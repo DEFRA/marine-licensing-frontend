@@ -215,6 +215,15 @@ export const config = convict({
       default: 'x-cdp-request-id',
       env: 'TRACING_HEADER'
     }
+  },
+  backend: {
+    apiUrl: {
+      doc: 'Endpoint for the backend API service',
+      format: String,
+      nullable: true,
+      default: 'http://localhost:3001',
+      env: 'MARINE_LICENSING_BACKEND_API_URL'
+    }
   }
 })
 

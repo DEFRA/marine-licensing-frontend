@@ -15,13 +15,12 @@ describe('#homeController', () => {
   })
 
   test('Should provide expected response', async () => {
-    const { result, statusCode } = await server.inject({
+    const { headers, statusCode } = await server.inject({
       method: 'GET',
       url: '/'
     })
-
-    expect(result).toEqual(expect.stringContaining('Home |'))
-    expect(statusCode).toBe(statusCodes.ok)
+    expect(statusCode).toBe(statusCodes.redirect)
+    expect(headers.location).toBe('/exemption')
   })
 })
 

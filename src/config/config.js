@@ -40,7 +40,7 @@ export const config = convict({
   serviceName: {
     doc: 'Applications Service Name',
     format: String,
-    default: 'marine-licensing-frontend'
+    default: 'Apply for a marine licence'
   },
   root: {
     doc: 'Project root',

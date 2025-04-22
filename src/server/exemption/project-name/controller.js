@@ -41,6 +41,7 @@ export const projectNameSubmitController = {
           json: true
         }
       )
+
       return h.view('exemption/project-name/index', {
         pageTitle: 'Project name',
         heading: 'Project Name'

@@ -5,11 +5,6 @@
 {% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
 
 {% block content %}
-  {{ appHeading({
-    text: heading,
-    caption: "Enter a descriptive name to help you find your project later"
-  }) }}
-
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
       <div class="govuk-body" data-testid="app-page-body">
@@ -24,7 +19,12 @@
         <form method="POST">
           {{ govukInput({
             label: {
-              text: "Project name"
+              text: "Project name",
+              classes: "govuk-label--l",
+              isPageHeading: true
+            },
+            hint: {
+              text: "Enter a descriptive name to help you find your project later"
             },
             errorMessage: {text: errorSummary.projectName.text } if errorSummary['projectName'],
             id: "projectName",

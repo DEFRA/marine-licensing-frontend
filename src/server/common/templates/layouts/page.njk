@@ -2,6 +2,8 @@
 
 {# Import GOVUK components globally #}
 {% from "govuk/components/breadcrumbs/macro.njk" import govukBreadcrumbs %}
+{% from "govuk/components/phase-banner/macro.njk" import govukPhaseBanner %}
+
 
 {# Import custom components globally #}
 {% from "heading/macro.njk" import appHeading %}
@@ -21,7 +23,6 @@
     serviceUrl: serviceUrl,
     useTudorCrown: true
   }) }}
-  {% include "partials/navigation/navigation.njk" %}
 {% endblock %}
 
 {% block pageTitle %}
@@ -34,6 +35,14 @@
       items: breadcrumbs
     }) }}
   {% endif %}
+
+  {{ govukPhaseBanner({
+    tag: {
+      text: "Beta"
+      },
+    html: 'This is a new service. Help us improve it and <a class="govuk-link" href="#">give your feedback (opens in a new tab)</a>.'
+  }) }}
+
 {% endblock %}
 
 {% block content %}{% endblock %}

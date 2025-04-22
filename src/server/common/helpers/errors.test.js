@@ -22,7 +22,7 @@ describe('#errors', () => {
     })
 
     expect(result).toEqual(
-      expect.stringContaining('Page not found | marine-licensing-frontend')
+      expect.stringContaining('Page not found | Apply for a marine licence')
     )
     expect(statusCode).toBe(statusCodes.notFound)
   })

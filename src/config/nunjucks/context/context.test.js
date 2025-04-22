@@ -42,7 +42,7 @@ describe('#context', () => {
             url: '/'
           }
         ],
-        serviceName: 'marine-licensing-frontend',
+        serviceName: 'Apply for a marine licence',
         serviceUrl: '/'
       })
     })
@@ -126,7 +126,7 @@ describe('#context cache', () => {
             url: '/'
           }
         ],
-        serviceName: 'marine-licensing-frontend',
+        serviceName: 'Apply for a marine licence',
         serviceUrl: '/'
       })
     })

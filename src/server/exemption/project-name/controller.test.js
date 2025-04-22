@@ -30,12 +30,25 @@ describe('#projectNameController', () => {
   test('Should provide expected response with valid data', async () => {
     const { result, statusCode } = await server.inject({
       method: 'POST',
-      url: '/exemption/project-name'
+      url: '/exemption/project-name',
+      payload: { projectName: 'Project name' }
     })
 
     expect(result).toEqual(
       expect.stringContaining(`Project name | ${config.get('serviceName')}`)
     )
+    expect(statusCode).toBe(statusCodes.ok)
+  })
+
+  test('Should shoew error messages with invalid data', async () => {
+    const { result, statusCode } = await server.inject({
+      method: 'POST',
+      url: '/exemption/project-name',
+      payload: { projectName: '' }
+    })
+
+    expect(result).toEqual(expect.stringContaining(`Enter the project name`))
+
     expect(statusCode).toBe(statusCodes.ok)
   })
 })

@@ -1,5 +1,8 @@
 import { config } from '~/src/config/config.js'
-import { errorDescriptionByFieldName } from '~/src/server/exemption/project-name/utils.js'
+import {
+  errorDescriptionByFieldName,
+  mapErrorMessage
+} from '~/src/server/exemption/project-name/utils.js'
 import Wreck from '@hapi/wreck'
 
 /**
@@ -12,17 +15,6 @@ export const projectNameController = {
       pageTitle: 'Project name',
       heading: 'Project Name'
     })
-  }
-}
-
-const mapErrorMessage = (error) => {
-  switch (error) {
-    case 'PROJECT_NAME_REQUIRED':
-      return 'Enter the project name'
-    case 'PROJECT_NAME_MAX_LENGTH':
-      return 'Project name should be 250 characters or fewer'
-    default:
-      return 'Enter the project name'
   }
 }
 
@@ -47,7 +39,7 @@ export const projectNameSubmitController = {
         heading: 'Project Name'
       })
     } catch (e) {
-      const { details } = e.data.payload.validation ?? []
+      const { details } = e.data.payload.validation
 
       const errors = details.map((error) => ({
         href: `#${error.field}`,
@@ -60,6 +52,7 @@ export const projectNameSubmitController = {
       return h.view('exemption/project-name/index', {
         pageTitle: 'Project name',
         heading: 'Project Name',
+        payload,
         errors,
         errorSummary
       })

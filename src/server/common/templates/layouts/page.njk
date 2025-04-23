@@ -3,7 +3,7 @@
 {# Import GOVUK components globally #}
 {% from "govuk/components/breadcrumbs/macro.njk" import govukBreadcrumbs %}
 {% from "govuk/components/phase-banner/macro.njk" import govukPhaseBanner %}
-
+{% from "govuk/components/service-navigation/macro.njk" import govukServiceNavigation %}
 
 {# Import custom components globally #}
 {% from "heading/macro.njk" import appHeading %}
@@ -17,11 +17,14 @@
 {% block header %}
   {{ govukHeader({
     homepageUrl: "https://www.gov.uk/",
-    classes: "app-header",
-    containerClasses: "govuk-width-container",
-    serviceName: serviceName,
+    classes: "govuk-header--full-width-border",
     serviceUrl: serviceUrl,
     useTudorCrown: true
+  }) }}
+
+  {{ govukServiceNavigation({
+    serviceName: serviceName,
+    serviceUrl: ""
   }) }}
 {% endblock %}
 
@@ -40,7 +43,7 @@
     tag: {
       text: "Beta"
       },
-    html: 'This is a new service. Help us improve it and <a class="govuk-link" href="#">give your feedback (opens in a new tab)</a>.'
+    html: 'This is a new service. Help us improve it and <a class="govuk-link" href="#">give your feedback (opens in new tab)</a>.'
   }) }}
 
 {% endblock %}

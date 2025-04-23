@@ -40,7 +40,7 @@ describe('#projectNameController/utils', () => {
   })
 
   describe('#projectNameController/utils/mapErrorMessage', () => {
-    test('return correct error message for PROJECT_NAME_REQUIRED', () => {
+    test('return input value if no error is specified', () => {
       const result = mapErrorMessage('Error')
       expect(result).toBe('Error')
     })

@@ -17,7 +17,7 @@ export const exemption = {
         {
           method: 'GET',
           path: '/exemption',
-          handler: (request, h) => {
+          handler: (_request, h) => {
             return h.redirect('/exemption/project-name')
           }
         }

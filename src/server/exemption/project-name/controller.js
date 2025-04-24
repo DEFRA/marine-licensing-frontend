@@ -3,15 +3,20 @@ import { mapErrorMessage } from '~/src/server/exemption/project-name/utils.js'
 import { errorDescriptionByFieldName } from '~/src/server/common/helpers/errors.js'
 import Wreck from '@hapi/wreck'
 
+const projectNameViewRoute = 'exemption/project-name/index'
+const projectNameViewSettings = {
+  pageTitle: 'Project name',
+  heading: 'Project Name'
+}
+
 /**
  * A GDS styled project name page controller.
  * @satisfies {Partial<ServerRoute>}
  */
 export const projectNameController = {
   handler(_request, h) {
-    return h.view('exemption/project-name/index', {
-      pageTitle: 'Project name',
-      heading: 'Project Name'
+    return h.view(projectNameViewRoute, {
+      ...projectNameViewSettings
     })
   }
 }
@@ -32,9 +37,8 @@ export const projectNameSubmitController = {
         }
       )
 
-      return h.view('exemption/project-name/index', {
-        pageTitle: 'Project name',
-        heading: 'Project Name'
+      return h.view(projectNameViewRoute, {
+        ...projectNameViewSettings
       })
     } catch (e) {
       const { details } = e.data.payload.validation
@@ -47,9 +51,8 @@ export const projectNameSubmitController = {
 
       const errorSummary = errorDescriptionByFieldName(errors)
 
-      return h.view('exemption/project-name/index', {
-        pageTitle: 'Project name',
-        heading: 'Project Name',
+      return h.view(projectNameViewRoute, {
+        ...projectNameViewSettings,
         payload,
         errors,
         errorSummary

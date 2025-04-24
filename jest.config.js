@@ -16,7 +16,7 @@ export default {
     '<rootDir>/node_modules/',
     '<rootDir>/.server',
     '<rootDir>/.public',
-    '<rootDir>/src/server/common/test-helpers',
+    '<rootDir>/src/server/test-helpers',
     '<rootDir>/src/client/javascripts/application.js',
     '<rootDir>/src/index.js',
     'index.js'

@@ -1,6 +1,6 @@
 services:
 
-  your-frontend:
+  marine-licensing-frontend:
     build: ./
     ports:
       - '3000:3000'

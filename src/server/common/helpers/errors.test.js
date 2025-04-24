@@ -1,6 +1,9 @@
 import { createServer } from '~/src/server/index.js'
 import { statusCodes } from '~/src/server/common/constants/status-codes.js'
-import { catchAll } from '~/src/server/common/helpers/errors.js'
+import {
+  catchAll,
+  errorDescriptionByFieldName
+} from '~/src/server/common/helpers/errors.js'
 
 describe('#errors', () => {
   /** @type {Server} */
@@ -121,6 +124,41 @@ describe('#catchAll', () => {
     expect(mockToolkitCode).toHaveBeenCalledWith(
       statusCodes.internalServerError
     )
+  })
+})
+
+describe('errorDescriptionByFieldName', () => {
+  test('return error formatted correctly for front end display', () => {
+    const result = errorDescriptionByFieldName()
+    expect(result).toEqual({})
+  })
+
+  test('return empty array when no data is provided', () => {
+    const result = errorDescriptionByFieldName([
+      {
+        href: '#test',
+        text: 'Test text',
+        field: 'test'
+      },
+      {
+        href: '#test2',
+        text: 'Test text 2',
+        field: 'test2'
+      }
+    ])
+
+    expect(result).toEqual({
+      test: {
+        href: '#test',
+        text: 'Test text',
+        field: 'test'
+      },
+      test2: {
+        href: '#test2',
+        text: 'Test text 2',
+        field: 'test2'
+      }
+    })
   })
 })
 

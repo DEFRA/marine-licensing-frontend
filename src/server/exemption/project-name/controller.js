@@ -1,8 +1,6 @@
 import { config } from '~/src/config/config.js'
-import {
-  errorDescriptionByFieldName,
-  mapErrorMessage
-} from '~/src/server/exemption/project-name/utils.js'
+import { mapErrorMessage } from '~/src/server/exemption/project-name/utils.js'
+import { errorDescriptionByFieldName } from '~/src/server/common/helpers/errors.js'
 import Wreck from '@hapi/wreck'
 
 /**

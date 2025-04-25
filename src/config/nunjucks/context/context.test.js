@@ -40,14 +40,9 @@ describe('#context', () => {
             isActive: true,
             text: 'Home',
             url: '/'
-          },
-          {
-            isActive: false,
-            text: 'About',
-            url: '/about'
           }
         ],
-        serviceName: 'marine-licensing-frontend',
+        serviceName: 'Apply for a marine licence',
         serviceUrl: '/'
       })
     })
@@ -129,14 +124,9 @@ describe('#context cache', () => {
             isActive: true,
             text: 'Home',
             url: '/'
-          },
-          {
-            isActive: false,
-            text: 'About',
-            url: '/about'
           }
         ],
-        serviceName: 'marine-licensing-frontend',
+        serviceName: 'Apply for a marine licence',
         serviceUrl: '/'
       })
     })

@@ -46,5 +46,16 @@ export function catchAll(request, h) {
 }
 
 /**
- * @import { Request, ResponseToolkit } from '@hapi/hapi'
+ * Outputs all errors to an object with the field name as the key
+ * @param { ValidationError[] } errors
+ */
+export const errorDescriptionByFieldName = (errors = []) => {
+  return errors.reduce((error, obj) => {
+    error[obj.field] = obj
+    return error
+  }, {})
+}
+
+/**
+ * @import { Request, ResponseToolkit, ValidationError } from '@hapi/hapi'
  */

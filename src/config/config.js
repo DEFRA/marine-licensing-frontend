@@ -40,7 +40,7 @@ export const config = convict({
   serviceName: {
     doc: 'Applications Service Name',
     format: String,
-    default: 'marine-licensing-frontend'
+    default: 'Apply for a marine licence'
   },
   root: {
     doc: 'Project root',
@@ -214,6 +214,15 @@ export const config = convict({
       format: String,
       default: 'x-cdp-request-id',
       env: 'TRACING_HEADER'
+    }
+  },
+  backend: {
+    apiUrl: {
+      doc: 'Endpoint for the backend API service',
+      format: String,
+      nullable: true,
+      default: 'http://localhost:3001',
+      env: 'MARINE_LICENSING_BACKEND_API_URL'
     }
   }
 })

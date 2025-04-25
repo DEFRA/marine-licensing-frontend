@@ -1,0 +1,44 @@
+{% extends 'layouts/page.njk' %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/warning-text/macro.njk" import govukWarningText %}
+{% from "govuk/components/input/macro.njk" import govukInput %}
+{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+
+{% block content %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+      <div class="govuk-body" data-testid="app-page-body">
+
+        {% if errors %}
+            {{ govukErrorSummary({
+                  titleText: "There is a problem",
+                  errorList: errors
+            }) }}
+        {% endif %}
+
+        <form method="POST">
+          {{ govukInput({
+            label: {
+              text: "Project name",
+              classes: "govuk-label--l",
+              isPageHeading: true
+            },
+            hint: {
+              text: "Enter a descriptive name to help you find your project later"
+            },
+            errorMessage: {text: errorSummary.projectName.text } if errorSummary['projectName'],
+            id: "projectName",
+            name: "projectName",
+            value: payload.projectName
+          }) }}
+
+          {{ govukButton({
+            text: "Save and continue",
+            classes: "govuk-button--primary"
+          }) }}
+        </form>
+      </div>
+    </div>
+  </div>
+
+{% endblock %}

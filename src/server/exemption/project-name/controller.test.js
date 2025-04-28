@@ -134,6 +134,8 @@ describe('#projectNameController', () => {
     projectNameSubmitController.options.validate.failAction(request, h, err)
 
     expect(h.view).toHaveBeenCalledWith('exemption/project-name/index', {
+      heading: "Project Name",
+      pageTitle: "Project name",
       payload: { projectName: '' },
       errors: [
         {
@@ -168,6 +170,8 @@ describe('#projectNameController', () => {
     projectNameSubmitController.options.validate.failAction(request, h, {})
 
     expect(h.view).toHaveBeenCalledWith('exemption/project-name/index', {
+      heading: "Project Name",
+      pageTitle: "Project name",
       payload: { projectName: '' }
     })
 

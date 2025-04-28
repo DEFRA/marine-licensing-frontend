@@ -38,7 +38,9 @@ export const projectNameSubmitController = {
         const { payload } = request
 
         if (!err.details) {
-          return h.view(projectNameViewRoute, { ...projectNameViewSettings, payload }).takeover()
+          return h
+            .view(projectNameViewRoute, { ...projectNameViewSettings, payload })
+            .takeover()
         }
 
         const errors = err.details.map((error) => ({
@@ -50,7 +52,12 @@ export const projectNameSubmitController = {
         const errorSummary = errorDescriptionByFieldName(errors)
 
         return h
-          .view(projectNameViewRoute, { ...projectNameViewSettings, payload, errors, errorSummary })
+          .view(projectNameViewRoute, {
+            ...projectNameViewSettings,
+            payload,
+            errors,
+            errorSummary
+          })
           .takeover()
       }
     }

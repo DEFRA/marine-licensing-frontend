@@ -3,6 +3,7 @@ import { statusCodes } from '~/src/server/common/constants/status-codes.js'
 import { config } from '~/src/config/config.js'
 import Wreck from '@hapi/wreck'
 import { JSDOM } from 'jsdom'
+import { projectNameSubmitController } from '~/src/server/exemption/project-name/controller.js'
 
 describe('#projectNameController', () => {
   /** @type {Server} */
@@ -89,7 +90,7 @@ describe('#projectNameController', () => {
     const { result, statusCode } = await server.inject({
       method: 'POST',
       url: '/exemption/project-name',
-      payload: { projectName: '' }
+      payload: { projectName: 'test' }
     })
 
     expect(result).toEqual(expect.stringContaining(`Enter the project name`))
@@ -107,6 +108,66 @@ describe('#projectNameController', () => {
     expect(document.querySelector('.govuk-error-summary')).toBeTruthy()
 
     expect(statusCode).toBe(statusCodes.ok)
+  })
+
+  test('Should correctly validate on empty data', () => {
+    const request = {
+      payload: { projectName: '' }
+    }
+
+    const h = {
+      view: jest.fn().mockReturnValue({
+        takeover: jest.fn()
+      })
+    }
+
+    const err = {
+      details: [
+        {
+          path: ['projectName'],
+          message: 'TEST',
+          type: 'string.empty'
+        }
+      ]
+    }
+
+    projectNameSubmitController.options.validate.failAction(request, h, err)
+
+    expect(h.view).toHaveBeenCalledWith('exemption/project-name/index', {
+      payload: { projectName: '' },
+      errors: [
+        {
+          href: '#projectName',
+          text: 'TEST',
+          field: ['projectName']
+        }
+      ],
+      errorSummary: {
+        projectName: {
+          field: ['projectName'],
+          href: '#projectName',
+          text: 'TEST'
+        }
+      }
+    })
+
+    expect(h.view().takeover).toHaveBeenCalled()
+  })
+
+  test('Should show error messages without calling the back end when payload data is empty', async () => {
+    const apiPostMock = jest.spyOn(Wreck, 'post')
+
+    const { result } = await server.inject({
+      method: 'POST',
+      url: '/exemption/project-name',
+      payload: { projectName: '' }
+    })
+
+    expect(apiPostMock).not.toHaveBeenCalled()
+
+    const { document } = new JSDOM(result).window
+
+    expect(document.querySelector('.govuk-error-summary')).toBeTruthy()
   })
 })
 

@@ -2,6 +2,7 @@ import { config } from '~/src/config/config.js'
 import { mapErrorMessage } from '~/src/server/exemption/project-name/utils.js'
 import { errorDescriptionByFieldName } from '~/src/server/common/helpers/errors.js'
 import Wreck from '@hapi/wreck'
+import joi from 'joi'
 
 const projectNameViewRoute = 'exemption/project-name/index'
 const projectNameViewSettings = {
@@ -26,6 +27,30 @@ export const projectNameController = {
  * @satisfies {Partial<ServerRoute>}
  */
 export const projectNameSubmitController = {
+  options: {
+    validate: {
+      payload: joi.object({
+        projectName: joi.string().min(1).required().messages({
+          'string.empty': 'PROJECT_NAME_REQUIRED'
+        })
+      }),
+      failAction: (request, h, err) => {
+        const { payload } = request
+
+        const errors = err.details.map((error) => ({
+          href: `#${error.path}`,
+          text: mapErrorMessage(error.message),
+          field: error.path
+        }))
+
+        const errorSummary = errorDescriptionByFieldName(errors)
+
+        return h
+          .view(projectNameViewRoute, { payload, errors, errorSummary })
+          .takeover()
+      }
+    }
+  },
   async handler(request, h) {
     const { payload } = request
     try {

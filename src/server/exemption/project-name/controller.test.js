@@ -154,6 +154,26 @@ describe('#projectNameController', () => {
     expect(h.view().takeover).toHaveBeenCalled()
   })
 
+  test('Should correctly validate on empty data and handle a scenario where error details are missing', () => {
+    const request = {
+      payload: { projectName: '' }
+    }
+
+    const h = {
+      view: jest.fn().mockReturnValue({
+        takeover: jest.fn()
+      })
+    }
+
+    projectNameSubmitController.options.validate.failAction(request, h, {})
+
+    expect(h.view).toHaveBeenCalledWith('exemption/project-name/index', {
+      payload: { projectName: '' }
+    })
+
+    expect(h.view().takeover).toHaveBeenCalled()
+  })
+
   test('Should show error messages without calling the back end when payload data is empty', async () => {
     const apiPostMock = jest.spyOn(Wreck, 'post')
 

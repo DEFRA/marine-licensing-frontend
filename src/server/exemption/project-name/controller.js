@@ -37,6 +37,10 @@ export const projectNameSubmitController = {
       failAction: (request, h, err) => {
         const { payload } = request
 
+        if (!err.details) {
+          return h.view(projectNameViewRoute, { payload }).takeover()
+        }
+
         const errors = err.details.map((error) => ({
           href: `#${error.path}`,
           text: mapErrorMessage(error.message),

@@ -137,14 +137,14 @@ describe('#projectNameController', () => {
       heading: 'Project Name',
       pageTitle: 'Project name',
       payload: { projectName: '' },
-      errors: [
+      errorSummary: [
         {
           href: '#projectName',
           text: 'TEST',
           field: ['projectName']
         }
       ],
-      errorSummary: {
+      errors: {
         projectName: {
           field: ['projectName'],
           href: '#projectName',

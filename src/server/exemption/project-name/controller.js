@@ -1,8 +1,15 @@
 import { config } from '~/src/config/config.js'
-import { mapErrorMessage } from '~/src/server/exemption/project-name/utils.js'
-import { errorDescriptionByFieldName } from '~/src/server/common/helpers/errors.js'
+import {
+  errorDescriptionByFieldName,
+  mapErrorsForDisplay
+} from '~/src/server/common/helpers/errors.js'
 import Wreck from '@hapi/wreck'
 import joi from 'joi'
+
+const errorMessages = {
+  PROJECT_NAME_REQUIRED: 'Enter the project name',
+  PROJECT_NAME_MAX_LENGTH: 'Project name should be 250 characters or less'
+}
 
 const projectNameViewRoute = 'exemption/project-name/index'
 const projectNameViewSettings = {
@@ -43,13 +50,9 @@ export const projectNameSubmitController = {
             .takeover()
         }
 
-        const errors = err.details.map((error) => ({
-          href: `#${error.path}`,
-          text: mapErrorMessage(error.message),
-          field: error.path
-        }))
+        const errorSummary = mapErrorsForDisplay(err.details, errorMessages)
 
-        const errorSummary = errorDescriptionByFieldName(errors)
+        const errors = errorDescriptionByFieldName(errorSummary)
 
         return h
           .view(projectNameViewRoute, {
@@ -79,13 +82,9 @@ export const projectNameSubmitController = {
     } catch (e) {
       const { details } = e.data.payload.validation
 
-      const errors = details.map((error) => ({
-        href: `#${error.field}`,
-        text: mapErrorMessage(error.message),
-        field: error.field
-      }))
+      const errorSummary = mapErrorsForDisplay(details, errorMessages)
 
-      const errorSummary = errorDescriptionByFieldName(errors)
+      const errors = errorDescriptionByFieldName(errorSummary)
 
       return h.view(projectNameViewRoute, {
         ...projectNameViewSettings,

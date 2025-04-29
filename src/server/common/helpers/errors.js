@@ -61,7 +61,7 @@ export const errorDescriptionByFieldName = (errors = []) => {
  * @param { ValidationError[] } errors
  * @param { {[key: string]: string} } messages
  */
-export const mapErrorsForDisplay = (errors = [], messages) =>
+export const mapErrorsForDisplay = (errors = [], messages = {}) =>
   errors.map((error) => {
     const field = error.field || error.path
     return {

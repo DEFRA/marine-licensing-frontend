@@ -1,20 +1,11 @@
-import { projectNameRoutes } from '~/src/server/exemption/project-name/index.js'
+import { taskListRoutes } from '~/src/server/exemption/task-list/index.js'
 
-describe('projectNameRoutes routes', () => {
+describe('taskList routes', () => {
   test('get route is formatted correctly', () => {
-    expect(projectNameRoutes[0]).toEqual(
+    expect(taskListRoutes[0]).toEqual(
       expect.objectContaining({
         method: 'GET',
-        path: '/exemption/project-name'
-      })
-    )
-  })
-
-  test('post route is formatted correctly', () => {
-    expect(projectNameRoutes[1]).toEqual(
-      expect.objectContaining({
-        method: 'POST',
-        path: '/exemption/project-name'
+        path: '/exemption/task-list'
       })
     )
   })

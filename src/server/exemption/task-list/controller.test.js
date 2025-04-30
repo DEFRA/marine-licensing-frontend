@@ -3,11 +3,16 @@ import { statusCodes } from '~/src/server/common/constants/status-codes.js'
 import { config } from '~/src/config/config.js'
 import { JSDOM } from 'jsdom'
 import * as cacheUtils from '~/src/server/common/helpers/session-cache/utils.js'
-import { TASK_LIST_ROUTE } from '~/src/server/exemption/task-list/controller.js'
+import {
+  taskListController,
+  TASK_LIST_ROUTE,
+  TASK_LIST_VIEW_ROUTE
+} from '~/src/server/exemption/task-list/controller.js'
 
 describe('#taskListController', () => {
   /** @type {Server} */
   let server
+  let getExemptionCacheSpy
 
   const mockExemptionState = { projectName: 'Test Project' }
 
@@ -18,7 +23,7 @@ describe('#taskListController', () => {
 
   beforeEach(() => {
     jest.resetAllMocks()
-    jest
+    getExemptionCacheSpy = jest
       .spyOn(cacheUtils, 'getExemptionCache')
       .mockReturnValue(mockExemptionState)
   })
@@ -48,6 +53,28 @@ describe('#taskListController', () => {
     ).toBe('Project name')
 
     expect(statusCode).toBe(statusCodes.ok)
+  })
+
+  it('taskListController handler should render with correct context', () => {
+    const h = { view: jest.fn() }
+
+    taskListController.handler({}, h)
+
+    expect(h.view).toHaveBeenCalledWith(TASK_LIST_VIEW_ROUTE, {
+      pageTitle: 'Task list',
+      heading: 'Task list',
+      projectName: 'Test Project'
+    })
+
+    getExemptionCacheSpy.mockResolvedValueOnce(null)
+
+    taskListController.handler({}, h)
+
+    expect(h.view).toHaveBeenNthCalledWith(2, TASK_LIST_VIEW_ROUTE, {
+      pageTitle: 'Task list',
+      heading: 'Task list',
+      projectName: undefined
+    })
   })
 })
 

@@ -1,9 +1,19 @@
 import { config } from '~/src/config/config.js'
-import { mapErrorMessage } from '~/src/server/exemption/project-name/utils.js'
-import { errorDescriptionByFieldName } from '~/src/server/common/helpers/errors.js'
+import {
+  errorDescriptionByFieldName,
+  mapErrorsForDisplay
+} from '~/src/server/common/helpers/errors.js'
 import Wreck from '@hapi/wreck'
+import joi from 'joi'
 
-const projectNameViewRoute = 'exemption/project-name/index'
+const errorMessages = {
+  PROJECT_NAME_REQUIRED: 'Enter the project name',
+  PROJECT_NAME_MAX_LENGTH: 'Project name should be 250 characters or less'
+}
+
+export const PROJECT_NAME_ROUTE = '/exemption/project-name'
+export const PROJECT_NAME_VIEW_ROUTE = 'exemption/project-name/index'
+
 const projectNameViewSettings = {
   pageTitle: 'Project name',
   heading: 'Project Name'
@@ -15,7 +25,7 @@ const projectNameViewSettings = {
  */
 export const projectNameController = {
   handler(_request, h) {
-    return h.view(projectNameViewRoute, {
+    return h.view(PROJECT_NAME_VIEW_ROUTE, {
       ...projectNameViewSettings
     })
   }
@@ -26,6 +36,40 @@ export const projectNameController = {
  * @satisfies {Partial<ServerRoute>}
  */
 export const projectNameSubmitController = {
+  options: {
+    validate: {
+      payload: joi.object({
+        projectName: joi.string().min(1).required().messages({
+          'string.empty': 'PROJECT_NAME_REQUIRED'
+        })
+      }),
+      failAction: (request, h, err) => {
+        const { payload } = request
+
+        if (!err.details) {
+          return h
+            .view(PROJECT_NAME_VIEW_ROUTE, {
+              ...projectNameViewSettings,
+              payload
+            })
+            .takeover()
+        }
+
+        const errorSummary = mapErrorsForDisplay(err.details, errorMessages)
+
+        const errors = errorDescriptionByFieldName(errorSummary)
+
+        return h
+          .view(PROJECT_NAME_VIEW_ROUTE, {
+            ...projectNameViewSettings,
+            payload,
+            errors,
+            errorSummary
+          })
+          .takeover()
+      }
+    }
+  },
   async handler(request, h) {
     const { payload } = request
     try {
@@ -37,21 +81,17 @@ export const projectNameSubmitController = {
         }
       )
 
-      return h.view(projectNameViewRoute, {
+      return h.view(PROJECT_NAME_VIEW_ROUTE, {
         ...projectNameViewSettings
       })
     } catch (e) {
       const { details } = e.data.payload.validation
 
-      const errors = details.map((error) => ({
-        href: `#${error.field}`,
-        text: mapErrorMessage(error.message),
-        field: error.field
-      }))
+      const errorSummary = mapErrorsForDisplay(details, errorMessages)
 
-      const errorSummary = errorDescriptionByFieldName(errors)
+      const errors = errorDescriptionByFieldName(errorSummary)
 
-      return h.view(projectNameViewRoute, {
+      return h.view(PROJECT_NAME_VIEW_ROUTE, {
         ...projectNameViewSettings,
         payload,
         errors,

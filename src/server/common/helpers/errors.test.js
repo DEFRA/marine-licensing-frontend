@@ -2,7 +2,8 @@ import { createServer } from '~/src/server/index.js'
 import { statusCodes } from '~/src/server/common/constants/status-codes.js'
 import {
   catchAll,
-  errorDescriptionByFieldName
+  errorDescriptionByFieldName,
+  mapErrorsForDisplay
 } from '~/src/server/common/helpers/errors.js'
 
 describe('#errors', () => {
@@ -159,6 +160,47 @@ describe('errorDescriptionByFieldName', () => {
         field: 'test2'
       }
     })
+  })
+})
+
+describe('mapErrorsForDisplay', () => {
+  test('return correct error message format for error summary', () => {
+    const messages = {
+      PROJECT_NAME_REQUIRED: 'Enter the project name',
+      PROJECT_NAME_MAX_LENGTH: 'Project name should be 250 characters or less'
+    }
+
+    const result = mapErrorsForDisplay(
+      [
+        { message: 'PROJECT_NAME_REQUIRED', path: 'projectName' },
+        { message: 'PROJECT_NAME_MAX_LENGTH', path: 'testField2' }
+      ],
+      messages
+    )
+
+    expect(result).toStrictEqual([
+      {
+        href: '#projectName',
+        text: 'Enter the project name',
+        field: 'projectName'
+      },
+      {
+        href: '#testField2',
+        text: 'Project name should be 250 characters or less',
+        field: 'testField2'
+      }
+    ])
+  })
+
+  test('can handle empty input array', () => {
+    const result = mapErrorsForDisplay()
+    expect(result).toEqual([])
+  })
+
+  it('returns h.continue for non-Boom response', () => {
+    const h = {}
+    const result = catchAll({ response: {} }, h)
+    expect(result).toBe(h.continue)
   })
 })
 

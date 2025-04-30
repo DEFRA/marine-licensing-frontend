@@ -12,7 +12,7 @@
         {% if errors %}
             {{ govukErrorSummary({
                   titleText: "There is a problem",
-                  errorList: errors
+                  errorList: errorSummary
             }) }}
         {% endif %}
 
@@ -26,7 +26,7 @@
             hint: {
               text: "Enter a descriptive name to help you find your project later"
             },
-            errorMessage: {text: errorSummary.projectName.text } if errorSummary['projectName'],
+            errorMessage: errors['projectName'],
             id: "projectName",
             name: "projectName",
             value: payload.projectName

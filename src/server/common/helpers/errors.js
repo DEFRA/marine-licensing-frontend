@@ -57,5 +57,20 @@ export const errorDescriptionByFieldName = (errors = []) => {
 }
 
 /**
+ * Format errors for error summary component
+ * @param { ValidationError[] } errors
+ * @param { {[key: string]: string} } messages
+ */
+export const mapErrorsForDisplay = (errors = [], messages = {}) =>
+  errors.map((error) => {
+    const field = error.field || error.path
+    return {
+      href: `#${field}`,
+      text: messages[error.message] ?? error.message,
+      field
+    }
+  })
+
+/**
  * @import { Request, ResponseToolkit, ValidationError } from '@hapi/hapi'
  */

@@ -196,6 +196,12 @@ describe('mapErrorsForDisplay', () => {
     const result = mapErrorsForDisplay()
     expect(result).toEqual([])
   })
+
+  it('returns h.continue for non-Boom response', () => {
+    const h = {}
+    const result = catchAll({ response: {} }, h)
+    expect(result).toBe(h.continue)
+  })
 })
 
 /**

@@ -11,7 +11,9 @@ const errorMessages = {
   PROJECT_NAME_MAX_LENGTH: 'Project name should be 250 characters or less'
 }
 
-const projectNameViewRoute = 'exemption/project-name/index'
+export const PROJECT_NAME_ROUTE = '/exemption/project-name'
+export const PROJECT_NAME_VIEW_ROUTE = 'exemption/project-name/index'
+
 const projectNameViewSettings = {
   pageTitle: 'Project name',
   heading: 'Project Name'
@@ -23,7 +25,7 @@ const projectNameViewSettings = {
  */
 export const projectNameController = {
   handler(_request, h) {
-    return h.view(projectNameViewRoute, {
+    return h.view(PROJECT_NAME_VIEW_ROUTE, {
       ...projectNameViewSettings
     })
   }
@@ -46,7 +48,10 @@ export const projectNameSubmitController = {
 
         if (!err.details) {
           return h
-            .view(projectNameViewRoute, { ...projectNameViewSettings, payload })
+            .view(PROJECT_NAME_VIEW_ROUTE, {
+              ...projectNameViewSettings,
+              payload
+            })
             .takeover()
         }
 
@@ -55,7 +60,7 @@ export const projectNameSubmitController = {
         const errors = errorDescriptionByFieldName(errorSummary)
 
         return h
-          .view(projectNameViewRoute, {
+          .view(PROJECT_NAME_VIEW_ROUTE, {
             ...projectNameViewSettings,
             payload,
             errors,
@@ -76,7 +81,7 @@ export const projectNameSubmitController = {
         }
       )
 
-      return h.view(projectNameViewRoute, {
+      return h.view(PROJECT_NAME_VIEW_ROUTE, {
         ...projectNameViewSettings
       })
     } catch (e) {
@@ -86,7 +91,7 @@ export const projectNameSubmitController = {
 
       const errors = errorDescriptionByFieldName(errorSummary)
 
-      return h.view(projectNameViewRoute, {
+      return h.view(PROJECT_NAME_VIEW_ROUTE, {
         ...projectNameViewSettings,
         payload,
         errors,

@@ -3,7 +3,12 @@ import { statusCodes } from '~/src/server/common/constants/status-codes.js'
 import { config } from '~/src/config/config.js'
 import Wreck from '@hapi/wreck'
 import { JSDOM } from 'jsdom'
-import { projectNameSubmitController } from '~/src/server/exemption/project-name/controller.js'
+import {
+  projectNameSubmitController,
+  projectNameController,
+  PROJECT_NAME_ROUTE,
+  PROJECT_NAME_VIEW_ROUTE
+} from '~/src/server/exemption/project-name/controller.js'
 
 describe('#projectNameController', () => {
   /** @type {Server} */
@@ -25,7 +30,7 @@ describe('#projectNameController', () => {
   test('Should provide expected response', async () => {
     const { result, statusCode } = await server.inject({
       method: 'GET',
-      url: '/exemption/project-name'
+      url: PROJECT_NAME_ROUTE
     })
 
     expect(result).toEqual(
@@ -43,9 +48,14 @@ describe('#projectNameController', () => {
 
     const { result, statusCode } = await server.inject({
       method: 'POST',
-      url: '/exemption/project-name',
+      url: PROJECT_NAME_ROUTE,
       payload: { projectName: 'Project name' }
     })
+
+    expect(Wreck.post).toHaveBeenCalledWith(
+      `${config.get('backend').apiUrl}/exemption/project-name`,
+      { payload: { projectName: 'Project name' }, json: true }
+    )
 
     expect(result).toEqual(
       expect.stringContaining(`Project name | ${config.get('serviceName')}`)
@@ -64,6 +74,17 @@ describe('#projectNameController', () => {
     expect(button.textContent.trim()).toBe('Save and continue')
 
     expect(statusCode).toBe(statusCodes.ok)
+  })
+
+  it('projectNameController handler should render with correct context', () => {
+    const h = { view: jest.fn() }
+
+    projectNameController.handler({}, h)
+
+    expect(h.view).toHaveBeenCalledWith(PROJECT_NAME_VIEW_ROUTE, {
+      pageTitle: 'Project name',
+      heading: 'Project Name'
+    })
   })
 
   test('Should show error messages with invalid data', async () => {
@@ -89,7 +110,7 @@ describe('#projectNameController', () => {
 
     const { result, statusCode } = await server.inject({
       method: 'POST',
-      url: '/exemption/project-name',
+      url: PROJECT_NAME_ROUTE,
       payload: { projectName: 'test' }
     })
 
@@ -133,7 +154,7 @@ describe('#projectNameController', () => {
 
     projectNameSubmitController.options.validate.failAction(request, h, err)
 
-    expect(h.view).toHaveBeenCalledWith('exemption/project-name/index', {
+    expect(h.view).toHaveBeenCalledWith(PROJECT_NAME_VIEW_ROUTE, {
       heading: 'Project Name',
       pageTitle: 'Project name',
       payload: { projectName: '' },
@@ -156,6 +177,32 @@ describe('#projectNameController', () => {
     expect(h.view().takeover).toHaveBeenCalled()
   })
 
+  test('Should correctly handle an incorrectly formed error object', () => {
+    const request = {
+      payload: { projectName: '' }
+    }
+
+    const h = {
+      view: jest.fn().mockReturnValue({
+        takeover: jest.fn()
+      })
+    }
+
+    const err = {
+      details: null
+    }
+
+    projectNameSubmitController.options.validate.failAction(request, h, err)
+
+    expect(h.view).toHaveBeenCalledWith(PROJECT_NAME_VIEW_ROUTE, {
+      heading: 'Project Name',
+      pageTitle: 'Project name',
+      payload: { projectName: '' }
+    })
+
+    expect(h.view().takeover).toHaveBeenCalled()
+  })
+
   test('Should correctly validate on empty data and handle a scenario where error details are missing', () => {
     const request = {
       payload: { projectName: '' }
@@ -169,7 +216,7 @@ describe('#projectNameController', () => {
 
     projectNameSubmitController.options.validate.failAction(request, h, {})
 
-    expect(h.view).toHaveBeenCalledWith('exemption/project-name/index', {
+    expect(h.view).toHaveBeenCalledWith(PROJECT_NAME_VIEW_ROUTE, {
       heading: 'Project Name',
       pageTitle: 'Project name',
       payload: { projectName: '' }
@@ -183,7 +230,7 @@ describe('#projectNameController', () => {
 
     const { result } = await server.inject({
       method: 'POST',
-      url: '/exemption/project-name',
+      url: PROJECT_NAME_ROUTE,
       payload: { projectName: '' }
     })
 

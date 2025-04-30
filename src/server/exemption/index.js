@@ -1,4 +1,5 @@
 import { projectNameRoutes } from '~/src/server/exemption/project-name/index.js'
+import { taskListRoutes } from '~/src/server/exemption/task-list/index.js'
 
 /**
  * Sets up the routes used in the exemption home page.
@@ -14,6 +15,7 @@ export const exemption = {
     register(server) {
       server.route([
         ...projectNameRoutes,
+        ...taskListRoutes,
         {
           method: 'GET',
           path: '/exemption',

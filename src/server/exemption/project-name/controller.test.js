@@ -56,6 +56,25 @@ describe('#projectNameController', () => {
     expect(statusCode).toBe(statusCodes.ok)
   })
 
+  test('Should provide expected response and correctly not pre populate data if it is not present', async () => {
+    getExemptionCacheSpy.mockResolvedValueOnce({})
+
+    const { result, statusCode } = await server.inject({
+      method: 'GET',
+      url: PROJECT_NAME_ROUTE
+    })
+
+    expect(result).toEqual(
+      expect.stringContaining(`Project name | ${config.get('serviceName')}`)
+    )
+
+    const { document } = new JSDOM(result).window
+
+    expect(document.querySelector('#projectName').value).toBeFalsy()
+
+    expect(statusCode).toBe(statusCodes.ok)
+  })
+
   test('Should correctly redirect to the next page on success', async () => {
     const apiPostMock = jest.spyOn(Wreck, 'post')
     apiPostMock.mockResolvedValueOnce({

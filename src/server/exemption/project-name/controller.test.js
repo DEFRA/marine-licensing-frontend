@@ -11,6 +11,8 @@ import {
 } from '~/src/server/exemption/project-name/controller.js'
 import * as cacheUtils from '~/src/server/common/helpers/session-cache/utils.js'
 
+jest.mock('~/src/server/common/helpers/session-cache/utils.js')
+
 describe('#projectNameController', () => {
   /** @type {Server} */
   let server
@@ -35,7 +37,7 @@ describe('#projectNameController', () => {
     await server.stop({ timeout: 0 })
   })
 
-  test('Should provide expected response and correctly prefill data', async () => {
+  test('Should provide expected response and correctly pre populate data', async () => {
     const { result, statusCode } = await server.inject({
       method: 'GET',
       url: PROJECT_NAME_ROUTE
@@ -251,6 +253,28 @@ describe('#projectNameController', () => {
     const { document } = new JSDOM(result).window
 
     expect(document.querySelector('.govuk-error-summary')).toBeTruthy()
+  })
+
+  test('Should correctly set the cache when submitting a project name', async () => {
+    const h = {
+      redirect: jest.fn().mockReturnValue({
+        takeover: jest.fn()
+      }),
+      view: jest.fn()
+    }
+
+    const mockRequest = { payload: { projectName: 'Project name' } }
+
+    await projectNameSubmitController.handler(
+      { payload: { projectName: 'Project name' } },
+      h
+    )
+
+    expect(cacheUtils.getExemptionCache).toHaveBeenCalledWith(mockRequest)
+
+    expect(cacheUtils.setExemptionCache).toHaveBeenCalledWith(mockRequest, {
+      projectName: 'Project name'
+    })
   })
 })
 

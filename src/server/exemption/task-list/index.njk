@@ -8,25 +8,22 @@
 {% block content %}
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
-      <div class="govuk-body" data-testid="app-page-body">
         
-         {% if projectName %}
+        {% if projectName %}
           <span class="govuk-caption-l">Exempt activity</span>
         {% endif %}
 
-        <h1 class="govuk-heading-l">
-          {% if projectName %}
-            {{ projectName }}
-          {% endif %}
-        </h1>
+        {% if projectName %}
+          <h1 class="govuk-heading-l">
+              {{ projectName }}
+          </h1>
+        {% endif %}
 
         <p class="govuk-body">You must complete each section before you can send us your information.</p>
         <p class="govuk-body">You can still make changes to a section, even after it is marked as completed.</p>
-        <p class="govuk-body">You must complete each section before you can send us your information.</p>
-
+        <p class="govuk-body govuk-!-margin-bottom-7">If you can't finish now, you can come back later, your progress will be saved.</p>
 
         {{ govukTaskList({
-          classes: "govuk-!-margin-top-7",
           idPrefix: "task-list",
           items: [
             {
@@ -40,7 +37,7 @@
             }
           ]
         }) }}
-      </div>
+
     </div>
   </div>
 

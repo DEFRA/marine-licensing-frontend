@@ -33,7 +33,7 @@ describe('#utils', () => {
       expect(result).toEqual({})
     })
 
-    it('should return a copy of cached data', () => {
+    it('should return a copy of cached data when it is previously set', () => {
       const cachedData = { projectName: 'Test project' }
       mockRequest.yar.get.mockReturnValue(cachedData)
 
@@ -94,7 +94,7 @@ describe('#utils', () => {
       expect(cache).toBe(value)
     })
 
-    it('should handle undefined values', () => {
+    it('should handle undefined values and default to an empty object', () => {
       const value = undefined
 
       const cache = setExemptionCache(mockRequest, value)

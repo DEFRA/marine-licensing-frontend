@@ -32,11 +32,9 @@ export const projectNameController = {
   handler(request, h) {
     const exemption = getExemptionCache(request)
 
-    const projectName = exemption.projectName
-
     return h.view(PROJECT_NAME_VIEW_ROUTE, {
       ...projectNameViewSettings,
-      payload: { projectName }
+      payload: { projectName: exemption.projectName }
     })
   }
 }

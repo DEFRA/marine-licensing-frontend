@@ -20,12 +20,16 @@ describe('exemption route', () => {
       }),
       expect.objectContaining({
         method: 'GET',
+        path: '/exemption/task-list'
+      }),
+      expect.objectContaining({
+        method: 'GET',
         path: '/exemption'
       })
     ])
   })
 
-  test('handler should redirect to /test', () => {
+  test('handler should redirect to /exemption/project-name', () => {
     const server = {
       route: jest.fn()
     }
@@ -35,7 +39,8 @@ describe('exemption route', () => {
     expect(server.route).toHaveBeenCalled()
 
     const routes = server.route.mock.calls[0][0]
-    const handler = routes[2].handler
+
+    const handler = routes[3].handler
 
     const redirectSpy = jest.fn().mockReturnValue('redirected')
 

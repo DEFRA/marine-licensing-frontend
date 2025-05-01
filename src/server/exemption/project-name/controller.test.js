@@ -9,10 +9,16 @@ import {
   PROJECT_NAME_ROUTE,
   PROJECT_NAME_VIEW_ROUTE
 } from '~/src/server/exemption/project-name/controller.js'
+import * as cacheUtils from '~/src/server/common/helpers/session-cache/utils.js'
+
+jest.mock('~/src/server/common/helpers/session-cache/utils.js')
 
 describe('#projectNameController', () => {
   /** @type {Server} */
   let server
+  let getExemptionCacheSpy
+
+  const mockExemptionState = { projectName: 'Test Project' }
 
   beforeAll(async () => {
     server = await createServer()
@@ -21,13 +27,17 @@ describe('#projectNameController', () => {
 
   beforeEach(() => {
     jest.resetAllMocks()
+
+    getExemptionCacheSpy = jest
+      .spyOn(cacheUtils, 'getExemptionCache')
+      .mockReturnValue(mockExemptionState)
   })
 
   afterAll(async () => {
     await server.stop({ timeout: 0 })
   })
 
-  test('Should provide expected response', async () => {
+  test('Should provide expected response and correctly pre populate data', async () => {
     const { result, statusCode } = await server.inject({
       method: 'GET',
       url: PROJECT_NAME_ROUTE
@@ -36,17 +46,43 @@ describe('#projectNameController', () => {
     expect(result).toEqual(
       expect.stringContaining(`Project name | ${config.get('serviceName')}`)
     )
+
+    const { document } = new JSDOM(result).window
+
+    expect(document.querySelector('#projectName').value).toBe(
+      mockExemptionState.projectName
+    )
+
     expect(statusCode).toBe(statusCodes.ok)
   })
 
-  test('Should provide expected response with valid data', async () => {
+  test('Should provide expected response and correctly not pre populate data if it is not present', async () => {
+    getExemptionCacheSpy.mockResolvedValueOnce({})
+
+    const { result, statusCode } = await server.inject({
+      method: 'GET',
+      url: PROJECT_NAME_ROUTE
+    })
+
+    expect(result).toEqual(
+      expect.stringContaining(`Project name | ${config.get('serviceName')}`)
+    )
+
+    const { document } = new JSDOM(result).window
+
+    expect(document.querySelector('#projectName').value).toBeFalsy()
+
+    expect(statusCode).toBe(statusCodes.ok)
+  })
+
+  test('Should correctly redirect to the next page on success', async () => {
     const apiPostMock = jest.spyOn(Wreck, 'post')
     apiPostMock.mockResolvedValueOnce({
       res: { statusCode: 200 },
       payload: { data: 'test' }
     })
 
-    const { result, statusCode } = await server.inject({
+    const { statusCode, headers } = await server.inject({
       method: 'POST',
       url: PROJECT_NAME_ROUTE,
       payload: { projectName: 'Project name' }
@@ -57,33 +93,30 @@ describe('#projectNameController', () => {
       { payload: { projectName: 'Project name' }, json: true }
     )
 
-    expect(result).toEqual(
-      expect.stringContaining(`Project name | ${config.get('serviceName')}`)
-    )
+    expect(statusCode).toBe(302)
 
-    const { document } = new JSDOM(result).window
-
-    expect(document.querySelector('h1').textContent.trim()).toBe('Project name')
-
-    expect(
-      document.querySelector('input[aria-describedby="projectName-hint"]')
-    ).toBeTruthy()
-
-    const button = document.querySelector('[data-module="govuk-button"]')
-    expect(button).toBeTruthy()
-    expect(button.textContent.trim()).toBe('Save and continue')
-
-    expect(statusCode).toBe(statusCodes.ok)
+    expect(headers.location).toBe('/exemption/task-list')
   })
 
-  it('projectNameController handler should render with correct context', () => {
+  test('projectNameController handler should render with correct context', () => {
     const h = { view: jest.fn() }
 
     projectNameController.handler({}, h)
 
     expect(h.view).toHaveBeenCalledWith(PROJECT_NAME_VIEW_ROUTE, {
       pageTitle: 'Project name',
-      heading: 'Project Name'
+      heading: 'Project Name',
+      payload: mockExemptionState
+    })
+
+    getExemptionCacheSpy.mockResolvedValueOnce(null)
+
+    projectNameController.handler({}, h)
+
+    expect(h.view).toHaveBeenNthCalledWith(2, PROJECT_NAME_VIEW_ROUTE, {
+      pageTitle: 'Project name',
+      heading: 'Project Name',
+      payload: { projectName: undefined }
     })
   })
 
@@ -239,6 +272,28 @@ describe('#projectNameController', () => {
     const { document } = new JSDOM(result).window
 
     expect(document.querySelector('.govuk-error-summary')).toBeTruthy()
+  })
+
+  test('Should correctly set the cache when submitting a project name', async () => {
+    const h = {
+      redirect: jest.fn().mockReturnValue({
+        takeover: jest.fn()
+      }),
+      view: jest.fn()
+    }
+
+    const mockRequest = { payload: { projectName: 'Project name' } }
+
+    await projectNameSubmitController.handler(
+      { payload: { projectName: 'Project name' } },
+      h
+    )
+
+    expect(cacheUtils.getExemptionCache).toHaveBeenCalledWith(mockRequest)
+
+    expect(cacheUtils.setExemptionCache).toHaveBeenCalledWith(mockRequest, {
+      projectName: 'Project name'
+    })
   })
 })
 

@@ -3,6 +3,11 @@ import {
   errorDescriptionByFieldName,
   mapErrorsForDisplay
 } from '~/src/server/common/helpers/errors.js'
+import {
+  getExemptionCache,
+  setExemptionCache
+} from '~/src/server/common/helpers/session-cache/utils.js'
+
 import Wreck from '@hapi/wreck'
 import joi from 'joi'
 
@@ -24,9 +29,12 @@ const projectNameViewSettings = {
  * @satisfies {Partial<ServerRoute>}
  */
 export const projectNameController = {
-  handler(_request, h) {
+  handler(request, h) {
+    const exemption = getExemptionCache(request)
+
     return h.view(PROJECT_NAME_VIEW_ROUTE, {
-      ...projectNameViewSettings
+      ...projectNameViewSettings,
+      payload: { projectName: exemption.projectName }
     })
   }
 }
@@ -81,9 +89,13 @@ export const projectNameSubmitController = {
         }
       )
 
-      return h.view(PROJECT_NAME_VIEW_ROUTE, {
-        ...projectNameViewSettings
+      const exemption = getExemptionCache(request)
+      setExemptionCache(request, {
+        ...exemption,
+        projectName: payload.projectName
       })
+
+      return h.redirect('/exemption/task-list')
     } catch (e) {
       const { details } = e.data.payload.validation
 

@@ -23,7 +23,7 @@ describe('#utils', () => {
       }
     })
 
-    it('should return an empty object no cache is set', () => {
+    test('should return an empty object no cache is set', () => {
       mockRequest.yar.get.mockReturnValue(undefined)
 
       const result = getExemptionCache(mockRequest)
@@ -33,7 +33,7 @@ describe('#utils', () => {
       expect(result).toEqual({})
     })
 
-    it('should return a copy of cached data when it is previously set', () => {
+    test('should return a copy of cached data when it is previously set', () => {
       const cachedData = { projectName: 'Test project' }
       mockRequest.yar.get.mockReturnValue(cachedData)
 
@@ -45,7 +45,7 @@ describe('#utils', () => {
       expect(result).toEqual(cachedData)
     })
 
-    it('should handle null values in cache', () => {
+    test('should handle null values in cache', () => {
       mockRequest.yar.get.mockReturnValue(null)
 
       const result = getExemptionCache(mockRequest)
@@ -70,7 +70,7 @@ describe('#utils', () => {
       }
     })
 
-    it('should store the value in cache', () => {
+    test('should store the value in cache', () => {
       const value = { projectName: 'Test project' }
 
       const result = setExemptionCache(mockRequest, value)
@@ -82,7 +82,7 @@ describe('#utils', () => {
       expect(result).toBe(value)
     })
 
-    it('should handle empty objects', () => {
+    test('should handle empty objects', () => {
       const value = {}
 
       const cache = setExemptionCache(mockRequest, value)
@@ -94,7 +94,7 @@ describe('#utils', () => {
       expect(cache).toBe(value)
     })
 
-    it('should handle undefined values and default to an empty object', () => {
+    test('should handle undefined values and default to an empty object', () => {
       const value = undefined
 
       const cache = setExemptionCache(mockRequest, value)

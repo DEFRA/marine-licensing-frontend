@@ -79,7 +79,7 @@ describe('#projectNameController', () => {
     expect(headers.location).toBe('/exemption/task-list')
   })
 
-  it('projectNameController handler should render with correct context', () => {
+  test('projectNameController handler should render with correct context', () => {
     const h = { view: jest.fn() }
 
     projectNameController.handler({}, h)

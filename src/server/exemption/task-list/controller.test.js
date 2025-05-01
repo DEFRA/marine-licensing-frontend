@@ -55,7 +55,7 @@ describe('#taskListController', () => {
     expect(statusCode).toBe(statusCodes.ok)
   })
 
-  it('taskListController handler should render with correct context', () => {
+  test('taskListController handler should render with correct context', () => {
     const h = { view: jest.fn() }
 
     taskListController.handler({}, h)

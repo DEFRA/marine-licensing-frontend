@@ -44,6 +44,10 @@ describe('#taskListController', () => {
 
     const { document } = new JSDOM(result).window
 
+    expect(document.querySelector('h1').textContent.trim()).toBe(
+      mockExemptionState.projectName
+    )
+
     expect(document.querySelector('.govuk-caption-l').textContent.trim()).toBe(
       'Exempt activity'
     )
@@ -51,6 +55,12 @@ describe('#taskListController', () => {
     expect(
       document.querySelectorAll('.govuk-task-list__link')[0].textContent.trim()
     ).toBe('Project name')
+
+    expect(
+      document
+        .querySelectorAll('.govuk-task-list__status')[0]
+        .textContent.trim()
+    ).toBe('Completed')
 
     expect(statusCode).toBe(statusCodes.ok)
   })

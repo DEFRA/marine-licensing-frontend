@@ -99,9 +99,8 @@ describe('#utils', () => {
 
       const cache = setExemptionCache(mockRequest, value)
 
-      expect(mockRequest.yar.set).toHaveBeenCalledWith(EXEMPTION_CACHE_KEY, {
-        undefined
-      })
+      expect(mockRequest.yar.set).toHaveBeenCalledWith(EXEMPTION_CACHE_KEY, {})
+
       expect(cache).toEqual({})
     })
   })

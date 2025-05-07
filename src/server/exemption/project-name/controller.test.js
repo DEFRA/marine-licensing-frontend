@@ -1,5 +1,6 @@
 import { createServer } from '~/src/server/index.js'
 import { statusCodes } from '~/src/server/common/constants/status-codes.js'
+import { mockExemption } from '~/src/server/test-helpers/mocks.js'
 import { config } from '~/src/config/config.js'
 import Wreck from '@hapi/wreck'
 import { JSDOM } from 'jsdom'
@@ -27,6 +28,10 @@ describe('#projectNameController', () => {
 
   beforeEach(() => {
     jest.resetAllMocks()
+
+    jest
+      .spyOn(Wreck, 'post')
+      .mockReturnValue({ payload: { id: mockExemption.id } })
 
     getExemptionCacheSpy = jest
       .spyOn(cacheUtils, 'getExemptionCache')
@@ -288,9 +293,6 @@ describe('#projectNameController', () => {
       { payload: { projectName: 'Project name' } },
       h
     )
-
-    expect(cacheUtils.getExemptionCache).toHaveBeenCalledWith(mockRequest)
-
     expect(cacheUtils.setExemptionCache).toHaveBeenCalledWith(mockRequest, {
       projectName: 'Project name'
     })

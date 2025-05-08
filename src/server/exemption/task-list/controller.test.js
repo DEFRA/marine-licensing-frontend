@@ -96,6 +96,15 @@ describe('#taskListController', () => {
           title: {
             text: 'Project name'
           }
+        },
+        {
+          href: '/exemption/public-register',
+          status: {
+            text: 'Completed'
+          },
+          title: {
+            text: 'Public register'
+          }
         }
       ]
     })

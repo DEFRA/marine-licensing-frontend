@@ -29,6 +29,13 @@ export const transformTaskList = (taskList) => {
       },
       href: '/exemption/project-name',
       status: setStatus(taskList.projectName)
+    },
+    {
+      title: {
+        text: 'Public register'
+      },
+      href: '/exemption/public-register',
+      status: setStatus(taskList.publicRegister)
     }
   ]
 }

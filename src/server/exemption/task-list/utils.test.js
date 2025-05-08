@@ -8,6 +8,11 @@ describe('taskList utils', () => {
         href: '/exemption/project-name',
         status: { text: 'Completed' },
         title: { text: 'Project name' }
+      },
+      {
+        href: '/exemption/public-register',
+        status: { text: 'Completed' },
+        title: { text: 'Public register' }
       }
     ])
   })
@@ -18,6 +23,11 @@ describe('taskList utils', () => {
         href: '/exemption/project-name',
         status: { tag: { text: 'Incomplete', classes: 'govuk-tag--blue' } },
         title: { text: 'Project name' }
+      },
+      {
+        href: '/exemption/public-register',
+        status: { tag: { text: 'Incomplete', classes: 'govuk-tag--blue' } },
+        title: { text: 'Public register' }
       }
     ])
   })

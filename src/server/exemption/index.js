@@ -1,4 +1,5 @@
 import { projectNameRoutes } from '~/src/server/exemption/project-name/index.js'
+import { publicRegisterRoutes } from '~/src/server/exemption/public-register/index.js'
 import { taskListRoutes } from '~/src/server/exemption/task-list/index.js'
 
 /**
@@ -15,6 +16,7 @@ export const exemption = {
     register(server) {
       server.route([
         ...projectNameRoutes,
+        ...publicRegisterRoutes,
         ...taskListRoutes,
         {
           method: 'GET',

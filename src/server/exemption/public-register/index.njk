@@ -1,0 +1,62 @@
+{% extends 'layouts/page.njk' %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/radios/macro.njk" import govukRadios %}
+{% from "govuk/components/input/macro.njk" import govukInput %}
+{% from "govuk/components/textarea/macro.njk" import govukTextarea %}
+{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+
+{% block content %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+
+        <form method="POST">
+
+          <h1 class="govuk-heading-l">Public register</h1>
+
+          <p class="govuk-body">The Marine Management Organisation publishes information about marine licence applications and exemptions on a <a class="govuk-link" href="#">public register (opens in new tab).</a></p>
+
+          {% set yesHtml %}
+            {{ govukTextarea({
+              id: "reason-text",
+              name: "reason",
+              label: {
+                text: "Provide details of why the information should be withheld"
+              },
+              value: payload.reason
+            }) }}
+          {% endset -%}
+
+          {{ govukRadios({
+            name: "consent",
+            value: payload.consent,
+            fieldset: {
+              legend: {
+                text: "Do you believe the information you have provided should be withheld from the public register?",
+                classes: "govuk-fieldset__legend govuk-fieldset__legend--m" 
+              }
+            },
+            items: [
+              {
+                value: "yes",
+                text: "Yes",
+                conditional: {
+                  html: yesHtml
+                }
+              },
+              {
+                value: "no",
+                text: "No"
+              }
+            ]
+          }) }}
+
+          {{ govukButton({
+            text: "Save and continue",
+            classes: "govuk-button--primary"
+          }) }}
+        </form>
+
+    </div>
+  </div>
+
+{% endblock %}

@@ -119,7 +119,7 @@ export const publicRegisterSubmitController = {
         ...exemption,
         publicRegister: {
           consent: payload.consent,
-          reason: payload.reason
+          ...(isAnswerYes && { reason: payload.reason })
         }
       })
 

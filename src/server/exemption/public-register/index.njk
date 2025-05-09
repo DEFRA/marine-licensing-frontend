@@ -4,6 +4,14 @@
 {% from "govuk/components/input/macro.njk" import govukInput %}
 {% from "govuk/components/textarea/macro.njk" import govukTextarea %}
 {% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+{% from "govuk/components/back-link/macro.njk" import govukBackLink %}
+
+{% block beforeContent %}
+  {{ govukBackLink({
+    text: "Back",
+    href: '/exemption/task-list'
+  }) }}
+{% endblock %}
 
 {% block content %}
   <div class="govuk-grid-row">
@@ -60,10 +68,14 @@
             ]
           }) }}
 
-          {{ govukButton({
-            text: "Save and continue",
-            classes: "govuk-button--primary"
-          }) }}
+          <div class="govuk-button-group">
+            {{ govukButton({
+              text: "Save and continue",
+              classes: "govuk-button--primary"
+            }) }}
+
+            <a class="govuk-link" href="/exemption/task-list">Cancel</a>
+          </div>
         </form>
 
     </div>

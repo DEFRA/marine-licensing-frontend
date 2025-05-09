@@ -81,16 +81,29 @@ export const projectNameSubmitController = {
   async handler(request, h) {
     const { payload } = request
     try {
-      const { payload: responsePayload } = await Wreck.post(
-        `${config.get('backend').apiUrl}/exemption/project-name`,
-        {
-          payload,
-          json: true
-        }
-      )
+      const exemption = getExemptionCache(request)
+
+      const isUpdate = !!exemption.id
+
+      const { payload: responsePayload } = isUpdate
+        ? await Wreck.patch(
+            `${config.get('backend').apiUrl}/exemption/project-name`,
+            {
+              payload: { ...payload, id: exemption.id },
+              json: true
+            }
+          )
+        : await Wreck.post(
+            `${config.get('backend').apiUrl}/exemption/project-name`,
+            {
+              payload,
+              json: true
+            }
+          )
 
       setExemptionCache(request, {
-        ...responsePayload.value,
+        ...exemption,
+        ...(!isUpdate && responsePayload.value),
         projectName: payload.projectName
       })
 

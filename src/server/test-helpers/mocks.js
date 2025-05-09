@@ -8,5 +8,6 @@ export const mockExemptionTaskList = {
 export const mockExemption = {
   id: faker.database.mongodbObjectId(),
   projectName: 'Test Project',
+  publicRegister: { consent: 'yes', reason: 'Test reason' },
   taskList: mockExemptionTaskList
 }

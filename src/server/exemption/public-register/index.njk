@@ -9,11 +9,20 @@
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
 
+        {% if errors %}
+          {{ govukErrorSummary({
+                titleText: "There is a problem",
+                errorList: errorSummary
+          }) }}
+        {% endif %}
+
+        <span class="govuk-caption-l">{{ projectName }}</span>
+
+        <h1 class="govuk-heading-l">Public register</h1>
+
+        <p class="govuk-body">The Marine Management Organisation publishes information about marine licence applications and exemptions on a <a class="govuk-link" href="#">public register (opens in new tab).</a></p>
+
         <form method="POST">
-
-          <h1 class="govuk-heading-l">Public register</h1>
-
-          <p class="govuk-body">The Marine Management Organisation publishes information about marine licence applications and exemptions on a <a class="govuk-link" href="#">public register (opens in new tab).</a></p>
 
           {% set yesHtml %}
             {{ govukTextarea({
@@ -29,6 +38,7 @@
           {{ govukRadios({
             name: "consent",
             value: payload.consent,
+            errorMessage: errors['reason'] if errors['reason'] else errors['consent'],
             fieldset: {
               legend: {
                 text: "Do you believe the information you have provided should be withheld from the public register?",

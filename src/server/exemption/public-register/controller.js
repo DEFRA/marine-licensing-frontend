@@ -3,11 +3,25 @@ import {
   setExemptionCache
 } from '~/src/server/common/helpers/session-cache/utils.js'
 import { config } from '~/src/config/config.js'
+import {
+  errorDescriptionByFieldName,
+  mapErrorsForDisplay
+} from '~/src/server/common/helpers/errors.js'
 
 import Wreck from '@hapi/wreck'
+import joi from 'joi'
 
 export const PUBLIC_REGISTER_ROUTE = '/exemption/public-register'
 export const PUBLIC_REGISTER_VIEW_ROUTE = 'exemption/public-register/index'
+
+export const errorMessages = {
+  PUBLIC_REGISTER_REASON_REQUIRED:
+    'Provide details of why the information should be withheld',
+  PUBLIC_REGISTER_REASON_MAX_LENGTH:
+    'Details of why the information should be witheld must be 1000 characters or less',
+  PUBLIC_REGISTER_CONSENT_REQUIRED:
+    'Select whether you believe your information should be withheld from the public register'
+}
 
 const publicRegisterSettings = {
   pageTitle: 'Public register',
@@ -24,10 +38,8 @@ export const publicRegisterController = {
 
     return h.view(PUBLIC_REGISTER_VIEW_ROUTE, {
       ...publicRegisterSettings,
-      payload: {
-        projectName: exemption.projectName,
-        ...exemption.publicRegister
-      }
+      projectName: exemption.projectName,
+      payload: exemption.publicRegister
     })
   }
 }
@@ -37,18 +49,65 @@ export const publicRegisterController = {
  * @satisfies {Partial<ServerRoute>}
  */
 export const publicRegisterSubmitController = {
+  options: {
+    validate: {
+      payload: joi.object({
+        consent: joi.string().required().messages({
+          'any.required': 'PUBLIC_REGISTER_CONSENT_REQUIRED',
+          'string.required': 'PUBLIC_REGISTER_CONSENT_REQUIRED'
+        }),
+        reason: joi.when('consent', {
+          is: 'yes',
+          then: joi.string().required().messages({
+            'string.empty': 'PUBLIC_REGISTER_REASON_REQUIRED',
+            'any.required': 'PUBLIC_REGISTER_REASON_REQUIRED'
+          })
+        })
+      }),
+      failAction: (request, h, err) => {
+        const { payload } = request
+
+        const { projectName } = getExemptionCache(request)
+
+        if (!err.details) {
+          return h
+            .view(PUBLIC_REGISTER_VIEW_ROUTE, {
+              ...publicRegisterSettings,
+              payload,
+              projectName
+            })
+            .takeover()
+        }
+
+        const errorSummary = mapErrorsForDisplay(err.details, errorMessages)
+
+        const errors = errorDescriptionByFieldName(errorSummary)
+
+        return h
+          .view(PUBLIC_REGISTER_VIEW_ROUTE, {
+            ...publicRegisterSettings,
+            payload,
+            projectName,
+            errors,
+            errorSummary
+          })
+          .takeover()
+      }
+    }
+  },
   async handler(request, h) {
     const { payload } = request
-    try {
-      const exemption = getExemptionCache(request)
 
+    const exemption = getExemptionCache(request)
+
+    try {
       const isAnswerYes = payload.consent === 'yes'
 
       await Wreck.patch(
         `${config.get('backend').apiUrl}/exemption/public-register`,
         {
           payload: {
-            consent: !!isAnswerYes,
+            consent: payload.consent,
             ...(isAnswerYes && { reason: payload.reason }),
             id: exemption.id
           },
@@ -66,9 +125,18 @@ export const publicRegisterSubmitController = {
 
       return h.redirect('/exemption/task-list')
     } catch (e) {
+      const { details } = e.data.payload.validation
+
+      const errorSummary = mapErrorsForDisplay(details, errorMessages)
+
+      const errors = errorDescriptionByFieldName(errorSummary)
+
       return h.view(PUBLIC_REGISTER_VIEW_ROUTE, {
         ...publicRegisterSettings,
-        payload
+        payload,
+        projectName: exemption.projectName,
+        errors,
+        errorSummary
       })
     }
   }

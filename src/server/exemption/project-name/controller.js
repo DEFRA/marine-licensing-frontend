@@ -81,7 +81,7 @@ export const projectNameSubmitController = {
   async handler(request, h) {
     const { payload } = request
     try {
-      await Wreck.post(
+      const { payload: responsePayload } = await Wreck.post(
         `${config.get('backend').apiUrl}/exemption/project-name`,
         {
           payload,
@@ -89,9 +89,8 @@ export const projectNameSubmitController = {
         }
       )
 
-      const exemption = getExemptionCache(request)
       setExemptionCache(request, {
-        ...exemption,
+        ...responsePayload.value,
         projectName: payload.projectName
       })
 

@@ -8,6 +8,9 @@ import {
   TASK_LIST_ROUTE,
   TASK_LIST_VIEW_ROUTE
 } from '~/src/server/exemption/task-list/controller.js'
+import { mockExemption } from '~/src/server/test-helpers/mocks.js'
+
+import Wreck from '@hapi/wreck'
 
 describe('#taskListController', () => {
   /** @type {Server} */
@@ -23,9 +26,14 @@ describe('#taskListController', () => {
 
   beforeEach(() => {
     jest.resetAllMocks()
+
+    jest
+      .spyOn(Wreck, 'get')
+      .mockReturnValue({ payload: { value: mockExemption } })
+
     getExemptionCacheSpy = jest
       .spyOn(cacheUtils, 'getExemptionCache')
-      .mockReturnValue(mockExemptionState)
+      .mockReturnValue(mockExemption)
   })
 
   afterAll(async () => {
@@ -65,26 +73,43 @@ describe('#taskListController', () => {
     expect(statusCode).toBe(statusCodes.ok)
   })
 
-  test('taskListController handler should render with correct context', () => {
+  test('taskListController handler should render with correct context', async () => {
     const h = { view: jest.fn() }
 
-    taskListController.handler({}, h)
+    await taskListController.handler({}, h)
+
+    expect(Wreck.get).toHaveBeenCalledWith(
+      `${config.get('backend').apiUrl}/exemption/${mockExemption.id}`,
+      { json: true }
+    )
 
     expect(h.view).toHaveBeenCalledWith(TASK_LIST_VIEW_ROUTE, {
       pageTitle: 'Task list',
       heading: 'Task list',
-      projectName: 'Test Project'
+      projectName: 'Test Project',
+      taskList: [
+        {
+          href: '/exemption/project-name',
+          status: {
+            text: 'Completed'
+          },
+          title: {
+            text: 'Project name'
+          }
+        }
+      ]
     })
+  })
+
+  test('taskListController handler should throw a 404 if exemption is not found', async () => {
+    const h = { view: jest.fn() }
 
     getExemptionCacheSpy.mockResolvedValueOnce(null)
 
-    taskListController.handler({}, h)
-
-    expect(h.view).toHaveBeenNthCalledWith(2, TASK_LIST_VIEW_ROUTE, {
-      pageTitle: 'Task list',
-      heading: 'Task list',
-      projectName: undefined
-    })
+    await expect(() => taskListController.handler({}, h)).rejects.toThrow(
+      `Exemption not found`,
+      mockExemption.id
+    )
   })
 })
 

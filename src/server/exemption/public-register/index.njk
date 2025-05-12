@@ -39,6 +39,7 @@
               label: {
                 text: "Provide details of why the information should be withheld"
               },
+              errorMessage: errors['reason'],
               value: payload.reason
             }) }}
           {% endset -%}
@@ -46,7 +47,7 @@
           {{ govukRadios({
             name: "consent",
             value: payload.consent,
-            errorMessage: errors['reason'] if errors['reason'] else errors['consent'],
+            errorMessage: errors['consent'],
             fieldset: {
               legend: {
                 text: "Do you believe the information you have provided should be withheld from the public register?",

@@ -193,6 +193,26 @@ describe('#projectNameController', () => {
     expect(statusCode).toBe(statusCodes.ok)
   })
 
+  test('Should pass erorr to global catchAll behaviour if it is not a validation error', async () => {
+    const apiPostMock = jest.spyOn(Wreck, 'post')
+    apiPostMock.mockRejectedValueOnce({
+      res: { statusCode: 500 },
+      data: {}
+    })
+
+    const { result } = await server.inject({
+      method: 'POST',
+      url: PROJECT_NAME_ROUTE,
+      payload: { projectName: 'test' }
+    })
+
+    expect(result).toContain('Something went wrong')
+
+    const { document } = new JSDOM(result).window
+
+    expect(document.querySelector('h1').textContent.trim()).toBe('500')
+  })
+
   test('Should correctly validate on empty data', () => {
     const request = {
       payload: { projectName: '' }

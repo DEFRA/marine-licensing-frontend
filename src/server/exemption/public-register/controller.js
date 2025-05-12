@@ -16,7 +16,7 @@ export const PUBLIC_REGISTER_VIEW_ROUTE = 'exemption/public-register/index'
 
 export const errorMessages = {
   PUBLIC_REGISTER_REASON_REQUIRED:
-    'Provide details of why the information should be withheld',
+    'Details of why the information should be withheld cannot be blank',
   PUBLIC_REGISTER_REASON_MAX_LENGTH:
     'Details of why the information should be witheld must be 1000 characters or less',
   PUBLIC_REGISTER_CONSENT_REQUIRED:
@@ -125,7 +125,11 @@ export const publicRegisterSubmitController = {
 
       return h.redirect('/exemption/task-list')
     } catch (e) {
-      const { details } = e.data.payload.validation
+      const { details } = e.data?.payload?.validation ?? {}
+
+      if (!details) {
+        throw e
+      }
 
       const errorSummary = mapErrorsForDisplay(details, errorMessages)
 

@@ -109,7 +109,11 @@ export const projectNameSubmitController = {
 
       return h.redirect('/exemption/task-list')
     } catch (e) {
-      const { details } = e.data.payload.validation
+      const { details } = e.data?.payload?.validation ?? {}
+
+      if (!details) {
+        throw e
+      }
 
       const errorSummary = mapErrorsForDisplay(details, errorMessages)
 

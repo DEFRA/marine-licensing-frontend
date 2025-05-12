@@ -205,6 +205,26 @@ describe('#publicRegisterController', () => {
     expect(statusCode).toBe(statusCodes.ok)
   })
 
+  test('Should pass error to global catchAll behaviour if it contains no validation data', async () => {
+    const apiPostMock = jest.spyOn(Wreck, 'patch')
+    apiPostMock.mockRejectedValueOnce({
+      res: { statusCode: 500 },
+      data: {}
+    })
+
+    const { result } = await server.inject({
+      method: 'POST',
+      url: PUBLIC_REGISTER_ROUTE,
+      payload: { consent: 'invalid' }
+    })
+
+    expect(result).toContain('Something went wrong')
+
+    const { document } = new JSDOM(result).window
+
+    expect(document.querySelector('h1').textContent.trim()).toBe('500')
+  })
+
   test('Should correctly validate on empty data', () => {
     const request = {
       payload: { consent: '' }

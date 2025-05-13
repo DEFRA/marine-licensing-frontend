@@ -52,9 +52,10 @@ export const publicRegisterSubmitController = {
   options: {
     validate: {
       payload: joi.object({
-        consent: joi.string().required().messages({
-          'any.required': 'PUBLIC_REGISTER_CONSENT_REQUIRED',
-          'string.required': 'PUBLIC_REGISTER_CONSENT_REQUIRED'
+        consent: joi.string().valid('yes', 'no').required().messages({
+          'any.only': 'PUBLIC_REGISTER_CONSENT_REQUIRED',
+          'string.empty': 'PUBLIC_REGISTER_CONSENT_REQUIRED',
+          'any.required': 'PUBLIC_REGISTER_CONSENT_REQUIRED'
         }),
         reason: joi.when('consent', {
           is: 'yes',
@@ -125,9 +126,10 @@ export const publicRegisterSubmitController = {
 
       return h.redirect('/exemption/task-list')
     } catch (e) {
-      const { details } = e.data?.payload?.validation ?? {}
+      const validation = e.data?.payload?.validation
+      const details = validation?.details
 
-      if (!details) {
+      if (!Array.isArray(details)) {
         throw e
       }
 

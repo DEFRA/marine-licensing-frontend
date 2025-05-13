@@ -183,7 +183,7 @@ describe('#publicRegisterController', () => {
     const { result, statusCode } = await server.inject({
       method: 'POST',
       url: PUBLIC_REGISTER_ROUTE,
-      payload: { consent: 'invalid' }
+      payload: { consent: 'no' }
     })
 
     expect(result).toEqual(
@@ -215,7 +215,7 @@ describe('#publicRegisterController', () => {
     const { result } = await server.inject({
       method: 'POST',
       url: PUBLIC_REGISTER_ROUTE,
-      payload: { consent: 'invalid' }
+      payload: { consent: 'no' }
     })
 
     expect(result).toContain('Something went wrong')
@@ -322,8 +322,31 @@ describe('#publicRegisterController', () => {
     expect(h.view().takeover).toHaveBeenCalled()
   })
 
+  test('Should correctly validate on invalid data', () => {
+    const request = {
+      payload: { consent: 'invalid' }
+    }
+
+    const h = {
+      view: jest.fn().mockReturnValue({
+        takeover: jest.fn()
+      })
+    }
+
+    publicRegisterSubmitController.options.validate.failAction(request, h, {})
+
+    expect(h.view).toHaveBeenCalledWith(PUBLIC_REGISTER_VIEW_ROUTE, {
+      heading: 'Public register',
+      pageTitle: 'Public register',
+      projectName: 'Test Project',
+      payload: { consent: 'invalid' }
+    })
+
+    expect(h.view().takeover).toHaveBeenCalled()
+  })
+
   test('Should show error messages without calling the back end when payload data is empty', async () => {
-    const apiPatchMock = jest.spyOn(Wreck, 'post')
+    const apiPostMock = jest.spyOn(Wreck, 'post')
 
     const { result } = await server.inject({
       method: 'POST',
@@ -331,7 +354,7 @@ describe('#publicRegisterController', () => {
       payload: { consent: '' }
     })
 
-    expect(apiPatchMock).not.toHaveBeenCalled()
+    expect(apiPostMock).not.toHaveBeenCalled()
 
     const { document } = new JSDOM(result).window
 
@@ -339,7 +362,7 @@ describe('#publicRegisterController', () => {
   })
 
   test('Should show error for reason being empty when consent is set to yes', async () => {
-    const apiPatchMock = jest.spyOn(Wreck, 'post')
+    const apiPostMock = jest.spyOn(Wreck, 'post')
 
     const { result } = await server.inject({
       method: 'POST',
@@ -347,7 +370,7 @@ describe('#publicRegisterController', () => {
       payload: { consent: 'yes' }
     })
 
-    expect(apiPatchMock).not.toHaveBeenCalled()
+    expect(apiPostMock).not.toHaveBeenCalled()
 
     const { document } = new JSDOM(result).window
 

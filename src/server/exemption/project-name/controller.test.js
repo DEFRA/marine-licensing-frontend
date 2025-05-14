@@ -80,7 +80,7 @@ describe('#projectNameController', () => {
     expect(statusCode).toBe(statusCodes.ok)
   })
 
-  test('Should correctly redirect to the next page on success', async () => {
+  test('Should correctly create new project and redirect to the next page on success', async () => {
     const apiPostMock = jest.spyOn(Wreck, 'post')
     apiPostMock.mockResolvedValueOnce({
       res: { statusCode: 200 },
@@ -96,6 +96,30 @@ describe('#projectNameController', () => {
     expect(Wreck.post).toHaveBeenCalledWith(
       `${config.get('backend').apiUrl}/exemption/project-name`,
       { payload: { projectName: 'Project name' }, json: true }
+    )
+
+    expect(statusCode).toBe(302)
+
+    expect(headers.location).toBe('/exemption/task-list')
+  })
+
+  test('Should correctly update existing project and redirect to the next page on success', async () => {
+    getExemptionCacheSpy.mockReturnValueOnce(mockExemption)
+
+    jest.spyOn(Wreck, 'patch').mockImplementationOnce(() => jest.fn())
+
+    const { statusCode, headers } = await server.inject({
+      method: 'POST',
+      url: PROJECT_NAME_ROUTE,
+      payload: { projectName: 'Project name' }
+    })
+
+    expect(Wreck.patch).toHaveBeenCalledWith(
+      `${config.get('backend').apiUrl}/exemption/project-name`,
+      {
+        payload: { projectName: 'Project name', id: mockExemption.id },
+        json: true
+      }
     )
 
     expect(statusCode).toBe(302)
@@ -167,6 +191,26 @@ describe('#projectNameController', () => {
     expect(document.querySelector('.govuk-error-summary')).toBeTruthy()
 
     expect(statusCode).toBe(statusCodes.ok)
+  })
+
+  test('Should pass erorr to global catchAll behaviour if it is not a validation error', async () => {
+    const apiPostMock = jest.spyOn(Wreck, 'post')
+    apiPostMock.mockRejectedValueOnce({
+      res: { statusCode: 500 },
+      data: {}
+    })
+
+    const { result } = await server.inject({
+      method: 'POST',
+      url: PROJECT_NAME_ROUTE,
+      payload: { projectName: 'test' }
+    })
+
+    expect(result).toContain('Something went wrong')
+
+    const { document } = new JSDOM(result).window
+
+    expect(document.querySelector('h1').textContent.trim()).toBe('500')
   })
 
   test('Should correctly validate on empty data', () => {

@@ -20,6 +20,14 @@ describe('exemption route', () => {
       }),
       expect.objectContaining({
         method: 'GET',
+        path: '/exemption/public-register'
+      }),
+      expect.objectContaining({
+        method: 'POST',
+        path: '/exemption/public-register'
+      }),
+      expect.objectContaining({
+        method: 'GET',
         path: '/exemption/task-list'
       }),
       expect.objectContaining({
@@ -40,7 +48,7 @@ describe('exemption route', () => {
 
     const routes = server.route.mock.calls[0][0]
 
-    const handler = routes[3].handler
+    const handler = routes[5].handler
 
     const redirectSpy = jest.fn().mockReturnValue('redirected')
 

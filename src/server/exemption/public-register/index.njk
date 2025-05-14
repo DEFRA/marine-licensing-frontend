@@ -1,0 +1,86 @@
+{% extends 'layouts/page.njk' %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/radios/macro.njk" import govukRadios %}
+{% from "govuk/components/input/macro.njk" import govukInput %}
+{% from "govuk/components/textarea/macro.njk" import govukTextarea %}
+{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+{% from "govuk/components/back-link/macro.njk" import govukBackLink %}
+
+{% block beforeContent %}
+  {{ govukBackLink({
+    text: "Back",
+    href: '/exemption/task-list'
+  }) }}
+{% endblock %}
+
+{% block content %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+
+        {% if errors %}
+          {{ govukErrorSummary({
+                titleText: "There is a problem",
+                errorList: errorSummary
+          }) }}
+        {% endif %}
+
+        <span class="govuk-caption-l">{{ projectName }}</span>
+
+        <h1 class="govuk-heading-l">Public register</h1>
+
+        <p class="govuk-body">The Marine Management Organisation publishes information about marine licence applications and exemptions on a <a class="govuk-link" href="#">public register (opens in new tab).</a></p>
+
+        <form method="POST">
+
+          {% set yesHtml %}
+            {{ govukTextarea({
+              id: "reason",
+              name: "reason",
+              label: {
+                text: "Provide details of why the information should be withheld"
+              },
+              errorMessage: errors['reason'],
+              value: payload.reason
+            }) }}
+          {% endset -%}
+
+          {{ govukRadios({
+            name: "consent",
+            value: payload.consent,
+            errorMessage: errors['consent'],
+            idPrefix: "consent",
+            fieldset: {
+              legend: {
+                text: "Do you believe the information you have provided should be withheld from the public register?",
+                classes: "govuk-fieldset__legend govuk-fieldset__legend--m" 
+              }
+            },
+            items: [
+              {
+                value: "yes",
+                text: "Yes",
+                conditional: {
+                  html: yesHtml
+                }
+              },
+              {
+                value: "no",
+                text: "No"
+              }
+            ]
+          }) }}
+
+          <div class="govuk-button-group">
+            {{ govukButton({
+              text: "Save and continue",
+              classes: "govuk-button--primary"
+            }) }}
+
+            <a class="govuk-link" href="/exemption/task-list">Cancel</a>
+          </div>
+        </form>
+
+    </div>
+  </div>
+
+{% endblock %}

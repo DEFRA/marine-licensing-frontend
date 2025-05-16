@@ -1,4 +1,4 @@
-import { provideCoordinatesChoiceRoutes } from '~/src/server/exemption/site-details/provide-coordinates-choice/index.js'
+import { coordinatesTypeRoutes } from '~/src/server/exemption/site-details/coordinates-type/index.js'
 
 /**
  * Sets up the routes used in the Site Details section
@@ -8,7 +8,7 @@ import { provideCoordinatesChoiceRoutes } from '~/src/server/exemption/site-deta
 /**
  * @satisfies {ServerRegisterPluginObject<void>}
  */
-export const siteDetailsRoutes = [...provideCoordinatesChoiceRoutes]
+export const siteDetailsRoutes = [...coordinatesTypeRoutes]
 
 /**
  * @import { ServerRegisterPluginObject } from '@hapi/hapi'

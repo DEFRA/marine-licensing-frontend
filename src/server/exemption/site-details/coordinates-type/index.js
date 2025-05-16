@@ -1,7 +1,8 @@
 import {
-  provideCoordinatesChoiceController,
+  coordinatesTypeController,
+  coordinatesTypeSubmitController,
   PROVIDE_COORDINATES_CHOICE_ROUTE
-} from '~/src/server/exemption/site-details/provide-coordinates-choice/controller.js'
+} from '~/src/server/exemption/site-details/coordinates-type/controller.js'
 
 /**
  * Sets up the routes used in the provide the coordinates choice page.
@@ -11,11 +12,16 @@ import {
 /**
  * @satisfies {ServerRegisterPluginObject<void>}
  */
-export const provideCoordinatesChoiceRoutes = [
+export const coordinatesTypeRoutes = [
   {
     method: 'GET',
     path: PROVIDE_COORDINATES_CHOICE_ROUTE,
-    ...provideCoordinatesChoiceController
+    ...coordinatesTypeController
+  },
+  {
+    method: 'POST',
+    path: PROVIDE_COORDINATES_CHOICE_ROUTE,
+    ...coordinatesTypeSubmitController
   }
 ]
 

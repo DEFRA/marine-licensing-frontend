@@ -1,6 +1,7 @@
 import {
   getExemptionCache,
   setExemptionCache,
+  updateExemptionSiteDetails,
   EXEMPTION_CACHE_KEY
 } from '~/src/server/common/helpers/session-cache/utils.js'
 import { clone } from '@hapi/hoek'
@@ -102,6 +103,67 @@ describe('#utils', () => {
       expect(mockRequest.yar.set).toHaveBeenCalledWith(EXEMPTION_CACHE_KEY, {})
 
       expect(cache).toEqual({})
+    })
+  })
+
+  describe('updateExemptionSiteDetails', () => {
+    let mockRequest
+
+    beforeEach(() => {
+      jest.clearAllMocks()
+
+      mockRequest = {
+        yar: {
+          get: jest.fn(),
+          set: jest.fn()
+        }
+      }
+    })
+
+    test('should store the value in cache', () => {
+      const value = { coordinatesType: 'file' }
+
+      const result = updateExemptionSiteDetails(
+        mockRequest,
+        'coordinatesType',
+        value.coordinatesType
+      )
+
+      expect(mockRequest.yar.set).toHaveBeenCalledWith(EXEMPTION_CACHE_KEY, {
+        siteDetails: value
+      })
+      expect(result).toEqual(value)
+    })
+
+    test('should handle empty objects', () => {
+      const value = {}
+
+      const result = updateExemptionSiteDetails(
+        mockRequest,
+        'coordinatesType',
+        value.coordinatesType
+      )
+
+      expect(mockRequest.yar.set).toHaveBeenCalledWith(EXEMPTION_CACHE_KEY, {
+        siteDetails: value
+      })
+      expect(result).toEqual({ coordinatesType: undefined })
+    })
+
+    test('should handle undefined values and default to an empty object', () => {
+      const value = undefined
+
+      const result = updateExemptionSiteDetails(
+        mockRequest,
+        'coordinatesType',
+        value
+      )
+
+      expect(mockRequest.yar.set).toHaveBeenCalledWith(EXEMPTION_CACHE_KEY, {
+        siteDetails: { coordinatesType: undefined }
+      })
+
+      expect(result).toEqual({})
     })
   })
 })

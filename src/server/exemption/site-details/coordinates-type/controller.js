@@ -1,4 +1,7 @@
-import { getExemptionCache } from '~/src/server/common/helpers/session-cache/utils.js'
+import {
+  getExemptionCache,
+  updateExemptionSiteDetails
+} from '~/src/server/common/helpers/session-cache/utils.js'
 import {
   errorDescriptionByFieldName,
   mapErrorsForDisplay
@@ -29,9 +32,14 @@ export const coordinatesTypeController = {
   handler(request, h) {
     const exemption = getExemptionCache(request)
 
+    const siteDetails = exemption.siteDetails ?? {}
+
     return h.view(PROVIDE_COORDINATES_CHOICE_VIEW_ROUTE, {
       ...provideCoordinatesSettings,
-      projectName: exemption.projectName
+      projectName: exemption.projectName,
+      payload: {
+        coordinatesType: siteDetails.coordinatesType
+      }
     })
   }
 }
@@ -86,11 +94,22 @@ export const coordinatesTypeSubmitController = {
     }
   },
   handler(request, h) {
+    const { payload } = request
+
     const exemption = getExemptionCache(request)
+
+    updateExemptionSiteDetails(
+      request,
+      'coordinatesType',
+      payload.coordinatesType
+    )
 
     return h.view(PROVIDE_COORDINATES_CHOICE_VIEW_ROUTE, {
       ...provideCoordinatesSettings,
-      projectName: exemption.projectName
+      projectName: exemption.projectName,
+      payload: {
+        coordinatesType: payload.coordinatesType
+      }
     })
   }
 }

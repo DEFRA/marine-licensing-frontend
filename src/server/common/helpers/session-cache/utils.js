@@ -18,3 +18,21 @@ export const setExemptionCache = (request, value) => {
   request.yar.set(EXEMPTION_CACHE_KEY, value || {})
   return cacheValue
 }
+
+/**
+ * @param { Request } request
+ * @param { string } key
+ * @param { {} } value
+ */
+export const updateExemptionSiteDetails = (request, key, value) => {
+  const existingCache = getExemptionCache(request)
+  const existingSiteDetails = existingCache.siteDetails
+  const cacheValue = value || undefined
+
+  request.yar.set(EXEMPTION_CACHE_KEY, {
+    ...existingCache,
+    siteDetails: { ...existingSiteDetails, [key]: cacheValue }
+  })
+
+  return { [key]: cacheValue }
+}

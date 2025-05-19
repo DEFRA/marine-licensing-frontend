@@ -136,6 +136,29 @@ describe('#coordinatesTypeController', () => {
     expect(h.view().takeover).toHaveBeenCalled()
   })
 
+  test('Should correctly output page with no error data in object', () => {
+    const request = {
+      payload: { coordinatesType: 'invalid' }
+    }
+
+    const h = {
+      view: jest.fn().mockReturnValue({
+        takeover: jest.fn()
+      })
+    }
+
+    coordinatesTypeSubmitController.options.validate.failAction(request, h, {})
+
+    expect(h.view).toHaveBeenCalledWith(PROVIDE_COORDINATES_CHOICE_VIEW_ROUTE, {
+      pageTitle: 'How do you want to provide the site location?',
+      heading: 'How do you want to provide the site location?',
+      projectName: 'Test Project',
+      payload: { coordinatesType: 'invalid' }
+    })
+
+    expect(h.view().takeover).toHaveBeenCalled()
+  })
+
   test('Should correctly validate on valid data', () => {
     const request = {
       coordinatesType: 'file'

@@ -98,6 +98,18 @@ describe('#taskListController', () => {
           }
         },
         {
+          href: '/exemption/how-do-you-want-to-provide-the-coordinates',
+          status: {
+            tag: {
+              classes: 'govuk-tag--blue',
+              text: 'Incomplete'
+            }
+          },
+          title: {
+            text: 'Site details'
+          }
+        },
+        {
           href: '/exemption/public-register',
           status: {
             text: 'Completed'

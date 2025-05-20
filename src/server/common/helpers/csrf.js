@@ -6,7 +6,6 @@ export const csrf = {
   plugin: crumb,
   options: {
     key: 'csrfToken',
-    restful: true,
     cookieOptions: {
       isSecure: config.get('isProduction')
     },

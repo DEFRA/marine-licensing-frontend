@@ -1,0 +1,55 @@
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/radios/macro.njk" import govukRadios %}
+{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+
+        {% if params.errorSummary %}
+            {{ govukErrorSummary({
+                titleText: "There is a problem",
+                errorList: params.errorSummary
+            }) }}
+        {% endif %}
+
+        {% if params.projectName %}
+            <span class="govuk-caption-l">{{ params.projectName }}</span>
+        {% endif %}
+
+        {% if params.isPageHeading %} {% else %}
+            <h1 class="govuk-heading-l">{{ params.heading }}</h1>
+        {% endif %}
+
+        <form method="POST">
+
+            {{ govukRadios({
+                idPrefix: params.name,
+                name: params.name,
+                value: params.value,
+                fieldset: {
+                    legend: {
+                    text: params.heading,
+                    isPageHeading: true,
+                    classes: "govuk-fieldset__legend govuk-fieldset__legend--l govuk-!-margin-bottom-6"
+                    }
+                } if params.isPageHeading,
+                hint: {
+                    text: params.hint
+                } if params.hint,
+                errorMessage: params.errorMessage,
+                items: params.items
+            }) }}
+
+            <div class="govuk-button-group">
+                {{ govukButton({
+                text: "Continue",
+                classes: "govuk-button--primary"
+                }) }}
+
+                <a class="govuk-link" href="/exemption/task-list">Cancel</a>
+            </div>
+
+        </form>
+
+    </div>
+<div>

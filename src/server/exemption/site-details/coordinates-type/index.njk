@@ -1,0 +1,35 @@
+{% extends 'layouts/page.njk' %}
+{% from "govuk/components/back-link/macro.njk" import govukBackLink %}
+{% from "radio-page/macro.njk" import appRadioPage %}
+
+{% block beforeContent %}
+  {{ govukBackLink({
+    text: "Back",
+    href: '/exemption/task-list'
+  }) }}
+{% endblock %}
+
+{% block content %}
+
+  {{ appRadioPage({
+      name: "coordinatesType",
+      errorSummary: errorSummary,
+      errors: errors,
+      heading: "How do you want to provide the site location?",
+      isPageHeading: true,
+      value: payload.coordinatesType,
+      errorMessage: errors['coordinatesType'],
+      projectName: projectName,
+      items: [
+        {
+          value: "file",
+          text: "Upload a file with the coordinates of the site"
+        },
+        {
+          value: "coordinates",
+          text: "Enter the coordinates of the site manually"
+        }
+      ]
+    }) }}
+
+{% endblock %}

@@ -9,5 +9,6 @@ export const mockExemption = {
   id: faker.database.mongodbObjectId(),
   projectName: 'Test Project',
   publicRegister: { consent: 'yes', reason: 'Test reason' },
+  siteDetails: { coordinatesType: 'coordinates' },
   taskList: mockExemptionTaskList
 }

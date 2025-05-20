@@ -9,7 +9,7 @@ import * as globals from '~/src/config/nunjucks/globals.js'
 const dirname = path.dirname(fileURLToPath(import.meta.url))
 const nunjucksTestEnv = nunjucks.configure(
   [
-    '~/node_modules/govuk-frontend/dist/',
+    'node_modules/govuk-frontend/dist/',
     path.normalize(path.resolve(dirname, '../common/templates')),
     path.normalize(path.resolve(dirname, '../common/components'))
   ],

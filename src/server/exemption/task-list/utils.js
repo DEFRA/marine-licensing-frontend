@@ -30,6 +30,14 @@ export const transformTaskList = (taskList) => {
       href: '/exemption/project-name',
       status: setStatus(taskList.projectName)
     },
+
+    {
+      title: {
+        text: 'Site details'
+      },
+      href: '/exemption/how-do-you-want-to-provide-the-coordinates',
+      status: setStatus(taskList.siteDetails)
+    },
     {
       title: {
         text: 'Public register'

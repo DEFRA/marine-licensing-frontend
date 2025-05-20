@@ -29,7 +29,10 @@ describe('radioPage Component', () => {
     const legend = $radioPage('.govuk-fieldset__legend')
 
     expect(legend).toHaveLength(1)
-    expect(legend.children('h1').text().trim()).toBe('Test heading')
+    expect(legend.children('h1').html().trim()).toContain(
+      '<span class="govuk-caption-l">test project</span>'
+    )
+    expect(legend.children('h1').html().trim()).toContain('Test heading')
 
     expect($radioPage('.govuk-caption-l').text().trim()).toBe('test project')
 

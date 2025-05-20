@@ -16,6 +16,7 @@ jest.mock('~/src/server/common/helpers/session-cache/utils.js')
 describe('#coordinatesTypeController', () => {
   /** @type {Server} */
   let server
+  let getExemptionCacheSpy
 
   beforeAll(async () => {
     server = await createServer()
@@ -24,7 +25,9 @@ describe('#coordinatesTypeController', () => {
 
   beforeEach(() => {
     jest.resetAllMocks()
-    jest.spyOn(cacheUtils, 'getExemptionCache').mockReturnValue(mockExemption)
+    getExemptionCacheSpy = jest
+      .spyOn(cacheUtils, 'getExemptionCache')
+      .mockReturnValue(mockExemption)
   })
 
   afterAll(async () => {
@@ -39,7 +42,25 @@ describe('#coordinatesTypeController', () => {
     expect(h.view).toHaveBeenCalledWith(PROVIDE_COORDINATES_CHOICE_VIEW_ROUTE, {
       pageTitle: 'How do you want to provide the site location?',
       heading: 'How do you want to provide the site location?',
+      payload: { coordinatesType: 'coordinates' },
+      projectName: 'Test Project'
+    })
+  })
+
+  test('coordinatesTypeController handler should render with correct context with no existing cache data', () => {
+    getExemptionCacheSpy.mockReturnValueOnce({
       projectName: mockExemption.projectName
+    })
+
+    const h = { view: jest.fn() }
+
+    coordinatesTypeController.handler({}, h)
+
+    expect(h.view).toHaveBeenCalledWith(PROVIDE_COORDINATES_CHOICE_VIEW_ROUTE, {
+      pageTitle: 'How do you want to provide the site location?',
+      heading: 'How do you want to provide the site location?',
+      payload: { coordinatesType: undefined },
+      projectName: 'Test Project'
     })
   })
 
@@ -57,8 +78,11 @@ describe('#coordinatesTypeController', () => {
 
     const { document } = new JSDOM(result).window
 
-    expect(document.querySelector('h1').textContent.trim()).toBe(
+    expect(document.querySelector('h1').textContent.trim()).toContain(
       'How do you want to provide the site location?'
+    )
+    expect(document.querySelector('h1').innerHTML.trim()).toContain(
+      '<span class="govuk-caption-l">Test Project</span>'
     )
 
     expect(document.querySelector('.govuk-caption-l').textContent.trim()).toBe(
@@ -70,6 +94,8 @@ describe('#coordinatesTypeController', () => {
     expect(document.querySelector('#coordinatesType-2').value).toBe(
       'coordinates'
     )
+
+    expect(document.querySelector('#coordinatesType-2').checked).toBe(true)
 
     expect(
       document
@@ -86,18 +112,146 @@ describe('#coordinatesTypeController', () => {
     expect(statusCode).toBe(statusCodes.ok)
   })
 
+  test('Should correctly format error data', () => {
+    const request = {
+      payload: { coordinatesType: 'invalid' }
+    }
+
+    const h = {
+      view: jest.fn().mockReturnValue({
+        takeover: jest.fn()
+      })
+    }
+
+    const err = {
+      details: [
+        {
+          path: ['coordinatesType'],
+          message: 'TEST',
+          type: 'any.only'
+        }
+      ]
+    }
+
+    coordinatesTypeSubmitController.options.validate.failAction(request, h, err)
+
+    expect(h.view).toHaveBeenCalledWith(PROVIDE_COORDINATES_CHOICE_VIEW_ROUTE, {
+      pageTitle: 'How do you want to provide the site location?',
+      heading: 'How do you want to provide the site location?',
+      projectName: 'Test Project',
+      payload: { coordinatesType: 'invalid' },
+      errorSummary: [
+        {
+          href: '#coordinatesType',
+          text: 'TEST',
+          field: ['coordinatesType']
+        }
+      ],
+      errors: {
+        coordinatesType: {
+          field: ['coordinatesType'],
+          href: '#coordinatesType',
+          text: 'TEST'
+        }
+      }
+    })
+
+    expect(h.view().takeover).toHaveBeenCalled()
+  })
+
+  test('Should correctly output page with no error data in object', () => {
+    const request = {
+      payload: { coordinatesType: 'invalid' }
+    }
+
+    const h = {
+      view: jest.fn().mockReturnValue({
+        takeover: jest.fn()
+      })
+    }
+
+    coordinatesTypeSubmitController.options.validate.failAction(request, h, {})
+
+    expect(h.view).toHaveBeenCalledWith(PROVIDE_COORDINATES_CHOICE_VIEW_ROUTE, {
+      pageTitle: 'How do you want to provide the site location?',
+      heading: 'How do you want to provide the site location?',
+      projectName: 'Test Project',
+      payload: { coordinatesType: 'invalid' }
+    })
+
+    expect(h.view().takeover).toHaveBeenCalled()
+  })
+
+  test('Should correctly validate on valid data', () => {
+    const request = {
+      coordinatesType: 'file'
+    }
+
+    const payloadValidator =
+      coordinatesTypeSubmitController.options.validate.payload
+
+    const result = payloadValidator.validate(request)
+
+    expect(result.error).toBeUndefined()
+  })
+
+  test('Should correctly validate on empty data', () => {
+    const request = {}
+
+    const payloadValidator =
+      coordinatesTypeSubmitController.options.validate.payload
+
+    const result = payloadValidator.validate(request)
+
+    expect(result.error.message).toBe('PROVIDE_COORDINATES_CHOICE_REQUIRED')
+  })
+
+  test('Should correctly validate on invalid data', () => {
+    const request = { coordinatesType: 'invalid' }
+
+    const payloadValidator =
+      coordinatesTypeSubmitController.options.validate.payload
+
+    const result = payloadValidator.validate(request)
+
+    expect(result.error.message).toBe('PROVIDE_COORDINATES_CHOICE_REQUIRED')
+  })
+
   test('Should correctly remain on the same page when POST is successful', async () => {
     const h = {
       view: jest.fn()
     }
 
-    await coordinatesTypeSubmitController.handler({}, h)
+    await coordinatesTypeSubmitController.handler(
+      { payload: { coordinatesType: 'file' } },
+      h
+    )
 
     expect(h.view).toHaveBeenCalledWith(PROVIDE_COORDINATES_CHOICE_VIEW_ROUTE, {
       pageTitle: 'How do you want to provide the site location?',
       heading: 'How do you want to provide the site location?',
+      payload: { coordinatesType: 'file' },
       projectName: mockExemption.projectName
     })
+  })
+
+  test('Should correctly set the cache when submitting', async () => {
+    const h = {
+      redirect: jest.fn().mockReturnValue({
+        takeover: jest.fn()
+      }),
+      view: jest.fn()
+    }
+
+    const mockRequest = { payload: { coordinatesType: 'file' } }
+
+    await coordinatesTypeSubmitController.handler(mockRequest, h)
+
+    expect(cacheUtils.updateExemptionSiteDetails).toHaveBeenCalledWith(
+      mockRequest,
+      'coordinatesType',
+      'file'
+    )
   })
 })
 

@@ -28,6 +28,8 @@
 
         <form method="POST">
 
+            <input type="hidden" name="csrfToken" value="{{params.csrfToken}}" />
+
             {{ govukRadios({
                 idPrefix: params.name,
                 name: params.name,

@@ -16,6 +16,9 @@
         {% endif %}
 
         <form method="POST">
+          
+          <input type="hidden" name="csrfToken" value="{{csrfToken}}" />
+
           {{ govukInput({
             label: {
               text: "Project name",

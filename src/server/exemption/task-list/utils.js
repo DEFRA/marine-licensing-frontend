@@ -1,3 +1,5 @@
+import { routes } from '~/src/server/common/constants/routes.js'
+
 /**
  * Set text for front end display
  * @param { string } task
@@ -27,7 +29,7 @@ export const transformTaskList = (taskList) => {
       title: {
         text: 'Project name'
       },
-      href: '/exemption/project-name',
+      href: routes.PROJECT_NAME,
       status: setStatus(taskList.projectName)
     },
 
@@ -42,7 +44,7 @@ export const transformTaskList = (taskList) => {
       title: {
         text: 'Public register'
       },
-      href: '/exemption/public-register',
+      href: routes.PUBLIC_REGISTER,
       status: setStatus(taskList.publicRegister)
     }
   ]

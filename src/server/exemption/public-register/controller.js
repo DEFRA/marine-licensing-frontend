@@ -7,11 +7,11 @@ import {
   errorDescriptionByFieldName,
   mapErrorsForDisplay
 } from '~/src/server/common/helpers/errors.js'
+import { routes } from '~/src/server/common/constants/routes.js'
 
 import Wreck from '@hapi/wreck'
 import joi from 'joi'
 
-export const PUBLIC_REGISTER_ROUTE = '/exemption/public-register'
 export const PUBLIC_REGISTER_VIEW_ROUTE = 'exemption/public-register/index'
 
 export const errorMessages = {
@@ -124,7 +124,7 @@ export const publicRegisterSubmitController = {
         }
       })
 
-      return h.redirect('/exemption/task-list')
+      return h.redirect(routes.TASK_LIST)
     } catch (e) {
       const validation = e.data?.payload?.validation
       const details = validation?.details

@@ -7,11 +7,11 @@ import { JSDOM } from 'jsdom'
 import {
   publicRegisterController,
   publicRegisterSubmitController,
-  PUBLIC_REGISTER_ROUTE,
   PUBLIC_REGISTER_VIEW_ROUTE,
   errorMessages
 } from '~/src/server/exemption/public-register/controller.js'
 import * as cacheUtils from '~/src/server/common/helpers/session-cache/utils.js'
+import { routes } from '~/src/server/common/constants/routes.js'
 
 jest.mock('~/src/server/common/helpers/session-cache/utils.js')
 
@@ -52,7 +52,7 @@ describe('#publicRegisterController', () => {
   test('Should provide expected response and correctly pre populate data', async () => {
     const { result, statusCode } = await server.inject({
       method: 'GET',
-      url: PUBLIC_REGISTER_ROUTE
+      url: routes.PUBLIC_REGISTER
     })
 
     expect(result).toEqual(
@@ -93,7 +93,7 @@ describe('#publicRegisterController', () => {
 
     const { result, statusCode } = await server.inject({
       method: 'GET',
-      url: PUBLIC_REGISTER_ROUTE
+      url: routes.PUBLIC_REGISTER
     })
 
     expect(result).toEqual(
@@ -112,7 +112,7 @@ describe('#publicRegisterController', () => {
   test('Should correctly redirect to the next page on success', async () => {
     const { statusCode, headers } = await server.inject({
       method: 'POST',
-      url: PUBLIC_REGISTER_ROUTE,
+      url: routes.PUBLIC_REGISTER,
       payload: { consent: 'yes', reason: 'Test reason' }
     })
 
@@ -182,7 +182,7 @@ describe('#publicRegisterController', () => {
 
     const { result, statusCode } = await server.inject({
       method: 'POST',
-      url: PUBLIC_REGISTER_ROUTE,
+      url: routes.PUBLIC_REGISTER,
       payload: { consent: 'no' }
     })
 
@@ -214,7 +214,7 @@ describe('#publicRegisterController', () => {
 
     const { result } = await server.inject({
       method: 'POST',
-      url: PUBLIC_REGISTER_ROUTE,
+      url: routes.PUBLIC_REGISTER,
       payload: { consent: 'no' }
     })
 
@@ -350,7 +350,7 @@ describe('#publicRegisterController', () => {
 
     const { result } = await server.inject({
       method: 'POST',
-      url: PUBLIC_REGISTER_ROUTE,
+      url: routes.PUBLIC_REGISTER,
       payload: { consent: '' }
     })
 
@@ -366,7 +366,7 @@ describe('#publicRegisterController', () => {
 
     const { result } = await server.inject({
       method: 'POST',
-      url: PUBLIC_REGISTER_ROUTE,
+      url: routes.PUBLIC_REGISTER,
       payload: { consent: 'yes' }
     })
 

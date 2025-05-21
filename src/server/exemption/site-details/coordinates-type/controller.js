@@ -9,8 +9,6 @@ import {
 
 import joi from 'joi'
 
-export const PROVIDE_COORDINATES_CHOICE_ROUTE =
-  '/exemption/how-do-you-want-to-provide-the-coordinates'
 export const PROVIDE_COORDINATES_CHOICE_VIEW_ROUTE =
   'exemption/site-details/coordinates-type/index'
 

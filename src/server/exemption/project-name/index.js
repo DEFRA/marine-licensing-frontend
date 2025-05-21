@@ -2,6 +2,7 @@ import {
   projectNameController,
   projectNameSubmitController
 } from '~/src/server/exemption/project-name/controller.js'
+import { routes } from '~/src/server/common/constants/routes.js'
 
 /**
  * Sets up the routes used in the project name page.
@@ -14,12 +15,12 @@ import {
 export const projectNameRoutes = [
   {
     method: 'GET',
-    path: '/exemption/project-name',
+    path: routes.PROJECT_NAME,
     ...projectNameController
   },
   {
     method: 'POST',
-    path: '/exemption/project-name',
+    path: routes.PROJECT_NAME,
     ...projectNameSubmitController
   }
 ]

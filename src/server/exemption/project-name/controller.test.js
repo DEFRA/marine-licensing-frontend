@@ -1,5 +1,6 @@
 import { createServer } from '~/src/server/index.js'
 import { statusCodes } from '~/src/server/common/constants/status-codes.js'
+import { routes } from '~/src/server/common/constants/routes.js'
 import { mockExemption } from '~/src/server/test-helpers/mocks.js'
 import { config } from '~/src/config/config.js'
 import Wreck from '@hapi/wreck'
@@ -7,7 +8,6 @@ import { JSDOM } from 'jsdom'
 import {
   projectNameSubmitController,
   projectNameController,
-  PROJECT_NAME_ROUTE,
   PROJECT_NAME_VIEW_ROUTE
 } from '~/src/server/exemption/project-name/controller.js'
 import * as cacheUtils from '~/src/server/common/helpers/session-cache/utils.js'
@@ -45,7 +45,7 @@ describe('#projectNameController', () => {
   test('Should provide expected response and correctly pre populate data', async () => {
     const { result, statusCode } = await server.inject({
       method: 'GET',
-      url: PROJECT_NAME_ROUTE
+      url: routes.PROJECT_NAME
     })
 
     expect(result).toEqual(
@@ -66,7 +66,7 @@ describe('#projectNameController', () => {
 
     const { result, statusCode } = await server.inject({
       method: 'GET',
-      url: PROJECT_NAME_ROUTE
+      url: routes.PROJECT_NAME
     })
 
     expect(result).toEqual(
@@ -89,7 +89,7 @@ describe('#projectNameController', () => {
 
     const { statusCode, headers } = await server.inject({
       method: 'POST',
-      url: PROJECT_NAME_ROUTE,
+      url: routes.PROJECT_NAME,
       payload: { projectName: 'Project name' }
     })
 
@@ -100,7 +100,7 @@ describe('#projectNameController', () => {
 
     expect(statusCode).toBe(302)
 
-    expect(headers.location).toBe('/exemption/task-list')
+    expect(headers.location).toBe(routes.TASK_LIST)
   })
 
   test('Should correctly update existing project and redirect to the next page on success', async () => {
@@ -110,7 +110,7 @@ describe('#projectNameController', () => {
 
     const { statusCode, headers } = await server.inject({
       method: 'POST',
-      url: PROJECT_NAME_ROUTE,
+      url: routes.PROJECT_NAME,
       payload: { projectName: 'Project name' }
     })
 
@@ -124,7 +124,7 @@ describe('#projectNameController', () => {
 
     expect(statusCode).toBe(302)
 
-    expect(headers.location).toBe('/exemption/task-list')
+    expect(headers.location).toBe(routes.TASK_LIST)
   })
 
   test('projectNameController handler should render with correct context', () => {
@@ -172,7 +172,7 @@ describe('#projectNameController', () => {
 
     const { result, statusCode } = await server.inject({
       method: 'POST',
-      url: PROJECT_NAME_ROUTE,
+      url: routes.PROJECT_NAME,
       payload: { projectName: 'test' }
     })
 
@@ -202,7 +202,7 @@ describe('#projectNameController', () => {
 
     const { result } = await server.inject({
       method: 'POST',
-      url: PROJECT_NAME_ROUTE,
+      url: routes.PROJECT_NAME,
       payload: { projectName: 'test' }
     })
 
@@ -312,7 +312,7 @@ describe('#projectNameController', () => {
 
     const { result } = await server.inject({
       method: 'POST',
-      url: PROJECT_NAME_ROUTE,
+      url: routes.PROJECT_NAME,
       payload: { projectName: '' }
     })
 

@@ -2,14 +2,14 @@ import { createServer } from '~/src/server/index.js'
 import {
   coordinatesTypeController,
   coordinatesTypeSubmitController,
-  PROVIDE_COORDINATES_CHOICE_VIEW_ROUTE,
-  PROVIDE_COORDINATES_CHOICE_ROUTE
+  PROVIDE_COORDINATES_CHOICE_VIEW_ROUTE
 } from '~/src/server/exemption/site-details/coordinates-type/controller.js'
 import * as cacheUtils from '~/src/server/common/helpers/session-cache/utils.js'
 import { mockExemption } from '~/src/server/test-helpers/mocks.js'
 import { statusCodes } from '~/src/server/common/constants/status-codes.js'
 import { config } from '~/src/config/config.js'
 import { JSDOM } from 'jsdom'
+import { routes } from '~/src/server/common/constants/routes.js'
 
 jest.mock('~/src/server/common/helpers/session-cache/utils.js')
 
@@ -67,7 +67,7 @@ describe('#coordinatesTypeController', () => {
   test('Should provide expected response and correctly pre populate data', async () => {
     const { result, statusCode } = await server.inject({
       method: 'GET',
-      url: PROVIDE_COORDINATES_CHOICE_ROUTE
+      url: routes.COORDINATES_TYPE_CHOICE
     })
 
     expect(result).toEqual(

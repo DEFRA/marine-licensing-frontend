@@ -5,7 +5,6 @@ import { transformTaskList } from '~/src/server/exemption/task-list/utils.js'
 import Wreck from '@hapi/wreck'
 import Boom from '@hapi/boom'
 
-export const TASK_LIST_ROUTE = '/exemption/task-list'
 export const TASK_LIST_VIEW_ROUTE = 'exemption/task-list/index'
 
 const taskListViewSettings = {

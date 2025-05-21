@@ -1,4 +1,5 @@
 import { taskListController } from '~/src/server/exemption/task-list/controller.js'
+import { routes } from '~/src/server/common/constants/routes.js'
 
 /**
  * Sets up the routes used in the task list page.
@@ -11,7 +12,7 @@ import { taskListController } from '~/src/server/exemption/task-list/controller.
 export const taskListRoutes = [
   {
     method: 'GET',
-    path: '/exemption/task-list',
+    path: routes.TASK_LIST,
     ...taskListController
   }
 ]

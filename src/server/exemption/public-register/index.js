@@ -2,6 +2,7 @@ import {
   publicRegisterController,
   publicRegisterSubmitController
 } from '~/src/server/exemption/public-register/controller.js'
+import { routes } from '~/src/server/common/constants/routes.js'
 
 /**
  * Sets up the routes used in the public register page.
@@ -14,12 +15,12 @@ import {
 export const publicRegisterRoutes = [
   {
     method: 'GET',
-    path: '/exemption/public-register',
+    path: routes.PUBLIC_REGISTER,
     ...publicRegisterController
   },
   {
     method: 'POST',
-    path: '/exemption/public-register',
+    path: routes.PUBLIC_REGISTER,
     ...publicRegisterSubmitController
   }
 ]

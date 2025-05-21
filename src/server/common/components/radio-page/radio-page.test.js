@@ -4,6 +4,8 @@ describe('radioPage Component', () => {
   /** @type {CheerioAPI} */
   let $radioPage
 
+  const csrfToken = 'testCSRF'
+
   const commonTestData = {
     name: 'test-name',
     items: [
@@ -16,7 +18,8 @@ describe('radioPage Component', () => {
         text: 'No'
       }
     ],
-    projectName: 'test project'
+    projectName: 'test project',
+    csrfToken
   }
 
   test('Should render radio buttons page correctly with a heading inside the form element', () => {

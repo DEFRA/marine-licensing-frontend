@@ -98,7 +98,7 @@ describe('#taskListController', () => {
           }
         },
         {
-          href: '/exemption/how-do-you-want-to-provide-the-coordinates',
+          href: routes.COORDINATES_TYPE_CHOICE,
           status: {
             tag: {
               classes: 'govuk-tag--blue',

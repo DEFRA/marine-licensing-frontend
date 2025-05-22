@@ -11,7 +11,7 @@ describe('taskList utils', () => {
         title: { text: 'Project name' }
       },
       {
-        href: '/exemption/how-do-you-want-to-provide-the-coordinates',
+        href: routes.COORDINATES_TYPE_CHOICE,
         status: { tag: { text: 'Incomplete', classes: 'govuk-tag--blue' } },
         title: { text: 'Site details' }
       },
@@ -31,7 +31,7 @@ describe('taskList utils', () => {
         title: { text: 'Project name' }
       },
       {
-        href: '/exemption/how-do-you-want-to-provide-the-coordinates',
+        href: routes.COORDINATES_TYPE_CHOICE,
         status: { tag: { text: 'Incomplete', classes: 'govuk-tag--blue' } },
         title: { text: 'Site details' }
       },

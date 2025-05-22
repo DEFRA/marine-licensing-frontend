@@ -37,7 +37,7 @@ export const transformTaskList = (taskList) => {
       title: {
         text: 'Site details'
       },
-      href: '/exemption/how-do-you-want-to-provide-the-coordinates',
+      href: routes.COORDINATES_TYPE_CHOICE,
       status: setStatus(taskList.siteDetails)
     },
     {

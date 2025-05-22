@@ -6,6 +6,7 @@ import {
   errorDescriptionByFieldName,
   mapErrorsForDisplay
 } from '~/src/server/common/helpers/errors.js'
+import { routes } from '~/src/server/common/constants/routes.js'
 
 import joi from 'joi'
 
@@ -101,6 +102,10 @@ export const coordinatesTypeSubmitController = {
       'coordinatesType',
       payload.coordinatesType
     )
+
+    if (payload.coordinatesType === 'coordinates') {
+      return h.redirect(routes.COORDINATES_ENTRY_CHOICE).takeover()
+    }
 
     return h.view(PROVIDE_COORDINATES_CHOICE_VIEW_ROUTE, {
       ...provideCoordinatesSettings,

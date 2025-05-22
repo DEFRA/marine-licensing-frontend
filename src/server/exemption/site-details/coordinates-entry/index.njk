@@ -1,0 +1,43 @@
+{% extends 'layouts/page.njk' %}
+{% from "govuk/components/back-link/macro.njk" import govukBackLink %}
+{% from "radio-page/macro.njk" import appRadioPage %}
+
+{% block beforeContent %}
+  {{ govukBackLink({
+    text: "Back",
+    href: backLink
+  }) }}
+{% endblock %}
+
+{% block content %}
+
+  {{ appRadioPage({
+      name: "coordinatesEntry",
+      errorSummary: errorSummary,
+      errors: errors,
+      heading: "How do you want to enter the coordinates?",
+      isPageHeading: true,
+      value: payload.coordinatesEntry,
+      errorMessage: errors['coordinatesEntry'],
+      projectName: projectName,
+      items: [
+        {
+          value: "single",
+          text: "Enter one set of coordinates and a width to create a circular site",
+          hint: {
+            text: "Use this if you only have the centre point of the site"
+          }
+        },
+        {
+          value: "multiple",
+          text: "Enter multiple sets of coordinates to mark the boundary of the site",
+          hint: {
+            text: "Use this if the site is a custom shape with more than one point"
+          }
+        }
+      ],
+      csrfToken: csrfToken
+    })
+  }}
+
+{% endblock %} 

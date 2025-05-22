@@ -5,10 +5,10 @@ import { JSDOM } from 'jsdom'
 import * as cacheUtils from '~/src/server/common/helpers/session-cache/utils.js'
 import {
   taskListController,
-  TASK_LIST_ROUTE,
   TASK_LIST_VIEW_ROUTE
 } from '~/src/server/exemption/task-list/controller.js'
 import { mockExemption } from '~/src/server/test-helpers/mocks.js'
+import { routes } from '~/src/server/common/constants/routes.js'
 
 import Wreck from '@hapi/wreck'
 
@@ -43,7 +43,7 @@ describe('#taskListController', () => {
   test('Should provide expected response when loading page', async () => {
     const { result, statusCode } = await server.inject({
       method: 'GET',
-      url: TASK_LIST_ROUTE
+      url: routes.TASK_LIST
     })
 
     expect(result).toEqual(
@@ -89,7 +89,7 @@ describe('#taskListController', () => {
       projectName: 'Test Project',
       taskList: [
         {
-          href: '/exemption/project-name',
+          href: routes.PROJECT_NAME,
           status: {
             text: 'Completed'
           },
@@ -98,7 +98,7 @@ describe('#taskListController', () => {
           }
         },
         {
-          href: '/exemption/how-do-you-want-to-provide-the-coordinates',
+          href: routes.COORDINATES_TYPE_CHOICE,
           status: {
             tag: {
               classes: 'govuk-tag--blue',
@@ -110,7 +110,7 @@ describe('#taskListController', () => {
           }
         },
         {
-          href: '/exemption/public-register',
+          href: routes.PUBLIC_REGISTER,
           status: {
             text: 'Completed'
           },

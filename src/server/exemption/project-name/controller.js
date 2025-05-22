@@ -7,6 +7,7 @@ import {
   getExemptionCache,
   setExemptionCache
 } from '~/src/server/common/helpers/session-cache/utils.js'
+import { routes } from '~/src/server/common/constants/routes.js'
 
 import Wreck from '@hapi/wreck'
 import joi from 'joi'
@@ -16,7 +17,6 @@ const errorMessages = {
   PROJECT_NAME_MAX_LENGTH: 'Project name should be 250 characters or less'
 }
 
-export const PROJECT_NAME_ROUTE = '/exemption/project-name'
 export const PROJECT_NAME_VIEW_ROUTE = 'exemption/project-name/index'
 
 const projectNameViewSettings = {
@@ -107,7 +107,7 @@ export const projectNameSubmitController = {
         projectName: payload.projectName
       })
 
-      return h.redirect('/exemption/task-list')
+      return h.redirect(routes.TASK_LIST)
     } catch (e) {
       const { details } = e.data?.payload?.validation ?? {}
 

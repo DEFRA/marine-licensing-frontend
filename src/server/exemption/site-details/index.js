@@ -1,5 +1,6 @@
 import { coordinatesTypeRoutes } from '~/src/server/exemption/site-details/coordinates-type/index.js'
 import { coordinatesEntryRoutes } from '~/src/server/exemption/site-details/coordinates-entry/index.js'
+import { coordinateSystemRoutes } from '~/src/server/exemption/site-details/coordinate-system/index.js'
 
 /**
  * Sets up the routes used in the Site Details section
@@ -11,7 +12,8 @@ import { coordinatesEntryRoutes } from '~/src/server/exemption/site-details/coor
  */
 export const siteDetailsRoutes = [
   ...coordinatesTypeRoutes,
-  ...coordinatesEntryRoutes
+  ...coordinatesEntryRoutes,
+  ...coordinateSystemRoutes
 ]
 
 /**

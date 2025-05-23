@@ -95,20 +95,12 @@ export const coordinatesEntrySubmitController = {
   handler(request, h) {
     const { payload } = request
 
-    const exemption = getExemptionCache(request)
-
     updateExemptionSiteDetails(
       request,
       'coordinatesEntry',
       payload.coordinatesEntry
     )
 
-    return h.view(COORDINATES_ENTRY_VIEW_ROUTE, {
-      ...coordinatesEntrySettings,
-      projectName: exemption.projectName,
-      payload: {
-        coordinatesEntry: payload.coordinatesEntry
-      }
-    })
+    return h.redirect(routes.COORDINATE_SYSTEM_CHOICE)
   }
 }

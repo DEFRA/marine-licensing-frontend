@@ -15,14 +15,13 @@ export const COORDINATES_ENTRY_VIEW_ROUTE =
 
 const coordinatesEntrySettings = {
   pageTitle: 'How do you want to enter the coordinates?',
-  heading: 'How do you want to enter the coordinates?'
+  heading: 'How do you want to enter the coordinates?',
+  backLink: routes.COORDINATES_TYPE_CHOICE
 }
 
 export const errorMessages = {
   COORDINATES_ENTRY_REQUIRED: 'Select how you want to enter the coordinates'
 }
-
-const backLink = routes.COORDINATES_TYPE_CHOICE
 
 /**
  * A GDS styled page controller for the coordinates entry page.
@@ -36,7 +35,6 @@ export const coordinatesEntryController = {
 
     return h.view(COORDINATES_ENTRY_VIEW_ROUTE, {
       ...coordinatesEntrySettings,
-      backLink,
       projectName: exemption.projectName,
       payload: {
         coordinatesEntry: siteDetails.coordinatesEntry
@@ -72,7 +70,6 @@ export const coordinatesEntrySubmitController = {
           return h
             .view(COORDINATES_ENTRY_VIEW_ROUTE, {
               ...coordinatesEntrySettings,
-              backLink,
               payload,
               projectName
             })
@@ -86,7 +83,6 @@ export const coordinatesEntrySubmitController = {
         return h
           .view(COORDINATES_ENTRY_VIEW_ROUTE, {
             ...coordinatesEntrySettings,
-            backLink,
             payload,
             projectName,
             errors,
@@ -109,7 +105,6 @@ export const coordinatesEntrySubmitController = {
 
     return h.view(COORDINATES_ENTRY_VIEW_ROUTE, {
       ...coordinatesEntrySettings,
-      backLink,
       projectName: exemption.projectName,
       payload: {
         coordinatesEntry: payload.coordinatesEntry

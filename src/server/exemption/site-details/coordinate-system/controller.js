@@ -103,7 +103,6 @@ export const coordinateSystemSubmitController = {
       payload.coordinateSystem
     )
 
-    // Stay on the same page after submission for now
     return h.view(COORDINATE_SYSTEM_VIEW_ROUTE, {
       ...coordinateSystemSettings,
       projectName: exemption.projectName,

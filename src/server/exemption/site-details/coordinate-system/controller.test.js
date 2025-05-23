@@ -112,6 +112,20 @@ describe('#coordinateSystem', () => {
     expect(document.querySelector('#coordinateSystem').value).toBe('wgs84')
     expect(document.querySelector('#coordinateSystem-2').value).toBe('osgb36')
 
+    const hint = document.querySelector('.govuk-hint')
+    expect(hint.hasAttribute('open')).toBe(false)
+    expect(hint.innerHTML).toContain(
+      '<h2 class="govuk-heading-s">WGS84 (World Geodetic System 1984)</h2>'
+    )
+    expect(hint.innerHTML).toContain(
+      '<h2 class="govuk-heading-s">OSGB36 (National Grid)</h2>'
+    )
+
+    const hintSummary = document.querySelector('.govuk-details__summary-text')
+    expect(hintSummary.textContent.trim()).toBe(
+      'Help with the coordinate systems'
+    )
+
     expect(
       document
         .querySelector(

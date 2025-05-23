@@ -41,9 +41,7 @@
                     classes: "govuk-fieldset__legend govuk-fieldset__legend--l govuk-!-margin-bottom-6"
                     }
                 } if params.isPageHeading,
-                hint: {
-                    text: params.hint
-                } if params.hint,
+                hint: params.hint,
                 errorMessage: params.errorMessage,
                 items: params.items
             }) }}

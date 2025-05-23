@@ -217,9 +217,12 @@ describe('#coordinatesTypeController', () => {
     expect(result.error.message).toBe('PROVIDE_COORDINATES_CHOICE_REQUIRED')
   })
 
-  test('Should correctly remain on the same page when POST is successful', async () => {
+  test('Should correctly remain on the same page when file option is selected', async () => {
     const h = {
-      view: jest.fn()
+      view: jest.fn(),
+      redirect: jest.fn().mockReturnValue({
+        takeover: jest.fn()
+      })
     }
 
     await coordinatesTypeSubmitController.handler(
@@ -233,6 +236,25 @@ describe('#coordinatesTypeController', () => {
       payload: { coordinatesType: 'file' },
       projectName: mockExemption.projectName
     })
+    expect(h.redirect).not.toHaveBeenCalled()
+  })
+
+  test('Should correctly redirect to coordinates entry page when coordinates option is selected', async () => {
+    const h = {
+      view: jest.fn(),
+      redirect: jest.fn().mockReturnValue({
+        takeover: jest.fn()
+      })
+    }
+
+    await coordinatesTypeSubmitController.handler(
+      { payload: { coordinatesType: 'coordinates' } },
+      h
+    )
+
+    expect(h.redirect).toHaveBeenCalledWith(routes.COORDINATES_ENTRY_CHOICE)
+    expect(h.redirect().takeover).toHaveBeenCalled()
+    expect(h.view).not.toHaveBeenCalled()
   })
 
   test('Should correctly set the cache when submitting', async () => {

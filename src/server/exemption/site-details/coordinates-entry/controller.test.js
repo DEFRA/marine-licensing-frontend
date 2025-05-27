@@ -13,7 +13,7 @@ import { routes } from '~/src/server/common/constants/routes.js'
 
 jest.mock('~/src/server/common/helpers/session-cache/utils.js')
 
-describe('#coordinatesEntryController', () => {
+describe('#coordinatesEntry', () => {
   /** @type {Server} */
   let server
   let getExemptionCacheSpy
@@ -34,224 +34,236 @@ describe('#coordinatesEntryController', () => {
     await server.stop({ timeout: 0 })
   })
 
-  test('coordinatesEntryController handler should render with correct context', () => {
-    const h = { view: jest.fn() }
+  describe('#coordinatesEntryController', () => {
+    test('coordinatesEntryController handler should render with correct context', () => {
+      const h = { view: jest.fn() }
 
-    coordinatesEntryController.handler({}, h)
+      coordinatesEntryController.handler({}, h)
 
-    expect(h.view).toHaveBeenCalledWith(COORDINATES_ENTRY_VIEW_ROUTE, {
-      pageTitle: 'How do you want to enter the coordinates?',
-      heading: 'How do you want to enter the coordinates?',
-      backLink: routes.COORDINATES_TYPE_CHOICE,
-      payload: { coordinatesEntry: mockExemption.siteDetails.coordinatesEntry },
-      projectName: 'Test Project'
-    })
-  })
-
-  test('coordinatesEntryController handler should render with correct context with no existing cache data', () => {
-    getExemptionCacheSpy.mockReturnValueOnce({
-      projectName: mockExemption.projectName
+      expect(h.view).toHaveBeenCalledWith(COORDINATES_ENTRY_VIEW_ROUTE, {
+        pageTitle: 'How do you want to enter the coordinates?',
+        heading: 'How do you want to enter the coordinates?',
+        backLink: routes.COORDINATES_TYPE_CHOICE,
+        payload: {
+          coordinatesEntry: mockExemption.siteDetails.coordinatesEntry
+        },
+        projectName: 'Test Project'
+      })
     })
 
-    const h = { view: jest.fn() }
+    test('coordinatesEntryController handler should render with correct context with no existing cache data', () => {
+      getExemptionCacheSpy.mockReturnValueOnce({
+        projectName: mockExemption.projectName
+      })
 
-    coordinatesEntryController.handler({}, h)
+      const h = { view: jest.fn() }
 
-    expect(h.view).toHaveBeenCalledWith(COORDINATES_ENTRY_VIEW_ROUTE, {
-      pageTitle: 'How do you want to enter the coordinates?',
-      heading: 'How do you want to enter the coordinates?',
-      backLink: routes.COORDINATES_TYPE_CHOICE,
-      payload: { coordinatesEntry: undefined },
-      projectName: 'Test Project'
+      coordinatesEntryController.handler({}, h)
+
+      expect(h.view).toHaveBeenCalledWith(COORDINATES_ENTRY_VIEW_ROUTE, {
+        pageTitle: 'How do you want to enter the coordinates?',
+        heading: 'How do you want to enter the coordinates?',
+        backLink: routes.COORDINATES_TYPE_CHOICE,
+        payload: { coordinatesEntry: undefined },
+        projectName: 'Test Project'
+      })
     })
-  })
 
-  test('Should provide expected response and correctly pre populate data', async () => {
-    const { result, statusCode } = await server.inject({
-      method: 'GET',
-      url: routes.COORDINATES_ENTRY_CHOICE
-    })
+    test('Should provide expected response and correctly pre populate data', async () => {
+      const { result, statusCode } = await server.inject({
+        method: 'GET',
+        url: routes.COORDINATES_ENTRY_CHOICE
+      })
 
-    expect(result).toEqual(
-      expect.stringContaining(
-        `How do you want to enter the coordinates? | ${config.get('serviceName')}`
-      )
-    )
-
-    const { document } = new JSDOM(result).window
-
-    expect(document.querySelector('h1').textContent.trim()).toContain(
-      'How do you want to enter the coordinates?'
-    )
-    expect(document.querySelector('h1').innerHTML.trim()).toContain(
-      '<span class="govuk-caption-l">Test Project</span>'
-    )
-
-    expect(document.querySelector('.govuk-caption-l').textContent.trim()).toBe(
-      mockExemption.projectName
-    )
-
-    expect(document.querySelector('#coordinatesEntry').value).toBe('single')
-
-    expect(document.querySelector('#coordinatesEntry-2').value).toBe('multiple')
-
-    expect(
-      document
-        .querySelector(
-          `.govuk-back-link[href="${routes.COORDINATES_TYPE_CHOICE}"`
+      expect(result).toEqual(
+        expect.stringContaining(
+          `How do you want to enter the coordinates? | ${config.get('serviceName')}`
         )
-        .textContent.trim()
-    ).toBe('Back')
+      )
 
-    expect(
-      document
-        .querySelector('.govuk-link[href="/exemption/task-list"')
-        .textContent.trim()
-    ).toBe('Cancel')
+      const { document } = new JSDOM(result).window
 
-    expect(statusCode).toBe(statusCodes.ok)
+      expect(document.querySelector('h1').textContent.trim()).toContain(
+        'How do you want to enter the coordinates?'
+      )
+      expect(document.querySelector('h1').innerHTML.trim()).toContain(
+        '<span class="govuk-caption-l">Test Project</span>'
+      )
+
+      expect(
+        document.querySelector('.govuk-caption-l').textContent.trim()
+      ).toBe(mockExemption.projectName)
+
+      expect(document.querySelector('#coordinatesEntry').value).toBe('single')
+
+      expect(document.querySelector('#coordinatesEntry-2').value).toBe(
+        'multiple'
+      )
+
+      expect(
+        document
+          .querySelector(
+            `.govuk-back-link[href="${routes.COORDINATES_TYPE_CHOICE}"`
+          )
+          .textContent.trim()
+      ).toBe('Back')
+
+      expect(
+        document
+          .querySelector('.govuk-link[href="/exemption/task-list"')
+          .textContent.trim()
+      ).toBe('Cancel')
+
+      expect(statusCode).toBe(statusCodes.ok)
+    })
   })
 
-  test('Should correctly format error data', () => {
-    const request = {
-      payload: { coordinatesEntry: 'invalid' }
-    }
-
-    const h = {
-      view: jest.fn().mockReturnValue({
-        takeover: jest.fn()
-      })
-    }
-
-    const err = {
-      details: [
-        {
-          path: ['coordinatesEntry'],
-          message: 'TEST',
-          type: 'any.only'
-        }
-      ]
-    }
-
-    coordinatesEntrySubmitController.options.validate.failAction(
-      request,
-      h,
-      err
-    )
-
-    expect(h.view).toHaveBeenCalledWith(COORDINATES_ENTRY_VIEW_ROUTE, {
-      pageTitle: 'How do you want to enter the coordinates?',
-      heading: 'How do you want to enter the coordinates?',
-      backLink: routes.COORDINATES_TYPE_CHOICE,
-      projectName: 'Test Project',
-      payload: { coordinatesEntry: 'invalid' },
-      errorSummary: [
-        {
-          href: '#coordinatesEntry',
-          text: 'TEST',
-          field: ['coordinatesEntry']
-        }
-      ],
-      errors: {
-        coordinatesEntry: {
-          field: ['coordinatesEntry'],
-          href: '#coordinatesEntry',
-          text: 'TEST'
-        }
+  describe('#coordinatesEntrySubmitController', () => {
+    test('Should correctly format error data', () => {
+      const request = {
+        payload: { coordinatesEntry: 'invalid' }
       }
-    })
 
-    expect(h.view().takeover).toHaveBeenCalled()
-  })
+      const h = {
+        view: jest.fn().mockReturnValue({
+          takeover: jest.fn()
+        })
+      }
 
-  test('Should correctly output page with no error data in object', () => {
-    const request = {
-      payload: { coordinatesEntry: 'invalid' }
-    }
+      const err = {
+        details: [
+          {
+            path: ['coordinatesEntry'],
+            message: 'TEST',
+            type: 'any.only'
+          }
+        ]
+      }
 
-    const h = {
-      view: jest.fn().mockReturnValue({
-        takeover: jest.fn()
+      coordinatesEntrySubmitController.options.validate.failAction(
+        request,
+        h,
+        err
+      )
+
+      expect(h.view).toHaveBeenCalledWith(COORDINATES_ENTRY_VIEW_ROUTE, {
+        pageTitle: 'How do you want to enter the coordinates?',
+        heading: 'How do you want to enter the coordinates?',
+        backLink: routes.COORDINATES_TYPE_CHOICE,
+        projectName: 'Test Project',
+        payload: { coordinatesEntry: 'invalid' },
+        errorSummary: [
+          {
+            href: '#coordinatesEntry',
+            text: 'TEST',
+            field: ['coordinatesEntry']
+          }
+        ],
+        errors: {
+          coordinatesEntry: {
+            field: ['coordinatesEntry'],
+            href: '#coordinatesEntry',
+            text: 'TEST'
+          }
+        }
       })
-    }
 
-    coordinatesEntrySubmitController.options.validate.failAction(request, h, {})
-
-    expect(h.view).toHaveBeenCalledWith(COORDINATES_ENTRY_VIEW_ROUTE, {
-      pageTitle: 'How do you want to enter the coordinates?',
-      heading: 'How do you want to enter the coordinates?',
-      backLink: routes.COORDINATES_TYPE_CHOICE,
-      projectName: 'Test Project',
-      payload: { coordinatesEntry: 'invalid' }
+      expect(h.view().takeover).toHaveBeenCalled()
     })
 
-    expect(h.view().takeover).toHaveBeenCalled()
-  })
+    test('Should correctly output page with no error data in object', () => {
+      const request = {
+        payload: { coordinatesEntry: 'invalid' }
+      }
 
-  test('Should correctly validate on valid data', () => {
-    const request = {
-      coordinatesEntry: 'single'
-    }
+      const h = {
+        view: jest.fn().mockReturnValue({
+          takeover: jest.fn()
+        })
+      }
 
-    const payloadValidator =
-      coordinatesEntrySubmitController.options.validate.payload
+      coordinatesEntrySubmitController.options.validate.failAction(
+        request,
+        h,
+        {}
+      )
 
-    const result = payloadValidator.validate(request)
+      expect(h.view).toHaveBeenCalledWith(COORDINATES_ENTRY_VIEW_ROUTE, {
+        pageTitle: 'How do you want to enter the coordinates?',
+        heading: 'How do you want to enter the coordinates?',
+        backLink: routes.COORDINATES_TYPE_CHOICE,
+        projectName: 'Test Project',
+        payload: { coordinatesEntry: 'invalid' }
+      })
 
-    expect(result.error).toBeUndefined()
-  })
+      expect(h.view().takeover).toHaveBeenCalled()
+    })
 
-  test('Should correctly validate on empty data', () => {
-    const request = {}
+    test('Should correctly validate on valid data', () => {
+      const request = {
+        coordinatesEntry: 'single'
+      }
 
-    const payloadValidator =
-      coordinatesEntrySubmitController.options.validate.payload
+      const payloadValidator =
+        coordinatesEntrySubmitController.options.validate.payload
 
-    const result = payloadValidator.validate(request)
+      const result = payloadValidator.validate(request)
 
-    expect(result.error.message).toBe('COORDINATES_ENTRY_REQUIRED')
-  })
+      expect(result.error).toBeUndefined()
+    })
 
-  test('Should correctly validate on invalid data', () => {
-    const request = { coordinatesEntry: 'invalid' }
+    test('Should correctly validate on empty data', () => {
+      const request = {}
 
-    const payloadValidator =
-      coordinatesEntrySubmitController.options.validate.payload
+      const payloadValidator =
+        coordinatesEntrySubmitController.options.validate.payload
 
-    const result = payloadValidator.validate(request)
+      const result = payloadValidator.validate(request)
 
-    expect(result.error.message).toBe('COORDINATES_ENTRY_REQUIRED')
-  })
+      expect(result.error.message).toBe('COORDINATES_ENTRY_REQUIRED')
+    })
 
-  test('Should correctly navigate to next page when POST is successful', async () => {
-    const h = {
-      redirect: jest.fn()
-    }
+    test('Should correctly validate on invalid data', () => {
+      const request = { coordinatesEntry: 'invalid' }
 
-    await coordinatesEntrySubmitController.handler(
-      { payload: { coordinatesEntry: 'single' } },
-      h
-    )
+      const payloadValidator =
+        coordinatesEntrySubmitController.options.validate.payload
 
-    expect(h.redirect).toHaveBeenCalledWith(routes.COORDINATE_SYSTEM_CHOICE)
-  })
+      const result = payloadValidator.validate(request)
 
-  test('Should correctly set the cache when submitting', async () => {
-    const h = {
-      redirect: jest.fn().mockReturnValue({
-        takeover: jest.fn()
-      }),
-      view: jest.fn()
-    }
+      expect(result.error.message).toBe('COORDINATES_ENTRY_REQUIRED')
+    })
 
-    const mockRequest = { payload: { coordinatesEntry: 'single' } }
+    test('Should correctly navigate to next page when POST is successful', async () => {
+      const h = {
+        redirect: jest.fn()
+      }
 
-    await coordinatesEntrySubmitController.handler(mockRequest, h)
+      await coordinatesEntrySubmitController.handler(
+        { payload: { coordinatesEntry: 'single' } },
+        h
+      )
 
-    expect(cacheUtils.updateExemptionSiteDetails).toHaveBeenCalledWith(
-      mockRequest,
-      'coordinatesEntry',
-      'single'
-    )
+      expect(h.redirect).toHaveBeenCalledWith(routes.COORDINATE_SYSTEM_CHOICE)
+    })
+
+    test('Should correctly set the cache when submitting', async () => {
+      const h = {
+        redirect: jest.fn().mockReturnValue({
+          takeover: jest.fn()
+        }),
+        view: jest.fn()
+      }
+
+      const mockRequest = { payload: { coordinatesEntry: 'single' } }
+
+      await coordinatesEntrySubmitController.handler(mockRequest, h)
+
+      expect(cacheUtils.updateExemptionSiteDetails).toHaveBeenCalledWith(
+        mockRequest,
+        'coordinatesEntry',
+        'single'
+      )
+    })
   })
 })

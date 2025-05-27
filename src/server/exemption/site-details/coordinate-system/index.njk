@@ -10,22 +10,25 @@
   }) }}
 {% endblock %}
 
+{% set helperHtml %}
+  <h2 class="govuk-heading-s">WGS84 (World Geodetic System 1984)</h2>
+  <p>
+    WGS84 is a global system that pinpoints locations using latitude and
+    longitude. Latitude shows how far north or south a place is, and longitude
+    shows how far east or west it is. WGS84 is widely used in GPS and mapping
+    tools like Google Maps.
+  </p>
+  <h2 class="govuk-heading-s">OSGB36 (National Grid)</h2>
+  <p>
+      Also known as the British National Grid (BNG), OSGB36 is a system used to map
+      Great Britain. It divides the country into squares using numerical east and
+      north positions, known as eastings and northings.
+  </p>
+{% endset %}
+
 {% set helperText %}
   {{ govukDetails({ 
-      html:'
-          <h2 class="govuk-heading-s">WGS84 (World Geodetic System 1984)</h2>
-          <p>
-            WGS84 is a global system that pinpoints locations using latitude and
-            longitude. Latitude shows how far north or south a place is, and longitude
-            shows how far east or west it is. WGS84 is widely used in GPS and mapping
-            tools like Google Maps.
-          </p>
-          <h2 class="govuk-heading-s">OSGB36 (National Grid)</h2>
-          <p>
-              Also known as the British National Grid (BNG), OSGB36 is a system used to map
-              Great Britain. It divides the country into squares using numerical east and
-              north positions, known as eastings and northings.
-          </p>', 
+      html:helperHtml, 
       summaryText: "Help with the coordinate systems" 
   }) }}
 {% endset %}

@@ -223,9 +223,9 @@ describe('#coordinatesEntryController', () => {
     expect(result.error.message).toBe('COORDINATES_ENTRY_REQUIRED')
   })
 
-  test('Should correctly remain on the same page when POST is successful', async () => {
+  test('Should correctly navigate to next page when POST is successful', async () => {
     const h = {
-      view: jest.fn()
+      redirect: jest.fn()
     }
 
     await coordinatesEntrySubmitController.handler(
@@ -233,13 +233,7 @@ describe('#coordinatesEntryController', () => {
       h
     )
 
-    expect(h.view).toHaveBeenCalledWith(COORDINATES_ENTRY_VIEW_ROUTE, {
-      pageTitle: 'How do you want to enter the coordinates?',
-      heading: 'How do you want to enter the coordinates?',
-      backLink: routes.COORDINATES_TYPE_CHOICE,
-      payload: { coordinatesEntry: 'single' },
-      projectName: mockExemption.projectName
-    })
+    expect(h.redirect).toHaveBeenCalledWith(routes.COORDINATE_SYSTEM_CHOICE)
   })
 
   test('Should correctly set the cache when submitting', async () => {

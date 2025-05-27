@@ -90,6 +90,20 @@ describe('radioPage Component', () => {
       'Error: test error'
     )
   })
+
+  test('Should render hint text', () => {
+    $radioPage = renderComponent('radio-page', {
+      ...commonTestData,
+      isPageHeading: true,
+      heading: 'Test heading',
+      hint: { html: '<h2>test hint text</h2>' }
+    })
+
+    expect($radioPage('.govuk-hint')).toHaveLength(1)
+    expect($radioPage('.govuk-hint').find('h2').text().trim()).toBe(
+      'test hint text'
+    )
+  })
 })
 
 /**

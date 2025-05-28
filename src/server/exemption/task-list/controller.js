@@ -1,6 +1,10 @@
 import { config } from '~/src/config/config.js'
-import { getExemptionCache } from '~/src/server/common/helpers/session-cache/utils.js'
+import {
+  getExemptionCache,
+  resetExemptionSiteDetails
+} from '~/src/server/common/helpers/session-cache/utils.js'
 import { transformTaskList } from '~/src/server/exemption/task-list/utils.js'
+import { routes } from '~/src/server/common/constants/routes.js'
 
 import Wreck from '@hapi/wreck'
 import Boom from '@hapi/boom'
@@ -24,6 +28,16 @@ export const taskListController = {
 
     if (!id) {
       throw Boom.notFound(`Exemption not found`, { id })
+    }
+
+    const { query } = request
+
+    if (query?.cancel) {
+      if (query.cancel === 'site-details') {
+        resetExemptionSiteDetails(request)
+      }
+
+      return h.redirect(routes.TASK_LIST)
     }
 
     const { payload } = await Wreck.get(

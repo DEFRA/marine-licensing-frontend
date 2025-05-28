@@ -1,6 +1,7 @@
 {% from "govuk/components/button/macro.njk" import govukButton %}
 {% from "govuk/components/radios/macro.njk" import govukRadios %}
 {% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+{% from "cancel-button/macro.njk" import appCancelButton %}
 
 {% set headingWithCaption %}
     {% if params.projectName %}
@@ -36,9 +37,9 @@
                 value: params.value,
                 fieldset: {
                     legend: {
-                    html: headingWithCaption,
-                    isPageHeading: true,
-                    classes: "govuk-fieldset__legend govuk-fieldset__legend--l govuk-!-margin-bottom-6"
+                        html: headingWithCaption,
+                        isPageHeading: true,
+                        classes: "govuk-fieldset__legend govuk-fieldset__legend--l govuk-!-margin-bottom-6"
                     }
                 } if params.isPageHeading,
                 hint: params.hint,
@@ -52,7 +53,9 @@
                 classes: "govuk-button--primary"
                 }) }}
 
-                <a class="govuk-link" href="/exemption/task-list">Cancel</a>
+                {{ appCancelButton({
+                cancelLink: params.cancelLink
+                }) }}
             </div>
 
         </form>

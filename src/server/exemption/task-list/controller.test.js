@@ -122,6 +122,38 @@ describe('#taskListController', () => {
     })
   })
 
+  test('taskListController handler should correctly handle request to clear cache and redirect', async () => {
+    const resetExemptionSiteDetailsSpy = jest.spyOn(
+      cacheUtils,
+      'resetExemptionSiteDetails'
+    )
+
+    const { statusCode, headers } = await server.inject({
+      method: 'GET',
+      url: `${routes.TASK_LIST}?cancel=site-details`
+    })
+
+    expect(resetExemptionSiteDetailsSpy).toHaveBeenCalled()
+    expect(statusCode).toBe(302)
+    expect(headers.location).toBe(routes.TASK_LIST)
+  })
+
+  test('taskListController should redirect when cancel query parameter is provided but does not match', async () => {
+    const resetExemptionSiteDetailsSpy = jest.spyOn(
+      cacheUtils,
+      'resetExemptionSiteDetails'
+    )
+
+    const { statusCode, headers } = await server.inject({
+      method: 'GET',
+      url: `${routes.TASK_LIST}?cancel=does-not-exist`
+    })
+
+    expect(resetExemptionSiteDetailsSpy).not.toHaveBeenCalled()
+    expect(statusCode).toBe(302)
+    expect(headers.location).toBe(routes.TASK_LIST)
+  })
+
   test('taskListController handler should throw a 404 if exemption is not found', async () => {
     const h = { view: jest.fn() }
 

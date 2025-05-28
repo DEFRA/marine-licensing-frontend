@@ -36,3 +36,11 @@ export const updateExemptionSiteDetails = (request, key, value) => {
 
   return { [key]: cacheValue }
 }
+
+/**
+ * @param { Request } request
+ */
+export const resetExemptionSiteDetails = (request) => {
+  request.yar.clear(EXEMPTION_CACHE_KEY.siteDetails)
+  return { siteDetails: undefined }
+}

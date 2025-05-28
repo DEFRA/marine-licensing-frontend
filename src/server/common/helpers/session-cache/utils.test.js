@@ -2,6 +2,7 @@ import {
   getExemptionCache,
   setExemptionCache,
   updateExemptionSiteDetails,
+  resetExemptionSiteDetails,
   EXEMPTION_CACHE_KEY
 } from '~/src/server/common/helpers/session-cache/utils.js'
 import { clone } from '@hapi/hoek'
@@ -164,6 +165,29 @@ describe('#utils', () => {
       })
 
       expect(result).toEqual({})
+    })
+  })
+
+  describe('resetExemptionSiteDetails', () => {
+    let mockRequest
+
+    beforeEach(() => {
+      jest.clearAllMocks()
+
+      mockRequest = {
+        yar: {
+          clear: jest.fn()
+        }
+      }
+    })
+
+    test('should clear the value in cache', () => {
+      const result = resetExemptionSiteDetails(mockRequest)
+
+      expect(mockRequest.yar.clear).toHaveBeenCalledWith(
+        EXEMPTION_CACHE_KEY.siteDetails
+      )
+      expect(result).toEqual({ siteDetails: undefined })
     })
   })
 })

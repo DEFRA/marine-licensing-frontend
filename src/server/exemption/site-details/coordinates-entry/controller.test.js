@@ -110,7 +110,9 @@ describe('#coordinatesEntry', () => {
 
       expect(
         document
-          .querySelector('.govuk-link[href="/exemption/task-list"')
+          .querySelector(
+            '.govuk-link[href="/exemption/task-list?cancel=site-details"'
+          )
           .textContent.trim()
       ).toBe('Cancel')
 

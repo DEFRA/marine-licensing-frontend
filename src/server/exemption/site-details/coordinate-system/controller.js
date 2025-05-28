@@ -95,20 +95,12 @@ export const coordinateSystemSubmitController = {
   handler(request, h) {
     const { payload } = request
 
-    const exemption = getExemptionCache(request)
-
     updateExemptionSiteDetails(
       request,
       'coordinateSystem',
       payload.coordinateSystem
     )
 
-    return h.view(COORDINATE_SYSTEM_VIEW_ROUTE, {
-      ...coordinateSystemSettings,
-      projectName: exemption.projectName,
-      payload: {
-        coordinateSystem: payload.coordinateSystem
-      }
-    })
+    return h.redirect(routes.CIRCLE_CENTER_POINT)
   }
 }

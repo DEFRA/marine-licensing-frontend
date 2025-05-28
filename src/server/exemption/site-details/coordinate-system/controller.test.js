@@ -148,6 +148,20 @@ describe('#coordinateSystem', () => {
   })
 
   describe('#coordinateSystemSubmitController', () => {
+    test('Should correctly navigate to the next page', async () => {
+      const request = {
+        payload: { coordinateSystem: 'wgs84' }
+      }
+
+      const h = {
+        redirect: jest.fn()
+      }
+
+      await coordinateSystemSubmitController.handler(request, h)
+
+      expect(h.redirect).toHaveBeenCalledWith(routes.CIRCLE_CENTER_POINT)
+    })
+
     test('Should correctly format error data', () => {
       const request = {
         payload: { coordinateSystem: 'invalid' }
@@ -267,7 +281,7 @@ describe('#coordinateSystem', () => {
 
     test('Should correctly set the cache when submitting', async () => {
       const h = {
-        view: jest.fn()
+        redirect: jest.fn()
       }
 
       const mockRequest = { payload: { coordinateSystem: 'wgs84' } }

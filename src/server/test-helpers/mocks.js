@@ -12,7 +12,8 @@ export const mockExemption = {
   siteDetails: {
     coordinatesType: 'coordinates',
     coordinatesEntry: 'single',
-    coordinateSystem: 'osgb36'
+    coordinateSystem: 'osgb36',
+    coordinates: { latitude: '54.978252', longitude: '-1.617780' }
   },
   taskList: mockExemptionTaskList
 }

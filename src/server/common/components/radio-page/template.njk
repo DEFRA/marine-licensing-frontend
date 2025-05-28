@@ -37,9 +37,9 @@
                 value: params.value,
                 fieldset: {
                     legend: {
-                    html: headingWithCaption,
-                    isPageHeading: true,
-                    classes: "govuk-fieldset__legend govuk-fieldset__legend--l govuk-!-margin-bottom-6"
+                        html: headingWithCaption,
+                        isPageHeading: true,
+                        classes: "govuk-fieldset__legend govuk-fieldset__legend--l govuk-!-margin-bottom-6"
                     }
                 } if params.isPageHeading,
                 hint: params.hint,
@@ -53,9 +53,9 @@
                 classes: "govuk-button--primary"
                 }) }}
 
-                  {{ appCancelButton({
-                    cancelLink: params.cancelLink
-                  }) }}
+                {{ appCancelButton({
+                cancelLink: params.cancelLink
+                }) }}
             </div>
 
         </form>

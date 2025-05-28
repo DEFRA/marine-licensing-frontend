@@ -176,7 +176,8 @@ describe('#utils', () => {
 
       mockRequest = {
         yar: {
-          clear: jest.fn()
+          get: jest.fn(),
+          set: jest.fn()
         }
       }
     })
@@ -184,10 +185,8 @@ describe('#utils', () => {
     test('should clear the value in cache', () => {
       const result = resetExemptionSiteDetails(mockRequest)
 
-      expect(mockRequest.yar.clear).toHaveBeenCalledWith(
-        EXEMPTION_CACHE_KEY.siteDetails
-      )
-      expect(result).toEqual({ siteDetails: undefined })
+      expect(mockRequest.yar.set).toHaveBeenCalledWith(EXEMPTION_CACHE_KEY, {})
+      expect(result).toEqual({ siteDetails: null })
     })
   })
 })

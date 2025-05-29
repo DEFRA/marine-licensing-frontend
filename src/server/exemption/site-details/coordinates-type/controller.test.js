@@ -85,12 +85,13 @@ describe('#coordinatesType', () => {
 
       const { document } = new JSDOM(result).window
 
-      expect(document.querySelector('h1').textContent.trim()).toContain(
+      expect(document.querySelector('h1').textContent.trim()).toBe(
         'How do you want to provide the site location?'
       )
-      expect(document.querySelector('h1').innerHTML.trim()).toContain(
-        '<span class="govuk-caption-l">Test Project</span>'
-      )
+
+      expect(
+        document.querySelector('.govuk-caption-l').textContent.trim()
+      ).toBe('Test Project')
 
       expect(
         document.querySelector('.govuk-caption-l').textContent.trim()

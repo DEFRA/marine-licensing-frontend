@@ -19,6 +19,11 @@ describe('taskList utils', () => {
         href: routes.PUBLIC_REGISTER,
         status: { text: 'Completed' },
         title: { text: 'Public register' }
+      },
+      {
+        href: routes.ACTIVITY_DESCRIPTION,
+        status: { tag: { text: 'Incomplete', classes: 'govuk-tag--blue' } },
+        title: { text: 'Activity description' }
       }
     ])
   })
@@ -39,6 +44,11 @@ describe('taskList utils', () => {
         href: routes.PUBLIC_REGISTER,
         status: { tag: { text: 'Incomplete', classes: 'govuk-tag--blue' } },
         title: { text: 'Public register' }
+      },
+      {
+        href: routes.ACTIVITY_DESCRIPTION,
+        status: { tag: { text: 'Incomplete', classes: 'govuk-tag--blue' } },
+        title: { text: 'Activity description' }
       }
     ])
   })

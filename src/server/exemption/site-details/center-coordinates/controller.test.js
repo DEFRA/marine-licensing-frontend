@@ -2,7 +2,9 @@ import { createServer } from '~/src/server/index.js'
 import {
   centerCoordinatesController,
   centerCoordinatesSubmitController,
-  COORDINATE_SYSTEM_VIEW_ROUTES
+  COORDINATE_SYSTEM_VIEW_ROUTES,
+  centerCoordinatesSubmitFailHandler,
+  validationSchemaWGS64
 } from '~/src/server/exemption/site-details/center-coordinates/controller.js'
 import { COORDINATE_SYSTEMS } from '~/src/server/common/constants/exemptions.js'
 import * as cacheUtils from '~/src/server/common/helpers/session-cache/utils.js'
@@ -213,10 +215,11 @@ describe('#centerCoordinates', () => {
         ]
       }
 
-      centerCoordinatesSubmitController.options.validate.failAction(
+      centerCoordinatesSubmitFailHandler(
         request,
         h,
-        err
+        err,
+        COORDINATE_SYSTEMS.WGS84
       )
 
       expect(h.view).toHaveBeenCalledWith(
@@ -263,10 +266,11 @@ describe('#centerCoordinates', () => {
 
       const err = {}
 
-      centerCoordinatesSubmitController.options.validate.failAction(
+      centerCoordinatesSubmitFailHandler(
         request,
         h,
-        err
+        err,
+        COORDINATE_SYSTEMS.WGS84
       )
 
       expect(h.view).toHaveBeenCalledWith(
@@ -292,10 +296,7 @@ describe('#centerCoordinates', () => {
         longitude: mockExemption.siteDetails.coordinates.longitude
       }
 
-      const payloadValidator =
-        centerCoordinatesSubmitController.options.validate.payload
-
-      const result = payloadValidator.validate(request)
+      const result = validationSchemaWGS64.validate(request)
 
       expect(result.error).toBeUndefined()
     })
@@ -303,10 +304,7 @@ describe('#centerCoordinates', () => {
     test('Should correctly validate on empty data', () => {
       const request = {}
 
-      const payloadValidator =
-        centerCoordinatesSubmitController.options.validate.payload
-
-      const result = payloadValidator.validate(request)
+      const result = validationSchemaWGS64.validate(request)
 
       expect(result.error.message).toBe('LATITUDE_REQUIRED')
     })
@@ -316,10 +314,7 @@ describe('#centerCoordinates', () => {
         longitude: mockExemption.siteDetails.coordinates.longitude
       }
 
-      const payloadValidator =
-        centerCoordinatesSubmitController.options.validate.payload
-
-      const result = payloadValidator.validate(request)
+      const result = validationSchemaWGS64.validate(request)
 
       expect(result.error.message).toBe('LATITUDE_REQUIRED')
     })
@@ -329,10 +324,7 @@ describe('#centerCoordinates', () => {
         latitude: mockExemption.siteDetails.coordinates.latitude
       }
 
-      const payloadValidator =
-        centerCoordinatesSubmitController.options.validate.payload
-
-      const result = payloadValidator.validate(request)
+      const result = validationSchemaWGS64.validate(request)
 
       expect(result.error.message).toBe('LONGITUDE_REQUIRED')
     })

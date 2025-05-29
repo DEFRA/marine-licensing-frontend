@@ -55,71 +55,106 @@ export const centerCoordinatesController = {
   }
 }
 
+export const validationSchemaWGS64 = joi.object({
+  latitude: joi.string().required().messages({
+    'string.empty': 'LATITUDE_REQUIRED',
+    'any.required': 'LATITUDE_REQUIRED'
+  }),
+  longitude: joi.string().required().messages({
+    'string.empty': 'LONGITUDE_REQUIRED',
+    'any.required': 'LONGITUDE_REQUIRED'
+  })
+})
+
+export const validationSchemaOSGB36 = joi.object({
+  eastings: joi.string().required().messages({
+    'string.empty': 'EASTINGS_REQUIRED',
+    'any.required': 'EASTINGS_REQUIRED'
+  }),
+  northings: joi.string().required().messages({
+    'string.empty': 'NORTHINGS_REQUIRED',
+    'any.required': 'NORTHINGS_REQUIRED'
+  })
+})
+
+export const centerCoordinatesSubmitFailHandler = (
+  request,
+  h,
+  error,
+  coordinateSystem
+) => {
+  const { payload } = request
+  const exemption = getExemptionCache(request)
+
+  const { projectName } = exemption
+
+  if (!error.details) {
+    return h
+      .view(COORDINATE_SYSTEM_VIEW_ROUTES[coordinateSystem], {
+        ...centerCoordinatesSettings,
+        projectName,
+        payload
+      })
+      .takeover()
+  }
+
+  const errorSummary = mapErrorsForDisplay(
+    error.details,
+    errorMessages[coordinateSystem]
+  )
+
+  const errors = errorDescriptionByFieldName(errorSummary)
+
+  return h
+    .view(COORDINATE_SYSTEM_VIEW_ROUTES[coordinateSystem], {
+      ...centerCoordinatesSettings,
+      projectName,
+      payload,
+      errors,
+      errorSummary
+    })
+    .takeover()
+}
+
 /**
  * A GDS styled page controller for the POST route in the center coordinates page.
  * @satisfies {Partial<ServerRoute>}
  */
 export const centerCoordinatesSubmitController = {
-  options: {
-    validate: {
-      payload: joi.object({
-        latitude: joi.string().required().messages({
-          'string.empty': 'LATITUDE_REQUIRED',
-          'any.required': 'LATITUDE_REQUIRED'
-        }),
-        longitude: joi.string().required().messages({
-          'string.empty': 'LONGITUDE_REQUIRED',
-          'any.required': 'LONGITUDE_REQUIRED'
-        })
-      }),
-      failAction: (request, h, err) => {
-        const { payload } = request
-
-        const { projectName } = getExemptionCache(request)
-
-        if (!err.details) {
-          return h
-            .view(COORDINATE_SYSTEM_VIEW_ROUTES[COORDINATE_SYSTEMS.WGS84], {
-              ...centerCoordinatesSettings,
-              payload,
-              projectName
-            })
-            .takeover()
-        }
-
-        const errorSummary = mapErrorsForDisplay(
-          err.details,
-          errorMessages[COORDINATE_SYSTEMS.WGS84]
-        )
-
-        const errors = errorDescriptionByFieldName(errorSummary)
-
-        return h
-          .view(COORDINATE_SYSTEM_VIEW_ROUTES[COORDINATE_SYSTEMS.WGS84], {
-            ...centerCoordinatesSettings,
-            payload,
-            projectName,
-            errors,
-            errorSummary
-          })
-          .takeover()
-      }
-    }
-  },
   handler(request, h) {
     const { payload } = request
 
+    const { coordinateSystem } = getCoordinateSystem(request)
+
     const exemption = getExemptionCache(request)
 
-    const { latitude, longitude } = payload
+    const { projectName, siteDetails } = exemption
 
-    updateExemptionSiteDetails(request, 'coordinates', { latitude, longitude })
+    const schema =
+      coordinateSystem === COORDINATE_SYSTEMS.OSGB36
+        ? validationSchemaOSGB36
+        : validationSchemaWGS64
+
+    const { error } = schema.validate(payload, {
+      abortEarly: false
+    })
+
+    if (error) {
+      return centerCoordinatesSubmitFailHandler(
+        request,
+        h,
+        error,
+        coordinateSystem
+      )
+    }
+
+    updateExemptionSiteDetails(request, 'coordinates', payload)
 
     return h
-      .view(COORDINATE_SYSTEM_VIEW_ROUTES[COORDINATE_SYSTEMS.WGS84], {
+      .view(COORDINATE_SYSTEM_VIEW_ROUTES[coordinateSystem], {
         ...centerCoordinatesSettings,
-        payload,
-        projectName: exemption.projectName
+        payload: getPayload(siteDetails, coordinateSystem),
+        projectName
       })
       .takeover()
   }

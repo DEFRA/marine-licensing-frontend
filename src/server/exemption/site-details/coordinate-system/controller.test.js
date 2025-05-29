@@ -155,12 +155,19 @@ describe('#coordinateSystem', () => {
       }
 
       const h = {
-        redirect: jest.fn()
+        view: jest.fn().mockReturnValue({
+          takeover: jest.fn()
+        })
       }
 
       await coordinateSystemSubmitController.handler(request, h)
-
-      expect(h.redirect).toHaveBeenCalledWith(routes.CIRCLE_CENTER_POINT)
+      expect(h.view).toHaveBeenCalledWith(COORDINATE_SYSTEM_VIEW_ROUTE, {
+        pageTitle: 'Which coordinate system do you want to use?',
+        heading: 'Which coordinate system do you want to use?',
+        projectName: 'Test Project',
+        backLink: routes.COORDINATES_ENTRY_CHOICE,
+        payload: { coordinateSystem: 'wgs84' }
+      })
     })
 
     test('Should correctly format error data', () => {
@@ -282,7 +289,9 @@ describe('#coordinateSystem', () => {
 
     test('Should correctly set the cache when submitting', async () => {
       const h = {
-        redirect: jest.fn()
+        view: jest.fn().mockReturnValue({
+          takeover: jest.fn()
+        })
       }
 
       const mockRequest = { payload: { coordinateSystem: 'wgs84' } }

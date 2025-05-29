@@ -1,4 +1,5 @@
 import {
+  getCoordinateSystem,
   getExemptionCache,
   updateExemptionSiteDetails
 } from '~/src/server/common/helpers/session-cache/utils.js'
@@ -7,13 +8,10 @@ import {
   mapErrorsForDisplay
 } from '~/src/server/common/helpers/errors.js'
 import { routes } from '~/src/server/common/constants/routes.js'
+import { COORDINATE_SYSTEMS } from '~/src/server/common/constants/exemptions.js'
+import { getPayload } from '~/src/server/exemption/site-details/center-coordinates/utils.js'
 
 import joi from 'joi'
-
-export const COORDINATE_SYSTEMS = {
-  WGS84: 'WGS84',
-  OSGB36: 'OSGB36'
-}
 
 export const COORDINATE_SYSTEM_VIEW_ROUTES = {
   [COORDINATE_SYSTEMS.WGS84]: 'exemption/site-details/center-coordinates/wgs84',
@@ -28,8 +26,14 @@ const centerCoordinatesSettings = {
 }
 
 export const errorMessages = {
-  LATITUDE_REQUIRED: 'Enter the coordinates',
-  LONGITUDE_REQUIRED: 'Enter the coordinates'
+  [COORDINATE_SYSTEMS.WGS84]: {
+    LATITUDE_REQUIRED: 'Enter the latitude',
+    LONGITUDE_REQUIRED: 'Enter the longitude'
+  },
+  [COORDINATE_SYSTEMS.OSGB36]: {
+    EASTINGS_REQUIRED: 'Enter the eastings',
+    NORTHINGS_REQUIRED: 'Enter the northings'
+  }
 }
 
 /**
@@ -39,16 +43,14 @@ export const errorMessages = {
 export const centerCoordinatesController = {
   handler(request, h) {
     const exemption = getExemptionCache(request)
+    const { coordinateSystem } = getCoordinateSystem(request)
 
     const siteDetails = exemption.siteDetails ?? {}
 
-    return h.view(COORDINATE_SYSTEM_VIEW_ROUTES[COORDINATE_SYSTEMS.WGS84], {
+    return h.view(COORDINATE_SYSTEM_VIEW_ROUTES[coordinateSystem], {
       ...centerCoordinatesSettings,
       projectName: exemption.projectName,
-      payload: {
-        latitude: siteDetails.coordinates?.latitude,
-        longitude: siteDetails.coordinates?.longitude
-      }
+      payload: getPayload(siteDetails, coordinateSystem)
     })
   }
 }
@@ -85,7 +87,10 @@ export const centerCoordinatesSubmitController = {
             .takeover()
         }
 
-        const errorSummary = mapErrorsForDisplay(err.details, errorMessages)
+        const errorSummary = mapErrorsForDisplay(
+          err.details,
+          errorMessages[COORDINATE_SYSTEMS.WGS84]
+        )
 
         const errors = errorDescriptionByFieldName(errorSummary)
 

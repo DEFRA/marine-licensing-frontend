@@ -2,9 +2,9 @@ import { createServer } from '~/src/server/index.js'
 import {
   centerCoordinatesController,
   centerCoordinatesSubmitController,
-  COORDINATE_SYSTEMS,
   COORDINATE_SYSTEM_VIEW_ROUTES
 } from '~/src/server/exemption/site-details/center-coordinates/controller.js'
+import { COORDINATE_SYSTEMS } from '~/src/server/common/constants/exemptions.js'
 import * as cacheUtils from '~/src/server/common/helpers/session-cache/utils.js'
 import { mockExemption } from '~/src/server/test-helpers/mocks.js'
 import { statusCodes } from '~/src/server/common/constants/status-codes.js'
@@ -18,10 +18,14 @@ describe('#centerCoordinates', () => {
   /** @type {Server} */
   let server
   let getExemptionCacheSpy
+  let getCoordinateSystemSpy
 
   const mockCoordinates = {
-    latitude: mockExemption.siteDetails.coordinates.latitude,
-    longitude: mockExemption.siteDetails.coordinates.longitude
+    [COORDINATE_SYSTEMS.WGS84]: {
+      latitude: mockExemption.siteDetails.coordinates.latitude,
+      longitude: mockExemption.siteDetails.coordinates.longitude
+    },
+    [COORDINATE_SYSTEMS.OSGB36]: { eastings: '425053', northings: '564180' }
   }
 
   beforeAll(async () => {
@@ -34,6 +38,9 @@ describe('#centerCoordinates', () => {
     getExemptionCacheSpy = jest
       .spyOn(cacheUtils, 'getExemptionCache')
       .mockReturnValue(mockExemption)
+    getCoordinateSystemSpy = jest
+      .spyOn(cacheUtils, 'getCoordinateSystem')
+      .mockReturnValue({ coordinateSystem: COORDINATE_SYSTEMS.WGS84 })
   })
 
   afterAll(async () => {
@@ -59,7 +66,7 @@ describe('#centerCoordinates', () => {
       )
     })
 
-    test('centerCoordinatesController handler should render with correct context', () => {
+    test('centerCoordinatesController handler should render with correct context for wgs64', () => {
       const h = { view: jest.fn() }
 
       centerCoordinatesController.handler({}, h)
@@ -70,7 +77,36 @@ describe('#centerCoordinates', () => {
           heading: 'Enter the coordinates at the centre point of the site',
           pageTitle: 'Enter the coordinates at the centre point of the site',
           backLink: routes.COORDINATE_SYSTEM_CHOICE,
-          payload: { ...mockCoordinates },
+          payload: { ...mockCoordinates[COORDINATE_SYSTEMS.WGS84] },
+          projectName: 'Test Project'
+        }
+      )
+    })
+
+    test('centerCoordinatesController handler should render with correct context for osgb36', () => {
+      const h = { view: jest.fn() }
+
+      getExemptionCacheSpy.mockReturnValueOnce({
+        ...mockExemption,
+        siteDetails: {
+          ...mockExemption.siteDetails,
+          coordinates: mockCoordinates[COORDINATE_SYSTEMS.OSGB36]
+        }
+      })
+
+      getCoordinateSystemSpy.mockReturnValueOnce({
+        coordinateSystem: COORDINATE_SYSTEMS.OSGB36
+      })
+
+      centerCoordinatesController.handler({}, h)
+
+      expect(h.view).toHaveBeenCalledWith(
+        COORDINATE_SYSTEM_VIEW_ROUTES[COORDINATE_SYSTEMS.OSGB36],
+        {
+          heading: 'Enter the coordinates at the centre point of the site',
+          pageTitle: 'Enter the coordinates at the centre point of the site',
+          backLink: routes.COORDINATE_SYSTEM_CHOICE,
+          payload: { ...mockCoordinates[COORDINATE_SYSTEMS.OSGB36] },
           projectName: 'Test Project'
         }
       )
@@ -80,7 +116,8 @@ describe('#centerCoordinates', () => {
       getExemptionCacheSpy.mockReturnValueOnce({
         projectName: mockExemption.projectName,
         siteDetails: {
-          coordinates: mockCoordinates
+          ...mockExemption.siteDetails,
+          coordinates: mockCoordinates[COORDINATE_SYSTEMS.WGS84]
         }
       })
 
@@ -94,7 +131,7 @@ describe('#centerCoordinates', () => {
           heading: 'Enter the coordinates at the centre point of the site',
           pageTitle: 'Enter the coordinates at the centre point of the site',
           backLink: routes.COORDINATE_SYSTEM_CHOICE,
-          payload: { ...mockCoordinates },
+          payload: { ...mockCoordinates[COORDINATE_SYSTEMS.WGS84] },
           projectName: 'Test Project'
         }
       )
@@ -123,10 +160,10 @@ describe('#centerCoordinates', () => {
       ).toBe(mockExemption.projectName)
 
       expect(document.querySelector('#latitude').value).toBe(
-        mockCoordinates.latitude
+        mockCoordinates[COORDINATE_SYSTEMS.WGS84].latitude
       )
       expect(document.querySelector('#longitude').value).toBe(
-        mockCoordinates.longitude
+        mockCoordinates[COORDINATE_SYSTEMS.WGS84].longitude
       )
 
       const hintSummary = document.querySelector('.govuk-details__summary-text')
@@ -212,7 +249,10 @@ describe('#centerCoordinates', () => {
 
     test('Should still render page if no error details are provided', () => {
       const request = {
-        payload: { ...mockCoordinates, latitude: 'invalid' }
+        payload: {
+          ...mockCoordinates[COORDINATE_SYSTEMS.WGS84],
+          latitude: 'invalid'
+        }
       }
 
       const h = {
@@ -236,7 +276,10 @@ describe('#centerCoordinates', () => {
           pageTitle: 'Enter the coordinates at the centre point of the site',
           projectName: 'Test Project',
           backLink: routes.COORDINATE_SYSTEM_CHOICE,
-          payload: { ...mockCoordinates, latitude: 'invalid' }
+          payload: {
+            ...mockCoordinates[COORDINATE_SYSTEMS.WGS84],
+            latitude: 'invalid'
+          }
         }
       )
 

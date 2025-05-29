@@ -59,7 +59,7 @@ describe('#coordinateSystem', () => {
         pageTitle: 'Which coordinate system do you want to use?',
         heading: 'Which coordinate system do you want to use?',
         backLink: routes.COORDINATES_ENTRY_CHOICE,
-        payload: { coordinateSystem: 'osgb36' },
+        payload: { coordinateSystem: 'wgs84' },
         projectName: 'Test Project'
       })
     })

@@ -40,9 +40,7 @@
                 <input type="hidden" name="csrfToken" value="{{csrfToken}}">
 
                 {% block coordinateFields %}{% endblock %}
-                
-                <input type="hidden" name="coordSystem" value="{{ payload.coordSystem }}">
-                
+                                
                <div class="govuk-button-group">
                     {{ govukButton({
                         text: "Continue",

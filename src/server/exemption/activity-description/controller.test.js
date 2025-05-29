@@ -160,7 +160,7 @@ describe('#activityDescriptionController', () => {
       ).toContain('There is a problem')
       expect(
         document.querySelector('.govuk-error-message').textContent
-      ).toContain('Enter activity details')
+      ).toContain('Enter the activity details')
     })
 
     test('should pass error to global catchAll handler', async () => {
@@ -283,7 +283,7 @@ describe('#activityDescriptionController', () => {
       const { document } = new JSDOM(result).window
       expect(
         document.querySelector('.govuk-error-message').textContent.trim()
-      ).toBe('Error: Enter activity details')
+      ).toBe('Error: Enter the activity details')
       expect(document.querySelector('h2').textContent.trim()).toBe(
         'There is a problem'
       )

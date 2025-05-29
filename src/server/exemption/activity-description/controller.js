@@ -17,7 +17,7 @@ export const ACTIVITY_DESCRIPTION_VIEW_ROUTE =
 const ACTIVITY_DESCRIPTION_FIELD_MAX_LENGTH = 4000
 
 export const errorMessages = {
-  ACTIVITY_DESCRIPTION_REQUIRED: 'Enter activity details',
+  ACTIVITY_DESCRIPTION_REQUIRED: 'Enter the activity details',
   ACTIVITY_DESCRIPTION_MAX_LENGTH: `Activity details should be ${ACTIVITY_DESCRIPTION_FIELD_MAX_LENGTH} characters or less`
 }
 

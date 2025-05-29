@@ -2,7 +2,8 @@ import { createServer } from '~/src/server/index.js'
 import {
   centerCoordinatesController,
   centerCoordinatesSubmitController,
-  CENTER_COORDINATES_VIEW_ROUTE
+  COORDINATE_SYSTEMS,
+  COORDINATE_SYSTEM_VIEW_ROUTES
 } from '~/src/server/exemption/site-details/center-coordinates/controller.js'
 import * as cacheUtils from '~/src/server/common/helpers/session-cache/utils.js'
 import { mockExemption } from '~/src/server/test-helpers/mocks.js'
@@ -46,13 +47,16 @@ describe('#centerCoordinates', () => {
 
       centerCoordinatesController.handler({}, h)
 
-      expect(h.view).toHaveBeenCalledWith(CENTER_COORDINATES_VIEW_ROUTE, {
-        heading: 'Enter the coordinates at the centre point of the site',
-        pageTitle: 'Enter the coordinates at the centre point of the site',
-        backLink: routes.COORDINATE_SYSTEM_CHOICE,
-        payload: { latitude: undefined, longitude: undefined },
-        projectName: undefined
-      })
+      expect(h.view).toHaveBeenCalledWith(
+        COORDINATE_SYSTEM_VIEW_ROUTES[COORDINATE_SYSTEMS.WGS84],
+        {
+          heading: 'Enter the coordinates at the centre point of the site',
+          pageTitle: 'Enter the coordinates at the centre point of the site',
+          backLink: routes.COORDINATE_SYSTEM_CHOICE,
+          payload: { latitude: undefined, longitude: undefined },
+          projectName: undefined
+        }
+      )
     })
 
     test('centerCoordinatesController handler should render with correct context', () => {
@@ -60,13 +64,16 @@ describe('#centerCoordinates', () => {
 
       centerCoordinatesController.handler({}, h)
 
-      expect(h.view).toHaveBeenCalledWith(CENTER_COORDINATES_VIEW_ROUTE, {
-        heading: 'Enter the coordinates at the centre point of the site',
-        pageTitle: 'Enter the coordinates at the centre point of the site',
-        backLink: routes.COORDINATE_SYSTEM_CHOICE,
-        payload: { ...mockCoordinates },
-        projectName: 'Test Project'
-      })
+      expect(h.view).toHaveBeenCalledWith(
+        COORDINATE_SYSTEM_VIEW_ROUTES[COORDINATE_SYSTEMS.WGS84],
+        {
+          heading: 'Enter the coordinates at the centre point of the site',
+          pageTitle: 'Enter the coordinates at the centre point of the site',
+          backLink: routes.COORDINATE_SYSTEM_CHOICE,
+          payload: { ...mockCoordinates },
+          projectName: 'Test Project'
+        }
+      )
     })
 
     test('centerCoordinatesController handler should render with correct context with existing cache data', () => {
@@ -81,13 +88,16 @@ describe('#centerCoordinates', () => {
 
       centerCoordinatesController.handler({}, h)
 
-      expect(h.view).toHaveBeenCalledWith(CENTER_COORDINATES_VIEW_ROUTE, {
-        heading: 'Enter the coordinates at the centre point of the site',
-        pageTitle: 'Enter the coordinates at the centre point of the site',
-        backLink: routes.COORDINATE_SYSTEM_CHOICE,
-        payload: { ...mockCoordinates },
-        projectName: 'Test Project'
-      })
+      expect(h.view).toHaveBeenCalledWith(
+        COORDINATE_SYSTEM_VIEW_ROUTES[COORDINATE_SYSTEMS.WGS84],
+        {
+          heading: 'Enter the coordinates at the centre point of the site',
+          pageTitle: 'Enter the coordinates at the centre point of the site',
+          backLink: routes.COORDINATE_SYSTEM_CHOICE,
+          payload: { ...mockCoordinates },
+          projectName: 'Test Project'
+        }
+      )
     })
 
     test('Should provide expected response and correctly pre populate data', async () => {
@@ -172,27 +182,30 @@ describe('#centerCoordinates', () => {
         err
       )
 
-      expect(h.view).toHaveBeenCalledWith(CENTER_COORDINATES_VIEW_ROUTE, {
-        heading: 'Enter the coordinates at the centre point of the site',
-        pageTitle: 'Enter the coordinates at the centre point of the site',
-        projectName: 'Test Project',
-        backLink: routes.COORDINATE_SYSTEM_CHOICE,
-        payload: { latitude: 'invalid' },
-        errorSummary: [
-          {
-            href: '#latitude',
-            text: 'TEST',
-            field: ['latitude']
-          }
-        ],
-        errors: {
-          latitude: {
-            field: ['latitude'],
-            href: '#latitude',
-            text: 'TEST'
+      expect(h.view).toHaveBeenCalledWith(
+        COORDINATE_SYSTEM_VIEW_ROUTES[COORDINATE_SYSTEMS.WGS84],
+        {
+          heading: 'Enter the coordinates at the centre point of the site',
+          pageTitle: 'Enter the coordinates at the centre point of the site',
+          projectName: 'Test Project',
+          backLink: routes.COORDINATE_SYSTEM_CHOICE,
+          payload: { latitude: 'invalid' },
+          errorSummary: [
+            {
+              href: '#latitude',
+              text: 'TEST',
+              field: ['latitude']
+            }
+          ],
+          errors: {
+            latitude: {
+              field: ['latitude'],
+              href: '#latitude',
+              text: 'TEST'
+            }
           }
         }
-      })
+      )
 
       expect(h.view().takeover).toHaveBeenCalled()
     })
@@ -216,13 +229,16 @@ describe('#centerCoordinates', () => {
         err
       )
 
-      expect(h.view).toHaveBeenCalledWith(CENTER_COORDINATES_VIEW_ROUTE, {
-        heading: 'Enter the coordinates at the centre point of the site',
-        pageTitle: 'Enter the coordinates at the centre point of the site',
-        projectName: 'Test Project',
-        backLink: routes.COORDINATE_SYSTEM_CHOICE,
-        payload: { ...mockCoordinates, latitude: 'invalid' }
-      })
+      expect(h.view).toHaveBeenCalledWith(
+        COORDINATE_SYSTEM_VIEW_ROUTES[COORDINATE_SYSTEMS.WGS84],
+        {
+          heading: 'Enter the coordinates at the centre point of the site',
+          pageTitle: 'Enter the coordinates at the centre point of the site',
+          projectName: 'Test Project',
+          backLink: routes.COORDINATE_SYSTEM_CHOICE,
+          payload: { ...mockCoordinates, latitude: 'invalid' }
+        }
+      )
 
       expect(h.view().takeover).toHaveBeenCalled()
     })

@@ -10,8 +10,16 @@ import { routes } from '~/src/server/common/constants/routes.js'
 
 import joi from 'joi'
 
-export const CENTER_COORDINATES_VIEW_ROUTE =
-  'exemption/site-details/center-coordinates/index'
+export const COORDINATE_SYSTEMS = {
+  WGS84: 'WGS84',
+  OSGB36: 'OSGB36'
+}
+
+export const COORDINATE_SYSTEM_VIEW_ROUTES = {
+  [COORDINATE_SYSTEMS.WGS84]: 'exemption/site-details/center-coordinates/wgs84',
+  [COORDINATE_SYSTEMS.OSGB36]:
+    'exemption/site-details/center-coordinates/osgb36'
+}
 
 const centerCoordinatesSettings = {
   pageTitle: 'Enter the coordinates at the centre point of the site',
@@ -34,7 +42,7 @@ export const centerCoordinatesController = {
 
     const siteDetails = exemption.siteDetails ?? {}
 
-    return h.view(CENTER_COORDINATES_VIEW_ROUTE, {
+    return h.view(COORDINATE_SYSTEM_VIEW_ROUTES[COORDINATE_SYSTEMS.WGS84], {
       ...centerCoordinatesSettings,
       projectName: exemption.projectName,
       payload: {
@@ -69,7 +77,7 @@ export const centerCoordinatesSubmitController = {
 
         if (!err.details) {
           return h
-            .view(CENTER_COORDINATES_VIEW_ROUTE, {
+            .view(COORDINATE_SYSTEM_VIEW_ROUTES[COORDINATE_SYSTEMS.WGS84], {
               ...centerCoordinatesSettings,
               payload,
               projectName
@@ -82,7 +90,7 @@ export const centerCoordinatesSubmitController = {
         const errors = errorDescriptionByFieldName(errorSummary)
 
         return h
-          .view(CENTER_COORDINATES_VIEW_ROUTE, {
+          .view(COORDINATE_SYSTEM_VIEW_ROUTES[COORDINATE_SYSTEMS.WGS84], {
             ...centerCoordinatesSettings,
             payload,
             projectName,
@@ -103,7 +111,7 @@ export const centerCoordinatesSubmitController = {
     updateExemptionSiteDetails(request, 'coordinates', { latitude, longitude })
 
     return h
-      .view(CENTER_COORDINATES_VIEW_ROUTE, {
+      .view(COORDINATE_SYSTEM_VIEW_ROUTES[COORDINATE_SYSTEMS.WGS84], {
         ...centerCoordinatesSettings,
         payload,
         projectName: exemption.projectName

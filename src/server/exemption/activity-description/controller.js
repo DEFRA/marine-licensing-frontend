@@ -14,10 +14,11 @@ import joi from 'joi'
 export const ACTIVITY_DESCRIPTION_VIEW_ROUTE =
   'exemption/activity-description/index'
 
+const ACTIVITY_DESCRIPTION_FIELD_MAX_LENGTH = 4000
+
 export const errorMessages = {
   ACTIVITY_DESCRIPTION_REQUIRED: 'Enter activity details',
-  ACTIVITY_DESCRIPTION_MAX_LENGTH:
-    'Activity details should be 4000 characters or less'
+  ACTIVITY_DESCRIPTION_MAX_LENGTH: `Activity details should be ${ACTIVITY_DESCRIPTION_FIELD_MAX_LENGTH} characters or less`
 }
 
 const templateValues = {
@@ -49,10 +50,15 @@ export const activityDescriptionSubmitController = {
   options: {
     validate: {
       payload: joi.object({
-        activityDescription: joi.string().min(1).max(4000).required().messages({
-          'string.empty': errorMessages.ACTIVITY_DESCRIPTION_REQUIRED,
-          'string.max': errorMessages.ACTIVITY_DESCRIPTION_MAX_LENGTH
-        })
+        activityDescription: joi
+          .string()
+          .min(1)
+          .max(ACTIVITY_DESCRIPTION_FIELD_MAX_LENGTH)
+          .required()
+          .messages({
+            'string.empty': errorMessages.ACTIVITY_DESCRIPTION_REQUIRED,
+            'string.max': errorMessages.ACTIVITY_DESCRIPTION_MAX_LENGTH
+          })
       }),
       failAction: (request, h, err) => {
         const { payload } = request

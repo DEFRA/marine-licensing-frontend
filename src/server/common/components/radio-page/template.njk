@@ -6,7 +6,8 @@
 {% set headingWithCaption %}
     {% if params.projectName %}
         <span class="govuk-caption-l">{{ params.projectName }}</span>
-    {% endif %}{{ params.heading }}
+    {% endif %}
+    <h1 class="govuk-heading-l govuk-!-margin-bottom-0">{{ params.heading }}</h1>
 {% endset %}
 
   <div class="govuk-grid-row">
@@ -38,7 +39,6 @@
                 fieldset: {
                     legend: {
                         html: headingWithCaption,
-                        isPageHeading: true,
                         classes: "govuk-fieldset__legend govuk-fieldset__legend--l govuk-!-margin-bottom-6"
                     }
                 } if params.isPageHeading,
@@ -49,12 +49,12 @@
 
             <div class="govuk-button-group">
                 {{ govukButton({
-                text: "Continue",
-                classes: "govuk-button--primary"
+                    text: "Continue",
+                    classes: "govuk-button--primary"
                 }) }}
 
                 {{ appCancelButton({
-                cancelLink: params.cancelLink
+                    cancelLink: params.cancelLink
                 }) }}
             </div>
 

@@ -99,12 +99,13 @@ describe('#coordinateSystem', () => {
 
       const { document } = new JSDOM(result).window
 
-      expect(document.querySelector('h1').textContent.trim()).toContain(
+      expect(document.querySelector('h1').textContent.trim()).toBe(
         'Which coordinate system do you want to use?'
       )
-      expect(document.querySelector('h1').innerHTML.trim()).toContain(
-        '<span class="govuk-caption-l">Test Project</span>'
-      )
+
+      expect(
+        document.querySelector('.govuk-caption-l').textContent.trim()
+      ).toBe('Test Project')
 
       expect(
         document.querySelector('.govuk-caption-l').textContent.trim()

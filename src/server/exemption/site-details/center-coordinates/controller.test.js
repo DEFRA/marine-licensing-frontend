@@ -4,7 +4,8 @@ import {
   centerCoordinatesSubmitController,
   COORDINATE_SYSTEM_VIEW_ROUTES,
   centerCoordinatesSubmitFailHandler,
-  validationSchemaWGS64
+  validationSchemaWGS64,
+  validationSchemaOSGB36
 } from '~/src/server/exemption/site-details/center-coordinates/controller.js'
 import { COORDINATE_SYSTEMS } from '~/src/server/common/constants/exemptions.js'
 import * as cacheUtils from '~/src/server/common/helpers/session-cache/utils.js'
@@ -329,7 +330,27 @@ describe('#centerCoordinates', () => {
       expect(result.error.message).toBe('LONGITUDE_REQUIRED')
     })
 
-    test('Should correctly set the cache when submitting', async () => {
+    test('Should correctly validate on empty northings data', () => {
+      const request = {
+        eastings: mockCoordinates[COORDINATE_SYSTEMS.OSGB36].eastings
+      }
+
+      const result = validationSchemaOSGB36.validate(request)
+
+      expect(result.error.message).toBe('NORTHINGS_REQUIRED')
+    })
+
+    test('Should correctly validate on empty eastings data', () => {
+      const request = {
+        northings: mockCoordinates[COORDINATE_SYSTEMS.OSGB36].northings
+      }
+
+      const result = validationSchemaOSGB36.validate(request)
+
+      expect(result.error.message).toBe('EASTINGS_REQUIRED')
+    })
+
+    test('Should correctly set the cache when submitting WGS64 data', async () => {
       const h = {
         view: jest.fn().mockReturnValue({
           takeover: jest.fn()
@@ -347,6 +368,54 @@ describe('#centerCoordinates', () => {
         'coordinates',
         mockExemption.siteDetails.coordinates
       )
+    })
+
+    test('Should correctly set the cache when submitting OSGB36 data', async () => {
+      const h = {
+        view: jest.fn().mockReturnValue({
+          takeover: jest.fn()
+        })
+      }
+
+      const mockRequest = {
+        payload: mockCoordinates[COORDINATE_SYSTEMS.OSGB36]
+      }
+
+      getCoordinateSystemSpy.mockReturnValueOnce({
+        coordinateSystem: COORDINATE_SYSTEMS.OSGB36
+      })
+
+      await centerCoordinatesSubmitController.handler(mockRequest, h)
+
+      expect(cacheUtils.updateExemptionSiteDetails).toHaveBeenCalledWith(
+        mockRequest,
+        'coordinates',
+        mockCoordinates[COORDINATE_SYSTEMS.OSGB36]
+      )
+    })
+
+    test('Should correctly handle validation errors', () => {
+      const request = {
+        payload: { latitude: 'invalid' }
+      }
+
+      const h = {
+        view: jest.fn().mockReturnValue({
+          takeover: jest.fn()
+        })
+      }
+
+      centerCoordinatesSubmitController.handler(request, h)
+
+      expect(h.view).toHaveBeenCalledWith(
+        COORDINATE_SYSTEM_VIEW_ROUTES[COORDINATE_SYSTEMS.WGS84],
+        expect.objectContaining({
+          payload: request.payload
+        })
+      )
+
+      expect(h.view().takeover).toHaveBeenCalled()
+      expect(cacheUtils.updateExemptionSiteDetails).not.toHaveBeenCalled()
     })
   })
 })

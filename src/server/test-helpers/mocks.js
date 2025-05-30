@@ -1,4 +1,5 @@
 import { faker } from '@faker-js/faker'
+import { COORDINATE_SYSTEMS } from '~/src/server/common/constants/exemptions.js'
 
 export const mockExemptionTaskList = {
   projectName: 'COMPLETED',
@@ -12,7 +13,8 @@ export const mockExemption = {
   siteDetails: {
     coordinatesType: 'coordinates',
     coordinatesEntry: 'single',
-    coordinateSystem: 'osgb36'
+    coordinateSystem: COORDINATE_SYSTEMS.WGS84,
+    coordinates: { latitude: '54.978252', longitude: '-1.617780' }
   },
   taskList: mockExemptionTaskList
 }

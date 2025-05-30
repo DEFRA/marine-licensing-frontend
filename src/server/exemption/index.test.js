@@ -56,6 +56,14 @@ describe('exemption route', () => {
       }),
       expect.objectContaining({
         method: 'GET',
+        path: '/exemption/enter-the-coordinates-at-the-centre-point'
+      }),
+      expect.objectContaining({
+        method: 'POST',
+        path: '/exemption/enter-the-coordinates-at-the-centre-point'
+      }),
+      expect.objectContaining({
+        method: 'GET',
         path: '/exemption'
       })
     ])

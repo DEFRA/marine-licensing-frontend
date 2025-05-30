@@ -1,0 +1,60 @@
+{% extends 'layouts/page.njk' %}
+
+{% from "govuk/components/back-link/macro.njk" import govukBackLink %}
+{% from "govuk/components/details/macro.njk" import govukDetails %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/input/macro.njk" import govukInput %}
+{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+{% from "cancel-button/macro.njk" import appCancelButton %}
+
+{% block beforeContent %}
+    {{ govukBackLink({
+        text: "Back",
+        href: backLink
+    }) }}
+{% endblock %}
+
+{% block content %}
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-two-thirds">
+            
+            {% if errorSummary %}
+                {{ govukErrorSummary({
+                    titleText: "There is a problem",
+                    errorList: errorSummary
+                }) }}
+            {% endif %}
+            
+            <span class="govuk-caption-l">{{ projectName }}</span>
+            <h1 class="govuk-heading-l">{{ heading }}</h1>
+
+            {% block introText %}{% endblock %}
+
+            {{ govukDetails({
+                summaryText: detailsSummary,
+                html: detailsHTML
+            }) }}
+            
+            <form method="POST">
+
+                <input type="hidden" name="csrfToken" value="{{csrfToken}}">
+
+                {% block coordinateFields %}{% endblock %}
+                                
+               <div class="govuk-button-group">
+                    {{ govukButton({
+                        text: "Continue",
+                        attributes: {
+                            id: "continue"
+                        }
+                    }) }}
+
+                    {{ appCancelButton({
+                        cancelLink: "/exemption/task-list?cancel=site-details"
+                    }) }}
+                </div>
+            </form>
+            
+        </div>
+    </div>
+{% endblock %} 

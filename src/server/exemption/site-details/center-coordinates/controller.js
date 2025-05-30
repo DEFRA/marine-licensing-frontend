@@ -19,7 +19,7 @@ export const COORDINATE_SYSTEM_VIEW_ROUTES = {
     'exemption/site-details/center-coordinates/osgb36'
 }
 
-const centerCoordinatesSettings = {
+const centerCoordinatesPageData = {
   pageTitle: 'Enter the coordinates at the centre point of the site',
   heading: 'Enter the coordinates at the centre point of the site',
   backLink: routes.COORDINATE_SYSTEM_CHOICE
@@ -48,14 +48,14 @@ export const centerCoordinatesController = {
     const siteDetails = exemption.siteDetails ?? {}
 
     return h.view(COORDINATE_SYSTEM_VIEW_ROUTES[coordinateSystem], {
-      ...centerCoordinatesSettings,
+      ...centerCoordinatesPageData,
       projectName: exemption.projectName,
       payload: getPayload(siteDetails, coordinateSystem)
     })
   }
 }
 
-export const validationSchemaWGS64 = joi.object({
+export const wgs64ValidationSchema = joi.object({
   latitude: joi.string().required().messages({
     'string.empty': 'LATITUDE_REQUIRED',
     'any.required': 'LATITUDE_REQUIRED'
@@ -66,7 +66,7 @@ export const validationSchemaWGS64 = joi.object({
   })
 })
 
-export const validationSchemaOSGB36 = joi.object({
+export const osgb36ValidationSchema = joi.object({
   eastings: joi.string().required().messages({
     'string.empty': 'EASTINGS_REQUIRED',
     'any.required': 'EASTINGS_REQUIRED'
@@ -91,7 +91,7 @@ export const centerCoordinatesSubmitFailHandler = (
   if (!error.details) {
     return h
       .view(COORDINATE_SYSTEM_VIEW_ROUTES[coordinateSystem], {
-        ...centerCoordinatesSettings,
+        ...centerCoordinatesPageData,
         projectName,
         payload
       })
@@ -107,7 +107,7 @@ export const centerCoordinatesSubmitFailHandler = (
 
   return h
     .view(COORDINATE_SYSTEM_VIEW_ROUTES[coordinateSystem], {
-      ...centerCoordinatesSettings,
+      ...centerCoordinatesPageData,
       projectName,
       payload,
       errors,
@@ -132,8 +132,8 @@ export const centerCoordinatesSubmitController = {
 
     const schema =
       coordinateSystem === COORDINATE_SYSTEMS.OSGB36
-        ? validationSchemaOSGB36
-        : validationSchemaWGS64
+        ? osgb36ValidationSchema
+        : wgs64ValidationSchema
 
     const { error } = schema.validate(payload, {
       abortEarly: false
@@ -152,7 +152,7 @@ export const centerCoordinatesSubmitController = {
 
     return h
       .view(COORDINATE_SYSTEM_VIEW_ROUTES[coordinateSystem], {
-        ...centerCoordinatesSettings,
+        ...centerCoordinatesPageData,
         payload,
         projectName
       })

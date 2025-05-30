@@ -4,8 +4,8 @@ import {
   centerCoordinatesSubmitController,
   COORDINATE_SYSTEM_VIEW_ROUTES,
   centerCoordinatesSubmitFailHandler,
-  validationSchemaWGS64,
-  validationSchemaOSGB36
+  wgs64ValidationSchema,
+  osgb36ValidationSchema
 } from '~/src/server/exemption/site-details/center-coordinates/controller.js'
 import { COORDINATE_SYSTEMS } from '~/src/server/common/constants/exemptions.js'
 import * as cacheUtils from '~/src/server/common/helpers/session-cache/utils.js'
@@ -297,7 +297,7 @@ describe('#centerCoordinates', () => {
         longitude: mockExemption.siteDetails.coordinates.longitude
       }
 
-      const result = validationSchemaWGS64.validate(request)
+      const result = wgs64ValidationSchema.validate(request)
 
       expect(result.error).toBeUndefined()
     })
@@ -305,7 +305,7 @@ describe('#centerCoordinates', () => {
     test('Should correctly validate on empty data', () => {
       const request = {}
 
-      const result = validationSchemaWGS64.validate(request)
+      const result = wgs64ValidationSchema.validate(request)
 
       expect(result.error.message).toBe('LATITUDE_REQUIRED')
     })
@@ -315,7 +315,7 @@ describe('#centerCoordinates', () => {
         longitude: mockExemption.siteDetails.coordinates.longitude
       }
 
-      const result = validationSchemaWGS64.validate(request)
+      const result = wgs64ValidationSchema.validate(request)
 
       expect(result.error.message).toBe('LATITUDE_REQUIRED')
     })
@@ -325,7 +325,7 @@ describe('#centerCoordinates', () => {
         latitude: mockExemption.siteDetails.coordinates.latitude
       }
 
-      const result = validationSchemaWGS64.validate(request)
+      const result = wgs64ValidationSchema.validate(request)
 
       expect(result.error.message).toBe('LONGITUDE_REQUIRED')
     })
@@ -335,7 +335,7 @@ describe('#centerCoordinates', () => {
         eastings: mockCoordinates[COORDINATE_SYSTEMS.OSGB36].eastings
       }
 
-      const result = validationSchemaOSGB36.validate(request)
+      const result = osgb36ValidationSchema.validate(request)
 
       expect(result.error.message).toBe('NORTHINGS_REQUIRED')
     })
@@ -345,7 +345,7 @@ describe('#centerCoordinates', () => {
         northings: mockCoordinates[COORDINATE_SYSTEMS.OSGB36].northings
       }
 
-      const result = validationSchemaOSGB36.validate(request)
+      const result = osgb36ValidationSchema.validate(request)
 
       expect(result.error.message).toBe('EASTINGS_REQUIRED')
     })

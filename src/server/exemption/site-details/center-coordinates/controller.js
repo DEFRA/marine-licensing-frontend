@@ -128,7 +128,7 @@ export const centerCoordinatesSubmitController = {
 
     const exemption = getExemptionCache(request)
 
-    const { projectName, siteDetails } = exemption
+    const { projectName } = exemption
 
     const schema =
       coordinateSystem === COORDINATE_SYSTEMS.OSGB36
@@ -153,7 +153,7 @@ export const centerCoordinatesSubmitController = {
     return h
       .view(COORDINATE_SYSTEM_VIEW_ROUTES[coordinateSystem], {
         ...centerCoordinatesSettings,
-        payload: getPayload(siteDetails, coordinateSystem),
+        payload,
         projectName
       })
       .takeover()

@@ -30,11 +30,15 @@ const centerCoordinatesPageData = {
 export const errorMessages = {
   [COORDINATE_SYSTEMS.WGS84]: {
     LATITUDE_REQUIRED: 'Enter the latitude',
-    LONGITUDE_REQUIRED: 'Enter the longitude'
+    LATITUDE_LENGTH: 'Latitude must be between -90 and 90',
+    LONGITUDE_REQUIRED: 'Enter the longitude',
+    LONGITUDE_LENGTH: 'Longitude must be between -90 and 90'
   },
   [COORDINATE_SYSTEMS.OSGB36]: {
     EASTINGS_REQUIRED: 'Enter the eastings',
-    NORTHINGS_REQUIRED: 'Enter the northings'
+    EASTINGS_LENGTH: 'Eastings must be exactly 6 digits',
+    NORTHINGS_REQUIRED: 'Enter the northings',
+    NORTHINGS_LENGTH: 'Northings must be 6 or 7 digits'
   }
 }
 

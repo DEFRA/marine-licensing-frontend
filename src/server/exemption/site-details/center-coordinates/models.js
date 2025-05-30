@@ -1,23 +1,39 @@
 import joi from 'joi'
 
 export const wgs64ValidationSchema = joi.object({
-  latitude: joi.string().required().messages({
-    'string.empty': 'LATITUDE_REQUIRED',
-    'any.required': 'LATITUDE_REQUIRED'
+  latitude: joi.number().required().min(-90).max(90).messages({
+    'number.base': 'LATITUDE_REQUIRED',
+    'any.required': 'LATITUDE_REQUIRED',
+    'number.min': 'LATITUDE_LENGTH',
+    'number.max': 'LATITUDE_LENGTH'
   }),
-  longitude: joi.string().required().messages({
-    'string.empty': 'LONGITUDE_REQUIRED',
-    'any.required': 'LONGITUDE_REQUIRED'
+  longitude: joi.number().min(-90).max(90).required().messages({
+    'number.base': 'LONGITUDE_REQUIRED',
+    'any.required': 'LONGITUDE_REQUIRED',
+    'number.min': 'LONGITUDE_LENGTH',
+    'number.max': 'LONGITUDE_LENGTH'
   })
 })
 
 export const osgb36ValidationSchema = joi.object({
-  eastings: joi.string().required().messages({
-    'string.empty': 'EASTINGS_REQUIRED',
-    'any.required': 'EASTINGS_REQUIRED'
+  eastings: joi.number().required().integer().min(100000).max(999999).messages({
+    'number.base': 'EASTINGS_REQUIRED',
+    'any.required': 'EASTINGS_REQUIRED',
+    'number.min': 'EASTINGS_LENGTH',
+    'number.max': 'EASTINGS_LENGTH',
+    'number.integer': 'EASTINGS_LENGTH'
   }),
-  northings: joi.string().required().messages({
-    'string.empty': 'NORTHINGS_REQUIRED',
-    'any.required': 'NORTHINGS_REQUIRED'
-  })
+  northings: joi
+    .number()
+    .required()
+    .integer()
+    .min(100000)
+    .max(9999999)
+    .messages({
+      'number.base': 'NORTHINGS_REQUIRED',
+      'any.required': 'NORTHINGS_REQUIRED',
+      'number.min': 'NORTHINGS_LENGTH',
+      'number.max': 'NORTHINGS_LENGTH',
+      'number.integer': 'NORTHINGS_LENGTH'
+    })
 })

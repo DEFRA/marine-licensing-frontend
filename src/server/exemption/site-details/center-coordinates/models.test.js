@@ -10,7 +10,7 @@ const mockCoordinates = {
     latitude: mockExemption.siteDetails.coordinates.latitude,
     longitude: mockExemption.siteDetails.coordinates.longitude
   },
-  [COORDINATE_SYSTEMS.OSGB36]: { eastings: '425053', northings: '564180' }
+  [COORDINATE_SYSTEMS.OSGB36]: { eastings: 425053, northings: 564180 }
 }
 
 describe('#centerCoordinate models', () => {
@@ -57,6 +57,34 @@ describe('#centerCoordinate models', () => {
 
       expect(result.error.message).toBe('LONGITUDE_REQUIRED')
     })
+
+    test('Should correctly validate when latitude and longitude is below minimum allowed value', () => {
+      const request = {
+        latitude: -91,
+        longitude: -91
+      }
+
+      const result = wgs64ValidationSchema.validate(request, {
+        abortEarly: false
+      })
+
+      expect(result.error.message).toContain('LATITUDE_LENGTH')
+      expect(result.error.message).toContain('LONGITUDE_LENGTH')
+    })
+
+    test('Should correctly validate when latitude and longitude is above maximum allowed value', () => {
+      const request = {
+        latitude: 91,
+        longitude: 91
+      }
+
+      const result = wgs64ValidationSchema.validate(request, {
+        abortEarly: false
+      })
+
+      expect(result.error.message).toContain('LATITUDE_LENGTH')
+      expect(result.error.message).toContain('LONGITUDE_LENGTH')
+    })
   })
 
   describe('#osgb36ValidationSchema model', () => {
@@ -94,6 +122,34 @@ describe('#centerCoordinate models', () => {
       const result = osgb36ValidationSchema.validate(request)
 
       expect(result.error.message).toBe('EASTINGS_REQUIRED')
+    })
+
+    test('Should correctly validate when northings and eastings is below minimum allowed value', () => {
+      const request = {
+        eastings: 10000,
+        northings: 10000
+      }
+
+      const result = osgb36ValidationSchema.validate(request, {
+        abortEarly: false
+      })
+
+      expect(result.error.message).toContain('EASTINGS_LENGTH')
+      expect(result.error.message).toContain('NORTHINGS_LENGTH')
+    })
+
+    test('Should correctly validate when northings and eastings is above maximum allowed value', () => {
+      const request = {
+        eastings: 9999999,
+        northings: 99999999
+      }
+
+      const result = osgb36ValidationSchema.validate(request, {
+        abortEarly: false
+      })
+
+      expect(result.error.message).toContain('EASTINGS_LENGTH')
+      expect(result.error.message).toContain('NORTHINGS_LENGTH')
     })
   })
 })

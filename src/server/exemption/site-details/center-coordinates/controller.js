@@ -10,8 +10,10 @@ import {
 import { routes } from '~/src/server/common/constants/routes.js'
 import { COORDINATE_SYSTEMS } from '~/src/server/common/constants/exemptions.js'
 import { getPayload } from '~/src/server/exemption/site-details/center-coordinates/utils.js'
-
-import joi from 'joi'
+import {
+  osgb36ValidationSchema,
+  wgs64ValidationSchema
+} from '~/src/server/exemption/site-details/center-coordinates/models.js'
 
 export const COORDINATE_SYSTEM_VIEW_ROUTES = {
   [COORDINATE_SYSTEMS.WGS84]: 'exemption/site-details/center-coordinates/wgs84',
@@ -54,28 +56,6 @@ export const centerCoordinatesController = {
     })
   }
 }
-
-export const wgs64ValidationSchema = joi.object({
-  latitude: joi.string().required().messages({
-    'string.empty': 'LATITUDE_REQUIRED',
-    'any.required': 'LATITUDE_REQUIRED'
-  }),
-  longitude: joi.string().required().messages({
-    'string.empty': 'LONGITUDE_REQUIRED',
-    'any.required': 'LONGITUDE_REQUIRED'
-  })
-})
-
-export const osgb36ValidationSchema = joi.object({
-  eastings: joi.string().required().messages({
-    'string.empty': 'EASTINGS_REQUIRED',
-    'any.required': 'EASTINGS_REQUIRED'
-  }),
-  northings: joi.string().required().messages({
-    'string.empty': 'NORTHINGS_REQUIRED',
-    'any.required': 'NORTHINGS_REQUIRED'
-  })
-})
 
 export const centerCoordinatesSubmitFailHandler = (
   request,

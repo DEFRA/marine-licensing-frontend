@@ -149,7 +149,7 @@ describe('#coordinateSystem', () => {
   })
 
   describe('#coordinateSystemSubmitController', () => {
-    test('Should correctly navigate to the next page', async () => {
+    test('Should correctly stay on the page when submitting', async () => {
       const request = {
         payload: { coordinateSystem: 'wgs84' }
       }

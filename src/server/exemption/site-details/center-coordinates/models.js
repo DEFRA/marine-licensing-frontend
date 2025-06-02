@@ -21,15 +21,21 @@ const MAX_EASTINGS_LENGTH = 999999
 const MIN_NORTHINGS_LENGTH = 100000
 const MAX_NORTHINGS_LENGTH = 9999999
 
+const checkEmptyString = (value, helpers) => {
+  if (value === '') {
+    return helpers.error(JOI_ERRORS.STRING_EMPTY)
+  }
+  return null
+}
+
 export const wgs64ValidationSchema = joi.object({
   latitude: joi
     .string()
     .required()
     .pattern(/^-?[0-9.]+$/)
     .custom((value, helpers) => {
-      if (value === '') {
-        return helpers.error(JOI_ERRORS.STRING_EMPTY)
-      }
+      const emptyError = checkEmptyString(value, helpers)
+      if (emptyError) return emptyError
 
       const latitude = Number(value)
       if (isNaN(latitude)) {
@@ -63,9 +69,8 @@ export const wgs64ValidationSchema = joi.object({
     .required()
     .pattern(/^-?[0-9.]+$/)
     .custom((value, helpers) => {
-      if (value === '') {
-        return helpers.error(JOI_ERRORS.STRING_EMPTY)
-      }
+      const emptyError = checkEmptyString(value, helpers)
+      if (emptyError) return emptyError
 
       const longitude = Number(value)
       if (isNaN(longitude)) {
@@ -102,9 +107,9 @@ export const osgb36ValidationSchema = joi.object({
     .required()
     .pattern(/^-?[0-9.]+$/)
     .custom((value, helpers) => {
-      if (value === '') {
-        return helpers.error(JOI_ERRORS.STRING_EMPTY)
-      }
+      const emptyError = checkEmptyString(value, helpers)
+      if (emptyError) return emptyError
+
       const eastings = Number(value)
       if (isNaN(eastings)) {
         return helpers.error(JOI_ERRORS.NUMBER_BASE)
@@ -130,9 +135,9 @@ export const osgb36ValidationSchema = joi.object({
     .required()
     .pattern(/^-?[0-9.]+$/)
     .custom((value, helpers) => {
-      if (value === '') {
-        return helpers.error(JOI_ERRORS.STRING_EMPTY)
-      }
+      const emptyError = checkEmptyString(value, helpers)
+      if (emptyError) return emptyError
+
       const northings = Number(value)
       if (isNaN(northings)) {
         return helpers.error(JOI_ERRORS.NUMBER_BASE)

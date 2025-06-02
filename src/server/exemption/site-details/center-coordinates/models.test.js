@@ -10,7 +10,7 @@ const mockCoordinates = {
     latitude: mockExemption.siteDetails.coordinates.latitude,
     longitude: mockExemption.siteDetails.coordinates.longitude
   },
-  [COORDINATE_SYSTEMS.OSGB36]: { eastings: 425053, northings: 564180 }
+  [COORDINATE_SYSTEMS.OSGB36]: { eastings: '425053', northings: '564180' }
 }
 
 describe('#centerCoordinate models', () => {
@@ -74,8 +74,8 @@ describe('#centerCoordinate models', () => {
 
     test('Should correctly validate when latitude and longitude is above maximum allowed value', () => {
       const request = {
-        latitude: 91,
-        longitude: 91
+        latitude: '91',
+        longitude: '91'
       }
 
       const result = wgs64ValidationSchema.validate(request, {
@@ -99,35 +99,18 @@ describe('#centerCoordinate models', () => {
     test('Should correctly validate on empty data', () => {
       const request = {}
 
-      const result = osgb36ValidationSchema.validate(request)
+      const result = osgb36ValidationSchema.validate(request, {
+        abortEarly: false
+      })
 
-      expect(result.error.message).toBe('EASTINGS_REQUIRED')
-    })
-
-    test('Should correctly validate on empty northings data', () => {
-      const request = {
-        eastings: mockCoordinates[COORDINATE_SYSTEMS.OSGB36].eastings
-      }
-
-      const result = osgb36ValidationSchema.validate(request)
-
-      expect(result.error.message).toBe('NORTHINGS_REQUIRED')
-    })
-
-    test('Should correctly validate on empty eastings data', () => {
-      const request = {
-        northings: mockCoordinates[COORDINATE_SYSTEMS.OSGB36].northings
-      }
-
-      const result = osgb36ValidationSchema.validate(request)
-
-      expect(result.error.message).toBe('EASTINGS_REQUIRED')
+      expect(result.error.message).toContain('EASTINGS_REQUIRED')
+      expect(result.error.message).toContain('NORTHINGS_REQUIRED')
     })
 
     test('Should correctly validate when northings and eastings is below minimum allowed value', () => {
       const request = {
-        eastings: 10000,
-        northings: 10000
+        eastings: '10000',
+        northings: '10000'
       }
 
       const result = osgb36ValidationSchema.validate(request, {
@@ -140,8 +123,8 @@ describe('#centerCoordinate models', () => {
 
     test('Should correctly validate when northings and eastings is above maximum allowed value', () => {
       const request = {
-        eastings: 9999999,
-        northings: 99999999
+        eastings: '9999999',
+        northings: '99999999'
       }
 
       const result = osgb36ValidationSchema.validate(request, {
@@ -152,36 +135,10 @@ describe('#centerCoordinate models', () => {
       expect(result.error.message).toContain('NORTHINGS_LENGTH')
     })
 
-    test('Should correctly validate when eastings is a negative number', () => {
+    test('Should correctly validate when eastings and northings are negative numbers', () => {
       const request = {
-        eastings: -425053,
-        northings: 564180
-      }
-
-      const result = osgb36ValidationSchema.validate(request, {
-        abortEarly: false
-      })
-
-      expect(result.error.message).toContain('EASTINGS_POSITIVE_NUMBER')
-    })
-
-    test('Should correctly validate when northings is a negative number', () => {
-      const request = {
-        eastings: 425053,
-        northings: -564180
-      }
-
-      const result = osgb36ValidationSchema.validate(request, {
-        abortEarly: false
-      })
-
-      expect(result.error.message).toContain('NORTHINGS_POSITIVE_NUMBER')
-    })
-
-    test('Should correctly validate when both eastings and northings are negative numbers', () => {
-      const request = {
-        eastings: -425053,
-        northings: -564180
+        eastings: '-425053',
+        northings: '-564180'
       }
 
       const result = osgb36ValidationSchema.validate(request, {
@@ -190,6 +147,34 @@ describe('#centerCoordinate models', () => {
 
       expect(result.error.message).toContain('EASTINGS_POSITIVE_NUMBER')
       expect(result.error.message).toContain('NORTHINGS_POSITIVE_NUMBER')
+    })
+
+    test('Should correctly validate when eastings and northings contain incorrect characters', () => {
+      const request = {
+        eastings: '42505/',
+        northings: '56410/'
+      }
+
+      const result = osgb36ValidationSchema.validate(request, {
+        abortEarly: false
+      })
+
+      expect(result.error.message).toContain('EASTINGS_NON_NUMERIC')
+      expect(result.error.message).toContain('NORTHINGS_NON_NUMERIC')
+    })
+
+    test('Should correctly validate when eastings and northings contain - inside the value', () => {
+      const request = {
+        eastings: '425-057',
+        northings: '564-109'
+      }
+
+      const result = osgb36ValidationSchema.validate(request, {
+        abortEarly: false
+      })
+
+      expect(result.error.message).toContain('EASTINGS_NON_NUMERIC')
+      expect(result.error.message).toContain('NORTHINGS_NON_NUMERIC')
     })
   })
 })

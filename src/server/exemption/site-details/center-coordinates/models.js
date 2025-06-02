@@ -17,33 +17,59 @@ export const wgs64ValidationSchema = joi.object({
 
 export const osgb36ValidationSchema = joi.object({
   eastings: joi
-    .number()
+    .string()
     .required()
-    .integer()
-    .positive()
-    .min(100000)
-    .max(999999)
+    .pattern(/^-?[0-9.]+$/)
+    .custom((value, helpers) => {
+      if (value === '') {
+        return helpers.error('string.empty')
+      }
+      const eastings = Number(value)
+      if (isNaN(eastings)) {
+        return helpers.error('number.base')
+      }
+      if (eastings <= 0) {
+        return helpers.error('number.positive')
+      }
+      if (eastings < 100000 || eastings > 999999) {
+        return helpers.error('number.range')
+      }
+      return eastings
+    })
     .messages({
-      'number.base': 'EASTINGS_REQUIRED',
-      'any.required': 'EASTINGS_REQUIRED',
-      'number.min': 'EASTINGS_LENGTH',
-      'number.max': 'EASTINGS_LENGTH',
-      'number.integer': 'EASTINGS_LENGTH',
-      'number.positive': 'EASTINGS_POSITIVE_NUMBER'
+      'string.empty': 'EASTINGS_REQUIRED',
+      'string.pattern.base': 'EASTINGS_NON_NUMERIC',
+      'number.base': 'EASTINGS_NON_NUMERIC',
+      'number.positive': 'EASTINGS_POSITIVE_NUMBER',
+      'number.range': 'EASTINGS_LENGTH',
+      'any.required': 'EASTINGS_REQUIRED'
     }),
   northings: joi
-    .number()
+    .string()
     .required()
-    .integer()
-    .positive()
-    .min(100000)
-    .max(9999999)
+    .pattern(/^-?[0-9.]+$/)
+    .custom((value, helpers) => {
+      if (value === '') {
+        return helpers.error('string.empty')
+      }
+      const northings = Number(value)
+      if (isNaN(northings)) {
+        return helpers.error('number.base')
+      }
+      if (northings <= 0) {
+        return helpers.error('number.positive')
+      }
+      if (northings < 100000 || northings > 9999999) {
+        return helpers.error('number.range')
+      }
+      return northings
+    })
     .messages({
-      'number.base': 'NORTHINGS_REQUIRED',
-      'any.required': 'NORTHINGS_REQUIRED',
-      'number.min': 'NORTHINGS_LENGTH',
-      'number.max': 'NORTHINGS_LENGTH',
-      'number.integer': 'NORTHINGS_LENGTH',
-      'number.positive': 'NORTHINGS_POSITIVE_NUMBER'
+      'string.empty': 'NORTHINGS_REQUIRED',
+      'string.pattern.base': 'NORTHINGS_NON_NUMERIC',
+      'number.base': 'NORTHINGS_NON_NUMERIC',
+      'number.positive': 'NORTHINGS_POSITIVE_NUMBER',
+      'number.range': 'NORTHINGS_LENGTH',
+      'any.required': 'NORTHINGS_REQUIRED'
     })
 })

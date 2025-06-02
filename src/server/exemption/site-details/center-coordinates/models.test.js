@@ -41,6 +41,20 @@ describe('#centerCoordinate models', () => {
       expect(result.error.message).toContain('LONGITUDE_REQUIRED')
     })
 
+    test('Should correctly validate when latitude and longitude are empty strings', () => {
+      const request = {
+        latitude: '',
+        longitude: ''
+      }
+
+      const result = wgs64ValidationSchema.validate(request, {
+        abortEarly: false
+      })
+
+      expect(result.error.message).toContain('LATITUDE_REQUIRED')
+      expect(result.error.message).toContain('LONGITUDE_REQUIRED')
+    })
+
     test('Should correctly validate when latitude and longitude is below minimum allowed value', () => {
       const request = {
         latitude: '-91',
@@ -115,6 +129,34 @@ describe('#centerCoordinate models', () => {
       })
 
       expect(result.error.message).toContain('EASTINGS_REQUIRED')
+      expect(result.error.message).toContain('NORTHINGS_REQUIRED')
+    })
+
+    test('Should correctly validate when eastings is an empty string', () => {
+      const request = {
+        eastings: '',
+        northings: '564180'
+      }
+
+      const result = osgb36ValidationSchema.validate(request, {
+        abortEarly: false
+      })
+
+      expect(result.error.message).toContain('EASTINGS_REQUIRED')
+      expect(result.error.message).not.toContain('NORTHINGS_REQUIRED')
+    })
+
+    test('Should correctly validate when northings is an empty string', () => {
+      const request = {
+        eastings: '425053',
+        northings: ''
+      }
+
+      const result = osgb36ValidationSchema.validate(request, {
+        abortEarly: false
+      })
+
+      expect(result.error.message).not.toContain('EASTINGS_REQUIRED')
       expect(result.error.message).toContain('NORTHINGS_REQUIRED')
     })
 

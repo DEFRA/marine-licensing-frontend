@@ -12,6 +12,18 @@ const MAX_EASTINGS_LENGTH = 999999
 const MIN_NORTHINGS_LENGTH = 100000
 const MAX_NORTHINGS_LENGTH = 9999999
 
+const validateDecimals = (value, helpers) => {
+  const decimalParts = value.split('.')
+  if (
+    decimalParts.length !== 2 ||
+    decimalParts[1].length !== LAT_LONG_DECIMAL_PLACES
+  ) {
+    return helpers.error(JOI_ERRORS.NUMBER_DECIMAL)
+  }
+
+  return null
+}
+
 export const wgs64ValidationSchema = joi.object({
   latitude: joi
     .string()
@@ -27,12 +39,9 @@ export const wgs64ValidationSchema = joi.object({
         return helpers.error(JOI_ERRORS.NUMBER_RANGE)
       }
 
-      const decimalParts = value.split('.')
-      if (
-        decimalParts.length !== 2 ||
-        decimalParts[1].length !== LAT_LONG_DECIMAL_PLACES
-      ) {
-        return helpers.error(JOI_ERRORS.NUMBER_DECIMAL)
+      const decimals = validateDecimals(value, helpers)
+      if (decimals) {
+        return decimals
       }
 
       return value
@@ -59,12 +68,9 @@ export const wgs64ValidationSchema = joi.object({
         return helpers.error(JOI_ERRORS.NUMBER_RANGE)
       }
 
-      const decimalParts = value.split('.')
-      if (
-        decimalParts.length !== 2 ||
-        decimalParts[1].length !== LAT_LONG_DECIMAL_PLACES
-      ) {
-        return helpers.error(JOI_ERRORS.NUMBER_DECIMAL)
+      const decimals = validateDecimals(value, helpers)
+      if (decimals) {
+        return decimals
       }
 
       return value

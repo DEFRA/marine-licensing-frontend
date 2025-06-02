@@ -192,7 +192,7 @@ describe('mapErrorsForDisplay', () => {
     ])
   })
 
-  test('show only on error per field', () => {
+  test('show only one error per field', () => {
     const messages = {
       PROJECT_NAME_REQUIRED: 'Enter the project name',
       PROJECT_NAME_MAX_LENGTH: 'Project name should be 250 characters or less'

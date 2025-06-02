@@ -31,8 +31,14 @@ export const errorMessages = {
   [COORDINATE_SYSTEMS.WGS84]: {
     LATITUDE_REQUIRED: 'Enter the latitude',
     LATITUDE_LENGTH: 'Latitude must be between -90 and 90',
+    LATITUDE_NON_NUMERIC: 'Latitude must be a number',
+    LATITUDE_DECIMAL_PLACES:
+      'Latitude must include 6 decimal places, like 55.019889',
     LONGITUDE_REQUIRED: 'Enter the longitude',
-    LONGITUDE_LENGTH: 'Longitude must be between -90 and 90'
+    LONGITUDE_LENGTH: 'Longitude must be between -180 and 80',
+    LONGITUDE_NON_NUMERIC: 'Longitude must be a number',
+    LONGITUDE_DECIMAL_PLACES:
+      'Longitude must include 6 decimal places, like -1.399500'
   },
   [COORDINATE_SYSTEMS.OSGB36]: {
     EASTINGS_REQUIRED: 'Enter the eastings',

@@ -1,18 +1,72 @@
 import joi from 'joi'
 
 export const wgs64ValidationSchema = joi.object({
-  latitude: joi.number().required().min(-90).max(90).messages({
-    'number.base': 'LATITUDE_REQUIRED',
-    'any.required': 'LATITUDE_REQUIRED',
-    'number.min': 'LATITUDE_LENGTH',
-    'number.max': 'LATITUDE_LENGTH'
-  }),
-  longitude: joi.number().min(-90).max(90).required().messages({
-    'number.base': 'LONGITUDE_REQUIRED',
-    'any.required': 'LONGITUDE_REQUIRED',
-    'number.min': 'LONGITUDE_LENGTH',
-    'number.max': 'LONGITUDE_LENGTH'
-  })
+  latitude: joi
+    .string()
+    .required()
+    .pattern(/^-?[0-9.]+$/)
+    .custom((value, helpers) => {
+      if (value === '') {
+        return helpers.error('string.empty')
+      }
+
+      const latitude = Number(value)
+      if (isNaN(latitude)) {
+        return helpers.error('number.base')
+      }
+
+      if (latitude < -90 || latitude > 90) {
+        return helpers.error('number.range')
+      }
+
+      const decimalParts = value.split('.')
+      if (decimalParts.length !== 2 || decimalParts[1].length !== 6) {
+        return helpers.error('number.decimal')
+      }
+
+      return latitude
+    })
+    .messages({
+      'string.empty': 'LATITUDE_REQUIRED',
+      'any.required': 'LATITUDE_REQUIRED',
+      'string.pattern.base': 'LATITUDE_NON_NUMERIC',
+      'number.base': 'LATITUDE_NON_NUMERIC',
+      'number.range': 'LATITUDE_LENGTH',
+      'number.decimal': 'LATITUDE_DECIMAL_PLACES'
+    }),
+  longitude: joi
+    .string()
+    .required()
+    .pattern(/^-?[0-9.]+$/)
+    .custom((value, helpers) => {
+      if (value === '') {
+        return helpers.error('string.empty')
+      }
+
+      const longitude = Number(value)
+      if (isNaN(longitude)) {
+        return helpers.error('number.base')
+      }
+
+      if (longitude < -180 || longitude > 180) {
+        return helpers.error('number.range')
+      }
+
+      const decimalParts = value.split('.')
+      if (decimalParts.length !== 2 || decimalParts[1].length !== 6) {
+        return helpers.error('number.decimal')
+      }
+
+      return longitude
+    })
+    .messages({
+      'string.empty': 'LONGITUDE_REQUIRED',
+      'any.required': 'LONGITUDE_REQUIRED',
+      'string.pattern.base': 'LONGITUDE_NON_NUMERIC',
+      'number.base': 'LONGITUDE_NON_NUMERIC',
+      'number.range': 'LONGITUDE_LENGTH',
+      'number.decimal': 'LONGITUDE_DECIMAL_PLACES'
+    })
 })
 
 export const osgb36ValidationSchema = joi.object({

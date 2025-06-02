@@ -33,35 +33,18 @@ describe('#centerCoordinate models', () => {
     test('Should correctly validate on empty data', () => {
       const request = {}
 
-      const result = wgs64ValidationSchema.validate(request)
+      const result = wgs64ValidationSchema.validate(request, {
+        abortEarly: false
+      })
 
-      expect(result.error.message).toBe('LATITUDE_REQUIRED')
-    })
-
-    test('Should correctly validate on empty latitude data', () => {
-      const request = {
-        longitude: mockExemption.siteDetails.coordinates.longitude
-      }
-
-      const result = wgs64ValidationSchema.validate(request)
-
-      expect(result.error.message).toBe('LATITUDE_REQUIRED')
-    })
-
-    test('Should correctly validate on empty longitude data', () => {
-      const request = {
-        latitude: mockExemption.siteDetails.coordinates.latitude
-      }
-
-      const result = wgs64ValidationSchema.validate(request)
-
-      expect(result.error.message).toBe('LONGITUDE_REQUIRED')
+      expect(result.error.message).toContain('LATITUDE_REQUIRED')
+      expect(result.error.message).toContain('LONGITUDE_REQUIRED')
     })
 
     test('Should correctly validate when latitude and longitude is below minimum allowed value', () => {
       const request = {
-        latitude: -91,
-        longitude: -91
+        latitude: '-91',
+        longitude: '-181'
       }
 
       const result = wgs64ValidationSchema.validate(request, {
@@ -75,7 +58,7 @@ describe('#centerCoordinate models', () => {
     test('Should correctly validate when latitude and longitude is above maximum allowed value', () => {
       const request = {
         latitude: '91',
-        longitude: '91'
+        longitude: '181'
       }
 
       const result = wgs64ValidationSchema.validate(request, {
@@ -84,6 +67,34 @@ describe('#centerCoordinate models', () => {
 
       expect(result.error.message).toContain('LATITUDE_LENGTH')
       expect(result.error.message).toContain('LONGITUDE_LENGTH')
+    })
+
+    test('Should correctly validate when latitude and longitude have incorrect characters', () => {
+      const request = {
+        latitude: '-9/',
+        longitude: '-18/'
+      }
+
+      const result = wgs64ValidationSchema.validate(request, {
+        abortEarly: false
+      })
+
+      expect(result.error.message).toContain('LATITUDE_NON_NUMERIC')
+      expect(result.error.message).toContain('LONGITUDE_NON_NUMERIC')
+    })
+
+    test('Should correctly validate eastings and northing do not have correct decimal places', () => {
+      const request = {
+        latitude: '50.12345',
+        longitude: '50.12345'
+      }
+
+      const result = wgs64ValidationSchema.validate(request, {
+        abortEarly: false
+      })
+
+      expect(result.error.message).toContain('LATITUDE_DECIMAL_PLACES')
+      expect(result.error.message).toContain('LONGITUDE_DECIMAL_PLACES')
     })
   })
 

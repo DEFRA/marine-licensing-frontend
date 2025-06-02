@@ -151,5 +151,45 @@ describe('#centerCoordinate models', () => {
       expect(result.error.message).toContain('EASTINGS_LENGTH')
       expect(result.error.message).toContain('NORTHINGS_LENGTH')
     })
+
+    test('Should correctly validate when eastings is a negative number', () => {
+      const request = {
+        eastings: -425053,
+        northings: 564180
+      }
+
+      const result = osgb36ValidationSchema.validate(request, {
+        abortEarly: false
+      })
+
+      expect(result.error.message).toContain('EASTINGS_POSITIVE_NUMBER')
+    })
+
+    test('Should correctly validate when northings is a negative number', () => {
+      const request = {
+        eastings: 425053,
+        northings: -564180
+      }
+
+      const result = osgb36ValidationSchema.validate(request, {
+        abortEarly: false
+      })
+
+      expect(result.error.message).toContain('NORTHINGS_POSITIVE_NUMBER')
+    })
+
+    test('Should correctly validate when both eastings and northings are negative numbers', () => {
+      const request = {
+        eastings: -425053,
+        northings: -564180
+      }
+
+      const result = osgb36ValidationSchema.validate(request, {
+        abortEarly: false
+      })
+
+      expect(result.error.message).toContain('EASTINGS_POSITIVE_NUMBER')
+      expect(result.error.message).toContain('NORTHINGS_POSITIVE_NUMBER')
+    })
   })
 })

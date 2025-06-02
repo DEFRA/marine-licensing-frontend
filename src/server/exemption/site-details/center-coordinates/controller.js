@@ -37,8 +37,12 @@ export const errorMessages = {
   [COORDINATE_SYSTEMS.OSGB36]: {
     EASTINGS_REQUIRED: 'Enter the eastings',
     EASTINGS_LENGTH: 'Eastings must be exactly 6 digits',
+    EASTINGS_POSITIVE_NUMBER:
+      'Eastings must be a positive 6-digit number, like 123456',
     NORTHINGS_REQUIRED: 'Enter the northings',
-    NORTHINGS_LENGTH: 'Northings must be 6 or 7 digits'
+    NORTHINGS_LENGTH: 'Northings must be 6 or 7 digits',
+    NORTHINGS_POSITIVE_NUMBER:
+      'Northings must be a positive 6 or 7-digit number, like 123456'
   }
 }
 
@@ -81,7 +85,6 @@ export const centerCoordinatesSubmitFailHandler = (
       })
       .takeover()
   }
-
   const errorSummary = mapErrorsForDisplay(
     error.details,
     errorMessages[coordinateSystem]

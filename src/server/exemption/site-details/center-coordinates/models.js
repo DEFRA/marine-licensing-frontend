@@ -16,17 +16,26 @@ export const wgs64ValidationSchema = joi.object({
 })
 
 export const osgb36ValidationSchema = joi.object({
-  eastings: joi.number().required().integer().min(100000).max(999999).messages({
-    'number.base': 'EASTINGS_REQUIRED',
-    'any.required': 'EASTINGS_REQUIRED',
-    'number.min': 'EASTINGS_LENGTH',
-    'number.max': 'EASTINGS_LENGTH',
-    'number.integer': 'EASTINGS_LENGTH'
-  }),
+  eastings: joi
+    .number()
+    .required()
+    .integer()
+    .positive()
+    .min(100000)
+    .max(999999)
+    .messages({
+      'number.base': 'EASTINGS_REQUIRED',
+      'any.required': 'EASTINGS_REQUIRED',
+      'number.min': 'EASTINGS_LENGTH',
+      'number.max': 'EASTINGS_LENGTH',
+      'number.integer': 'EASTINGS_LENGTH',
+      'number.positive': 'EASTINGS_POSITIVE_NUMBER'
+    }),
   northings: joi
     .number()
     .required()
     .integer()
+    .positive()
     .min(100000)
     .max(9999999)
     .messages({
@@ -34,6 +43,7 @@ export const osgb36ValidationSchema = joi.object({
       'any.required': 'NORTHINGS_REQUIRED',
       'number.min': 'NORTHINGS_LENGTH',
       'number.max': 'NORTHINGS_LENGTH',
-      'number.integer': 'NORTHINGS_LENGTH'
+      'number.integer': 'NORTHINGS_LENGTH',
+      'number.positive': 'NORTHINGS_POSITIVE_NUMBER'
     })
 })

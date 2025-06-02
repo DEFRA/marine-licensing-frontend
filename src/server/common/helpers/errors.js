@@ -57,19 +57,32 @@ export const errorDescriptionByFieldName = (errors = []) => {
 }
 
 /**
- * Format errors for error summary component
+ * Format errors for error summary component, returning one error per field
  * @param { ValidationError[] } errors
  * @param { {[key: string]: string} } messages
  */
-export const mapErrorsForDisplay = (errors = [], messages = {}) =>
-  errors.map((error) => {
-    const field = error.field || error.path
-    return {
-      href: `#${field}`,
-      text: messages[error.message] ?? error.message,
-      field
-    }
-  })
+export const mapErrorsForDisplay = (errors = [], messages = {}) => {
+  const errorFields = new Set()
+
+  return errors
+    .filter((error) => {
+      const field = error.field || error.path
+      if (errorFields.has(field[0])) {
+        return false
+      }
+
+      errorFields.add(field[0])
+      return true
+    })
+    .map((error) => {
+      const field = error.field || error.path
+      return {
+        href: `#${field}`,
+        text: messages[error.message] ?? error.message,
+        field
+      }
+    })
+}
 
 /**
  * @import { Request, ResponseToolkit, ValidationError } from '@hapi/hapi'

@@ -3,33 +3,28 @@
 {% from "govuk/components/back-link/macro.njk" import govukBackLink %}
 {% from "govuk/components/textarea/macro.njk" import govukTextarea %}
 {% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
-
 {% block beforeContent %}
   {{ govukBackLink({
     text: "Back",
     href: backLink
   }) }}
 {% endblock %}
-
 {% block content %}
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
-
       {% if errors %}
         {{ govukErrorSummary({
           titleText: "There is a problem",
           errorList: errorSummary
         }) }}
       {% endif %}
-
-      <form method="POST" >
-
-        <input type="hidden" name="csrfToken" value="{{csrfToken}}" />
-
-        {{ govukTextarea({
+      <form method="POST">
+        <input type="hidden" name="csrfToken" value="{{ csrfToken }}"/>
+          {{ govukTextarea({
           id: "activity-description",
           name: "activityDescription",
           value: payload.activityDescription,
+          rows: 8,
           label: {
             text: "Activity description",
             classes: "govuk-label--l",
@@ -40,7 +35,6 @@
           },
           errorMessage: errors['activityDescription']
         }) }}
-
         <div class="govuk-button-group">
           {{ govukButton({
               text: "Save and continue",
@@ -49,6 +43,6 @@
           <a class="govuk-link" href="/exemption/task-list">Cancel</a>
         </div>
       </form>
+    </div>
   </div>
-</div>
 {% endblock %}

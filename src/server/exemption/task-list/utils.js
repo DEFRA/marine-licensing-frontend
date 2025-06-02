@@ -32,7 +32,13 @@ export const transformTaskList = (taskList) => {
       href: routes.PROJECT_NAME,
       status: setStatus(taskList.projectName)
     },
-
+    {
+      title: {
+        text: 'Activity description'
+      },
+      href: routes.ACTIVITY_DESCRIPTION,
+      status: setStatus(taskList.activityDescription)
+    },
     {
       title: {
         text: 'Site details'
@@ -46,13 +52,6 @@ export const transformTaskList = (taskList) => {
       },
       href: routes.PUBLIC_REGISTER,
       status: setStatus(taskList.publicRegister)
-    },
-    {
-      title: {
-        text: 'Activity description'
-      },
-      href: routes.ACTIVITY_DESCRIPTION,
-      status: setStatus(taskList.activityDescription)
     }
   ]
 }

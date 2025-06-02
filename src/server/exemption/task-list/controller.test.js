@@ -98,6 +98,18 @@ describe('#taskListController', () => {
           }
         },
         {
+          href: routes.ACTIVITY_DESCRIPTION,
+          status: {
+            tag: {
+              classes: 'govuk-tag--blue',
+              text: 'Incomplete'
+            }
+          },
+          title: {
+            text: 'Activity description'
+          }
+        },
+        {
           href: routes.COORDINATES_TYPE_CHOICE,
           status: {
             tag: {
@@ -116,18 +128,6 @@ describe('#taskListController', () => {
           },
           title: {
             text: 'Public register'
-          }
-        },
-        {
-          href: routes.ACTIVITY_DESCRIPTION,
-          status: {
-            tag: {
-              classes: 'govuk-tag--blue',
-              text: 'Incomplete'
-            }
-          },
-          title: {
-            text: 'Activity description'
           }
         }
       ]

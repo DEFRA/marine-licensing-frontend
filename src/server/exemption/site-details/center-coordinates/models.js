@@ -1,5 +1,26 @@
 import joi from 'joi'
 
+const JOI_ERRORS = {
+  NUMBER_BASE: 'number.base',
+  NUMBER_POSITIVE: 'number.positive',
+  NUMBER_RANGE: 'number.range',
+  NUMBER_DECIMAL: 'number.decimal',
+  STRING_EMPTY: 'string.empty',
+  STRING_PATTERN_BASE: 'string.pattern.base',
+  ANY_REQUIRED: 'any.required'
+}
+
+const MIN_LATITUDE = -90
+const MAX_LATITUDE = 90
+const MIN_LONGITUDE = -180
+const MAX_LONGITUDE = 180
+const LAT_LONG_DECIMAL_PLACES = 6
+
+const MIN_EASTINGS_LENGTH = 100000
+const MAX_EASTINGS_LENGTH = 999999
+const MIN_NORTHINGS_LENGTH = 100000
+const MAX_NORTHINGS_LENGTH = 9999999
+
 export const wgs64ValidationSchema = joi.object({
   latitude: joi
     .string()
@@ -7,32 +28,35 @@ export const wgs64ValidationSchema = joi.object({
     .pattern(/^-?[0-9.]+$/)
     .custom((value, helpers) => {
       if (value === '') {
-        return helpers.error('string.empty')
+        return helpers.error(JOI_ERRORS.STRING_EMPTY)
       }
 
       const latitude = Number(value)
       if (isNaN(latitude)) {
-        return helpers.error('number.base')
+        return helpers.error(JOI_ERRORS.NUMBER_BASE)
       }
 
-      if (latitude < -90 || latitude > 90) {
-        return helpers.error('number.range')
+      if (latitude < MIN_LATITUDE || latitude > MAX_LATITUDE) {
+        return helpers.error(JOI_ERRORS.NUMBER_RANGE)
       }
 
       const decimalParts = value.split('.')
-      if (decimalParts.length !== 2 || decimalParts[1].length !== 6) {
-        return helpers.error('number.decimal')
+      if (
+        decimalParts.length !== 2 ||
+        decimalParts[1].length !== LAT_LONG_DECIMAL_PLACES
+      ) {
+        return helpers.error(JOI_ERRORS.NUMBER_DECIMAL)
       }
 
-      return latitude
+      return value
     })
     .messages({
-      'string.empty': 'LATITUDE_REQUIRED',
-      'any.required': 'LATITUDE_REQUIRED',
-      'string.pattern.base': 'LATITUDE_NON_NUMERIC',
-      'number.base': 'LATITUDE_NON_NUMERIC',
-      'number.range': 'LATITUDE_LENGTH',
-      'number.decimal': 'LATITUDE_DECIMAL_PLACES'
+      [JOI_ERRORS.STRING_EMPTY]: 'LATITUDE_REQUIRED',
+      [JOI_ERRORS.ANY_REQUIRED]: 'LATITUDE_REQUIRED',
+      [JOI_ERRORS.STRING_PATTERN_BASE]: 'LATITUDE_NON_NUMERIC',
+      [JOI_ERRORS.NUMBER_BASE]: 'LATITUDE_NON_NUMERIC',
+      [JOI_ERRORS.NUMBER_RANGE]: 'LATITUDE_LENGTH',
+      [JOI_ERRORS.NUMBER_DECIMAL]: 'LATITUDE_DECIMAL_PLACES'
     }),
   longitude: joi
     .string()
@@ -40,32 +64,35 @@ export const wgs64ValidationSchema = joi.object({
     .pattern(/^-?[0-9.]+$/)
     .custom((value, helpers) => {
       if (value === '') {
-        return helpers.error('string.empty')
+        return helpers.error(JOI_ERRORS.STRING_EMPTY)
       }
 
       const longitude = Number(value)
       if (isNaN(longitude)) {
-        return helpers.error('number.base')
+        return helpers.error(JOI_ERRORS.NUMBER_BASE)
       }
 
-      if (longitude < -180 || longitude > 180) {
-        return helpers.error('number.range')
+      if (longitude < MIN_LONGITUDE || longitude > MAX_LONGITUDE) {
+        return helpers.error(JOI_ERRORS.NUMBER_RANGE)
       }
 
       const decimalParts = value.split('.')
-      if (decimalParts.length !== 2 || decimalParts[1].length !== 6) {
-        return helpers.error('number.decimal')
+      if (
+        decimalParts.length !== 2 ||
+        decimalParts[1].length !== LAT_LONG_DECIMAL_PLACES
+      ) {
+        return helpers.error(JOI_ERRORS.NUMBER_DECIMAL)
       }
 
-      return longitude
+      return value
     })
     .messages({
-      'string.empty': 'LONGITUDE_REQUIRED',
-      'any.required': 'LONGITUDE_REQUIRED',
-      'string.pattern.base': 'LONGITUDE_NON_NUMERIC',
-      'number.base': 'LONGITUDE_NON_NUMERIC',
-      'number.range': 'LONGITUDE_LENGTH',
-      'number.decimal': 'LONGITUDE_DECIMAL_PLACES'
+      [JOI_ERRORS.STRING_EMPTY]: 'LONGITUDE_REQUIRED',
+      [JOI_ERRORS.ANY_REQUIRED]: 'LONGITUDE_REQUIRED',
+      [JOI_ERRORS.STRING_PATTERN_BASE]: 'LONGITUDE_NON_NUMERIC',
+      [JOI_ERRORS.NUMBER_BASE]: 'LONGITUDE_NON_NUMERIC',
+      [JOI_ERRORS.NUMBER_RANGE]: 'LONGITUDE_LENGTH',
+      [JOI_ERRORS.NUMBER_DECIMAL]: 'LONGITUDE_DECIMAL_PLACES'
     })
 })
 
@@ -76,27 +103,27 @@ export const osgb36ValidationSchema = joi.object({
     .pattern(/^-?[0-9.]+$/)
     .custom((value, helpers) => {
       if (value === '') {
-        return helpers.error('string.empty')
+        return helpers.error(JOI_ERRORS.STRING_EMPTY)
       }
       const eastings = Number(value)
       if (isNaN(eastings)) {
-        return helpers.error('number.base')
+        return helpers.error(JOI_ERRORS.NUMBER_BASE)
       }
       if (eastings <= 0) {
-        return helpers.error('number.positive')
+        return helpers.error(JOI_ERRORS.NUMBER_POSITIVE)
       }
-      if (eastings < 100000 || eastings > 999999) {
-        return helpers.error('number.range')
+      if (eastings < MIN_EASTINGS_LENGTH || eastings > MAX_EASTINGS_LENGTH) {
+        return helpers.error(JOI_ERRORS.NUMBER_RANGE)
       }
-      return eastings
+      return value
     })
     .messages({
-      'string.empty': 'EASTINGS_REQUIRED',
-      'string.pattern.base': 'EASTINGS_NON_NUMERIC',
-      'number.base': 'EASTINGS_NON_NUMERIC',
-      'number.positive': 'EASTINGS_POSITIVE_NUMBER',
-      'number.range': 'EASTINGS_LENGTH',
-      'any.required': 'EASTINGS_REQUIRED'
+      [JOI_ERRORS.STRING_EMPTY]: 'EASTINGS_REQUIRED',
+      [JOI_ERRORS.STRING_PATTERN_BASE]: 'EASTINGS_NON_NUMERIC',
+      [JOI_ERRORS.NUMBER_BASE]: 'EASTINGS_NON_NUMERIC',
+      [JOI_ERRORS.NUMBER_POSITIVE]: 'EASTINGS_POSITIVE_NUMBER',
+      [JOI_ERRORS.NUMBER_RANGE]: 'EASTINGS_LENGTH',
+      [JOI_ERRORS.ANY_REQUIRED]: 'EASTINGS_REQUIRED'
     }),
   northings: joi
     .string()
@@ -104,26 +131,29 @@ export const osgb36ValidationSchema = joi.object({
     .pattern(/^-?[0-9.]+$/)
     .custom((value, helpers) => {
       if (value === '') {
-        return helpers.error('string.empty')
+        return helpers.error(JOI_ERRORS.STRING_EMPTY)
       }
       const northings = Number(value)
       if (isNaN(northings)) {
-        return helpers.error('number.base')
+        return helpers.error(JOI_ERRORS.NUMBER_BASE)
       }
       if (northings <= 0) {
-        return helpers.error('number.positive')
+        return helpers.error(JOI_ERRORS.NUMBER_POSITIVE)
       }
-      if (northings < 100000 || northings > 9999999) {
-        return helpers.error('number.range')
+      if (
+        northings < MIN_NORTHINGS_LENGTH ||
+        northings > MAX_NORTHINGS_LENGTH
+      ) {
+        return helpers.error(JOI_ERRORS.NUMBER_RANGE)
       }
-      return northings
+      return value
     })
     .messages({
-      'string.empty': 'NORTHINGS_REQUIRED',
-      'string.pattern.base': 'NORTHINGS_NON_NUMERIC',
-      'number.base': 'NORTHINGS_NON_NUMERIC',
-      'number.positive': 'NORTHINGS_POSITIVE_NUMBER',
-      'number.range': 'NORTHINGS_LENGTH',
-      'any.required': 'NORTHINGS_REQUIRED'
+      [JOI_ERRORS.STRING_EMPTY]: 'NORTHINGS_REQUIRED',
+      [JOI_ERRORS.STRING_PATTERN_BASE]: 'NORTHINGS_NON_NUMERIC',
+      [JOI_ERRORS.NUMBER_BASE]: 'NORTHINGS_NON_NUMERIC',
+      [JOI_ERRORS.NUMBER_POSITIVE]: 'NORTHINGS_POSITIVE_NUMBER',
+      [JOI_ERRORS.NUMBER_RANGE]: 'NORTHINGS_LENGTH',
+      [JOI_ERRORS.ANY_REQUIRED]: 'NORTHINGS_REQUIRED'
     })
 })

@@ -17,8 +17,8 @@ export const ACTIVITY_DESCRIPTION_VIEW_ROUTE =
 const ACTIVITY_DESCRIPTION_FIELD_MAX_LENGTH = 4000
 
 export const errorMessages = {
-  ACTIVITY_DESCRIPTION_REQUIRED: 'Enter the activity details',
-  ACTIVITY_DESCRIPTION_MAX_LENGTH: `Activity details should be ${ACTIVITY_DESCRIPTION_FIELD_MAX_LENGTH} characters or less`
+  ACTIVITY_DESCRIPTION_REQUIRED: 'Enter the activity description',
+  ACTIVITY_DESCRIPTION_MAX_LENGTH: `Activity description must be ${ACTIVITY_DESCRIPTION_FIELD_MAX_LENGTH} characters or less`
 }
 
 const templateValues = {
@@ -43,7 +43,7 @@ export const activityDescriptionController = {
 }
 
 /**
- * A GDS styled activity description POST page controller.
+ * A GDS styled activity description PATCH page controller.
  * @satisfies {Partial<ServerRoute>}
  */
 export const activityDescriptionSubmitController = {
@@ -90,7 +90,7 @@ export const activityDescriptionSubmitController = {
     const { payload } = request
     try {
       const exemption = getExemptionCache(request)
-      const { payload: responsePayload } = await Wreck.post(
+      const { payload: responsePayload } = await Wreck.patch(
         `${config.get('backend').apiUrl}/exemption/activity-description`,
         {
           payload: { ...payload, id: exemption.id },

@@ -29,7 +29,7 @@ describe('#activityDescriptionController', () => {
     jest.resetAllMocks()
 
     jest
-      .spyOn(Wreck, 'post')
+      .spyOn(Wreck, 'patch')
       .mockReturnValue({ payload: { id: mockExemption.id } })
 
     getExemptionCacheSpy = jest
@@ -99,12 +99,12 @@ describe('#activityDescriptionController', () => {
 
   describe('activityDescriptionController POST', () => {
     test('should handle form submission with valid data', async () => {
-      const apiPostMock = jest.spyOn(Wreck, 'post')
+      const apiPatchMock = jest.spyOn(Wreck, 'patch')
       const payload = {
         activityDescription: 'This is a test activity description.'
       }
 
-      apiPostMock.mockResolvedValueOnce({
+      apiPatchMock.mockResolvedValueOnce({
         res: { statusCode: 200 },
         payload: { data: 'test' }
       })
@@ -115,7 +115,7 @@ describe('#activityDescriptionController', () => {
         payload
       })
 
-      expect(Wreck.post).toHaveBeenCalledWith(
+      expect(Wreck.patch).toHaveBeenCalledWith(
         `${config.get('backend').apiUrl}/exemption/activity-description`,
         {
           payload: { ...payload },
@@ -160,12 +160,12 @@ describe('#activityDescriptionController', () => {
       ).toContain('There is a problem')
       expect(
         document.querySelector('.govuk-error-message').textContent
-      ).toContain('Enter the activity details')
+      ).toContain('Enter the activity description')
     })
 
     test('should pass error to global catchAll handler', async () => {
-      const apiPostMock = jest.spyOn(Wreck, 'post')
-      apiPostMock.mockRejectedValueOnce({
+      const apiPatchMock = jest.spyOn(Wreck, 'patch')
+      apiPatchMock.mockRejectedValueOnce({
         res: { statusCode: 500 },
         data: {}
       })
@@ -254,7 +254,7 @@ describe('#activityDescriptionController', () => {
     })
 
     test('should show error message with empty activity description', async () => {
-      const apiPostMock = jest.spyOn(Wreck, 'post')
+      const apiPatchMock = jest.spyOn(Wreck, 'patch')
       const fakeError = new Error('Bad Request')
       fakeError.data = {
         payload: {
@@ -272,7 +272,7 @@ describe('#activityDescriptionController', () => {
         }
       }
 
-      apiPostMock.mockRejectedValueOnce(fakeError)
+      apiPatchMock.mockRejectedValueOnce(fakeError)
 
       const { result, statusCode } = await server.inject({
         method: 'POST',
@@ -283,7 +283,7 @@ describe('#activityDescriptionController', () => {
       const { document } = new JSDOM(result).window
       expect(
         document.querySelector('.govuk-error-message').textContent.trim()
-      ).toBe('Error: Enter the activity details')
+      ).toBe('Error: Enter the activity description')
       expect(document.querySelector('h2').textContent.trim()).toBe(
         'There is a problem'
       )

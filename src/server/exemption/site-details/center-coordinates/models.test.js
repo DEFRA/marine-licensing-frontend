@@ -1,5 +1,5 @@
 import {
-  wgs64ValidationSchema,
+  wgs84ValidationSchema,
   osgb36ValidationSchema
 } from '~/src/server/exemption/site-details/center-coordinates/models.js'
 import { mockExemption } from '~/src/server/test-helpers/mocks.js'
@@ -18,14 +18,14 @@ describe('#centerCoordinate models', () => {
     jest.resetAllMocks()
   })
 
-  describe('#wgs64ValidationSchema model', () => {
+  describe('#wgs84ValidationSchema model', () => {
     test('Should correctly validate on valid data', () => {
       const request = {
         latitude: mockExemption.siteDetails.coordinates.latitude,
         longitude: mockExemption.siteDetails.coordinates.longitude
       }
 
-      const result = wgs64ValidationSchema.validate(request)
+      const result = wgs84ValidationSchema.validate(request)
 
       expect(result.error).toBeUndefined()
     })
@@ -33,7 +33,7 @@ describe('#centerCoordinate models', () => {
     test('Should correctly validate on empty data', () => {
       const request = {}
 
-      const result = wgs64ValidationSchema.validate(request, {
+      const result = wgs84ValidationSchema.validate(request, {
         abortEarly: false
       })
 
@@ -47,7 +47,7 @@ describe('#centerCoordinate models', () => {
         longitude: ''
       }
 
-      const result = wgs64ValidationSchema.validate(request, {
+      const result = wgs84ValidationSchema.validate(request, {
         abortEarly: false
       })
 
@@ -61,7 +61,7 @@ describe('#centerCoordinate models', () => {
         longitude: '-181'
       }
 
-      const result = wgs64ValidationSchema.validate(request, {
+      const result = wgs84ValidationSchema.validate(request, {
         abortEarly: false
       })
 
@@ -75,7 +75,7 @@ describe('#centerCoordinate models', () => {
         longitude: '181'
       }
 
-      const result = wgs64ValidationSchema.validate(request, {
+      const result = wgs84ValidationSchema.validate(request, {
         abortEarly: false
       })
 
@@ -89,7 +89,7 @@ describe('#centerCoordinate models', () => {
         longitude: '-18/'
       }
 
-      const result = wgs64ValidationSchema.validate(request, {
+      const result = wgs84ValidationSchema.validate(request, {
         abortEarly: false
       })
 
@@ -103,7 +103,7 @@ describe('#centerCoordinate models', () => {
         longitude: '50.12345'
       }
 
-      const result = wgs64ValidationSchema.validate(request, {
+      const result = wgs84ValidationSchema.validate(request, {
         abortEarly: false
       })
 

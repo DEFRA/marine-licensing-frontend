@@ -12,7 +12,7 @@ import { COORDINATE_SYSTEMS } from '~/src/server/common/constants/exemptions.js'
 import { getPayload } from '~/src/server/exemption/site-details/center-coordinates/utils.js'
 import {
   osgb36ValidationSchema,
-  wgs64ValidationSchema
+  wgs84ValidationSchema
 } from '~/src/server/exemption/site-details/center-coordinates/models.js'
 
 export const COORDINATE_SYSTEM_VIEW_ROUTES = {
@@ -35,7 +35,7 @@ export const errorMessages = {
     LATITUDE_DECIMAL_PLACES:
       'Latitude must include 6 decimal places, like 55.019889',
     LONGITUDE_REQUIRED: 'Enter the longitude',
-    LONGITUDE_LENGTH: 'Longitude must be between -180 and 80',
+    LONGITUDE_LENGTH: 'Longitude must be between -180 and 180',
     LONGITUDE_NON_NUMERIC: 'Longitude must be a number',
     LONGITUDE_DECIMAL_PLACES:
       'Longitude must include 6 decimal places, like -1.399500'
@@ -128,7 +128,7 @@ export const centerCoordinatesSubmitController = {
     const schema =
       coordinateSystem === COORDINATE_SYSTEMS.OSGB36
         ? osgb36ValidationSchema
-        : wgs64ValidationSchema
+        : wgs84ValidationSchema
 
     const { error } = schema.validate(payload, {
       abortEarly: false

@@ -67,7 +67,7 @@ describe('#centerCoordinates', () => {
       )
     })
 
-    test('centerCoordinatesController handler should render with correct context for wgs64', () => {
+    test('centerCoordinatesController handler should render with correct context for wgs84', () => {
       const h = { view: jest.fn() }
 
       centerCoordinatesController.handler({}, h)
@@ -289,7 +289,7 @@ describe('#centerCoordinates', () => {
       expect(h.view().takeover).toHaveBeenCalled()
     })
 
-    test('Should correctly set the cache when submitting WGS64 data', async () => {
+    test('Should correctly set the cache when submitting wgs84 data', async () => {
       const h = {
         view: jest.fn().mockReturnValue({
           takeover: jest.fn()

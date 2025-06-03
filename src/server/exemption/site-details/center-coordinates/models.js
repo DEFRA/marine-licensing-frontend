@@ -24,7 +24,7 @@ const validateDecimals = (value, helpers) => {
   return null
 }
 
-export const wgs64ValidationSchema = joi.object({
+export const wgs84ValidationSchema = joi.object({
   latitude: joi
     .string()
     .required()

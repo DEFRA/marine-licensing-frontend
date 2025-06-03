@@ -25,6 +25,8 @@ const nunjucksEnvironment = nunjucks.configure(
   }
 )
 
+nunjucksEnvironment.addGlobal('govukRebrand', true)
+
 /**
  * @satisfies {ServerRegisterPluginObject<ServerViewsConfiguration>}
  */

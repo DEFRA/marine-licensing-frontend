@@ -25,16 +25,18 @@ const validateCoordinates = (value, helpers, type) => {
     return helpers.error(JOI_ERRORS.NUMBER_BASE)
   }
 
-  if (type === 'latitude') {
-    if (coordinate < MIN_LATITUDE || coordinate > MAX_LATITUDE) {
-      return helpers.error(JOI_ERRORS.NUMBER_RANGE)
-    }
+  if (
+    type === 'latitude' &&
+    (coordinate < MIN_LATITUDE || coordinate > MAX_LATITUDE)
+  ) {
+    return helpers.error(JOI_ERRORS.NUMBER_RANGE)
   }
 
-  if (type === 'longitude') {
-    if (coordinate < MIN_LONGITUDE || coordinate > MAX_LONGITUDE) {
-      return helpers.error(JOI_ERRORS.NUMBER_RANGE)
-    }
+  if (
+    type === 'longitude' &&
+    (coordinate < MIN_LONGITUDE || coordinate > MAX_LONGITUDE)
+  ) {
+    return helpers.error(JOI_ERRORS.NUMBER_RANGE)
   }
 
   return value

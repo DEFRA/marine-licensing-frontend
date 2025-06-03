@@ -16,19 +16,18 @@ const validateCoordinates = (value, helpers, type) => {
     return helpers.error(JOI_ERRORS.NUMBER_POSITIVE)
   }
 
-  if (type === 'eastings') {
-    if (coordinate < MIN_EASTINGS_LENGTH || coordinate > MAX_EASTINGS_LENGTH) {
-      return helpers.error(JOI_ERRORS.NUMBER_RANGE)
-    }
+  if (
+    type === 'eastings' &&
+    (coordinate < MIN_EASTINGS_LENGTH || coordinate > MAX_EASTINGS_LENGTH)
+  ) {
+    return helpers.error(JOI_ERRORS.NUMBER_RANGE)
   }
 
-  if (type === 'northings') {
-    if (
-      coordinate < MIN_NORTHINGS_LENGTH ||
-      coordinate > MAX_NORTHINGS_LENGTH
-    ) {
-      return helpers.error(JOI_ERRORS.NUMBER_RANGE)
-    }
+  if (
+    type === 'northings' &&
+    (coordinate < MIN_NORTHINGS_LENGTH || coordinate > MAX_NORTHINGS_LENGTH)
+  ) {
+    return helpers.error(JOI_ERRORS.NUMBER_RANGE)
   }
 
   return value

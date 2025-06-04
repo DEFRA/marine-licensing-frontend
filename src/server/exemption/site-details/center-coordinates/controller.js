@@ -10,8 +10,8 @@ import {
 import { routes } from '~/src/server/common/constants/routes.js'
 import { COORDINATE_SYSTEMS } from '~/src/server/common/constants/exemptions.js'
 import { getPayload } from '~/src/server/exemption/site-details/center-coordinates/utils.js'
-import { wgs84ValidationSchema } from '~/src/server/exemption/site-details/center-coordinates/schemas/wgs84.js'
-import { osgb36ValidationSchema } from '~/src/server/exemption/site-details/center-coordinates/schemas/osgb36.js'
+import { wgs84ValidationSchema } from '~/src/server/common/schemas/wgs84.js'
+import { osgb36ValidationSchema } from '~/src/server/common/schemas/osgb36.js'
 
 export const COORDINATE_SYSTEM_VIEW_ROUTES = {
   [COORDINATE_SYSTEMS.WGS84]: 'exemption/site-details/center-coordinates/wgs84',

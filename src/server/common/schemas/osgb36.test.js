@@ -1,4 +1,4 @@
-import { osgb36ValidationSchema } from '~/src/server/exemption/site-details/center-coordinates/schemas/osgb36.js'
+import { osgb36ValidationSchema } from '~/src/server/common/schemas/osgb36.js'
 import { COORDINATE_SYSTEMS } from '~/src/server/common/constants/exemptions.js'
 
 const mockCoordinates = {

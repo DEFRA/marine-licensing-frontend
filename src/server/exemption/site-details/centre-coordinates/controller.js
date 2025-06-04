@@ -9,17 +9,17 @@ import {
 } from '~/src/server/common/helpers/errors.js'
 import { routes } from '~/src/server/common/constants/routes.js'
 import { COORDINATE_SYSTEMS } from '~/src/server/common/constants/exemptions.js'
-import { getPayload } from '~/src/server/exemption/site-details/center-coordinates/utils.js'
+import { getPayload } from '~/src/server/exemption/site-details/centre-coordinates/utils.js'
 import { wgs84ValidationSchema } from '~/src/server/common/schemas/wgs84.js'
 import { osgb36ValidationSchema } from '~/src/server/common/schemas/osgb36.js'
 
 export const COORDINATE_SYSTEM_VIEW_ROUTES = {
-  [COORDINATE_SYSTEMS.WGS84]: 'exemption/site-details/center-coordinates/wgs84',
+  [COORDINATE_SYSTEMS.WGS84]: 'exemption/site-details/centre-coordinates/wgs84',
   [COORDINATE_SYSTEMS.OSGB36]:
-    'exemption/site-details/center-coordinates/osgb36'
+    'exemption/site-details/centre-coordinates/osgb36'
 }
 
-const centerCoordinatesPageData = {
+const centreCoordinatesPageData = {
   pageTitle: 'Enter the coordinates at the centre point of the site',
   heading: 'Enter the coordinates at the centre point of the site',
   backLink: routes.COORDINATE_SYSTEM_CHOICE
@@ -53,10 +53,10 @@ export const errorMessages = {
 }
 
 /**
- * A GDS styled page controller for the center coordinates page.
+ * A GDS styled page controller for the centre coordinates page.
  * @satisfies {Partial<ServerRoute>}
  */
-export const centerCoordinatesController = {
+export const centreCoordinatesController = {
   handler(request, h) {
     const exemption = getExemptionCache(request)
     const { coordinateSystem } = getCoordinateSystem(request)
@@ -64,14 +64,14 @@ export const centerCoordinatesController = {
     const siteDetails = exemption.siteDetails ?? {}
 
     return h.view(COORDINATE_SYSTEM_VIEW_ROUTES[coordinateSystem], {
-      ...centerCoordinatesPageData,
+      ...centreCoordinatesPageData,
       projectName: exemption.projectName,
       payload: getPayload(siteDetails, coordinateSystem)
     })
   }
 }
 
-export const centerCoordinatesSubmitFailHandler = (
+export const centreCoordinatesSubmitFailHandler = (
   request,
   h,
   error,
@@ -85,7 +85,7 @@ export const centerCoordinatesSubmitFailHandler = (
   if (!error.details) {
     return h
       .view(COORDINATE_SYSTEM_VIEW_ROUTES[coordinateSystem], {
-        ...centerCoordinatesPageData,
+        ...centreCoordinatesPageData,
         projectName,
         payload
       })
@@ -100,7 +100,7 @@ export const centerCoordinatesSubmitFailHandler = (
 
   return h
     .view(COORDINATE_SYSTEM_VIEW_ROUTES[coordinateSystem], {
-      ...centerCoordinatesPageData,
+      ...centreCoordinatesPageData,
       projectName,
       payload,
       errors,
@@ -110,10 +110,10 @@ export const centerCoordinatesSubmitFailHandler = (
 }
 
 /**
- * A GDS styled page controller for the POST route in the center coordinates page.
+ * A GDS styled page controller for the POST route in the centre coordinates page.
  * @satisfies {Partial<ServerRoute>}
  */
-export const centerCoordinatesSubmitController = {
+export const centreCoordinatesSubmitController = {
   handler(request, h) {
     const { payload } = request
 
@@ -133,7 +133,7 @@ export const centerCoordinatesSubmitController = {
     })
 
     if (error) {
-      return centerCoordinatesSubmitFailHandler(
+      return centreCoordinatesSubmitFailHandler(
         request,
         h,
         error,
@@ -145,7 +145,7 @@ export const centerCoordinatesSubmitController = {
 
     return h
       .view(COORDINATE_SYSTEM_VIEW_ROUTES[coordinateSystem], {
-        ...centerCoordinatesPageData,
+        ...centreCoordinatesPageData,
         payload,
         projectName
       })

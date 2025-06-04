@@ -1,7 +1,7 @@
 import { wgs84ValidationSchema } from '~/src/server/common/schemas/wgs84.js'
 import { mockExemption } from '~/src/server/test-helpers/mocks.js'
 
-describe('#centerCoordinate models', () => {
+describe('#centreCoordinate models', () => {
   beforeEach(() => {
     jest.resetAllMocks()
   })

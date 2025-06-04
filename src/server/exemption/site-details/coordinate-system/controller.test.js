@@ -177,7 +177,7 @@ describe('#coordinateSystem', () => {
       })
     })
 
-    test('Should redirect to center coordinates page when coordinatesEntry is single', async () => {
+    test('Should redirect to centre coordinates page when coordinatesEntry is single', async () => {
       const request = {
         payload: { coordinateSystem: 'wgs84' }
       }
@@ -194,7 +194,7 @@ describe('#coordinateSystem', () => {
       }
 
       await coordinateSystemSubmitController.handler(request, h)
-      expect(h.redirect).toHaveBeenCalledWith(routes.CIRCLE_CENTER_POINT)
+      expect(h.redirect).toHaveBeenCalledWith(routes.CIRCLE_CENTRE_POINT)
     })
 
     test('Should correctly format error data', () => {

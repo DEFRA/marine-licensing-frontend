@@ -4,7 +4,7 @@ export const routes = {
   COORDINATES_ENTRY_CHOICE:
     '/exemption/how-do-you-want-to-enter-the-coordinates',
   COORDINATE_SYSTEM_CHOICE: '/exemption/what-coordinate-system',
-  CIRCLE_CENTER_POINT: '/exemption/enter-the-coordinates-at-the-centre-point',
+  CIRCLE_CENTRE_POINT: '/exemption/enter-the-coordinates-at-the-centre-point',
   PROJECT_NAME: '/exemption/project-name',
   PUBLIC_REGISTER: '/exemption/public-register',
   TASK_LIST: '/exemption/task-list',

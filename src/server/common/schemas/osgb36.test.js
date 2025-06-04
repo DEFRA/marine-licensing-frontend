@@ -5,7 +5,7 @@ const mockCoordinates = {
   [COORDINATE_SYSTEMS.OSGB36]: { eastings: '425053', northings: '564180' }
 }
 
-describe('#centerCoordinate models', () => {
+describe('#centreCoordinate models', () => {
   beforeEach(() => {
     jest.resetAllMocks()
   })

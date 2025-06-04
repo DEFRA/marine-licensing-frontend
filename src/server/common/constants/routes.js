@@ -7,5 +7,6 @@ export const routes = {
   CIRCLE_CENTER_POINT: '/exemption/enter-the-coordinates-at-the-centre-point',
   PROJECT_NAME: '/exemption/project-name',
   PUBLIC_REGISTER: '/exemption/public-register',
-  TASK_LIST: '/exemption/task-list'
+  TASK_LIST: '/exemption/task-list',
+  ACTIVITY_DESCRIPTION: '/exemption/activity-description'
 }

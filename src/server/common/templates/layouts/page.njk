@@ -29,6 +29,9 @@
 {% endblock %}
 
 {% block pageTitle %}
+  {% if errors %}
+    Error: 
+  {% endif %}
   {{ pageTitle }} | {{ serviceName }}
 {% endblock %}
 

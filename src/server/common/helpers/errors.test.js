@@ -192,6 +192,28 @@ describe('mapErrorsForDisplay', () => {
     ])
   })
 
+  test('show only one error per field', () => {
+    const messages = {
+      PROJECT_NAME_REQUIRED: 'Enter the project name',
+      PROJECT_NAME_MAX_LENGTH: 'Project name should be 250 characters or less'
+    }
+    const result = mapErrorsForDisplay(
+      [
+        { message: 'PROJECT_NAME_REQUIRED', path: 'projectName' },
+        { message: 'PROJECT_NAME_MAX_LENGTH', path: 'projectName' }
+      ],
+      messages
+    )
+
+    expect(result).toStrictEqual([
+      {
+        href: '#projectName',
+        text: messages.PROJECT_NAME_REQUIRED,
+        field: 'projectName'
+      }
+    ])
+  })
+
   test('can handle empty input array', () => {
     const result = mapErrorsForDisplay()
     expect(result).toEqual([])

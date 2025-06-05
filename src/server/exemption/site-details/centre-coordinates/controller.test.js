@@ -1,12 +1,10 @@
 import { createServer } from '~/src/server/index.js'
 import {
-  centerCoordinatesController,
-  centerCoordinatesSubmitController,
+  centreCoordinatesController,
+  centreCoordinatesSubmitController,
   COORDINATE_SYSTEM_VIEW_ROUTES,
-  centerCoordinatesSubmitFailHandler,
-  wgs64ValidationSchema,
-  osgb36ValidationSchema
-} from '~/src/server/exemption/site-details/center-coordinates/controller.js'
+  centreCoordinatesSubmitFailHandler
+} from '~/src/server/exemption/site-details/centre-coordinates/controller.js'
 import { COORDINATE_SYSTEMS } from '~/src/server/common/constants/exemptions.js'
 import * as cacheUtils from '~/src/server/common/helpers/session-cache/utils.js'
 import { mockExemption } from '~/src/server/test-helpers/mocks.js'
@@ -17,7 +15,7 @@ import { routes } from '~/src/server/common/constants/routes.js'
 
 jest.mock('~/src/server/common/helpers/session-cache/utils.js')
 
-describe('#centerCoordinates', () => {
+describe('#centreCoordinates', () => {
   /** @type {Server} */
   let server
   let getExemptionCacheSpy
@@ -50,12 +48,12 @@ describe('#centerCoordinates', () => {
     await server.stop({ timeout: 0 })
   })
 
-  describe('#centerCoordinatesController', () => {
-    test('centerCoordinatesController handler should render with correct context with no existing data', () => {
+  describe('#centreCoordinatesController', () => {
+    test('centreCoordinatesController handler should render with correct context with no existing data', () => {
       getExemptionCacheSpy.mockReturnValueOnce({})
       const h = { view: jest.fn() }
 
-      centerCoordinatesController.handler({}, h)
+      centreCoordinatesController.handler({}, h)
 
       expect(h.view).toHaveBeenCalledWith(
         COORDINATE_SYSTEM_VIEW_ROUTES[COORDINATE_SYSTEMS.WGS84],
@@ -69,10 +67,10 @@ describe('#centerCoordinates', () => {
       )
     })
 
-    test('centerCoordinatesController handler should render with correct context for wgs64', () => {
+    test('centreCoordinatesController handler should render with correct context for wgs84', () => {
       const h = { view: jest.fn() }
 
-      centerCoordinatesController.handler({}, h)
+      centreCoordinatesController.handler({}, h)
 
       expect(h.view).toHaveBeenCalledWith(
         COORDINATE_SYSTEM_VIEW_ROUTES[COORDINATE_SYSTEMS.WGS84],
@@ -86,7 +84,7 @@ describe('#centerCoordinates', () => {
       )
     })
 
-    test('centerCoordinatesController handler should render with correct context for osgb36', () => {
+    test('centreCoordinatesController handler should render with correct context for osgb36', () => {
       const h = { view: jest.fn() }
 
       getExemptionCacheSpy.mockReturnValueOnce({
@@ -101,7 +99,7 @@ describe('#centerCoordinates', () => {
         coordinateSystem: COORDINATE_SYSTEMS.OSGB36
       })
 
-      centerCoordinatesController.handler({}, h)
+      centreCoordinatesController.handler({}, h)
 
       expect(h.view).toHaveBeenCalledWith(
         COORDINATE_SYSTEM_VIEW_ROUTES[COORDINATE_SYSTEMS.OSGB36],
@@ -115,7 +113,7 @@ describe('#centerCoordinates', () => {
       )
     })
 
-    test('centerCoordinatesController handler should render with correct context with existing cache data', () => {
+    test('centreCoordinatesController handler should render with correct context with existing cache data', () => {
       getExemptionCacheSpy.mockReturnValueOnce({
         projectName: mockExemption.projectName,
         siteDetails: {
@@ -126,7 +124,7 @@ describe('#centerCoordinates', () => {
 
       const h = { view: jest.fn() }
 
-      centerCoordinatesController.handler({}, h)
+      centreCoordinatesController.handler({}, h)
 
       expect(h.view).toHaveBeenCalledWith(
         COORDINATE_SYSTEM_VIEW_ROUTES[COORDINATE_SYSTEMS.WGS84],
@@ -143,7 +141,7 @@ describe('#centerCoordinates', () => {
     test('Should provide expected response and correctly pre populate data', async () => {
       const { result, statusCode } = await server.inject({
         method: 'GET',
-        url: routes.CIRCLE_CENTER_POINT
+        url: routes.CIRCLE_CENTRE_POINT
       })
 
       expect(result).toEqual(
@@ -194,7 +192,7 @@ describe('#centerCoordinates', () => {
     })
   })
 
-  describe('#centerCoordinatesSubmitController', () => {
+  describe('#centreCoordinatesSubmitController', () => {
     test('Should correctly format error data', () => {
       const request = {
         payload: { latitude: 'invalid' }
@@ -216,7 +214,7 @@ describe('#centerCoordinates', () => {
         ]
       }
 
-      centerCoordinatesSubmitFailHandler(
+      centreCoordinatesSubmitFailHandler(
         request,
         h,
         err,
@@ -267,7 +265,7 @@ describe('#centerCoordinates', () => {
 
       const err = {}
 
-      centerCoordinatesSubmitFailHandler(
+      centreCoordinatesSubmitFailHandler(
         request,
         h,
         err,
@@ -291,66 +289,7 @@ describe('#centerCoordinates', () => {
       expect(h.view().takeover).toHaveBeenCalled()
     })
 
-    test('Should correctly validate on valid data', () => {
-      const request = {
-        latitude: mockExemption.siteDetails.coordinates.latitude,
-        longitude: mockExemption.siteDetails.coordinates.longitude
-      }
-
-      const result = wgs64ValidationSchema.validate(request)
-
-      expect(result.error).toBeUndefined()
-    })
-
-    test('Should correctly validate on empty data', () => {
-      const request = {}
-
-      const result = wgs64ValidationSchema.validate(request)
-
-      expect(result.error.message).toBe('LATITUDE_REQUIRED')
-    })
-
-    test('Should correctly validate on empty latitude data', () => {
-      const request = {
-        longitude: mockExemption.siteDetails.coordinates.longitude
-      }
-
-      const result = wgs64ValidationSchema.validate(request)
-
-      expect(result.error.message).toBe('LATITUDE_REQUIRED')
-    })
-
-    test('Should correctly validate on empty longitude data', () => {
-      const request = {
-        latitude: mockExemption.siteDetails.coordinates.latitude
-      }
-
-      const result = wgs64ValidationSchema.validate(request)
-
-      expect(result.error.message).toBe('LONGITUDE_REQUIRED')
-    })
-
-    test('Should correctly validate on empty northings data', () => {
-      const request = {
-        eastings: mockCoordinates[COORDINATE_SYSTEMS.OSGB36].eastings
-      }
-
-      const result = osgb36ValidationSchema.validate(request)
-
-      expect(result.error.message).toBe('NORTHINGS_REQUIRED')
-    })
-
-    test('Should correctly validate on empty eastings data', () => {
-      const request = {
-        northings: mockCoordinates[COORDINATE_SYSTEMS.OSGB36].northings
-      }
-
-      const result = osgb36ValidationSchema.validate(request)
-
-      expect(result.error.message).toBe('EASTINGS_REQUIRED')
-    })
-
-    test('Should correctly set the cache when submitting WGS64 data', async () => {
+    test('Should correctly set the cache when submitting wgs84 data', async () => {
       const h = {
         view: jest.fn().mockReturnValue({
           takeover: jest.fn()
@@ -361,7 +300,7 @@ describe('#centerCoordinates', () => {
         payload: mockExemption.siteDetails.coordinates
       }
 
-      await centerCoordinatesSubmitController.handler(mockRequest, h)
+      await centreCoordinatesSubmitController.handler(mockRequest, h)
 
       expect(cacheUtils.updateExemptionSiteDetails).toHaveBeenCalledWith(
         mockRequest,
@@ -385,7 +324,7 @@ describe('#centerCoordinates', () => {
         coordinateSystem: COORDINATE_SYSTEMS.OSGB36
       })
 
-      await centerCoordinatesSubmitController.handler(mockRequest, h)
+      await centreCoordinatesSubmitController.handler(mockRequest, h)
 
       expect(cacheUtils.updateExemptionSiteDetails).toHaveBeenCalledWith(
         mockRequest,
@@ -405,7 +344,7 @@ describe('#centerCoordinates', () => {
         })
       }
 
-      centerCoordinatesSubmitController.handler(request, h)
+      centreCoordinatesSubmitController.handler(request, h)
 
       expect(h.view).toHaveBeenCalledWith(
         COORDINATE_SYSTEM_VIEW_ROUTES[COORDINATE_SYSTEMS.WGS84],

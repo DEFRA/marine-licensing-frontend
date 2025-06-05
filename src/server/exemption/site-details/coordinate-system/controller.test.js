@@ -149,10 +149,17 @@ describe('#coordinateSystem', () => {
   })
 
   describe('#coordinateSystemSubmitController', () => {
-    test('Should correctly stay on the page when submitting', async () => {
+    test('Should correctly stay on the page when submitting and coordinatesEntry is not single', async () => {
       const request = {
         payload: { coordinateSystem: 'wgs84' }
       }
+
+      getExemptionCacheSpy.mockReturnValueOnce({
+        projectName: 'Test Project',
+        siteDetails: {
+          coordinatesEntry: 'multiple'
+        }
+      })
 
       const h = {
         view: jest.fn().mockReturnValue({
@@ -168,6 +175,26 @@ describe('#coordinateSystem', () => {
         backLink: routes.COORDINATES_ENTRY_CHOICE,
         payload: { coordinateSystem: 'wgs84' }
       })
+    })
+
+    test('Should redirect to centre coordinates page when coordinatesEntry is single', async () => {
+      const request = {
+        payload: { coordinateSystem: 'wgs84' }
+      }
+
+      getExemptionCacheSpy.mockReturnValueOnce({
+        projectName: 'Test Project',
+        siteDetails: {
+          coordinatesEntry: 'single'
+        }
+      })
+
+      const h = {
+        redirect: jest.fn()
+      }
+
+      await coordinateSystemSubmitController.handler(request, h)
+      expect(h.redirect).toHaveBeenCalledWith(routes.CIRCLE_CENTRE_POINT)
     })
 
     test('Should correctly format error data', () => {
@@ -289,9 +316,7 @@ describe('#coordinateSystem', () => {
 
     test('Should correctly set the cache when submitting', async () => {
       const h = {
-        view: jest.fn().mockReturnValue({
-          takeover: jest.fn()
-        })
+        redirect: jest.fn()
       }
 
       const mockRequest = { payload: { coordinateSystem: 'wgs84' } }

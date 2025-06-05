@@ -13,14 +13,16 @@ import { routes } from '~/src/server/common/constants/routes.js'
 export const WIDTH_OF_SITE_VIEW_ROUTE =
   'exemption/site-details/width-of-site/index'
 
+const ENTER_WIDTH = 'Enter the width of the circular site in metres'
+
 const widthOfSiteSettings = {
-  pageTitle: 'Enter the width of the circular site in metres',
-  heading: 'Enter the width of the circular site in metres',
+  pageTitle: ENTER_WIDTH,
+  heading: ENTER_WIDTH,
   backLink: routes.CIRCLE_CENTRE_POINT
 }
 
 export const errorMessages = {
-  WIDTH_REQUIRED: 'Enter the width of the circular site in metres',
+  WIDTH_REQUIRED: ENTER_WIDTH,
   WIDTH_INVALID: 'The width of the circular site must be a number',
   WIDTH_MIN: 'The width of the circular site must be 1 metre or more',
   WIDTH_NON_INTEGER:

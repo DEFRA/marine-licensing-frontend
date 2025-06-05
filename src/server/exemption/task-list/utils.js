@@ -32,7 +32,13 @@ export const transformTaskList = (taskList) => {
       href: routes.PROJECT_NAME,
       status: setStatus(taskList.projectName)
     },
-
+    {
+      title: {
+        text: 'Activity dates'
+      },
+      href: routes.ACTIVITY_DATES,
+      status: setStatus(taskList.activityDates)
+    },
     {
       title: {
         text: 'Site details'

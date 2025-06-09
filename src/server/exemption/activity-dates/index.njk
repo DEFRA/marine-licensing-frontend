@@ -8,22 +8,22 @@
 {% from "cancel-button/macro.njk" import appCancelButton %}
 {% block beforeContent %}
     {{ govukBackLink({
-    text: "Back",
-    href: backLink
-  }) }}
+        text: "Back",
+        href: backLink
+    }) }}
 {% endblock %}
 {% block content %}
     <div class="govuk-grid-row">
         <div class="govuk-grid-column-two-thirds">
             {% if errors %}
                 {{ govukErrorSummary({
-                titleText: "There is a problem",
-                errorList: errorSummary
-            }) }}
+                    titleText: "There is a problem",
+                    errorList: errorSummary
+                }) }}
             {% endif %}
             <h2 class="govuk-heading-l">{{ title }}</h2>
             {% for paragraph in descriptionParagraphs %}
-                <p>{{ paragraph }}</p>
+                <p class="govuk-body">{{ paragraph }}</p>
             {% endfor %}
             <form method="{{ formMethod }}">
                 <input type="hidden" name="csrfToken" value="{{ csrfToken }}"/> {{ govukDateInput({
@@ -32,29 +32,32 @@
                     fieldset: {
                         legend: {
                             text: "Start date",
-                            isPageHeading: true,
+                            isPageHeading: false,
                             classes: "govuk-fieldset__legend--s"
                         }
                     },
                     hint: {
                         text: "For example, 27 5 2025"
                     },
+                    errorMessage: startDateErrorMessage,
                     items: [
                         {
-                            value: activityStartDateDay, 
+                            value: activityStartDateDay,
                             id: "activity-start-date-day",
                             name: "day",
-                            classes: "govuk-input--width-2"
-                        }, { 
-                            value:activityStartDateMonth,
+                            classes: "govuk-input--width-2" + (" govuk-input--error" if errors['activity-start-date-day'])
+                        },
+                        {
+                            value: activityStartDateMonth,
                             id: "activity-start-date-month",
                             name: "month",
-                            classes: "govuk-input--width-2"
-                        }, {
+                            classes: "govuk-input--width-2" + (" govuk-input--error" if errors['activity-start-date-month'])
+                        },
+                        {
                             value: activityStartDateYear,
                             id: "activity-start-date-year",
                             name: "year",
-                            classes: "govuk-input--width-4"
+                            classes: "govuk-input--width-4" + (" govuk-input--error" if errors['activity-start-date-year'])
                         }
                     ]
                 }) }}
@@ -64,42 +67,43 @@
                     fieldset: {
                         legend: {
                             text: "End date",
-                            isPageHeading: true,
+                            isPageHeading: false,
                             classes: "govuk-fieldset__legend--s"
                         }
                     },
                     hint: {
                         text: "For example, 27 5 2025"
                     },
+                    errorMessage: endDateErrorMessage,
                     items: [
                         {
                             value: activityEndDateDay,
                             id: "activity-end-date-day",
                             name: "day",
-                            classes: "govuk-input--width-2"
+                            classes: "govuk-input--width-2" + (" govuk-input--error" if errors['activity-end-date-day'])
                         },
                         {
                             value: activityEndDateMonth,
                             id: "activity-end-date-month",
                             name: "month",
-                            classes: "govuk-input--width-2"
+                            classes: "govuk-input--width-2" + (" govuk-input--error" if errors['activity-end-date-month'])
                         },
                         {
                             value: activityEndDateYear,
                             id: "activity-end-date-year",
                             name: "year",
-                            classes: "govuk-input--width-4"
+                            classes: "govuk-input--width-4" + (" govuk-input--error" if errors['activity-end-date-year'])
                         }
                     ]
                 }) }}
                 <div class="govuk-button-group">
                     {{ govukButton({
-                    text: "Save and continue",
-                    classes: "govuk-button--primary"
-                }) }}
+                        text: "Save and continue",
+                        type: "submit"
+                    }) }}
                     {{ appCancelButton({
-                    cancelLink: '/exemption/task-list'
-                }) }}
+                        cancelLink: '/exemption/task-list'
+                    }) }}
                 </div>
             </form>
         </div>

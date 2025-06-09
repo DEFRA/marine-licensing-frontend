@@ -16,6 +16,11 @@ describe('taskList utils', () => {
         title: { text: 'Activity dates' }
       },
       {
+        href: routes.ACTIVITY_DESCRIPTION,
+        status: { tag: { text: 'Incomplete', classes: 'govuk-tag--blue' } },
+        title: { text: 'Activity description' }
+      },
+      {
         href: routes.COORDINATES_TYPE_CHOICE,
         status: { tag: { text: 'Incomplete', classes: 'govuk-tag--blue' } },
         title: { text: 'Site details' }
@@ -39,6 +44,11 @@ describe('taskList utils', () => {
         href: routes.ACTIVITY_DATES,
         status: { tag: { text: 'Incomplete', classes: 'govuk-tag--blue' } },
         title: { text: 'Activity dates' }
+      },
+      {
+        href: routes.ACTIVITY_DESCRIPTION,
+        status: { tag: { text: 'Incomplete', classes: 'govuk-tag--blue' } },
+        title: { text: 'Activity description' }
       },
       {
         href: routes.COORDINATES_TYPE_CHOICE,

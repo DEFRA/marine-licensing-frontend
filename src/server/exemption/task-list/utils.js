@@ -41,6 +41,13 @@ export const transformTaskList = (taskList) => {
     },
     {
       title: {
+        text: 'Activity description'
+      },
+      href: routes.ACTIVITY_DESCRIPTION,
+      status: setStatus(taskList.activityDescription)
+    },
+    {
+      title: {
         text: 'Site details'
       },
       href: routes.COORDINATES_TYPE_CHOICE,

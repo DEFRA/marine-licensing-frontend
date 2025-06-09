@@ -103,6 +103,10 @@ export const coordinateSystemSubmitController = {
       payload.coordinateSystem
     )
 
+    if (exemption.siteDetails?.coordinatesEntry === 'single') {
+      return h.redirect(routes.CIRCLE_CENTRE_POINT)
+    }
+
     return h.view(COORDINATE_SYSTEM_VIEW_ROUTE, {
       ...coordinateSystemSettings,
       projectName: exemption.projectName,

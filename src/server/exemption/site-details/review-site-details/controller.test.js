@@ -11,6 +11,7 @@ import { statusCodes } from '~/src/server/common/constants/status-codes.js'
 import { config } from '~/src/config/config.js'
 import { JSDOM } from 'jsdom'
 import { routes } from '~/src/server/common/constants/routes.js'
+import Wreck from '@hapi/wreck'
 
 jest.mock('~/src/server/common/helpers/session-cache/utils.js')
 
@@ -35,6 +36,14 @@ describe('#reviewSiteDetails', () => {
 
   beforeEach(() => {
     jest.resetAllMocks()
+
+    jest.spyOn(Wreck, 'patch').mockReturnValue({
+      payload: {
+        id: mockExemption.id,
+        siteDetails: mockExemption.siteDetails
+      }
+    })
+
     getExemptionCacheSpy = jest
       .spyOn(cacheUtils, 'getExemptionCache')
       .mockReturnValue(mockExemption)
@@ -201,24 +210,91 @@ describe('#reviewSiteDetails', () => {
   })
 
   describe('#reviewSiteDetailsSubmitController', () => {
-    test('Should redirect to task list for POST request', () => {
-      const request = {}
-      const h = { redirect: jest.fn() }
-
-      reviewSiteDetailsSubmitController.handler(request, h)
-
-      expect(h.redirect).toHaveBeenCalledWith(routes.TASK_LIST)
-    })
-
-    test('Should redirect to task list on POST request', async () => {
+    test('Should redirect to task list and call backend API for PATCH request', async () => {
       const { headers, statusCode } = await server.inject({
         method: 'POST',
         url: routes.REVIEW_SITE_DETAILS,
         payload: {}
       })
 
+      expect(Wreck.patch).toHaveBeenCalledWith(
+        `${config.get('backend').apiUrl}/exemption/site-details`,
+        {
+          payload: {
+            siteDetails: mockExemption.siteDetails,
+            id: mockExemption.id
+          },
+          json: true
+        }
+      )
+
       expect(headers.location).toBe(routes.TASK_LIST)
       expect(statusCode).toBe(statusCodes.redirect)
+    })
+
+    test('Should redirect to task list for successful POST request', async () => {
+      const request = {}
+      const h = { redirect: jest.fn() }
+
+      await reviewSiteDetailsSubmitController.handler(request, h)
+
+      expect(h.redirect).toHaveBeenCalledWith(routes.TASK_LIST)
+    })
+
+    test('Should show error page with validation errors from backend', async () => {
+      const apiPatchMock = jest.spyOn(Wreck, 'patch')
+      apiPatchMock.mockRejectedValueOnce({
+        res: { statusCode: 400 },
+        data: {
+          payload: {
+            validation: {
+              source: 'payload',
+              keys: ['siteDetails'],
+              details: [
+                {
+                  field: 'siteDetails',
+                  message: 'SITE_DETAILS_INVALID',
+                  type: 'any.invalid'
+                }
+              ]
+            }
+          }
+        }
+      })
+
+      const { result, statusCode } = await server.inject({
+        method: 'POST',
+        url: routes.REVIEW_SITE_DETAILS,
+        payload: {}
+      })
+
+      expect(result).toEqual(expect.stringContaining('Bad Request'))
+
+      const { document } = new JSDOM(result).window
+
+      expect(document.querySelector('h1').textContent.trim()).toContain('400')
+
+      expect(statusCode).toBe(statusCodes.badRequest)
+    })
+
+    test('Should pass error to global catchAll behaviour if it contains no validation data', async () => {
+      const apiPatchMock = jest.spyOn(Wreck, 'patch')
+      apiPatchMock.mockRejectedValueOnce({
+        res: { statusCode: 500 },
+        data: {}
+      })
+
+      const { result } = await server.inject({
+        method: 'POST',
+        url: routes.REVIEW_SITE_DETAILS,
+        payload: {}
+      })
+
+      expect(result).toContain('Bad Request')
+
+      const { document } = new JSDOM(result).window
+
+      expect(document.querySelector('h1').textContent.trim()).toBe('400')
     })
   })
 })

@@ -3,11 +3,14 @@ import {
   getExemptionCache
 } from '~/src/server/common/helpers/session-cache/utils.js'
 import { routes } from '~/src/server/common/constants/routes.js'
+import { config } from '~/src/config/config.js'
 import {
   getCoordinateSystemText,
   getReviewSummaryText,
   getCoordinateDisplayText
 } from './utils.js'
+import Boom from '@hapi/boom'
+import Wreck from '@hapi/wreck'
 
 export const REVIEW_SITE_DETAILS_VIEW_ROUTE =
   'exemption/site-details/review-site-details/index'
@@ -51,7 +54,24 @@ export const reviewSiteDetailsController = {
  * @satisfies {Partial<ServerRoute>}
  */
 export const reviewSiteDetailsSubmitController = {
-  handler(request, h) {
-    return h.redirect(routes.TASK_LIST)
+  async handler(request, h) {
+    const exemption = getExemptionCache(request)
+
+    try {
+      await Wreck.patch(
+        `${config.get('backend').apiUrl}/exemption/site-details`,
+        {
+          payload: {
+            siteDetails: exemption.siteDetails,
+            id: exemption.id
+          },
+          json: true
+        }
+      )
+
+      return h.redirect(routes.TASK_LIST)
+    } catch (e) {
+      throw Boom.badRequest(`Error submitting for review`, e)
+    }
   }
 }

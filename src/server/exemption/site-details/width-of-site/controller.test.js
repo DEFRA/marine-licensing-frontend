@@ -192,7 +192,7 @@ describe('#widthOfSite', () => {
       expect(h.view().takeover).toHaveBeenCalled()
     })
 
-    test('Should stay on current page when POST is successful', async () => {
+    test('Should redirect to review site details page when POST is successful', async () => {
       const h = {
         redirect: jest.fn()
       }
@@ -202,7 +202,7 @@ describe('#widthOfSite', () => {
         h
       )
 
-      expect(h.redirect).toHaveBeenCalledWith(routes.WIDTH_OF_SITE)
+      expect(h.redirect).toHaveBeenCalledWith(routes.REVIEW_SITE_DETAILS)
     })
 
     test('Should correctly set the cache when submitting', async () => {

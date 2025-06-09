@@ -201,42 +201,24 @@ describe('#reviewSiteDetails', () => {
   })
 
   describe('#reviewSiteDetailsSubmitController', () => {
-    test('Should re-render the same page for POST request', () => {
+    test('Should redirect to task list for POST request', () => {
       const request = {}
-      const h = { view: jest.fn() }
+      const h = { redirect: jest.fn() }
 
       reviewSiteDetailsSubmitController.handler(request, h)
 
-      expect(h.view).toHaveBeenCalledWith(REVIEW_SITE_DETAILS_VIEW_ROUTE, {
-        heading: 'Review site details',
-        pageTitle: 'Review site details',
-        backLink: routes.CIRCLE_CENTRE_POINT,
-        projectName: 'Test Project',
-        summaryData: {
-          method:
-            'Manually enter one set of coordinates and a width to create a circular site',
-          coordinateSystem:
-            'WGS84 (World Geodetic System 1984)\nLatitude and longitude',
-          coordinates: `${mockCoordinates[COORDINATE_SYSTEMS.WGS84].latitude}, ${mockCoordinates[COORDINATE_SYSTEMS.WGS84].longitude}`,
-          width: '100 metres'
-        }
-      })
+      expect(h.redirect).toHaveBeenCalledWith(routes.TASK_LIST)
     })
 
-    test('Should handle POST request correctly', async () => {
-      const { result, statusCode } = await server.inject({
+    test('Should redirect to task list on POST request', async () => {
+      const { headers, statusCode } = await server.inject({
         method: 'POST',
         url: routes.REVIEW_SITE_DETAILS,
         payload: {}
       })
 
-      expect(result).toEqual(
-        expect.stringContaining(
-          `Review site details | ${config.get('serviceName')}`
-        )
-      )
-
-      expect(statusCode).toBe(statusCodes.ok)
+      expect(headers.location).toBe(routes.TASK_LIST)
+      expect(statusCode).toBe(statusCodes.redirect)
     })
   })
 })

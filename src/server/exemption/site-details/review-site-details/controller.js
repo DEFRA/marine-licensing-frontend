@@ -52,6 +52,6 @@ export const reviewSiteDetailsController = {
  */
 export const reviewSiteDetailsSubmitController = {
   handler(request, h) {
-    return reviewSiteDetailsController.handler(request, h)
+    return h.redirect(routes.TASK_LIST)
   }
 }

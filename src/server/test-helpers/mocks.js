@@ -15,7 +15,7 @@ export const mockExemption = {
     coordinatesEntry: 'single',
     coordinateSystem: COORDINATE_SYSTEMS.WGS84,
     coordinates: { latitude: '54.978252', longitude: '-1.617780' },
-    circleWidth: '20'
+    circleWidth: '100'
   },
   taskList: mockExemptionTaskList
 }

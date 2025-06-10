@@ -2,6 +2,15 @@ import joi from 'joi'
 import { individualDate, activityStartEndDateSchema } from './date.js'
 
 describe('Date Validator', () => {
+  beforeEach(() => {
+    jest.useFakeTimers()
+    jest.setSystemTime(new Date('2025-01-01'))
+  })
+
+  afterEach(() => {
+    jest.restoreAllMocks()
+  })
+
   describe('Individual Date', () => {
     test('should validate a complete date', () => {
       const result = joi
@@ -89,20 +98,6 @@ describe('Date Validator', () => {
       expect(error).toBeUndefined()
     })
 
-    test('should fail if end date is before start date', () => {
-      const testPayload = {
-        'activity-start-date-day': '11',
-        'activity-start-date-month': '10',
-        'activity-start-date-year': '2025',
-        'activity-end-date-day': '10',
-        'activity-end-date-month': '10',
-        'activity-end-date-year': '2025'
-      }
-
-      const { error } = activityStartEndDateSchema.validate(testPayload)
-      expect(error.details[0].message).toBe('custom.endDate.before.startDate')
-    })
-
     test('should fail if start date is invalid', () => {
       const testPayload = {
         'activity-start-date-day': '31',
@@ -129,6 +124,20 @@ describe('Date Validator', () => {
 
       const { error } = activityStartEndDateSchema.validate(testPayload)
       expect(error.details[0].message).toBe('custom.endDate.invalid')
+    })
+
+    test('should fail if end date is before start date', () => {
+      const testPayload = {
+        'activity-start-date-day': '02',
+        'activity-start-date-month': '03',
+        'activity-start-date-year': '2025',
+        'activity-end-date-day': '01',
+        'activity-end-date-month': '03',
+        'activity-end-date-year': '2025'
+      }
+
+      const { error } = activityStartEndDateSchema.validate(testPayload)
+      expect(error.details[0].message).toBe('custom.endDate.before.startDate')
     })
   })
 })

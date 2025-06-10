@@ -2,6 +2,7 @@ import { coordinatesTypeRoutes } from '~/src/server/exemption/site-details/coord
 import { coordinatesEntryRoutes } from '~/src/server/exemption/site-details/coordinates-entry/index.js'
 import { coordinateSystemRoutes } from '~/src/server/exemption/site-details/coordinate-system/index.js'
 import { centreCoordinatesRoutes } from '~/src/server/exemption/site-details/centre-coordinates/index.js'
+import { widthOfSiteRoutes } from '~/src/server/exemption/site-details/width-of-site/index.js'
 import { reviewSiteDetailsRoutes } from '~/src/server/exemption/site-details/review-site-details/index.js'
 
 /**
@@ -17,6 +18,7 @@ export const siteDetailsRoutes = [
   ...coordinatesEntryRoutes,
   ...coordinateSystemRoutes,
   ...centreCoordinatesRoutes,
+  ...widthOfSiteRoutes,
   ...reviewSiteDetailsRoutes
 ]
 

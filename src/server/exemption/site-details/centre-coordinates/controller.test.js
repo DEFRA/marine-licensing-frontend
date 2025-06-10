@@ -291,14 +291,16 @@ describe('#centreCoordinates', () => {
 
     test('Should correctly set the cache when submitting wgs84 data', async () => {
       const h = {
-        view: jest.fn().mockReturnValue({
-          takeover: jest.fn()
-        })
+        redirect: jest.fn()
       }
 
       const mockRequest = {
         payload: mockExemption.siteDetails.coordinates
       }
+
+      getCoordinateSystemSpy.mockReturnValueOnce({
+        coordinateSystem: COORDINATE_SYSTEMS.WGS84
+      })
 
       await centreCoordinatesSubmitController.handler(mockRequest, h)
 
@@ -307,13 +309,13 @@ describe('#centreCoordinates', () => {
         'coordinates',
         mockExemption.siteDetails.coordinates
       )
+
+      expect(h.redirect).toHaveBeenCalledWith(routes.WIDTH_OF_SITE)
     })
 
     test('Should correctly set the cache when submitting OSGB36 data', async () => {
       const h = {
-        view: jest.fn().mockReturnValue({
-          takeover: jest.fn()
-        })
+        redirect: jest.fn()
       }
 
       const mockRequest = {
@@ -331,6 +333,8 @@ describe('#centreCoordinates', () => {
         'coordinates',
         mockCoordinates[COORDINATE_SYSTEMS.OSGB36]
       )
+
+      expect(h.redirect).toHaveBeenCalledWith(routes.WIDTH_OF_SITE)
     })
 
     test('Should correctly handle validation errors', () => {

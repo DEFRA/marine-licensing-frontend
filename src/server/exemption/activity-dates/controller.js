@@ -20,7 +20,7 @@ const activityDatesViewContent = {
     "Enter the activity dates. Allow time for potential delays, like consents (for example, a river works licence) or bad weather. If you miss the dates, you'll need to restart the process.",
     "You can enter a start date from today and begin your activity as soon as you've sent your information."
   ],
-  backLink: '/task-list',
+  backLink: '/exemption/task-list',
   formAction: '/activity-dates',
   formMethod: 'POST'
 }

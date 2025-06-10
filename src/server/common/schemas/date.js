@@ -40,6 +40,11 @@ export const individualDate = ({
     })
 })
 
+const isValidDate = ({ date, day, month, year }) =>
+  date.getUTCFullYear() === year &&
+  date.getUTCMonth() === month - 1 &&
+  date.getUTCDate() === day
+
 export const activityStartEndDateSchema = joi
   .object({
     ...individualDate({
@@ -67,17 +72,23 @@ export const activityStartEndDateSchema = joi
     const endDate = new Date(Date.UTC(endYear, endMonth - 1, endDay))
 
     if (
-      startDate.getUTCFullYear() !== startYear ||
-      startDate.getUTCMonth() !== startMonth - 1 ||
-      startDate.getUTCDate() !== startDay
+      !isValidDate({
+        date: startDate,
+        day: startDay,
+        month: startMonth,
+        year: endYear
+      })
     ) {
       return helpers.error('custom.startDate.invalid')
     }
 
     if (
-      endDate.getUTCFullYear() !== endYear ||
-      endDate.getUTCMonth() !== endMonth - 1 ||
-      endDate.getUTCDate() !== endDay
+      !isValidDate({
+        date: endDate,
+        day: endDay,
+        month: endMonth,
+        year: endYear
+      })
     ) {
       return helpers.error('custom.endDate.invalid')
     }

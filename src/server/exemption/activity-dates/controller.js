@@ -72,6 +72,12 @@ export const activityDatesSubmitController = {
           errors['activity-start-date-day'] &&
           errors['activity-start-date-month'] &&
           errors['activity-start-date-year']
+
+        const isEndMissing =
+          errors['activity-end-date-day'] &&
+          errors['activity-end-date-month'] &&
+          errors['activity-end-date-year']
+
         if (isStartMissing) {
           errorSummary = errorSummary.filter(
             (error) => !error.href.includes('#activity-start-date')
@@ -85,10 +91,6 @@ export const activityDatesSubmitController = {
           }
         }
 
-        const isEndMissing =
-          errors['activity-end-date-day'] &&
-          errors['activity-end-date-month'] &&
-          errors['activity-end-date-year']
         if (isEndMissing) {
           errorSummary = errorSummary.filter(
             (error) => !error.href.includes('#activity-end-date')
@@ -102,20 +104,6 @@ export const activityDatesSubmitController = {
           }
         }
 
-        const startDateError =
-          details.find(
-            (d) =>
-              d.path.includes('activity-start-date') ||
-              d.type === 'custom.startDate.invalid'
-          ) || (isStartMissing ? { message: 'custom.startDate.missing' } : null)
-        const endDateError =
-          details.find(
-            (d) =>
-              d.path.includes('activity-end-date') ||
-              d.type === 'custom.endDate.invalid' ||
-              d.type === 'custom.endDate.before.startDate'
-          ) || (isEndMissing ? { message: 'custom.endDate.missing' } : null)
-
         const viewData = {
           ...activityDatesViewContent,
           activityStartDateDay: payload['activity-start-date-day'],
@@ -126,11 +114,11 @@ export const activityDatesSubmitController = {
           activityEndDateYear: payload['activity-end-date-year'],
           errors,
           errorSummary,
-          startDateErrorMessage: startDateError
-            ? { text: errorMessages[startDateError.message] }
+          startDateErrorMessage: isStartMissing
+            ? { text: errorMessages['custom.startDate.missing'] }
             : undefined,
-          endDateErrorMessage: endDateError
-            ? { text: errorMessages[endDateError.message] }
+          endDateErrorMessage: isEndMissing
+            ? { text: errorMessages['custom.endDate.missing'] }
             : undefined
         }
 

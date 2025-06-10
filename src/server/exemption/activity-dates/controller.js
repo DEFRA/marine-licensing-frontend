@@ -9,6 +9,7 @@ import {
   setExemptionCache
 } from '~/src/server/common/helpers/session-cache/utils.js'
 import { routes } from '~/src/server/common/constants/routes.js'
+import { JOI_ERRORS } from '~/src/server/common/constants/joi.js'
 import { activityStartEndDateSchema } from '~/src/server/common/schemas/date.js'
 
 const ACTIVITY_DATES_VIEW_ROUTE = 'exemption/activity-dates/index'
@@ -22,21 +23,6 @@ const activityDatesViewContent = {
   backLink: '/task-list',
   formAction: '/activity-dates',
   formMethod: 'POST'
-}
-
-const JOI_ERRORS = {
-  ACTIVITY_START_DATE_DAY: 'activity-start-date-day',
-  ACTIVITY_START_DATE_MONTH: 'activity-start-date-month',
-  ACTIVITY_START_DATE_YEAR: 'activity-start-date-year',
-  ACTIVITY_END_DATE_DAY: 'activity-end-date-day',
-  ACTIVITY_END_DATE_MONTH: 'activity-end-date-month',
-  ACTIVITY_END_DATE_YEAR: 'activity-end-date-year',
-  CUSTOM_START_DATE_INVALID: 'custom.startDate.invalid',
-  CUSTOM_END_DATE_INVALID: 'custom.endDate.invalid',
-  CUSTOM_START_DATE_TODAY_OR_FUTURE: 'custom.startDate.todayOrFuture',
-  CUSTOM_END_DATE_BEFORE_START_DATE: 'custom.endDate.before.startDate',
-  CUSTOM_START_DATE_MISSING: 'custom.startDate.missing',
-  CUSTOM_END_DATE_MISSING: 'custom.endDate.missing'
 }
 
 const errorMessages = {

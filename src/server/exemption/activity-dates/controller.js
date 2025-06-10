@@ -24,30 +24,36 @@ const activityDatesViewContent = {
   formMethod: 'POST'
 }
 
-const FIELDS = {
+const JOI_ERRORS = {
   ACTIVITY_START_DATE_DAY: 'activity-start-date-day',
   ACTIVITY_START_DATE_MONTH: 'activity-start-date-month',
   ACTIVITY_START_DATE_YEAR: 'activity-start-date-year',
   ACTIVITY_END_DATE_DAY: 'activity-end-date-day',
   ACTIVITY_END_DATE_MONTH: 'activity-end-date-month',
-  ACTIVITY_END_DATE_YEAR: 'activity-end-date-year'
+  ACTIVITY_END_DATE_YEAR: 'activity-end-date-year',
+  CUSTOM_START_DATE_INVALID: 'custom.startDate.invalid',
+  CUSTOM_END_DATE_INVALID: 'custom.endDate.invalid',
+  CUSTOM_START_DATE_TODAY_OR_FUTURE: 'custom.startDate.todayOrFuture',
+  CUSTOM_END_DATE_BEFORE_START_DATE: 'custom.endDate.before.startDate',
+  CUSTOM_START_DATE_MISSING: 'custom.startDate.missing',
+  CUSTOM_END_DATE_MISSING: 'custom.endDate.missing'
 }
 
 const errorMessages = {
-  [FIELDS.ACTIVITY_START_DATE_DAY]: 'The start date must include a day',
-  [FIELDS.ACTIVITY_START_DATE_MONTH]: 'The start date must include a month',
-  [FIELDS.ACTIVITY_START_DATE_YEAR]: 'The start date must include a year',
-  [FIELDS.ACTIVITY_END_DATE_DAY]: 'The end date must include a day',
-  [FIELDS.ACTIVITY_END_DATE_MONTH]: 'The end date must include a month',
-  [FIELDS.ACTIVITY_END_DATE_YEAR]: 'The end date must include a year',
-  'custom.startDate.invalid': 'The start date must be a real date',
-  'custom.endDate.invalid': 'The end date must be a real date',
-  'custom.startDate.todayOrFuture':
+  [JOI_ERRORS.ACTIVITY_START_DATE_DAY]: 'The start date must include a day',
+  [JOI_ERRORS.ACTIVITY_START_DATE_MONTH]: 'The start date must include a month',
+  [JOI_ERRORS.ACTIVITY_START_DATE_YEAR]: 'The start date must include a year',
+  [JOI_ERRORS.ACTIVITY_END_DATE_DAY]: 'The end date must include a day',
+  [JOI_ERRORS.ACTIVITY_END_DATE_MONTH]: 'The end date must include a month',
+  [JOI_ERRORS.ACTIVITY_END_DATE_YEAR]: 'The end date must include a year',
+  [JOI_ERRORS.CUSTOM_START_DATE_INVALID]: 'The start date must be a real date',
+  [JOI_ERRORS.CUSTOM_END_DATE_INVALID]: 'The end date must be a real date',
+  [JOI_ERRORS.CUSTOM_START_DATE_TODAY_OR_FUTURE]:
     'The start date must be today or in the future',
-  'custom.endDate.before.startDate':
+  [JOI_ERRORS.CUSTOM_END_DATE_BEFORE_START_DATE]:
     'The end date must be the same as or after the start date',
-  'custom.startDate.missing': 'Enter the start date',
-  'custom.endDate.missing': 'Enter the end date'
+  [JOI_ERRORS.CUSTOM_START_DATE_MISSING]: 'Enter the start date',
+  [JOI_ERRORS.CUSTOM_END_DATE_MISSING]: 'Enter the end date'
 }
 
 export const activityDatesController = {
@@ -78,14 +84,14 @@ export const activityDatesSubmitController = {
         const errors = errorDescriptionByFieldName(errorSummary)
 
         const isStartMissing =
-          errors[FIELDS.ACTIVITY_START_DATE_DAY] &&
-          errors[FIELDS.ACTIVITY_START_DATE_MONTH] &&
-          errors[FIELDS.ACTIVITY_START_DATE_YEAR]
+          errors[JOI_ERRORS.ACTIVITY_START_DATE_DAY] &&
+          errors[JOI_ERRORS.ACTIVITY_START_DATE_MONTH] &&
+          errors[JOI_ERRORS.ACTIVITY_START_DATE_YEAR]
 
         const isEndMissing =
-          errors[FIELDS.ACTIVITY_END_DATE_DAY] &&
-          errors[FIELDS.ACTIVITY_END_DATE_MONTH] &&
-          errors[FIELDS.ACTIVITY_END_DATE_YEAR]
+          errors[JOI_ERRORS.ACTIVITY_END_DATE_DAY] &&
+          errors[JOI_ERRORS.ACTIVITY_END_DATE_MONTH] &&
+          errors[JOI_ERRORS.ACTIVITY_END_DATE_YEAR]
 
         if (isStartMissing) {
           errorSummary = errorSummary.filter(
@@ -93,10 +99,10 @@ export const activityDatesSubmitController = {
           )
           errorSummary.unshift({
             href: '#activity-start-date-day',
-            text: errorMessages['custom.startDate.missing']
+            text: errorMessages[JOI_ERRORS.CUSTOM_START_DATE_MISSING]
           })
           errors['activity-start-date'] = {
-            text: errorMessages['custom.startDate.missing']
+            text: errorMessages[JOI_ERRORS.CUSTOM_START_DATE_MISSING]
           }
         }
 
@@ -106,28 +112,28 @@ export const activityDatesSubmitController = {
           )
           errorSummary.push({
             href: '#activity-end-date-day',
-            text: errorMessages['custom.endDate.missing']
+            text: errorMessages[JOI_ERRORS.CUSTOM_END_DATE_MISSING]
           })
           errors['activity-end-date'] = {
-            text: errorMessages['custom.endDate.missing']
+            text: errorMessages[JOI_ERRORS.CUSTOM_END_DATE_MISSING]
           }
         }
 
         const viewData = {
           ...activityDatesViewContent,
-          activityStartDateDay: payload[FIELDS.ACTIVITY_START_DATE_DAY],
-          activityStartDateMonth: payload[FIELDS.ACTIVITY_START_DATE_MONTH],
-          activityStartDateYear: payload[FIELDS.ACTIVITY_START_DATE_YEAR],
-          activityEndDateDay: payload[FIELDS.ACTIVITY_END_DATE_DAY],
-          activityEndDateMonth: payload[FIELDS.ACTIVITY_END_DATE_MONTH],
-          activityEndDateYear: payload[FIELDS.ACTIVITY_END_DATE_YEAR],
+          activityStartDateDay: payload[JOI_ERRORS.ACTIVITY_START_DATE_DAY],
+          activityStartDateMonth: payload[JOI_ERRORS.ACTIVITY_START_DATE_MONTH],
+          activityStartDateYear: payload[JOI_ERRORS.ACTIVITY_START_DATE_YEAR],
+          activityEndDateDay: payload[JOI_ERRORS.ACTIVITY_END_DATE_DAY],
+          activityEndDateMonth: payload[JOI_ERRORS.ACTIVITY_END_DATE_MONTH],
+          activityEndDateYear: payload[JOI_ERRORS.ACTIVITY_END_DATE_YEAR],
           errors,
           errorSummary,
           startDateErrorMessage: isStartMissing
-            ? { text: errorMessages['custom.startDate.missing'] }
+            ? { text: errorMessages[JOI_ERRORS.CUSTOM_START_DATE_MISSING] }
             : undefined,
           endDateErrorMessage: isEndMissing
-            ? { text: errorMessages['custom.endDate.missing'] }
+            ? { text: errorMessages[JOI_ERRORS.CUSTOM_END_DATE_MISSING] }
             : undefined
         }
 
@@ -141,14 +147,14 @@ export const activityDatesSubmitController = {
 
     try {
       const start = {
-        day: payload[FIELDS.ACTIVITY_START_DATE_DAY],
-        month: payload[FIELDS.ACTIVITY_START_DATE_MONTH],
-        year: payload[FIELDS.ACTIVITY_START_DATE_YEAR]
+        day: payload[JOI_ERRORS.ACTIVITY_START_DATE_DAY],
+        month: payload[JOI_ERRORS.ACTIVITY_START_DATE_MONTH],
+        year: payload[JOI_ERRORS.ACTIVITY_START_DATE_YEAR]
       }
       const end = {
-        day: payload[FIELDS.ACTIVITY_END_DATE_DAY],
-        month: payload[FIELDS.ACTIVITY_END_DATE_MONTH],
-        year: payload[FIELDS.ACTIVITY_END_DATE_YEAR]
+        day: payload[JOI_ERRORS.ACTIVITY_END_DATE_DAY],
+        month: payload[JOI_ERRORS.ACTIVITY_END_DATE_MONTH],
+        year: payload[JOI_ERRORS.ACTIVITY_END_DATE_YEAR]
       }
 
       await Wreck.patch(

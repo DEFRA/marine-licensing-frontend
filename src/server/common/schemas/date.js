@@ -80,7 +80,7 @@ export const activityStartEndDateSchema = joi
         date: startDate,
         day: startDay,
         month: startMonth,
-        year: endYear
+        year: startYear
       })
     ) {
       return helpers.error('custom.startDate.invalid')

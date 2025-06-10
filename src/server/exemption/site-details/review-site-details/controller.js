@@ -71,7 +71,7 @@ export const reviewSiteDetailsSubmitController = {
 
       return h.redirect(routes.TASK_LIST)
     } catch (e) {
-      throw Boom.badRequest(`Error submitting for review`, e)
+      throw Boom.badRequest(`Error submitting site review`, e)
     }
   }
 }

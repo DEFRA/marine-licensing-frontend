@@ -24,13 +24,22 @@ const activityDatesViewContent = {
   formMethod: 'POST'
 }
 
+const FIELDS = {
+  ACTIVITY_START_DATE_DAY: 'activity-start-date-day',
+  ACTIVITY_START_DATE_MONTH: 'activity-start-date-month',
+  ACTIVITY_START_DATE_YEAR: 'activity-start-date-year',
+  ACTIVITY_END_DATE_DAY: 'activity-end-date-day',
+  ACTIVITY_END_DATE_MONTH: 'activity-end-date-month',
+  ACTIVITY_END_DATE_YEAR: 'activity-end-date-year'
+}
+
 const errorMessages = {
-  'activity-start-date-day': 'The start date must include a day',
-  'activity-start-date-month': 'The start date must include a month',
-  'activity-start-date-year': 'The start date must include a year',
-  'activity-end-date-day': 'The end date must include a day',
-  'activity-end-date-month': 'The end date must include a month',
-  'activity-end-date-year': 'The end date must include a year',
+  [FIELDS.ACTIVITY_START_DATE_DAY]: 'The start date must include a day',
+  [FIELDS.ACTIVITY_START_DATE_MONTH]: 'The start date must include a month',
+  [FIELDS.ACTIVITY_START_DATE_YEAR]: 'The start date must include a year',
+  [FIELDS.ACTIVITY_END_DATE_DAY]: 'The end date must include a day',
+  [FIELDS.ACTIVITY_END_DATE_MONTH]: 'The end date must include a month',
+  [FIELDS.ACTIVITY_END_DATE_YEAR]: 'The end date must include a year',
   'custom.startDate.invalid': 'The start date must be a real date',
   'custom.endDate.invalid': 'The end date must be a real date',
   'custom.startDate.todayOrFuture':
@@ -69,14 +78,14 @@ export const activityDatesSubmitController = {
         const errors = errorDescriptionByFieldName(errorSummary)
 
         const isStartMissing =
-          errors['activity-start-date-day'] &&
-          errors['activity-start-date-month'] &&
-          errors['activity-start-date-year']
+          errors[FIELDS.ACTIVITY_START_DATE_DAY] &&
+          errors[FIELDS.ACTIVITY_START_DATE_MONTH] &&
+          errors[FIELDS.ACTIVITY_START_DATE_YEAR]
 
         const isEndMissing =
-          errors['activity-end-date-day'] &&
-          errors['activity-end-date-month'] &&
-          errors['activity-end-date-year']
+          errors[FIELDS.ACTIVITY_END_DATE_DAY] &&
+          errors[FIELDS.ACTIVITY_END_DATE_MONTH] &&
+          errors[FIELDS.ACTIVITY_END_DATE_YEAR]
 
         if (isStartMissing) {
           errorSummary = errorSummary.filter(
@@ -106,12 +115,12 @@ export const activityDatesSubmitController = {
 
         const viewData = {
           ...activityDatesViewContent,
-          activityStartDateDay: payload['activity-start-date-day'],
-          activityStartDateMonth: payload['activity-start-date-month'],
-          activityStartDateYear: payload['activity-start-date-year'],
-          activityEndDateDay: payload['activity-end-date-day'],
-          activityEndDateMonth: payload['activity-end-date-month'],
-          activityEndDateYear: payload['activity-end-date-year'],
+          activityStartDateDay: payload[FIELDS.ACTIVITY_START_DATE_DAY],
+          activityStartDateMonth: payload[FIELDS.ACTIVITY_START_DATE_MONTH],
+          activityStartDateYear: payload[FIELDS.ACTIVITY_START_DATE_YEAR],
+          activityEndDateDay: payload[FIELDS.ACTIVITY_END_DATE_DAY],
+          activityEndDateMonth: payload[FIELDS.ACTIVITY_END_DATE_MONTH],
+          activityEndDateYear: payload[FIELDS.ACTIVITY_END_DATE_YEAR],
           errors,
           errorSummary,
           startDateErrorMessage: isStartMissing
@@ -132,14 +141,14 @@ export const activityDatesSubmitController = {
 
     try {
       const start = {
-        day: payload['activity-start-date-day'],
-        month: payload['activity-start-date-month'],
-        year: payload['activity-start-date-year']
+        day: payload[FIELDS.ACTIVITY_START_DATE_DAY],
+        month: payload[FIELDS.ACTIVITY_START_DATE_MONTH],
+        year: payload[FIELDS.ACTIVITY_START_DATE_YEAR]
       }
       const end = {
-        day: payload['activity-end-date-day'],
-        month: payload['activity-end-date-month'],
-        year: payload['activity-end-date-year']
+        day: payload[FIELDS.ACTIVITY_END_DATE_DAY],
+        month: payload[FIELDS.ACTIVITY_END_DATE_MONTH],
+        year: payload[FIELDS.ACTIVITY_END_DATE_YEAR]
       }
 
       await Wreck.patch(

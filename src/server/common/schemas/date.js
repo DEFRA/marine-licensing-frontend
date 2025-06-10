@@ -1,7 +1,11 @@
 import joi from 'joi'
 
 const MIN_YEAR = new Date().getFullYear()
-const MAX_YEAR = MIN_YEAR + 75
+const MAX_YEAR_OFFSET = 75
+const MAX_YEAR = MIN_YEAR + MAX_YEAR_OFFSET
+
+const MAX_DAYS_IN_MONTH = 31
+const MAX_MONTHS_IN_YEAR = 12
 
 export const individualDate = ({
   prefix,
@@ -12,7 +16,7 @@ export const individualDate = ({
     .number()
     .integer()
     .min(1)
-    .max(31)
+    .max(MAX_DAYS_IN_MONTH)
     .required()
     .messages({
       'any.required': `${prefix}-day`,
@@ -22,7 +26,7 @@ export const individualDate = ({
     .number()
     .integer()
     .min(1)
-    .max(12)
+    .max(MAX_MONTHS_IN_YEAR)
     .required()
     .messages({
       'any.required': `${prefix}-month`,

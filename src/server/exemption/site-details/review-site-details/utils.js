@@ -2,18 +2,18 @@ import { COORDINATE_SYSTEMS } from '~/src/server/common/constants/exemptions.js'
 import { routes } from '~/src/server/common/constants/routes.js'
 
 export const getSiteDetailsBackLink = (previousPage) => {
-  try {
-    const url = new URL(previousPage)
-    const previousPath = url.pathname
-
-    if (previousPath === routes.TASK_LIST) {
-      return routes.TASK_LIST
-    }
-
-    return routes.WIDTH_OF_SITE
-  } catch (e) {
+  if (!previousPage || !URL.canParse(previousPage)) {
     return routes.TASK_LIST
   }
+
+  const url = new URL(previousPage)
+  const previousPath = url.pathname
+
+  if (previousPath === routes.TASK_LIST) {
+    return routes.TASK_LIST
+  }
+
+  return routes.WIDTH_OF_SITE
 }
 
 export const getReviewSummaryText = (siteDetails) => {

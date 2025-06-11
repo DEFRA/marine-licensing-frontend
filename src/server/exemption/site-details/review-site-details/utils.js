@@ -12,7 +12,7 @@ export const getSiteDetailsBackLink = (previousPage) => {
 
     return routes.WIDTH_OF_SITE
   } catch (e) {
-    return routes.WIDTH_OF_SITE
+    return routes.TASK_LIST
   }
 }
 

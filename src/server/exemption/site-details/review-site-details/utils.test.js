@@ -23,7 +23,7 @@ describe('siteDetails utils', () => {
     })
 
     test('getSiteDetailsBackLink correctly returns fallback option', () => {
-      expect(getSiteDetailsBackLink(undefined)).toBe(routes.WIDTH_OF_SITE)
+      expect(getSiteDetailsBackLink(undefined)).toBe(routes.TASK_LIST)
     })
   })
 

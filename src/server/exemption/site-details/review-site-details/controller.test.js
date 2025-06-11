@@ -68,7 +68,7 @@ describe('#reviewSiteDetails', () => {
       expect(h.view).toHaveBeenCalledWith(REVIEW_SITE_DETAILS_VIEW_ROUTE, {
         heading: 'Review site details',
         pageTitle: 'Review site details',
-        backLink: routes.WIDTH_OF_SITE,
+        backLink: routes.TASK_LIST,
         projectName: undefined,
         summaryData: {
           method: '',
@@ -87,7 +87,7 @@ describe('#reviewSiteDetails', () => {
       expect(h.view).toHaveBeenCalledWith(REVIEW_SITE_DETAILS_VIEW_ROUTE, {
         heading: 'Review site details',
         pageTitle: 'Review site details',
-        backLink: routes.WIDTH_OF_SITE,
+        backLink: routes.TASK_LIST,
         projectName: 'Test Project',
         summaryData: {
           method:
@@ -120,7 +120,7 @@ describe('#reviewSiteDetails', () => {
       expect(h.view).toHaveBeenCalledWith(REVIEW_SITE_DETAILS_VIEW_ROUTE, {
         heading: 'Review site details',
         pageTitle: 'Review site details',
-        backLink: routes.WIDTH_OF_SITE,
+        backLink: routes.TASK_LIST,
         projectName: 'Test Project',
         summaryData: {
           method:
@@ -135,7 +135,10 @@ describe('#reviewSiteDetails', () => {
     test('Should provide expected response and correctly display summary data', async () => {
       const { result, statusCode } = await server.inject({
         method: 'GET',
-        url: routes.REVIEW_SITE_DETAILS
+        url: routes.REVIEW_SITE_DETAILS,
+        headers: {
+          referer: `http://localhost/${routes.WIDTH_OF_SITE}`
+        }
       })
 
       expect(result).toEqual(
@@ -212,7 +215,10 @@ describe('#reviewSiteDetails', () => {
       const { headers, statusCode } = await server.inject({
         method: 'POST',
         url: routes.REVIEW_SITE_DETAILS,
-        payload: {}
+        payload: {},
+        headers: {
+          referer: `http://localhost/${routes.WIDTH_OF_SITE}`
+        }
       })
 
       expect(Wreck.patch).toHaveBeenCalledWith(
@@ -263,7 +269,10 @@ describe('#reviewSiteDetails', () => {
       const { result, statusCode } = await server.inject({
         method: 'POST',
         url: routes.REVIEW_SITE_DETAILS,
-        payload: {}
+        payload: {},
+        headers: {
+          referer: `http://localhost/${routes.WIDTH_OF_SITE}`
+        }
       })
 
       expect(result).toEqual(expect.stringContaining('Bad Request'))
@@ -285,7 +294,10 @@ describe('#reviewSiteDetails', () => {
       const { result } = await server.inject({
         method: 'POST',
         url: routes.REVIEW_SITE_DETAILS,
-        payload: {}
+        payload: {},
+        headers: {
+          referer: `http://localhost/${routes.WIDTH_OF_SITE}`
+        }
       })
 
       expect(result).toContain('Bad Request')

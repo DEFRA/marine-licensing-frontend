@@ -158,6 +158,32 @@ export const activityDatesSubmitController = {
             text: errorMessages[JOI_ERRORS.CUSTOM_END_DATE_MISSING]
           }
         }
+
+        let startDateErrorMessage
+        let endDateErrorMessage
+
+        if (isStartMissing) {
+          startDateErrorMessage = {
+            text: errorMessages[JOI_ERRORS.CUSTOM_START_DATE_MISSING]
+          }
+        }
+        if (isEndMissing) {
+          endDateErrorMessage = {
+            text: errorMessages[JOI_ERRORS.CUSTOM_END_DATE_MISSING]
+          }
+        }
+
+        if (
+          details.some(
+            (detail) =>
+              detail.message === JOI_ERRORS.CUSTOM_END_DATE_BEFORE_START_DATE
+          )
+        ) {
+          endDateErrorMessage = {
+            text: errorMessages[JOI_ERRORS.CUSTOM_END_DATE_BEFORE_START_DATE]
+          }
+        }
+
         const viewData = {
           ...activityDatesViewContent,
           activityStartDateDay: payload[FIELDS.ACTIVITY_START_DATE_DAY],
@@ -168,12 +194,8 @@ export const activityDatesSubmitController = {
           activityEndDateYear: payload[FIELDS.ACTIVITY_END_DATE_YEAR],
           errors,
           errorSummary,
-          startDateErrorMessage: isStartMissing
-            ? { text: errorMessages[JOI_ERRORS.CUSTOM_START_DATE_MISSING] }
-            : undefined,
-          endDateErrorMessage: isEndMissing
-            ? { text: errorMessages[JOI_ERRORS.CUSTOM_END_DATE_MISSING] }
-            : undefined
+          startDateErrorMessage,
+          endDateErrorMessage
         }
         return h.view(ACTIVITY_DATES_VIEW_ROUTE, viewData).takeover()
       }
@@ -227,6 +249,12 @@ export const activityDatesSubmitController = {
         ...activityDatesViewContent,
         payload,
         errors,
+        activityStartDateDay: payload[FIELDS.ACTIVITY_START_DATE_DAY],
+        activityStartDateMonth: payload[FIELDS.ACTIVITY_START_DATE_MONTH],
+        activityStartDateYear: payload[FIELDS.ACTIVITY_START_DATE_YEAR],
+        activityEndDateDay: payload[FIELDS.ACTIVITY_END_DATE_DAY],
+        activityEndDateMonth: payload[FIELDS.ACTIVITY_END_DATE_MONTH],
+        activityEndDateYear: payload[FIELDS.ACTIVITY_END_DATE_YEAR],
         errorSummary
       })
     }

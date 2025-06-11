@@ -1,4 +1,5 @@
 import joi from 'joi'
+import { JOI_ERRORS } from '../constants/joi.js'
 
 const MIN_YEAR = new Date().getFullYear()
 const MAX_YEAR_OFFSET = 75
@@ -10,7 +11,8 @@ const MAX_MONTHS_IN_YEAR = 12
 export const individualDate = ({
   prefix,
   minYear = MIN_YEAR,
-  maxYear = MAX_YEAR
+  maxYear = MAX_YEAR,
+  minYearError
 }) => ({
   [`${prefix}-day`]: joi
     .number()
@@ -40,7 +42,8 @@ export const individualDate = ({
     .required()
     .messages({
       'any.required': `${prefix}-year`,
-      'number.base': `${prefix}-year`
+      'number.base': `${prefix}-year`,
+      'number.min': minYearError
     })
 })
 
@@ -54,12 +57,14 @@ export const activityStartEndDateSchema = joi
     ...individualDate({
       prefix: 'activity-start-date',
       minYear: MIN_YEAR,
-      maxYear: MAX_YEAR
+      maxYear: MAX_YEAR,
+      minYearError: JOI_ERRORS.CUSTOM_START_DATE_TODAY_OR_FUTURE
     }),
     ...individualDate({
       prefix: 'activity-end-date',
       minYear: MIN_YEAR,
-      maxYear: MAX_YEAR
+      maxYear: MAX_YEAR,
+      minYearError: JOI_ERRORS.CUSTOM_END_DATE_BEFORE_START_DATE
     })
   })
   .custom((value, helpers) => {
@@ -104,6 +109,7 @@ export const activityStartEndDateSchema = joi
     return value
   })
   .messages({
+    'number.min': 'custom.startDate.todayOrFuture',
     'custom.startDate.invalid': 'custom.startDate.invalid',
     'custom.endDate.invalid': 'custom.endDate.invalid',
     'custom.endDate.before.startDate': 'custom.endDate.before.startDate'

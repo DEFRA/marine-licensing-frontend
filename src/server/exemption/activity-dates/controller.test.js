@@ -6,6 +6,7 @@ import { config } from '~/src/config/config.js'
 import { JSDOM } from 'jsdom'
 import Wreck from '@hapi/wreck'
 import * as cacheUtils from '~/src/server/common/helpers/session-cache/utils.js'
+import { JOI_ERRORS } from '../../common/constants/joi.js'
 
 jest.mock('~/src/server/common/helpers/session-cache/utils.js')
 
@@ -57,8 +58,8 @@ describe('Activity Dates Controller', () => {
 
     it('Should return 200 and the activity dates view with pre-populated data', async () => {
       mockExemptionState.activityDates = {
-        start: { day: '27', month: '5', year: '2025' },
-        end: { day: '30', month: '5', year: '2025' }
+        start: new Date('2025-05-27'),
+        end: new Date('2025-05-30')
       }
 
       const { result, statusCode } = await server.inject({
@@ -200,16 +201,8 @@ describe('Activity Dates Controller', () => {
         {
           payload: {
             id: mockExemption.id,
-            start: {
-              day: 27,
-              month: 5,
-              year: 2025
-            },
-            end: {
-              day: 30,
-              month: 5,
-              year: 2025
-            }
+            start: new Date('2025-05-27'),
+            end: new Date('2025-05-30')
           }
         }
       )
@@ -225,12 +218,9 @@ describe('Activity Dates Controller', () => {
           validation: {
             details: [
               {
-                path: ['activity-start-date-day'],
-                type: 'custom.startDate.invalid'
-              },
-              {
-                path: ['activity-end-date-day'],
-                type: 'custom.endDate.invalid'
+                field: 'start',
+                type: 'date.min',
+                message: JOI_ERRORS.CUSTOM_START_DATE_TODAY_OR_FUTURE
               }
             ]
           }

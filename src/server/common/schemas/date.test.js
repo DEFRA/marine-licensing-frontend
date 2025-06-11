@@ -1,5 +1,6 @@
 import joi from 'joi'
 import { individualDate, activityStartEndDateSchema } from './date.js'
+import { JOI_ERRORS } from '../constants/joi.js'
 
 describe('Date Validator', () => {
   beforeEach(() => {
@@ -18,7 +19,8 @@ describe('Date Validator', () => {
           ...individualDate({
             prefix: 'start-date',
             minYear: 2020,
-            maxYear: 2030
+            maxYear: 2030,
+            minYearError: JOI_ERRORS.CUSTOM_START_DATE_TODAY_OR_FUTURE
           })
         })
         .validate(
@@ -40,7 +42,8 @@ describe('Date Validator', () => {
           ...individualDate({
             prefix: 'start-date',
             minYear: 2020,
-            maxYear: 2030
+            maxYear: 2030,
+            minYearError: JOI_ERRORS.CUSTOM_START_DATE_TODAY_OR_FUTURE
           })
         })
         .validate({
@@ -57,7 +60,8 @@ describe('Date Validator', () => {
           ...individualDate({
             prefix: 'start-date',
             minYear: 2020,
-            maxYear: 2030
+            maxYear: 2030,
+            minYearError: JOI_ERRORS.CUSTOM_START_DATE_TODAY_OR_FUTURE
           })
         })
         .validate({

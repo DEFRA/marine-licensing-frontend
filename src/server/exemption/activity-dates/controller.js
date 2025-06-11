@@ -12,6 +12,27 @@ import { routes } from '~/src/server/common/constants/routes.js'
 import { JOI_ERRORS } from '~/src/server/common/constants/joi.js'
 import { activityStartEndDateSchema } from '~/src/server/common/schemas/date.js'
 
+function createDateFromInput(year, month, day) {
+  const numYear = parseInt(year, 10)
+  const numMonth = parseInt(month, 10)
+  const numDay = parseInt(day, 10)
+
+  if (isNaN(numYear) || isNaN(numMonth) || isNaN(numDay)) {
+    return null
+  }
+
+  const date = new Date(Date.UTC(numYear, numMonth - 1, numDay))
+  if (
+    date.getUTCFullYear() !== numYear ||
+    date.getUTCMonth() !== numMonth - 1 ||
+    date.getUTCDate() !== numDay
+  ) {
+    return null
+  }
+
+  return date
+}
+
 const ACTIVITY_DATES_VIEW_ROUTE = 'exemption/activity-dates/index'
 
 const activityDatesViewContent = {
@@ -42,43 +63,77 @@ const errorMessages = {
   [JOI_ERRORS.CUSTOM_END_DATE_MISSING]: 'Enter the end date'
 }
 
+const FIELDS = {
+  ACTIVITY_START_DATE_DAY: 'activity-start-date-day',
+  ACTIVITY_START_DATE_MONTH: 'activity-start-date-month',
+  ACTIVITY_START_DATE_YEAR: 'activity-start-date-year',
+  ACTIVITY_END_DATE_DAY: 'activity-end-date-day',
+  ACTIVITY_END_DATE_MONTH: 'activity-end-date-month',
+  ACTIVITY_END_DATE_YEAR: 'activity-end-date-year'
+}
+
+/**
+ * A GDS styled project name page controller.
+ * @satisfies {Partial<ServerRoute>}
+ */
 export const activityDatesController = {
   handler(request, h) {
     const exemption = getExemptionCache(request)
+
+    let activityStartDateDay = ''
+    let activityStartDateMonth = ''
+    let activityStartDateYear = ''
+    let activityEndDateDay = ''
+    let activityEndDateMonth = ''
+    let activityEndDateYear = ''
+
+    if (exemption.activityDates?.start) {
+      const startDate = new Date(exemption.activityDates.start)
+      activityStartDateDay = startDate.getDate().toString()
+      activityStartDateMonth = (startDate.getMonth() + 1).toString()
+      activityStartDateYear = startDate.getFullYear().toString()
+    }
+
+    if (exemption.activityDates?.end) {
+      const endDate = new Date(exemption.activityDates.end)
+      activityEndDateDay = endDate.getDate().toString()
+      activityEndDateMonth = (endDate.getMonth() + 1).toString()
+      activityEndDateYear = endDate.getFullYear().toString()
+    }
+
     return h.view(ACTIVITY_DATES_VIEW_ROUTE, {
       ...activityDatesViewContent,
-      activityStartDateDay: exemption.activityDates?.start?.day || '',
-      activityStartDateMonth: exemption.activityDates?.start?.month || '',
-      activityStartDateYear: exemption.activityDates?.start?.year || '',
-      activityEndDateDay: exemption.activityDates?.end?.day || '',
-      activityEndDateMonth: exemption.activityDates?.end?.month || '',
-      activityEndDateYear: exemption.activityDates?.end?.year || ''
+      activityStartDateDay,
+      activityStartDateMonth,
+      activityStartDateYear,
+      activityEndDateDay,
+      activityEndDateMonth,
+      activityEndDateYear
     })
   }
 }
 
+/**
+ * A GDS styled project name page controller.
+ * @satisfies {Partial<ServerRoute>}
+ */
 export const activityDatesSubmitController = {
   options: {
     validate: {
       payload: activityStartEndDateSchema,
-
       failAction: (request, h, err) => {
         const { payload } = request
         const { details } = err
-
         let errorSummary = mapErrorsForDisplay(details, errorMessages)
         const errors = errorDescriptionByFieldName(errorSummary)
-
         const isStartMissing =
           errors[JOI_ERRORS.ACTIVITY_START_DATE_DAY] &&
           errors[JOI_ERRORS.ACTIVITY_START_DATE_MONTH] &&
           errors[JOI_ERRORS.ACTIVITY_START_DATE_YEAR]
-
         const isEndMissing =
           errors[JOI_ERRORS.ACTIVITY_END_DATE_DAY] &&
           errors[JOI_ERRORS.ACTIVITY_END_DATE_MONTH] &&
           errors[JOI_ERRORS.ACTIVITY_END_DATE_YEAR]
-
         if (isStartMissing) {
           errorSummary = errorSummary.filter(
             (error) => !error.href.includes('#activity-start-date')
@@ -91,7 +146,6 @@ export const activityDatesSubmitController = {
             text: errorMessages[JOI_ERRORS.CUSTOM_START_DATE_MISSING]
           }
         }
-
         if (isEndMissing) {
           errorSummary = errorSummary.filter(
             (error) => !error.href.includes('#activity-end-date')
@@ -104,15 +158,14 @@ export const activityDatesSubmitController = {
             text: errorMessages[JOI_ERRORS.CUSTOM_END_DATE_MISSING]
           }
         }
-
         const viewData = {
           ...activityDatesViewContent,
-          activityStartDateDay: payload[JOI_ERRORS.ACTIVITY_START_DATE_DAY],
-          activityStartDateMonth: payload[JOI_ERRORS.ACTIVITY_START_DATE_MONTH],
-          activityStartDateYear: payload[JOI_ERRORS.ACTIVITY_START_DATE_YEAR],
-          activityEndDateDay: payload[JOI_ERRORS.ACTIVITY_END_DATE_DAY],
-          activityEndDateMonth: payload[JOI_ERRORS.ACTIVITY_END_DATE_MONTH],
-          activityEndDateYear: payload[JOI_ERRORS.ACTIVITY_END_DATE_YEAR],
+          activityStartDateDay: payload[FIELDS.ACTIVITY_START_DATE_DAY],
+          activityStartDateMonth: payload[FIELDS.ACTIVITY_START_DATE_MONTH],
+          activityStartDateYear: payload[FIELDS.ACTIVITY_START_DATE_YEAR],
+          activityEndDateDay: payload[FIELDS.ACTIVITY_END_DATE_DAY],
+          activityEndDateMonth: payload[FIELDS.ACTIVITY_END_DATE_MONTH],
+          activityEndDateYear: payload[FIELDS.ACTIVITY_END_DATE_YEAR],
           errors,
           errorSummary,
           startDateErrorMessage: isStartMissing
@@ -122,7 +175,6 @@ export const activityDatesSubmitController = {
             ? { text: errorMessages[JOI_ERRORS.CUSTOM_END_DATE_MISSING] }
             : undefined
         }
-
         return h.view(ACTIVITY_DATES_VIEW_ROUTE, viewData).takeover()
       }
     }
@@ -132,16 +184,17 @@ export const activityDatesSubmitController = {
     const exemption = getExemptionCache(request)
 
     try {
-      const start = {
-        day: payload[JOI_ERRORS.ACTIVITY_START_DATE_DAY],
-        month: payload[JOI_ERRORS.ACTIVITY_START_DATE_MONTH],
-        year: payload[JOI_ERRORS.ACTIVITY_START_DATE_YEAR]
-      }
-      const end = {
-        day: payload[JOI_ERRORS.ACTIVITY_END_DATE_DAY],
-        month: payload[JOI_ERRORS.ACTIVITY_END_DATE_MONTH],
-        year: payload[JOI_ERRORS.ACTIVITY_END_DATE_YEAR]
-      }
+      const start = createDateFromInput(
+        payload['activity-start-date-year'],
+        payload['activity-start-date-month'],
+        payload['activity-start-date-day']
+      )
+
+      const end = createDateFromInput(
+        payload['activity-end-date-year'],
+        payload['activity-end-date-month'],
+        payload['activity-end-date-day']
+      )
 
       await Wreck.patch(
         `${config.get('backend').apiUrl}/exemption/activity-dates`,
@@ -163,9 +216,8 @@ export const activityDatesSubmitController = {
       })
       return h.redirect(routes.TASK_LIST)
     } catch (e) {
-      const validation = e.data?.payload?.validation
-      const details = validation?.details
-      if (Array.isArray(details)) {
+      const { details } = e.data?.validation ?? {}
+      if (!details) {
         throw e
       }
 
@@ -174,12 +226,6 @@ export const activityDatesSubmitController = {
       return h.view(ACTIVITY_DATES_VIEW_ROUTE, {
         ...activityDatesViewContent,
         payload,
-        activityStartDateDay: exemption.activityDates?.start?.day || '',
-        activityStartDateMonth: exemption.activityDates?.start?.month || '',
-        activityStartDateYear: exemption.activityDates?.start?.year || '',
-        activityEndDateDay: exemption.activityDates?.end?.day || '',
-        activityEndDateMonth: exemption.activityDates?.end?.month || '',
-        activityEndDateYear: exemption.activityDates?.end?.year || '',
         errors,
         errorSummary
       })

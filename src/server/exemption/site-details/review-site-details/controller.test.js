@@ -68,7 +68,7 @@ describe('#reviewSiteDetails', () => {
       expect(h.view).toHaveBeenCalledWith(REVIEW_SITE_DETAILS_VIEW_ROUTE, {
         heading: 'Review site details',
         pageTitle: 'Review site details',
-        backLink: routes.CIRCLE_CENTRE_POINT,
+        backLink: routes.WIDTH_OF_SITE,
         projectName: undefined,
         summaryData: {
           method: '',
@@ -87,7 +87,7 @@ describe('#reviewSiteDetails', () => {
       expect(h.view).toHaveBeenCalledWith(REVIEW_SITE_DETAILS_VIEW_ROUTE, {
         heading: 'Review site details',
         pageTitle: 'Review site details',
-        backLink: routes.CIRCLE_CENTRE_POINT,
+        backLink: routes.WIDTH_OF_SITE,
         projectName: 'Test Project',
         summaryData: {
           method:
@@ -120,7 +120,7 @@ describe('#reviewSiteDetails', () => {
       expect(h.view).toHaveBeenCalledWith(REVIEW_SITE_DETAILS_VIEW_ROUTE, {
         heading: 'Review site details',
         pageTitle: 'Review site details',
-        backLink: routes.CIRCLE_CENTRE_POINT,
+        backLink: routes.WIDTH_OF_SITE,
         projectName: 'Test Project',
         summaryData: {
           method:
@@ -191,9 +191,7 @@ describe('#reviewSiteDetails', () => {
 
       expect(
         document
-          .querySelector(
-            '.govuk-back-link[href="/exemption/enter-the-coordinates-at-the-centre-point'
-          )
+          .querySelector('.govuk-back-link[href="/exemption/width-of-site')
           .textContent.trim()
       ).toBe('Back')
 

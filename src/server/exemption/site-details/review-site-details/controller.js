@@ -18,7 +18,7 @@ export const REVIEW_SITE_DETAILS_VIEW_ROUTE =
 const reviewSiteDetailsPageData = {
   pageTitle: 'Review site details',
   heading: 'Review site details',
-  backLink: routes.CIRCLE_CENTRE_POINT
+  backLink: routes.WIDTH_OF_SITE
 }
 
 /**

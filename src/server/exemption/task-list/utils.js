@@ -43,7 +43,9 @@ export const transformTaskList = (taskList) => {
       title: {
         text: 'Site details'
       },
-      href: routes.COORDINATES_TYPE_CHOICE,
+      href: taskList.siteDetails
+        ? routes.REVIEW_SITE_DETAILS
+        : routes.COORDINATES_TYPE_CHOICE,
       status: setStatus(taskList.siteDetails)
     },
     {

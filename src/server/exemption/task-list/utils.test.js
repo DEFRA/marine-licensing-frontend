@@ -16,6 +16,36 @@ describe('taskList utils', () => {
         title: { text: 'Activity description' }
       },
       {
+        href: routes.REVIEW_SITE_DETAILS,
+        status: { text: 'Completed' },
+        title: { text: 'Site details' }
+      },
+      {
+        href: routes.PUBLIC_REGISTER,
+        status: { text: 'Completed' },
+        title: { text: 'Public register' }
+      }
+    ])
+  })
+
+  test('transformTaskList correctly returns task list when site details is empty', () => {
+    expect(
+      transformTaskList({
+        ...mockExemptionTaskList,
+        siteDetails: null
+      })
+    ).toEqual([
+      {
+        href: routes.PROJECT_NAME,
+        status: { text: 'Completed' },
+        title: { text: 'Project name' }
+      },
+      {
+        href: routes.ACTIVITY_DESCRIPTION,
+        status: { tag: { text: 'Incomplete', classes: 'govuk-tag--blue' } },
+        title: { text: 'Activity description' }
+      },
+      {
         href: routes.COORDINATES_TYPE_CHOICE,
         status: { tag: { text: 'Incomplete', classes: 'govuk-tag--blue' } },
         title: { text: 'Site details' }

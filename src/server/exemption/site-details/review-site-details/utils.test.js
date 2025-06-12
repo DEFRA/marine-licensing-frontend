@@ -1,12 +1,32 @@
 import {
   getReviewSummaryText,
   getCoordinateSystemText,
-  getCoordinateDisplayText
+  getCoordinateDisplayText,
+  getSiteDetailsBackLink
 } from '~/src/server/exemption/site-details/review-site-details/utils.js'
 import { COORDINATE_SYSTEMS } from '~/src/server/common/constants/exemptions.js'
 import { mockExemption } from '~/src/server/test-helpers/mocks.js'
+import { routes } from '~/src/server/common/constants/routes.js'
 
 describe('siteDetails utils', () => {
+  describe('getSiteDetailsBackLink util', () => {
+    test('getSiteDetailsBackLink correctly returns task list when coming from the task list', () => {
+      expect(getSiteDetailsBackLink(`http://hostname${routes.TASK_LIST}`)).toBe(
+        routes.TASK_LIST
+      )
+    })
+
+    test('getSiteDetailsBackLink correctly returns page when coming from circle width page', () => {
+      expect(
+        getSiteDetailsBackLink(`http://hostname${routes.WIDTH_OF_SITE}`)
+      ).toBe(routes.WIDTH_OF_SITE)
+    })
+
+    test('getSiteDetailsBackLink correctly returns fallback option', () => {
+      expect(getSiteDetailsBackLink(undefined)).toBe(routes.TASK_LIST)
+    })
+  })
+
   describe('getReviewSummaryText utils', () => {
     test('getReviewSummaryText correctly returns text for site details circle width text', () => {
       expect(

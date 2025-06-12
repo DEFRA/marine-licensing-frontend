@@ -7,6 +7,7 @@ import { mockExemption } from '~/src/server/test-helpers/mocks.js'
 
 describe('check your answers controller', () => {
   let server
+  let getExemptionCacheSpy
 
   beforeAll(async () => {
     server = await createServer()
@@ -20,11 +21,31 @@ describe('check your answers controller', () => {
       .spyOn(Wreck, 'get')
       .mockReturnValue({ payload: { value: mockExemption } })
 
-    jest.spyOn(cacheUtils, 'getExemptionCache').mockReturnValue(mockExemption)
+    getExemptionCacheSpy = jest
+      .spyOn(cacheUtils, 'getExemptionCache')
+      .mockReturnValue(mockExemption)
   })
 
   afterAll(async () => {
     await server.stop({ timeout: 0 })
+  })
+
+  test('Should throw a 404 if exemption is not found', async () => {
+    getExemptionCacheSpy.mockReturnValueOnce({})
+    const { statusCode } = await server.inject({
+      method: 'GET',
+      url: '/exemption/check-your-answers'
+    })
+    expect(statusCode).toBe(404)
+  })
+
+  test('Should throw a 404 if exemption data is not found from server', async () => {
+    jest.spyOn(Wreck, 'get').mockReturnValueOnce({ payload: {} })
+    const { statusCode } = await server.inject({
+      method: 'GET',
+      url: '/exemption/check-your-answers'
+    })
+    expect(statusCode).toBe(404)
   })
 
   test('Should render a complete check your answers page', async () => {

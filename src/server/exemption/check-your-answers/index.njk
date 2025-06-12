@@ -1,0 +1,186 @@
+{% extends 'layouts/page.njk' %}
+{% from "govuk/components/back-link/macro.njk" import govukBackLink %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
+{% block beforeContent %}
+  {{ govukBackLink({
+        text: "Go back to your project",
+        href: backLink
+    }) }}
+{% endblock %}
+{% block content %}
+  <div class="govuk-grid-row">
+    <h2 class="govuk-heading-l" id="check-your-answers-heading">Check your answers before sending your information</h2>
+    {{ govukSummaryList({
+        card: {
+          title: {
+            text: "Project details"
+          },
+          actions: {
+            items: [
+              {
+                href: "#",
+                text: "Change"
+              }
+            ]
+          }
+        },
+        rows: [
+          {
+            key: {
+              text: "Project name"
+            },
+            value: {
+              html: projectName
+            }
+          }
+        ]
+      }) }}
+    {{ govukSummaryList({
+        card: {
+          title: {
+            text: "Activity dates"
+          },
+                actions: {
+                  items: [
+                    {
+                      href: "#",
+                      text: "Change"
+                    }
+                  ]
+                }
+        },
+        rows: [
+          {
+            key: {
+              text: "Start date"
+            },
+            value: {
+              html: "TODO"
+            }
+          },
+          {
+            key: {
+              text: "End date"
+            },
+            value: {
+              html: "TODO"
+            }
+          }
+        ]
+      }) }}
+    {{ govukSummaryList({
+        card: {
+          title: {
+            text: "Activity details"
+          }
+        },
+        rows: [
+          {
+            key: {
+              text: "Activity description"
+            },
+            value: {
+              html: activityDescription
+            },
+            classes: "",
+            actions: {
+              items: [
+                {
+                  href: "#",
+                  text: "Change",
+                  visuallyHiddenText: "activity description"
+                }
+              ]
+            }
+          },
+          {
+            key: {
+              text: "Type of activity"
+            },
+            value: {
+              html: ""
+            },
+            classes: "govuk-summary-list__row--no-border"
+          },
+          {
+            key: {
+              text: "The purpose of the activity"
+            },
+            value: {
+              html: ""
+            },
+            classes: "govuk-summary-list__row--no-border"
+          },
+          {
+            key: {
+              text: "What the activity involves"
+            },
+            value: {
+              html: ""
+            },
+            classes: "govuk-summary-list__row--no-border"
+          },
+          {
+            key: {
+              text: "Why this activity is exempt"
+            },
+            value: {
+              html: ""
+            },
+            classes: "govuk-summary-list__row--no-border"
+          }
+        ]
+      }) }}
+    {{ govukSummaryList({
+        card: {
+          title: {
+            text: "Site details"
+          },
+          actions: {
+            items: [
+              {
+                href: "#",
+                text: "Change"
+              }
+            ]
+          }
+        },
+        rows: []
+      }) }}
+    {{ govukSummaryList({
+        card: {
+          title: {
+            text: "Public register"
+          },
+          actions: {
+            items: [
+              {
+                href: "#",
+                text: "Change"
+              }
+            ]
+          }
+        },
+        rows: [
+        {
+            key: {
+              text: "Information withheld from public register"
+            },
+            value: {
+              html: "Yes" if publicRegister.consent === 'no' else "No"
+            }
+          }
+        ]
+      }) }}
+    <h2 class="govuk-heading-m">Now send your information</h2>
+    <p class="govuk-body">By submitting this information you are confirming that, to the best of your knowledge, the details
+      you are providing are correct.</p>
+    {{ govukButton({
+          text: "Confirm and send",
+          attributes: {
+            id: "confirm-and-send"
+          }
+        }) }}
+  </div>
+{% endblock %}

@@ -130,7 +130,8 @@ describe('#taskListController', () => {
             text: 'Public register'
           }
         }
-      ]
+      ],
+      hasCompletedAllTasks: false
     })
   })
 

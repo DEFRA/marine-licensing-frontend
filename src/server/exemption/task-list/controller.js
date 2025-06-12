@@ -47,10 +47,15 @@ export const taskListController = {
       }
     )
 
+    const hasCompletedAllTasks =
+      payload?.value?.taskList &&
+      Object.values(payload.value.taskList).includes('INCOMPLETE')
+
     return h.view(TASK_LIST_VIEW_ROUTE, {
       ...taskListViewSettings,
       projectName: payload.value.projectName,
-      taskList: transformTaskList(payload.value.taskList)
+      taskList: transformTaskList(payload.value.taskList),
+      hasCompletedAllTasks
     })
   }
 }

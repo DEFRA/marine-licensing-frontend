@@ -10,5 +10,6 @@ export const routes = {
   PUBLIC_REGISTER: '/exemption/public-register',
   TASK_LIST: '/exemption/task-list',
   ACTIVITY_DESCRIPTION: '/exemption/activity-description',
-  WIDTH_OF_SITE: '/exemption/width-of-site'
+  WIDTH_OF_SITE: '/exemption/width-of-site',
+  CHECK_YOUR_ANSWERS: '/exemption/check-your-answers'
 }

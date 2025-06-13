@@ -126,6 +126,7 @@ export const activityDatesSubmitController = {
         const { details } = err
         let errorSummary = mapErrorsForDisplay(details, errorMessages)
         const errors = errorDescriptionByFieldName(errorSummary)
+
         const isStartMissing =
           errors[JOI_ERRORS.ACTIVITY_START_DATE_DAY] &&
           errors[JOI_ERRORS.ACTIVITY_START_DATE_MONTH] &&
@@ -134,6 +135,10 @@ export const activityDatesSubmitController = {
           errors[JOI_ERRORS.ACTIVITY_END_DATE_DAY] &&
           errors[JOI_ERRORS.ACTIVITY_END_DATE_MONTH] &&
           errors[JOI_ERRORS.ACTIVITY_END_DATE_YEAR]
+
+        let startDateErrorMessage
+        let endDateErrorMessage
+
         if (isStartMissing) {
           errorSummary = errorSummary.filter(
             (error) => !error.href.includes('#activity-start-date')
@@ -145,7 +150,33 @@ export const activityDatesSubmitController = {
           errors['activity-start-date'] = {
             text: errorMessages[JOI_ERRORS.CUSTOM_START_DATE_MISSING]
           }
+
+          startDateErrorMessage = {
+            text: errorMessages[JOI_ERRORS.CUSTOM_START_DATE_MISSING]
+          }
+        } else {
+          const hasStartDateTodayOrFutureError = Object.values(errors).some(
+            (error) =>
+              error.text ===
+              errorMessages[JOI_ERRORS.CUSTOM_START_DATE_TODAY_OR_FUTURE]
+          )
+
+          const hasStartDateInvalidError = Object.values(errors).some(
+            (error) =>
+              error.text === errorMessages[JOI_ERRORS.CUSTOM_START_DATE_INVALID]
+          )
+
+          if (hasStartDateTodayOrFutureError) {
+            startDateErrorMessage = {
+              text: errorMessages[JOI_ERRORS.CUSTOM_START_DATE_TODAY_OR_FUTURE]
+            }
+          } else if (hasStartDateInvalidError) {
+            startDateErrorMessage = {
+              text: errorMessages[JOI_ERRORS.CUSTOM_START_DATE_INVALID]
+            }
+          }
         }
+
         if (isEndMissing) {
           errorSummary = errorSummary.filter(
             (error) => !error.href.includes('#activity-end-date')
@@ -157,30 +188,29 @@ export const activityDatesSubmitController = {
           errors['activity-end-date'] = {
             text: errorMessages[JOI_ERRORS.CUSTOM_END_DATE_MISSING]
           }
-        }
-
-        let startDateErrorMessage
-        let endDateErrorMessage
-
-        if (isStartMissing) {
-          startDateErrorMessage = {
-            text: errorMessages[JOI_ERRORS.CUSTOM_START_DATE_MISSING]
-          }
-        }
-        if (isEndMissing) {
           endDateErrorMessage = {
             text: errorMessages[JOI_ERRORS.CUSTOM_END_DATE_MISSING]
           }
-        }
-
-        if (
-          details.some(
-            (detail) =>
-              detail.message === JOI_ERRORS.CUSTOM_END_DATE_BEFORE_START_DATE
+        } else {
+          const hasEndDateInvalidError = Object.values(errors).some(
+            (error) =>
+              error.text === errorMessages[JOI_ERRORS.CUSTOM_END_DATE_INVALID]
           )
-        ) {
-          endDateErrorMessage = {
-            text: errorMessages[JOI_ERRORS.CUSTOM_END_DATE_BEFORE_START_DATE]
+
+          const hasEndDateBeforeStartError = Object.values(errors).some(
+            (error) =>
+              error.text ===
+              errorMessages[JOI_ERRORS.CUSTOM_END_DATE_BEFORE_START_DATE]
+          )
+
+          if (hasEndDateInvalidError) {
+            endDateErrorMessage = {
+              text: errorMessages[JOI_ERRORS.CUSTOM_END_DATE_INVALID]
+            }
+          } else if (hasEndDateBeforeStartError) {
+            endDateErrorMessage = {
+              text: errorMessages[JOI_ERRORS.CUSTOM_END_DATE_BEFORE_START_DATE]
+            }
           }
         }
 

@@ -22,7 +22,9 @@ export const individualDate = ({
     .required()
     .messages({
       'any.required': `${prefix}-day`,
-      'number.base': `${prefix}-day`
+      'number.base': `${prefix}-day`,
+      'number.min': `${prefix}-day`,
+      'number.max': `${prefix}-day`
     }),
   [`${prefix}-month`]: joi
     .number()
@@ -32,7 +34,9 @@ export const individualDate = ({
     .required()
     .messages({
       'any.required': `${prefix}-month`,
-      'number.base': `${prefix}-month`
+      'number.base': `${prefix}-month`,
+      'number.min': `${prefix}-month`,
+      'number.max': `${prefix}-month`
     }),
   [`${prefix}-year`]: joi
     .number()
@@ -79,6 +83,8 @@ export const activityStartEndDateSchema = joi
 
     const startDate = new Date(Date.UTC(startYear, startMonth - 1, startDay))
     const endDate = new Date(Date.UTC(endYear, endMonth - 1, endDay))
+    const today = new Date()
+    today.setHours(0, 0, 0, 0)
 
     if (
       !isValidDate({
@@ -102,6 +108,10 @@ export const activityStartEndDateSchema = joi
       return helpers.error('custom.endDate.invalid')
     }
 
+    if (startDate < today) {
+      return helpers.error('custom.startDate.todayOrFuture')
+    }
+
     if (endDate < startDate) {
       return helpers.error('custom.endDate.before.startDate')
     }
@@ -110,6 +120,13 @@ export const activityStartEndDateSchema = joi
   })
   .messages({
     'number.min': 'custom.startDate.todayOrFuture',
+    'activity-start-date-day': 'activity-start-date-day',
+    'activity-start-date-month': 'activity-start-date-month',
+    'activity-start-date-year': 'activity-start-date-year',
+    'activity-end-date-day': 'activity-end-date-day',
+    'activity-end-date-month': 'activity-end-date-month',
+    'activity-end-date-year': 'activity-end-date-year',
+    'custom.startDate.todayOrFuture': 'custom.startDate.todayOrFuture',
     'custom.startDate.invalid': 'custom.startDate.invalid',
     'custom.endDate.invalid': 'custom.endDate.invalid',
     'custom.endDate.before.startDate': 'custom.endDate.before.startDate'

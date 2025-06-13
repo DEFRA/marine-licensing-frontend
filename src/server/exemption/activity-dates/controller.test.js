@@ -14,9 +14,20 @@ describe('Activity Dates Controller', () => {
   let server
   let getExemptionCacheSpy
 
+  const RealDate = Date
+
   const mockExemptionState = {}
 
   beforeAll(async () => {
+    global.Date = class extends RealDate {
+      constructor(...args) {
+        if (args.length === 0) {
+          return new RealDate('2020-01-01T00:00:00Z')
+        }
+        return new RealDate(...args)
+      }
+    }
+
     server = await createServer()
     await server.initialize()
   })
@@ -28,6 +39,7 @@ describe('Activity Dates Controller', () => {
   })
 
   afterAll(async () => {
+    global.Date = RealDate
     await server.stop()
   })
 
@@ -88,7 +100,7 @@ describe('Activity Dates Controller', () => {
   })
 
   describe('POST /activity-dates', () => {
-    it('should show error message for missing start date', async () => {
+    it('Should show error message for missing start date', async () => {
       const { result, statusCode } = await server.inject({
         method: 'POST',
         url: routes.ACTIVITY_DATES,
@@ -113,7 +125,7 @@ describe('Activity Dates Controller', () => {
       ).toBe('The start date must include a day')
     })
 
-    it('should show custom message when all three end date fields are missing', async () => {
+    it('Should show custom message when all three end date fields are missing', async () => {
       const { result, statusCode } = await server.inject({
         method: 'POST',
         url: routes.ACTIVITY_DATES,
@@ -143,7 +155,7 @@ describe('Activity Dates Controller', () => {
       ).toBe('Enter the end date')
     })
 
-    it('should show stacked error messages for two missing date values for start and end', async () => {
+    it('Should show stacked error messages for two missing date values for start and end', async () => {
       const { result, statusCode } = await server.inject({
         method: 'POST',
         url: routes.ACTIVITY_DATES,
@@ -181,7 +193,7 @@ describe('Activity Dates Controller', () => {
       ).toBe('The end date must include a month')
     })
 
-    it('should return 302 and redirect to task list on success', async () => {
+    it('Should return 302 and redirect to task list on success', async () => {
       jest.spyOn(Wreck, 'patch').mockImplementationOnce(() => jest.fn())
       getExemptionCacheSpy.mockReturnValueOnce(mockExemption)
       const { statusCode, headers } = await server.inject({

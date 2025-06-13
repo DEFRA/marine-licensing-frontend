@@ -88,6 +88,14 @@ describe('exemption route', () => {
       }),
       expect.objectContaining({
         method: 'GET',
+        path: '/exemption/choose-file-type-to-upload'
+      }),
+      expect.objectContaining({
+        method: 'POST',
+        path: '/exemption/choose-file-type-to-upload'
+      }),
+      expect.objectContaining({
+        method: 'GET',
         path: '/exemption'
       })
     ])

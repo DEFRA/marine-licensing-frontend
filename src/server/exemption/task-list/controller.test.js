@@ -110,12 +110,9 @@ describe('#taskListController', () => {
           }
         },
         {
-          href: routes.COORDINATES_TYPE_CHOICE,
+          href: routes.REVIEW_SITE_DETAILS,
           status: {
-            tag: {
-              classes: 'govuk-tag--blue',
-              text: 'Incomplete'
-            }
+            text: 'Completed'
           },
           title: {
             text: 'Site details'

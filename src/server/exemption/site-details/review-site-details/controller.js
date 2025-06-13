@@ -3,19 +3,22 @@ import {
   getExemptionCache
 } from '~/src/server/common/helpers/session-cache/utils.js'
 import { routes } from '~/src/server/common/constants/routes.js'
+import { config } from '~/src/config/config.js'
 import {
   getCoordinateSystemText,
   getReviewSummaryText,
-  getCoordinateDisplayText
+  getCoordinateDisplayText,
+  getSiteDetailsBackLink
 } from './utils.js'
+import Boom from '@hapi/boom'
+import Wreck from '@hapi/wreck'
 
 export const REVIEW_SITE_DETAILS_VIEW_ROUTE =
   'exemption/site-details/review-site-details/index'
 
 const reviewSiteDetailsPageData = {
   pageTitle: 'Review site details',
-  heading: 'Review site details',
-  backLink: routes.CIRCLE_CENTRE_POINT
+  heading: 'Review site details'
 }
 
 /**
@@ -24,6 +27,8 @@ const reviewSiteDetailsPageData = {
  */
 export const reviewSiteDetailsController = {
   handler(request, h) {
+    const previousPage = request.headers?.referer
+
     const exemption = getExemptionCache(request)
     const { coordinateSystem } = getCoordinateSystem(request)
 
@@ -40,6 +45,7 @@ export const reviewSiteDetailsController = {
 
     return h.view(REVIEW_SITE_DETAILS_VIEW_ROUTE, {
       ...reviewSiteDetailsPageData,
+      backLink: getSiteDetailsBackLink(previousPage),
       projectName: exemption.projectName,
       summaryData
     })
@@ -51,7 +57,24 @@ export const reviewSiteDetailsController = {
  * @satisfies {Partial<ServerRoute>}
  */
 export const reviewSiteDetailsSubmitController = {
-  handler(request, h) {
-    return reviewSiteDetailsController.handler(request, h)
+  async handler(request, h) {
+    const exemption = getExemptionCache(request)
+
+    try {
+      await Wreck.patch(
+        `${config.get('backend').apiUrl}/exemption/site-details`,
+        {
+          payload: {
+            siteDetails: exemption.siteDetails,
+            id: exemption.id
+          },
+          json: true
+        }
+      )
+
+      return h.redirect(routes.TASK_LIST)
+    } catch (e) {
+      throw Boom.badRequest(`Error submitting site review`, e)
+    }
   }
 }

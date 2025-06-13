@@ -3,6 +3,7 @@
 {% from "govuk/components/input/macro.njk" import govukInput %}
 {% from "govuk/components/button/macro.njk" import govukButton %}
 {% from "cancel-button/macro.njk" import appCancelButton %}
+{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
 
 {% set headingWithCaption %}
     {% if projectName %}
@@ -21,6 +22,14 @@
 {% block content %}
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
+
+        {% if errors %}
+          {{ govukErrorSummary({
+                titleText: "There is a problem",
+                errorList: errorSummary
+          }) }}
+        {% endif %}
+
       <form method="POST" action="{{ routes.WIDTH_OF_SITE }}">
 
         <input type="hidden" name="csrfToken" value="{{ csrfToken }}">

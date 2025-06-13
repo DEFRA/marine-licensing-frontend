@@ -98,13 +98,11 @@ export const chooseFileTypeSubmitController = {
       payload.fileUploadType
     )
 
-    return h
-      .view(CHOOSE_FILE_UPLOAD_TYPE_VIEW_ROUTE, {
-        ...pageSettings,
-        projectName: exemption.projectName,
-        payload,
-        backLink: routes.COORDINATES_TYPE_CHOICE
-      })
-      .code(200)
+    return h.view(CHOOSE_FILE_UPLOAD_TYPE_VIEW_ROUTE, {
+      ...pageSettings,
+      projectName: exemption.projectName,
+      payload,
+      backLink: routes.COORDINATES_TYPE_CHOICE
+    })
   }
 }

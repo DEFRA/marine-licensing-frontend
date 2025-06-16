@@ -149,7 +149,42 @@
             ]
           }
         },
-        rows: []
+        rows: [{
+          key: {
+            text: "Coordinates type"
+          },
+          value: {
+            html: siteDetails.coordinatesType
+          }
+        }, {
+          key: {
+            text: "Coordinates Entry"
+          },
+          value: {
+            html: siteDetails.coordinatesEntry
+          }
+        }, {
+          key: {
+            text: "Coordinates system"
+          },
+          value: {
+            html: siteDetails.coordinateSystem
+          }
+        }, {
+          key: {
+            text: "Coordinates"
+          },
+          value: {
+            html: siteDetails.coordinates.latitude + ", " + siteDetails.coordinates.longitude
+          }
+        }, {
+          key: {
+            text: "Circle width"
+          },
+          value: {
+            html: siteDetails.circleWidth
+          }
+        }]
       }) }}
     {{ govukSummaryList({
         card: {

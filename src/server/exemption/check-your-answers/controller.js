@@ -31,13 +31,6 @@ export const checkYourAnswersController = {
       throw Boom.notFound(`Exemption data not found for id: ${id}`, { id })
     }
 
-    // TODO: uncomment when decided what to do
-    // if (Object.values(payload.value.taskList).includes('INCOMPLETE')) {
-    //   throw Boom.badRequest(
-    //     'You must complete all tasks before checking your answers.'
-    //   )
-    // }
-
     return h.view(CHECK_YOUR_ANSWERS_VIEW_ROUTE, {
       ...checkYourAnswersViewContent,
       ...exemption

@@ -47,14 +47,15 @@ export const taskListController = {
       }
     )
 
-    const hasCompletedAllTasks =
-      payload?.value?.taskList &&
-      Object.values(payload.value.taskList).includes('INCOMPLETE')
+    const taskList = transformTaskList(payload?.value?.taskList)
+    const hasCompletedAllTasks = taskList?.every(
+      (task) => task.status.text === 'Completed'
+    )
 
     return h.view(TASK_LIST_VIEW_ROUTE, {
       ...taskListViewSettings,
       projectName: payload.value.projectName,
-      taskList: transformTaskList(payload.value.taskList),
+      taskList,
       hasCompletedAllTasks
     })
   }

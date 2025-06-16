@@ -10,6 +10,11 @@ export const mockExemptionTaskList = {
 export const mockExemption = {
   id: faker.database.mongodbObjectId(),
   projectName: 'Test Project',
+  activityDates: {
+    startDate: '2025-01-01',
+    endDate: '2025-01-01'
+  },
+  activityDescription: 'Test activity description',
   publicRegister: { consent: 'yes', reason: 'Test reason' },
   siteDetails: {
     coordinatesType: 'coordinates',

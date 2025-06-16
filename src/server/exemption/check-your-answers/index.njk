@@ -23,6 +23,9 @@
                 text: "Change"
               }
             ]
+          },
+          attributes: {
+            id: "project-details-card"
           }
         },
         rows: [
@@ -44,14 +47,17 @@
           title: {
             text: "Activity dates"
           },
-                actions: {
-                  items: [
-                    {
-                      href: "#",
-                      text: "Change"
-                    }
-                  ]
-                }
+          actions: {
+            items: [
+              {
+                href: "#",
+                text: "Change"
+              }
+            ]
+          },
+          attributes: {
+            id: "activity-dates-card"
+          }
         },
         rows: [
           {
@@ -59,7 +65,7 @@
               text: "Start date"
             },
             value: {
-              html: "TODO"
+              html: activityDates.startDate
             }
           },
           {
@@ -67,7 +73,7 @@
               text: "End date"
             },
             value: {
-              html: "TODO"
+              html: activityDates.endDate
             }
           }
         ]
@@ -76,6 +82,9 @@
         card: {
           title: {
             text: "Activity details"
+          },
+          attributes: {
+            id: "activity-details-card"
           }
         },
         rows: [
@@ -132,6 +141,18 @@
               html: ""
             },
             classes: "govuk-summary-list__row--no-border"
+          },
+          {
+            key: {
+              text: "Your answers from 'Check if you need a marine licence'"
+            },
+            value: {
+              html: "<p><a href=\"\">Download a copy of your answers (PDF)</a>
+                <p>If you need to change any of your 'Check if you need a marine licence' answers
+                  <ol>
+                <li>Delete this project from your projects.</li>
+                <li>Restart the process by checking if you need a marine licence.</li></ol>"
+            }
           }
         ]
       }) }}
@@ -147,6 +168,9 @@
                 text: "Change"
               }
             ]
+          },
+          attributes: {
+            id: "site-details-card"
           }
         },
         rows: [{
@@ -198,6 +222,9 @@
                 text: "Change"
               }
             ]
+          },
+          attributes: {
+            id: "public-register-card"
           }
         },
         rows: [
@@ -206,7 +233,7 @@
               text: "Information withheld from public register"
             },
             value: {
-              html: "Yes" if publicRegister.consent === 'no' else "No"
+              html: "Yes" if publicRegister.consent === 'yes' else "No"
             }
           }
         ]

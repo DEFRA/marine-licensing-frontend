@@ -63,5 +63,96 @@ describe('check your answers controller', () => {
     expect(document.querySelector('.govuk-back-link').textContent.trim()).toBe(
       'Go back to your project'
     )
+
+    expect(
+      document
+        .querySelector('#project-details-card .govuk-summary-list__key')
+        .textContent.trim()
+    ).toBe('Project name')
+
+    expect(
+      document
+        .querySelector(
+          '#project-details-card .govuk-summary-list .govuk-summary-list__value'
+        )
+        .textContent.trim()
+    ).toBe(mockExemption.projectName)
+
+    expect(
+      document
+        .querySelector(
+          '#activity-dates-card .govuk-summary-list .govuk-summary-list__row:first-child .govuk-summary-list__value'
+        )
+        .textContent.trim()
+    ).toBe(mockExemption.activityDates.startDate)
+
+    expect(
+      document
+        .querySelector(
+          '#activity-dates-card .govuk-summary-list .govuk-summary-list__row:last-child .govuk-summary-list__value'
+        )
+        .textContent.trim()
+    ).toBe(mockExemption.activityDates.endDate)
+
+    expect(
+      document
+        .querySelector(
+          '#activity-details-card .govuk-summary-list .govuk-summary-list__row:first-child .govuk-summary-list__value'
+        )
+        .textContent.trim()
+    ).toBe(mockExemption.activityDescription)
+
+    expect(
+      document
+        .querySelector(
+          '#site-details-card .govuk-summary-list .govuk-summary-list__row:first-child .govuk-summary-list__value'
+        )
+        .textContent.trim()
+    ).toBe(mockExemption.siteDetails.coordinatesType)
+
+    expect(
+      document
+        .querySelector(
+          '#site-details-card .govuk-summary-list .govuk-summary-list__row:nth-child(2) .govuk-summary-list__value'
+        )
+        .textContent.trim()
+    ).toBe(mockExemption.siteDetails.coordinatesEntry)
+
+    expect(
+      document
+        .querySelector(
+          '#site-details-card .govuk-summary-list .govuk-summary-list__row:nth-child(3) .govuk-summary-list__value'
+        )
+        .textContent.trim()
+    ).toBe(mockExemption.siteDetails.coordinateSystem)
+
+    expect(
+      document
+        .querySelector(
+          '#site-details-card .govuk-summary-list .govuk-summary-list__row:nth-child(4) .govuk-summary-list__value'
+        )
+        .textContent.trim()
+    ).toBe(
+      mockExemption.siteDetails.coordinates.latitude +
+        ', ' +
+        mockExemption.siteDetails.coordinates.longitude
+    )
+
+    expect(
+      document
+        .querySelector(
+          '#site-details-card .govuk-summary-list .govuk-summary-list__row:nth-child(5) .govuk-summary-list__value'
+        )
+        .textContent.trim()
+    ).toBe(mockExemption.siteDetails.circleWidth)
+
+    expect(
+      document
+        .querySelector(
+          '#public-register-card .govuk-summary-list .govuk-summary-list__row:first-child .govuk-summary-list__value'
+        )
+        .textContent.trim()
+        .toUpperCase()
+    ).toBe(mockExemption.publicRegister.consent.toUpperCase())
   })
 })

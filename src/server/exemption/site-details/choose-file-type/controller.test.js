@@ -121,33 +121,27 @@ describe('#chooseFileType', () => {
 
       const { document } = new JSDOM(result).window
 
-      // Check for details element
       const detailsElement = document.querySelector('.govuk-details')
       expect(detailsElement).toBeTruthy()
 
-      // Check for summary element and its text
       const summaryElement = document.querySelector('.govuk-details__summary')
       expect(summaryElement).toBeTruthy()
       expect(summaryElement.textContent.trim()).toBe('Help with file types')
 
-      // Check for Shapefile heading
       const shapefileHeading = document.querySelector('.govuk-details h2')
       expect(shapefileHeading).toBeTruthy()
       expect(shapefileHeading.textContent.trim()).toBe('Shapefile')
 
-      // Check for Shapefile description
       const shapefileDescription = document.querySelector('.govuk-details p')
       expect(shapefileDescription).toBeTruthy()
       expect(shapefileDescription.textContent.trim()).toMatch(
         /^A shapefile is a collection of files that store map data\./
       )
 
-      // Check for KML heading
       const kmlHeading = document.querySelectorAll('.govuk-details h2')[1]
       expect(kmlHeading).toBeTruthy()
       expect(kmlHeading.textContent.trim()).toBe('KML')
 
-      // Check for KML description
       const kmlDescription = document.querySelectorAll('.govuk-details p')[1]
       expect(kmlDescription).toBeTruthy()
       expect(kmlDescription.textContent.trim()).toMatch(

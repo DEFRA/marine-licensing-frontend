@@ -84,6 +84,14 @@ function getDateErrorMessage(errors, dateType) {
     : JOI_ERRORS.CUSTOM_END_DATE_TODAY_OR_FUTURE
   const beforeStartKey = JOI_ERRORS.CUSTOM_END_DATE_BEFORE_START_DATE
 
+  const customError = errors['']
+  if (customError) {
+    if (customError.text === errorMessages[invalidKey]) return customError
+    if (customError.text === errorMessages[futureKey]) return customError
+    if (!isStart && customError.text === errorMessages[beforeStartKey])
+      return customError
+  }
+
   if (errors[invalidKey]) return { text: errorMessages[invalidKey] }
   if (errors[futureKey]) return { text: errorMessages[futureKey] }
   if (!isStart && errors[beforeStartKey])

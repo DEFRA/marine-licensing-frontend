@@ -295,6 +295,41 @@ describe('Activity Dates Controller', () => {
       )
     })
 
+    it('Should show endDateErrorMessage for end date before start date', async () => {
+      const { result, statusCode } = await server.inject({
+        method: 'POST',
+        url: routes.ACTIVITY_DATES,
+        payload: {
+          'activity-start-date-day': 12,
+          'activity-start-date-month': 12,
+          'activity-start-date-year': 2025,
+          'activity-end-date-day': 30,
+          'activity-end-date-month': 9,
+          'activity-end-date-year': 2025
+        }
+      })
+
+      expect(statusCode).toBe(statusCodes.ok)
+
+      const { document } = new JSDOM(result).window
+
+      // Check error summary
+      expect(document.querySelector('h2').textContent.trim()).toBe(
+        'There is a problem'
+      )
+      expect(
+        document
+          .querySelector('.govuk-error-summary__list a')
+          .textContent.trim()
+      ).toBe('The end date must be the same as or after the start date')
+
+      // Check that endDateErrorMessage is displayed alongside the end date component
+      const endDateError = document.querySelector('#activity-end-date-error')
+      expect(endDateError.textContent.trim()).toContain(
+        'The end date must be the same as or after the start date'
+      )
+    })
+
     it('Should show endDateErrorMessage for partial end date (missing month)', async () => {
       const { result, statusCode } = await server.inject({
         method: 'POST',

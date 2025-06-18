@@ -259,6 +259,78 @@ describe('Activity Dates Controller', () => {
       )
     })
 
+    it('Should show startDateErrorMessage for partial start date (missing year)', async () => {
+      const { result, statusCode } = await server.inject({
+        method: 'POST',
+        url: routes.ACTIVITY_DATES,
+        payload: {
+          'activity-start-date-day': 15,
+          'activity-start-date-month': 6,
+          'activity-start-date-year': '',
+          'activity-end-date-day': 30,
+          'activity-end-date-month': 5,
+          'activity-end-date-year': 2025
+        }
+      })
+
+      expect(statusCode).toBe(statusCodes.ok)
+
+      const { document } = new JSDOM(result).window
+
+      // Check error summary
+      expect(document.querySelector('h2').textContent.trim()).toBe(
+        'There is a problem'
+      )
+      expect(
+        document.querySelector('.govuk-error-summary ul li a').textContent
+      ).toBe('The start date must include a year')
+
+      // Check that startDateErrorMessage is displayed on the date component
+      const startDateErrorElement = document.querySelector(
+        '#activity-start-date-error'
+      )
+      expect(startDateErrorElement).not.toBeNull()
+      expect(startDateErrorElement.textContent.trim()).toContain(
+        'The start date must include a year'
+      )
+    })
+
+    it('Should show endDateErrorMessage for partial end date (missing month)', async () => {
+      const { result, statusCode } = await server.inject({
+        method: 'POST',
+        url: routes.ACTIVITY_DATES,
+        payload: {
+          'activity-start-date-day': 15,
+          'activity-start-date-month': 6,
+          'activity-start-date-year': 2025,
+          'activity-end-date-day': 30,
+          'activity-end-date-month': '',
+          'activity-end-date-year': 2025
+        }
+      })
+
+      expect(statusCode).toBe(statusCodes.ok)
+
+      const { document } = new JSDOM(result).window
+
+      // Check error summary
+      expect(document.querySelector('h2').textContent.trim()).toBe(
+        'There is a problem'
+      )
+      expect(
+        document.querySelector('.govuk-error-summary ul li a').textContent
+      ).toBe('The end date must include a month')
+
+      // Check that endDateErrorMessage is displayed on the date component
+      const endDateErrorElement = document.querySelector(
+        '#activity-end-date-error'
+      )
+      expect(endDateErrorElement).not.toBeNull()
+      expect(endDateErrorElement.textContent.trim()).toContain(
+        'The end date must include a month'
+      )
+    })
+
     test('Should pass error to global catchAll behaviour if it is not a validation error', async () => {
       jest.spyOn(Wreck, 'patch').mockRejectedValueOnce(
         Object.assign(new Error('Validation error'), {

@@ -65,6 +65,36 @@ const errorMessages = {
   [JOI_ERRORS.CUSTOM_END_DATE_MISSING]: 'Enter the end date'
 }
 
+function getDateErrorMessage(errors, dateType) {
+  const isStart = dateType === 'start'
+  const dayKey = isStart
+    ? JOI_ERRORS.ACTIVITY_START_DATE_DAY
+    : JOI_ERRORS.ACTIVITY_END_DATE_DAY
+  const monthKey = isStart
+    ? JOI_ERRORS.ACTIVITY_START_DATE_MONTH
+    : JOI_ERRORS.ACTIVITY_END_DATE_MONTH
+  const yearKey = isStart
+    ? JOI_ERRORS.ACTIVITY_START_DATE_YEAR
+    : JOI_ERRORS.ACTIVITY_END_DATE_YEAR
+  const invalidKey = isStart
+    ? JOI_ERRORS.CUSTOM_START_DATE_INVALID
+    : JOI_ERRORS.CUSTOM_END_DATE_INVALID
+  const futureKey = isStart
+    ? JOI_ERRORS.CUSTOM_START_DATE_TODAY_OR_FUTURE
+    : JOI_ERRORS.CUSTOM_END_DATE_TODAY_OR_FUTURE
+  const beforeStartKey = JOI_ERRORS.CUSTOM_END_DATE_BEFORE_START_DATE
+
+  if (errors[invalidKey]) return { text: errorMessages[invalidKey] }
+  if (errors[futureKey]) return { text: errorMessages[futureKey] }
+  if (!isStart && errors[beforeStartKey])
+    return { text: errorMessages[beforeStartKey] }
+  if (errors[dayKey]) return { text: errorMessages[dayKey] }
+  if (errors[monthKey]) return { text: errorMessages[monthKey] }
+  if (errors[yearKey]) return { text: errorMessages[yearKey] }
+
+  return null
+}
+
 const FIELDS = {
   ACTIVITY_START_DATE_DAY: 'activity-start-date-day',
   ACTIVITY_START_DATE_MONTH: 'activity-start-date-month',
@@ -153,31 +183,11 @@ export const activityDatesSubmitController = {
           errors['activity-start-date'] = {
             text: errorMessages[JOI_ERRORS.CUSTOM_START_DATE_MISSING]
           }
-
           startDateErrorMessage = {
             text: errorMessages[JOI_ERRORS.CUSTOM_START_DATE_MISSING]
           }
         } else {
-          const hasStartDateTodayOrFutureError = Object.values(errors).some(
-            (error) =>
-              error.text ===
-              errorMessages[JOI_ERRORS.CUSTOM_START_DATE_TODAY_OR_FUTURE]
-          )
-
-          const hasStartDateInvalidError = Object.values(errors).some(
-            (error) =>
-              error.text === errorMessages[JOI_ERRORS.CUSTOM_START_DATE_INVALID]
-          )
-
-          if (hasStartDateTodayOrFutureError) {
-            startDateErrorMessage = {
-              text: errorMessages[JOI_ERRORS.CUSTOM_START_DATE_TODAY_OR_FUTURE]
-            }
-          } else if (hasStartDateInvalidError) {
-            startDateErrorMessage = {
-              text: errorMessages[JOI_ERRORS.CUSTOM_START_DATE_INVALID]
-            }
-          }
+          startDateErrorMessage = getDateErrorMessage(errors, 'start')
         }
 
         if (isEndMissing) {
@@ -195,36 +205,7 @@ export const activityDatesSubmitController = {
             text: errorMessages[JOI_ERRORS.CUSTOM_END_DATE_MISSING]
           }
         } else {
-          const hasEndDateInvalidError = Object.values(errors).some(
-            (error) =>
-              error.text === errorMessages[JOI_ERRORS.CUSTOM_END_DATE_INVALID]
-          )
-
-          const hasEndDateTodayOrFutureError = Object.values(errors).some(
-            (error) =>
-              error.text ===
-              errorMessages[JOI_ERRORS.CUSTOM_END_DATE_TODAY_OR_FUTURE]
-          )
-
-          const hasEndDateBeforeStartError = Object.values(errors).some(
-            (error) =>
-              error.text ===
-              errorMessages[JOI_ERRORS.CUSTOM_END_DATE_BEFORE_START_DATE]
-          )
-
-          if (hasEndDateInvalidError) {
-            endDateErrorMessage = {
-              text: errorMessages[JOI_ERRORS.CUSTOM_END_DATE_INVALID]
-            }
-          } else if (hasEndDateTodayOrFutureError) {
-            endDateErrorMessage = {
-              text: errorMessages[JOI_ERRORS.CUSTOM_END_DATE_TODAY_OR_FUTURE]
-            }
-          } else if (hasEndDateBeforeStartError) {
-            endDateErrorMessage = {
-              text: errorMessages[JOI_ERRORS.CUSTOM_END_DATE_BEFORE_START_DATE]
-            }
-          }
+          endDateErrorMessage = getDateErrorMessage(errors, 'end')
         }
 
         const viewData = {

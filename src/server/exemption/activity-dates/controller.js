@@ -57,6 +57,8 @@ const errorMessages = {
   [JOI_ERRORS.CUSTOM_END_DATE_INVALID]: 'The end date must be a real date',
   [JOI_ERRORS.CUSTOM_START_DATE_TODAY_OR_FUTURE]:
     'The start date must be today or in the future',
+  [JOI_ERRORS.CUSTOM_END_DATE_TODAY_OR_FUTURE]:
+    'The end date must be today or in the future',
   [JOI_ERRORS.CUSTOM_END_DATE_BEFORE_START_DATE]:
     'The end date must be the same as or after the start date',
   [JOI_ERRORS.CUSTOM_START_DATE_MISSING]: 'Enter the start date',
@@ -89,20 +91,21 @@ export const activityDatesController = {
 
     if (exemption.activityDates?.start) {
       const startDate = new Date(exemption.activityDates.start)
-      activityStartDateDay = startDate.getDate().toString()
-      activityStartDateMonth = (startDate.getMonth() + 1).toString()
-      activityStartDateYear = startDate.getFullYear().toString()
+      activityStartDateDay = startDate.getUTCDate().toString()
+      activityStartDateMonth = (startDate.getUTCMonth() + 1).toString()
+      activityStartDateYear = startDate.getUTCFullYear().toString()
     }
 
     if (exemption.activityDates?.end) {
       const endDate = new Date(exemption.activityDates.end)
-      activityEndDateDay = endDate.getDate().toString()
-      activityEndDateMonth = (endDate.getMonth() + 1).toString()
-      activityEndDateYear = endDate.getFullYear().toString()
+      activityEndDateDay = endDate.getUTCDate().toString()
+      activityEndDateMonth = (endDate.getUTCMonth() + 1).toString()
+      activityEndDateYear = endDate.getUTCFullYear().toString()
     }
 
     return h.view(ACTIVITY_DATES_VIEW_ROUTE, {
       ...activityDatesViewContent,
+      projectName: exemption.projectName,
       activityStartDateDay,
       activityStartDateMonth,
       activityStartDateYear,
@@ -197,6 +200,12 @@ export const activityDatesSubmitController = {
               error.text === errorMessages[JOI_ERRORS.CUSTOM_END_DATE_INVALID]
           )
 
+          const hasEndDateTodayOrFutureError = Object.values(errors).some(
+            (error) =>
+              error.text ===
+              errorMessages[JOI_ERRORS.CUSTOM_END_DATE_TODAY_OR_FUTURE]
+          )
+
           const hasEndDateBeforeStartError = Object.values(errors).some(
             (error) =>
               error.text ===
@@ -207,6 +216,10 @@ export const activityDatesSubmitController = {
             endDateErrorMessage = {
               text: errorMessages[JOI_ERRORS.CUSTOM_END_DATE_INVALID]
             }
+          } else if (hasEndDateTodayOrFutureError) {
+            endDateErrorMessage = {
+              text: errorMessages[JOI_ERRORS.CUSTOM_END_DATE_TODAY_OR_FUTURE]
+            }
           } else if (hasEndDateBeforeStartError) {
             endDateErrorMessage = {
               text: errorMessages[JOI_ERRORS.CUSTOM_END_DATE_BEFORE_START_DATE]
@@ -216,6 +229,7 @@ export const activityDatesSubmitController = {
 
         const viewData = {
           ...activityDatesViewContent,
+          projectName: getExemptionCache(request).projectName,
           activityStartDateDay: payload[FIELDS.ACTIVITY_START_DATE_DAY],
           activityStartDateMonth: payload[FIELDS.ACTIVITY_START_DATE_MONTH],
           activityStartDateYear: payload[FIELDS.ACTIVITY_START_DATE_YEAR],
@@ -277,6 +291,7 @@ export const activityDatesSubmitController = {
       const errors = errorDescriptionByFieldName(errorSummary)
       return h.view(ACTIVITY_DATES_VIEW_ROUTE, {
         ...activityDatesViewContent,
+        projectName: exemption.projectName,
         payload,
         errors,
         activityStartDateDay: payload[FIELDS.ACTIVITY_START_DATE_DAY],

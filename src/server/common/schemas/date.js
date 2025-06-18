@@ -112,6 +112,10 @@ export const activityStartEndDateSchema = joi
       return helpers.error('custom.startDate.todayOrFuture')
     }
 
+    if (endDate < today) {
+      return helpers.error('custom.endDate.todayOrFuture')
+    }
+
     if (endDate < startDate) {
       return helpers.error('custom.endDate.before.startDate')
     }
@@ -129,5 +133,6 @@ export const activityStartEndDateSchema = joi
     'custom.startDate.todayOrFuture': 'custom.startDate.todayOrFuture',
     'custom.startDate.invalid': 'custom.startDate.invalid',
     'custom.endDate.invalid': 'custom.endDate.invalid',
+    'custom.endDate.todayOrFuture': 'custom.endDate.todayOrFuture',
     'custom.endDate.before.startDate': 'custom.endDate.before.startDate'
   })

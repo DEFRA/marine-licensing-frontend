@@ -11,6 +11,7 @@ export const JOI_ERRORS = {
   CUSTOM_START_DATE_INVALID: 'custom.startDate.invalid',
   CUSTOM_END_DATE_INVALID: 'custom.endDate.invalid',
   CUSTOM_START_DATE_TODAY_OR_FUTURE: 'custom.startDate.todayOrFuture',
+  CUSTOM_END_DATE_TODAY_OR_FUTURE: 'custom.endDate.todayOrFuture',
   CUSTOM_END_DATE_BEFORE_START_DATE: 'custom.endDate.before.startDate',
   CUSTOM_START_DATE_MISSING: 'custom.startDate.missing',
   CUSTOM_END_DATE_MISSING: 'custom.endDate.missing',

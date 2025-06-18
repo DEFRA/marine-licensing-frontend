@@ -21,7 +21,10 @@
                     errorList: errorSummary
                 }) }}
             {% endif %}
-            <h2 class="govuk-heading-l">{{ title }}</h2>
+            {% if projectName %}
+                <span class="govuk-caption-l">{{ projectName }}</span>
+            {% endif %}
+            <h1 class="govuk-heading-l">{{ title }}</h1>
             {% for paragraph in descriptionParagraphs %}
                 <p class="govuk-body">{{ paragraph }}</p>
             {% endfor %}

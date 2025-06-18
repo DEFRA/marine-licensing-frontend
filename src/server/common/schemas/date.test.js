@@ -143,5 +143,19 @@ describe('Date Validator', () => {
       const { error } = activityStartEndDateSchema.validate(testPayload)
       expect(error.details[0].message).toBe('custom.endDate.before.startDate')
     })
+
+    test('should fail if start date is in the past', () => {
+      const testPayload = {
+        'activity-start-date-day': '01',
+        'activity-start-date-month': '01',
+        'activity-start-date-year': '2024',
+        'activity-end-date-day': '15',
+        'activity-end-date-month': '01',
+        'activity-end-date-year': '2024'
+      }
+
+      const { error } = activityStartEndDateSchema.validate(testPayload)
+      expect(error.details[0].message).toBe('custom.startDate.todayOrFuture')
+    })
   })
 })

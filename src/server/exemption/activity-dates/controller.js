@@ -33,7 +33,7 @@ const activityDatesViewSettings = {
   cancelLink: routes.TASK_LIST
 }
 
-const errorMessages = {
+export const errorMessages = {
   [JOI_ERRORS.ACTIVITY_START_DATE_DAY]: 'The start date must include a day',
   [JOI_ERRORS.ACTIVITY_START_DATE_MONTH]: 'The start date must include a month',
   [JOI_ERRORS.ACTIVITY_START_DATE_YEAR]: 'The start date must include a year',
@@ -117,27 +117,42 @@ function isCompleteDateMissing(errors, dateType) {
  * @param {Array} errorSummary - Current error summary array
  * @param {object} errorTypeMap - Error type mapping
  */
-function addCustomValidationErrors(errorSummary, errorTypeMap) {
-  // Start date custom errors
+export function addCustomValidationErrors(errorSummary, errorTypeMap) {
+  // Start date custom errors - check for today/future first (higher priority)
+  let startDateErrorAdded = false
+
   if (errorTypeMap[JOI_ERRORS.CUSTOM_START_DATE_TODAY_OR_FUTURE]) {
     errorSummary.push({
       href: `#${FIELD_NAMES.START_DATE_DAY}`,
       text: errorMessages[JOI_ERRORS.CUSTOM_START_DATE_TODAY_OR_FUTURE]
     })
-  } else if (errorTypeMap[JOI_ERRORS.CUSTOM_START_DATE_INVALID]) {
+    startDateErrorAdded = true
+  }
+
+  // Only add invalid date error if no today/future error was added
+  if (
+    !startDateErrorAdded &&
+    errorTypeMap[JOI_ERRORS.CUSTOM_START_DATE_INVALID]
+  ) {
     errorSummary.push({
       href: `#${FIELD_NAMES.START_DATE_DAY}`,
       text: errorMessages[JOI_ERRORS.CUSTOM_START_DATE_INVALID]
     })
   }
 
-  // End date custom errors
+  // End date custom errors - check for today/future first (higher priority)
+  let endDateErrorAdded = false
+
   if (errorTypeMap[JOI_ERRORS.CUSTOM_END_DATE_TODAY_OR_FUTURE]) {
     errorSummary.push({
       href: `#${FIELD_NAMES.END_DATE_DAY}`,
       text: errorMessages[JOI_ERRORS.CUSTOM_END_DATE_TODAY_OR_FUTURE]
     })
-  } else if (errorTypeMap[JOI_ERRORS.CUSTOM_END_DATE_INVALID]) {
+    endDateErrorAdded = true
+  }
+
+  // Only add invalid date error if no today/future error was added
+  if (!endDateErrorAdded && errorTypeMap[JOI_ERRORS.CUSTOM_END_DATE_INVALID]) {
     errorSummary.push({
       href: `#${FIELD_NAMES.END_DATE_DAY}`,
       text: errorMessages[JOI_ERRORS.CUSTOM_END_DATE_INVALID]

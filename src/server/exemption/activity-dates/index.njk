@@ -1,0 +1,112 @@
+{% extends 'layouts/page.njk' %}
+{% from "govuk/components/back-link/macro.njk" import govukBackLink %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/date-input/macro.njk" import govukDateInput %}
+{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+{% from "cancel-button/macro.njk" import appCancelButton %}
+{% block beforeContent %}
+  {{ govukBackLink({
+        text: "Back",
+        href: backLink
+    }) }}
+{% endblock %}
+{% block content %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+      {% if errors %}
+        {{ govukErrorSummary({
+          titleText: "There is a problem",
+          errorList: errorSummary
+        }) }}
+      {% endif %}
+      <h1 class="govuk-heading-l">{{ title }}</h1>
+      {% if projectName %}
+        <span class="govuk-caption-l">{{ projectName }}</span>
+      {% endif %}
+      {% for paragraph in descriptionParagraphs %}
+        <p class="govuk-body">{{ paragraph }}</p>
+      {% endfor %}
+      <form method="POST">
+        <input type="hidden" name="csrfToken" value="{{ csrfToken }}"/> {{ govukDateInput({
+          id: "activity-start-date",
+          namePrefix: "activity-start-date",
+          fieldset: {
+            legend: {
+              text: "Start date",
+              isPageHeading: false,
+              classes: "govuk-fieldset__legend--s"
+            }
+          },
+          hint: {
+            text: "For example, 27 5 2025"
+          },
+          errorMessage: startDateErrorMessage,
+          items: [
+            {
+              id: "activity-start-date-day",
+              name: "day",
+              classes: "govuk-input--width-2" + (" govuk-input--error" if errors['activity-start-date-day']),
+              value: activityStartDateDay if activityStartDateDay
+            },
+            {
+              id: "activity-start-date-month",
+              name: "month",
+              classes: "govuk-input--width-2" + (" govuk-input--error" if errors['activity-start-date-month']),
+              value: activityStartDateMonth if activityStartDateMonth
+            },
+            {
+              id: "activity-start-date-year",
+              name: "year",
+              classes: "govuk-input--width-4" + (" govuk-input--error" if errors['activity-start-date-year']),
+              value: activityStartDateYear if activityStartDateYear
+            }
+          ]
+        }) }}
+        {{ govukDateInput({
+          id: "activity-end-date",
+          namePrefix: "activity-end-date",
+          fieldset: {
+            legend: {
+              text: "End date",
+              isPageHeading: false,
+              classes: "govuk-fieldset__legend--s"
+            }
+          },
+          hint: {
+            text: "For example, 27 5 2025"
+          },
+          errorMessage: endDateErrorMessage,
+          items: [
+            {
+              id: "activity-end-date-day",
+              name: "day",
+              classes: "govuk-input--width-2" + (" govuk-input--error" if errors['activity-end-date-day']),
+              value: activityEndDateDay if activityEndDateDay
+            },
+            {
+              id: "activity-end-date-month",
+              name: "month",
+              classes: "govuk-input--width-2" + (" govuk-input--error" if errors['activity-end-date-month']),
+              value: activityEndDateMonth if activityEndDateMonth
+            },
+            {
+              id: "activity-end-date-year",
+              name: "year",
+              classes: "govuk-input--width-4" + (" govuk-input--error" if errors['activity-end-date-year']),
+              value: activityEndDateYear if activityEndDateYear
+            }
+          ]
+        }) }}
+        <div class="govuk-button-group">
+          {{ govukButton({
+              text: "Save and continue",
+              type: "submit"
+          }) }}
+          {{ appCancelButton({
+              cancelLink: '/exemption/task-list'
+          }) }}
+        </div>
+      </form>
+    </div>
+  </div>
+{% endblock %}

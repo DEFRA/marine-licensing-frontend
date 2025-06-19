@@ -1,258 +1,175 @@
 import joi from 'joi'
 import { JOI_ERRORS } from '~/src/server/common/constants/joi.js'
 
-const CURRENT_YEAR = new Date().getFullYear()
-const YEARS_IN_PAST_ALLOWED = 10 // Allow 10 years in the past for reasonable range validation
-const YEARS_IN_FUTURE_ALLOWED = 75 // Allow 75 years in the future for long-term planning
-const MIN_YEAR = CURRENT_YEAR - YEARS_IN_PAST_ALLOWED
-const MAX_YEAR = CURRENT_YEAR + YEARS_IN_FUTURE_ALLOWED
+const MIN_YEAR = new Date().getFullYear()
+const MAX_YEAR_OFFSET = 75
+const MAX_YEAR = MIN_YEAR + MAX_YEAR_OFFSET
+
 const MAX_DAYS_IN_MONTH = 31
 const MAX_MONTHS_IN_YEAR = 12
 
 /**
- * Creates a date from individual day, month, year components
- * @param {number} year
- * @param {number} month (1-12)
- * @param {number} day
- * @returns {Date|null}
+ * Creates individual date field validation schema
+ * @param {object} config - Configuration object
+ * @param {string} config.prefix - Field prefix (e.g., 'activity-start-date')
+ * @param {number} config.minYear - Minimum allowed year (default: current year)
+ * @param {number} config.maxYear - Maximum allowed year (default: current year + 75)
+ * @param {string} config.minYearError - Error message for minimum year validation
+ * @returns {object} Joi schema object for day, month, year fields
  */
-function createDateFromComponents(year, month, day) {
-  if (isNaN(year) || isNaN(month) || isNaN(day)) {
-    return null
-  }
-
-  const date = new Date(Date.UTC(year, month - 1, day))
-  if (
-    date.getUTCFullYear() !== year ||
-    date.getUTCMonth() !== month - 1 ||
-    date.getUTCDate() !== day
-  ) {
-    return null
-  }
-
-  return date
-}
+export const individualDate = ({
+  prefix,
+  minYear = MIN_YEAR,
+  maxYear = MAX_YEAR,
+  minYearError
+}) => ({
+  [`${prefix}-day`]: joi
+    .number()
+    .integer()
+    .min(1)
+    .max(MAX_DAYS_IN_MONTH)
+    .required()
+    .messages({
+      'any.required': `${prefix}-day`,
+      'number.base': `${prefix}-day`,
+      'number.min': `${prefix}-day`,
+      'number.max': `${prefix}-day`
+    }),
+  [`${prefix}-month`]: joi
+    .number()
+    .integer()
+    .min(1)
+    .max(MAX_MONTHS_IN_YEAR)
+    .required()
+    .messages({
+      'any.required': `${prefix}-month`,
+      'number.base': `${prefix}-month`,
+      'number.min': `${prefix}-month`,
+      'number.max': `${prefix}-month`
+    }),
+  [`${prefix}-year`]: joi
+    .number()
+    .integer()
+    .min(minYear)
+    .max(maxYear)
+    .required()
+    .messages({
+      'any.required': `${prefix}-year`,
+      'number.base': `${prefix}-year`,
+      'number.min': minYearError || `${prefix}-year`,
+      'number.max': `${prefix}-year`
+    })
+})
 
 /**
- * Checks if a date is today or in the future
- * @param {Date} date
- * @returns {boolean}
+ * Validates if a date object matches its components
+ * @param {object} params - Parameters object
+ * @param {Date} params.date - Date object to validate
+ * @param {number} params.day - Day component
+ * @param {number} params.month - Month component
+ * @param {number} params.year - Year component
+ * @returns {boolean} True if date matches components
  */
-function isDateTodayOrFuture(date) {
-  const today = new Date()
-  today.setHours(0, 0, 0, 0)
-  return date >= today
-}
+const isValidDate = ({ date, day, month, year }) =>
+  date.getUTCFullYear() === year &&
+  date.getUTCMonth() === month - 1 &&
+  date.getUTCDate() === day
 
 /**
- * Validates if date component values are valid numbers
- * @param {number} day
- * @param {number} month
- * @param {number} year
- * @returns {boolean}
+ * Activity dates schema for start and end date validation
  */
-function areComponentsValidNumbers(day, month, year) {
-  return !isNaN(day) && !isNaN(month) && !isNaN(year)
-}
-
-/**
- * Validates if date component values are within valid ranges
- * @param {number} day
- * @param {number} month
- * @param {number} year
- * @returns {boolean}
- */
-function areComponentsInValidRange(day, month, year) {
-  return (
-    day >= 1 &&
-    day <= MAX_DAYS_IN_MONTH &&
-    month >= 1 &&
-    month <= MAX_MONTHS_IN_YEAR &&
-    year >= MIN_YEAR &&
-    year <= MAX_YEAR
-  )
-}
-
-/**
- * Extracts and parses date components from form value
- * @param {Object} value - Form data object
- * @returns {Object} Parsed date components
- */
-function extractDateComponents(value) {
-  return {
-    startDay: parseInt(value['activity-start-date-day'], 10),
-    startMonth: parseInt(value['activity-start-date-month'], 10),
-    startYear: parseInt(value['activity-start-date-year'], 10),
-    endDay: parseInt(value['activity-end-date-day'], 10),
-    endMonth: parseInt(value['activity-end-date-month'], 10),
-    endYear: parseInt(value['activity-end-date-year'], 10)
-  }
-}
-
-/**
- * Validates start date components and returns error if invalid
- * @param {number} startDay
- * @param {number} startMonth
- * @param {number} startYear
- * @param {Object} helpers - Joi helpers object
- * @returns {Object|null} Error object or null if valid
- */
-function validateStartDateComponents(startDay, startMonth, startYear, helpers) {
-  if (!areComponentsValidNumbers(startDay, startMonth, startYear)) {
-    return helpers.error(JOI_ERRORS.CUSTOM_START_DATE_INVALID)
-  }
-
-  if (!areComponentsInValidRange(startDay, startMonth, startYear)) {
-    return helpers.error(JOI_ERRORS.CUSTOM_START_DATE_INVALID)
-  }
-
-  return null
-}
-
-/**
- * Validates end date components and returns error if invalid
- * @param {number} endDay
- * @param {number} endMonth
- * @param {number} endYear
- * @param {Object} helpers - Joi helpers object
- * @returns {Object|null} Error object or null if valid
- */
-function validateEndDateComponents(endDay, endMonth, endYear, helpers) {
-  if (!areComponentsValidNumbers(endDay, endMonth, endYear)) {
-    return helpers.error(JOI_ERRORS.CUSTOM_END_DATE_INVALID)
-  }
-
-  if (!areComponentsInValidRange(endDay, endMonth, endYear)) {
-    return helpers.error(JOI_ERRORS.CUSTOM_END_DATE_INVALID)
-  }
-
-  return null
-}
-
-/**
- * Validates date objects and relationships
- * @param {Date} startDate
- * @param {Date} endDate
- * @param {Object} helpers - Joi helpers object
- * @returns {Object|null} Error object or null if valid
- */
-function validateDateRelationships(startDate, endDate, helpers) {
-  if (!startDate) {
-    return helpers.error(JOI_ERRORS.CUSTOM_START_DATE_INVALID)
-  }
-
-  if (!endDate) {
-    return helpers.error(JOI_ERRORS.CUSTOM_END_DATE_INVALID)
-  }
-
-  if (endDate < startDate) {
-    return helpers.error(JOI_ERRORS.CUSTOM_END_DATE_BEFORE_START_DATE)
-  }
-
-  if (!isDateTodayOrFuture(startDate)) {
-    return helpers.error(JOI_ERRORS.CUSTOM_START_DATE_TODAY_OR_FUTURE)
-  }
-
-  if (!isDateTodayOrFuture(endDate)) {
-    return helpers.error(JOI_ERRORS.CUSTOM_END_DATE_TODAY_OR_FUTURE)
-  }
-
-  return null
-}
-
 export const activityDatesSchema = joi
   .object({
-    'activity-start-date-day': joi
-      .string()
-      .pattern(/^\d+$/)
-      .required()
-      .messages({
-        'any.required': JOI_ERRORS.ACTIVITY_START_DATE_DAY,
-        'string.empty': JOI_ERRORS.ACTIVITY_START_DATE_DAY,
-        'string.pattern.base': JOI_ERRORS.ACTIVITY_START_DATE_DAY
-      }),
-    'activity-start-date-month': joi
-      .string()
-      .pattern(/^\d+$/)
-      .required()
-      .messages({
-        'any.required': JOI_ERRORS.ACTIVITY_START_DATE_MONTH,
-        'string.empty': JOI_ERRORS.ACTIVITY_START_DATE_MONTH,
-        'string.pattern.base': JOI_ERRORS.ACTIVITY_START_DATE_MONTH
-      }),
-    'activity-start-date-year': joi
-      .string()
-      .pattern(/^\d+$/)
-      .required()
-      .messages({
-        'any.required': JOI_ERRORS.ACTIVITY_START_DATE_YEAR,
-        'string.empty': JOI_ERRORS.ACTIVITY_START_DATE_YEAR,
-        'string.pattern.base': JOI_ERRORS.ACTIVITY_START_DATE_YEAR
-      }),
-    'activity-end-date-day': joi.string().pattern(/^\d+$/).required().messages({
-      'any.required': JOI_ERRORS.ACTIVITY_END_DATE_DAY,
-      'string.empty': JOI_ERRORS.ACTIVITY_END_DATE_DAY,
-      'string.pattern.base': JOI_ERRORS.ACTIVITY_END_DATE_DAY
+    ...individualDate({
+      prefix: 'activity-start-date',
+      minYear: MIN_YEAR,
+      maxYear: MAX_YEAR,
+      minYearError: JOI_ERRORS.CUSTOM_START_DATE_TODAY_OR_FUTURE
     }),
-    'activity-end-date-month': joi
-      .string()
-      .pattern(/^\d+$/)
-      .required()
-      .messages({
-        'any.required': JOI_ERRORS.ACTIVITY_END_DATE_MONTH,
-        'string.empty': JOI_ERRORS.ACTIVITY_END_DATE_MONTH,
-        'string.pattern.base': JOI_ERRORS.ACTIVITY_END_DATE_MONTH
-      }),
-    'activity-end-date-year': joi
-      .string()
-      .pattern(/^\d+$/)
-      .required()
-      .messages({
-        'any.required': JOI_ERRORS.ACTIVITY_END_DATE_YEAR,
-        'string.empty': JOI_ERRORS.ACTIVITY_END_DATE_YEAR,
-        'string.pattern.base': JOI_ERRORS.ACTIVITY_END_DATE_YEAR
-      })
+    ...individualDate({
+      prefix: 'activity-end-date',
+      minYear: MIN_YEAR,
+      maxYear: MAX_YEAR,
+      minYearError: JOI_ERRORS.CUSTOM_END_DATE_TODAY_OR_FUTURE
+    })
   })
   .custom((value, helpers) => {
-    const { startDay, startMonth, startYear, endDay, endMonth, endYear } =
-      extractDateComponents(value)
+    const {
+      'activity-start-date-day': startDay,
+      'activity-start-date-month': startMonth,
+      'activity-start-date-year': startYear,
+      'activity-end-date-day': endDay,
+      'activity-end-date-month': endMonth,
+      'activity-end-date-year': endYear
+    } = value
 
-    const startDateError = validateStartDateComponents(
-      startDay,
-      startMonth,
-      startYear,
-      helpers
-    )
-    if (startDateError) return startDateError
+    const startDate = new Date(Date.UTC(startYear, startMonth - 1, startDay))
+    const endDate = new Date(Date.UTC(endYear, endMonth - 1, endDay))
+    const today = new Date()
+    today.setHours(0, 0, 0, 0)
 
-    const endDateError = validateEndDateComponents(
-      endDay,
-      endMonth,
-      endYear,
-      helpers
-    )
-    if (endDateError) return endDateError
+    // Validate start date is a real date
+    if (
+      !isValidDate({
+        date: startDate,
+        day: startDay,
+        month: startMonth,
+        year: startYear
+      })
+    ) {
+      return helpers.error('custom.startDate.invalid')
+    }
 
-    const startDate = createDateFromComponents(startYear, startMonth, startDay)
-    const endDate = createDateFromComponents(endYear, endMonth, endDay)
+    // Validate end date is a real date
+    if (
+      !isValidDate({
+        date: endDate,
+        day: endDay,
+        month: endMonth,
+        year: endYear
+      })
+    ) {
+      return helpers.error('custom.endDate.invalid')
+    }
 
-    const relationshipError = validateDateRelationships(
-      startDate,
-      endDate,
-      helpers
-    )
-    if (relationshipError) return relationshipError
+    // Check end date future validation before date order (for consistency with existing behavior)
+    if (endDate < today) {
+      return helpers.error('custom.endDate.todayOrFuture')
+    }
+
+    // Validate date order
+    if (endDate < startDate) {
+      return helpers.error('custom.endDate.before.startDate')
+    }
+
+    // Check start date future validation last
+    if (startDate < today) {
+      return helpers.error('custom.startDate.todayOrFuture')
+    }
 
     return value
   })
   .messages({
-    [JOI_ERRORS.CUSTOM_START_DATE_INVALID]:
-      JOI_ERRORS.CUSTOM_START_DATE_INVALID,
-    [JOI_ERRORS.CUSTOM_END_DATE_INVALID]: JOI_ERRORS.CUSTOM_END_DATE_INVALID,
-    [JOI_ERRORS.CUSTOM_START_DATE_TODAY_OR_FUTURE]:
+    'activity-start-date-day': JOI_ERRORS.ACTIVITY_START_DATE_DAY,
+    'activity-start-date-month': JOI_ERRORS.ACTIVITY_START_DATE_MONTH,
+    'activity-start-date-year': JOI_ERRORS.ACTIVITY_START_DATE_YEAR,
+    'activity-end-date-day': JOI_ERRORS.ACTIVITY_END_DATE_DAY,
+    'activity-end-date-month': JOI_ERRORS.ACTIVITY_END_DATE_MONTH,
+    'activity-end-date-year': JOI_ERRORS.ACTIVITY_END_DATE_YEAR,
+    'custom.startDate.todayOrFuture':
       JOI_ERRORS.CUSTOM_START_DATE_TODAY_OR_FUTURE,
-    [JOI_ERRORS.CUSTOM_END_DATE_TODAY_OR_FUTURE]:
-      JOI_ERRORS.CUSTOM_END_DATE_TODAY_OR_FUTURE,
-    [JOI_ERRORS.CUSTOM_END_DATE_BEFORE_START_DATE]:
+    'custom.startDate.invalid': JOI_ERRORS.CUSTOM_START_DATE_INVALID,
+    'custom.endDate.invalid': JOI_ERRORS.CUSTOM_END_DATE_INVALID,
+    'custom.endDate.todayOrFuture': JOI_ERRORS.CUSTOM_END_DATE_TODAY_OR_FUTURE,
+    'custom.endDate.before.startDate':
       JOI_ERRORS.CUSTOM_END_DATE_BEFORE_START_DATE
   })
+
+// Export constants for reuse
+export {
+  MIN_YEAR,
+  MAX_YEAR,
+  MAX_YEAR_OFFSET,
+  MAX_DAYS_IN_MONTH,
+  MAX_MONTHS_IN_YEAR
+}

@@ -59,7 +59,7 @@ const errorMessages = {
  * @param {string|number} day
  * @returns {string|null}
  */
-function createDateISO(year, month, day) {
+export function createDateISO(year, month, day) {
   const numYear = parseInt(year, 10)
   const numMonth = parseInt(month, 10)
   const numDay = parseInt(day, 10)
@@ -81,6 +81,10 @@ function createErrorTypeMap(errorDetails) {
   const errorTypeMap = {}
   errorDetails.forEach((detail) => {
     errorTypeMap[detail.type] = detail
+    // Also map by message for custom error types
+    if (detail.message !== detail.type) {
+      errorTypeMap[detail.message] = detail
+    }
   })
   return errorTypeMap
 }

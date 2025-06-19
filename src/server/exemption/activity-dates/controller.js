@@ -14,6 +14,15 @@ import { activityDatesSchema } from '~/src/server/common/schemas/date.js'
 
 export const ACTIVITY_DATES_VIEW_ROUTE = 'exemption/activity-dates/index'
 
+const FIELD_NAMES = {
+  START_DATE_DAY: 'activity-start-date-day',
+  START_DATE_MONTH: 'activity-start-date-month',
+  START_DATE_YEAR: 'activity-start-date-year',
+  END_DATE_DAY: 'activity-end-date-day',
+  END_DATE_MONTH: 'activity-end-date-month',
+  END_DATE_YEAR: 'activity-end-date-year'
+}
+
 const activityDatesViewSettings = {
   title: 'Activity dates',
   descriptionParagraphs: [
@@ -60,6 +69,190 @@ function createDateISO(year, month, day) {
 
   const date = new Date(Date.UTC(numYear, numMonth - 1, numDay))
   return date.toISOString()
+}
+
+/**
+ * Creates error type mapping from JOI error details
+ * @param {Array} errorDetails - JOI error details array
+ * @returns {Object} Error type mapping
+ */
+function createErrorTypeMap(errorDetails) {
+  const errorTypeMap = {}
+  errorDetails.forEach((detail) => {
+    errorTypeMap[detail.type] = detail
+  })
+  return errorTypeMap
+}
+
+/**
+ * Checks if all date components are missing for complete date validation
+ * @param {Object} errors - Error descriptions by field name
+ * @param {string} dateType - 'start' or 'end'
+ * @returns {boolean}
+ */
+function isCompleteDateMissing(errors, dateType) {
+  const dayError =
+    dateType === 'start'
+      ? JOI_ERRORS.ACTIVITY_START_DATE_DAY
+      : JOI_ERRORS.ACTIVITY_END_DATE_DAY
+  const monthError =
+    dateType === 'start'
+      ? JOI_ERRORS.ACTIVITY_START_DATE_MONTH
+      : JOI_ERRORS.ACTIVITY_END_DATE_MONTH
+  const yearError =
+    dateType === 'start'
+      ? JOI_ERRORS.ACTIVITY_START_DATE_YEAR
+      : JOI_ERRORS.ACTIVITY_END_DATE_YEAR
+
+  return errors[dayError] && errors[monthError] && errors[yearError]
+}
+
+/**
+ * Adds custom validation errors to error summary
+ * @param {Array} errorSummary - Current error summary array
+ * @param {Object} errorTypeMap - Error type mapping
+ */
+function addCustomValidationErrors(errorSummary, errorTypeMap) {
+  // Start date custom errors
+  if (errorTypeMap[JOI_ERRORS.CUSTOM_START_DATE_TODAY_OR_FUTURE]) {
+    errorSummary.push({
+      href: `#${FIELD_NAMES.START_DATE_DAY}`,
+      text: errorMessages[JOI_ERRORS.CUSTOM_START_DATE_TODAY_OR_FUTURE]
+    })
+  } else if (errorTypeMap[JOI_ERRORS.CUSTOM_START_DATE_INVALID]) {
+    errorSummary.push({
+      href: `#${FIELD_NAMES.START_DATE_DAY}`,
+      text: errorMessages[JOI_ERRORS.CUSTOM_START_DATE_INVALID]
+    })
+  }
+
+  // End date custom errors
+  if (errorTypeMap[JOI_ERRORS.CUSTOM_END_DATE_TODAY_OR_FUTURE]) {
+    errorSummary.push({
+      href: `#${FIELD_NAMES.END_DATE_DAY}`,
+      text: errorMessages[JOI_ERRORS.CUSTOM_END_DATE_TODAY_OR_FUTURE]
+    })
+  } else if (errorTypeMap[JOI_ERRORS.CUSTOM_END_DATE_INVALID]) {
+    errorSummary.push({
+      href: `#${FIELD_NAMES.END_DATE_DAY}`,
+      text: errorMessages[JOI_ERRORS.CUSTOM_END_DATE_INVALID]
+    })
+  }
+
+  // Date relationship error
+  if (errorTypeMap[JOI_ERRORS.CUSTOM_END_DATE_BEFORE_START_DATE]) {
+    errorSummary.push({
+      href: `#${FIELD_NAMES.END_DATE_DAY}`,
+      text: errorMessages[JOI_ERRORS.CUSTOM_END_DATE_BEFORE_START_DATE]
+    })
+  }
+}
+
+/**
+ * Handles missing complete date errors in summary
+ * @param {Array} errorSummary - Current error summary array
+ * @param {boolean} isStartMissing - Whether start date is completely missing
+ * @param {boolean} isEndMissing - Whether end date is completely missing
+ * @returns {Array} Modified error summary
+ */
+function handleMissingDateErrors(errorSummary, isStartMissing, isEndMissing) {
+  let modifiedSummary = [...errorSummary]
+
+  if (isStartMissing) {
+    modifiedSummary = modifiedSummary.filter(
+      (error) => !error.href.includes('#activity-start-date')
+    )
+    modifiedSummary.unshift({
+      href: `#${FIELD_NAMES.START_DATE_DAY}`,
+      text: errorMessages[JOI_ERRORS.CUSTOM_START_DATE_MISSING]
+    })
+  }
+
+  if (isEndMissing) {
+    modifiedSummary = modifiedSummary.filter(
+      (error) => !error.href.includes('#activity-end-date')
+    )
+    modifiedSummary.push({
+      href: `#${FIELD_NAMES.END_DATE_DAY}`,
+      text: errorMessages[JOI_ERRORS.CUSTOM_END_DATE_MISSING]
+    })
+  }
+
+  return modifiedSummary
+}
+
+/**
+ * Determines the appropriate error message for start date
+ * @param {boolean} isStartMissing - Whether start date is completely missing
+ * @param {Object} errorTypeMap - Error type mapping
+ * @param {Object} errors - Error descriptions by field name
+ * @returns {Object|null} Error message object or null
+ */
+function getStartDateErrorMessage(isStartMissing, errorTypeMap, errors) {
+  if (isStartMissing) {
+    return { text: errorMessages[JOI_ERRORS.CUSTOM_START_DATE_MISSING] }
+  }
+
+  if (errorTypeMap[JOI_ERRORS.CUSTOM_START_DATE_TODAY_OR_FUTURE]) {
+    return { text: errorMessages[JOI_ERRORS.CUSTOM_START_DATE_TODAY_OR_FUTURE] }
+  }
+
+  if (errorTypeMap[JOI_ERRORS.CUSTOM_START_DATE_INVALID]) {
+    return { text: errorMessages[JOI_ERRORS.CUSTOM_START_DATE_INVALID] }
+  }
+
+  if (errors[JOI_ERRORS.ACTIVITY_START_DATE_DAY]) {
+    return { text: errorMessages[JOI_ERRORS.ACTIVITY_START_DATE_DAY] }
+  }
+
+  if (errors[JOI_ERRORS.ACTIVITY_START_DATE_MONTH]) {
+    return { text: errorMessages[JOI_ERRORS.ACTIVITY_START_DATE_MONTH] }
+  }
+
+  if (errors[JOI_ERRORS.ACTIVITY_START_DATE_YEAR]) {
+    return { text: errorMessages[JOI_ERRORS.ACTIVITY_START_DATE_YEAR] }
+  }
+
+  return null
+}
+
+/**
+ * Determines the appropriate error message for end date
+ * @param {boolean} isEndMissing - Whether end date is completely missing
+ * @param {Object} errorTypeMap - Error type mapping
+ * @param {Object} errors - Error descriptions by field name
+ * @returns {Object|null} Error message object or null
+ */
+function getEndDateErrorMessage(isEndMissing, errorTypeMap, errors) {
+  if (isEndMissing) {
+    return { text: errorMessages[JOI_ERRORS.CUSTOM_END_DATE_MISSING] }
+  }
+
+  if (errorTypeMap[JOI_ERRORS.CUSTOM_END_DATE_TODAY_OR_FUTURE]) {
+    return { text: errorMessages[JOI_ERRORS.CUSTOM_END_DATE_TODAY_OR_FUTURE] }
+  }
+
+  if (errorTypeMap[JOI_ERRORS.CUSTOM_END_DATE_INVALID]) {
+    return { text: errorMessages[JOI_ERRORS.CUSTOM_END_DATE_INVALID] }
+  }
+
+  if (errorTypeMap[JOI_ERRORS.CUSTOM_END_DATE_BEFORE_START_DATE]) {
+    return { text: errorMessages[JOI_ERRORS.CUSTOM_END_DATE_BEFORE_START_DATE] }
+  }
+
+  if (errors[JOI_ERRORS.ACTIVITY_END_DATE_DAY]) {
+    return { text: errorMessages[JOI_ERRORS.ACTIVITY_END_DATE_DAY] }
+  }
+
+  if (errors[JOI_ERRORS.ACTIVITY_END_DATE_MONTH]) {
+    return { text: errorMessages[JOI_ERRORS.ACTIVITY_END_DATE_MONTH] }
+  }
+
+  if (errors[JOI_ERRORS.ACTIVITY_END_DATE_YEAR]) {
+    return { text: errorMessages[JOI_ERRORS.ACTIVITY_END_DATE_YEAR] }
+  }
+
+  return null
 }
 
 /**
@@ -128,142 +321,44 @@ export const activityDatesSubmitController = {
 
         const errorSummary = mapErrorsForDisplay(err.details, errorMessages)
         const errors = errorDescriptionByFieldName(errorSummary)
+        const errorTypeMap = createErrorTypeMap(err.details)
 
-        const errorTypeMap = {}
-        err.details.forEach((detail) => {
-          errorTypeMap[detail.type] = detail
-        })
-
-        // Check if all three date components are missing to consolidate error messages
-        const isStartMissing =
-          errors[JOI_ERRORS.ACTIVITY_START_DATE_DAY] &&
-          errors[JOI_ERRORS.ACTIVITY_START_DATE_MONTH] &&
-          errors[JOI_ERRORS.ACTIVITY_START_DATE_YEAR]
-
-        const isEndMissing =
-          errors[JOI_ERRORS.ACTIVITY_END_DATE_DAY] &&
-          errors[JOI_ERRORS.ACTIVITY_END_DATE_MONTH] &&
-          errors[JOI_ERRORS.ACTIVITY_END_DATE_YEAR]
+        const isStartMissing = isCompleteDateMissing(errors, 'start')
+        const isEndMissing = isCompleteDateMissing(errors, 'end')
 
         let modifiedErrorSummary = errorSummary.filter(
           (error) =>
             error.href && error.href !== '#' && error.href !== '#undefined'
         )
-        let startDateErrorMessage = null
-        let endDateErrorMessage = null
 
-        // Prioritize specific error messages over generic ones
-        if (errorTypeMap[JOI_ERRORS.CUSTOM_START_DATE_TODAY_OR_FUTURE]) {
-          modifiedErrorSummary.push({
-            href: '#activity-start-date-day',
-            text: errorMessages[JOI_ERRORS.CUSTOM_START_DATE_TODAY_OR_FUTURE]
-          })
-        } else if (errorTypeMap[JOI_ERRORS.CUSTOM_START_DATE_INVALID]) {
-          modifiedErrorSummary.push({
-            href: '#activity-start-date-day',
-            text: errorMessages[JOI_ERRORS.CUSTOM_START_DATE_INVALID]
-          })
-        }
+        addCustomValidationErrors(modifiedErrorSummary, errorTypeMap)
+        modifiedErrorSummary = handleMissingDateErrors(
+          modifiedErrorSummary,
+          isStartMissing,
+          isEndMissing
+        )
 
-        if (errorTypeMap[JOI_ERRORS.CUSTOM_END_DATE_TODAY_OR_FUTURE]) {
-          modifiedErrorSummary.push({
-            href: '#activity-end-date-day',
-            text: errorMessages[JOI_ERRORS.CUSTOM_END_DATE_TODAY_OR_FUTURE]
-          })
-        } else if (errorTypeMap[JOI_ERRORS.CUSTOM_END_DATE_INVALID]) {
-          modifiedErrorSummary.push({
-            href: '#activity-end-date-day',
-            text: errorMessages[JOI_ERRORS.CUSTOM_END_DATE_INVALID]
-          })
-        }
-
-        if (errorTypeMap[JOI_ERRORS.CUSTOM_END_DATE_BEFORE_START_DATE]) {
-          modifiedErrorSummary.push({
-            href: '#activity-end-date-day',
-            text: errorMessages[JOI_ERRORS.CUSTOM_END_DATE_BEFORE_START_DATE]
-          })
-        }
-
-        if (isStartMissing) {
-          modifiedErrorSummary = modifiedErrorSummary.filter(
-            (error) => !error.href.includes('#activity-start-date')
-          )
-          modifiedErrorSummary.unshift({
-            href: '#activity-start-date-day',
-            text: errorMessages[JOI_ERRORS.CUSTOM_START_DATE_MISSING]
-          })
-          startDateErrorMessage = {
-            text: errorMessages[JOI_ERRORS.CUSTOM_START_DATE_MISSING]
-          }
-        } else if (errorTypeMap[JOI_ERRORS.CUSTOM_START_DATE_TODAY_OR_FUTURE]) {
-          startDateErrorMessage = {
-            text: errorMessages[JOI_ERRORS.CUSTOM_START_DATE_TODAY_OR_FUTURE]
-          }
-        } else if (errorTypeMap[JOI_ERRORS.CUSTOM_START_DATE_INVALID]) {
-          startDateErrorMessage = {
-            text: errorMessages[JOI_ERRORS.CUSTOM_START_DATE_INVALID]
-          }
-        } else if (errors[JOI_ERRORS.ACTIVITY_START_DATE_DAY]) {
-          startDateErrorMessage = {
-            text: errorMessages[JOI_ERRORS.ACTIVITY_START_DATE_DAY]
-          }
-        } else if (errors[JOI_ERRORS.ACTIVITY_START_DATE_MONTH]) {
-          startDateErrorMessage = {
-            text: errorMessages[JOI_ERRORS.ACTIVITY_START_DATE_MONTH]
-          }
-        } else if (errors[JOI_ERRORS.ACTIVITY_START_DATE_YEAR]) {
-          startDateErrorMessage = {
-            text: errorMessages[JOI_ERRORS.ACTIVITY_START_DATE_YEAR]
-          }
-        }
-
-        if (isEndMissing) {
-          modifiedErrorSummary = modifiedErrorSummary.filter(
-            (error) => !error.href.includes('#activity-end-date')
-          )
-          modifiedErrorSummary.push({
-            href: '#activity-end-date-day',
-            text: errorMessages[JOI_ERRORS.CUSTOM_END_DATE_MISSING]
-          })
-          endDateErrorMessage = {
-            text: errorMessages[JOI_ERRORS.CUSTOM_END_DATE_MISSING]
-          }
-        } else if (errorTypeMap[JOI_ERRORS.CUSTOM_END_DATE_TODAY_OR_FUTURE]) {
-          endDateErrorMessage = {
-            text: errorMessages[JOI_ERRORS.CUSTOM_END_DATE_TODAY_OR_FUTURE]
-          }
-        } else if (errorTypeMap[JOI_ERRORS.CUSTOM_END_DATE_INVALID]) {
-          endDateErrorMessage = {
-            text: errorMessages[JOI_ERRORS.CUSTOM_END_DATE_INVALID]
-          }
-        } else if (errorTypeMap[JOI_ERRORS.CUSTOM_END_DATE_BEFORE_START_DATE]) {
-          endDateErrorMessage = {
-            text: errorMessages[JOI_ERRORS.CUSTOM_END_DATE_BEFORE_START_DATE]
-          }
-        } else if (errors[JOI_ERRORS.ACTIVITY_END_DATE_DAY]) {
-          endDateErrorMessage = {
-            text: errorMessages[JOI_ERRORS.ACTIVITY_END_DATE_DAY]
-          }
-        } else if (errors[JOI_ERRORS.ACTIVITY_END_DATE_MONTH]) {
-          endDateErrorMessage = {
-            text: errorMessages[JOI_ERRORS.ACTIVITY_END_DATE_MONTH]
-          }
-        } else if (errors[JOI_ERRORS.ACTIVITY_END_DATE_YEAR]) {
-          endDateErrorMessage = {
-            text: errorMessages[JOI_ERRORS.ACTIVITY_END_DATE_YEAR]
-          }
-        }
+        const startDateErrorMessage = getStartDateErrorMessage(
+          isStartMissing,
+          errorTypeMap,
+          errors
+        )
+        const endDateErrorMessage = getEndDateErrorMessage(
+          isEndMissing,
+          errorTypeMap,
+          errors
+        )
 
         return h
           .view(ACTIVITY_DATES_VIEW_ROUTE, {
             ...activityDatesViewSettings,
             projectName: exemption.projectName,
-            activityStartDateDay: payload['activity-start-date-day'] || '',
-            activityStartDateMonth: payload['activity-start-date-month'] || '',
-            activityStartDateYear: payload['activity-start-date-year'] || '',
-            activityEndDateDay: payload['activity-end-date-day'] || '',
-            activityEndDateMonth: payload['activity-end-date-month'] || '',
-            activityEndDateYear: payload['activity-end-date-year'] || '',
+            activityStartDateDay: payload[FIELD_NAMES.START_DATE_DAY] || '',
+            activityStartDateMonth: payload[FIELD_NAMES.START_DATE_MONTH] || '',
+            activityStartDateYear: payload[FIELD_NAMES.START_DATE_YEAR] || '',
+            activityEndDateDay: payload[FIELD_NAMES.END_DATE_DAY] || '',
+            activityEndDateMonth: payload[FIELD_NAMES.END_DATE_MONTH] || '',
+            activityEndDateYear: payload[FIELD_NAMES.END_DATE_YEAR] || '',
             errors,
             errorSummary: modifiedErrorSummary,
             startDateErrorMessage,
@@ -279,15 +374,15 @@ export const activityDatesSubmitController = {
 
     try {
       const start = createDateISO(
-        payload['activity-start-date-year'],
-        payload['activity-start-date-month'],
-        payload['activity-start-date-day']
+        payload[FIELD_NAMES.START_DATE_YEAR],
+        payload[FIELD_NAMES.START_DATE_MONTH],
+        payload[FIELD_NAMES.START_DATE_DAY]
       )
 
       const end = createDateISO(
-        payload['activity-end-date-year'],
-        payload['activity-end-date-month'],
-        payload['activity-end-date-day']
+        payload[FIELD_NAMES.END_DATE_YEAR],
+        payload[FIELD_NAMES.END_DATE_MONTH],
+        payload[FIELD_NAMES.END_DATE_DAY]
       )
 
       await Wreck.patch(
@@ -324,12 +419,12 @@ export const activityDatesSubmitController = {
       return h.view(ACTIVITY_DATES_VIEW_ROUTE, {
         ...activityDatesViewSettings,
         projectName: exemption.projectName,
-        activityStartDateDay: payload['activity-start-date-day'] || '',
-        activityStartDateMonth: payload['activity-start-date-month'] || '',
-        activityStartDateYear: payload['activity-start-date-year'] || '',
-        activityEndDateDay: payload['activity-end-date-day'] || '',
-        activityEndDateMonth: payload['activity-end-date-month'] || '',
-        activityEndDateYear: payload['activity-end-date-year'] || '',
+        activityStartDateDay: payload[FIELD_NAMES.START_DATE_DAY] || '',
+        activityStartDateMonth: payload[FIELD_NAMES.START_DATE_MONTH] || '',
+        activityStartDateYear: payload[FIELD_NAMES.START_DATE_YEAR] || '',
+        activityEndDateDay: payload[FIELD_NAMES.END_DATE_DAY] || '',
+        activityEndDateMonth: payload[FIELD_NAMES.END_DATE_MONTH] || '',
+        activityEndDateYear: payload[FIELD_NAMES.END_DATE_YEAR] || '',
         errors,
         errorSummary
       })

@@ -42,6 +42,122 @@ function isDateTodayOrFuture(date) {
   return date >= today
 }
 
+/**
+ * Validates if date component values are valid numbers
+ * @param {number} day
+ * @param {number} month
+ * @param {number} year
+ * @returns {boolean}
+ */
+function areComponentsValidNumbers(day, month, year) {
+  return !isNaN(day) && !isNaN(month) && !isNaN(year)
+}
+
+/**
+ * Validates if date component values are within valid ranges
+ * @param {number} day
+ * @param {number} month
+ * @param {number} year
+ * @returns {boolean}
+ */
+function areComponentsInValidRange(day, month, year) {
+  return (
+    day >= 1 &&
+    day <= MAX_DAYS_IN_MONTH &&
+    month >= 1 &&
+    month <= MAX_MONTHS_IN_YEAR &&
+    year >= MIN_YEAR &&
+    year <= MAX_YEAR
+  )
+}
+
+/**
+ * Extracts and parses date components from form value
+ * @param {Object} value - Form data object
+ * @returns {Object} Parsed date components
+ */
+function extractDateComponents(value) {
+  return {
+    startDay: parseInt(value['activity-start-date-day'], 10),
+    startMonth: parseInt(value['activity-start-date-month'], 10),
+    startYear: parseInt(value['activity-start-date-year'], 10),
+    endDay: parseInt(value['activity-end-date-day'], 10),
+    endMonth: parseInt(value['activity-end-date-month'], 10),
+    endYear: parseInt(value['activity-end-date-year'], 10)
+  }
+}
+
+/**
+ * Validates start date components and returns error if invalid
+ * @param {number} startDay
+ * @param {number} startMonth
+ * @param {number} startYear
+ * @param {Object} helpers - Joi helpers object
+ * @returns {Object|null} Error object or null if valid
+ */
+function validateStartDateComponents(startDay, startMonth, startYear, helpers) {
+  if (!areComponentsValidNumbers(startDay, startMonth, startYear)) {
+    return helpers.error(JOI_ERRORS.CUSTOM_START_DATE_INVALID)
+  }
+
+  if (!areComponentsInValidRange(startDay, startMonth, startYear)) {
+    return helpers.error(JOI_ERRORS.CUSTOM_START_DATE_INVALID)
+  }
+
+  return null
+}
+
+/**
+ * Validates end date components and returns error if invalid
+ * @param {number} endDay
+ * @param {number} endMonth
+ * @param {number} endYear
+ * @param {Object} helpers - Joi helpers object
+ * @returns {Object|null} Error object or null if valid
+ */
+function validateEndDateComponents(endDay, endMonth, endYear, helpers) {
+  if (!areComponentsValidNumbers(endDay, endMonth, endYear)) {
+    return helpers.error(JOI_ERRORS.CUSTOM_END_DATE_INVALID)
+  }
+
+  if (!areComponentsInValidRange(endDay, endMonth, endYear)) {
+    return helpers.error(JOI_ERRORS.CUSTOM_END_DATE_INVALID)
+  }
+
+  return null
+}
+
+/**
+ * Validates date objects and relationships
+ * @param {Date} startDate
+ * @param {Date} endDate
+ * @param {Object} helpers - Joi helpers object
+ * @returns {Object|null} Error object or null if valid
+ */
+function validateDateRelationships(startDate, endDate, helpers) {
+  if (!startDate) {
+    return helpers.error(JOI_ERRORS.CUSTOM_START_DATE_INVALID)
+  }
+
+  if (!endDate) {
+    return helpers.error(JOI_ERRORS.CUSTOM_END_DATE_INVALID)
+  }
+
+  if (endDate < startDate) {
+    return helpers.error(JOI_ERRORS.CUSTOM_END_DATE_BEFORE_START_DATE)
+  }
+
+  if (!isDateTodayOrFuture(startDate)) {
+    return helpers.error(JOI_ERRORS.CUSTOM_START_DATE_TODAY_OR_FUTURE)
+  }
+
+  if (!isDateTodayOrFuture(endDate)) {
+    return helpers.error(JOI_ERRORS.CUSTOM_END_DATE_TODAY_OR_FUTURE)
+  }
+
+  return null
+}
+
 export const activityDatesSchema = joi
   .object({
     'activity-start-date-day': joi
@@ -96,67 +212,34 @@ export const activityDatesSchema = joi
       })
   })
   .custom((value, helpers) => {
-    const startDay = parseInt(value['activity-start-date-day'], 10)
-    const startMonth = parseInt(value['activity-start-date-month'], 10)
-    const startYear = parseInt(value['activity-start-date-year'], 10)
+    const { startDay, startMonth, startYear, endDay, endMonth, endYear } =
+      extractDateComponents(value)
 
-    const endDay = parseInt(value['activity-end-date-day'], 10)
-    const endMonth = parseInt(value['activity-end-date-month'], 10)
-    const endYear = parseInt(value['activity-end-date-year'], 10)
+    const startDateError = validateStartDateComponents(
+      startDay,
+      startMonth,
+      startYear,
+      helpers
+    )
+    if (startDateError) return startDateError
 
-    if (isNaN(startDay) || isNaN(startMonth) || isNaN(startYear)) {
-      return helpers.error(JOI_ERRORS.CUSTOM_START_DATE_INVALID)
-    }
-
-    if (isNaN(endDay) || isNaN(endMonth) || isNaN(endYear)) {
-      return helpers.error(JOI_ERRORS.CUSTOM_END_DATE_INVALID)
-    }
-
-    if (
-      startDay < 1 ||
-      startDay > MAX_DAYS_IN_MONTH ||
-      startMonth < 1 ||
-      startMonth > MAX_MONTHS_IN_YEAR ||
-      startYear < MIN_YEAR ||
-      startYear > MAX_YEAR
-    ) {
-      return helpers.error(JOI_ERRORS.CUSTOM_START_DATE_INVALID)
-    }
-
-    if (
-      endDay < 1 ||
-      endDay > MAX_DAYS_IN_MONTH ||
-      endMonth < 1 ||
-      endMonth > MAX_MONTHS_IN_YEAR ||
-      endYear < MIN_YEAR ||
-      endYear > MAX_YEAR
-    ) {
-      return helpers.error(JOI_ERRORS.CUSTOM_END_DATE_INVALID)
-    }
+    const endDateError = validateEndDateComponents(
+      endDay,
+      endMonth,
+      endYear,
+      helpers
+    )
+    if (endDateError) return endDateError
 
     const startDate = createDateFromComponents(startYear, startMonth, startDay)
-    if (!startDate) {
-      return helpers.error(JOI_ERRORS.CUSTOM_START_DATE_INVALID)
-    }
-
     const endDate = createDateFromComponents(endYear, endMonth, endDay)
-    if (!endDate) {
-      return helpers.error(JOI_ERRORS.CUSTOM_END_DATE_INVALID)
-    }
 
-    // REORDER: Check date relationships BEFORE checking if dates are in the future
-    // This ensures more specific error messages are shown first
-    if (endDate < startDate) {
-      return helpers.error(JOI_ERRORS.CUSTOM_END_DATE_BEFORE_START_DATE)
-    }
-
-    if (!isDateTodayOrFuture(startDate)) {
-      return helpers.error(JOI_ERRORS.CUSTOM_START_DATE_TODAY_OR_FUTURE)
-    }
-
-    if (!isDateTodayOrFuture(endDate)) {
-      return helpers.error(JOI_ERRORS.CUSTOM_END_DATE_TODAY_OR_FUTURE)
-    }
+    const relationshipError = validateDateRelationships(
+      startDate,
+      endDate,
+      helpers
+    )
+    if (relationshipError) return relationshipError
 
     return value
   })

@@ -77,6 +77,7 @@ describe('#activityDatesController', () => {
           "You can enter a start date from today and begin your activity as soon as you've sent your information."
         ],
         backLink: routes.TASK_LIST,
+        cancelLink: routes.TASK_LIST,
         projectName: mockExemptionState.projectName,
         activityStartDateDay: '',
         activityStartDateMonth: '',
@@ -110,6 +111,7 @@ describe('#activityDatesController', () => {
           "You can enter a start date from today and begin your activity as soon as you've sent your information."
         ],
         backLink: routes.TASK_LIST,
+        cancelLink: routes.TASK_LIST,
         projectName: exemptionWithDates.projectName,
         activityStartDateDay: '15',
         activityStartDateMonth: '6',

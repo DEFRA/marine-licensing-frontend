@@ -29,7 +29,8 @@ const activityDatesViewSettings = {
     "Enter the activity dates. Allow time for potential delays, like consents (for example, a river works licence) or bad weather. If you miss the dates, you'll need to restart the process.",
     "You can enter a start date from today and begin your activity as soon as you've sent your information."
   ],
-  backLink: routes.TASK_LIST
+  backLink: routes.TASK_LIST,
+  cancelLink: routes.TASK_LIST
 }
 
 const errorMessages = {
@@ -74,7 +75,7 @@ function createDateISO(year, month, day) {
 /**
  * Creates error type mapping from JOI error details
  * @param {Array} errorDetails - JOI error details array
- * @returns {Object} Error type mapping
+ * @returns {object} Error type mapping
  */
 function createErrorTypeMap(errorDetails) {
   const errorTypeMap = {}
@@ -86,7 +87,7 @@ function createErrorTypeMap(errorDetails) {
 
 /**
  * Checks if all date components are missing for complete date validation
- * @param {Object} errors - Error descriptions by field name
+ * @param {object} errors - Error descriptions by field name
  * @param {string} dateType - 'start' or 'end'
  * @returns {boolean}
  */
@@ -110,7 +111,7 @@ function isCompleteDateMissing(errors, dateType) {
 /**
  * Adds custom validation errors to error summary
  * @param {Array} errorSummary - Current error summary array
- * @param {Object} errorTypeMap - Error type mapping
+ * @param {object} errorTypeMap - Error type mapping
  */
 function addCustomValidationErrors(errorSummary, errorTypeMap) {
   // Start date custom errors
@@ -184,9 +185,9 @@ function handleMissingDateErrors(errorSummary, isStartMissing, isEndMissing) {
 /**
  * Determines the appropriate error message for start date
  * @param {boolean} isStartMissing - Whether start date is completely missing
- * @param {Object} errorTypeMap - Error type mapping
- * @param {Object} errors - Error descriptions by field name
- * @returns {Object|null} Error message object or null
+ * @param {object} errorTypeMap - Error type mapping
+ * @param {object} errors - Error descriptions by field name
+ * @returns {object|null} Error message object or null
  */
 function getStartDateErrorMessage(isStartMissing, errorTypeMap, errors) {
   if (isStartMissing) {
@@ -219,9 +220,9 @@ function getStartDateErrorMessage(isStartMissing, errorTypeMap, errors) {
 /**
  * Determines the appropriate error message for end date
  * @param {boolean} isEndMissing - Whether end date is completely missing
- * @param {Object} errorTypeMap - Error type mapping
- * @param {Object} errors - Error descriptions by field name
- * @returns {Object|null} Error message object or null
+ * @param {object} errorTypeMap - Error type mapping
+ * @param {object} errors - Error descriptions by field name
+ * @returns {object|null} Error message object or null
  */
 function getEndDateErrorMessage(isEndMissing, errorTypeMap, errors) {
   if (isEndMissing) {

@@ -2,8 +2,10 @@ import joi from 'joi'
 import { JOI_ERRORS } from '~/src/server/common/constants/joi.js'
 
 const CURRENT_YEAR = new Date().getFullYear()
-const MIN_YEAR = CURRENT_YEAR - 10 // Allow 10 years in the past for reasonable range validation
-const MAX_YEAR = CURRENT_YEAR + 75
+const YEARS_IN_PAST_ALLOWED = 10 // Allow 10 years in the past for reasonable range validation
+const YEARS_IN_FUTURE_ALLOWED = 75 // Allow 75 years in the future for long-term planning
+const MIN_YEAR = CURRENT_YEAR - YEARS_IN_PAST_ALLOWED
+const MAX_YEAR = CURRENT_YEAR + YEARS_IN_FUTURE_ALLOWED
 const MAX_DAYS_IN_MONTH = 31
 const MAX_MONTHS_IN_YEAR = 12
 

@@ -1,7 +1,13 @@
 import joi from 'joi'
+import dayjs from 'dayjs'
+import utc from 'dayjs/plugin/utc'
+import customParseFormat from 'dayjs/plugin/customParseFormat'
 import { JOI_ERRORS } from '~/src/server/common/constants/joi.js'
 
-const MIN_YEAR = new Date().getFullYear()
+dayjs.extend(utc)
+dayjs.extend(customParseFormat)
+
+const MIN_YEAR = dayjs().year()
 const MAX_YEAR_OFFSET = 75
 const MAX_YEAR = MIN_YEAR + MAX_YEAR_OFFSET
 
@@ -62,21 +68,36 @@ export const individualDate = ({
 })
 
 /**
- * Validates if a date object matches its components
- * @param {object} params - Parameters object
- * @param {Date} params.date - Date object to validate
- * @param {number} params.day - Day component
- * @param {number} params.month - Month component
- * @param {number} params.year - Year component
- * @returns {boolean} True if date matches components
+ * Validates if date components form a valid Day.js date
+ * @param {number} year - Year component
+ * @param {number} month - Month component (1-12)
+ * @param {number} day - Day component (1-31)
+ * @returns {boolean} True if date is valid
  */
-const isValidDate = ({ date, day, month, year }) =>
-  date.getUTCFullYear() === year &&
-  date.getUTCMonth() === month - 1 &&
-  date.getUTCDate() === day
+const isValidDate = (year, month, day) => {
+  // Create the date with strict parsing
+  const date = dayjs.utc(
+    `${year}-${month.toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}`,
+    'YYYY-MM-DD',
+    true
+  )
+
+  // Check if Day.js created a valid date AND the components match exactly
+  // This prevents Day.js from "correcting" invalid dates like Feb 30th -> Mar 2nd
+  if (!date.isValid()) {
+    return false
+  }
+
+  // Verify the parsed date components match the input exactly
+  return (
+    date.year() === year &&
+    date.month() + 1 === month && // Day.js months are 0-indexed
+    date.date() === day
+  )
+}
 
 /**
- * Activity dates schema for start and end date validation
+ * Activity dates schema for start and end date validation using Day.js
  */
 export const activityDatesSchema = joi
   .object({
@@ -103,47 +124,40 @@ export const activityDatesSchema = joi
       'activity-end-date-year': endYear
     } = value
 
-    const startDate = new Date(Date.UTC(startYear, startMonth - 1, startDay))
-    const endDate = new Date(Date.UTC(endYear, endMonth - 1, endDay))
-    const today = new Date()
-    today.setHours(0, 0, 0, 0)
-
-    // Validate start date is a real date
-    if (
-      !isValidDate({
-        date: startDate,
-        day: startDay,
-        month: startMonth,
-        year: startYear
-      })
-    ) {
+    // Validate start date components form a valid date
+    if (!isValidDate(startYear, startMonth, startDay)) {
       return helpers.error('custom.startDate.invalid')
     }
 
-    // Validate end date is a real date
-    if (
-      !isValidDate({
-        date: endDate,
-        day: endDay,
-        month: endMonth,
-        year: endYear
-      })
-    ) {
+    // Validate end date components form a valid date
+    if (!isValidDate(endYear, endMonth, endDay)) {
       return helpers.error('custom.endDate.invalid')
     }
 
-    // Check end date future validation before date order (for consistency with existing behavior)
-    if (endDate < today) {
-      return helpers.error('custom.endDate.todayOrFuture')
-    }
+    // Create Day.js dates for comparison (we know they're valid now)
+    const startDate = dayjs.utc(
+      `${startYear}-${startMonth.toString().padStart(2, '0')}-${startDay.toString().padStart(2, '0')}`,
+      'YYYY-MM-DD'
+    )
+    const endDate = dayjs.utc(
+      `${endYear}-${endMonth.toString().padStart(2, '0')}-${endDay.toString().padStart(2, '0')}`,
+      'YYYY-MM-DD'
+    )
+    const today = dayjs.utc().startOf('day')
 
-    // Validate date order
-    if (endDate < startDate) {
+    // Check date order first - if end date is before start date, show that error
+    // regardless of whether dates are in the past
+    if (endDate.isBefore(startDate, 'day')) {
       return helpers.error('custom.endDate.before.startDate')
     }
 
+    // Then check future date validation for end date
+    if (endDate.isBefore(today, 'day')) {
+      return helpers.error('custom.endDate.todayOrFuture')
+    }
+
     // Check start date future validation last
-    if (startDate < today) {
+    if (startDate.isBefore(today, 'day')) {
       return helpers.error('custom.startDate.todayOrFuture')
     }
 

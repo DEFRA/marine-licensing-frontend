@@ -11,6 +11,10 @@ import { config } from '~/src/config/config.js'
 import { routes } from '~/src/server/common/constants/routes.js'
 import { JOI_ERRORS } from '~/src/server/common/constants/joi.js'
 import { activityDatesSchema } from '~/src/server/common/schemas/date.js'
+import {
+  createDateISO,
+  extractDateComponents
+} from '~/src/server/common/helpers/date-utils.js'
 
 export const ACTIVITY_DATES_VIEW_ROUTE = 'exemption/activity-dates/index'
 
@@ -53,23 +57,55 @@ export const errorMessages = {
 }
 
 /**
- * Creates a date from individual components and returns ISO string
- * @param {string|number} year
- * @param {string|number} month
- * @param {string|number} day
- * @returns {string|null}
+ * Extracts date fields from payload for display
+ * @param {object} payload - Form payload
+ * @returns {object} Date field values
  */
-export function createDateISO(year, month, day) {
-  const numYear = parseInt(year, 10)
-  const numMonth = parseInt(month, 10)
-  const numDay = parseInt(day, 10)
+export function extractDateFieldsFromPayload(payload) {
+  return {
+    activityStartDateDay: payload[FIELD_NAMES.START_DATE_DAY] || '',
+    activityStartDateMonth: payload[FIELD_NAMES.START_DATE_MONTH] || '',
+    activityStartDateYear: payload[FIELD_NAMES.START_DATE_YEAR] || '',
+    activityEndDateDay: payload[FIELD_NAMES.END_DATE_DAY] || '',
+    activityEndDateMonth: payload[FIELD_NAMES.END_DATE_MONTH] || '',
+    activityEndDateYear: payload[FIELD_NAMES.END_DATE_YEAR] || ''
+  }
+}
 
-  if (isNaN(numYear) || isNaN(numMonth) || isNaN(numDay)) {
-    return null
+/**
+ * Creates base template data with date fields
+ * @param {object} exemption - Exemption cache data
+ * @param {object} payload - Optional form payload
+ * @returns {object} Template data
+ */
+export function createTemplateData(exemption, payload = null) {
+  let dateFields
+
+  if (payload) {
+    dateFields = extractDateFieldsFromPayload(payload)
+  } else {
+    const startDateComponents = extractDateComponents(
+      exemption.activityDates?.start
+    )
+    const endDateComponents = extractDateComponents(
+      exemption.activityDates?.end
+    )
+
+    dateFields = {
+      activityStartDateDay: startDateComponents.day,
+      activityStartDateMonth: startDateComponents.month,
+      activityStartDateYear: startDateComponents.year,
+      activityEndDateDay: endDateComponents.day,
+      activityEndDateMonth: endDateComponents.month,
+      activityEndDateYear: endDateComponents.year
+    }
   }
 
-  const date = new Date(Date.UTC(numYear, numMonth - 1, numDay))
-  return date.toISOString()
+  return {
+    ...activityDatesViewSettings,
+    projectName: exemption.projectName,
+    ...dateFields
+  }
 }
 
 /**
@@ -118,6 +154,16 @@ function isCompleteDateMissing(errors, dateType) {
  * @param {object} errorTypeMap - Error type mapping
  */
 export function addCustomValidationErrors(errorSummary, errorTypeMap) {
+  // Check for number.max errors that should be treated as invalid date errors
+  const hasStartInvalidFieldErrors = hasNumberMaxErrorsForDate(
+    'start',
+    errorTypeMap
+  )
+  const hasEndInvalidFieldErrors = hasNumberMaxErrorsForDate(
+    'end',
+    errorTypeMap
+  )
+
   // Start date custom errors - check for today/future first (higher priority)
   let startDateErrorAdded = false
 
@@ -129,15 +175,18 @@ export function addCustomValidationErrors(errorSummary, errorTypeMap) {
     startDateErrorAdded = true
   }
 
-  // Only add invalid date error if no today/future error was added
+  // Add invalid date error if no today/future error was added AND we have either
+  // a custom invalid error OR number.max errors for date fields
   if (
     !startDateErrorAdded &&
-    errorTypeMap[JOI_ERRORS.CUSTOM_START_DATE_INVALID]
+    (errorTypeMap[JOI_ERRORS.CUSTOM_START_DATE_INVALID] ||
+      hasStartInvalidFieldErrors)
   ) {
     errorSummary.push({
       href: `#${FIELD_NAMES.START_DATE_DAY}`,
       text: errorMessages[JOI_ERRORS.CUSTOM_START_DATE_INVALID]
     })
+    startDateErrorAdded = true
   }
 
   // End date custom errors - check for today/future first (higher priority)
@@ -151,12 +200,18 @@ export function addCustomValidationErrors(errorSummary, errorTypeMap) {
     endDateErrorAdded = true
   }
 
-  // Only add invalid date error if no today/future error was added
-  if (!endDateErrorAdded && errorTypeMap[JOI_ERRORS.CUSTOM_END_DATE_INVALID]) {
+  // Add invalid date error if no today/future error was added AND we have either
+  // a custom invalid error OR number.max errors for date fields
+  if (
+    !endDateErrorAdded &&
+    (errorTypeMap[JOI_ERRORS.CUSTOM_END_DATE_INVALID] ||
+      hasEndInvalidFieldErrors)
+  ) {
     errorSummary.push({
       href: `#${FIELD_NAMES.END_DATE_DAY}`,
       text: errorMessages[JOI_ERRORS.CUSTOM_END_DATE_INVALID]
     })
+    endDateErrorAdded = true
   }
 
   // Date relationship error
@@ -202,6 +257,121 @@ function handleMissingDateErrors(errorSummary, isStartMissing, isEndMissing) {
 }
 
 /**
+ * Checks if there are any number.max errors for date fields that should be treated as invalid date errors
+ * @param {string} dateType - 'start' or 'end'
+ * @param {object} errorTypeMap - Error type mapping
+ * @returns {boolean} True if there are number.max errors for date fields
+ */
+function hasNumberMaxErrorsForDate(dateType, errorTypeMap) {
+  const prefix =
+    dateType === 'start' ? 'activity-start-date' : 'activity-end-date'
+  const dayField = `${prefix}-day`
+  const monthField = `${prefix}-month`
+
+  // Check if any of the date field errors are caused by number.max validation
+  const dayError = errorTypeMap[dayField]
+  const monthError = errorTypeMap[monthField]
+
+  return (
+    (dayError && dayError.type === 'number.max') ||
+    (monthError && monthError.type === 'number.max')
+  )
+}
+
+/**
+ * Generic error message resolver for date fields
+ * @param {string} dateType - 'start' or 'end'
+ * @param {boolean} isDateMissing - Whether date is completely missing
+ * @param {object} errorTypeMap - Error type mapping
+ * @param {object} errors - Error descriptions by field name
+ * @returns {object|null} Error message object or null
+ */
+function getDateErrorMessage(dateType, isDateMissing, errorTypeMap, errors) {
+  // Check if we have number.max errors that should be treated as invalid date errors
+  const hasInvalidDateFieldErrors = hasNumberMaxErrorsForDate(
+    dateType,
+    errorTypeMap
+  )
+
+  const errorPriority =
+    dateType === 'start'
+      ? [
+          {
+            condition: isDateMissing,
+            key: JOI_ERRORS.CUSTOM_START_DATE_MISSING
+          },
+          {
+            condition:
+              errorTypeMap[JOI_ERRORS.CUSTOM_START_DATE_INVALID] ||
+              hasInvalidDateFieldErrors,
+            key: JOI_ERRORS.CUSTOM_START_DATE_INVALID
+          },
+          {
+            condition:
+              errorTypeMap[JOI_ERRORS.CUSTOM_START_DATE_TODAY_OR_FUTURE],
+            key: JOI_ERRORS.CUSTOM_START_DATE_TODAY_OR_FUTURE
+          },
+          {
+            condition:
+              errors[JOI_ERRORS.ACTIVITY_START_DATE_DAY] &&
+              !hasInvalidDateFieldErrors,
+            key: JOI_ERRORS.ACTIVITY_START_DATE_DAY
+          },
+          {
+            condition:
+              errors[JOI_ERRORS.ACTIVITY_START_DATE_MONTH] &&
+              !hasInvalidDateFieldErrors,
+            key: JOI_ERRORS.ACTIVITY_START_DATE_MONTH
+          },
+          {
+            condition:
+              errors[JOI_ERRORS.ACTIVITY_START_DATE_YEAR] &&
+              !hasInvalidDateFieldErrors,
+            key: JOI_ERRORS.ACTIVITY_START_DATE_YEAR
+          }
+        ]
+      : [
+          { condition: isDateMissing, key: JOI_ERRORS.CUSTOM_END_DATE_MISSING },
+          {
+            condition:
+              errorTypeMap[JOI_ERRORS.CUSTOM_END_DATE_INVALID] ||
+              hasInvalidDateFieldErrors,
+            key: JOI_ERRORS.CUSTOM_END_DATE_INVALID
+          },
+          {
+            condition:
+              errorTypeMap[JOI_ERRORS.CUSTOM_END_DATE_BEFORE_START_DATE],
+            key: JOI_ERRORS.CUSTOM_END_DATE_BEFORE_START_DATE
+          },
+          {
+            condition: errorTypeMap[JOI_ERRORS.CUSTOM_END_DATE_TODAY_OR_FUTURE],
+            key: JOI_ERRORS.CUSTOM_END_DATE_TODAY_OR_FUTURE
+          },
+          {
+            condition:
+              errors[JOI_ERRORS.ACTIVITY_END_DATE_DAY] &&
+              !hasInvalidDateFieldErrors,
+            key: JOI_ERRORS.ACTIVITY_END_DATE_DAY
+          },
+          {
+            condition:
+              errors[JOI_ERRORS.ACTIVITY_END_DATE_MONTH] &&
+              !hasInvalidDateFieldErrors,
+            key: JOI_ERRORS.ACTIVITY_END_DATE_MONTH
+          },
+          {
+            condition:
+              errors[JOI_ERRORS.ACTIVITY_END_DATE_YEAR] &&
+              !hasInvalidDateFieldErrors,
+            key: JOI_ERRORS.ACTIVITY_END_DATE_YEAR
+          }
+        ]
+
+  const errorToShow = errorPriority.find((error) => error.condition)
+  return errorToShow ? { text: errorMessages[errorToShow.key] } : null
+}
+
+/**
  * Determines the appropriate error message for start date
  * @param {boolean} isStartMissing - Whether start date is completely missing
  * @param {object} errorTypeMap - Error type mapping
@@ -209,31 +379,7 @@ function handleMissingDateErrors(errorSummary, isStartMissing, isEndMissing) {
  * @returns {object|null} Error message object or null
  */
 function getStartDateErrorMessage(isStartMissing, errorTypeMap, errors) {
-  if (isStartMissing) {
-    return { text: errorMessages[JOI_ERRORS.CUSTOM_START_DATE_MISSING] }
-  }
-
-  if (errorTypeMap[JOI_ERRORS.CUSTOM_START_DATE_TODAY_OR_FUTURE]) {
-    return { text: errorMessages[JOI_ERRORS.CUSTOM_START_DATE_TODAY_OR_FUTURE] }
-  }
-
-  if (errorTypeMap[JOI_ERRORS.CUSTOM_START_DATE_INVALID]) {
-    return { text: errorMessages[JOI_ERRORS.CUSTOM_START_DATE_INVALID] }
-  }
-
-  if (errors[JOI_ERRORS.ACTIVITY_START_DATE_DAY]) {
-    return { text: errorMessages[JOI_ERRORS.ACTIVITY_START_DATE_DAY] }
-  }
-
-  if (errors[JOI_ERRORS.ACTIVITY_START_DATE_MONTH]) {
-    return { text: errorMessages[JOI_ERRORS.ACTIVITY_START_DATE_MONTH] }
-  }
-
-  if (errors[JOI_ERRORS.ACTIVITY_START_DATE_YEAR]) {
-    return { text: errorMessages[JOI_ERRORS.ACTIVITY_START_DATE_YEAR] }
-  }
-
-  return null
+  return getDateErrorMessage('start', isStartMissing, errorTypeMap, errors)
 }
 
 /**
@@ -244,35 +390,7 @@ function getStartDateErrorMessage(isStartMissing, errorTypeMap, errors) {
  * @returns {object|null} Error message object or null
  */
 function getEndDateErrorMessage(isEndMissing, errorTypeMap, errors) {
-  if (isEndMissing) {
-    return { text: errorMessages[JOI_ERRORS.CUSTOM_END_DATE_MISSING] }
-  }
-
-  if (errorTypeMap[JOI_ERRORS.CUSTOM_END_DATE_TODAY_OR_FUTURE]) {
-    return { text: errorMessages[JOI_ERRORS.CUSTOM_END_DATE_TODAY_OR_FUTURE] }
-  }
-
-  if (errorTypeMap[JOI_ERRORS.CUSTOM_END_DATE_INVALID]) {
-    return { text: errorMessages[JOI_ERRORS.CUSTOM_END_DATE_INVALID] }
-  }
-
-  if (errorTypeMap[JOI_ERRORS.CUSTOM_END_DATE_BEFORE_START_DATE]) {
-    return { text: errorMessages[JOI_ERRORS.CUSTOM_END_DATE_BEFORE_START_DATE] }
-  }
-
-  if (errors[JOI_ERRORS.ACTIVITY_END_DATE_DAY]) {
-    return { text: errorMessages[JOI_ERRORS.ACTIVITY_END_DATE_DAY] }
-  }
-
-  if (errors[JOI_ERRORS.ACTIVITY_END_DATE_MONTH]) {
-    return { text: errorMessages[JOI_ERRORS.ACTIVITY_END_DATE_MONTH] }
-  }
-
-  if (errors[JOI_ERRORS.ACTIVITY_END_DATE_YEAR]) {
-    return { text: errorMessages[JOI_ERRORS.ACTIVITY_END_DATE_YEAR] }
-  }
-
-  return null
+  return getDateErrorMessage('end', isEndMissing, errorTypeMap, errors)
 }
 
 /**
@@ -283,38 +401,65 @@ export const activityDatesController = {
   handler(request, h) {
     const exemption = getExemptionCache(request)
 
-    let activityStartDateDay = ''
-    let activityStartDateMonth = ''
-    let activityStartDateYear = ''
-    let activityEndDateDay = ''
-    let activityEndDateMonth = ''
-    let activityEndDateYear = ''
-
-    if (exemption.activityDates?.start) {
-      const startDate = new Date(exemption.activityDates.start)
-      activityStartDateDay = startDate.getUTCDate().toString()
-      activityStartDateMonth = (startDate.getUTCMonth() + 1).toString()
-      activityStartDateYear = startDate.getUTCFullYear().toString()
-    }
-
-    if (exemption.activityDates?.end) {
-      const endDate = new Date(exemption.activityDates.end)
-      activityEndDateDay = endDate.getUTCDate().toString()
-      activityEndDateMonth = (endDate.getUTCMonth() + 1).toString()
-      activityEndDateYear = endDate.getUTCFullYear().toString()
-    }
-
-    return h.view(ACTIVITY_DATES_VIEW_ROUTE, {
-      ...activityDatesViewSettings,
-      projectName: exemption.projectName,
-      activityStartDateDay,
-      activityStartDateMonth,
-      activityStartDateYear,
-      activityEndDateDay,
-      activityEndDateMonth,
-      activityEndDateYear
-    })
+    return h.view(ACTIVITY_DATES_VIEW_ROUTE, createTemplateData(exemption))
   }
+}
+
+/**
+ * Processes validation errors and returns template data
+ * @param {object} request - Hapi request object
+ * @param {object} h - Hapi response toolkit
+ * @param {Error} err - Validation error
+ * @returns {object} Response with error template
+ */
+function handleValidationErrors(request, h, err) {
+  const { payload } = request
+  const exemption = getExemptionCache(request)
+
+  if (!err.details) {
+    return h
+      .view(ACTIVITY_DATES_VIEW_ROUTE, createTemplateData(exemption, payload))
+      .takeover()
+  }
+
+  const errorSummary = mapErrorsForDisplay(err.details, errorMessages)
+  const errors = errorDescriptionByFieldName(errorSummary)
+  const errorTypeMap = createErrorTypeMap(err.details)
+
+  const isStartMissing = isCompleteDateMissing(errors, 'start')
+  const isEndMissing = isCompleteDateMissing(errors, 'end')
+
+  let modifiedErrorSummary = errorSummary.filter(
+    (error) => error.href && error.href !== '#' && error.href !== '#undefined'
+  )
+
+  addCustomValidationErrors(modifiedErrorSummary, errorTypeMap)
+  modifiedErrorSummary = handleMissingDateErrors(
+    modifiedErrorSummary,
+    isStartMissing,
+    isEndMissing
+  )
+
+  const startDateErrorMessage = getStartDateErrorMessage(
+    isStartMissing,
+    errorTypeMap,
+    errors
+  )
+  const endDateErrorMessage = getEndDateErrorMessage(
+    isEndMissing,
+    errorTypeMap,
+    errors
+  )
+
+  return h
+    .view(ACTIVITY_DATES_VIEW_ROUTE, {
+      ...createTemplateData(exemption, payload),
+      errors,
+      errorSummary: modifiedErrorSummary,
+      startDateErrorMessage,
+      endDateErrorMessage
+    })
+    .takeover()
 }
 
 /**
@@ -325,67 +470,7 @@ export const activityDatesSubmitController = {
   options: {
     validate: {
       payload: activityDatesSchema,
-      failAction: (request, h, err) => {
-        const { payload } = request
-        const exemption = getExemptionCache(request)
-
-        if (!err.details) {
-          return h
-            .view(ACTIVITY_DATES_VIEW_ROUTE, {
-              ...activityDatesViewSettings,
-              projectName: exemption.projectName,
-              payload
-            })
-            .takeover()
-        }
-
-        const errorSummary = mapErrorsForDisplay(err.details, errorMessages)
-        const errors = errorDescriptionByFieldName(errorSummary)
-        const errorTypeMap = createErrorTypeMap(err.details)
-
-        const isStartMissing = isCompleteDateMissing(errors, 'start')
-        const isEndMissing = isCompleteDateMissing(errors, 'end')
-
-        let modifiedErrorSummary = errorSummary.filter(
-          (error) =>
-            error.href && error.href !== '#' && error.href !== '#undefined'
-        )
-
-        addCustomValidationErrors(modifiedErrorSummary, errorTypeMap)
-        modifiedErrorSummary = handleMissingDateErrors(
-          modifiedErrorSummary,
-          isStartMissing,
-          isEndMissing
-        )
-
-        const startDateErrorMessage = getStartDateErrorMessage(
-          isStartMissing,
-          errorTypeMap,
-          errors
-        )
-        const endDateErrorMessage = getEndDateErrorMessage(
-          isEndMissing,
-          errorTypeMap,
-          errors
-        )
-
-        return h
-          .view(ACTIVITY_DATES_VIEW_ROUTE, {
-            ...activityDatesViewSettings,
-            projectName: exemption.projectName,
-            activityStartDateDay: payload[FIELD_NAMES.START_DATE_DAY] || '',
-            activityStartDateMonth: payload[FIELD_NAMES.START_DATE_MONTH] || '',
-            activityStartDateYear: payload[FIELD_NAMES.START_DATE_YEAR] || '',
-            activityEndDateDay: payload[FIELD_NAMES.END_DATE_DAY] || '',
-            activityEndDateMonth: payload[FIELD_NAMES.END_DATE_MONTH] || '',
-            activityEndDateYear: payload[FIELD_NAMES.END_DATE_YEAR] || '',
-            errors,
-            errorSummary: modifiedErrorSummary,
-            startDateErrorMessage,
-            endDateErrorMessage
-          })
-          .takeover()
-      }
+      failAction: handleValidationErrors
     }
   },
   async handler(request, h) {
@@ -437,14 +522,7 @@ export const activityDatesSubmitController = {
       const errors = errorDescriptionByFieldName(errorSummary)
 
       return h.view(ACTIVITY_DATES_VIEW_ROUTE, {
-        ...activityDatesViewSettings,
-        projectName: exemption.projectName,
-        activityStartDateDay: payload[FIELD_NAMES.START_DATE_DAY] || '',
-        activityStartDateMonth: payload[FIELD_NAMES.START_DATE_MONTH] || '',
-        activityStartDateYear: payload[FIELD_NAMES.START_DATE_YEAR] || '',
-        activityEndDateDay: payload[FIELD_NAMES.END_DATE_DAY] || '',
-        activityEndDateMonth: payload[FIELD_NAMES.END_DATE_MONTH] || '',
-        activityEndDateYear: payload[FIELD_NAMES.END_DATE_YEAR] || '',
+        ...createTemplateData(exemption, payload),
         errors,
         errorSummary
       })

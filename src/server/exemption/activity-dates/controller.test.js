@@ -10,10 +10,10 @@ import {
   activityDatesController,
   activityDatesSubmitController,
   ACTIVITY_DATES_VIEW_ROUTE,
-  createDateISO,
   addCustomValidationErrors,
   errorMessages
 } from '~/src/server/exemption/activity-dates/controller.js'
+import { createDateISO } from '~/src/server/common/helpers/date-utils.js'
 import * as cacheUtils from '~/src/server/common/helpers/session-cache/utils.js'
 
 jest.mock('~/src/server/common/helpers/session-cache/utils.js')
@@ -237,14 +237,16 @@ describe('#activityDatesController', () => {
       const errorSummary = document.querySelector('.govuk-error-summary')
       expect(errorSummary).toBeTruthy()
 
-      // With new validation order, end date future validation is checked first
-      // So past end dates trigger "today or future" error before relationship checks
-      expect(result).toContain('The end date must be today or in the future')
+      // Date order validation now takes precedence over future date validation
+      // This ensures end date before start date errors are shown correctly
+      expect(result).toContain(
+        'The end date must be the same as or after the start date'
+      )
 
       const endDateError = document.querySelector('#activity-end-date-error')
       expect(endDateError).toBeTruthy()
       expect(endDateError.textContent.trim()).toContain(
-        'The end date must be today or in the future'
+        'The end date must be the same as or after the start date'
       )
     })
 
@@ -270,14 +272,16 @@ describe('#activityDatesController', () => {
       const errorSummary = document.querySelector('.govuk-error-summary')
       expect(errorSummary).toBeTruthy()
 
-      // With new validation order, end date future validation is checked first
-      // So past end dates trigger "today or future" error before relationship checks
-      expect(result).toContain('The end date must be today or in the future')
+      // Date order validation now takes precedence over future date validation
+      // This ensures end date before start date errors are shown correctly
+      expect(result).toContain(
+        'The end date must be the same as or after the start date'
+      )
 
       const endDateError = document.querySelector('#activity-end-date-error')
       expect(endDateError).toBeTruthy()
       expect(endDateError.textContent.trim()).toContain(
-        'The end date must be today or in the future'
+        'The end date must be the same as or after the start date'
       )
     })
 
@@ -470,6 +474,80 @@ describe('#activityDatesController', () => {
 
       expect(statusCode).toBe(statusCodes.ok)
       expect(result).toContain('Activity dates')
+    })
+
+    test('should handle impossible dates with field-level real date errors', async () => {
+      // Test month 14 which triggers number.max validation
+      const payloadMonth14 = {
+        'activity-start-date-day': '1',
+        'activity-start-date-month': '1',
+        'activity-start-date-year': (new Date().getFullYear() + 1).toString(),
+        'activity-end-date-day': '1',
+        'activity-end-date-month': '14', // Invalid month > 12
+        'activity-end-date-year': (new Date().getFullYear() + 1).toString()
+      }
+
+      const { result: resultMonth14, statusCode: statusCodeMonth14 } =
+        await server.inject({
+          method: 'POST',
+          url: routes.ACTIVITY_DATES,
+          payload: payloadMonth14
+        })
+
+      expect(statusCodeMonth14).toBe(statusCodes.ok)
+
+      const { document: documentMonth14 } = new JSDOM(resultMonth14).window
+      const errorSummaryMonth14 = documentMonth14.querySelector(
+        '.govuk-error-summary'
+      )
+      expect(errorSummaryMonth14).toBeTruthy()
+
+      // Should show "real date" error message in field-level error element
+      expect(resultMonth14).toContain('The end date must be a real date')
+
+      const endDateErrorMonth14 = documentMonth14.querySelector(
+        '#activity-end-date-error'
+      )
+      expect(endDateErrorMonth14).toBeTruthy()
+      expect(endDateErrorMonth14.textContent.trim()).toContain(
+        'The end date must be a real date'
+      )
+
+      // Test day 32 which also triggers number.max validation
+      const payloadDay32 = {
+        'activity-start-date-day': '32', // Invalid day > 31
+        'activity-start-date-month': '1',
+        'activity-start-date-year': (new Date().getFullYear() + 1).toString(),
+        'activity-end-date-day': '1',
+        'activity-end-date-month': '1',
+        'activity-end-date-year': (new Date().getFullYear() + 1).toString()
+      }
+
+      const { result: resultDay32, statusCode: statusCodeDay32 } =
+        await server.inject({
+          method: 'POST',
+          url: routes.ACTIVITY_DATES,
+          payload: payloadDay32
+        })
+
+      expect(statusCodeDay32).toBe(statusCodes.ok)
+
+      const { document: documentDay32 } = new JSDOM(resultDay32).window
+      const errorSummaryDay32 = documentDay32.querySelector(
+        '.govuk-error-summary'
+      )
+      expect(errorSummaryDay32).toBeTruthy()
+
+      // Should show "real date" error message in field-level error element
+      expect(resultDay32).toContain('The start date must be a real date')
+
+      const startDateErrorDay32 = documentDay32.querySelector(
+        '#activity-start-date-error'
+      )
+      expect(startDateErrorDay32).toBeTruthy()
+      expect(startDateErrorDay32.textContent.trim()).toContain(
+        'The start date must be a real date'
+      )
     })
   })
 
@@ -983,7 +1061,14 @@ describe('#activityDatesController', () => {
         ACTIVITY_DATES_VIEW_ROUTE,
         expect.objectContaining({
           projectName: 'Test Project',
-          payload: { 'test-field': 'test-value' }
+          title: 'Activity dates',
+          // The payload is now processed by createTemplateData, not passed directly
+          activityStartDateDay: '',
+          activityStartDateMonth: '',
+          activityStartDateYear: '',
+          activityEndDateDay: '',
+          activityEndDateMonth: '',
+          activityEndDateYear: ''
         })
       )
       expect(h.takeover).toHaveBeenCalled()

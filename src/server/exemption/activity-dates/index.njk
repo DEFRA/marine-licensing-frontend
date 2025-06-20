@@ -4,6 +4,53 @@
 {% from "govuk/components/date-input/macro.njk" import govukDateInput %}
 {% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
 {% from "cancel-button/macro.njk" import appCancelButton %}
+{# Date input macro to reduce duplication #}
+{% macro activityDateInput(
+  id, 
+  namePrefix, 
+  legend, 
+  dayValue, 
+  monthValue, 
+  yearValue, 
+  errorMessage, 
+  errors = {}
+) %}
+  {{ govukDateInput({
+    id: id,
+    namePrefix: namePrefix,
+    fieldset: {
+      legend: {
+        text: legend,
+        isPageHeading: false,
+        classes: "govuk-fieldset__legend--s"
+      }
+    },
+    hint: {
+      text: "For example, 27 5 2025"
+    },
+    errorMessage: errorMessage,
+    items: [
+      {
+        id: namePrefix + "-day",
+        name: "day",
+        classes: "govuk-input--width-2" + (" govuk-input--error" if errors[namePrefix + '-day']),
+        value: dayValue if dayValue
+      },
+      {
+        id: namePrefix + "-month",
+        name: "month",
+        classes: "govuk-input--width-2" + (" govuk-input--error" if errors[namePrefix + '-month']),
+        value: monthValue if monthValue
+      },
+      {
+        id: namePrefix + "-year",
+        name: "year",
+        classes: "govuk-input--width-4" + (" govuk-input--error" if errors[namePrefix + '-year']),
+        value: yearValue if yearValue
+      }
+    ]
+  }) }}
+{% endmacro %}
 {% block beforeContent %}
   {{ govukBackLink({
         text: "Back",
@@ -27,76 +74,26 @@
         <p class="govuk-body">{{ paragraph }}</p>
       {% endfor %}
       <form method="POST">
-        <input type="hidden" name="csrfToken" value="{{ csrfToken }}"/> {{ govukDateInput({
-          id: "activity-start-date",
-          namePrefix: "activity-start-date",
-          fieldset: {
-            legend: {
-              text: "Start date",
-              isPageHeading: false,
-              classes: "govuk-fieldset__legend--s"
-            }
-          },
-          hint: {
-            text: "For example, 27 5 2025"
-          },
-          errorMessage: startDateErrorMessage,
-          items: [
-            {
-              id: "activity-start-date-day",
-              name: "day",
-              classes: "govuk-input--width-2" + (" govuk-input--error" if errors['activity-start-date-day']),
-              value: activityStartDateDay if activityStartDateDay
-            },
-            {
-              id: "activity-start-date-month",
-              name: "month",
-              classes: "govuk-input--width-2" + (" govuk-input--error" if errors['activity-start-date-month']),
-              value: activityStartDateMonth if activityStartDateMonth
-            },
-            {
-              id: "activity-start-date-year",
-              name: "year",
-              classes: "govuk-input--width-4" + (" govuk-input--error" if errors['activity-start-date-year']),
-              value: activityStartDateYear if activityStartDateYear
-            }
-          ]
-        }) }}
-        {{ govukDateInput({
-          id: "activity-end-date",
-          namePrefix: "activity-end-date",
-          fieldset: {
-            legend: {
-              text: "End date",
-              isPageHeading: false,
-              classes: "govuk-fieldset__legend--s"
-            }
-          },
-          hint: {
-            text: "For example, 27 5 2025"
-          },
-          errorMessage: endDateErrorMessage,
-          items: [
-            {
-              id: "activity-end-date-day",
-              name: "day",
-              classes: "govuk-input--width-2" + (" govuk-input--error" if errors['activity-end-date-day']),
-              value: activityEndDateDay if activityEndDateDay
-            },
-            {
-              id: "activity-end-date-month",
-              name: "month",
-              classes: "govuk-input--width-2" + (" govuk-input--error" if errors['activity-end-date-month']),
-              value: activityEndDateMonth if activityEndDateMonth
-            },
-            {
-              id: "activity-end-date-year",
-              name: "year",
-              classes: "govuk-input--width-4" + (" govuk-input--error" if errors['activity-end-date-year']),
-              value: activityEndDateYear if activityEndDateYear
-            }
-          ]
-        }) }}
+        <input type="hidden" name="csrfToken" value="{{ csrfToken }}"/> {{ activityDateInput(
+          "activity-start-date",
+          "activity-start-date", 
+          "Start date",
+          activityStartDateDay,
+          activityStartDateMonth,
+          activityStartDateYear,
+          startDateErrorMessage,
+          errors
+        ) }}
+        {{ activityDateInput(
+          "activity-end-date",
+          "activity-end-date", 
+          "End date",
+          activityEndDateDay,
+          activityEndDateMonth,
+          activityEndDateYear,
+          endDateErrorMessage,
+          errors
+        ) }}
         <div class="govuk-button-group">
           {{ govukButton({
               text: "Save and continue",

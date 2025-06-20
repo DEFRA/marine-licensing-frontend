@@ -2,10 +2,10 @@
  * Day.js-based date utility functions for handling date operations across the application
  */
 import dayjs from 'dayjs'
-import utc from 'dayjs/plugin/utc'
-import customParseFormat from 'dayjs/plugin/customParseFormat'
-import isSameOrAfter from 'dayjs/plugin/isSameOrAfter'
-import isSameOrBefore from 'dayjs/plugin/isSameOrBefore'
+import utc from 'dayjs/plugin/utc.js'
+import customParseFormat from 'dayjs/plugin/customParseFormat.js'
+import isSameOrAfter from 'dayjs/plugin/isSameOrAfter.js'
+import isSameOrBefore from 'dayjs/plugin/isSameOrBefore.js'
 
 // Extend dayjs with plugins
 dayjs.extend(utc)

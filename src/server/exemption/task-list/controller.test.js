@@ -98,6 +98,15 @@ describe('#taskListController', () => {
           }
         },
         {
+          href: routes.ACTIVITY_DATES,
+          status: {
+            text: 'Completed'
+          },
+          title: {
+            text: 'Activity dates'
+          }
+        },
+        {
           href: routes.ACTIVITY_DESCRIPTION,
           status: {
             tag: {

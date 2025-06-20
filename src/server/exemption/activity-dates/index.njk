@@ -1,0 +1,110 @@
+{% extends 'layouts/page.njk' %}
+{% from "govuk/components/back-link/macro.njk" import govukBackLink %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/date-input/macro.njk" import govukDateInput %}
+{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+{% from "cancel-button/macro.njk" import appCancelButton %}
+{# Date input macro to reduce duplication #}
+{% macro activityDateInput(
+  id, 
+  namePrefix, 
+  legend, 
+  dayValue, 
+  monthValue, 
+  yearValue, 
+  errorMessage, 
+  errors = {}
+) %}
+  {{ govukDateInput({
+    id: id,
+    namePrefix: namePrefix,
+    fieldset: {
+      legend: {
+        text: legend,
+        isPageHeading: false,
+        classes: "govuk-fieldset__legend--s"
+      }
+    },
+    hint: {
+      text: "For example, 27 5 2025"
+    },
+    errorMessage: errorMessage,
+    items: [
+      {
+        id: namePrefix + "-day",
+        name: "day",
+        classes: "govuk-input--width-2" + (" govuk-input--error" if errors[namePrefix + '-day']),
+        value: dayValue if dayValue
+      },
+      {
+        id: namePrefix + "-month",
+        name: "month",
+        classes: "govuk-input--width-2" + (" govuk-input--error" if errors[namePrefix + '-month']),
+        value: monthValue if monthValue
+      },
+      {
+        id: namePrefix + "-year",
+        name: "year",
+        classes: "govuk-input--width-4" + (" govuk-input--error" if errors[namePrefix + '-year']),
+        value: yearValue if yearValue
+      }
+    ]
+  }) }}
+{% endmacro %}
+{% block beforeContent %}
+  {{ govukBackLink({
+        text: "Back",
+        href: backLink
+    }) }}
+{% endblock %}
+{% block content %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+      {% if errors %}
+        {{ govukErrorSummary({
+          titleText: "There is a problem",
+          errorList: errorSummary
+        }) }}
+      {% endif %}
+      <h1 class="govuk-heading-l">{{ title }}</h1>
+      {% if projectName %}
+        <span class="govuk-caption-l">{{ projectName }}</span>
+      {% endif %}
+      <p class="govuk-body">Enter the activity dates. Allow time for potential delays, like consents (for example, a river
+        works licence) or bad weather. If you miss the dates, you'll need to restart the process.</p>
+      <p class="govuk-body">You can enter a start date from today and begin your activity as soon as you've sent your
+        information.</p>
+      <form method="POST">
+        <input type="hidden" name="csrfToken" value="{{ csrfToken }}"/> {{ activityDateInput(
+          "activity-start-date",
+          "activity-start-date", 
+          "Start date",
+          activityStartDateDay,
+          activityStartDateMonth,
+          activityStartDateYear,
+          startDateErrorMessage,
+          errors
+        ) }}
+        {{ activityDateInput(
+          "activity-end-date",
+          "activity-end-date", 
+          "End date",
+          activityEndDateDay,
+          activityEndDateMonth,
+          activityEndDateYear,
+          endDateErrorMessage,
+          errors
+        ) }}
+        <div class="govuk-button-group">
+          {{ govukButton({
+              text: "Save and continue",
+              type: "submit"
+          }) }}
+          {{ appCancelButton({
+              cancelLink: cancelLink
+          }) }}
+        </div>
+      </form>
+    </div>
+  </div>
+{% endblock %}

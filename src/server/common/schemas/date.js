@@ -14,6 +14,9 @@ const MAX_YEAR = MIN_YEAR + MAX_YEAR_OFFSET
 const MAX_DAYS_IN_MONTH = 31
 const MAX_MONTHS_IN_YEAR = 12
 
+// Date format constants
+const DATE_FORMAT_ISO = 'YYYY-MM-DD'
+
 /**
  * Creates individual date field validation schema
  * @param {object} config - Configuration object
@@ -78,7 +81,7 @@ const isValidDate = (year, month, day) => {
   // Create the date with strict parsing
   const date = dayjs.utc(
     `${year}-${month.toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}`,
-    'YYYY-MM-DD',
+    DATE_FORMAT_ISO,
     true
   )
 
@@ -137,11 +140,11 @@ export const activityDatesSchema = joi
     // Create Day.js dates for comparison (we know they're valid now)
     const startDate = dayjs.utc(
       `${startYear}-${startMonth.toString().padStart(2, '0')}-${startDay.toString().padStart(2, '0')}`,
-      'YYYY-MM-DD'
+      DATE_FORMAT_ISO
     )
     const endDate = dayjs.utc(
       `${endYear}-${endMonth.toString().padStart(2, '0')}-${endDay.toString().padStart(2, '0')}`,
-      'YYYY-MM-DD'
+      DATE_FORMAT_ISO
     )
     const today = dayjs.utc().startOf('day')
 

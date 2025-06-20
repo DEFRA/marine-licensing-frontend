@@ -22,8 +22,12 @@ import {
 
 export const ACTIVITY_DATES_VIEW_ROUTE = 'exemption/activity-dates/index'
 
-const START_DATE_FIELD_NAMES = createDateFieldNames('activity-start-date')
-const END_DATE_FIELD_NAMES = createDateFieldNames('activity-end-date')
+// Date field prefix constants
+const ACTIVITY_START_DATE_PREFIX = 'activity-start-date'
+const ACTIVITY_END_DATE_PREFIX = 'activity-end-date'
+
+const START_DATE_FIELD_NAMES = createDateFieldNames(ACTIVITY_START_DATE_PREFIX)
+const END_DATE_FIELD_NAMES = createDateFieldNames(ACTIVITY_END_DATE_PREFIX)
 
 const FIELD_NAMES = {
   START_DATE_DAY: START_DATE_FIELD_NAMES.DAY,
@@ -66,8 +70,8 @@ export const errorMessages = {
  */
 export function extractDateFieldsFromPayload(payload) {
   const dateConfigs = [
-    { key: 'activityStartDate', prefix: 'activity-start-date' },
-    { key: 'activityEndDate', prefix: 'activity-end-date' }
+    { key: 'activityStartDate', prefix: ACTIVITY_START_DATE_PREFIX },
+    { key: 'activityEndDate', prefix: ACTIVITY_END_DATE_PREFIX }
   ]
 
   return extractMultipleDateFields(payload, dateConfigs)
@@ -112,7 +116,7 @@ export function createTemplateData(exemption, payload = null) {
 // Date configuration for the generic date form utilities
 const DATE_CONFIGS = [
   {
-    prefix: 'activity-start-date',
+    prefix: ACTIVITY_START_DATE_PREFIX,
     fieldNames: START_DATE_FIELD_NAMES,
     errorMessageKey: 'startDateErrorMessage',
     errorKeys: {
@@ -131,7 +135,7 @@ const DATE_CONFIGS = [
     errorMessages
   },
   {
-    prefix: 'activity-end-date',
+    prefix: ACTIVITY_END_DATE_PREFIX,
     fieldNames: END_DATE_FIELD_NAMES,
     errorMessageKey: 'endDateErrorMessage',
     errorKeys: {

@@ -292,7 +292,6 @@ export function addCustomValidationErrors(
         href: `#${dateFieldNames.DAY}`,
         text: errorMessages[errorKeys.INVALID]
       })
-      dateErrorAdded = true
     }
 
     // Date relationship error (e.g., end before start)

@@ -13,6 +13,10 @@ dayjs.extend(customParseFormat)
 dayjs.extend(isSameOrAfter)
 dayjs.extend(isSameOrBefore)
 
+// Date format constants
+const DATE_FORMAT_ISO = 'YYYY-MM-DD'
+const DATE_FORMAT_FLEXIBLE = 'YYYY-M-D'
+
 /**
  * Creates a date from individual components and returns ISO string
  * @param {string|number} year
@@ -28,7 +32,7 @@ export function createDateISO(year, month, day) {
 
   const date = dayjs.utc(
     `${year}-${month.toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}`,
-    'YYYY-MM-DD',
+    DATE_FORMAT_ISO,
     true // strict parsing
   )
 
@@ -60,8 +64,7 @@ export function extractDateComponents(isoDate) {
  * @returns {string} Formatted date string
  */
 export function formatDate(date, format = 'D MMMM YYYY') {
-  const dayjsDate = typeof date === 'string' ? dayjs.utc(date) : dayjs.utc(date)
-  return dayjsDate.format(format)
+  return dayjs.utc(date).format(format)
 }
 
 /**
@@ -72,7 +75,7 @@ export function formatDate(date, format = 'D MMMM YYYY') {
  * @returns {boolean}
  */
 export function isValidDateComponents(year, month, day) {
-  const date = dayjs.utc(`${year}-${month}-${day}`, 'YYYY-M-D', true)
+  const date = dayjs.utc(`${year}-${month}-${day}`, DATE_FORMAT_FLEXIBLE, true)
   return date.isValid()
 }
 
@@ -82,7 +85,7 @@ export function isValidDateComponents(year, month, day) {
  * @returns {boolean}
  */
 export function isTodayOrFuture(date) {
-  const inputDate = typeof date === 'string' ? dayjs.utc(date) : dayjs.utc(date)
+  const inputDate = dayjs.utc(date)
   const today = dayjs.utc().startOf('day')
 
   return inputDate.isSameOrAfter(today, 'day')
@@ -95,11 +98,15 @@ export function isTodayOrFuture(date) {
  * @returns {number} -1 if date1 < date2, 0 if equal, 1 if date1 > date2
  */
 export function compareDates(date1, date2) {
-  const d1 = typeof date1 === 'string' ? dayjs.utc(date1) : dayjs.utc(date1)
-  const d2 = typeof date2 === 'string' ? dayjs.utc(date2) : dayjs.utc(date2)
+  const d1 = dayjs.utc(date1)
+  const d2 = dayjs.utc(date2)
 
-  if (d1.isBefore(d2)) return -1
-  if (d1.isAfter(d2)) return 1
+  if (d1.isBefore(d2)) {
+    return -1
+  }
+  if (d1.isAfter(d2)) {
+    return 1
+  }
   return 0
 }
 
@@ -124,6 +131,6 @@ export function isEndDateBeforeStartDate(startDate, endDate) {
  * @returns {dayjs.Dayjs|null} Day.js object or null if invalid
  */
 export function createDayjsDate(year, month, day) {
-  const date = dayjs.utc(`${year}-${month}-${day}`, 'YYYY-M-D', true)
+  const date = dayjs.utc(`${year}-${month}-${day}`, DATE_FORMAT_FLEXIBLE, true)
   return date.isValid() ? date : null
 }

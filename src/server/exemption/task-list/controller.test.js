@@ -100,10 +100,7 @@ describe('#taskListController', () => {
         {
           href: routes.ACTIVITY_DATES,
           status: {
-            tag: {
-              classes: 'govuk-tag--blue',
-              text: 'Incomplete'
-            }
+            text: 'Completed'
           },
           title: {
             text: 'Activity dates'

@@ -3,6 +3,7 @@ import { COORDINATE_SYSTEMS } from '~/src/server/common/constants/exemptions.js'
 
 export const mockExemptionTaskList = {
   projectName: 'COMPLETED',
+  activityDates: 'COMPLETED',
   publicRegister: 'COMPLETED',
   siteDetails: 'COMPLETED'
 }

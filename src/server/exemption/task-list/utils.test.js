@@ -12,7 +12,7 @@ describe('taskList utils', () => {
       },
       {
         href: routes.ACTIVITY_DATES,
-        status: { tag: { text: 'Incomplete', classes: 'govuk-tag--blue' } },
+        status: { text: 'Completed' },
         title: { text: 'Activity dates' }
       },
       {
@@ -47,7 +47,7 @@ describe('taskList utils', () => {
       },
       {
         href: routes.ACTIVITY_DATES,
-        status: { tag: { text: 'Incomplete', classes: 'govuk-tag--blue' } },
+        status: { text: 'Completed' },
         title: { text: 'Activity dates' }
       },
       {

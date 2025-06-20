@@ -3,6 +3,7 @@ import { publicRegisterRoutes } from '~/src/server/exemption/public-register/ind
 import { taskListRoutes } from '~/src/server/exemption/task-list/index.js'
 import { siteDetailsRoutes } from '~/src/server/exemption/site-details/index.js'
 import { activityDescriptionRoutes } from './activity-description/index.js'
+import { activityDatesRoutes } from './activity-dates/index.js'
 import { routes } from '~/src/server/common/constants/routes.js'
 
 /**
@@ -23,6 +24,7 @@ export const exemption = {
         ...taskListRoutes,
         ...siteDetailsRoutes,
         ...activityDescriptionRoutes,
+        ...activityDatesRoutes,
         {
           method: 'GET',
           path: '/exemption',

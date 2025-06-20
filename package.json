@@ -52,6 +52,7 @@
     "cssnano": "^7.0.6",
     "cssnano-preset-default": "^7.0.6",
     "date-fns": "^4.1.0",
+    "dayjs": "^1.11.13",
     "global-agent": "^3.0.0",
     "govuk-frontend": "^5.10.2",
     "hapi-pino": "^12.1.0",

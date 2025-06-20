@@ -70,9 +70,10 @@
       {% if projectName %}
         <span class="govuk-caption-l">{{ projectName }}</span>
       {% endif %}
-      {% for paragraph in descriptionParagraphs %}
-        <p class="govuk-body">{{ paragraph }}</p>
-      {% endfor %}
+      <p class="govuk-body">Enter the activity dates. Allow time for potential delays, like consents (for example, a river
+        works licence) or bad weather. If you miss the dates, you'll need to restart the process.</p>
+      <p class="govuk-body">You can enter a start date from today and begin your activity as soon as you've sent your
+        information.</p>
       <form method="POST">
         <input type="hidden" name="csrfToken" value="{{ csrfToken }}"/> {{ activityDateInput(
           "activity-start-date",

@@ -108,20 +108,14 @@ describe('check your answers controller', () => {
           '#site-details-card .govuk-summary-list .govuk-summary-list__row:first-child .govuk-summary-list__value'
         )
         .textContent.trim()
-    ).toBe(mockExemption.siteDetails.coordinatesType)
+    ).toBe(
+      'Manually enter one set of coordinates and a width to create a circular site'
+    )
 
     expect(
       document
         .querySelector(
           '#site-details-card .govuk-summary-list .govuk-summary-list__row:nth-child(2) .govuk-summary-list__value'
-        )
-        .textContent.trim()
-    ).toBe(mockExemption.siteDetails.coordinatesEntry)
-
-    expect(
-      document
-        .querySelector(
-          '#site-details-card .govuk-summary-list .govuk-summary-list__row:nth-child(3) .govuk-summary-list__value'
         )
         .textContent.trim()
     ).toBe(
@@ -131,7 +125,7 @@ describe('check your answers controller', () => {
     expect(
       document
         .querySelector(
-          '#site-details-card .govuk-summary-list .govuk-summary-list__row:nth-child(4) .govuk-summary-list__value'
+          '#site-details-card .govuk-summary-list .govuk-summary-list__row:nth-child(3) .govuk-summary-list__value'
         )
         .textContent.trim()
     ).toBe(
@@ -143,7 +137,7 @@ describe('check your answers controller', () => {
     expect(
       document
         .querySelector(
-          '#site-details-card .govuk-summary-list .govuk-summary-list__row:nth-child(5) .govuk-summary-list__value'
+          '#site-details-card .govuk-summary-list .govuk-summary-list__row:nth-child(4) .govuk-summary-list__value'
         )
         .textContent.trim()
     ).toBe(mockExemption.siteDetails.circleWidth + ' metres')

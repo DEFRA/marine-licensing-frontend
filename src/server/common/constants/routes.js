@@ -10,6 +10,7 @@ export const routes = {
   PUBLIC_REGISTER: '/exemption/public-register',
   TASK_LIST: '/exemption/task-list',
   ACTIVITY_DESCRIPTION: '/exemption/activity-description',
+  ACTIVITY_DATES: '/exemption/activity-dates',
   WIDTH_OF_SITE: '/exemption/width-of-site',
   CHOOSE_FILE_UPLOAD_TYPE: '/exemption/choose-file-type-to-upload'
 }

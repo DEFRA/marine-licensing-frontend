@@ -1,0 +1,69 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+---
+description: API Integration Standards
+globs: src/**/*.js
+---
+# API Integration Standards
+
+## Configuration
+- Use apiServer from config for base URL:
+```javascript
+import { config } from '~/src/config/config.js'
+const baseUrl = config.get('apiServer')
+```
+
+## Making API Calls
+- Use native fetch for HTTP requests (do not use Axios or other HTTP clients)
+- Always include error handling
+- Use JSON content type by default
+- Follow RESTful conventions
+- Use absolute imports with '~' alias
+
+### Standard Pattern
+
+```javascript
+import { config } from '~/src/config/config.js'
+import { statusCodes } from '~/src/server/common/constants/status-codes.js'
+async function makeApiCall(request) {
+try {
+const response = await fetch(${config.get('apiServer')}/api/v1/endpoint, {
+method: 'POST',
+headers: {
+'Content-Type': 'application/json'
+},
+body: JSON.stringify(data)
+})
+if (!response.ok) {
+throw new Error(API call failed with status: ${response.status})
+}
+return await response.json()
+} catch (error) {
+request.logger.error(error)
+throw error
+}
+}
+```
+
+
+## Error Handling
+- Check response.ok status
+- Log errors with request.logger
+- Use statusCodes constants for response codes
+- Return user-friendly error messages
+- Propagate errors up for handling
+
+## Response Processing 
+- Parse JSON responses
+- Validate response data structure
+- Handle empty responses appropriately
+- Use TypeScript-style JSDoc for type annotations
+
+## Security
+- Use HTTPS in production
+- Include authorization headers when required
+- Redact sensitive data in logs
+- Follow security best practices

@@ -9,6 +9,7 @@ export const routes = {
   PROJECT_NAME: '/exemption/project-name',
   PUBLIC_REGISTER: '/exemption/public-register',
   TASK_LIST: '/exemption/task-list',
+  ACTIVITY_DATES: '/exemption/activity-dates',
   ACTIVITY_DESCRIPTION: '/exemption/activity-description',
   WIDTH_OF_SITE: '/exemption/width-of-site',
   CHECK_YOUR_ANSWERS: '/exemption/check-your-answers'

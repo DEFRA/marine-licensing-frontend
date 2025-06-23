@@ -124,7 +124,9 @@ describe('check your answers controller', () => {
           '#site-details-card .govuk-summary-list .govuk-summary-list__row:nth-child(3) .govuk-summary-list__value'
         )
         .textContent.trim()
-    ).toBe(mockExemption.siteDetails.coordinateSystem)
+    ).toBe(
+      'WGS84 (World Geodetic System 1984)\n          Latitude and longitude'
+    )
 
     expect(
       document
@@ -144,7 +146,7 @@ describe('check your answers controller', () => {
           '#site-details-card .govuk-summary-list .govuk-summary-list__row:nth-child(5) .govuk-summary-list__value'
         )
         .textContent.trim()
-    ).toBe(mockExemption.siteDetails.circleWidth)
+    ).toBe(mockExemption.siteDetails.circleWidth + ' metres')
 
     expect(
       document

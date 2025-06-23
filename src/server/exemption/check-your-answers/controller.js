@@ -2,6 +2,7 @@ import Boom from '@hapi/boom'
 import Wreck from '@hapi/wreck'
 import { config } from '~/src/config/config.js'
 import { getExemptionCache } from '~/src/server/common/helpers/session-cache/utils.js'
+import { getCoordinateSystemText } from '~/src/server/exemption/site-details/review-site-details/utils.js'
 
 const checkYourAnswersViewContent = {
   title: 'Check your answers',
@@ -31,9 +32,20 @@ export const checkYourAnswersController = {
       throw Boom.notFound(`Exemption data not found for id: ${id}`, { id })
     }
 
+    // Process site details to include formatted coordinate system text
+    const processedSiteDetails = exemption.siteDetails
+      ? {
+          ...exemption.siteDetails,
+          coordinateSystemText: getCoordinateSystemText(
+            exemption.siteDetails.coordinateSystem
+          )
+        }
+      : null
+
     return h.view(CHECK_YOUR_ANSWERS_VIEW_ROUTE, {
       ...checkYourAnswersViewContent,
-      ...exemption
+      ...exemption,
+      siteDetails: processedSiteDetails
     })
   }
 }

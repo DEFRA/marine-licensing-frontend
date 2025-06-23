@@ -65,7 +65,7 @@
               text: "Start date"
             },
             value: {
-              html: activityDates.startDate
+              html: activityDates.start | formatDate('dd/MM/yyyy')
             }
           },
           {
@@ -73,7 +73,7 @@
               text: "End date"
             },
             value: {
-              html: activityDates.endDate
+              html: activityDates.end | formatDate('dd/MM/yyyy')
             }
           }
         ]

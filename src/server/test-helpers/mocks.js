@@ -12,8 +12,8 @@ export const mockExemption = {
   id: faker.database.mongodbObjectId(),
   projectName: 'Test Project',
   activityDates: {
-    startDate: '2025-01-01',
-    endDate: '2025-01-01'
+    start: '2025-01-01T00:00:00.000Z',
+    end: '2025-01-01T00:00:00.000Z'
   },
   activityDescription: 'Test activity description',
   publicRegister: { consent: 'yes', reason: 'Test reason' },

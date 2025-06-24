@@ -30,6 +30,72 @@ describe('check your answers controller', () => {
     await server.stop({ timeout: 0 })
   })
 
+  describe('POST /exemption/check-your-answers', () => {
+    beforeEach(() => {
+      jest.spyOn(Wreck, 'post').mockResolvedValue({
+        payload: {
+          message: 'success',
+          value: {
+            applicationReference: 'APP-123456',
+            submittedAt: '2025-01-01T10:00:00.000Z'
+          }
+        }
+      })
+    })
+
+    test('Should submit exemption and redirect to confirmation page', async () => {
+      const { statusCode, headers } = await server.inject({
+        method: 'POST',
+        url: '/exemption/check-your-answers'
+      })
+
+      expect(statusCode).toBe(302)
+      expect(headers.location).toBe(
+        '/exemption/confirmation?applicationReference=APP-123456'
+      )
+      expect(Wreck.post).toHaveBeenCalledWith(
+        expect.stringContaining('/exemption/submit'),
+        {
+          payload: { id: mockExemption.id },
+          json: true
+        }
+      )
+    })
+
+    test('Should throw a 404 if exemption is not found', async () => {
+      getExemptionCacheSpy.mockReturnValueOnce({})
+      const { statusCode } = await server.inject({
+        method: 'POST',
+        url: '/exemption/check-your-answers'
+      })
+      expect(statusCode).toBe(404)
+    })
+
+    test('Should handle API errors gracefully', async () => {
+      jest.spyOn(Wreck, 'post').mockRejectedValue(new Error('API Error'))
+
+      const { statusCode } = await server.inject({
+        method: 'POST',
+        url: '/exemption/check-your-answers'
+      })
+
+      expect(statusCode).toBe(400)
+    })
+
+    test('Should handle unexpected API response format', async () => {
+      jest.spyOn(Wreck, 'post').mockResolvedValue({
+        payload: { message: 'error', error: 'Something went wrong' }
+      })
+
+      const { statusCode } = await server.inject({
+        method: 'POST',
+        url: '/exemption/check-your-answers'
+      })
+
+      expect(statusCode).toBe(400)
+    })
+  })
+
   test('Should throw a 404 if exemption is not found', async () => {
     getExemptionCacheSpy.mockReturnValueOnce({})
     const { statusCode } = await server.inject({
@@ -46,6 +112,50 @@ describe('check your answers controller', () => {
       url: '/exemption/check-your-answers'
     })
     expect(statusCode).toBe(404)
+  })
+
+  test('Should throw a 404 if exemption data has no taskList', async () => {
+    jest.spyOn(Wreck, 'get').mockReturnValueOnce({
+      payload: {
+        value: {
+          id: 'test-id'
+          // Missing taskList property
+        }
+      }
+    })
+    const { statusCode } = await server.inject({
+      method: 'GET',
+      url: '/exemption/check-your-answers'
+    })
+    expect(statusCode).toBe(404)
+  })
+
+  test('Should throw a 404 if exemption data value is null', async () => {
+    jest.spyOn(Wreck, 'get').mockReturnValueOnce({
+      payload: {
+        value: null
+      }
+    })
+    const { statusCode } = await server.inject({
+      method: 'GET',
+      url: '/exemption/check-your-answers'
+    })
+    expect(statusCode).toBe(404)
+  })
+
+  test('Should render page when exemption has no siteDetails', async () => {
+    const exemptionWithoutSiteDetails = {
+      ...mockExemption,
+      siteDetails: null
+    }
+
+    getExemptionCacheSpy.mockReturnValueOnce(exemptionWithoutSiteDetails)
+
+    const { statusCode } = await server.inject({
+      method: 'GET',
+      url: '/exemption/check-your-answers'
+    })
+    expect(statusCode).toBe(200)
   })
 
   test('Should render a complete check your answers page', async () => {
@@ -150,5 +260,15 @@ describe('check your answers controller', () => {
         .textContent.trim()
         .toUpperCase()
     ).toBe(mockExemption.publicRegister.consent.toUpperCase())
+
+    // Verify the form is present and configured correctly
+    const form = document.querySelector('form')
+    expect(form).toBeTruthy()
+    expect(form.getAttribute('method')).toBe('post')
+
+    // Verify the submit button is inside the form
+    const submitButton = document.querySelector('#confirm-and-send')
+    expect(submitButton).toBeTruthy()
+    expect(form.contains(submitButton)).toBe(true)
   })
 })

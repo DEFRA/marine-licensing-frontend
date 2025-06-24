@@ -35,7 +35,6 @@ export const checkYourAnswersController = {
       throw Boom.notFound(`Exemption data not found for id: ${id}`, { id })
     }
 
-    // Process site details to include formatted coordinate system text and review summary
     const siteDetails = exemption.siteDetails
       ? {
           ...exemption.siteDetails,
@@ -51,5 +50,37 @@ export const checkYourAnswersController = {
       ...exemption,
       siteDetails
     })
+  }
+}
+
+export const checkYourAnswersSubmitController = {
+  async handler(request, h) {
+    const exemption = getExemptionCache(request)
+
+    const { id } = exemption
+    if (!id) {
+      throw Boom.notFound(`Exemption not found`, { id })
+    }
+
+    try {
+      const { payload: response } = await Wreck.post(
+        `${config.get('backend').apiUrl}/exemption/submit`,
+        {
+          payload: { id },
+          json: true
+        }
+      )
+
+      if (response?.message === 'success' && response?.value) {
+        const { applicationReference } = response.value
+        return h.redirect(
+          `/exemption/confirmation?applicationReference=${applicationReference}`
+        )
+      }
+
+      throw new Error('Unexpected API response format')
+    } catch (error) {
+      throw Boom.badRequest('Error submitting exemption', error)
+    }
   }
 }

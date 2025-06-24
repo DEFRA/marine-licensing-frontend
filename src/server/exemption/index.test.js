@@ -99,6 +99,14 @@ describe('exemption route', () => {
         path: '/exemption/check-your-answers'
       }),
       expect.objectContaining({
+        method: 'POST',
+        path: '/exemption/check-your-answers'
+      }),
+      expect.objectContaining({
+        method: 'GET',
+        path: '/exemption/confirmation'
+      }),
+      expect.objectContaining({
         method: 'GET',
         path: '/exemption'
       })

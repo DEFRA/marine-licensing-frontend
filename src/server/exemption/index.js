@@ -5,6 +5,7 @@ import { siteDetailsRoutes } from '~/src/server/exemption/site-details/index.js'
 import { activityDescriptionRoutes } from './activity-description/index.js'
 import { activityDatesRoutes } from './activity-dates/index.js'
 import { routes } from '~/src/server/common/constants/routes.js'
+import { chooseFileTypeRoutes } from './site-details/choose-file-type/index.js'
 
 /**
  * Sets up the routes used in the exemption home page.
@@ -24,6 +25,7 @@ export const exemption = {
         ...taskListRoutes,
         ...siteDetailsRoutes,
         ...activityDescriptionRoutes,
+        ...chooseFileTypeRoutes,
         ...activityDatesRoutes,
         {
           method: 'GET',

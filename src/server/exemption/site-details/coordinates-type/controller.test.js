@@ -243,7 +243,7 @@ describe('#coordinatesType', () => {
       expect(result.error.message).toBe('PROVIDE_COORDINATES_CHOICE_REQUIRED')
     })
 
-    test('Should correctly remain on the same page when file option is selected', async () => {
+    test('Should correctly redirect when file option is selected', async () => {
       const h = {
         view: jest.fn(),
         redirect: jest.fn().mockReturnValue({
@@ -256,16 +256,8 @@ describe('#coordinatesType', () => {
         h
       )
 
-      expect(h.view).toHaveBeenCalledWith(
-        PROVIDE_COORDINATES_CHOICE_VIEW_ROUTE,
-        {
-          pageTitle: 'How do you want to provide the site location?',
-          heading: 'How do you want to provide the site location?',
-          payload: { coordinatesType: 'file' },
-          projectName: mockExemption.projectName
-        }
-      )
-      expect(h.redirect).not.toHaveBeenCalled()
+      expect(h.view).not.toHaveBeenCalled()
+      expect(h.redirect).toHaveBeenCalledWith(routes.CHOOSE_FILE_UPLOAD_TYPE)
     })
 
     test('Should correctly redirect to coordinates entry page when coordinates option is selected', async () => {

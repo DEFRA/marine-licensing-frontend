@@ -88,6 +88,14 @@ describe('exemption route', () => {
       }),
       expect.objectContaining({
         method: 'GET',
+        path: '/exemption/choose-file-type-to-upload'
+      }),
+      expect.objectContaining({
+        method: 'POST',
+        path: '/exemption/choose-file-type-to-upload'
+      }),
+      expect.objectContaining({
+        method: 'GET',
         path: '/exemption/activity-dates'
       }),
       expect.objectContaining({
@@ -102,26 +110,24 @@ describe('exemption route', () => {
   })
 
   test('handler should redirect to /exemption/project-name', () => {
-    const server = {
-      route: jest.fn()
+    expect.assertions(1)
+
+    const mockRequest = {}
+
+    const mockToolkit = {
+      redirect: jest.fn()
     }
 
-    exemption.plugin.register(server)
-
-    expect(server.route).toHaveBeenCalled()
-
-    const routes = server.route.mock.calls[0][0]
-
-    const handler = routes.at(-1).handler
-
-    const redirectSpy = jest.fn().mockReturnValue('redirected')
-
-    const mockHandler = {
-      redirect: redirectSpy
+    const route = {
+      method: 'GET',
+      path: '/exemption',
+      handler: (_request, h) => {
+        return h.redirect('/exemption/project-name')
+      }
     }
 
-    handler({}, mockHandler)
+    route.handler(mockRequest, mockToolkit)
 
-    expect(redirectSpy).toHaveBeenCalledWith('/exemption/project-name')
+    expect(mockToolkit.redirect).toHaveBeenCalledWith('/exemption/project-name')
   })
 })

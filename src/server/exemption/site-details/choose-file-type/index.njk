@@ -1,0 +1,61 @@
+{% extends 'layouts/page.njk' %}
+{% from "govuk/components/back-link/macro.njk" import govukBackLink %}
+{% from "radio-page/macro.njk" import appRadioPage %}
+{% from "govuk/components/details/macro.njk" import govukDetails %}
+
+{% block beforeContent %}
+  {{ govukBackLink({
+    text: "Back",
+    href: backLink
+  }) }}
+{% endblock %}
+
+{% block content %}
+
+  {% set helperHtml %}
+  <h2 class="govuk-heading-s">Shapefile</h2>
+  <p>A shapefile is a collection of files that store map data. It defines locations, shapes, 
+         and other details like names or numbers. Shapefiles are commonly used in geographic 
+         information system (GIS) software.</p>
+
+  <h2 class="govuk-heading-s">KML</h2>
+  <p>
+        A KML file (Keyhole Markup Language) is used to store map data. It tells mapping programs
+        like Google Earth where to place points, lines, shapes, and other features on a map. KML 
+        files are written in XML (Extensible Markup Language), a format that organises data so 
+        computers can read it.</p>
+  {% endset %}
+
+  {% set helperText %}
+  {{ govukDetails({ 
+      html:helperHtml, 
+      summaryText: "Help with file types" 
+  }) }}
+  {% endset %}
+
+    {{ appRadioPage({
+            name: "fileUploadType",
+            errorSummary: errorSummary,
+            errors: errors,
+            heading: "Which type of file do you want to upload?",
+            isPageHeading: true,
+            value: payload.fileUploadType,
+            errorMessage: errors['fileUploadType'],
+            projectName: projectName,
+            hint: { html: helperText },
+            items: [
+                {
+                value: "shapefile",
+                text: "Shapefile"
+                },
+                {
+                value: "kml",
+                text: "KML"
+                }
+            ],
+            csrfToken: csrfToken,
+            cancelLink: "/exemption/task-list?cancel=site-details"
+            })
+        }}
+
+{% endblock %}

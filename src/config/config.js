@@ -224,6 +224,26 @@ export const config = convict({
       default: 'http://localhost:3001',
       env: 'MARINE_LICENSING_BACKEND_API_URL'
     }
+  },
+  cdpUploader: {
+    baseUrl: {
+      doc: 'CDP Uploader service base URL',
+      format: String,
+      default: 'http://localhost:7337',
+      env: 'CDP_UPLOADER_BASE_URL'
+    },
+    timeout: {
+      doc: 'Request timeout for CDP Uploader calls in milliseconds',
+      format: Number,
+      default: 30000,
+      env: 'CDP_UPLOADER_TIMEOUT'
+    },
+    maxFileSize: {
+      doc: 'Maximum file size in bytes (50MB)',
+      format: Number,
+      default: 50 * 1000 * 1000, // 50MB
+      env: 'CDP_UPLOADER_MAX_FILE_SIZE'
+    }
   }
 })
 

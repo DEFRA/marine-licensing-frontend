@@ -662,6 +662,28 @@ describe('#CdpUploadService', () => {
         )
       })
 
+      test('Should handle 400 Bad Request error', async () => {
+        // Given
+        Wreck.get.mockResolvedValue({
+          res: { statusCode: 400, statusMessage: 'Bad Request' },
+          payload: { error: 'Invalid upload ID format' }
+        })
+
+        // When / Then
+        await expect(
+          service.getStatus(mockUploadId, mockStatusUrl)
+        ).rejects.toThrow('API call failed with status: 400')
+
+        expect(mockLoggerError).toHaveBeenCalledWith(
+          'API call failed with status: 400',
+          {
+            uploadId: mockUploadId,
+            status: 400,
+            statusText: 'Bad Request'
+          }
+        )
+      })
+
       test('Should handle 500 Internal Server Error', async () => {
         // Given
         Wreck.get.mockResolvedValue({
@@ -765,6 +787,98 @@ describe('#CdpUploadService', () => {
       expect(result).toEqual({
         status: 'pending',
         message: 'Upload pending'
+      })
+    })
+
+    test('Should handle form with keys but no valid file data', async () => {
+      // Given - Form object exists with keys but no valid file data
+      Wreck.get.mockResolvedValue({
+        res: { statusCode: 200 },
+        payload: {
+          uploadStatus: 'initiated',
+          form: {
+            someKey: null // Has keys but Object.values(form)[0] returns null
+          }
+        }
+      })
+
+      // When
+      const result = await service.getStatus(mockUploadId, mockStatusUrl)
+
+      // Then
+      expect(result).toEqual({
+        status: 'pending',
+        message: 'Upload pending'
+      })
+    })
+
+    test('Should handle unknown upload status values', async () => {
+      // Given - Unknown uploadStatus that falls to default case
+      Wreck.get.mockResolvedValue({
+        res: { statusCode: 200 },
+        payload: {
+          uploadStatus: 'unknown-status', // Unknown status hits default case
+          form: {}
+        }
+      })
+
+      // When
+      const result = await service.getStatus(mockUploadId, mockStatusUrl)
+
+      // Then
+      expect(result).toEqual({
+        status: 'pending', // Default case returns 'pending'
+        message: 'Upload pending'
+      })
+    })
+
+    test('Should handle ready upload status with no form data', async () => {
+      // Given - Ready uploadStatus but no form data to cover READY case in _mapUploadStatus
+      Wreck.get.mockResolvedValue({
+        res: { statusCode: 200 },
+        payload: {
+          uploadStatus: 'ready', // Ready status should map to 'scanning'
+          form: {} // No form data, so _mapUploadStatus is called
+        }
+      })
+
+      // When
+      const result = await service.getStatus(mockUploadId, mockStatusUrl)
+
+      // Then
+      expect(result).toEqual({
+        status: 'scanning', // Ready status maps to 'scanning' when no form data
+        message: 'Upload pending'
+      })
+    })
+
+    test('Should handle unknown upload status with file data to cover _determineOverallStatus default', async () => {
+      // Given - Unknown uploadStatus with file data to hit different path
+      Wreck.get.mockResolvedValue({
+        res: { statusCode: 200 },
+        payload: {
+          uploadStatus: 'unknown-status', // Unknown status
+          form: {
+            file: {
+              filename: 'test.kml',
+              fileStatus: 'unknown-file-status', // Unknown file status hits default
+              contentLength: 1024,
+              hasError: false
+            }
+          }
+        }
+      })
+
+      // When
+      const result = await service.getStatus(mockUploadId, mockStatusUrl)
+
+      // Then
+      expect(result).toEqual({
+        status: 'pending', // Default case returns 'pending'
+        filename: 'test.kml',
+        fileSize: 1024,
+        uploadedAt: expect.any(String),
+        retryable: false
       })
     })
 

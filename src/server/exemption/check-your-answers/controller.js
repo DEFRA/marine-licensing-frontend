@@ -4,6 +4,7 @@ import { config } from '~/src/config/config.js'
 import { getExemptionCache } from '~/src/server/common/helpers/session-cache/utils.js'
 import {
   getCoordinateSystemText,
+  getCoordinateDisplayText,
   getReviewSummaryText
 } from '~/src/server/exemption/site-details/review-site-details/utils.js'
 
@@ -39,6 +40,10 @@ export const checkYourAnswersController = {
       ? {
           ...exemption.siteDetails,
           coordinateSystemText: getCoordinateSystemText(
+            exemption.siteDetails.coordinateSystem
+          ),
+          coordinateDisplayText: getCoordinateDisplayText(
+            exemption.siteDetails,
             exemption.siteDetails.coordinateSystem
           ),
           reviewSummaryText: getReviewSummaryText(exemption.siteDetails)

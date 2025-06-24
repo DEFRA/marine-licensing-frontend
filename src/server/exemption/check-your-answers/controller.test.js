@@ -271,4 +271,74 @@ describe('check your answers controller', () => {
     expect(submitButton).toBeTruthy()
     expect(form.contains(submitButton)).toBe(true)
   })
+
+  test('Should display WGS84 coordinates correctly', async () => {
+    const wgs84Exemption = {
+      ...mockExemption,
+      siteDetails: {
+        ...mockExemption.siteDetails,
+        coordinateSystem: 'wgs84',
+        coordinates: {
+          latitude: '55.019889',
+          longitude: '-1.399500'
+        }
+      }
+    }
+
+    getExemptionCacheSpy.mockReturnValueOnce(wgs84Exemption)
+
+    const { result, statusCode } = await server.inject({
+      method: 'GET',
+      url: '/exemption/check-your-answers'
+    })
+    expect(statusCode).toBe(200)
+
+    const { document } = new JSDOM(result).window
+    expect(
+      document
+        .querySelector(
+          '#site-details-card .govuk-summary-list .govuk-summary-list__row:nth-child(3) .govuk-summary-list__value'
+        )
+        .textContent.trim()
+    ).toBe('55.019889, -1.399500')
+  })
+
+  test('Should display OSGB36 coordinates correctly', async () => {
+    const osgb36Exemption = {
+      ...mockExemption,
+      siteDetails: {
+        ...mockExemption.siteDetails,
+        coordinateSystem: 'osgb36',
+        coordinates: {
+          eastings: '425053',
+          northings: '564180'
+        }
+      }
+    }
+
+    getExemptionCacheSpy.mockReturnValueOnce(osgb36Exemption)
+
+    const { result, statusCode } = await server.inject({
+      method: 'GET',
+      url: '/exemption/check-your-answers'
+    })
+    expect(statusCode).toBe(200)
+
+    const { document } = new JSDOM(result).window
+    expect(
+      document
+        .querySelector(
+          '#site-details-card .govuk-summary-list .govuk-summary-list__row:nth-child(2) .govuk-summary-list__value'
+        )
+        .textContent.trim()
+    ).toBe('OSGB36 (National Grid)\n          Eastings and Northings')
+
+    expect(
+      document
+        .querySelector(
+          '#site-details-card .govuk-summary-list .govuk-summary-list__row:nth-child(3) .govuk-summary-list__value'
+        )
+        .textContent.trim()
+    ).toBe('425053, 564180')
+  })
 })

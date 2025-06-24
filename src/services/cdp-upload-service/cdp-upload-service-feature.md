@@ -6,7 +6,6 @@ The `CdpUploadService` provides integration with the Defra CDP Uploader utility 
 
 ## Dependencies
 
-- **Native Fetch**: Uses Node.js v22+ native `fetch` for all HTTP communications
 - **Configuration**: Uses the convict-based configuration system
 
 ## File Constraints
@@ -83,7 +82,6 @@ constructor(allowedMimeTypes)
 - Import and read config directly using `config.get('cdpUploader')`
 - Accept optional `allowedMimeTypes` array for file type restrictions
 - Controllers determine appropriate MIME types based on their use case
-- Use native `fetch` for all HTTP requests (Node.js v22+ native support)
 - Implement error handling and logging following API Integration Standards
 - Configure timeout and base URL from config
 - Implement logging at from debug levels upwards
@@ -137,7 +135,6 @@ export function createCdpUploadService(allowedMimeTypes = null) {
 - Use `allowedMimeTypes` parameter if provided, otherwise fall back to constructor parameter
 - Return upload configuration for frontend form
 - Handle HTTP errors and provide meaningful error messages
-- Use native `fetch` with JSON content type following API Integration Standards
 
 **Request Body:**
 
@@ -192,7 +189,6 @@ The status values should be exported constants that are easy to consume by tests
 - **Important**: Error messages from CDP Uploader are GDS content approved and can be passed directly to views
 - Handle timeout scenarios gracefully
 - Provide appropriate error messages for different failure scenarios
-- Use `fetch` with proper error handling following API Integration Standards
 
 **Error Handling:**
 
@@ -234,7 +230,6 @@ const uploadConfig = await cdpService.initiate('/success-page', [
 
 ### Unit Tests
 
-- Mock native `fetch` for all network calls
 - Test error handling for all HTTP response scenarios
 - Validate configuration parsing
 - Test factory function behavior
@@ -261,7 +256,6 @@ const uploadConfig = await cdpService.initiate('/success-page', [
 ### Testing Tools
 
 - Jest for unit testing framework
-- Mock `fetch` responses for all scenarios using jest mocking
 - Test data covering all CDP Uploader response formats
 - Coverage reporting via Jest's built-in coverage tools
 

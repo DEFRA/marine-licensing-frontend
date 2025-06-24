@@ -12,5 +12,7 @@ export const routes = {
   ACTIVITY_DATES: '/exemption/activity-dates',
   ACTIVITY_DESCRIPTION: '/exemption/activity-description',
   WIDTH_OF_SITE: '/exemption/width-of-site',
-  CHECK_YOUR_ANSWERS: '/exemption/check-your-answers'
+  CHECK_YOUR_ANSWERS: '/exemption/check-your-answers',
+  CHOOSE_FILE_UPLOAD_TYPE: '/exemption/choose-file-type-to-upload',
+  CONFIRMATION: '/exemption/confirmation'
 }

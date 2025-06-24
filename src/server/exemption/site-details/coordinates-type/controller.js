@@ -95,8 +95,6 @@ export const coordinatesTypeSubmitController = {
   handler(request, h) {
     const { payload } = request
 
-    const exemption = getExemptionCache(request)
-
     updateExemptionSiteDetails(
       request,
       'coordinatesType',
@@ -105,14 +103,10 @@ export const coordinatesTypeSubmitController = {
 
     if (payload.coordinatesType === 'coordinates') {
       return h.redirect(routes.COORDINATES_ENTRY_CHOICE).takeover()
+    } else {
+      // the 'file' case is at this point in the code flow is the only
+      // reachable option, as the validator explicitly lists all available valid choices.
+      return h.redirect(routes.CHOOSE_FILE_UPLOAD_TYPE).takeover()
     }
-
-    return h.view(PROVIDE_COORDINATES_CHOICE_VIEW_ROUTE, {
-      ...provideCoordinatesSettings,
-      projectName: exemption.projectName,
-      payload: {
-        coordinatesType: payload.coordinatesType
-      }
-    })
   }
 }

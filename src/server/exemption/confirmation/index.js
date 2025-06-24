@@ -1,9 +1,10 @@
+import { routes as routePaths } from '~/src/server/common/constants/routes.js'
 import { confirmationController } from './controller.js'
 
 const routes = [
   {
     method: 'GET',
-    path: '/exemption/confirmation',
+    path: routePaths.CONFIRMATION,
     handler: confirmationController.handler.bind(confirmationController),
     options: {
       description:

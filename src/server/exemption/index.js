@@ -7,6 +7,7 @@ import { activityDescriptionRoutes } from '~/src/server/exemption/activity-descr
 import { checkYourAnswersRoutes } from '~/src/server/exemption/check-your-answers/index.js'
 import { routes as confirmationRoutes } from '~/src/server/exemption/confirmation/index.js'
 import { routes } from '~/src/server/common/constants/routes.js'
+import { chooseFileTypeRoutes } from './site-details/choose-file-type/index.js'
 
 /**
  * Sets up the routes used in the exemption home page.
@@ -25,6 +26,7 @@ export const exemption = {
         ...publicRegisterRoutes,
         ...taskListRoutes,
         ...siteDetailsRoutes,
+        ...chooseFileTypeRoutes,
         ...activityDatesRoutes,
         ...activityDescriptionRoutes,
         ...checkYourAnswersRoutes,

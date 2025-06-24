@@ -42,6 +42,7 @@ const ERROR_MESSAGES = {
  * @typedef {object} UploadConfig
  * @property {string} uploadId - UUID for this upload session
  * @property {string} uploadUrl - Direct upload endpoint URL
+ * @property {statusUrl} statusUrl - The url to use to check the upload status
  * @property {number} maxFileSize - Maximum allowed file size in bytes
  * @property {string[]} allowedTypes - Array of allowed MIME types
  */
@@ -80,23 +81,34 @@ export class CdpUploadService {
 
   /**
    * Initiates a new file upload session with CDP Uploader
-   * @param {string} redirectUrl - URL to redirect user after upload completion
-   * @param {string[]?} allowedMimeTypes - Array of allowed MIME types to override constructor defaults
+   * @param {object} options - Configuration options for the upload session
+   * @param {string} options.redirectUrl - URL to redirect user after upload completion
+   * @param {string[]?} options.allowedMimeTypes - Array of allowed MIME types to override constructor defaults
+   * @param {string?} options.s3Path - Optional S3 path prefix for organizing files in folders (defaults to empty string)
+   * @param {object?} options.metadata - Optional metadata object to attach to the upload
    * @returns {Promise<UploadConfig>}
    */
-  async initiate(redirectUrl, allowedMimeTypes) {
+  async initiate({ redirectUrl, allowedMimeTypes, s3Path = '', metadata }) {
     const mimeTypes = allowedMimeTypes ?? this.allowedMimeTypes
     const requestPayload = {
       redirectUrl,
       maxFileSize: this.config.maxFileSize,
-      mimeTypes
+      mimeTypes,
+      s3Path
+    }
+
+    // Add metadata to payload if provided
+    if (metadata) {
+      requestPayload.metadata = metadata
     }
 
     try {
       this.logger.debug('Initiating upload session', {
         redirectUrl,
         maxFileSize: this.config.maxFileSize,
-        mimeTypes
+        mimeTypes,
+        s3Path,
+        metadata
       })
 
       const { res, payload } = await Wreck.post(
@@ -128,6 +140,7 @@ export class CdpUploadService {
       return {
         uploadId: data.uploadId,
         uploadUrl: data.uploadUrl,
+        statusUrl: data.statusUrl,
         maxFileSize: this.config.maxFileSize,
         allowedTypes: mimeTypes ?? []
       }
@@ -135,7 +148,9 @@ export class CdpUploadService {
       this.logger.error('Failed to initiate upload session', {
         error: error.message,
         redirectUrl,
-        mimeTypes
+        mimeTypes,
+        s3Path,
+        metadata
       })
       throw error
     }

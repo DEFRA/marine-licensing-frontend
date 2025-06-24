@@ -1,0 +1,1011 @@
+import Wreck from '@hapi/wreck'
+import { CdpUploadService, UPLOAD_STATUSES } from './cdp-upload-service.js'
+import { config } from '~/src/config/config.js'
+
+// Mock dependencies
+const mockLoggerDebug = jest.fn()
+const mockLoggerInfo = jest.fn()
+const mockLoggerWarn = jest.fn()
+const mockLoggerError = jest.fn()
+
+jest.mock('@hapi/wreck')
+jest.mock('~/src/server/common/helpers/logging/logger.js', () => ({
+  createLogger: () => ({
+    debug: (...args) => mockLoggerDebug(...args),
+    info: (...args) => mockLoggerInfo(...args),
+    warn: (...args) => mockLoggerWarn(...args),
+    error: (...args) => mockLoggerError(...args)
+  })
+}))
+
+// Test data constants
+const mockUploadId = 'b18ceadb-afb1-4955-a70b-256bf94444d5'
+const mockRedirectUrl = '/success-page'
+const mockStatusUrl = `https://cdp-uploader/status/${mockUploadId}`
+const mockUploadUrl = `/upload-and-scan/${mockUploadId}`
+const mockAllowedMimeTypes = [
+  'application/vnd.google-earth.kml+xml',
+  'application/zip'
+]
+
+describe('#CdpUploadService', () => {
+  let service
+
+  beforeEach(() => {
+    jest.resetAllMocks()
+    jest.clearAllMocks()
+  })
+
+  afterEach(() => {
+    jest.restoreAllMocks()
+  })
+
+  describe('Constructor', () => {
+    test('Should initialize with default configuration and no MIME types', () => {
+      // Given / When
+      service = new CdpUploadService()
+
+      // Then
+      expect(service.allowedMimeTypes).toBeUndefined()
+      expect(service.config).toEqual(config.get('cdpUploader'))
+      expect(mockLoggerDebug).toHaveBeenCalledWith(
+        'CdpUploadService initialized',
+        {
+          baseUrl: config.get('cdpUploader').baseUrl,
+          timeout: config.get('cdpUploader').timeout,
+          maxFileSize: config.get('cdpUploader').maxFileSize,
+          allowedMimeTypes: undefined
+        }
+      )
+    })
+
+    test('Should initialize with provided MIME types', () => {
+      // Given / When
+      service = new CdpUploadService(mockAllowedMimeTypes)
+
+      // Then
+      expect(service.allowedMimeTypes).toEqual(mockAllowedMimeTypes)
+      expect(mockLoggerDebug).toHaveBeenCalledWith(
+        'CdpUploadService initialized',
+        expect.objectContaining({
+          allowedMimeTypes: mockAllowedMimeTypes
+        })
+      )
+    })
+  })
+
+  describe('initiate()', () => {
+    beforeEach(() => {
+      service = new CdpUploadService(mockAllowedMimeTypes)
+    })
+
+    describe('Given successful API response', () => {
+      test('Should initiate upload session with constructor MIME types', async () => {
+        // Given
+        const mockResponse = {
+          uploadId: mockUploadId,
+          uploadUrl: mockUploadUrl,
+          statusUrl: mockStatusUrl
+        }
+
+        Wreck.post.mockResolvedValue({
+          res: { statusCode: 200 },
+          payload: mockResponse
+        })
+
+        // When
+        const result = await service.initiate({ redirectUrl: mockRedirectUrl })
+
+        // Then
+        expect(Wreck.post).toHaveBeenCalledWith(
+          `${config.get('cdpUploader').baseUrl}/initiate`,
+          {
+            payload: {
+              redirectUrl: mockRedirectUrl,
+              maxFileSize: config.get('cdpUploader').maxFileSize,
+              mimeTypes: mockAllowedMimeTypes,
+              s3Path: ''
+            },
+            json: true,
+            timeout: config.get('cdpUploader').timeout
+          }
+        )
+
+        expect(result).toEqual({
+          uploadId: mockUploadId,
+          uploadUrl: mockUploadUrl,
+          statusUrl: mockStatusUrl,
+          maxFileSize: config.get('cdpUploader').maxFileSize,
+          allowedTypes: mockAllowedMimeTypes
+        })
+
+        expect(mockLoggerInfo).toHaveBeenCalledWith(
+          'Upload session initiated successfully',
+          {
+            uploadId: mockUploadId,
+            redirectUrl: mockRedirectUrl
+          }
+        )
+      })
+
+      test('Should override constructor MIME types with parameter', async () => {
+        // Given
+        const overrideMimeTypes = ['application/vnd.google-earth.kml+xml']
+        const mockResponse = {
+          uploadId: mockUploadId,
+          uploadUrl: mockUploadUrl
+        }
+
+        Wreck.post.mockResolvedValue({
+          res: { statusCode: 200 },
+          payload: mockResponse
+        })
+
+        // When
+        const result = await service.initiate({
+          redirectUrl: mockRedirectUrl,
+          allowedMimeTypes: overrideMimeTypes
+        })
+
+        // Then
+        expect(Wreck.post).toHaveBeenCalledWith(
+          expect.any(String),
+          expect.objectContaining({
+            payload: expect.objectContaining({
+              mimeTypes: overrideMimeTypes
+            })
+          })
+        )
+
+        expect(result.allowedTypes).toEqual(overrideMimeTypes)
+      })
+
+      test('Should include s3Path when provided', async () => {
+        // Given
+        const s3Path = 'documents/coordinates'
+        const mockResponse = {
+          uploadId: mockUploadId,
+          uploadUrl: mockUploadUrl
+        }
+
+        Wreck.post.mockResolvedValue({
+          res: { statusCode: 200 },
+          payload: mockResponse
+        })
+
+        // When
+        await service.initiate({
+          redirectUrl: mockRedirectUrl,
+          s3Path
+        })
+
+        // Then
+        expect(Wreck.post).toHaveBeenCalledWith(
+          expect.any(String),
+          expect.objectContaining({
+            payload: expect.objectContaining({
+              s3Path: 'documents/coordinates'
+            })
+          })
+        )
+      })
+
+      test('Should include metadata when provided', async () => {
+        // Given
+        const metadata = {
+          projectId: 'test-project-123',
+          userId: 'user-456',
+          fileType: 'coordinates'
+        }
+        const mockResponse = {
+          uploadId: mockUploadId,
+          uploadUrl: mockUploadUrl
+        }
+
+        Wreck.post.mockResolvedValue({
+          res: { statusCode: 200 },
+          payload: mockResponse
+        })
+
+        // When
+        await service.initiate({
+          redirectUrl: mockRedirectUrl,
+          metadata
+        })
+
+        // Then
+        expect(Wreck.post).toHaveBeenCalledWith(
+          expect.any(String),
+          expect.objectContaining({
+            payload: expect.objectContaining({
+              metadata: {
+                projectId: 'test-project-123',
+                userId: 'user-456',
+                fileType: 'coordinates'
+              }
+            })
+          })
+        )
+      })
+
+      test('Should include both s3Path and metadata when provided', async () => {
+        // Given
+        const s3Path = 'uploads/kml-files'
+        const metadata = { uploadType: 'coordinate-file' }
+        const mockResponse = {
+          uploadId: mockUploadId,
+          uploadUrl: mockUploadUrl
+        }
+
+        Wreck.post.mockResolvedValue({
+          res: { statusCode: 200 },
+          payload: mockResponse
+        })
+
+        // When
+        await service.initiate({
+          redirectUrl: mockRedirectUrl,
+          allowedMimeTypes: mockAllowedMimeTypes,
+          s3Path,
+          metadata
+        })
+
+        // Then
+        expect(Wreck.post).toHaveBeenCalledWith(
+          expect.any(String),
+          expect.objectContaining({
+            payload: expect.objectContaining({
+              redirectUrl: mockRedirectUrl,
+              mimeTypes: mockAllowedMimeTypes,
+              s3Path: 'uploads/kml-files',
+              metadata: { uploadType: 'coordinate-file' }
+            })
+          })
+        )
+      })
+
+      test('Should default s3Path to empty string when not provided', async () => {
+        // Given
+        const mockResponse = {
+          uploadId: mockUploadId,
+          uploadUrl: mockUploadUrl
+        }
+
+        Wreck.post.mockResolvedValue({
+          res: { statusCode: 200 },
+          payload: mockResponse
+        })
+
+        // When
+        await service.initiate({ redirectUrl: mockRedirectUrl })
+
+        // Then
+        expect(Wreck.post).toHaveBeenCalledWith(
+          expect.any(String),
+          expect.objectContaining({
+            payload: expect.objectContaining({
+              s3Path: ''
+            })
+          })
+        )
+
+        // Should not include metadata if not provided
+        expect(Wreck.post).toHaveBeenCalledWith(
+          expect.any(String),
+          expect.objectContaining({
+            payload: expect.not.objectContaining({
+              metadata: expect.anything()
+            })
+          })
+        )
+      })
+    })
+
+    describe('Given API error responses', () => {
+      test('Should handle 400 Bad Request error', async () => {
+        // Given
+        Wreck.post.mockResolvedValue({
+          res: { statusCode: 400, statusMessage: 'Bad Request' },
+          payload: { error: 'Invalid request' }
+        })
+
+        // When / Then
+        await expect(
+          service.initiate({ redirectUrl: mockRedirectUrl })
+        ).rejects.toThrow('API call failed with status: 400')
+
+        expect(mockLoggerError).toHaveBeenCalledWith(
+          'API call failed with status: 400',
+          expect.objectContaining({
+            status: 400,
+            statusText: 'Bad Request',
+            endpoint: '/initiate'
+          })
+        )
+      })
+
+      test('Should handle network timeout', async () => {
+        // Given
+        const networkError = new Error('Request timeout')
+        networkError.code = 'ETIMEDOUT'
+        Wreck.post.mockRejectedValue(networkError)
+
+        // When / Then
+        await expect(
+          service.initiate({ redirectUrl: mockRedirectUrl })
+        ).rejects.toThrow('Request timeout')
+
+        expect(mockLoggerError).toHaveBeenCalledWith(
+          'Failed to initiate upload session',
+          expect.objectContaining({
+            error: 'Request timeout'
+          })
+        )
+      })
+    })
+  })
+
+  describe('getStatus()', () => {
+    beforeEach(() => {
+      service = new CdpUploadService()
+    })
+
+    describe('Given successful API responses', () => {
+      test('Should return pending status when no files uploaded yet', async () => {
+        // Given
+        const mockResponse = {
+          uploadStatus: 'initiated',
+          form: {}
+        }
+
+        Wreck.get.mockResolvedValue({
+          res: { statusCode: 200 },
+          payload: mockResponse
+        })
+
+        // When
+        const result = await service.getStatus(mockUploadId, mockStatusUrl)
+
+        // Then
+        expect(Wreck.get).toHaveBeenCalledWith(mockStatusUrl, {
+          json: true,
+          timeout: config.get('cdpUploader').timeout
+        })
+
+        expect(result).toEqual({
+          status: 'pending',
+          message: 'Upload pending'
+        })
+
+        expect(mockLoggerDebug).toHaveBeenCalledWith(
+          'Upload status retrieved',
+          {
+            uploadId: mockUploadId,
+            status: 'pending'
+          }
+        )
+      })
+
+      test('Should return scanning status when file is being scanned', async () => {
+        // Given
+        const mockResponse = {
+          uploadStatus: 'ready',
+          form: {
+            file: {
+              filename: 'test-coordinates.kml',
+              contentType: 'application/vnd.google-earth.kml+xml',
+              fileStatus: 'pending',
+              contentLength: 1024,
+              hasError: false
+            }
+          }
+        }
+
+        Wreck.get.mockResolvedValue({
+          res: { statusCode: 200 },
+          payload: mockResponse
+        })
+
+        // When
+        const result = await service.getStatus(mockUploadId, mockStatusUrl)
+
+        // Then
+        expect(result).toEqual({
+          status: 'scanning',
+          filename: 'test-coordinates.kml',
+          fileSize: 1024,
+          uploadedAt: expect.any(String),
+          retryable: false
+        })
+      })
+
+      test('Should return ready status when file is complete and ready', async () => {
+        // Given
+        const mockResponse = {
+          uploadStatus: 'ready',
+          form: {
+            file: {
+              filename: 'test-coordinates.kml',
+              fileStatus: 'complete',
+              contentLength: 1024,
+              hasError: false
+            }
+          }
+        }
+
+        Wreck.get.mockResolvedValue({
+          res: { statusCode: 200 },
+          payload: mockResponse
+        })
+
+        // When
+        const result = await service.getStatus(mockUploadId, mockStatusUrl)
+
+        // Then
+        expect(result).toEqual({
+          status: 'ready',
+          filename: 'test-coordinates.kml',
+          fileSize: 1024,
+          uploadedAt: expect.any(String),
+          completedAt: expect.any(String),
+          retryable: false
+        })
+      })
+
+      test('Should return rejected status with virus detection error', async () => {
+        // Given
+        const mockResponse = {
+          uploadStatus: 'ready',
+          form: {
+            file: {
+              filename: 'virus-test.kml',
+              fileStatus: 'rejected',
+              contentLength: 1024,
+              hasError: true,
+              errorMessage: 'The selected file contains a virus'
+            }
+          }
+        }
+
+        Wreck.get.mockResolvedValue({
+          res: { statusCode: 200 },
+          payload: mockResponse
+        })
+
+        // When
+        const result = await service.getStatus(mockUploadId, mockStatusUrl)
+
+        // Then
+        expect(result).toEqual({
+          status: 'rejected',
+          filename: 'virus-test.kml',
+          fileSize: 1024,
+          uploadedAt: expect.any(String),
+          completedAt: expect.any(String),
+          message: 'The selected file contains a virus',
+          errorCode: 'VIRUS_DETECTED',
+          retryable: false
+        })
+      })
+    })
+
+    describe('Given file validation errors matching ML-70 acceptance criteria', () => {
+      test('Should handle file too large error (AC4)', async () => {
+        // Given
+        const errorResponse = {
+          uploadStatus: 'ready',
+          form: {
+            file: {
+              filename: 'large-file.kml',
+              fileStatus: 'rejected',
+              hasError: true,
+              errorMessage: 'The selected file must be smaller than 50MB'
+            }
+          }
+        }
+
+        Wreck.get.mockResolvedValue({
+          res: { statusCode: 200 },
+          payload: errorResponse
+        })
+
+        // When
+        const result = await service.getStatus(mockUploadId, mockStatusUrl)
+
+        // Then
+        expect(result.status).toBe('rejected')
+        expect(result.message).toBe(
+          'The selected file must be smaller than 50MB'
+        )
+        expect(result.errorCode).toBe('FILE_TOO_LARGE')
+      })
+
+      test('Should handle empty file error (AC4)', async () => {
+        // Given
+        const errorResponse = {
+          uploadStatus: 'ready',
+          form: {
+            file: {
+              filename: 'empty.kml',
+              fileStatus: 'rejected',
+              hasError: true,
+              errorMessage: 'The selected file is empty'
+            }
+          }
+        }
+
+        Wreck.get.mockResolvedValue({
+          res: { statusCode: 200 },
+          payload: errorResponse
+        })
+
+        // When
+        const result = await service.getStatus(mockUploadId, mockStatusUrl)
+
+        // Then
+        expect(result.status).toBe('rejected')
+        expect(result.message).toBe('The selected file is empty')
+        expect(result.errorCode).toBe('FILE_EMPTY')
+      })
+
+      test('Should handle invalid file type error (AC4)', async () => {
+        // Given
+        const errorResponse = {
+          uploadStatus: 'ready',
+          form: {
+            file: {
+              filename: 'document.pdf',
+              fileStatus: 'rejected',
+              hasError: true,
+              errorMessage: 'The selected file must be a KML file'
+            }
+          }
+        }
+
+        Wreck.get.mockResolvedValue({
+          res: { statusCode: 200 },
+          payload: errorResponse
+        })
+
+        // When
+        const result = await service.getStatus(mockUploadId, mockStatusUrl)
+
+        // Then
+        expect(result.status).toBe('rejected')
+        expect(result.message).toBe('The selected file must be a KML file')
+        expect(result.errorCode).toBe('INVALID_FILE_TYPE')
+      })
+
+      test('Should handle password protected file error (AC4)', async () => {
+        // Given
+        const errorResponse = {
+          uploadStatus: 'ready',
+          form: {
+            file: {
+              filename: 'protected.zip',
+              fileStatus: 'rejected',
+              hasError: true,
+              errorMessage: 'The selected file is password protected'
+            }
+          }
+        }
+
+        Wreck.get.mockResolvedValue({
+          res: { statusCode: 200 },
+          payload: errorResponse
+        })
+
+        // When
+        const result = await service.getStatus(mockUploadId, mockStatusUrl)
+
+        // Then
+        expect(result.status).toBe('rejected')
+        expect(result.message).toBe('The selected file is password protected')
+        expect(result.errorCode).toBe('PASSWORD_PROTECTED')
+      })
+
+      test('Should handle generic upload error (AC4)', async () => {
+        // Given
+        const errorResponse = {
+          uploadStatus: 'ready',
+          form: {
+            file: {
+              filename: 'error.kml',
+              fileStatus: 'rejected',
+              hasError: true,
+              errorMessage:
+                'The selected file could not be uploaded – try again'
+            }
+          }
+        }
+
+        Wreck.get.mockResolvedValue({
+          res: { statusCode: 200 },
+          payload: errorResponse
+        })
+
+        // When
+        const result = await service.getStatus(mockUploadId, mockStatusUrl)
+
+        // Then
+        expect(result.status).toBe('rejected')
+        expect(result.message).toBe(
+          'The selected file could not be uploaded – try again'
+        )
+        expect(result.errorCode).toBe('UPLOAD_ERROR')
+      })
+    })
+
+    describe('Given API error responses', () => {
+      test('Should handle 404 Not Found (upload session not found)', async () => {
+        // Given
+        Wreck.get.mockResolvedValue({
+          res: { statusCode: 404 },
+          payload: null
+        })
+
+        // When
+        const result = await service.getStatus(mockUploadId, mockStatusUrl)
+
+        // Then
+        expect(result).toEqual({
+          status: 'error',
+          message: 'Upload session not found',
+          retryable: false
+        })
+
+        expect(mockLoggerWarn).toHaveBeenCalledWith(
+          'Upload session not found',
+          {
+            uploadId: mockUploadId
+          }
+        )
+      })
+
+      test('Should handle 500 Internal Server Error', async () => {
+        // Given
+        Wreck.get.mockResolvedValue({
+          res: { statusCode: 500 },
+          payload: null
+        })
+
+        // When
+        const result = await service.getStatus(mockUploadId, mockStatusUrl)
+
+        // Then
+        expect(result).toEqual({
+          status: 'error',
+          message: 'Service temporarily unavailable',
+          retryable: true
+        })
+      })
+
+      test('Should handle connection timeout gracefully', async () => {
+        // Given
+        const timeoutError = new Error('Request timeout')
+        timeoutError.code = 'ETIMEDOUT'
+        Wreck.get.mockRejectedValue(timeoutError)
+
+        // When
+        const result = await service.getStatus(mockUploadId, mockStatusUrl)
+
+        // Then
+        expect(result).toEqual({
+          status: 'error',
+          message: 'Unable to check status',
+          retryable: true
+        })
+
+        expect(mockLoggerError).toHaveBeenCalledWith(
+          'Request timeout when checking status',
+          {
+            uploadId: mockUploadId,
+            error: 'Request timeout'
+          }
+        )
+      })
+
+      test('Should handle connection reset gracefully', async () => {
+        // Given
+        const resetError = new Error('Connection reset')
+        resetError.code = 'ECONNRESET'
+        Wreck.get.mockRejectedValue(resetError)
+
+        // When
+        const result = await service.getStatus(mockUploadId, mockStatusUrl)
+
+        // Then
+        expect(result).toEqual({
+          status: 'error',
+          message: 'Unable to check status',
+          retryable: true
+        })
+      })
+    })
+  })
+
+  describe('Constants and Exports', () => {
+    test('Should export UPLOAD_STATUSES constants', () => {
+      // Given / When / Then
+      expect(UPLOAD_STATUSES).toEqual({
+        INITIATED: 'initiated',
+        PENDING: 'pending',
+        READY: 'ready',
+        COMPLETE: 'complete',
+        REJECTED: 'rejected',
+        ERROR: 'error'
+      })
+    })
+
+    test('Should have correct status constant values for ML-70 requirements', () => {
+      // Given / When / Then
+      expect(UPLOAD_STATUSES.PENDING).toBe('pending')
+      expect(UPLOAD_STATUSES.READY).toBe('ready')
+      expect(UPLOAD_STATUSES.REJECTED).toBe('rejected')
+      expect(UPLOAD_STATUSES.ERROR).toBe('error')
+    })
+  })
+
+  describe('Edge cases and boundary conditions', () => {
+    beforeEach(() => {
+      service = new CdpUploadService()
+    })
+
+    test('Should handle malformed response with no form data', async () => {
+      // Given
+      Wreck.get.mockResolvedValue({
+        res: { statusCode: 200 },
+        payload: { uploadStatus: 'pending' }
+      })
+
+      // When
+      const result = await service.getStatus(mockUploadId, mockStatusUrl)
+
+      // Then
+      expect(result).toEqual({
+        status: 'pending',
+        message: 'Upload pending'
+      })
+    })
+
+    test('Should handle maximum file size (50MB limit from ML-70)', async () => {
+      // Given
+      const maxSizeResponse = {
+        uploadStatus: 'ready',
+        form: {
+          file: {
+            filename: 'max-size.kml',
+            fileStatus: 'complete',
+            contentLength: 50 * 1000 * 1000, // 50MB limit
+            hasError: false
+          }
+        }
+      }
+
+      Wreck.get.mockResolvedValue({
+        res: { statusCode: 200 },
+        payload: maxSizeResponse
+      })
+
+      // When
+      const result = await service.getStatus(mockUploadId, mockStatusUrl)
+
+      // Then
+      expect(result.fileSize).toBe(50 * 1000 * 1000)
+      expect(result.status).toBe('ready')
+    })
+
+    test('Should validate timestamp format is ISO string', async () => {
+      // Given
+      const mockResponse = {
+        uploadStatus: 'ready',
+        form: {
+          file: {
+            filename: 'test.kml',
+            fileStatus: 'complete',
+            contentLength: 1024,
+            hasError: false
+          }
+        }
+      }
+
+      Wreck.get.mockResolvedValue({
+        res: { statusCode: 200 },
+        payload: mockResponse
+      })
+
+      // When
+      const result = await service.getStatus(mockUploadId, mockStatusUrl)
+
+      // Then
+      expect(result.uploadedAt).toMatch(
+        /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/
+      )
+      expect(result.completedAt).toMatch(
+        /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/
+      )
+    })
+  })
+
+  describe('ML-70 specific test scenarios', () => {
+    beforeEach(() => {
+      service = new CdpUploadService()
+    })
+
+    test('Should support KML file type validation', async () => {
+      // Given - KML MIME type for coordinate file upload
+      const kmlService = new CdpUploadService([
+        'application/vnd.google-earth.kml+xml'
+      ])
+
+      const mockResponse = {
+        uploadId: mockUploadId,
+        uploadUrl: mockUploadUrl
+      }
+
+      Wreck.post.mockResolvedValue({
+        res: { statusCode: 200 },
+        payload: mockResponse
+      })
+
+      // When
+      const result = await kmlService.initiate({ redirectUrl: mockRedirectUrl })
+
+      // Then
+      expect(result.allowedTypes).toEqual([
+        'application/vnd.google-earth.kml+xml'
+      ])
+      expect(Wreck.post).toHaveBeenCalledWith(
+        expect.any(String),
+        expect.objectContaining({
+          payload: expect.objectContaining({
+            mimeTypes: ['application/vnd.google-earth.kml+xml']
+          })
+        })
+      )
+    })
+
+    test('Should support Shapefile (ZIP) validation', async () => {
+      // Given - ZIP MIME type for Shapefile upload
+      const shapefileService = new CdpUploadService(['application/zip'])
+
+      const mockResponse = {
+        uploadId: mockUploadId,
+        uploadUrl: mockUploadUrl
+      }
+
+      Wreck.post.mockResolvedValue({
+        res: { statusCode: 200 },
+        payload: mockResponse
+      })
+
+      // When
+      const result = await shapefileService.initiate({
+        redirectUrl: mockRedirectUrl
+      })
+
+      // Then
+      expect(result.allowedTypes).toEqual(['application/zip'])
+      expect(Wreck.post).toHaveBeenCalledWith(
+        expect.any(String),
+        expect.objectContaining({
+          payload: expect.objectContaining({
+            mimeTypes: ['application/zip']
+          })
+        })
+      )
+    })
+
+    test('Should handle both KML and Shapefile types as per ML-70 requirements', async () => {
+      // Given - Both file types supported as per ML-70
+      const bothTypesService = new CdpUploadService([
+        'application/vnd.google-earth.kml+xml',
+        'application/zip'
+      ])
+
+      const mockResponse = {
+        uploadId: mockUploadId,
+        uploadUrl: mockUploadUrl
+      }
+
+      Wreck.post.mockResolvedValue({
+        res: { statusCode: 200 },
+        payload: mockResponse
+      })
+
+      // When
+      const result = await bothTypesService.initiate({
+        redirectUrl: mockRedirectUrl
+      })
+
+      // Then
+      expect(result.allowedTypes).toEqual([
+        'application/vnd.google-earth.kml+xml',
+        'application/zip'
+      ])
+    })
+
+    test('Should enforce 50MB file size limit as specified in ML-70', () => {
+      // Given / When
+      service = new CdpUploadService()
+
+      // Then
+      expect(service.config.maxFileSize).toBe(50 * 1000 * 1000) // 50MB as per ML-70
+    })
+
+    test('Should support organizing coordinate files with s3Path', async () => {
+      // Given - Organize coordinate files in folders as per ML-70
+      const kmlService = new CdpUploadService([
+        'application/vnd.google-earth.kml+xml'
+      ])
+      const s3Path = 'exemptions/site-details/coordinates'
+      const mockResponse = {
+        uploadId: mockUploadId,
+        uploadUrl: mockUploadUrl
+      }
+
+      Wreck.post.mockResolvedValue({
+        res: { statusCode: 200 },
+        payload: mockResponse
+      })
+
+      // When
+      await kmlService.initiate({
+        redirectUrl: mockRedirectUrl,
+        s3Path
+      })
+
+      // Then
+      expect(Wreck.post).toHaveBeenCalledWith(
+        expect.any(String),
+        expect.objectContaining({
+          payload: expect.objectContaining({
+            s3Path: 'exemptions/site-details/coordinates',
+            mimeTypes: ['application/vnd.google-earth.kml+xml']
+          })
+        })
+      )
+    })
+
+    test('Should support attaching project metadata to coordinate uploads', async () => {
+      // Given - Attach project context to uploads as per ML-70
+      const service = new CdpUploadService()
+      const metadata = {
+        exemptionId: 'exemption-123',
+        projectName: 'Test Marine Licensing Project',
+        coordinateType: 'site-details',
+        uploadStep: 'coordinate-file'
+      }
+      const mockResponse = {
+        uploadId: mockUploadId,
+        uploadUrl: mockUploadUrl
+      }
+
+      Wreck.post.mockResolvedValue({
+        res: { statusCode: 200 },
+        payload: mockResponse
+      })
+
+      // When
+      await service.initiate({
+        redirectUrl: mockRedirectUrl,
+        metadata
+      })
+
+      // Then
+      expect(Wreck.post).toHaveBeenCalledWith(
+        expect.any(String),
+        expect.objectContaining({
+          payload: expect.objectContaining({
+            metadata: {
+              exemptionId: 'exemption-123',
+              projectName: 'Test Marine Licensing Project',
+              coordinateType: 'site-details',
+              uploadStep: 'coordinate-file'
+            }
+          })
+        })
+      )
+    })
+  })
+})

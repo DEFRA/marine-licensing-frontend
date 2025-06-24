@@ -228,9 +228,8 @@ describe('check your answers controller', () => {
           '#site-details-card .govuk-summary-list .govuk-summary-list__row:nth-child(2) .govuk-summary-list__value'
         )
         .textContent.trim()
-    ).toBe(
-      'WGS84 (World Geodetic System 1984)\n          Latitude and longitude'
-    )
+        .replace(/\s+/g, ' ')
+    ).toBe('WGS84 (World Geodetic System 1984) Latitude and longitude')
 
     expect(
       document
@@ -331,7 +330,8 @@ describe('check your answers controller', () => {
           '#site-details-card .govuk-summary-list .govuk-summary-list__row:nth-child(2) .govuk-summary-list__value'
         )
         .textContent.trim()
-    ).toBe('OSGB36 (National Grid)\n          Eastings and Northings')
+        .replace(/\s+/g, ' ')
+    ).toBe('OSGB36 (National Grid) Eastings and Northings')
 
     expect(
       document

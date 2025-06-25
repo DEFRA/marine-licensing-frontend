@@ -80,14 +80,6 @@ describe('exemption route', () => {
       }),
       expect.objectContaining({
         method: 'GET',
-        path: '/exemption/activity-description'
-      }),
-      expect.objectContaining({
-        method: 'POST',
-        path: '/exemption/activity-description'
-      }),
-      expect.objectContaining({
-        method: 'GET',
         path: '/exemption/choose-file-type-to-upload'
       }),
       expect.objectContaining({
@@ -101,6 +93,26 @@ describe('exemption route', () => {
       expect.objectContaining({
         method: 'POST',
         path: '/exemption/activity-dates'
+      }),
+      expect.objectContaining({
+        method: 'GET',
+        path: '/exemption/activity-description'
+      }),
+      expect.objectContaining({
+        method: 'POST',
+        path: '/exemption/activity-description'
+      }),
+      expect.objectContaining({
+        method: 'GET',
+        path: '/exemption/check-your-answers'
+      }),
+      expect.objectContaining({
+        method: 'POST',
+        path: '/exemption/check-your-answers'
+      }),
+      expect.objectContaining({
+        method: 'GET',
+        path: '/exemption/confirmation'
       }),
       expect.objectContaining({
         method: 'GET',
@@ -112,21 +124,24 @@ describe('exemption route', () => {
   test('handler should redirect to /exemption/project-name', () => {
     expect.assertions(1)
 
-    const mockRequest = {}
+    const server = {
+      route: jest.fn()
+    }
 
+    exemption.plugin.register(server)
+
+    // Get the actual handler from the registered routes
+    const registeredRoutes = server.route.mock.calls[0][0]
+    const exemptionRoute = registeredRoutes.find(
+      (route) => route.method === 'GET' && route.path === '/exemption'
+    )
+
+    const mockRequest = {}
     const mockToolkit = {
       redirect: jest.fn()
     }
 
-    const route = {
-      method: 'GET',
-      path: '/exemption',
-      handler: (_request, h) => {
-        return h.redirect('/exemption/project-name')
-      }
-    }
-
-    route.handler(mockRequest, mockToolkit)
+    exemptionRoute.handler(mockRequest, mockToolkit)
 
     expect(mockToolkit.redirect).toHaveBeenCalledWith('/exemption/project-name')
   })

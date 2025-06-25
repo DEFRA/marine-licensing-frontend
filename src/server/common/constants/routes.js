@@ -9,8 +9,10 @@ export const routes = {
   PROJECT_NAME: '/exemption/project-name',
   PUBLIC_REGISTER: '/exemption/public-register',
   TASK_LIST: '/exemption/task-list',
-  ACTIVITY_DESCRIPTION: '/exemption/activity-description',
   ACTIVITY_DATES: '/exemption/activity-dates',
+  ACTIVITY_DESCRIPTION: '/exemption/activity-description',
   WIDTH_OF_SITE: '/exemption/width-of-site',
-  CHOOSE_FILE_UPLOAD_TYPE: '/exemption/choose-file-type-to-upload'
+  CHECK_YOUR_ANSWERS: '/exemption/check-your-answers',
+  CHOOSE_FILE_UPLOAD_TYPE: '/exemption/choose-file-type-to-upload',
+  CONFIRMATION: '/exemption/confirmation'
 }

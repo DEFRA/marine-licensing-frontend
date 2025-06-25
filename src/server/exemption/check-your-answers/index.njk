@@ -1,0 +1,247 @@
+{% extends 'layouts/page.njk' %}
+{% from "govuk/components/back-link/macro.njk" import govukBackLink %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
+{% block beforeContent %}
+  {{ govukBackLink({
+        text: "Go back to your project",
+        href: backLink
+    }) }}
+{% endblock %}
+{% block content %}
+  <div class="govuk-grid-row">
+    <h2 class="govuk-heading-l" id="check-your-answers-heading">Check your answers before sending your information</h2>
+    {{ govukSummaryList({
+        card: {
+          title: {
+            text: "Project details"
+          },
+          actions: {
+            items: [
+              {
+                href: "#",
+                text: "Change"
+              }
+            ]
+          },
+          attributes: {
+            id: "project-details-card"
+          }
+        },
+        rows: [
+          {
+            key: {
+              text: "Project name"
+            },
+            value: {
+              html: projectName
+            },
+            attributes: {
+              id: "project-name-row"
+            }
+          }
+        ]
+      }) }}
+    {{ govukSummaryList({
+        card: {
+          title: {
+            text: "Activity dates"
+          },
+          actions: {
+            items: [
+              {
+                href: "#",
+                text: "Change"
+              }
+            ]
+          },
+          attributes: {
+            id: "activity-dates-card"
+          }
+        },
+        rows: [
+          {
+            key: {
+              text: "Start date"
+            },
+            value: {
+              html: activityDates.start | formatDate('dd/MM/yyyy')
+            }
+          },
+          {
+            key: {
+              text: "End date"
+            },
+            value: {
+              html: activityDates.end | formatDate('dd/MM/yyyy')
+            }
+          }
+        ]
+      }) }}
+    {{ govukSummaryList({
+        card: {
+          title: {
+            text: "Activity details"
+          },
+          attributes: {
+            id: "activity-details-card"
+          }
+        },
+        rows: [
+          {
+            key: {
+              text: "Activity description"
+            },
+            value: {
+              html: activityDescription
+            },
+            classes: "",
+            actions: {
+              items: [
+                {
+                  href: "#",
+                  text: "Change",
+                  visuallyHiddenText: "activity description"
+                }
+              ]
+            }
+          },
+          {
+            key: {
+              text: "Type of activity"
+            },
+            value: {
+              html: ""
+            },
+            classes: "govuk-summary-list__row--no-border"
+          },
+          {
+            key: {
+              text: "The purpose of the activity"
+            },
+            value: {
+              html: ""
+            },
+            classes: "govuk-summary-list__row--no-border"
+          },
+          {
+            key: {
+              text: "What the activity involves"
+            },
+            value: {
+              html: ""
+            },
+            classes: "govuk-summary-list__row--no-border"
+          },
+          {
+            key: {
+              text: "Why this activity is exempt"
+            },
+            value: {
+              html: ""
+            },
+            classes: "govuk-summary-list__row--no-border"
+          },
+          {
+            key: {
+              text: "Your answers from 'Check if you need a marine licence'"
+            },
+            value: {
+              html: "<p><a href=\"\">Download a copy of your answers (PDF)</a>
+                <p>If you need to change any of your 'Check if you need a marine licence' answers
+                  <ol>
+                <li>Delete this project from your projects.</li>
+                <li>Restart the process by checking if you need a marine licence.</li></ol>"
+            }
+          }
+        ]
+      }) }}
+    {{ govukSummaryList({
+        card: {
+          title: {
+            text: "Site details"
+          },
+          actions: {
+            items: [
+              {
+                href: "#",
+                text: "Change"
+              }
+            ]
+          },
+          attributes: {
+            id: "site-details-card"
+          }
+        },
+        rows: [{
+          key: {
+            text: "Method of providing site location"
+          },
+          value: {
+            html: siteDetails.reviewSummaryText
+          }
+        }, {
+          key: {
+            text: "Coordinates system"
+          },
+          value: {
+            html: siteDetails.coordinateSystemText
+          }
+        }, {
+          key: {
+            text: "Coordinates at centre of site"
+          },
+          value: {
+            html: siteDetails.coordinateDisplayText
+          }
+        }, {
+          key: {
+            text: "Width of circular site"
+          },
+          value: {
+            html: siteDetails.circleWidth + " metres"
+          }
+        }]
+      }) }}
+    {{ govukSummaryList({
+        card: {
+          title: {
+            text: "Public register"
+          },
+          actions: {
+            items: [
+              {
+                href: "#",
+                text: "Change"
+              }
+            ]
+          },
+          attributes: {
+            id: "public-register-card"
+          }
+        },
+        rows: [
+        {
+            key: {
+              text: "Information withheld from public register"
+            },
+            value: {
+              html: "Yes" if publicRegister.consent === 'yes' else "No"
+            }
+          }
+        ]
+      }) }}
+    <form method="post">
+      <input type="hidden" name="csrfToken" value="{{ csrfToken }}"/>
+      <h2 class="govuk-heading-m">Now send your information</h2>
+      <p class="govuk-body">By submitting this information you are confirming that, to the best of your knowledge, the details
+        you are providing are correct.</p>
+      {{ govukButton({
+            text: "Confirm and send",
+            attributes: {
+              id: "confirm-and-send"
+            }
+          }) }}
+    </form>
+  </div>
+{% endblock %}

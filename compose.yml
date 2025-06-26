@@ -1,10 +1,25 @@
 services:
+  redis-frontend:
+    image: redis:7.2.3-alpine3.18
+    ports:
+      - '6380:6379'
+    restart: always
+    networks:
+      cdp-tenant:
+
   defra-id-stub:
     image: defradigital/cdp-defra-id-stub:latest
     ports:
       - '3200:3200'
     environment:
       PORT: 3200
+      REDIS_HOST: redis-frontend
+      REDIS_PORT: 6380
+      USE_SINGLE_INSTANCE_CACHE: true
+      NODE_ENV: development
+    depends_on:
+      redis-frontend:
+        condition: service_started
     healthcheck:
       test: ['CMD', 'curl', '-f', 'http://localhost:3200/health']
       interval: 5s

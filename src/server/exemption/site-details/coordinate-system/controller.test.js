@@ -149,7 +149,7 @@ describe('#coordinateSystem', () => {
   })
 
   describe('#coordinateSystemSubmitController', () => {
-    test('Should correctly stay on the page when submitting and coordinatesEntry is not single', async () => {
+    test('Should redirect to multiple coordinates page when coordinatesEntry is multiple', async () => {
       const request = {
         payload: { coordinateSystem: 'wgs84' }
       }
@@ -162,19 +162,11 @@ describe('#coordinateSystem', () => {
       })
 
       const h = {
-        view: jest.fn().mockReturnValue({
-          takeover: jest.fn()
-        })
+        redirect: jest.fn()
       }
 
       await coordinateSystemSubmitController.handler(request, h)
-      expect(h.view).toHaveBeenCalledWith(COORDINATE_SYSTEM_VIEW_ROUTE, {
-        pageTitle: 'Which coordinate system do you want to use?',
-        heading: 'Which coordinate system do you want to use?',
-        projectName: 'Test Project',
-        backLink: routes.COORDINATES_ENTRY_CHOICE,
-        payload: { coordinateSystem: 'wgs84' }
-      })
+      expect(h.redirect).toHaveBeenCalledWith(routes.ENTER_MULTIPLE_COORDINATES)
     })
 
     test('Should redirect to centre coordinates page when coordinatesEntry is single', async () => {

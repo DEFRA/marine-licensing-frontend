@@ -5,6 +5,7 @@ export const routes = {
     '/exemption/how-do-you-want-to-enter-the-coordinates',
   COORDINATE_SYSTEM_CHOICE: '/exemption/what-coordinate-system',
   CIRCLE_CENTRE_POINT: '/exemption/enter-the-coordinates-at-the-centre-point',
+  ENTER_MULTIPLE_COORDINATES: '/exemption/enter-multiple-coordinates',
   REVIEW_SITE_DETAILS: '/exemption/review-site-details',
   PROJECT_NAME: '/exemption/project-name',
   PUBLIC_REGISTER: '/exemption/public-register',

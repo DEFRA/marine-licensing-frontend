@@ -46,6 +46,7 @@
     "@hapi/inert": "^7.1.0",
     "@hapi/vision": "^7.0.3",
     "@hapi/yar": "^11.0.2",
+    "@ministryofjustice/frontend": "^5.1.4",
     "aws-embedded-metrics": "^4.2.0",
     "babel-plugin-module-resolver": "^5.0.2",
     "convict": "^6.2.4",

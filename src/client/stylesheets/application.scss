@@ -1,7 +1,54 @@
-@use "govuk-frontend";
+@use 'govuk-frontend';
 
-@use "variables";
-@use "helpers";
-@use "core";
-@use "components";
-@use "partials";
+@use 'variables';
+@use 'helpers';
+@use 'core';
+@use 'components';
+@use 'partials';
+
+.moj-add-another {
+  &__item {
+    position: relative;
+    margin: 0;
+    margin-top: 40px;
+    padding: 0;
+
+    &:first-of-type {
+      margin-top: 0;
+    }
+  }
+
+  &__title {
+    width: 100%;
+    padding: 4px 100px 4px 0;
+    float: left;
+
+    & + .govuk-form-group {
+      clear: left;
+    }
+  }
+
+  &__remove-button {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: auto;
+  }
+
+  &__add-button {
+    display: block;
+  }
+
+  &__heading:focus {
+    outline: none;
+    color: #0b0c0c;
+    background-color: #ffdd00;
+    box-shadow:
+      0 -2px #ffdd00,
+      0 4px #0b0c0c;
+  }
+}
+
+.moj-button-action {
+  margin-bottom: 20px;
+}

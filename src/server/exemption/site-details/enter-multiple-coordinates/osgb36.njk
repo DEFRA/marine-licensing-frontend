@@ -1,0 +1,136 @@
+{% extends "layouts/page.njk" %}
+{% from "govuk/components/back-link/macro.njk" import govukBackLink %}
+{% from "govuk/components/details/macro.njk" import govukDetails %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/input/macro.njk" import govukInput %}
+{% from "govuk/components/fieldset/macro.njk" import govukFieldset %}
+{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+{% from "cancel-button/macro.njk" import appCancelButton %}
+{% set detailsSummary %} Help with eastings and northings formats {% endset %}
+{% set detailsHTML %}
+<p>Eastings and northings use the Ordnance Survey National Grid reference system.</p>
+<ul class="govuk-list govuk-list--bullet">
+  <li>eastings - the distance east from the false origin in metres</li>
+  <li>northings - the distance north from the false origin in metres</li>
+</ul>
+<p>Enter coordinates as a 6-digit easting and 6 or 7-digit northing. For example:</p>
+<ul class="govuk-list govuk-list--bullet">
+  <li>easting: 123456</li>
+  <li>northing: 654321 or 1234567</li>
+</ul>
+<p>You can find grid references using the
+  <a
+    href="https://gridreferencefinder.ordnancesurvey.co.uk/"
+    class="govuk-link"
+    target="_blank"
+    rel="noopener noreferrer">Ordnance Survey grid reference finder (opens in new tab)</a>.</p>
+{% endset %}
+{% block beforeContent %}
+  {{ govukBackLink({
+        text: "Back",
+        href: backLink
+    }) }}
+{% endblock %}
+{% block content %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+      {% if errorSummary %}
+        {{ govukErrorSummary({
+                    titleText: "There is a problem",
+                    errorList: errorSummary
+                }) }}
+      {% endif %}
+      <span class="govuk-caption-l">{{ projectName }}</span>
+      <h1 class="govuk-heading-l">{{ heading }}</h1>
+      <p>Enter the easting and northing coordinates. For example, 123456 and 654321.</p>
+      {{ govukDetails({
+                summaryText: detailsSummary,
+                html: detailsHTML
+            }) }}
+      <div data-module="moj-add-another">
+        <h2 class="govuk-heading-m moj-add-another__heading" tabindex="-1">Coordinates</h2>
+        <form method="POST">
+          <input type="hidden" name="csrfToken" value="{{ csrfToken }}">
+            {% for coordinate in payload.coordinates %}
+              {% set coordinateIndex = loop.index0 %}
+              {% set pointNumber = loop.index %}
+              {% call govukFieldset({
+              classes: "moj-add-another__item",
+              legend: {
+                text: "Start and end point" if coordinateIndex == 0 else "Point " + pointNumber,
+                classes: "moj-add-another__title govuk-fieldset__legend--m",
+                isPageHeading: false
+              }
+            }) %}
+              {{ govukInput({
+              id: "coordinates[" + coordinateIndex + "][eastings]",
+              name: "coordinates[" + coordinateIndex + "][eastings]",
+              value: coordinate.eastings if coordinate.eastings else "",
+              errorMessage: errors["coordinates" + coordinateIndex + "eastings"] if errors,
+              label: {
+                text: "Eastings",
+                classes: "govuk-!-font-weight-bold"
+              },
+              classes: "govuk-!-width-one-half",
+              attributes: {
+                "data-name": "coordinates[%index%][eastings]",
+                "data-id": "coordinates[%index%][eastings]"
+              }
+            }) }}
+              {{ govukInput({
+              id: "coordinates[" + coordinateIndex + "][northings]",
+              name: "coordinates[" + coordinateIndex + "][northings]",
+              value: coordinate.northings if coordinate.northings else "",
+              errorMessage: errors["coordinates" + coordinateIndex + "northings"] if errors,
+              label: {
+                text: "Northings",
+                classes: "govuk-!-font-weight-bold"
+              },
+              classes: "govuk-!-width-one-half",
+              attributes: {
+                "data-name": "coordinates[%index%][northings]",
+                "data-id": "coordinates[%index%][northings]"
+              }
+            }) }}
+              {% if coordinateIndex > 2 %}
+                <div class="moj-button-action">
+                  {{ govukButton({
+                  text: "Remove point " + pointNumber,
+                  classes: "govuk-button--secondary moj-add-another__remove-button"
+                }) }}
+                  <noscript>
+                    <a href="?action=remove&pointIndex={{ coordinateIndex }}" class="govuk-link">
+                      Remove point {{ pointNumber }}
+                    </a>
+                  </noscript>
+                </div>
+              {% endif %}
+              {% endcall %}
+            {% endfor %}
+            <div class="moj-button-action">
+              {{ govukButton({
+              text: "Add another point",
+              classes: "govuk-button--secondary moj-add-another__add-button govuk-!-margin-bottom-4"
+            }) }}
+              <noscript>
+                <a href="?action=add" class="govuk-link">
+                  Add another point
+                </a>
+              </noscript>
+            </div>
+            <div class="govuk-button-group">
+              {{ govukButton({
+                    text: "Continue",
+                    attributes: {
+                        id: "continue"
+                    }
+                }) }}
+              {{ appCancelButton({
+                    cancelLink: "/exemption/task-list?cancel=site-details"
+                }) }}
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  {% endblock %}

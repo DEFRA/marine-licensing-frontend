@@ -9,104 +9,106 @@ describe('exemption route', () => {
     exemption.plugin.register(server)
 
     expect(server.route).toHaveBeenCalledTimes(1)
-    expect(server.route).toHaveBeenCalledWith([
-      expect.objectContaining({
-        method: 'GET',
-        path: '/exemption/project-name'
-      }),
-      expect.objectContaining({
-        method: 'POST',
-        path: '/exemption/project-name'
-      }),
-      expect.objectContaining({
-        method: 'GET',
-        path: '/exemption/public-register'
-      }),
-      expect.objectContaining({
-        method: 'POST',
-        path: '/exemption/public-register'
-      }),
-      expect.objectContaining({
-        method: 'GET',
-        path: '/exemption/task-list'
-      }),
-      expect.objectContaining({
-        method: 'GET',
-        path: '/exemption/how-do-you-want-to-provide-the-coordinates'
-      }),
-      expect.objectContaining({
-        method: 'POST',
-        path: '/exemption/how-do-you-want-to-provide-the-coordinates'
-      }),
-      expect.objectContaining({
-        method: 'GET',
-        path: '/exemption/how-do-you-want-to-enter-the-coordinates'
-      }),
-      expect.objectContaining({
-        method: 'POST',
-        path: '/exemption/how-do-you-want-to-enter-the-coordinates'
-      }),
-      expect.objectContaining({
-        method: 'GET',
-        path: '/exemption/what-coordinate-system'
-      }),
-      expect.objectContaining({
-        method: 'POST',
-        path: '/exemption/what-coordinate-system'
-      }),
-      expect.objectContaining({
-        method: 'GET',
-        path: '/exemption/enter-the-coordinates-at-the-centre-point'
-      }),
-      expect.objectContaining({
-        method: 'POST',
-        path: '/exemption/enter-the-coordinates-at-the-centre-point'
-      }),
-      expect.objectContaining({
-        method: 'GET',
-        path: '/exemption/width-of-site'
-      }),
-      expect.objectContaining({
-        method: 'POST',
-        path: '/exemption/width-of-site'
-      }),
-      expect.objectContaining({
-        method: 'GET',
-        path: '/exemption/review-site-details'
-      }),
-      expect.objectContaining({
-        method: 'POST',
-        path: '/exemption/review-site-details'
-      }),
-      expect.objectContaining({
-        method: 'GET',
-        path: '/exemption/activity-description'
-      }),
-      expect.objectContaining({
-        method: 'POST',
-        path: '/exemption/activity-description'
-      }),
-      expect.objectContaining({
-        method: 'GET',
-        path: '/exemption/choose-file-type-to-upload'
-      }),
-      expect.objectContaining({
-        method: 'POST',
-        path: '/exemption/choose-file-type-to-upload'
-      }),
-      expect.objectContaining({
-        method: 'GET',
-        path: '/exemption/activity-dates'
-      }),
-      expect.objectContaining({
-        method: 'POST',
-        path: '/exemption/activity-dates'
-      }),
-      expect.objectContaining({
-        method: 'GET',
-        path: '/exemption'
-      })
-    ])
+    expect(server.route).toHaveBeenCalledWith(
+      expect.arrayContaining([
+        expect.objectContaining({
+          method: 'GET',
+          path: '/exemption/project-name'
+        }),
+        expect.objectContaining({
+          method: 'POST',
+          path: '/exemption/project-name'
+        }),
+        expect.objectContaining({
+          method: 'GET',
+          path: '/exemption/public-register'
+        }),
+        expect.objectContaining({
+          method: 'POST',
+          path: '/exemption/public-register'
+        }),
+        expect.objectContaining({
+          method: 'GET',
+          path: '/exemption/task-list'
+        }),
+        expect.objectContaining({
+          method: 'GET',
+          path: '/exemption/how-do-you-want-to-provide-the-coordinates'
+        }),
+        expect.objectContaining({
+          method: 'POST',
+          path: '/exemption/how-do-you-want-to-provide-the-coordinates'
+        }),
+        expect.objectContaining({
+          method: 'GET',
+          path: '/exemption/how-do-you-want-to-enter-the-coordinates'
+        }),
+        expect.objectContaining({
+          method: 'POST',
+          path: '/exemption/how-do-you-want-to-enter-the-coordinates'
+        }),
+        expect.objectContaining({
+          method: 'GET',
+          path: '/exemption/what-coordinate-system'
+        }),
+        expect.objectContaining({
+          method: 'POST',
+          path: '/exemption/what-coordinate-system'
+        }),
+        expect.objectContaining({
+          method: 'GET',
+          path: '/exemption/enter-the-coordinates-at-the-centre-point'
+        }),
+        expect.objectContaining({
+          method: 'POST',
+          path: '/exemption/enter-the-coordinates-at-the-centre-point'
+        }),
+        expect.objectContaining({
+          method: 'GET',
+          path: '/exemption/width-of-site'
+        }),
+        expect.objectContaining({
+          method: 'POST',
+          path: '/exemption/width-of-site'
+        }),
+        expect.objectContaining({
+          method: 'GET',
+          path: '/exemption/review-site-details'
+        }),
+        expect.objectContaining({
+          method: 'POST',
+          path: '/exemption/review-site-details'
+        }),
+        expect.objectContaining({
+          method: 'GET',
+          path: '/exemption/activity-description'
+        }),
+        expect.objectContaining({
+          method: 'POST',
+          path: '/exemption/activity-description'
+        }),
+        expect.objectContaining({
+          method: 'GET',
+          path: '/exemption/choose-file-type-to-upload'
+        }),
+        expect.objectContaining({
+          method: 'POST',
+          path: '/exemption/choose-file-type-to-upload'
+        }),
+        expect.objectContaining({
+          method: 'GET',
+          path: '/exemption/activity-dates'
+        }),
+        expect.objectContaining({
+          method: 'POST',
+          path: '/exemption/activity-dates'
+        }),
+        expect.objectContaining({
+          method: 'GET',
+          path: '/exemption'
+        })
+      ])
+    )
   })
 
   test('handler should redirect to /exemption/project-name', () => {

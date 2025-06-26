@@ -4,13 +4,13 @@ import {
   UPLOAD_STATUSES
 } from './index.js'
 
-describe('#CdpUploadService Index', () => {
+describe('#CDP Upload Service Index', () => {
   afterEach(() => {
     jest.restoreAllMocks()
   })
 
   describe('getCdpUploadService factory function', () => {
-    test('Should return new CdpUploadService instance with no MIME types', () => {
+    test('Should create a CdpUploadService instance with no MIME types when called with no arguments', () => {
       // Given / When
       const service = getCdpUploadService()
 
@@ -19,7 +19,16 @@ describe('#CdpUploadService Index', () => {
       expect(service.allowedMimeTypes).toBeNull()
     })
 
-    test('Should return new CdpUploadService instance with provided MIME types', () => {
+    test('Should create a CdpUploadService instance with no MIME types when called with null', () => {
+      // Given / When
+      const service = getCdpUploadService(null)
+
+      // Then
+      expect(service).toBeInstanceOf(CdpUploadService)
+      expect(service.allowedMimeTypes).toBeNull()
+    })
+
+    test('Should create a CdpUploadService instance with provided MIME types', () => {
       // Given
       const allowedMimeTypes = [
         'application/vnd.google-earth.kml+xml',
@@ -34,28 +43,7 @@ describe('#CdpUploadService Index', () => {
       expect(service.allowedMimeTypes).toEqual(allowedMimeTypes)
     })
 
-    test('Should return new CdpUploadService instance with empty array', () => {
-      // Given
-      const allowedMimeTypes = []
-
-      // When
-      const service = getCdpUploadService(allowedMimeTypes)
-
-      // Then
-      expect(service).toBeInstanceOf(CdpUploadService)
-      expect(service.allowedMimeTypes).toEqual([])
-    })
-
-    test('Should handle null parameter explicitly', () => {
-      // Given / When
-      const service = getCdpUploadService(null)
-
-      // Then
-      expect(service).toBeInstanceOf(CdpUploadService)
-      expect(service.allowedMimeTypes).toBeNull()
-    })
-
-    test('Should create new instances on each call', () => {
+    test('Should create a new instance each time it is called', () => {
       // Given / When
       const service1 = getCdpUploadService()
       const service2 = getCdpUploadService()
@@ -68,20 +56,23 @@ describe('#CdpUploadService Index', () => {
   })
 
   describe('Re-exports', () => {
-    test('Should export CdpUploadService class', () => {
+    test('Should re-export CdpUploadService class', () => {
       // Given / When / Then
       expect(CdpUploadService).toBeDefined()
       expect(typeof CdpUploadService).toBe('function')
+      expect(CdpUploadService.name).toBe('CdpUploadService')
     })
 
-    test('Should export UPLOAD_STATUSES constants', () => {
+    test('Should re-export UPLOAD_STATUSES constants', () => {
       // Given / When / Then
       expect(UPLOAD_STATUSES).toBeDefined()
       expect(typeof UPLOAD_STATUSES).toBe('object')
 
-      // Verify key status constants for ML-70
+      // Verify it contains expected status constants
+      expect(UPLOAD_STATUSES.INITIATED).toBe('initiated')
       expect(UPLOAD_STATUSES.PENDING).toBe('pending')
       expect(UPLOAD_STATUSES.READY).toBe('ready')
+      expect(UPLOAD_STATUSES.COMPLETE).toBe('complete')
       expect(UPLOAD_STATUSES.REJECTED).toBe('rejected')
       expect(UPLOAD_STATUSES.ERROR).toBe('error')
     })

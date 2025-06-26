@@ -51,7 +51,8 @@ describe('#CdpUploadService', () => {
       expect(mockLoggerDebug).toHaveBeenCalledWith(
         'CdpUploadService initialized',
         {
-          baseUrl: config.get('cdpUploader').baseUrl,
+          cdpServiceBaseUrl: config.get('cdpUploader').cdpUploadServiceBaseUrl,
+          appBaseUrl: config.get('appBaseUrl'),
           timeout: config.get('cdpUploader').timeout,
           maxFileSize: config.get('cdpUploader').maxFileSize,
           allowedMimeTypes: undefined
@@ -68,6 +69,8 @@ describe('#CdpUploadService', () => {
       expect(mockLoggerDebug).toHaveBeenCalledWith(
         'CdpUploadService initialized',
         expect.objectContaining({
+          cdpServiceBaseUrl: config.get('cdpUploader').cdpUploadServiceBaseUrl,
+          appBaseUrl: config.get('appBaseUrl'),
           allowedMimeTypes: mockAllowedMimeTypes
         })
       )
@@ -94,18 +97,22 @@ describe('#CdpUploadService', () => {
         })
 
         // When
-        const result = await service.initiate({ redirectUrl: mockRedirectUrl })
+        const result = await service.initiate({
+          redirectUrl: mockRedirectUrl,
+          s3Bucket: config.get('cdpUploader').s3Bucket
+        })
 
         // Then
         expect(Wreck.post).toHaveBeenCalledWith(
-          `${config.get('cdpUploader').baseUrl}/initiate`,
+          `${config.get('cdpUploader').cdpUploadServiceBaseUrl}/initiate`,
           {
-            payload: {
-              redirectUrl: mockRedirectUrl,
+            payload: JSON.stringify({
+              redirect: mockRedirectUrl,
               maxFileSize: config.get('cdpUploader').maxFileSize,
               mimeTypes: mockAllowedMimeTypes,
-              s3Path: ''
-            },
+              s3Path: '',
+              s3Bucket: config.get('cdpUploader').s3Bucket
+            }),
             json: true,
             timeout: config.get('cdpUploader').timeout
           }
@@ -144,6 +151,7 @@ describe('#CdpUploadService', () => {
         // When
         const result = await service.initiate({
           redirectUrl: mockRedirectUrl,
+          s3Bucket: config.get('cdpUploader').s3Bucket,
           allowedMimeTypes: overrideMimeTypes
         })
 
@@ -151,9 +159,9 @@ describe('#CdpUploadService', () => {
         expect(Wreck.post).toHaveBeenCalledWith(
           expect.any(String),
           expect.objectContaining({
-            payload: expect.objectContaining({
-              mimeTypes: overrideMimeTypes
-            })
+            payload: expect.stringContaining(
+              '"mimeTypes":["application/vnd.google-earth.kml+xml"]'
+            )
           })
         )
 
@@ -162,7 +170,7 @@ describe('#CdpUploadService', () => {
 
       test('Should include s3Path when provided', async () => {
         // Given
-        const s3Path = 'documents/coordinates'
+        const s3Path = 'uploads/kml-files'
         const mockResponse = {
           uploadId: mockUploadId,
           uploadUrl: mockUploadUrl
@@ -176,6 +184,8 @@ describe('#CdpUploadService', () => {
         // When
         await service.initiate({
           redirectUrl: mockRedirectUrl,
+          s3Bucket: config.get('cdpUploader').s3Bucket,
+          allowedMimeTypes: mockAllowedMimeTypes,
           s3Path
         })
 
@@ -183,83 +193,14 @@ describe('#CdpUploadService', () => {
         expect(Wreck.post).toHaveBeenCalledWith(
           expect.any(String),
           expect.objectContaining({
-            payload: expect.objectContaining({
-              s3Path: 'documents/coordinates'
-            })
+            payload: expect.stringContaining('"redirect":"/success-page"')
           })
         )
-      })
 
-      test('Should include metadata when provided', async () => {
-        // Given
-        const metadata = {
-          projectId: 'test-project-123',
-          userId: 'user-456',
-          fileType: 'coordinates'
-        }
-        const mockResponse = {
-          uploadId: mockUploadId,
-          uploadUrl: mockUploadUrl
-        }
-
-        Wreck.post.mockResolvedValue({
-          res: { statusCode: 200 },
-          payload: mockResponse
-        })
-
-        // When
-        await service.initiate({
-          redirectUrl: mockRedirectUrl,
-          metadata
-        })
-
-        // Then
         expect(Wreck.post).toHaveBeenCalledWith(
           expect.any(String),
           expect.objectContaining({
-            payload: expect.objectContaining({
-              metadata: {
-                projectId: 'test-project-123',
-                userId: 'user-456',
-                fileType: 'coordinates'
-              }
-            })
-          })
-        )
-      })
-
-      test('Should include both s3Path and metadata when provided', async () => {
-        // Given
-        const s3Path = 'uploads/kml-files'
-        const metadata = { uploadType: 'coordinate-file' }
-        const mockResponse = {
-          uploadId: mockUploadId,
-          uploadUrl: mockUploadUrl
-        }
-
-        Wreck.post.mockResolvedValue({
-          res: { statusCode: 200 },
-          payload: mockResponse
-        })
-
-        // When
-        await service.initiate({
-          redirectUrl: mockRedirectUrl,
-          allowedMimeTypes: mockAllowedMimeTypes,
-          s3Path,
-          metadata
-        })
-
-        // Then
-        expect(Wreck.post).toHaveBeenCalledWith(
-          expect.any(String),
-          expect.objectContaining({
-            payload: expect.objectContaining({
-              redirectUrl: mockRedirectUrl,
-              mimeTypes: mockAllowedMimeTypes,
-              s3Path: 'uploads/kml-files',
-              metadata: { uploadType: 'coordinate-file' }
-            })
+            payload: expect.stringContaining('"s3Path":"uploads/kml-files"')
           })
         )
       })
@@ -277,26 +218,77 @@ describe('#CdpUploadService', () => {
         })
 
         // When
-        await service.initiate({ redirectUrl: mockRedirectUrl })
+        await service.initiate({
+          redirectUrl: mockRedirectUrl,
+          s3Bucket: config.get('cdpUploader').s3Bucket
+        })
 
         // Then
         expect(Wreck.post).toHaveBeenCalledWith(
           expect.any(String),
           expect.objectContaining({
-            payload: expect.objectContaining({
-              s3Path: ''
-            })
+            payload: expect.stringContaining('"s3Path":""')
           })
         )
+      })
 
-        // Should not include metadata if not provided
-        expect(Wreck.post).toHaveBeenCalledWith(
-          expect.any(String),
-          expect.objectContaining({
-            payload: expect.not.objectContaining({
-              metadata: expect.anything()
-            })
+      test('Should return empty array for allowedTypes when no MIME types are configured', async () => {
+        // Given - Create service with no constructor MIME types
+        const serviceWithNoMimeTypes = new CdpUploadService()
+        const mockResponse = {
+          uploadId: mockUploadId,
+          uploadUrl: mockUploadUrl,
+          statusUrl: mockStatusUrl
+        }
+
+        Wreck.post.mockResolvedValue({
+          res: { statusCode: 200 },
+          payload: mockResponse
+        })
+
+        // When - Don't pass allowedMimeTypes parameter
+        const result = await serviceWithNoMimeTypes.initiate({
+          redirectUrl: mockRedirectUrl,
+          s3Bucket: config.get('cdpUploader').s3Bucket
+        })
+
+        // Then - Should return empty array for allowedTypes (covers line 148: mimeTypes ?? [])
+        expect(result).toEqual({
+          uploadId: mockUploadId,
+          uploadUrl: mockUploadUrl,
+          statusUrl: mockStatusUrl,
+          maxFileSize: config.get('cdpUploader').maxFileSize,
+          allowedTypes: []
+        })
+
+        // Verify the API was called (the exact mimeTypes format doesn't matter for this test)
+        expect(Wreck.post).toHaveBeenCalledTimes(1)
+      })
+    })
+
+    describe('Given validation errors', () => {
+      test('Should throw error when redirectUrl is not provided', async () => {
+        // Given / When / Then
+        await expect(
+          service.initiate({
+            s3Bucket: config.get('cdpUploader').s3Bucket
           })
+        ).rejects.toThrow('redirectUrl is required')
+      })
+
+      test('Should throw error when s3Bucket is not provided', async () => {
+        // Given / When / Then
+        await expect(
+          service.initiate({
+            redirectUrl: mockRedirectUrl
+          })
+        ).rejects.toThrow('S3 Bucket is required')
+      })
+
+      test('Should throw error when both redirectUrl and s3Bucket are not provided', async () => {
+        // Given / When / Then
+        await expect(service.initiate({})).rejects.toThrow(
+          'redirectUrl is required'
         )
       })
     })
@@ -311,7 +303,10 @@ describe('#CdpUploadService', () => {
 
         // When / Then
         await expect(
-          service.initiate({ redirectUrl: mockRedirectUrl })
+          service.initiate({
+            redirectUrl: mockRedirectUrl,
+            s3Bucket: config.get('cdpUploader').s3Bucket
+          })
         ).rejects.toThrow('API call failed with status: 400')
 
         expect(mockLoggerError).toHaveBeenCalledWith(
@@ -332,7 +327,10 @@ describe('#CdpUploadService', () => {
 
         // When / Then
         await expect(
-          service.initiate({ redirectUrl: mockRedirectUrl })
+          service.initiate({
+            redirectUrl: mockRedirectUrl,
+            s3Bucket: config.get('cdpUploader').s3Bucket
+          })
         ).rejects.toThrow('Request timeout')
 
         expect(mockLoggerError).toHaveBeenCalledWith(
@@ -963,7 +961,10 @@ describe('#CdpUploadService', () => {
       })
 
       // When
-      const result = await kmlService.initiate({ redirectUrl: mockRedirectUrl })
+      const result = await kmlService.initiate({
+        redirectUrl: mockRedirectUrl,
+        s3Bucket: config.get('cdpUploader').s3Bucket
+      })
 
       // Then
       expect(result.allowedTypes).toEqual([
@@ -972,9 +973,9 @@ describe('#CdpUploadService', () => {
       expect(Wreck.post).toHaveBeenCalledWith(
         expect.any(String),
         expect.objectContaining({
-          payload: expect.objectContaining({
-            mimeTypes: ['application/vnd.google-earth.kml+xml']
-          })
+          payload: expect.stringContaining(
+            '"mimeTypes":["application/vnd.google-earth.kml+xml"]'
+          )
         })
       )
     })
@@ -995,7 +996,8 @@ describe('#CdpUploadService', () => {
 
       // When
       const result = await shapefileService.initiate({
-        redirectUrl: mockRedirectUrl
+        redirectUrl: mockRedirectUrl,
+        s3Bucket: config.get('cdpUploader').s3Bucket
       })
 
       // Then
@@ -1003,9 +1005,7 @@ describe('#CdpUploadService', () => {
       expect(Wreck.post).toHaveBeenCalledWith(
         expect.any(String),
         expect.objectContaining({
-          payload: expect.objectContaining({
-            mimeTypes: ['application/zip']
-          })
+          payload: expect.stringContaining('"mimeTypes":["application/zip"]')
         })
       )
     })
@@ -1029,7 +1029,8 @@ describe('#CdpUploadService', () => {
 
       // When
       const result = await bothTypesService.initiate({
-        redirectUrl: mockRedirectUrl
+        redirectUrl: mockRedirectUrl,
+        s3Bucket: config.get('cdpUploader').s3Bucket
       })
 
       // Then
@@ -1066,6 +1067,7 @@ describe('#CdpUploadService', () => {
       // When
       await kmlService.initiate({
         redirectUrl: mockRedirectUrl,
+        s3Bucket: config.get('cdpUploader').s3Bucket,
         s3Path
       })
 
@@ -1073,51 +1075,18 @@ describe('#CdpUploadService', () => {
       expect(Wreck.post).toHaveBeenCalledWith(
         expect.any(String),
         expect.objectContaining({
-          payload: expect.objectContaining({
-            s3Path: 'exemptions/site-details/coordinates',
-            mimeTypes: ['application/vnd.google-earth.kml+xml']
-          })
+          payload: expect.stringContaining(
+            '"s3Path":"exemptions/site-details/coordinates"'
+          )
         })
       )
-    })
 
-    test('Should support attaching project metadata to coordinate uploads', async () => {
-      // Given - Attach project context to uploads as per ML-70
-      const service = new CdpUploadService()
-      const metadata = {
-        exemptionId: 'exemption-123',
-        projectName: 'Test Marine Licensing Project',
-        coordinateType: 'site-details',
-        uploadStep: 'coordinate-file'
-      }
-      const mockResponse = {
-        uploadId: mockUploadId,
-        uploadUrl: mockUploadUrl
-      }
-
-      Wreck.post.mockResolvedValue({
-        res: { statusCode: 200 },
-        payload: mockResponse
-      })
-
-      // When
-      await service.initiate({
-        redirectUrl: mockRedirectUrl,
-        metadata
-      })
-
-      // Then
       expect(Wreck.post).toHaveBeenCalledWith(
         expect.any(String),
         expect.objectContaining({
-          payload: expect.objectContaining({
-            metadata: {
-              exemptionId: 'exemption-123',
-              projectName: 'Test Marine Licensing Project',
-              coordinateType: 'site-details',
-              uploadStep: 'coordinate-file'
-            }
-          })
+          payload: expect.stringContaining(
+            '"mimeTypes":["application/vnd.google-earth.kml+xml"]'
+          )
         })
       )
     })

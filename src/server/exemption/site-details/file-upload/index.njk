@@ -1,0 +1,108 @@
+{% extends 'layouts/page.njk' %}
+{% from "govuk/components/back-link/macro.njk" import govukBackLink %}
+{% from "govuk/components/file-upload/macro.njk" import govukFileUpload %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+{% from "cancel-button/macro.njk" import appCancelButton %}
+
+{% block pageTitle %}
+  {% if errorSummary %}Error: {% endif %}{{ heading }} - {{ serviceName }}
+{% endblock %}
+
+{% block beforeContent %}
+  {{ govukBackLink({
+    text: "Back",
+    href: backLink
+  }) }}
+{% endblock %}
+
+{% block content %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+      
+      {% if errorSummary %}
+        {{ govukErrorSummary({
+          titleText: "There is a problem",
+          errorList: errorSummary
+        }) }}
+      {% endif %}
+
+      {% if projectName %}
+        <span class="govuk-caption-l">{{ projectName }}</span>
+      {% endif %}        
+
+      {% if uploadedFile %}
+        {# AC5: Show uploaded file success state #}
+        <div class="govuk-notification-banner govuk-notification-banner--success" role="alert" aria-labelledby="govuk-notification-banner-title" data-module="govuk-notification-banner">
+          <div class="govuk-notification-banner__header">
+            <h2 class="govuk-notification-banner__title" id="govuk-notification-banner-title">
+              Success
+            </h2>
+          </div>
+          <div class="govuk-notification-banner__content">
+            <p class="govuk-notification-banner__heading">
+              Your file has been uploaded successfully
+            </p>
+            <p class="govuk-body">
+              <strong>{{ uploadedFile.filename }}</strong> has been uploaded and virus checked.
+            </p>
+          </div>
+        </div>
+      {% endif %}
+
+      {% if not uploadedFile or showUploadForm %}
+        {# Show upload form - either initial load or after error #}
+        <form action="{{ uploadUrl }}" method="post" enctype="multipart/form-data" novalidate>
+
+          {{ govukFileUpload({
+              id: "file-id",
+              name: "file",
+              label: {
+                text: heading,
+                for: "file-id",
+                isPageHeading: true,
+                classes: "govuk-label--l"
+               },
+              multiple: false,
+              javascript: true,
+              errorMessage: errors['file-upload'] if errors else false,
+              attributes: {
+                "accept": acceptAttribute           
+              }
+          }) }}
+
+          <div class="govuk-button-group">
+            {{ govukButton({
+              text: "Continue",
+              type: "submit",
+              classes: "govuk-button--primary"
+            }) }}
+
+            {{ appCancelButton({
+              cancelLink: cancelLink
+            }) }}
+          </div>
+
+        </form>
+      {% else %}
+        {# File uploaded successfully - show continue button #}
+        <form action="#" method="post" novalidate>
+          <input type="hidden" name="csrfToken" value="{{ csrfToken }}" />
+          
+          <div class="govuk-button-group">
+            {{ govukButton({
+              text: "Continue",
+              classes: "govuk-button--primary"
+            }) }}
+
+            {{ appCancelButton({
+              cancelLink: cancelLink
+            }) }}
+          </div>
+        </form>
+      {% endif %}
+
+    </div>
+  </div>
+
+{% endblock %} 

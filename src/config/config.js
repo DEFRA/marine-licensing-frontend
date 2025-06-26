@@ -42,6 +42,12 @@ export const config = convict({
     format: String,
     default: 'Apply for a marine licence'
   },
+  appBaseUrl: {
+    doc: 'Base URL for the application (used for CDP upload redirects)',
+    format: String,
+    default: 'http://localhost:3000',
+    env: 'APP_BASE_URL'
+  },
   root: {
     doc: 'Project root',
     format: String,
@@ -226,7 +232,7 @@ export const config = convict({
     }
   },
   cdpUploader: {
-    baseUrl: {
+    cdpUploadServiceBaseUrl: {
       doc: 'CDP Uploader service base URL',
       format: String,
       default: 'http://localhost:7337',
@@ -243,6 +249,12 @@ export const config = convict({
       format: Number,
       default: 50 * 1000 * 1000, // 50MB
       env: 'CDP_UPLOADER_MAX_FILE_SIZE'
+    },
+    s3Bucket: {
+      doc: 'S3 Bucket for uploads to be placed in after the virus scan',
+      format: String,
+      default: 'mmo-uploads',
+      env: 'CDP_UPLOAD_BUCKET'
     }
   }
 })

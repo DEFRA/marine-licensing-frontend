@@ -1,0 +1,41 @@
+{% extends 'layouts/page.njk' %}
+
+{% block pageTitle %}
+  {{ heading }} - {{ serviceName }}
+{% endblock %}
+
+{% block head %}
+  {{ super() }}
+  {% if isProcessing %}
+    <meta http-equiv="refresh" content="1">
+  {% endif %}
+{% endblock %}
+
+{% block content %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+      
+      {% if projectName %}
+        <span class="govuk-caption-l">{{ projectName }}</span>
+      {% endif %}
+      
+      <h1 class="govuk-heading-l">{{ heading }}</h1>
+
+      {% if isProcessing %}
+        <p class="govuk-body">Please wait while we check your file for viruses.</p>
+      
+        <p class="govuk-body">This page will automatically refresh every second until the check is complete.</p>  
+
+      {% else %}
+        <p class="govuk-body">Something went wrong. Please try uploading your file again.</p>
+        
+        <div class="govuk-button-group">
+          <a href="{{ routes.FILE_UPLOAD }}" class="govuk-button">Try again</a>
+          <a href="{{ routes.TASK_LIST }}" class="govuk-link">Return to task list</a>
+        </div>
+      {% endif %}
+
+    </div>
+  </div>
+
+{% endblock %} 

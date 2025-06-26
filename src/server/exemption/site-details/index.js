@@ -4,6 +4,8 @@ import { coordinateSystemRoutes } from '~/src/server/exemption/site-details/coor
 import { centreCoordinatesRoutes } from '~/src/server/exemption/site-details/centre-coordinates/index.js'
 import { widthOfSiteRoutes } from '~/src/server/exemption/site-details/width-of-site/index.js'
 import { reviewSiteDetailsRoutes } from '~/src/server/exemption/site-details/review-site-details/index.js'
+import { fileUploadRoutes } from '~/src/server/exemption/site-details/file-upload/index.js'
+import { uploadCompleteRoutes } from '~/src/server/exemption/site-details/upload-complete/index.js'
 
 /**
  * Sets up the routes used in the Site Details section
@@ -19,7 +21,9 @@ export const siteDetailsRoutes = [
   ...coordinateSystemRoutes,
   ...centreCoordinatesRoutes,
   ...widthOfSiteRoutes,
-  ...reviewSiteDetailsRoutes
+  ...reviewSiteDetailsRoutes,
+  ...fileUploadRoutes,
+  ...uploadCompleteRoutes
 ]
 
 /**

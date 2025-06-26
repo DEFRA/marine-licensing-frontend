@@ -69,10 +69,12 @@ export class CdpUploadService {
   constructor(allowedMimeTypes) {
     this.allowedMimeTypes = allowedMimeTypes
     this.config = config.get('cdpUploader')
+    this.baseUrl = config.get('appBaseUrl')
     this.logger = createLogger()
 
     this.logger.debug('CdpUploadService initialized', {
-      baseUrl: this.config.baseUrl,
+      cdpServiceBaseUrl: this.config.cdpUploadServiceBaseUrl,
+      appBaseUrl: this.baseUrl,
       timeout: this.config.timeout,
       maxFileSize: this.config.maxFileSize,
       allowedMimeTypes: this.allowedMimeTypes
@@ -85,40 +87,36 @@ export class CdpUploadService {
    * @param {string} options.redirectUrl - URL to redirect user after upload completion
    * @param {string[]?} options.allowedMimeTypes - Array of allowed MIME types to override constructor defaults
    * @param {string?} options.s3Path - Optional S3 path prefix for organizing files in folders (defaults to empty string)
-   * @param {object?} options.metadata - Optional metadata object to attach to the upload
+   * @param {string} options.s3Bucket - Required
    * @returns {Promise<UploadConfig>}
    */
-  async initiate({ redirectUrl, allowedMimeTypes, s3Path = '', metadata }) {
+  async initiate({ redirectUrl, s3Bucket, allowedMimeTypes, s3Path = '' }) {
     const mimeTypes = allowedMimeTypes ?? this.allowedMimeTypes
-    const requestPayload = {
-      redirectUrl,
-      maxFileSize: this.config.maxFileSize,
-      mimeTypes,
-      s3Path
+
+    if (!redirectUrl) {
+      throw new Error('redirectUrl is required')
     }
 
-    // Add metadata to payload if provided
-    if (metadata) {
-      requestPayload.metadata = metadata
+    if (!s3Bucket) {
+      throw new Error('S3 Bucket is required')
+    }
+
+    const requestPayload = {
+      redirect: redirectUrl,
+      maxFileSize: this.config.maxFileSize,
+      mimeTypes,
+      s3Path,
+      s3Bucket
     }
 
     try {
-      this.logger.debug('Initiating upload session', {
-        redirectUrl,
-        maxFileSize: this.config.maxFileSize,
-        mimeTypes,
-        s3Path,
-        metadata
+      this.logger.debug('Initiating upload session', requestPayload)
+      const endPointUrl = `${this.config.cdpUploadServiceBaseUrl}${ENDPOINTS.INITIATE}`
+      const { res, payload } = await Wreck.post(endPointUrl, {
+        payload: JSON.stringify(requestPayload),
+        json: true,
+        timeout: this.config.timeout
       })
-
-      const { res, payload } = await Wreck.post(
-        `${this.config.baseUrl}${ENDPOINTS.INITIATE}`,
-        {
-          payload: requestPayload,
-          json: true,
-          timeout: this.config.timeout
-        }
-      )
 
       if (res.statusCode < 200 || res.statusCode >= 300) {
         const errorMessage = `API call failed with status: ${res.statusCode}`
@@ -149,8 +147,7 @@ export class CdpUploadService {
         error: error.message,
         redirectUrl,
         mimeTypes,
-        s3Path,
-        metadata
+        s3Path
       })
       throw error
     }

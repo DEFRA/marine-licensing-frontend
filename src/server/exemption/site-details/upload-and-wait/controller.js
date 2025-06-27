@@ -25,7 +25,9 @@ const transformCdpErrorToValidationError = (message, fileType) => {
   // Map CDP error messages to AC4 requirements
   let errorMessage = message
 
-  if (message.includes('virus')) {
+  if (message.includes('Select a file to upload')) {
+    errorMessage = 'Select a file to upload'
+  } else if (message.includes('virus')) {
     errorMessage = 'The selected file contains a virus'
   } else if (message.includes('empty')) {
     errorMessage = 'The selected file is empty'

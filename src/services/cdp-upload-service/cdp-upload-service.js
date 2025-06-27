@@ -288,6 +288,29 @@ export class CdpUploadService {
       // Process response from CDP Uploader service status endpoint
       // Response structure documented at: https://github.com/DEFRA/cdp-uploader/blob/main/README.md#get-statusuploadid
       const data = payload
+
+      // DEBUG: Log the complete CDP service response
+      this.logger.debug(`CDP service response received for ${uploadId}`)
+      this.logger.debug(`Upload Status: ${data.uploadStatus}`)
+      this.logger.debug(`Has Form: ${!!data.form}`)
+      this.logger.debug(
+        `Number of rejected files: ${data.numberOfRejectedFiles}`
+      )
+      if (data.form) {
+        this.logger.debug(`Form Keys: ${Object.keys(data.form).join(', ')}`)
+        this.logger.debug(
+          `Form Value Types: ${Object.values(data.form)
+            .map((val) => typeof val)
+            .join(', ')}`
+        )
+        this.logger.debug(
+          `Full Form Data: ${JSON.stringify(data.form, null, 2)}`
+        )
+      } else {
+        this.logger.debug('No form data in response')
+      }
+      this.logger.debug(`Full CDP Response: ${JSON.stringify(data, null, 2)}`)
+
       const transformedStatus = this._transformCdpResponse(data)
 
       this.logger.debug('Upload status retrieved', {
@@ -391,15 +414,51 @@ export class CdpUploadService {
   _transformCdpResponse(cdpResponse) {
     const { uploadStatus, form } = cdpResponse
 
+    // DEBUG: Log transformation process
+    this.logger.debug(`Starting response transformation`)
+    this.logger.debug(`Upload Status: ${uploadStatus}`)
+    this.logger.debug(
+      `Form Object Count: ${form ? Object.keys(form).length : 0}`
+    )
+    if (form) {
+      this.logger.debug(`Form Data: ${JSON.stringify(form, null, 2)}`)
+    } else {
+      this.logger.debug('Form Data: null')
+    }
+
     // Validate form data exists
     const validationError = this._validateFormData(form)
     if (validationError) {
+      this.logger.debug(`Form validation returned error`)
+      this.logger.debug(
+        `Validation Error: ${JSON.stringify(validationError, null, 2)}`
+      )
       return validationError
     }
 
     // Extract file data from form
     const fileData = this._extractFileData(form)
+
+    // DEBUG: Log file data extraction
+    this.logger.debug(`File data extraction result`)
+    this.logger.debug(`File Data Exists: ${!!fileData}`)
+    if (fileData) {
+      this.logger.debug(
+        `Extracted File Data: ${JSON.stringify(fileData, null, 2)}`
+      )
+    } else {
+      this.logger.debug('Extracted File Data: null')
+    }
+    if (form && Object.keys(form).length > 0) {
+      this.logger.debug(
+        `First Form Value: ${JSON.stringify(Object.values(form)[0], null, 2)}`
+      )
+    } else {
+      this.logger.debug('First Form Value: no form values')
+    }
+
     if (!fileData) {
+      this.logger.debug('No file data found, returning NO_FILE_SELECTED')
       return this._createErrorResponse(
         ERROR_MESSAGES.NO_FILE_SELECTED,
         ERROR_CODES.NO_FILE_SELECTED,
@@ -408,7 +467,13 @@ export class CdpUploadService {
     }
 
     // Build and return standardized response
-    return this._buildUploadStatusResponse(uploadStatus, fileData)
+    const result = this._buildUploadStatusResponse(uploadStatus, fileData)
+    this.logger.debug('Final transformation result', {
+      resultStatus: result.status,
+      resultMessage: result.message,
+      fullResult: JSON.stringify(result, null, 2)
+    })
+    return result
   }
 
   /**
@@ -446,11 +511,31 @@ export class CdpUploadService {
    * @private
    */
   _buildUploadStatusResponse(uploadStatus, fileData) {
+    // DEBUG: Log inputs to status building
+    this.logger.debug('Building upload status response', {
+      uploadStatus,
+      fileDataType: typeof fileData,
+      fileDataKeys: fileData ? Object.keys(fileData) : [],
+      fileStatus: fileData?.fileStatus,
+      hasError: fileData?.hasError,
+      errorMessage: fileData?.errorMessage
+    })
+
     const status = this._determineOverallStatus(
       uploadStatus,
       fileData.fileStatus,
       fileData.hasError
     )
+
+    // DEBUG: Log status determination
+    this.logger.debug('Status determination result', {
+      determinedStatus: status,
+      inputs: {
+        uploadStatus,
+        fileStatus: fileData.fileStatus,
+        hasError: fileData.hasError
+      }
+    })
 
     const result = this._createBaseStatusResponse(fileData, status)
     this._addTimestamps(result, status)

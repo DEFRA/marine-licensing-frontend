@@ -1108,14 +1108,14 @@ describe('#CdpUploadService', () => {
     })
   })
 
-  describe('_extractFilename', () => {
+  describe('Filename extraction (via FilenameHandler)', () => {
     it('should return regular filename when available', () => {
       const service = new CdpUploadService()
       const fileData = {
         filename: 'test-file.kml'
       }
 
-      const result = service._extractFilename(fileData)
+      const result = service.filenameHandler.extractFilename(fileData)
       expect(result).toBe('test-file.kml')
     })
 
@@ -1125,7 +1125,7 @@ describe('#CdpUploadService', () => {
         encodedfilename: '=?utf-8?B?Y29vcmRvbm7DqWVzLWR1LXNpdGUua21s?='
       }
 
-      const result = service._extractFilename(fileData)
+      const result = service.filenameHandler.extractFilename(fileData)
       expect(result).toBe('coordonnées-du-site.kml')
     })
 
@@ -1135,7 +1135,7 @@ describe('#CdpUploadService', () => {
         encodedfilename: '=?utf-8?Q?coordonn=C3=A9es_du_site.kml?='
       }
 
-      const result = service._extractFilename(fileData)
+      const result = service.filenameHandler.extractFilename(fileData)
       expect(result).toBe('coordonnées du site.kml')
     })
 
@@ -1146,7 +1146,7 @@ describe('#CdpUploadService', () => {
         encodedfilename: '=?UTF-8?B?encoded-file.kml?='
       }
 
-      const result = service._extractFilename(fileData)
+      const result = service.filenameHandler.extractFilename(fileData)
       expect(result).toBe('regular-file.kml')
     })
 
@@ -1156,7 +1156,7 @@ describe('#CdpUploadService', () => {
         encodedfilename: '=?INVALID?ENCODING?broken?='
       }
 
-      const result = service._extractFilename(fileData)
+      const result = service.filenameHandler.extractFilename(fileData)
       expect(result).toBe('=?INVALID?ENCODING?broken?=')
     })
 
@@ -1166,7 +1166,7 @@ describe('#CdpUploadService', () => {
         encodedfilename: '=?utf-8?B?6IqB5Zub5LqN5qCHLmttbA==?='
       }
 
-      const result = service._extractFilename(fileData)
+      const result = service.filenameHandler.extractFilename(fileData)
       expect(result).toBe('芁四亍标.kml')
     })
 
@@ -1174,7 +1174,7 @@ describe('#CdpUploadService', () => {
       const service = new CdpUploadService()
       const fileData = {}
 
-      const result = service._extractFilename(fileData)
+      const result = service.filenameHandler.extractFilename(fileData)
       expect(result).toBe('unknown-file')
     })
   })

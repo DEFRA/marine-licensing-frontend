@@ -1,7 +1,9 @@
 import Wreck from '@hapi/wreck'
-import rfc2047 from 'rfc2047'
 import { config } from '~/src/config/config.js'
 import { createLogger } from '~/src/server/common/helpers/logging/logger.js'
+import { CdpLoggingHelper } from './cdp-logging-helper.js'
+import { S3LocationBuilder } from './s3-location-builder.js'
+import { FilenameHandler } from './filename-handler.js'
 
 /**
  * CDP Upload Service integration
@@ -14,58 +16,88 @@ import { createLogger } from '~/src/server/common/helpers/logging/logger.js'
  * - GET /status/{uploadId} - Checks upload/scan status
  */
 
-// CDP Service Status Constants
-const UPLOAD_STATUS = {
-  INITIATED: 'initiated',
-  PENDING: 'pending',
-  READY: 'ready'
+// CDP Service Integration Constants
+const CDP_CONSTANTS = {
+  // CDP Service Status Constants
+  UPLOAD_STATUS: {
+    INITIATED: 'initiated',
+    PENDING: 'pending',
+    READY: 'ready'
+  },
+
+  FILE_STATUS: {
+    PENDING: 'pending',
+    COMPLETE: 'complete',
+    REJECTED: 'rejected'
+  },
+
+  // Application Status Constants
+  APP_STATUS: {
+    PENDING: 'pending',
+    SCANNING: 'scanning',
+    READY: 'ready',
+    REJECTED: 'rejected',
+    ERROR: 'error'
+  },
+
+  // Error Classification
+  ERROR_CODES: {
+    NO_FILE_SELECTED: 'NO_FILE_SELECTED',
+    VIRUS_DETECTED: 'VIRUS_DETECTED',
+    FILE_EMPTY: 'FILE_EMPTY',
+    FILE_TOO_LARGE: 'FILE_TOO_LARGE',
+    INVALID_FILE_TYPE: 'INVALID_FILE_TYPE',
+    PASSWORD_PROTECTED: 'PASSWORD_PROTECTED',
+    UPLOAD_ERROR: 'UPLOAD_ERROR'
+  },
+
+  // HTTP Status Codes
+  HTTP_STATUS: {
+    NOT_FOUND: 404,
+    SERVER_ERROR: 500
+  },
+
+  // API Configuration
+  ENDPOINTS: {
+    INITIATE: '/initiate',
+    STATUS: '/status'
+  },
+
+  // User-Facing Messages
+  ERROR_MESSAGES: {
+    UPLOAD_NOT_FOUND: 'Upload session not found',
+    SERVICE_UNAVAILABLE: 'Service temporarily unavailable',
+    STATUS_CHECK_FAILED: 'Unable to check status',
+    NO_FILE_SELECTED: 'Select a file to upload'
+  },
+
+  // Error Message to Code Mappings
+  ERROR_MAPPINGS: [
+    { keywords: ['virus'], code: 'VIRUS_DETECTED' },
+    { keywords: ['empty'], code: 'FILE_EMPTY' },
+    {
+      keywords: ['smaller than', 'must be smaller than'],
+      code: 'FILE_TOO_LARGE'
+    },
+    {
+      keywords: ['must be a', 'KML file', 'Shapefile'],
+      code: 'INVALID_FILE_TYPE'
+    },
+    { keywords: ['password protected'], code: 'PASSWORD_PROTECTED' },
+    { keywords: ['could not be uploaded'], code: 'UPLOAD_ERROR' }
+  ]
 }
 
-const FILE_STATUS = {
-  PENDING: 'pending',
-  COMPLETE: 'complete',
-  REJECTED: 'rejected'
-}
-
-// Application Status Constants
-const APP_STATUS = {
-  PENDING: 'pending',
-  SCANNING: 'scanning',
-  READY: 'ready',
-  REJECTED: 'rejected',
-  ERROR: 'error'
-}
-
-// Error Classification
-const ERROR_CODES = {
-  NO_FILE_SELECTED: 'NO_FILE_SELECTED',
-  VIRUS_DETECTED: 'VIRUS_DETECTED',
-  FILE_EMPTY: 'FILE_EMPTY',
-  FILE_TOO_LARGE: 'FILE_TOO_LARGE',
-  INVALID_FILE_TYPE: 'INVALID_FILE_TYPE',
-  PASSWORD_PROTECTED: 'PASSWORD_PROTECTED',
-  UPLOAD_ERROR: 'UPLOAD_ERROR'
-}
-
-// HTTP Status Codes
-const HTTP_STATUS = {
-  NOT_FOUND: 404,
-  SERVER_ERROR: 500
-}
-
-// API Configuration
-const ENDPOINTS = {
-  INITIATE: '/initiate',
-  STATUS: '/status'
-}
-
-// User-Facing Messages
-const ERROR_MESSAGES = {
-  UPLOAD_NOT_FOUND: 'Upload session not found',
-  SERVICE_UNAVAILABLE: 'Service temporarily unavailable',
-  STATUS_CHECK_FAILED: 'Unable to check status',
-  NO_FILE_SELECTED: 'Select a file to upload'
-}
+// Extract frequently used constants for backward compatibility and convenience
+const {
+  UPLOAD_STATUS,
+  FILE_STATUS,
+  APP_STATUS,
+  ERROR_CODES,
+  HTTP_STATUS,
+  ENDPOINTS,
+  ERROR_MESSAGES
+} = CDP_CONSTANTS
 
 /**
  * @typedef {object} UploadConfig
@@ -131,6 +163,10 @@ export class CdpUploadService {
     this.config = config.get('cdpUploader')
     this.baseUrl = config.get('appBaseUrl')
     this.logger = createLogger()
+
+    // Initialize utility helpers
+    this.loggingHelper = new CdpLoggingHelper(this.logger)
+    this.filenameHandler = new FilenameHandler(this.logger)
 
     this.logger.debug('CdpUploadService initialized', {
       cdpServiceBaseUrl: this.config.cdpUploadServiceBaseUrl,
@@ -246,7 +282,7 @@ export class CdpUploadService {
       // Response structure documented at: https://github.com/DEFRA/cdp-uploader/blob/main/README.md#get-statusuploadid
       const data = payload
 
-      this._logCdpResponse(uploadId, data)
+      this.loggingHelper.logCdpResponse(uploadId, data)
 
       const transformedStatus = this._transformCdpResponse(data)
 
@@ -387,7 +423,7 @@ export class CdpUploadService {
   _transformCdpResponse(cdpResponse) {
     const { uploadStatus, form } = cdpResponse
 
-    this._logTransformationStart(uploadStatus, form)
+    this.loggingHelper.logTransformationStart(uploadStatus, form)
 
     // Extract and validate file data from form
     const fileData = this._extractAndValidateFileData(form)
@@ -396,11 +432,11 @@ export class CdpUploadService {
       return this._createNoFileSelectedError()
     }
 
-    this._logFileDataExtraction(fileData, form)
+    this.loggingHelper.logFileDataExtraction(fileData, form)
 
     // Build and return standardized response
     const result = this._buildCompleteStatusResponse(uploadStatus, fileData)
-    this._logTransformationResult(result)
+    this.loggingHelper.logTransformationResult(result)
     return result
   }
 
@@ -428,7 +464,7 @@ export class CdpUploadService {
    * @private
    */
   _buildCompleteStatusResponse(uploadStatus, fileData) {
-    this._logStatusBuilding(uploadStatus, fileData)
+    this.loggingHelper.logStatusBuilding(uploadStatus, fileData)
 
     const status = this._determineOverallStatus(
       uploadStatus,
@@ -436,44 +472,38 @@ export class CdpUploadService {
       fileData.hasError
     )
 
-    this._logStatusDetermination(status, uploadStatus, fileData)
+    this.loggingHelper.logStatusDetermination(status, uploadStatus, fileData)
 
     // Create base response with core information
     const result = {
       status,
-      filename: this._extractFilename(fileData),
+      filename: this.filenameHandler.extractFilename(fileData),
       fileSize: fileData.contentLength,
-      uploadedAt: this._getCurrentTimestamp(),
+      uploadedAt: this._getTimestamp(),
       retryable: this._isRetryable(status)
     }
 
     // Add completion timestamp for finished uploads
     if (status === APP_STATUS.READY || status === APP_STATUS.REJECTED) {
-      result.completedAt = this._getCurrentTimestamp()
+      result.completedAt = this._getTimestamp()
     }
 
     // Add error details if file was rejected
     if (fileData.hasError && fileData.errorMessage) {
       result.message = fileData.errorMessage // GDS approved message
-      result.errorCode = this._getErrorCode(fileData.errorMessage)
+      result.errorCode = this._extractErrorCode(fileData.errorMessage)
     }
 
     // Include S3 information when upload is complete (AC8 requirement)
     if (
       status === APP_STATUS.READY &&
-      fileData.s3Key &&
-      fileData.s3Bucket &&
-      fileData.fileId
+      S3LocationBuilder.isFileReadyForS3(fileData, FILE_STATUS.COMPLETE)
     ) {
-      result.s3Location = {
-        s3Bucket: fileData.s3Bucket,
-        s3Key: fileData.s3Key,
-        fileId: fileData.fileId,
-        s3Url: `s3://${fileData.s3Bucket}/${fileData.s3Key}/${fileData.fileId}`,
-        detectedContentType: fileData.detectedContentType,
-        checksumSha256: fileData.checksumSha256,
-        contentLength: fileData.contentLength
-      }
+      result.s3Location = S3LocationBuilder.buildS3LocationObject(
+        fileData,
+        () => this._getTimestamp(),
+        (data) => this.filenameHandler.extractFilename(data)
+      )
     }
 
     return result
@@ -522,28 +552,10 @@ export class CdpUploadService {
    * @returns {string}
    * @private
    */
-  _getErrorCode(errorMessage) {
-    const errorMappings = [
-      { keywords: ['virus'], code: ERROR_CODES.VIRUS_DETECTED },
-      { keywords: ['empty'], code: ERROR_CODES.FILE_EMPTY },
-      {
-        keywords: ['smaller than', 'must be smaller than'],
-        code: ERROR_CODES.FILE_TOO_LARGE
-      },
-      {
-        keywords: ['must be a', 'KML file', 'Shapefile'],
-        code: ERROR_CODES.INVALID_FILE_TYPE
-      },
-      {
-        keywords: ['password protected'],
-        code: ERROR_CODES.PASSWORD_PROTECTED
-      },
-      { keywords: ['could not be uploaded'], code: ERROR_CODES.UPLOAD_ERROR }
-    ]
-
-    for (const mapping of errorMappings) {
+  _extractErrorCode(errorMessage) {
+    for (const mapping of CDP_CONSTANTS.ERROR_MAPPINGS) {
       if (mapping.keywords.some((keyword) => errorMessage.includes(keyword))) {
-        return mapping.code
+        return ERROR_CODES[mapping.code]
       }
     }
 
@@ -551,46 +563,11 @@ export class CdpUploadService {
   }
 
   /**
-   * Extracts filename from file data, handling both regular and RFC-2047 encoded filenames
-   *
-   * As per CdpFileData typedef: either filename or encodedfilename will be provided
-   * depending on whether the original filename contained non-ascii characters.
-   * Uses the rfc2047 npm package for proper RFC-2047 decoding.
-   * @param {CdpFileData} fileData - File data from CDP response
-   * @returns {string} Decoded filename
-   * @private
-   */
-  _extractFilename(fileData) {
-    // If regular filename is available, use it
-    if (fileData.filename) {
-      return fileData.filename
-    }
-
-    // If encoded filename is available, decode it from RFC-2047 format using proper library
-    if (fileData.encodedfilename) {
-      try {
-        const decoded = rfc2047.decode(fileData.encodedfilename)
-        return decoded
-      } catch (error) {
-        this.logger.warn('Failed to decode RFC-2047 filename', {
-          encodedfilename: fileData.encodedfilename,
-          error: error.message
-        })
-        // Fallback: return as-is if we can't decode
-        return fileData.encodedfilename
-      }
-    }
-
-    // Fallback if neither is available
-    return 'unknown-file'
-  }
-
-  /**
    * Gets current timestamp in ISO format
    * @returns {string}
    * @private
    */
-  _getCurrentTimestamp() {
+  _getTimestamp() {
     return new Date().toISOString()
   }
 
@@ -618,109 +595,15 @@ export class CdpUploadService {
     }
 
     const fileData = this._extractAndValidateFileData(cdpResponse.form)
-    if (
-      !fileData?.s3Key ||
-      !fileData?.s3Bucket ||
-      !fileData?.fileId ||
-      fileData.fileStatus !== FILE_STATUS.COMPLETE
-    ) {
+    if (!S3LocationBuilder.isFileReadyForS3(fileData, FILE_STATUS.COMPLETE)) {
       return null
     }
 
-    return {
-      s3Bucket: fileData.s3Bucket,
-      s3Key: fileData.s3Key,
-      fileId: fileData.fileId,
-      s3Url: `s3://${fileData.s3Bucket}/${fileData.s3Key}/${fileData.fileId}`,
-      filename: this._extractFilename(fileData),
-      fileSize: fileData.contentLength,
-      detectedContentType: fileData.detectedContentType,
-      checksumSha256: fileData.checksumSha256,
-      contentLength: fileData.contentLength,
-      uploadedAt: this._getCurrentTimestamp()
-    }
-  }
-
-  _logCdpResponse(uploadId, data) {
-    // DEBUG: Log the complete CDP service response
-    this.logger.debug(`CDP service response received for ${uploadId}`)
-    this.logger.debug(`Upload Status: ${data.uploadStatus}`)
-    this.logger.debug(`Has Form: ${!!data.form}`)
-    this.logger.debug(`Number of rejected files: ${data.numberOfRejectedFiles}`)
-    if (data.form) {
-      this.logger.debug(`Form Keys: ${Object.keys(data.form).join(', ')}`)
-      this.logger.debug(
-        `Form Value Types: ${Object.values(data.form)
-          .map((val) => typeof val)
-          .join(', ')}`
-      )
-      this.logger.debug(`Full Form Data: ${JSON.stringify(data.form, null, 2)}`)
-    } else {
-      this.logger.debug('No form data in response')
-    }
-    this.logger.debug(`Full CDP Response: ${JSON.stringify(data, null, 2)}`)
-  }
-
-  _logTransformationStart(uploadStatus, form) {
-    this.logger.debug(`Starting response transformation`)
-    this.logger.debug(`Upload Status: ${uploadStatus}`)
-    this.logger.debug(
-      `Form Object Count: ${form ? Object.keys(form).length : 0}`
+    return S3LocationBuilder.buildS3LocationObject(
+      fileData,
+      () => this._getTimestamp(),
+      (data) => this.filenameHandler.extractFilename(data)
     )
-    if (form) {
-      this.logger.debug(`Form Data: ${JSON.stringify(form, null, 2)}`)
-    } else {
-      this.logger.debug('Form Data: null')
-    }
-  }
-
-  _logFileDataExtraction(fileData, form) {
-    this.logger.debug(`File data extraction result`)
-    this.logger.debug(`File Data Exists: ${!!fileData}`)
-    if (fileData) {
-      this.logger.debug(
-        `Extracted File Data: ${JSON.stringify(fileData, null, 2)}`
-      )
-    } else {
-      this.logger.debug('Extracted File Data: null')
-    }
-    if (form && Object.keys(form).length > 0) {
-      this.logger.debug(
-        `First Form Value: ${JSON.stringify(Object.values(form)[0], null, 2)}`
-      )
-    } else {
-      this.logger.debug('First Form Value: no form values')
-    }
-  }
-
-  _logTransformationResult(result) {
-    this.logger.debug('Final transformation result', {
-      resultStatus: result.status,
-      resultMessage: result.message,
-      fullResult: JSON.stringify(result, null, 2)
-    })
-  }
-
-  _logStatusBuilding(uploadStatus, fileData) {
-    this.logger.debug('Building upload status response', {
-      uploadStatus,
-      fileDataType: typeof fileData,
-      fileDataKeys: fileData ? Object.keys(fileData) : [],
-      fileStatus: fileData?.fileStatus,
-      hasError: fileData?.hasError,
-      errorMessage: fileData?.errorMessage
-    })
-  }
-
-  _logStatusDetermination(status, uploadStatus, fileData) {
-    this.logger.debug('Status determination result', {
-      determinedStatus: status,
-      inputs: {
-        uploadStatus,
-        fileStatus: fileData.fileStatus,
-        hasError: fileData.hasError
-      }
-    })
   }
 
   _handleStatusErrors(res, uploadId) {
@@ -766,7 +649,10 @@ export class CdpUploadService {
 
 // Export status constants for use by consumers
 export const UPLOAD_STATUSES = {
-  ...UPLOAD_STATUS,
-  ...FILE_STATUS,
-  ...APP_STATUS
+  ...CDP_CONSTANTS.UPLOAD_STATUS,
+  ...CDP_CONSTANTS.FILE_STATUS,
+  ...CDP_CONSTANTS.APP_STATUS
 }
+
+// Export the organized constants for advanced usage
+export { CDP_CONSTANTS }

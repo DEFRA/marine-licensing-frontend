@@ -651,6 +651,7 @@ describe('#CdpUploadService', () => {
         expect(result).toEqual({
           status: 'error',
           message: 'Upload session not found',
+          errorCode: 'UPLOAD_ERROR',
           retryable: false
         })
 
@@ -679,7 +680,8 @@ describe('#CdpUploadService', () => {
           {
             uploadId: mockUploadId,
             status: 400,
-            statusText: 'Bad Request'
+            statusText: 'Bad Request',
+            endpoint: '/status'
           }
         )
       })
@@ -698,6 +700,7 @@ describe('#CdpUploadService', () => {
         expect(result).toEqual({
           status: 'error',
           message: 'Service temporarily unavailable',
+          errorCode: 'UPLOAD_ERROR',
           retryable: true
         })
       })
@@ -715,6 +718,7 @@ describe('#CdpUploadService', () => {
         expect(result).toEqual({
           status: 'error',
           message: 'Unable to check status',
+          errorCode: 'UPLOAD_ERROR',
           retryable: true
         })
 
@@ -740,6 +744,7 @@ describe('#CdpUploadService', () => {
         expect(result).toEqual({
           status: 'error',
           message: 'Unable to check status',
+          errorCode: 'UPLOAD_ERROR',
           retryable: true
         })
       })
@@ -755,6 +760,7 @@ describe('#CdpUploadService', () => {
         READY: 'ready',
         COMPLETE: 'complete',
         REJECTED: 'rejected',
+        SCANNING: 'scanning',
         ERROR: 'error'
       })
     })

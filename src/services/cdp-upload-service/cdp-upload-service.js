@@ -13,7 +13,7 @@ import { createLogger } from '~/src/server/common/helpers/logging/logger.js'
  * - GET /status/{uploadId} - Checks upload/scan status
  */
 
-// Status constants
+// CDP Service Status Constants
 const UPLOAD_STATUS = {
   INITIATED: 'initiated',
   PENDING: 'pending',
@@ -26,11 +26,16 @@ const FILE_STATUS = {
   REJECTED: 'rejected'
 }
 
-const ERROR_STATUS = {
+// Application Status Constants
+const APP_STATUS = {
+  PENDING: 'pending',
+  SCANNING: 'scanning',
+  READY: 'ready',
+  REJECTED: 'rejected',
   ERROR: 'error'
 }
 
-// Error codes
+// Error Classification
 const ERROR_CODES = {
   NO_FILE_SELECTED: 'NO_FILE_SELECTED',
   VIRUS_DETECTED: 'VIRUS_DETECTED',
@@ -41,19 +46,19 @@ const ERROR_CODES = {
   UPLOAD_ERROR: 'UPLOAD_ERROR'
 }
 
-// HTTP status codes
+// HTTP Status Codes
 const HTTP_STATUS = {
   NOT_FOUND: 404,
   SERVER_ERROR: 500
 }
 
-// API endpoints
+// API Configuration
 const ENDPOINTS = {
   INITIATE: '/initiate',
   STATUS: '/status'
 }
 
-// Error messages
+// User-Facing Messages
 const ERROR_MESSAGES = {
   UPLOAD_NOT_FOUND: 'Upload session not found',
   SERVICE_UNAVAILABLE: 'Service temporarily unavailable',
@@ -152,16 +157,9 @@ export class CdpUploadService {
    * @returns {Promise<UploadConfig>}
    */
   async initiate({ redirectUrl, s3Bucket, allowedMimeTypes, s3Path = '' }) {
+    this._validateInitiateParams({ redirectUrl, s3Bucket })
+
     const mimeTypes = allowedMimeTypes ?? this.allowedMimeTypes
-
-    if (!redirectUrl) {
-      throw new Error('redirectUrl is required')
-    }
-
-    if (!s3Bucket) {
-      throw new Error('S3 Bucket is required')
-    }
-
     const requestPayload = {
       redirect: redirectUrl,
       maxFileSize: this.config.maxFileSize,
@@ -179,15 +177,7 @@ export class CdpUploadService {
         timeout: this.config.timeout
       })
 
-      if (res.statusCode < 200 || res.statusCode >= 300) {
-        const errorMessage = `API call failed with status: ${res.statusCode}`
-        this.logger.error(errorMessage, {
-          status: res.statusCode,
-          statusText: res.statusMessage,
-          endpoint: ENDPOINTS.INITIATE
-        })
-        throw new Error(errorMessage)
-      }
+      this._validateHttpResponse(res, ENDPOINTS.INITIATE)
 
       // Process response from CDP Uploader service
       // Response structure documented at: https://github.com/DEFRA/cdp-uploader/blob/main/README.md#post-initiate
@@ -269,13 +259,14 @@ export class CdpUploadService {
         timeout: this.config.timeout
       })
 
+      // Handle specific status error responses
       if (res.statusCode === HTTP_STATUS.NOT_FOUND) {
         this.logger.warn('Upload session not found', { uploadId })
-        return {
-          status: ERROR_STATUS.ERROR,
-          message: ERROR_MESSAGES.UPLOAD_NOT_FOUND,
-          retryable: false
-        }
+        return this._createErrorResponse(
+          ERROR_MESSAGES.UPLOAD_NOT_FOUND,
+          ERROR_CODES.UPLOAD_ERROR,
+          false
+        )
       }
 
       if (res.statusCode >= HTTP_STATUS.SERVER_ERROR) {
@@ -283,22 +274,14 @@ export class CdpUploadService {
           uploadId,
           status: res.statusCode
         })
-        return {
-          status: ERROR_STATUS.ERROR,
-          message: ERROR_MESSAGES.SERVICE_UNAVAILABLE,
-          retryable: true
-        }
+        return this._createErrorResponse(
+          ERROR_MESSAGES.SERVICE_UNAVAILABLE,
+          ERROR_CODES.UPLOAD_ERROR,
+          true
+        )
       }
 
-      if (res.statusCode < 200 || res.statusCode >= 300) {
-        const errorMessage = `API call failed with status: ${res.statusCode}`
-        this.logger.error(errorMessage, {
-          uploadId,
-          status: res.statusCode,
-          statusText: res.statusMessage
-        })
-        throw new Error(errorMessage)
-      }
+      this._validateHttpResponse(res, ENDPOINTS.STATUS, uploadId)
 
       // Process response from CDP Uploader service status endpoint
       // Response structure documented at: https://github.com/DEFRA/cdp-uploader/blob/main/README.md#get-statusuploadid
@@ -317,11 +300,11 @@ export class CdpUploadService {
           uploadId,
           error: error.message
         })
-        return {
-          status: ERROR_STATUS.ERROR,
-          message: ERROR_MESSAGES.STATUS_CHECK_FAILED,
-          retryable: true
-        }
+        return this._createErrorResponse(
+          ERROR_MESSAGES.STATUS_CHECK_FAILED,
+          ERROR_CODES.UPLOAD_ERROR,
+          true
+        )
       }
 
       this.logger.error('Failed to check upload status', {
@@ -329,6 +312,67 @@ export class CdpUploadService {
         error: error.message
       })
       throw error
+    }
+  }
+
+  /**
+   * Validates input parameters for initiate method
+   * @param {object} params - Parameters to validate
+   * @param {string} params.redirectUrl - URL to redirect user after upload completion
+   * @param {string} params.s3Bucket - S3 bucket name
+   * @throws {Error} When required parameters are missing
+   * @private
+   */
+  _validateInitiateParams({ redirectUrl, s3Bucket }) {
+    if (!redirectUrl) {
+      throw new Error('redirectUrl is required')
+    }
+
+    if (!s3Bucket) {
+      throw new Error('S3 Bucket is required')
+    }
+  }
+
+  /**
+   * Validates HTTP response status and throws error for non-success responses
+   * @param {object} res - HTTP response object
+   * @param {string} endpoint - API endpoint for logging context
+   * @param {string?} uploadId - Optional upload ID for logging context
+   * @throws {Error} When HTTP response indicates failure
+   * @private
+   */
+  _validateHttpResponse(res, endpoint, uploadId) {
+    if (res.statusCode < 200 || res.statusCode >= 300) {
+      const errorMessage = `API call failed with status: ${res.statusCode}`
+      const logContext = {
+        status: res.statusCode,
+        statusText: res.statusMessage,
+        endpoint
+      }
+
+      if (uploadId) {
+        logContext.uploadId = uploadId
+      }
+
+      this.logger.error(errorMessage, logContext)
+      throw new Error(errorMessage)
+    }
+  }
+
+  /**
+   * Creates standardized error response object
+   * @param {string} message - User-friendly error message
+   * @param {string} errorCode - Error code for logging
+   * @param {boolean} retryable - Whether the operation can be retried
+   * @returns {object} Standardized error response
+   * @private
+   */
+  _createErrorResponse(message, errorCode, retryable) {
+    return {
+      status: APP_STATUS.ERROR,
+      message,
+      errorCode,
+      retryable
     }
   }
 
@@ -345,71 +389,113 @@ export class CdpUploadService {
   _transformCdpResponse(cdpResponse) {
     const { uploadStatus, form } = cdpResponse
 
-    // Handle case where no files were uploaded yet
-    if (!form || Object.keys(form).length === 0) {
-      return {
-        status: ERROR_STATUS.ERROR,
-        message: ERROR_MESSAGES.NO_FILE_SELECTED,
-        errorCode: ERROR_CODES.NO_FILE_SELECTED,
-        retryable: true
-      }
+    // Validate form data exists
+    const validationError = this._validateFormData(form)
+    if (validationError) {
+      return validationError
     }
 
-    // Get the first file from the form (assuming single file upload)
-    const fileData = Object.values(form)[0]
-
+    // Extract file data from form
+    const fileData = this._extractFileData(form)
     if (!fileData) {
-      return {
-        status: ERROR_STATUS.ERROR,
-        message: ERROR_MESSAGES.NO_FILE_SELECTED,
-        errorCode: ERROR_CODES.NO_FILE_SELECTED,
-        retryable: true
-      }
+      return this._createErrorResponse(
+        ERROR_MESSAGES.NO_FILE_SELECTED,
+        ERROR_CODES.NO_FILE_SELECTED,
+        true
+      )
     }
 
+    // Build and return standardized response
+    return this._buildUploadStatusResponse(uploadStatus, fileData)
+  }
+
+  /**
+   * Validates that form data exists and contains files
+   * @param {object} form - Form data from CDP response
+   * @returns {object|null} Error response if validation fails, null if valid
+   * @private
+   */
+  _validateFormData(form) {
+    if (!form || Object.keys(form).length === 0) {
+      return this._createErrorResponse(
+        ERROR_MESSAGES.NO_FILE_SELECTED,
+        ERROR_CODES.NO_FILE_SELECTED,
+        true
+      )
+    }
+    return null
+  }
+
+  /**
+   * Extracts file data from form object
+   * @param {object} form - Form data from CDP response
+   * @returns {object|null} File data object or null if not found
+   * @private
+   */
+  _extractFileData(form) {
+    return Object.values(form)[0] || null
+  }
+
+  /**
+   * Builds standardized upload status response from file data
+   * @param {string} uploadStatus - CDP upload status
+   * @param {object} fileData - File data from CDP response
+   * @returns {object} Standardized upload status response
+   * @private
+   */
+  _buildUploadStatusResponse(uploadStatus, fileData) {
     const status = this._determineOverallStatus(
       uploadStatus,
       fileData.fileStatus,
       fileData.hasError
     )
 
-    const result = {
+    const result = this._createBaseStatusResponse(fileData, status)
+    this._addTimestamps(result, status)
+    this._addErrorDetails(result, fileData)
+
+    return result
+  }
+
+  /**
+   * Creates base status response with core file information
+   * @param {object} fileData - File data from CDP response
+   * @param {string} status - Determined upload status
+   * @returns {object} Base response object
+   * @private
+   */
+  _createBaseStatusResponse(fileData, status) {
+    return {
       status,
       filename: fileData.filename,
       fileSize: fileData.contentLength,
       uploadedAt: this._getCurrentTimestamp(),
       retryable: this._isRetryable(status)
     }
-
-    // Add completion timestamp for completed uploads
-    if (status === 'ready' || status === 'rejected') {
-      result.completedAt = this._getCurrentTimestamp()
-    }
-
-    // Add error details if file was rejected
-    if (fileData.hasError && fileData.errorMessage) {
-      result.message = fileData.errorMessage // GDS approved message
-      result.errorCode = this._getErrorCode(fileData.errorMessage)
-    }
-
-    return result
   }
 
   /**
-   * Maps CDP uploadStatus to our status values
-   * @param {string} uploadStatus - CDP upload status
-   * @returns {string}
+   * Adds completion timestamp for finished uploads
+   * @param {object} result - Response object to modify
+   * @param {string} status - Upload status
    * @private
    */
-  _mapUploadStatus(uploadStatus) {
-    switch (uploadStatus) {
-      case UPLOAD_STATUS.INITIATED:
-      case UPLOAD_STATUS.PENDING:
-        return 'pending'
-      case UPLOAD_STATUS.READY:
-        return 'scanning'
-      default:
-        return 'pending'
+  _addTimestamps(result, status) {
+    if (status === APP_STATUS.READY || status === APP_STATUS.REJECTED) {
+      result.completedAt = this._getCurrentTimestamp()
+    }
+  }
+
+  /**
+   * Adds error details if file was rejected
+   * @param {object} result - Response object to modify
+   * @param {object} fileData - File data from CDP response
+   * @private
+   */
+  _addErrorDetails(result, fileData) {
+    if (fileData.hasError && fileData.errorMessage) {
+      result.message = fileData.errorMessage // GDS approved message
+      result.errorCode = this._getErrorCode(fileData.errorMessage)
     }
   }
 
@@ -423,21 +509,21 @@ export class CdpUploadService {
    */
   _determineOverallStatus(uploadStatus, fileStatus, hasError) {
     if (hasError || fileStatus === FILE_STATUS.REJECTED) {
-      return 'rejected'
+      return APP_STATUS.REJECTED
     }
 
     if (
       fileStatus === FILE_STATUS.COMPLETE &&
       uploadStatus === UPLOAD_STATUS.READY
     ) {
-      return 'ready'
+      return APP_STATUS.READY
     }
 
     if (fileStatus === FILE_STATUS.PENDING) {
-      return 'scanning'
+      return APP_STATUS.SCANNING
     }
 
-    return 'pending'
+    return APP_STATUS.PENDING
   }
 
   /**
@@ -447,7 +533,7 @@ export class CdpUploadService {
    * @private
    */
   _isRetryable(status) {
-    return status === ERROR_STATUS.ERROR
+    return status === APP_STATUS.ERROR
   }
 
   /**
@@ -457,21 +543,20 @@ export class CdpUploadService {
    * @private
    */
   _getErrorCode(errorMessage) {
-    if (errorMessage.includes('virus')) {
-      return ERROR_CODES.VIRUS_DETECTED
+    const errorMappings = [
+      { keywords: ['virus'], code: ERROR_CODES.VIRUS_DETECTED },
+      { keywords: ['empty'], code: ERROR_CODES.FILE_EMPTY },
+      { keywords: ['smaller than'], code: ERROR_CODES.FILE_TOO_LARGE },
+      { keywords: ['must be a'], code: ERROR_CODES.INVALID_FILE_TYPE },
+      { keywords: ['password protected'], code: ERROR_CODES.PASSWORD_PROTECTED }
+    ]
+
+    for (const mapping of errorMappings) {
+      if (mapping.keywords.some((keyword) => errorMessage.includes(keyword))) {
+        return mapping.code
+      }
     }
-    if (errorMessage.includes('empty')) {
-      return ERROR_CODES.FILE_EMPTY
-    }
-    if (errorMessage.includes('smaller than')) {
-      return ERROR_CODES.FILE_TOO_LARGE
-    }
-    if (errorMessage.includes('must be a')) {
-      return ERROR_CODES.INVALID_FILE_TYPE
-    }
-    if (errorMessage.includes('password protected')) {
-      return ERROR_CODES.PASSWORD_PROTECTED
-    }
+
     return ERROR_CODES.UPLOAD_ERROR
   }
 
@@ -489,5 +574,5 @@ export class CdpUploadService {
 export const UPLOAD_STATUSES = {
   ...UPLOAD_STATUS,
   ...FILE_STATUS,
-  ...ERROR_STATUS
+  ...APP_STATUS
 }

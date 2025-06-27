@@ -23,7 +23,7 @@ export const validateUserSession = async (request, session) => {
       return { isValid: false }
     }
 
-    const refreshAccessTokenJson = await response.json
+    const refreshAccessTokenJson = response.json
     const updatedSession = await updateUserSession(
       request,
       refreshAccessTokenJson

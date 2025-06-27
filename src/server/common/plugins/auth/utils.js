@@ -6,8 +6,8 @@ import { addSeconds } from 'date-fns'
 
 export const getUserSession = async (request, session) => {
   if (session?.sessionId) {
-    const sessionId = await request.server.app.cache.get(session.sessionId)
-    return sessionId
+    const userSession = await request.server.app.cache.get(session.sessionId)
+    return userSession
   }
 
   return null

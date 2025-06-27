@@ -349,7 +349,7 @@ describe('#CdpUploadService', () => {
     })
 
     describe('Given successful API responses', () => {
-      test('Should return pending status when no files uploaded yet', async () => {
+      test('Should return error status when no files uploaded yet', async () => {
         // Given
         const mockResponse = {
           uploadStatus: 'initiated',
@@ -371,15 +371,17 @@ describe('#CdpUploadService', () => {
         })
 
         expect(result).toEqual({
-          status: 'pending',
-          message: 'Upload pending'
+          status: 'error',
+          message: 'No file selected',
+          errorCode: 'NO_FILE_SELECTED',
+          retryable: true
         })
 
         expect(mockLoggerDebug).toHaveBeenCalledWith(
           'Upload status retrieved',
           {
             uploadId: mockUploadId,
-            status: 'pending'
+            status: 'error'
           }
         )
       })
@@ -783,8 +785,10 @@ describe('#CdpUploadService', () => {
 
       // Then
       expect(result).toEqual({
-        status: 'pending',
-        message: 'Upload pending'
+        status: 'error',
+        message: 'No file selected',
+        errorCode: 'NO_FILE_SELECTED',
+        retryable: true
       })
     })
 
@@ -805,8 +809,10 @@ describe('#CdpUploadService', () => {
 
       // Then
       expect(result).toEqual({
-        status: 'pending',
-        message: 'Upload pending'
+        status: 'error',
+        message: 'No file selected',
+        errorCode: 'NO_FILE_SELECTED',
+        retryable: true
       })
     })
 
@@ -825,8 +831,10 @@ describe('#CdpUploadService', () => {
 
       // Then
       expect(result).toEqual({
-        status: 'pending', // Default case returns 'pending'
-        message: 'Upload pending'
+        status: 'error', // No file selected returns error
+        message: 'No file selected',
+        errorCode: 'NO_FILE_SELECTED',
+        retryable: true
       })
     })
 
@@ -845,8 +853,10 @@ describe('#CdpUploadService', () => {
 
       // Then
       expect(result).toEqual({
-        status: 'scanning', // Ready status maps to 'scanning' when no form data
-        message: 'Upload pending'
+        status: 'error', // No file selected returns error
+        message: 'No file selected',
+        errorCode: 'NO_FILE_SELECTED',
+        retryable: true
       })
     })
 

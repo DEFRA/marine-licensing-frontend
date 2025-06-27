@@ -19,6 +19,17 @@ const ERROR_STATUS = {
   ERROR: 'error'
 }
 
+// Error codes
+const ERROR_CODES = {
+  NO_FILE_SELECTED: 'NO_FILE_SELECTED',
+  VIRUS_DETECTED: 'VIRUS_DETECTED',
+  FILE_EMPTY: 'FILE_EMPTY',
+  FILE_TOO_LARGE: 'FILE_TOO_LARGE',
+  INVALID_FILE_TYPE: 'INVALID_FILE_TYPE',
+  PASSWORD_PROTECTED: 'PASSWORD_PROTECTED',
+  UPLOAD_ERROR: 'UPLOAD_ERROR'
+}
+
 // HTTP status codes
 const HTTP_STATUS = {
   NOT_FOUND: 404,
@@ -35,7 +46,8 @@ const ENDPOINTS = {
 const ERROR_MESSAGES = {
   UPLOAD_NOT_FOUND: 'Upload session not found',
   SERVICE_UNAVAILABLE: 'Service temporarily unavailable',
-  STATUS_CHECK_FAILED: 'Unable to check status'
+  STATUS_CHECK_FAILED: 'Unable to check status',
+  NO_FILE_SELECTED: 'No file selected'
 }
 
 /**
@@ -241,8 +253,10 @@ export class CdpUploadService {
     // Handle case where no files were uploaded yet
     if (!form || Object.keys(form).length === 0) {
       return {
-        status: this._mapUploadStatus(uploadStatus),
-        message: 'Upload pending'
+        status: ERROR_STATUS.ERROR,
+        message: ERROR_MESSAGES.NO_FILE_SELECTED,
+        errorCode: ERROR_CODES.NO_FILE_SELECTED,
+        retryable: true
       }
     }
 
@@ -251,8 +265,10 @@ export class CdpUploadService {
 
     if (!fileData) {
       return {
-        status: this._mapUploadStatus(uploadStatus),
-        message: 'Upload pending'
+        status: ERROR_STATUS.ERROR,
+        message: ERROR_MESSAGES.NO_FILE_SELECTED,
+        errorCode: ERROR_CODES.NO_FILE_SELECTED,
+        retryable: true
       }
     }
 
@@ -347,21 +363,21 @@ export class CdpUploadService {
    */
   _getErrorCode(errorMessage) {
     if (errorMessage.includes('virus')) {
-      return 'VIRUS_DETECTED'
+      return ERROR_CODES.VIRUS_DETECTED
     }
     if (errorMessage.includes('empty')) {
-      return 'FILE_EMPTY'
+      return ERROR_CODES.FILE_EMPTY
     }
     if (errorMessage.includes('smaller than')) {
-      return 'FILE_TOO_LARGE'
+      return ERROR_CODES.FILE_TOO_LARGE
     }
     if (errorMessage.includes('must be a')) {
-      return 'INVALID_FILE_TYPE'
+      return ERROR_CODES.INVALID_FILE_TYPE
     }
     if (errorMessage.includes('password protected')) {
-      return 'PASSWORD_PROTECTED'
+      return ERROR_CODES.PASSWORD_PROTECTED
     }
-    return 'UPLOAD_ERROR'
+    return ERROR_CODES.UPLOAD_ERROR
   }
 
   /**

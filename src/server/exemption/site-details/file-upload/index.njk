@@ -65,7 +65,7 @@
                },
               multiple: false,
               javascript: true,
-              errorMessage: errors['file-upload'] if errors else false,
+              errorMessage: { text: errors['file'].text } if errors and errors['file'] else false,
               attributes: {
                 "accept": acceptAttribute           
               }

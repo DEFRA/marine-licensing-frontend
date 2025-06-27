@@ -14,5 +14,5 @@ export const routes = {
   WIDTH_OF_SITE: '/exemption/width-of-site',
   CHOOSE_FILE_UPLOAD_TYPE: '/exemption/choose-file-type-to-upload',
   FILE_UPLOAD: '/exemption/upload-file',
-  UPLOAD_COMPLETE: '/exemption/upload-complete'
+  UPLOAD_AND_WAIT: '/exemption/upload-and-wait'
 }

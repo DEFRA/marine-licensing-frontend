@@ -5,6 +5,10 @@ import {
 import { getCdpUploadService } from '~/src/services/cdp-upload-service/index.js'
 import { routes } from '~/src/server/common/constants/routes.js'
 import { config } from '~/src/config/config.js'
+import {
+  errorDescriptionByFieldName,
+  mapErrorsForDisplay
+} from '~/src/server/common/helpers/errors.js'
 
 export const FILE_UPLOAD_VIEW_ROUTE = 'exemption/site-details/file-upload/index'
 
@@ -61,13 +65,36 @@ const getFileTypeContent = (fileUploadType) => {
 }
 
 /**
+ * Create error summary and field errors for display
+ * @param {string} message - Error message
+ * @param {string} fieldName - Field name for error
+ * @returns {object} Error summary and field errors
+ */
+const createErrorDisplay = (message, fieldName) => {
+  const errorDetail = {
+    path: [fieldName], // Must be array to match Joi validation format
+    message,
+    type: 'upload.error'
+  }
+
+  const errorSummary = mapErrorsForDisplay([errorDetail], {
+    [message]: message
+  })
+
+  const errors = errorDescriptionByFieldName(errorSummary)
+
+  return { errorSummary, errors }
+}
+
+/**
  * A GDS styled file upload page controller.
  * @satisfies {Partial<ServerRoute>}
  */
 export const fileUploadController = {
   async handler(request, h) {
     const exemption = getExemptionCache(request)
-    const { fileUploadType, uploadedFile } = exemption.siteDetails || {}
+    const { fileUploadType, uploadedFile, uploadError } =
+      exemption.siteDetails || {}
 
     if (!fileUploadType) {
       // Redirect back to file type selection if no type chosen
@@ -76,8 +103,28 @@ export const fileUploadController = {
 
     const fileTypeContent = getFileTypeContent(fileUploadType)
 
-    // AC5: If file already uploaded, show success state with continue option
-    if (uploadedFile) {
+    // Check for error state from previous upload attempt
+    let errorSummary, errors
+    if (uploadError) {
+      const errorDisplay = createErrorDisplay(
+        uploadError.message,
+        uploadError.fieldName
+      )
+      errorSummary = errorDisplay.errorSummary
+      errors = errorDisplay.errors
+
+      // Clear error from session after retrieving
+      updateExemptionSiteDetails(request, 'uploadError', undefined)
+
+      request.logger.debug('Displaying upload error from session', {
+        message: uploadError.message,
+        fieldName: uploadError.fieldName,
+        fileType: uploadError.fileType
+      })
+    }
+
+    // AC5: If file already uploaded and no errors, show success state with continue option
+    if (uploadedFile && !uploadError) {
       return h.view(FILE_UPLOAD_VIEW_ROUTE, {
         ...pageSettings,
         ...fileTypeContent,
@@ -91,12 +138,12 @@ export const fileUploadController = {
     }
 
     try {
-      // Initialize CDP upload session
+      // Initialize CDP upload session (always needed for upload form)
       const mimeTypes = getMimeTypesForFileType(fileUploadType)
       const cdpService = getCdpUploadService(mimeTypes)
       const cdpUploadConfig = config.get('cdpUploader')
       const s3Bucket = cdpUploadConfig.s3Bucket
-      const redirectUrl = `${config.get('appBaseUrl')}${routes.UPLOAD_COMPLETE}`
+      const redirectUrl = `${config.get('appBaseUrl')}${routes.UPLOAD_AND_WAIT}`
       const uploadConfig = await cdpService.initiate({
         redirectUrl,
         s3Path: 'exemptions',
@@ -109,7 +156,6 @@ export const fileUploadController = {
         statusUrl: uploadConfig.statusUrl,
         fileType: fileUploadType
       })
-
       return h.view(FILE_UPLOAD_VIEW_ROUTE, {
         ...pageSettings,
         ...fileTypeContent,
@@ -119,7 +165,10 @@ export const fileUploadController = {
         acceptAttribute: fileTypeContent.acceptAttribute,
         fileUploadType,
         backLink: routes.CHOOSE_FILE_UPLOAD_TYPE,
-        cancelLink: `${routes.TASK_LIST}?cancel=site-details`
+        cancelLink: `${routes.TASK_LIST}?cancel=site-details`,
+        errorSummary,
+        errors,
+        showUploadForm: true // Flag to ensure upload form is shown
       })
     } catch (error) {
       request.logger.error('Failed to initialize file upload', {

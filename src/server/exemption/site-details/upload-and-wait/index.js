@@ -1,4 +1,4 @@
-import { uploadCompleteController } from '~/src/server/exemption/site-details/upload-complete/controller.js'
+import { uploadAndWaitController } from '~/src/server/exemption/site-details/upload-and-wait/controller.js'
 import { routes } from '~/src/server/common/constants/routes.js'
 
 /**
@@ -9,10 +9,10 @@ import { routes } from '~/src/server/common/constants/routes.js'
 /**
  * @satisfies {ServerRegisterPluginObject<void>}
  */
-export const uploadCompleteRoutes = [
+export const uploadAndWaitRoutes = [
   {
     method: 'GET',
-    path: routes.UPLOAD_COMPLETE,
-    ...uploadCompleteController
+    path: routes.UPLOAD_AND_WAIT,
+    ...uploadAndWaitController
   }
 ]

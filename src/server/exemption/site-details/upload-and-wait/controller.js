@@ -4,13 +4,9 @@ import {
 } from '~/src/server/common/helpers/session-cache/utils.js'
 import { getCdpUploadService } from '~/src/services/cdp-upload-service/index.js'
 import { routes } from '~/src/server/common/constants/routes.js'
-import {
-  errorDescriptionByFieldName,
-  mapErrorsForDisplay
-} from '~/src/server/common/helpers/errors.js'
 
-export const UPLOAD_COMPLETE_VIEW_ROUTE =
-  'exemption/site-details/upload-complete/index'
+export const UPLOAD_AND_WAIT_VIEW_ROUTE =
+  'exemption/site-details/upload-and-wait/index'
 
 const pageSettings = {
   pageTitle: 'File upload status',
@@ -21,10 +17,10 @@ const pageSettings = {
  * Transform CDP error message to validation error format
  * @param {string} message - CDP error message
  * @param {string} fileType - File type for contextualized errors
- * @returns {object} Validation error object
+ * @returns {object} Validation error object with message and fieldName
  */
 const transformCdpErrorToValidationError = (message, fileType) => {
-  const errorKey = 'file-upload'
+  const errorKey = 'file'
 
   // Map CDP error messages to AC4 requirements
   let errorMessage = message
@@ -51,26 +47,17 @@ const transformCdpErrorToValidationError = (message, fileType) => {
     errorMessage = 'The selected file could not be uploaded – try again'
   }
 
-  const errorDetail = {
-    path: [errorKey],
+  return {
     message: errorMessage,
-    type: 'upload.error'
+    fieldName: errorKey
   }
-
-  const errorSummary = mapErrorsForDisplay([errorDetail], {
-    [errorMessage]: errorMessage
-  })
-
-  const errors = errorDescriptionByFieldName(errorSummary)
-
-  return { errorSummary, errors }
 }
 
 /**
  * A GDS styled upload complete page controller.
  * @satisfies {Partial<ServerRoute>}
  */
-export const uploadCompleteController = {
+export const uploadAndWaitController = {
   async handler(request, h) {
     const exemption = getExemptionCache(request)
     const { uploadConfig } = exemption.siteDetails || {}
@@ -96,7 +83,7 @@ export const uploadCompleteController = {
 
       if (status.status === 'pending' || status.status === 'scanning') {
         // Still processing - show waiting page with meta refresh
-        return h.view(UPLOAD_COMPLETE_VIEW_ROUTE, {
+        return h.view(UPLOAD_AND_WAIT_VIEW_ROUTE, {
           ...pageSettings,
           projectName: exemption.projectName,
           isProcessing: true,
@@ -122,32 +109,24 @@ export const uploadCompleteController = {
       }
 
       if (status.status === 'rejected' || status.status === 'error') {
-        // File rejected or error - show upload page with error
-        const { errorSummary, errors } = transformCdpErrorToValidationError(
+        // File rejected or error - store error details in session and redirect
+        const errorDetails = transformCdpErrorToValidationError(
           status.message ?? 'Upload failed',
           uploadConfig.fileType
         )
 
+        // Store error details in session for file-upload controller to handle
+        updateExemptionSiteDetails(request, 'uploadError', {
+          message: errorDetails.message,
+          fieldName: errorDetails.fieldName,
+          fileType: uploadConfig.fileType
+        })
+
         // Clear upload config from session
         updateExemptionSiteDetails(request, 'uploadConfig', undefined)
 
-        // Get file type content for re-rendering upload page
-        const fileTypeContent =
-          uploadConfig.fileType === 'kml'
-            ? { heading: 'Upload a KML file', acceptAttribute: '.kml' }
-            : { heading: 'Upload a Shapefile', acceptAttribute: '.zip' }
-
-        return h.view('exemption/site-details/file-upload/index', {
-          pageTitle: 'Upload a file',
-          ...fileTypeContent,
-          projectName: exemption.projectName,
-          fileUploadType: uploadConfig.fileType,
-          backLink: routes.CHOOSE_FILE_UPLOAD_TYPE,
-          cancelLink: `${routes.TASK_LIST}?cancel=site-details`,
-          errorSummary,
-          errors,
-          showUploadForm: true // Flag to re-initialize upload form
-        })
+        // Redirect to file-upload route to handle error display and new session creation
+        return h.redirect(routes.FILE_UPLOAD)
       }
 
       // Unknown status - redirect to file type selection

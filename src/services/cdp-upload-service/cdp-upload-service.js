@@ -1,4 +1,5 @@
 import Wreck from '@hapi/wreck'
+import rfc2047 from 'rfc2047'
 import { config } from '~/src/config/config.js'
 import { createLogger } from '~/src/server/common/helpers/logging/logger.js'
 
@@ -63,7 +64,7 @@ const ERROR_MESSAGES = {
   UPLOAD_NOT_FOUND: 'Upload session not found',
   SERVICE_UNAVAILABLE: 'Service temporarily unavailable',
   STATUS_CHECK_FAILED: 'Unable to check status',
-  NO_FILE_SELECTED: 'No file selected'
+  NO_FILE_SELECTED: 'Select a file to upload'
 }
 
 /**
@@ -85,7 +86,8 @@ const ERROR_MESSAGES = {
 /**
  * @typedef {object} CdpFileData
  * @property {string} fileId - UUID of the uploaded file
- * @property {string} filename - Original filename of the uploaded file
+ * @property {string} filename - Optional: original filename of the uploaded file
+ * @property {string} encodedfilename - Optional: either filename or encodedfilename will be provided. RFC-2047 encoded filename if the filename contained non-ascii characters.
  * @property {string} contentType - MIME type as declared in the multipart upload
  * @property {'pending'|'complete'|'rejected'} fileStatus - File processing status
  * @property {number} contentLength - File size in bytes
@@ -109,7 +111,7 @@ const ERROR_MESSAGES = {
  * @typedef {object} UploadStatus
  * @property {'pending'|'scanning'|'ready'|'rejected'|'error'} status - Upload status
  * @property {string} [message] - User-friendly status message (GDS approved)
- * @property {string} [filename] - Original uploaded filename
+ * @property {string} [filename] - Original uploaded filename (decoded from RFC-2047 if necessary)
  * @property {number} [fileSize] - File size in bytes
  * @property {string} [uploadedAt] - ISO timestamp of upload
  * @property {string} [completedAt] - ISO timestamp of completion (if applicable)
@@ -465,13 +467,33 @@ export class CdpUploadService {
    * @private
    */
   _createBaseStatusResponse(fileData, status) {
-    return {
+    const result = {
       status,
-      filename: fileData.filename,
+      filename: this._extractFilename(fileData),
       fileSize: fileData.contentLength,
       uploadedAt: this._getCurrentTimestamp(),
       retryable: this._isRetryable(status)
     }
+
+    // Include S3 information when upload is complete (AC8 requirement)
+    if (
+      status === APP_STATUS.READY &&
+      fileData.s3Key &&
+      fileData.s3Bucket &&
+      fileData.fileId
+    ) {
+      result.s3Location = {
+        s3Bucket: fileData.s3Bucket,
+        s3Key: fileData.s3Key,
+        fileId: fileData.fileId,
+        s3Url: `s3://${fileData.s3Bucket}/${fileData.s3Key}/${fileData.fileId}`,
+        detectedContentType: fileData.detectedContentType,
+        checksumSha256: fileData.checksumSha256,
+        contentLength: fileData.contentLength
+      }
+    }
+
+    return result
   }
 
   /**
@@ -546,9 +568,19 @@ export class CdpUploadService {
     const errorMappings = [
       { keywords: ['virus'], code: ERROR_CODES.VIRUS_DETECTED },
       { keywords: ['empty'], code: ERROR_CODES.FILE_EMPTY },
-      { keywords: ['smaller than'], code: ERROR_CODES.FILE_TOO_LARGE },
-      { keywords: ['must be a'], code: ERROR_CODES.INVALID_FILE_TYPE },
-      { keywords: ['password protected'], code: ERROR_CODES.PASSWORD_PROTECTED }
+      {
+        keywords: ['smaller than', 'must be smaller than'],
+        code: ERROR_CODES.FILE_TOO_LARGE
+      },
+      {
+        keywords: ['must be a', 'KML file', 'Shapefile'],
+        code: ERROR_CODES.INVALID_FILE_TYPE
+      },
+      {
+        keywords: ['password protected'],
+        code: ERROR_CODES.PASSWORD_PROTECTED
+      },
+      { keywords: ['could not be uploaded'], code: ERROR_CODES.UPLOAD_ERROR }
     ]
 
     for (const mapping of errorMappings) {
@@ -561,12 +593,94 @@ export class CdpUploadService {
   }
 
   /**
+   * Extracts filename from file data, handling both regular and RFC-2047 encoded filenames
+   *
+   * As per CdpFileData typedef: either filename or encodedfilename will be provided
+   * depending on whether the original filename contained non-ascii characters.
+   * Uses the rfc2047 npm package for proper RFC-2047 decoding.
+   * @param {CdpFileData} fileData - File data from CDP response
+   * @returns {string} Decoded filename
+   * @private
+   */
+  _extractFilename(fileData) {
+    // If regular filename is available, use it
+    if (fileData.filename) {
+      return fileData.filename
+    }
+
+    // If encoded filename is available, decode it from RFC-2047 format using proper library
+    if (fileData.encodedfilename) {
+      try {
+        const decoded = rfc2047.decode(fileData.encodedfilename)
+        return decoded
+      } catch (error) {
+        this.logger.warn('Failed to decode RFC-2047 filename', {
+          encodedfilename: fileData.encodedfilename,
+          error: error.message
+        })
+        // Fallback: return as-is if we can't decode
+        return fileData.encodedfilename
+      }
+    }
+
+    // Fallback if neither is available
+    return 'unknown-file'
+  }
+
+  /**
    * Gets current timestamp in ISO format
    * @returns {string}
    * @private
    */
   _getCurrentTimestamp() {
     return new Date().toISOString()
+  }
+
+  /**
+   * Extracts S3 file location from CDP response for session storage
+   *
+   * Fulfills AC8 requirement: "store the S3 file and bucket location in session storage"
+   * @param {CdpStatusResponse} cdpResponse - Raw CDP status response
+   * @returns {object|null} Complete S3 location object with all file metadata, or null if not ready.
+   * When successful, returns object with properties:
+   * - s3Bucket {string} - S3 bucket name
+   * - s3Key {string} - S3 object key path
+   * - fileId {string} - Unique file identifier (UUID)
+   * - s3Url {string} - Complete S3 URL for file retrieval: s3://{bucket}/{key}/{fileId}
+   * - filename {string} - Original filename (decoded if necessary)
+   * - fileSize {number} - File size in bytes (alias for contentLength)
+   * - detectedContentType {string} - MIME type detected by CDP uploader
+   * - checksumSha256 {string} - SHA256 checksum for file integrity verification
+   * - contentLength {number} - File size in bytes
+   * - uploadedAt {string} - ISO timestamp of when extraction occurred
+   */
+  extractS3Location(cdpResponse) {
+    if (cdpResponse.uploadStatus !== UPLOAD_STATUS.READY) {
+      return null
+    }
+
+    const fileData = this._extractFileData(cdpResponse.form)
+    if (
+      !fileData?.s3Key ||
+      !fileData?.s3Bucket ||
+      !fileData?.fileId ||
+      fileData.fileStatus !== FILE_STATUS.COMPLETE
+    ) {
+      return null
+    }
+
+    return {
+      s3Bucket: fileData.s3Bucket,
+      s3Key: fileData.s3Key,
+      fileId: fileData.fileId,
+      s3Url: `s3://${fileData.s3Bucket}/${fileData.s3Key}/${fileData.fileId}`,
+      filename: this._extractFilename(fileData),
+      fileSize: fileData.contentLength,
+      detectedContentType: fileData.detectedContentType,
+      checksumSha256: fileData.checksumSha256,
+      contentLength: fileData.contentLength,
+      uploadedAt: this._getCurrentTimestamp()
+    }
   }
 }
 

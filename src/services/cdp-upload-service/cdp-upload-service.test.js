@@ -372,7 +372,7 @@ describe('#CdpUploadService', () => {
 
         expect(result).toEqual({
           status: 'error',
-          message: 'No file selected',
+          message: 'Select a file to upload',
           errorCode: 'NO_FILE_SELECTED',
           retryable: true
         })
@@ -792,7 +792,7 @@ describe('#CdpUploadService', () => {
       // Then
       expect(result).toEqual({
         status: 'error',
-        message: 'No file selected',
+        message: 'Select a file to upload',
         errorCode: 'NO_FILE_SELECTED',
         retryable: true
       })
@@ -816,7 +816,7 @@ describe('#CdpUploadService', () => {
       // Then
       expect(result).toEqual({
         status: 'error',
-        message: 'No file selected',
+        message: 'Select a file to upload',
         errorCode: 'NO_FILE_SELECTED',
         retryable: true
       })
@@ -838,7 +838,7 @@ describe('#CdpUploadService', () => {
       // Then
       expect(result).toEqual({
         status: 'error', // No file selected returns error
-        message: 'No file selected',
+        message: 'Select a file to upload',
         errorCode: 'NO_FILE_SELECTED',
         retryable: true
       })
@@ -860,7 +860,7 @@ describe('#CdpUploadService', () => {
       // Then
       expect(result).toEqual({
         status: 'error', // No file selected returns error
-        message: 'No file selected',
+        message: 'Select a file to upload',
         errorCode: 'NO_FILE_SELECTED',
         retryable: true
       })
@@ -1105,6 +1105,144 @@ describe('#CdpUploadService', () => {
           )
         })
       )
+    })
+  })
+
+  describe('_extractFilename', () => {
+    it('should return regular filename when available', () => {
+      const service = new CdpUploadService()
+      const fileData = {
+        filename: 'test-file.kml'
+      }
+
+      const result = service._extractFilename(fileData)
+      expect(result).toBe('test-file.kml')
+    })
+
+    it('should decode RFC-2047 base64 encoded filename', () => {
+      const service = new CdpUploadService()
+      const fileData = {
+        encodedfilename: '=?utf-8?B?Y29vcmRvbm7DqWVzLWR1LXNpdGUua21s?='
+      }
+
+      const result = service._extractFilename(fileData)
+      expect(result).toBe('coordonnées-du-site.kml')
+    })
+
+    it('should decode RFC-2047 quoted-printable encoded filename', () => {
+      const service = new CdpUploadService()
+      const fileData = {
+        encodedfilename: '=?utf-8?Q?coordonn=C3=A9es_du_site.kml?='
+      }
+
+      const result = service._extractFilename(fileData)
+      expect(result).toBe('coordonnées du site.kml')
+    })
+
+    it('should prefer regular filename over encoded filename when both present', () => {
+      const service = new CdpUploadService()
+      const fileData = {
+        filename: 'regular-file.kml',
+        encodedfilename: '=?UTF-8?B?encoded-file.kml?='
+      }
+
+      const result = service._extractFilename(fileData)
+      expect(result).toBe('regular-file.kml')
+    })
+
+    it('should return encoded filename as-is if decoding fails', () => {
+      const service = new CdpUploadService()
+      const fileData = {
+        encodedfilename: '=?INVALID?ENCODING?broken?='
+      }
+
+      const result = service._extractFilename(fileData)
+      expect(result).toBe('=?INVALID?ENCODING?broken?=')
+    })
+
+    it('should decode RFC-2047 with Asian characters', () => {
+      const service = new CdpUploadService()
+      const fileData = {
+        encodedfilename: '=?utf-8?B?6IqB5Zub5LqN5qCHLmttbA==?='
+      }
+
+      const result = service._extractFilename(fileData)
+      expect(result).toBe('芁四亍标.kml')
+    })
+
+    it('should return fallback when neither filename nor encodedfilename present', () => {
+      const service = new CdpUploadService()
+      const fileData = {}
+
+      const result = service._extractFilename(fileData)
+      expect(result).toBe('unknown-file')
+    })
+  })
+
+  describe('extractS3Location', () => {
+    it('should extract complete S3 location for AC8 compliance', () => {
+      const service = new CdpUploadService()
+      const cdpResponse = {
+        uploadStatus: 'ready',
+        form: {
+          'file-upload': {
+            fileId: '9fcaabe5-77ec-44db-8356-3a6e8dc51b13',
+            filename: 'coordinates.kml',
+            fileStatus: 'complete',
+            contentLength: 11264,
+            s3Key: 'path/to/file',
+            s3Bucket: 'marine-licensing-files',
+            detectedContentType: 'application/vnd.google-earth.kml+xml',
+            checksumSha256: 'bng5jOVC6TxEgwTUlX4DikFtDEYEc8vQTsOP0ZAv21c='
+          }
+        }
+      }
+
+      const result = service.extractS3Location(cdpResponse)
+
+      expect(result).toEqual({
+        s3Bucket: 'marine-licensing-files',
+        s3Key: 'path/to/file',
+        fileId: '9fcaabe5-77ec-44db-8356-3a6e8dc51b13',
+        s3Url:
+          's3://marine-licensing-files/path/to/file/9fcaabe5-77ec-44db-8356-3a6e8dc51b13',
+        filename: 'coordinates.kml',
+        fileSize: 11264,
+        detectedContentType: 'application/vnd.google-earth.kml+xml',
+        checksumSha256: 'bng5jOVC6TxEgwTUlX4DikFtDEYEc8vQTsOP0ZAv21c=',
+        contentLength: 11264,
+        uploadedAt: expect.any(String)
+      })
+    })
+
+    it('should return null when file is not ready', () => {
+      const service = new CdpUploadService()
+      const cdpResponse = {
+        uploadStatus: 'pending',
+        form: {}
+      }
+
+      const result = service.extractS3Location(cdpResponse)
+      expect(result).toBeNull()
+    })
+
+    it('should return null when missing required S3 fields', () => {
+      const service = new CdpUploadService()
+      const cdpResponse = {
+        uploadStatus: 'ready',
+        form: {
+          'file-upload': {
+            fileId: '9fcaabe5-77ec-44db-8356-3a6e8dc51b13',
+            filename: 'coordinates.kml',
+            fileStatus: 'complete',
+            contentLength: 11264
+            // Missing s3Key and s3Bucket
+          }
+        }
+      }
+
+      const result = service.extractS3Location(cdpResponse)
+      expect(result).toBeNull()
     })
   })
 })

@@ -232,55 +232,12 @@ export class CdpUploadService {
     try {
       this.logger.debug('Checking upload status', { uploadId, statusUrl })
 
-      // Example response:
-      // {
-      //   "uploadStatus": "ready",
-      //   "metadata": {
-      //     "example-id": "id"
-      //   },
-      //   "form": {
-      //     "a-form-field": "some value",
-      //     "a-file-upload-field": {
-      //       "fileId": "9fcaabe5-77ec-44db-8356-3a6e8dc51b13",
-      //       "filename": "dragon-b.jpeg",
-      //       "contentType": "image/jpeg",
-      //       "fileStatus": "complete",
-      //       "contentLength": 11264,
-      //       "checksumSha256": "bng5jOVC6TxEgwTUlX4DikFtDEYEc8vQTsOP0ZAv21c=",
-      //       "detectedContentType": "image/jpeg",
-      //       "s3Key": "3b0b2a02-a669-44ba-9b78-bd5cb8460253/9fcaabe5-77ec-44db-8356-3a6e8dc51b13",
-      //       "s3Bucket": "cdp-example-node-frontend"
-      //     },
-      //     "another-form-field": "foobazbar"
-      //   },
-      //   "numberOfRejectedFiles": 0
-      // }
-
-      const { res, payload } = await Wreck.get(statusUrl, {
-        json: true,
-        timeout: this.config.timeout
-      })
+      const { res, payload } = await this._makeStatusRequest(statusUrl)
 
       // Handle specific status error responses
-      if (res.statusCode === HTTP_STATUS.NOT_FOUND) {
-        this.logger.warn('Upload session not found', { uploadId })
-        return this._createErrorResponse(
-          ERROR_MESSAGES.UPLOAD_NOT_FOUND,
-          ERROR_CODES.UPLOAD_ERROR,
-          false
-        )
-      }
-
-      if (res.statusCode >= HTTP_STATUS.SERVER_ERROR) {
-        this.logger.error('Service error when checking status', {
-          uploadId,
-          status: res.statusCode
-        })
-        return this._createErrorResponse(
-          ERROR_MESSAGES.SERVICE_UNAVAILABLE,
-          ERROR_CODES.UPLOAD_ERROR,
-          true
-        )
+      const errorResponse = this._handleStatusErrors(res, uploadId)
+      if (errorResponse) {
+        return errorResponse
       }
 
       this._validateHttpResponse(res, ENDPOINTS.STATUS, uploadId)
@@ -289,27 +246,7 @@ export class CdpUploadService {
       // Response structure documented at: https://github.com/DEFRA/cdp-uploader/blob/main/README.md#get-statusuploadid
       const data = payload
 
-      // DEBUG: Log the complete CDP service response
-      this.logger.debug(`CDP service response received for ${uploadId}`)
-      this.logger.debug(`Upload Status: ${data.uploadStatus}`)
-      this.logger.debug(`Has Form: ${!!data.form}`)
-      this.logger.debug(
-        `Number of rejected files: ${data.numberOfRejectedFiles}`
-      )
-      if (data.form) {
-        this.logger.debug(`Form Keys: ${Object.keys(data.form).join(', ')}`)
-        this.logger.debug(
-          `Form Value Types: ${Object.values(data.form)
-            .map((val) => typeof val)
-            .join(', ')}`
-        )
-        this.logger.debug(
-          `Full Form Data: ${JSON.stringify(data.form, null, 2)}`
-        )
-      } else {
-        this.logger.debug('No form data in response')
-      }
-      this.logger.debug(`Full CDP Response: ${JSON.stringify(data, null, 2)}`)
+      this._logCdpResponse(uploadId, data)
 
       const transformedStatus = this._transformCdpResponse(data)
 
@@ -320,23 +257,7 @@ export class CdpUploadService {
 
       return transformedStatus
     } catch (error) {
-      if (error.code === 'ECONNRESET' || error.code === 'ETIMEDOUT') {
-        this.logger.error('Request timeout when checking status', {
-          uploadId,
-          error: error.message
-        })
-        return this._createErrorResponse(
-          ERROR_MESSAGES.STATUS_CHECK_FAILED,
-          ERROR_CODES.UPLOAD_ERROR,
-          true
-        )
-      }
-
-      this.logger.error('Failed to check upload status', {
-        uploadId,
-        error: error.message
-      })
-      throw error
+      return this._handleNetworkErrors(error, uploadId)
     }
   }
 
@@ -402,6 +323,58 @@ export class CdpUploadService {
   }
 
   /**
+   * Creates error response for when no file is selected
+   * @returns {object} Standardized error response
+   * @private
+   */
+  _createNoFileSelectedError() {
+    return this._createErrorResponse(
+      ERROR_MESSAGES.NO_FILE_SELECTED,
+      ERROR_CODES.NO_FILE_SELECTED,
+      true
+    )
+  }
+
+  /**
+   * Creates error response for upload session not found (404)
+   * @returns {object} Standardized error response
+   * @private
+   */
+  _createUploadNotFoundError() {
+    return this._createErrorResponse(
+      ERROR_MESSAGES.UPLOAD_NOT_FOUND,
+      ERROR_CODES.UPLOAD_ERROR,
+      false
+    )
+  }
+
+  /**
+   * Creates error response for service unavailable (500+)
+   * @returns {object} Standardized error response
+   * @private
+   */
+  _createServiceUnavailableError() {
+    return this._createErrorResponse(
+      ERROR_MESSAGES.SERVICE_UNAVAILABLE,
+      ERROR_CODES.UPLOAD_ERROR,
+      true
+    )
+  }
+
+  /**
+   * Creates error response for network/timeout errors
+   * @returns {object} Standardized error response
+   * @private
+   */
+  _createNetworkTimeoutError() {
+    return this._createErrorResponse(
+      ERROR_MESSAGES.STATUS_CHECK_FAILED,
+      ERROR_CODES.UPLOAD_ERROR,
+      true
+    )
+  }
+
+  /**
    * Transforms CDP Uploader response to standardized format
    *
    * Converts the complex CDP service response structure into our simplified UploadStatus format.
@@ -414,112 +387,48 @@ export class CdpUploadService {
   _transformCdpResponse(cdpResponse) {
     const { uploadStatus, form } = cdpResponse
 
-    // DEBUG: Log transformation process
-    this.logger.debug(`Starting response transformation`)
-    this.logger.debug(`Upload Status: ${uploadStatus}`)
-    this.logger.debug(
-      `Form Object Count: ${form ? Object.keys(form).length : 0}`
-    )
-    if (form) {
-      this.logger.debug(`Form Data: ${JSON.stringify(form, null, 2)}`)
-    } else {
-      this.logger.debug('Form Data: null')
-    }
+    this._logTransformationStart(uploadStatus, form)
 
-    // Validate form data exists
-    const validationError = this._validateFormData(form)
-    if (validationError) {
-      this.logger.debug(`Form validation returned error`)
-      this.logger.debug(
-        `Validation Error: ${JSON.stringify(validationError, null, 2)}`
-      )
-      return validationError
-    }
-
-    // Extract file data from form
-    const fileData = this._extractFileData(form)
-
-    // DEBUG: Log file data extraction
-    this.logger.debug(`File data extraction result`)
-    this.logger.debug(`File Data Exists: ${!!fileData}`)
-    if (fileData) {
-      this.logger.debug(
-        `Extracted File Data: ${JSON.stringify(fileData, null, 2)}`
-      )
-    } else {
-      this.logger.debug('Extracted File Data: null')
-    }
-    if (form && Object.keys(form).length > 0) {
-      this.logger.debug(
-        `First Form Value: ${JSON.stringify(Object.values(form)[0], null, 2)}`
-      )
-    } else {
-      this.logger.debug('First Form Value: no form values')
-    }
-
+    // Extract and validate file data from form
+    const fileData = this._extractAndValidateFileData(form)
     if (!fileData) {
       this.logger.debug('No file data found, returning NO_FILE_SELECTED')
-      return this._createErrorResponse(
-        ERROR_MESSAGES.NO_FILE_SELECTED,
-        ERROR_CODES.NO_FILE_SELECTED,
-        true
-      )
+      return this._createNoFileSelectedError()
     }
 
+    this._logFileDataExtraction(fileData, form)
+
     // Build and return standardized response
-    const result = this._buildUploadStatusResponse(uploadStatus, fileData)
-    this.logger.debug('Final transformation result', {
-      resultStatus: result.status,
-      resultMessage: result.message,
-      fullResult: JSON.stringify(result, null, 2)
-    })
+    const result = this._buildCompleteStatusResponse(uploadStatus, fileData)
+    this._logTransformationResult(result)
     return result
   }
 
   /**
-   * Validates that form data exists and contains files
+   * Extracts file data from form and validates it exists
    * @param {object} form - Form data from CDP response
-   * @returns {object|null} Error response if validation fails, null if valid
+   * @returns {object|null} File data object or null if not found/invalid
    * @private
    */
-  _validateFormData(form) {
+  _extractAndValidateFileData(form) {
+    // Validate form data exists and contains files
     if (!form || Object.keys(form).length === 0) {
-      return this._createErrorResponse(
-        ERROR_MESSAGES.NO_FILE_SELECTED,
-        ERROR_CODES.NO_FILE_SELECTED,
-        true
-      )
+      return null
     }
-    return null
-  }
 
-  /**
-   * Extracts file data from form object
-   * @param {object} form - Form data from CDP response
-   * @returns {object|null} File data object or null if not found
-   * @private
-   */
-  _extractFileData(form) {
+    // Extract first file data from form
     return Object.values(form)[0] || null
   }
 
   /**
-   * Builds standardized upload status response from file data
+   * Builds complete upload status response from file data with all details
    * @param {string} uploadStatus - CDP upload status
    * @param {object} fileData - File data from CDP response
-   * @returns {object} Standardized upload status response
+   * @returns {object} Complete standardized upload status response
    * @private
    */
-  _buildUploadStatusResponse(uploadStatus, fileData) {
-    // DEBUG: Log inputs to status building
-    this.logger.debug('Building upload status response', {
-      uploadStatus,
-      fileDataType: typeof fileData,
-      fileDataKeys: fileData ? Object.keys(fileData) : [],
-      fileStatus: fileData?.fileStatus,
-      hasError: fileData?.hasError,
-      errorMessage: fileData?.errorMessage
-    })
+  _buildCompleteStatusResponse(uploadStatus, fileData) {
+    this._logStatusBuilding(uploadStatus, fileData)
 
     const status = this._determineOverallStatus(
       uploadStatus,
@@ -527,37 +436,26 @@ export class CdpUploadService {
       fileData.hasError
     )
 
-    // DEBUG: Log status determination
-    this.logger.debug('Status determination result', {
-      determinedStatus: status,
-      inputs: {
-        uploadStatus,
-        fileStatus: fileData.fileStatus,
-        hasError: fileData.hasError
-      }
-    })
+    this._logStatusDetermination(status, uploadStatus, fileData)
 
-    const result = this._createBaseStatusResponse(fileData, status)
-    this._addTimestamps(result, status)
-    this._addErrorDetails(result, fileData)
-
-    return result
-  }
-
-  /**
-   * Creates base status response with core file information
-   * @param {object} fileData - File data from CDP response
-   * @param {string} status - Determined upload status
-   * @returns {object} Base response object
-   * @private
-   */
-  _createBaseStatusResponse(fileData, status) {
+    // Create base response with core information
     const result = {
       status,
       filename: this._extractFilename(fileData),
       fileSize: fileData.contentLength,
       uploadedAt: this._getCurrentTimestamp(),
       retryable: this._isRetryable(status)
+    }
+
+    // Add completion timestamp for finished uploads
+    if (status === APP_STATUS.READY || status === APP_STATUS.REJECTED) {
+      result.completedAt = this._getCurrentTimestamp()
+    }
+
+    // Add error details if file was rejected
+    if (fileData.hasError && fileData.errorMessage) {
+      result.message = fileData.errorMessage // GDS approved message
+      result.errorCode = this._getErrorCode(fileData.errorMessage)
     }
 
     // Include S3 information when upload is complete (AC8 requirement)
@@ -579,31 +477,6 @@ export class CdpUploadService {
     }
 
     return result
-  }
-
-  /**
-   * Adds completion timestamp for finished uploads
-   * @param {object} result - Response object to modify
-   * @param {string} status - Upload status
-   * @private
-   */
-  _addTimestamps(result, status) {
-    if (status === APP_STATUS.READY || status === APP_STATUS.REJECTED) {
-      result.completedAt = this._getCurrentTimestamp()
-    }
-  }
-
-  /**
-   * Adds error details if file was rejected
-   * @param {object} result - Response object to modify
-   * @param {object} fileData - File data from CDP response
-   * @private
-   */
-  _addErrorDetails(result, fileData) {
-    if (fileData.hasError && fileData.errorMessage) {
-      result.message = fileData.errorMessage // GDS approved message
-      result.errorCode = this._getErrorCode(fileData.errorMessage)
-    }
   }
 
   /**
@@ -744,7 +617,7 @@ export class CdpUploadService {
       return null
     }
 
-    const fileData = this._extractFileData(cdpResponse.form)
+    const fileData = this._extractAndValidateFileData(cdpResponse.form)
     if (
       !fileData?.s3Key ||
       !fileData?.s3Bucket ||
@@ -766,6 +639,128 @@ export class CdpUploadService {
       contentLength: fileData.contentLength,
       uploadedAt: this._getCurrentTimestamp()
     }
+  }
+
+  _logCdpResponse(uploadId, data) {
+    // DEBUG: Log the complete CDP service response
+    this.logger.debug(`CDP service response received for ${uploadId}`)
+    this.logger.debug(`Upload Status: ${data.uploadStatus}`)
+    this.logger.debug(`Has Form: ${!!data.form}`)
+    this.logger.debug(`Number of rejected files: ${data.numberOfRejectedFiles}`)
+    if (data.form) {
+      this.logger.debug(`Form Keys: ${Object.keys(data.form).join(', ')}`)
+      this.logger.debug(
+        `Form Value Types: ${Object.values(data.form)
+          .map((val) => typeof val)
+          .join(', ')}`
+      )
+      this.logger.debug(`Full Form Data: ${JSON.stringify(data.form, null, 2)}`)
+    } else {
+      this.logger.debug('No form data in response')
+    }
+    this.logger.debug(`Full CDP Response: ${JSON.stringify(data, null, 2)}`)
+  }
+
+  _logTransformationStart(uploadStatus, form) {
+    this.logger.debug(`Starting response transformation`)
+    this.logger.debug(`Upload Status: ${uploadStatus}`)
+    this.logger.debug(
+      `Form Object Count: ${form ? Object.keys(form).length : 0}`
+    )
+    if (form) {
+      this.logger.debug(`Form Data: ${JSON.stringify(form, null, 2)}`)
+    } else {
+      this.logger.debug('Form Data: null')
+    }
+  }
+
+  _logFileDataExtraction(fileData, form) {
+    this.logger.debug(`File data extraction result`)
+    this.logger.debug(`File Data Exists: ${!!fileData}`)
+    if (fileData) {
+      this.logger.debug(
+        `Extracted File Data: ${JSON.stringify(fileData, null, 2)}`
+      )
+    } else {
+      this.logger.debug('Extracted File Data: null')
+    }
+    if (form && Object.keys(form).length > 0) {
+      this.logger.debug(
+        `First Form Value: ${JSON.stringify(Object.values(form)[0], null, 2)}`
+      )
+    } else {
+      this.logger.debug('First Form Value: no form values')
+    }
+  }
+
+  _logTransformationResult(result) {
+    this.logger.debug('Final transformation result', {
+      resultStatus: result.status,
+      resultMessage: result.message,
+      fullResult: JSON.stringify(result, null, 2)
+    })
+  }
+
+  _logStatusBuilding(uploadStatus, fileData) {
+    this.logger.debug('Building upload status response', {
+      uploadStatus,
+      fileDataType: typeof fileData,
+      fileDataKeys: fileData ? Object.keys(fileData) : [],
+      fileStatus: fileData?.fileStatus,
+      hasError: fileData?.hasError,
+      errorMessage: fileData?.errorMessage
+    })
+  }
+
+  _logStatusDetermination(status, uploadStatus, fileData) {
+    this.logger.debug('Status determination result', {
+      determinedStatus: status,
+      inputs: {
+        uploadStatus,
+        fileStatus: fileData.fileStatus,
+        hasError: fileData.hasError
+      }
+    })
+  }
+
+  _handleStatusErrors(res, uploadId) {
+    if (res.statusCode === HTTP_STATUS.NOT_FOUND) {
+      this.logger.warn('Upload session not found', { uploadId })
+      return this._createUploadNotFoundError()
+    }
+
+    if (res.statusCode >= HTTP_STATUS.SERVER_ERROR) {
+      this.logger.error('Service error when checking status', {
+        uploadId,
+        status: res.statusCode
+      })
+      return this._createServiceUnavailableError()
+    }
+
+    return null
+  }
+
+  _handleNetworkErrors(error, uploadId) {
+    if (error.code === 'ECONNRESET' || error.code === 'ETIMEDOUT') {
+      this.logger.error('Request timeout when checking status', {
+        uploadId,
+        error: error.message
+      })
+      return this._createNetworkTimeoutError()
+    }
+
+    this.logger.error('Failed to check upload status', {
+      uploadId,
+      error: error.message
+    })
+    throw error
+  }
+
+  async _makeStatusRequest(statusUrl) {
+    return await Wreck.get(statusUrl, {
+      json: true,
+      timeout: this.config.timeout
+    })
   }
 }
 

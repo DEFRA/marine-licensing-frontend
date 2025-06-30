@@ -1,7 +1,9 @@
 import Boom from '@hapi/boom'
-import Wreck from '@hapi/wreck'
-import { config } from '~/src/config/config.js'
 import { getExemptionCache } from '~/src/server/common/helpers/session-cache/utils.js'
+import {
+  authenticatedGetRequest,
+  authenticatedPostRequest
+} from '~/src/server/common/helpers/authenticated-requests.js'
 import {
   getCoordinateSystemText,
   getCoordinateDisplayText,
@@ -25,11 +27,9 @@ export const checkYourAnswersController = {
       throw Boom.notFound(`Exemption not found`, { id })
     }
 
-    const { payload } = await Wreck.get(
-      `${config.get('backend').apiUrl}/exemption/${id}`,
-      {
-        json: true
-      }
+    const { payload } = await authenticatedGetRequest(
+      request,
+      `/exemption/${id}`
     )
 
     if (!payload?.value?.taskList) {
@@ -68,12 +68,10 @@ export const checkYourAnswersSubmitController = {
     }
 
     try {
-      const { payload: response } = await Wreck.post(
-        `${config.get('backend').apiUrl}/exemption/submit`,
-        {
-          payload: { id },
-          json: true
-        }
+      const { payload: response } = await authenticatedPostRequest(
+        request,
+        '/exemption/submit',
+        { id }
       )
 
       if (response?.message === 'success' && response?.value) {

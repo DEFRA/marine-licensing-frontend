@@ -9,8 +9,7 @@ import {
 } from '~/src/server/exemption/task-list/controller.js'
 import { mockExemption } from '~/src/server/test-helpers/mocks.js'
 import { routes } from '~/src/server/common/constants/routes.js'
-
-import Wreck from '@hapi/wreck'
+import * as authRequests from '~/src/server/common/helpers/authenticated-requests.js'
 
 describe('#taskListController', () => {
   /** @type {Server} */
@@ -28,8 +27,8 @@ describe('#taskListController', () => {
     jest.resetAllMocks()
 
     jest
-      .spyOn(Wreck, 'get')
-      .mockReturnValue({ payload: { value: mockExemption } })
+      .spyOn(authRequests, 'authenticatedGetRequest')
+      .mockResolvedValue({ payload: { value: mockExemption } })
 
     getExemptionCacheSpy = jest
       .spyOn(cacheUtils, 'getExemptionCache')
@@ -78,9 +77,9 @@ describe('#taskListController', () => {
 
     await taskListController.handler({}, h)
 
-    expect(Wreck.get).toHaveBeenCalledWith(
-      `${config.get('backend').apiUrl}/exemption/${mockExemption.id}`,
-      { json: true }
+    expect(authRequests.authenticatedGetRequest).toHaveBeenCalledWith(
+      expect.any(Object),
+      `/exemption/${mockExemption.id}`
     )
 
     expect(h.view).toHaveBeenCalledWith(TASK_LIST_VIEW_ROUTE, {

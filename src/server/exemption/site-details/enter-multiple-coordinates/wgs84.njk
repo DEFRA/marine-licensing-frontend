@@ -6,10 +6,9 @@
 {% from "govuk/components/fieldset/macro.njk" import govukFieldset %}
 {% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
 {% from "cancel-button/macro.njk" import appCancelButton %}
-{% set detailsSummary %} Help with latitude and longitude formats {% endset %}
+{% set detailsSummary %}Help with latitude and longitude formats{% endset %}
 {% set detailsHTML %}
-<p>Latitude and longitude can be written in different formats, including:
-</p>
+<p>Latitude and longitude can be written in different formats, including:</p>
 <ul class="govuk-list govuk-list--bullet">
   <li>decimal degrees (DD) - 55.019889 or -1.399500</li>
   <li>degrees, minutes and seconds (DMS) - 55°01'11.6"N 1°23'58.2"WE</li>
@@ -21,110 +20,133 @@
 {% endset %}
 {% block beforeContent %}
   {{ govukBackLink({
-        text: "Back",
-        href: backLink
-    }) }}
+    text: "Back",
+    href: backLink
+  }) }}
 {% endblock %}
 {% block content %}
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
       {% if errorSummary %}
         {{ govukErrorSummary({
-                    titleText: "There is a problem",
-                    errorList: errorSummary
-                }) }}
+          titleText: "There is a problem",
+          errorList: errorSummary
+        }) }}
       {% endif %}
       <span class="govuk-caption-l">{{ projectName }}</span>
       <h1 class="govuk-heading-l">{{ heading }}</h1>
       <p>Enter in the decimal degree format. For example, 55.019889 or -1.399500.</p>
       {{ govukDetails({
-                summaryText: detailsSummary,
-                html: detailsHTML
-            }) }}
+        summaryText: detailsSummary,
+        html: detailsHTML
+      }) }}
       <div data-module="moj-add-another">
         <h2 class="govuk-heading-m moj-add-another__heading" tabindex="-1">Coordinates</h2>
-        <form method="POST">
+        <form method="POST" id="coordinate-form">
           <input type="hidden" name="csrfToken" value="{{ csrfToken }}">
-            {% for coordinate in payload.coordinates %}
-              {% set coordinateIndex = loop.index0 %}
-              {% set pointNumber = loop.index %}
+            {% for i in range(0, coordinateCount) %}
+              {% set coordinate = coordinates[i] or { latitude: '', longitude: '' } %}
+              {% set pointNumber = i + 1 %}
+              {% set showRemoveButton = i >= 3 %}
+              {% set legendText %} Point {{ pointNumber }}
+              {% endset %}
               {% call govukFieldset({
               classes: "moj-add-another__item",
               legend: {
-                text: "Start and end point" if coordinateIndex == 0 else "Point " + pointNumber,
+                html: legendText,
                 classes: "moj-add-another__title govuk-fieldset__legend--m",
-                isPageHeading: false
+                isPageHeading: false,
+                attributes: {
+                  style: "float: left;"
+                }
+              },
+              attributes: {
+                "data-point-index": i,
+                "data-is-start-point": (i == 0)
               }
             }) %}
               {{ govukInput({
-              id: "coordinates[" + coordinateIndex + "][latitude]",
-              name: "coordinates[" + coordinateIndex + "][latitude]",
-              value: coordinate.latitude if coordinate.latitude else "",
-              errorMessage: errors["coordinates" + coordinateIndex + "latitude"] if errors,
-              label: {
-                text: "Latitude",
-                classes: "govuk-!-font-weight-bold"
-              },
-              classes: "govuk-!-width-one-half",
-              attributes: {
-                "data-name": "coordinates[%index%][latitude]",
-                "data-id": "coordinates[%index%][latitude]"
-              }
-            }) }}
+                id: "coordinates[" + i + "][latitude]",
+                name: "coordinates[" + i + "][latitude]",
+                value: coordinate.latitude,
+                errorMessage: errors["coordinates" + i + "latitude"] if errors,
+                label: {
+                  text: "Latitude",
+                  classes: "govuk-!-font-weight-bold"
+                },
+                classes: "govuk-!-width-one-half",
+                attributes: {
+                  "data-name": "coordinates[%index%][latitude]",
+                  "data-id": "coordinates[%index%][latitude]"
+                }
+              }) }}
               {{ govukInput({
-              id: "coordinates[" + coordinateIndex + "][longitude]",
-              name: "coordinates[" + coordinateIndex + "][longitude]",
-              value: coordinate.longitude if coordinate.longitude else "",
-              errorMessage: errors["coordinates" + coordinateIndex + "longitude"] if errors,
-              label: {
-                text: "Longitude",
-                classes: "govuk-!-font-weight-bold"
-              },
-              classes: "govuk-!-width-one-half",
-              attributes: {
-                "data-name": "coordinates[%index%][longitude]",
-                "data-id": "coordinates[%index%][longitude]"
-              }
-            }) }}
-              {% if coordinateIndex > 2 %}
-                <div class="moj-button-action">
-                  {{ govukButton({
-                  text: "Remove point " + pointNumber,
-                  classes: "govuk-button--secondary moj-add-another__remove-button"
-                }) }}
-                  <noscript>
-                    <a href="?action=remove&pointIndex={{ coordinateIndex }}" class="govuk-link">
-                      Remove point {{ pointNumber }}
-                    </a>
-                  </noscript>
-                </div>
+                id: "coordinates[" + i + "][longitude]",
+                name: "coordinates[" + i + "][longitude]",
+                value: coordinate.longitude,
+                errorMessage: errors["coordinates" + i + "longitude"] if errors,
+                label: {
+                  text: "Longitude",
+                  classes: "govuk-!-font-weight-bold"
+                },
+                classes: "govuk-!-width-one-half",
+                attributes: {
+                  "data-name": "coordinates[%index%][longitude]",
+                  "data-id": "coordinates[%index%][longitude]"
+                }
+              }) }}
+              {% if showRemoveButton %}
+                <a
+                  href="?action=remove&pointIndex={{ i }}"
+                  onclick="event.preventDefault(); submitWithAction('remove', {{ i }})"
+                  class="govuk-button govuk-button--secondary remove-button govuk-!-margin-bottom-0 moj-add-another__remove-button">
+                  Remove<span class="govuk-visually-hidden">
+                    point {{ pointNumber }}</span>
+                </a>
               {% endif %}
               {% endcall %}
             {% endfor %}
             <div class="moj-button-action">
-              {{ govukButton({
-              text: "Add another point",
-              classes: "govuk-button--secondary moj-add-another__add-button govuk-!-margin-bottom-4"
-            }) }}
-              <noscript>
-                <a href="?action=add" class="govuk-link">
-                  Add another point
-                </a>
-              </noscript>
+              <a
+                href="?action=add"
+                onclick="event.preventDefault(); submitWithAction('add')"
+                class="govuk-button govuk-button--secondary govuk-!-margin-bottom-4">
+                Add another point
+              </a>
             </div>
-            <div class="govuk-button-group">
+            <div class="govuk-button-group govuk-!-margin-top-8">
               {{ govukButton({
-                    text: "Continue",
-                    attributes: {
-                        id: "continue"
-                    }
-                }) }}
+              text: "Continue",
+              attributes: {
+                id: "continue"
+              }
+            }) }}
               {{ appCancelButton({
-                    cancelLink: "/exemption/task-list?cancel=site-details"
-                }) }}
+              cancelLink: "/exemption/task-list?cancel=site-details"
+            }) }}
             </div>
           </form>
         </div>
       </div>
     </div>
+    <script>
+      function submitWithAction(action, pointIndex) {
+        const form = document.getElementById('coordinate-form');
+        const formData = new FormData(form);
+        // Build query string with current form data
+        const params = new URLSearchParams();
+        params.set('action', action);
+        if (pointIndex !== undefined) {
+          params.set('pointIndex', pointIndex);
+        }
+        // Add all form fields to query string
+        for (const [key, value] of formData.entries()) {
+          if (key !== 'csrfToken' && value.trim() !== '') {
+            params.set(key, value);
+          }
+        }
+        // Submit as GET request
+        window.location.href = window.location.pathname + '?' + params.toString();
+      }
+    </script>
   {% endblock %}

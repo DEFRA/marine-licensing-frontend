@@ -24,5 +24,15 @@ document.addEventListener('DOMContentLoaded', function () {
   addAnotherElements.forEach(function (element) {
     // eslint-disable-next-line no-new
     new AddAnother(element)
+
+    if (element.querySelector('[data-is-start-point]')) {
+      const firstItem = element.querySelector('[data-is-start-point="true"]')
+      if (firstItem) {
+        const legend = firstItem.querySelector('.moj-add-another__title')
+        if (legend) {
+          legend.textContent = 'Start and end point'
+        }
+      }
+    }
   })
 })

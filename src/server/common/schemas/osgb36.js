@@ -1,4 +1,9 @@
 import { JOI_ERRORS } from '~/src/server/common/constants/joi.js'
+import {
+  COORDINATE_ERROR_MESSAGES,
+  createPointSpecificErrorMessages
+} from '~/src/server/common/helpers/site-details.js'
+import { COORDINATE_SYSTEMS } from '~/src/server/common/constants/exemptions.js'
 import joi from 'joi'
 
 export const MIN_EASTINGS_LENGTH = 100000
@@ -33,102 +38,110 @@ export const validateCoordinates = (value, helpers, type) => {
   return value
 }
 
-export const validateInteger = (value, helpers) => {
-  if (value.includes('.')) {
-    return helpers.error(JOI_ERRORS.NUMBER_INTEGER)
-  }
-  return value
+/**
+ * Create a base OSGB36 coordinate schema with configurable decimal support and error messages
+ * @param {boolean} allowDecimals - Whether to allow decimal values
+ * @param {object} errorMessages - Custom error messages to use
+ * @returns {object} Joi schema object with eastings and northings validation
+ */
+const createBaseOsgb36Schema = (
+  allowDecimals = false,
+  errorMessages = COORDINATE_ERROR_MESSAGES[COORDINATE_SYSTEMS.OSGB36]
+) => {
+  const pattern = allowDecimals ? /^[0-9.]+$/ : /^[0-9]+$/
+  const northingsPattern = allowDecimals ? /^-?[0-9.]+$/ : /^[0-9]+$/
+
+  return joi.object({
+    eastings: joi
+      .string()
+      .required()
+      .pattern(pattern)
+      .custom((value, helpers) =>
+        validateCoordinates(value, helpers, 'eastings')
+      )
+      .messages({
+        [JOI_ERRORS.STRING_EMPTY]: errorMessages.EASTINGS_REQUIRED,
+        [JOI_ERRORS.STRING_PATTERN_BASE]: allowDecimals
+          ? errorMessages.EASTINGS_NON_NUMERIC
+          : errorMessages.EASTINGS_WHOLE_NUMBER,
+        [JOI_ERRORS.NUMBER_BASE]: errorMessages.EASTINGS_NON_NUMERIC,
+        [JOI_ERRORS.NUMBER_POSITIVE]: errorMessages.EASTINGS_POSITIVE_NUMBER,
+        [JOI_ERRORS.NUMBER_RANGE]: errorMessages.EASTINGS_LENGTH,
+        [JOI_ERRORS.ANY_REQUIRED]: errorMessages.EASTINGS_REQUIRED
+      }),
+    northings: joi
+      .string()
+      .required()
+      .pattern(northingsPattern)
+      .custom((value, helpers) =>
+        validateCoordinates(value, helpers, 'northings')
+      )
+      .messages({
+        [JOI_ERRORS.STRING_EMPTY]: errorMessages.NORTHINGS_REQUIRED,
+        [JOI_ERRORS.STRING_PATTERN_BASE]: allowDecimals
+          ? errorMessages.NORTHINGS_NON_NUMERIC
+          : errorMessages.NORTHINGS_WHOLE_NUMBER,
+        [JOI_ERRORS.NUMBER_BASE]: errorMessages.NORTHINGS_NON_NUMERIC,
+        [JOI_ERRORS.NUMBER_POSITIVE]: errorMessages.NORTHINGS_POSITIVE_NUMBER,
+        [JOI_ERRORS.NUMBER_RANGE]: errorMessages.NORTHINGS_LENGTH,
+        [JOI_ERRORS.ANY_REQUIRED]: errorMessages.NORTHINGS_REQUIRED
+      })
+  })
 }
 
-export const osgb36ValidationSchema = joi.object({
-  eastings: joi
-    .string()
-    .required()
-    .pattern(/^[0-9.]+$/)
-    .custom((value, helpers) => validateCoordinates(value, helpers, 'eastings'))
-    .messages({
-      [JOI_ERRORS.STRING_EMPTY]: 'EASTINGS_REQUIRED',
-      [JOI_ERRORS.STRING_PATTERN_BASE]: 'EASTINGS_NON_NUMERIC',
-      [JOI_ERRORS.NUMBER_BASE]: 'EASTINGS_NON_NUMERIC',
-      [JOI_ERRORS.NUMBER_POSITIVE]: 'EASTINGS_POSITIVE_NUMBER',
-      [JOI_ERRORS.NUMBER_RANGE]: 'EASTINGS_LENGTH',
-      [JOI_ERRORS.ANY_REQUIRED]: 'EASTINGS_REQUIRED'
-    }),
-  northings: joi
-    .string()
-    .required()
-    .pattern(/^[0-9.]+$/)
-    .custom((value, helpers) =>
-      validateCoordinates(value, helpers, 'northings')
-    )
-    .messages({
-      [JOI_ERRORS.STRING_EMPTY]: 'NORTHINGS_REQUIRED',
-      [JOI_ERRORS.STRING_PATTERN_BASE]: 'NORTHINGS_NON_NUMERIC',
-      [JOI_ERRORS.NUMBER_BASE]: 'NORTHINGS_NON_NUMERIC',
-      [JOI_ERRORS.NUMBER_POSITIVE]: 'NORTHINGS_POSITIVE_NUMBER',
-      [JOI_ERRORS.NUMBER_RANGE]: 'NORTHINGS_LENGTH',
-      [JOI_ERRORS.ANY_REQUIRED]: 'NORTHINGS_REQUIRED'
-    })
+// Schema that allows decimals (for centre coordinates)
+export const osgb36ValidationSchema = createBaseOsgb36Schema(true, {
+  EASTINGS_REQUIRED: 'EASTINGS_REQUIRED',
+  EASTINGS_NON_NUMERIC: 'EASTINGS_NON_NUMERIC',
+  EASTINGS_POSITIVE_NUMBER: 'EASTINGS_POSITIVE_NUMBER',
+  EASTINGS_LENGTH: 'EASTINGS_LENGTH',
+  NORTHINGS_REQUIRED: 'NORTHINGS_REQUIRED',
+  NORTHINGS_NON_NUMERIC: 'NORTHINGS_NON_NUMERIC',
+  NORTHINGS_POSITIVE_NUMBER: 'NORTHINGS_POSITIVE_NUMBER',
+  NORTHINGS_LENGTH: 'NORTHINGS_LENGTH'
 })
 
-// Schema for multiple coordinates with integer validation
-export const osgb36IntegerValidationSchema = joi.object({
-  eastings: joi
-    .string()
-    .required()
-    .pattern(/^[0-9.]+$/)
-    .custom((value, helpers) => validateInteger(value, helpers))
-    .custom((value, helpers) => validateCoordinates(value, helpers, 'eastings'))
-    .messages({
-      [JOI_ERRORS.STRING_EMPTY]: 'Enter the eastings',
-      [JOI_ERRORS.STRING_PATTERN_BASE]: 'Eastings must be a number',
-      [JOI_ERRORS.NUMBER_BASE]: 'Eastings must be a number',
-      [JOI_ERRORS.NUMBER_INTEGER]: 'Eastings must be a whole number',
-      [JOI_ERRORS.NUMBER_POSITIVE]:
-        'Eastings must be a positive 6-digit number, like 123456',
-      [JOI_ERRORS.NUMBER_RANGE]: 'Eastings must be 6 digits',
-      [JOI_ERRORS.ANY_REQUIRED]: 'Enter the eastings'
-    }),
-  northings: joi
-    .string()
-    .required()
-    .pattern(/^[0-9.]+$/)
-    .custom((value, helpers) => validateInteger(value, helpers))
-    .custom((value, helpers) =>
-      validateCoordinates(value, helpers, 'northings')
-    )
-    .messages({
-      [JOI_ERRORS.STRING_EMPTY]: 'Enter the northings',
-      [JOI_ERRORS.STRING_PATTERN_BASE]: 'Northings must be a number',
-      [JOI_ERRORS.NUMBER_BASE]: 'Northings must be a number',
-      [JOI_ERRORS.NUMBER_INTEGER]: 'Northings must be a whole number',
-      [JOI_ERRORS.NUMBER_POSITIVE]:
-        'Northings must be a positive 6 or 7-digit number, like 123456',
-      [JOI_ERRORS.NUMBER_RANGE]: 'Northings must be 6 or 7 digits',
-      [JOI_ERRORS.ANY_REQUIRED]: 'Enter the northings'
-    })
-})
+// Schema that only allows integers (for multiple coordinates)
+export const osgb36IntegerValidationSchema = createBaseOsgb36Schema(false)
+
+/**
+ * Create an OSGB36 validation schema for a specific point
+ * @param {string} pointName - Name of the point for error messages (e.g., "the start and end point", "point 2")
+ * @returns {object} Joi schema for OSGB36 coordinate validation
+ */
+export const createOsgb36PointSchema = (pointName) => {
+  const pointSpecificMessages = createPointSpecificErrorMessages(
+    pointName,
+    COORDINATE_SYSTEMS.OSGB36
+  )
+  return createBaseOsgb36Schema(false, pointSpecificMessages)
+}
 
 /**
  * Create an eastings validation schema for a specific point
  * @param {string} pointName - Name of the point for error messages (e.g., "the start and end point", "point 2")
  * @returns {object} Joi schema for eastings validation
+ * @deprecated Use createOsgb36PointSchema instead - this function is kept for backward compatibility
  */
 export const createEastingsSchema = (pointName) => {
+  const pointSpecificMessages = createPointSpecificErrorMessages(
+    pointName,
+    COORDINATE_SYSTEMS.OSGB36
+  )
   return joi
     .string()
     .required()
-    .pattern(/^[0-9.]+$/)
-    .custom((value, helpers) => validateInteger(value, helpers))
+    .pattern(/^[0-9]+$/)
     .custom((value, helpers) => validateCoordinates(value, helpers, 'eastings'))
     .messages({
-      [JOI_ERRORS.STRING_EMPTY]: `Enter the eastings of ${pointName}`,
-      [JOI_ERRORS.ANY_REQUIRED]: `Enter the eastings of ${pointName}`,
-      [JOI_ERRORS.STRING_PATTERN_BASE]: `Eastings of ${pointName} must be a number`,
-      [JOI_ERRORS.NUMBER_BASE]: `Eastings of ${pointName} must be a number`,
-      [JOI_ERRORS.NUMBER_INTEGER]: `Eastings of ${pointName} must be a whole number`,
-      [JOI_ERRORS.NUMBER_POSITIVE]: `Eastings of ${pointName} must be a positive 6-digit number, like 123456`,
-      [JOI_ERRORS.NUMBER_RANGE]: `Eastings of ${pointName} must be 6 digits`
+      [JOI_ERRORS.STRING_EMPTY]: pointSpecificMessages.EASTINGS_REQUIRED,
+      [JOI_ERRORS.ANY_REQUIRED]: pointSpecificMessages.EASTINGS_REQUIRED,
+      [JOI_ERRORS.STRING_PATTERN_BASE]:
+        pointSpecificMessages.EASTINGS_WHOLE_NUMBER,
+      [JOI_ERRORS.NUMBER_BASE]: pointSpecificMessages.EASTINGS_NON_NUMERIC,
+      [JOI_ERRORS.NUMBER_POSITIVE]:
+        pointSpecificMessages.EASTINGS_POSITIVE_NUMBER,
+      [JOI_ERRORS.NUMBER_RANGE]: pointSpecificMessages.EASTINGS_LENGTH
     })
 }
 
@@ -136,23 +149,49 @@ export const createEastingsSchema = (pointName) => {
  * Create a northings validation schema for a specific point
  * @param {string} pointName - Name of the point for error messages (e.g., "the start and end point", "point 2")
  * @returns {object} Joi schema for northings validation
+ * @deprecated Use createOsgb36PointSchema instead - this function is kept for backward compatibility
  */
 export const createNorthingsSchema = (pointName) => {
+  const pointSpecificMessages = createPointSpecificErrorMessages(
+    pointName,
+    COORDINATE_SYSTEMS.OSGB36
+  )
   return joi
     .string()
     .required()
-    .pattern(/^[0-9.]+$/)
-    .custom((value, helpers) => validateInteger(value, helpers))
+    .pattern(/^[0-9]+$/)
     .custom((value, helpers) =>
       validateCoordinates(value, helpers, 'northings')
     )
     .messages({
-      [JOI_ERRORS.STRING_EMPTY]: `Enter the northings of ${pointName}`,
-      [JOI_ERRORS.ANY_REQUIRED]: `Enter the northings of ${pointName}`,
-      [JOI_ERRORS.STRING_PATTERN_BASE]: `Northings of ${pointName} must be a number`,
-      [JOI_ERRORS.NUMBER_BASE]: `Northings of ${pointName} must be a number`,
-      [JOI_ERRORS.NUMBER_INTEGER]: `Northings of ${pointName} must be a whole number`,
-      [JOI_ERRORS.NUMBER_POSITIVE]: `Northings of ${pointName} must be a positive 6 or 7-digit number, like 123456`,
-      [JOI_ERRORS.NUMBER_RANGE]: `Northings of ${pointName} must be 6 or 7 digits`
+      [JOI_ERRORS.STRING_EMPTY]: pointSpecificMessages.NORTHINGS_REQUIRED,
+      [JOI_ERRORS.ANY_REQUIRED]: pointSpecificMessages.NORTHINGS_REQUIRED,
+      [JOI_ERRORS.STRING_PATTERN_BASE]:
+        pointSpecificMessages.NORTHINGS_WHOLE_NUMBER,
+      [JOI_ERRORS.NUMBER_BASE]: pointSpecificMessages.NORTHINGS_NON_NUMERIC,
+      [JOI_ERRORS.NUMBER_POSITIVE]:
+        pointSpecificMessages.NORTHINGS_POSITIVE_NUMBER,
+      [JOI_ERRORS.NUMBER_RANGE]: pointSpecificMessages.NORTHINGS_LENGTH
     })
+}
+
+/**
+ * Create OSGB36 multiple coordinates validation schema
+ * Uses Joi array validation for clean, simple validation
+ * @returns {object} Joi validation schema
+ */
+export const createOsgb36MultipleCoordinatesSchema = () => {
+  return joi
+    .object({
+      coordinates: joi
+        .array()
+        .min(3)
+        .items(osgb36IntegerValidationSchema)
+        .required()
+        .messages({
+          'array.min': 'You must provide at least 3 coordinate points',
+          'any.required': 'Coordinates are required'
+        })
+    })
+    .unknown(true)
 }

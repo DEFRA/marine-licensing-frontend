@@ -120,3 +120,60 @@ export const createLongitudeSchema = (pointName) => {
       [JOI_ERRORS.NUMBER_DECIMAL]: `Longitude of ${pointName} must include 6 decimal places, like -1.399500`
     })
 }
+
+// WGS84 validation schema with user-friendly error messages for multiple coordinates
+export const wgs84MultipleCoordinateItemSchema = joi.object({
+  latitude: joi
+    .string()
+    .required()
+    .pattern(/^-?[0-9.]+$/)
+    .custom((value, helpers) => validateCoordinates(value, helpers, 'latitude'))
+    .custom((value, helpers) => validateDecimals(value, helpers))
+    .messages({
+      [JOI_ERRORS.STRING_EMPTY]: 'Enter the latitude',
+      [JOI_ERRORS.ANY_REQUIRED]: 'Enter the latitude',
+      [JOI_ERRORS.STRING_PATTERN_BASE]: 'Latitude must be a number',
+      [JOI_ERRORS.NUMBER_BASE]: 'Latitude must be a number',
+      [JOI_ERRORS.NUMBER_RANGE]: 'Latitude must be between -90 and 90',
+      [JOI_ERRORS.NUMBER_DECIMAL]:
+        'Latitude must include 6 decimal places, like 55.019889'
+    }),
+  longitude: joi
+    .string()
+    .required()
+    .pattern(/^-?[0-9.]+$/)
+    .custom((value, helpers) =>
+      validateCoordinates(value, helpers, 'longitude')
+    )
+    .custom((value, helpers) => validateDecimals(value, helpers))
+    .messages({
+      [JOI_ERRORS.STRING_EMPTY]: 'Enter the longitude',
+      [JOI_ERRORS.ANY_REQUIRED]: 'Enter the longitude',
+      [JOI_ERRORS.STRING_PATTERN_BASE]: 'Longitude must be a number',
+      [JOI_ERRORS.NUMBER_BASE]: 'Longitude must be a number',
+      [JOI_ERRORS.NUMBER_RANGE]: 'Longitude must be between -180 and 180',
+      [JOI_ERRORS.NUMBER_DECIMAL]:
+        'Longitude must include 6 decimal places, like -1.399500'
+    })
+})
+
+/**
+ * Create WGS84 multiple coordinates validation schema
+ * Uses Joi array validation for clean, simple validation
+ * @returns {object} Joi validation schema
+ */
+export const createWgs84MultipleCoordinatesSchema = () => {
+  return joi
+    .object({
+      coordinates: joi
+        .array()
+        .min(3)
+        .items(wgs84MultipleCoordinateItemSchema)
+        .required()
+        .messages({
+          'array.min': 'You must provide at least 3 coordinate points',
+          'any.required': 'Coordinates are required'
+        })
+    })
+    .unknown(true)
+}

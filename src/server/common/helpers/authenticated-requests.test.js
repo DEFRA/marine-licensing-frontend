@@ -74,6 +74,54 @@ describe('#authenticated-requests', () => {
       expect(result).toEqual(mockResponse)
     })
 
+    test('should still send request without token if it errors when trying to find one', async () => {
+      const mockResponse = { payload: { data: 'test' } }
+      Wreck.get.mockResolvedValue(mockResponse)
+
+      getUserSessionMock.mockRejectedValueOnce(null)
+
+      const result = await authenticatedGetRequest(
+        mockRequest,
+        '/test-endpoint'
+      )
+
+      expect(getUserSessionMock).toHaveBeenCalledWith(mockRequest, {
+        sessionId: 'test-session-id'
+      })
+      expect(Wreck.get).toHaveBeenCalledWith(
+        'http://localhost:3001/test-endpoint',
+        {
+          headers: { 'Content-Type': 'application/json' },
+          json: true
+        }
+      )
+      expect(result).toEqual(mockResponse)
+    })
+
+    test('should still send request without token if it fails to find one', async () => {
+      const mockResponse = { payload: { data: 'test' } }
+      Wreck.get.mockResolvedValue(mockResponse)
+
+      getUserSessionMock.mockResolvedValueOnce({})
+
+      const result = await authenticatedGetRequest(
+        mockRequest,
+        '/test-endpoint'
+      )
+
+      expect(getUserSessionMock).toHaveBeenCalledWith(mockRequest, {
+        sessionId: 'test-session-id'
+      })
+      expect(Wreck.get).toHaveBeenCalledWith(
+        'http://localhost:3001/test-endpoint',
+        {
+          headers: { 'Content-Type': 'application/json' },
+          json: true
+        }
+      )
+      expect(result).toEqual(mockResponse)
+    })
+
     test('should include additional options', async () => {
       const additionalOptions = { timeout: 5000 }
       Wreck.get.mockResolvedValue({})

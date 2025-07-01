@@ -92,10 +92,11 @@ describe('#uploadAndWait', () => {
       )
 
       expect(h.view).toHaveBeenCalledWith(UPLOAD_AND_WAIT_VIEW_ROUTE, {
-        pageTitle: 'File upload status',
-        heading: 'Your file is currently being checked for viruses',
+        pageTitle: 'Checking your file...',
+        heading: 'Checking your file...',
         projectName: 'Test Project',
         isProcessing: true,
+        pageRefreshTimeInSeconds: 2,
         filename: 'test.kml'
       })
     })
@@ -116,10 +117,11 @@ describe('#uploadAndWait', () => {
       await uploadAndWaitController.handler(mockRequest, h)
 
       expect(h.view).toHaveBeenCalledWith(UPLOAD_AND_WAIT_VIEW_ROUTE, {
-        pageTitle: 'File upload status',
-        heading: 'Your file is currently being checked for viruses',
+        pageTitle: 'Checking your file...',
+        heading: 'Checking your file...',
         projectName: 'Test Project',
         isProcessing: true,
+        pageRefreshTimeInSeconds: 2,
         filename: 'test.kml'
       })
     })

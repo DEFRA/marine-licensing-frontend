@@ -9,8 +9,9 @@ export const UPLOAD_AND_WAIT_VIEW_ROUTE =
   'exemption/site-details/upload-and-wait/index'
 
 const pageSettings = {
-  pageTitle: 'File upload status',
-  heading: 'Your file is currently being checked for viruses'
+  pageTitle: 'Checking your file...',
+  heading: 'Checking your file...',
+  pageRefreshTimeInSeconds: 2
 }
 
 /**

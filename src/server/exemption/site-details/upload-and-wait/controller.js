@@ -43,7 +43,8 @@ const transformCdpErrorToValidationError = (message, fileType) => {
     } else if (fileType === 'shapefile') {
       errorMessage = 'The selected file must be a Shapefile'
     } else {
-      errorMessage = 'The selected file is not the correct type'
+      // There isn't a generic wrong file type error. Use the generic one.
+      errorMessage = 'The selected file could not be uploaded – try again'
     }
   } else {
     // Generic upload error
@@ -76,6 +77,10 @@ export const uploadAndWaitController = {
       const status = await cdpService.getStatus(
         uploadConfig.uploadId,
         uploadConfig.statusUrl
+      )
+
+      request.logger.debug(
+        'CdpService status response: ' + JSON.stringify(status)
       )
 
       request.logger.debug('Upload status check', {
@@ -114,7 +119,7 @@ export const uploadAndWaitController = {
       if (status.status === 'rejected' || status.status === 'error') {
         // File rejected or error - store error details in session and redirect
         const errorDetails = transformCdpErrorToValidationError(
-          status.message ?? 'Upload failed',
+          status.message,
           uploadConfig.fileType
         )
 

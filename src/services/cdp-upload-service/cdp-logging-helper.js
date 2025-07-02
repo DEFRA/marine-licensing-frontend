@@ -19,22 +19,6 @@ export class CdpLoggingHelper {
    */
   logCdpResponse(uploadId, data) {
     this.logger.debug(`CDP service response received for ${uploadId}`)
-    this.logger.debug(`Upload Status: ${data.uploadStatus}`)
-    this.logger.debug(`Has Form: ${!!data.form}`)
-    this.logger.debug(`Number of rejected files: ${data.numberOfRejectedFiles}`)
-
-    if (data.form) {
-      this.logger.debug(`Form Keys: ${Object.keys(data.form).join(', ')}`)
-      this.logger.debug(
-        `Form Value Types: ${Object.values(data.form)
-          .map((val) => typeof val)
-          .join(', ')}`
-      )
-      this.logger.debug(`Full Form Data: ${JSON.stringify(data.form, null, 2)}`)
-    } else {
-      this.logger.debug('No form data in response')
-    }
-
     this.logger.debug(`Full CDP Response: ${JSON.stringify(data, null, 2)}`)
   }
 

@@ -217,6 +217,10 @@ describe('#uploadAndWait', () => {
           expected: 'The selected file must be a KML file'
         },
         {
+          message: 'Select a file to upload',
+          expected: 'Select a file to upload'
+        },
+        {
           message: 'unknown error',
           expected: 'The selected file could not be uploaded – try again'
         }
@@ -245,6 +249,40 @@ describe('#uploadAndWait', () => {
           })
         )
       }
+    })
+
+    test('should handle unknown file type message correctly', async () => {
+      const testCase = {
+        message: 'must be a foo file',
+        expected: 'The selected file could not be uploaded – try again'
+      }
+
+      const mockUploadConfigUnknownFile = {
+        ...mockUploadConfig,
+        fileType: 'foo'
+      }
+
+      getExemptionCacheSpy.mockReturnValue({
+        projectName: 'Test Project',
+        siteDetails: { uploadConfig: mockUploadConfigUnknownFile }
+      })
+
+      mockCdpService.getStatus.mockResolvedValue({
+        status: 'rejected',
+        message: testCase.message
+      })
+
+      const h = { redirect: jest.fn() }
+
+      await uploadAndWaitController.handler(mockRequest, h)
+
+      expect(updateExemptionSiteDetailsSpy).toHaveBeenCalledWith(
+        mockRequest,
+        'uploadError',
+        expect.objectContaining({
+          message: testCase.expected
+        })
+      )
     })
 
     test('should handle shapefile error message correctly', async () => {

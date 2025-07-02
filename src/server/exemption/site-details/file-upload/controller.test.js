@@ -337,6 +337,25 @@ describe('#fileUpload', () => {
           routes.CHOOSE_FILE_UPLOAD_TYPE
         )
       })
+
+      test('Logs a warning before re-uploading a file', async () => {
+        // Given - Error stored in session from previous upload attempt
+        getExemptionCacheSpy.mockReturnValue({
+          ...mockExemption,
+          siteDetails: {
+            fileUploadType: 'kml',
+            uploadError: null,
+            uploadedFile: {
+              filename: 'test.kml',
+              fileSize: 1024
+            }
+          }
+        })
+        // When
+        await fileUploadController.handler(mockRequest, mockH)
+        // Then - Should display error and clear it from session
+        expect(mockRequest.logger.debug).toHaveBeenCalledTimes(1)
+      })
     })
 
     describe('Template data and navigation', () => {

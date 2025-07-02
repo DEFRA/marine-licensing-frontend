@@ -24,7 +24,10 @@
 
   {{ govukServiceNavigation({
     serviceName: serviceName,
-    serviceUrl: ""
+    navigation: [{
+      text: 'Sign out',
+      href: signOutUrl
+    }]
   }) }}
 {% endblock %}
 

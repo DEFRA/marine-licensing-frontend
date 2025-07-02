@@ -1,0 +1,18 @@
+{
+  "userId": "05e8abef-790c-48a9-a266-97de0b1da1e4",
+  "email": "05e8abef-790c-48a9-a266-97de0b1da1e4@example.com",
+  "firstName": "John",
+  "lastName": "Doe",
+  "loa": "1",
+  "aal": "1",
+  "enrolmentCount": 1,
+  "enrolmentRequestCount": 1,
+  "relationships": [
+    {
+      "organisationName": "Test Company",
+      "relationshipRole": "Employee",
+      "roleName": "Some role",
+      "roleStatus": "1"
+    }
+  ]
+}

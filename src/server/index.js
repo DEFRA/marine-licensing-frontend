@@ -1,6 +1,9 @@
 import path from 'path'
 import hapi from '@hapi/hapi'
 
+import bell from '@hapi/bell'
+import cookie from '@hapi/cookie'
+import basic from '@hapi/basic'
 import { config } from '~/src/config/config.js'
 import { nunjucksConfig } from '~/src/config/nunjucks/nunjucks.js'
 import { router } from './router.js'
@@ -13,6 +16,7 @@ import { pulse } from '~/src/server/common/helpers/pulse.js'
 import { requestTracing } from '~/src/server/common/helpers/request-tracing.js'
 import { setupProxy } from '~/src/server/common/helpers/proxy/setup-proxy.js'
 import { csrf } from '~/src/server/common/helpers/csrf.js'
+import { defraId } from '~/src/server/common/plugins/defra-id.js'
 
 export async function createServer() {
   setupProxy()
@@ -53,14 +57,25 @@ export async function createServer() {
       strictHeader: false
     }
   })
+
+  server.app.cache = server.cache({
+    cache: 'session',
+    expiresIn: config.get('redis.ttl'),
+    segment: 'session'
+  })
+
   await server.register([
     requestLogger,
     requestTracing,
     secureContext,
     pulse,
     sessionCache,
+    bell,
+    cookie,
+    basic,
     nunjucksConfig,
     csrf,
+    defraId,
     router // Register all the controllers/routes defined in src/server/router.js
   ])
 

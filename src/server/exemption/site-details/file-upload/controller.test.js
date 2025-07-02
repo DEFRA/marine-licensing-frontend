@@ -339,81 +339,6 @@ describe('#fileUpload', () => {
       })
     })
 
-    describe('AC5 - Continue after successful upload', () => {
-      test('Should display success state when file already uploaded', async () => {
-        // Given - File successfully uploaded (no errors)
-        const uploadedFile = {
-          filename: 'test-site.kml',
-          fileSize: 1024,
-          uploadedAt: '2023-01-01T00:00:00Z',
-          s3Key: 'test-upload-id',
-          fileType: 'kml'
-        }
-
-        getExemptionCacheSpy.mockReturnValue({
-          ...mockExemption,
-          siteDetails: {
-            fileUploadType: 'kml',
-            uploadedFile
-          }
-        })
-
-        // When
-        await fileUploadController.handler(mockRequest, mockH)
-
-        // Then - Should show success state with uploaded file details (but CSRF logic works differently)
-        expect(mockH.view).toHaveBeenCalledWith(
-          FILE_UPLOAD_VIEW_ROUTE,
-          expect.objectContaining({
-            pageTitle: 'Upload a file',
-            heading: 'Upload a KML file',
-            uploadedFile,
-            fileUploadType: 'kml',
-            projectName: 'Test Project',
-            backLink: routes.CHOOSE_FILE_UPLOAD_TYPE,
-            cancelLink: `${routes.TASK_LIST}?cancel=site-details`
-          })
-        )
-
-        // Should generate CSRF token in success state
-        expect(mockRequest.server.plugins.crumb.generate).toHaveBeenCalledWith(
-          mockRequest,
-          mockH
-        )
-
-        // Should NOT show upload form when file already uploaded
-        expect(mockH.view).toHaveBeenCalledWith(
-          FILE_UPLOAD_VIEW_ROUTE,
-          expect.not.objectContaining({
-            showUploadForm: true
-          })
-        )
-      })
-
-      test('Should not initialize new CDP session when file already uploaded', async () => {
-        // Given - File already uploaded successfully
-        getExemptionCacheSpy.mockReturnValue({
-          ...mockExemption,
-          siteDetails: {
-            fileUploadType: 'kml',
-            uploadedFile: {
-              filename: 'test-site.kml',
-              fileSize: 1024,
-              uploadedAt: '2023-01-01T00:00:00Z',
-              s3Key: 'test-upload-id',
-              fileType: 'kml'
-            }
-          }
-        })
-
-        // When
-        await fileUploadController.handler(mockRequest, mockH)
-
-        // Then - Should NOT call CDP service initiate
-        expect(mockCdpService.initiate).not.toHaveBeenCalled()
-      })
-    })
-
     describe('Template data and navigation', () => {
       test('Should include correct navigation links', async () => {
         // Given
@@ -439,29 +364,6 @@ describe('#fileUpload', () => {
             backLink: routes.CHOOSE_FILE_UPLOAD_TYPE, // AC7 - Back to file type selection
             cancelLink: `${routes.TASK_LIST}?cancel=site-details` // AC6 - Cancel to task list
           })
-        )
-      })
-
-      test('Should include CSRF token for form security in success state', async () => {
-        // Given - File already uploaded (success state)
-        getExemptionCacheSpy.mockReturnValue({
-          ...mockExemption,
-          siteDetails: {
-            fileUploadType: 'kml',
-            uploadedFile: {
-              filename: 'test-site.kml',
-              fileSize: 1024
-            }
-          }
-        })
-
-        // When
-        await fileUploadController.handler(mockRequest, mockH)
-
-        // Then - Should generate CSRF token in success state
-        expect(mockRequest.server.plugins.crumb.generate).toHaveBeenCalledWith(
-          mockRequest,
-          mockH
         )
       })
 

@@ -86,6 +86,7 @@ const createErrorDisplay = (message, fieldName) => {
   return { errorSummary, errors }
 }
 
+const s3PathForExemptions = 'exemptions'
 /**
  * A GDS styled file upload page controller.
  * @satisfies {Partial<ServerRoute>}
@@ -123,18 +124,11 @@ export const fileUploadController = {
       })
     }
 
-    // AC5: If file already uploaded and no errors, show success state with continue option
     if (uploadedFile && !uploadError) {
-      return h.view(FILE_UPLOAD_VIEW_ROUTE, {
-        ...pageSettings,
-        ...fileTypeContent,
-        projectName: exemption.projectName,
-        uploadedFile,
-        fileUploadType,
-        backLink: routes.CHOOSE_FILE_UPLOAD_TYPE,
-        cancelLink: `${routes.TASK_LIST}?cancel=site-details`,
-        csrfToken: request.server.plugins.crumb.generate(request, h)
-      })
+      request.logger.debug(
+        'Uploaded file without error found, but starting a new upload session'
+      )
+      // We may want to consider adding in some error handling as we have a valid file at this point.
     }
 
     try {
@@ -146,7 +140,7 @@ export const fileUploadController = {
       const redirectUrl = `${config.get('appBaseUrl')}${routes.UPLOAD_AND_WAIT}`
       const uploadConfig = await cdpService.initiate({
         redirectUrl,
-        s3Path: 'exemptions',
+        s3Path: s3PathForExemptions,
         s3Bucket
       })
 
@@ -168,7 +162,7 @@ export const fileUploadController = {
         cancelLink: `${routes.TASK_LIST}?cancel=site-details`,
         errorSummary,
         errors,
-        showUploadForm: true // Flag to ensure upload form is shown
+        showUploadForm: true
       })
     } catch (error) {
       request.logger.error('Failed to initialize file upload', {
@@ -177,7 +171,6 @@ export const fileUploadController = {
         fileUploadType
       })
 
-      // Return to file type selection with error
       return h.redirect(routes.CHOOSE_FILE_UPLOAD_TYPE)
     }
   }

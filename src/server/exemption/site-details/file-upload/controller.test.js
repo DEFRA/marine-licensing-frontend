@@ -339,7 +339,7 @@ describe('#fileUpload', () => {
       })
 
       test('Logs a warning before re-uploading a file', async () => {
-        // Given - Error stored in session from previous upload attempt
+        // Given - File already uploaded, and no uploadError
         getExemptionCacheSpy.mockReturnValue({
           ...mockExemption,
           siteDetails: {
@@ -353,7 +353,7 @@ describe('#fileUpload', () => {
         })
         // When
         await fileUploadController.handler(mockRequest, mockH)
-        // Then - Should display error and clear it from session
+        // Then - it logs a warning
         expect(mockRequest.logger.debug).toHaveBeenCalledTimes(1)
       })
     })

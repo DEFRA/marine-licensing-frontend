@@ -3,8 +3,7 @@ import rfc2047 from 'rfc2047'
 /**
  * Filename Handler Utility
  *
- * Handles filename extraction and RFC-2047 decoding.
- * Extracted to separate filename concerns from main service logic.
+ * Handles filename extraction and RFC-2047 decoding
  */
 export class FilenameHandler {
   /**
@@ -23,17 +22,18 @@ export class FilenameHandler {
    * @returns {string} Decoded filename
    */
   extractFilename(fileData) {
-    // If regular filename is available, use it
+    if (!fileData) {
+      return 'unknown-file'
+    }
+
     if (fileData.filename) {
       return fileData.filename
     }
 
-    // If encoded filename is available, decode it from RFC-2047 format
     if (fileData.encodedfilename) {
       return this.decodeRfc2047Filename(fileData.encodedfilename)
     }
 
-    // Fallback if neither is available
     return 'unknown-file'
   }
 

@@ -1274,24 +1274,14 @@ describe('#CdpUploadService', () => {
     })
 
     test('Should return UPLOAD_ERROR when no keyword matches are found', () => {
-      // Given
       const errorMessage = 'Some unexpected error that matches no keywords'
-
-      // When
       const result = service._extractErrorCode(errorMessage)
-
-      // Then
       expect(result).toBe('UPLOAD_ERROR')
     })
 
     test('Should return specific error code when keyword matches', () => {
-      // Given
       const errorMessage = 'File contains a virus'
-
-      // When
       const result = service._extractErrorCode(errorMessage)
-
-      // Then
       expect(result).toBe('VIRUS_DETECTED')
     })
   })

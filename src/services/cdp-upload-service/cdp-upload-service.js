@@ -102,7 +102,7 @@ const {
  * @typedef {object} UploadConfig
  * @property {string} uploadId - UUID for this upload session
  * @property {string} uploadUrl - Direct upload endpoint URL
- * @property {statusUrl} statusUrl - The url to use to check the upload status
+ * @property {string} statusUrl - The URL to use to check the upload status
  * @property {number} maxFileSize - Maximum allowed file size in bytes
  * @property {string[]} allowedTypes - Array of allowed MIME types
  */
@@ -144,10 +144,15 @@ const {
  * @property {string} [message] - User-friendly status message (GDS approved)
  * @property {string} [filename] - Original uploaded filename (decoded from RFC-2047 if necessary)
  * @property {number} [fileSize] - File size in bytes
- * @property {string} [uploadedAt] - ISO timestamp of upload
  * @property {string} [completedAt] - ISO timestamp of completion (if applicable)
  * @property {string} [errorCode] - Error code for system logging
- * @property {boolean} [retryable] - Whether the operation can be retried
+ * @property {object} [s3Location] - S3 location information when status is 'ready'
+ * @property {string} [s3Location.s3Bucket] - S3 bucket name
+ * @property {string} [s3Location.s3Key] - S3 object key path
+ * @property {string} [s3Location.fileId] - Unique file identifier (UUID)
+ * @property {string} [s3Location.s3Url] - Complete S3 URL (s3://{bucket}/{key})
+ * @property {string} [s3Location.detectedContentType] - MIME type detected by CDP uploader
+ * @property {string} [s3Location.checksumSha256] - SHA256 checksum for file integrity
  */
 
 /**
@@ -555,20 +560,15 @@ export class CdpUploadService {
   /**
    * Extracts S3 file location from CDP response for session storage
    *
-   * Fulfills AC8 requirement: "store the S3 file and bucket location in session storage"
    * @param {CdpStatusResponse} cdpResponse - Raw CDP status response
-   * @returns {object|null} Complete S3 location object with all file metadata, or null if not ready.
+   * @returns {S3Location|null} Complete S3 location object with file metadata, or null if not ready.
    * When successful, returns object with properties:
    * - s3Bucket {string} - S3 bucket name
    * - s3Key {string} - S3 object key path
    * - fileId {string} - Unique file identifier (UUID)
-   * - s3Url {string} - Complete S3 URL for file retrieval: s3://{bucket}/{key}/{fileId}
-   * - filename {string} - Original filename (decoded if necessary)
-   * - fileSize {number} - File size in bytes (alias for contentLength)
+   * - s3Url {string} - Complete S3 URL in format s3://bucket/key
    * - detectedContentType {string} - MIME type detected by CDP uploader
    * - checksumSha256 {string} - SHA256 checksum for file integrity verification
-   * - contentLength {number} - File size in bytes
-   * - uploadedAt {string} - ISO timestamp of when extraction occurred
    */
   extractS3Location(cdpResponse) {
     if (cdpResponse.uploadStatus !== UPLOAD_STATUS.READY) {

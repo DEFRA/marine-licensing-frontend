@@ -4,11 +4,22 @@
  * Handles building S3 location objects from CDP file data.
  * Extracted to eliminate duplication and centralize S3 logic.
  */
+
+/**
+ * @typedef {object} S3Location
+ * @property {string} s3Bucket - The S3 bucket name
+ * @property {string} s3Key - The S3 object key
+ * @property {string} fileId - Unique identifier for the file
+ * @property {string} s3Url - Full S3 URL in format s3://bucket/key
+ * @property {string} detectedContentType - The detected MIME type of the file
+ * @property {string} checksumSha256 - SHA256 checksum of the file
+ */
+
 export class S3LocationBuilder {
   /**
    * Builds S3 location object from file data
    * @param {object} fileData - File data from CDP response
-   * @returns {object} S3 location object with all metadata
+   * @returns {S3Location} S3 location object with all metadata
    */
   static buildS3LocationObject(fileData) {
     return {

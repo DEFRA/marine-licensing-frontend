@@ -3,7 +3,6 @@ import { statusCodes } from '~/src/server/common/constants/status-codes.js'
 import { routes } from '~/src/server/common/constants/routes.js'
 import { mockExemption } from '~/src/server/test-helpers/mocks.js'
 import { config } from '~/src/config/config.js'
-import Wreck from '@hapi/wreck'
 import { JSDOM } from 'jsdom'
 import {
   projectNameSubmitController,
@@ -11,6 +10,7 @@ import {
   PROJECT_NAME_VIEW_ROUTE
 } from '~/src/server/exemption/project-name/controller.js'
 import * as cacheUtils from '~/src/server/common/helpers/session-cache/utils.js'
+import * as authRequests from '~/src/server/common/helpers/authenticated-requests.js'
 
 jest.mock('~/src/server/common/helpers/session-cache/utils.js')
 
@@ -30,7 +30,7 @@ describe('#projectName', () => {
     jest.resetAllMocks()
 
     jest
-      .spyOn(Wreck, 'post')
+      .spyOn(authRequests, 'authenticatedPostRequest')
       .mockReturnValue({ payload: { id: mockExemption.id } })
 
     getExemptionCacheSpy = jest
@@ -106,7 +106,7 @@ describe('#projectName', () => {
 
   describe('#projectNameSubmitController', () => {
     test('Should correctly create new project and redirect to the next page on success', async () => {
-      const apiPostMock = jest.spyOn(Wreck, 'post')
+      const apiPostMock = jest.spyOn(authRequests, 'authenticatedPostRequest')
       apiPostMock.mockResolvedValueOnce({
         res: { statusCode: 200 },
         payload: { data: 'test' }
@@ -118,9 +118,10 @@ describe('#projectName', () => {
         payload: { projectName: 'Project name' }
       })
 
-      expect(Wreck.post).toHaveBeenCalledWith(
-        `${config.get('backend').apiUrl}/exemption/project-name`,
-        { payload: { projectName: 'Project name' }, json: true }
+      expect(authRequests.authenticatedPostRequest).toHaveBeenCalledWith(
+        expect.any(Object),
+        `/exemption/project-name`,
+        { projectName: 'Project name' }
       )
 
       expect(statusCode).toBe(302)
@@ -131,7 +132,10 @@ describe('#projectName', () => {
     test('Should correctly update existing project and redirect to the next page on success', async () => {
       getExemptionCacheSpy.mockReturnValueOnce(mockExemption)
 
-      jest.spyOn(Wreck, 'patch').mockImplementationOnce(() => jest.fn())
+      const apiPatchMock = jest.spyOn(authRequests, 'authenticatedPatchRequest')
+      apiPatchMock.mockResolvedValue({
+        payload: { projectName: 'Project name' }
+      })
 
       const { statusCode, headers } = await server.inject({
         method: 'POST',
@@ -139,12 +143,10 @@ describe('#projectName', () => {
         payload: { projectName: 'Project name' }
       })
 
-      expect(Wreck.patch).toHaveBeenCalledWith(
-        `${config.get('backend').apiUrl}/exemption/project-name`,
-        {
-          payload: { projectName: 'Project name', id: mockExemption.id },
-          json: true
-        }
+      expect(authRequests.authenticatedPatchRequest).toHaveBeenCalledWith(
+        expect.any(Object),
+        `/exemption/project-name`,
+        { projectName: 'Project name', id: mockExemption.id }
       )
 
       expect(statusCode).toBe(302)
@@ -153,7 +155,7 @@ describe('#projectName', () => {
     })
 
     test('Should show error messages with invalid data', async () => {
-      const apiPostMock = jest.spyOn(Wreck, 'post')
+      const apiPostMock = jest.spyOn(authRequests, 'authenticatedPostRequest')
       apiPostMock.mockRejectedValueOnce({
         res: { statusCode: 200 },
         data: {
@@ -197,7 +199,7 @@ describe('#projectName', () => {
     })
 
     test('Should pass erorr to global catchAll behaviour if it is not a validation error', async () => {
-      const apiPostMock = jest.spyOn(Wreck, 'post')
+      const apiPostMock = jest.spyOn(authRequests, 'authenticatedPostRequest')
       apiPostMock.mockRejectedValueOnce({
         res: { statusCode: 500 },
         data: {}
@@ -311,7 +313,7 @@ describe('#projectName', () => {
     })
 
     test('Should show error messages without calling the back end when payload data is empty', async () => {
-      const apiPostMock = jest.spyOn(Wreck, 'post')
+      const apiPostMock = jest.spyOn(authRequests, 'authenticatedPostRequest')
 
       const { result } = await server.inject({
         method: 'POST',

@@ -72,27 +72,7 @@ export class CdpLoggingHelper {
    * @param {object} result - Final transformation result
    */
   logTransformationResult(result) {
-    this.logger.debug('Final transformation result', {
-      resultStatus: result.status,
-      resultMessage: result.message,
-      fullResult: JSON.stringify(result, null, 2)
-    })
-  }
-
-  /**
-   * Logs status building process details
-   * @param {string} uploadStatus - CDP upload status
-   * @param {object} fileData - File data object
-   */
-  logStatusBuilding(uploadStatus, fileData) {
-    this.logger.debug('Building upload status response', {
-      uploadStatus,
-      fileDataType: typeof fileData,
-      fileDataKeys: fileData ? Object.keys(fileData) : [],
-      fileStatus: fileData?.fileStatus,
-      hasError: fileData?.hasError,
-      errorMessage: fileData?.errorMessage
-    })
+    this.logger.debug(`status() returning: ${JSON.stringify(result, null, 2)}`)
   }
 
   /**
@@ -102,13 +82,19 @@ export class CdpLoggingHelper {
    * @param {object} fileData - File data object
    */
   logStatusDetermination(status, uploadStatus, fileData) {
-    this.logger.debug('Status determination result', {
-      determinedStatus: status,
-      inputs: {
-        uploadStatus,
-        fileStatus: fileData.fileStatus,
-        hasError: fileData.hasError
-      }
-    })
+    this.logger.debug(
+      `Status determination result, ${JSON.stringify(
+        {
+          determinedStatus: status,
+          inputs: {
+            uploadStatus,
+            fileStatus: fileData.fileStatus,
+            hasError: fileData.hasError
+          }
+        },
+        null,
+        2
+      )}`
+    )
   }
 }

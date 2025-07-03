@@ -88,7 +88,6 @@ const CDP_CONSTANTS = {
   ]
 }
 
-// Extract frequently used constants for backward compatibility and convenience
 const {
   UPLOAD_STATUS,
   FILE_STATUS,
@@ -464,8 +463,6 @@ export class CdpUploadService {
    * @private
    */
   _buildCompleteStatusResponse(uploadStatus, fileData) {
-    this.loggingHelper.logStatusBuilding(uploadStatus, fileData)
-
     const status = this._determineOverallStatus(
       uploadStatus,
       fileData.fileStatus,
@@ -478,9 +475,7 @@ export class CdpUploadService {
     const result = {
       status,
       filename: this.filenameHandler.extractFilename(fileData),
-      fileSize: fileData.contentLength,
-      uploadedAt: this._getTimestamp(),
-      retryable: this._isRetryable(status)
+      fileSize: fileData.contentLength
     }
 
     // Add completion timestamp for finished uploads
@@ -499,11 +494,7 @@ export class CdpUploadService {
       status === APP_STATUS.READY &&
       S3LocationBuilder.isFileReadyForS3(fileData, FILE_STATUS.COMPLETE)
     ) {
-      result.s3Location = S3LocationBuilder.buildS3LocationObject(
-        fileData,
-        () => this._getTimestamp(),
-        (data) => this.filenameHandler.extractFilename(data)
-      )
+      result.s3Location = S3LocationBuilder.buildS3LocationObject(fileData)
     }
 
     return result
@@ -534,16 +525,6 @@ export class CdpUploadService {
     }
 
     return APP_STATUS.PENDING
-  }
-
-  /**
-   * Determines if operation can be retried based on status
-   * @param {string} status - Current status
-   * @returns {boolean}
-   * @private
-   */
-  _isRetryable(status) {
-    return status === APP_STATUS.ERROR
   }
 
   /**
@@ -599,11 +580,7 @@ export class CdpUploadService {
       return null
     }
 
-    return S3LocationBuilder.buildS3LocationObject(
-      fileData,
-      () => this._getTimestamp(),
-      (data) => this.filenameHandler.extractFilename(data)
-    )
+    return S3LocationBuilder.buildS3LocationObject(fileData)
   }
 
   _handleStatusErrors(res, uploadId) {

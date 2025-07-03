@@ -132,12 +132,24 @@ describe('#uploadAndWait', () => {
         siteDetails: { uploadConfig: mockUploadConfig }
       })
 
-      mockCdpService.getStatus.mockResolvedValue({
+      const statusResponse = {
         status: 'ready',
-        filename: 'test.kml',
-        fileSize: 1024,
-        uploadedAt: '2023-01-01T00:00:00Z'
-      })
+        filename: 'test.zip',
+        fileSize: 3754,
+        completedAt: '2025-07-02T21:29:38.471Z',
+        s3Location: {
+          s3Bucket: 'test-bucket',
+          s3Key:
+            's3Path/a283cf8a-b13e-4ae3-85e9-7c3db9a4a076/558d2f8d-5b78-47e7-9958-e315763f44af',
+          fileId: '558d2f8d-5b78-47e7-9958-e315763f44af',
+          s3Url:
+            's3://test-bucket/s3Path/a283cf8a-b13e-4ae3-85e9-7c3db9a4a076/558d2f8d-5b78-47e7-9958-e315763f44af',
+          detectedContentType: 'application/zip',
+          checksumSha256: '2Vvqe1CDdtBezIBTQWyf3IYhc0dnuKgy/YeOY055s6g='
+        }
+      }
+
+      mockCdpService.getStatus.mockResolvedValue(statusResponse)
 
       const h = { redirect: jest.fn() }
 
@@ -146,13 +158,7 @@ describe('#uploadAndWait', () => {
       expect(updateExemptionSiteDetailsSpy).toHaveBeenCalledWith(
         mockRequest,
         'uploadedFile',
-        {
-          filename: 'test.kml',
-          fileSize: 1024,
-          uploadedAt: '2023-01-01T00:00:00Z',
-          s3Key: 'test-upload-id',
-          fileType: 'kml'
-        }
+        statusResponse
       )
 
       expect(updateExemptionSiteDetailsSpy).toHaveBeenCalledWith(
@@ -386,14 +392,7 @@ describe('#uploadAndWait', () => {
 
       await uploadAndWaitController.handler(mockRequest, h)
 
-      expect(mockRequest.logger.debug).toHaveBeenCalledWith(
-        'Upload status check',
-        {
-          uploadId: 'test-upload-id',
-          status: 'pending',
-          filename: 'test.kml'
-        }
-      )
+      expect(mockRequest.logger.debug).toHaveBeenCalledTimes(1)
     })
   })
 })

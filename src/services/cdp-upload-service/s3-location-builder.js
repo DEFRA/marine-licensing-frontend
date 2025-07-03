@@ -8,22 +8,16 @@ export class S3LocationBuilder {
   /**
    * Builds S3 location object from file data
    * @param {object} fileData - File data from CDP response
-   * @param {Function} getTimestamp - Function to get current timestamp
-   * @param {Function} extractFilename - Function to extract filename from file data
    * @returns {object} S3 location object with all metadata
    */
-  static buildS3LocationObject(fileData, getTimestamp, extractFilename) {
+  static buildS3LocationObject(fileData) {
     return {
       s3Bucket: fileData.s3Bucket,
       s3Key: fileData.s3Key,
       fileId: fileData.fileId,
-      s3Url: `s3://${fileData.s3Bucket}/${fileData.s3Key}/${fileData.fileId}`,
+      s3Url: `s3://${fileData.s3Bucket}/${fileData.s3Key}`,
       detectedContentType: fileData.detectedContentType,
-      checksumSha256: fileData.checksumSha256,
-      contentLength: fileData.contentLength,
-      filename: extractFilename(fileData),
-      fileSize: fileData.contentLength, // Alias for contentLength
-      uploadedAt: getTimestamp()
+      checksumSha256: fileData.checksumSha256
     }
   }
 

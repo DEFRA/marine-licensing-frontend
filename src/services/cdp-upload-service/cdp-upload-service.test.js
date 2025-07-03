@@ -413,9 +413,7 @@ describe('#CdpUploadService', () => {
         expect(result).toEqual({
           status: 'scanning',
           filename: 'test-coordinates.kml',
-          fileSize: 1024,
-          uploadedAt: expect.any(String),
-          retryable: false
+          fileSize: 1024
         })
       })
 
@@ -446,9 +444,7 @@ describe('#CdpUploadService', () => {
           status: 'ready',
           filename: 'test-coordinates.kml',
           fileSize: 1024,
-          uploadedAt: expect.any(String),
-          completedAt: expect.any(String),
-          retryable: false
+          completedAt: expect.any(String)
         })
       })
 
@@ -480,12 +476,44 @@ describe('#CdpUploadService', () => {
           status: 'rejected',
           filename: 'virus-test.kml',
           fileSize: 1024,
-          uploadedAt: expect.any(String),
           completedAt: expect.any(String),
           message: 'The selected file contains a virus',
-          errorCode: 'VIRUS_DETECTED',
-          retryable: false
+          errorCode: 'VIRUS_DETECTED'
         })
+      })
+
+      test('Should return the s3 file data when the file is ready', async () => {
+        // Given
+        const mockResponse = {
+          uploadStatus: 'ready',
+          metadata: {},
+          form: {
+            file: {
+              fileId: '74c0eee1-bb7f-4f97-b975-7ea2151cd630',
+              filename: 'coordinates.zip',
+              contentType: 'application/zip',
+              fileStatus: 'complete',
+              contentLength: 4321,
+              checksumSha256: '2Vvqe1CDdtBezIBTQWyf3IYhc0dnuKgy/YeOY055s6g=',
+              detectedContentType: 'application/zip',
+              s3Key:
+                's3Path/ac33e356-7c25-43e2-aedc-2b895edae1ec/74c0eee1-bb7f-4f97-b975-7ea2151cd630',
+              s3Bucket: 'marine-licensing-files'
+            },
+            numberOfRejectedFiles: 0
+          }
+        }
+
+        Wreck.get.mockResolvedValue({
+          res: { statusCode: 200 },
+          payload: mockResponse
+        })
+
+        // When
+        const result = await service.getStatus(mockUploadId, mockStatusUrl)
+
+        // Then
+        expect(result.s3Location).toBeDefined()
       })
     })
 
@@ -839,8 +867,8 @@ describe('#CdpUploadService', () => {
       expect(result).toEqual({
         status: 'error', // No file selected returns error
         message: 'Select a file to upload',
-        errorCode: 'NO_FILE_SELECTED',
-        retryable: true
+        retryable: true,
+        errorCode: 'NO_FILE_SELECTED'
       })
     })
 
@@ -890,9 +918,7 @@ describe('#CdpUploadService', () => {
       expect(result).toEqual({
         status: 'pending', // Default case returns 'pending'
         filename: 'test.kml',
-        fileSize: 1024,
-        uploadedAt: expect.any(String),
-        retryable: false
+        fileSize: 1024
       })
     })
 
@@ -946,9 +972,6 @@ describe('#CdpUploadService', () => {
       const result = await service.getStatus(mockUploadId, mockStatusUrl)
 
       // Then
-      expect(result.uploadedAt).toMatch(
-        /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/
-      )
       expect(result.completedAt).toMatch(
         /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/
       )
@@ -1188,9 +1211,10 @@ describe('#CdpUploadService', () => {
           'file-upload': {
             fileId: '9fcaabe5-77ec-44db-8356-3a6e8dc51b13',
             filename: 'coordinates.kml',
+            contentType: 'application/vnd.google-earth.kml+xml',
             fileStatus: 'complete',
-            contentLength: 11264,
-            s3Key: 'path/to/file',
+            contentLength: 4321,
+            s3Key: 'path/to/9fcaabe5-77ec-44db-8356-3a6e8dc51b13',
             s3Bucket: 'marine-licensing-files',
             detectedContentType: 'application/vnd.google-earth.kml+xml',
             checksumSha256: 'bng5jOVC6TxEgwTUlX4DikFtDEYEc8vQTsOP0ZAv21c='
@@ -1202,16 +1226,12 @@ describe('#CdpUploadService', () => {
 
       expect(result).toEqual({
         s3Bucket: 'marine-licensing-files',
-        s3Key: 'path/to/file',
+        s3Key: 'path/to/9fcaabe5-77ec-44db-8356-3a6e8dc51b13',
         fileId: '9fcaabe5-77ec-44db-8356-3a6e8dc51b13',
         s3Url:
-          's3://marine-licensing-files/path/to/file/9fcaabe5-77ec-44db-8356-3a6e8dc51b13',
-        filename: 'coordinates.kml',
-        fileSize: 11264,
+          's3://marine-licensing-files/path/to/9fcaabe5-77ec-44db-8356-3a6e8dc51b13',
         detectedContentType: 'application/vnd.google-earth.kml+xml',
-        checksumSha256: 'bng5jOVC6TxEgwTUlX4DikFtDEYEc8vQTsOP0ZAv21c=',
-        contentLength: 11264,
-        uploadedAt: expect.any(String)
+        checksumSha256: 'bng5jOVC6TxEgwTUlX4DikFtDEYEc8vQTsOP0ZAv21c='
       })
     })
 

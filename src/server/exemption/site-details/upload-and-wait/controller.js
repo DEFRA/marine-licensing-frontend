@@ -80,14 +80,16 @@ export const uploadAndWaitController = {
       )
 
       request.logger.debug(
-        'CdpService status response: ' + JSON.stringify(status)
+        `Upload status check:  ${JSON.stringify(
+          {
+            uploadId: uploadConfig.uploadId,
+            status: status.status,
+            filename: status.filename
+          },
+          null,
+          2
+        )}`
       )
-
-      request.logger.debug('Upload status check', {
-        uploadId: uploadConfig.uploadId,
-        status: status.status,
-        filename: status.filename
-      })
 
       if (status.status === 'pending' || status.status === 'scanning') {
         // Still processing - show waiting page with meta refresh
@@ -101,18 +103,12 @@ export const uploadAndWaitController = {
 
       if (status.status === 'ready') {
         // File upload successful - store file details in session
-        updateExemptionSiteDetails(request, 'uploadedFile', {
-          filename: status.filename,
-          fileSize: status.fileSize,
-          uploadedAt: status.uploadedAt,
-          s3Key: uploadConfig.uploadId, // Use uploadId as reference
-          fileType: uploadConfig.fileType
-        })
+        updateExemptionSiteDetails(request, 'uploadedFile', status)
 
         // Clear upload config from session
         updateExemptionSiteDetails(request, 'uploadConfig', undefined)
 
-        // AC5: Return to upload page to show success (per story requirements)
+        // ToDo: change this to next page when built
         return h.redirect(routes.FILE_UPLOAD)
       }
 

@@ -1,4 +1,3 @@
-import { config } from '~/src/config/config.js'
 import {
   errorDescriptionByFieldName,
   mapErrorsForDisplay
@@ -8,7 +7,7 @@ import {
   setExemptionCache
 } from '~/src/server/common/helpers/session-cache/utils.js'
 import { routes } from '~/src/server/common/constants/routes.js'
-import Wreck from '@hapi/wreck'
+import { authenticatedPatchRequest } from '~/src/server/common/helpers/authenticated-requests.js'
 import joi from 'joi'
 
 export const ACTIVITY_DESCRIPTION_VIEW_ROUTE =
@@ -90,12 +89,10 @@ export const activityDescriptionSubmitController = {
     const { payload } = request
     try {
       const exemption = getExemptionCache(request)
-      const { payload: responsePayload } = await Wreck.patch(
-        `${config.get('backend').apiUrl}/exemption/activity-description`,
-        {
-          payload: { ...payload, id: exemption.id },
-          json: true
-        }
+      const { payload: responsePayload } = await authenticatedPatchRequest(
+        request,
+        '/exemption/activity-description',
+        { ...payload, id: exemption.id }
       )
 
       setExemptionCache(request, {

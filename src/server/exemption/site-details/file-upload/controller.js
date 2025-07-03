@@ -175,16 +175,3 @@ export const fileUploadController = {
     }
   }
 }
-
-/**
- * A GDS styled file upload POST controller for handling successful uploads.
- * @satisfies {Partial<ServerRoute>}
- */
-export const fileUploadSubmitController = {
-  handler(request, h) {
-    // AC5: Continue to next step in flow after successful upload
-    // For now, redirect to task list as per AC requirements
-    // This will be updated when next page in flow is implemented
-    return h.redirect(routes.TASK_LIST)
-  }
-}

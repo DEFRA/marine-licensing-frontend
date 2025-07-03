@@ -1,4 +1,3 @@
-import Wreck from '@hapi/wreck'
 import {
   getExemptionCache,
   setExemptionCache
@@ -7,8 +6,8 @@ import {
   errorDescriptionByFieldName,
   mapErrorsForDisplay
 } from '~/src/server/common/helpers/errors.js'
-import { config } from '~/src/config/config.js'
 import { routes } from '~/src/server/common/constants/routes.js'
+import { authenticatedPatchRequest } from '~/src/server/common/helpers/authenticated-requests.js'
 import { JOI_ERRORS } from '~/src/server/common/constants/joi.js'
 import { activityDatesSchema } from '~/src/server/common/schemas/date.js'
 import { createDateISO } from '~/src/server/common/helpers/date-utils.js'
@@ -230,17 +229,11 @@ export const activityDatesSubmitController = {
         payload[FIELD_NAMES.END_DATE_DAY]
       )
 
-      await Wreck.patch(
-        `${config.get('backend').apiUrl}/exemption/activity-dates`,
-        {
-          payload: {
-            id: exemption.id,
-            start,
-            end
-          },
-          json: true
-        }
-      )
+      await authenticatedPatchRequest(request, '/exemption/activity-dates', {
+        id: exemption.id,
+        start,
+        end
+      })
 
       setExemptionCache(request, {
         ...exemption,

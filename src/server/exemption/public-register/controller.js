@@ -2,14 +2,13 @@ import {
   getExemptionCache,
   setExemptionCache
 } from '~/src/server/common/helpers/session-cache/utils.js'
-import { config } from '~/src/config/config.js'
 import {
   errorDescriptionByFieldName,
   mapErrorsForDisplay
 } from '~/src/server/common/helpers/errors.js'
 import { routes } from '~/src/server/common/constants/routes.js'
+import { authenticatedPatchRequest } from '~/src/server/common/helpers/authenticated-requests.js'
 
-import Wreck from '@hapi/wreck'
 import joi from 'joi'
 
 export const PUBLIC_REGISTER_VIEW_ROUTE = 'exemption/public-register/index'
@@ -104,17 +103,11 @@ export const publicRegisterSubmitController = {
     try {
       const isAnswerYes = payload.consent === 'yes'
 
-      await Wreck.patch(
-        `${config.get('backend').apiUrl}/exemption/public-register`,
-        {
-          payload: {
-            consent: payload.consent,
-            ...(isAnswerYes && { reason: payload.reason }),
-            id: exemption.id
-          },
-          json: true
-        }
-      )
+      await authenticatedPatchRequest(request, '/exemption/public-register', {
+        consent: payload.consent,
+        ...(isAnswerYes && { reason: payload.reason }),
+        id: exemption.id
+      })
 
       setExemptionCache(request, {
         ...exemption,

@@ -10,9 +10,14 @@ export const routes = {
   PUBLIC_REGISTER: '/exemption/public-register',
   TASK_LIST: '/exemption/task-list',
   ACTIVITY_DESCRIPTION: '/exemption/activity-description',
-  ACTIVITY_DATES: '/exemption/activity-dates',
+  AUTH_DEFRA_ID_CALLBACK: '/signin-oidc',
+  LOGIN: '/login',
+  SIGN_OUT: '/sign-out',
   WIDTH_OF_SITE: '/exemption/width-of-site',
   CHOOSE_FILE_UPLOAD_TYPE: '/exemption/choose-file-type-to-upload',
   FILE_UPLOAD: '/exemption/upload-file',
-  UPLOAD_AND_WAIT: '/exemption/upload-and-wait'
+  UPLOAD_AND_WAIT: '/exemption/upload-and-wait',
+  ACTIVITY_DATES: '/exemption/activity-dates',
+  CHECK_YOUR_ANSWERS: '/exemption/check-your-answers',
+  CONFIRMATION: '/exemption/confirmation'
 }

@@ -1,7 +1,6 @@
 import { createServer } from '~/src/server/index.js'
 import {
   fileUploadController,
-  fileUploadSubmitController,
   FILE_UPLOAD_VIEW_ROUTE
 } from '~/src/server/exemption/site-details/file-upload/controller.js'
 import * as cacheUtils from '~/src/server/common/helpers/session-cache/utils.js'
@@ -442,30 +441,6 @@ describe('#fileUpload', () => {
           })
         )
       })
-    })
-  })
-
-  describe('#fileUploadSubmitController', () => {
-    const mockRequest = {
-      logger: {
-        debug: jest.fn()
-      }
-    }
-
-    const mockH = {
-      redirect: jest.fn()
-    }
-
-    beforeEach(() => {
-      mockH.redirect.mockClear()
-    })
-
-    test('Should redirect to task list after successful upload submission', async () => {
-      // Given / When - AC5: Continue after successful upload
-      await fileUploadSubmitController.handler(mockRequest, mockH)
-
-      // Then - Should redirect to task list
-      expect(mockH.redirect).toHaveBeenCalledWith(routes.TASK_LIST)
     })
   })
 

@@ -6,6 +6,7 @@ import { widthOfSiteRoutes } from '~/src/server/exemption/site-details/width-of-
 import { reviewSiteDetailsRoutes } from '~/src/server/exemption/site-details/review-site-details/index.js'
 import { fileUploadRoutes } from '~/src/server/exemption/site-details/file-upload/index.js'
 import { uploadAndWaitRoutes } from '~/src/server/exemption/site-details/upload-and-wait/index.js'
+import { chooseFileTypeRoutes } from '~/src/server/exemption/site-details/choose-file-type/index.js'
 
 /**
  * Sets up the routes used in the Site Details section
@@ -22,6 +23,7 @@ export const siteDetailsRoutes = [
   ...centreCoordinatesRoutes,
   ...widthOfSiteRoutes,
   ...reviewSiteDetailsRoutes,
+  ...chooseFileTypeRoutes,
   ...fileUploadRoutes,
   ...uploadAndWaitRoutes
 ]

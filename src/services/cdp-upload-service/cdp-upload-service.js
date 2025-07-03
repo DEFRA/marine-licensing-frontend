@@ -559,7 +559,6 @@ export class CdpUploadService {
 
   /**
    * Extracts S3 file location from CDP response for session storage
-   *
    * @param {CdpStatusResponse} cdpResponse - Raw CDP status response
    * @returns {S3Location|null} Complete S3 location object with file metadata, or null if not ready.
    * When successful, returns object with properties:

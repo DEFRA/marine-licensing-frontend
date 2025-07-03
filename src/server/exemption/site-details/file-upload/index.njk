@@ -16,37 +16,43 @@
   }) }}
 {% endblock %}
 
+{% set formLabel %}
+  {% if projectName %}
+    <span class="govuk-caption-l">{{ projectName }}</span>                
+  {% endif %}
+
+  <h1 class="govuk-label-wrapper">
+    <label class="govuk-label govuk-label--l" for="file-id" id="file-upload-1-label">
+      {{ heading }}    
+    </label>
+  </h1>  
+{% endset %} 
+
 {% block content %}
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
-      
+
       {% if errorSummary %}
         {{ govukErrorSummary({
           titleText: "There is a problem",
           errorList: errorSummary
         }) }}
       {% endif %}
-
-      {% if projectName %}
-        <span class="govuk-caption-l">{{ projectName }}</span>
-      {% endif %}             
-     
+  
         <form action="{{ uploadUrl }}" method="post" enctype="multipart/form-data" novalidate>
 
           {{ govukFileUpload({
               id: "file-id",
               name: "file",
               label: {
-                text: heading,
-                for: "file-id",
-                isPageHeading: true,
-                classes: "govuk-label--l"
+                html: formLabel,
+                for: "file-id"
                },
               multiple: false,
               javascript: true,
               errorMessage: { text: errors['file'].text } if errors and errors['file'] else false,
               attributes: {
-                "accept": acceptAttribute           
+                "accept": acceptAttribute
               }
           }) }}
 
@@ -62,8 +68,8 @@
             }) }}
           </div>
 
-        </form>  
+        </form>
     </div>
   </div>
 
-{% endblock %} 
+{% endblock %}

@@ -1,3 +1,4 @@
+import { config } from '~/src/config/config.js'
 import {
   errorDescriptionByFieldName,
   mapErrorsForDisplay
@@ -6,12 +7,9 @@ import {
   getExemptionCache,
   setExemptionCache
 } from '~/src/server/common/helpers/session-cache/utils.js'
-import {
-  authenticatedPostRequest,
-  authenticatedPatchRequest
-} from '~/src/server/common/helpers/authenticated-requests.js'
 import { routes } from '~/src/server/common/constants/routes.js'
 
+import Wreck from '@hapi/wreck'
 import joi from 'joi'
 
 const errorMessages = {
@@ -88,14 +86,19 @@ export const projectNameSubmitController = {
       const isUpdate = !!exemption.id
 
       const { payload: responsePayload } = isUpdate
-        ? await authenticatedPatchRequest(request, '/exemption/project-name', {
-            ...payload,
-            id: exemption.id
-          })
-        : await authenticatedPostRequest(
-            request,
-            '/exemption/project-name',
-            payload
+        ? await Wreck.patch(
+            `${config.get('backend').apiUrl}/exemption/project-name`,
+            {
+              payload: { ...payload, id: exemption.id },
+              json: true
+            }
+          )
+        : await Wreck.post(
+            `${config.get('backend').apiUrl}/exemption/project-name`,
+            {
+              payload,
+              json: true
+            }
           )
 
       setExemptionCache(request, {

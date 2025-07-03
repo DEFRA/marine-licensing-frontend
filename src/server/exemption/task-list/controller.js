@@ -1,11 +1,12 @@
+import { config } from '~/src/config/config.js'
 import {
   getExemptionCache,
   resetExemptionSiteDetails
 } from '~/src/server/common/helpers/session-cache/utils.js'
 import { transformTaskList } from '~/src/server/exemption/task-list/utils.js'
 import { routes } from '~/src/server/common/constants/routes.js'
-import { authenticatedGetRequest } from '~/src/server/common/helpers/authenticated-requests.js'
 
+import Wreck from '@hapi/wreck'
 import Boom from '@hapi/boom'
 
 export const TASK_LIST_VIEW_ROUTE = 'exemption/task-list/index'
@@ -39,9 +40,11 @@ export const taskListController = {
       return h.redirect(routes.TASK_LIST)
     }
 
-    const { payload } = await authenticatedGetRequest(
-      request,
-      `/exemption/${id}`
+    const { payload } = await Wreck.get(
+      `${config.get('backend').apiUrl}/exemption/${id}`,
+      {
+        json: true
+      }
     )
 
     const taskList = transformTaskList(payload?.value?.taskList)

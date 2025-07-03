@@ -2,6 +2,7 @@ import { createServer } from '~/src/server/index.js'
 import { statusCodes } from '~/src/server/common/constants/status-codes.js'
 import { mockExemption } from '~/src/server/test-helpers/mocks.js'
 import { config } from '~/src/config/config.js'
+import Wreck from '@hapi/wreck'
 import { JSDOM } from 'jsdom'
 import {
   publicRegisterController,
@@ -11,7 +12,6 @@ import {
 } from '~/src/server/exemption/public-register/controller.js'
 import * as cacheUtils from '~/src/server/common/helpers/session-cache/utils.js'
 import { routes } from '~/src/server/common/constants/routes.js'
-import * as authRequests from '~/src/server/common/helpers/authenticated-requests.js'
 
 jest.mock('~/src/server/common/helpers/session-cache/utils.js')
 
@@ -33,7 +33,7 @@ describe('#publicRegister', () => {
   beforeEach(() => {
     jest.resetAllMocks()
 
-    jest.spyOn(authRequests, 'authenticatedPatchRequest').mockResolvedValue({
+    jest.spyOn(Wreck, 'patch').mockReturnValue({
       payload: {
         id: mockExemption.id,
         ...mockExemption.publicRegister
@@ -149,13 +149,15 @@ describe('#publicRegister', () => {
         payload: { consent: 'yes', reason: 'Test reason' }
       })
 
-      expect(authRequests.authenticatedPatchRequest).toHaveBeenCalledWith(
-        expect.any(Object),
-        '/exemption/public-register',
+      expect(Wreck.patch).toHaveBeenCalledWith(
+        `${config.get('backend').apiUrl}/exemption/public-register`,
         {
-          id: mockExemption.id,
-          consent: 'yes',
-          reason: 'Test reason'
+          payload: {
+            id: mockExemption.id,
+            consent: 'yes',
+            reason: 'Test reason'
+          },
+          json: true
         }
       )
 
@@ -165,7 +167,7 @@ describe('#publicRegister', () => {
     })
 
     test('Should show error messages with invalid data', async () => {
-      const apiPostMock = jest.spyOn(authRequests, 'authenticatedPatchRequest')
+      const apiPostMock = jest.spyOn(Wreck, 'patch')
       apiPostMock.mockRejectedValueOnce({
         res: { statusCode: 200 },
         data: {
@@ -211,7 +213,7 @@ describe('#publicRegister', () => {
     })
 
     test('Should pass error to global catchAll behaviour if it contains no validation data', async () => {
-      const apiPostMock = jest.spyOn(authRequests, 'authenticatedPatchRequest')
+      const apiPostMock = jest.spyOn(Wreck, 'patch')
       apiPostMock.mockRejectedValueOnce({
         res: { statusCode: 500 },
         data: {}
@@ -359,7 +361,7 @@ describe('#publicRegister', () => {
     })
 
     test('Should show error messages without calling the back end when payload data is empty', async () => {
-      const apiPostMock = jest.spyOn(authRequests, 'authenticatedPatchRequest')
+      const apiPostMock = jest.spyOn(Wreck, 'post')
 
       const { result } = await server.inject({
         method: 'POST',
@@ -375,7 +377,7 @@ describe('#publicRegister', () => {
     })
 
     test('Should show error for reason being empty when consent is set to yes', async () => {
-      const apiPostMock = jest.spyOn(authRequests, 'authenticatedPatchRequest')
+      const apiPostMock = jest.spyOn(Wreck, 'post')
 
       const { result } = await server.inject({
         method: 'POST',

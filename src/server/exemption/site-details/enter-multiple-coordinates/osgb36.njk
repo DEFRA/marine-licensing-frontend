@@ -1,0 +1,163 @@
+{% extends "layouts/page.njk" %}
+{% from "govuk/components/back-link/macro.njk" import govukBackLink %}
+{% from "govuk/components/details/macro.njk" import govukDetails %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/input/macro.njk" import govukInput %}
+{% from "govuk/components/fieldset/macro.njk" import govukFieldset %}
+{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+{% from "cancel-button/macro.njk" import appCancelButton %}
+
+{% set detailsSummary %}Help with eastings and northings formats{% endset %}
+{% set detailsHTML %}
+<p>Eastings and northings use the Ordnance Survey National Grid reference system.</p>
+<ul class="govuk-list govuk-list--bullet">
+  <li>eastings - the distance east from the false origin in metres</li>
+  <li>northings - the distance north from the false origin in metres</li>
+</ul>
+<p>Enter coordinates as a 6-digit easting and 6 or 7-digit northing. For example:</p>
+<ul class="govuk-list govuk-list--bullet">
+  <li>easting: 123456</li>
+  <li>northing: 654321 or 1234567</li>
+</ul>
+<p>You can find grid references using the <a href="https://gridreferencefinder.ordnancesurvey.co.uk/" class="govuk-link" target="_blank" rel="noopener noreferrer">Ordnance Survey grid reference finder (opens in new tab)</a>.</p>
+{% endset %}
+
+{% block beforeContent %}
+  {{ govukBackLink({
+    text: "Back",
+    href: backLink
+  }) }}
+{% endblock %}
+
+{% block content %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+      {% if errorSummary %}
+        {{ govukErrorSummary({
+          titleText: "There is a problem",
+          errorList: errorSummary
+        }) }}
+      {% endif %}
+
+      <span class="govuk-caption-l">{{ projectName }}</span>
+      <h1 class="govuk-heading-l">{{ heading }}</h1>
+      <p>Enter the easting and northing coordinates. For example, 123456 and 654321.</p>
+      
+      {{ govukDetails({
+        summaryText: detailsSummary,
+        html: detailsHTML
+      }) }}
+
+      <form method="POST">
+        <input type="hidden" name="csrfToken" value="{{ csrfToken }}">
+
+        <h2 class="govuk-heading-m">Coordinates</h2>
+
+        {% call govukFieldset({
+          legend: {
+            text: "Start and end point",
+            classes: "govuk-fieldset__legend--m",
+            isPageHeading: false
+          }
+        }) %}
+          {{ govukInput({
+            id: "point1-eastings",
+            name: "point1-eastings",
+            value: payload["point1-eastings"] if payload,
+            errorMessage: errors["point1-eastings"] if errors,
+            label: {
+              text: "Eastings",
+              classes: "govuk-!-font-weight-bold"
+            },
+            classes: "govuk-!-width-one-half"
+          }) }}
+          {{ govukInput({
+            id: "point1-northings",
+            name: "point1-northings",
+            value: payload["point1-northings"] if payload,
+            errorMessage: errors["point1-northings"] if errors,
+            label: {
+              text: "Northings",
+              classes: "govuk-!-font-weight-bold"
+            },
+            classes: "govuk-!-width-one-half"
+          }) }}
+        {% endcall %}
+
+        {% call govukFieldset({
+          legend: {
+            text: "Point 2",
+            classes: "govuk-fieldset__legend--m",
+            isPageHeading: false
+          }
+        }) %}
+          {{ govukInput({
+            id: "point2-eastings",
+            name: "point2-eastings",
+            value: payload["point2-eastings"] if payload,
+            errorMessage: errors["point2-eastings"] if errors,
+            label: {
+              text: "Eastings",
+              classes: "govuk-!-font-weight-bold"
+            },
+            classes: "govuk-!-width-one-half"
+          }) }}
+          {{ govukInput({
+            id: "point2-northings",
+            name: "point2-northings",
+            value: payload["point2-northings"] if payload,
+            errorMessage: errors["point2-northings"] if errors,
+            label: {
+              text: "Northings",
+              classes: "govuk-!-font-weight-bold"
+            },
+            classes: "govuk-!-width-one-half"
+          }) }}
+        {% endcall %}
+
+        {% call govukFieldset({
+          legend: {
+            text: "Point 3",
+            classes: "govuk-fieldset__legend--m",
+            isPageHeading: false
+          }
+        }) %}
+          {{ govukInput({
+            id: "point3-eastings",
+            name: "point3-eastings",
+            value: payload["point3-eastings"] if payload,
+            errorMessage: errors["point3-eastings"] if errors,
+            label: {
+              text: "Eastings",
+              classes: "govuk-!-font-weight-bold"
+            },
+            classes: "govuk-!-width-one-half"
+          }) }}
+          {{ govukInput({
+            id: "point3-northings",
+            name: "point3-northings",
+            value: payload["point3-northings"] if payload,
+            errorMessage: errors["point3-northings"] if errors,
+            label: {
+              text: "Northings",
+              classes: "govuk-!-font-weight-bold"
+            },
+            classes: "govuk-!-width-one-half"
+          }) }}
+        {% endcall %}
+
+        <div class="govuk-button-group govuk-!-margin-top-8">
+          {{ govukButton({
+            text: "Continue",
+            attributes: {
+              id: "continue"
+            }
+          }) }}
+          {{ appCancelButton({
+            cancelLink: "/exemption/task-list?cancel=site-details"
+          }) }}
+        </div>
+      </form>
+    </div>
+  </div>
+{% endblock %}

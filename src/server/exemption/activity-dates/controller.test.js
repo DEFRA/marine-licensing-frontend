@@ -3,6 +3,8 @@ import { statusCodes } from '~/src/server/common/constants/status-codes.js'
 import { routes } from '~/src/server/common/constants/routes.js'
 import { JOI_ERRORS } from '~/src/server/common/constants/joi.js'
 import { mockExemption } from '~/src/server/test-helpers/mocks.js'
+import { config } from '~/src/config/config.js'
+import Wreck from '@hapi/wreck'
 import { JSDOM } from 'jsdom'
 import {
   activityDatesController,
@@ -13,7 +15,6 @@ import {
 } from '~/src/server/exemption/activity-dates/controller.js'
 import { createDateISO } from '~/src/server/common/helpers/date-utils.js'
 import * as cacheUtils from '~/src/server/common/helpers/session-cache/utils.js'
-import * as authRequests from '~/src/server/common/helpers/authenticated-requests.js'
 
 jest.mock('~/src/server/common/helpers/session-cache/utils.js')
 
@@ -39,7 +40,7 @@ describe('#activityDatesController', () => {
       .mockReturnValue(mockExemptionState)
 
     jest
-      .spyOn(authRequests, 'authenticatedPatchRequest')
+      .spyOn(Wreck, 'patch')
       .mockResolvedValue({ payload: { id: mockExemption.id } })
   })
 
@@ -136,13 +137,15 @@ describe('#activityDatesController', () => {
         payload
       })
 
-      expect(authRequests.authenticatedPatchRequest).toHaveBeenCalledWith(
-        expect.any(Object),
-        '/exemption/activity-dates',
+      expect(Wreck.patch).toHaveBeenCalledWith(
+        `${config.get('backend').apiUrl}/exemption/activity-dates`,
         expect.objectContaining({
-          id: mockExemptionState.id,
-          start: expect.any(String),
-          end: expect.any(String)
+          payload: expect.objectContaining({
+            id: mockExemptionState.id,
+            start: expect.any(String),
+            end: expect.any(String)
+          }),
+          json: true
         })
       )
       expect(statusCode).toBe(statusCodes.redirect)
@@ -401,7 +404,7 @@ describe('#activityDatesController', () => {
     })
 
     test('should handle API errors gracefully', async () => {
-      const apiPatchMock = jest.spyOn(authRequests, 'authenticatedPatchRequest')
+      const apiPatchMock = jest.spyOn(Wreck, 'patch')
       apiPatchMock.mockRejectedValueOnce({
         res: { statusCode: 500 },
         data: {}
@@ -428,7 +431,7 @@ describe('#activityDatesController', () => {
     })
 
     test('should handle API validation errors', async () => {
-      const apiPatchMock = jest.spyOn(authRequests, 'authenticatedPatchRequest')
+      const apiPatchMock = jest.spyOn(Wreck, 'patch')
       apiPatchMock.mockRejectedValueOnce({
         data: {
           payload: {
@@ -885,7 +888,7 @@ describe('#activityDatesController', () => {
     })
 
     test('should handle API errors without validation details', async () => {
-      const apiPatchMock = jest.spyOn(authRequests, 'authenticatedPatchRequest')
+      const apiPatchMock = jest.spyOn(Wreck, 'patch')
       apiPatchMock.mockRejectedValueOnce({
         message: 'Network error',
         data: {}
@@ -1064,7 +1067,7 @@ describe('#activityDatesController', () => {
     })
 
     test('should cover line 414 - throw error when no validation details in handler', async () => {
-      const apiPatchMock = jest.spyOn(authRequests, 'authenticatedPatchRequest')
+      const apiPatchMock = jest.spyOn(Wreck, 'patch')
       // Create an error without validation details to trigger the throw on line 414
       const networkError = new Error('Network error')
       networkError.data = { payload: {} } // No validation property
@@ -1097,7 +1100,7 @@ describe('#activityDatesController', () => {
 
     test('should cover lines 423-428 - API error with validation details', async () => {
       // Mock the API to return an error with validation details
-      const apiPatchMock = jest.spyOn(authRequests, 'authenticatedPatchRequest')
+      const apiPatchMock = jest.spyOn(Wreck, 'patch')
       const apiError = new Error('API validation error')
       apiError.data = {
         payload: {
@@ -1168,7 +1171,7 @@ describe('#activityDatesController', () => {
 
     test('should cover lines 423-428 with empty payload values - API error fallback', async () => {
       // Mock the API to return an error with validation details
-      const apiPatchMock = jest.spyOn(authRequests, 'authenticatedPatchRequest')
+      const apiPatchMock = jest.spyOn(Wreck, 'patch')
       const apiError = new Error('API validation error')
       apiError.data = {
         payload: {

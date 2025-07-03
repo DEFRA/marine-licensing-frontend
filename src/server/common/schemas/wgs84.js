@@ -1,5 +1,5 @@
-import { JOI_ERRORS } from '~/src/server/common/constants/joi.js'
 import joi from 'joi'
+import { JOI_ERRORS } from '~/src/server/common/constants/joi.js'
 
 const MIN_LATITUDE = -90
 const MAX_LATITUDE = 90
@@ -15,7 +15,6 @@ const validateDecimals = (value, helpers) => {
   ) {
     return helpers.error(JOI_ERRORS.NUMBER_DECIMAL)
   }
-
   return value
 }
 
@@ -25,18 +24,14 @@ const validateCoordinates = (value, helpers, type) => {
     return helpers.error(JOI_ERRORS.NUMBER_BASE)
   }
 
-  if (
-    type === 'latitude' &&
-    (coordinate < MIN_LATITUDE || coordinate > MAX_LATITUDE)
-  ) {
-    return helpers.error(JOI_ERRORS.NUMBER_RANGE)
-  }
-
-  if (
-    type === 'longitude' &&
-    (coordinate < MIN_LONGITUDE || coordinate > MAX_LONGITUDE)
-  ) {
-    return helpers.error(JOI_ERRORS.NUMBER_RANGE)
+  if (type === 'latitude') {
+    if (coordinate < MIN_LATITUDE || coordinate > MAX_LATITUDE) {
+      return helpers.error(JOI_ERRORS.NUMBER_RANGE)
+    }
+  } else if (type === 'longitude') {
+    if (coordinate < MIN_LONGITUDE || coordinate > MAX_LONGITUDE) {
+      return helpers.error(JOI_ERRORS.NUMBER_RANGE)
+    }
   }
 
   return value
@@ -74,3 +69,49 @@ export const wgs84ValidationSchema = joi.object({
       [JOI_ERRORS.NUMBER_DECIMAL]: 'LONGITUDE_DECIMAL_PLACES'
     })
 })
+
+/**
+ * Create a latitude validation schema for a specific point
+ * @param {string} pointName - Name of the point for error messages (e.g., "point 1", "point 2")
+ * @returns {object} Joi schema for latitude validation
+ */
+export const createLatitudeSchema = (pointName) => {
+  return joi
+    .string()
+    .required()
+    .pattern(/^-?[0-9.]+$/)
+    .custom((value, helpers) => validateCoordinates(value, helpers, 'latitude'))
+    .custom((value, helpers) => validateDecimals(value, helpers))
+    .messages({
+      [JOI_ERRORS.STRING_EMPTY]: `Enter the latitude of ${pointName}`,
+      [JOI_ERRORS.ANY_REQUIRED]: `Enter the latitude of ${pointName}`,
+      [JOI_ERRORS.STRING_PATTERN_BASE]: `Latitude of ${pointName} must be a number`,
+      [JOI_ERRORS.NUMBER_BASE]: `Latitude of ${pointName} must be a number`,
+      [JOI_ERRORS.NUMBER_RANGE]: `Latitude of ${pointName} must be between -90 and 90`,
+      [JOI_ERRORS.NUMBER_DECIMAL]: `Latitude of ${pointName} must include 6 decimal places, like 55.019889`
+    })
+}
+
+/**
+ * Create a longitude validation schema for a specific point
+ * @param {string} pointName - Name of the point for error messages (e.g., "point 1", "point 2")
+ * @returns {object} Joi schema for longitude validation
+ */
+export const createLongitudeSchema = (pointName) => {
+  return joi
+    .string()
+    .required()
+    .pattern(/^-?[0-9.]+$/)
+    .custom((value, helpers) =>
+      validateCoordinates(value, helpers, 'longitude')
+    )
+    .custom((value, helpers) => validateDecimals(value, helpers))
+    .messages({
+      [JOI_ERRORS.STRING_EMPTY]: `Enter the longitude of ${pointName}`,
+      [JOI_ERRORS.ANY_REQUIRED]: `Enter the longitude of ${pointName}`,
+      [JOI_ERRORS.STRING_PATTERN_BASE]: `Longitude of ${pointName} must be a number`,
+      [JOI_ERRORS.NUMBER_BASE]: `Longitude of ${pointName} must be a number`,
+      [JOI_ERRORS.NUMBER_RANGE]: `Longitude of ${pointName} must be between -180 and 180`,
+      [JOI_ERRORS.NUMBER_DECIMAL]: `Longitude of ${pointName} must include 6 decimal places, like -1.399500`
+    })
+}

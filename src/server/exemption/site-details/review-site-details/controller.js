@@ -3,15 +3,14 @@ import {
   getExemptionCache
 } from '~/src/server/common/helpers/session-cache/utils.js'
 import { routes } from '~/src/server/common/constants/routes.js'
-import { config } from '~/src/config/config.js'
 import {
   getCoordinateSystemText,
   getReviewSummaryText,
   getCoordinateDisplayText,
   getSiteDetailsBackLink
 } from './utils.js'
+import { authenticatedPatchRequest } from '~/src/server/common/helpers/authenticated-requests.js'
 import Boom from '@hapi/boom'
-import Wreck from '@hapi/wreck'
 
 export const REVIEW_SITE_DETAILS_VIEW_ROUTE =
   'exemption/site-details/review-site-details/index'
@@ -61,16 +60,10 @@ export const reviewSiteDetailsSubmitController = {
     const exemption = getExemptionCache(request)
 
     try {
-      await Wreck.patch(
-        `${config.get('backend').apiUrl}/exemption/site-details`,
-        {
-          payload: {
-            siteDetails: exemption.siteDetails,
-            id: exemption.id
-          },
-          json: true
-        }
-      )
+      await authenticatedPatchRequest(request, '/exemption/site-details', {
+        siteDetails: exemption.siteDetails,
+        id: exemption.id
+      })
 
       return h.redirect(routes.TASK_LIST)
     } catch (e) {

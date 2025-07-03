@@ -1,11 +1,17 @@
-import { JOI_ERRORS } from '~/src/server/common/constants/joi.js'
 import joi from 'joi'
+import { JOI_ERRORS } from '~/src/server/common/constants/joi.js'
 
 export const MIN_LATITUDE = -90
 export const MAX_LATITUDE = 90
 export const MIN_LONGITUDE = -180
 export const MAX_LONGITUDE = 180
 export const LAT_LONG_DECIMAL_PLACES = 6
+
+const isLatitudeInRange = (coordinate) =>
+  coordinate >= MIN_LATITUDE && coordinate <= MAX_LATITUDE
+
+const isLongitudeInRange = (coordinate) =>
+  coordinate >= MIN_LONGITUDE && coordinate <= MAX_LONGITUDE
 
 export const validateDecimals = (value, helpers) => {
   const decimalParts = value.split('.')
@@ -25,17 +31,11 @@ export const validateCoordinates = (value, helpers, type) => {
     return helpers.error(JOI_ERRORS.NUMBER_BASE)
   }
 
-  if (
-    type === 'latitude' &&
-    (coordinate < MIN_LATITUDE || coordinate > MAX_LATITUDE)
-  ) {
+  if (type === 'latitude' && !isLatitudeInRange(coordinate)) {
     return helpers.error(JOI_ERRORS.NUMBER_RANGE)
   }
 
-  if (
-    type === 'longitude' &&
-    (coordinate < MIN_LONGITUDE || coordinate > MAX_LONGITUDE)
-  ) {
+  if (type === 'longitude' && !isLongitudeInRange(coordinate)) {
     return helpers.error(JOI_ERRORS.NUMBER_RANGE)
   }
 

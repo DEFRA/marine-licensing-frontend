@@ -1,18 +1,25 @@
+import joi from 'joi'
+import { COORDINATE_SYSTEMS } from '~/src/server/common/constants/exemptions.js'
 import { JOI_ERRORS } from '~/src/server/common/constants/joi.js'
 import {
   COORDINATE_ERROR_MESSAGES,
   createPointSpecificErrorMessages
 } from '~/src/server/common/helpers/site-details.js'
-import { COORDINATE_SYSTEMS } from '~/src/server/common/constants/exemptions.js'
-import joi from 'joi'
 
 export const MIN_EASTINGS_LENGTH = 100000
 export const MAX_EASTINGS_LENGTH = 999999
 export const MIN_NORTHINGS_LENGTH = 100000
 export const MAX_NORTHINGS_LENGTH = 9999999
 
+const isEastingsInRange = (coordinate) =>
+  coordinate >= MIN_EASTINGS_LENGTH && coordinate <= MAX_EASTINGS_LENGTH
+
+const isNorthingsInRange = (coordinate) =>
+  coordinate >= MIN_NORTHINGS_LENGTH && coordinate <= MAX_NORTHINGS_LENGTH
+
 export const validateCoordinates = (value, helpers, type) => {
   const coordinate = Number(value)
+
   if (isNaN(coordinate)) {
     return helpers.error(JOI_ERRORS.NUMBER_BASE)
   }
@@ -21,17 +28,11 @@ export const validateCoordinates = (value, helpers, type) => {
     return helpers.error(JOI_ERRORS.NUMBER_POSITIVE)
   }
 
-  if (
-    type === 'eastings' &&
-    (coordinate < MIN_EASTINGS_LENGTH || coordinate > MAX_EASTINGS_LENGTH)
-  ) {
+  if (type === 'eastings' && !isEastingsInRange(coordinate)) {
     return helpers.error(JOI_ERRORS.NUMBER_RANGE)
   }
 
-  if (
-    type === 'northings' &&
-    (coordinate < MIN_NORTHINGS_LENGTH || coordinate > MAX_NORTHINGS_LENGTH)
-  ) {
+  if (type === 'northings' && !isNorthingsInRange(coordinate)) {
     return helpers.error(JOI_ERRORS.NUMBER_RANGE)
   }
 

@@ -17,5 +17,6 @@ export const routes = {
   ACTIVITY_DATES: '/exemption/activity-dates',
   CHOOSE_FILE_UPLOAD_TYPE: '/exemption/choose-file-type-to-upload',
   CHECK_YOUR_ANSWERS: '/exemption/check-your-answers',
-  CONFIRMATION: '/exemption/confirmation'
+  CONFIRMATION: '/exemption/confirmation',
+  DASHBOARD: '/home'
 }

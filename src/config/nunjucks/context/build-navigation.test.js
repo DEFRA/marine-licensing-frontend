@@ -1,4 +1,4 @@
-import { buildNavigation } from '~/src/config/nunjucks/context/build-navigation.js'
+import { buildNavigation } from './build-navigation.js'
 
 /**
  * @param {Partial<Request>} [options]
@@ -13,9 +13,9 @@ describe('#buildNavigation', () => {
       buildNavigation(mockRequest({ path: '/non-existent-path' }))
     ).toEqual([
       {
-        isActive: false,
-        text: 'Home',
-        url: '/'
+        active: false,
+        text: 'Projects Home',
+        href: '/home'
       }
     ])
   })
@@ -23,11 +23,41 @@ describe('#buildNavigation', () => {
   test('Should provide expected highlighted navigation details', () => {
     expect(buildNavigation(mockRequest({ path: '/' }))).toEqual([
       {
-        isActive: true,
-        text: 'Home',
-        url: '/'
+        active: false,
+        text: 'Projects Home',
+        href: '/home'
       }
     ])
+  })
+
+  test('Should include Projects Home link in navigation', () => {
+    const navigation = buildNavigation()
+
+    const projectsHomeLink = navigation.find(
+      (item) => item.text === 'Projects Home'
+    )
+    expect(projectsHomeLink).toBeTruthy()
+    expect(projectsHomeLink.href).toBe('/home')
+  })
+
+  test('Should mark Projects Home as active when on dashboard page', () => {
+    const request = { path: '/home' }
+    const navigation = buildNavigation(request)
+
+    const projectsHomeLink = navigation.find(
+      (item) => item.text === 'Projects Home'
+    )
+    expect(projectsHomeLink.active).toBe(true)
+  })
+
+  test('Should mark Projects Home as inactive when not on dashboard page', () => {
+    const request = { path: '/exemption/project-name' }
+    const navigation = buildNavigation(request)
+
+    const projectsHomeLink = navigation.find(
+      (item) => item.text === 'Projects Home'
+    )
+    expect(projectsHomeLink.active).toBe(false)
   })
 })
 

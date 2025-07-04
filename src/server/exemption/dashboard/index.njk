@@ -1,0 +1,82 @@
+{% extends "layouts/page.njk" %}
+
+{% block content %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+      <h1 class="govuk-heading-l">{{ heading }}</h1>
+      
+      {% if projects and projects.length > 0 %}
+        {%- from "govuk/components/table/macro.njk" import govukTable -%}
+
+        {% set tableRows = [] %}
+        {% for project in projects %}
+          {% set row = [
+            {
+              text: project.name
+            },
+            {
+              text: project.type
+            },
+            {
+              text: project.reference or '-'
+            },
+            {
+              text: project.status
+            },
+            {
+              text: project.dateSubmitted or '-',
+              format: "numeric",
+              attributes: {
+                "data-sort-value": project.dateSubmitted or ''
+              }
+            }
+          ] %}
+          {% set _ = tableRows.push(row) %}
+        {% endfor %}
+
+        {{ govukTable({
+          attributes: {
+            "data-module": "moj-sortable-table"
+          },
+          caption: "Your projects",
+          head: [
+            {
+              text: "Name",
+              attributes: {
+                "aria-sort": "none"
+              }
+            },
+            {
+              text: "Type",
+              attributes: {
+                "aria-sort": "none"
+              }
+            },
+            {
+              text: "Reference",
+              attributes: {
+                "aria-sort": "none"
+              }
+            },
+            {
+              text: "Status",
+              attributes: {
+                "aria-sort": "none"
+              }
+            },
+            {
+              text: "Date submitted",
+              attributes: {
+                "aria-sort": "none"
+              },
+              format: "numeric"
+            }
+          ],
+          rows: tableRows
+        }) }}
+      {% else %}
+        <p class="govuk-body">You have not created any projects yet.</p>
+      {% endif %}
+    </div>
+  </div>
+{% endblock %} 

@@ -33,11 +33,13 @@ const convertPayloadToCoordinatesArray = (payload, coordinateSystem) => {
     }
   })
 
+  const useWGS84 = coordinateSystem === COORDINATE_SYSTEMS.WGS84
+
   Array.from(indices)
     .sort()
     .forEach((index) => {
       const coordinate = {}
-      if (coordinateSystem === COORDINATE_SYSTEMS.WGS84) {
+      if (useWGS84) {
         coordinate.latitude = payload[`coordinates[${index}][latitude]`] || ''
         coordinate.longitude = payload[`coordinates[${index}][longitude]`] || ''
       } else {
@@ -48,44 +50,6 @@ const convertPayloadToCoordinatesArray = (payload, coordinateSystem) => {
     })
 
   return coordinates
-}
-
-/**
- * Convert form payload to structured format for template display
- * @param {object} payload - Raw form payload
- * @param {string} coordinateSystem - Current coordinate system
- * @returns {object} Structured payload object for template
- */
-const convertFormPayloadToStructured = (payload, coordinateSystem) => {
-  const coordinates = []
-
-  const fieldNames = Object.keys(payload).filter((name) =>
-    name.startsWith('coordinates[')
-  )
-
-  const indices = new Set()
-  fieldNames.forEach((name) => {
-    const match = name.match(/coordinates\[(\d+)\]/)
-    if (match) {
-      indices.add(parseInt(match[1], 10))
-    }
-  })
-
-  Array.from(indices)
-    .sort()
-    .forEach((index) => {
-      const coordinate = {}
-      if (coordinateSystem === COORDINATE_SYSTEMS.WGS84) {
-        coordinate.latitude = payload[`coordinates[${index}][latitude]`] || ''
-        coordinate.longitude = payload[`coordinates[${index}][longitude]`] || ''
-      } else {
-        coordinate.eastings = payload[`coordinates[${index}][eastings]`] || ''
-        coordinate.northings = payload[`coordinates[${index}][northings]`] || ''
-      }
-      coordinates[index] = coordinate
-    })
-
-  return { coordinates }
 }
 
 /**
@@ -154,14 +118,14 @@ const convertArrayErrorsToFlattenedErrors = (error) => {
 const handleValidationFailure = (request, h, error, coordinateSystem) => {
   const { payload } = request
   const exemption = getExemptionCache(request)
-  const structuredPayload = convertFormPayloadToStructured(
+  const coordinates = convertPayloadToCoordinatesArray(
     payload,
     coordinateSystem
   )
 
   if (!error.details) {
     const context = generatePageContext({
-      coordinates: structuredPayload.coordinates,
+      coordinates,
       errors: {},
       projectName: exemption.projectName,
       backLink: multipleCoordinatesPageData.backLink
@@ -206,7 +170,7 @@ const handleValidationFailure = (request, h, error, coordinateSystem) => {
   })
 
   const context = generatePageContext({
-    coordinates: structuredPayload.coordinates,
+    coordinates,
     errors,
     projectName: exemption.projectName,
     backLink: multipleCoordinatesPageData.backLink

@@ -169,12 +169,12 @@ describe('#dashboard', () => {
       })
     })
 
-    test('Should handle null payload from API', async () => {
+    test('Should handle null payload value from API', async () => {
       const h = { view: jest.fn() }
       const request = { logger: { error: jest.fn() } }
 
       authenticatedGetRequestMock.mockResolvedValue({
-        payload: null
+        payload: {}
       })
 
       await dashboardController.handler(request, h)

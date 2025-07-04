@@ -106,7 +106,7 @@ export const uploadAndWaitController = {
         // Clear upload config from session
         updateExemptionSiteDetails(request, 'uploadConfig', undefined)
 
-        // ToDo: change this to next page when built
+        // Change this to next page when built
         return h.redirect(routes.FILE_UPLOAD)
       }
 

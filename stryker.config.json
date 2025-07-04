@@ -12,6 +12,7 @@
     "src/server/about/**/*.js",
     "src/server/health/**/*.js",
     "src/server/common/helpers/*.js",
+    "!src/server/common/helpers/serve-static-files.js",
     "!src/**/*.test.js",
     "!src/**/*.spec.js",
     "!src/server/test-helpers/**/*.js"

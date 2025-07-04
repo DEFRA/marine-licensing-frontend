@@ -66,7 +66,7 @@ describe('#multipleCoordinates OSGB36 schema', () => {
       const result = schema.validate(payload)
 
       expect(result.error).toBeDefined()
-      expect(result.error.message).toContain('Eastings must be a whole number')
+      expect(result.error.message).toContain('Eastings must be a number')
     })
 
     test('Should require coordinates array', () => {
@@ -77,22 +77,6 @@ describe('#multipleCoordinates OSGB36 schema', () => {
 
       expect(result.error).toBeDefined()
       expect(result.error.message).toContain('required')
-    })
-
-    test('Should validate that coordinates must be whole numbers', () => {
-      const payload = {
-        coordinates: [
-          { eastings: '123456.5', northings: '654321.5' }, // Decimal numbers not allowed
-          { eastings: '234567', northings: '765432' },
-          { eastings: '345678', northings: '876543' }
-        ]
-      }
-
-      const schema = createOsgb36MultipleCoordinatesSchema()
-      const result = schema.validate(payload)
-
-      expect(result.error).toBeDefined()
-      expect(result.error.message).toContain('Eastings must be a whole number')
     })
 
     test('Should validate coordinate ranges', () => {

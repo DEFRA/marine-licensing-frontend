@@ -1,10 +1,8 @@
-import joi from 'joi'
 import { COORDINATE_SYSTEMS } from '~/src/server/common/constants/coordinates.js'
 import {
-  createEastingsSchema,
-  createNorthingsSchema,
-  osgb36IntegerValidationSchema,
-  osgb36ValidationSchema
+  osgb36ValidationSchema,
+  createOsgb36MultipleCoordinatesSchema,
+  createOsgb36CoordinateSchema
 } from '~/src/server/common/schemas/osgb36.js'
 
 const mockCoordinates = {
@@ -134,389 +132,107 @@ describe('#osgb36ValidationSchema model', () => {
   })
 })
 
-describe('#osgb36IntegerValidationSchema model', () => {
+describe('#createOsgb36MultipleCoordinatesSchema', () => {
   beforeEach(() => {
     jest.resetAllMocks()
   })
 
-  test('Should correctly validate valid integer OSGB36 coordinates', () => {
+  test('Should correctly validate valid multiple coordinates', () => {
+    const schema = createOsgb36MultipleCoordinatesSchema()
     const request = {
-      eastings: '425053',
-      northings: '564180'
+      coordinates: [
+        { eastings: '425053', northings: '564180' },
+        { eastings: '425054', northings: '564181' },
+        { eastings: '425055', northings: '564182' }
+      ]
     }
 
-    const result = osgb36IntegerValidationSchema.validate(request)
+    const result = schema.validate(request)
 
     expect(result.error).toBeUndefined()
   })
 
-  test('Should correctly validate valid 7-digit northings', () => {
+  test('Should correctly validate when coordinates array is empty', () => {
+    const schema = createOsgb36MultipleCoordinatesSchema()
     const request = {
-      eastings: '425053',
-      northings: '1564180'
+      coordinates: []
     }
 
-    const result = osgb36IntegerValidationSchema.validate(request)
+    const result = schema.validate(request)
 
-    expect(result.error).toBeUndefined()
+    expect(result.error.message).toContain(
+      'You must provide at least 3 coordinate points'
+    )
   })
 
-  test('Should correctly validate when fields are required but empty', () => {
+  test('Should correctly validate when coordinates array has insufficient points', () => {
+    const schema = createOsgb36MultipleCoordinatesSchema()
     const request = {
-      eastings: '',
-      northings: ''
+      coordinates: [
+        { eastings: '425053', northings: '564180' },
+        { eastings: '425054', northings: '564181' }
+      ]
     }
 
-    const result = osgb36IntegerValidationSchema.validate(request, {
-      abortEarly: false
-    })
+    const result = schema.validate(request)
 
-    expect(result.error.message).toContain('Enter the eastings')
-    expect(result.error.message).toContain('Enter the northings')
+    expect(result.error.message).toContain(
+      'You must provide at least 3 coordinate points'
+    )
   })
 
-  test('Should correctly validate when fields are required but missing', () => {
+  test('Should correctly validate when coordinates field is missing', () => {
+    const schema = createOsgb36MultipleCoordinatesSchema()
     const request = {}
 
-    const result = osgb36IntegerValidationSchema.validate(request, {
-      abortEarly: false
-    })
+    const result = schema.validate(request)
 
+    expect(result.error.message).toContain('Coordinates are required')
+  })
+
+  test('Should correctly validate when individual coordinates are invalid', () => {
+    const schema = createOsgb36MultipleCoordinatesSchema()
+    const request = {
+      coordinates: [
+        { eastings: '10000', northings: '10000' },
+        { eastings: '425054', northings: '564181' },
+        { eastings: '425055', northings: '564182' }
+      ]
+    }
+
+    const result = schema.validate(request, { abortEarly: false })
+
+    expect(result.error.message).toContain('Eastings must be 6 digits')
+    expect(result.error.message).toContain('Northings must be 6 or 7 digits')
+  })
+
+  test('Should correctly validate with additional unknown fields', () => {
+    const schema = createOsgb36MultipleCoordinatesSchema()
+    const request = {
+      coordinates: [
+        { eastings: '425053', northings: '564180' },
+        { eastings: '425054', northings: '564181' },
+        { eastings: '425055', northings: '564182' }
+      ],
+      additionalField: 'should be ignored'
+    }
+
+    const result = schema.validate(request)
+
+    expect(result.error).toBeUndefined()
+  })
+})
+
+describe('#createOsgb36CoordinateSchema', () => {
+  beforeEach(() => {
+    jest.resetAllMocks()
+  })
+
+  test('Should default to simple messageType when not specified', () => {
+    const schema = createOsgb36CoordinateSchema('eastings')
+    const result = schema.validate('')
+
+    expect(result.error).toBeDefined()
     expect(result.error.message).toContain('Enter the eastings')
-    expect(result.error.message).toContain('Enter the northings')
-  })
-
-  test('Should correctly validate when eastings contains decimal number', () => {
-    const request = {
-      eastings: '425053.5',
-      northings: '564180'
-    }
-
-    const result = osgb36IntegerValidationSchema.validate(request)
-
-    expect(result.error.message).toContain('Eastings must be a whole number')
-  })
-
-  test('Should correctly validate when northings contains decimal number', () => {
-    const request = {
-      eastings: '425053',
-      northings: '564180.7'
-    }
-
-    const result = osgb36IntegerValidationSchema.validate(request)
-
-    expect(result.error.message).toContain('Northings must be a whole number')
-  })
-
-  test('Should correctly validate when eastings contains non-numeric characters', () => {
-    const request = {
-      eastings: '42505a',
-      northings: '564180'
-    }
-
-    const result = osgb36IntegerValidationSchema.validate(request)
-
-    expect(result.error.message).toContain('Eastings must be a whole number')
-  })
-
-  test('Should correctly validate when northings contains non-numeric characters', () => {
-    const request = {
-      eastings: '425053',
-      northings: '56418b'
-    }
-
-    const result = osgb36IntegerValidationSchema.validate(request)
-
-    expect(result.error.message).toContain('Northings must be a whole number')
-  })
-
-  test('Should correctly validate when eastings is below minimum range', () => {
-    const request = {
-      eastings: '99999',
-      northings: '564180'
-    }
-
-    const result = osgb36IntegerValidationSchema.validate(request)
-
-    expect(result.error.message).toContain('Eastings must be 6 digits')
-  })
-
-  test('Should correctly validate when eastings is above maximum range', () => {
-    const request = {
-      eastings: '1000000',
-      northings: '564180'
-    }
-
-    const result = osgb36IntegerValidationSchema.validate(request)
-
-    expect(result.error.message).toContain('Eastings must be 6 digits')
-  })
-
-  test('Should correctly validate when northings is below minimum range', () => {
-    const request = {
-      eastings: '425053',
-      northings: '99999'
-    }
-
-    const result = osgb36IntegerValidationSchema.validate(request)
-
-    expect(result.error.message).toContain('Northings must be 6 or 7 digits')
-  })
-
-  test('Should correctly validate when northings is above maximum range', () => {
-    const request = {
-      eastings: '425053',
-      northings: '10000000'
-    }
-
-    const result = osgb36IntegerValidationSchema.validate(request)
-
-    expect(result.error.message).toContain('Northings must be 6 or 7 digits')
-  })
-
-  test('Should correctly validate when eastings is zero', () => {
-    const request = {
-      eastings: '0',
-      northings: '564180'
-    }
-
-    const result = osgb36IntegerValidationSchema.validate(request)
-
-    expect(result.error.message).toContain(
-      'Eastings must be a positive 6-digit number, like 123456'
-    )
-  })
-
-  test('Should correctly validate when northings is zero', () => {
-    const request = {
-      eastings: '425053',
-      northings: '0'
-    }
-
-    const result = osgb36IntegerValidationSchema.validate(request)
-
-    expect(result.error.message).toContain(
-      'Northings must be a positive 6 or 7-digit number, like 123456'
-    )
-  })
-
-  test('Should correctly validate when eastings is negative', () => {
-    const request = {
-      eastings: '-425053',
-      northings: '564180'
-    }
-
-    const result = osgb36IntegerValidationSchema.validate(request)
-
-    expect(result.error.message).toContain(
-      'Eastings must be a positive 6-digit number, like 123456'
-    )
-  })
-
-  test('Should correctly validate when northings is negative', () => {
-    const request = {
-      eastings: '425053',
-      northings: '-564180'
-    }
-
-    const result = osgb36IntegerValidationSchema.validate(request)
-
-    expect(result.error.message).toContain(
-      'Northings must be a positive 6 or 7-digit number, like 123456'
-    )
-  })
-})
-
-describe('#createEastingsSchema', () => {
-  beforeEach(() => {
-    jest.resetAllMocks()
-  })
-
-  test('Should correctly validate valid eastings data', () => {
-    const schema = createEastingsSchema('the start and end point')
-    const result = schema.validate('425053')
-
-    expect(result.error).toBeUndefined()
-    expect(result.value).toBe('425053')
-  })
-
-  test('Should correctly validate when eastings is required but empty', () => {
-    const schema = createEastingsSchema('point 2')
-    const result = schema.validate('')
-
-    expect(result.error.message).toContain('Enter the eastings of point 2')
-  })
-
-  test('Should correctly validate when eastings is required but missing', () => {
-    const schema = createEastingsSchema('the start and end point')
-    const result = schema.validate(undefined)
-
-    expect(result.error.message).toContain(
-      'Enter the eastings of the start and end point'
-    )
-  })
-
-  test('Should correctly validate when eastings contains non-numeric characters', () => {
-    const schema = createEastingsSchema('point 3')
-    const result = schema.validate('42505a')
-
-    expect(result.error.message).toContain(
-      'Eastings of point 3 must be a whole number'
-    )
-  })
-
-  test('Should correctly validate when eastings contains decimal number', () => {
-    const schema = createEastingsSchema('point 2')
-    const result = schema.validate('425053.5')
-
-    expect(result.error.message).toContain(
-      'Eastings of point 2 must be a whole number'
-    )
-  })
-
-  test('Should correctly validate when eastings is below minimum range', () => {
-    const schema = createEastingsSchema('the start and end point')
-    const result = schema.validate('99999')
-
-    expect(result.error.message).toContain(
-      'Eastings of the start and end point must be 6 digits'
-    )
-  })
-
-  test('Should correctly validate when eastings is above maximum range', () => {
-    const schema = createEastingsSchema('point 4')
-    const result = schema.validate('1000000')
-
-    expect(result.error.message).toContain(
-      'Eastings of point 4 must be 6 digits'
-    )
-  })
-
-  test('Should correctly validate when eastings is negative', () => {
-    const schema = createEastingsSchema('point 2')
-    const result = schema.validate('-425053')
-
-    expect(result.error.message).toContain(
-      'Eastings of point 2 must be a positive 6-digit number, like 123456'
-    )
-  })
-
-  test('Should correctly validate when eastings is zero', () => {
-    const schema = createEastingsSchema('the start and end point')
-    const result = schema.validate('0')
-
-    expect(result.error.message).toContain(
-      'Eastings of the start and end point must be a positive 6-digit number, like 123456'
-    )
-  })
-
-  test('Should correctly validate required field error for eastings', () => {
-    const schema = joi.object({
-      eastings: createEastingsSchema('point 5')
-    })
-    const result = schema.validate({})
-
-    expect(result.error.message).toContain('Enter the eastings of point 5')
-  })
-})
-
-describe('#createNorthingsSchema', () => {
-  beforeEach(() => {
-    jest.resetAllMocks()
-  })
-
-  test('Should correctly validate valid northings data', () => {
-    const schema = createNorthingsSchema('the start and end point')
-    const result = schema.validate('564180')
-
-    expect(result.error).toBeUndefined()
-    expect(result.value).toBe('564180')
-  })
-
-  test('Should correctly validate valid 7-digit northings data', () => {
-    const schema = createNorthingsSchema('point 2')
-    const result = schema.validate('1564180')
-
-    expect(result.error).toBeUndefined()
-    expect(result.value).toBe('1564180')
-  })
-
-  test('Should correctly validate when northings is required but empty', () => {
-    const schema = createNorthingsSchema('point 3')
-    const result = schema.validate('')
-
-    expect(result.error.message).toContain('Enter the northings of point 3')
-  })
-
-  test('Should correctly validate when northings is required but missing', () => {
-    const schema = createNorthingsSchema('the start and end point')
-    const result = schema.validate(undefined)
-
-    expect(result.error.message).toContain(
-      'Enter the northings of the start and end point'
-    )
-  })
-
-  test('Should correctly validate when northings contains non-numeric characters', () => {
-    const schema = createNorthingsSchema('point 2')
-    const result = schema.validate('56418b')
-
-    expect(result.error.message).toContain(
-      'Northings of point 2 must be a whole number'
-    )
-  })
-
-  test('Should correctly validate when northings contains decimal number', () => {
-    const schema = createNorthingsSchema('point 4')
-    const result = schema.validate('564180.7')
-
-    expect(result.error.message).toContain(
-      'Northings of point 4 must be a whole number'
-    )
-  })
-
-  test('Should correctly validate when northings is below minimum range', () => {
-    const schema = createNorthingsSchema('the start and end point')
-    const result = schema.validate('99999')
-
-    expect(result.error.message).toContain(
-      'Northings of the start and end point must be 6 or 7 digits'
-    )
-  })
-
-  test('Should correctly validate when northings is above maximum range', () => {
-    const schema = createNorthingsSchema('point 2')
-    const result = schema.validate('10000000')
-
-    expect(result.error.message).toContain(
-      'Northings of point 2 must be 6 or 7 digits'
-    )
-  })
-
-  test('Should correctly validate when northings is negative', () => {
-    const schema = createNorthingsSchema('point 3')
-    const result = schema.validate('-564180')
-
-    expect(result.error.message).toContain(
-      'Northings of point 3 must be a positive 6 or 7-digit number, like 123456'
-    )
-  })
-
-  test('Should correctly validate when northings is zero', () => {
-    const schema = createNorthingsSchema('the start and end point')
-    const result = schema.validate('0')
-
-    expect(result.error.message).toContain(
-      'Northings of the start and end point must be a positive 6 or 7-digit number, like 123456'
-    )
-  })
-
-  test('Should correctly validate required field error for northings', () => {
-    const schema = joi.object({
-      northings: createNorthingsSchema('point 6')
-    })
-    const result = schema.validate({})
-
-    expect(result.error.message).toContain('Enter the northings of point 6')
   })
 })

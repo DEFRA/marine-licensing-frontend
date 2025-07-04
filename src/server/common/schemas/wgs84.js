@@ -98,7 +98,7 @@ const createMessages = (coordinateType, messageType, pointName) => {
   }
 }
 
-const createCoordinateSchema = (
+export const createCoordinateSchema = (
   coordinateType,
   messageType = 'simple',
   pointName = null
@@ -118,14 +118,6 @@ export const wgs84ValidationSchema = joi.object({
   latitude: createCoordinateSchema('latitude', 'constants'),
   longitude: createCoordinateSchema('longitude', 'constants')
 })
-
-export const createLatitudeSchema = (pointName) => {
-  return createCoordinateSchema('latitude', 'withPoint', pointName)
-}
-
-export const createLongitudeSchema = (pointName) => {
-  return createCoordinateSchema('longitude', 'withPoint', pointName)
-}
 
 export const wgs84MultipleCoordinateItemSchema = joi.object({
   latitude: createCoordinateSchema('latitude', 'simple'),

@@ -13,116 +13,185 @@ import {
   multipleCoordinatesPageData
 } from './utils.js'
 
+// === CONSTANTS ===
+
 const REQUIRED_COORDINATES_COUNT = 3
 
-/**
- * Convert flattened payload to nested coordinates array
- * @param {object} payload - Flattened payload from form
- * @param {string} coordinateSystem - Current coordinate system
- * @returns {Array} Array of coordinate objects
- */
-const convertPayloadToCoordinatesArray = (payload, coordinateSystem) => {
-  const coordinates = []
-  const fieldNames = Object.keys(payload).filter((name) =>
-    name.startsWith('coordinates[')
-  )
+const COORDINATE_FIELDS = {
+  WGS84: {
+    primary: 'latitude',
+    secondary: 'longitude'
+  },
+  OSGB36: {
+    primary: 'eastings',
+    secondary: 'northings'
+  }
+}
 
+const PATTERNS = {
+  COORDINATES_PREFIX: 'coordinates[',
+  COORDINATE_INDEX: /coordinates\[(\d+)\]/,
+  FIELD_BRACKETS: /[[\]]/g
+}
+
+// === COORDINATE SYSTEM UTILITIES ===
+
+const isWGS84 = (coordinateSystem) =>
+  coordinateSystem === COORDINATE_SYSTEMS.WGS84
+
+const getCoordinateFields = (coordinateSystem) =>
+  isWGS84(coordinateSystem) ? COORDINATE_FIELDS.WGS84 : COORDINATE_FIELDS.OSGB36
+
+const createEmptyCoordinate = (coordinateSystem) => {
+  const fields = getCoordinateFields(coordinateSystem)
+  return { [fields.primary]: '', [fields.secondary]: '' }
+}
+
+// === FIELD PROCESSING UTILITIES ===
+
+const extractCoordinateIndices = (fieldNames) => {
   const indices = new Set()
   fieldNames.forEach((name) => {
-    const match = name.match(/coordinates\[(\d+)\]/)
+    const match = name.match(PATTERNS.COORDINATE_INDEX)
     if (match) {
       indices.add(parseInt(match[1], 10))
     }
   })
+  return Array.from(indices).sort((a, b) => a - b)
+}
 
-  const useWGS84 = coordinateSystem === COORDINATE_SYSTEMS.WGS84
+const extractCoordinateIndexFromFieldName = (fieldName) => {
+  const indexMatch = fieldName.match(/coordinates(\d+)/)
+  return indexMatch ? parseInt(indexMatch[1], 10) : 0
+}
 
-  Array.from(indices)
-    .sort((a, b) => a - b)
-    .forEach((index) => {
-      const coordinate = {}
-      if (useWGS84) {
-        coordinate.latitude = payload[`coordinates[${index}][latitude]`] || ''
-        coordinate.longitude = payload[`coordinates[${index}][longitude]`] || ''
-      } else {
-        coordinate.eastings = payload[`coordinates[${index}][eastings]`] || ''
-        coordinate.northings = payload[`coordinates[${index}][northings]`] || ''
-      }
-      coordinates[index] = coordinate
-    })
+const sanitiseFieldName = (fieldPath) =>
+  fieldPath.join('').replace(PATTERNS.FIELD_BRACKETS, '')
+
+const buildCoordinateFromPayload = (payload, index, coordinateSystem) => {
+  const fields = getCoordinateFields(coordinateSystem)
+  return {
+    [fields.primary]: payload[`coordinates[${index}][${fields.primary}]`] || '',
+    [fields.secondary]:
+      payload[`coordinates[${index}][${fields.secondary}]`] || ''
+  }
+}
+
+const convertPayloadToCoordinatesArray = (payload, coordinateSystem) => {
+  const coordinates = []
+  const fieldNames = Object.keys(payload).filter((name) =>
+    name.startsWith(PATTERNS.COORDINATES_PREFIX)
+  )
+
+  const indices = extractCoordinateIndices(fieldNames)
+
+  indices.forEach((index) => {
+    coordinates[index] = buildCoordinateFromPayload(
+      payload,
+      index,
+      coordinateSystem
+    )
+  })
 
   return coordinates
 }
 
-/**
- * Get payload data from session for the current coordinate system
- * @param {object} siteDetails - Site details from session
- * @returns {object} Payload object for template
- */
-const getPayload = (siteDetails) => {
-  const multipleCoordinates = siteDetails.multipleCoordinates || {}
-  return { coordinates: multipleCoordinates.coordinates || [] }
+// === COORDINATE DISPLAY UTILITIES ===
+
+const createDefaultCoordinates = (coordinateSystem) => {
+  return Array.from({ length: REQUIRED_COORDINATES_COUNT }, () =>
+    createEmptyCoordinate(coordinateSystem)
+  )
 }
 
-/**
- * Get the appropriate validation schema for the coordinate system
- * @param {string} coordinateSystem - Current coordinate system
- * @returns {object} Joi validation schema
- */
-const getValidationSchema = (coordinateSystem) => {
-  if (coordinateSystem === COORDINATE_SYSTEMS.WGS84) {
-    return createWgs84MultipleCoordinatesSchema()
-  } else {
-    return createOsgb36MultipleCoordinatesSchema()
+const normaliseCoordinatesForDisplay = (coordinates, coordinateSystem) => {
+  const displayCoordinates = coordinates || []
+
+  if (displayCoordinates.length === 0) {
+    return createDefaultCoordinates(coordinateSystem)
   }
+
+  while (displayCoordinates.length < REQUIRED_COORDINATES_COUNT) {
+    displayCoordinates.push(createEmptyCoordinate(coordinateSystem))
+  }
+
+  return displayCoordinates.slice(0, REQUIRED_COORDINATES_COUNT)
 }
 
-/**
- * Convert array-based validation errors back to flattened field names
- * @param {object} error - Joi validation error
- * @returns {object} Converted error with flattened field names
- */
+// === VALIDATION UTILITIES ===
+
+const getValidationSchema = (coordinateSystem) => {
+  return isWGS84(coordinateSystem)
+    ? createWgs84MultipleCoordinatesSchema()
+    : createOsgb36MultipleCoordinatesSchema()
+}
+
 const convertArrayErrorsToFlattenedErrors = (error) => {
   if (!error.details) {
     return error
   }
 
   const convertedDetails = error.details.map((detail) => {
-    // Convert array path like coordinates.0.latitude to coordinates[0][latitude]
     const path = detail.path
       .map((segment, index) => {
         if (index === 0) {
           return segment
-        } // coordinates
-        if (typeof segment === 'number') {
-          return `[${segment}]`
-        } // [0]
-        return `[${segment}]` // [latitude]
+        }
+        return typeof segment === 'number' ? `[${segment}]` : `[${segment}]`
       })
       .join('')
 
-    return {
-      ...detail,
-      path: [path]
-    }
+    return { ...detail, path: [path] }
   })
 
-  return {
-    ...error,
-    details: convertedDetails
-  }
+  return { ...error, details: convertedDetails }
 }
 
-// Point-specific error message generation is now handled by the site-details helper
+// === ERROR PROCESSING UTILITIES ===
 
-/**
- * Handle validation failure for multiple coordinates submit
- * @param {object} request - Hapi request object
- * @param {object} h - Hapi response toolkit
- * @param {object} error - Validation error
- * @param {string} coordinateSystem - Current coordinate system
- * @returns {object} Error response
- */
+const processErrorDetail = (detail) => {
+  const fieldName = sanitiseFieldName(detail.path)
+  const coordinateIndex = extractCoordinateIndexFromFieldName(fieldName)
+  const enhancedMessage = generatePointSpecificErrorMessage(
+    detail.message,
+    coordinateIndex
+  )
+
+  return { fieldName, coordinateIndex, enhancedMessage }
+}
+
+const createErrorSummary = (validationError) => {
+  return validationError.details.map((detail) => {
+    const { fieldName, enhancedMessage } = processErrorDetail(detail)
+    return {
+      href: `#${fieldName}`,
+      text: enhancedMessage
+    }
+  })
+}
+
+const createFieldErrors = (validationError) => {
+  const errors = {}
+
+  validationError.details.forEach((detail) => {
+    const { fieldName, enhancedMessage } = processErrorDetail(detail)
+    errors[fieldName] = { text: enhancedMessage }
+  })
+
+  return errors
+}
+
+// === CONTEXT UTILITIES ===
+
+const createPageContextWithDefaults = (coordinates, errors, exemption) => {
+  return generatePageContext({
+    coordinates,
+    errors,
+    projectName: exemption?.projectName,
+    backLink: multipleCoordinatesPageData.backLink
+  })
+}
+
 const handleValidationFailure = (request, h, error, coordinateSystem) => {
   const { payload } = request
   const exemption = getExemptionCache(request)
@@ -132,57 +201,20 @@ const handleValidationFailure = (request, h, error, coordinateSystem) => {
   )
 
   if (!error.details) {
-    const errorContext = generatePageContext({
+    const errorContext = createPageContextWithDefaults(
       coordinates,
-      errors: {},
-      projectName: exemption.projectName,
-      backLink: multipleCoordinatesPageData.backLink
-    })
+      {},
+      exemption
+    )
     return h
       .view(MULTIPLE_COORDINATES_VIEW_ROUTES[coordinateSystem], errorContext)
       .takeover()
   }
 
-  const errorSummary = error.details.map((detail) => {
-    const fieldName = detail.path.join('').replace(/[[\]]/g, '')
+  const errorSummary = createErrorSummary(error)
+  const errors = createFieldErrors(error)
 
-    // Extract coordinate index from field name (e.g., "coordinates0latitude" -> 0)
-    const indexMatch = fieldName.match(/coordinates(\d+)/)
-    const coordinateIndex = indexMatch ? parseInt(indexMatch[1], 10) : 0
-
-    const enhancedMessage = generatePointSpecificErrorMessage(
-      detail.message,
-      coordinateIndex
-    )
-
-    return {
-      href: `#${fieldName}`,
-      text: enhancedMessage
-    }
-  })
-
-  const errors = {}
-  error.details.forEach((detail) => {
-    const fieldName = detail.path.join('').replace(/[[\]]/g, '')
-
-    // Extract coordinate index from field name
-    const indexMatch = fieldName.match(/coordinates(\d+)/)
-    const coordinateIndex = indexMatch ? parseInt(indexMatch[1], 10) : 0
-
-    const enhancedMessage = generatePointSpecificErrorMessage(
-      detail.message,
-      coordinateIndex
-    )
-
-    errors[fieldName] = { text: enhancedMessage }
-  })
-
-  const context = generatePageContext({
-    coordinates,
-    errors,
-    projectName: exemption.projectName,
-    backLink: multipleCoordinatesPageData.backLink
-  })
+  const context = createPageContextWithDefaults(coordinates, errors, exemption)
 
   return h
     .view(MULTIPLE_COORDINATES_VIEW_ROUTES[coordinateSystem], {
@@ -192,66 +224,50 @@ const handleValidationFailure = (request, h, error, coordinateSystem) => {
     .takeover()
 }
 
-/**
- * Create a new coordinate based on the coordinate system
- * @param {string} coordinateSystem - The coordinate system to use
- * @returns {object} New empty coordinate object
- */
-const createNewCoordinate = (coordinateSystem) => {
-  const useWGS84 =
-    coordinateSystem === COORDINATE_SYSTEMS.WGS84 || !coordinateSystem
-  return useWGS84
-    ? { latitude: '', longitude: '' }
-    : { eastings: '', northings: '' }
+// === SESSION UTILITIES ===
+
+const getSessionPayload = (siteDetails) => {
+  const multipleCoordinates = siteDetails.multipleCoordinates || {}
+  return { coordinates: multipleCoordinates.coordinates || [] }
 }
 
-/**
- * A GDS styled page controller for the multiple coordinates page.
- * @satisfies {Partial<ServerRoute>}
- */
+const saveCoordinatesToSession = (request, coordinates) => {
+  updateExemptionSiteDetails(request, 'multipleCoordinates', { coordinates })
+}
+
+// === VALIDATION WORKFLOW ===
+
+const validateCoordinates = (coordinates, exemptionId, coordinateSystem) => {
+  const validationPayload = { coordinates, id: exemptionId }
+  const schema = getValidationSchema(coordinateSystem)
+
+  return schema.validate(validationPayload, { abortEarly: false })
+}
+
+// === MAIN CONTROLLERS ===
+
 export const multipleCoordinatesController = {
   options: {},
   handler(request, h) {
     const exemption = getExemptionCache(request)
     const { coordinateSystem } = getCoordinateSystem(request)
-
     const siteDetails = exemption?.siteDetails ?? {}
-    const payload = getPayload(siteDetails)
+    const payload = getSessionPayload(siteDetails)
 
-    // Always display exactly the required coordinates for ML-19 (no add/remove functionality)
-    let coordinatesForDisplay = payload.coordinates || []
-    if (coordinatesForDisplay.length === 0) {
-      coordinatesForDisplay = Array.from(
-        { length: REQUIRED_COORDINATES_COUNT },
-        () => createNewCoordinate(coordinateSystem)
-      )
-    }
-
-    // Ensure we always have exactly the required coordinates
-    while (coordinatesForDisplay.length < REQUIRED_COORDINATES_COUNT) {
-      coordinatesForDisplay.push(createNewCoordinate(coordinateSystem))
-    }
-    // Only show first required coordinates
-    coordinatesForDisplay = coordinatesForDisplay.slice(
-      0,
-      REQUIRED_COORDINATES_COUNT
+    const coordinatesForDisplay = normaliseCoordinatesForDisplay(
+      payload.coordinates,
+      coordinateSystem
     )
 
-    const context = generatePageContext({
-      coordinates: coordinatesForDisplay,
-      errors: {},
-      projectName: exemption?.projectName,
-      backLink: multipleCoordinatesPageData.backLink
-    })
-
+    const context = createPageContextWithDefaults(
+      coordinatesForDisplay,
+      {},
+      exemption
+    )
     return h.view(MULTIPLE_COORDINATES_VIEW_ROUTES[coordinateSystem], context)
   }
 }
 
-/**
- * A GDS styled page controller for the POST route in the multiple coordinates page.
- * @satisfies {Partial<ServerRoute>}
- */
 export const multipleCoordinatesSubmitController = {
   options: {},
   handler(request, h) {
@@ -259,24 +275,17 @@ export const multipleCoordinatesSubmitController = {
     const exemption = getExemptionCache(request)
     const { coordinateSystem } = getCoordinateSystem(request)
 
-    // Convert flattened payload to nested structure for validation
     const coordinates = convertPayloadToCoordinatesArray(
       payload,
       coordinateSystem
     )
-    const validationPayload = {
+    const validationResult = validateCoordinates(
       coordinates,
-      id: exemption.id
-    }
-
-    // Validate using the simplified schema
-    const schema = getValidationSchema(coordinateSystem)
-    const validationResult = schema.validate(validationPayload, {
-      abortEarly: false
-    })
+      exemption.id,
+      coordinateSystem
+    )
 
     if (validationResult.error) {
-      // Convert array errors back to flattened field names for display
       const convertedError = convertArrayErrorsToFlattenedErrors(
         validationResult.error
       )
@@ -288,33 +297,22 @@ export const multipleCoordinatesSubmitController = {
       )
     }
 
-    // ML-19 AC6: Save coordinates to session but remain on same page (no backend submission)
-    updateExemptionSiteDetails(request, 'multipleCoordinates', {
-      coordinates
-    })
+    saveCoordinatesToSession(request, coordinates)
 
-    // Return to same page with saved data displayed
     const updatedExemption = getExemptionCache(request)
     const updatedSiteDetails = updatedExemption?.siteDetails ?? {}
-    const updatedPayload = getPayload(updatedSiteDetails)
+    const updatedPayload = getSessionPayload(updatedSiteDetails)
 
-    // Ensure exactly the required coordinates for display
-    let coordinatesForDisplay = updatedPayload.coordinates || coordinates
-    while (coordinatesForDisplay.length < REQUIRED_COORDINATES_COUNT) {
-      coordinatesForDisplay.push(createNewCoordinate(coordinateSystem))
-    }
-    coordinatesForDisplay = coordinatesForDisplay.slice(
-      0,
-      REQUIRED_COORDINATES_COUNT
+    const coordinatesForDisplay = normaliseCoordinatesForDisplay(
+      updatedPayload.coordinates || coordinates,
+      coordinateSystem
     )
 
-    const context = generatePageContext({
-      coordinates: coordinatesForDisplay,
-      errors: {},
-      projectName: updatedExemption?.projectName,
-      backLink: multipleCoordinatesPageData.backLink
-    })
-
+    const context = createPageContextWithDefaults(
+      coordinatesForDisplay,
+      {},
+      updatedExemption
+    )
     return h.view(MULTIPLE_COORDINATES_VIEW_ROUTES[coordinateSystem], context)
   }
 }

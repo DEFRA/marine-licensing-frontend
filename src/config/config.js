@@ -7,7 +7,7 @@ const dirname = path.dirname(fileURLToPath(import.meta.url))
 const oneDay = 1000 * 60 * 60 * 24
 const fourHoursMs = 14400000
 const oneWeekMs = 604800000
-const fiftyMB = 50 * 1000 * 1000 // 50MB
+const fiftyMB = 50000000 // 50 MB :== 50 * 1000 * 1000
 
 const isProduction = process.env.NODE_ENV === 'production'
 const isTest = process.env.NODE_ENV === 'test'

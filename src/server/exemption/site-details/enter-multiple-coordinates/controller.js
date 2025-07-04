@@ -13,6 +13,8 @@ import {
   multipleCoordinatesPageData
 } from './utils.js'
 
+const REQUIRED_COORDINATES_COUNT = 3
+
 /**
  * Convert flattened payload to nested coordinates array
  * @param {object} payload - Flattened payload from form
@@ -142,7 +144,7 @@ const handleValidationFailure = (request, h, error, coordinateSystem) => {
   }
 
   const errorSummary = error.details.map((detail) => {
-    const fieldName = detail.path.join('').replace(/\[|\]/g, '')
+    const fieldName = detail.path.join('').replace(/[[\]]/g, '')
 
     // Extract coordinate index from field name (e.g., "coordinates0latitude" -> 0)
     const indexMatch = fieldName.match(/coordinates(\d+)/)
@@ -161,7 +163,7 @@ const handleValidationFailure = (request, h, error, coordinateSystem) => {
 
   const errors = {}
   error.details.forEach((detail) => {
-    const fieldName = detail.path.join('').replace(/\[|\]/g, '')
+    const fieldName = detail.path.join('').replace(/[[\]]/g, '')
 
     // Extract coordinate index from field name
     const indexMatch = fieldName.match(/coordinates(\d+)/)
@@ -216,22 +218,24 @@ export const multipleCoordinatesController = {
     const siteDetails = exemption?.siteDetails ?? {}
     const payload = getPayload(siteDetails)
 
-    // Always display exactly 3 coordinates for ML-19 (no add/remove functionality)
+    // Always display exactly the required coordinates for ML-19 (no add/remove functionality)
     let coordinatesForDisplay = payload.coordinates || []
     if (coordinatesForDisplay.length === 0) {
-      coordinatesForDisplay = [
-        createNewCoordinate(coordinateSystem),
-        createNewCoordinate(coordinateSystem),
-        createNewCoordinate(coordinateSystem)
-      ]
+      coordinatesForDisplay = Array.from(
+        { length: REQUIRED_COORDINATES_COUNT },
+        () => createNewCoordinate(coordinateSystem)
+      )
     }
 
-    // Ensure we always have exactly 3 coordinates
-    while (coordinatesForDisplay.length < 3) {
+    // Ensure we always have exactly the required coordinates
+    while (coordinatesForDisplay.length < REQUIRED_COORDINATES_COUNT) {
       coordinatesForDisplay.push(createNewCoordinate(coordinateSystem))
     }
-    // Only show first 3 coordinates
-    coordinatesForDisplay = coordinatesForDisplay.slice(0, 3)
+    // Only show first required coordinates
+    coordinatesForDisplay = coordinatesForDisplay.slice(
+      0,
+      REQUIRED_COORDINATES_COUNT
+    )
 
     const context = generatePageContext({
       coordinates: coordinatesForDisplay,
@@ -294,12 +298,15 @@ export const multipleCoordinatesSubmitController = {
     const updatedSiteDetails = updatedExemption?.siteDetails ?? {}
     const updatedPayload = getPayload(updatedSiteDetails)
 
-    // Ensure exactly 3 coordinates for display
+    // Ensure exactly the required coordinates for display
     let coordinatesForDisplay = updatedPayload.coordinates || coordinates
-    while (coordinatesForDisplay.length < 3) {
+    while (coordinatesForDisplay.length < REQUIRED_COORDINATES_COUNT) {
       coordinatesForDisplay.push(createNewCoordinate(coordinateSystem))
     }
-    coordinatesForDisplay = coordinatesForDisplay.slice(0, 3)
+    coordinatesForDisplay = coordinatesForDisplay.slice(
+      0,
+      REQUIRED_COORDINATES_COUNT
+    )
 
     const context = generatePageContext({
       coordinates: coordinatesForDisplay,

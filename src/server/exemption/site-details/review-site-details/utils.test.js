@@ -4,7 +4,7 @@ import {
   getCoordinateDisplayText,
   getSiteDetailsBackLink
 } from '~/src/server/exemption/site-details/review-site-details/utils.js'
-import { COORDINATE_SYSTEMS } from '~/src/server/common/constants/exemptions.js'
+import { COORDINATE_SYSTEMS } from '~/src/server/common/constants/coordinates.js'
 import { mockExemption } from '~/src/server/test-helpers/mocks.js'
 import { routes } from '~/src/server/common/constants/routes.js'
 

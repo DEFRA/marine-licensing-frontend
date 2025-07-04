@@ -9,7 +9,7 @@ import {
 } from '~/src/server/common/helpers/errors.js'
 import { COORDINATE_ERROR_MESSAGES } from '~/src/server/common/helpers/site-details.js'
 import { routes } from '~/src/server/common/constants/routes.js'
-import { COORDINATE_SYSTEMS } from '~/src/server/common/constants/exemptions.js'
+import { COORDINATE_SYSTEMS } from '~/src/server/common/constants/coordinates.js'
 import { getPayload } from '~/src/server/exemption/site-details/centre-coordinates/utils.js'
 import { wgs84ValidationSchema } from '~/src/server/common/schemas/wgs84.js'
 import { osgb36ValidationSchema } from '~/src/server/common/schemas/osgb36.js'

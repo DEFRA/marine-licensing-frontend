@@ -1,5 +1,5 @@
 import { clone } from '@hapi/hoek'
-import { COORDINATE_SYSTEMS } from '~/src/server/common/constants/exemptions.js'
+import { COORDINATE_SYSTEMS } from '~/src/server/common/constants/coordinates.js'
 
 export const EXEMPTION_CACHE_KEY = 'exemption'
 

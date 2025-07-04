@@ -7,7 +7,7 @@ import {
   EXEMPTION_CACHE_KEY
 } from '~/src/server/common/helpers/session-cache/utils.js'
 import { clone } from '@hapi/hoek'
-import { COORDINATE_SYSTEMS } from '~/src/server/common/constants/exemptions.js'
+import { COORDINATE_SYSTEMS } from '~/src/server/common/constants/coordinates.js'
 
 jest.mock('@hapi/hoek', () => ({
   clone: jest.fn((data) => ({ ...data }))

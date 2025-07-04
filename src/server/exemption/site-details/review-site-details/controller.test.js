@@ -4,7 +4,7 @@ import {
   reviewSiteDetailsSubmitController,
   REVIEW_SITE_DETAILS_VIEW_ROUTE
 } from '~/src/server/exemption/site-details/review-site-details/controller.js'
-import { COORDINATE_SYSTEMS } from '~/src/server/common/constants/exemptions.js'
+import { COORDINATE_SYSTEMS } from '~/src/server/common/constants/coordinates.js'
 import * as cacheUtils from '~/src/server/common/helpers/session-cache/utils.js'
 import { mockExemption } from '~/src/server/test-helpers/mocks.js'
 import { statusCodes } from '~/src/server/common/constants/status-codes.js'

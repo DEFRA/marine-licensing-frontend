@@ -1,4 +1,4 @@
-import { COORDINATE_SYSTEMS } from '~/src/server/common/constants/exemptions.js'
+import { COORDINATE_SYSTEMS } from '~/src/server/common/constants/coordinates.js'
 import { routes } from '~/src/server/common/constants/routes.js'
 
 export const MULTIPLE_COORDINATES_VIEW_ROUTES = {

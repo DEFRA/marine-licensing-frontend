@@ -132,14 +132,14 @@ const handleValidationFailure = (request, h, error, coordinateSystem) => {
   )
 
   if (!error.details) {
-    const context = generatePageContext({
+    const errorContext = generatePageContext({
       coordinates,
       errors: {},
       projectName: exemption.projectName,
       backLink: multipleCoordinatesPageData.backLink
     })
     return h
-      .view(MULTIPLE_COORDINATES_VIEW_ROUTES[coordinateSystem], context)
+      .view(MULTIPLE_COORDINATES_VIEW_ROUTES[coordinateSystem], errorContext)
       .takeover()
   }
 

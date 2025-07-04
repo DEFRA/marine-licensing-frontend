@@ -555,13 +555,6 @@ describe('#fileUpload', () => {
         debug: jest.fn(),
         warn: jest.fn(),
         error: jest.fn()
-      },
-      server: {
-        plugins: {
-          crumb: {
-            generate: jest.fn().mockReturnValue('mock-csrf-token')
-          }
-        }
       }
     }
 

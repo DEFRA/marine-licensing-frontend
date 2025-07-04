@@ -1,3 +1,6 @@
+import { authenticatedGetRequest } from '~/src/server/common/helpers/authenticated-requests.js'
+import { formatProjectsForDisplay } from './utils.js'
+
 export const DASHBOARD_VIEW_ROUTE = 'exemption/dashboard/index.njk'
 
 /**
@@ -5,13 +8,25 @@ export const DASHBOARD_VIEW_ROUTE = 'exemption/dashboard/index.njk'
  * @param {import('@hapi/hapi').ResponseToolkit} h
  */
 export const dashboardController = {
-  handler: (request, h) => {
-    // Example projects data, replace with real data source
-    const projects = []
-    return h.view(DASHBOARD_VIEW_ROUTE, {
-      pageTitle: 'Projects Home',
-      heading: 'Projects Home',
-      projects
-    })
+  handler: async (request, h) => {
+    try {
+      const { payload } = await authenticatedGetRequest(request, '/exemptions')
+
+      const projects = payload.value ?? []
+
+      return h.view(DASHBOARD_VIEW_ROUTE, {
+        pageTitle: 'Projects Home',
+        heading: 'Projects Home',
+        projects: formatProjectsForDisplay(projects)
+      })
+    } catch (error) {
+      request.logger.error('Error fetching projects:', error)
+
+      return h.view(DASHBOARD_VIEW_ROUTE, {
+        pageTitle: 'Projects Home',
+        heading: 'Projects Home',
+        projects: []
+      })
+    }
   }
 }

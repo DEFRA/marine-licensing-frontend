@@ -4,10 +4,16 @@ import { routes } from '~/src/server/common/constants/routes.js'
 import { config } from '~/src/config/config.js'
 import { JSDOM } from 'jsdom'
 import { dashboardController, DASHBOARD_VIEW_ROUTE } from './controller.js'
+import { authenticatedGetRequest } from '~/src/server/common/helpers/authenticated-requests.js'
+import { formatProjectsForDisplay } from './utils.js'
+
+jest.mock('~/src/server/common/helpers/authenticated-requests.js')
 
 describe('#dashboard', () => {
   /** @type {Server} */
   let server
+
+  const authenticatedGetRequestMock = jest.mocked(authenticatedGetRequest)
 
   beforeAll(async () => {
     server = await createServer()
@@ -18,8 +24,16 @@ describe('#dashboard', () => {
     await server.stop({ timeout: 0 })
   })
 
+  beforeEach(() => {
+    jest.clearAllMocks()
+  })
+
   describe('#dashboardController', () => {
     test('Should provide expected response with correct page title', async () => {
+      authenticatedGetRequestMock.mockResolvedValueOnce({
+        payload: { value: [] }
+      })
+
       const { result, statusCode } = await server.inject({
         method: 'GET',
         url: routes.DASHBOARD
@@ -32,10 +46,15 @@ describe('#dashboard', () => {
       expect(statusCode).toBe(statusCodes.ok)
     })
 
-    test('Should render dashboard template with correct context', () => {
-      const h = { view: jest.fn() }
+    test('Should render dashboard template with correct context', async () => {
+      authenticatedGetRequestMock.mockResolvedValueOnce({
+        payload: { value: [] }
+      })
 
-      dashboardController.handler({}, h)
+      const h = { view: jest.fn() }
+      const request = { logger: { error: jest.fn() } }
+
+      await dashboardController.handler(request, h)
 
       expect(h.view).toHaveBeenCalledWith(DASHBOARD_VIEW_ROUTE, {
         pageTitle: 'Projects Home',
@@ -44,38 +63,40 @@ describe('#dashboard', () => {
       })
     })
 
-    test('Should display sortable table with correct structure when projects exist', () => {
+    test('Should display sortable table with correct structure when projects exist', async () => {
       const h = { view: jest.fn() }
-      const request = { logger: { info: jest.fn() } }
+      const request = { logger: { error: jest.fn() } }
 
       const projects = [
         {
-          name: 'Test Project',
+          projectName: 'Test Project',
           type: 'Exempt activity',
           reference: 'ML-2024-001',
           status: 'Draft',
-          dateSubmitted: null
+          submittedAt: null
         }
       ]
 
-      dashboardController.handler = (req, response) => {
-        return response.view(DASHBOARD_VIEW_ROUTE, {
-          pageTitle: 'Projects Home',
-          heading: 'Projects Home',
-          projects
-        })
-      }
+      const expectedFormattedProjects = formatProjectsForDisplay(projects)
 
-      dashboardController.handler(request, h)
+      authenticatedGetRequestMock.mockResolvedValueOnce({
+        payload: { value: projects }
+      })
+
+      await dashboardController.handler(request, h)
 
       expect(h.view).toHaveBeenCalledWith(DASHBOARD_VIEW_ROUTE, {
         pageTitle: 'Projects Home',
         heading: 'Projects Home',
-        projects
+        projects: expectedFormattedProjects
       })
     })
 
     test('Should display empty state when no projects exist', async () => {
+      authenticatedGetRequestMock.mockResolvedValueOnce({
+        payload: { value: [] }
+      })
+
       const { result } = await server.inject({
         method: 'GET',
         url: routes.DASHBOARD
@@ -89,44 +110,77 @@ describe('#dashboard', () => {
       )
     })
 
-    test('Should display projects data when projects exist', () => {
+    test('Should display projects data when projects exist', async () => {
       const h = { view: jest.fn() }
-      const request = { logger: { info: jest.fn() } }
+      const request = { logger: { error: jest.fn() } }
 
-      const originalHandler = dashboardController.handler
       const projects = [
         {
-          name: 'Test Project 1',
+          projectName: 'Test Project 1',
           type: 'Exempt activity',
           reference: 'ML-2024-001',
           status: 'Draft',
-          dateSubmitted: null
+          submittedAt: null
         },
         {
-          name: 'Test Project 2',
+          projectName: 'Test Project 2',
           type: 'Exempt activity',
           reference: 'ML-2024-002',
           status: 'Closed',
-          dateSubmitted: '2024-01-15'
+          submittedAt: '2024-01-15'
         }
       ]
-      dashboardController.handler = (req, response) => {
-        return response.view(DASHBOARD_VIEW_ROUTE, {
-          pageTitle: 'Projects Home',
-          heading: 'Projects Home',
-          projects
-        })
-      }
 
-      dashboardController.handler(request, h)
+      const expectedFormattedProjects = formatProjectsForDisplay(projects)
+
+      authenticatedGetRequestMock.mockResolvedValueOnce({
+        payload: { value: projects }
+      })
+
+      await dashboardController.handler(request, h)
 
       expect(h.view).toHaveBeenCalledWith(DASHBOARD_VIEW_ROUTE, {
         pageTitle: 'Projects Home',
         heading: 'Projects Home',
-        projects
+        projects: expectedFormattedProjects
+      })
+    })
+
+    test('Should handle API errors gracefully', async () => {
+      const h = { view: jest.fn() }
+      const request = { logger: { error: jest.fn() } }
+
+      authenticatedGetRequestMock.mockRejectedValueOnce(new Error('API Error'))
+
+      await dashboardController.handler(request, h)
+
+      expect(request.logger.error).toHaveBeenCalledWith(
+        'Error fetching projects:',
+        expect.any(Error)
+      )
+
+      expect(h.view).toHaveBeenCalledWith(DASHBOARD_VIEW_ROUTE, {
+        pageTitle: 'Projects Home',
+        heading: 'Projects Home',
+        projects: []
+      })
+    })
+
+    test('Should handle null payload from API', async () => {
+      const h = { view: jest.fn() }
+      const request = { logger: { error: jest.fn() } }
+
+      authenticatedGetRequestMock.mockResolvedValue({
+        payload: null
       })
 
-      dashboardController.handler = originalHandler
+      await dashboardController.handler(request, h)
+
+      expect(h.view).toHaveBeenCalledWith(DASHBOARD_VIEW_ROUTE, {
+        pageTitle: 'Projects Home',
+        heading: 'Projects Home',
+        projects: []
+      })
     })
   })
 })

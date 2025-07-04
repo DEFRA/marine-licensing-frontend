@@ -24,7 +24,7 @@ const transformCdpErrorToValidationError = (message, fileType) => {
   const errorKey = 'file'
 
   // Map CDP error messages to AC4 requirements
-  let errorMessage = message
+  let errorMessage
 
   if (message.includes('Select a file to upload')) {
     errorMessage = 'Select a file to upload'

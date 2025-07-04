@@ -119,7 +119,6 @@ describe('#fileUpload', () => {
             projectName: 'Test Project',
             acceptAttribute: '.kml',
             fileUploadType: 'kml',
-            showUploadForm: true,
             backLink: routes.CHOOSE_FILE_UPLOAD_TYPE,
             cancelLink: `${routes.TASK_LIST}?cancel=site-details`
           })
@@ -151,8 +150,7 @@ describe('#fileUpload', () => {
             heading: 'Upload a Shapefile',
             projectName: 'Test Project',
             acceptAttribute: '.zip',
-            fileUploadType: 'shapefile',
-            showUploadForm: true
+            fileUploadType: 'shapefile'
           })
         )
       })
@@ -436,8 +434,7 @@ describe('#fileUpload', () => {
           expect.objectContaining({
             uploadUrl: 'https://upload.example.com',
             maxFileSize: 50000000,
-            acceptAttribute: '.kml',
-            showUploadForm: true
+            acceptAttribute: '.kml'
           })
         )
       })
@@ -518,7 +515,6 @@ describe('#fileUpload', () => {
       expect(mockH.view).toHaveBeenCalledWith(
         FILE_UPLOAD_VIEW_ROUTE,
         expect.objectContaining({
-          showUploadForm: true,
           errorSummary: expect.any(Array),
           errors: expect.any(Object)
         })

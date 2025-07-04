@@ -98,7 +98,6 @@ export const fileUploadController = {
       exemption.siteDetails || {}
 
     if (!fileUploadType) {
-      // Redirect back to file type selection if no type chosen
       return h.redirect(routes.CHOOSE_FILE_UPLOAD_TYPE)
     }
 
@@ -150,6 +149,8 @@ export const fileUploadController = {
         statusUrl: uploadConfig.statusUrl,
         fileType: fileUploadType
       })
+
+      // Show the upload form
       return h.view(FILE_UPLOAD_VIEW_ROUTE, {
         ...pageSettings,
         ...fileTypeContent,
@@ -161,8 +162,7 @@ export const fileUploadController = {
         backLink: routes.CHOOSE_FILE_UPLOAD_TYPE,
         cancelLink: `${routes.TASK_LIST}?cancel=site-details`,
         errorSummary,
-        errors,
-        showUploadForm: true
+        errors
       })
     } catch (error) {
       request.logger.error('Failed to initialize file upload', {

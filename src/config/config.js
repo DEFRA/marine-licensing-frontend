@@ -7,6 +7,7 @@ const dirname = path.dirname(fileURLToPath(import.meta.url))
 const oneDay = 1000 * 60 * 60 * 24
 const fourHoursMs = 14400000
 const oneWeekMs = 604800000
+const fiftyMB = 50 * 1000 * 1000 // 50MB
 
 const isProduction = process.env.NODE_ENV === 'production'
 const isTest = process.env.NODE_ENV === 'test'
@@ -306,7 +307,7 @@ export const config = convict({
     maxFileSize: {
       doc: 'Maximum file size in bytes (50MB)',
       format: Number,
-      default: 50 * 1000 * 1000, // 50MB
+      default: fiftyMB,
       env: 'CDP_UPLOADER_MAX_FILE_SIZE'
     },
     s3Bucket: {

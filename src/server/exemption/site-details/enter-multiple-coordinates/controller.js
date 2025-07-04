@@ -36,7 +36,7 @@ const convertPayloadToCoordinatesArray = (payload, coordinateSystem) => {
   const useWGS84 = coordinateSystem === COORDINATE_SYSTEMS.WGS84
 
   Array.from(indices)
-    .sort()
+    .sort((a, b) => a - b)
     .forEach((index) => {
       const coordinate = {}
       if (useWGS84) {

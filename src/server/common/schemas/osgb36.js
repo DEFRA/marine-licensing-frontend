@@ -27,19 +27,19 @@ export const validateCoordinates = (value, helpers, type) => {
   const coordinate = Number(value)
 
   if (isNaN(coordinate)) {
-    return helpers.error(JOI_ERRORS.NUMBER_BASE)
+    return helpers.error('number.base')
   }
 
   if (coordinate <= 0) {
-    return helpers.error(JOI_ERRORS.NUMBER_POSITIVE)
+    return helpers.error('number.positive')
   }
 
   if (type === 'eastings' && !isEastingsInRange(coordinate)) {
-    return helpers.error(JOI_ERRORS.NUMBER_RANGE)
+    return helpers.error('number.range')
   }
 
   if (type === 'northings' && !isNorthingsInRange(coordinate)) {
-    return helpers.error(JOI_ERRORS.NUMBER_RANGE)
+    return helpers.error('number.range')
   }
 
   return value
@@ -51,7 +51,7 @@ const createOsgb36CoordinateSchema = (coordinateType, errorMessages) => {
   return joi
     .string()
     .required()
-    .pattern(/^-?\d+$/)
+    .pattern(/^-?\d+$/) // Only allow integers
     .custom((value, helpers) =>
       validateCoordinates(value, helpers, coordinateType)
     )
@@ -59,7 +59,7 @@ const createOsgb36CoordinateSchema = (coordinateType, errorMessages) => {
       [JOI_ERRORS.STRING_EMPTY]: errorMessages[`${messageKey}_REQUIRED`],
       [JOI_ERRORS.ANY_REQUIRED]: errorMessages[`${messageKey}_REQUIRED`],
       [JOI_ERRORS.STRING_PATTERN_BASE]:
-        errorMessages[`${messageKey}_WHOLE_NUMBER`],
+        errorMessages[`${messageKey}_NON_NUMERIC`],
       [JOI_ERRORS.NUMBER_BASE]: errorMessages[`${messageKey}_NON_NUMERIC`],
       [JOI_ERRORS.NUMBER_POSITIVE]:
         errorMessages[`${messageKey}_POSITIVE_NUMBER`],
@@ -68,11 +68,9 @@ const createOsgb36CoordinateSchema = (coordinateType, errorMessages) => {
 }
 
 const createBaseOsgb36Schema = (
-  allowDecimals = false,
   errorMessages = COORDINATE_ERROR_MESSAGES[COORDINATE_SYSTEMS.OSGB36]
 ) => {
-  const pattern = allowDecimals ? /^-?[\d.]+$/ : /^-?\d+$/
-  const northingsPattern = allowDecimals ? /^-?[\d.]+$/ : /^-?\d+$/
+  const pattern = /^-?\d+$/ // Only allow integers
 
   return joi.object({
     eastings: joi
@@ -84,9 +82,7 @@ const createBaseOsgb36Schema = (
       )
       .messages({
         [JOI_ERRORS.STRING_EMPTY]: errorMessages.EASTINGS_REQUIRED,
-        [JOI_ERRORS.STRING_PATTERN_BASE]: allowDecimals
-          ? errorMessages.EASTINGS_NON_NUMERIC
-          : errorMessages.EASTINGS_WHOLE_NUMBER,
+        [JOI_ERRORS.STRING_PATTERN_BASE]: errorMessages.EASTINGS_NON_NUMERIC,
         [JOI_ERRORS.NUMBER_BASE]: errorMessages.EASTINGS_NON_NUMERIC,
         [JOI_ERRORS.NUMBER_POSITIVE]: errorMessages.EASTINGS_POSITIVE_NUMBER,
         [JOI_ERRORS.NUMBER_RANGE]: errorMessages.EASTINGS_LENGTH,
@@ -95,15 +91,13 @@ const createBaseOsgb36Schema = (
     northings: joi
       .string()
       .required()
-      .pattern(northingsPattern)
+      .pattern(pattern)
       .custom((value, helpers) =>
         validateCoordinates(value, helpers, 'northings')
       )
       .messages({
         [JOI_ERRORS.STRING_EMPTY]: errorMessages.NORTHINGS_REQUIRED,
-        [JOI_ERRORS.STRING_PATTERN_BASE]: allowDecimals
-          ? errorMessages.NORTHINGS_NON_NUMERIC
-          : errorMessages.NORTHINGS_WHOLE_NUMBER,
+        [JOI_ERRORS.STRING_PATTERN_BASE]: errorMessages.NORTHINGS_NON_NUMERIC,
         [JOI_ERRORS.NUMBER_BASE]: errorMessages.NORTHINGS_NON_NUMERIC,
         [JOI_ERRORS.NUMBER_POSITIVE]: errorMessages.NORTHINGS_POSITIVE_NUMBER,
         [JOI_ERRORS.NUMBER_RANGE]: errorMessages.NORTHINGS_LENGTH,
@@ -112,7 +106,7 @@ const createBaseOsgb36Schema = (
   })
 }
 
-export const osgb36ValidationSchema = createBaseOsgb36Schema(true, {
+export const osgb36ValidationSchema = createBaseOsgb36Schema({
   EASTINGS_REQUIRED: 'EASTINGS_REQUIRED',
   EASTINGS_NON_NUMERIC: 'EASTINGS_NON_NUMERIC',
   EASTINGS_POSITIVE_NUMBER: 'EASTINGS_POSITIVE_NUMBER',
@@ -123,14 +117,14 @@ export const osgb36ValidationSchema = createBaseOsgb36Schema(true, {
   NORTHINGS_LENGTH: 'NORTHINGS_LENGTH'
 })
 
-export const osgb36IntegerValidationSchema = createBaseOsgb36Schema(false)
+export const osgb36IntegerValidationSchema = createBaseOsgb36Schema()
 
 export const createOsgb36PointSchema = (pointName) => {
   const pointSpecificMessages = createPointSpecificErrorMessages(
     pointName,
     COORDINATE_SYSTEMS.OSGB36
   )
-  return createBaseOsgb36Schema(false, pointSpecificMessages)
+  return createBaseOsgb36Schema(pointSpecificMessages)
 }
 
 export const createEastingsSchema = (pointName) => {

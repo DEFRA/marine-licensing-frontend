@@ -161,13 +161,23 @@ const processErrorDetail = (detail) => {
 }
 
 const createErrorSummary = (validationError) => {
-  return validationError.details.map((detail) => {
+  const seenFields = new Set()
+  const uniqueErrors = []
+
+  validationError.details.forEach((detail) => {
     const { fieldName, enhancedMessage } = processErrorDetail(detail)
-    return {
-      href: `#${fieldName}`,
-      text: enhancedMessage
+
+    // Fix Issue 2: Deduplicate errors - only show first error per field
+    if (!seenFields.has(fieldName)) {
+      seenFields.add(fieldName)
+      uniqueErrors.push({
+        href: `#${fieldName}`,
+        text: enhancedMessage
+      })
     }
   })
+
+  return uniqueErrors
 }
 
 const createFieldErrors = (validationError) => {
@@ -184,12 +194,23 @@ const createFieldErrors = (validationError) => {
 // === CONTEXT UTILITIES ===
 
 const createPageContextWithDefaults = (coordinates, errors, exemption) => {
-  return generatePageContext({
+  const context = generatePageContext({
     coordinates,
-    errors,
     projectName: exemption?.projectName,
     backLink: multipleCoordinatesPageData.backLink
   })
+
+  // Fix Issue 1: Only include errors object if there are actual errors
+  // This prevents "Error:" appearing in page title when there are no errors
+  const hasErrors = errors && Object.keys(errors).length > 0
+  if (hasErrors) {
+    context.errors = errors
+  }
+
+  // Fix Issue 1: Set pageTitle to prevent "Error:" prefix on clean pages
+  context.pageTitle = multipleCoordinatesPageData.heading
+
+  return context
 }
 
 const handleValidationFailure = (request, h, error, coordinateSystem) => {
@@ -216,11 +237,12 @@ const handleValidationFailure = (request, h, error, coordinateSystem) => {
 
   const context = createPageContextWithDefaults(coordinates, errors, exemption)
 
+  // Force errors to be included when we have validation errors and errorSummary
+  context.errors = errors
+  context.errorSummary = errorSummary
+
   return h
-    .view(MULTIPLE_COORDINATES_VIEW_ROUTES[coordinateSystem], {
-      ...context,
-      errorSummary
-    })
+    .view(MULTIPLE_COORDINATES_VIEW_ROUTES[coordinateSystem], context)
     .takeover()
 }
 

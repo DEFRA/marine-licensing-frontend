@@ -194,7 +194,7 @@ describe('#osgb36IntegerValidationSchema model', () => {
 
     const result = osgb36IntegerValidationSchema.validate(request)
 
-    expect(result.error.message).toContain('Eastings must be a whole number')
+    expect(result.error.message).toContain('Eastings must be a number')
   })
 
   test('Should correctly validate when northings contains decimal number', () => {
@@ -205,7 +205,7 @@ describe('#osgb36IntegerValidationSchema model', () => {
 
     const result = osgb36IntegerValidationSchema.validate(request)
 
-    expect(result.error.message).toContain('Northings must be a whole number')
+    expect(result.error.message).toContain('Northings must be a number')
   })
 
   test('Should correctly validate when eastings contains non-numeric characters', () => {
@@ -216,7 +216,7 @@ describe('#osgb36IntegerValidationSchema model', () => {
 
     const result = osgb36IntegerValidationSchema.validate(request)
 
-    expect(result.error.message).toContain('Eastings must be a whole number')
+    expect(result.error.message).toContain('Eastings must be a number')
   })
 
   test('Should correctly validate when northings contains non-numeric characters', () => {
@@ -227,7 +227,7 @@ describe('#osgb36IntegerValidationSchema model', () => {
 
     const result = osgb36IntegerValidationSchema.validate(request)
 
-    expect(result.error.message).toContain('Northings must be a whole number')
+    expect(result.error.message).toContain('Northings must be a number')
   })
 
   test('Should correctly validate when eastings is below minimum range', () => {
@@ -361,7 +361,7 @@ describe('#createEastingsSchema', () => {
     const result = schema.validate('42505a')
 
     expect(result.error.message).toContain(
-      'Eastings of point 3 must be a whole number'
+      'Eastings of point 3 must be a number'
     )
   })
 
@@ -370,7 +370,7 @@ describe('#createEastingsSchema', () => {
     const result = schema.validate('425053.5')
 
     expect(result.error.message).toContain(
-      'Eastings of point 2 must be a whole number'
+      'Eastings of point 2 must be a number'
     )
   })
 
@@ -462,7 +462,7 @@ describe('#createNorthingsSchema', () => {
     const result = schema.validate('56418b')
 
     expect(result.error.message).toContain(
-      'Northings of point 2 must be a whole number'
+      'Northings of point 2 must be a number'
     )
   })
 
@@ -471,7 +471,7 @@ describe('#createNorthingsSchema', () => {
     const result = schema.validate('564180.7')
 
     expect(result.error.message).toContain(
-      'Northings of point 4 must be a whole number'
+      'Northings of point 4 must be a number'
     )
   })
 

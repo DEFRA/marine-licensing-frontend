@@ -1,11 +1,11 @@
-import {
-  osgb36ValidationSchema,
-  osgb36IntegerValidationSchema,
-  createEastingsSchema,
-  createNorthingsSchema
-} from '~/src/server/common/schemas/osgb36.js'
-import { COORDINATE_SYSTEMS } from '~/src/server/common/constants/coordinates.js'
 import joi from 'joi'
+import { COORDINATE_SYSTEMS } from '~/src/server/common/constants/coordinates.js'
+import {
+  createEastingsSchema,
+  createNorthingsSchema,
+  osgb36IntegerValidationSchema,
+  osgb36ValidationSchema
+} from '~/src/server/common/schemas/osgb36.js'
 
 const mockCoordinates = {
   [COORDINATE_SYSTEMS.OSGB36]: { eastings: '425053', northings: '564180' }
@@ -308,7 +308,9 @@ describe('#osgb36IntegerValidationSchema model', () => {
 
     const result = osgb36IntegerValidationSchema.validate(request)
 
-    expect(result.error.message).toContain('Eastings must be a whole number')
+    expect(result.error.message).toContain(
+      'Eastings must be a positive 6-digit number, like 123456'
+    )
   })
 
   test('Should correctly validate when northings is negative', () => {
@@ -319,7 +321,9 @@ describe('#osgb36IntegerValidationSchema model', () => {
 
     const result = osgb36IntegerValidationSchema.validate(request)
 
-    expect(result.error.message).toContain('Northings must be a whole number')
+    expect(result.error.message).toContain(
+      'Northings must be a positive 6 or 7-digit number, like 123456'
+    )
   })
 })
 
@@ -393,7 +397,7 @@ describe('#createEastingsSchema', () => {
     const result = schema.validate('-425053')
 
     expect(result.error.message).toContain(
-      'Eastings of point 2 must be a whole number'
+      'Eastings of point 2 must be a positive 6-digit number, like 123456'
     )
   })
 
@@ -494,7 +498,7 @@ describe('#createNorthingsSchema', () => {
     const result = schema.validate('-564180')
 
     expect(result.error.message).toContain(
-      'Northings of point 3 must be a whole number'
+      'Northings of point 3 must be a positive 6 or 7-digit number, like 123456'
     )
   })
 

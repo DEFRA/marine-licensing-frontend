@@ -51,7 +51,7 @@ const createOsgb36CoordinateSchema = (coordinateType, errorMessages) => {
   return joi
     .string()
     .required()
-    .pattern(/^\d+$/)
+    .pattern(/^-?\d+$/)
     .custom((value, helpers) =>
       validateCoordinates(value, helpers, coordinateType)
     )
@@ -71,8 +71,8 @@ const createBaseOsgb36Schema = (
   allowDecimals = false,
   errorMessages = COORDINATE_ERROR_MESSAGES[COORDINATE_SYSTEMS.OSGB36]
 ) => {
-  const pattern = allowDecimals ? /^[\d.]+$/ : /^\d+$/
-  const northingsPattern = allowDecimals ? /^-?[\d.]+$/ : /^\d+$/
+  const pattern = allowDecimals ? /^-?[\d.]+$/ : /^-?\d+$/
+  const northingsPattern = allowDecimals ? /^-?[\d.]+$/ : /^-?\d+$/
 
   return joi.object({
     eastings: joi

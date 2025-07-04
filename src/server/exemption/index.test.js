@@ -1,7 +1,39 @@
 import { exemption } from '~/src/server/exemption/index.js'
 
 describe('exemption route', () => {
-  test('route is registered correctly', () => {
+  const expectedRoutes = [
+    ['GET', '/exemption/project-name'],
+    ['POST', '/exemption/project-name'],
+    ['GET', '/exemption/public-register'],
+    ['POST', '/exemption/public-register'],
+    ['GET', '/exemption/task-list'],
+    ['GET', '/exemption/how-do-you-want-to-provide-the-coordinates'],
+    ['POST', '/exemption/how-do-you-want-to-provide-the-coordinates'],
+    ['GET', '/exemption/how-do-you-want-to-enter-the-coordinates'],
+    ['POST', '/exemption/how-do-you-want-to-enter-the-coordinates'],
+    ['GET', '/exemption/what-coordinate-system'],
+    ['POST', '/exemption/what-coordinate-system'],
+    ['GET', '/exemption/enter-the-coordinates-at-the-centre-point'],
+    ['POST', '/exemption/enter-the-coordinates-at-the-centre-point'],
+    ['GET', '/exemption/enter-multiple-coordinates'],
+    ['POST', '/exemption/enter-multiple-coordinates'],
+    ['GET', '/exemption/width-of-site'],
+    ['POST', '/exemption/width-of-site'],
+    ['GET', '/exemption/review-site-details'],
+    ['POST', '/exemption/review-site-details'],
+    ['GET', '/exemption/choose-file-type-to-upload'],
+    ['POST', '/exemption/choose-file-type-to-upload'],
+    ['GET', '/exemption/activity-dates'],
+    ['POST', '/exemption/activity-dates'],
+    ['GET', '/exemption/activity-description'],
+    ['POST', '/exemption/activity-description'],
+    ['GET', '/exemption/check-your-answers'],
+    ['POST', '/exemption/check-your-answers'],
+    ['GET', '/exemption/confirmation'],
+    ['GET', '/exemption']
+  ]
+
+  test('routes are registered correctly', () => {
     const server = {
       route: jest.fn()
     }
@@ -9,124 +41,26 @@ describe('exemption route', () => {
     exemption.plugin.register(server)
 
     expect(server.route).toHaveBeenCalledTimes(1)
-    expect(server.route).toHaveBeenCalledWith([
-      expect.objectContaining({
-        method: 'GET',
-        path: '/exemption/project-name'
-      }),
-      expect.objectContaining({
-        method: 'POST',
-        path: '/exemption/project-name'
-      }),
-      expect.objectContaining({
-        method: 'GET',
-        path: '/exemption/public-register'
-      }),
-      expect.objectContaining({
-        method: 'POST',
-        path: '/exemption/public-register'
-      }),
-      expect.objectContaining({
-        method: 'GET',
-        path: '/exemption/task-list'
-      }),
-      expect.objectContaining({
-        method: 'GET',
-        path: '/exemption/how-do-you-want-to-provide-the-coordinates'
-      }),
-      expect.objectContaining({
-        method: 'POST',
-        path: '/exemption/how-do-you-want-to-provide-the-coordinates'
-      }),
-      expect.objectContaining({
-        method: 'GET',
-        path: '/exemption/how-do-you-want-to-enter-the-coordinates'
-      }),
-      expect.objectContaining({
-        method: 'POST',
-        path: '/exemption/how-do-you-want-to-enter-the-coordinates'
-      }),
-      expect.objectContaining({
-        method: 'GET',
-        path: '/exemption/what-coordinate-system'
-      }),
-      expect.objectContaining({
-        method: 'POST',
-        path: '/exemption/what-coordinate-system'
-      }),
-      expect.objectContaining({
-        method: 'GET',
-        path: '/exemption/enter-the-coordinates-at-the-centre-point'
-      }),
-      expect.objectContaining({
-        method: 'POST',
-        path: '/exemption/enter-the-coordinates-at-the-centre-point'
-      }),
-      expect.objectContaining({
-        method: 'GET',
-        path: '/exemption/enter-multiple-coordinates'
-      }),
-      expect.objectContaining({
-        method: 'POST',
-        path: '/exemption/enter-multiple-coordinates'
-      }),
-      expect.objectContaining({
-        method: 'GET',
-        path: '/exemption/width-of-site'
-      }),
-      expect.objectContaining({
-        method: 'POST',
-        path: '/exemption/width-of-site'
-      }),
-      expect.objectContaining({
-        method: 'GET',
-        path: '/exemption/review-site-details'
-      }),
-      expect.objectContaining({
-        method: 'POST',
-        path: '/exemption/review-site-details'
-      }),
-      expect.objectContaining({
-        method: 'GET',
-        path: '/exemption/choose-file-type-to-upload'
-      }),
-      expect.objectContaining({
-        method: 'POST',
-        path: '/exemption/choose-file-type-to-upload'
-      }),
-      expect.objectContaining({
-        method: 'GET',
-        path: '/exemption/activity-dates'
-      }),
-      expect.objectContaining({
-        method: 'POST',
-        path: '/exemption/activity-dates'
-      }),
-      expect.objectContaining({
-        method: 'GET',
-        path: '/exemption/activity-description'
-      }),
-      expect.objectContaining({
-        method: 'POST',
-        path: '/exemption/activity-description'
-      }),
-      expect.objectContaining({
-        method: 'GET',
-        path: '/exemption/check-your-answers'
-      }),
-      expect.objectContaining({
-        method: 'POST',
-        path: '/exemption/check-your-answers'
-      }),
-      expect.objectContaining({
-        method: 'GET',
-        path: '/exemption/confirmation'
-      }),
-      expect.objectContaining({
-        method: 'GET',
-        path: '/exemption'
-      })
-    ])
+    expect(server.route).toHaveBeenCalledWith(
+      expectedRoutes.map(([method, path]) =>
+        expect.objectContaining({ method, path })
+      )
+    )
+  })
+
+  it.each(expectedRoutes)('registers %s %s route', (method, path) => {
+    const server = {
+      route: jest.fn()
+    }
+
+    exemption.plugin.register(server)
+
+    const registeredRoutes = server.route.mock.calls[0][0]
+    const routeExists = registeredRoutes.some(
+      (route) => route.method === method && route.path === path
+    )
+
+    expect(routeExists).toBe(true)
   })
 
   test('handler should redirect to /exemption/project-name', () => {

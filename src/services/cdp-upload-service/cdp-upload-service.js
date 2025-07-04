@@ -326,7 +326,9 @@ export class CdpUploadService {
    * @private
    */
   _validateHttpResponse(res, endpoint, uploadId) {
-    if (res.statusCode < 200 || res.statusCode >= 300) {
+    const HTTP_200 = 200
+    const HTTP_300 = 300
+    if (res.statusCode < HTTP_200 || res.statusCode >= HTTP_300) {
       const errorMessage = `API call failed with status: ${res.statusCode}`
       const logContext = {
         status: res.statusCode,
@@ -614,7 +616,7 @@ export class CdpUploadService {
   }
 
   async _makeStatusRequest(statusUrl) {
-    return await Wreck.get(statusUrl, {
+    return Wreck.get(statusUrl, {
       json: true,
       timeout: this.config.timeout
     })

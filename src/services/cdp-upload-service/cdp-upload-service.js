@@ -47,7 +47,6 @@ const CDP_CONSTANTS = {
     FILE_EMPTY: 'FILE_EMPTY',
     FILE_TOO_LARGE: 'FILE_TOO_LARGE',
     INVALID_FILE_TYPE: 'INVALID_FILE_TYPE',
-    PASSWORD_PROTECTED: 'PASSWORD_PROTECTED',
     UPLOAD_ERROR: 'UPLOAD_ERROR'
   },
 
@@ -83,7 +82,6 @@ const CDP_CONSTANTS = {
       keywords: ['must be a', 'KML file', 'Shapefile'],
       code: 'INVALID_FILE_TYPE'
     },
-    { keywords: ['password protected'], code: 'PASSWORD_PROTECTED' },
     { keywords: ['could not be uploaded'], code: 'UPLOAD_ERROR' }
   ]
 }

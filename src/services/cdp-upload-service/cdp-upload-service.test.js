@@ -604,34 +604,6 @@ describe('#CdpUploadService', () => {
         expect(result.errorCode).toBe('INVALID_FILE_TYPE')
       })
 
-      test('Should handle password protected file error (AC4)', async () => {
-        // Given
-        const errorResponse = {
-          uploadStatus: 'ready',
-          form: {
-            file: {
-              filename: 'protected.zip',
-              fileStatus: 'rejected',
-              hasError: true,
-              errorMessage: 'The selected file is password protected'
-            }
-          }
-        }
-
-        Wreck.get.mockResolvedValue({
-          res: { statusCode: 200 },
-          payload: errorResponse
-        })
-
-        // When
-        const result = await service.getStatus(mockUploadId, mockStatusUrl)
-
-        // Then
-        expect(result.status).toBe('rejected')
-        expect(result.message).toBe('The selected file is password protected')
-        expect(result.errorCode).toBe('PASSWORD_PROTECTED')
-      })
-
       test('Should handle generic upload error (AC4)', async () => {
         // Given
         const errorResponse = {

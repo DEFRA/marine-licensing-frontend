@@ -215,10 +215,6 @@ describe('#uploadAndWait', () => {
           expected: 'The selected file must be smaller than 50 MB'
         },
         {
-          message: 'file is password protected',
-          expected: 'The selected file is password protected'
-        },
-        {
           message: 'must be a kml file',
           expected: 'The selected file must be a KML file'
         },

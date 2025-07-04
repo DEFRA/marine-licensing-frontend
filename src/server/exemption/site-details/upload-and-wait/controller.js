@@ -34,8 +34,6 @@ const transformCdpErrorToValidationError = (message, fileType) => {
     errorMessage = 'The selected file is empty'
   } else if (message.includes('smaller than')) {
     errorMessage = 'The selected file must be smaller than 50 MB'
-  } else if (message.includes('password protected')) {
-    errorMessage = 'The selected file is password protected'
   } else if (message.includes('must be a')) {
     // Contextualize file type error based on selected type
     if (fileType === 'kml') {

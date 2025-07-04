@@ -27,9 +27,10 @@ const MIME_TYPES = {
   ]
 }
 
+const UPLOAD_A_FILE = 'Upload a file'
 const pageSettings = {
-  pageTitle: 'Upload a file',
-  heading: 'Upload a file'
+  pageTitle: UPLOAD_A_FILE,
+  heading: UPLOAD_A_FILE
 }
 
 /**
@@ -59,7 +60,7 @@ const getFileTypeContent = (fileUploadType) => {
     }
   }
   return {
-    heading: 'Upload a file',
+    heading: UPLOAD_A_FILE,
     acceptAttribute: ''
   }
 }

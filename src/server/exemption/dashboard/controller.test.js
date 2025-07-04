@@ -43,7 +43,7 @@ describe('#dashboard', () => {
       })
 
       expect(result).toEqual(
-        expect.stringContaining(`Projects Home | ${config.get('serviceName')}`)
+        expect.stringContaining(`Your projects | ${config.get('serviceName')}`)
       )
 
       expect(statusCode).toBe(statusCodes.ok)
@@ -60,8 +60,8 @@ describe('#dashboard', () => {
       await dashboardController.handler(request, h)
 
       expect(h.view).toHaveBeenCalledWith(DASHBOARD_VIEW_ROUTE, {
-        pageTitle: 'Projects Home',
-        heading: 'Projects Home',
+        pageTitle: 'Your projects',
+        heading: 'Your projects',
         projects: []
       })
     })
@@ -89,8 +89,8 @@ describe('#dashboard', () => {
       await dashboardController.handler(request, h)
 
       expect(h.view).toHaveBeenCalledWith(DASHBOARD_VIEW_ROUTE, {
-        pageTitle: 'Projects Home',
-        heading: 'Projects Home',
+        pageTitle: 'Your projects',
+        heading: 'Your projects',
         projects: expectedFormattedProjects
       })
     })
@@ -143,8 +143,8 @@ describe('#dashboard', () => {
       await dashboardController.handler(request, h)
 
       expect(h.view).toHaveBeenCalledWith(DASHBOARD_VIEW_ROUTE, {
-        pageTitle: 'Projects Home',
-        heading: 'Projects Home',
+        pageTitle: 'Your projects',
+        heading: 'Your projects',
         projects: expectedFormattedProjects
       })
     })
@@ -163,8 +163,8 @@ describe('#dashboard', () => {
       )
 
       expect(h.view).toHaveBeenCalledWith(DASHBOARD_VIEW_ROUTE, {
-        pageTitle: 'Projects Home',
-        heading: 'Projects Home',
+        pageTitle: 'Your projects',
+        heading: 'Your projects',
         projects: []
       })
     })
@@ -180,8 +180,8 @@ describe('#dashboard', () => {
       await dashboardController.handler(request, h)
 
       expect(h.view).toHaveBeenCalledWith(DASHBOARD_VIEW_ROUTE, {
-        pageTitle: 'Projects Home',
-        heading: 'Projects Home',
+        pageTitle: 'Your projects',
+        heading: 'Your projects',
         projects: []
       })
     })

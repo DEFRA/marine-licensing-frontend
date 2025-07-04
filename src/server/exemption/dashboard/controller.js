@@ -2,6 +2,7 @@ import { authenticatedGetRequest } from '~/src/server/common/helpers/authenticat
 import { formatProjectsForDisplay } from './utils.js'
 
 export const DASHBOARD_VIEW_ROUTE = 'exemption/dashboard/index.njk'
+const DASHBOARD_PAGE_TITLE = 'Your projects'
 
 /**
  * @param {import('@hapi/hapi').Request} request
@@ -15,16 +16,16 @@ export const dashboardController = {
       const projects = payload.value ?? []
 
       return h.view(DASHBOARD_VIEW_ROUTE, {
-        pageTitle: 'Projects Home',
-        heading: 'Projects Home',
+        pageTitle: DASHBOARD_PAGE_TITLE,
+        heading: DASHBOARD_PAGE_TITLE,
         projects: formatProjectsForDisplay(projects)
       })
     } catch (error) {
       request.logger.error('Error fetching projects:', error)
 
       return h.view(DASHBOARD_VIEW_ROUTE, {
-        pageTitle: 'Projects Home',
-        heading: 'Projects Home',
+        pageTitle: DASHBOARD_PAGE_TITLE,
+        heading: DASHBOARD_PAGE_TITLE,
         projects: []
       })
     }

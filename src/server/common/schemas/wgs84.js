@@ -13,15 +13,6 @@ const {
   DECIMAL_PLACES: LAT_LONG_DECIMAL_PLACES
 } = WGS84_CONSTANTS
 
-export {
-  LAT_LONG_DECIMAL_PLACES,
-  MAX_LATITUDE,
-  MAX_LONGITUDE,
-  MIN_COORDINATE_POINTS,
-  MIN_LATITUDE,
-  MIN_LONGITUDE
-}
-
 const isLatitudeInRange = (coordinate) =>
   coordinate >= MIN_LATITUDE && coordinate <= MAX_LATITUDE
 

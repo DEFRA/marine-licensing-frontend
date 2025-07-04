@@ -6,6 +6,7 @@ export const MAX_LATITUDE = 90
 export const MIN_LONGITUDE = -180
 export const MAX_LONGITUDE = 180
 export const LAT_LONG_DECIMAL_PLACES = 6
+export const MIN_COORDINATE_POINTS = 3
 
 const isLatitudeInRange = (coordinate) =>
   coordinate >= MIN_LATITUDE && coordinate <= MAX_LATITUDE
@@ -46,7 +47,7 @@ export const wgs84ValidationSchema = joi.object({
   latitude: joi
     .string()
     .required()
-    .pattern(/^-?[0-9.]+$/)
+    .pattern(/^-?[\d.]+$/)
     .custom((value, helpers) => validateCoordinates(value, helpers, 'latitude'))
     .custom((value, helpers) => validateDecimals(value, helpers))
     .messages({
@@ -60,7 +61,7 @@ export const wgs84ValidationSchema = joi.object({
   longitude: joi
     .string()
     .required()
-    .pattern(/^-?[0-9.]+$/)
+    .pattern(/^-?[\d.]+$/)
     .custom((value, helpers) =>
       validateCoordinates(value, helpers, 'longitude')
     )
@@ -84,7 +85,7 @@ export const createLatitudeSchema = (pointName) => {
   return joi
     .string()
     .required()
-    .pattern(/^-?[0-9.]+$/)
+    .pattern(/^-?[\d.]+$/)
     .custom((value, helpers) => validateCoordinates(value, helpers, 'latitude'))
     .custom((value, helpers) => validateDecimals(value, helpers))
     .messages({
@@ -106,7 +107,7 @@ export const createLongitudeSchema = (pointName) => {
   return joi
     .string()
     .required()
-    .pattern(/^-?[0-9.]+$/)
+    .pattern(/^-?[\d.]+$/)
     .custom((value, helpers) =>
       validateCoordinates(value, helpers, 'longitude')
     )
@@ -126,7 +127,7 @@ export const wgs84MultipleCoordinateItemSchema = joi.object({
   latitude: joi
     .string()
     .required()
-    .pattern(/^-?[0-9.]+$/)
+    .pattern(/^-?[\d.]+$/)
     .custom((value, helpers) => validateCoordinates(value, helpers, 'latitude'))
     .custom((value, helpers) => validateDecimals(value, helpers))
     .messages({
@@ -141,7 +142,7 @@ export const wgs84MultipleCoordinateItemSchema = joi.object({
   longitude: joi
     .string()
     .required()
-    .pattern(/^-?[0-9.]+$/)
+    .pattern(/^-?[\d.]+$/)
     .custom((value, helpers) =>
       validateCoordinates(value, helpers, 'longitude')
     )
@@ -167,11 +168,11 @@ export const createWgs84MultipleCoordinatesSchema = () => {
     .object({
       coordinates: joi
         .array()
-        .min(3)
+        .min(MIN_COORDINATE_POINTS)
         .items(wgs84MultipleCoordinateItemSchema)
         .required()
         .messages({
-          'array.min': 'You must provide at least 3 coordinate points',
+          'array.min': `You must provide at least ${MIN_COORDINATE_POINTS} coordinate points`,
           'any.required': 'Coordinates are required'
         })
     })

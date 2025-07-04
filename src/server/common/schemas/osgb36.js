@@ -10,6 +10,7 @@ export const MIN_EASTINGS_LENGTH = 100000
 export const MAX_EASTINGS_LENGTH = 999999
 export const MIN_NORTHINGS_LENGTH = 100000
 export const MAX_NORTHINGS_LENGTH = 9999999
+export const MIN_COORDINATE_POINTS = 3
 
 const isEastingsInRange = (coordinate) =>
   coordinate >= MIN_EASTINGS_LENGTH && coordinate <= MAX_EASTINGS_LENGTH
@@ -49,8 +50,8 @@ const createBaseOsgb36Schema = (
   allowDecimals = false,
   errorMessages = COORDINATE_ERROR_MESSAGES[COORDINATE_SYSTEMS.OSGB36]
 ) => {
-  const pattern = allowDecimals ? /^[0-9.]+$/ : /^[0-9]+$/
-  const northingsPattern = allowDecimals ? /^-?[0-9.]+$/ : /^[0-9]+$/
+  const pattern = allowDecimals ? /^[\d.]+$/ : /^\d+$/
+  const northingsPattern = allowDecimals ? /^-?[\d.]+$/ : /^\d+$/
 
   return joi.object({
     eastings: joi
@@ -132,7 +133,7 @@ export const createEastingsSchema = (pointName) => {
   return joi
     .string()
     .required()
-    .pattern(/^[0-9]+$/)
+    .pattern(/^\d+$/)
     .custom((value, helpers) => validateCoordinates(value, helpers, 'eastings'))
     .messages({
       [JOI_ERRORS.STRING_EMPTY]: pointSpecificMessages.EASTINGS_REQUIRED,
@@ -160,7 +161,7 @@ export const createNorthingsSchema = (pointName) => {
   return joi
     .string()
     .required()
-    .pattern(/^[0-9]+$/)
+    .pattern(/^\d+$/)
     .custom((value, helpers) =>
       validateCoordinates(value, helpers, 'northings')
     )
@@ -186,11 +187,11 @@ export const createOsgb36MultipleCoordinatesSchema = () => {
     .object({
       coordinates: joi
         .array()
-        .min(3)
+        .min(MIN_COORDINATE_POINTS)
         .items(osgb36IntegerValidationSchema)
         .required()
         .messages({
-          'array.min': 'You must provide at least 3 coordinate points',
+          'array.min': `You must provide at least ${MIN_COORDINATE_POINTS} coordinate points`,
           'any.required': 'Coordinates are required'
         })
     })

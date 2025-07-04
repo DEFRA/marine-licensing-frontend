@@ -1,3 +1,5 @@
+import { formatDate } from '~/src/config/nunjucks/filters/format-date.js'
+
 export const formatProjectsForDisplay = (projects) =>
   projects.map((project) => {
     const tagClass =
@@ -6,10 +8,14 @@ export const formatProjectsForDisplay = (projects) =>
     return [
       { text: project.projectName },
       { text: project.type },
-      { text: project.reference || '-' },
+      { text: project.applicationReference || '-' },
       {
         html: `<strong class="govuk-tag ${tagClass}">${project.status}</strong>`
       },
-      { text: project.submittedAt || '-' }
+      {
+        text: project.submittedAt
+          ? formatDate(project.submittedAt, 'dd MMM yyyy')
+          : '-'
+      }
     ]
   })

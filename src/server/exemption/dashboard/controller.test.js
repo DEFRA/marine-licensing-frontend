@@ -6,14 +6,17 @@ import { JSDOM } from 'jsdom'
 import { dashboardController, DASHBOARD_VIEW_ROUTE } from './controller.js'
 import { authenticatedGetRequest } from '~/src/server/common/helpers/authenticated-requests.js'
 import { formatProjectsForDisplay } from './utils.js'
+import { formatDate } from '~/src/config/nunjucks/filters/format-date.js'
 
 jest.mock('~/src/server/common/helpers/authenticated-requests.js')
+jest.mock('~/src/config/nunjucks/filters/format-date.js')
 
 describe('#dashboard', () => {
   /** @type {Server} */
   let server
 
   const authenticatedGetRequestMock = jest.mocked(authenticatedGetRequest)
+  jest.mocked(formatDate).mockReturnValue('01 Jan 2024')
 
   beforeAll(async () => {
     server = await createServer()

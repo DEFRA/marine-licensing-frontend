@@ -58,10 +58,11 @@ const getFileTypeContent = (fileUploadType) => {
       heading: 'Upload a Shapefile',
       acceptAttribute: '.zip'
     }
-  }
-  return {
-    heading: UPLOAD_A_FILE,
-    acceptAttribute: ''
+  } else {
+    return {
+      heading: UPLOAD_A_FILE,
+      acceptAttribute: ''
+    }
   }
 }
 

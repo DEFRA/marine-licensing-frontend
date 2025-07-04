@@ -137,7 +137,7 @@ const convertArrayErrorsToFlattenedErrors = (error) => {
         if (index === 0) {
           return segment
         }
-        return typeof segment === 'number' ? `[${segment}]` : `[${segment}]`
+        return `[${segment}]`
       })
       .join('')
 

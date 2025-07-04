@@ -26,8 +26,12 @@ jest.mock('~/src/config/config.js', () => ({
           format: 'ecs'
         }
       }
-      if (key === 'serviceName') return 'TestService'
-      if (key === 'serviceVersion') return '1.0.0'
+      if (key === 'serviceName') {
+        return 'TestService'
+      }
+      if (key === 'serviceVersion') {
+        return '1.0.0'
+      }
       return {}
     })
   }

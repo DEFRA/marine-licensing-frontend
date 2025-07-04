@@ -81,14 +81,20 @@ const getValidationSchema = (coordinateSystem) => {
  * @returns {object} Converted error with flattened field names
  */
 const convertArrayErrorsToFlattenedErrors = (error) => {
-  if (!error.details) return error
+  if (!error.details) {
+    return error
+  }
 
   const convertedDetails = error.details.map((detail) => {
     // Convert array path like coordinates.0.latitude to coordinates[0][latitude]
     const path = detail.path
       .map((segment, index) => {
-        if (index === 0) return segment // coordinates
-        if (typeof segment === 'number') return `[${segment}]` // [0]
+        if (index === 0) {
+          return segment
+        } // coordinates
+        if (typeof segment === 'number') {
+          return `[${segment}]`
+        } // [0]
         return `[${segment}]` // [latitude]
       })
       .join('')

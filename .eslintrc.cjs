@@ -42,6 +42,7 @@ module.exports = {
           }
         ],
         'no-console': 'error',
+        curly: ['error', 'all'],
 
         // Turn off strict type checking rules
         '@typescript-eslint/no-unsafe-argument': 'off',

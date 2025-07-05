@@ -1,43 +1,67 @@
 import { COORDINATE_SYSTEMS } from '~/src/server/common/constants/coordinates.js'
-import { routes } from '~/src/server/common/constants/routes.js'
+
+const REQUIRED_COORDINATES_COUNT = 3
+
+const COORDINATE_FIELDS = {
+  WGS84: {
+    primary: 'latitude',
+    secondary: 'longitude'
+  },
+  OSGB36: {
+    primary: 'eastings',
+    secondary: 'northings'
+  }
+}
+
+// === COORDINATE SYSTEM UTILITIES ===
+
+const isWGS84 = (coordinateSystem) =>
+  coordinateSystem === COORDINATE_SYSTEMS.WGS84
+
+const getCoordinateFields = (coordinateSystem) =>
+  isWGS84(coordinateSystem) ? COORDINATE_FIELDS.WGS84 : COORDINATE_FIELDS.OSGB36
+
+const createEmptyCoordinate = (coordinateSystem) => {
+  const fields = getCoordinateFields(coordinateSystem)
+  return { [fields.primary]: '', [fields.secondary]: '' }
+}
+
+// === COORDINATE DISPLAY UTILITIES ===
+
+const createDefaultCoordinates = (coordinateSystem) => {
+  return Array.from({ length: REQUIRED_COORDINATES_COUNT }, () =>
+    createEmptyCoordinate(coordinateSystem)
+  )
+}
+
+/**
+ * Normalise coordinates for display - ensures exactly 3 coordinates with empty defaults
+ * @param {Array} coordinates - Coordinate data
+ * @param {string} coordinateSystem - Coordinate system type
+ * @returns {Array} Array of exactly 3 coordinates
+ */
+export const normaliseCoordinatesForDisplay = (
+  coordinates,
+  coordinateSystem
+) => {
+  const displayCoordinates = coordinates || []
+
+  if (displayCoordinates.length === 0) {
+    return createDefaultCoordinates(coordinateSystem)
+  }
+
+  while (displayCoordinates.length < REQUIRED_COORDINATES_COUNT) {
+    displayCoordinates.push(createEmptyCoordinate(coordinateSystem))
+  }
+
+  return displayCoordinates.slice(0, REQUIRED_COORDINATES_COUNT)
+}
+
+// === EXISTING EXPORTS ===
 
 export const MULTIPLE_COORDINATES_VIEW_ROUTES = {
   [COORDINATE_SYSTEMS.WGS84]:
     'exemption/site-details/enter-multiple-coordinates/wgs84',
   [COORDINATE_SYSTEMS.OSGB36]:
     'exemption/site-details/enter-multiple-coordinates/osgb36'
-}
-
-export const multipleCoordinatesPageData = {
-  heading:
-    'Enter multiple sets of coordinates to mark the boundary of the site',
-  backLink: routes.COORDINATE_SYSTEM_CHOICE
-}
-
-/**
- * Generate template context for multiple coordinates page
- * @param {object} options - Page options
- * @param {Array} options.coordinates - Coordinate data
- * @param {object} options.errors - Validation errors
- * @param {string} options.projectName - Project name
- * @param {string} options.backLink - Back link URL
- * @returns {object} Template context
- */
-export const generatePageContext = ({
-  coordinates,
-  errors,
-  projectName,
-  backLink
-}) => {
-  // ML-19: Always show exactly 3 coordinates (no add/remove functionality)
-  const coordinateCount = 3
-
-  return {
-    coordinates: coordinates || [],
-    coordinateCount,
-    errors,
-    projectName,
-    backLink,
-    ...multipleCoordinatesPageData
-  }
 }

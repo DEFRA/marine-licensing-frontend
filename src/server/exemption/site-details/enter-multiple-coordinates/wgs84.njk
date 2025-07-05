@@ -8,15 +8,16 @@
 {% from "cancel-button/macro.njk" import appCancelButton %}
 {% set detailsSummary = "Help with latitude and longitude formats" %}
 {% set detailsHTML %}
-  <p class="govuk-body">
-    <strong>WGS84</strong> is a global system that pinpoints locations using latitude and longitude.
-  </p>
-  <p class="govuk-body">
-    Latitude shows how far north or south a place is, and longitude shows how far east or west it is.
-  </p>
-  <p class="govuk-body">
-    WGS84 is widely used in GPS and mapping tools like Google Maps.
-  </p>
+<p class="govuk-body">
+  <strong>WGS84</strong>
+  is a global system that pinpoints locations using latitude and longitude.
+</p>
+<p class="govuk-body">
+  Latitude shows how far north or south a place is, and longitude shows how far east or west it is.
+</p>
+<p class="govuk-body">
+  WGS84 is widely used in GPS and mapping tools like Google Maps.
+</p>
 {% endset %}
 {% block beforeContent %}
   {{ govukBackLink({
@@ -40,24 +41,23 @@
         summaryText: detailsSummary,
         html: detailsHTML
       }) }}
-      
       <form method="POST">
         <input type="hidden" name="csrfToken" value="{{ csrfToken }}">
-        
-        {% for i in range(0, 3) %}
-          {% set coordinate = coordinates[i] or { latitude: '', longitude: '' } %}
-          {% set pointNumber = i + 1 %}
-          {% set legendText %}
-            {% if i == 0 %}Start and end point{% else %}Point {{ pointNumber }}{% endif %}
-          {% endset %}
-          
-          {% call govukFieldset({
+          <input type="hidden" name="coordinateSystem" value="WGS84">
+            {% for i in range(0, 3) %}
+              {% set coordinate = coordinates[i] or { latitude: '', longitude: '' } %}
+              {% set pointNumber = i + 1 %}
+              {% set legendText %}
+              {% if i == 0 %}Start and end point{% else %}Point {{ pointNumber }}
+              {% endif %}
+              {% endset %}
+              {% call govukFieldset({
             legend: {
               text: legendText,
               classes: "govuk-fieldset__legend--m"
             }
           }) %}
-            {{ govukInput({
+              {{ govukInput({
               id: "coordinates[" + i + "][latitude]",
               name: "coordinates[" + i + "][latitude]",
               value: coordinate.latitude,
@@ -68,7 +68,7 @@
               },
               classes: "govuk-!-width-one-half"
             }) }}
-            {{ govukInput({
+              {{ govukInput({
               id: "coordinates[" + i + "][longitude]",
               name: "coordinates[" + i + "][longitude]",
               value: coordinate.longitude,
@@ -79,21 +79,20 @@
               },
               classes: "govuk-!-width-one-half"
             }) }}
-          {% endcall %}
-        {% endfor %}
-        
-        <div class="govuk-button-group govuk-!-margin-top-8">
-          {{ govukButton({
+              {% endcall %}
+            {% endfor %}
+            <div class="govuk-button-group govuk-!-margin-top-8">
+              {{ govukButton({
             text: "Continue",
             attributes: {
               id: "continue"
             }
           }) }}
-          {{ appCancelButton({
+              {{ appCancelButton({
             cancelLink: "/exemption/task-list?cancel=site-details"
           }) }}
+            </div>
+          </form>
         </div>
-      </form>
-    </div>
-  </div>
-{% endblock %}
+      </div>
+    {% endblock %}

@@ -1,6 +1,6 @@
 import { COORDINATE_SYSTEMS } from '~/src/server/common/constants/coordinates.js'
+import { routes } from '~/src/server/common/constants/routes.js'
 import {
-  getCoordinateSystem,
   getExemptionCache,
   updateExemptionSiteDetails
 } from '~/src/server/common/helpers/session-cache/utils.js'
@@ -9,29 +9,17 @@ import { createOsgb36MultipleCoordinatesSchema } from '~/src/server/common/schem
 import { createWgs84MultipleCoordinatesSchema } from '~/src/server/common/schemas/wgs84.js'
 import {
   MULTIPLE_COORDINATES_VIEW_ROUTES,
-  generatePageContext,
-  multipleCoordinatesPageData
+  normaliseCoordinatesForDisplay
 } from './utils.js'
 
-// === CONSTANTS ===
-
-const REQUIRED_COORDINATES_COUNT = 3
-
-const COORDINATE_FIELDS = {
-  WGS84: {
-    primary: 'latitude',
-    secondary: 'longitude'
-  },
-  OSGB36: {
-    primary: 'eastings',
-    secondary: 'northings'
-  }
+const PATTERNS = {
+  FIELD_BRACKETS: /[[\]]/g
 }
 
-const PATTERNS = {
-  COORDINATES_PREFIX: 'coordinates[',
-  COORDINATE_INDEX: /coordinates\[(\d+)\]/,
-  FIELD_BRACKETS: /[[\]]/g
+const multipleCoordinatesPageData = {
+  heading:
+    'Enter multiple sets of coordinates to mark the boundary of the site',
+  backLink: routes.COORDINATE_SYSTEM_CHOICE
 }
 
 // === COORDINATE SYSTEM UTILITIES ===
@@ -39,26 +27,7 @@ const PATTERNS = {
 const isWGS84 = (coordinateSystem) =>
   coordinateSystem === COORDINATE_SYSTEMS.WGS84
 
-const getCoordinateFields = (coordinateSystem) =>
-  isWGS84(coordinateSystem) ? COORDINATE_FIELDS.WGS84 : COORDINATE_FIELDS.OSGB36
-
-const createEmptyCoordinate = (coordinateSystem) => {
-  const fields = getCoordinateFields(coordinateSystem)
-  return { [fields.primary]: '', [fields.secondary]: '' }
-}
-
 // === FIELD PROCESSING UTILITIES ===
-
-const extractCoordinateIndices = (fieldNames) => {
-  const indices = new Set()
-  fieldNames.forEach((name) => {
-    const match = name.match(PATTERNS.COORDINATE_INDEX)
-    if (match) {
-      indices.add(parseInt(match[1], 10))
-    }
-  })
-  return Array.from(indices).sort((a, b) => a - b)
-}
 
 const extractCoordinateIndexFromFieldName = (fieldName) => {
   const indexMatch = fieldName.match(/coordinates(\d+)/)
@@ -68,54 +37,30 @@ const extractCoordinateIndexFromFieldName = (fieldName) => {
 const sanitiseFieldName = (fieldPath) =>
   fieldPath.join('').replace(PATTERNS.FIELD_BRACKETS, '')
 
-const buildCoordinateFromPayload = (payload, index, coordinateSystem) => {
-  const fields = getCoordinateFields(coordinateSystem)
-  return {
-    [fields.primary]: payload[`coordinates[${index}][${fields.primary}]`] || '',
-    [fields.secondary]:
-      payload[`coordinates[${index}][${fields.secondary}]`] || ''
-  }
-}
-
 const convertPayloadToCoordinatesArray = (payload, coordinateSystem) => {
   const coordinates = []
-  const fieldNames = Object.keys(payload).filter((name) =>
-    name.startsWith(PATTERNS.COORDINATES_PREFIX)
-  )
+  const coordinateFields = {
+    [COORDINATE_SYSTEMS.WGS84]: ['latitude', 'longitude'],
+    [COORDINATE_SYSTEMS.OSGB36]: ['eastings', 'northings']
+  }
 
-  const indices = extractCoordinateIndices(fieldNames)
+  const [field1, field2] = coordinateFields[coordinateSystem] || []
 
-  indices.forEach((index) => {
-    coordinates[index] = buildCoordinateFromPayload(
-      payload,
-      index,
-      coordinateSystem
-    )
-  })
+  Object.keys(payload)
+    .map((name) => {
+      const match = name.match(/^coordinates\[(\d+)\]/)
+      return match ? Number(match[1]) : null
+    })
+    .filter((index) => index !== null)
+    .sort((a, b) => a - b)
+    .forEach((index) => {
+      coordinates[index] = {
+        [field1]: payload[`coordinates[${index}][${field1}]`] || '',
+        [field2]: payload[`coordinates[${index}][${field2}]`] || ''
+      }
+    })
 
   return coordinates
-}
-
-// === COORDINATE DISPLAY UTILITIES ===
-
-const createDefaultCoordinates = (coordinateSystem) => {
-  return Array.from({ length: REQUIRED_COORDINATES_COUNT }, () =>
-    createEmptyCoordinate(coordinateSystem)
-  )
-}
-
-const normaliseCoordinatesForDisplay = (coordinates, coordinateSystem) => {
-  const displayCoordinates = coordinates || []
-
-  if (displayCoordinates.length === 0) {
-    return createDefaultCoordinates(coordinateSystem)
-  }
-
-  while (displayCoordinates.length < REQUIRED_COORDINATES_COUNT) {
-    displayCoordinates.push(createEmptyCoordinate(coordinateSystem))
-  }
-
-  return displayCoordinates.slice(0, REQUIRED_COORDINATES_COUNT)
 }
 
 // === VALIDATION UTILITIES ===
@@ -181,17 +126,6 @@ const createFieldErrors = (validationError) => {
   return errors
 }
 
-// === CONTEXT UTILITIES ===
-
-const createPageContextWithDefaults = (coordinates, errors, exemption) => {
-  return generatePageContext({
-    coordinates,
-    errors,
-    projectName: exemption?.projectName,
-    backLink: multipleCoordinatesPageData.backLink
-  })
-}
-
 const handleValidationFailure = (request, h, error, coordinateSystem) => {
   const { payload } = request
   const exemption = getExemptionCache(request)
@@ -201,24 +135,24 @@ const handleValidationFailure = (request, h, error, coordinateSystem) => {
   )
 
   if (!error.details) {
-    const errorContext = createPageContextWithDefaults(
-      coordinates,
-      {},
-      exemption
-    )
     return h
-      .view(MULTIPLE_COORDINATES_VIEW_ROUTES[coordinateSystem], errorContext)
+      .view(MULTIPLE_COORDINATES_VIEW_ROUTES[coordinateSystem], {
+        ...multipleCoordinatesPageData,
+        coordinates,
+        projectName: exemption?.projectName
+      })
       .takeover()
   }
 
   const errorSummary = createErrorSummary(error)
   const errors = createFieldErrors(error)
 
-  const context = createPageContextWithDefaults(coordinates, errors, exemption)
-
   return h
     .view(MULTIPLE_COORDINATES_VIEW_ROUTES[coordinateSystem], {
-      ...context,
+      ...multipleCoordinatesPageData,
+      coordinates,
+      errors,
+      projectName: exemption?.projectName,
       errorSummary
     })
     .takeover()
@@ -226,13 +160,26 @@ const handleValidationFailure = (request, h, error, coordinateSystem) => {
 
 // === SESSION UTILITIES ===
 
-const getSessionPayload = (siteDetails) => {
+const getSessionPayload = (siteDetails, coordinateSystem) => {
   const multipleCoordinates = siteDetails.multipleCoordinates || {}
-  return { coordinates: multipleCoordinates.coordinates || [] }
+  return { coordinates: multipleCoordinates[coordinateSystem] || [] }
 }
 
-const saveCoordinatesToSession = (request, coordinates) => {
-  updateExemptionSiteDetails(request, 'multipleCoordinates', { coordinates })
+const saveCoordinatesToSession = (request, coordinates, coordinateSystem) => {
+  const exemption = getExemptionCache(request)
+  const existingMultipleCoordinates =
+    exemption?.siteDetails?.multipleCoordinates || {}
+
+  const updatedMultipleCoordinates = {
+    ...existingMultipleCoordinates,
+    [coordinateSystem]: coordinates
+  }
+
+  updateExemptionSiteDetails(
+    request,
+    'multipleCoordinates',
+    updatedMultipleCoordinates
+  )
 }
 
 // === VALIDATION WORKFLOW ===
@@ -247,24 +194,28 @@ const validateCoordinates = (coordinates, exemptionId, coordinateSystem) => {
 // === MAIN CONTROLLERS ===
 
 export const multipleCoordinatesController = {
-  options: {},
   handler(request, h) {
     const exemption = getExemptionCache(request)
-    const { coordinateSystem } = getCoordinateSystem(request)
     const siteDetails = exemption?.siteDetails ?? {}
-    const payload = getSessionPayload(siteDetails)
+
+    // Get coordinate system from session cache
+    const coordinateSystem =
+      siteDetails.coordinateSystem === COORDINATE_SYSTEMS.OSGB36
+        ? COORDINATE_SYSTEMS.OSGB36
+        : COORDINATE_SYSTEMS.WGS84
+
+    const payload = getSessionPayload(siteDetails, coordinateSystem)
 
     const coordinatesForDisplay = normaliseCoordinatesForDisplay(
       payload.coordinates,
       coordinateSystem
     )
 
-    const context = createPageContextWithDefaults(
-      coordinatesForDisplay,
-      {},
-      exemption
-    )
-    return h.view(MULTIPLE_COORDINATES_VIEW_ROUTES[coordinateSystem], context)
+    return h.view(MULTIPLE_COORDINATES_VIEW_ROUTES[coordinateSystem], {
+      ...multipleCoordinatesPageData,
+      coordinates: coordinatesForDisplay,
+      projectName: exemption?.projectName
+    })
   }
 }
 
@@ -273,12 +224,39 @@ export const multipleCoordinatesSubmitController = {
   handler(request, h) {
     const { payload } = request
     const exemption = getExemptionCache(request)
-    const { coordinateSystem } = getCoordinateSystem(request)
+
+    // Handle missing exemption
+    if (!exemption) {
+      return h
+        .view(MULTIPLE_COORDINATES_VIEW_ROUTES[COORDINATE_SYSTEMS.WGS84], {
+          ...multipleCoordinatesPageData,
+          coordinates: [],
+          projectName: undefined
+        })
+        .takeover()
+    }
+
+    // Convert form value to coordinate system constant
+    const coordinateSystem =
+      payload.coordinateSystem === 'OSGB36'
+        ? COORDINATE_SYSTEMS.OSGB36
+        : COORDINATE_SYSTEMS.WGS84
 
     const coordinates = convertPayloadToCoordinatesArray(
       payload,
       coordinateSystem
     )
+
+    // Handle missing or invalid exemption id
+    if (!exemption.id) {
+      return handleValidationFailure(
+        request,
+        h,
+        { error: 'Missing exemption id' },
+        coordinateSystem
+      )
+    }
+
     const validationResult = validateCoordinates(
       coordinates,
       exemption.id,
@@ -297,22 +275,17 @@ export const multipleCoordinatesSubmitController = {
       )
     }
 
-    saveCoordinatesToSession(request, coordinates)
-
-    const updatedExemption = getExemptionCache(request)
-    const updatedSiteDetails = updatedExemption?.siteDetails ?? {}
-    const updatedPayload = getSessionPayload(updatedSiteDetails)
+    saveCoordinatesToSession(request, coordinates, coordinateSystem)
 
     const coordinatesForDisplay = normaliseCoordinatesForDisplay(
-      updatedPayload.coordinates || coordinates,
+      coordinates,
       coordinateSystem
     )
 
-    const context = createPageContextWithDefaults(
-      coordinatesForDisplay,
-      {},
-      updatedExemption
-    )
-    return h.view(MULTIPLE_COORDINATES_VIEW_ROUTES[coordinateSystem], context)
+    return h.view(MULTIPLE_COORDINATES_VIEW_ROUTES[coordinateSystem], {
+      ...multipleCoordinatesPageData,
+      coordinates: coordinatesForDisplay,
+      projectName: exemption?.projectName
+    })
   }
 }

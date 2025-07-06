@@ -44,17 +44,6 @@ export const multipleCoordinatesSubmitController = {
     const { payload } = request
     const exemption = getExemptionCache(request)
 
-    // Handle missing exemption
-    if (!exemption) {
-      return h
-        .view(MULTIPLE_COORDINATES_VIEW_ROUTES[COORDINATE_SYSTEMS.WGS84], {
-          ...multipleCoordinatesPageData,
-          coordinates: [],
-          projectName: undefined
-        })
-        .takeover()
-    }
-
     // Convert form value to coordinate system constant
     const coordinateSystem =
       payload.coordinateSystem === 'OSGB36'
@@ -65,16 +54,6 @@ export const multipleCoordinatesSubmitController = {
       payload,
       coordinateSystem
     )
-
-    // Handle missing or invalid exemption id
-    if (!exemption.id) {
-      return handleValidationFailure(
-        request,
-        h,
-        { error: 'Missing exemption id' },
-        coordinateSystem
-      )
-    }
 
     const validationResult = validateCoordinates(
       coordinates,

@@ -582,6 +582,27 @@ describe('enter-multiple-coordinates utils', () => {
       )
       expect(result).toEqual([])
     })
+
+    it('should filter out non-coordinate keys from payload', () => {
+      const payload = {
+        'coordinates[0][latitude]': '51.5074',
+        'coordinates[0][longitude]': '-0.1278',
+        invalidKey: 'should be ignored',
+        'anotherInvalidKey[0]': 'also ignored',
+        'coordinates[1][latitude]': '52.4862',
+        'coordinates[1][longitude]': '-1.8904'
+      }
+
+      const result = convertPayloadToCoordinatesArray(
+        payload,
+        COORDINATE_SYSTEMS.WGS84
+      )
+
+      expect(result).toEqual([
+        { latitude: '51.5074', longitude: '-0.1278' },
+        { latitude: '52.4862', longitude: '-1.8904' }
+      ])
+    })
   })
 
   describe('getValidationSchema', () => {

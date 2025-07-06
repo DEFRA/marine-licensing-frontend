@@ -323,21 +323,5 @@ describe('#multipleCoordinates', () => {
         COORDINATE_SYSTEMS.WGS84
       )
     })
-
-    test('should handle empty exemption cache gracefully', () => {
-      getExemptionCacheSpy.mockReturnValueOnce(undefined)
-      const payload = { coordinateSystem: 'WGS84' }
-      const request = { payload }
-
-      multipleCoordinatesSubmitController.handler(request, mockH)
-
-      expect(mockH.view).toHaveBeenCalledWith(
-        MULTIPLE_COORDINATES_VIEW_ROUTES[COORDINATE_SYSTEMS.WGS84],
-        expect.objectContaining({
-          ...multipleCoordinatesPageData,
-          projectName: undefined
-        })
-      )
-    })
   })
 })

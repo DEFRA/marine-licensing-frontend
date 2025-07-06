@@ -1,8 +1,26 @@
 import { COORDINATE_SYSTEMS } from '~/src/server/common/constants/coordinates.js'
+import { routes } from '~/src/server/common/constants/routes.js'
+import {
+  getExemptionCache,
+  updateExemptionSiteDetails
+} from '~/src/server/common/helpers/session-cache/utils.js'
+import { generatePointSpecificErrorMessage } from '~/src/server/common/helpers/site-details.js'
+import { createOsgb36MultipleCoordinatesSchema } from '~/src/server/common/schemas/osgb36.js'
+import { createWgs84MultipleCoordinatesSchema } from '~/src/server/common/schemas/wgs84.js'
 
 const REQUIRED_COORDINATES_COUNT = 3
 
-const COORDINATE_FIELDS = {
+export const PATTERNS = {
+  FIELD_BRACKETS: /[[\]]/g
+}
+
+export const multipleCoordinatesPageData = {
+  heading:
+    'Enter multiple sets of coordinates to mark the boundary of the site',
+  backLink: routes.COORDINATE_SYSTEM_CHOICE
+}
+
+export const COORDINATE_FIELDS = {
   WGS84: {
     primary: 'latitude',
     secondary: 'longitude'
@@ -15,7 +33,7 @@ const COORDINATE_FIELDS = {
 
 // === COORDINATE SYSTEM UTILITIES ===
 
-const isWGS84 = (coordinateSystem) =>
+export const isWGS84 = (coordinateSystem) =>
   coordinateSystem === COORDINATE_SYSTEMS.WGS84
 
 const getCoordinateFields = (coordinateSystem) =>
@@ -55,6 +73,182 @@ export const normaliseCoordinatesForDisplay = (
   }
 
   return displayCoordinates.slice(0, REQUIRED_COORDINATES_COUNT)
+}
+
+// === FIELD PROCESSING UTILITIES ===
+
+export const extractCoordinateIndexFromFieldName = (fieldName) => {
+  const indexMatch = fieldName.match(/coordinates(\d+)/)
+  return indexMatch ? parseInt(indexMatch[1], 10) : 0
+}
+
+export const sanitiseFieldName = (fieldPath) =>
+  fieldPath.join('').replace(PATTERNS.FIELD_BRACKETS, '')
+
+export const convertPayloadToCoordinatesArray = (payload, coordinateSystem) => {
+  const coordinates = []
+  const coordinateSystemKey = isWGS84(coordinateSystem) ? 'WGS84' : 'OSGB36'
+  const fields = COORDINATE_FIELDS[coordinateSystemKey]
+
+  const field1 = fields.primary
+  const field2 = fields.secondary
+
+  Object.keys(payload)
+    .map((name) => {
+      const match = name.match(/^coordinates\[(\d+)\]/)
+      return match ? Number(match[1]) : null
+    })
+    .filter((index) => index !== null)
+    .sort((a, b) => a - b)
+    .forEach((index) => {
+      coordinates[index] = {
+        [field1]: payload[`coordinates[${index}][${field1}]`] || '',
+        [field2]: payload[`coordinates[${index}][${field2}]`] || ''
+      }
+    })
+
+  return coordinates
+}
+
+// === VALIDATION UTILITIES ===
+
+export const getValidationSchema = (coordinateSystem) => {
+  return isWGS84(coordinateSystem)
+    ? createWgs84MultipleCoordinatesSchema()
+    : createOsgb36MultipleCoordinatesSchema()
+}
+
+export const convertArrayErrorsToFlattenedErrors = (error) => {
+  if (!error.details) {
+    return error
+  }
+
+  const convertedDetails = error.details.map((detail) => {
+    const path = detail.path
+      .map((segment, index) => {
+        if (index === 0) {
+          return segment
+        }
+        return `[${segment}]`
+      })
+      .join('')
+
+    return { ...detail, path: [path] }
+  })
+
+  return { ...error, details: convertedDetails }
+}
+
+// === ERROR PROCESSING UTILITIES ===
+
+export const processErrorDetail = (detail) => {
+  const fieldName = sanitiseFieldName(detail.path)
+  const coordinateIndex = extractCoordinateIndexFromFieldName(fieldName)
+  const enhancedMessage = generatePointSpecificErrorMessage(
+    detail.message,
+    coordinateIndex
+  )
+
+  return { fieldName, coordinateIndex, enhancedMessage }
+}
+
+export const createErrorSummary = (validationError) => {
+  return validationError.details.map((detail) => {
+    const { fieldName, enhancedMessage } = processErrorDetail(detail)
+    return {
+      href: `#${fieldName}`,
+      text: enhancedMessage
+    }
+  })
+}
+
+export const createFieldErrors = (validationError) => {
+  const errors = {}
+
+  validationError.details.forEach((detail) => {
+    const { fieldName, enhancedMessage } = processErrorDetail(detail)
+    errors[fieldName] = { text: enhancedMessage }
+  })
+
+  return errors
+}
+
+export const handleValidationFailure = (
+  request,
+  h,
+  error,
+  coordinateSystem
+) => {
+  const { payload } = request
+  const exemption = getExemptionCache(request)
+  const coordinates = convertPayloadToCoordinatesArray(
+    payload,
+    coordinateSystem
+  )
+
+  if (!error.details) {
+    return h
+      .view(MULTIPLE_COORDINATES_VIEW_ROUTES[coordinateSystem], {
+        ...multipleCoordinatesPageData,
+        coordinates,
+        projectName: exemption?.projectName
+      })
+      .takeover()
+  }
+
+  const errorSummary = createErrorSummary(error)
+  const errors = createFieldErrors(error)
+
+  return h
+    .view(MULTIPLE_COORDINATES_VIEW_ROUTES[coordinateSystem], {
+      ...multipleCoordinatesPageData,
+      coordinates,
+      errors,
+      projectName: exemption?.projectName,
+      errorSummary
+    })
+    .takeover()
+}
+
+// === SESSION UTILITIES ===
+
+export const getSessionPayload = (siteDetails, coordinateSystem) => {
+  const multipleCoordinates = siteDetails.multipleCoordinates || {}
+  return { coordinates: multipleCoordinates[coordinateSystem] || [] }
+}
+
+export const saveCoordinatesToSession = (
+  request,
+  coordinates,
+  coordinateSystem
+) => {
+  const exemption = getExemptionCache(request)
+  const existingMultipleCoordinates =
+    exemption?.siteDetails?.multipleCoordinates || {}
+
+  const updatedMultipleCoordinates = {
+    ...existingMultipleCoordinates,
+    [coordinateSystem]: coordinates
+  }
+
+  updateExemptionSiteDetails(
+    request,
+    'multipleCoordinates',
+    updatedMultipleCoordinates
+  )
+}
+
+// === VALIDATION WORKFLOW ===
+
+export const validateCoordinates = (
+  coordinates,
+  exemptionId,
+  coordinateSystem
+) => {
+  const validationPayload = { coordinates, id: exemptionId }
+  const schema = getValidationSchema(coordinateSystem)
+
+  return schema.validate(validationPayload, { abortEarly: false })
 }
 
 // === EXISTING EXPORTS ===

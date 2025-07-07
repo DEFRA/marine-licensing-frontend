@@ -189,6 +189,62 @@ describe('#coordinateSystem', () => {
       expect(h.redirect).toHaveBeenCalledWith(routes.CIRCLE_CENTRE_POINT)
     })
 
+    test('Should render view when coordinatesEntry is neither single nor multiple', async () => {
+      const request = {
+        payload: { coordinateSystem: 'wgs84' }
+      }
+
+      getExemptionCacheSpy.mockReturnValueOnce({
+        projectName: 'Test Project',
+        siteDetails: {
+          coordinatesEntry: 'other'
+        }
+      })
+
+      const h = {
+        view: jest.fn()
+      }
+
+      await coordinateSystemSubmitController.handler(request, h)
+
+      expect(h.view).toHaveBeenCalledWith(COORDINATE_SYSTEM_VIEW_ROUTE, {
+        pageTitle: 'Which coordinate system do you want to use?',
+        heading: 'Which coordinate system do you want to use?',
+        backLink: routes.COORDINATES_ENTRY_CHOICE,
+        projectName: 'Test Project',
+        payload: {
+          coordinateSystem: 'wgs84'
+        }
+      })
+    })
+
+    test('Should render view when siteDetails is null', async () => {
+      const request = {
+        payload: { coordinateSystem: 'osgb36' }
+      }
+
+      getExemptionCacheSpy.mockReturnValueOnce({
+        projectName: 'Test Project',
+        siteDetails: null
+      })
+
+      const h = {
+        view: jest.fn()
+      }
+
+      await coordinateSystemSubmitController.handler(request, h)
+
+      expect(h.view).toHaveBeenCalledWith(COORDINATE_SYSTEM_VIEW_ROUTE, {
+        pageTitle: 'Which coordinate system do you want to use?',
+        heading: 'Which coordinate system do you want to use?',
+        backLink: routes.COORDINATES_ENTRY_CHOICE,
+        projectName: 'Test Project',
+        payload: {
+          coordinateSystem: 'osgb36'
+        }
+      })
+    })
+
     test('Should correctly format error data', () => {
       const request = {
         payload: { coordinateSystem: 'invalid' }

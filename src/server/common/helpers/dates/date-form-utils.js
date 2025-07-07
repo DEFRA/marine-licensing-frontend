@@ -67,8 +67,12 @@ function buildSimplifiedErrorSummary(errorDetails, dateConfigs, errorMessages) {
   return errorSummary
 
   function processDateConfig(config, errors, errorTypeMap, errorSummary) {
-    if (handleMissingDateError(config, errors, errorSummary)) return
-    if (handleCustomValidationErrors(config, errorTypeMap, errorSummary)) return
+    if (handleMissingDateError(config, errors, errorSummary)) {
+      return
+    }
+    if (handleCustomValidationErrors(config, errorTypeMap, errorSummary)) {
+      return
+    }
     handleIndividualFieldErrors(config, errors, errorSummary)
   }
 

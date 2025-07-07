@@ -17,7 +17,9 @@ function validateDateFields(dateFields, prefix, type, errors) {
   const initialErrorCount = errors.length
 
   checkMissingFields(dateFields, config, errors)
-  if (errors.length > initialErrorCount) return
+  if (errors.length > initialErrorCount) {
+    return
+  }
 
   return validateCompleteDate(dateFields, config, errors)
 

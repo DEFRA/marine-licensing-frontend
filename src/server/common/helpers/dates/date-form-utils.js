@@ -39,7 +39,6 @@ function buildSimplifiedErrorSummary(errorDetails, dateConfigs, errorMessages) {
   const basicErrorSummary = mapErrorsForDisplay(errorDetails, errorMessages)
   const errors = errorDescriptionByFieldName(basicErrorSummary)
 
-  // Process start date first, then end date
   const sortedConfigs = [...dateConfigs].sort((config) =>
     config.prefix.includes('start') ? -1 : 1
   )
@@ -48,7 +47,6 @@ function buildSimplifiedErrorSummary(errorDetails, dateConfigs, errorMessages) {
     validateConfigFields(config, errors, errorSummary, errorTypeMap)
   })
 
-  // Add any non-date errors
   addNonDateErrors(basicErrorSummary, dateConfigs, errorSummary)
 
   return errorSummary
@@ -57,7 +55,6 @@ function buildSimplifiedErrorSummary(errorDetails, dateConfigs, errorMessages) {
 function validateConfigFields(config, errors, errorSummary, errorTypeMap) {
   const { prefix, fieldErrorKeys, errorKeys, errorMessages } = config
 
-  // Check if complete date is missing (highest priority)
   if (isCompleteDateMissing(errors, prefix, fieldErrorKeys)) {
     errorSummary.push(
       createErrorSummaryItem(prefix, errorMessages[errorKeys.MISSING])
@@ -65,12 +62,10 @@ function validateConfigFields(config, errors, errorSummary, errorTypeMap) {
     return
   }
 
-  // Check for custom validation errors (invalid date, future date, date order)
   if (hasCustomValidationError(config, errorTypeMap, errorSummary)) {
     return
   }
 
-  // Add individual field errors
   const fieldNames = createDateFieldNames(prefix)
   const dayError = errors[fieldErrorKeys[fieldNames.DAY]]
   const monthError = errors[fieldErrorKeys[fieldNames.MONTH]]

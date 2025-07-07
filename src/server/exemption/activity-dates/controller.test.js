@@ -1,19 +1,21 @@
-import { createServer } from '~/src/server/index.js'
-import { statusCodes } from '~/src/server/common/constants/status-codes.js'
-import { routes } from '~/src/server/common/constants/routes.js'
-import { JOI_ERRORS } from '~/src/server/common/constants/joi.js'
-import { mockExemption } from '~/src/server/test-helpers/mocks.js'
 import { JSDOM } from 'jsdom'
+import {
+  ACTIVITY_DATES_ERROR_MESSAGES,
+  ACTIVITY_DATES_VIEW_ROUTE
+} from '~/src/server/common/constants/activity-dates.js'
+import { JOI_ERRORS } from '~/src/server/common/constants/joi.js'
+import { routes } from '~/src/server/common/constants/routes.js'
+import { statusCodes } from '~/src/server/common/constants/status-codes.js'
+import * as authRequests from '~/src/server/common/helpers/authenticated-requests.js'
+import { createDateISO } from '~/src/server/common/helpers/dates/date-utils.js'
+import * as cacheUtils from '~/src/server/common/helpers/session-cache/utils.js'
 import {
   activityDatesController,
   activityDatesSubmitController,
-  ACTIVITY_DATES_VIEW_ROUTE,
-  addCustomValidationErrors,
-  errorMessages
+  addCustomValidationErrors
 } from '~/src/server/exemption/activity-dates/controller.js'
-import { createDateISO } from '~/src/server/common/helpers/date-utils.js'
-import * as cacheUtils from '~/src/server/common/helpers/session-cache/utils.js'
-import * as authRequests from '~/src/server/common/helpers/authenticated-requests.js'
+import { createServer } from '~/src/server/index.js'
+import { mockExemption } from '~/src/server/test-helpers/mocks.js'
 
 jest.mock('~/src/server/common/helpers/session-cache/utils.js')
 
@@ -1227,7 +1229,9 @@ describe('#activityDatesController', () => {
       // Should only add the today/future error, not the invalid error
       expect(errorSummary).toHaveLength(1)
       expect(errorSummary[0].text).toBe(
-        errorMessages[JOI_ERRORS.CUSTOM_START_DATE_TODAY_OR_FUTURE]
+        ACTIVITY_DATES_ERROR_MESSAGES[
+          JOI_ERRORS.CUSTOM_START_DATE_TODAY_OR_FUTURE
+        ]
       )
       expect(errorSummary[0].href).toBe('#activity-start-date-day')
     })
@@ -1245,7 +1249,9 @@ describe('#activityDatesController', () => {
       // Should only add the today/future error, not the invalid error
       expect(errorSummary).toHaveLength(1)
       expect(errorSummary[0].text).toBe(
-        errorMessages[JOI_ERRORS.CUSTOM_END_DATE_TODAY_OR_FUTURE]
+        ACTIVITY_DATES_ERROR_MESSAGES[
+          JOI_ERRORS.CUSTOM_END_DATE_TODAY_OR_FUTURE
+        ]
       )
       expect(errorSummary[0].href).toBe('#activity-end-date-day')
     })
@@ -1262,7 +1268,7 @@ describe('#activityDatesController', () => {
       // Should add the invalid error since no today/future error exists
       expect(errorSummary).toHaveLength(1)
       expect(errorSummary[0].text).toBe(
-        errorMessages[JOI_ERRORS.CUSTOM_START_DATE_INVALID]
+        ACTIVITY_DATES_ERROR_MESSAGES[JOI_ERRORS.CUSTOM_START_DATE_INVALID]
       )
       expect(errorSummary[0].href).toBe('#activity-start-date-day')
     })
@@ -1279,7 +1285,7 @@ describe('#activityDatesController', () => {
       // Should add the invalid error since no today/future error exists
       expect(errorSummary).toHaveLength(1)
       expect(errorSummary[0].text).toBe(
-        errorMessages[JOI_ERRORS.CUSTOM_END_DATE_INVALID]
+        ACTIVITY_DATES_ERROR_MESSAGES[JOI_ERRORS.CUSTOM_END_DATE_INVALID]
       )
       expect(errorSummary[0].href).toBe('#activity-end-date-day')
     })

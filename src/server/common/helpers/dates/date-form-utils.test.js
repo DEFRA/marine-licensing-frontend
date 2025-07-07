@@ -1,16 +1,15 @@
 import {
+  addCustomValidationErrors,
   createDateFieldNames,
-  extractDateFieldsFromPayload,
-  extractMultipleDateFields,
   createDateFieldsFromValue,
   createErrorTypeMap,
-  isCompleteDateMissing,
-  hasNumberMaxErrorsForDate,
+  extractDateFieldsFromPayload,
+  extractMultipleDateFields,
   getDateErrorMessage,
-  addCustomValidationErrors,
   handleMissingDateErrors,
-  handleDateValidationErrors
-} from '~/src/server/common/helpers/date-form-utils.js'
+  isCompleteDateMissing,
+  processDateValidationErrors
+} from './date-form-utils.js'
 
 describe('Date Form Utils', () => {
   describe('createDateFieldNames', () => {
@@ -152,28 +151,6 @@ describe('Date Form Utils', () => {
     })
   })
 
-  describe('hasNumberMaxErrorsForDate', () => {
-    test('should return true when there are number.max errors for date fields', () => {
-      const errorTypeMap = {
-        'test-date-day': { type: 'number.max' },
-        'test-date-month': { type: 'any.required' }
-      }
-
-      const result = hasNumberMaxErrorsForDate('test-date', errorTypeMap)
-      expect(result).toBe(true)
-    })
-
-    test('should return false when there are no number.max errors', () => {
-      const errorTypeMap = {
-        'test-date-day': { type: 'any.required' },
-        'test-date-month': { type: 'any.required' }
-      }
-
-      const result = hasNumberMaxErrorsForDate('test-date', errorTypeMap)
-      expect(result).toBe(false)
-    })
-  })
-
   describe('getDateErrorMessage', () => {
     const mockErrorMessages = {
       missing: 'Date is missing',
@@ -185,7 +162,6 @@ describe('Date Form Utils', () => {
 
     test('should return missing error message with highest priority', () => {
       const config = {
-        prefix: 'test-date',
         isDateMissing: true,
         errorTypeMap: {},
         errors: {},
@@ -202,7 +178,6 @@ describe('Date Form Utils', () => {
 
     test('should return invalid error message when not missing but invalid', () => {
       const config = {
-        prefix: 'test-date',
         isDateMissing: false,
         errorTypeMap: { invalid: true },
         errors: {},
@@ -219,7 +194,6 @@ describe('Date Form Utils', () => {
 
     test('should return null when no errors match', () => {
       const config = {
-        prefix: 'test-date',
         isDateMissing: false,
         errorTypeMap: {},
         errors: {},
@@ -288,28 +262,32 @@ describe('Date Form Utils', () => {
     })
   })
 
-  describe('handleDateValidationErrors', () => {
-    test('should handle validation errors with no details', () => {
-      const mockRequest = { payload: {} }
-      const mockH = {
-        view: jest.fn().mockReturnValue({ takeover: jest.fn() })
+  describe('processDateValidationErrors', () => {
+    test('should return null when no error details', () => {
+      const result = processDateValidationErrors({}, [], {})
+      expect(result).toBeNull()
+    })
+
+    test('should process validation errors and return data object', () => {
+      const mockErr = {
+        details: [
+          { type: 'any.required', path: ['test-field'], message: 'Required' }
+        ]
       }
-      const mockErr = {}
-      const mockCreateTemplateData = jest.fn().mockReturnValue({ test: 'data' })
+      const mockDateConfigs = []
+      const mockErrorMessages = {}
 
-      const config = {
-        request: mockRequest,
-        h: mockH,
-        err: mockErr,
-        dateConfigs: [],
-        errorMessages: {},
-        createTemplateData: mockCreateTemplateData,
-        viewRoute: 'test/view'
-      }
-
-      handleDateValidationErrors(config)
-
-      expect(mockH.view).toHaveBeenCalledWith('test/view', { test: 'data' })
+      const result = processDateValidationErrors(
+        mockErr,
+        mockDateConfigs,
+        mockErrorMessages
+      )
+      expect(result).toEqual(
+        expect.objectContaining({
+          errors: expect.any(Object),
+          errorSummary: expect.any(Array)
+        })
+      )
     })
   })
 })

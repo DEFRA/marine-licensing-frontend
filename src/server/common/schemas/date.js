@@ -36,25 +36,21 @@ export const individualDate = ({
     .number()
     .integer()
     .min(1)
-    .max(MAX_DAYS_IN_MONTH)
     .required()
     .messages({
       'any.required': `${prefix}-day`,
       'number.base': `${prefix}-day`,
-      'number.min': `${prefix}-day`,
-      'number.max': `${prefix}-day`
+      'number.min': `${prefix}-day`
     }),
   [`${prefix}-month`]: joi
     .number()
     .integer()
     .min(1)
-    .max(MAX_MONTHS_IN_YEAR)
     .required()
     .messages({
       'any.required': `${prefix}-month`,
       'number.base': `${prefix}-month`,
-      'number.min': `${prefix}-month`,
-      'number.max': `${prefix}-month`
+      'number.min': `${prefix}-month`
     }),
   [`${prefix}-year`]: joi
     .number()

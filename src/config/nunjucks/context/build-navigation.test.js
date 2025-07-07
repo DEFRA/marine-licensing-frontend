@@ -1,4 +1,4 @@
-import { buildNavigation } from './build-navigation.js'
+import { buildNavigation } from '~/src/config/nunjucks/context/build-navigation.js'
 
 /**
  * @param {Partial<Request>} [options]
@@ -28,16 +28,6 @@ describe('#buildNavigation', () => {
         href: '/home'
       }
     ])
-  })
-
-  test('Should include Projects Home link in navigation', () => {
-    const navigation = buildNavigation()
-
-    const projectsHomeLink = navigation.find(
-      (item) => item.text === 'Projects Home'
-    )
-    expect(projectsHomeLink).toBeTruthy()
-    expect(projectsHomeLink.href).toBe('/home')
   })
 
   test('Should mark Projects Home as active when on dashboard page', () => {

@@ -82,6 +82,16 @@ describe('#dashboard', () => {
 
       const expectedFormattedProjects = formatProjectsForDisplay(projects)
 
+      expect(expectedFormattedProjects).toEqual([
+        [
+          { text: 'Test Project' },
+          { text: 'Exempt activity' },
+          { text: '-' },
+          { html: '<strong class="govuk-tag govuk-tag--blue">Draft</strong>' },
+          { text: '-' }
+        ]
+      ])
+
       authenticatedGetRequestMock.mockResolvedValueOnce({
         payload: { value: projects }
       })
@@ -109,7 +119,7 @@ describe('#dashboard', () => {
 
       const emptyState = document.querySelector('.govuk-body')
       expect(emptyState.textContent).toContain(
-        'You have not created any projects yet'
+        'You currently have no projects.'
       )
     })
 

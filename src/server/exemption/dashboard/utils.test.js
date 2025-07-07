@@ -80,7 +80,7 @@ describe('#formatProjectsForDisplay', () => {
         projectName: 'Project 2',
         type: 'Exempt activity',
         applicationReference: 'ML-2024-002',
-        status: 'Approved',
+        status: 'Closed',
         submittedAt: '2024-06-25'
       }
     ]
@@ -102,7 +102,7 @@ describe('#formatProjectsForDisplay', () => {
       { text: 'Exempt activity' },
       { text: 'ML-2024-002' },
       {
-        html: '<strong class="govuk-tag govuk-tag--red">Approved</strong>'
+        html: '<strong class="govuk-tag govuk-tag--green">Closed</strong>'
       },
       { text: '25 Jun 2024' }
     ])
@@ -136,7 +136,7 @@ describe('#formatProjectsForDisplay', () => {
 
     expect(result[0][3].html).toContain('govuk-tag--blue')
     expect(result[0][3].html).toContain('Draft')
-    expect(result[1][3].html).toContain('govuk-tag--red')
+    expect(result[1][3].html).toContain('govuk-tag--green')
     expect(result[1][3].html).toContain('Closed')
   })
 })

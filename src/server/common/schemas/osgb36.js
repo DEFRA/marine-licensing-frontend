@@ -15,11 +15,11 @@ const {
 const validateCoordinates = (value, helpers, type) => {
   const coordinate = Number(value)
   if (isNaN(coordinate)) {
-    return helpers.error(JOI_ERRORS.NUMBER_BASE)
+    return helpers.error('number.base')
   }
 
   if (coordinate <= 0) {
-    return helpers.error(JOI_ERRORS.NUMBER_POSITIVE)
+    return helpers.error('number.positive')
   }
 
   if (

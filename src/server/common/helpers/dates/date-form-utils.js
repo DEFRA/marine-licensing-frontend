@@ -76,18 +76,21 @@ function validateConfigFields(config, errors, errorSummary, errorTypeMap) {
   const monthError = errors[fieldErrorKeys[fieldNames.MONTH]]
   const yearError = errors[fieldErrorKeys[fieldNames.YEAR]]
 
-  if (dayError)
+  if (dayError) {
     errorSummary.push(
       createErrorSummaryItem(prefix, errorMessages[errorKeys.DAY])
     )
-  if (monthError)
+  }
+  if (monthError) {
     errorSummary.push(
       createErrorSummaryItem(prefix, errorMessages[errorKeys.MONTH])
     )
-  if (yearError)
+  }
+  if (yearError) {
     errorSummary.push(
       createErrorSummaryItem(prefix, errorMessages[errorKeys.YEAR])
     )
+  }
 }
 
 function hasCustomValidationError(config, errorTypeMap, errorSummary) {

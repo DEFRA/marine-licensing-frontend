@@ -18,20 +18,20 @@ function validateDateFields(dateFields, prefix, type, errors) {
 
   checkMissingFields(dateFields, config, errors)
   if (errors.length > initialErrorCount) {
-    return
+    return null
   }
 
   return validateCompleteDate(dateFields, config, errors)
 
-  function checkMissingFields({ day, month, year }, { prefix, type }, errors) {
+  function checkMissingFields({ day, month, year }, dateConfig, errorList) {
     const hasAnyField = day || month || year
     const hasAllFields = day && month && year
 
     if (!hasAnyField) {
-      errors.push(
+      errorList.push(
         createErrorSummaryItem(
-          `activity-${prefix}-date-day`,
-          `Enter the ${type} date`
+          `activity-${dateConfig.prefix}-date-day`,
+          `Enter the ${dateConfig.type} date`
         )
       )
       return
@@ -46,10 +46,10 @@ function validateDateFields(dateFields, prefix, type, errors) {
 
       fieldChecks.forEach((field) => {
         if (!field.value) {
-          errors.push(
+          errorList.push(
             createErrorSummaryItem(
-              `activity-${prefix}-date-${field.name}`,
-              `The ${type} date must include a ${field.name}`
+              `activity-${dateConfig.prefix}-date-${field.name}`,
+              `The ${dateConfig.type} date must include a ${field.name}`
             )
           )
         }
@@ -57,27 +57,23 @@ function validateDateFields(dateFields, prefix, type, errors) {
     }
   }
 
-  function validateCompleteDate(
-    { day, month, year },
-    { prefix, type },
-    errors
-  ) {
+  function validateCompleteDate({ day, month, year }, dateConfig, errorList) {
     const dateISO = createDateISO(year, month, day)
     if (!dateISO) {
-      errors.push(
+      errorList.push(
         createErrorSummaryItem(
-          `activity-${prefix}-date-day`,
-          `The ${type} date must be a real date`
+          `activity-${dateConfig.prefix}-date-day`,
+          `The ${dateConfig.type} date must be a real date`
         )
       )
       return null
     }
 
     if (!isTodayOrFuture(dateISO)) {
-      errors.push(
+      errorList.push(
         createErrorSummaryItem(
-          `activity-${prefix}-date-day`,
-          `The ${type} date must be today or in the future`
+          `activity-${dateConfig.prefix}-date-day`,
+          `The ${dateConfig.type} date must be today or in the future`
         )
       )
     }

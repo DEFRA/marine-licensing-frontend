@@ -1,19 +1,25 @@
-import { JOI_ERRORS } from '~/src/server/common/constants/joi.js'
 import joi from 'joi'
+import { JOI_ERRORS } from '~/src/server/common/constants/joi.js'
+import {
+  MIN_COORDINATE_POINTS,
+  OSGB36_CONSTANTS
+} from '~/src/server/common/constants/exemptions.js'
 
-const MIN_EASTINGS_LENGTH = 100000
-const MAX_EASTINGS_LENGTH = 999999
-const MIN_NORTHINGS_LENGTH = 100000
-const MAX_NORTHINGS_LENGTH = 9999999
+const {
+  MIN_EASTINGS: MIN_EASTINGS_LENGTH,
+  MAX_EASTINGS: MAX_EASTINGS_LENGTH,
+  MIN_NORTHINGS: MIN_NORTHINGS_LENGTH,
+  MAX_NORTHINGS: MAX_NORTHINGS_LENGTH
+} = OSGB36_CONSTANTS
 
 const validateCoordinates = (value, helpers, type) => {
   const coordinate = Number(value)
   if (isNaN(coordinate)) {
-    return helpers.error(JOI_ERRORS.NUMBER_BASE)
+    return helpers.error('number.base')
   }
 
   if (coordinate <= 0) {
-    return helpers.error(JOI_ERRORS.NUMBER_POSITIVE)
+    return helpers.error('number.positive')
   }
 
   if (
@@ -33,33 +39,94 @@ const validateCoordinates = (value, helpers, type) => {
   return value
 }
 
-export const osgb36ValidationSchema = joi.object({
-  eastings: joi
-    .string()
-    .required()
-    .pattern(/^-?[0-9.]+$/)
-    .custom((value, helpers) => validateCoordinates(value, helpers, 'eastings'))
-    .messages({
-      [JOI_ERRORS.STRING_EMPTY]: 'EASTINGS_REQUIRED',
-      [JOI_ERRORS.STRING_PATTERN_BASE]: 'EASTINGS_NON_NUMERIC',
-      [JOI_ERRORS.NUMBER_BASE]: 'EASTINGS_NON_NUMERIC',
-      [JOI_ERRORS.NUMBER_POSITIVE]: 'EASTINGS_POSITIVE_NUMBER',
-      [JOI_ERRORS.NUMBER_RANGE]: 'EASTINGS_LENGTH',
-      [JOI_ERRORS.ANY_REQUIRED]: 'EASTINGS_REQUIRED'
-    }),
-  northings: joi
+const capitaliseCoordinateType = (type) =>
+  type.charAt(0).toUpperCase() + type.slice(1)
+
+const COORDINATE_CONFIG = {
+  eastings: {
+    constantPrefix: 'EASTINGS',
+    lengthDescription: '6 digits',
+    example: '123456'
+  },
+  northings: {
+    constantPrefix: 'NORTHINGS',
+    lengthDescription: '6 or 7 digits',
+    example: '123456'
+  }
+}
+
+const createMessages = (coordinateType, messageType, pointName) => {
+  const { constantPrefix, lengthDescription, example } =
+    COORDINATE_CONFIG[coordinateType]
+  const capitalised = capitaliseCoordinateType(coordinateType)
+
+  const templates = {
+    constants: [constantPrefix, '', ''],
+    simple: ['', `Enter the ${coordinateType}`, `${capitalised}`],
+    withPoint: [
+      '',
+      `Enter the ${coordinateType} of ${pointName}`,
+      `${capitalised} of ${pointName}`
+    ]
+  }
+
+  const [prefix, enterMsg, typeMsg] = templates[messageType]
+
+  return {
+    [JOI_ERRORS.STRING_EMPTY]: prefix ? `${prefix}_REQUIRED` : enterMsg,
+    [JOI_ERRORS.ANY_REQUIRED]: prefix ? `${prefix}_REQUIRED` : enterMsg,
+    [JOI_ERRORS.STRING_PATTERN_BASE]: prefix
+      ? `${prefix}_NON_NUMERIC`
+      : `${typeMsg} must be a number`,
+    [JOI_ERRORS.NUMBER_BASE]: prefix
+      ? `${prefix}_NON_NUMERIC`
+      : `${typeMsg} must be a number`,
+    [JOI_ERRORS.NUMBER_POSITIVE]: prefix
+      ? `${prefix}_POSITIVE_NUMBER`
+      : `${typeMsg} must be a positive ${lengthDescription}, like ${example}`,
+    [JOI_ERRORS.NUMBER_RANGE]: prefix
+      ? `${prefix}_LENGTH`
+      : `${typeMsg} must be ${lengthDescription}`
+  }
+}
+
+export const createOsgb36CoordinateSchema = (
+  coordinateType,
+  messageType = 'simple',
+  pointName = null
+) => {
+  return joi
     .string()
     .required()
     .pattern(/^-?[0-9.]+$/)
     .custom((value, helpers) =>
-      validateCoordinates(value, helpers, 'northings')
+      validateCoordinates(value, helpers, coordinateType)
     )
-    .messages({
-      [JOI_ERRORS.STRING_EMPTY]: 'NORTHINGS_REQUIRED',
-      [JOI_ERRORS.STRING_PATTERN_BASE]: 'NORTHINGS_NON_NUMERIC',
-      [JOI_ERRORS.NUMBER_BASE]: 'NORTHINGS_NON_NUMERIC',
-      [JOI_ERRORS.NUMBER_POSITIVE]: 'NORTHINGS_POSITIVE_NUMBER',
-      [JOI_ERRORS.NUMBER_RANGE]: 'NORTHINGS_LENGTH',
-      [JOI_ERRORS.ANY_REQUIRED]: 'NORTHINGS_REQUIRED'
-    })
+    .messages(createMessages(coordinateType, messageType, pointName))
+}
+
+export const osgb36ValidationSchema = joi.object({
+  eastings: createOsgb36CoordinateSchema('eastings', 'constants'),
+  northings: createOsgb36CoordinateSchema('northings', 'constants')
 })
+
+export const osgb36MultipleCoordinateItemSchema = joi.object({
+  eastings: createOsgb36CoordinateSchema('eastings', 'simple'),
+  northings: createOsgb36CoordinateSchema('northings', 'simple')
+})
+
+export const createOsgb36MultipleCoordinatesSchema = () => {
+  return joi
+    .object({
+      coordinates: joi
+        .array()
+        .min(MIN_COORDINATE_POINTS)
+        .items(osgb36MultipleCoordinateItemSchema)
+        .required()
+        .messages({
+          'array.min': `You must provide at least ${MIN_COORDINATE_POINTS} coordinate points`,
+          'any.required': 'Coordinates are required'
+        })
+    })
+    .unknown(true)
+}

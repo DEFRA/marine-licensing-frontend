@@ -1,5 +1,9 @@
-import { osgb36ValidationSchema } from '~/src/server/common/schemas/osgb36.js'
 import { COORDINATE_SYSTEMS } from '~/src/server/common/constants/exemptions.js'
+import {
+  osgb36ValidationSchema,
+  createOsgb36MultipleCoordinatesSchema,
+  createOsgb36CoordinateSchema
+} from '~/src/server/common/schemas/osgb36.js'
 
 const mockCoordinates = {
   [COORDINATE_SYSTEMS.OSGB36]: { eastings: '425053', northings: '564180' }
@@ -125,5 +129,110 @@ describe('#osgb36ValidationSchema model', () => {
 
     expect(result.error.message).toContain('EASTINGS_NON_NUMERIC')
     expect(result.error.message).toContain('NORTHINGS_NON_NUMERIC')
+  })
+})
+
+describe('#createOsgb36MultipleCoordinatesSchema', () => {
+  beforeEach(() => {
+    jest.resetAllMocks()
+  })
+
+  test('Should correctly validate valid multiple coordinates', () => {
+    const schema = createOsgb36MultipleCoordinatesSchema()
+    const request = {
+      coordinates: [
+        { eastings: '425053', northings: '564180' },
+        { eastings: '425054', northings: '564181' },
+        { eastings: '425055', northings: '564182' }
+      ]
+    }
+
+    const result = schema.validate(request)
+
+    expect(result.error).toBeUndefined()
+  })
+
+  test('Should correctly validate when coordinates array is empty', () => {
+    const schema = createOsgb36MultipleCoordinatesSchema()
+    const request = {
+      coordinates: []
+    }
+
+    const result = schema.validate(request)
+
+    expect(result.error.message).toContain(
+      'You must provide at least 3 coordinate points'
+    )
+  })
+
+  test('Should correctly validate when coordinates array has insufficient points', () => {
+    const schema = createOsgb36MultipleCoordinatesSchema()
+    const request = {
+      coordinates: [
+        { eastings: '425053', northings: '564180' },
+        { eastings: '425054', northings: '564181' }
+      ]
+    }
+
+    const result = schema.validate(request)
+
+    expect(result.error.message).toContain(
+      'You must provide at least 3 coordinate points'
+    )
+  })
+
+  test('Should correctly validate when coordinates field is missing', () => {
+    const schema = createOsgb36MultipleCoordinatesSchema()
+    const request = {}
+
+    const result = schema.validate(request)
+
+    expect(result.error.message).toContain('Coordinates are required')
+  })
+
+  test('Should correctly validate when individual coordinates are invalid', () => {
+    const schema = createOsgb36MultipleCoordinatesSchema()
+    const request = {
+      coordinates: [
+        { eastings: '10000', northings: '10000' },
+        { eastings: '425054', northings: '564181' },
+        { eastings: '425055', northings: '564182' }
+      ]
+    }
+
+    const result = schema.validate(request, { abortEarly: false })
+
+    expect(result.error.message).toContain('Eastings must be 6 digits')
+    expect(result.error.message).toContain('Northings must be 6 or 7 digits')
+  })
+
+  test('Should correctly validate with additional unknown fields', () => {
+    const schema = createOsgb36MultipleCoordinatesSchema()
+    const request = {
+      coordinates: [
+        { eastings: '425053', northings: '564180' },
+        { eastings: '425054', northings: '564181' },
+        { eastings: '425055', northings: '564182' }
+      ],
+      additionalField: 'should be ignored'
+    }
+
+    const result = schema.validate(request)
+
+    expect(result.error).toBeUndefined()
+  })
+})
+
+describe('#createOsgb36CoordinateSchema', () => {
+  beforeEach(() => {
+    jest.resetAllMocks()
+  })
+
+  test('Should default to simple messageType when not specified', () => {
+    const schema = createOsgb36CoordinateSchema('eastings')
+    const result = schema.validate('')
+
+    expect(result.error).toBeDefined()
+    expect(result.error.message).toContain('Enter the eastings')
   })
 })

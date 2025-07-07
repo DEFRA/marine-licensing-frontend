@@ -36,13 +36,13 @@ describe('date-utils', () => {
       expect(result).toBeNull()
     })
 
-    test('returns null for impossible date (strict parsing)', () => {
-      const result = createDateISO(2025, 2, 29) // Not a leap year
+    test('returns null for impossible date (strict parsing) - not a leap year', () => {
+      const result = createDateISO(2025, 2, 29)
       expect(result).toBeNull()
     })
 
-    test('handles valid leap year date', () => {
-      const result = createDateISO(2024, 2, 29) // Leap year
+    test('handles valid leap year date - a leap year', () => {
+      const result = createDateISO(2024, 2, 29)
       expect(result).toBe('2024-02-29T00:00:00.000Z')
     })
 

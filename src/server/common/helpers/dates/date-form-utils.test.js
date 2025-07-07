@@ -1,12 +1,10 @@
 import {
-  addCustomValidationErrors,
   createDateFieldNames,
   createDateFieldsFromValue,
   createErrorTypeMap,
   extractDateFieldsFromPayload,
   extractMultipleDateFields,
   getDateErrorMessage,
-  handleMissingDateErrors,
   isCompleteDateMissing,
   processDateValidationErrors
 } from './date-form-utils.js'
@@ -205,60 +203,6 @@ describe('Date Form Utils', () => {
 
       const result = getDateErrorMessage(config)
       expect(result).toBeNull()
-    })
-  })
-
-  describe('addCustomValidationErrors', () => {
-    test('should add custom validation errors to error summary', () => {
-      const errorSummary = []
-      const errorTypeMap = {
-        'invalid-error': true,
-        'future-error': true
-      }
-      const dateConfigs = [
-        {
-          prefix: 'test-date',
-          fieldNames: { DAY: 'test-date-day' },
-          errorKeys: {
-            INVALID: 'invalid-error',
-            TODAY_OR_FUTURE: 'future-error'
-          },
-          errorMessages: {
-            'invalid-error': 'Date is invalid',
-            'future-error': 'Date must be future'
-          }
-        }
-      ]
-
-      addCustomValidationErrors(errorSummary, errorTypeMap, dateConfigs)
-
-      expect(errorSummary).toHaveLength(1)
-      expect(errorSummary[0]).toEqual({
-        href: '#test-date-day',
-        text: 'Date must be future'
-      })
-    })
-  })
-
-  describe('handleMissingDateErrors', () => {
-    test('should handle missing date errors in summary', () => {
-      const errorSummary = [{ href: '#other-field', text: 'Other error' }]
-      const missingDates = [
-        {
-          prefix: 'test-date',
-          errorKey: 'MISSING_START',
-          errorMessage: 'Start date is missing',
-          fieldNames: { DAY: 'test-date-day' }
-        }
-      ]
-
-      const result = handleMissingDateErrors(errorSummary, missingDates)
-
-      expect(result).toHaveLength(2)
-      expect(result[0]).toEqual({
-        href: '#test-date-day',
-        text: 'Start date is missing'
-      })
     })
   })
 

@@ -8,13 +8,12 @@ import {
 } from '~/src/server/common/constants/activity-dates.js'
 import { routes } from '~/src/server/common/constants/routes.js'
 import { authenticatedPatchRequest } from '~/src/server/common/helpers/authenticated-requests.js'
+import { processDateValidationErrors } from '~/src/server/common/helpers/dates/date-form-utils.js'
 import {
   createDateFieldsFromValue,
-  extractMultipleDateFields,
-  addCustomValidationErrors as genericAddCustomValidationErrors,
-  processDateValidationErrors
-} from '~/src/server/common/helpers/dates/date-form-utils.js'
-import { createDateISO } from '~/src/server/common/helpers/dates/date-utils.js'
+  createDateISO,
+  extractMultipleDateFields
+} from '~/src/server/common/helpers/dates/date-utils.js'
 import {
   errorDescriptionByFieldName,
   mapErrorsForDisplay
@@ -57,14 +56,6 @@ export function createTemplateData(exemption, payload = null) {
     projectName: exemption.projectName,
     ...dateFields
   }
-}
-
-export function addCustomValidationErrors(errorSummary, errorTypeMap) {
-  return genericAddCustomValidationErrors(
-    errorSummary,
-    errorTypeMap,
-    ACTIVITY_DATES_CONFIG
-  )
 }
 
 export const activityDatesController = {

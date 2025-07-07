@@ -4,7 +4,6 @@ import {
   MULTIPLE_COORDINATES_VIEW_ROUTES,
   normaliseCoordinatesForDisplay,
   multipleCoordinatesPageData,
-  getSessionPayload,
   convertPayloadToCoordinatesArray,
   validateCoordinates,
   convertArrayErrorsToFlattenedErrors,
@@ -14,26 +13,24 @@ import {
 
 export const multipleCoordinatesController = {
   handler(request, h) {
-    const exemption = getExemptionCache(request)
-    const siteDetails = exemption?.siteDetails ?? {}
+    const { projectName, siteDetails = {} } = getExemptionCache(request) || {}
 
-    // Get coordinate system from session cache
     const coordinateSystem =
       siteDetails.coordinateSystem === COORDINATE_SYSTEMS.OSGB36
         ? COORDINATE_SYSTEMS.OSGB36
         : COORDINATE_SYSTEMS.WGS84
 
-    const payload = getSessionPayload(siteDetails, coordinateSystem)
+    const multipleCoordinates = siteDetails.multipleCoordinates || {}
 
-    const coordinatesForDisplay = normaliseCoordinatesForDisplay(
-      payload.coordinates,
+    const coordinates = normaliseCoordinatesForDisplay(
+      multipleCoordinates[coordinateSystem] || [],
       coordinateSystem
     )
 
     return h.view(MULTIPLE_COORDINATES_VIEW_ROUTES[coordinateSystem], {
       ...multipleCoordinatesPageData,
-      coordinates: coordinatesForDisplay,
-      projectName: exemption?.projectName
+      coordinates,
+      projectName
     })
   }
 }
@@ -44,7 +41,6 @@ export const multipleCoordinatesSubmitController = {
     const { payload } = request
     const exemption = getExemptionCache(request)
 
-    // Convert form value to coordinate system constant
     const coordinateSystem =
       payload.coordinateSystem === 'OSGB36'
         ? COORDINATE_SYSTEMS.OSGB36

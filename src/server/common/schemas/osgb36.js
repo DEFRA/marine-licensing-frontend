@@ -5,12 +5,8 @@ import {
   OSGB36_CONSTANTS
 } from '~/src/server/common/constants/exemptions.js'
 
-const {
-  MIN_EASTINGS: MIN_EASTINGS_LENGTH,
-  MAX_EASTINGS: MAX_EASTINGS_LENGTH,
-  MIN_NORTHINGS: MIN_NORTHINGS_LENGTH,
-  MAX_NORTHINGS: MAX_NORTHINGS_LENGTH
-} = OSGB36_CONSTANTS
+const { MIN_EASTINGS, MAX_EASTINGS, MIN_NORTHINGS, MAX_NORTHINGS } =
+  OSGB36_CONSTANTS
 
 const validateCoordinates = (value, helpers, type) => {
   const coordinate = Number(value)
@@ -24,14 +20,14 @@ const validateCoordinates = (value, helpers, type) => {
 
   if (
     type === 'eastings' &&
-    (coordinate < MIN_EASTINGS_LENGTH || coordinate > MAX_EASTINGS_LENGTH)
+    (coordinate < MIN_EASTINGS || coordinate > MAX_EASTINGS)
   ) {
     return helpers.error(JOI_ERRORS.NUMBER_RANGE)
   }
 
   if (
     type === 'northings' &&
-    (coordinate < MIN_NORTHINGS_LENGTH || coordinate > MAX_NORTHINGS_LENGTH)
+    (coordinate < MIN_NORTHINGS || coordinate > MAX_NORTHINGS)
   ) {
     return helpers.error(JOI_ERRORS.NUMBER_RANGE)
   }

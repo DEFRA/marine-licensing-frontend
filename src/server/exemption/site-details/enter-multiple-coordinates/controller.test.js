@@ -11,7 +11,6 @@ import {
   normaliseCoordinatesForDisplay,
   isWGS84,
   multipleCoordinatesPageData,
-  getSessionPayload,
   convertPayloadToCoordinatesArray,
   validateCoordinates,
   convertArrayErrorsToFlattenedErrors,
@@ -34,7 +33,6 @@ jest.mock(
         'Enter multiple sets of coordinates to mark the boundary of the site',
       backLink: '/exemption/what-coordinate-system'
     },
-    getSessionPayload: jest.fn(),
     convertPayloadToCoordinatesArray: jest.fn(),
     validateCoordinates: jest.fn(),
     convertArrayErrorsToFlattenedErrors: jest.fn(),
@@ -81,16 +79,11 @@ describe('#multipleCoordinates', () => {
       .spyOn(cacheUtils, 'getExemptionCache')
       .mockReturnValue(mockExemption)
 
-    // Simple mock implementations for controller testing
     normaliseCoordinatesForDisplay.mockImplementation((coords) => coords || [])
     isWGS84.mockImplementation(
       (coordinateSystem) => coordinateSystem === COORDINATE_SYSTEMS.WGS84
     )
-    getSessionPayload.mockImplementation((siteDetails, coordinateSystem) => ({
-      coordinates: siteDetails.multipleCoordinates?.[coordinateSystem] || []
-    }))
     convertPayloadToCoordinatesArray.mockImplementation((payload) => {
-      // Simple implementation for controller testing
       const coordinates = []
       Object.keys(payload)
         .filter((key) => key.startsWith('coordinates['))
@@ -314,7 +307,7 @@ describe('#multipleCoordinates', () => {
       }
       const request = { payload }
 
-      isWGS84.mockReturnValueOnce(false) // Invalid system should default to WGS84
+      isWGS84.mockReturnValueOnce(false)
 
       multipleCoordinatesSubmitController.handler(request, mockH)
 

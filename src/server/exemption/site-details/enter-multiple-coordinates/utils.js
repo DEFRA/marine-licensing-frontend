@@ -14,6 +14,13 @@ export const PATTERNS = {
   FIELD_BRACKETS: /[[\]]/g
 }
 
+export const MULTIPLE_COORDINATES_VIEW_ROUTES = {
+  [COORDINATE_SYSTEMS.WGS84]:
+    'exemption/site-details/enter-multiple-coordinates/wgs84',
+  [COORDINATE_SYSTEMS.OSGB36]:
+    'exemption/site-details/enter-multiple-coordinates/osgb36'
+}
+
 export const multipleCoordinatesPageData = {
   heading:
     'Enter multiple sets of coordinates to mark the boundary of the site',
@@ -31,8 +38,6 @@ export const COORDINATE_FIELDS = {
   }
 }
 
-// === COORDINATE SYSTEM UTILITIES ===
-
 export const isWGS84 = (coordinateSystem) =>
   coordinateSystem === COORDINATE_SYSTEMS.WGS84
 
@@ -43,8 +48,6 @@ const createEmptyCoordinate = (coordinateSystem) => {
   const fields = getCoordinateFields(coordinateSystem)
   return { [fields.primary]: '', [fields.secondary]: '' }
 }
-
-// === COORDINATE DISPLAY UTILITIES ===
 
 const createDefaultCoordinates = (coordinateSystem) => {
   return Array.from({ length: REQUIRED_COORDINATES_COUNT }, () =>
@@ -74,8 +77,6 @@ export const normaliseCoordinatesForDisplay = (
 
   return displayCoordinates.slice(0, REQUIRED_COORDINATES_COUNT)
 }
-
-// === FIELD PROCESSING UTILITIES ===
 
 export const extractCoordinateIndexFromFieldName = (fieldName) => {
   const indexMatch = fieldName.match(/coordinates(\d+)/)
@@ -110,8 +111,6 @@ export const convertPayloadToCoordinatesArray = (payload, coordinateSystem) => {
   return coordinates
 }
 
-// === VALIDATION UTILITIES ===
-
 export const getValidationSchema = (coordinateSystem) => {
   return isWGS84(coordinateSystem)
     ? createWgs84MultipleCoordinatesSchema()
@@ -138,8 +137,6 @@ export const convertArrayErrorsToFlattenedErrors = (error) => {
 
   return { ...error, details: convertedDetails }
 }
-
-// === ERROR PROCESSING UTILITIES ===
 
 export const processErrorDetail = (detail) => {
   const fieldName = sanitiseFieldName(detail.path)
@@ -210,13 +207,6 @@ export const handleValidationFailure = (
     .takeover()
 }
 
-// === SESSION UTILITIES ===
-
-export const getSessionPayload = (siteDetails, coordinateSystem) => {
-  const multipleCoordinates = siteDetails.multipleCoordinates || {}
-  return { coordinates: multipleCoordinates[coordinateSystem] || [] }
-}
-
 export const saveCoordinatesToSession = (
   request,
   coordinates,
@@ -238,8 +228,6 @@ export const saveCoordinatesToSession = (
   )
 }
 
-// === VALIDATION WORKFLOW ===
-
 export const validateCoordinates = (
   coordinates,
   exemptionId,
@@ -249,13 +237,4 @@ export const validateCoordinates = (
   const schema = getValidationSchema(coordinateSystem)
 
   return schema.validate(validationPayload, { abortEarly: false })
-}
-
-// === EXISTING EXPORTS ===
-
-export const MULTIPLE_COORDINATES_VIEW_ROUTES = {
-  [COORDINATE_SYSTEMS.WGS84]:
-    'exemption/site-details/enter-multiple-coordinates/wgs84',
-  [COORDINATE_SYSTEMS.OSGB36]:
-    'exemption/site-details/enter-multiple-coordinates/osgb36'
 }

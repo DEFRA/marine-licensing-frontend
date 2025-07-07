@@ -77,7 +77,6 @@ export function generateDateErrorMessages({
   const dateErrorMessages = {}
   const errorTypeMap = createErrorTypeMap(errorDetails)
 
-  // Use the same error mapping flow as the rest of the system
   const basicErrorSummary = errorDetails.map((detail) => ({
     href: detail.path?.[0] ? `#${detail.path[0]}` : '#',
     text: errorMessages[detail.type] || detail.message,

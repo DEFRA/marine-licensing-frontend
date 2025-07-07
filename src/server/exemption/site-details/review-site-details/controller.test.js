@@ -11,7 +11,7 @@ import { statusCodes } from '~/src/server/common/constants/status-codes.js'
 import { config } from '~/src/config/config.js'
 import { JSDOM } from 'jsdom'
 import { routes } from '~/src/server/common/constants/routes.js'
-import Wreck from '@hapi/wreck'
+import * as authRequests from '~/src/server/common/helpers/authenticated-requests.js'
 
 jest.mock('~/src/server/common/helpers/session-cache/utils.js')
 
@@ -37,7 +37,7 @@ describe('#reviewSiteDetails', () => {
   beforeEach(() => {
     jest.resetAllMocks()
 
-    jest.spyOn(Wreck, 'patch').mockReturnValue({
+    jest.spyOn(authRequests, 'authenticatedPatchRequest').mockResolvedValue({
       payload: {
         id: mockExemption.id,
         siteDetails: mockExemption.siteDetails
@@ -221,14 +221,12 @@ describe('#reviewSiteDetails', () => {
         }
       })
 
-      expect(Wreck.patch).toHaveBeenCalledWith(
-        `${config.get('backend').apiUrl}/exemption/site-details`,
+      expect(authRequests.authenticatedPatchRequest).toHaveBeenCalledWith(
+        expect.any(Object),
+        '/exemption/site-details',
         {
-          payload: {
-            siteDetails: mockExemption.siteDetails,
-            id: mockExemption.id
-          },
-          json: true
+          siteDetails: mockExemption.siteDetails,
+          id: mockExemption.id
         }
       )
 
@@ -246,7 +244,7 @@ describe('#reviewSiteDetails', () => {
     })
 
     test('Should show error page with validation errors from backend', async () => {
-      const apiPatchMock = jest.spyOn(Wreck, 'patch')
+      const apiPatchMock = jest.spyOn(authRequests, 'authenticatedPatchRequest')
       apiPatchMock.mockRejectedValueOnce({
         res: { statusCode: 400 },
         data: {
@@ -285,7 +283,7 @@ describe('#reviewSiteDetails', () => {
     })
 
     test('Should pass error to global catchAll behaviour if it contains no validation data', async () => {
-      const apiPatchMock = jest.spyOn(Wreck, 'patch')
+      const apiPatchMock = jest.spyOn(authRequests, 'authenticatedPatchRequest')
       apiPatchMock.mockRejectedValueOnce({
         res: { statusCode: 500 },
         data: {}

@@ -3,14 +3,14 @@ import { statusCodes } from '~/src/server/common/constants/status-codes.js'
 import { routes } from '~/src/server/common/constants/routes.js'
 import { mockExemption } from '~/src/server/test-helpers/mocks.js'
 import { config } from '~/src/config/config.js'
-import Wreck from '@hapi/wreck'
 import { JSDOM } from 'jsdom'
 import {
-  activityDescriptionSubmitController,
   activityDescriptionController,
+  activityDescriptionSubmitController,
   ACTIVITY_DESCRIPTION_VIEW_ROUTE
 } from '~/src/server/exemption/activity-description/controller.js'
 import * as cacheUtils from '~/src/server/common/helpers/session-cache/utils.js'
+import * as authRequests from '~/src/server/common/helpers/authenticated-requests.js'
 
 jest.mock('~/src/server/common/helpers/session-cache/utils.js')
 
@@ -29,8 +29,8 @@ describe('#activityDescriptionController', () => {
     jest.resetAllMocks()
 
     jest
-      .spyOn(Wreck, 'patch')
-      .mockReturnValue({ payload: { id: mockExemption.id } })
+      .spyOn(authRequests, 'authenticatedPatchRequest')
+      .mockResolvedValue({ payload: { id: mockExemption.id } })
 
     getExemptionCacheSpy = jest
       .spyOn(cacheUtils, 'getExemptionCache')
@@ -99,7 +99,7 @@ describe('#activityDescriptionController', () => {
 
   describe('activityDescriptionController POST', () => {
     test('should handle form submission with valid data', async () => {
-      const apiPatchMock = jest.spyOn(Wreck, 'patch')
+      const apiPatchMock = jest.spyOn(authRequests, 'authenticatedPatchRequest')
       const payload = {
         activityDescription: 'This is a test activity description.'
       }
@@ -115,12 +115,10 @@ describe('#activityDescriptionController', () => {
         payload
       })
 
-      expect(Wreck.patch).toHaveBeenCalledWith(
-        `${config.get('backend').apiUrl}/exemption/activity-description`,
-        {
-          payload: { ...payload },
-          json: true
-        }
+      expect(authRequests.authenticatedPatchRequest).toHaveBeenCalledWith(
+        expect.any(Object),
+        '/exemption/activity-description',
+        { ...payload }
       )
       expect(statusCode).toBe(statusCodes.redirect)
       expect(headers.location).toBe(routes.TASK_LIST)
@@ -164,7 +162,7 @@ describe('#activityDescriptionController', () => {
     })
 
     test('should pass error to global catchAll handler', async () => {
-      const apiPatchMock = jest.spyOn(Wreck, 'patch')
+      const apiPatchMock = jest.spyOn(authRequests, 'authenticatedPatchRequest')
       apiPatchMock.mockRejectedValueOnce({
         res: { statusCode: 500 },
         data: {}
@@ -254,7 +252,7 @@ describe('#activityDescriptionController', () => {
     })
 
     test('should show error message with empty activity description', async () => {
-      const apiPatchMock = jest.spyOn(Wreck, 'patch')
+      const apiPatchMock = jest.spyOn(authRequests, 'authenticatedPatchRequest')
       const fakeError = new Error('Bad Request')
       fakeError.data = {
         payload: {

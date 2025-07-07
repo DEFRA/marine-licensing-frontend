@@ -1,9 +1,8 @@
 import { JSDOM } from 'jsdom'
-import Wreck from '@hapi/wreck'
-
 import * as cacheUtils from '~/src/server/common/helpers/session-cache/utils.js'
 import { createServer } from '~/src/server/index.js'
 import { mockExemption } from '~/src/server/test-helpers/mocks.js'
+import * as authRequests from '~/src/server/common/helpers/authenticated-requests.js'
 
 describe('check your answers controller', () => {
   let server
@@ -18,8 +17,8 @@ describe('check your answers controller', () => {
     jest.resetAllMocks()
 
     jest
-      .spyOn(Wreck, 'get')
-      .mockReturnValue({ payload: { value: mockExemption } })
+      .spyOn(authRequests, 'authenticatedGetRequest')
+      .mockResolvedValue({ payload: { value: mockExemption } })
 
     getExemptionCacheSpy = jest
       .spyOn(cacheUtils, 'getExemptionCache')
@@ -32,7 +31,7 @@ describe('check your answers controller', () => {
 
   describe('POST /exemption/check-your-answers', () => {
     beforeEach(() => {
-      jest.spyOn(Wreck, 'post').mockResolvedValue({
+      jest.spyOn(authRequests, 'authenticatedPostRequest').mockResolvedValue({
         payload: {
           message: 'success',
           value: {
@@ -53,12 +52,10 @@ describe('check your answers controller', () => {
       expect(headers.location).toBe(
         '/exemption/confirmation?applicationReference=APP-123456'
       )
-      expect(Wreck.post).toHaveBeenCalledWith(
-        expect.stringContaining('/exemption/submit'),
-        {
-          payload: { id: mockExemption.id },
-          json: true
-        }
+      expect(authRequests.authenticatedPostRequest).toHaveBeenCalledWith(
+        expect.any(Object),
+        '/exemption/submit',
+        { id: mockExemption.id }
       )
     })
 
@@ -72,7 +69,9 @@ describe('check your answers controller', () => {
     })
 
     test('Should handle API errors gracefully', async () => {
-      jest.spyOn(Wreck, 'post').mockRejectedValue(new Error('API Error'))
+      jest
+        .spyOn(authRequests, 'authenticatedPostRequest')
+        .mockRejectedValue(new Error('API Error'))
 
       const { statusCode } = await server.inject({
         method: 'POST',
@@ -83,7 +82,7 @@ describe('check your answers controller', () => {
     })
 
     test('Should handle unexpected API response format', async () => {
-      jest.spyOn(Wreck, 'post').mockResolvedValue({
+      jest.spyOn(authRequests, 'authenticatedPostRequest').mockResolvedValue({
         payload: { message: 'error', error: 'Something went wrong' }
       })
 
@@ -106,7 +105,9 @@ describe('check your answers controller', () => {
   })
 
   test('Should throw a 404 if exemption data is not found from server', async () => {
-    jest.spyOn(Wreck, 'get').mockReturnValueOnce({ payload: {} })
+    jest
+      .spyOn(authRequests, 'authenticatedGetRequest')
+      .mockResolvedValueOnce({ payload: {} })
     const { statusCode } = await server.inject({
       method: 'GET',
       url: '/exemption/check-your-answers'
@@ -115,7 +116,7 @@ describe('check your answers controller', () => {
   })
 
   test('Should throw a 404 if exemption data has no taskList', async () => {
-    jest.spyOn(Wreck, 'get').mockReturnValueOnce({
+    jest.spyOn(authRequests, 'authenticatedGetRequest').mockResolvedValueOnce({
       payload: {
         value: {
           id: 'test-id'
@@ -131,7 +132,7 @@ describe('check your answers controller', () => {
   })
 
   test('Should throw a 404 if exemption data value is null', async () => {
-    jest.spyOn(Wreck, 'get').mockReturnValueOnce({
+    jest.spyOn(authRequests, 'authenticatedGetRequest').mockResolvedValueOnce({
       payload: {
         value: null
       }

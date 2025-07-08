@@ -36,10 +36,6 @@ export const validateDecimals = (value, helpers) => {
 
 export const validateCoordinates = (value, helpers, type) => {
   const coordinate = Number(value)
-  if (isNaN(coordinate)) {
-    return helpers.error(JOI_ERRORS.NUMBER_BASE)
-  }
-
   if (type === 'latitude' && !isLatitudeInRange(coordinate)) {
     return helpers.error(JOI_ERRORS.NUMBER_RANGE)
   }

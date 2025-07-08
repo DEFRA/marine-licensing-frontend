@@ -1,5 +1,8 @@
 import { COORDINATE_SYSTEMS } from '~/src/server/common/constants/exemptions.js'
-import { getExemptionCache } from '~/src/server/common/helpers/session-cache/utils.js'
+import {
+  getExemptionCache,
+  getCoordinateSystem
+} from '~/src/server/common/helpers/session-cache/utils.js'
 import {
   MULTIPLE_COORDINATES_VIEW_ROUTES,
   normaliseCoordinatesForDisplay,
@@ -40,11 +43,7 @@ export const multipleCoordinatesSubmitController = {
   handler(request, h) {
     const { payload } = request
     const exemption = getExemptionCache(request)
-
-    const coordinateSystem =
-      payload.coordinateSystem === 'OSGB36'
-        ? COORDINATE_SYSTEMS.OSGB36
-        : COORDINATE_SYSTEMS.WGS84
+    const { coordinateSystem } = getCoordinateSystem(request)
 
     const coordinates = convertPayloadToCoordinatesArray(
       payload,

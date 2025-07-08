@@ -45,6 +45,7 @@ describe('#multipleCoordinates', () => {
   /** @type {Server} */
   let server
   let getExemptionCacheSpy
+  let getCoordinateSystemSpy
 
   const mockCoordinates = {
     wgs84: [
@@ -78,6 +79,9 @@ describe('#multipleCoordinates', () => {
     getExemptionCacheSpy = jest
       .spyOn(cacheUtils, 'getExemptionCache')
       .mockReturnValue(mockExemption)
+    getCoordinateSystemSpy = jest
+      .spyOn(cacheUtils, 'getCoordinateSystem')
+      .mockReturnValue({ coordinateSystem: COORDINATE_SYSTEMS.WGS84 })
 
     normaliseCoordinatesForDisplay.mockImplementation((coords) => coords || [])
     isWGS84.mockImplementation(
@@ -204,8 +208,7 @@ describe('#multipleCoordinates', () => {
     test('should successfully process and save valid coordinates', () => {
       const payload = {
         'coordinates[0][latitude]': '51.5074',
-        'coordinates[0][longitude]': '-0.1278',
-        coordinateSystem: 'WGS84'
+        'coordinates[0][longitude]': '-0.1278'
       }
       const request = { payload }
       const expectedCoordinates = [
@@ -243,8 +246,7 @@ describe('#multipleCoordinates', () => {
 
     test('should handle validation errors by calling handleValidationFailure', () => {
       const payload = {
-        'coordinates[0][latitude]': 'invalid',
-        coordinateSystem: 'WGS84'
+        'coordinates[0][latitude]': 'invalid'
       }
       const request = { payload }
       const mockValidationError = {
@@ -268,10 +270,12 @@ describe('#multipleCoordinates', () => {
     })
 
     test('should handle OSGB36 coordinate system correctly', () => {
+      getCoordinateSystemSpy.mockReturnValueOnce({
+        coordinateSystem: COORDINATE_SYSTEMS.OSGB36
+      })
       const payload = {
         'coordinates[0][eastings]': '530000',
-        'coordinates[0][northings]': '181000',
-        coordinateSystem: 'OSGB36'
+        'coordinates[0][northings]': '181000'
       }
       const request = { payload }
       const expectedCoordinates = [{ eastings: '530000', northings: '181000' }]
@@ -302,8 +306,7 @@ describe('#multipleCoordinates', () => {
 
     test('should default to WGS84 when coordinateSystem is invalid', () => {
       const payload = {
-        'coordinates[0][latitude]': '51.5074',
-        coordinateSystem: 'INVALID'
+        'coordinates[0][latitude]': '51.5074'
       }
       const request = { payload }
 

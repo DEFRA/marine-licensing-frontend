@@ -10,9 +10,6 @@ const { MIN_EASTINGS, MAX_EASTINGS, MIN_NORTHINGS, MAX_NORTHINGS } =
 
 const validateCoordinates = (value, helpers, type) => {
   const coordinate = Number(value)
-  if (isNaN(coordinate)) {
-    return helpers.error(JOI_ERRORS.NUMBER_BASE)
-  }
 
   if (coordinate <= 0) {
     return helpers.error(JOI_ERRORS.NUMBER_POSITIVE)
@@ -36,13 +33,11 @@ const validateCoordinates = (value, helpers, type) => {
 }
 
 const validateCoordinatesWithPattern = (value, helpers, type) => {
-  // First check if the value matches the numeric pattern
   const numericPattern = /^-?[0-9.]+$/
   if (!numericPattern.test(value)) {
     return helpers.error(JOI_ERRORS.STRING_PATTERN_BASE)
   }
 
-  // If pattern matches, proceed with numeric validation
   return validateCoordinates(value, helpers, type)
 }
 

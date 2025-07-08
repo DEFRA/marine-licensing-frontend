@@ -6,7 +6,7 @@ import { routes } from '~/src/server/common/constants/routes.js'
 export function buildNavigation(request) {
   return [
     {
-      text: 'Projects Home',
+      text: 'Projects home',
       href: routes.DASHBOARD,
       active: request?.path === routes.DASHBOARD
     }

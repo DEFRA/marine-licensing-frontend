@@ -38,7 +38,7 @@ describe('#context', () => {
         navigation: [
           {
             active: false,
-            text: 'Projects Home',
+            text: 'Projects home',
             href: '/home'
           }
         ],
@@ -123,7 +123,7 @@ describe('#context cache', () => {
         navigation: [
           {
             active: false,
-            text: 'Projects Home',
+            text: 'Projects home',
             href: '/home'
           }
         ],

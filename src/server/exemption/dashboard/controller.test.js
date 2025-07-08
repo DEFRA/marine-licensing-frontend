@@ -87,7 +87,9 @@ describe('#dashboard', () => {
           { text: 'Test Project' },
           { text: 'Exempt activity' },
           { text: '-' },
-          { html: '<strong class="govuk-tag govuk-tag--blue">Draft</strong>' },
+          {
+            html: '<strong class="govuk-tag govuk-tag--light-blue">Draft</strong>'
+          },
           { text: '-' }
         ]
       ])

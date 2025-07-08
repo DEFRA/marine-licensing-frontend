@@ -14,7 +14,7 @@ describe('#buildNavigation', () => {
     ).toEqual([
       {
         active: false,
-        text: 'Projects Home',
+        text: 'Projects home',
         href: '/home'
       }
     ])
@@ -24,7 +24,7 @@ describe('#buildNavigation', () => {
     expect(buildNavigation(mockRequest({ path: '/' }))).toEqual([
       {
         active: false,
-        text: 'Projects Home',
+        text: 'Projects home',
         href: '/home'
       }
     ])
@@ -35,7 +35,7 @@ describe('#buildNavigation', () => {
     const navigation = buildNavigation(request)
 
     const projectsHomeLink = navigation.find(
-      (item) => item.text === 'Projects Home'
+      (item) => item.text === 'Projects home'
     )
     expect(projectsHomeLink.active).toBe(true)
   })
@@ -45,7 +45,7 @@ describe('#buildNavigation', () => {
     const navigation = buildNavigation(request)
 
     const projectsHomeLink = navigation.find(
-      (item) => item.text === 'Projects Home'
+      (item) => item.text === 'Projects home'
     )
     expect(projectsHomeLink.active).toBe(false)
   })

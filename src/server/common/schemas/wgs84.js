@@ -48,19 +48,16 @@ export const validateCoordinates = (value, helpers, type) => {
 }
 
 const validateCoordinatesWithPattern = (value, helpers, type) => {
-  // First check if the value matches the numeric pattern
   const numericPattern = /^-?[\d.]+$/
   if (!numericPattern.test(value)) {
     return helpers.error(JOI_ERRORS.STRING_PATTERN_BASE)
   }
 
-  // If pattern matches, proceed with numeric validation
   const coordinateValidation = validateCoordinates(value, helpers, type)
   if (coordinateValidation !== value) {
-    return coordinateValidation // Return the error
+    return coordinateValidation
   }
 
-  // If numeric validation passes, proceed with decimal validation
   return validateDecimals(value, helpers)
 }
 

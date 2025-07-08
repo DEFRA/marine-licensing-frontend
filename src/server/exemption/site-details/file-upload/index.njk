@@ -18,15 +18,18 @@
 
 {% set formLabel %}
   {% if projectName %}
-    <span class="govuk-caption-l">{{ projectName }}</span>                
+    <span class="govuk-caption-l">{{ projectName }}</span>
   {% endif %}
 
   <h1 class="govuk-label-wrapper">
     <label class="govuk-label govuk-label--l" for="file-id" id="file-upload-1-label">
-      {{ heading }}    
+      {{ heading }}
     </label>
-  </h1>  
-{% endset %} 
+    {%  if fileUploadType == 'shapefile' %}
+      <p class="govuk_hint">Upload a ZIP file containing all the files for your Shapefile (for example, .shp, .shx and .dbf).</p>
+    {%  endif %}
+  </h1>
+{% endset %}
 
 {% block content %}
   <div class="govuk-grid-row">
@@ -38,7 +41,7 @@
           errorList: errorSummary
         }) }}
       {% endif %}
-  
+
         <form action="{{ uploadUrl }}" method="post" enctype="multipart/form-data" novalidate>
 
           {{ govukFileUpload({

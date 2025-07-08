@@ -11,11 +11,11 @@ const { MIN_EASTINGS, MAX_EASTINGS, MIN_NORTHINGS, MAX_NORTHINGS } =
 const validateCoordinates = (value, helpers, type) => {
   const coordinate = Number(value)
   if (isNaN(coordinate)) {
-    return helpers.error('number.base')
+    return helpers.error(JOI_ERRORS.NUMBER_BASE)
   }
 
   if (coordinate <= 0) {
-    return helpers.error('number.positive')
+    return helpers.error(JOI_ERRORS.NUMBER_POSITIVE)
   }
 
   if (

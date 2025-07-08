@@ -1,7 +1,6 @@
 import {
   COORDINATE_ERROR_MESSAGES,
-  generatePointSpecificErrorMessage,
-  createPointSpecificErrorMessages
+  generatePointSpecificErrorMessage
 } from './site-details.js'
 import { COORDINATE_SYSTEMS } from '~/src/server/common/constants/exemptions.js'
 
@@ -51,49 +50,6 @@ describe('site-details helper', () => {
       const originalMessage = 'Some unknown error message'
       const result = generatePointSpecificErrorMessage(originalMessage, 1)
       expect(result).toBe(originalMessage)
-    })
-  })
-
-  describe('createPointSpecificErrorMessages', () => {
-    test('should create WGS84 point-specific error messages', () => {
-      const pointName = 'the start and end point'
-      const result = createPointSpecificErrorMessages(
-        pointName,
-        COORDINATE_SYSTEMS.WGS84
-      )
-
-      expect(result.LATITUDE_REQUIRED).toBe(
-        'Enter the latitude of the start and end point'
-      )
-      expect(result.LONGITUDE_REQUIRED).toBe(
-        'Enter the longitude of the start and end point'
-      )
-      expect(result.LATITUDE_NON_NUMERIC).toBe(
-        'Latitude of the start and end point must be a number'
-      )
-      expect(result.LONGITUDE_DECIMAL_PLACES).toBe(
-        'Longitude of the start and end point must include 6 decimal places, like -1.399500'
-      )
-    })
-
-    test('should create OSGB36 point-specific error messages', () => {
-      const pointName = 'point 2'
-      const result = createPointSpecificErrorMessages(
-        pointName,
-        COORDINATE_SYSTEMS.OSGB36
-      )
-
-      expect(result.EASTINGS_REQUIRED).toBe('Enter the eastings of point 2')
-      expect(result.NORTHINGS_REQUIRED).toBe('Enter the northings of point 2')
-      expect(result.EASTINGS_NON_NUMERIC).toBe(
-        'Eastings of point 2 must be a number'
-      )
-      expect(result.NORTHINGS_WHOLE_NUMBER).toBe(
-        'Northings of point 2 must be a whole number'
-      )
-      expect(result.EASTINGS_POSITIVE_NUMBER).toBe(
-        'Eastings of point 2 must be a positive 6-digit number, like 123456'
-      )
     })
   })
 })

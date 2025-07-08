@@ -130,6 +130,27 @@ describe('#osgb36ValidationSchema model', () => {
     expect(result.error.message).toContain('EASTINGS_NON_NUMERIC')
     expect(result.error.message).toContain('NORTHINGS_NON_NUMERIC')
   })
+
+  test('Should generate single error message for non-numeric input like "abc123"', () => {
+    const request = {
+      eastings: 'abc123',
+      northings: '564180'
+    }
+
+    const result = osgb36ValidationSchema.validate(request, {
+      abortEarly: false
+    })
+
+    expect(result.error).toBeDefined()
+    expect(result.error.message).toContain('EASTINGS_NON_NUMERIC')
+    expect(result.error.message).not.toContain('NORTHINGS_NON_NUMERIC')
+
+    // Verify only one error for eastings (no duplicate)
+    const eastingsErrors = result.error.details.filter((detail) =>
+      detail.path.includes('eastings')
+    )
+    expect(eastingsErrors).toHaveLength(1)
+  })
 })
 
 describe('#createOsgb36MultipleCoordinatesSchema', () => {
@@ -234,5 +255,135 @@ describe('#createOsgb36CoordinateSchema', () => {
 
     expect(result.error).toBeDefined()
     expect(result.error.message).toContain('Enter the eastings')
+  })
+
+  describe('Error message specification verification', () => {
+    test('Should show correct error for blank eastings field with withPoint messageType', () => {
+      const schema = createOsgb36CoordinateSchema(
+        'eastings',
+        'withPoint',
+        'point 2'
+      )
+      const result = schema.validate('')
+
+      expect(result.error).toBeDefined()
+      expect(result.error.message).toBe('Enter the eastings of point 2')
+    })
+
+    test('Should show correct error for blank northings field with withPoint messageType', () => {
+      const schema = createOsgb36CoordinateSchema(
+        'northings',
+        'withPoint',
+        'point 3'
+      )
+      const result = schema.validate('')
+
+      expect(result.error).toBeDefined()
+      expect(result.error.message).toBe('Enter the northings of point 3')
+    })
+
+    test('Should show correct error for non-numeric eastings with withPoint messageType', () => {
+      const schema = createOsgb36CoordinateSchema(
+        'eastings',
+        'withPoint',
+        'point 2'
+      )
+      const result = schema.validate('abc123')
+
+      expect(result.error).toBeDefined()
+      expect(result.error.message).toBe('Eastings of point 2 must be a number')
+    })
+
+    test('Should show correct error for non-numeric northings with withPoint messageType', () => {
+      const schema = createOsgb36CoordinateSchema(
+        'northings',
+        'withPoint',
+        'point 3'
+      )
+      const result = schema.validate('xyz789')
+
+      expect(result.error).toBeDefined()
+      expect(result.error.message).toBe('Northings of point 3 must be a number')
+    })
+
+    test('Should show correct error for negative eastings with withPoint messageType', () => {
+      const schema = createOsgb36CoordinateSchema(
+        'eastings',
+        'withPoint',
+        'point 2'
+      )
+      const result = schema.validate('-123456')
+
+      expect(result.error).toBeDefined()
+      expect(result.error.message).toBe(
+        'Eastings of point 2 must be a positive 6-digit number, like 123456'
+      )
+    })
+
+    test('Should show correct error for negative northings with withPoint messageType', () => {
+      const schema = createOsgb36CoordinateSchema(
+        'northings',
+        'withPoint',
+        'point 3'
+      )
+      const result = schema.validate('-1234567')
+
+      expect(result.error).toBeDefined()
+      expect(result.error.message).toBe(
+        'Northings of point 3 must be a positive 6 or 7-digit number, like 123456'
+      )
+    })
+
+    test('Should show correct error for eastings not exactly 6 digits with withPoint messageType', () => {
+      const schema = createOsgb36CoordinateSchema(
+        'eastings',
+        'withPoint',
+        'point 2'
+      )
+      const result = schema.validate('12345') // 5 digits
+
+      expect(result.error).toBeDefined()
+      expect(result.error.message).toBe('Eastings of point 2 must be 6 digits')
+    })
+
+    test('Should show correct error for northings not 6 or 7 digits with withPoint messageType', () => {
+      const schema = createOsgb36CoordinateSchema(
+        'northings',
+        'withPoint',
+        'point 3'
+      )
+      const result = schema.validate('12345') // 5 digits
+
+      expect(result.error).toBeDefined()
+      expect(result.error.message).toBe(
+        'Northings of point 3 must be 6 or 7 digits'
+      )
+    })
+
+    test('Should show correct error for eastings with too many digits', () => {
+      const schema = createOsgb36CoordinateSchema(
+        'eastings',
+        'withPoint',
+        'point 2'
+      )
+      const result = schema.validate('1234567') // 7 digits
+
+      expect(result.error).toBeDefined()
+      expect(result.error.message).toBe('Eastings of point 2 must be 6 digits')
+    })
+
+    test('Should show correct error for northings with too many digits', () => {
+      const schema = createOsgb36CoordinateSchema(
+        'northings',
+        'withPoint',
+        'point 3'
+      )
+      const result = schema.validate('12345678') // 8 digits
+
+      expect(result.error).toBeDefined()
+      expect(result.error.message).toBe(
+        'Northings of point 3 must be 6 or 7 digits'
+      )
+    })
   })
 })

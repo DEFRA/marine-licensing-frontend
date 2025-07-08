@@ -51,6 +51,23 @@ export const validateCoordinates = (value, helpers, type) => {
   return value
 }
 
+const validateCoordinatesWithPattern = (value, helpers, type) => {
+  // First check if the value matches the numeric pattern
+  const numericPattern = /^-?[\d.]+$/
+  if (!numericPattern.test(value)) {
+    return helpers.error(JOI_ERRORS.STRING_PATTERN_BASE)
+  }
+
+  // If pattern matches, proceed with numeric validation
+  const coordinateValidation = validateCoordinates(value, helpers, type)
+  if (coordinateValidation !== value) {
+    return coordinateValidation // Return the error
+  }
+
+  // If numeric validation passes, proceed with decimal validation
+  return validateDecimals(value, helpers)
+}
+
 const COORDINATE_CONFIG = {
   latitude: {
     constantPrefix: 'LATITUDE',
@@ -106,11 +123,9 @@ export const createCoordinateSchema = (
   return joi
     .string()
     .required()
-    .pattern(/^-?[\d.]+$/)
     .custom((value, helpers) =>
-      validateCoordinates(value, helpers, coordinateType)
+      validateCoordinatesWithPattern(value, helpers, coordinateType)
     )
-    .custom((value, helpers) => validateDecimals(value, helpers))
     .messages(createMessages(coordinateType, messageType, pointName))
 }
 

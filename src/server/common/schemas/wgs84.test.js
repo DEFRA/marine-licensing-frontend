@@ -101,6 +101,27 @@ describe('#centreCoordinate models', () => {
       expect(result.error.message).toContain('LATITUDE_DECIMAL_PLACES')
       expect(result.error.message).toContain('LONGITUDE_DECIMAL_PLACES')
     })
+
+    test('Should generate single error message for non-numeric input like "abc123"', () => {
+      const request = {
+        latitude: 'abc123',
+        longitude: '-1.399500'
+      }
+
+      const result = wgs84ValidationSchema.validate(request, {
+        abortEarly: false
+      })
+
+      expect(result.error).toBeDefined()
+      expect(result.error.message).toContain('LATITUDE_NON_NUMERIC')
+      expect(result.error.message).not.toContain('LONGITUDE_NON_NUMERIC')
+
+      // Verify only one error for latitude (no duplicate)
+      const latitudeErrors = result.error.details.filter((detail) =>
+        detail.path.includes('latitude')
+      )
+      expect(latitudeErrors).toHaveLength(1)
+    })
   })
 
   describe('#createCoordinateSchema', () => {

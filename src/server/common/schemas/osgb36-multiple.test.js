@@ -111,5 +111,30 @@ describe('#multipleCoordinates OSGB36 schema', () => {
 
       expect(result.error).toBeUndefined()
     })
+
+    test('Should generate single error message for non-numeric input like "abc123"', () => {
+      const payload = {
+        coordinates: [
+          { eastings: 'abc123', northings: '654321' },
+          { eastings: '234567', northings: '765432' },
+          { eastings: '345678', northings: '876543' }
+        ]
+      }
+
+      const schema = createOsgb36MultipleCoordinatesSchema()
+      const result = schema.validate(payload, { abortEarly: false })
+
+      expect(result.error).toBeDefined()
+      expect(result.error.message).toContain('Eastings must be a number')
+
+      // Verify only one error for the first coordinate's eastings (no duplicate)
+      const eastingsErrors = result.error.details.filter(
+        (detail) =>
+          detail.path.includes('coordinates') &&
+          detail.path.includes(0) &&
+          detail.path.includes('eastings')
+      )
+      expect(eastingsErrors).toHaveLength(1)
+    })
   })
 })

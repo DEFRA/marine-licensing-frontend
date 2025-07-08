@@ -35,6 +35,17 @@ const validateCoordinates = (value, helpers, type) => {
   return value
 }
 
+const validateCoordinatesWithPattern = (value, helpers, type) => {
+  // First check if the value matches the numeric pattern
+  const numericPattern = /^-?[0-9.]+$/
+  if (!numericPattern.test(value)) {
+    return helpers.error(JOI_ERRORS.STRING_PATTERN_BASE)
+  }
+
+  // If pattern matches, proceed with numeric validation
+  return validateCoordinates(value, helpers, type)
+}
+
 const capitaliseCoordinateType = (type) =>
   type.charAt(0).toUpperCase() + type.slice(1)
 
@@ -42,17 +53,19 @@ const COORDINATE_CONFIG = {
   eastings: {
     constantPrefix: 'EASTINGS',
     lengthDescription: '6 digits',
+    positiveDescription: '6-digit number',
     example: '123456'
   },
   northings: {
     constantPrefix: 'NORTHINGS',
     lengthDescription: '6 or 7 digits',
+    positiveDescription: '6 or 7-digit number',
     example: '123456'
   }
 }
 
 const createMessages = (coordinateType, messageType, pointName) => {
-  const { constantPrefix, lengthDescription, example } =
+  const { constantPrefix, lengthDescription, positiveDescription, example } =
     COORDINATE_CONFIG[coordinateType]
   const capitalised = capitaliseCoordinateType(coordinateType)
 
@@ -79,7 +92,7 @@ const createMessages = (coordinateType, messageType, pointName) => {
       : `${typeMsg} must be a number`,
     [JOI_ERRORS.NUMBER_POSITIVE]: prefix
       ? `${prefix}_POSITIVE_NUMBER`
-      : `${typeMsg} must be a positive ${lengthDescription}, like ${example}`,
+      : `${typeMsg} must be a positive ${positiveDescription}, like ${example}`,
     [JOI_ERRORS.NUMBER_RANGE]: prefix
       ? `${prefix}_LENGTH`
       : `${typeMsg} must be ${lengthDescription}`
@@ -94,9 +107,8 @@ export const createOsgb36CoordinateSchema = (
   return joi
     .string()
     .required()
-    .pattern(/^-?[0-9.]+$/)
     .custom((value, helpers) =>
-      validateCoordinates(value, helpers, coordinateType)
+      validateCoordinatesWithPattern(value, helpers, coordinateType)
     )
     .messages(createMessages(coordinateType, messageType, pointName))
 }

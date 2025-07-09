@@ -511,5 +511,61 @@ describe('#uploadAndWait', () => {
 
       expect(mockRequest.logger.debug).toHaveBeenCalledTimes(2)
     })
+
+    test('should handle unknown file type in getAllowedExtensions default case', async () => {
+      const unknownFileTypeConfig = {
+        ...mockUploadConfig,
+        fileType: 'unknown'
+      }
+
+      getExemptionCacheSpy.mockReturnValue({
+        projectName: 'Test Project',
+        siteDetails: { uploadConfig: unknownFileTypeConfig }
+      })
+
+      const statusResponse = {
+        status: 'ready',
+        filename: 'test.unknown',
+        fileSize: 1024,
+        completedAt: '2025-07-02T21:29:38.471Z'
+      }
+
+      mockCdpService.getStatus.mockResolvedValue(statusResponse)
+
+      // Mock file validation to fail due to empty allowed extensions array
+      mockFileValidationService.validateFileExtension.mockReturnValue({
+        isValid: false,
+        extension: 'unknown',
+        errorMessage: 'The selected file could not be uploaded – try again'
+      })
+
+      const h = { redirect: jest.fn() }
+
+      await uploadAndWaitController.handler(mockRequest, h)
+
+      // Verify that validateFileExtension is called with empty array (default case)
+      expect(
+        mockFileValidationService.validateFileExtension
+      ).toHaveBeenCalledWith('test.unknown', [])
+
+      // Verify error handling for unknown file type
+      expect(updateExemptionSiteDetailsSpy).toHaveBeenCalledWith(
+        mockRequest,
+        'uploadError',
+        {
+          message: 'The selected file could not be uploaded – try again',
+          fieldName: 'file',
+          fileType: 'unknown'
+        }
+      )
+
+      expect(updateExemptionSiteDetailsSpy).toHaveBeenCalledWith(
+        mockRequest,
+        'uploadConfig',
+        undefined
+      )
+
+      expect(h.redirect).toHaveBeenCalledWith(routes.FILE_UPLOAD)
+    })
   })
 })

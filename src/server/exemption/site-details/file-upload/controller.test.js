@@ -157,7 +157,7 @@ describe('#fileUpload', () => {
     })
 
     describe('AC2 & AC3 - File upload functionality (Choose file & Drop file)', () => {
-      test('Should initialize CDP upload session with correct MIME types for KML', async () => {
+      test('Should initialize CDP upload session for KML', async () => {
         // Given - KML file type
         getExemptionCacheSpy.mockReturnValue({
           ...mockExemption,
@@ -174,13 +174,8 @@ describe('#fileUpload', () => {
         // When
         await fileUploadController.handler(mockRequest, mockH)
 
-        // Then - Should get CDP service with KML MIME types
-        expect(cdpUploadService.getCdpUploadService).toHaveBeenCalledWith([
-          'application/vnd.google-earth.kml+xml',
-          'application/kml+xml',
-          'text/xml',
-          'application/xml'
-        ])
+        // Then - Should get CDP service without MIME types
+        expect(cdpUploadService.getCdpUploadService).toHaveBeenCalledWith()
 
         // And CDP should be initiated with correct parameters
         expect(mockCdpService.initiate).toHaveBeenCalledWith({
@@ -190,7 +185,7 @@ describe('#fileUpload', () => {
         })
       })
 
-      test('Should initialize CDP upload session with correct MIME types for Shapefile', async () => {
+      test('Should initialize CDP upload session for Shapefile', async () => {
         // Given - Shapefile type
         getExemptionCacheSpy.mockReturnValue({
           ...mockExemption,
@@ -207,12 +202,8 @@ describe('#fileUpload', () => {
         // When
         await fileUploadController.handler(mockRequest, mockH)
 
-        // Then - Should get CDP service with Shapefile MIME types
-        expect(cdpUploadService.getCdpUploadService).toHaveBeenCalledWith([
-          'application/zip',
-          'application/x-zip-compressed',
-          'application/octet-stream'
-        ])
+        // Then - Should get CDP service without MIME types
+        expect(cdpUploadService.getCdpUploadService).toHaveBeenCalledWith()
       })
 
       test('Should store upload configuration in session', async () => {
@@ -350,8 +341,8 @@ describe('#fileUpload', () => {
         })
         // When
         await fileUploadController.handler(mockRequest, mockH)
-        // Then - it logs a warning
-        expect(mockRequest.logger.debug).toHaveBeenCalledTimes(1)
+        // Then - it logs a warning twice
+        expect(mockRequest.logger.debug).toHaveBeenCalledTimes(2)
       })
     })
 
@@ -600,23 +591,12 @@ describe('#fileUpload', () => {
         {
           type: 'kml',
           expectedHeading: 'Upload a KML file',
-          expectedAccept: '.kml',
-          expectedMimeTypes: [
-            'application/vnd.google-earth.kml+xml',
-            'application/kml+xml',
-            'text/xml',
-            'application/xml'
-          ]
+          expectedAccept: '.kml'
         },
         {
           type: 'shapefile',
           expectedHeading: 'Upload a Shapefile',
-          expectedAccept: '.zip',
-          expectedMimeTypes: [
-            'application/zip',
-            'application/x-zip-compressed',
-            'application/octet-stream'
-          ]
+          expectedAccept: '.zip'
         }
       ]
 
@@ -639,10 +619,8 @@ describe('#fileUpload', () => {
         // When
         await fileUploadController.handler(mockRequest, mockH)
 
-        // Then
-        expect(cdpUploadService.getCdpUploadService).toHaveBeenCalledWith(
-          fileType.expectedMimeTypes
-        )
+        // Then - Should get CDP service without MIME types
+        expect(cdpUploadService.getCdpUploadService).toHaveBeenCalledWith()
 
         expect(mockH.view).toHaveBeenCalledWith(
           FILE_UPLOAD_VIEW_ROUTE,

@@ -203,13 +203,18 @@ export class CdpUploadService {
     const requestPayload = {
       redirect: redirectUrl,
       maxFileSize: this.config.maxFileSize,
-      mimeTypes,
       s3Path,
       s3Bucket
     }
 
+    if (mimeTypes !== null) {
+      requestPayload.mimeTypes = mimeTypes
+    }
+
     try {
-      this.logger.debug('Initiating upload session', requestPayload)
+      this.logger.debug(
+        `CdpUploadService: initiate() called with params: ${JSON.stringify(requestPayload, null, 2)})`
+      )
       const endPointUrl = `${this.config.cdpUploadServiceBaseUrl}${ENDPOINTS.INITIATE}`
       const { res, payload } = await Wreck.post(endPointUrl, {
         payload: JSON.stringify(requestPayload),

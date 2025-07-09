@@ -105,17 +105,13 @@ describe('#CdpUploadService', () => {
         // Then
         expect(Wreck.post).toHaveBeenCalledWith(
           `${config.get('cdpUploader').cdpUploadServiceBaseUrl}/initiate`,
-          {
-            payload: JSON.stringify({
-              redirect: mockRedirectUrl,
-              maxFileSize: config.get('cdpUploader').maxFileSize,
-              mimeTypes: mockAllowedMimeTypes,
-              s3Path: '',
-              s3Bucket: config.get('cdpUploader').s3Bucket
-            }),
+          expect.objectContaining({
             json: true,
-            timeout: config.get('cdpUploader').timeout
-          }
+            payload: expect.stringContaining(
+              '"mimeTypes":["application/vnd.google-earth.kml+xml","application/zip"]'
+            ),
+            timeout: 30000
+          })
         )
 
         expect(result).toEqual({

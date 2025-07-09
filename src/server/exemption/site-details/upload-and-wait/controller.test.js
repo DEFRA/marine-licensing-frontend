@@ -388,7 +388,7 @@ describe('#uploadAndWait', () => {
 
       await uploadAndWaitController.handler(mockRequest, h)
 
-      expect(mockRequest.logger.debug).toHaveBeenCalledTimes(1)
+      expect(mockRequest.logger.debug).toHaveBeenCalledTimes(2)
     })
   })
 })

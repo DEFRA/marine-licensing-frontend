@@ -12,34 +12,10 @@ import {
 
 export const FILE_UPLOAD_VIEW_ROUTE = 'exemption/site-details/file-upload/index'
 
-// MIME types for different file types - inclusive approach for cross-platform compatibility
-const MIME_TYPES = {
-  kml: [
-    'application/vnd.google-earth.kml+xml',
-    'application/kml+xml',
-    'text/xml', // Some systems detect KML as generic XML
-    'application/xml'
-  ],
-  shapefile: [
-    'application/zip',
-    'application/x-zip-compressed',
-    'application/octet-stream' // Some systems detect ZIP as binary
-  ]
-}
-
 const UPLOAD_A_FILE = 'Upload a file'
 const pageSettings = {
   pageTitle: UPLOAD_A_FILE,
   heading: UPLOAD_A_FILE
-}
-
-/**
- * Get appropriate MIME types based on selected file type
- * @param {string} fileUploadType - 'kml' or 'shapefile'
- * @returns {string[]} Array of MIME types
- */
-const getMimeTypesForFileType = (fileUploadType) => {
-  return MIME_TYPES[fileUploadType] || []
 }
 
 /**
@@ -99,6 +75,10 @@ export const fileUploadController = {
     const { fileUploadType, uploadedFile, uploadError } =
       exemption.siteDetails || {}
 
+    request.logger.debug(
+      `fileUploadController: fileUploadType [${fileUploadType}]`
+    )
+
     if (!fileUploadType) {
       return h.redirect(routes.CHOOSE_FILE_UPLOAD_TYPE)
     }
@@ -129,13 +109,10 @@ export const fileUploadController = {
       request.logger.debug(
         'Uploaded file without error found, but starting a new upload session'
       )
-      // We may want to consider adding in some error handling as we have a valid file at this point.
     }
 
     try {
-      // Initialize CDP upload session (always needed for upload form)
-      const mimeTypes = getMimeTypesForFileType(fileUploadType)
-      const cdpService = getCdpUploadService(mimeTypes)
+      const cdpService = getCdpUploadService()
       const cdpUploadConfig = config.get('cdpUploader')
       const s3Bucket = cdpUploadConfig.s3Bucket
       const redirectUrl = `${config.get('appBaseUrl')}${routes.UPLOAD_AND_WAIT}`

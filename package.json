@@ -75,7 +75,7 @@
     "@babel/cli": "^7.25.9",
     "@babel/core": "^7.26.0",
     "@babel/preset-env": "^7.26.0",
-    "@faker-js/faker": "^9.7.0",
+    "@faker-js/faker": "^9.9.0",
     "@stryker-mutator/jest-runner": "^9.0.1",
     "@types/convict": "^6.1.6",
     "@types/hapi__catbox-memory": "^4.1.8",

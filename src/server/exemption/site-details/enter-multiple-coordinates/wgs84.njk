@@ -1,0 +1,105 @@
+{% extends "layouts/page.njk" %}
+{% from "govuk/components/back-link/macro.njk" import govukBackLink %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/details/macro.njk" import govukDetails %}
+{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+{% from "govuk/components/fieldset/macro.njk" import govukFieldset %}
+{% from "govuk/components/input/macro.njk" import govukInput %}
+{% from "cancel-button/macro.njk" import appCancelButton %}
+{% block pageTitle %}
+  {{ pageTitle }}
+{% endblock %}
+{% set detailsSummary = "Help with latitude and longitude formats" %}
+{% set detailsHTML %}
+<p class="govuk-body">
+  Latitude and longitude can be written in different formats, including:
+</p>
+<ul class="govuk-list govuk-list--bullet">
+  <li>decimal degrees (DD) - 55.019889 or -1.399500</li>
+  <li>degrees, minutes and seconds (DMS) - 55°01'11.6"N 1°23'58.2"WE</li>
+  <li>degrees and decimal minutes (DMM) - 55° 1.19334', 1° 23.97'</li>
+</ul>
+<p class="govuk-body">
+  Enter coordinates in decimal degree (DD) format only.
+</p>
+<p class="govuk-body">
+  Latitude ranges from -90 to 90, and longitude ranges from -180 to 180. Always enter latitude first, then longitude, in
+  their separate fields.
+</p>
+{% endset %}
+{% block beforeContent %}
+  {{ govukBackLink({
+    text: "Back",
+    href: backLink
+  }) }}
+{% endblock %}
+{% block content %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+      {% if errorSummary %}
+        {{ govukErrorSummary({
+          titleText: "There is a problem",
+          errorList: errorSummary
+        }) }}
+      {% endif %}
+      <span class="govuk-caption-l">{{ projectName }}</span>
+      <h1 class="govuk-heading-l">{{ heading }}</h1>
+      <p>Enter in the decimal degree format. For example, 55.019889 or -1.399500.</p>
+      {{ govukDetails({
+        summaryText: detailsSummary,
+        html: detailsHTML
+      }) }}
+      <form method="POST">
+        <input type="hidden" name="csrfToken" value="{{ csrfToken }}">
+          {% for i in range(0, 3) %}
+            {% set coordinate = coordinates[i] or { latitude: '', longitude: '' } %}
+            {% set pointNumber = i + 1 %}
+            {% set legendText %}
+            {% if i == 0 %}Start and end point{% else %}Point {{ pointNumber }}
+            {% endif %}
+            {% endset %}
+            {% set labelText %}
+            {% if i == 0 %}of start and end point{% else %}of point {{ pointNumber }}
+            {% endif %}
+            {% endset %}
+            {% call govukFieldset({
+            legend: {
+              text: legendText,
+              classes: "govuk-fieldset__legend--s"
+            }
+          }) %}
+            {{ govukInput({
+              id: "coordinates[" + i + "][latitude]",
+              name: "coordinates[" + i + "][latitude]",
+              value: coordinate.latitude,
+              errorMessage: errors["coordinates" + i + "latitude"] if errors,
+              label: {
+                text: "Latitude " + labelText
+              }, classes: "govuk-!-width-one-half" }) }}
+            {{ govukInput({
+              id: "coordinates[" + i + "][longitude]",
+              name: "coordinates[" + i + "][longitude]",
+              value: coordinate.longitude,
+              errorMessage: errors["coordinates" + i + "longitude"] if errors,
+              label: {
+                text: "Longitude " + labelText
+              },
+              classes: "govuk-!-width-one-half"
+            }) }}
+            {% endcall %}
+          {% endfor %}
+          <div class="govuk-button-group govuk-!-margin-top-8">
+            {{ govukButton({
+            text: "Continue",
+            attributes: {
+              id: "continue"
+            }
+          }) }}
+            {{ appCancelButton({
+            cancelLink: "/exemption/task-list?cancel=site-details"
+          }) }}
+          </div>
+        </form>
+      </div>
+    </div>
+  {% endblock %}

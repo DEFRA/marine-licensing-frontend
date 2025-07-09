@@ -8,24 +8,26 @@ import {
 const { MIN_EASTINGS, MAX_EASTINGS, MIN_NORTHINGS, MAX_NORTHINGS } =
   OSGB36_CONSTANTS
 
+const isPositiveCoordinate = (coordinate) => coordinate > 0
+
+const isEastingsInRange = (coordinate) =>
+  coordinate >= MIN_EASTINGS && coordinate <= MAX_EASTINGS
+
+const isNorthingsInRange = (coordinate) =>
+  coordinate >= MIN_NORTHINGS && coordinate <= MAX_NORTHINGS
+
 const validateCoordinates = (value, helpers, type) => {
   const coordinate = Number(value)
 
-  if (coordinate <= 0) {
+  if (!isPositiveCoordinate(coordinate)) {
     return helpers.error(JOI_ERRORS.NUMBER_POSITIVE)
   }
 
-  if (
-    type === 'eastings' &&
-    (coordinate < MIN_EASTINGS || coordinate > MAX_EASTINGS)
-  ) {
+  if (type === 'eastings' && !isEastingsInRange(coordinate)) {
     return helpers.error(JOI_ERRORS.NUMBER_RANGE)
   }
 
-  if (
-    type === 'northings' &&
-    (coordinate < MIN_NORTHINGS || coordinate > MAX_NORTHINGS)
-  ) {
+  if (type === 'northings' && !isNorthingsInRange(coordinate)) {
     return helpers.error(JOI_ERRORS.NUMBER_RANGE)
   }
 

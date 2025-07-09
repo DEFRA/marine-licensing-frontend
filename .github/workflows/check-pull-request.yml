@@ -59,6 +59,7 @@ jobs:
         with:
           node-version-file: .nvmrc
           cache: npm
-      - run: |
+      - name: Run npm audit and fail on high/critical vulnerabilities
+        run: |
           npm ci
           npm audit --audit-level=high --production

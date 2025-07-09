@@ -183,7 +183,7 @@ export const uploadAndWaitController = {
   async handler(request, h) {
     const exemption = getExemptionCache(request)
     request.logger.debug(
-      `uploadAndWaitController: excemption: ${JSON.stringify(exemption, null, 2)}`
+      `uploadAndWaitController: exemption: ${JSON.stringify(exemption, null, 2)}`
     )
     const { uploadConfig } = exemption.siteDetails || {}
 

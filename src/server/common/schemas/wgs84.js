@@ -48,7 +48,7 @@ export const validateCoordinates = (value, helpers, type) => {
 }
 
 const validateCoordinatesWithPattern = (value, helpers, type) => {
-  const numericPattern = /^-?[\d.]+$/
+  const numericPattern = /^-?\d+(\.\d+)?$/
   if (!numericPattern.test(value)) {
     return helpers.error(JOI_ERRORS.STRING_PATTERN_BASE)
   }

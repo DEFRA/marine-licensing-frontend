@@ -87,20 +87,9 @@ describe('#multipleCoordinates', () => {
     isWGS84.mockImplementation(
       (coordinateSystem) => coordinateSystem === COORDINATE_SYSTEMS.WGS84
     )
-    convertPayloadToCoordinatesArray.mockImplementation((payload) => {
-      const coordinates = []
-      Object.keys(payload)
-        .filter((key) => key.startsWith('coordinates['))
-        .forEach((key) => {
-          const match = key.match(/coordinates\[(\d+)\]\[([^\]]+)\]/)
-          if (match) {
-            const index = parseInt(match[1], 10)
-            const field = match[2]
-            coordinates[index] = coordinates[index] || {}
-            coordinates[index][field] = payload[key]
-          }
-        })
-      return coordinates
+    const expectedCoordinates = [{ latitude: '51.5074', longitude: '-0.1278' }]
+    convertPayloadToCoordinatesArray.mockImplementation(() => {
+      return expectedCoordinates
     })
     validateCoordinates.mockReturnValue({ error: null })
     convertArrayErrorsToFlattenedErrors.mockImplementation((error) => error)

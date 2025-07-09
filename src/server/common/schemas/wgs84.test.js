@@ -88,7 +88,7 @@ describe('#centreCoordinate models', () => {
       expect(result.error.message).toContain('LONGITUDE_NON_NUMERIC')
     })
 
-    test('Should correctly validate eastings and northing do not have correct decimal places', () => {
+    test('Should correctly validate latitude and longitude do not have correct decimal places', () => {
       const request = {
         latitude: '50.12345',
         longitude: '50.12345'
@@ -116,11 +116,24 @@ describe('#centreCoordinate models', () => {
       expect(result.error.message).toContain('LATITUDE_NON_NUMERIC')
       expect(result.error.message).not.toContain('LONGITUDE_NON_NUMERIC')
 
-      // Verify only one error for latitude (no duplicate)
       const latitudeErrors = result.error.details.filter((detail) =>
         detail.path.includes('latitude')
       )
       expect(latitudeErrors).toHaveLength(1)
+    })
+
+    test('Should correctly validate latitude and longitude with multiple dots as non-numeric', () => {
+      const request = {
+        latitude: '1.2.3',
+        longitude: '4.5.6'
+      }
+
+      const result = wgs84ValidationSchema.validate(request, {
+        abortEarly: false
+      })
+
+      expect(result.error.message).toContain('LATITUDE_NON_NUMERIC')
+      expect(result.error.message).toContain('LONGITUDE_NON_NUMERIC')
     })
   })
 

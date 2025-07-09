@@ -8,6 +8,7 @@ export default {
   clearMocks: true,
   silent: false,
   testMatch: ['**/src/**/*.test.js'],
+  testPathIgnorePatterns: ['/node_modules/', '<rootDir>/.stryker-tmp/'],
   reporters: ['default', ['github-actions', { silent: false }], 'summary'],
   setupFiles: ['<rootDir>/.jest/setup-file.js'],
   setupFilesAfterEnv: ['<rootDir>/.jest/setup-file-after-env.js'],

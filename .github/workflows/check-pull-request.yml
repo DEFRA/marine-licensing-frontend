@@ -51,9 +51,6 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Use latest npm
-        run: npm install -g npm@latest
-
       - name: Dependency Review
         uses: actions/dependency-review-action@v4
 

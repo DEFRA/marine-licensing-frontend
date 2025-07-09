@@ -5,11 +5,13 @@ import {
 } from '~/src/server/exemption/site-details/upload-and-wait/controller.js'
 import * as cacheUtils from '~/src/server/common/helpers/session-cache/utils.js'
 import * as cdpUploadService from '~/src/services/cdp-upload-service/index.js'
+import * as fileValidationService from '~/src/services/file-validation/index.js'
 import { mockExemption } from '~/src/server/test-helpers/mocks.js'
 import { routes } from '~/src/server/common/constants/routes.js'
 
 jest.mock('~/src/server/common/helpers/session-cache/utils.js')
 jest.mock('~/src/services/cdp-upload-service/index.js')
+jest.mock('~/src/services/file-validation/index.js')
 
 describe('#uploadAndWait', () => {
   /** @type {Server} */
@@ -17,6 +19,7 @@ describe('#uploadAndWait', () => {
   let getExemptionCacheSpy
   let updateExemptionSiteDetailsSpy
   let mockCdpService
+  let mockFileValidationService
 
   beforeAll(async () => {
     server = await createServer()
@@ -38,9 +41,17 @@ describe('#uploadAndWait', () => {
       getStatus: jest.fn()
     }
 
+    mockFileValidationService = {
+      validateFileExtension: jest.fn()
+    }
+
     jest
       .spyOn(cdpUploadService, 'getCdpUploadService')
       .mockReturnValue(mockCdpService)
+
+    jest
+      .spyOn(fileValidationService, 'getFileValidationService')
+      .mockReturnValue(mockFileValidationService)
   })
 
   afterAll(async () => {
@@ -126,7 +137,7 @@ describe('#uploadAndWait', () => {
       })
     })
 
-    test('should redirect to FILE_UPLOAD when status is ready', async () => {
+    test('should redirect to FILE_UPLOAD when status is ready and file validation passes', async () => {
       getExemptionCacheSpy.mockReturnValue({
         projectName: 'Test Project',
         siteDetails: { uploadConfig: mockUploadConfig }
@@ -134,7 +145,7 @@ describe('#uploadAndWait', () => {
 
       const statusResponse = {
         status: 'ready',
-        filename: 'test.zip',
+        filename: 'test.kml',
         fileSize: 3754,
         completedAt: '2025-07-02T21:29:38.471Z',
         s3Location: {
@@ -144,16 +155,27 @@ describe('#uploadAndWait', () => {
           fileId: '558d2f8d-5b78-47e7-9958-e315763f44af',
           s3Url:
             's3://test-bucket/s3Path/a283cf8a-b13e-4ae3-85e9-7c3db9a4a076/558d2f8d-5b78-47e7-9958-e315763f44af',
-          detectedContentType: 'application/zip',
+          detectedContentType: 'application/vnd.google-earth.kml+xml',
           checksumSha256: '2Vvqe1CDdtBezIBTQWyf3IYhc0dnuKgy/YeOY055s6g='
         }
       }
 
       mockCdpService.getStatus.mockResolvedValue(statusResponse)
 
+      // Mock successful file validation
+      mockFileValidationService.validateFileExtension.mockReturnValue({
+        isValid: true,
+        extension: 'kml',
+        errorMessage: null
+      })
+
       const h = { redirect: jest.fn() }
 
       await uploadAndWaitController.handler(mockRequest, h)
+
+      expect(
+        mockFileValidationService.validateFileExtension
+      ).toHaveBeenCalledWith('test.kml', ['kml'])
 
       expect(updateExemptionSiteDetailsSpy).toHaveBeenCalledWith(
         mockRequest,
@@ -165,6 +187,105 @@ describe('#uploadAndWait', () => {
         mockRequest,
         'uploadConfig',
         undefined
+      )
+
+      expect(h.redirect).toHaveBeenCalledWith(routes.FILE_UPLOAD)
+    })
+
+    test('should redirect to FILE_UPLOAD with error when file validation fails for wrong extension', async () => {
+      getExemptionCacheSpy.mockReturnValue({
+        projectName: 'Test Project',
+        siteDetails: { uploadConfig: mockUploadConfig }
+      })
+
+      const statusResponse = {
+        status: 'ready',
+        filename: 'document.pdf',
+        fileSize: 1024,
+        completedAt: '2025-07-02T21:29:38.471Z'
+      }
+
+      mockCdpService.getStatus.mockResolvedValue(statusResponse)
+
+      // Mock failed file validation
+      mockFileValidationService.validateFileExtension.mockReturnValue({
+        isValid: false,
+        extension: 'pdf',
+        errorMessage: 'The selected file must be a KML file'
+      })
+
+      const h = { redirect: jest.fn() }
+
+      await uploadAndWaitController.handler(mockRequest, h)
+
+      expect(
+        mockFileValidationService.validateFileExtension
+      ).toHaveBeenCalledWith('document.pdf', ['kml'])
+
+      expect(updateExemptionSiteDetailsSpy).toHaveBeenCalledWith(
+        mockRequest,
+        'uploadError',
+        {
+          message: 'The selected file must be a KML file',
+          fieldName: 'file',
+          fileType: 'kml'
+        }
+      )
+
+      expect(updateExemptionSiteDetailsSpy).toHaveBeenCalledWith(
+        mockRequest,
+        'uploadConfig',
+        undefined
+      )
+
+      expect(h.redirect).toHaveBeenCalledWith(routes.FILE_UPLOAD)
+
+      // Should not store uploaded file when validation fails
+      expect(updateExemptionSiteDetailsSpy).not.toHaveBeenCalledWith(
+        mockRequest,
+        'uploadedFile',
+        expect.anything()
+      )
+    })
+
+    test('should validate shapefile extensions correctly', async () => {
+      const shapefileUploadConfig = {
+        ...mockUploadConfig,
+        fileType: 'shapefile'
+      }
+
+      getExemptionCacheSpy.mockReturnValue({
+        projectName: 'Test Project',
+        siteDetails: { uploadConfig: shapefileUploadConfig }
+      })
+
+      const statusResponse = {
+        status: 'ready',
+        filename: 'coordinates.zip',
+        fileSize: 5432
+      }
+
+      mockCdpService.getStatus.mockResolvedValue(statusResponse)
+
+      // Mock successful shapefile validation
+      mockFileValidationService.validateFileExtension.mockReturnValue({
+        isValid: true,
+        extension: 'zip',
+        errorMessage: null
+      })
+
+      const h = { redirect: jest.fn() }
+
+      await uploadAndWaitController.handler(mockRequest, h)
+
+      expect(
+        mockFileValidationService.validateFileExtension
+      ).toHaveBeenCalledWith('coordinates.zip', ['zip'])
+
+      expect(updateExemptionSiteDetailsSpy).toHaveBeenCalledWith(
+        mockRequest,
+        'uploadedFile',
+        statusResponse
       )
 
       expect(h.redirect).toHaveBeenCalledWith(routes.FILE_UPLOAD)

@@ -3,6 +3,7 @@ import {
   updateExemptionSiteDetails
 } from '~/src/server/common/helpers/session-cache/utils.js'
 import { getCdpUploadService } from '~/src/services/cdp-upload-service/index.js'
+import { getFileValidationService } from '~/src/services/file-validation/index.js'
 import { routes } from '~/src/server/common/constants/routes.js'
 
 export const UPLOAD_AND_WAIT_VIEW_ROUTE =
@@ -103,7 +104,37 @@ export const uploadAndWaitController = {
       }
 
       if (status.status === 'ready') {
-        // File upload successful - store file details in session
+        // Apply our business validation to files that passed CDP checks
+        const fileValidationService = getFileValidationService(request.logger)
+        const allowedExtensions = getAllowedExtensions(uploadConfig.fileType)
+
+        const validation = fileValidationService.validateFileExtension(
+          status.filename,
+          allowedExtensions
+        )
+
+        if (!validation.isValid) {
+          // File failed our validation - treat as rejection
+          const errorDetails = transformCdpErrorToValidationError(
+            validation.errorMessage,
+            uploadConfig.fileType
+          )
+
+          // Store error details in session for file-upload controller to handle
+          updateExemptionSiteDetails(request, 'uploadError', {
+            message: errorDetails.message,
+            fieldName: errorDetails.fieldName,
+            fileType: uploadConfig.fileType
+          })
+
+          // Clear upload config from session
+          updateExemptionSiteDetails(request, 'uploadConfig', undefined)
+
+          // Redirect to file-upload route to handle error display and new session creation
+          return h.redirect(routes.FILE_UPLOAD)
+        }
+
+        // File passed all validations - store file details in session
         updateExemptionSiteDetails(request, 'uploadedFile', status)
 
         // Clear upload config from session
@@ -151,5 +182,21 @@ export const uploadAndWaitController = {
       updateExemptionSiteDetails(request, 'uploadConfig', undefined)
       return h.redirect(routes.CHOOSE_FILE_UPLOAD_TYPE)
     }
+  }
+}
+
+/**
+ * Gets allowed extensions for file type
+ * @param {string} fileType - The file type ('kml' or 'shapefile')
+ * @returns {string[]} Allowed extensions
+ */
+function getAllowedExtensions(fileType) {
+  switch (fileType) {
+    case 'kml':
+      return ['kml']
+    case 'shapefile':
+      return ['zip']
+    default:
+      return []
   }
 }

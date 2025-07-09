@@ -30,7 +30,6 @@ globs: *.js
 - Use convict for configuration management
 - Use BEM-style naming with 'app-' prefix
 - Use curly braces for control structures
-- Use comments for complex logic only
 - Use constants instead of magic strings and numbers
 - Use child functions when function complexity is greater than ten
 

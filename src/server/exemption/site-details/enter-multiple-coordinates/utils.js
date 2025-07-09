@@ -96,7 +96,7 @@ export const convertPayloadToCoordinatesArray = (payload, coordinateSystem) => {
 
   Object.keys(payload)
     .map((name) => {
-      const match = name.match(/^coordinates\[(\d+)\]/)
+      const match = /^coordinates\[(\d+)\]/.exec(name)
       return match ? Number(match[1]) : null
     })
     .filter((index) => index !== null)

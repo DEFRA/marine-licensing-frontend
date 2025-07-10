@@ -254,7 +254,7 @@ describe('#chooseFileType', () => {
       expect(h.view().takeover).toHaveBeenCalled()
     })
 
-    test('Should successfully update exemption cache and return 200 status code', async () => {
+    test('Should successfully update exemption cache and return 302 status code', async () => {
       const updateExemptionSiteDetailsSpy = jest.spyOn(
         cacheUtils,
         'updateExemptionSiteDetails'
@@ -272,7 +272,7 @@ describe('#chooseFileType', () => {
         'shapefile'
       )
 
-      expect(statusCode).toBe(statusCodes.ok)
+      expect(statusCode).toBe(statusCodes.redirect)
     })
   })
 })

@@ -62,7 +62,7 @@ globs: *.js
 - Use h.redirect for navigation
 
 ## API Integration
-- Use fetch for API calls
+- Use Hapi/Wreck for API calls
 - Base URL from config
 - JSON content type
 - Response status checking

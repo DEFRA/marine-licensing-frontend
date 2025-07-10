@@ -1,0 +1,78 @@
+{% extends 'layouts/page.njk' %}
+{% from "govuk/components/back-link/macro.njk" import govukBackLink %}
+{% from "govuk/components/file-upload/macro.njk" import govukFileUpload %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+{% from "cancel-button/macro.njk" import appCancelButton %}
+
+{% block pageTitle %}
+  {% if errorSummary %}Error: {% endif %}{{ heading }} - {{ serviceName }}
+{% endblock %}
+
+{% block beforeContent %}
+  {{ govukBackLink({
+    text: "Back",
+    href: backLink
+  }) }}
+{% endblock %}
+
+{% set formLabel %}
+  {% if projectName %}
+    <span class="govuk-caption-l">{{ projectName }}</span>
+  {% endif %}
+
+  <h1 class="govuk-label-wrapper">
+    <label class="govuk-label govuk-label--l" for="file-id" id="file-upload-1-label">
+      {{ heading }}
+    </label>
+    {%  if fileUploadType == 'shapefile' %}
+      <p class="govuk-hint">Upload a ZIP file containing all the files for your Shapefile (for example, .shp, .shx and .dbf).</p>
+    {%  endif %}
+  </h1>
+{% endset %}
+
+{% block content %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+
+      {% if errorSummary %}
+        {{ govukErrorSummary({
+          titleText: "There is a problem",
+          errorList: errorSummary
+        }) }}
+      {% endif %}
+
+        <form action="{{ uploadUrl }}" method="post" enctype="multipart/form-data" novalidate>
+
+          {{ govukFileUpload({
+              id: "file-id",
+              name: "file",
+              label: {
+                html: formLabel,
+                for: "file-id"
+               },
+              multiple: false,
+              javascript: true,
+              errorMessage: { text: errors['file'].text } if errors and errors['file'] else false,
+              attributes: {
+                "accept": acceptAttribute
+              }
+          }) }}
+
+          <div class="govuk-button-group">
+            {{ govukButton({
+              text: "Continue",
+              type: "submit",
+              classes: "govuk-button--primary"
+            }) }}
+
+            {{ appCancelButton({
+              cancelLink: cancelLink
+            }) }}
+          </div>
+
+        </form>
+    </div>
+  </div>
+
+{% endblock %}

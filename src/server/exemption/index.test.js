@@ -96,6 +96,14 @@ describe('exemption route', () => {
       }),
       expect.objectContaining({
         method: 'GET',
+        path: '/exemption/upload-file'
+      }),
+      expect.objectContaining({
+        method: 'GET',
+        path: '/exemption/upload-and-wait'
+      }),
+      expect.objectContaining({
+        method: 'GET',
         path: '/exemption/activity-dates'
       }),
       expect.objectContaining({

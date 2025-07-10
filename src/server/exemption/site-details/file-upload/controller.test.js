@@ -179,7 +179,7 @@ describe('#fileUpload', () => {
 
         // And CDP should be initiated with correct parameters
         expect(mockCdpService.initiate).toHaveBeenCalledWith({
-          redirectUrl: `${config.get('appBaseUrl')}${routes.UPLOAD_AND_WAIT}`,
+          redirectUrl: routes.UPLOAD_AND_WAIT,
           s3Path: 'exemptions',
           s3Bucket: config.get('cdpUploader').s3Bucket
         })

@@ -107,6 +107,10 @@ export const coordinateSystemSubmitController = {
       return h.redirect(routes.CIRCLE_CENTRE_POINT)
     }
 
+    if (exemption.siteDetails?.coordinatesEntry === 'multiple') {
+      return h.redirect(routes.ENTER_MULTIPLE_COORDINATES)
+    }
+
     return h.view(COORDINATE_SYSTEM_VIEW_ROUTE, {
       ...coordinateSystemSettings,
       projectName: exemption.projectName,

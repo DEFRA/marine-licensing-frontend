@@ -1,0 +1,34 @@
+sequenceDiagram
+    participant User
+    participant Frontend as Marine Licensing Frontend
+    participant CDPUploader as CDP Uploader
+    participant S3 as S3 Storage
+    participant Scanner as Virus Scanner
+
+    User->>Frontend: Request upload page
+    Frontend->>CDPUploader: POST /initiate with config
+    CDPUploader-->>Frontend: Return upload configuration
+    Frontend-->>User: Return upload form with uploadUrl
+    
+    User->>CDPUploader: Upload file directly to /upload-and-scan/{uploadId}
+    CDPUploader->>CDPUploader: Validate file type
+    CDPUploader->>S3: Store in quarantine bucket
+    CDPUploader->>Scanner: Trigger virus scan
+    CDPUploader-->>User: Redirect to status page
+    
+    loop Poll Status
+        Frontend->>CDPUploader: GET /status/{uploadId}
+        CDPUploader-->>Frontend: Return status
+        Frontend-->>User: Update status page
+        
+        alt File Clean
+            Scanner-->>CDPUploader: Scan complete (clean)
+            CDPUploader->>S3: Move to final bucket
+            CDPUploader-->>Frontend: Status: ready
+            Frontend-->>User: Show success message
+        else File Infected
+            Scanner-->>CDPUploader: Scan complete (infected)
+            CDPUploader-->>Frontend: Status: rejected
+            Frontend-->>User: Show error message
+        end
+    end 

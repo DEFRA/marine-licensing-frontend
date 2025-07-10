@@ -10,3 +10,6 @@ coverage
 .cache
 .envrc
 tsconfig.tsbuildinfo
+
+# stryker temp files
+.stryker-tmp

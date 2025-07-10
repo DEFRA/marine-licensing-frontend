@@ -3,6 +3,7 @@ import {
   Button,
   Checkboxes,
   ErrorSummary,
+  FileUpload,
   Header,
   Radios,
   SkipLink
@@ -14,3 +15,4 @@ createAll(ErrorSummary)
 createAll(Header)
 createAll(Radios)
 createAll(SkipLink)
+createAll(FileUpload)

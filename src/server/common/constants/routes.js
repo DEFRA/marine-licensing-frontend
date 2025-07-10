@@ -20,5 +20,6 @@ export const routes = {
   UPLOAD_AND_WAIT: '/exemption/upload-and-wait',
   ACTIVITY_DATES: '/exemption/activity-dates',
   CHECK_YOUR_ANSWERS: '/exemption/check-your-answers',
-  CONFIRMATION: '/exemption/confirmation'
+  CONFIRMATION: '/exemption/confirmation',
+  DASHBOARD: '/home'
 }

@@ -115,7 +115,7 @@ export const fileUploadController = {
       const cdpService = getCdpUploadService()
       const cdpUploadConfig = config.get('cdpUploader')
       const s3Bucket = cdpUploadConfig.s3Bucket
-      const redirectUrl = `${config.get('appBaseUrl')}${routes.UPLOAD_AND_WAIT}`
+      const redirectUrl = routes.UPLOAD_AND_WAIT
       const uploadConfig = await cdpService.initiate({
         redirectUrl,
         s3Path: s3PathForExemptions,

@@ -62,4 +62,4 @@ jobs:
       - name: Run npm audit and fail on high/critical vulnerabilities
         run: |
           npm ci
-          npm audit --audit-level=high --development || (echo 'Vulnerabilities found!' && exit 1)
+          npm audit --audit-level=high --production || (echo 'Vulnerabilities found!' && exit 1)

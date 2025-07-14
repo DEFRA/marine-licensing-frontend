@@ -6,6 +6,13 @@ export const EXEMPTION_CACHE_KEY = 'exemption'
 /**
  * @param { Request } request
  */
+export const clearExemptionCache = (request) => {
+  request.yar.clear(EXEMPTION_CACHE_KEY)
+}
+
+/**
+ * @param { Request } request
+ */
 export const getExemptionCache = (request) => {
   return clone(request.yar.get(EXEMPTION_CACHE_KEY) || {})
 }

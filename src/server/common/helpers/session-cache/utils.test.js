@@ -4,7 +4,8 @@ import {
   setExemptionCache,
   updateExemptionSiteDetails,
   resetExemptionSiteDetails,
-  EXEMPTION_CACHE_KEY
+  EXEMPTION_CACHE_KEY,
+  clearExemptionCache
 } from '~/src/server/common/helpers/session-cache/utils.js'
 import { clone } from '@hapi/hoek'
 import { COORDINATE_SYSTEMS } from '~/src/server/common/constants/exemptions.js'
@@ -14,6 +15,25 @@ jest.mock('@hapi/hoek', () => ({
 }))
 
 describe('#utils', () => {
+  describe('clearExemptionCache', () => {
+    let mockRequest
+
+    beforeEach(() => {
+      jest.clearAllMocks()
+
+      mockRequest = {
+        yar: {
+          clear: jest.fn()
+        }
+      }
+    })
+
+    test('should clear exemption cache', () => {
+      clearExemptionCache(mockRequest)
+      expect(mockRequest.yar.clear).toHaveBeenCalledWith(EXEMPTION_CACHE_KEY)
+    })
+  })
+
   describe('getExemptionCache', () => {
     let mockRequest
 

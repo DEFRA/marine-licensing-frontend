@@ -5,6 +5,7 @@ import {
 } from '~/src/server/common/plugins/auth/utils.js'
 
 import { config } from '~/src/config/config.js'
+import { clearExemptionCache } from '~/src/server/common/helpers/session-cache/utils.js'
 
 export const signOutController = {
   method: 'GET',
@@ -19,6 +20,8 @@ export const signOutController = {
     }
 
     removeUserSession(request, request.auth.credentials)
+
+    clearExemptionCache(request)
 
     const referrer = `${config.get('defraId.redirectUrl')}${routes.PROJECT_NAME}`
     const { idToken } = userSession

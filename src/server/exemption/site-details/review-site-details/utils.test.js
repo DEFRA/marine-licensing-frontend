@@ -39,6 +39,17 @@ describe('siteDetails utils', () => {
       )
     })
 
+    test('getReviewSummaryText correctly returns text for site details multiple coordinates text', () => {
+      expect(
+        getReviewSummaryText({
+          coordinatesEntry: 'multiple',
+          coordinatesType: 'coordinates'
+        })
+      ).toBe(
+        'Manually enter multiple sets of coordinates to mark the boundary of the site'
+      )
+    })
+
     test('getReviewSummaryText correctly returns blank otherwise', () => {
       expect(getReviewSummaryText({})).toBe('')
     })

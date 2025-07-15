@@ -23,6 +23,10 @@ export const getReviewSummaryText = (siteDetails) => {
     return 'Manually enter one set of coordinates and a width to create a circular site'
   }
 
+  if (coordinatesEntry === 'multiple' && coordinatesType === 'coordinates') {
+    return 'Manually enter multiple sets of coordinates to mark the boundary of the site'
+  }
+
   return ''
 }
 

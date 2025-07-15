@@ -14,6 +14,7 @@ import {
   handleValidationFailure,
   removeCoordinateAtIndex
 } from './utils.js'
+import { routes } from '~/src/server/common/constants/routes.js'
 
 export const multipleCoordinatesController = {
   handler(request, h) {
@@ -102,11 +103,15 @@ export const multipleCoordinatesSubmitController = {
       coordinates = [...coordinates, emptyCoordinate]
     }
 
-    return renderMultipleCoordinatesView(
-      h,
-      coordinates,
-      coordinateSystem,
-      exemption?.projectName
-    )
+    if (payload.add || payload.remove) {
+      return renderMultipleCoordinatesView(
+        h,
+        coordinates,
+        coordinateSystem,
+        exemption?.projectName
+      )
+    }
+
+    return h.redirect(routes.REVIEW_SITE_DETAILS)
   }
 }

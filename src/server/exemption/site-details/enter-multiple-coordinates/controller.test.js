@@ -186,13 +186,18 @@ describe('#multipleCoordinates', () => {
     const mockViewResult = {
       takeover: mockTakeover
     }
-    const mockH = {
-      view: jest.fn().mockReturnValue(mockViewResult)
-    }
+    let mockH
+    let mockRedirect
 
     beforeEach(() => {
+      mockRedirect = jest.fn()
+      mockH = {
+        view: jest.fn().mockReturnValue(mockViewResult),
+        redirect: mockRedirect
+      }
       mockH.view.mockClear()
       mockTakeover.mockClear()
+      mockRedirect.mockClear()
       mockH.view.mockReturnValue(mockViewResult)
     })
 
@@ -209,6 +214,7 @@ describe('#multipleCoordinates', () => {
       convertPayloadToCoordinatesArray.mockReturnValueOnce(expectedCoordinates)
       normaliseCoordinatesForDisplay.mockReturnValueOnce(expectedCoordinates)
 
+      // Simulate a submit with no add/remove (should redirect)
       multipleCoordinatesSubmitController.handler(request, mockH)
 
       expect(convertPayloadToCoordinatesArray).toHaveBeenCalledWith(
@@ -225,14 +231,7 @@ describe('#multipleCoordinates', () => {
         'coordinates',
         expectedCoordinates
       )
-      expect(mockH.view).toHaveBeenCalledWith(
-        MULTIPLE_COORDINATES_VIEW_ROUTES[COORDINATE_SYSTEMS.WGS84],
-        expect.objectContaining({
-          ...multipleCoordinatesPageData,
-          coordinates: expectedCoordinates,
-          projectName: 'Test Project'
-        })
-      )
+      expect(mockRedirect).toHaveBeenCalledWith(routes.REVIEW_SITE_DETAILS)
     })
 
     test('should handle validation errors by calling handleValidationFailure', () => {
@@ -257,6 +256,7 @@ describe('#multipleCoordinates', () => {
         mockValidationError,
         COORDINATE_SYSTEMS.WGS84
       )
+      expect(mockRedirect).not.toHaveBeenCalled()
     })
 
     test('should handle OSGB36 coordinate system correctly', () => {
@@ -274,6 +274,7 @@ describe('#multipleCoordinates', () => {
       convertPayloadToCoordinatesArray.mockReturnValueOnce(expectedCoordinates)
       normaliseCoordinatesForDisplay.mockReturnValueOnce(expectedCoordinates)
 
+      // Simulate a submit with no add/remove (should redirect)
       multipleCoordinatesSubmitController.handler(request, mockH)
 
       expect(convertPayloadToCoordinatesArray).toHaveBeenCalledWith(
@@ -290,13 +291,7 @@ describe('#multipleCoordinates', () => {
         'coordinates',
         expectedCoordinates
       )
-      expect(mockH.view).toHaveBeenCalledWith(
-        MULTIPLE_COORDINATES_VIEW_ROUTES[COORDINATE_SYSTEMS.OSGB36],
-        expect.objectContaining({
-          ...multipleCoordinatesPageData,
-          coordinates: expectedCoordinates
-        })
-      )
+      expect(mockRedirect).toHaveBeenCalledWith(routes.REVIEW_SITE_DETAILS)
     })
 
     test('should default to WGS84 when coordinateSystem is invalid', () => {
@@ -352,6 +347,7 @@ describe('#multipleCoordinates', () => {
           projectName: 'Test Project'
         })
       )
+      expect(mockRedirect).not.toHaveBeenCalled()
     })
 
     test('should re-render the page with an added osgb36 point when the add point button is clicked', () => {
@@ -391,6 +387,7 @@ describe('#multipleCoordinates', () => {
           projectName: 'Test Project'
         })
       )
+      expect(mockRedirect).not.toHaveBeenCalled()
     })
 
     test('should re-render the page with a removed point when the remove button is clicked', () => {
@@ -430,6 +427,26 @@ describe('#multipleCoordinates', () => {
           projectName: 'Test Project'
         })
       )
+      expect(mockRedirect).not.toHaveBeenCalled()
+    })
+
+    test('should redirect to REVIEW_SITE_DETAILS when neither add nor remove is present', () => {
+      const payload = {
+        'coordinates[0][latitude]': '51.5074',
+        'coordinates[0][longitude]': '-0.1278'
+      }
+      const request = { payload }
+      const expectedCoordinates = [
+        { latitude: '51.5074', longitude: '-0.1278' }
+      ]
+      convertPayloadToCoordinatesArray.mockReturnValueOnce(expectedCoordinates)
+      validateCoordinates.mockReturnValueOnce({ error: null })
+      updateExemptionSiteDetails.mockReturnValueOnce(undefined)
+
+      multipleCoordinatesSubmitController.handler(request, mockH)
+
+      expect(mockRedirect).toHaveBeenCalledWith(routes.REVIEW_SITE_DETAILS)
+      expect(mockH.view).not.toHaveBeenCalled()
     })
   })
 })

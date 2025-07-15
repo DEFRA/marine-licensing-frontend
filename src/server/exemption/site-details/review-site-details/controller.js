@@ -38,8 +38,11 @@ export const reviewSiteDetailsController = {
     const summaryData = {
       method: getReviewSummaryText(siteDetails),
       coordinateSystem: getCoordinateSystemText(coordinateSystem),
-      coordinates: getCoordinateDisplayText(siteDetails, coordinateSystem),
-      width: circleWidth ? `${circleWidth} metres` : ''
+      coordinates: getCoordinateDisplayText(siteDetails, coordinateSystem)
+    }
+
+    if (circleWidth) {
+      summaryData.width = circleWidth !== '' ? `${circleWidth} metres` : ''
     }
 
     return h.view(REVIEW_SITE_DETAILS_VIEW_ROUTE, {

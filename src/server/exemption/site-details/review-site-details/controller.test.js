@@ -73,8 +73,7 @@ describe('#reviewSiteDetails', () => {
         summaryData: {
           method: '',
           coordinateSystem: '',
-          coordinates: '',
-          width: ''
+          coordinates: ''
         }
       })
     })

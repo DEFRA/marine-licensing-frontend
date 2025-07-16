@@ -1,0 +1,33 @@
+@use "govuk-frontend" as *;
+
+.app-loading-spinner {
+  border: 15px solid $govuk-border-colour;
+  border-top: 15px solid $govuk-brand-colour;
+  border-radius: 50%;
+  width: 80px;
+  height: 80px;
+  animation: app-loading-spinner-rotate 2s linear infinite;
+  margin: 0 auto;
+  display: block;
+
+  // Add screen reader text
+  &__text {
+    @include govuk-visually-hidden;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .app-loading-spinner {
+    animation-duration: 4s; // Slower animation for reduced motion
+  }
+}
+
+@keyframes app-loading-spinner-rotate {
+  0% { 
+    transform: rotate(0deg); 
+  }
+  
+  100% { 
+    transform: rotate(360deg); 
+  }
+} 

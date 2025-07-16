@@ -90,7 +90,6 @@ export const chooseFileTypeSubmitController = {
   },
   handler(request, h) {
     const { payload } = request
-    const exemption = getExemptionCache(request)
 
     updateExemptionSiteDetails(
       request,
@@ -98,11 +97,6 @@ export const chooseFileTypeSubmitController = {
       payload.fileUploadType
     )
 
-    return h.view(CHOOSE_FILE_UPLOAD_TYPE_VIEW_ROUTE, {
-      ...pageSettings,
-      projectName: exemption.projectName,
-      payload,
-      backLink: routes.COORDINATES_TYPE_CHOICE
-    })
+    return h.redirect(routes.FILE_UPLOAD)
   }
 }

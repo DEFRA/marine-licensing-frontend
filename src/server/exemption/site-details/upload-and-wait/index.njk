@@ -1,0 +1,55 @@
+{% extends 'layouts/page.njk' %}
+
+{% block pageTitle %}
+  {{ heading }} - {{ serviceName }}
+{% endblock %}
+
+{% block beforeContent %} 
+
+{% endblock %} 
+
+{% block footer %}
+
+{% endblock %}
+
+{% block head %}
+  {{ super() }}
+  {% if isProcessing %}
+    {# This meta-refresh of 2 should be kept the same as the app-loading-spinner animation time  #}
+    <meta http-equiv="refresh" content="{{ pageRefreshTimeInSeconds }}">
+  {% endif %}
+{% endblock %}
+
+{% block content %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+                
+      {% if isProcessing %}
+
+        <div class="govuk-!-text-align-centre">
+          <div class="app-loading-spinner" role="status">
+            <span class="app-loading-spinner__text">Checking your file</span>          
+          </div>          
+          <h1 class="govuk-heading-l govuk-!-padding-top-6">{{ heading }}</h1>
+          <p class="govuk-body">This may take a few seconds.</p>
+        </div>
+
+      {% else %}
+
+        {% if projectName %}
+          <span class="govuk-caption-l">{{ projectName }}</span>
+        {% endif %}
+
+        <p class="govuk-body">Something went wrong. Please try uploading your file again.</p>
+        
+        <div class="govuk-button-group">
+          <a href="{{ routes.FILE_UPLOAD }}" class="govuk-button">Try again</a>
+          <a href="{{ routes.TASK_LIST }}" class="govuk-link">Cancel</a>
+        </div>
+      {% endif %}
+
+
+    </div>
+  </div>
+
+{% endblock %} 

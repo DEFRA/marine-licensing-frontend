@@ -1,0 +1,60 @@
+{%- from "govuk/components/table/macro.njk" import govukTable -%}
+{%- from "govuk/components/tag/macro.njk" import govukTag -%}
+
+{% extends "layouts/page.njk" %}
+
+{% set bodyClasses = "govuk-wide-template" %}
+
+{% block content %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-full">
+      <h1 class="govuk-heading-l">{{ heading }}</h1>
+      
+      {% if projects and projects.length > 0 %}
+
+        {{ govukTable({
+          attributes: {
+            "data-module": "moj-sortable-table"
+          },
+          head: [
+            {
+              text: "Name",
+              attributes: {
+                "aria-sort": "none"
+              }
+            },
+            {
+              text: "Type",
+              attributes: {
+                "aria-sort": "none"
+              }
+            },
+            {
+              text: "Reference",
+              attributes: {
+                "aria-sort": "none"
+              }
+            },
+            {
+              text: "Status",
+              attributes: {
+                "aria-sort": "none"
+              }
+            },
+            {
+              text: "Date submitted",
+              attributes: {
+                "aria-sort": "none"
+              }
+            }
+          ],
+          rows: projects
+        }) }}
+      {% else %}
+        <p class="govuk-body">
+          You currently have no projects.
+        </p>
+      {% endif %}
+    </div>
+  </div>
+{% endblock %} 

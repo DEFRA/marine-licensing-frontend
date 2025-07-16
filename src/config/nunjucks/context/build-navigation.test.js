@@ -13,9 +13,9 @@ describe('#buildNavigation', () => {
       buildNavigation(mockRequest({ path: '/non-existent-path' }))
     ).toEqual([
       {
-        isActive: false,
-        text: 'Home',
-        url: '/'
+        active: false,
+        text: 'Projects home',
+        href: '/home'
       }
     ])
   })
@@ -23,11 +23,31 @@ describe('#buildNavigation', () => {
   test('Should provide expected highlighted navigation details', () => {
     expect(buildNavigation(mockRequest({ path: '/' }))).toEqual([
       {
-        isActive: true,
-        text: 'Home',
-        url: '/'
+        active: false,
+        text: 'Projects home',
+        href: '/home'
       }
     ])
+  })
+
+  test('Should mark Projects Home as active when on dashboard page', () => {
+    const request = { path: '/home' }
+    const navigation = buildNavigation(request)
+
+    const projectsHomeLink = navigation.find(
+      (item) => item.text === 'Projects home'
+    )
+    expect(projectsHomeLink.active).toBe(true)
+  })
+
+  test('Should mark Projects Home as inactive when not on dashboard page', () => {
+    const request = { path: '/exemption/project-name' }
+    const navigation = buildNavigation(request)
+
+    const projectsHomeLink = navigation.find(
+      (item) => item.text === 'Projects home'
+    )
+    expect(projectsHomeLink.active).toBe(false)
   })
 })
 

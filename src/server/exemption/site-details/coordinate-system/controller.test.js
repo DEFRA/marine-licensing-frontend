@@ -149,7 +149,7 @@ describe('#coordinateSystem', () => {
   })
 
   describe('#coordinateSystemSubmitController', () => {
-    test('Should correctly stay on the page when submitting and coordinatesEntry is not single', async () => {
+    test('Should redirect to multiple coordinates page when coordinatesEntry is multiple', async () => {
       const request = {
         payload: { coordinateSystem: 'wgs84' }
       }
@@ -162,9 +162,27 @@ describe('#coordinateSystem', () => {
       })
 
       const h = {
-        view: jest.fn().mockReturnValue({
-          takeover: jest.fn()
-        })
+        redirect: jest.fn()
+      }
+
+      await coordinateSystemSubmitController.handler(request, h)
+      expect(h.redirect).toHaveBeenCalledWith(routes.ENTER_MULTIPLE_COORDINATES)
+    })
+
+    test('Should stay on the page when coordinatesEntry is neither single nor multiple', async () => {
+      const request = {
+        payload: { coordinateSystem: 'wgs84' }
+      }
+
+      getExemptionCacheSpy.mockReturnValueOnce({
+        projectName: 'Test Project',
+        siteDetails: {
+          coordinatesEntry: 'other'
+        }
+      })
+
+      const h = {
+        view: jest.fn()
       }
 
       await coordinateSystemSubmitController.handler(request, h)

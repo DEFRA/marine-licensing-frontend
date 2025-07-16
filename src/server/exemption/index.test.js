@@ -72,6 +72,14 @@ describe('exemption route', () => {
       }),
       expect.objectContaining({
         method: 'GET',
+        path: '/exemption/enter-multiple-coordinates'
+      }),
+      expect.objectContaining({
+        method: 'POST',
+        path: '/exemption/enter-multiple-coordinates'
+      }),
+      expect.objectContaining({
+        method: 'GET',
         path: '/exemption/review-site-details'
       }),
       expect.objectContaining({
@@ -85,6 +93,14 @@ describe('exemption route', () => {
       expect.objectContaining({
         method: 'POST',
         path: '/exemption/choose-file-type-to-upload'
+      }),
+      expect.objectContaining({
+        method: 'GET',
+        path: '/exemption/upload-file'
+      }),
+      expect.objectContaining({
+        method: 'GET',
+        path: '/exemption/upload-and-wait'
       }),
       expect.objectContaining({
         method: 'GET',
@@ -113,6 +129,10 @@ describe('exemption route', () => {
       expect.objectContaining({
         method: 'GET',
         path: '/exemption/confirmation'
+      }),
+      expect.objectContaining({
+        method: 'GET',
+        path: '/home'
       }),
       expect.objectContaining({
         method: 'GET',

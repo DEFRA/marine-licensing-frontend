@@ -7,6 +7,7 @@ const dirname = path.dirname(fileURLToPath(import.meta.url))
 const oneDay = 1000 * 60 * 60 * 24
 const fourHoursMs = 14400000
 const oneWeekMs = 604800000
+const fiftyMB = 50_000_000 // 50 MB :== 50 * 1000 * 1000
 
 const isProduction = process.env.NODE_ENV === 'production'
 const isTest = process.env.NODE_ENV === 'test'
@@ -42,6 +43,12 @@ export const config = convict({
     doc: 'Applications Service Name',
     format: String,
     default: 'Apply for a marine licence'
+  },
+  appBaseUrl: {
+    doc: 'Base URL for the application (used for CDP upload redirects)',
+    format: String,
+    default: 'http://localhost:3000',
+    env: 'APP_BASE_URL'
   },
   root: {
     doc: 'Project root',
@@ -282,6 +289,32 @@ export const config = convict({
       format: Boolean,
       default: true,
       env: 'DEFRA_ID_REFRESH_TOKENS'
+    }
+  },
+  cdpUploader: {
+    cdpUploadServiceBaseUrl: {
+      doc: 'CDP Uploader service base URL',
+      format: String,
+      default: 'http://localhost:7337',
+      env: 'CDP_UPLOADER_BASE_URL'
+    },
+    timeout: {
+      doc: 'Request timeout for CDP Uploader calls in milliseconds',
+      format: Number,
+      default: 30000,
+      env: 'CDP_UPLOADER_TIMEOUT'
+    },
+    maxFileSize: {
+      doc: 'Maximum file size in bytes (50MB)',
+      format: Number,
+      default: fiftyMB,
+      env: 'CDP_UPLOADER_MAX_FILE_SIZE'
+    },
+    s3Bucket: {
+      doc: 'S3 Bucket for uploads to be placed in after the virus scan',
+      format: String,
+      default: 'mmo-uploads',
+      env: 'CDP_UPLOAD_BUCKET'
     }
   }
 })

@@ -17,7 +17,7 @@ const baseUrl = config.get('apiServer')
 ```
 
 ## Making API Calls
-- Use native fetch for HTTP requests (do not use Axios or other HTTP clients)
+- Use native Hapi/Wreck for HTTP requests (do not use Axios or other HTTP clients)
 - Always include error handling
 - Use JSON content type by default
 - Follow RESTful conventions

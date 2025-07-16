@@ -6,7 +6,9 @@ import {
   getUserSession,
   removeUserSession
 } from '~/src/server/common/plugins/auth/utils.js'
+import { clearExemptionCache } from '~/src/server/common/helpers/session-cache/utils.js'
 
+jest.mock('~/src/server/common/helpers/session-cache/utils.js')
 jest.mock('~/src/server/common/plugins/auth/utils.js', () => ({
   getUserSession: jest.fn(),
   removeUserSession: jest.fn()
@@ -14,6 +16,8 @@ jest.mock('~/src/server/common/plugins/auth/utils.js', () => ({
 
 describe('#signOutController', () => {
   let server
+
+  const clearExemptionCacheMock = jest.mocked(clearExemptionCache)
 
   beforeAll(async () => {
     server = await createServer()
@@ -66,6 +70,7 @@ describe('#signOutController', () => {
     })
 
     expect(removeUserSession).toHaveBeenCalled()
+    expect(clearExemptionCacheMock).toHaveBeenCalled()
     expect(statusCode).toBe(statusCodes.redirect)
     expect(headers.location).toBe(
       `testLogout?id_token_hint=testId&post_logout_redirect_uri=http://localhost:3000${routes.PROJECT_NAME}`

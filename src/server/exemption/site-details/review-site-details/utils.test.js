@@ -30,6 +30,10 @@ describe('siteDetails utils', () => {
       ).toBe(routes.ENTER_MULTIPLE_COORDINATES)
     })
 
+    test('getSiteDetailsBackLink correctly returns default option when referrer is not in the list', () => {
+      expect(getSiteDetailsBackLink('http://google.com')).toBe(routes.TASK_LIST)
+    })
+
     test('getSiteDetailsBackLink correctly returns fallback option', () => {
       expect(getSiteDetailsBackLink(undefined)).toBe(routes.TASK_LIST)
     })

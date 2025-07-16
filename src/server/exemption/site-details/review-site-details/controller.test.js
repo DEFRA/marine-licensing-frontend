@@ -6,7 +6,10 @@ import {
 } from '~/src/server/exemption/site-details/review-site-details/controller.js'
 import { COORDINATE_SYSTEMS } from '~/src/server/common/constants/exemptions.js'
 import * as cacheUtils from '~/src/server/common/helpers/session-cache/utils.js'
-import { mockExemption } from '~/src/server/test-helpers/mocks.js'
+import {
+  mockExemption,
+  mockMultipleExemption
+} from '~/src/server/test-helpers/mocks.js'
 import { statusCodes } from '~/src/server/common/constants/status-codes.js'
 import { config } from '~/src/config/config.js'
 import { JSDOM } from 'jsdom'
@@ -21,6 +24,11 @@ describe('#reviewSiteDetails', () => {
   let getExemptionCacheSpy
   let getCoordinateSystemSpy
 
+  const mockWGS84Coordinate = {
+    latitude: mockExemption.siteDetails.coordinates.latitude,
+    longitude: mockExemption.siteDetails.coordinates.longitude
+  }
+
   const mockCoordinates = {
     [COORDINATE_SYSTEMS.WGS84]: {
       latitude: mockExemption.siteDetails.coordinates.latitude,
@@ -28,6 +36,11 @@ describe('#reviewSiteDetails', () => {
     },
     [COORDINATE_SYSTEMS.OSGB36]: { eastings: '425053', northings: '564180' }
   }
+
+  const mockMultipleWGS84Coordinates = [
+    mockWGS84Coordinate,
+    mockWGS84Coordinate
+  ]
 
   beforeAll(async () => {
     server = await createServer()
@@ -129,6 +142,72 @@ describe('#reviewSiteDetails', () => {
           coordinates: `${mockCoordinates[COORDINATE_SYSTEMS.OSGB36].eastings}, ${mockCoordinates[COORDINATE_SYSTEMS.OSGB36].northings}`,
           circleWidth: '100 metres',
           coordinatesEntry: 'single'
+        }
+      })
+    })
+
+    test('reviewSiteDetailsController handler should render with correct context for OSGB36 with empty circle width', () => {
+      const h = { view: jest.fn() }
+
+      getExemptionCacheSpy.mockReturnValueOnce({
+        ...mockExemption,
+        siteDetails: {
+          ...mockExemption.siteDetails,
+          coordinates: mockCoordinates[COORDINATE_SYSTEMS.OSGB36],
+          circleWidth: ''
+        }
+      })
+
+      getCoordinateSystemSpy.mockReturnValueOnce({
+        coordinateSystem: COORDINATE_SYSTEMS.OSGB36
+      })
+
+      reviewSiteDetailsController.handler({}, h)
+
+      expect(h.view).toHaveBeenCalledWith(REVIEW_SITE_DETAILS_VIEW_ROUTE, {
+        heading: 'Review site details',
+        pageTitle: 'Review site details',
+        backLink: routes.TASK_LIST,
+        projectName: 'Test Project',
+        summaryData: {
+          method:
+            'Manually enter one set of coordinates and a width to create a circular site',
+          coordinateSystem: 'OSGB36 (National Grid)\nEastings and Northings',
+          coordinates: `${mockCoordinates[COORDINATE_SYSTEMS.OSGB36].eastings}, ${mockCoordinates[COORDINATE_SYSTEMS.OSGB36].northings}`,
+          circleWidth: '',
+          coordinatesEntry: 'single'
+        }
+      })
+    })
+
+    test('reviewSiteDetailsController handler should render with correct context for multiple coordinates', () => {
+      const h = { view: jest.fn() }
+
+      getExemptionCacheSpy.mockReturnValueOnce({
+        ...mockExemption,
+        siteDetails: {
+          ...mockMultipleExemption.siteDetails,
+          coordinates: mockMultipleWGS84Coordinates
+        }
+      })
+
+      reviewSiteDetailsController.handler({}, h)
+
+      expect(h.view).toHaveBeenCalledWith(REVIEW_SITE_DETAILS_VIEW_ROUTE, {
+        heading: 'Review site details',
+        pageTitle: 'Review site details',
+        backLink: routes.TASK_LIST,
+        projectName: 'Test Project',
+        summaryData: {
+          method:
+            'Manually enter multiple sets of coordinates to mark the boundary of the site',
+          coordinateSystem:
+            'WGS84 (World Geodetic System 1984)\nLatitude and longitude',
+          coordinates: [
+            `${mockMultipleWGS84Coordinates[0].latitude}, ${mockMultipleWGS84Coordinates[0].longitude}`,
+            `${mockMultipleWGS84Coordinates[1].latitude}, ${mockMultipleWGS84Coordinates[1].longitude}`
+          ],
+          coordinatesEntry: 'multiple'
         }
       })
     })

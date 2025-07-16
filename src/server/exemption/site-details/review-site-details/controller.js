@@ -55,7 +55,7 @@ export const reviewSiteDetailsController = {
       coordinates: displayCoordinates
     }
 
-    if (circleWidth) {
+    if (circleWidth !== undefined) {
       summaryData.circleWidth =
         circleWidth !== '' ? `${circleWidth} metres` : ''
     }

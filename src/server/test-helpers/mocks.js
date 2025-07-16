@@ -26,3 +26,24 @@ export const mockExemption = {
   },
   taskList: mockExemptionTaskList
 }
+
+export const mockMultipleExemption = {
+  id: faker.database.mongodbObjectId(),
+  projectName: 'Test Project',
+  activityDates: {
+    start: '2025-01-01T00:00:00.000Z',
+    end: '2025-01-01T00:00:00.000Z'
+  },
+  activityDescription: 'Test activity description',
+  publicRegister: { consent: 'yes', reason: 'Test reason' },
+  siteDetails: {
+    coordinatesType: 'coordinates',
+    coordinatesEntry: 'multiple',
+    coordinateSystem: COORDINATE_SYSTEMS.WGS84,
+    coordinates: [
+      { latitude: '51.489676', longitude: '-0.231530' },
+      { latitude: '51.489676', longitude: '-0.231530' }
+    ]
+  },
+  taskList: mockExemptionTaskList
+}

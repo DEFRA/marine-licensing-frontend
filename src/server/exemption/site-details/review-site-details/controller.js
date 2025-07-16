@@ -6,7 +6,6 @@ import { routes } from '~/src/server/common/constants/routes.js'
 import {
   getCoordinateSystemText,
   getReviewSummaryText,
-  getCoordinateDisplayText,
   getSiteDetailsBackLink
 } from './utils.js'
 import { authenticatedPatchRequest } from '~/src/server/common/helpers/authenticated-requests.js'
@@ -35,14 +34,30 @@ export const reviewSiteDetailsController = {
 
     const { circleWidth } = siteDetails
 
+    let displayCoordinates
+    if (Array.isArray(siteDetails.coordinates)) {
+      displayCoordinates = siteDetails.coordinates.map((coordinate) => {
+        return Object.values(coordinate).join(', ')
+      })
+    } else if (
+      siteDetails.coordinates &&
+      typeof siteDetails.coordinates === 'object'
+    ) {
+      displayCoordinates = Object.values(siteDetails.coordinates).join(', ')
+    } else {
+      displayCoordinates = ''
+    }
+
     const summaryData = {
       method: getReviewSummaryText(siteDetails),
+      coordinatesEntry: siteDetails.coordinatesEntry,
       coordinateSystem: getCoordinateSystemText(coordinateSystem),
-      coordinates: getCoordinateDisplayText(siteDetails, coordinateSystem)
+      coordinates: displayCoordinates
     }
 
     if (circleWidth) {
-      summaryData.width = circleWidth !== '' ? `${circleWidth} metres` : ''
+      summaryData.circleWidth =
+        circleWidth !== '' ? `${circleWidth} metres` : ''
     }
 
     return h.view(REVIEW_SITE_DETAILS_VIEW_ROUTE, {

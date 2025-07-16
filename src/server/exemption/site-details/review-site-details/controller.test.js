@@ -94,7 +94,8 @@ describe('#reviewSiteDetails', () => {
           coordinateSystem:
             'WGS84 (World Geodetic System 1984)\nLatitude and longitude',
           coordinates: `${mockCoordinates[COORDINATE_SYSTEMS.WGS84].latitude}, ${mockCoordinates[COORDINATE_SYSTEMS.WGS84].longitude}`,
-          width: '100 metres'
+          circleWidth: '100 metres',
+          coordinatesEntry: 'single'
         }
       })
     })
@@ -126,7 +127,8 @@ describe('#reviewSiteDetails', () => {
             'Manually enter one set of coordinates and a width to create a circular site',
           coordinateSystem: 'OSGB36 (National Grid)\nEastings and Northings',
           coordinates: `${mockCoordinates[COORDINATE_SYSTEMS.OSGB36].eastings}, ${mockCoordinates[COORDINATE_SYSTEMS.OSGB36].northings}`,
-          width: '100 metres'
+          circleWidth: '100 metres',
+          coordinatesEntry: 'single'
         }
       })
     })

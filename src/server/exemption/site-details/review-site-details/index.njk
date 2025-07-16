@@ -1,38 +1,34 @@
 {% extends 'layouts/page.njk' %}
-
 {% from "govuk/components/back-link/macro.njk" import govukBackLink %}
 {% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
 {% from "govuk/components/button/macro.njk" import govukButton %}
 {% from "cancel-button/macro.njk" import appCancelButton %}
-
 {% block beforeContent %}
     {{ govukBackLink({
         text: "Back",
         href: backLink
     }) }}
 {% endblock %}
-
 {% block content %}
     <div class="govuk-grid-row">
         <div class="govuk-grid-column-full">
-            
             <span class="govuk-caption-l">{{ projectName }}</span>
             <h1 class="govuk-heading-l">{{ heading }}</h1>
-
-            {{ govukSummaryList({
-                card: {
-                    title: {
-                        text: "Site details"
-                    }
-                },
-                rows: [
-                    {
+            {% set rows = [                    {
                         key: {
                             text: "Method of providing site location"
                         },
                         value: {
                             text: summaryData.method
+                        },
+                        actions: {
+                        items: [
+                        {
+                            href: "#",
+                            text: "Change"
                         }
+                        ]
+                    }
                     },
                     {
                         key: {
@@ -40,44 +36,117 @@
                         },
                         value: {
                             html: summaryData.coordinateSystem | replace('\n', '<br>')
-                        }
-                    },
-                    {
-                        key: {
-                            text: "Coordinates at centre of site"
                         },
-                        value: {
-                            text: summaryData.coordinates
+                        actions: {
+                        items: [
+                        {
+                            href: "#",
+                            text: "Change"
                         }
-                    },
-                    {
-                        key: {
-                            text: "Width of circular site"
-                        },
-                        value: {
-                            text: summaryData.width
-                        }
+                        ]
                     }
-                ]
+                    }] %}
+            {% if summaryData.circleWidth and summaryData.coordinatesEntry === 'single' %}
+                {% set _ = rows.push({
+                    key: {
+                        text: "Coordinates at centre of site"
+                    },
+                    value: {
+                        text: summaryData.coordinates
+                    },
+                    actions: {
+                        items: [
+                        {
+                            href: "#",
+                            text: "Change"
+                        }
+                        ]
+                    }
+                }) %}
+                {% set _ = rows.push({
+                    key: {
+                        text: "Width of circular site"
+                    },
+                    value: {
+                        text: summaryData.circleWidth
+                    },
+                    actions: {
+                        items: [
+                        {
+                            href: "#",
+                            text: "Change"
+                        }
+                        ]
+                    }
+                }) %}
+            {% endif %}
+            {% if summaryData.coordinates and summaryData.coordinatesEntry === 'multiple' %}
+                {% if summaryData.coordinates is iterable and summaryData.coordinates is not string %}
+                    {% for coordinate in summaryData.coordinates %}
+                        {% if loop.index0 == 0 %}
+                            {% set _ = rows.push({
+                    key: {
+                        text: "Start and end point"
+                    },
+                    value: {
+                        text: coordinate
+                    },
+                    classes: "govuk-summary-list__row--no-border",
+                    actions: {
+                        items: [
+                        {
+                            href: "#",
+                            text: "Change"
+                        }
+                        ]
+                    }
+                }) %}
+                        {% else %}
+                            {% set _ = rows.push({
+                    key: {
+                        text: "Point " + (loop.index0 + 1)
+                    },
+                    value: {
+                        text: coordinate
+                    },
+                    classes: "govuk-summary-list__row--no-border"
+                }) %}
+                        {% endif %}
+                    {% endfor %}
+                {% else %}
+                    {% set _ = rows.push({
+            key: {
+                text: "Coordinates"
+            },
+            value: {
+                text: summaryData.coordinates
+            },
+            classes: "govuk-summary-list__row--no-border"
+        }) %}
+                {% endif %}
+            {% endif %}
+            {{ govukSummaryList({
+                card: {
+                    title: {
+                        text: "Site details"
+                    }
+                },
+                rows: rows
             }) }}
-            
             <form method="POST">
-                <input type="hidden" name="csrfToken" value="{{csrfToken}}">
-                                
-                <div class="govuk-button-group">
-                    {{ govukButton({
+                <input type="hidden" name="csrfToken" value="{{ csrfToken }}">
+                    <div class="govuk-button-group">
+                        {{ govukButton({
                         text: "Save and continue",
                         attributes: {
                             id: "continue"
                         }
                     }) }}
-
-                    {{ appCancelButton({
+                        {{ appCancelButton({
                         cancelLink: "/exemption/task-list?cancel=site-details"
                     }) }}
-                </div>
-            </form>
-            
+                    </div>
+                </form>
+            </div>
         </div>
-    </div>
-{% endblock %} 
+    {% endblock %}

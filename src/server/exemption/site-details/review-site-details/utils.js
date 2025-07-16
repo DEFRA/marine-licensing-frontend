@@ -13,7 +13,15 @@ export const getSiteDetailsBackLink = (previousPage) => {
     return routes.TASK_LIST
   }
 
-  return routes.WIDTH_OF_SITE
+  if (previousPath === routes.WIDTH_OF_SITE) {
+    return routes.WIDTH_OF_SITE
+  }
+
+  if (previousPath === routes.ENTER_MULTIPLE_COORDINATES) {
+    return routes.ENTER_MULTIPLE_COORDINATES
+  }
+
+  return routes.TASK_LIST
 }
 
 export const getReviewSummaryText = (siteDetails) => {

@@ -22,6 +22,14 @@ describe('siteDetails utils', () => {
       ).toBe(routes.WIDTH_OF_SITE)
     })
 
+    test('getSiteDetailsBackLink correctly returns page when coming from multiple coordinates page', () => {
+      expect(
+        getSiteDetailsBackLink(
+          `http://hostname${routes.ENTER_MULTIPLE_COORDINATES}`
+        )
+      ).toBe(routes.ENTER_MULTIPLE_COORDINATES)
+    })
+
     test('getSiteDetailsBackLink correctly returns fallback option', () => {
       expect(getSiteDetailsBackLink(undefined)).toBe(routes.TASK_LIST)
     })

@@ -138,7 +138,7 @@ describe('#reviewSiteDetails', () => {
         method: 'GET',
         url: routes.REVIEW_SITE_DETAILS,
         headers: {
-          referer: `http://localhost/${routes.WIDTH_OF_SITE}`
+          referer: `http://localhost${routes.WIDTH_OF_SITE}`
         }
       })
 
@@ -195,7 +195,7 @@ describe('#reviewSiteDetails', () => {
 
       expect(
         document
-          .querySelector('.govuk-back-link[href="/exemption/width-of-site')
+          .querySelector('.govuk-back-link[href="/exemption/width-of-site"]')
           .textContent.trim()
       ).toBe('Back')
 

@@ -97,7 +97,7 @@
                   }) }}
                 {% endif %}
                 {{ govukInput({
-                  id: "coordinates-" + i + "-eastings",
+                  id: "coordinates" + i + "eastings",
                   name: "coordinates[" + i + "][eastings]",
                   value: coordinate.eastings,
                   errorMessage: errors["coordinates" + i + "eastings"] if errors,
@@ -110,7 +110,7 @@
                   }
                 }) }}
                 {{ govukInput({
-                  id: "coordinates-" + i + "-northings",
+                  id: "coordinates" + i + "northings",
                   name: "coordinates[" + i + "][northings]",
                   value: coordinate.northings,
                   errorMessage: errors["coordinates" + i + "northings"] if errors,

@@ -89,7 +89,7 @@
                   </button>
                 {% endif %}
                 {{ govukInput({
-                  id: "coordinates-" + i + "-latitude",
+                  id: "coordinates" + i + "latitude",
                   name: "coordinates[" + i + "][latitude]",
                   value: coordinate.latitude,
                   errorMessage: errors["coordinates" + i + "latitude"] if errors,
@@ -101,7 +101,7 @@
                     text: "Latitude " ~ labelText
                   } }) }}
                 {{ govukInput({
-                  id: "coordinates-" + i + "-longitude",
+                  id: "coordinates" + i + "longitude",
                   name: "coordinates[" + i + "][longitude]",
                   value: coordinate.longitude,
                   errorMessage: errors["coordinates" + i + "longitude"] if errors,

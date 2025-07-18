@@ -35,7 +35,7 @@ export function context(request) {
     signOutUrl: routes.SIGN_OUT,
     breadcrumbs: [],
     navigation: buildNavigation(request),
-
+    clarityProjectId: config.get('clarityProjectId'),
     /**
      * @param {string} asset
      */

@@ -70,7 +70,8 @@
     "pino": "^9.5.0",
     "pino-pretty": "^13.0.0",
     "rfc2047": "^4.0.1",
-    "undici": "^6.21.1"
+    "undici": "^6.21.1",
+    "@microsoft/clarity": "^1.0.0"
   },
   "devDependencies": {
     "@babel/cli": "^7.25.9",

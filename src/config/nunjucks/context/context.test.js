@@ -34,6 +34,7 @@ describe('#context', () => {
       expect(contextResult).toEqual({
         assetPath: '/public/assets',
         breadcrumbs: [],
+        clarityProjectId: '',
         getAssetPath: expect.any(Function),
         navigation: [
           {
@@ -119,6 +120,7 @@ describe('#context cache', () => {
       expect(contextResult).toEqual({
         assetPath: '/public/assets',
         breadcrumbs: [],
+        clarityProjectId: '',
         getAssetPath: expect.any(Function),
         navigation: [
           {

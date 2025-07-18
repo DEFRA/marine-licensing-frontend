@@ -316,6 +316,12 @@ export const config = convict({
       default: 'mmo-uploads',
       env: 'CDP_UPLOAD_BUCKET'
     }
+  },
+  clarityProjectId: {
+    doc: 'Microsoft Clarity Project ID',
+    format: String,
+    default: '',
+    env: 'CLARITY_PROJECT_ID'
   }
 })
 

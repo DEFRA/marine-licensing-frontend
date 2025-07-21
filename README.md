@@ -126,6 +126,26 @@ To update dependencies use [npm-check-updates](https://github.com/raineorshine/n
 ncu --interactive --format group
 ```
 
+### Mutation Testing
+
+We use [Stryker](https://stryker-mutator.io/) for mutation testing to assess the quality of our test suite by introducing small code changes (mutations) and verifying that tests catch them.
+
+To run mutation testing:
+
+```bash
+npx stryker run stryker.conf.cjs
+```
+
+The configuration:
+
+- Mutates all JavaScript files in `src/` (excluding tests and test helpers)
+- Uses Jest as the test runner with our existing Jest configuration
+- Generates an HTML report in `reports/mutation/mutation.html`
+- Runs with 4 concurrent workers for performance
+- Sets mutation score thresholds: high (80%), low (60%)
+
+Reports help identify areas where test coverage could be improved by showing which mutations weren't caught by existing tests.
+
 ### Formatting
 
 #### Windows prettier issue

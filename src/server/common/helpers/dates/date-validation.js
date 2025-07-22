@@ -12,29 +12,31 @@ function createErrorSummaryItem(fieldId, message) {
   }
 }
 
-function validateDateFields(dateFields, prefix, type, errors) {
+function validateDateFields(dateFields, prefix, type) {
   const config = { prefix, type }
-  const initialErrorCount = errors.length
 
-  checkMissingFields(dateFields, config, errors)
-  if (errors.length > initialErrorCount) {
-    return null
+  const missingFieldErrors = checkMissingFields(dateFields, config)
+  if (missingFieldErrors.length > 0) {
+    return { errors: missingFieldErrors, date: null }
   }
 
-  return validateCompleteDate(dateFields, config, errors)
+  const { errors: completeErrors, date } = validateCompleteDate(
+    dateFields,
+    config
+  )
+  return { errors: completeErrors, date }
 
-  function checkMissingFields({ day, month, year }, dateConfig, errorList) {
+  function checkMissingFields({ day, month, year }, dateConfig) {
     const hasAnyField = day || month || year
     const hasAllFields = day && month && year
 
     if (!hasAnyField) {
-      errorList.push(
+      return [
         createErrorSummaryItem(
           `activity-${dateConfig.prefix}-date-day`,
           `Enter the ${dateConfig.type} date`
         )
-      )
-      return
+      ]
     }
 
     if (!hasAllFields) {
@@ -44,41 +46,46 @@ function validateDateFields(dateFields, prefix, type, errors) {
         { value: year, name: 'year' }
       ]
 
-      fieldChecks.forEach((field) => {
-        if (!field.value) {
-          errorList.push(
-            createErrorSummaryItem(
-              `activity-${dateConfig.prefix}-date-${field.name}`,
-              `The ${dateConfig.type} date must include a ${field.name}`
-            )
+      return fieldChecks
+        .filter((field) => !field.value)
+        .map((field) =>
+          createErrorSummaryItem(
+            `activity-${dateConfig.prefix}-date-${field.name}`,
+            `The ${dateConfig.type} date must include a ${field.name}`
           )
-        }
-      })
+        )
     }
+
+    return []
   }
 
-  function validateCompleteDate({ day, month, year }, dateConfig, errorList) {
+  function validateCompleteDate({ day, month, year }, dateConfig) {
     const dateISO = createDateISO(year, month, day)
     if (!dateISO) {
-      errorList.push(
-        createErrorSummaryItem(
-          `activity-${dateConfig.prefix}-date-day`,
-          `The ${dateConfig.type} date must be a real date`
-        )
-      )
-      return null
+      return {
+        errors: [
+          createErrorSummaryItem(
+            `activity-${dateConfig.prefix}-date-day`,
+            `The ${dateConfig.type} date must be a real date`
+          )
+        ],
+        date: null
+      }
     }
 
     if (!isTodayOrFuture(dateISO)) {
-      errorList.push(
-        createErrorSummaryItem(
-          `activity-${dateConfig.prefix}-date-day`,
-          `The ${dateConfig.type} date must be today or in the future`
-        )
-      )
+      return {
+        errors: [
+          createErrorSummaryItem(
+            `activity-${dateConfig.prefix}-date-day`,
+            `The ${dateConfig.type} date must be today or in the future`
+          )
+        ],
+        date: dateISO
+      }
     }
 
-    return dateISO
+    return { errors: [], date: dateISO }
   }
 }
 
@@ -86,12 +93,12 @@ export function validateActivityDates(payload) {
   const startDate = extractDateFieldsFromPayload(payload, 'activity-start-date')
   const endDate = extractDateFieldsFromPayload(payload, 'activity-end-date')
 
-  const errors = []
+  const startResult = validateDateFields(startDate, 'start', 'start')
+  const endResult = validateDateFields(endDate, 'end', 'end')
 
-  const startDateISO = validateDateFields(startDate, 'start', 'start', errors)
-  const endDateISO = validateDateFields(endDate, 'end', 'end', errors)
+  const errors = [...startResult.errors, ...endResult.errors]
 
-  if (shouldCheckDateOrder(startDateISO, endDateISO)) {
+  if (shouldCheckDateOrder(startResult.date, endResult.date)) {
     errors.push(
       createErrorSummaryItem(
         'activity-end-date-day',

@@ -225,6 +225,36 @@ describe('AddAnotherPoint', () => {
       expect(errorMessage.textContent).toContain('point 4')
     })
 
+    it('should update error message text for both "Point n" and "point n" after re-indexing', () => {
+      $root.innerHTML = `
+        <div class="add-another-point__item">
+          <fieldset class="govuk-fieldset">
+            <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">Point 6</legend>
+            <div class="govuk-form-group govuk-form-group--error">
+              <label class="govuk-label" for="coordinates-5-latitude">Latitude of point 6</label>
+              <p id="coordinates-5-latitude-error" class="govuk-error-message">
+                <span class="govuk-visually-hidden">Error:</span> Enter the latitude of point 6
+              </p>
+              <input class="govuk-input govuk-input--error" id="coordinates-5-latitude" name="coordinates[5][latitude]" type="text" value="" aria-describedby="coordinates-5-latitude-error" data-name="coordinates[%index%][latitude]" data-id="coordinates-%index%-latitude">
+            </div>
+            <div class="govuk-form-group govuk-form-group--error">
+              <label class="govuk-label" for="coordinates-5-longitude">Longitude of Point 6</label>
+              <p id="coordinates-5-longitude-error" class="govuk-error-message">
+                <span class="govuk-visually-hidden">Error:</span> Enter the longitude of Point 6
+              </p>
+              <input class="govuk-input govuk-input--error" id="coordinates-5-longitude" name="coordinates[5][longitude]" type="text" value="" aria-describedby="coordinates-5-longitude-error" data-name="coordinates[%index%][longitude]" data-id="coordinates-%index%-longitude">
+            </div>
+          </fieldset>
+        </div>
+      `
+      const item = $root.querySelector('.add-another-point__item')
+      component.updateAttributes(item, 4)
+      const errorMsg1 = item.querySelector('#coordinates-4-latitude-error')
+      const errorMsg2 = item.querySelector('#coordinates-4-longitude-error')
+      expect(errorMsg1.textContent).toContain('point 5')
+      expect(errorMsg2.textContent).toContain('Point 5')
+    })
+
     it('should not throw if label is not found', () => {
       const item = $root.querySelector('.add-another-point__item')
       item.querySelectorAll('label').forEach((label) => label.remove())

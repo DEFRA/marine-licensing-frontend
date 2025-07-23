@@ -217,10 +217,9 @@ export class AddAnotherPoint extends Component {
 
   updatePointNumberText(element, index) {
     if (element) {
-      element.textContent = element.textContent.replace(
-        /Point \d+/g,
-        `Point ${index + 1}`
-      )
+      element.textContent = element.textContent
+        .replace(/Point \d+/g, `Point ${index + 1}`)
+        .replace(/point \d+/g, `point ${index + 1}`)
     }
   }
 
@@ -404,6 +403,7 @@ export class AddAnotherPoint extends Component {
       const items = this.getItems()
       const parentItem = items.find(($item) => $item.contains($input))
       const newIndex = items.indexOf(parentItem)
+      if (newIndex === -1) return
 
       const currentIndexMatch = href.match(/coordinates-(\d+)-/)
       if (!currentIndexMatch) return

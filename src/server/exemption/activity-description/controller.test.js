@@ -58,10 +58,10 @@ describe('#activityDescriptionController', () => {
       const { document } = new JSDOM(result).window
       expect(
         document
-          .querySelector('label[for="activity-description"]')
+          .querySelector('label[for="activityDescription"]')
           .textContent.trim()
       ).toBe('Activity description')
-      expect(document.querySelector('#activity-description').value).toBe('')
+      expect(document.querySelector('#activityDescription').value).toBe('')
       expect(document.querySelector('form').method).toBe('post')
       expect(
         document.querySelector('button[type="submit"]').textContent.trim()
@@ -145,10 +145,10 @@ describe('#activityDescriptionController', () => {
       const { document } = new JSDOM(result).window
       expect(
         document
-          .querySelector('label[for="activity-description"]')
+          .querySelector('label[for="activityDescription"]')
           .textContent.trim()
       ).toBe('Activity description')
-      expect(document.querySelector('#activity-description').value).toBe('')
+      expect(document.querySelector('#activityDescription').value).toBe('')
       expect(document.querySelector('form').method).toBe('post')
       expect(
         document.querySelector('button[type="submit"]').textContent.trim()

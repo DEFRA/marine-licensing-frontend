@@ -1,7 +1,8 @@
 import { COORDINATE_SYSTEMS } from '~/src/server/common/constants/exemptions.js'
 import {
   getExemptionCache,
-  getCoordinateSystem
+  getCoordinateSystem,
+  updateExemptionSiteDetails
 } from '~/src/server/common/helpers/session-cache/utils.js'
 import {
   MULTIPLE_COORDINATES_VIEW_ROUTES,
@@ -11,7 +12,7 @@ import {
   validateCoordinates,
   convertArrayErrorsToFlattenedErrors,
   handleValidationFailure,
-  saveCoordinatesToSession
+  removeCoordinateAtIndex
 } from './utils.js'
 
 export const multipleCoordinatesController = {
@@ -23,19 +24,55 @@ export const multipleCoordinatesController = {
         ? COORDINATE_SYSTEMS.OSGB36
         : COORDINATE_SYSTEMS.WGS84
 
-    const multipleCoordinates = siteDetails.multipleCoordinates || {}
-
     const coordinates = normaliseCoordinatesForDisplay(
-      multipleCoordinates[coordinateSystem] || [],
-      coordinateSystem
+      coordinateSystem,
+      siteDetails.coordinates
     )
+
+    const minCoords = 3
+    const paddedCoordinates = [...coordinates]
+    const emptyCoordinate =
+      coordinateSystem === COORDINATE_SYSTEMS.OSGB36
+        ? { eastings: '', northings: '' }
+        : { latitude: '', longitude: '' }
+
+    while (paddedCoordinates.length < minCoords) {
+      paddedCoordinates.push({ ...emptyCoordinate })
+    }
 
     return h.view(MULTIPLE_COORDINATES_VIEW_ROUTES[coordinateSystem], {
       ...multipleCoordinatesPageData,
-      coordinates,
+      coordinates: paddedCoordinates,
       projectName
     })
   }
+}
+
+function renderMultipleCoordinatesView(
+  h,
+  coordinates,
+  coordinateSystem,
+  projectName
+) {
+  const coordinatesForDisplay = normaliseCoordinatesForDisplay(
+    coordinateSystem,
+    coordinates
+  )
+  // Pad coordinates to at least 3 items
+  const minCoords = 3
+  const paddedCoordinates = [...coordinatesForDisplay]
+  const emptyCoordinate =
+    coordinateSystem === COORDINATE_SYSTEMS.OSGB36
+      ? { eastings: '', northings: '' }
+      : { latitude: '', longitude: '' }
+  while (paddedCoordinates.length < minCoords) {
+    paddedCoordinates.push({ ...emptyCoordinate })
+  }
+  return h.view(MULTIPLE_COORDINATES_VIEW_ROUTES[coordinateSystem], {
+    ...multipleCoordinatesPageData,
+    coordinates: paddedCoordinates,
+    projectName
+  })
 }
 
 export const multipleCoordinatesSubmitController = {
@@ -45,10 +82,17 @@ export const multipleCoordinatesSubmitController = {
     const exemption = getExemptionCache(request)
     const { coordinateSystem } = getCoordinateSystem(request)
 
-    const coordinates = convertPayloadToCoordinatesArray(
+    let coordinates = convertPayloadToCoordinatesArray(
       payload,
       coordinateSystem
     )
+
+    if (payload.remove) {
+      coordinates = removeCoordinateAtIndex(
+        coordinates,
+        parseInt(payload.remove)
+      )
+    }
 
     const validationResult = validateCoordinates(
       coordinates,
@@ -68,17 +112,22 @@ export const multipleCoordinatesSubmitController = {
       )
     }
 
-    saveCoordinatesToSession(request, coordinates, coordinateSystem)
+    updateExemptionSiteDetails(request, 'coordinates', coordinates)
 
-    const coordinatesForDisplay = normaliseCoordinatesForDisplay(
+    if (payload.add) {
+      const emptyCoordinate =
+        coordinateSystem === COORDINATE_SYSTEMS.OSGB36
+          ? { eastings: '', northings: '' }
+          : { latitude: '', longitude: '' }
+
+      coordinates = [...coordinates, emptyCoordinate]
+    }
+
+    return renderMultipleCoordinatesView(
+      h,
       coordinates,
-      coordinateSystem
+      coordinateSystem,
+      exemption?.projectName
     )
-
-    return h.view(MULTIPLE_COORDINATES_VIEW_ROUTES[coordinateSystem], {
-      ...multipleCoordinatesPageData,
-      coordinates: coordinatesForDisplay,
-      projectName: exemption?.projectName
-    })
   }
 }

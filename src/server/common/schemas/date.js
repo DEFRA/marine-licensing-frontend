@@ -11,9 +11,6 @@ const MIN_YEAR = dayjs().year()
 const MAX_YEAR_OFFSET = 75
 const MAX_YEAR = MIN_YEAR + MAX_YEAR_OFFSET
 
-const MAX_DAYS_IN_MONTH = 31
-const MAX_MONTHS_IN_YEAR = 12
-
 // Date format constants
 const DATE_FORMAT_ISO = 'YYYY-MM-DD'
 
@@ -177,12 +174,3 @@ export const activityDatesSchema = joi
     'custom.endDate.before.startDate':
       JOI_ERRORS.CUSTOM_END_DATE_BEFORE_START_DATE
   })
-
-// Export constants for reuse
-export {
-  MIN_YEAR,
-  MAX_YEAR,
-  MAX_YEAR_OFFSET,
-  MAX_DAYS_IN_MONTH,
-  MAX_MONTHS_IN_YEAR
-}

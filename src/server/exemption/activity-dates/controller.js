@@ -24,15 +24,11 @@ import {
 } from '~/src/server/common/helpers/session-cache/utils.js'
 import { activityDatesSchema } from '~/src/server/common/schemas/date.js'
 
-export function extractDateFieldsFromPayload(payload) {
-  return extractMultipleDateFields(payload, DATE_EXTRACTION_CONFIG)
-}
-
-export function createTemplateData(exemption, payload = null) {
+function createTemplateData(exemption, payload = null) {
   let dateFields
 
   if (payload) {
-    dateFields = extractDateFieldsFromPayload(payload)
+    dateFields = extractMultipleDateFields(payload, DATE_EXTRACTION_CONFIG)
   } else {
     const startDateFields = createDateFieldsFromValue(
       exemption.activityDates?.start

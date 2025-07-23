@@ -27,11 +27,13 @@
     "postversion": "git add package.json package-lock.json && git commit -m $npm_package_version",
     "test": "jest --coverage --verbose",
     "test:watch": "jest --watch",
+    "test:mutation": "npx stryker run stryker.conf.cjs",
     "server:watch": "nodemon --exec tsx --enable-source-maps ./src",
     "server:debug": "nodemon --exec tsx --enable-source-maps --inspect ./src",
     "prestart": "npm run build",
     "start": "NODE_ENV=production node --use-strict .",
-    "setup:husky": "node -e \"try { (await import('husky')).default() } catch (e) { if (e.code !== 'ERR_MODULE_NOT_FOUND') throw e }\" --input-type module"
+    "setup:husky": "node -e \"try { (await import('husky')).default() } catch (e) { if (e.code !== 'ERR_MODULE_NOT_FOUND') throw e }\" --input-type module",
+    "knip": "knip"
   },
   "author": "Defra DDTS",
   "license": "OGL-UK-3.0",
@@ -71,8 +73,7 @@
     "pino": "^9.7.0",
     "pino-pretty": "^13.0.0",
     "rfc2047": "^4.0.1",
-    "undici": "^7.11.0",
-    "@microsoft/clarity": "^1.0.0"
+    "undici": "^7.11.0"
   },
   "devDependencies": {
     "@babel/cli": "^7.25.9",
@@ -85,7 +86,7 @@
     "@types/hapi__catbox-memory": "^6.0.2",
     "@types/jest": "^30.0.0",
     "@types/lodash": "^4.17.20",
-    "@types/node": "24.0.15",
+    "@types/node": "^24.0.15",
     "@types/nunjucks": "^3.2.6",
     "@types/webpack-assets-manifest": "^5.1.4",
     "@typescript-eslint/eslint-plugin": "^7.17.0",
@@ -112,6 +113,7 @@
     "jest": "^30.0.4",
     "jest-environment-jsdom": "^30.0.4",
     "jest-fetch-mock": "3.0.3",
+    "knip": "^5.62.0",
     "nodemon": "^3.1.10",
     "npm-run-all": "^4.1.5",
     "postcss-load-config": "^6.0.1",

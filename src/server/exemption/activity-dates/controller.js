@@ -1,92 +1,34 @@
 import {
-  getExemptionCache,
-  setExemptionCache
-} from '~/src/server/common/helpers/session-cache/utils.js'
+  ACTIVITY_DATE_FIELD_NAMES,
+  ACTIVITY_DATES_CONFIG,
+  ACTIVITY_DATES_ERROR_MESSAGES,
+  ACTIVITY_DATES_VIEW_ROUTE,
+  ACTIVITY_DATES_VIEW_SETTINGS,
+  DATE_EXTRACTION_CONFIG
+} from '~/src/server/common/constants/activity-dates.js'
+import { routes } from '~/src/server/common/constants/routes.js'
+import { authenticatedPatchRequest } from '~/src/server/common/helpers/authenticated-requests.js'
+import { processDateValidationErrors } from '~/src/server/common/helpers/dates/date-form-utils.js'
+import {
+  createDateFieldsFromValue,
+  createDateISO,
+  extractMultipleDateFields
+} from '~/src/server/common/helpers/dates/date-utils.js'
 import {
   errorDescriptionByFieldName,
   mapErrorsForDisplay
 } from '~/src/server/common/helpers/errors.js'
-import { routes } from '~/src/server/common/constants/routes.js'
-import { authenticatedPatchRequest } from '~/src/server/common/helpers/authenticated-requests.js'
-import { JOI_ERRORS } from '~/src/server/common/constants/joi.js'
-import { activityDatesSchema } from '~/src/server/common/schemas/date.js'
-import { createDateISO } from '~/src/server/common/helpers/date-utils.js'
 import {
-  createDateFieldNames,
-  extractMultipleDateFields,
-  createDateFieldsFromValue,
-  handleDateValidationErrors,
-  addCustomValidationErrors as genericAddCustomValidationErrors
-} from '~/src/server/common/helpers/date-form-utils.js'
+  getExemptionCache,
+  setExemptionCache
+} from '~/src/server/common/helpers/session-cache/utils.js'
+import { activityDatesSchema } from '~/src/server/common/schemas/date.js'
 
-export const ACTIVITY_DATES_VIEW_ROUTE = 'exemption/activity-dates/index'
-
-// Date field prefix constants
-const ACTIVITY_START_DATE_PREFIX = 'activity-start-date'
-const ACTIVITY_END_DATE_PREFIX = 'activity-end-date'
-
-const START_DATE_FIELD_NAMES = createDateFieldNames(ACTIVITY_START_DATE_PREFIX)
-const END_DATE_FIELD_NAMES = createDateFieldNames(ACTIVITY_END_DATE_PREFIX)
-
-const FIELD_NAMES = {
-  START_DATE_DAY: START_DATE_FIELD_NAMES.DAY,
-  START_DATE_MONTH: START_DATE_FIELD_NAMES.MONTH,
-  START_DATE_YEAR: START_DATE_FIELD_NAMES.YEAR,
-  END_DATE_DAY: END_DATE_FIELD_NAMES.DAY,
-  END_DATE_MONTH: END_DATE_FIELD_NAMES.MONTH,
-  END_DATE_YEAR: END_DATE_FIELD_NAMES.YEAR
-}
-
-const activityDatesViewSettings = {
-  title: 'Activity dates',
-  backLink: routes.TASK_LIST,
-  cancelLink: routes.TASK_LIST
-}
-
-export const errorMessages = {
-  [JOI_ERRORS.ACTIVITY_START_DATE_DAY]: 'The start date must include a day',
-  [JOI_ERRORS.ACTIVITY_START_DATE_MONTH]: 'The start date must include a month',
-  [JOI_ERRORS.ACTIVITY_START_DATE_YEAR]: 'The start date must include a year',
-  [JOI_ERRORS.ACTIVITY_END_DATE_DAY]: 'The end date must include a day',
-  [JOI_ERRORS.ACTIVITY_END_DATE_MONTH]: 'The end date must include a month',
-  [JOI_ERRORS.ACTIVITY_END_DATE_YEAR]: 'The end date must include a year',
-  [JOI_ERRORS.CUSTOM_START_DATE_MISSING]: 'Enter the start date',
-  [JOI_ERRORS.CUSTOM_END_DATE_MISSING]: 'Enter the end date',
-  [JOI_ERRORS.CUSTOM_START_DATE_INVALID]: 'The start date must be a real date',
-  [JOI_ERRORS.CUSTOM_END_DATE_INVALID]: 'The end date must be a real date',
-  [JOI_ERRORS.CUSTOM_START_DATE_TODAY_OR_FUTURE]:
-    'The start date must be today or in the future',
-  [JOI_ERRORS.CUSTOM_END_DATE_TODAY_OR_FUTURE]:
-    'The end date must be today or in the future',
-  [JOI_ERRORS.CUSTOM_END_DATE_BEFORE_START_DATE]:
-    'The end date must be the same as or after the start date'
-}
-
-/**
- * Extracts date fields from payload for display
- * @param {object} payload - Form payload
- * @returns {object} Date field values
- */
-export function extractDateFieldsFromPayload(payload) {
-  const dateConfigs = [
-    { key: 'activityStartDate', prefix: ACTIVITY_START_DATE_PREFIX },
-    { key: 'activityEndDate', prefix: ACTIVITY_END_DATE_PREFIX }
-  ]
-
-  return extractMultipleDateFields(payload, dateConfigs)
-}
-
-/**
- * Creates base template data with date fields
- * @param {object} exemption - Exemption cache data
- * @param {object} payload - Optional form payload
- * @returns {object} Template data
- */
-export function createTemplateData(exemption, payload = null) {
+function createTemplateData(exemption, payload = null) {
   let dateFields
 
   if (payload) {
-    dateFields = extractDateFieldsFromPayload(payload)
+    dateFields = extractMultipleDateFields(payload, DATE_EXTRACTION_CONFIG)
   } else {
     const startDateFields = createDateFieldsFromValue(
       exemption.activityDates?.start
@@ -106,105 +48,43 @@ export function createTemplateData(exemption, payload = null) {
   }
 
   return {
-    ...activityDatesViewSettings,
+    ...ACTIVITY_DATES_VIEW_SETTINGS,
     projectName: exemption.projectName,
     ...dateFields
   }
 }
 
-// Date configuration for the generic date form utilities
-const DATE_CONFIGS = [
-  {
-    prefix: ACTIVITY_START_DATE_PREFIX,
-    fieldNames: START_DATE_FIELD_NAMES,
-    errorMessageKey: 'startDateErrorMessage',
-    errorKeys: {
-      MISSING: JOI_ERRORS.CUSTOM_START_DATE_MISSING,
-      INVALID: JOI_ERRORS.CUSTOM_START_DATE_INVALID,
-      TODAY_OR_FUTURE: JOI_ERRORS.CUSTOM_START_DATE_TODAY_OR_FUTURE,
-      DAY: JOI_ERRORS.ACTIVITY_START_DATE_DAY,
-      MONTH: JOI_ERRORS.ACTIVITY_START_DATE_MONTH,
-      YEAR: JOI_ERRORS.ACTIVITY_START_DATE_YEAR
-    },
-    fieldErrorKeys: {
-      [START_DATE_FIELD_NAMES.DAY]: JOI_ERRORS.ACTIVITY_START_DATE_DAY,
-      [START_DATE_FIELD_NAMES.MONTH]: JOI_ERRORS.ACTIVITY_START_DATE_MONTH,
-      [START_DATE_FIELD_NAMES.YEAR]: JOI_ERRORS.ACTIVITY_START_DATE_YEAR
-    },
-    errorMessages
-  },
-  {
-    prefix: ACTIVITY_END_DATE_PREFIX,
-    fieldNames: END_DATE_FIELD_NAMES,
-    errorMessageKey: 'endDateErrorMessage',
-    errorKeys: {
-      MISSING: JOI_ERRORS.CUSTOM_END_DATE_MISSING,
-      INVALID: JOI_ERRORS.CUSTOM_END_DATE_INVALID,
-      TODAY_OR_FUTURE: JOI_ERRORS.CUSTOM_END_DATE_TODAY_OR_FUTURE,
-      BEFORE_OTHER_DATE: JOI_ERRORS.CUSTOM_END_DATE_BEFORE_START_DATE,
-      DAY: JOI_ERRORS.ACTIVITY_END_DATE_DAY,
-      MONTH: JOI_ERRORS.ACTIVITY_END_DATE_MONTH,
-      YEAR: JOI_ERRORS.ACTIVITY_END_DATE_YEAR
-    },
-    fieldErrorKeys: {
-      [END_DATE_FIELD_NAMES.DAY]: JOI_ERRORS.ACTIVITY_END_DATE_DAY,
-      [END_DATE_FIELD_NAMES.MONTH]: JOI_ERRORS.ACTIVITY_END_DATE_MONTH,
-      [END_DATE_FIELD_NAMES.YEAR]: JOI_ERRORS.ACTIVITY_END_DATE_YEAR
-    },
-    errorMessages
-  }
-]
-
-/**
- * Backwards compatibility wrapper for addCustomValidationErrors
- * @param {Array} errorSummary - Current error summary array
- * @param {object} errorTypeMap - Error type mapping
- */
-export function addCustomValidationErrors(errorSummary, errorTypeMap) {
-  return genericAddCustomValidationErrors(
-    errorSummary,
-    errorTypeMap,
-    DATE_CONFIGS
-  )
-}
-
-/**
- * Activity dates GET controller.
- * @satisfies {Partial<ServerRoute>}
- */
 export const activityDatesController = {
   handler(request, h) {
     const exemption = getExemptionCache(request)
-
     return h.view(ACTIVITY_DATES_VIEW_ROUTE, createTemplateData(exemption))
   }
 }
 
-/**
- * Processes validation errors and returns template data
- * @param {object} request - Hapi request object
- * @param {object} h - Hapi response toolkit
- * @param {Error} err - Validation error
- * @returns {object} Response with error template
- */
 function handleValidationErrors(request, h, err) {
   const exemption = getExemptionCache(request)
+  const { payload } = request
 
-  return handleDateValidationErrors({
-    request,
-    h,
+  const validationResult = processDateValidationErrors(
     err,
-    dateConfigs: DATE_CONFIGS,
-    errorMessages,
-    createTemplateData: (payload) => createTemplateData(exemption, payload),
-    viewRoute: ACTIVITY_DATES_VIEW_ROUTE
-  })
+    ACTIVITY_DATES_CONFIG,
+    ACTIVITY_DATES_ERROR_MESSAGES
+  )
+
+  if (!validationResult) {
+    return h
+      .view(ACTIVITY_DATES_VIEW_ROUTE, createTemplateData(exemption, payload))
+      .takeover()
+  }
+
+  return h
+    .view(ACTIVITY_DATES_VIEW_ROUTE, {
+      ...createTemplateData(exemption, payload),
+      ...validationResult
+    })
+    .takeover()
 }
 
-/**
- * Activity dates POST controller.
- * @satisfies {Partial<ServerRoute>}
- */
 export const activityDatesSubmitController = {
   options: {
     validate: {
@@ -218,15 +98,15 @@ export const activityDatesSubmitController = {
 
     try {
       const start = createDateISO(
-        payload[FIELD_NAMES.START_DATE_YEAR],
-        payload[FIELD_NAMES.START_DATE_MONTH],
-        payload[FIELD_NAMES.START_DATE_DAY]
+        payload[ACTIVITY_DATE_FIELD_NAMES.START_DATE_YEAR],
+        payload[ACTIVITY_DATE_FIELD_NAMES.START_DATE_MONTH],
+        payload[ACTIVITY_DATE_FIELD_NAMES.START_DATE_DAY]
       )
 
       const end = createDateISO(
-        payload[FIELD_NAMES.END_DATE_YEAR],
-        payload[FIELD_NAMES.END_DATE_MONTH],
-        payload[FIELD_NAMES.END_DATE_DAY]
+        payload[ACTIVITY_DATE_FIELD_NAMES.END_DATE_YEAR],
+        payload[ACTIVITY_DATE_FIELD_NAMES.END_DATE_MONTH],
+        payload[ACTIVITY_DATE_FIELD_NAMES.END_DATE_DAY]
       )
 
       await authenticatedPatchRequest(request, '/exemption/activity-dates', {
@@ -251,7 +131,10 @@ export const activityDatesSubmitController = {
         throw e
       }
 
-      const errorSummary = mapErrorsForDisplay(details, errorMessages)
+      const errorSummary = mapErrorsForDisplay(
+        details,
+        ACTIVITY_DATES_ERROR_MESSAGES
+      )
       const errors = errorDescriptionByFieldName(errorSummary)
 
       return h.view(ACTIVITY_DATES_VIEW_ROUTE, {

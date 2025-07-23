@@ -16,6 +16,8 @@ Core delivery platform Node.js Frontend Template.
   - [Production](#production)
   - [Npm scripts](#npm-scripts)
   - [Update dependencies](#update-dependencies)
+  - [Code Analysis with Knip](#code-analysis-with-knip)
+  - [Mutation Testing](#mutation-testing)
   - [Formatting](#formatting)
     - [Windows prettier issue](#windows-prettier-issue)
 - [Docker](#docker)
@@ -126,6 +128,32 @@ To update dependencies use [npm-check-updates](https://github.com/raineorshine/n
 ncu --interactive --format group
 ```
 
+### Code Analysis with Knip
+
+We use [Knip](https://knip.dev/) to find and remove unused dependencies, exports, and files in the codebase. Knip helps keep projects clean by identifying dead code, unused dependencies, and unreferenced files.
+
+To run knip:
+
+```bash
+npm run knip
+```
+
+Knip analyses the entire project and reports:
+
+- Unused dependencies in `package.json`
+- Unused exports that aren't imported anywhere
+- Unreferenced files that aren't used
+- Missing dependencies that should be added to `package.json`
+
+Benefits of using knip:
+
+- Reduces bundle sizes by identifying code that can be removed
+- Improves build performance by eliminating unnecessary dependencies
+- Makes the codebase easier to maintain and navigate
+- Helps prevent version conflicts and security vulnerabilities from unused packages
+
+For automatic fixes, knip can remove unused code with the `--fix` flag, though this should be used with caution and proper version control.
+
 ### Mutation Testing
 
 We use [Stryker](https://stryker-mutator.io/) for mutation testing to assess the quality of our test suite by introducing small code changes (mutations) and verifying that tests catch them.
@@ -133,16 +161,37 @@ We use [Stryker](https://stryker-mutator.io/) for mutation testing to assess the
 To run mutation testing:
 
 ```bash
-npx stryker run stryker.conf.cjs
+npm run test:mutation
 ```
 
-The configuration:
+#### Configuration
 
-- Mutates all JavaScript files in `src/` (excluding tests and test helpers)
-- Uses Jest as the test runner with our existing Jest configuration
-- Generates an HTML report in `reports/mutation/mutation.html`
-- Runs with 4 concurrent workers for performance
-- Sets mutation score thresholds: high (80%), low (60%)
+The mutation testing is configured in `stryker.conf.cjs` with the following key settings:
+
+**Files to mutate:**
+
+- All JavaScript files in `src/` directory
+- Excludes test files (`*.test.js`, `*.spec.js`)
+- Excludes test helpers in `src/server/test-helpers/`
+- Excludes problematic files that cause issues during mutation
+
+**Test runner settings:**
+
+- Uses Jest as the test runner with our existing `jest.config.js`
+- Enables per-test coverage analysis for more precise mutation testing
+- Disables `findRelatedTests` for better performance
+
+**Output and reporting:**
+
+- Generates HTML report in `reports/mutation/mutation.html`
+- Provides clear-text and progress output during execution
+- Runs with 4 concurrent workers for optimal performance
+
+**Quality thresholds:**
+
+- High threshold: 80% (good mutation score)
+- Low threshold: 60% (minimum acceptable score)
+- No break threshold (won't fail the build)
 
 Reports help identify areas where test coverage could be improved by showing which mutations weren't caught by existing tests.
 

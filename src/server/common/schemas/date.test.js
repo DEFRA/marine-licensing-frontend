@@ -1,9 +1,9 @@
+import joi from 'joi'
+import { JOI_ERRORS } from '~/src/server/common/constants/joi.js'
 import {
   activityDatesSchema,
   individualDate
 } from '~/src/server/common/schemas/date.js'
-import joi from 'joi'
-import { JOI_ERRORS } from '~/src/server/common/constants/joi.js'
 
 describe('activityDatesSchema', () => {
   // Mock a fixed date to ensure consistent test results
@@ -139,7 +139,7 @@ describe('activityDatesSchema', () => {
       expect(result.error).toBeDefined()
 
       const errorTypes = result.error.details.map((d) => d.type)
-      expect(errorTypes).toContain('number.max')
+      expect(errorTypes).toContain('custom.startDate.invalid')
     })
 
     test('should reject invalid month (> 12)', () => {
@@ -156,7 +156,7 @@ describe('activityDatesSchema', () => {
       expect(result.error).toBeDefined()
 
       const errorTypes = result.error.details.map((d) => d.type)
-      expect(errorTypes).toContain('number.max')
+      expect(errorTypes).toContain('custom.startDate.invalid')
     })
 
     test('should reject invalid year (too far in future)', () => {

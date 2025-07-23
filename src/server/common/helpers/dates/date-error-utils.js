@@ -108,9 +108,3 @@ export function generateDateErrorMessages({
 
   return dateErrorMessages
 }
-
-export function cleanErrorSummary(errorSummary) {
-  return errorSummary.filter(
-    (error) => error.href && error.href !== '#' && error.href !== '#undefined'
-  )
-}

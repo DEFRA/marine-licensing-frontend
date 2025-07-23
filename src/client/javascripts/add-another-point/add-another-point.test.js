@@ -116,6 +116,17 @@ describe('AddAnotherPoint', () => {
 
       expect(component.getNewItem()).toBeNull()
     })
+
+    it('should remove error elements from cloned items', () => {
+      const lastItem = $root.querySelector('.add-another-point__item')
+      const error = document.createElement('p')
+      error.className = 'govuk-error-message'
+      error.textContent = 'There was an error!'
+      lastItem.appendChild(error)
+
+      const newItem = component.getNewItem()
+      expect(newItem.querySelector('.govuk-error-message')).toBeNull()
+    })
   })
 
   describe('updateAttributes', () => {

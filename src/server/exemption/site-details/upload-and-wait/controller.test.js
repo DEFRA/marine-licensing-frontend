@@ -279,6 +279,291 @@ const expectFileValidationFailure = async (
   )
 }
 
+// Test Data Factories
+const createMockUploadConfig = (overrides = {}) => ({
+  uploadId: 'test-upload-id',
+  statusUrl: 'test-status-url',
+  fileType: 'kml',
+  ...overrides
+})
+
+const createMockStatusResponse = (status, overrides = {}) => ({
+  status,
+  filename: 'test.kml',
+  fileSize: 1024,
+  completedAt: '2025-01-01T00:00:00.000Z',
+  ...(status === 'ready' && {
+    s3Location: {
+      s3Bucket: 'test-bucket',
+      s3Key: 'test-key',
+      fileId: 'test-id',
+      s3Url: 'test-url',
+      checksumSha256: 'test-checksum'
+    }
+  }),
+  ...overrides
+})
+
+const createMockExemption = (overrides = {}) => ({
+  projectName: 'Test Project',
+  siteDetails: { uploadConfig: createMockUploadConfig() },
+  ...overrides
+})
+
+const createMockRequest = () => ({
+  logger: {
+    debug: jest.fn(),
+    warn: jest.fn(),
+    error: jest.fn(),
+    info: jest.fn()
+  }
+})
+
+const createMockGeoJsonResponse = () => ({
+  statusCode: 200,
+  payload: {
+    message: 'success',
+    value: {
+      type: 'FeatureCollection',
+      features: [
+        {
+          type: 'Feature',
+          geometry: {
+            type: 'Point',
+            coordinates: [1, 2] // Simple test coordinates
+          }
+        }
+      ]
+    }
+  }
+})
+
+const createMockResponseHandler = () => ({
+  view: jest.fn(),
+  redirect: jest.fn()
+})
+
+// Mock Configuration Setup
+const setupMockConfig = () => {
+  config.get.mockImplementation((key) => {
+    const configMap = {
+      cdpUploader: { s3Bucket: 'test-bucket' },
+      root: '/test/root',
+      assetPath: '/test/assets',
+      env: 'test',
+      isDev: false,
+      isTest: true,
+      isProd: false,
+      serviceName: 'test-service',
+      serviceUrl: 'http://test-service',
+      port: 3000,
+      staticCacheControl: 'public, max-age=86400',
+      cookieOptions: {
+        ttl: 24 * 60 * 60 * 1000,
+        encoding: 'base64json',
+        isSecure: true,
+        isHttpOnly: true,
+        clearInvalid: true,
+        strictHeader: true
+      },
+      sessionCookieName: 'test-session',
+      redisHost: 'localhost',
+      redisPort: 6379,
+      redisPassword: '',
+      redisPrefix: 'test:',
+      redisTls: false,
+      redisDb: 0,
+      redisTimeout: 2000,
+      sessionTtl: 24 * 60 * 60 * 1000,
+      trustStorePath: '/test/trust-store',
+      trustStoreType: 'test',
+      trustStorePassword: 'test',
+      trustStoreCerts: [],
+      trustStoreEnabled: false,
+      'session.cache.name': 'test-cache',
+      'session.cache.engine': 'memory',
+      'session.cookie.password': 'test-password',
+      'session.cookie.ttl': 24 * 60 * 60 * 1000,
+      'session.cookie.secure': false,
+      'redis.ttl': 24 * 60 * 60 * 1000,
+      log: { enabled: true, redact: [] }
+    }
+    return configMap[key]
+  })
+}
+
+// Assertion Helpers
+const expectCacheUpdateWith = (spy, request, key, value) => {
+  expect(spy).toHaveBeenCalledWith(request, key, value)
+}
+
+const expectRedirectTo = (h, route) => {
+  expect(h.redirect).toHaveBeenCalledWith(route)
+}
+
+const expectViewCalledWith = (h, viewRoute, viewData) => {
+  expect(h.view).toHaveBeenCalledWith(viewRoute, viewData)
+}
+
+const expectUploadErrorSet = (spy, request, message, fileType = 'kml') => {
+  expectCacheUpdateWith(spy, request, 'uploadError', {
+    message,
+    fieldName: 'file',
+    fileType
+  })
+}
+
+const expectUploadConfigCleared = (spy, request) => {
+  expectCacheUpdateWith(spy, request, 'uploadConfig', undefined)
+}
+
+const expectSuccessfulFileProcessing = (spy, request) => {
+  // Verify essential data is stored (not testing exact structure)
+  expect(spy).toHaveBeenCalledWith(request, 'uploadedFile', expect.any(Object))
+  expect(spy).toHaveBeenCalledWith(
+    request,
+    'extractedCoordinates',
+    expect.any(Array)
+  )
+  expect(spy).toHaveBeenCalledWith(request, 'geoJSON', expect.any(Object))
+  expect(spy).toHaveBeenCalledWith(request, 'featureCount', expect.any(Number))
+
+  // Verify upload config is cleared (this behavior matters)
+  expectUploadConfigCleared(spy, request)
+}
+
+// Service Mock Setup Helpers
+const setupMockServices = () => {
+  const mockCdpService = {
+    getStatus: jest.fn()
+  }
+
+  const mockFileValidationService = {
+    validateFileExtension: jest.fn()
+  }
+
+  jest
+    .spyOn(cdpUploadService, 'getCdpUploadService')
+    .mockReturnValue(mockCdpService)
+  jest
+    .spyOn(fileValidationService, 'getFileValidationService')
+    .mockReturnValue(mockFileValidationService)
+
+  return { mockCdpService, mockFileValidationService }
+}
+
+const setupCacheSpies = () => {
+  const getExemptionCacheSpy = jest
+    .spyOn(cacheUtils, 'getExemptionCache')
+    .mockReturnValue(mockExemption)
+
+  const updateExemptionSiteDetailsSpy = jest
+    .spyOn(cacheUtils, 'updateExemptionSiteDetails')
+    .mockImplementation()
+
+  return { getExemptionCacheSpy, updateExemptionSiteDetailsSpy }
+}
+
+const setupAuthenticatedRequestSpy = () => {
+  return jest
+    .spyOn(authenticatedRequests, 'authenticatedPostRequest')
+    .mockResolvedValue(createMockGeoJsonResponse())
+}
+
+// Error Testing Helpers
+const expectRejectedStatusHandling = async (
+  mockRequest,
+  getExemptionCacheSpy,
+  mockCdpService,
+  updateExemptionSiteDetailsSpy,
+  rejectedMessage,
+  expectedErrorMessage,
+  fileType = 'kml'
+) => {
+  // Given exemption with upload config and rejected status
+  getExemptionCacheSpy.mockReturnValue(
+    createMockExemption({
+      siteDetails: { uploadConfig: createMockUploadConfig({ fileType }) }
+    })
+  )
+  mockCdpService.getStatus.mockResolvedValue({
+    status: 'rejected',
+    message: rejectedMessage
+  })
+
+  const h = createMockResponseHandler()
+
+  // When handler is called
+  await uploadAndWaitController.handler(mockRequest, h)
+
+  // Then expected error handling occurs
+  expectUploadErrorSet(
+    updateExemptionSiteDetailsSpy,
+    mockRequest,
+    expectedErrorMessage,
+    fileType
+  )
+  expectUploadConfigCleared(updateExemptionSiteDetailsSpy, mockRequest)
+  expectRedirectTo(h, routes.FILE_UPLOAD)
+}
+
+const expectFileValidationFailure = async (
+  mockRequest,
+  getExemptionCacheSpy,
+  mockCdpService,
+  mockFileValidationService,
+  updateExemptionSiteDetailsSpy,
+  filename,
+  fileType,
+  allowedExtensions,
+  errorMessage
+) => {
+  // Given exemption with upload config and ready status
+  getExemptionCacheSpy.mockReturnValue(
+    createMockExemption({
+      siteDetails: { uploadConfig: createMockUploadConfig({ fileType }) }
+    })
+  )
+
+  const statusResponse = createMockStatusResponse('ready', { filename })
+  mockCdpService.getStatus.mockResolvedValue(statusResponse)
+
+  // And failed file validation
+  mockFileValidationService.validateFileExtension.mockReturnValue({
+    isValid: false,
+    extension: filename.split('.').pop(),
+    errorMessage
+  })
+
+  const h = createMockResponseHandler()
+
+  // When handler is called
+  await uploadAndWaitController.handler(mockRequest, h)
+
+  // Then file validation is performed
+  expect(mockFileValidationService.validateFileExtension).toHaveBeenCalledWith(
+    filename,
+    allowedExtensions
+  )
+
+  // And error handling occurs
+  expectUploadErrorSet(
+    updateExemptionSiteDetailsSpy,
+    mockRequest,
+    errorMessage,
+    fileType
+  )
+  expectUploadConfigCleared(updateExemptionSiteDetailsSpy, mockRequest)
+  expectRedirectTo(h, routes.FILE_UPLOAD)
+
+  // And uploaded file should not be stored when validation fails
+  expect(updateExemptionSiteDetailsSpy).not.toHaveBeenCalledWith(
+    mockRequest,
+    'uploadedFile',
+    expect.anything()
+  )
+}
+
 describe('#uploadAndWait', () => {
   let getExemptionCacheSpy
   let updateExemptionSiteDetailsSpy

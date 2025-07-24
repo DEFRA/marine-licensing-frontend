@@ -96,3 +96,116 @@ export const getFileUploadBackLink = (previousPage) => {
   // Otherwise, return to file upload page
   return routes.FILE_UPLOAD
 }
+
+/**
+ * Builds summary data for manual coordinate entry display
+ * @param {object} siteDetails - Site details from exemption
+ * @param {string} coordinateSystem - Selected coordinate system
+ * @returns {object} Summary data for template
+ */
+export const buildManualCoordinateSummaryData = (
+  siteDetails,
+  coordinateSystem
+) => {
+  const { circleWidth } = siteDetails
+
+  return {
+    method: getReviewSummaryText(siteDetails),
+    coordinateSystem: getCoordinateSystemText(coordinateSystem),
+    coordinates: getCoordinateDisplayText(siteDetails, coordinateSystem),
+    width: circleWidth ? `${circleWidth} metres` : ''
+  }
+}
+
+/**
+ * Loads site details from MongoDB when session data is incomplete
+ * @param {object} request - Hapi request object
+ * @param {object} exemption - Current exemption from session
+ * @param {Function} authenticatedGetRequest - Function to make authenticated API calls
+ * @returns {Promise<object>} Site details object
+ */
+export const loadSiteDetailsFromMongoDB = async (
+  request,
+  exemption,
+  authenticatedGetRequest
+) => {
+  let siteDetails = exemption.siteDetails ?? {}
+
+  // If we have an exemption ID but incomplete site details, load from MongoDB
+  if (exemption.id && exemption.siteDetails === undefined) {
+    try {
+      const { payload } = await authenticatedGetRequest(
+        request,
+        `/exemption/${exemption.id}`
+      )
+      if (payload?.value?.siteDetails) {
+        siteDetails = payload.value.siteDetails
+        request.logger.info('Loaded site details from MongoDB for display', {
+          exemptionId: exemption.id,
+          coordinatesType: siteDetails.coordinatesType
+        })
+      }
+    } catch (error) {
+      request.logger.error('Failed to load exemption data from MongoDB', {
+        error: error.message,
+        exemptionId: exemption.id
+      })
+      // Continue with session data even if MongoDB load fails
+    }
+  }
+
+  return siteDetails
+}
+
+/**
+ * Prepares file upload data for saving to MongoDB
+ * @param {object} siteDetails - Site details from exemption
+ * @param {object} request - Hapi request object for logging
+ * @returns {object} Formatted data for API submission
+ */
+export const prepareFileUploadDataForSave = (siteDetails, request) => {
+  const uploadedFile = siteDetails.uploadedFile
+  const geoJSON = siteDetails.geoJSON
+  const featureCount = siteDetails.featureCount || 0
+
+  const dataToSave = {
+    coordinatesType: 'file',
+    fileUploadType: siteDetails.fileUploadType,
+    geoJSON,
+    featureCount,
+    uploadedFile: {
+      filename: uploadedFile.filename // Save filename for display
+    },
+    s3Location: {
+      s3Bucket: uploadedFile.s3Location.s3Bucket,
+      s3Key: uploadedFile.s3Location.s3Key,
+      checksumSha256: uploadedFile.s3Location.checksumSha256
+    }
+  }
+
+  request.logger.info('Saving file upload site details', {
+    fileType: siteDetails.fileUploadType,
+    featureCount,
+    filename: uploadedFile.filename
+  })
+
+  return dataToSave
+}
+
+/**
+ * Prepares manual coordinate data for saving to MongoDB
+ * @param {object} exemption - Current exemption from session
+ * @param {object} request - Hapi request object for logging
+ * @returns {object} Formatted data for API submission
+ */
+export const prepareManualCoordinateDataForSave = (exemption, request) => {
+  const siteDetails = exemption.siteDetails
+
+  request.logger.info('Saving manual coordinate site details', {
+    coordinatesType: siteDetails.coordinatesType,
+    coordinatesEntry: siteDetails.coordinatesEntry
+  })
+
+  // Manual coordinate entry flow - use existing data structure
+  return exemption.siteDetails
+}

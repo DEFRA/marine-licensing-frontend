@@ -5,12 +5,13 @@ import {
 } from '~/src/server/common/helpers/session-cache/utils.js'
 import { routes } from '~/src/server/common/constants/routes.js'
 import {
-  getCoordinateSystemText,
-  getReviewSummaryText,
-  getCoordinateDisplayText,
   getSiteDetailsBackLink,
   getFileUploadSummaryData,
-  getFileUploadBackLink
+  getFileUploadBackLink,
+  buildManualCoordinateSummaryData,
+  loadSiteDetailsFromMongoDB,
+  prepareFileUploadDataForSave,
+  prepareManualCoordinateDataForSave
 } from './utils.js'
 import {
   authenticatedPatchRequest,
@@ -37,30 +38,11 @@ export const reviewSiteDetailsController = {
   async handler(request, h) {
     const previousPage = request.headers?.referer
     const exemption = getExemptionCache(request)
-    let siteDetails = exemption.siteDetails ?? {}
-
-    // If we have an exemption ID but incomplete site details, load from MongoDB
-    if (exemption.id && exemption.siteDetails === undefined) {
-      try {
-        const { payload } = await authenticatedGetRequest(
-          request,
-          `/exemption/${exemption.id}`
-        )
-        if (payload?.value?.siteDetails) {
-          siteDetails = payload.value.siteDetails
-          request.logger.info('Loaded site details from MongoDB for display', {
-            exemptionId: exemption.id,
-            coordinatesType: siteDetails.coordinatesType
-          })
-        }
-      } catch (error) {
-        request.logger.error('Failed to load exemption data from MongoDB', {
-          error: error.message,
-          exemptionId: exemption.id
-        })
-        // Continue with session data even if MongoDB load fails
-      }
-    }
+    const siteDetails = await loadSiteDetailsFromMongoDB(
+      request,
+      exemption,
+      authenticatedGetRequest
+    )
 
     if (siteDetails.coordinatesType === 'file') {
       const fileUploadSummaryData = getFileUploadSummaryData({
@@ -78,14 +60,10 @@ export const reviewSiteDetailsController = {
 
     // Manual coordinate entry flow
     const { coordinateSystem } = getCoordinateSystem(request)
-    const { circleWidth } = siteDetails
-
-    const summaryData = {
-      method: getReviewSummaryText(siteDetails),
-      coordinateSystem: getCoordinateSystemText(coordinateSystem),
-      coordinates: getCoordinateDisplayText(siteDetails, coordinateSystem),
-      width: circleWidth ? `${circleWidth} metres` : ''
-    }
+    const summaryData = buildManualCoordinateSummaryData(
+      siteDetails,
+      coordinateSystem
+    )
 
     return h.view(REVIEW_SITE_DETAILS_VIEW_ROUTE, {
       ...reviewSiteDetailsPageData,
@@ -106,42 +84,10 @@ export const reviewSiteDetailsSubmitController = {
     const siteDetails = exemption.siteDetails ?? {}
 
     try {
-      let dataToSave
-
-      if (siteDetails.coordinatesType === 'file') {
-        const uploadedFile = siteDetails.uploadedFile
-        const geoJSON = siteDetails.geoJSON
-        const featureCount = siteDetails.featureCount || 0
-
-        dataToSave = {
-          coordinatesType: 'file',
-          fileUploadType: siteDetails.fileUploadType,
-          geoJSON,
-          featureCount,
-          uploadedFile: {
-            filename: uploadedFile.filename // Save filename for display
-          },
-          s3Location: {
-            s3Bucket: uploadedFile.s3Location.s3Bucket,
-            s3Key: uploadedFile.s3Location.s3Key,
-            checksumSha256: uploadedFile.s3Location.checksumSha256
-          }
-        }
-
-        request.logger.info('Saving file upload site details', {
-          fileType: siteDetails.fileUploadType,
-          featureCount,
-          filename: uploadedFile.filename
-        })
-      } else {
-        // Manual coordinate entry flow - use existing data structure
-        dataToSave = exemption.siteDetails
-
-        request.logger.info('Saving manual coordinate site details', {
-          coordinatesType: siteDetails.coordinatesType,
-          coordinatesEntry: siteDetails.coordinatesEntry
-        })
-      }
+      const dataToSave =
+        siteDetails.coordinatesType === 'file'
+          ? prepareFileUploadDataForSave(siteDetails, request)
+          : prepareManualCoordinateDataForSave(exemption, request)
 
       await authenticatedPatchRequest(request, '/exemption/site-details', {
         siteDetails: dataToSave,

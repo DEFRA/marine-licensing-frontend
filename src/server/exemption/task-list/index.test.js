@@ -8,5 +8,11 @@ describe('taskList routes', () => {
         path: '/exemption/task-list'
       })
     )
+    expect(taskListRoutes[1]).toEqual(
+      expect.objectContaining({
+        method: 'GET',
+        path: '/exemption/task-list/{exemptionId}'
+      })
+    )
   })
 })

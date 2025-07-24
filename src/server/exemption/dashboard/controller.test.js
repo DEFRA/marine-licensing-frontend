@@ -224,9 +224,9 @@ describe('#dashboard', () => {
 
       const { document } = new JSDOM(result).window
 
-      const continueLink = Array.from(document.querySelectorAll('a')).find(
-        (el) => el.textContent.trim() === 'Continue'
-      )
+      const continueLink = Array.from(
+        document.querySelectorAll('a,button')
+      ).find((el) => el.textContent.trim() === 'Continue')
       expect(continueLink).toBeTruthy()
       expect(continueLink.getAttribute('href')).toBe(
         `/exemption/task-list/${draftExemption.id}`

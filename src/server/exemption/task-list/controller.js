@@ -54,7 +54,7 @@ export const taskListController = {
       projectName,
       publicRegister,
       siteDetails
-    } = payload?.value
+    } = payload.value
 
     const taskListTransformed = transformTaskList(taskList)
     const hasCompletedAllTasks = taskListTransformed?.every(

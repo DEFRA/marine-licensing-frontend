@@ -419,6 +419,7 @@ describe('#uploadAndWait', () => {
     // const mockUploadConfig = createMockUploadConfig()
 
     describe('when no upload config exists', () => {
+      /* eslint-disable jest/expect-expect */
       test('should redirect to CHOOSE_FILE_UPLOAD_TYPE', async () => {
         // Given no upload config exists
         getExemptionCacheSpy.mockReturnValue({})
@@ -461,6 +462,7 @@ describe('#uploadAndWait', () => {
         })
       })
 
+      /* eslint-disable jest/expect-expect */
       test('should show waiting page when status is scanning', async () => {
         // Given exemption with upload config and scanning status
         getExemptionCacheSpy.mockReturnValue(createMockExemption())
@@ -615,6 +617,7 @@ describe('#uploadAndWait', () => {
     })
 
     describe('when file validation fails', () => {
+      /* eslint-disable jest/expect-expect */
       test('should redirect to file upload with error for wrong extension', async () => {
         await expectFileValidationFailure(
           mockRequest,
@@ -629,6 +632,7 @@ describe('#uploadAndWait', () => {
         )
       })
 
+      /* eslint-disable jest/expect-expect */
       test('should handle unknown file type in getAllowedExtensions default case', async () => {
         await expectFileValidationFailure(
           mockRequest,
@@ -645,6 +649,7 @@ describe('#uploadAndWait', () => {
     })
 
     describe('when upload is rejected', () => {
+      /* eslint-disable jest/expect-expect */
       test('should redirect to file upload with virus error message', async () => {
         await expectRejectedStatusHandling(
           mockRequest,
@@ -656,6 +661,7 @@ describe('#uploadAndWait', () => {
         )
       })
 
+      /* eslint-disable jest/expect-expect */
       test('should handle error status the same as rejected status', async () => {
         // Given exemption with upload config and error status
         getExemptionCacheSpy.mockReturnValue(createMockExemption())
@@ -683,6 +689,7 @@ describe('#uploadAndWait', () => {
         expectRedirectTo(h, routes.FILE_UPLOAD)
       })
 
+      /* eslint-disable jest/expect-expect */
       test('should handle different error message types correctly', async () => {
         const testCases = [
           { message: 'file is empty', expected: 'The selected file is empty' },
@@ -716,6 +723,7 @@ describe('#uploadAndWait', () => {
         }
       })
 
+      /* eslint-disable jest/expect-expect */
       test('should handle unknown file type message correctly', async () => {
         await expectRejectedStatusHandling(
           mockRequest,
@@ -728,6 +736,7 @@ describe('#uploadAndWait', () => {
         )
       })
 
+      /* eslint-disable jest/expect-expect */
       test('should handle shapefile error message correctly', async () => {
         await expectRejectedStatusHandling(
           mockRequest,
@@ -800,6 +809,7 @@ describe('#uploadAndWait', () => {
         expectRedirectTo(h, routes.FILE_UPLOAD)
       })
 
+      /* eslint-disable jest/expect-expect */
       test('should handle geo-parser API returning invalid response', async () => {
         // Given exemption with upload config and ready status
         getExemptionCacheSpy.mockReturnValue(createMockExemption())
@@ -837,6 +847,7 @@ describe('#uploadAndWait', () => {
         expectRedirectTo(h, routes.FILE_UPLOAD)
       })
 
+      /* eslint-disable jest/expect-expect */
       test('should handle geo-parser API returning unsuccessful response', async () => {
         // Given exemption with upload config and ready status
         getExemptionCacheSpy.mockReturnValue(createMockExemption())
@@ -875,6 +886,7 @@ describe('#uploadAndWait', () => {
         expectRedirectTo(h, routes.FILE_UPLOAD)
       })
 
+      /* eslint-disable jest/expect-expect */
       test('should handle geo-parser API returning invalid GeoJSON structure', async () => {
         // Given exemption with upload config and ready status
         getExemptionCacheSpy.mockReturnValue(createMockExemption())
@@ -1004,6 +1016,7 @@ describe('#uploadAndWait', () => {
     })
 
     describe('edge cases', () => {
+      /* eslint-disable jest/expect-expect */
       test('should handle missing s3Location in status response', async () => {
         // Given exemption with upload config and ready status without s3Location
         getExemptionCacheSpy.mockReturnValue(createMockExemption())
@@ -1034,6 +1047,7 @@ describe('#uploadAndWait', () => {
         expectRedirectTo(h, routes.FILE_UPLOAD)
       })
 
+      /* eslint-disable jest/expect-expect */
       test('should handle empty filename in status response', async () => {
         // Given exemption with upload config and status with empty filename
         getExemptionCacheSpy.mockReturnValue(createMockExemption())

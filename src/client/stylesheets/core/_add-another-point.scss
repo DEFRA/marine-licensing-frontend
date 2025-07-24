@@ -1,0 +1,19 @@
+.add-another-point .govuk-fieldset {
+  position: relative;
+}
+
+.add-another-point .govuk-form-group {
+  clear: both;
+}
+
+.add-another-point .govuk-fieldset .govuk-fieldset__legend {
+  position: relative;
+  float: left;
+  padding: 4px 100px 4px 0;
+  width: 100%;
+}
+
+.add-another-point .govuk-fieldset .govuk-button {
+  position: absolute;
+  right: 0;
+}

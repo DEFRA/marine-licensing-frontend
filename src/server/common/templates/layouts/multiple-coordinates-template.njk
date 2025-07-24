@@ -1,0 +1,134 @@
+{% extends "layouts/page.njk" %}
+
+{% from "govuk/components/back-link/macro.njk" import govukBackLink %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/details/macro.njk" import govukDetails %}
+{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+{% from "govuk/components/fieldset/macro.njk" import govukFieldset %}
+{% from "govuk/components/input/macro.njk" import govukInput %}
+{% from "cancel-button/macro.njk" import appCancelButton %}
+
+{% block pageTitle %}
+  {{ pageTitle }}
+{% endblock %}
+
+{% block beforeContent %}
+  {{ govukBackLink({
+    text: "Back",
+    href: backLink
+  }) }}
+{% endblock %}
+
+{% block content %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-three-quarters">
+
+      {% if errorSummary %}
+        {{ govukErrorSummary({
+          titleText: "There is a problem",
+          errorList: errorSummary
+        }) }}
+      {% endif %}
+
+      <span class="govuk-caption-l">{{ projectName }}</span>
+      <h1 class="govuk-heading-l">{{ heading }}</h1>
+
+      <p>{{ introText }}</p>
+
+      {{ govukDetails({
+        summaryText: detailsSummary,
+        html: detailsHTML
+      }) }}
+
+      <form method="POST">
+        <input type="hidden" name="csrfToken" value="{{ csrfToken }}">
+        <div class="add-another-point" data-module="add-another-point" data-min-items="3" data-field-names={{ fieldNames }}>
+
+          {% for coordinate in coordinates %}
+            {% set i = loop.index0 %}
+            {% set pointNumber = i + 1 %}
+
+            {% set legendText %}
+              {% if i == 0 %}Start and end point{% else %}Point {{ pointNumber }}{% endif %}
+            {% endset %}
+
+            {% set labelText %}
+              {% if i == 0 %}of start and end point{% else %}of point {{ pointNumber }}{% endif %}
+            {% endset %}
+
+            <div class="add-another-point__item">
+              {% call govukFieldset({
+                legend: {
+                  text: legendText,
+                  classes: "govuk-fieldset__legend--s"
+                },
+                classes: "govuk-!-width-one-half"
+              }) %}
+                {% if i >= 3 and loop.length > 3 %}
+                  {{ govukButton({
+                    text: "Remove",
+                    classes: "govuk-button--secondary add-another-point__remove-button",
+                    attributes: {
+                      name: "remove",
+                      value: i,
+                      type: "submit"
+                    }
+                  }) }}
+                {% endif %}
+                {{ govukInput({
+                  id: "coordinates-" + i + "-" + firstCoordinate,
+                  name: "coordinates[" + i + "][" + firstCoordinate + "]",
+                  value: coordinate[firstCoordinate],
+                  errorMessage: errors["coordinates" + i + firstCoordinate] if errors,
+                  label: {
+                    text: (firstCoordinate | capitalize) ~ " " ~ labelText
+                  },
+                  attributes: {
+                    "data-name": "coordinates[%index%][" + firstCoordinate + "]",
+                    "data-id": "coordinates-%index%-" + firstCoordinate
+                  }
+                }) }}
+                {{ govukInput({
+                  id: "coordinates-" + i + "-" + secondCoordinate,
+                  name: "coordinates[" + i + "][" + secondCoordinate + "]",
+                  value: coordinate[secondCoordinate],
+                  errorMessage: errors["coordinates" + i + secondCoordinate] if errors,
+                  label: {
+                    text: (secondCoordinate | capitalize) ~ " " ~ labelText
+                  },
+                  attributes: {
+                    "data-name": "coordinates[%index%][" + secondCoordinate + "]",
+                    "data-id": "coordinates-%index%-" + secondCoordinate
+                  }
+                }) }}
+              {% endcall %}
+            </div>
+          {% endfor %}
+
+          {{ govukButton({
+            text: "Add another point",
+            classes: "govuk-button--secondary add-another-point__add-button",
+            attributes: {
+              name: "add",
+              value: "add",
+              type: "submit"
+            }
+          }) }}
+        </div>
+
+        <div class="govuk-button-group govuk-!-margin-top-6">
+          {{ govukButton({
+            text: "Continue",
+            attributes: {
+              id: "continue"
+            }
+          }) }}
+          {{ appCancelButton({
+            cancelLink: "/exemption/task-list?cancel=site-details"
+          }) }}
+        </div>
+
+      </form>
+    </div>
+  </div>
+{% endblock %}

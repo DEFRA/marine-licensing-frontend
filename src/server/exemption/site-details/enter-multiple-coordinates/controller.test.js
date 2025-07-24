@@ -6,6 +6,7 @@ import {
 import { COORDINATE_SYSTEMS } from '~/src/server/common/constants/exemptions.js'
 import * as cacheUtils from '~/src/server/common/helpers/session-cache/utils.js'
 import { routes } from '~/src/server/common/constants/routes.js'
+import { updateExemptionSiteDetails } from '~/src/server/common/helpers/session-cache/utils.js'
 import {
   MULTIPLE_COORDINATES_VIEW_ROUTES,
   normaliseCoordinatesForDisplay,
@@ -14,31 +15,36 @@ import {
   convertPayloadToCoordinatesArray,
   validateCoordinates,
   convertArrayErrorsToFlattenedErrors,
-  handleValidationFailure,
-  saveCoordinatesToSession
+  handleValidationFailure
 } from '~/src/server/exemption/site-details/enter-multiple-coordinates/utils.js'
 
 jest.mock('~/src/server/common/helpers/session-cache/utils.js')
 jest.mock(
   '~/src/server/exemption/site-details/enter-multiple-coordinates/utils.js',
-  () => ({
-    MULTIPLE_COORDINATES_VIEW_ROUTES: {
-      WGS84: 'wgs84.njk',
-      OSGB36: 'osgb36.njk'
-    },
-    normaliseCoordinatesForDisplay: jest.fn(),
-    isWGS84: jest.fn(),
-    multipleCoordinatesPageData: {
-      heading:
-        'Enter multiple sets of coordinates to mark the boundary of the site',
-      backLink: '/exemption/what-coordinate-system'
-    },
-    convertPayloadToCoordinatesArray: jest.fn(),
-    validateCoordinates: jest.fn(),
-    convertArrayErrorsToFlattenedErrors: jest.fn(),
-    handleValidationFailure: jest.fn(),
-    saveCoordinatesToSession: jest.fn()
-  })
+  () => {
+    const actualUtils = jest.requireActual(
+      '~/src/server/exemption/site-details/enter-multiple-coordinates/utils.js'
+    )
+    return {
+      MULTIPLE_COORDINATES_VIEW_ROUTES: {
+        WGS84: 'wgs84.njk',
+        OSGB36: 'osgb36.njk'
+      },
+      normaliseCoordinatesForDisplay: jest.fn(),
+      isWGS84: jest.fn(),
+      multipleCoordinatesPageData: {
+        heading:
+          'Enter multiple sets of coordinates to mark the boundary of the site',
+        backLink: '/exemption/what-coordinate-system'
+      },
+      convertPayloadToCoordinatesArray: jest.fn(),
+      validateCoordinates: jest.fn(),
+      convertArrayErrorsToFlattenedErrors: jest.fn(),
+      handleValidationFailure: jest.fn(),
+      removeCoordinateAtIndex: actualUtils.removeCoordinateAtIndex,
+      REQUIRED_COORDINATES_COUNT: actualUtils.REQUIRED_COORDINATES_COUNT
+    }
+  }
 )
 
 describe('#multipleCoordinates', () => {
@@ -58,14 +64,17 @@ describe('#multipleCoordinates', () => {
     ]
   }
 
+  const paddedCoordinates = {
+    wgs84: { latitude: '', longitude: '' },
+    osgb36: { eastings: '', northings: '' }
+  }
+
   const mockExemption = {
     id: 'test-exemption-id',
     projectName: 'Test Project',
     siteDetails: {
       coordinateSystem: COORDINATE_SYSTEMS.WGS84,
-      multipleCoordinates: {
-        [COORDINATE_SYSTEMS.WGS84]: mockCoordinates.wgs84
-      }
+      coordinates: mockCoordinates.wgs84
     }
   }
 
@@ -83,7 +92,9 @@ describe('#multipleCoordinates', () => {
       .spyOn(cacheUtils, 'getCoordinateSystem')
       .mockReturnValue({ coordinateSystem: COORDINATE_SYSTEMS.WGS84 })
 
-    normaliseCoordinatesForDisplay.mockImplementation((coords) => coords || [])
+    normaliseCoordinatesForDisplay.mockImplementation(
+      (system, coords) => coords || []
+    )
     isWGS84.mockImplementation(
       (coordinateSystem) => coordinateSystem === COORDINATE_SYSTEMS.WGS84
     )
@@ -108,7 +119,6 @@ describe('#multipleCoordinates', () => {
         })
         .takeover()
     })
-    saveCoordinatesToSession.mockImplementation(jest.fn())
   })
 
   afterAll(async () => {
@@ -131,7 +141,7 @@ describe('#multipleCoordinates', () => {
         MULTIPLE_COORDINATES_VIEW_ROUTES[COORDINATE_SYSTEMS.WGS84],
         {
           ...multipleCoordinatesPageData,
-          coordinates: mockCoordinates.wgs84,
+          coordinates: [...mockCoordinates.wgs84, paddedCoordinates.wgs84],
           projectName: 'Test Project'
         }
       )
@@ -142,9 +152,7 @@ describe('#multipleCoordinates', () => {
         ...mockExemption,
         siteDetails: {
           coordinateSystem: COORDINATE_SYSTEMS.OSGB36,
-          multipleCoordinates: {
-            [COORDINATE_SYSTEMS.OSGB36]: mockCoordinates.osgb36
-          }
+          coordinates: mockCoordinates.osgb36
         }
       })
       normaliseCoordinatesForDisplay.mockReturnValueOnce(mockCoordinates.osgb36)
@@ -155,7 +163,7 @@ describe('#multipleCoordinates', () => {
         MULTIPLE_COORDINATES_VIEW_ROUTES[COORDINATE_SYSTEMS.OSGB36],
         {
           ...multipleCoordinatesPageData,
-          coordinates: mockCoordinates.osgb36,
+          coordinates: [...mockCoordinates.osgb36, paddedCoordinates.osgb36],
           projectName: 'Test Project'
         }
       )
@@ -171,7 +179,11 @@ describe('#multipleCoordinates', () => {
         MULTIPLE_COORDINATES_VIEW_ROUTES[COORDINATE_SYSTEMS.WGS84],
         expect.objectContaining({
           ...multipleCoordinatesPageData,
-          coordinates: [],
+          coordinates: [
+            paddedCoordinates.wgs84,
+            paddedCoordinates.wgs84,
+            paddedCoordinates.wgs84
+          ],
           projectName: undefined
         })
       )
@@ -190,7 +202,6 @@ describe('#multipleCoordinates', () => {
     beforeEach(() => {
       mockH.view.mockClear()
       mockTakeover.mockClear()
-      // Ensure view always returns object with takeover method
       mockH.view.mockReturnValue(mockViewResult)
     })
 
@@ -201,7 +212,9 @@ describe('#multipleCoordinates', () => {
       }
       const request = { payload }
       const expectedCoordinates = [
-        { latitude: '51.5074', longitude: '-0.1278' }
+        { latitude: '51.5074', longitude: '-0.1278' },
+        paddedCoordinates.wgs84,
+        paddedCoordinates.wgs84
       ]
 
       convertPayloadToCoordinatesArray.mockReturnValueOnce(expectedCoordinates)
@@ -218,10 +231,10 @@ describe('#multipleCoordinates', () => {
         mockExemption.id,
         COORDINATE_SYSTEMS.WGS84
       )
-      expect(saveCoordinatesToSession).toHaveBeenCalledWith(
+      expect(updateExemptionSiteDetails).toHaveBeenCalledWith(
         request,
-        expectedCoordinates,
-        COORDINATE_SYSTEMS.WGS84
+        'coordinates',
+        expectedCoordinates
       )
       expect(mockH.view).toHaveBeenCalledWith(
         MULTIPLE_COORDINATES_VIEW_ROUTES[COORDINATE_SYSTEMS.WGS84],
@@ -255,7 +268,6 @@ describe('#multipleCoordinates', () => {
         mockValidationError,
         COORDINATE_SYSTEMS.WGS84
       )
-      expect(saveCoordinatesToSession).not.toHaveBeenCalled()
     })
 
     test('should handle OSGB36 coordinate system correctly', () => {
@@ -267,7 +279,11 @@ describe('#multipleCoordinates', () => {
         'coordinates[0][northings]': '181000'
       }
       const request = { payload }
-      const expectedCoordinates = [{ eastings: '530000', northings: '181000' }]
+      const expectedCoordinates = [
+        { eastings: '530000', northings: '181000' },
+        paddedCoordinates.osgb36,
+        paddedCoordinates.osgb36
+      ]
 
       isWGS84.mockReturnValueOnce(false)
       convertPayloadToCoordinatesArray.mockReturnValueOnce(expectedCoordinates)
@@ -283,6 +299,11 @@ describe('#multipleCoordinates', () => {
         expectedCoordinates,
         mockExemption.id,
         COORDINATE_SYSTEMS.OSGB36
+      )
+      expect(updateExemptionSiteDetails).toHaveBeenCalledWith(
+        request,
+        'coordinates',
+        expectedCoordinates
       )
       expect(mockH.view).toHaveBeenCalledWith(
         MULTIPLE_COORDINATES_VIEW_ROUTES[COORDINATE_SYSTEMS.OSGB36],
@@ -306,6 +327,127 @@ describe('#multipleCoordinates', () => {
       expect(convertPayloadToCoordinatesArray).toHaveBeenCalledWith(
         payload,
         COORDINATE_SYSTEMS.WGS84
+      )
+    })
+
+    test('should re-render the page with an added wgs84 point when the add point button is clicked', () => {
+      const payload = {
+        'coordinates[0][latitude]': '51.5074',
+        'coordinates[0][longitude]': '-0.1278',
+        'coordinates[1][latitude]': '51.5175',
+        'coordinates[1][longitude]': '-0.1376',
+        'coordinates[2][latitude]': '51.5276',
+        'coordinates[2][longitude]': '-0.1477',
+        add: 'add'
+      }
+      const request = { payload }
+
+      const existingCoordinates = [
+        { latitude: '51.5074', longitude: '-0.1278' },
+        { latitude: '51.5175', longitude: '-0.1376' },
+        { latitude: '51.5276', longitude: '-0.1477' }
+      ]
+      const expectedCoordinates = [
+        ...existingCoordinates,
+        { latitude: '', longitude: '' },
+        paddedCoordinates.wgs84
+      ]
+      getCoordinateSystemSpy.mockReturnValueOnce({
+        coordinateSystem: COORDINATE_SYSTEMS.WGS84
+      })
+      convertPayloadToCoordinatesArray.mockReturnValueOnce(existingCoordinates)
+      normaliseCoordinatesForDisplay.mockReturnValueOnce(expectedCoordinates)
+
+      multipleCoordinatesSubmitController.handler(request, mockH)
+
+      expect(mockH.view).toHaveBeenCalledWith(
+        MULTIPLE_COORDINATES_VIEW_ROUTES[COORDINATE_SYSTEMS.WGS84],
+        expect.objectContaining({
+          ...multipleCoordinatesPageData,
+          coordinates: expectedCoordinates,
+          projectName: 'Test Project'
+        })
+      )
+    })
+
+    test('should re-render the page with an added osgb36 point when the add point button is clicked', () => {
+      const payload = {
+        'coordinates[0][eastings]': '530000',
+        'coordinates[0][northings]': '181000',
+        'coordinates[1][eastings]': '530100',
+        'coordinates[1][northings]': '181100',
+        'coordinates[2][eastings]': '530200',
+        'coordinates[2][northings]': '181200',
+        add: 'add'
+      }
+      const request = { payload }
+
+      const existingCoordinates = [
+        { eastings: '530000', northings: '181000' },
+        { eastings: '530100', northings: '181100' },
+        { eastings: '530200', northings: '181200' }
+      ]
+      const expectedCoordinates = [
+        ...existingCoordinates,
+        { eastings: '', northings: '' }
+      ]
+      getCoordinateSystemSpy.mockReturnValueOnce({
+        coordinateSystem: COORDINATE_SYSTEMS.OSGB36
+      })
+      convertPayloadToCoordinatesArray.mockReturnValueOnce(existingCoordinates)
+      normaliseCoordinatesForDisplay.mockReturnValueOnce(expectedCoordinates)
+
+      multipleCoordinatesSubmitController.handler(request, mockH)
+
+      expect(mockH.view).toHaveBeenCalledWith(
+        MULTIPLE_COORDINATES_VIEW_ROUTES[COORDINATE_SYSTEMS.OSGB36],
+        expect.objectContaining({
+          ...multipleCoordinatesPageData,
+          coordinates: expectedCoordinates,
+          projectName: 'Test Project'
+        })
+      )
+    })
+
+    test('should re-render the page with a removed point when the remove button is clicked', () => {
+      const payload = {
+        'coordinates[0][eastings]': '530000',
+        'coordinates[0][northings]': '181000',
+        'coordinates[1][eastings]': '530100',
+        'coordinates[1][northings]': '181100',
+        'coordinates[2][eastings]': '530200',
+        'coordinates[2][northings]': '181200',
+        remove: '3'
+      }
+      const request = { payload }
+
+      const existingCoordinates = [
+        { eastings: '530000', northings: '181000' },
+        { eastings: '530100', northings: '181100' },
+        { eastings: '530200', northings: '181200' }
+      ]
+
+      const expectedCoordinates = [
+        { eastings: '530100', northings: '181100' },
+        { eastings: '530200', northings: '181200' },
+        paddedCoordinates.osgb36
+      ]
+
+      getCoordinateSystemSpy.mockReturnValueOnce({
+        coordinateSystem: COORDINATE_SYSTEMS.OSGB36
+      })
+      convertPayloadToCoordinatesArray.mockReturnValueOnce(existingCoordinates)
+      normaliseCoordinatesForDisplay.mockReturnValueOnce(expectedCoordinates)
+
+      multipleCoordinatesSubmitController.handler(request, mockH)
+
+      expect(mockH.view).toHaveBeenCalledWith(
+        MULTIPLE_COORDINATES_VIEW_ROUTES[COORDINATE_SYSTEMS.OSGB36],
+        expect.objectContaining({
+          ...multipleCoordinatesPageData,
+          coordinates: expectedCoordinates,
+          projectName: 'Test Project'
+        })
       )
     })
   })

@@ -1,9 +1,6 @@
 import { COORDINATE_SYSTEMS } from '~/src/server/common/constants/exemptions.js'
 import { routes } from '~/src/server/common/constants/routes.js'
-import {
-  getExemptionCache,
-  updateExemptionSiteDetails
-} from '~/src/server/common/helpers/session-cache/utils.js'
+import { getExemptionCache } from '~/src/server/common/helpers/session-cache/utils.js'
 import { generatePointSpecificErrorMessage } from '~/src/server/common/helpers/site-details.js'
 import { createOsgb36MultipleCoordinatesSchema } from '~/src/server/common/schemas/osgb36.js'
 import { createWgs84MultipleCoordinatesSchema } from '~/src/server/common/schemas/wgs84.js'
@@ -23,8 +20,8 @@ import {
   createErrorSummary,
   createFieldErrors,
   handleValidationFailure,
-  saveCoordinatesToSession,
-  validateCoordinates
+  validateCoordinates,
+  removeCoordinateAtIndex
 } from './utils.js'
 
 jest.mock('~/src/server/common/helpers/session-cache/utils.js')
@@ -75,95 +72,97 @@ describe('enter-multiple-coordinates utils', () => {
   })
 
   describe('normaliseCoordinatesForDisplay', () => {
-    describe.each(COORDINATE_SYSTEMS_TEST_DATA)(
-      '$system coordinate system',
-      ({ system, emptyCoordinate, sampleCoordinates }) => {
-        it.each([
-          { input: [], title: 'empty array' },
-          { input: null, title: 'null' },
-          { input: undefined, title: 'undefined' }
-        ])(
-          'should return 3 empty coordinates when $title provided',
-          ({ input }) => {
-            const result = normaliseCoordinatesForDisplay(input, system)
-            expect(result).toEqual([
-              emptyCoordinate,
-              emptyCoordinate,
-              emptyCoordinate
-            ])
-          }
-        )
+    it('should return 3 empty coordinates when array is empty', () => {
+      expect(
+        normaliseCoordinatesForDisplay(COORDINATE_SYSTEMS.WGS84, [])
+      ).toEqual([
+        { latitude: '', longitude: '' },
+        { latitude: '', longitude: '' },
+        { latitude: '', longitude: '' }
+      ])
+      expect(
+        normaliseCoordinatesForDisplay(COORDINATE_SYSTEMS.OSGB36, [])
+      ).toEqual([
+        { eastings: '', northings: '' },
+        { eastings: '', northings: '' },
+        { eastings: '', northings: '' }
+      ])
+    })
 
-        it.each([
-          { input: [sampleCoordinates[0]], description: 'one coordinate' },
-          {
-            input: [sampleCoordinates[0], sampleCoordinates[1]],
-            description: 'two coordinates'
-          }
-        ])(
-          'should pad with empty coordinates when fewer than 3 provided - $description',
-          ({ input }) => {
-            const result = normaliseCoordinatesForDisplay(input, system)
-            expect(result).toHaveLength(3)
+    it('should return 3 empty coordinates if first coordinate is WGS84 but system is OSGB36', () => {
+      const coords = [{ latitude: '51.5', longitude: '-0.1' }]
+      expect(
+        normaliseCoordinatesForDisplay(COORDINATE_SYSTEMS.OSGB36, coords)
+      ).toEqual([
+        { eastings: '', northings: '' },
+        { eastings: '', northings: '' },
+        { eastings: '', northings: '' }
+      ])
+    })
 
-            input.forEach((coord, index) => {
-              expect(result[index]).toEqual(coord)
-            })
+    it('should return 3 empty coordinates if first coordinate is OSGB36 but system is WGS84', () => {
+      const coords = [{ eastings: '123456', northings: '654321' }]
+      expect(
+        normaliseCoordinatesForDisplay(COORDINATE_SYSTEMS.WGS84, coords)
+      ).toEqual([
+        { latitude: '', longitude: '' },
+        { latitude: '', longitude: '' },
+        { latitude: '', longitude: '' }
+      ])
+    })
 
-            for (let i = input.length; i < 3; i++) {
-              expect(result[i]).toEqual(emptyCoordinate)
-            }
-          }
-        )
+    it('should pad with empty coordinates if fewer than 3 and keys match system', () => {
+      const coords = [{ latitude: '51.5', longitude: '-0.1' }]
+      expect(
+        normaliseCoordinatesForDisplay(COORDINATE_SYSTEMS.WGS84, coords)
+      ).toEqual([
+        { latitude: '51.5', longitude: '-0.1' },
+        { latitude: '', longitude: '' },
+        { latitude: '', longitude: '' }
+      ])
+    })
 
-        it('should return exactly 3 coordinates when 3 provided', () => {
-          const result = normaliseCoordinatesForDisplay(
-            sampleCoordinates,
-            system
-          )
-          expect(result).toHaveLength(3)
-          expect(result).toEqual(sampleCoordinates)
-        })
+    it('should return coordinates as-is if 3 or more and keys match system', () => {
+      const coords = [
+        { latitude: '51.5', longitude: '-0.1' },
+        { latitude: '52.5', longitude: '-1.1' },
+        { latitude: '53.5', longitude: '-2.1' }
+      ]
+      expect(
+        normaliseCoordinatesForDisplay(COORDINATE_SYSTEMS.WGS84, coords)
+      ).toEqual(coords)
+    })
 
-        it('should truncate to 3 coordinates when more than 3 provided', () => {
-          const extraCoordinates = [
-            ...sampleCoordinates,
-            sampleCoordinates[0],
-            sampleCoordinates[1]
-          ]
-          const result = normaliseCoordinatesForDisplay(
-            extraCoordinates,
-            system
-          )
-          expect(result).toHaveLength(3)
-          expect(result).toEqual(sampleCoordinates)
-        })
-      }
-    )
+    it('should return 3 empty coordinates if first coordinate is not an object', () => {
+      expect(
+        normaliseCoordinatesForDisplay(COORDINATE_SYSTEMS.WGS84, [null])
+      ).toEqual([
+        { latitude: '', longitude: '' },
+        { latitude: '', longitude: '' },
+        { latitude: '', longitude: '' }
+      ])
+    })
 
-    describe('edge cases', () => {
-      it('should preserve existing coordinate data structure', () => {
-        const coordinateWithExtra = {
-          ...SAMPLE_WGS84_COORDINATES[0],
-          additionalProperty: 'test'
-        }
-        const result = normaliseCoordinatesForDisplay(
-          [coordinateWithExtra],
-          COORDINATE_SYSTEMS.WGS84
-        )
-        expect(result[0]).toEqual(coordinateWithExtra)
-      })
+    it('should return 3 empty coordinates if no coordinates', () => {
+      expect(normaliseCoordinatesForDisplay(COORDINATE_SYSTEMS.WGS84)).toEqual([
+        { latitude: '', longitude: '' },
+        { latitude: '', longitude: '' },
+        { latitude: '', longitude: '' }
+      ])
+    })
 
-      it('should handle mixed coordinate systems gracefully', () => {
-        const result = normaliseCoordinatesForDisplay(
-          [SAMPLE_WGS84_COORDINATES[0]],
-          COORDINATE_SYSTEMS.OSGB36
-        )
-        expect(result).toHaveLength(3)
-        expect(result[0]).toEqual(SAMPLE_WGS84_COORDINATES[0])
-        expect(result[1]).toEqual(EMPTY_OSGB36_COORDINATE)
-        expect(result[2]).toEqual(EMPTY_OSGB36_COORDINATE)
-      })
+    it('should return 3 empty coordinates if array contains mixed coordinate types and first does not match', () => {
+      const coords = [
+        { eastings: '123456', northings: '654321' },
+        { latitude: '51.5', longitude: '-0.1' }
+      ]
+      expect(
+        normaliseCoordinatesForDisplay(COORDINATE_SYSTEMS.WGS84, coords)
+      ).toEqual([
+        { latitude: '', longitude: '' },
+        { latitude: '', longitude: '' },
+        { latitude: '', longitude: '' }
+      ])
     })
   })
 
@@ -404,6 +403,7 @@ describe('enter-multiple-coordinates utils', () => {
         },
         expected: {
           fieldName: 'coordinates0latitude',
+          fieldId: 'coordinates-0-latitude',
           coordinateIndex: 0,
           enhancedMessage: 'Point 1: Field is required'
         }
@@ -412,6 +412,7 @@ describe('enter-multiple-coordinates utils', () => {
         input: { path: ['coordinates2longitude'], message: 'Invalid format' },
         expected: {
           fieldName: 'coordinates2longitude',
+          fieldId: 'coordinates-2-longitude',
           coordinateIndex: 2,
           enhancedMessage: 'Point 3: Invalid format'
         }
@@ -441,8 +442,8 @@ describe('enter-multiple-coordinates utils', () => {
 
       const result = createErrorSummary(validationError)
       expect(result).toEqual([
-        { href: '#coordinates0latitude', text: 'Point 1: Field is required' },
-        { href: '#coordinates1longitude', text: 'Point 2: Invalid value' }
+        { href: '#coordinates-0-latitude', text: 'Point 1: Field is required' },
+        { href: '#coordinates-1-longitude', text: 'Point 2: Invalid value' }
       ])
     })
 
@@ -530,7 +531,7 @@ describe('enter-multiple-coordinates utils', () => {
           },
           errorSummary: [
             {
-              href: '#coordinates0latitude',
+              href: '#coordinates-0-latitude',
               text: 'Point 1: Field is required'
             }
           ],
@@ -557,52 +558,6 @@ describe('enter-multiple-coordinates utils', () => {
         })
       )
     })
-  })
-
-  describe('saveCoordinatesToSession', () => {
-    const mockRequest = {}
-    const existingCoordinates = {
-      [COORDINATE_SYSTEMS.OSGB36]: [{ eastings: '529090', northings: '181680' }]
-    }
-
-    it('should save coordinates to session', () => {
-      getExemptionCache.mockReturnValue({
-        siteDetails: { multipleCoordinates: existingCoordinates }
-      })
-      const coordinates = [{ latitude: '51.5074', longitude: '-0.1278' }]
-
-      saveCoordinatesToSession(
-        mockRequest,
-        coordinates,
-        COORDINATE_SYSTEMS.WGS84
-      )
-
-      expect(updateExemptionSiteDetails).toHaveBeenCalledWith(
-        mockRequest,
-        'multipleCoordinates',
-        { ...existingCoordinates, [COORDINATE_SYSTEMS.WGS84]: coordinates }
-      )
-    })
-
-    it.each([{ mockReturn: { siteDetails: {} } }, { mockReturn: null }])(
-      'should handle missing cache scenarios - $description',
-      ({ mockReturn }) => {
-        getExemptionCache.mockReturnValue(mockReturn)
-        const coordinates = [{ latitude: '51.5074', longitude: '-0.1278' }]
-
-        saveCoordinatesToSession(
-          mockRequest,
-          coordinates,
-          COORDINATE_SYSTEMS.WGS84
-        )
-
-        expect(updateExemptionSiteDetails).toHaveBeenCalledWith(
-          mockRequest,
-          'multipleCoordinates',
-          { [COORDINATE_SYSTEMS.WGS84]: coordinates }
-        )
-      }
-    )
   })
 
   describe('validateCoordinates', () => {
@@ -637,6 +592,77 @@ describe('enter-multiple-coordinates utils', () => {
       const coordinates = [{ eastings: '529090', northings: '181680' }]
       validateCoordinates(coordinates, 'test-id', COORDINATE_SYSTEMS.OSGB36)
       expect(createOsgb36MultipleCoordinatesSchema).toHaveBeenCalled()
+    })
+  })
+
+  describe('removeCoordinateAtIndex', () => {
+    const baseCoords = [
+      { latitude: '1', longitude: '1' },
+      { latitude: '2', longitude: '2' },
+      { latitude: '3', longitude: '3' },
+      { latitude: '4', longitude: '4' },
+      { latitude: '5', longitude: '5' }
+    ]
+
+    it('should not remove if index is less than 3', () => {
+      expect(removeCoordinateAtIndex(baseCoords, 0)).toEqual(baseCoords)
+      expect(removeCoordinateAtIndex(baseCoords, 2)).toEqual(baseCoords)
+    })
+
+    it('should not remove if removing would leave fewer than 3 coordinates', () => {
+      const coords = [
+        { latitude: '1', longitude: '1' },
+        { latitude: '2', longitude: '2' },
+        { latitude: '3', longitude: '3' },
+        { latitude: '4', longitude: '4' }
+      ]
+
+      expect(removeCoordinateAtIndex(coords, 3)).toEqual([
+        { latitude: '1', longitude: '1' },
+        { latitude: '2', longitude: '2' },
+        { latitude: '3', longitude: '3' }
+      ])
+
+      expect(
+        removeCoordinateAtIndex(
+          [
+            { latitude: '1', longitude: '1' },
+            { latitude: '2', longitude: '2' },
+            { latitude: '3', longitude: '3' }
+          ],
+          3
+        )
+      ).toEqual([
+        { latitude: '1', longitude: '1' },
+        { latitude: '2', longitude: '2' },
+        { latitude: '3', longitude: '3' }
+      ])
+    })
+
+    it('should remove the coordinate at index 3 or greater if more than REQUIRED_COORDINATES_COUNT remain after removal', () => {
+      expect(removeCoordinateAtIndex(baseCoords, 3)).toEqual([
+        { latitude: '1', longitude: '1' },
+        { latitude: '2', longitude: '2' },
+        { latitude: '3', longitude: '3' },
+        { latitude: '5', longitude: '5' }
+      ])
+      expect(removeCoordinateAtIndex(baseCoords, 4)).toEqual([
+        { latitude: '1', longitude: '1' },
+        { latitude: '2', longitude: '2' },
+        { latitude: '3', longitude: '3' },
+        { latitude: '4', longitude: '4' }
+      ])
+    })
+
+    it('should return the same array if index is out of bounds', () => {
+      expect(removeCoordinateAtIndex(baseCoords, 10)).toEqual(baseCoords)
+      expect(removeCoordinateAtIndex([], 3)).toEqual([])
+    })
+
+    it('should not mutate the original array', () => {
+      const coordsCopy = [...baseCoords]
+      removeCoordinateAtIndex(coordsCopy, 3)
+      expect(coordsCopy).toEqual(baseCoords)
     })
   })
 })

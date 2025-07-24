@@ -2,7 +2,8 @@ import {
   getReviewSummaryText,
   getCoordinateSystemText,
   getCoordinateDisplayText,
-  getSiteDetailsBackLink
+  getSiteDetailsBackLink,
+  getFileUploadSummaryData
 } from '~/src/server/exemption/site-details/review-site-details/utils.js'
 import { COORDINATE_SYSTEMS } from '~/src/server/common/constants/exemptions.js'
 import { mockExemption } from '~/src/server/test-helpers/mocks.js'
@@ -24,6 +25,165 @@ describe('siteDetails utils', () => {
 
     test('getSiteDetailsBackLink correctly returns fallback option', () => {
       expect(getSiteDetailsBackLink(undefined)).toBe(routes.TASK_LIST)
+    })
+  })
+
+  describe('getFileUploadSummaryData util', () => {
+    test('getFileUploadSummaryData correctly parses coordinates from geoJSON for KML', () => {
+      const exemption = {
+        siteDetails: {
+          fileUploadType: 'kml',
+          uploadedFile: {
+            filename: 'test-site.kml'
+          },
+          geoJSON: {
+            type: 'FeatureCollection',
+            features: [
+              {
+                type: 'Feature',
+                geometry: {
+                  type: 'Point',
+                  coordinates: [51.5074, -0.1278]
+                }
+              },
+              {
+                type: 'Feature',
+                geometry: {
+                  type: 'Polygon',
+                  coordinates: [
+                    [
+                      [0, 0],
+                      [1, 0],
+                      [1, 1],
+                      [0, 1],
+                      [0, 0]
+                    ]
+                  ]
+                }
+              }
+            ]
+          }
+        }
+      }
+
+      const result = getFileUploadSummaryData(exemption)
+
+      expect(result).toEqual({
+        method: 'Upload a file with the coordinates of the site',
+        fileType: 'KML',
+        filename: 'test-site.kml',
+        coordinates: [
+          {
+            type: 'Point',
+            coordinates: [51.5074, -0.1278]
+          },
+          {
+            type: 'Polygon',
+            coordinates: [
+              [
+                [0, 0],
+                [1, 0],
+                [1, 1],
+                [0, 1],
+                [0, 0]
+              ]
+            ]
+          }
+        ]
+      })
+    })
+
+    test('getFileUploadSummaryData correctly parses coordinates from geoJSON for Shapefile', () => {
+      const exemption = {
+        siteDetails: {
+          fileUploadType: 'shapefile',
+          uploadedFile: {
+            filename: 'test-site.shp'
+          },
+          geoJSON: {
+            type: 'FeatureCollection',
+            features: [
+              {
+                type: 'Feature',
+                geometry: {
+                  type: 'LineString',
+                  coordinates: [
+                    [0, 0],
+                    [1, 1],
+                    [2, 2]
+                  ]
+                }
+              }
+            ]
+          }
+        }
+      }
+
+      const result = getFileUploadSummaryData(exemption)
+
+      expect(result).toEqual({
+        method: 'Upload a file with the coordinates of the site',
+        fileType: 'Shapefile',
+        filename: 'test-site.shp',
+        coordinates: [
+          {
+            type: 'LineString',
+            coordinates: [
+              [0, 0],
+              [1, 1],
+              [2, 2]
+            ]
+          }
+        ]
+      })
+    })
+
+    test('getFileUploadSummaryData handles empty or missing geoJSON', () => {
+      const exemption = {
+        siteDetails: {
+          fileUploadType: 'kml',
+          uploadedFile: {
+            filename: 'test-site.kml'
+          },
+          geoJSON: {}
+        }
+      }
+
+      const result = getFileUploadSummaryData(exemption)
+
+      expect(result).toEqual({
+        method: 'Upload a file with the coordinates of the site',
+        fileType: 'KML',
+        filename: 'test-site.kml',
+        coordinates: []
+      })
+    })
+
+    test('getFileUploadSummaryData handles missing site details', () => {
+      const exemption = {}
+
+      expect(() => getFileUploadSummaryData(exemption)).toThrow(
+        'Unsupported file type for site details'
+      )
+    })
+
+    test('getFileUploadSummaryData handles invalid file type', () => {
+      const exemption = {
+        siteDetails: {
+          fileUploadType: 'invalid',
+          uploadedFile: {
+            filename: 'test-site.xyz'
+          },
+          geoJSON: {
+            type: 'FeatureCollection',
+            features: []
+          }
+        }
+      }
+
+      expect(() => getFileUploadSummaryData(exemption)).toThrow(
+        'Unsupported file type for site details'
+      )
     })
   })
 

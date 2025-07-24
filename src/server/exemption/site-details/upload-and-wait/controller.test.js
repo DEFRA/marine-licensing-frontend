@@ -6,12 +6,91 @@ import {
 import * as cacheUtils from '~/src/server/common/helpers/session-cache/utils.js'
 import * as cdpUploadService from '~/src/services/cdp-upload-service/index.js'
 import * as fileValidationService from '~/src/services/file-validation/index.js'
+import * as authenticatedRequests from '~/src/server/common/helpers/authenticated-requests.js'
 import { mockExemption } from '~/src/server/test-helpers/mocks.js'
 import { routes } from '~/src/server/common/constants/routes.js'
+import { config } from '~/src/config/config.js'
+import path from 'path'
+import hapi from '@hapi/hapi'
 
 jest.mock('~/src/server/common/helpers/session-cache/utils.js')
 jest.mock('~/src/services/cdp-upload-service/index.js')
 jest.mock('~/src/services/file-validation/index.js')
+jest.mock('~/src/server/common/helpers/authenticated-requests.js')
+jest.mock('~/src/config/config.js')
+jest.mock('path')
+jest.mock('@hapi/hapi')
+
+// Mock logger configuration
+jest.mock('~/src/server/common/helpers/logging/logger-options.js', () => ({
+  loggerOptions: {
+    enabled: true,
+    ignorePaths: ['/health'],
+    redact: {
+      paths: []
+    }
+  }
+}))
+
+// Mock logger
+jest.mock('~/src/server/common/helpers/logging/logger.js', () => ({
+  createLogger: jest.fn().mockReturnValue({
+    info: jest.fn(),
+    error: jest.fn(),
+    warn: jest.fn(),
+    debug: jest.fn()
+  })
+}))
+
+// Mock path.join to return a fixed path
+path.join.mockImplementation((...args) => args.join('/'))
+
+// Mock manifest file
+jest.mock('~/src/config/nunjucks/context/context.js', () => ({
+  getContext: jest.fn().mockReturnValue({})
+}))
+
+// Mock session configuration
+jest.mock('~/src/server/common/helpers/session-cache/session-cache.js', () => ({
+  sessionConfig: {
+    cache: {
+      name: 'test-cache',
+      ttl: 24 * 60 * 60 * 1000
+    }
+  }
+}))
+
+// Mock cache engine
+jest.mock('~/src/server/common/helpers/session-cache/cache-engine.js', () => ({
+  getCacheEngine: jest.fn().mockReturnValue({
+    start: jest.fn(),
+    stop: jest.fn(),
+    isReady: jest.fn().mockReturnValue(true),
+    validateSegmentName: jest.fn(),
+    get: jest.fn(),
+    set: jest.fn(),
+    drop: jest.fn()
+  })
+}))
+
+// Mock server cache
+const mockServerCache = {
+  get: jest.fn(),
+  set: jest.fn(),
+  drop: jest.fn()
+}
+
+// Mock Hapi server
+const mockServer = {
+  app: {},
+  cache: jest.fn().mockReturnValue(mockServerCache),
+  register: jest.fn(),
+  ext: jest.fn(),
+  initialize: jest.fn(),
+  stop: jest.fn()
+}
+
+hapi.server.mockReturnValue(mockServer)
 
 describe('#uploadAndWait', () => {
   /** @type {Server} */
@@ -20,8 +99,94 @@ describe('#uploadAndWait', () => {
   let updateExemptionSiteDetailsSpy
   let mockCdpService
   let mockFileValidationService
+  let authenticatedPostRequestSpy
 
   beforeAll(async () => {
+    config.get.mockImplementation((key) => {
+      switch (key) {
+        case 'cdpUploader':
+          return {
+            s3Bucket: 'test-bucket'
+          }
+        case 'root':
+          return '/test/root'
+        case 'assetPath':
+          return '/test/assets'
+        case 'env':
+          return 'test'
+        case 'isDev':
+          return false
+        case 'isTest':
+          return true
+        case 'isProd':
+          return false
+        case 'serviceName':
+          return 'test-service'
+        case 'serviceUrl':
+          return 'http://test-service'
+        case 'port':
+          return 3000
+        case 'staticCacheControl':
+          return 'public, max-age=86400'
+        case 'cookieOptions':
+          return {
+            ttl: 24 * 60 * 60 * 1000,
+            encoding: 'base64json',
+            isSecure: true,
+            isHttpOnly: true,
+            clearInvalid: true,
+            strictHeader: true
+          }
+        case 'sessionCookieName':
+          return 'test-session'
+        case 'redisHost':
+          return 'localhost'
+        case 'redisPort':
+          return 6379
+        case 'redisPassword':
+          return ''
+        case 'redisPrefix':
+          return 'test:'
+        case 'redisTls':
+          return false
+        case 'redisDb':
+          return 0
+        case 'redisTimeout':
+          return 2000
+        case 'sessionTtl':
+          return 24 * 60 * 60 * 1000
+        case 'trustStorePath':
+          return '/test/trust-store'
+        case 'trustStoreType':
+          return 'test'
+        case 'trustStorePassword':
+          return 'test'
+        case 'trustStoreCerts':
+          return []
+        case 'trustStoreEnabled':
+          return false
+        case 'session.cache.name':
+          return 'test-cache'
+        case 'session.cache.engine':
+          return 'memory'
+        case 'session.cookie.password':
+          return 'test-password'
+        case 'session.cookie.ttl':
+          return 24 * 60 * 60 * 1000
+        case 'session.cookie.secure':
+          return false
+        case 'redis.ttl':
+          return 24 * 60 * 60 * 1000
+        case 'log':
+          return {
+            enabled: true,
+            redact: []
+          }
+        default:
+          return undefined
+      }
+    })
+
     server = await createServer()
     await server.initialize()
   })
@@ -45,6 +210,27 @@ describe('#uploadAndWait', () => {
       validateFileExtension: jest.fn()
     }
 
+    authenticatedPostRequestSpy = jest
+      .spyOn(authenticatedRequests, 'authenticatedPostRequest')
+      .mockResolvedValue({
+        statusCode: 200,
+        payload: {
+          message: 'success',
+          value: {
+            type: 'FeatureCollection',
+            features: [
+              {
+                type: 'Feature',
+                geometry: {
+                  type: 'Point',
+                  coordinates: [0, 0]
+                }
+              }
+            ]
+          }
+        }
+      })
+
     jest
       .spyOn(cdpUploadService, 'getCdpUploadService')
       .mockReturnValue(mockCdpService)
@@ -55,7 +241,9 @@ describe('#uploadAndWait', () => {
   })
 
   afterAll(async () => {
-    await server.stop({ timeout: 0 })
+    if (server) {
+      await server.stop({ timeout: 0 })
+    }
   })
 
   describe('#uploadAndWaitController', () => {
@@ -63,7 +251,8 @@ describe('#uploadAndWait', () => {
       logger: {
         debug: jest.fn(),
         warn: jest.fn(),
-        error: jest.fn()
+        error: jest.fn(),
+        info: jest.fn()
       }
     }
 
@@ -137,7 +326,7 @@ describe('#uploadAndWait', () => {
       })
     })
 
-    test('should redirect to FILE_UPLOAD when status is ready and file validation passes', async () => {
+    test('should redirect to REVIEW_SITE_DETAILS when status is ready and file validation passes', async () => {
       getExemptionCacheSpy.mockReturnValue({
         projectName: 'Test Project',
         siteDetails: { uploadConfig: mockUploadConfig }
@@ -150,13 +339,10 @@ describe('#uploadAndWait', () => {
         completedAt: '2025-07-02T21:29:38.471Z',
         s3Location: {
           s3Bucket: 'test-bucket',
-          s3Key:
-            's3Path/a283cf8a-b13e-4ae3-85e9-7c3db9a4a076/558d2f8d-5b78-47e7-9958-e315763f44af',
-          fileId: '558d2f8d-5b78-47e7-9958-e315763f44af',
-          s3Url:
-            's3://test-bucket/s3Path/a283cf8a-b13e-4ae3-85e9-7c3db9a4a076/558d2f8d-5b78-47e7-9958-e315763f44af',
-          detectedContentType: 'application/vnd.google-earth.kml+xml',
-          checksumSha256: '2Vvqe1CDdtBezIBTQWyf3IYhc0dnuKgy/YeOY055s6g='
+          s3Key: 'test-key',
+          fileId: 'test-id',
+          s3Url: 'test-url',
+          checksumSha256: 'test-checksum'
         }
       }
 
@@ -169,6 +355,16 @@ describe('#uploadAndWait', () => {
         errorMessage: null
       })
 
+      // Mock config for S3 bucket
+      config.get.mockImplementation((key) => {
+        if (key === 'cdpUploader') {
+          return {
+            s3Bucket: 'test-bucket'
+          }
+        }
+        return undefined
+      })
+
       const h = { redirect: jest.fn() }
 
       await uploadAndWaitController.handler(mockRequest, h)
@@ -177,10 +373,63 @@ describe('#uploadAndWait', () => {
         mockFileValidationService.validateFileExtension
       ).toHaveBeenCalledWith('test.kml', ['kml'])
 
+      expect(authenticatedPostRequestSpy).toHaveBeenCalledWith(
+        mockRequest,
+        '/geo-parser/extract',
+        {
+          s3Bucket: 'test-bucket',
+          s3Key: 'test-key',
+          fileType: 'kml'
+        }
+      )
+
       expect(updateExemptionSiteDetailsSpy).toHaveBeenCalledWith(
         mockRequest,
         'uploadedFile',
-        statusResponse
+        {
+          ...statusResponse,
+          s3Location: {
+            s3Bucket: 'test-bucket',
+            s3Key: statusResponse.s3Location.s3Key,
+            fileId: statusResponse.s3Location.fileId,
+            s3Url: statusResponse.s3Location.s3Url,
+            checksumSha256: statusResponse.s3Location.checksumSha256
+          }
+        }
+      )
+
+      expect(updateExemptionSiteDetailsSpy).toHaveBeenCalledWith(
+        mockRequest,
+        'extractedCoordinates',
+        [
+          {
+            type: 'Point',
+            coordinates: [0, 0]
+          }
+        ]
+      )
+
+      expect(updateExemptionSiteDetailsSpy).toHaveBeenCalledWith(
+        mockRequest,
+        'geoJSON',
+        {
+          type: 'FeatureCollection',
+          features: [
+            {
+              type: 'Feature',
+              geometry: {
+                type: 'Point',
+                coordinates: [0, 0]
+              }
+            }
+          ]
+        }
+      )
+
+      expect(updateExemptionSiteDetailsSpy).toHaveBeenCalledWith(
+        mockRequest,
+        'featureCount',
+        1
       )
 
       expect(updateExemptionSiteDetailsSpy).toHaveBeenCalledWith(
@@ -189,7 +438,7 @@ describe('#uploadAndWait', () => {
         undefined
       )
 
-      expect(h.redirect).toHaveBeenCalledWith(routes.FILE_UPLOAD)
+      expect(h.redirect).toHaveBeenCalledWith(routes.REVIEW_SITE_DETAILS)
     })
 
     test('should redirect to FILE_UPLOAD with error when file validation fails for wrong extension', async () => {
@@ -262,7 +511,15 @@ describe('#uploadAndWait', () => {
       const statusResponse = {
         status: 'ready',
         filename: 'coordinates.zip',
-        fileSize: 5432
+        fileSize: 5432,
+        completedAt: '2025-07-02T21:29:38.471Z',
+        s3Location: {
+          s3Bucket: 'test-bucket',
+          s3Key: 'test-key',
+          fileId: 'test-id',
+          s3Url: 'test-url',
+          checksumSha256: 'test-checksum'
+        }
       }
 
       mockCdpService.getStatus.mockResolvedValue(statusResponse)
@@ -274,6 +531,16 @@ describe('#uploadAndWait', () => {
         errorMessage: null
       })
 
+      // Mock config for S3 bucket
+      config.get.mockImplementation((key) => {
+        if (key === 'cdpUploader') {
+          return {
+            s3Bucket: 'test-bucket'
+          }
+        }
+        return undefined
+      })
+
       const h = { redirect: jest.fn() }
 
       await uploadAndWaitController.handler(mockRequest, h)
@@ -282,13 +549,72 @@ describe('#uploadAndWait', () => {
         mockFileValidationService.validateFileExtension
       ).toHaveBeenCalledWith('coordinates.zip', ['zip'])
 
+      expect(authenticatedPostRequestSpy).toHaveBeenCalledWith(
+        mockRequest,
+        '/geo-parser/extract',
+        {
+          s3Bucket: 'test-bucket',
+          s3Key: 'test-key',
+          fileType: 'shapefile'
+        }
+      )
+
       expect(updateExemptionSiteDetailsSpy).toHaveBeenCalledWith(
         mockRequest,
         'uploadedFile',
-        statusResponse
+        {
+          ...statusResponse,
+          s3Location: {
+            s3Bucket: 'test-bucket',
+            s3Key: statusResponse.s3Location.s3Key,
+            fileId: statusResponse.s3Location.fileId,
+            s3Url: statusResponse.s3Location.s3Url,
+            checksumSha256: statusResponse.s3Location.checksumSha256
+          }
+        }
       )
 
-      expect(h.redirect).toHaveBeenCalledWith(routes.FILE_UPLOAD)
+      expect(updateExemptionSiteDetailsSpy).toHaveBeenCalledWith(
+        mockRequest,
+        'extractedCoordinates',
+        [
+          {
+            type: 'Point',
+            coordinates: [0, 0]
+          }
+        ]
+      )
+
+      expect(updateExemptionSiteDetailsSpy).toHaveBeenCalledWith(
+        mockRequest,
+        'geoJSON',
+        {
+          type: 'FeatureCollection',
+          features: [
+            {
+              type: 'Feature',
+              geometry: {
+                type: 'Point',
+                coordinates: [0, 0]
+              }
+            }
+          ]
+        }
+      )
+
+      expect(updateExemptionSiteDetailsSpy).toHaveBeenCalledWith(
+        mockRequest,
+        'featureCount',
+        1
+      )
+
+      expect(updateExemptionSiteDetailsSpy).toHaveBeenCalledWith(
+        mockRequest,
+        'uploadConfig',
+        undefined
+      )
+
+      expect(h.redirect).toHaveBeenCalledWith(routes.REVIEW_SITE_DETAILS)
     })
 
     test('should redirect to FILE_UPLOAD with error when status is rejected', async () => {

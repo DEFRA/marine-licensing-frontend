@@ -1,14 +1,11 @@
 import { COORDINATE_SYSTEMS } from '~/src/server/common/constants/exemptions.js'
 import { routes } from '~/src/server/common/constants/routes.js'
-import {
-  getExemptionCache,
-  updateExemptionSiteDetails
-} from '~/src/server/common/helpers/session-cache/utils.js'
+import { getExemptionCache } from '~/src/server/common/helpers/session-cache/utils.js'
 import { generatePointSpecificErrorMessage } from '~/src/server/common/helpers/site-details.js'
 import { createOsgb36MultipleCoordinatesSchema } from '~/src/server/common/schemas/osgb36.js'
 import { createWgs84MultipleCoordinatesSchema } from '~/src/server/common/schemas/wgs84.js'
 
-const REQUIRED_COORDINATES_COUNT = 3
+export const REQUIRED_COORDINATES_COUNT = 3
 
 export const PATTERNS = {
   FIELD_BRACKETS: /[[\]]/g
@@ -56,26 +53,30 @@ const createDefaultCoordinates = (coordinateSystem) => {
 }
 
 /**
- * Normalise coordinates for display - ensures exactly 3 coordinates with empty defaults
- * @param {Array} coordinates - Coordinate data
+ * Normalise coordinates for display - ensures minimum 3 coordinates with empty defaults
  * @param {string} coordinateSystem - Coordinate system type
- * @returns {Array} Array of exactly 3 coordinates
+ * @param {Array} coordinates - Coordinate data
+ * @returns {Array} Array of all coordinates
  */
 export const normaliseCoordinatesForDisplay = (
-  coordinates,
-  coordinateSystem
+  coordinateSystem,
+  coordinates = []
 ) => {
-  const displayCoordinates = coordinates || []
-
-  if (displayCoordinates.length === 0) {
+  if (
+    coordinates.length === 0 ||
+    !coordinates[0] ||
+    (coordinates[0]?.latitude &&
+      coordinateSystem !== COORDINATE_SYSTEMS.WGS84) ||
+    (coordinates[0]?.eastings && coordinateSystem !== COORDINATE_SYSTEMS.OSGB36)
+  ) {
     return createDefaultCoordinates(coordinateSystem)
   }
 
-  while (displayCoordinates.length < REQUIRED_COORDINATES_COUNT) {
-    displayCoordinates.push(createEmptyCoordinate(coordinateSystem))
+  while (coordinates.length < REQUIRED_COORDINATES_COUNT) {
+    coordinates.push(createEmptyCoordinate(coordinateSystem))
   }
 
-  return displayCoordinates.slice(0, REQUIRED_COORDINATES_COUNT)
+  return coordinates
 }
 
 export const extractCoordinateIndexFromFieldName = (fieldName) => {
@@ -85,6 +86,12 @@ export const extractCoordinateIndexFromFieldName = (fieldName) => {
 
 export const sanitiseFieldName = (fieldPath) =>
   fieldPath.join('').replace(PATTERNS.FIELD_BRACKETS, '')
+
+export const sanitiseFieldId = (fieldName) =>
+  fieldName
+    .join('')
+    .replace(PATTERNS.FIELD_BRACKETS, '')
+    .replace(/(\d+)/g, '-$1-')
 
 export const convertPayloadToCoordinatesArray = (payload, coordinateSystem) => {
   const coordinates = []
@@ -140,20 +147,21 @@ export const convertArrayErrorsToFlattenedErrors = (error) => {
 
 export const processErrorDetail = (detail) => {
   const fieldName = sanitiseFieldName(detail.path)
+  const fieldId = sanitiseFieldId(detail.path)
   const coordinateIndex = extractCoordinateIndexFromFieldName(fieldName)
   const enhancedMessage = generatePointSpecificErrorMessage(
     detail.message,
     coordinateIndex
   )
 
-  return { fieldName, coordinateIndex, enhancedMessage }
+  return { fieldName, fieldId, coordinateIndex, enhancedMessage }
 }
 
 export const createErrorSummary = (validationError) => {
   return validationError.details.map((detail) => {
-    const { fieldName, enhancedMessage } = processErrorDetail(detail)
+    const { fieldId, enhancedMessage } = processErrorDetail(detail)
     return {
-      href: `#${fieldName}`,
+      href: `#${fieldId}`,
       text: enhancedMessage
     }
   })
@@ -207,27 +215,6 @@ export const handleValidationFailure = (
     .takeover()
 }
 
-export const saveCoordinatesToSession = (
-  request,
-  coordinates,
-  coordinateSystem
-) => {
-  const exemption = getExemptionCache(request)
-  const existingMultipleCoordinates =
-    exemption?.siteDetails?.multipleCoordinates || {}
-
-  const updatedMultipleCoordinates = {
-    ...existingMultipleCoordinates,
-    [coordinateSystem]: coordinates
-  }
-
-  updateExemptionSiteDetails(
-    request,
-    'multipleCoordinates',
-    updatedMultipleCoordinates
-  )
-}
-
 export const validateCoordinates = (
   coordinates,
   exemptionId,
@@ -237,4 +224,21 @@ export const validateCoordinates = (
   const schema = getValidationSchema(coordinateSystem)
 
   return schema.validate(validationPayload, { abortEarly: false })
+}
+
+/**
+ * Remove a coordinate at a given index, but only if index >= 3 and at least 3 remain after removal
+ * @param {Array} coordinates - Array of coordinates
+ * @param {number} index - Index to remove
+ * @returns {Array} New array with coordinate removed if allowed, else original array
+ */
+export const removeCoordinateAtIndex = (coordinates, index) => {
+  if (
+    index >= REQUIRED_COORDINATES_COUNT &&
+    index < coordinates.length &&
+    coordinates.length > REQUIRED_COORDINATES_COUNT
+  ) {
+    return coordinates.slice(0, index).concat(coordinates.slice(index + 1))
+  }
+  return coordinates
 }

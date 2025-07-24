@@ -19,6 +19,7 @@ export default {
     '<rootDir>/.public',
     '<rootDir>/src/server/test-helpers',
     '<rootDir>/src/client/javascripts/application.js',
+    '<rootDir>/src/client/javascripts/add-another-point/index.js',
     '<rootDir>/src/index.js'
   ],
   coverageDirectory: '<rootDir>/coverage',

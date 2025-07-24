@@ -42,7 +42,12 @@ module.exports = {
           }
         ],
         'no-console': 'error',
-
+        'jsdoc/check-tag-names': [
+          'warn',
+          {
+            definedTags: ['jest-environment']
+          }
+        ],
         // Turn off strict type checking rules
         '@typescript-eslint/no-unsafe-argument': 'off',
         '@typescript-eslint/no-unsafe-assignment': 'off',

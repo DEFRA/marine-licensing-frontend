@@ -1,23 +1,20 @@
 import {
-  getCoordinateSystem,
   getExemptionCache,
   resetExemptionSiteDetails
 } from '~/src/server/common/helpers/session-cache/utils.js'
 import { routes } from '~/src/server/common/constants/routes.js'
 import {
-  getSiteDetailsBackLink,
-  getFileUploadSummaryData,
-  getFileUploadBackLink,
-  buildManualCoordinateSummaryData,
   loadSiteDetailsFromMongoDB,
   prepareFileUploadDataForSave,
-  prepareManualCoordinateDataForSave
+  prepareManualCoordinateDataForSave,
+  renderFileUploadReview,
+  renderManualCoordinateReview,
+  handleSubmissionError
 } from './utils.js'
 import {
   authenticatedPatchRequest,
   authenticatedGetRequest
 } from '~/src/server/common/helpers/authenticated-requests.js'
-import Boom from '@hapi/boom'
 
 export const REVIEW_SITE_DETAILS_VIEW_ROUTE =
   'exemption/site-details/review-site-details/index'
@@ -44,33 +41,22 @@ export const reviewSiteDetailsController = {
       authenticatedGetRequest
     )
 
-    if (siteDetails.coordinatesType === 'file') {
-      const fileUploadSummaryData = getFileUploadSummaryData({
-        ...exemption,
-        siteDetails
-      })
-
-      return h.view(FILE_UPLOAD_REVIEW_VIEW_ROUTE, {
-        ...reviewSiteDetailsPageData,
-        backLink: getFileUploadBackLink(previousPage),
-        projectName: exemption.projectName,
-        fileUploadSummaryData
-      })
-    }
-
-    // Manual coordinate entry flow
-    const { coordinateSystem } = getCoordinateSystem(request)
-    const summaryData = buildManualCoordinateSummaryData(
-      siteDetails,
-      coordinateSystem
-    )
-
-    return h.view(REVIEW_SITE_DETAILS_VIEW_ROUTE, {
-      ...reviewSiteDetailsPageData,
-      backLink: getSiteDetailsBackLink(previousPage),
-      projectName: exemption.projectName,
-      summaryData
-    })
+    return siteDetails.coordinatesType === 'file'
+      ? renderFileUploadReview(
+          h,
+          exemption,
+          siteDetails,
+          previousPage,
+          reviewSiteDetailsPageData
+        )
+      : renderManualCoordinateReview(
+          h,
+          request,
+          exemption,
+          siteDetails,
+          previousPage,
+          reviewSiteDetailsPageData
+        )
   }
 }
 
@@ -96,13 +82,13 @@ export const reviewSiteDetailsSubmitController = {
 
       resetExemptionSiteDetails(request)
       return h.redirect(routes.TASK_LIST)
-    } catch (e) {
-      request.logger.error('Error submitting site review', {
-        error: e.message,
-        exemptionId: exemption.id,
-        coordinatesType: siteDetails.coordinatesType
-      })
-      throw Boom.badRequest(`Error submitting site review`, e)
+    } catch (error) {
+      throw handleSubmissionError(
+        request,
+        error,
+        exemption.id,
+        siteDetails.coordinatesType
+      )
     }
   }
 }

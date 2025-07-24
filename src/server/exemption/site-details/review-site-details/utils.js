@@ -1,5 +1,13 @@
 import { COORDINATE_SYSTEMS } from '~/src/server/common/constants/exemptions.js'
 import { routes } from '~/src/server/common/constants/routes.js'
+import { getCoordinateSystem } from '~/src/server/common/helpers/session-cache/utils.js'
+import Boom from '@hapi/boom'
+
+const REVIEW_SITE_DETAILS_VIEW_ROUTE =
+  'exemption/site-details/review-site-details/index'
+
+const FILE_UPLOAD_REVIEW_VIEW_ROUTE =
+  'exemption/site-details/review-site-details/file-upload-review'
 
 export const getSiteDetailsBackLink = (previousPage) => {
   if (!previousPage || !URL.canParse(previousPage)) {
@@ -208,4 +216,87 @@ export const prepareManualCoordinateDataForSave = (exemption, request) => {
 
   // Manual coordinate entry flow - use existing data structure
   return exemption.siteDetails
+}
+
+/**
+ * Handles file upload review view rendering
+ * @param {object} h - Hapi response toolkit
+ * @param {object} exemption - Current exemption from session
+ * @param {object} siteDetails - Site details object
+ * @param {string} previousPage - Previous page URL for back link
+ * @param {object} reviewSiteDetailsPageData - Common page data
+ * @returns {object} Rendered view response
+ */
+export const renderFileUploadReview = (
+  h,
+  exemption,
+  siteDetails,
+  previousPage,
+  reviewSiteDetailsPageData
+) => {
+  const fileUploadSummaryData = getFileUploadSummaryData({
+    ...exemption,
+    siteDetails
+  })
+
+  return h.view(FILE_UPLOAD_REVIEW_VIEW_ROUTE, {
+    ...reviewSiteDetailsPageData,
+    backLink: getFileUploadBackLink(previousPage),
+    projectName: exemption.projectName,
+    fileUploadSummaryData
+  })
+}
+
+/**
+ * Handles manual coordinate review view rendering
+ * @param {object} h - Hapi response toolkit
+ * @param {object} request - Hapi request object
+ * @param {object} exemption - Current exemption from session
+ * @param {object} siteDetails - Site details object
+ * @param {string} previousPage - Previous page URL for back link
+ * @param {object} reviewSiteDetailsPageData - Common page data
+ * @returns {object} Rendered view response
+ */
+export const renderManualCoordinateReview = (
+  h,
+  request,
+  exemption,
+  siteDetails,
+  previousPage,
+  reviewSiteDetailsPageData
+) => {
+  const { coordinateSystem } = getCoordinateSystem(request)
+  const summaryData = buildManualCoordinateSummaryData(
+    siteDetails,
+    coordinateSystem
+  )
+
+  return h.view(REVIEW_SITE_DETAILS_VIEW_ROUTE, {
+    ...reviewSiteDetailsPageData,
+    backLink: getSiteDetailsBackLink(previousPage),
+    projectName: exemption.projectName,
+    summaryData
+  })
+}
+
+/**
+ * Handles errors during site details submission
+ * @param {object} request - Hapi request object
+ * @param {Error} error - The error that occurred
+ * @param {string} exemptionId - ID of the exemption
+ * @param {string} coordinatesType - Type of coordinates being saved
+ * @returns {Boom} Standardized error response
+ */
+export const handleSubmissionError = (
+  request,
+  error,
+  exemptionId,
+  coordinatesType
+) => {
+  request.logger.error('Error submitting site review', {
+    error: error.message,
+    exemptionId,
+    coordinatesType
+  })
+  return Boom.badRequest('Error submitting site review', error)
 }

@@ -460,6 +460,51 @@ describe('siteDetails utils', () => {
       )
     })
 
+    test('loadSiteDetailsFromMongoDB logs warning when MongoDB response has no site details', async () => {
+      const exemption = {
+        id: 'test-exemption-id',
+        siteDetails: undefined
+      }
+
+      const mockRequest = {
+        logger: {
+          info: jest.fn(),
+          error: jest.fn(),
+          warn: jest.fn()
+        }
+      }
+
+      const mockMongoResponse = {
+        payload: {
+          value: {
+            // No siteDetails property in response
+            otherData: 'some data'
+          }
+        }
+      }
+
+      mockAuthenticatedGetRequest.mockResolvedValue(mockMongoResponse)
+
+      const result = await loadSiteDetailsFromMongoDB(
+        mockRequest,
+        exemption,
+        mockAuthenticatedGetRequest
+      )
+
+      expect(result).toEqual({})
+      expect(mockAuthenticatedGetRequest).toHaveBeenCalledWith(
+        mockRequest,
+        '/exemption/test-exemption-id'
+      )
+      expect(mockRequest.logger.warn).toHaveBeenCalledWith(
+        'No site details found in MongoDB response',
+        {
+          exemptionId: 'test-exemption-id'
+        }
+      )
+      expect(mockRequest.logger.info).not.toHaveBeenCalled()
+    })
+
     test('loadSiteDetailsFromMongoDB returns empty object when no exemption ID', async () => {
       const exemption = {}
 

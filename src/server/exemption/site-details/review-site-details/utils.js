@@ -61,13 +61,21 @@ export const getFileUploadSummaryData = (exemption) => {
   const uploadedFile = siteDetails.uploadedFile || {}
   const geoJSON = siteDetails.geoJSON || {}
 
-  // Parse coordinates from geoJSON instead of using extractedCoordinates
+  // Parse coordinates from geoJSON, only including features with valid geometry
   let coordinates = []
   if (geoJSON.features && Array.isArray(geoJSON.features)) {
-    coordinates = geoJSON.features.map((feature) => ({
-      type: feature.geometry?.type || '',
-      coordinates: feature.geometry?.coordinates || []
-    }))
+    coordinates = geoJSON.features
+      .filter(
+        (feature) =>
+          feature.geometry?.type &&
+          feature.geometry?.coordinates &&
+          Array.isArray(feature.geometry.coordinates) &&
+          feature.geometry.coordinates.length > 0
+      )
+      .map((feature) => ({
+        type: feature.geometry.type,
+        coordinates: feature.geometry.coordinates
+      }))
   }
 
   // Determine file type display text
@@ -83,7 +91,7 @@ export const getFileUploadSummaryData = (exemption) => {
   return {
     method: 'Upload a file with the coordinates of the site',
     fileType: fileTypeText,
-    filename: uploadedFile.filename || '',
+    filename: uploadedFile.filename,
     coordinates
   }
 }
@@ -152,13 +160,17 @@ export const loadSiteDetailsFromMongoDB = async (
           exemptionId: exemption.id,
           coordinatesType: siteDetails.coordinatesType
         })
+      } else {
+        request.logger.warn('No site details found in MongoDB response', {
+          exemptionId: exemption.id
+        })
+        // Continue with session data when no site details found
       }
     } catch (error) {
       request.logger.error('Failed to load exemption data from MongoDB', {
         error: error.message,
         exemptionId: exemption.id
       })
-      // Continue with session data even if MongoDB load fails
     }
   }
 

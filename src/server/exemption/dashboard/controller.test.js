@@ -73,6 +73,7 @@ describe('#dashboard', () => {
 
       const projects = [
         {
+          id: 'abc123',
           projectName: 'Test Project',
           type: 'Exempt activity',
           reference: 'ML-2024-001',
@@ -91,7 +92,10 @@ describe('#dashboard', () => {
           {
             html: '<strong class="govuk-tag govuk-tag--light-blue">Draft</strong>'
           },
-          { text: '-' }
+          { text: '-' },
+          {
+            html: '<a href="/exemption/task-list/abc123" class="govuk-link">Continue</a>'
+          }
         ]
       ])
 
@@ -220,9 +224,9 @@ describe('#dashboard', () => {
 
       const { document } = new JSDOM(result).window
 
-      const continueLink = document
-        .querySelectorAll('a,button')
-        .find((el) => el.textContent.trim() === 'Continue')
+      const continueLink = Array.from(document.querySelectorAll('a')).find(
+        (el) => el.textContent.trim() === 'Continue'
+      )
       expect(continueLink).toBeTruthy()
       expect(continueLink.getAttribute('href')).toBe(
         `/exemption/task-list/${draftExemption.id}`

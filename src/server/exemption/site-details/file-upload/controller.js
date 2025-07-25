@@ -96,7 +96,7 @@ export const fileUploadController = {
       errors = errorDisplay.errors
 
       // Clear error from session after retrieving
-      updateExemptionSiteDetails(request, 'uploadError', undefined)
+      updateExemptionSiteDetails(request, 'uploadError', null)
 
       request.logger.debug('Displaying upload error from session', {
         message: uploadError.message,

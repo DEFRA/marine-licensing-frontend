@@ -284,7 +284,7 @@ describe('#fileUpload', () => {
         expect(updateExemptionSiteDetailsSpy).toHaveBeenCalledWith(
           mockRequest,
           'uploadError',
-          undefined
+          null
         )
 
         expect(mockRequest.logger.debug).toHaveBeenCalledWith(

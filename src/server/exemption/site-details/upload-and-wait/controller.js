@@ -1,6 +1,7 @@
 import {
   getExemptionCache,
-  updateExemptionSiteDetails
+  updateExemptionSiteDetails,
+  updateExemptionSiteDetailsBatch
 } from '~/src/server/common/helpers/session-cache/utils.js'
 import { getCdpUploadService } from '~/src/services/cdp-upload-service/index.js'
 import { getFileValidationService } from '~/src/services/file-validation/index.js'
@@ -192,7 +193,7 @@ function handleCdpRejectionError(request, status, fileType) {
  * @param {object} request - Hapi request object
  */
 function clearUploadSession(request) {
-  updateExemptionSiteDetails(request, 'uploadConfig', undefined)
+  updateExemptionSiteDetails(request, 'uploadConfig', null)
 }
 
 /**
@@ -225,32 +226,22 @@ function storeSuccessfulUpload(
   s3Bucket,
   s3Key
 ) {
-  // Store uploaded file details in session
-  updateExemptionSiteDetails(request, 'uploadedFile', {
-    ...status,
-    s3Location: {
-      s3Bucket,
-      s3Key,
-      fileId: status.s3Location.fileId,
-      s3Url: status.s3Location.s3Url,
-      checksumSha256: status.s3Location.checksumSha256
-    }
+  updateExemptionSiteDetailsBatch(request, {
+    uploadedFile: {
+      ...status,
+      s3Location: {
+        s3Bucket,
+        s3Key,
+        fileId: status.s3Location.fileId,
+        s3Url: status.s3Location.s3Url,
+        checksumSha256: status.s3Location.checksumSha256
+      }
+    },
+    extractedCoordinates: coordinateData.extractedCoordinates,
+    geoJSON: coordinateData.geoJSON,
+    featureCount: coordinateData.featureCount,
+    uploadConfig: null // Clear upload config
   })
-
-  // Store extracted coordinates for review page
-  updateExemptionSiteDetails(
-    request,
-    'extractedCoordinates',
-    coordinateData.extractedCoordinates
-  )
-  updateExemptionSiteDetails(request, 'geoJSON', coordinateData.geoJSON)
-  updateExemptionSiteDetails(
-    request,
-    'featureCount',
-    coordinateData.featureCount
-  )
-
-  clearUploadSession(request)
 }
 
 /**
@@ -442,7 +433,7 @@ export const uploadAndWaitController = {
       })
 
       // Clear upload config and redirect to file type selection
-      updateExemptionSiteDetails(request, 'uploadConfig', undefined)
+      updateExemptionSiteDetails(request, 'uploadConfig', null)
       return h.redirect(routes.CHOOSE_FILE_UPLOAD_TYPE)
     }
   }

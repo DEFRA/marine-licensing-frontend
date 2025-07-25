@@ -5,7 +5,7 @@ export const getActionButtons = (project) => {
   let buttons = ''
 
   if (project.status === 'Draft') {
-    buttons = `<a href="${routes.TASK_LIST}/${project.id}" class="govuk-link">Continue</a>`
+    buttons = `<a href="${routes.TASK_LIST}/${project.id}" class="govuk-link" aria-label="Continue to task list">Continue</a>`
   }
 
   return buttons

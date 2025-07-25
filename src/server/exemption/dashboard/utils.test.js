@@ -40,7 +40,7 @@ describe('#formatProjectsForDisplay', () => {
         },
         { text: '15 Jan 2024' },
         {
-          html: '<a href="/exemption/task-list/abc123" class="govuk-link">Continue</a>'
+          html: '<a href="/exemption/task-list/abc123" class="govuk-link" aria-label="Continue to task list">Continue</a>'
         }
       ]
     ])
@@ -70,7 +70,7 @@ describe('#formatProjectsForDisplay', () => {
         },
         { text: '-' },
         {
-          html: '<a href="/exemption/task-list/abc123" class="govuk-link">Continue</a>'
+          html: '<a href="/exemption/task-list/abc123" class="govuk-link" aria-label="Continue to task list">Continue</a>'
         }
       ]
     ])
@@ -107,7 +107,7 @@ describe('#formatProjectsForDisplay', () => {
       },
       { text: '15 Jan 2024' },
       {
-        html: '<a href="/exemption/task-list/abc123" class="govuk-link">Continue</a>'
+        html: '<a href="/exemption/task-list/abc123" class="govuk-link" aria-label="Continue to task list">Continue</a>'
       }
     ])
     expect(result[1]).toEqual([
@@ -160,7 +160,7 @@ describe('getActionButtons', () => {
     const draft = { id: 'abc123', status: 'Draft' }
     const result = getActionButtons(draft)
     expect(result).toBe(
-      `<a href="${routes.TASK_LIST}/abc123" class="govuk-link">Continue</a>`
+      `<a href="${routes.TASK_LIST}/abc123" class="govuk-link" aria-label="Continue to task list">Continue</a>`
     )
   })
 

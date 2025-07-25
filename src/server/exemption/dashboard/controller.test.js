@@ -94,7 +94,7 @@ describe('#dashboard', () => {
           },
           { text: '-' },
           {
-            html: '<a href="/exemption/task-list/abc123" class="govuk-link">Continue</a>'
+            html: '<a href="/exemption/task-list/abc123" class="govuk-link" aria-label="Continue to task list">Continue</a>'
           }
         ]
       ])

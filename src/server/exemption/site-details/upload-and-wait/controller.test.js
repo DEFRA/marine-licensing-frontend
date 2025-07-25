@@ -346,49 +346,11 @@ const createMockResponseHandler = () => ({
 // Mock Configuration Setup
 const setupMockConfig = () => {
   config.get.mockImplementation((key) => {
-    const configMap = {
-      cdpUploader: { s3Bucket: 'test-bucket' },
-      root: '/test/root',
-      assetPath: '/test/assets',
-      env: 'test',
-      isDev: false,
-      isTest: true,
-      isProd: false,
-      serviceName: 'test-service',
-      serviceUrl: 'http://test-service',
-      port: 3000,
-      staticCacheControl: 'public, max-age=86400',
-      cookieOptions: {
-        ttl: 24 * 60 * 60 * 1000,
-        encoding: 'base64json',
-        isSecure: true,
-        isHttpOnly: true,
-        clearInvalid: true,
-        strictHeader: true
-      },
-      sessionCookieName: 'test-session',
-      redisHost: 'localhost',
-      redisPort: 6379,
-      redisPassword: '',
-      redisPrefix: 'test:',
-      redisTls: false,
-      redisDb: 0,
-      redisTimeout: 2000,
-      sessionTtl: 24 * 60 * 60 * 1000,
-      trustStorePath: '/test/trust-store',
-      trustStoreType: 'test',
-      trustStorePassword: 'test',
-      trustStoreCerts: [],
-      trustStoreEnabled: false,
-      'session.cache.name': 'test-cache',
-      'session.cache.engine': 'memory',
-      'session.cookie.password': 'test-password',
-      'session.cookie.ttl': 24 * 60 * 60 * 1000,
-      'session.cookie.secure': false,
-      'redis.ttl': 24 * 60 * 60 * 1000,
-      log: { enabled: true, redact: [] }
+    if (key === 'cdpUploader') {
+      return { s3Bucket: 'test-bucket' }
     }
-    return configMap[key]
+    // Return undefined for any other keys - will cause test to fail if something unexpected is accessed
+    return undefined
   })
 }
 

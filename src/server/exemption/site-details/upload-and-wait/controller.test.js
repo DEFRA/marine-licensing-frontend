@@ -465,14 +465,21 @@ const expectRejectedStatusHandling = async (
   await uploadAndWaitController.handler(mockRequest, h)
 
   // Then expected error handling occurs
-  expectUploadErrorSet(
-    updateExemptionSiteDetailsSpy,
+  expect(updateExemptionSiteDetailsSpy).toHaveBeenCalledWith(
     mockRequest,
-    expectedErrorMessage,
-    fileType
+    'uploadError',
+    {
+      message: expectedErrorMessage,
+      fieldName: 'file',
+      fileType
+    }
   )
-  expectUploadConfigCleared(updateExemptionSiteDetailsSpy, mockRequest)
-  expectRedirectTo(h, routes.FILE_UPLOAD)
+  expect(updateExemptionSiteDetailsSpy).toHaveBeenCalledWith(
+    mockRequest,
+    'uploadConfig',
+    null
+  )
+  expect(h.redirect).toHaveBeenCalledWith(routes.FILE_UPLOAD)
 }
 
 const expectFileValidationFailure = async (
@@ -515,14 +522,21 @@ const expectFileValidationFailure = async (
   )
 
   // And error handling occurs
-  expectUploadErrorSet(
-    updateExemptionSiteDetailsSpy,
+  expect(updateExemptionSiteDetailsSpy).toHaveBeenCalledWith(
     mockRequest,
-    errorMessage,
-    fileType
+    'uploadError',
+    {
+      message: errorMessage,
+      fieldName: 'file',
+      fileType
+    }
   )
-  expectUploadConfigCleared(updateExemptionSiteDetailsSpy, mockRequest)
-  expectRedirectTo(h, routes.FILE_UPLOAD)
+  expect(updateExemptionSiteDetailsSpy).toHaveBeenCalledWith(
+    mockRequest,
+    'uploadConfig',
+    null
+  )
+  expect(h.redirect).toHaveBeenCalledWith(routes.FILE_UPLOAD)
 
   // And uploaded file should not be stored when validation fails
   expect(updateExemptionSiteDetailsSpy).not.toHaveBeenCalledWith(
@@ -563,7 +577,6 @@ describe('#uploadAndWait', () => {
     const mockRequest = createMockRequest()
 
     describe('when no upload config exists', () => {
-      /* eslint-disable jest/expect-expect */
       test('should redirect to CHOOSE_FILE_UPLOAD_TYPE', async () => {
         // Given no upload config exists
         getExemptionCacheSpy.mockReturnValue({})
@@ -606,7 +619,6 @@ describe('#uploadAndWait', () => {
         })
       })
 
-      /* eslint-disable jest/expect-expect */
       test('should show waiting page when status is scanning', async () => {
         // Given exemption with upload config and scanning status
         getExemptionCacheSpy.mockReturnValue(createMockExemption())
@@ -811,7 +823,6 @@ describe('#uploadAndWait', () => {
         )
       })
 
-      /* eslint-disable jest/expect-expect */
       test('should handle error status the same as rejected status', async () => {
         // Given exemption with upload config and error status
         getExemptionCacheSpy.mockReturnValue(createMockExemption())
@@ -975,7 +986,6 @@ describe('#uploadAndWait', () => {
         expect(h.redirect).toHaveBeenCalledWith(routes.FILE_UPLOAD)
       })
 
-      /* eslint-disable jest/expect-expect */
       test('should handle geo-parser API returning invalid response', async () => {
         // Given exemption with upload config and ready status
         getExemptionCacheSpy.mockReturnValue(createMockExemption())
@@ -1021,7 +1031,6 @@ describe('#uploadAndWait', () => {
         expect(h.redirect).toHaveBeenCalledWith(routes.FILE_UPLOAD)
       })
 
-      /* eslint-disable jest/expect-expect */
       test('should handle geo-parser API returning unsuccessful response', async () => {
         // Given exemption with upload config and ready status
         getExemptionCacheSpy.mockReturnValue(createMockExemption())
@@ -1068,7 +1077,6 @@ describe('#uploadAndWait', () => {
         expect(h.redirect).toHaveBeenCalledWith(routes.FILE_UPLOAD)
       })
 
-      /* eslint-disable jest/expect-expect */
       test('should handle geo-parser API returning invalid GeoJSON structure', async () => {
         // Given exemption with upload config and ready status
         getExemptionCacheSpy.mockReturnValue(createMockExemption())
@@ -1210,7 +1218,6 @@ describe('#uploadAndWait', () => {
     })
 
     describe('edge cases', () => {
-      /* eslint-disable jest/expect-expect */
       test('should handle missing s3Location in status response', async () => {
         // Given exemption with upload config and ready status without s3Location
         getExemptionCacheSpy.mockReturnValue(createMockExemption())
@@ -1249,7 +1256,6 @@ describe('#uploadAndWait', () => {
         expect(h.redirect).toHaveBeenCalledWith(routes.FILE_UPLOAD)
       })
 
-      /* eslint-disable jest/expect-expect */
       test('should handle empty filename in status response', async () => {
         // Given exemption with upload config and status with empty filename
         getExemptionCacheSpy.mockReturnValue(createMockExemption())

@@ -39,7 +39,6 @@ const transformCdpErrorToValidationError = (message, fileType) => {
   } else if (message.includes('smaller than')) {
     errorMessage = 'The selected file must be smaller than 50 MB'
   } else if (message.includes('must be a')) {
-    // Contextualize file type error based on selected type
     if (fileType === 'kml') {
       errorMessage = 'The selected file must be a KML file'
     } else if (fileType === 'shapefile') {
@@ -107,7 +106,6 @@ async function extractCoordinatesFromFile(request, s3Bucket, s3Key, fileType) {
       throw new Error('Invalid GeoJSON structure')
     }
 
-    // Extract coordinate array from GeoJSON for display using utility function
     const extractedCoordinates = extractCoordinatesFromGeoJSON(geoJSON)
 
     request.logger.info('Successfully extracted coordinates', {
@@ -252,7 +250,6 @@ function storeSuccessfulUpload(
     coordinateData.featureCount
   )
 
-  // Clear upload config from session
   clearUploadSession(request)
 }
 
@@ -264,7 +261,7 @@ function storeSuccessfulUpload(
  * @returns {object} Hapi response (view with processing status)
  */
 function handleProcessingStatus(status, exemption, h) {
-  // Still processing - show waiting page with meta refresh
+  // Show waiting page with meta refresh
   return h.view(UPLOAD_AND_WAIT_VIEW_ROUTE, {
     ...pageSettings,
     projectName: exemption.projectName,
@@ -292,7 +289,6 @@ async function handleReadyStatus(status, uploadConfig, request, h) {
   )
 
   if (!validation.isValid) {
-    // File failed our validation - handle error and redirect
     handleValidationError(request, validation, uploadConfig.fileType)
     return h.redirect(routes.FILE_UPLOAD)
   }
@@ -422,12 +418,10 @@ export const uploadAndWaitController = {
     const { uploadConfig } = exemption.siteDetails || {}
 
     if (!uploadConfig) {
-      // No upload session, redirect back to file type selection
       return h.redirect(routes.CHOOSE_FILE_UPLOAD_TYPE)
     }
 
     try {
-      // Check upload status
       const cdpService = getCdpUploadService()
       const status = await cdpService.getStatus(
         uploadConfig.uploadId,

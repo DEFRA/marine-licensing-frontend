@@ -526,17 +526,14 @@ describe('#reviewSiteDetails', () => {
     })
 
     test('Should handle exemption with undefined siteDetails and assign empty object', async () => {
-      // Create an exemption where siteDetails is undefined (triggering the ?? {} fallback)
       const exemptionWithUndefinedSiteDetails = {
         ...mockExemption,
         siteDetails: undefined // This will trigger the ?? {} fallback
       }
 
-      // Mock the exemption cache to return the exemption without siteDetails
       const originalGetExemptionCache = cacheUtils.getExemptionCache
       let capturedSiteDetails
 
-      // Spy on the cache call to capture what siteDetails becomes after the nullish coalescing
       jest.spyOn(cacheUtils, 'getExemptionCache').mockImplementation(() => {
         const exemption = exemptionWithUndefinedSiteDetails
         // This simulates the line: const siteDetails = exemption.siteDetails ?? {}
@@ -561,7 +558,6 @@ describe('#reviewSiteDetails', () => {
       // Verify that the nullish coalescing operator worked correctly
       expect(capturedSiteDetails).toEqual({})
 
-      // Restore the original implementation
       cacheUtils.getExemptionCache.mockImplementation(originalGetExemptionCache)
     })
 

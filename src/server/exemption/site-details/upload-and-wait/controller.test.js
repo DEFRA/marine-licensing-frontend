@@ -416,7 +416,6 @@ describe('#uploadAndWait', () => {
 
   describe('#uploadAndWaitController', () => {
     const mockRequest = createMockRequest()
-    // const mockUploadConfig = createMockUploadConfig()
 
     describe('when no upload config exists', () => {
       /* eslint-disable jest/expect-expect */

@@ -1,4 +1,3 @@
-import { createServer } from '~/src/server/index.js'
 import {
   uploadAndWaitController,
   UPLOAD_AND_WAIT_VIEW_ROUTE
@@ -10,16 +9,12 @@ import * as authenticatedRequests from '~/src/server/common/helpers/authenticate
 import { mockExemption } from '~/src/server/test-helpers/mocks.js'
 import { routes } from '~/src/server/common/constants/routes.js'
 import { config } from '~/src/config/config.js'
-import path from 'path'
-import hapi from '@hapi/hapi'
 
 jest.mock('~/src/server/common/helpers/session-cache/utils.js')
 jest.mock('~/src/services/cdp-upload-service/index.js')
 jest.mock('~/src/services/file-validation/index.js')
 jest.mock('~/src/server/common/helpers/authenticated-requests.js')
 jest.mock('~/src/config/config.js')
-jest.mock('path')
-jest.mock('@hapi/hapi')
 
 // Mock logger configuration
 jest.mock('~/src/server/common/helpers/logging/logger-options.js', () => ({
@@ -41,56 +36,6 @@ jest.mock('~/src/server/common/helpers/logging/logger.js', () => ({
     debug: jest.fn()
   })
 }))
-
-// Mock path.join to return a fixed path
-path.join.mockImplementation((...args) => args.join('/'))
-
-// Mock manifest file
-jest.mock('~/src/config/nunjucks/context/context.js', () => ({
-  getContext: jest.fn().mockReturnValue({})
-}))
-
-// Mock session configuration
-jest.mock('~/src/server/common/helpers/session-cache/session-cache.js', () => ({
-  sessionConfig: {
-    cache: {
-      name: 'test-cache',
-      ttl: 24 * 60 * 60 * 1000
-    }
-  }
-}))
-
-// Mock cache engine
-jest.mock('~/src/server/common/helpers/session-cache/cache-engine.js', () => ({
-  getCacheEngine: jest.fn().mockReturnValue({
-    start: jest.fn(),
-    stop: jest.fn(),
-    isReady: jest.fn().mockReturnValue(true),
-    validateSegmentName: jest.fn(),
-    get: jest.fn(),
-    set: jest.fn(),
-    drop: jest.fn()
-  })
-}))
-
-// Mock server cache
-const mockServerCache = {
-  get: jest.fn(),
-  set: jest.fn(),
-  drop: jest.fn()
-}
-
-// Mock Hapi server
-const mockServer = {
-  app: {},
-  cache: jest.fn().mockReturnValue(mockServerCache),
-  register: jest.fn(),
-  ext: jest.fn(),
-  initialize: jest.fn(),
-  stop: jest.fn()
-}
-
-hapi.server.mockReturnValue(mockServer)
 
 // Test Data Factories
 const createMockUploadConfig = (overrides = {}) => ({
@@ -159,49 +104,11 @@ const createMockResponseHandler = () => ({
 // Mock Configuration Setup
 const setupMockConfig = () => {
   config.get.mockImplementation((key) => {
-    const configMap = {
-      cdpUploader: { s3Bucket: 'test-bucket' },
-      root: '/test/root',
-      assetPath: '/test/assets',
-      env: 'test',
-      isDev: false,
-      isTest: true,
-      isProd: false,
-      serviceName: 'test-service',
-      serviceUrl: 'http://test-service',
-      port: 3000,
-      staticCacheControl: 'public, max-age=86400',
-      cookieOptions: {
-        ttl: 24 * 60 * 60 * 1000,
-        encoding: 'base64json',
-        isSecure: true,
-        isHttpOnly: true,
-        clearInvalid: true,
-        strictHeader: true
-      },
-      sessionCookieName: 'test-session',
-      redisHost: 'localhost',
-      redisPort: 6379,
-      redisPassword: '',
-      redisPrefix: 'test:',
-      redisTls: false,
-      redisDb: 0,
-      redisTimeout: 2000,
-      sessionTtl: 24 * 60 * 60 * 1000,
-      trustStorePath: '/test/trust-store',
-      trustStoreType: 'test',
-      trustStorePassword: 'test',
-      trustStoreCerts: [],
-      trustStoreEnabled: false,
-      'session.cache.name': 'test-cache',
-      'session.cache.engine': 'memory',
-      'session.cookie.password': 'test-password',
-      'session.cookie.ttl': 24 * 60 * 60 * 1000,
-      'session.cookie.secure': false,
-      'redis.ttl': 24 * 60 * 60 * 1000,
-      log: { enabled: true, redact: [] }
+    if (key === 'cdpUploader') {
+      return { s3Bucket: 'test-bucket' }
     }
-    return configMap[key]
+    // Return undefined for any other keys - will cause test to fail if something unexpected is accessed
+    return undefined
   })
 }
 
@@ -384,19 +291,12 @@ const expectFileValidationFailure = async (
 }
 
 describe('#uploadAndWait', () => {
-  /** @type {Server} */
-  let server
   let getExemptionCacheSpy
   let updateExemptionSiteDetailsSpy
   let updateExemptionSiteDetailsBatchSpy
   let mockCdpService
   let mockFileValidationService
   let authenticatedPostRequestSpy
-
-  beforeAll(async () => {
-    server = await createServer()
-    await server.initialize()
-  })
 
   beforeEach(() => {
     jest.resetAllMocks()
@@ -415,12 +315,6 @@ describe('#uploadAndWait', () => {
     mockFileValidationService = services.mockFileValidationService
 
     authenticatedPostRequestSpy = setupAuthenticatedRequestSpy()
-  })
-
-  afterAll(async () => {
-    if (server) {
-      await server.stop({ timeout: 0 })
-    }
   })
 
   describe('#uploadAndWaitController', () => {

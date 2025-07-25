@@ -414,22 +414,20 @@ const expectUploadErrorSet = (spy, request, message, fileType = 'kml') => {
 }
 
 const expectUploadConfigCleared = (spy, request) => {
-  expectCacheUpdateWith(spy, request, 'uploadConfig', undefined)
+  expectCacheUpdateWith(spy, request, 'uploadConfig', null)
 }
 
-const expectSuccessfulFileProcessing = (spy, request) => {
-  // Verify essential data is stored (not testing exact structure)
-  expect(spy).toHaveBeenCalledWith(request, 'uploadedFile', expect.any(Object))
-  expect(spy).toHaveBeenCalledWith(
-    request,
-    'extractedCoordinates',
-    expect.any(Array)
-  )
-  expect(spy).toHaveBeenCalledWith(request, 'geoJSON', expect.any(Object))
-  expect(spy).toHaveBeenCalledWith(request, 'featureCount', expect.any(Number))
+const expectSuccessfulFileProcessing = (spies, request) => {
+  const { updateExemptionSiteDetailsBatchSpy } = spies
 
-  // Verify upload config is cleared (this behavior matters)
-  expectUploadConfigCleared(spy, request)
+  // Verify batch update was called with all the required data including clearing upload config
+  expect(updateExemptionSiteDetailsBatchSpy).toHaveBeenCalledWith(request, {
+    uploadedFile: expect.any(Object),
+    extractedCoordinates: expect.any(Array),
+    geoJSON: expect.any(Object),
+    featureCount: expect.any(Number),
+    uploadConfig: null // Verify upload config is cleared as part of batch operation
+  })
 }
 
 // Service Mock Setup Helpers
@@ -461,7 +459,15 @@ const setupCacheSpies = () => {
     .spyOn(cacheUtils, 'updateExemptionSiteDetails')
     .mockImplementation()
 
-  return { getExemptionCacheSpy, updateExemptionSiteDetailsSpy }
+  const updateExemptionSiteDetailsBatchSpy = jest
+    .spyOn(cacheUtils, 'updateExemptionSiteDetailsBatch')
+    .mockImplementation()
+
+  return {
+    getExemptionCacheSpy,
+    updateExemptionSiteDetailsSpy,
+    updateExemptionSiteDetailsBatchSpy
+  }
 }
 
 const setupAuthenticatedRequestSpy = () => {

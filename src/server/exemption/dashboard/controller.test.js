@@ -10,6 +10,7 @@ import { formatDate } from '~/src/config/nunjucks/filters/format-date.js'
 
 jest.mock('~/src/server/common/helpers/authenticated-requests.js')
 jest.mock('~/src/config/nunjucks/filters/format-date.js')
+jest.mock('~/src/server/exemption/task-list/controller.js')
 
 describe('#dashboard', () => {
   /** @type {Server} */
@@ -72,6 +73,7 @@ describe('#dashboard', () => {
 
       const projects = [
         {
+          id: 'abc123',
           projectName: 'Test Project',
           type: 'Exempt activity',
           reference: 'ML-2024-001',
@@ -90,7 +92,10 @@ describe('#dashboard', () => {
           {
             html: '<strong class="govuk-tag govuk-tag--light-blue">Draft</strong>'
           },
-          { text: '-' }
+          { text: '-' },
+          {
+            html: '<a href="/exemption/task-list/abc123" class="govuk-link" aria-label="Continue to task list">Continue</a>'
+          }
         ]
       ])
 
@@ -196,6 +201,36 @@ describe('#dashboard', () => {
         heading: 'Your projects',
         projects: []
       })
+    })
+
+    test('Should display Continue link for draft exemptions pointing to /exemption/task-list/{id}', async () => {
+      const draftExemption = {
+        projectName: 'Draft Exemption',
+        type: 'Exempt activity',
+        reference: 'ML-2024-003',
+        status: 'Draft',
+        submittedAt: null,
+        id: 'abc123'
+      }
+
+      authenticatedGetRequestMock.mockResolvedValueOnce({
+        payload: { value: [draftExemption] }
+      })
+
+      const { result } = await server.inject({
+        method: 'GET',
+        url: routes.DASHBOARD
+      })
+
+      const { document } = new JSDOM(result).window
+
+      const continueLink = Array.from(
+        document.querySelectorAll('a,button')
+      ).find((el) => el.textContent.trim() === 'Continue')
+      expect(continueLink).toBeTruthy()
+      expect(continueLink.getAttribute('href')).toBe(
+        `/exemption/task-list/${draftExemption.id}`
+      )
     })
   })
 })

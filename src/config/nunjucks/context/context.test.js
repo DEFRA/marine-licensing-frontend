@@ -43,7 +43,7 @@ describe('#context', () => {
             href: '/home'
           }
         ],
-        serviceName: 'Apply for a marine licence',
+        serviceName: 'Get permission for marine work',
         serviceUrl: '/',
         signOutUrl: '/sign-out'
       })
@@ -129,7 +129,7 @@ describe('#context cache', () => {
             href: '/home'
           }
         ],
-        serviceName: 'Apply for a marine licence',
+        serviceName: 'Get permission for marine work',
         serviceUrl: '/',
         signOutUrl: '/sign-out'
       })

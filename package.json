@@ -62,7 +62,7 @@
     "date-fns": "^4.1.0",
     "dayjs": "^1.11.13",
     "global-agent": "^3.0.0",
-    "govuk-frontend": "^5.10.2",
+    "govuk-frontend": "^5.11.1",
     "hapi-pino": "^12.1.0",
     "hapi-pulse": "^3.0.1",
     "ioredis": "^5.6.1",

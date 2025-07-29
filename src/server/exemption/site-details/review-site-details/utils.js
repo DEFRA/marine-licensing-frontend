@@ -136,20 +136,20 @@ export const buildManualCoordinateSummaryData = (
 }
 
 /**
- * Loads site details from MongoDB when session data is incomplete
+ * Loads site details from DB when session data is incomplete
  * @param {object} request - Hapi request object
  * @param {object} exemption - Current exemption from session
  * @param {Function} authenticatedGetRequest - Function to make authenticated API calls
  * @returns {Promise<object>} Site details object
  */
-export const loadSiteDetailsFromMongoDB = async (
+export const getSiteDetails = async (
   request,
   exemption,
   authenticatedGetRequest
 ) => {
   let siteDetails = exemption.siteDetails ?? {}
 
-  // If we have an exemption ID but incomplete site details, load from MongoDB
+  // If we have an exemption ID but incomplete site details, load from DB
   if (exemption.id && exemption.siteDetails === undefined) {
     try {
       const { payload } = await authenticatedGetRequest(

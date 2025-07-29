@@ -4,7 +4,7 @@ import {
 } from '~/src/server/common/helpers/session-cache/utils.js'
 import { routes } from '~/src/server/common/constants/routes.js'
 import {
-  loadSiteDetailsFromMongoDB,
+  getSiteDetails,
   prepareFileUploadDataForSave,
   prepareManualCoordinateDataForSave,
   renderFileUploadReview,
@@ -35,7 +35,7 @@ export const reviewSiteDetailsController = {
   async handler(request, h) {
     const previousPage = request.headers?.referer
     const exemption = getExemptionCache(request)
-    const siteDetails = await loadSiteDetailsFromMongoDB(
+    const siteDetails = await getSiteDetails(
       request,
       exemption,
       authenticatedGetRequest

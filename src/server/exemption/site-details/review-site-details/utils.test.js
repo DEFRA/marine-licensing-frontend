@@ -7,7 +7,7 @@ import {
   getReviewSummaryText,
   getSiteDetailsBackLink,
   handleSubmissionError,
-  loadSiteDetailsFromMongoDB,
+  getSiteDetails,
   prepareFileUploadDataForSave,
   prepareManualCoordinateDataForSave,
   renderFileUploadReview,
@@ -370,7 +370,7 @@ describe('siteDetails utils', () => {
     })
   })
 
-  describe('loadSiteDetailsFromMongoDB util', () => {
+  describe('getSiteDetails util', () => {
     const mockRequest = {
       logger: {
         info: jest.fn(),
@@ -383,7 +383,7 @@ describe('siteDetails utils', () => {
       jest.clearAllMocks()
     })
 
-    test('loadSiteDetailsFromMongoDB returns existing site details when available', async () => {
+    test('getSiteDetails returns existing site details when available', async () => {
       const exemption = {
         id: 'test-exemption-id',
         siteDetails: {
@@ -392,7 +392,7 @@ describe('siteDetails utils', () => {
         }
       }
 
-      const result = await loadSiteDetailsFromMongoDB(
+      const result = await getSiteDetails(
         mockRequest,
         exemption,
         mockAuthenticatedGetRequest
@@ -402,7 +402,7 @@ describe('siteDetails utils', () => {
       expect(mockAuthenticatedGetRequest).not.toHaveBeenCalled()
     })
 
-    test('loadSiteDetailsFromMongoDB loads from MongoDB when site details undefined', async () => {
+    test('getSiteDetails loads from MongoDB when site details undefined', async () => {
       const exemption = {
         id: 'test-exemption-id',
         siteDetails: undefined
@@ -421,7 +421,7 @@ describe('siteDetails utils', () => {
 
       mockAuthenticatedGetRequest.mockResolvedValue(mockMongoResponse)
 
-      const result = await loadSiteDetailsFromMongoDB(
+      const result = await getSiteDetails(
         mockRequest,
         exemption,
         mockAuthenticatedGetRequest
@@ -441,7 +441,7 @@ describe('siteDetails utils', () => {
       )
     })
 
-    test('loadSiteDetailsFromMongoDB handles MongoDB load failure gracefully', async () => {
+    test('getSiteDetails handles MongoDB load failure gracefully', async () => {
       const exemption = {
         id: 'test-exemption-id',
         siteDetails: undefined
@@ -450,7 +450,7 @@ describe('siteDetails utils', () => {
       const mockError = new Error('MongoDB connection failed')
       mockAuthenticatedGetRequest.mockRejectedValue(mockError)
 
-      const result = await loadSiteDetailsFromMongoDB(
+      const result = await getSiteDetails(
         mockRequest,
         exemption,
         mockAuthenticatedGetRequest
@@ -466,7 +466,7 @@ describe('siteDetails utils', () => {
       )
     })
 
-    test('loadSiteDetailsFromMongoDB logs warning when MongoDB response has no site details', async () => {
+    test('getSiteDetails logs warning when MongoDB response has no site details', async () => {
       const exemption = {
         id: 'test-exemption-id',
         siteDetails: undefined
@@ -491,7 +491,7 @@ describe('siteDetails utils', () => {
 
       mockAuthenticatedGetRequest.mockResolvedValue(mockMongoResponse)
 
-      const result = await loadSiteDetailsFromMongoDB(
+      const result = await getSiteDetails(
         mockRequest,
         exemption,
         mockAuthenticatedGetRequest
@@ -511,10 +511,10 @@ describe('siteDetails utils', () => {
       expect(mockRequest.logger.info).not.toHaveBeenCalled()
     })
 
-    test('loadSiteDetailsFromMongoDB returns empty object when no exemption ID', async () => {
+    test('getSiteDetails returns empty object when no exemption ID', async () => {
       const exemption = {}
 
-      const result = await loadSiteDetailsFromMongoDB(
+      const result = await getSiteDetails(
         mockRequest,
         exemption,
         mockAuthenticatedGetRequest

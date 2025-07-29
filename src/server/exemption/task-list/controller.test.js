@@ -10,13 +10,21 @@ import {
 import { mockExemption } from '~/src/server/test-helpers/mocks.js'
 import { routes } from '~/src/server/common/constants/routes.js'
 import * as authRequests from '~/src/server/common/helpers/authenticated-requests.js'
+import {
+  clearExemptionCache,
+  getExemptionCache,
+  setExemptionCache
+} from '~/src/server/common/helpers/session-cache/utils.js'
+
+jest.mock('~/src/server/common/helpers/session-cache/utils.js')
 
 describe('#taskListController', () => {
   /** @type {Server} */
   let server
-  let getExemptionCacheSpy
 
   const mockExemptionState = { projectName: 'Test Project' }
+  const getExemptionCacheMock = jest.mocked(getExemptionCache)
+  const setExemptionCacheMock = jest.mocked(setExemptionCache)
 
   beforeAll(async () => {
     server = await createServer()
@@ -30,9 +38,7 @@ describe('#taskListController', () => {
       .spyOn(authRequests, 'authenticatedGetRequest')
       .mockResolvedValue({ payload: { value: mockExemption } })
 
-    getExemptionCacheSpy = jest
-      .spyOn(cacheUtils, 'getExemptionCache')
-      .mockReturnValue(mockExemption)
+    getExemptionCacheMock.mockReturnValue(mockExemption)
   })
 
   afterAll(async () => {
@@ -80,6 +86,14 @@ describe('#taskListController', () => {
     expect(authRequests.authenticatedGetRequest).toHaveBeenCalledWith(
       expect.any(Object),
       `/exemption/${mockExemption.id}`
+    )
+
+    const exemptionWithoutTaskList = { ...mockExemption }
+    delete exemptionWithoutTaskList.taskList
+
+    expect(setExemptionCacheMock).toHaveBeenCalledWith(
+      {},
+      exemptionWithoutTaskList
     )
 
     expect(h.view).toHaveBeenCalledWith(TASK_LIST_VIEW_ROUTE, {
@@ -175,12 +189,53 @@ describe('#taskListController', () => {
   test('taskListController handler should throw a 404 if exemption is not found', async () => {
     const h = { view: jest.fn() }
 
-    getExemptionCacheSpy.mockResolvedValueOnce(null)
+    getExemptionCacheMock.mockResolvedValueOnce(null)
 
     await expect(() => taskListController.handler({}, h)).rejects.toThrow(
       `Exemption not found`,
       mockExemption.id
     )
+  })
+})
+
+describe('#taskListSelectExemptionController', () => {
+  /** @type {Server} */
+  let server
+
+  const clearExemptionCacheMock = jest.mocked(clearExemptionCache)
+  const setExemptionCacheMock = jest.mocked(setExemptionCache)
+
+  beforeAll(async () => {
+    server = await createServer()
+    await server.initialize()
+  })
+
+  beforeEach(() => {
+    jest.resetAllMocks()
+
+    jest
+      .spyOn(authRequests, 'authenticatedGetRequest')
+      .mockResolvedValue({ payload: { value: mockExemption } })
+  })
+
+  afterAll(async () => {
+    await server.stop({ timeout: 0 })
+  })
+
+  test('should clear cache and return to task list', async () => {
+    const { statusCode, headers } = await server.inject({
+      method: 'GET',
+      url: '/exemption/task-list/abc123?from=dashboard'
+    })
+
+    expect(clearExemptionCacheMock).toHaveBeenCalled()
+
+    expect(setExemptionCacheMock).toHaveBeenCalledWith(expect.any(Object), {
+      id: 'abc123'
+    })
+
+    expect(statusCode).toBe(302)
+    expect(headers.location).toBe('/exemption/task-list')
   })
 })
 

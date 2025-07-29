@@ -161,23 +161,26 @@ describe('#reviewSiteDetails', () => {
           coordinatesType: 'file'
         }
       )
-      expect(h.view).toHaveBeenCalledWith(FILE_UPLOAD_REVIEW_VIEW_ROUTE, {
-        heading: 'Review site details',
-        pageTitle: 'Review site details',
-        backLink: routes.FILE_UPLOAD,
-        projectName: 'Test Project',
-        fileUploadSummaryData: {
-          method: 'Upload a file with the coordinates of the site',
-          fileType: 'KML',
-          filename: 'test-site.kml',
-          coordinates: [
-            {
-              type: 'Point',
-              coordinates: [51.5074, -0.1278]
-            }
-          ]
-        }
-      })
+      expect(h.view).toHaveBeenCalledWith(
+        FILE_UPLOAD_REVIEW_VIEW_ROUTE,
+        expect.objectContaining({
+          heading: 'Review site details',
+          pageTitle: 'Review site details',
+          backLink: routes.FILE_UPLOAD,
+          projectName: 'Test Project',
+          fileUploadSummaryData: expect.objectContaining({
+            method: 'Upload a file with the coordinates of the site',
+            fileType: 'KML',
+            filename: 'test-site.kml',
+            coordinates: [
+              {
+                type: 'Point',
+                coordinates: [51.5074, -0.1278]
+              }
+            ]
+          })
+        })
+      )
     })
 
     test('reviewSiteDetailsController handler should render file upload template for file upload flow', async () => {
@@ -218,23 +221,26 @@ describe('#reviewSiteDetails', () => {
 
       await reviewSiteDetailsController.handler(mockRequest, h)
 
-      expect(h.view).toHaveBeenCalledWith(FILE_UPLOAD_REVIEW_VIEW_ROUTE, {
-        heading: 'Review site details',
-        pageTitle: 'Review site details',
-        backLink: routes.FILE_UPLOAD,
-        projectName: 'Test Project',
-        fileUploadSummaryData: {
-          method: 'Upload a file with the coordinates of the site',
-          fileType: 'KML',
-          filename: 'test-site.kml',
-          coordinates: [
-            {
-              type: 'Point',
-              coordinates: [51.5074, -0.1278]
-            }
-          ]
-        }
-      })
+      expect(h.view).toHaveBeenCalledWith(
+        FILE_UPLOAD_REVIEW_VIEW_ROUTE,
+        expect.objectContaining({
+          heading: 'Review site details',
+          pageTitle: 'Review site details',
+          backLink: routes.FILE_UPLOAD,
+          projectName: 'Test Project',
+          fileUploadSummaryData: expect.objectContaining({
+            method: 'Upload a file with the coordinates of the site',
+            fileType: 'KML',
+            filename: 'test-site.kml',
+            coordinates: [
+              {
+                type: 'Point',
+                coordinates: [51.5074, -0.1278]
+              }
+            ]
+          })
+        })
+      )
     })
 
     test('reviewSiteDetailsController handler should render with correct context for WGS84', async () => {

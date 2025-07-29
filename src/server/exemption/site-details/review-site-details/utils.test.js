@@ -84,29 +84,31 @@ describe('siteDetails utils', () => {
 
       const result = getFileUploadSummaryData(exemption)
 
-      expect(result).toEqual({
-        method: 'Upload a file with the coordinates of the site',
-        fileType: 'KML',
-        filename: 'test-site.kml',
-        coordinates: [
-          {
-            type: 'Point',
-            coordinates: [51.5074, -0.1278]
-          },
-          {
-            type: 'Polygon',
-            coordinates: [
-              [
-                [0, 0],
-                [1, 0],
-                [1, 1],
-                [0, 1],
-                [0, 0]
+      expect(result).toEqual(
+        expect.objectContaining({
+          method: 'Upload a file with the coordinates of the site',
+          fileType: 'KML',
+          filename: 'test-site.kml',
+          coordinates: [
+            {
+              type: 'Point',
+              coordinates: [51.5074, -0.1278]
+            },
+            {
+              type: 'Polygon',
+              coordinates: [
+                [
+                  [0, 0],
+                  [1, 0],
+                  [1, 1],
+                  [0, 1],
+                  [0, 0]
+                ]
               ]
-            ]
-          }
-        ]
-      })
+            }
+          ]
+        })
+      )
     })
 
     test('getFileUploadSummaryData correctly parses coordinates from geoJSON for Shapefile', () => {
@@ -137,21 +139,23 @@ describe('siteDetails utils', () => {
 
       const result = getFileUploadSummaryData(exemption)
 
-      expect(result).toEqual({
-        method: 'Upload a file with the coordinates of the site',
-        fileType: 'Shapefile',
-        filename: 'test-site.shp',
-        coordinates: [
-          {
-            type: 'LineString',
-            coordinates: [
-              [0, 0],
-              [1, 1],
-              [2, 2]
-            ]
-          }
-        ]
-      })
+      expect(result).toEqual(
+        expect.objectContaining({
+          method: 'Upload a file with the coordinates of the site',
+          fileType: 'Shapefile',
+          filename: 'test-site.shp',
+          coordinates: [
+            {
+              type: 'LineString',
+              coordinates: [
+                [0, 0],
+                [1, 1],
+                [2, 2]
+              ]
+            }
+          ]
+        })
+      )
     })
 
     test('getFileUploadSummaryData handles empty or missing geoJSON', () => {
@@ -167,12 +171,14 @@ describe('siteDetails utils', () => {
 
       const result = getFileUploadSummaryData(exemption)
 
-      expect(result).toEqual({
-        method: 'Upload a file with the coordinates of the site',
-        fileType: 'KML',
-        filename: 'test-site.kml',
-        coordinates: []
-      })
+      expect(result).toEqual(
+        expect.objectContaining({
+          method: 'Upload a file with the coordinates of the site',
+          fileType: 'KML',
+          filename: 'test-site.kml',
+          coordinates: []
+        })
+      )
     })
 
     test('getFileUploadSummaryData handles missing site details', () => {
@@ -686,11 +692,11 @@ describe('siteDetails utils', () => {
 
       expect(mockH.view).toHaveBeenCalledWith(
         'exemption/site-details/review-site-details/file-upload-review',
-        {
+        expect.objectContaining({
           pageTitle: 'Review site details',
           backLink: routes.FILE_UPLOAD,
           projectName: 'Test Project',
-          fileUploadSummaryData: {
+          fileUploadSummaryData: expect.objectContaining({
             method: 'Upload a file with the coordinates of the site',
             fileType: 'KML',
             filename: 'test-site.kml',
@@ -700,8 +706,8 @@ describe('siteDetails utils', () => {
                 coordinates: [51.5074, -0.1278]
               }
             ]
-          }
-        }
+          })
+        })
       )
     })
   })

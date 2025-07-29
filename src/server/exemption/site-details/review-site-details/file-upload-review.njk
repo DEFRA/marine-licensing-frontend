@@ -16,6 +16,13 @@
 {% endblock %}
 
 {% block content %}
+  {#  This javascript variable is only for testing purposes. #}
+  {% if configEnv !== 'production' %}
+    <script>
+      var geoJSON = {{ fileUploadSummaryData.geoJSON | dump | safe }};
+    </script>
+  {% endif %}
+
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-full">
 

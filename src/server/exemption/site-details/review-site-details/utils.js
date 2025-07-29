@@ -2,6 +2,7 @@ import { COORDINATE_SYSTEMS } from '~/src/server/common/constants/exemptions.js'
 import { routes } from '~/src/server/common/constants/routes.js'
 import { getCoordinateSystem } from '~/src/server/common/helpers/session-cache/utils.js'
 import Boom from '@hapi/boom'
+import { config } from '~/src/config/config.js'
 
 const REVIEW_SITE_DETAILS_VIEW_ROUTE =
   'exemption/site-details/review-site-details/index'
@@ -92,7 +93,8 @@ export const getFileUploadSummaryData = (exemption) => {
     method: 'Upload a file with the coordinates of the site',
     fileType: fileTypeText,
     filename: uploadedFile.filename,
-    coordinates
+    coordinates,
+    geoJSON
   }
 }
 
@@ -255,7 +257,8 @@ export const renderFileUploadReview = (
     ...reviewSiteDetailsPageData,
     backLink: getFileUploadBackLink(previousPage),
     projectName: exemption.projectName,
-    fileUploadSummaryData
+    fileUploadSummaryData,
+    configEnv: config.get('env')
   })
 }
 

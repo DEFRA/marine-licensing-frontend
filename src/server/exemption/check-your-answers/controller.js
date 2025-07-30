@@ -7,7 +7,8 @@ import {
 import {
   getCoordinateSystemText,
   getCoordinateDisplayText,
-  getReviewSummaryText
+  getReviewSummaryText,
+  getFileUploadSummaryData
 } from '~/src/server/exemption/site-details/review-site-details/utils.js'
 
 const checkYourAnswersViewContent = {
@@ -36,9 +37,43 @@ export const checkYourAnswersController = {
       throw Boom.notFound(`Exemption data not found for id: ${id}`, { id })
     }
 
-    const siteDetails = exemption.siteDetails
-      ? {
+    let siteDetails = null
+    if (exemption.siteDetails) {
+      const { coordinatesType } = exemption.siteDetails
+
+      if (coordinatesType === 'file') {
+        // Handle file upload site details
+        try {
+          const fileUploadData = getFileUploadSummaryData(exemption)
+          siteDetails = {
+            ...exemption.siteDetails,
+            isFileUpload: true,
+            method: fileUploadData.method,
+            fileType: fileUploadData.fileType,
+            filename: fileUploadData.filename
+          }
+        } catch (error) {
+          request.logger.error('Error getting file upload summary data', {
+            error: error.message
+          })
+          // Fallback to basic site details if file upload data unavailable
+          siteDetails = {
+            ...exemption.siteDetails,
+            isFileUpload: true,
+            method: 'Upload a file with the coordinates of the site',
+            fileType:
+              exemption.siteDetails.fileUploadType === 'kml'
+                ? 'KML'
+                : 'Shapefile',
+            filename:
+              exemption.siteDetails.uploadedFile?.filename || 'Unknown file'
+          }
+        }
+      } else {
+        // Handle manual coordinate site details (existing logic)
+        siteDetails = {
           ...exemption.siteDetails,
+          isFileUpload: false,
           coordinateSystemText: getCoordinateSystemText(
             exemption.siteDetails.coordinateSystem
           ),
@@ -48,7 +83,8 @@ export const checkYourAnswersController = {
           ),
           reviewSummaryText: getReviewSummaryText(exemption.siteDetails)
         }
-      : null
+      }
+    }
 
     return h.view(CHECK_YOUR_ANSWERS_VIEW_ROUTE, {
       ...checkYourAnswersViewContent,

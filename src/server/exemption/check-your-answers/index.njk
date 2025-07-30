@@ -156,6 +156,60 @@
           }
         ]
       }) }}
+    {% if siteDetails.isFileUpload %}
+      {% set siteDetailsRows = [{
+        key: {
+          text: "Method of providing site location"
+        },
+        value: {
+          html: siteDetails.method
+        }
+      }, {
+        key: {
+          text: "File type"
+        },
+        value: {
+          html: siteDetails.fileType
+        }
+      }, {
+        key: {
+          text: "File uploaded"
+        },
+        value: {
+          html: siteDetails.filename
+        }
+      }] %}
+    {% else %}
+      {% set siteDetailsRows = [{
+        key: {
+          text: "Method of providing site location"
+        },
+        value: {
+          html: siteDetails.reviewSummaryText
+        }
+      }, {
+        key: {
+          text: "Coordinates system"
+        },
+        value: {
+          html: siteDetails.coordinateSystemText
+        }
+      }, {
+        key: {
+          text: "Coordinates at centre of site"
+        },
+        value: {
+          html: siteDetails.coordinateDisplayText
+        }
+      }, {
+        key: {
+          text: "Width of circular site"
+        },
+        value: {
+          html: siteDetails.circleWidth + " metres"
+        }
+      }] %}
+    {% endif %}
     {{ govukSummaryList({
         card: {
           title: {
@@ -173,35 +227,7 @@
             id: "site-details-card"
           }
         },
-        rows: [{
-          key: {
-            text: "Method of providing site location"
-          },
-          value: {
-            html: siteDetails.reviewSummaryText
-          }
-        }, {
-          key: {
-            text: "Coordinates system"
-          },
-          value: {
-            html: siteDetails.coordinateSystemText
-          }
-        }, {
-          key: {
-            text: "Coordinates at centre of site"
-          },
-          value: {
-            html: siteDetails.coordinateDisplayText
-          }
-        }, {
-          key: {
-            text: "Width of circular site"
-          },
-          value: {
-            html: siteDetails.circleWidth + " metres"
-          }
-        }]
+        rows: siteDetailsRows
       }) }}
     {{ govukSummaryList({
         card: {

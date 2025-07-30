@@ -30,6 +30,110 @@ const checkYourAnswersViewContent = {
   backLink: '/exemption/task-list'
 }
 
+/**
+ * Validates exemption and fetches data from API
+ * @param {object} request - Hapi request object
+ * @param {object} exemption - Exemption data from cache
+ * @returns {Promise<object>} API response payload
+ */
+const validateAndFetchExemption = async (request, exemption) => {
+  const { id } = exemption
+  if (!id) {
+    request.logger.error(errorMessages.EXEMPTION_NOT_FOUND, { id })
+    throw Boom.notFound(errorMessages.EXEMPTION_NOT_FOUND, { id })
+  }
+
+  const { payload } = await authenticatedGetRequest(
+    request,
+    apiPaths.getExemption(id)
+  )
+
+  if (!payload?.value?.taskList) {
+    request.logger.error(errorMessages.EXEMPTION_DATA_NOT_FOUND, { id })
+    throw Boom.notFound(
+      `${errorMessages.EXEMPTION_DATA_NOT_FOUND} for id: ${id}`,
+      { id }
+    )
+  }
+
+  return payload
+}
+
+/**
+ * Processes file upload site details with error handling
+ * @param {object} exemption - Exemption data
+ * @param {string} id - Exemption ID
+ * @param {object} request - Hapi request object
+ * @returns {object} Processed site details for file upload
+ */
+const processFileUploadSiteDetails = (exemption, id, request) => {
+  try {
+    const fileUploadData = getFileUploadSummaryData(exemption)
+    return {
+      ...exemption.siteDetails,
+      isFileUpload: true,
+      method: fileUploadData.method,
+      fileType: fileUploadData.fileType,
+      filename: fileUploadData.filename
+    }
+  } catch (error) {
+    request.logger.error(errorMessages.FILE_UPLOAD_DATA_ERROR, {
+      error: error.message,
+      exemptionId: id
+    })
+    // Fallback to basic site details if file upload data unavailable
+    return {
+      ...exemption.siteDetails,
+      isFileUpload: true,
+      method: 'Upload a file with the coordinates of the site',
+      fileType:
+        exemption.siteDetails.fileUploadType === 'kml' ? 'KML' : 'Shapefile',
+      filename: exemption.siteDetails.uploadedFile?.filename || 'Unknown file'
+    }
+  }
+}
+
+/**
+ * Processes manual coordinate site details
+ * @param {object} exemption - Exemption data
+ * @returns {object} Processed site details for manual coordinates
+ */
+const processManualSiteDetails = (exemption) => {
+  return {
+    ...exemption.siteDetails,
+    isFileUpload: false,
+    coordinateSystemText: getCoordinateSystemText(
+      exemption.siteDetails.coordinateSystem
+    ),
+    coordinateDisplayText: getCoordinateDisplayText(
+      exemption.siteDetails,
+      exemption.siteDetails.coordinateSystem
+    ),
+    reviewSummaryText: getReviewSummaryText(exemption.siteDetails)
+  }
+}
+
+/**
+ * Processes site details based on coordinates type
+ * @param {object} exemption - Exemption data
+ * @param {string} id - Exemption ID
+ * @param {object} request - Hapi request object
+ * @returns {object|null} Processed site details or null
+ */
+const processSiteDetails = (exemption, id, request) => {
+  if (!exemption.siteDetails) {
+    return null
+  }
+
+  const { coordinatesType } = exemption.siteDetails
+
+  if (coordinatesType === 'file') {
+    return processFileUploadSiteDetails(exemption, id, request)
+  } else {
+    return processManualSiteDetails(exemption)
+  }
+}
+
 export const CHECK_YOUR_ANSWERS_VIEW_ROUTE =
   'exemption/check-your-answers/index'
 
@@ -40,75 +144,10 @@ export const CHECK_YOUR_ANSWERS_VIEW_ROUTE =
 export const checkYourAnswersController = {
   async handler(request, h) {
     const exemption = getExemptionCache(request)
-
     const { id } = exemption
-    if (!id) {
-      request.logger.error(errorMessages.EXEMPTION_NOT_FOUND, { id })
-      throw Boom.notFound(errorMessages.EXEMPTION_NOT_FOUND, { id })
-    }
 
-    const { payload } = await authenticatedGetRequest(
-      request,
-      apiPaths.getExemption(id)
-    )
-
-    if (!payload?.value?.taskList) {
-      request.logger.error(errorMessages.EXEMPTION_DATA_NOT_FOUND, { id })
-      throw Boom.notFound(
-        `${errorMessages.EXEMPTION_DATA_NOT_FOUND} for id: ${id}`,
-        { id }
-      )
-    }
-
-    let siteDetails = null
-    if (exemption.siteDetails) {
-      const { coordinatesType } = exemption.siteDetails
-
-      if (coordinatesType === 'file') {
-        // Handle file upload site details
-        try {
-          const fileUploadData = getFileUploadSummaryData(exemption)
-          siteDetails = {
-            ...exemption.siteDetails,
-            isFileUpload: true,
-            method: fileUploadData.method,
-            fileType: fileUploadData.fileType,
-            filename: fileUploadData.filename
-          }
-        } catch (error) {
-          request.logger.error(errorMessages.FILE_UPLOAD_DATA_ERROR, {
-            error: error.message,
-            exemptionId: id
-          })
-          // Fallback to basic site details if file upload data unavailable
-          siteDetails = {
-            ...exemption.siteDetails,
-            isFileUpload: true,
-            method: 'Upload a file with the coordinates of the site',
-            fileType:
-              exemption.siteDetails.fileUploadType === 'kml'
-                ? 'KML'
-                : 'Shapefile',
-            filename:
-              exemption.siteDetails.uploadedFile?.filename || 'Unknown file'
-          }
-        }
-      } else {
-        // Handle manual coordinate site details (existing logic)
-        siteDetails = {
-          ...exemption.siteDetails,
-          isFileUpload: false,
-          coordinateSystemText: getCoordinateSystemText(
-            exemption.siteDetails.coordinateSystem
-          ),
-          coordinateDisplayText: getCoordinateDisplayText(
-            exemption.siteDetails,
-            exemption.siteDetails.coordinateSystem
-          ),
-          reviewSummaryText: getReviewSummaryText(exemption.siteDetails)
-        }
-      }
-    }
+    await validateAndFetchExemption(request, exemption)
+    const siteDetails = processSiteDetails(exemption, id, request)
 
     return h.view(CHECK_YOUR_ANSWERS_VIEW_ROUTE, {
       ...checkYourAnswersViewContent,
@@ -125,12 +164,10 @@ export const checkYourAnswersController = {
 export const checkYourAnswersSubmitController = {
   async handler(request, h) {
     const exemption = getExemptionCache(request)
-
     const { id } = exemption
-    if (!id) {
-      request.logger.error(errorMessages.EXEMPTION_NOT_FOUND, { id })
-      throw Boom.notFound(errorMessages.EXEMPTION_NOT_FOUND, { id })
-    }
+
+    // Validate exemption exists (reusing validation logic)
+    await validateAndFetchExemption(request, exemption)
 
     try {
       const { payload: response } = await authenticatedPostRequest(

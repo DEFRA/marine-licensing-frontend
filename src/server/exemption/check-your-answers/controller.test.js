@@ -195,7 +195,7 @@ describe('check your answers controller', () => {
           '#activity-dates-card .govuk-summary-list .govuk-summary-list__row:first-child .govuk-summary-list__value'
         )
         .textContent.trim()
-    ).toBe('01/01/2025')
+    ).toBe('1 January 2025')
 
     expect(
       document
@@ -203,7 +203,7 @@ describe('check your answers controller', () => {
           '#activity-dates-card .govuk-summary-list .govuk-summary-list__row:last-child .govuk-summary-list__value'
         )
         .textContent.trim()
-    ).toBe('01/01/2025')
+    ).toBe('1 January 2025')
 
     expect(
       document

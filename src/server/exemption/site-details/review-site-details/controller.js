@@ -1,19 +1,26 @@
 import {
-  getCoordinateSystem,
-  getExemptionCache
+  getExemptionCache,
+  resetExemptionSiteDetails
 } from '~/src/server/common/helpers/session-cache/utils.js'
 import { routes } from '~/src/server/common/constants/routes.js'
 import {
-  getCoordinateSystemText,
-  getReviewSummaryText,
-  getCoordinateDisplayText,
-  getSiteDetailsBackLink
+  getSiteDetails,
+  prepareFileUploadDataForSave,
+  prepareManualCoordinateDataForSave,
+  renderFileUploadReview,
+  renderManualCoordinateReview,
+  handleSubmissionError
 } from './utils.js'
-import { authenticatedPatchRequest } from '~/src/server/common/helpers/authenticated-requests.js'
-import Boom from '@hapi/boom'
+import {
+  authenticatedPatchRequest,
+  authenticatedGetRequest
+} from '~/src/server/common/helpers/authenticated-requests.js'
 
 export const REVIEW_SITE_DETAILS_VIEW_ROUTE =
   'exemption/site-details/review-site-details/index'
+
+export const FILE_UPLOAD_REVIEW_VIEW_ROUTE =
+  'exemption/site-details/review-site-details/file-upload-review'
 
 const reviewSiteDetailsPageData = {
   pageTitle: 'Review site details',
@@ -25,29 +32,31 @@ const reviewSiteDetailsPageData = {
  * @satisfies {Partial<ServerRoute>}
  */
 export const reviewSiteDetailsController = {
-  handler(request, h) {
+  async handler(request, h) {
     const previousPage = request.headers?.referer
-
     const exemption = getExemptionCache(request)
-    const { coordinateSystem } = getCoordinateSystem(request)
+    const siteDetails = await getSiteDetails(
+      request,
+      exemption,
+      authenticatedGetRequest
+    )
 
-    const siteDetails = exemption.siteDetails ?? {}
-
-    const { circleWidth } = siteDetails
-
-    const summaryData = {
-      method: getReviewSummaryText(siteDetails),
-      coordinateSystem: getCoordinateSystemText(coordinateSystem),
-      coordinates: getCoordinateDisplayText(siteDetails, coordinateSystem),
-      width: circleWidth ? `${circleWidth} metres` : ''
-    }
-
-    return h.view(REVIEW_SITE_DETAILS_VIEW_ROUTE, {
-      ...reviewSiteDetailsPageData,
-      backLink: getSiteDetailsBackLink(previousPage),
-      projectName: exemption.projectName,
-      summaryData
-    })
+    return siteDetails.coordinatesType === 'file'
+      ? renderFileUploadReview(
+          h,
+          exemption,
+          siteDetails,
+          previousPage,
+          reviewSiteDetailsPageData
+        )
+      : renderManualCoordinateReview(
+          h,
+          request,
+          exemption,
+          siteDetails,
+          previousPage,
+          reviewSiteDetailsPageData
+        )
   }
 }
 
@@ -58,16 +67,28 @@ export const reviewSiteDetailsController = {
 export const reviewSiteDetailsSubmitController = {
   async handler(request, h) {
     const exemption = getExemptionCache(request)
+    const siteDetails = exemption.siteDetails ?? {}
 
     try {
+      const dataToSave =
+        siteDetails.coordinatesType === 'file'
+          ? prepareFileUploadDataForSave(siteDetails, request)
+          : prepareManualCoordinateDataForSave(exemption, request)
+
       await authenticatedPatchRequest(request, '/exemption/site-details', {
-        siteDetails: exemption.siteDetails,
+        siteDetails: dataToSave,
         id: exemption.id
       })
 
+      resetExemptionSiteDetails(request)
       return h.redirect(routes.TASK_LIST)
-    } catch (e) {
-      throw Boom.badRequest(`Error submitting site review`, e)
+    } catch (error) {
+      throw handleSubmissionError(
+        request,
+        error,
+        exemption.id,
+        siteDetails.coordinatesType
+      )
     }
   }
 }

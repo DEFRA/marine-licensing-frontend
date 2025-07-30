@@ -1,0 +1,90 @@
+{% extends 'layouts/page.njk' %}
+{% from "govuk/components/back-link/macro.njk" import govukBackLink %}
+{% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "cancel-button/macro.njk" import appCancelButton %}
+
+{% block pageTitle %}
+  Review site details - {{ serviceName }}
+{% endblock %}
+
+{% block beforeContent %}
+  {{ govukBackLink({
+    text: "Back",
+    href: backLink
+  }) }}
+{% endblock %}
+
+{% block content %}
+  {#  This javascript variable is only for testing purposes. #}
+  {% if configEnv !== 'production' %}
+    <script>
+      var geoJSON = {{ fileUploadSummaryData.geoJSON | dump | safe }};
+    </script>
+  {% endif %}
+
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-full">
+
+      <span class="govuk-caption-l">{{ projectName }}</span>
+      <h1 class="govuk-heading-l">Review site details</h1>
+
+      {% if fileUploadSummaryData %}
+        {% set rows = [] %}
+        {% set _ = rows.push({
+          key: { text: "Method of providing site location" },
+          value: { text: fileUploadSummaryData.method | default('') }
+        }) %}
+        {% set _ = rows.push({
+          key: { text: "File type" },
+          value: { text: fileUploadSummaryData.fileType | default('') }
+        }) %}
+        {% set _ = rows.push({
+          key: { text: "File uploaded" },
+          value: { text: fileUploadSummaryData.filename | sanitiseFilename }
+        }) %}
+
+        {% if fileUploadSummaryData.coordinates %}
+          {% for coordinate in fileUploadSummaryData.coordinates %}
+            {% set _ = rows.push({
+              key: { text: "Extracted " + (coordinate.type | default('')) },
+              value: { text: (coordinate.coordinates | default([]) | dump) }
+            }) %}
+          {% endfor %}
+        {% endif %}
+
+        {%  set _ = rows.push({
+          key: { text: "Map view" },
+          value: { text: "" }
+        }) %}
+
+        {{ govukSummaryList({
+          card: {
+            title: {
+              text: "Site details"
+            }
+          },
+          rows: rows
+        }) }}
+      {% endif %}
+
+      <form method="POST">
+        <input type="hidden" name="csrfToken" value="{{ csrfToken }}">
+
+        <div class="govuk-button-group">
+          {{ govukButton({
+            text: "Save and continue",
+            attributes: {
+              id: "continue"
+            }
+          }) }}
+
+          {{ appCancelButton({
+            cancelLink: "/exemption/task-list?cancel=site-details"
+          }) }}
+        </div>
+      </form>
+
+    </div>
+  </div>
+{% endblock %}

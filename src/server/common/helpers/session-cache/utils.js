@@ -35,7 +35,7 @@ export const setExemptionCache = (request, value) => {
 export const updateExemptionSiteDetails = (request, key, value) => {
   const existingCache = getExemptionCache(request)
   const existingSiteDetails = existingCache.siteDetails
-  const cacheValue = value || undefined
+  const cacheValue = value ?? null
 
   request.yar.set(EXEMPTION_CACHE_KEY, {
     ...existingCache,
@@ -68,4 +68,26 @@ export const getCoordinateSystem = (request) => {
       : COORDINATE_SYSTEMS.WGS84
 
   return { coordinateSystem }
+}
+
+/**
+ * @param { Request } request
+ * @param { object } updates - Object containing key-value pairs to update in siteDetails
+ */
+export const updateExemptionSiteDetailsBatch = (request, updates) => {
+  const existingCache = getExemptionCache(request)
+  const existingSiteDetails = existingCache.siteDetails || {}
+
+  // Apply all updates in a single operation
+  const updatedSiteDetails = {
+    ...existingSiteDetails,
+    ...updates
+  }
+
+  request.yar.set(EXEMPTION_CACHE_KEY, {
+    ...existingCache,
+    siteDetails: updatedSiteDetails
+  })
+
+  return updatedSiteDetails
 }

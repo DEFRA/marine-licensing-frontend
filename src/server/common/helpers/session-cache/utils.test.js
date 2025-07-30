@@ -3,6 +3,7 @@ import {
   getCoordinateSystem,
   setExemptionCache,
   updateExemptionSiteDetails,
+  updateExemptionSiteDetailsBatch,
   resetExemptionSiteDetails,
   EXEMPTION_CACHE_KEY,
   clearExemptionCache
@@ -168,12 +169,12 @@ describe('#utils', () => {
       )
 
       expect(mockRequest.yar.set).toHaveBeenCalledWith(EXEMPTION_CACHE_KEY, {
-        siteDetails: value
+        siteDetails: { coordinatesType: null }
       })
-      expect(result).toEqual({ coordinatesType: undefined })
+      expect(result).toEqual({ coordinatesType: null })
     })
 
-    test('should handle undefined values and default to an empty object', () => {
+    test('should handle undefined values and convert to null', () => {
       const value = undefined
 
       const result = updateExemptionSiteDetails(
@@ -183,10 +184,98 @@ describe('#utils', () => {
       )
 
       expect(mockRequest.yar.set).toHaveBeenCalledWith(EXEMPTION_CACHE_KEY, {
-        siteDetails: { coordinatesType: undefined }
+        siteDetails: { coordinatesType: null }
       })
 
-      expect(result).toEqual({})
+      expect(result).toEqual({ coordinatesType: null })
+    })
+
+    test('should handle null values correctly', () => {
+      const value = null
+
+      const result = updateExemptionSiteDetails(
+        mockRequest,
+        'coordinatesType',
+        value
+      )
+
+      expect(mockRequest.yar.set).toHaveBeenCalledWith(EXEMPTION_CACHE_KEY, {
+        siteDetails: { coordinatesType: null }
+      })
+
+      expect(result).toEqual({ coordinatesType: null })
+    })
+  })
+
+  describe('updateExemptionSiteDetailsBatch', () => {
+    let mockRequest
+
+    beforeEach(() => {
+      jest.clearAllMocks()
+
+      mockRequest = {
+        yar: {
+          get: jest.fn(),
+          set: jest.fn()
+        }
+      }
+    })
+
+    test('should update multiple siteDetails properties in a single operation', () => {
+      const existingCache = {
+        projectName: 'Test Project',
+        siteDetails: {
+          coordinatesType: 'file',
+          existingProperty: 'keepThis'
+        }
+      }
+
+      mockRequest.yar.get.mockReturnValue(existingCache)
+
+      const updates = {
+        uploadedFile: { filename: 'test.kml', status: 'ready' },
+        extractedCoordinates: [{ lat: 50, lng: -1 }],
+        geoJSON: { type: 'FeatureCollection', features: [] },
+        featureCount: 1
+      }
+
+      const result = updateExemptionSiteDetailsBatch(mockRequest, updates)
+
+      expect(mockRequest.yar.set).toHaveBeenCalledWith(EXEMPTION_CACHE_KEY, {
+        projectName: 'Test Project',
+        siteDetails: {
+          coordinatesType: 'file',
+          existingProperty: 'keepThis',
+          uploadedFile: { filename: 'test.kml', status: 'ready' },
+          extractedCoordinates: [{ lat: 50, lng: -1 }],
+          geoJSON: { type: 'FeatureCollection', features: [] },
+          featureCount: 1
+        }
+      })
+
+      expect(result).toEqual({
+        coordinatesType: 'file',
+        existingProperty: 'keepThis',
+        uploadedFile: { filename: 'test.kml', status: 'ready' },
+        extractedCoordinates: [{ lat: 50, lng: -1 }],
+        geoJSON: { type: 'FeatureCollection', features: [] },
+        featureCount: 1
+      })
+    })
+
+    test('should handle empty siteDetails', () => {
+      const existingCache = { projectName: 'Test Project' }
+      mockRequest.yar.get.mockReturnValue(existingCache)
+
+      const updates = { newProperty: 'newValue' }
+      const result = updateExemptionSiteDetailsBatch(mockRequest, updates)
+
+      expect(mockRequest.yar.set).toHaveBeenCalledWith(EXEMPTION_CACHE_KEY, {
+        projectName: 'Test Project',
+        siteDetails: { newProperty: 'newValue' }
+      })
+
+      expect(result).toEqual({ newProperty: 'newValue' })
     })
   })
 

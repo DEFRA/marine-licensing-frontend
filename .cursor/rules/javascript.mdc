@@ -103,3 +103,6 @@ globs: *.js
 - Bind controller methods when used as route handlers
 - Follow template inheritance patterns from gov-uk-standards
 - Keep templates close to their feature modules
+
+## SonarQube
+- do not assign to undefined; use null

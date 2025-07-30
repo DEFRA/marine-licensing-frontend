@@ -10,6 +10,11 @@
 {% endblock %}
 {% block content %}
   <div class="govuk-grid-row">
+
+    {% if projectName %}
+      <span class="govuk-caption-l">{{ projectName }}</span>
+    {% endif %}
+
     <h2 class="govuk-heading-l" id="check-your-answers-heading">Check your answers before sending your information</h2>
     {{ govukSummaryList({
         card: {

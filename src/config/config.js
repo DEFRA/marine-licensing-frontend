@@ -42,7 +42,7 @@ export const config = convict({
   serviceName: {
     doc: 'Applications Service Name',
     format: String,
-    default: 'Apply for a marine licence'
+    default: 'Get permission for marine work'
   },
   appBaseUrl: {
     doc: 'Base URL for the application (used for CDP upload redirects)',

@@ -11,30 +11,53 @@ import {
   getFileUploadSummaryData
 } from '~/src/server/exemption/site-details/review-site-details/utils.js'
 
+const errorMessages = {
+  EXEMPTION_NOT_FOUND: 'Exemption not found',
+  EXEMPTION_DATA_NOT_FOUND: 'Exemption data not found',
+  SUBMISSION_FAILED: 'Error submitting exemption',
+  FILE_UPLOAD_DATA_ERROR: 'Error getting file upload summary data',
+  UNEXPECTED_API_RESPONSE: 'Unexpected API response format'
+}
+
+const apiPaths = {
+  getExemption: (id) => `/exemption/${id}`,
+  submitExemption: '/exemption/submit'
+}
+
 const checkYourAnswersViewContent = {
   title: 'Check your answers',
   description: 'Please review your answers before submitting your application.',
   backLink: '/exemption/task-list'
 }
 
-const CHECK_YOUR_ANSWERS_VIEW_ROUTE = 'exemption/check-your-answers/index'
+export const CHECK_YOUR_ANSWERS_VIEW_ROUTE =
+  'exemption/check-your-answers/index'
 
+/**
+ * A GDS styled check your answers page controller.
+ * @satisfies {Partial<ServerRoute>}
+ */
 export const checkYourAnswersController = {
   async handler(request, h) {
     const exemption = getExemptionCache(request)
 
     const { id } = exemption
     if (!id) {
-      throw Boom.notFound(`Exemption not found`, { id })
+      request.logger.error(errorMessages.EXEMPTION_NOT_FOUND, { id })
+      throw Boom.notFound(errorMessages.EXEMPTION_NOT_FOUND, { id })
     }
 
     const { payload } = await authenticatedGetRequest(
       request,
-      `/exemption/${id}`
+      apiPaths.getExemption(id)
     )
 
     if (!payload?.value?.taskList) {
-      throw Boom.notFound(`Exemption data not found for id: ${id}`, { id })
+      request.logger.error(errorMessages.EXEMPTION_DATA_NOT_FOUND, { id })
+      throw Boom.notFound(
+        `${errorMessages.EXEMPTION_DATA_NOT_FOUND} for id: ${id}`,
+        { id }
+      )
     }
 
     let siteDetails = null
@@ -53,8 +76,9 @@ export const checkYourAnswersController = {
             filename: fileUploadData.filename
           }
         } catch (error) {
-          request.logger.error('Error getting file upload summary data', {
-            error: error.message
+          request.logger.error(errorMessages.FILE_UPLOAD_DATA_ERROR, {
+            error: error.message,
+            exemptionId: id
           })
           // Fallback to basic site details if file upload data unavailable
           siteDetails = {
@@ -94,19 +118,24 @@ export const checkYourAnswersController = {
   }
 }
 
+/**
+ * A GDS styled check your answers submission controller.
+ * @satisfies {Partial<ServerRoute>}
+ */
 export const checkYourAnswersSubmitController = {
   async handler(request, h) {
     const exemption = getExemptionCache(request)
 
     const { id } = exemption
     if (!id) {
-      throw Boom.notFound(`Exemption not found`, { id })
+      request.logger.error(errorMessages.EXEMPTION_NOT_FOUND, { id })
+      throw Boom.notFound(errorMessages.EXEMPTION_NOT_FOUND, { id })
     }
 
     try {
       const { payload: response } = await authenticatedPostRequest(
         request,
-        '/exemption/submit',
+        apiPaths.submitExemption,
         { id }
       )
 
@@ -117,9 +146,13 @@ export const checkYourAnswersSubmitController = {
         )
       }
 
-      throw new Error('Unexpected API response format')
+      throw new Error(errorMessages.UNEXPECTED_API_RESPONSE)
     } catch (error) {
-      throw Boom.badRequest('Error submitting exemption', error)
+      request.logger.error(errorMessages.SUBMISSION_FAILED, {
+        error: error.message,
+        exemptionId: id
+      })
+      throw Boom.badRequest(errorMessages.SUBMISSION_FAILED, error)
     }
   }
 }

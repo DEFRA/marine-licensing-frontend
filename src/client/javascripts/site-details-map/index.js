@@ -37,8 +37,9 @@ export class SiteDetailsMap extends Component {
         { default: Point },
         { default: CircleGeom },
         { Style, Fill, Stroke, Circle },
-        { fromLonLat },
-        { default: GeoJSON }
+        { fromLonLat, toLonLat },
+        { default: GeoJSON },
+        { default: Polygon }
       ] = await Promise.all([
         import('ol/Map.js'),
         import('ol/View.js'),
@@ -51,7 +52,8 @@ export class SiteDetailsMap extends Component {
         import('ol/geom/Circle.js'),
         import('ol/style.js'),
         import('ol/proj.js'),
-        import('ol/format/GeoJSON.js')
+        import('ol/format/GeoJSON.js'),
+        import('ol/geom/Polygon.js')
       ])
 
       // Store modules for later use
@@ -65,11 +67,13 @@ export class SiteDetailsMap extends Component {
         Feature,
         Point,
         CircleGeom,
+        Polygon,
         Style,
         Fill,
         Stroke,
         Circle,
         fromLonLat,
+        toLonLat,
         GeoJSON
       }
 
@@ -212,7 +216,13 @@ export class SiteDetailsMap extends Component {
     }
 
     this.map.getView().setCenter(mapCoordinates)
-    this.map.getView().setZoom(14)
+
+    // Use different zoom levels based on whether it's a circle or point
+    if (siteDetails.circleWidth) {
+      this.map.getView().setZoom(14) // Closer zoom for circles so 50m is visible
+    } else {
+      this.map.getView().setZoom(14) // Standard zoom for points
+    }
   }
 
   displayPointSite(coordinates) {
@@ -224,16 +234,64 @@ export class SiteDetailsMap extends Component {
   }
 
   displayCircularSite(centerCoordinates, radiusInMeters) {
-    const { Feature, Point, CircleGeom } = this.olModules
-    const circleFeature = new Feature({
-      geometry: new CircleGeom(centerCoordinates, radiusInMeters)
-    })
-    this.vectorSource.addFeature(circleFeature)
+    const { Feature, Polygon, fromLonLat, toLonLat } = this.olModules
 
-    const pointFeature = new Feature({
-      geometry: new Point(centerCoordinates)
+    // Convert center coordinates back to WGS84 to work in geographic coordinates
+    const centerWGS84 = toLonLat(centerCoordinates)
+
+    // Create circle points in WGS84 (degrees) then convert to Web Mercator
+    const circleCoords = this.createGeographicCircle(
+      centerWGS84,
+      radiusInMeters
+    )
+
+    // Convert all points to Web Mercator
+    const projectedCoords = circleCoords.map((coord) => fromLonLat(coord))
+
+    const circlePolygon = new Polygon([projectedCoords])
+    const circleFeature = new Feature({
+      geometry: circlePolygon
     })
-    this.vectorSource.addFeature(pointFeature)
+
+    this.vectorSource.addFeature(circleFeature)
+  }
+
+  createGeographicCircle(centerLonLat, radiusInMeters, sides = 64) {
+    const [centerLon, centerLat] = centerLonLat
+    const coordinates = []
+
+    // Earth's radius in meters
+    const earthRadius = 6378137
+
+    // Convert radius to angular distance
+    const angularDistance = radiusInMeters / earthRadius
+
+    // Generate circle points
+    for (let i = 0; i <= sides; i++) {
+      const bearing = (i * 2 * Math.PI) / sides
+
+      // Calculate point on circle using spherical geometry
+      const lat = Math.asin(
+        Math.sin((centerLat * Math.PI) / 180) * Math.cos(angularDistance) +
+          Math.cos((centerLat * Math.PI) / 180) *
+            Math.sin(angularDistance) *
+            Math.cos(bearing)
+      )
+
+      const lon =
+        (centerLon * Math.PI) / 180 +
+        Math.atan2(
+          Math.sin(bearing) *
+            Math.sin(angularDistance) *
+            Math.cos((centerLat * Math.PI) / 180),
+          Math.cos(angularDistance) -
+            Math.sin((centerLat * Math.PI) / 180) * Math.sin(lat)
+        )
+
+      coordinates.push([(lon * 180) / Math.PI, (lat * 180) / Math.PI])
+    }
+
+    return coordinates
   }
 
   convertOSGB36ToWebMercator(eastings, northings) {

@@ -76,8 +76,12 @@
 // Simple separate map component
 .app-map-component {
   margin-top: 30px;
+  margin-bottom: 30px; // Add space before buttons
 
   h2 {
     margin-bottom: 15px;
+    font-size: 18px; // Match summary list card title
+    font-weight: bold;
+    color: #0b0c0c;
   }
 }

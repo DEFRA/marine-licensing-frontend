@@ -94,7 +94,10 @@ describe('#reviewSiteDetails', () => {
           coordinateSystem: '',
           coordinates: '',
           width: ''
-        }
+        },
+        siteDetailsData: JSON.stringify({
+          coordinatesType: 'coordinates'
+        })
       })
     })
 
@@ -268,7 +271,17 @@ describe('#reviewSiteDetails', () => {
             'WGS84 (World Geodetic System 1984)\nLatitude and longitude',
           coordinates: `${mockCoordinates[COORDINATE_SYSTEMS.WGS84].latitude}, ${mockCoordinates[COORDINATE_SYSTEMS.WGS84].longitude}`,
           width: '100 metres'
-        }
+        },
+        siteDetailsData: JSON.stringify({
+          coordinatesType: 'coordinates',
+          coordinateSystem: 'wgs84',
+          coordinatesEntry: 'single',
+          coordinates: {
+            latitude: '51.489676',
+            longitude: '-0.231530'
+          },
+          circleWidth: '100'
+        })
       })
     })
 
@@ -308,7 +321,17 @@ describe('#reviewSiteDetails', () => {
           coordinateSystem: 'OSGB36 (National Grid)\nEastings and Northings',
           coordinates: `${mockCoordinates[COORDINATE_SYSTEMS.OSGB36].eastings}, ${mockCoordinates[COORDINATE_SYSTEMS.OSGB36].northings}`,
           width: '100 metres'
-        }
+        },
+        siteDetailsData: JSON.stringify({
+          coordinatesType: 'coordinates',
+          coordinateSystem: 'osgb36',
+          coordinatesEntry: 'single',
+          coordinates: {
+            eastings: '425053',
+            northings: '564180'
+          },
+          circleWidth: '100'
+        })
       })
     })
 

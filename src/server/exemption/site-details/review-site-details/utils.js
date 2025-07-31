@@ -1,8 +1,8 @@
+import Boom from '@hapi/boom'
+import { config } from '~/src/config/config.js'
 import { COORDINATE_SYSTEMS } from '~/src/server/common/constants/exemptions.js'
 import { routes } from '~/src/server/common/constants/routes.js'
 import { getCoordinateSystem } from '~/src/server/common/helpers/session-cache/utils.js'
-import Boom from '@hapi/boom'
-import { config } from '~/src/config/config.js'
 
 const REVIEW_SITE_DETAILS_VIEW_ROUTE =
   'exemption/site-details/review-site-details/index'
@@ -253,11 +253,20 @@ export const renderFileUploadReview = (
     siteDetails
   })
 
+  // Prepare site details data for map if needed
+  const siteDetailsData = JSON.stringify({
+    coordinatesType: 'file',
+    geoJSON: siteDetails.geoJSON,
+    fileUploadType: siteDetails.fileUploadType,
+    uploadedFile: siteDetails.uploadedFile
+  })
+
   return h.view(FILE_UPLOAD_REVIEW_VIEW_ROUTE, {
     ...reviewSiteDetailsPageData,
     backLink: getFileUploadBackLink(previousPage),
     projectName: exemption.projectName,
     fileUploadSummaryData,
+    siteDetailsData,
     configEnv: config.get('env')
   })
 }
@@ -286,11 +295,21 @@ export const renderManualCoordinateReview = (
     coordinateSystem
   )
 
+  // Prepare site details data for map if needed
+  const siteDetailsData = JSON.stringify({
+    coordinatesType: 'coordinates',
+    coordinateSystem,
+    coordinatesEntry: siteDetails.coordinatesEntry,
+    coordinates: siteDetails.coordinates,
+    circleWidth: siteDetails.circleWidth
+  })
+
   return h.view(REVIEW_SITE_DETAILS_VIEW_ROUTE, {
     ...reviewSiteDetailsPageData,
     backLink: getSiteDetailsBackLink(previousPage),
     projectName: exemption.projectName,
-    summaryData
+    summaryData,
+    siteDetailsData
   })
 }
 

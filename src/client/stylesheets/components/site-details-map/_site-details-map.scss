@@ -1,0 +1,68 @@
+.app-site-details-map {
+  height: 300px;
+  width: 100%;
+  max-width: 100%;
+  border: 1px solid #b1b4b6;
+  margin-bottom: 10px;
+  overflow: hidden;
+  box-sizing: border-box;
+
+  .ol-viewport {
+    border-radius: 0;
+  }
+
+  // Loading state
+  &__loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    background-color: #f3f2f1;
+    color: #0b0c0c;
+    font-family: 'GDS Transport', arial, sans-serif;
+    font-size: 19px;
+  }
+
+  // Error state
+  &__error {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    background-color: #f3f2f1;
+    color: #d4351c;
+    font-family: 'GDS Transport', arial, sans-serif;
+    font-size: 19px;
+  }
+
+  // OpenLayers control styling to match GOV.UK
+  .ol-control {
+    button {
+      background-color: #ffffff;
+      border: 2px solid #b1b4b6;
+      color: #0b0c0c;
+      font-family: 'GDS Transport', arial, sans-serif;
+      font-size: 16px;
+
+      &:hover {
+        background-color: #f3f2f1;
+      }
+
+      &:focus {
+        outline: 3px solid #ffdd00;
+        outline-offset: 0;
+      }
+    }
+  }
+
+  // Attribution styling
+  .ol-attribution {
+    background-color: rgba(255, 255, 255, 0.8);
+    font-family: 'GDS Transport', arial, sans-serif;
+    font-size: 14px;
+
+    ul {
+      color: #0b0c0c;
+    }
+  }
+}

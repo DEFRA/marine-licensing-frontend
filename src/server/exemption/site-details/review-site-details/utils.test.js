@@ -766,7 +766,17 @@ describe('siteDetails utils', () => {
               'WGS84 (World Geodetic System 1984)\nLatitude and longitude',
             coordinates: '51.5074, -0.1278',
             width: '100 metres'
-          }
+          },
+          siteDetailsData: JSON.stringify({
+            coordinatesType: 'coordinates',
+            coordinateSystem: 'wgs84',
+            coordinatesEntry: 'single',
+            coordinates: {
+              latitude: '51.5074',
+              longitude: '-0.1278'
+            },
+            circleWidth: '100'
+          })
         }
       )
     })

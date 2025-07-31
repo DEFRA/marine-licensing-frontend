@@ -19,6 +19,8 @@
             <span class="govuk-caption-l">{{ projectName }}</span>
             <h1 class="govuk-heading-l">{{ heading }}</h1>
 
+
+
             {{ govukSummaryList({
                 card: {
                     title: {
@@ -57,9 +59,22 @@
                         value: {
                             text: summaryData.width
                         }
+                    },
+                    {
+                        key: {
+                            text: "Map view"
+                        },
+                        value: {
+                            html: '<div class="app-site-details-map" data-module="site-details-map"></div><p class="govuk-body-s govuk-!-margin-top-2 govuk-!-margin-bottom-0">Map data © OpenStreetMap contributors</p>'
+                        }
                     }
                 ]
             }) }}
+
+            <!-- Site Details Data for JavaScript -->
+            <script type="application/json" id="site-details-data">
+                {{ siteDetailsData | safe }}
+            </script>
             
             <form method="POST">
                 <input type="hidden" name="csrfToken" value="{{csrfToken}}">

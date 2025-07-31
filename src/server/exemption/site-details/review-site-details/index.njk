@@ -57,17 +57,15 @@
                         value: {
                             text: summaryData.width
                         }
-                    },
-                    {
-                        key: {
-                            text: "Map view"
-                        },
-                        value: {
-                            html: '<div class="app-site-details-map" data-module="site-details-map"></div>'
-                        }
                     }
                 ]
             }) }}
+
+            <!-- Separate map section that integrates visually -->
+            <div class="app-map-section">
+                <h3 class="govuk-heading-s app-map-section__heading">Map view</h3>
+                <div class="app-site-details-map" data-module="site-details-map"></div>
+            </div>
 
             <!-- Site Details Data for JavaScript -->
             <script type="application/json" id="site-details-data">

@@ -3,9 +3,16 @@
   width: 100%;
   max-width: 100%;
   border: 1px solid #b1b4b6;
-  margin-bottom: 10px;
+  margin: 0; // Remove default margin when in section
   overflow: hidden;
   box-sizing: border-box;
+
+  // When inside the map section
+  .app-map-section & {
+    border: 0; // No border needed - section provides it
+    margin: 20px;
+    height: 300px; // Standard map height
+  }
 
   .ol-viewport {
     border-radius: 0;
@@ -64,5 +71,23 @@
     ul {
       color: #0b0c0c;
     }
+  }
+}
+
+// Clean map section that integrates visually with the summary list
+.app-map-section {
+  background-color: #f3f2f1;
+  border: 1px solid #b1b4b6;
+  border-top: 0; // Connect seamlessly with summary list above
+  margin: 0;
+  padding: 0;
+
+  &__heading {
+    background-color: #ffffff;
+    border-bottom: 1px solid #b1b4b6;
+    margin: 0;
+    padding: 15px 20px;
+    font-weight: bold;
+    color: #0b0c0c;
   }
 }

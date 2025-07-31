@@ -53,10 +53,9 @@
           {% endfor %}
         {% endif %}
 
-        {%  set _ = rows.push({
-          key: { text: "Map view" },
-          value: { html: '<div class="app-site-details-map" data-module="site-details-map"></div>' }
-        }) %}
+
+
+
 
         {{ govukSummaryList({
           card: {
@@ -66,6 +65,12 @@
           },
           rows: rows
         }) }}
+
+        <!-- Separate map section that integrates visually -->
+        <div class="app-map-section">
+          <h3 class="govuk-heading-s app-map-section__heading">Map view</h3>
+          <div class="app-site-details-map" data-module="site-details-map"></div>
+        </div>
       {% endif %}
 
       <!-- Site Details Data for JavaScript -->

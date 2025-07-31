@@ -10,6 +10,7 @@ import {
   getReviewSummaryText,
   getFileUploadSummaryData
 } from '~/src/server/exemption/site-details/review-site-details/utils.js'
+import { routes } from '~/src/server/common/constants/routes.js'
 
 const errorMessages = {
   EXEMPTION_NOT_FOUND: 'Exemption not found',
@@ -27,7 +28,7 @@ const apiPaths = {
 const checkYourAnswersViewContent = {
   title: 'Check your answers',
   description: 'Please review your answers before submitting your application.',
-  backLink: '/exemption/task-list'
+  backLink: routes.TASK_LIST
 }
 
 /**

@@ -3,6 +3,7 @@ import * as cacheUtils from '~/src/server/common/helpers/session-cache/utils.js'
 import { createServer } from '~/src/server/index.js'
 import { mockExemption } from '~/src/server/test-helpers/mocks.js'
 import * as authRequests from '~/src/server/common/helpers/authenticated-requests.js'
+import * as reviewUtils from '~/src/server/exemption/site-details/review-site-details/utils.js'
 
 describe('check your answers controller', () => {
   let server
@@ -677,6 +678,69 @@ describe('check your answers controller', () => {
           )
           .textContent.trim()
       ).toBe('Unknown file')
+    })
+
+    test('Should display KML fallback when getFileUploadSummaryData fails for KML file', async () => {
+      // Given: Mock getFileUploadSummaryData to throw an error to trigger fallback logic
+      jest
+        .spyOn(reviewUtils, 'getFileUploadSummaryData')
+        .mockImplementation(() => {
+          throw new Error('Mocked error for testing fallback')
+        })
+
+      const kmlExemptionWithError = {
+        ...mockExemption,
+        siteDetails: {
+          coordinatesType: 'file',
+          fileUploadType: 'kml', // KML type to test the KML branch in fallback
+          uploadedFile: {
+            filename: 'test.kml'
+          }
+        }
+      }
+
+      getExemptionCacheSpy.mockReturnValueOnce(kmlExemptionWithError)
+
+      // When: User views the check your answers page
+      const { result, statusCode } = await server.inject({
+        method: 'GET',
+        url: '/exemption/check-your-answers'
+      })
+
+      // Then: Response is successful with KML fallback display
+      expect(statusCode).toBe(200)
+
+      const { document } = new JSDOM(result).window
+
+      // Verify fallback method text is displayed
+      expect(
+        document
+          .querySelector(
+            '#site-details-card .govuk-summary-list .govuk-summary-list__row:first-child .govuk-summary-list__value'
+          )
+          .textContent.trim()
+      ).toBe('Upload a file with the coordinates of the site')
+
+      // Verify file type shows KML
+      expect(
+        document
+          .querySelector(
+            '#site-details-card .govuk-summary-list .govuk-summary-list__row:nth-child(2) .govuk-summary-list__value'
+          )
+          .textContent.trim()
+      ).toBe('KML')
+
+      // Verify filename is displayed
+      expect(
+        document
+          .querySelector(
+            '#site-details-card .govuk-summary-list .govuk-summary-list__row:nth-child(3) .govuk-summary-list__value'
+          )
+          .textContent.trim()
+      ).toBe('test.kml')
+
+      // Restore the mock
+      reviewUtils.getFileUploadSummaryData.mockRestore()
     })
 
     test('Should verify site details card structure for file uploads', async () => {

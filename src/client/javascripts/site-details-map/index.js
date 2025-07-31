@@ -83,14 +83,17 @@ export class SiteDetailsMap extends Component {
         target: this.$root,
         layers: [
           new TileLayer({
-            source: new OSM()
+            source: new OSM({
+              attributions: []
+            })
           }),
           this.vectorLayer
         ],
         view: new View({
           center: fromLonLat(this.options.center),
           zoom: this.options.zoom
-        })
+        }),
+        controls: []
       })
 
       this.geoJSONFormat = new GeoJSON()

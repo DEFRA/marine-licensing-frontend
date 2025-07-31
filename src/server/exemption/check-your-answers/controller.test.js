@@ -5,6 +5,144 @@ import { mockExemption } from '~/src/server/test-helpers/mocks.js'
 import * as authRequests from '~/src/server/common/helpers/authenticated-requests.js'
 import * as reviewUtils from '~/src/server/exemption/site-details/review-site-details/utils.js'
 
+// Test Constants
+const CSS_SELECTORS = {
+  checkYourAnswersHeading: '#check-your-answers-heading',
+  backLink: '.govuk-back-link',
+  form: 'form',
+  submitButton: '#confirm-and-send',
+  cards: {
+    projectDetails: '#project-details-card',
+    activityDates: '#activity-dates-card',
+    activityDetails: '#activity-details-card',
+    siteDetails: '#site-details-card',
+    publicRegister: '#public-register-card'
+  },
+  summaryList: {
+    key: '.govuk-summary-list__key',
+    value: '.govuk-summary-list__value',
+    row: '.govuk-summary-list__row'
+  },
+  card: {
+    title: '.govuk-summary-card__title',
+    actions: '.govuk-summary-card__actions a'
+  }
+}
+
+const EXPECTED_TEXT = {
+  headings: {
+    checkYourAnswers: 'Check your answers before sending your information'
+  },
+  backLink: 'Go back to your project',
+  cardTitles: {
+    siteDetails: 'Site details'
+  },
+  rowKeys: {
+    projectName: 'Project name',
+    methodOfProviding: 'Method of providing site location',
+    fileType: 'File type',
+    fileUploaded: 'File uploaded'
+  },
+  coordinateSystems: {
+    wgs84: 'WGS84 (World Geodetic System 1984) Latitude and longitude',
+    osgb36: 'OSGB36 (National Grid) Eastings and Northings'
+  },
+  siteDetailsMethods: {
+    fileUpload: 'Upload a file with the coordinates of the site',
+    manualCircle:
+      'Manually enter one set of coordinates and a width to create a circular site'
+  },
+  fileTypes: {
+    kml: 'KML',
+    shapefile: 'Shapefile'
+  },
+  fallbacks: {
+    unknownFile: 'Unknown file'
+  }
+}
+
+// DOM Helper Functions
+const getCardValue = (document, cardSelector, rowIndex) => {
+  return document
+    .querySelector(
+      `${cardSelector} ${CSS_SELECTORS.summaryList.row}:nth-child(${rowIndex}) ${CSS_SELECTORS.summaryList.value}`
+    )
+    ?.textContent.trim()
+}
+
+const getFirstRowValue = (document, cardSelector) =>
+  getCardValue(document, cardSelector, 1)
+const getSecondRowValue = (document, cardSelector) =>
+  getCardValue(document, cardSelector, 2)
+const getThirdRowValue = (document, cardSelector) =>
+  getCardValue(document, cardSelector, 3)
+const getFourthRowValue = (document, cardSelector) =>
+  getCardValue(document, cardSelector, 4)
+
+const getCardKey = (document, cardSelector, rowIndex) => {
+  return document
+    .querySelector(
+      `${cardSelector} ${CSS_SELECTORS.summaryList.row}:nth-child(${rowIndex}) ${CSS_SELECTORS.summaryList.key}`
+    )
+    ?.textContent.trim()
+}
+
+const getSummaryRowCount = (document, cardSelector) => {
+  return document.querySelectorAll(
+    `${cardSelector} ${CSS_SELECTORS.summaryList.row}`
+  ).length
+}
+
+const normalizeWhitespace = (text) => text.replace(/\s+/g, ' ')
+
+// Test Data Builders
+const createExemptionWithSiteDetails = (siteDetailsOverrides = {}) => ({
+  ...mockExemption,
+  siteDetails: {
+    ...mockExemption.siteDetails,
+    ...siteDetailsOverrides
+  }
+})
+
+const createFileUploadExemption = (
+  fileType = 'kml',
+  filename = 'test.kml',
+  additionalOverrides = {}
+) =>
+  createExemptionWithSiteDetails({
+    coordinatesType: 'file',
+    fileUploadType: fileType,
+    uploadedFile: { filename },
+    geoJSON: {
+      type: 'FeatureCollection',
+      features: [
+        {
+          type: 'Feature',
+          geometry: {
+            type: 'Point',
+            coordinates: [51.5074, -0.1278]
+          }
+        }
+      ]
+    },
+    ...additionalOverrides
+  })
+
+const createWgs84Exemption = (
+  latitude = '55.019889',
+  longitude = '-1.399500'
+) =>
+  createExemptionWithSiteDetails({
+    coordinateSystem: 'wgs84',
+    coordinates: { latitude, longitude }
+  })
+
+const createOsgb36Exemption = (eastings = '425053', northings = '564180') =>
+  createExemptionWithSiteDetails({
+    coordinateSystem: 'osgb36',
+    coordinates: { eastings, northings }
+  })
+
 describe('check your answers controller', () => {
   let server
   let getExemptionCacheSpy
@@ -161,215 +299,137 @@ describe('check your answers controller', () => {
   })
 
   test('Should render a complete check your answers page', async () => {
+    // Given: Default exemption data
+    // When: User views the check your answers page
     const { result, statusCode } = await server.inject({
       method: 'GET',
       url: '/exemption/check-your-answers'
     })
+
+    // Then: Page renders successfully with all expected content
     expect(statusCode).toBe(200)
-
     const { document } = new JSDOM(result).window
-    expect(
-      document.querySelector('#check-your-answers-heading').textContent.trim()
-    ).toBe('Check your answers before sending your information')
 
-    expect(document.querySelector('.govuk-back-link').textContent.trim()).toBe(
-      'Go back to your project'
+    // Verify page structure
+    expect(
+      document
+        .querySelector(CSS_SELECTORS.checkYourAnswersHeading)
+        .textContent.trim()
+    ).toBe(EXPECTED_TEXT.headings.checkYourAnswers)
+    expect(
+      document.querySelector(CSS_SELECTORS.backLink).textContent.trim()
+    ).toBe(EXPECTED_TEXT.backLink)
+
+    // Verify project details card
+    expect(getCardKey(document, CSS_SELECTORS.cards.projectDetails, 1)).toBe(
+      EXPECTED_TEXT.rowKeys.projectName
+    )
+    expect(getFirstRowValue(document, CSS_SELECTORS.cards.projectDetails)).toBe(
+      mockExemption.projectName
     )
 
-    expect(
-      document
-        .querySelector('#project-details-card .govuk-summary-list__key')
-        .textContent.trim()
-    ).toBe('Project name')
-
-    expect(
-      document
-        .querySelector(
-          '#project-details-card .govuk-summary-list .govuk-summary-list__value'
-        )
-        .textContent.trim()
-    ).toBe(mockExemption.projectName)
-
+    // Verify activity dates card
+    expect(getFirstRowValue(document, CSS_SELECTORS.cards.activityDates)).toBe(
+      '1 January 2025'
+    )
     expect(
       document
         .querySelector(
-          '#activity-dates-card .govuk-summary-list .govuk-summary-list__row:first-child .govuk-summary-list__value'
+          `${CSS_SELECTORS.cards.activityDates} ${CSS_SELECTORS.summaryList.row}:last-child ${CSS_SELECTORS.summaryList.value}`
         )
         .textContent.trim()
     ).toBe('1 January 2025')
 
+    // Verify activity details card
     expect(
-      document
-        .querySelector(
-          '#activity-dates-card .govuk-summary-list .govuk-summary-list__row:last-child .govuk-summary-list__value'
-        )
-        .textContent.trim()
-    ).toBe('1 January 2025')
-
-    expect(
-      document
-        .querySelector(
-          '#activity-details-card .govuk-summary-list .govuk-summary-list__row:first-child .govuk-summary-list__value'
-        )
-        .textContent.trim()
+      getFirstRowValue(document, CSS_SELECTORS.cards.activityDetails)
     ).toBe(mockExemption.activityDescription)
 
+    // Verify site details card (manual coordinates)
+    expect(getFirstRowValue(document, CSS_SELECTORS.cards.siteDetails)).toBe(
+      EXPECTED_TEXT.siteDetailsMethods.manualCircle
+    )
     expect(
-      document
-        .querySelector(
-          '#site-details-card .govuk-summary-list .govuk-summary-list__row:first-child .govuk-summary-list__value'
-        )
-        .textContent.trim()
-    ).toBe(
-      'Manually enter one set of coordinates and a width to create a circular site'
+      normalizeWhitespace(
+        getSecondRowValue(document, CSS_SELECTORS.cards.siteDetails)
+      )
+    ).toBe(EXPECTED_TEXT.coordinateSystems.wgs84)
+    expect(getThirdRowValue(document, CSS_SELECTORS.cards.siteDetails)).toBe(
+      `${mockExemption.siteDetails.coordinates.latitude}, ${mockExemption.siteDetails.coordinates.longitude}`
+    )
+    expect(getFourthRowValue(document, CSS_SELECTORS.cards.siteDetails)).toBe(
+      `${mockExemption.siteDetails.circleWidth} metres`
     )
 
+    // Verify public register card
     expect(
-      document
-        .querySelector(
-          '#site-details-card .govuk-summary-list .govuk-summary-list__row:nth-child(2) .govuk-summary-list__value'
-        )
-        .textContent.trim()
-        .replace(/\s+/g, ' ')
-    ).toBe('WGS84 (World Geodetic System 1984) Latitude and longitude')
-
-    expect(
-      document
-        .querySelector(
-          '#site-details-card .govuk-summary-list .govuk-summary-list__row:nth-child(3) .govuk-summary-list__value'
-        )
-        .textContent.trim()
-    ).toBe(
-      mockExemption.siteDetails.coordinates.latitude +
-        ', ' +
-        mockExemption.siteDetails.coordinates.longitude
-    )
-
-    expect(
-      document
-        .querySelector(
-          '#site-details-card .govuk-summary-list .govuk-summary-list__row:nth-child(4) .govuk-summary-list__value'
-        )
-        .textContent.trim()
-    ).toBe(mockExemption.siteDetails.circleWidth + ' metres')
-
-    expect(
-      document
-        .querySelector(
-          '#public-register-card .govuk-summary-list .govuk-summary-list__row:first-child .govuk-summary-list__value'
-        )
-        .textContent.trim()
-        .toUpperCase()
+      getFirstRowValue(
+        document,
+        CSS_SELECTORS.cards.publicRegister
+      ).toUpperCase()
     ).toBe(mockExemption.publicRegister.consent.toUpperCase())
 
-    // Verify the form is present and configured correctly
-    const form = document.querySelector('form')
+    // Verify form structure
+    const form = document.querySelector(CSS_SELECTORS.form)
     expect(form).toBeTruthy()
     expect(form.getAttribute('method')).toBe('post')
 
-    // Verify the submit button is inside the form
-    const submitButton = document.querySelector('#confirm-and-send')
+    const submitButton = document.querySelector(CSS_SELECTORS.submitButton)
     expect(submitButton).toBeTruthy()
     expect(form.contains(submitButton)).toBe(true)
   })
 
   test('Should display WGS84 coordinates correctly', async () => {
-    const wgs84Exemption = {
-      ...mockExemption,
-      siteDetails: {
-        ...mockExemption.siteDetails,
-        coordinateSystem: 'wgs84',
-        coordinates: {
-          latitude: '55.019889',
-          longitude: '-1.399500'
-        }
-      }
-    }
-
+    // Given: An exemption with WGS84 coordinates
+    const wgs84Exemption = createWgs84Exemption('55.019889', '-1.399500')
     getExemptionCacheSpy.mockReturnValueOnce(wgs84Exemption)
 
+    // When: User views the check your answers page
     const { result, statusCode } = await server.inject({
       method: 'GET',
       url: '/exemption/check-your-answers'
     })
-    expect(statusCode).toBe(200)
 
+    // Then: WGS84 coordinates are displayed correctly
+    expect(statusCode).toBe(200)
     const { document } = new JSDOM(result).window
-    expect(
-      document
-        .querySelector(
-          '#site-details-card .govuk-summary-list .govuk-summary-list__row:nth-child(3) .govuk-summary-list__value'
-        )
-        .textContent.trim()
-    ).toBe('55.019889, -1.399500')
+    expect(getThirdRowValue(document, CSS_SELECTORS.cards.siteDetails)).toBe(
+      '55.019889, -1.399500'
+    )
   })
 
   test('Should display OSGB36 coordinates correctly', async () => {
-    const osgb36Exemption = {
-      ...mockExemption,
-      siteDetails: {
-        ...mockExemption.siteDetails,
-        coordinateSystem: 'osgb36',
-        coordinates: {
-          eastings: '425053',
-          northings: '564180'
-        }
-      }
-    }
-
+    // Given: An exemption with OSGB36 coordinates
+    const osgb36Exemption = createOsgb36Exemption('425053', '564180')
     getExemptionCacheSpy.mockReturnValueOnce(osgb36Exemption)
 
+    // When: User views the check your answers page
     const { result, statusCode } = await server.inject({
       method: 'GET',
       url: '/exemption/check-your-answers'
     })
+
+    // Then: OSGB36 coordinates are displayed correctly
     expect(statusCode).toBe(200)
-
     const { document } = new JSDOM(result).window
-    expect(
-      document
-        .querySelector(
-          '#site-details-card .govuk-summary-list .govuk-summary-list__row:nth-child(2) .govuk-summary-list__value'
-        )
-        .textContent.trim()
-        .replace(/\s+/g, ' ')
-    ).toBe('OSGB36 (National Grid) Eastings and Northings')
 
     expect(
-      document
-        .querySelector(
-          '#site-details-card .govuk-summary-list .govuk-summary-list__row:nth-child(3) .govuk-summary-list__value'
-        )
-        .textContent.trim()
-    ).toBe('425053, 564180')
+      normalizeWhitespace(
+        getSecondRowValue(document, CSS_SELECTORS.cards.siteDetails)
+      )
+    ).toBe(EXPECTED_TEXT.coordinateSystems.osgb36)
+    expect(getThirdRowValue(document, CSS_SELECTORS.cards.siteDetails)).toBe(
+      '425053, 564180'
+    )
   })
 
   describe('ML-140: File upload site details display', () => {
     test('Should display KML file upload site details correctly', async () => {
       // Given: An exemption with KML file upload site details
-      const kmlFileExemption = {
-        ...mockExemption,
-        siteDetails: {
-          coordinatesType: 'file',
-          fileUploadType: 'kml',
-          uploadedFile: {
-            filename: 'hammersmith_coordinates.kml'
-          },
-          geoJSON: {
-            type: 'FeatureCollection',
-            features: [
-              {
-                type: 'Feature',
-                geometry: {
-                  type: 'Point',
-                  coordinates: [51.5074, -0.1278]
-                }
-              }
-            ]
-          }
-        }
-      }
-
+      const kmlFileExemption = createFileUploadExemption(
+        'kml',
+        'hammersmith_coordinates.kml'
+      )
       getExemptionCacheSpy.mockReturnValueOnce(kmlFileExemption)
 
       // When: User views the check your answers page
@@ -380,47 +440,25 @@ describe('check your answers controller', () => {
 
       // Then: Response is successful and displays KML file upload details
       expect(statusCode).toBe(200)
-
       const { document } = new JSDOM(result).window
 
-      // Verify method of providing site location
-      expect(
-        document
-          .querySelector(
-            '#site-details-card .govuk-summary-list .govuk-summary-list__row:first-child .govuk-summary-list__value'
-          )
-          .textContent.trim()
-      ).toBe('Upload a file with the coordinates of the site')
-
-      // Verify file type is displayed as KML
-      expect(
-        document
-          .querySelector(
-            '#site-details-card .govuk-summary-list .govuk-summary-list__row:nth-child(2) .govuk-summary-list__value'
-          )
-          .textContent.trim()
-      ).toBe('KML')
-
-      // Verify filename is displayed with extension
-      expect(
-        document
-          .querySelector(
-            '#site-details-card .govuk-summary-list .govuk-summary-list__row:nth-child(3) .govuk-summary-list__value'
-          )
-          .textContent.trim()
-      ).toBe('hammersmith_coordinates.kml')
+      expect(getFirstRowValue(document, CSS_SELECTORS.cards.siteDetails)).toBe(
+        EXPECTED_TEXT.siteDetailsMethods.fileUpload
+      )
+      expect(getSecondRowValue(document, CSS_SELECTORS.cards.siteDetails)).toBe(
+        EXPECTED_TEXT.fileTypes.kml
+      )
+      expect(getThirdRowValue(document, CSS_SELECTORS.cards.siteDetails)).toBe(
+        'hammersmith_coordinates.kml'
+      )
     })
 
     test('Should display Shapefile upload site details correctly', async () => {
       // Given: An exemption with Shapefile upload site details
-      const shapefileExemption = {
-        ...mockExemption,
-        siteDetails: {
-          coordinatesType: 'file',
-          fileUploadType: 'shapefile',
-          uploadedFile: {
-            filename: 'site_boundaries.shp'
-          },
+      const shapefileExemption = createFileUploadExemption(
+        'shapefile',
+        'site_boundaries.shp',
+        {
           geoJSON: {
             type: 'FeatureCollection',
             features: [
@@ -442,8 +480,7 @@ describe('check your answers controller', () => {
             ]
           }
         }
-      }
-
+      )
       getExemptionCacheSpy.mockReturnValueOnce(shapefileExemption)
 
       // When: User views the check your answers page
@@ -454,51 +491,28 @@ describe('check your answers controller', () => {
 
       // Then: Response is successful and displays Shapefile upload details
       expect(statusCode).toBe(200)
-
       const { document } = new JSDOM(result).window
 
-      // Verify method of providing site location
-      expect(
-        document
-          .querySelector(
-            '#site-details-card .govuk-summary-list .govuk-summary-list__row:first-child .govuk-summary-list__value'
-          )
-          .textContent.trim()
-      ).toBe('Upload a file with the coordinates of the site')
-
-      // Verify file type is displayed as Shapefile
-      expect(
-        document
-          .querySelector(
-            '#site-details-card .govuk-summary-list .govuk-summary-list__row:nth-child(2) .govuk-summary-list__value'
-          )
-          .textContent.trim()
-      ).toBe('Shapefile')
-
-      // Verify filename is displayed with extension
-      expect(
-        document
-          .querySelector(
-            '#site-details-card .govuk-summary-list .govuk-summary-list__row:nth-child(3) .govuk-summary-list__value'
-          )
-          .textContent.trim()
-      ).toBe('site_boundaries.shp')
+      expect(getFirstRowValue(document, CSS_SELECTORS.cards.siteDetails)).toBe(
+        EXPECTED_TEXT.siteDetailsMethods.fileUpload
+      )
+      expect(getSecondRowValue(document, CSS_SELECTORS.cards.siteDetails)).toBe(
+        EXPECTED_TEXT.fileTypes.shapefile
+      )
+      expect(getThirdRowValue(document, CSS_SELECTORS.cards.siteDetails)).toBe(
+        'site_boundaries.shp'
+      )
     })
 
     test('Should handle file upload with missing geoJSON gracefully', async () => {
       // Given: An exemption with file upload but missing geoJSON data
-      const exemptionWithMissingGeoJSON = {
-        ...mockExemption,
-        siteDetails: {
-          coordinatesType: 'file',
-          fileUploadType: 'kml',
-          uploadedFile: {
-            filename: 'incomplete_data.kml'
-          }
-          // Missing geoJSON property
+      const exemptionWithMissingGeoJSON = createFileUploadExemption(
+        'kml',
+        'incomplete_data.kml',
+        {
+          geoJSON: undefined // Missing geoJSON property
         }
-      }
-
+      )
       getExemptionCacheSpy.mockReturnValueOnce(exemptionWithMissingGeoJSON)
 
       // When: User views the check your answers page
@@ -509,35 +523,17 @@ describe('check your answers controller', () => {
 
       // Then: Response is successful with fallback display
       expect(statusCode).toBe(200)
-
       const { document } = new JSDOM(result).window
 
-      // Verify fallback method text is displayed
-      expect(
-        document
-          .querySelector(
-            '#site-details-card .govuk-summary-list .govuk-summary-list__row:first-child .govuk-summary-list__value'
-          )
-          .textContent.trim()
-      ).toBe('Upload a file with the coordinates of the site')
-
-      // Verify file type is displayed correctly even without geoJSON
-      expect(
-        document
-          .querySelector(
-            '#site-details-card .govuk-summary-list .govuk-summary-list__row:nth-child(2) .govuk-summary-list__value'
-          )
-          .textContent.trim()
-      ).toBe('KML')
-
-      // Verify filename is displayed
-      expect(
-        document
-          .querySelector(
-            '#site-details-card .govuk-summary-list .govuk-summary-list__row:nth-child(3) .govuk-summary-list__value'
-          )
-          .textContent.trim()
-      ).toBe('incomplete_data.kml')
+      expect(getFirstRowValue(document, CSS_SELECTORS.cards.siteDetails)).toBe(
+        EXPECTED_TEXT.siteDetailsMethods.fileUpload
+      )
+      expect(getSecondRowValue(document, CSS_SELECTORS.cards.siteDetails)).toBe(
+        EXPECTED_TEXT.fileTypes.kml
+      )
+      expect(getThirdRowValue(document, CSS_SELECTORS.cards.siteDetails)).toBe(
+        'incomplete_data.kml'
+      )
     })
 
     test('Should handle file upload with missing uploaded file data gracefully', async () => {
@@ -596,15 +592,13 @@ describe('check your answers controller', () => {
 
     test('Should display "Unknown file" fallback when uploadedFile has no filename', async () => {
       // Given: An exemption that triggers getFileUploadSummaryData error AND has no filename
-      const exemptionWithNoFilename = {
-        ...mockExemption,
-        siteDetails: {
-          coordinatesType: 'file',
-          fileUploadType: 'invalid_type', // Invalid type triggers error in getFileUploadSummaryData
-          uploadedFile: {} // No filename property to trigger 'Unknown file' fallback on line 69
+      const exemptionWithNoFilename = createFileUploadExemption(
+        'invalid_type',
+        '',
+        {
+          uploadedFile: {} // No filename property to trigger 'Unknown file' fallback
         }
-      }
-
+      )
       getExemptionCacheSpy.mockReturnValueOnce(exemptionWithNoFilename)
 
       // When: User views the check your answers page
@@ -615,48 +609,28 @@ describe('check your answers controller', () => {
 
       // Then: Response is successful with 'Unknown file' fallback display
       expect(statusCode).toBe(200)
-
       const { document } = new JSDOM(result).window
 
-      // Verify fallback method text is displayed
-      expect(
-        document
-          .querySelector(
-            '#site-details-card .govuk-summary-list .govuk-summary-list__row:first-child .govuk-summary-list__value'
-          )
-          .textContent.trim()
-      ).toBe('Upload a file with the coordinates of the site')
-
-      // Verify file type fallback
-      expect(
-        document
-          .querySelector(
-            '#site-details-card .govuk-summary-list .govuk-summary-list__row:nth-child(2) .govuk-summary-list__value'
-          )
-          .textContent.trim()
-      ).toBe('Shapefile')
-
-      // Verify 'Unknown file' fallback is triggered
-      expect(
-        document
-          .querySelector(
-            '#site-details-card .govuk-summary-list .govuk-summary-list__row:nth-child(3) .govuk-summary-list__value'
-          )
-          .textContent.trim()
-      ).toBe('Unknown file')
+      expect(getFirstRowValue(document, CSS_SELECTORS.cards.siteDetails)).toBe(
+        EXPECTED_TEXT.siteDetailsMethods.fileUpload
+      )
+      expect(getSecondRowValue(document, CSS_SELECTORS.cards.siteDetails)).toBe(
+        EXPECTED_TEXT.fileTypes.shapefile
+      )
+      expect(getThirdRowValue(document, CSS_SELECTORS.cards.siteDetails)).toBe(
+        EXPECTED_TEXT.fallbacks.unknownFile
+      )
     })
 
     test('Should display "Unknown file" fallback when uploadedFile is null', async () => {
       // Given: An exemption that triggers getFileUploadSummaryData error AND has null uploadedFile
-      const exemptionWithNullFile = {
-        ...mockExemption,
-        siteDetails: {
-          coordinatesType: 'file',
-          fileUploadType: 'invalid_type', // Invalid type triggers error in getFileUploadSummaryData
-          uploadedFile: null // Null uploadedFile triggers 'Unknown file' fallback on line 69
+      const exemptionWithNullFile = createFileUploadExemption(
+        'invalid_type',
+        '',
+        {
+          uploadedFile: null // Null uploadedFile triggers 'Unknown file' fallback
         }
-      }
-
+      )
       getExemptionCacheSpy.mockReturnValueOnce(exemptionWithNullFile)
 
       // When: User views the check your answers page
@@ -667,17 +641,11 @@ describe('check your answers controller', () => {
 
       // Then: Response is successful with 'Unknown file' fallback display
       expect(statusCode).toBe(200)
-
       const { document } = new JSDOM(result).window
 
-      // Verify 'Unknown file' fallback is triggered
-      expect(
-        document
-          .querySelector(
-            '#site-details-card .govuk-summary-list .govuk-summary-list__row:nth-child(3) .govuk-summary-list__value'
-          )
-          .textContent.trim()
-      ).toBe('Unknown file')
+      expect(getThirdRowValue(document, CSS_SELECTORS.cards.siteDetails)).toBe(
+        EXPECTED_TEXT.fallbacks.unknownFile
+      )
     })
 
     test('Should display KML fallback when getFileUploadSummaryData fails for KML file', async () => {
@@ -745,21 +713,13 @@ describe('check your answers controller', () => {
 
     test('Should verify site details card structure for file uploads', async () => {
       // Given: An exemption with file upload site details
-      const fileUploadExemption = {
-        ...mockExemption,
-        siteDetails: {
-          coordinatesType: 'file',
-          fileUploadType: 'kml',
-          uploadedFile: {
-            filename: 'test_upload.kml'
-          },
-          geoJSON: {
-            type: 'FeatureCollection',
-            features: []
-          }
+      const fileUploadExemption = createFileUploadExemption(
+        'kml',
+        'test_upload.kml',
+        {
+          geoJSON: { type: 'FeatureCollection', features: [] }
         }
-      }
-
+      )
       getExemptionCacheSpy.mockReturnValueOnce(fileUploadExemption)
 
       // When: User views the check your answers page
@@ -770,42 +730,37 @@ describe('check your answers controller', () => {
 
       // Then: Response is successful and site details card structure is correct
       expect(statusCode).toBe(200)
-
       const { document } = new JSDOM(result).window
 
-      // Verify site details card exists
-      const siteDetailsCard = document.querySelector('#site-details-card')
+      // Verify card structure and content
+      const siteDetailsCard = document.querySelector(
+        CSS_SELECTORS.cards.siteDetails
+      )
       expect(siteDetailsCard).toBeTruthy()
 
-      // Verify card title
       const cardTitle = document.querySelector(
-        '#site-details-card .govuk-summary-card__title'
+        `${CSS_SELECTORS.cards.siteDetails} ${CSS_SELECTORS.card.title}`
       )
-      expect(cardTitle?.textContent.trim()).toBe('Site details')
+      expect(cardTitle?.textContent.trim()).toBe(
+        EXPECTED_TEXT.cardTitles.siteDetails
+      )
 
-      // Verify expected number of rows for file upload (3 rows: method, file type, filename)
-      const summaryRows = document.querySelectorAll(
-        '#site-details-card .govuk-summary-list__row'
+      const summaryRows = getSummaryRowCount(
+        document,
+        CSS_SELECTORS.cards.siteDetails
       )
-      expect(summaryRows).toHaveLength(3)
+      expect(summaryRows).toBe(3)
 
       // Verify row keys are correct
-      const firstRowKey = summaryRows[0].querySelector(
-        '.govuk-summary-list__key'
+      expect(getCardKey(document, CSS_SELECTORS.cards.siteDetails, 1)).toBe(
+        EXPECTED_TEXT.rowKeys.methodOfProviding
       )
-      expect(firstRowKey?.textContent.trim()).toBe(
-        'Method of providing site location'
+      expect(getCardKey(document, CSS_SELECTORS.cards.siteDetails, 2)).toBe(
+        EXPECTED_TEXT.rowKeys.fileType
       )
-
-      const secondRowKey = summaryRows[1].querySelector(
-        '.govuk-summary-list__key'
+      expect(getCardKey(document, CSS_SELECTORS.cards.siteDetails, 3)).toBe(
+        EXPECTED_TEXT.rowKeys.fileUploaded
       )
-      expect(secondRowKey?.textContent.trim()).toBe('File type')
-
-      const thirdRowKey = summaryRows[2].querySelector(
-        '.govuk-summary-list__key'
-      )
-      expect(thirdRowKey?.textContent.trim()).toBe('File uploaded')
     })
 
     test('Should handle file upload with empty geoJSON features array', async () => {
@@ -866,14 +821,10 @@ describe('check your answers controller', () => {
 
     test('Should verify AC1 acceptance criteria - file upload site details display', async () => {
       // Given: An exemption with uploaded site details meeting AC1 requirements
-      const ac1FileUploadExemption = {
-        ...mockExemption,
-        siteDetails: {
-          coordinatesType: 'file',
-          fileUploadType: 'kml',
-          uploadedFile: {
-            filename: 'Hammersmith_coordinates.kml'
-          },
+      const ac1FileUploadExemption = createFileUploadExemption(
+        'kml',
+        'Hammersmith_coordinates.kml',
+        {
           geoJSON: {
             type: 'FeatureCollection',
             features: [
@@ -887,8 +838,7 @@ describe('check your answers controller', () => {
             ]
           }
         }
-      }
-
+      )
       getExemptionCacheSpy.mockReturnValueOnce(ac1FileUploadExemption)
 
       // When: User views the check your answers page
@@ -899,48 +849,31 @@ describe('check your answers controller', () => {
 
       // Then: AC1 requirements are met
       expect(statusCode).toBe(200)
-
       const { document } = new JSDOM(result).window
 
-      // AC1: Method of providing site location - populated with fixed text
-      expect(
-        document
-          .querySelector(
-            '#site-details-card .govuk-summary-list .govuk-summary-list__row:first-child .govuk-summary-list__value'
-          )
-          .textContent.trim()
-      ).toBe('Upload a file with the coordinates of the site')
-
-      // AC1: File type - populated with "KML"
-      expect(
-        document
-          .querySelector(
-            '#site-details-card .govuk-summary-list .govuk-summary-list__row:nth-child(2) .govuk-summary-list__value'
-          )
-          .textContent.trim()
-      ).toBe('KML')
-
-      // AC1: File uploaded - populated with filename including extension
-      expect(
-        document
-          .querySelector(
-            '#site-details-card .govuk-summary-list .govuk-summary-list__row:nth-child(3) .govuk-summary-list__value'
-          )
-          .textContent.trim()
-      ).toBe('Hammersmith_coordinates.kml')
+      // AC1: Basic site details are displayed correctly
+      expect(getFirstRowValue(document, CSS_SELECTORS.cards.siteDetails)).toBe(
+        EXPECTED_TEXT.siteDetailsMethods.fileUpload
+      )
+      expect(getSecondRowValue(document, CSS_SELECTORS.cards.siteDetails)).toBe(
+        EXPECTED_TEXT.fileTypes.kml
+      )
+      expect(getThirdRowValue(document, CSS_SELECTORS.cards.siteDetails)).toBe(
+        'Hammersmith_coordinates.kml'
+      )
 
       // AC1: Map view row should NOT be present (out of scope)
       const summaryRows = document.querySelectorAll(
-        '#site-details-card .govuk-summary-list__row'
+        `${CSS_SELECTORS.cards.siteDetails} ${CSS_SELECTORS.summaryList.row}`
       )
       const rowKeys = Array.from(summaryRows).map((row) =>
-        row.querySelector('.govuk-summary-list__key')?.textContent.trim()
+        row.querySelector(CSS_SELECTORS.summaryList.key)?.textContent.trim()
       )
       expect(rowKeys).not.toContain('Map view')
 
       // AC1: Change link should NOT be functional (out of scope)
       const changeLink = document.querySelector(
-        '#site-details-card .govuk-summary-card__actions a'
+        `${CSS_SELECTORS.cards.siteDetails} ${CSS_SELECTORS.card.actions}`
       )
       expect(changeLink?.getAttribute('href')).toBe('#')
     })

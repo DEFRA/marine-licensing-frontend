@@ -112,16 +112,20 @@ export class SiteDetailsMap extends Component {
     const { Style, Fill, Stroke, Circle } = this.olModules
     return new Style({
       fill: new Fill({
-        color: 'rgba(255, 0, 0, 0.2)'
+        color: 'transparent'
       }),
       stroke: new Stroke({
-        color: '#ff0000',
+        color: '#000000',
         width: 2
       }),
       image: new Circle({
         radius: 7,
         fill: new Fill({
-          color: '#ff0000'
+          color: 'transparent'
+        }),
+        stroke: new Stroke({
+          color: '#000000',
+          width: 2
         })
       })
     })

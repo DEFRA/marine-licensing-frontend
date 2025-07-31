@@ -55,7 +55,7 @@
 
         {%  set _ = rows.push({
           key: { text: "Map view" },
-          value: { text: "" }
+          value: { html: '<div class="app-site-details-map" data-module="site-details-map"></div>' }
         }) %}
 
         {{ govukSummaryList({
@@ -67,6 +67,11 @@
           rows: rows
         }) }}
       {% endif %}
+
+      <!-- Site Details Data for JavaScript -->
+      <script type="application/json" id="site-details-data">
+        {{ fileUploadSummaryData | safe }}
+      </script>
 
       <form method="POST">
         <input type="hidden" name="csrfToken" value="{{ csrfToken }}">

@@ -1,5 +1,18 @@
 import { Component } from 'govuk-frontend'
 
+const DEFAULT_UK_CENTER_LONGITUDE = -3.5
+const DEFAULT_UK_CENTER_LATITUDE = 54.0
+const DEFAULT_MAP_ZOOM = 6
+const DETAILED_ZOOM_LEVEL = 14
+const MAX_ZOOM_LEVEL = 16
+
+const EARTH_RADIUS_METERS = 6378137
+const DEGREES_TO_RADIANS_FACTOR = 180
+const CIRCLE_APPROXIMATION_SIDES = 64
+
+const MAP_PADDING_PIXELS = 20
+const STROKE_WIDTH_PIXELS = 2
+
 export class SiteDetailsMap extends Component {
   static moduleName = 'site-details-map'
 
@@ -7,8 +20,8 @@ export class SiteDetailsMap extends Component {
     super($root)
 
     this.options = {
-      center: [-3.5, 54.0],
-      zoom: 6,
+      center: [DEFAULT_UK_CENTER_LONGITUDE, DEFAULT_UK_CENTER_LATITUDE],
+      zoom: DEFAULT_MAP_ZOOM,
       ...options
     }
 
@@ -27,7 +40,9 @@ export class SiteDetailsMap extends Component {
   async initializeMap() {
     try {
       await this.loadOpenLayersModules()
-      if (this.destroyed) return
+      if (this.destroyed) {
+        return
+      }
       this.createMapLayers()
       this.createMap()
       this.loadSiteDetails()
@@ -51,7 +66,7 @@ export class SiteDetailsMap extends Component {
   async loadOpenLayersModules() {
     const [
       ,
-      { default: Map },
+      { default: OpenLayersMap },
       { default: View },
       { default: TileLayer },
       { default: OSM },
@@ -82,7 +97,7 @@ export class SiteDetailsMap extends Component {
     ])
 
     this.olModules = {
-      Map,
+      OpenLayersMap,
       View,
       TileLayer,
       OSM,
@@ -114,8 +129,8 @@ export class SiteDetailsMap extends Component {
   }
 
   createMap() {
-    const { Map, View, TileLayer, OSM, fromLonLat } = this.olModules
-    this.map = new Map({
+    const { OpenLayersMap, View, TileLayer, OSM, fromLonLat } = this.olModules
+    this.map = new OpenLayersMap({
       target: this.$root,
       layers: [
         new TileLayer({
@@ -146,7 +161,7 @@ export class SiteDetailsMap extends Component {
       }),
       stroke: new Stroke({
         color: '#000000',
-        width: 2
+        width: STROKE_WIDTH_PIXELS
       }),
       image: new Circle({
         radius: 7,
@@ -155,7 +170,7 @@ export class SiteDetailsMap extends Component {
         }),
         stroke: new Stroke({
           color: '#000000',
-          width: 2
+          width: STROKE_WIDTH_PIXELS
         })
       })
     })
@@ -171,7 +186,7 @@ export class SiteDetailsMap extends Component {
       const siteDetails = JSON.parse(siteDataElement.textContent)
       this.displaySiteDetails(siteDetails)
     } catch (error) {
-      // Site details data parsing failed
+      this.showError()
     }
   }
 
@@ -182,6 +197,8 @@ export class SiteDetailsMap extends Component {
       this.displayFileUploadData(siteDetails.geoJSON)
     } else if (siteDetails.coordinatesType === 'coordinates') {
       this.displayManualCoordinates(siteDetails)
+    } else {
+      this.showError()
     }
   }
 
@@ -199,8 +216,13 @@ export class SiteDetailsMap extends Component {
     if (features.length > 0) {
       const extent = this.vectorSource.getExtent()
       this.map.getView().fit(extent, {
-        padding: [20, 20, 20, 20],
-        maxZoom: 16
+        padding: [
+          MAP_PADDING_PIXELS,
+          MAP_PADDING_PIXELS,
+          MAP_PADDING_PIXELS,
+          MAP_PADDING_PIXELS
+        ],
+        maxZoom: MAX_ZOOM_LEVEL
       })
     }
   }
@@ -230,7 +252,7 @@ export class SiteDetailsMap extends Component {
     }
 
     this.map.getView().setCenter(mapCoordinates)
-    this.map.getView().setZoom(14)
+    this.map.getView().setZoom(DETAILED_ZOOM_LEVEL)
   }
 
   parseCoordinates(coordinateSystem, coordinates, fromLonLat) {
@@ -305,10 +327,14 @@ export class SiteDetailsMap extends Component {
     this.vectorSource.addFeature(circleFeature)
   }
 
-  createGeographicCircle(centerLonLat, radiusInMeters, sides = 64) {
+  createGeographicCircle(
+    centerLonLat,
+    radiusInMeters,
+    sides = CIRCLE_APPROXIMATION_SIDES
+  ) {
     const [centerLon, centerLat] = centerLonLat
     const coordinates = []
-    const earthRadius = 6378137
+    const earthRadius = EARTH_RADIUS_METERS
     const angularDistance = radiusInMeters / earthRadius
 
     for (let i = 0; i <= sides; i++) {
@@ -326,8 +352,8 @@ export class SiteDetailsMap extends Component {
   }
 
   calculateCirclePoint(centerLon, centerLat, angularDistance, bearing) {
-    const centerLatRad = (centerLat * Math.PI) / 180
-    const centerLonRad = (centerLon * Math.PI) / 180
+    const centerLatRad = (centerLat * Math.PI) / DEGREES_TO_RADIANS_FACTOR
+    const centerLonRad = (centerLon * Math.PI) / DEGREES_TO_RADIANS_FACTOR
 
     const lat = Math.asin(
       Math.sin(centerLatRad) * Math.cos(angularDistance) +
@@ -341,7 +367,10 @@ export class SiteDetailsMap extends Component {
         Math.cos(angularDistance) - Math.sin(centerLatRad) * Math.sin(lat)
       )
 
-    return [(lon * 180) / Math.PI, (lat * 180) / Math.PI]
+    return [
+      (lon * DEGREES_TO_RADIANS_FACTOR) / Math.PI,
+      (lat * DEGREES_TO_RADIANS_FACTOR) / Math.PI
+    ]
   }
 
   convertOSGB36ToWebMercator(eastings, northings) {
@@ -356,8 +385,8 @@ function osgb36ToWgs84(eastings, northings) {
   const a = 6377563.396
   const b = 6356256.909
   const F0 = 0.9996012717
-  const lat0 = (49 * Math.PI) / 180
-  const lon0 = (-2 * Math.PI) / 180
+  const lat0 = (49 * Math.PI) / DEGREES_TO_RADIANS_FACTOR
+  const lon0 = (-2 * Math.PI) / DEGREES_TO_RADIANS_FACTOR
   const N0 = -100000
   const E0 = 400000
   const e2 = 1 - (b * b) / (a * a)
@@ -386,7 +415,9 @@ function osgb36ToWgs84(eastings, northings) {
     const mNew = b * F0 * (Ma - Mb + Mc - Md)
 
     latNew = latNew + (northings - N0 - mNew) / (a * F0)
-    if (Math.abs(northings - N0 - mNew) < 0.01) break
+    if (Math.abs(northings - N0 - mNew) < 0.01) {
+      break
+    }
   }
 
   const v = (a * F0) / Math.sqrt(1 - e2 * Math.sin(latNew) * Math.sin(latNew))
@@ -417,5 +448,8 @@ function osgb36ToWgs84(eastings, northings) {
     latNew - VII * dE * dE + VIII * Math.pow(dE, 4) - IX * Math.pow(dE, 6)
   const lonFinal = lon0 + X * dE - XI * Math.pow(dE, 3) + XII * Math.pow(dE, 5)
 
-  return [(lonFinal * 180) / Math.PI, (latFinal * 180) / Math.PI]
+  return [
+    (lonFinal * DEGREES_TO_RADIANS_FACTOR) / Math.PI,
+    (latFinal * DEGREES_TO_RADIANS_FACTOR) / Math.PI
+  ]
 }

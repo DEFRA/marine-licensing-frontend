@@ -2,7 +2,11 @@
   "name": "marine-licensing-frontend",
   "version": "0.0.0",
   "description": "CDP Frontend Template",
-  "sideEffects": false,
+  "sideEffects": [
+    "ol/ol.css",
+    "**/*.css",
+    "**/*.scss"
+  ],
   "main": ".server/index.js",
   "type": "module",
   "engines": {
@@ -33,7 +37,9 @@
     "prestart": "npm run build",
     "start": "NODE_ENV=production node --use-strict .",
     "setup:husky": "node -e \"try { (await import('husky')).default() } catch (e) { if (e.code !== 'ERR_MODULE_NOT_FOUND') throw e }\" --input-type module",
-    "knip": "knip"
+    "knip": "knip",
+    "analyze:bundle": "NODE_ENV=production webpack --profile --json > webpack-stats.json",
+    "analyze:bundle-size": "npx webpack-bundle-analyzer webpack-stats.json .public --port 8888 --host 0.0.0.0"
   },
   "author": "Defra DDTS",
   "license": "OGL-UK-3.0",
@@ -130,6 +136,7 @@
     "typescript": "^5.8.3",
     "webpack": "^5.96.1",
     "webpack-assets-manifest": "^5.2.1",
+    "webpack-bundle-analyzer": "^4.10.2",
     "webpack-cli": "^5.1.4"
   }
 }

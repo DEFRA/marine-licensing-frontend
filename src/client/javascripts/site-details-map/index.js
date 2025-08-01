@@ -17,6 +17,7 @@ export class SiteDetailsMap extends Component {
     this.vectorLayer = null
     this.geoJSONFormat = null
     this.olModules = null
+    this.destroyed = false
 
     this.initializeMap().catch(() => {
       this.showError()
@@ -26,6 +27,7 @@ export class SiteDetailsMap extends Component {
   async initializeMap() {
     try {
       await this.loadOpenLayersModules()
+      if (this.destroyed) return
       this.createMapLayers()
       this.createMap()
       this.loadSiteDetails()
@@ -34,8 +36,21 @@ export class SiteDetailsMap extends Component {
     }
   }
 
+  destroy() {
+    this.destroyed = true
+    if (this.map) {
+      this.map.setTarget(null)
+      this.map = null
+    }
+    this.vectorSource = null
+    this.vectorLayer = null
+    this.geoJSONFormat = null
+    this.olModules = null
+  }
+
   async loadOpenLayersModules() {
     const [
+      ,
       { default: Map },
       { default: View },
       { default: TileLayer },
@@ -50,6 +65,7 @@ export class SiteDetailsMap extends Component {
       { default: GeoJSON },
       { default: Polygon }
     ] = await Promise.all([
+      import('ol/ol.css'),
       import('ol/Map.js'),
       import('ol/View.js'),
       import('ol/layer/Tile.js'),
@@ -332,13 +348,6 @@ export class SiteDetailsMap extends Component {
     const { fromLonLat } = this.olModules
     const wgs84Coords = osgb36ToWgs84(eastings, northings)
     return fromLonLat(wgs84Coords)
-  }
-
-  destroy() {
-    if (this.map) {
-      this.map.setTarget(null)
-      this.map = null
-    }
   }
 }
 

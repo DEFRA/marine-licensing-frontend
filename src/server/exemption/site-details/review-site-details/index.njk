@@ -57,15 +57,18 @@
                         value: {
                             text: summaryData.width
                         }
+                    },
+                    {
+                        key: {
+                            text: "Map view",
+                            classes: "govuk-summary-list__key--top-aligned"
+                        },
+                        value: {
+                            html: '<div class="app-site-details-map" data-module="site-details-map"></div>'
+                        }
                     }
                 ]
             }) }}
-
-            <!-- Simple separate map component -->
-            <div class="app-map-component">
-                <h2 class="govuk-heading-m">Map view</h2>
-                <div class="app-site-details-map" data-module="site-details-map"></div>
-            </div>
 
             <!-- Site Details Data for JavaScript -->
             <script type="application/json" id="site-details-data">

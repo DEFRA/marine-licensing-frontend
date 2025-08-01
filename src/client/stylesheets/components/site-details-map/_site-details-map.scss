@@ -1,7 +1,6 @@
 .app-site-details-map {
-  height: 300px;
   width: 100%;
-  max-width: 100%;
+  aspect-ratio: 1 / 1; // Makes it square - height matches width
   border: 1px solid #b1b4b6;
   margin: 0; // Remove default margin when in section
   overflow: hidden;
@@ -9,7 +8,8 @@
 
   // When inside the map component
   .app-map-component & {
-    height: 300px;
+    width: 100%;
+    aspect-ratio: 1 / 1;
     margin: 0;
   }
 
@@ -84,4 +84,10 @@
     font-weight: bold;
     color: #0b0c0c;
   }
+}
+
+// Top align map view key in summary list
+.govuk-summary-list__key--top-aligned {
+  // stylelint-disable-next-line declaration-no-important
+  vertical-align: top !important;
 }

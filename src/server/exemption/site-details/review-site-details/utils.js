@@ -62,40 +62,49 @@ export const getFileUploadSummaryData = (exemption) => {
   const uploadedFile = siteDetails.uploadedFile || {}
   const geoJSON = siteDetails.geoJSON || {}
 
-  // Parse coordinates from geoJSON, only including features with valid geometry
-  let coordinates = []
-  if (geoJSON.features && Array.isArray(geoJSON.features)) {
-    coordinates = geoJSON.features
-      .filter(
-        (feature) =>
-          feature.geometry?.type &&
-          feature.geometry?.coordinates &&
-          Array.isArray(feature.geometry.coordinates) &&
-          feature.geometry.coordinates.length > 0
-      )
-      .map((feature) => ({
-        type: feature.geometry.type,
-        coordinates: feature.geometry.coordinates
-      }))
-  }
-
-  // Determine file type display text
-  let fileTypeText = ''
-  if (siteDetails.fileUploadType === 'kml') {
-    fileTypeText = 'KML'
-  } else if (siteDetails.fileUploadType === 'shapefile') {
-    fileTypeText = 'Shapefile'
-  } else {
-    throw new Error('Unsupported file type for site details')
-  }
+  const coordinates = parseGeoJSONCoordinates(geoJSON)
+  const fileType = getFileTypeText(siteDetails.fileUploadType)
 
   return {
     method: 'Upload a file with the coordinates of the site',
-    fileType: fileTypeText,
+    fileType,
     filename: uploadedFile.filename,
     coordinates,
     geoJSON
   }
+}
+
+const parseGeoJSONCoordinates = (geoJSON) => {
+  const features = geoJSON.features
+  if (!features || !Array.isArray(features)) return []
+
+  return features.filter(hasValidGeometry).map(extractCoordinateData)
+}
+
+const hasValidGeometry = (feature) => {
+  const geometry = feature.geometry
+  return (
+    geometry?.type &&
+    geometry?.coordinates &&
+    Array.isArray(geometry.coordinates) &&
+    geometry.coordinates.length > 0
+  )
+}
+
+const extractCoordinateData = (feature) => ({
+  type: feature.geometry.type,
+  coordinates: feature.geometry.coordinates
+})
+
+const getFileTypeText = (fileUploadType) => {
+  const typeMap = { kml: 'KML', shapefile: 'Shapefile' }
+  const fileType = typeMap[fileUploadType]
+
+  if (!fileType) {
+    throw new Error('Unsupported file type for site details')
+  }
+
+  return fileType
 }
 
 export const getFileUploadBackLink = (previousPage) => {
@@ -235,19 +244,16 @@ export const prepareManualCoordinateDataForSave = (exemption, request) => {
 /**
  * Handles file upload review view rendering
  * @param {object} h - Hapi response toolkit
- * @param {object} exemption - Current exemption from session
- * @param {object} siteDetails - Site details object
- * @param {string} previousPage - Previous page URL for back link
- * @param {object} reviewSiteDetailsPageData - Common page data
+ * @param {object} options - Rendering options
+ * @param {object} options.exemption - Current exemption from session
+ * @param {object} options.siteDetails - Site details object
+ * @param {string} options.previousPage - Previous page URL for back link
+ * @param {object} options.reviewSiteDetailsPageData - Common page data
  * @returns {object} Rendered view response
  */
-export const renderFileUploadReview = (
-  h,
-  exemption,
-  siteDetails,
-  previousPage,
-  reviewSiteDetailsPageData
-) => {
+export const renderFileUploadReview = (h, options) => {
+  const { exemption, siteDetails, previousPage, reviewSiteDetailsPageData } =
+    options
   const fileUploadSummaryData = getFileUploadSummaryData({
     ...exemption,
     siteDetails
@@ -275,20 +281,16 @@ export const renderFileUploadReview = (
  * Handles manual coordinate review view rendering
  * @param {object} h - Hapi response toolkit
  * @param {object} request - Hapi request object
- * @param {object} exemption - Current exemption from session
- * @param {object} siteDetails - Site details object
- * @param {string} previousPage - Previous page URL for back link
- * @param {object} reviewSiteDetailsPageData - Common page data
+ * @param {object} options - Rendering options
+ * @param {object} options.exemption - Current exemption from session
+ * @param {object} options.siteDetails - Site details object
+ * @param {string} options.previousPage - Previous page URL for back link
+ * @param {object} options.reviewSiteDetailsPageData - Common page data
  * @returns {object} Rendered view response
  */
-export const renderManualCoordinateReview = (
-  h,
-  request,
-  exemption,
-  siteDetails,
-  previousPage,
-  reviewSiteDetailsPageData
-) => {
+export const renderManualCoordinateReview = (h, request, options) => {
+  const { exemption, siteDetails, previousPage, reviewSiteDetailsPageData } =
+    options
   const { coordinateSystem } = getCoordinateSystem(request)
   const summaryData = buildManualCoordinateSummaryData(
     siteDetails,

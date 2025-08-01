@@ -227,6 +227,152 @@ describe('CircleGeometryCalculator', () => {
         expectValidCoordinateFormat(result)
       })
     })
+
+    describe('mathematical precision validation', () => {
+      test('should generate correct bearing angles for known side counts', () => {
+        const centerLonLat = [0, 0]
+        const radiusInMeters = 1000
+
+        // Test 4-sided polygon (square) - bearings should be 0, π/2, π, 3π/2
+        const result = CircleGeometryCalculator.createGeographicCircle(
+          centerLonLat,
+          radiusInMeters,
+          4
+        )
+
+        expect(result).toHaveLength(5) // 4 sides + 1 closure point
+
+        // First point (bearing 0) should be due north of center
+        expect(result[0][0]).toBeCloseTo(0, 10) // longitude unchanged
+        expect(result[0][1]).toBeGreaterThan(0) // latitude increased (north)
+
+        // Second point (bearing π/2) should be due east of center
+        expect(result[1][0]).toBeGreaterThan(0) // longitude increased (east)
+        expect(result[1][1]).toBeCloseTo(0, 5) // latitude approximately center
+
+        // Third point (bearing π) should be due south of center
+        expect(result[2][0]).toBeCloseTo(0, 10) // longitude unchanged
+        expect(result[2][1]).toBeLessThan(0) // latitude decreased (south)
+
+        // Fourth point (bearing 3π/2) should be due west of center
+        expect(result[3][0]).toBeLessThan(0) // longitude decreased (west)
+        expect(result[3][1]).toBeCloseTo(0, 5) // latitude approximately center
+      })
+
+      test('should calculate correct distances from center for all points', () => {
+        const centerLonLat = [0, 51.5] // London-ish
+        const radiusInMeters = 1000
+        const earthRadiusKm = 6378.137
+
+        const result = CircleGeometryCalculator.createGeographicCircle(
+          centerLonLat,
+          radiusInMeters,
+          8
+        )
+
+        // Calculate expected angular distance in degrees
+        const expectedAngularDistanceDeg =
+          (radiusInMeters / 1000 / earthRadiusKm) * (180 / Math.PI)
+
+        result.slice(0, -1).forEach((point) => {
+          const [lon, lat] = point
+          const [centerLon, centerLat] = centerLonLat
+
+          // Calculate distance using spherical law of cosines
+          const latRad1 = (centerLat * Math.PI) / 180
+          const latRad2 = (lat * Math.PI) / 180
+          const deltaLonRad = ((lon - centerLon) * Math.PI) / 180
+
+          const angularDistance = Math.acos(
+            Math.sin(latRad1) * Math.sin(latRad2) +
+              Math.cos(latRad1) * Math.cos(latRad2) * Math.cos(deltaLonRad)
+          )
+
+          const distanceDeg = (angularDistance * 180) / Math.PI
+
+          // Should be within 1% of expected distance
+          expect(distanceDeg).toBeCloseTo(expectedAngularDistanceDeg, 4)
+        })
+      })
+
+      test('should validate spherical trigonometry formulas with known coordinates', () => {
+        const centerLon = 0
+        const centerLat = 0 // Equator for simpler math
+        const angularDistance = 0.001 // Small distance for precision
+        const bearing = Math.PI / 2 // Due east
+
+        const result = CircleGeometryCalculator.calculateCirclePoint(
+          centerLon,
+          centerLat,
+          angularDistance,
+          bearing
+        )
+
+        // At equator, due east movement should only affect longitude
+        expect(result[1]).toBeCloseTo(0, 8) // latitude should remain ~0
+        expect(result[0]).toBeGreaterThan(0) // longitude should increase
+
+        // Test due north (bearing = 0)
+        const northResult = CircleGeometryCalculator.calculateCirclePoint(
+          centerLon,
+          centerLat,
+          angularDistance,
+          0
+        )
+
+        expect(northResult[0]).toBeCloseTo(0, 8) // longitude should remain ~0
+        expect(northResult[1]).toBeGreaterThan(0) // latitude should increase
+      })
+
+      test('should produce symmetric results for opposite bearings', () => {
+        const centerLon = 1
+        const centerLat = 52
+        const angularDistance = 0.01
+
+        // Test north vs south
+        const north = CircleGeometryCalculator.calculateCirclePoint(
+          centerLon,
+          centerLat,
+          angularDistance,
+          0
+        )
+        const south = CircleGeometryCalculator.calculateCirclePoint(
+          centerLon,
+          centerLat,
+          angularDistance,
+          Math.PI
+        )
+
+        // Should be equidistant from center but in opposite directions
+        expect(north[0]).toBeCloseTo(south[0], 6) // same longitude
+        expect(Math.abs(north[1] - centerLat)).toBeCloseTo(
+          Math.abs(south[1] - centerLat),
+          6
+        )
+        expect((north[1] - centerLat) * (south[1] - centerLat)).toBeLessThan(0) // opposite sides
+
+        // Test east vs west
+        const east = CircleGeometryCalculator.calculateCirclePoint(
+          centerLon,
+          centerLat,
+          angularDistance,
+          Math.PI / 2
+        )
+        const west = CircleGeometryCalculator.calculateCirclePoint(
+          centerLon,
+          centerLat,
+          angularDistance,
+          (3 * Math.PI) / 2
+        )
+
+        expect(east[1]).toBeCloseTo(west[1], 6) // same latitude
+        expect(Math.abs(east[0] - centerLon)).toBeCloseTo(
+          Math.abs(west[0] - centerLon),
+          6
+        )
+        expect((east[0] - centerLon) * (west[0] - centerLon)).toBeLessThan(0) // opposite sides
+      })
+    })
   })
 
   describe('calculateCirclePoint', () => {

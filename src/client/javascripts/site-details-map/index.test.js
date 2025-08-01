@@ -701,4 +701,114 @@ describe('SiteDetailsMap', () => {
       })
     })
   })
+
+  describe('conditional logic edge cases', () => {
+    // Helper functions to reduce duplication
+    const setupDisplaySiteDetailsTest = () => {
+      siteDetailsMap = new SiteDetailsMap(mockRoot)
+      siteDetailsMap.displayManualCoordinates = jest.fn()
+      siteDetailsMap.displayFileUploadData = jest.fn()
+      siteDetailsMap.showError = jest.fn()
+      siteDetailsMap.vectorSource = { clear: jest.fn() }
+    }
+
+    const setupDisplayFileUploadTest = () => {
+      siteDetailsMap = new SiteDetailsMap(mockRoot)
+      siteDetailsMap.olModules = mockOpenLayersModules
+      siteDetailsMap.vectorSource = {
+        addFeatures: jest.fn(),
+        getExtent: jest.fn().mockReturnValue([0, 0, 100, 100])
+      }
+      siteDetailsMap.map = {
+        getView: jest.fn().mockReturnValue({ fit: jest.fn() })
+      }
+    }
+
+    // eslint-disable-next-line jest/expect-expect
+    test.each([
+      {
+        description: 'handle file coordinates without geoJSON',
+        siteDetails: { coordinatesType: 'file', geoJSON: null }
+      },
+      {
+        description: 'handle file coordinates with empty geoJSON',
+        siteDetails: { coordinatesType: 'file', geoJSON: '' }
+      }
+    ])('should $description', ({ siteDetails }) => {
+      setupDisplaySiteDetailsTest()
+
+      siteDetailsMap.displaySiteDetails(siteDetails)
+
+      expect(siteDetailsMap.displayFileUploadData).not.toHaveBeenCalled()
+      expect(siteDetailsMap.displayManualCoordinates).not.toHaveBeenCalled()
+      expect(siteDetailsMap.showError).toHaveBeenCalled()
+    })
+
+    test('should handle features array with zero length', () => {
+      setupDisplayFileUploadTest()
+      const geoJSONData = { features: [] }
+      const mockFeatures = []
+      siteDetailsMap.geoJSONFormat = {
+        readFeatures: jest.fn().mockReturnValue(mockFeatures)
+      }
+
+      siteDetailsMap.displayFileUploadData(geoJSONData)
+
+      expect(siteDetailsMap.vectorSource.addFeatures).toHaveBeenCalledWith(
+        mockFeatures
+      )
+      expect(siteDetailsMap.map.getView().fit).not.toHaveBeenCalled()
+    })
+
+    test('should handle features array with multiple items', () => {
+      setupDisplayFileUploadTest()
+      const geoJSONData = { features: [{}, {}] }
+      const mockFeatures = [{ mock: 'feature1' }, { mock: 'feature2' }]
+      siteDetailsMap.geoJSONFormat = {
+        readFeatures: jest.fn().mockReturnValue(mockFeatures)
+      }
+
+      siteDetailsMap.displayFileUploadData(geoJSONData)
+
+      expect(siteDetailsMap.vectorSource.addFeatures).toHaveBeenCalledWith(
+        mockFeatures
+      )
+      expect(siteDetailsMap.map.getView().fit).toHaveBeenCalled()
+    })
+  })
+
+  describe('coordinate system validation edge cases', () => {
+    beforeEach(() => {
+      siteDetailsMap = new SiteDetailsMap(mockRoot)
+    })
+
+    // eslint-disable-next-line jest/expect-expect
+    test.each([
+      {
+        description: 'handle mixed coordinate system detection',
+        coordinates: {
+          latitude: '51.5',
+          longitude: '-0.1',
+          eastings: '529090'
+        },
+        coordinateSystem: 'OSGB36'
+      },
+      {
+        description: 'handle OSGB36 system without OSGB36 coordinates',
+        coordinates: { latitude: '51.5', longitude: '-0.1' },
+        coordinateSystem: 'OSGB36'
+      },
+      {
+        description: 'handle WGS84 system without WGS84 coordinates',
+        coordinates: { eastings: '529090', northings: '181680' },
+        coordinateSystem: 'WGS84'
+      }
+    ])('should $description', ({ coordinates, coordinateSystem }) => {
+      const result = siteDetailsMap.parseCoordinates(
+        coordinates,
+        coordinateSystem
+      )
+      expect(result).toBeNull()
+    })
+  })
 })

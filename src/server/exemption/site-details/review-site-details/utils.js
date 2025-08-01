@@ -76,7 +76,9 @@ export const getFileUploadSummaryData = (exemption) => {
 
 const parseGeoJSONCoordinates = (geoJSON) => {
   const features = geoJSON.features
-  if (!features || !Array.isArray(features)) return []
+  if (!features || !Array.isArray(features)) {
+    return []
+  }
 
   return features.filter(hasValidGeometry).map(extractCoordinateData)
 }

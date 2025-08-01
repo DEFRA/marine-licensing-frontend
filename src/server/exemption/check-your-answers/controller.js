@@ -167,7 +167,6 @@ export const checkYourAnswersSubmitController = {
     const exemption = getExemptionCache(request)
     const { id } = exemption
 
-    // Validate exemption exists (reusing validation logic)
     await validateAndFetchExemption(request, exemption)
 
     try {

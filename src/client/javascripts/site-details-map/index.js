@@ -25,86 +25,96 @@ export class SiteDetailsMap extends Component {
 
   async initializeMap() {
     try {
-      // Dynamically import OpenLayers modules
-      const [
-        { default: Map },
-        { default: View },
-        { default: TileLayer },
-        { default: OSM },
-        { default: VectorLayer },
-        { default: VectorSource },
-        { default: Feature },
-        { default: Point },
-        { default: CircleGeom },
-        { Style, Fill, Stroke, Circle },
-        { fromLonLat, toLonLat },
-        { default: GeoJSON },
-        { default: Polygon }
-      ] = await Promise.all([
-        import('ol/Map.js'),
-        import('ol/View.js'),
-        import('ol/layer/Tile.js'),
-        import('ol/source/OSM.js'),
-        import('ol/layer/Vector.js'),
-        import('ol/source/Vector.js'),
-        import('ol/Feature.js'),
-        import('ol/geom/Point.js'),
-        import('ol/geom/Circle.js'),
-        import('ol/style.js'),
-        import('ol/proj.js'),
-        import('ol/format/GeoJSON.js'),
-        import('ol/geom/Polygon.js')
-      ])
-
-      // Store modules for later use
-      this.olModules = {
-        Map,
-        View,
-        TileLayer,
-        OSM,
-        VectorLayer,
-        VectorSource,
-        Feature,
-        Point,
-        CircleGeom,
-        Polygon,
-        Style,
-        Fill,
-        Stroke,
-        Circle,
-        fromLonLat,
-        toLonLat,
-        GeoJSON
-      }
-
-      this.vectorSource = new VectorSource()
-      this.vectorLayer = new VectorLayer({
-        source: this.vectorSource,
-        style: this.createDefaultStyle()
-      })
-
-      this.map = new Map({
-        target: this.$root,
-        layers: [
-          new TileLayer({
-            source: new OSM({
-              attributions: []
-            })
-          }),
-          this.vectorLayer
-        ],
-        view: new View({
-          center: fromLonLat(this.options.center),
-          zoom: this.options.zoom
-        }),
-        controls: []
-      })
-
-      this.geoJSONFormat = new GeoJSON()
+      await this.loadOpenLayersModules()
+      this.createMapLayers()
+      this.createMap()
       this.loadSiteDetails()
     } catch (error) {
       this.showError()
     }
+  }
+
+  async loadOpenLayersModules() {
+    const [
+      { default: Map },
+      { default: View },
+      { default: TileLayer },
+      { default: OSM },
+      { default: VectorLayer },
+      { default: VectorSource },
+      { default: Feature },
+      { default: Point },
+      { default: CircleGeom },
+      { Style, Fill, Stroke, Circle },
+      { fromLonLat, toLonLat },
+      { default: GeoJSON },
+      { default: Polygon }
+    ] = await Promise.all([
+      import('ol/Map.js'),
+      import('ol/View.js'),
+      import('ol/layer/Tile.js'),
+      import('ol/source/OSM.js'),
+      import('ol/layer/Vector.js'),
+      import('ol/source/Vector.js'),
+      import('ol/Feature.js'),
+      import('ol/geom/Point.js'),
+      import('ol/geom/Circle.js'),
+      import('ol/style.js'),
+      import('ol/proj.js'),
+      import('ol/format/GeoJSON.js'),
+      import('ol/geom/Polygon.js')
+    ])
+
+    this.olModules = {
+      Map,
+      View,
+      TileLayer,
+      OSM,
+      VectorLayer,
+      VectorSource,
+      Feature,
+      Point,
+      CircleGeom,
+      Polygon,
+      Style,
+      Fill,
+      Stroke,
+      Circle,
+      fromLonLat,
+      toLonLat,
+      GeoJSON
+    }
+
+    this.geoJSONFormat = new GeoJSON()
+  }
+
+  createMapLayers() {
+    const { VectorSource, VectorLayer } = this.olModules
+    this.vectorSource = new VectorSource()
+    this.vectorLayer = new VectorLayer({
+      source: this.vectorSource,
+      style: this.createDefaultStyle()
+    })
+  }
+
+  createMap() {
+    const { Map, View, TileLayer, OSM, fromLonLat } = this.olModules
+    this.map = new Map({
+      target: this.$root,
+      layers: [
+        new TileLayer({
+          source: new OSM({
+            attributions: []
+          })
+        }),
+        this.vectorLayer
+      ],
+      view: new View({
+        center: fromLonLat(this.options.center),
+        zoom: this.options.zoom
+      }),
+      controls: []
+    })
   }
 
   showError() {
@@ -187,23 +197,11 @@ export class SiteDetailsMap extends Component {
       return
     }
 
-    let mapCoordinates
-
-    if (coordinateSystem === 'WGS84' || coordinateSystem === 'wgs84') {
-      if (coordinates.latitude && coordinates.longitude) {
-        mapCoordinates = fromLonLat([
-          parseFloat(coordinates.longitude),
-          parseFloat(coordinates.latitude)
-        ])
-      }
-    } else if (coordinateSystem === 'OSGB36' || coordinateSystem === 'osgb36') {
-      if (coordinates.eastings && coordinates.northings) {
-        mapCoordinates = this.convertOSGB36ToWebMercator(
-          parseFloat(coordinates.eastings),
-          parseFloat(coordinates.northings)
-        )
-      }
-    }
+    const mapCoordinates = this.parseCoordinates(
+      coordinateSystem,
+      coordinates,
+      fromLonLat
+    )
 
     if (!mapCoordinates) {
       return
@@ -216,13 +214,48 @@ export class SiteDetailsMap extends Component {
     }
 
     this.map.getView().setCenter(mapCoordinates)
+    this.map.getView().setZoom(14)
+  }
 
-    // Use different zoom levels based on whether it's a circle or point
-    if (siteDetails.circleWidth) {
-      this.map.getView().setZoom(14) // Closer zoom for circles so 50m is visible
-    } else {
-      this.map.getView().setZoom(14) // Standard zoom for points
+  parseCoordinates(coordinateSystem, coordinates, fromLonLat) {
+    const isWGS84 = this.isWGS84CoordinateSystem(coordinateSystem)
+    const isOSGB36 = this.isOSGB36CoordinateSystem(coordinateSystem)
+
+    if (isWGS84 && this.hasWGS84Coordinates(coordinates)) {
+      return this.convertFromLonLat(coordinates, fromLonLat)
     }
+
+    if (isOSGB36 && this.hasOSGB36Coordinates(coordinates)) {
+      return this.convertOSGB36ToWebMercator(
+        parseFloat(coordinates.eastings),
+        parseFloat(coordinates.northings)
+      )
+    }
+
+    return null
+  }
+
+  isWGS84CoordinateSystem(coordinateSystem) {
+    return coordinateSystem === 'WGS84' || coordinateSystem === 'wgs84'
+  }
+
+  isOSGB36CoordinateSystem(coordinateSystem) {
+    return coordinateSystem === 'OSGB36' || coordinateSystem === 'osgb36'
+  }
+
+  hasWGS84Coordinates(coordinates) {
+    return coordinates.latitude && coordinates.longitude
+  }
+
+  hasOSGB36Coordinates(coordinates) {
+    return coordinates.eastings && coordinates.northings
+  }
+
+  convertFromLonLat(coordinates, fromLonLat) {
+    return fromLonLat([
+      parseFloat(coordinates.longitude),
+      parseFloat(coordinates.latitude)
+    ])
   }
 
   displayPointSite(coordinates) {
@@ -259,115 +292,46 @@ export class SiteDetailsMap extends Component {
   createGeographicCircle(centerLonLat, radiusInMeters, sides = 64) {
     const [centerLon, centerLat] = centerLonLat
     const coordinates = []
-
-    // Earth's radius in meters
     const earthRadius = 6378137
-
-    // Convert radius to angular distance
     const angularDistance = radiusInMeters / earthRadius
 
-    // Generate circle points
     for (let i = 0; i <= sides; i++) {
       const bearing = (i * 2 * Math.PI) / sides
-
-      // Calculate point on circle using spherical geometry
-      const lat = Math.asin(
-        Math.sin((centerLat * Math.PI) / 180) * Math.cos(angularDistance) +
-          Math.cos((centerLat * Math.PI) / 180) *
-            Math.sin(angularDistance) *
-            Math.cos(bearing)
+      const point = this.calculateCirclePoint(
+        centerLon,
+        centerLat,
+        angularDistance,
+        bearing
       )
-
-      const lon =
-        (centerLon * Math.PI) / 180 +
-        Math.atan2(
-          Math.sin(bearing) *
-            Math.sin(angularDistance) *
-            Math.cos((centerLat * Math.PI) / 180),
-          Math.cos(angularDistance) -
-            Math.sin((centerLat * Math.PI) / 180) * Math.sin(lat)
-        )
-
-      coordinates.push([(lon * 180) / Math.PI, (lat * 180) / Math.PI])
+      coordinates.push(point)
     }
 
     return coordinates
   }
 
-  convertOSGB36ToWebMercator(eastings, northings) {
-    const { fromLonLat } = this.olModules
-    const wgs84Coords = this.osgb36ToWgs84(eastings, northings)
-    return fromLonLat(wgs84Coords)
+  calculateCirclePoint(centerLon, centerLat, angularDistance, bearing) {
+    const centerLatRad = (centerLat * Math.PI) / 180
+    const centerLonRad = (centerLon * Math.PI) / 180
+
+    const lat = Math.asin(
+      Math.sin(centerLatRad) * Math.cos(angularDistance) +
+        Math.cos(centerLatRad) * Math.sin(angularDistance) * Math.cos(bearing)
+    )
+
+    const lon =
+      centerLonRad +
+      Math.atan2(
+        Math.sin(bearing) * Math.sin(angularDistance) * Math.cos(centerLatRad),
+        Math.cos(angularDistance) - Math.sin(centerLatRad) * Math.sin(lat)
+      )
+
+    return [(lon * 180) / Math.PI, (lat * 180) / Math.PI]
   }
 
-  osgb36ToWgs84(eastings, northings) {
-    const a = 6377563.396
-    const b = 6356256.909
-    const F0 = 0.9996012717
-    const lat0 = (49 * Math.PI) / 180
-    const lon0 = (-2 * Math.PI) / 180
-    const N0 = -100000
-    const E0 = 400000
-    const e2 = 1 - (b * b) / (a * a)
-    const n = (a - b) / (a + b)
-
-    const lat = lat0
-
-    let latNew = lat
-    for (let i = 0; i < 10; i++) {
-      const Ma =
-        (1 + n + (5 / 4) * n * n + (5 / 4) * n * n * n) * (latNew - lat0)
-      const Mb =
-        (3 * n + 3 * n * n + (21 / 8) * n * n * n) *
-        Math.sin(latNew - lat0) *
-        Math.cos(latNew + lat0)
-      const Mc =
-        ((15 / 8) * n * n + (15 / 8) * n * n * n) *
-        Math.sin(2 * (latNew - lat0)) *
-        Math.cos(2 * (latNew + lat0))
-      const Md =
-        (35 / 24) *
-        n *
-        n *
-        n *
-        Math.sin(3 * (latNew - lat0)) *
-        Math.cos(3 * (latNew + lat0))
-      const mNew = b * F0 * (Ma - Mb + Mc - Md)
-
-      latNew = latNew + (northings - N0 - mNew) / (a * F0)
-      if (Math.abs(northings - N0 - mNew) < 0.01) break
-    }
-
-    const v = (a * F0) / Math.sqrt(1 - e2 * Math.sin(latNew) * Math.sin(latNew))
-    const rho =
-      (a * F0 * (1 - e2)) /
-      Math.pow(1 - e2 * Math.sin(latNew) * Math.sin(latNew), 1.5)
-    const eta2 = v / rho - 1
-
-    const tanLat = Math.tan(latNew)
-    const secLat = 1 / Math.cos(latNew)
-
-    const VII = tanLat / (2 * rho * v)
-    const VIII =
-      (tanLat / (24 * rho * Math.pow(v, 3))) *
-      (5 + 3 * tanLat * tanLat + eta2 - 9 * tanLat * tanLat * eta2)
-    const IX =
-      (tanLat / (720 * rho * Math.pow(v, 5))) *
-      (61 + 90 * tanLat * tanLat + 45 * tanLat * tanLat * tanLat * tanLat)
-
-    const X = secLat / v
-    const XI = (secLat / (6 * Math.pow(v, 3))) * (v / rho + 2 * tanLat * tanLat)
-    const XII =
-      (secLat / (120 * Math.pow(v, 5))) *
-      (5 + 28 * tanLat * tanLat + 24 * tanLat * tanLat * tanLat * tanLat)
-
-    const dE = eastings - E0
-    const latFinal =
-      latNew - VII * dE * dE + VIII * Math.pow(dE, 4) - IX * Math.pow(dE, 6)
-    const lonFinal =
-      lon0 + X * dE - XI * Math.pow(dE, 3) + XII * Math.pow(dE, 5)
-
-    return [(lonFinal * 180) / Math.PI, (latFinal * 180) / Math.PI]
+  convertOSGB36ToWebMercator(eastings, northings) {
+    const { fromLonLat } = this.olModules
+    const wgs84Coords = osgb36ToWgs84(eastings, northings)
+    return fromLonLat(wgs84Coords)
   }
 
   destroy() {
@@ -376,4 +340,73 @@ export class SiteDetailsMap extends Component {
       this.map = null
     }
   }
+}
+
+// OSGB36 to WGS84 conversion function (extracted as standalone utility)
+function osgb36ToWgs84(eastings, northings) {
+  const a = 6377563.396
+  const b = 6356256.909
+  const F0 = 0.9996012717
+  const lat0 = (49 * Math.PI) / 180
+  const lon0 = (-2 * Math.PI) / 180
+  const N0 = -100000
+  const E0 = 400000
+  const e2 = 1 - (b * b) / (a * a)
+  const n = (a - b) / (a + b)
+
+  const lat = lat0
+
+  let latNew = lat
+  for (let i = 0; i < 10; i++) {
+    const Ma = (1 + n + (5 / 4) * n * n + (5 / 4) * n * n * n) * (latNew - lat0)
+    const Mb =
+      (3 * n + 3 * n * n + (21 / 8) * n * n * n) *
+      Math.sin(latNew - lat0) *
+      Math.cos(latNew + lat0)
+    const Mc =
+      ((15 / 8) * n * n + (15 / 8) * n * n * n) *
+      Math.sin(2 * (latNew - lat0)) *
+      Math.cos(2 * (latNew + lat0))
+    const Md =
+      (35 / 24) *
+      n *
+      n *
+      n *
+      Math.sin(3 * (latNew - lat0)) *
+      Math.cos(3 * (latNew + lat0))
+    const mNew = b * F0 * (Ma - Mb + Mc - Md)
+
+    latNew = latNew + (northings - N0 - mNew) / (a * F0)
+    if (Math.abs(northings - N0 - mNew) < 0.01) break
+  }
+
+  const v = (a * F0) / Math.sqrt(1 - e2 * Math.sin(latNew) * Math.sin(latNew))
+  const rho =
+    (a * F0 * (1 - e2)) /
+    Math.pow(1 - e2 * Math.sin(latNew) * Math.sin(latNew), 1.5)
+  const eta2 = v / rho - 1
+
+  const tanLat = Math.tan(latNew)
+  const secLat = 1 / Math.cos(latNew)
+
+  const VII = tanLat / (2 * rho * v)
+  const VIII =
+    (tanLat / (24 * rho * Math.pow(v, 3))) *
+    (5 + 3 * tanLat * tanLat + eta2 - 9 * tanLat * tanLat * eta2)
+  const IX =
+    (tanLat / (720 * rho * Math.pow(v, 5))) *
+    (61 + 90 * tanLat * tanLat + 45 * tanLat * tanLat * tanLat * tanLat)
+
+  const X = secLat / v
+  const XI = (secLat / (6 * Math.pow(v, 3))) * (v / rho + 2 * tanLat * tanLat)
+  const XII =
+    (secLat / (120 * Math.pow(v, 5))) *
+    (5 + 28 * tanLat * tanLat + 24 * tanLat * tanLat * tanLat * tanLat)
+
+  const dE = eastings - E0
+  const latFinal =
+    latNew - VII * dE * dE + VIII * Math.pow(dE, 4) - IX * Math.pow(dE, 6)
+  const lonFinal = lon0 + X * dE - XI * Math.pow(dE, 3) + XII * Math.pow(dE, 5)
+
+  return [(lonFinal * 180) / Math.PI, (latFinal * 180) / Math.PI]
 }

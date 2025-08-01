@@ -41,6 +41,29 @@ describe('SiteDetailsMap', () => {
   let mockOpenLayersModules
   let siteDetailsMap
 
+  // Helper functions to reduce code duplication
+  const expectBasicMapInitialization = (siteDetailsMap, mockRoot) => {
+    expect(siteDetailsMap.$root).toBe(mockRoot)
+    expect(siteDetailsMap.map).toBeNull()
+    expect(siteDetailsMap.vectorSource).toBeNull()
+    expect(siteDetailsMap.vectorLayer).toBeNull()
+    expect(siteDetailsMap.geoJSONFormat).toBeNull()
+    expect(siteDetailsMap.olModules).toBeNull()
+    expect(siteDetailsMap.destroyed).toBe(false)
+  }
+
+  const expectMapCleanup = (siteDetailsMap) => {
+    expect(siteDetailsMap.destroyed).toBe(true)
+    expect(siteDetailsMap.map).toBeNull()
+    expect(siteDetailsMap.vectorSource).toBeNull()
+    expect(siteDetailsMap.vectorLayer).toBeNull()
+    expect(siteDetailsMap.geoJSONFormat).toBeNull()
+    expect(siteDetailsMap.olModules).toBeNull()
+  }
+
+  const createSiteDetailsMapWithOptions = (options = {}) =>
+    new SiteDetailsMap(mockRoot, options)
+
   beforeEach(() => {
     jest.clearAllMocks()
 
@@ -70,31 +93,29 @@ describe('SiteDetailsMap', () => {
   })
 
   describe('constructor', () => {
-    test('should initialize with default options', () => {
-      siteDetailsMap = new SiteDetailsMap(mockRoot)
-
-      expect(siteDetailsMap.$root).toBe(mockRoot)
-      expect(siteDetailsMap.options.center).toEqual([-3.5, 54.0])
-      expect(siteDetailsMap.options.zoom).toBe(6)
-      expect(siteDetailsMap.map).toBeNull()
-      expect(siteDetailsMap.vectorSource).toBeNull()
-      expect(siteDetailsMap.vectorLayer).toBeNull()
-      expect(siteDetailsMap.geoJSONFormat).toBeNull()
-      expect(siteDetailsMap.olModules).toBeNull()
-      expect(siteDetailsMap.destroyed).toBe(false)
-    })
-
-    test('should initialize with custom options', () => {
-      const customOptions = {
-        center: [1.0, 52.0],
-        zoom: 8
+    test.each([
+      {
+        description: 'default options',
+        options: undefined,
+        expectedCenter: [-3.5, 54.0],
+        expectedZoom: 6
+      },
+      {
+        description: 'custom options',
+        options: { center: [1.0, 52.0], zoom: 8 },
+        expectedCenter: [1.0, 52.0],
+        expectedZoom: 8
       }
+    ])(
+      'should initialize with $description',
+      ({ options, expectedCenter, expectedZoom }) => {
+        siteDetailsMap = createSiteDetailsMapWithOptions(options)
 
-      siteDetailsMap = new SiteDetailsMap(mockRoot, customOptions)
-
-      expect(siteDetailsMap.options.center).toEqual([1.0, 52.0])
-      expect(siteDetailsMap.options.zoom).toBe(8)
-    })
+        expectBasicMapInitialization(siteDetailsMap, mockRoot)
+        expect(siteDetailsMap.options.center).toEqual(expectedCenter)
+        expect(siteDetailsMap.options.zoom).toBe(expectedZoom)
+      }
+    )
 
     test('should call scheduleMapInitialization', () => {
       siteDetailsMap = new SiteDetailsMap(mockRoot)
@@ -130,29 +151,32 @@ describe('SiteDetailsMap', () => {
   })
 
   describe('destroy', () => {
-    test('should cleanup resources', () => {
-      siteDetailsMap = new SiteDetailsMap(mockRoot)
-      const mockMap = {
-        setTarget: jest.fn()
+    test.each([
+      {
+        description: 'cleanup resources',
+        setupMap: true,
+        additionalChecks: (mockMap) => {
+          expect(mockMap.setTarget).toHaveBeenCalledWith(null)
+        }
+      },
+      {
+        description: 'handle missing map gracefully',
+        setupMap: false
       }
-      siteDetailsMap.map = mockMap
-
-      siteDetailsMap.destroy()
-
-      expect(siteDetailsMap.destroyed).toBe(true)
-      expect(mockMap.setTarget).toHaveBeenCalledWith(null)
-      expect(siteDetailsMap.map).toBeNull()
-      expect(siteDetailsMap.vectorSource).toBeNull()
-      expect(siteDetailsMap.vectorLayer).toBeNull()
-      expect(siteDetailsMap.geoJSONFormat).toBeNull()
-      expect(siteDetailsMap.olModules).toBeNull()
-    })
-
-    test('should handle missing map gracefully', () => {
+    ])('should $description', ({ setupMap, additionalChecks }) => {
       siteDetailsMap = new SiteDetailsMap(mockRoot)
+      let mockMap = null
+
+      if (setupMap) {
+        mockMap = { setTarget: jest.fn() }
+        siteDetailsMap.map = mockMap
+      }
 
       expect(() => siteDetailsMap.destroy()).not.toThrow()
-      expect(siteDetailsMap.destroyed).toBe(true)
+      expectMapCleanup(siteDetailsMap)
+      if (additionalChecks) {
+        additionalChecks(mockMap)
+      }
     })
   })
 
@@ -370,56 +394,57 @@ describe('SiteDetailsMap', () => {
       siteDetailsMap = new SiteDetailsMap(mockRoot)
     })
 
-    describe('isWGS84CoordinateSystem', () => {
-      test('should recognize WGS84 coordinate system', () => {
-        expect(siteDetailsMap.isWGS84CoordinateSystem('WGS84')).toBe(true)
-        expect(siteDetailsMap.isWGS84CoordinateSystem('wgs84')).toBe(true)
-        expect(siteDetailsMap.isWGS84CoordinateSystem('OSGB36')).toBe(false)
-      })
-    })
-
-    describe('isOSGB36CoordinateSystem', () => {
-      test('should recognize OSGB36 coordinate system', () => {
-        expect(siteDetailsMap.isOSGB36CoordinateSystem('OSGB36')).toBe(true)
-        expect(siteDetailsMap.isOSGB36CoordinateSystem('osgb36')).toBe(true)
-        expect(siteDetailsMap.isOSGB36CoordinateSystem('WGS84')).toBe(false)
-      })
-    })
-
-    describe('hasWGS84Coordinates', () => {
-      test('should validate WGS84 coordinates', () => {
-        expect(
-          siteDetailsMap.hasWGS84Coordinates({
-            latitude: '51.5',
-            longitude: '-0.1'
+    describe('coordinate system recognition', () => {
+      test.each([
+        {
+          method: 'isWGS84CoordinateSystem',
+          validInputs: ['WGS84', 'wgs84'],
+          invalidInputs: ['OSGB36', 'invalid']
+        },
+        {
+          method: 'isOSGB36CoordinateSystem',
+          validInputs: ['OSGB36', 'osgb36'],
+          invalidInputs: ['WGS84', 'invalid']
+        }
+      ])(
+        '$method should recognize coordinate systems',
+        ({ method, validInputs, invalidInputs }) => {
+          validInputs.forEach((input) => {
+            expect(siteDetailsMap[method](input)).toBe(true)
           })
-        ).toBeTruthy()
-        expect(
-          siteDetailsMap.hasWGS84Coordinates({ latitude: '51.5' })
-        ).toBeFalsy()
-        expect(
-          siteDetailsMap.hasWGS84Coordinates({ longitude: '-0.1' })
-        ).toBeFalsy()
-        expect(siteDetailsMap.hasWGS84Coordinates({})).toBeFalsy()
-      })
+          invalidInputs.forEach((input) => {
+            expect(siteDetailsMap[method](input)).toBe(false)
+          })
+        }
+      )
     })
 
-    describe('hasOSGB36Coordinates', () => {
-      test('should validate OSGB36 coordinates', () => {
-        expect(
-          siteDetailsMap.hasOSGB36Coordinates({
-            eastings: '530000',
-            northings: '180000'
+    describe('coordinate validation', () => {
+      test.each([
+        {
+          method: 'hasWGS84Coordinates',
+          validCoords: { latitude: '51.5', longitude: '-0.1' },
+          invalidCoordsSets: [{ latitude: '51.5' }, { longitude: '-0.1' }, {}]
+        },
+        {
+          method: 'hasOSGB36Coordinates',
+          validCoords: { eastings: '530000', northings: '180000' },
+          invalidCoordsSets: [
+            { eastings: '530000' },
+            { northings: '180000' },
+            {}
+          ]
+        }
+      ])(
+        '$method should validate coordinates',
+        ({ method, validCoords, invalidCoordsSets }) => {
+          expect(siteDetailsMap[method](validCoords)).toBeTruthy()
+
+          invalidCoordsSets.forEach((coords) => {
+            expect(siteDetailsMap[method](coords)).toBeFalsy()
           })
-        ).toBeTruthy()
-        expect(
-          siteDetailsMap.hasOSGB36Coordinates({ eastings: '530000' })
-        ).toBeFalsy()
-        expect(
-          siteDetailsMap.hasOSGB36Coordinates({ northings: '180000' })
-        ).toBeFalsy()
-        expect(siteDetailsMap.hasOSGB36Coordinates({})).toBeFalsy()
-      })
+        }
+      )
     })
   })
 
@@ -453,64 +478,75 @@ describe('SiteDetailsMap', () => {
         .mockReturnValue([3000, 4000])
     })
 
-    test('should parse WGS84 coordinates', () => {
-      const coordinates = { latitude: '51.5', longitude: '-0.1' }
-      const mockFromLonLat = jest.fn()
+    describe('successful coordinate parsing', () => {
+      test.each([
+        {
+          description: 'parse WGS84 coordinates',
+          coordinateSystem: 'WGS84',
+          coordinates: { latitude: '51.5', longitude: '-0.1' },
+          expectedResult: [1000, 2000],
+          expectedMethod: 'convertFromLonLat',
+          expectedArgs: [
+            { latitude: '51.5', longitude: '-0.1' },
+            expect.any(Function)
+          ]
+        },
+        {
+          description: 'parse OSGB36 coordinates',
+          coordinateSystem: 'OSGB36',
+          coordinates: { eastings: '530000', northings: '180000' },
+          expectedResult: [3000, 4000],
+          expectedMethod: 'convertOSGB36ToWebMercator',
+          expectedArgs: [530000, 180000]
+        }
+      ])(
+        'should $description',
+        ({
+          coordinateSystem,
+          coordinates,
+          expectedResult,
+          expectedMethod,
+          expectedArgs
+        }) => {
+          const mockFromLonLat = jest.fn()
 
-      const result = siteDetailsMap.parseCoordinates(
-        'WGS84',
-        coordinates,
-        mockFromLonLat
-      )
+          const result = siteDetailsMap.parseCoordinates(
+            coordinateSystem,
+            coordinates,
+            mockFromLonLat
+          )
 
-      expect(siteDetailsMap.convertFromLonLat).toHaveBeenCalledWith(
-        coordinates,
-        mockFromLonLat
+          expect(result).toEqual(expectedResult)
+          expect(siteDetailsMap[expectedMethod]).toHaveBeenCalledWith(
+            ...expectedArgs
+          )
+        }
       )
-      expect(result).toEqual([1000, 2000])
     })
 
-    test('should parse OSGB36 coordinates', () => {
-      const coordinates = { eastings: '530000', northings: '180000' }
-      const mockFromLonLat = jest.fn()
+    describe('failed coordinate parsing', () => {
+      test.each([
+        {
+          description: 'return null for invalid coordinate system',
+          coordinateSystem: 'INVALID',
+          coordinates: { latitude: '51.5', longitude: '-0.1' }
+        },
+        {
+          description: 'return null for missing coordinates',
+          coordinateSystem: 'WGS84',
+          coordinates: { latitude: '51.5' }
+        }
+      ])('should $description', ({ coordinateSystem, coordinates }) => {
+        const mockFromLonLat = jest.fn()
 
-      const result = siteDetailsMap.parseCoordinates(
-        'OSGB36',
-        coordinates,
-        mockFromLonLat
-      )
+        const result = siteDetailsMap.parseCoordinates(
+          coordinateSystem,
+          coordinates,
+          mockFromLonLat
+        )
 
-      expect(siteDetailsMap.convertOSGB36ToWebMercator).toHaveBeenCalledWith(
-        530000,
-        180000
-      )
-      expect(result).toEqual([3000, 4000])
-    })
-
-    test('should return null for invalid coordinate system', () => {
-      const coordinates = { latitude: '51.5', longitude: '-0.1' }
-      const mockFromLonLat = jest.fn()
-
-      const result = siteDetailsMap.parseCoordinates(
-        'INVALID',
-        coordinates,
-        mockFromLonLat
-      )
-
-      expect(result).toBeNull()
-    })
-
-    test('should return null for missing coordinates', () => {
-      const coordinates = { latitude: '51.5' }
-      const mockFromLonLat = jest.fn()
-
-      const result = siteDetailsMap.parseCoordinates(
-        'WGS84',
-        coordinates,
-        mockFromLonLat
-      )
-
-      expect(result).toBeNull()
+        expect(result).toBeNull()
+      })
     })
   })
 
@@ -595,65 +631,74 @@ describe('SiteDetailsMap', () => {
       }
     })
 
-    test('should return early when no coordinates provided', () => {
-      const siteDetails = { coordinateSystem: 'WGS84' }
+    describe('early returns', () => {
+      test('should return early when no coordinates provided', () => {
+        const siteDetails = { coordinateSystem: 'WGS84' }
 
-      siteDetailsMap.displayManualCoordinates(siteDetails)
+        siteDetailsMap.displayManualCoordinates(siteDetails)
 
-      expect(siteDetailsMap.parseCoordinates).not.toHaveBeenCalled()
+        expect(siteDetailsMap.parseCoordinates).not.toHaveBeenCalled()
+        expect(siteDetailsMap.displayPointSite).not.toHaveBeenCalled()
+        expect(siteDetailsMap.displayCircularSite).not.toHaveBeenCalled()
+      })
+
+      test('should return early when coordinate parsing fails', () => {
+        const siteDetails = {
+          coordinateSystem: 'WGS84',
+          coordinates: { latitude: '51.5', longitude: '-0.1' }
+        }
+        siteDetailsMap.parseCoordinates.mockReturnValue(null)
+
+        siteDetailsMap.displayManualCoordinates(siteDetails)
+
+        expect(siteDetailsMap.parseCoordinates).toHaveBeenCalled()
+        expect(siteDetailsMap.displayPointSite).not.toHaveBeenCalled()
+        expect(siteDetailsMap.displayCircularSite).not.toHaveBeenCalled()
+      })
     })
 
-    test('should return early when coordinate parsing fails', () => {
-      const siteDetails = {
-        coordinateSystem: 'WGS84',
-        coordinates: { latitude: '51.5', longitude: '-0.1' }
-      }
-      siteDetailsMap.parseCoordinates.mockReturnValue(null)
+    describe('successful displays', () => {
+      test('should display circular site when circle width provided', () => {
+        const siteDetails = {
+          coordinateSystem: 'WGS84',
+          coordinates: { latitude: '51.5', longitude: '-0.1' },
+          circleWidth: 1000
+        }
+        const mapCoordinates = [1000, 2000]
+        siteDetailsMap.parseCoordinates.mockReturnValue(mapCoordinates)
 
-      siteDetailsMap.displayManualCoordinates(siteDetails)
+        siteDetailsMap.displayManualCoordinates(siteDetails)
 
-      expect(siteDetailsMap.displayPointSite).not.toHaveBeenCalled()
-      expect(siteDetailsMap.displayCircularSite).not.toHaveBeenCalled()
-    })
+        expect(siteDetailsMap.parseCoordinates).toHaveBeenCalled()
+        expect(siteDetailsMap.displayCircularSite).toHaveBeenCalledWith(
+          mapCoordinates,
+          1000
+        )
+        expect(siteDetailsMap.map.getView().setCenter).toHaveBeenCalledWith(
+          mapCoordinates
+        )
+        expect(siteDetailsMap.map.getView().setZoom).toHaveBeenCalledWith(14)
+      })
 
-    test('should display circular site when circle width provided', () => {
-      const siteDetails = {
-        coordinateSystem: 'WGS84',
-        coordinates: { latitude: '51.5', longitude: '-0.1' },
-        circleWidth: 1000
-      }
-      const mapCoordinates = [1000, 2000]
-      siteDetailsMap.parseCoordinates.mockReturnValue(mapCoordinates)
+      test('should display point site when no circle width provided', () => {
+        const siteDetails = {
+          coordinateSystem: 'WGS84',
+          coordinates: { latitude: '51.5', longitude: '-0.1' }
+        }
+        const mapCoordinates = [1000, 2000]
+        siteDetailsMap.parseCoordinates.mockReturnValue(mapCoordinates)
 
-      siteDetailsMap.displayManualCoordinates(siteDetails)
+        siteDetailsMap.displayManualCoordinates(siteDetails)
 
-      expect(siteDetailsMap.displayCircularSite).toHaveBeenCalledWith(
-        mapCoordinates,
-        1000
-      )
-      expect(siteDetailsMap.map.getView().setCenter).toHaveBeenCalledWith(
-        mapCoordinates
-      )
-      expect(siteDetailsMap.map.getView().setZoom).toHaveBeenCalledWith(14)
-    })
-
-    test('should display point site when no circle width provided', () => {
-      const siteDetails = {
-        coordinateSystem: 'WGS84',
-        coordinates: { latitude: '51.5', longitude: '-0.1' }
-      }
-      const mapCoordinates = [1000, 2000]
-      siteDetailsMap.parseCoordinates.mockReturnValue(mapCoordinates)
-
-      siteDetailsMap.displayManualCoordinates(siteDetails)
-
-      expect(siteDetailsMap.displayPointSite).toHaveBeenCalledWith(
-        mapCoordinates
-      )
-      expect(siteDetailsMap.map.getView().setCenter).toHaveBeenCalledWith(
-        mapCoordinates
-      )
-      expect(siteDetailsMap.map.getView().setZoom).toHaveBeenCalledWith(14)
+        expect(siteDetailsMap.parseCoordinates).toHaveBeenCalled()
+        expect(siteDetailsMap.displayPointSite).toHaveBeenCalledWith(
+          mapCoordinates
+        )
+        expect(siteDetailsMap.map.getView().setCenter).toHaveBeenCalledWith(
+          mapCoordinates
+        )
+        expect(siteDetailsMap.map.getView().setZoom).toHaveBeenCalledWith(14)
+      })
     })
   })
 })

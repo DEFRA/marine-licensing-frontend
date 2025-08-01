@@ -1,245 +1,186 @@
 import GeographicCoordinateConverter from './GeographicCoordinateConverter.js'
 
 describe('GeographicCoordinateConverter', () => {
+  // Helper functions to reduce code duplication
+  const expectBasicCoordinateResult = (result) => {
+    expect(result).toBeDefined()
+    expect(Array.isArray(result)).toBe(true)
+    expect(result).toHaveLength(2)
+  }
+
+  const expectValidCoordinateTypes = (result) => {
+    expect(typeof result[0]).toBe('number')
+    expect(typeof result[1]).toBe('number')
+  }
+
+  const expectFiniteCoordinates = (result) => {
+    expect(isFinite(result[0])).toBe(true)
+    expect(isFinite(result[1])).toBe(true)
+  }
+
+  const convertCoordinates = (easting, northing) =>
+    GeographicCoordinateConverter.osgb36ToWgs84(easting, northing)
+
+  const testBasicConversion = (easting, northing) => {
+    const result = convertCoordinates(easting, northing)
+    expectBasicCoordinateResult(result)
+    expectValidCoordinateTypes(result)
+    return result
+  }
+
   describe('osgb36ToWgs84', () => {
     describe('valid coordinate conversions', () => {
-      test('should convert London coordinates correctly', () => {
-        const osgbEasting = 530000
-        const osgbNorthing = 180000
-
-        const result = GeographicCoordinateConverter.osgb36ToWgs84(
-          osgbEasting,
-          osgbNorthing
-        )
-
-        expect(result).toBeDefined()
-        expect(Array.isArray(result)).toBe(true)
-        expect(result).toHaveLength(2)
-        expect(typeof result[0]).toBe('number')
-        expect(typeof result[1]).toBe('number')
-        expect(result[0]).toBeCloseTo(0.0, 0)
-        expect(result[1]).toBeCloseTo(51.5, 0)
-      })
-
-      test('should convert Edinburgh coordinates correctly', () => {
-        const osgbEasting = 325000
-        const osgbNorthing = 675000
-
-        const result = GeographicCoordinateConverter.osgb36ToWgs84(
-          osgbEasting,
-          osgbNorthing
-        )
-
-        expect(result).toBeDefined()
-        expect(Array.isArray(result)).toBe(true)
-        expect(result).toHaveLength(2)
-        expect(typeof result[0]).toBe('number')
-        expect(typeof result[1]).toBe('number')
-        expect(result[0]).toBeCloseTo(-3.2, 0)
-        expect(result[1]).toBeCloseTo(55.9, 0)
-      })
-
-      test('should convert Brighton coordinates correctly', () => {
-        const osgbEasting = 532000
-        const osgbNorthing = 105000
-
-        const result = GeographicCoordinateConverter.osgb36ToWgs84(
-          osgbEasting,
-          osgbNorthing
-        )
-
-        expect(result).toBeDefined()
-        expect(Array.isArray(result)).toBe(true)
-        expect(result).toHaveLength(2)
-        expect(typeof result[0]).toBe('number')
-        expect(typeof result[1]).toBe('number')
-        expect(result[0]).toBeCloseTo(0.0, 0)
-        expect(result[1]).toBeCloseTo(50.8, 0)
-      })
+      test.each([
+        {
+          location: 'London',
+          easting: 530000,
+          northing: 180000,
+          expectedLon: 0.0,
+          expectedLat: 51.5
+        },
+        {
+          location: 'Edinburgh',
+          easting: 325000,
+          northing: 675000,
+          expectedLon: -3.2,
+          expectedLat: 55.9
+        },
+        {
+          location: 'Brighton',
+          easting: 532000,
+          northing: 105000,
+          expectedLon: 0.0,
+          expectedLat: 50.8
+        }
+      ])(
+        'should convert $location coordinates correctly',
+        ({ easting, northing, expectedLon, expectedLat }) => {
+          const result = testBasicConversion(easting, northing)
+          expect(result[0]).toBeCloseTo(expectedLon, 0)
+          expect(result[1]).toBeCloseTo(expectedLat, 0)
+        }
+      )
     })
 
     describe('boundary values', () => {
-      test('should handle minimum valid OSGB36 coordinates', () => {
-        const osgbEasting = 100000
-        const osgbNorthing = 0
-
-        const result = GeographicCoordinateConverter.osgb36ToWgs84(
-          osgbEasting,
-          osgbNorthing
-        )
-
-        expect(result).toBeDefined()
-        expect(Array.isArray(result)).toBe(true)
-        expect(result).toHaveLength(2)
-        expect(typeof result[0]).toBe('number')
-        expect(typeof result[1]).toBe('number')
-      })
-
-      test('should handle maximum valid OSGB36 coordinates', () => {
-        const osgbEasting = 700000
-        const osgbNorthing = 1300000
-
-        const result = GeographicCoordinateConverter.osgb36ToWgs84(
-          osgbEasting,
-          osgbNorthing
-        )
-
-        expect(result).toBeDefined()
-        expect(Array.isArray(result)).toBe(true)
-        expect(result).toHaveLength(2)
-        expect(typeof result[0]).toBe('number')
-        expect(typeof result[1]).toBe('number')
+      // eslint-disable-next-line jest/expect-expect
+      test.each([
+        { description: 'minimum valid OSGB36', easting: 100000, northing: 0 },
+        {
+          description: 'maximum valid OSGB36',
+          easting: 700000,
+          northing: 1300000
+        }
+      ])('should handle $description coordinates', ({ easting, northing }) => {
+        testBasicConversion(easting, northing)
       })
     })
 
     describe('precision requirements', () => {
-      test('should return coordinates with sufficient precision for mapping', () => {
-        const osgbEasting = 530000
-        const osgbNorthing = 180000
-
-        const result = GeographicCoordinateConverter.osgb36ToWgs84(
-          osgbEasting,
-          osgbNorthing
-        )
-
-        const longitude = result[0]
-        const latitude = result[1]
-
-        expect(longitude.toString()).toMatch(/^-?\d+\.\d{6,}$/)
-        expect(latitude.toString()).toMatch(/^-?\d+\.\d{6,}$/)
-      })
-
-      test('should produce consistent results for same input', () => {
-        const osgbEasting = 400000
-        const osgbNorthing = 300000
-
-        const result1 = GeographicCoordinateConverter.osgb36ToWgs84(
-          osgbEasting,
-          osgbNorthing
-        )
-        const result2 = GeographicCoordinateConverter.osgb36ToWgs84(
-          osgbEasting,
-          osgbNorthing
-        )
-
-        expect(result1).toEqual(result2)
-      })
+      test.each([
+        {
+          description: 'sufficient precision for mapping',
+          easting: 530000,
+          northing: 180000,
+          checks: (result) => {
+            expect(result[0].toString()).toMatch(/^-?\d+\.\d{6,}$/)
+            expect(result[1].toString()).toMatch(/^-?\d+\.\d{6,}$/)
+          }
+        },
+        {
+          description: 'consistent results for same input',
+          easting: 400000,
+          northing: 300000,
+          checks: (result, easting, northing) => {
+            const result2 = convertCoordinates(easting, northing)
+            expect(result).toEqual(result2)
+          }
+        }
+      ])(
+        'should return coordinates with $description',
+        ({ easting, northing, checks }) => {
+          const result = convertCoordinates(easting, northing)
+          checks(result, easting, northing)
+        }
+      )
     })
 
     describe('coordinate format validation', () => {
-      test('should return longitude first, latitude second', () => {
-        const osgbEasting = 530000
-        const osgbNorthing = 180000
+      test.each([
+        {
+          description: 'longitude first, latitude second',
+          easting: 530000,
+          northing: 180000,
+          bounds: { lonMin: -180, lonMax: 180, latMin: -90, latMax: 90 }
+        },
+        {
+          description: 'valid UK coordinates within expected bounds',
+          easting: 400000,
+          northing: 400000,
+          bounds: { lonMin: -8, lonMax: 2, latMin: 49, latMax: 61 }
+        }
+      ])('should return $description', ({ easting, northing, bounds }) => {
+        const result = convertCoordinates(easting, northing)
+        const [longitude, latitude] = result
 
-        const result = GeographicCoordinateConverter.osgb36ToWgs84(
-          osgbEasting,
-          osgbNorthing
-        )
-
-        const longitude = result[0]
-        const latitude = result[1]
-
-        expect(longitude).toBeGreaterThan(-180)
-        expect(longitude).toBeLessThan(180)
-        expect(latitude).toBeGreaterThan(-90)
-        expect(latitude).toBeLessThan(90)
-      })
-
-      test('should return valid UK coordinates within expected bounds', () => {
-        const osgbEasting = 400000
-        const osgbNorthing = 400000
-
-        const result = GeographicCoordinateConverter.osgb36ToWgs84(
-          osgbEasting,
-          osgbNorthing
-        )
-
-        const longitude = result[0]
-        const latitude = result[1]
-
-        expect(longitude).toBeGreaterThan(-8)
-        expect(longitude).toBeLessThan(2)
-        expect(latitude).toBeGreaterThan(49)
-        expect(latitude).toBeLessThan(61)
+        expect(longitude).toBeGreaterThan(bounds.lonMin)
+        expect(longitude).toBeLessThan(bounds.lonMax)
+        expect(latitude).toBeGreaterThan(bounds.latMin)
+        expect(latitude).toBeLessThan(bounds.latMax)
       })
     })
 
     describe('marine licensing coordinate examples', () => {
-      test('should convert coastal coordinates accurately', () => {
-        const osgbEasting = 450000
-        const osgbNorthing = 200000
-
-        const result = GeographicCoordinateConverter.osgb36ToWgs84(
-          osgbEasting,
-          osgbNorthing
-        )
-
-        expect(result).toBeDefined()
-        expect(Array.isArray(result)).toBe(true)
-        expect(result).toHaveLength(2)
-
-        const longitude = result[0]
-        const latitude = result[1]
-
-        expect(longitude).toBeCloseTo(-1.0, 0)
-        expect(latitude).toBeCloseTo(51.7, 0)
-      })
-
-      test('should convert offshore coordinates accurately', () => {
-        const osgbEasting = 500000
-        const osgbNorthing = 500000
-
-        const result = GeographicCoordinateConverter.osgb36ToWgs84(
-          osgbEasting,
-          osgbNorthing
-        )
-
-        expect(result).toBeDefined()
-        expect(Array.isArray(result)).toBe(true)
-        expect(result).toHaveLength(2)
-
-        const longitude = result[0]
-        const latitude = result[1]
-
-        expect(typeof longitude).toBe('number')
-        expect(typeof latitude).toBe('number')
-        expect(isFinite(longitude)).toBe(true)
-        expect(isFinite(latitude)).toBe(true)
-      })
+      test.each([
+        {
+          description: 'coastal coordinates accurately',
+          easting: 450000,
+          northing: 200000,
+          expectedLon: -1.0,
+          expectedLat: 51.7,
+          additionalChecks: (result, expectedLon, expectedLat) => {
+            expect(result[0]).toBeCloseTo(expectedLon, 0)
+            expect(result[1]).toBeCloseTo(expectedLat, 0)
+          }
+        },
+        {
+          description: 'offshore coordinates accurately',
+          easting: 500000,
+          northing: 500000,
+          additionalChecks: (result) => {
+            expectFiniteCoordinates(result)
+          }
+        }
+      ])(
+        'should convert $description',
+        ({ easting, northing, expectedLon, expectedLat, additionalChecks }) => {
+          const result = testBasicConversion(easting, northing)
+          additionalChecks(result, expectedLon, expectedLat)
+        }
+      )
     })
 
     describe('input handling', () => {
-      test('should handle integer coordinates', () => {
-        const result = GeographicCoordinateConverter.osgb36ToWgs84(
-          400000,
-          300000
-        )
-
-        expect(result).toBeDefined()
-        expect(Array.isArray(result)).toBe(true)
-        expect(result).toHaveLength(2)
-      })
-
-      test('should handle floating point coordinates', () => {
-        const result = GeographicCoordinateConverter.osgb36ToWgs84(
-          400000.5,
-          300000.7
-        )
-
-        expect(result).toBeDefined()
-        expect(Array.isArray(result)).toBe(true)
-        expect(result).toHaveLength(2)
-      })
-
-      test('should handle negative coordinates', () => {
-        const result = GeographicCoordinateConverter.osgb36ToWgs84(
-          -100000,
-          -50000
-        )
-
-        expect(result).toBeDefined()
-        expect(Array.isArray(result)).toBe(true)
-        expect(result).toHaveLength(2)
+      // eslint-disable-next-line jest/expect-expect
+      test.each([
+        {
+          description: 'integer coordinates',
+          easting: 400000,
+          northing: 300000
+        },
+        {
+          description: 'floating point coordinates',
+          easting: 400000.5,
+          northing: 300000.7
+        },
+        {
+          description: 'negative coordinates',
+          easting: -100000,
+          northing: -50000
+        }
+      ])('should handle $description', ({ easting, northing }) => {
+        const result = convertCoordinates(easting, northing)
+        expectBasicCoordinateResult(result)
       })
     })
   })

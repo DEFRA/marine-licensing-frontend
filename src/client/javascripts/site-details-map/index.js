@@ -33,15 +33,9 @@ export class SiteDetailsMap extends Component {
     this.olModules = null
     this.destroyed = false
 
-    this.scheduleMapInitialization()
-  }
-
-  scheduleMapInitialization() {
-    setTimeout(() => {
-      this.initializeMap().catch(() => {
-        this.showError()
-      })
-    }, 0)
+    this.initializeMap().catch(() => {
+      this.showError()
+    })
   }
 
   async initializeMap() {

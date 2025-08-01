@@ -1,13 +1,14 @@
 import { Component } from 'govuk-frontend'
 
+import CircleGeometryCalculator from './CircleGeometryCalculator.js'
+import GeographicCoordinateConverter from './GeographicCoordinateConverter.js'
+
 const DEFAULT_UK_CENTER_LONGITUDE = -3.5
 const DEFAULT_UK_CENTER_LATITUDE = 54.0
 const DEFAULT_MAP_ZOOM = 6
 const DETAILED_ZOOM_LEVEL = 14
 const MAX_ZOOM_LEVEL = 16
 
-const EARTH_RADIUS_METERS = 6378137
-const DEGREES_TO_RADIANS_FACTOR = 180
 const CIRCLE_APPROXIMATION_SIDES = 64
 
 const MAP_PADDING_PIXELS = 20
@@ -64,6 +65,12 @@ export class SiteDetailsMap extends Component {
   }
 
   async loadOpenLayersModules() {
+    const modules = await this.importOpenLayersModules()
+    this.setupOpenLayersModules(modules)
+    this.initializeGeoJSONFormat(modules.GeoJSON)
+  }
+
+  async importOpenLayersModules() {
     const [
       ,
       { default: OpenLayersMap },
@@ -96,7 +103,7 @@ export class SiteDetailsMap extends Component {
       import('ol/geom/Polygon.js')
     ])
 
-    this.olModules = {
+    return {
       OpenLayersMap,
       View,
       TileLayer,
@@ -115,7 +122,13 @@ export class SiteDetailsMap extends Component {
       toLonLat,
       GeoJSON
     }
+  }
 
+  setupOpenLayersModules(modules) {
+    this.olModules = modules
+  }
+
+  initializeGeoJSONFormat(GeoJSON) {
     this.geoJSONFormat = new GeoJSON()
   }
 
@@ -332,124 +345,21 @@ export class SiteDetailsMap extends Component {
     radiusInMeters,
     sides = CIRCLE_APPROXIMATION_SIDES
   ) {
-    const [centerLon, centerLat] = centerLonLat
-    const coordinates = []
-    const earthRadius = EARTH_RADIUS_METERS
-    const angularDistance = radiusInMeters / earthRadius
-
-    for (let i = 0; i <= sides; i++) {
-      const bearing = (i * 2 * Math.PI) / sides
-      const point = this.calculateCirclePoint(
-        centerLon,
-        centerLat,
-        angularDistance,
-        bearing
-      )
-      coordinates.push(point)
-    }
-
-    return coordinates
-  }
-
-  calculateCirclePoint(centerLon, centerLat, angularDistance, bearing) {
-    const centerLatRad = (centerLat * Math.PI) / DEGREES_TO_RADIANS_FACTOR
-    const centerLonRad = (centerLon * Math.PI) / DEGREES_TO_RADIANS_FACTOR
-
-    const lat = Math.asin(
-      Math.sin(centerLatRad) * Math.cos(angularDistance) +
-        Math.cos(centerLatRad) * Math.sin(angularDistance) * Math.cos(bearing)
+    return CircleGeometryCalculator.createGeographicCircle(
+      centerLonLat,
+      radiusInMeters,
+      sides
     )
-
-    const lon =
-      centerLonRad +
-      Math.atan2(
-        Math.sin(bearing) * Math.sin(angularDistance) * Math.cos(centerLatRad),
-        Math.cos(angularDistance) - Math.sin(centerLatRad) * Math.sin(lat)
-      )
-
-    return [
-      (lon * DEGREES_TO_RADIANS_FACTOR) / Math.PI,
-      (lat * DEGREES_TO_RADIANS_FACTOR) / Math.PI
-    ]
   }
 
   convertOSGB36ToWebMercator(eastings, northings) {
     const { fromLonLat } = this.olModules
-    const wgs84Coords = osgb36ToWgs84(eastings, northings)
+    const wgs84Coords = GeographicCoordinateConverter.osgb36ToWgs84(
+      eastings,
+      northings
+    )
     return fromLonLat(wgs84Coords)
   }
 }
 
-// OSGB36 to WGS84 conversion function (extracted as standalone utility)
-function osgb36ToWgs84(eastings, northings) {
-  const a = 6377563.396
-  const b = 6356256.909
-  const F0 = 0.9996012717
-  const lat0 = (49 * Math.PI) / DEGREES_TO_RADIANS_FACTOR
-  const lon0 = (-2 * Math.PI) / DEGREES_TO_RADIANS_FACTOR
-  const N0 = -100000
-  const E0 = 400000
-  const e2 = 1 - (b * b) / (a * a)
-  const n = (a - b) / (a + b)
-
-  const lat = lat0
-
-  let latNew = lat
-  for (let i = 0; i < 10; i++) {
-    const Ma = (1 + n + (5 / 4) * n * n + (5 / 4) * n * n * n) * (latNew - lat0)
-    const Mb =
-      (3 * n + 3 * n * n + (21 / 8) * n * n * n) *
-      Math.sin(latNew - lat0) *
-      Math.cos(latNew + lat0)
-    const Mc =
-      ((15 / 8) * n * n + (15 / 8) * n * n * n) *
-      Math.sin(2 * (latNew - lat0)) *
-      Math.cos(2 * (latNew + lat0))
-    const Md =
-      (35 / 24) *
-      n *
-      n *
-      n *
-      Math.sin(3 * (latNew - lat0)) *
-      Math.cos(3 * (latNew + lat0))
-    const mNew = b * F0 * (Ma - Mb + Mc - Md)
-
-    latNew = latNew + (northings - N0 - mNew) / (a * F0)
-    if (Math.abs(northings - N0 - mNew) < 0.01) {
-      break
-    }
-  }
-
-  const v = (a * F0) / Math.sqrt(1 - e2 * Math.sin(latNew) * Math.sin(latNew))
-  const rho =
-    (a * F0 * (1 - e2)) /
-    Math.pow(1 - e2 * Math.sin(latNew) * Math.sin(latNew), 1.5)
-  const eta2 = v / rho - 1
-
-  const tanLat = Math.tan(latNew)
-  const secLat = 1 / Math.cos(latNew)
-
-  const VII = tanLat / (2 * rho * v)
-  const VIII =
-    (tanLat / (24 * rho * Math.pow(v, 3))) *
-    (5 + 3 * tanLat * tanLat + eta2 - 9 * tanLat * tanLat * eta2)
-  const IX =
-    (tanLat / (720 * rho * Math.pow(v, 5))) *
-    (61 + 90 * tanLat * tanLat + 45 * tanLat * tanLat * tanLat * tanLat)
-
-  const X = secLat / v
-  const XI = (secLat / (6 * Math.pow(v, 3))) * (v / rho + 2 * tanLat * tanLat)
-  const XII =
-    (secLat / (120 * Math.pow(v, 5))) *
-    (5 + 28 * tanLat * tanLat + 24 * tanLat * tanLat * tanLat * tanLat)
-
-  const dE = eastings - E0
-  const latFinal =
-    latNew - VII * dE * dE + VIII * Math.pow(dE, 4) - IX * Math.pow(dE, 6)
-  const lonFinal = lon0 + X * dE - XI * Math.pow(dE, 3) + XII * Math.pow(dE, 5)
-
-  return [
-    (lonFinal * DEGREES_TO_RADIANS_FACTOR) / Math.PI,
-    (latFinal * DEGREES_TO_RADIANS_FACTOR) / Math.PI
-  ]
-}
+export default SiteDetailsMap

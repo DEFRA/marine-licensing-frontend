@@ -158,7 +158,29 @@ describe('SiteDetailsMap', () => {
       siteDetailsMap.siteVisualizer = mockSiteVisualizer
     })
 
-    test('should display file data when valid file coordinates exist', () => {
+    test('should clear features before displaying new data', () => {
+      const siteDetails = { geoJSON: { features: [] } }
+      mockDataLoader.hasValidFileCoordinates.mockReturnValue(true)
+      mockDataLoader.hasValidManualCoordinates.mockReturnValue(false)
+
+      siteDetailsMap.displaySiteDetails(siteDetails)
+
+      expect(mockSiteVisualizer.clearFeatures).toHaveBeenCalled()
+    })
+
+    test('should display file upload data when file coordinates are valid', () => {
+      const siteDetails = { geoJSON: { features: [] } }
+      mockDataLoader.hasValidFileCoordinates.mockReturnValue(true)
+      mockDataLoader.hasValidManualCoordinates.mockReturnValue(false)
+
+      siteDetailsMap.displaySiteDetails(siteDetails)
+
+      expect(mockSiteVisualizer.displayFileUploadData).toHaveBeenCalledWith(
+        siteDetails.geoJSON
+      )
+    })
+
+    test('should return file type when file coordinates are displayed', () => {
       const siteDetails = { geoJSON: { features: [] } }
       mockDataLoader.hasValidFileCoordinates.mockReturnValue(true)
       mockDataLoader.hasValidManualCoordinates.mockReturnValue(false)
@@ -166,10 +188,15 @@ describe('SiteDetailsMap', () => {
       const result = siteDetailsMap.displaySiteDetails(siteDetails)
 
       expect(result).toBe('file')
-      expect(mockSiteVisualizer.clearFeatures).toHaveBeenCalled()
-      expect(mockSiteVisualizer.displayFileUploadData).toHaveBeenCalledWith(
-        siteDetails.geoJSON
-      )
+    })
+
+    test('should validate file coordinates using data loader', () => {
+      const siteDetails = { geoJSON: { features: [] } }
+      mockDataLoader.hasValidFileCoordinates.mockReturnValue(true)
+      mockDataLoader.hasValidManualCoordinates.mockReturnValue(false)
+
+      siteDetailsMap.displaySiteDetails(siteDetails)
+
       expect(mockDataLoader.hasValidFileCoordinates).toHaveBeenCalledWith(
         siteDetails
       )

@@ -33,51 +33,103 @@ describe('MapFactory', () => {
     mapFactory = new MapFactory(mockOlModules)
   })
 
+  const createMapTestSetup = () => ({
+    target: document.createElement('div'),
+    options: { center: [-3.5, 54.0], zoom: 6 },
+    vectorLayer: {},
+    mocks: {
+      tileLayer: {},
+      osm: {},
+      view: {},
+      attribution: {},
+      map: {}
+    }
+  })
+
+  const setupMapMocks = (setup) => {
+    mockOlModules.TileLayer.mockReturnValue(setup.mocks.tileLayer)
+    mockOlModules.OSM.mockReturnValue(setup.mocks.osm)
+    mockOlModules.View.mockReturnValue(setup.mocks.view)
+    mockOlModules.Attribution.mockReturnValue(setup.mocks.attribution)
+    mockOlModules.OpenLayersMap.mockReturnValue(setup.mocks.map)
+  }
+
   describe('createMap', () => {
-    test('should create map with correct configuration', () => {
-      const mockTarget = document.createElement('div')
-      const options = { center: [-3.5, 54.0], zoom: 6 }
-      const mockVectorLayer = {}
-      const mockTileLayer = {}
-      const mockOSM = {}
-      const mockView = {}
-      const mockAttribution = {}
-      const mockMap = {}
+    test('should create tile layer with OSM source', () => {
+      const setup = createMapTestSetup()
+      setupMapMocks(setup)
 
-      mockOlModules.TileLayer.mockReturnValue(mockTileLayer)
-      mockOlModules.OSM.mockReturnValue(mockOSM)
-      mockOlModules.View.mockReturnValue(mockView)
-
-      mockOlModules.Attribution.mockReturnValue(mockAttribution)
-      mockOlModules.OpenLayersMap.mockReturnValue(mockMap)
-
-      const result = mapFactory.createMap(mockTarget, options, mockVectorLayer)
+      mapFactory.createMap(setup.target, setup.options, setup.vectorLayer)
 
       expect(mockOlModules.TileLayer).toHaveBeenCalledWith({
-        source: mockOSM
+        source: setup.mocks.osm
       })
       expect(mockOlModules.OSM).toHaveBeenCalled()
+    })
+
+    test('should configure attribution without collapsible button', () => {
+      const setup = createMapTestSetup()
+      setupMapMocks(setup)
+
+      mapFactory.createMap(setup.target, setup.options, setup.vectorLayer)
+
       expect(mockOlModules.Attribution).toHaveBeenCalledWith({
         collapsible: false,
         collapsed: false
       })
+    })
+
+    test('should setup controls with custom attribution', () => {
+      const setup = createMapTestSetup()
+      setupMapMocks(setup)
+
+      mapFactory.createMap(setup.target, setup.options, setup.vectorLayer)
+
       expect(mockOlModules.defaultControls).toHaveBeenCalledWith({
         attribution: false
       })
       expect(mockOlModules.defaultControls().extend).toHaveBeenCalledWith([
-        mockAttribution
+        setup.mocks.attribution
       ])
+    })
+
+    test('should create view with provided options', () => {
+      const setup = createMapTestSetup()
+      setupMapMocks(setup)
+
+      mapFactory.createMap(setup.target, setup.options, setup.vectorLayer)
+
       expect(mockOlModules.View).toHaveBeenCalledWith({
-        center: options.center,
-        zoom: options.zoom
+        center: setup.options.center,
+        zoom: setup.options.zoom
       })
+    })
+
+    test('should create map with all components', () => {
+      const setup = createMapTestSetup()
+      setupMapMocks(setup)
+
+      mapFactory.createMap(setup.target, setup.options, setup.vectorLayer)
+
       expect(mockOlModules.OpenLayersMap).toHaveBeenCalledWith({
-        target: mockTarget,
-        layers: [mockTileLayer, mockVectorLayer],
+        target: setup.target,
+        layers: [setup.mocks.tileLayer, setup.vectorLayer],
         controls: [],
-        view: mockView
+        view: setup.mocks.view
       })
-      expect(result).toBe(mockMap)
+    })
+
+    test('should return created map instance', () => {
+      const setup = createMapTestSetup()
+      setupMapMocks(setup)
+
+      const result = mapFactory.createMap(
+        setup.target,
+        setup.options,
+        setup.vectorLayer
+      )
+
+      expect(result).toBe(setup.mocks.map)
     })
   })
 

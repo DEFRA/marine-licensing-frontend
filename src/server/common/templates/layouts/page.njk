@@ -12,6 +12,7 @@
 
 {% block head %}
   <link href="{{ getAssetPath('stylesheets/application.scss') }}" rel="stylesheet">
+  {% block extraCSS %}{% endblock %}
   <script>
     window.CLARITY_PROJECT_ID = "{{ clarityProjectId | default('') }}";
   </script>

@@ -5,6 +5,14 @@
 {% from "govuk/components/button/macro.njk" import govukButton %}
 {% from "cancel-button/macro.njk" import appCancelButton %}
 
+{% block pageTitle %}
+  Review site details | {{ serviceName }}
+{% endblock %}
+
+{% block extraCSS %}
+  <link href="/public/stylesheets/ol.css" rel="stylesheet">
+{% endblock %}
+
 {% block beforeContent %}
     {{ govukBackLink({
         text: "Back",

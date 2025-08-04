@@ -120,7 +120,7 @@ describe('MapFactory', () => {
       const result = mapFactory.createDefaultStyle()
 
       expect(mockOlModules.Fill).toHaveBeenCalledWith({
-        color: 'rgba(255, 255, 255, 0.6)'
+        color: 'rgba(255, 255, 255, 0.2)'
       })
       expect(mockOlModules.Stroke).toHaveBeenCalledWith({
         color: '#000000',
@@ -164,7 +164,7 @@ describe('MapFactory', () => {
 
       // Main fill
       expect(mockOlModules.Fill).toHaveBeenCalledWith({
-        color: 'rgba(255, 255, 255, 0.6)'
+        color: 'rgba(255, 255, 255, 0.2)'
       })
       // Circle fill (transparent)
       expect(mockOlModules.Fill).toHaveBeenCalledWith({

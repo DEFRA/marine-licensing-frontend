@@ -193,6 +193,10 @@ export default {
         {
           from: path.join(govukFrontendPath, 'dist/govuk/assets'),
           to: 'assets'
+        },
+        {
+          from: require.resolve('ol/ol.css'),
+          to: 'stylesheets/ol.css'
         }
       ]
     })

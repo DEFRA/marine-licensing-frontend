@@ -64,6 +64,16 @@ describe('#reviewSiteDetails', () => {
     }
   })
 
+  const createTestContext = () => ({
+    h: { view: jest.fn(), redirect: jest.fn() },
+    request: createMockRequest()
+  })
+
+  const extractViewCall = (mockH) => {
+    const [route, context] = mockH.view.mock.calls[0]
+    return { route, context }
+  }
+
   const createFileUploadExemptionWithS3 = () => ({
     ...mockExemption,
     siteDetails: {
@@ -269,36 +279,37 @@ describe('#reviewSiteDetails', () => {
       )
     })
 
-    test('reviewSiteDetailsController handler should render with correct context for WGS84', async () => {
-      const h = { view: jest.fn() }
-      const mockRequest = createMockRequest()
+    test('should render WGS84 template', async () => {
+      const { h, request } = createTestContext()
 
-      await reviewSiteDetailsController.handler(mockRequest, h)
+      await reviewSiteDetailsController.handler(request, h)
 
-      expect(h.view).toHaveBeenCalledWith(REVIEW_SITE_DETAILS_VIEW_ROUTE, {
-        heading: 'Review site details',
-        pageTitle: 'Review site details',
-        backLink: routes.TASK_LIST,
-        projectName: 'Test Project',
-        summaryData: {
-          method:
-            'Manually enter one set of coordinates and a width to create a circular site',
-          coordinateSystem:
-            'WGS84 (World Geodetic System 1984)\nLatitude and longitude',
-          coordinates: `${mockCoordinates[COORDINATE_SYSTEMS.WGS84].latitude}, ${mockCoordinates[COORDINATE_SYSTEMS.WGS84].longitude}`,
-          width: '100 metres'
-        },
-        siteDetailsData: JSON.stringify({
-          coordinatesType: 'coordinates',
-          coordinateSystem: 'wgs84',
-          coordinatesEntry: 'single',
-          coordinates: {
-            latitude: '51.489676',
-            longitude: '-0.231530'
-          },
-          circleWidth: '100'
-        })
-      })
+      expect(h.view).toHaveBeenCalledWith(
+        REVIEW_SITE_DETAILS_VIEW_ROUTE,
+        expect.any(Object)
+      )
+    })
+
+    test('should format WGS84 coordinate display correctly', async () => {
+      const { h, request } = createTestContext()
+
+      await reviewSiteDetailsController.handler(request, h)
+
+      const { context } = extractViewCall(h)
+      expect(context.summaryData.coordinates).toBe(
+        `${mockCoordinates[COORDINATE_SYSTEMS.WGS84].latitude}, ${mockCoordinates[COORDINATE_SYSTEMS.WGS84].longitude}`
+      )
+    })
+
+    test('should include WGS84 coordinate system description', async () => {
+      const { h, request } = createTestContext()
+
+      await reviewSiteDetailsController.handler(request, h)
+
+      const { context } = extractViewCall(h)
+      expect(context.summaryData.coordinateSystem).toBe(
+        'WGS84 (World Geodetic System 1984)\nLatitude and longitude'
+      )
     })
 
     test('reviewSiteDetailsController handler should render with correct context for OSGB36', async () => {

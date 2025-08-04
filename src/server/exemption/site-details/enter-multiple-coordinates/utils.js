@@ -75,22 +75,22 @@ const areCoordinatesEmptyOrInvalid = (coordinates) => {
 
 /**
  * Check if coordinate data matches the expected coordinate system
- * @param {Object} coordinate - First coordinate object
+ * @param {object} coordinate - First coordinate object
  * @param {string} coordinateSystem - Expected coordinate system
  * @returns {boolean} True if coordinate system matches the data
  */
 const doesCoordinateSystemMatchData = (coordinate, coordinateSystem) => {
   const hasWgs84Fields = coordinate?.latitude !== undefined
   const hasOsgb36Fields = coordinate?.eastings !== undefined
-  
+
   if (coordinateSystem === COORDINATE_SYSTEMS.WGS84) {
     return hasWgs84Fields && !hasOsgb36Fields
   }
-  
+
   if (coordinateSystem === COORDINATE_SYSTEMS.OSGB36) {
     return hasOsgb36Fields && !hasWgs84Fields
   }
-  
+
   return false
 }
 

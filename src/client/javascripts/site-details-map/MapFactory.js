@@ -1,0 +1,85 @@
+class MapFactory {
+  constructor(olModules) {
+    this.olModules = olModules
+  }
+
+  /**
+   * Create a new map instance
+   * @param {HTMLElement} target - DOM element to attach map to
+   * @param {object} options - Map options (center, zoom)
+   * @param {object} vectorLayer - Vector layer for features
+   * @returns {object} OpenLayers Map instance
+   */
+  createMap(target, options, vectorLayer) {
+    const { OpenLayersMap, View, TileLayer, OSM } = this.olModules
+
+    return new OpenLayersMap({
+      target,
+      layers: [
+        new TileLayer({
+          source: new OSM()
+        }),
+        vectorLayer
+      ],
+      view: new View({
+        center: options.center,
+        zoom: options.zoom
+      })
+    })
+  }
+
+  /**
+   * Create vector source and layer for map features
+   * @returns {object} object containing vectorSource and vectorLayer
+   */
+  createMapLayers() {
+    const { VectorSource, VectorLayer } = this.olModules
+    const vectorSource = new VectorSource()
+    const vectorLayer = new VectorLayer({
+      source: vectorSource,
+      style: this.createDefaultStyle()
+    })
+
+    return { vectorSource, vectorLayer }
+  }
+
+  /**
+   * Create default styling for map features
+   * @returns {object} OpenLayers Style instance
+   */
+  createDefaultStyle() {
+    const { Style, Fill, Stroke, Circle } = this.olModules
+    const STROKE_WIDTH_PIXELS = 2
+
+    return new Style({
+      fill: new Fill({
+        color: 'rgba(255, 255, 255, 0.6)'
+      }),
+      stroke: new Stroke({
+        color: '#000000',
+        width: STROKE_WIDTH_PIXELS
+      }),
+      image: new Circle({
+        radius: 7,
+        fill: new Fill({
+          color: 'transparent'
+        }),
+        stroke: new Stroke({
+          color: '#000000',
+          width: STROKE_WIDTH_PIXELS
+        })
+      })
+    })
+  }
+
+  /**
+   * Initialize GeoJSON format for reading features
+   * @param {Function} GeoJSONClass - OpenLayers GeoJSON class
+   * @returns {object} GeoJSON format instance
+   */
+  initializeGeoJSONFormat(GeoJSONClass) {
+    return new GeoJSONClass()
+  }
+}
+
+export default MapFactory

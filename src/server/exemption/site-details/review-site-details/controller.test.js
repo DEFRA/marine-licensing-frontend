@@ -64,6 +64,61 @@ describe('#reviewSiteDetails', () => {
     }
   })
 
+  const createFileUploadExemptionWithS3 = () => ({
+    ...mockExemption,
+    siteDetails: {
+      coordinatesType: 'file',
+      fileUploadType: 'kml',
+      uploadedFile: {
+        filename: 'test-site.kml',
+        s3Location: {
+          s3Bucket: 'test-bucket',
+          s3Key: 'test-key',
+          checksumSha256: 'test-checksum'
+        }
+      },
+      geoJSON: {
+        type: 'FeatureCollection',
+        features: [
+          {
+            type: 'Feature',
+            geometry: {
+              type: 'Point',
+              coordinates: [51.5074, -0.1278]
+            }
+          }
+        ]
+      },
+      featureCount: 1
+    }
+  })
+
+  const createExpectedSiteDetails = () => ({
+    coordinatesType: 'file',
+    fileUploadType: 'kml',
+    geoJSON: {
+      type: 'FeatureCollection',
+      features: [
+        {
+          type: 'Feature',
+          geometry: {
+            type: 'Point',
+            coordinates: [51.5074, -0.1278]
+          }
+        }
+      ]
+    },
+    featureCount: 1,
+    uploadedFile: {
+      filename: 'test-site.kml'
+    },
+    s3Location: {
+      s3Bucket: 'test-bucket',
+      s3Key: 'test-key',
+      checksumSha256: 'test-checksum'
+    }
+  })
+
   beforeAll(async () => {
     server = await createServer()
     await server.initialize()
@@ -416,43 +471,10 @@ describe('#reviewSiteDetails', () => {
     })
 
     test('Should save file upload data with display metadata for file upload flow', async () => {
-      const mockFileUploadExemption = {
-        ...mockExemption,
-        siteDetails: {
-          coordinatesType: 'file',
-          fileUploadType: 'kml',
-          uploadedFile: {
-            filename: 'test-site.kml',
-            s3Location: {
-              s3Bucket: 'test-bucket',
-              s3Key: 'test-key',
-              checksumSha256: 'test-checksum'
-            }
-          },
-          geoJSON: {
-            type: 'FeatureCollection',
-            features: [
-              {
-                type: 'Feature',
-                geometry: {
-                  type: 'Point',
-                  coordinates: [51.5074, -0.1278]
-                }
-              }
-            ]
-          },
-          featureCount: 1
-        }
-      }
-
+      const mockFileUploadExemption = createFileUploadExemptionWithS3()
       getExemptionCacheSpy.mockReturnValueOnce(mockFileUploadExemption)
 
-      const request = {
-        logger: {
-          info: jest.fn(),
-          error: jest.fn()
-        }
-      }
+      const request = createMockRequest()
       const h = { redirect: jest.fn() }
 
       await reviewSiteDetailsSubmitController.handler(request, h)
@@ -461,31 +483,7 @@ describe('#reviewSiteDetails', () => {
         expect.any(Object),
         '/exemption/site-details',
         {
-          siteDetails: {
-            coordinatesType: 'file',
-            fileUploadType: 'kml',
-            geoJSON: {
-              type: 'FeatureCollection',
-              features: [
-                {
-                  type: 'Feature',
-                  geometry: {
-                    type: 'Point',
-                    coordinates: [51.5074, -0.1278]
-                  }
-                }
-              ]
-            },
-            featureCount: 1,
-            uploadedFile: {
-              filename: 'test-site.kml'
-            },
-            s3Location: {
-              s3Bucket: 'test-bucket',
-              s3Key: 'test-key',
-              checksumSha256: 'test-checksum'
-            }
-          },
+          siteDetails: createExpectedSiteDetails(),
           id: mockExemption.id
         }
       )

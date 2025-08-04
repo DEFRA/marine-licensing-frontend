@@ -1,6 +1,7 @@
 import CoordinateParser from './coordinate-parser.js'
 import { SiteDetailsMap } from './index.js'
 import MapFactory from './map-factory.js'
+import OpenLayersModuleLoader from './openlayers-module-loader.js'
 import SiteDataLoader from './site-data-loader.js'
 import SiteVisualizer from './site-visualizer.js'
 
@@ -24,6 +25,7 @@ jest.mock('govuk-frontend', () => ({
 }))
 
 jest.mock('./coordinate-parser.js')
+jest.mock('./openlayers-module-loader.js')
 jest.mock('./site-data-loader.js')
 jest.mock('./map-factory.js')
 jest.mock('./site-visualizer.js')
@@ -38,6 +40,7 @@ describe('SiteDetailsMap', () => {
   let mockDataLoader
   let mockSiteVisualizer
   let mockCoordinateParser
+  let mockModuleLoader
 
   beforeEach(() => {
     jest.clearAllMocks()
@@ -68,10 +71,41 @@ describe('SiteDetailsMap', () => {
       parseCoordinates: jest.fn()
     }
 
+    mockModuleLoader = {
+      loadModules: jest.fn().mockResolvedValue({
+        OpenLayersMap: jest.fn(),
+        View: jest.fn(),
+        TileLayer: jest.fn(),
+        OSM: jest.fn(),
+        VectorLayer: jest.fn(),
+        VectorSource: jest.fn(),
+        Feature: jest.fn(),
+        Point: jest.fn(),
+        Polygon: jest.fn(),
+        Style: jest.fn(),
+        Fill: jest.fn(),
+        Stroke: jest.fn(),
+        Circle: jest.fn(),
+        fromLonLat: jest.fn(),
+        toLonLat: jest.fn(),
+        GeoJSON: jest.fn(),
+        Attribution: jest.fn(),
+        defaultControls: jest.fn()
+      })
+    }
+
     SiteDataLoader.mockImplementation(() => mockDataLoader)
     SiteVisualizer.mockImplementation(() => mockSiteVisualizer)
     CoordinateParser.mockImplementation(() => mockCoordinateParser)
-    MapFactory.mockImplementation(() => ({}))
+    MapFactory.mockImplementation(() => ({
+      createMapLayers: jest.fn().mockReturnValue({
+        vectorSource: {},
+        vectorLayer: {}
+      }),
+      initializeGeoJSONFormat: jest.fn().mockReturnValue({}),
+      createMap: jest.fn().mockReturnValue({})
+    }))
+    OpenLayersModuleLoader.mockImplementation(() => mockModuleLoader)
   })
 
   describe('constructor', () => {
@@ -98,6 +132,23 @@ describe('SiteDetailsMap', () => {
 
       expect(CoordinateParser).toHaveBeenCalled()
       expect(SiteDataLoader).toHaveBeenCalled()
+      expect(OpenLayersModuleLoader).toHaveBeenCalled()
+    })
+
+    test('should use default module loader when none provided', () => {
+      siteDetailsMap = new SiteDetailsMap(mockRoot)
+
+      expect(siteDetailsMap.moduleLoader).toBeDefined()
+      expect(OpenLayersModuleLoader).toHaveBeenCalled()
+    })
+
+    test('should accept injected module loader', () => {
+      const customModuleLoader = { loadModules: jest.fn() }
+
+      siteDetailsMap = new SiteDetailsMap(mockRoot, {}, customModuleLoader)
+
+      expect(siteDetailsMap.moduleLoader).toBe(customModuleLoader)
+      expect(OpenLayersModuleLoader).not.toHaveBeenCalled()
     })
   })
 
@@ -457,6 +508,93 @@ describe('SiteDetailsMap', () => {
 
       expect(result).toBe(false)
       expect(mockSiteVisualizer.centerMapView).not.toHaveBeenCalled()
+    })
+  })
+
+  describe('initializeMap with dependency injection', () => {
+    test('should use injected module loader to load OpenLayers modules', async () => {
+      const customModuleLoader = {
+        loadModules: jest.fn().mockResolvedValue({
+          OpenLayersMap: jest.fn(),
+          View: jest.fn(),
+          TileLayer: jest.fn(),
+          OSM: jest.fn(),
+          VectorLayer: jest.fn(),
+          VectorSource: jest.fn(),
+          Feature: jest.fn(),
+          Point: jest.fn(),
+          Polygon: jest.fn(),
+          Style: jest.fn(),
+          Fill: jest.fn(),
+          Stroke: jest.fn(),
+          Circle: jest.fn(),
+          fromLonLat: jest.fn(),
+          toLonLat: jest.fn(),
+          GeoJSON: jest.fn(),
+          Attribution: jest.fn(),
+          defaultControls: jest.fn()
+        })
+      }
+
+      siteDetailsMap = new SiteDetailsMap(mockRoot, {}, customModuleLoader)
+
+      await siteDetailsMap.initializeMap()
+
+      expect(customModuleLoader.loadModules).toHaveBeenCalled()
+      expect(MapFactory).toHaveBeenCalledWith(
+        expect.objectContaining({
+          OpenLayersMap: expect.any(Function),
+          View: expect.any(Function)
+        })
+      )
+    })
+
+    test('should handle module loading errors gracefully', async () => {
+      const failingModuleLoader = {
+        loadModules: jest
+          .fn()
+          .mockRejectedValue(new Error('Module loading failed'))
+      }
+
+      siteDetailsMap = new SiteDetailsMap(mockRoot, {}, failingModuleLoader)
+
+      await expect(siteDetailsMap.initializeMap()).rejects.toThrow(
+        'Module loading failed'
+      )
+      expect(failingModuleLoader.loadModules).toHaveBeenCalled()
+    })
+
+    test('should return early when component is destroyed during initialization', async () => {
+      const moduleLoader = {
+        loadModules: jest.fn().mockResolvedValue({
+          OpenLayersMap: jest.fn(),
+          View: jest.fn(),
+          TileLayer: jest.fn(),
+          OSM: jest.fn(),
+          VectorLayer: jest.fn(),
+          VectorSource: jest.fn(),
+          Feature: jest.fn(),
+          Point: jest.fn(),
+          Polygon: jest.fn(),
+          Style: jest.fn(),
+          Fill: jest.fn(),
+          Stroke: jest.fn(),
+          Circle: jest.fn(),
+          fromLonLat: jest.fn(),
+          toLonLat: jest.fn(),
+          GeoJSON: jest.fn(),
+          Attribution: jest.fn(),
+          defaultControls: jest.fn()
+        })
+      }
+
+      siteDetailsMap = new SiteDetailsMap(mockRoot, {}, moduleLoader)
+      siteDetailsMap.destroyed = true
+
+      await siteDetailsMap.initializeMap()
+
+      expect(moduleLoader.loadModules).toHaveBeenCalled()
+      expect(MapFactory).not.toHaveBeenCalled()
     })
   })
 })

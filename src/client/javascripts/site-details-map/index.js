@@ -1,6 +1,7 @@
 import { Component } from 'govuk-frontend'
 import CoordinateParser from './coordinate-parser.js'
 import MapFactory from './map-factory.js'
+import OpenLayersModuleLoader from './openlayers-module-loader.js'
 import SiteDataLoader from './site-data-loader.js'
 import SiteVisualizer from './site-visualizer.js'
 
@@ -12,7 +13,7 @@ const DETAILED_ZOOM_LEVEL = 14
 export class SiteDetailsMap extends Component {
   static moduleName = 'site-details-map'
 
-  constructor($root, options = {}) {
+  constructor($root, options = {}, moduleLoader = null) {
     super($root)
 
     this.options = {
@@ -28,6 +29,7 @@ export class SiteDetailsMap extends Component {
     this.dataLoader = new SiteDataLoader()
     this.mapFactory = null
     this.siteVisualizer = null
+    this.moduleLoader = moduleLoader ?? new OpenLayersModuleLoader()
 
     this.scheduleMapInitialization()
   }
@@ -40,73 +42,8 @@ export class SiteDetailsMap extends Component {
     }, 0)
   }
 
-  async loadOpenLayersModules() {
-    const [
-      { default: OpenLayersMap },
-      { default: View },
-      { default: TileLayer },
-      { default: OSM }
-    ] = await Promise.all([
-      import('ol/Map.js'),
-      import('ol/View.js'),
-      import('ol/layer/Tile.js'),
-      import('ol/source/OSM.js')
-    ])
-
-    const [
-      { default: VectorLayer },
-      { default: VectorSource },
-      { default: Feature },
-      { Style, Fill, Stroke, Circle }
-    ] = await Promise.all([
-      import('ol/layer/Vector.js'),
-      import('ol/source/Vector.js'),
-      import('ol/Feature.js'),
-      import('ol/style.js')
-    ])
-
-    const [
-      { default: Point },
-      { default: Polygon },
-      { fromLonLat, toLonLat },
-      { default: GeoJSON }
-    ] = await Promise.all([
-      import('ol/geom/Point.js'),
-      import('ol/geom/Polygon.js'),
-      import('ol/proj.js'),
-      import('ol/format/GeoJSON.js')
-    ])
-
-    const [{ default: Attribution }, { defaults: defaultControls }] =
-      await Promise.all([
-        import('ol/control/Attribution.js'),
-        import('ol/control/defaults.js')
-      ])
-
-    return {
-      OpenLayersMap,
-      View,
-      TileLayer,
-      OSM,
-      VectorLayer,
-      VectorSource,
-      Feature,
-      Point,
-      Polygon,
-      Style,
-      Fill,
-      Stroke,
-      Circle,
-      fromLonLat,
-      toLonLat,
-      GeoJSON,
-      Attribution,
-      defaultControls
-    }
-  }
-
   async initializeMap() {
-    const olModules = await this.loadOpenLayersModules()
+    const olModules = await this.moduleLoader.loadModules()
 
     if (this.destroyed) {
       return

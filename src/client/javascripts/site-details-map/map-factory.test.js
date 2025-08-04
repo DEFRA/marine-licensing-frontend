@@ -248,6 +248,22 @@ describe('MapFactory', () => {
       expect(mockAttribution.setCollapsed).toHaveBeenCalledWith(true)
     })
 
+    test('should not collapse attribution for map exactly at boundary size', () => {
+      const mockMap = {
+        on: jest.fn(),
+        getSize: jest.fn().mockReturnValue([600, 600])
+      }
+      const mockAttribution = {
+        setCollapsible: jest.fn(),
+        setCollapsed: jest.fn()
+      }
+
+      mapFactory.setupResponsiveAttribution(mockMap, mockAttribution)
+
+      expect(mockAttribution.setCollapsible).toHaveBeenCalledWith(false)
+      expect(mockAttribution.setCollapsed).toHaveBeenCalledWith(false)
+    })
+
     test('should call checkSize function when map size changes', () => {
       const mockMap = {
         on: jest.fn(),

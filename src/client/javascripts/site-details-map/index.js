@@ -153,20 +153,24 @@ export class SiteDetailsMap extends Component {
   /**
    * Display site details based on coordinate type
    * @param {object} siteDetails - Site details data
+   * @returns {string|null} - Type of display action taken: 'file', 'manual', 'error', or null if no visualizer
    */
   displaySiteDetails(siteDetails) {
     if (!this.siteVisualizer) {
-      return
+      return null
     }
 
     this.siteVisualizer.clearFeatures()
 
     if (this.dataLoader.hasValidFileCoordinates(siteDetails)) {
       this.siteVisualizer.displayFileUploadData(siteDetails.geoJSON)
+      return 'file'
     } else if (this.dataLoader.hasValidManualCoordinates(siteDetails)) {
       this.displayManualCoordinates(siteDetails)
+      return 'manual'
     } else {
       this.showError()
+      return 'error'
     }
   }
 
@@ -206,20 +210,24 @@ export class SiteDetailsMap extends Component {
 
   renderSiteGeometry(mapCoordinates, circleWidth) {
     if (!this.siteVisualizer) {
-      return
+      return null
     }
 
     if (circleWidth) {
       this.siteVisualizer.displayCircularSite(mapCoordinates, circleWidth)
+      return 'circle'
     } else {
       this.siteVisualizer.displayPointSite(mapCoordinates)
+      return 'point'
     }
   }
 
   centerMapOnCoordinates(mapCoordinates) {
     if (this.siteVisualizer) {
       this.siteVisualizer.centerMapView(mapCoordinates, DETAILED_ZOOM_LEVEL)
+      return true
     }
+    return false
   }
 
   showError() {

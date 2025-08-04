@@ -112,8 +112,9 @@ describe('SiteDetailsMap', () => {
       mockDataLoader.hasValidFileCoordinates.mockReturnValue(true)
       mockDataLoader.hasValidManualCoordinates.mockReturnValue(false)
 
-      siteDetailsMap.displaySiteDetails(siteDetails)
+      const result = siteDetailsMap.displaySiteDetails(siteDetails)
 
+      expect(result).toBe('file')
       expect(mockSiteVisualizer.clearFeatures).toHaveBeenCalled()
       expect(mockSiteVisualizer.displayFileUploadData).toHaveBeenCalledWith(
         siteDetails.geoJSON
@@ -132,8 +133,9 @@ describe('SiteDetailsMap', () => {
       mockDataLoader.hasValidManualCoordinates.mockReturnValue(true)
       mockCoordinateParser.parseCoordinates.mockReturnValue([1000, 2000])
 
-      siteDetailsMap.displaySiteDetails(siteDetails)
+      const result = siteDetailsMap.displaySiteDetails(siteDetails)
 
+      expect(result).toBe('manual')
       expect(mockSiteVisualizer.clearFeatures).toHaveBeenCalled()
       expect(mockDataLoader.hasValidManualCoordinates).toHaveBeenCalledWith(
         siteDetails
@@ -147,8 +149,9 @@ describe('SiteDetailsMap', () => {
 
       const showErrorSpy = jest.spyOn(siteDetailsMap, 'showError')
 
-      siteDetailsMap.displaySiteDetails(siteDetails)
+      const result = siteDetailsMap.displaySiteDetails(siteDetails)
 
+      expect(result).toBe('error')
       expect(mockSiteVisualizer.clearFeatures).toHaveBeenCalled()
       expect(showErrorSpy).toHaveBeenCalled()
     })
@@ -157,8 +160,9 @@ describe('SiteDetailsMap', () => {
       siteDetailsMap.siteVisualizer = null
       const siteDetails = {}
 
-      siteDetailsMap.displaySiteDetails(siteDetails)
+      const result = siteDetailsMap.displaySiteDetails(siteDetails)
 
+      expect(result).toBeNull()
       expect(mockDataLoader.hasValidFileCoordinates).not.toHaveBeenCalled()
       expect(mockDataLoader.hasValidManualCoordinates).not.toHaveBeenCalled()
     })
@@ -379,6 +383,80 @@ describe('SiteDetailsMap', () => {
       await callback()
 
       expect(showErrorSpy).toHaveBeenCalled()
+    })
+  })
+
+  describe('renderSiteGeometry', () => {
+    beforeEach(() => {
+      siteDetailsMap = new SiteDetailsMap(mockRoot)
+      siteDetailsMap.siteVisualizer = mockSiteVisualizer
+    })
+
+    test('should render circular site when circleWidth provided', () => {
+      const mapCoordinates = [1000, 2000]
+      const circleWidth = 500
+
+      const result = siteDetailsMap.renderSiteGeometry(
+        mapCoordinates,
+        circleWidth
+      )
+
+      expect(result).toBe('circle')
+      expect(mockSiteVisualizer.displayCircularSite).toHaveBeenCalledWith(
+        mapCoordinates,
+        circleWidth
+      )
+    })
+
+    test('should render point site when no circleWidth provided', () => {
+      const mapCoordinates = [1000, 2000]
+
+      const result = siteDetailsMap.renderSiteGeometry(mapCoordinates)
+
+      expect(result).toBe('point')
+      expect(mockSiteVisualizer.displayPointSite).toHaveBeenCalledWith(
+        mapCoordinates
+      )
+    })
+
+    test('should return null when no siteVisualizer available', () => {
+      siteDetailsMap.siteVisualizer = null
+      const mapCoordinates = [1000, 2000]
+
+      const result = siteDetailsMap.renderSiteGeometry(mapCoordinates)
+
+      expect(result).toBeNull()
+      expect(mockSiteVisualizer.displayCircularSite).not.toHaveBeenCalled()
+      expect(mockSiteVisualizer.displayPointSite).not.toHaveBeenCalled()
+    })
+  })
+
+  describe('centerMapOnCoordinates', () => {
+    beforeEach(() => {
+      siteDetailsMap = new SiteDetailsMap(mockRoot)
+      siteDetailsMap.siteVisualizer = mockSiteVisualizer
+    })
+
+    test('should center map when siteVisualizer available', () => {
+      const mapCoordinates = [1000, 2000]
+
+      const result = siteDetailsMap.centerMapOnCoordinates(mapCoordinates)
+
+      expect(result).toBe(true)
+      expect(mockSiteVisualizer.centerMapView).toHaveBeenCalledWith(
+        mapCoordinates,
+        14
+      )
+    })
+
+    test('should return false when no siteVisualizer available', () => {
+      siteDetailsMap.siteVisualizer = null
+      const mapCoordinates = [1000, 2000]
+
+      const result = siteDetailsMap.centerMapOnCoordinates(mapCoordinates)
+
+      expect(result).toBe(false)
+      expect(mockSiteVisualizer.centerMapView).not.toHaveBeenCalled()
     })
   })
 })

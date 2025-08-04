@@ -211,15 +211,19 @@ describe('MapFactory', () => {
   })
 
   describe('setupResponsiveAttribution', () => {
-    test('should set up event listener and check size on initialization', () => {
-      const mockMap = {
+    const createMocks = (mapSize = [800, 600]) => ({
+      mockMap: {
         on: jest.fn(),
-        getSize: jest.fn().mockReturnValue([800, 600])
-      }
-      const mockAttribution = {
+        getSize: jest.fn().mockReturnValue(mapSize)
+      },
+      mockAttribution: {
         setCollapsible: jest.fn(),
         setCollapsed: jest.fn()
       }
+    })
+
+    test('should set up event listener and check size on initialization', () => {
+      const { mockMap, mockAttribution } = createMocks()
 
       mapFactory.setupResponsiveAttribution(mockMap, mockAttribution)
 
@@ -233,14 +237,7 @@ describe('MapFactory', () => {
     })
 
     test('should collapse attribution for small maps', () => {
-      const mockMap = {
-        on: jest.fn(),
-        getSize: jest.fn().mockReturnValue([400, 300])
-      }
-      const mockAttribution = {
-        setCollapsible: jest.fn(),
-        setCollapsed: jest.fn()
-      }
+      const { mockMap, mockAttribution } = createMocks([400, 300])
 
       mapFactory.setupResponsiveAttribution(mockMap, mockAttribution)
 
@@ -249,14 +246,7 @@ describe('MapFactory', () => {
     })
 
     test('should not collapse attribution for map exactly at boundary size', () => {
-      const mockMap = {
-        on: jest.fn(),
-        getSize: jest.fn().mockReturnValue([600, 600])
-      }
-      const mockAttribution = {
-        setCollapsible: jest.fn(),
-        setCollapsed: jest.fn()
-      }
+      const { mockMap, mockAttribution } = createMocks([600, 600])
 
       mapFactory.setupResponsiveAttribution(mockMap, mockAttribution)
 
@@ -265,26 +255,15 @@ describe('MapFactory', () => {
     })
 
     test('should call checkSize function when map size changes', () => {
-      const mockMap = {
-        on: jest.fn(),
-        getSize: jest.fn().mockReturnValue([800, 600])
-      }
-      const mockAttribution = {
-        setCollapsible: jest.fn(),
-        setCollapsed: jest.fn()
-      }
+      const { mockMap, mockAttribution } = createMocks()
 
       mapFactory.setupResponsiveAttribution(mockMap, mockAttribution)
 
-      // Get the callback function passed to map.on
       const [, callback] = mockMap.on.mock.calls[0]
-
-      // Clear previous calls and simulate size change
       mockAttribution.setCollapsible.mockClear()
       mockAttribution.setCollapsed.mockClear()
       mockMap.getSize.mockReturnValue([500, 400])
 
-      // Call the callback
       callback()
 
       expect(mockAttribution.setCollapsible).toHaveBeenCalledWith(true)

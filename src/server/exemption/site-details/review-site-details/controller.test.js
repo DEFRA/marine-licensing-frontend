@@ -13,6 +13,13 @@ import { config } from '~/src/config/config.js'
 import { JSDOM } from 'jsdom'
 import { routes } from '~/src/server/common/constants/routes.js'
 import * as authRequests from '~/src/server/common/helpers/authenticated-requests.js'
+import {
+  getPolygonCoordinatesDisplayData,
+  buildManualCoordinateSummaryData,
+  getSiteDetailsBackLink,
+  getReviewSummaryText,
+  getCoordinateSystemText
+} from '~/src/server/exemption/site-details/review-site-details/utils.js'
 
 jest.mock('~/src/server/common/helpers/session-cache/utils.js')
 
@@ -29,6 +36,39 @@ describe('#reviewSiteDetails', () => {
       longitude: mockExemption.siteDetails.coordinates.longitude
     },
     [COORDINATE_SYSTEMS.OSGB36]: { eastings: '425053', northings: '564180' }
+  }
+
+  // Mock data for polygon coordinates (ML-121)
+  const mockPolygonCoordinatesWGS84 = [
+    { latitude: '55.123456', longitude: '55.123456' },
+    { latitude: '33.987654', longitude: '33.987654' },
+    { latitude: '78.123456', longitude: '78.123456' }
+  ]
+
+  const mockPolygonCoordinatesOSGB36 = [
+    { eastings: '425053', northings: '564180' },
+    { eastings: '426000', northings: '565000' },
+    { eastings: '427000', northings: '566000' }
+  ]
+
+  const mockPolygonExemptionWGS84 = {
+    ...mockExemption,
+    siteDetails: {
+      coordinatesType: 'coordinates',
+      coordinatesEntry: 'multiple',
+      coordinateSystem: COORDINATE_SYSTEMS.WGS84,
+      coordinates: mockPolygonCoordinatesWGS84
+    }
+  }
+
+  const mockPolygonExemptionOSGB36 = {
+    ...mockExemption,
+    siteDetails: {
+      coordinatesType: 'coordinates',
+      coordinatesEntry: 'multiple',
+      coordinateSystem: COORDINATE_SYSTEMS.OSGB36,
+      coordinates: mockPolygonCoordinatesOSGB36
+    }
   }
 
   beforeAll(async () => {
@@ -388,6 +428,355 @@ describe('#reviewSiteDetails', () => {
 
       expect(statusCode).toBe(statusCodes.ok)
     })
+
+    describe('multiple coordinates - polygon', () => {
+      test('reviewSiteDetailsController should render polygon coordinates for WGS84', async () => {
+        getExemptionCacheSpy.mockReturnValueOnce(mockPolygonExemptionWGS84)
+
+        const h = { view: jest.fn() }
+        const mockRequest = {
+          headers: {
+            referer: `http://localhost${routes.ENTER_MULTIPLE_COORDINATES}`
+          },
+          logger: {
+            info: jest.fn(),
+            error: jest.fn(),
+            warn: jest.fn(),
+            debug: jest.fn()
+          }
+        }
+
+        await reviewSiteDetailsController.handler(mockRequest, h)
+
+        expect(h.view).toHaveBeenCalledWith(REVIEW_SITE_DETAILS_VIEW_ROUTE, {
+          heading: 'Review site details',
+          pageTitle: 'Review site details',
+          backLink: routes.ENTER_MULTIPLE_COORDINATES,
+          projectName: 'Test Project',
+          summaryData: {
+            method:
+              'Manually enter multiple sets of coordinates to mark the boundary of the site',
+            coordinateSystem:
+              'WGS84 (World Geodetic System 1984)\nLatitude and longitude',
+            polygonCoordinates: [
+              {
+                label: 'Start and end points',
+                value: '55.123456, 55.123456'
+              },
+              {
+                label: 'Point 2',
+                value: '33.987654, 33.987654'
+              },
+              {
+                label: 'Point 3',
+                value: '78.123456, 78.123456'
+              }
+            ]
+          }
+        })
+      })
+
+      test('reviewSiteDetailsController should render polygon coordinates for OSGB36', async () => {
+        getExemptionCacheSpy.mockReturnValueOnce(mockPolygonExemptionOSGB36)
+        getCoordinateSystemSpy.mockReturnValueOnce({
+          coordinateSystem: COORDINATE_SYSTEMS.OSGB36
+        })
+
+        const h = { view: jest.fn() }
+        const mockRequest = {
+          headers: {
+            referer: `http://localhost${routes.ENTER_MULTIPLE_COORDINATES}`
+          },
+          logger: {
+            info: jest.fn(),
+            error: jest.fn(),
+            warn: jest.fn(),
+            debug: jest.fn()
+          }
+        }
+
+        await reviewSiteDetailsController.handler(mockRequest, h)
+
+        expect(h.view).toHaveBeenCalledWith(REVIEW_SITE_DETAILS_VIEW_ROUTE, {
+          heading: 'Review site details',
+          pageTitle: 'Review site details',
+          backLink: routes.ENTER_MULTIPLE_COORDINATES,
+          projectName: 'Test Project',
+          summaryData: {
+            method:
+              'Manually enter multiple sets of coordinates to mark the boundary of the site',
+            coordinateSystem: 'OSGB36 (National Grid)\nEastings and Northings',
+            polygonCoordinates: [
+              {
+                label: 'Start and end points',
+                value: '425053, 564180'
+              },
+              {
+                label: 'Point 2',
+                value: '426000, 565000'
+              },
+              {
+                label: 'Point 3',
+                value: '427000, 566000'
+              }
+            ]
+          }
+        })
+      })
+
+      test('reviewSiteDetailsController should handle empty polygon coordinates gracefully', async () => {
+        const exemptionWithEmptyCoordinates = {
+          ...mockPolygonExemptionWGS84,
+          siteDetails: {
+            ...mockPolygonExemptionWGS84.siteDetails,
+            coordinates: []
+          }
+        }
+
+        getExemptionCacheSpy.mockReturnValueOnce(exemptionWithEmptyCoordinates)
+
+        const h = { view: jest.fn() }
+        const mockRequest = {
+          headers: {
+            referer: `http://localhost${routes.ENTER_MULTIPLE_COORDINATES}`
+          },
+          logger: {
+            info: jest.fn(),
+            error: jest.fn(),
+            warn: jest.fn(),
+            debug: jest.fn()
+          }
+        }
+
+        await reviewSiteDetailsController.handler(mockRequest, h)
+
+        expect(h.view).toHaveBeenCalledWith(REVIEW_SITE_DETAILS_VIEW_ROUTE, {
+          heading: 'Review site details',
+          pageTitle: 'Review site details',
+          backLink: routes.ENTER_MULTIPLE_COORDINATES,
+          projectName: 'Test Project',
+          summaryData: {
+            method:
+              'Manually enter multiple sets of coordinates to mark the boundary of the site',
+            coordinateSystem:
+              'WGS84 (World Geodetic System 1984)\nLatitude and longitude',
+            polygonCoordinates: []
+          }
+        })
+      })
+
+      test('reviewSiteDetailsController should filter out incomplete coordinates', async () => {
+        const exemptionWithIncompleteCoordinates = {
+          ...mockPolygonExemptionWGS84,
+          siteDetails: {
+            ...mockPolygonExemptionWGS84.siteDetails,
+            coordinates: [
+              { latitude: '55.123456', longitude: '55.123456' },
+              { latitude: '', longitude: '33.987654' }, // incomplete
+              { latitude: '78.123456', longitude: '78.123456' },
+              { latitude: null, longitude: null } // invalid
+            ]
+          }
+        }
+
+        getExemptionCacheSpy.mockReturnValueOnce(
+          exemptionWithIncompleteCoordinates
+        )
+
+        const h = { view: jest.fn() }
+        const mockRequest = {
+          headers: {
+            referer: `http://localhost${routes.ENTER_MULTIPLE_COORDINATES}`
+          },
+          logger: {
+            info: jest.fn(),
+            error: jest.fn(),
+            warn: jest.fn(),
+            debug: jest.fn()
+          }
+        }
+
+        await reviewSiteDetailsController.handler(mockRequest, h)
+
+        expect(h.view).toHaveBeenCalledWith(REVIEW_SITE_DETAILS_VIEW_ROUTE, {
+          heading: 'Review site details',
+          pageTitle: 'Review site details',
+          backLink: routes.ENTER_MULTIPLE_COORDINATES,
+          projectName: 'Test Project',
+          summaryData: {
+            method:
+              'Manually enter multiple sets of coordinates to mark the boundary of the site',
+            coordinateSystem:
+              'WGS84 (World Geodetic System 1984)\nLatitude and longitude',
+            polygonCoordinates: [
+              {
+                label: 'Start and end points',
+                value: '55.123456, 55.123456'
+              },
+              {
+                label: 'Point 2',
+                value: '78.123456, 78.123456'
+              }
+            ]
+          }
+        })
+      })
+
+      test('reviewSiteDetailsController should handle single polygon coordinate', async () => {
+        const exemptionWithSingleCoordinate = {
+          ...mockPolygonExemptionWGS84,
+          siteDetails: {
+            ...mockPolygonExemptionWGS84.siteDetails,
+            coordinates: [{ latitude: '55.123456', longitude: '55.123456' }]
+          }
+        }
+
+        getExemptionCacheSpy.mockReturnValueOnce(exemptionWithSingleCoordinate)
+
+        const h = { view: jest.fn() }
+        const mockRequest = {
+          logger: {
+            info: jest.fn(),
+            error: jest.fn(),
+            warn: jest.fn(),
+            debug: jest.fn()
+          }
+        }
+
+        await reviewSiteDetailsController.handler(mockRequest, h)
+
+        const expectedCall = h.view.mock.calls[0]
+        expect(expectedCall[1].summaryData.polygonCoordinates).toEqual([
+          {
+            label: 'Start and end points',
+            value: '55.123456, 55.123456'
+          }
+        ])
+      })
+
+      test('reviewSiteDetailsController should render correctly with many polygon coordinates', async () => {
+        const manyCoordinates = [
+          { latitude: '50.123456', longitude: '50.123456' },
+          { latitude: '51.123456', longitude: '51.123456' },
+          { latitude: '52.123456', longitude: '52.123456' },
+          { latitude: '53.123456', longitude: '53.123456' },
+          { latitude: '54.123456', longitude: '54.123456' }
+        ]
+
+        const exemptionWithManyCoordinates = {
+          ...mockPolygonExemptionWGS84,
+          siteDetails: {
+            ...mockPolygonExemptionWGS84.siteDetails,
+            coordinates: manyCoordinates
+          }
+        }
+
+        getExemptionCacheSpy.mockReturnValueOnce(exemptionWithManyCoordinates)
+
+        const h = { view: jest.fn() }
+        const mockRequest = {
+          logger: {
+            info: jest.fn(),
+            error: jest.fn(),
+            warn: jest.fn(),
+            debug: jest.fn()
+          }
+        }
+
+        await reviewSiteDetailsController.handler(mockRequest, h)
+
+        const expectedCall = h.view.mock.calls[0]
+        expect(expectedCall[1].summaryData.polygonCoordinates).toEqual([
+          { label: 'Start and end points', value: '50.123456, 50.123456' },
+          { label: 'Point 2', value: '51.123456, 51.123456' },
+          { label: 'Point 3', value: '52.123456, 52.123456' },
+          { label: 'Point 4', value: '53.123456, 53.123456' },
+          { label: 'Point 5', value: '54.123456, 54.123456' }
+        ])
+      })
+
+      test('Should provide expected response and correctly display polygon summary data in DOM', async () => {
+        getExemptionCacheSpy.mockReturnValueOnce(mockPolygonExemptionWGS84)
+
+        const { result, statusCode } = await server.inject({
+          method: 'GET',
+          url: routes.REVIEW_SITE_DETAILS,
+          headers: {
+            referer: `http://localhost/${routes.ENTER_MULTIPLE_COORDINATES}`
+          }
+        })
+
+        expect(result).toEqual(
+          expect.stringContaining(
+            `Review site details | ${config.get('serviceName')}`
+          )
+        )
+
+        const { document } = new JSDOM(result).window
+
+        expect(document.querySelector('h1').textContent.trim()).toContain(
+          'Review site details'
+        )
+
+        expect(
+          document.querySelector('.govuk-caption-l').textContent.trim()
+        ).toBe(mockPolygonExemptionWGS84.projectName)
+
+        const summaryCardTitle = document.querySelector(
+          '.govuk-summary-card__title'
+        )
+        expect(summaryCardTitle.textContent.trim()).toBe('Site details')
+
+        const summaryKeys = document.querySelectorAll(
+          '.govuk-summary-list__key'
+        )
+        const summaryValues = document.querySelectorAll(
+          '.govuk-summary-list__value'
+        )
+
+        expect(summaryKeys[0].textContent.trim()).toBe(
+          'Method of providing site location'
+        )
+        expect(summaryValues[0].textContent.trim()).toBe(
+          'Manually enter multiple sets of coordinates to mark the boundary of the site'
+        )
+
+        expect(summaryKeys[1].textContent.trim()).toBe('Coordinate system')
+        expect(summaryValues[1].innerHTML.trim()).toContain(
+          'WGS84 (World Geodetic System 1984)'
+        )
+        expect(summaryValues[1].innerHTML.trim()).toContain(
+          'Latitude and longitude'
+        )
+
+        expect(summaryKeys[2].textContent.trim()).toBe('Start and end points')
+        expect(summaryValues[2].textContent.trim()).toBe('55.123456, 55.123456')
+
+        expect(summaryKeys[3].textContent.trim()).toBe('Point 2')
+        expect(summaryValues[3].textContent.trim()).toBe('33.987654, 33.987654')
+
+        expect(summaryKeys[4].textContent.trim()).toBe('Point 3')
+        expect(summaryValues[4].textContent.trim()).toBe('78.123456, 78.123456')
+
+        expect(
+          document
+            .querySelector(
+              `.govuk-back-link[href="${routes.ENTER_MULTIPLE_COORDINATES}"]`
+            )
+            .textContent.trim()
+        ).toBe('Back')
+
+        expect(
+          document
+            .querySelector(
+              '.govuk-link[href="/exemption/task-list?cancel=site-details"]'
+            )
+            .textContent.trim()
+        ).toBe('Cancel')
+
+        expect(statusCode).toBe(statusCodes.ok)
+      })
+    })
   })
 
   describe('#reviewSiteDetailsSubmitController', () => {
@@ -630,6 +1019,376 @@ describe('#reviewSiteDetails', () => {
       const { document } = new JSDOM(result).window
 
       expect(document.querySelector('h1').textContent.trim()).toBe('400')
+    })
+
+    describe('Polygon Coordinate Submission', () => {
+      test('Should save polygon coordinate data correctly for WGS84', async () => {
+        getExemptionCacheSpy.mockReturnValueOnce(mockPolygonExemptionWGS84)
+
+        const request = {
+          logger: {
+            info: jest.fn(),
+            error: jest.fn(),
+            debug: jest.fn()
+          }
+        }
+        const h = { redirect: jest.fn() }
+
+        await reviewSiteDetailsSubmitController.handler(request, h)
+
+        expect(authRequests.authenticatedPatchRequest).toHaveBeenCalledWith(
+          expect.any(Object),
+          '/exemption/site-details',
+          {
+            siteDetails: mockPolygonExemptionWGS84.siteDetails,
+            id: mockPolygonExemptionWGS84.id
+          }
+        )
+
+        expect(resetExemptionSiteDetailsSpy).toHaveBeenCalledWith(request)
+        expect(h.redirect).toHaveBeenCalledWith(routes.TASK_LIST)
+      })
+
+      test('Should save polygon coordinate data correctly for OSGB36', async () => {
+        getExemptionCacheSpy.mockReturnValueOnce(mockPolygonExemptionOSGB36)
+
+        const request = {
+          logger: {
+            info: jest.fn(),
+            error: jest.fn(),
+            debug: jest.fn()
+          }
+        }
+        const h = { redirect: jest.fn() }
+
+        await reviewSiteDetailsSubmitController.handler(request, h)
+
+        expect(authRequests.authenticatedPatchRequest).toHaveBeenCalledWith(
+          expect.any(Object),
+          '/exemption/site-details',
+          {
+            siteDetails: mockPolygonExemptionOSGB36.siteDetails,
+            id: mockPolygonExemptionOSGB36.id
+          }
+        )
+
+        expect(resetExemptionSiteDetailsSpy).toHaveBeenCalledWith(request)
+        expect(h.redirect).toHaveBeenCalledWith(routes.TASK_LIST)
+      })
+
+      test('Should handle POST request for polygon site through HTTP interface', async () => {
+        getExemptionCacheSpy.mockReturnValueOnce(mockPolygonExemptionWGS84)
+
+        const { headers, statusCode } = await server.inject({
+          method: 'POST',
+          url: routes.REVIEW_SITE_DETAILS,
+          payload: {},
+          headers: {
+            referer: `http://localhost/${routes.ENTER_MULTIPLE_COORDINATES}`
+          }
+        })
+
+        expect(authRequests.authenticatedPatchRequest).toHaveBeenCalledWith(
+          expect.any(Object),
+          '/exemption/site-details',
+          {
+            siteDetails: mockPolygonExemptionWGS84.siteDetails,
+            id: mockPolygonExemptionWGS84.id
+          }
+        )
+
+        expect(headers.location).toBe(routes.TASK_LIST)
+        expect(statusCode).toBe(statusCodes.redirect)
+      })
+
+      test('Should handle validation errors specific to polygon coordinates', async () => {
+        getExemptionCacheSpy.mockReturnValueOnce(mockPolygonExemptionWGS84)
+
+        const apiPatchMock = jest.spyOn(
+          authRequests,
+          'authenticatedPatchRequest'
+        )
+        apiPatchMock.mockRejectedValueOnce({
+          res: { statusCode: 400 },
+          data: {
+            payload: {
+              validation: {
+                source: 'payload',
+                keys: ['siteDetails.coordinates'],
+                details: [
+                  {
+                    field: 'siteDetails.coordinates',
+                    message: 'POLYGON_COORDINATES_INVALID',
+                    type: 'array.min'
+                  }
+                ]
+              }
+            }
+          }
+        })
+
+        const { result, statusCode } = await server.inject({
+          method: 'POST',
+          url: routes.REVIEW_SITE_DETAILS,
+          payload: {},
+          headers: {
+            referer: `http://localhost/${routes.ENTER_MULTIPLE_COORDINATES}`
+          }
+        })
+
+        expect(result).toEqual(expect.stringContaining('Bad Request'))
+
+        const { document } = new JSDOM(result).window
+        expect(document.querySelector('h1').textContent.trim()).toContain('400')
+        expect(statusCode).toBe(statusCodes.badRequest)
+      })
+    })
+  })
+
+  describe('Polygon Utility Functions', () => {
+    describe('getPolygonCoordinatesDisplayData', () => {
+      test('should format WGS84 polygon coordinates correctly', () => {
+        const siteDetails = {
+          coordinates: mockPolygonCoordinatesWGS84
+        }
+
+        const result = getPolygonCoordinatesDisplayData(
+          siteDetails,
+          COORDINATE_SYSTEMS.WGS84
+        )
+
+        expect(result).toEqual([
+          { label: 'Start and end points', value: '55.123456, 55.123456' },
+          { label: 'Point 2', value: '33.987654, 33.987654' },
+          { label: 'Point 3', value: '78.123456, 78.123456' }
+        ])
+      })
+
+      test('should format OSGB36 polygon coordinates correctly', () => {
+        const siteDetails = {
+          coordinates: mockPolygonCoordinatesOSGB36
+        }
+
+        const result = getPolygonCoordinatesDisplayData(
+          siteDetails,
+          COORDINATE_SYSTEMS.OSGB36
+        )
+
+        expect(result).toEqual([
+          { label: 'Start and end points', value: '425053, 564180' },
+          { label: 'Point 2', value: '426000, 565000' },
+          { label: 'Point 3', value: '427000, 566000' }
+        ])
+      })
+
+      test('should filter out incomplete coordinates', () => {
+        const siteDetails = {
+          coordinates: [
+            { latitude: '55.123456', longitude: '55.123456' },
+            { latitude: '', longitude: '33.987654' },
+            { latitude: '78.123456', longitude: '78.123456' },
+            { latitude: null, longitude: null }
+          ]
+        }
+
+        const result = getPolygonCoordinatesDisplayData(
+          siteDetails,
+          COORDINATE_SYSTEMS.WGS84
+        )
+
+        expect(result).toEqual([
+          { label: 'Start and end points', value: '55.123456, 55.123456' },
+          { label: 'Point 2', value: '78.123456, 78.123456' }
+        ])
+      })
+
+      test('should handle empty coordinates array', () => {
+        const siteDetails = { coordinates: [] }
+
+        const result = getPolygonCoordinatesDisplayData(
+          siteDetails,
+          COORDINATE_SYSTEMS.WGS84
+        )
+
+        expect(result).toEqual([])
+      })
+
+      test('should handle null/undefined coordinates', () => {
+        const siteDetails = { coordinates: null }
+
+        const result = getPolygonCoordinatesDisplayData(
+          siteDetails,
+          COORDINATE_SYSTEMS.WGS84
+        )
+
+        expect(result).toEqual([])
+      })
+
+      test('should handle missing coordinate system', () => {
+        const siteDetails = {
+          coordinates: mockPolygonCoordinatesWGS84
+        }
+
+        const result = getPolygonCoordinatesDisplayData(siteDetails, null)
+
+        expect(result).toEqual([])
+      })
+    })
+
+    describe('buildManualCoordinateSummaryData', () => {
+      test('should build polygon summary data for multiple coordinates', () => {
+        const siteDetails = {
+          coordinatesEntry: 'multiple',
+          coordinatesType: 'coordinates',
+          coordinates: mockPolygonCoordinatesWGS84
+        }
+
+        const result = buildManualCoordinateSummaryData(
+          siteDetails,
+          COORDINATE_SYSTEMS.WGS84
+        )
+
+        expect(result).toEqual({
+          method:
+            'Manually enter multiple sets of coordinates to mark the boundary of the site',
+          coordinateSystem:
+            'WGS84 (World Geodetic System 1984)\nLatitude and longitude',
+          polygonCoordinates: [
+            { label: 'Start and end points', value: '55.123456, 55.123456' },
+            { label: 'Point 2', value: '33.987654, 33.987654' },
+            { label: 'Point 3', value: '78.123456, 78.123456' }
+          ]
+        })
+      })
+
+      test('should build circular summary data for single coordinates', () => {
+        const siteDetails = {
+          coordinatesEntry: 'single',
+          coordinatesType: 'coordinates',
+          coordinates: { latitude: '50.123456', longitude: '-0.123456' },
+          circleWidth: '200'
+        }
+
+        const result = buildManualCoordinateSummaryData(
+          siteDetails,
+          COORDINATE_SYSTEMS.WGS84
+        )
+
+        expect(result).toEqual({
+          method:
+            'Manually enter one set of coordinates and a width to create a circular site',
+          coordinateSystem:
+            'WGS84 (World Geodetic System 1984)\nLatitude and longitude',
+          coordinates: '50.123456, -0.123456',
+          width: '200 metres'
+        })
+      })
+    })
+
+    describe('getSiteDetailsBackLink', () => {
+      test('should return ENTER_MULTIPLE_COORDINATES for polygon sites', () => {
+        const previousPage =
+          'http://localhost/exemption/enter-multiple-coordinates'
+
+        const result = getSiteDetailsBackLink(previousPage, 'multiple')
+
+        expect(result).toBe(routes.ENTER_MULTIPLE_COORDINATES)
+      })
+
+      test('should return WIDTH_OF_SITE for circular sites', () => {
+        const previousPage = 'http://localhost/exemption/width-of-site'
+
+        const result = getSiteDetailsBackLink(previousPage, 'single')
+
+        expect(result).toBe(routes.WIDTH_OF_SITE)
+      })
+
+      test('should return TASK_LIST for task list origin', () => {
+        const previousPage = 'http://localhost/exemption/task-list'
+
+        const result = getSiteDetailsBackLink(previousPage, 'multiple')
+
+        expect(result).toBe(routes.TASK_LIST)
+      })
+
+      test('should handle invalid previousPage URLs', () => {
+        const result = getSiteDetailsBackLink('invalid-url', 'multiple')
+
+        expect(result).toBe(routes.TASK_LIST)
+      })
+
+      test('should handle null previousPage', () => {
+        const result = getSiteDetailsBackLink(null, 'multiple')
+
+        expect(result).toBe(routes.TASK_LIST)
+      })
+    })
+
+    describe('getReviewSummaryText', () => {
+      test('should return polygon text for multiple coordinates', () => {
+        const siteDetails = {
+          coordinatesEntry: 'multiple',
+          coordinatesType: 'coordinates'
+        }
+
+        const result = getReviewSummaryText(siteDetails)
+
+        expect(result).toBe(
+          'Manually enter multiple sets of coordinates to mark the boundary of the site'
+        )
+      })
+
+      test('should return circular text for single coordinates', () => {
+        const siteDetails = {
+          coordinatesEntry: 'single',
+          coordinatesType: 'coordinates'
+        }
+
+        const result = getReviewSummaryText(siteDetails)
+
+        expect(result).toBe(
+          'Manually enter one set of coordinates and a width to create a circular site'
+        )
+      })
+
+      test('should return empty string for unsupported combinations', () => {
+        const siteDetails = {
+          coordinatesEntry: 'unknown',
+          coordinatesType: 'coordinates'
+        }
+
+        const result = getReviewSummaryText(siteDetails)
+
+        expect(result).toBe('')
+      })
+    })
+
+    describe('getCoordinateSystemText', () => {
+      test('should return WGS84 text', () => {
+        const result = getCoordinateSystemText(COORDINATE_SYSTEMS.WGS84)
+
+        expect(result).toBe(
+          'WGS84 (World Geodetic System 1984)\nLatitude and longitude'
+        )
+      })
+
+      test('should return OSGB36 text', () => {
+        const result = getCoordinateSystemText(COORDINATE_SYSTEMS.OSGB36)
+
+        expect(result).toBe('OSGB36 (National Grid)\nEastings and Northings')
+      })
+
+      test('should handle null coordinate system', () => {
+        const result = getCoordinateSystemText(null)
+
+        expect(result).toBe('')
+      })
+
+      test('should handle undefined coordinate system', () => {
+        const result = getCoordinateSystemText(undefined)
+
+        expect(result).toBe('')
+      })
     })
   })
 })

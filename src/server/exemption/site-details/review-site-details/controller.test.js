@@ -23,6 +23,199 @@ import {
 
 jest.mock('~/src/server/common/helpers/session-cache/utils.js')
 
+/**
+ * Creates a mock request object with logger and optional properties
+ * @param {object} options - Optional request properties
+ * @param {object} options.headers - Request headers
+ * @param {object} options.payload - Request payload
+ * @param {object} options.params - Route parameters
+ * @returns {object} Mock request object
+ */
+function createMockRequest(options = {}) {
+  return {
+    logger: {
+      info: jest.fn(),
+      error: jest.fn(),
+      warn: jest.fn(),
+      debug: jest.fn()
+    },
+    ...options
+  }
+}
+
+/**
+ * Creates a mock Hapi response toolkit
+ * @param {string} type - Handler type: 'view' or 'redirect'
+ * @returns {object} Mock response toolkit
+ */
+function createMockHandler(type = 'view') {
+  if (type === 'redirect') {
+    return { redirect: jest.fn() }
+  }
+  return { view: jest.fn() }
+}
+
+/**
+ * Creates mock exemption data for different coordinate scenarios
+ * @param {string} type - Type: 'single', 'multiple', 'file', 'empty'
+ * @param {string} coordinateSystem - Coordinate system: 'wgs84' or 'osgb36'
+ * @param {object} overrides - Optional overrides for id, projectName, etc.
+ * @returns {object} Mock exemption object
+ */
+function createMockExemption(
+  type = 'single',
+  coordinateSystem = COORDINATE_SYSTEMS.WGS84,
+  overrides = {}
+) {
+  const baseExemption = {
+    ...mockExemption,
+    ...overrides,
+    siteDetails: {
+      coordinatesType: 'coordinates',
+      coordinateSystem
+    }
+  }
+
+  switch (type) {
+    case 'multiple':
+      return {
+        ...baseExemption,
+        siteDetails: {
+          ...baseExemption.siteDetails,
+          coordinatesEntry: 'multiple',
+          coordinates:
+            coordinateSystem === COORDINATE_SYSTEMS.WGS84
+              ? [
+                  { latitude: '55.123456', longitude: '55.123456' },
+                  { latitude: '33.987654', longitude: '33.987654' },
+                  { latitude: '78.123456', longitude: '78.123456' }
+                ]
+              : [
+                  { eastings: '425053', northings: '564180' },
+                  { eastings: '426000', northings: '565000' },
+                  { eastings: '427000', northings: '566000' }
+                ]
+        }
+      }
+
+    case 'file':
+      return {
+        ...baseExemption,
+        siteDetails: {
+          coordinatesType: 'file',
+          fileUploadType: 'kml',
+          uploadedFile: {
+            filename: 'test-site.kml'
+          },
+          geoJSON: {
+            type: 'FeatureCollection',
+            features: [
+              {
+                type: 'Feature',
+                geometry: {
+                  type: 'Point',
+                  coordinates: [51.5074, -0.1278]
+                }
+              }
+            ]
+          }
+        }
+      }
+
+    case 'empty':
+      return {
+        id: baseExemption.id,
+        projectName: baseExemption.projectName
+        // siteDetails is undefined
+      }
+
+    default: // 'single'
+      return {
+        ...baseExemption,
+        siteDetails: {
+          ...baseExemption.siteDetails,
+          coordinatesEntry: 'single',
+          coordinates:
+            coordinateSystem === COORDINATE_SYSTEMS.WGS84
+              ? {
+                  latitude: mockExemption.siteDetails.coordinates.latitude,
+                  longitude: mockExemption.siteDetails.coordinates.longitude
+                }
+              : { eastings: '425053', northings: '564180' },
+          circleWidth: '100'
+        }
+      }
+  }
+}
+
+/**
+ * DOM assertion helper for page titles and headings
+ * @param {Document} document - JSDOM document
+ * @param {string} expectedTitle - Expected page title
+ * @param {string} expectedHeading - Expected h1 content
+ */
+function assertPageTitleAndHeading(
+  document,
+  expectedTitle,
+  expectedHeading = expectedTitle
+) {
+  expect(document.querySelector('h1').textContent.trim()).toContain(
+    expectedHeading
+  )
+
+  const pageTitle = document.querySelector('title')?.textContent ?? ''
+  expect(pageTitle).toContain(expectedTitle)
+}
+
+/**
+ * DOM assertion helper for project name caption
+ * @param {Document} document - JSDOM document
+ * @param {string} expectedProjectName - Expected project name
+ */
+function assertProjectNameCaption(document, expectedProjectName) {
+  const caption = document.querySelector('.govuk-caption-l')
+  expect(caption?.textContent.trim()).toBe(expectedProjectName)
+}
+
+/**
+ * DOM assertion helper for summary list data
+ * @param {Document} document - JSDOM document
+ * @param {Array} expectedData - Array of {key, value} objects
+ */
+function assertSummaryListData(document, expectedData) {
+  const summaryKeys = document.querySelectorAll('.govuk-summary-list__key')
+  const summaryValues = document.querySelectorAll('.govuk-summary-list__value')
+
+  expectedData.forEach((item, index) => {
+    expect(summaryKeys[index]?.textContent.trim()).toBe(item.key)
+    if (item.isHtml) {
+      expect(summaryValues[index]?.innerHTML.trim()).toContain(item.value)
+    } else {
+      expect(summaryValues[index]?.textContent.trim()).toBe(item.value)
+    }
+  })
+}
+
+/**
+ * DOM assertion helper for navigation links
+ * @param {Document} document - JSDOM document
+ * @param {string} backLink - Expected back link href
+ * @param {string} cancelLink - Expected cancel link href (optional)
+ */
+function assertNavigationLinks(document, backLink, cancelLink = null) {
+  const backElement = document.querySelector(
+    `.govuk-back-link[href="${backLink}"]`
+  )
+  expect(backElement?.textContent.trim()).toBe('Back')
+
+  if (cancelLink) {
+    const cancelElement = document.querySelector(
+      `.govuk-link[href="${cancelLink}"]`
+    )
+    expect(cancelElement?.textContent.trim()).toBe('Cancel')
+  }
+}
+
 describe('#reviewSiteDetails', () => {
   /** @type {Server} */
   let server
@@ -38,7 +231,6 @@ describe('#reviewSiteDetails', () => {
     [COORDINATE_SYSTEMS.OSGB36]: { eastings: '425053', northings: '564180' }
   }
 
-  // Mock data for polygon coordinates (ML-121)
   const mockPolygonCoordinatesWGS84 = [
     { latitude: '55.123456', longitude: '55.123456' },
     { latitude: '33.987654', longitude: '33.987654' },
@@ -112,15 +304,8 @@ describe('#reviewSiteDetails', () => {
       getExemptionCacheSpy.mockReturnValueOnce({})
       getCoordinateSystemSpy.mockReturnValueOnce({})
 
-      const h = { view: jest.fn() }
-      const mockRequest = {
-        logger: {
-          info: jest.fn(),
-          error: jest.fn(),
-          warn: jest.fn(),
-          debug: jest.fn()
-        }
-      }
+      const h = createMockHandler()
+      const mockRequest = createMockRequest()
 
       await reviewSiteDetailsController.handler(mockRequest, h)
 
@@ -139,35 +324,22 @@ describe('#reviewSiteDetails', () => {
     })
 
     test('reviewSiteDetailsController handler should load data from MongoDB when session has ID but no siteDetails', async () => {
-      const exemptionWithoutSiteDetails = {
-        id: 'test-id',
-        projectName: 'Test Project'
-        // siteDetails is undefined
-      }
-
-      const completeMongoData = {
-        id: 'test-id',
-        projectName: 'Test Project',
-        siteDetails: {
-          coordinatesType: 'file',
-          fileUploadType: 'kml',
-          uploadedFile: {
-            filename: 'test-site.kml'
-          },
-          geoJSON: {
-            type: 'FeatureCollection',
-            features: [
-              {
-                type: 'Feature',
-                geometry: {
-                  type: 'Point',
-                  coordinates: [51.5074, -0.1278]
-                }
-              }
-            ]
-          }
+      const exemptionWithoutSiteDetails = createMockExemption(
+        'empty',
+        COORDINATE_SYSTEMS.WGS84,
+        {
+          id: 'test-id',
+          projectName: 'Test Project'
         }
-      }
+      )
+      const completeMongoData = createMockExemption(
+        'file',
+        COORDINATE_SYSTEMS.WGS84,
+        {
+          id: 'test-id',
+          projectName: 'Test Project'
+        }
+      )
 
       getExemptionCacheSpy.mockReturnValueOnce(exemptionWithoutSiteDetails)
       jest
@@ -178,15 +350,8 @@ describe('#reviewSiteDetails', () => {
           }
         })
 
-      const h = { view: jest.fn() }
-      const mockRequest = {
-        logger: {
-          info: jest.fn(),
-          error: jest.fn(),
-          warn: jest.fn(),
-          debug: jest.fn()
-        }
-      }
+      const h = createMockHandler()
+      const mockRequest = createMockRequest()
 
       await reviewSiteDetailsController.handler(mockRequest, h)
 
@@ -369,62 +534,45 @@ describe('#reviewSiteDetails', () => {
 
       const { document } = new JSDOM(result).window
 
-      expect(document.querySelector('h1').textContent.trim()).toContain(
-        'Review site details'
-      )
+      // Use DOM assertion helpers
+      assertPageTitleAndHeading(document, 'Review site details')
+      assertProjectNameCaption(document, mockExemption.projectName)
 
-      expect(
-        document.querySelector('.govuk-caption-l').textContent.trim()
-      ).toBe(mockExemption.projectName)
-
+      // Summary card title
       const summaryCardTitle = document.querySelector(
         '.govuk-summary-card__title'
       )
       expect(summaryCardTitle.textContent.trim()).toBe('Site details')
 
-      const summaryKeys = document.querySelectorAll('.govuk-summary-list__key')
-      const summaryValues = document.querySelectorAll(
-        '.govuk-summary-list__value'
-      )
+      // Summary list data
+      const summaryData = [
+        {
+          key: 'Method of providing site location',
+          value:
+            'Manually enter one set of coordinates and a width to create a circular site'
+        },
+        {
+          key: 'Coordinate system',
+          value: 'WGS84 (World Geodetic System 1984)',
+          isHtml: true
+        },
+        {
+          key: 'Coordinates at centre of site',
+          value: `${mockCoordinates[COORDINATE_SYSTEMS.WGS84].latitude}, ${mockCoordinates[COORDINATE_SYSTEMS.WGS84].longitude}`
+        },
+        {
+          key: 'Width of circular site',
+          value: '100 metres'
+        }
+      ]
+      assertSummaryListData(document, summaryData)
 
-      expect(summaryKeys[0].textContent.trim()).toBe(
-        'Method of providing site location'
+      // Navigation links
+      assertNavigationLinks(
+        document,
+        '/exemption/width-of-site',
+        '/exemption/task-list?cancel=site-details'
       )
-      expect(summaryValues[0].textContent.trim()).toBe(
-        'Manually enter one set of coordinates and a width to create a circular site'
-      )
-
-      expect(summaryKeys[1].textContent.trim()).toBe('Coordinate system')
-      expect(summaryValues[1].innerHTML.trim()).toContain(
-        'WGS84 (World Geodetic System 1984)'
-      )
-      expect(summaryValues[1].innerHTML.trim()).toContain(
-        'Latitude and longitude'
-      )
-
-      expect(summaryKeys[2].textContent.trim()).toBe(
-        'Coordinates at centre of site'
-      )
-      expect(summaryValues[2].textContent.trim()).toBe(
-        `${mockCoordinates[COORDINATE_SYSTEMS.WGS84].latitude}, ${mockCoordinates[COORDINATE_SYSTEMS.WGS84].longitude}`
-      )
-
-      expect(summaryKeys[3].textContent.trim()).toBe('Width of circular site')
-      expect(summaryValues[3].textContent.trim()).toBe('100 metres')
-
-      expect(
-        document
-          .querySelector('.govuk-back-link[href="/exemption/width-of-site"]')
-          .textContent.trim()
-      ).toBe('Back')
-
-      expect(
-        document
-          .querySelector(
-            '.govuk-link[href="/exemption/task-list?cancel=site-details"]'
-          )
-          .textContent.trim()
-      ).toBe('Cancel')
 
       expect(statusCode).toBe(statusCodes.ok)
     })
@@ -477,23 +625,22 @@ describe('#reviewSiteDetails', () => {
       })
 
       test('reviewSiteDetailsController should render polygon coordinates for OSGB36', async () => {
-        getExemptionCacheSpy.mockReturnValueOnce(mockPolygonExemptionOSGB36)
+        const polygonExemption = createMockExemption(
+          'multiple',
+          COORDINATE_SYSTEMS.OSGB36
+        )
+
+        getExemptionCacheSpy.mockReturnValueOnce(polygonExemption)
         getCoordinateSystemSpy.mockReturnValueOnce({
           coordinateSystem: COORDINATE_SYSTEMS.OSGB36
         })
 
-        const h = { view: jest.fn() }
-        const mockRequest = {
+        const h = createMockHandler()
+        const mockRequest = createMockRequest({
           headers: {
             referer: `http://localhost${routes.ENTER_MULTIPLE_COORDINATES}`
-          },
-          logger: {
-            info: jest.fn(),
-            error: jest.fn(),
-            warn: jest.fn(),
-            debug: jest.fn()
           }
-        }
+        })
 
         await reviewSiteDetailsController.handler(mockRequest, h)
 

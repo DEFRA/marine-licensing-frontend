@@ -389,40 +389,12 @@ describe('#reviewSiteDetails', () => {
     })
 
     test('reviewSiteDetailsController handler should render file upload template for file upload flow', async () => {
-      const mockFileUploadExemption = {
-        ...mockExemption,
-        siteDetails: {
-          coordinatesType: 'file',
-          fileUploadType: 'kml',
-          uploadedFile: {
-            filename: 'test-site.kml'
-          },
-          geoJSON: {
-            type: 'FeatureCollection',
-            features: [
-              {
-                type: 'Feature',
-                geometry: {
-                  type: 'Point',
-                  coordinates: [51.5074, -0.1278]
-                }
-              }
-            ]
-          }
-        }
-      }
+      const mockFileUploadExemption = createMockExemption('file')
 
       getExemptionCacheSpy.mockReturnValueOnce(mockFileUploadExemption)
 
-      const h = { view: jest.fn() }
-      const mockRequest = {
-        logger: {
-          info: jest.fn(),
-          error: jest.fn(),
-          warn: jest.fn(),
-          debug: jest.fn()
-        }
-      }
+      const h = createMockHandler()
+      const mockRequest = createMockRequest()
 
       await reviewSiteDetailsController.handler(mockRequest, h)
 
@@ -449,15 +421,8 @@ describe('#reviewSiteDetails', () => {
     })
 
     test('reviewSiteDetailsController handler should render with correct context for WGS84', async () => {
-      const h = { view: jest.fn() }
-      const mockRequest = {
-        logger: {
-          info: jest.fn(),
-          error: jest.fn(),
-          warn: jest.fn(),
-          debug: jest.fn()
-        }
-      }
+      const h = createMockHandler()
+      const mockRequest = createMockRequest()
 
       await reviewSiteDetailsController.handler(mockRequest, h)
 
@@ -478,23 +443,12 @@ describe('#reviewSiteDetails', () => {
     })
 
     test('reviewSiteDetailsController handler should render with correct context for OSGB36', async () => {
-      const h = { view: jest.fn() }
-      const mockRequest = {
-        logger: {
-          info: jest.fn(),
-          error: jest.fn(),
-          warn: jest.fn(),
-          debug: jest.fn()
-        }
-      }
+      const h = createMockHandler()
+      const mockRequest = createMockRequest()
 
-      getExemptionCacheSpy.mockReturnValueOnce({
-        ...mockExemption,
-        siteDetails: {
-          ...mockExemption.siteDetails,
-          coordinates: mockCoordinates[COORDINATE_SYSTEMS.OSGB36]
-        }
-      })
+      getExemptionCacheSpy.mockReturnValueOnce(
+        createMockExemption('single', COORDINATE_SYSTEMS.OSGB36)
+      )
 
       getCoordinateSystemSpy.mockReturnValueOnce({
         coordinateSystem: COORDINATE_SYSTEMS.OSGB36
@@ -579,20 +533,19 @@ describe('#reviewSiteDetails', () => {
 
     describe('multiple coordinates - polygon', () => {
       test('reviewSiteDetailsController should render polygon coordinates for WGS84', async () => {
-        getExemptionCacheSpy.mockReturnValueOnce(mockPolygonExemptionWGS84)
+        const polygonExemption = createMockExemption(
+          'multiple',
+          COORDINATE_SYSTEMS.WGS84
+        )
 
-        const h = { view: jest.fn() }
-        const mockRequest = {
+        getExemptionCacheSpy.mockReturnValueOnce(polygonExemption)
+
+        const h = createMockHandler()
+        const mockRequest = createMockRequest({
           headers: {
             referer: `http://localhost${routes.ENTER_MULTIPLE_COORDINATES}`
-          },
-          logger: {
-            info: jest.fn(),
-            error: jest.fn(),
-            warn: jest.fn(),
-            debug: jest.fn()
           }
-        }
+        })
 
         await reviewSiteDetailsController.handler(mockRequest, h)
 
@@ -672,28 +625,26 @@ describe('#reviewSiteDetails', () => {
       })
 
       test('reviewSiteDetailsController should handle empty polygon coordinates gracefully', async () => {
+        const baseExemption = createMockExemption(
+          'multiple',
+          COORDINATE_SYSTEMS.WGS84
+        )
         const exemptionWithEmptyCoordinates = {
-          ...mockPolygonExemptionWGS84,
+          ...baseExemption,
           siteDetails: {
-            ...mockPolygonExemptionWGS84.siteDetails,
+            ...baseExemption.siteDetails,
             coordinates: []
           }
         }
 
         getExemptionCacheSpy.mockReturnValueOnce(exemptionWithEmptyCoordinates)
 
-        const h = { view: jest.fn() }
-        const mockRequest = {
+        const h = createMockHandler()
+        const mockRequest = createMockRequest({
           headers: {
             referer: `http://localhost${routes.ENTER_MULTIPLE_COORDINATES}`
-          },
-          logger: {
-            info: jest.fn(),
-            error: jest.fn(),
-            warn: jest.fn(),
-            debug: jest.fn()
           }
-        }
+        })
 
         await reviewSiteDetailsController.handler(mockRequest, h)
 
@@ -713,10 +664,14 @@ describe('#reviewSiteDetails', () => {
       })
 
       test('reviewSiteDetailsController should filter out incomplete coordinates', async () => {
+        const baseExemption = createMockExemption(
+          'multiple',
+          COORDINATE_SYSTEMS.WGS84
+        )
         const exemptionWithIncompleteCoordinates = {
-          ...mockPolygonExemptionWGS84,
+          ...baseExemption,
           siteDetails: {
-            ...mockPolygonExemptionWGS84.siteDetails,
+            ...baseExemption.siteDetails,
             coordinates: [
               { latitude: '55.123456', longitude: '55.123456' },
               { latitude: '', longitude: '33.987654' }, // incomplete
@@ -730,18 +685,12 @@ describe('#reviewSiteDetails', () => {
           exemptionWithIncompleteCoordinates
         )
 
-        const h = { view: jest.fn() }
-        const mockRequest = {
+        const h = createMockHandler()
+        const mockRequest = createMockRequest({
           headers: {
             referer: `http://localhost${routes.ENTER_MULTIPLE_COORDINATES}`
-          },
-          logger: {
-            info: jest.fn(),
-            error: jest.fn(),
-            warn: jest.fn(),
-            debug: jest.fn()
           }
-        }
+        })
 
         await reviewSiteDetailsController.handler(mockRequest, h)
 
@@ -770,25 +719,22 @@ describe('#reviewSiteDetails', () => {
       })
 
       test('reviewSiteDetailsController should handle single polygon coordinate', async () => {
+        const baseExemption = createMockExemption(
+          'multiple',
+          COORDINATE_SYSTEMS.WGS84
+        )
         const exemptionWithSingleCoordinate = {
-          ...mockPolygonExemptionWGS84,
+          ...baseExemption,
           siteDetails: {
-            ...mockPolygonExemptionWGS84.siteDetails,
+            ...baseExemption.siteDetails,
             coordinates: [{ latitude: '55.123456', longitude: '55.123456' }]
           }
         }
 
         getExemptionCacheSpy.mockReturnValueOnce(exemptionWithSingleCoordinate)
 
-        const h = { view: jest.fn() }
-        const mockRequest = {
-          logger: {
-            info: jest.fn(),
-            error: jest.fn(),
-            warn: jest.fn(),
-            debug: jest.fn()
-          }
-        }
+        const h = createMockHandler()
+        const mockRequest = createMockRequest()
 
         await reviewSiteDetailsController.handler(mockRequest, h)
 
@@ -810,25 +756,22 @@ describe('#reviewSiteDetails', () => {
           { latitude: '54.123456', longitude: '54.123456' }
         ]
 
+        const baseExemption = createMockExemption(
+          'multiple',
+          COORDINATE_SYSTEMS.WGS84
+        )
         const exemptionWithManyCoordinates = {
-          ...mockPolygonExemptionWGS84,
+          ...baseExemption,
           siteDetails: {
-            ...mockPolygonExemptionWGS84.siteDetails,
+            ...baseExemption.siteDetails,
             coordinates: manyCoordinates
           }
         }
 
         getExemptionCacheSpy.mockReturnValueOnce(exemptionWithManyCoordinates)
 
-        const h = { view: jest.fn() }
-        const mockRequest = {
-          logger: {
-            info: jest.fn(),
-            error: jest.fn(),
-            warn: jest.fn(),
-            debug: jest.fn()
-          }
-        }
+        const h = createMockHandler()
+        const mockRequest = createMockRequest()
 
         await reviewSiteDetailsController.handler(mockRequest, h)
 

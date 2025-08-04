@@ -37,15 +37,13 @@ describe('SiteDataLoader', () => {
       expect(result).toEqual(siteDetails)
     })
 
-    test('should return null when JSON parsing fails', () => {
+    test('should throw error when JSON parsing fails', () => {
       const mockElement = {
         textContent: 'invalid json'
       }
       document.getElementById.mockReturnValue(mockElement)
 
-      const result = siteDataLoader.loadSiteDetails()
-
-      expect(result).toBeNull()
+      expect(() => siteDataLoader.loadSiteDetails()).toThrow()
     })
   })
 

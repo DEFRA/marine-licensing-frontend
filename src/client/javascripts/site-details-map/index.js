@@ -106,37 +106,29 @@ export class SiteDetailsMap extends Component {
   }
 
   async initializeMap() {
-    try {
-      const olModules = await this.loadOpenLayersModules()
+    const olModules = await this.loadOpenLayersModules()
 
-      if (this.destroyed) {
-        return
-      }
-
-      this.mapFactory = new MapFactory(olModules)
-      const { vectorSource, vectorLayer } = this.mapFactory.createMapLayers()
-      const geoJSONFormat = this.mapFactory.initializeGeoJSONFormat(
-        olModules.GeoJSON
-      )
-
-      this.siteVisualizer = new SiteVisualizer(
-        olModules,
-        vectorSource,
-        geoJSONFormat,
-        null
-      )
-
-      this.map = this.mapFactory.createMap(
-        this.$root,
-        this.options,
-        vectorLayer
-      )
-
-      this.siteVisualizer.map = this.map
-      this.loadAndDisplaySiteDetails()
-    } catch (error) {
-      this.showError()
+    if (this.destroyed) {
+      return
     }
+
+    this.mapFactory = new MapFactory(olModules)
+    const { vectorSource, vectorLayer } = this.mapFactory.createMapLayers()
+    const geoJSONFormat = this.mapFactory.initializeGeoJSONFormat(
+      olModules.GeoJSON
+    )
+
+    this.siteVisualizer = new SiteVisualizer(
+      olModules,
+      vectorSource,
+      geoJSONFormat,
+      null
+    )
+
+    this.map = this.mapFactory.createMap(this.$root, this.options, vectorLayer)
+
+    this.siteVisualizer.map = this.map
+    this.loadAndDisplaySiteDetails()
   }
 
   destroy() {

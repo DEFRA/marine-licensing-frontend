@@ -300,7 +300,7 @@ describe('#reviewSiteDetails', () => {
   })
 
   describe('#reviewSiteDetailsController', () => {
-    test('reviewSiteDetailsController handler should render with correct context with no existing data', async () => {
+    test('should render empty context when no data exists', async () => {
       getExemptionCacheSpy.mockReturnValueOnce({})
       getCoordinateSystemSpy.mockReturnValueOnce({})
 
@@ -323,7 +323,7 @@ describe('#reviewSiteDetails', () => {
       })
     })
 
-    test('reviewSiteDetailsController handler should load data from MongoDB when session has ID but no siteDetails', async () => {
+    test('should load data from MongoDB when session lacks siteDetails', async () => {
       const exemptionWithoutSiteDetails = createMockExemption(
         'empty',
         COORDINATE_SYSTEMS.WGS84,
@@ -388,7 +388,7 @@ describe('#reviewSiteDetails', () => {
       )
     })
 
-    test('reviewSiteDetailsController handler should render file upload template for file upload flow', async () => {
+    test('should render file upload template for file flow', async () => {
       const mockFileUploadExemption = createMockExemption('file')
 
       getExemptionCacheSpy.mockReturnValueOnce(mockFileUploadExemption)
@@ -420,7 +420,7 @@ describe('#reviewSiteDetails', () => {
       )
     })
 
-    test('reviewSiteDetailsController handler should render with correct context for WGS84', async () => {
+    test('should render WGS84 coordinates correctly', async () => {
       const h = createMockHandler()
       const mockRequest = createMockRequest()
 
@@ -442,7 +442,7 @@ describe('#reviewSiteDetails', () => {
       })
     })
 
-    test('reviewSiteDetailsController handler should render with correct context for OSGB36', async () => {
+    test('should render OSGB36 coordinates correctly', async () => {
       const h = createMockHandler()
       const mockRequest = createMockRequest()
 
@@ -471,7 +471,7 @@ describe('#reviewSiteDetails', () => {
       })
     })
 
-    test('Should provide expected response and correctly display summary data', async () => {
+    test('should display summary data correctly in DOM', async () => {
       const { result, statusCode } = await server.inject({
         method: 'GET',
         url: routes.REVIEW_SITE_DETAILS,
@@ -532,7 +532,7 @@ describe('#reviewSiteDetails', () => {
     })
 
     describe('multiple coordinates - polygon', () => {
-      test('reviewSiteDetailsController should render polygon coordinates for WGS84', async () => {
+      test('should render WGS84 polygon coordinates', async () => {
         const polygonExemption = createMockExemption(
           'multiple',
           COORDINATE_SYSTEMS.WGS84
@@ -577,7 +577,7 @@ describe('#reviewSiteDetails', () => {
         })
       })
 
-      test('reviewSiteDetailsController should render polygon coordinates for OSGB36', async () => {
+      test('should render OSGB36 polygon coordinates', async () => {
         const polygonExemption = createMockExemption(
           'multiple',
           COORDINATE_SYSTEMS.OSGB36
@@ -624,7 +624,7 @@ describe('#reviewSiteDetails', () => {
         })
       })
 
-      test('reviewSiteDetailsController should handle empty polygon coordinates gracefully', async () => {
+      test('should handle empty polygon coordinates', async () => {
         const baseExemption = createMockExemption(
           'multiple',
           COORDINATE_SYSTEMS.WGS84
@@ -663,7 +663,7 @@ describe('#reviewSiteDetails', () => {
         })
       })
 
-      test('reviewSiteDetailsController should filter out incomplete coordinates', async () => {
+      test('should filter out incomplete coordinates', async () => {
         const baseExemption = createMockExemption(
           'multiple',
           COORDINATE_SYSTEMS.WGS84
@@ -718,7 +718,7 @@ describe('#reviewSiteDetails', () => {
         })
       })
 
-      test('reviewSiteDetailsController should handle single polygon coordinate', async () => {
+      test('should handle single polygon coordinate', async () => {
         const baseExemption = createMockExemption(
           'multiple',
           COORDINATE_SYSTEMS.WGS84
@@ -747,7 +747,7 @@ describe('#reviewSiteDetails', () => {
         ])
       })
 
-      test('reviewSiteDetailsController should render correctly with many polygon coordinates', async () => {
+      test('should render many polygon coordinates', async () => {
         const manyCoordinates = [
           { latitude: '50.123456', longitude: '50.123456' },
           { latitude: '51.123456', longitude: '51.123456' },
@@ -785,7 +785,7 @@ describe('#reviewSiteDetails', () => {
         ])
       })
 
-      test('Should provide expected response and correctly display polygon summary data in DOM', async () => {
+      test('should display polygon summary data in DOM', async () => {
         getExemptionCacheSpy.mockReturnValueOnce(mockPolygonExemptionWGS84)
 
         const { result, statusCode } = await server.inject({
@@ -870,7 +870,7 @@ describe('#reviewSiteDetails', () => {
   })
 
   describe('#reviewSiteDetailsSubmitController', () => {
-    test('Should redirect to task list and call backend API for PATCH request', async () => {
+    test('should redirect to task list and patch backend', async () => {
       const { headers, statusCode } = await server.inject({
         method: 'POST',
         url: routes.REVIEW_SITE_DETAILS,
@@ -893,7 +893,7 @@ describe('#reviewSiteDetails', () => {
       expect(statusCode).toBe(statusCodes.redirect)
     })
 
-    test('Should call resetExemptionSiteDetails after saving to MongoDB', async () => {
+    test('should reset exemption after saving to MongoDB', async () => {
       const request = {
         logger: {
           info: jest.fn(),
@@ -918,7 +918,7 @@ describe('#reviewSiteDetails', () => {
       expect(h.redirect).toHaveBeenCalledWith(routes.TASK_LIST)
     })
 
-    test('Should save file upload data with display metadata for file upload flow', async () => {
+    test('should save file upload data with metadata', async () => {
       const mockFileUploadExemption = {
         ...mockExemption,
         siteDetails: {
@@ -998,7 +998,7 @@ describe('#reviewSiteDetails', () => {
       expect(h.redirect).toHaveBeenCalledWith(routes.TASK_LIST)
     })
 
-    test('Should redirect to task list for successful POST request', async () => {
+    test('should redirect to task list on successful POST', async () => {
       const request = {
         logger: {
           info: jest.fn(),
@@ -1013,7 +1013,7 @@ describe('#reviewSiteDetails', () => {
       expect(h.redirect).toHaveBeenCalledWith(routes.TASK_LIST)
     })
 
-    test('Should handle exemption with undefined siteDetails and assign empty object', async () => {
+    test('should handle undefined siteDetails gracefully', async () => {
       const exemptionWithUndefinedSiteDetails = {
         ...mockExemption,
         siteDetails: undefined // This will trigger the ?? {} fallback
@@ -1049,7 +1049,7 @@ describe('#reviewSiteDetails', () => {
       cacheUtils.getExemptionCache.mockImplementation(originalGetExemptionCache)
     })
 
-    test('Should show error page with validation errors from backend', async () => {
+    test('should show error page for validation errors', async () => {
       const apiPatchMock = jest.spyOn(authRequests, 'authenticatedPatchRequest')
       apiPatchMock.mockRejectedValueOnce({
         res: { statusCode: 400 },
@@ -1088,7 +1088,7 @@ describe('#reviewSiteDetails', () => {
       expect(statusCode).toBe(statusCodes.badRequest)
     })
 
-    test('Should pass error to global catchAll behaviour if it contains no validation data', async () => {
+    test('should pass error to global handler when no validation data', async () => {
       const apiPatchMock = jest.spyOn(authRequests, 'authenticatedPatchRequest')
       apiPatchMock.mockRejectedValueOnce({
         res: { statusCode: 500 },
@@ -1112,7 +1112,7 @@ describe('#reviewSiteDetails', () => {
     })
 
     describe('Polygon Coordinate Submission', () => {
-      test('Should save polygon coordinate data correctly for WGS84', async () => {
+      test('should save WGS84 polygon data correctly', async () => {
         getExemptionCacheSpy.mockReturnValueOnce(mockPolygonExemptionWGS84)
 
         const request = {
@@ -1139,7 +1139,7 @@ describe('#reviewSiteDetails', () => {
         expect(h.redirect).toHaveBeenCalledWith(routes.TASK_LIST)
       })
 
-      test('Should save polygon coordinate data correctly for OSGB36', async () => {
+      test('should save OSGB36 polygon data correctly', async () => {
         getExemptionCacheSpy.mockReturnValueOnce(mockPolygonExemptionOSGB36)
 
         const request = {
@@ -1166,7 +1166,7 @@ describe('#reviewSiteDetails', () => {
         expect(h.redirect).toHaveBeenCalledWith(routes.TASK_LIST)
       })
 
-      test('Should handle POST request for polygon site through HTTP interface', async () => {
+      test('should handle polygon site POST request', async () => {
         getExemptionCacheSpy.mockReturnValueOnce(mockPolygonExemptionWGS84)
 
         const { headers, statusCode } = await server.inject({
@@ -1191,7 +1191,7 @@ describe('#reviewSiteDetails', () => {
         expect(statusCode).toBe(statusCodes.redirect)
       })
 
-      test('Should handle validation errors specific to polygon coordinates', async () => {
+      test('should handle polygon coordinate validation errors', async () => {
         getExemptionCacheSpy.mockReturnValueOnce(mockPolygonExemptionWGS84)
 
         const apiPatchMock = jest.spyOn(

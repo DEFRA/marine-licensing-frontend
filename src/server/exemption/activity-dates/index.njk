@@ -52,10 +52,12 @@
   }) }}
 {% endmacro %}
 {% block beforeContent %}
+<nav>
   {{ govukBackLink({
         text: "Back",
         href: backLink
     }) }}
+</nav>
 {% endblock %}
 {% block content %}
   <div class="govuk-grid-row">

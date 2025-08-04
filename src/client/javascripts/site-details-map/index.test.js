@@ -28,8 +28,9 @@ jest.mock('./site-data-loader.js')
 jest.mock('./map-factory.js')
 jest.mock('./site-visualizer.js')
 
-// Mock setTimeout to execute synchronously for testing
-globalThis.setTimeout = jest.fn((fn) => fn())
+// Mock setTimeout to control execution for testing
+const mockSetTimeout = jest.fn()
+globalThis.setTimeout = mockSetTimeout
 
 describe('SiteDetailsMap', () => {
   let mockRoot
@@ -40,6 +41,7 @@ describe('SiteDetailsMap', () => {
 
   beforeEach(() => {
     jest.clearAllMocks()
+    mockSetTimeout.mockClear()
 
     mockRoot = document.createElement('div')
     mockRoot.innerHTML = ''
@@ -350,6 +352,33 @@ describe('SiteDetailsMap', () => {
       const result = siteDetailsMap.getFromLonLatFunction()
 
       expect(result).toBeNull()
+    })
+  })
+
+  describe('scheduleMapInitialization', () => {
+    test('should call setTimeout with initialization function', () => {
+      siteDetailsMap = new SiteDetailsMap(mockRoot)
+      jest.spyOn(siteDetailsMap, 'initializeMap').mockResolvedValue()
+
+      siteDetailsMap.scheduleMapInitialization()
+
+      expect(mockSetTimeout).toHaveBeenCalledWith(expect.any(Function), 0)
+    })
+
+    test('should handle initializeMap errors', async () => {
+      siteDetailsMap = new SiteDetailsMap(mockRoot)
+      const showErrorSpy = jest.spyOn(siteDetailsMap, 'showError')
+      jest
+        .spyOn(siteDetailsMap, 'initializeMap')
+        .mockRejectedValue(new Error('Init failed'))
+
+      // Get the callback function passed to setTimeout
+      siteDetailsMap.scheduleMapInitialization()
+      const [callback] = mockSetTimeout.mock.calls[0]
+
+      await callback()
+
+      expect(showErrorSpy).toHaveBeenCalled()
     })
   })
 })

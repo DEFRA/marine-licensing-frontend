@@ -209,4 +209,70 @@ describe('MapFactory', () => {
       expect(result).toBe(mockInstance)
     })
   })
+
+  describe('setupResponsiveAttribution', () => {
+    test('should set up event listener and check size on initialization', () => {
+      const mockMap = {
+        on: jest.fn(),
+        getSize: jest.fn().mockReturnValue([800, 600])
+      }
+      const mockAttribution = {
+        setCollapsible: jest.fn(),
+        setCollapsed: jest.fn()
+      }
+
+      mapFactory.setupResponsiveAttribution(mockMap, mockAttribution)
+
+      expect(mockMap.on).toHaveBeenCalledWith(
+        'change:size',
+        expect.any(Function)
+      )
+      expect(mockMap.getSize).toHaveBeenCalled()
+      expect(mockAttribution.setCollapsible).toHaveBeenCalledWith(false)
+      expect(mockAttribution.setCollapsed).toHaveBeenCalledWith(false)
+    })
+
+    test('should collapse attribution for small maps', () => {
+      const mockMap = {
+        on: jest.fn(),
+        getSize: jest.fn().mockReturnValue([400, 300])
+      }
+      const mockAttribution = {
+        setCollapsible: jest.fn(),
+        setCollapsed: jest.fn()
+      }
+
+      mapFactory.setupResponsiveAttribution(mockMap, mockAttribution)
+
+      expect(mockAttribution.setCollapsible).toHaveBeenCalledWith(true)
+      expect(mockAttribution.setCollapsed).toHaveBeenCalledWith(true)
+    })
+
+    test('should call checkSize function when map size changes', () => {
+      const mockMap = {
+        on: jest.fn(),
+        getSize: jest.fn().mockReturnValue([800, 600])
+      }
+      const mockAttribution = {
+        setCollapsible: jest.fn(),
+        setCollapsed: jest.fn()
+      }
+
+      mapFactory.setupResponsiveAttribution(mockMap, mockAttribution)
+
+      // Get the callback function passed to map.on
+      const [, callback] = mockMap.on.mock.calls[0]
+
+      // Clear previous calls and simulate size change
+      mockAttribution.setCollapsible.mockClear()
+      mockAttribution.setCollapsed.mockClear()
+      mockMap.getSize.mockReturnValue([500, 400])
+
+      // Call the callback
+      callback()
+
+      expect(mockAttribution.setCollapsible).toHaveBeenCalledWith(true)
+      expect(mockAttribution.setCollapsed).toHaveBeenCalledWith(true)
+    })
+  })
 })

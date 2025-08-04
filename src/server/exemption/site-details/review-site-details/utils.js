@@ -10,7 +10,7 @@ const REVIEW_SITE_DETAILS_VIEW_ROUTE =
 const FILE_UPLOAD_REVIEW_VIEW_ROUTE =
   'exemption/site-details/review-site-details/file-upload-review'
 
-export const getSiteDetailsBackLink = (previousPage) => {
+export const getSiteDetailsBackLink = (previousPage, coordinatesEntry) => {
   if (!previousPage || !URL.canParse(previousPage)) {
     return routes.TASK_LIST
   }
@@ -22,6 +22,11 @@ export const getSiteDetailsBackLink = (previousPage) => {
     return routes.TASK_LIST
   }
 
+  if (coordinatesEntry === 'multiple') {
+    return routes.ENTER_MULTIPLE_COORDINATES
+  }
+
+  // For circular sites (single coordinate), go back to width page
   return routes.WIDTH_OF_SITE
 }
 
@@ -30,6 +35,10 @@ export const getReviewSummaryText = (siteDetails) => {
 
   if (coordinatesEntry === 'single' && coordinatesType === 'coordinates') {
     return 'Manually enter one set of coordinates and a width to create a circular site'
+  }
+
+  if (coordinatesEntry === 'multiple' && coordinatesType === 'coordinates') {
+    return 'Manually enter multiple sets of coordinates to mark the boundary of the site'
   }
 
   return ''
@@ -55,6 +64,40 @@ export const getCoordinateDisplayText = (siteDetails, coordinateSystem) => {
   return coordinateSystem === COORDINATE_SYSTEMS.WGS84
     ? `${coordinates.latitude}, ${coordinates.longitude}`
     : `${coordinates.eastings}, ${coordinates.northings}`
+}
+
+export const getPolygonCoordinatesDisplayData = (
+  siteDetails,
+  coordinateSystem
+) => {
+  const { coordinates } = siteDetails
+
+  if (!coordinates || !Array.isArray(coordinates) || !coordinateSystem) {
+    return []
+  }
+
+  return coordinates
+    .filter(
+      (coord) =>
+        coord &&
+        ((coordinateSystem === COORDINATE_SYSTEMS.WGS84 &&
+          coord.latitude &&
+          coord.longitude) ||
+          (coordinateSystem === COORDINATE_SYSTEMS.OSGB36 &&
+            coord.eastings &&
+            coord.northings))
+    )
+    .map((coord, index) => {
+      const displayText =
+        coordinateSystem === COORDINATE_SYSTEMS.WGS84
+          ? `${coord.latitude}, ${coord.longitude}`
+          : `${coord.eastings}, ${coord.northings}`
+
+      return {
+        label: index === 0 ? 'Start and end points' : `Point ${index + 1}`,
+        value: displayText
+      }
+    })
 }
 
 export const getFileUploadSummaryData = (exemption) => {
@@ -125,8 +168,20 @@ export const buildManualCoordinateSummaryData = (
   siteDetails,
   coordinateSystem
 ) => {
-  const { circleWidth } = siteDetails
+  const { circleWidth, coordinatesEntry } = siteDetails
 
+  if (coordinatesEntry === 'multiple') {
+    return {
+      method: getReviewSummaryText(siteDetails),
+      coordinateSystem: getCoordinateSystemText(coordinateSystem),
+      polygonCoordinates: getPolygonCoordinatesDisplayData(
+        siteDetails,
+        coordinateSystem
+      )
+    }
+  }
+
+  // Default to circular site display
   return {
     method: getReviewSummaryText(siteDetails),
     coordinateSystem: getCoordinateSystemText(coordinateSystem),
@@ -288,7 +343,10 @@ export const renderManualCoordinateReview = (
 
   return h.view(REVIEW_SITE_DETAILS_VIEW_ROUTE, {
     ...reviewSiteDetailsPageData,
-    backLink: getSiteDetailsBackLink(previousPage),
+    backLink: getSiteDetailsBackLink(
+      previousPage,
+      siteDetails.coordinatesEntry
+    ),
     projectName: exemption.projectName,
     summaryData
   })

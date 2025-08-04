@@ -196,11 +196,13 @@ describe('#multipleCoordinates', () => {
       takeover: mockTakeover
     }
     const mockH = {
-      view: jest.fn().mockReturnValue(mockViewResult)
+      view: jest.fn().mockReturnValue(mockViewResult),
+      redirect: jest.fn()
     }
 
     beforeEach(() => {
       mockH.view.mockClear()
+      mockH.redirect.mockClear()
       mockTakeover.mockClear()
       mockH.view.mockReturnValue(mockViewResult)
     })
@@ -236,14 +238,7 @@ describe('#multipleCoordinates', () => {
         'coordinates',
         expectedCoordinates
       )
-      expect(mockH.view).toHaveBeenCalledWith(
-        MULTIPLE_COORDINATES_VIEW_ROUTES[COORDINATE_SYSTEMS.WGS84],
-        expect.objectContaining({
-          ...multipleCoordinatesPageData,
-          coordinates: expectedCoordinates,
-          projectName: 'Test Project'
-        })
-      )
+      expect(mockH.redirect).toHaveBeenCalledWith(routes.REVIEW_SITE_DETAILS)
     })
 
     test('should handle validation errors by calling handleValidationFailure', () => {
@@ -305,13 +300,7 @@ describe('#multipleCoordinates', () => {
         'coordinates',
         expectedCoordinates
       )
-      expect(mockH.view).toHaveBeenCalledWith(
-        MULTIPLE_COORDINATES_VIEW_ROUTES[COORDINATE_SYSTEMS.OSGB36],
-        expect.objectContaining({
-          ...multipleCoordinatesPageData,
-          coordinates: expectedCoordinates
-        })
-      )
+      expect(mockH.redirect).toHaveBeenCalledWith(routes.REVIEW_SITE_DETAILS)
     })
 
     test('should default to WGS84 when coordinateSystem is invalid', () => {
@@ -328,6 +317,7 @@ describe('#multipleCoordinates', () => {
         payload,
         COORDINATE_SYSTEMS.WGS84
       )
+      expect(mockH.redirect).toHaveBeenCalledWith(routes.REVIEW_SITE_DETAILS)
     })
 
     test('should re-render the page with an added wgs84 point when the add point button is clicked', () => {

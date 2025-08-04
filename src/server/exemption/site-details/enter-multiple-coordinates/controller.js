@@ -1,4 +1,5 @@
 import { COORDINATE_SYSTEMS } from '~/src/server/common/constants/exemptions.js'
+import { routes } from '~/src/server/common/constants/routes.js'
 import {
   getExemptionCache,
   getCoordinateSystem,
@@ -121,13 +122,24 @@ export const multipleCoordinatesSubmitController = {
           : { latitude: '', longitude: '' }
 
       coordinates = [...coordinates, emptyCoordinate]
+
+      return renderMultipleCoordinatesView(
+        h,
+        coordinates,
+        coordinateSystem,
+        exemption?.projectName
+      )
     }
 
-    return renderMultipleCoordinatesView(
-      h,
-      coordinates,
-      coordinateSystem,
-      exemption?.projectName
-    )
+    if (payload.remove) {
+      return renderMultipleCoordinatesView(
+        h,
+        coordinates,
+        coordinateSystem,
+        exemption?.projectName
+      )
+    }
+
+    return h.redirect(routes.REVIEW_SITE_DETAILS)
   }
 }

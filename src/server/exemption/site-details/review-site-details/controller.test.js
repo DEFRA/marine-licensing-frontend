@@ -418,7 +418,8 @@ describe('#reviewSiteDetails', () => {
       const request = {
         logger: {
           info: jest.fn(),
-          error: jest.fn()
+          error: jest.fn(),
+          debug: jest.fn()
         }
       }
       const h = { redirect: jest.fn() }
@@ -473,7 +474,8 @@ describe('#reviewSiteDetails', () => {
       const request = {
         logger: {
           info: jest.fn(),
-          error: jest.fn()
+          error: jest.fn(),
+          debug: jest.fn()
         }
       }
       const h = { redirect: jest.fn() }
@@ -521,7 +523,8 @@ describe('#reviewSiteDetails', () => {
       const request = {
         logger: {
           info: jest.fn(),
-          error: jest.fn()
+          error: jest.fn(),
+          debug: jest.fn()
         }
       }
       const h = { redirect: jest.fn() }

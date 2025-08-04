@@ -64,7 +64,7 @@ describe('CoordinateParser', () => {
   })
 
   describe('parseCoordinates', () => {
-    test('should parse WGS84 coordinates', () => {
+    test('should return transformed coordinates for WGS84 input', () => {
       const coordinates = { latitude: '51.5', longitude: '-0.1' }
       mockFromLonLat.mockReturnValue([1000, 2000])
 
@@ -75,11 +75,27 @@ describe('CoordinateParser', () => {
       )
 
       expect(result).toEqual([1000, 2000])
+    })
+
+    test('should call transformation function with correct WGS84 parameters', () => {
+      const coordinates = { latitude: '51.5', longitude: '-0.1' }
+      mockFromLonLat.mockReturnValue([1000, 2000])
+
+      coordinateParser.parseCoordinates('WGS84', coordinates, mockFromLonLat)
+
       expect(mockFromLonLat).toHaveBeenCalledWith([-0.1, 51.5])
+    })
+
+    test('should not use OSGB36 converter for WGS84 coordinates', () => {
+      const coordinates = { latitude: '51.5', longitude: '-0.1' }
+      mockFromLonLat.mockReturnValue([1000, 2000])
+
+      coordinateParser.parseCoordinates('WGS84', coordinates, mockFromLonLat)
+
       expect(GeographicCoordinateConverter.osgb36ToWgs84).not.toHaveBeenCalled()
     })
 
-    test('should parse OSGB36 coordinates', () => {
+    test('should return transformed coordinates for OSGB36 input', () => {
       const coordinates = { eastings: '530000', northings: '180000' }
       GeographicCoordinateConverter.osgb36ToWgs84.mockReturnValue([-0.1, 51.5])
       mockFromLonLat.mockReturnValue([3000, 4000])
@@ -91,11 +107,29 @@ describe('CoordinateParser', () => {
       )
 
       expect(result).toEqual([3000, 4000])
-      expect(mockFromLonLat).toHaveBeenCalledWith([-0.1, 51.5])
+    })
+
+    test('should convert OSGB36 to WGS84 before transformation', () => {
+      const coordinates = { eastings: '530000', northings: '180000' }
+      GeographicCoordinateConverter.osgb36ToWgs84.mockReturnValue([-0.1, 51.5])
+      mockFromLonLat.mockReturnValue([3000, 4000])
+
+      coordinateParser.parseCoordinates('OSGB36', coordinates, mockFromLonLat)
+
       expect(GeographicCoordinateConverter.osgb36ToWgs84).toHaveBeenCalledWith(
         530000,
         180000
       )
+    })
+
+    test('should call transformation function with converted coordinates', () => {
+      const coordinates = { eastings: '530000', northings: '180000' }
+      GeographicCoordinateConverter.osgb36ToWgs84.mockReturnValue([-0.1, 51.5])
+      mockFromLonLat.mockReturnValue([3000, 4000])
+
+      coordinateParser.parseCoordinates('OSGB36', coordinates, mockFromLonLat)
+
+      expect(mockFromLonLat).toHaveBeenCalledWith([-0.1, 51.5])
     })
 
     test.each([

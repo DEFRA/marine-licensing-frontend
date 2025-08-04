@@ -229,34 +229,58 @@ describe('CircleGeometryCalculator', () => {
     })
 
     describe('mathematical precision validation', () => {
-      test('should generate correct bearing angles for known side counts', () => {
-        const centerLonLat = [0, 0]
-        const radiusInMeters = 1000
+      const createSquareTestSetup = () => ({
+        centerLonLat: [0, 0],
+        radiusInMeters: 1000,
+        sides: 4
+      })
 
-        // Test 4-sided polygon (square) - bearings should be 0, π/2, π, 3π/2
+      test('should generate correct number of points for square', () => {
+        const setup = createSquareTestSetup()
         const result = CircleGeometryCalculator.createGeographicCircle(
-          centerLonLat,
-          radiusInMeters,
-          4
+          setup.centerLonLat,
+          setup.radiusInMeters,
+          setup.sides
         )
 
         expect(result).toHaveLength(5) // 4 sides + 1 closure point
+      })
 
-        // First point (bearing 0) should be due north of center
-        expect(result[0][0]).toBeCloseTo(0, 10) // longitude unchanged
-        expect(result[0][1]).toBeGreaterThan(0) // latitude increased (north)
+      test.each([
+        {
+          description: 'first point due north of center',
+          index: 0,
+          expectLon: (lon) => expect(lon).toBeCloseTo(0, 10),
+          expectLat: (lat) => expect(lat).toBeGreaterThan(0)
+        },
+        {
+          description: 'second point due east of center',
+          index: 1,
+          expectLon: (lon) => expect(lon).toBeGreaterThan(0),
+          expectLat: (lat) => expect(lat).toBeCloseTo(0, 5)
+        },
+        {
+          description: 'third point due south of center',
+          index: 2,
+          expectLon: (lon) => expect(lon).toBeCloseTo(0, 10),
+          expectLat: (lat) => expect(lat).toBeLessThan(0)
+        },
+        {
+          description: 'fourth point due west of center',
+          index: 3,
+          expectLon: (lon) => expect(lon).toBeLessThan(0),
+          expectLat: (lat) => expect(lat).toBeCloseTo(0, 5)
+        }
+      ])('should place $description', ({ index, expectLon, expectLat }) => {
+        const setup = createSquareTestSetup()
+        const result = CircleGeometryCalculator.createGeographicCircle(
+          setup.centerLonLat,
+          setup.radiusInMeters,
+          setup.sides
+        )
 
-        // Second point (bearing π/2) should be due east of center
-        expect(result[1][0]).toBeGreaterThan(0) // longitude increased (east)
-        expect(result[1][1]).toBeCloseTo(0, 5) // latitude approximately center
-
-        // Third point (bearing π) should be due south of center
-        expect(result[2][0]).toBeCloseTo(0, 10) // longitude unchanged
-        expect(result[2][1]).toBeLessThan(0) // latitude decreased (south)
-
-        // Fourth point (bearing 3π/2) should be due west of center
-        expect(result[3][0]).toBeLessThan(0) // longitude decreased (west)
-        expect(result[3][1]).toBeCloseTo(0, 5) // latitude approximately center
+        expectLon(result[index][0])
+        expectLat(result[index][1])
       })
 
       test('should calculate correct distances from center for all points', () => {
@@ -324,12 +348,11 @@ describe('CircleGeometryCalculator', () => {
         expect(northResult[1]).toBeGreaterThan(0) // latitude should increase
       })
 
-      test('should produce symmetric results for opposite bearings', () => {
+      test('should produce symmetric results for north vs south bearings', () => {
         const centerLon = 1
         const centerLat = 52
         const angularDistance = 0.01
 
-        // Test north vs south
         const north = CircleGeometryCalculator.calculateCirclePoint(
           centerLon,
           centerLat,
@@ -343,15 +366,19 @@ describe('CircleGeometryCalculator', () => {
           Math.PI
         )
 
-        // Should be equidistant from center but in opposite directions
         expect(north[0]).toBeCloseTo(south[0], 6) // same longitude
         expect(Math.abs(north[1] - centerLat)).toBeCloseTo(
           Math.abs(south[1] - centerLat),
           6
         )
         expect((north[1] - centerLat) * (south[1] - centerLat)).toBeLessThan(0) // opposite sides
+      })
 
-        // Test east vs west
+      test('should produce symmetric results for east vs west bearings', () => {
+        const centerLon = 1
+        const centerLat = 52
+        const angularDistance = 0.01
+
         const east = CircleGeometryCalculator.calculateCirclePoint(
           centerLon,
           centerLat,

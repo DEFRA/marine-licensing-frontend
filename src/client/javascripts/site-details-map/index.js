@@ -42,8 +42,6 @@ export class SiteDetailsMap extends Component {
 
   async initializeMap() {
     try {
-      // Load OpenLayers modules dynamically for optimal bundle size
-      // Core map components
       const [
         { default: OpenLayersMap },
         { default: View },
@@ -56,7 +54,6 @@ export class SiteDetailsMap extends Component {
         import('ol/source/OSM.js')
       ])
 
-      // Vector data and styling
       const [
         { default: VectorLayer },
         { default: VectorSource },
@@ -69,7 +66,6 @@ export class SiteDetailsMap extends Component {
         import('ol/style.js')
       ])
 
-      // Geometry and projection utilities
       const [
         { default: Point },
         { default: Polygon },
@@ -82,7 +78,6 @@ export class SiteDetailsMap extends Component {
         import('ol/format/GeoJSON.js')
       ])
 
-      // Map controls
       const [{ default: Attribution }, { defaults: defaultControls }] =
         await Promise.all([
           import('ol/control/Attribution.js'),
@@ -134,10 +129,8 @@ export class SiteDetailsMap extends Component {
       )
 
       this.siteVisualizer.map = this.map
-
       this.loadAndDisplaySiteDetails()
     } catch (error) {
-      // Show user-friendly error message - map initialization failures are handled gracefully
       this.showError()
     }
   }

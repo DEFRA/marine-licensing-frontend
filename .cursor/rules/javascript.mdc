@@ -1,6 +1,6 @@
 ---
-description: 
-globs: 
+description:
+globs:
 alwaysApply: true
 ---
 ---
@@ -92,6 +92,12 @@ globs: *.js
   - UI: test behavior + use data-testid
 - Use describe blocks and beforeEach for setup
 - Mock external dependencies
+
+### Jest Mocking Best Practices
+
+- **Prefer `jest.mocked()` over `spyOn`** for module-level mocking
+- Use `jest.mocked()` for type safety and better IntelliSense
+- Use `spyOn` for instance-specific mocking only
 
 ## Template Handling
 - Configure Nunjucks search paths in nunjucks.js:

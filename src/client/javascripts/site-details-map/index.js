@@ -40,61 +40,69 @@ export class SiteDetailsMap extends Component {
     }, 0)
   }
 
+  /**
+   * Load OpenLayers modules dynamically
+   * This was extracted to reduce the function size (Sonar stipulates < 75 lines)
+   * @returns {Promise<object>} OpenLayers modules object
+   */
+  async loadOpenLayersModules() {
+    const [
+      { default: OpenLayersMap },
+      { default: View },
+      { default: TileLayer },
+      { default: OSM },
+      { default: VectorLayer },
+      { default: VectorSource },
+      { default: Feature },
+      { default: Point },
+      { Style, Fill, Stroke, Circle },
+      { fromLonLat, toLonLat },
+      { default: GeoJSON },
+      { default: Polygon },
+      { default: Attribution },
+      { defaults: defaultControls }
+    ] = await Promise.all([
+      import('ol/Map.js'),
+      import('ol/View.js'),
+      import('ol/layer/Tile.js'),
+      import('ol/source/OSM.js'),
+      import('ol/layer/Vector.js'),
+      import('ol/source/Vector.js'),
+      import('ol/Feature.js'),
+      import('ol/geom/Point.js'),
+      import('ol/style.js'),
+      import('ol/proj.js'),
+      import('ol/format/GeoJSON.js'),
+      import('ol/geom/Polygon.js'),
+      import('ol/control/Attribution.js'),
+      import('ol/control/defaults.js')
+    ])
+
+    return {
+      OpenLayersMap,
+      View,
+      TileLayer,
+      OSM,
+      VectorLayer,
+      VectorSource,
+      Feature,
+      Point,
+      Polygon,
+      Style,
+      Fill,
+      Stroke,
+      Circle,
+      fromLonLat,
+      toLonLat,
+      GeoJSON,
+      Attribution,
+      defaultControls
+    }
+  }
+
   async initializeMap() {
     try {
-      // Import all required OpenLayers modules
-      const [
-        { default: OpenLayersMap },
-        { default: View },
-        { default: TileLayer },
-        { default: OSM },
-        { default: VectorLayer },
-        { default: VectorSource },
-        { default: Feature },
-        { default: Point },
-        { Style, Fill, Stroke, Circle },
-        { fromLonLat, toLonLat },
-        { default: GeoJSON },
-        { default: Polygon },
-        { default: Attribution },
-        { defaults: defaultControls }
-      ] = await Promise.all([
-        import('ol/Map.js'),
-        import('ol/View.js'),
-        import('ol/layer/Tile.js'),
-        import('ol/source/OSM.js'),
-        import('ol/layer/Vector.js'),
-        import('ol/source/Vector.js'),
-        import('ol/Feature.js'),
-        import('ol/geom/Point.js'),
-        import('ol/style.js'),
-        import('ol/proj.js'),
-        import('ol/format/GeoJSON.js'),
-        import('ol/geom/Polygon.js'),
-        import('ol/control/Attribution.js'),
-        import('ol/control/defaults.js')
-      ])
-
-      const olModules = {
-        OpenLayersMap,
-        View,
-        TileLayer,
-        OSM,
-        VectorLayer,
-        VectorSource,
-        Feature,
-        Point,
-        Polygon,
-        Style,
-        Fill,
-        Stroke,
-        Circle,
-        fromLonLat,
-        toLonLat,
-        GeoJSON,
-        Attribution,
-        defaultControls
-      }
+      const olModules = await this.loadOpenLayersModules()
 
       if (this.destroyed) {
         return

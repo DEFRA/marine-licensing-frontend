@@ -1,7 +1,7 @@
-import CoordinateParser from './CoordinateParser.js'
-import GeographicCoordinateConverter from './GeographicCoordinateConverter.js'
+import CoordinateParser from './coordinate-parser.js'
+import GeographicCoordinateConverter from './geographic-coordinate-converter.js'
 
-jest.mock('./GeographicCoordinateConverter.js', () => ({
+jest.mock('./geographic-coordinate-converter.js', () => ({
   default: {
     osgb36ToWgs84: jest.fn()
   }

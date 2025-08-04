@@ -1,8 +1,8 @@
 import { Component } from 'govuk-frontend'
-import CoordinateParser from './CoordinateParser.js'
-import MapFactory from './MapFactory.js'
-import SiteDataLoader from './SiteDataLoader.js'
-import SiteVisualizer from './SiteVisualizer.js'
+import CoordinateParser from './coordinate-parser.js'
+import MapFactory from './map-factory.js'
+import SiteDataLoader from './site-data-loader.js'
+import SiteVisualizer from './site-visualizer.js'
 
 const DEFAULT_UK_CENTER_LONGITUDE = -3.5
 const DEFAULT_UK_CENTER_LATITUDE = 54.0

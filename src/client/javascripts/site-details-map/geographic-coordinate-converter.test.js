@@ -1,4 +1,4 @@
-import GeographicCoordinateConverter from './GeographicCoordinateConverter.js'
+import GeographicCoordinateConverter from './geographic-coordinate-converter.js'
 
 describe('GeographicCoordinateConverter', () => {
   // Helper functions to reduce code duplication

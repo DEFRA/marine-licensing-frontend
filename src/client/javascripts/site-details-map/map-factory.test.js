@@ -1,4 +1,4 @@
-import MapFactory from './MapFactory.js'
+import MapFactory from './map-factory.js'
 
 Object.defineProperty(globalThis, 'document', {
   value: {

@@ -1,4 +1,4 @@
-import SiteDataLoader from './SiteDataLoader.js'
+import SiteDataLoader from './site-data-loader.js'
 
 Object.defineProperty(globalThis, 'document', {
   value: {

@@ -1,4 +1,4 @@
-import CircleGeometryCalculator from './CircleGeometryCalculator.js'
+import CircleGeometryCalculator from './circle-geometry-calculator.js'
 
 describe('CircleGeometryCalculator', () => {
   // Helper functions to reduce code duplication

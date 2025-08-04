@@ -1,7 +1,7 @@
-import CircleGeometryCalculator from './CircleGeometryCalculator.js'
-import SiteVisualizer from './SiteVisualizer.js'
+import CircleGeometryCalculator from './circle-geometry-calculator.js'
+import SiteVisualizer from './site-visualizer.js'
 
-jest.mock('./CircleGeometryCalculator.js', () => ({
+jest.mock('./circle-geometry-calculator.js', () => ({
   default: {
     createGeographicCircle: jest.fn()
   }

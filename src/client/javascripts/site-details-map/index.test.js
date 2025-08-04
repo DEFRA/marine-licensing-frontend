@@ -1,8 +1,8 @@
-import CoordinateParser from './CoordinateParser.js'
+import CoordinateParser from './coordinate-parser.js'
 import { SiteDetailsMap } from './index.js'
-import MapFactory from './MapFactory.js'
-import SiteDataLoader from './SiteDataLoader.js'
-import SiteVisualizer from './SiteVisualizer.js'
+import MapFactory from './map-factory.js'
+import SiteDataLoader from './site-data-loader.js'
+import SiteVisualizer from './site-visualizer.js'
 
 // Mock document for DOM operations
 Object.defineProperty(globalThis, 'document', {
@@ -23,10 +23,10 @@ jest.mock('govuk-frontend', () => ({
   }
 }))
 
-jest.mock('./CoordinateParser.js')
-jest.mock('./SiteDataLoader.js')
-jest.mock('./MapFactory.js')
-jest.mock('./SiteVisualizer.js')
+jest.mock('./coordinate-parser.js')
+jest.mock('./site-data-loader.js')
+jest.mock('./map-factory.js')
+jest.mock('./site-visualizer.js')
 
 // Mock setTimeout to execute synchronously for testing
 globalThis.setTimeout = jest.fn((fn) => fn())

@@ -1,4 +1,4 @@
-import GeographicCoordinateConverter from './GeographicCoordinateConverter.js'
+import GeographicCoordinateConverter from './geographic-coordinate-converter.js'
 
 class CoordinateParser {
   /**

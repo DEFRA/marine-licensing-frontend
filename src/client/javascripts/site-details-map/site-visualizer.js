@@ -1,4 +1,4 @@
-import CircleGeometryCalculator from './CircleGeometryCalculator.js'
+import CircleGeometryCalculator from './circle-geometry-calculator.js'
 
 class SiteVisualizer {
   constructor(olModules, vectorSource, geoJSONFormat, map) {

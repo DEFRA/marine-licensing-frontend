@@ -12,6 +12,7 @@ class SiteDataLoader {
     try {
       return JSON.parse(siteDataElement.textContent)
     } catch (error) {
+      // Return null for invalid JSON - calling code expects and handles this gracefully
       return null
     }
   }

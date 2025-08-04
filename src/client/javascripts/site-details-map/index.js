@@ -72,6 +72,7 @@ export class SiteDetailsMap extends Component {
 
       this.loadAndDisplaySiteDetails()
     } catch (error) {
+      // Show user-friendly error message - map initialization failures are handled gracefully
       this.showError()
     }
   }

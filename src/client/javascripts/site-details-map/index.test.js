@@ -1,7 +1,6 @@
 import CoordinateParser from './CoordinateParser.js'
 import { SiteDetailsMap } from './index.js'
 import MapFactory from './MapFactory.js'
-import OpenLayersModuleLoader from './OpenLayersModuleLoader.js'
 import SiteDataLoader from './SiteDataLoader.js'
 import SiteVisualizer from './SiteVisualizer.js'
 
@@ -24,7 +23,6 @@ jest.mock('govuk-frontend', () => ({
   }
 }))
 
-jest.mock('./OpenLayersModuleLoader.js')
 jest.mock('./CoordinateParser.js')
 jest.mock('./SiteDataLoader.js')
 jest.mock('./MapFactory.js')
@@ -71,7 +69,6 @@ describe('SiteDetailsMap', () => {
     SiteDataLoader.mockImplementation(() => mockDataLoader)
     SiteVisualizer.mockImplementation(() => mockSiteVisualizer)
     CoordinateParser.mockImplementation(() => mockCoordinateParser)
-    OpenLayersModuleLoader.mockImplementation(() => ({}))
     MapFactory.mockImplementation(() => ({}))
   })
 
@@ -97,7 +94,6 @@ describe('SiteDetailsMap', () => {
     test('should initialize service dependencies', () => {
       siteDetailsMap = new SiteDetailsMap(mockRoot)
 
-      expect(OpenLayersModuleLoader).toHaveBeenCalled()
       expect(CoordinateParser).toHaveBeenCalled()
       expect(SiteDataLoader).toHaveBeenCalled()
     })

@@ -1,7 +1,6 @@
 import { Component } from 'govuk-frontend'
 import CoordinateParser from './CoordinateParser.js'
 import MapFactory from './MapFactory.js'
-import OpenLayersModuleLoader from './OpenLayersModuleLoader.js'
 import SiteDataLoader from './SiteDataLoader.js'
 import SiteVisualizer from './SiteVisualizer.js'
 
@@ -25,7 +24,6 @@ export class SiteDetailsMap extends Component {
     this.map = null
     this.destroyed = false
 
-    this.moduleLoader = new OpenLayersModuleLoader()
     this.coordinateParser = new CoordinateParser()
     this.dataLoader = new SiteDataLoader()
     this.mapFactory = null
@@ -44,7 +42,60 @@ export class SiteDetailsMap extends Component {
 
   async initializeMap() {
     try {
-      const olModules = await this.moduleLoader.importModules()
+      // Import all required OpenLayers modules
+      const [
+        { default: OpenLayersMap },
+        { default: View },
+        { default: TileLayer },
+        { default: OSM },
+        { default: VectorLayer },
+        { default: VectorSource },
+        { default: Feature },
+        { default: Point },
+        { Style, Fill, Stroke, Circle },
+        { fromLonLat, toLonLat },
+        { default: GeoJSON },
+        { default: Polygon },
+        { default: Attribution },
+        { defaults: defaultControls }
+      ] = await Promise.all([
+        import('ol/Map.js'),
+        import('ol/View.js'),
+        import('ol/layer/Tile.js'),
+        import('ol/source/OSM.js'),
+        import('ol/layer/Vector.js'),
+        import('ol/source/Vector.js'),
+        import('ol/Feature.js'),
+        import('ol/geom/Point.js'),
+        import('ol/style.js'),
+        import('ol/proj.js'),
+        import('ol/format/GeoJSON.js'),
+        import('ol/geom/Polygon.js'),
+        import('ol/control/Attribution.js'),
+        import('ol/control/defaults.js')
+      ])
+
+      const olModules = {
+        OpenLayersMap,
+        View,
+        TileLayer,
+        OSM,
+        VectorLayer,
+        VectorSource,
+        Feature,
+        Point,
+        Polygon,
+        Style,
+        Fill,
+        Stroke,
+        Circle,
+        fromLonLat,
+        toLonLat,
+        GeoJSON,
+        Attribution,
+        defaultControls
+      }
+
       if (this.destroyed) {
         return
       }

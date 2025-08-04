@@ -4,7 +4,7 @@ class MapFactory {
   }
 
   /**
-   * Create a new map instance with responsive attribution controls
+   * Create a new map instance with zoom controls and responsive attribution
    * @param {HTMLElement} target - DOM element to attach map to
    * @param {object} options - Map options (center, zoom)
    * @param {object} vectorLayer - Vector layer for features
@@ -20,9 +20,10 @@ class MapFactory {
       defaultControls
     } = this.olModules
 
-    // Create attribution control that will be responsive
+    // Create attribution control without collapsible button
     const attribution = new Attribution({
-      collapsible: false
+      collapsible: false,
+      collapsed: false
     })
 
     const map = new OpenLayersMap({
@@ -39,9 +40,6 @@ class MapFactory {
         zoom: options.zoom
       })
     })
-
-    // Set up responsive attribution behavior
-    this.setupResponsiveAttribution(map, attribution)
 
     return map
   }

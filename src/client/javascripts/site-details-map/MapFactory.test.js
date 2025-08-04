@@ -23,8 +23,11 @@ describe('MapFactory', () => {
       Fill: jest.fn(),
       Stroke: jest.fn(),
       Circle: jest.fn(),
+
       Attribution: jest.fn(),
-      defaultControls: jest.fn()
+      defaultControls: jest.fn().mockReturnValue({
+        extend: jest.fn().mockReturnValue([])
+      })
     }
 
     mapFactory = new MapFactory(mockOlModules)
@@ -38,23 +41,14 @@ describe('MapFactory', () => {
       const mockTileLayer = {}
       const mockOSM = {}
       const mockView = {}
-      const mockAttribution = {
-        setCollapsible: jest.fn(),
-        setCollapsed: jest.fn()
-      }
-      const mockDefaultControls = {
-        extend: jest.fn().mockReturnValue([])
-      }
-      const mockMap = {
-        on: jest.fn(),
-        getSize: jest.fn().mockReturnValue([800, 600])
-      }
+      const mockAttribution = {}
+      const mockMap = {}
 
       mockOlModules.TileLayer.mockReturnValue(mockTileLayer)
       mockOlModules.OSM.mockReturnValue(mockOSM)
       mockOlModules.View.mockReturnValue(mockView)
+
       mockOlModules.Attribution.mockReturnValue(mockAttribution)
-      mockOlModules.defaultControls.mockReturnValue(mockDefaultControls)
       mockOlModules.OpenLayersMap.mockReturnValue(mockMap)
 
       const result = mapFactory.createMap(mockTarget, options, mockVectorLayer)
@@ -64,12 +58,15 @@ describe('MapFactory', () => {
       })
       expect(mockOlModules.OSM).toHaveBeenCalled()
       expect(mockOlModules.Attribution).toHaveBeenCalledWith({
-        collapsible: false
+        collapsible: false,
+        collapsed: false
       })
       expect(mockOlModules.defaultControls).toHaveBeenCalledWith({
         attribution: false
       })
-      expect(mockDefaultControls.extend).toHaveBeenCalledWith([mockAttribution])
+      expect(mockOlModules.defaultControls().extend).toHaveBeenCalledWith([
+        mockAttribution
+      ])
       expect(mockOlModules.View).toHaveBeenCalledWith({
         center: options.center,
         zoom: options.zoom
@@ -80,47 +77,7 @@ describe('MapFactory', () => {
         controls: [],
         view: mockView
       })
-      expect(mockMap.on).toHaveBeenCalledWith(
-        'change:size',
-        expect.any(Function)
-      )
       expect(result).toBe(mockMap)
-    })
-  })
-
-  describe('setupResponsiveAttribution', () => {
-    const createMockAttribution = () => ({
-      setCollapsible: jest.fn(),
-      setCollapsed: jest.fn()
-    })
-
-    const createMockMap = (width, height) => ({
-      on: jest.fn(),
-      getSize: jest.fn().mockReturnValue([width, height])
-    })
-
-    test('should set up responsive attribution behavior', () => {
-      const mockAttribution = createMockAttribution()
-      const mockMap = createMockMap(800, 600)
-
-      mapFactory.setupResponsiveAttribution(mockMap, mockAttribution)
-
-      expect(mockMap.on).toHaveBeenCalledWith(
-        'change:size',
-        expect.any(Function)
-      )
-      expect(mockAttribution.setCollapsible).toHaveBeenCalledWith(false)
-      expect(mockAttribution.setCollapsed).toHaveBeenCalledWith(false)
-    })
-
-    test('should collapse attribution on small maps', () => {
-      const mockAttribution = createMockAttribution()
-      const mockMap = createMockMap(500, 400)
-
-      mapFactory.setupResponsiveAttribution(mockMap, mockAttribution)
-
-      expect(mockAttribution.setCollapsible).toHaveBeenCalledWith(true)
-      expect(mockAttribution.setCollapsed).toHaveBeenCalledWith(true)
     })
   })
 

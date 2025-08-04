@@ -1,4 +1,7 @@
-import { authenticatedGetRequest } from '~/src/server/common/helpers/authenticated-requests.js'
+import {
+  authenticatedDeleteRequest,
+  authenticatedGetRequest
+} from '~/src/server/common/helpers/authenticated-requests.js'
 import { routes } from '~/src/server/common/constants/routes.js'
 import {
   getExemptionCache,
@@ -70,7 +73,7 @@ export const deleteExemptionSelectController = {
  * @satisfies {Partial<ServerRoute>}
  */
 export const deleteExemptionSubmitController = {
-  handler: (request, h) => {
+  handler: async (request, h) => {
     try {
       const { exemptionId } = request.payload
       const exemption = getExemptionCache(request)
@@ -84,8 +87,7 @@ export const deleteExemptionSubmitController = {
         return h.redirect(routes.DASHBOARD)
       }
 
-      // TODO: Make DELETE API call to actually delete the exemption
-      // const response = await authenticatedDeleteRequest(request, `/exemption/${exemptionId}`)
+      await authenticatedDeleteRequest(request, `/exemption/${exemptionId}`)
 
       clearExemptionCache(request)
 

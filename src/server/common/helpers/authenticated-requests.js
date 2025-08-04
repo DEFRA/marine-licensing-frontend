@@ -44,6 +44,21 @@ export const authenticatedGetRequest = async (
   })
 }
 
+export const authenticatedDeleteRequest = async (
+  request,
+  endpoint,
+  options = {}
+) => {
+  const headers = await createAuthHeaders(request)
+  const url = `${config.get('backend').apiUrl}${endpoint}`
+
+  return Wreck.delete(url, {
+    headers,
+    json: true,
+    ...options
+  })
+}
+
 export const authenticatedPostRequest = async (
   request,
   endpoint,

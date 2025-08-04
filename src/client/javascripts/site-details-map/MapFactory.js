@@ -4,16 +4,28 @@ class MapFactory {
   }
 
   /**
-   * Create a new map instance
+   * Create a new map instance with responsive attribution controls
    * @param {HTMLElement} target - DOM element to attach map to
    * @param {object} options - Map options (center, zoom)
    * @param {object} vectorLayer - Vector layer for features
    * @returns {object} OpenLayers Map instance
    */
   createMap(target, options, vectorLayer) {
-    const { OpenLayersMap, View, TileLayer, OSM } = this.olModules
+    const {
+      OpenLayersMap,
+      View,
+      TileLayer,
+      OSM,
+      Attribution,
+      defaultControls
+    } = this.olModules
 
-    return new OpenLayersMap({
+    // Create attribution control that will be responsive
+    const attribution = new Attribution({
+      collapsible: false
+    })
+
+    const map = new OpenLayersMap({
       target,
       layers: [
         new TileLayer({
@@ -21,11 +33,33 @@ class MapFactory {
         }),
         vectorLayer
       ],
+      controls: defaultControls({ attribution: false }).extend([attribution]),
       view: new View({
         center: options.center,
         zoom: options.zoom
       })
     })
+
+    // Set up responsive attribution behavior
+    this.setupResponsiveAttribution(map, attribution)
+
+    return map
+  }
+
+  /**
+   * Set up responsive attribution that collapses on small maps
+   * @param {object} map - OpenLayers Map instance
+   * @param {object} attribution - Attribution control instance
+   */
+  setupResponsiveAttribution(map, attribution) {
+    const checkSize = () => {
+      const small = map.getSize()[0] < 600
+      attribution.setCollapsible(small)
+      attribution.setCollapsed(small)
+    }
+
+    map.on('change:size', checkSize)
+    checkSize()
   }
 
   /**

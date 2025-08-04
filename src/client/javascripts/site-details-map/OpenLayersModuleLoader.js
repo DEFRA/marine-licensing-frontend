@@ -18,7 +18,9 @@ class OpenLayersModuleLoader {
       { Style, Fill, Stroke, Circle },
       { fromLonLat, toLonLat },
       { default: GeoJSON },
-      { default: Polygon }
+      { default: Polygon },
+      { default: Attribution },
+      { defaults: defaultControls }
     ] = await Promise.all([
       import('ol/ol.css'),
       import('ol/Map.js'),
@@ -33,7 +35,9 @@ class OpenLayersModuleLoader {
       import('ol/style.js'),
       import('ol/proj.js'),
       import('ol/format/GeoJSON.js'),
-      import('ol/geom/Polygon.js')
+      import('ol/geom/Polygon.js'),
+      import('ol/control/Attribution.js'),
+      import('ol/control/defaults.js')
     ])
 
     return {
@@ -53,7 +57,9 @@ class OpenLayersModuleLoader {
       Circle,
       fromLonLat,
       toLonLat,
-      GeoJSON
+      GeoJSON,
+      Attribution,
+      defaultControls
     }
   }
 }

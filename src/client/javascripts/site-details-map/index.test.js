@@ -1,12 +1,19 @@
-/**
- * @jest-environment jsdom
- */
 import CoordinateParser from './CoordinateParser.js'
 import { SiteDetailsMap } from './index.js'
 import MapFactory from './MapFactory.js'
 import OpenLayersModuleLoader from './OpenLayersModuleLoader.js'
 import SiteDataLoader from './SiteDataLoader.js'
 import SiteVisualizer from './SiteVisualizer.js'
+
+// Mock document for DOM operations
+Object.defineProperty(globalThis, 'document', {
+  value: {
+    createElement: jest.fn().mockReturnValue({
+      innerHTML: ''
+    })
+  },
+  writable: true
+})
 
 // Mock govuk-frontend Component to avoid browser compatibility checks
 jest.mock('govuk-frontend', () => ({

@@ -52,8 +52,9 @@ class MapFactory {
    * @param {object} attribution - Attribution control instance
    */
   setupResponsiveAttribution(map, attribution) {
+    const SMALL_MAP_SIZE = 600
     const checkSize = () => {
-      const small = map.getSize()[0] < 600
+      const small = map.getSize()[0] < SMALL_MAP_SIZE
       attribution.setCollapsible(small)
       attribution.setCollapsed(small)
     }

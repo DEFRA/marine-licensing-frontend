@@ -23,7 +23,6 @@ export class SiteDetailsMap extends Component {
     }
 
     this.map = null
-    this.destroyed = false
 
     this.coordinateParser = new CoordinateParser()
     this.dataLoader = new SiteDataLoader()
@@ -45,10 +44,6 @@ export class SiteDetailsMap extends Component {
   async initializeMap() {
     const olModules = await this.moduleLoader.loadModules()
 
-    if (this.destroyed) {
-      return
-    }
-
     this.mapFactory = new MapFactory(olModules)
     const { vectorSource, vectorLayer } = this.mapFactory.createMapLayers()
     const geoJSONFormat = this.mapFactory.initializeGeoJSONFormat(
@@ -66,16 +61,6 @@ export class SiteDetailsMap extends Component {
 
     this.siteVisualizer.map = this.map
     this.loadAndDisplaySiteDetails()
-  }
-
-  destroy() {
-    this.destroyed = true
-    if (this.map) {
-      this.map.setTarget(null)
-      this.map = null
-    }
-    this.mapFactory = null
-    this.siteVisualizer = null
   }
 
   loadAndDisplaySiteDetails() {

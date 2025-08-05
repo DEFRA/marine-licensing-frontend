@@ -115,7 +115,6 @@ describe('SiteDetailsMap', () => {
       expect(siteDetailsMap.options.center).toEqual([-3.5, 54.0])
       expect(siteDetailsMap.options.zoom).toBe(6)
       expect(siteDetailsMap.map).toBeNull()
-      expect(siteDetailsMap.destroyed).toBe(false)
     })
 
     test('should merge custom options with defaults', () => {
@@ -375,35 +374,6 @@ describe('SiteDetailsMap', () => {
     })
   })
 
-  describe('destroy', () => {
-    test('should set destroyed flag and clean up references', () => {
-      siteDetailsMap = new SiteDetailsMap(mockRoot)
-      const mockMap = { setTarget: jest.fn() }
-      siteDetailsMap.map = mockMap
-      siteDetailsMap.mapFactory = {}
-      siteDetailsMap.siteVisualizer = {}
-
-      siteDetailsMap.destroy()
-
-      expect(siteDetailsMap.destroyed).toBe(true)
-      expect(mockMap.setTarget).toHaveBeenCalledWith(null)
-      expect(siteDetailsMap.map).toBeNull()
-      expect(siteDetailsMap.mapFactory).toBeNull()
-      expect(siteDetailsMap.siteVisualizer).toBeNull()
-    })
-
-    test('should handle destroy when map is not set', () => {
-      siteDetailsMap = new SiteDetailsMap(mockRoot)
-      siteDetailsMap.map = null
-
-      expect(() => {
-        siteDetailsMap.destroy()
-      }).not.toThrow()
-
-      expect(siteDetailsMap.destroyed).toBe(true)
-    })
-  })
-
   describe('getFromLonLatFunction', () => {
     beforeEach(() => {
       siteDetailsMap = new SiteDetailsMap(mockRoot)
@@ -589,39 +559,6 @@ describe('SiteDetailsMap', () => {
         'Module loading failed'
       )
       expect(failingModuleLoader.loadModules).toHaveBeenCalled()
-    })
-
-    test('should return early when component is destroyed during initialization', async () => {
-      const moduleLoader = {
-        loadModules: jest.fn().mockResolvedValue({
-          OpenLayersMap: jest.fn(),
-          View: jest.fn(),
-          TileLayer: jest.fn(),
-          OSM: jest.fn(),
-          VectorLayer: jest.fn(),
-          VectorSource: jest.fn(),
-          Feature: jest.fn(),
-          Point: jest.fn(),
-          Polygon: jest.fn(),
-          Style: jest.fn(),
-          Fill: jest.fn(),
-          Stroke: jest.fn(),
-          Circle: jest.fn(),
-          fromLonLat: jest.fn(),
-          toLonLat: jest.fn(),
-          GeoJSON: jest.fn(),
-          Attribution: jest.fn(),
-          defaultControls: jest.fn()
-        })
-      }
-
-      siteDetailsMap = new SiteDetailsMap(mockRoot, {}, moduleLoader)
-      siteDetailsMap.destroyed = true
-
-      await siteDetailsMap.initializeMap()
-
-      expect(moduleLoader.loadModules).toHaveBeenCalled()
-      expect(MapFactory).not.toHaveBeenCalled()
     })
   })
 })

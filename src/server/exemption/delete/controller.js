@@ -69,7 +69,7 @@ export const deleteExemptionSelectController = {
 }
 
 /**
- * Controller for handling the DELETE request to actually delete an exemption.
+ * Controller for handling the request to actually delete an exemption.
  * @satisfies {Partial<ServerRoute>}
  */
 export const deleteExemptionSubmitController = {

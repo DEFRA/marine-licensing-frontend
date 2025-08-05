@@ -1,4 +1,7 @@
-import { COORDINATE_SYSTEMS } from '~/src/server/common/constants/exemptions.js'
+import {
+  COORDINATE_SYSTEMS,
+  POLYGON_MIN_COORDINATE_POINTS
+} from '~/src/server/common/constants/exemptions.js'
 import { routes } from '~/src/server/common/constants/routes.js'
 import {
   getExemptionCache,
@@ -30,14 +33,13 @@ export const multipleCoordinatesController = {
       siteDetails.coordinates
     )
 
-    const minCoords = 3
     const paddedCoordinates = [...coordinates]
     const emptyCoordinate =
       coordinateSystem === COORDINATE_SYSTEMS.OSGB36
         ? { eastings: '', northings: '' }
         : { latitude: '', longitude: '' }
 
-    while (paddedCoordinates.length < minCoords) {
+    while (paddedCoordinates.length < POLYGON_MIN_COORDINATE_POINTS) {
       paddedCoordinates.push({ ...emptyCoordinate })
     }
 

@@ -1,4 +1,7 @@
-import { COORDINATE_SYSTEMS } from '~/src/server/common/constants/exemptions.js'
+import {
+  COORDINATE_SYSTEMS,
+  POLYGON_MIN_COORDINATE_POINTS
+} from '~/src/server/common/constants/exemptions.js'
 import { routes } from '~/src/server/common/constants/routes.js'
 import { getExemptionCache } from '~/src/server/common/helpers/session-cache/utils.js'
 import { generatePointSpecificErrorMessage } from '~/src/server/common/helpers/site-details.js'
@@ -8,8 +11,6 @@ import { createWgs84MultipleCoordinatesSchema } from '~/src/server/common/schema
 // ============================================================================
 // CONSTANTS AND CONFIGURATION
 // ============================================================================
-
-export const REQUIRED_COORDINATES_COUNT = 3
 
 export const PATTERNS = {
   FIELD_BRACKETS: /[[\]]/g
@@ -55,7 +56,7 @@ const createEmptyCoordinate = (coordinateSystem) => {
 }
 
 const createDefaultCoordinates = (coordinateSystem) => {
-  return Array.from({ length: REQUIRED_COORDINATES_COUNT }, () =>
+  return Array.from({ length: POLYGON_MIN_COORDINATE_POINTS }, () =>
     createEmptyCoordinate(coordinateSystem)
   )
 }
@@ -111,7 +112,7 @@ export const normaliseCoordinatesForDisplay = (
     return createDefaultCoordinates(coordinateSystem)
   }
 
-  while (coordinates.length < REQUIRED_COORDINATES_COUNT) {
+  while (coordinates.length < POLYGON_MIN_COORDINATE_POINTS) {
     coordinates.push(createEmptyCoordinate(coordinateSystem))
   }
 
@@ -285,9 +286,9 @@ export const handleValidationFailure = (
  */
 export const removeCoordinateAtIndex = (coordinates, index) => {
   if (
-    index >= REQUIRED_COORDINATES_COUNT &&
+    index >= POLYGON_MIN_COORDINATE_POINTS &&
     index < coordinates.length &&
-    coordinates.length > REQUIRED_COORDINATES_COUNT
+    coordinates.length > POLYGON_MIN_COORDINATE_POINTS
   ) {
     return coordinates.slice(0, index).concat(coordinates.slice(index + 1))
   }

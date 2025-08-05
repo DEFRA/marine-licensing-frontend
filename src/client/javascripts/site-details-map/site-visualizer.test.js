@@ -74,22 +74,22 @@ describe('SiteVisualizer', () => {
     })
   })
 
-  const createCircularSiteTestSetup = () => ({
-    centreCoordinates: [1000, 2000],
-    radiusInMetres: 500,
-    centreWGS84: [0, 51],
-    circleCoords: [
-      [0, 51],
-      [0.1, 51],
-      [0, 51]
-    ],
-    mocks: {
-      feature: {},
-      polygon: {}
+  const setupCircularSiteTest = () => {
+    const setup = {
+      centreCoordinates: [1000, 2000],
+      radiusInMetres: 500,
+      centreWGS84: [0, 51],
+      circleCoords: [
+        [0, 51],
+        [0.1, 51],
+        [0, 51]
+      ],
+      mocks: {
+        feature: {},
+        polygon: {}
+      }
     }
-  })
 
-  const setupCircularSiteMocks = (setup) => {
     mockOlModules.Feature.mockReturnValue(setup.mocks.feature)
     mockOlModules.Polygon.mockReturnValue(setup.mocks.polygon)
     mockOlModules.toLonLat.mockReturnValue(setup.centreWGS84)
@@ -99,46 +99,34 @@ describe('SiteVisualizer', () => {
     CircleGeometryCalculator.createGeographicCircle.mockReturnValue(
       setup.circleCoords
     )
+
+    return setup
   }
 
   describe('displayCircularSite', () => {
-    test('should convert centre coordinates to WGS84', () => {
-      const setup = createCircularSiteTestSetup()
-      setupCircularSiteMocks(setup)
+    let setup
 
+    beforeEach(() => {
+      setup = setupCircularSiteTest()
       siteVisualizer.displayCircularSite(
         setup.centreCoordinates,
         setup.radiusInMetres
       )
+    })
 
+    test('should convert centre coordinates to WGS84', () => {
       expect(mockOlModules.toLonLat).toHaveBeenCalledWith(
         setup.centreCoordinates
       )
     })
 
     test('should calculate geographic circle with correct parameters', () => {
-      const setup = createCircularSiteTestSetup()
-      setupCircularSiteMocks(setup)
-
-      siteVisualizer.displayCircularSite(
-        setup.centreCoordinates,
-        setup.radiusInMetres
-      )
-
       expect(
         CircleGeometryCalculator.createGeographicCircle
       ).toHaveBeenCalledWith(setup.centreWGS84, setup.radiusInMetres)
     })
 
     test('should project circle coordinates to map projection', () => {
-      const setup = createCircularSiteTestSetup()
-      setupCircularSiteMocks(setup)
-
-      siteVisualizer.displayCircularSite(
-        setup.centreCoordinates,
-        setup.radiusInMetres
-      )
-
       expect(mockOlModules.Polygon).toHaveBeenCalledWith([
         [
           [0, 51000],
@@ -149,28 +137,12 @@ describe('SiteVisualizer', () => {
     })
 
     test('should create feature with polygon geometry', () => {
-      const setup = createCircularSiteTestSetup()
-      setupCircularSiteMocks(setup)
-
-      siteVisualizer.displayCircularSite(
-        setup.centreCoordinates,
-        setup.radiusInMetres
-      )
-
       expect(mockOlModules.Feature).toHaveBeenCalledWith({
         geometry: setup.mocks.polygon
       })
     })
 
     test('should add created feature to vector source', () => {
-      const setup = createCircularSiteTestSetup()
-      setupCircularSiteMocks(setup)
-
-      siteVisualizer.displayCircularSite(
-        setup.centreCoordinates,
-        setup.radiusInMetres
-      )
-
       expect(mockVectorSource.addFeature).toHaveBeenCalledWith(
         setup.mocks.feature
       )

@@ -1,6 +1,7 @@
 const EARTH_RADIUS_METRES = 6378137
-const DEGREES_TO_RADIANS_FACTOR = 180
 const CIRCLE_APPROXIMATION_SIDES = 64
+const DEGREES_TO_RADIANS = Math.PI / 180
+const RADIANS_TO_DEGREES = 180 / Math.PI
 
 class CircleGeometryCalculator {
   static createGeographicCircle(
@@ -28,8 +29,8 @@ class CircleGeometryCalculator {
   }
 
   static calculateCirclePoint(centreLon, centreLat, angularDistance, bearing) {
-    const centreLatRad = (centreLat * Math.PI) / DEGREES_TO_RADIANS_FACTOR
-    const centreLonRad = (centreLon * Math.PI) / DEGREES_TO_RADIANS_FACTOR
+    const centreLatRad = centreLat * DEGREES_TO_RADIANS
+    const centreLonRad = centreLon * DEGREES_TO_RADIANS
 
     const lat = Math.asin(
       Math.sin(centreLatRad) * Math.cos(angularDistance) +
@@ -43,10 +44,7 @@ class CircleGeometryCalculator {
         Math.cos(angularDistance) - Math.sin(centreLatRad) * Math.sin(lat)
       )
 
-    return [
-      (lon * DEGREES_TO_RADIANS_FACTOR) / Math.PI,
-      (lat * DEGREES_TO_RADIANS_FACTOR) / Math.PI
-    ]
+    return [lon * RADIANS_TO_DEGREES, lat * RADIANS_TO_DEGREES]
   }
 }
 

@@ -18,6 +18,13 @@ describe('CoordinateParser', () => {
     mockFromLonLat = jest.fn()
   })
 
+  const setupOSGB36Test = (webMercatorResult = [3000, 4000]) => {
+    const coordinates = { eastings: '530000', northings: '180000' }
+    GeographicCoordinateConverter.osgb36ToWgs84.mockReturnValue([-0.1, 51.5])
+    mockFromLonLat.mockReturnValue(webMercatorResult)
+    return coordinates
+  }
+
   describe('coordinate system recognition', () => {
     test.each([
       {
@@ -96,9 +103,7 @@ describe('CoordinateParser', () => {
     })
 
     test('should return transformed coordinates for OSGB36 input', () => {
-      const coordinates = { eastings: '530000', northings: '180000' }
-      GeographicCoordinateConverter.osgb36ToWgs84.mockReturnValue([-0.1, 51.5])
-      mockFromLonLat.mockReturnValue([3000, 4000])
+      const coordinates = setupOSGB36Test()
 
       const result = coordinateParser.parseCoordinates(
         'OSGB36',
@@ -110,9 +115,7 @@ describe('CoordinateParser', () => {
     })
 
     test('should convert OSGB36 to WGS84 before transformation', () => {
-      const coordinates = { eastings: '530000', northings: '180000' }
-      GeographicCoordinateConverter.osgb36ToWgs84.mockReturnValue([-0.1, 51.5])
-      mockFromLonLat.mockReturnValue([3000, 4000])
+      const coordinates = setupOSGB36Test()
 
       coordinateParser.parseCoordinates('OSGB36', coordinates, mockFromLonLat)
 
@@ -123,9 +126,7 @@ describe('CoordinateParser', () => {
     })
 
     test('should call transformation function with converted coordinates', () => {
-      const coordinates = { eastings: '530000', northings: '180000' }
-      GeographicCoordinateConverter.osgb36ToWgs84.mockReturnValue([-0.1, 51.5])
-      mockFromLonLat.mockReturnValue([3000, 4000])
+      const coordinates = setupOSGB36Test()
 
       coordinateParser.parseCoordinates('OSGB36', coordinates, mockFromLonLat)
 
@@ -188,8 +189,7 @@ describe('CoordinateParser', () => {
 
   describe('convertOSGB36ToWebMercator', () => {
     test('should convert OSGB36 coordinates to Web Mercator', () => {
-      GeographicCoordinateConverter.osgb36ToWgs84.mockReturnValue([-0.1, 51.5])
-      mockFromLonLat.mockReturnValue([3000, 4000])
+      setupOSGB36Test()
 
       const result = coordinateParser.convertOSGB36ToWebMercator(
         530000,

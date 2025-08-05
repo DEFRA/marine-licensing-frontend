@@ -182,6 +182,19 @@ describe('enter-multiple-coordinates utils', () => {
         { eastings: '', northings: '' }
       ])
     })
+
+    it('should return 3 empty coordinates when coordinate system is invalid/unknown', () => {
+      const coords = [{ latitude: '51.5', longitude: '-0.1' }]
+      const invalidCoordinateSystem = 'INVALID_SYSTEM'
+
+      expect(
+        normaliseCoordinatesForDisplay(invalidCoordinateSystem, coords)
+      ).toEqual([
+        { eastings: '', northings: '' },
+        { eastings: '', northings: '' },
+        { eastings: '', northings: '' }
+      ])
+    })
   })
 
   describe('PATTERNS', () => {

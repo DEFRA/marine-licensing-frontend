@@ -28,6 +28,10 @@ const isValidCoordinateForSystem = (coord, coordinateSystem) => {
   return coord.eastings && coord.northings
 }
 
+const generateCoordinateLabel = (index) => {
+  return index === 0 ? 'Start and end points' : `Point ${index + 1}`
+}
+
 const transformCoordinateToDisplayFormat = (coord, index, coordinateSystem) => {
   const displayText = getCoordinateDisplayText(
     { coordinates: coord },
@@ -35,7 +39,7 @@ const transformCoordinateToDisplayFormat = (coord, index, coordinateSystem) => {
   )
 
   return {
-    label: index === 0 ? 'Start and end points' : `Point ${index + 1}`,
+    label: generateCoordinateLabel(index),
     value: displayText
   }
 }

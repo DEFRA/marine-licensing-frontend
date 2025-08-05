@@ -29,6 +29,22 @@ export const createAuthHeaders = async (request, additionalHeaders = {}) => {
   return headers
 }
 
+export const authenticatedRequest = async (
+  request,
+  method,
+  endpoint,
+  options = {}
+) => {
+  const headers = await createAuthHeaders(request)
+  const url = `${config.get('backend').apiUrl}${endpoint}`
+
+  return Wreck[method.toLowerCase()](url, {
+    headers,
+    json: true,
+    ...options
+  })
+}
+
 export const authenticatedGetRequest = async (
   request,
   endpoint,
@@ -38,21 +54,6 @@ export const authenticatedGetRequest = async (
   const url = `${config.get('backend').apiUrl}${endpoint}`
 
   return Wreck.get(url, {
-    headers,
-    json: true,
-    ...options
-  })
-}
-
-export const authenticatedDeleteRequest = async (
-  request,
-  endpoint,
-  options = {}
-) => {
-  const headers = await createAuthHeaders(request)
-  const url = `${config.get('backend').apiUrl}${endpoint}`
-
-  return Wreck.delete(url, {
     headers,
     json: true,
     ...options

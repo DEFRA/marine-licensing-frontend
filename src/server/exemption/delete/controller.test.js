@@ -1,7 +1,7 @@
 import { jest } from '@jest/globals'
 
 import {
-  authenticatedDeleteRequest,
+  authenticatedRequest,
   authenticatedGetRequest
 } from '~/src/server/common/helpers/authenticated-requests.js'
 import {
@@ -25,9 +25,7 @@ describe('#delete', () => {
   let mockH
 
   const mockedAuthenticatedGetRequest = jest.mocked(authenticatedGetRequest)
-  const mockedAuthenticatedDeleteRequest = jest.mocked(
-    authenticatedDeleteRequest
-  )
+  const mockedAuthenticatedRequest = jest.mocked(authenticatedRequest)
 
   const mockedGetExemptionCache = jest.mocked(getExemptionCache)
   const mockedSetExemptionCache = jest.mocked(setExemptionCache)
@@ -153,8 +151,9 @@ describe('#delete', () => {
       )
 
       expect(mockedGetExemptionCache).toHaveBeenCalledWith(mockRequest)
-      expect(mockedAuthenticatedDeleteRequest).toHaveBeenCalledWith(
+      expect(mockedAuthenticatedRequest).toHaveBeenCalledWith(
         mockRequest,
+        'DELETE',
         '/exemption/test-project-id'
       )
       expect(mockedClearExemptionCache).toHaveBeenCalledWith(mockRequest)
@@ -194,9 +193,7 @@ describe('#delete', () => {
       mockRequest.payload = { exemptionId: 'test-project-id' }
       const mockExemption = { id: 'test-project-id' }
       mockedGetExemptionCache.mockReturnValue(mockExemption)
-      mockedAuthenticatedDeleteRequest.mockRejectedValue(
-        new Error('Test error')
-      )
+      mockedAuthenticatedRequest.mockRejectedValue(new Error('Test error'))
 
       const result = await deleteExemptionSubmitController.handler(
         mockRequest,

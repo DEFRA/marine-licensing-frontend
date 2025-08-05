@@ -5,7 +5,7 @@ import {
   authenticatedPostRequest,
   authenticatedPatchRequest,
   authenticatedPutRequest,
-  authenticatedDeleteRequest
+  authenticatedRequest
 } from './authenticated-requests.js'
 import { getUserSession } from '~/src/server/common/plugins/auth/utils.js'
 
@@ -144,13 +144,14 @@ describe('#authenticated-requests', () => {
     })
   })
 
-  describe('#authenticatedDeleteRequest', () => {
+  describe('#authenticatedRequest', () => {
     test('should make DELETE request with auth headers', async () => {
       const mockResponse = { payload: { data: 'test' } }
       Wreck.delete.mockResolvedValue(mockResponse)
 
-      const result = await authenticatedDeleteRequest(
+      const result = await authenticatedRequest(
         mockRequest,
+        'DELETE',
         '/test-endpoint'
       )
 
@@ -173,8 +174,9 @@ describe('#authenticated-requests', () => {
 
       getUserSessionMock.mockRejectedValueOnce(null)
 
-      const result = await authenticatedDeleteRequest(
+      const result = await authenticatedRequest(
         mockRequest,
+        'DELETE',
         '/test-endpoint'
       )
 
@@ -197,8 +199,9 @@ describe('#authenticated-requests', () => {
 
       getUserSessionMock.mockResolvedValueOnce({})
 
-      const result = await authenticatedDeleteRequest(
+      const result = await authenticatedRequest(
         mockRequest,
+        'DELETE',
         '/test-endpoint'
       )
 
@@ -219,8 +222,9 @@ describe('#authenticated-requests', () => {
       const additionalOptions = { timeout: 5000 }
       Wreck.delete.mockResolvedValue({})
 
-      await authenticatedDeleteRequest(
+      await authenticatedRequest(
         mockRequest,
+        'DELETE',
         '/test-endpoint',
         additionalOptions
       )

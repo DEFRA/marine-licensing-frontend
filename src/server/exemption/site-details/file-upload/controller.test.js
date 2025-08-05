@@ -514,4 +514,125 @@ describe('#fileUpload', () => {
       }
     )
   })
+
+  describe('Mutation testing coverage - surviving mutants', () => {
+    let mockRequest, mockH
+
+    beforeEach(() => {
+      mockRequest = createMockRequest()
+      mockH = createMockH()
+    })
+
+    const setupMutationTest = async (siteDetails, shouldMockCdp = true) => {
+      getExemptionCacheSpy.mockReturnValue({
+        ...mockExemption,
+        siteDetails
+      })
+      if (shouldMockCdp) {
+        mockCdpService.initiate.mockResolvedValue(createStandardUploadConfig())
+      }
+      await fileUploadController.handler(mockRequest, mockH)
+    }
+
+    test('Should map error message correctly in error summary', async () => {
+      const testMessage = 'Test error message'
+      await setupMutationTest({
+        fileUploadType: 'kml',
+        uploadError: {
+          message: testMessage,
+          fieldName: 'file',
+          fileType: 'kml'
+        }
+      })
+
+      expect(mockH.view).toHaveBeenCalledWith(
+        FILE_UPLOAD_VIEW_ROUTE,
+        expect.objectContaining({
+          errorSummary: expect.arrayContaining([
+            expect.objectContaining({
+              text: testMessage
+            })
+          ])
+        })
+      )
+    })
+
+    test('Should log fileUploadType debug message', async () => {
+      await setupMutationTest({ fileUploadType: 'kml' })
+
+      expect(mockRequest.logger.debug).toHaveBeenCalledWith(
+        'fileUploadController: fileUploadType [kml]'
+      )
+    })
+
+    test.each([
+      { type: 'empty string', value: '' },
+      { type: 'whitespace', value: '   ' }
+    ])('Should redirect when fileUploadType is $type', async ({ value }) => {
+      await setupMutationTest({ fileUploadType: value }, false)
+
+      expect(mockH.redirect).toHaveBeenCalledWith(
+        routes.CHOOSE_FILE_UPLOAD_TYPE
+      )
+      expect(mockH.view).not.toHaveBeenCalled()
+    })
+
+    test('Should log warning when uploadedFile exists without uploadError', async () => {
+      await setupMutationTest({
+        fileUploadType: 'kml',
+        uploadedFile: {
+          filename: 'test.kml',
+          fileSize: 1024
+        }
+      })
+
+      expect(mockRequest.logger.debug).toHaveBeenCalledWith(
+        'Uploaded file without error found, but starting a new upload session'
+      )
+    })
+
+    test.each([
+      {
+        scenario: 'uploadedFile exists with uploadError',
+        siteDetails: {
+          fileUploadType: 'kml',
+          uploadedFile: { filename: 'test.kml', fileSize: 1024 },
+          uploadError: {
+            message: 'File has virus',
+            fieldName: 'file',
+            fileType: 'kml'
+          }
+        }
+      },
+      {
+        scenario: 'no uploadedFile exists',
+        siteDetails: { fileUploadType: 'kml' }
+      },
+      {
+        scenario: 'uploadedFile is falsy with no uploadError',
+        siteDetails: { fileUploadType: 'kml', uploadedFile: null }
+      }
+    ])('Should not log warning when $scenario', async ({ siteDetails }) => {
+      await setupMutationTest(siteDetails)
+
+      expect(mockRequest.logger.debug).not.toHaveBeenCalledWith(
+        'Uploaded file without error found, but starting a new upload session'
+      )
+    })
+
+    test('Should handle all falsy fileUploadType values with redirect', async () => {
+      const falsyValues = [null, undefined, false, 0, '']
+
+      for (const falsyValue of falsyValues) {
+        jest.clearAllMocks()
+        await setupMutationTest({ fileUploadType: falsyValue }, false)
+
+        expect(mockH.redirect).toHaveBeenCalledWith(
+          routes.CHOOSE_FILE_UPLOAD_TYPE
+        )
+        expect(mockH.view).not.toHaveBeenCalled()
+        expect(mockCdpService.initiate).not.toHaveBeenCalled()
+      }
+    })
+  })
 })

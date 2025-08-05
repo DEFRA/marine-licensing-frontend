@@ -164,6 +164,24 @@ describe('enter-multiple-coordinates utils', () => {
         { latitude: '', longitude: '' }
       ])
     })
+
+    it('should return 3 empty coordinates if first coordinate has both field types when system is OSGB36', () => {
+      const coords = [
+        {
+          latitude: '51.5',
+          longitude: '-0.1',
+          eastings: '123456',
+          northings: '654321'
+        }
+      ]
+      expect(
+        normaliseCoordinatesForDisplay(COORDINATE_SYSTEMS.OSGB36, coords)
+      ).toEqual([
+        { eastings: '', northings: '' },
+        { eastings: '', northings: '' },
+        { eastings: '', northings: '' }
+      ])
+    })
   })
 
   describe('PATTERNS', () => {

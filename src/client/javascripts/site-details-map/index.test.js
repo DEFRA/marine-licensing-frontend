@@ -407,11 +407,21 @@ describe('SiteDetailsMap', () => {
       mockDataLoader.loadSiteDetails.mockReturnValue(null)
       siteDetailsMap = new SiteDetailsMap(mockRoot)
       const errorSpy = jest.spyOn(siteDetailsMap, 'showError')
+      const hasValidSiteDetailsSpy = jest.spyOn(
+        siteDetailsMap,
+        'hasValidSiteDetails'
+      )
 
       await siteDetailsMap.initialiseMap()
 
-      expect(errorSpy).toHaveBeenCalled()
+      expect(errorSpy).toHaveBeenCalledTimes(1)
       expect(mockDataLoader.loadSiteDetails).toHaveBeenCalled()
+      // The method should return early, never reaching hasValidSiteDetails
+      expect(hasValidSiteDetailsSpy).not.toHaveBeenCalled()
+      // Ensure execution stops and no further processing occurs
+      expect(mockModuleLoader.loadModules).not.toHaveBeenCalled()
+      expect(siteDetailsMap.map).toBeNull()
+      expect(siteDetailsMap.siteVisualiser).toBeNull()
     })
 
     test('should show error when site details are invalid', async () => {
@@ -427,6 +437,31 @@ describe('SiteDetailsMap', () => {
 
       expect(errorSpy).toHaveBeenCalled()
       expect(mockDataLoader.loadSiteDetails).toHaveBeenCalled()
+      // Ensure execution stops and no further processing occurs
+      expect(mockModuleLoader.loadModules).not.toHaveBeenCalled()
+      expect(siteDetailsMap.map).toBeNull()
+      expect(siteDetailsMap.siteVisualiser).toBeNull()
+    })
+
+    test('should handle null site details with proper early return', async () => {
+      // Test to specifically catch mutation where condition is bypassed
+      mockDataLoader.loadSiteDetails.mockReturnValue(null)
+      siteDetailsMap = new SiteDetailsMap(mockRoot)
+
+      // Mock all subsequent methods to detect if they're called inappropriately
+      const showErrorSpy = jest
+        .spyOn(siteDetailsMap, 'showError')
+        .mockImplementation()
+      const hasValidSpy = jest
+        .spyOn(siteDetailsMap, 'hasValidSiteDetails')
+        .mockImplementation()
+
+      await siteDetailsMap.initialiseMap()
+
+      // When siteDetails is null, showError MUST be called and hasValidSiteDetails must NOT be called
+      expect(showErrorSpy).toHaveBeenCalledTimes(1)
+      expect(hasValidSpy).not.toHaveBeenCalled()
+      expect(mockModuleLoader.loadModules).not.toHaveBeenCalled()
     })
   })
 })

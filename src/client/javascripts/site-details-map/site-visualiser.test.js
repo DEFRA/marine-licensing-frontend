@@ -231,4 +231,122 @@ describe('SiteVisualiser', () => {
       expect(mockMap.getView().setZoom).toHaveBeenCalledWith(zoomLevel)
     })
   })
+
+  describe('displayManualCoordinates', () => {
+    let mockCoordinateParser
+
+    beforeEach(() => {
+      mockCoordinateParser = {
+        parseCoordinates: jest.fn()
+      }
+      siteVisualiser.coordinateParser = mockCoordinateParser
+      jest.spyOn(siteVisualiser, 'displayCircularSite').mockImplementation()
+      jest.spyOn(siteVisualiser, 'displayPointSite').mockImplementation()
+      jest.spyOn(siteVisualiser, 'centreMapView').mockImplementation()
+    })
+
+    const expectNoMethodsCalled = () => {
+      expect(siteVisualiser.displayCircularSite).not.toHaveBeenCalled()
+      expect(siteVisualiser.displayPointSite).not.toHaveBeenCalled()
+      expect(siteVisualiser.centreMapView).not.toHaveBeenCalled()
+    }
+
+    test('should return early when no coordinates provided', () => {
+      const siteDetails = { coordinateSystem: 'WGS84' }
+
+      siteVisualiser.displayManualCoordinates(siteDetails)
+
+      expect(mockCoordinateParser.parseCoordinates).not.toHaveBeenCalled()
+      expectNoMethodsCalled()
+    })
+
+    test('should return early when fromLonLat is not available', () => {
+      const siteDetails = {
+        coordinateSystem: 'WGS84',
+        coordinates: { latitude: '51.5', longitude: '-0.1' }
+      }
+      siteVisualiser.olModules = {}
+
+      siteVisualiser.displayManualCoordinates(siteDetails)
+
+      expect(mockCoordinateParser.parseCoordinates).not.toHaveBeenCalled()
+      expectNoMethodsCalled()
+    })
+
+    test('should return early when parseCoordinates returns null', () => {
+      const siteDetails = {
+        coordinateSystem: 'WGS84',
+        coordinates: { latitude: '51.5', longitude: '-0.1' }
+      }
+      mockCoordinateParser.parseCoordinates.mockReturnValue(null)
+
+      siteVisualiser.displayManualCoordinates(siteDetails)
+
+      expect(mockCoordinateParser.parseCoordinates).toHaveBeenCalledWith(
+        'WGS84',
+        { latitude: '51.5', longitude: '-0.1' },
+        mockOlModules.fromLonLat
+      )
+      expectNoMethodsCalled()
+    })
+
+    test('should display circular site when circleWidth is provided', () => {
+      const siteDetails = {
+        coordinateSystem: 'WGS84',
+        coordinates: { latitude: '51.5', longitude: '-0.1' },
+        circleWidth: 100
+      }
+      const mapCoordinates = [1000, 2000]
+      mockCoordinateParser.parseCoordinates.mockReturnValue(mapCoordinates)
+
+      siteVisualiser.displayManualCoordinates(siteDetails)
+
+      expect(siteVisualiser.displayCircularSite).toHaveBeenCalledWith(
+        mapCoordinates,
+        100
+      )
+      expect(siteVisualiser.displayPointSite).not.toHaveBeenCalled()
+      expect(siteVisualiser.centreMapView).toHaveBeenCalledWith(
+        mapCoordinates,
+        14
+      )
+    })
+
+    test('should display point site when no circleWidth provided', () => {
+      const siteDetails = {
+        coordinateSystem: 'WGS84',
+        coordinates: { latitude: '51.5', longitude: '-0.1' }
+      }
+      const mapCoordinates = [1000, 2000]
+      mockCoordinateParser.parseCoordinates.mockReturnValue(mapCoordinates)
+
+      siteVisualiser.displayManualCoordinates(siteDetails)
+
+      expect(siteVisualiser.displayPointSite).toHaveBeenCalledWith(
+        mapCoordinates
+      )
+      expect(siteVisualiser.displayCircularSite).not.toHaveBeenCalled()
+      expect(siteVisualiser.centreMapView).toHaveBeenCalledWith(
+        mapCoordinates,
+        14
+      )
+    })
+
+    test('should call parseCoordinates with correct parameters', () => {
+      const siteDetails = {
+        coordinateSystem: 'OSGB36',
+        coordinates: { eastings: '530000', northings: '180000' }
+      }
+      const mapCoordinates = [3000, 4000]
+      mockCoordinateParser.parseCoordinates.mockReturnValue(mapCoordinates)
+
+      siteVisualiser.displayManualCoordinates(siteDetails)
+
+      expect(mockCoordinateParser.parseCoordinates).toHaveBeenCalledWith(
+        'OSGB36',
+        { eastings: '530000', northings: '180000' },
+        mockOlModules.fromLonLat
+      )
+    })
+  })
 })

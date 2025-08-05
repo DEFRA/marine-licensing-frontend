@@ -6,6 +6,5 @@
 
 // Top align map view key in summary list
 .govuk-summary-list__key--top-aligned {
-  // stylelint-disable-next-line declaration-no-important
-  vertical-align: top !important;
+  vertical-align: top;
 }

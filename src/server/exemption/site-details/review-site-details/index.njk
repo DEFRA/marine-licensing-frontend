@@ -9,7 +9,8 @@
   Review site details | {{ serviceName }}
 {% endblock %}
 
-{% block extraCSS %}
+{% block head %}
+  {{ super() }}
   <link href="/public/stylesheets/ol.css" rel="stylesheet">
 {% endblock %}
 

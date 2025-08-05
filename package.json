@@ -2,11 +2,7 @@
   "name": "marine-licensing-frontend",
   "version": "0.0.0",
   "description": "CDP Frontend Template",
-  "sideEffects": [
-    "ol/ol.css",
-    "**/*.css",
-    "**/*.scss"
-  ],
+  "sideEffects": false,
   "main": ".server/index.js",
   "type": "module",
   "engines": {

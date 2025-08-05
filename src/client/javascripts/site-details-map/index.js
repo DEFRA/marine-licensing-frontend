@@ -2,7 +2,7 @@ import { Component } from 'govuk-frontend'
 import MapFactory from './map-factory.js'
 import OpenLayersModuleLoader from './openlayers-module-loader.js'
 import SiteDataLoader from './site-data-loader.js'
-import SiteVisualizer from './site-visualizer.js'
+import SiteVisualiser from './site-visualiser.js'
 
 const DEFAULT_UK_CENTRE_LONGITUDE = -3.5
 const DEFAULT_UK_CENTRE_LATITUDE = 54.0
@@ -23,13 +23,13 @@ export class SiteDetailsMap extends Component {
     this.map = null
     this.dataLoader = new SiteDataLoader()
     this.mapFactory = null
-    this.siteVisualizer = null
+    this.siteVisualiser = null
     this.moduleLoader = moduleLoader ?? new OpenLayersModuleLoader()
 
-    this.scheduleMapInitialization()
+    this.scheduleMapInitialisation()
   }
 
-  scheduleMapInitialization() {
+  scheduleMapInitialisation() {
     setTimeout(() => {
       this.initialiseMap().catch(() => {
         this.showError()
@@ -57,7 +57,7 @@ export class SiteDetailsMap extends Component {
 
     this.map = this.mapFactory.createMap(this.$root, this.options, vectorLayer)
 
-    this.siteVisualizer = new SiteVisualizer(
+    this.siteVisualiser = new SiteVisualiser(
       olModules,
       vectorSource,
       geoJSONFormat,
@@ -77,20 +77,20 @@ export class SiteDetailsMap extends Component {
   /**
    * Display site details based on coordinate type
    * @param {object} siteDetails - Site details data
-   * @returns {string|null} - Type of display action taken: 'file', 'manual', 'error', or null if no visualizer
+   * @returns {string|null} - Type of display action taken: 'file', 'manual', 'error', or null if no visualiser
    */
   displaySiteDetails(siteDetails) {
-    if (!this.siteVisualizer) {
+    if (!this.siteVisualiser) {
       return null
     }
 
-    this.siteVisualizer.clearFeatures()
+    this.siteVisualiser.clearFeatures()
 
     if (this.dataLoader.hasValidFileCoordinates(siteDetails)) {
-      this.siteVisualizer.displayFileUploadData(siteDetails.geoJSON)
+      this.siteVisualiser.displayFileUploadData(siteDetails.geoJSON)
       return 'file'
     } else if (this.dataLoader.hasValidManualCoordinates(siteDetails)) {
-      this.siteVisualizer.displayManualCoordinates(siteDetails)
+      this.siteVisualiser.displayManualCoordinates(siteDetails)
       return 'manual'
     } else {
       this.showError()

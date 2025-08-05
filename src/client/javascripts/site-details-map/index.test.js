@@ -2,7 +2,7 @@ import { SiteDetailsMap } from './index.js'
 import MapFactory from './map-factory.js'
 import OpenLayersModuleLoader from './openlayers-module-loader.js'
 import SiteDataLoader from './site-data-loader.js'
-import SiteVisualizer from './site-visualizer.js'
+import SiteVisualiser from './site-visualiser.js'
 
 // Mock document for DOM operations
 Object.defineProperty(globalThis, 'document', {
@@ -26,7 +26,7 @@ jest.mock('govuk-frontend', () => ({
 jest.mock('./openlayers-module-loader.js')
 jest.mock('./site-data-loader.js')
 jest.mock('./map-factory.js')
-jest.mock('./site-visualizer.js')
+jest.mock('./site-visualiser.js')
 
 // Mock setTimeout to control execution for testing
 const mockSetTimeout = jest.fn()
@@ -36,7 +36,7 @@ describe('SiteDetailsMap', () => {
   let mockRoot
   let siteDetailsMap
   let mockDataLoader
-  let mockSiteVisualizer
+  let mockSiteVisualiser
   let mockModuleLoader
 
   // Helper functions to reduce test duplication
@@ -73,7 +73,7 @@ describe('SiteDetailsMap', () => {
       hasValidManualCoordinates: jest.fn()
     }
 
-    mockSiteVisualizer = {
+    mockSiteVisualiser = {
       clearFeatures: jest.fn(),
       displayFileUploadData: jest.fn(),
       centreMapView: jest.fn(),
@@ -109,7 +109,7 @@ describe('SiteDetailsMap', () => {
     }
 
     SiteDataLoader.mockImplementation(() => mockDataLoader)
-    SiteVisualizer.mockImplementation(() => mockSiteVisualizer)
+    SiteVisualiser.mockImplementation(() => mockSiteVisualiser)
     MapFactory.mockImplementation(() => ({
       createMapLayers: jest.fn().mockReturnValue({
         vectorSource: {},
@@ -166,7 +166,7 @@ describe('SiteDetailsMap', () => {
   describe('displaySiteDetails coordination', () => {
     beforeEach(() => {
       siteDetailsMap = new SiteDetailsMap(mockRoot)
-      siteDetailsMap.siteVisualizer = mockSiteVisualizer
+      siteDetailsMap.siteVisualiser = mockSiteVisualiser
     })
 
     test('should clear features before displaying new data', () => {
@@ -176,7 +176,7 @@ describe('SiteDetailsMap', () => {
 
       siteDetailsMap.displaySiteDetails(siteDetails)
 
-      expect(mockSiteVisualizer.clearFeatures).toHaveBeenCalled()
+      expect(mockSiteVisualiser.clearFeatures).toHaveBeenCalled()
     })
 
     test('should display file upload data when file coordinates are valid', () => {
@@ -186,7 +186,7 @@ describe('SiteDetailsMap', () => {
 
       siteDetailsMap.displaySiteDetails(siteDetails)
 
-      expect(mockSiteVisualizer.displayFileUploadData).toHaveBeenCalledWith(
+      expect(mockSiteVisualiser.displayFileUploadData).toHaveBeenCalledWith(
         siteDetails.geoJSON
       )
     })
@@ -217,11 +217,11 @@ describe('SiteDetailsMap', () => {
       const result = siteDetailsMap.displaySiteDetails(siteDetails)
 
       expect(result).toBe('manual')
-      expect(mockSiteVisualizer.clearFeatures).toHaveBeenCalled()
+      expect(mockSiteVisualiser.clearFeatures).toHaveBeenCalled()
       expect(mockDataLoader.hasValidManualCoordinates).toHaveBeenCalledWith(
         siteDetails
       )
-      expect(mockSiteVisualizer.displayManualCoordinates).toHaveBeenCalledWith(
+      expect(mockSiteVisualiser.displayManualCoordinates).toHaveBeenCalledWith(
         siteDetails
       )
     })
@@ -236,12 +236,12 @@ describe('SiteDetailsMap', () => {
       const result = siteDetailsMap.displaySiteDetails(siteDetails)
 
       expect(result).toBe('error')
-      expect(mockSiteVisualizer.clearFeatures).toHaveBeenCalled()
+      expect(mockSiteVisualiser.clearFeatures).toHaveBeenCalled()
       expect(showErrorSpy).toHaveBeenCalled()
     })
 
-    test('should return early if siteVisualizer is not available', () => {
-      siteDetailsMap.siteVisualizer = null
+    test('should return early if siteVisualiser is not available', () => {
+      siteDetailsMap.siteVisualiser = null
       const siteDetails = {}
 
       const result = siteDetailsMap.displaySiteDetails(siteDetails)
@@ -308,12 +308,12 @@ describe('SiteDetailsMap', () => {
     })
   })
 
-  describe('scheduleMapInitialization', () => {
-    test('should call setTimeout with initialization function', () => {
+  describe('scheduleMapInitialisation', () => {
+    test('should call setTimeout with initialisation function', () => {
       siteDetailsMap = new SiteDetailsMap(mockRoot)
       jest.spyOn(siteDetailsMap, 'initialiseMap').mockResolvedValue()
 
-      siteDetailsMap.scheduleMapInitialization()
+      siteDetailsMap.scheduleMapInitialisation()
 
       expect(mockSetTimeout).toHaveBeenCalledWith(expect.any(Function), 0)
     })
@@ -326,7 +326,7 @@ describe('SiteDetailsMap', () => {
         .mockRejectedValue(new Error('Init failed'))
 
       // Get the callback function passed to setTimeout
-      siteDetailsMap.scheduleMapInitialization()
+      siteDetailsMap.scheduleMapInitialisation()
       const [callback] = mockSetTimeout.mock.calls[0]
 
       await callback()

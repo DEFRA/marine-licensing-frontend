@@ -1,7 +1,7 @@
 import CircleGeometryCalculator from './circle-geometry-calculator.js'
 import CoordinateParser from './coordinate-parser.js'
 
-class SiteVisualizer {
+class SiteVisualiser {
   constructor(olModules, vectorSource, geoJSONFormat, map) {
     this.olModules = olModules
     this.vectorSource = vectorSource
@@ -129,4 +129,4 @@ class SiteVisualizer {
   }
 }
 
-export default SiteVisualizer
+export default SiteVisualiser

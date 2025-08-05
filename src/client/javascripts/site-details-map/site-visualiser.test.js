@@ -1,5 +1,5 @@
 import CircleGeometryCalculator from './circle-geometry-calculator.js'
-import SiteVisualizer from './site-visualizer.js'
+import SiteVisualiser from './site-visualiser.js'
 
 jest.mock('./circle-geometry-calculator.js', () => ({
   default: {
@@ -7,8 +7,8 @@ jest.mock('./circle-geometry-calculator.js', () => ({
   }
 }))
 
-describe('SiteVisualizer', () => {
-  let siteVisualizer
+describe('SiteVisualiser', () => {
+  let siteVisualiser
   let mockOlModules
   let mockVectorSource
   let mockGeoJSONFormat
@@ -46,7 +46,7 @@ describe('SiteVisualizer', () => {
       })
     }
 
-    siteVisualizer = new SiteVisualizer(
+    siteVisualiser = new SiteVisualiser(
       mockOlModules,
       mockVectorSource,
       mockGeoJSONFormat,
@@ -63,7 +63,7 @@ describe('SiteVisualizer', () => {
       mockOlModules.Feature.mockReturnValue(mockFeature)
       mockOlModules.Point.mockReturnValue(mockPoint)
 
-      siteVisualizer.displayPointSite(coordinates)
+      siteVisualiser.displayPointSite(coordinates)
 
       expect(mockOlModules.Point).toHaveBeenCalledWith(coordinates)
       expect(mockOlModules.Feature).toHaveBeenCalledWith({
@@ -108,7 +108,7 @@ describe('SiteVisualizer', () => {
 
     beforeEach(() => {
       setup = setupCircularSiteTest()
-      siteVisualizer.displayCircularSite(
+      siteVisualiser.displayCircularSite(
         setup.centreCoordinates,
         setup.radiusInMetres
       )
@@ -151,13 +151,13 @@ describe('SiteVisualizer', () => {
 
   describe('displayFileUploadData', () => {
     test('should return early for invalid geoJSON', () => {
-      siteVisualizer.displayFileUploadData({})
+      siteVisualiser.displayFileUploadData({})
 
       expect(mockGeoJSONFormat.readFeatures).not.toHaveBeenCalled()
     })
 
     test('should return early for geoJSON with non-array features', () => {
-      siteVisualizer.displayFileUploadData({ features: 'not-array' })
+      siteVisualiser.displayFileUploadData({ features: 'not-array' })
 
       expect(mockGeoJSONFormat.readFeatures).not.toHaveBeenCalled()
     })
@@ -167,7 +167,7 @@ describe('SiteVisualizer', () => {
       const mockFeatures = ['feature1', 'feature2']
       mockGeoJSONFormat.readFeatures.mockReturnValue(mockFeatures)
 
-      siteVisualizer.displayFileUploadData(geoJSON)
+      siteVisualiser.displayFileUploadData(geoJSON)
 
       expect(mockGeoJSONFormat.readFeatures).toHaveBeenCalledWith(geoJSON, {
         featureProjection: 'EPSG:3857'
@@ -183,7 +183,7 @@ describe('SiteVisualizer', () => {
       mockGeoJSONFormat.readFeatures.mockReturnValue(mockFeatures)
       mockVectorSource.getExtent.mockReturnValue(mockExtent)
 
-      siteVisualizer.displayFileUploadData(geoJSON)
+      siteVisualiser.displayFileUploadData(geoJSON)
 
       expect(mockMap.getView().fit).toHaveBeenCalledWith(mockExtent, {
         padding: [20, 20, 20, 20],
@@ -197,7 +197,7 @@ describe('SiteVisualizer', () => {
 
       mockGeoJSONFormat.readFeatures.mockReturnValue(mockFeatures)
 
-      siteVisualizer.displayFileUploadData(geoJSON)
+      siteVisualiser.displayFileUploadData(geoJSON)
 
       expect(mockMap.getView().fit).not.toHaveBeenCalled()
     })
@@ -205,7 +205,7 @@ describe('SiteVisualizer', () => {
 
   describe('clearFeatures', () => {
     test('should clear all features from vector source', () => {
-      siteVisualizer.clearFeatures()
+      siteVisualiser.clearFeatures()
 
       expect(mockVectorSource.clear).toHaveBeenCalled()
     })
@@ -215,7 +215,7 @@ describe('SiteVisualizer', () => {
     test('should centre map on coordinates with default zoom', () => {
       const coordinates = [1000, 2000]
 
-      siteVisualizer.centreMapView(coordinates)
+      siteVisualiser.centreMapView(coordinates)
 
       expect(mockMap.getView().setCenter).toHaveBeenCalledWith(coordinates)
       expect(mockMap.getView().setZoom).toHaveBeenCalledWith(14)
@@ -225,7 +225,7 @@ describe('SiteVisualizer', () => {
       const coordinates = [1000, 2000]
       const zoomLevel = 10
 
-      siteVisualizer.centreMapView(coordinates, zoomLevel)
+      siteVisualiser.centreMapView(coordinates, zoomLevel)
 
       expect(mockMap.getView().setCenter).toHaveBeenCalledWith(coordinates)
       expect(mockMap.getView().setZoom).toHaveBeenCalledWith(zoomLevel)

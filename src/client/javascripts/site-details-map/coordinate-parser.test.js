@@ -31,7 +31,7 @@ describe('CoordinateParser', () => {
         invalid: ['WGS84', 'invalid']
       }
     ])(
-      '$method should recognize coordinate systems',
+      '$method should recognise coordinate systems',
       ({ method, valid, invalid }) => {
         valid.forEach((input) => {
           expect(coordinateParser[method](input)).toBe(true)

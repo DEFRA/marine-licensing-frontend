@@ -274,7 +274,7 @@ describe('MapFactory', () => {
       }
     })
 
-    test('should set up event listener and check size on initialization', () => {
+    test('should set up event listener and check size on initialisation', () => {
       const { mockMap, mockAttribution } = createMocks()
 
       mapFactory.setupResponsiveAttribution(mockMap, mockAttribution)

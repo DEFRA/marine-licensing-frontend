@@ -7,6 +7,15 @@ import { config } from '~/src/config/config.js'
 const isWGS84 = (coordinateSystem) =>
   coordinateSystem === COORDINATE_SYSTEMS.WGS84
 
+const isValidPolygonInput = (siteDetails, coordinateSystem) => {
+  if (!siteDetails || !coordinateSystem) {
+    return false
+  }
+
+  const { coordinates } = siteDetails
+  return coordinates && Array.isArray(coordinates)
+}
+
 const isValidCoordinateForSystem = (coord, coordinateSystem) => {
   if (!coord) {
     return false
@@ -17,6 +26,18 @@ const isValidCoordinateForSystem = (coord, coordinateSystem) => {
   }
 
   return coord.eastings && coord.northings
+}
+
+const transformCoordinateToDisplayFormat = (coord, index, coordinateSystem) => {
+  const displayText = getCoordinateDisplayText(
+    { coordinates: coord },
+    coordinateSystem
+  )
+
+  return {
+    label: index === 0 ? 'Start and end points' : `Point ${index + 1}`,
+    value: displayText
+  }
 }
 
 const REVIEW_SITE_DETAILS_VIEW_ROUTE =
@@ -85,25 +106,19 @@ export const getPolygonCoordinatesDisplayData = (
   siteDetails,
   coordinateSystem
 ) => {
-  const { coordinates } = siteDetails
-
-  if (!coordinates || !Array.isArray(coordinates) || !coordinateSystem) {
+  if (!isValidPolygonInput(siteDetails, coordinateSystem)) {
     return []
   }
 
-  return coordinates
-    .filter((coord) => isValidCoordinateForSystem(coord, coordinateSystem))
-    .map((coord, index) => {
-      const displayText = getCoordinateDisplayText(
-        { coordinates: coord },
-        coordinateSystem
-      )
+  const { coordinates } = siteDetails
 
-      return {
-        label: index === 0 ? 'Start and end points' : `Point ${index + 1}`,
-        value: displayText
-      }
-    })
+  const validCoordinates = coordinates.filter((coord) =>
+    isValidCoordinateForSystem(coord, coordinateSystem)
+  )
+
+  return validCoordinates.map((coord, index) =>
+    transformCoordinateToDisplayFormat(coord, index, coordinateSystem)
+  )
 }
 
 export const getFileUploadSummaryData = (exemption) => {

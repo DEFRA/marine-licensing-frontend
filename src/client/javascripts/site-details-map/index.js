@@ -48,16 +48,15 @@ export class SiteDetailsMap extends Component {
     const { vectorSource, vectorLayer } = this.mapFactory.createMapLayers()
     const geoJSONFormat = this.mapFactory.initialiseGeoJSONFormat()
 
+    this.map = this.mapFactory.createMap(this.$root, this.options, vectorLayer)
+
     this.siteVisualizer = new SiteVisualizer(
       olModules,
       vectorSource,
       geoJSONFormat,
-      null
+      this.map
     )
 
-    this.map = this.mapFactory.createMap(this.$root, this.options, vectorLayer)
-
-    this.siteVisualizer.map = this.map
     this.loadAndDisplaySiteDetails()
   }
 

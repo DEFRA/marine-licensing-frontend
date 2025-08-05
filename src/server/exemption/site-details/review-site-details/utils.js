@@ -4,6 +4,21 @@ import { getCoordinateSystem } from '~/src/server/common/helpers/session-cache/u
 import Boom from '@hapi/boom'
 import { config } from '~/src/config/config.js'
 
+const isWGS84 = (coordinateSystem) =>
+  coordinateSystem === COORDINATE_SYSTEMS.WGS84
+
+const isValidCoordinateForSystem = (coord, coordinateSystem) => {
+  if (!coord) {
+    return false
+  }
+
+  if (isWGS84(coordinateSystem)) {
+    return coord.latitude && coord.longitude
+  }
+
+  return coord.eastings && coord.northings
+}
+
 const REVIEW_SITE_DETAILS_VIEW_ROUTE =
   'exemption/site-details/review-site-details/index'
 
@@ -49,7 +64,7 @@ export const getCoordinateSystemText = (coordinateSystem) => {
     return ''
   }
 
-  return coordinateSystem === COORDINATE_SYSTEMS.WGS84
+  return isWGS84(coordinateSystem)
     ? 'WGS84 (World Geodetic System 1984)\nLatitude and longitude'
     : 'OSGB36 (National Grid)\nEastings and Northings'
 }
@@ -61,7 +76,7 @@ export const getCoordinateDisplayText = (siteDetails, coordinateSystem) => {
     return ''
   }
 
-  return coordinateSystem === COORDINATE_SYSTEMS.WGS84
+  return isWGS84(coordinateSystem)
     ? `${coordinates.latitude}, ${coordinates.longitude}`
     : `${coordinates.eastings}, ${coordinates.northings}`
 }
@@ -77,21 +92,12 @@ export const getPolygonCoordinatesDisplayData = (
   }
 
   return coordinates
-    .filter(
-      (coord) =>
-        coord &&
-        ((coordinateSystem === COORDINATE_SYSTEMS.WGS84 &&
-          coord.latitude &&
-          coord.longitude) ||
-          (coordinateSystem === COORDINATE_SYSTEMS.OSGB36 &&
-            coord.eastings &&
-            coord.northings))
-    )
+    .filter((coord) => isValidCoordinateForSystem(coord, coordinateSystem))
     .map((coord, index) => {
-      const displayText =
-        coordinateSystem === COORDINATE_SYSTEMS.WGS84
-          ? `${coord.latitude}, ${coord.longitude}`
-          : `${coord.eastings}, ${coord.northings}`
+      const displayText = getCoordinateDisplayText(
+        { coordinates: coord },
+        coordinateSystem
+      )
 
       return {
         label: index === 0 ? 'Start and end points' : `Point ${index + 1}`,

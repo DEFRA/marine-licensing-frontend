@@ -59,7 +59,7 @@ describe('SiteDetailsMap', () => {
     mockSiteVisualizer = {
       clearFeatures: jest.fn(),
       displayFileUploadData: jest.fn(),
-      centerMapView: jest.fn(),
+      centreMapView: jest.fn(),
       displayCircularSite: jest.fn(),
       displayPointSite: jest.fn(),
       olModules: {
@@ -270,7 +270,7 @@ describe('SiteDetailsMap', () => {
       expect(mockSiteVisualizer.displayPointSite).toHaveBeenCalledWith(
         mapCoordinates
       )
-      expect(mockSiteVisualizer.centerMapView).toHaveBeenCalledWith(
+      expect(mockSiteVisualizer.centreMapView).toHaveBeenCalledWith(
         mapCoordinates,
         14
       )
@@ -291,7 +291,7 @@ describe('SiteDetailsMap', () => {
         mapCoordinates,
         500
       )
-      expect(mockSiteVisualizer.centerMapView).toHaveBeenCalledWith(
+      expect(mockSiteVisualizer.centreMapView).toHaveBeenCalledWith(
         mapCoordinates,
         14
       )
@@ -327,7 +327,7 @@ describe('SiteDetailsMap', () => {
       siteDetailsMap.displayManualCoordinates(siteDetails)
 
       expect(mockSiteVisualizer.displayPointSite).not.toHaveBeenCalled()
-      expect(mockSiteVisualizer.centerMapView).not.toHaveBeenCalled()
+      expect(mockSiteVisualizer.centreMapView).not.toHaveBeenCalled()
     })
   })
 
@@ -509,19 +509,19 @@ describe('SiteDetailsMap', () => {
     })
   })
 
-  describe('centerMapOnCoordinates', () => {
+  describe('centreMapOnCoordinates', () => {
     beforeEach(() => {
       siteDetailsMap = new SiteDetailsMap(mockRoot)
       siteDetailsMap.siteVisualizer = mockSiteVisualizer
     })
 
-    test('should center map when siteVisualizer available', () => {
+    test('should centre map when siteVisualizer available', () => {
       const mapCoordinates = [1000, 2000]
 
-      const result = siteDetailsMap.centerMapOnCoordinates(mapCoordinates)
+      const result = siteDetailsMap.centreMapOnCoordinates(mapCoordinates)
 
       expect(result).toBe(true)
-      expect(mockSiteVisualizer.centerMapView).toHaveBeenCalledWith(
+      expect(mockSiteVisualizer.centreMapView).toHaveBeenCalledWith(
         mapCoordinates,
         14
       )
@@ -531,10 +531,10 @@ describe('SiteDetailsMap', () => {
       siteDetailsMap.siteVisualizer = null
       const mapCoordinates = [1000, 2000]
 
-      const result = siteDetailsMap.centerMapOnCoordinates(mapCoordinates)
+      const result = siteDetailsMap.centreMapOnCoordinates(mapCoordinates)
 
       expect(result).toBe(false)
-      expect(mockSiteVisualizer.centerMapView).not.toHaveBeenCalled()
+      expect(mockSiteVisualizer.centreMapView).not.toHaveBeenCalled()
     })
   })
 

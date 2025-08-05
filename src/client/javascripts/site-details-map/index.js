@@ -5,8 +5,8 @@ import OpenLayersModuleLoader from './openlayers-module-loader.js'
 import SiteDataLoader from './site-data-loader.js'
 import SiteVisualizer from './site-visualizer.js'
 
-const DEFAULT_UK_CENTER_LONGITUDE = -3.5
-const DEFAULT_UK_CENTER_LATITUDE = 54.0
+const DEFAULT_UK_CENTRE_LONGITUDE = -3.5
+const DEFAULT_UK_CENTRE_LATITUDE = 54.0
 const DEFAULT_MAP_ZOOM = 6
 const DETAILED_ZOOM_LEVEL = 14
 
@@ -17,7 +17,7 @@ export class SiteDetailsMap extends Component {
     super($root)
 
     this.options = {
-      center: [DEFAULT_UK_CENTER_LONGITUDE, DEFAULT_UK_CENTER_LATITUDE],
+      center: [DEFAULT_UK_CENTRE_LONGITUDE, DEFAULT_UK_CENTRE_LATITUDE],
       zoom: DEFAULT_MAP_ZOOM,
       ...options
     }
@@ -138,7 +138,7 @@ export class SiteDetailsMap extends Component {
     }
 
     this.renderSiteGeometry(mapCoordinates, circleWidth)
-    this.centerMapOnCoordinates(mapCoordinates)
+    this.centreMapOnCoordinates(mapCoordinates)
   }
 
   getFromLonLatFunction() {
@@ -159,9 +159,9 @@ export class SiteDetailsMap extends Component {
     }
   }
 
-  centerMapOnCoordinates(mapCoordinates) {
+  centreMapOnCoordinates(mapCoordinates) {
     if (this.siteVisualizer) {
-      this.siteVisualizer.centerMapView(mapCoordinates, DETAILED_ZOOM_LEVEL)
+      this.siteVisualizer.centreMapView(mapCoordinates, DETAILED_ZOOM_LEVEL)
       return true
     }
     return false

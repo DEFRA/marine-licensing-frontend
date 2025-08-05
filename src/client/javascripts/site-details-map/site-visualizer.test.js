@@ -75,9 +75,9 @@ describe('SiteVisualizer', () => {
   })
 
   const createCircularSiteTestSetup = () => ({
-    centerCoordinates: [1000, 2000],
-    radiusInMeters: 500,
-    centerWGS84: [0, 51],
+    centreCoordinates: [1000, 2000],
+    radiusInMetres: 500,
+    centreWGS84: [0, 51],
     circleCoords: [
       [0, 51],
       [0.1, 51],
@@ -92,7 +92,7 @@ describe('SiteVisualizer', () => {
   const setupCircularSiteMocks = (setup) => {
     mockOlModules.Feature.mockReturnValue(setup.mocks.feature)
     mockOlModules.Polygon.mockReturnValue(setup.mocks.polygon)
-    mockOlModules.toLonLat.mockReturnValue(setup.centerWGS84)
+    mockOlModules.toLonLat.mockReturnValue(setup.centreWGS84)
     mockOlModules.fromLonLat.mockImplementation((coord) =>
       coord.map((c) => c * 1000)
     )
@@ -102,17 +102,17 @@ describe('SiteVisualizer', () => {
   }
 
   describe('displayCircularSite', () => {
-    test('should convert center coordinates to WGS84', () => {
+    test('should convert centre coordinates to WGS84', () => {
       const setup = createCircularSiteTestSetup()
       setupCircularSiteMocks(setup)
 
       siteVisualizer.displayCircularSite(
-        setup.centerCoordinates,
-        setup.radiusInMeters
+        setup.centreCoordinates,
+        setup.radiusInMetres
       )
 
       expect(mockOlModules.toLonLat).toHaveBeenCalledWith(
-        setup.centerCoordinates
+        setup.centreCoordinates
       )
     })
 
@@ -121,13 +121,13 @@ describe('SiteVisualizer', () => {
       setupCircularSiteMocks(setup)
 
       siteVisualizer.displayCircularSite(
-        setup.centerCoordinates,
-        setup.radiusInMeters
+        setup.centreCoordinates,
+        setup.radiusInMetres
       )
 
       expect(
         CircleGeometryCalculator.createGeographicCircle
-      ).toHaveBeenCalledWith(setup.centerWGS84, setup.radiusInMeters)
+      ).toHaveBeenCalledWith(setup.centreWGS84, setup.radiusInMetres)
     })
 
     test('should project circle coordinates to map projection', () => {
@@ -135,8 +135,8 @@ describe('SiteVisualizer', () => {
       setupCircularSiteMocks(setup)
 
       siteVisualizer.displayCircularSite(
-        setup.centerCoordinates,
-        setup.radiusInMeters
+        setup.centreCoordinates,
+        setup.radiusInMetres
       )
 
       expect(mockOlModules.Polygon).toHaveBeenCalledWith([
@@ -153,8 +153,8 @@ describe('SiteVisualizer', () => {
       setupCircularSiteMocks(setup)
 
       siteVisualizer.displayCircularSite(
-        setup.centerCoordinates,
-        setup.radiusInMeters
+        setup.centreCoordinates,
+        setup.radiusInMetres
       )
 
       expect(mockOlModules.Feature).toHaveBeenCalledWith({
@@ -167,8 +167,8 @@ describe('SiteVisualizer', () => {
       setupCircularSiteMocks(setup)
 
       siteVisualizer.displayCircularSite(
-        setup.centerCoordinates,
-        setup.radiusInMeters
+        setup.centreCoordinates,
+        setup.radiusInMetres
       )
 
       expect(mockVectorSource.addFeature).toHaveBeenCalledWith(
@@ -239,21 +239,21 @@ describe('SiteVisualizer', () => {
     })
   })
 
-  describe('centerMapView', () => {
-    test('should center map on coordinates with default zoom', () => {
+  describe('centreMapView', () => {
+    test('should centre map on coordinates with default zoom', () => {
       const coordinates = [1000, 2000]
 
-      siteVisualizer.centerMapView(coordinates)
+      siteVisualizer.centreMapView(coordinates)
 
       expect(mockMap.getView().setCenter).toHaveBeenCalledWith(coordinates)
       expect(mockMap.getView().setZoom).toHaveBeenCalledWith(14)
     })
 
-    test('should center map on coordinates with custom zoom', () => {
+    test('should centre map on coordinates with custom zoom', () => {
       const coordinates = [1000, 2000]
       const zoomLevel = 10
 
-      siteVisualizer.centerMapView(coordinates, zoomLevel)
+      siteVisualizer.centreMapView(coordinates, zoomLevel)
 
       expect(mockMap.getView().setCenter).toHaveBeenCalledWith(coordinates)
       expect(mockMap.getView().setZoom).toHaveBeenCalledWith(zoomLevel)

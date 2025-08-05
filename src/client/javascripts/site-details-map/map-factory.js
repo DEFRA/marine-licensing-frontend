@@ -6,7 +6,7 @@ class MapFactory {
   /**
    * Create a new map instance with zoom controls and responsive attribution
    * @param {HTMLElement} target - DOM element to attach map to
-   * @param {object} options - Map options (center, zoom)
+   * @param {object} options - Map options (centre, zoom)
    * @param {object} vectorLayer - Vector layer for features
    * @returns {object} OpenLayers Map instance
    */

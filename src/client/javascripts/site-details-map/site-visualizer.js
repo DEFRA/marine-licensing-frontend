@@ -22,16 +22,16 @@ class SiteVisualizer {
 
   /**
    * Display a circular site on the map
-   * @param {Array} centerCoordinates - Web Mercator center coordinates [x, y]
-   * @param {number} radiusInMeters - Radius in meters
+   * @param {Array} centreCoordinates - Web Mercator centre coordinates [x, y]
+   * @param {number} radiusInMetres - Radius in metres
    */
-  displayCircularSite(centerCoordinates, radiusInMeters) {
+  displayCircularSite(centreCoordinates, radiusInMetres) {
     const { Feature, Polygon, fromLonLat, toLonLat } = this.olModules
-    const centerWGS84 = toLonLat(centerCoordinates)
+    const centreWGS84 = toLonLat(centreCoordinates)
 
     const circleCoords = CircleGeometryCalculator.createGeographicCircle(
-      centerWGS84,
-      radiusInMeters
+      centreWGS84,
+      radiusInMetres
     )
 
     const projectedCoords = circleCoords.map((coord) => fromLonLat(coord))
@@ -81,11 +81,11 @@ class SiteVisualizer {
   }
 
   /**
-   * Center the map view on specific coordinates
+   * Centre the map view on specific coordinates
    * @param {Array} mapCoordinates - Web Mercator coordinates [x, y]
    * @param {number} zoomLevel - Zoom level to set
    */
-  centerMapView(mapCoordinates, zoomLevel = 14) {
+  centreMapView(mapCoordinates, zoomLevel = 14) {
     this.map.getView().setCenter(mapCoordinates)
     this.map.getView().setZoom(zoomLevel)
   }

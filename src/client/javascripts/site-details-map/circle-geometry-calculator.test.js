@@ -24,13 +24,13 @@ describe('CircleGeometryCalculator', () => {
   }
 
   const defaultTestCoords = () => ({
-    centerLon: 0,
-    centerLat: 51.5,
-    centerLonLat: [0, 51.5]
+    centreLon: 0,
+    centreLat: 51.5,
+    centreLonLat: [0, 51.5]
   })
   const defaultCircleParams = () => ({
     ...defaultTestCoords(),
-    radiusInMeters: 1000
+    radiusInMetres: 1000
   })
   const defaultPointParams = () => ({
     ...defaultTestCoords(),
@@ -39,17 +39,17 @@ describe('CircleGeometryCalculator', () => {
   })
 
   // Test execution helpers
-  const createCircle = (centerLonLat, radiusInMeters, sides) =>
+  const createCircle = (centreLonLat, radiusInMetres, sides) =>
     CircleGeometryCalculator.createGeographicCircle(
-      centerLonLat,
-      radiusInMeters,
+      centreLonLat,
+      radiusInMetres,
       sides
     )
 
-  const calculatePoint = (centerLon, centerLat, angularDistance, bearing) =>
+  const calculatePoint = (centreLon, centreLat, angularDistance, bearing) =>
     CircleGeometryCalculator.calculateCirclePoint(
-      centerLon,
-      centerLat,
+      centreLon,
+      centreLat,
       angularDistance,
       bearing
     )
@@ -57,8 +57,8 @@ describe('CircleGeometryCalculator', () => {
   // Combined test helpers
   const testBasicCircle = (params, expectedLength = 65) => {
     const result = createCircle(
-      params.centerLonLat,
-      params.radiusInMeters,
+      params.centreLonLat,
+      params.radiusInMetres,
       params.sides
     )
     expectBasicCircleResult(result, expectedLength)
@@ -67,8 +67,8 @@ describe('CircleGeometryCalculator', () => {
 
   const testBasicPoint = (params) => {
     const result = calculatePoint(
-      params.centerLon,
-      params.centerLat,
+      params.centreLon,
+      params.centreLat,
       params.angularDistance,
       params.bearing
     )
@@ -102,12 +102,12 @@ describe('CircleGeometryCalculator', () => {
 
     describe('coordinate format validation', () => {
       test('should return coordinates as longitude latitude pairs', () => {
-        const centerLonLat = [0, 51.5]
-        const radiusInMeters = 1000
+        const centreLonLat = [0, 51.5]
+        const radiusInMetres = 1000
 
         const result = CircleGeometryCalculator.createGeographicCircle(
-          centerLonLat,
-          radiusInMeters
+          centreLonLat,
+          radiusInMetres
         )
 
         result.forEach((coordinate) => {
@@ -118,12 +118,12 @@ describe('CircleGeometryCalculator', () => {
       })
 
       test('should ensure all coordinates are within valid geographic bounds', () => {
-        const centerLonLat = [0, 51.5]
-        const radiusInMeters = 1000
+        const centreLonLat = [0, 51.5]
+        const radiusInMetres = 1000
 
         const result = CircleGeometryCalculator.createGeographicCircle(
-          centerLonLat,
-          radiusInMeters
+          centreLonLat,
+          radiusInMetres
         )
 
         result.forEach((coordinate) => {
@@ -138,12 +138,12 @@ describe('CircleGeometryCalculator', () => {
 
     describe('circle closure validation', () => {
       test('should create closed circle where first point equals last point', () => {
-        const centerLonLat = [0, 51.5]
-        const radiusInMeters = 1000
+        const centreLonLat = [0, 51.5]
+        const radiusInMetres = 1000
 
         const result = CircleGeometryCalculator.createGeographicCircle(
-          centerLonLat,
-          radiusInMeters
+          centreLonLat,
+          radiusInMetres
         )
 
         const firstPoint = result[0]
@@ -158,54 +158,54 @@ describe('CircleGeometryCalculator', () => {
       test.each([
         {
           description: 'small circle for short radius',
-          radiusInMeters: 100,
+          radiusInMetres: 100,
           expectDistance: (distance) => expect(distance).toBeLessThan(0.01)
         },
         {
           description: 'large circle for long radius',
-          radiusInMeters: 10000,
+          radiusInMetres: 10000,
           expectDistance: (distance) => expect(distance).toBeGreaterThan(0.01)
         }
-      ])('should create $description', ({ radiusInMeters, expectDistance }) => {
-        const centerLonLat = [0, 51.5]
-        const result = createCircle(centerLonLat, radiusInMeters)
+      ])('should create $description', ({ radiusInMetres, expectDistance }) => {
+        const centreLonLat = [0, 51.5]
+        const result = createCircle(centreLonLat, radiusInMetres)
         expectBasicCircleResult(result)
 
-        const [centerLon, centerLat] = centerLonLat
+        const [centreLon, centreLat] = centreLonLat
         result.forEach((coordinate) => {
           const [lon, lat] = coordinate
           const distance = Math.sqrt(
-            Math.pow(lon - centerLon, 2) + Math.pow(lat - centerLat, 2)
+            Math.pow(lon - centreLon, 2) + Math.pow(lat - centreLat, 2)
           )
           expectDistance(distance)
         })
       })
 
       test('should handle zero radius', () => {
-        const centerLonLat = [0, 51.5]
-        const result = createCircle(centerLonLat, 0)
+        const centreLonLat = [0, 51.5]
+        const result = createCircle(centreLonLat, 0)
         expectBasicCircleResult(result)
 
         result.forEach((coordinate) => {
-          expect(coordinate[0]).toBeCloseTo(centerLonLat[0], 10)
-          expect(coordinate[1]).toBeCloseTo(centerLonLat[1], 10)
+          expect(coordinate[0]).toBeCloseTo(centreLonLat[0], 10)
+          expect(coordinate[1]).toBeCloseTo(centreLonLat[1], 10)
         })
       })
     })
 
-    describe('different center locations', () => {
+    describe('different centre locations', () => {
       test.each([
-        { location: 'London', centerLonLat: [-0.1276, 51.5074] },
-        { location: 'Edinburgh', centerLonLat: [-3.1883, 55.9533] }
+        { location: 'London', centreLonLat: [-0.1276, 51.5074] },
+        { location: 'Edinburgh', centreLonLat: [-3.1883, 55.9533] }
       ])(
         'should create circle around $location coordinates',
-        ({ centerLonLat }) => {
-          const result = createCircle(centerLonLat, 1000)
+        ({ centreLonLat }) => {
+          const result = createCircle(centreLonLat, 1000)
           expectBasicCircleResult(result)
 
           result.forEach((coordinate) => {
-            expect(coordinate[0]).toBeCloseTo(centerLonLat[0], 1)
-            expect(coordinate[1]).toBeCloseTo(centerLonLat[1], 1)
+            expect(coordinate[0]).toBeCloseTo(centreLonLat[0], 1)
+            expect(coordinate[1]).toBeCloseTo(centreLonLat[1], 1)
           })
         }
       )
@@ -213,12 +213,12 @@ describe('CircleGeometryCalculator', () => {
 
     describe('marine licensing scenarios', () => {
       test('should create appropriate circle for marine site boundary', () => {
-        const centerLonLat = [1.0, 52.0]
-        const radiusInMeters = 500
+        const centreLonLat = [1.0, 52.0]
+        const radiusInMetres = 500
 
         const result = CircleGeometryCalculator.createGeographicCircle(
-          centerLonLat,
-          radiusInMeters
+          centreLonLat,
+          radiusInMetres
         )
 
         expect(result).toBeDefined()
@@ -230,16 +230,16 @@ describe('CircleGeometryCalculator', () => {
 
     describe('mathematical precision validation', () => {
       const createSquareTestSetup = () => ({
-        centerLonLat: [0, 0],
-        radiusInMeters: 1000,
+        centreLonLat: [0, 0],
+        radiusInMetres: 1000,
         sides: 4
       })
 
       test('should generate correct number of points for square', () => {
         const setup = createSquareTestSetup()
         const result = CircleGeometryCalculator.createGeographicCircle(
-          setup.centerLonLat,
-          setup.radiusInMeters,
+          setup.centreLonLat,
+          setup.radiusInMetres,
           setup.sides
         )
 
@@ -248,25 +248,25 @@ describe('CircleGeometryCalculator', () => {
 
       test.each([
         {
-          description: 'first point due north of center',
+          description: 'first point due north of centre',
           index: 0,
           expectLon: (lon) => expect(lon).toBeCloseTo(0, 10),
           expectLat: (lat) => expect(lat).toBeGreaterThan(0)
         },
         {
-          description: 'second point due east of center',
+          description: 'second point due east of centre',
           index: 1,
           expectLon: (lon) => expect(lon).toBeGreaterThan(0),
           expectLat: (lat) => expect(lat).toBeCloseTo(0, 5)
         },
         {
-          description: 'third point due south of center',
+          description: 'third point due south of centre',
           index: 2,
           expectLon: (lon) => expect(lon).toBeCloseTo(0, 10),
           expectLat: (lat) => expect(lat).toBeLessThan(0)
         },
         {
-          description: 'fourth point due west of center',
+          description: 'fourth point due west of centre',
           index: 3,
           expectLon: (lon) => expect(lon).toBeLessThan(0),
           expectLat: (lat) => expect(lat).toBeCloseTo(0, 5)
@@ -274,8 +274,8 @@ describe('CircleGeometryCalculator', () => {
       ])('should place $description', ({ index, expectLon, expectLat }) => {
         const setup = createSquareTestSetup()
         const result = CircleGeometryCalculator.createGeographicCircle(
-          setup.centerLonLat,
-          setup.radiusInMeters,
+          setup.centreLonLat,
+          setup.radiusInMetres,
           setup.sides
         )
 
@@ -283,29 +283,29 @@ describe('CircleGeometryCalculator', () => {
         expectLat(result[index][1])
       })
 
-      test('should calculate correct distances from center for all points', () => {
-        const centerLonLat = [0, 51.5] // London-ish
-        const radiusInMeters = 1000
+      test('should calculate correct distances from centre for all points', () => {
+        const centreLonLat = [0, 51.5] // London-ish
+        const radiusInMetres = 1000
         const earthRadiusKm = 6378.137
 
         const result = CircleGeometryCalculator.createGeographicCircle(
-          centerLonLat,
-          radiusInMeters,
+          centreLonLat,
+          radiusInMetres,
           8
         )
 
         // Calculate expected angular distance in degrees
         const expectedAngularDistanceDeg =
-          (radiusInMeters / 1000 / earthRadiusKm) * (180 / Math.PI)
+          (radiusInMetres / 1000 / earthRadiusKm) * (180 / Math.PI)
 
         result.slice(0, -1).forEach((point) => {
           const [lon, lat] = point
-          const [centerLon, centerLat] = centerLonLat
+          const [centreLon, centreLat] = centreLonLat
 
           // Calculate distance using spherical law of cosines
-          const latRad1 = (centerLat * Math.PI) / 180
+          const latRad1 = (centreLat * Math.PI) / 180
           const latRad2 = (lat * Math.PI) / 180
-          const deltaLonRad = ((lon - centerLon) * Math.PI) / 180
+          const deltaLonRad = ((lon - centreLon) * Math.PI) / 180
 
           const angularDistance = Math.acos(
             Math.sin(latRad1) * Math.sin(latRad2) +
@@ -320,14 +320,14 @@ describe('CircleGeometryCalculator', () => {
       })
 
       test('should validate spherical trigonometry formulas with known coordinates', () => {
-        const centerLon = 0
-        const centerLat = 0 // Equator for simpler math
+        const centreLon = 0
+        const centreLat = 0 // Equator for simpler math
         const angularDistance = 0.001 // Small distance for precision
         const bearing = Math.PI / 2 // Due east
 
         const result = CircleGeometryCalculator.calculateCirclePoint(
-          centerLon,
-          centerLat,
+          centreLon,
+          centreLat,
           angularDistance,
           bearing
         )
@@ -338,8 +338,8 @@ describe('CircleGeometryCalculator', () => {
 
         // Test due north (bearing = 0)
         const northResult = CircleGeometryCalculator.calculateCirclePoint(
-          centerLon,
-          centerLat,
+          centreLon,
+          centreLat,
           angularDistance,
           0
         )
@@ -349,55 +349,55 @@ describe('CircleGeometryCalculator', () => {
       })
 
       test('should produce symmetric results for north vs south bearings', () => {
-        const centerLon = 1
-        const centerLat = 52
+        const centreLon = 1
+        const centreLat = 52
         const angularDistance = 0.01
 
         const north = CircleGeometryCalculator.calculateCirclePoint(
-          centerLon,
-          centerLat,
+          centreLon,
+          centreLat,
           angularDistance,
           0
         )
         const south = CircleGeometryCalculator.calculateCirclePoint(
-          centerLon,
-          centerLat,
+          centreLon,
+          centreLat,
           angularDistance,
           Math.PI
         )
 
         expect(north[0]).toBeCloseTo(south[0], 6) // same longitude
-        expect(Math.abs(north[1] - centerLat)).toBeCloseTo(
-          Math.abs(south[1] - centerLat),
+        expect(Math.abs(north[1] - centreLat)).toBeCloseTo(
+          Math.abs(south[1] - centreLat),
           6
         )
-        expect((north[1] - centerLat) * (south[1] - centerLat)).toBeLessThan(0) // opposite sides
+        expect((north[1] - centreLat) * (south[1] - centreLat)).toBeLessThan(0) // opposite sides
       })
 
       test('should produce symmetric results for east vs west bearings', () => {
-        const centerLon = 1
-        const centerLat = 52
+        const centreLon = 1
+        const centreLat = 52
         const angularDistance = 0.01
 
         const east = CircleGeometryCalculator.calculateCirclePoint(
-          centerLon,
-          centerLat,
+          centreLon,
+          centreLat,
           angularDistance,
           Math.PI / 2
         )
         const west = CircleGeometryCalculator.calculateCirclePoint(
-          centerLon,
-          centerLat,
+          centreLon,
+          centreLat,
           angularDistance,
           (3 * Math.PI) / 2
         )
 
         expect(east[1]).toBeCloseTo(west[1], 6) // same latitude
-        expect(Math.abs(east[0] - centerLon)).toBeCloseTo(
-          Math.abs(west[0] - centerLon),
+        expect(Math.abs(east[0] - centreLon)).toBeCloseTo(
+          Math.abs(west[0] - centreLon),
           6
         )
-        expect((east[0] - centerLon) * (west[0] - centerLon)).toBeLessThan(0) // opposite sides
+        expect((east[0] - centreLon) * (west[0] - centreLon)).toBeLessThan(0) // opposite sides
       })
     })
   })
@@ -408,42 +408,42 @@ describe('CircleGeometryCalculator', () => {
         {
           direction: 'north',
           bearing: 0,
-          expectLon: (result, centerLon) =>
-            expect(result[0]).toBeCloseTo(centerLon, 3),
-          expectLat: (result, centerLat) =>
-            expect(result[1]).toBeGreaterThan(centerLat)
+          expectLon: (result, centreLon) =>
+            expect(result[0]).toBeCloseTo(centreLon, 3),
+          expectLat: (result, centreLat) =>
+            expect(result[1]).toBeGreaterThan(centreLat)
         },
         {
           direction: 'east',
           bearing: Math.PI / 2,
-          expectLon: (result, centerLon) =>
-            expect(result[0]).toBeGreaterThan(centerLon),
-          expectLat: (result, centerLat) =>
-            expect(result[1]).toBeCloseTo(centerLat, 3)
+          expectLon: (result, centreLon) =>
+            expect(result[0]).toBeGreaterThan(centreLon),
+          expectLat: (result, centreLat) =>
+            expect(result[1]).toBeCloseTo(centreLat, 3)
         },
         {
           direction: 'south',
           bearing: Math.PI,
-          expectLon: (result, centerLon) =>
-            expect(result[0]).toBeCloseTo(centerLon, 3),
-          expectLat: (result, centerLat) =>
-            expect(result[1]).toBeLessThan(centerLat)
+          expectLon: (result, centreLon) =>
+            expect(result[0]).toBeCloseTo(centreLon, 3),
+          expectLat: (result, centreLat) =>
+            expect(result[1]).toBeLessThan(centreLat)
         },
         {
           direction: 'west',
           bearing: (3 * Math.PI) / 2,
-          expectLon: (result, centerLon) =>
-            expect(result[0]).toBeLessThan(centerLon),
-          expectLat: (result, centerLat) =>
-            expect(result[1]).toBeCloseTo(centerLat, 3)
+          expectLon: (result, centreLon) =>
+            expect(result[0]).toBeLessThan(centreLon),
+          expectLat: (result, centreLat) =>
+            expect(result[1]).toBeCloseTo(centreLat, 3)
         }
       ])(
         'should calculate $direction point correctly',
         ({ bearing, expectLon, expectLat }) => {
           const params = { ...defaultPointParams(), bearing }
           const result = testBasicPoint(params)
-          expectLon(result, params.centerLon)
-          expectLat(result, params.centerLat)
+          expectLon(result, params.centreLon)
+          expectLat(result, params.centreLat)
         }
       )
     })
@@ -455,8 +455,8 @@ describe('CircleGeometryCalculator', () => {
           angularDistance: 0,
           bearing: 0,
           additionalChecks: (result, params) => {
-            expect(result[0]).toBeCloseTo(params.centerLon, 10)
-            expect(result[1]).toBeCloseTo(params.centerLat, 10)
+            expect(result[0]).toBeCloseTo(params.centreLon, 10)
+            expect(result[1]).toBeCloseTo(params.centreLat, 10)
           }
         },
         {
@@ -513,14 +513,14 @@ describe('CircleGeometryCalculator', () => {
           description: 'consistent results for same inputs',
           checks: (params) => {
             const result1 = calculatePoint(
-              params.centerLon,
-              params.centerLat,
+              params.centreLon,
+              params.centreLat,
               params.angularDistance,
               params.bearing
             )
             const result2 = calculatePoint(
-              params.centerLon,
-              params.centerLat,
+              params.centreLon,
+              params.centreLat,
               params.angularDistance,
               params.bearing
             )
@@ -531,8 +531,8 @@ describe('CircleGeometryCalculator', () => {
           description: 'sufficient precision for mapping applications',
           checks: (params) => {
             const result = calculatePoint(
-              params.centerLon,
-              params.centerLat,
+              params.centreLon,
+              params.centreLat,
               params.angularDistance,
               params.bearing
             )

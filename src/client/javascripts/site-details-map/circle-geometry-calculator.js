@@ -1,23 +1,23 @@
-const EARTH_RADIUS_METERS = 6378137
+const EARTH_RADIUS_METRES = 6378137
 const DEGREES_TO_RADIANS_FACTOR = 180
 const CIRCLE_APPROXIMATION_SIDES = 64
 
 class CircleGeometryCalculator {
   static createGeographicCircle(
-    centerLonLat,
-    radiusInMeters,
+    centreLonLat,
+    radiusInMetres,
     sides = CIRCLE_APPROXIMATION_SIDES
   ) {
-    const [centerLon, centerLat] = centerLonLat
+    const [centreLon, centreLat] = centreLonLat
     const coordinates = []
-    const earthRadius = EARTH_RADIUS_METERS
-    const angularDistance = radiusInMeters / earthRadius
+    const earthRadius = EARTH_RADIUS_METRES
+    const angularDistance = radiusInMetres / earthRadius
 
     for (let i = 0; i <= sides; i++) {
       const bearing = (i * 2 * Math.PI) / sides
       const point = this.calculateCirclePoint(
-        centerLon,
-        centerLat,
+        centreLon,
+        centreLat,
         angularDistance,
         bearing
       )
@@ -27,20 +27,20 @@ class CircleGeometryCalculator {
     return coordinates
   }
 
-  static calculateCirclePoint(centerLon, centerLat, angularDistance, bearing) {
-    const centerLatRad = (centerLat * Math.PI) / DEGREES_TO_RADIANS_FACTOR
-    const centerLonRad = (centerLon * Math.PI) / DEGREES_TO_RADIANS_FACTOR
+  static calculateCirclePoint(centreLon, centreLat, angularDistance, bearing) {
+    const centreLatRad = (centreLat * Math.PI) / DEGREES_TO_RADIANS_FACTOR
+    const centreLonRad = (centreLon * Math.PI) / DEGREES_TO_RADIANS_FACTOR
 
     const lat = Math.asin(
-      Math.sin(centerLatRad) * Math.cos(angularDistance) +
-        Math.cos(centerLatRad) * Math.sin(angularDistance) * Math.cos(bearing)
+      Math.sin(centreLatRad) * Math.cos(angularDistance) +
+        Math.cos(centreLatRad) * Math.sin(angularDistance) * Math.cos(bearing)
     )
 
     const lon =
-      centerLonRad +
+      centreLonRad +
       Math.atan2(
-        Math.sin(bearing) * Math.sin(angularDistance) * Math.cos(centerLatRad),
-        Math.cos(angularDistance) - Math.sin(centerLatRad) * Math.sin(lat)
+        Math.sin(bearing) * Math.sin(angularDistance) * Math.cos(centreLatRad),
+        Math.cos(angularDistance) - Math.sin(centreLatRad) * Math.sin(lat)
       )
 
     return [

@@ -42,6 +42,17 @@ export class SiteDetailsMap extends Component {
   }
 
   async initialiseMap() {
+    const siteDetails = this.dataLoader.loadSiteDetails()
+    if (!siteDetails) {
+      this.showError()
+      return
+    }
+
+    if (!this.hasValidSiteDetails(siteDetails)) {
+      this.showError()
+      return
+    }
+
     const olModules = await this.moduleLoader.loadModules()
 
     this.mapFactory = new MapFactory(olModules)
@@ -57,16 +68,14 @@ export class SiteDetailsMap extends Component {
       this.map
     )
 
-    this.loadAndDisplaySiteDetails()
+    this.displaySiteDetails(siteDetails)
   }
 
-  loadAndDisplaySiteDetails() {
-    const siteDetails = this.dataLoader.loadSiteDetails()
-    if (!siteDetails) {
-      return
-    }
-
-    this.displaySiteDetails(siteDetails)
+  hasValidSiteDetails(siteDetails) {
+    return (
+      this.dataLoader.hasValidFileCoordinates(siteDetails) ||
+      this.dataLoader.hasValidManualCoordinates(siteDetails)
+    )
   }
 
   /**

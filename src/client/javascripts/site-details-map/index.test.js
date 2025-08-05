@@ -330,35 +330,48 @@ describe('SiteDetailsMap', () => {
     })
   })
 
-  describe('loadAndDisplaySiteDetails', () => {
+  describe('hasValidSiteDetails', () => {
     beforeEach(() => {
       siteDetailsMap = new SiteDetailsMap(mockRoot)
-      siteDetailsMap.siteVisualizer = mockSiteVisualizer
     })
 
-    test('should load and display site details when data exists', () => {
+    test('should return true when file coordinates are valid', () => {
+      const siteDetails = { coordinateSystem: 'WGS84', coordinatesType: 'file' }
+      mockDataLoader.hasValidFileCoordinates.mockReturnValue(true)
+      mockDataLoader.hasValidManualCoordinates.mockReturnValue(false)
+
+      const result = siteDetailsMap.hasValidSiteDetails(siteDetails)
+
+      expect(result).toBe(true)
+      expect(mockDataLoader.hasValidFileCoordinates).toHaveBeenCalledWith(
+        siteDetails
+      )
+    })
+
+    test('should return true when manual coordinates are valid', () => {
+      const siteDetails = {
+        coordinateSystem: 'WGS84',
+        coordinatesType: 'coordinates'
+      }
+      mockDataLoader.hasValidFileCoordinates.mockReturnValue(false)
+      mockDataLoader.hasValidManualCoordinates.mockReturnValue(true)
+
+      const result = siteDetailsMap.hasValidSiteDetails(siteDetails)
+
+      expect(result).toBe(true)
+      expect(mockDataLoader.hasValidManualCoordinates).toHaveBeenCalledWith(
+        siteDetails
+      )
+    })
+
+    test('should return false when no valid coordinates exist', () => {
       const siteDetails = { coordinateSystem: 'WGS84' }
-      mockDataLoader.loadSiteDetails.mockReturnValue(siteDetails)
       mockDataLoader.hasValidFileCoordinates.mockReturnValue(false)
       mockDataLoader.hasValidManualCoordinates.mockReturnValue(false)
 
-      const displaySpy = jest.spyOn(siteDetailsMap, 'displaySiteDetails')
+      const result = siteDetailsMap.hasValidSiteDetails(siteDetails)
 
-      siteDetailsMap.loadAndDisplaySiteDetails()
-
-      expect(mockDataLoader.loadSiteDetails).toHaveBeenCalled()
-      expect(displaySpy).toHaveBeenCalledWith(siteDetails)
-    })
-
-    test('should return early when no site details exist', () => {
-      mockDataLoader.loadSiteDetails.mockReturnValue(null)
-
-      const displaySpy = jest.spyOn(siteDetailsMap, 'displaySiteDetails')
-
-      siteDetailsMap.loadAndDisplaySiteDetails()
-
-      expect(mockDataLoader.loadSiteDetails).toHaveBeenCalled()
-      expect(displaySpy).not.toHaveBeenCalled()
+      expect(result).toBe(false)
     })
   })
 
@@ -509,7 +522,20 @@ describe('SiteDetailsMap', () => {
   })
 
   describe('initialiseMap with dependency injection', () => {
+    const setupValidSiteDetailsData = () => {
+      const siteDetails = {
+        coordinateSystem: 'WGS84',
+        coordinatesType: 'coordinates'
+      }
+      mockDataLoader.loadSiteDetails.mockReturnValue(siteDetails)
+      mockDataLoader.hasValidFileCoordinates.mockReturnValue(false)
+      mockDataLoader.hasValidManualCoordinates.mockReturnValue(true)
+      return siteDetails
+    }
+
     test('should use injected module loader to load OpenLayers modules', async () => {
+      setupValidSiteDetailsData()
+
       const customModuleLoader = {
         loadModules: jest.fn().mockResolvedValue({
           OpenLayersMap: jest.fn(),
@@ -547,6 +573,8 @@ describe('SiteDetailsMap', () => {
     })
 
     test('should handle module loading errors gracefully', async () => {
+      setupValidSiteDetailsData()
+
       const failingModuleLoader = {
         loadModules: jest
           .fn()
@@ -559,6 +587,32 @@ describe('SiteDetailsMap', () => {
         'Module loading failed'
       )
       expect(failingModuleLoader.loadModules).toHaveBeenCalled()
+    })
+
+    test('should show error when no site details exist', async () => {
+      mockDataLoader.loadSiteDetails.mockReturnValue(null)
+      siteDetailsMap = new SiteDetailsMap(mockRoot)
+      const errorSpy = jest.spyOn(siteDetailsMap, 'showError')
+
+      await siteDetailsMap.initialiseMap()
+
+      expect(errorSpy).toHaveBeenCalled()
+      expect(mockDataLoader.loadSiteDetails).toHaveBeenCalled()
+    })
+
+    test('should show error when site details are invalid', async () => {
+      const invalidSiteDetails = { coordinateSystem: 'WGS84' }
+      mockDataLoader.loadSiteDetails.mockReturnValue(invalidSiteDetails)
+      mockDataLoader.hasValidFileCoordinates.mockReturnValue(false)
+      mockDataLoader.hasValidManualCoordinates.mockReturnValue(false)
+
+      siteDetailsMap = new SiteDetailsMap(mockRoot)
+      const errorSpy = jest.spyOn(siteDetailsMap, 'showError')
+
+      await siteDetailsMap.initialiseMap()
+
+      expect(errorSpy).toHaveBeenCalled()
+      expect(mockDataLoader.loadSiteDetails).toHaveBeenCalled()
     })
   })
 })

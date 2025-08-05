@@ -1,18 +1,18 @@
-import { createServer } from '~/src/server/index.js'
-import {
-  reviewSiteDetailsController,
-  reviewSiteDetailsSubmitController,
-  REVIEW_SITE_DETAILS_VIEW_ROUTE,
-  FILE_UPLOAD_REVIEW_VIEW_ROUTE
-} from '~/src/server/exemption/site-details/review-site-details/controller.js'
-import { COORDINATE_SYSTEMS } from '~/src/server/common/constants/exemptions.js'
-import * as cacheUtils from '~/src/server/common/helpers/session-cache/utils.js'
-import { mockExemption } from '~/src/server/test-helpers/mocks.js'
-import { statusCodes } from '~/src/server/common/constants/status-codes.js'
 import { config } from '~/src/config/config.js'
+import { COORDINATE_SYSTEMS } from '~/src/server/common/constants/exemptions.js'
+import { statusCodes } from '~/src/server/common/constants/status-codes.js'
+import * as authRequests from '~/src/server/common/helpers/authenticated-requests.js'
+import * as cacheUtils from '~/src/server/common/helpers/session-cache/utils.js'
+import {
+  FILE_UPLOAD_REVIEW_VIEW_ROUTE,
+  REVIEW_SITE_DETAILS_VIEW_ROUTE,
+  reviewSiteDetailsController,
+  reviewSiteDetailsSubmitController
+} from '~/src/server/exemption/site-details/review-site-details/controller.js'
+import { createServer } from '~/src/server/index.js'
+import { mockExemption } from '~/src/server/test-helpers/mocks.js'
 import { JSDOM } from 'jsdom'
 import { routes } from '~/src/server/common/constants/routes.js'
-import * as authRequests from '~/src/server/common/helpers/authenticated-requests.js'
 import {
   getPolygonCoordinatesDisplayData,
   buildManualCoordinateSummaryData,
@@ -22,26 +22,6 @@ import {
 } from '~/src/server/exemption/site-details/review-site-details/utils.js'
 
 jest.mock('~/src/server/common/helpers/session-cache/utils.js')
-
-/**
- * Creates a mock request object with logger and optional properties
- * @param {object} options - Optional request properties
- * @param {object} options.headers - Request headers
- * @param {object} options.payload - Request payload
- * @param {object} options.params - Route parameters
- * @returns {object} Mock request object
- */
-function createMockRequest(options = {}) {
-  return {
-    logger: {
-      info: jest.fn(),
-      error: jest.fn(),
-      warn: jest.fn(),
-      debug: jest.fn()
-    },
-    ...options
-  }
-}
 
 /**
  * Creates a mock Hapi response toolkit
@@ -263,6 +243,70 @@ describe('#reviewSiteDetails', () => {
     }
   }
 
+  const createMockRequest = () => ({
+    logger: {
+      info: jest.fn(),
+      error: jest.fn(),
+      warn: jest.fn(),
+      debug: jest.fn()
+    }
+  })
+
+  const createFileUploadExemptionWithS3 = () => ({
+    ...mockExemption,
+    siteDetails: {
+      coordinatesType: 'file',
+      fileUploadType: 'kml',
+      uploadedFile: {
+        filename: 'test-site.kml',
+        s3Location: {
+          s3Bucket: 'test-bucket',
+          s3Key: 'test-key',
+          checksumSha256: 'test-checksum'
+        }
+      },
+      geoJSON: {
+        type: 'FeatureCollection',
+        features: [
+          {
+            type: 'Feature',
+            geometry: {
+              type: 'Point',
+              coordinates: [51.5074, -0.1278]
+            }
+          }
+        ]
+      },
+      featureCount: 1
+    }
+  })
+
+  const createExpectedSiteDetails = () => ({
+    coordinatesType: 'file',
+    fileUploadType: 'kml',
+    geoJSON: {
+      type: 'FeatureCollection',
+      features: [
+        {
+          type: 'Feature',
+          geometry: {
+            type: 'Point',
+            coordinates: [51.5074, -0.1278]
+          }
+        }
+      ]
+    },
+    featureCount: 1,
+    uploadedFile: {
+      filename: 'test-site.kml'
+    },
+    s3Location: {
+      s3Bucket: 'test-bucket',
+      s3Key: 'test-key',
+      checksumSha256: 'test-checksum'
+    }
+  })
+
   beforeAll(async () => {
     server = await createServer()
     await server.initialize()
@@ -320,7 +364,8 @@ describe('#reviewSiteDetails', () => {
             coordinateSystem: '',
             coordinates: '',
             width: ''
-          }
+          },
+          siteDetailsData: '{"coordinatesType":"coordinates"}'
         })
       })
 
@@ -439,7 +484,9 @@ describe('#reviewSiteDetails', () => {
               'WGS84 (World Geodetic System 1984)\nLatitude and longitude',
             coordinates: `${mockCoordinates[COORDINATE_SYSTEMS.WGS84].latitude}, ${mockCoordinates[COORDINATE_SYSTEMS.WGS84].longitude}`,
             width: '100 metres'
-          }
+          },
+          siteDetailsData:
+            '{"coordinatesType":"coordinates","coordinateSystem":"wgs84","coordinatesEntry":"single","coordinates":{"latitude":"51.489676","longitude":"-0.231530"},"circleWidth":"100"}'
         })
       })
 
@@ -468,7 +515,9 @@ describe('#reviewSiteDetails', () => {
             coordinateSystem: 'OSGB36 (National Grid)\nEastings and Northings',
             coordinates: `${mockCoordinates[COORDINATE_SYSTEMS.OSGB36].eastings}, ${mockCoordinates[COORDINATE_SYSTEMS.OSGB36].northings}`,
             width: '100 metres'
-          }
+          },
+          siteDetailsData:
+            '{"coordinatesType":"coordinates","coordinateSystem":"osgb36","coordinatesEntry":"single","coordinates":{"eastings":"425053","northings":"564180"},"circleWidth":"100"}'
         })
       })
     })
@@ -544,13 +593,15 @@ describe('#reviewSiteDetails', () => {
           )
 
           getExemptionCacheSpy.mockReturnValueOnce(polygonExemption)
+          getCoordinateSystemSpy.mockReturnValueOnce({
+            coordinateSystem: COORDINATE_SYSTEMS.WGS84
+          })
 
           const h = createMockHandler()
-          const mockRequest = createMockRequest({
-            headers: {
-              referer: `http://localhost${routes.ENTER_MULTIPLE_COORDINATES}`
-            }
-          })
+          const mockRequest = createMockRequest()
+          mockRequest.headers = {
+            referer: `http://localhost${routes.ENTER_MULTIPLE_COORDINATES}`
+          }
 
           await reviewSiteDetailsController.handler(mockRequest, h)
 
@@ -578,7 +629,9 @@ describe('#reviewSiteDetails', () => {
                   value: '78.123456, 78.123456'
                 }
               ]
-            }
+            },
+            siteDetailsData:
+              '{"coordinatesType":"coordinates","coordinateSystem":"wgs84","coordinatesEntry":"multiple","coordinates":[{"latitude":"55.123456","longitude":"55.123456"},{"latitude":"33.987654","longitude":"33.987654"},{"latitude":"78.123456","longitude":"78.123456"}]}'
           })
         })
 
@@ -594,11 +647,10 @@ describe('#reviewSiteDetails', () => {
           })
 
           const h = createMockHandler()
-          const mockRequest = createMockRequest({
-            headers: {
-              referer: `http://localhost${routes.ENTER_MULTIPLE_COORDINATES}`
-            }
-          })
+          const mockRequest = createMockRequest()
+          mockRequest.headers = {
+            referer: `http://localhost${routes.ENTER_MULTIPLE_COORDINATES}`
+          }
 
           await reviewSiteDetailsController.handler(mockRequest, h)
 
@@ -626,7 +678,9 @@ describe('#reviewSiteDetails', () => {
                   value: '427000, 566000'
                 }
               ]
-            }
+            },
+            siteDetailsData:
+              '{"coordinatesType":"coordinates","coordinateSystem":"osgb36","coordinatesEntry":"multiple","coordinates":[{"eastings":"425053","northings":"564180"},{"eastings":"426000","northings":"565000"},{"eastings":"427000","northings":"566000"}]}'
           })
         })
 
@@ -646,13 +700,15 @@ describe('#reviewSiteDetails', () => {
           getExemptionCacheSpy.mockReturnValueOnce(
             exemptionWithEmptyCoordinates
           )
+          getCoordinateSystemSpy.mockReturnValueOnce({
+            coordinateSystem: COORDINATE_SYSTEMS.WGS84
+          })
 
           const h = createMockHandler()
-          const mockRequest = createMockRequest({
-            headers: {
-              referer: `http://localhost${routes.ENTER_MULTIPLE_COORDINATES}`
-            }
-          })
+          const mockRequest = createMockRequest()
+          mockRequest.headers = {
+            referer: `http://localhost${routes.ENTER_MULTIPLE_COORDINATES}`
+          }
 
           await reviewSiteDetailsController.handler(mockRequest, h)
 
@@ -667,7 +723,9 @@ describe('#reviewSiteDetails', () => {
               coordinateSystem:
                 'WGS84 (World Geodetic System 1984)\nLatitude and longitude',
               polygonCoordinates: []
-            }
+            },
+            siteDetailsData:
+              '{"coordinatesType":"coordinates","coordinateSystem":"wgs84","coordinatesEntry":"multiple","coordinates":[]}'
           })
         })
 
@@ -692,13 +750,15 @@ describe('#reviewSiteDetails', () => {
           getExemptionCacheSpy.mockReturnValueOnce(
             exemptionWithIncompleteCoordinates
           )
+          getCoordinateSystemSpy.mockReturnValueOnce({
+            coordinateSystem: COORDINATE_SYSTEMS.WGS84
+          })
 
           const h = createMockHandler()
-          const mockRequest = createMockRequest({
-            headers: {
-              referer: `http://localhost${routes.ENTER_MULTIPLE_COORDINATES}`
-            }
-          })
+          const mockRequest = createMockRequest()
+          mockRequest.headers = {
+            referer: `http://localhost${routes.ENTER_MULTIPLE_COORDINATES}`
+          }
 
           await reviewSiteDetailsController.handler(mockRequest, h)
 
@@ -722,7 +782,9 @@ describe('#reviewSiteDetails', () => {
                   value: '78.123456, 78.123456'
                 }
               ]
-            }
+            },
+            siteDetailsData:
+              '{"coordinatesType":"coordinates","coordinateSystem":"wgs84","coordinatesEntry":"multiple","coordinates":[{"latitude":"55.123456","longitude":"55.123456"},{"latitude":"","longitude":"33.987654"},{"latitude":"78.123456","longitude":"78.123456"},{"latitude":null,"longitude":null}]}'
           })
         })
 
@@ -802,7 +864,7 @@ describe('#reviewSiteDetails', () => {
             method: 'GET',
             url: routes.REVIEW_SITE_DETAILS,
             headers: {
-              referer: `http://localhost/${routes.ENTER_MULTIPLE_COORDINATES}`
+              referer: `http://localhost${routes.ENTER_MULTIPLE_COORDINATES}`
             }
           })
 
@@ -934,45 +996,11 @@ describe('#reviewSiteDetails', () => {
         expect(h.redirect).toHaveBeenCalledWith(routes.TASK_LIST)
       })
 
-      test('should save file upload data with metadata', async () => {
-        const mockFileUploadExemption = {
-          ...mockExemption,
-          siteDetails: {
-            coordinatesType: 'file',
-            fileUploadType: 'kml',
-            uploadedFile: {
-              filename: 'test-site.kml',
-              s3Location: {
-                s3Bucket: 'test-bucket',
-                s3Key: 'test-key',
-                checksumSha256: 'test-checksum'
-              }
-            },
-            geoJSON: {
-              type: 'FeatureCollection',
-              features: [
-                {
-                  type: 'Feature',
-                  geometry: {
-                    type: 'Point',
-                    coordinates: [51.5074, -0.1278]
-                  }
-                }
-              ]
-            },
-            featureCount: 1
-          }
-        }
-
+      test('Should save file upload data with display metadata for file upload flow', async () => {
+        const mockFileUploadExemption = createFileUploadExemptionWithS3()
         getExemptionCacheSpy.mockReturnValueOnce(mockFileUploadExemption)
 
-        const request = {
-          logger: {
-            info: jest.fn(),
-            error: jest.fn(),
-            debug: jest.fn()
-          }
-        }
+        const request = createMockRequest()
         const h = { redirect: jest.fn() }
 
         await reviewSiteDetailsSubmitController.handler(request, h)
@@ -981,31 +1009,7 @@ describe('#reviewSiteDetails', () => {
           expect.any(Object),
           '/exemption/site-details',
           {
-            siteDetails: {
-              coordinatesType: 'file',
-              fileUploadType: 'kml',
-              geoJSON: {
-                type: 'FeatureCollection',
-                features: [
-                  {
-                    type: 'Feature',
-                    geometry: {
-                      type: 'Point',
-                      coordinates: [51.5074, -0.1278]
-                    }
-                  }
-                ]
-              },
-              featureCount: 1,
-              uploadedFile: {
-                filename: 'test-site.kml'
-              },
-              s3Location: {
-                s3Bucket: 'test-bucket',
-                s3Key: 'test-key',
-                checksumSha256: 'test-checksum'
-              }
-            },
+            siteDetails: createExpectedSiteDetails(),
             id: mockExemption.id
           }
         )
@@ -1198,7 +1202,7 @@ describe('#reviewSiteDetails', () => {
             url: routes.REVIEW_SITE_DETAILS,
             payload: {},
             headers: {
-              referer: `http://localhost/${routes.ENTER_MULTIPLE_COORDINATES}`
+              referer: `http://localhost${routes.ENTER_MULTIPLE_COORDINATES}`
             }
           })
 
@@ -1246,7 +1250,7 @@ describe('#reviewSiteDetails', () => {
             url: routes.REVIEW_SITE_DETAILS,
             payload: {},
             headers: {
-              referer: `http://localhost/${routes.ENTER_MULTIPLE_COORDINATES}`
+              referer: `http://localhost${routes.ENTER_MULTIPLE_COORDINATES}`
             }
           })
 

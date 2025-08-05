@@ -1,16 +1,18 @@
-import { createServer } from '~/src/server/index.js'
-import {
-  fileUploadController,
-  FILE_UPLOAD_VIEW_ROUTE
-} from '~/src/server/exemption/site-details/file-upload/controller.js'
-import * as cacheUtils from '~/src/server/common/helpers/session-cache/utils.js'
-import * as cdpUploadService from '~/src/services/cdp-upload-service/index.js'
-import { mockExemption } from '~/src/server/test-helpers/mocks.js'
-import { routes } from '~/src/server/common/constants/routes.js'
 import { config } from '~/src/config/config.js'
+import { routes } from '~/src/server/common/constants/routes.js'
+import * as cacheUtils from '~/src/server/common/helpers/session-cache/utils.js'
+import {
+  FILE_UPLOAD_VIEW_ROUTE,
+  fileUploadController
+} from '~/src/server/exemption/site-details/file-upload/controller.js'
+import { createServer } from '~/src/server/index.js'
+import { mockExemption } from '~/src/server/test-helpers/mocks.js'
+import * as cdpUploadService from '~/src/services/cdp-upload-service/index.js'
 
 jest.mock('~/src/server/common/helpers/session-cache/utils.js')
 jest.mock('~/src/services/cdp-upload-service/index.js')
+
+/* eslint jest/expect-expect: ["error", { "assertFunctionNames": ["expect", "expectViewCalledWith"] }] */
 
 describe('#fileUpload', () => {
   /** @type {Server} */
@@ -18,6 +20,60 @@ describe('#fileUpload', () => {
   let getExemptionCacheSpy
   let updateExemptionSiteDetailsSpy
   let mockCdpService
+
+  const createMockRequest = () => ({
+    logger: {
+      debug: jest.fn(),
+      warn: jest.fn(),
+      error: jest.fn()
+    },
+    server: {
+      plugins: {
+        crumb: {
+          generate: jest.fn().mockReturnValue('mock-csrf-token')
+        }
+      }
+    }
+  })
+
+  const createMockH = () => ({
+    view: jest.fn(),
+    redirect: jest.fn()
+  })
+
+  const createStandardUploadConfig = () => ({
+    uploadId: 'test-upload-id',
+    uploadUrl: 'https://upload.example.com',
+    statusUrl: 'https://status.example.com',
+    maxFileSize: 50000000
+  })
+
+  const setupExemptionWithFileType = (
+    fileUploadType,
+    additionalSiteDetails = {}
+  ) => {
+    getExemptionCacheSpy.mockReturnValue({
+      ...mockExemption,
+      siteDetails: { fileUploadType, ...additionalSiteDetails }
+    })
+  }
+
+  const setupStandardFileUploadTest = async (
+    fileUploadType,
+    mockRequest,
+    mockH
+  ) => {
+    setupExemptionWithFileType(fileUploadType)
+    mockCdpService.initiate.mockResolvedValue(createStandardUploadConfig())
+    await fileUploadController.handler(mockRequest, mockH)
+  }
+
+  const expectViewCalledWith = (mockH, expectedContent) => {
+    expect(mockH.view).toHaveBeenCalledWith(
+      FILE_UPLOAD_VIEW_ROUTE,
+      expect.objectContaining(expectedContent)
+    )
+  }
 
   beforeAll(async () => {
     server = await createServer()
@@ -50,30 +106,12 @@ describe('#fileUpload', () => {
   })
 
   describe('#fileUploadController', () => {
-    const mockRequest = {
-      logger: {
-        debug: jest.fn(),
-        warn: jest.fn(),
-        error: jest.fn()
-      },
-      server: {
-        plugins: {
-          crumb: {
-            generate: jest.fn().mockReturnValue('mock-csrf-token')
-          }
-        }
-      }
-    }
-
-    const mockH = {
-      view: jest.fn(),
-      redirect: jest.fn()
-    }
+    let mockRequest
+    let mockH
 
     beforeEach(() => {
-      mockH.view.mockClear()
-      mockH.redirect.mockClear()
-      mockRequest.server.plugins.crumb.generate.mockClear()
+      mockRequest = createMockRequest()
+      mockH = createMockH()
     })
 
     describe('AC1 - Display page based on file type selection', () => {
@@ -93,137 +131,60 @@ describe('#fileUpload', () => {
         )
       })
 
-      test('Should display KML upload page with correct title and content', async () => {
-        // Given - KML file type selected
-        getExemptionCacheSpy.mockReturnValue({
-          ...mockExemption,
-          siteDetails: { fileUploadType: 'kml' }
-        })
+      test.each([
+        {
+          fileType: 'kml',
+          expectedHeading: 'Upload a KML file',
+          expectedAccept: '.kml'
+        },
+        {
+          fileType: 'shapefile',
+          expectedHeading: 'Upload a Shapefile',
+          expectedAccept: '.zip'
+        }
+      ])(
+        'Should display $fileType upload page with correct title and content',
+        async ({ fileType, expectedHeading, expectedAccept }) => {
+          // Given - File type selected
+          // When
+          await setupStandardFileUploadTest(fileType, mockRequest, mockH)
 
-        mockCdpService.initiate.mockResolvedValue({
-          uploadId: 'test-upload-id',
-          uploadUrl: 'https://upload.example.com',
-          statusUrl: 'https://status.example.com',
-          maxFileSize: 50000000
-        })
-
-        // When
-        await fileUploadController.handler(mockRequest, mockH)
-
-        // Then
-        expect(mockH.view).toHaveBeenCalledWith(
-          FILE_UPLOAD_VIEW_ROUTE,
-          expect.objectContaining({
+          // Then
+          expectViewCalledWith(mockH, {
             pageTitle: 'Upload a file',
-            heading: 'Upload a KML file',
+            heading: expectedHeading,
             projectName: 'Test Project',
-            acceptAttribute: '.kml',
-            fileUploadType: 'kml',
+            acceptAttribute: expectedAccept,
+            fileUploadType: fileType,
             backLink: routes.CHOOSE_FILE_UPLOAD_TYPE,
             cancelLink: `${routes.TASK_LIST}?cancel=site-details`
           })
-        )
-      })
-
-      test('Should display Shapefile upload page with correct title and content', async () => {
-        // Given - Shapefile type selected
-        getExemptionCacheSpy.mockReturnValue({
-          ...mockExemption,
-          siteDetails: { fileUploadType: 'shapefile' }
-        })
-
-        mockCdpService.initiate.mockResolvedValue({
-          uploadId: 'test-upload-id',
-          uploadUrl: 'https://upload.example.com',
-          statusUrl: 'https://status.example.com',
-          maxFileSize: 50000000
-        })
-
-        // When
-        await fileUploadController.handler(mockRequest, mockH)
-
-        // Then
-        expect(mockH.view).toHaveBeenCalledWith(
-          FILE_UPLOAD_VIEW_ROUTE,
-          expect.objectContaining({
-            pageTitle: 'Upload a file',
-            heading: 'Upload a Shapefile',
-            projectName: 'Test Project',
-            acceptAttribute: '.zip',
-            fileUploadType: 'shapefile'
-          })
-        )
-      })
+        }
+      )
     })
 
     describe('AC2 & AC3 - File upload functionality (Choose file & Drop file)', () => {
-      test('Should initialize CDP upload session for KML', async () => {
-        // Given - KML file type
-        getExemptionCacheSpy.mockReturnValue({
-          ...mockExemption,
-          siteDetails: { fileUploadType: 'kml' }
-        })
+      test.each(['kml', 'shapefile'])(
+        'Should initialize CDP upload session for %s',
+        async (fileType) => {
+          // Given - File type
+          await setupStandardFileUploadTest(fileType, mockRequest, mockH)
 
-        mockCdpService.initiate.mockResolvedValue({
-          uploadId: 'test-upload-id',
-          uploadUrl: 'https://upload.example.com',
-          statusUrl: 'https://status.example.com',
-          maxFileSize: 50000000
-        })
+          // Then - Should get CDP service without MIME types
+          expect(cdpUploadService.getCdpUploadService).toHaveBeenCalledWith()
 
-        // When
-        await fileUploadController.handler(mockRequest, mockH)
-
-        // Then - Should get CDP service without MIME types
-        expect(cdpUploadService.getCdpUploadService).toHaveBeenCalledWith()
-
-        // And CDP should be initiated with correct parameters
-        expect(mockCdpService.initiate).toHaveBeenCalledWith({
-          redirectUrl: routes.UPLOAD_AND_WAIT,
-          s3Path: 'exemptions',
-          s3Bucket: config.get('cdpUploader').s3Bucket
-        })
-      })
-
-      test('Should initialize CDP upload session for Shapefile', async () => {
-        // Given - Shapefile type
-        getExemptionCacheSpy.mockReturnValue({
-          ...mockExemption,
-          siteDetails: { fileUploadType: 'shapefile' }
-        })
-
-        mockCdpService.initiate.mockResolvedValue({
-          uploadId: 'test-upload-id',
-          uploadUrl: 'https://upload.example.com',
-          statusUrl: 'https://status.example.com',
-          maxFileSize: 50000000
-        })
-
-        // When
-        await fileUploadController.handler(mockRequest, mockH)
-
-        // Then - Should get CDP service without MIME types
-        expect(cdpUploadService.getCdpUploadService).toHaveBeenCalledWith()
-      })
+          // And CDP should be initiated with correct parameters
+          expect(mockCdpService.initiate).toHaveBeenCalledWith({
+            redirectUrl: routes.UPLOAD_AND_WAIT,
+            s3Path: 'exemptions',
+            s3Bucket: config.get('cdpUploader').s3Bucket
+          })
+        }
+      )
 
       test('Should store upload configuration in session', async () => {
-        // Given
-        getExemptionCacheSpy.mockReturnValue({
-          ...mockExemption,
-          siteDetails: { fileUploadType: 'kml' }
-        })
-
-        const mockUploadConfig = {
-          uploadId: 'test-upload-id',
-          uploadUrl: 'https://upload.example.com',
-          statusUrl: 'https://status.example.com',
-          maxFileSize: 50000000
-        }
-
-        mockCdpService.initiate.mockResolvedValue(mockUploadConfig)
-
-        // When
-        await fileUploadController.handler(mockRequest, mockH)
+        // Given & When
+        await setupStandardFileUploadTest('kml', mockRequest, mockH)
 
         // Then - Should store upload config in session
         expect(updateExemptionSiteDetailsSpy).toHaveBeenCalledWith(
@@ -401,61 +362,26 @@ describe('#fileUpload', () => {
       })
 
       test('Should include upload form configuration when showing upload form', async () => {
-        // Given
-        getExemptionCacheSpy.mockReturnValue({
-          ...mockExemption,
-          siteDetails: { fileUploadType: 'kml' }
-        })
-
-        const mockUploadConfig = {
-          uploadId: 'test-upload-id',
-          uploadUrl: 'https://upload.example.com',
-          statusUrl: 'https://status.example.com',
-          maxFileSize: 50000000
-        }
-
-        mockCdpService.initiate.mockResolvedValue(mockUploadConfig)
-
-        // When
-        await fileUploadController.handler(mockRequest, mockH)
+        // Given & When
+        await setupStandardFileUploadTest('kml', mockRequest, mockH)
 
         // Then - Should include upload configuration
-        expect(mockH.view).toHaveBeenCalledWith(
-          FILE_UPLOAD_VIEW_ROUTE,
-          expect.objectContaining({
-            uploadUrl: 'https://upload.example.com',
-            maxFileSize: 50000000,
-            acceptAttribute: '.kml'
-          })
-        )
+        expectViewCalledWith(mockH, {
+          uploadUrl: 'https://upload.example.com',
+          maxFileSize: 50000000,
+          acceptAttribute: '.kml'
+        })
       })
     })
   })
 
   describe('Edge cases and error scenarios', () => {
-    const mockRequest = {
-      logger: {
-        debug: jest.fn(),
-        warn: jest.fn(),
-        error: jest.fn()
-      },
-      server: {
-        plugins: {
-          crumb: {
-            generate: jest.fn().mockReturnValue('mock-csrf-token')
-          }
-        }
-      }
-    }
-
-    const mockH = {
-      view: jest.fn(),
-      redirect: jest.fn()
-    }
+    let mockRequest
+    let mockH
 
     beforeEach(() => {
-      mockH.view.mockClear()
-      mockH.redirect.mockClear()
+      mockRequest = createMockRequest()
+      mockH = createMockH()
     })
 
     test('Should handle missing siteDetails in exemption cache', async () => {
@@ -541,95 +467,171 @@ describe('#fileUpload', () => {
   })
 
   describe('ML-70 requirements validation', () => {
-    const mockRequest = {
-      logger: {
-        debug: jest.fn(),
-        warn: jest.fn(),
-        error: jest.fn()
-      }
-    }
-
-    const mockH = {
-      view: jest.fn(),
-      redirect: jest.fn()
-    }
+    let mockRequest
+    let mockH
 
     beforeEach(() => {
-      mockH.view.mockClear()
-      mockH.redirect.mockClear()
+      mockRequest = createMockRequest()
+      mockH = createMockH()
     })
 
     test('Should support 50MB maximum file size as per ML-70', async () => {
       // Given
-      getExemptionCacheSpy.mockReturnValue({
-        ...mockExemption,
-        siteDetails: { fileUploadType: 'kml' }
-      })
-
-      mockCdpService.initiate.mockResolvedValue({
-        uploadId: 'test-upload-id',
-        uploadUrl: 'https://upload.example.com',
-        statusUrl: 'https://status.example.com',
-        maxFileSize: 50000000 // 50MB as per ML-70
-      })
-
       // When
-      await fileUploadController.handler(mockRequest, mockH)
+      await setupStandardFileUploadTest('kml', mockRequest, mockH)
 
       // Then - Should include 50MB file size limit
-      expect(mockH.view).toHaveBeenCalledWith(
-        FILE_UPLOAD_VIEW_ROUTE,
-        expect.objectContaining({
-          maxFileSize: 50000000
-        })
-      )
+      expectViewCalledWith(mockH, {
+        maxFileSize: 50000000
+      })
     })
 
-    test('Should support both KML and Shapefile types as per ML-70', async () => {
-      // Test both file types are handled correctly
-      const fileTypes = [
-        {
-          type: 'kml',
-          expectedHeading: 'Upload a KML file',
-          expectedAccept: '.kml'
-        },
-        {
-          type: 'shapefile',
-          expectedHeading: 'Upload a Shapefile',
-          expectedAccept: '.zip'
-        }
-      ]
-
-      for (const fileType of fileTypes) {
+    test.each([
+      {
+        type: 'kml',
+        expectedHeading: 'Upload a KML file',
+        expectedAccept: '.kml'
+      },
+      {
+        type: 'shapefile',
+        expectedHeading: 'Upload a Shapefile',
+        expectedAccept: '.zip'
+      }
+    ])(
+      'Should support $type file type as per ML-70',
+      async ({ type, expectedHeading, expectedAccept }) => {
         // Given
-        getExemptionCacheSpy.mockReturnValue({
-          ...mockExemption,
-          siteDetails: { fileUploadType: fileType.type }
-        })
-
-        mockCdpService.initiate.mockResolvedValue({
-          uploadId: 'test-upload-id',
-          uploadUrl: 'https://upload.example.com',
-          statusUrl: 'https://status.example.com',
-          maxFileSize: 50000000
-        })
-
-        mockH.view.mockClear()
-
-        // When
-        await fileUploadController.handler(mockRequest, mockH)
+        await setupStandardFileUploadTest(type, mockRequest, mockH)
 
         // Then - Should get CDP service without MIME types
         expect(cdpUploadService.getCdpUploadService).toHaveBeenCalledWith()
 
-        expect(mockH.view).toHaveBeenCalledWith(
-          FILE_UPLOAD_VIEW_ROUTE,
-          expect.objectContaining({
-            heading: fileType.expectedHeading,
-            acceptAttribute: fileType.expectedAccept,
-            fileUploadType: fileType.type
-          })
+        expectViewCalledWith(mockH, {
+          heading: expectedHeading,
+          acceptAttribute: expectedAccept,
+          fileUploadType: type
+        })
+      }
+    )
+  })
+
+  describe('Mutation testing coverage - surviving mutants', () => {
+    let mockRequest, mockH
+
+    beforeEach(() => {
+      mockRequest = createMockRequest()
+      mockH = createMockH()
+    })
+
+    const setupMutationTest = async (siteDetails, shouldMockCdp = true) => {
+      getExemptionCacheSpy.mockReturnValue({
+        ...mockExemption,
+        siteDetails
+      })
+      if (shouldMockCdp) {
+        mockCdpService.initiate.mockResolvedValue(createStandardUploadConfig())
+      }
+      await fileUploadController.handler(mockRequest, mockH)
+    }
+
+    test('Should map error message correctly in error summary', async () => {
+      const testMessage = 'Test error message'
+      await setupMutationTest({
+        fileUploadType: 'kml',
+        uploadError: {
+          message: testMessage,
+          fieldName: 'file',
+          fileType: 'kml'
+        }
+      })
+
+      expect(mockH.view).toHaveBeenCalledWith(
+        FILE_UPLOAD_VIEW_ROUTE,
+        expect.objectContaining({
+          errorSummary: expect.arrayContaining([
+            expect.objectContaining({
+              text: testMessage
+            })
+          ])
+        })
+      )
+    })
+
+    test('Should log fileUploadType debug message', async () => {
+      await setupMutationTest({ fileUploadType: 'kml' })
+
+      expect(mockRequest.logger.debug).toHaveBeenCalledWith(
+        'fileUploadController: fileUploadType [kml]'
+      )
+    })
+
+    test.each([
+      { type: 'empty string', value: '' },
+      { type: 'whitespace', value: '   ' }
+    ])('Should redirect when fileUploadType is $type', async ({ value }) => {
+      await setupMutationTest({ fileUploadType: value }, false)
+
+      expect(mockH.redirect).toHaveBeenCalledWith(
+        routes.CHOOSE_FILE_UPLOAD_TYPE
+      )
+      expect(mockH.view).not.toHaveBeenCalled()
+    })
+
+    test('Should log warning when uploadedFile exists without uploadError', async () => {
+      await setupMutationTest({
+        fileUploadType: 'kml',
+        uploadedFile: {
+          filename: 'test.kml',
+          fileSize: 1024
+        }
+      })
+
+      expect(mockRequest.logger.debug).toHaveBeenCalledWith(
+        'Uploaded file without error found, but starting a new upload session'
+      )
+    })
+
+    test.each([
+      {
+        scenario: 'uploadedFile exists with uploadError',
+        siteDetails: {
+          fileUploadType: 'kml',
+          uploadedFile: { filename: 'test.kml', fileSize: 1024 },
+          uploadError: {
+            message: 'File has virus',
+            fieldName: 'file',
+            fileType: 'kml'
+          }
+        }
+      },
+      {
+        scenario: 'no uploadedFile exists',
+        siteDetails: { fileUploadType: 'kml' }
+      },
+      {
+        scenario: 'uploadedFile is falsy with no uploadError',
+        siteDetails: { fileUploadType: 'kml', uploadedFile: null }
+      }
+    ])('Should not log warning when $scenario', async ({ siteDetails }) => {
+      await setupMutationTest(siteDetails)
+
+      expect(mockRequest.logger.debug).not.toHaveBeenCalledWith(
+        'Uploaded file without error found, but starting a new upload session'
+      )
+    })
+
+    test('Should handle all falsy fileUploadType values with redirect', async () => {
+      const falsyValues = [null, undefined, false, 0, '']
+
+      for (const falsyValue of falsyValues) {
+        jest.clearAllMocks()
+        await setupMutationTest({ fileUploadType: falsyValue }, false)
+
+        expect(mockH.redirect).toHaveBeenCalledWith(
+          routes.CHOOSE_FILE_UPLOAD_TYPE
         )
+        expect(mockH.view).not.toHaveBeenCalled()
+        expect(mockCdpService.initiate).not.toHaveBeenCalled()
       }
     })
   })

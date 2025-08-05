@@ -1,3 +1,6 @@
+import Boom from '@hapi/boom'
+import { COORDINATE_SYSTEMS } from '~/src/server/common/constants/exemptions.js'
+import { routes } from '~/src/server/common/constants/routes.js'
 import {
   buildManualCoordinateSummaryData,
   getCoordinateDisplayText,
@@ -6,18 +9,15 @@ import {
   getFileUploadSummaryData,
   getPolygonCoordinatesDisplayData,
   getReviewSummaryText,
+  getSiteDetails,
   getSiteDetailsBackLink,
   handleSubmissionError,
-  getSiteDetails,
   prepareFileUploadDataForSave,
   prepareManualCoordinateDataForSave,
   renderFileUploadReview,
   renderManualCoordinateReview
 } from '~/src/server/exemption/site-details/review-site-details/utils.js'
-import { COORDINATE_SYSTEMS } from '~/src/server/common/constants/exemptions.js'
 import { mockExemption } from '~/src/server/test-helpers/mocks.js'
-import { routes } from '~/src/server/common/constants/routes.js'
-import Boom from '@hapi/boom'
 
 import { getCoordinateSystem } from '~/src/server/common/helpers/session-cache/utils.js'
 
@@ -822,13 +822,12 @@ describe('siteDetails utils', () => {
         pageTitle: 'Review site details'
       }
 
-      renderFileUploadReview(
-        mockH,
+      renderFileUploadReview(mockH, {
         exemption,
         siteDetails,
         previousPage,
         reviewSiteDetailsPageData
-      )
+      })
 
       expect(mockH.view).toHaveBeenCalledWith(
         'exemption/site-details/review-site-details/file-upload-review',
@@ -884,14 +883,12 @@ describe('siteDetails utils', () => {
         pageTitle: 'Review site details'
       }
 
-      renderManualCoordinateReview(
-        mockH,
-        mockRequest,
+      renderManualCoordinateReview(mockH, mockRequest, {
         exemption,
         siteDetails,
         previousPage,
         reviewSiteDetailsPageData
-      )
+      })
 
       expect(mockH.view).toHaveBeenCalledWith(
         'exemption/site-details/review-site-details/index',
@@ -906,7 +903,17 @@ describe('siteDetails utils', () => {
               'WGS84 (World Geodetic System 1984)\nLatitude and longitude',
             coordinates: '51.5074, -0.1278',
             width: '100 metres'
-          }
+          },
+          siteDetailsData: JSON.stringify({
+            coordinatesType: 'coordinates',
+            coordinateSystem: 'wgs84',
+            coordinatesEntry: 'single',
+            coordinates: {
+              latitude: '51.5074',
+              longitude: '-0.1278'
+            },
+            circleWidth: '100'
+          })
         }
       )
     })

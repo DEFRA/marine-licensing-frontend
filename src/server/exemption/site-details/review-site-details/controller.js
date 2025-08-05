@@ -42,21 +42,18 @@ export const reviewSiteDetailsController = {
     )
 
     return siteDetails.coordinatesType === 'file'
-      ? renderFileUploadReview(
-          h,
+      ? renderFileUploadReview(h, {
           exemption,
           siteDetails,
           previousPage,
           reviewSiteDetailsPageData
-        )
-      : renderManualCoordinateReview(
-          h,
-          request,
+        })
+      : renderManualCoordinateReview(h, request, {
           exemption,
           siteDetails,
           previousPage,
           reviewSiteDetailsPageData
-        )
+        })
   }
 }
 

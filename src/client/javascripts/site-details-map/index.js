@@ -35,20 +35,18 @@ export class SiteDetailsMap extends Component {
 
   scheduleMapInitialization() {
     setTimeout(() => {
-      this.initializeMap().catch(() => {
+      this.initialiseMap().catch(() => {
         this.showError()
       })
     }, 0)
   }
 
-  async initializeMap() {
+  async initialiseMap() {
     const olModules = await this.moduleLoader.loadModules()
 
     this.mapFactory = new MapFactory(olModules)
     const { vectorSource, vectorLayer } = this.mapFactory.createMapLayers()
-    const geoJSONFormat = this.mapFactory.initializeGeoJSONFormat(
-      olModules.GeoJSON
-    )
+    const geoJSONFormat = this.mapFactory.initialiseGeoJSONFormat()
 
     this.siteVisualizer = new SiteVisualizer(
       olModules,

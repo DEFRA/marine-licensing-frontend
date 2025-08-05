@@ -23,6 +23,7 @@ describe('MapFactory', () => {
       Fill: jest.fn(),
       Stroke: jest.fn(),
       Circle: jest.fn(),
+      GeoJSON: jest.fn(),
 
       Attribution: jest.fn(),
       defaultControls: jest.fn().mockReturnValue({
@@ -249,15 +250,14 @@ describe('MapFactory', () => {
     })
   })
 
-  describe('initializeGeoJSONFormat', () => {
+  describe('initialiseGeoJSONFormat', () => {
     test('should create GeoJSON format instance', () => {
-      const MockGeoJSON = jest.fn()
       const mockInstance = {}
-      MockGeoJSON.mockReturnValue(mockInstance)
+      mockOlModules.GeoJSON.mockReturnValue(mockInstance)
 
-      const result = mapFactory.initializeGeoJSONFormat(MockGeoJSON)
+      const result = mapFactory.initialiseGeoJSONFormat()
 
-      expect(MockGeoJSON).toHaveBeenCalled()
+      expect(mockOlModules.GeoJSON).toHaveBeenCalled()
       expect(result).toBe(mockInstance)
     })
   })

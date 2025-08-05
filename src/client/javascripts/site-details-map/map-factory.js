@@ -106,12 +106,12 @@ class MapFactory {
   }
 
   /**
-   * Initialize GeoJSON format for reading features
-   * @param {Function} GeoJSONClass - OpenLayers GeoJSON class
+   * initialise GeoJSON format for reading features
    * @returns {object} GeoJSON format instance
    */
-  initializeGeoJSONFormat(GeoJSONClass) {
-    return new GeoJSONClass()
+  initialiseGeoJSONFormat() {
+    const { GeoJSON } = this.olModules
+    return new GeoJSON()
   }
 }
 

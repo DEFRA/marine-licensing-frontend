@@ -102,14 +102,14 @@ describe('SiteDetailsMap', () => {
         vectorSource: {},
         vectorLayer: {}
       }),
-      initializeGeoJSONFormat: jest.fn().mockReturnValue({}),
+      initialiseGeoJSONFormat: jest.fn().mockReturnValue({}),
       createMap: jest.fn().mockReturnValue({})
     }))
     OpenLayersModuleLoader.mockImplementation(() => mockModuleLoader)
   })
 
   describe('constructor', () => {
-    test('should initialize with default options', () => {
+    test('should initialise with default options', () => {
       siteDetailsMap = new SiteDetailsMap(mockRoot)
 
       expect(siteDetailsMap.options.center).toEqual([-3.5, 54.0])
@@ -126,7 +126,7 @@ describe('SiteDetailsMap', () => {
       expect(siteDetailsMap.options.center).toEqual([0, 51])
     })
 
-    test('should initialize service dependencies', () => {
+    test('should initialise service dependencies', () => {
       siteDetailsMap = new SiteDetailsMap(mockRoot)
 
       expect(CoordinateParser).toHaveBeenCalled()
@@ -410,18 +410,18 @@ describe('SiteDetailsMap', () => {
   describe('scheduleMapInitialization', () => {
     test('should call setTimeout with initialization function', () => {
       siteDetailsMap = new SiteDetailsMap(mockRoot)
-      jest.spyOn(siteDetailsMap, 'initializeMap').mockResolvedValue()
+      jest.spyOn(siteDetailsMap, 'initialiseMap').mockResolvedValue()
 
       siteDetailsMap.scheduleMapInitialization()
 
       expect(mockSetTimeout).toHaveBeenCalledWith(expect.any(Function), 0)
     })
 
-    test('should handle initializeMap errors', async () => {
+    test('should handle initialiseMap errors', async () => {
       siteDetailsMap = new SiteDetailsMap(mockRoot)
       const showErrorSpy = jest.spyOn(siteDetailsMap, 'showError')
       jest
-        .spyOn(siteDetailsMap, 'initializeMap')
+        .spyOn(siteDetailsMap, 'initialiseMap')
         .mockRejectedValue(new Error('Init failed'))
 
       // Get the callback function passed to setTimeout
@@ -508,7 +508,7 @@ describe('SiteDetailsMap', () => {
     })
   })
 
-  describe('initializeMap with dependency injection', () => {
+  describe('initialiseMap with dependency injection', () => {
     test('should use injected module loader to load OpenLayers modules', async () => {
       const customModuleLoader = {
         loadModules: jest.fn().mockResolvedValue({
@@ -535,7 +535,7 @@ describe('SiteDetailsMap', () => {
 
       siteDetailsMap = new SiteDetailsMap(mockRoot, {}, customModuleLoader)
 
-      await siteDetailsMap.initializeMap()
+      await siteDetailsMap.initialiseMap()
 
       expect(customModuleLoader.loadModules).toHaveBeenCalled()
       expect(MapFactory).toHaveBeenCalledWith(
@@ -555,7 +555,7 @@ describe('SiteDetailsMap', () => {
 
       siteDetailsMap = new SiteDetailsMap(mockRoot, {}, failingModuleLoader)
 
-      await expect(siteDetailsMap.initializeMap()).rejects.toThrow(
+      await expect(siteDetailsMap.initialiseMap()).rejects.toThrow(
         'Module loading failed'
       )
       expect(failingModuleLoader.loadModules).toHaveBeenCalled()

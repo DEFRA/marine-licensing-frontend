@@ -1,4 +1,3 @@
-import CoordinateParser from './coordinate-parser.js'
 import { SiteDetailsMap } from './index.js'
 import MapFactory from './map-factory.js'
 import OpenLayersModuleLoader from './openlayers-module-loader.js'
@@ -24,7 +23,6 @@ jest.mock('govuk-frontend', () => ({
   }
 }))
 
-jest.mock('./coordinate-parser.js')
 jest.mock('./openlayers-module-loader.js')
 jest.mock('./site-data-loader.js')
 jest.mock('./map-factory.js')
@@ -39,8 +37,27 @@ describe('SiteDetailsMap', () => {
   let siteDetailsMap
   let mockDataLoader
   let mockSiteVisualizer
-  let mockCoordinateParser
   let mockModuleLoader
+
+  // Helper functions to reduce test duplication
+  const setupFileCoordinatesTest = (
+    siteDetails = { geoJSON: { features: [] } }
+  ) => {
+    mockDataLoader.hasValidFileCoordinates.mockReturnValue(true)
+    mockDataLoader.hasValidManualCoordinates.mockReturnValue(false)
+    return siteDetails
+  }
+
+  const setupManualCoordinatesTest = (
+    siteDetails = {
+      coordinateSystem: 'WGS84',
+      coordinates: { latitude: '51.5', longitude: '-0.1' }
+    }
+  ) => {
+    mockDataLoader.hasValidFileCoordinates.mockReturnValue(false)
+    mockDataLoader.hasValidManualCoordinates.mockReturnValue(true)
+    return siteDetails
+  }
 
   beforeEach(() => {
     jest.clearAllMocks()
@@ -62,13 +79,10 @@ describe('SiteDetailsMap', () => {
       centreMapView: jest.fn(),
       displayCircularSite: jest.fn(),
       displayPointSite: jest.fn(),
+      displayManualCoordinates: jest.fn(),
       olModules: {
         fromLonLat: jest.fn()
       }
-    }
-
-    mockCoordinateParser = {
-      parseCoordinates: jest.fn()
     }
 
     mockModuleLoader = {
@@ -96,7 +110,6 @@ describe('SiteDetailsMap', () => {
 
     SiteDataLoader.mockImplementation(() => mockDataLoader)
     SiteVisualizer.mockImplementation(() => mockSiteVisualizer)
-    CoordinateParser.mockImplementation(() => mockCoordinateParser)
     MapFactory.mockImplementation(() => ({
       createMapLayers: jest.fn().mockReturnValue({
         vectorSource: {},
@@ -129,7 +142,6 @@ describe('SiteDetailsMap', () => {
     test('should initialise service dependencies', () => {
       siteDetailsMap = new SiteDetailsMap(mockRoot)
 
-      expect(CoordinateParser).toHaveBeenCalled()
       expect(SiteDataLoader).toHaveBeenCalled()
       expect(OpenLayersModuleLoader).toHaveBeenCalled()
     })
@@ -190,9 +202,7 @@ describe('SiteDetailsMap', () => {
     })
 
     test('should validate file coordinates using data loader', () => {
-      const siteDetails = { geoJSON: { features: [] } }
-      mockDataLoader.hasValidFileCoordinates.mockReturnValue(true)
-      mockDataLoader.hasValidManualCoordinates.mockReturnValue(false)
+      const siteDetails = setupFileCoordinatesTest()
 
       siteDetailsMap.displaySiteDetails(siteDetails)
 
@@ -202,19 +212,16 @@ describe('SiteDetailsMap', () => {
     })
 
     test('should display manual coordinates when valid manual coordinates exist', () => {
-      const siteDetails = {
-        coordinateSystem: 'WGS84',
-        coordinates: { latitude: '51.5', longitude: '-0.1' }
-      }
-      mockDataLoader.hasValidFileCoordinates.mockReturnValue(false)
-      mockDataLoader.hasValidManualCoordinates.mockReturnValue(true)
-      mockCoordinateParser.parseCoordinates.mockReturnValue([1000, 2000])
+      const siteDetails = setupManualCoordinatesTest()
 
       const result = siteDetailsMap.displaySiteDetails(siteDetails)
 
       expect(result).toBe('manual')
       expect(mockSiteVisualizer.clearFeatures).toHaveBeenCalled()
       expect(mockDataLoader.hasValidManualCoordinates).toHaveBeenCalledWith(
+        siteDetails
+      )
+      expect(mockSiteVisualizer.displayManualCoordinates).toHaveBeenCalledWith(
         siteDetails
       )
     })
@@ -245,100 +252,16 @@ describe('SiteDetailsMap', () => {
     })
   })
 
-  describe('displayManualCoordinates', () => {
-    beforeEach(() => {
-      siteDetailsMap = new SiteDetailsMap(mockRoot)
-      siteDetailsMap.siteVisualizer = mockSiteVisualizer
-    })
-
-    test('should render point geometry when no circle width provided', () => {
-      const siteDetails = {
-        coordinateSystem: 'WGS84',
-        coordinates: { latitude: '51.5', longitude: '-0.1' }
-      }
-      const mapCoordinates = [1000, 2000]
-      mockCoordinateParser.parseCoordinates.mockReturnValue(mapCoordinates)
-
-      siteDetailsMap.displayManualCoordinates(siteDetails)
-
-      expect(mockCoordinateParser.parseCoordinates).toHaveBeenCalledWith(
-        'WGS84',
-        siteDetails.coordinates,
-        mockSiteVisualizer.olModules.fromLonLat
-      )
-      expect(mockSiteVisualizer.displayPointSite).toHaveBeenCalledWith(
-        mapCoordinates
-      )
-      expect(mockSiteVisualizer.centreMapView).toHaveBeenCalledWith(
-        mapCoordinates,
-        14
-      )
-    })
-
-    test('should render circular geometry when circle width provided', () => {
-      const siteDetails = {
-        coordinateSystem: 'OSGB36',
-        coordinates: { eastings: '530000', northings: '180000' },
-        circleWidth: 500
-      }
-      const mapCoordinates = [3000, 4000]
-      mockCoordinateParser.parseCoordinates.mockReturnValue(mapCoordinates)
-
-      siteDetailsMap.displayManualCoordinates(siteDetails)
-
-      expect(mockSiteVisualizer.displayCircularSite).toHaveBeenCalledWith(
-        mapCoordinates,
-        500
-      )
-      expect(mockSiteVisualizer.centreMapView).toHaveBeenCalledWith(
-        mapCoordinates,
-        14
-      )
-    })
-
-    test('should return early when coordinates are missing', () => {
-      const siteDetails = { coordinateSystem: 'WGS84' }
-
-      siteDetailsMap.displayManualCoordinates(siteDetails)
-
-      expect(mockCoordinateParser.parseCoordinates).not.toHaveBeenCalled()
-      expect(mockSiteVisualizer.displayPointSite).not.toHaveBeenCalled()
-    })
-
-    test('should return early when fromLonLat function is not available', () => {
-      const siteDetails = {
-        coordinates: { latitude: '51.5', longitude: '-0.1' }
-      }
-      siteDetailsMap.siteVisualizer = { ...mockSiteVisualizer, olModules: null }
-
-      siteDetailsMap.displayManualCoordinates(siteDetails)
-
-      expect(mockCoordinateParser.parseCoordinates).not.toHaveBeenCalled()
-    })
-
-    test('should return early when coordinate parsing fails', () => {
-      const siteDetails = {
-        coordinateSystem: 'INVALID',
-        coordinates: { latitude: '51.5', longitude: '-0.1' }
-      }
-      mockCoordinateParser.parseCoordinates.mockReturnValue(null)
-
-      siteDetailsMap.displayManualCoordinates(siteDetails)
-
-      expect(mockSiteVisualizer.displayPointSite).not.toHaveBeenCalled()
-      expect(mockSiteVisualizer.centreMapView).not.toHaveBeenCalled()
-    })
-  })
-
   describe('hasValidSiteDetails', () => {
     beforeEach(() => {
       siteDetailsMap = new SiteDetailsMap(mockRoot)
     })
 
     test('should return true when file coordinates are valid', () => {
-      const siteDetails = { coordinateSystem: 'WGS84', coordinatesType: 'file' }
-      mockDataLoader.hasValidFileCoordinates.mockReturnValue(true)
-      mockDataLoader.hasValidManualCoordinates.mockReturnValue(false)
+      const siteDetails = setupFileCoordinatesTest({
+        coordinateSystem: 'WGS84',
+        coordinatesType: 'file'
+      })
 
       const result = siteDetailsMap.hasValidSiteDetails(siteDetails)
 
@@ -349,12 +272,10 @@ describe('SiteDetailsMap', () => {
     })
 
     test('should return true when manual coordinates are valid', () => {
-      const siteDetails = {
+      const siteDetails = setupManualCoordinatesTest({
         coordinateSystem: 'WGS84',
         coordinatesType: 'coordinates'
-      }
-      mockDataLoader.hasValidFileCoordinates.mockReturnValue(false)
-      mockDataLoader.hasValidManualCoordinates.mockReturnValue(true)
+      })
 
       const result = siteDetailsMap.hasValidSiteDetails(siteDetails)
 
@@ -387,39 +308,6 @@ describe('SiteDetailsMap', () => {
     })
   })
 
-  describe('getFromLonLatFunction', () => {
-    beforeEach(() => {
-      siteDetailsMap = new SiteDetailsMap(mockRoot)
-    })
-
-    test('should return fromLonLat function when available', () => {
-      const mockFromLonLat = jest.fn()
-      siteDetailsMap.siteVisualizer = {
-        olModules: { fromLonLat: mockFromLonLat }
-      }
-
-      const result = siteDetailsMap.getFromLonLatFunction()
-
-      expect(result).toBe(mockFromLonLat)
-    })
-
-    test('should return null when siteVisualizer is not available', () => {
-      siteDetailsMap.siteVisualizer = null
-
-      const result = siteDetailsMap.getFromLonLatFunction()
-
-      expect(result).toBeNull()
-    })
-
-    test('should return null when olModules is not available', () => {
-      siteDetailsMap.siteVisualizer = { olModules: null }
-
-      const result = siteDetailsMap.getFromLonLatFunction()
-
-      expect(result).toBeNull()
-    })
-  })
-
   describe('scheduleMapInitialization', () => {
     test('should call setTimeout with initialization function', () => {
       siteDetailsMap = new SiteDetailsMap(mockRoot)
@@ -444,80 +332,6 @@ describe('SiteDetailsMap', () => {
       await callback()
 
       expect(showErrorSpy).toHaveBeenCalled()
-    })
-  })
-
-  describe('renderSiteGeometry', () => {
-    beforeEach(() => {
-      siteDetailsMap = new SiteDetailsMap(mockRoot)
-      siteDetailsMap.siteVisualizer = mockSiteVisualizer
-    })
-
-    test('should render circular site when circleWidth provided', () => {
-      const mapCoordinates = [1000, 2000]
-      const circleWidth = 500
-
-      const result = siteDetailsMap.renderSiteGeometry(
-        mapCoordinates,
-        circleWidth
-      )
-
-      expect(result).toBe('circle')
-      expect(mockSiteVisualizer.displayCircularSite).toHaveBeenCalledWith(
-        mapCoordinates,
-        circleWidth
-      )
-    })
-
-    test('should render point site when no circleWidth provided', () => {
-      const mapCoordinates = [1000, 2000]
-
-      const result = siteDetailsMap.renderSiteGeometry(mapCoordinates)
-
-      expect(result).toBe('point')
-      expect(mockSiteVisualizer.displayPointSite).toHaveBeenCalledWith(
-        mapCoordinates
-      )
-    })
-
-    test('should return null when no siteVisualizer available', () => {
-      siteDetailsMap.siteVisualizer = null
-      const mapCoordinates = [1000, 2000]
-
-      const result = siteDetailsMap.renderSiteGeometry(mapCoordinates)
-
-      expect(result).toBeNull()
-      expect(mockSiteVisualizer.displayCircularSite).not.toHaveBeenCalled()
-      expect(mockSiteVisualizer.displayPointSite).not.toHaveBeenCalled()
-    })
-  })
-
-  describe('centreMapOnCoordinates', () => {
-    beforeEach(() => {
-      siteDetailsMap = new SiteDetailsMap(mockRoot)
-      siteDetailsMap.siteVisualizer = mockSiteVisualizer
-    })
-
-    test('should centre map when siteVisualizer available', () => {
-      const mapCoordinates = [1000, 2000]
-
-      const result = siteDetailsMap.centreMapOnCoordinates(mapCoordinates)
-
-      expect(result).toBe(true)
-      expect(mockSiteVisualizer.centreMapView).toHaveBeenCalledWith(
-        mapCoordinates,
-        14
-      )
-    })
-
-    test('should return false when no siteVisualizer available', () => {
-      siteDetailsMap.siteVisualizer = null
-      const mapCoordinates = [1000, 2000]
-
-      const result = siteDetailsMap.centreMapOnCoordinates(mapCoordinates)
-
-      expect(result).toBe(false)
-      expect(mockSiteVisualizer.centreMapView).not.toHaveBeenCalled()
     })
   })
 

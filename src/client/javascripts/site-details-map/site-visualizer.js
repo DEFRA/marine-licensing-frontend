@@ -1,4 +1,5 @@
 import CircleGeometryCalculator from './circle-geometry-calculator.js'
+import CoordinateParser from './coordinate-parser.js'
 
 class SiteVisualizer {
   constructor(olModules, vectorSource, geoJSONFormat, map) {
@@ -6,6 +7,7 @@ class SiteVisualizer {
     this.vectorSource = vectorSource
     this.geoJSONFormat = geoJSONFormat
     this.map = map
+    this.coordinateParser = new CoordinateParser()
   }
 
   /**
@@ -74,6 +76,42 @@ class SiteVisualizer {
         maxZoom: MAX_ZOOM_LEVEL
       })
     }
+  }
+
+  /**
+   * Display manual coordinates (point or circle)
+   * @param {object} siteDetails - Site details with manual coordinates
+   */
+  displayManualCoordinates(siteDetails) {
+    const DETAILED_ZOOM_LEVEL = 14
+    const { coordinateSystem, coordinates, circleWidth } = siteDetails
+
+    if (!coordinates) {
+      return
+    }
+
+    const { fromLonLat } = this.olModules
+    if (!fromLonLat) {
+      return
+    }
+
+    const mapCoordinates = this.coordinateParser.parseCoordinates(
+      coordinateSystem,
+      coordinates,
+      fromLonLat
+    )
+
+    if (!mapCoordinates) {
+      return
+    }
+
+    if (circleWidth) {
+      this.displayCircularSite(mapCoordinates, circleWidth)
+    } else {
+      this.displayPointSite(mapCoordinates)
+    }
+
+    this.centreMapView(mapCoordinates, DETAILED_ZOOM_LEVEL)
   }
 
   clearFeatures() {

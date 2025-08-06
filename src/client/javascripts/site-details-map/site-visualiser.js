@@ -1,5 +1,6 @@
-import CircleGeometryCalculator from './circle-geometry-calculator.js'
 import CoordinateParser from './coordinate-parser.js'
+import FeatureFactory from './feature-factory.js'
+import MapViewManager from './map-view-manager.js'
 
 class SiteVisualiser {
   constructor(olModules, vectorSource, geoJSONFormat, map) {
@@ -8,6 +9,8 @@ class SiteVisualiser {
     this.geoJSONFormat = geoJSONFormat
     this.map = map
     this.coordinateParser = new CoordinateParser()
+    this.mapViewManager = new MapViewManager()
+    this.featureFactory = new FeatureFactory()
   }
 
   /**
@@ -15,10 +18,10 @@ class SiteVisualiser {
    * @param {Array} coordinates - Web Mercator coordinates [x, y]
    */
   displayPointSite(coordinates) {
-    const { Feature, Point } = this.olModules
-    const pointFeature = new Feature({
-      geometry: new Point(coordinates)
-    })
+    const pointFeature = this.featureFactory.createPointFeature(
+      this.olModules,
+      coordinates
+    )
     this.vectorSource.addFeature(pointFeature)
   }
 
@@ -28,23 +31,16 @@ class SiteVisualiser {
    * @param {number} diameterInMetres - Diameter (width) in metres
    */
   displayCircularSite(centreCoordinates, diameterInMetres) {
-    const { Feature, Polygon, fromLonLat, toLonLat } = this.olModules
-    const centreWGS84 = toLonLat(centreCoordinates)
-
-    const radiusInMetres = diameterInMetres / 2
-    const circleCoords = CircleGeometryCalculator.createGeographicCircle(
-      centreWGS84,
-      radiusInMetres
+    const circleFeature = this.featureFactory.createCircleFeature(
+      this.olModules,
+      centreCoordinates,
+      diameterInMetres
     )
 
-    const projectedCoords = circleCoords.map((coord) => fromLonLat(coord))
-
-    const circlePolygon = new Polygon([projectedCoords])
-    const circleFeature = new Feature({
-      geometry: circlePolygon
-    })
-
     this.vectorSource.addFeature(circleFeature)
+
+    // Fit the map to show the circle with appropriate zoom level
+    this.mapViewManager.fitMapToGeometry(this.map, circleFeature.getGeometry())
   }
 
   /**
@@ -52,31 +48,19 @@ class SiteVisualiser {
    * @param {object} geoJSON - GeoJSON data from file upload
    */
   displayFileUploadData(geoJSON) {
-    const MAP_PADDING_PIXELS = 20
-    const MAX_ZOOM_LEVEL = 16
+    const features = this.featureFactory.createFeaturesFromGeoJSON(
+      this.geoJSONFormat,
+      geoJSON
+    )
 
-    if (!geoJSON.features || !Array.isArray(geoJSON.features)) {
+    if (features.length === 0) {
       return
     }
 
-    const features = this.geoJSONFormat.readFeatures(geoJSON, {
-      featureProjection: 'EPSG:3857'
-    })
-
     this.vectorSource.addFeatures(features)
 
-    if (features.length > 0) {
-      const extent = this.vectorSource.getExtent()
-      this.map.getView().fit(extent, {
-        padding: [
-          MAP_PADDING_PIXELS,
-          MAP_PADDING_PIXELS,
-          MAP_PADDING_PIXELS,
-          MAP_PADDING_PIXELS
-        ],
-        maxZoom: MAX_ZOOM_LEVEL
-      })
-    }
+    // Fit the map to show all uploaded features with appropriate zoom level
+    this.mapViewManager.fitMapToAllFeatures(this.map, this.vectorSource)
   }
 
   /**
@@ -84,7 +68,7 @@ class SiteVisualiser {
    * @param {object} siteDetails - Site details with manual coordinates
    */
   displayManualCoordinates(siteDetails) {
-    const DETAILED_ZOOM_LEVEL = 14
+    const POINT_ZOOM_LEVEL = 14
     const { coordinateSystem, coordinates, circleWidth } = siteDetails
 
     if (!coordinates) {
@@ -107,26 +91,21 @@ class SiteVisualiser {
     }
 
     if (circleWidth) {
+      // Circle display automatically fits to geometry - no need to manually set zoom
       this.displayCircularSite(mapCoordinates, circleWidth)
     } else {
+      // For points, centre and zoom since points have no extent to fit to
       this.displayPointSite(mapCoordinates)
+      this.mapViewManager.centreMapView(
+        this.map,
+        mapCoordinates,
+        POINT_ZOOM_LEVEL
+      )
     }
-
-    this.centreMapView(mapCoordinates, DETAILED_ZOOM_LEVEL)
   }
 
   clearFeatures() {
     this.vectorSource.clear()
-  }
-
-  /**
-   * Centre the map view on specific coordinates
-   * @param {Array} mapCoordinates - Web Mercator coordinates [x, y]
-   * @param {number} zoomLevel - Zoom level to set
-   */
-  centreMapView(mapCoordinates, zoomLevel = 14) {
-    this.map.getView().setCenter(mapCoordinates)
-    this.map.getView().setZoom(zoomLevel)
   }
 }
 

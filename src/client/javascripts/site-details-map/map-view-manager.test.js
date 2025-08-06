@@ -100,35 +100,29 @@ describe('MapViewManager', () => {
     }
   })
 
-  describe('fitMapToGeometry', () => {
-    test('should get extent from geometry and call fitMapToExtent', () => {
-      const { mockSource, extent, options } = setupFitTest(
-        'fitMapToGeometry',
+  test.each([
+    ['fitMapToGeometry', 'geometry', [100, 200, 300, 400], { maxZoom: 15 }],
+    [
+      'fitMapToAllFeatures',
+      'vector source',
+      [500, 600, 700, 800],
+      { minZoom: 10 }
+    ]
+  ])(
+    '%s should get extent from %s and call fitMapToExtent',
+    (methodName, sourceType, extent, options) => {
+      const { mockSource } = setupFitTest(
+        methodName,
         (extent) => ({ getExtent: jest.fn().mockReturnValue(extent) }),
-        [100, 200, 300, 400],
-        { maxZoom: 15 }
+        extent,
+        options
       )
 
       const expectations = getFitExpectations(extent, options)
       expect(mockSource.getExtent).toHaveBeenCalled()
       expect(mockView.fit).toHaveBeenCalledWith(extent, expectations.fitOptions)
-    })
-  })
-
-  describe('fitMapToAllFeatures', () => {
-    test('should get extent from vector source and call fitMapToExtent', () => {
-      const { mockSource, extent, options } = setupFitTest(
-        'fitMapToAllFeatures',
-        (extent) => ({ getExtent: jest.fn().mockReturnValue(extent) }),
-        [500, 600, 700, 800],
-        { minZoom: 10 }
-      )
-
-      const expectations = getFitExpectations(extent, options)
-      expect(mockSource.getExtent).toHaveBeenCalled()
-      expect(mockView.fit).toHaveBeenCalledWith(extent, expectations.fitOptions)
-    })
-  })
+    }
+  )
 
   describe('centreMapView', () => {
     test('should centre map on coordinates with default zoom', () => {

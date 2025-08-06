@@ -34,7 +34,8 @@ describe('#delete', () => {
   beforeEach(() => {
     mockRequest = {
       logger: {
-        error: jest.fn()
+        error: jest.fn(),
+        info: jest.fn()
       }
     }
 

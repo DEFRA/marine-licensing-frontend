@@ -89,6 +89,8 @@ export const deleteExemptionSubmitController = {
 
       await authenticatedRequest(request, 'DELETE', `/exemption/${exemptionId}`)
 
+      request.logger.info(`Deleted exemption ${exemptionId}`)
+
       clearExemptionCache(request)
 
       return h.redirect(routes.DASHBOARD)

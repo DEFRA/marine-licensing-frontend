@@ -1,0 +1,10 @@
+.app-site-details-map {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  border: 1px solid #b1b4b6;
+}
+
+// Top align map view key in summary list
+.govuk-summary-list__key--top-aligned {
+  vertical-align: top;
+}

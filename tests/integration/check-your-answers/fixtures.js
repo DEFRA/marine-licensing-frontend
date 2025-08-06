@@ -1,4 +1,4 @@
-export const baseExemption = {
+const baseExemption = {
   id: 'test-exemption-123',
   projectName: 'Hammersmith pontoon construction',
   activityDates: {
@@ -9,10 +9,6 @@ export const baseExemption = {
     'We will be installing a pontoon approximately 20 metres squared at the east of our garden that backs onto the river.',
   siteDetails: {
     coordinatesType: 'file',
-    fileUploadType: 'shapefile',
-    uploadedFile: {
-      filename: 'Cavendish_Dock_Boundary_Polygon_WGS84.zip'
-    },
     geoJSON: {
       type: 'FeatureCollection',
       features: [
@@ -45,3 +41,69 @@ export const baseExemption = {
     publicRegister: { status: 'completed' }
   }
 }
+
+export const testScenarios = [
+  {
+    name: 'Shapefile upload (default fixture)',
+    exemption: {
+      ...baseExemption,
+      siteDetails: {
+        ...baseExemption.siteDetails,
+        fileUploadType: 'shapefile',
+        uploadedFile: { filename: 'Cavendish_Dock_Boundary_Polygon_WGS84.zip' }
+      }
+    },
+    expected: {
+      fileType: 'Shapefile',
+      filename: 'Cavendish_Dock_Boundary_Polygon_WGS84.zip'
+    }
+  },
+  {
+    name: 'KML upload',
+    exemption: {
+      ...baseExemption,
+      siteDetails: {
+        ...baseExemption.siteDetails,
+        fileUploadType: 'kml',
+        uploadedFile: { filename: 'coordinates.kml' }
+      }
+    },
+    expected: {
+      fileType: 'KML',
+      filename: 'coordinates.kml'
+    }
+  },
+  {
+    name: 'user story example Shapefile (Hammersmith_coordinates.zip)',
+    exemption: {
+      ...baseExemption,
+      siteDetails: {
+        ...baseExemption.siteDetails,
+        fileUploadType: 'shapefile',
+        uploadedFile: { filename: 'Hammersmith_coordinates.zip' }
+      }
+    },
+    expected: {
+      fileType: 'Shapefile',
+      filename: 'Hammersmith_coordinates.zip'
+    }
+  }
+]
+
+export const errorScenarios = [
+  {
+    name: 'missing filename gracefully',
+    exemption: {
+      ...baseExemption,
+      siteDetails: {
+        ...baseExemption.siteDetails,
+        fileUploadType: 'shapefile',
+        uploadedFile: { filename: undefined }
+      }
+    },
+    expected: {
+      fileType: 'Shapefile',
+      filename: null
+    }
+  }
+]

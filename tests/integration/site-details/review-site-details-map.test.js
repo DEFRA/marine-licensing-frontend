@@ -11,7 +11,68 @@ import { mockExemption } from '~/src/server/test-helpers/mocks.js'
 jest.mock('~/src/server/common/helpers/session-cache/utils.js')
 jest.mock('~/src/server/common/helpers/authenticated-requests.js')
 
-describe('Review Site Details - Map Integration Tests', () => {
+const SAMPLE_COORDINATES = {
+  OSGB36_EASTINGS_NORTHINGS: { eastings: '123456', northings: '654321' },
+  WGS84_LATITUDE_LONGITUDE: { latitude: '50.123456', longitude: '-1.234567' },
+  INVALID_COORDINATES: { latitude: 'invalid', longitude: 'coordinates' }
+}
+
+const CIRCLE_MEASUREMENTS = {
+  STANDARD_CIRCLE_WIDTH: '100',
+  LARGE_CIRCLE_WIDTH: '200',
+  NO_CIRCLE: null
+}
+
+const FILE_UPLOAD_EXAMPLES = {
+  SHAPEFILE: {
+    type: 'shapefile',
+    filename: 'test-site.zip',
+    displayName: 'Shapefile'
+  },
+  KML: { type: 'kml', filename: 'test-site.kml', displayName: 'KML file' }
+}
+
+const PORTSMOUTH_UK_COORDINATES = [-1.234567, 50.123456]
+
+const SAMPLE_GEOJSON_POINT = {
+  type: 'FeatureCollection',
+  features: [
+    {
+      type: 'Feature',
+      geometry: {
+        type: 'Point',
+        coordinates: PORTSMOUTH_UK_COORDINATES
+      }
+    }
+  ]
+}
+
+const EXPECTED_UI_TEXT = {
+  PAGE_HEADING: 'Review site details',
+  BACK_BUTTON: 'Back',
+  CONTINUE_BUTTON: 'Save and continue',
+  CANCEL_BUTTON: 'Cancel',
+  MAP_VIEW_INDICATOR: 'Map view',
+  FILE_UPLOAD_METHOD: 'Upload a file with the coordinates of the site',
+  OSGB36_DISPLAY: 'OSGB36 (National Grid)Eastings and Northings',
+  COORDINATE_CENTRE_LABEL: 'Coordinates at centre of site',
+  COORDINATE_SYSTEM_LABEL: 'Coordinate system',
+  LOCATION_METHOD_LABEL: 'Method of providing site location'
+}
+
+const CSS_SELECTORS = {
+  MAP_CONTAINER: '.app-site-details-map',
+  SITE_DATA_SCRIPT: '#site-details-data',
+  BACK_LINK: '.govuk-back-link',
+  SUMMARY_ROWS: '.govuk-summary-list__row',
+  SUMMARY_KEY: '.govuk-summary-list__key',
+  SUMMARY_VALUE: '.govuk-summary-list__value',
+  OPENLAYERS_CSS: 'link[href="/public/stylesheets/ol.css"]'
+}
+
+const MAP_MODULE_NAME = 'site-details-map'
+
+describe('Review Site Details Page - Interactive Map Display and Data Verification', () => {
   let server
 
   beforeAll(async () => {
@@ -42,7 +103,7 @@ describe('Review Site Details - Map Integration Tests', () => {
     })
   })
 
-  const createMockExemption = (siteDetailsOverride = {}) => ({
+  const createExemptionWithSiteDetails = (siteDetailsOverride = {}) => ({
     ...mockExemption,
     siteDetails: {
       ...mockExemption.siteDetails,
@@ -50,17 +111,17 @@ describe('Review Site Details - Map Integration Tests', () => {
     }
   })
 
-  const getPageDocument = async (exemption = mockExemption) => {
+  const renderReviewPageForAuthenticatedUserWith = async (
+    exemption = mockExemption
+  ) => {
     jest.spyOn(cacheUtils, 'getExemptionCache').mockReturnValue(exemption)
 
-    // Override coordinate system mock if exemption has specific coordinateSystem
     if (exemption.siteDetails?.coordinateSystem) {
       jest.spyOn(cacheUtils, 'getCoordinateSystem').mockReturnValue({
         coordinateSystem: exemption.siteDetails.coordinateSystem
       })
     }
 
-    // Ensure authenticated request returns the exemption with its site details
     jest.spyOn(authRequests, 'authenticatedGetRequest').mockResolvedValue({
       payload: { value: exemption }
     })
@@ -84,188 +145,209 @@ describe('Review Site Details - Map Integration Tests', () => {
     return new JSDOM(response.result).window.document
   }
 
-  const validateMapContainer = (document) => {
-    const mapContainer = document.querySelector('.app-site-details-map')
+  const expectInteractiveMapToBeDisplayedIn = (document) => {
+    const mapContainer = document.querySelector(CSS_SELECTORS.MAP_CONTAINER)
+
     expect(mapContainer).toBeInTheDocument()
-    expect(mapContainer.getAttribute('data-module')).toBe('site-details-map')
+    expect(mapContainer.getAttribute('data-module')).toBe(MAP_MODULE_NAME)
   }
 
-  const validateSiteDetailsData = (document, expectedData) => {
-    const dataScript = document.querySelector('#site-details-data')
+  const expectSiteDataToBeEmbeddedAs = (document, expectedSiteData) => {
+    const dataScript = document.querySelector(CSS_SELECTORS.SITE_DATA_SCRIPT)
     expect(dataScript).toBeInTheDocument()
 
-    const siteData = JSON.parse(dataScript.textContent)
-    Object.entries(expectedData).forEach(([key, value]) => {
-      expect(siteData[key]).toEqual(value)
-    })
+    const embeddedSiteData = JSON.parse(dataScript.textContent)
+    Object.entries(expectedSiteData).forEach(
+      ([propertyName, expectedValue]) => {
+        expect(embeddedSiteData[propertyName]).toEqual(expectedValue)
+      }
+    )
   }
 
-  const validateSummaryContent = (document, key, expectedValue) => {
-    const rows = document.querySelectorAll('.govuk-summary-list__row')
-    const row = Array.from(rows).find((row) => {
-      const keyElement = row.querySelector('.govuk-summary-list__key')
-      return keyElement?.textContent.trim() === key
+  const expectSummaryToShow = (document, labelText, expectedValue) => {
+    const summaryRows = document.querySelectorAll(CSS_SELECTORS.SUMMARY_ROWS)
+    const targetRow = Array.from(summaryRows).find((row) => {
+      const labelElement = row.querySelector(CSS_SELECTORS.SUMMARY_KEY)
+      return labelElement?.textContent.trim() === labelText
     })
-    expect(row).toBeTruthy()
 
-    const valueElement = row.querySelector('.govuk-summary-list__value')
+    expect(targetRow).toBeTruthy()
+
+    const valueElement = targetRow.querySelector(CSS_SELECTORS.SUMMARY_VALUE)
     expect(valueElement.textContent.trim()).toBe(expectedValue)
   }
 
-  describe('Manual Coordinates with Circle', () => {
-    test('should display map for manual coordinates with circle width', async () => {
-      const document = await getPageDocument()
-
-      validateMapContainer(document)
-
-      const mapViewRow = queryByText(document, 'Map view')
-      expect(mapViewRow).toBeInTheDocument()
-    })
-
-    test('should display map for manual coordinates without circle width', async () => {
-      expect.hasAssertions()
-      const siteDetailsOverride = {
-        coordinateSystem: COORDINATE_SYSTEMS.OSGB36,
-        coordinates: { eastings: '123456', northings: '654321' },
-        circleWidth: null
-      }
-
-      const document = await getPageDocument(
-        createMockExemption(siteDetailsOverride)
-      )
-
-      validateMapContainer(document)
-      validateSiteDetailsData(document, {
-        coordinateSystem: COORDINATE_SYSTEMS.OSGB36,
-        coordinates: { eastings: '123456', northings: '654321' },
-        circleWidth: null
+  describe('When applicant provided manual coordinates for a circular site area', () => {
+    test('displays interactive map with site location when circle boundary is specified', async () => {
+      const exemptionWithCircularSite = createExemptionWithSiteDetails({
+        coordinateSystem: COORDINATE_SYSTEMS.WGS84,
+        coordinates: SAMPLE_COORDINATES.WGS84_LATITUDE_LONGITUDE,
+        circleWidth: CIRCLE_MEASUREMENTS.STANDARD_CIRCLE_WIDTH
       })
 
-      validateSummaryContent(
-        document,
-        'Coordinate system',
-        'OSGB36 (National Grid)Eastings and Northings'
+      const pageDocument = await renderReviewPageForAuthenticatedUserWith(
+        exemptionWithCircularSite
       )
-      validateSummaryContent(
-        document,
-        'Coordinates at centre of site',
+
+      expectInteractiveMapToBeDisplayedIn(pageDocument)
+      const mapViewIndicator = queryByText(
+        pageDocument,
+        EXPECTED_UI_TEXT.MAP_VIEW_INDICATOR
+      )
+      expect(mapViewIndicator).toBeInTheDocument()
+    })
+
+    test('displays interactive map with precise point location when no circle boundary is specified', async () => {
+      expect.hasAssertions()
+
+      const exemptionWithPointSite = createExemptionWithSiteDetails({
+        coordinateSystem: COORDINATE_SYSTEMS.OSGB36,
+        coordinates: SAMPLE_COORDINATES.OSGB36_EASTINGS_NORTHINGS,
+        circleWidth: CIRCLE_MEASUREMENTS.NO_CIRCLE
+      })
+
+      const pageDocument = await renderReviewPageForAuthenticatedUserWith(
+        exemptionWithPointSite
+      )
+
+      expectInteractiveMapToBeDisplayedIn(pageDocument)
+      expectSiteDataToBeEmbeddedAs(pageDocument, {
+        coordinateSystem: COORDINATE_SYSTEMS.OSGB36,
+        coordinates: SAMPLE_COORDINATES.OSGB36_EASTINGS_NORTHINGS,
+        circleWidth: CIRCLE_MEASUREMENTS.NO_CIRCLE
+      })
+
+      expectSummaryToShow(
+        pageDocument,
+        EXPECTED_UI_TEXT.COORDINATE_SYSTEM_LABEL,
+        EXPECTED_UI_TEXT.OSGB36_DISPLAY
+      )
+      expectSummaryToShow(
+        pageDocument,
+        EXPECTED_UI_TEXT.COORDINATE_CENTRE_LABEL,
         '123456, 654321'
       )
     })
   })
 
-  describe('File Upload Coordinates', () => {
-    const getFileUploadTestData = (fileUploadType, filename) => ({
+  describe('When applicant uploaded a file containing site boundary coordinates', () => {
+    const createFileUploadSiteDetails = (fileUploadType, filename) => ({
       coordinatesType: 'file',
       fileUploadType,
       uploadedFile: { filename },
-      geoJSON: {
-        type: 'FeatureCollection',
-        features: [
-          {
-            type: 'Feature',
-            geometry: {
-              type: 'Point',
-              coordinates: [-1.234567, 50.123456]
-            }
-          }
-        ]
-      }
+      geoJSON: SAMPLE_GEOJSON_POINT
     })
 
     test.each([
-      ['Shapefile', 'shapefile', 'test-site.zip'],
-      ['KML file', 'kml', 'test-site.kml']
+      [
+        FILE_UPLOAD_EXAMPLES.SHAPEFILE.displayName,
+        FILE_UPLOAD_EXAMPLES.SHAPEFILE.type,
+        FILE_UPLOAD_EXAMPLES.SHAPEFILE.filename
+      ],
+      [
+        FILE_UPLOAD_EXAMPLES.KML.displayName,
+        FILE_UPLOAD_EXAMPLES.KML.type,
+        FILE_UPLOAD_EXAMPLES.KML.filename
+      ]
     ])(
-      'should display map for %s upload',
-      async (displayName, fileUploadType, filename) => {
+      'displays interactive map showing site boundaries from %s data',
+      async (fileTypeDisplayName, fileUploadType, filename) => {
         expect.hasAssertions()
-        const siteDetailsOverride = getFileUploadTestData(
-          fileUploadType,
-          filename
+
+        const exemptionWithUploadedSiteFile = createExemptionWithSiteDetails(
+          createFileUploadSiteDetails(fileUploadType, filename)
         )
 
-        const document = await getPageDocument(
-          createMockExemption(siteDetailsOverride)
+        const pageDocument = await renderReviewPageForAuthenticatedUserWith(
+          exemptionWithUploadedSiteFile
         )
 
-        validateMapContainer(document)
-        validateSiteDetailsData(document, {
+        expectInteractiveMapToBeDisplayedIn(pageDocument)
+        expectSiteDataToBeEmbeddedAs(pageDocument, {
           coordinatesType: 'file',
           fileUploadType,
-          geoJSON: siteDetailsOverride.geoJSON
+          geoJSON: SAMPLE_GEOJSON_POINT
         })
 
-        validateSummaryContent(
-          document,
-          'Method of providing site location',
-          'Upload a file with the coordinates of the site'
+        expectSummaryToShow(
+          pageDocument,
+          EXPECTED_UI_TEXT.LOCATION_METHOD_LABEL,
+          EXPECTED_UI_TEXT.FILE_UPLOAD_METHOD
         )
       }
     )
   })
 
-  describe('Page Structure and Navigation', () => {
-    test('should display correct page structure and navigation elements', async () => {
-      const siteDetailsOverride = {
+  describe('When applicant accesses the review page to confirm their site details', () => {
+    test('displays complete page structure with navigation controls for application workflow', async () => {
+      const exemptionWithWGS84Coordinates = createExemptionWithSiteDetails({
         coordinateSystem: COORDINATE_SYSTEMS.WGS84,
-        coordinates: { latitude: '50.123456', longitude: '-1.234567' },
-        circleWidth: '100'
-      }
+        coordinates: SAMPLE_COORDINATES.WGS84_LATITUDE_LONGITUDE,
+        circleWidth: CIRCLE_MEASUREMENTS.STANDARD_CIRCLE_WIDTH
+      })
 
-      const document = await getPageDocument(
-        createMockExemption(siteDetailsOverride)
+      const pageDocument = await renderReviewPageForAuthenticatedUserWith(
+        exemptionWithWGS84Coordinates
       )
 
-      const heading = getByRole(document, 'heading', { level: 1 })
-      expect(heading).toHaveTextContent('Review site details')
+      const pageHeading = getByRole(pageDocument, 'heading', { level: 1 })
+      expect(pageHeading).toHaveTextContent(EXPECTED_UI_TEXT.PAGE_HEADING)
 
-      const projectName = getByText(document, mockExemption.projectName)
-      expect(projectName).toBeInTheDocument()
+      const projectNameDisplay = getByText(
+        pageDocument,
+        mockExemption.projectName
+      )
+      expect(projectNameDisplay).toBeInTheDocument()
 
-      const backLink = document.querySelector('.govuk-back-link')
-      expect(backLink).toBeInTheDocument()
-      expect(backLink).toHaveTextContent('Back')
+      const backNavigationLink = pageDocument.querySelector(
+        CSS_SELECTORS.BACK_LINK
+      )
+      expect(backNavigationLink).toBeInTheDocument()
+      expect(backNavigationLink).toHaveTextContent(EXPECTED_UI_TEXT.BACK_BUTTON)
 
-      const continueButton = getByRole(document, 'button', {
-        name: 'Save and continue'
+      const proceedToNextStepButton = getByRole(pageDocument, 'button', {
+        name: EXPECTED_UI_TEXT.CONTINUE_BUTTON
       })
-      expect(continueButton).toBeInTheDocument()
+      expect(proceedToNextStepButton).toBeInTheDocument()
 
-      const cancelButton = getByText(document, 'Cancel')
-      expect(cancelButton).toBeInTheDocument()
+      const cancelApplicationButton = getByText(
+        pageDocument,
+        EXPECTED_UI_TEXT.CANCEL_BUTTON
+      )
+      expect(cancelApplicationButton).toBeInTheDocument()
     })
 
-    test('should include OpenLayers CSS for map styling', async () => {
-      const siteDetailsOverride = {
+    test('includes OpenLayers stylesheet to enable interactive map functionality', async () => {
+      const exemptionWithWGS84Coordinates = createExemptionWithSiteDetails({
         coordinateSystem: COORDINATE_SYSTEMS.WGS84,
-        coordinates: { latitude: '50.123456', longitude: '-1.234567' }
-      }
+        coordinates: SAMPLE_COORDINATES.WGS84_LATITUDE_LONGITUDE
+      })
 
-      const document = await getPageDocument(
-        createMockExemption(siteDetailsOverride)
+      const pageDocument = await renderReviewPageForAuthenticatedUserWith(
+        exemptionWithWGS84Coordinates
       )
 
-      const olCssLink = document.querySelector(
-        'link[href="/public/stylesheets/ol.css"]'
+      const openLayersStylesheet = pageDocument.querySelector(
+        CSS_SELECTORS.OPENLAYERS_CSS
       )
-      expect(olCssLink).toBeInTheDocument()
-      expect(olCssLink.getAttribute('rel')).toBe('stylesheet')
+      expect(openLayersStylesheet).toBeInTheDocument()
+      expect(openLayersStylesheet.getAttribute('rel')).toBe('stylesheet')
     })
   })
 
-  describe('Form Submission', () => {
-    test('should handle successful form submission', async () => {
-      const siteDetailsOverride = {
+  describe('When applicant submits their confirmed site details', () => {
+    test('processes application continuation successfully and redirects to next step', async () => {
+      const exemptionWithLargeCircularSite = createExemptionWithSiteDetails({
         coordinateSystem: COORDINATE_SYSTEMS.WGS84,
-        coordinates: { latitude: '50.123456', longitude: '-1.234567' },
-        circleWidth: '200'
-      }
+        coordinates: SAMPLE_COORDINATES.WGS84_LATITUDE_LONGITUDE,
+        circleWidth: CIRCLE_MEASUREMENTS.LARGE_CIRCLE_WIDTH
+      })
 
-      const exemption = createMockExemption(siteDetailsOverride)
-      jest.spyOn(cacheUtils, 'getExemptionCache').mockReturnValue(exemption)
+      jest
+        .spyOn(cacheUtils, 'getExemptionCache')
+        .mockReturnValue(exemptionWithLargeCircularSite)
 
-      const response = await server.inject({
+      const submissionResponse = await server.inject({
         method: 'POST',
         url: routes.REVIEW_SITE_DETAILS,
         payload: {
@@ -273,41 +355,46 @@ describe('Review Site Details - Map Integration Tests', () => {
         }
       })
 
-      expect(response.statusCode).toBe(statusCodes.redirect)
+      expect(submissionResponse.statusCode).toBe(statusCodes.redirect)
     })
   })
 
-  describe('Data Validation', () => {
-    test('should handle missing site details gracefully', async () => {
-      const exemption = createMockExemption({})
+  describe('When handling incomplete or malformed site data gracefully', () => {
+    test('displays page structure with map container even when site details are missing', async () => {
+      const exemptionWithMissingSiteDetails = createExemptionWithSiteDetails({})
 
-      const document = await getPageDocument(exemption)
-
-      validateMapContainer(document)
-
-      const dataScript = document.querySelector('#site-details-data')
-      expect(dataScript).toBeInTheDocument()
-
-      const siteData = JSON.parse(dataScript.textContent)
-      expect(siteData).toBeDefined()
-    })
-
-    test('should handle invalid coordinate formats', async () => {
-      expect.hasAssertions()
-      const siteDetailsOverride = {
-        coordinateSystem: COORDINATE_SYSTEMS.WGS84,
-        coordinates: { latitude: 'invalid', longitude: 'coordinates' },
-        circleWidth: null
-      }
-
-      const document = await getPageDocument(
-        createMockExemption(siteDetailsOverride)
+      const pageDocument = await renderReviewPageForAuthenticatedUserWith(
+        exemptionWithMissingSiteDetails
       )
 
-      validateMapContainer(document)
-      validateSiteDetailsData(document, {
+      expectInteractiveMapToBeDisplayedIn(pageDocument)
+
+      const siteDataScript = pageDocument.querySelector(
+        CSS_SELECTORS.SITE_DATA_SCRIPT
+      )
+      expect(siteDataScript).toBeInTheDocument()
+
+      const embeddedSiteData = JSON.parse(siteDataScript.textContent)
+      expect(embeddedSiteData).toBeDefined()
+    })
+
+    test('renders page successfully even when coordinate data contains invalid values', async () => {
+      expect.hasAssertions()
+
+      const exemptionWithMalformedCoordinates = createExemptionWithSiteDetails({
         coordinateSystem: COORDINATE_SYSTEMS.WGS84,
-        coordinates: { latitude: 'invalid', longitude: 'coordinates' }
+        coordinates: SAMPLE_COORDINATES.INVALID_COORDINATES,
+        circleWidth: CIRCLE_MEASUREMENTS.NO_CIRCLE
+      })
+
+      const pageDocument = await renderReviewPageForAuthenticatedUserWith(
+        exemptionWithMalformedCoordinates
+      )
+
+      expectInteractiveMapToBeDisplayedIn(pageDocument)
+      expectSiteDataToBeEmbeddedAs(pageDocument, {
+        coordinateSystem: COORDINATE_SYSTEMS.WGS84,
+        coordinates: SAMPLE_COORDINATES.INVALID_COORDINATES
       })
     })
   })

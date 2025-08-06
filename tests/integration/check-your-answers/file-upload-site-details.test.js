@@ -138,6 +138,29 @@ describe('Check Your Answers - File Upload Site Details Integration Tests', () =
         'Shapefile'
       )
     })
+
+    test('should display exact file examples from user story', async () => {
+      expect.hasAssertions()
+
+      await testFileUploadDisplay('kml', 'coordinates.kml', 'KML')
+      await testFileUploadDisplay(
+        'shapefile',
+        'Hammersmith_coordinates.zip',
+        'Shapefile'
+      )
+    })
+
+    test('should show fixed method text as specified in AC1', async () => {
+      expect.hasAssertions()
+      const { document } = await getCheckYourAnswersPage()
+
+      const { card } = getSummaryCard(document, '#site-details-card')
+      verifySummaryListRow(
+        card,
+        'Method of providing site location',
+        'Upload a file with the coordinates of the site'
+      )
+    })
   })
 
   describe('Page structure and navigation', () => {
@@ -198,6 +221,44 @@ describe('Check Your Answers - File Upload Site Details Integration Tests', () =
 
       const csrfToken = form.querySelector('input[name="csrfToken"]')
       expect(csrfToken).toBeTruthy()
+    })
+
+    test('should display GOV.UK page structure elements from user story', async () => {
+      const { document } = await getCheckYourAnswersPage()
+
+      const pageLayout = document.querySelector('.govuk-grid-row')
+      expect(pageLayout).toBeTruthy()
+
+      const mainColumn = document.querySelector('.govuk-grid-column-full')
+      expect(mainColumn).toBeTruthy()
+    })
+  })
+
+  describe('User Story ML-140 Complete AC1 Validation', () => {
+    test('GIVEN I am viewing Check your answers page AND I have uploaded site details WHEN I view Site details card THEN I see all AC1 requirements', async () => {
+      expect.hasAssertions()
+      const { document } = await getCheckYourAnswersPage()
+
+      const { card, title } = getSummaryCard(document, '#site-details-card')
+
+      expect(title.textContent.trim()).toBe('Site details')
+
+      verifySummaryListRow(
+        card,
+        'Method of providing site location',
+        'Upload a file with the coordinates of the site'
+      )
+
+      verifySummaryListRow(card, 'File type', 'Shapefile')
+
+      verifySummaryListRow(
+        card,
+        'File uploaded',
+        'Cavendish_Dock_Boundary_Polygon_WGS84.zip'
+      )
+
+      const mapViewRow = getSummaryListRow(card, 'Map view')
+      expect(mapViewRow).toBeFalsy()
     })
   })
 

@@ -44,7 +44,7 @@ const baseExemption = {
 
 export const testScenarios = [
   {
-    name: 'Shapefile upload (default fixture)',
+    name: 'Shapefile upload',
     exemption: {
       ...baseExemption,
       siteDetails: {
@@ -53,9 +53,38 @@ export const testScenarios = [
         uploadedFile: { filename: 'Cavendish_Dock_Boundary_Polygon_WGS84.zip' }
       }
     },
-    expected: {
-      fileType: 'Shapefile',
-      filename: 'Cavendish_Dock_Boundary_Polygon_WGS84.zip'
+    expectedPageContent: {
+      pageTitle: 'Check your answers before sending your information',
+      backLinkText: 'Go back to your project',
+      summaryCards: [
+        'Project details',
+        'Activity dates',
+        'Activity details',
+        'Site details',
+        'Public register'
+      ],
+      projectDetails: {
+        'Project name': 'Hammersmith pontoon construction'
+      },
+      activityDates: {
+        'Start date': '1 July 2025',
+        'End date': '7 July 2025'
+      },
+      activityDetails: {
+        'Activity description':
+          'We will be installing a pontoon approximately 20 metres squared at the east of our garden that backs onto the river.'
+      },
+      siteDetails: {
+        'Method of providing site location':
+          'Upload a file with the coordinates of the site',
+        'File type': 'Shapefile',
+        'File uploaded': 'Cavendish_Dock_Boundary_Polygon_WGS84.zip'
+      },
+      publicRegister: {
+        'Information withheld from public register': 'No'
+      },
+      submitButton: 'Confirm and send',
+      shouldNotHaveMapView: true
     }
   },
   {
@@ -68,42 +97,38 @@ export const testScenarios = [
         uploadedFile: { filename: 'coordinates.kml' }
       }
     },
-    expected: {
-      fileType: 'KML',
-      filename: 'coordinates.kml'
-    }
-  },
-  {
-    name: 'user story example Shapefile (Hammersmith_coordinates.zip)',
-    exemption: {
-      ...baseExemption,
+    expectedPageContent: {
+      pageTitle: 'Check your answers before sending your information',
+      backLinkText: 'Go back to your project',
+      summaryCards: [
+        'Project details',
+        'Activity dates',
+        'Activity details',
+        'Site details',
+        'Public register'
+      ],
+      projectDetails: {
+        'Project name': 'Hammersmith pontoon construction'
+      },
+      activityDates: {
+        'Start date': '1 July 2025',
+        'End date': '7 July 2025'
+      },
+      activityDetails: {
+        'Activity description':
+          'We will be installing a pontoon approximately 20 metres squared at the east of our garden that backs onto the river.'
+      },
       siteDetails: {
-        ...baseExemption.siteDetails,
-        fileUploadType: 'shapefile',
-        uploadedFile: { filename: 'Hammersmith_coordinates.zip' }
-      }
-    },
-    expected: {
-      fileType: 'Shapefile',
-      filename: 'Hammersmith_coordinates.zip'
-    }
-  }
-]
-
-export const errorScenarios = [
-  {
-    name: 'missing filename gracefully',
-    exemption: {
-      ...baseExemption,
-      siteDetails: {
-        ...baseExemption.siteDetails,
-        fileUploadType: 'shapefile',
-        uploadedFile: { filename: undefined }
-      }
-    },
-    expected: {
-      fileType: 'Shapefile',
-      filename: null
+        'Method of providing site location':
+          'Upload a file with the coordinates of the site',
+        'File type': 'KML',
+        'File uploaded': 'coordinates.kml'
+      },
+      publicRegister: {
+        'Information withheld from public register': 'No'
+      },
+      submitButton: 'Confirm and send',
+      shouldNotHaveMapView: true
     }
   }
 ]

@@ -5,10 +5,8 @@ export const baseExemption = {
     start: '2025-07-01',
     end: '2025-07-07'
   },
-  activityDescription: {
-    description:
-      'We will be installing a pontoon approximately 20 metres squared at the east of our garden that backs onto the river.'
-  },
+  activityDescription:
+    'We will be installing a pontoon approximately 20 metres squared at the east of our garden that backs onto the river.',
   siteDetails: {
     coordinatesType: 'file',
     fileUploadType: 'shapefile',

@@ -17,13 +17,19 @@ class MapFactory {
       TileLayer,
       OSM,
       Attribution,
-      defaultControls
+      defaultControls,
+      ScaleLine
     } = this.olModules
 
     // Create attribution control without collapsible button
     const attribution = new Attribution({
       collapsible: false,
       collapsed: false
+    })
+
+    // Create scale line control with metric units
+    const scaleLine = new ScaleLine({
+      units: 'metric'
     })
 
     const map = new OpenLayersMap({
@@ -34,7 +40,10 @@ class MapFactory {
         }),
         vectorLayer
       ],
-      controls: defaultControls({ attribution: false }).extend([attribution]),
+      controls: defaultControls({ attribution: false }).extend([
+        attribution,
+        scaleLine
+      ]),
       view: new View({
         center: options.center,
         zoom: options.zoom

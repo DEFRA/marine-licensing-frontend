@@ -50,11 +50,15 @@ class OpenLayersModuleLoader {
     ])
 
     // Map controls
-    const [{ default: Attribution }, { defaults: defaultControls }] =
-      await Promise.all([
-        import('ol/control/Attribution.js'),
-        import('ol/control/defaults.js')
-      ])
+    const [
+      { default: Attribution },
+      { defaults: defaultControls },
+      { default: ScaleLine }
+    ] = await Promise.all([
+      import('ol/control/Attribution.js'),
+      import('ol/control/defaults.js'),
+      import('ol/control/ScaleLine.js')
+    ])
 
     return {
       OpenLayersMap,
@@ -74,7 +78,8 @@ class OpenLayersModuleLoader {
       toLonLat,
       GeoJSON,
       Attribution,
-      defaultControls
+      defaultControls,
+      ScaleLine
     }
   }
 }

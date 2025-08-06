@@ -115,6 +115,7 @@
     "eslint-plugin-promise": "^6.4.0",
     "husky": "^9.1.6",
     "jest": "^30.0.4",
+    "jest-axe": "^10.0.0",
     "jest-environment-jsdom": "^30.0.4",
     "jest-fetch-mock": "3.0.3",
     "knip": "^5.62.0",

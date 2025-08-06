@@ -3,10 +3,12 @@
 {% from "govuk/components/button/macro.njk" import govukButton %}
 {% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
 {% block beforeContent %}
+<nav>
   {{ govukBackLink({
         text: "Go back to your project",
         href: backLink
     }) }}
+    </nav>
 {% endblock %}
 {% block content %}
   <div class="govuk-grid-row">

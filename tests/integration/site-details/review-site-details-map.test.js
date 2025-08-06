@@ -96,7 +96,6 @@ describe('Site Details Interactive Map Behavior', () => {
     const response = await server.inject({
       method: 'GET',
       url: routes.REVIEW_SITE_DETAILS,
-      headers: { referer: `http://localhost/${routes.WIDTH_OF_SITE}` },
       auth: {
         strategy: 'session',
         credentials: { userId: 'test-user-id', sessionId: 'test-session-id' }

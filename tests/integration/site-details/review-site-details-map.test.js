@@ -42,7 +42,7 @@ const GEOJSON_POLYGON_FEATURE = {
   ]
 }
 
-describe('Site Details Interactive Map Behavior', () => {
+describe('Site Details Interactive Map Behaviour', () => {
   let server
   let mapContainer
   let siteDataScript
@@ -118,7 +118,7 @@ describe('Site Details Interactive Map Behavior', () => {
     return JSON.parse(siteDataScript.textContent)
   }
 
-  describe('When map initializes with manual coordinate entry', () => {
+  describe('When map initialises with manual coordinate entry', () => {
     const createMapTestExpectations = (
       coordinateSystem,
       coordinates,
@@ -143,13 +143,13 @@ describe('Site Details Interactive Map Behavior', () => {
         null
       ],
       [
-        '100 meter circular area',
+        '100 metre circular area',
         COORDINATE_SYSTEMS.WGS84,
         WGS84_LATITUDE_LONGITUDE,
         CIRCLE_WIDTH_100M
       ],
       [
-        '200 meter circular area',
+        '200 metre circular area',
         COORDINATE_SYSTEMS.WGS84,
         WGS84_LATITUDE_LONGITUDE,
         CIRCLE_WIDTH_200M
@@ -185,8 +185,8 @@ describe('Site Details Interactive Map Behavior', () => {
     )
   })
 
-  describe('When map initializes with uploaded file coordinates', () => {
-    test('prepares GeoJSON polygon data for shapefile visualization', async () => {
+  describe('When map initialises with uploaded file coordinates', () => {
+    test('prepares GeoJSON polygon data for shapefile visualisation', async () => {
       expect.hasAssertions()
 
       const exemptionWithShapefileUpload = createExemptionWithSiteDetails({
@@ -231,7 +231,7 @@ describe('Site Details Interactive Map Behavior', () => {
         PROJECTED_OSGB36_COORDINATES
       ],
       [
-        'KML file visualization',
+        'KML file visualisation',
         'kml',
         'site-location.kml',
         PROJECTED_WGS84_COORDINATES
@@ -303,7 +303,7 @@ describe('Site Details Interactive Map Behavior', () => {
     })
   })
 
-  describe('When map data is prepared for JavaScript initialization', () => {
+  describe('When map data is prepared for JavaScript initialisation', () => {
     test('includes required OpenLayers stylesheet for map rendering', async () => {
       const exemptionWithBasicCoordinates = createExemptionWithSiteDetails({
         coordinateSystem: COORDINATE_SYSTEMS.WGS84,

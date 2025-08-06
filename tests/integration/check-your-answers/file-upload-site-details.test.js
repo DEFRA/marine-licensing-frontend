@@ -23,13 +23,36 @@ describe('Check Your Answers - File Upload Site Details Integration Tests', () =
     return { response, document }
   }
 
-  const verifyCardContent = (document, cardId, expectedTexts) => {
+  const getSummaryListRow = (card, keyText) => {
+    const rows = card.querySelectorAll('.govuk-summary-list__row')
+    return Array.from(rows).find((row) => {
+      const key = row.querySelector('.govuk-summary-list__key')
+      return key && key.textContent.trim() === keyText
+    })
+  }
+
+  const verifySummaryListRow = (card, keyText, expectedValue) => {
+    const row = getSummaryListRow(card, keyText)
+    expect(row).toBeTruthy()
+
+    const key = row.querySelector('.govuk-summary-list__key')
+    const value = row.querySelector('.govuk-summary-list__value')
+
+    expect(key.textContent.trim()).toBe(keyText)
+    expect(value.textContent.trim()).toBe(expectedValue)
+
+    return { row, key, value }
+  }
+
+  const getSummaryCard = (document, cardId) => {
     const card = document.querySelector(cardId)
     expect(card).toBeTruthy()
-    expectedTexts.forEach((text) => {
-      expect(card.textContent).toContain(text)
-    })
-    return card
+    expect(card.classList.contains('govuk-summary-card')).toBe(true)
+
+    const title = card.querySelector('.govuk-summary-card__title')
+    expect(title).toBeTruthy()
+
+    return { card, title }
   }
 
   const createFileUploadExemption = (fileUploadType, filename) => ({
@@ -42,17 +65,21 @@ describe('Check Your Answers - File Upload Site Details Integration Tests', () =
   })
 
   const verifySiteDetailsCard = (document, fileType, filename) => {
-    const commonTexts = [
-      'Site details',
+    const { card, title } = getSummaryCard(document, '#site-details-card')
+    expect(title.textContent.trim()).toBe('Site details')
+
+    verifySummaryListRow(
+      card,
       'Method of providing site location',
-      'Upload a file with the coordinates of the site',
-      'File type',
-      fileType
-    ]
+      'Upload a file with the coordinates of the site'
+    )
+    verifySummaryListRow(card, 'File type', fileType)
+
     if (filename) {
-      commonTexts.push('File uploaded', filename)
+      verifySummaryListRow(card, 'File uploaded', filename)
     }
-    return verifyCardContent(document, '#site-details-card', commonTexts)
+
+    return card
   }
 
   const testFileUploadDisplay = async (
@@ -117,47 +144,60 @@ describe('Check Your Answers - File Upload Site Details Integration Tests', () =
     test('should display correct page layout and navigation elements', async () => {
       const { document } = await getCheckYourAnswersPage()
 
-      expect(
-        getByText(
-          document,
-          'Check your answers before sending your information'
-        )
-      ).toBeInTheDocument()
-
-      const projectNameElements = document.querySelectorAll('*')
-      const projectNameTexts = Array.from(projectNameElements).filter(
-        (el) =>
-          el.textContent && el.textContent.trim() === baseExemption.projectName
+      const heading = document.querySelector('#check-your-answers-heading')
+      expect(heading).toBeTruthy()
+      expect(heading.tagName).toBe('H2')
+      expect(heading.classList.contains('govuk-heading-l')).toBe(true)
+      expect(heading.textContent.trim()).toBe(
+        'Check your answers before sending your information'
       )
-      expect(projectNameTexts.length).toBeGreaterThanOrEqual(1)
 
-      expect(getByText(document, 'Go back to your project')).toBeInTheDocument()
+      const projectCaption = document.querySelector('.govuk-caption-l')
+      expect(projectCaption).toBeTruthy()
+      expect(projectCaption.textContent.trim()).toBe(baseExemption.projectName)
+
+      const backLink = document.querySelector('.govuk-back-link')
+      expect(backLink).toBeTruthy()
+      expect(backLink.textContent.trim()).toBe('Go back to your project')
     })
 
     test('should display all required summary cards from user story', async () => {
       const { document } = await getCheckYourAnswersPage()
 
-      expect(getByText(document, 'Project details')).toBeInTheDocument()
-      expect(getByText(document, 'Project name')).toBeInTheDocument()
-      expect(getByText(document, 'Activity dates')).toBeInTheDocument()
-      expect(getByText(document, 'Start date')).toBeInTheDocument()
-      expect(getByText(document, 'End date')).toBeInTheDocument()
-      expect(getByText(document, 'Activity details')).toBeInTheDocument()
-      expect(getByText(document, 'Site details')).toBeInTheDocument()
-      expect(getByText(document, 'Public register')).toBeInTheDocument()
+      const requiredCards = [
+        { id: '#project-details-card', title: 'Project details' },
+        { id: '#activity-dates-card', title: 'Activity dates' },
+        { id: '#activity-details-card', title: 'Activity details' },
+        { id: '#site-details-card', title: 'Site details' },
+        { id: '#public-register-card', title: 'Public register' }
+      ]
+
+      requiredCards.forEach(({ id, title }) => {
+        const { title: cardTitle } = getSummaryCard(document, id)
+        expect(cardTitle.textContent.trim()).toBe(title)
+      })
     })
 
     test('should display submission section', async () => {
       const { document } = await getCheckYourAnswersPage()
 
-      expect(
-        getByText(document, 'Now send your information')
-      ).toBeInTheDocument()
-
-      const submitButtons = document.querySelectorAll(
-        'button[type="submit"], input[type="submit"]'
+      const submissionHeading = document.querySelector('h2.govuk-heading-m')
+      expect(submissionHeading).toBeTruthy()
+      expect(submissionHeading.textContent.trim()).toBe(
+        'Now send your information'
       )
-      expect(submitButtons.length).toBeGreaterThan(0)
+
+      const confirmButton = document.querySelector('#confirm-and-send')
+      expect(confirmButton).toBeTruthy()
+      expect(confirmButton.tagName).toBe('BUTTON')
+      expect(confirmButton.classList.contains('govuk-button')).toBe(true)
+      expect(confirmButton.textContent.trim()).toBe('Confirm and send')
+
+      const form = document.querySelector('form[method="post"]')
+      expect(form).toBeTruthy()
+
+      const csrfToken = form.querySelector('input[name="csrfToken"]')
+      expect(csrfToken).toBeTruthy()
     })
   })
 
@@ -166,24 +206,35 @@ describe('Check Your Answers - File Upload Site Details Integration Tests', () =
       expect.hasAssertions()
       const { document } = await getCheckYourAnswersPage()
 
-      verifyCardContent(document, '#project-details-card', [
-        'Project details',
+      const { card: projectCard, title: projectTitle } = getSummaryCard(
+        document,
+        '#project-details-card'
+      )
+      expect(projectTitle.textContent.trim()).toBe('Project details')
+      verifySummaryListRow(
+        projectCard,
         'Project name',
         baseExemption.projectName
-      ])
+      )
 
-      verifyCardContent(document, '#activity-dates-card', [
-        'Activity dates',
-        'Start date',
-        '1 July 2025',
-        'End date',
-        '7 July 2025'
-      ])
+      const { card: datesCard, title: datesTitle } = getSummaryCard(
+        document,
+        '#activity-dates-card'
+      )
+      expect(datesTitle.textContent.trim()).toBe('Activity dates')
+      verifySummaryListRow(datesCard, 'Start date', '1 July 2025')
+      verifySummaryListRow(datesCard, 'End date', '7 July 2025')
 
-      verifyCardContent(document, '#activity-details-card', [
-        'Activity details',
+      const { card: activityCard, title: activityTitle } = getSummaryCard(
+        document,
+        '#activity-details-card'
+      )
+      expect(activityTitle.textContent.trim()).toBe('Activity details')
+      const activityDescRow = getSummaryListRow(
+        activityCard,
         'Activity description'
-      ])
+      )
+      expect(activityDescRow).toBeTruthy()
 
       verifySiteDetailsCard(
         document,
@@ -191,7 +242,11 @@ describe('Check Your Answers - File Upload Site Details Integration Tests', () =
         'Cavendish_Dock_Boundary_Polygon_WGS84.zip'
       )
 
-      verifyCardContent(document, '#public-register-card', ['Public register'])
+      const { title: publicTitle } = getSummaryCard(
+        document,
+        '#public-register-card'
+      )
+      expect(publicTitle.textContent.trim()).toBe('Public register')
     })
 
     test('should display activity dates in correct format', async () => {
@@ -205,17 +260,37 @@ describe('Check Your Answers - File Upload Site Details Integration Tests', () =
       expect.hasAssertions()
       const { document } = await getCheckYourAnswersPage()
 
-      verifyCardContent(document, '#activity-details-card', [
-        'Activity details',
+      const { card: activityCard, title: activityTitle } = getSummaryCard(
+        document,
+        '#activity-details-card'
+      )
+      expect(activityTitle.textContent.trim()).toBe('Activity details')
+
+      const activityDescRow = getSummaryListRow(
+        activityCard,
         'Activity description'
-      ])
+      )
+      expect(activityDescRow).toBeTruthy()
+
+      const key = activityDescRow.querySelector('.govuk-summary-list__key')
+      expect(key.textContent.trim()).toBe('Activity description')
     })
 
     test('should handle public register information in correct card', async () => {
       expect.hasAssertions()
       const { document } = await getCheckYourAnswersPage()
 
-      verifyCardContent(document, '#public-register-card', ['Public register'])
+      const { card: publicCard, title: publicTitle } = getSummaryCard(
+        document,
+        '#public-register-card'
+      )
+      expect(publicTitle.textContent.trim()).toBe('Public register')
+
+      const infoRow = getSummaryListRow(
+        publicCard,
+        'Information withheld from public register'
+      )
+      expect(infoRow).toBeTruthy()
     })
   })
 

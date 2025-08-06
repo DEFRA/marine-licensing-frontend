@@ -1,6 +1,9 @@
+import { getUserSession } from '~/src/server/common/plugins/auth/utils.js'
+
 const mockReadFileSync = jest.fn()
 const mockLoggerError = jest.fn()
 
+jest.mock('~/src/server/common/plugins/auth/utils.js')
 jest.mock('node:fs', () => ({
   ...jest.requireActual('node:fs'),
   readFileSync: () => mockReadFileSync()
@@ -12,6 +15,11 @@ jest.mock('~/src/server/common/helpers/logging/logger.js', () => ({
 describe('#context', () => {
   const mockRequest = { path: '/' }
   let contextResult
+  const mockGetUserSession = jest.mocked(getUserSession)
+
+  beforeEach(() => {
+    jest.clearAllMocks()
+  })
 
   describe('When webpack manifest file read succeeds', () => {
     let contextImport
@@ -20,14 +28,14 @@ describe('#context', () => {
       contextImport = await import('~/src/config/nunjucks/context/context.js')
     })
 
-    beforeEach(() => {
+    beforeEach(async () => {
       // Return JSON string
       mockReadFileSync.mockReturnValue(`{
         "application.js": "javascripts/application.js",
         "stylesheets/application.scss": "stylesheets/application.css"
       }`)
 
-      contextResult = contextImport.context(mockRequest)
+      contextResult = await contextImport.context(mockRequest)
     })
 
     test('Should provide expected context', () => {
@@ -64,6 +72,52 @@ describe('#context', () => {
         )
       })
     })
+
+    describe('When user is authenticated with defraId', () => {
+      beforeEach(async () => {
+        mockGetUserSession.mockResolvedValue({
+          strategy: 'defra-id',
+          displayName: 'John Doe'
+        })
+
+        contextResult = await contextImport.context(mockRequest)
+      })
+
+      test('Should include account management link in navigation', () => {
+        expect(contextResult.navigation).toEqual([
+          {
+            active: false,
+            text: 'Projects home',
+            href: '/home'
+          },
+          {
+            text: 'Defra account',
+            href: '#'
+          }
+        ])
+      })
+    })
+
+    describe('When user is not authenticated with defraId', () => {
+      beforeEach(async () => {
+        mockGetUserSession.mockResolvedValue({
+          strategy: 'basic',
+          displayName: 'Guest User'
+        })
+
+        contextResult = await contextImport.context(mockRequest)
+      })
+
+      test('Should not include account management link in navigation', () => {
+        expect(contextResult.navigation).toEqual([
+          {
+            active: false,
+            text: 'Projects home',
+            href: '/home'
+          }
+        ])
+      })
+    })
   })
 
   describe('When webpack manifest file read fails', () => {
@@ -73,10 +127,10 @@ describe('#context', () => {
       contextImport = await import('~/src/config/nunjucks/context/context.js')
     })
 
-    beforeEach(() => {
+    beforeEach(async () => {
       mockReadFileSync.mockReturnValue(new Error('File not found'))
 
-      contextResult = contextImport.context(mockRequest)
+      contextResult = await contextImport.context(mockRequest)
     })
 
     test('Should log that the Webpack Manifest file is not available', () => {
@@ -98,14 +152,14 @@ describe('#context cache', () => {
       contextImport = await import('~/src/config/nunjucks/context/context.js')
     })
 
-    beforeEach(() => {
+    beforeEach(async () => {
       // Return JSON string
       mockReadFileSync.mockReturnValue(`{
         "application.js": "javascripts/application.js",
         "stylesheets/application.scss": "stylesheets/application.css"
       }`)
 
-      contextResult = contextImport.context(mockRequest)
+      contextResult = await contextImport.context(mockRequest)
     })
 
     test('Should read file', () => {

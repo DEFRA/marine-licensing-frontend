@@ -19,7 +19,7 @@ let webpackManifest
 /**
  * @param {Request | null} request
  */
-export function context(request) {
+export async function context(request) {
   if (!webpackManifest) {
     try {
       webpackManifest = JSON.parse(readFileSync(manifestPath, 'utf-8'))
@@ -28,13 +28,15 @@ export function context(request) {
     }
   }
 
+  const navigation = await buildNavigation(request)
+
   return {
     assetPath: `${assetPath}/assets`,
     serviceName: config.get('serviceName'),
     serviceUrl: '/',
     signOutUrl: routes.SIGN_OUT,
     breadcrumbs: [],
-    navigation: buildNavigation(request),
+    navigation,
     clarityProjectId: config.get('clarityProjectId'),
     /**
      * @param {string} asset

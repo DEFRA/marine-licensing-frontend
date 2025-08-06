@@ -25,12 +25,13 @@ class SiteVisualiser {
   /**
    * Display a circular site on the map
    * @param {Array} centreCoordinates - Web Mercator centre coordinates [x, y]
-   * @param {number} radiusInMetres - Radius in metres
+   * @param {number} diameterInMetres - Diameter (width) in metres
    */
-  displayCircularSite(centreCoordinates, radiusInMetres) {
+  displayCircularSite(centreCoordinates, diameterInMetres) {
     const { Feature, Polygon, fromLonLat, toLonLat } = this.olModules
     const centreWGS84 = toLonLat(centreCoordinates)
 
+    const radiusInMetres = diameterInMetres / 2
     const circleCoords = CircleGeometryCalculator.createGeographicCircle(
       centreWGS84,
       radiusInMetres

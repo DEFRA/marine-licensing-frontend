@@ -77,7 +77,7 @@ describe('SiteVisualiser', () => {
   const setupCircularSiteTest = () => {
     const setup = {
       centreCoordinates: [1000, 2000],
-      radiusInMetres: 500,
+      diameterInMetres: 500,
       centreWGS84: [0, 51],
       circleCoords: [
         [0, 51],
@@ -110,7 +110,7 @@ describe('SiteVisualiser', () => {
       setup = setupCircularSiteTest()
       siteVisualiser.displayCircularSite(
         setup.centreCoordinates,
-        setup.radiusInMetres
+        setup.diameterInMetres
       )
     })
 
@@ -123,7 +123,7 @@ describe('SiteVisualiser', () => {
     test('should calculate geographic circle with correct parameters', () => {
       expect(
         CircleGeometryCalculator.createGeographicCircle
-      ).toHaveBeenCalledWith(setup.centreWGS84, setup.radiusInMetres)
+      ).toHaveBeenCalledWith(setup.centreWGS84, setup.diameterInMetres / 2)
     })
 
     test('should project circle coordinates to map projection', () => {

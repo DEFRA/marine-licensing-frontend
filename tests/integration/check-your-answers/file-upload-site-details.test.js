@@ -55,6 +55,18 @@ describe('Check Your Answers - File Upload Site Details Integration Tests', () =
     return verifyCardContent(document, '#site-details-card', commonTexts)
   }
 
+  const testFileUploadDisplay = async (
+    fileUploadType,
+    filename,
+    expectedDisplayType
+  ) => {
+    const exemption = createFileUploadExemption(fileUploadType, filename)
+    jest.spyOn(cacheUtils, 'getExemptionCache').mockReturnValue(exemption)
+
+    const { document } = await getCheckYourAnswersPage()
+    verifySiteDetailsCard(document, expectedDisplayType, filename)
+  }
+
   beforeAll(async () => {
     server = await createServer()
     await server.initialize()
@@ -88,29 +100,15 @@ describe('Check Your Answers - File Upload Site Details Integration Tests', () =
 
     test('should display KML upload details correctly', async () => {
       expect.hasAssertions()
-      const kmlExemption = createFileUploadExemption(
-        'kml',
-        'hammersmith_coordinates.kml'
-      )
-      jest.spyOn(cacheUtils, 'getExemptionCache').mockReturnValue(kmlExemption)
-
-      const { document } = await getCheckYourAnswersPage()
-      verifySiteDetailsCard(document, 'KML', 'hammersmith_coordinates.kml')
+      await testFileUploadDisplay('kml', 'hammersmith_coordinates.kml', 'KML')
     })
 
     test('should display zip filenames correctly', async () => {
       expect.hasAssertions()
-      const zipExemption = createFileUploadExemption(
+      await testFileUploadDisplay(
         'shapefile',
-        'marine_site_coordinates.zip'
-      )
-      jest.spyOn(cacheUtils, 'getExemptionCache').mockReturnValue(zipExemption)
-
-      const { document } = await getCheckYourAnswersPage()
-      verifySiteDetailsCard(
-        document,
-        'Shapefile',
-        'marine_site_coordinates.zip'
+        'marine_site_coordinates.zip',
+        'Shapefile'
       )
     })
   })

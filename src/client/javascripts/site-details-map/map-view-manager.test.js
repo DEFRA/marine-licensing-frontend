@@ -29,7 +29,7 @@ describe('MapViewManager', () => {
 
       expect(mockView.fit).toHaveBeenCalledWith(extent, {
         padding: [20, 20, 20, 20],
-        maxZoom: 16,
+        maxZoom: 14,
         minZoom: 8,
         duration: 500
       })
@@ -60,7 +60,7 @@ describe('MapViewManager', () => {
 
       expect(mockView.fit).not.toHaveBeenCalled()
       expect(mockView.setCenter).toHaveBeenCalledWith([-3.5, 54.0])
-      expect(mockView.setZoom).toHaveBeenCalledWith(14)
+      expect(mockView.setZoom).toHaveBeenCalledWith(12)
     })
 
     test('should fall back to centre view when extent is null', () => {
@@ -68,7 +68,7 @@ describe('MapViewManager', () => {
 
       expect(mockView.fit).not.toHaveBeenCalled()
       expect(mockView.setCenter).toHaveBeenCalledWith([-3.5, 54.0])
-      expect(mockView.setZoom).toHaveBeenCalledWith(14)
+      expect(mockView.setZoom).toHaveBeenCalledWith(12)
     })
 
     test('should fall back to centre view when fit throws an error', () => {
@@ -80,45 +80,53 @@ describe('MapViewManager', () => {
       mapViewManager.fitMapToExtent(mockMap, extent)
 
       expect(mockView.setCenter).toHaveBeenCalledWith([-3.5, 54.0])
-      expect(mockView.setZoom).toHaveBeenCalledWith(14)
+      expect(mockView.setZoom).toHaveBeenCalledWith(12)
     })
+  })
+
+  const setupFitTest = (methodName, mockSourceFactory, extent, options) => {
+    const mockSource = mockSourceFactory(extent)
+    mapViewManager[methodName](mockMap, mockSource, options)
+    return { mockSource, extent, options }
+  }
+
+  const getFitExpectations = (extent, options) => ({
+    fitOptions: {
+      padding: [20, 20, 20, 20],
+      maxZoom: 14,
+      minZoom: 8,
+      duration: 500,
+      ...options
+    }
   })
 
   describe('fitMapToGeometry', () => {
     test('should get extent from geometry and call fitMapToExtent', () => {
-      const mockGeometry = {
-        getExtent: jest.fn().mockReturnValue([100, 200, 300, 400])
-      }
-      const options = { maxZoom: 15 }
+      const { mockSource, extent, options } = setupFitTest(
+        'fitMapToGeometry',
+        (extent) => ({ getExtent: jest.fn().mockReturnValue(extent) }),
+        [100, 200, 300, 400],
+        { maxZoom: 15 }
+      )
 
-      mapViewManager.fitMapToGeometry(mockMap, mockGeometry, options)
-
-      expect(mockGeometry.getExtent).toHaveBeenCalled()
-      expect(mockView.fit).toHaveBeenCalledWith([100, 200, 300, 400], {
-        padding: [20, 20, 20, 20],
-        maxZoom: 15,
-        minZoom: 8,
-        duration: 500
-      })
+      const expectations = getFitExpectations(extent, options)
+      expect(mockSource.getExtent).toHaveBeenCalled()
+      expect(mockView.fit).toHaveBeenCalledWith(extent, expectations.fitOptions)
     })
   })
 
   describe('fitMapToAllFeatures', () => {
     test('should get extent from vector source and call fitMapToExtent', () => {
-      const mockVectorSource = {
-        getExtent: jest.fn().mockReturnValue([500, 600, 700, 800])
-      }
-      const options = { minZoom: 10 }
+      const { mockSource, extent, options } = setupFitTest(
+        'fitMapToAllFeatures',
+        (extent) => ({ getExtent: jest.fn().mockReturnValue(extent) }),
+        [500, 600, 700, 800],
+        { minZoom: 10 }
+      )
 
-      mapViewManager.fitMapToAllFeatures(mockMap, mockVectorSource, options)
-
-      expect(mockVectorSource.getExtent).toHaveBeenCalled()
-      expect(mockView.fit).toHaveBeenCalledWith([500, 600, 700, 800], {
-        padding: [20, 20, 20, 20],
-        maxZoom: 16,
-        minZoom: 10,
-        duration: 500
-      })
+      const expectations = getFitExpectations(extent, options)
+      expect(mockSource.getExtent).toHaveBeenCalled()
+      expect(mockView.fit).toHaveBeenCalledWith(extent, expectations.fitOptions)
     })
   })
 
@@ -129,7 +137,7 @@ describe('MapViewManager', () => {
       mapViewManager.centreMapView(mockMap, coordinates)
 
       expect(mockView.setCenter).toHaveBeenCalledWith(coordinates)
-      expect(mockView.setZoom).toHaveBeenCalledWith(14)
+      expect(mockView.setZoom).toHaveBeenCalledWith(12)
     })
 
     test('should centre map on coordinates with custom zoom', () => {

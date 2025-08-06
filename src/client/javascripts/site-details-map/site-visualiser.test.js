@@ -230,7 +230,7 @@ describe('SiteVisualiser', () => {
     const getPointSiteExpectations = (mapCoordinates) => ({
       displayCircularSite: { called: false },
       displayPointSite: { called: true, args: [mapCoordinates] },
-      centreMapView: { called: true, args: [mockMap, mapCoordinates, 14] }
+      centreMapView: { called: true, args: [mockMap, mapCoordinates, 12] }
     })
 
     beforeEach(() => {

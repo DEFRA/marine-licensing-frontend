@@ -68,7 +68,7 @@ class SiteVisualiser {
    * @param {object} siteDetails - Site details with manual coordinates
    */
   displayManualCoordinates(siteDetails) {
-    const POINT_ZOOM_LEVEL = 14
+    const POINT_ZOOM_LEVEL = 12
     const { coordinateSystem, coordinates, circleWidth } = siteDetails
 
     if (!coordinates) {

@@ -11,7 +11,7 @@ class MapViewManager {
   fitMapToExtent(map, extent, options = {}) {
     const defaultOptions = {
       padding: [20, 20, 20, 20], // top, right, bottom, left padding in pixels
-      maxZoom: 16, // prevent zooming too far in
+      maxZoom: 14, // prevent zooming too far in
       minZoom: 8, // prevent zooming too far out
       duration: 500 // smooth animation duration
     }
@@ -66,7 +66,7 @@ class MapViewManager {
    * @param {Array} mapCoordinates - Web Mercator coordinates [x, y]
    * @param {number} zoomLevel - Zoom level to set
    */
-  centreMapView(map, mapCoordinates, zoomLevel = 14) {
+  centreMapView(map, mapCoordinates, zoomLevel = 12) {
     map.getView().setCenter(mapCoordinates)
     map.getView().setZoom(zoomLevel)
   }

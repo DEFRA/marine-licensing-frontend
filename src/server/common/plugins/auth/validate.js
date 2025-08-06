@@ -7,13 +7,13 @@ import {
 import { isPast, parseISO, subMinutes } from 'date-fns'
 
 export const validateUserSession = async (request, session) => {
-  const userSession = await getUserSession(request, session)
+  const authedUser = await getUserSession(request, session)
 
-  if (!userSession) {
+  if (!authedUser) {
     return { isValid: false }
   }
 
-  const tokenHasExpired = isPast(subMinutes(parseISO(userSession.expiresAt), 1))
+  const tokenHasExpired = isPast(subMinutes(parseISO(authedUser.expiresAt), 1))
 
   if (tokenHasExpired) {
     const response = await refreshAccessToken(request, session)
@@ -34,6 +34,14 @@ export const validateUserSession = async (request, session) => {
       credentials: updatedSession
     }
   }
+  const userSession = await request.server.app.cache.get(session.sessionId)
 
-  return { isValid: true, credentials: userSession }
+  if (userSession) {
+    return {
+      isValid: true,
+      credentials: userSession
+    }
+  }
+
+  return { isValid: false }
 }

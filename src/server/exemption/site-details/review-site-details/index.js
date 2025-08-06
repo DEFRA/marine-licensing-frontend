@@ -1,8 +1,8 @@
+import { routes } from '~/src/server/common/constants/routes.js'
 import {
   reviewSiteDetailsController,
   reviewSiteDetailsSubmitController
 } from '~/src/server/exemption/site-details/review-site-details/controller.js'
-import { routes } from '~/src/server/common/constants/routes.js'
 
 /**
  * Sets up the routes used in the review site details page.

@@ -93,6 +93,18 @@ export default {
         sideEffects: false
       },
       {
+        test: /\.css$/,
+        type: ruleTypeAssetResource,
+        generator: {
+          binary: false,
+          filename:
+            NODE_ENV === 'production'
+              ? 'stylesheets/[name].[contenthash:7].min.css'
+              : 'stylesheets/[name].css'
+        },
+        use: ['postcss-loader']
+      },
+      {
         test: /\.scss$/,
         type: ruleTypeAssetResource,
         generator: {
@@ -181,6 +193,10 @@ export default {
         {
           from: path.join(govukFrontendPath, 'dist/govuk/assets'),
           to: 'assets'
+        },
+        {
+          from: require.resolve('ol/ol.css'),
+          to: 'stylesheets/ol.css'
         }
       ]
     })

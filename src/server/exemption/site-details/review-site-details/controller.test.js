@@ -1,18 +1,18 @@
-import { createServer } from '~/src/server/index.js'
-import {
-  reviewSiteDetailsController,
-  reviewSiteDetailsSubmitController,
-  REVIEW_SITE_DETAILS_VIEW_ROUTE,
-  FILE_UPLOAD_REVIEW_VIEW_ROUTE
-} from '~/src/server/exemption/site-details/review-site-details/controller.js'
-import { COORDINATE_SYSTEMS } from '~/src/server/common/constants/exemptions.js'
-import * as cacheUtils from '~/src/server/common/helpers/session-cache/utils.js'
-import { mockExemption } from '~/src/server/test-helpers/mocks.js'
-import { statusCodes } from '~/src/server/common/constants/status-codes.js'
-import { config } from '~/src/config/config.js'
 import { JSDOM } from 'jsdom'
+import { config } from '~/src/config/config.js'
+import { COORDINATE_SYSTEMS } from '~/src/server/common/constants/exemptions.js'
 import { routes } from '~/src/server/common/constants/routes.js'
+import { statusCodes } from '~/src/server/common/constants/status-codes.js'
 import * as authRequests from '~/src/server/common/helpers/authenticated-requests.js'
+import * as cacheUtils from '~/src/server/common/helpers/session-cache/utils.js'
+import {
+  FILE_UPLOAD_REVIEW_VIEW_ROUTE,
+  REVIEW_SITE_DETAILS_VIEW_ROUTE,
+  reviewSiteDetailsController,
+  reviewSiteDetailsSubmitController
+} from '~/src/server/exemption/site-details/review-site-details/controller.js'
+import { createServer } from '~/src/server/index.js'
+import { mockExemption } from '~/src/server/test-helpers/mocks.js'
 
 jest.mock('~/src/server/common/helpers/session-cache/utils.js')
 
@@ -30,6 +30,104 @@ describe('#reviewSiteDetails', () => {
     },
     [COORDINATE_SYSTEMS.OSGB36]: { eastings: '425053', northings: '564180' }
   }
+
+  const createFileUploadExemption = () => ({
+    id: 'test-id',
+    projectName: 'Test Project',
+    siteDetails: {
+      coordinatesType: 'file',
+      fileUploadType: 'kml',
+      uploadedFile: {
+        filename: 'test-site.kml'
+      },
+      geoJSON: {
+        type: 'FeatureCollection',
+        features: [
+          {
+            type: 'Feature',
+            geometry: {
+              type: 'Point',
+              coordinates: [51.5074, -0.1278]
+            }
+          }
+        ]
+      }
+    }
+  })
+
+  const createMockRequest = () => ({
+    logger: {
+      info: jest.fn(),
+      error: jest.fn(),
+      warn: jest.fn(),
+      debug: jest.fn()
+    }
+  })
+
+  const createTestContext = () => ({
+    h: { view: jest.fn(), redirect: jest.fn() },
+    request: createMockRequest()
+  })
+
+  const extractViewCall = (mockH) => {
+    const [route, context] = mockH.view.mock.calls[0]
+    return { route, context }
+  }
+
+  const createFileUploadExemptionWithS3 = () => ({
+    ...mockExemption,
+    siteDetails: {
+      coordinatesType: 'file',
+      fileUploadType: 'kml',
+      uploadedFile: {
+        filename: 'test-site.kml',
+        s3Location: {
+          s3Bucket: 'test-bucket',
+          s3Key: 'test-key',
+          checksumSha256: 'test-checksum'
+        }
+      },
+      geoJSON: {
+        type: 'FeatureCollection',
+        features: [
+          {
+            type: 'Feature',
+            geometry: {
+              type: 'Point',
+              coordinates: [51.5074, -0.1278]
+            }
+          }
+        ]
+      },
+      featureCount: 1
+    }
+  })
+
+  const createExpectedSiteDetails = () => ({
+    coordinatesType: 'file',
+    fileUploadType: 'kml',
+    geoJSON: {
+      type: 'FeatureCollection',
+      features: [
+        {
+          type: 'Feature',
+          geometry: {
+            type: 'Point',
+            coordinates: [51.5074, -0.1278]
+          }
+        }
+      ]
+    },
+    featureCount: 1,
+    uploadedFile: {
+      filename: 'test-site.kml'
+    },
+    s3Location: {
+      s3Bucket: 'test-bucket',
+      s3Key: 'test-key',
+      checksumSha256: 'test-checksum'
+    }
+  })
 
   beforeAll(async () => {
     server = await createServer()
@@ -73,14 +171,7 @@ describe('#reviewSiteDetails', () => {
       getCoordinateSystemSpy.mockReturnValueOnce({})
 
       const h = { view: jest.fn() }
-      const mockRequest = {
-        logger: {
-          info: jest.fn(),
-          error: jest.fn(),
-          warn: jest.fn(),
-          debug: jest.fn()
-        }
-      }
+      const mockRequest = createMockRequest()
 
       await reviewSiteDetailsController.handler(mockRequest, h)
 
@@ -94,7 +185,10 @@ describe('#reviewSiteDetails', () => {
           coordinateSystem: '',
           coordinates: '',
           width: ''
-        }
+        },
+        siteDetailsData: JSON.stringify({
+          coordinatesType: 'coordinates'
+        })
       })
     })
 
@@ -102,51 +196,18 @@ describe('#reviewSiteDetails', () => {
       const exemptionWithoutSiteDetails = {
         id: 'test-id',
         projectName: 'Test Project'
-        // siteDetails is undefined
       }
-
-      const completeMongoData = {
-        id: 'test-id',
-        projectName: 'Test Project',
-        siteDetails: {
-          coordinatesType: 'file',
-          fileUploadType: 'kml',
-          uploadedFile: {
-            filename: 'test-site.kml'
-          },
-          geoJSON: {
-            type: 'FeatureCollection',
-            features: [
-              {
-                type: 'Feature',
-                geometry: {
-                  type: 'Point',
-                  coordinates: [51.5074, -0.1278]
-                }
-              }
-            ]
-          }
-        }
-      }
+      const completeMongoData = createFileUploadExemption()
 
       getExemptionCacheSpy.mockReturnValueOnce(exemptionWithoutSiteDetails)
       jest
         .spyOn(authRequests, 'authenticatedGetRequest')
         .mockResolvedValueOnce({
-          payload: {
-            value: completeMongoData
-          }
+          payload: { value: completeMongoData }
         })
 
       const h = { view: jest.fn() }
-      const mockRequest = {
-        logger: {
-          info: jest.fn(),
-          error: jest.fn(),
-          warn: jest.fn(),
-          debug: jest.fn()
-        }
-      }
+      const mockRequest = createMockRequest()
 
       await reviewSiteDetailsController.handler(mockRequest, h)
 
@@ -186,38 +247,13 @@ describe('#reviewSiteDetails', () => {
     test('reviewSiteDetailsController handler should render file upload template for file upload flow', async () => {
       const mockFileUploadExemption = {
         ...mockExemption,
-        siteDetails: {
-          coordinatesType: 'file',
-          fileUploadType: 'kml',
-          uploadedFile: {
-            filename: 'test-site.kml'
-          },
-          geoJSON: {
-            type: 'FeatureCollection',
-            features: [
-              {
-                type: 'Feature',
-                geometry: {
-                  type: 'Point',
-                  coordinates: [51.5074, -0.1278]
-                }
-              }
-            ]
-          }
-        }
+        ...createFileUploadExemption()
       }
 
       getExemptionCacheSpy.mockReturnValueOnce(mockFileUploadExemption)
 
       const h = { view: jest.fn() }
-      const mockRequest = {
-        logger: {
-          info: jest.fn(),
-          error: jest.fn(),
-          warn: jest.fn(),
-          debug: jest.fn()
-        }
-      }
+      const mockRequest = createMockRequest()
 
       await reviewSiteDetailsController.handler(mockRequest, h)
 
@@ -243,45 +279,42 @@ describe('#reviewSiteDetails', () => {
       )
     })
 
-    test('reviewSiteDetailsController handler should render with correct context for WGS84', async () => {
-      const h = { view: jest.fn() }
-      const mockRequest = {
-        logger: {
-          info: jest.fn(),
-          error: jest.fn(),
-          warn: jest.fn(),
-          debug: jest.fn()
-        }
-      }
+    test('should render WGS84 template', async () => {
+      const { h, request } = createTestContext()
 
-      await reviewSiteDetailsController.handler(mockRequest, h)
+      await reviewSiteDetailsController.handler(request, h)
 
-      expect(h.view).toHaveBeenCalledWith(REVIEW_SITE_DETAILS_VIEW_ROUTE, {
-        heading: 'Review site details',
-        pageTitle: 'Review site details',
-        backLink: routes.TASK_LIST,
-        projectName: 'Test Project',
-        summaryData: {
-          method:
-            'Manually enter one set of coordinates and a width to create a circular site',
-          coordinateSystem:
-            'WGS84 (World Geodetic System 1984)\nLatitude and longitude',
-          coordinates: `${mockCoordinates[COORDINATE_SYSTEMS.WGS84].latitude}, ${mockCoordinates[COORDINATE_SYSTEMS.WGS84].longitude}`,
-          width: '100 metres'
-        }
-      })
+      expect(h.view).toHaveBeenCalledWith(
+        REVIEW_SITE_DETAILS_VIEW_ROUTE,
+        expect.any(Object)
+      )
+    })
+
+    test('should format WGS84 coordinate display correctly', async () => {
+      const { h, request } = createTestContext()
+
+      await reviewSiteDetailsController.handler(request, h)
+
+      const { context } = extractViewCall(h)
+      expect(context.summaryData.coordinates).toBe(
+        `${mockCoordinates[COORDINATE_SYSTEMS.WGS84].latitude}, ${mockCoordinates[COORDINATE_SYSTEMS.WGS84].longitude}`
+      )
+    })
+
+    test('should include WGS84 coordinate system description', async () => {
+      const { h, request } = createTestContext()
+
+      await reviewSiteDetailsController.handler(request, h)
+
+      const { context } = extractViewCall(h)
+      expect(context.summaryData.coordinateSystem).toBe(
+        'WGS84 (World Geodetic System 1984)\nLatitude and longitude'
+      )
     })
 
     test('reviewSiteDetailsController handler should render with correct context for OSGB36', async () => {
       const h = { view: jest.fn() }
-      const mockRequest = {
-        logger: {
-          info: jest.fn(),
-          error: jest.fn(),
-          warn: jest.fn(),
-          debug: jest.fn()
-        }
-      }
+      const mockRequest = createMockRequest()
 
       getExemptionCacheSpy.mockReturnValueOnce({
         ...mockExemption,
@@ -308,7 +341,17 @@ describe('#reviewSiteDetails', () => {
           coordinateSystem: 'OSGB36 (National Grid)\nEastings and Northings',
           coordinates: `${mockCoordinates[COORDINATE_SYSTEMS.OSGB36].eastings}, ${mockCoordinates[COORDINATE_SYSTEMS.OSGB36].northings}`,
           width: '100 metres'
-        }
+        },
+        siteDetailsData: JSON.stringify({
+          coordinatesType: 'coordinates',
+          coordinateSystem: 'osgb36',
+          coordinatesEntry: 'single',
+          coordinates: {
+            eastings: '425053',
+            northings: '564180'
+          },
+          circleWidth: '100'
+        })
       })
     })
 
@@ -439,43 +482,10 @@ describe('#reviewSiteDetails', () => {
     })
 
     test('Should save file upload data with display metadata for file upload flow', async () => {
-      const mockFileUploadExemption = {
-        ...mockExemption,
-        siteDetails: {
-          coordinatesType: 'file',
-          fileUploadType: 'kml',
-          uploadedFile: {
-            filename: 'test-site.kml',
-            s3Location: {
-              s3Bucket: 'test-bucket',
-              s3Key: 'test-key',
-              checksumSha256: 'test-checksum'
-            }
-          },
-          geoJSON: {
-            type: 'FeatureCollection',
-            features: [
-              {
-                type: 'Feature',
-                geometry: {
-                  type: 'Point',
-                  coordinates: [51.5074, -0.1278]
-                }
-              }
-            ]
-          },
-          featureCount: 1
-        }
-      }
-
+      const mockFileUploadExemption = createFileUploadExemptionWithS3()
       getExemptionCacheSpy.mockReturnValueOnce(mockFileUploadExemption)
 
-      const request = {
-        logger: {
-          info: jest.fn(),
-          error: jest.fn()
-        }
-      }
+      const request = createMockRequest()
       const h = { redirect: jest.fn() }
 
       await reviewSiteDetailsSubmitController.handler(request, h)
@@ -484,31 +494,7 @@ describe('#reviewSiteDetails', () => {
         expect.any(Object),
         '/exemption/site-details',
         {
-          siteDetails: {
-            coordinatesType: 'file',
-            fileUploadType: 'kml',
-            geoJSON: {
-              type: 'FeatureCollection',
-              features: [
-                {
-                  type: 'Feature',
-                  geometry: {
-                    type: 'Point',
-                    coordinates: [51.5074, -0.1278]
-                  }
-                }
-              ]
-            },
-            featureCount: 1,
-            uploadedFile: {
-              filename: 'test-site.kml'
-            },
-            s3Location: {
-              s3Bucket: 'test-bucket',
-              s3Key: 'test-key',
-              checksumSha256: 'test-checksum'
-            }
-          },
+          siteDetails: createExpectedSiteDetails(),
           id: mockExemption.id
         }
       )

@@ -1,3 +1,7 @@
+import { config } from '~/src/config/config.js'
+import { routes } from '~/src/server/common/constants/routes.js'
+import { authenticatedPostRequest } from '~/src/server/common/helpers/authenticated-requests.js'
+import { extractCoordinatesFromGeoJSON } from '~/src/server/common/helpers/coordinate-utils.js'
 import {
   getExemptionCache,
   updateExemptionSiteDetails,
@@ -5,10 +9,6 @@ import {
 } from '~/src/server/common/helpers/session-cache/utils.js'
 import { getCdpUploadService } from '~/src/services/cdp-upload-service/index.js'
 import { getFileValidationService } from '~/src/services/file-validation/index.js'
-import { routes } from '~/src/server/common/constants/routes.js'
-import { authenticatedPostRequest } from '~/src/server/common/helpers/authenticated-requests.js'
-import { config } from '~/src/config/config.js'
-import { extractCoordinatesFromGeoJSON } from '~/src/server/common/helpers/coordinate-utils.js'
 
 export const UPLOAD_AND_WAIT_VIEW_ROUTE =
   'exemption/site-details/upload-and-wait/index'
@@ -26,37 +26,56 @@ const pageSettings = {
  * @returns {object} Validation error object with message and fieldName
  */
 const transformCdpErrorToValidationError = (message, fileType) => {
-  const errorKey = 'file'
-
-  // Map CDP error messages to AC4 requirements
-  let errorMessage
-
-  if (message.includes('Select a file to upload')) {
-    errorMessage = 'Select a file to upload'
-  } else if (message.includes('virus')) {
-    errorMessage = 'The selected file contains a virus'
-  } else if (message.includes('empty')) {
-    errorMessage = 'The selected file is empty'
-  } else if (message.includes('smaller than')) {
-    errorMessage = 'The selected file must be smaller than 50 MB'
-  } else if (message.includes('must be a')) {
-    if (fileType === 'kml') {
-      errorMessage = 'The selected file must be a KML file'
-    } else if (fileType === 'shapefile') {
-      errorMessage = 'The selected file must be a Shapefile'
-    } else {
-      // There isn't a generic wrong file type error. Use the generic one.
-      errorMessage = 'The selected file could not be uploaded – try again'
-    }
-  } else {
-    // Generic upload error
-    errorMessage = 'The selected file could not be uploaded – try again'
-  }
+  const errorMessage = getErrorMessage(message, fileType)
 
   return {
     message: errorMessage,
-    fieldName: errorKey
+    fieldName: 'file'
   }
+}
+
+const getErrorMessage = (message, fileType) => {
+  const errorMappings = [
+    {
+      condition: (msg) => msg.includes('Select a file to upload'),
+      message: 'Select a file to upload'
+    },
+    {
+      condition: (msg) => msg.includes('virus'),
+      message: 'The selected file contains a virus'
+    },
+    {
+      condition: (msg) => msg.includes('empty'),
+      message: 'The selected file is empty'
+    },
+    {
+      condition: (msg) => msg.includes('smaller than'),
+      message: 'The selected file must be smaller than 50 MB'
+    },
+    {
+      condition: (msg) => msg.includes('must be a'),
+      message: getFileTypeErrorMessage(fileType)
+    }
+  ]
+
+  const matchedMapping = errorMappings.find((mapping) =>
+    mapping.condition(message)
+  )
+  return matchedMapping
+    ? matchedMapping.message
+    : 'The selected file could not be uploaded – try again'
+}
+
+const getFileTypeErrorMessage = (fileType) => {
+  const fileTypeMessages = {
+    kml: 'The selected file must be a KML file',
+    shapefile: 'The selected file must be a Shapefile'
+  }
+
+  return (
+    fileTypeMessages[fileType] ||
+    'The selected file could not be uploaded – try again'
+  )
 }
 
 /**
@@ -86,48 +105,60 @@ function getAllowedExtensions(fileType) {
 async function extractCoordinatesFromFile(request, s3Bucket, s3Key, fileType) {
   try {
     request.logger.info('Calling geo-parser API', { s3Bucket, s3Key, fileType })
-
-    const response = await authenticatedPostRequest(
-      request,
-      '/geo-parser/extract',
-      {
-        s3Bucket,
-        s3Key,
-        fileType
-      }
-    )
-
-    const { payload } = response
-    if (!payload || payload.message !== 'success') {
-      throw new Error('Invalid geo-parser response')
-    }
-
-    const geoJSON = payload.value
-    if (!geoJSON?.features) {
-      throw new Error('Invalid GeoJSON structure')
-    }
-
+    const response = await callGeoParserAPI(request, s3Bucket, s3Key, fileType)
+    const geoJSON = validateAndExtractGeoJSON(response)
     const extractedCoordinates = extractCoordinatesFromGeoJSON(geoJSON)
 
-    request.logger.info('Successfully extracted coordinates', {
-      featureCount: geoJSON.features.length,
-      coordinateCount: extractedCoordinates.length
-    })
+    logExtractionSuccess(request, geoJSON, extractedCoordinates)
 
-    return {
-      geoJSON,
-      extractedCoordinates,
-      featureCount: geoJSON.features.length
-    }
+    return buildCoordinateResult(geoJSON, extractedCoordinates)
   } catch (error) {
-    request.logger.error('Failed to extract coordinates from file', {
-      error: error.message,
-      s3Bucket,
-      s3Key,
-      fileType
-    })
+    logExtractionError(request, error, { s3Bucket, s3Key, fileType })
     throw error
   }
+}
+
+const callGeoParserAPI = async (request, s3Bucket, s3Key, fileType) => {
+  return authenticatedPostRequest(request, '/geo-parser/extract', {
+    s3Bucket,
+    s3Key,
+    fileType
+  })
+}
+
+const validateAndExtractGeoJSON = (response) => {
+  const { payload } = response
+
+  if (!payload || payload.message !== 'success') {
+    throw new Error('Invalid geo-parser response')
+  }
+
+  const geoJSON = payload.value
+  if (!geoJSON?.features) {
+    throw new Error('Invalid GeoJSON structure')
+  }
+
+  return geoJSON
+}
+
+const logExtractionSuccess = (request, geoJSON, extractedCoordinates) => {
+  request.logger.info('Successfully extracted coordinates', {
+    featureCount: geoJSON.features.length,
+    coordinateCount: extractedCoordinates.length
+  })
+}
+
+const buildCoordinateResult = (geoJSON, extractedCoordinates) => ({
+  geoJSON,
+  extractedCoordinates,
+  featureCount: geoJSON.features.length
+})
+
+const logExtractionError = (request, error, fileContext) => {
+  request.logger.error('Failed to extract coordinates from file', {
+    error: error.message,
+    ...fileContext
+  })
 }
 
 /**
@@ -216,22 +247,17 @@ function storeUploadError(request, errorDetails, fileType) {
  * @param {object} request - Hapi request object
  * @param {object} status - Upload status response from CDP
  * @param {object} coordinateData - Extracted coordinate data
- * @param {string} s3Bucket - S3 bucket name
- * @param {string} s3Key - S3 object key
+ * @param {object} s3Location - S3 location details
+ * @param {string} s3Location.s3Bucket - S3 bucket name
+ * @param {string} s3Location.s3Key - S3 object key
  */
-function storeSuccessfulUpload(
-  request,
-  status,
-  coordinateData,
-  s3Bucket,
-  s3Key
-) {
+function storeSuccessfulUpload(request, status, coordinateData, s3Location) {
   updateExemptionSiteDetailsBatch(request, {
     uploadedFile: {
       ...status,
       s3Location: {
-        s3Bucket,
-        s3Key,
+        s3Bucket: s3Location.s3Bucket,
+        s3Key: s3Location.s3Key,
         fileId: status.s3Location.fileId,
         s3Url: status.s3Location.s3Url,
         checksumSha256: status.s3Location.checksumSha256
@@ -270,10 +296,17 @@ function handleProcessingStatus(status, exemption, h) {
  * @returns {Promise<object>} Hapi response (redirect)
  */
 async function handleReadyStatus(status, uploadConfig, request, h) {
-  // Apply our business validation to files that passed CDP checks
+  const validationResult = validateUploadedFile(status, uploadConfig, request)
+  if (!validationResult.isValid) {
+    return h.redirect(routes.FILE_UPLOAD)
+  }
+
+  return processValidatedFile(status, uploadConfig, request, h)
+}
+
+const validateUploadedFile = (status, uploadConfig, request) => {
   const fileValidationService = getFileValidationService(request.logger)
   const allowedExtensions = getAllowedExtensions(uploadConfig.fileType)
-
   const validation = fileValidationService.validateFileExtension(
     status.filename,
     allowedExtensions
@@ -281,43 +314,56 @@ async function handleReadyStatus(status, uploadConfig, request, h) {
 
   if (!validation.isValid) {
     handleValidationError(request, validation, uploadConfig.fileType)
-    return h.redirect(routes.FILE_UPLOAD)
   }
 
-  // File passed all validations - extract coordinates and store details
+  return validation
+}
+
+const processValidatedFile = async (status, uploadConfig, request, h) => {
   try {
-    // Get S3 details for geo-parser API call
-    const cdpUploadConfig = config.get('cdpUploader')
-    const s3Bucket = cdpUploadConfig.s3Bucket
-    const s3Key = status.s3Location.s3Key
-
-    // Extract coordinates using geo-parser API
-    const coordinateData = await extractCoordinatesFromFile(
-      request,
-      s3Bucket,
-      s3Key,
-      uploadConfig.fileType
+    const coordinateData = await extractAndStoreCoordinates(
+      status,
+      uploadConfig,
+      request
     )
-
-    // Store all successful upload data in session
-    storeSuccessfulUpload(request, status, coordinateData, s3Bucket, s3Key)
-
-    request.logger.info(
-      'File upload and coordinate extraction completed successfully',
-      {
-        filename: status.filename,
-        fileType: uploadConfig.fileType,
-        featureCount: coordinateData.featureCount
-      }
-    )
-
-    // Redirect to review site details page
+    logSuccessfulProcessing(request, status, uploadConfig, coordinateData)
     return h.redirect(routes.REVIEW_SITE_DETAILS)
   } catch (error) {
-    // Handle geo-parser errors and redirect
     handleGeoParserError(request, error, status.filename, uploadConfig.fileType)
     return h.redirect(routes.FILE_UPLOAD)
   }
+}
+
+const extractAndStoreCoordinates = async (status, uploadConfig, request) => {
+  const cdpUploadConfig = config.get('cdpUploader')
+  const s3Bucket = cdpUploadConfig.s3Bucket
+  const s3Key = status.s3Location.s3Key
+
+  const coordinateData = await extractCoordinatesFromFile(
+    request,
+    s3Bucket,
+    s3Key,
+    uploadConfig.fileType
+  )
+  storeSuccessfulUpload(request, status, coordinateData, { s3Bucket, s3Key })
+
+  return coordinateData
+}
+
+const logSuccessfulProcessing = (
+  request,
+  status,
+  uploadConfig,
+  coordinateData
+) => {
+  request.logger.info(
+    'File upload and coordinate extraction completed successfully',
+    {
+      filename: status.filename,
+      fileType: uploadConfig.fileType,
+      featureCount: coordinateData.featureCount
+    }
+  )
 }
 
 /**
@@ -355,19 +401,15 @@ function handleUnknownStatus(request, uploadConfig, status, h) {
 /**
  * Process upload status and handle appropriate response
  * @param {object} status - Upload status response from CDP
- * @param {object} uploadConfig - Upload configuration from session
- * @param {object} request - Hapi request object
- * @param {object} h - Hapi response toolkit
- * @param {object} exemption - Exemption data from session
+ * @param {object} context - Processing context
+ * @param {object} context.uploadConfig - Upload configuration from session
+ * @param {object} context.request - Hapi request object
+ * @param {object} context.h - Hapi response toolkit
+ * @param {object} context.exemption - Exemption data from session
  * @returns {Promise<object>} Hapi response (view or redirect)
  */
-async function processUploadStatus(
-  status,
-  uploadConfig,
-  request,
-  h,
-  exemption
-) {
+async function processUploadStatus(status, context) {
+  const { uploadConfig, request, h, exemption } = context
   request.logger.debug(
     `Upload status check:  ${JSON.stringify(
       {
@@ -419,13 +461,12 @@ export const uploadAndWaitController = {
         uploadConfig.statusUrl
       )
 
-      return await processUploadStatus(
-        status,
+      return await processUploadStatus(status, {
         uploadConfig,
         request,
         h,
         exemption
-      )
+      })
     } catch (error) {
       request.logger.error('Failed to check upload status', {
         error: error.message,

@@ -75,24 +75,38 @@ const areCoordinatesEmptyOrInvalid = (coordinates) => {
 }
 
 /**
- * Check if coordinate data matches the expected coordinate system
+ * Check if coordinate data has fields for the expected coordinate system
  * @param {object} coordinate - First coordinate object
  * @param {string} coordinateSystem - Expected coordinate system
- * @returns {boolean} True if coordinate system matches the data
+ * @returns {boolean} True if coordinate has the required fields for the system
  */
 const doesCoordinateSystemMatchData = (coordinate, coordinateSystem) => {
   const hasWgs84Fields = coordinate?.latitude !== undefined
   const hasOsgb36Fields = coordinate?.eastings !== undefined
 
   if (coordinateSystem === COORDINATE_SYSTEMS.WGS84) {
-    return hasWgs84Fields && !hasOsgb36Fields
+    return hasWgs84Fields
   }
 
   if (coordinateSystem === COORDINATE_SYSTEMS.OSGB36) {
-    return hasOsgb36Fields && !hasWgs84Fields
+    return hasOsgb36Fields
   }
 
   return false
+}
+
+/**
+ * Extract only the relevant fields for the coordinate system from a coordinate object
+ * @param {object} coordinate - Coordinate object that may have mixed field types
+ * @param {string} coordinateSystem - Target coordinate system
+ * @returns {object} Coordinate with only the relevant fields
+ */
+const extractRelevantCoordinateFields = (coordinate, coordinateSystem) => {
+  const fields = getCoordinateFields(coordinateSystem)
+  return {
+    [fields.primary]: coordinate[fields.primary] || '',
+    [fields.secondary]: coordinate[fields.secondary] || ''
+  }
 }
 
 /**
@@ -112,11 +126,15 @@ export const normaliseCoordinatesForDisplay = (
     return createDefaultCoordinates(coordinateSystem)
   }
 
-  while (coordinates.length < POLYGON_MIN_COORDINATE_POINTS) {
-    coordinates.push(createEmptyCoordinate(coordinateSystem))
+  const normalisedCoordinates = coordinates.map((coord) =>
+    extractRelevantCoordinateFields(coord, coordinateSystem)
+  )
+
+  while (normalisedCoordinates.length < POLYGON_MIN_COORDINATE_POINTS) {
+    normalisedCoordinates.push(createEmptyCoordinate(coordinateSystem))
   }
 
-  return coordinates
+  return normalisedCoordinates
 }
 
 export const extractCoordinateIndexFromFieldName = (fieldName) => {

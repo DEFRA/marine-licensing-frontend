@@ -115,7 +115,6 @@ describe('Site Details Interactive Map Behavior', () => {
   }
 
   const extractEmbeddedSiteData = (siteDataScript) => {
-    expect(siteDataScript).toBeInTheDocument()
     return JSON.parse(siteDataScript.textContent)
   }
 
@@ -165,6 +164,8 @@ describe('Site Details Interactive Map Behavior', () => {
         })
 
         await renderPageAndExtractMapElements(exemption)
+
+        expect(siteDataScript).toBeInTheDocument()
         const siteData = extractEmbeddedSiteData(siteDataScript)
 
         expect(mapContainer).toBeInTheDocument()
@@ -196,6 +197,8 @@ describe('Site Details Interactive Map Behavior', () => {
       })
 
       await renderPageAndExtractMapElements(exemptionWithShapefileUpload)
+
+      expect(siteDataScript).toBeInTheDocument()
       const siteData = extractEmbeddedSiteData(siteDataScript)
 
       expect(siteData.coordinatesType).toBe('file')
@@ -248,6 +251,8 @@ describe('Site Details Interactive Map Behavior', () => {
         })
 
         await renderPageAndExtractMapElements(exemption)
+
+        expect(siteDataScript).toBeInTheDocument()
         const siteData = extractEmbeddedSiteData(siteDataScript)
 
         expect(siteData.coordinatesType).toBe('file')
@@ -266,6 +271,8 @@ describe('Site Details Interactive Map Behavior', () => {
       const exemptionWithoutSiteDetails = createExemptionWithSiteDetails({})
 
       await renderPageAndExtractMapElements(exemptionWithoutSiteDetails)
+
+      expect(siteDataScript).toBeInTheDocument()
       const siteData = extractEmbeddedSiteData(siteDataScript)
 
       expect(mapContainer).toBeInTheDocument()
@@ -286,6 +293,8 @@ describe('Site Details Interactive Map Behavior', () => {
       })
 
       await renderPageAndExtractMapElements(exemptionWithInvalidCoordinates)
+
+      expect(siteDataScript).toBeInTheDocument()
       const siteData = extractEmbeddedSiteData(siteDataScript)
 
       expect(siteData.coordinateSystem).toBe(COORDINATE_SYSTEMS.WGS84)
@@ -319,6 +328,7 @@ describe('Site Details Interactive Map Behavior', () => {
 
       await renderPageAndExtractMapElements(exemptionWithSpecificData)
 
+      expect(siteDataScript).toBeInTheDocument()
       expect(siteDataScript.tagName).toBe('SCRIPT')
       expect(siteDataScript.getAttribute('type')).toBe('application/json')
       expect(siteDataScript.getAttribute('id')).toBe('site-details-data')

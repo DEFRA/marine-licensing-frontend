@@ -1,0 +1,81 @@
+{% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
+
+{{ govukSummaryList({
+    card: {
+      title: {
+        text: "Activity details"
+      },
+      attributes: {
+        id: "activity-details-card"
+      }
+    },
+    rows: [
+      {
+        key: {
+          text: "Activity description"
+        },
+        value: {
+          html: activityDescription
+        },
+        classes: "",
+        actions: {
+          items: [
+            {
+              href: "#",
+              text: "Change",
+              visuallyHiddenText: "activity description"
+            }
+          ]
+        }
+      },
+      {
+        key: {
+          text: "Type of activity"
+        },
+        value: {
+          html: ""
+        },
+        classes: "govuk-summary-list__row--no-border"
+      },
+      {
+        key: {
+          text: "The purpose of the activity"
+        },
+        value: {
+          html: ""
+        },
+        classes: "govuk-summary-list__row--no-border"
+      },
+      {
+        key: {
+          text: "What the activity involves"
+        },
+        value: {
+          html: ""
+        },
+        classes: "govuk-summary-list__row--no-border"
+      },
+      {
+        key: {
+          text: "Why this activity is exempt"
+        },
+        value: {
+          html: ""
+        },
+        classes: "govuk-summary-list__row--no-border"
+      },
+      {
+        key: {
+          text: "Your answers from 'Check if you need a marine licence'"
+        },
+        value: {
+          html: "<p><a href=\"#\" class=\"govuk-link\">Download a copy of your answers (PDF)</a></p>
+                <p class=\"govuk-body\">If you need to change any of your 'Check if you need a marine licence' answers:</p>
+                <ol class=\"govuk-list govuk-list--number\">
+                  <li>Delete this project from your projects.</li>
+                  <li>Restart the process by checking if you need a marine licence.</li>
+                </ol>"
+        }
+      }
+    ]
+  }) }}

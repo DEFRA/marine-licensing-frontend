@@ -1,0 +1,30 @@
+{% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
+
+{{ govukSummaryList({
+    card: {
+      title: {
+        text: "Public register"
+      },
+      actions: {
+        items: [
+          {
+            href: "#",
+            text: "Change"
+          }
+        ]
+      },
+      attributes: {
+        id: "public-register-card"
+      }
+    },
+    rows: [
+      {
+        key: {
+          text: "Information withheld from public register"
+        },
+        value: {
+          html: "Yes" if publicRegister.consent === 'yes' else "No"
+        }
+      }
+    ]
+  }) }}

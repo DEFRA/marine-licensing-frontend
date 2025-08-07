@@ -4,6 +4,7 @@ import { createServer } from '~/src/server/index.js'
 import { mockExemption } from '~/src/server/test-helpers/mocks.js'
 import * as authRequests from '~/src/server/common/helpers/authenticated-requests.js'
 import * as reviewUtils from '~/src/server/exemption/site-details/review-site-details/utils.js'
+import { COORDINATE_SYSTEMS } from '~/src/server/common/constants/exemptions.js'
 
 const CSS_SELECTORS = {
   checkYourAnswersHeading: '#check-your-answers-heading',
@@ -814,6 +815,408 @@ describe('check your answers controller', () => {
         `${CSS_SELECTORS.cards.siteDetails} ${CSS_SELECTORS.card.actions}`
       )
       expect(changeLink?.getAttribute('href')).toBe('#')
+    })
+  })
+
+  describe('Polygon site details display', () => {
+    const createPolygonExemption = (coordinateSystem, coordinates) =>
+      createExemptionWithSiteDetails({
+        coordinatesType: 'coordinates',
+        coordinatesEntry: 'multiple',
+        coordinateSystem,
+        coordinates
+      })
+
+    const mockPolygonCoordinatesWGS84 = [
+      { latitude: '55.123456', longitude: '-1.234567' },
+      { latitude: '55.223456', longitude: '-1.334567' },
+      { latitude: '55.323456', longitude: '-1.434567' }
+    ]
+
+    const mockPolygonCoordinatesOSGB36 = [
+      { eastings: '425053', northings: '564180' },
+      { eastings: '426000', northings: '565000' },
+      { eastings: '427000', northings: '566000' }
+    ]
+
+    const EXPECTED_POLYGON_TEXT = {
+      methodOfProviding:
+        'Manually enter multiple sets of coordinates to mark the boundary of the site',
+      coordinateSystems: {
+        wgs84: 'WGS84 (World Geodetic System 1984) Latitude and longitude',
+        osgb36: 'OSGB36 (National Grid) Eastings and Northings'
+      },
+      coordinateLabels: {
+        startEnd: 'Start and end points',
+        point2: 'Point 2',
+        point3: 'Point 3'
+      }
+    }
+
+    describe('Site details card for polygon site', () => {
+      test('Should display polygon site details with WGS84 coordinates correctly', async () => {
+        const polygonExemption = createPolygonExemption(
+          COORDINATE_SYSTEMS.WGS84,
+          mockPolygonCoordinatesWGS84
+        )
+        getExemptionCacheSpy.mockReturnValueOnce(polygonExemption)
+
+        const { result, statusCode } = await server.inject({
+          method: 'GET',
+          url: '/exemption/check-your-answers'
+        })
+
+        expect(statusCode).toBe(200)
+        const { document } = new JSDOM(result).window
+
+        expect(
+          getFirstRowValue(document, CSS_SELECTORS.cards.siteDetails)
+        ).toBe(EXPECTED_POLYGON_TEXT.methodOfProviding)
+
+        expect(
+          normalizeWhitespace(
+            getSecondRowValue(document, CSS_SELECTORS.cards.siteDetails)
+          )
+        ).toBe(EXPECTED_POLYGON_TEXT.coordinateSystems.wgs84)
+
+        expect(getCardKey(document, CSS_SELECTORS.cards.siteDetails, 3)).toBe(
+          EXPECTED_POLYGON_TEXT.coordinateLabels.startEnd
+        )
+        expect(
+          getThirdRowValue(document, CSS_SELECTORS.cards.siteDetails)
+        ).toBe('55.123456, -1.234567')
+
+        expect(getCardKey(document, CSS_SELECTORS.cards.siteDetails, 4)).toBe(
+          EXPECTED_POLYGON_TEXT.coordinateLabels.point2
+        )
+        expect(
+          getFourthRowValue(document, CSS_SELECTORS.cards.siteDetails)
+        ).toBe('55.223456, -1.334567')
+      })
+
+      test('Should display polygon site details with OSGB36 coordinates correctly', async () => {
+        const polygonExemption = createPolygonExemption(
+          COORDINATE_SYSTEMS.OSGB36,
+          mockPolygonCoordinatesOSGB36
+        )
+        getExemptionCacheSpy.mockReturnValueOnce(polygonExemption)
+
+        const { result, statusCode } = await server.inject({
+          method: 'GET',
+          url: '/exemption/check-your-answers'
+        })
+
+        expect(statusCode).toBe(200)
+        const { document } = new JSDOM(result).window
+
+        expect(
+          getFirstRowValue(document, CSS_SELECTORS.cards.siteDetails)
+        ).toBe(EXPECTED_POLYGON_TEXT.methodOfProviding)
+
+        expect(
+          normalizeWhitespace(
+            getSecondRowValue(document, CSS_SELECTORS.cards.siteDetails)
+          )
+        ).toBe(EXPECTED_POLYGON_TEXT.coordinateSystems.osgb36)
+
+        expect(getCardKey(document, CSS_SELECTORS.cards.siteDetails, 3)).toBe(
+          EXPECTED_POLYGON_TEXT.coordinateLabels.startEnd
+        )
+        expect(
+          getThirdRowValue(document, CSS_SELECTORS.cards.siteDetails)
+        ).toBe('425053, 564180')
+
+        expect(getCardKey(document, CSS_SELECTORS.cards.siteDetails, 4)).toBe(
+          EXPECTED_POLYGON_TEXT.coordinateLabels.point2
+        )
+        expect(
+          getFourthRowValue(document, CSS_SELECTORS.cards.siteDetails)
+        ).toBe('426000, 565000')
+      })
+
+      test('Should display all coordinate points for polygon with multiple coordinates', async () => {
+        const polygonExemption = createPolygonExemption(
+          COORDINATE_SYSTEMS.WGS84,
+          mockPolygonCoordinatesWGS84
+        )
+        getExemptionCacheSpy.mockReturnValueOnce(polygonExemption)
+
+        const { result, statusCode } = await server.inject({
+          method: 'GET',
+          url: '/exemption/check-your-answers'
+        })
+
+        expect(statusCode).toBe(200)
+        const { document } = new JSDOM(result).window
+
+        const summaryRows = getSummaryRowCount(
+          document,
+          CSS_SELECTORS.cards.siteDetails
+        )
+        expect(summaryRows).toBe(5) // Method + Coordinate System + 3 coordinate points
+
+        expect(getCardKey(document, CSS_SELECTORS.cards.siteDetails, 5)).toBe(
+          EXPECTED_POLYGON_TEXT.coordinateLabels.point3
+        )
+        expect(getCardValue(document, CSS_SELECTORS.cards.siteDetails, 5)).toBe(
+          '55.323456, -1.434567'
+        )
+      })
+
+      test('Should verify polygon site template is used instead of circular site', async () => {
+        const polygonExemption = createPolygonExemption(
+          COORDINATE_SYSTEMS.WGS84,
+          mockPolygonCoordinatesWGS84
+        )
+        getExemptionCacheSpy.mockReturnValueOnce(polygonExemption)
+
+        const { result, statusCode } = await server.inject({
+          method: 'GET',
+          url: '/exemption/check-your-answers'
+        })
+
+        expect(statusCode).toBe(200)
+        const { document } = new JSDOM(result).window
+
+        const summaryRows = document.querySelectorAll(
+          `${CSS_SELECTORS.cards.siteDetails} ${CSS_SELECTORS.summaryList.row}`
+        )
+        const rowKeys = Array.from(summaryRows).map((row) =>
+          row.querySelector(CSS_SELECTORS.summaryList.key)?.textContent.trim()
+        )
+
+        expect(rowKeys).not.toContain('Width')
+        expect(rowKeys).toContain(
+          EXPECTED_POLYGON_TEXT.coordinateLabels.startEnd
+        )
+        expect(rowKeys).toContain(EXPECTED_POLYGON_TEXT.coordinateLabels.point2)
+        expect(rowKeys).toContain(EXPECTED_POLYGON_TEXT.coordinateLabels.point3)
+      })
+    })
+
+    describe('Polygon coordinate edge cases', () => {
+      test('Should handle polygon with minimum 3 coordinates', async () => {
+        const minCoordinates = [
+          { latitude: '51.5074', longitude: '-0.1278' },
+          { latitude: '51.5084', longitude: '-0.1288' },
+          { latitude: '51.5094', longitude: '-0.1298' }
+        ]
+
+        const minPolygonExemption = createPolygonExemption(
+          COORDINATE_SYSTEMS.WGS84,
+          minCoordinates
+        )
+        getExemptionCacheSpy.mockReturnValueOnce(minPolygonExemption)
+
+        const { result, statusCode } = await server.inject({
+          method: 'GET',
+          url: '/exemption/check-your-answers'
+        })
+
+        expect(statusCode).toBe(200)
+        const { document } = new JSDOM(result).window
+
+        const summaryRows = getSummaryRowCount(
+          document,
+          CSS_SELECTORS.cards.siteDetails
+        )
+        expect(summaryRows).toBe(5) // Method + Coordinate System + 3 coordinate points
+
+        expect(
+          getThirdRowValue(document, CSS_SELECTORS.cards.siteDetails)
+        ).toBe('51.5074, -0.1278')
+        expect(
+          getFourthRowValue(document, CSS_SELECTORS.cards.siteDetails)
+        ).toBe('51.5084, -0.1288')
+        expect(getCardValue(document, CSS_SELECTORS.cards.siteDetails, 5)).toBe(
+          '51.5094, -0.1298'
+        )
+      })
+
+      test('Should handle polygon with more than 3 coordinates', async () => {
+        const manyCoordinates = [
+          { latitude: '51.5074', longitude: '-0.1278' },
+          { latitude: '51.5084', longitude: '-0.1288' },
+          { latitude: '51.5094', longitude: '-0.1298' },
+          { latitude: '51.5104', longitude: '-0.1308' },
+          { latitude: '51.5114', longitude: '-0.1318' }
+        ]
+
+        const manyPointsExemption = createPolygonExemption(
+          COORDINATE_SYSTEMS.WGS84,
+          manyCoordinates
+        )
+        getExemptionCacheSpy.mockReturnValueOnce(manyPointsExemption)
+
+        const { result, statusCode } = await server.inject({
+          method: 'GET',
+          url: '/exemption/check-your-answers'
+        })
+
+        expect(statusCode).toBe(200)
+        const { document } = new JSDOM(result).window
+
+        const summaryRows = getSummaryRowCount(
+          document,
+          CSS_SELECTORS.cards.siteDetails
+        )
+        expect(summaryRows).toBe(7) // Method + Coordinate System + 5 coordinate points
+
+        expect(getCardKey(document, CSS_SELECTORS.cards.siteDetails, 6)).toBe(
+          'Point 4'
+        )
+        expect(getCardValue(document, CSS_SELECTORS.cards.siteDetails, 6)).toBe(
+          '51.5104, -0.1308'
+        )
+
+        expect(getCardKey(document, CSS_SELECTORS.cards.siteDetails, 7)).toBe(
+          'Point 5'
+        )
+        expect(getCardValue(document, CSS_SELECTORS.cards.siteDetails, 7)).toBe(
+          '51.5114, -0.1318'
+        )
+      })
+
+      test('Should filter out invalid coordinates gracefully', async () => {
+        const mixedValidityCoordinates = [
+          { latitude: '51.5074', longitude: '-0.1278' },
+          { latitude: '', longitude: '-0.1288' }, // Invalid - empty latitude
+          { latitude: '51.5094', longitude: '-0.1298' },
+          { latitude: null, longitude: null }, // Invalid - null values
+          { latitude: '51.5114', longitude: '-0.1318' }
+        ]
+
+        const mixedExemption = createPolygonExemption(
+          COORDINATE_SYSTEMS.WGS84,
+          mixedValidityCoordinates
+        )
+        getExemptionCacheSpy.mockReturnValueOnce(mixedExemption)
+
+        const { result, statusCode } = await server.inject({
+          method: 'GET',
+          url: '/exemption/check-your-answers'
+        })
+
+        expect(statusCode).toBe(200)
+        const { document } = new JSDOM(result).window
+
+        const summaryRows = getSummaryRowCount(
+          document,
+          CSS_SELECTORS.cards.siteDetails
+        )
+        expect(summaryRows).toBe(5) // Only valid coordinates should be displayed
+
+        expect(
+          getThirdRowValue(document, CSS_SELECTORS.cards.siteDetails)
+        ).toBe('51.5074, -0.1278')
+        expect(
+          getFourthRowValue(document, CSS_SELECTORS.cards.siteDetails)
+        ).toBe('51.5094, -0.1298')
+        expect(getCardValue(document, CSS_SELECTORS.cards.siteDetails, 5)).toBe(
+          '51.5114, -0.1318'
+        )
+      })
+
+      test('Should handle empty coordinates array gracefully', async () => {
+        const emptyCoordinatesExemption = createPolygonExemption(
+          COORDINATE_SYSTEMS.WGS84,
+          []
+        )
+        getExemptionCacheSpy.mockReturnValueOnce(emptyCoordinatesExemption)
+
+        const { result, statusCode } = await server.inject({
+          method: 'GET',
+          url: '/exemption/check-your-answers'
+        })
+
+        expect(statusCode).toBe(200)
+        const { document } = new JSDOM(result).window
+
+        const summaryRows = getSummaryRowCount(
+          document,
+          CSS_SELECTORS.cards.siteDetails
+        )
+        expect(summaryRows).toBe(2) // Only Method + Coordinate System, no coordinate points
+
+        expect(
+          getFirstRowValue(document, CSS_SELECTORS.cards.siteDetails)
+        ).toBe(EXPECTED_POLYGON_TEXT.methodOfProviding)
+        expect(
+          normalizeWhitespace(
+            getSecondRowValue(document, CSS_SELECTORS.cards.siteDetails)
+          )
+        ).toBe(EXPECTED_POLYGON_TEXT.coordinateSystems.wgs84)
+      })
+    })
+
+    describe('Integration with existing Check Your Answers functionality', () => {
+      test('Should display polygon site details alongside other exemption cards', async () => {
+        const polygonExemption = createPolygonExemption(
+          COORDINATE_SYSTEMS.WGS84,
+          mockPolygonCoordinatesWGS84
+        )
+        getExemptionCacheSpy.mockReturnValueOnce(polygonExemption)
+
+        const { result, statusCode } = await server.inject({
+          method: 'GET',
+          url: '/exemption/check-your-answers'
+        })
+
+        expect(statusCode).toBe(200)
+        const { document } = new JSDOM(result).window
+
+        // Verify all expected cards are present
+        expect(
+          document.querySelector(CSS_SELECTORS.cards.projectDetails)
+        ).toBeTruthy()
+        expect(
+          document.querySelector(CSS_SELECTORS.cards.activityDates)
+        ).toBeTruthy()
+        expect(
+          document.querySelector(CSS_SELECTORS.cards.activityDetails)
+        ).toBeTruthy()
+        expect(
+          document.querySelector(CSS_SELECTORS.cards.siteDetails)
+        ).toBeTruthy()
+        expect(
+          document.querySelector(CSS_SELECTORS.cards.publicRegister)
+        ).toBeTruthy()
+
+        // Verify site details card shows polygon data
+        expect(
+          getFirstRowValue(document, CSS_SELECTORS.cards.siteDetails)
+        ).toBe(EXPECTED_POLYGON_TEXT.methodOfProviding)
+
+        // Verify other cards still work correctly
+        expect(
+          getFirstRowValue(document, CSS_SELECTORS.cards.projectDetails)
+        ).toBe(polygonExemption.projectName)
+      })
+
+      test('Should maintain submission form functionality with polygon data', async () => {
+        const polygonExemption = createPolygonExemption(
+          COORDINATE_SYSTEMS.WGS84,
+          mockPolygonCoordinatesWGS84
+        )
+        getExemptionCacheSpy.mockReturnValueOnce(polygonExemption)
+
+        const { result, statusCode } = await server.inject({
+          method: 'GET',
+          url: '/exemption/check-your-answers'
+        })
+
+        expect(statusCode).toBe(200)
+        const { document } = new JSDOM(result).window
+
+        const form = document.querySelector(CSS_SELECTORS.form)
+        expect(form).toBeTruthy()
+        expect(form.getAttribute('method')).toBe('post')
+
+        const submitButton = document.querySelector(CSS_SELECTORS.submitButton)
+        expect(submitButton).toBeTruthy()
+        expect(submitButton.textContent.trim()).toBe('Confirm and send')
+        expect(form.contains(submitButton)).toBe(true)
+      })
     })
   })
 })

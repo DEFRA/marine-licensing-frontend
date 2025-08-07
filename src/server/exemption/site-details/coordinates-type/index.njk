@@ -3,10 +3,12 @@
 {% from "radio-page/macro.njk" import appRadioPage %}
 
 {% block beforeContent %}
+<nav>
   {{ govukBackLink({
     text: "Back",
     href: '/exemption/task-list'
   }) }}
+</nav>
 {% endblock %}
 
 {% block content %}

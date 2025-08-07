@@ -21,5 +21,6 @@ export const routes = {
   ACTIVITY_DATES: '/exemption/activity-dates',
   CHECK_YOUR_ANSWERS: '/exemption/check-your-answers',
   CONFIRMATION: '/exemption/confirmation',
+  SITE_DETAILS: '/exemption/site-details',
   DASHBOARD: '/home'
 }

@@ -240,6 +240,12 @@ export const config = convict({
     }
   },
   defraId: {
+    accountManagementUrl: {
+      doc: 'Defra ID account management portal URL',
+      format: String,
+      env: 'DEFRA_ID_ACCOUNT_MANAGEMENT_URL',
+      default: '#'
+    },
     authEnabled: {
       doc: 'DEFRA ID Auth enabled',
       format: Boolean,

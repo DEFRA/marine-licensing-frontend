@@ -8,9 +8,9 @@ function mockRequest(options) {
 }
 
 describe('#buildNavigation', () => {
-  test('Should provide expected navigation details', () => {
+  test('Should provide expected navigation details', async () => {
     expect(
-      buildNavigation(mockRequest({ path: '/non-existent-path' }))
+      await buildNavigation(mockRequest({ path: '/non-existent-path' }))
     ).toEqual([
       {
         active: false,
@@ -20,8 +20,8 @@ describe('#buildNavigation', () => {
     ])
   })
 
-  test('Should provide expected highlighted navigation details', () => {
-    expect(buildNavigation(mockRequest({ path: '/' }))).toEqual([
+  test('Should provide expected highlighted navigation details', async () => {
+    expect(await buildNavigation(mockRequest({ path: '/' }))).toEqual([
       {
         active: false,
         text: 'Projects home',
@@ -30,9 +30,9 @@ describe('#buildNavigation', () => {
     ])
   })
 
-  test('Should mark Projects Home as active when on dashboard page', () => {
+  test('Should mark Projects Home as active when on dashboard page', async () => {
     const request = { path: '/home' }
-    const navigation = buildNavigation(request)
+    const navigation = await buildNavigation(request)
 
     const projectsHomeLink = navigation.find(
       (item) => item.text === 'Projects home'
@@ -40,9 +40,9 @@ describe('#buildNavigation', () => {
     expect(projectsHomeLink.active).toBe(true)
   })
 
-  test('Should mark Projects Home as inactive when not on dashboard page', () => {
+  test('Should mark Projects Home as inactive when not on dashboard page', async () => {
     const request = { path: '/exemption/project-name' }
-    const navigation = buildNavigation(request)
+    const navigation = await buildNavigation(request)
 
     const projectsHomeLink = navigation.find(
       (item) => item.text === 'Projects home'

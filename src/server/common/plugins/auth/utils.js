@@ -18,8 +18,8 @@ export const removeUserSession = (request, session) => {
   request.cookieAuth.clear()
 }
 
-export const refreshAccessToken = async (request, session) => {
-  const authedUser = await getUserSession(request, session)
+export const refreshAccessToken = async (request) => {
+  const authedUser = await getUserSession(request, request.state.userSession)
   request.logger.setBindings({ refreshingAccessToken: authedUser.strategy })
 
   const authConfig = config.get('defraId')
@@ -48,18 +48,17 @@ export const updateUserSession = async (request, refreshedSession) => {
   const expiresInMilliSeconds = expiresInSeconds * 1000
   const expiresAt = addSeconds(new Date(), expiresInSeconds)
 
-  const authedUser = await getUserSession(request, request.state.session)
+  const authedUser = await getUserSession(request, request.state.userSession)
   const displayName = [payload.firstName, payload.lastName]
     .filter((part) => part)
     .join(' ')
 
   await request.server.app.cache.set(
-    request.state.session.sessionId,
+    request.state.userSession.sessionId,
     {
       ...authedUser,
       id: payload.sub,
       correlationId: payload.correlationId,
-      sessionId: payload.sessionId,
       contactId: payload.contactId,
       serviceId: payload.serviceId,
       firstName: payload.firstName,
@@ -84,5 +83,5 @@ export const updateUserSession = async (request, refreshedSession) => {
     expiresInMilliSeconds
   )
 
-  return getUserSession(request, request.state.session)
+  return getUserSession(request, request.state.userSession)
 }

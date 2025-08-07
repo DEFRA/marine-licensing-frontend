@@ -28,55 +28,64 @@
             <span class="govuk-caption-l">{{ projectName }}</span>
             <h1 class="govuk-heading-l">{{ heading }}</h1>
 
+            {% set summaryRows = [
+                {
+                    key: {
+                        text: "Method of providing site location"
+                    },
+                    value: {
+                        text: summaryData.method
+                    }
+                },
+                {
+                    key: {
+                        text: "Coordinate system"
+                    },
+                    value: {
+                        html: summaryData.coordinateSystem | replace('\n', '<br>')
+                    }
+                }
+            ] %}
+
+            {% if summaryData.polygonCoordinates %}
+                {# Polygon site - multiple coordinates #}
+                {% for coordinate in summaryData.polygonCoordinates %}
+                    {% set summaryRows = (summaryRows.push({
+                        key: {
+                            text: coordinate.label
+                        },
+                        value: {
+                            text: coordinate.value
+                        }
+                    }), summaryRows) %}
+                {% endfor %}
+            {% else %}
+                {# Circular site - single coordinate and width #}
+                {% set summaryRows = (summaryRows.push({
+                    key: {
+                        text: "Coordinates at centre of site"
+                    },
+                    value: {
+                        text: summaryData.coordinates
+                    }
+                }), summaryRows) %}
+                {% set summaryRows = (summaryRows.push({
+                    key: {
+                        text: "Width of circular site"
+                    },
+                    value: {
+                        text: summaryData.width
+                    }
+                }), summaryRows) %}
+            {% endif %}
+
             {{ govukSummaryList({
                 card: {
                     title: {
                         text: "Site details"
                     }
                 },
-                rows: [
-                    {
-                        key: {
-                            text: "Method of providing site location"
-                        },
-                        value: {
-                            text: summaryData.method
-                        }
-                    },
-                    {
-                        key: {
-                            text: "Coordinate system"
-                        },
-                        value: {
-                            html: summaryData.coordinateSystem | replace('\n', '<br>')
-                        }
-                    },
-                    {
-                        key: {
-                            text: "Coordinates at centre of site"
-                        },
-                        value: {
-                            text: summaryData.coordinates
-                        }
-                    },
-                    {
-                        key: {
-                            text: "Width of circular site"
-                        },
-                        value: {
-                            text: summaryData.width
-                        }
-                    },
-                    {
-                        key: {
-                            text: "Map view",
-                            classes: "govuk-summary-list__key--top-aligned"
-                        },
-                        value: {
-                            html: '<div class="app-site-details-map" data-module="site-details-map"></div>'
-                        }
-                    }
-                ]
+                rows: summaryRows
             }) }}
 
             <!-- Site Details Data for JavaScript -->

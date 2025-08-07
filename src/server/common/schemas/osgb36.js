@@ -1,7 +1,7 @@
 import joi from 'joi'
 import { JOI_ERRORS } from '~/src/server/common/constants/joi.js'
 import {
-  MIN_COORDINATE_POINTS,
+  POLYGON_MIN_COORDINATE_POINTS,
   OSGB36_CONSTANTS
 } from '~/src/server/common/constants/exemptions.js'
 
@@ -125,11 +125,11 @@ export const createOsgb36MultipleCoordinatesSchema = () => {
     .object({
       coordinates: joi
         .array()
-        .min(MIN_COORDINATE_POINTS)
+        .min(POLYGON_MIN_COORDINATE_POINTS)
         .items(osgb36MultipleCoordinateItemSchema)
         .required()
         .messages({
-          'array.min': `You must provide at least ${MIN_COORDINATE_POINTS} coordinate points`,
+          'array.min': `You must provide at least ${POLYGON_MIN_COORDINATE_POINTS} coordinate points`,
           'any.required': 'Coordinates are required'
         })
     })

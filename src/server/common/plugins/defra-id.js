@@ -40,10 +40,12 @@ export const defraId = {
 
       server.auth.strategy('session', 'cookie', {
         cookie: {
+          name: 'userSession',
           path: '/',
           password: cookie.password,
           isSecure: cookie.secure,
-          ttl: cookie.ttl
+          ttl: cookie.ttl,
+          isSameSite: 'Lax'
         },
         keepAlive: true,
         redirectTo: () => {

@@ -23,7 +23,7 @@ describe('#authenticated-requests', () => {
 
     mockRequest = {
       state: {
-        session: {
+        userSession: {
           sessionId: 'test-session-id'
         }
       },

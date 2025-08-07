@@ -2,6 +2,10 @@
 {% from "govuk/components/back-link/macro.njk" import govukBackLink %}
 {% from "govuk/components/button/macro.njk" import govukButton %}
 {% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
+
+{% block pageTitle %}
+  {{ title }} - {{ serviceName }}
+{% endblock %}
 {% block beforeContent %}
   {{ govukBackLink({
         text: "Go back to your project",
@@ -10,6 +14,12 @@
 {% endblock %}
 {% block content %}
   <div class="govuk-grid-row">
+    <div class="govuk-grid-column-full">
+
+    {% if projectName %}
+      <span class="govuk-caption-l">{{ projectName }}</span>
+    {% endif %}
+
     <h2 class="govuk-heading-l" id="check-your-answers-heading">Check your answers before sending your information</h2>
     {{ govukSummaryList({
         card: {
@@ -65,7 +75,7 @@
               text: "Start date"
             },
             value: {
-              html: activityDates.start | formatDate('dd/MM/yyyy')
+              html: activityDates.start | formatDate('d MMMM yyyy')
             }
           },
           {
@@ -73,7 +83,7 @@
               text: "End date"
             },
             value: {
-              html: activityDates.end | formatDate('dd/MM/yyyy')
+              html: activityDates.end | formatDate('d MMMM yyyy')
             }
           }
         ]
@@ -147,15 +157,70 @@
               text: "Your answers from 'Check if you need a marine licence'"
             },
             value: {
-              html: "<p><a href=\"\">Download a copy of your answers (PDF)</a>
-                <p>If you need to change any of your 'Check if you need a marine licence' answers
-                  <ol>
-                <li>Delete this project from your projects.</li>
-                <li>Restart the process by checking if you need a marine licence.</li></ol>"
+              html: "<p><a href=\"#\" class=\"govuk-link\">Download a copy of your answers (PDF)</a></p>
+                    <p class=\"govuk-body\">If you need to change any of your 'Check if you need a marine licence' answers:</p>
+                    <ol class=\"govuk-list govuk-list--number\">
+                      <li>Delete this project from your projects.</li>
+                      <li>Restart the process by checking if you need a marine licence.</li>
+                    </ol>"
             }
           }
         ]
       }) }}
+    {% if siteDetails.isFileUpload %}
+      {% set siteDetailsRows = [{
+        key: {
+          text: "Method of providing site location"
+        },
+        value: {
+          html: siteDetails.method
+        }
+      }, {
+        key: {
+          text: "File type"
+        },
+        value: {
+          html: siteDetails.fileType
+        }
+      }, {
+        key: {
+          text: "File uploaded"
+        },
+        value: {
+          html: siteDetails.filename
+        }
+      }] %}
+    {% else %}
+      {% set siteDetailsRows = [{
+        key: {
+          text: "Method of providing site location"
+        },
+        value: {
+          html: siteDetails.reviewSummaryText
+        }
+      }, {
+        key: {
+          text: "Coordinates system"
+        },
+        value: {
+          html: siteDetails.coordinateSystemText
+        }
+      }, {
+        key: {
+          text: "Coordinates at centre of site"
+        },
+        value: {
+          html: siteDetails.coordinateDisplayText
+        }
+      }, {
+        key: {
+          text: "Width of circular site"
+        },
+        value: {
+          html: siteDetails.circleWidth + " metres"
+        }
+      }] %}
+    {% endif %}
     {{ govukSummaryList({
         card: {
           title: {
@@ -173,35 +238,7 @@
             id: "site-details-card"
           }
         },
-        rows: [{
-          key: {
-            text: "Method of providing site location"
-          },
-          value: {
-            html: siteDetails.reviewSummaryText
-          }
-        }, {
-          key: {
-            text: "Coordinates system"
-          },
-          value: {
-            html: siteDetails.coordinateSystemText
-          }
-        }, {
-          key: {
-            text: "Coordinates at centre of site"
-          },
-          value: {
-            html: siteDetails.coordinateDisplayText
-          }
-        }, {
-          key: {
-            text: "Width of circular site"
-          },
-          value: {
-            html: siteDetails.circleWidth + " metres"
-          }
-        }]
+        rows: siteDetailsRows
       }) }}
     {{ govukSummaryList({
         card: {
@@ -243,5 +280,6 @@
             }
           }) }}
     </form>
+    </div>
   </div>
 {% endblock %}

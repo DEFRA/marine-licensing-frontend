@@ -106,3 +106,4 @@ globs: *.js
 
 ## SonarQube
 - do not assign to undefined; use null
+- function names must follow regex: ^[a-z][a-zA-Z0-9]*$ (start with lowercase, camelCase)

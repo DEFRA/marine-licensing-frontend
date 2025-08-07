@@ -8,7 +8,8 @@ import {
   getCoordinateSystemText,
   getCoordinateDisplayText,
   getReviewSummaryText,
-  getFileUploadSummaryData
+  getFileUploadSummaryData,
+  getPolygonCoordinatesDisplayData
 } from '~/src/server/exemption/site-details/review-site-details/utils.js'
 import { routes } from '~/src/server/common/constants/routes.js'
 
@@ -100,17 +101,36 @@ const processFileUploadSiteDetails = (exemption, id, request) => {
  * @returns {object} Processed site details for manual coordinates
  */
 const processManualSiteDetails = (exemption) => {
-  return {
-    ...exemption.siteDetails,
+  const { siteDetails } = exemption
+  const { coordinateSystem, coordinatesEntry } = siteDetails
+
+  const baseData = {
     isFileUpload: false,
-    coordinateSystemText: getCoordinateSystemText(
-      exemption.siteDetails.coordinateSystem
-    ),
+    coordinateSystemText: getCoordinateSystemText(coordinateSystem),
+    reviewSummaryText: getReviewSummaryText(siteDetails)
+  }
+
+  // Handle polygon sites (multiple coordinates)
+  if (coordinatesEntry === 'multiple') {
+    return {
+      ...baseData,
+      isPolygonSite: true,
+      polygonCoordinates: getPolygonCoordinatesDisplayData(
+        siteDetails,
+        coordinateSystem
+      )
+    }
+  }
+
+  // Handle circular sites (single coordinate + width)
+  return {
+    ...baseData,
+    isPolygonSite: false,
     coordinateDisplayText: getCoordinateDisplayText(
-      exemption.siteDetails,
-      exemption.siteDetails.coordinateSystem
+      siteDetails,
+      coordinateSystem
     ),
-    reviewSummaryText: getReviewSummaryText(exemption.siteDetails)
+    circleWidth: siteDetails.circleWidth
   }
 }
 

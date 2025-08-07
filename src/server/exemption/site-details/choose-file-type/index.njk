@@ -4,10 +4,12 @@
 {% from "govuk/components/details/macro.njk" import govukDetails %}
 
 {% block beforeContent %}
+<nav>
   {{ govukBackLink({
     text: "Back",
     href: backLink
   }) }}
+</nav>
 {% endblock %}
 
 {% block content %}

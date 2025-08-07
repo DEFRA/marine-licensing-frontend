@@ -7,10 +7,12 @@
   {{ title }} - {{ serviceName }}
 {% endblock %}
 {% block beforeContent %}
+<nav>
   {{ govukBackLink({
         text: "Go back to your project",
         href: backLink
     }) }}
+    </nav>
 {% endblock %}
 {% block content %}
   <div class="govuk-grid-row">

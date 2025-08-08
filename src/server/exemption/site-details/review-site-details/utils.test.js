@@ -7,6 +7,7 @@ import {
   getCoordinateSystemText,
   getFileUploadBackLink,
   getFileUploadSummaryData,
+  getPolygonCoordinatesDisplayData,
   getReviewSummaryText,
   getSiteDetails,
   getSiteDetailsBackLink,
@@ -271,6 +272,145 @@ describe('siteDetails utils', () => {
 
     test('getCoordinateDisplayText correctly returns blank otherwise', () => {
       expect(getCoordinateDisplayText({})).toBe('')
+    })
+  })
+
+  describe('getPolygonCoordinatesDisplayData util', () => {
+    test('getPolygonCoordinatesDisplayData correctly formats valid WGS84 coordinates', () => {
+      const siteDetails = {
+        coordinates: [
+          { latitude: '51.5074', longitude: '-0.1278' },
+          { latitude: '51.5084', longitude: '-0.1288' },
+          { latitude: '51.5094', longitude: '-0.1298' }
+        ]
+      }
+      const coordinateSystem = COORDINATE_SYSTEMS.WGS84
+
+      const result = getPolygonCoordinatesDisplayData(
+        siteDetails,
+        coordinateSystem
+      )
+
+      expect(result).toEqual([
+        { label: 'Start and end points', value: '51.5074, -0.1278' },
+        { label: 'Point 2', value: '51.5084, -0.1288' },
+        { label: 'Point 3', value: '51.5094, -0.1298' }
+      ])
+    })
+
+    test('getPolygonCoordinatesDisplayData correctly formats valid OSGB36 coordinates', () => {
+      const siteDetails = {
+        coordinates: [
+          { eastings: '425053', northings: '564180' },
+          { eastings: '425063', northings: '564190' }
+        ]
+      }
+      const coordinateSystem = COORDINATE_SYSTEMS.OSGB36
+
+      const result = getPolygonCoordinatesDisplayData(
+        siteDetails,
+        coordinateSystem
+      )
+
+      expect(result).toEqual([
+        { label: 'Start and end points', value: '425053, 564180' },
+        { label: 'Point 2', value: '425063, 564190' }
+      ])
+    })
+
+    test('getPolygonCoordinatesDisplayData filters out falsy coordinates', () => {
+      const siteDetails = {
+        coordinates: [
+          { latitude: '51.5074', longitude: '-0.1278' },
+          null, // This should be filtered out
+          undefined, // This should be filtered out
+          { latitude: '51.5084', longitude: '-0.1288' },
+          '', // This should be filtered out
+          { latitude: '51.5094', longitude: '-0.1298' }
+        ]
+      }
+      const coordinateSystem = COORDINATE_SYSTEMS.WGS84
+
+      const result = getPolygonCoordinatesDisplayData(
+        siteDetails,
+        coordinateSystem
+      )
+
+      expect(result).toEqual([
+        { label: 'Start and end points', value: '51.5074, -0.1278' },
+        { label: 'Point 2', value: '51.5084, -0.1288' },
+        { label: 'Point 3', value: '51.5094, -0.1298' }
+      ])
+    })
+
+    test('getPolygonCoordinatesDisplayData filters out incomplete coordinates for WGS84', () => {
+      const siteDetails = {
+        coordinates: [
+          { latitude: '51.5074', longitude: '-0.1278' },
+          { latitude: '51.5084' }, // Missing longitude
+          { longitude: '-0.1288' }, // Missing latitude
+          { latitude: '51.5094', longitude: '-0.1298' }
+        ]
+      }
+      const coordinateSystem = COORDINATE_SYSTEMS.WGS84
+
+      const result = getPolygonCoordinatesDisplayData(
+        siteDetails,
+        coordinateSystem
+      )
+
+      expect(result).toEqual([
+        { label: 'Start and end points', value: '51.5074, -0.1278' },
+        { label: 'Point 2', value: '51.5094, -0.1298' }
+      ])
+    })
+
+    test('getPolygonCoordinatesDisplayData filters out incomplete coordinates for OSGB36', () => {
+      const siteDetails = {
+        coordinates: [
+          { eastings: '425053', northings: '564180' },
+          { eastings: '425063' }, // Missing northings
+          { northings: '564190' }, // Missing eastings
+          { eastings: '425073', northings: '564200' }
+        ]
+      }
+      const coordinateSystem = COORDINATE_SYSTEMS.OSGB36
+
+      const result = getPolygonCoordinatesDisplayData(
+        siteDetails,
+        coordinateSystem
+      )
+
+      expect(result).toEqual([
+        { label: 'Start and end points', value: '425053, 564180' },
+        { label: 'Point 2', value: '425073, 564200' }
+      ])
+    })
+
+    test('getPolygonCoordinatesDisplayData returns empty array when site details invalid', () => {
+      expect(
+        getPolygonCoordinatesDisplayData(null, COORDINATE_SYSTEMS.WGS84)
+      ).toEqual([])
+      expect(
+        getPolygonCoordinatesDisplayData({}, COORDINATE_SYSTEMS.WGS84)
+      ).toEqual([])
+      expect(
+        getPolygonCoordinatesDisplayData(
+          { coordinates: null },
+          COORDINATE_SYSTEMS.WGS84
+        )
+      ).toEqual([])
+    })
+
+    test('getPolygonCoordinatesDisplayData returns empty array when coordinate system invalid', () => {
+      const siteDetails = {
+        coordinates: [{ latitude: '51.5074', longitude: '-0.1278' }]
+      }
+
+      expect(getPolygonCoordinatesDisplayData(siteDetails, null)).toEqual([])
+      expect(getPolygonCoordinatesDisplayData(siteDetails, undefined)).toEqual(
+        []
+      )
     })
   })
 

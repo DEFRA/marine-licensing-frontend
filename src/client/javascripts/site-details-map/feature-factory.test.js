@@ -56,13 +56,13 @@ describe('FeatureFactory', () => {
 
   describe('createCircleFeature', () => {
     test('should create circle feature with correct geometry', () => {
-      const centreCoordinates = [1000, 2000]
+      const centreCoordinates = [56000, 6708000]
       const diameterInMetres = 500
-      const centreWGS84 = [0, 51]
+      const centreWGS84 = [0.7, 51.55]
       const circleCoords = [
-        [0, 51],
-        [0.1, 51],
-        [0, 51]
+        [0.7, 51.55],
+        [0.8, 51.55],
+        [0.7, 51.55]
       ]
       const mockPolygon = {}
       const mockFeature = {}
@@ -89,15 +89,133 @@ describe('FeatureFactory', () => {
       ).toHaveBeenCalledWith(centreWGS84, diameterInMetres / 2)
       expect(mockOlModules.Polygon).toHaveBeenCalledWith([
         [
-          [0, 51000],
-          [100, 51000],
-          [0, 51000]
+          [700, 51550],
+          [800, 51550],
+          [700, 51550]
         ]
       ])
       expect(mockOlModules.Feature).toHaveBeenCalledWith({
         geometry: mockPolygon
       })
       expect(result).toBe(mockFeature)
+    })
+  })
+
+  describe('createPolygonFeature', () => {
+    const setupPolygonMocks = () => {
+      const mockPolygon = {}
+      const mockFeature = {}
+      mockOlModules.Polygon.mockReturnValue(mockPolygon)
+      mockOlModules.Feature.mockReturnValue(mockFeature)
+      return { mockPolygon, mockFeature }
+    }
+
+    test('should create polygon feature with correct geometry', () => {
+      const coordinatesArray = [
+        [56000, 6708000],
+        [78000, 6698000],
+        [89000, 6680000]
+      ]
+      const { mockPolygon, mockFeature } = setupPolygonMocks()
+
+      const result = featureFactory.createPolygonFeature(
+        mockOlModules,
+        coordinatesArray
+      )
+
+      expect(mockOlModules.Polygon).toHaveBeenCalledWith([
+        [
+          [56000, 6708000],
+          [78000, 6698000],
+          [89000, 6680000],
+          [56000, 6708000]
+        ]
+      ])
+      expect(mockOlModules.Feature).toHaveBeenCalledWith({
+        geometry: mockPolygon
+      })
+      expect(result).toBe(mockFeature)
+    })
+
+    test('should close unclosed polygon by adding first coordinate', () => {
+      const coordinatesArray = [
+        [1000, 2000],
+        [1100, 2100],
+        [1200, 2200]
+      ]
+      setupPolygonMocks()
+
+      featureFactory.createPolygonFeature(mockOlModules, coordinatesArray)
+
+      const expectedClosedCoordinates = [
+        [1000, 2000],
+        [1100, 2100],
+        [1200, 2200],
+        [1000, 2000]
+      ]
+      expect(mockOlModules.Polygon).toHaveBeenCalledWith([
+        expectedClosedCoordinates
+      ])
+    })
+
+    test.each([
+      {
+        description:
+          'should not duplicate first coordinate if polygon already closed',
+        coordinatesArray: [
+          [1000, 2000],
+          [1100, 2100],
+          [1200, 2200],
+          [1000, 2000]
+        ]
+      },
+      {
+        description:
+          'should handle coordinates with identical first and last points',
+        coordinatesArray: [
+          [1000, 2000],
+          [1100, 2100],
+          [1200, 2200],
+          [1000, 2000]
+        ]
+      }
+    ])('$description', ({ coordinatesArray }) => {
+      setupPolygonMocks()
+
+      featureFactory.createPolygonFeature(mockOlModules, coordinatesArray)
+
+      expect(mockOlModules.Polygon).toHaveBeenCalledWith([coordinatesArray])
+    })
+
+    test.each([
+      {
+        description: 'insufficient coordinates',
+        coordinatesArray: [
+          [1000, 2000],
+          [1100, 2100]
+        ]
+      },
+      {
+        description: 'null coordinates array',
+        coordinatesArray: null
+      },
+      {
+        description: 'undefined coordinates array',
+        coordinatesArray: undefined
+      },
+      {
+        description: 'empty coordinates array',
+        coordinatesArray: []
+      }
+    ])('should return null for $description', ({ coordinatesArray }) => {
+      const result = featureFactory.createPolygonFeature(
+        mockOlModules,
+        coordinatesArray
+      )
+
+      expect(result).toBeNull()
+      expect(mockOlModules.Polygon).not.toHaveBeenCalled()
+      expect(mockOlModules.Feature).not.toHaveBeenCalled()
     })
   })
 

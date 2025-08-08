@@ -9,7 +9,6 @@ class CoordinateParser {
    * @returns {Array|null} Web Mercator coordinates or null if invalid
    */
   parseCoordinates(coordinateSystem, coordinates, fromLonLatFunction) {
-    // Handle array of coordinates (polygon)
     if (Array.isArray(coordinates)) {
       return this.parseMultipleCoordinates(
         coordinateSystem,
@@ -17,8 +16,6 @@ class CoordinateParser {
         fromLonLatFunction
       )
     }
-
-    // Handle single coordinate (point/circle)
     const isWGS84 = this.isWGS84CoordinateSystem(coordinateSystem)
     const isOSGB36 = this.isOSGB36CoordinateSystem(coordinateSystem)
 

@@ -52,7 +52,6 @@ class FeatureFactory {
       return null
     }
 
-    // Ensure polygon is closed by adding first coordinate at the end if needed
     const closedCoordinates = [...coordinatesArray]
     const firstCoord = coordinatesArray[0]
     const lastCoord = coordinatesArray[coordinatesArray.length - 1]

@@ -230,15 +230,12 @@ describe('MapFactory', () => {
 
       mapFactory.createDefaultStyle()
 
-      // Main fill
       expect(mockOlModules.Fill).toHaveBeenCalledWith({
         color: 'rgba(255, 255, 255, 0.2)'
       })
-      // Circle fill (transparent)
       expect(mockOlModules.Fill).toHaveBeenCalledWith({
         color: 'transparent'
       })
-      // Should not be called with empty objects or empty strings
       expect(mockOlModules.Fill).not.toHaveBeenCalledWith({})
       expect(mockOlModules.Fill).not.toHaveBeenCalledWith({
         color: ''

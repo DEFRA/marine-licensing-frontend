@@ -22,6 +22,7 @@ jest.mock('./feature-factory.js', () => {
   return jest.fn().mockImplementation(() => ({
     createPointFeature: jest.fn(),
     createCircleFeature: jest.fn(),
+    createPolygonFeature: jest.fn(),
     createFeaturesFromGeoJSON: jest.fn()
   }))
 })
@@ -40,11 +41,9 @@ describe('SiteVisualiser', () => {
 
     CircleGeometryCalculator.createGeographicCircle = jest.fn()
 
-    // Clear the constructor mocks
     MapViewManager.mockClear()
     FeatureFactory.mockClear()
 
-    // Create mock instances that will be returned by the constructors
     mockMapViewManager = {
       fitMapToExtent: jest.fn(),
       fitMapToGeometry: jest.fn(),
@@ -55,10 +54,10 @@ describe('SiteVisualiser', () => {
     mockFeatureFactory = {
       createPointFeature: jest.fn(),
       createCircleFeature: jest.fn(),
+      createPolygonFeature: jest.fn(),
       createFeaturesFromGeoJSON: jest.fn()
     }
 
-    // Make the constructors return our mock instances
     MapViewManager.mockImplementation(() => mockMapViewManager)
     FeatureFactory.mockImplementation(() => mockFeatureFactory)
 
@@ -97,60 +96,124 @@ describe('SiteVisualiser', () => {
     )
   })
 
-  describe('displayPointSite', () => {
-    test('should create and add point feature', () => {
-      const coordinates = [1000, 2000]
-      const mockFeature = {}
-
-      mockFeatureFactory.createPointFeature.mockReturnValue(mockFeature)
-
-      siteVisualiser.displayPointSite(coordinates)
-
-      expect(mockFeatureFactory.createPointFeature).toHaveBeenCalledWith(
-        mockOlModules,
-        coordinates
-      )
-      expect(mockVectorSource.addFeature).toHaveBeenCalledWith(mockFeature)
-    })
+  const getTestCoordinates = () => [56000, 6708000]
+  const getValidPolygonCoordinates = () => [
+    [56000, 6708000],
+    [78000, 6698000],
+    [89000, 6680000],
+    [67000, 6675000],
+    [45000, 6695000]
+  ]
+  const createBasicMockFeature = () => ({})
+  const createMockFeatureWithGeometry = (
+    geometry = { mockGeometry: true }
+  ) => ({
+    getGeometry: jest.fn().mockReturnValue(geometry)
   })
 
-  describe('displayCircularSite', () => {
-    test('should create circle feature and add to vector source', () => {
-      const centreCoordinates = [1000, 2000]
-      const diameterInMetres = 500
-      const mockFeature = {
-        getGeometry: jest.fn().mockReturnValue({ mockGeometry: true })
+  const getFeatureDisplayTestData = () => ({
+    point: {
+      method: 'displayPointSite',
+      factoryMethod: 'createPointFeature',
+      coordinates: getTestCoordinates(),
+      args: [getTestCoordinates()]
+    },
+    circle: {
+      method: 'displayCircularSite',
+      factoryMethod: 'createCircleFeature',
+      coordinates: getTestCoordinates(),
+      diameter: 500,
+      args: [getTestCoordinates(), 500]
+    },
+    polygon: {
+      method: 'displayPolygonSite',
+      factoryMethod: 'createPolygonFeature',
+      coordinates: getValidPolygonCoordinates(),
+      args: [getValidPolygonCoordinates()]
+    }
+  })
+
+  describe('feature display methods', () => {
+    test.each([
+      ['point', 'displayPointSite', 'createPointFeature'],
+      ['circle', 'displayCircularSite', 'createCircleFeature'],
+      ['polygon', 'displayPolygonSite', 'createPolygonFeature']
+    ])(
+      'should create %s feature and add to vector source',
+      (featureType, displayMethod, factoryMethod) => {
+        const testData = getFeatureDisplayTestData()[featureType]
+        const mockFeature =
+          featureType === 'point'
+            ? createBasicMockFeature()
+            : createMockFeatureWithGeometry()
+        mockFeatureFactory[factoryMethod] = jest
+          .fn()
+          .mockReturnValue(mockFeature)
+
+        siteVisualiser[displayMethod](...testData.args)
+
+        expect(mockFeatureFactory[factoryMethod]).toHaveBeenCalledWith(
+          mockOlModules,
+          ...testData.args
+        )
+        expect(mockVectorSource.addFeature).toHaveBeenCalledWith(mockFeature)
       }
+    )
 
-      mockFeatureFactory.createCircleFeature.mockReturnValue(mockFeature)
+    test.each([
+      ['circle', 'displayCircularSite', 'createCircleFeature'],
+      ['polygon', 'displayPolygonSite', 'createPolygonFeature']
+    ])(
+      'should fit map to %s geometry',
+      (featureType, displayMethod, factoryMethod) => {
+        const testData = getFeatureDisplayTestData()[featureType]
+        const mockGeometry = { mockGeometry: true }
+        const mockFeature = createMockFeatureWithGeometry(mockGeometry)
+        mockFeatureFactory[factoryMethod] = jest
+          .fn()
+          .mockReturnValue(mockFeature)
 
-      siteVisualiser.displayCircularSite(centreCoordinates, diameterInMetres)
+        siteVisualiser[displayMethod](...testData.args)
 
-      expect(mockFeatureFactory.createCircleFeature).toHaveBeenCalledWith(
-        mockOlModules,
-        centreCoordinates,
-        diameterInMetres
-      )
-      expect(mockVectorSource.addFeature).toHaveBeenCalledWith(mockFeature)
-    })
-
-    test('should fit map to circle geometry', () => {
-      const centreCoordinates = [1000, 2000]
-      const diameterInMetres = 500
-      const mockGeometry = { mockGeometry: true }
-      const mockFeature = {
-        getGeometry: jest.fn().mockReturnValue(mockGeometry)
+        expect(mockMapViewManager.fitMapToGeometry).toHaveBeenCalledWith(
+          mockMap,
+          mockGeometry
+        )
       }
+    )
+  })
 
-      mockFeatureFactory.createCircleFeature.mockReturnValue(mockFeature)
+  describe('displayPolygonSite edge cases', () => {
+    const getInsufficientCoordinates = () => [
+      [56000, 6708000],
+      [78000, 6698000]
+    ]
 
-      siteVisualiser.displayCircularSite(centreCoordinates, diameterInMetres)
+    const setupPolygonFeatureFactory = (returnValue) => {
+      mockFeatureFactory.createPolygonFeature = jest
+        .fn()
+        .mockReturnValue(returnValue)
+    }
 
-      expect(mockMapViewManager.fitMapToGeometry).toHaveBeenCalledWith(
-        mockMap,
-        mockGeometry
-      )
-    })
+    test.each([
+      ['insufficient coordinates', getInsufficientCoordinates()],
+      ['empty coordinates array', []],
+      ['null coordinates array', null]
+    ])(
+      'should return early when polygon feature creation fails with %s',
+      (description, coordinatesArray) => {
+        setupPolygonFeatureFactory(null)
+
+        siteVisualiser.displayPolygonSite(coordinatesArray)
+
+        expect(mockFeatureFactory.createPolygonFeature).toHaveBeenCalledWith(
+          mockOlModules,
+          coordinatesArray
+        )
+        expect(mockVectorSource.addFeature).not.toHaveBeenCalled()
+        expect(mockMapViewManager.fitMapToGeometry).not.toHaveBeenCalled()
+      }
+    )
   })
 
   describe('displayFileUploadData', () => {
@@ -203,7 +266,7 @@ describe('SiteVisualiser', () => {
 
     const commonSiteDetails = {
       coordinateSystem: 'WGS84',
-      coordinates: { latitude: '51.5', longitude: '-0.1' }
+      coordinates: { latitude: '51.550000', longitude: '0.700000' }
     }
 
     const expectEarlyReturn = () => {
@@ -212,26 +275,32 @@ describe('SiteVisualiser', () => {
       expect(mockMapViewManager.centreMapView).not.toHaveBeenCalled()
     }
 
-    const getTestCoordinates = () => [1000, 2000]
+    const getThamesEstuaryCoordinates = () => [56000, 6708000]
 
     const setupCoordinateMock = (coordinates) => {
       mockCoordinateParser.parseCoordinates.mockReturnValue(coordinates)
     }
 
-    const getCircularSiteExpectations = (mapCoordinates, circleWidth) => ({
-      displayCircularSite: {
-        called: true,
-        args: [mapCoordinates, circleWidth]
-      },
-      displayPointSite: { called: false },
-      centreMapView: { called: false }
-    })
+    const expectCircularSiteCall = (mapCoordinates, circleWidth) => {
+      expect(siteVisualiser.displayCircularSite).toHaveBeenCalledWith(
+        mapCoordinates,
+        circleWidth
+      )
+      expect(siteVisualiser.displayPointSite).not.toHaveBeenCalled()
+      expect(mockMapViewManager.centreMapView).not.toHaveBeenCalled()
+    }
 
-    const getPointSiteExpectations = (mapCoordinates) => ({
-      displayCircularSite: { called: false },
-      displayPointSite: { called: true, args: [mapCoordinates] },
-      centreMapView: { called: true, args: [mockMap, mapCoordinates, 12] }
-    })
+    const expectPointSiteCall = (mapCoordinates) => {
+      expect(siteVisualiser.displayCircularSite).not.toHaveBeenCalled()
+      expect(siteVisualiser.displayPointSite).toHaveBeenCalledWith(
+        mapCoordinates
+      )
+      expect(mockMapViewManager.centreMapView).toHaveBeenCalledWith(
+        mockMap,
+        mapCoordinates,
+        12
+      )
+    }
 
     beforeEach(() => {
       mockCoordinateParser = {
@@ -277,41 +346,31 @@ describe('SiteVisualiser', () => {
       expectEarlyReturn()
     })
 
-    test('should display circular site when circleWidth is provided', () => {
-      const siteDetailsWithCircle = { ...commonSiteDetails, circleWidth: 100 }
-      const mapCoordinates = getTestCoordinates()
+    test.each([
+      [
+        'circular site when circleWidth is provided',
+        { ...commonSiteDetails, circleWidth: 100 },
+        (mapCoordinates) => expectCircularSiteCall(mapCoordinates, 100)
+      ],
+      [
+        'point site when no circleWidth provided',
+        commonSiteDetails,
+        (mapCoordinates) => expectPointSiteCall(mapCoordinates)
+      ]
+    ])('should display %s', (description, siteDetails, expectationFunction) => {
+      expect.hasAssertions()
+      const mapCoordinates = getThamesEstuaryCoordinates()
       setupCoordinateMock(mapCoordinates)
 
-      siteVisualiser.displayManualCoordinates(siteDetailsWithCircle)
+      siteVisualiser.displayManualCoordinates(siteDetails)
 
-      const expectations = getCircularSiteExpectations(mapCoordinates, 100)
-      expect(siteVisualiser.displayCircularSite).toHaveBeenCalledWith(
-        ...expectations.displayCircularSite.args
-      )
-      expect(siteVisualiser.displayPointSite).not.toHaveBeenCalled()
-      expect(mockMapViewManager.centreMapView).not.toHaveBeenCalled()
-    })
-
-    test('should display point site when no circleWidth provided', () => {
-      const mapCoordinates = getTestCoordinates()
-      setupCoordinateMock(mapCoordinates)
-
-      siteVisualiser.displayManualCoordinates(commonSiteDetails)
-
-      const expectations = getPointSiteExpectations(mapCoordinates)
-      expect(siteVisualiser.displayPointSite).toHaveBeenCalledWith(
-        ...expectations.displayPointSite.args
-      )
-      expect(siteVisualiser.displayCircularSite).not.toHaveBeenCalled()
-      expect(mockMapViewManager.centreMapView).toHaveBeenCalledWith(
-        ...expectations.centreMapView.args
-      )
+      expectationFunction(mapCoordinates)
     })
 
     test('should call parseCoordinates with correct parameters', () => {
       const siteDetails = {
         coordinateSystem: 'OSGB36',
-        coordinates: { eastings: '530000', northings: '180000' }
+        coordinates: { eastings: '577000', northings: '178000' }
       }
       const mapCoordinates = [3000, 4000]
       mockCoordinateParser.parseCoordinates.mockReturnValue(mapCoordinates)
@@ -320,7 +379,7 @@ describe('SiteVisualiser', () => {
 
       expect(mockCoordinateParser.parseCoordinates).toHaveBeenCalledWith(
         'OSGB36',
-        { eastings: '530000', northings: '180000' },
+        { eastings: '577000', northings: '178000' },
         mockOlModules.fromLonLat
       )
     })

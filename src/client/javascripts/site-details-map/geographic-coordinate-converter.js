@@ -1,6 +1,5 @@
 import proj4 from 'proj4'
 
-// British National Grid (OSGB36) Projection Parameters - EPSG:27700
 const BRITISH_NATIONAL_GRID_PROJECTION = 'tmerc'
 const TRUE_ORIGIN_LATITUDE = 49
 const TRUE_ORIGIN_LONGITUDE = -2
@@ -9,8 +8,6 @@ const FALSE_EASTING = 400000
 const FALSE_NORTHING = -100000
 const ELLIPSOID = 'airy'
 
-// Helmert Transformation Parameters (OSGB36 to WGS84)
-// These parameters provide ~3m accuracy transformation
 const HELMERT_DX = 446.448
 const HELMERT_DY = -125.157
 const HELMERT_DZ = 542.06
@@ -33,7 +30,6 @@ const BRITISH_NATIONAL_GRID_DEFINITION = [
   '+type=crs'
 ].join(' ')
 
-// Define the British National Grid projection for proj4
 proj4.defs('EPSG:27700', BRITISH_NATIONAL_GRID_DEFINITION)
 
 class GeographicCoordinateConverter {

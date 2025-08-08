@@ -39,7 +39,6 @@ class SiteVisualiser {
 
     this.vectorSource.addFeature(circleFeature)
 
-    // Fit the map to show the circle with appropriate zoom level
     this.mapViewManager.fitMapToGeometry(this.map, circleFeature.getGeometry())
   }
 
@@ -59,7 +58,6 @@ class SiteVisualiser {
 
     this.vectorSource.addFeatures(features)
 
-    // Fit the map to show all uploaded features with appropriate zoom level
     this.mapViewManager.fitMapToAllFeatures(this.map, this.vectorSource)
   }
 
@@ -91,14 +89,11 @@ class SiteVisualiser {
       return
     }
 
-    // Check if this is polygon coordinates (multiple coordinates)
     if (coordinatesEntry === 'multiple' && Array.isArray(mapCoordinates)) {
       this.displayPolygonSite(mapCoordinates)
     } else if (circleWidth) {
-      // Circle display automatically fits to geometry - no need to manually set zoom
       this.displayCircularSite(mapCoordinates, circleWidth)
     } else {
-      // For points, centre and zoom since points have no extent to fit to
       this.displayPointSite(mapCoordinates)
       this.mapViewManager.centreMapView(
         this.map,
@@ -124,7 +119,6 @@ class SiteVisualiser {
 
     this.vectorSource.addFeature(polygonFeature)
 
-    // Fit the map to show the polygon with appropriate zoom level
     this.mapViewManager.fitMapToGeometry(this.map, polygonFeature.getGeometry())
   }
 

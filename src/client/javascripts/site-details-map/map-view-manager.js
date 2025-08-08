@@ -10,27 +10,24 @@ class MapViewManager {
    */
   fitMapToExtent(map, extent, options = {}) {
     const defaultOptions = {
-      padding: [20, 20, 20, 20], // top, right, bottom, left padding in pixels
-      maxZoom: 14, // prevent zooming too far in
-      minZoom: 8, // prevent zooming too far out
-      duration: 500 // smooth animation duration
+      padding: [20, 20, 20, 20],
+      maxZoom: 14,
+      minZoom: 8,
+      duration: 500
     }
 
     const fitOptions = { ...defaultOptions, ...options }
 
     try {
-      // Check if extent is valid (not empty or infinite)
       if (extent?.every((coord) => isFinite(coord))) {
         map.getView().fit(extent, fitOptions)
       } else {
-        // Fallback to default UK centre if extent is invalid
         this.centreMapView(map, [
           DEFAULT_UK_CENTRE_LONGITUDE,
           DEFAULT_UK_CENTRE_LATITUDE
         ])
       }
     } catch (error) {
-      // Fallback to default view if fitting fails
       this.centreMapView(map, [
         DEFAULT_UK_CENTRE_LONGITUDE,
         DEFAULT_UK_CENTRE_LATITUDE

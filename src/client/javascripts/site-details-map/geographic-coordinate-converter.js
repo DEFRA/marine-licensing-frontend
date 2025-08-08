@@ -8,6 +8,8 @@ const FALSE_EASTING = 400000
 const FALSE_NORTHING = -100000
 const ELLIPSOID = 'airy'
 
+// Helmert Transformation Parameters (OSGB36 to WGS84)
+// These parameters provide ~3m accuracy transformation
 const HELMERT_DX = 446.448
 const HELMERT_DY = -125.157
 const HELMERT_DZ = 542.06

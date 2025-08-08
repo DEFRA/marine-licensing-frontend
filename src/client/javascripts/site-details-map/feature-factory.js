@@ -1,5 +1,7 @@
 import CircleGeometryCalculator from './circle-geometry-calculator.js'
 
+const MINIMUM_POLYGON_COORDINATES = 3
+
 class FeatureFactory {
   /**
    * Create a point feature
@@ -48,7 +50,10 @@ class FeatureFactory {
   createPolygonFeature(olModules, coordinatesArray) {
     const { Feature, Polygon } = olModules
 
-    if (!coordinatesArray || coordinatesArray.length < 3) {
+    if (
+      !coordinatesArray ||
+      coordinatesArray.length < MINIMUM_POLYGON_COORDINATES
+    ) {
       return null
     }
 

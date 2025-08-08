@@ -1,5 +1,7 @@
 import GeographicCoordinateConverter from './geographic-coordinate-converter.js'
 
+const MINIMUM_POLYGON_COORDINATES = 3
+
 class CoordinateParser {
   /**
    * Parse coordinates from any supported coordinate system to Web Mercator
@@ -46,7 +48,10 @@ class CoordinateParser {
     coordinatesArray,
     fromLonLatFunction
   ) {
-    if (!coordinatesArray || coordinatesArray.length < 3) {
+    if (
+      !coordinatesArray ||
+      coordinatesArray.length < MINIMUM_POLYGON_COORDINATES
+    ) {
       return null
     }
 
@@ -63,7 +68,9 @@ class CoordinateParser {
       }
     }
 
-    return parsedCoordinates.length >= 3 ? parsedCoordinates : null
+    return parsedCoordinates.length >= MINIMUM_POLYGON_COORDINATES
+      ? parsedCoordinates
+      : null
   }
 
   /**

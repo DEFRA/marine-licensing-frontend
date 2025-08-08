@@ -1,5 +1,6 @@
 const DEFAULT_UK_CENTRE_LONGITUDE = -3.5
 const DEFAULT_UK_CENTRE_LATITUDE = 54.0
+const DEFAULT_MAP_PADDING = 20
 
 class MapViewManager {
   /**
@@ -10,7 +11,12 @@ class MapViewManager {
    */
   fitMapToExtent(map, extent, options = {}) {
     const defaultOptions = {
-      padding: [20, 20, 20, 20],
+      padding: [
+        DEFAULT_MAP_PADDING,
+        DEFAULT_MAP_PADDING,
+        DEFAULT_MAP_PADDING,
+        DEFAULT_MAP_PADDING
+      ],
       maxZoom: 14,
       minZoom: 8,
       duration: 500

@@ -92,7 +92,6 @@ describe('#beforeYouStart', () => {
           .textContent.trim()
       ).toBe('Continue')
 
-      // Check for the main content sections
       expect(
         document.querySelector('h2.govuk-heading-m').textContent.trim()
       ).toBe('Before you start')

@@ -45,6 +45,7 @@ describe('#coordinatesType', () => {
         {
           pageTitle: 'How do you want to provide the site location?',
           heading: 'How do you want to provide the site location?',
+          backLink: routes.SITE_DETAILS,
           payload: { coordinatesType: 'coordinates' },
           projectName: 'Test Project'
         }
@@ -65,6 +66,7 @@ describe('#coordinatesType', () => {
         {
           pageTitle: 'How do you want to provide the site location?',
           heading: 'How do you want to provide the site location?',
+          backLink: routes.SITE_DETAILS,
           payload: { coordinatesType: undefined },
           projectName: 'Test Project'
         }
@@ -107,7 +109,7 @@ describe('#coordinatesType', () => {
 
       expect(
         document
-          .querySelector('.govuk-back-link[href="/exemption/task-list"')
+          .querySelector('.govuk-back-link[href="/exemption/site-details"')
           .textContent.trim()
       ).toBe('Back')
 
@@ -158,6 +160,7 @@ describe('#coordinatesType', () => {
           heading: 'How do you want to provide the site location?',
           projectName: 'Test Project',
           payload: { coordinatesType: 'invalid' },
+          backLink: routes.SITE_DETAILS,
           errorSummary: [
             {
               href: '#coordinatesType',
@@ -198,6 +201,7 @@ describe('#coordinatesType', () => {
       expect(h.view).toHaveBeenCalledWith(
         PROVIDE_COORDINATES_CHOICE_VIEW_ROUTE,
         {
+          backLink: routes.SITE_DETAILS,
           pageTitle: 'How do you want to provide the site location?',
           heading: 'How do you want to provide the site location?',
           projectName: 'Test Project',

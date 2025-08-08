@@ -164,6 +164,55 @@ describe('enter-multiple-coordinates utils', () => {
         { latitude: '', longitude: '' }
       ])
     })
+
+    it('should pick osgb36 if first coordinate has both field types when system is OSGB36', () => {
+      const coords = [
+        {
+          latitude: '51.5',
+          longitude: '-0.1',
+          eastings: '123456',
+          northings: '654321'
+        }
+      ]
+      expect(
+        normaliseCoordinatesForDisplay(COORDINATE_SYSTEMS.OSGB36, coords)
+      ).toEqual([
+        { eastings: '123456', northings: '654321' },
+        { eastings: '', northings: '' },
+        { eastings: '', northings: '' }
+      ])
+    })
+
+    it('should pick wsg84 if first coordinate has both field types when system is WSG84', () => {
+      const coords = [
+        {
+          latitude: '51.5',
+          longitude: '-0.1',
+          eastings: '123456',
+          northings: '654321'
+        }
+      ]
+      expect(
+        normaliseCoordinatesForDisplay(COORDINATE_SYSTEMS.WGS84, coords)
+      ).toEqual([
+        { latitude: '51.5', longitude: '-0.1' },
+        { latitude: '', longitude: '' },
+        { latitude: '', longitude: '' }
+      ])
+    })
+
+    it('should return 3 empty coordinates when coordinate system is invalid/unknown', () => {
+      const coords = [{ latitude: '51.5', longitude: '-0.1' }]
+      const invalidCoordinateSystem = 'INVALID_SYSTEM'
+
+      expect(
+        normaliseCoordinatesForDisplay(invalidCoordinateSystem, coords)
+      ).toEqual([
+        { eastings: '', northings: '' },
+        { eastings: '', northings: '' },
+        { eastings: '', northings: '' }
+      ])
+    })
   })
 
   describe('PATTERNS', () => {

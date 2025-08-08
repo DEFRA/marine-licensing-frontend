@@ -1,6 +1,6 @@
 import joi from 'joi'
 import {
-  MIN_COORDINATE_POINTS,
+  POLYGON_MIN_COORDINATE_POINTS,
   WGS84_CONSTANTS
 } from '~/src/server/common/constants/exemptions.js'
 import { JOI_ERRORS } from '~/src/server/common/constants/joi.js'
@@ -137,11 +137,11 @@ export const createWgs84MultipleCoordinatesSchema = () => {
     .object({
       coordinates: joi
         .array()
-        .min(MIN_COORDINATE_POINTS)
+        .min(POLYGON_MIN_COORDINATE_POINTS)
         .items(wgs84MultipleCoordinateItemSchema)
         .required()
         .messages({
-          'array.min': `You must provide at least ${MIN_COORDINATE_POINTS} coordinate points`,
+          'array.min': `You must provide at least ${POLYGON_MIN_COORDINATE_POINTS} coordinate points`,
           'any.required': 'Coordinates are required'
         })
     })

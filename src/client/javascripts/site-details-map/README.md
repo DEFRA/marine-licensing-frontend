@@ -384,14 +384,6 @@ SMALL_MAP_SIZE = 600 // for responsive attribution
 - **Proj4js**: Coordinate system transformations
 - **GOV.UK Frontend**: Component base class and styling
 
-## Future Enhancements
-
-- **Additional Coordinate Systems**: Support for UTM zones
-- **Advanced Editing**: Interactive coordinate editing
-- **Export Functionality**: Download displayed areas as files
-- **Measurement Tools**: Distance and area calculations
-- **Layer Management**: Multiple overlay support
-
 ---
 
 _This module provides a robust, testable, and maintainable solution for marine licensing coordinate visualisation, following government digital service standards and best practices._

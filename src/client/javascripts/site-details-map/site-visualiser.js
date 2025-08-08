@@ -64,12 +64,13 @@ class SiteVisualiser {
   }
 
   /**
-   * Display manual coordinates (point or circle)
+   * Display manual coordinates (point, circle, or polygon)
    * @param {object} siteDetails - Site details with manual coordinates
    */
   displayManualCoordinates(siteDetails) {
     const POINT_ZOOM_LEVEL = 12
-    const { coordinateSystem, coordinates, circleWidth } = siteDetails
+    const { coordinateSystem, coordinates, circleWidth, coordinatesEntry } =
+      siteDetails
 
     if (!coordinates) {
       return
@@ -90,7 +91,10 @@ class SiteVisualiser {
       return
     }
 
-    if (circleWidth) {
+    // Check if this is polygon coordinates (multiple coordinates)
+    if (coordinatesEntry === 'multiple' && Array.isArray(mapCoordinates)) {
+      this.displayPolygonSite(mapCoordinates)
+    } else if (circleWidth) {
       // Circle display automatically fits to geometry - no need to manually set zoom
       this.displayCircularSite(mapCoordinates, circleWidth)
     } else {
@@ -102,6 +106,26 @@ class SiteVisualiser {
         POINT_ZOOM_LEVEL
       )
     }
+  }
+
+  /**
+   * Display a polygon site on the map
+   * @param {Array} coordinatesArray - Array of Web Mercator coordinates [[x, y], [x, y], ...]
+   */
+  displayPolygonSite(coordinatesArray) {
+    const polygonFeature = this.featureFactory.createPolygonFeature(
+      this.olModules,
+      coordinatesArray
+    )
+
+    if (!polygonFeature) {
+      return
+    }
+
+    this.vectorSource.addFeature(polygonFeature)
+
+    // Fit the map to show the polygon with appropriate zoom level
+    this.mapViewManager.fitMapToGeometry(this.map, polygonFeature.getGeometry())
   }
 
   clearFeatures() {

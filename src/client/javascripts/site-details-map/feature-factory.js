@@ -40,6 +40,34 @@ class FeatureFactory {
   }
 
   /**
+   * Create a polygon feature from multiple coordinates
+   * @param {object} olModules - OpenLayers modules
+   * @param {Array} coordinatesArray - Array of Web Mercator coordinates [[x, y], [x, y], ...]
+   * @returns {object} OpenLayers Feature with Polygon geometry
+   */
+  createPolygonFeature(olModules, coordinatesArray) {
+    const { Feature, Polygon } = olModules
+
+    if (!coordinatesArray || coordinatesArray.length < 3) {
+      return null
+    }
+
+    // Ensure polygon is closed by adding first coordinate at the end if needed
+    const closedCoordinates = [...coordinatesArray]
+    const firstCoord = coordinatesArray[0]
+    const lastCoord = coordinatesArray[coordinatesArray.length - 1]
+
+    if (firstCoord[0] !== lastCoord[0] || firstCoord[1] !== lastCoord[1]) {
+      closedCoordinates.push(firstCoord)
+    }
+
+    const polygonGeometry = new Polygon([closedCoordinates])
+    return new Feature({
+      geometry: polygonGeometry
+    })
+  }
+
+  /**
    * Create features from GeoJSON data
    * @param {object} geoJSONFormat - OpenLayers GeoJSON format instance
    * @param {object} geoJSON - GeoJSON data from file upload

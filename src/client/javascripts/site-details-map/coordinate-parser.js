@@ -4,11 +4,21 @@ class CoordinateParser {
   /**
    * Parse coordinates from any supported coordinate system to Web Mercator
    * @param {string} coordinateSystem - The coordinate system ('WGS84', 'OSGB36')
-   * @param {object} coordinates - The coordinate values
+   * @param {object|Array} coordinates - The coordinate values (single object or array)
    * @param {Function} fromLonLatFunction - OpenLayers fromLonLat function
    * @returns {Array|null} Web Mercator coordinates or null if invalid
    */
   parseCoordinates(coordinateSystem, coordinates, fromLonLatFunction) {
+    // Handle array of coordinates (polygon)
+    if (Array.isArray(coordinates)) {
+      return this.parseMultipleCoordinates(
+        coordinateSystem,
+        coordinates,
+        fromLonLatFunction
+      )
+    }
+
+    // Handle single coordinate (point/circle)
     const isWGS84 = this.isWGS84CoordinateSystem(coordinateSystem)
     const isOSGB36 = this.isOSGB36CoordinateSystem(coordinateSystem)
 
@@ -25,6 +35,38 @@ class CoordinateParser {
     }
 
     return null
+  }
+
+  /**
+   * Parse multiple coordinates for polygon display
+   * @param {string} coordinateSystem - The coordinate system ('WGS84', 'OSGB36')
+   * @param {Array} coordinatesArray - Array of coordinate objects
+   * @param {Function} fromLonLatFunction - OpenLayers fromLonLat function
+   * @returns {Array|null} Array of Web Mercator coordinates or null if invalid
+   */
+  parseMultipleCoordinates(
+    coordinateSystem,
+    coordinatesArray,
+    fromLonLatFunction
+  ) {
+    if (!coordinatesArray || coordinatesArray.length < 3) {
+      return null
+    }
+
+    const parsedCoordinates = []
+
+    for (const coord of coordinatesArray) {
+      const parsed = this.parseCoordinates(
+        coordinateSystem,
+        coord,
+        fromLonLatFunction
+      )
+      if (parsed) {
+        parsedCoordinates.push(parsed)
+      }
+    }
+
+    return parsedCoordinates.length >= 3 ? parsedCoordinates : null
   }
 
   /**

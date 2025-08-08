@@ -39,16 +39,22 @@ describe('Before you start site details page', () => {
 
     const { document } = new JSDOM(result).window
 
-    expect(getByText(document, 'Site details')).toBeInTheDocument()
+    expect(
+      getByRole(document, 'heading', { name: 'Site details' })
+    ).toBeInTheDocument()
     expect(getByText(document, mockExemption.projectName)).toBeInTheDocument()
 
-    expect(getByText(document, 'Before you start')).toBeInTheDocument()
-    expect(getByText(document, 'Providing site locations')).toBeInTheDocument()
     expect(
-      getByText(document, 'Defining the site boundary')
+      getByRole(document, 'heading', { name: 'Before you start' })
     ).toBeInTheDocument()
     expect(
-      getByText(document, 'Projects with multiple sites')
+      getByRole(document, 'heading', { name: 'Providing site locations' })
+    ).toBeInTheDocument()
+    expect(
+      getByRole(document, 'heading', { name: 'Defining the site boundary' })
+    ).toBeInTheDocument()
+    expect(
+      getByRole(document, 'heading', { name: 'Projects with multiple sites' })
     ).toBeInTheDocument()
 
     expect(
@@ -83,10 +89,14 @@ describe('Before you start site details page', () => {
 
     const { document } = new JSDOM(result).window
 
-    expect(getByText(document, 'Before you start')).toBeInTheDocument()
-    expect(getByText(document, 'Providing site locations')).toBeInTheDocument()
     expect(
-      getByText(document, 'Defining the site boundary')
+      getByRole(document, 'heading', { name: 'Before you start' })
+    ).toBeInTheDocument()
+    expect(
+      getByRole(document, 'heading', { name: 'Providing site locations' })
+    ).toBeInTheDocument()
+    expect(
+      getByRole(document, 'heading', { name: 'Defining the site boundary' })
     ).toBeInTheDocument()
 
     expect(getByText(document, 'a site name')).toBeInTheDocument()
@@ -106,5 +116,37 @@ describe('Before you start site details page', () => {
     expect(
       getByText(document, 'enter the coordinates manually')
     ).toBeInTheDocument()
+  })
+
+  test('should have properly structured lists for accessibility', async () => {
+    const { result } = await server.inject({
+      method: 'GET',
+      url: routes.SITE_DETAILS
+    })
+
+    const { document } = new JSDOM(result).window
+
+    const lists = document.querySelectorAll('ul.govuk-list--bullet')
+    expect(lists).toHaveLength(2)
+
+    const firstList = lists[0]
+    expect(firstList).toContainElement(getByText(document, 'a site name'))
+    expect(firstList).toContainElement(
+      getByText(document, 'the exact location of the site')
+    )
+    expect(firstList).toContainElement(
+      getByText(document, 'the dates the activity will take place')
+    )
+    expect(firstList).toContainElement(
+      getByText(document, 'a description of the activity')
+    )
+
+    const secondList = lists[1]
+    expect(secondList).toContainElement(
+      getByText(document, 'upload a file with the coordinates')
+    )
+    expect(secondList).toContainElement(
+      getByText(document, 'enter the coordinates manually')
+    )
   })
 })

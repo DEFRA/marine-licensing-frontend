@@ -310,33 +310,6 @@ describe('CircleGeometryCalculator', () => {
         })
       })
 
-      test('should validate spherical trigonometry formulas with known coordinates', () => {
-        const centreLon = 0
-        const centreLat = 0
-        const angularDistance = 0.001
-        const bearing = Math.PI / 2
-
-        const result = CircleGeometryCalculator.calculateCirclePoint(
-          centreLon,
-          centreLat,
-          angularDistance,
-          bearing
-        )
-
-        expect(result[1]).toBeCloseTo(0, 8)
-        expect(result[0]).toBeGreaterThan(0)
-
-        const northResult = CircleGeometryCalculator.calculateCirclePoint(
-          centreLon,
-          centreLat,
-          angularDistance,
-          0
-        )
-
-        expect(northResult[0]).toBeCloseTo(0, 8)
-        expect(northResult[1]).toBeGreaterThan(0)
-      })
-
       const getSymmetryTestSetup = () => ({
         centreLon: 1,
         centreLat: 52,

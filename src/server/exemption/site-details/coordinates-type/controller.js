@@ -105,7 +105,7 @@ export const coordinatesTypeSubmitController = {
     )
 
     if (payload.coordinatesType === 'coordinates') {
-      return h.redirect(routes.COORDINATES_ENTRY_CHOICE).takeover()
+      return h.redirect(routes.MULTIPLE_SITES_CHOICE).takeover()
     } else {
       // the 'file' case is at this point in the code flow is the only
       // reachable option, as the validator explicitly lists all available valid choices.

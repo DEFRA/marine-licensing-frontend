@@ -19,7 +19,6 @@ describe('FeatureFactory', () => {
 
     mockOlModules = {
       Feature: jest.fn(),
-      Point: jest.fn(),
       Polygon: jest.fn(),
       fromLonLat: jest.fn(),
       toLonLat: jest.fn()
@@ -30,28 +29,6 @@ describe('FeatureFactory', () => {
     }
 
     featureFactory = new FeatureFactory()
-  })
-
-  describe('createPointFeature', () => {
-    test('should create point feature with correct geometry', () => {
-      const coordinates = [1000, 2000]
-      const mockPoint = {}
-      const mockFeature = {}
-
-      mockOlModules.Point.mockReturnValue(mockPoint)
-      mockOlModules.Feature.mockReturnValue(mockFeature)
-
-      const result = featureFactory.createPointFeature(
-        mockOlModules,
-        coordinates
-      )
-
-      expect(mockOlModules.Point).toHaveBeenCalledWith(coordinates)
-      expect(mockOlModules.Feature).toHaveBeenCalledWith({
-        geometry: mockPoint
-      })
-      expect(result).toBe(mockFeature)
-    })
   })
 
   describe('createCircleFeature', () => {

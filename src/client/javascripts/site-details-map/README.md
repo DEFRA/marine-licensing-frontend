@@ -91,18 +91,6 @@ graph TB
 
 ## Feature Types
 
-### **Point Sites**
-
-Single coordinate locations displayed as markers
-
-```javascript
-// Example data structure
-{
-  coordinateSystem: 'WGS84',
-  coordinates: { latitude: '51.5', longitude: '-0.1' }
-}
-```
-
 ### **Circular Sites**
 
 Centre point with radius, displayed as accurate geographic circles

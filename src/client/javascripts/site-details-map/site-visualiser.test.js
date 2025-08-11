@@ -20,7 +20,6 @@ jest.mock('./map-view-manager.js', () => {
 
 jest.mock('./feature-factory.js', () => {
   return jest.fn().mockImplementation(() => ({
-    createPointFeature: jest.fn(),
     createCircleFeature: jest.fn(),
     createPolygonFeature: jest.fn(),
     createFeaturesFromGeoJSON: jest.fn()
@@ -52,7 +51,6 @@ describe('SiteVisualiser', () => {
     }
 
     mockFeatureFactory = {
-      createPointFeature: jest.fn(),
       createCircleFeature: jest.fn(),
       createPolygonFeature: jest.fn(),
       createFeaturesFromGeoJSON: jest.fn()
@@ -112,12 +110,6 @@ describe('SiteVisualiser', () => {
   })
 
   const getFeatureDisplayTestData = () => ({
-    point: {
-      method: 'displayPointSite',
-      factoryMethod: 'createPointFeature',
-      coordinates: getTestCoordinates(),
-      args: [getTestCoordinates()]
-    },
     circle: {
       method: 'displayCircularSite',
       factoryMethod: 'createCircleFeature',
@@ -135,7 +127,6 @@ describe('SiteVisualiser', () => {
 
   describe('feature display methods', () => {
     test.each([
-      ['point', 'displayPointSite', 'createPointFeature'],
       ['circle', 'displayCircularSite', 'createCircleFeature'],
       ['polygon', 'displayPolygonSite', 'createPolygonFeature']
     ])(
@@ -271,7 +262,6 @@ describe('SiteVisualiser', () => {
 
     const expectEarlyReturn = () => {
       expect(siteVisualiser.displayCircularSite).not.toHaveBeenCalled()
-      expect(siteVisualiser.displayPointSite).not.toHaveBeenCalled()
       expect(mockMapViewManager.centreMapView).not.toHaveBeenCalled()
     }
 
@@ -286,20 +276,7 @@ describe('SiteVisualiser', () => {
         mapCoordinates,
         circleWidth
       )
-      expect(siteVisualiser.displayPointSite).not.toHaveBeenCalled()
       expect(mockMapViewManager.centreMapView).not.toHaveBeenCalled()
-    }
-
-    const expectPointSiteCall = (mapCoordinates) => {
-      expect(siteVisualiser.displayCircularSite).not.toHaveBeenCalled()
-      expect(siteVisualiser.displayPointSite).toHaveBeenCalledWith(
-        mapCoordinates
-      )
-      expect(mockMapViewManager.centreMapView).toHaveBeenCalledWith(
-        mockMap,
-        mapCoordinates,
-        12
-      )
     }
 
     beforeEach(() => {
@@ -308,7 +285,6 @@ describe('SiteVisualiser', () => {
       }
       siteVisualiser.coordinateParser = mockCoordinateParser
       jest.spyOn(siteVisualiser, 'displayCircularSite').mockImplementation()
-      jest.spyOn(siteVisualiser, 'displayPointSite').mockImplementation()
     })
 
     test('should return early when no coordinates provided', () => {
@@ -351,11 +327,6 @@ describe('SiteVisualiser', () => {
         'circular site when circleWidth is provided',
         { ...commonSiteDetails, circleWidth: 100 },
         (mapCoordinates) => expectCircularSiteCall(mapCoordinates, 100)
-      ],
-      [
-        'point site when no circleWidth provided',
-        commonSiteDetails,
-        (mapCoordinates) => expectPointSiteCall(mapCoordinates)
       ]
     ])('should display %s', (description, siteDetails, expectationFunction) => {
       expect.hasAssertions()

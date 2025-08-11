@@ -4,19 +4,6 @@ const MINIMUM_POLYGON_COORDINATES = 3
 
 class FeatureFactory {
   /**
-   * Create a point feature
-   * @param {object} olModules - OpenLayers modules
-   * @param {Array} coordinates - Web Mercator coordinates [x, y]
-   * @returns {object} OpenLayers Feature with Point geometry
-   */
-  createPointFeature(olModules, coordinates) {
-    const { Feature, Point } = olModules
-    return new Feature({
-      geometry: new Point(coordinates)
-    })
-  }
-
-  /**
    * Create a circular feature
    * @param {object} olModules - OpenLayers modules
    * @param {Array} centreCoordinates - Web Mercator centre coordinates [x, y]

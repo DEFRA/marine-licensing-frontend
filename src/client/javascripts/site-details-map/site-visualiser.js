@@ -14,18 +14,6 @@ class SiteVisualiser {
   }
 
   /**
-   * Display a point site on the map
-   * @param {Array} coordinates - Web Mercator coordinates [x, y]
-   */
-  displayPointSite(coordinates) {
-    const pointFeature = this.featureFactory.createPointFeature(
-      this.olModules,
-      coordinates
-    )
-    this.vectorSource.addFeature(pointFeature)
-  }
-
-  /**
    * Display a circular site on the map
    * @param {Array} centreCoordinates - Web Mercator centre coordinates [x, y]
    * @param {number} diameterInMetres - Diameter (width) in metres
@@ -66,7 +54,6 @@ class SiteVisualiser {
    * @param {object} siteDetails - Site details with manual coordinates
    */
   displayManualCoordinates(siteDetails) {
-    const POINT_ZOOM_LEVEL = 12
     const { coordinateSystem, coordinates, circleWidth, coordinatesEntry } =
       siteDetails
 
@@ -93,13 +80,6 @@ class SiteVisualiser {
       this.displayPolygonSite(mapCoordinates)
     } else if (circleWidth) {
       this.displayCircularSite(mapCoordinates, circleWidth)
-    } else {
-      this.displayPointSite(mapCoordinates)
-      this.mapViewManager.centreMapView(
-        this.map,
-        mapCoordinates,
-        POINT_ZOOM_LEVEL
-      )
     }
   }
 

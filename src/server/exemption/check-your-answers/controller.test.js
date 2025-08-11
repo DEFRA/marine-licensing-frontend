@@ -376,25 +376,19 @@ describe('check your answers controller', () => {
     expect(statusCode).toBe(200)
     const { document } = new JSDOM(result).window
 
-    const rows = document.querySelectorAll(
-      '#public-register-card .govuk-summary-list__row'
-    )
-
-    const row1Dt = rows[0].querySelector('dt.govuk-summary-list__key')
-    const row1Dd = rows[0].querySelector('dd.govuk-summary-list__value')
-
-    expect(row1Dt.textContent.trim()).toBe(
+    expect(getCardKey(document, CSS_SELECTORS.cards.publicRegister, 1)).toBe(
       'Information withheld from public register'
     )
-    expect(row1Dd.textContent.trim()).toBe('Yes')
+    expect(getCardValue(document, CSS_SELECTORS.cards.publicRegister, 1)).toBe(
+      'Yes'
+    )
 
-    const row2Dt = rows[1].querySelector('dt.govuk-summary-list__key')
-    const row2Dd = rows[1].querySelector('dd.govuk-summary-list__value')
-
-    expect(row2Dt.textContent.trim()).toBe(
+    expect(getCardKey(document, CSS_SELECTORS.cards.publicRegister, 2)).toBe(
       'Why the information should be withheld'
     )
-    expect(row2Dd.textContent.trim()).toBe('Test reason')
+    expect(getCardValue(document, CSS_SELECTORS.cards.publicRegister, 2)).toBe(
+      'Test reason'
+    )
   })
 
   test('should NOT ender the reason why it should be withheld from the public register when No is selected', async () => {
@@ -413,23 +407,20 @@ describe('check your answers controller', () => {
     expect(statusCode).toBe(200)
     const { document } = new JSDOM(result).window
 
-    const rows = document.querySelectorAll(
-      '#public-register-card .govuk-summary-list__row'
-    )
-
-    const row1Dt = rows[0].querySelector('dt.govuk-summary-list__key')
-    const row1Dd = rows[0].querySelector('dd.govuk-summary-list__value')
-
-    expect(row1Dt.textContent.trim()).toBe(
+    expect(getCardKey(document, CSS_SELECTORS.cards.publicRegister, 1)).toBe(
       'Information withheld from public register'
     )
-    expect(row1Dd.textContent.trim()).toBe('No')
+    expect(getCardValue(document, CSS_SELECTORS.cards.publicRegister, 1)).toBe(
+      'No'
+    )
 
     expect(document.body).not.toHaveTextContent(
       'Why the information should be withheld'
     )
 
-    expect(rows).toHaveLength(1)
+    expect(
+      getSummaryRowCount(document, CSS_SELECTORS.cards.publicRegister)
+    ).toBe(1)
   })
 
   test('Should display WGS84 coordinates correctly', async () => {

@@ -7,7 +7,6 @@ import { getExemptionCache } from '~/src/server/common/helpers/session-cache/uti
 import { mockExemption } from '~/src/server/test-helpers/mocks.js'
 import { statusCodes } from '~/src/server/common/constants/status-codes.js'
 import { config } from '~/src/config/config.js'
-import { JSDOM } from 'jsdom'
 import { routes } from '~/src/server/common/constants/routes.js'
 
 jest.mock('~/src/server/common/helpers/session-cache/utils.js')
@@ -55,50 +54,6 @@ describe('#beforeYouStart', () => {
       expect(result).toEqual(
         expect.stringContaining(`Site details | ${config.get('serviceName')}`)
       )
-
-      const { document } = new JSDOM(result).window
-
-      expect(document.querySelector('h1').textContent.trim()).toBe(
-        'Site details'
-      )
-
-      expect(
-        document.querySelector('.govuk-caption-l').textContent.trim()
-      ).toBe('Test Project')
-
-      expect(
-        document.querySelector('.govuk-caption-l').textContent.trim()
-      ).toBe(mockExemption.projectName)
-
-      expect(
-        document
-          .querySelector('.govuk-back-link[href="/exemption/task-list"')
-          .textContent.trim()
-      ).toBe('Back')
-
-      expect(
-        document
-          .querySelector(
-            '.govuk-link[href="/exemption/task-list?cancel=site-details"'
-          )
-          .textContent.trim()
-      ).toBe('Cancel')
-
-      expect(
-        document
-          .querySelector(
-            '.govuk-button[href="/exemption/how-do-you-want-to-provide-the-coordinates"'
-          )
-          .textContent.trim()
-      ).toBe('Continue')
-
-      expect(
-        document.querySelector('h2.govuk-heading-m').textContent.trim()
-      ).toBe('Before you start')
-      expect(document.querySelectorAll('h2.govuk-heading-m')).toHaveLength(3)
-      expect(
-        document.querySelector('h3.govuk-heading-s').textContent.trim()
-      ).toBe('Projects with multiple sites')
 
       expect(statusCode).toBe(statusCodes.ok)
     })

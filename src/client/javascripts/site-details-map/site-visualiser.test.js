@@ -279,6 +279,22 @@ describe('SiteVisualiser', () => {
       expect(mockMapViewManager.centreMapView).not.toHaveBeenCalled()
     }
 
+    const setupCoordinateDisplayTest = (
+      coordinatesEntry,
+      coordinates,
+      circleWidth
+    ) => {
+      const siteDetails = {
+        ...commonSiteDetails,
+        coordinatesEntry,
+        circleWidth
+      }
+      mockCoordinateParser.parseCoordinates.mockReturnValue(coordinates)
+      jest.spyOn(siteVisualiser, 'displayPolygonSite').mockImplementation()
+
+      return { siteDetails, coordinates }
+    }
+
     beforeEach(() => {
       mockCoordinateParser = {
         parseCoordinates: jest.fn()
@@ -287,33 +303,36 @@ describe('SiteVisualiser', () => {
       jest.spyOn(siteVisualiser, 'displayCircularSite').mockImplementation()
     })
 
-    test('should return early when no coordinates provided', () => {
+    test('handles missing site coordinates gracefully', () => {
       const siteDetails = { coordinateSystem: 'WGS84' }
 
-      siteVisualiser.displayManualCoordinates(siteDetails)
+      const result = siteVisualiser.displayManualCoordinates(siteDetails)
 
+      expect(result).toBe('no-coordinates')
       expect(mockCoordinateParser.parseCoordinates).not.toHaveBeenCalled()
       expectEarlyReturn()
     })
 
-    test('should return early when fromLonLat is not available', () => {
+    test('handles map projection library unavailability gracefully', () => {
       const siteDetails = {
         coordinateSystem: 'WGS84',
         coordinates: { latitude: '51.5', longitude: '-0.1' }
       }
       siteVisualiser.olModules = {}
 
-      siteVisualiser.displayManualCoordinates(siteDetails)
+      const result = siteVisualiser.displayManualCoordinates(siteDetails)
 
+      expect(result).toBe('no-projection')
       expect(mockCoordinateParser.parseCoordinates).not.toHaveBeenCalled()
       expectEarlyReturn()
     })
 
-    test('should return early when parseCoordinates returns null', () => {
+    test('handles malformed or invalid coordinates gracefully', () => {
       mockCoordinateParser.parseCoordinates.mockReturnValue(null)
 
-      siteVisualiser.displayManualCoordinates(commonSiteDetails)
+      const result = siteVisualiser.displayManualCoordinates(commonSiteDetails)
 
+      expect(result).toBe('invalid-coordinates')
       expect(mockCoordinateParser.parseCoordinates).toHaveBeenCalledWith(
         commonSiteDetails.coordinateSystem,
         commonSiteDetails.coordinates,
@@ -322,32 +341,92 @@ describe('SiteVisualiser', () => {
       expectEarlyReturn()
     })
 
-    test.each([
-      [
-        'circular site when circleWidth is provided',
-        { ...commonSiteDetails, circleWidth: 100 },
-        (mapCoordinates) => expectCircularSiteCall(mapCoordinates, 100)
-      ]
-    ])('should display %s', (description, siteDetails, expectationFunction) => {
-      expect.hasAssertions()
+    test('displays circular site boundary when width is specified', () => {
+      const siteDetails = { ...commonSiteDetails, circleWidth: 100 }
       const mapCoordinates = getThamesEstuaryCoordinates()
       setupCoordinateMock(mapCoordinates)
 
-      siteVisualiser.displayManualCoordinates(siteDetails)
+      const result = siteVisualiser.displayManualCoordinates(siteDetails)
 
-      expectationFunction(mapCoordinates)
+      expect(result).toBe('circle')
+      expectCircularSiteCall(mapCoordinates, 100)
     })
 
-    test('should call parseCoordinates with correct parameters', () => {
+    test('displays polygon site boundary for multiple coordinate points', () => {
+      const polygonCoordinates = getValidPolygonCoordinates()
+      const { siteDetails, coordinates } = setupCoordinateDisplayTest(
+        'multiple',
+        polygonCoordinates
+      )
+
+      const result = siteVisualiser.displayManualCoordinates(siteDetails)
+
+      expect(result).toBe('polygon')
+      expect(siteVisualiser.displayPolygonSite).toHaveBeenCalledWith(
+        coordinates
+      )
+      expect(siteVisualiser.displayCircularSite).not.toHaveBeenCalled()
+    })
+
+    test.each([
+      {
+        description:
+          'displays circle for single coordinate point with specified width',
+        coordinatesEntry: 'single',
+        coordinatesFactory: () => getThamesEstuaryCoordinates(),
+        circleWidth: 50
+      },
+      {
+        description:
+          'displays circle for single coordinate even when marked as multiple',
+        coordinatesEntry: 'multiple',
+        coordinatesFactory: () => ({ x: 56000, y: 6708000 }),
+        circleWidth: 75
+      }
+    ])(
+      '$description',
+      ({ coordinatesEntry, coordinatesFactory, circleWidth }) => {
+        const coordinates = coordinatesFactory()
+        const { siteDetails, coordinates: testCoordinates } =
+          setupCoordinateDisplayTest(coordinatesEntry, coordinates, circleWidth)
+
+        const result = siteVisualiser.displayManualCoordinates(siteDetails)
+
+        expect(result).toBe('circle')
+        expect(siteVisualiser.displayPolygonSite).not.toHaveBeenCalled()
+        expect(siteVisualiser.displayCircularSite).toHaveBeenCalledWith(
+          testCoordinates,
+          circleWidth
+        )
+      }
+    )
+
+    test('takes no action when single coordinate lacks width specification', () => {
+      const singleCoordinate = { x: 56000, y: 6708000 }
+      const { siteDetails } = setupCoordinateDisplayTest(
+        'single',
+        singleCoordinate
+      )
+
+      const result = siteVisualiser.displayManualCoordinates(siteDetails)
+
+      expect(result).toBe('no-action')
+      expect(siteVisualiser.displayPolygonSite).not.toHaveBeenCalled()
+      expect(siteVisualiser.displayCircularSite).not.toHaveBeenCalled()
+    })
+
+    test('processes OSGB36 coordinate system correctly', () => {
       const siteDetails = {
         coordinateSystem: 'OSGB36',
-        coordinates: { eastings: '577000', northings: '178000' }
+        coordinates: { eastings: '577000', northings: '178000' },
+        circleWidth: 100
       }
       const mapCoordinates = [3000, 4000]
       mockCoordinateParser.parseCoordinates.mockReturnValue(mapCoordinates)
 
-      siteVisualiser.displayManualCoordinates(siteDetails)
+      const result = siteVisualiser.displayManualCoordinates(siteDetails)
 
+      expect(result).toBe('circle')
       expect(mockCoordinateParser.parseCoordinates).toHaveBeenCalledWith(
         'OSGB36',
         { eastings: '577000', northings: '178000' },

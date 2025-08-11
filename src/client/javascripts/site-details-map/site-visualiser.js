@@ -52,19 +52,17 @@ class SiteVisualiser {
   /**
    * Display manual coordinates (point, circle, or polygon)
    * @param {object} siteDetails - Site details with manual coordinates
+   * @returns {string} The action taken: 'polygon', 'circle', 'no-coordinates', 'no-projection', 'invalid-coordinates', or 'no-action'
    */
   displayManualCoordinates(siteDetails) {
+    const validationResult = this.validateSiteDetailsForDisplay(siteDetails)
+    if (validationResult !== 'valid') {
+      return validationResult
+    }
+
     const { coordinateSystem, coordinates, circleWidth, coordinatesEntry } =
       siteDetails
-
-    if (!coordinates) {
-      return
-    }
-
     const { fromLonLat } = this.olModules
-    if (!fromLonLat) {
-      return
-    }
 
     const mapCoordinates = this.coordinateParser.parseCoordinates(
       coordinateSystem,
@@ -73,15 +71,43 @@ class SiteVisualiser {
     )
 
     if (!mapCoordinates) {
-      return
+      return 'invalid-coordinates'
     }
 
+    return this.displayCoordinatesByType(
+      mapCoordinates,
+      coordinatesEntry,
+      circleWidth
+    )
+  }
+
+  validateSiteDetailsForDisplay(siteDetails) {
+    const { coordinates } = siteDetails
+
+    if (!coordinates) {
+      return 'no-coordinates'
+    }
+
+    const { fromLonLat } = this.olModules
+    if (!fromLonLat) {
+      return 'no-projection'
+    }
+
+    return 'valid'
+  }
+
+  displayCoordinatesByType(mapCoordinates, coordinatesEntry, circleWidth) {
     if (coordinatesEntry === 'multiple' && Array.isArray(mapCoordinates)) {
       this.displayPolygonSite(mapCoordinates)
-      // sonarjs:S126
-    } else if (circleWidth) {
-      this.displayCircularSite(mapCoordinates, circleWidth)
+      return 'polygon'
     }
+
+    if (circleWidth) {
+      this.displayCircularSite(mapCoordinates, circleWidth)
+      return 'circle'
+    }
+
+    return 'no-action'
   }
 
   /**

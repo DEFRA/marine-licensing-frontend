@@ -78,6 +78,7 @@ class SiteVisualiser {
 
     if (coordinatesEntry === 'multiple' && Array.isArray(mapCoordinates)) {
       this.displayPolygonSite(mapCoordinates)
+      // sonarjs:S126
     } else if (circleWidth) {
       this.displayCircularSite(mapCoordinates, circleWidth)
     }

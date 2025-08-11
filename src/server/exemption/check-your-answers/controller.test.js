@@ -367,6 +367,71 @@ describe('check your answers controller', () => {
     expect(form.contains(submitButton)).toBe(true)
   })
 
+  test('should render the reason why it should be withheld from the public register', async () => {
+    const { result, statusCode } = await server.inject({
+      method: 'GET',
+      url: '/exemption/check-your-answers'
+    })
+
+    expect(statusCode).toBe(200)
+    const { document } = new JSDOM(result).window
+
+    const rows = document.querySelectorAll(
+      '#public-register-card .govuk-summary-list__row'
+    )
+
+    const row1Dt = rows[0].querySelector('dt.govuk-summary-list__key')
+    const row1Dd = rows[0].querySelector('dd.govuk-summary-list__value')
+
+    expect(row1Dt.textContent.trim()).toBe(
+      'Information withheld from public register'
+    )
+    expect(row1Dd.textContent.trim()).toBe('Yes')
+
+    const row2Dt = rows[1].querySelector('dt.govuk-summary-list__key')
+    const row2Dd = rows[1].querySelector('dd.govuk-summary-list__value')
+
+    expect(row2Dt.textContent.trim()).toBe(
+      'Why the information should be withheld'
+    )
+    expect(row2Dd.textContent.trim()).toBe('Test reason')
+  })
+
+  test('should NOT ender the reason why it should be withheld from the public register when No is selected', async () => {
+    const exemptionOnThePublicRegister = {
+      ...mockExemption,
+      publicRegister: { consent: 'no' }
+    }
+
+    getExemptionCacheSpy.mockReturnValueOnce(exemptionOnThePublicRegister)
+
+    const { result, statusCode } = await server.inject({
+      method: 'GET',
+      url: '/exemption/check-your-answers'
+    })
+
+    expect(statusCode).toBe(200)
+    const { document } = new JSDOM(result).window
+
+    const rows = document.querySelectorAll(
+      '#public-register-card .govuk-summary-list__row'
+    )
+
+    const row1Dt = rows[0].querySelector('dt.govuk-summary-list__key')
+    const row1Dd = rows[0].querySelector('dd.govuk-summary-list__value')
+
+    expect(row1Dt.textContent.trim()).toBe(
+      'Information withheld from public register'
+    )
+    expect(row1Dd.textContent.trim()).toBe('No')
+
+    expect(document.body).not.toHaveTextContent(
+      'Why the information should be withheld'
+    )
+
+    expect(rows).toHaveLength(1)
+  })
+
   test('Should display WGS84 coordinates correctly', async () => {
     const wgs84Exemption = createWgs84Exemption('55.019889', '-1.399500')
     getExemptionCacheSpy.mockReturnValueOnce(wgs84Exemption)

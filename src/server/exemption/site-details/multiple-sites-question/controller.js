@@ -1,6 +1,7 @@
 import {
   getExemptionCache,
-  updateExemptionSiteDetails
+  updateExemptionSiteDetails,
+  setExemptionCache
 } from '~/src/server/common/helpers/session-cache/utils.js'
 import {
   errorDescriptionByFieldName,
@@ -33,14 +34,17 @@ export const errorMessages = {
 export const multipleSitesController = {
   handler(request, h) {
     const exemption = getExemptionCache(request)
-    const siteDetails = exemption.siteDetails ?? {}
 
     return h.view(MULTIPLE_SITES_VIEW_ROUTE, {
       ...multipleSitesSettings,
       backLink: routes.COORDINATES_TYPE_CHOICE,
       projectName: exemption.projectName,
       payload: {
-        multipleSites: siteDetails.multipleSites
+        multipleSites: exemption.multiSite
+          ? 'yes'
+          : exemption.multiSite === false
+            ? 'no'
+            : undefined
       }
     })
   }
@@ -95,8 +99,15 @@ export const multipleSitesSubmitController = {
   },
   handler(request, h) {
     const { payload } = request
+    const exemption = getExemptionCache(request)
 
     updateExemptionSiteDetails(request, 'multipleSites', payload.multipleSites)
+
+    const multiSiteValue = payload.multipleSites === 'yes'
+    setExemptionCache(request, {
+      ...exemption,
+      multiSite: multiSiteValue
+    })
 
     if (payload.multipleSites === 'no') {
       return h.redirect(routes.COORDINATES_ENTRY_CHOICE)

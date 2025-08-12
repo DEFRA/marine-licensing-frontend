@@ -1,6 +1,5 @@
 import proj4 from 'proj4'
 
-// British National Grid (OSGB36) Projection Parameters - EPSG:27700
 const BRITISH_NATIONAL_GRID_PROJECTION = 'tmerc'
 const TRUE_ORIGIN_LATITUDE = 49
 const TRUE_ORIGIN_LONGITUDE = -2
@@ -33,7 +32,6 @@ const BRITISH_NATIONAL_GRID_DEFINITION = [
   '+type=crs'
 ].join(' ')
 
-// Define the British National Grid projection for proj4
 proj4.defs('EPSG:27700', BRITISH_NATIONAL_GRID_DEFINITION)
 
 class GeographicCoordinateConverter {

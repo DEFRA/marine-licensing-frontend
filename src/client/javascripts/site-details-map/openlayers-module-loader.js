@@ -1,16 +1,9 @@
-/**
- * OpenLayers Module Loader
- *
- * Responsible for dynamically loading OpenLayers modules.
- * This separation allows for easy testing via dependency injection.
- */
 class OpenLayersModuleLoader {
   /**
    * Load all required OpenLayers modules dynamically
    * @returns {Promise<object>} Object containing all OpenLayers modules
    */
   async loadModules() {
-    // Core map components
     const [
       { default: OpenLayersMap },
       { default: View },
@@ -23,7 +16,6 @@ class OpenLayersModuleLoader {
       import('ol/source/OSM.js')
     ])
 
-    // Vector data and styling
     const [
       { default: VectorLayer },
       { default: VectorSource },
@@ -36,7 +28,6 @@ class OpenLayersModuleLoader {
       import('ol/style.js')
     ])
 
-    // Geometry and projection utilities
     const [
       { default: Point },
       { default: Polygon },
@@ -49,12 +40,15 @@ class OpenLayersModuleLoader {
       import('ol/format/GeoJSON.js')
     ])
 
-    // Map controls
-    const [{ default: Attribution }, { defaults: defaultControls }] =
-      await Promise.all([
-        import('ol/control/Attribution.js'),
-        import('ol/control/defaults.js')
-      ])
+    const [
+      { default: Attribution },
+      { defaults: defaultControls },
+      { default: ScaleLine }
+    ] = await Promise.all([
+      import('ol/control/Attribution.js'),
+      import('ol/control/defaults.js'),
+      import('ol/control/ScaleLine.js')
+    ])
 
     return {
       OpenLayersMap,
@@ -74,7 +68,8 @@ class OpenLayersModuleLoader {
       toLonLat,
       GeoJSON,
       Attribution,
-      defaultControls
+      defaultControls,
+      ScaleLine
     }
   }
 }

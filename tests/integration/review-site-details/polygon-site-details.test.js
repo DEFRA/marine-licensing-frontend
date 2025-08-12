@@ -202,7 +202,14 @@ describe('Review Site Details - Polygon Coordinates Integration Tests', () => {
     })
 
     const mapViewRow = getRowByKey(siteCard, 'Map view')
-    expect(mapViewRow).toBeFalsy()
+    expect(mapViewRow).toBeTruthy()
+    expect(mapViewRow.textContent.trim()).toBe('Map view')
+
+    // Verify map component is present
+    const mapDiv = mapViewRow.querySelector(
+      '.app-site-details-map[data-module="site-details-map"]'
+    )
+    expect(mapDiv).toBeTruthy()
   }
 
   const validateNavigationElements = (document) => {

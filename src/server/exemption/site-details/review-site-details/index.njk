@@ -79,6 +79,17 @@
                 }), summaryRows) %}
             {% endif %}
 
+            {# Add map view row for all coordinate types #}
+            {% set summaryRows = (summaryRows.push({
+                key: {
+                    text: "Map view",
+                    classes: "govuk-summary-list__key--top-aligned"
+                },
+                value: {
+                    html: '<div class="app-site-details-map" data-module="site-details-map"></div>'
+                }
+            }), summaryRows) %}
+
             {{ govukSummaryList({
                 card: {
                     title: {

@@ -1,14 +1,14 @@
+import clarity from '@microsoft/clarity'
 import {
-  createAll,
   Button,
   Checkboxes,
+  createAll,
   ErrorSummary,
   FileUpload,
   Header,
   Radios,
   SkipLink
 } from 'govuk-frontend'
-import clarity from '@microsoft/clarity'
 
 import { AddAnotherPoint } from './add-another-point/index.js'
 import { SiteDetailsMap } from './site-details-map/index.js'
@@ -26,16 +26,14 @@ document.addEventListener('DOMContentLoaded', () => {
     '[data-module="add-another-point"]'
   )
   addAnotherElements.forEach((element) => {
-    // eslint-disable-next-line no-new
-    new AddAnotherPoint(element)
+    new AddAnotherPoint(element) // eslint-disable-line no-new
   })
 
   const mapElements = document.querySelectorAll(
     '[data-module="site-details-map"]'
   )
   mapElements.forEach((element) => {
-    // eslint-disable-next-line no-new
-    new SiteDetailsMap(element)
+    new SiteDetailsMap(element) // eslint-disable-line no-new
   })
 })
 if (window.CLARITY_PROJECT_ID) {

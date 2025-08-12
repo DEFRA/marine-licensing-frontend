@@ -53,7 +53,6 @@ const validateAndFetchExemption = async (request, exemptionId) => {
 
     const exemption = payload.value
 
-    // Check if exemption has been submitted (has applicationReference and is not Draft)
     if (exemption.status === 'Draft' || !exemption.applicationReference) {
       request.logger.error(
         {
@@ -63,11 +62,6 @@ const validateAndFetchExemption = async (request, exemptionId) => {
         },
         errorMessages.EXEMPTION_NOT_SUBMITTED
       )
-
-      // Redirect to check-your-answers if still in draft
-      if (exemption.status === 'Draft') {
-        throw Boom.redirect(routes.CHECK_YOUR_ANSWERS)
-      }
 
       throw Boom.forbidden(errorMessages.EXEMPTION_NOT_SUBMITTED)
     }

@@ -5,7 +5,8 @@ export const getActionButtons = (project) => {
   let buttons = ''
 
   if (project.status === 'Draft') {
-    buttons = `<a href="${routes.TASK_LIST}/${project.id}" class="govuk-link" aria-label="Continue to task list">Continue</a>`
+    buttons = `<a href="${routes.TASK_LIST}/${project.id}" class="govuk-link govuk-!-margin-right-4 govuk-link--no-visited-state" aria-label="Continue to task list">Continue</a>`
+    buttons += `<a href="${routes.DELETE_EXEMPTION}/${project.id}" class="govuk-link" aria-label="Delete ${project.projectName}">Delete</a>`
   }
 
   return buttons

@@ -3,12 +3,11 @@ import {
   updateExemptionSiteDetails,
   setExemptionCache
 } from '~/src/server/common/helpers/session-cache/utils.js'
+import { routes } from '~/src/server/common/constants/routes.js'
 import {
   errorDescriptionByFieldName,
   mapErrorsForDisplay
 } from '~/src/server/common/helpers/errors.js'
-import { routes } from '~/src/server/common/constants/routes.js'
-
 import joi from 'joi'
 
 export const MULTIPLE_SITES_VIEW_ROUTE =
@@ -27,33 +26,6 @@ export const errorMessages = {
     'Select whether you need to tell us about more than one site'
 }
 
-/**
- * A GDS styled page controller for the multiple sites question page.
- * @satisfies {Partial<ServerRoute>}
- */
-export const multipleSitesController = {
-  handler(request, h) {
-    const exemption = getExemptionCache(request)
-
-    return h.view(MULTIPLE_SITES_VIEW_ROUTE, {
-      ...multipleSitesSettings,
-      backLink: routes.COORDINATES_TYPE_CHOICE,
-      projectName: exemption.projectName,
-      payload: {
-        multipleSites: exemption.multiSite
-          ? 'yes'
-          : exemption.multiSite === false
-            ? 'no'
-            : undefined
-      }
-    })
-  }
-}
-
-/**
- * A GDS styled page controller for the POST route in the multiple sites question page.
- * @satisfies {Partial<ServerRoute>}
- */
 const createValidationFailAction = (request, h, err) => {
   const { payload } = request
   const { projectName } = getExemptionCache(request)
@@ -84,6 +56,25 @@ const createValidationFailAction = (request, h, err) => {
     .takeover()
 }
 
+export const multipleSitesController = {
+  handler(request, h) {
+    const exemption = getExemptionCache(request)
+
+    return h.view(MULTIPLE_SITES_VIEW_ROUTE, {
+      ...multipleSitesSettings,
+      backLink: routes.COORDINATES_TYPE_CHOICE,
+      projectName: exemption.projectName,
+      payload: {
+        multipleSites: exemption.multiSite?.enabled
+          ? 'yes'
+          : exemption.multiSite?.enabled === false
+            ? 'no'
+            : undefined
+      }
+    })
+  }
+}
+
 export const multipleSitesSubmitController = {
   options: {
     validate: {
@@ -106,7 +97,7 @@ export const multipleSitesSubmitController = {
     const multiSiteValue = payload.multipleSites === 'yes'
     setExemptionCache(request, {
       ...exemption,
-      multiSite: multiSiteValue
+      multiSite: { enabled: multiSiteValue }
     })
 
     if (payload.multipleSites === 'no') {

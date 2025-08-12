@@ -70,7 +70,7 @@ describe('Multiple sites question page', () => {
   test('should pre-populate radio button when multiSite value exists in cache', async () => {
     jest.mocked(getExemptionCache).mockReturnValue({
       ...mockExemption,
-      multiSite: true
+      multiSite: { enabled: true }
     })
 
     const { result, statusCode } = await server.inject({
@@ -93,7 +93,7 @@ describe('Multiple sites question page', () => {
   test('should not overwrite existing multiSite value on GET route', async () => {
     jest.mocked(getExemptionCache).mockReturnValue({
       ...mockExemption,
-      multiSite: true
+      multiSite: { enabled: true }
     })
 
     const { statusCode } = await server.inject({
@@ -173,7 +173,7 @@ describe('Multiple sites question page', () => {
 
     expect(setExemptionCache).toHaveBeenCalledWith(expect.any(Object), {
       ...mockExemption,
-      multiSite: true
+      multiSite: { enabled: true }
     })
   })
 
@@ -193,7 +193,7 @@ describe('Multiple sites question page', () => {
 
     expect(setExemptionCache).toHaveBeenCalledWith(expect.any(Object), {
       ...mockExemption,
-      multiSite: false
+      multiSite: { enabled: false }
     })
   })
 

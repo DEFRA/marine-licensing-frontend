@@ -41,7 +41,7 @@ const checkYourAnswersViewContent = {
 const validateAndFetchExemption = async (request, exemption) => {
   const { id } = exemption
   if (!id) {
-    request.logger.error(errorMessages.EXEMPTION_NOT_FOUND, { id })
+    request.logger.error({ id }, errorMessages.EXEMPTION_NOT_FOUND)
     throw Boom.notFound(errorMessages.EXEMPTION_NOT_FOUND, { id })
   }
 
@@ -51,7 +51,7 @@ const validateAndFetchExemption = async (request, exemption) => {
   )
 
   if (!payload?.value?.taskList) {
-    request.logger.error(errorMessages.EXEMPTION_DATA_NOT_FOUND, { id })
+    request.logger.error({ id }, errorMessages.EXEMPTION_DATA_NOT_FOUND)
     throw Boom.notFound(
       `${errorMessages.EXEMPTION_DATA_NOT_FOUND} for id: ${id}`,
       { id }
@@ -79,10 +79,13 @@ const processFileUploadSiteDetails = (exemption, id, request) => {
       filename: fileUploadData.filename
     }
   } catch (error) {
-    request.logger.error(errorMessages.FILE_UPLOAD_DATA_ERROR, {
-      error: error.message,
-      exemptionId: id
-    })
+    request.logger.error(
+      {
+        error: error.message,
+        exemptionId: id
+      },
+      errorMessages.FILE_UPLOAD_DATA_ERROR
+    )
     // Fallback to basic site details if file upload data unavailable
     return {
       ...exemption.siteDetails,
@@ -205,10 +208,13 @@ export const checkYourAnswersSubmitController = {
 
       throw new Error(errorMessages.UNEXPECTED_API_RESPONSE)
     } catch (error) {
-      request.logger.error(errorMessages.SUBMISSION_FAILED, {
-        error: error.message,
-        exemptionId: id
-      })
+      request.logger.error(
+        {
+          error: error.message,
+          exemptionId: id
+        },
+        errorMessages.SUBMISSION_FAILED
+      )
       throw Boom.badRequest(errorMessages.SUBMISSION_FAILED, error)
     }
   }

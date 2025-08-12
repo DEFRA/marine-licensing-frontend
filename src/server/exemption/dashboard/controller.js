@@ -21,7 +21,7 @@ export const dashboardController = {
         projects: formatProjectsForDisplay(projects)
       })
     } catch (error) {
-      request.logger.error('Error fetching projects:', error)
+      request.logger.error({ error }, 'Error fetching projects')
 
       return h.view(DASHBOARD_VIEW_ROUTE, {
         pageTitle: DASHBOARD_PAGE_TITLE,

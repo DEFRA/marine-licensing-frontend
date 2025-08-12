@@ -128,10 +128,13 @@ const processFileUploadSiteDetails = (exemption, id, request) => {
       filename: fileUploadData.filename
     }
   } catch (error) {
-    request.logger.error(errorMessages.FILE_UPLOAD_DATA_ERROR, {
-      error: error.message,
-      exemptionId: id
-    })
+    request.logger.error(
+      {
+        error: error.message,
+        exemptionId: id
+      },
+      errorMessages.FILE_UPLOAD_DATA_ERROR
+    )
     // Fallback to basic site details if file upload data unavailable
     return {
       ...exemption.siteDetails,

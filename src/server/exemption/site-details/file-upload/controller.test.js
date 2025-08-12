@@ -249,12 +249,12 @@ describe('#fileUpload', () => {
         )
 
         expect(mockRequest.logger.debug).toHaveBeenCalledWith(
-          'Displaying upload error from session',
           expect.objectContaining({
             message: 'The selected file contains a virus',
             fieldName: 'file',
             fileType: 'kml'
-          })
+          }),
+          'Displaying upload error from session'
         )
       })
 
@@ -274,12 +274,12 @@ describe('#fileUpload', () => {
 
         // Then - Should log error and redirect to file type selection
         expect(mockRequest.logger.error).toHaveBeenCalledWith(
-          'Failed to initialize file upload',
           expect.objectContaining({
             error: 'CDP service unavailable',
             exemptionId: mockExemption.id,
             fileUploadType: 'kml'
-          })
+          }),
+          'Failed to initialize file upload'
         )
 
         expect(mockH.redirect).toHaveBeenCalledWith(

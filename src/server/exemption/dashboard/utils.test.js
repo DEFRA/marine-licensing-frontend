@@ -40,7 +40,7 @@ describe('#formatProjectsForDisplay', () => {
         },
         { text: '15 Jan 2024' },
         {
-          html: '<a href="/exemption/task-list/abc123" class="govuk-link" aria-label="Continue to task list">Continue</a>'
+          html: '<a href="/exemption/task-list/abc123" class="govuk-link govuk-!-margin-right-4 govuk-link--no-visited-state" aria-label="Continue to task list">Continue</a><a href="/exemption/delete/abc123" class="govuk-link" aria-label="Delete Test Project">Delete</a>'
         }
       ]
     ])
@@ -70,7 +70,7 @@ describe('#formatProjectsForDisplay', () => {
         },
         { text: '-' },
         {
-          html: '<a href="/exemption/task-list/abc123" class="govuk-link" aria-label="Continue to task list">Continue</a>'
+          html: '<a href="/exemption/task-list/abc123" class="govuk-link govuk-!-margin-right-4 govuk-link--no-visited-state" aria-label="Continue to task list">Continue</a><a href="/exemption/delete/abc123" class="govuk-link" aria-label="Delete Test Project">Delete</a>'
         }
       ]
     ])
@@ -107,7 +107,7 @@ describe('#formatProjectsForDisplay', () => {
       },
       { text: '15 Jan 2024' },
       {
-        html: '<a href="/exemption/task-list/abc123" class="govuk-link" aria-label="Continue to task list">Continue</a>'
+        html: '<a href="/exemption/task-list/abc123" class="govuk-link govuk-!-margin-right-4 govuk-link--no-visited-state" aria-label="Continue to task list">Continue</a><a href="/exemption/delete/abc123" class="govuk-link" aria-label="Delete Project 1">Delete</a>'
       }
     ])
     expect(result[1]).toEqual([
@@ -157,10 +157,14 @@ describe('#formatProjectsForDisplay', () => {
 
 describe('getActionButtons', () => {
   it('returns Continue button for draft exemption', () => {
-    const draft = { id: 'abc123', status: 'Draft' }
+    const draft = {
+      id: 'abc123',
+      projectName: 'Test Project',
+      status: 'Draft'
+    }
     const result = getActionButtons(draft)
     expect(result).toBe(
-      `<a href="${routes.TASK_LIST}/abc123" class="govuk-link" aria-label="Continue to task list">Continue</a>`
+      `<a href="${routes.TASK_LIST}/abc123" class="govuk-link govuk-!-margin-right-4 govuk-link--no-visited-state" aria-label="Continue to task list">Continue</a><a href="${routes.DELETE_EXEMPTION}/abc123" class="govuk-link" aria-label="Delete Test Project">Delete</a>`
     )
   })
 

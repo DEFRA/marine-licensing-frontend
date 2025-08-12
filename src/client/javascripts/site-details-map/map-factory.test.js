@@ -28,7 +28,8 @@ describe('MapFactory', () => {
       Attribution: jest.fn(),
       defaultControls: jest.fn().mockReturnValue({
         extend: jest.fn().mockReturnValue([])
-      })
+      }),
+      ScaleLine: jest.fn()
     }
 
     mapFactory = new MapFactory(mockOlModules)
@@ -43,6 +44,7 @@ describe('MapFactory', () => {
       osm: {},
       view: {},
       attribution: {},
+      scaleLine: {},
       map: {}
     }
   })
@@ -52,6 +54,7 @@ describe('MapFactory', () => {
     mockOlModules.OSM.mockReturnValue(setup.mocks.osm)
     mockOlModules.View.mockReturnValue(setup.mocks.view)
     mockOlModules.Attribution.mockReturnValue(setup.mocks.attribution)
+    mockOlModules.ScaleLine.mockReturnValue(setup.mocks.scaleLine)
     mockOlModules.OpenLayersMap.mockReturnValue(setup.mocks.map)
   }
 
@@ -80,7 +83,7 @@ describe('MapFactory', () => {
       })
     })
 
-    test('should setup controls with custom attribution', () => {
+    test('should setup controls with custom attribution and scale line', () => {
       const setup = createMapTestSetup()
       setupMapMocks(setup)
 
@@ -90,8 +93,20 @@ describe('MapFactory', () => {
         attribution: false
       })
       expect(mockOlModules.defaultControls().extend).toHaveBeenCalledWith([
-        setup.mocks.attribution
+        setup.mocks.attribution,
+        setup.mocks.scaleLine
       ])
+    })
+
+    test('should configure scale line with metric units', () => {
+      const setup = createMapTestSetup()
+      setupMapMocks(setup)
+
+      mapFactory.createMap(setup.target, setup.options, setup.vectorLayer)
+
+      expect(mockOlModules.ScaleLine).toHaveBeenCalledWith({
+        units: 'metric'
+      })
     })
 
     test('should create view with provided options', () => {
@@ -215,15 +230,12 @@ describe('MapFactory', () => {
 
       mapFactory.createDefaultStyle()
 
-      // Main fill
       expect(mockOlModules.Fill).toHaveBeenCalledWith({
         color: 'rgba(255, 255, 255, 0.2)'
       })
-      // Circle fill (transparent)
       expect(mockOlModules.Fill).toHaveBeenCalledWith({
         color: 'transparent'
       })
-      // Should not be called with empty objects or empty strings
       expect(mockOlModules.Fill).not.toHaveBeenCalledWith({})
       expect(mockOlModules.Fill).not.toHaveBeenCalledWith({
         color: ''

@@ -1,0 +1,48 @@
+{% extends 'layouts/page.njk' %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/inset-text/macro.njk" import govukInsetText %}
+{% from "govuk/components/back-link/macro.njk" import govukBackLink %}
+{% from "cancel-button/macro.njk" import appCancelButton %}
+
+{% block beforeContent %}
+  <nav>
+    {{ govukBackLink({
+      text: "Back",
+      href: backLink
+    }) }}
+  </nav>
+{% endblock %}
+
+{% block content %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+
+      <h1 class="govuk-heading-l">Are you sure you want to delete this project?</h1>
+
+      {{ govukInsetText({
+        text: projectName
+      }) }}
+
+      <form method="POST">
+        <input type="hidden" name="csrfToken" value="{{csrfToken}}">
+        <input type="hidden" name="exemptionId" value="{{ exemptionId }}">
+
+        <div class="govuk-button-group">
+          {{ govukButton({
+            text: "Yes, delete project",
+            classes: "govuk-button--warning",
+            type: "submit",
+            attributes: {
+              "data-module": "govuk-button"
+            }
+          }) }}
+
+          {{ appCancelButton({
+            cancelLink: "/home"
+          }) }}
+        </div>
+      </form>
+
+    </div>
+  </div>
+{% endblock %} 

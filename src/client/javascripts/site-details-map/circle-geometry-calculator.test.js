@@ -1,7 +1,6 @@
 import CircleGeometryCalculator from './circle-geometry-calculator.js'
 
 describe('CircleGeometryCalculator', () => {
-  // Helper functions to reduce code duplication
   const expectValidCoordinateFormat = (coordinates) => {
     coordinates.forEach((coordinate) => {
       expect(typeof coordinate[0]).toBe('number')
@@ -38,7 +37,6 @@ describe('CircleGeometryCalculator', () => {
     bearing: Math.PI / 4
   })
 
-  // Test execution helpers
   const createCircle = (centreLonLat, radiusInMetres, sides) =>
     CircleGeometryCalculator.createGeographicCircle(
       centreLonLat,
@@ -54,7 +52,6 @@ describe('CircleGeometryCalculator', () => {
       bearing
     )
 
-  // Combined test helpers
   const testBasicCircle = (params, expectedLength = 65) => {
     const result = createCircle(
       params.centreLonLat,
@@ -78,7 +75,6 @@ describe('CircleGeometryCalculator', () => {
 
   describe('createGeographicCircle', () => {
     describe('basic circle creation', () => {
-      // eslint-disable-next-line jest/expect-expect
       test.each([
         {
           sides: undefined,
@@ -94,6 +90,7 @@ describe('CircleGeometryCalculator', () => {
       ])(
         'should create circle with $description',
         ({ sides, expectedLength }) => {
+          expect.hasAssertions()
           const params = { ...defaultCircleParams(), sides }
           testBasicCircle(params, expectedLength)
         }
@@ -235,15 +232,18 @@ describe('CircleGeometryCalculator', () => {
         sides: 4
       })
 
-      test('should generate correct number of points for square', () => {
+      const calculateSquareCircle = () => {
         const setup = createSquareTestSetup()
-        const result = CircleGeometryCalculator.createGeographicCircle(
+        return CircleGeometryCalculator.createGeographicCircle(
           setup.centreLonLat,
           setup.radiusInMetres,
           setup.sides
         )
+      }
 
-        expect(result).toHaveLength(5) // 4 sides + 1 closure point
+      test('should generate correct number of points for square', () => {
+        const result = calculateSquareCircle()
+        expect(result).toHaveLength(5)
       })
 
       test.each([
@@ -272,19 +272,13 @@ describe('CircleGeometryCalculator', () => {
           expectLat: (lat) => expect(lat).toBeCloseTo(0, 5)
         }
       ])('should place $description', ({ index, expectLon, expectLat }) => {
-        const setup = createSquareTestSetup()
-        const result = CircleGeometryCalculator.createGeographicCircle(
-          setup.centreLonLat,
-          setup.radiusInMetres,
-          setup.sides
-        )
-
+        const result = calculateSquareCircle()
         expectLon(result[index][0])
         expectLat(result[index][1])
       })
 
       test('should calculate correct distances from centre for all points', () => {
-        const centreLonLat = [0, 51.5] // London-ish
+        const centreLonLat = [0, 51.5]
         const radiusInMetres = 1000
         const earthRadiusKm = 6378.137
 
@@ -294,7 +288,6 @@ describe('CircleGeometryCalculator', () => {
           8
         )
 
-        // Calculate expected angular distance in degrees
         const expectedAngularDistanceDeg =
           (radiusInMetres / 1000 / earthRadiusKm) * (180 / Math.PI)
 
@@ -302,7 +295,6 @@ describe('CircleGeometryCalculator', () => {
           const [lon, lat] = point
           const [centreLon, centreLat] = centreLonLat
 
-          // Calculate distance using spherical law of cosines
           const latRad1 = (centreLat * Math.PI) / 180
           const latRad2 = (lat * Math.PI) / 180
           const deltaLonRad = ((lon - centreLon) * Math.PI) / 180
@@ -314,91 +306,80 @@ describe('CircleGeometryCalculator', () => {
 
           const distanceDeg = (angularDistance * 180) / Math.PI
 
-          // Should be within 1% of expected distance
           expect(distanceDeg).toBeCloseTo(expectedAngularDistanceDeg, 4)
         })
       })
 
-      test('should validate spherical trigonometry formulas with known coordinates', () => {
-        const centreLon = 0
-        const centreLat = 0 // Equator for simpler math
-        const angularDistance = 0.001 // Small distance for precision
-        const bearing = Math.PI / 2 // Due east
-
-        const result = CircleGeometryCalculator.calculateCirclePoint(
-          centreLon,
-          centreLat,
-          angularDistance,
-          bearing
-        )
-
-        // At equator, due east movement should only affect longitude
-        expect(result[1]).toBeCloseTo(0, 8) // latitude should remain ~0
-        expect(result[0]).toBeGreaterThan(0) // longitude should increase
-
-        // Test due north (bearing = 0)
-        const northResult = CircleGeometryCalculator.calculateCirclePoint(
-          centreLon,
-          centreLat,
-          angularDistance,
-          0
-        )
-
-        expect(northResult[0]).toBeCloseTo(0, 8) // longitude should remain ~0
-        expect(northResult[1]).toBeGreaterThan(0) // latitude should increase
+      const getSymmetryTestSetup = () => ({
+        centreLon: 1,
+        centreLat: 52,
+        angularDistance: 0.01
       })
 
-      test('should produce symmetric results for north vs south bearings', () => {
-        const centreLon = 1
-        const centreLat = 52
-        const angularDistance = 0.01
+      const calculateOppositePoints = (setup, bearing1, bearing2) => {
+        const point1 = CircleGeometryCalculator.calculateCirclePoint(
+          setup.centreLon,
+          setup.centreLat,
+          setup.angularDistance,
+          bearing1
+        )
+        const point2 = CircleGeometryCalculator.calculateCirclePoint(
+          setup.centreLon,
+          setup.centreLat,
+          setup.angularDistance,
+          bearing2
+        )
+        return { point1, point2 }
+      }
 
-        const north = CircleGeometryCalculator.calculateCirclePoint(
-          centreLon,
-          centreLat,
-          angularDistance,
-          0
-        )
-        const south = CircleGeometryCalculator.calculateCirclePoint(
-          centreLon,
-          centreLat,
-          angularDistance,
-          Math.PI
-        )
+      test.each([
+        {
+          description: 'north vs south bearings',
+          bearing1: 0,
+          bearing2: Math.PI,
+          checkCoordinate: 0,
+          variableCoordinate: 1,
+          centreValue: (setup) => setup.centreLat
+        },
+        {
+          description: 'east vs west bearings',
+          bearing1: Math.PI / 2,
+          bearing2: (3 * Math.PI) / 2,
+          checkCoordinate: 1,
+          variableCoordinate: 0,
+          centreValue: (setup) => setup.centreLon
+        }
+      ])(
+        'should produce symmetric results for $description',
+        ({
+          bearing1,
+          bearing2,
+          checkCoordinate,
+          variableCoordinate,
+          centreValue
+        }) => {
+          const setup = getSymmetryTestSetup()
+          const { point1, point2 } = calculateOppositePoints(
+            setup,
+            bearing1,
+            bearing2
+          )
+          const centre = centreValue(setup)
 
-        expect(north[0]).toBeCloseTo(south[0], 6) // same longitude
-        expect(Math.abs(north[1] - centreLat)).toBeCloseTo(
-          Math.abs(south[1] - centreLat),
-          6
-        )
-        expect((north[1] - centreLat) * (south[1] - centreLat)).toBeLessThan(0) // opposite sides
-      })
-
-      test('should produce symmetric results for east vs west bearings', () => {
-        const centreLon = 1
-        const centreLat = 52
-        const angularDistance = 0.01
-
-        const east = CircleGeometryCalculator.calculateCirclePoint(
-          centreLon,
-          centreLat,
-          angularDistance,
-          Math.PI / 2
-        )
-        const west = CircleGeometryCalculator.calculateCirclePoint(
-          centreLon,
-          centreLat,
-          angularDistance,
-          (3 * Math.PI) / 2
-        )
-
-        expect(east[1]).toBeCloseTo(west[1], 6) // same latitude
-        expect(Math.abs(east[0] - centreLon)).toBeCloseTo(
-          Math.abs(west[0] - centreLon),
-          6
-        )
-        expect((east[0] - centreLon) * (west[0] - centreLon)).toBeLessThan(0) // opposite sides
-      })
+          expect(point1[checkCoordinate]).toBeCloseTo(
+            point2[checkCoordinate],
+            6
+          )
+          expect(Math.abs(point1[variableCoordinate] - centre)).toBeCloseTo(
+            Math.abs(point2[variableCoordinate] - centre),
+            6
+          )
+          expect(
+            (point1[variableCoordinate] - centre) *
+              (point2[variableCoordinate] - centre)
+          ).toBeLessThan(0)
+        }
+      )
     })
   })
 

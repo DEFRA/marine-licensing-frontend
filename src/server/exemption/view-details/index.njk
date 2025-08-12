@@ -1,0 +1,41 @@
+{% extends 'layouts/page.njk' %}
+{% from "govuk/components/back-link/macro.njk" import govukBackLink %}
+
+{% block pageTitle %}
+  {{ pageTitle }} - {{ serviceName }}
+{% endblock %}
+
+{% block beforeContent %}
+  <nav>
+    {{ govukBackLink({
+          text: "Back",
+          href: backLink
+      }) }}
+  </nav>
+{% endblock %}
+
+{% block content %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-full">
+
+    {% if pageCaption %}
+      <span class="govuk-caption-l">{{ pageCaption }}</span>
+    {% endif %}
+
+    <h1 class="govuk-heading-l" id="view-details-heading">{{ pageTitle }}</h1>
+    
+    {% include "project-details-card-readonly.njk" %}
+    {% include "activity-dates-card-readonly.njk" %}
+    {% include "activity-details-card-readonly.njk" %}
+    {% if siteDetails.isFileUpload %}
+      {% include "file-upload-summary-readonly.njk" %}
+    {% elif siteDetails.isPolygonSite %}
+      {% include "polygon-summary-readonly.njk" %}
+    {% else %}
+      {% include "point-circle-summary-readonly.njk" %}
+    {% endif %}
+    {% include "public-register-card-readonly.njk" %}
+    
+    </div>
+  </div>
+{% endblock %}

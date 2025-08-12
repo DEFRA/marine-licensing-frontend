@@ -1,0 +1,66 @@
+{% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
+
+{{ govukSummaryList({
+    card: {
+      title: {
+        text: "Activity details"
+      },
+      attributes: {
+        id: "activity-details-card"
+      }
+    },
+    rows: [
+      {
+        key: {
+          text: "Activity description"
+        },
+        value: {
+          html: activityDescription
+        }
+      },
+      {
+        key: {
+          text: "Type of activity"
+        },
+        value: {
+          html: ""
+        },
+        classes: "govuk-summary-list__row--no-border"
+      },
+      {
+        key: {
+          text: "The purpose of the activity"
+        },
+        value: {
+          html: ""
+        },
+        classes: "govuk-summary-list__row--no-border"
+      },
+      {
+        key: {
+          text: "What the activity involves"
+        },
+        value: {
+          html: ""
+        },
+        classes: "govuk-summary-list__row--no-border"
+      },
+      {
+        key: {
+          text: "Why this activity is exempt"
+        },
+        value: {
+          html: ""
+        },
+        classes: "govuk-summary-list__row--no-border"
+      },
+      {
+        key: {
+          text: "Your answers from 'Check if you need a marine licence'"
+        },
+        value: {
+          html: "<p><a href=\"#\" class=\"govuk-link\">Download a copy of your answers (PDF)</a></p>"
+        }
+      }
+    ]
+  }) }}

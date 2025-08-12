@@ -6,6 +6,8 @@ export const getActionButtons = (project) => {
 
   if (project.status === 'Draft') {
     buttons = `<a href="${routes.TASK_LIST}/${project.id}" class="govuk-link" aria-label="Continue to task list">Continue</a>`
+  } else {
+    buttons = `<a href="${routes.VIEW_DETAILS}/${project.id}" class="govuk-link" aria-label="View details of ${project.projectName}">View details</a>`
   }
 
   return buttons

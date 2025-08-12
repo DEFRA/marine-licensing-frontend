@@ -9,6 +9,7 @@ import { viewDetailsRoutes } from '~/src/server/exemption/view-details/index.js'
 import { routes as confirmationRoutes } from '~/src/server/exemption/confirmation/index.js'
 import { routes } from '~/src/server/common/constants/routes.js'
 import { dashboardRoutes } from './dashboard/index.js'
+import { deleteExemptionRoutes } from './delete/index.js'
 
 /**
  * Sets up the routes used in the exemption home page.
@@ -33,6 +34,7 @@ export const exemption = {
         ...viewDetailsRoutes,
         ...confirmationRoutes,
         ...dashboardRoutes,
+        ...deleteExemptionRoutes,
         {
           method: 'GET',
           path: '/exemption',

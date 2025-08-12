@@ -22,5 +22,6 @@ export const routes = {
   CHECK_YOUR_ANSWERS: '/exemption/check-your-answers',
   VIEW_DETAILS: '/exemption/view-details',
   CONFIRMATION: '/exemption/confirmation',
-  DASHBOARD: '/home'
+  DASHBOARD: '/home',
+  DELETE_EXEMPTION: '/exemption/delete'
 }

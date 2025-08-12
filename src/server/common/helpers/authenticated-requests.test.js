@@ -4,7 +4,8 @@ import {
   authenticatedGetRequest,
   authenticatedPostRequest,
   authenticatedPatchRequest,
-  authenticatedPutRequest
+  authenticatedPutRequest,
+  authenticatedRequest
 } from './authenticated-requests.js'
 import { getUserSession } from '~/src/server/common/plugins/auth/utils.js'
 
@@ -133,6 +134,102 @@ describe('#authenticated-requests', () => {
       )
 
       expect(Wreck.get).toHaveBeenCalledWith(
+        'http://localhost:3001/test-endpoint',
+        {
+          headers: mockHeaders,
+          json: true,
+          timeout: 5000
+        }
+      )
+    })
+  })
+
+  describe('#authenticatedRequest', () => {
+    test('should make DELETE request with auth headers', async () => {
+      const mockResponse = { payload: { data: 'test' } }
+      Wreck.delete.mockResolvedValue(mockResponse)
+
+      const result = await authenticatedRequest(
+        mockRequest,
+        'DELETE',
+        '/test-endpoint'
+      )
+
+      expect(getUserSessionMock).toHaveBeenCalledWith(mockRequest, {
+        sessionId: 'test-session-id'
+      })
+      expect(Wreck.delete).toHaveBeenCalledWith(
+        'http://localhost:3001/test-endpoint',
+        {
+          headers: mockHeaders,
+          json: true
+        }
+      )
+      expect(result).toEqual(mockResponse)
+    })
+
+    test('should still send request without token if it errors when trying to find one', async () => {
+      const mockResponse = { payload: { data: 'test' } }
+      Wreck.delete.mockResolvedValue(mockResponse)
+
+      getUserSessionMock.mockRejectedValueOnce(null)
+
+      const result = await authenticatedRequest(
+        mockRequest,
+        'DELETE',
+        '/test-endpoint'
+      )
+
+      expect(getUserSessionMock).toHaveBeenCalledWith(mockRequest, {
+        sessionId: 'test-session-id'
+      })
+      expect(Wreck.delete).toHaveBeenCalledWith(
+        'http://localhost:3001/test-endpoint',
+        {
+          headers: { 'Content-Type': 'application/json' },
+          json: true
+        }
+      )
+      expect(result).toEqual(mockResponse)
+    })
+
+    test('should still send request without token if it fails to find one', async () => {
+      const mockResponse = { payload: { data: 'test' } }
+      Wreck.delete.mockResolvedValue(mockResponse)
+
+      getUserSessionMock.mockResolvedValueOnce({})
+
+      const result = await authenticatedRequest(
+        mockRequest,
+        'DELETE',
+        '/test-endpoint'
+      )
+
+      expect(getUserSessionMock).toHaveBeenCalledWith(mockRequest, {
+        sessionId: 'test-session-id'
+      })
+      expect(Wreck.delete).toHaveBeenCalledWith(
+        'http://localhost:3001/test-endpoint',
+        {
+          headers: { 'Content-Type': 'application/json' },
+          json: true
+        }
+      )
+      expect(result).toEqual(mockResponse)
+    })
+
+    test('should include additional options', async () => {
+      const additionalOptions = { timeout: 5000 }
+      Wreck.delete.mockResolvedValue({})
+
+      await authenticatedRequest(
+        mockRequest,
+        'DELETE',
+        '/test-endpoint',
+        additionalOptions
+      )
+
+      expect(Wreck.delete).toHaveBeenCalledWith(
         'http://localhost:3001/test-endpoint',
         {
           headers: mockHeaders,

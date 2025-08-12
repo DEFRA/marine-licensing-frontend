@@ -1,7 +1,6 @@
 import GeographicCoordinateConverter from './geographic-coordinate-converter.js'
 
 describe('GeographicCoordinateConverter', () => {
-  // Helper functions to reduce code duplication
   const expectBasicCoordinateResult = (result) => {
     expect(result).toBeDefined()
     expect(Array.isArray(result)).toBe(true)
@@ -63,7 +62,6 @@ describe('GeographicCoordinateConverter', () => {
     })
 
     describe('boundary values', () => {
-      // eslint-disable-next-line jest/expect-expect
       test.each([
         { description: 'minimum valid OSGB36', easting: 100000, northing: 0 },
         {
@@ -72,6 +70,7 @@ describe('GeographicCoordinateConverter', () => {
           northing: 1300000
         }
       ])('should handle $description coordinates', ({ easting, northing }) => {
+        expect.hasAssertions()
         testBasicConversion(easting, northing)
       })
     })
@@ -161,7 +160,6 @@ describe('GeographicCoordinateConverter', () => {
     })
 
     describe('input handling', () => {
-      // eslint-disable-next-line jest/expect-expect
       test.each([
         {
           description: 'integer coordinates',
@@ -179,6 +177,7 @@ describe('GeographicCoordinateConverter', () => {
           northing: -50000
         }
       ])('should handle $description', ({ easting, northing }) => {
+        expect.hasAssertions()
         const result = convertCoordinates(easting, northing)
         expectBasicCoordinateResult(result)
       })

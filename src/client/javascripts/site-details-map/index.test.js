@@ -4,7 +4,6 @@ import OpenLayersModuleLoader from './openlayers-module-loader.js'
 import SiteDataLoader from './site-data-loader.js'
 import SiteVisualiser from './site-visualiser.js'
 
-// Mock document for DOM operations
 Object.defineProperty(globalThis, 'document', {
   value: {
     createElement: jest.fn().mockReturnValue({
@@ -14,7 +13,6 @@ Object.defineProperty(globalThis, 'document', {
   writable: true
 })
 
-// Mock govuk-frontend Component to avoid browser compatibility checks
 jest.mock('govuk-frontend', () => ({
   Component: class MockComponent {
     constructor($root) {
@@ -28,7 +26,6 @@ jest.mock('./site-data-loader.js')
 jest.mock('./map-factory.js')
 jest.mock('./site-visualiser.js')
 
-// Mock setTimeout to control execution for testing
 const mockSetTimeout = jest.fn()
 globalThis.setTimeout = mockSetTimeout
 
@@ -39,7 +36,6 @@ describe('SiteDetailsMap', () => {
   let mockSiteVisualiser
   let mockModuleLoader
 
-  // Helper functions to reduce test duplication
   const setupFileCoordinatesTest = (
     siteDetails = { geoJSON: { features: [] } }
   ) => {
@@ -66,7 +62,6 @@ describe('SiteDetailsMap', () => {
     mockRoot = document.createElement('div')
     mockRoot.innerHTML = ''
 
-    // Set up service mocks
     mockDataLoader = {
       loadSiteDetails: jest.fn(),
       hasValidFileCoordinates: jest.fn(),
@@ -325,7 +320,6 @@ describe('SiteDetailsMap', () => {
         .spyOn(siteDetailsMap, 'initialiseMap')
         .mockRejectedValue(new Error('Init failed'))
 
-      // Get the callback function passed to setTimeout
       siteDetailsMap.scheduleMapInitialisation()
       const [callback] = mockSetTimeout.mock.calls[0]
 
@@ -416,9 +410,7 @@ describe('SiteDetailsMap', () => {
 
       expect(errorSpy).toHaveBeenCalledTimes(1)
       expect(mockDataLoader.loadSiteDetails).toHaveBeenCalled()
-      // The method should return early, never reaching hasValidSiteDetails
       expect(hasValidSiteDetailsSpy).not.toHaveBeenCalled()
-      // Ensure execution stops and no further processing occurs
       expect(mockModuleLoader.loadModules).not.toHaveBeenCalled()
       expect(siteDetailsMap.map).toBeNull()
       expect(siteDetailsMap.siteVisualiser).toBeNull()
@@ -437,18 +429,15 @@ describe('SiteDetailsMap', () => {
 
       expect(errorSpy).toHaveBeenCalled()
       expect(mockDataLoader.loadSiteDetails).toHaveBeenCalled()
-      // Ensure execution stops and no further processing occurs
       expect(mockModuleLoader.loadModules).not.toHaveBeenCalled()
       expect(siteDetailsMap.map).toBeNull()
       expect(siteDetailsMap.siteVisualiser).toBeNull()
     })
 
     test('should handle null site details with proper early return', async () => {
-      // Test to specifically catch mutation where condition is bypassed
       mockDataLoader.loadSiteDetails.mockReturnValue(null)
       siteDetailsMap = new SiteDetailsMap(mockRoot)
 
-      // Mock all subsequent methods to detect if they're called inappropriately
       const showErrorSpy = jest
         .spyOn(siteDetailsMap, 'showError')
         .mockImplementation()
@@ -458,7 +447,6 @@ describe('SiteDetailsMap', () => {
 
       await siteDetailsMap.initialiseMap()
 
-      // When siteDetails is null, showError MUST be called and hasValidSiteDetails must NOT be called
       expect(showErrorSpy).toHaveBeenCalledTimes(1)
       expect(hasValidSpy).not.toHaveBeenCalled()
       expect(mockModuleLoader.loadModules).not.toHaveBeenCalled()

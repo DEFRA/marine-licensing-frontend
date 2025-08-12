@@ -1,5 +1,8 @@
 import Boom from '@hapi/boom'
-import { getExemptionCache } from '~/src/server/common/helpers/session-cache/utils.js'
+import {
+  getExemptionCache,
+  getCoordinateSystem
+} from '~/src/server/common/helpers/session-cache/utils.js'
 import {
   authenticatedGetRequest,
   authenticatedPostRequest
@@ -11,6 +14,7 @@ import {
   getFileUploadSummaryData
 } from '~/src/server/exemption/site-details/review-site-details/utils.js'
 import { routes } from '~/src/server/common/constants/routes.js'
+import { createSiteDetailsDataJson } from '~/src/server/common/helpers/site-details.js'
 
 const errorMessages = {
   EXEMPTION_NOT_FOUND: 'Exemption not found',
@@ -149,11 +153,17 @@ export const checkYourAnswersController = {
 
     await validateAndFetchExemption(request, exemption)
     const siteDetails = processSiteDetails(exemption, id, request)
+    const { coordinateSystem } = getCoordinateSystem(request)
+    const siteDetailsData = createSiteDetailsDataJson(
+      siteDetails,
+      coordinateSystem
+    )
 
     return h.view(CHECK_YOUR_ANSWERS_VIEW_ROUTE, {
       ...checkYourAnswersViewContent,
       ...exemption,
-      siteDetails
+      siteDetails,
+      siteDetailsData
     })
   }
 }

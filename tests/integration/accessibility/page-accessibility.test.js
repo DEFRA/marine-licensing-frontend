@@ -1,6 +1,6 @@
 import { routes } from '~/src/server/common/constants/routes.js'
 import { statusCodes } from '~/src/server/common/constants/status-codes.js'
-import { getExemptionCache } from '~/src/server/common/helpers/session-cache/utils.js'
+import * as sessionCacheUtils from '~/src/server/common/helpers/session-cache/utils.js'
 import { createServer } from '~/src/server/index.js'
 import { toHaveNoViolations } from 'jest-axe'
 import { runAxeChecks } from '~/.jest/axe-helper.js'
@@ -11,7 +11,6 @@ jest.mock('~/src/server/common/helpers/authenticated-requests.js')
 
 expect.extend(toHaveNoViolations)
 
-jest.mock('~/src/server/common/helpers/session-cache/utils.js')
 jest.mock('~/src/server/common/helpers/authenticated-requests.js')
 
 describe('Page accessibility checks (Axe)', () => {
@@ -29,7 +28,9 @@ describe('Page accessibility checks (Axe)', () => {
   beforeEach(() => {
     jest.resetAllMocks()
 
-    jest.mocked(getExemptionCache).mockReturnValue(mockExemption)
+    jest
+      .spyOn(sessionCacheUtils, 'getExemptionCache')
+      .mockReturnValue(mockExemption)
     jest
       .mocked(authenticatedGetRequest)
       .mockImplementation((_request, endpoint) => ({

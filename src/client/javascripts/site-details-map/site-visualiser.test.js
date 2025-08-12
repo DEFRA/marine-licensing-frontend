@@ -322,7 +322,7 @@ describe('SiteVisualiser', () => {
 
       const result = siteVisualiser.displayManualCoordinates(siteDetails)
 
-      expect(result).toBe('no-projection')
+      expect(result).toBe('modules-unavailable')
       expect(mockCoordinateParser.parseCoordinates).not.toHaveBeenCalled()
       expectEarlyReturn()
     })

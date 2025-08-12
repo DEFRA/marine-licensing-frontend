@@ -50,11 +50,16 @@ class SiteVisualiser {
   }
 
   /**
-   * Display manual coordinates (point, circle, or polygon)
+   * Display manual coordinates (circle, or polygon)
    * @param {object} siteDetails - Site details with manual coordinates
-   * @returns {string} The action taken: 'polygon', 'circle', 'no-coordinates', 'no-projection', 'invalid-coordinates', or 'no-action'
+   * @returns {string} The action taken: 'polygon', 'circle', 'no-coordinates', 'modules-unavailable', 'invalid-coordinates', or 'no-action'
    */
   displayManualCoordinates(siteDetails) {
+    const fromLonLat = this.olModules?.fromLonLat
+    if (!fromLonLat) {
+      return 'modules-unavailable'
+    }
+
     const validationResult = this.validateSiteDetailsForDisplay(siteDetails)
     if (validationResult !== 'valid') {
       return validationResult
@@ -62,7 +67,6 @@ class SiteVisualiser {
 
     const { coordinateSystem, coordinates, circleWidth, coordinatesEntry } =
       siteDetails
-    const { fromLonLat } = this.olModules
 
     const mapCoordinates = this.coordinateParser.parseCoordinates(
       coordinateSystem,
@@ -82,15 +86,8 @@ class SiteVisualiser {
   }
 
   validateSiteDetailsForDisplay(siteDetails) {
-    const { coordinates } = siteDetails
-
-    if (!coordinates) {
+    if (!siteDetails.coordinates) {
       return 'no-coordinates'
-    }
-
-    const { fromLonLat } = this.olModules
-    if (!fromLonLat) {
-      return 'no-projection'
     }
 
     return 'valid'

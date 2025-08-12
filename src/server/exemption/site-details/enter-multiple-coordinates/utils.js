@@ -1,11 +1,16 @@
-import { COORDINATE_SYSTEMS } from '~/src/server/common/constants/exemptions.js'
+import {
+  COORDINATE_SYSTEMS,
+  POLYGON_MIN_COORDINATE_POINTS
+} from '~/src/server/common/constants/exemptions.js'
 import { routes } from '~/src/server/common/constants/routes.js'
 import { getExemptionCache } from '~/src/server/common/helpers/session-cache/utils.js'
 import { generatePointSpecificErrorMessage } from '~/src/server/common/helpers/site-details.js'
 import { createOsgb36MultipleCoordinatesSchema } from '~/src/server/common/schemas/osgb36.js'
 import { createWgs84MultipleCoordinatesSchema } from '~/src/server/common/schemas/wgs84.js'
 
-export const REQUIRED_COORDINATES_COUNT = 3
+// ============================================================================
+// CONSTANTS AND CONFIGURATION
+// ============================================================================
 
 export const PATTERNS = {
   FIELD_BRACKETS: /[[\]]/g
@@ -35,6 +40,10 @@ export const COORDINATE_FIELDS = {
   }
 }
 
+// ============================================================================
+// COORDINATE SYSTEM UTILITIES
+// ============================================================================
+
 export const isWGS84 = (coordinateSystem) =>
   coordinateSystem === COORDINATE_SYSTEMS.WGS84
 
@@ -47,9 +56,57 @@ const createEmptyCoordinate = (coordinateSystem) => {
 }
 
 const createDefaultCoordinates = (coordinateSystem) => {
-  return Array.from({ length: REQUIRED_COORDINATES_COUNT }, () =>
+  return Array.from({ length: POLYGON_MIN_COORDINATE_POINTS }, () =>
     createEmptyCoordinate(coordinateSystem)
   )
+}
+
+// ============================================================================
+// DATA TRANSFORMATION FUNCTIONS
+// ============================================================================
+
+/**
+ * Check if coordinates array is empty or has invalid first coordinate
+ * @param {Array} coordinates - Array of coordinates
+ * @returns {boolean} True if coordinates are empty or invalid
+ */
+const areCoordinatesEmptyOrInvalid = (coordinates) => {
+  return coordinates.length === 0 || !coordinates[0]
+}
+
+/**
+ * Check if coordinate data has fields for the expected coordinate system
+ * @param {object} coordinate - First coordinate object
+ * @param {string} coordinateSystem - Expected coordinate system
+ * @returns {boolean} True if coordinate has the required fields for the system
+ */
+const doesCoordinateSystemMatchData = (coordinate, coordinateSystem) => {
+  const hasWgs84Fields = coordinate?.latitude !== undefined
+  const hasOsgb36Fields = coordinate?.eastings !== undefined
+
+  if (coordinateSystem === COORDINATE_SYSTEMS.WGS84) {
+    return hasWgs84Fields
+  }
+
+  if (coordinateSystem === COORDINATE_SYSTEMS.OSGB36) {
+    return hasOsgb36Fields
+  }
+
+  return false
+}
+
+/**
+ * Extract only the relevant fields for the coordinate system from a coordinate object
+ * @param {object} coordinate - Coordinate object that may have mixed field types
+ * @param {string} coordinateSystem - Target coordinate system
+ * @returns {object} Coordinate with only the relevant fields
+ */
+const extractRelevantCoordinateFields = (coordinate, coordinateSystem) => {
+  const fields = getCoordinateFields(coordinateSystem)
+  return {
+    [fields.primary]: coordinate[fields.primary] || '',
+    [fields.secondary]: coordinate[fields.secondary] || ''
+  }
 }
 
 /**
@@ -63,20 +120,21 @@ export const normaliseCoordinatesForDisplay = (
   coordinates = []
 ) => {
   if (
-    coordinates.length === 0 ||
-    !coordinates[0] ||
-    (coordinates[0]?.latitude &&
-      coordinateSystem !== COORDINATE_SYSTEMS.WGS84) ||
-    (coordinates[0]?.eastings && coordinateSystem !== COORDINATE_SYSTEMS.OSGB36)
+    areCoordinatesEmptyOrInvalid(coordinates) ||
+    !doesCoordinateSystemMatchData(coordinates[0], coordinateSystem)
   ) {
     return createDefaultCoordinates(coordinateSystem)
   }
 
-  while (coordinates.length < REQUIRED_COORDINATES_COUNT) {
-    coordinates.push(createEmptyCoordinate(coordinateSystem))
+  const normalisedCoordinates = coordinates.map((coord) =>
+    extractRelevantCoordinateFields(coord, coordinateSystem)
+  )
+
+  while (normalisedCoordinates.length < POLYGON_MIN_COORDINATE_POINTS) {
+    normalisedCoordinates.push(createEmptyCoordinate(coordinateSystem))
   }
 
-  return coordinates
+  return normalisedCoordinates
 }
 
 export const extractCoordinateIndexFromFieldName = (fieldName) => {
@@ -118,11 +176,30 @@ export const convertPayloadToCoordinatesArray = (payload, coordinateSystem) => {
   return coordinates
 }
 
+// ============================================================================
+// VALIDATION FUNCTIONS
+// ============================================================================
+
 export const getValidationSchema = (coordinateSystem) => {
   return isWGS84(coordinateSystem)
     ? createWgs84MultipleCoordinatesSchema()
     : createOsgb36MultipleCoordinatesSchema()
 }
+
+export const validateCoordinates = (
+  coordinates,
+  exemptionId,
+  coordinateSystem
+) => {
+  const validationPayload = { coordinates, id: exemptionId }
+  const schema = getValidationSchema(coordinateSystem)
+
+  return schema.validate(validationPayload, { abortEarly: false })
+}
+
+// ============================================================================
+// ERROR HANDLING FUNCTIONS
+// ============================================================================
 
 export const convertArrayErrorsToFlattenedErrors = (error) => {
   if (!error.details) {
@@ -215,16 +292,9 @@ export const handleValidationFailure = (
     .takeover()
 }
 
-export const validateCoordinates = (
-  coordinates,
-  exemptionId,
-  coordinateSystem
-) => {
-  const validationPayload = { coordinates, id: exemptionId }
-  const schema = getValidationSchema(coordinateSystem)
-
-  return schema.validate(validationPayload, { abortEarly: false })
-}
+// ============================================================================
+// ARRAY MANIPULATION UTILITIES
+// ============================================================================
 
 /**
  * Remove a coordinate at a given index, but only if index >= 3 and at least 3 remain after removal
@@ -234,9 +304,9 @@ export const validateCoordinates = (
  */
 export const removeCoordinateAtIndex = (coordinates, index) => {
   if (
-    index >= REQUIRED_COORDINATES_COUNT &&
+    index >= POLYGON_MIN_COORDINATE_POINTS &&
     index < coordinates.length &&
-    coordinates.length > REQUIRED_COORDINATES_COUNT
+    coordinates.length > POLYGON_MIN_COORDINATE_POINTS
   ) {
     return coordinates.slice(0, index).concat(coordinates.slice(index + 1))
   }

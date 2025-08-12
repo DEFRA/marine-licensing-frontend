@@ -4,13 +4,53 @@ import { COORDINATE_SYSTEMS } from '~/src/server/common/constants/exemptions.js'
 import { routes } from '~/src/server/common/constants/routes.js'
 import { getCoordinateSystem } from '~/src/server/common/helpers/session-cache/utils.js'
 
+const isWGS84 = (coordinateSystem) =>
+  coordinateSystem === COORDINATE_SYSTEMS.WGS84
+
+const isValidPolygonInput = (siteDetails, coordinateSystem) => {
+  if (!siteDetails || !coordinateSystem) {
+    return false
+  }
+
+  const { coordinates } = siteDetails
+  return coordinates && Array.isArray(coordinates)
+}
+
+const isValidCoordinateForSystem = (coord, coordinateSystem) => {
+  if (!coord) {
+    return false
+  }
+
+  if (isWGS84(coordinateSystem)) {
+    return coord.latitude && coord.longitude
+  }
+
+  return coord.eastings && coord.northings
+}
+
+const generateCoordinateLabel = (index) => {
+  return index === 0 ? 'Start and end points' : `Point ${index + 1}`
+}
+
+const transformCoordinateToDisplayFormat = (coord, index, coordinateSystem) => {
+  const displayText = getCoordinateDisplayText(
+    { coordinates: coord },
+    coordinateSystem
+  )
+
+  return {
+    label: generateCoordinateLabel(index),
+    value: displayText
+  }
+}
+
 const REVIEW_SITE_DETAILS_VIEW_ROUTE =
   'exemption/site-details/review-site-details/index'
 
 const FILE_UPLOAD_REVIEW_VIEW_ROUTE =
   'exemption/site-details/review-site-details/file-upload-review'
 
-export const getSiteDetailsBackLink = (previousPage) => {
+export const getSiteDetailsBackLink = (previousPage, coordinatesEntry) => {
   if (!previousPage || !URL.canParse(previousPage)) {
     return routes.TASK_LIST
   }
@@ -22,6 +62,11 @@ export const getSiteDetailsBackLink = (previousPage) => {
     return routes.TASK_LIST
   }
 
+  if (coordinatesEntry === 'multiple') {
+    return routes.ENTER_MULTIPLE_COORDINATES
+  }
+
+  // For circular sites (single coordinate), go back to width page
   return routes.WIDTH_OF_SITE
 }
 
@@ -32,6 +77,10 @@ export const getReviewSummaryText = (siteDetails) => {
     return 'Manually enter one set of coordinates and a width to create a circular site'
   }
 
+  if (coordinatesEntry === 'multiple' && coordinatesType === 'coordinates') {
+    return 'Manually enter multiple sets of coordinates to mark the boundary of the site'
+  }
+
   return ''
 }
 
@@ -40,7 +89,7 @@ export const getCoordinateSystemText = (coordinateSystem) => {
     return ''
   }
 
-  return coordinateSystem === COORDINATE_SYSTEMS.WGS84
+  return isWGS84(coordinateSystem)
     ? 'WGS84 (World Geodetic System 1984)\nLatitude and longitude'
     : 'OSGB36 (National Grid)\nEastings and Northings'
 }
@@ -52,9 +101,28 @@ export const getCoordinateDisplayText = (siteDetails, coordinateSystem) => {
     return ''
   }
 
-  return coordinateSystem === COORDINATE_SYSTEMS.WGS84
+  return isWGS84(coordinateSystem)
     ? `${coordinates.latitude}, ${coordinates.longitude}`
     : `${coordinates.eastings}, ${coordinates.northings}`
+}
+
+export const getPolygonCoordinatesDisplayData = (
+  siteDetails,
+  coordinateSystem
+) => {
+  if (!isValidPolygonInput(siteDetails, coordinateSystem)) {
+    return []
+  }
+
+  const { coordinates } = siteDetails
+
+  const validCoordinates = coordinates.filter((coord) =>
+    isValidCoordinateForSystem(coord, coordinateSystem)
+  )
+
+  return validCoordinates.map((coord, index) =>
+    transformCoordinateToDisplayFormat(coord, index, coordinateSystem)
+  )
 }
 
 export const getFileUploadSummaryData = (exemption) => {
@@ -136,8 +204,20 @@ export const buildManualCoordinateSummaryData = (
   siteDetails,
   coordinateSystem
 ) => {
-  const { circleWidth } = siteDetails
+  const { circleWidth, coordinatesEntry } = siteDetails
 
+  if (coordinatesEntry === 'multiple') {
+    return {
+      method: getReviewSummaryText(siteDetails),
+      coordinateSystem: getCoordinateSystemText(coordinateSystem),
+      polygonCoordinates: getPolygonCoordinatesDisplayData(
+        siteDetails,
+        coordinateSystem
+      )
+    }
+  }
+
+  // Default to circular site display
   return {
     method: getReviewSummaryText(siteDetails),
     coordinateSystem: getCoordinateSystemText(coordinateSystem),
@@ -310,7 +390,10 @@ export const renderManualCoordinateReview = (h, request, options) => {
 
   return h.view(REVIEW_SITE_DETAILS_VIEW_ROUTE, {
     ...reviewSiteDetailsPageData,
-    backLink: getSiteDetailsBackLink(previousPage),
+    backLink: getSiteDetailsBackLink(
+      previousPage,
+      siteDetails.coordinatesEntry
+    ),
     projectName: exemption.projectName,
     summaryData,
     siteDetailsData

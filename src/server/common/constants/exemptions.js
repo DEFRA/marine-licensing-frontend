@@ -3,7 +3,7 @@ export const COORDINATE_SYSTEMS = {
   OSGB36: 'osgb36'
 }
 
-export const MIN_COORDINATE_POINTS = 3
+export const POLYGON_MIN_COORDINATE_POINTS = 3
 
 export const WGS84_CONSTANTS = {
   MIN_LATITUDE: -90,

@@ -4,6 +4,7 @@
 {% from "activity-dates-card/macro.njk" import appActivityDatesCard %}
 {% from "activity-details-card/macro.njk" import appActivityDetailsCard %}
 {% from "file-upload-summary/macro.njk" import appFileUploadSummary %}
+{% from "point-circle-summary/macro.njk" import appPointCircleSummary %}
 
 {% block pageTitle %}
   {{ pageTitle }} - {{ serviceName }}
@@ -48,7 +49,10 @@
     {% elif siteDetails.isPolygonSite %}
       {% include "polygon-summary-readonly.njk" %}
     {% else %}
-      {% include "point-circle-summary-readonly.njk" %}
+      {{ appPointCircleSummary({
+        siteDetails: siteDetails,
+        isReadOnly: isReadOnly
+      }) }}
     {% endif %}
     {% include "public-register-card-readonly.njk" %}
     

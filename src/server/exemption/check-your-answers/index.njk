@@ -5,6 +5,7 @@
 {% from "activity-dates-card/macro.njk" import appActivityDatesCard %}
 {% from "activity-details-card/macro.njk" import appActivityDetailsCard %}
 {% from "file-upload-summary/macro.njk" import appFileUploadSummary %}
+{% from "point-circle-summary/macro.njk" import appPointCircleSummary %}
 
 {% block pageTitle %}
   {{ title }} - {{ serviceName }}
@@ -47,7 +48,10 @@
     {% elif siteDetails.isPolygonSite %}
       {% include "polygon-summary.njk" %}
     {% else %}
-      {% include "point-circle-summary.njk" %}
+      {{ appPointCircleSummary({
+        siteDetails: siteDetails,
+        isReadOnly: isReadOnly
+      }) }}
     {% endif %}
     {% include "public-register-card.njk" %}
     <form method="post">

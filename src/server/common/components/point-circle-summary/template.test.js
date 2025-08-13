@@ -62,7 +62,7 @@ describe('Point Circle Summary Component', () => {
         siteDetails: {
           reviewSummaryText: 'Draw/enter coordinates',
           coordinateSystemText: 'OSGB36\nBritish National Grid',
-          coordinateDisplayText: 'SZ 123456 654321',
+          coordinateDisplayText: '425053, 564180',
           circleWidth: '250'
         },
         isReadOnly: true
@@ -77,7 +77,7 @@ describe('Point Circle Summary Component', () => {
       const htmlContent = $component.html()
       expect(htmlContent).toContain('Draw/enter coordinates')
       expect(htmlContent).toContain('OSGB36')
-      expect(htmlContent).toContain('SZ 123456 654321')
+      expect(htmlContent).toContain('425053, 564180')
       expect(htmlContent).toContain('250 metres')
     })
 

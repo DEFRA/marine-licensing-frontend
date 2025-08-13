@@ -153,14 +153,14 @@ describe('Polygon Summary Component', () => {
 
     test('Should handle polygon with many coordinates', () => {
       const manyCoordinates = []
-              for (let i = 1; i <= 10; i++) {
-          const baseEasting = 425053 + (i * 1000)
-          const baseNorthing = 564180 + (i * 1000)
-          manyCoordinates.push({
-            label: `Point ${i}`,
-            value: `${baseEasting}, ${baseNorthing}`
-          })
-        }
+      for (let i = 1; i <= 10; i++) {
+        const baseEasting = 425053 + i * 1000
+        const baseNorthing = 564180 + i * 1000
+        manyCoordinates.push({
+          label: `Point ${i}`,
+          value: `${baseEasting}, ${baseNorthing}`
+        })
+      }
 
       $component = renderComponent('polygon-summary', {
         siteDetails: {

@@ -6,6 +6,7 @@
 {% from "file-upload-summary/macro.njk" import appFileUploadSummary %}
 {% from "point-circle-summary/macro.njk" import appPointCircleSummary %}
 {% from "polygon-summary/macro.njk" import appPolygonSummary %}
+{% from "public-register-card/macro.njk" import appPublicRegisterCard %}
 
 {% block pageTitle %}
   {{ pageTitle }} - {{ serviceName }}
@@ -58,7 +59,10 @@
         isReadOnly: isReadOnly
       }) }}
     {% endif %}
-    {% include "public-register-card-readonly.njk" %}
+    {{ appPublicRegisterCard({
+      publicRegister: publicRegister,
+      isReadOnly: isReadOnly
+    }) }}
     
     </div>
   </div>

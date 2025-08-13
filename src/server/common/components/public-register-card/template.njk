@@ -4,15 +4,15 @@
 
 {% set _ = rows.push({
      key: { text:  "Information withheld from public register" },
-     value: { html: "Yes" if publicRegister.consent === 'yes' else "No" }
+     value: { html: "Yes" if params.publicRegister.consent === 'yes' else "No" }
    })
 %}
 
-{%  if publicRegister.consent === 'yes' %}
+{%  if params.publicRegister.consent === 'yes' %}
 
 {% set _ = rows.push({
   key: { text: "Why the information should be withheld" },
-  value: { html: publicRegister.reason | default('') }
+  value: { html: params.publicRegister.reason | default('') }
 }) %}
 
 {%  endif  %}
@@ -22,6 +22,14 @@
       title: {
         text: "Public register"
       },
+      actions: {
+        items: [
+          {
+            href: "#",
+            text: "Change"
+          }
+        ]
+      } if not params.isReadOnly,
       attributes: {
         id: "public-register-card"
       }

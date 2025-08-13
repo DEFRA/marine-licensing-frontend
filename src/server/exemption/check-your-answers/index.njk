@@ -4,6 +4,7 @@
 {% from "project-details-card/macro.njk" import appProjectDetailsCard %}
 {% from "activity-dates-card/macro.njk" import appActivityDatesCard %}
 {% from "activity-details-card/macro.njk" import appActivityDetailsCard %}
+{% from "file-upload-summary/macro.njk" import appFileUploadSummary %}
 
 {% block pageTitle %}
   {{ title }} - {{ serviceName }}
@@ -39,7 +40,10 @@
       isReadOnly: isReadOnly
     }) }}
     {% if siteDetails.isFileUpload %}
-      {% include "file-upload-summary.njk" %}
+      {{ appFileUploadSummary({
+        siteDetails: siteDetails,
+        isReadOnly: isReadOnly
+      }) }}
     {% elif siteDetails.isPolygonSite %}
       {% include "polygon-summary.njk" %}
     {% else %}

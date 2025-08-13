@@ -12,7 +12,7 @@
             text: "Change"
           }
         ]
-      },
+      } if not params.isReadOnly,
       attributes: {
         id: "site-details-card"
       }
@@ -23,7 +23,7 @@
           text: "Method of providing site location"
         },
         value: {
-          html: siteDetails.method
+          html: params.siteDetails.method
         }
       },
       {
@@ -31,7 +31,7 @@
           text: "File type"
         },
         value: {
-          html: siteDetails.fileType
+          html: params.siteDetails.fileType
         }
       },
       {
@@ -39,7 +39,7 @@
           text: "File uploaded"
         },
         value: {
-          html: siteDetails.filename
+          html: params.siteDetails.filename
         }
       }
     ]

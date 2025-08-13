@@ -1,6 +1,7 @@
 {% extends 'layouts/page.njk' %}
 {% from "govuk/components/back-link/macro.njk" import govukBackLink %}
 {% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "project-details-card/macro.njk" import appProjectDetailsCard %}
 
 {% block pageTitle %}
   {{ title }} - {{ serviceName }}
@@ -23,7 +24,10 @@
 
     <h2 class="govuk-heading-l" id="check-your-answers-heading">Check your answers before sending your information</h2>
     
-    {% include "project-details-card.njk" %}
+    {{ appProjectDetailsCard({
+      projectName: projectName,
+      isReadOnly: isReadOnly
+    }) }}
     {% include "activity-dates-card.njk" %}
     {% include "activity-details-card.njk" %}
     {% if siteDetails.isFileUpload %}

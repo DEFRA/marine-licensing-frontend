@@ -1,5 +1,6 @@
 {% extends 'layouts/page.njk' %}
 {% from "govuk/components/back-link/macro.njk" import govukBackLink %}
+{% from "project-details-card/macro.njk" import appProjectDetailsCard %}
 
 {% block pageTitle %}
   {{ pageTitle }} - {{ serviceName }}
@@ -24,7 +25,10 @@
 
     <h1 class="govuk-heading-l" id="view-details-heading">{{ pageTitle }}</h1>
     
-    {% include "project-details-card-readonly.njk" %}
+    {{ appProjectDetailsCard({
+      projectName: projectName,
+      isReadOnly: isReadOnly
+    }) }}
     {% include "activity-dates-card-readonly.njk" %}
     {% include "activity-details-card-readonly.njk" %}
     {% if siteDetails.isFileUpload %}

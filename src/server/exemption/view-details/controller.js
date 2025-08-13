@@ -231,6 +231,7 @@ export const viewDetailsController = {
         pageCaption,
         backLink: routes.DASHBOARD,
         readOnly: true,
+        isReadOnly: true,
         ...exemption,
         siteDetails
       })

@@ -12,7 +12,7 @@
             text: "Change"
           }
         ]
-      },
+      } if not params.isReadOnly,
       attributes: {
         id: "project-details-card"
       }
@@ -23,7 +23,7 @@
           text: "Project name"
         },
         value: {
-          html: projectName
+          html: params.projectName
         },
         attributes: {
           id: "project-name-row"

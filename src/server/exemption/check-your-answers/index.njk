@@ -2,6 +2,7 @@
 {% from "govuk/components/back-link/macro.njk" import govukBackLink %}
 {% from "govuk/components/button/macro.njk" import govukButton %}
 {% from "project-details-card/macro.njk" import appProjectDetailsCard %}
+{% from "activity-dates-card/macro.njk" import appActivityDatesCard %}
 
 {% block pageTitle %}
   {{ title }} - {{ serviceName }}
@@ -28,7 +29,10 @@
       projectName: projectName,
       isReadOnly: isReadOnly
     }) }}
-    {% include "activity-dates-card.njk" %}
+    {{ appActivityDatesCard({
+      activityDates: activityDates,
+      isReadOnly: isReadOnly
+    }) }}
     {% include "activity-details-card.njk" %}
     {% if siteDetails.isFileUpload %}
       {% include "file-upload-summary.njk" %}

@@ -5,6 +5,14 @@
       title: {
         text: "Activity dates"
       },
+      actions: {
+        items: [
+          {
+            href: "#",
+            text: "Change"
+          }
+        ]
+      } if not params.isReadOnly,
       attributes: {
         id: "activity-dates-card"
       }
@@ -15,7 +23,7 @@
           text: "Start date"
         },
         value: {
-          html: activityDates.start | formatDate('d MMMM yyyy')
+          html: params.activityDates.start | formatDate('d MMMM yyyy')
         }
       },
       {
@@ -23,7 +31,7 @@
           text: "End date"
         },
         value: {
-          html: activityDates.end | formatDate('d MMMM yyyy')
+          html: params.activityDates.end | formatDate('d MMMM yyyy')
         }
       }
     ]

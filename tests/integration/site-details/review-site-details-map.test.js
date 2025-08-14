@@ -4,10 +4,12 @@ import { routes } from '~/src/server/common/constants/routes.js'
 import { statusCodes } from '~/src/server/common/constants/status-codes.js'
 import * as authRequests from '~/src/server/common/helpers/authenticated-requests.js'
 import * as cacheUtils from '~/src/server/common/helpers/session-cache/utils.js'
+import * as coordinateUtils from '~/src/server/common/helpers/coordinate-utils.js'
 import { createServer } from '~/src/server/index.js'
 import { mockExemption } from '~/src/server/test-helpers/mocks.js'
 
 jest.mock('~/src/server/common/helpers/session-cache/utils.js')
+jest.mock('~/src/server/common/helpers/coordinate-utils.js')
 jest.mock('~/src/server/common/helpers/authenticated-requests.js')
 
 const OSGB36_EASTINGS_NORTHINGS = { eastings: '123456', northings: '654321' }
@@ -84,7 +86,7 @@ describe('Site Details Interactive Map Behaviour', () => {
     jest.spyOn(cacheUtils, 'getExemptionCache').mockReturnValue(exemption)
 
     if (exemption.siteDetails?.coordinateSystem) {
-      jest.spyOn(cacheUtils, 'getCoordinateSystem').mockReturnValue({
+      jest.spyOn(coordinateUtils, 'getCoordinateSystem').mockReturnValue({
         coordinateSystem: exemption.siteDetails.coordinateSystem
       })
     }

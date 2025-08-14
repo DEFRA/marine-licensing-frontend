@@ -5,6 +5,7 @@ import {
 } from '~/src/server/exemption/site-details/enter-multiple-coordinates/controller.js'
 import { COORDINATE_SYSTEMS } from '~/src/server/common/constants/exemptions.js'
 import * as cacheUtils from '~/src/server/common/helpers/session-cache/utils.js'
+import * as coordinateUtils from '~/src/server/common/helpers/coordinate-utils.js'
 import { routes } from '~/src/server/common/constants/routes.js'
 import { updateExemptionSiteDetails } from '~/src/server/common/helpers/session-cache/utils.js'
 import {
@@ -89,7 +90,7 @@ describe('#multipleCoordinates', () => {
       .spyOn(cacheUtils, 'getExemptionCache')
       .mockReturnValue(mockExemption)
     getCoordinateSystemSpy = jest
-      .spyOn(cacheUtils, 'getCoordinateSystem')
+      .spyOn(coordinateUtils, 'getCoordinateSystem')
       .mockReturnValue({ coordinateSystem: COORDINATE_SYSTEMS.WGS84 })
 
     normaliseCoordinatesForDisplay.mockImplementation(

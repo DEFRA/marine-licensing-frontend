@@ -19,11 +19,12 @@ import {
 } from '~/src/server/exemption/site-details/review-site-details/utils.js'
 import { mockExemption } from '~/src/server/test-helpers/mocks.js'
 
-import { getCoordinateSystem } from '~/src/server/common/helpers/session-cache/utils.js'
+import { getCoordinateSystem } from '~/src/server/common/helpers/coordinate-utils.js'
 
 // Mock the getCoordinateSystem helper
-jest.mock('~/src/server/common/helpers/session-cache/utils.js', () => ({
-  getCoordinateSystem: jest.fn()
+jest.mock('~/src/server/common/helpers/coordinate-utils.js', () => ({
+  getCoordinateSystem: jest.fn(),
+  extractCoordinatesFromGeoJSON: jest.fn()
 }))
 
 describe('siteDetails utils', () => {

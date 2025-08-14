@@ -5,9 +5,9 @@ import {
 import { routes } from '~/src/server/common/constants/routes.js'
 import {
   getExemptionCache,
-  getCoordinateSystem,
   updateExemptionSiteDetails
 } from '~/src/server/common/helpers/session-cache/utils.js'
+import { getCoordinateSystem } from '~/src/server/common/helpers/coordinate-utils.js'
 import {
   MULTIPLE_COORDINATES_VIEW_ROUTES,
   normaliseCoordinatesForDisplay,

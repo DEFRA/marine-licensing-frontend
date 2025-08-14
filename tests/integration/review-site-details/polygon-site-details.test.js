@@ -4,10 +4,12 @@ import { routes } from '~/src/server/common/constants/routes.js'
 import { statusCodes } from '~/src/server/common/constants/status-codes.js'
 import * as authRequests from '~/src/server/common/helpers/authenticated-requests.js'
 import * as cacheUtils from '~/src/server/common/helpers/session-cache/utils.js'
+import * as coordinateUtils from '~/src/server/common/helpers/coordinate-utils.js'
 import { createServer } from '~/src/server/index.js'
 import { testScenarios } from './polygon-fixtures.js'
 
 jest.mock('~/src/server/common/helpers/session-cache/utils.js')
+jest.mock('~/src/server/common/helpers/coordinate-utils.js')
 jest.mock('~/src/server/common/helpers/authenticated-requests.js')
 
 describe('Review Site Details - Polygon Coordinates Integration Tests', () => {
@@ -28,7 +30,7 @@ describe('Review Site Details - Polygon Coordinates Integration Tests', () => {
       .spyOn(cacheUtils, 'setExemptionCache')
       .mockImplementation(() => undefined)
     jest
-      .spyOn(cacheUtils, 'getCoordinateSystem')
+      .spyOn(coordinateUtils, 'getCoordinateSystem')
       .mockReturnValue({ coordinateSystem: COORDINATE_SYSTEMS.WGS84 })
     jest
       .spyOn(cacheUtils, 'resetExemptionSiteDetails')
@@ -42,7 +44,7 @@ describe('Review Site Details - Polygon Coordinates Integration Tests', () => {
 
       if (coordinateSystem) {
         jest
-          .spyOn(cacheUtils, 'getCoordinateSystem')
+          .spyOn(coordinateUtils, 'getCoordinateSystem')
           .mockReturnValue({ coordinateSystem })
       }
 

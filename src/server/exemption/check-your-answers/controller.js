@@ -1,8 +1,5 @@
 import Boom from '@hapi/boom'
-import {
-  getExemptionCache,
-  getCoordinateSystem
-} from '~/src/server/common/helpers/session-cache/utils.js'
+import { getExemptionCache } from '~/src/server/common/helpers/session-cache/utils.js'
 import {
   authenticatedGetRequest,
   authenticatedPostRequest
@@ -15,6 +12,7 @@ import {
 } from '~/src/server/exemption/site-details/review-site-details/utils.js'
 import { routes } from '~/src/server/common/constants/routes.js'
 import { createSiteDetailsDataJson } from '~/src/server/common/helpers/site-details.js'
+import { getCoordinateSystem } from '~/src/server/common/helpers/coordinate-utils.js'
 
 const errorMessages = {
   EXEMPTION_NOT_FOUND: 'Exemption not found',

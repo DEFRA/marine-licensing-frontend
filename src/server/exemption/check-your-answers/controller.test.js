@@ -1,6 +1,7 @@
 import { JSDOM } from 'jsdom'
 import * as authRequests from '~/src/server/common/helpers/authenticated-requests.js'
 import * as cacheUtils from '~/src/server/common/helpers/session-cache/utils.js'
+import * as coordinateUtils from '~/src/server/common/helpers/coordinate-utils.js'
 import * as reviewUtils from '~/src/server/exemption/site-details/review-site-details/utils.js'
 import { createServer } from '~/src/server/index.js'
 import { mockExemption } from '~/src/server/test-helpers/mocks.js'
@@ -1044,7 +1045,7 @@ describe('check your answers controller', () => {
       getExemptionCacheSpy.mockReturnValueOnce(osgb36Exemption)
 
       jest
-        .spyOn(cacheUtils, 'getCoordinateSystem')
+        .spyOn(coordinateUtils, 'getCoordinateSystem')
         .mockReturnValueOnce({ coordinateSystem: 'osgb36' })
 
       const { result, statusCode } = await server.inject({
@@ -1066,8 +1067,6 @@ describe('check your answers controller', () => {
         coordinates: { eastings: '425053', northings: '564180' },
         circleWidth: '100'
       })
-
-      cacheUtils.getCoordinateSystem.mockRestore()
     })
   })
 })

@@ -1,33 +1,29 @@
 {% extends 'layouts/page.njk' %}
-
 {% from "govuk/components/back-link/macro.njk" import govukBackLink %}
 {% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
 {% from "govuk/components/button/macro.njk" import govukButton %}
 {% from "cancel-button/macro.njk" import appCancelButton %}
-
+{% from "site-details-data-script/macro.njk" import appSiteDetailsDataScript %}
 {% block pageTitle %}
-  Review site details | {{ serviceName }}
+    Review site details | {{ serviceName }}
 {% endblock %}
-
 {% block head %}
-  {{ super() }}
-  <link href="/public/stylesheets/ol.css" rel="stylesheet">
+    {{ super() }}
+    {{ appSiteDetailsDataScript(siteDetailsData) }}
 {% endblock %}
-
 {% block beforeContent %}
-    {{ govukBackLink({
+    <nav>
+        {{ govukBackLink({
         text: "Back",
         href: backLink
     }) }}
+    </nav>
 {% endblock %}
-
 {% block content %}
     <div class="govuk-grid-row">
         <div class="govuk-grid-column-full">
-            
             <span class="govuk-caption-l">{{ projectName }}</span>
             <h1 class="govuk-heading-l">{{ heading }}</h1>
-
             {% set summaryRows = [
                 {
                     key: {
@@ -46,7 +42,6 @@
                     }
                 }
             ] %}
-
             {% if summaryData.polygonCoordinates %}
                 {# Polygon site - multiple coordinates #}
                 {% for coordinate in summaryData.polygonCoordinates %}
@@ -78,49 +73,40 @@
                     }
                 }), summaryRows) %}
             {% endif %}
-
             {# Add map view row for all coordinate types #}
             {% set summaryRows = (summaryRows.push({
                 key: {
                     text: "Map view",
-                    classes: "govuk-summary-list__key--top-aligned"
+                            classes: "govuk-summary-list__key--full-width"
                 },
                 value: {
-                    html: '<div class="app-site-details-map" data-module="site-details-map"></div>'
+                    html: '<div class="app-site-details-map" data-module="site-details-map"></div>',
+                    classes: "govuk-summary-list__value--full-width"
                 }
             }), summaryRows) %}
-
             {{ govukSummaryList({
                 card: {
                     title: {
                         text: "Site details"
                     }
                 },
-                rows: summaryRows
+                rows: summaryRows,
+                    classes: "govuk-summary-list--full-width"
             }) }}
-
-            <!-- Site Details Data for JavaScript -->
-            <script type="application/json" id="site-details-data">
-                {{ siteDetailsData | safe }}
-            </script>
-            
             <form method="POST">
-                <input type="hidden" name="csrfToken" value="{{csrfToken}}">
-                                
-                <div class="govuk-button-group">
-                    {{ govukButton({
+                <input type="hidden" name="csrfToken" value="{{ csrfToken }}">
+                    <div class="govuk-button-group">
+                        {{ govukButton({
                         text: "Save and continue",
                         attributes: {
                             id: "continue"
                         }
                     }) }}
-
-                    {{ appCancelButton({
+                        {{ appCancelButton({
                         cancelLink: "/exemption/task-list?cancel=site-details"
                     }) }}
-                </div>
-            </form>
-            
+                    </div>
+                </form>
+            </div>
         </div>
-    </div>
-{% endblock %} 
+    {% endblock %}

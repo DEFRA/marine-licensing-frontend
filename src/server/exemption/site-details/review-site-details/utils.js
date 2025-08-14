@@ -3,6 +3,7 @@ import { config } from '~/src/config/config.js'
 import { COORDINATE_SYSTEMS } from '~/src/server/common/constants/exemptions.js'
 import { routes } from '~/src/server/common/constants/routes.js'
 import { getCoordinateSystem } from '~/src/server/common/helpers/coordinate-utils.js'
+import { createSiteDetailsDataJson } from '~/src/server/common/helpers/site-details.js'
 
 const isWGS84 = (coordinateSystem) =>
   coordinateSystem === COORDINATE_SYSTEMS.WGS84
@@ -342,12 +343,7 @@ export const renderFileUploadReview = (h, options) => {
   })
 
   // Prepare site details data for map if needed
-  const siteDetailsData = JSON.stringify({
-    coordinatesType: 'file',
-    geoJSON: siteDetails.geoJSON,
-    fileUploadType: siteDetails.fileUploadType,
-    uploadedFile: siteDetails.uploadedFile
-  })
+  const siteDetailsData = createSiteDetailsDataJson(siteDetails)
 
   return h.view(FILE_UPLOAD_REVIEW_VIEW_ROUTE, {
     ...reviewSiteDetailsPageData,
@@ -380,13 +376,10 @@ export const renderManualCoordinateReview = (h, request, options) => {
   )
 
   // Prepare site details data for map if needed
-  const siteDetailsData = JSON.stringify({
-    coordinatesType: 'coordinates',
-    coordinateSystem,
-    coordinatesEntry: siteDetails.coordinatesEntry,
-    coordinates: siteDetails.coordinates,
-    circleWidth: siteDetails.circleWidth
-  })
+  const siteDetailsData = createSiteDetailsDataJson(
+    siteDetails,
+    coordinateSystem
+  )
 
   return h.view(REVIEW_SITE_DETAILS_VIEW_ROUTE, {
     ...reviewSiteDetailsPageData,

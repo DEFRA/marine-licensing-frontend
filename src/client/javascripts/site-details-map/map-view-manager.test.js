@@ -28,10 +28,8 @@ describe('MapViewManager', () => {
       mapViewManager.fitMapToExtent(mockMap, extent)
 
       expect(mockView.fit).toHaveBeenCalledWith(extent, {
-        padding: [20, 20, 20, 20],
-        maxZoom: 14,
-        minZoom: 8,
-        duration: 500
+        padding: [100, 100, 100, 100],
+        minResolution: 0.1
       })
     })
 
@@ -39,17 +37,14 @@ describe('MapViewManager', () => {
       const extent = [100, 200, 300, 400]
       const customOptions = {
         padding: [10, 10, 10, 10],
-        maxZoom: 18,
-        minZoom: 5
+        minResolution: 0.2
       }
 
       mapViewManager.fitMapToExtent(mockMap, extent, customOptions)
 
       expect(mockView.fit).toHaveBeenCalledWith(extent, {
         padding: [10, 10, 10, 10],
-        maxZoom: 18,
-        minZoom: 5,
-        duration: 500
+        minResolution: 0.2
       })
     })
 
@@ -119,10 +114,8 @@ describe('MapViewManager', () => {
 
   const getFitExpectations = (extent, options) => ({
     fitOptions: {
-      padding: [20, 20, 20, 20],
-      maxZoom: 14,
-      minZoom: 8,
-      duration: 500,
+      padding: [100, 100, 100, 100],
+      minResolution: 0.1,
       ...options
     }
   })

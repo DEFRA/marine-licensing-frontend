@@ -1,3 +1,6 @@
+import { getExemptionCache } from './session-cache/utils.js'
+import { COORDINATE_SYSTEMS } from '~/src/server/common/constants/exemptions.js'
+
 /**
  * Extract coordinate data from GeoJSON for display purposes
  * @param {object} geoJSON - GeoJSON object containing features
@@ -19,4 +22,21 @@ export function extractCoordinatesFromGeoJSON(geoJSON) {
   }
 
   return extractedCoordinates
+}
+
+/**
+ * Gets the coordinate system from the exemption cache with fallback to WGS84
+ * @param {Request} request - Hapi request object
+ * @returns {object} Object containing coordinateSystem property
+ */
+export const getCoordinateSystem = (request) => {
+  const existingCache = getExemptionCache(request)
+  const currentSystem = existingCache.siteDetails?.coordinateSystem
+
+  const coordinateSystem =
+    currentSystem === COORDINATE_SYSTEMS.OSGB36
+      ? COORDINATE_SYSTEMS.OSGB36
+      : COORDINATE_SYSTEMS.WGS84
+
+  return { coordinateSystem }
 }

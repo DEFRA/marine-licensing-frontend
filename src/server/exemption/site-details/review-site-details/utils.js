@@ -2,7 +2,7 @@ import Boom from '@hapi/boom'
 import { config } from '~/src/config/config.js'
 import { COORDINATE_SYSTEMS } from '~/src/server/common/constants/exemptions.js'
 import { routes } from '~/src/server/common/constants/routes.js'
-import { getCoordinateSystem } from '~/src/server/common/helpers/session-cache/utils.js'
+import { getCoordinateSystem } from '~/src/server/common/helpers/coordinate-utils.js'
 
 const isWGS84 = (coordinateSystem) =>
   coordinateSystem === COORDINATE_SYSTEMS.WGS84

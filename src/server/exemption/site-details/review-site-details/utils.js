@@ -195,6 +195,9 @@ export const getFileUploadBackLink = (previousPage) => {
   return routes.FILE_UPLOAD
 }
 
+const metresLabel = (metres) =>
+  metres === '1' ? `${metres} metre` : `${metres} metres`
+
 /**
  * Builds summary data for manual coordinate entry display
  * @param {object} siteDetails - Site details from exemption
@@ -223,7 +226,7 @@ export const buildManualCoordinateSummaryData = (
     method: getReviewSummaryText(siteDetails),
     coordinateSystem: getCoordinateSystemText(coordinateSystem),
     coordinates: getCoordinateDisplayText(siteDetails, coordinateSystem),
-    width: circleWidth ? `${circleWidth} metres` : ''
+    width: circleWidth ? metresLabel(circleWidth) : ''
   }
 }
 

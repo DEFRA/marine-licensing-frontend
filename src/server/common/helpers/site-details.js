@@ -66,3 +66,34 @@ export const generatePointSpecificErrorMessage = (baseMessage, index) => {
 
   return messageMap[baseMessage] || baseMessage
 }
+
+/**
+ * Create site details data JSON for map visualization
+ * @param {object} siteDetails - Site details object containing coordinate and file information
+ * @returns {string} JSON string containing site details data for map
+ */
+export const createSiteDetailsDataJson = (siteDetails, coordinateSystem) => {
+  if (!siteDetails) {
+    return JSON.stringify({
+      coordinatesType: 'none',
+      coordinateSystem: null
+    })
+  }
+
+  if (siteDetails.coordinatesType === 'file') {
+    return JSON.stringify({
+      coordinatesType: 'file',
+      geoJSON: siteDetails.geoJSON,
+      fileUploadType: siteDetails.fileUploadType,
+      uploadedFile: siteDetails.uploadedFile
+    })
+  } else {
+    return JSON.stringify({
+      coordinatesType: 'coordinates',
+      coordinateSystem,
+      coordinatesEntry: siteDetails.coordinatesEntry,
+      coordinates: siteDetails.coordinates,
+      circleWidth: siteDetails.circleWidth
+    })
+  }
+}

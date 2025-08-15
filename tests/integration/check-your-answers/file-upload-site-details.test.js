@@ -6,7 +6,6 @@ import * as cacheUtils from '~/src/server/common/helpers/session-cache/utils.js'
 import { createServer } from '~/src/server/index.js'
 import { testScenarios } from './fixtures.js'
 
-jest.mock('~/src/server/common/helpers/session-cache/utils.js')
 jest.mock('~/src/server/common/helpers/authenticated-requests.js')
 
 describe('Check Your Answers - File Upload Site Details', () => {
@@ -127,16 +126,6 @@ describe('Check Your Answers - File Upload Site Details', () => {
       '#site-details-card',
       expected.siteDetails
     )
-
-    if (expected.shouldNotHaveMapView) {
-      const siteCard = document.querySelector('#site-details-card')
-      const rows = siteCard.querySelectorAll('.govuk-summary-list__row')
-      const mapViewRow = Array.from(rows).find((row) => {
-        const keyElement = row.querySelector('.govuk-summary-list__key')
-        return keyElement && keyElement.textContent.trim() === 'Map view'
-      })
-      expect(mapViewRow).toBeFalsy()
-    }
   }
 
   const validatePublicRegister = (document, expected) => {

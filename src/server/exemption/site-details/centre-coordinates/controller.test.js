@@ -7,6 +7,7 @@ import {
 } from '~/src/server/exemption/site-details/centre-coordinates/controller.js'
 import { COORDINATE_SYSTEMS } from '~/src/server/common/constants/exemptions.js'
 import * as cacheUtils from '~/src/server/common/helpers/session-cache/utils.js'
+import * as coordinateUtils from '~/src/server/common/helpers/coordinate-utils.js'
 import { mockExemption } from '~/src/server/test-helpers/mocks.js'
 import { statusCodes } from '~/src/server/common/constants/status-codes.js'
 import { config } from '~/src/config/config.js'
@@ -40,7 +41,7 @@ describe('#centreCoordinates', () => {
       .spyOn(cacheUtils, 'getExemptionCache')
       .mockReturnValue(mockExemption)
     getCoordinateSystemSpy = jest
-      .spyOn(cacheUtils, 'getCoordinateSystem')
+      .spyOn(coordinateUtils, 'getCoordinateSystem')
       .mockReturnValue({ coordinateSystem: COORDINATE_SYSTEMS.WGS84 })
   })
 

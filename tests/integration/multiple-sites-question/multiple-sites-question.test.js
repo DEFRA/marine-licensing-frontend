@@ -34,7 +34,7 @@ describe('Multiple sites question page', () => {
     jest.mocked(setExemptionCache).mockReturnValue({})
   })
 
-  test('should display the multiple sites question page with correct content and multiSite defaults to false', async () => {
+  test('should display the multiple sites question page with correct content and multipleSiteDetails defaults to false', async () => {
     const { result, statusCode } = await server.inject({
       method: 'GET',
       url: '/exemption/does-your-project-involve-more-than-one-site'
@@ -67,10 +67,10 @@ describe('Multiple sites question page', () => {
     expect(setExemptionCache).not.toHaveBeenCalled()
   })
 
-  test('should pre-populate radio button when multiSite value exists in cache', async () => {
+  test('should pre-populate radio button when multipleSiteDetails value exists in cache', async () => {
     jest.mocked(getExemptionCache).mockReturnValue({
       ...mockExemption,
-      multiSite: { enabled: true }
+      multipleSiteDetails: { multipleSitesEnabled: 'yes' }
     })
 
     const { result, statusCode } = await server.inject({
@@ -90,10 +90,10 @@ describe('Multiple sites question page', () => {
     expect(setExemptionCache).not.toHaveBeenCalled()
   })
 
-  test('should not overwrite existing multiSite value on GET route', async () => {
+  test('should not overwrite existing multipleSiteDetails value on GET route', async () => {
     jest.mocked(getExemptionCache).mockReturnValue({
       ...mockExemption,
-      multiSite: { enabled: true }
+      multipleSiteDetails: { multipleSitesEnabled: 'yes' }
     })
 
     const { statusCode } = await server.inject({
@@ -152,12 +152,12 @@ describe('Multiple sites question page', () => {
     ).toBeInTheDocument()
   })
 
-  test('should stay on same page when YES is selected and set multiSite to true', async () => {
+  test('should stay on same page when YES is selected and set multipleSiteDetails to true', async () => {
     const { result, statusCode } = await server.inject({
       method: 'POST',
       url: '/exemption/does-your-project-involve-more-than-one-site',
       payload: {
-        multipleSites: 'yes'
+        multipleSitesEnabled: 'yes'
       }
     })
 
@@ -173,16 +173,16 @@ describe('Multiple sites question page', () => {
 
     expect(setExemptionCache).toHaveBeenCalledWith(expect.any(Object), {
       ...mockExemption,
-      multiSite: { enabled: true }
+      multipleSiteDetails: { multipleSitesEnabled: true }
     })
   })
 
-  test('should redirect to coordinates entry choice when NO is selected and set multiSite to false', async () => {
+  test('should redirect to coordinates entry choice when NO is selected and set multipleSiteDetails to false', async () => {
     const response = await server.inject({
       method: 'POST',
       url: '/exemption/does-your-project-involve-more-than-one-site',
       payload: {
-        multipleSites: 'no'
+        multipleSitesEnabled: 'no'
       }
     })
 
@@ -193,7 +193,7 @@ describe('Multiple sites question page', () => {
 
     expect(setExemptionCache).toHaveBeenCalledWith(expect.any(Object), {
       ...mockExemption,
-      multiSite: { enabled: false }
+      multipleSiteDetails: { multipleSitesEnabled: false }
     })
   })
 

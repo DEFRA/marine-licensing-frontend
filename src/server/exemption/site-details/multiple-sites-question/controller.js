@@ -1,6 +1,5 @@
 import {
   getExemptionCache,
-  updateExemptionSiteDetails,
   setExemptionCache
 } from '~/src/server/common/helpers/session-cache/utils.js'
 import { routes } from '~/src/server/common/constants/routes.js'
@@ -65,9 +64,10 @@ export const multipleSitesController = {
       backLink: routes.COORDINATES_TYPE_CHOICE,
       projectName: exemption.projectName,
       payload: {
-        multipleSites: exemption.multiSite?.enabled
+        multipleSitesEnabled: exemption.multipleSiteDetails
+          ?.multipleSitesEnabled
           ? 'yes'
-          : exemption.multiSite?.enabled === false
+          : exemption.multipleSiteDetails?.multipleSitesEnabled === false
             ? 'no'
             : undefined
       }
@@ -79,11 +79,15 @@ export const multipleSitesSubmitController = {
   options: {
     validate: {
       payload: joi.object({
-        multipleSites: joi.string().valid('yes', 'no').required().messages({
-          'any.only': 'MULTIPLE_SITES_REQUIRED',
-          'string.empty': 'MULTIPLE_SITES_REQUIRED',
-          'any.required': 'MULTIPLE_SITES_REQUIRED'
-        })
+        multipleSitesEnabled: joi
+          .string()
+          .valid('yes', 'no')
+          .required()
+          .messages({
+            'any.only': 'MULTIPLE_SITES_REQUIRED',
+            'string.empty': 'MULTIPLE_SITES_REQUIRED',
+            'any.required': 'MULTIPLE_SITES_REQUIRED'
+          })
       }),
       failAction: createValidationFailAction
     }
@@ -92,15 +96,13 @@ export const multipleSitesSubmitController = {
     const { payload } = request
     const exemption = getExemptionCache(request)
 
-    updateExemptionSiteDetails(request, 'multipleSites', payload.multipleSites)
-
-    const multiSiteValue = payload.multipleSites === 'yes'
+    const multiSiteValue = payload.multipleSitesEnabled === 'yes'
     setExemptionCache(request, {
       ...exemption,
-      multiSite: { enabled: multiSiteValue }
+      multipleSiteDetails: { multipleSitesEnabled: multiSiteValue }
     })
 
-    if (payload.multipleSites === 'no') {
+    if (payload.multipleSitesEnabled === 'no') {
       return h.redirect(routes.COORDINATES_ENTRY_CHOICE)
     } else {
       return h.view(MULTIPLE_SITES_VIEW_ROUTE, {
@@ -108,7 +110,7 @@ export const multipleSitesSubmitController = {
         backLink: routes.COORDINATES_TYPE_CHOICE,
         projectName: getExemptionCache(request).projectName,
         payload: {
-          multipleSites: payload.multipleSites
+          multipleSitesEnabled: payload.multipleSitesEnabled
         }
       })
     }

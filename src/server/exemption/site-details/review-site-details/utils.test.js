@@ -446,7 +446,7 @@ describe('siteDetails utils', () => {
           latitude: '51.5074',
           longitude: '-0.1278'
         },
-        circleWidth: '100'
+        circleWidth: '1'
       }
       const coordinateSystem = COORDINATE_SYSTEMS.WGS84
 
@@ -461,7 +461,7 @@ describe('siteDetails utils', () => {
         coordinateSystem:
           'WGS84 (World Geodetic System 1984)\nLatitude and longitude',
         coordinates: '51.5074, -0.1278',
-        width: '100 metres'
+        width: '1 metre'
       })
     })
 

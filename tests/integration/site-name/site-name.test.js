@@ -10,7 +10,7 @@ import {
 
 jest.mock('~/src/server/common/helpers/session-cache/utils.js')
 
-describe('Multiple sites question page', () => {
+describe('Site name page', () => {
   let server
 
   const mockExemption = {
@@ -34,10 +34,10 @@ describe('Multiple sites question page', () => {
     jest.mocked(setExemptionCache).mockReturnValue({})
   })
 
-  test('should display the multiple sites question page with correct content and multiSite defaults to false', async () => {
+  test('should display the site name page with correct content', async () => {
     const { result, statusCode } = await server.inject({
       method: 'GET',
-      url: '/exemption/does-your-project-involve-more-than-one-site'
+      url: '/exemption/site-name'
     })
 
     expect(statusCode).toBe(statusCodes.ok)
@@ -46,17 +46,14 @@ describe('Multiple sites question page', () => {
 
     expect(
       getByRole(document, 'heading', {
-        name: 'Do you need to tell us about more than one site?'
+        name: 'Site name'
       })
     ).toBeInTheDocument()
     expect(getByText(document, mockExemption.projectName)).toBeInTheDocument()
 
-    const yesRadio = document.querySelector('input[value="yes"]')
-    const noRadio = document.querySelector('input[value="no"]')
-    expect(yesRadio).toBeInTheDocument()
-    expect(noRadio).toBeInTheDocument()
-    expect(yesRadio).not.toBeChecked()
-    expect(noRadio).not.toBeChecked()
+    const siteNameInput = document.querySelector('input[name="siteName"]')
+    expect(siteNameInput).toBeInTheDocument()
+    expect(siteNameInput).toHaveAttribute('type', 'text')
 
     expect(
       getByRole(document, 'button', { name: 'Continue' })
@@ -67,41 +64,23 @@ describe('Multiple sites question page', () => {
     expect(setExemptionCache).not.toHaveBeenCalled()
   })
 
-  test('should pre-populate radio button when multiSite value exists in cache', async () => {
+  test('should pre-populate input when siteName value exists in cache', async () => {
     jest.mocked(getExemptionCache).mockReturnValue({
       ...mockExemption,
-      multiSite: { enabled: true }
+      siteName: 'Test Site'
     })
 
     const { result, statusCode } = await server.inject({
       method: 'GET',
-      url: '/exemption/does-your-project-involve-more-than-one-site'
+      url: '/exemption/site-name'
     })
 
     expect(statusCode).toBe(statusCodes.ok)
 
     const { document } = new JSDOM(result).window
 
-    const yesRadio = document.querySelector('input[value="yes"]')
-    const noRadio = document.querySelector('input[value="no"]')
-    expect(yesRadio).toBeChecked()
-    expect(noRadio).not.toBeChecked()
-
-    expect(setExemptionCache).not.toHaveBeenCalled()
-  })
-
-  test('should not overwrite existing multiSite value on GET route', async () => {
-    jest.mocked(getExemptionCache).mockReturnValue({
-      ...mockExemption,
-      multiSite: { enabled: true }
-    })
-
-    const { statusCode } = await server.inject({
-      method: 'GET',
-      url: '/exemption/does-your-project-involve-more-than-one-site'
-    })
-
-    expect(statusCode).toBe(statusCodes.ok)
+    const siteNameInput = document.querySelector('input[name="siteName"]')
+    expect(siteNameInput).toHaveValue('Test Site')
 
     expect(setExemptionCache).not.toHaveBeenCalled()
   })
@@ -109,7 +88,7 @@ describe('Multiple sites question page', () => {
   test('should have correct navigation links', async () => {
     const { result } = await server.inject({
       method: 'GET',
-      url: '/exemption/does-your-project-involve-more-than-one-site'
+      url: '/exemption/site-name'
     })
 
     const { document } = new JSDOM(result).window
@@ -123,14 +102,14 @@ describe('Multiple sites question page', () => {
     const backLink = getByRole(document, 'link', { name: 'Back' })
     expect(backLink).toHaveAttribute(
       'href',
-      '/exemption/how-do-you-want-to-provide-the-coordinates'
+      '/exemption/does-your-project-involve-more-than-one-site'
     )
   })
 
-  test('should stay on same page when continue is clicked without selection', async () => {
+  test('should stay on same page when continue is clicked without entering site name', async () => {
     const { result, statusCode } = await server.inject({
       method: 'POST',
-      url: '/exemption/does-your-project-involve-more-than-one-site',
+      url: '/exemption/site-name',
       payload: {}
     })
 
@@ -140,43 +119,21 @@ describe('Multiple sites question page', () => {
 
     expect(
       getByRole(document, 'heading', {
-        name: 'Do you need to tell us about more than one site?'
+        name: 'Site name'
       })
     ).toBeInTheDocument()
 
-    expect(
-      getByText(
-        document,
-        'Select whether you need to tell us about more than one site'
-      )
-    ).toBeInTheDocument()
+    const errorMessage = document.querySelector('.govuk-error-message')
+    expect(errorMessage).toBeInTheDocument()
+    expect(errorMessage.textContent).toContain('Enter the site name')
   })
 
-  test('should stay on same page when YES is selected and set multiSite to true', async () => {
-    const { headers, statusCode } = await server.inject({
-      method: 'POST',
-      url: '/exemption/does-your-project-involve-more-than-one-site',
-      payload: {
-        multipleSites: 'yes'
-      }
-    })
-
-    expect(statusCode).toBe(statusCodes.redirect)
-
-    expect(headers.location).toBe('/exemption/site-name')
-
-    expect(setExemptionCache).toHaveBeenCalledWith(expect.any(Object), {
-      ...mockExemption,
-      multiSite: { enabled: true }
-    })
-  })
-
-  test('should redirect to coordinates entry choice when NO is selected and set multiSite to false', async () => {
+  test('should redirect to coordinates entry choice when valid site name is submitted', async () => {
     const response = await server.inject({
       method: 'POST',
-      url: '/exemption/does-your-project-involve-more-than-one-site',
+      url: '/exemption/site-name',
       payload: {
-        multipleSites: 'no'
+        siteName: 'Test Site Name'
       }
     })
 
@@ -185,16 +142,17 @@ describe('Multiple sites question page', () => {
       '/exemption/how-do-you-want-to-enter-the-coordinates'
     )
 
-    expect(setExemptionCache).toHaveBeenCalledWith(expect.any(Object), {
-      ...mockExemption,
-      multiSite: { enabled: false }
-    })
+    expect(updateExemptionSiteDetails).toHaveBeenCalledWith(
+      expect.any(Object),
+      'siteName',
+      'Test Site Name'
+    )
   })
 
   test('should redirect to task list when cancel is clicked', async () => {
     const { result, statusCode } = await server.inject({
       method: 'GET',
-      url: '/exemption/does-your-project-involve-more-than-one-site'
+      url: '/exemption/site-name'
     })
 
     expect(statusCode).toBe(statusCodes.ok)

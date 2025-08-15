@@ -122,6 +122,13 @@ describe('SiteVisualiser', () => {
       factoryMethod: 'createPolygonFeature',
       coordinates: getValidPolygonCoordinates(),
       args: [getValidPolygonCoordinates()]
+    },
+    circleSmall: {
+      method: 'displayCircularSite',
+      factoryMethod: 'createCircleFeature',
+      coordinates: getTestCoordinates(),
+      diameter: 1,
+      args: [getTestCoordinates(), 1]
     }
   })
 
@@ -151,27 +158,55 @@ describe('SiteVisualiser', () => {
       }
     )
 
-    test.each([
-      ['circle', 'displayCircularSite', 'createCircleFeature'],
-      ['polygon', 'displayPolygonSite', 'createPolygonFeature']
-    ])(
-      'should fit map to %s geometry',
-      (featureType, displayMethod, factoryMethod) => {
-        const testData = getFeatureDisplayTestData()[featureType]
-        const mockGeometry = { mockGeometry: true }
-        const mockFeature = createMockFeatureWithGeometry(mockGeometry)
-        mockFeatureFactory[factoryMethod] = jest
-          .fn()
-          .mockReturnValue(mockFeature)
+    test('should fit map to circle geometry', () => {
+      const testData = getFeatureDisplayTestData().circle
+      const mockGeometry = { mockGeometry: true }
+      const mockFeature = createMockFeatureWithGeometry(mockGeometry)
+      mockFeatureFactory.createCircleFeature = jest
+        .fn()
+        .mockReturnValue(mockFeature)
 
-        siteVisualiser[displayMethod](...testData.args)
+      siteVisualiser.displayCircularSite(...testData.args)
 
-        expect(mockMapViewManager.fitMapToGeometry).toHaveBeenCalledWith(
-          mockMap,
-          mockGeometry
-        )
-      }
-    )
+      expect(mockMapViewManager.fitMapToGeometry).toHaveBeenCalledWith(
+        mockMap,
+        mockGeometry,
+        {}
+      )
+    })
+
+    test('should fit map to small circle geometry', () => {
+      const testData = getFeatureDisplayTestData().circleSmall
+      const mockGeometry = { mockGeometry: true }
+      const mockFeature = createMockFeatureWithGeometry(mockGeometry)
+      mockFeatureFactory.createCircleFeature = jest
+        .fn()
+        .mockReturnValue(mockFeature)
+
+      siteVisualiser.displayCircularSite(...testData.args)
+
+      expect(mockMapViewManager.fitMapToGeometry).toHaveBeenCalledWith(
+        mockMap,
+        mockGeometry,
+        { minResolution: 2 }
+      )
+    })
+
+    test('should fit map to polygon geometry', () => {
+      const testData = getFeatureDisplayTestData().polygon
+      const mockGeometry = { mockGeometry: true }
+      const mockFeature = createMockFeatureWithGeometry(mockGeometry)
+      mockFeatureFactory.createPolygonFeature = jest
+        .fn()
+        .mockReturnValue(mockFeature)
+
+      siteVisualiser.displayPolygonSite(...testData.args)
+
+      expect(mockMapViewManager.fitMapToGeometry).toHaveBeenCalledWith(
+        mockMap,
+        mockGeometry
+      )
+    })
   })
 
   describe('displayPolygonSite edge cases', () => {

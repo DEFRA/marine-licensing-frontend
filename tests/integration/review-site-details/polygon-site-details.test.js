@@ -1,4 +1,5 @@
 import { JSDOM } from 'jsdom'
+import { within } from '@testing-library/dom'
 import { COORDINATE_SYSTEMS } from '~/src/server/common/constants/exemptions.js'
 import { routes } from '~/src/server/common/constants/routes.js'
 import { statusCodes } from '~/src/server/common/constants/status-codes.js'
@@ -215,12 +216,12 @@ describe('Review Site Details - Polygon Coordinates Integration Tests', () => {
   }
 
   const validateNavigationElements = (document) => {
-    const saveButton = document.querySelector('button[type="submit"]')
-    expect(saveButton.textContent.trim()).toBe('Save and continue')
-
-    const cancelLink = document.querySelector('.govuk-link')
-    expect(cancelLink.textContent.trim()).toBe('Cancel')
-    expect(cancelLink.getAttribute('href')).toContain('/exemption/task-list')
+    expect(
+      within(document).getByRole('button', { name: 'Save and continue' })
+    ).toHaveAttribute('type', 'submit')
+    expect(
+      within(document).getByRole('link', { name: 'Cancel' })
+    ).toHaveAttribute('href', '/exemption/task-list?cancel=site-details')
   }
 
   const getRowByKey = (card, keyText) => {

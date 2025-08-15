@@ -31,15 +31,6 @@
                     },
                     value: {
                         text: summaryData.method
-                    },
-                    actions: {
-                        items: [
-                        {
-                            href: "#",
-                            text: "Change",
-                            visuallyHiddenText: "name"
-                        }
-                        ]
                     }
                 },
                 {
@@ -48,15 +39,6 @@
                     },
                     value: {
                         html: summaryData.coordinateSystem | replace('\n', '<br>')
-                    },
-                    actions: {
-                        items: [
-                        {
-                            href: "#",
-                            text: "Change",
-                            visuallyHiddenText: "name"
-                        }
-                        ]
                     }
                 }
             ] %}
@@ -80,15 +62,6 @@
                     },
                     value: {
                         text: summaryData.coordinates
-                    },
-                    actions: {
-                        items: [
-                        {
-                            href: "#",
-                            text: "Change",
-                            visuallyHiddenText: "name"
-                        }
-                        ]
                     }
                 }), summaryRows) %}
                 {% set summaryRows = (summaryRows.push({
@@ -97,15 +70,6 @@
                     },
                     value: {
                         text: summaryData.width
-                    },
-                    actions: {
-                        items: [
-                        {
-                            href: "#",
-                            text: "Change",
-                            visuallyHiddenText: "name"
-                        }
-                        ]
                     }
                 }), summaryRows) %}
             {% endif %}

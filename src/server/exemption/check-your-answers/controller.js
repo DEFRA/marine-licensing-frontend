@@ -12,6 +12,8 @@ import {
   getPolygonCoordinatesDisplayData
 } from '~/src/server/exemption/site-details/review-site-details/utils.js'
 import { routes } from '~/src/server/common/constants/routes.js'
+import { createSiteDetailsDataJson } from '~/src/server/common/helpers/site-details.js'
+import { getCoordinateSystem } from '~/src/server/common/helpers/coordinate-utils.js'
 
 const errorMessages = {
   EXEMPTION_NOT_FOUND: 'Exemption not found',
@@ -107,7 +109,13 @@ const processManualSiteDetails = (exemption) => {
   const baseData = {
     isFileUpload: false,
     coordinateSystemText: getCoordinateSystemText(coordinateSystem),
-    reviewSummaryText: getReviewSummaryText(siteDetails)
+    reviewSummaryText: getReviewSummaryText(siteDetails),
+    // Preserve raw coordinate data needed for map visualization
+    coordinatesType: 'coordinates',
+    coordinateSystem,
+    coordinatesEntry,
+    coordinates: siteDetails.coordinates,
+    circleWidth: siteDetails.circleWidth
   }
 
   // Handle polygon sites (multiple coordinates)
@@ -129,8 +137,7 @@ const processManualSiteDetails = (exemption) => {
     coordinateDisplayText: getCoordinateDisplayText(
       siteDetails,
       coordinateSystem
-    ),
-    circleWidth: siteDetails.circleWidth
+    )
   }
 }
 
@@ -169,11 +176,17 @@ export const checkYourAnswersController = {
 
     await validateAndFetchExemption(request, exemption)
     const siteDetails = processSiteDetails(exemption, id, request)
+    const { coordinateSystem } = getCoordinateSystem(request)
+    const siteDetailsData = createSiteDetailsDataJson(
+      siteDetails,
+      coordinateSystem
+    )
 
     return h.view(CHECK_YOUR_ANSWERS_VIEW_ROUTE, {
       ...checkYourAnswersViewContent,
       ...exemption,
-      siteDetails
+      siteDetails,
+      siteDetailsData
     })
   }
 }

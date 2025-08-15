@@ -2,28 +2,30 @@
 {% from "govuk/components/back-link/macro.njk" import govukBackLink %}
 {% from "govuk/components/button/macro.njk" import govukButton %}
 {% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
-
+{% from "site-details-data-script/macro.njk" import appSiteDetailsDataScript %}
 {% block pageTitle %}
   {{ title }} - {{ serviceName }}
 {% endblock %}
+{% block head %}
+  {{ super() }}
+  {{ appSiteDetailsDataScript(siteDetailsData) }}
+{% endblock %}
 {% block beforeContent %}
-<nav>
-  {{ govukBackLink({
+  <nav>
+    {{ govukBackLink({
         text: "Go back to your project",
         href: backLink
     }) }}
-    </nav>
+  </nav>
 {% endblock %}
 {% block content %}
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-full">
-
-    {% if projectName %}
-      <span class="govuk-caption-l">{{ projectName }}</span>
-    {% endif %}
-
-    <h2 class="govuk-heading-l" id="check-your-answers-heading">Check your answers before sending your information</h2>
-    {{ govukSummaryList({
+      {% if projectName %}
+        <span class="govuk-caption-l">{{ projectName }}</span>
+      {% endif %}
+      <h2 class="govuk-heading-l" id="check-your-answers-heading">Check your answers before sending your information</h2>
+      {{ govukSummaryList({
         card: {
           title: {
             text: "Project details"
@@ -54,7 +56,7 @@
           }
         ]
       }) }}
-    {{ govukSummaryList({
+      {{ govukSummaryList({
         card: {
           title: {
             text: "Activity dates"
@@ -90,7 +92,7 @@
           }
         ]
       }) }}
-    {{ govukSummaryList({
+      {{ govukSummaryList({
         card: {
           title: {
             text: "Activity details"
@@ -169,8 +171,8 @@
           }
         ]
       }) }}
-    {% if siteDetails.isFileUpload %}
-      {% set siteDetailsRows = [{
+      {% if siteDetails.isFileUpload %}
+        {% set siteDetailsRows = [{
         key: {
           text: "Method of providing site location"
         },
@@ -191,9 +193,20 @@
         value: {
           html: siteDetails.filename
         }
-      }] %}
-    {% else %}
-      {% set siteDetailsRows = [{
+      },
+                    {
+                    classes: "govuk-summary-list__row--full-width",
+                        key: {
+                            text: "Map view",
+                            classes: "govuk-summary-list__key--full-width"
+                        },
+                        value: {
+                            html: '<div class="app-site-details-map" data-module="site-details-map"></div>',
+                            classes: "govuk-summary-list__value--full-width"
+                        }
+                    }] %}
+      {% else %}
+        {% set siteDetailsRows = [{
         key: {
           text: "Method of providing site location"
         },
@@ -221,9 +234,19 @@
         value: {
           html: siteDetails.circleWidth + " metres"
         }
-      }] %}
-    {% endif %}
-    {{ govukSummaryList({
+      },
+                    {
+                        key: {
+                            text: "Map view",
+                            classes: "govuk-summary-list__key--full-width"
+                        },
+                        value: {
+                            html: '<div class="app-site-details-map" data-module="site-details-map"></div>',
+                            classes: "govuk-summary-list__value--full-width"
+                        }
+                    }] %}
+      {% endif %}
+      {{ govukSummaryList({
         card: {
           title: {
             text: "Site details"
@@ -240,9 +263,10 @@
             id: "site-details-card"
           }
         },
-        rows: siteDetailsRows
+        rows: siteDetailsRows,
+        classes: "govuk-summary-list--full-width"
       }) }}
-    {{ govukSummaryList({
+      {{ govukSummaryList({
         card: {
           title: {
             text: "Public register"
@@ -270,18 +294,18 @@
           }
         ]
       }) }}
-    <form method="post">
-      <input type="hidden" name="csrfToken" value="{{ csrfToken }}"/>
-      <h2 class="govuk-heading-m">Now send your information</h2>
-      <p class="govuk-body">By submitting this information you are confirming that, to the best of your knowledge, the details
-        you are providing are correct.</p>
-      {{ govukButton({
+      <form method="post">
+        <input type="hidden" name="csrfToken" value="{{ csrfToken }}"/>
+        <h2 class="govuk-heading-m">Now send your information</h2>
+        <p class="govuk-body">By submitting this information you are confirming that, to the best of your knowledge, the details
+          you are providing are correct.</p>
+        {{ govukButton({
             text: "Confirm and send",
             attributes: {
               id: "confirm-and-send"
             }
           }) }}
-    </form>
+      </form>
     </div>
   </div>
 {% endblock %}

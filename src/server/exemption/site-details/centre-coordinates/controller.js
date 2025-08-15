@@ -1,8 +1,8 @@
 import {
-  getCoordinateSystem,
   getExemptionCache,
   updateExemptionSiteDetails
 } from '~/src/server/common/helpers/session-cache/utils.js'
+import { getCoordinateSystem } from '~/src/server/common/helpers/coordinate-utils.js'
 import {
   errorDescriptionByFieldName,
   mapErrorsForDisplay

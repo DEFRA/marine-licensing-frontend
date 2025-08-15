@@ -1,0 +1,13 @@
+.govuk-summary-list--full-width {
+    &.govuk-summary-list,
+    .govuk-summary-list__row:has(.govuk-summary-list__value--full-width),
+    .govuk-summary-list__key--full-width,
+    .govuk-summary-list__value--full-width {
+        display: block;
+    }
+
+    .govuk-summary-list__value--full-width {
+        padding-top: 0;
+        padding-bottom: 0;
+    }
+}

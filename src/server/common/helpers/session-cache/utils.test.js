@@ -1,15 +1,13 @@
+import { clone } from '@hapi/hoek'
 import {
+  EXEMPTION_CACHE_KEY,
+  clearExemptionCache,
   getExemptionCache,
-  getCoordinateSystem,
+  resetExemptionSiteDetails,
   setExemptionCache,
   updateExemptionSiteDetails,
-  updateExemptionSiteDetailsBatch,
-  resetExemptionSiteDetails,
-  EXEMPTION_CACHE_KEY,
-  clearExemptionCache
+  updateExemptionSiteDetailsBatch
 } from '~/src/server/common/helpers/session-cache/utils.js'
-import { clone } from '@hapi/hoek'
-import { COORDINATE_SYSTEMS } from '~/src/server/common/constants/exemptions.js'
 
 jest.mock('@hapi/hoek', () => ({
   clone: jest.fn((data) => ({ ...data }))
@@ -298,47 +296,6 @@ describe('#utils', () => {
 
       expect(mockRequest.yar.set).toHaveBeenCalledWith(EXEMPTION_CACHE_KEY, {})
       expect(result).toEqual({ siteDetails: null })
-    })
-  })
-
-  describe('getCoordinateSystem', () => {
-    let mockRequest
-
-    beforeEach(() => {
-      jest.clearAllMocks()
-
-      mockRequest = {
-        yar: {
-          get: jest.fn()
-        }
-      }
-    })
-
-    test('should return WGS84 by default', () => {
-      const result = getCoordinateSystem(mockRequest)
-
-      expect(mockRequest.yar.get).toHaveBeenCalledWith(EXEMPTION_CACHE_KEY)
-      expect(result).toEqual({ coordinateSystem: COORDINATE_SYSTEMS.WGS84 })
-    })
-
-    test('should correctly return OSGB36 when this has been previously set as prefered system', () => {
-      mockRequest.yar.get.mockReturnValueOnce({
-        siteDetails: { coordinateSystem: COORDINATE_SYSTEMS.OSGB36 }
-      })
-      const result = getCoordinateSystem(mockRequest)
-
-      expect(mockRequest.yar.get).toHaveBeenCalledWith(EXEMPTION_CACHE_KEY)
-      expect(result).toEqual({ coordinateSystem: COORDINATE_SYSTEMS.OSGB36 })
-    })
-
-    test('should correctly return WGS84 when this has been previously set as prefered system', () => {
-      mockRequest.yar.get.mockReturnValueOnce({
-        siteDetails: { coordinateSystem: COORDINATE_SYSTEMS.WGS84 }
-      })
-      const result = getCoordinateSystem(mockRequest)
-
-      expect(mockRequest.yar.get).toHaveBeenCalledWith(EXEMPTION_CACHE_KEY)
-      expect(result).toEqual({ coordinateSystem: COORDINATE_SYSTEMS.WGS84 })
     })
   })
 })

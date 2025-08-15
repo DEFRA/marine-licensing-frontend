@@ -13,10 +13,12 @@
 {% endset %}
 
 {% block beforeContent %}
+<nav>
   {{ govukBackLink({
     text: "Back",
     href: backLink
   }) }}
+</nav>
 {% endblock %}
 
 {% block content %}

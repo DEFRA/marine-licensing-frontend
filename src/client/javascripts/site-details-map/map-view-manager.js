@@ -1,14 +1,13 @@
 const DEFAULT_UK_CENTRE_LONGITUDE = -3.5
 const DEFAULT_UK_CENTRE_LATITUDE = 54.0
 const DEFAULT_MAP_PADDING = 100
-const DEFAULT_MIN_RESOLUTION = 0.1
 
 class MapViewManager {
   /**
    * Core method to fit the map view to an extent with error handling
    * @param {object} map - OpenLayers Map instance
    * @param {Array} extent - OpenLayers extent [minX, minY, maxX, maxY]
-   * @param {object} options - Fit options (padding, maxZoom, minZoom)
+   * @param {object} options - Fit options (padding, maxZoom, minZoom, minResolution)
    */
   fitMapToExtent(map, extent, options = {}) {
     const defaultOptions = {
@@ -18,7 +17,8 @@ class MapViewManager {
         DEFAULT_MAP_PADDING,
         DEFAULT_MAP_PADDING
       ],
-      minResolution: DEFAULT_MIN_RESOLUTION
+      maxZoom: 14,
+      minZoom: 8
     }
 
     const fitOptions = { ...defaultOptions, ...options }

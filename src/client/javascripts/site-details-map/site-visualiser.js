@@ -26,8 +26,18 @@ class SiteVisualiser {
     )
 
     this.vectorSource.addFeature(circleFeature)
+    const MAX_DIAMETER_FOR_MIN_RESOLUTION = 5
+    const MIN_RESOLUTION_MULTIPLIER = 2
+    const options =
+      diameterInMetres < MAX_DIAMETER_FOR_MIN_RESOLUTION
+        ? { minResolution: diameterInMetres * MIN_RESOLUTION_MULTIPLIER }
+        : {}
 
-    this.mapViewManager.fitMapToGeometry(this.map, circleFeature.getGeometry())
+    this.mapViewManager.fitMapToGeometry(
+      this.map,
+      circleFeature.getGeometry(),
+      options
+    )
   }
 
   /**

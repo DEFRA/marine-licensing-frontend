@@ -132,6 +132,36 @@ describe('Site name page', () => {
     expect(errorMessage.textContent).toContain('Enter the site name')
   })
 
+  test('should stay on same page when site name is too long', async () => {
+    const siteName = 'A'.repeat(251)
+
+    const { result, statusCode } = await server.inject({
+      method: 'POST',
+      url: '/exemption/site-name',
+      payload: {
+        siteName
+      }
+    })
+
+    expect(statusCode).toBe(statusCodes.ok)
+
+    const { document } = new JSDOM(result).window
+
+    expect(
+      getByRole(document, 'heading', {
+        level: 1,
+        name: 'Site name'
+      })
+    ).toBeInTheDocument()
+    expect(getByText(document, 'Site 1')).toBeInTheDocument()
+
+    const errorMessage = document.querySelector('.govuk-error-message')
+    expect(errorMessage).toBeInTheDocument()
+    expect(errorMessage.textContent).toContain(
+      'Site name should be 250 characters or less'
+    )
+  })
+
   test('should redirect to coordinates entry choice when valid site name is submitted', async () => {
     const response = await server.inject({
       method: 'POST',

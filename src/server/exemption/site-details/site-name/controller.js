@@ -21,7 +21,8 @@ const siteNameSettings = {
 }
 
 export const errorMessages = {
-  SITE_NAME_REQUIRED: 'Enter the site name'
+  SITE_NAME_REQUIRED: 'Enter the site name',
+  SITE_NAME_MAX_LENGTH: 'Site name should be 250 characters or less'
 }
 
 const createValidationFailAction = (request, h, err) => {
@@ -78,9 +79,10 @@ export const siteNameSubmitController = {
   options: {
     validate: {
       payload: joi.object({
-        siteName: joi.string().min(1).required().messages({
+        siteName: joi.string().min(1).max(250).required().messages({
           'string.empty': 'SITE_NAME_REQUIRED',
-          'any.required': 'SITE_NAME_REQUIRED'
+          'any.required': 'SITE_NAME_REQUIRED',
+          'string.max': 'SITE_NAME_MAX_LENGTH'
         })
       }),
       failAction: createValidationFailAction

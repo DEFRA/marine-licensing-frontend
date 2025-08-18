@@ -1,142 +1,13 @@
-import { JSDOM } from 'jsdom'
 import Boom from '@hapi/boom'
 import { createServer } from '~/src/server/index.js'
-import { mockExemption } from '~/src/server/test-helpers/mocks.js'
 import * as authRequests from '~/src/server/common/helpers/authenticated-requests.js'
 import * as reviewUtils from '~/src/server/exemption/site-details/review-site-details/utils.js'
-import { COORDINATE_SYSTEMS } from '~/src/server/common/constants/exemptions.js'
 import { viewDetailsController, VIEW_DETAILS_VIEW_ROUTE } from './controller.js'
-
-const CSS_SELECTORS = {
-  pageTitle: '#view-details-heading',
-  pageCaption: '.govuk-caption-l',
-  backLink: '.govuk-back-link',
-  cards: {
-    projectDetails: '#project-details-card',
-    activityDates: '#activity-dates-card',
-    activityDetails: '#activity-details-card',
-    siteDetails: '#site-details-card',
-    publicRegister: '#public-register-card'
-  },
-  summaryList: {
-    key: '.govuk-summary-list__key',
-    value: '.govuk-summary-list__value',
-    row: '.govuk-summary-list__row'
-  },
-  card: {
-    title: '.govuk-summary-card__title',
-    actions: '.govuk-summary-card__actions a'
-  }
-}
-
-const EXPECTED_TEXT = {
-  pageTitle: 'View notification details',
-  backLink: 'Back',
-  cardTitles: {
-    projectDetails: 'Project details',
-    siteDetails: 'Site details'
-  },
-  rowKeys: {
-    projectName: 'Project name',
-    methodOfProviding: 'Method of providing site location',
-    fileType: 'File type',
-    fileUploaded: 'File uploaded'
-  },
-  coordinateSystems: {
-    wgs84: 'WGS84 (World Geodetic System 1984) Latitude and longitude',
-    osgb36: 'OSGB36 (National Grid) Eastings and Northings'
-  },
-  siteDetailsMethods: {
-    fileUpload: 'Upload a file with the coordinates of the site',
-    manualCircle:
-      'Manually enter one set of coordinates and a width to create a circular site',
-    polygon:
-      'Manually enter multiple sets of coordinates to mark the boundary of the site'
-  },
-  fileTypes: {
-    kml: 'KML',
-    shapefile: 'Shapefile'
-  }
-}
-
-const getCardValue = (document, cardSelector, rowIndex) => {
-  return document
-    .querySelector(
-      `${cardSelector} ${CSS_SELECTORS.summaryList.row}:nth-child(${rowIndex}) ${CSS_SELECTORS.summaryList.value}`
-    )
-    ?.textContent.trim()
-}
-
-const getFirstRowValue = (document, cardSelector) =>
-  getCardValue(document, cardSelector, 1)
-const getSecondRowValue = (document, cardSelector) =>
-  getCardValue(document, cardSelector, 2)
-const getThirdRowValue = (document, cardSelector) =>
-  getCardValue(document, cardSelector, 3)
-const getFourthRowValue = (document, cardSelector) =>
-  getCardValue(document, cardSelector, 4)
-
-const getSummaryRowCount = (document, cardSelector) => {
-  return document.querySelectorAll(
-    `${cardSelector} ${CSS_SELECTORS.summaryList.row}`
-  ).length
-}
-
-const normalizeWhitespace = (text) => text.replace(/\s+/g, ' ')
-
-const createSubmittedExemption = (overrides = {}) => ({
-  ...mockExemption,
-  status: 'Submitted',
-  applicationReference: 'EXE/2025/00003',
-  submittedAt: '2025-01-01T10:00:00.000Z',
-  ...overrides
-})
-
-const createExemptionWithSiteDetails = (siteDetailsOverrides = {}) =>
-  createSubmittedExemption({
-    siteDetails: {
-      ...mockExemption.siteDetails,
-      ...siteDetailsOverrides
-    }
-  })
-
-const createFileUploadExemption = (
-  fileType = 'kml',
-  filename = 'test.kml',
-  additionalOverrides = {}
-) =>
-  createExemptionWithSiteDetails({
-    coordinatesType: 'file',
-    fileUploadType: fileType,
-    uploadedFile: { filename },
-    geoJSON: {
-      type: 'FeatureCollection',
-      features: [
-        {
-          type: 'Feature',
-          geometry: {
-            type: 'Point',
-            coordinates: [51.5074, -0.1278]
-          }
-        }
-      ]
-    },
-    ...additionalOverrides
-  })
-
-const createPolygonExemption = (coordinateSystem, coordinates) =>
-  createExemptionWithSiteDetails({
-    coordinatesType: 'coordinates',
-    coordinatesEntry: 'multiple',
-    coordinateSystem,
-    coordinates
-  })
-
-const mockPolygonCoordinatesWGS84 = [
-  { latitude: '55.123456', longitude: '-1.234567' },
-  { latitude: '55.223456', longitude: '-1.334567' },
-  { latitude: '55.323456', longitude: '-1.434567' }
-]
+import {
+  createSubmittedExemption,
+  createFileUploadExemption,
+  errorScenarios
+} from '~/tests/integration/view-details/test-utilities.js'
 
 describe('view details controller', () => {
   let server
@@ -165,119 +36,26 @@ describe('view details controller', () => {
     const validExemptionId = '507f1f77bcf86cd799439011'
 
     describe('successful scenarios', () => {
-      test('should render view details page with submitted exemption data', async () => {
+      test('should return 200 status for valid submitted exemption', async () => {
         const submittedExemption = createSubmittedExemption()
         authenticatedGetRequestSpy.mockResolvedValue({
           payload: { value: submittedExemption }
         })
 
-        const { result, statusCode } = await server.inject({
+        const { statusCode } = await server.inject({
           method: 'GET',
           url: `/exemption/view-details/${validExemptionId}`
         })
 
         expect(statusCode).toBe(200)
-        const { document } = new JSDOM(result).window
-
-        expect(
-          document.querySelector(CSS_SELECTORS.pageTitle).textContent.trim()
-        ).toBe(EXPECTED_TEXT.pageTitle)
-
-        expect(
-          document.querySelector(CSS_SELECTORS.pageCaption).textContent.trim()
-        ).toBe('EXE/2025/00003 - Exempt activity notification')
-
-        expect(
-          document.querySelector(CSS_SELECTORS.backLink).textContent.trim()
-        ).toBe(EXPECTED_TEXT.backLink)
-
-        expect(
-          document.querySelector(CSS_SELECTORS.backLink).getAttribute('href')
-        ).toBe('/home')
-      })
-
-      test('should display all exemption cards in read-only mode', async () => {
-        const submittedExemption = createSubmittedExemption()
-        authenticatedGetRequestSpy.mockResolvedValue({
-          payload: { value: submittedExemption }
-        })
-
-        const { result, statusCode } = await server.inject({
-          method: 'GET',
-          url: `/exemption/view-details/${validExemptionId}`
-        })
-
-        expect(statusCode).toBe(200)
-        const { document } = new JSDOM(result).window
-
-        expect(
-          document.querySelector(CSS_SELECTORS.cards.projectDetails)
-        ).toBeTruthy()
-        expect(
-          document.querySelector(CSS_SELECTORS.cards.activityDates)
-        ).toBeTruthy()
-        expect(
-          document.querySelector(CSS_SELECTORS.cards.activityDetails)
-        ).toBeTruthy()
-        expect(
-          document.querySelector(CSS_SELECTORS.cards.siteDetails)
-        ).toBeTruthy()
-        expect(
-          document.querySelector(CSS_SELECTORS.cards.publicRegister)
-        ).toBeTruthy()
-
-        expect(
-          getFirstRowValue(document, CSS_SELECTORS.cards.projectDetails)
-        ).toBe(submittedExemption.projectName)
-      })
-
-      test('should not display Change links in read-only mode', async () => {
-        const submittedExemption = createSubmittedExemption()
-        authenticatedGetRequestSpy.mockResolvedValue({
-          payload: { value: submittedExemption }
-        })
-
-        const { result, statusCode } = await server.inject({
-          method: 'GET',
-          url: `/exemption/view-details/${validExemptionId}`
-        })
-
-        expect(statusCode).toBe(200)
-        const { document } = new JSDOM(result).window
-
-        const changeLinks = document.querySelectorAll('a[href*="change"]')
-        expect(changeLinks).toHaveLength(0)
-
-        const addLinks = document.querySelectorAll('a[href*="add"]')
-        expect(addLinks).toHaveLength(0)
-      })
-
-      test('should not display Confirm and send button', async () => {
-        const submittedExemption = createSubmittedExemption()
-        authenticatedGetRequestSpy.mockResolvedValue({
-          payload: { value: submittedExemption }
-        })
-
-        const { result, statusCode } = await server.inject({
-          method: 'GET',
-          url: `/exemption/view-details/${validExemptionId}`
-        })
-
-        expect(statusCode).toBe(200)
-        const { document } = new JSDOM(result).window
-
-        const form = document.querySelector('form')
-        expect(form).toBeFalsy()
-
-        const submitButton = document.querySelector(
-          'button[type="submit"], input[type="submit"]'
-        )
-        expect(submitButton).toBeFalsy()
-
-        expect(document.body.textContent).not.toContain('Confirm and send')
       })
 
       test('should call API with correct exemption ID', async () => {
+        const submittedExemption = createSubmittedExemption()
+        authenticatedGetRequestSpy.mockResolvedValue({
+          payload: { value: submittedExemption }
+        })
+
         await server.inject({
           method: 'GET',
           url: `/exemption/view-details/${validExemptionId}`
@@ -290,104 +68,7 @@ describe('view details controller', () => {
       })
     })
 
-    describe('site details display scenarios', () => {
-      test('should display circular site details correctly', async () => {
-        const circularExemption = createExemptionWithSiteDetails({
-          coordinatesType: 'coordinates',
-          coordinatesEntry: 'single',
-          coordinateSystem: COORDINATE_SYSTEMS.WGS84,
-          coordinates: { latitude: '51.489676', longitude: '-0.231530' },
-          circleWidth: '100'
-        })
-        authenticatedGetRequestSpy.mockResolvedValue({
-          payload: { value: circularExemption }
-        })
-
-        const { result, statusCode } = await server.inject({
-          method: 'GET',
-          url: `/exemption/view-details/${validExemptionId}`
-        })
-
-        expect(statusCode).toBe(200)
-        const { document } = new JSDOM(result).window
-
-        expect(
-          getFirstRowValue(document, CSS_SELECTORS.cards.siteDetails)
-        ).toBe(EXPECTED_TEXT.siteDetailsMethods.manualCircle)
-        expect(
-          normalizeWhitespace(
-            getSecondRowValue(document, CSS_SELECTORS.cards.siteDetails)
-          )
-        ).toBe(EXPECTED_TEXT.coordinateSystems.wgs84)
-        expect(
-          getThirdRowValue(document, CSS_SELECTORS.cards.siteDetails)
-        ).toBe('51.489676, -0.231530')
-        expect(
-          getFourthRowValue(document, CSS_SELECTORS.cards.siteDetails)
-        ).toBe('100 metres')
-      })
-
-      test('should display file upload site details correctly', async () => {
-        const fileUploadExemption = createFileUploadExemption(
-          'kml',
-          'test_site.kml'
-        )
-        authenticatedGetRequestSpy.mockResolvedValue({
-          payload: { value: fileUploadExemption }
-        })
-
-        const { result, statusCode } = await server.inject({
-          method: 'GET',
-          url: `/exemption/view-details/${validExemptionId}`
-        })
-
-        expect(statusCode).toBe(200)
-        const { document } = new JSDOM(result).window
-
-        expect(
-          getFirstRowValue(document, CSS_SELECTORS.cards.siteDetails)
-        ).toBe(EXPECTED_TEXT.siteDetailsMethods.fileUpload)
-        expect(
-          getSecondRowValue(document, CSS_SELECTORS.cards.siteDetails)
-        ).toBe(EXPECTED_TEXT.fileTypes.kml)
-        expect(
-          getThirdRowValue(document, CSS_SELECTORS.cards.siteDetails)
-        ).toBe('test_site.kml')
-      })
-
-      test('should display polygon site details correctly', async () => {
-        const polygonExemption = createPolygonExemption(
-          COORDINATE_SYSTEMS.WGS84,
-          mockPolygonCoordinatesWGS84
-        )
-        authenticatedGetRequestSpy.mockResolvedValue({
-          payload: { value: polygonExemption }
-        })
-
-        const { result, statusCode } = await server.inject({
-          method: 'GET',
-          url: `/exemption/view-details/${validExemptionId}`
-        })
-
-        expect(statusCode).toBe(200)
-        const { document } = new JSDOM(result).window
-
-        expect(
-          getFirstRowValue(document, CSS_SELECTORS.cards.siteDetails)
-        ).toBe(EXPECTED_TEXT.siteDetailsMethods.polygon)
-        expect(
-          normalizeWhitespace(
-            getSecondRowValue(document, CSS_SELECTORS.cards.siteDetails)
-          )
-        ).toBe(EXPECTED_TEXT.coordinateSystems.wgs84)
-
-        const summaryRows = getSummaryRowCount(
-          document,
-          CSS_SELECTORS.cards.siteDetails
-        )
-        expect(summaryRows).toBe(6) // Method + Coordinate System + 3 coordinate points + map
-      })
-
+    describe('data processing scenarios', () => {
       test('should handle exemption with no site details', async () => {
         const exemptionWithoutSiteDetails = createSubmittedExemption({
           siteDetails: null
@@ -396,20 +77,12 @@ describe('view details controller', () => {
           payload: { value: exemptionWithoutSiteDetails }
         })
 
-        const { result, statusCode } = await server.inject({
+        const { statusCode } = await server.inject({
           method: 'GET',
           url: `/exemption/view-details/${validExemptionId}`
         })
 
         expect(statusCode).toBe(200)
-        const { document } = new JSDOM(result).window
-
-        expect(
-          document.querySelector(CSS_SELECTORS.cards.projectDetails)
-        ).toBeTruthy()
-        expect(
-          document.querySelector(CSS_SELECTORS.cards.activityDates)
-        ).toBeTruthy()
       })
 
       test('should handle file upload data error gracefully', async () => {
@@ -424,24 +97,12 @@ describe('view details controller', () => {
           payload: { value: fileUploadExemption }
         })
 
-        const { result, statusCode } = await server.inject({
+        const { statusCode } = await server.inject({
           method: 'GET',
           url: `/exemption/view-details/${validExemptionId}`
         })
 
         expect(statusCode).toBe(200)
-        const { document } = new JSDOM(result).window
-
-        expect(
-          getFirstRowValue(document, CSS_SELECTORS.cards.siteDetails)
-        ).toBe(EXPECTED_TEXT.siteDetailsMethods.fileUpload)
-        expect(
-          getSecondRowValue(document, CSS_SELECTORS.cards.siteDetails)
-        ).toBe(EXPECTED_TEXT.fileTypes.kml)
-        expect(
-          getThirdRowValue(document, CSS_SELECTORS.cards.siteDetails)
-        ).toBe('test.kml')
-
         reviewUtils.getFileUploadSummaryData.mockRestore()
       })
     })
@@ -483,13 +144,8 @@ describe('view details controller', () => {
       })
 
       test('should throw 403 when exemption is still in Draft status', async () => {
-        const draftExemption = {
-          ...mockExemption,
-          status: 'Draft',
-          applicationReference: null
-        }
         authenticatedGetRequestSpy.mockResolvedValue({
-          payload: { value: draftExemption }
+          payload: { value: errorScenarios.draftExemption }
         })
 
         const { statusCode } = await server.inject({
@@ -501,13 +157,8 @@ describe('view details controller', () => {
       })
 
       test('should throw 403 when exemption has no application reference', async () => {
-        const exemptionWithoutRef = {
-          ...mockExemption,
-          status: 'Submitted',
-          applicationReference: null
-        }
         authenticatedGetRequestSpy.mockResolvedValue({
-          payload: { value: exemptionWithoutRef }
+          payload: { value: errorScenarios.exemptionWithoutReference }
         })
 
         const { statusCode } = await server.inject({
@@ -637,56 +288,12 @@ describe('view details controller', () => {
     })
 
     describe('acceptance criteria verification', () => {
-      test('AC1 - View details option functionality verified through dashboard utils', () => {
+      test('AC1 - View details route pattern validation', () => {
         const route = `/exemption/view-details/${validExemptionId}`
         expect(route).toMatch(/^\/exemption\/view-details\/[a-f0-9]{24}$/)
       })
 
-      test('AC2 - Navigation to view notification details page', async () => {
-        const submittedExemption = createSubmittedExemption()
-        authenticatedGetRequestSpy.mockResolvedValue({
-          payload: { value: submittedExemption }
-        })
-
-        const { result, statusCode } = await server.inject({
-          method: 'GET',
-          url: `/exemption/view-details/${validExemptionId}`
-        })
-
-        expect(statusCode).toBe(200)
-        const { document } = new JSDOM(result).window
-
-        expect(
-          document.querySelector(CSS_SELECTORS.pageTitle).textContent.trim()
-        ).toBe(EXPECTED_TEXT.pageTitle)
-      })
-
-      test('AC3 - Page content verification', async () => {
-        const submittedExemption = createSubmittedExemption()
-        authenticatedGetRequestSpy.mockResolvedValue({
-          payload: { value: submittedExemption }
-        })
-
-        const { result, statusCode } = await server.inject({
-          method: 'GET',
-          url: `/exemption/view-details/${validExemptionId}`
-        })
-
-        expect(statusCode).toBe(200)
-        const { document } = new JSDOM(result).window
-
-        expect(
-          document.querySelector(CSS_SELECTORS.pageCaption).textContent.trim()
-        ).toBe('EXE/2025/00003 - Exempt activity notification')
-
-        expect(document.body.textContent).not.toContain('Confirm and send')
-
-        expect(
-          document.querySelector(CSS_SELECTORS.backLink).textContent.trim()
-        ).toBe('Back')
-      })
-
-      test('AC4 - Unique URL verification', async () => {
+      test('AC2 - Navigation to view notification details page returns 200', async () => {
         const submittedExemption = createSubmittedExemption()
         authenticatedGetRequestSpy.mockResolvedValue({
           payload: { value: submittedExemption }
@@ -700,33 +307,25 @@ describe('view details controller', () => {
         expect(statusCode).toBe(200)
       })
 
-      test('AC5 - Back link navigation', async () => {
+      test('AC4 - Unique URL accessibility', async () => {
         const submittedExemption = createSubmittedExemption()
         authenticatedGetRequestSpy.mockResolvedValue({
           payload: { value: submittedExemption }
         })
 
-        const { result, statusCode } = await server.inject({
+        const { statusCode } = await server.inject({
           method: 'GET',
           url: `/exemption/view-details/${validExemptionId}`
         })
 
         expect(statusCode).toBe(200)
-        const { document } = new JSDOM(result).window
-
-        const backLink = document.querySelector(CSS_SELECTORS.backLink)
-        expect(backLink.getAttribute('href')).toBe('/home')
-        expect(backLink.textContent.trim()).toBe('Back')
       })
     })
 
     describe('data integrity and edge cases', () => {
       test('should handle empty application reference', async () => {
-        const exemptionWithEmptyRef = createSubmittedExemption({
-          applicationReference: ''
-        })
         authenticatedGetRequestSpy.mockResolvedValue({
-          payload: { value: exemptionWithEmptyRef }
+          payload: { value: errorScenarios.exemptionWithEmptyReference }
         })
 
         const { statusCode } = await server.inject({
@@ -738,11 +337,8 @@ describe('view details controller', () => {
       })
 
       test('should handle malformed site details data', async () => {
-        const exemptionWithBadSiteDetails = createSubmittedExemption({
-          siteDetails: { invalidStructure: true }
-        })
         authenticatedGetRequestSpy.mockResolvedValue({
-          payload: { value: exemptionWithBadSiteDetails }
+          payload: { value: errorScenarios.exemptionWithMalformedSiteDetails }
         })
 
         const { statusCode } = await server.inject({

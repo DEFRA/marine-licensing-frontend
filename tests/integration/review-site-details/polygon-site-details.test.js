@@ -1,13 +1,16 @@
 import { JSDOM } from 'jsdom'
+import { within } from '@testing-library/dom'
 import { COORDINATE_SYSTEMS } from '~/src/server/common/constants/exemptions.js'
 import { routes } from '~/src/server/common/constants/routes.js'
 import { statusCodes } from '~/src/server/common/constants/status-codes.js'
 import * as authRequests from '~/src/server/common/helpers/authenticated-requests.js'
 import * as cacheUtils from '~/src/server/common/helpers/session-cache/utils.js'
+import * as coordinateUtils from '~/src/server/common/helpers/coordinate-utils.js'
 import { createServer } from '~/src/server/index.js'
 import { testScenarios } from './polygon-fixtures.js'
 
 jest.mock('~/src/server/common/helpers/session-cache/utils.js')
+jest.mock('~/src/server/common/helpers/coordinate-utils.js')
 jest.mock('~/src/server/common/helpers/authenticated-requests.js')
 
 describe('Review Site Details - Polygon Coordinates Integration Tests', () => {
@@ -28,7 +31,7 @@ describe('Review Site Details - Polygon Coordinates Integration Tests', () => {
       .spyOn(cacheUtils, 'setExemptionCache')
       .mockImplementation(() => undefined)
     jest
-      .spyOn(cacheUtils, 'getCoordinateSystem')
+      .spyOn(coordinateUtils, 'getCoordinateSystem')
       .mockReturnValue({ coordinateSystem: COORDINATE_SYSTEMS.WGS84 })
     jest
       .spyOn(cacheUtils, 'resetExemptionSiteDetails')
@@ -42,7 +45,7 @@ describe('Review Site Details - Polygon Coordinates Integration Tests', () => {
 
       if (coordinateSystem) {
         jest
-          .spyOn(cacheUtils, 'getCoordinateSystem')
+          .spyOn(coordinateUtils, 'getCoordinateSystem')
           .mockReturnValue({ coordinateSystem })
       }
 
@@ -213,12 +216,12 @@ describe('Review Site Details - Polygon Coordinates Integration Tests', () => {
   }
 
   const validateNavigationElements = (document) => {
-    const saveButton = document.querySelector('button[type="submit"]')
-    expect(saveButton.textContent.trim()).toBe('Save and continue')
-
-    const cancelLink = document.querySelector('.govuk-link')
-    expect(cancelLink.textContent.trim()).toBe('Cancel')
-    expect(cancelLink.getAttribute('href')).toContain('/exemption/task-list')
+    expect(
+      within(document).getByRole('button', { name: 'Save and continue' })
+    ).toHaveAttribute('type', 'submit')
+    expect(
+      within(document).getByRole('link', { name: 'Cancel' })
+    ).toHaveAttribute('href', '/exemption/task-list?cancel=site-details')
   }
 
   const getRowByKey = (card, keyText) => {

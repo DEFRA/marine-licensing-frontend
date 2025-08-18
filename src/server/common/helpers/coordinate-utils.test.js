@@ -1,4 +1,12 @@
-import { extractCoordinatesFromGeoJSON } from '~/src/server/common/helpers/coordinate-utils.js'
+import {
+  extractCoordinatesFromGeoJSON,
+  getCoordinateSystem
+} from '~/src/server/common/helpers/coordinate-utils.js'
+import { getExemptionCache } from './session-cache/utils.js'
+import { COORDINATE_SYSTEMS } from '~/src/server/common/constants/exemptions.js'
+
+// Mock the session cache utils
+jest.mock('./session-cache/utils.js')
 
 describe('coordinate-utils', () => {
   describe('extractCoordinatesFromGeoJSON', () => {
@@ -219,6 +227,125 @@ describe('coordinate-utils', () => {
           coordinates: [-1.3995, 55.019889]
         }
       ])
+    })
+  })
+
+  describe('getCoordinateSystem', () => {
+    const mockRequest = {}
+    const mockGetExemptionCache = jest.mocked(getExemptionCache)
+
+    beforeEach(() => {
+      jest.clearAllMocks()
+    })
+
+    test('should return OSGB36 when coordinate system is set to OSGB36 in cache', () => {
+      mockGetExemptionCache.mockReturnValue({
+        siteDetails: {
+          coordinateSystem: COORDINATE_SYSTEMS.OSGB36
+        }
+      })
+
+      const result = getCoordinateSystem(mockRequest)
+
+      expect(result).toEqual({
+        coordinateSystem: COORDINATE_SYSTEMS.OSGB36
+      })
+      expect(mockGetExemptionCache).toHaveBeenCalledWith(mockRequest)
+    })
+
+    test('should return WGS84 when coordinate system is set to WGS84 in cache', () => {
+      mockGetExemptionCache.mockReturnValue({
+        siteDetails: {
+          coordinateSystem: COORDINATE_SYSTEMS.WGS84
+        }
+      })
+
+      const result = getCoordinateSystem(mockRequest)
+
+      expect(result).toEqual({
+        coordinateSystem: COORDINATE_SYSTEMS.WGS84
+      })
+      expect(mockGetExemptionCache).toHaveBeenCalledWith(mockRequest)
+    })
+
+    test('should default to WGS84 when coordinate system is not set in cache', () => {
+      mockGetExemptionCache.mockReturnValue({
+        siteDetails: {}
+      })
+
+      const result = getCoordinateSystem(mockRequest)
+
+      expect(result).toEqual({
+        coordinateSystem: COORDINATE_SYSTEMS.WGS84
+      })
+      expect(mockGetExemptionCache).toHaveBeenCalledWith(mockRequest)
+    })
+
+    test('should default to WGS84 when siteDetails is not present in cache', () => {
+      mockGetExemptionCache.mockReturnValue({})
+
+      const result = getCoordinateSystem(mockRequest)
+
+      expect(result).toEqual({
+        coordinateSystem: COORDINATE_SYSTEMS.WGS84
+      })
+      expect(mockGetExemptionCache).toHaveBeenCalledWith(mockRequest)
+    })
+
+    test('should default to WGS84 when cache is empty', () => {
+      mockGetExemptionCache.mockReturnValue({})
+
+      const result = getCoordinateSystem(mockRequest)
+
+      expect(result).toEqual({
+        coordinateSystem: COORDINATE_SYSTEMS.WGS84
+      })
+      expect(mockGetExemptionCache).toHaveBeenCalledWith(mockRequest)
+    })
+
+    test('should default to WGS84 when coordinate system has an invalid value', () => {
+      mockGetExemptionCache.mockReturnValue({
+        siteDetails: {
+          coordinateSystem: 'invalid-system'
+        }
+      })
+
+      const result = getCoordinateSystem(mockRequest)
+
+      expect(result).toEqual({
+        coordinateSystem: COORDINATE_SYSTEMS.WGS84
+      })
+      expect(mockGetExemptionCache).toHaveBeenCalledWith(mockRequest)
+    })
+
+    test('should default to WGS84 when coordinate system is null', () => {
+      mockGetExemptionCache.mockReturnValue({
+        siteDetails: {
+          coordinateSystem: null
+        }
+      })
+
+      const result = getCoordinateSystem(mockRequest)
+
+      expect(result).toEqual({
+        coordinateSystem: COORDINATE_SYSTEMS.WGS84
+      })
+      expect(mockGetExemptionCache).toHaveBeenCalledWith(mockRequest)
+    })
+
+    test('should default to WGS84 when coordinate system is undefined', () => {
+      mockGetExemptionCache.mockReturnValue({
+        siteDetails: {
+          coordinateSystem: undefined
+        }
+      })
+
+      const result = getCoordinateSystem(mockRequest)
+
+      expect(result).toEqual({
+        coordinateSystem: COORDINATE_SYSTEMS.WGS84
+      })
+      expect(mockGetExemptionCache).toHaveBeenCalledWith(mockRequest)
     })
   })
 })

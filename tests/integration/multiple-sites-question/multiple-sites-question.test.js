@@ -34,7 +34,7 @@ describe('Multiple sites question page', () => {
     jest.mocked(setExemptionCache).mockReturnValue({})
   })
 
-  test('should display the multiple sites question page with correct content and multiSite defaults to false', async () => {
+  test('should display the multiple sites question page with correct content and multipleSiteDetails defaults to false', async () => {
     const { result, statusCode } = await server.inject({
       method: 'GET',
       url: '/exemption/does-your-project-involve-more-than-one-site'
@@ -46,31 +46,25 @@ describe('Multiple sites question page', () => {
 
     expect(
       getByRole(document, 'heading', {
+        level: 1,
         name: 'Do you need to tell us about more than one site?'
       })
     ).toBeInTheDocument()
     expect(getByText(document, mockExemption.projectName)).toBeInTheDocument()
 
-    const yesRadio = document.querySelector('input[value="yes"]')
-    const noRadio = document.querySelector('input[value="no"]')
-    expect(yesRadio).toBeInTheDocument()
-    expect(noRadio).toBeInTheDocument()
+    const yesRadio = getByRole(document, 'radio', { name: 'Yes' })
+    const noRadio = getByRole(document, 'radio', { name: 'No' })
+
     expect(yesRadio).not.toBeChecked()
     expect(noRadio).not.toBeChecked()
-
-    expect(
-      getByRole(document, 'button', { name: 'Continue' })
-    ).toBeInTheDocument()
-    expect(getByRole(document, 'link', { name: 'Cancel' })).toBeInTheDocument()
-    expect(getByRole(document, 'link', { name: 'Back' })).toBeInTheDocument()
 
     expect(setExemptionCache).not.toHaveBeenCalled()
   })
 
-  test('should pre-populate radio button when multiSite value exists in cache', async () => {
+  test('should pre-populate radio button when multipleSiteDetails value exists in cache', async () => {
     jest.mocked(getExemptionCache).mockReturnValue({
       ...mockExemption,
-      multiSite: { enabled: true }
+      multipleSiteDetails: { multipleSitesEnabled: 'yes' }
     })
 
     const { result, statusCode } = await server.inject({
@@ -82,18 +76,18 @@ describe('Multiple sites question page', () => {
 
     const { document } = new JSDOM(result).window
 
-    const yesRadio = document.querySelector('input[value="yes"]')
-    const noRadio = document.querySelector('input[value="no"]')
+    const yesRadio = getByRole(document, 'radio', { name: 'Yes' })
+    const noRadio = getByRole(document, 'radio', { name: 'No' })
     expect(yesRadio).toBeChecked()
     expect(noRadio).not.toBeChecked()
 
     expect(setExemptionCache).not.toHaveBeenCalled()
   })
 
-  test('should not overwrite existing multiSite value on GET route', async () => {
+  test('should not overwrite existing multipleSiteDetails value on GET route', async () => {
     jest.mocked(getExemptionCache).mockReturnValue({
       ...mockExemption,
-      multiSite: { enabled: true }
+      multipleSiteDetails: { multipleSitesEnabled: 'yes' }
     })
 
     const { statusCode } = await server.inject({
@@ -118,7 +112,10 @@ describe('Multiple sites question page', () => {
     expect(continueButton).toBeInTheDocument()
 
     const cancelLink = getByRole(document, 'link', { name: 'Cancel' })
-    expect(cancelLink).toHaveAttribute('href', '/exemption/task-list')
+    expect(cancelLink).toHaveAttribute(
+      'href',
+      '/exemption/task-list?cancel=site-details'
+    )
 
     const backLink = getByRole(document, 'link', { name: 'Back' })
     expect(backLink).toHaveAttribute(
@@ -140,6 +137,7 @@ describe('Multiple sites question page', () => {
 
     expect(
       getByRole(document, 'heading', {
+        level: 1,
         name: 'Do you need to tell us about more than one site?'
       })
     ).toBeInTheDocument()
@@ -152,31 +150,30 @@ describe('Multiple sites question page', () => {
     ).toBeInTheDocument()
   })
 
-  test('should stay on same page when YES is selected and set multiSite to true', async () => {
-    const { headers, statusCode } = await server.inject({
-      method: 'POST',
-      url: '/exemption/does-your-project-involve-more-than-one-site',
-      payload: {
-        multipleSites: 'yes'
-      }
-    })
-
-    expect(statusCode).toBe(statusCodes.redirect)
-
-    expect(headers.location).toBe('/exemption/site-name')
-
-    expect(setExemptionCache).toHaveBeenCalledWith(expect.any(Object), {
-      ...mockExemption,
-      multiSite: { enabled: true }
-    })
-  })
-
-  test('should redirect to coordinates entry choice when NO is selected and set multiSite to false', async () => {
+  test('should navigate to Site Name page when YES is selected and set multipleSiteDetails to true', async () => {
     const response = await server.inject({
       method: 'POST',
       url: '/exemption/does-your-project-involve-more-than-one-site',
       payload: {
-        multipleSites: 'no'
+        multipleSitesEnabled: 'yes'
+      }
+    })
+
+    expect(response.statusCode).toBe(statusCodes.redirect)
+    expect(response.headers.location).toBe('/exemption/site-name')
+
+    expect(setExemptionCache).toHaveBeenCalledWith(expect.any(Object), {
+      ...mockExemption,
+      multipleSiteDetails: { multipleSitesEnabled: true }
+    })
+  })
+
+  test('should redirect to coordinates entry choice when NO is selected and set multipleSiteDetails to false', async () => {
+    const response = await server.inject({
+      method: 'POST',
+      url: '/exemption/does-your-project-involve-more-than-one-site',
+      payload: {
+        multipleSitesEnabled: 'no'
       }
     })
 
@@ -187,7 +184,7 @@ describe('Multiple sites question page', () => {
 
     expect(setExemptionCache).toHaveBeenCalledWith(expect.any(Object), {
       ...mockExemption,
-      multiSite: { enabled: false }
+      multipleSiteDetails: { multipleSitesEnabled: false }
     })
   })
 
@@ -202,6 +199,9 @@ describe('Multiple sites question page', () => {
     const { document } = new JSDOM(result).window
 
     const cancelLink = getByRole(document, 'link', { name: 'Cancel' })
-    expect(cancelLink).toHaveAttribute('href', '/exemption/task-list')
+    expect(cancelLink).toHaveAttribute(
+      'href',
+      '/exemption/task-list?cancel=site-details'
+    )
   })
 })

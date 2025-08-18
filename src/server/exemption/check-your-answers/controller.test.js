@@ -1,9 +1,10 @@
 import { JSDOM } from 'jsdom'
+import * as authRequests from '~/src/server/common/helpers/authenticated-requests.js'
 import * as cacheUtils from '~/src/server/common/helpers/session-cache/utils.js'
+import * as coordinateUtils from '~/src/server/common/helpers/coordinate-utils.js'
+import * as reviewUtils from '~/src/server/exemption/site-details/review-site-details/utils.js'
 import { createServer } from '~/src/server/index.js'
 import { mockExemption } from '~/src/server/test-helpers/mocks.js'
-import * as authRequests from '~/src/server/common/helpers/authenticated-requests.js'
-import * as reviewUtils from '~/src/server/exemption/site-details/review-site-details/utils.js'
 
 const CSS_SELECTORS = {
   checkYourAnswersHeading: '#check-your-answers-heading',
@@ -256,7 +257,6 @@ describe('check your answers controller', () => {
       payload: {
         value: {
           id: 'test-id'
-          // Missing taskList property
         }
       }
     })
@@ -513,7 +513,7 @@ describe('check your answers controller', () => {
         ...mockExemption,
         siteDetails: {
           coordinatesType: 'file',
-          fileUploadType: 'invalid_type', // Invalid type triggers error in getFileUploadSummaryData
+          fileUploadType: 'invalid_type',
           uploadedFile: {
             filename: 'test.invalid'
           }
@@ -561,7 +561,7 @@ describe('check your answers controller', () => {
         'invalid_type',
         '',
         {
-          uploadedFile: {} // No filename property to trigger 'Unknown file' fallback
+          uploadedFile: {}
         }
       )
       getExemptionCacheSpy.mockReturnValueOnce(exemptionWithNoFilename)
@@ -590,7 +590,7 @@ describe('check your answers controller', () => {
         'invalid_type',
         '',
         {
-          uploadedFile: null // Null uploadedFile triggers 'Unknown file' fallback
+          uploadedFile: null
         }
       )
       getExemptionCacheSpy.mockReturnValueOnce(exemptionWithNullFile)
@@ -619,7 +619,7 @@ describe('check your answers controller', () => {
         ...mockExemption,
         siteDetails: {
           coordinatesType: 'file',
-          fileUploadType: 'kml', // KML type to test the KML branch in fallback
+          fileUploadType: 'kml',
           uploadedFile: {
             filename: 'test.kml'
           }
@@ -698,7 +698,7 @@ describe('check your answers controller', () => {
         document,
         CSS_SELECTORS.cards.siteDetails
       )
-      expect(summaryRows).toBe(3)
+      expect(summaryRows).toBe(4)
 
       expect(getCardKey(document, CSS_SELECTORS.cards.siteDetails, 1)).toBe(
         EXPECTED_TEXT.rowKeys.methodOfProviding
@@ -708,6 +708,9 @@ describe('check your answers controller', () => {
       )
       expect(getCardKey(document, CSS_SELECTORS.cards.siteDetails, 3)).toBe(
         EXPECTED_TEXT.rowKeys.fileUploaded
+      )
+      expect(getCardKey(document, CSS_SELECTORS.cards.siteDetails, 4)).toBe(
+        'Map view'
       )
     })
 
@@ -722,7 +725,7 @@ describe('check your answers controller', () => {
           },
           geoJSON: {
             type: 'FeatureCollection',
-            features: [] // Empty features array
+            features: []
           }
         }
       }
@@ -808,12 +811,262 @@ describe('check your answers controller', () => {
       const rowKeys = Array.from(summaryRows).map((row) =>
         row.querySelector(CSS_SELECTORS.summaryList.key)?.textContent.trim()
       )
-      expect(rowKeys).not.toContain('Map view')
+      expect(rowKeys).toContain('Map view')
 
       const changeLink = document.querySelector(
         `${CSS_SELECTORS.cards.siteDetails} ${CSS_SELECTORS.card.actions}`
       )
       expect(changeLink?.getAttribute('href')).toBe('#')
+    })
+  })
+
+  describe('ML-68: Map view integration and siteDetailsData generation', () => {
+    test('Should generate siteDetailsData with WGS84 coordinate system', async () => {
+      const testExemption = createWgs84Exemption('55.019889', '-1.399500')
+      getExemptionCacheSpy.mockReturnValueOnce(testExemption)
+
+      const { result, statusCode } = await server.inject({
+        method: 'GET',
+        url: '/exemption/check-your-answers'
+      })
+
+      expect(statusCode).toBe(200)
+
+      const { document } = new JSDOM(result).window
+      const siteDetailsScript = document.querySelector('#site-details-data')
+      expect(siteDetailsScript).toBeTruthy()
+
+      const siteDetailsData = JSON.parse(siteDetailsScript.textContent.trim())
+      expect(siteDetailsData).toEqual({
+        coordinatesType: 'coordinates',
+        coordinateSystem: 'wgs84',
+        coordinatesEntry: 'single',
+        coordinates: { latitude: '55.019889', longitude: '-1.399500' },
+        circleWidth: '100'
+      })
+    })
+
+    test('Should generate siteDetailsData for file upload site details', async () => {
+      const fileUploadExemption = createFileUploadExemption('kml', 'test.kml')
+      getExemptionCacheSpy.mockReturnValueOnce(fileUploadExemption)
+
+      const { result, statusCode } = await server.inject({
+        method: 'GET',
+        url: '/exemption/check-your-answers'
+      })
+
+      expect(statusCode).toBe(200)
+
+      const { document } = new JSDOM(result).window
+      const siteDetailsScript = document.querySelector('#site-details-data')
+      expect(siteDetailsScript).toBeTruthy()
+
+      const siteDetailsData = JSON.parse(siteDetailsScript.textContent.trim())
+      expect(siteDetailsData.coordinatesType).toBe('file')
+      expect(siteDetailsData.fileUploadType).toBe('kml')
+      expect(siteDetailsData.uploadedFile).toEqual({ filename: 'test.kml' })
+      expect(siteDetailsData.geoJSON).toEqual({
+        type: 'FeatureCollection',
+        features: [
+          {
+            type: 'Feature',
+            geometry: {
+              type: 'Point',
+              coordinates: [51.5074, -0.1278]
+            }
+          }
+        ]
+      })
+    })
+
+    test('Should include valid JSON in site details data script tag', async () => {
+      const testExemption = createWgs84Exemption()
+      getExemptionCacheSpy.mockReturnValueOnce(testExemption)
+
+      const { result, statusCode } = await server.inject({
+        method: 'GET',
+        url: '/exemption/check-your-answers'
+      })
+
+      expect(statusCode).toBe(200)
+
+      const { document } = new JSDOM(result).window
+      const siteDetailsScript = document.querySelector('#site-details-data')
+      expect(siteDetailsScript).toBeTruthy()
+      expect(siteDetailsScript.type).toBe('application/json')
+
+      expect(() =>
+        JSON.parse(siteDetailsScript.textContent.trim())
+      ).not.toThrow()
+
+      const siteDetailsData = JSON.parse(siteDetailsScript.textContent.trim())
+      expect(siteDetailsData).toHaveProperty('coordinatesType')
+      expect(siteDetailsData).toHaveProperty('coordinateSystem')
+    })
+
+    test('Should include site details data script tag with coordinates data in HTML output', async () => {
+      const testExemption = createWgs84Exemption('55.019889', '-1.399500')
+      getExemptionCacheSpy.mockReturnValueOnce(testExemption)
+
+      const { result, statusCode } = await server.inject({
+        method: 'GET',
+        url: '/exemption/check-your-answers'
+      })
+
+      expect(statusCode).toBe(200)
+      const { document } = new JSDOM(result).window
+
+      const siteDetailsScript = document.querySelector('#site-details-data')
+      expect(siteDetailsScript).toBeTruthy()
+      expect(siteDetailsScript.type).toBe('application/json')
+
+      const scriptContent = siteDetailsScript.textContent.trim()
+      expect(scriptContent).toContain('coordinatesType')
+      expect(scriptContent).toContain('coordinateSystem')
+      expect(scriptContent).toContain('wgs84')
+      expect(scriptContent).toContain('55.019889')
+      expect(scriptContent).toContain('-1.399500')
+    })
+
+    test('Should include Map view row for file upload site details', async () => {
+      const fileUploadExemption = createFileUploadExemption('kml', 'site.kml')
+      getExemptionCacheSpy.mockReturnValueOnce(fileUploadExemption)
+
+      const { result, statusCode } = await server.inject({
+        method: 'GET',
+        url: '/exemption/check-your-answers'
+      })
+
+      expect(statusCode).toBe(200)
+      const { document } = new JSDOM(result).window
+
+      const summaryRows = document.querySelectorAll(
+        `${CSS_SELECTORS.cards.siteDetails} ${CSS_SELECTORS.summaryList.row}`
+      )
+      const rowKeys = Array.from(summaryRows).map((row) =>
+        row.querySelector(CSS_SELECTORS.summaryList.key)?.textContent.trim()
+      )
+
+      expect(rowKeys).toContain('Map view')
+
+      const mapViewRow = Array.from(summaryRows).find(
+        (row) =>
+          row
+            .querySelector(CSS_SELECTORS.summaryList.key)
+            ?.textContent.trim() === 'Map view'
+      )
+      expect(mapViewRow).toBeTruthy()
+
+      const mapViewValue = mapViewRow.querySelector(
+        CSS_SELECTORS.summaryList.value
+      )
+      expect(mapViewValue.innerHTML).toContain('app-site-details-map')
+      expect(mapViewValue.innerHTML).toContain('data-module="site-details-map"')
+    })
+
+    test('Should include Map view row for manual coordinate site details', async () => {
+      const manualExemption = createWgs84Exemption('55.019889', '-1.399500')
+      getExemptionCacheSpy.mockReturnValueOnce(manualExemption)
+
+      const { result, statusCode } = await server.inject({
+        method: 'GET',
+        url: '/exemption/check-your-answers'
+      })
+
+      expect(statusCode).toBe(200)
+      const { document } = new JSDOM(result).window
+
+      const summaryRows = document.querySelectorAll(
+        `${CSS_SELECTORS.cards.siteDetails} ${CSS_SELECTORS.summaryList.row}`
+      )
+      const rowKeys = Array.from(summaryRows).map((row) =>
+        row.querySelector(CSS_SELECTORS.summaryList.key)?.textContent.trim()
+      )
+
+      expect(rowKeys).toContain('Map view')
+
+      const mapViewRow = Array.from(summaryRows).find(
+        (row) =>
+          row
+            .querySelector(CSS_SELECTORS.summaryList.key)
+            ?.textContent.trim() === 'Map view'
+      )
+      expect(mapViewRow).toBeTruthy()
+
+      const mapViewValue = mapViewRow.querySelector(
+        CSS_SELECTORS.summaryList.value
+      )
+      expect(mapViewValue.innerHTML).toContain('app-site-details-map')
+      expect(mapViewValue.innerHTML).toContain('data-module="site-details-map"')
+    })
+
+    test('Should handle null siteDetails gracefully and generate appropriate JSON', async () => {
+      const exemptionWithoutSiteDetails = {
+        ...mockExemption,
+        siteDetails: null
+      }
+      getExemptionCacheSpy.mockReturnValueOnce(exemptionWithoutSiteDetails)
+
+      const { result, statusCode } = await server.inject({
+        method: 'GET',
+        url: '/exemption/check-your-answers'
+      })
+
+      expect(statusCode).toBe(200)
+
+      const { document } = new JSDOM(result).window
+      const siteDetailsScript = document.querySelector('#site-details-data')
+      expect(siteDetailsScript).toBeTruthy()
+
+      const siteDetailsData = JSON.parse(siteDetailsScript.textContent.trim())
+      expect(siteDetailsData).toEqual({
+        coordinatesType: 'none',
+        coordinateSystem: null
+      })
+    })
+
+    test('Should include OpenLayers CSS link in HTML head', async () => {
+      const testExemption = createWgs84Exemption()
+      getExemptionCacheSpy.mockReturnValueOnce(testExemption)
+
+      const { result, statusCode } = await server.inject({
+        method: 'GET',
+        url: '/exemption/check-your-answers'
+      })
+
+      expect(statusCode).toBe(200)
+      expect(result).toContain(
+        '<link href="/public/stylesheets/ol.css" rel="stylesheet">'
+      )
+    })
+
+    test('Should generate siteDetailsData with OSGB36 coordinate system', async () => {
+      const osgb36Exemption = createOsgb36Exemption('425053', '564180')
+      getExemptionCacheSpy.mockReturnValueOnce(osgb36Exemption)
+
+      jest
+        .spyOn(coordinateUtils, 'getCoordinateSystem')
+        .mockReturnValueOnce({ coordinateSystem: 'osgb36' })
+
+      const { result, statusCode } = await server.inject({
+        method: 'GET',
+        url: '/exemption/check-your-answers'
+      })
+
+      expect(statusCode).toBe(200)
+
+      const { document } = new JSDOM(result).window
+      const siteDetailsScript = document.querySelector('#site-details-data')
+      expect(siteDetailsScript).toBeTruthy()
+
+      const siteDetailsData = JSON.parse(siteDetailsScript.textContent.trim())
+      expect(siteDetailsData).toEqual({
+        coordinatesType: 'coordinates',
+        coordinateSystem: 'osgb36',
+        coordinatesEntry: 'single',
+        coordinates: { eastings: '425053', northings: '564180' },
+        circleWidth: '100'
+      })
     })
   })
 })

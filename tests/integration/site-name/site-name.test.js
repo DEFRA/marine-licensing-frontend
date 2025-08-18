@@ -46,6 +46,7 @@ describe('Site name page', () => {
 
     expect(
       getByRole(document, 'heading', {
+        level: 1,
         name: 'Site name'
       })
     ).toBeInTheDocument()
@@ -119,6 +120,7 @@ describe('Site name page', () => {
 
     expect(
       getByRole(document, 'heading', {
+        level: 1,
         name: 'Site name'
       })
     ).toBeInTheDocument()

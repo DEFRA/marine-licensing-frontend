@@ -3,6 +3,7 @@ import { COORDINATE_SYSTEMS } from '~/src/server/common/constants/exemptions.js'
 import { statusCodes } from '~/src/server/common/constants/status-codes.js'
 import * as authRequests from '~/src/server/common/helpers/authenticated-requests.js'
 import * as cacheUtils from '~/src/server/common/helpers/session-cache/utils.js'
+import * as coordinateUtils from '~/src/server/common/helpers/coordinate-utils.js'
 import {
   FILE_UPLOAD_REVIEW_VIEW_ROUTE,
   REVIEW_SITE_DETAILS_VIEW_ROUTE,
@@ -22,6 +23,7 @@ import {
 } from '~/src/server/exemption/site-details/review-site-details/utils.js'
 
 jest.mock('~/src/server/common/helpers/session-cache/utils.js')
+jest.mock('~/src/server/common/helpers/coordinate-utils.js')
 
 /**
  * Creates a mock Hapi response toolkit
@@ -332,7 +334,7 @@ describe('#reviewSiteDetails', () => {
       .spyOn(cacheUtils, 'getExemptionCache')
       .mockReturnValue(mockExemption)
     getCoordinateSystemSpy = jest
-      .spyOn(cacheUtils, 'getCoordinateSystem')
+      .spyOn(coordinateUtils, 'getCoordinateSystem')
       .mockReturnValue({ coordinateSystem: COORDINATE_SYSTEMS.WGS84 })
     resetExemptionSiteDetailsSpy = jest
       .spyOn(cacheUtils, 'resetExemptionSiteDetails')
@@ -962,6 +964,7 @@ describe('#reviewSiteDetails', () => {
           expect.any(Object),
           '/exemption/site-details',
           {
+            multipleSiteDetails: mockExemption.multipleSiteDetails,
             siteDetails: mockExemption.siteDetails,
             id: mockExemption.id
           }
@@ -987,6 +990,7 @@ describe('#reviewSiteDetails', () => {
           expect.any(Object),
           '/exemption/site-details',
           {
+            multipleSiteDetails: mockExemption.multipleSiteDetails,
             siteDetails: mockExemption.siteDetails,
             id: mockExemption.id
           }
@@ -1009,6 +1013,7 @@ describe('#reviewSiteDetails', () => {
           expect.any(Object),
           '/exemption/site-details',
           {
+            multipleSiteDetails: mockExemption.multipleSiteDetails,
             siteDetails: createExpectedSiteDetails(),
             id: mockExemption.id
           }
@@ -1158,6 +1163,8 @@ describe('#reviewSiteDetails', () => {
             expect.any(Object),
             '/exemption/site-details',
             {
+              multipleSiteDetails:
+                mockPolygonExemptionWGS84.multipleSiteDetails,
               siteDetails: mockPolygonExemptionWGS84.siteDetails,
               id: mockPolygonExemptionWGS84.id
             }
@@ -1185,6 +1192,8 @@ describe('#reviewSiteDetails', () => {
             expect.any(Object),
             '/exemption/site-details',
             {
+              multipleSiteDetails:
+                mockPolygonExemptionOSGB36.multipleSiteDetails,
               siteDetails: mockPolygonExemptionOSGB36.siteDetails,
               id: mockPolygonExemptionOSGB36.id
             }
@@ -1210,6 +1219,8 @@ describe('#reviewSiteDetails', () => {
             expect.any(Object),
             '/exemption/site-details',
             {
+              multipleSiteDetails:
+                mockPolygonExemptionWGS84.multipleSiteDetails,
               siteDetails: mockPolygonExemptionWGS84.siteDetails,
               id: mockPolygonExemptionWGS84.id
             }

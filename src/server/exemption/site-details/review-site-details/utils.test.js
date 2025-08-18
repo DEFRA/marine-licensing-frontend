@@ -19,11 +19,12 @@ import {
 } from '~/src/server/exemption/site-details/review-site-details/utils.js'
 import { mockExemption } from '~/src/server/test-helpers/mocks.js'
 
-import { getCoordinateSystem } from '~/src/server/common/helpers/session-cache/utils.js'
+import { getCoordinateSystem } from '~/src/server/common/helpers/coordinate-utils.js'
 
 // Mock the getCoordinateSystem helper
-jest.mock('~/src/server/common/helpers/session-cache/utils.js', () => ({
-  getCoordinateSystem: jest.fn()
+jest.mock('~/src/server/common/helpers/coordinate-utils.js', () => ({
+  getCoordinateSystem: jest.fn(),
+  extractCoordinatesFromGeoJSON: jest.fn()
 }))
 
 describe('siteDetails utils', () => {
@@ -445,7 +446,7 @@ describe('siteDetails utils', () => {
           latitude: '51.5074',
           longitude: '-0.1278'
         },
-        circleWidth: '100'
+        circleWidth: '1'
       }
       const coordinateSystem = COORDINATE_SYSTEMS.WGS84
 
@@ -460,7 +461,7 @@ describe('siteDetails utils', () => {
         coordinateSystem:
           'WGS84 (World Geodetic System 1984)\nLatitude and longitude',
         coordinates: '51.5074, -0.1278',
-        width: '100 metres'
+        width: '1 metre'
       })
     })
 

@@ -48,7 +48,6 @@ export const mockProjectList = [
   {
     id: 'abc123',
     projectName: 'Test Project',
-    type: 'Exempt activity',
     reference: 'ML-2024-001',
     status: 'Draft',
     submittedAt: null

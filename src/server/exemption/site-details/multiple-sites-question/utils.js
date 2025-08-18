@@ -6,7 +6,7 @@
  */
 export const getMultipleSitesEnabledValue = (multipleSiteDetails) => {
   if (multipleSiteDetails?.multipleSitesEnabled === undefined) {
-    return
+    return undefined
   }
 
   return multipleSiteDetails?.multipleSitesEnabled ? 'yes' : 'no'

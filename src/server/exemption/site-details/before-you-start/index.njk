@@ -1,0 +1,57 @@
+{% extends 'layouts/page.njk' %}
+{% from "govuk/components/back-link/macro.njk" import govukBackLink %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "cancel-button/macro.njk" import appCancelButton %}
+
+{% block beforeContent %}
+<nav>
+  {{ govukBackLink({
+    text: "Back",
+    href: '/exemption/task-list'
+  }) }}
+</nav>
+{% endblock %}
+
+{% block content %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+      <span class="govuk-caption-l">{{ projectName }}</span>
+      <h1 class="govuk-heading-l">{{ heading }}</h1>
+      
+      <h2 class="govuk-heading-m">Before you start</h2>
+      <p>In the next step, you'll need to provide the following for every site:</p>
+      <ul class="govuk-list govuk-list--bullet">
+        <li>a site name</li>
+        <li>the exact location of the site</li>
+        <li>the dates the activity will take place</li>
+        <li>a description of the activity</li>
+      </ul>
+
+      <h2 class="govuk-heading-m">Providing site locations</h2>
+      <p>You can provide site locations in 2 ways:</p>
+      <ul class="govuk-list govuk-list--bullet">
+        <li>upload a file with the coordinates</li>
+        <li>enter the coordinates manually</li>
+      </ul>
+
+      <h3 class="govuk-heading-s">Projects with multiple sites</h3>
+      <p>You need to give separate location details for each site if your project has multiple sites.</p>
+      <p>If you're uploading a file you need to include all the sites in 1 file.</p>
+
+      <h2 class="govuk-heading-m">Defining the site boundary</h2>
+      <p>The coordinates must mark the full boundary of every site, including space for any movement or small changes in the activity location.</p>
+      <p>If the activity happens outside the marked boundary, it will not be covered by the exemption.</p>
+      
+      <div class="govuk-button-group">
+        {{ govukButton({
+          text: "Continue",
+          href: "/exemption/how-do-you-want-to-provide-the-coordinates"
+        }) }}
+        
+        {{ appCancelButton({
+          cancelLink: "/exemption/task-list?cancel=site-details"
+        }) }}
+      </div>
+    </div>
+  </div>
+{% endblock %} 

@@ -51,6 +51,7 @@ describe('Site name page', () => {
       })
     ).toBeInTheDocument()
     expect(getByText(document, mockExemption.projectName)).toBeInTheDocument()
+    expect(getByText(document, 'Site 1')).toBeInTheDocument()
 
     const siteNameInput = document.querySelector('input[name="siteName"]')
     expect(siteNameInput).toBeInTheDocument()
@@ -124,6 +125,7 @@ describe('Site name page', () => {
         name: 'Site name'
       })
     ).toBeInTheDocument()
+    expect(getByText(document, 'Site 1')).toBeInTheDocument()
 
     const errorMessage = document.querySelector('.govuk-error-message')
     expect(errorMessage).toBeInTheDocument()

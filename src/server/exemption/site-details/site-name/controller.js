@@ -8,6 +8,7 @@ import {
   errorDescriptionByFieldName,
   mapErrorsForDisplay
 } from '~/src/server/common/helpers/errors.js'
+import { getSiteNumber } from '../utils/site-number.js'
 import joi from 'joi'
 
 export const SITE_NAME_VIEW_ROUTE = 'exemption/site-details/site-name/index'
@@ -25,7 +26,8 @@ export const errorMessages = {
 
 const createValidationFailAction = (request, h, err) => {
   const { payload } = request
-  const { projectName } = getExemptionCache(request)
+  const exemption = getExemptionCache(request)
+  const siteNumber = getSiteNumber(exemption, request)
 
   if (!err.details) {
     return h
@@ -33,7 +35,8 @@ const createValidationFailAction = (request, h, err) => {
         ...siteNameSettings,
         backLink: routes.MULTIPLE_SITES_CHOICE,
         payload,
-        projectName
+        projectName: exemption.projectName,
+        siteNumber
       })
       .takeover()
   }
@@ -46,7 +49,8 @@ const createValidationFailAction = (request, h, err) => {
       ...siteNameSettings,
       backLink: routes.MULTIPLE_SITES_CHOICE,
       payload,
-      projectName,
+      projectName: exemption.projectName,
+      siteNumber,
       errors,
       errorSummary
     })
@@ -56,11 +60,13 @@ const createValidationFailAction = (request, h, err) => {
 export const siteNameController = {
   handler(request, h) {
     const exemption = getExemptionCache(request)
+    const siteNumber = getSiteNumber(exemption, request)
 
     return h.view(SITE_NAME_VIEW_ROUTE, {
       ...siteNameSettings,
       backLink: routes.MULTIPLE_SITES_CHOICE,
       projectName: exemption.projectName,
+      siteNumber,
       payload: {
         siteName: exemption.siteName
       }

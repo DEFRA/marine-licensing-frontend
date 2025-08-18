@@ -8,6 +8,7 @@ import { reviewSiteDetailsRoutes } from '~/src/server/exemption/site-details/rev
 import { fileUploadRoutes } from '~/src/server/exemption/site-details/file-upload/index.js'
 import { uploadAndWaitRoutes } from '~/src/server/exemption/site-details/upload-and-wait/index.js'
 import { chooseFileTypeRoutes } from '~/src/server/exemption/site-details/choose-file-type/index.js'
+import { beforeYouStartRoutes } from '~/src/server/exemption/site-details/before-you-start/index.js'
 
 /**
  * Sets up the routes used in the Site Details section
@@ -27,7 +28,8 @@ export const siteDetailsRoutes = [
   ...reviewSiteDetailsRoutes,
   ...chooseFileTypeRoutes,
   ...fileUploadRoutes,
-  ...uploadAndWaitRoutes
+  ...uploadAndWaitRoutes,
+  ...beforeYouStartRoutes
 ]
 
 /**

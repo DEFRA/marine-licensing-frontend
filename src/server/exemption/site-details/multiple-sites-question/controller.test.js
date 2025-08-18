@@ -18,28 +18,11 @@ describe('#multipleSitesQuestion', () => {
   jest.mocked(setExemptionCache).mockReturnValue({})
 
   describe('#multipleSitesController', () => {
-    test('should render with correct context when no multipleSiteDetails exists', () => {
-      jest.mocked(getExemptionCache).mockReturnValueOnce({
-        projectName: mockExemption.projectName
-      })
-
-      const h = { view: jest.fn() }
-
-      multipleSitesController.handler({}, h)
-
-      expect(h.view).toHaveBeenCalledWith(MULTIPLE_SITES_VIEW_ROUTE, {
-        pageTitle: 'Do you need to tell us about more than one site?',
-        heading: 'Do you need to tell us about more than one site?',
-        backLink: routes.COORDINATES_TYPE_CHOICE,
-        payload: { multipleSitesEnabled: undefined },
-        projectName: 'Test Project'
-      })
-    })
-
-    test('should render with correct context when multipleSiteDetails.multipleSitesEnabled is true', () => {
+    test('should render with correct context and call utils function', () => {
+      const mockMultipleSiteDetails = { multipleSitesEnabled: true }
       jest.mocked(getExemptionCache).mockReturnValueOnce({
         ...mockExemption,
-        multipleSiteDetails: { multipleSitesEnabled: true }
+        multipleSiteDetails: mockMultipleSiteDetails
       })
 
       const h = { view: jest.fn() }
@@ -51,25 +34,6 @@ describe('#multipleSitesQuestion', () => {
         heading: 'Do you need to tell us about more than one site?',
         backLink: routes.COORDINATES_TYPE_CHOICE,
         payload: { multipleSitesEnabled: 'yes' },
-        projectName: 'Test Project'
-      })
-    })
-
-    test('should render with correct context when multipleSiteDetails.multipleSitesEnabled is false', () => {
-      jest.mocked(getExemptionCache).mockReturnValueOnce({
-        ...mockExemption,
-        multipleSiteDetails: { multipleSitesEnabled: false }
-      })
-
-      const h = { view: jest.fn() }
-
-      multipleSitesController.handler({}, h)
-
-      expect(h.view).toHaveBeenCalledWith(MULTIPLE_SITES_VIEW_ROUTE, {
-        pageTitle: 'Do you need to tell us about more than one site?',
-        heading: 'Do you need to tell us about more than one site?',
-        backLink: routes.COORDINATES_TYPE_CHOICE,
-        payload: { multipleSitesEnabled: 'no' },
         projectName: 'Test Project'
       })
     })
@@ -147,8 +111,6 @@ describe('#multipleSitesQuestion', () => {
       }
       const h = { view: jest.fn().mockReturnValue({ takeover: jest.fn() }) }
 
-      const failAction =
-        multipleSitesSubmitController.options.validate.failAction
       const err = {
         details: [
           {
@@ -158,7 +120,7 @@ describe('#multipleSitesQuestion', () => {
         ]
       }
 
-      failAction(request, h, err)
+      multipleSitesSubmitController.options.validate.failAction(request, h, err)
 
       expect(h.view).toHaveBeenCalledWith(MULTIPLE_SITES_VIEW_ROUTE, {
         pageTitle: 'Do you need to tell us about more than one site?',
@@ -177,12 +139,7 @@ describe('#multipleSitesQuestion', () => {
       }
       const h = { view: jest.fn().mockReturnValue({ takeover: jest.fn() }) }
 
-      // Mock the failAction to test it directly
-      const failAction =
-        multipleSitesSubmitController.options.validate.failAction
-      const err = {} // No details
-
-      failAction(request, h, err)
+      multipleSitesSubmitController.options.validate.failAction(request, h, {})
 
       expect(h.view).toHaveBeenCalledWith(MULTIPLE_SITES_VIEW_ROUTE, {
         pageTitle: 'Do you need to tell us about more than one site?',

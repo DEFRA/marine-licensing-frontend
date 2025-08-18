@@ -7,6 +7,7 @@ import {
   errorDescriptionByFieldName,
   mapErrorsForDisplay
 } from '~/src/server/common/helpers/errors.js'
+import { getMultipleSitesEnabledValue } from './utils.js'
 import joi from 'joi'
 
 export const MULTIPLE_SITES_VIEW_ROUTE =
@@ -64,12 +65,9 @@ export const multipleSitesController = {
       backLink: routes.COORDINATES_TYPE_CHOICE,
       projectName: exemption.projectName,
       payload: {
-        multipleSitesEnabled: exemption.multipleSiteDetails
-          ?.multipleSitesEnabled
-          ? 'yes'
-          : exemption.multipleSiteDetails?.multipleSitesEnabled === false
-            ? 'no'
-            : undefined
+        multipleSitesEnabled: getMultipleSitesEnabledValue(
+          exemption.multipleSiteDetails
+        )
       }
     })
   }

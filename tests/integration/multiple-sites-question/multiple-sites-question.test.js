@@ -118,7 +118,10 @@ describe('Multiple sites question page', () => {
     expect(continueButton).toBeInTheDocument()
 
     const cancelLink = getByRole(document, 'link', { name: 'Cancel' })
-    expect(cancelLink).toHaveAttribute('href', '/exemption/task-list')
+    expect(cancelLink).toHaveAttribute(
+      'href',
+      '/exemption/task-list?cancel=site-details'
+    )
 
     const backLink = getByRole(document, 'link', { name: 'Back' })
     expect(backLink).toHaveAttribute(
@@ -208,6 +211,9 @@ describe('Multiple sites question page', () => {
     const { document } = new JSDOM(result).window
 
     const cancelLink = getByRole(document, 'link', { name: 'Cancel' })
-    expect(cancelLink).toHaveAttribute('href', '/exemption/task-list')
+    expect(cancelLink).toHaveAttribute(
+      'href',
+      '/exemption/task-list?cancel=site-details'
+    )
   })
 })

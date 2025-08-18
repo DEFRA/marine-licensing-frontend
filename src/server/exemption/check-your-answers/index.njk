@@ -1,6 +1,7 @@
 {% extends 'layouts/page.njk' %}
 {% from "govuk/components/back-link/macro.njk" import govukBackLink %}
 {% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "site-details-data-script/macro.njk" import appSiteDetailsDataScript %}
 {% from "project-details-card/macro.njk" import appProjectDetailsCard %}
 {% from "activity-dates-card/macro.njk" import appActivityDatesCard %}
 {% from "activity-details-card/macro.njk" import appActivityDetailsCard %}
@@ -12,21 +13,24 @@
 {% block pageTitle %}
   {{ title }} - {{ serviceName }}
 {% endblock %}
+{% block head %}
+  {{ super() }}
+  {{ appSiteDetailsDataScript(siteDetailsData) }}
+{% endblock %}
 {% block beforeContent %}
   <nav>
     {{ govukBackLink({
-          text: "Go back to your project",
-          href: backLink
-      }) }}
+        text: "Go back to your project",
+        href: backLink
+    }) }}
   </nav>
 {% endblock %}
 {% block content %}
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-full">
-
-    {% if projectName %}
-      <span class="govuk-caption-l">{{ projectName }}</span>
-    {% endif %}
+      {% if projectName %}
+        <span class="govuk-caption-l">{{ projectName }}</span>
+      {% endif %}
 
     <h2 class="govuk-heading-l" id="check-your-answers-heading">Check your answers before sending your information</h2>
     
@@ -73,7 +77,7 @@
               id: "confirm-and-send"
             }
           }) }}
-    </form>
+      </form>
     </div>
   </div>
 {% endblock %}

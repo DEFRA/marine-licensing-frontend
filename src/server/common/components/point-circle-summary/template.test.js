@@ -45,7 +45,7 @@ describe('Point Circle Summary Component', () => {
     test('Should display all required fields', () => {
       const htmlContent = $component.html()
       expect(htmlContent).toContain('Method of providing site location')
-      expect(htmlContent).toContain('Coordinate system')
+      expect(htmlContent).toContain('Coordinates system')
       expect(htmlContent).toContain('Coordinates at centre of site')
       expect(htmlContent).toContain('Width of circular site')
     })
@@ -94,7 +94,7 @@ describe('Point Circle Summary Component', () => {
     test('Should display all required fields', () => {
       const htmlContent = $component.html()
       expect(htmlContent).toContain('Method of providing site location')
-      expect(htmlContent).toContain('Coordinate system')
+      expect(htmlContent).toContain('Coordinates system')
       expect(htmlContent).toContain('Coordinates at centre of site')
       expect(htmlContent).toContain('Width of circular site')
     })

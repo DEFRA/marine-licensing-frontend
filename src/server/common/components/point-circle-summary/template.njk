@@ -28,7 +28,7 @@
       },
       {
         key: {
-          text: "Coordinate system"
+          text: "Coordinates system"
         },
         value: {
           html: params.siteDetails.coordinateSystemText | replace('\n', '<br> ')
@@ -49,6 +49,18 @@
         value: {
           html: params.siteDetails.circleWidth + " metres"
         }
+      },
+      {
+        classes: "govuk-summary-list__row--full-width",
+        key: {
+          text: "Map view",
+          classes: "govuk-summary-list__key--full-width"
+        },
+        value: {
+          html: '<div class="app-site-details-map" data-module="site-details-map"></div>',
+          classes: "govuk-summary-list__value--full-width"
+        }
       }
-    ]
+    ],
+    classes: "govuk-summary-list--full-width"
   }) }}

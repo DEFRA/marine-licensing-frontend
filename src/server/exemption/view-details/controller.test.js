@@ -385,7 +385,7 @@ describe('view details controller', () => {
           document,
           CSS_SELECTORS.cards.siteDetails
         )
-        expect(summaryRows).toBe(5) // Method + Coordinate System + 3 coordinate points
+        expect(summaryRows).toBe(6) // Method + Coordinate System + 3 coordinate points + map
       })
 
       test('should handle exemption with no site details', async () => {

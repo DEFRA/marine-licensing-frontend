@@ -28,10 +28,9 @@ describe('MapViewManager', () => {
       mapViewManager.fitMapToExtent(mockMap, extent)
 
       expect(mockView.fit).toHaveBeenCalledWith(extent, {
-        padding: [20, 20, 20, 20],
+        padding: [100, 100, 100, 100],
         maxZoom: 14,
-        minZoom: 8,
-        duration: 500
+        minZoom: 8
       })
     })
 
@@ -39,17 +38,18 @@ describe('MapViewManager', () => {
       const extent = [100, 200, 300, 400]
       const customOptions = {
         padding: [10, 10, 10, 10],
-        maxZoom: 18,
-        minZoom: 5
+        minResolution: 0.2,
+        maxZoom: 14,
+        minZoom: 8
       }
 
       mapViewManager.fitMapToExtent(mockMap, extent, customOptions)
 
       expect(mockView.fit).toHaveBeenCalledWith(extent, {
         padding: [10, 10, 10, 10],
-        maxZoom: 18,
-        minZoom: 5,
-        duration: 500
+        minResolution: 0.2,
+        maxZoom: 14,
+        minZoom: 8
       })
     })
 
@@ -81,6 +81,8 @@ describe('MapViewManager', () => {
 
     test('should fall back to centre view when fit throws an error', () => {
       const extent = [100, 200, 300, 400]
+      const consoleWarnSpy = jest.spyOn(console, 'warn').mockImplementation()
+
       mockView.fit.mockImplementation(() => {
         throw new Error('Fit failed')
       })
@@ -89,6 +91,8 @@ describe('MapViewManager', () => {
 
       expect(mockView.setCenter).toHaveBeenCalledWith([-3.5, 54.0])
       expect(mockView.setZoom).toHaveBeenCalledWith(12)
+
+      consoleWarnSpy.mockRestore()
     })
 
     test('should log specific warning message when fit throws an error', () => {
@@ -119,27 +123,20 @@ describe('MapViewManager', () => {
 
   const getFitExpectations = (extent, options) => ({
     fitOptions: {
-      padding: [20, 20, 20, 20],
-      maxZoom: 14,
+      padding: [100, 100, 100, 100],
       minZoom: 8,
-      duration: 500,
+      maxZoom: 14,
       ...options
     }
   })
 
-  test.each([
-    ['fitMapToGeometry', 'geometry', [100, 200, 300, 400], { maxZoom: 15 }],
-    [
-      'fitMapToAllFeatures',
-      'vector source',
-      [500, 600, 700, 800],
-      { minZoom: 10 }
-    ]
-  ])(
-    '%s should get extent from %s and call fitMapToExtent',
-    (methodName, sourceType, extent, options) => {
+  describe('fitMapToGeometry', () => {
+    test('should get extent from geometry and call fitMapToExtent', () => {
+      const extent = [100, 200, 300, 400]
+      const options = { maxZoom: 15 }
+
       const { mockSource } = setupFitTest(
-        methodName,
+        'fitMapToGeometry',
         (extent) => ({ getExtent: jest.fn().mockReturnValue(extent) }),
         extent,
         options
@@ -148,8 +145,26 @@ describe('MapViewManager', () => {
       const expectations = getFitExpectations(extent, options)
       expect(mockSource.getExtent).toHaveBeenCalled()
       expect(mockView.fit).toHaveBeenCalledWith(extent, expectations.fitOptions)
-    }
-  )
+    })
+  })
+
+  describe('fitMapToAllFeatures', () => {
+    test('should get extent from vector source and call fitMapToExtent', () => {
+      const extent = [500, 600, 700, 800]
+      const options = { minZoom: 10 }
+
+      const { mockSource } = setupFitTest(
+        'fitMapToAllFeatures',
+        (extent) => ({ getExtent: jest.fn().mockReturnValue(extent) }),
+        extent,
+        options
+      )
+
+      const expectations = getFitExpectations(extent, options)
+      expect(mockSource.getExtent).toHaveBeenCalled()
+      expect(mockView.fit).toHaveBeenCalledWith(extent, expectations.fitOptions)
+    })
+  })
 
   describe('centreMapView', () => {
     test('should centre map on coordinates with default zoom', () => {

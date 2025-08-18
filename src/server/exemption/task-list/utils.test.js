@@ -56,7 +56,7 @@ describe('taskList utils', () => {
         title: { text: 'Activity description' }
       },
       {
-        href: routes.COORDINATES_TYPE_CHOICE,
+        href: routes.SITE_DETAILS,
         status: { tag: { text: 'Incomplete', classes: 'govuk-tag--blue' } },
         title: { text: 'Site details' }
       },
@@ -86,7 +86,7 @@ describe('taskList utils', () => {
         title: { text: 'Activity description' }
       },
       {
-        href: routes.COORDINATES_TYPE_CHOICE,
+        href: routes.SITE_DETAILS,
         status: { tag: { text: 'Incomplete', classes: 'govuk-tag--blue' } },
         title: { text: 'Site details' }
       },

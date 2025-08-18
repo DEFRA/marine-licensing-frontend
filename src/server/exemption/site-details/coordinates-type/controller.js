@@ -35,6 +35,7 @@ export const coordinatesTypeController = {
 
     return h.view(PROVIDE_COORDINATES_CHOICE_VIEW_ROUTE, {
       ...provideCoordinatesSettings,
+      backLink: routes.SITE_DETAILS,
       projectName: exemption.projectName,
       payload: {
         coordinatesType: siteDetails.coordinatesType
@@ -70,6 +71,7 @@ export const coordinatesTypeSubmitController = {
           return h
             .view(PROVIDE_COORDINATES_CHOICE_VIEW_ROUTE, {
               ...provideCoordinatesSettings,
+              backLink: routes.SITE_DETAILS,
               payload,
               projectName
             })
@@ -83,6 +85,7 @@ export const coordinatesTypeSubmitController = {
         return h
           .view(PROVIDE_COORDINATES_CHOICE_VIEW_ROUTE, {
             ...provideCoordinatesSettings,
+            backLink: routes.SITE_DETAILS,
             payload,
             projectName,
             errors,

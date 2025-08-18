@@ -52,7 +52,7 @@ export const transformTaskList = (taskList) => {
       },
       href: taskList.siteDetails
         ? routes.REVIEW_SITE_DETAILS
-        : routes.COORDINATES_TYPE_CHOICE,
+        : routes.SITE_DETAILS,
       status: setStatus(taskList.siteDetails)
     },
     {

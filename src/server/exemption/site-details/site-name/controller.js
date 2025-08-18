@@ -1,7 +1,6 @@
 import {
   getExemptionCache,
-  updateExemptionSiteDetails,
-  setExemptionCache
+  updateExemptionSiteDetails
 } from '~/src/server/common/helpers/session-cache/utils.js'
 import { routes } from '~/src/server/common/constants/routes.js'
 import {
@@ -90,14 +89,8 @@ export const siteNameSubmitController = {
   },
   handler(request, h) {
     const { payload } = request
-    const exemption = getExemptionCache(request)
 
     updateExemptionSiteDetails(request, 'siteName', payload.siteName)
-
-    setExemptionCache(request, {
-      ...exemption,
-      siteName: payload.siteName
-    })
 
     return h.redirect(routes.COORDINATES_ENTRY_CHOICE)
   }

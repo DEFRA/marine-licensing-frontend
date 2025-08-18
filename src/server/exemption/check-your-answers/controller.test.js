@@ -5,6 +5,7 @@ import * as coordinateUtils from '~/src/server/common/helpers/coordinate-utils.j
 import * as reviewUtils from '~/src/server/exemption/site-details/review-site-details/utils.js'
 import { createServer } from '~/src/server/index.js'
 import { mockExemption } from '~/src/server/test-helpers/mocks.js'
+import * as authUtils from '~/src/server/common/plugins/auth/utils.js'
 
 const CSS_SELECTORS = {
   checkYourAnswersHeading: '#check-your-answers-heading',
@@ -94,6 +95,12 @@ const getSummaryRowCount = (document, cardSelector) => {
 
 const normalizeWhitespace = (text) => text.replace(/\s+/g, ' ')
 
+const mockUserSession = {
+  displayName: 'John Doe',
+  email: 'john.doe@example.com',
+  sessionId: 'test-session-123'
+}
+
 const createExemptionWithSiteDetails = (siteDetailsOverrides = {}) => ({
   ...mockExemption,
   siteDetails: {
@@ -157,6 +164,8 @@ describe('check your answers controller', () => {
       .spyOn(authRequests, 'authenticatedGetRequest')
       .mockResolvedValue({ payload: { value: mockExemption } })
 
+    jest.spyOn(authUtils, 'getUserSession').mockResolvedValue(mockUserSession)
+
     getExemptionCacheSpy = jest
       .spyOn(cacheUtils, 'getExemptionCache')
       .mockReturnValue(mockExemption)
@@ -192,7 +201,11 @@ describe('check your answers controller', () => {
       expect(authRequests.authenticatedPostRequest).toHaveBeenCalledWith(
         expect.any(Object),
         '/exemption/submit',
-        { id: mockExemption.id }
+        {
+          id: mockExemption.id,
+          userName: mockUserSession.displayName,
+          userEmail: mockUserSession.email
+        }
       )
     })
 
@@ -221,6 +234,118 @@ describe('check your answers controller', () => {
     test('Should handle unexpected API response format', async () => {
       jest.spyOn(authRequests, 'authenticatedPostRequest').mockResolvedValue({
         payload: { message: 'error', error: 'Something went wrong' }
+      })
+
+      const { statusCode } = await server.inject({
+        method: 'POST',
+        url: '/exemption/check-your-answers'
+      })
+
+      expect(statusCode).toBe(400)
+    })
+
+    test('Should handle API response with missing value', async () => {
+      jest.spyOn(authRequests, 'authenticatedPostRequest').mockResolvedValue({
+        payload: { message: 'success', value: null }
+      })
+
+      const { statusCode } = await server.inject({
+        method: 'POST',
+        url: '/exemption/check-your-answers'
+      })
+
+      expect(statusCode).toBe(400)
+    })
+
+    test('Should redirect even with missing applicationReference when value exists', async () => {
+      jest.spyOn(authRequests, 'authenticatedPostRequest').mockResolvedValue({
+        payload: { message: 'success', value: {} }
+      })
+
+      const { statusCode, headers } = await server.inject({
+        method: 'POST',
+        url: '/exemption/check-your-answers'
+      })
+
+      expect(statusCode).toBe(302)
+      expect(headers.location).toBe(
+        '/exemption/confirmation?applicationReference=undefined'
+      )
+    })
+
+    test('Should handle API response with wrong message type', async () => {
+      jest.spyOn(authRequests, 'authenticatedPostRequest').mockResolvedValue({
+        payload: {
+          message: 'pending',
+          value: { applicationReference: 'APP-123' }
+        }
+      })
+
+      const { statusCode } = await server.inject({
+        method: 'POST',
+        url: '/exemption/check-your-answers'
+      })
+
+      expect(statusCode).toBe(400)
+    })
+
+    test('Should error if user session is missing', async () => {
+      jest.spyOn(authUtils, 'getUserSession').mockResolvedValue(null)
+
+      const { statusCode } = await server.inject({
+        method: 'POST',
+        url: '/exemption/check-your-answers'
+      })
+
+      expect(statusCode).toBe(400)
+    })
+
+    test('Should error if user session has missing displayName', async () => {
+      jest.spyOn(authUtils, 'getUserSession').mockResolvedValue({
+        displayName: null,
+        email: 'test@example.com'
+      })
+
+      const { statusCode } = await server.inject({
+        method: 'POST',
+        url: '/exemption/check-your-answers'
+      })
+
+      expect(statusCode).toBe(400)
+    })
+
+    test('Should error if user session has missing email', async () => {
+      jest.spyOn(authUtils, 'getUserSession').mockResolvedValue({
+        displayName: 'Test User',
+        email: null
+      })
+
+      const { statusCode } = await server.inject({
+        method: 'POST',
+        url: '/exemption/check-your-answers'
+      })
+
+      expect(statusCode).toBe(400)
+    })
+
+    test('Should error if user session has empty displayName', async () => {
+      jest.spyOn(authUtils, 'getUserSession').mockResolvedValue({
+        displayName: '',
+        email: 'test@example.com'
+      })
+
+      const { statusCode } = await server.inject({
+        method: 'POST',
+        url: '/exemption/check-your-answers'
+      })
+
+      expect(statusCode).toBe(400)
+    })
+
+    test('Should error if user session has empty email', async () => {
+      jest.spyOn(authUtils, 'getUserSession').mockResolvedValue({
+        displayName: 'Test User',
+        email: ''
       })
 
       const { statusCode } = await server.inject({
@@ -272,6 +397,28 @@ describe('check your answers controller', () => {
       payload: {
         value: null
       }
+    })
+    const { statusCode } = await server.inject({
+      method: 'GET',
+      url: '/exemption/check-your-answers'
+    })
+    expect(statusCode).toBe(404)
+  })
+
+  test('Should handle API error when fetching exemption data', async () => {
+    jest
+      .spyOn(authRequests, 'authenticatedGetRequest')
+      .mockRejectedValueOnce(new Error('API connection failed'))
+    const { statusCode } = await server.inject({
+      method: 'GET',
+      url: '/exemption/check-your-answers'
+    })
+    expect(statusCode).toBe(500)
+  })
+
+  test('Should handle malformed API response on GET request', async () => {
+    jest.spyOn(authRequests, 'authenticatedGetRequest').mockResolvedValueOnce({
+      payload: null
     })
     const { statusCode } = await server.inject({
       method: 'GET',
@@ -402,6 +549,80 @@ describe('check your answers controller', () => {
     expect(getThirdRowValue(document, CSS_SELECTORS.cards.siteDetails)).toBe(
       '425053, 564180'
     )
+  })
+
+  describe('Site details processing functions', () => {
+    test('Should handle exemption with undefined siteDetails', async () => {
+      const exemptionWithUndefinedSiteDetails = {
+        ...mockExemption,
+        siteDetails: undefined
+      }
+
+      getExemptionCacheSpy.mockReturnValueOnce(
+        exemptionWithUndefinedSiteDetails
+      )
+
+      const { statusCode } = await server.inject({
+        method: 'GET',
+        url: '/exemption/check-your-answers'
+      })
+      expect(statusCode).toBe(200)
+    })
+
+    test('Should handle manual coordinates with missing coordinates', async () => {
+      const exemptionWithMissingCoords = createExemptionWithSiteDetails({
+        coordinatesType: 'coordinates',
+        coordinateSystem: 'wgs84',
+        coordinates: null
+      })
+
+      getExemptionCacheSpy.mockReturnValueOnce(exemptionWithMissingCoords)
+
+      const { statusCode } = await server.inject({
+        method: 'GET',
+        url: '/exemption/check-your-answers'
+      })
+      expect(statusCode).toBe(200)
+    })
+
+    test('Should handle manual coordinates with invalid coordinate system', async () => {
+      const exemptionWithInvalidSystem = createExemptionWithSiteDetails({
+        coordinatesType: 'coordinates',
+        coordinateSystem: 'invalid_system',
+        coordinates: { latitude: '55.0', longitude: '-1.0' }
+      })
+
+      getExemptionCacheSpy.mockReturnValueOnce(exemptionWithInvalidSystem)
+
+      const { statusCode } = await server.inject({
+        method: 'GET',
+        url: '/exemption/check-your-answers'
+      })
+      expect(statusCode).toBe(200)
+    })
+
+    test('Should handle multiple coordinates type', async () => {
+      const exemptionWithMultipleCoords = createExemptionWithSiteDetails({
+        coordinatesType: 'coordinates',
+        coordinatesEntry: 'multiple',
+        coordinateSystem: 'wgs84',
+        multipleCoordinates: [
+          { latitude: '55.0', longitude: '-1.0' },
+          { latitude: '56.0', longitude: '-1.5' }
+        ]
+      })
+
+      getExemptionCacheSpy.mockReturnValueOnce(exemptionWithMultipleCoords)
+
+      const { statusCode, result } = await server.inject({
+        method: 'GET',
+        url: '/exemption/check-your-answers'
+      })
+
+      expect(statusCode).toBe(200)
+      const { document } = new JSDOM(result).window
+      expect(document.querySelector('#site-details-card')).toBeTruthy()
+    })
   })
 
   describe('ML-140: File upload site details display', () => {
@@ -817,6 +1038,108 @@ describe('check your answers controller', () => {
         `${CSS_SELECTORS.cards.siteDetails} ${CSS_SELECTORS.card.actions}`
       )
       expect(changeLink?.getAttribute('href')).toBe('#')
+    })
+  })
+
+  describe('Controller error handling edge cases', () => {
+    test('Should handle POST request with missing exemption cache', async () => {
+      getExemptionCacheSpy.mockReturnValueOnce(null)
+
+      const { statusCode } = await server.inject({
+        method: 'POST',
+        url: '/exemption/check-your-answers'
+      })
+
+      expect(statusCode).toBe(500)
+    })
+
+    test('Should handle GET request with missing exemption cache', async () => {
+      getExemptionCacheSpy.mockReturnValueOnce(null)
+
+      const { statusCode } = await server.inject({
+        method: 'GET',
+        url: '/exemption/check-your-answers'
+      })
+
+      expect(statusCode).toBe(500)
+    })
+
+    test('Should handle getUserSession throwing an error', async () => {
+      jest
+        .spyOn(authUtils, 'getUserSession')
+        .mockRejectedValueOnce(new Error('Session retrieval failed'))
+
+      const { statusCode } = await server.inject({
+        method: 'POST',
+        url: '/exemption/check-your-answers'
+      })
+
+      expect(statusCode).toBe(400)
+    })
+
+    test('Should handle validateAndFetchExemption with network timeout', async () => {
+      jest
+        .spyOn(authRequests, 'authenticatedGetRequest')
+        .mockRejectedValueOnce(new Error('ECONNRESET'))
+
+      const { statusCode } = await server.inject({
+        method: 'GET',
+        url: '/exemption/check-your-answers'
+      })
+
+      expect(statusCode).toBe(500)
+    })
+
+    test('Should handle file upload processing error gracefully', async () => {
+      // Mock getFileUploadSummaryData to throw an error
+      jest
+        .spyOn(reviewUtils, 'getFileUploadSummaryData')
+        .mockImplementation(() => {
+          throw new Error('File processing error')
+        })
+
+      const fileUploadExemption = createFileUploadExemption('kml', 'test.kml')
+      getExemptionCacheSpy.mockReturnValueOnce(fileUploadExemption)
+
+      const { statusCode, result } = await server.inject({
+        method: 'GET',
+        url: '/exemption/check-your-answers'
+      })
+
+      expect(statusCode).toBe(200)
+      const { document } = new JSDOM(result).window
+
+      // Should fall back to basic display
+      expect(getFirstRowValue(document, CSS_SELECTORS.cards.siteDetails)).toBe(
+        EXPECTED_TEXT.siteDetailsMethods.fileUpload
+      )
+
+      reviewUtils.getFileUploadSummaryData.mockRestore()
+    })
+
+    test('Should handle file upload with missing uploadedFile completely', async () => {
+      const exemptionWithMissingUploadedFile = {
+        ...mockExemption,
+        siteDetails: {
+          coordinatesType: 'file',
+          fileUploadType: 'invalid',
+          uploadedFile: undefined
+        }
+      }
+
+      getExemptionCacheSpy.mockReturnValueOnce(exemptionWithMissingUploadedFile)
+
+      const { result, statusCode } = await server.inject({
+        method: 'GET',
+        url: '/exemption/check-your-answers'
+      })
+
+      expect(statusCode).toBe(200)
+      const { document } = new JSDOM(result).window
+
+      expect(getThirdRowValue(document, CSS_SELECTORS.cards.siteDetails)).toBe(
+        EXPECTED_TEXT.fallbacks.unknownFile
+      )
     })
   })
 

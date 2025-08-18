@@ -38,7 +38,7 @@
   "author": "Defra DDTS",
   "license": "OGL-UK-3.0",
   "dependencies": {
-    "@babel/runtime": "^7.28.2",
+    "@babel/runtime": "^7.28.3",
     "@defra/hapi-tracing": "^1.26.0",
     "@elastic/ecs-pino-format": "^1.5.0",
     "@hapi/basic": "^7.0.2",
@@ -78,9 +78,9 @@
     "undici": "^7.13.0"
   },
   "devDependencies": {
-    "@babel/cli": "^7.28.0",
-    "@babel/core": "^7.28.0",
-    "@babel/preset-env": "^7.28.0",
+    "@babel/cli": "^7.28.3",
+    "@babel/core": "^7.28.3",
+    "@babel/preset-env": "^7.28.3",
     "@faker-js/faker": "^9.9.0",
     "@stryker-mutator/core": "^9.0.1",
     "@stryker-mutator/jest-runner": "^9.0.1",
@@ -97,8 +97,8 @@
     "@typescript-eslint/parser": "^7.17.0",
     "autoprefixer": "^10.4.21",
     "babel-jest": "^30.0.5",
-    "babel-loader": "^9.2.1",
-    "babel-plugin-transform-import-meta": "^2.2.1",
+    "babel-loader": "^10.0.0",
+    "babel-plugin-transform-import-meta": "^2.3.3",
     "cheerio": "^1.1.2",
     "clean-webpack-plugin": "^4.0.0",
     "copy-webpack-plugin": "^13.0.0",
@@ -130,10 +130,10 @@
     "stylelint": "^16.23.0",
     "stylelint-config-gds": "^2.0.0",
     "terser-webpack-plugin": "^5.3.14",
-    "tsx": "^4.20.3",
+    "tsx": "^4.20.4",
     "typescript": "^5.9.2",
-    "webpack": "^5.101.0",
-    "webpack-assets-manifest": "^5.2.1",
-    "webpack-cli": "^5.1.4"
+    "webpack": "^5.101.2",
+    "webpack-assets-manifest": "^6.2.2",
+    "webpack-cli": "^6.0.1"
   }
 }

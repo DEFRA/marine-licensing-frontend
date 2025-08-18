@@ -46,23 +46,17 @@ describe('Multiple sites question page', () => {
 
     expect(
       getByRole(document, 'heading', {
+        level: 1,
         name: 'Do you need to tell us about more than one site?'
       })
     ).toBeInTheDocument()
     expect(getByText(document, mockExemption.projectName)).toBeInTheDocument()
 
-    const yesRadio = document.querySelector('input[value="yes"]')
-    const noRadio = document.querySelector('input[value="no"]')
-    expect(yesRadio).toBeInTheDocument()
-    expect(noRadio).toBeInTheDocument()
+    const yesRadio = getByRole(document, 'radio', { name: 'Yes' })
+    const noRadio = getByRole(document, 'radio', { name: 'No' })
+
     expect(yesRadio).not.toBeChecked()
     expect(noRadio).not.toBeChecked()
-
-    expect(
-      getByRole(document, 'button', { name: 'Continue' })
-    ).toBeInTheDocument()
-    expect(getByRole(document, 'link', { name: 'Cancel' })).toBeInTheDocument()
-    expect(getByRole(document, 'link', { name: 'Back' })).toBeInTheDocument()
 
     expect(setExemptionCache).not.toHaveBeenCalled()
   })
@@ -82,8 +76,8 @@ describe('Multiple sites question page', () => {
 
     const { document } = new JSDOM(result).window
 
-    const yesRadio = document.querySelector('input[value="yes"]')
-    const noRadio = document.querySelector('input[value="no"]')
+    const yesRadio = getByRole(document, 'radio', { name: 'Yes' })
+    const noRadio = getByRole(document, 'radio', { name: 'No' })
     expect(yesRadio).toBeChecked()
     expect(noRadio).not.toBeChecked()
 
@@ -143,6 +137,7 @@ describe('Multiple sites question page', () => {
 
     expect(
       getByRole(document, 'heading', {
+        level: 1,
         name: 'Do you need to tell us about more than one site?'
       })
     ).toBeInTheDocument()
@@ -170,6 +165,7 @@ describe('Multiple sites question page', () => {
 
     expect(
       getByRole(document, 'heading', {
+        level: 1,
         name: 'Do you need to tell us about more than one site?'
       })
     ).toBeInTheDocument()

@@ -26,3 +26,31 @@ export const mockExemption = {
   },
   taskList: mockExemptionTaskList
 }
+
+export const mockExemptionWithShapefile = {
+  ...mockExemption,
+  siteDetails: { ...mockExemption.siteDetails, fileUploadType: 'shapefile' }
+}
+
+export const mockExemptionWithUploadConfig = {
+  ...mockExemption,
+  siteDetails: {
+    ...mockExemption.siteDetails,
+    uploadConfig: {
+      uploadId: 'test-upload-id',
+      statusUrl: 'test-status-url',
+      fileType: 'kml'
+    }
+  }
+}
+
+export const mockProjectList = [
+  {
+    id: 'abc123',
+    projectName: 'Test Project',
+    type: 'Exempt activity',
+    reference: 'ML-2024-001',
+    status: 'Draft',
+    submittedAt: null
+  }
+]

@@ -536,7 +536,7 @@ describe('check your answers controller', () => {
         ...mockExemption,
         siteDetails: {
           coordinatesType: 'file',
-          fileUploadType: 'invalid_type', // Invalid type triggers error in getFileUploadSummaryData
+          fileUploadType: 'invalid_type',
           uploadedFile: {
             filename: 'test.invalid'
           }
@@ -584,7 +584,7 @@ describe('check your answers controller', () => {
         'invalid_type',
         '',
         {
-          uploadedFile: {} // No filename property to trigger 'Unknown file' fallback
+          uploadedFile: {}
         }
       )
       getExemptionCacheSpy.mockReturnValueOnce(exemptionWithNoFilename)
@@ -613,7 +613,7 @@ describe('check your answers controller', () => {
         'invalid_type',
         '',
         {
-          uploadedFile: null // Null uploadedFile triggers 'Unknown file' fallback
+          uploadedFile: null
         }
       )
       getExemptionCacheSpy.mockReturnValueOnce(exemptionWithNullFile)
@@ -642,7 +642,7 @@ describe('check your answers controller', () => {
         ...mockExemption,
         siteDetails: {
           coordinatesType: 'file',
-          fileUploadType: 'kml', // KML type to test the KML branch in fallback
+          fileUploadType: 'kml',
           uploadedFile: {
             filename: 'test.kml'
           }
@@ -748,7 +748,7 @@ describe('check your answers controller', () => {
           },
           geoJSON: {
             type: 'FeatureCollection',
-            features: [] // Empty features array
+            features: []
           }
         }
       }

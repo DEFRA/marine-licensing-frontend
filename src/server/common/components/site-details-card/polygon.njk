@@ -1,0 +1,64 @@
+{% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
+
+{% set siteDetailsRows = [
+  {
+    key: {
+      text: "Method of providing site location"
+    },
+    value: {
+      html: params.siteDetails.reviewSummaryText
+    }
+  },
+  {
+    key: {
+      text: "Coordinates system"
+    },
+    value: {
+      html: params.siteDetails.coordinateSystemText | replace('\n', '<br> ')
+    }
+  }
+] %}
+
+{% for coordinate in params.siteDetails.polygonCoordinates %}
+  {% set siteDetailsRows = (siteDetailsRows.push({
+    key: {
+      text: coordinate.label
+    },
+    value: {
+      text: coordinate.value
+    }
+  }), siteDetailsRows) %}
+{% endfor %}
+
+{% set siteDetailsRows = (siteDetailsRows.push({
+  classes: "govuk-summary-list__row--full-width",
+  key: {
+    text: "Map view",
+    classes: "govuk-summary-list__key--full-width"
+  },
+  value: {
+    html: '<div class="app-site-details-map" data-module="site-details-map"></div>',
+    classes: "govuk-summary-list__value--full-width"
+  }
+}), siteDetailsRows) %}
+
+{{ govukSummaryList({
+    card: {
+      title: {
+        text: "Site details"
+      },
+      actions: {
+        items: [
+          {
+            href: "#",
+            text: "Change"
+          }
+        ]
+      } if not params.isReadOnly,
+      attributes: {
+        id: "site-details-card"
+      }
+    },
+    rows: siteDetailsRows,
+    classes: "govuk-summary-list--full-width"
+  }) }}

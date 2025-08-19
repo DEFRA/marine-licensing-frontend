@@ -5,9 +5,7 @@
 {% from "project-details-card/macro.njk" import appProjectDetailsCard %}
 {% from "activity-dates-card/macro.njk" import appActivityDatesCard %}
 {% from "activity-details-card/macro.njk" import appActivityDetailsCard %}
-{% from "file-upload-summary/macro.njk" import appFileUploadSummary %}
-{% from "point-circle-summary/macro.njk" import appPointCircleSummary %}
-{% from "polygon-summary/macro.njk" import appPolygonSummary %}
+{% from "site-details-card/macro.njk" import appSiteDetailsCard %}
 {% from "public-register-card/macro.njk" import appPublicRegisterCard %}
 
 {% block pageTitle %}
@@ -46,22 +44,10 @@
       activityDescription: activityDescription,
       isReadOnly: isReadOnly
     }) }}
-    {% if siteDetails.isFileUpload %}
-      {{ appFileUploadSummary({
-        siteDetails: siteDetails,
-        isReadOnly: isReadOnly
-      }) }}
-    {% elif siteDetails.isPolygonSite %}
-      {{ appPolygonSummary({
-        siteDetails: siteDetails,
-        isReadOnly: isReadOnly
-      }) }}
-    {% else %}
-      {{ appPointCircleSummary({
-        siteDetails: siteDetails,
-        isReadOnly: isReadOnly
-      }) }}
-    {% endif %}
+    {{ appSiteDetailsCard({
+      siteDetails: siteDetails,
+      isReadOnly: isReadOnly
+    }) }}
     {{ appPublicRegisterCard({
       publicRegister: publicRegister,
       isReadOnly: isReadOnly

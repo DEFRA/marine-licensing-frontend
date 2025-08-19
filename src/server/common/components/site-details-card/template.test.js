@@ -48,12 +48,10 @@ const dirname = path.dirname(fileURLToPath(import.meta.url))
  *
  * This replaces the Cheerio-based approach with JSDOM for better DOM API compatibility.
  * This helper can be extracted to a shared test utility if needed across multiple components.
- *
  * @param {string} componentName - Name of the component (e.g., 'site-details-card')
  * @param {object} params - Parameters to pass to the component macro
  * @param {string} [callBlock] - Optional call block content for macro
  * @returns {Document} DOM document for testing with full DOM API support
- *
  * @example
  * const document = renderComponentWithJSDOM('site-details-card', {
  *   siteDetails: { isFileUpload: false },

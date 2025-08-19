@@ -8,6 +8,7 @@ import {
   getPolygonCoordinatesDisplayData
 } from '~/src/server/exemption/site-details/review-site-details/utils.js'
 import { routes } from '~/src/server/common/constants/routes.js'
+import { createSiteDetailsDataJson } from '~/src/server/common/helpers/site-details.js'
 
 const errorMessages = {
   EXEMPTION_NOT_FOUND: 'Exemption not found',
@@ -159,7 +160,12 @@ const processManualSiteDetails = (exemption) => {
   const baseData = {
     isFileUpload: false,
     coordinateSystemText: getCoordinateSystemText(coordinateSystem),
-    reviewSummaryText: getReviewSummaryText(siteDetails)
+    reviewSummaryText: getReviewSummaryText(siteDetails),
+    coordinatesType: 'coordinates',
+    coordinateSystem,
+    coordinatesEntry,
+    coordinates: siteDetails.coordinates,
+    circleWidth: siteDetails.circleWidth
   }
 
   // Handle polygon sites (multiple coordinates)
@@ -222,6 +228,12 @@ export const viewDetailsController = {
       const exemption = payload.value
 
       const siteDetails = processSiteDetails(exemption, exemptionId, request)
+      const coordinateSystem =
+        exemption.siteDetails?.coordinateSystem || 'wgs84'
+      const siteDetailsData = createSiteDetailsDataJson(
+        siteDetails,
+        coordinateSystem
+      )
 
       // Format the page caption with application reference
       const pageCaption = `${exemption.applicationReference} - Exempt activity notification`
@@ -233,7 +245,8 @@ export const viewDetailsController = {
         readOnly: true,
         isReadOnly: true,
         ...exemption,
-        siteDetails
+        siteDetails,
+        siteDetailsData
       })
     } catch (error) {
       if (error.isBoom) {

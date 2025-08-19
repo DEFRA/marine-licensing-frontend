@@ -1,5 +1,6 @@
 {% extends 'layouts/page.njk' %}
 {% from "govuk/components/back-link/macro.njk" import govukBackLink %}
+{% from "site-details-data-script/macro.njk" import appSiteDetailsDataScript %}
 {% from "project-details-card/macro.njk" import appProjectDetailsCard %}
 {% from "activity-dates-card/macro.njk" import appActivityDatesCard %}
 {% from "activity-details-card/macro.njk" import appActivityDetailsCard %}
@@ -7,7 +8,11 @@
 {% from "public-register-card/macro.njk" import appPublicRegisterCard %}
 
 {% block pageTitle %}
-  {{ pageTitle }} - {{ serviceName }}
+  {{ title }} - {{ serviceName }}
+{% endblock %}
+{% block head %}
+  {{ super() }}
+  {{ appSiteDetailsDataScript(siteDetailsData) }}
 {% endblock %}
 
 {% block beforeContent %}
@@ -28,7 +33,7 @@
     {% endif %}
 
     <h1 class="govuk-heading-l" id="view-details-heading">{{ pageTitle }}</h1>
-    
+
     {{ appProjectDetailsCard({
       projectName: projectName,
       isReadOnly: isReadOnly
@@ -49,7 +54,7 @@
       publicRegister: publicRegister,
       isReadOnly: isReadOnly
     }) }}
-    
+
     </div>
   </div>
 {% endblock %}

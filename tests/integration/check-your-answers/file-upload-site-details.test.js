@@ -8,7 +8,7 @@ import { testScenarios } from './fixtures.js'
 
 jest.mock('~/src/server/common/helpers/authenticated-requests.js')
 
-describe('Check Your Answers - File Upload Site Details', () => {
+describe('Check your answers - page content Validation', () => {
   let server
 
   beforeAll(async () => {

@@ -177,5 +177,211 @@ export const testScenarios = [
       },
       submitButton: 'Confirm and send'
     }
+  },
+  {
+    name: 'Manual coordinates - WGS84 single point',
+    exemption: {
+      ...baseExemption,
+      siteDetails: {
+        coordinatesType: 'coordinates',
+        coordinatesEntry: 'single',
+        coordinateSystem: 'wgs84',
+        coordinates: {
+          latitude: '54.726200',
+          longitude: '-1.599400'
+        },
+        circleWidth: '100'
+      }
+    },
+    expectedPageContent: {
+      pageTitle: 'Check your answers before sending your information',
+      backLinkText: 'Go back to your project',
+      summaryCards: [
+        'Project details',
+        'Activity dates',
+        'Activity details',
+        'Site details',
+        'Public register'
+      ],
+      projectDetails: {
+        'Project name': 'Hammersmith pontoon construction'
+      },
+      activityDates: {
+        'Start date': '1 July 2025',
+        'End date': '7 July 2025'
+      },
+      activityDetails: {
+        'Activity description':
+          'We will be installing a pontoon approximately 20 metres squared at the east of our garden that backs onto the river.'
+      },
+      siteDetails: {
+        'Method of providing site location':
+          'Manually enter one set of coordinates and a width to create a circular site',
+        'Coordinates system':
+          'WGS84 (World Geodetic System 1984) Latitude and longitude',
+        'Coordinates at centre of site': '54.726200, -1.599400',
+        'Width of circular site': '100 metres',
+        'Map view': ''
+      },
+      publicRegister: {
+        'Information withheld from public register': 'No'
+      },
+      submitButton: 'Confirm and send'
+    }
+  },
+  {
+    name: 'Manual coordinates - OSGB36 single point',
+    exemption: {
+      ...baseExemption,
+      siteDetails: {
+        coordinatesType: 'coordinates',
+        coordinatesEntry: 'single',
+        coordinateSystem: 'osgb36',
+        coordinates: {
+          eastings: '425053',
+          northings: '564180'
+        },
+        circleWidth: '100'
+      }
+    },
+    expectedPageContent: {
+      pageTitle: 'Check your answers before sending your information',
+      backLinkText: 'Go back to your project',
+      summaryCards: [
+        'Project details',
+        'Activity dates',
+        'Activity details',
+        'Site details',
+        'Public register'
+      ],
+      projectDetails: {
+        'Project name': 'Hammersmith pontoon construction'
+      },
+      activityDates: {
+        'Start date': '1 July 2025',
+        'End date': '7 July 2025'
+      },
+      activityDetails: {
+        'Activity description':
+          'We will be installing a pontoon approximately 20 metres squared at the east of our garden that backs onto the river.'
+      },
+      siteDetails: {
+        'Method of providing site location':
+          'Manually enter one set of coordinates and a width to create a circular site',
+        'Coordinates system': 'OSGB36 (National Grid) Eastings and Northings',
+        'Coordinates at centre of site': '425053, 564180',
+        'Width of circular site': '100 metres',
+        'Map view': ''
+      },
+      publicRegister: {
+        'Information withheld from public register': 'No'
+      },
+      submitButton: 'Confirm and send'
+    }
+  },
+  {
+    name: 'Polygon coordinates - WGS84 multiple points',
+    exemption: {
+      ...baseExemption,
+      siteDetails: {
+        coordinatesType: 'coordinates',
+        coordinatesEntry: 'multiple',
+        coordinateSystem: 'wgs84',
+        coordinates: [
+          { latitude: '54.721000', longitude: '-1.595000' },
+          { latitude: '54.725000', longitude: '-1.590000' },
+          { latitude: '54.729000', longitude: '-1.585000' }
+        ],
+        circleWidth: '100'
+      }
+    },
+    expectedPageContent: {
+      pageTitle: 'Check your answers before sending your information',
+      backLinkText: 'Go back to your project',
+      summaryCards: [
+        'Project details',
+        'Activity dates',
+        'Activity details',
+        'Site details',
+        'Public register'
+      ],
+      projectDetails: {
+        'Project name': 'Hammersmith pontoon construction'
+      },
+      activityDates: {
+        'Start date': '1 July 2025',
+        'End date': '7 July 2025'
+      },
+      activityDetails: {
+        'Activity description':
+          'We will be installing a pontoon approximately 20 metres squared at the east of our garden that backs onto the river.'
+      },
+      siteDetails: {
+        'Method of providing site location':
+          'Manually enter multiple sets of coordinates to mark the boundary of the site',
+        'Coordinates system':
+          'WGS84 (World Geodetic System 1984) Latitude and longitude',
+        'Start and end points': '54.721000, -1.595000',
+        'Point 2': '54.725000, -1.590000',
+        'Point 3': '54.729000, -1.585000',
+        'Map view': ''
+      },
+      publicRegister: {
+        'Information withheld from public register': 'No'
+      },
+      submitButton: 'Confirm and send'
+    }
+  },
+  {
+    name: 'Polygon coordinates - OSGB36 multiple points',
+    exemption: {
+      ...baseExemption,
+      siteDetails: {
+        coordinatesType: 'coordinates',
+        coordinatesEntry: 'multiple',
+        coordinateSystem: 'osgb36',
+        coordinates: [
+          { eastings: '425053', northings: '564180' },
+          { eastings: '426000', northings: '565000' },
+          { eastings: '427000', northings: '566000' }
+        ],
+        circleWidth: '100'
+      }
+    },
+    expectedPageContent: {
+      pageTitle: 'Check your answers before sending your information',
+      backLinkText: 'Go back to your project',
+      summaryCards: [
+        'Project details',
+        'Activity dates',
+        'Activity details',
+        'Site details',
+        'Public register'
+      ],
+      projectDetails: {
+        'Project name': 'Hammersmith pontoon construction'
+      },
+      activityDates: {
+        'Start date': '1 July 2025',
+        'End date': '7 July 2025'
+      },
+      activityDetails: {
+        'Activity description':
+          'We will be installing a pontoon approximately 20 metres squared at the east of our garden that backs onto the river.'
+      },
+      siteDetails: {
+        'Method of providing site location':
+          'Manually enter multiple sets of coordinates to mark the boundary of the site',
+        'Coordinates system': 'OSGB36 (National Grid) Eastings and Northings',
+        'Start and end points': '425053, 564180',
+        'Point 2': '426000, 565000',
+        'Point 3': '427000, 566000',
+        'Map view': ''
+      },
+      publicRegister: {
+        'Information withheld from public register': 'No'
+      },
+      submitButton: 'Confirm and send'
+    }
   }
 ]

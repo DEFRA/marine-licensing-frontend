@@ -1,5 +1,6 @@
 import { formatDate } from '~/src/config/nunjucks/filters/format-date.js'
 import { routes } from '~/src/server/common/constants/routes.js'
+import { EXEMPTION_TYPE } from '~/src/server/common/constants/exemptions.js'
 
 export const getActionButtons = (project) => {
   let buttons = ''
@@ -19,7 +20,7 @@ export const formatProjectsForDisplay = (projects) =>
 
     return [
       { text: project.projectName },
-      { text: project.type },
+      { text: EXEMPTION_TYPE },
       { text: project.applicationReference || '-' },
       {
         html: `<strong class="govuk-tag ${tagClass}">${project.status}</strong>`

@@ -19,3 +19,5 @@ export const OSGB36_CONSTANTS = {
   MIN_NORTHINGS: 100000,
   MAX_NORTHINGS: 9999999
 }
+
+export const EXEMPTION_TYPE = 'Exempt activity notification'

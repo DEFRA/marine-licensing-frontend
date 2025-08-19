@@ -21,7 +21,6 @@ describe('#formatProjectsForDisplay', () => {
       {
         id: 'abc123',
         projectName: 'Test Project',
-        type: 'Exempt activity',
         applicationReference: 'ML-2024-001',
         status: 'Draft',
         submittedAt: '2024-01-15'
@@ -33,7 +32,7 @@ describe('#formatProjectsForDisplay', () => {
     expect(result).toEqual([
       [
         { text: 'Test Project' },
-        { text: 'Exempt activity' },
+        { text: 'Exempt activity notification' },
         { text: 'ML-2024-001' },
         {
           html: '<strong class="govuk-tag govuk-tag--light-blue">Draft</strong>'
@@ -51,7 +50,7 @@ describe('#formatProjectsForDisplay', () => {
       {
         id: 'abc123',
         projectName: 'Test Project',
-        type: 'Exempt activity',
+
         applicationReference: null,
         status: 'Draft',
         submittedAt: null
@@ -63,7 +62,7 @@ describe('#formatProjectsForDisplay', () => {
     expect(result).toEqual([
       [
         { text: 'Test Project' },
-        { text: 'Exempt activity' },
+        { text: 'Exempt activity notification' },
         { text: '-' },
         {
           html: '<strong class="govuk-tag govuk-tag--light-blue">Draft</strong>'
@@ -81,14 +80,14 @@ describe('#formatProjectsForDisplay', () => {
       {
         id: 'abc123',
         projectName: 'Project 1',
-        type: 'Exempt activity',
+
         applicationReference: 'ML-2024-001',
         status: 'Draft',
         submittedAt: '2024-01-15'
       },
       {
         projectName: 'Project 2',
-        type: 'Exempt activity',
+
         applicationReference: 'ML-2024-002',
         status: 'Closed',
         submittedAt: '2024-06-25'
@@ -100,7 +99,7 @@ describe('#formatProjectsForDisplay', () => {
     expect(result).toHaveLength(2)
     expect(result[0]).toEqual([
       { text: 'Project 1' },
-      { text: 'Exempt activity' },
+      { text: 'Exempt activity notification' },
       { text: 'ML-2024-001' },
       {
         html: '<strong class="govuk-tag govuk-tag--light-blue">Draft</strong>'
@@ -112,7 +111,7 @@ describe('#formatProjectsForDisplay', () => {
     ])
     expect(result[1]).toEqual([
       { text: 'Project 2' },
-      { text: 'Exempt activity' },
+      { text: 'Exempt activity notification' },
       { text: 'ML-2024-002' },
       {
         html: '<strong class="govuk-tag govuk-tag--green">Closed</strong>'
@@ -132,14 +131,14 @@ describe('#formatProjectsForDisplay', () => {
     const projects = [
       {
         projectName: 'Test Project',
-        type: 'Exempt activity',
+
         applicationReference: 'ML-2024-001',
         status: 'Draft',
         submittedAt: '2024-01-15'
       },
       {
         projectName: 'Test Project',
-        type: 'Exempt activity',
+
         applicationReference: 'ML-2024-001',
         status: 'Closed',
         submittedAt: '2024-01-15'

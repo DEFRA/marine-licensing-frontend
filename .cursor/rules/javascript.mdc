@@ -32,6 +32,7 @@ globs: *.js
 - Use curly braces for control structures
 - Use constants instead of magic strings and numbers
 - Use child functions when function complexity is greater than ten
+- Only use comments to clarify complex or non-obvious logic
 
 ## Project Structure
 - /src/config/ - Configuration and setup

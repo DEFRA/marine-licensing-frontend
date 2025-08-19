@@ -1,5 +1,5 @@
 import { JSDOM } from 'jsdom'
-import { getByRole, getByText } from '@testing-library/dom'
+import { getByRole, getByText, within } from '@testing-library/dom'
 import { createServer } from '~/src/server/index.js'
 import { statusCodes } from '~/src/server/common/constants/status-codes.js'
 import {
@@ -142,10 +142,52 @@ describe('Multiple sites question page', () => {
       })
     ).toBeInTheDocument()
 
+    const errorSummary = getByRole(document, 'alert')
+    expect(errorSummary).toBeInTheDocument()
+    expect(getByText(errorSummary, 'There is a problem')).toBeInTheDocument()
+
+    const expectedErrors = [
+      {
+        field: 'multipleSitesEnabled',
+        message: 'Select whether you need to tell us about more than one site'
+      }
+    ]
+
+    expectedErrors.forEach(({ field, message, summaryMessage }) => {
+      const summaryList = within(errorSummary).getByRole('list')
+      const summaryLink = within(summaryList).getByText(
+        summaryMessage || message
+      )
+      expect(summaryLink).toBeInTheDocument()
+      expect(summaryLink).toHaveAttribute(
+        'href',
+        expect.stringMatching(new RegExp(`^#${field}`))
+      )
+
+      const fieldContainer = document.getElementById(field)
+      expect(fieldContainer).toBeInTheDocument()
+
+      const errorMessage = getByText(
+        fieldContainer.closest('.govuk-form-group') ?? fieldContainer,
+        message,
+        { exact: false }
+      )
+      expect(errorMessage).toBeInTheDocument()
+
+      const formGroup = fieldContainer.closest('.govuk-form-group')
+      const hasErrorStyling =
+        formGroup?.classList.contains('govuk-form-group--error') ??
+        fieldContainer.querySelectorAll('.govuk-input--error').length > 0
+      expect(hasErrorStyling).toBe(true)
+    })
+
     expect(
       getByText(
         document,
-        'Select whether you need to tell us about more than one site'
+        'Select whether you need to tell us about more than one site',
+        {
+          selector: '.govuk-error-message'
+        }
       )
     ).toBeInTheDocument()
   })

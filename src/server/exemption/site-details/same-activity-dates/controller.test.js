@@ -6,9 +6,6 @@ import {
 } from './controller.js'
 import * as cacheUtils from '~/src/server/common/helpers/session-cache/utils.js'
 import { mockExemption } from '~/src/server/test-helpers/mocks.js'
-import { statusCodes } from '~/src/server/common/constants/status-codes.js'
-import { config } from '~/src/config/config.js'
-import { JSDOM } from 'jsdom'
 import { routes } from '~/src/server/common/constants/routes.js'
 
 jest.mock('~/src/server/common/helpers/session-cache/utils.js')
@@ -45,7 +42,8 @@ describe('#sameActivityDates', () => {
         heading: 'Are the activity dates the same for every site?',
         backLink: routes.SITE_NAME,
         payload: {
-          sameActivityDates: mockExemption.sameActivityDates
+          sameActivityDates:
+            mockExemption.multipleSiteDetails?.sameActivityDates
         },
         projectName: 'Test Project'
       })
@@ -67,48 +65,6 @@ describe('#sameActivityDates', () => {
         payload: { sameActivityDates: undefined },
         projectName: 'Test Project'
       })
-    })
-
-    test('Should provide expected response and correctly pre populate data', async () => {
-      const { result, statusCode } = await server.inject({
-        method: 'GET',
-        url: routes.SAME_ACTIVITY_DATES
-      })
-
-      expect(result).toEqual(
-        expect.stringContaining(
-          `Are the activity dates the same for every site? | ${config.get('serviceName')}`
-        )
-      )
-
-      const { document } = new JSDOM(result).window
-
-      expect(document.querySelector('h1').textContent.trim()).toBe(
-        'Are the activity dates the same for every site?'
-      )
-
-      expect(
-        document.querySelector('.govuk-caption-l').textContent.trim()
-      ).toBe('Test Project')
-
-      expect(document.querySelector('#sameActivityDates').value).toBe('yes')
-      expect(document.querySelector('#sameActivityDates-2').value).toBe('no')
-
-      expect(
-        document
-          .querySelector(`.govuk-back-link[href="${routes.SITE_NAME}"`)
-          .textContent.trim()
-      ).toBe('Back')
-
-      expect(
-        document
-          .querySelector(
-            '.govuk-link[href="/exemption/task-list?cancel=site-details"'
-          )
-          .textContent.trim()
-      ).toBe('Cancel')
-
-      expect(statusCode).toBe(statusCodes.ok)
     })
   })
 
@@ -233,31 +189,17 @@ describe('#sameActivityDates', () => {
         redirect: jest.fn()
       }
 
-      await sameActivityDatesSubmitController.handler(
-        { payload: { sameActivityDates: 'yes' } },
-        h
-      )
-
-      expect(h.redirect).toHaveBeenCalledWith(routes.COORDINATES_ENTRY_CHOICE)
-    })
-
-    test('Should correctly set the cache when submitting', async () => {
-      const h = {
-        redirect: jest.fn().mockReturnValue({
-          takeover: jest.fn()
-        }),
-        view: jest.fn()
+      const mockRequest = {
+        payload: { sameActivityDates: 'yes' }
       }
-
-      const mockRequest = { payload: { sameActivityDates: 'yes' } }
 
       await sameActivityDatesSubmitController.handler(mockRequest, h)
 
-      expect(cacheUtils.updateExemptionSiteDetails).toHaveBeenCalledWith(
-        mockRequest,
-        'sameActivityDates',
-        'yes'
-      )
+      expect(
+        cacheUtils.updateExemptionMultipleSiteDetails
+      ).toHaveBeenCalledWith(mockRequest, 'sameActivityDates', 'yes')
+
+      expect(h.redirect).toHaveBeenCalledWith(routes.COORDINATES_ENTRY_CHOICE)
     })
   })
 })

@@ -9,7 +9,7 @@ describe('#getCoordinatesEntryBackLink', () => {
 
     const result = getCoordinatesEntryBackLink(exemption)
 
-    expect(result).toBe(routes.SITE_NAME)
+    expect(result).toBe(routes.SAME_ACTIVITY_DATES)
   })
 
   test('should return correct route when multipleSitesEnabled is false', () => {

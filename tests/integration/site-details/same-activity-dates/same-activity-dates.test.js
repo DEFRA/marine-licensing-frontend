@@ -4,8 +4,7 @@ import { createServer } from '~/src/server/index.js'
 import { statusCodes } from '~/src/server/common/constants/status-codes.js'
 import {
   getExemptionCache,
-  updateExemptionSiteDetails,
-  setExemptionCache
+  updateExemptionMultipleSiteDetails
 } from '~/src/server/common/helpers/session-cache/utils.js'
 
 jest.mock('~/src/server/common/helpers/session-cache/utils.js')
@@ -15,12 +14,14 @@ describe('Same activity dates page', () => {
 
   const mockExemption = {
     id: 'test-exemption-123',
-    projectName: 'Test Project'
+    projectName: 'Test Project',
+    multipleSiteDetails: {
+      multipleSitesEnabled: true
+    }
   }
 
   jest.mocked(getExemptionCache).mockReturnValue(mockExemption)
-  jest.mocked(updateExemptionSiteDetails).mockReturnValue({})
-  jest.mocked(setExemptionCache).mockReturnValue({})
+  jest.mocked(updateExemptionMultipleSiteDetails).mockReturnValue({})
 
   beforeAll(async () => {
     server = await createServer()
@@ -49,15 +50,16 @@ describe('Same activity dates page', () => {
     ).toBeInTheDocument()
     expect(getByText(document, mockExemption.projectName)).toBeInTheDocument()
 
-    const yesRadio = document.querySelector('input[value="yes"]')
-    expect(yesRadio).toBeInTheDocument()
+    const yesRadio = getByRole(document, 'radio', {
+      name: 'Yes, the dates are the same for every site.'
+    })
     expect(yesRadio).toHaveAttribute('type', 'radio')
 
-    const noRadio = document.querySelector('input[value="no"]')
-    expect(noRadio).toBeInTheDocument()
+    const noRadio = getByRole(document, 'radio', {
+      name: 'No, at least one site has different dates.'
+    })
     expect(noRadio).toHaveAttribute('type', 'radio')
 
-    // Check radio labels and hints
     expect(
       getByText(document, 'Yes, the dates are the same for every site.')
     ).toBeInTheDocument()
@@ -77,13 +79,16 @@ describe('Same activity dates page', () => {
     expect(getByRole(document, 'link', { name: 'Cancel' })).toBeInTheDocument()
     expect(getByRole(document, 'link', { name: 'Back' })).toBeInTheDocument()
 
-    expect(setExemptionCache).not.toHaveBeenCalled()
+    expect(updateExemptionMultipleSiteDetails).not.toHaveBeenCalled()
   })
 
   test('should pre-populate radio when sameActivityDates value exists in cache', async () => {
     jest.mocked(getExemptionCache).mockReturnValue({
       ...mockExemption,
-      sameActivityDates: 'yes'
+      multipleSiteDetails: {
+        ...mockExemption.multipleSiteDetails,
+        sameActivityDates: 'yes'
+      }
     })
 
     const { result, statusCode } = await server.inject({
@@ -105,7 +110,7 @@ describe('Same activity dates page', () => {
     })
     expect(noRadio).not.toBeChecked()
 
-    expect(setExemptionCache).not.toHaveBeenCalled()
+    expect(updateExemptionMultipleSiteDetails).not.toHaveBeenCalled()
   })
 
   test('should have correct navigation links', async () => {
@@ -168,7 +173,7 @@ describe('Same activity dates page', () => {
       '/exemption/how-do-you-want-to-enter-the-coordinates'
     )
 
-    expect(updateExemptionSiteDetails).toHaveBeenCalledWith(
+    expect(updateExemptionMultipleSiteDetails).toHaveBeenCalledWith(
       expect.any(Object),
       'sameActivityDates',
       'yes'
@@ -189,7 +194,7 @@ describe('Same activity dates page', () => {
       '/exemption/how-do-you-want-to-enter-the-coordinates'
     )
 
-    expect(updateExemptionSiteDetails).toHaveBeenCalledWith(
+    expect(updateExemptionMultipleSiteDetails).toHaveBeenCalledWith(
       expect.any(Object),
       'sameActivityDates',
       'no'

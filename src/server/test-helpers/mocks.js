@@ -17,7 +17,10 @@ export const mockExemption = {
   },
   activityDescription: 'Test activity description',
   publicRegister: { consent: 'yes', reason: 'Test reason' },
-  multipleSiteDetails: { multipleSitesEnabled: false },
+  multipleSiteDetails: {
+    multipleSitesEnabled: false,
+    sameActivityDates: 'yes'
+  },
   siteDetails: {
     coordinatesType: 'coordinates',
     coordinatesEntry: 'single',

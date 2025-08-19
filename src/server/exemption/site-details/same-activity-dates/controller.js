@@ -1,6 +1,6 @@
 import {
   getExemptionCache,
-  updateExemptionSiteDetails
+  updateExemptionMultipleSiteDetails
 } from '~/src/server/common/helpers/session-cache/utils.js'
 import { routes } from '~/src/server/common/constants/routes.js'
 import {
@@ -67,7 +67,7 @@ export const sameActivityDatesController = {
       backLink: routes.SITE_NAME,
       projectName: exemption.projectName,
       payload: {
-        sameActivityDates: exemption.sameActivityDates
+        sameActivityDates: exemption.multipleSiteDetails?.sameActivityDates
       }
     })
   }
@@ -93,7 +93,7 @@ export const sameActivityDatesSubmitController = {
   handler(request, h) {
     const { payload } = request
 
-    updateExemptionSiteDetails(
+    updateExemptionMultipleSiteDetails(
       request,
       'sameActivityDates',
       payload.sameActivityDates

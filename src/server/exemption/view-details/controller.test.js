@@ -253,6 +253,142 @@ describe('view details controller', () => {
         )
       })
 
+      test('should handle file upload data error and use fallback', async () => {
+        const getFileUploadSummaryDataSpy = jest
+          .spyOn(reviewUtils, 'getFileUploadSummaryData')
+          .mockImplementation(() => {
+            throw new Error('File upload data processing error')
+          })
+
+        const fileUploadExemption = createFileUploadExemption(
+          'shapefile',
+          'test-boundary.zip',
+          {
+            siteDetails: {
+              coordinatesType: 'file',
+              fileUploadType: 'shapefile'
+            }
+          }
+        )
+        authenticatedGetRequestSpy.mockResolvedValue({
+          payload: { value: fileUploadExemption }
+        })
+
+        const mockRequest = {
+          params: { exemptionId: validExemptionId },
+          logger: { error: jest.fn() }
+        }
+        const mockH = { view: jest.fn() }
+
+        await viewDetailsController.handler(mockRequest, mockH)
+
+        expect(getFileUploadSummaryDataSpy).toHaveBeenCalledWith(
+          fileUploadExemption
+        )
+
+        expect(mockRequest.logger.error).toHaveBeenCalledWith(
+          {
+            error: 'File upload data processing error',
+            exemptionId: validExemptionId
+          },
+          'Error getting file upload summary data'
+        )
+
+        expect(mockH.view).toHaveBeenCalledWith(
+          VIEW_DETAILS_VIEW_ROUTE,
+          expect.objectContaining({
+            siteDetails: expect.objectContaining({
+              isFileUpload: true,
+              method: 'Upload a file with the coordinates of the site',
+              fileType: 'Shapefile',
+              filename: 'Unknown file'
+            })
+          })
+        )
+
+        getFileUploadSummaryDataSpy.mockRestore()
+      })
+
+      test('should handle file upload data error with KML file type fallback', async () => {
+        const getFileUploadSummaryDataSpy = jest
+          .spyOn(reviewUtils, 'getFileUploadSummaryData')
+          .mockImplementation(() => {
+            throw new Error('KML processing error')
+          })
+
+        const kmlFileUploadExemption = createFileUploadExemption(
+          'kml',
+          'test-area.kml',
+          {
+            siteDetails: { coordinatesType: 'file', fileUploadType: 'kml' }
+          }
+        )
+        authenticatedGetRequestSpy.mockResolvedValue({
+          payload: { value: kmlFileUploadExemption }
+        })
+
+        const mockRequest = {
+          params: { exemptionId: validExemptionId },
+          logger: { error: jest.fn() }
+        }
+        const mockH = { view: jest.fn() }
+
+        await viewDetailsController.handler(mockRequest, mockH)
+
+        expect(mockRequest.logger.error).toHaveBeenCalledWith(
+          {
+            error: 'KML processing error',
+            exemptionId: validExemptionId
+          },
+          'Error getting file upload summary data'
+        )
+
+        expect(mockH.view).toHaveBeenCalledWith(
+          VIEW_DETAILS_VIEW_ROUTE,
+          expect.objectContaining({
+            siteDetails: expect.objectContaining({
+              isFileUpload: true,
+              method: 'Upload a file with the coordinates of the site',
+              fileType: 'KML',
+              filename: 'Unknown file'
+            })
+          })
+        )
+
+        getFileUploadSummaryDataSpy.mockRestore()
+      })
+
+      test('should handle non-Boom errors', async () => {
+        const submittedExemption = createSubmittedExemption()
+        authenticatedGetRequestSpy.mockResolvedValue({
+          payload: { value: submittedExemption }
+        })
+
+        const mockError = new Error('Site details processing failed')
+        const mockH = { view: jest.fn() }
+
+        mockH.view.mockImplementation(() => {
+          throw mockError
+        })
+
+        const mockRequest = {
+          params: { exemptionId: validExemptionId },
+          logger: { error: jest.fn() }
+        }
+
+        await expect(
+          viewDetailsController.handler(mockRequest, mockH)
+        ).rejects.toThrow('Error displaying exemption details')
+
+        expect(mockRequest.logger.error).toHaveBeenCalledWith(
+          {
+            message: 'Site details processing failed',
+            exemptionId: validExemptionId
+          },
+          'Error displaying exemption details'
+        )
+      })
+
       test('should handle missing exemption ID in params', async () => {
         const mockRequest = {
           params: {},

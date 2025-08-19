@@ -62,7 +62,7 @@ describe('#taskListController', () => {
     )
 
     expect(document.querySelector('.govuk-caption-l').textContent.trim()).toBe(
-      'Exempt activity'
+      'Exempt activity notification'
     )
 
     expect(
@@ -99,6 +99,7 @@ describe('#taskListController', () => {
     expect(h.view).toHaveBeenCalledWith(TASK_LIST_VIEW_ROUTE, {
       pageTitle: 'Task list',
       heading: 'Task list',
+      type: 'Exempt activity notification',
       projectName: 'Test Project',
       taskList: [
         {

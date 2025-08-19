@@ -75,7 +75,7 @@ describe('#dashboard', () => {
         {
           id: 'abc123',
           projectName: 'Test Project',
-          type: 'Exempt activity',
+
           reference: 'ML-2024-001',
           status: 'Draft',
           submittedAt: null
@@ -87,7 +87,7 @@ describe('#dashboard', () => {
       expect(expectedFormattedProjects).toEqual([
         [
           { text: 'Test Project' },
-          { text: 'Exempt activity' },
+          { text: 'Exempt activity notification' },
           { text: '-' },
           {
             html: '<strong class="govuk-tag govuk-tag--light-blue">Draft</strong>'
@@ -137,14 +137,14 @@ describe('#dashboard', () => {
       const projects = [
         {
           projectName: 'Test Project 1',
-          type: 'Exempt activity',
+
           reference: 'ML-2024-001',
           status: 'Draft',
           submittedAt: null
         },
         {
           projectName: 'Test Project 2',
-          type: 'Exempt activity',
+
           reference: 'ML-2024-002',
           status: 'Closed',
           submittedAt: '2024-01-15'
@@ -206,7 +206,7 @@ describe('#dashboard', () => {
     test('Should display Continue link for draft exemptions pointing to /exemption/task-list/{id}', async () => {
       const draftExemption = {
         projectName: 'Draft Exemption',
-        type: 'Exempt activity',
+
         reference: 'ML-2024-003',
         status: 'Draft',
         submittedAt: null,

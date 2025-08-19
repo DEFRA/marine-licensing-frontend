@@ -55,6 +55,7 @@ export const taskListController = {
       activityDescription,
       projectName,
       publicRegister,
+      multipleSiteDetails,
       siteDetails
     } = payload.value
 
@@ -69,6 +70,7 @@ export const taskListController = {
       activityDescription,
       projectName,
       publicRegister,
+      multipleSiteDetails,
       siteDetails
     })
 

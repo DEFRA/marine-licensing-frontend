@@ -10,7 +10,7 @@ import {
 
 jest.mock('~/src/server/common/helpers/session-cache/utils.js')
 
-describe('Site name page', () => {
+describe('Same activity dates page', () => {
   let server
 
   const mockExemption = {
@@ -31,10 +31,10 @@ describe('Site name page', () => {
     await server.stop()
   })
 
-  test('should display the site name page with correct content', async () => {
+  test('should display the same activity dates page with correct content', async () => {
     const { result, statusCode } = await server.inject({
       method: 'GET',
-      url: '/exemption/site-name'
+      url: '/exemption/same-activity-dates'
     })
 
     expect(statusCode).toBe(statusCodes.ok)
@@ -44,15 +44,32 @@ describe('Site name page', () => {
     expect(
       getByRole(document, 'heading', {
         level: 1,
-        name: 'Site name'
+        name: 'Are the activity dates the same for every site?'
       })
     ).toBeInTheDocument()
     expect(getByText(document, mockExemption.projectName)).toBeInTheDocument()
-    expect(getByText(document, 'Site 1')).toBeInTheDocument()
 
-    const siteNameInput = document.querySelector('input[name="siteName"]')
-    expect(siteNameInput).toBeInTheDocument()
-    expect(siteNameInput).toHaveAttribute('type', 'text')
+    const yesRadio = document.querySelector('input[value="yes"]')
+    expect(yesRadio).toBeInTheDocument()
+    expect(yesRadio).toHaveAttribute('type', 'radio')
+
+    const noRadio = document.querySelector('input[value="no"]')
+    expect(noRadio).toBeInTheDocument()
+    expect(noRadio).toHaveAttribute('type', 'radio')
+
+    // Check radio labels and hints
+    expect(
+      getByText(document, 'Yes, the dates are the same for every site.')
+    ).toBeInTheDocument()
+    expect(
+      getByText(document, "You'll only need to enter the dates once")
+    ).toBeInTheDocument()
+    expect(
+      getByText(document, 'No, at least one site has different dates.')
+    ).toBeInTheDocument()
+    expect(
+      getByText(document, "You'll need to enter dates for each site")
+    ).toBeInTheDocument()
 
     expect(
       getByRole(document, 'button', { name: 'Continue' })
@@ -63,23 +80,30 @@ describe('Site name page', () => {
     expect(setExemptionCache).not.toHaveBeenCalled()
   })
 
-  test('should pre-populate input when siteName value exists in cache', async () => {
+  test('should pre-populate radio when sameActivityDates value exists in cache', async () => {
     jest.mocked(getExemptionCache).mockReturnValue({
       ...mockExemption,
-      siteDetails: { ...mockExemption.siteDetails, siteName: 'Test Site' }
+      sameActivityDates: 'yes'
     })
 
     const { result, statusCode } = await server.inject({
       method: 'GET',
-      url: '/exemption/site-name'
+      url: '/exemption/same-activity-dates'
     })
 
     expect(statusCode).toBe(statusCodes.ok)
 
     const { document } = new JSDOM(result).window
 
-    const siteNameInput = document.querySelector('input[name="siteName"]')
-    expect(siteNameInput).toHaveValue('Test Site')
+    const yesRadio = getByRole(document, 'radio', {
+      name: 'Yes, the dates are the same for every site.'
+    })
+    expect(yesRadio).toBeChecked()
+
+    const noRadio = getByRole(document, 'radio', {
+      name: 'No, at least one site has different dates.'
+    })
+    expect(noRadio).not.toBeChecked()
 
     expect(setExemptionCache).not.toHaveBeenCalled()
   })
@@ -87,7 +111,7 @@ describe('Site name page', () => {
   test('should have correct navigation links', async () => {
     const { result } = await server.inject({
       method: 'GET',
-      url: '/exemption/site-name'
+      url: '/exemption/same-activity-dates'
     })
 
     const { document } = new JSDOM(result).window
@@ -96,19 +120,19 @@ describe('Site name page', () => {
     expect(continueButton).toBeInTheDocument()
 
     const cancelLink = getByRole(document, 'link', { name: 'Cancel' })
-    expect(cancelLink).toHaveAttribute('href', '/exemption/task-list')
+    expect(cancelLink).toHaveAttribute(
+      'href',
+      '/exemption/task-list?cancel=site-details'
+    )
 
     const backLink = getByRole(document, 'link', { name: 'Back' })
-    expect(backLink).toHaveAttribute(
-      'href',
-      '/exemption/does-your-project-involve-more-than-one-site'
-    )
+    expect(backLink).toHaveAttribute('href', '/exemption/site-name')
   })
 
-  test('should stay on same page when continue is clicked without entering site name', async () => {
+  test('should stay on same page when continue is clicked without selecting an option', async () => {
     const { result, statusCode } = await server.inject({
       method: 'POST',
-      url: '/exemption/site-name',
+      url: '/exemption/same-activity-dates',
       payload: {}
     })
 
@@ -119,69 +143,63 @@ describe('Site name page', () => {
     expect(
       getByRole(document, 'heading', {
         level: 1,
-        name: 'Site name'
+        name: 'Are the activity dates the same for every site?'
       })
     ).toBeInTheDocument()
-    expect(getByText(document, 'Site 1')).toBeInTheDocument()
-
-    const errorMessage = document.querySelector('.govuk-error-message')
-    expect(errorMessage).toBeInTheDocument()
-    expect(errorMessage.textContent).toContain('Enter the site name')
-  })
-
-  test('should stay on same page when site name is too long', async () => {
-    const siteName = 'A'.repeat(251)
-
-    const { result, statusCode } = await server.inject({
-      method: 'POST',
-      url: '/exemption/site-name',
-      payload: {
-        siteName
-      }
-    })
-
-    expect(statusCode).toBe(statusCodes.ok)
-
-    const { document } = new JSDOM(result).window
-
-    expect(
-      getByRole(document, 'heading', {
-        level: 1,
-        name: 'Site name'
-      })
-    ).toBeInTheDocument()
-    expect(getByText(document, 'Site 1')).toBeInTheDocument()
 
     const errorMessage = document.querySelector('.govuk-error-message')
     expect(errorMessage).toBeInTheDocument()
     expect(errorMessage.textContent).toContain(
-      'Site name should be 250 characters or less'
+      'Select whether the activity dates are the same for every site'
     )
   })
 
-  test('should redirect to same activity dates when valid site name is submitted', async () => {
+  test('should redirect to coordinates entry choice when "yes" is selected', async () => {
     const response = await server.inject({
       method: 'POST',
-      url: '/exemption/site-name',
+      url: '/exemption/same-activity-dates',
       payload: {
-        siteName: 'Test Site Name'
+        sameActivityDates: 'yes'
       }
     })
 
     expect(response.statusCode).toBe(statusCodes.redirect)
-    expect(response.headers.location).toBe('/exemption/same-activity-dates')
+    expect(response.headers.location).toBe(
+      '/exemption/how-do-you-want-to-enter-the-coordinates'
+    )
 
     expect(updateExemptionSiteDetails).toHaveBeenCalledWith(
       expect.any(Object),
-      'siteName',
-      'Test Site Name'
+      'sameActivityDates',
+      'yes'
+    )
+  })
+
+  test('should redirect to coordinates entry choice when "no" is selected', async () => {
+    const response = await server.inject({
+      method: 'POST',
+      url: '/exemption/same-activity-dates',
+      payload: {
+        sameActivityDates: 'no'
+      }
+    })
+
+    expect(response.statusCode).toBe(statusCodes.redirect)
+    expect(response.headers.location).toBe(
+      '/exemption/how-do-you-want-to-enter-the-coordinates'
+    )
+
+    expect(updateExemptionSiteDetails).toHaveBeenCalledWith(
+      expect.any(Object),
+      'sameActivityDates',
+      'no'
     )
   })
 
   test('should redirect to task list when cancel is clicked', async () => {
     const { result, statusCode } = await server.inject({
       method: 'GET',
-      url: '/exemption/site-name'
+      url: '/exemption/same-activity-dates'
     })
 
     expect(statusCode).toBe(statusCodes.ok)
@@ -189,6 +207,9 @@ describe('Site name page', () => {
     const { document } = new JSDOM(result).window
 
     const cancelLink = getByRole(document, 'link', { name: 'Cancel' })
-    expect(cancelLink).toHaveAttribute('href', '/exemption/task-list')
+    expect(cancelLink).toHaveAttribute(
+      'href',
+      '/exemption/task-list?cancel=site-details'
+    )
   })
 })

@@ -92,6 +92,6 @@ export const siteNameSubmitController = {
 
     updateExemptionSiteDetails(request, 'siteName', payload.siteName)
 
-    return h.redirect(routes.COORDINATES_ENTRY_CHOICE)
+    return h.redirect(routes.SAME_ACTIVITY_DATES)
   }
 }

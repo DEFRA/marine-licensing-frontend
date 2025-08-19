@@ -18,6 +18,10 @@ describe('Site name page', () => {
     projectName: 'Test Project'
   }
 
+  jest.mocked(getExemptionCache).mockReturnValue(mockExemption)
+  jest.mocked(updateExemptionSiteDetails).mockReturnValue({})
+  jest.mocked(setExemptionCache).mockReturnValue({})
+
   beforeAll(async () => {
     server = await createServer()
     await server.initialize()
@@ -25,13 +29,6 @@ describe('Site name page', () => {
 
   afterAll(async () => {
     await server.stop()
-  })
-
-  beforeEach(() => {
-    jest.resetAllMocks()
-    jest.mocked(getExemptionCache).mockReturnValue(mockExemption)
-    jest.mocked(updateExemptionSiteDetails).mockReturnValue({})
-    jest.mocked(setExemptionCache).mockReturnValue({})
   })
 
   test('should display the site name page with correct content', async () => {
@@ -69,7 +66,7 @@ describe('Site name page', () => {
   test('should pre-populate input when siteName value exists in cache', async () => {
     jest.mocked(getExemptionCache).mockReturnValue({
       ...mockExemption,
-      siteName: 'Test Site'
+      siteDetails: { ...mockExemption.siteDetails, siteName: 'Test Site' }
     })
 
     const { result, statusCode } = await server.inject({

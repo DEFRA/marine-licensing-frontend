@@ -68,7 +68,7 @@ export const siteNameController = {
       projectName: exemption.projectName,
       siteNumber,
       payload: {
-        siteName: exemption.siteName
+        siteName: exemption.siteDetails?.siteName
       }
     })
   }

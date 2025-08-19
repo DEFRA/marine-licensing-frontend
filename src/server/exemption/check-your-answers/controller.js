@@ -13,13 +13,15 @@ import {
 import { routes } from '~/src/server/common/constants/routes.js'
 import { createSiteDetailsDataJson } from '~/src/server/common/helpers/site-details.js'
 import { getCoordinateSystem } from '~/src/server/common/helpers/coordinate-utils.js'
+import { getUserSession } from '~/src/server/common/plugins/auth/utils.js'
 
 const errorMessages = {
   EXEMPTION_NOT_FOUND: 'Exemption not found',
   EXEMPTION_DATA_NOT_FOUND: 'Exemption data not found',
   SUBMISSION_FAILED: 'Error submitting exemption',
   FILE_UPLOAD_DATA_ERROR: 'Error getting file upload summary data',
-  UNEXPECTED_API_RESPONSE: 'Unexpected API response format'
+  UNEXPECTED_API_RESPONSE: 'Unexpected API response format',
+  USER_SESSION_NOT_FOUND: 'User session not found'
 }
 
 const apiPaths = {
@@ -178,10 +180,21 @@ export const checkYourAnswersSubmitController = {
     await validateAndFetchExemption(request, exemption)
 
     try {
+      const { displayName, email } = await getUserSession(
+        request,
+        request.state?.userSession
+      )
+      if (!displayName || !email) {
+        throw new Error(errorMessages.USER_SESSION_NOT_FOUND)
+      }
       const { payload: response } = await authenticatedPostRequest(
         request,
         apiPaths.submitExemption,
-        { id }
+        {
+          id,
+          userName: displayName,
+          userEmail: email
+        }
       )
 
       if (response?.message === 'success' && response?.value) {

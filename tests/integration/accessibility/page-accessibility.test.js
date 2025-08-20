@@ -99,6 +99,7 @@ describe('Page accessibility checks (Axe)', () => {
       url: `${routes.CONFIRMATION}?applicationReference=123`,
       title: 'Application complete'
     },
+    { url: routes.SITE_NAME, title: 'Site name' },
     { url: routes.DASHBOARD, title: 'Your projects' },
     { url: routes.SITE_DETAILS, title: 'Site details' }
   ]

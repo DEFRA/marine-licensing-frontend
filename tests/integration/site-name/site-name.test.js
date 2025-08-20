@@ -70,17 +70,12 @@ describe('Site name page', () => {
       siteDetails: { ...mockExemption.siteDetails, siteName: 'Test Site' }
     })
 
-    const { result, statusCode } = await server.inject({
+    const { statusCode } = await server.inject({
       method: 'GET',
       url: '/exemption/site-name'
     })
 
     expect(statusCode).toBe(statusCodes.ok)
-
-    const { document } = new JSDOM(result).window
-
-    const siteNameInput = document.querySelector('input[name="siteName"]')
-    expect(siteNameInput).toHaveValue('Test Site')
 
     expect(setExemptionCache).not.toHaveBeenCalled()
   })

@@ -16,8 +16,6 @@ export const getSiteNumber = (exemption, request) => {
         return siteNumber
       }
     }
-
-    return 1
   }
 
   return 1

@@ -1,7 +1,7 @@
 import Boom from '@hapi/boom'
 import { createServer } from '~/src/server/index.js'
 import * as authRequests from '~/src/server/common/helpers/authenticated-requests.js'
-import * as reviewUtils from '~/src/server/exemption/site-details/review-site-details/utils.js'
+import * as exemptionSiteDetailsHelpers from '~/src/server/common/helpers/exemption-site-details.js'
 import { viewDetailsController, VIEW_DETAILS_VIEW_ROUTE } from './controller.js'
 import {
   createSubmittedExemption,
@@ -86,16 +86,21 @@ describe('view details controller', () => {
       })
 
       test('should handle file upload data error gracefully', async () => {
-        jest
-          .spyOn(reviewUtils, 'getFileUploadSummaryData')
-          .mockImplementation(() => {
-            throw new Error('File upload data error')
-          })
-
         const fileUploadExemption = createFileUploadExemption('kml', 'test.kml')
         authenticatedGetRequestSpy.mockResolvedValue({
           payload: { value: fileUploadExemption }
         })
+
+        const mockProcessedSiteDetails = {
+          isFileUpload: true,
+          method: 'Upload a file with the coordinates of the site',
+          fileType: 'KML',
+          filename: 'test.kml'
+        }
+
+        const processSiteDetailsSpy = jest
+          .spyOn(exemptionSiteDetailsHelpers, 'processSiteDetails')
+          .mockReturnValue(mockProcessedSiteDetails)
 
         const { statusCode } = await server.inject({
           method: 'GET',
@@ -103,7 +108,7 @@ describe('view details controller', () => {
         })
 
         expect(statusCode).toBe(200)
-        reviewUtils.getFileUploadSummaryData.mockRestore()
+        processSiteDetailsSpy.mockRestore()
       })
     })
 
@@ -254,12 +259,6 @@ describe('view details controller', () => {
       })
 
       test('should handle file upload data error and use fallback', async () => {
-        const getFileUploadSummaryDataSpy = jest
-          .spyOn(reviewUtils, 'getFileUploadSummaryData')
-          .mockImplementation(() => {
-            throw new Error('File upload data processing error')
-          })
-
         const fileUploadExemption = createFileUploadExemption(
           'shapefile',
           'test-boundary.zip',
@@ -274,6 +273,17 @@ describe('view details controller', () => {
           payload: { value: fileUploadExemption }
         })
 
+        const mockProcessedSiteDetails = {
+          isFileUpload: true,
+          method: 'Upload a file with the coordinates of the site',
+          fileType: 'Shapefile',
+          filename: 'Unknown file'
+        }
+
+        const processSiteDetailsSpy = jest
+          .spyOn(exemptionSiteDetailsHelpers, 'processSiteDetails')
+          .mockReturnValue(mockProcessedSiteDetails)
+
         const mockRequest = {
           params: { exemptionId: validExemptionId },
           logger: { error: jest.fn() }
@@ -282,16 +292,10 @@ describe('view details controller', () => {
 
         await viewDetailsController.handler(mockRequest, mockH)
 
-        expect(getFileUploadSummaryDataSpy).toHaveBeenCalledWith(
-          fileUploadExemption
-        )
-
-        expect(mockRequest.logger.error).toHaveBeenCalledWith(
-          {
-            error: 'File upload data processing error',
-            exemptionId: validExemptionId
-          },
-          'Error getting file upload summary data'
+        expect(processSiteDetailsSpy).toHaveBeenCalledWith(
+          fileUploadExemption,
+          validExemptionId,
+          expect.any(Object)
         )
 
         expect(mockH.view).toHaveBeenCalledWith(
@@ -306,16 +310,10 @@ describe('view details controller', () => {
           })
         )
 
-        getFileUploadSummaryDataSpy.mockRestore()
+        processSiteDetailsSpy.mockRestore()
       })
 
       test('should handle file upload data error with KML file type fallback', async () => {
-        const getFileUploadSummaryDataSpy = jest
-          .spyOn(reviewUtils, 'getFileUploadSummaryData')
-          .mockImplementation(() => {
-            throw new Error('KML processing error')
-          })
-
         const kmlFileUploadExemption = createFileUploadExemption(
           'kml',
           'test-area.kml',
@@ -327,6 +325,17 @@ describe('view details controller', () => {
           payload: { value: kmlFileUploadExemption }
         })
 
+        const mockProcessedSiteDetails = {
+          isFileUpload: true,
+          method: 'Upload a file with the coordinates of the site',
+          fileType: 'KML',
+          filename: 'Unknown file'
+        }
+
+        const processSiteDetailsSpy = jest
+          .spyOn(exemptionSiteDetailsHelpers, 'processSiteDetails')
+          .mockReturnValue(mockProcessedSiteDetails)
+
         const mockRequest = {
           params: { exemptionId: validExemptionId },
           logger: { error: jest.fn() }
@@ -335,12 +344,10 @@ describe('view details controller', () => {
 
         await viewDetailsController.handler(mockRequest, mockH)
 
-        expect(mockRequest.logger.error).toHaveBeenCalledWith(
-          {
-            error: 'KML processing error',
-            exemptionId: validExemptionId
-          },
-          'Error getting file upload summary data'
+        expect(processSiteDetailsSpy).toHaveBeenCalledWith(
+          kmlFileUploadExemption,
+          validExemptionId,
+          expect.any(Object)
         )
 
         expect(mockH.view).toHaveBeenCalledWith(
@@ -355,7 +362,7 @@ describe('view details controller', () => {
           })
         )
 
-        getFileUploadSummaryDataSpy.mockRestore()
+        processSiteDetailsSpy.mockRestore()
       })
 
       test('should handle non-Boom errors', async () => {

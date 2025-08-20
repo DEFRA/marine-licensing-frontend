@@ -3,7 +3,7 @@ import { createServer } from '~/src/server/index.js'
 import { mockExemption } from '~/src/server/test-helpers/mocks.js'
 import * as authRequests from '~/src/server/common/helpers/authenticated-requests.js'
 import * as authUtils from '~/src/server/common/plugins/auth/utils.js'
-import * as reviewUtils from '~/src/server/exemption/site-details/review-site-details/utils.js'
+import * as exemptionSiteDetailsHelpers from '~/src/server/common/helpers/exemption-site-details.js'
 
 const mockUserSession = {
   displayName: 'John Doe',
@@ -373,12 +373,16 @@ describe('check your answers controller', () => {
 
       getExemptionCacheSpy.mockReturnValueOnce(fileUploadExemption)
 
-      const mockError = new Error('File processing error')
-      const getFileUploadSummaryDataSpy = jest
-        .spyOn(reviewUtils, 'getFileUploadSummaryData')
-        .mockImplementation(() => {
-          throw mockError
-        })
+      const mockProcessedSiteDetails = {
+        isFileUpload: true,
+        method: 'Upload a file with the coordinates of the site',
+        fileType: 'KML',
+        filename: 'test.kml'
+      }
+
+      const processSiteDetailsSpy = jest
+        .spyOn(exemptionSiteDetailsHelpers, 'processSiteDetails')
+        .mockReturnValue(mockProcessedSiteDetails)
 
       const { statusCode } = await server.inject({
         method: 'GET',
@@ -386,10 +390,12 @@ describe('check your answers controller', () => {
       })
 
       expect(statusCode).toBe(200)
-      expect(getFileUploadSummaryDataSpy).toHaveBeenCalledWith(
-        fileUploadExemption
+      expect(processSiteDetailsSpy).toHaveBeenCalledWith(
+        fileUploadExemption,
+        fileUploadExemption.id,
+        expect.any(Object)
       )
-      getFileUploadSummaryDataSpy.mockRestore()
+      processSiteDetailsSpy.mockRestore()
     })
 
     test('Should handle file upload processing error and use Shapefile and Unknown file fallbacks', async () => {
@@ -397,7 +403,7 @@ describe('check your answers controller', () => {
         ...mockExemption,
         siteDetails: {
           coordinatesType: 'file',
-          fileUploadType: 'shapefile', // This should trigger 'Shapefile' fallback
+          fileUploadType: 'shapefile',
           uploadedFile: {
             // No filename property - this should trigger 'Unknown file' fallback
           }
@@ -406,12 +412,16 @@ describe('check your answers controller', () => {
 
       getExemptionCacheSpy.mockReturnValueOnce(shapefileExemption)
 
-      const mockError = new Error('Shapefile processing error')
-      const getFileUploadSummaryDataSpy = jest
-        .spyOn(reviewUtils, 'getFileUploadSummaryData')
-        .mockImplementation(() => {
-          throw mockError
-        })
+      const mockProcessedSiteDetails = {
+        isFileUpload: true,
+        method: 'Upload a file with the coordinates of the site',
+        fileType: 'Shapefile',
+        filename: 'Unknown file'
+      }
+
+      const processSiteDetailsSpy = jest
+        .spyOn(exemptionSiteDetailsHelpers, 'processSiteDetails')
+        .mockReturnValue(mockProcessedSiteDetails)
 
       const { statusCode } = await server.inject({
         method: 'GET',
@@ -419,10 +429,12 @@ describe('check your answers controller', () => {
       })
 
       expect(statusCode).toBe(200)
-      expect(getFileUploadSummaryDataSpy).toHaveBeenCalledWith(
-        shapefileExemption
+      expect(processSiteDetailsSpy).toHaveBeenCalledWith(
+        shapefileExemption,
+        shapefileExemption.id,
+        expect.any(Object)
       )
-      getFileUploadSummaryDataSpy.mockRestore()
+      processSiteDetailsSpy.mockRestore()
     })
   })
 })

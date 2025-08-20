@@ -1,22 +1,19 @@
 import Boom from '@hapi/boom'
 import { authenticatedGetRequest } from '~/src/server/common/helpers/authenticated-requests.js'
-import {
-  getCoordinateSystemText,
-  getCoordinateDisplayText,
-  getReviewSummaryText,
-  getFileUploadSummaryData,
-  getPolygonCoordinatesDisplayData
-} from '~/src/server/exemption/site-details/review-site-details/utils.js'
 import { routes } from '~/src/server/common/constants/routes.js'
 import { createSiteDetailsDataJson } from '~/src/server/common/helpers/site-details.js'
 import { statusCodes } from '~/src/server/common/constants/status-codes.js'
+import {
+  processSiteDetails,
+  errorMessages as siteDetailsErrorMessages
+} from '~/src/server/common/helpers/exemption-site-details.js'
 
 const errorMessages = {
   EXEMPTION_NOT_FOUND: 'Exemption not found',
   EXEMPTION_DATA_NOT_FOUND: 'Exemption data not found',
   EXEMPTION_NOT_SUBMITTED: 'Exemption has not been submitted',
-  FILE_UPLOAD_DATA_ERROR: 'Error getting file upload summary data',
-  UNAUTHORIZED_ACCESS: 'You do not have permission to view this exemption'
+  UNAUTHORIZED_ACCESS: 'You do not have permission to view this exemption',
+  ...siteDetailsErrorMessages
 }
 
 const apiPaths = {
@@ -110,108 +107,6 @@ const validateAndFetchExemption = async (request, exemptionId) => {
     )
     throw Boom.internal('Error retrieving exemption details')
   }
-}
-
-/**
- * Processes file upload site details with error handling
- * @param {object} exemption - Exemption data
- * @param {string} id - Exemption ID
- * @param {object} request - Hapi request object
- * @returns {object} Processed site details for file upload
- */
-const processFileUploadSiteDetails = (exemption, id, request) => {
-  try {
-    const fileUploadData = getFileUploadSummaryData(exemption)
-    return {
-      ...exemption.siteDetails,
-      isFileUpload: true,
-      method: fileUploadData.method,
-      fileType: fileUploadData.fileType,
-      filename: fileUploadData.filename
-    }
-  } catch (error) {
-    request.logger.error(
-      {
-        error: error.message,
-        exemptionId: id
-      },
-      errorMessages.FILE_UPLOAD_DATA_ERROR
-    )
-    // Fallback to basic site details if file upload data unavailable
-    return {
-      ...exemption.siteDetails,
-      isFileUpload: true,
-      method: 'Upload a file with the coordinates of the site',
-      fileType:
-        exemption.siteDetails.fileUploadType === 'kml' ? 'KML' : 'Shapefile',
-      filename: exemption.siteDetails.uploadedFile?.filename || 'Unknown file'
-    }
-  }
-}
-
-/**
- * Processes manual coordinate site details
- * @param {object} exemption - Exemption data
- * @returns {object} Processed site details for manual coordinates
- */
-const processManualSiteDetails = (exemption) => {
-  const { siteDetails } = exemption
-  const { coordinateSystem, coordinatesEntry } = siteDetails
-
-  const baseData = {
-    isFileUpload: false,
-    coordinateSystemText: getCoordinateSystemText(coordinateSystem),
-    reviewSummaryText: getReviewSummaryText(siteDetails),
-    coordinatesType: 'coordinates',
-    coordinateSystem,
-    coordinatesEntry,
-    coordinates: siteDetails.coordinates,
-    circleWidth: siteDetails.circleWidth
-  }
-
-  // Handle polygon sites (multiple coordinates)
-  if (coordinatesEntry === 'multiple') {
-    return {
-      ...baseData,
-      isPolygonSite: true,
-      polygonCoordinates: getPolygonCoordinatesDisplayData(
-        siteDetails,
-        coordinateSystem
-      )
-    }
-  }
-
-  // Handle circular sites (single coordinate + width)
-  return {
-    ...baseData,
-    isPolygonSite: false,
-    coordinateDisplayText: getCoordinateDisplayText(
-      siteDetails,
-      coordinateSystem
-    ),
-    circleWidth: siteDetails.circleWidth
-  }
-}
-
-/**
- * Processes site details based on coordinates type
- * @param {object} exemption - Exemption data
- * @param {string} id - Exemption ID
- * @param {object} request - Hapi request object
- * @returns {object|null} Processed site details or null
- */
-const processSiteDetails = (exemption, id, request) => {
-  if (!exemption.siteDetails) {
-    return null
-  }
-
-  const { coordinatesType } = exemption.siteDetails
-
-  if (coordinatesType === 'file') {
-    return processFileUploadSiteDetails(exemption, id, request)
-  }
-
-  return processManualSiteDetails(exemption)
 }
 
 export const VIEW_DETAILS_VIEW_ROUTE = 'exemption/view-details/index'

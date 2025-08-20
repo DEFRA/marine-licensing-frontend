@@ -1,0 +1,66 @@
+{% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
+
+{{ govukSummaryList({
+    card: {
+      title: {
+        text: "Site details"
+      },
+      actions: {
+        items: [
+          {
+            href: "#",
+            text: "Change"
+          }
+        ]
+      },
+      attributes: {
+        id: "site-details-card"
+      }
+    },
+    rows: [
+      {
+        key: {
+          text: "Method of providing site location"
+        },
+        value: {
+          html: siteDetails.reviewSummaryText
+        }
+      },
+      {
+        key: {
+          text: "Coordinates system"
+        },
+        value: {
+          html: siteDetails.coordinateSystemText | replace('\n', '<br> ')
+        }
+      },
+      {
+        key: {
+          text: "Coordinates at centre of site"
+        },
+        value: {
+          html: siteDetails.coordinateDisplayText
+        }
+      },
+      {
+        key: {
+          text: "Width of circular site"
+        },
+        value: {
+          html: siteDetails.circleWidth + " metres"
+        }
+      },
+      {
+        classes: "govuk-summary-list__row--full-width",
+        key: {
+          text: "Map view",
+          classes: "govuk-summary-list__key--full-width"
+        },
+        value: {
+          html: '<div class="app-site-details-map" data-module="site-details-map"></div>',
+          classes: "govuk-summary-list__value--full-width"
+        }
+      }
+    ],
+    classes: "govuk-summary-list--full-width"
+  }) }}

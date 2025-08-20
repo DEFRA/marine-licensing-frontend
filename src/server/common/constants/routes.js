@@ -3,6 +3,8 @@ export const routes = {
     '/exemption/how-do-you-want-to-provide-the-coordinates',
   COORDINATES_ENTRY_CHOICE:
     '/exemption/how-do-you-want-to-enter-the-coordinates',
+  MULTIPLE_SITES_CHOICE:
+    '/exemption/does-your-project-involve-more-than-one-site',
   COORDINATE_SYSTEM_CHOICE: '/exemption/what-coordinate-system',
   CIRCLE_CENTRE_POINT: '/exemption/enter-the-coordinates-at-the-centre-point',
   ENTER_MULTIPLE_COORDINATES: '/exemption/enter-multiple-coordinates',

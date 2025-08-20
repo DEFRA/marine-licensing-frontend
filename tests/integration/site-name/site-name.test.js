@@ -1,5 +1,5 @@
 import { JSDOM } from 'jsdom'
-import { getByRole, getByText } from '@testing-library/dom'
+import { getByLabelText, getByRole, getByText } from '@testing-library/dom'
 import { createServer } from '~/src/server/index.js'
 import { statusCodes } from '~/src/server/common/constants/status-codes.js'
 import {
@@ -70,12 +70,17 @@ describe('Site name page', () => {
       siteDetails: { ...mockExemption.siteDetails, siteName: 'Test Site' }
     })
 
-    const { statusCode } = await server.inject({
+    const { result, statusCode } = await server.inject({
       method: 'GET',
       url: '/exemption/site-name'
     })
 
     expect(statusCode).toBe(statusCodes.ok)
+
+    const { document } = new JSDOM(result).window
+
+    const siteNameInput = getByLabelText(document, 'Site name')
+    expect(siteNameInput).toHaveValue('Test Site')
 
     expect(setExemptionCache).not.toHaveBeenCalled()
   })

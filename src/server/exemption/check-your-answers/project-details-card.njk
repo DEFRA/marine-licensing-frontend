@@ -1,0 +1,33 @@
+{% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
+
+{{ govukSummaryList({
+    card: {
+      title: {
+        text: "Project details"
+      },
+      actions: {
+        items: [
+          {
+            href: "#",
+            text: "Change"
+          }
+        ]
+      },
+      attributes: {
+        id: "project-details-card"
+      }
+    },
+    rows: [
+      {
+        key: {
+          text: "Project name"
+        },
+        value: {
+          html: projectName
+        },
+        attributes: {
+          id: "project-name-row"
+        }
+      }
+    ]
+  }) }}

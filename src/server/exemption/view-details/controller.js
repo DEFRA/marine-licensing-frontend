@@ -9,6 +9,7 @@ import {
 } from '~/src/server/exemption/site-details/review-site-details/utils.js'
 import { routes } from '~/src/server/common/constants/routes.js'
 import { createSiteDetailsDataJson } from '~/src/server/common/helpers/site-details.js'
+import { statusCodes } from '~/src/server/common/constants/status-codes.js'
 
 const errorMessages = {
   EXEMPTION_NOT_FOUND: 'Exemption not found',
@@ -83,7 +84,7 @@ const validateAndFetchExemption = async (request, exemptionId) => {
     )
 
     // Handle potential authorization errors from API
-    if (error.output?.statusCode === 403) {
+    if (error.output?.statusCode === statusCodes.forbidden) {
       request.logger.error(
         {
           id: exemptionId
@@ -93,7 +94,7 @@ const validateAndFetchExemption = async (request, exemptionId) => {
       throw Boom.forbidden(errorMessages.UNAUTHORIZED_ACCESS)
     }
 
-    if (error.output?.statusCode === 404) {
+    if (error.output?.statusCode === statusCodes.notFound) {
       request.logger.error(
         {
           id: exemptionId

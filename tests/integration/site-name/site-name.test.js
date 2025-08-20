@@ -51,8 +51,7 @@ describe('Site name page', () => {
     expect(getByText(document, mockExemption.projectName)).toBeInTheDocument()
     expect(getByText(document, 'Site 1')).toBeInTheDocument()
 
-    const siteNameInput = document.querySelector('input[name="siteName"]')
-    expect(siteNameInput).toBeInTheDocument()
+    const siteNameInput = getByLabelText(document, 'Site name')
     expect(siteNameInput).toHaveAttribute('type', 'text')
 
     expect(

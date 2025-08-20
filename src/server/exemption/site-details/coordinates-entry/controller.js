@@ -16,7 +16,7 @@ export const COORDINATES_ENTRY_VIEW_ROUTE =
 const coordinatesEntrySettings = {
   pageTitle: 'How do you want to enter the coordinates?',
   heading: 'How do you want to enter the coordinates?',
-  backLink: routes.COORDINATES_TYPE_CHOICE
+  backLink: routes.MULTIPLE_SITES_CHOICE
 }
 
 export const errorMessages = {

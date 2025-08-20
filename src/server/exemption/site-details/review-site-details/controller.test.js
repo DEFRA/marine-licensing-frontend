@@ -964,6 +964,7 @@ describe('#reviewSiteDetails', () => {
           expect.any(Object),
           '/exemption/site-details',
           {
+            multipleSiteDetails: mockExemption.multipleSiteDetails,
             siteDetails: mockExemption.siteDetails,
             id: mockExemption.id
           }
@@ -989,6 +990,7 @@ describe('#reviewSiteDetails', () => {
           expect.any(Object),
           '/exemption/site-details',
           {
+            multipleSiteDetails: mockExemption.multipleSiteDetails,
             siteDetails: mockExemption.siteDetails,
             id: mockExemption.id
           }
@@ -1011,6 +1013,7 @@ describe('#reviewSiteDetails', () => {
           expect.any(Object),
           '/exemption/site-details',
           {
+            multipleSiteDetails: mockExemption.multipleSiteDetails,
             siteDetails: createExpectedSiteDetails(),
             id: mockExemption.id
           }
@@ -1160,6 +1163,8 @@ describe('#reviewSiteDetails', () => {
             expect.any(Object),
             '/exemption/site-details',
             {
+              multipleSiteDetails:
+                mockPolygonExemptionWGS84.multipleSiteDetails,
               siteDetails: mockPolygonExemptionWGS84.siteDetails,
               id: mockPolygonExemptionWGS84.id
             }
@@ -1187,6 +1192,8 @@ describe('#reviewSiteDetails', () => {
             expect.any(Object),
             '/exemption/site-details',
             {
+              multipleSiteDetails:
+                mockPolygonExemptionOSGB36.multipleSiteDetails,
               siteDetails: mockPolygonExemptionOSGB36.siteDetails,
               id: mockPolygonExemptionOSGB36.id
             }
@@ -1212,6 +1219,8 @@ describe('#reviewSiteDetails', () => {
             expect.any(Object),
             '/exemption/site-details',
             {
+              multipleSiteDetails:
+                mockPolygonExemptionWGS84.multipleSiteDetails,
               siteDetails: mockPolygonExemptionWGS84.siteDetails,
               id: mockPolygonExemptionWGS84.id
             }

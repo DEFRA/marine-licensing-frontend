@@ -1,5 +1,6 @@
 import { coordinatesTypeRoutes } from '~/src/server/exemption/site-details/coordinates-type/index.js'
 import { coordinatesEntryRoutes } from '~/src/server/exemption/site-details/coordinates-entry/index.js'
+import { multipleSitesChoiceRoutes } from '~/src/server/exemption/site-details/multiple-sites-question/index.js'
 import { coordinateSystemRoutes } from '~/src/server/exemption/site-details/coordinate-system/index.js'
 import { centreCoordinatesRoutes } from '~/src/server/exemption/site-details/centre-coordinates/index.js'
 import { widthOfSiteRoutes } from '~/src/server/exemption/site-details/width-of-site/index.js'
@@ -21,6 +22,7 @@ import { beforeYouStartRoutes } from '~/src/server/exemption/site-details/before
 export const siteDetailsRoutes = [
   ...coordinatesTypeRoutes,
   ...coordinatesEntryRoutes,
+  ...multipleSitesChoiceRoutes,
   ...coordinateSystemRoutes,
   ...centreCoordinatesRoutes,
   ...widthOfSiteRoutes,

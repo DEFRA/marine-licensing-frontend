@@ -7,6 +7,7 @@ import {
   updateExemptionSiteDetails,
   setExemptionCache
 } from '~/src/server/common/helpers/session-cache/utils.js'
+import { validateErrors } from '../utils/utils.test.js'
 
 jest.mock('~/src/server/common/helpers/session-cache/utils.js')
 
@@ -124,9 +125,14 @@ describe('Site name page', () => {
     ).toBeInTheDocument()
     expect(getByText(document, 'Site 1')).toBeInTheDocument()
 
-    const errorMessage = document.querySelector('.govuk-error-message')
-    expect(errorMessage).toBeInTheDocument()
-    expect(errorMessage.textContent).toContain('Enter the site name')
+    const expectedErrors = [
+      {
+        field: 'siteName',
+        message: 'Enter the site name'
+      }
+    ]
+
+    validateErrors(expectedErrors, document)
   })
 
   test('should stay on same page when site name is too long', async () => {
@@ -152,11 +158,14 @@ describe('Site name page', () => {
     ).toBeInTheDocument()
     expect(getByText(document, 'Site 1')).toBeInTheDocument()
 
-    const errorMessage = document.querySelector('.govuk-error-message')
-    expect(errorMessage).toBeInTheDocument()
-    expect(errorMessage.textContent).toContain(
-      'Site name should be 250 characters or less'
-    )
+    const expectedErrors = [
+      {
+        field: 'siteName',
+        message: 'Site name should be 250 characters or less'
+      }
+    ]
+
+    validateErrors(expectedErrors, document)
   })
 
   test('should redirect to coordinates entry choice when valid site name is submitted', async () => {

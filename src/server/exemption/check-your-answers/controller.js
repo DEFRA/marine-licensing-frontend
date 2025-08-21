@@ -1,9 +1,6 @@
 import Boom from '@hapi/boom'
 import { getExemptionCache } from '~/src/server/common/helpers/session-cache/utils.js'
-import {
-  authenticatedGetRequest,
-  authenticatedPostRequest
-} from '~/src/server/common/helpers/authenticated-requests.js'
+import { authenticatedPostRequest } from '~/src/server/common/helpers/authenticated-requests.js'
 import { routes } from '~/src/server/common/constants/routes.js'
 import { createSiteDetailsDataJson } from '~/src/server/common/helpers/site-details.js'
 import { getCoordinateSystem } from '~/src/server/common/helpers/coordinate-utils.js'
@@ -12,7 +9,6 @@ import { processSiteDetails } from '~/src/server/common/helpers/exemption-site-d
 import { errorMessages } from '~/src/server/common/constants/error-messages.js'
 
 const apiPaths = {
-  getExemption: (id) => `/exemption/${id}`,
   submitExemption: '/exemption/submit'
 }
 
@@ -20,35 +16,6 @@ const checkYourAnswersViewContent = {
   title: 'Check your answers',
   description: 'Please review your answers before submitting your application.',
   backLink: routes.TASK_LIST
-}
-
-/**
- * Validates exemption and fetches data from API
- * @param {object} request - Hapi request object
- * @param {object} exemption - Exemption data from cache
- * @returns {Promise<object>} API response payload
- */
-const validateAndFetchExemption = async (request, exemption) => {
-  const { id } = exemption
-  if (!id) {
-    request.logger.error({ id }, errorMessages.EXEMPTION_NOT_FOUND)
-    throw Boom.notFound(errorMessages.EXEMPTION_NOT_FOUND, { id })
-  }
-
-  const { payload } = await authenticatedGetRequest(
-    request,
-    apiPaths.getExemption(id)
-  )
-
-  if (!payload?.value?.taskList) {
-    request.logger.error({ id }, errorMessages.EXEMPTION_DATA_NOT_FOUND)
-    throw Boom.notFound(
-      `${errorMessages.EXEMPTION_DATA_NOT_FOUND} for id: ${id}`,
-      { id }
-    )
-  }
-
-  return payload
 }
 
 export const CHECK_YOUR_ANSWERS_VIEW_ROUTE =
@@ -59,11 +26,9 @@ export const CHECK_YOUR_ANSWERS_VIEW_ROUTE =
  * @satisfies {Partial<ServerRoute>}
  */
 export const checkYourAnswersController = {
-  async handler(request, h) {
+  handler(request, h) {
     const exemption = getExemptionCache(request)
     const { id } = exemption
-
-    await validateAndFetchExemption(request, exemption)
     const siteDetails = processSiteDetails(exemption, id, request)
     const { coordinateSystem } = getCoordinateSystem(request)
     const siteDetailsData = createSiteDetailsDataJson(
@@ -89,9 +54,6 @@ export const checkYourAnswersSubmitController = {
   async handler(request, h) {
     const exemption = getExemptionCache(request)
     const { id } = exemption
-
-    await validateAndFetchExemption(request, exemption)
-
     try {
       const { displayName, email } = await getUserSession(
         request,

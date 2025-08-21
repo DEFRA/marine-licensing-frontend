@@ -1,103 +1,10 @@
 import Boom from '@hapi/boom'
-import { authenticatedGetRequest } from '~/src/server/common/helpers/authenticated-requests.js'
 import { routes } from '~/src/server/common/constants/routes.js'
 import { createSiteDetailsDataJson } from '~/src/server/common/helpers/site-details.js'
-import { statusCodes } from '~/src/server/common/constants/status-codes.js'
 import { processSiteDetails } from '~/src/server/common/helpers/exemption-site-details.js'
 import { errorMessages } from '~/src/server/common/constants/error-messages.js'
-
-const apiPaths = {
-  getExemption: (id) => `/exemption/${id}`
-}
-
-/**
- * Validates exemption and fetches data from API
- * @param {object} request - Hapi request object
- * @param {string} exemptionId - Exemption ID from route params
- * @returns {Promise<object>} API response payload
- */
-const validateAndFetchExemption = async (request, exemptionId) => {
-  if (!exemptionId) {
-    request.logger.error({ id: exemptionId }, errorMessages.EXEMPTION_NOT_FOUND)
-    throw Boom.notFound(errorMessages.EXEMPTION_NOT_FOUND)
-  }
-
-  try {
-    const response = await authenticatedGetRequest(
-      request,
-      apiPaths.getExemption(exemptionId)
-    )
-
-    const { payload } = response
-
-    if (!payload?.value) {
-      request.logger.error(
-        {
-          id: exemptionId
-        },
-        errorMessages.EXEMPTION_DATA_NOT_FOUND
-      )
-      throw Boom.notFound(errorMessages.EXEMPTION_DATA_NOT_FOUND)
-    }
-
-    const exemption = payload.value
-
-    if (exemption.status === 'Draft' || !exemption.applicationReference) {
-      request.logger.error(
-        {
-          id: exemptionId,
-          status: exemption.status,
-          hasApplicationReference: !!exemption.applicationReference
-        },
-        errorMessages.EXEMPTION_NOT_SUBMITTED
-      )
-
-      throw Boom.forbidden(errorMessages.EXEMPTION_NOT_SUBMITTED)
-    }
-
-    return payload
-  } catch (error) {
-    if (error.isBoom) {
-      throw error
-    }
-
-    request.logger.error(
-      {
-        exemptionId,
-        message: error.message,
-        statusCode: error.output?.statusCode || error.statusCode
-      },
-      'Error in API request'
-    )
-
-    // Handle potential authorization errors from API
-    if (error.output?.statusCode === statusCodes.forbidden) {
-      request.logger.error(
-        {
-          id: exemptionId
-        },
-        errorMessages.UNAUTHORIZED_ACCESS
-      )
-      throw Boom.forbidden(errorMessages.UNAUTHORIZED_ACCESS)
-    }
-
-    if (error.output?.statusCode === statusCodes.notFound) {
-      request.logger.error(
-        {
-          id: exemptionId
-        },
-        errorMessages.EXEMPTION_NOT_FOUND
-      )
-      throw Boom.notFound(errorMessages.EXEMPTION_NOT_FOUND)
-    }
-
-    request.logger.error(
-      { error: error.message },
-      'Unexpected error fetching exemption'
-    )
-    throw Boom.internal('Error retrieving exemption details')
-  }
-}
+import { getExemptionService } from '~/src/services/exemption-service/index.js'
+import { EXEMPTION_STATUS } from '~/src/server/common/constants/exemptions.js'
 
 export const VIEW_DETAILS_VIEW_ROUTE = 'exemption/view-details/index'
 
@@ -110,12 +17,27 @@ export const viewDetailsController = {
     const { exemptionId } = request.params
 
     try {
-      const payload = await validateAndFetchExemption(request, exemptionId)
-      const exemption = payload.value
+      const exemptionService = getExemptionService(request)
+      const exemption = await exemptionService.getExemptionById(exemptionId)
+
+      if (
+        exemption.status === EXEMPTION_STATUS.DRAFT ||
+        !exemption.applicationReference
+      ) {
+        request.logger.error(
+          {
+            id: exemptionId,
+            status: exemption.status,
+            hasApplicationReference: !!exemption.applicationReference
+          },
+          errorMessages.EXEMPTION_NOT_SUBMITTED
+        )
+
+        throw Boom.forbidden(errorMessages.EXEMPTION_NOT_SUBMITTED)
+      }
 
       const siteDetails = processSiteDetails(exemption, exemptionId, request)
-      const coordinateSystem =
-        exemption.siteDetails?.coordinateSystem || 'wgs84'
+      const coordinateSystem = exemption.siteDetails?.coordinateSystem
       const siteDetailsData = createSiteDetailsDataJson(
         siteDetails,
         coordinateSystem
@@ -128,7 +50,6 @@ export const viewDetailsController = {
         pageTitle: 'View notification details',
         pageCaption,
         backLink: routes.DASHBOARD,
-        readOnly: true,
         isReadOnly: true,
         ...exemption,
         siteDetails,
@@ -139,13 +60,7 @@ export const viewDetailsController = {
         throw error
       }
 
-      request.logger.error(
-        {
-          message: error.message,
-          exemptionId
-        },
-        'Error displaying exemption details'
-      )
+      request.logger.error(error, 'Error displaying exemption details')
       throw Boom.internal('Error displaying exemption details')
     }
   }

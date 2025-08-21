@@ -23,7 +23,7 @@
           text: "Start date"
         },
         value: {
-          html: params.activityDates.start | formatDate('d MMMM yyyy')
+          html: (params.activityDates and params.activityDates.start) | formatDate('d MMMM yyyy')
         }
       },
       {
@@ -31,7 +31,7 @@
           text: "End date"
         },
         value: {
-          html: params.activityDates.end | formatDate('d MMMM yyyy')
+          html: (params.activityDates and params.activityDates.end) | formatDate('d MMMM yyyy')
         }
       }
     ]

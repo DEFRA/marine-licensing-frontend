@@ -1,10 +1,10 @@
 import { getByRole, getByText } from '@testing-library/dom'
 import { JSDOM } from 'jsdom'
-import * as authRequests from '~/src/server/common/helpers/authenticated-requests.js'
+import * as exemptionServiceModule from '~/src/services/exemption-service/index.js'
 import { createServer } from '~/src/server/index.js'
 import { testScenarios } from './fixtures.js'
 
-jest.mock('~/src/server/common/helpers/authenticated-requests.js')
+jest.mock('~/src/services/exemption-service/index.js')
 
 describe('View Details - Content Verification Integration Tests', () => {
   let server
@@ -137,9 +137,12 @@ describe('View Details - Content Verification Integration Tests', () => {
   }
 
   const getPageDocument = async (exemption) => {
-    jest.spyOn(authRequests, 'authenticatedGetRequest').mockResolvedValue({
-      payload: { value: exemption }
-    })
+    const mockExemptionService = {
+      getExemptionById: jest.fn().mockResolvedValue(exemption)
+    }
+    jest
+      .mocked(exemptionServiceModule.getExemptionService)
+      .mockReturnValue(mockExemptionService)
 
     const response = await server.inject({
       method: 'GET',

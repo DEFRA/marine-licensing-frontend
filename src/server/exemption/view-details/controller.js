@@ -3,18 +3,8 @@ import { authenticatedGetRequest } from '~/src/server/common/helpers/authenticat
 import { routes } from '~/src/server/common/constants/routes.js'
 import { createSiteDetailsDataJson } from '~/src/server/common/helpers/site-details.js'
 import { statusCodes } from '~/src/server/common/constants/status-codes.js'
-import {
-  processSiteDetails,
-  errorMessages as siteDetailsErrorMessages
-} from '~/src/server/common/helpers/exemption-site-details.js'
-
-const errorMessages = {
-  EXEMPTION_NOT_FOUND: 'Exemption not found',
-  EXEMPTION_DATA_NOT_FOUND: 'Exemption data not found',
-  EXEMPTION_NOT_SUBMITTED: 'Exemption has not been submitted',
-  UNAUTHORIZED_ACCESS: 'You do not have permission to view this exemption',
-  ...siteDetailsErrorMessages
-}
+import { processSiteDetails } from '~/src/server/common/helpers/exemption-site-details.js'
+import { errorMessages } from '~/src/server/common/constants/error-messages.js'
 
 const apiPaths = {
   getExemption: (id) => `/exemption/${id}`

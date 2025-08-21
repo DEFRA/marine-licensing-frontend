@@ -51,23 +51,23 @@ describe('Same activity dates page', () => {
     expect(getByText(document, mockExemption.projectName)).toBeInTheDocument()
 
     const yesRadio = getByRole(document, 'radio', {
-      name: 'Yes, the dates are the same for every site.'
+      name: 'Yes, the dates are the same for every site'
     })
     expect(yesRadio).toHaveAttribute('type', 'radio')
 
     const noRadio = getByRole(document, 'radio', {
-      name: 'No, at least one site has different dates.'
+      name: 'No, at least one site has different dates'
     })
     expect(noRadio).toHaveAttribute('type', 'radio')
 
     expect(
-      getByText(document, 'Yes, the dates are the same for every site.')
+      getByText(document, 'Yes, the dates are the same for every site')
     ).toBeInTheDocument()
     expect(
       getByText(document, "You'll only need to enter the dates once")
     ).toBeInTheDocument()
     expect(
-      getByText(document, 'No, at least one site has different dates.')
+      getByText(document, 'No, at least one site has different dates')
     ).toBeInTheDocument()
     expect(
       getByText(document, "You'll need to enter dates for each site")
@@ -101,12 +101,12 @@ describe('Same activity dates page', () => {
     const { document } = new JSDOM(result).window
 
     const yesRadio = getByRole(document, 'radio', {
-      name: 'Yes, the dates are the same for every site.'
+      name: 'Yes, the dates are the same for every site'
     })
     expect(yesRadio).toBeChecked()
 
     const noRadio = getByRole(document, 'radio', {
-      name: 'No, at least one site has different dates.'
+      name: 'No, at least one site has different dates'
     })
     expect(noRadio).not.toBeChecked()
 

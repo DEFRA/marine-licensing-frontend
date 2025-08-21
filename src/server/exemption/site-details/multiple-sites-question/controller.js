@@ -95,7 +95,6 @@ export const multipleSitesSubmitController = {
     const exemption = getExemptionCache(request)
 
     const multiSiteValue = payload.multipleSitesEnabled === 'yes'
-
     setExemptionCache(request, {
       ...exemption,
       multipleSiteDetails: { multipleSitesEnabled: multiSiteValue }

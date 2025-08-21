@@ -7,6 +7,7 @@ import {
   updateExemptionSiteDetails,
   setExemptionCache
 } from '~/src/server/common/helpers/session-cache/utils.js'
+import { validateErrors } from '../utils/utils.test.js'
 
 jest.mock('~/src/server/common/helpers/session-cache/utils.js')
 
@@ -142,10 +143,22 @@ describe('Multiple sites question page', () => {
       })
     ).toBeInTheDocument()
 
+    const expectedErrors = [
+      {
+        field: 'multipleSitesEnabled',
+        message: 'Select whether you need to tell us about more than one site'
+      }
+    ]
+
+    validateErrors(expectedErrors, document)
+
     expect(
       getByText(
         document,
-        'Select whether you need to tell us about more than one site'
+        'Select whether you need to tell us about more than one site',
+        {
+          selector: '.govuk-error-message'
+        }
       )
     ).toBeInTheDocument()
   })

@@ -1,5 +1,5 @@
 import { JSDOM } from 'jsdom'
-import { getByRole, getByText } from '@testing-library/dom'
+import { getByLabelText, getByRole, getByText } from '@testing-library/dom'
 import { createServer } from '~/src/server/index.js'
 import { statusCodes } from '~/src/server/common/constants/status-codes.js'
 import {
@@ -7,6 +7,7 @@ import {
   updateExemptionSiteDetails,
   setExemptionCache
 } from '~/src/server/common/helpers/session-cache/utils.js'
+import { validateErrors } from '../utils/utils.test.js'
 
 jest.mock('~/src/server/common/helpers/session-cache/utils.js')
 
@@ -50,8 +51,7 @@ describe('Site name page', () => {
     expect(getByText(document, mockExemption.projectName)).toBeInTheDocument()
     expect(getByText(document, 'Site 1')).toBeInTheDocument()
 
-    const siteNameInput = document.querySelector('input[name="siteName"]')
-    expect(siteNameInput).toBeInTheDocument()
+    const siteNameInput = getByLabelText(document, 'Site name')
     expect(siteNameInput).toHaveAttribute('type', 'text')
 
     expect(
@@ -78,7 +78,7 @@ describe('Site name page', () => {
 
     const { document } = new JSDOM(result).window
 
-    const siteNameInput = document.querySelector('input[name="siteName"]')
+    const siteNameInput = getByLabelText(document, 'Site name')
     expect(siteNameInput).toHaveValue('Test Site')
 
     expect(setExemptionCache).not.toHaveBeenCalled()
@@ -124,9 +124,14 @@ describe('Site name page', () => {
     ).toBeInTheDocument()
     expect(getByText(document, 'Site 1')).toBeInTheDocument()
 
-    const errorMessage = document.querySelector('.govuk-error-message')
-    expect(errorMessage).toBeInTheDocument()
-    expect(errorMessage.textContent).toContain('Enter the site name')
+    const expectedErrors = [
+      {
+        field: 'siteName',
+        message: 'Enter the site name'
+      }
+    ]
+
+    validateErrors(expectedErrors, document)
   })
 
   test('should stay on same page when site name is too long', async () => {
@@ -152,11 +157,14 @@ describe('Site name page', () => {
     ).toBeInTheDocument()
     expect(getByText(document, 'Site 1')).toBeInTheDocument()
 
-    const errorMessage = document.querySelector('.govuk-error-message')
-    expect(errorMessage).toBeInTheDocument()
-    expect(errorMessage.textContent).toContain(
-      'Site name should be 250 characters or less'
-    )
+    const expectedErrors = [
+      {
+        field: 'siteName',
+        message: 'Site name should be 250 characters or less'
+      }
+    ]
+
+    validateErrors(expectedErrors, document)
   })
 
   test('should redirect to same activity dates when valid site name is submitted', async () => {

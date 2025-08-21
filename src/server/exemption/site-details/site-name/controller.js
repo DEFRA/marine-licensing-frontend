@@ -10,6 +10,8 @@ import {
 import { getSiteNumber } from '../utils/site-number.js'
 import joi from 'joi'
 
+const SITE_NAME_MAX_LENGTH = 250
+
 export const SITE_NAME_VIEW_ROUTE = 'exemption/site-details/site-name/index'
 
 export const SITE_NAME_URL = '/exemption/site-name'
@@ -78,11 +80,16 @@ export const siteNameSubmitController = {
   options: {
     validate: {
       payload: joi.object({
-        siteName: joi.string().min(1).max(250).required().messages({
-          'string.empty': 'SITE_NAME_REQUIRED',
-          'any.required': 'SITE_NAME_REQUIRED',
-          'string.max': 'SITE_NAME_MAX_LENGTH'
-        })
+        siteName: joi
+          .string()
+          .min(1)
+          .max(SITE_NAME_MAX_LENGTH)
+          .required()
+          .messages({
+            'string.empty': 'SITE_NAME_REQUIRED',
+            'any.required': 'SITE_NAME_REQUIRED',
+            'string.max': 'SITE_NAME_MAX_LENGTH'
+          })
       }),
       failAction: createValidationFailAction
     }

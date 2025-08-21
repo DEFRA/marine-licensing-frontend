@@ -1,27 +1,41 @@
-import { JSDOM } from 'jsdom'
 import { routes } from '~/src/server/common/constants/routes.js'
 import { statusCodes } from '~/src/server/common/constants/status-codes.js'
 import * as authRequests from '~/src/server/common/helpers/authenticated-requests.js'
 import * as cacheUtils from '~/src/server/common/helpers/session-cache/utils.js'
-import { createServer } from '~/src/server/index.js'
 import { testScenarios } from './fixtures.js'
+import {
+  validatePageStructure,
+  validateAllSummaryCardsExist,
+  validateProjectDetails,
+  validateActivityDates,
+  validateActivityDetails,
+  validateSiteDetails,
+  validatePublicRegister
+} from '../shared/summary-card-validators.js'
+import { validateSubmissionSection } from '../shared/dom-helpers.js'
+import {
+  createTestServer,
+  responseToDocument,
+  resetMocks,
+  validateResponse
+} from '../shared/test-setup-helpers.js'
 
 jest.mock('~/src/server/common/helpers/authenticated-requests.js')
 
 describe('Check your answers - page content Validation', () => {
+  const testServer = createTestServer()
   let server
 
   beforeAll(async () => {
-    server = await createServer()
-    await server.initialize()
+    server = await testServer.setup()
   })
 
   afterAll(async () => {
-    await server.stop()
+    await testServer.teardown()
   })
 
   beforeEach(() => {
-    jest.resetAllMocks()
+    resetMocks()
     jest
       .spyOn(cacheUtils, 'setExemptionCache')
       .mockImplementation(() => undefined)
@@ -56,88 +70,7 @@ describe('Check your answers - page content Validation', () => {
       url: routes.CHECK_YOUR_ANSWERS
     })
 
-    expect(response.statusCode).toBe(statusCodes.ok)
-    return new JSDOM(response.result).window.document
-  }
-
-  const validatePageStructure = (document, expected) => {
-    const heading = document.querySelector('#check-your-answers-heading')
-    expect(heading.textContent.trim()).toBe(expected.pageTitle)
-
-    const backLink = document.querySelector('.govuk-back-link')
-    expect(backLink.textContent.trim()).toBe(expected.backLinkText)
-  }
-
-  const validateAllSummaryCardsExist = (document, expected) => {
-    expected.summaryCards.forEach((expectedTitle) => {
-      const cardTitles = document.querySelectorAll('.govuk-summary-card__title')
-      const foundCard = Array.from(cardTitles).find(
-        (title) => title.textContent.trim() === expectedTitle
-      )
-      expect(foundCard).toBeTruthy()
-    })
-  }
-
-  const validateSummaryCardContent = (
-    document,
-    cardSelector,
-    expectedContent
-  ) => {
-    const card = document.querySelector(cardSelector)
-    Object.entries(expectedContent).forEach(([key, value]) => {
-      const rows = card.querySelectorAll('.govuk-summary-list__row')
-      const row = Array.from(rows).find((row) => {
-        const keyElement = row.querySelector('.govuk-summary-list__key')
-        return keyElement && keyElement.textContent.trim() === key
-      })
-      expect(row).toBeTruthy()
-      const valueElement = row.querySelector('.govuk-summary-list__value')
-      expect(valueElement.textContent.trim()).toBe(value)
-    })
-  }
-
-  const validateProjectDetails = (document, expected) => {
-    validateSummaryCardContent(
-      document,
-      '#project-details-card',
-      expected.projectDetails
-    )
-  }
-
-  const validateActivityDates = (document, expected) => {
-    validateSummaryCardContent(
-      document,
-      '#activity-dates-card',
-      expected.activityDates
-    )
-  }
-
-  const validateActivityDetails = (document, expected) => {
-    validateSummaryCardContent(
-      document,
-      '#activity-details-card',
-      expected.activityDetails
-    )
-  }
-
-  const validateSiteDetails = (document, expected) => {
-    validateSummaryCardContent(
-      document,
-      '#site-details-card',
-      expected.siteDetails
-    )
-  }
-
-  const validatePublicRegister = (document, expected) => {
-    validateSummaryCardContent(
-      document,
-      '#public-register-card',
-      expected.publicRegister
-    )
-  }
-
-  const validateSubmissionSection = (document, expected) => {
-    const confirmButton = document.querySelector('#confirm-and-send')
-    expect(confirmButton.textContent.trim()).toBe(expected.submitButton)
+    validateResponse(response, statusCodes.ok)
+    return responseToDocument(response)
   }
 })

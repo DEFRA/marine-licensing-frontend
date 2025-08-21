@@ -13,7 +13,7 @@ const baseSubmittedExemption = {
   activityDescription:
     'Marine construction activities including pile driving and dredging operations.',
   publicRegister: {
-    withholdFromPublicRegister: false
+    consent: 'no'
   }
 }
 
@@ -221,7 +221,8 @@ export const testScenarios = [
     name: 'Exemption with no public register inclusion',
     exemption: createSubmittedExemption({
       publicRegister: {
-        consent: 'yes'
+        consent: 'yes',
+        reason: 'Lorem ipsum dolor sit amet'
       },
       siteDetails: {
         coordinatesType: 'coordinates',
@@ -242,7 +243,8 @@ export const testScenarios = [
         'Width of circular site': '100 metres'
       },
       publicRegister: {
-        'Information withheld from public register': 'Yes'
+        'Information withheld from public register': 'Yes',
+        'Why the information should be withheld': 'Lorem ipsum dolor sit amet'
       }
     }
   }

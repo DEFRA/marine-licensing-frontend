@@ -66,12 +66,13 @@ describe('#activityDatesController', () => {
 
     test('should render with empty date fields when no existing data', () => {
       const h = { view: jest.fn() }
-      const request = {}
+      const request = { url: {} }
 
       activityDatesController.handler(request, h)
 
       expect(h.view).toHaveBeenCalledWith(ACTIVITY_DATES_VIEW_ROUTE, {
         title: 'Activity dates',
+        pageTitle: 'Activity dates',
         backLink: routes.TASK_LIST,
         cancelLink: routes.TASK_LIST,
         projectName: mockExemptionState.projectName,
@@ -96,7 +97,7 @@ describe('#activityDatesController', () => {
       getExemptionCacheSpy.mockReturnValue(exemptionWithDates)
 
       const h = { view: jest.fn() }
-      const request = {}
+      const request = { url: {} }
 
       activityDatesController.handler(request, h)
 
@@ -104,6 +105,7 @@ describe('#activityDatesController', () => {
         title: 'Activity dates',
         backLink: routes.TASK_LIST,
         cancelLink: routes.TASK_LIST,
+        pageTitle: 'Activity dates',
         projectName: exemptionWithDates.projectName,
         activityStartDateDay: '15',
         activityStartDateMonth: '6',
@@ -571,7 +573,7 @@ describe('#activityDatesController', () => {
         ]
       }
 
-      const request = { payload: {} }
+      const request = { payload: {}, url: {} }
 
       activityDatesSubmitController.options.validate.failAction(request, h, err)
 
@@ -600,7 +602,7 @@ describe('#activityDatesController', () => {
         ]
       }
 
-      const request = { payload: {} }
+      const request = { payload: {}, url: {} }
 
       activityDatesSubmitController.options.validate.failAction(request, h, err)
 
@@ -633,7 +635,7 @@ describe('#activityDatesController', () => {
         ]
       }
 
-      const request = { payload: {} }
+      const request = { payload: {}, url: {} }
 
       activityDatesSubmitController.options.validate.failAction(request, h, err)
 
@@ -662,7 +664,7 @@ describe('#activityDatesController', () => {
         ]
       }
 
-      const request = { payload: {} }
+      const request = { payload: {}, url: {} }
 
       activityDatesSubmitController.options.validate.failAction(request, h, err)
 
@@ -691,7 +693,7 @@ describe('#activityDatesController', () => {
         ]
       }
 
-      const request = { payload: {} }
+      const request = { payload: {}, url: {} }
 
       activityDatesSubmitController.options.validate.failAction(request, h, err)
 
@@ -720,7 +722,7 @@ describe('#activityDatesController', () => {
         ]
       }
 
-      const request = { payload: {} }
+      const request = { payload: {}, url: {} }
 
       activityDatesSubmitController.options.validate.failAction(request, h, err)
 
@@ -754,7 +756,7 @@ describe('#activityDatesController', () => {
         ]
       }
 
-      const request = { payload: {} }
+      const request = { payload: {}, url: {} }
 
       activityDatesSubmitController.options.validate.failAction(request, h, err)
 
@@ -783,7 +785,7 @@ describe('#activityDatesController', () => {
         ]
       }
 
-      const request = { payload: {} }
+      const request = { payload: {}, url: {} }
 
       activityDatesSubmitController.options.validate.failAction(request, h, err)
 
@@ -812,7 +814,7 @@ describe('#activityDatesController', () => {
         ]
       }
 
-      const request = { payload: {} }
+      const request = { payload: {}, url: {} }
 
       activityDatesSubmitController.options.validate.failAction(request, h, err)
 
@@ -841,7 +843,7 @@ describe('#activityDatesController', () => {
         ]
       }
 
-      const request = { payload: {} }
+      const request = { payload: {}, url: {} }
 
       activityDatesSubmitController.options.validate.failAction(request, h, err)
 
@@ -870,7 +872,7 @@ describe('#activityDatesController', () => {
         ]
       }
 
-      const request = { payload: {} }
+      const request = { payload: {}, url: {} }
 
       activityDatesSubmitController.options.validate.failAction(request, h, err)
 
@@ -923,7 +925,7 @@ describe('#activityDatesController', () => {
         ]
       }
 
-      const request = { payload: {} }
+      const request = { payload: {}, url: {} }
 
       activityDatesSubmitController.options.validate.failAction(request, h, err)
 
@@ -952,7 +954,7 @@ describe('#activityDatesController', () => {
         ]
       }
 
-      const request = { payload: {} }
+      const request = { payload: {}, url: {} }
 
       activityDatesSubmitController.options.validate.failAction(request, h, err)
 
@@ -981,7 +983,7 @@ describe('#activityDatesController', () => {
         ]
       }
 
-      const request = { payload: {} }
+      const request = { payload: {}, url: {} }
 
       activityDatesSubmitController.options.validate.failAction(request, h, err)
 
@@ -1012,7 +1014,7 @@ describe('#activityDatesController', () => {
         ]
       }
 
-      const request = { payload: {} }
+      const request = { payload: {}, url: {} }
 
       activityDatesSubmitController.options.validate.failAction(request, h, err)
 
@@ -1035,7 +1037,7 @@ describe('#activityDatesController', () => {
       // Create an error without details to trigger line 314 (return h)
       const err = {} // No details property
 
-      const request = { payload: { 'test-field': 'test-value' } }
+      const request = { payload: { 'test-field': 'test-value' }, url: {} }
 
       getExemptionCacheSpy.mockReturnValueOnce({
         projectName: 'Test Project'
@@ -1083,7 +1085,7 @@ describe('#activityDatesController', () => {
         'activity-end-date-year': (currentYear + 1).toString()
       }
 
-      const request = { payload }
+      const request = { payload, url: {} }
       const h = { redirect: jest.fn() }
 
       // This should trigger line 414 (throw e) since there are no validation details
@@ -1131,7 +1133,7 @@ describe('#activityDatesController', () => {
         'activity-end-date-year': (currentYear + 1).toString()
       }
 
-      const request = { payload }
+      const request = { payload, url: {} }
 
       // Call the handler directly to hit the catch block
       await activityDatesSubmitController.handler(request, h)
@@ -1195,7 +1197,7 @@ describe('#activityDatesController', () => {
       // Use empty payload to test the || '' fallback logic
       const payload = {}
 
-      const request = { payload }
+      const request = { payload, url: {} }
 
       // Call the handler directly to hit the catch block
       await activityDatesSubmitController.handler(request, h)

@@ -159,7 +159,7 @@ describe('Same activity dates page', () => {
     )
   })
 
-  test('should redirect to coordinates entry choice when "yes" is selected', async () => {
+  test('should redirect to correct page "yes" is selected', async () => {
     const response = await server.inject({
       method: 'POST',
       url: '/exemption/same-activity-dates',
@@ -170,7 +170,7 @@ describe('Same activity dates page', () => {
 
     expect(response.statusCode).toBe(statusCodes.redirect)
     expect(response.headers.location).toBe(
-      '/exemption/how-do-you-want-to-enter-the-coordinates'
+      '/exemption/site-details-activity-dates'
     )
 
     expect(updateExemptionMultipleSiteDetails).toHaveBeenCalledWith(
@@ -180,7 +180,7 @@ describe('Same activity dates page', () => {
     )
   })
 
-  test('should redirect to coordinates entry choice when "no" is selected', async () => {
+  test('should redirect to correct page when "no" is selected', async () => {
     const response = await server.inject({
       method: 'POST',
       url: '/exemption/same-activity-dates',
@@ -191,7 +191,7 @@ describe('Same activity dates page', () => {
 
     expect(response.statusCode).toBe(statusCodes.redirect)
     expect(response.headers.location).toBe(
-      '/exemption/how-do-you-want-to-enter-the-coordinates'
+      '/exemption/site-details-activity-dates'
     )
 
     expect(updateExemptionMultipleSiteDetails).toHaveBeenCalledWith(

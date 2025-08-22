@@ -23,8 +23,12 @@ import {
   setExemptionCache
 } from '~/src/server/common/helpers/session-cache/utils.js'
 import { activityDatesSchema } from '~/src/server/common/schemas/date.js'
+import { getSiteNumber } from '~/src/server/exemption/site-details/utils/site-number.js'
 
-function createTemplateData(exemption, payload = null) {
+const isPageInSiteDetailsFlow = (request) =>
+  request.url.pathname === routes.SITE_DETAILS_ACTIVITY_DATES
+
+const createTemplateData = (request, exemption, payload = null) => {
   let dateFields
 
   if (payload) {
@@ -47,6 +51,27 @@ function createTemplateData(exemption, payload = null) {
     }
   }
 
+  const isInSiteDetailsFlow = isPageInSiteDetailsFlow(request)
+  const { multipleSiteDetails } = exemption
+
+  if (isInSiteDetailsFlow) {
+    const siteNumber = getSiteNumber(exemption, request)
+
+    const sameActivityDates = multipleSiteDetails?.sameActivityDates
+    const showSiteNumber = sameActivityDates === 'no' && siteNumber
+
+    return {
+      ...ACTIVITY_DATES_VIEW_SETTINGS,
+      projectName: exemption.projectName,
+      ...dateFields,
+      backLink: routes.SAME_ACTIVITY_DATES,
+      cancelLink: routes.TASK_LIST + '?cancel=site-details',
+      isSiteDetailsFlow: true,
+      isMultiSiteJourney: !!multipleSiteDetails?.multipleSitesEnabled,
+      siteNumber: showSiteNumber ? siteNumber : null
+    }
+  }
+
   return {
     ...ACTIVITY_DATES_VIEW_SETTINGS,
     projectName: exemption.projectName,
@@ -57,7 +82,10 @@ function createTemplateData(exemption, payload = null) {
 export const activityDatesController = {
   handler(request, h) {
     const exemption = getExemptionCache(request)
-    return h.view(ACTIVITY_DATES_VIEW_ROUTE, createTemplateData(exemption))
+    return h.view(
+      ACTIVITY_DATES_VIEW_ROUTE,
+      createTemplateData(request, exemption)
+    )
   }
 }
 
@@ -73,13 +101,16 @@ function handleValidationErrors(request, h, err) {
 
   if (!validationResult) {
     return h
-      .view(ACTIVITY_DATES_VIEW_ROUTE, createTemplateData(exemption, payload))
+      .view(
+        ACTIVITY_DATES_VIEW_ROUTE,
+        createTemplateData(request, exemption, payload)
+      )
       .takeover()
   }
 
   return h
     .view(ACTIVITY_DATES_VIEW_ROUTE, {
-      ...createTemplateData(exemption, payload),
+      ...createTemplateData(request, exemption, payload),
       ...validationResult
     })
     .takeover()
@@ -123,7 +154,11 @@ export const activityDatesSubmitController = {
         }
       })
 
-      return h.redirect(routes.TASK_LIST)
+      const isInSiteDetailsFlow = isPageInSiteDetailsFlow(request)
+
+      return h.redirect(
+        isInSiteDetailsFlow ? routes.COORDINATES_ENTRY_CHOICE : routes.TASK_LIST
+      )
     } catch (e) {
       const { details } = e.data?.payload?.validation ?? {}
 
@@ -138,7 +173,7 @@ export const activityDatesSubmitController = {
       const errors = errorDescriptionByFieldName(errorSummary)
 
       return h.view(ACTIVITY_DATES_VIEW_ROUTE, {
-        ...createTemplateData(exemption, payload),
+        ...createTemplateData(request, exemption, payload),
         errors,
         errorSummary
       })

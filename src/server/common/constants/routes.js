@@ -21,6 +21,7 @@ export const routes = {
   FILE_UPLOAD: '/exemption/upload-file',
   UPLOAD_AND_WAIT: '/exemption/upload-and-wait',
   ACTIVITY_DATES: '/exemption/activity-dates',
+  SITE_DETAILS_ACTIVITY_DATES: '/exemption/site-details-activity-dates',
   CHECK_YOUR_ANSWERS: '/exemption/check-your-answers',
   CONFIRMATION: '/exemption/confirmation',
   SITE_DETAILS: '/exemption/site-details',

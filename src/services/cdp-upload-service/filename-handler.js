@@ -46,10 +46,13 @@ export class FilenameHandler {
     try {
       return rfc2047.decode(encodedFilename)
     } catch (error) {
-      this.logger.warn('Failed to decode RFC-2047 filename', {
-        encodedfilename: encodedFilename,
-        error: error.message
-      })
+      this.logger.warn(
+        {
+          encodedfilename: encodedFilename,
+          error: error.message
+        },
+        'Failed to decode RFC-2047 filename'
+      )
       // Fallback: return as-is if we can't decode
       return encodedFilename
     }

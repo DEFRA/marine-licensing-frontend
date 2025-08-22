@@ -408,11 +408,11 @@ describe('#reviewSiteDetails', () => {
           '/exemption/test-id'
         )
         expect(mockRequest.logger.info).toHaveBeenCalledWith(
-          'Loaded site details from MongoDB for display',
           {
             exemptionId: 'test-id',
             coordinatesType: 'file'
-          }
+          },
+          'Loaded site details from MongoDB for display'
         )
         expect(h.view).toHaveBeenCalledWith(
           FILE_UPLOAD_REVIEW_VIEW_ROUTE,

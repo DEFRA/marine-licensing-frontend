@@ -10,7 +10,7 @@ export const getAuthToken = async (request) => {
     )
     return sessionData?.token || null
   } catch (error) {
-    request.logger.error('Error getting auth token from session:', error)
+    request.logger.error(error, 'Error getting auth token from session')
     return null
   }
 }

@@ -12,7 +12,7 @@
             text: "Change"
           }
         ]
-      },
+      } if not params.isReadOnly,
       attributes: {
         id: "site-details-card"
       }
@@ -23,7 +23,7 @@
           text: "Method of providing site location"
         },
         value: {
-          html: siteDetails.reviewSummaryText
+          html: params.siteDetails.reviewSummaryText
         }
       },
       {
@@ -31,7 +31,7 @@
           text: "Coordinate system"
         },
         value: {
-          html: siteDetails.coordinateSystemText | replace('\n', '<br> ')
+          html: params.siteDetails.coordinateSystemText | replace('\n', '<br> ')
         }
       },
       {
@@ -39,7 +39,7 @@
           text: "Coordinates at centre of site"
         },
         value: {
-          html: siteDetails.coordinateDisplayText
+          html: params.siteDetails.coordinateDisplayText
         }
       },
       {
@@ -47,7 +47,7 @@
           text: "Width of circular site"
         },
         value: {
-          html: siteDetails.circleWidth + " metres"
+          html: params.siteDetails.circleWidth + " metres"
         }
       },
       {

@@ -15,14 +15,14 @@
 {% block head %}
   {{ super() }}
   {% if isProcessing %}
-    {# This meta-refresh of 2 should be kept the same as the app-loading-spinner animation time  #}
+    {# This meta-refresh of 2 should be kept the same as the app-loading-spinner animation time so they are kept in visual sync #}
     <meta http-equiv="refresh" content="{{ pageRefreshTimeInSeconds }}">
   {% endif %}
 {% endblock %}
 
 {% block content %}
   <div class="govuk-grid-row">
-    <div class="govuk-grid-column-two-thirds">
+    <div class="govuk-grid-column-full">
 
       {% if isProcessing %}
 

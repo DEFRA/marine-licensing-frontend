@@ -253,21 +253,30 @@ export const getSiteDetails = async (
       )
       if (payload?.value?.siteDetails) {
         siteDetails = payload.value.siteDetails
-        request.logger.info('Loaded site details from MongoDB for display', {
-          exemptionId: exemption.id,
-          coordinatesType: siteDetails.coordinatesType
-        })
+        request.logger.info(
+          {
+            exemptionId: exemption.id,
+            coordinatesType: siteDetails.coordinatesType
+          },
+          'Loaded site details from MongoDB for display'
+        )
       } else {
-        request.logger.warn('No site details found in MongoDB response', {
-          exemptionId: exemption.id
-        })
+        request.logger.warn(
+          {
+            exemptionId: exemption.id
+          },
+          'No site details found in MongoDB response'
+        )
         // Continue with session data when no site details found
       }
     } catch (error) {
-      request.logger.error('Failed to load exemption data from MongoDB', {
-        error: error.message,
-        exemptionId: exemption.id
-      })
+      request.logger.error(
+        {
+          error: error.message,
+          exemptionId: exemption.id
+        },
+        'Failed to load exemption data from MongoDB'
+      )
     }
   }
 
@@ -300,11 +309,14 @@ export const prepareFileUploadDataForSave = (siteDetails, request) => {
     }
   }
 
-  request.logger.info('Saving file upload site details', {
-    fileType: siteDetails.fileUploadType,
-    featureCount,
-    filename: uploadedFile.filename
-  })
+  request.logger.info(
+    {
+      fileType: siteDetails.fileUploadType,
+      featureCount,
+      filename: uploadedFile.filename
+    },
+    'Saving file upload site details'
+  )
 
   return dataToSave
 }
@@ -318,10 +330,13 @@ export const prepareFileUploadDataForSave = (siteDetails, request) => {
 export const prepareManualCoordinateDataForSave = (exemption, request) => {
   const siteDetails = exemption.siteDetails
 
-  request.logger.info('Saving manual coordinate site details', {
-    coordinatesType: siteDetails.coordinatesType,
-    coordinatesEntry: siteDetails.coordinatesEntry
-  })
+  request.logger.info(
+    {
+      coordinatesType: siteDetails.coordinatesType,
+      coordinatesEntry: siteDetails.coordinatesEntry
+    },
+    'Saving manual coordinate site details'
+  )
 
   // Manual coordinate entry flow - use existing data structure
   return exemption.siteDetails
@@ -410,10 +425,13 @@ export const handleSubmissionError = (
   exemptionId,
   coordinatesType
 ) => {
-  request.logger.error('Error submitting site review', {
-    error: error.message,
-    exemptionId,
-    coordinatesType
-  })
+  request.logger.error(
+    {
+      error: error.message,
+      exemptionId,
+      coordinatesType
+    },
+    'Error submitting site review'
+  )
   return Boom.badRequest('Error submitting site review', error)
 }

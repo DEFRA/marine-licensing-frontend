@@ -104,7 +104,7 @@ function getAllowedExtensions(fileType) {
  */
 async function extractCoordinatesFromFile(request, s3Bucket, s3Key, fileType) {
   try {
-    request.logger.info('Calling geo-parser API', { s3Bucket, s3Key, fileType })
+    request.logger.info({ s3Bucket, s3Key, fileType }, 'Calling geo-parser API')
     const response = await callGeoParserAPI(request, s3Bucket, s3Key, fileType)
     const geoJSON = validateAndExtractGeoJSON(response)
     const extractedCoordinates = extractCoordinatesFromGeoJSON(geoJSON)
@@ -142,10 +142,13 @@ const validateAndExtractGeoJSON = (response) => {
 }
 
 const logExtractionSuccess = (request, geoJSON, extractedCoordinates) => {
-  request.logger.info('Successfully extracted coordinates', {
-    featureCount: geoJSON.features.length,
-    coordinateCount: extractedCoordinates.length
-  })
+  request.logger.info(
+    {
+      featureCount: geoJSON.features.length,
+      coordinateCount: extractedCoordinates.length
+    },
+    'Successfully extracted coordinates'
+  )
 }
 
 const buildCoordinateResult = (geoJSON, extractedCoordinates) => ({
@@ -155,10 +158,13 @@ const buildCoordinateResult = (geoJSON, extractedCoordinates) => ({
 })
 
 const logExtractionError = (request, error, fileContext) => {
-  request.logger.error('Failed to extract coordinates from file', {
-    error: error.message,
-    ...fileContext
-  })
+  request.logger.error(
+    {
+      error: error.message,
+      ...fileContext
+    },
+    'Failed to extract coordinates from file'
+  )
 }
 
 /**
@@ -194,11 +200,14 @@ function handleGeoParserError(request, error, filename, fileType) {
 
   storeUploadError(request, errorDetails, fileType)
 
-  request.logger.error('Failed to extract coordinates from uploaded file', {
-    error: error.message,
-    filename,
-    fileType
-  })
+  request.logger.error(
+    {
+      error: error.message,
+      filename,
+      fileType
+    },
+    'Failed to extract coordinates from uploaded file'
+  )
 
   return { redirect: routes.FILE_UPLOAD }
 }
@@ -390,10 +399,13 @@ function handleRejectedStatus(status, uploadConfig, request, h) {
  */
 function handleUnknownStatus(request, uploadConfig, status, h) {
   // Unknown status - redirect to file type selection
-  request.logger.warn('Unknown upload status', {
-    uploadId: uploadConfig.uploadId,
-    status: status.status
-  })
+  request.logger.warn(
+    {
+      uploadId: uploadConfig.uploadId,
+      status: status.status
+    },
+    'Unknown upload status'
+  )
 
   return h.redirect(routes.CHOOSE_FILE_UPLOAD_TYPE)
 }
@@ -468,10 +480,13 @@ export const uploadAndWaitController = {
         exemption
       })
     } catch (error) {
-      request.logger.error('Failed to check upload status', {
-        error: error.message,
-        uploadId: uploadConfig.uploadId
-      })
+      request.logger.error(
+        {
+          error: error.message,
+          uploadId: uploadConfig.uploadId
+        },
+        'Failed to check upload status'
+      )
 
       // Clear upload config and redirect to file type selection
       updateExemptionSiteDetails(request, 'uploadConfig', null)

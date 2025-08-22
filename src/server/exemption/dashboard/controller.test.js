@@ -175,8 +175,8 @@ describe('#dashboard', () => {
       await dashboardController.handler(request, h)
 
       expect(request.logger.error).toHaveBeenCalledWith(
-        'Error fetching projects:',
-        expect.any(Error)
+        { error: expect.any(Error) },
+        'Error fetching projects'
       )
 
       expect(h.view).toHaveBeenCalledWith(DASHBOARD_VIEW_ROUTE, {

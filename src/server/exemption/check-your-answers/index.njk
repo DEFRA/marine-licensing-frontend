@@ -1,8 +1,8 @@
 {% extends 'layouts/page.njk' %}
 {% from "govuk/components/back-link/macro.njk" import govukBackLink %}
 {% from "govuk/components/button/macro.njk" import govukButton %}
-{% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
 {% from "site-details-data-script/macro.njk" import appSiteDetailsDataScript %}
+
 {% block pageTitle %}
   {{ title }} - {{ serviceName }}
 {% endblock %}
@@ -24,276 +24,20 @@
       {% if projectName %}
         <span class="govuk-caption-l">{{ projectName }}</span>
       {% endif %}
+
       <h2 class="govuk-heading-l" id="check-your-answers-heading">Check your answers before sending your information</h2>
-      {{ govukSummaryList({
-        card: {
-          title: {
-            text: "Project details"
-          },
-          actions: {
-            items: [
-              {
-                href: "#",
-                text: "Change"
-              }
-            ]
-          },
-          attributes: {
-            id: "project-details-card"
-          }
-        },
-        rows: [
-          {
-            key: {
-              text: "Project name"
-            },
-            value: {
-              html: projectName
-            },
-            attributes: {
-              id: "project-name-row"
-            }
-          }
-        ]
-      }) }}
-      {{ govukSummaryList({
-        card: {
-          title: {
-            text: "Activity dates"
-          },
-          actions: {
-            items: [
-              {
-                href: "#",
-                text: "Change"
-              }
-            ]
-          },
-          attributes: {
-            id: "activity-dates-card"
-          }
-        },
-        rows: [
-          {
-            key: {
-              text: "Start date"
-            },
-            value: {
-              html: activityDates.start | formatDate('d MMMM yyyy')
-            }
-          },
-          {
-            key: {
-              text: "End date"
-            },
-            value: {
-              html: activityDates.end | formatDate('d MMMM yyyy')
-            }
-          }
-        ]
-      }) }}
-      {{ govukSummaryList({
-        card: {
-          title: {
-            text: "Activity details"
-          },
-          attributes: {
-            id: "activity-details-card"
-          }
-        },
-        rows: [
-          {
-            key: {
-              text: "Activity description"
-            },
-            value: {
-              html: activityDescription
-            },
-            classes: "",
-            actions: {
-              items: [
-                {
-                  href: "#",
-                  text: "Change",
-                  visuallyHiddenText: "activity description"
-                }
-              ]
-            }
-          },
-          {
-            key: {
-              text: "Type of activity"
-            },
-            value: {
-              html: ""
-            },
-            classes: "govuk-summary-list__row--no-border"
-          },
-          {
-            key: {
-              text: "The purpose of the activity"
-            },
-            value: {
-              html: ""
-            },
-            classes: "govuk-summary-list__row--no-border"
-          },
-          {
-            key: {
-              text: "What the activity involves"
-            },
-            value: {
-              html: ""
-            },
-            classes: "govuk-summary-list__row--no-border"
-          },
-          {
-            key: {
-              text: "Why this activity is exempt"
-            },
-            value: {
-              html: ""
-            },
-            classes: "govuk-summary-list__row--no-border"
-          },
-          {
-            key: {
-              text: "Your answers from 'Check if you need a marine licence'"
-            },
-            value: {
-              html: "<p><a href=\"#\" class=\"govuk-link\">Download a copy of your answers (PDF)</a></p>
-                    <p class=\"govuk-body\">If you need to change any of your 'Check if you need a marine licence' answers:</p>
-                    <ol class=\"govuk-list govuk-list--number\">
-                      <li>Delete this project from your projects.</li>
-                      <li>Restart the process by checking if you need a marine licence.</li>
-                    </ol>"
-            }
-          }
-        ]
-      }) }}
+      
+      {% include "project-details-card.njk" %}
+      {% include "activity-dates-card.njk" %}
+      {% include "activity-details-card.njk" %}
       {% if siteDetails.isFileUpload %}
-        {% set siteDetailsRows = [{
-        key: {
-          text: "Method of providing site location"
-        },
-        value: {
-          html: siteDetails.method
-        }
-      }, {
-        key: {
-          text: "File type"
-        },
-        value: {
-          html: siteDetails.fileType
-        }
-      }, {
-        key: {
-          text: "File uploaded"
-        },
-        value: {
-          html: siteDetails.filename
-        }
-      },
-                    {
-                    classes: "govuk-summary-list__row--full-width",
-                        key: {
-                            text: "Map view",
-                            classes: "govuk-summary-list__key--full-width"
-                        },
-                        value: {
-                            html: '<div class="app-site-details-map" data-module="site-details-map"></div>',
-                            classes: "govuk-summary-list__value--full-width"
-                        }
-                    }] %}
+        {% include "file-upload-summary.njk" %}
+      {% elif siteDetails.isPolygonSite %}
+        {% include "polygon-summary.njk" %}
       {% else %}
-        {% set siteDetailsRows = [{
-        key: {
-          text: "Method of providing site location"
-        },
-        value: {
-          html: siteDetails.reviewSummaryText
-        }
-      }, {
-        key: {
-          text: "Coordinates system"
-        },
-        value: {
-          html: siteDetails.coordinateSystemText
-        }
-      }, {
-        key: {
-          text: "Coordinates at centre of site"
-        },
-        value: {
-          html: siteDetails.coordinateDisplayText
-        }
-      }, {
-        key: {
-          text: "Width of circular site"
-        },
-        value: {
-          html: siteDetails.circleWidth + " metres"
-        }
-      },
-                    {
-                        key: {
-                            text: "Map view",
-                            classes: "govuk-summary-list__key--full-width"
-                        },
-                        value: {
-                            html: '<div class="app-site-details-map" data-module="site-details-map"></div>',
-                            classes: "govuk-summary-list__value--full-width"
-                        }
-                    }] %}
+        {% include "point-circle-summary.njk" %}
       {% endif %}
-      {{ govukSummaryList({
-        card: {
-          title: {
-            text: "Site details"
-          },
-          actions: {
-            items: [
-              {
-                href: "#",
-                text: "Change"
-              }
-            ]
-          },
-          attributes: {
-            id: "site-details-card"
-          }
-        },
-        rows: siteDetailsRows,
-        classes: "govuk-summary-list--full-width"
-      }) }}
-      {{ govukSummaryList({
-        card: {
-          title: {
-            text: "Public register"
-          },
-          actions: {
-            items: [
-              {
-                href: "#",
-                text: "Change"
-              }
-            ]
-          },
-          attributes: {
-            id: "public-register-card"
-          }
-        },
-        rows: [
-        {
-            key: {
-              text: "Information withheld from public register"
-            },
-            value: {
-              html: "Yes" if publicRegister.consent === 'yes' else "No"
-            }
-          }
-        ]
-      }) }}
+      {% include "public-register-card.njk" %}
       <form method="post">
         <input type="hidden" name="csrfToken" value="{{ csrfToken }}"/>
         <h2 class="govuk-heading-m">Now send your information</h2>

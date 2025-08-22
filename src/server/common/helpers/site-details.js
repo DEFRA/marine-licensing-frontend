@@ -70,6 +70,7 @@ export const generatePointSpecificErrorMessage = (baseMessage, index) => {
 /**
  * Create site details data JSON for map visualization
  * @param {object} siteDetails - Site details object containing coordinate and file information
+ * @param {string} coordinateSystem - Coordinate system identifier ('wgs84' or 'osgb36')
  * @returns {string} JSON string containing site details data for map
  */
 export const createSiteDetailsDataJson = (siteDetails, coordinateSystem) => {

@@ -1,10 +1,10 @@
 import { JSDOM } from 'jsdom'
-import * as authRequests from '~/src/server/common/helpers/authenticated-requests.js'
 import * as cacheUtils from '~/src/server/common/helpers/session-cache/utils.js'
-import * as coordinateUtils from '~/src/server/common/helpers/coordinate-utils.js'
-import * as reviewUtils from '~/src/server/exemption/site-details/review-site-details/utils.js'
 import { createServer } from '~/src/server/index.js'
 import { mockExemption } from '~/src/server/test-helpers/mocks.js'
+import * as authRequests from '~/src/server/common/helpers/authenticated-requests.js'
+import * as reviewUtils from '~/src/server/exemption/site-details/review-site-details/utils.js'
+import * as coordinateUtils from '~/src/server/common/helpers/coordinate-utils.js'
 import * as authUtils from '~/src/server/common/plugins/auth/utils.js'
 
 const CSS_SELECTORS = {
@@ -134,8 +134,8 @@ const createFileUploadExemption = (
   })
 
 const createWgs84Exemption = (
-  latitude = '55.019889',
-  longitude = '-1.399500'
+  latitude = '54.726200',
+  longitude = '-1.599400'
 ) =>
   createExemptionWithSiteDetails({
     coordinateSystem: 'wgs84',
@@ -147,6 +147,24 @@ const createOsgb36Exemption = (eastings = '425053', northings = '564180') =>
     coordinateSystem: 'osgb36',
     coordinates: { eastings, northings }
   })
+
+const createPolygonExemption = (
+  coordinateSystem = 'wgs84',
+  coordinates = [
+    { latitude: '54.721000', longitude: '-1.595000' },
+    { latitude: '54.725000', longitude: '-1.590000' },
+    { latitude: '54.729000', longitude: '-1.585000' }
+  ]
+) => ({
+  ...mockExemption,
+  siteDetails: {
+    coordinatesType: 'coordinates',
+    coordinatesEntry: 'multiple',
+    coordinateSystem,
+    coordinates,
+    circleWidth: '100'
+  }
+})
 
 describe('check your answers controller', () => {
   let server
@@ -169,6 +187,10 @@ describe('check your answers controller', () => {
     getExemptionCacheSpy = jest
       .spyOn(cacheUtils, 'getExemptionCache')
       .mockReturnValue(mockExemption)
+  })
+
+  afterEach(() => {
+    jest.restoreAllMocks()
   })
 
   afterAll(async () => {
@@ -382,6 +404,7 @@ describe('check your answers controller', () => {
       payload: {
         value: {
           id: 'test-id'
+          // Missing taskList property
         }
       }
     })
@@ -1390,6 +1413,325 @@ describe('check your answers controller', () => {
         coordinates: { eastings: '425053', northings: '564180' },
         circleWidth: '100'
       })
+    })
+  })
+
+  describe('Polygon coordinate handling', () => {
+    beforeEach(() => {
+      jest
+        .spyOn(reviewUtils, 'getPolygonCoordinatesDisplayData')
+        .mockImplementation((siteDetails) => {
+          if (siteDetails?.coordinateSystem === 'wgs84') {
+            return (
+              siteDetails.coordinates?.map((coord, index) => ({
+                label:
+                  index === 0 ? 'Start and end points' : `Point ${index + 1}`,
+                value: `${coord.latitude}, ${coord.longitude}`
+              })) || []
+            )
+          }
+          if (siteDetails?.coordinateSystem === 'osgb36') {
+            return (
+              siteDetails.coordinates?.map((coord, index) => ({
+                label:
+                  index === 0 ? 'Start and end points' : `Point ${index + 1}`,
+                value: `${coord.eastings}, ${coord.northings}`
+              })) || []
+            )
+          }
+          return []
+        })
+    })
+
+    const setupPolygonMocks = (polygonExemption) => {
+      getExemptionCacheSpy.mockReturnValue(polygonExemption)
+
+      jest
+        .spyOn(authRequests, 'authenticatedGetRequest')
+        .mockResolvedValue({ payload: { value: polygonExemption } })
+    }
+
+    test('Should process polygon site details with coordinatesEntry multiple', async () => {
+      const polygonExemption = createPolygonExemption('wgs84', [
+        { latitude: '54.721000', longitude: '-1.595000' },
+        { latitude: '54.725000', longitude: '-1.590000' },
+        { latitude: '54.729000', longitude: '-1.585000' }
+      ])
+
+      setupPolygonMocks(polygonExemption)
+
+      const { result, statusCode } = await server.inject({
+        method: 'GET',
+        url: '/exemption/check-your-answers'
+      })
+
+      expect(statusCode).toBe(200)
+
+      expect(result).toContain(
+        'Check your answers before sending your information'
+      )
+
+      expect(result).toContain(
+        'Manually enter multiple sets of coordinates to mark the boundary of the site'
+      )
+
+      expect(result).toContain('WGS84 (World Geodetic System 1984)')
+
+      expect(result).toContain('Start and end points')
+      expect(result).toContain('Point 2')
+      expect(result).toContain('Point 3')
+    })
+
+    test('Should display WGS84 polygon coordinates correctly with 3 points', async () => {
+      const smallPolygonExemption = createPolygonExemption('wgs84', [
+        { latitude: '54.721000', longitude: '-1.595000' },
+        { latitude: '54.725000', longitude: '-1.590000' },
+        { latitude: '54.729000', longitude: '-1.585000' }
+      ])
+
+      setupPolygonMocks(smallPolygonExemption)
+
+      const { result, statusCode } = await server.inject({
+        method: 'GET',
+        url: '/exemption/check-your-answers'
+      })
+
+      expect(statusCode).toBe(200)
+      const { document } = new JSDOM(result).window
+
+      expect(
+        normalizeWhitespace(
+          getSecondRowValue(document, CSS_SELECTORS.cards.siteDetails)
+        )
+      ).toBe(EXPECTED_TEXT.coordinateSystems.wgs84)
+
+      expect(result).toContain('54.721000, -1.595000')
+      expect(result).toContain('54.725000, -1.590000')
+      expect(result).toContain('54.729000, -1.585000')
+    })
+
+    test('Should display OSGB36 polygon coordinates correctly with 3 points', async () => {
+      const osgb36PolygonExemption = createPolygonExemption('osgb36', [
+        { eastings: '425053', northings: '564180' },
+        { eastings: '426000', northings: '565000' },
+        { eastings: '427000', northings: '566000' }
+      ])
+
+      setupPolygonMocks(osgb36PolygonExemption)
+
+      const { result, statusCode } = await server.inject({
+        method: 'GET',
+        url: '/exemption/check-your-answers'
+      })
+
+      expect(statusCode).toBe(200)
+      const { document } = new JSDOM(result).window
+
+      expect(
+        normalizeWhitespace(
+          getSecondRowValue(document, CSS_SELECTORS.cards.siteDetails)
+        )
+      ).toBe(EXPECTED_TEXT.coordinateSystems.osgb36)
+
+      expect(result).toContain('425053, 564180')
+      expect(result).toContain('426000, 565000')
+      expect(result).toContain('427000, 566000')
+    })
+
+    test('Should display WGS84 polygon coordinates correctly with 13 points', async () => {
+      const largePolygonCoordinates = [
+        { latitude: '54.720000', longitude: '-1.600000' },
+        { latitude: '54.722000', longitude: '-1.598000' },
+        { latitude: '54.724000', longitude: '-1.596000' },
+        { latitude: '54.726000', longitude: '-1.594000' },
+        { latitude: '54.728000', longitude: '-1.592000' },
+        { latitude: '54.730000', longitude: '-1.590000' },
+        { latitude: '54.732000', longitude: '-1.588000' },
+        { latitude: '54.734000', longitude: '-1.586000' },
+        { latitude: '54.736000', longitude: '-1.584000' },
+        { latitude: '54.738000', longitude: '-1.582000' },
+        { latitude: '54.740000', longitude: '-1.580000' },
+        { latitude: '54.742000', longitude: '-1.578000' },
+        { latitude: '54.744000', longitude: '-1.576000' }
+      ]
+
+      const largePolygonExemption = createPolygonExemption(
+        'wgs84',
+        largePolygonCoordinates
+      )
+
+      setupPolygonMocks(largePolygonExemption)
+
+      const { result, statusCode } = await server.inject({
+        method: 'GET',
+        url: '/exemption/check-your-answers'
+      })
+
+      expect(statusCode).toBe(200)
+      const { document } = new JSDOM(result).window
+
+      // Verify all 13 coordinates are displayed
+      expect(result).toContain('Start and end points')
+      for (let i = 2; i <= 13; i++) {
+        expect(result).toContain(`Point ${i}`)
+      }
+
+      expect(
+        normalizeWhitespace(
+          getSecondRowValue(document, CSS_SELECTORS.cards.siteDetails)
+        )
+      ).toBe(EXPECTED_TEXT.coordinateSystems.wgs84)
+
+      expect(result).toContain('54.720000, -1.600000')
+      expect(result).toContain('54.744000, -1.576000')
+    })
+
+    test('Should display OSGB36 polygon coordinates correctly with 13 points', async () => {
+      const largeOsgb36PolygonCoordinates = [
+        { eastings: '425053', northings: '564180' },
+        { eastings: '426000', northings: '565000' },
+        { eastings: '427000', northings: '566000' },
+        { eastings: '428000', northings: '567000' },
+        { eastings: '429000', northings: '568000' },
+        { eastings: '430000', northings: '569000' },
+        { eastings: '431000', northings: '570000' },
+        { eastings: '432000', northings: '571000' },
+        { eastings: '433000', northings: '572000' },
+        { eastings: '434000', northings: '573000' },
+        { eastings: '435000', northings: '574000' },
+        { eastings: '436000', northings: '575000' },
+        { eastings: '437000', northings: '576000' }
+      ]
+
+      const largeOsgb36PolygonExemption = createPolygonExemption(
+        'osgb36',
+        largeOsgb36PolygonCoordinates
+      )
+
+      setupPolygonMocks(largeOsgb36PolygonExemption)
+
+      const { result, statusCode } = await server.inject({
+        method: 'GET',
+        url: '/exemption/check-your-answers'
+      })
+
+      expect(statusCode).toBe(200)
+      const { document } = new JSDOM(result).window
+
+      expect(result).toContain('Start and end points')
+      for (let i = 2; i <= 13; i++) {
+        expect(result).toContain(`Point ${i}`)
+      }
+
+      expect(
+        normalizeWhitespace(
+          getSecondRowValue(document, CSS_SELECTORS.cards.siteDetails)
+        )
+      ).toBe(EXPECTED_TEXT.coordinateSystems.osgb36)
+
+      // Check a couple of coordinates are there
+      expect(result).toContain('425053, 564180')
+      expect(result).toContain('437000, 576000')
+    })
+
+    test('Should handle polygon sites with isPolygonSite property set correctly', async () => {
+      const polygonExemption = createPolygonExemption('wgs84', [
+        { latitude: '54.721000', longitude: '-1.595000' },
+        { latitude: '54.725000', longitude: '-1.590000' },
+        { latitude: '54.729000', longitude: '-1.585000' }
+      ])
+
+      setupPolygonMocks(polygonExemption)
+
+      const { result, statusCode } = await server.inject({
+        method: 'GET',
+        url: '/exemption/check-your-answers'
+      })
+
+      expect(statusCode).toBe(200)
+
+      expect(result).toContain('Start and end points')
+      expect(result).toContain('Point 2')
+      expect(result).toContain('Point 3')
+
+      expect(result).toContain(
+        'Manually enter multiple sets of coordinates to mark the boundary of the site'
+      )
+    })
+
+    test('Should generate correct site details data for polygon sites', async () => {
+      const polygonExemption = createPolygonExemption('wgs84', [
+        { latitude: '54.721000', longitude: '-1.595000' },
+        { latitude: '54.725000', longitude: '-1.590000' },
+        { latitude: '54.729000', longitude: '-1.585000' }
+      ])
+
+      setupPolygonMocks(polygonExemption)
+
+      const { result, statusCode } = await server.inject({
+        method: 'GET',
+        url: '/exemption/check-your-answers'
+      })
+
+      expect(statusCode).toBe(200)
+      const { document } = new JSDOM(result).window
+
+      const siteDetailsScript = document.querySelector('#site-details-data')
+      expect(siteDetailsScript).toBeTruthy()
+
+      const siteDetailsData = JSON.parse(siteDetailsScript.textContent.trim())
+      expect(siteDetailsData).toEqual({
+        coordinatesType: 'coordinates',
+        coordinateSystem: 'wgs84',
+        coordinatesEntry: 'multiple',
+        coordinates: [
+          { latitude: '54.721000', longitude: '-1.595000' },
+          { latitude: '54.725000', longitude: '-1.590000' },
+          { latitude: '54.729000', longitude: '-1.585000' }
+        ],
+        circleWidth: '100'
+      })
+    })
+
+    test('Should include Map view row for polygon sites', async () => {
+      const polygonExemption = createPolygonExemption('wgs84', [
+        { latitude: '54.721000', longitude: '-1.595000' },
+        { latitude: '54.725000', longitude: '-1.590000' },
+        { latitude: '54.729000', longitude: '-1.585000' }
+      ])
+
+      setupPolygonMocks(polygonExemption)
+
+      const { result, statusCode } = await server.inject({
+        method: 'GET',
+        url: '/exemption/check-your-answers'
+      })
+
+      expect(statusCode).toBe(200)
+      const { document } = new JSDOM(result).window
+
+      const summaryRows = document.querySelectorAll(
+        `${CSS_SELECTORS.cards.siteDetails} ${CSS_SELECTORS.summaryList.row}`
+      )
+      const rowKeys = Array.from(summaryRows).map((row) =>
+        row.querySelector(CSS_SELECTORS.summaryList.key)?.textContent.trim()
+      )
+
+      expect(rowKeys).toContain('Map view')
+
+      const mapViewRow = Array.from(summaryRows).find(
+        (row) =>
+          row
+            .querySelector(CSS_SELECTORS.summaryList.key)
+            ?.textContent.trim() === 'Map view'
+      )
+      expect(mapViewRow).toBeTruthy()
+
+      const mapViewValue = mapViewRow.querySelector(
+        CSS_SELECTORS.summaryList.value
+      )
+      expect(mapViewValue.innerHTML).toContain('app-site-details-map')
+      expect(mapViewValue.innerHTML).toContain('data-module="site-details-map"')
     })
   })
 })

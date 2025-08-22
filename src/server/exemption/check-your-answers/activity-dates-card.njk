@@ -1,0 +1,38 @@
+{% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
+
+{{ govukSummaryList({
+    card: {
+      title: {
+        text: "Activity dates"
+      },
+      actions: {
+        items: [
+          {
+            href: "#",
+            text: "Change"
+          }
+        ]
+      },
+      attributes: {
+        id: "activity-dates-card"
+      }
+    },
+    rows: [
+      {
+        key: {
+          text: "Start date"
+        },
+        value: {
+          html: activityDates.start | formatDate('d MMMM yyyy')
+        }
+      },
+      {
+        key: {
+          text: "End date"
+        },
+        value: {
+          html: activityDates.end | formatDate('d MMMM yyyy')
+        }
+      }
+    ]
+  }) }}

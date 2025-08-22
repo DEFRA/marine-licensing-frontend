@@ -1,0 +1,38 @@
+{% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
+
+ {% set rows = [] %}
+
+ {% set _ = rows.push({
+      key: { text:  "Information withheld from public register" },
+      value: { html: "Yes" if publicRegister.consent === 'yes' else "No" }
+    })
+ %}
+
+{%  if publicRegister.consent === 'yes' %}
+
+ {% set _ = rows.push({
+   key: { text: "Why the information should be withheld" },
+   value: { html: publicRegister.reason | default('') }
+ }) %}
+
+{%  endif  %}
+
+{{ govukSummaryList({
+    card: {
+      title: {
+        text: "Public register"
+      },
+      actions: {
+        items: [
+          {
+            href: "#",
+            text: "Change"
+          }
+        ]
+      },
+      attributes: {
+        id: "public-register-card"
+      }
+    },
+    rows: rows
+  }) }}

@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm run format:*)",
+      "Bash(npm i:*)",
+      "Bash(claude mcp add playwright npx '@playwright/mcp@latest')",
+      "Bash(npm run dev:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

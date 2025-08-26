@@ -22,8 +22,6 @@ describe('defraId plugin', () => {
   let mockRequest
 
   beforeEach(() => {
-    jest.clearAllMocks()
-
     mockRequest = {
       yar: {
         flash: jest.fn()

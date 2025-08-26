@@ -3,6 +3,7 @@ import { config } from '~/src/config/config.js'
 import { openIdProvider } from '~/src/server/common/plugins/auth/open-id.js'
 import { routes } from '~/src/server/common/constants/routes.js'
 import { validateUserSession } from '~/src/server/common/plugins/auth/validate.js'
+import { cacheMcmsContextFromQueryParams } from '~/src/server/common/helpers/mcms-context/cache-mcms-context.js'
 
 export const defraId = {
   plugin: {
@@ -48,7 +49,8 @@ export const defraId = {
           isSameSite: 'Lax'
         },
         keepAlive: true,
-        redirectTo: () => {
+        redirectTo: (request) => {
+          cacheMcmsContextFromQueryParams(request)
           return `/login`
         },
         validate: async (request, session) => {

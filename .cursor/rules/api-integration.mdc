@@ -1,9 +1,4 @@
 ---
-description: 
-globs: 
-alwaysApply: true
----
----
 description: API Integration Standards
 globs: src/**/*.js
 ---
@@ -56,7 +51,7 @@ throw error
 - Return user-friendly error messages
 - Propagate errors up for handling
 
-## Response Processing 
+## Response Processing
 - Parse JSON responses
 - Validate response data structure
 - Handle empty responses appropriately

@@ -48,7 +48,7 @@ export const deleteExemptionController = {
         routes
       })
     } catch (error) {
-      request.logger.error('Error fetching project for delete:', error)
+      request.logger.error({ error }, 'Error fetching project for delete')
 
       return h.redirect(routes.DASHBOARD)
     }
@@ -80,22 +80,25 @@ export const deleteExemptionSubmitController = {
       const { id: cachedExemptionId } = exemption
 
       if (!exemptionId || exemptionId !== cachedExemptionId) {
-        request.logger.error('Exemption ID mismatch or missing:', {
-          formExemptionId: exemptionId,
-          cachedExemptionId
-        })
+        request.logger.error(
+          {
+            formExemptionId: exemptionId,
+            cachedExemptionId
+          },
+          'Exemption ID mismatch or missing'
+        )
         return h.redirect(routes.DASHBOARD)
       }
 
       await authenticatedRequest(request, 'DELETE', `/exemption/${exemptionId}`)
 
-      request.logger.info(`Deleted exemption ${exemptionId}`)
+      request.logger.info({ exemptionId }, `Deleted exemption ${exemptionId}`)
 
       clearExemptionCache(request)
 
       return h.redirect(routes.DASHBOARD)
     } catch (error) {
-      request.logger.error('Error deleting exemption:', error)
+      request.logger.error({ error }, 'Error deleting exemption')
       return h.redirect(routes.DASHBOARD)
     }
   }

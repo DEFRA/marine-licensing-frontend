@@ -170,13 +170,16 @@ export class CdpUploadService {
     this.loggingHelper = new CdpLoggingHelper(this.logger)
     this.filenameHandler = new FilenameHandler(this.logger)
 
-    this.logger.debug('CdpUploadService initialized', {
-      cdpServiceBaseUrl: this.config.cdpUploadServiceBaseUrl,
-      appBaseUrl: this.baseUrl,
-      timeout: this.config.timeout,
-      maxFileSize: this.config.maxFileSize,
-      allowedMimeTypes: this.allowedMimeTypes
-    })
+    this.logger.debug(
+      {
+        cdpServiceBaseUrl: this.config.cdpUploadServiceBaseUrl,
+        appBaseUrl: this.baseUrl,
+        timeout: this.config.timeout,
+        maxFileSize: this.config.maxFileSize,
+        allowedMimeTypes: this.allowedMimeTypes
+      },
+      'CdpUploadService initialized'
+    )
   }
 
   /**
@@ -228,10 +231,13 @@ export class CdpUploadService {
       // Response structure documented at: https://github.com/DEFRA/cdp-uploader/blob/main/README.md#post-initiate
       const data = payload
 
-      this.logger.info('Upload session initiated successfully', {
-        uploadId: data.uploadId,
-        redirectUrl
-      })
+      this.logger.info(
+        {
+          uploadId: data.uploadId,
+          redirectUrl
+        },
+        'Upload session initiated successfully'
+      )
 
       // Transform CDP service response to our standardized UploadConfig format
       return {
@@ -242,12 +248,14 @@ export class CdpUploadService {
         allowedTypes: mimeTypes ?? []
       }
     } catch (error) {
-      this.logger.error('Failed to initiate upload session', {
-        error: error.message,
-        redirectUrl,
-        mimeTypes,
-        s3Path
-      })
+      this.logger.error(
+        {
+          error: error.message,
+          redirectUrl,
+          mimeTypes
+        },
+        'Failed to initiate upload session'
+      )
       throw error
     }
   }
@@ -273,7 +281,7 @@ export class CdpUploadService {
    */
   async getStatus(uploadId, statusUrl) {
     try {
-      this.logger.debug('Checking upload status', { uploadId, statusUrl })
+      this.logger.debug({ uploadId, statusUrl }, 'Checking upload status')
 
       const { res, payload } = await this._makeStatusRequest(statusUrl)
 
@@ -293,10 +301,13 @@ export class CdpUploadService {
 
       const transformedStatus = this._transformCdpResponse(data)
 
-      this.logger.debug('Upload status retrieved', {
-        uploadId,
-        status: transformedStatus.status
-      })
+      this.logger.debug(
+        {
+          uploadId,
+          status: transformedStatus.status
+        },
+        'Upload status retrieved'
+      )
 
       return transformedStatus
     } catch (error) {
@@ -345,7 +356,7 @@ export class CdpUploadService {
         logContext.uploadId = uploadId
       }
 
-      this.logger.error(errorMessage, logContext)
+      this.logger.error(logContext, errorMessage)
       throw new Error(errorMessage)
     }
   }
@@ -589,15 +600,18 @@ export class CdpUploadService {
 
   _handleStatusErrors(res, uploadId) {
     if (res.statusCode === HTTP_STATUS.NOT_FOUND) {
-      this.logger.warn('Upload session not found', { uploadId })
+      this.logger.warn({ uploadId }, 'Upload session not found')
       return this._createUploadNotFoundError()
     }
 
     if (res.statusCode >= HTTP_STATUS.SERVER_ERROR) {
-      this.logger.error('Service error when checking status', {
-        uploadId,
-        status: res.statusCode
-      })
+      this.logger.error(
+        {
+          uploadId,
+          status: res.statusCode
+        },
+        'Service error when checking status'
+      )
       return this._createServiceUnavailableError()
     }
 
@@ -606,17 +620,23 @@ export class CdpUploadService {
 
   _handleNetworkErrors(error, uploadId) {
     if (error.code === 'ECONNRESET' || error.code === 'ETIMEDOUT') {
-      this.logger.error('Request timeout when checking status', {
-        uploadId,
-        error: error.message
-      })
+      this.logger.error(
+        {
+          uploadId,
+          error: error.message
+        },
+        'Request timeout when checking status'
+      )
       return this._createNetworkTimeoutError()
     }
 
-    this.logger.error('Failed to check upload status', {
-      uploadId,
-      error: error.message
-    })
+    this.logger.error(
+      {
+        uploadId,
+        error: error.message
+      },
+      'Failed to check upload status'
+    )
     throw error
   }
 

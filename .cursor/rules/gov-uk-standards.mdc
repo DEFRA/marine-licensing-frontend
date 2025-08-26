@@ -1,11 +1,7 @@
 ---
-description: 
-globs: 
-alwaysApply: true
----
----
 description: GOV.UK Frontend
 globs: *.njk, *.js
+alwaysApply: true
 ---
 # GOV UK Frontend
 
@@ -18,11 +14,12 @@ globs: *.njk, *.js
 - Use layouts/page.njk as base template
 - Follow GDS template hierarchy
 - Required template blocks:
-  - pageTitle: Page title with " - Defra SDLC Governance Checklist" suffix
+  - pageTitle: Page title
   - content: Main content area
 - Use govuk-width-container for page layout
 - Use govuk-main-wrapper for main content
 - Use govuk-grid-row and govuk-grid-column-* for grid layouts
+- Use <nav> element for back links (accessibility)
 
 ## Template Inheritance
 - Always use search path style imports (e.g. {% extends "layouts/page.njk" %})

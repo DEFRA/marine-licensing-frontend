@@ -23,6 +23,7 @@ export const routes = {
   ACTIVITY_DATES: '/exemption/activity-dates',
   SITE_DETAILS_ACTIVITY_DATES: '/exemption/site-details-activity-dates',
   CHECK_YOUR_ANSWERS: '/exemption/check-your-answers',
+  VIEW_DETAILS: '/exemption/view-details',
   CONFIRMATION: '/exemption/confirmation',
   SITE_DETAILS: '/exemption/site-details',
   SITE_NAME: '/exemption/site-name',

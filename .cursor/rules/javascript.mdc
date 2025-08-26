@@ -1,11 +1,7 @@
 ---
-description:
-globs:
-alwaysApply: true
----
----
 description: Javascript in Defra
 globs: *.js
+alwaysApply: true
 ---
 # JavaScript in Defra
 
@@ -93,6 +89,7 @@ globs: *.js
   - UI: test behavior + use data-testid
 - Use describe blocks and beforeEach for setup
 - Mock external dependencies
+- Don't add clearAllMocks or resetAllMocks to individual test files because it's already in jest.config.js
 
 ### Jest Mocking Best Practices
 

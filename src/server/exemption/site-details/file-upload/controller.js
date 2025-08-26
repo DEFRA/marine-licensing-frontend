@@ -98,11 +98,14 @@ export const fileUploadController = {
       // Clear error from session after retrieving
       updateExemptionSiteDetails(request, 'uploadError', null)
 
-      request.logger.debug('Displaying upload error from session', {
-        message: uploadError.message,
-        fieldName: uploadError.fieldName,
-        fileType: uploadError.fileType
-      })
+      request.logger.debug(
+        {
+          message: uploadError.message,
+          fieldName: uploadError.fieldName,
+          fileType: uploadError.fileType
+        },
+        'Displaying upload error from session'
+      )
     }
 
     if (uploadedFile && !uploadError) {
@@ -144,11 +147,14 @@ export const fileUploadController = {
         errors
       })
     } catch (error) {
-      request.logger.error('Failed to initialize file upload', {
-        error: error.message,
-        exemptionId: exemption.id,
-        fileUploadType
-      })
+      request.logger.error(
+        {
+          error: error.message,
+          exemptionId: exemption.id,
+          fileUploadType
+        },
+        'Failed to initialize file upload'
+      )
 
       return h.redirect(routes.CHOOSE_FILE_UPLOAD_TYPE)
     }

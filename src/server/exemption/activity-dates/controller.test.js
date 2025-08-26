@@ -29,8 +29,6 @@ describe('#activityDatesController', () => {
   })
 
   beforeEach(() => {
-    jest.resetAllMocks()
-
     getExemptionCacheSpy = jest
       .spyOn(cacheUtils, 'getExemptionCache')
       .mockReturnValue(mockExemptionState)
@@ -146,6 +144,70 @@ describe('#activityDatesController', () => {
       )
       expect(statusCode).toBe(statusCodes.redirect)
       expect(headers.location).toBe(routes.TASK_LIST)
+    })
+
+    test('should call setExemptionCache when not in site details flow', async () => {
+      const mockedSetExemptionCache = jest.mocked(cacheUtils.setExemptionCache)
+
+      const currentYear = new Date().getFullYear()
+      const payload = {
+        'activity-start-date-day': '1',
+        'activity-start-date-month': '6',
+        'activity-start-date-year': (currentYear + 1).toString(),
+        'activity-end-date-day': '15',
+        'activity-end-date-month': '6',
+        'activity-end-date-year': (currentYear + 1).toString()
+      }
+
+      await server.inject({
+        method: 'POST',
+        url: routes.ACTIVITY_DATES,
+        payload
+      })
+
+      expect(mockedSetExemptionCache).toHaveBeenCalledWith(
+        expect.any(Object),
+        expect.objectContaining({
+          ...mockExemptionState,
+          activityDates: {
+            start: expect.any(String),
+            end: expect.any(String)
+          }
+        })
+      )
+    })
+
+    test('should call updateExemptionSiteDetails when in site details flow', async () => {
+      const mockedUpdateExemptionSiteDetails = jest.mocked(
+        cacheUtils.updateExemptionSiteDetails
+      )
+
+      const currentYear = new Date().getFullYear()
+      const payload = {
+        'activity-start-date-day': '1',
+        'activity-start-date-month': '6',
+        'activity-start-date-year': (currentYear + 1).toString(),
+        'activity-end-date-day': '15',
+        'activity-end-date-month': '6',
+        'activity-end-date-year': (currentYear + 1).toString()
+      }
+
+      const { statusCode, headers } = await server.inject({
+        method: 'POST',
+        url: routes.SITE_DETAILS_ACTIVITY_DATES,
+        payload
+      })
+
+      expect(mockedUpdateExemptionSiteDetails).toHaveBeenCalledWith(
+        expect.any(Object),
+        'activityDates',
+        {
+          start: expect.any(String),
+          end: expect.any(String)
+        }
+      )
+      expect(statusCode).toBe(statusCodes.redirect)
+      expect(headers.location).toBe(routes.COORDINATES_ENTRY_CHOICE)
     })
 
     test('should handle validation errors for missing start date', async () => {

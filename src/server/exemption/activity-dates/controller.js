@@ -20,7 +20,8 @@ import {
 } from '~/src/server/common/helpers/errors.js'
 import {
   getExemptionCache,
-  setExemptionCache
+  setExemptionCache,
+  updateExemptionSiteDetails
 } from '~/src/server/common/helpers/session-cache/utils.js'
 import { activityDatesSchema } from '~/src/server/common/schemas/date.js'
 import { getSiteNumber } from '~/src/server/exemption/site-details/utils/site-number.js'
@@ -146,15 +147,20 @@ export const activityDatesSubmitController = {
         end
       })
 
-      setExemptionCache(request, {
-        ...exemption,
-        activityDates: {
-          start,
-          end
-        }
-      })
-
       const isInSiteDetailsFlow = isPageInSiteDetailsFlow(request)
+
+      isInSiteDetailsFlow
+        ? updateExemptionSiteDetails(request, 'activityDates', {
+            start,
+            end
+          })
+        : setExemptionCache(request, {
+            ...exemption,
+            activityDates: {
+              start,
+              end
+            }
+          })
 
       return h.redirect(
         isInSiteDetailsFlow ? routes.COORDINATES_ENTRY_CHOICE : routes.TASK_LIST

@@ -41,7 +41,7 @@ describe('#siteName', () => {
   })
 
   describe('#siteNameSubmitController', () => {
-    test('should redirect to coordinates entry choice when valid site name is submitted', () => {
+    test('should redirect to next page when valid site name is submitted', () => {
       const request = {
         payload: { siteName: 'Test Site Name' }
       }
@@ -54,7 +54,7 @@ describe('#siteName', () => {
         'siteName',
         'Test Site Name'
       )
-      expect(h.redirect).toHaveBeenCalledWith(routes.COORDINATES_ENTRY_CHOICE)
+      expect(h.redirect).toHaveBeenCalledWith(routes.SAME_ACTIVITY_DATES)
     })
 
     test('should validate payload correctly', () => {

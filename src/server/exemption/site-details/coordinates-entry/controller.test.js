@@ -43,7 +43,7 @@ describe('#coordinatesEntry', () => {
       expect(h.view).toHaveBeenCalledWith(COORDINATES_ENTRY_VIEW_ROUTE, {
         pageTitle: 'How do you want to enter the coordinates?',
         heading: 'How do you want to enter the coordinates?',
-        backLink: routes.MULTIPLE_SITES_CHOICE,
+        backLink: routes.SAME_ACTIVITY_DATES,
         payload: {
           coordinatesEntry: mockExemption.siteDetails.coordinatesEntry
         },
@@ -104,7 +104,7 @@ describe('#coordinatesEntry', () => {
       expect(
         document
           .querySelector(
-            `.govuk-back-link[href="${routes.MULTIPLE_SITES_CHOICE}"`
+            `.govuk-back-link[href="${routes.SAME_ACTIVITY_DATES}"`
           )
           .textContent.trim()
       ).toBe('Back')
@@ -152,7 +152,7 @@ describe('#coordinatesEntry', () => {
       expect(h.view).toHaveBeenCalledWith(COORDINATES_ENTRY_VIEW_ROUTE, {
         pageTitle: 'How do you want to enter the coordinates?',
         heading: 'How do you want to enter the coordinates?',
-        backLink: routes.MULTIPLE_SITES_CHOICE,
+        backLink: routes.SAME_ACTIVITY_DATES,
         projectName: 'Test Project',
         payload: { coordinatesEntry: 'invalid' },
         errorSummary: [
@@ -194,7 +194,7 @@ describe('#coordinatesEntry', () => {
       expect(h.view).toHaveBeenCalledWith(COORDINATES_ENTRY_VIEW_ROUTE, {
         pageTitle: 'How do you want to enter the coordinates?',
         heading: 'How do you want to enter the coordinates?',
-        backLink: routes.MULTIPLE_SITES_CHOICE,
+        backLink: routes.SAME_ACTIVITY_DATES,
         projectName: 'Test Project',
         payload: { coordinatesEntry: 'invalid' }
       })

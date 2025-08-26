@@ -167,7 +167,7 @@ describe('Site name page', () => {
     validateErrors(expectedErrors, document)
   })
 
-  test('should redirect to coordinates entry choice when valid site name is submitted', async () => {
+  test('should redirect to same activity dates when valid site name is submitted', async () => {
     const response = await server.inject({
       method: 'POST',
       url: '/exemption/site-name',
@@ -177,9 +177,7 @@ describe('Site name page', () => {
     })
 
     expect(response.statusCode).toBe(statusCodes.redirect)
-    expect(response.headers.location).toBe(
-      '/exemption/how-do-you-want-to-enter-the-coordinates'
-    )
+    expect(response.headers.location).toBe('/exemption/same-activity-dates')
 
     expect(updateExemptionSiteDetails).toHaveBeenCalledWith(
       expect.any(Object),

@@ -18,7 +18,10 @@ export const mockExemption = {
   activityDescription: 'Test activity description',
   // consent:yes: means consent to withdraw the application from the public register
   publicRegister: { consent: 'yes', reason: 'Test reason' },
-  multipleSiteDetails: { multipleSitesEnabled: false },
+  multipleSiteDetails: {
+    multipleSitesEnabled: true,
+    sameActivityDates: 'yes'
+  },
   siteDetails: {
     coordinatesType: 'coordinates',
     coordinatesEntry: 'single',

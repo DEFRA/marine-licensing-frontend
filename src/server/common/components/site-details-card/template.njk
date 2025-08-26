@@ -1,0 +1,7 @@
+{% if params.siteDetails.isFileUpload %}
+  {%- include "./file-upload.njk" -%}
+{% elif params.siteDetails.isPolygonSite %}
+  {%- include "./polygon.njk" -%}
+{% else %}
+  {%- include "./point-circle.njk" -%}
+{% endif %}

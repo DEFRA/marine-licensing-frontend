@@ -1,11 +1,7 @@
 ---
-description:
-globs:
-alwaysApply: true
----
----
 description: Javascript in Defra
 globs: *.js
+alwaysApply: true
 ---
 # JavaScript in Defra
 

@@ -212,13 +212,13 @@ describe('FileValidationService', () => {
         service.validateFileExtension('file.kml', ['kml'])
 
         expect(mockLogger.debug).toHaveBeenCalledWith(
-          'File extension validation',
           {
             filename: 'file.kml',
             extension: 'kml',
             allowedExtensions: ['kml'],
             isValid: true
-          }
+          },
+          'File extension validation'
         )
       })
 
@@ -226,13 +226,13 @@ describe('FileValidationService', () => {
         service.validateFileExtension('file.pdf', ['kml'])
 
         expect(mockLogger.debug).toHaveBeenCalledWith(
-          'File extension validation',
           {
             filename: 'file.pdf',
             extension: 'pdf',
             allowedExtensions: ['kml'],
             isValid: false
-          }
+          },
+          'File extension validation'
         )
       })
     })

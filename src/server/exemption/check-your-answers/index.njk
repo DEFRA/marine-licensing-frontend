@@ -2,6 +2,11 @@
 {% from "govuk/components/back-link/macro.njk" import govukBackLink %}
 {% from "govuk/components/button/macro.njk" import govukButton %}
 {% from "site-details-data-script/macro.njk" import appSiteDetailsDataScript %}
+{% from "project-details-card/macro.njk" import appProjectDetailsCard %}
+{% from "activity-dates-card/macro.njk" import appActivityDatesCard %}
+{% from "activity-details-card/macro.njk" import appActivityDetailsCard %}
+{% from "site-details-card/macro.njk" import appSiteDetailsCard %}
+{% from "public-register-card/macro.njk" import appPublicRegisterCard %}
 
 {% block pageTitle %}
   {{ title }} - {{ serviceName }}
@@ -25,25 +30,34 @@
         <span class="govuk-caption-l">{{ projectName }}</span>
       {% endif %}
 
-      <h2 class="govuk-heading-l" id="check-your-answers-heading">Check your answers before sending your information</h2>
-      
-      {% include "project-details-card.njk" %}
-      {% include "activity-dates-card.njk" %}
-      {% include "activity-details-card.njk" %}
-      {% if siteDetails.isFileUpload %}
-        {% include "file-upload-summary.njk" %}
-      {% elif siteDetails.isPolygonSite %}
-        {% include "polygon-summary.njk" %}
-      {% else %}
-        {% include "point-circle-summary.njk" %}
-      {% endif %}
-      {% include "public-register-card.njk" %}
-      <form method="post">
-        <input type="hidden" name="csrfToken" value="{{ csrfToken }}"/>
-        <h2 class="govuk-heading-m">Now send your information</h2>
-        <p class="govuk-body">By submitting this information you are confirming that, to the best of your knowledge, the details
-          you are providing are correct.</p>
-        {{ govukButton({
+    <h2 class="govuk-heading-l" id="check-your-answers-heading">Check your answers before sending your information</h2>
+    
+    {{ appProjectDetailsCard({
+      projectName: projectName,
+      isReadOnly: isReadOnly
+    }) }}
+    {{ appActivityDatesCard({
+      activityDates: activityDates,
+      isReadOnly: isReadOnly
+    }) }}
+    {{ appActivityDetailsCard({
+      activityDescription: activityDescription,
+      isReadOnly: isReadOnly
+    }) }}
+    {{ appSiteDetailsCard({
+      siteDetails: siteDetails,
+      isReadOnly: isReadOnly
+    }) }}
+    {{ appPublicRegisterCard({
+      publicRegister: publicRegister,
+      isReadOnly: isReadOnly
+    }) }}
+    <form method="post">
+      <input type="hidden" name="csrfToken" value="{{ csrfToken }}"/>
+      <h2 class="govuk-heading-m">Now send your information</h2>
+      <p class="govuk-body">By submitting this information you are confirming that, to the best of your knowledge, the details
+        you are providing are correct.</p>
+      {{ govukButton({
             text: "Confirm and send",
             attributes: {
               id: "confirm-and-send"

@@ -6,20 +6,20 @@
       text: "Method of providing site location"
     },
     value: {
-      html: siteDetails.reviewSummaryText
+      html: params.siteDetails.reviewSummaryText
     }
   },
   {
     key: {
-      text: "Coordinate system"
+      text: "Coordinates system"
     },
     value: {
-      html: siteDetails.coordinateSystemText | replace('\n', '<br> ')
+      html: params.siteDetails.coordinateSystemText | replace('\n', '<br> ')
     }
   }
 ] %}
 
-{% for coordinate in siteDetails.polygonCoordinates %}
+{% for coordinate in params.siteDetails.polygonCoordinates %}
   {% set siteDetailsRows = (siteDetailsRows.push({
     key: {
       text: coordinate.label
@@ -54,7 +54,7 @@
             text: "Change"
           }
         ]
-      },
+      } if not params.isReadOnly,
       attributes: {
         id: "site-details-card"
       }

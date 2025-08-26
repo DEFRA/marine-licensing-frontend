@@ -6,6 +6,12 @@ const logConfig = config.get('log')
 const serviceName = config.get('serviceName')
 const serviceVersion = config.get('serviceVersion')
 
+const options = {}
+
+if (config.get('isDevelopment')) {
+  options.ignore = 'pid,res,req'
+}
+
 /**
  * @type {{ecs: Omit<LoggerOptions, "mixin"|"transport">, "pino-pretty": {transport: {target: string}}}}
  */
@@ -16,7 +22,7 @@ const formatters = {
       serviceName
     })
   },
-  'pino-pretty': { transport: { target: 'pino-pretty' } }
+  'pino-pretty': { transport: { target: 'pino-pretty', options } }
 }
 
 /**

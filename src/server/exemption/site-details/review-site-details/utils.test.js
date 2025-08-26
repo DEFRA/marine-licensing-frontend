@@ -574,11 +574,11 @@ describe('siteDetails utils', () => {
         '/exemption/test-exemption-id'
       )
       expect(mockRequest.logger.info).toHaveBeenCalledWith(
-        'Loaded site details from MongoDB for display',
         {
           exemptionId: 'test-exemption-id',
           coordinatesType: 'file'
-        }
+        },
+        'Loaded site details from MongoDB for display'
       )
     })
 
@@ -599,11 +599,11 @@ describe('siteDetails utils', () => {
 
       expect(result).toEqual({})
       expect(mockRequest.logger.error).toHaveBeenCalledWith(
-        'Failed to load exemption data from MongoDB',
         {
           error: 'MongoDB connection failed',
           exemptionId: 'test-exemption-id'
-        }
+        },
+        'Failed to load exemption data from MongoDB'
       )
     })
 
@@ -644,10 +644,10 @@ describe('siteDetails utils', () => {
         '/exemption/test-exemption-id'
       )
       expect(mockRequest.logger.warn).toHaveBeenCalledWith(
-        'No site details found in MongoDB response',
         {
           exemptionId: 'test-exemption-id'
-        }
+        },
+        'No site details found in MongoDB response'
       )
       expect(mockRequest.logger.info).not.toHaveBeenCalled()
     })
@@ -721,12 +721,12 @@ describe('siteDetails utils', () => {
       })
 
       expect(mockRequest.logger.info).toHaveBeenCalledWith(
-        'Saving file upload site details',
         {
           fileType: 'kml',
           featureCount: 1,
           filename: 'test-site.kml'
-        }
+        },
+        'Saving file upload site details'
       )
     })
 
@@ -778,11 +778,11 @@ describe('siteDetails utils', () => {
 
       expect(result).toEqual(exemption.siteDetails)
       expect(mockRequest.logger.info).toHaveBeenCalledWith(
-        'Saving manual coordinate site details',
         {
           coordinatesType: 'coordinates',
           coordinatesEntry: 'single'
-        }
+        },
+        'Saving manual coordinate site details'
       )
     })
   })
@@ -944,12 +944,12 @@ describe('siteDetails utils', () => {
       )
 
       expect(mockRequest.logger.error).toHaveBeenCalledWith(
-        'Error submitting site review',
         {
           error: 'Test error message',
           exemptionId: 'test-exemption-id',
           coordinatesType: 'coordinates'
-        }
+        },
+        'Error submitting site review'
       )
 
       expect(Boom.isBoom(result)).toBe(true)

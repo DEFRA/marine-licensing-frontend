@@ -37,12 +37,15 @@ export class FileValidationService {
     const normalizedAllowed = allowedExtensions.map((ext) => ext.toLowerCase())
     const isValid = normalizedAllowed.includes(extension)
 
-    this.logger.debug('File extension validation', {
-      filename,
-      extension,
-      allowedExtensions: normalizedAllowed,
-      isValid
-    })
+    this.logger.debug(
+      {
+        filename,
+        extension,
+        allowedExtensions: normalizedAllowed,
+        isValid
+      },
+      'File extension validation'
+    )
 
     return {
       isValid,

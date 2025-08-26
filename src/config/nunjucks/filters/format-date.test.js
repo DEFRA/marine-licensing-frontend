@@ -35,4 +35,18 @@ describe('#formatDate', () => {
       ).toBe('11:40 am on Wednesday 1st February 2023')
     })
   })
+
+  describe('With undefined or null values', () => {
+    test('Should return empty string for undefined', () => {
+      expect(formatDate(undefined)).toBe('')
+    })
+
+    test('Should return empty string for null', () => {
+      expect(formatDate(null)).toBe('')
+    })
+
+    test('Should return empty string for empty string', () => {
+      expect(formatDate('')).toBe('')
+    })
+  })
 })

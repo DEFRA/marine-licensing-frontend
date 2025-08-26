@@ -13,8 +13,7 @@ const nunjucksEnvironment = nunjucks.configure(
   [
     'node_modules/govuk-frontend/dist/',
     path.resolve(dirname, '../../server/common/templates'),
-    path.resolve(dirname, '../../server/common/components'),
-    path.resolve(dirname, '../../server/exemption/check-your-answers')
+    path.resolve(dirname, '../../server/common/components')
   ],
   {
     autoescape: true,

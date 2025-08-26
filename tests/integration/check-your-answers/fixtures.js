@@ -217,7 +217,7 @@ export const testScenarios = [
       siteDetails: {
         'Method of providing site location':
           'Manually enter one set of coordinates and a width to create a circular site',
-        'Coordinates system':
+        'Coordinate system':
           'WGS84 (World Geodetic System 1984) Latitude and longitude',
         'Coordinates at centre of site': '54.726200, -1.599400',
         'Width of circular site': '100 metres',
@@ -268,7 +268,7 @@ export const testScenarios = [
       siteDetails: {
         'Method of providing site location':
           'Manually enter one set of coordinates and a width to create a circular site',
-        'Coordinates system': 'OSGB36 (National Grid) Eastings and Northings',
+        'Coordinate system': 'OSGB36 (National Grid) Eastings and Northings',
         'Coordinates at centre of site': '425053, 564180',
         'Width of circular site': '100 metres',
         'Map view': ''
@@ -319,7 +319,7 @@ export const testScenarios = [
       siteDetails: {
         'Method of providing site location':
           'Manually enter multiple sets of coordinates to mark the boundary of the site',
-        'Coordinates system':
+        'Coordinate system':
           'WGS84 (World Geodetic System 1984) Latitude and longitude',
         'Start and end points': '54.721000, -1.595000',
         'Point 2': '54.725000, -1.590000',
@@ -372,7 +372,7 @@ export const testScenarios = [
       siteDetails: {
         'Method of providing site location':
           'Manually enter multiple sets of coordinates to mark the boundary of the site',
-        'Coordinates system': 'OSGB36 (National Grid) Eastings and Northings',
+        'Coordinate system': 'OSGB36 (National Grid) Eastings and Northings',
         'Start and end points': '425053, 564180',
         'Point 2': '426000, 565000',
         'Point 3': '427000, 566000',

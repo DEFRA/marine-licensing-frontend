@@ -153,7 +153,7 @@ describe('Site Details Card Component', () => {
         ).map((el) => el.textContent.trim())
 
         expect(keys).toContain('Method of providing site location')
-        expect(keys).toContain('Coordinates system')
+        expect(keys).toContain('Coordinate system')
         expect(keys).toContain('Coordinates at centre of site')
         expect(keys).toContain('Width of circular site')
         expect(keys).toContain('Map view')
@@ -269,7 +269,7 @@ describe('Site Details Card Component', () => {
         ).map((el) => el.textContent.trim())
 
         expect(keys).toContain('Method of providing site location')
-        expect(keys).toContain('Coordinates system')
+        expect(keys).toContain('Coordinate system')
         expect(keys).toContain('Map view')
       })
 
@@ -352,7 +352,7 @@ describe('Site Details Card Component', () => {
 
         // Should still have base fields and map view
         expect(keys).toContain('Method of providing site location')
-        expect(keys).toContain('Coordinates system')
+        expect(keys).toContain('Coordinate system')
         expect(keys).toContain('Map view')
       })
     })

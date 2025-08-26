@@ -27,8 +27,6 @@ describe('#projectName', () => {
   })
 
   beforeEach(() => {
-    jest.resetAllMocks()
-
     jest
       .spyOn(authRequests, 'authenticatedPostRequest')
       .mockReturnValue({ payload: { id: mockExemption.id } })
@@ -121,7 +119,10 @@ describe('#projectName', () => {
       expect(authRequests.authenticatedPostRequest).toHaveBeenCalledWith(
         expect.any(Object),
         `/exemption/project-name`,
-        { projectName: 'Project name' }
+        expect.objectContaining({
+          projectName: 'Project name',
+          mcmsContext: null
+        })
       )
 
       expect(statusCode).toBe(302)
@@ -336,15 +337,65 @@ describe('#projectName', () => {
         view: jest.fn()
       }
 
-      const mockRequest = { payload: { projectName: 'Project name' } }
+      const mockRequest = {
+        payload: { projectName: 'Project name' },
+        yar: {
+          flash: jest.fn().mockReturnValue([])
+        },
+        url: 'http://example.com/project-name',
+        logger: { error: jest.fn() }
+      }
 
-      await projectNameSubmitController.handler(
-        { payload: { projectName: 'Project name' } },
-        h
-      )
+      await projectNameSubmitController.handler(mockRequest, h)
+
       expect(cacheUtils.setExemptionCache).toHaveBeenCalledWith(mockRequest, {
         projectName: 'Project name'
       })
+    })
+
+    test('Should correctly retrieve cached MCMS context when creating a new exemption', async () => {
+      const h = { redirect: jest.fn() }
+      const apiPostMock = jest.spyOn(authRequests, 'authenticatedPostRequest')
+      const mockMcmsContext = {
+        activityType: 'CON',
+        activitySubtype: 'maintenance',
+        article: '17',
+        pdfDownloadUrl: 'https://example.com/test.pdf'
+      }
+      const mockRequest = {
+        payload: { projectName: 'Project name' },
+        yar: {
+          flash: jest.fn().mockReturnValue([mockMcmsContext])
+        }
+      }
+
+      await projectNameSubmitController.handler(mockRequest, h)
+
+      expect(apiPostMock.mock.calls[0][2]).toEqual({
+        mcmsContext: {
+          activitySubtype: 'maintenance',
+          activityType: 'CON',
+          article: '17',
+          pdfDownloadUrl: 'https://example.com/test.pdf'
+        },
+        projectName: 'Project name'
+      })
+    })
+
+    test('Should handle missing MCMS context when creating a new exemption', async () => {
+      const h = { redirect: jest.fn() }
+      const mockRequest = {
+        payload: { projectName: 'Project name' },
+        yar: {
+          flash: jest.fn().mockReturnValue([])
+        },
+        url: 'http://example.com/project-name',
+        logger: { error: jest.fn() }
+      }
+
+      await projectNameSubmitController.handler(mockRequest, h)
+
+      expect(mockRequest.yar.flash).toHaveBeenCalledWith('mcmsContext')
     })
   })
 })

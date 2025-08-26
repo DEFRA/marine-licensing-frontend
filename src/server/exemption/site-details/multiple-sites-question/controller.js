@@ -103,14 +103,7 @@ export const multipleSitesSubmitController = {
     if (payload.multipleSitesEnabled === 'no') {
       return h.redirect(routes.COORDINATES_ENTRY_CHOICE)
     } else {
-      return h.view(MULTIPLE_SITES_VIEW_ROUTE, {
-        ...multipleSitesSettings,
-        backLink: routes.COORDINATES_TYPE_CHOICE,
-        projectName: getExemptionCache(request).projectName,
-        payload: {
-          multipleSitesEnabled: payload.multipleSitesEnabled
-        }
-      })
+      return h.redirect(routes.SITE_NAME)
     }
   }
 }

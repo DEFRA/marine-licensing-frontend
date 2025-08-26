@@ -55,11 +55,11 @@ describe('#multipleSitesQuestion', () => {
       expect(h.redirect).toHaveBeenCalledWith(routes.COORDINATES_ENTRY_CHOICE)
     })
 
-    test('should stay on page and update cache when "yes" is selected', () => {
+    test('should redirect to site name when "yes" is selected', () => {
       const request = {
         payload: { multipleSitesEnabled: 'yes' }
       }
-      const h = { view: jest.fn() }
+      const h = { redirect: jest.fn() }
 
       multipleSitesSubmitController.handler(request, h)
 
@@ -67,13 +67,7 @@ describe('#multipleSitesQuestion', () => {
         ...mockExemption,
         multipleSiteDetails: { multipleSitesEnabled: true }
       })
-      expect(h.view).toHaveBeenCalledWith(MULTIPLE_SITES_VIEW_ROUTE, {
-        pageTitle: 'Do you need to tell us about more than one site?',
-        heading: 'Do you need to tell us about more than one site?',
-        backLink: routes.COORDINATES_TYPE_CHOICE,
-        projectName: 'Test Project',
-        payload: { multipleSitesEnabled: 'yes' }
-      })
+      expect(h.redirect).toHaveBeenCalledWith(routes.SITE_NAME)
     })
 
     test('should validate payload correctly', () => {

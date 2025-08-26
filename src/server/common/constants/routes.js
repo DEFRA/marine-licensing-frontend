@@ -25,6 +25,7 @@ export const routes = {
   VIEW_DETAILS: '/exemption/view-details',
   CONFIRMATION: '/exemption/confirmation',
   SITE_DETAILS: '/exemption/site-details',
+  SITE_NAME: '/exemption/site-name',
   DASHBOARD: '/home',
   DELETE_EXEMPTION: '/exemption/delete'
 }

@@ -47,7 +47,6 @@ export const paramsSchema = Joi.object({
 })
   .unknown(true)
   .custom((value) => {
-    // Find the activity subtype value from any of the EXE_ACTIVITY_SUBTYPE_* fields
     const activitySubtype =
       value.EXE_ACTIVITY_SUBTYPE_CONSTRUCTION ||
       value.EXE_ACTIVITY_SUBTYPE_DEPOSIT ||
@@ -55,7 +54,6 @@ export const paramsSchema = Joi.object({
       value.EXE_ACTIVITY_SUBTYPE_DREDGING ||
       null
 
-    // Return the transformed object
     return {
       activityType: value[ACTIVITY_TYPE],
       activitySubtype,

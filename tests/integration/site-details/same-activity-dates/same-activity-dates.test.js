@@ -1,5 +1,5 @@
 import { JSDOM } from 'jsdom'
-import { getByRole, getByText } from '@testing-library/dom'
+import { getByLabelText, getByRole, getByText } from '@testing-library/dom'
 import { createServer } from '~/src/server/index.js'
 import { statusCodes } from '~/src/server/common/constants/status-codes.js'
 import {
@@ -61,13 +61,13 @@ describe('Same activity dates page', () => {
     expect(noRadio).toHaveAttribute('type', 'radio')
 
     expect(
-      getByText(document, 'Yes, the dates are the same for every site')
+      getByLabelText(document, 'Yes, the dates are the same for every site')
     ).toBeInTheDocument()
     expect(
       getByText(document, "You'll only need to enter the dates once")
     ).toBeInTheDocument()
     expect(
-      getByText(document, 'No, at least one site has different dates')
+      getByLabelText(document, 'No, at least one site has different dates')
     ).toBeInTheDocument()
     expect(
       getByText(document, "You'll need to enter dates for each site")

@@ -121,7 +121,7 @@ export const testScenarios = [
       siteDetails: {
         'Method of providing site location':
           'Manually enter one set of coordinates and a width to create a circular site',
-        'Coordinates system':
+        'Coordinate system':
           'WGS84 (World Geodetic System 1984) Latitude and longitude',
         'Coordinates at centre of site': '51.489676, -0.231530',
         'Width of circular site': '100 metres'
@@ -142,7 +142,7 @@ export const testScenarios = [
       siteDetails: {
         'Method of providing site location':
           'Manually enter one set of coordinates and a width to create a circular site',
-        'Coordinates system': 'OSGB36 (National Grid) Eastings and Northings',
+        'Coordinate system': 'OSGB36 (National Grid) Eastings and Northings',
         'Coordinates at centre of site': '123456, 654321',
         'Width of circular site': '250 metres'
       }
@@ -185,11 +185,11 @@ export const testScenarios = [
       siteDetails: {
         'Method of providing site location':
           'Manually enter multiple sets of coordinates to mark the boundary of the site',
-        'Coordinates system':
+        'Coordinate system':
           'WGS84 (World Geodetic System 1984) Latitude and longitude'
       },
       siteDetailsExtended: {
-        expectedRowCount: 6, // Method + Coordinates System + 3 coordinate points + map
+        expectedRowCount: 6, // Method + Coordinate System + 3 coordinate points + map
         coordinatePoints: [
           '55.123456, -1.234567',
           '55.223456, -1.334567',
@@ -209,10 +209,10 @@ export const testScenarios = [
       siteDetails: {
         'Method of providing site location':
           'Manually enter multiple sets of coordinates to mark the boundary of the site',
-        'Coordinates system': 'OSGB36 (National Grid) Eastings and Northings'
+        'Coordinate system': 'OSGB36 (National Grid) Eastings and Northings'
       },
       siteDetailsExtended: {
-        expectedRowCount: 6, // Method + Coordinates System + 3 coordinate points + map
+        expectedRowCount: 6, // Method + Coordinate System + 3 coordinate points + map
         coordinatePoints: ['123456, 654321', '123556, 654421', '123656, 654521']
       }
     }
@@ -237,7 +237,7 @@ export const testScenarios = [
       siteDetails: {
         'Method of providing site location':
           'Manually enter one set of coordinates and a width to create a circular site',
-        'Coordinates system':
+        'Coordinate system':
           'WGS84 (World Geodetic System 1984) Latitude and longitude',
         'Coordinates at centre of site': '51.489676, -0.231530',
         'Width of circular site': '100 metres'

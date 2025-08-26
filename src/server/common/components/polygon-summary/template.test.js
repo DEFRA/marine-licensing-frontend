@@ -56,7 +56,7 @@ describe('Polygon Summary Component', () => {
     test('Should display all required static fields', () => {
       const htmlContent = $component.html()
       expect(htmlContent).toContain('Method of providing site location')
-      expect(htmlContent).toContain('Coordinates system')
+      expect(htmlContent).toContain('Coordinate system')
     })
 
     test('Should handle coordinate system text with line breaks', () => {
@@ -117,7 +117,7 @@ describe('Polygon Summary Component', () => {
     test('Should display all required static fields', () => {
       const htmlContent = $component.html()
       expect(htmlContent).toContain('Method of providing site location')
-      expect(htmlContent).toContain('Coordinates system')
+      expect(htmlContent).toContain('Coordinate system')
     })
 
     test('Should handle OSGB36 coordinate system with line breaks', () => {

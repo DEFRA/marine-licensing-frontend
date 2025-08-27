@@ -142,26 +142,27 @@ export const activityDatesSubmitController = {
         payload[ACTIVITY_DATE_FIELD_NAMES.END_DATE_DAY]
       )
 
-      await authenticatedPatchRequest(request, '/exemption/activity-dates', {
-        id: exemption.id,
-        start,
-        end
-      })
-
       const isInSiteDetailsFlow = isPageInSiteDetailsFlow(request)
 
-      isInSiteDetailsFlow
-        ? updateExemptionSiteDetails(request, 'activityDates', {
+      if (isInSiteDetailsFlow) {
+        updateExemptionSiteDetails(request, 'activityDates', {
+          start,
+          end
+        })
+      } else {
+        await authenticatedPatchRequest(request, '/exemption/activity-dates', {
+          id: exemption.id,
+          start,
+          end
+        })
+        setExemptionCache(request, {
+          ...exemption,
+          activityDates: {
             start,
             end
-          })
-        : setExemptionCache(request, {
-            ...exemption,
-            activityDates: {
-              start,
-              end
-            }
-          })
+          }
+        })
+      }
 
       return h.redirect(
         isInSiteDetailsFlow ? routes.COORDINATES_ENTRY_CHOICE : routes.TASK_LIST

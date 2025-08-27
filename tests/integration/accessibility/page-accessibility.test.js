@@ -100,6 +100,10 @@ describe('Page accessibility checks (Axe)', () => {
       title: 'Application complete'
     },
     { url: routes.SITE_NAME, title: 'Site name' },
+    {
+      url: routes.SAME_ACTIVITY_DATES,
+      title: 'Are the activity dates the same for every site?'
+    },
     { url: routes.DASHBOARD, title: 'Your projects' },
     { url: routes.SITE_DETAILS, title: 'Site details' }
   ]

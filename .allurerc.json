@@ -1,0 +1,5 @@
+{
+  "resultsDir": "allure-results",
+  "reportDir": "allure-report",
+  "plugins": ["behaviors", "packages", "screen-diff"]
+}

@@ -1,0 +1,80 @@
+name: Integration Tests - Allure Report
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+jobs:
+  test-and-report:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build application
+        run: npm run build
+
+      - name: Run integration tests with Allure
+        run: npx jest tests/ --coverage=false
+        env:
+          CI: true
+
+      - name: Generate Allure Report
+        if: always()
+        run: |
+          npx allure generate allure-results --single-file --clean --output allure-report
+
+      - name: Add test run info to report
+        if: always()
+        run: |
+          echo "Test run: ${{ github.run_number }}" > allure-report/run-info.txt
+          echo "Branch: ${{ github.ref_name }}" >> allure-report/run-info.txt
+          echo "Commit: ${{ github.sha }}" >> allure-report/run-info.txt
+          echo "Timestamp: $(date)" >> allure-report/run-info.txt
+
+      - name: Upload Allure Report Artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: allure-report-${{ github.run_number }}
+          path: allure-report/
+          retention-days: 30
+
+      - name: Setup Pages
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+        uses: actions/configure-pages@v4
+
+      - name: Upload to GitHub Pages
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: allure-report
+
+  deploy:
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    needs: test-and-report
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

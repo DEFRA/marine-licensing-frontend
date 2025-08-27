@@ -13,3 +13,8 @@ tsconfig.tsbuildinfo
 
 # stryker temp files
 .stryker-tmp
+
+# Allure
+allure-results/
+allure-report/
+.allure/

@@ -32,14 +32,20 @@ const isPageInSiteDetailsFlow = (request) =>
 const createTemplateData = (request, exemption, payload = null) => {
   let dateFields
 
+  const isInSiteDetailsFlow = isPageInSiteDetailsFlow(request)
+
   if (payload) {
     dateFields = extractMultipleDateFields(payload, DATE_EXTRACTION_CONFIG)
   } else {
     const startDateFields = createDateFieldsFromValue(
-      exemption.activityDates?.start
+      isInSiteDetailsFlow
+        ? exemption.siteDetails.activityDates?.start
+        : exemption.activityDates?.start
     )
     const endDateFields = createDateFieldsFromValue(
-      exemption.activityDates?.end
+      isInSiteDetailsFlow
+        ? exemption.siteDetails.activityDates?.end
+        : exemption.activityDates?.end
     )
 
     dateFields = {
@@ -52,7 +58,6 @@ const createTemplateData = (request, exemption, payload = null) => {
     }
   }
 
-  const isInSiteDetailsFlow = isPageInSiteDetailsFlow(request)
   const { multipleSiteDetails } = exemption
 
   if (isInSiteDetailsFlow) {

@@ -402,6 +402,7 @@ describe('Activity Dates Validation - Comprehensive Integration Tests', () => {
     test('should display correct text when same activity dates for all sites', async () => {
       const mockExemptionWithSameActivityDates = {
         ...mockExemption,
+        siteDetails: {},
         multipleSiteDetails: {
           multipleSitesEnabled: true,
           sameActivityDates: 'yes'

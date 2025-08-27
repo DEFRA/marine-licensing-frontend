@@ -35,8 +35,6 @@ describe('exemption-site-details helper', () => {
     mockRequest = {
       logger: mockLogger
     }
-
-    jest.resetAllMocks()
   })
 
   describe('errorMessages', () => {

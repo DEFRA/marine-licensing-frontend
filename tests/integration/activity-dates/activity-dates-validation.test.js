@@ -32,8 +32,6 @@ describe('Activity Dates Validation - Comprehensive Integration Tests', () => {
   })
 
   beforeEach(() => {
-    jest.resetAllMocks()
-
     getExemptionCacheMock = jest
       .mocked(getExemptionCache)
       .mockReturnValue(mockExemption)

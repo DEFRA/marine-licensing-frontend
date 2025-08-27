@@ -29,7 +29,6 @@ describe('Multiple sites question page', () => {
   })
 
   beforeEach(() => {
-    jest.resetAllMocks()
     jest.mocked(getExemptionCache).mockReturnValue(mockExemption)
     jest.mocked(updateExemptionSiteDetails).mockReturnValue({})
     jest.mocked(setExemptionCache).mockReturnValue({})

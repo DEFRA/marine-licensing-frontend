@@ -36,7 +36,6 @@ describe('#centreCoordinates', () => {
   })
 
   beforeEach(() => {
-    jest.resetAllMocks()
     getExemptionCacheSpy = jest
       .spyOn(cacheUtils, 'getExemptionCache')
       .mockReturnValue(mockExemption)

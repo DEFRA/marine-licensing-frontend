@@ -1,10 +1,6 @@
 import { createOsgb36MultipleCoordinatesSchema } from '~/src/server/common/schemas/osgb36.js'
 
 describe('#multipleCoordinates OSGB36 schema', () => {
-  beforeEach(() => {
-    jest.resetAllMocks()
-  })
-
   describe('#createOsgb36MultipleCoordinatesSchema', () => {
     test('Should correctly validate valid OSGB36 coordinates array', () => {
       const payload = {

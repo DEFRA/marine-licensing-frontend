@@ -21,8 +21,6 @@ describe('check your answers controller', () => {
   })
 
   beforeEach(() => {
-    jest.resetAllMocks()
-
     jest.spyOn(authUtils, 'getUserSession').mockResolvedValue(mockUserSession)
 
     getExemptionCacheSpy = jest

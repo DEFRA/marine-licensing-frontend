@@ -30,7 +30,6 @@ describe('Page accessibility checks (Axe)', () => {
   })
 
   beforeEach(() => {
-    jest.resetAllMocks()
     jest.spyOn(cdpUploadService, 'getCdpUploadService').mockReturnValue({
       getStatus: jest.fn().mockResolvedValue({
         status: 'pending'

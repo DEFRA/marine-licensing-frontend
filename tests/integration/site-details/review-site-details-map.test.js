@@ -61,8 +61,6 @@ describe('Site Details Interactive Map Behaviour', () => {
   })
 
   beforeEach(() => {
-    jest.resetAllMocks()
-
     jest
       .spyOn(cacheUtils, 'setExemptionCache')
       .mockImplementation(() => undefined)

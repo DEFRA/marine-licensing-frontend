@@ -10,10 +10,6 @@ const mockCoordinates = {
 }
 
 describe('#osgb36ValidationSchema model', () => {
-  beforeEach(() => {
-    jest.resetAllMocks()
-  })
-
   test('Should correctly validate on valid data', () => {
     const request = mockCoordinates[COORDINATE_SYSTEMS.OSGB36]
 
@@ -154,10 +150,6 @@ describe('#osgb36ValidationSchema model', () => {
 })
 
 describe('#createOsgb36MultipleCoordinatesSchema', () => {
-  beforeEach(() => {
-    jest.resetAllMocks()
-  })
-
   test('Should correctly validate valid multiple coordinates', () => {
     const schema = createOsgb36MultipleCoordinatesSchema()
     const request = {
@@ -245,10 +237,6 @@ describe('#createOsgb36MultipleCoordinatesSchema', () => {
 })
 
 describe('#createOsgb36CoordinateSchema', () => {
-  beforeEach(() => {
-    jest.resetAllMocks()
-  })
-
   test('Should default to simple messageType when not specified', () => {
     const schema = createOsgb36CoordinateSchema('eastings')
     const result = schema.validate('')

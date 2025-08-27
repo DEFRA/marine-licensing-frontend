@@ -26,10 +26,6 @@ export const responseToDocument = (response) => {
   return new JSDOM(response.result).window.document
 }
 
-export const resetMocks = () => {
-  jest.resetAllMocks()
-}
-
 export const validateResponse = (response, expectedStatus = 200) => {
   expect(response.statusCode).toBe(expectedStatus)
 }

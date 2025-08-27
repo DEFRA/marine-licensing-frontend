@@ -26,7 +26,6 @@ describe('Review Site Details - Polygon Coordinates Integration Tests', () => {
   })
 
   beforeEach(() => {
-    jest.resetAllMocks()
     jest
       .spyOn(cacheUtils, 'setExemptionCache')
       .mockImplementation(() => undefined)

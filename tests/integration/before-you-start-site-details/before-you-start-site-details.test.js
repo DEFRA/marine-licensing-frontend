@@ -25,7 +25,6 @@ describe('Before you start site details page', () => {
   })
 
   beforeEach(() => {
-    jest.resetAllMocks()
     jest.mocked(getExemptionCache).mockReturnValue(mockExemption)
   })
 

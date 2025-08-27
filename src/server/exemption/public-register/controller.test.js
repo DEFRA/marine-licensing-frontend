@@ -31,8 +31,6 @@ describe('#publicRegister', () => {
   })
 
   beforeEach(() => {
-    jest.resetAllMocks()
-
     jest.spyOn(authRequests, 'authenticatedPatchRequest').mockResolvedValue({
       payload: {
         id: mockExemption.id,

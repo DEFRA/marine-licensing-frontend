@@ -288,8 +288,6 @@ describe('#uploadAndWait', () => {
   let authenticatedPostRequestSpy
 
   beforeEach(() => {
-    jest.resetAllMocks()
-
     // Setup config after reset to ensure it's available
     setupMockConfig()
 

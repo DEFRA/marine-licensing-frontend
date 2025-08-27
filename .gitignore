@@ -13,3 +13,8 @@ tsconfig.tsbuildinfo
 
 # stryker temp files
 .stryker-tmp
+
+# SSL Certificates (generated locally, do not commit)
+*.pem
+*.key
+*.crt

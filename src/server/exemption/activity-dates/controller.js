@@ -69,6 +69,7 @@ const createTemplateData = (request, exemption, payload = null) => {
       cancelLink: routes.TASK_LIST + '?cancel=site-details',
       isSiteDetailsFlow: true,
       isMultiSiteJourney: !!multipleSiteDetails?.multipleSitesEnabled,
+      isSameActivityDates: multipleSiteDetails?.sameActivityDates === 'yes',
       siteNumber: showSiteNumber ? siteNumber : null
     }
   }

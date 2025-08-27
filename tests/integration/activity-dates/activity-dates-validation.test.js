@@ -2,8 +2,11 @@ import { getByRole, getByText, within } from '@testing-library/dom'
 import { JSDOM } from 'jsdom'
 import { routes } from '~/src/server/common/constants/routes.js'
 import { statusCodes } from '~/src/server/common/constants/status-codes.js'
-import * as authRequests from '~/src/server/common/helpers/authenticated-requests.js'
-import * as cacheUtils from '~/src/server/common/helpers/session-cache/utils.js'
+import { authenticatedPatchRequest } from '~/src/server/common/helpers/authenticated-requests.js'
+import {
+  getExemptionCache,
+  setExemptionCache
+} from '~/src/server/common/helpers/session-cache/utils.js'
 import { createServer } from '~/src/server/index.js'
 
 jest.mock('~/src/server/common/helpers/session-cache/utils.js')
@@ -11,6 +14,7 @@ jest.mock('~/src/server/common/helpers/authenticated-requests.js')
 
 describe('Activity Dates Validation - Comprehensive Integration Tests', () => {
   let server
+  let getExemptionCacheMock
 
   const mockExemption = {
     id: 'test-exemption-123',
@@ -30,14 +34,14 @@ describe('Activity Dates Validation - Comprehensive Integration Tests', () => {
   beforeEach(() => {
     jest.resetAllMocks()
 
-    jest.spyOn(cacheUtils, 'getExemptionCache').mockReturnValue(mockExemption)
+    getExemptionCacheMock = jest
+      .mocked(getExemptionCache)
+      .mockReturnValue(mockExemption)
+
+    jest.mocked(setExemptionCache).mockImplementation(() => undefined)
 
     jest
-      .spyOn(cacheUtils, 'setExemptionCache')
-      .mockImplementation(() => undefined)
-
-    jest
-      .spyOn(authRequests, 'authenticatedPatchRequest')
+      .mocked(authenticatedPatchRequest)
       .mockResolvedValue({ payload: { id: mockExemption.id } })
   })
 
@@ -387,6 +391,39 @@ describe('Activity Dates Validation - Comprehensive Integration Tests', () => {
         name: 'Save and continue'
       })
       expect(submitButton).toHaveTextContent('Save and continue')
+
+      expect(
+        getByText(document, 'Enter the activity dates for this site', {
+          exact: false
+        })
+      ).toBeInTheDocument()
+    })
+
+    test('should display correct text when same activity dates for all sites', async () => {
+      const mockExemptionWithSameActivityDates = {
+        ...mockExemption,
+        multipleSiteDetails: {
+          multipleSitesEnabled: true,
+          sameActivityDates: 'yes'
+        }
+      }
+
+      getExemptionCacheMock.mockReturnValue(mockExemptionWithSameActivityDates)
+
+      const response = await server.inject({
+        method: 'GET',
+        url: routes.SITE_DETAILS_ACTIVITY_DATES
+      })
+
+      expect(response.statusCode).toBe(statusCodes.ok)
+
+      const { document } = new JSDOM(response.result).window
+
+      expect(
+        getByText(document, 'Enter the activity dates for all sites', {
+          exact: false
+        })
+      ).toBeInTheDocument()
     })
 
     test('should maintain form values after validation error', async () => {

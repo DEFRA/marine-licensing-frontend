@@ -51,7 +51,9 @@ describe('Site name page', () => {
     expect(getByText(document, mockExemption.projectName)).toBeInTheDocument()
     expect(getByText(document, 'Site 1')).toBeInTheDocument()
 
-    const siteNameInput = getByLabelText(document, 'Site name')
+    const siteNameInput = getByLabelText(document, 'Site name', {
+      exact: false
+    })
     expect(siteNameInput).toHaveAttribute('type', 'text')
 
     expect(
@@ -78,7 +80,9 @@ describe('Site name page', () => {
 
     const { document } = new JSDOM(result).window
 
-    const siteNameInput = getByLabelText(document, 'Site name')
+    const siteNameInput = getByLabelText(document, 'Site name', {
+      exact: false
+    })
     expect(siteNameInput).toHaveValue('Test Site')
 
     expect(setExemptionCache).not.toHaveBeenCalled()

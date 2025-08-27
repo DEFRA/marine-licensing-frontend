@@ -427,6 +427,34 @@ describe('Activity Dates Validation - Comprehensive Integration Tests', () => {
       ).toBeInTheDocument()
     })
 
+    test('should display correct text when variable activity dates for sites.', async () => {
+      const mockExemptionWithSameActivityDates = {
+        ...mockExemption,
+        siteDetails: {},
+        multipleSiteDetails: {
+          multipleSitesEnabled: true,
+          sameActivityDates: 'no'
+        }
+      }
+
+      getExemptionCacheMock.mockReturnValue(mockExemptionWithSameActivityDates)
+
+      const response = await server.inject({
+        method: 'GET',
+        url: routes.SITE_DETAILS_ACTIVITY_DATES
+      })
+
+      expect(response.statusCode).toBe(statusCodes.ok)
+
+      const { document } = new JSDOM(response.result).window
+
+      expect(
+        getByText(document, 'Enter the activity dates for this site.', {
+          exact: false
+        })
+      ).toBeInTheDocument()
+    })
+
     test('should maintain form values after validation error', async () => {
       const payload = {
         'activity-start-date-day': '31',

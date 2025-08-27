@@ -58,13 +58,13 @@ const createTemplateData = (request, exemption, payload = null) => {
     }
   }
 
-  const { multipleSiteDetails } = exemption
-
   if (isInSiteDetailsFlow) {
+    const { multipleSiteDetails } = exemption
+
     const siteNumber = getSiteNumber(exemption, request)
 
-    const sameActivityDates = multipleSiteDetails?.sameActivityDates
-    const showSiteNumber = sameActivityDates === 'no' && siteNumber
+    const variableActivityDates =
+      multipleSiteDetails?.sameActivityDates === 'no'
 
     return {
       ...ACTIVITY_DATES_VIEW_SETTINGS,
@@ -75,7 +75,7 @@ const createTemplateData = (request, exemption, payload = null) => {
       isSiteDetailsFlow: true,
       isMultiSiteJourney: !!multipleSiteDetails?.multipleSitesEnabled,
       isSameActivityDates: multipleSiteDetails?.sameActivityDates === 'yes',
-      siteNumber: showSiteNumber ? siteNumber : null
+      siteNumber: variableActivityDates ? siteNumber : null
     }
   }
 

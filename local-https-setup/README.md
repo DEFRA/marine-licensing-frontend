@@ -20,14 +20,17 @@ This folder contains all the scripts and configuration files needed to run the M
    ```
 
 3. **Generate SSL certificates** (first time only):
+
    ```bash
    cd local-https-setup
    mkcert marine-licensing-frontend.test.cdp-int.defra.cloud
    cd ..
    ```
+
    > **⚠️ Important**: SSL certificates are generated locally and should NOT be committed to the repository. The certificates are already in `.gitignore` to prevent accidental commits.
 
 4. **Enable local DNS** (first time only):
+
    ```bash
    ./local-https-setup/toggle-local-dns.sh
    ```

@@ -1,32 +1,24 @@
 import { JSDOM } from 'jsdom'
 import { getByRole, getByText } from '@testing-library/dom'
-import { createServer } from '~/src/server/index.js'
 import { statusCodes } from '~/src/server/common/constants/status-codes.js'
 import {
   getExemptionCache,
   updateExemptionSiteDetails,
   setExemptionCache
 } from '~/src/server/common/helpers/session-cache/utils.js'
-import { validateErrors } from '../utils/utils.test.js'
+import { validateErrors } from '../shared/expect-utils.js'
+
+import { setupTestServer } from '~/tests/integration/shared/test-setup-helpers.js'
 
 jest.mock('~/src/server/common/helpers/session-cache/utils.js')
 
 describe('Multiple sites question page', () => {
-  let server
+  const getServer = setupTestServer()
 
   const mockExemption = {
     id: 'test-exemption-123',
     projectName: 'Test Project'
   }
-
-  beforeAll(async () => {
-    server = await createServer()
-    await server.initialize()
-  })
-
-  afterAll(async () => {
-    await server.stop()
-  })
 
   beforeEach(() => {
     jest.mocked(getExemptionCache).mockReturnValue(mockExemption)
@@ -35,7 +27,7 @@ describe('Multiple sites question page', () => {
   })
 
   test('should display the multiple sites question page with correct content and multipleSiteDetails defaults to false', async () => {
-    const { result, statusCode } = await server.inject({
+    const { result, statusCode } = await getServer().inject({
       method: 'GET',
       url: '/exemption/does-your-project-involve-more-than-one-site'
     })
@@ -67,7 +59,7 @@ describe('Multiple sites question page', () => {
       multipleSiteDetails: { multipleSitesEnabled: 'yes' }
     })
 
-    const { result, statusCode } = await server.inject({
+    const { result, statusCode } = await getServer().inject({
       method: 'GET',
       url: '/exemption/does-your-project-involve-more-than-one-site'
     })
@@ -90,7 +82,7 @@ describe('Multiple sites question page', () => {
       multipleSiteDetails: { multipleSitesEnabled: 'yes' }
     })
 
-    const { statusCode } = await server.inject({
+    const { statusCode } = await getServer().inject({
       method: 'GET',
       url: '/exemption/does-your-project-involve-more-than-one-site'
     })
@@ -101,7 +93,7 @@ describe('Multiple sites question page', () => {
   })
 
   test('should have correct navigation links', async () => {
-    const { result } = await server.inject({
+    const { result } = await getServer().inject({
       method: 'GET',
       url: '/exemption/does-your-project-involve-more-than-one-site'
     })
@@ -125,7 +117,7 @@ describe('Multiple sites question page', () => {
   })
 
   test('should stay on same page when continue is clicked without selection', async () => {
-    const { result, statusCode } = await server.inject({
+    const { result, statusCode } = await getServer().inject({
       method: 'POST',
       url: '/exemption/does-your-project-involve-more-than-one-site',
       payload: {}
@@ -163,7 +155,7 @@ describe('Multiple sites question page', () => {
   })
 
   test('should navigate to Site Name page when YES is selected and set multipleSiteDetails to true', async () => {
-    const response = await server.inject({
+    const response = await getServer().inject({
       method: 'POST',
       url: '/exemption/does-your-project-involve-more-than-one-site',
       payload: {
@@ -181,7 +173,7 @@ describe('Multiple sites question page', () => {
   })
 
   test('should redirect to coordinates entry choice when NO is selected and set multipleSiteDetails to false', async () => {
-    const response = await server.inject({
+    const response = await getServer().inject({
       method: 'POST',
       url: '/exemption/does-your-project-involve-more-than-one-site',
       payload: {
@@ -201,7 +193,7 @@ describe('Multiple sites question page', () => {
   })
 
   test('should redirect to task list when cancel is clicked', async () => {
-    const { result, statusCode } = await server.inject({
+    const { result, statusCode } = await getServer().inject({
       method: 'GET',
       url: '/exemption/does-your-project-involve-more-than-one-site'
     })

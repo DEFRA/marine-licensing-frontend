@@ -3,3 +3,5 @@ jest.mock('ioredis')
 
 // Setup DOM Testing Library
 import '@testing-library/jest-dom'
+
+beforeEach(() => expect.hasAssertions())

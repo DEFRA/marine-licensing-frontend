@@ -2,7 +2,7 @@ name: Integration Tests - Allure Report
 
 on:
   push:
-  pull_request:
+    branches: [main]
   workflow_dispatch:
 
 permissions:
@@ -38,7 +38,7 @@ jobs:
       - name: Generate Allure Report
         if: always()
         run: |
-          npx allure generate allure-results --single-file --clean --output allure-report
+          npx allure generate allure-results --single-file --clean --output allure-report --name marine-licensing-dom-testing-library-tests
 
       - name: Add test run info to report
         if: always()

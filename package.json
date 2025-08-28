@@ -28,7 +28,7 @@
     "test": "jest --coverage --verbose",
     "test:watch": "jest --watch",
     "test:mutation": "npx stryker run stryker.conf.cjs",
-    "test:integration:allure": "npx jest tests/ --coverage=false && npx allure generate allure-results --single-file --clean",
+    "test:integration:allure": "npx jest tests/ --coverage=false && npx allure generate allure-results --single-file --clean --name marine-licensing-dom-testing-library-tests",
     "server:watch": "nodemon --exec tsx --enable-source-maps ./src",
     "server:debug": "nodemon --exec tsx --enable-source-maps --inspect ./src",
     "prestart": "npm run build",

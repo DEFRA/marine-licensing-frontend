@@ -38,6 +38,13 @@ export const mockExemptionWithShapefile = {
   siteDetails: { ...mockExemption.siteDetails, fileUploadType: 'shapefile' }
 }
 
+export const mockExemptionNoSiteDetails = {
+  ...mockExemption,
+  siteDetails: null,
+  multipleSiteDetails: null,
+  taskList: null
+}
+
 export const mockExemptionWithUploadConfig = {
   ...mockExemption,
   siteDetails: {

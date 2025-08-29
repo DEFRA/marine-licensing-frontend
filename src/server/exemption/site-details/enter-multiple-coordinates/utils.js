@@ -5,8 +5,6 @@ import {
 import { routes } from '~/src/server/common/constants/routes.js'
 import { getExemptionCache } from '~/src/server/common/helpers/session-cache/utils.js'
 import { generatePointSpecificErrorMessage } from '~/src/server/common/helpers/site-details.js'
-import { createOsgb36MultipleCoordinatesSchema } from '~/src/server/common/schemas/osgb36.js'
-import { createWgs84MultipleCoordinatesSchema } from '~/src/server/common/schemas/wgs84.js'
 
 // ============================================================================
 // CONSTANTS AND CONFIGURATION
@@ -174,27 +172,6 @@ export const convertPayloadToCoordinatesArray = (payload, coordinateSystem) => {
     })
 
   return coordinates
-}
-
-// ============================================================================
-// VALIDATION FUNCTIONS
-// ============================================================================
-
-export const getValidationSchema = (coordinateSystem) => {
-  return isWGS84(coordinateSystem)
-    ? createWgs84MultipleCoordinatesSchema()
-    : createOsgb36MultipleCoordinatesSchema()
-}
-
-export const validateCoordinates = (
-  coordinates,
-  exemptionId,
-  coordinateSystem
-) => {
-  const validationPayload = { coordinates, id: exemptionId }
-  const schema = getValidationSchema(coordinateSystem)
-
-  return schema.validate(validationPayload, { abortEarly: false })
 }
 
 // ============================================================================

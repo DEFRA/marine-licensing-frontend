@@ -21,7 +21,6 @@ describe('#beforeYouStart', () => {
   })
 
   beforeEach(() => {
-    jest.resetAllMocks()
     jest.mocked(getExemptionCache).mockReturnValue(mockExemption)
   })
 

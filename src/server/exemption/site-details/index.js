@@ -1,5 +1,8 @@
 import { coordinatesTypeRoutes } from '~/src/server/exemption/site-details/coordinates-type/index.js'
 import { coordinatesEntryRoutes } from '~/src/server/exemption/site-details/coordinates-entry/index.js'
+import { multipleSitesChoiceRoutes } from '~/src/server/exemption/site-details/multiple-sites-question/index.js'
+import { siteNameRoutes } from '~/src/server/exemption/site-details/site-name/index.js'
+import { sameActivityDatesRoutes } from '~/src/server/exemption/site-details/same-activity-dates/index.js'
 import { coordinateSystemRoutes } from '~/src/server/exemption/site-details/coordinate-system/index.js'
 import { centreCoordinatesRoutes } from '~/src/server/exemption/site-details/centre-coordinates/index.js'
 import { widthOfSiteRoutes } from '~/src/server/exemption/site-details/width-of-site/index.js'
@@ -21,6 +24,9 @@ import { beforeYouStartRoutes } from '~/src/server/exemption/site-details/before
 export const siteDetailsRoutes = [
   ...coordinatesTypeRoutes,
   ...coordinatesEntryRoutes,
+  ...multipleSitesChoiceRoutes,
+  ...siteNameRoutes,
+  ...sameActivityDatesRoutes,
   ...coordinateSystemRoutes,
   ...centreCoordinatesRoutes,
   ...widthOfSiteRoutes,

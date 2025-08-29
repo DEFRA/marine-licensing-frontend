@@ -31,8 +31,6 @@ describe('#publicRegister', () => {
   })
 
   beforeEach(() => {
-    jest.resetAllMocks()
-
     jest.spyOn(authRequests, 'authenticatedPatchRequest').mockResolvedValue({
       payload: {
         id: mockExemption.id,
@@ -78,13 +76,13 @@ describe('#publicRegister', () => {
 
       expect(
         document
-          .querySelector('.govuk-back-link[href="/exemption/task-list"')
+          .querySelector('.govuk-back-link[href="/exemption/task-list"]')
           .textContent.trim()
       ).toBe('Back')
 
       expect(
         document
-          .querySelector('.govuk-link[href="/exemption/task-list"')
+          .querySelector('.govuk-link[href="/exemption/task-list"]')
           .textContent.trim()
       ).toBe('Cancel')
 

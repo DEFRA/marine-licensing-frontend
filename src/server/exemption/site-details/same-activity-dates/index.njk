@@ -1,0 +1,45 @@
+{% extends 'layouts/page.njk' %}
+{% from "govuk/components/back-link/macro.njk" import govukBackLink %}
+{% from "radio-page/macro.njk" import appRadioPage %}
+
+{% block beforeContent %}
+<nav>
+  {{ govukBackLink({
+    text: "Back",
+    href: backLink
+  }) }}
+</nav>
+{% endblock %}
+{% block content %}
+
+  {{ appRadioPage({
+      name: "sameActivityDates",
+      errorSummary: errorSummary,
+      errors: errors,
+      heading: "Are the activity dates the same for every site?",
+      isPageHeading: true,
+      value: payload.sameActivityDates,
+      errorMessage: errors['sameActivityDates'],
+      projectName: projectName,
+      items: [
+        {
+          value: "yes",
+          text: "Yes, the dates are the same for every site",
+          hint: {
+            text: "You'll only need to enter the dates once"
+          }
+        },
+        {
+          value: "no",
+          text: "No, at least one site has different dates",
+          hint: {
+            text: "You'll need to enter dates for each site"
+          }
+        }
+      ],
+      csrfToken: csrfToken,
+      cancelLink: "/exemption/task-list?cancel=site-details"
+    })
+  }}
+
+{% endblock %}

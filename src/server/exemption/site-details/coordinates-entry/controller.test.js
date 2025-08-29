@@ -24,7 +24,6 @@ describe('#coordinatesEntry', () => {
   })
 
   beforeEach(() => {
-    jest.resetAllMocks()
     getExemptionCacheSpy = jest
       .spyOn(cacheUtils, 'getExemptionCache')
       .mockReturnValue(mockExemption)
@@ -43,7 +42,7 @@ describe('#coordinatesEntry', () => {
       expect(h.view).toHaveBeenCalledWith(COORDINATES_ENTRY_VIEW_ROUTE, {
         pageTitle: 'How do you want to enter the coordinates?',
         heading: 'How do you want to enter the coordinates?',
-        backLink: routes.COORDINATES_TYPE_CHOICE,
+        backLink: routes.MULTIPLE_SITES_CHOICE,
         payload: {
           coordinatesEntry: mockExemption.siteDetails.coordinatesEntry
         },
@@ -63,7 +62,7 @@ describe('#coordinatesEntry', () => {
       expect(h.view).toHaveBeenCalledWith(COORDINATES_ENTRY_VIEW_ROUTE, {
         pageTitle: 'How do you want to enter the coordinates?',
         heading: 'How do you want to enter the coordinates?',
-        backLink: routes.COORDINATES_TYPE_CHOICE,
+        backLink: routes.MULTIPLE_SITES_CHOICE,
         payload: { coordinatesEntry: undefined },
         projectName: 'Test Project'
       })
@@ -104,7 +103,7 @@ describe('#coordinatesEntry', () => {
       expect(
         document
           .querySelector(
-            `.govuk-back-link[href="${routes.COORDINATES_TYPE_CHOICE}"`
+            `.govuk-back-link[href="${routes.MULTIPLE_SITES_CHOICE}"`
           )
           .textContent.trim()
       ).toBe('Back')
@@ -152,7 +151,7 @@ describe('#coordinatesEntry', () => {
       expect(h.view).toHaveBeenCalledWith(COORDINATES_ENTRY_VIEW_ROUTE, {
         pageTitle: 'How do you want to enter the coordinates?',
         heading: 'How do you want to enter the coordinates?',
-        backLink: routes.COORDINATES_TYPE_CHOICE,
+        backLink: routes.MULTIPLE_SITES_CHOICE,
         projectName: 'Test Project',
         payload: { coordinatesEntry: 'invalid' },
         errorSummary: [
@@ -194,7 +193,7 @@ describe('#coordinatesEntry', () => {
       expect(h.view).toHaveBeenCalledWith(COORDINATES_ENTRY_VIEW_ROUTE, {
         pageTitle: 'How do you want to enter the coordinates?',
         heading: 'How do you want to enter the coordinates?',
-        backLink: routes.COORDINATES_TYPE_CHOICE,
+        backLink: routes.MULTIPLE_SITES_CHOICE,
         projectName: 'Test Project',
         payload: { coordinatesEntry: 'invalid' }
       })

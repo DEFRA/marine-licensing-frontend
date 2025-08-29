@@ -13,6 +13,7 @@ import {
 import { routes } from '~/src/server/common/constants/routes.js'
 
 import joi from 'joi'
+import { getMcmsContextFromCache } from '~/src/server/common/helpers/mcms-context/cache-mcms-context.js'
 
 const errorMessages = {
   PROJECT_NAME_REQUIRED: 'Enter the project name',
@@ -86,17 +87,16 @@ export const projectNameSubmitController = {
       const exemption = getExemptionCache(request)
 
       const isUpdate = !!exemption.id
-
+      const mcmsContext = getMcmsContextFromCache(request)
       const { payload: responsePayload } = isUpdate
         ? await authenticatedPatchRequest(request, '/exemption/project-name', {
             ...payload,
             id: exemption.id
           })
-        : await authenticatedPostRequest(
-            request,
-            '/exemption/project-name',
-            payload
-          )
+        : await authenticatedPostRequest(request, '/exemption/project-name', {
+            ...payload,
+            mcmsContext
+          })
 
       setExemptionCache(request, {
         ...exemption,

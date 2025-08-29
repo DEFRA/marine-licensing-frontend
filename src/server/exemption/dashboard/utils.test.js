@@ -21,7 +21,6 @@ describe('#formatProjectsForDisplay', () => {
       {
         id: 'abc123',
         projectName: 'Test Project',
-        type: 'Exempt activity',
         applicationReference: 'ML-2024-001',
         status: 'Draft',
         submittedAt: '2024-01-15'
@@ -33,7 +32,7 @@ describe('#formatProjectsForDisplay', () => {
     expect(result).toEqual([
       [
         { text: 'Test Project' },
-        { text: 'Exempt activity' },
+        { text: 'Exempt activity notification' },
         { text: 'ML-2024-001' },
         {
           html: '<strong class="govuk-tag govuk-tag--light-blue">Draft</strong>'
@@ -51,7 +50,7 @@ describe('#formatProjectsForDisplay', () => {
       {
         id: 'abc123',
         projectName: 'Test Project',
-        type: 'Exempt activity',
+
         applicationReference: null,
         status: 'Draft',
         submittedAt: null
@@ -63,7 +62,7 @@ describe('#formatProjectsForDisplay', () => {
     expect(result).toEqual([
       [
         { text: 'Test Project' },
-        { text: 'Exempt activity' },
+        { text: 'Exempt activity notification' },
         { text: '-' },
         {
           html: '<strong class="govuk-tag govuk-tag--light-blue">Draft</strong>'
@@ -81,14 +80,15 @@ describe('#formatProjectsForDisplay', () => {
       {
         id: 'abc123',
         projectName: 'Project 1',
-        type: 'Exempt activity',
+
         applicationReference: 'ML-2024-001',
         status: 'Draft',
         submittedAt: '2024-01-15'
       },
       {
+        id: 'def456',
         projectName: 'Project 2',
-        type: 'Exempt activity',
+
         applicationReference: 'ML-2024-002',
         status: 'Closed',
         submittedAt: '2024-06-25'
@@ -100,7 +100,7 @@ describe('#formatProjectsForDisplay', () => {
     expect(result).toHaveLength(2)
     expect(result[0]).toEqual([
       { text: 'Project 1' },
-      { text: 'Exempt activity' },
+      { text: 'Exempt activity notification' },
       { text: 'ML-2024-001' },
       {
         html: '<strong class="govuk-tag govuk-tag--light-blue">Draft</strong>'
@@ -112,13 +112,15 @@ describe('#formatProjectsForDisplay', () => {
     ])
     expect(result[1]).toEqual([
       { text: 'Project 2' },
-      { text: 'Exempt activity' },
+      { text: 'Exempt activity notification' },
       { text: 'ML-2024-002' },
       {
         html: '<strong class="govuk-tag govuk-tag--green">Closed</strong>'
       },
       { text: '25 Jun 2024' },
-      { html: '' }
+      {
+        html: '<a href="/exemption/view-details/def456" class="govuk-link" aria-label="View details of Project 2">View details</a>'
+      }
     ])
   })
 
@@ -132,14 +134,14 @@ describe('#formatProjectsForDisplay', () => {
     const projects = [
       {
         projectName: 'Test Project',
-        type: 'Exempt activity',
+
         applicationReference: 'ML-2024-001',
         status: 'Draft',
         submittedAt: '2024-01-15'
       },
       {
         projectName: 'Test Project',
-        type: 'Exempt activity',
+
         applicationReference: 'ML-2024-001',
         status: 'Closed',
         submittedAt: '2024-01-15'
@@ -168,9 +170,39 @@ describe('getActionButtons', () => {
     )
   })
 
-  it('returns no html when not a draft', () => {
-    const submitted = { id: 'abc123', status: 'Closed' }
+  it('returns View details link when status is Closed', () => {
+    const submitted = {
+      id: 'abc123',
+      projectName: 'Test Project',
+      status: 'Closed'
+    }
     const result = getActionButtons(submitted)
-    expect(result).toBe('')
+    expect(result).toBe(
+      '<a href="/exemption/view-details/abc123" class="govuk-link" aria-label="View details of Test Project">View details</a>'
+    )
+  })
+
+  it('returns View details link when status is Submitted', () => {
+    const submitted = {
+      id: 'def456',
+      projectName: 'Another Project',
+      status: 'Submitted'
+    }
+    const result = getActionButtons(submitted)
+    expect(result).toBe(
+      '<a href="/exemption/view-details/def456" class="govuk-link" aria-label="View details of Another Project">View details</a>'
+    )
+  })
+
+  it('returns View details link for any non-Draft status', () => {
+    const unknown = {
+      id: 'ghi789',
+      projectName: 'Unknown Status Project',
+      status: 'Unknown'
+    }
+    const result = getActionButtons(unknown)
+    expect(result).toBe(
+      '<a href="/exemption/view-details/ghi789" class="govuk-link" aria-label="View details of Unknown Status Project">View details</a>'
+    )
   })
 })

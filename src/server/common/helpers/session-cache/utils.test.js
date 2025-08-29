@@ -6,7 +6,8 @@ import {
   resetExemptionSiteDetails,
   setExemptionCache,
   updateExemptionSiteDetails,
-  updateExemptionSiteDetailsBatch
+  updateExemptionSiteDetailsBatch,
+  updateExemptionMultipleSiteDetails
 } from '~/src/server/common/helpers/session-cache/utils.js'
 
 jest.mock('@hapi/hoek', () => ({
@@ -202,6 +203,123 @@ describe('#utils', () => {
       })
 
       expect(result).toEqual({ coordinatesType: null })
+    })
+  })
+
+  describe('updateExemptionMultipleSiteDetails', () => {
+    let mockRequest
+
+    beforeEach(() => {
+      jest.clearAllMocks()
+
+      mockRequest = {
+        yar: {
+          get: jest.fn(),
+          set: jest.fn()
+        }
+      }
+    })
+
+    test('should store the value in multipleSiteDetails cache', () => {
+      const existingCache = {
+        projectName: 'Test Project',
+        multipleSiteDetails: {
+          multipleSitesEnabled: true
+        }
+      }
+
+      mockRequest.yar.get.mockReturnValue(existingCache)
+
+      const result = updateExemptionMultipleSiteDetails(
+        mockRequest,
+        'sameActivityDates',
+        'yes'
+      )
+
+      expect(mockRequest.yar.set).toHaveBeenCalledWith(EXEMPTION_CACHE_KEY, {
+        projectName: 'Test Project',
+        multipleSiteDetails: {
+          multipleSitesEnabled: true,
+          sameActivityDates: 'yes'
+        }
+      })
+      expect(result).toEqual({ sameActivityDates: 'yes' })
+    })
+
+    test('should handle empty multipleSiteDetails', () => {
+      const existingCache = {
+        projectName: 'Test Project'
+      }
+
+      mockRequest.yar.get.mockReturnValue(existingCache)
+
+      const result = updateExemptionMultipleSiteDetails(
+        mockRequest,
+        'sameActivityDates',
+        'no'
+      )
+
+      expect(mockRequest.yar.set).toHaveBeenCalledWith(EXEMPTION_CACHE_KEY, {
+        projectName: 'Test Project',
+        multipleSiteDetails: {
+          sameActivityDates: 'no'
+        }
+      })
+      expect(result).toEqual({ sameActivityDates: 'no' })
+    })
+
+    test('should handle undefined values and convert to null', () => {
+      const existingCache = {
+        projectName: 'Test Project',
+        multipleSiteDetails: {
+          multipleSitesEnabled: true
+        }
+      }
+
+      mockRequest.yar.get.mockReturnValue(existingCache)
+
+      const result = updateExemptionMultipleSiteDetails(
+        mockRequest,
+        'sameActivityDates',
+        undefined
+      )
+
+      expect(mockRequest.yar.set).toHaveBeenCalledWith(EXEMPTION_CACHE_KEY, {
+        projectName: 'Test Project',
+        multipleSiteDetails: {
+          multipleSitesEnabled: true,
+          sameActivityDates: null
+        }
+      })
+
+      expect(result).toEqual({ sameActivityDates: null })
+    })
+
+    test('should handle null values correctly', () => {
+      const existingCache = {
+        projectName: 'Test Project',
+        multipleSiteDetails: {
+          multipleSitesEnabled: true
+        }
+      }
+
+      mockRequest.yar.get.mockReturnValue(existingCache)
+
+      const result = updateExemptionMultipleSiteDetails(
+        mockRequest,
+        'sameActivityDates',
+        null
+      )
+
+      expect(mockRequest.yar.set).toHaveBeenCalledWith(EXEMPTION_CACHE_KEY, {
+        projectName: 'Test Project',
+        multipleSiteDetails: {
+          multipleSitesEnabled: true,
+          sameActivityDates: null
+        }
+      })
+
+      expect(result).toEqual({ sameActivityDates: null })
     })
   })
 

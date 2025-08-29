@@ -1,11 +1,7 @@
 ---
-description:
-globs:
-alwaysApply: true
----
----
 description: Javascript in Defra
 globs: *.js
+alwaysApply: true
 ---
 # JavaScript in Defra
 
@@ -32,6 +28,7 @@ globs: *.js
 - Use curly braces for control structures
 - Use constants instead of magic strings and numbers
 - Use child functions when function complexity is greater than ten
+- Only use comments to clarify complex or non-obvious logic
 
 ## Project Structure
 - /src/config/ - Configuration and setup
@@ -92,6 +89,8 @@ globs: *.js
   - UI: test behavior + use data-testid
 - Use describe blocks and beforeEach for setup
 - Mock external dependencies
+- Don't add clearAllMocks or resetAllMocks to individual test files because it's already in jest.config.js
+- Don't add restoreAllMocks to individual test files
 
 ### Jest Mocking Best Practices
 

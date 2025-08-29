@@ -315,8 +315,6 @@ describe('#reviewSiteDetails', () => {
   })
 
   beforeEach(() => {
-    jest.resetAllMocks()
-
     jest.spyOn(authRequests, 'authenticatedPatchRequest').mockResolvedValue({
       payload: {
         id: mockExemption.id,
@@ -408,11 +406,11 @@ describe('#reviewSiteDetails', () => {
           '/exemption/test-id'
         )
         expect(mockRequest.logger.info).toHaveBeenCalledWith(
-          'Loaded site details from MongoDB for display',
           {
             exemptionId: 'test-id',
             coordinatesType: 'file'
-          }
+          },
+          'Loaded site details from MongoDB for display'
         )
         expect(h.view).toHaveBeenCalledWith(
           FILE_UPLOAD_REVIEW_VIEW_ROUTE,
@@ -964,6 +962,7 @@ describe('#reviewSiteDetails', () => {
           expect.any(Object),
           '/exemption/site-details',
           {
+            multipleSiteDetails: mockExemption.multipleSiteDetails,
             siteDetails: mockExemption.siteDetails,
             id: mockExemption.id
           }
@@ -989,6 +988,7 @@ describe('#reviewSiteDetails', () => {
           expect.any(Object),
           '/exemption/site-details',
           {
+            multipleSiteDetails: mockExemption.multipleSiteDetails,
             siteDetails: mockExemption.siteDetails,
             id: mockExemption.id
           }
@@ -1160,6 +1160,8 @@ describe('#reviewSiteDetails', () => {
             expect.any(Object),
             '/exemption/site-details',
             {
+              multipleSiteDetails:
+                mockPolygonExemptionWGS84.multipleSiteDetails,
               siteDetails: mockPolygonExemptionWGS84.siteDetails,
               id: mockPolygonExemptionWGS84.id
             }
@@ -1187,6 +1189,8 @@ describe('#reviewSiteDetails', () => {
             expect.any(Object),
             '/exemption/site-details',
             {
+              multipleSiteDetails:
+                mockPolygonExemptionOSGB36.multipleSiteDetails,
               siteDetails: mockPolygonExemptionOSGB36.siteDetails,
               id: mockPolygonExemptionOSGB36.id
             }
@@ -1212,6 +1216,8 @@ describe('#reviewSiteDetails', () => {
             expect.any(Object),
             '/exemption/site-details',
             {
+              multipleSiteDetails:
+                mockPolygonExemptionWGS84.multipleSiteDetails,
               siteDetails: mockPolygonExemptionWGS84.siteDetails,
               id: mockPolygonExemptionWGS84.id
             }

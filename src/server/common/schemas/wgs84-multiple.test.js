@@ -1,10 +1,6 @@
 import { createWgs84MultipleCoordinatesSchema } from '~/src/server/common/schemas/wgs84.js'
 
 describe('#multipleCoordinates WGS84 schema', () => {
-  beforeEach(() => {
-    jest.resetAllMocks()
-  })
-
   describe('#createWgs84MultipleCoordinatesSchema', () => {
     test('Should correctly validate valid WGS84 coordinates array', () => {
       const payload = {

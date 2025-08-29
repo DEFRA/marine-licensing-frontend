@@ -1,5 +1,6 @@
 import { formatDate } from '~/src/config/nunjucks/filters/format-date.js'
 import { routes } from '~/src/server/common/constants/routes.js'
+import { EXEMPTION_TYPE } from '~/src/server/common/constants/exemptions.js'
 
 export const getActionButtons = (project) => {
   let buttons = ''
@@ -7,6 +8,8 @@ export const getActionButtons = (project) => {
   if (project.status === 'Draft') {
     buttons = `<a href="${routes.TASK_LIST}/${project.id}" class="govuk-link govuk-!-margin-right-4 govuk-link--no-visited-state" aria-label="Continue to task list">Continue</a>`
     buttons += `<a href="${routes.DELETE_EXEMPTION}/${project.id}" class="govuk-link" aria-label="Delete ${project.projectName}">Delete</a>`
+  } else {
+    buttons = `<a href="${routes.VIEW_DETAILS}/${project.id}" class="govuk-link" aria-label="View details of ${project.projectName}">View details</a>`
   }
 
   return buttons
@@ -19,7 +22,7 @@ export const formatProjectsForDisplay = (projects) =>
 
     return [
       { text: project.projectName },
-      { text: project.type },
+      { text: EXEMPTION_TYPE },
       { text: project.applicationReference || '-' },
       {
         html: `<strong class="govuk-tag ${tagClass}">${project.status}</strong>`

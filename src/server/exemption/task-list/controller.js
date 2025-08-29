@@ -7,6 +7,7 @@ import {
 import { transformTaskList } from '~/src/server/exemption/task-list/utils.js'
 import { routes } from '~/src/server/common/constants/routes.js'
 import { authenticatedGetRequest } from '~/src/server/common/helpers/authenticated-requests.js'
+import { EXEMPTION_TYPE } from '~/src/server/common/constants/exemptions.js'
 
 import Boom from '@hapi/boom'
 
@@ -14,7 +15,8 @@ export const TASK_LIST_VIEW_ROUTE = 'exemption/task-list/index'
 
 const taskListViewSettings = {
   pageTitle: 'Task list',
-  heading: 'Task list'
+  heading: 'Task list',
+  type: EXEMPTION_TYPE
 }
 
 /**
@@ -53,6 +55,7 @@ export const taskListController = {
       activityDescription,
       projectName,
       publicRegister,
+      multipleSiteDetails,
       siteDetails
     } = payload.value
 
@@ -67,6 +70,7 @@ export const taskListController = {
       activityDescription,
       projectName,
       publicRegister,
+      multipleSiteDetails,
       siteDetails
     })
 

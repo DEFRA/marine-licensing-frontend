@@ -23,6 +23,7 @@ export const DATE_EXTRACTION_CONFIG = [
 export const ACTIVITY_DATES_VIEW_ROUTE = 'exemption/activity-dates/index'
 
 export const ACTIVITY_DATES_VIEW_SETTINGS = {
+  pageTitle: 'Activity dates',
   title: 'Activity dates',
   backLink: routes.TASK_LIST,
   cancelLink: routes.TASK_LIST

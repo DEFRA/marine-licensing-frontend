@@ -29,7 +29,6 @@ describe('#chooseFileType', () => {
   })
 
   beforeEach(() => {
-    jest.resetAllMocks()
     getExemptionCacheSpy = jest
       .spyOn(cacheUtils, 'getExemptionCache')
       .mockReturnValue(mockExemptionState)

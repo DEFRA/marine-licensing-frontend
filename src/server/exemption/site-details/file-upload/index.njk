@@ -10,10 +10,12 @@
 {% endblock %}
 
 {% block beforeContent %}
+<nav>
   {{ govukBackLink({
     text: "Back",
     href: backLink
   }) }}
+</nav>
 {% endblock %}
 
 {% set formLabel %}

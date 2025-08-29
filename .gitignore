@@ -8,8 +8,13 @@ node_modules
 npm-debug.log
 coverage
 .cache
-.envrc
+.envrc*
 tsconfig.tsbuildinfo
 
 # stryker temp files
 .stryker-tmp
+
+# Allure
+allure-results/
+allure-report/
+.allure/

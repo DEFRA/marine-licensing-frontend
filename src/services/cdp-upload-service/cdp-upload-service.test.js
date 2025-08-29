@@ -32,7 +32,6 @@ describe('#CdpUploadService', () => {
   let service
 
   beforeEach(() => {
-    jest.resetAllMocks()
     jest.clearAllMocks()
   })
 
@@ -49,14 +48,14 @@ describe('#CdpUploadService', () => {
       expect(service.allowedMimeTypes).toBeUndefined()
       expect(service.config).toEqual(config.get('cdpUploader'))
       expect(mockLoggerDebug).toHaveBeenCalledWith(
-        'CdpUploadService initialized',
         {
           cdpServiceBaseUrl: config.get('cdpUploader').cdpUploadServiceBaseUrl,
           appBaseUrl: config.get('appBaseUrl'),
           timeout: config.get('cdpUploader').timeout,
           maxFileSize: config.get('cdpUploader').maxFileSize,
           allowedMimeTypes: undefined
-        }
+        },
+        'CdpUploadService initialized'
       )
     })
 
@@ -67,12 +66,12 @@ describe('#CdpUploadService', () => {
       // Then
       expect(service.allowedMimeTypes).toEqual(mockAllowedMimeTypes)
       expect(mockLoggerDebug).toHaveBeenCalledWith(
-        'CdpUploadService initialized',
         expect.objectContaining({
           cdpServiceBaseUrl: config.get('cdpUploader').cdpUploadServiceBaseUrl,
           appBaseUrl: config.get('appBaseUrl'),
           allowedMimeTypes: mockAllowedMimeTypes
-        })
+        }),
+        'CdpUploadService initialized'
       )
     })
   })
@@ -123,11 +122,11 @@ describe('#CdpUploadService', () => {
         })
 
         expect(mockLoggerInfo).toHaveBeenCalledWith(
-          'Upload session initiated successfully',
           {
             uploadId: mockUploadId,
             redirectUrl: mockRedirectUrl
-          }
+          },
+          'Upload session initiated successfully'
         )
       })
 
@@ -306,12 +305,12 @@ describe('#CdpUploadService', () => {
         ).rejects.toThrow('API call failed with status: 400')
 
         expect(mockLoggerError).toHaveBeenCalledWith(
-          'API call failed with status: 400',
           expect.objectContaining({
             status: 400,
             statusText: 'Bad Request',
             endpoint: '/initiate'
-          })
+          }),
+          'API call failed with status: 400'
         )
       })
 
@@ -330,10 +329,10 @@ describe('#CdpUploadService', () => {
         ).rejects.toThrow('Request timeout')
 
         expect(mockLoggerError).toHaveBeenCalledWith(
-          'Failed to initiate upload session',
           expect.objectContaining({
             error: 'Request timeout'
-          })
+          }),
+          'Failed to initiate upload session'
         )
       })
     })
@@ -374,11 +373,11 @@ describe('#CdpUploadService', () => {
         })
 
         expect(mockLoggerDebug).toHaveBeenCalledWith(
-          'Upload status retrieved',
           {
             uploadId: mockUploadId,
             status: 'error'
-          }
+          },
+          'Upload status retrieved'
         )
       })
 
@@ -652,10 +651,10 @@ describe('#CdpUploadService', () => {
         })
 
         expect(mockLoggerWarn).toHaveBeenCalledWith(
-          'Upload session not found',
           {
             uploadId: mockUploadId
-          }
+          },
+          'Upload session not found'
         )
       })
 
@@ -672,13 +671,13 @@ describe('#CdpUploadService', () => {
         ).rejects.toThrow('API call failed with status: 400')
 
         expect(mockLoggerError).toHaveBeenCalledWith(
-          'API call failed with status: 400',
           {
             uploadId: mockUploadId,
             status: 400,
             statusText: 'Bad Request',
             endpoint: '/status'
-          }
+          },
+          'API call failed with status: 400'
         )
       })
 
@@ -719,11 +718,11 @@ describe('#CdpUploadService', () => {
         })
 
         expect(mockLoggerError).toHaveBeenCalledWith(
-          'Request timeout when checking status',
           {
             uploadId: mockUploadId,
             error: 'Request timeout'
-          }
+          },
+          'Request timeout when checking status'
         )
       })
 

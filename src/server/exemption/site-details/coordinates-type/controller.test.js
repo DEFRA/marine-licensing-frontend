@@ -24,7 +24,6 @@ describe('#coordinatesType', () => {
   })
 
   beforeEach(() => {
-    jest.resetAllMocks()
     getExemptionCacheSpy = jest
       .spyOn(cacheUtils, 'getExemptionCache')
       .mockReturnValue(mockExemption)
@@ -279,7 +278,7 @@ describe('#coordinatesType', () => {
 
       expect(h.view).not.toHaveBeenCalled()
 
-      expect(h.redirect).toHaveBeenCalledWith(routes.COORDINATES_ENTRY_CHOICE)
+      expect(h.redirect).toHaveBeenCalledWith(routes.MULTIPLE_SITES_CHOICE)
       expect(h.redirect().takeover).toHaveBeenCalled()
     })
 

@@ -13,11 +13,11 @@ import {
   normaliseCoordinatesForDisplay,
   multipleCoordinatesPageData,
   convertPayloadToCoordinatesArray,
-  validateCoordinates,
   convertArrayErrorsToFlattenedErrors,
   handleValidationFailure,
   removeCoordinateAtIndex
 } from './utils.js'
+import { validateCoordinates } from '~/src/server/exemption/site-details/enter-multiple-coordinates/validation/validation.js'
 
 export const multipleCoordinatesController = {
   handler(request, h) {

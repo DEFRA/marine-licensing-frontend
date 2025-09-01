@@ -1,18 +1,19 @@
 import { JSDOM } from 'jsdom'
 import { getByLabelText, getByRole, getByText } from '@testing-library/dom'
-import { createServer } from '~/src/server/index.js'
 import { statusCodes } from '~/src/server/common/constants/status-codes.js'
 import {
   getExemptionCache,
   updateExemptionSiteDetails,
   setExemptionCache
 } from '~/src/server/common/helpers/session-cache/utils.js'
-import { validateErrors } from '../utils/utils.test.js'
+import { validateErrors } from '../shared/expect-utils.js'
+
+import { setupTestServer } from '~/tests/integration/shared/test-setup-helpers.js'
 
 jest.mock('~/src/server/common/helpers/session-cache/utils.js')
 
 describe('Site name page', () => {
-  let server
+  const getServer = setupTestServer()
 
   const mockExemption = {
     id: 'test-exemption-123',
@@ -23,17 +24,8 @@ describe('Site name page', () => {
   jest.mocked(updateExemptionSiteDetails).mockReturnValue({})
   jest.mocked(setExemptionCache).mockReturnValue({})
 
-  beforeAll(async () => {
-    server = await createServer()
-    await server.initialize()
-  })
-
-  afterAll(async () => {
-    await server.stop()
-  })
-
   test('should display the site name page with correct content', async () => {
-    const { result, statusCode } = await server.inject({
+    const { result, statusCode } = await getServer().inject({
       method: 'GET',
       url: '/exemption/site-name'
     })
@@ -51,7 +43,9 @@ describe('Site name page', () => {
     expect(getByText(document, mockExemption.projectName)).toBeInTheDocument()
     expect(getByText(document, 'Site 1')).toBeInTheDocument()
 
-    const siteNameInput = getByLabelText(document, 'Site name')
+    const siteNameInput = getByLabelText(document, 'Site name', {
+      exact: false
+    })
     expect(siteNameInput).toHaveAttribute('type', 'text')
 
     expect(
@@ -69,7 +63,7 @@ describe('Site name page', () => {
       siteDetails: { ...mockExemption.siteDetails, siteName: 'Test Site' }
     })
 
-    const { result, statusCode } = await server.inject({
+    const { result, statusCode } = await getServer().inject({
       method: 'GET',
       url: '/exemption/site-name'
     })
@@ -78,14 +72,16 @@ describe('Site name page', () => {
 
     const { document } = new JSDOM(result).window
 
-    const siteNameInput = getByLabelText(document, 'Site name')
+    const siteNameInput = getByLabelText(document, 'Site name', {
+      exact: false
+    })
     expect(siteNameInput).toHaveValue('Test Site')
 
     expect(setExemptionCache).not.toHaveBeenCalled()
   })
 
   test('should have correct navigation links', async () => {
-    const { result } = await server.inject({
+    const { result } = await getServer().inject({
       method: 'GET',
       url: '/exemption/site-name'
     })
@@ -106,7 +102,7 @@ describe('Site name page', () => {
   })
 
   test('should stay on same page when continue is clicked without entering site name', async () => {
-    const { result, statusCode } = await server.inject({
+    const { result, statusCode } = await getServer().inject({
       method: 'POST',
       url: '/exemption/site-name',
       payload: {}
@@ -137,7 +133,7 @@ describe('Site name page', () => {
   test('should stay on same page when site name is too long', async () => {
     const siteName = 'A'.repeat(251)
 
-    const { result, statusCode } = await server.inject({
+    const { result, statusCode } = await getServer().inject({
       method: 'POST',
       url: '/exemption/site-name',
       payload: {
@@ -168,7 +164,7 @@ describe('Site name page', () => {
   })
 
   test('should redirect to same activity dates when valid site name is submitted', async () => {
-    const response = await server.inject({
+    const response = await getServer().inject({
       method: 'POST',
       url: '/exemption/site-name',
       payload: {
@@ -187,7 +183,7 @@ describe('Site name page', () => {
   })
 
   test('should redirect to task list when cancel is clicked', async () => {
-    const { result, statusCode } = await server.inject({
+    const { result, statusCode } = await getServer().inject({
       method: 'GET',
       url: '/exemption/site-name'
     })

@@ -17,6 +17,7 @@ import { requestTracing } from '~/src/server/common/helpers/request-tracing.js'
 import { setupProxy } from '~/src/server/common/helpers/proxy/setup-proxy.js'
 import { csrf } from '~/src/server/common/helpers/csrf.js'
 import { defraId } from '~/src/server/common/plugins/defra-id.js'
+import { setPageCacheControlHeaders } from '~/src/server/common/helpers/cache-control.js'
 
 export async function createServer() {
   setupProxy()
@@ -79,6 +80,7 @@ export async function createServer() {
     router // Register all the controllers/routes defined in src/server/router.js
   ])
 
+  server.ext('onPreResponse', setPageCacheControlHeaders)
   server.ext('onPreResponse', catchAll)
 
   return server

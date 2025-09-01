@@ -32,7 +32,6 @@ describe('#CdpUploadService', () => {
   let service
 
   beforeEach(() => {
-    jest.resetAllMocks()
     jest.clearAllMocks()
   })
 

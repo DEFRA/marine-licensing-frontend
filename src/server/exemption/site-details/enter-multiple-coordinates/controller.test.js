@@ -14,10 +14,10 @@ import {
   isWGS84,
   multipleCoordinatesPageData,
   convertPayloadToCoordinatesArray,
-  validateCoordinates,
   convertArrayErrorsToFlattenedErrors,
   handleValidationFailure
 } from '~/src/server/exemption/site-details/enter-multiple-coordinates/utils.js'
+import { validateCoordinates } from '~/src/server/exemption/site-details/enter-multiple-coordinates/validation/validation.js'
 
 jest.mock('~/src/server/common/helpers/session-cache/utils.js')
 jest.mock(
@@ -44,6 +44,14 @@ jest.mock(
       handleValidationFailure: jest.fn(),
       removeCoordinateAtIndex: actualUtils.removeCoordinateAtIndex,
       REQUIRED_COORDINATES_COUNT: actualUtils.REQUIRED_COORDINATES_COUNT
+    }
+  }
+)
+jest.mock(
+  '~/src/server/exemption/site-details/enter-multiple-coordinates/validation/validation.js',
+  () => {
+    return {
+      validateCoordinates: jest.fn()
     }
   }
 )

@@ -198,7 +198,9 @@ describe('#sameActivityDates', () => {
         cacheUtils.updateExemptionMultipleSiteDetails
       ).toHaveBeenCalledWith(mockRequest, 'sameActivityDates', 'yes')
 
-      expect(h.redirect).toHaveBeenCalledWith(routes.COORDINATES_ENTRY_CHOICE)
+      expect(h.redirect).toHaveBeenCalledWith(
+        routes.SITE_DETAILS_ACTIVITY_DATES
+      )
     })
   })
 })

@@ -315,8 +315,6 @@ describe('#reviewSiteDetails', () => {
   })
 
   beforeEach(() => {
-    jest.resetAllMocks()
-
     jest.spyOn(authRequests, 'authenticatedPatchRequest').mockResolvedValue({
       payload: {
         id: mockExemption.id,
@@ -1013,7 +1011,6 @@ describe('#reviewSiteDetails', () => {
           expect.any(Object),
           '/exemption/site-details',
           {
-            multipleSiteDetails: mockExemption.multipleSiteDetails,
             siteDetails: createExpectedSiteDetails(),
             id: mockExemption.id
           }

@@ -1,5 +1,8 @@
 import Boom from '@hapi/boom'
-import { getExemptionCache } from '~/src/server/common/helpers/session-cache/utils.js'
+import {
+  clearExemptionCache,
+  getExemptionCache
+} from '~/src/server/common/helpers/session-cache/utils.js'
 import { authenticatedPostRequest } from '~/src/server/common/helpers/authenticated-requests.js'
 import { routes } from '~/src/server/common/constants/routes.js'
 import { createSiteDetailsDataJson } from '~/src/server/common/helpers/site-details.js'
@@ -73,6 +76,7 @@ export const checkYourAnswersSubmitController = {
       )
 
       if (response?.message === 'success' && response?.value) {
+        clearExemptionCache(request)
         const { applicationReference } = response.value
         return h.redirect(
           `/exemption/confirmation?applicationReference=${applicationReference}`

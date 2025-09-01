@@ -6,6 +6,8 @@
 
 /* eslint-env jest */
 
+import { within } from '@testing-library/dom'
+
 /**
  * Validates that no "Change" links are present (read-only mode)
  * @param {Document} document - JSDOM document
@@ -76,3 +78,15 @@ export const validateElementAttributes = (element, expectedAttributes) => {
     expect(element).toHaveAttribute(attr, value)
   })
 }
+
+export const getInputInFieldset = ({ document, fieldsetLabel, inputLabel }) => {
+  const fieldset = getFieldsetByLabel({ document, fieldsetLabel })
+  return within(fieldset).getByLabelText(inputLabel)
+}
+
+export const getFieldsetByLabel = ({ document, fieldsetLabel }) =>
+  within(document)
+    .getByText(fieldsetLabel, {
+      selector: 'legend'
+    })
+    .closest('fieldset')

@@ -15,3 +15,11 @@ tsconfig.tsbuildinfo
 .stryker-tmp
 
 local-https-setup/*.pem
+
+# Allure
+allure-results/
+allure-report/
+.allure/
+
+# Claude local settings
+.claude/settings.local.json

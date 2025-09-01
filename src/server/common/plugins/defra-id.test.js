@@ -4,16 +4,20 @@ import { config } from '~/src/config/config.js'
 import { getOidcConfig } from '~/src/server/common/plugins/auth/get-oidc-config.js'
 import { openIdProvider } from '~/src/server/common/plugins/auth/open-id.js'
 import { validateUserSession } from '~/src/server/common/plugins/auth/validate.js'
+import { clearExemptionCache } from '~/src/server/common/helpers/session-cache/utils.js'
 
 jest.mock('~/src/config/config.js')
 jest.mock('~/src/server/common/plugins/auth/get-oidc-config.js')
 jest.mock('~/src/server/common/plugins/auth/open-id.js')
 jest.mock('~/src/server/common/plugins/auth/validate.js')
 jest.mock('~/src/server/common/constants/routes.js')
+jest.mock('~/src/server/common/helpers/session-cache/utils.js')
+jest.mock('~/src/server/common/helpers/mcms-context/cache-mcms-context.js')
 
 const mockedGetOidcConfig = jest.mocked(getOidcConfig)
 const mockedOpenIdProvider = jest.mocked(openIdProvider)
 const mockedValidateUserSession = jest.mocked(validateUserSession)
+const mockedClearExemptionCache = jest.mocked(clearExemptionCache)
 
 describe('defraId plugin', () => {
   let mockServer
@@ -147,5 +151,28 @@ describe('defraId plugin', () => {
 
     const redirectToReturnValue = redirectTo(mockRequest)
     expect(redirectToReturnValue).toBe('/login')
+  })
+
+  test('should call clearExemptionCache when validity.isValid is false', async () => {
+    mockedValidateUserSession.mockReturnValue({ isValid: false })
+
+    await defraId.plugin.register(mockServer)
+
+    const sessionStrategyCall = mockServer.auth.strategy.mock.calls.find(
+      (call) => call[0] === 'session'
+    )
+
+    const sessionConfig = sessionStrategyCall[2]
+    const validate = sessionConfig.validate
+    const mockSession = { userId: 'test-user' }
+
+    const result = await validate(mockRequest, mockSession)
+
+    expect(mockedValidateUserSession).toHaveBeenCalledWith(
+      mockRequest,
+      mockSession
+    )
+    expect(result).toEqual({ isValid: false })
+    expect(mockedClearExemptionCache).toHaveBeenCalledWith(mockRequest)
   })
 })

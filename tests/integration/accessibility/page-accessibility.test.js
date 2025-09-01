@@ -115,6 +115,7 @@ describe('Page accessibility checks (Axe)', () => {
         .mocked(authenticatedGetRequest)
         .mockImplementation((_request, endpoint) => ({
           payload: {
+            message: 'success',
             value: endpoint === '/exemptions' ? mockProjectList : exemption
           }
         }))

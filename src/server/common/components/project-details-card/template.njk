@@ -1,33 +1,66 @@
-{% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
-
-{{ govukSummaryList({
-    card: {
-      title: {
-        text: "Project details"
-      },
-      actions: {
-        items: [
-          {
-            href: "#",
-            text: "Change"
-          }
-        ]
-      } if not params.isReadOnly,
-      attributes: {
-        id: "project-details-card"
-      }
-    },
-    rows: [
-      {
-        key: {
-          text: "Project name"
-        },
-        value: {
-          html: params.projectName
-        },
-        attributes: {
-          id: "project-name-row"
-        }
-      }
-    ]
-  }) }}
+<div class="govuk-summary-card" id="project-details-card">
+  <div class="govuk-summary-card__title-wrapper">
+    <h2 class="govuk-summary-card__title">Project summary</h2>
+  </div>
+  <div class="govuk-summary-card__content">
+    <dl class="govuk-summary-list">
+      <div class="govuk-summary-list__row" id="project-name-row">
+        <dt class="govuk-summary-list__key">
+          Project name
+        </dt>
+        <dd class="govuk-summary-list__value">
+          {{ params.projectName }}
+        </dd>
+        {% if not params.isReadOnly %}
+          <dd class="govuk-summary-list__actions">
+            <a class="govuk-link" href="#">
+              Change<span class="govuk-visually-hidden"> project name</span>
+            </a>
+          </dd>
+        {% endif %}
+      </div>
+      <div class="govuk-summary-list__row govuk-summary-list__row--no-actions govuk-summary-list__row--no-border">
+        <dt class="govuk-summary-list__key">
+          Type of activity
+        </dt>
+        <dd class="govuk-summary-list__value">
+          {% if not params.mcmsContext %}
+          An error occurred saving the answers from 'Check if you need a marine licence'.
+          {% else %}
+          {{ params.mcmsContext.activityType.label }}
+          {% endif %}
+        </dd>
+      </div>
+      <div class="govuk-summary-list__row govuk-summary-list__row--no-actions govuk-summary-list__row--no-border">
+        <dt class="govuk-summary-list__key">
+          Why this activity is exempt
+        </dt>
+        <dd class="govuk-summary-list__value">
+          {% if not params.mcmsContext %}
+          An error occurred saving the answers from 'Check if you need a marine licence'.
+          {% else %}
+          Based on your answers from 'Check if you need a marine licence', your article is exempt under <a
+            href="http://www.legislation.gov.uk/uksi/2011/409/article/{{ params.mcmsContext.article }}" target="_blank"
+            rel="noopener noreferrer">Article {{ params.mcmsContext.article }} of the Marine Licensing (Exempted Activities) Order 2011 (opens in new tab)</a>
+          {% endif %}
+        </dd>
+      </div>
+      <div class="govuk-summary-list__row govuk-summary-list__row--no-actions">
+        <dt class="govuk-summary-list__key">Your answers from 'Check if you need a marine licence'</dt>
+        <dd class="govuk-summary-list__value">
+          {% if not params.mcmsContext %}
+          An error occurred saving the answers from 'Check if you need a marine licence'.
+          {% else %}
+          <p><a href="{{ params.mcmsContext.pdfDownloadUrl }}" class="govuk-link">Download a copy of your answers (PDF)</a></p>
+            <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible">
+            <p class="govuk-body">If you need to change any of your 'Check if you need a marine licence' answers:</p>
+            <ol class="govuk-list govuk-list--number">
+            <li>Delete this project from your projects.</li>
+            <li>Restart the process by checking if you need a marine licence.</li>
+            </ol>
+          {% endif %}
+        </dd>
+      </div>
+    </dl>
+  </div>
+</div>

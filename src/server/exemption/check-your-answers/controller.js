@@ -10,6 +10,7 @@ import { getCoordinateSystem } from '~/src/server/common/helpers/coordinate-util
 import { getUserSession } from '~/src/server/common/plugins/auth/utils.js'
 import { processSiteDetails } from '~/src/server/common/helpers/exemption-site-details.js'
 import { errorMessages } from '~/src/server/common/constants/error-messages.js'
+import { getExemptionService } from '~/src/services/exemption-service/index.js'
 
 const apiPaths = {
   submitExemption: '/exemption/submit'
@@ -29,19 +30,22 @@ export const CHECK_YOUR_ANSWERS_VIEW_ROUTE =
  * @satisfies {Partial<ServerRoute>}
  */
 export const checkYourAnswersController = {
-  handler(request, h) {
-    const exemption = getExemptionCache(request)
-    const { id } = exemption
-    const siteDetails = processSiteDetails(exemption, id, request)
+  async handler(request, h) {
+    const cachedExemption = getExemptionCache(request)
+    const { id } = cachedExemption
+    const siteDetails = processSiteDetails(cachedExemption, id, request)
     const { coordinateSystem } = getCoordinateSystem(request)
     const siteDetailsData = createSiteDetailsDataJson(
       siteDetails,
       coordinateSystem
     )
+    const exemptionService = getExemptionService(request)
+    const savedExemption = await exemptionService.getExemptionById(id)
 
     return h.view(CHECK_YOUR_ANSWERS_VIEW_ROUTE, {
       ...checkYourAnswersViewContent,
-      ...exemption,
+      ...cachedExemption,
+      mcmsContext: savedExemption.mcmsContext,
       siteDetails,
       siteDetailsData,
       isReadOnly: false

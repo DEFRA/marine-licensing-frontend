@@ -58,14 +58,23 @@ export const testScenarios = [
       pageTitle: 'Check your answers before sending your information',
       backLinkText: 'Go back to your project',
       summaryCards: [
-        'Project details',
+        'Project summary',
         'Activity dates',
         'Activity details',
         'Site details',
         'Public register'
       ],
       projectDetails: {
-        'Project name': 'Hammersmith pontoon construction'
+        'Project name': 'Hammersmith pontoon construction',
+        'Type of activity': 'Deposit of a substance or object',
+        'Why this activity is exempt':
+          "Based on your answers from 'Check if you need a marine licence', your article is exempt under Article 17 of the Marine Licensing (Exempted Activities) Order 2011 (opens in new tab)",
+        "Your answers from 'Check if you need a marine licence'": [
+          'Download a copy of your answers (PDF)',
+          "If you need to change any of your 'Check if you need a marine licence' answers:",
+          'Delete this project from your projects.',
+          'Restart the process by checking if you need a marine licence.'
+        ]
       },
       activityDates: {
         'Start date': '1 July 2025',
@@ -103,7 +112,7 @@ export const testScenarios = [
       pageTitle: 'Check your answers before sending your information',
       backLinkText: 'Go back to your project',
       summaryCards: [
-        'Project details',
+        'Project summary',
         'Activity dates',
         'Activity details',
         'Site details',
@@ -148,7 +157,7 @@ export const testScenarios = [
       pageTitle: 'Check your answers before sending your information',
       backLinkText: 'Go back to your project',
       summaryCards: [
-        'Project details',
+        'Project summary',
         'Activity dates',
         'Activity details',
         'Site details',
@@ -197,7 +206,7 @@ export const testScenarios = [
       pageTitle: 'Check your answers before sending your information',
       backLinkText: 'Go back to your project',
       summaryCards: [
-        'Project details',
+        'Project summary',
         'Activity dates',
         'Activity details',
         'Site details',
@@ -248,7 +257,7 @@ export const testScenarios = [
       pageTitle: 'Check your answers before sending your information',
       backLinkText: 'Go back to your project',
       summaryCards: [
-        'Project details',
+        'Project summary',
         'Activity dates',
         'Activity details',
         'Site details',
@@ -299,7 +308,7 @@ export const testScenarios = [
       pageTitle: 'Check your answers before sending your information',
       backLinkText: 'Go back to your project',
       summaryCards: [
-        'Project details',
+        'Project summary',
         'Activity dates',
         'Activity details',
         'Site details',
@@ -352,7 +361,7 @@ export const testScenarios = [
       pageTitle: 'Check your answers before sending your information',
       backLinkText: 'Go back to your project',
       summaryCards: [
-        'Project details',
+        'Project summary',
         'Activity dates',
         'Activity details',
         'Site details',

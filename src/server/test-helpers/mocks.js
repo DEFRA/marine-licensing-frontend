@@ -8,6 +8,14 @@ export const mockExemptionTaskList = {
   siteDetails: 'COMPLETED'
 }
 
+export const mockExemptionMcmsContext = {
+  activityType: 'DEPOSIT',
+  activitySubtype: 'scientificResearch',
+  article: '17',
+  pdfDownloadUrl:
+    'https://marinelicensingtest.marinemanagement.org.uk/mmofox5uat/journey…'
+}
+
 export const mockExemption = {
   id: faker.database.mongodbObjectId(),
   projectName: 'Test Project',
@@ -30,7 +38,8 @@ export const mockExemption = {
     circleWidth: '100',
     siteName: 'Mock site'
   },
-  taskList: mockExemptionTaskList
+  taskList: mockExemptionTaskList,
+  mcmsContext: mockExemptionMcmsContext
 }
 
 export const mockExemptionWithShapefile = {

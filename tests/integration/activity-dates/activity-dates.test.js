@@ -90,4 +90,44 @@ describe('Activity dates - page structure & accessibility', () => {
       })
     ).toBeInTheDocument()
   })
+
+  test('should have correct page content for single site joruney', async () => {
+    const mockExemptionSingleSite = {
+      ...exemptionNoActivityDates,
+      siteDetails: {},
+      multipleSiteDetails: {
+        multipleSitesEnabled: false
+      }
+    }
+
+    mockExemption(mockExemptionSingleSite)
+
+    const document = await loadPage({
+      requestUrl: routes.SITE_DETAILS_ACTIVITY_DATES,
+      server: getServer()
+    })
+
+    const backLink = getByRole(document, 'link', { name: 'Back' })
+    expect(backLink).toHaveAttribute('href', routes.MULTIPLE_SITES_CHOICE)
+  })
+
+  test('should have correct page content for multiple site joruney', async () => {
+    const mockExemptionSingleSite = {
+      ...exemptionNoActivityDates,
+      siteDetails: {},
+      multipleSiteDetails: {
+        multipleSitesEnabled: true
+      }
+    }
+
+    mockExemption(mockExemptionSingleSite)
+
+    const document = await loadPage({
+      requestUrl: routes.SITE_DETAILS_ACTIVITY_DATES,
+      server: getServer()
+    })
+
+    const backLink = getByRole(document, 'link', { name: 'Back' })
+    expect(backLink).toHaveAttribute('href', routes.SAME_ACTIVITY_DATES)
+  })
 })

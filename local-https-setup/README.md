@@ -19,7 +19,16 @@ This folder contains all the scripts and configuration files needed to run the M
    brew install nginx
    ```
 
-3. **Generate SSL certificates** (first time only):
+3. **Set up nginx directories** (required for Homebrew nginx):
+
+   ```bash
+   sudo mkdir -p /usr/local/var/run/nginx
+   sudo chown -R $(whoami):admin /usr/local/var/run/nginx
+   ```
+
+   > **⚠️ Important**: This step is required to set the working directory correctly for Homebrew installed nginx.
+
+4. **Generate SSL certificates** (first time only):
 
    ```bash
    cd local-https-setup
@@ -29,13 +38,13 @@ This folder contains all the scripts and configuration files needed to run the M
 
    > **⚠️ Important**: SSL certificates are generated locally and should NOT be committed to the repository. The certificates are already in `.gitignore` to prevent accidental commits.
 
-4. **Enable local DNS** (first time only):
+5. **Enable local DNS** (first time only):
 
    ```bash
    ./local-https-setup/toggle-local-dns.sh
    ```
 
-5. **Update config.js from the test env for all defra id related changes** :
+6. **Update config.js from the test env for all defra id related changes** :
 
 - including AUTH_DEFRA_ID_SCOPES and DEFRA_ID_CLIENT_SECRET from secrets
 - use other values from here https://github.com/DEFRA/cdp-app-config/blob/fac3e76ed9485599c2c93868e04863321c60f48a/services/marine-licensing-frontend/test/marine-licensing-frontend.env#L4

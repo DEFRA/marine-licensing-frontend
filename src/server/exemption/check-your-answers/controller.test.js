@@ -14,6 +14,7 @@ const mockUserSession = {
 describe('check your answers controller', () => {
   let server
   let getExemptionCacheSpy
+  let clearExemptionCacheSpy
 
   beforeAll(async () => {
     server = await createServer()
@@ -21,17 +22,15 @@ describe('check your answers controller', () => {
   })
 
   beforeEach(() => {
-    jest.resetAllMocks()
-
     jest.spyOn(authUtils, 'getUserSession').mockResolvedValue(mockUserSession)
 
     getExemptionCacheSpy = jest
       .spyOn(cacheUtils, 'getExemptionCache')
       .mockReturnValue(mockExemption)
-  })
 
-  afterEach(() => {
-    jest.restoreAllMocks()
+    clearExemptionCacheSpy = jest
+      .spyOn(cacheUtils, 'clearExemptionCache')
+      .mockImplementation(() => ({}))
   })
 
   afterAll(async () => {
@@ -51,7 +50,7 @@ describe('check your answers controller', () => {
       })
     })
 
-    test('Should submit exemption and redirect to confirmation page', async () => {
+    test('Should submit exemption and redirect to confirmation page after clearing exemption cache', async () => {
       const { statusCode, headers } = await server.inject({
         method: 'POST',
         url: '/exemption/check-your-answers'
@@ -70,6 +69,7 @@ describe('check your answers controller', () => {
           userEmail: mockUserSession.email
         }
       )
+      expect(clearExemptionCacheSpy).toHaveBeenCalledWith(expect.any(Object))
     })
 
     test('Should handle missing exemption data on POST', async () => {
@@ -92,6 +92,7 @@ describe('check your answers controller', () => {
       })
 
       expect(statusCode).toBe(400)
+      expect(clearExemptionCacheSpy).not.toHaveBeenCalled()
     })
 
     test('Should handle unexpected API response format', async () => {
@@ -105,6 +106,7 @@ describe('check your answers controller', () => {
       })
 
       expect(statusCode).toBe(400)
+      expect(clearExemptionCacheSpy).not.toHaveBeenCalled()
     })
 
     test('Should handle API response with missing value', async () => {
@@ -118,6 +120,7 @@ describe('check your answers controller', () => {
       })
 
       expect(statusCode).toBe(400)
+      expect(clearExemptionCacheSpy).not.toHaveBeenCalled()
     })
 
     test('Should redirect even with missing applicationReference when value exists', async () => {
@@ -134,6 +137,7 @@ describe('check your answers controller', () => {
       expect(headers.location).toBe(
         '/exemption/confirmation?applicationReference=undefined'
       )
+      expect(clearExemptionCacheSpy).toHaveBeenCalledWith(expect.any(Object))
     })
 
     test('Should handle API response with wrong message type', async () => {

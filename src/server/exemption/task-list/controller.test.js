@@ -32,8 +32,6 @@ describe('#taskListController', () => {
   })
 
   beforeEach(() => {
-    jest.resetAllMocks()
-
     jest
       .spyOn(authRequests, 'authenticatedGetRequest')
       .mockResolvedValue({ payload: { value: mockExemption } })
@@ -212,8 +210,6 @@ describe('#taskListSelectExemptionController', () => {
   })
 
   beforeEach(() => {
-    jest.resetAllMocks()
-
     jest
       .spyOn(authRequests, 'authenticatedGetRequest')
       .mockResolvedValue({ payload: { value: mockExemption } })

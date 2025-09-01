@@ -26,7 +26,7 @@
       }
     },
     hint: {
-      text: "For example, 27 5 2025"
+      text: "For example, 27 5 2026"
     },
     errorMessage: errorMessage,
     items: [
@@ -51,6 +51,24 @@
     ]
   }) }}
 {% endmacro %}
+
+{% set introText %}
+  {% if isSameActivityDates %}
+    Enter the activity dates for all sites.
+  {% else %}
+    Enter the activity dates for this site.
+  {% endif %}
+{% endset %}
+
+
+{% set buttonText %}
+  {% if isMultiSiteJourney %}
+    Continue
+  {% else %}
+    Save and continue
+  {% endif %}
+{% endset %}
+
 {% block beforeContent %}
 <nav>
   {{ govukBackLink({
@@ -68,14 +86,17 @@
           errorList: errorSummary
         }) }}
       {% endif %}
-      <h1 class="govuk-heading-l">{{ title }}</h1>
       {% if projectName %}
         <span class="govuk-caption-l">{{ projectName }}</span>
       {% endif %}
-      <p class="govuk-body">Enter the activity dates. Allow time for potential delays, like consents (for example, a river
-        works licence) or bad weather. If you miss the dates, you'll need to restart the process.</p>
-      <p class="govuk-body">You can enter a start date from today and begin your activity as soon as you've sent your
-        information.</p>
+      {% if siteNumber %}
+        <span class="govuk-caption-l">Site {{ siteNumber }}</span>
+      {% endif %}
+      <h1 class="govuk-heading-l">{{ title }}</h1>
+        <p class="govuk-body">{{ introText }} Allow time for potential delays, like consents (for example, a river
+          works licence) or bad weather. If you miss the dates, you'll need to restart the process.</p>
+        <p class="govuk-body">You can enter a start date from today and begin your activity as soon as you've sent your
+          information.</p>
       <form method="POST">
         <input type="hidden" name="csrfToken" value="{{ csrfToken }}"/> {{ activityDateInput(
           "activity-start-date",
@@ -99,7 +120,7 @@
         ) }}
         <div class="govuk-button-group">
           {{ govukButton({
-              text: "Save and continue",
+              text: buttonText,
               type: "submit"
           }) }}
           {{ appCancelButton({

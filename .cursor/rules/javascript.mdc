@@ -90,6 +90,7 @@ alwaysApply: true
 - Use describe blocks and beforeEach for setup
 - Mock external dependencies
 - Don't add clearAllMocks or resetAllMocks to individual test files because it's already in jest.config.js
+- Don't add restoreAllMocks to individual test files
 
 ### Jest Mocking Best Practices
 

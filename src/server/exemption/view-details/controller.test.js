@@ -20,8 +20,6 @@ describe('view details controller', () => {
   })
 
   beforeEach(() => {
-    jest.resetAllMocks()
-
     mockExemptionService = {
       getExemptionById: jest.fn().mockResolvedValue(createSubmittedExemption())
     }

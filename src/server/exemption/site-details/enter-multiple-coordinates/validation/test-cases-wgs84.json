@@ -1,0 +1,50 @@
+[
+  {
+    "expectedError": "Latitude must be a number",
+    "coordinates": [
+      { "latitude": "abc", "longitude": "-1.399500" },
+      { "latitude": "55.019890", "longitude": "-1.399501" },
+      { "latitude": "55.019891", "longitude": "-1.399502" }
+    ]
+  },
+  {
+    "expectedError": "Longitude must be a number",
+    "coordinates": [
+      { "latitude": "55.019889", "longitude": "-1.399500" },
+      { "latitude": "55.019890", "longitude": "uvw" },
+      { "latitude": "55.019891", "longitude": "-1.399502" }
+    ]
+  },
+  {
+    "expectedError": "Latitude must be between -90 and 90",
+    "coordinates": [
+      { "latitude": "55.019889", "longitude": "-1.399500" },
+      { "latitude": "91.000000", "longitude": "-1.399501" },
+      { "latitude": "55.019891", "longitude": "-1.399502" }
+    ]
+  },
+  {
+    "expectedError": "Longitude must be between -180 and 180",
+    "coordinates": [
+      { "latitude": "55.019889", "longitude": "-1.399500" },
+      { "latitude": "55.019890", "longitude": "-1.399501" },
+      { "latitude": "55.019891", "longitude": "-185.123456" }
+    ]
+  },
+  {
+    "expectedError": "Latitude must include 6 decimal places",
+    "coordinates": [
+      { "latitude": "55.019889", "longitude": "-1.399500" },
+      { "latitude": "55.0198899", "longitude": "-1.399501" },
+      { "latitude": "55.019891", "longitude": "-1.399502" }
+    ]
+  },
+  {
+    "expectedError": "Longitude must include 6 decimal places",
+    "coordinates": [
+      { "latitude": "55.019889", "longitude": "-1.39950" },
+      { "latitude": "55.019890", "longitude": "-1.399501" },
+      { "latitude": "55.019891", "longitude": "-1.399502" }
+    ]
+  }
+]

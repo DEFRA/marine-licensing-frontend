@@ -13,3 +13,11 @@ tsconfig.tsbuildinfo
 
 # stryker temp files
 .stryker-tmp
+
+# Allure
+allure-results/
+allure-report/
+.allure/
+
+# Claude local settings
+.claude/settings.local.json

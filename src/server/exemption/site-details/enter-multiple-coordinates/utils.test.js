@@ -2,8 +2,6 @@ import { COORDINATE_SYSTEMS } from '~/src/server/common/constants/exemptions.js'
 import { routes } from '~/src/server/common/constants/routes.js'
 import { getExemptionCache } from '~/src/server/common/helpers/session-cache/utils.js'
 import { generatePointSpecificErrorMessage } from '~/src/server/common/helpers/site-details.js'
-import { createOsgb36MultipleCoordinatesSchema } from '~/src/server/common/schemas/osgb36.js'
-import { createWgs84MultipleCoordinatesSchema } from '~/src/server/common/schemas/wgs84.js'
 import {
   PATTERNS,
   multipleCoordinatesPageData,
@@ -14,13 +12,11 @@ import {
   extractCoordinateIndexFromFieldName,
   sanitiseFieldName,
   convertPayloadToCoordinatesArray,
-  getValidationSchema,
   convertArrayErrorsToFlattenedErrors,
   processErrorDetail,
   createErrorSummary,
   createFieldErrors,
   handleValidationFailure,
-  validateCoordinates,
   removeCoordinateAtIndex
 } from './utils.js'
 
@@ -381,27 +377,6 @@ describe('enter-multiple-coordinates utils', () => {
     })
   })
 
-  describe('getValidationSchema', () => {
-    const mockWgs84Schema = { validate: jest.fn() }
-    const mockOsgb36Schema = { validate: jest.fn() }
-
-    beforeEach(() => {
-      createWgs84MultipleCoordinatesSchema.mockReturnValue(mockWgs84Schema)
-      createOsgb36MultipleCoordinatesSchema.mockReturnValue(mockOsgb36Schema)
-    })
-
-    it('should return correct schema for coordinate systems', () => {
-      expect(getValidationSchema(COORDINATE_SYSTEMS.WGS84)).toBe(
-        mockWgs84Schema
-      )
-      expect(getValidationSchema(COORDINATE_SYSTEMS.OSGB36)).toBe(
-        mockOsgb36Schema
-      )
-      expect(createWgs84MultipleCoordinatesSchema).toHaveBeenCalled()
-      expect(createOsgb36MultipleCoordinatesSchema).toHaveBeenCalled()
-    })
-  })
-
   describe('convertArrayErrorsToFlattenedErrors', () => {
     it('should convert array error paths to flattened format', () => {
       const error = {
@@ -606,41 +581,6 @@ describe('enter-multiple-coordinates utils', () => {
           projectName: 'Test Project'
         })
       )
-    })
-  })
-
-  describe('validateCoordinates', () => {
-    const mockSchema = { validate: jest.fn() }
-
-    beforeEach(() => {
-      createWgs84MultipleCoordinatesSchema.mockReturnValue(mockSchema)
-      createOsgb36MultipleCoordinatesSchema.mockReturnValue(mockSchema)
-    })
-
-    it('should validate coordinates with correct payload and schema', () => {
-      const coordinates = [{ latitude: '51.5074', longitude: '-0.1278' }]
-      const exemptionId = 'test-id'
-      const mockResult = { error: null, value: {} }
-      mockSchema.validate.mockReturnValue(mockResult)
-
-      const result = validateCoordinates(
-        coordinates,
-        exemptionId,
-        COORDINATE_SYSTEMS.WGS84
-      )
-
-      expect(mockSchema.validate).toHaveBeenCalledWith(
-        { coordinates, id: exemptionId },
-        { abortEarly: false }
-      )
-      expect(createWgs84MultipleCoordinatesSchema).toHaveBeenCalled()
-      expect(result).toBe(mockResult)
-    })
-
-    it('should use correct schema for OSGB36', () => {
-      const coordinates = [{ eastings: '529090', northings: '181680' }]
-      validateCoordinates(coordinates, 'test-id', COORDINATE_SYSTEMS.OSGB36)
-      expect(createOsgb36MultipleCoordinatesSchema).toHaveBeenCalled()
     })
   })
 

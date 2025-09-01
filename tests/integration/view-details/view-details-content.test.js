@@ -13,7 +13,6 @@ import { validateReadOnlyBehavior } from '../shared/dom-helpers.js'
 import {
   createTestServer,
   responseToDocument,
-  resetMocks,
   validateResponse
 } from '../shared/test-setup-helpers.js'
 
@@ -29,10 +28,6 @@ describe('View Details - Content Verification Integration Tests', () => {
 
   afterAll(async () => {
     await testServer.teardown()
-  })
-
-  beforeEach(() => {
-    resetMocks()
   })
 
   const getPageDocument = async (exemption) => {

@@ -16,7 +16,6 @@ import { validateSubmissionSection } from '../shared/dom-helpers.js'
 import {
   createTestServer,
   responseToDocument,
-  resetMocks,
   validateResponse
 } from '../shared/test-setup-helpers.js'
 
@@ -35,7 +34,6 @@ describe('Check your answers - page content Validation', () => {
   })
 
   beforeEach(() => {
-    resetMocks()
     jest
       .spyOn(cacheUtils, 'setExemptionCache')
       .mockImplementation(() => undefined)

@@ -4,6 +4,7 @@ import { openIdProvider } from '~/src/server/common/plugins/auth/open-id.js'
 import { routes } from '~/src/server/common/constants/routes.js'
 import { validateUserSession } from '~/src/server/common/plugins/auth/validate.js'
 import { cacheMcmsContextFromQueryParams } from '~/src/server/common/helpers/mcms-context/cache-mcms-context.js'
+import { clearExemptionCache } from '~/src/server/common/helpers/session-cache/utils.js'
 
 export const defraId = {
   plugin: {
@@ -54,7 +55,11 @@ export const defraId = {
           return `/login`
         },
         validate: async (request, session) => {
-          return validateUserSession(request, session)
+          const validity = validateUserSession(request, session)
+          if (validity.isValid === false) {
+            clearExemptionCache(request)
+          }
+          return validity
         }
       })
 

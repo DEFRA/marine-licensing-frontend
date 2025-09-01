@@ -5,10 +5,6 @@ import {
 import { mockExemption } from '~/src/server/test-helpers/mocks.js'
 
 describe('#centreCoordinate models', () => {
-  beforeEach(() => {
-    jest.resetAllMocks()
-  })
-
   describe('#wgs84ValidationSchema model', () => {
     test('Should correctly validate on valid data', () => {
       const request = {

@@ -10,10 +10,6 @@ describe('#loginController', () => {
     await server.initialize()
   })
 
-  beforeEach(() => {
-    jest.resetAllMocks()
-  })
-
   afterAll(async () => {
     await server.stop({ timeout: 0 })
   })

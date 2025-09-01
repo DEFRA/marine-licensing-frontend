@@ -258,6 +258,12 @@ the [.github/example.dependabot.yml](.github/example.dependabot.yml) to `.github
 
 Instructions for setting up SonarCloud can be found in [sonar-project.properties](./sonar-project.properties).
 
+## Releases
+
+### [1.0.0](https://eaflood.atlassian.net/projects/ML/versions/23736/tab/release-report-all-issues)
+
+Initial release of the marine licensing frontend application but wont be used by public.
+
 ## Licence
 
 THIS INFORMATION IS LICENSED UNDER THE CONDITIONS OF THE OPEN GOVERNMENT LICENCE found at:

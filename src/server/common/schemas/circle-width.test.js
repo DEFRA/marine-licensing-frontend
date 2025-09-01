@@ -1,10 +1,6 @@
 import { circleWidthValidationSchema } from '~/src/server/common/schemas/circle-width.js'
 
 describe('#osgb36ValidationSchema model', () => {
-  beforeEach(() => {
-    jest.resetAllMocks()
-  })
-
   test('Should correctly validate on valid data', () => {
     const result = circleWidthValidationSchema.validate({ width: '20' })
 

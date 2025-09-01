@@ -19,7 +19,7 @@ export const mockExemption = {
   // consent:yes: means consent to withdraw the application from the public register
   publicRegister: { consent: 'yes', reason: 'Test reason' },
   multipleSiteDetails: {
-    multipleSitesEnabled: true,
+    multipleSitesEnabled: false,
     sameActivityDates: 'yes'
   },
   siteDetails: {
@@ -36,6 +36,13 @@ export const mockExemption = {
 export const mockExemptionWithShapefile = {
   ...mockExemption,
   siteDetails: { ...mockExemption.siteDetails, fileUploadType: 'shapefile' }
+}
+
+export const mockExemptionNoSiteDetails = {
+  ...mockExemption,
+  siteDetails: null,
+  multipleSiteDetails: null,
+  taskList: null
 }
 
 export const mockExemptionWithUploadConfig = {

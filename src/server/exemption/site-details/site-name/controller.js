@@ -7,7 +7,7 @@ import {
   errorDescriptionByFieldName,
   mapErrorsForDisplay
 } from '~/src/server/common/helpers/errors.js'
-import { getSiteNumber } from '../utils/site-number.js'
+import { getSiteNumber } from '~/src/server/exemption/site-details/utils/site-number.js'
 import joi from 'joi'
 
 const SITE_NAME_MAX_LENGTH = 250

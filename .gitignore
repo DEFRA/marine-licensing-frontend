@@ -13,3 +13,5 @@ tsconfig.tsbuildinfo
 
 # stryker temp files
 .stryker-tmp
+
+local-https-setup/*.pem

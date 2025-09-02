@@ -171,7 +171,6 @@ describe('mcms-context schema', () => {
         expect(error).toBeUndefined()
         expect(value).toEqual({
           activityType: 'INCINERATION',
-          activitySubtype: null,
           article: '17',
           pdfDownloadUrl: 'https://example.com/test.pdf'
         })

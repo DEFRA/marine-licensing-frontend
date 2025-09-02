@@ -17,6 +17,7 @@ jest.mock('~/src/server/common/helpers/session-cache/utils.js')
 describe('#activityDescriptionController', () => {
   let server
   let getExemptionCacheSpy
+  const request = { url: {} }
 
   const mockExemptionState = {}
 
@@ -69,29 +70,56 @@ describe('#activityDescriptionController', () => {
     test('handler should render with correct context', () => {
       const h = { view: jest.fn() }
 
-      activityDescriptionController.handler({}, h)
+      activityDescriptionController.handler(request, h)
 
       expect(h.view).toHaveBeenCalledWith(ACTIVITY_DESCRIPTION_VIEW_ROUTE, {
         backLink: routes.TASK_LIST,
+        isSiteDetailsFlow: false,
         pageTitle: 'Activity description',
         heading: 'Activity description',
-        payload: mockExemptionState
+        payload: { activityDescription: undefined }
       })
 
       getExemptionCacheSpy.mockResolvedValueOnce(null)
 
-      activityDescriptionController.handler({}, h)
+      activityDescriptionController.handler(request, h)
 
       expect(h.view).toHaveBeenNthCalledWith(
         2,
         ACTIVITY_DESCRIPTION_VIEW_ROUTE,
         {
           backLink: routes.TASK_LIST,
+          isSiteDetailsFlow: false,
           pageTitle: 'Activity description',
           heading: 'Activity description',
           payload: { activityDescription: undefined }
         }
       )
+    })
+
+    test('handler should render with correct context for site details flow', () => {
+      const h = { view: jest.fn() }
+      const request = {
+        url: { pathname: routes.SITE_DETAILS_ACTIVITY_DESCRIPTION }
+      }
+      const exemptionWithSiteDetails = {
+        ...mockExemptionState,
+        siteDetails: {
+          activityDescription: 'Site activity description'
+        }
+      }
+
+      getExemptionCacheSpy.mockReturnValue(exemptionWithSiteDetails)
+
+      activityDescriptionController.handler(request, h)
+
+      expect(h.view).toHaveBeenCalledWith(ACTIVITY_DESCRIPTION_VIEW_ROUTE, {
+        backLink: routes.SITE_DETAILS_ACTIVITY_DATES,
+        isSiteDetailsFlow: true,
+        pageTitle: 'Activity description',
+        heading: 'Activity description',
+        payload: { activityDescription: 'Site activity description' }
+      })
     })
   })
 
@@ -120,6 +148,40 @@ describe('#activityDescriptionController', () => {
       )
       expect(statusCode).toBe(statusCodes.redirect)
       expect(headers.location).toBe(routes.TASK_LIST)
+    })
+
+    test('should call updateExemptionSiteDetails when in site details flow', async () => {
+      const mockedUpdateExemptionSiteDetails = jest.mocked(
+        cacheUtils.updateExemptionSiteDetails
+      )
+
+      const exemptionWithSiteDetails = {
+        ...mockExemption,
+        multipleSiteDetails: { multipleSitesEnabled: false },
+        siteDetails: {
+          activityDescription: 'Existing site activity description'
+        }
+      }
+
+      getExemptionCacheSpy.mockReturnValue(exemptionWithSiteDetails)
+
+      const payload = {
+        activityDescription: 'New site activity description.'
+      }
+
+      const { statusCode, headers } = await server.inject({
+        method: 'POST',
+        url: routes.SITE_DETAILS_ACTIVITY_DESCRIPTION,
+        payload
+      })
+
+      expect(mockedUpdateExemptionSiteDetails).toHaveBeenCalledWith(
+        expect.any(Object),
+        'activityDescription',
+        'New site activity description.'
+      )
+      expect(statusCode).toBe(statusCodes.redirect)
+      expect(headers.location).toBe(routes.COORDINATES_ENTRY_CHOICE)
     })
 
     test('should handle form submission with empty activity description', async () => {
@@ -199,13 +261,14 @@ describe('#activityDescriptionController', () => {
       }
 
       activityDescriptionSubmitController.options.validate.failAction(
-        { payload },
+        { payload, url: {} },
         h,
         err
       )
 
       expect(h.view).toHaveBeenCalledWith(ACTIVITY_DESCRIPTION_VIEW_ROUTE, {
         backLink: routes.TASK_LIST,
+        isSiteDetailsFlow: false,
         errorSummary: [
           {
             field: ['activityDescription'],
@@ -241,7 +304,7 @@ describe('#activityDescriptionController', () => {
       const err = {}
 
       activityDescriptionSubmitController.options.validate.failAction(
-        { payload },
+        { payload, url: {} },
         h,
         err
       )

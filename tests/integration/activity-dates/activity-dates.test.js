@@ -91,7 +91,7 @@ describe('Activity dates - page structure & accessibility', () => {
     ).toBeInTheDocument()
   })
 
-  test('should have correct page content for single site joruney', async () => {
+  test('should have correct page content for single site journey', async () => {
     const mockExemptionSingleSite = {
       ...exemptionNoActivityDates,
       siteDetails: {},
@@ -131,7 +131,7 @@ describe('Activity dates - page structure & accessibility', () => {
     expect(backLink).toHaveAttribute('href', routes.SAME_ACTIVITY_DATES)
 
     expect(
-      getByText(document, 'Enter the activity dates for this site', {
+      getByText(document, 'Enter the activity dates for this site.', {
         exact: false
       })
     ).toBeInTheDocument()
@@ -158,7 +158,7 @@ describe('Activity dates - page structure & accessibility', () => {
     expect(backLink).toHaveAttribute('href', routes.SAME_ACTIVITY_DATES)
 
     expect(
-      getByText(document, 'Enter the activity dates for all sites', {
+      getByText(document, 'Enter the activity dates for all sites.', {
         exact: false
       })
     ).toBeInTheDocument()

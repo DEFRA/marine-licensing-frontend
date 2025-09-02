@@ -42,7 +42,7 @@ describe('#coordinatesEntry', () => {
       expect(h.view).toHaveBeenCalledWith(COORDINATES_ENTRY_VIEW_ROUTE, {
         pageTitle: 'How do you want to enter the coordinates?',
         heading: 'How do you want to enter the coordinates?',
-        backLink: routes.MULTIPLE_SITES_CHOICE,
+        backLink: routes.SITE_DETAILS_ACTIVITY_DESCRIPTION,
         payload: {
           coordinatesEntry: mockExemption.siteDetails.coordinatesEntry
         },
@@ -62,7 +62,7 @@ describe('#coordinatesEntry', () => {
       expect(h.view).toHaveBeenCalledWith(COORDINATES_ENTRY_VIEW_ROUTE, {
         pageTitle: 'How do you want to enter the coordinates?',
         heading: 'How do you want to enter the coordinates?',
-        backLink: routes.MULTIPLE_SITES_CHOICE,
+        backLink: routes.SITE_DETAILS_ACTIVITY_DESCRIPTION,
         payload: { coordinatesEntry: undefined },
         projectName: 'Test Project'
       })
@@ -103,7 +103,7 @@ describe('#coordinatesEntry', () => {
       expect(
         document
           .querySelector(
-            `.govuk-back-link[href="${routes.MULTIPLE_SITES_CHOICE}"`
+            `.govuk-back-link[href="${routes.SITE_DETAILS_ACTIVITY_DESCRIPTION}"`
           )
           .textContent.trim()
       ).toBe('Back')
@@ -151,7 +151,7 @@ describe('#coordinatesEntry', () => {
       expect(h.view).toHaveBeenCalledWith(COORDINATES_ENTRY_VIEW_ROUTE, {
         pageTitle: 'How do you want to enter the coordinates?',
         heading: 'How do you want to enter the coordinates?',
-        backLink: routes.MULTIPLE_SITES_CHOICE,
+        backLink: routes.SITE_DETAILS_ACTIVITY_DESCRIPTION,
         projectName: 'Test Project',
         payload: { coordinatesEntry: 'invalid' },
         errorSummary: [
@@ -193,7 +193,7 @@ describe('#coordinatesEntry', () => {
       expect(h.view).toHaveBeenCalledWith(COORDINATES_ENTRY_VIEW_ROUTE, {
         pageTitle: 'How do you want to enter the coordinates?',
         heading: 'How do you want to enter the coordinates?',
-        backLink: routes.MULTIPLE_SITES_CHOICE,
+        backLink: routes.SITE_DETAILS_ACTIVITY_DESCRIPTION,
         projectName: 'Test Project',
         payload: { coordinatesEntry: 'invalid' }
       })

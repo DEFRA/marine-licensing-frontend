@@ -52,7 +52,7 @@ export const paramsSchema = Joi.object({
       value.EXE_ACTIVITY_SUBTYPE_DEPOSIT ||
       value.EXE_ACTIVITY_SUBTYPE_REMOVAL ||
       value.EXE_ACTIVITY_SUBTYPE_DREDGING ||
-      null
+      undefined
 
     return {
       activityType: value[ACTIVITY_TYPE],

@@ -172,7 +172,11 @@ export const activityDatesSubmitController = {
       }
 
       return h.redirect(
-        isInSiteDetailsFlow ? routes.COORDINATES_ENTRY_CHOICE : routes.TASK_LIST
+        isInSiteDetailsFlow
+          ? exemption.multipleSiteDetails?.multipleSitesEnabled
+            ? routes.COORDINATES_ENTRY_CHOICE
+            : routes.SITE_DETAILS_ACTIVITY_DESCRIPTION
+          : routes.TASK_LIST
       )
     } catch (e) {
       const { details } = e.data?.payload?.validation ?? {}

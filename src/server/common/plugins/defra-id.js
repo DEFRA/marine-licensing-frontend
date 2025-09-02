@@ -55,7 +55,7 @@ export const defraId = {
           return `/login`
         },
         validate: async (request, session) => {
-          const validity = validateUserSession(request, session)
+          const validity = await validateUserSession(request, session)
           if (validity.isValid === false) {
             clearExemptionCache(request)
           }

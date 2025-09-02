@@ -53,13 +53,14 @@
 {% endmacro %}
 
 {% set introText %}
-  {% if isSameActivityDates %}
+  {% if isMultiSiteJourney and isSameActivityDates %}
     Enter the activity dates for all sites.
-  {% else %}
+  {% elif isMultiSiteJourney %}
     Enter the activity dates for this site.
+  {% else %}
+    Enter the activity dates.
   {% endif %}
 {% endset %}
-
 
 {% set buttonText %}
   {% if isSiteDetailsFlow %}

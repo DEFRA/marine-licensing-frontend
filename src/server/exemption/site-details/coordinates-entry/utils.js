@@ -7,6 +7,6 @@ import { routes } from '~/src/server/common/constants/routes.js'
  */
 export const getCoordinatesEntryBackLink = (exemption) => {
   return exemption?.multipleSiteDetails?.multipleSitesEnabled
-    ? routes.SITE_DETAILS_ACTIVITY_DATES
+    ? routes.SAME_ACTIVITY_DESCRIPTION
     : routes.SITE_DETAILS_ACTIVITY_DESCRIPTION
 }

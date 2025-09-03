@@ -174,7 +174,7 @@ export const activityDatesSubmitController = {
       return h.redirect(
         isInSiteDetailsFlow
           ? exemption.multipleSiteDetails?.multipleSitesEnabled
-            ? routes.COORDINATES_ENTRY_CHOICE
+            ? routes.SAME_ACTIVITY_DESCRIPTION
             : routes.SITE_DETAILS_ACTIVITY_DESCRIPTION
           : routes.TASK_LIST
       )

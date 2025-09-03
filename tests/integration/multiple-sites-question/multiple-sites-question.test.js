@@ -6,7 +6,7 @@ import {
   updateExemptionSiteDetails,
   setExemptionCache
 } from '~/src/server/common/helpers/session-cache/utils.js'
-import { validateErrors } from '../shared/expect-utils.js'
+import { validateErrors } from '~/tests/integration/shared/expect-utils.js'
 
 import { setupTestServer } from '~/tests/integration/shared/test-setup-helpers.js'
 

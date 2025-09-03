@@ -27,13 +27,34 @@ export const validActivitySubtypes = [
 ]
 
 export const activityTypes = {
-  CON: 'CON',
-  DEPOSIT: 'DEPOSIT',
-  REMOVAL: 'REMOVAL',
-  DREDGE: 'DREDGE',
-  INCINERATION: 'INCINERATION',
-  EXPLOSIVES: 'EXPLOSIVES',
-  SCUTTLING: 'SCUTTLING'
+  CON: {
+    value: 'CON',
+    label: 'Construction'
+  },
+  DEPOSIT: {
+    value: 'DEPOSIT',
+    label: 'Deposit of a substance or object'
+  },
+  REMOVAL: {
+    value: 'REMOVAL',
+    label: 'Removal of a substance or object'
+  },
+  DREDGE: {
+    value: 'DREDGE',
+    label: 'Dredging'
+  },
+  INCINERATION: {
+    value: 'INCINERATION',
+    label: 'Incineration of a substance or object'
+  },
+  EXPLOSIVES: {
+    value: 'EXPLOSIVES',
+    label: 'Use of an explosive substance'
+  },
+  SCUTTLING: {
+    value: 'SCUTTLING',
+    label: 'Sinking of a vessel or floating container'
+  }
 }
 
 export const articleCodes = [

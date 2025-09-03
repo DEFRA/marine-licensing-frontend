@@ -63,3 +63,14 @@ jobs:
         run: |
           npm ci
           npm audit --audit-level=high --production || (echo 'Vulnerabilities found!' && exit 1)
+
+  test-journey:
+    name: Run Journey Tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - run: docker build -t defradigital/marine-licensing-frontend:${{github.sha}} .
+      - uses: DEFRA/marine-licensing-journey-tests/run-journey-tests@main
+        with:
+          marine-licensing-frontend: ${{github.sha}}
+          branch: main

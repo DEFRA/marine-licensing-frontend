@@ -17,11 +17,6 @@
   </script>
 {% endblock %}
 
-{% set navigationLinks = navigation.concat({
-      text: 'Sign out',
-      href: signOutUrl
-}) %}
-
 {% block header %}
   {{ govukHeader({
     homepageUrl: "https://www.gov.uk/",
@@ -32,13 +27,13 @@
 
   {{ govukServiceNavigation({
     serviceName: serviceName,
-    navigation: navigationLinks
+    navigation: navigation
   }) }}
 {% endblock %}
 
 {% block pageTitle %}
   {% if errors %}
-    Error: 
+    Error:
   {% endif %}
   {{ pageTitle }} | {{ serviceName }}
 {% endblock %}

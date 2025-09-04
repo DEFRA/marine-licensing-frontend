@@ -88,6 +88,7 @@ describe('#taskListController', () => {
 
     const exemptionWithoutTaskList = { ...mockExemption }
     delete exemptionWithoutTaskList.taskList
+    delete exemptionWithoutTaskList.mcmsContext
 
     expect(setExemptionCacheMock).toHaveBeenCalledWith(
       {},

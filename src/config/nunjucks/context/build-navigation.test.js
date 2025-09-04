@@ -14,8 +14,12 @@ describe('#buildNavigation', () => {
     ).toEqual([
       {
         active: false,
-        text: 'Projects home',
+        text: 'Projects',
         href: '/home'
+      },
+      {
+        href: '/sign-out',
+        text: 'Sign out'
       }
     ])
   })
@@ -24,8 +28,12 @@ describe('#buildNavigation', () => {
     expect(await buildNavigation(mockRequest({ path: '/' }))).toEqual([
       {
         active: false,
-        text: 'Projects home',
+        text: 'Projects',
         href: '/home'
+      },
+      {
+        href: '/sign-out',
+        text: 'Sign out'
       }
     ])
   })
@@ -34,9 +42,7 @@ describe('#buildNavigation', () => {
     const request = { path: '/home' }
     const navigation = await buildNavigation(request)
 
-    const projectsHomeLink = navigation.find(
-      (item) => item.text === 'Projects home'
-    )
+    const projectsHomeLink = navigation.find((item) => item.text === 'Projects')
     expect(projectsHomeLink.active).toBe(true)
   })
 
@@ -44,9 +50,7 @@ describe('#buildNavigation', () => {
     const request = { path: '/exemption/project-name' }
     const navigation = await buildNavigation(request)
 
-    const projectsHomeLink = navigation.find(
-      (item) => item.text === 'Projects home'
-    )
+    const projectsHomeLink = navigation.find((item) => item.text === 'Projects')
     expect(projectsHomeLink.active).toBe(false)
   })
 })

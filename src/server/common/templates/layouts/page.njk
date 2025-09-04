@@ -16,6 +16,11 @@
   <script>
     window.CLARITY_PROJECT_ID = "{{ clarityProjectId | default('') }}";
   </script>
+  <noscript>
+    <style>
+      .hide-if-no-js {display:none !important;}
+    </style>
+  </noscript>
 {% endblock %}
 
 {% set navigationLinks = navigation.concat({

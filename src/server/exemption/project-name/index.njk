@@ -1,8 +1,21 @@
 {% extends 'layouts/page.njk' %}
+{% from "govuk/components/back-link/macro.njk" import govukBackLink %}
 {% from "govuk/components/button/macro.njk" import govukButton %}
 {% from "govuk/components/warning-text/macro.njk" import govukWarningText %}
 {% from "govuk/components/input/macro.njk" import govukInput %}
 {% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+{% from "cancel-button/macro.njk" import appCancelButton %}
+
+{% block beforeContent %}
+  {% if payload.projectName %}
+  <nav>
+    {{ govukBackLink({
+      text: "Back",
+      href: payload.backLink
+    }) }}
+  </nav>
+  {% endif %}
+{% endblock %}
 
 {% block content %}
   <div class="govuk-grid-row">
@@ -16,9 +29,11 @@
         {% endif %}
 
         <form method="POST">
-          
-          <input type="hidden" name="csrfToken" value="{{csrfToken}}" />
 
+          <input type="hidden" name="csrfToken" value="{{csrfToken}}" />
+          {% if payload.projectName %}
+            <span class="govuk-caption-l">{{ payload.projectName }}</span>
+          {% endif %}
           {{ govukInput({
             label: {
               text: "Project name",
@@ -34,10 +49,17 @@
             value: payload.projectName
           }) }}
 
+          <div class="govuk-button-group">
           {{ govukButton({
             text: "Save and continue",
             classes: "govuk-button--primary"
           }) }}
+            {% if payload.projectName %}
+          {{ appCancelButton({
+            cancelLink: payload.backLink
+          }) }}
+            {% endif %}
+          </div>
         </form>
 
     </div>

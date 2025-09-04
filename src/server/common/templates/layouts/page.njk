@@ -7,6 +7,7 @@
 
 {# Import custom components globally #}
 {% from "heading/macro.njk" import appHeading %}
+{% from "back-link-history/macro.njk" import appBackLinkHistory %}
 
 {% set mainClasses = "app-main-wrapper" %}
 
@@ -15,6 +16,11 @@
   <script>
     window.CLARITY_PROJECT_ID = "{{ clarityProjectId | default('') }}";
   </script>
+  <noscript>
+    <style>
+      .hide-if-no-js {display:none !important;}
+    </style>
+  </noscript>
 {% endblock %}
 
 {% block header %}
@@ -61,16 +67,12 @@
     meta: {
       items: [
         {
-          href: "https://www.gov.uk/help/privacy-notice",
+          href: "/help/privacy",
           text: "Privacy"
         },
         {
           href: "https://www.gov.uk/help/cookies",
           text: "Cookies"
-        },
-        {
-          href: "https://www.gov.uk/help/accessibility-statement",
-          text: "Accessibility statement"
         }
       ]
     }

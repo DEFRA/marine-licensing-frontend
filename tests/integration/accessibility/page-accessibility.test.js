@@ -104,7 +104,11 @@ describe('Page accessibility checks (Axe)', () => {
       title: 'Are the activity dates the same for every site?'
     },
     { url: routes.DASHBOARD, title: 'Your projects' },
-    { url: routes.SITE_DETAILS, title: 'Site details' }
+    { url: routes.SITE_DETAILS, title: 'Site details' },
+    {
+      url: routes.PRIVACY,
+      title: 'Privacy notice – Get permission for marine work'
+    }
   ]
 
   test.each(pages)(

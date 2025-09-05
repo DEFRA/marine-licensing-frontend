@@ -69,6 +69,11 @@ updates:
       # Include direct package.json updates
       - dependency-type: direct
 
+    # Enable automerge when all checks pass
+    auto-merge:
+      enabled: true
+      merge-type: squash
+
   # Update GitHub Actions
   - package-ecosystem: github-actions
     directory: /
@@ -78,3 +83,8 @@ updates:
       interval: weekly
       time: '10:30'
       timezone: 'Europe/London'
+
+    # Enable automerge when all checks pass
+    auto-merge:
+      enabled: true
+      merge-type: squash

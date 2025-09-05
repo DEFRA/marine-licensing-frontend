@@ -43,7 +43,7 @@ export default {
   transformIgnorePatterns: [
     `node_modules/(?!${['@defra/hapi-tracing', 'node-fetch'].join('|')}/)`
   ],
-  watchPathIgnorePatterns: ['./allure-results']
+  watchPathIgnorePatterns: ['<rootDir>/allure-results']
 }
 
 /**

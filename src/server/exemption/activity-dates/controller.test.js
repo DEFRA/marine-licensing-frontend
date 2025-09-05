@@ -213,8 +213,8 @@ describe('#activityDatesController', () => {
         expect.any(Object),
         'activityDates',
         {
-          start: expect.any(String),
-          end: expect.any(String)
+          end: '2026-06-15T00:00:00.000Z',
+          start: '2026-06-01T00:00:00.000Z'
         }
       )
       expect(statusCode).toBe(statusCodes.redirect)
@@ -257,8 +257,8 @@ describe('#activityDatesController', () => {
         expect.any(Object),
         'activityDates',
         {
-          start: expect.any(String),
-          end: expect.any(String)
+          start: '2026-06-01T00:00:00.000Z',
+          end: '2026-06-15T00:00:00.000Z'
         }
       )
       expect(statusCode).toBe(statusCodes.redirect)

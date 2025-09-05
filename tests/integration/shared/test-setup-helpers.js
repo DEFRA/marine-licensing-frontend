@@ -5,7 +5,13 @@ import {
   getExemptionCache,
   setExemptionCache
 } from '~/src/server/common/helpers/session-cache/utils.js'
-import { authenticatedPatchRequest } from '~/src/server/common/helpers/authenticated-requests.js'
+import {
+  authenticatedPatchRequest,
+  authenticatedGetRequest
+} from '~/src/server/common/helpers/authenticated-requests.js'
+
+jest.mock('~/src/server/common/helpers/session-cache/utils.js')
+jest.mock('~/src/server/common/helpers/authenticated-requests.js')
 
 export const createTestServer = () => {
   let server
@@ -56,4 +62,8 @@ export const mockExemption = (mockExemption) => {
   jest
     .mocked(authenticatedPatchRequest)
     .mockResolvedValue({ payload: { id: mockExemption.id } })
+
+  jest.mocked(authenticatedGetRequest).mockResolvedValue({
+    payload: { message: 'success', value: mockExemption }
+  })
 }

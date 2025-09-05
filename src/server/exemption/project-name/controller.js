@@ -37,7 +37,10 @@ export const projectNameController = {
 
     return h.view(PROJECT_NAME_VIEW_ROUTE, {
       ...projectNameViewSettings,
-      payload: { projectName: exemption.projectName }
+      payload: {
+        projectName: exemption.projectName,
+        backLink: routes.TASK_LIST
+      }
     })
   }
 }

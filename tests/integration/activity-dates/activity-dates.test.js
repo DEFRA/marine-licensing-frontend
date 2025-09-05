@@ -38,7 +38,7 @@ describe('Activity dates - page structure & accessibility', () => {
     })
 
     expect(
-      getByText(document, 'Enter the activity dates for this site', {
+      getByText(document, 'Enter the activity dates', {
         exact: false
       })
     ).toBeInTheDocument()
@@ -86,6 +86,79 @@ describe('Activity dates - page structure & accessibility', () => {
 
     expect(
       getByText(document, 'Enter the activity dates for this site.', {
+        exact: false
+      })
+    ).toBeInTheDocument()
+  })
+
+  test('should have correct page content for single site journey', async () => {
+    const mockExemptionSingleSite = {
+      ...exemptionNoActivityDates,
+      siteDetails: {},
+      multipleSiteDetails: {
+        multipleSitesEnabled: false
+      }
+    }
+
+    mockExemption(mockExemptionSingleSite)
+
+    const document = await loadPage({
+      requestUrl: routes.SITE_DETAILS_ACTIVITY_DATES,
+      server: getServer()
+    })
+
+    const backLink = getByRole(document, 'link', { name: 'Back' })
+    expect(backLink).toHaveAttribute('href', routes.MULTIPLE_SITES_CHOICE)
+  })
+
+  test('should have correct page content for multiple site journey', async () => {
+    const mockExemptionSingleSite = {
+      ...exemptionNoActivityDates,
+      siteDetails: {},
+      multipleSiteDetails: {
+        multipleSitesEnabled: true
+      }
+    }
+
+    mockExemption(mockExemptionSingleSite)
+
+    const document = await loadPage({
+      requestUrl: routes.SITE_DETAILS_ACTIVITY_DATES,
+      server: getServer()
+    })
+
+    const backLink = getByRole(document, 'link', { name: 'Back' })
+    expect(backLink).toHaveAttribute('href', routes.SAME_ACTIVITY_DATES)
+
+    expect(
+      getByText(document, 'Enter the activity dates for this site.', {
+        exact: false
+      })
+    ).toBeInTheDocument()
+  })
+
+  test('should have correct page content for multiple site journey with same dates', async () => {
+    const mockExemptionSingleSite = {
+      ...exemptionNoActivityDates,
+      siteDetails: {},
+      multipleSiteDetails: {
+        multipleSitesEnabled: true,
+        sameActivityDates: 'yes'
+      }
+    }
+
+    mockExemption(mockExemptionSingleSite)
+
+    const document = await loadPage({
+      requestUrl: routes.SITE_DETAILS_ACTIVITY_DATES,
+      server: getServer()
+    })
+
+    const backLink = getByRole(document, 'link', { name: 'Back' })
+    expect(backLink).toHaveAttribute('href', routes.SAME_ACTIVITY_DATES)
+
+    expect(
+      getByText(document, 'Enter the activity dates for all sites.', {
         exact: false
       })
     ).toBeInTheDocument()

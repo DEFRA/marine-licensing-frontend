@@ -7,6 +7,7 @@
 
 {# Import custom components globally #}
 {% from "heading/macro.njk" import appHeading %}
+{% from "back-link-history/macro.njk" import appBackLinkHistory %}
 
 {% set mainClasses = "app-main-wrapper" %}
 
@@ -15,12 +16,12 @@
   <script>
     window.CLARITY_PROJECT_ID = "{{ clarityProjectId | default('') }}";
   </script>
+  <noscript>
+    <style>
+      .hide-if-no-js {display:none !important;}
+    </style>
+  </noscript>
 {% endblock %}
-
-{% set navigationLinks = navigation.concat({
-      text: 'Sign out',
-      href: signOutUrl
-}) %}
 
 {% block header %}
   {{ govukHeader({
@@ -32,13 +33,13 @@
 
   {{ govukServiceNavigation({
     serviceName: serviceName,
-    navigation: navigationLinks
+    navigation: navigation
   }) }}
 {% endblock %}
 
 {% block pageTitle %}
   {% if errors %}
-    Error: 
+    Error:
   {% endif %}
   {{ pageTitle }} | {{ serviceName }}
 {% endblock %}
@@ -66,16 +67,12 @@
     meta: {
       items: [
         {
-          href: "https://www.gov.uk/help/privacy-notice",
+          href: "/help/privacy",
           text: "Privacy"
         },
         {
           href: "https://www.gov.uk/help/cookies",
           text: "Cookies"
-        },
-        {
-          href: "https://www.gov.uk/help/accessibility-statement",
-          text: "Accessibility statement"
         }
       ]
     }

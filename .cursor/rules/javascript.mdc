@@ -91,6 +91,7 @@ alwaysApply: true
 - Mock external dependencies
 - Don't add clearAllMocks or resetAllMocks to individual test files because it's already in jest.config.js
 - Don't add restoreAllMocks to individual test files
+- Unit test files should be in the same folder as the main code they are testing
 
 ### Jest Mocking Best Practices
 

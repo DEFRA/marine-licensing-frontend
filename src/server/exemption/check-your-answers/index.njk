@@ -31,9 +31,10 @@
       {% endif %}
 
     <h2 class="govuk-heading-l" id="check-your-answers-heading">Check your answers before sending your information</h2>
-    
+
     {{ appProjectDetailsCard({
       projectName: projectName,
+      mcmsContext: mcmsContext,
       isReadOnly: isReadOnly
     }) }}
     {{ appActivityDatesCard({

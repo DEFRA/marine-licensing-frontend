@@ -46,12 +46,17 @@ describe('#multipleSitesQuestion', () => {
       }
       const h = { redirect: jest.fn() }
 
+      const expectedSiteDetails = { ...mockExemption.siteDetails }
+      delete expectedSiteDetails.siteName
+
       multipleSitesSubmitController.handler(request, h)
 
       expect(jest.mocked(setExemptionCache)).toHaveBeenCalledWith(request, {
         ...mockExemption,
-        multipleSiteDetails: { multipleSitesEnabled: false }
+        multipleSiteDetails: { multipleSitesEnabled: false },
+        siteDetails: expectedSiteDetails
       })
+
       expect(h.redirect).toHaveBeenCalledWith(
         routes.SITE_DETAILS_ACTIVITY_DATES
       )

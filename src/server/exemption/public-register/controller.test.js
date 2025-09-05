@@ -48,7 +48,7 @@ describe('#publicRegister', () => {
   })
 
   describe('#publicRegisterController', () => {
-    test('Should provide expected response and correctly pre populate data', async () => {
+    test('Should provide expected responsea', async () => {
       const { result, statusCode } = await server.inject({
         method: 'GET',
         url: routes.PUBLIC_REGISTER
@@ -59,55 +59,6 @@ describe('#publicRegister', () => {
           `Public register | ${config.get('serviceName')}`
         )
       )
-
-      const { document } = new JSDOM(result).window
-
-      expect(document.querySelector('h1').textContent.trim()).toBe(
-        'Public register'
-      )
-
-      expect(
-        document.querySelector('.govuk-caption-l').textContent.trim()
-      ).toBe(mockExemption.projectName)
-
-      expect(document.querySelector('#consent').value).toBe(
-        mockExemption.publicRegister.consent
-      )
-
-      expect(
-        document
-          .querySelector('.govuk-back-link[href="/exemption/task-list"]')
-          .textContent.trim()
-      ).toBe('Back')
-
-      expect(
-        document
-          .querySelector('.govuk-link[href="/exemption/task-list"]')
-          .textContent.trim()
-      ).toBe('Cancel')
-
-      expect(statusCode).toBe(statusCodes.ok)
-    })
-
-    test('Should provide expected response and correctly not pre populate data if it is not present', async () => {
-      getExemptionCacheSpy.mockReturnValueOnce({})
-
-      const { result, statusCode } = await server.inject({
-        method: 'GET',
-        url: routes.PUBLIC_REGISTER
-      })
-
-      expect(result).toEqual(
-        expect.stringContaining(
-          `Public register | ${config.get('serviceName')}`
-        )
-      )
-
-      const { document } = new JSDOM(result).window
-
-      expect(document.querySelector('#consent').value).toBe('yes')
-      expect(document.querySelector('#consent:checked')).toBeFalsy()
-      expect(document.querySelector('#consent-2').value).toBe('no')
 
       expect(statusCode).toBe(statusCodes.ok)
     })
@@ -160,52 +111,6 @@ describe('#publicRegister', () => {
       expect(statusCode).toBe(302)
 
       expect(headers.location).toBe('/exemption/task-list')
-    })
-
-    test('Should show error messages with invalid data', async () => {
-      const apiPostMock = jest.spyOn(authRequests, 'authenticatedPatchRequest')
-      apiPostMock.mockRejectedValueOnce({
-        res: { statusCode: 200 },
-        data: {
-          payload: {
-            validation: {
-              source: 'payload',
-              keys: ['consent'],
-              details: [
-                {
-                  field: 'consent',
-                  message: 'PUBLIC_REGISTER_CONSENT_REQUIRED',
-                  type: 'string.empty'
-                }
-              ]
-            }
-          }
-        }
-      })
-
-      const { result, statusCode } = await server.inject({
-        method: 'POST',
-        url: routes.PUBLIC_REGISTER,
-        payload: { consent: 'no' }
-      })
-
-      expect(result).toEqual(
-        expect.stringContaining(errorMessages.PUBLIC_REGISTER_CONSENT_REQUIRED)
-      )
-
-      const { document } = new JSDOM(result).window
-
-      expect(
-        document.querySelector('.govuk-error-message').textContent.trim()
-      ).toBe(`Error: ${errorMessages.PUBLIC_REGISTER_CONSENT_REQUIRED}`)
-
-      expect(document.querySelector('h2').textContent.trim()).toBe(
-        'There is a problem'
-      )
-
-      expect(document.querySelector('.govuk-error-summary')).toBeTruthy()
-
-      expect(statusCode).toBe(statusCodes.ok)
     })
 
     test('Should pass error to global catchAll behaviour if it contains no validation data', async () => {

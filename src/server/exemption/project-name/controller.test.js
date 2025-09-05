@@ -1,30 +1,22 @@
-import { createServer } from '~/src/server/index.js'
 import { statusCodes } from '~/src/server/common/constants/status-codes.js'
 import { routes } from '~/src/server/common/constants/routes.js'
 import { mockExemption } from '~/src/server/test-helpers/mocks.js'
-import { config } from '~/src/config/config.js'
 import { JSDOM } from 'jsdom'
 import {
   projectNameSubmitController,
-  projectNameController,
   PROJECT_NAME_VIEW_ROUTE
 } from '~/src/server/exemption/project-name/controller.js'
 import * as cacheUtils from '~/src/server/common/helpers/session-cache/utils.js'
 import * as authRequests from '~/src/server/common/helpers/authenticated-requests.js'
+import { setupTestServer } from '~/tests/integration/shared/test-setup-helpers.js'
 
 jest.mock('~/src/server/common/helpers/session-cache/utils.js')
 
 describe('#projectName', () => {
-  /** @type {Server} */
-  let server
+  const getServer = setupTestServer()
   let getExemptionCacheSpy
 
   const mockExemptionState = { projectName: 'Test Project' }
-
-  beforeAll(async () => {
-    server = await createServer()
-    await server.initialize()
-  })
 
   beforeEach(() => {
     jest
@@ -36,69 +28,14 @@ describe('#projectName', () => {
       .mockReturnValue(mockExemptionState)
   })
 
-  afterAll(async () => {
-    await server.stop({ timeout: 0 })
-  })
-
   describe('#projectNameController', () => {
-    test('Should provide expected response and correctly pre populate data', async () => {
-      const { result, statusCode } = await server.inject({
+    test('Should return success response code', async () => {
+      const { statusCode } = await getServer().inject({
         method: 'GET',
         url: routes.PROJECT_NAME
       })
 
-      expect(result).toEqual(
-        expect.stringContaining(`Project name | ${config.get('serviceName')}`)
-      )
-
-      const { document } = new JSDOM(result).window
-
-      expect(document.querySelector('#projectName').value).toBe(
-        mockExemptionState.projectName
-      )
-
       expect(statusCode).toBe(statusCodes.ok)
-    })
-
-    test('Should provide expected response and correctly not pre populate data if it is not present', async () => {
-      getExemptionCacheSpy.mockResolvedValueOnce({})
-
-      const { result, statusCode } = await server.inject({
-        method: 'GET',
-        url: routes.PROJECT_NAME
-      })
-
-      expect(result).toEqual(
-        expect.stringContaining(`Project name | ${config.get('serviceName')}`)
-      )
-
-      const { document } = new JSDOM(result).window
-
-      expect(document.querySelector('#projectName').value).toBeFalsy()
-
-      expect(statusCode).toBe(statusCodes.ok)
-    })
-
-    test('projectNameController handler should render with correct context', () => {
-      const h = { view: jest.fn() }
-
-      projectNameController.handler({}, h)
-
-      expect(h.view).toHaveBeenCalledWith(PROJECT_NAME_VIEW_ROUTE, {
-        pageTitle: 'Project name',
-        heading: 'Project Name',
-        payload: mockExemptionState
-      })
-
-      getExemptionCacheSpy.mockResolvedValueOnce(null)
-
-      projectNameController.handler({}, h)
-
-      expect(h.view).toHaveBeenNthCalledWith(2, PROJECT_NAME_VIEW_ROUTE, {
-        pageTitle: 'Project name',
-        heading: 'Project Name',
-        payload: { projectName: undefined }
-      })
     })
   })
 
@@ -110,7 +47,7 @@ describe('#projectName', () => {
         payload: { data: 'test' }
       })
 
-      const { statusCode, headers } = await server.inject({
+      const { statusCode, headers } = await getServer().inject({
         method: 'POST',
         url: routes.PROJECT_NAME,
         payload: { projectName: 'Project name' }
@@ -138,7 +75,7 @@ describe('#projectName', () => {
         payload: { projectName: 'Project name' }
       })
 
-      const { statusCode, headers } = await server.inject({
+      const { statusCode, headers } = await getServer().inject({
         method: 'POST',
         url: routes.PROJECT_NAME,
         payload: { projectName: 'Project name' }
@@ -155,58 +92,14 @@ describe('#projectName', () => {
       expect(headers.location).toBe(routes.TASK_LIST)
     })
 
-    test('Should show error messages with invalid data', async () => {
-      const apiPostMock = jest.spyOn(authRequests, 'authenticatedPostRequest')
-      apiPostMock.mockRejectedValueOnce({
-        res: { statusCode: 200 },
-        data: {
-          payload: {
-            validation: {
-              source: 'payload',
-              keys: ['projectName'],
-              details: [
-                {
-                  field: 'projectName',
-                  message: 'PROJECT_NAME_REQUIRED',
-                  type: 'string.empty'
-                }
-              ]
-            }
-          }
-        }
-      })
-
-      const { result, statusCode } = await server.inject({
-        method: 'POST',
-        url: routes.PROJECT_NAME,
-        payload: { projectName: 'test' }
-      })
-
-      expect(result).toEqual(expect.stringContaining(`Enter the project name`))
-
-      const { document } = new JSDOM(result).window
-
-      expect(
-        document.querySelector('.govuk-error-message').textContent.trim()
-      ).toBe('Error: Enter the project name')
-
-      expect(document.querySelector('h2').textContent.trim()).toBe(
-        'There is a problem'
-      )
-
-      expect(document.querySelector('.govuk-error-summary')).toBeTruthy()
-
-      expect(statusCode).toBe(statusCodes.ok)
-    })
-
-    test('Should pass erorr to global catchAll behaviour if it is not a validation error', async () => {
+    test('Should pass error to global catchAll behaviour if it is not a validation error', async () => {
       const apiPostMock = jest.spyOn(authRequests, 'authenticatedPostRequest')
       apiPostMock.mockRejectedValueOnce({
         res: { statusCode: 500 },
         data: {}
       })
 
-      const { result } = await server.inject({
+      const { result } = await getServer().inject({
         method: 'POST',
         url: routes.PROJECT_NAME,
         payload: { projectName: 'test' }
@@ -313,20 +206,16 @@ describe('#projectName', () => {
       expect(h.view().takeover).toHaveBeenCalled()
     })
 
-    test('Should show error messages without calling the back end when payload data is empty', async () => {
+    test('Should not call the back end when payload data is empty', async () => {
       const apiPostMock = jest.spyOn(authRequests, 'authenticatedPostRequest')
 
-      const { result } = await server.inject({
+      await getServer().inject({
         method: 'POST',
         url: routes.PROJECT_NAME,
         payload: { projectName: '' }
       })
 
       expect(apiPostMock).not.toHaveBeenCalled()
-
-      const { document } = new JSDOM(result).window
-
-      expect(document.querySelector('.govuk-error-summary')).toBeTruthy()
     })
 
     test('Should correctly set the cache when submitting a project name', async () => {

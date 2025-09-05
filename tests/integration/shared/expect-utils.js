@@ -1,6 +1,11 @@
 /* eslint-env jest */
 
-import { getByRole, getByText, within } from '@testing-library/dom'
+import {
+  getByLabelText,
+  getByRole,
+  getByText,
+  within
+} from '@testing-library/dom'
 import {
   getFieldsetByLabel,
   getInputInFieldset
@@ -48,6 +53,29 @@ export const expectFieldsetInputValue = ({
     inputLabel
   })
   expect(input).toHaveValue(value)
+}
+
+export const expectInputValue = ({ document, inputLabel, value }) => {
+  const input = getByLabelText(document, inputLabel)
+  expect(input).toHaveValue(value)
+}
+
+export const expectInputError = ({ document, inputLabel, errorMessage }) => {
+  const errorSummary = within(document).getByRole('alert')
+  within(errorSummary).getByRole('heading', {
+    level: 2,
+    name: 'There is a problem'
+  })
+  const errorSummaryLink = within(errorSummary).getByRole('link', {
+    name: errorMessage
+  })
+  // confirm that the error summary link correctly references an input within the fieldset
+  const inputId = errorSummaryLink.getAttribute('href')
+  const input = document.querySelector(inputId)
+  expect(input).toHaveAccessibleName(inputLabel)
+  expect(input).toHaveAccessibleDescription(
+    expect.stringContaining(errorMessage)
+  )
 }
 
 export const expectFieldsetError = ({

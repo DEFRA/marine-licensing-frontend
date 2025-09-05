@@ -29,5 +29,6 @@ export const routes = {
   SITE_NAME: '/exemption/site-name',
   SAME_ACTIVITY_DATES: '/exemption/same-activity-dates',
   DASHBOARD: '/home',
-  DELETE_EXEMPTION: '/exemption/delete'
+  DELETE_EXEMPTION: '/exemption/delete',
+  PRIVACY: '/help/privacy'
 }

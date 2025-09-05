@@ -32,5 +32,6 @@ export const routes = {
   SAME_ACTIVITY_DATES: '/exemption/same-activity-dates',
   SAME_ACTIVITY_DESCRIPTION: '/exemption/same-activity-description',
   DASHBOARD: '/home',
-  DELETE_EXEMPTION: '/exemption/delete'
+  DELETE_EXEMPTION: '/exemption/delete',
+  PRIVACY: '/help/privacy'
 }

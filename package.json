@@ -59,7 +59,7 @@
     "babel-plugin-module-resolver": "^5.0.2",
     "convict": "^6.2.4",
     "cssnano": "^7.0.6",
-    "cssnano-preset-default": "^7.0.6",
+    "cssnano-preset-default": "^7.0.9",
     "date-fns": "^4.1.0",
     "dayjs": "^1.11.13",
     "global-agent": "^3.0.0",

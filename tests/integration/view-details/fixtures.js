@@ -1,4 +1,5 @@
 import { COORDINATE_SYSTEMS } from '~/src/server/common/constants/exemptions.js'
+import { mockExemptionMcmsContext } from '~/src/server/test-helpers/mocks.js'
 
 const baseSubmittedExemption = {
   id: '507f1f77bcf86cd799439011',
@@ -14,7 +15,8 @@ const baseSubmittedExemption = {
     'Marine construction activities including pile driving and dredging operations.',
   publicRegister: {
     consent: 'no'
-  }
+  },
+  mcmsContext: mockExemptionMcmsContext
 }
 
 export const createSubmittedExemption = (overrides = {}) => ({
@@ -84,14 +86,23 @@ const baseExpectedContent = {
   backLinkText: 'Back',
   backLinkHref: '/home',
   summaryCards: [
-    'Project details',
+    'Project summary',
     'Activity dates',
     'Activity details',
     'Site details',
     'Public register'
   ],
   projectDetails: {
-    'Project name': 'Test Marine Activity Project'
+    'Project name': 'Test Marine Activity Project',
+    'Type of activity': 'Deposit of a substance or object',
+    'Why this activity is exempt':
+      "Based on your answers from 'Check if you need a marine licence', your article is exempt under Article 17 of the Marine Licensing (Exempted Activities) Order 2011 (opens in new tab)",
+    "Your answers from 'Check if you need a marine licence'": [
+      'Download a copy of your answers (PDF)',
+      "If you need to change any of your 'Check if you need a marine licence' answers:",
+      'Delete this project from your projects.',
+      'Restart the process by checking if you need a marine licence.'
+    ]
   },
   activityDates: {
     'Start date': '15 June 2025',

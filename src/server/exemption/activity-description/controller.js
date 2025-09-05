@@ -53,7 +53,7 @@ export const activityDescriptionController = {
       : exemption.activityDescription
 
     return h.view(ACTIVITY_DESCRIPTION_VIEW_ROUTE, {
-      ...getPageTemplateValues(request, exemption),
+      ...getPageTemplateValues(request),
       payload: { activityDescription }
     })
   }

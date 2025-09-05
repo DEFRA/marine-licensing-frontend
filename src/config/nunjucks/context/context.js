@@ -28,13 +28,13 @@ export async function context(request) {
     }
   }
 
-  const navigation = await buildNavigation(request)
+  const navigation =
+    request.path === routes.PROJECT_NAME ? [] : await buildNavigation(request)
 
   return {
     assetPath: `${assetPath}/assets`,
     serviceName: config.get('serviceName'),
     serviceUrl: '/',
-    signOutUrl: routes.SIGN_OUT,
     breadcrumbs: [],
     navigation,
     clarityProjectId: config.get('clarityProjectId'),

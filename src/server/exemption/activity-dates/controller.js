@@ -70,7 +70,9 @@ const createTemplateData = (request, exemption, payload = null) => {
       ...ACTIVITY_DATES_VIEW_SETTINGS,
       projectName: exemption.projectName,
       ...dateFields,
-      backLink: routes.SAME_ACTIVITY_DATES,
+      backLink: multipleSiteDetails?.multipleSitesEnabled
+        ? routes.SAME_ACTIVITY_DATES
+        : routes.MULTIPLE_SITES_CHOICE,
       cancelLink: routes.TASK_LIST + '?cancel=site-details',
       isSiteDetailsFlow: true,
       isMultiSiteJourney: !!multipleSiteDetails?.multipleSitesEnabled,

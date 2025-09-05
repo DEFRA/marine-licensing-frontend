@@ -183,7 +183,7 @@ describe('Multiple sites question page', () => {
 
     expect(response.statusCode).toBe(statusCodes.redirect)
     expect(response.headers.location).toBe(
-      '/exemption/how-do-you-want-to-enter-the-coordinates'
+      '/exemption/site-details-activity-dates'
     )
 
     expect(setExemptionCache).toHaveBeenCalledWith(expect.any(Object), {

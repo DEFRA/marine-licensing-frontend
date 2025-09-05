@@ -1,0 +1,176 @@
+{% extends 'layouts/page.njk' %}
+
+{% block beforeContent %}
+  {{ appBackLinkHistory() }}
+{% endblock %}
+
+{% block content %}
+  {{ appHeading({
+    text: heading
+  }) }}
+
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+      <div class="govuk-body" data-testid="app-page-body">
+
+        <p class="govuk-body">This notice explains how the Marine Management Organisation (MMO) uses your personal data when you use the Get permission for marine work service.</p>
+
+        <p class="govuk-body">Marine Management Organisation is an executive non-departmental public body sponsored by the Department for Environment, Food & Rural Affairs.</p>
+
+        <h2 class="govuk-heading-l">Who controls your data</h2>
+
+        <p class="govuk-body">Marine Management Organisation is the data controller for the information you provide.</p>
+
+        <p class="govuk-body">Postal address:</p>
+
+        <p class="govuk-body">
+          Marine Management Organisation<br>
+          Data Protection Team<br>
+          Lancaster House, Hampshire Court, Monarch Road<br>
+          Newcastle upon Tyne NE4 7YH<br>
+          United Kingdom
+        </p>
+
+        <p class="govuk-body">Email: <a href="mailto:dataprotection@marinemanagement.org.uk" class="govuk-link">dataprotection@marinemanagement.org.uk</a></p>
+
+        <p class="govuk-body">You can read more about how MMO handles personal data in the <a href="https://www.gov.uk/government/organisations/marine-management-organisation/about/personal-information-charter#contacting-us" class="govuk-link">MMO's Personal Information Charter</a>.</p>
+
+        <h2 class="govuk-heading-l">What data we collect</h2>
+
+        <p class="govuk-body">The personal data we collect includes:</p>
+
+        <ul class="govuk-list govuk-list--bullet">
+          <li>name and title</li>
+          <li>organisation and job title (if relevant)</li>
+          <li>postal address and postcode</li>
+          <li>email address and contact telephone number</li>
+          <li>date of birth (for account verification and password reset)</li>
+          <li>IP address and technical log information</li>
+          <li>photographs or video supplied with an application or generated during inspections</li>
+          <li>your declared interests (sector, topic area, marine plan area)</li>
+        </ul>
+
+        <p class="govuk-body">We also use essential cookies to remember your session and security settings.</p>
+
+        <p class="govuk-body">Where you provide your consent, we use <a href="https://support.google.com/analytics/topic/2919631" class="govuk-link">Google Analytics</a> cookies to collect information about how you use Get permission for marine work.</p>
+
+        <p class="govuk-body">You can read full details about the cookies we use in the <a href="/help/cookies" class="govuk-link">cookies policy</a>.</p>
+
+        <h2 class="govuk-heading-l">Why we need it</h2>
+
+        <p class="govuk-body">We use your information to:</p>
+
+        <ul class="govuk-list govuk-list--bullet">
+          <li>process marine licence applications</li>
+          <li>publish the details of every application and licence on the public register, as required by law</li>
+          <li>monitor compliance, including site visits after a licence is granted</li>
+          <li>issue invoices and collect licence fees</li>
+          <li>answer queries and manage complaints</li>
+          <li>improve the service through analytics and user feedback</li>
+        </ul>
+
+        <p class="govuk-body">If you choose not to provide the information we ask for, we may be unable to accept your application, process your query or meet our legal duties.</p>
+
+        <h2 class="govuk-heading-l">Legal basis for processing</h2>
+
+        <p class="govuk-body">We rely on four UK GDPR bases to process your personal data:</p>
+
+        <h3 class="govuk-heading-m">Public task – Article 6(1)(e)</h3>
+
+        <p class="govuk-body">We run the Get permission for marine work service and keep the public register under the Marine and Coastal Access Act 2009</p>
+
+        <h3 class="govuk-heading-m">Legal obligation – Article 6(1)(c)</h3>
+
+        <p class="govuk-body">We must keep financial and audit records, such as licence invoices</p>
+
+        <h3 class="govuk-heading-m">Legitimate interests – Article 6(1)(f)</h3>
+
+        <p class="govuk-body">We use anonymised analytics to improve the service and have checked that this does not override your rights and freedoms</p>
+
+        <h3 class="govuk-heading-m">Consent – Article 6(1)(a)</h3>
+
+        <p class="govuk-body">We send optional alerts or newsletters only if you ask for them. You can withdraw consent at any time. Withdrawing consent will not affect processing we carry out on other legal bases</p>
+
+        <p class="govuk-body">We do not use automated decision-making that has legal or similarly significant effects on you.</p>
+
+        <h2 class="govuk-heading-l">What we do with your data</h2>
+
+        <p class="govuk-body">We will never sell or rent your information.</p>
+
+        <p class="govuk-body">We share only what is necessary to deliver the service or where the law requires it:</p>
+
+        <ul class="govuk-list govuk-list--bullet">
+          <li>public register – your name, address and certain licence particulars appear online as required by law</li>
+          <li>statutory consultees and advisors (for example CEFAS) – they receive the parts of an application needed to give technical advice</li>
+          <li>other Defra group bodies or competent authorities – where another law or regulation requires us to share information</li>
+          <li>Shared Services Connected Ltd (SSCL) – receives billing data so it can raise invoices</li>
+          <li>authorised engineers may access data under strict support procedures</li>
+          <li>aggregated, anonymised analytics may be processed by GOV.UK PaaS and Defra platforms</li>
+        </ul>
+
+        <h2 class="govuk-heading-l">How long we keep your data</h2>
+
+        <p class="govuk-body">We keep personal data for seven years after the licence expires or a decision is made, whichever is later, unless a longer period is legally required (for example, ongoing litigation). After that it is securely deleted or anonymised in line with the MMO retention schedule.</p>
+
+        <h2 class="govuk-heading-l">Where your data is stored and processed</h2>
+
+        <p class="govuk-body">Data is stored on UK-based cloud platforms operated for Defra:</p>
+
+        <ul class="govuk-list govuk-list--bullet">
+          <li>Amazon Web Services (AWS UK regions) – Common Data Platform (MongoDB)</li>
+          <li>Microsoft Azure UK regions – Dataverse and Power Apps</li>
+          <li>Defra Strategic Reporting Database (UK)</li>
+        </ul>
+
+        <p class="govuk-body">No routine transfers are made outside the UK. If exceptional transfers are necessary, we will use UK-approved safeguards such as International Data Transfer Agreements.</p>
+
+        <h2 class="govuk-heading-l">How we protect your data</h2>
+
+        <ul class="govuk-list govuk-list--bullet">
+          <li>encryption in transit (TLS) and at rest</li>
+          <li>role-based access controls and logging</li>
+          <li>regular vulnerability scanning, penetration testing and audit</li>
+          <li>supplier contractual clauses aligned to the UK GDPR and the Government Security Policy Framework</li>
+        </ul>
+
+        <h2 class="govuk-heading-l">Your rights</h2>
+
+        <p class="govuk-body">You have the right to:</p>
+
+        <ul class="govuk-list govuk-list--bullet">
+          <li>be informed about how we use your data</li>
+          <li>access a copy of your data</li>
+          <li>rectify inaccurate data or complete incomplete data</li>
+          <li>erase your data in certain circumstances</li>
+          <li>restrict or object to processing</li>
+          <li>data portability (where applicable)</li>
+          <li>not be subject to automated decisions with legal effect</li>
+        </ul>
+
+        <p class="govuk-body">To exercise any of these rights, email <a href="mailto:dataprotection@marinemanagement.org.uk" class="govuk-link">dataprotection@marinemanagement.org.uk</a> or write to the address in the first section.</p>
+
+        <h2 class="govuk-heading-l">How to withdraw consent</h2>
+
+        <p class="govuk-body">If we process your data on the basis of consent, you can withdraw it at any time by contacting us. This will not affect any processing we have already carried out or other processing that relies on a different legal basis.</p>
+
+        <h2 class="govuk-heading-l">Questions, complaints and other contacts</h2>
+
+        <p class="govuk-body">For questions about this notice or how we handle your data contact the Data Protection Manager (details in first section) or contact:</p>
+
+        <ul class="govuk-list govuk-list--bullet">
+          <li>Access to Information Team – <a href="mailto:access-to-information@marinemanagement.org.uk" class="govuk-link">access-to-information@marinemanagement.org.uk</a>, 0300 123 1032</li>
+          <li>Defra Group Data Protection Officer, Seacole Building, 2 Marsham Street, London SW1P 4DF, United Kingdom</li>
+        </ul>
+
+        <p class="govuk-body">If you are unhappy with our response you can complain to the Information Commissioner's Office (ICO): Wycliffe House, Water Lane, Wilmslow SK9 5AF, 0303 123 1113, <a href="https://ico.org.uk" class="govuk-link">ico.org.uk</a>.</p>
+
+        <h2 class="govuk-heading-l">Changes to this notice</h2>
+
+        <p class="govuk-body">We review and update this notice at least annually or whenever we change how we process personal data. Last updated 20 June 2025.</p>
+
+        <p class="govuk-body">Marine Management Organisation, Lancaster House, Hampshire Court, Newcastle upon Tyne NE4 7YH</p>
+      </div>
+    </div>
+  </div>
+
+{% endblock %}

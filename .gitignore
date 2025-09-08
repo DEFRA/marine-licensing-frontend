@@ -10,9 +10,12 @@ coverage
 .cache
 .envrc*
 tsconfig.tsbuildinfo
+.env
 
 # stryker temp files
 .stryker-tmp
+
+local-https-setup/*.pem
 
 # Allure
 allure-results/

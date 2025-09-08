@@ -4,7 +4,8 @@ import {
 } from '~/src/server/common/helpers/errors.js'
 import {
   getExemptionCache,
-  setExemptionCache
+  setExemptionCache,
+  updateExemptionSiteDetails
 } from '~/src/server/common/helpers/session-cache/utils.js'
 import { routes } from '~/src/server/common/constants/routes.js'
 import { authenticatedPatchRequest } from '~/src/server/common/helpers/authenticated-requests.js'
@@ -22,8 +23,20 @@ export const errorMessages = {
 
 const templateValues = {
   pageTitle: 'Activity description',
-  heading: 'Activity description',
-  backLink: routes.TASK_LIST
+  heading: 'Activity description'
+}
+
+const isPageInSiteDetailsFlow = (request) =>
+  request.url.pathname === routes.SITE_DETAILS_ACTIVITY_DESCRIPTION
+
+const getPageTemplateValues = (request) => {
+  return {
+    ...templateValues,
+    isSiteDetailsFlow: isPageInSiteDetailsFlow(request),
+    backLink: isPageInSiteDetailsFlow(request)
+      ? routes.SITE_DETAILS_ACTIVITY_DATES
+      : routes.TASK_LIST
+  }
 }
 
 /**
@@ -33,10 +46,15 @@ const templateValues = {
 export const activityDescriptionController = {
   handler(request, h) {
     const exemption = getExemptionCache(request)
+    const isInSiteDetailsFlow = isPageInSiteDetailsFlow(request)
+
+    const activityDescription = isInSiteDetailsFlow
+      ? exemption.siteDetails?.activityDescription
+      : exemption.activityDescription
 
     return h.view(ACTIVITY_DESCRIPTION_VIEW_ROUTE, {
-      ...templateValues,
-      payload: { activityDescription: exemption.activityDescription }
+      ...getPageTemplateValues(request),
+      payload: { activityDescription }
     })
   }
 }
@@ -65,7 +83,7 @@ export const activityDescriptionSubmitController = {
         if (!err.details) {
           return h
             .view(ACTIVITY_DESCRIPTION_VIEW_ROUTE, {
-              ...templateValues,
+              ...getPageTemplateValues(request),
               payload
             })
             .takeover()
@@ -76,7 +94,7 @@ export const activityDescriptionSubmitController = {
 
         return h
           .view(ACTIVITY_DESCRIPTION_VIEW_ROUTE, {
-            ...templateValues,
+            ...getPageTemplateValues(request),
             payload,
             errors,
             errorSummary
@@ -87,20 +105,34 @@ export const activityDescriptionSubmitController = {
   },
   async handler(request, h) {
     const { payload } = request
-    try {
-      const exemption = getExemptionCache(request)
-      const { payload: responsePayload } = await authenticatedPatchRequest(
-        request,
-        '/exemption/activity-description',
-        { ...payload, id: exemption.id }
-      )
+    const exemption = getExemptionCache(request)
 
-      setExemptionCache(request, {
-        ...exemption,
-        ...responsePayload.value,
-        activityDescription: payload.activityDescription
-      })
-      return h.redirect(routes.TASK_LIST)
+    try {
+      const isInSiteDetailsFlow = isPageInSiteDetailsFlow(request)
+
+      if (isInSiteDetailsFlow) {
+        updateExemptionSiteDetails(
+          request,
+          'activityDescription',
+          payload.activityDescription
+        )
+      } else {
+        const { payload: responsePayload } = await authenticatedPatchRequest(
+          request,
+          '/exemption/activity-description',
+          { ...payload, id: exemption.id }
+        )
+
+        setExemptionCache(request, {
+          ...exemption,
+          ...responsePayload.value,
+          activityDescription: payload.activityDescription
+        })
+      }
+
+      return h.redirect(
+        isInSiteDetailsFlow ? routes.COORDINATES_ENTRY_CHOICE : routes.TASK_LIST
+      )
     } catch (e) {
       const { details } = e.data?.payload?.validation ?? {}
 
@@ -112,7 +144,7 @@ export const activityDescriptionSubmitController = {
       const errors = errorDescriptionByFieldName(errorSummary)
 
       return h.view(ACTIVITY_DESCRIPTION_VIEW_ROUTE, {
-        ...templateValues,
+        ...getPageTemplateValues(request),
         payload,
         errors,
         errorSummary

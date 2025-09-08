@@ -2,6 +2,7 @@ import { ExemptionService } from './exemption.service.js'
 import { errorMessages } from '~/src/server/common/constants/error-messages.js'
 import { createLogger } from '~/src/server/common/helpers/logging/logger.js'
 import { authenticatedGetRequest } from '~/src/server/common/helpers/authenticated-requests.js'
+import { mockExemption } from '~/src/server/test-helpers/mocks.js'
 
 jest.mock('~/src/server/common/helpers/logging/logger.js')
 jest.mock('~/src/server/common/helpers/authenticated-requests.js')
@@ -64,7 +65,8 @@ describe('ExemptionService', () => {
         const expectedExemption = {
           id: exemptionId,
           projectName: 'Test Project',
-          status: 'Draft'
+          status: 'Draft',
+          mcmsContext: null
         }
 
         mockAuthenticatedGetRequest.mockResolvedValue({
@@ -86,35 +88,26 @@ describe('ExemptionService', () => {
 
       test('should return exemption', async () => {
         const exemptionId = '507f1f77bcf86cd799439012'
-        const exemption = {
-          id: exemptionId,
-          status: 'Submitted',
-          applicationReference: 'EXE/2025/00003',
-          submittedAt: '2025-01-01T10:00:00.000Z',
-          projectName: 'Marine Construction Project',
-          activityDates: {
-            start: '2025-06-15T00:00:00.000Z',
-            end: '2025-08-30T00:00:00.000Z'
-          },
-          activityDescription: 'Marine construction activities',
-          publicRegister: { consent: 'no' },
-          siteDetails: {
-            coordinatesType: 'coordinates',
-            coordinateSystem: 'WGS84',
-            coordinates: { latitude: '51.489676', longitude: '-0.231530' }
-          }
-        }
 
         mockAuthenticatedGetRequest.mockResolvedValue({
           payload: {
             message: 'success',
-            value: exemption
+            value: mockExemption
           }
         })
 
         const result = await service.getExemptionById(exemptionId)
 
-        expect(result).toEqual(exemption)
+        expect(result).toEqual({
+          ...mockExemption,
+          mcmsContext: {
+            ...mockExemption.mcmsContext,
+            activityType: {
+              label: 'Deposit of a substance or object',
+              value: 'DEPOSIT'
+            }
+          }
+        })
       })
 
       describe('validation errors', () => {

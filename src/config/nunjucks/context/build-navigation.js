@@ -12,7 +12,7 @@ export const buildNavigation = async (request) => {
 
   const navigation = [
     {
-      text: 'Projects home',
+      text: 'Projects',
       href: routes.DASHBOARD,
       active: request?.path === routes.DASHBOARD
     }
@@ -24,6 +24,11 @@ export const buildNavigation = async (request) => {
       href: accountManagementUrl
     })
   }
+
+  navigation.push({
+    text: 'Sign out',
+    href: routes.SIGN_OUT
+  })
 
   return navigation
 }

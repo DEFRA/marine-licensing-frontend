@@ -22,6 +22,8 @@ export const routes = {
   UPLOAD_AND_WAIT: '/exemption/upload-and-wait',
   ACTIVITY_DATES: '/exemption/activity-dates',
   SITE_DETAILS_ACTIVITY_DATES: '/exemption/site-details-activity-dates',
+  SITE_DETAILS_ACTIVITY_DESCRIPTION:
+    '/exemption/site-details-activity-description',
   CHECK_YOUR_ANSWERS: '/exemption/check-your-answers',
   VIEW_DETAILS: '/exemption/view-details',
   CONFIRMATION: '/exemption/confirmation',
@@ -29,5 +31,6 @@ export const routes = {
   SITE_NAME: '/exemption/site-name',
   SAME_ACTIVITY_DATES: '/exemption/same-activity-dates',
   DASHBOARD: '/home',
-  DELETE_EXEMPTION: '/exemption/delete'
+  DELETE_EXEMPTION: '/exemption/delete',
+  PRIVACY: '/help/privacy'
 }

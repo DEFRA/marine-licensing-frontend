@@ -12,6 +12,15 @@
   }) }}
 </nav>
 {% endblock %}
+
+{% set buttonText %}
+  {% if isSiteDetailsFlow %}
+    Continue
+  {% else %}
+    Save and continue
+  {% endif %}
+{% endset %}
+
 {% block content %}
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
@@ -40,7 +49,7 @@
         }) }}
         <div class="govuk-button-group">
           {{ govukButton({
-              text: "Save and continue",
+              text: buttonText,
               classes: "govuk-button--primary"
             }) }}
           {{ appCancelButton({

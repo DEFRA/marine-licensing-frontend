@@ -1,6 +1,7 @@
 import convict from 'convict'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
+import { configDotenv } from 'dotenv'
 
 const dirname = path.dirname(fileURLToPath(import.meta.url))
 
@@ -12,6 +13,10 @@ const fiftyMB = 50_000_000 // 50 MB :== 50 * 1000 * 1000
 const isProduction = process.env.NODE_ENV === 'production'
 const isTest = process.env.NODE_ENV === 'test'
 const isDevelopment = process.env.NODE_ENV === 'development'
+
+if (isDevelopment) {
+  configDotenv()
+}
 
 export const config = convict({
   serviceVersion: {

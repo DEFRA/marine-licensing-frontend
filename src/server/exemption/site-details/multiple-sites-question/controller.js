@@ -95,13 +95,18 @@ export const multipleSitesSubmitController = {
     const exemption = getExemptionCache(request)
 
     const multiSiteValue = payload.multipleSitesEnabled === 'yes'
+
+    if (payload.multipleSitesEnabled === 'no' && exemption.siteDetails) {
+      delete exemption.siteDetails.siteName
+    }
+
     setExemptionCache(request, {
       ...exemption,
       multipleSiteDetails: { multipleSitesEnabled: multiSiteValue }
     })
 
     if (payload.multipleSitesEnabled === 'no') {
-      return h.redirect(routes.COORDINATES_ENTRY_CHOICE)
+      return h.redirect(routes.SITE_DETAILS_ACTIVITY_DATES)
     } else {
       return h.redirect(routes.SITE_NAME)
     }

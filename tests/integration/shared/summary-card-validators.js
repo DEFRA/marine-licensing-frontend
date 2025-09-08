@@ -73,7 +73,13 @@ export const validateSummaryCardContent = (
     })
     expect(row).toBeTruthy()
     const valueElement = row.querySelector('.govuk-summary-list__value')
-    expect(valueElement.textContent.trim()).toBe(value)
+    if (Array.isArray(value)) {
+      value.forEach((expectedValue) => {
+        expect(valueElement.textContent.trim()).toContain(expectedValue)
+      })
+    } else {
+      expect(valueElement.textContent.trim()).toBe(value)
+    }
   })
 }
 

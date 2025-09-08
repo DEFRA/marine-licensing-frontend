@@ -1,7 +1,5 @@
 import { routes } from '~/src/server/common/constants/routes.js'
 import { statusCodes } from '~/src/server/common/constants/status-codes.js'
-import * as authRequests from '~/src/server/common/helpers/authenticated-requests.js'
-import * as cacheUtils from '~/src/server/common/helpers/session-cache/utils.js'
 import { testScenarios } from './fixtures.js'
 import {
   validatePageStructure,
@@ -14,36 +12,35 @@ import {
 } from '../shared/summary-card-validators.js'
 import { validateSubmissionSection } from '../shared/dom-helpers.js'
 import {
-  createTestServer,
+  mockExemption,
   responseToDocument,
+  setupTestServer,
   validateResponse
 } from '../shared/test-setup-helpers.js'
+import { mockExemptionMcmsContext } from '~/src/server/test-helpers/mocks.js'
 
 jest.mock('~/src/server/common/helpers/authenticated-requests.js')
 
 describe('Check your answers - page content Validation', () => {
-  const testServer = createTestServer()
-  let server
+  const getServer = setupTestServer()
 
-  beforeAll(async () => {
-    server = await testServer.setup()
-  })
+  const getPageDocument = async (exemption) => {
+    mockExemption({
+      ...exemption,
+      mcmsContext: mockExemptionMcmsContext
+    })
+    const response = await getServer().inject({
+      method: 'GET',
+      url: routes.CHECK_YOUR_ANSWERS
+    })
 
-  afterAll(async () => {
-    await testServer.teardown()
-  })
-
-  beforeEach(() => {
-    jest
-      .spyOn(cacheUtils, 'setExemptionCache')
-      .mockImplementation(() => undefined)
-  })
+    validateResponse(response, statusCodes.ok)
+    return responseToDocument(response)
+  }
 
   test.each(testScenarios)(
     '$name - validates every element on the page',
     async ({ exemption, expectedPageContent }) => {
-      expect.hasAssertions()
-
       const document = await getPageDocument(exemption)
 
       validatePageStructure(document, expectedPageContent)
@@ -56,19 +53,4 @@ describe('Check your answers - page content Validation', () => {
       validateSubmissionSection(document, expectedPageContent)
     }
   )
-
-  const getPageDocument = async (exemption) => {
-    jest.spyOn(cacheUtils, 'getExemptionCache').mockReturnValue(exemption)
-    jest.spyOn(authRequests, 'authenticatedGetRequest').mockResolvedValue({
-      payload: { value: { taskList: { id: exemption.id } } }
-    })
-
-    const response = await server.inject({
-      method: 'GET',
-      url: routes.CHECK_YOUR_ANSWERS
-    })
-
-    validateResponse(response, statusCodes.ok)
-    return responseToDocument(response)
-  }
 })

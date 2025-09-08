@@ -1,0 +1,66 @@
+[
+  {
+    "expectedError": "Eastings must be a number",
+    "coordinates": [
+      { "eastings": "abc123", "northings": "654321" },
+      { "eastings": "234567", "northings": "765432" },
+      { "eastings": "345678", "northings": "876543" }
+    ]
+  },
+  {
+    "expectedError": "Northings must be a number",
+    "coordinates": [
+      { "eastings": "123456", "northings": "654321" },
+      { "eastings": "234567", "northings": "765432" },
+      { "eastings": "345678", "northings": "def789" }
+    ]
+  },
+  {
+    "expectedError": "Eastings must be a positive 6-digit number, like 123456",
+    "coordinates": [
+      { "eastings": "123456", "northings": "654321" },
+      { "eastings": "-654321", "northings": "765432" },
+      { "eastings": "345678", "northings": "876543" }
+    ]
+  },
+  {
+    "expectedError": "Northings must be a positive 6 or 7-digit number, like 123456",
+    "coordinates": [
+      { "eastings": "123456", "northings": "654321" },
+      { "eastings": "234567", "northings": "765432" },
+      { "eastings": "345678", "northings": "-1234567" }
+    ]
+  },
+  {
+    "expectedError": "Eastings must be 6 digits",
+    "coordinates": [
+      { "eastings": "12345", "northings": "654321" },
+      { "eastings": "234567", "northings": "765432" },
+      { "eastings": "345678", "northings": "876543" }
+    ]
+  },
+  {
+    "expectedError": "Northings must be 6 or 7 digits",
+    "coordinates": [
+      { "eastings": "123456", "northings": "654321" },
+      { "eastings": "234567", "northings": "123" },
+      { "eastings": "345678", "northings": "876543" }
+    ]
+  },
+  {
+    "expectedError": "Eastings must be 6 digits",
+    "coordinates": [
+      { "eastings": "123456", "northings": "654321" },
+      { "eastings": "12345678", "northings": "765432" },
+      { "eastings": "345678", "northings": "876543" }
+    ]
+  },
+  {
+    "expectedError": "Northings must be 6 or 7 digits",
+    "coordinates": [
+      { "eastings": "123456", "northings": "12345678" },
+      { "eastings": "234567", "northings": "765432" },
+      { "eastings": "345678", "northings": "876543" }
+    ]
+  }
+]

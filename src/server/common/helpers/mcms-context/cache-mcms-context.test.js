@@ -92,7 +92,6 @@ describe('Cache / get MCMS context', () => {
 
       expect(mockRequest.yar.flash).toHaveBeenCalledWith('mcmsContext', {
         activityType: 'INCINERATION',
-        activitySubtype: null,
         article: '34',
         pdfDownloadUrl: 'https://example.com/incineration.pdf'
       })

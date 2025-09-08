@@ -154,7 +154,7 @@ describe('defraId plugin', () => {
   })
 
   test('should call clearExemptionCache when validity.isValid is false', async () => {
-    mockedValidateUserSession.mockReturnValue({ isValid: false })
+    mockedValidateUserSession.mockResolvedValue({ isValid: false })
 
     await defraId.plugin.register(mockServer)
 

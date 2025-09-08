@@ -1,4 +1,4 @@
-import * as exemptionServiceModule from '~/src/services/exemption-service/index.js'
+import * as authRequests from '~/src/server/common/helpers/authenticated-requests.js'
 import { testScenarios } from './fixtures.js'
 import {
   validatePageStructure,
@@ -11,47 +11,46 @@ import {
 } from '../shared/summary-card-validators.js'
 import { validateReadOnlyBehavior } from '../shared/dom-helpers.js'
 import {
-  createTestServer,
   responseToDocument,
+  setupTestServer,
   validateResponse
 } from '../shared/test-setup-helpers.js'
+import * as cacheUtils from '~/src/server/common/helpers/session-cache/utils.js'
+import { routes } from '~/src/server/common/constants/routes.js'
+import { statusCodes } from '~/src/server/common/constants/status-codes.js'
 
-jest.mock('~/src/services/exemption-service/index.js')
+jest.mock('~/src/server/common/helpers/authenticated-requests.js')
 
 describe('View Details - Content Verification Integration Tests', () => {
-  const testServer = createTestServer()
-  let server
+  const getServer = setupTestServer()
 
-  beforeAll(async () => {
-    server = await testServer.setup()
-  })
-
-  afterAll(async () => {
-    await testServer.teardown()
+  beforeEach(() => {
+    jest
+      .spyOn(cacheUtils, 'setExemptionCache')
+      .mockImplementation(() => undefined)
   })
 
   const getPageDocument = async (exemption) => {
-    const mockExemptionService = {
-      getExemptionById: jest.fn().mockResolvedValue(exemption)
-    }
-    jest
-      .mocked(exemptionServiceModule.getExemptionService)
-      .mockReturnValue(mockExemptionService)
-
-    const response = await server.inject({
-      method: 'GET',
-      url: `/exemption/view-details/${exemption.id}`
+    jest.spyOn(cacheUtils, 'getExemptionCache').mockReturnValue(exemption)
+    jest.spyOn(authRequests, 'authenticatedGetRequest').mockResolvedValue({
+      payload: {
+        message: 'success',
+        value: exemption
+      }
     })
 
-    validateResponse(response, 200)
+    const response = await getServer().inject({
+      method: 'GET',
+      url: `${routes.VIEW_DETAILS}/${exemption.id}`
+    })
+
+    validateResponse(response, statusCodes.ok)
     return responseToDocument(response)
   }
 
   test.each(testScenarios)(
     '$name - validates every element on the page',
     async ({ exemption, expectedPageContent }) => {
-      expect.hasAssertions()
-
       const document = await getPageDocument(exemption)
 
       validatePageStructure(document, expectedPageContent)

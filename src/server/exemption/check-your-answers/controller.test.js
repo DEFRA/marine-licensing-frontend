@@ -4,6 +4,8 @@ import { mockExemption } from '~/src/server/test-helpers/mocks.js'
 import * as authRequests from '~/src/server/common/helpers/authenticated-requests.js'
 import * as authUtils from '~/src/server/common/plugins/auth/utils.js'
 import * as exemptionSiteDetailsHelpers from '~/src/server/common/helpers/exemption-site-details.js'
+import { createSubmittedExemption } from '~/tests/integration/view-details/test-utilities.js'
+import * as exemptionServiceModule from '~/src/services/exemption-service/index.js'
 
 const mockUserSession = {
   displayName: 'John Doe',
@@ -31,6 +33,10 @@ describe('check your answers controller', () => {
     clearExemptionCacheSpy = jest
       .spyOn(cacheUtils, 'clearExemptionCache')
       .mockImplementation(() => ({}))
+
+    jest.spyOn(exemptionServiceModule, 'getExemptionService').mockReturnValue({
+      getExemptionById: jest.fn().mockResolvedValue(createSubmittedExemption())
+    })
   })
 
   afterAll(async () => {
@@ -225,7 +231,7 @@ describe('check your answers controller', () => {
   })
 
   test('Should render page with empty exemption data', async () => {
-    getExemptionCacheSpy.mockReturnValueOnce({})
+    getExemptionCacheSpy.mockReturnValueOnce({ id: 'test-id' })
     const { statusCode } = await server.inject({
       method: 'GET',
       url: '/exemption/check-your-answers'

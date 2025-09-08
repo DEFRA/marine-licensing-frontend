@@ -22,7 +22,7 @@ describe('#getNextRoute', () => {
 
       const result = getNextRoute(exemption, true)
 
-      expect(result).toBe(routes.COORDINATES_ENTRY_CHOICE)
+      expect(result).toBe(routes.SAME_ACTIVITY_DESCRIPTION)
     })
 
     test('should return correct route when multipleSitesEnabled is false', () => {

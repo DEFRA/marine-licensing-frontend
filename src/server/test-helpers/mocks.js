@@ -28,7 +28,8 @@ export const mockExemption = {
   publicRegister: { consent: 'yes', reason: 'Test reason' },
   multipleSiteDetails: {
     multipleSitesEnabled: false,
-    sameActivityDates: 'yes'
+    sameActivityDates: 'yes',
+    sameActivityDescription: 'yes'
   },
   siteDetails: {
     coordinatesType: 'coordinates',

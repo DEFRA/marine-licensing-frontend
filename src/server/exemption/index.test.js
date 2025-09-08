@@ -76,6 +76,14 @@ describe('exemption route', () => {
       }),
       expect.objectContaining({
         method: 'GET',
+        path: '/exemption/same-activity-description'
+      }),
+      expect.objectContaining({
+        method: 'POST',
+        path: '/exemption/same-activity-description'
+      }),
+      expect.objectContaining({
+        method: 'GET',
         path: '/exemption/what-coordinate-system'
       }),
       expect.objectContaining({

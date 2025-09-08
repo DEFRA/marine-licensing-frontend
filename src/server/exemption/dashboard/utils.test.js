@@ -90,7 +90,7 @@ describe('#formatProjectsForDisplay', () => {
         projectName: 'Project 2',
 
         applicationReference: 'ML-2024-002',
-        status: 'Closed',
+        status: 'Active',
         submittedAt: '2024-06-25'
       }
     ]
@@ -115,7 +115,7 @@ describe('#formatProjectsForDisplay', () => {
       { text: 'Exempt activity notification' },
       { text: 'ML-2024-002' },
       {
-        html: '<strong class="govuk-tag govuk-tag--green">Closed</strong>'
+        html: '<strong class="govuk-tag govuk-tag--green">Active</strong>'
       },
       { text: '25 Jun 2024' },
       {
@@ -143,7 +143,7 @@ describe('#formatProjectsForDisplay', () => {
         projectName: 'Test Project',
 
         applicationReference: 'ML-2024-001',
-        status: 'Closed',
+        status: 'Active',
         submittedAt: '2024-01-15'
       }
     ]
@@ -153,7 +153,7 @@ describe('#formatProjectsForDisplay', () => {
     expect(result[0][3].html).toContain('govuk-tag--light-blue')
     expect(result[0][3].html).toContain('Draft')
     expect(result[1][3].html).toContain('govuk-tag--green')
-    expect(result[1][3].html).toContain('Closed')
+    expect(result[1][3].html).toContain('Active')
   })
 })
 
@@ -174,7 +174,7 @@ describe('getActionButtons', () => {
     const submitted = {
       id: 'abc123',
       projectName: 'Test Project',
-      status: 'Closed'
+      status: 'Active'
     }
     const result = getActionButtons(submitted)
     expect(result).toBe(

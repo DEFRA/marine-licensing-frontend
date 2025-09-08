@@ -146,7 +146,7 @@ describe('#dashboard', () => {
           projectName: 'Test Project 2',
 
           reference: 'ML-2024-002',
-          status: 'Closed',
+          status: 'Active',
           submittedAt: '2024-01-15'
         }
       ]

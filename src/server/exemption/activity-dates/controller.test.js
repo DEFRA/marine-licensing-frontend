@@ -262,7 +262,7 @@ describe('#activityDatesController', () => {
         }
       )
       expect(statusCode).toBe(statusCodes.redirect)
-      expect(headers.location).toBe(routes.COORDINATES_ENTRY_CHOICE)
+      expect(headers.location).toBe(routes.SAME_ACTIVITY_DESCRIPTION)
     })
 
     test('should handle validation errors for missing start date', async () => {

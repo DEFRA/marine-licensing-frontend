@@ -25,6 +25,7 @@ import {
 } from '~/src/server/common/helpers/session-cache/utils.js'
 import { activityDatesSchema } from '~/src/server/common/schemas/date.js'
 import { getSiteNumber } from '~/src/server/exemption/site-details/utils/site-number.js'
+import { getNextRoute } from './utils.js'
 
 const isPageInSiteDetailsFlow = (request) =>
   request.url.pathname === routes.SITE_DETAILS_ACTIVITY_DATES
@@ -171,9 +172,8 @@ export const activityDatesSubmitController = {
         })
       }
 
-      return h.redirect(
-        isInSiteDetailsFlow ? routes.COORDINATES_ENTRY_CHOICE : routes.TASK_LIST
-      )
+      const nextRoute = getNextRoute(exemption, isInSiteDetailsFlow)
+      return h.redirect(nextRoute)
     } catch (e) {
       const { details } = e.data?.payload?.validation ?? {}
 

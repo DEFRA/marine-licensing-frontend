@@ -177,10 +177,21 @@ describe('#activityDatesController', () => {
       )
     })
 
-    test('should call updateExemptionSiteDetails when in site details flow', async () => {
+    test('should call updateExemptionSiteDetails when in site details flow with a single site', async () => {
       const mockedUpdateExemptionSiteDetails = jest.mocked(
         cacheUtils.updateExemptionSiteDetails
       )
+
+      const exemptionWithDates = {
+        ...mockExemptionState,
+        multipleSiteDetails: { multipleSitesEnabled: false },
+        activityDates: {
+          start: '2025-06-15T00:00:00.000Z',
+          end: '2025-06-30T00:00:00.000Z'
+        }
+      }
+
+      getExemptionCacheSpy.mockReturnValue(exemptionWithDates)
 
       const currentYear = new Date().getFullYear()
       const payload = {
@@ -202,8 +213,52 @@ describe('#activityDatesController', () => {
         expect.any(Object),
         'activityDates',
         {
-          start: expect.any(String),
-          end: expect.any(String)
+          end: '2026-06-15T00:00:00.000Z',
+          start: '2026-06-01T00:00:00.000Z'
+        }
+      )
+      expect(statusCode).toBe(statusCodes.redirect)
+      expect(headers.location).toBe(routes.SITE_DETAILS_ACTIVITY_DESCRIPTION)
+    })
+
+    test('should call updateExemptionSiteDetails when in site details flow with a multi site', async () => {
+      const mockedUpdateExemptionSiteDetails = jest.mocked(
+        cacheUtils.updateExemptionSiteDetails
+      )
+
+      const exemptionWithDates = {
+        ...mockExemptionState,
+        multipleSiteDetails: { multipleSitesEnabled: true },
+        activityDates: {
+          start: '2025-06-15T00:00:00.000Z',
+          end: '2025-06-30T00:00:00.000Z'
+        }
+      }
+
+      getExemptionCacheSpy.mockReturnValue(exemptionWithDates)
+
+      const currentYear = new Date().getFullYear()
+      const payload = {
+        'activity-start-date-day': '1',
+        'activity-start-date-month': '6',
+        'activity-start-date-year': (currentYear + 1).toString(),
+        'activity-end-date-day': '15',
+        'activity-end-date-month': '6',
+        'activity-end-date-year': (currentYear + 1).toString()
+      }
+
+      const { statusCode, headers } = await server.inject({
+        method: 'POST',
+        url: routes.SITE_DETAILS_ACTIVITY_DATES,
+        payload
+      })
+
+      expect(mockedUpdateExemptionSiteDetails).toHaveBeenCalledWith(
+        expect.any(Object),
+        'activityDates',
+        {
+          start: '2026-06-01T00:00:00.000Z',
+          end: '2026-06-15T00:00:00.000Z'
         }
       )
       expect(statusCode).toBe(statusCodes.redirect)

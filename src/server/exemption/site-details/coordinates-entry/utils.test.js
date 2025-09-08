@@ -32,7 +32,7 @@ describe('#getCoordinatesEntryBackLink', () => {
 
     const result = getCoordinatesEntryBackLink(exemption)
 
-    expect(result).toBe(routes.MULTIPLE_SITES_CHOICE)
+    expect(result).toBe(routes.SITE_DETAILS_ACTIVITY_DESCRIPTION)
   })
 
   test('should return correct route when multipleSiteDetails is undefined', () => {
@@ -40,12 +40,12 @@ describe('#getCoordinatesEntryBackLink', () => {
 
     const result = getCoordinatesEntryBackLink(exemption)
 
-    expect(result).toBe(routes.MULTIPLE_SITES_CHOICE)
+    expect(result).toBe(routes.SITE_DETAILS_ACTIVITY_DESCRIPTION)
   })
 
   test('should return correct route when exemption is null', () => {
     const result = getCoordinatesEntryBackLink(null)
 
-    expect(result).toBe(routes.MULTIPLE_SITES_CHOICE)
+    expect(result).toBe(routes.SITE_DETAILS_ACTIVITY_DESCRIPTION)
   })
 })

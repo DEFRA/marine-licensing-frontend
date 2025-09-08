@@ -13,11 +13,29 @@ describe('activityDescriptionRoutes routes', () => {
     )
   })
 
-  it('POST route is exists and matches route constant', () => {
+  it('GET site details route is exists and matches route constant', () => {
     expect(activityDescriptionRoutes[1]).toEqual(
+      expect.objectContaining({
+        method: 'GET',
+        path: routes.SITE_DETAILS_ACTIVITY_DESCRIPTION
+      })
+    )
+  })
+
+  it('POST route is exists and matches route constant', () => {
+    expect(activityDescriptionRoutes[2]).toEqual(
       expect.objectContaining({
         method: 'POST',
         path: routes.ACTIVITY_DESCRIPTION
+      })
+    )
+  })
+
+  it('POST site details route is exists and matches route constant', () => {
+    expect(activityDescriptionRoutes[3]).toEqual(
+      expect.objectContaining({
+        method: 'POST',
+        path: routes.SITE_DETAILS_ACTIVITY_DESCRIPTION
       })
     )
   })

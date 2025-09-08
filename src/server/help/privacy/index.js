@@ -15,7 +15,7 @@ export const privacy = {
           method: 'GET',
           path: routes.PRIVACY,
           options: {
-            auth: false
+            auth: { strategy: 'defra-id', mode: 'try' }
           },
           ...privacyController
         }

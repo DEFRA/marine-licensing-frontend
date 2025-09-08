@@ -14,7 +14,7 @@ describe('privacy route', () => {
         method: 'GET',
         path: '/help/privacy',
         options: {
-          auth: false
+          auth: { strategy: 'defra-id', mode: 'try' }
         }
       })
     ])

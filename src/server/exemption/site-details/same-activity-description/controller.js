@@ -105,6 +105,6 @@ export const sameActivityDescriptionSubmitController = {
       payload.sameActivityDescription
     )
 
-    return h.redirect(routes.COORDINATES_ENTRY_CHOICE)
+    return h.redirect(routes.SITE_DETAILS_ACTIVITY_DESCRIPTION)
   }
 }

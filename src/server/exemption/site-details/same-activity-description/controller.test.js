@@ -90,7 +90,7 @@ describe('sameActivityDescriptionController', () => {
         'yes'
       )
       expect(mockH.redirect).toHaveBeenCalledWith(
-        routes.COORDINATES_ENTRY_CHOICE
+        routes.SITE_DETAILS_ACTIVITY_DESCRIPTION
       )
     })
 
@@ -110,7 +110,7 @@ describe('sameActivityDescriptionController', () => {
         'no'
       )
       expect(mockH.redirect).toHaveBeenCalledWith(
-        routes.COORDINATES_ENTRY_CHOICE
+        routes.SITE_DETAILS_ACTIVITY_DESCRIPTION
       )
     })
   })

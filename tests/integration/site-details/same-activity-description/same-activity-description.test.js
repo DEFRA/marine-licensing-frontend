@@ -188,7 +188,7 @@ describe('Same activity description page', () => {
 
     expect(response.statusCode).toBe(statusCodes.redirect)
     expect(response.headers.location).toBe(
-      '/exemption/how-do-you-want-to-enter-the-coordinates'
+      '/exemption/site-details-activity-description'
     )
 
     expect(updateExemptionMultipleSiteDetails).toHaveBeenCalledWith(
@@ -209,7 +209,7 @@ describe('Same activity description page', () => {
 
     expect(response.statusCode).toBe(statusCodes.redirect)
     expect(response.headers.location).toBe(
-      '/exemption/how-do-you-want-to-enter-the-coordinates'
+      '/exemption/site-details-activity-description'
     )
 
     expect(updateExemptionMultipleSiteDetails).toHaveBeenCalledWith(

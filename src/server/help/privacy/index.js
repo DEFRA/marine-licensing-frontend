@@ -14,6 +14,9 @@ export const privacy = {
         {
           method: 'GET',
           path: routes.PRIVACY,
+          options: {
+            auth: false
+          },
           ...privacyController
         }
       ])

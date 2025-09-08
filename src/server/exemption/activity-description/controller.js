@@ -10,6 +10,8 @@ import {
 import { routes } from '~/src/server/common/constants/routes.js'
 import { authenticatedPatchRequest } from '~/src/server/common/helpers/authenticated-requests.js'
 import joi from 'joi'
+import { getBackLink } from './utils.js'
+import { exemption } from '../index.js'
 
 export const ACTIVITY_DESCRIPTION_VIEW_ROUTE =
   'exemption/activity-description/index'
@@ -30,12 +32,13 @@ const isPageInSiteDetailsFlow = (request) =>
   request.url.pathname === routes.SITE_DETAILS_ACTIVITY_DESCRIPTION
 
 const getPageTemplateValues = (request) => {
+  const siteDetailsFlow = isPageInSiteDetailsFlow(request)
+  const exemption = getExemptionCache(request)
+
   return {
     ...templateValues,
-    isSiteDetailsFlow: isPageInSiteDetailsFlow(request),
-    backLink: isPageInSiteDetailsFlow(request)
-      ? routes.SITE_DETAILS_ACTIVITY_DATES
-      : routes.TASK_LIST
+    isSiteDetailsFlow: siteDetailsFlow,
+    backLink: getBackLink(exemption, siteDetailsFlow)
   }
 }
 

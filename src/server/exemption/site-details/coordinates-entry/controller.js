@@ -6,8 +6,6 @@ import {
   errorDescriptionByFieldName,
   mapErrorsForDisplay
 } from '~/src/server/common/helpers/errors.js'
-import { getCoordinatesEntryBackLink } from './utils.js'
-
 import joi from 'joi'
 import { routes } from '~/src/server/common/constants/routes.js'
 
@@ -16,7 +14,8 @@ export const COORDINATES_ENTRY_VIEW_ROUTE =
 
 const coordinatesEntrySettings = {
   pageTitle: 'How do you want to enter the coordinates?',
-  heading: 'How do you want to enter the coordinates?'
+  heading: 'How do you want to enter the coordinates?',
+  backLink: routes.SITE_DETAILS_ACTIVITY_DESCRIPTION
 }
 
 export const errorMessages = {
@@ -33,11 +32,8 @@ export const coordinatesEntryController = {
 
     const siteDetails = exemption.siteDetails ?? {}
 
-    const backLink = getCoordinatesEntryBackLink(exemption)
-
     return h.view(COORDINATES_ENTRY_VIEW_ROUTE, {
       ...coordinatesEntrySettings,
-      backLink,
       projectName: exemption.projectName,
       payload: {
         coordinatesEntry: siteDetails.coordinatesEntry
@@ -69,13 +65,10 @@ export const coordinatesEntrySubmitController = {
 
         const { projectName } = getExemptionCache(request)
 
-        const backLink = getCoordinatesEntryBackLink(getExemptionCache(request))
-
         if (!err.details) {
           return h
             .view(COORDINATES_ENTRY_VIEW_ROUTE, {
               ...coordinatesEntrySettings,
-              backLink,
               payload,
               projectName
             })
@@ -89,7 +82,6 @@ export const coordinatesEntrySubmitController = {
         return h
           .view(COORDINATES_ENTRY_VIEW_ROUTE, {
             ...coordinatesEntrySettings,
-            backLink,
             payload,
             projectName,
             errors,

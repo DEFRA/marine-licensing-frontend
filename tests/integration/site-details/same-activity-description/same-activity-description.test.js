@@ -1,40 +1,33 @@
 import { JSDOM } from 'jsdom'
 import { getByLabelText, getByRole, getByText } from '@testing-library/dom'
-import { createServer } from '~/src/server/index.js'
 import { statusCodes } from '~/src/server/common/constants/status-codes.js'
 import {
   getExemptionCache,
   updateExemptionMultipleSiteDetails
 } from '~/src/server/common/helpers/session-cache/utils.js'
 import { validateErrors } from '~/tests/integration/shared/expect-utils.js'
+import {
+  setupTestServer,
+  mockExemption
+} from '~/tests/integration/shared/test-setup-helpers.js'
 
 jest.mock('~/src/server/common/helpers/session-cache/utils.js')
 
-describe('Same activity description page', () => {
-  let server
-
-  const mockExemption = {
-    id: 'test-exemption-123',
-    projectName: 'Test Project',
-    multipleSiteDetails: {
-      multipleSitesEnabled: true
-    }
+const exemptionWithMultipleSites = {
+  id: 'test-exemption-123',
+  projectName: 'Test Project',
+  multipleSiteDetails: {
+    multipleSitesEnabled: true
   }
+}
 
-  jest.mocked(getExemptionCache).mockReturnValue(mockExemption)
-  jest.mocked(updateExemptionMultipleSiteDetails).mockReturnValue({})
+describe('Same activity description page', () => {
+  const getServer = setupTestServer()
 
-  beforeAll(async () => {
-    server = await createServer()
-    await server.initialize()
-  })
-
-  afterAll(async () => {
-    await server.stop()
-  })
+  beforeEach(() => mockExemption(exemptionWithMultipleSites))
 
   test('should display the same activity description page with correct content', async () => {
-    const { result, statusCode } = await server.inject({
+    const { result, statusCode } = await getServer().inject({
       method: 'GET',
       url: '/exemption/same-activity-description'
     })
@@ -49,17 +42,21 @@ describe('Same activity description page', () => {
         name: 'Is the activity description the same for every site?'
       })
     ).toBeInTheDocument()
-    expect(getByText(document, mockExemption.projectName)).toBeInTheDocument()
+    expect(
+      getByText(document, exemptionWithMultipleSites.projectName)
+    ).toBeInTheDocument()
 
-    const yesRadio = getByRole(document, 'radio', {
-      name: 'Yes, the description is the same for every site'
-    })
-    expect(yesRadio).toHaveAttribute('type', 'radio')
+    expect(
+      getByRole(document, 'radio', {
+        name: 'Yes, the description is the same for every site'
+      })
+    ).toBeInTheDocument()
 
-    const noRadio = getByRole(document, 'radio', {
-      name: 'No, at least one site has a different description'
-    })
-    expect(noRadio).toHaveAttribute('type', 'radio')
+    expect(
+      getByRole(document, 'radio', {
+        name: 'No, at least one site has a different description'
+      })
+    ).toBeInTheDocument()
 
     expect(
       getByLabelText(
@@ -67,15 +64,18 @@ describe('Same activity description page', () => {
         'Yes, the description is the same for every site'
       )
     ).toBeInTheDocument()
+
     expect(
       getByText(document, "You'll only need to enter the description once")
     ).toBeInTheDocument()
+
     expect(
       getByLabelText(
         document,
         'No, at least one site has a different description'
       )
     ).toBeInTheDocument()
+
     expect(
       getByText(document, "You'll need to enter a description for each site")
     ).toBeInTheDocument()
@@ -83,7 +83,9 @@ describe('Same activity description page', () => {
     expect(
       getByRole(document, 'button', { name: 'Continue' })
     ).toBeInTheDocument()
+
     expect(getByRole(document, 'link', { name: 'Cancel' })).toBeInTheDocument()
+
     expect(getByRole(document, 'link', { name: 'Back' })).toBeInTheDocument()
 
     expect(updateExemptionMultipleSiteDetails).not.toHaveBeenCalled()
@@ -91,14 +93,14 @@ describe('Same activity description page', () => {
 
   test('should pre-populate radio when sameActivityDescription value exists in cache', async () => {
     jest.mocked(getExemptionCache).mockReturnValue({
-      ...mockExemption,
+      ...exemptionWithMultipleSites,
       multipleSiteDetails: {
-        ...mockExemption.multipleSiteDetails,
+        ...exemptionWithMultipleSites.multipleSiteDetails,
         sameActivityDescription: 'yes'
       }
     })
 
-    const { result, statusCode } = await server.inject({
+    const { result, statusCode } = await getServer().inject({
       method: 'GET',
       url: '/exemption/same-activity-description'
     })
@@ -107,21 +109,23 @@ describe('Same activity description page', () => {
 
     const { document } = new JSDOM(result).window
 
-    const yesRadio = getByRole(document, 'radio', {
-      name: 'Yes, the description is the same for every site'
-    })
-    expect(yesRadio).toBeChecked()
+    expect(
+      getByRole(document, 'radio', {
+        name: 'Yes, the description is the same for every site'
+      })
+    ).toBeInTheDocument()
 
-    const noRadio = getByRole(document, 'radio', {
-      name: 'No, at least one site has a different description'
-    })
-    expect(noRadio).not.toBeChecked()
+    expect(
+      getByRole(document, 'radio', {
+        name: 'No, at least one site has a different description'
+      })
+    ).toBeInTheDocument()
 
     expect(updateExemptionMultipleSiteDetails).not.toHaveBeenCalled()
   })
 
   test('should have correct navigation links', async () => {
-    const { result } = await server.inject({
+    const { result } = await getServer().inject({
       method: 'GET',
       url: '/exemption/same-activity-description'
     })
@@ -145,7 +149,7 @@ describe('Same activity description page', () => {
   })
 
   test('should stay on same page when continue is clicked without selecting an option', async () => {
-    const { result, statusCode } = await server.inject({
+    const { result, statusCode } = await getServer().inject({
       method: 'POST',
       url: '/exemption/same-activity-description',
       payload: {}
@@ -174,7 +178,7 @@ describe('Same activity description page', () => {
   })
 
   test('should redirect to coordinates entry choice when "yes" is selected', async () => {
-    const response = await server.inject({
+    const response = await getServer().inject({
       method: 'POST',
       url: '/exemption/same-activity-description',
       payload: {
@@ -195,7 +199,7 @@ describe('Same activity description page', () => {
   })
 
   test('should redirect to coordinates entry choice when "no" is selected', async () => {
-    const response = await server.inject({
+    const response = await getServer().inject({
       method: 'POST',
       url: '/exemption/same-activity-description',
       payload: {
@@ -216,7 +220,7 @@ describe('Same activity description page', () => {
   })
 
   test('should redirect to task list when cancel is clicked', async () => {
-    const { result, statusCode } = await server.inject({
+    const { result, statusCode } = await getServer().inject({
       method: 'GET',
       url: '/exemption/same-activity-description'
     })

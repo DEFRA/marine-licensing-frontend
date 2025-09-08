@@ -103,6 +103,10 @@ describe('Page accessibility checks (Axe)', () => {
       url: routes.SAME_ACTIVITY_DATES,
       title: 'Are the activity dates the same for every site?'
     },
+    {
+      url: routes.SAME_ACTIVITY_DESCRIPTION,
+      title: 'Is the activity description the same for every site?'
+    },
     { url: routes.DASHBOARD, title: 'Your projects' },
     { url: routes.SITE_DETAILS, title: 'Site details' },
     {

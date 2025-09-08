@@ -14,8 +14,18 @@ export const activityDescriptionRoutes = [
     ...activityDescriptionController
   },
   {
+    method: 'GET',
+    path: routes.SITE_DETAILS_ACTIVITY_DESCRIPTION,
+    ...activityDescriptionController
+  },
+  {
     method: 'POST',
     path: routes.ACTIVITY_DESCRIPTION,
+    ...activityDescriptionSubmitController
+  },
+  {
+    method: 'POST',
+    path: routes.SITE_DETAILS_ACTIVITY_DESCRIPTION,
     ...activityDescriptionSubmitController
   }
 ]

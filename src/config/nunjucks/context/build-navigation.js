@@ -24,11 +24,12 @@ export const buildNavigation = async (request) => {
       href: accountManagementUrl
     })
   }
-
-  navigation.push({
-    text: 'Sign out',
-    href: routes.SIGN_OUT
-  })
+  if (authedUser) {
+    navigation.push({
+      text: 'Sign out',
+      href: routes.SIGN_OUT
+    })
+  }
 
   return navigation
 }

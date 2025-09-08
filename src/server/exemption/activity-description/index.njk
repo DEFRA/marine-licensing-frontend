@@ -13,6 +13,29 @@
 </nav>
 {% endblock %}
 
+{% set headingWithCaption %}
+    {% if projectName %}
+        <span class="govuk-caption-l">{{ projectName }}</span>
+    {% endif %}
+    {% if siteNumber %}
+      <span class="govuk-caption-l">Site {{ siteNumber }}</span>
+    {% endif %}
+    <h1 class="govuk-heading-l govuk-!-margin-bottom-0">Activity description</h1>
+{% endset %}
+
+
+{% set variableHintText %}
+  {% if isMultiSiteJourney %}
+    {% if siteNumber %} at this site{% else %} at all sites{% endif %}
+  {% endif %}
+{% endset %}
+
+{% set hintText %}
+    <p>Briefly describe what you'll do{{ variableHintText }}, how you'll do it, and why.</p>
+    <p>For example, 'Collect a 0.1 cubic metre seabed sample by day grab from a workboat for particle size analysis'.</p>
+{% endset %}
+
+
 {% set buttonText %}
   {% if isSiteDetailsFlow %}
     Continue
@@ -38,12 +61,11 @@
           value: payload.activityDescription,
           rows: 8,
           label: {
-            text: "Activity description",
-            classes: "govuk-label--l",
-            isPageHeading: true
+            html: headingWithCaption,
+            classes: "govuk-label--l"
           },
           hint: {
-            text: "Provide details about what you plan to do at this location"
+            html: hintText
           },
           errorMessage: errors['activityDescription']
         }) }}

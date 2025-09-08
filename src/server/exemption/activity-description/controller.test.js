@@ -74,10 +74,13 @@ describe('#activityDescriptionController', () => {
 
       expect(h.view).toHaveBeenCalledWith(ACTIVITY_DESCRIPTION_VIEW_ROUTE, {
         backLink: routes.TASK_LIST,
+        isMultiSiteJourney: false,
         isSiteDetailsFlow: false,
         pageTitle: 'Activity description',
         heading: 'Activity description',
-        payload: { activityDescription: undefined }
+        payload: { activityDescription: undefined },
+        projectName: undefined,
+        siteNumber: null
       })
 
       getExemptionCacheSpy.mockResolvedValueOnce(null)
@@ -89,10 +92,13 @@ describe('#activityDescriptionController', () => {
         ACTIVITY_DESCRIPTION_VIEW_ROUTE,
         {
           backLink: routes.TASK_LIST,
+          isMultiSiteJourney: false,
           isSiteDetailsFlow: false,
           pageTitle: 'Activity description',
           heading: 'Activity description',
-          payload: { activityDescription: undefined }
+          payload: { activityDescription: undefined },
+          projectName: undefined,
+          siteNumber: null
         }
       )
     })
@@ -115,10 +121,13 @@ describe('#activityDescriptionController', () => {
 
       expect(h.view).toHaveBeenCalledWith(ACTIVITY_DESCRIPTION_VIEW_ROUTE, {
         backLink: routes.SITE_DETAILS_ACTIVITY_DATES,
+        isMultiSiteJourney: false,
         isSiteDetailsFlow: true,
         pageTitle: 'Activity description',
         heading: 'Activity description',
-        payload: { activityDescription: 'Site activity description' }
+        payload: { activityDescription: 'Site activity description' },
+        projectName: undefined,
+        siteNumber: null
       })
     })
   })
@@ -268,6 +277,7 @@ describe('#activityDescriptionController', () => {
 
       expect(h.view).toHaveBeenCalledWith(ACTIVITY_DESCRIPTION_VIEW_ROUTE, {
         backLink: routes.TASK_LIST,
+        isMultiSiteJourney: false,
         isSiteDetailsFlow: false,
         errorSummary: [
           {
@@ -285,7 +295,9 @@ describe('#activityDescriptionController', () => {
         },
         heading: 'Activity description',
         pageTitle: 'Activity description',
-        payload: { activityDescription: '' }
+        payload: { activityDescription: '' },
+        projectName: undefined,
+        siteNumber: null
       })
 
       expect(h.view().takeover).toHaveBeenCalled()

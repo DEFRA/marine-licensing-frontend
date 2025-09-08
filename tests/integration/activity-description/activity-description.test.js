@@ -1,7 +1,12 @@
-import { getByRole, getByText, queryByRole } from '@testing-library/dom'
+import {
+  getByLabelText,
+  getByRole,
+  getByText,
+  queryByRole,
+  queryByText
+} from '@testing-library/dom'
 import { routes } from '~/src/server/common/constants/routes.js'
 import { exemptionNoActivityDescription } from '~/tests/integration/activity-description/fixtures.js'
-import { expectInputValue } from '~/tests/integration/shared/expect-utils.js'
 import {
   mockExemption,
   setupTestServer
@@ -27,11 +32,16 @@ describe('Activity description - page structure & accessibility', () => {
       name: 'Save and continue'
     })
 
-    expectInputValue({
-      document,
-      inputLabel: 'Activity description',
-      value: ''
+    const input = getByLabelText(document, `Activity description`, {
+      exact: false
     })
+    expect(input).toHaveValue('')
+
+    expect(
+      getByText(document, exemptionNoActivityDescription.projectName, {
+        exact: false
+      })
+    ).toBeInTheDocument()
 
     expect(
       getByRole(document, 'link', {
@@ -43,6 +53,13 @@ describe('Activity description - page structure & accessibility', () => {
       queryByRole(document, 'link', {
         name: 'Cancel'
       })
+    ).toBeInTheDocument()
+
+    expect(
+      getByText(
+        document,
+        `For example, 'Collect a 0.1 cubic metre seabed sample by day grab from a workboat for particle size analysis'.`
+      )
     ).toBeInTheDocument()
   })
 
@@ -64,18 +81,35 @@ describe('Activity description - page structure & accessibility', () => {
 
     const backLink = getByRole(document, 'link', { name: 'Back' })
     expect(backLink).toHaveAttribute('href', routes.SITE_DETAILS_ACTIVITY_DATES)
+
+    expect(queryByText(document, 'Site 1')).not.toBeInTheDocument()
+
+    expect(
+      getByText(
+        document,
+        `For example, 'Collect a 0.1 cubic metre seabed sample by day grab from a workboat for particle size analysis'.`
+      )
+    ).toBeInTheDocument()
+
+    expect(
+      getByText(
+        document,
+        `Briefly describe what you'll do, how you'll do it, and why.`
+      )
+    ).toBeInTheDocument()
   })
 
-  test('should have correct page content for multiple site journey', async () => {
-    const mockExemptionSingleSite = {
+  test('should have correct page content for multiple site journey with all sites the same', async () => {
+    const mockExemptionMultipleSite = {
       ...exemptionNoActivityDescription,
       siteDetails: {},
       multipleSiteDetails: {
-        multipleSitesEnabled: true
+        multipleSitesEnabled: true,
+        sameActivityDescription: 'yes'
       }
     }
 
-    mockExemption(mockExemptionSingleSite)
+    mockExemption(mockExemptionMultipleSite)
 
     const document = await loadPage({
       requestUrl: routes.SITE_DETAILS_ACTIVITY_DESCRIPTION,
@@ -85,13 +119,56 @@ describe('Activity description - page structure & accessibility', () => {
     const backLink = getByRole(document, 'link', { name: 'Back' })
     expect(backLink).toHaveAttribute('href', routes.SAME_ACTIVITY_DESCRIPTION)
 
+    expect(queryByText(document, 'Site 1')).not.toBeInTheDocument()
+
     expect(
       getByText(
         document,
-        'Provide details about what you plan to do at this location',
-        {
-          exact: false
-        }
+        `For example, 'Collect a 0.1 cubic metre seabed sample by day grab from a workboat for particle size analysis'.`
+      )
+    ).toBeInTheDocument()
+
+    expect(
+      getByText(
+        document,
+        `Briefly describe what you'll do at all sites, how you'll do it, and why.`
+      )
+    ).toBeInTheDocument()
+  })
+
+  test('should have correct page content for multiple site journey with variable answers', async () => {
+    const mockExemptionMultipleSite = {
+      ...exemptionNoActivityDescription,
+      siteDetails: {},
+      multipleSiteDetails: {
+        multipleSitesEnabled: true,
+        sameActivityDescription: 'no'
+      }
+    }
+
+    mockExemption(mockExemptionMultipleSite)
+
+    const document = await loadPage({
+      requestUrl: routes.SITE_DETAILS_ACTIVITY_DESCRIPTION,
+      server: getServer()
+    })
+
+    const backLink = getByRole(document, 'link', { name: 'Back' })
+    expect(backLink).toHaveAttribute('href', routes.SAME_ACTIVITY_DESCRIPTION)
+
+    expect(getByText(document, 'Site 1')).toBeInTheDocument()
+
+    expect(
+      getByText(
+        document,
+        `For example, 'Collect a 0.1 cubic metre seabed sample by day grab from a workboat for particle size analysis'.`
+      )
+    ).toBeInTheDocument()
+
+    expect(
+      getByText(
+        document,
+        `Briefly describe what you'll do at this site, how you'll do it, and why.`
       )
     ).toBeInTheDocument()
   })

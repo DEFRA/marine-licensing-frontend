@@ -11,7 +11,7 @@ import { routes } from '~/src/server/common/constants/routes.js'
 import { authenticatedPatchRequest } from '~/src/server/common/helpers/authenticated-requests.js'
 import joi from 'joi'
 import { getBackLink } from './utils.js'
-import { exemption } from '../index.js'
+import { getSiteNumber } from '~/src/server/exemption/site-details/utils/site-number.js'
 
 export const ACTIVITY_DESCRIPTION_VIEW_ROUTE =
   'exemption/activity-description/index'
@@ -34,11 +34,20 @@ const isPageInSiteDetailsFlow = (request) =>
 const getPageTemplateValues = (request) => {
   const siteDetailsFlow = isPageInSiteDetailsFlow(request)
   const exemption = getExemptionCache(request)
+  const siteNumber = getSiteNumber(exemption, request)
+
+  const { multipleSiteDetails } = exemption
+
+  const variableActivityDates =
+    multipleSiteDetails?.sameActivityDescription === 'no'
 
   return {
     ...templateValues,
+    isMultiSiteJourney: !!multipleSiteDetails?.multipleSitesEnabled,
     isSiteDetailsFlow: siteDetailsFlow,
-    backLink: getBackLink(exemption, siteDetailsFlow)
+    backLink: getBackLink(exemption, siteDetailsFlow),
+    projectName: exemption.projectName,
+    siteNumber: variableActivityDates ? siteNumber : null
   }
 }
 

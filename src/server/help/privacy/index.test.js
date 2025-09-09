@@ -12,7 +12,10 @@ describe('privacy route', () => {
     expect(server.route).toHaveBeenCalledWith([
       expect.objectContaining({
         method: 'GET',
-        path: '/help/privacy'
+        path: '/help/privacy',
+        options: {
+          auth: { strategy: 'defra-id', mode: 'try' }
+        }
       })
     ])
   })

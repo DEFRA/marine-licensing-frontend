@@ -38,7 +38,7 @@ const getPageTemplateValues = (request) => {
 
   const { multipleSiteDetails } = exemption
 
-  const variableActivityDates =
+  const variableActivityDescription =
     multipleSiteDetails?.sameActivityDescription === 'no'
 
   return {
@@ -47,7 +47,7 @@ const getPageTemplateValues = (request) => {
     isSiteDetailsFlow: siteDetailsFlow,
     backLink: getBackLink(exemption, siteDetailsFlow),
     projectName: exemption.projectName,
-    siteNumber: variableActivityDates ? siteNumber : null
+    siteNumber: variableActivityDescription ? siteNumber : null
   }
 }
 

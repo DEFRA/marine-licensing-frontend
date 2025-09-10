@@ -47,7 +47,7 @@ export const viewDetailsController = {
       const pageCaption = `${exemption.applicationReference} - Exempt activity notification`
 
       return h.view(VIEW_DETAILS_VIEW_ROUTE, {
-        pageTitle: 'View notification details',
+        pageTitle: exemption.projectName,
         pageCaption,
         backLink: routes.DASHBOARD,
         isReadOnly: true,

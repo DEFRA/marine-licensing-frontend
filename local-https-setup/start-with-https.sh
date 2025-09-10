@@ -1,5 +1,5 @@
 #!/bin/bash
-set -ex
+set -e
 
 # Script to start application with HTTPS support using nginx reverse proxy
 # This provides both HTTP and HTTPS access without port numbers

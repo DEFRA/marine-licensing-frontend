@@ -290,7 +290,7 @@ describe('Cookies page', () => {
         name: 'Go back to the previous page'
       })
       expect(returnLink).toBeInTheDocument()
-      expect(returnLink.getAttribute('href')).toBeTruthy()
+      expect(returnLink.getAttribute('href')).toBe('/exemption/site-name')
     })
   })
 

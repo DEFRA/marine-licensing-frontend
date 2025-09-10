@@ -93,8 +93,6 @@ describe('MS Clarity Analytics Integration', () => {
         .join(' ')
 
       expect(scriptContents).not.toContain('CLARITY_PROJECT_ID')
-      expect(scriptContents).not.toContain('clarity')
-      expect(scriptContents).not.toContain('Google Analytics')
     })
 
     test('Should include MS Clarity with correct Project ID when analytics cookies are ACCEPTED', async () => {

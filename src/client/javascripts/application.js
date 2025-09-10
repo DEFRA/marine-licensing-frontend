@@ -12,7 +12,6 @@ import {
 
 import { AddAnotherPoint } from './add-another-point/index.js'
 import { SiteDetailsMap } from './site-details-map/index.js'
-import { CookieSettings } from './cookies/index.js'
 
 createAll(Button)
 createAll(Checkboxes)
@@ -22,7 +21,25 @@ createAll(Radios)
 createAll(SkipLink)
 createAll(FileUpload)
 
+function syncClarityConsent() {
+  if (
+    window.clarity &&
+    typeof window.clarity === 'function' &&
+    typeof window.ANALYTICS_ENABLED === 'boolean'
+  ) {
+    try {
+      window.clarity('consent', window.ANALYTICS_ENABLED)
+    } catch {
+      // Silently handle Clarity consent errors
+    }
+  }
+}
+
 document.addEventListener('DOMContentLoaded', () => {
+  if (window.CLARITY_PROJECT_ID) {
+    Clarity.init(window.CLARITY_PROJECT_ID)
+  }
+
   const addAnotherElements = document.querySelectorAll(
     '[data-module="add-another-point"]'
   )
@@ -37,11 +54,5 @@ document.addEventListener('DOMContentLoaded', () => {
     new SiteDetailsMap(element) // eslint-disable-line no-new
   })
 
-  const cookieForm = document.querySelector('[data-module="cookie-settings"]')
-  if (cookieForm) {
-    new CookieSettings(cookieForm) // eslint-disable-line no-new
-  }
+  syncClarityConsent()
 })
-if (window.CLARITY_PROJECT_ID) {
-  Clarity.init(window.CLARITY_PROJECT_ID)
-}

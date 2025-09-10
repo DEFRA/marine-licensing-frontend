@@ -226,7 +226,7 @@
 
       <h2 class="govuk-heading-l">Change your cookie settings</h2>
 
-      <form method="post" novalidate data-module="cookie-settings">
+      <form method="post" novalidate>
         <input type="hidden" name="csrfToken" value="{{ csrfToken }}">
         {{ govukRadios({
           name: "analytics",

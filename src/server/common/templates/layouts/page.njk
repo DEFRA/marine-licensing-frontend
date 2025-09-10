@@ -16,6 +16,7 @@
   {% if analyticsEnabled %}
     <script>
       window.CLARITY_PROJECT_ID = "{{ clarityProjectId | default('') }}";
+      window.ANALYTICS_ENABLED = {{ analyticsEnabled | dump }};
     </script>
   {% endif %}
 

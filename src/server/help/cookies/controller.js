@@ -137,7 +137,8 @@ export const cookiesSubmitController = {
         isSameSite: 'Strict'
       }
 
-      // not allowed.  Invalid cookie data causes Defra ID stub to break.
+      // Whitespace, commas and semi-colons are not allowed in cookie data. Invalid cookie data causes Defra ID stub to break
+      // so here it must be base64 encoded to be acceptable.
       const cookieOptionsB64 = {
         ...cookieOptions,
         encoding: 'base64json'

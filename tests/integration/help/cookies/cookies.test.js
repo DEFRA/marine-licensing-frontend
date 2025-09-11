@@ -237,6 +237,44 @@ describe('Cookies page', () => {
         expectCookiesInResponse(response)
       })
     })
+
+    test('Should show validation error when no radio button selected', async () => {
+      const response = await getServer().inject({
+        method: 'POST',
+        url: '/help/cookies',
+        payload: 'csrfToken=',
+        headers: {
+          'content-type': 'application/x-www-form-urlencoded'
+        }
+      })
+
+      expect(response.statusCode).toBe(statusCodes.ok)
+
+      const { document } = new JSDOM(response.result).window
+
+      const errorSummary = document.querySelector('.govuk-error-summary')
+      expect(errorSummary).toBeInTheDocument()
+
+      const errorLink = getByRole(errorSummary, 'link', {
+        name: 'Select yes if you want to accept analytics cookies'
+      })
+      expect(errorLink).toBeInTheDocument()
+      expect(errorLink).toHaveAttribute('href', '#analytics')
+
+      const errorMessage = document.querySelector('.govuk-error-message')
+      expect(errorMessage).toBeInTheDocument()
+      expect(errorMessage).toHaveTextContent(
+        'Error: Select yes if you want to accept analytics cookies'
+      )
+
+      const analyticsFormGroup = document.querySelector('#analytics')
+      expect(analyticsFormGroup).toBeInTheDocument()
+
+      const yesRadio = getByRole(document, 'radio', { name: 'Yes' })
+      const noRadio = getByRole(document, 'radio', { name: 'No' })
+      expect(yesRadio).not.toBeChecked()
+      expect(noRadio).not.toBeChecked()
+    })
   })
 
   describe('Cookie preferences functionality', () => {

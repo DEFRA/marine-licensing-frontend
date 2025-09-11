@@ -112,6 +112,10 @@ describe('Page accessibility checks (Axe)', () => {
     {
       url: routes.PRIVACY,
       title: 'Privacy notice – Get permission for marine work'
+    },
+    {
+      url: routes.COOKIES,
+      title: 'Cookies on Get permission for marine work'
     }
   ]
 

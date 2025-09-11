@@ -28,12 +28,3 @@ export function areAnalyticsCookiesAccepted(request) {
   const preferences = getCookiePreferences(request)
   return preferences.analytics === true
 }
-
-/**
- * Check if user has made cookie preferences choice
- * @param {object} request - Hapi request object
- * @returns {boolean} True if user has made a choice
- */
-export function hasUserMadeCookieChoice(request) {
-  return request.state?.cookies_preferences_set === 'true'
-}

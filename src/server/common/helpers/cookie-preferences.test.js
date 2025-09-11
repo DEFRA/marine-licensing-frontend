@@ -1,7 +1,6 @@
 import {
   getCookiePreferences,
-  areAnalyticsCookiesAccepted,
-  hasUserMadeCookieChoice
+  areAnalyticsCookiesAccepted
 } from './cookie-preferences.js'
 
 const DEFAULT_PREFERENCES = {
@@ -152,76 +151,11 @@ describe('cookie-preferences', () => {
     })
   })
 
-  describe('hasUserMadeCookieChoice', () => {
-    const createRequestWithPreferences = (cookiesPreferencesSet) => ({
-      state: { cookies_preferences_set: cookiesPreferencesSet }
-    })
-
-    it('should return true when cookies_preferences_set is "true"', () => {
-      expect(
-        hasUserMadeCookieChoice(createRequestWithPreferences('true'))
-      ).toBe(true)
-    })
-
-    const falseTestCases = [
-      {
-        name: 'cookies_preferences_set is "false"',
-        request: createRequestWithPreferences('false')
-      },
-      {
-        name: 'cookies_preferences_set is undefined',
-        request: createRequestWithPreferences(undefined)
-      },
-      { name: 'state is empty object', request: createMockRequest({}) },
-      { name: 'state is null', request: createMockRequest(null) },
-      { name: 'state is undefined', request: createMockRequest(undefined) },
-      {
-        name: 'cookies_preferences_set is null',
-        request: createRequestWithPreferences(null)
-      },
-      { name: 'no state property', request: {} }
-    ]
-
-    falseTestCases.forEach(({ name, request }) => {
-      it(`should return false when ${name}`, () => {
-        expect(hasUserMadeCookieChoice(request)).toBe(false)
-      })
-    })
-
-    it('should return false for boolean true instead of string "true"', () => {
-      expect(hasUserMadeCookieChoice(createRequestWithPreferences(true))).toBe(
-        false
-      )
-    })
-
-    it('should return false for various non-"true" values', () => {
-      const nonTrueValues = [
-        1,
-        'yes',
-        'TRUE',
-        'True',
-        [],
-        {},
-        false,
-        0,
-        '',
-        NaN
-      ]
-
-      nonTrueValues.forEach((value) => {
-        expect(
-          hasUserMadeCookieChoice(createRequestWithPreferences(value))
-        ).toBe(false)
-      })
-    })
-  })
-
   describe('integration scenarios', () => {
     describe('complete user workflow', () => {
       it('should handle fresh user with no cookies', () => {
         const mockRequest = { state: {} }
 
-        expect(hasUserMadeCookieChoice(mockRequest)).toBe(false)
         expect(areAnalyticsCookiesAccepted(mockRequest)).toBe(false)
         expect(getCookiePreferences(mockRequest)).toEqual({
           essential: true,
@@ -242,7 +176,6 @@ describe('cookie-preferences', () => {
           }
         }
 
-        expect(hasUserMadeCookieChoice(mockRequest)).toBe(true)
         expect(areAnalyticsCookiesAccepted(mockRequest)).toBe(true)
         expect(getCookiePreferences(mockRequest)).toEqual({
           essential: true,
@@ -263,7 +196,6 @@ describe('cookie-preferences', () => {
           }
         }
 
-        expect(hasUserMadeCookieChoice(mockRequest)).toBe(true)
         expect(areAnalyticsCookiesAccepted(mockRequest)).toBe(false)
         expect(getCookiePreferences(mockRequest)).toEqual({
           essential: true,
@@ -281,7 +213,6 @@ describe('cookie-preferences', () => {
           }
         }
 
-        expect(hasUserMadeCookieChoice(mockRequest)).toBe(true)
         expect(areAnalyticsCookiesAccepted(mockRequest)).toBe(false)
         expect(getCookiePreferences(mockRequest)).toEqual({
           essential: true,
@@ -301,7 +232,6 @@ describe('cookie-preferences', () => {
           }
         }
 
-        expect(hasUserMadeCookieChoice(mockRequest)).toBe(false)
         expect(areAnalyticsCookiesAccepted(mockRequest)).toBe(true)
         expect(getCookiePreferences(mockRequest)).toEqual({
           essential: true,

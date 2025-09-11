@@ -81,7 +81,7 @@ export const mockPolygonCoordinatesOSGB36 = [
 ]
 
 const baseExpectedContent = {
-  pageTitle: 'View notification details',
+  pageTitle: 'Test Marine Activity Project',
   pageCaption: 'EXE/2025/00003 - Exempt activity notification',
   backLinkText: 'Back',
   backLinkHref: '/home',

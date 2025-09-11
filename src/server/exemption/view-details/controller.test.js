@@ -248,7 +248,7 @@ describe('view details controller', () => {
         expect(mockH.view).toHaveBeenCalledWith(
           VIEW_DETAILS_VIEW_ROUTE,
           expect.objectContaining({
-            pageTitle: 'View notification details',
+            pageTitle: submittedExemption.projectName,
             pageCaption: 'EXE/2025/00003 - Exempt activity notification',
             backLink: '/home',
             isReadOnly: true,

@@ -1,10 +1,10 @@
 import Boom from '@hapi/boom'
-import { routes } from '~/src/server/common/constants/routes.js'
-import { createSiteDetailsDataJson } from '~/src/server/common/helpers/site-details.js'
-import { processSiteDetails } from '~/src/server/common/helpers/exemption-site-details.js'
 import { errorMessages } from '~/src/server/common/constants/error-messages.js'
-import { getExemptionService } from '~/src/services/exemption-service/index.js'
 import { EXEMPTION_STATUS } from '~/src/server/common/constants/exemptions.js'
+import { routes } from '~/src/server/common/constants/routes.js'
+import { processSiteDetails } from '~/src/server/common/helpers/exemption-site-details.js'
+import { createSiteDetailsDataJson } from '~/src/server/common/helpers/site-details.js'
+import { getExemptionService } from '~/src/services/exemption-service/index.js'
 
 export const VIEW_DETAILS_VIEW_ROUTE = 'exemption/view-details/index'
 
@@ -47,7 +47,7 @@ export const viewDetailsController = {
       const pageCaption = `${exemption.applicationReference} - Exempt activity notification`
 
       return h.view(VIEW_DETAILS_VIEW_ROUTE, {
-        pageTitle: 'View notification details',
+        pageTitle: exemption.projectName,
         pageCaption,
         backLink: routes.DASHBOARD,
         isReadOnly: true,

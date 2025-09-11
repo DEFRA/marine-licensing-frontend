@@ -190,10 +190,7 @@ describe('Cookies Controller', () => {
     })
 
     it('should have correct auth strategy configuration', () => {
-      expect(cookiesController.options.auth).toEqual({
-        strategy: 'session',
-        mode: 'try'
-      })
+      expect(cookiesController.options.auth).toBe(false)
     })
   })
 
@@ -328,9 +325,8 @@ describe('Cookies Controller', () => {
     })
 
     describe('controller options', () => {
-      it('should have correct auth strategy configuration', () => {
-        expect(cookiesSubmitController.options.auth.strategy).toBe('session')
-        expect(cookiesSubmitController.options.auth.mode).toBe('try')
+      it('should have correct auth configuration', () => {
+        expect(cookiesSubmitController.options.auth).toBe(false)
       })
 
       it('should not have crumb protection disabled', () => {

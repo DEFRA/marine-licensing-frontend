@@ -26,10 +26,7 @@ const EXCLUDED_REFERRER_PATHS = [routes.COOKIES]
  */
 export const cookiesController = {
   options: {
-    auth: {
-      strategy: 'session',
-      mode: 'try'
-    }
+    auth: false
   },
   handler(request, h) {
     const preferences = getCookiePreferences(request)
@@ -64,10 +61,7 @@ export const cookiesController = {
  */
 export const cookiesSubmitController = {
   options: {
-    auth: {
-      strategy: 'session',
-      mode: 'try'
-    },
+    auth: false,
     validate: {
       payload: joi.object({
         csrfToken: joi.string().allow(''),

@@ -10,6 +10,7 @@ import {
   clearStoredReferrer
 } from '~/src/server/common/helpers/referrer-validation.js'
 import { getCookiePreferences } from '~/src/server/common/helpers/cookie-preferences.js'
+import { routes } from '~/src/server/common/constants/routes.js'
 
 const COOKIES_VIEW_ROUTE = 'help/cookies/index'
 
@@ -17,7 +18,7 @@ const cookiesPageSettings = {
   pageTitle: 'Cookies on Get permission for marine work'
 }
 
-const EXCLUDED_REFERRER_PATHS = ['/help/cookies']
+const EXCLUDED_REFERRER_PATHS = [routes.COOKIES]
 
 /**
  * Cookies page GET controller
@@ -35,7 +36,7 @@ export const cookiesController = {
     const referer = request.headers.referer
     const showSuccessBanner = request.query.success === 'true'
 
-    if (referer && !referer.includes('/help/cookies')) {
+    if (referer && !referer.includes(routes.COOKIES)) {
       storeReferrer(request, referer, EXCLUDED_REFERRER_PATHS)
     }
 

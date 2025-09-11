@@ -127,7 +127,7 @@ export const cookiesSubmitController = {
         timestamp
       }
 
-      const response = h.redirect('/help/cookies?success=true')
+      const response = h.redirect(`${routes.COOKIES}?success=true`)
 
       // Cookie options: 1 year expiry, site-wide path, secure in production
       const cookieOptions = {

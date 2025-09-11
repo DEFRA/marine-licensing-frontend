@@ -25,16 +25,8 @@
       .hide-if-no-js {display:none !important;}
     </style>
   </noscript>
-  
-{% endblock %}
 
-{% set navigationLinks = navigation %}
-{% if isAuthenticated %}
-  {% set navigationLinks = navigation.concat({
-        text: 'Sign out',
-        href: signOutUrl
-  }) %}
-{% endif %}
+{% endblock %}
 
 {% block header %}
   {{ govukHeader({

@@ -42,7 +42,7 @@ export async function context(request) {
     navigation,
     isAuthenticated,
     analyticsEnabled,
-    clarityProjectId: analyticsEnabled ? config.get('clarityProjectId') : '',
+    clarityProjectId: config.get('clarityProjectId'),
     /**
      * @param {string} asset
      */

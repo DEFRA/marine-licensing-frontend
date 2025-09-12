@@ -38,6 +38,7 @@ function syncClarityConsent() {
 document.addEventListener('DOMContentLoaded', () => {
   if (window.CLARITY_PROJECT_ID) {
     Clarity.init(window.CLARITY_PROJECT_ID)
+    syncClarityConsent()
   }
 
   const addAnotherElements = document.querySelectorAll(
@@ -53,6 +54,4 @@ document.addEventListener('DOMContentLoaded', () => {
   mapElements.forEach((element) => {
     new SiteDetailsMap(element) // eslint-disable-line no-new
   })
-
-  syncClarityConsent()
 })

@@ -67,8 +67,21 @@ describe('MS Clarity Analytics Integration', () => {
     return match ? match[1] : null
   }
 
+  const getAnalyticsEnabled = (document) => {
+    const scripts = Array.from(document.querySelectorAll('script'))
+    const clarityScript = scripts.find((script) =>
+      script.textContent?.includes('window.ANALYTICS_ENABLED')
+    )
+    if (!clarityScript) return null
+
+    const match = clarityScript.textContent.match(
+      /window\.ANALYTICS_ENABLED\s*=\s*(true|false)/
+    )
+    return match ? match[1] === 'true' : null
+  }
+
   describe('Cookies page analytics integration', () => {
-    test('Should NOT include MS Clarity when analytics cookies are REJECTED', async () => {
+    test('Should include MS Clarity when analytics cookies are REJECTED (to allow consent withdrawal)', async () => {
       const { result, statusCode } = await getServer().inject({
         method: 'GET',
         url: '/help/cookies',
@@ -81,18 +94,12 @@ describe('MS Clarity Analytics Integration', () => {
 
       const { document } = new JSDOM(result).window
 
-      expect(checkClarityScript(document)).toBe(false)
+      // Clarity should be present to handle consent withdrawal
+      expect(checkClarityScript(document)).toBe(true)
+      expect(getClarityProjectId(document)).toBe('test-clarity-id-123')
 
-      expect(getClarityProjectId(document)).toBeNull()
-
-      // Verify no analytics-related scripts are included
-      const scripts = Array.from(document.querySelectorAll('script'))
-      const scriptContents = scripts
-        .filter((script) => script.textContent)
-        .map((script) => script.textContent)
-        .join(' ')
-
-      expect(scriptContents).not.toContain('CLARITY_PROJECT_ID')
+      // Analytics should be disabled in the context
+      expect(getAnalyticsEnabled(document)).toBe(false)
     })
 
     test('Should include MS Clarity with correct Project ID when analytics cookies are ACCEPTED', async () => {
@@ -113,7 +120,7 @@ describe('MS Clarity Analytics Integration', () => {
       expect(projectId).toBe(CLARITY_PROJECT_ID)
     })
 
-    test('Should NOT include MS Clarity by default (no cookie preference)', async () => {
+    test('Should include MS Clarity by default (no cookie preference) to handle initial consent', async () => {
       const { result, statusCode } = await getServer().inject({
         method: 'GET',
         url: '/help/cookies'
@@ -122,7 +129,13 @@ describe('MS Clarity Analytics Integration', () => {
       expect(statusCode).toBe(statusCodes.ok)
 
       const { document } = new JSDOM(result).window
-      expect(checkClarityScript(document)).toBe(false)
+
+      // Clarity should be present to handle initial consent setting
+      expect(checkClarityScript(document)).toBe(true)
+      expect(getClarityProjectId(document)).toBe('test-clarity-id-123')
+
+      // Analytics should be disabled by default
+      expect(getAnalyticsEnabled(document)).toBe(false)
     })
 
     test('Should handle empty CLARITY_PROJECT_ID gracefully', async () => {
@@ -146,9 +159,8 @@ describe('MS Clarity Analytics Integration', () => {
 
       const { document } = new JSDOM(result).window
 
-      // Script should still be present but with empty project ID
-      expect(checkClarityScript(document)).toBe(true)
-      expect(getClarityProjectId(document)).toBe('')
+      // Script should not be present when project ID is empty
+      expect(checkClarityScript(document)).toBe(false)
     })
 
     test('Should handle missing CLARITY_PROJECT_ID config', async () => {
@@ -173,22 +185,23 @@ describe('MS Clarity Analytics Integration', () => {
 
       const { document } = new JSDOM(result).window
 
-      // Script should still be present but project ID should be empty string
-      expect(checkClarityScript(document)).toBe(true)
-      expect(getClarityProjectId(document)).toBe('')
+      // Script should not be present when project ID is undefined
+      expect(checkClarityScript(document)).toBe(false)
     })
   })
 
   describe('Cookie preference workflow', () => {
-    test('Should dynamically include/exclude MS Clarity based on preference changes', async () => {
-      // First request: No cookies, should not include Clarity
+    test('Should include MS Clarity with correct analytics state throughout preference workflow', async () => {
+      // First request: No cookies, should include Clarity with analytics disabled
       const firstResponse = await getServer().inject({
         method: 'GET',
         url: '/help/cookies'
       })
 
       let document = new JSDOM(firstResponse.result).window.document
-      expect(checkClarityScript(document)).toBe(false)
+      expect(checkClarityScript(document)).toBe(true)
+      expect(getClarityProjectId(document)).toBe('test-clarity-id-123')
+      expect(getAnalyticsEnabled(document)).toBe(false)
 
       // Accept analytics cookies
       const acceptResponse = await getServer().inject({
@@ -208,7 +221,7 @@ describe('MS Clarity Analytics Integration', () => {
         ? setCookieHeaders.join('; ')
         : setCookieHeaders
 
-      // Second request: With analytics accepted, should include Clarity
+      // Second request: With analytics accepted, should include Clarity with analytics enabled
       const secondResponse = await getServer().inject({
         method: 'GET',
         url: '/help/cookies',
@@ -220,6 +233,7 @@ describe('MS Clarity Analytics Integration', () => {
       document = new JSDOM(secondResponse.result).window.document
       expect(checkClarityScript(document)).toBe(true)
       expect(getClarityProjectId(document)).toBe(CLARITY_PROJECT_ID)
+      expect(getAnalyticsEnabled(document)).toBe(true)
 
       // Reject analytics cookies
       const rejectResponse = await getServer().inject({
@@ -239,7 +253,7 @@ describe('MS Clarity Analytics Integration', () => {
         ? rejectResponse.headers['set-cookie'].join('; ')
         : rejectResponse.headers['set-cookie']
 
-      // Third request: With analytics rejected, should not include Clarity
+      // Third request: With analytics rejected, should still include Clarity but with analytics disabled
       const thirdResponse = await getServer().inject({
         method: 'GET',
         url: '/help/cookies',
@@ -249,13 +263,15 @@ describe('MS Clarity Analytics Integration', () => {
       })
 
       document = new JSDOM(thirdResponse.result).window.document
-      expect(checkClarityScript(document)).toBe(false)
+      expect(checkClarityScript(document)).toBe(true)
+      expect(getClarityProjectId(document)).toBe(CLARITY_PROJECT_ID)
+      expect(getAnalyticsEnabled(document)).toBe(false)
     })
   })
 
   describe('Other pages with analytics', () => {
-    test('Should respect analytics preferences on privacy page', async () => {
-      // Test with analytics rejected
+    test('Should include MS Clarity with correct analytics state on privacy page', async () => {
+      // Test with analytics rejected - Clarity should be present but analytics disabled
       let response = await getServer().inject({
         method: 'GET',
         url: '/help/privacy',
@@ -266,9 +282,11 @@ describe('MS Clarity Analytics Integration', () => {
 
       expect(response.statusCode).toBe(statusCodes.ok)
       let document = new JSDOM(response.result).window.document
-      expect(checkClarityScript(document)).toBe(false)
+      expect(checkClarityScript(document)).toBe(true)
+      expect(getClarityProjectId(document)).toBe('test-clarity-id-123')
+      expect(getAnalyticsEnabled(document)).toBe(false)
 
-      // Test with analytics accepted
+      // Test with analytics accepted - Clarity should be present with analytics enabled
       response = await getServer().inject({
         method: 'GET',
         url: '/help/privacy',
@@ -281,6 +299,7 @@ describe('MS Clarity Analytics Integration', () => {
       document = new JSDOM(response.result).window.document
       expect(checkClarityScript(document)).toBe(true)
       expect(getClarityProjectId(document)).toBe(CLARITY_PROJECT_ID)
+      expect(getAnalyticsEnabled(document)).toBe(true)
     })
   })
 })

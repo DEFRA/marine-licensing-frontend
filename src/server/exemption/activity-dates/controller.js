@@ -23,6 +23,7 @@ import {
   setExemptionCache,
   updateExemptionSiteDetails
 } from '~/src/server/common/helpers/session-cache/utils.js'
+import { getSiteDetailsBySite } from '~/src/server/common/helpers/session-cache/site-utils.js'
 import { activityDatesSchema } from '~/src/server/common/schemas/date.js'
 import { getSiteNumber } from '~/src/server/exemption/site-details/utils/site-number.js'
 import { getNextRoute } from './utils.js'
@@ -40,12 +41,12 @@ const createTemplateData = (request, exemption, payload = null) => {
   } else {
     const startDateFields = createDateFieldsFromValue(
       isInSiteDetailsFlow
-        ? exemption.siteDetails.activityDates?.start
+        ? getSiteDetailsBySite(exemption).activityDates?.start
         : exemption.activityDates?.start
     )
     const endDateFields = createDateFieldsFromValue(
       isInSiteDetailsFlow
-        ? exemption.siteDetails.activityDates?.end
+        ? getSiteDetailsBySite(exemption)?.activityDates?.end
         : exemption.activityDates?.end
     )
 
@@ -153,7 +154,7 @@ export const activityDatesSubmitController = {
       const isInSiteDetailsFlow = isPageInSiteDetailsFlow(request)
 
       if (isInSiteDetailsFlow) {
-        updateExemptionSiteDetails(request, 'activityDates', {
+        updateExemptionSiteDetails(request, 0, 'activityDates', {
           start,
           end
         })

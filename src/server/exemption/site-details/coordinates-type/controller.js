@@ -2,6 +2,7 @@ import {
   getExemptionCache,
   updateExemptionSiteDetails
 } from '~/src/server/common/helpers/session-cache/utils.js'
+import { getSiteDetailsBySite } from '~/src/server/common/helpers/session-cache/site-utils.js'
 import {
   errorDescriptionByFieldName,
   mapErrorsForDisplay
@@ -30,8 +31,7 @@ export const errorMessages = {
 export const coordinatesTypeController = {
   handler(request, h) {
     const exemption = getExemptionCache(request)
-
-    const siteDetails = exemption.siteDetails ?? {}
+    const siteDetails = getSiteDetailsBySite(exemption)
 
     return h.view(PROVIDE_COORDINATES_CHOICE_VIEW_ROUTE, {
       ...provideCoordinatesSettings,
@@ -100,6 +100,7 @@ export const coordinatesTypeSubmitController = {
 
     updateExemptionSiteDetails(
       request,
+      0,
       'coordinatesType',
       payload.coordinatesType
     )

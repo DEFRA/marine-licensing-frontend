@@ -54,7 +54,7 @@ describe('#fileUpload', () => {
   ) => {
     getExemptionCacheSpy.mockReturnValue({
       ...mockExemption,
-      siteDetails: { fileUploadType, ...additionalSiteDetails }
+      siteDetails: [{ fileUploadType, ...additionalSiteDetails }]
     })
   }
 
@@ -117,7 +117,7 @@ describe('#fileUpload', () => {
         // Given - No file type selected
         getExemptionCacheSpy.mockReturnValue({
           ...mockExemption,
-          siteDetails: {}
+          siteDetails: [{}]
         })
 
         // When
@@ -187,6 +187,7 @@ describe('#fileUpload', () => {
         // Then - Should store upload config in session
         expect(updateExemptionSiteDetailsSpy).toHaveBeenCalledWith(
           mockRequest,
+          0,
           'uploadConfig',
           {
             uploadId: 'test-upload-id',
@@ -202,14 +203,16 @@ describe('#fileUpload', () => {
         // Given - Error stored in session from previous upload attempt
         getExemptionCacheSpy.mockReturnValue({
           ...mockExemption,
-          siteDetails: {
-            fileUploadType: 'kml',
-            uploadError: {
-              message: 'The selected file contains a virus',
-              fieldName: 'file',
-              fileType: 'kml'
+          siteDetails: [
+            {
+              fileUploadType: 'kml',
+              uploadError: {
+                message: 'The selected file contains a virus',
+                fieldName: 'file',
+                fileType: 'kml'
+              }
             }
-          }
+          ]
         })
 
         mockCdpService.initiate.mockResolvedValue({
@@ -242,6 +245,7 @@ describe('#fileUpload', () => {
 
         expect(updateExemptionSiteDetailsSpy).toHaveBeenCalledWith(
           mockRequest,
+          0,
           'uploadError',
           null
         )
@@ -260,7 +264,7 @@ describe('#fileUpload', () => {
         // Given - CDP service fails to initialize
         getExemptionCacheSpy.mockReturnValue({
           ...mockExemption,
-          siteDetails: { fileUploadType: 'kml' }
+          siteDetails: [{ fileUploadType: 'kml' }]
         })
 
         mockCdpService.initiate.mockRejectedValue(
@@ -289,14 +293,16 @@ describe('#fileUpload', () => {
         // Given - File already uploaded, and no uploadError
         getExemptionCacheSpy.mockReturnValue({
           ...mockExemption,
-          siteDetails: {
-            fileUploadType: 'kml',
-            uploadError: null,
-            uploadedFile: {
-              filename: 'test.kml',
-              fileSize: 1024
+          siteDetails: [
+            {
+              fileUploadType: 'kml',
+              uploadError: null,
+              uploadedFile: {
+                filename: 'test.kml',
+                fileSize: 1024
+              }
             }
-          }
+          ]
         })
         // When
         await fileUploadController.handler(mockRequest, mockH)
@@ -310,7 +316,7 @@ describe('#fileUpload', () => {
         // Given
         getExemptionCacheSpy.mockReturnValue({
           ...mockExemption,
-          siteDetails: { fileUploadType: 'kml' }
+          siteDetails: [{ fileUploadType: 'kml' }]
         })
 
         mockCdpService.initiate.mockResolvedValue({
@@ -337,7 +343,7 @@ describe('#fileUpload', () => {
         // Given - No file uploaded, showing upload form
         getExemptionCacheSpy.mockReturnValue({
           ...mockExemption,
-          siteDetails: { fileUploadType: 'kml' }
+          siteDetails: [{ fileUploadType: 'kml' }]
         })
 
         mockCdpService.initiate.mockResolvedValue({
@@ -402,18 +408,20 @@ describe('#fileUpload', () => {
       // Given - Both uploaded file and error present (error should take precedence)
       getExemptionCacheSpy.mockReturnValue({
         ...mockExemption,
-        siteDetails: {
-          fileUploadType: 'kml',
-          uploadedFile: {
-            filename: 'test.kml',
-            fileSize: 1024
-          },
-          uploadError: {
-            message: 'The selected file contains a virus',
-            fieldName: 'file',
-            fileType: 'kml'
+        siteDetails: [
+          {
+            fileUploadType: 'kml',
+            uploadedFile: {
+              filename: 'test.kml',
+              fileSize: 1024
+            },
+            uploadError: {
+              message: 'The selected file contains a virus',
+              fieldName: 'file',
+              fileType: 'kml'
+            }
           }
-        }
+        ]
       })
 
       mockCdpService.initiate.mockResolvedValue({
@@ -440,7 +448,7 @@ describe('#fileUpload', () => {
       // Given - Unknown file type
       getExemptionCacheSpy.mockReturnValue({
         ...mockExemption,
-        siteDetails: { fileUploadType: 'unknown' }
+        siteDetails: [{ fileUploadType: 'unknown' }]
       })
 
       mockCdpService.initiate.mockResolvedValue({
@@ -524,7 +532,7 @@ describe('#fileUpload', () => {
     const setupMutationTest = async (siteDetails, shouldMockCdp = true) => {
       getExemptionCacheSpy.mockReturnValue({
         ...mockExemption,
-        siteDetails
+        siteDetails: [siteDetails]
       })
       if (shouldMockCdp) {
         mockCdpService.initiate.mockResolvedValue(createStandardUploadConfig())

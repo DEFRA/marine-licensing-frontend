@@ -145,17 +145,19 @@ export const validateSiteDetails = (document, expectedPageContent) => {
   expect(siteCard).toBeTruthy()
 
   // Validate basic site details if present
-  if (expectedPageContent.siteDetails) {
-    Object.entries(expectedPageContent.siteDetails).forEach(([key, value]) => {
-      const rows = siteCard.querySelectorAll('.govuk-summary-list__row')
-      const row = Array.from(rows).find((row) => {
-        const keyElement = row.querySelector('.govuk-summary-list__key')
-        return keyElement && keyElement.textContent.trim() === key
-      })
-      expect(row).toBeTruthy()
-      const valueElement = row.querySelector('.govuk-summary-list__value')
-      expect(valueElement.textContent.trim()).toBe(value)
-    })
+  if (expectedPageContent.siteDetails.length) {
+    Object.entries(expectedPageContent.siteDetails[0]).forEach(
+      ([key, value]) => {
+        const rows = siteCard.querySelectorAll('.govuk-summary-list__row')
+        const row = Array.from(rows).find((row) => {
+          const keyElement = row.querySelector('.govuk-summary-list__key')
+          return keyElement && keyElement.textContent.trim() === key
+        })
+        expect(row).toBeTruthy()
+        const valueElement = row.querySelector('.govuk-summary-list__value')
+        expect(valueElement.textContent.trim()).toBe(value)
+      }
+    )
   }
 
   // Validate extended site details (coordinate points) if present

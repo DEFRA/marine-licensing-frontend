@@ -64,7 +64,7 @@ const createMockStatusResponse = (status, overrides = {}) => ({
 
 const createMockExemption = (overrides = {}) => ({
   projectName: 'Test Project',
-  siteDetails: { uploadConfig: createMockUploadConfig() },
+  siteDetails: [{ uploadConfig: createMockUploadConfig() }],
   ...overrides
 })
 
@@ -184,7 +184,7 @@ const expectRejectedStatusHandling = async (
   // Given exemption with upload config and rejected status
   getExemptionCacheSpy.mockReturnValue(
     createMockExemption({
-      siteDetails: { uploadConfig: createMockUploadConfig({ fileType }) }
+      siteDetails: [{ uploadConfig: createMockUploadConfig({ fileType }) }]
     })
   )
   mockCdpService.getStatus.mockResolvedValue({
@@ -200,6 +200,7 @@ const expectRejectedStatusHandling = async (
   // Then expected error handling occurs
   expect(updateExemptionSiteDetailsSpy).toHaveBeenCalledWith(
     mockRequest,
+    0,
     'uploadError',
     {
       message: expectedErrorMessage,
@@ -209,6 +210,7 @@ const expectRejectedStatusHandling = async (
   )
   expect(updateExemptionSiteDetailsSpy).toHaveBeenCalledWith(
     mockRequest,
+    0,
     'uploadConfig',
     null
   )
@@ -229,7 +231,7 @@ const expectFileValidationFailure = async (
   // Given exemption with upload config and ready status
   getExemptionCacheSpy.mockReturnValue(
     createMockExemption({
-      siteDetails: { uploadConfig: createMockUploadConfig({ fileType }) }
+      siteDetails: [{ uploadConfig: createMockUploadConfig({ fileType }) }]
     })
   )
 
@@ -257,6 +259,7 @@ const expectFileValidationFailure = async (
   // And error handling occurs
   expect(updateExemptionSiteDetailsSpy).toHaveBeenCalledWith(
     mockRequest,
+    0,
     'uploadError',
     {
       message: errorMessage,
@@ -266,6 +269,7 @@ const expectFileValidationFailure = async (
   )
   expect(updateExemptionSiteDetailsSpy).toHaveBeenCalledWith(
     mockRequest,
+    0,
     'uploadConfig',
     null
   )
@@ -457,7 +461,7 @@ describe('#uploadAndWait', () => {
           })
           getExemptionCacheSpy.mockReturnValue(
             createMockExemption({
-              siteDetails: { uploadConfig: shapefileUploadConfig }
+              siteDetails: [{ uploadConfig: shapefileUploadConfig }]
             })
           )
 
@@ -570,6 +574,7 @@ describe('#uploadAndWait', () => {
         // Then error is set in cache
         expect(updateExemptionSiteDetailsSpy).toHaveBeenCalledWith(
           mockRequest,
+          0,
           'uploadError',
           {
             message: 'The selected file could not be uploaded – try again',
@@ -581,6 +586,7 @@ describe('#uploadAndWait', () => {
         // And upload config is cleared
         expect(updateExemptionSiteDetailsSpy).toHaveBeenCalledWith(
           mockRequest,
+          0,
           'uploadConfig',
           null
         )
@@ -698,6 +704,7 @@ describe('#uploadAndWait', () => {
         // And generic error is set in cache
         expect(updateExemptionSiteDetailsSpy).toHaveBeenCalledWith(
           mockRequest,
+          0,
           'uploadError',
           {
             message: 'The selected file could not be processed – try again',
@@ -709,6 +716,7 @@ describe('#uploadAndWait', () => {
         // And upload config is cleared
         expect(updateExemptionSiteDetailsSpy).toHaveBeenCalledWith(
           mockRequest,
+          0,
           'uploadConfig',
           null
         )
@@ -746,6 +754,7 @@ describe('#uploadAndWait', () => {
         // Then error handling occurs
         expect(updateExemptionSiteDetailsSpy).toHaveBeenCalledWith(
           mockRequest,
+          0,
           'uploadError',
           {
             message: 'The selected file could not be processed – try again',
@@ -756,6 +765,7 @@ describe('#uploadAndWait', () => {
 
         expect(updateExemptionSiteDetailsSpy).toHaveBeenCalledWith(
           mockRequest,
+          0,
           'uploadConfig',
           null
         )
@@ -792,6 +802,7 @@ describe('#uploadAndWait', () => {
         // Then error handling occurs
         expect(updateExemptionSiteDetailsSpy).toHaveBeenCalledWith(
           mockRequest,
+          0,
           'uploadError',
           {
             message: 'The selected file could not be processed – try again',
@@ -802,6 +813,7 @@ describe('#uploadAndWait', () => {
 
         expect(updateExemptionSiteDetailsSpy).toHaveBeenCalledWith(
           mockRequest,
+          0,
           'uploadConfig',
           null
         )
@@ -841,6 +853,7 @@ describe('#uploadAndWait', () => {
         // Then error handling occurs
         expect(updateExemptionSiteDetailsSpy).toHaveBeenCalledWith(
           mockRequest,
+          0,
           'uploadError',
           {
             message: 'The selected file could not be processed – try again',
@@ -851,6 +864,7 @@ describe('#uploadAndWait', () => {
 
         expect(updateExemptionSiteDetailsSpy).toHaveBeenCalledWith(
           mockRequest,
+          0,
           'uploadConfig',
           null
         )
@@ -883,6 +897,7 @@ describe('#uploadAndWait', () => {
         // And upload config is cleared
         expect(updateExemptionSiteDetailsSpy).toHaveBeenCalledWith(
           mockRequest,
+          0,
           'uploadConfig',
           null
         )
@@ -971,6 +986,7 @@ describe('#uploadAndWait', () => {
         // Then error handling occurs due to missing s3Location
         expect(updateExemptionSiteDetailsSpy).toHaveBeenCalledWith(
           mockRequest,
+          0,
           'uploadError',
           {
             message: 'The selected file could not be processed – try again',
@@ -981,6 +997,7 @@ describe('#uploadAndWait', () => {
 
         expect(updateExemptionSiteDetailsSpy).toHaveBeenCalledWith(
           mockRequest,
+          0,
           'uploadConfig',
           null
         )

@@ -250,11 +250,11 @@ describe('siteDetails utils', () => {
     test('getCoordinateDisplayText correctly returns text for WGS84', () => {
       expect(
         getCoordinateDisplayText(
-          { coordinates: mockExemption.siteDetails.coordinates },
+          { coordinates: mockExemption.siteDetails[0].coordinates },
           COORDINATE_SYSTEMS.WGS84
         )
       ).toBe(
-        `${mockExemption.siteDetails.coordinates.latitude || ''}, ${mockExemption.siteDetails.coordinates.longitude || ''}`
+        `${mockExemption.siteDetails[0].coordinates.latitude ?? ''}, ${mockExemption.siteDetails[0].coordinates.longitude ?? ''}`
       )
     })
 
@@ -527,10 +527,12 @@ describe('siteDetails utils', () => {
     test('getSiteDetails returns existing site details when available', async () => {
       const exemption = {
         id: 'test-exemption-id',
-        siteDetails: {
-          coordinatesType: 'coordinates',
-          coordinates: { latitude: '51.5074', longitude: '-0.1278' }
-        }
+        siteDetails: [
+          {
+            coordinatesType: 'coordinates',
+            coordinates: { latitude: '51.5074', longitude: '-0.1278' }
+          }
+        ]
       }
 
       const result = await getSiteDetails(
@@ -539,7 +541,7 @@ describe('siteDetails utils', () => {
         mockAuthenticatedGetRequest
       )
 
-      expect(result).toEqual(exemption.siteDetails)
+      expect(result).toEqual(exemption.siteDetails[0])
       expect(mockAuthenticatedGetRequest).not.toHaveBeenCalled()
     })
 
@@ -552,10 +554,12 @@ describe('siteDetails utils', () => {
       const mockMongoResponse = {
         payload: {
           value: {
-            siteDetails: {
-              coordinatesType: 'file',
-              fileUploadType: 'kml'
-            }
+            siteDetails: [
+              {
+                coordinatesType: 'file',
+                fileUploadType: 'kml'
+              }
+            ]
           }
         }
       }
@@ -568,7 +572,7 @@ describe('siteDetails utils', () => {
         mockAuthenticatedGetRequest
       )
 
-      expect(result).toEqual(mockMongoResponse.payload.value.siteDetails)
+      expect(result).toEqual(mockMongoResponse.payload.value.siteDetails[0])
       expect(mockAuthenticatedGetRequest).toHaveBeenCalledWith(
         mockRequest,
         '/exemption/test-exemption-id'
@@ -678,37 +682,39 @@ describe('siteDetails utils', () => {
     })
 
     test('prepareFileUploadDataForSave correctly formats data for API submission', () => {
-      const siteDetails = {
-        fileUploadType: 'kml',
-        geoJSON: {
-          type: 'FeatureCollection',
-          features: [
-            {
-              type: 'Feature',
-              geometry: {
-                type: 'Point',
-                coordinates: [51.5074, -0.1278]
+      const siteDetails = [
+        {
+          fileUploadType: 'kml',
+          geoJSON: {
+            type: 'FeatureCollection',
+            features: [
+              {
+                type: 'Feature',
+                geometry: {
+                  type: 'Point',
+                  coordinates: [51.5074, -0.1278]
+                }
               }
+            ]
+          },
+          featureCount: 1,
+          uploadedFile: {
+            filename: 'test-site.kml',
+            s3Location: {
+              s3Bucket: 'test-bucket',
+              s3Key: 'test-key',
+              checksumSha256: 'test-checksum'
             }
-          ]
-        },
-        featureCount: 1,
-        uploadedFile: {
-          filename: 'test-site.kml',
-          s3Location: {
-            s3Bucket: 'test-bucket',
-            s3Key: 'test-key',
-            checksumSha256: 'test-checksum'
           }
         }
-      }
+      ]
 
-      const result = prepareFileUploadDataForSave(siteDetails, mockRequest)
+      const result = prepareFileUploadDataForSave(siteDetails, mockRequest)[0]
 
       expect(result).toEqual({
         coordinatesType: 'file',
         fileUploadType: 'kml',
-        geoJSON: siteDetails.geoJSON,
+        geoJSON: siteDetails[0].geoJSON,
         featureCount: 1,
         uploadedFile: {
           filename: 'test-site.kml'
@@ -731,20 +737,22 @@ describe('siteDetails utils', () => {
     })
 
     test('prepareFileUploadDataForSave handles missing featureCount', () => {
-      const siteDetails = {
-        fileUploadType: 'shapefile',
-        geoJSON: { type: 'FeatureCollection', features: [] },
-        uploadedFile: {
-          filename: 'test.shp',
-          s3Location: {
-            s3Bucket: 'bucket',
-            s3Key: 'key',
-            checksumSha256: 'checksum'
+      const siteDetails = [
+        {
+          fileUploadType: 'shapefile',
+          geoJSON: { type: 'FeatureCollection', features: [] },
+          uploadedFile: {
+            filename: 'test.shp',
+            s3Location: {
+              s3Bucket: 'bucket',
+              s3Key: 'key',
+              checksumSha256: 'checksum'
+            }
           }
         }
-      }
+      ]
 
-      const result = prepareFileUploadDataForSave(siteDetails, mockRequest)
+      const result = prepareFileUploadDataForSave(siteDetails, mockRequest)[0]
 
       expect(result.featureCount).toBe(0)
     })
@@ -763,15 +771,17 @@ describe('siteDetails utils', () => {
 
     test('prepareManualCoordinateDataForSave returns site details and logs correctly', () => {
       const exemption = {
-        siteDetails: {
-          coordinatesType: 'coordinates',
-          coordinatesEntry: 'single',
-          coordinates: {
-            latitude: '51.5074',
-            longitude: '-0.1278'
-          },
-          circleWidth: '100'
-        }
+        siteDetails: [
+          {
+            coordinatesType: 'coordinates',
+            coordinatesEntry: 'single',
+            coordinates: {
+              latitude: '51.5074',
+              longitude: '-0.1278'
+            },
+            circleWidth: '100'
+          }
+        ]
       }
 
       const result = prepareManualCoordinateDataForSave(exemption, mockRequest)

@@ -175,7 +175,7 @@ describe('Multiple co-ordinates - form validation', () => {
       })
     })
 
-    it('redirects if all form data is valid', async () => {
+    test('redirects if all form data is valid', async () => {
       const { response } = await submitForm({
         requestUrl: routes.ENTER_MULTIPLE_COORDINATES,
         server: getServer(),
@@ -338,7 +338,7 @@ describe('Multiple co-ordinates - form validation', () => {
       })
     })
 
-    it('redirects if all form data is valid', async () => {
+    test('redirects if all form data is valid', async () => {
       const { response } = await submitForm({
         requestUrl: routes.ENTER_MULTIPLE_COORDINATES,
         server: getServer(),

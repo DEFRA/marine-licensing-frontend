@@ -17,7 +17,8 @@ describe('Site name page', () => {
 
   const mockExemption = {
     id: 'test-exemption-123',
-    projectName: 'Test Project'
+    projectName: 'Test Project',
+    siteDetails: []
   }
 
   jest.mocked(getExemptionCache).mockReturnValue(mockExemption)
@@ -60,7 +61,7 @@ describe('Site name page', () => {
   test('should pre-populate input when siteName value exists in cache', async () => {
     jest.mocked(getExemptionCache).mockReturnValue({
       ...mockExemption,
-      siteDetails: { ...mockExemption.siteDetails, siteName: 'Test Site' }
+      siteDetails: [{ ...mockExemption.siteDetails[0], siteName: 'Test Site' }]
     })
 
     const { result, statusCode } = await getServer().inject({
@@ -177,6 +178,7 @@ describe('Site name page', () => {
 
     expect(updateExemptionSiteDetails).toHaveBeenCalledWith(
       expect.any(Object),
+      0,
       'siteName',
       'Test Site Name'
     )

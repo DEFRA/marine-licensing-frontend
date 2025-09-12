@@ -9,6 +9,7 @@ import {
   errorDescriptionByFieldName,
   mapErrorsForDisplay
 } from '~/src/server/common/helpers/errors.js'
+import { getSiteDetailsBySite } from '~/src/server/common/helpers/session-cache/site-utils.js'
 
 export const FILE_UPLOAD_VIEW_ROUTE = 'exemption/site-details/file-upload/index'
 
@@ -72,8 +73,9 @@ const s3PathForExemptions = 'exemptions'
 export const fileUploadController = {
   async handler(request, h) {
     const exemption = getExemptionCache(request)
-    const { fileUploadType, uploadedFile, uploadError } =
-      exemption.siteDetails || {}
+    const site = getSiteDetailsBySite(exemption)
+
+    const { fileUploadType, uploadedFile, uploadError } = site
 
     request.logger.debug(
       `fileUploadController: fileUploadType [${fileUploadType}]`
@@ -96,7 +98,7 @@ export const fileUploadController = {
       errors = errorDisplay.errors
 
       // Clear error from session after retrieving
-      updateExemptionSiteDetails(request, 'uploadError', null)
+      updateExemptionSiteDetails(request, 0, 'uploadError', null)
 
       request.logger.debug(
         {
@@ -126,7 +128,7 @@ export const fileUploadController = {
       })
 
       // Store upload configuration in session
-      updateExemptionSiteDetails(request, 'uploadConfig', {
+      updateExemptionSiteDetails(request, 0, 'uploadConfig', {
         uploadId: uploadConfig.uploadId,
         statusUrl: uploadConfig.statusUrl,
         fileType: fileUploadType

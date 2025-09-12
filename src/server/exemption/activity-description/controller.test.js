@@ -110,9 +110,11 @@ describe('#activityDescriptionController', () => {
       }
       const exemptionWithSiteDetails = {
         ...mockExemptionState,
-        siteDetails: {
-          activityDescription: 'Site activity description'
-        }
+        siteDetails: [
+          {
+            activityDescription: 'Site activity description'
+          }
+        ]
       }
 
       getExemptionCacheSpy.mockReturnValue(exemptionWithSiteDetails)
@@ -167,9 +169,11 @@ describe('#activityDescriptionController', () => {
       const exemptionWithSiteDetails = {
         ...mockExemption,
         multipleSiteDetails: { multipleSitesEnabled: false },
-        siteDetails: {
-          activityDescription: 'Existing site activity description'
-        }
+        siteDetails: [
+          {
+            activityDescription: 'Existing site activity description'
+          }
+        ]
       }
 
       getExemptionCacheSpy.mockReturnValue(exemptionWithSiteDetails)
@@ -186,6 +190,7 @@ describe('#activityDescriptionController', () => {
 
       expect(mockedUpdateExemptionSiteDetails).toHaveBeenCalledWith(
         expect.any(Object),
+        0,
         'activityDescription',
         'New site activity description.'
       )

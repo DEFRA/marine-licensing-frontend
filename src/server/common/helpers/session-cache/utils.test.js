@@ -148,12 +148,13 @@ describe('#utils', () => {
 
       const result = updateExemptionSiteDetails(
         mockRequest,
+        0,
         'coordinatesType',
         value.coordinatesType
       )
 
       expect(mockRequest.yar.set).toHaveBeenCalledWith(EXEMPTION_CACHE_KEY, {
-        siteDetails: value
+        siteDetails: [value]
       })
       expect(result).toEqual(value)
     })
@@ -163,12 +164,13 @@ describe('#utils', () => {
 
       const result = updateExemptionSiteDetails(
         mockRequest,
+        0,
         'coordinatesType',
         value.coordinatesType
       )
 
       expect(mockRequest.yar.set).toHaveBeenCalledWith(EXEMPTION_CACHE_KEY, {
-        siteDetails: { coordinatesType: null }
+        siteDetails: [{ coordinatesType: null }]
       })
       expect(result).toEqual({ coordinatesType: null })
     })
@@ -178,12 +180,13 @@ describe('#utils', () => {
 
       const result = updateExemptionSiteDetails(
         mockRequest,
+        0,
         'coordinatesType',
         value
       )
 
       expect(mockRequest.yar.set).toHaveBeenCalledWith(EXEMPTION_CACHE_KEY, {
-        siteDetails: { coordinatesType: null }
+        siteDetails: [{ coordinatesType: null }]
       })
 
       expect(result).toEqual({ coordinatesType: null })
@@ -194,12 +197,13 @@ describe('#utils', () => {
 
       const result = updateExemptionSiteDetails(
         mockRequest,
+        0,
         'coordinatesType',
         value
       )
 
       expect(mockRequest.yar.set).toHaveBeenCalledWith(EXEMPTION_CACHE_KEY, {
-        siteDetails: { coordinatesType: null }
+        siteDetails: [{ coordinatesType: null }]
       })
 
       expect(result).toEqual({ coordinatesType: null })
@@ -340,10 +344,12 @@ describe('#utils', () => {
     test('should update multiple siteDetails properties in a single operation', () => {
       const existingCache = {
         projectName: 'Test Project',
-        siteDetails: {
-          coordinatesType: 'file',
-          existingProperty: 'keepThis'
-        }
+        siteDetails: [
+          {
+            coordinatesType: 'file',
+            existingProperty: 'keepThis'
+          }
+        ]
       }
 
       mockRequest.yar.get.mockReturnValue(existingCache)
@@ -359,14 +365,16 @@ describe('#utils', () => {
 
       expect(mockRequest.yar.set).toHaveBeenCalledWith(EXEMPTION_CACHE_KEY, {
         projectName: 'Test Project',
-        siteDetails: {
-          coordinatesType: 'file',
-          existingProperty: 'keepThis',
-          uploadedFile: { filename: 'test.kml', status: 'ready' },
-          extractedCoordinates: [{ lat: 50, lng: -1 }],
-          geoJSON: { type: 'FeatureCollection', features: [] },
-          featureCount: 1
-        }
+        siteDetails: [
+          {
+            coordinatesType: 'file',
+            existingProperty: 'keepThis',
+            uploadedFile: { filename: 'test.kml', status: 'ready' },
+            extractedCoordinates: [{ lat: 50, lng: -1 }],
+            geoJSON: { type: 'FeatureCollection', features: [] },
+            featureCount: 1
+          }
+        ]
       })
 
       expect(result).toEqual({
@@ -388,7 +396,7 @@ describe('#utils', () => {
 
       expect(mockRequest.yar.set).toHaveBeenCalledWith(EXEMPTION_CACHE_KEY, {
         projectName: 'Test Project',
-        siteDetails: { newProperty: 'newValue' }
+        siteDetails: [{ newProperty: 'newValue' }]
       })
 
       expect(result).toEqual({ newProperty: 'newValue' })

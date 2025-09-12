@@ -2,6 +2,7 @@ import {
   getExemptionCache,
   updateExemptionSiteDetails
 } from '~/src/server/common/helpers/session-cache/utils.js'
+import { getSiteDetailsBySite } from '~/src/server/common/helpers/session-cache/site-utils.js'
 import { getCoordinateSystem } from '~/src/server/common/helpers/coordinate-utils.js'
 import {
   errorDescriptionByFieldName,
@@ -61,7 +62,7 @@ export const centreCoordinatesController = {
     const exemption = getExemptionCache(request)
     const { coordinateSystem } = getCoordinateSystem(request)
 
-    const siteDetails = exemption.siteDetails ?? {}
+    const siteDetails = getSiteDetailsBySite(exemption)
 
     return h.view(COORDINATE_SYSTEM_VIEW_ROUTES[coordinateSystem], {
       ...centreCoordinatesPageData,
@@ -137,7 +138,7 @@ export const centreCoordinatesSubmitController = {
       )
     }
 
-    updateExemptionSiteDetails(request, 'coordinates', payload)
+    updateExemptionSiteDetails(request, 0, 'coordinates', payload)
 
     return h.redirect(routes.WIDTH_OF_SITE)
   }

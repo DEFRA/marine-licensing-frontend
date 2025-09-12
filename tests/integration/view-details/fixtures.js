@@ -26,14 +26,16 @@ export const createSubmittedExemption = (overrides = {}) => ({
 
 export const createExemptionWithSiteDetails = (siteDetailsOverrides = {}) =>
   createSubmittedExemption({
-    siteDetails: {
-      coordinatesType: 'coordinates',
-      coordinatesEntry: 'single',
-      coordinateSystem: COORDINATE_SYSTEMS.WGS84,
-      coordinates: { latitude: '51.489676', longitude: '-0.231530' },
-      circleWidth: '100',
-      ...siteDetailsOverrides
-    }
+    siteDetails: [
+      {
+        coordinatesType: 'coordinates',
+        coordinatesEntry: 'single',
+        coordinateSystem: COORDINATE_SYSTEMS.WGS84,
+        coordinates: { latitude: '51.489676', longitude: '-0.231530' },
+        circleWidth: '100',
+        ...siteDetailsOverrides
+      }
+    ]
   })
 
 export const createFileUploadExemption = (
@@ -235,13 +237,15 @@ export const testScenarios = [
         consent: 'yes',
         reason: 'Lorem ipsum dolor sit amet'
       },
-      siteDetails: {
-        coordinatesType: 'coordinates',
-        coordinatesEntry: 'single',
-        coordinateSystem: COORDINATE_SYSTEMS.WGS84,
-        coordinates: { latitude: '51.489676', longitude: '-0.231530' },
-        circleWidth: '100'
-      }
+      siteDetails: [
+        {
+          coordinatesType: 'coordinates',
+          coordinatesEntry: 'single',
+          coordinateSystem: COORDINATE_SYSTEMS.WGS84,
+          coordinates: { latitude: '51.489676', longitude: '-0.231530' },
+          circleWidth: '100'
+        }
+      ]
     }),
     expectedPageContent: {
       ...baseExpectedContent,

@@ -74,18 +74,20 @@ describe('Site Details Interactive Map Behaviour', () => {
 
   const createExemptionWithSiteDetails = (siteDetailsOverride = {}) => ({
     ...mockExemption,
-    siteDetails: {
-      ...mockExemption.siteDetails,
-      ...siteDetailsOverride
-    }
+    siteDetails: [
+      {
+        ...mockExemption.siteDetails[0],
+        ...siteDetailsOverride
+      }
+    ]
   })
 
   const renderPageAndExtractMapElements = async (exemption = mockExemption) => {
     jest.spyOn(cacheUtils, 'getExemptionCache').mockReturnValue(exemption)
 
-    if (exemption.siteDetails?.coordinateSystem) {
+    if (exemption.siteDetails?.[0]?.coordinateSystem) {
       jest.spyOn(coordinateUtils, 'getCoordinateSystem').mockReturnValue({
-        coordinateSystem: exemption.siteDetails.coordinateSystem
+        coordinateSystem: exemption.siteDetails[0].coordinateSystem
       })
     }
 

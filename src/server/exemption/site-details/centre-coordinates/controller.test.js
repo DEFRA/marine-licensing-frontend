@@ -24,8 +24,8 @@ describe('#centreCoordinates', () => {
 
   const mockCoordinates = {
     [COORDINATE_SYSTEMS.WGS84]: {
-      latitude: mockExemption.siteDetails.coordinates.latitude,
-      longitude: mockExemption.siteDetails.coordinates.longitude
+      latitude: mockExemption.siteDetails[0].coordinates.latitude,
+      longitude: mockExemption.siteDetails[0].coordinates.longitude
     },
     [COORDINATE_SYSTEMS.OSGB36]: { eastings: '425053', northings: '564180' }
   }
@@ -89,10 +89,12 @@ describe('#centreCoordinates', () => {
 
       getExemptionCacheSpy.mockReturnValueOnce({
         ...mockExemption,
-        siteDetails: {
-          ...mockExemption.siteDetails,
-          coordinates: mockCoordinates[COORDINATE_SYSTEMS.OSGB36]
-        }
+        siteDetails: [
+          {
+            ...mockExemption.siteDetails[0],
+            coordinates: mockCoordinates[COORDINATE_SYSTEMS.OSGB36]
+          }
+        ]
       })
 
       getCoordinateSystemSpy.mockReturnValueOnce({
@@ -295,7 +297,7 @@ describe('#centreCoordinates', () => {
       }
 
       const mockRequest = {
-        payload: mockExemption.siteDetails.coordinates
+        payload: mockExemption.siteDetails[0].coordinates
       }
 
       getCoordinateSystemSpy.mockReturnValueOnce({
@@ -306,8 +308,9 @@ describe('#centreCoordinates', () => {
 
       expect(cacheUtils.updateExemptionSiteDetails).toHaveBeenCalledWith(
         mockRequest,
+        0,
         'coordinates',
-        mockExemption.siteDetails.coordinates
+        mockExemption.siteDetails[0].coordinates
       )
 
       expect(h.redirect).toHaveBeenCalledWith(routes.WIDTH_OF_SITE)
@@ -330,6 +333,7 @@ describe('#centreCoordinates', () => {
 
       expect(cacheUtils.updateExemptionSiteDetails).toHaveBeenCalledWith(
         mockRequest,
+        0,
         'coordinates',
         mockCoordinates[COORDINATE_SYSTEMS.OSGB36]
       )

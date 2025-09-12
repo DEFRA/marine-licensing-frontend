@@ -7,29 +7,31 @@ const baseExemption = {
   },
   activityDescription:
     'We will be installing a pontoon approximately 20 metres squared at the east of our garden that backs onto the river.',
-  siteDetails: {
-    coordinatesType: 'file',
-    geoJSON: {
-      type: 'FeatureCollection',
-      features: [
-        {
-          type: 'Feature',
-          geometry: {
-            type: 'Polygon',
-            coordinates: [
-              [
-                [-1.2345, 50.9876],
-                [-1.2335, 50.9876],
-                [-1.2335, 50.9886],
-                [-1.2345, 50.9886],
-                [-1.2345, 50.9876]
+  siteDetails: [
+    {
+      coordinatesType: 'file',
+      geoJSON: {
+        type: 'FeatureCollection',
+        features: [
+          {
+            type: 'Feature',
+            geometry: {
+              type: 'Polygon',
+              coordinates: [
+                [
+                  [-1.2345, 50.9876],
+                  [-1.2335, 50.9876],
+                  [-1.2335, 50.9886],
+                  [-1.2345, 50.9886],
+                  [-1.2345, 50.9876]
+                ]
               ]
-            ]
+            }
           }
-        }
-      ]
+        ]
+      }
     }
-  },
+  ],
   publicRegister: {
     withholdFromPublicRegister: false
   },
@@ -47,12 +49,16 @@ export const testScenarios = [
     name: 'Shapefile upload',
     exemption: {
       ...baseExemption,
-      siteDetails: {
-        ...baseExemption.siteDetails,
-        coordinateSystem: 'wgs84',
-        fileUploadType: 'shapefile',
-        uploadedFile: { filename: 'Cavendish_Dock_Boundary_Polygon_WGS84.zip' }
-      }
+      siteDetails: [
+        {
+          ...baseExemption.siteDetails[0],
+          coordinateSystem: 'wgs84',
+          fileUploadType: 'shapefile',
+          uploadedFile: {
+            filename: 'Cavendish_Dock_Boundary_Polygon_WGS84.zip'
+          }
+        }
+      ]
     },
     expectedPageContent: {
       pageTitle: 'Check your answers before sending your information',
@@ -101,12 +107,14 @@ export const testScenarios = [
     name: 'KML upload',
     exemption: {
       ...baseExemption,
-      siteDetails: {
-        ...baseExemption.siteDetails,
-        coordinateSystem: 'wgs84',
-        fileUploadType: 'kml',
-        uploadedFile: { filename: 'coordinates.kml' }
-      }
+      siteDetails: [
+        {
+          ...baseExemption.siteDetails[0],
+          coordinateSystem: 'wgs84',
+          fileUploadType: 'kml',
+          uploadedFile: { filename: 'coordinates.kml' }
+        }
+      ]
     },
     expectedPageContent: {
       pageTitle: 'Check your answers before sending your information',
@@ -146,12 +154,14 @@ export const testScenarios = [
     name: 'Shapefile upload (OSGB36)',
     exemption: {
       ...baseExemption,
-      siteDetails: {
-        ...baseExemption.siteDetails,
-        coordinateSystem: 'osgb36',
-        fileUploadType: 'shapefile',
-        uploadedFile: { filename: 'OSGB36_Site_Boundary.zip' }
-      }
+      siteDetails: [
+        {
+          ...baseExemption.siteDetails[0],
+          coordinateSystem: 'osgb36',
+          fileUploadType: 'shapefile',
+          uploadedFile: { filename: 'OSGB36_Site_Boundary.zip' }
+        }
+      ]
     },
     expectedPageContent: {
       pageTitle: 'Check your answers before sending your information',
@@ -191,16 +201,18 @@ export const testScenarios = [
     name: 'Manual coordinates - WGS84 single point',
     exemption: {
       ...baseExemption,
-      siteDetails: {
-        coordinatesType: 'coordinates',
-        coordinatesEntry: 'single',
-        coordinateSystem: 'wgs84',
-        coordinates: {
-          latitude: '54.726200',
-          longitude: '-1.599400'
-        },
-        circleWidth: '100'
-      }
+      siteDetails: [
+        {
+          coordinatesType: 'coordinates',
+          coordinatesEntry: 'single',
+          coordinateSystem: 'wgs84',
+          coordinates: {
+            latitude: '54.726200',
+            longitude: '-1.599400'
+          },
+          circleWidth: '100'
+        }
+      ]
     },
     expectedPageContent: {
       pageTitle: 'Check your answers before sending your information',
@@ -242,16 +254,18 @@ export const testScenarios = [
     name: 'Manual coordinates - OSGB36 single point',
     exemption: {
       ...baseExemption,
-      siteDetails: {
-        coordinatesType: 'coordinates',
-        coordinatesEntry: 'single',
-        coordinateSystem: 'osgb36',
-        coordinates: {
-          eastings: '425053',
-          northings: '564180'
-        },
-        circleWidth: '100'
-      }
+      siteDetails: [
+        {
+          coordinatesType: 'coordinates',
+          coordinatesEntry: 'single',
+          coordinateSystem: 'osgb36',
+          coordinates: {
+            eastings: '425053',
+            northings: '564180'
+          },
+          circleWidth: '100'
+        }
+      ]
     },
     expectedPageContent: {
       pageTitle: 'Check your answers before sending your information',
@@ -292,17 +306,19 @@ export const testScenarios = [
     name: 'Polygon coordinates - WGS84 multiple points',
     exemption: {
       ...baseExemption,
-      siteDetails: {
-        coordinatesType: 'coordinates',
-        coordinatesEntry: 'multiple',
-        coordinateSystem: 'wgs84',
-        coordinates: [
-          { latitude: '54.721000', longitude: '-1.595000' },
-          { latitude: '54.725000', longitude: '-1.590000' },
-          { latitude: '54.729000', longitude: '-1.585000' }
-        ],
-        circleWidth: '100'
-      }
+      siteDetails: [
+        {
+          coordinatesType: 'coordinates',
+          coordinatesEntry: 'multiple',
+          coordinateSystem: 'wgs84',
+          coordinates: [
+            { latitude: '54.721000', longitude: '-1.595000' },
+            { latitude: '54.725000', longitude: '-1.590000' },
+            { latitude: '54.729000', longitude: '-1.585000' }
+          ],
+          circleWidth: '100'
+        }
+      ]
     },
     expectedPageContent: {
       pageTitle: 'Check your answers before sending your information',
@@ -345,17 +361,19 @@ export const testScenarios = [
     name: 'Polygon coordinates - OSGB36 multiple points',
     exemption: {
       ...baseExemption,
-      siteDetails: {
-        coordinatesType: 'coordinates',
-        coordinatesEntry: 'multiple',
-        coordinateSystem: 'osgb36',
-        coordinates: [
-          { eastings: '425053', northings: '564180' },
-          { eastings: '426000', northings: '565000' },
-          { eastings: '427000', northings: '566000' }
-        ],
-        circleWidth: '100'
-      }
+      siteDetails: [
+        {
+          coordinatesType: 'coordinates',
+          coordinatesEntry: 'multiple',
+          coordinateSystem: 'osgb36',
+          coordinates: [
+            { eastings: '425053', northings: '564180' },
+            { eastings: '426000', northings: '565000' },
+            { eastings: '427000', northings: '566000' }
+          ],
+          circleWidth: '100'
+        }
+      ]
     },
     expectedPageContent: {
       pageTitle: 'Check your answers before sending your information',

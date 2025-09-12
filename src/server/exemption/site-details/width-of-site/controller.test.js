@@ -44,7 +44,7 @@ describe('#widthOfSite', () => {
         heading: 'Enter the width of the circular site in metres',
         backLink: routes.CIRCLE_CENTRE_POINT,
         payload: {
-          width: mockExemption.siteDetails.circleWidth
+          width: mockExemption.siteDetails[0].circleWidth
         },
         projectName: 'Test Project'
       })
@@ -95,7 +95,7 @@ describe('#widthOfSite', () => {
       ).toBe(mockExemption.projectName)
 
       expect(document.querySelector('#width').value).toBe(
-        mockExemption.siteDetails.circleWidth
+        mockExemption.siteDetails[0].circleWidth
       )
 
       expect(
@@ -218,6 +218,7 @@ describe('#widthOfSite', () => {
 
       expect(cacheUtils.updateExemptionSiteDetails).toHaveBeenCalledWith(
         mockRequest,
+        0,
         'circleWidth',
         'single'
       )

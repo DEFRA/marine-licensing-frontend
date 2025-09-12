@@ -62,12 +62,14 @@ describe('Review Site Details - Polygon Coordinates Integration Tests', () => {
       const emptyPolygonExemption = {
         id: 'test-exemption-empty',
         projectName: 'Empty Polygon Project',
-        siteDetails: {
-          coordinatesType: 'coordinates',
-          coordinatesEntry: 'multiple',
-          coordinateSystem: 'wgs84',
-          coordinates: []
-        }
+        siteDetails: [
+          {
+            coordinatesType: 'coordinates',
+            coordinatesEntry: 'multiple',
+            coordinateSystem: 'wgs84',
+            coordinates: []
+          }
+        ]
       }
 
       const document = await getPageDocument(emptyPolygonExemption)
@@ -88,17 +90,19 @@ describe('Review Site Details - Polygon Coordinates Integration Tests', () => {
       const incompleteCoordinatesExemption = {
         id: 'test-exemption-incomplete',
         projectName: 'Incomplete Coordinates Project',
-        siteDetails: {
-          coordinatesType: 'coordinates',
-          coordinatesEntry: 'multiple',
-          coordinateSystem: 'wgs84',
-          coordinates: [
-            { latitude: '55.123456', longitude: '55.123456' },
-            { latitude: '', longitude: '33.987654' },
-            { latitude: '78.123456', longitude: '78.123456' },
-            { latitude: null, longitude: null }
-          ]
-        }
+        siteDetails: [
+          {
+            coordinatesType: 'coordinates',
+            coordinatesEntry: 'multiple',
+            coordinateSystem: 'wgs84',
+            coordinates: [
+              { latitude: '55.123456', longitude: '55.123456' },
+              { latitude: '', longitude: '33.987654' },
+              { latitude: '78.123456', longitude: '78.123456' },
+              { latitude: null, longitude: null }
+            ]
+          }
+        ]
       }
 
       const document = await getPageDocument(incompleteCoordinatesExemption)
@@ -137,10 +141,12 @@ describe('Review Site Details - Polygon Coordinates Integration Tests', () => {
         '/exemption/site-details',
         expect.objectContaining({
           id: polygonExemption.id,
-          siteDetails: expect.objectContaining({
-            coordinatesType: 'coordinates',
-            coordinatesEntry: 'multiple'
-          })
+          siteDetails: [
+            expect.objectContaining({
+              coordinatesType: 'coordinates',
+              coordinatesEntry: 'multiple'
+            })
+          ]
         })
       )
     })

@@ -2,6 +2,7 @@ import {
   getExemptionCache,
   updateExemptionSiteDetails
 } from '~/src/server/common/helpers/session-cache/utils.js'
+import { getSiteDetailsBySite } from '~/src/server/common/helpers/session-cache/site-utils.js'
 import {
   errorDescriptionByFieldName,
   mapErrorsForDisplay
@@ -31,7 +32,7 @@ export const coordinateSystemController = {
   handler(request, h) {
     const exemption = getExemptionCache(request)
 
-    const siteDetails = exemption.siteDetails ?? {}
+    const siteDetails = getSiteDetailsBySite(exemption)
 
     return h.view(COORDINATE_SYSTEM_VIEW_ROUTE, {
       ...coordinateSystemSettings,
@@ -99,15 +100,16 @@ export const coordinateSystemSubmitController = {
 
     updateExemptionSiteDetails(
       request,
+      0,
       'coordinateSystem',
       payload.coordinateSystem
     )
 
-    if (exemption.siteDetails?.coordinatesEntry === 'single') {
+    if (getSiteDetailsBySite(exemption)?.coordinatesEntry === 'single') {
       return h.redirect(routes.CIRCLE_CENTRE_POINT)
     }
 
-    if (exemption.siteDetails?.coordinatesEntry === 'multiple') {
+    if (getSiteDetailsBySite(exemption)?.coordinatesEntry === 'multiple') {
       return h.redirect(routes.ENTER_MULTIPLE_COORDINATES)
     }
 

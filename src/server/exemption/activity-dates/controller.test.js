@@ -211,6 +211,7 @@ describe('#activityDatesController', () => {
 
       expect(mockedUpdateExemptionSiteDetails).toHaveBeenCalledWith(
         expect.any(Object),
+        0,
         'activityDates',
         {
           end: '2026-06-15T00:00:00.000Z',
@@ -255,6 +256,7 @@ describe('#activityDatesController', () => {
 
       expect(mockedUpdateExemptionSiteDetails).toHaveBeenCalledWith(
         expect.any(Object),
+        0,
         'activityDates',
         {
           start: '2026-06-01T00:00:00.000Z',

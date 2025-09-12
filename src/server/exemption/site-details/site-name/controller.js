@@ -2,6 +2,7 @@ import {
   getExemptionCache,
   updateExemptionSiteDetails
 } from '~/src/server/common/helpers/session-cache/utils.js'
+import { getSiteDetailsBySite } from '~/src/server/common/helpers/session-cache/site-utils.js'
 import { routes } from '~/src/server/common/constants/routes.js'
 import {
   errorDescriptionByFieldName,
@@ -70,7 +71,7 @@ export const siteNameController = {
       projectName: exemption.projectName,
       siteNumber,
       payload: {
-        siteName: exemption.siteDetails?.siteName
+        siteName: getSiteDetailsBySite(exemption)?.siteName
       }
     })
   }
@@ -97,7 +98,7 @@ export const siteNameSubmitController = {
   handler(request, h) {
     const { payload } = request
 
-    updateExemptionSiteDetails(request, 'siteName', payload.siteName)
+    updateExemptionSiteDetails(request, 0, 'siteName', payload.siteName)
 
     return h.redirect(routes.SAME_ACTIVITY_DATES)
   }

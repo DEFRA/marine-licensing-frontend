@@ -7,6 +7,7 @@ import {
   setExemptionCache,
   updateExemptionSiteDetails
 } from '~/src/server/common/helpers/session-cache/utils.js'
+import { getSiteDetailsBySite } from '~/src/server/common/helpers/session-cache/site-utils.js'
 import { routes } from '~/src/server/common/constants/routes.js'
 import { authenticatedPatchRequest } from '~/src/server/common/helpers/authenticated-requests.js'
 import joi from 'joi'
@@ -61,7 +62,7 @@ export const activityDescriptionController = {
     const isInSiteDetailsFlow = isPageInSiteDetailsFlow(request)
 
     const activityDescription = isInSiteDetailsFlow
-      ? exemption.siteDetails?.activityDescription
+      ? getSiteDetailsBySite(exemption)?.activityDescription
       : exemption.activityDescription
 
     return h.view(ACTIVITY_DESCRIPTION_VIEW_ROUTE, {
@@ -125,6 +126,7 @@ export const activityDescriptionSubmitController = {
       if (isInSiteDetailsFlow) {
         updateExemptionSiteDetails(
           request,
+          0,
           'activityDescription',
           payload.activityDescription
         )

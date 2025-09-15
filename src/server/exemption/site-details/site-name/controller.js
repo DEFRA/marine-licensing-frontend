@@ -2,13 +2,15 @@ import {
   getExemptionCache,
   updateExemptionSiteDetails
 } from '~/src/server/common/helpers/session-cache/utils.js'
-import { getSiteDetailsBySite } from '~/src/server/common/helpers/session-cache/site-utils.js'
+import {
+  setSiteData,
+  setSiteDataPreHandlerHook
+} from '~/src/server/common/helpers/session-cache/site-utils.js'
 import { routes } from '~/src/server/common/constants/routes.js'
 import {
   errorDescriptionByFieldName,
   mapErrorsForDisplay
 } from '~/src/server/common/helpers/errors.js'
-import { getSiteNumber } from '~/src/server/exemption/site-details/utils/site-number.js'
 import joi from 'joi'
 
 const SITE_NAME_MAX_LENGTH = 250
@@ -30,7 +32,9 @@ export const errorMessages = {
 const createValidationFailAction = (request, h, err) => {
   const { payload } = request
   const exemption = getExemptionCache(request)
-  const siteNumber = getSiteNumber(exemption, request)
+
+  const site = setSiteData(request)
+  const { siteNumber } = site
 
   if (!err.details) {
     return h
@@ -61,9 +65,14 @@ const createValidationFailAction = (request, h, err) => {
 }
 
 export const siteNameController = {
+  options: {
+    pre: [setSiteDataPreHandlerHook]
+  },
   handler(request, h) {
     const exemption = getExemptionCache(request)
-    const siteNumber = getSiteNumber(exemption, request)
+
+    const { site } = request
+    const { siteNumber, siteDetails } = site
 
     return h.view(SITE_NAME_VIEW_ROUTE, {
       ...siteNameSettings,
@@ -71,7 +80,7 @@ export const siteNameController = {
       projectName: exemption.projectName,
       siteNumber,
       payload: {
-        siteName: getSiteDetailsBySite(exemption)?.siteName
+        siteName: siteDetails?.siteName
       }
     })
   }
@@ -79,6 +88,7 @@ export const siteNameController = {
 
 export const siteNameSubmitController = {
   options: {
+    pre: [setSiteDataPreHandlerHook],
     validate: {
       payload: joi.object({
         siteName: joi
@@ -96,10 +106,12 @@ export const siteNameSubmitController = {
     }
   },
   handler(request, h) {
-    const { payload } = request
+    const { payload, site } = request
 
-    updateExemptionSiteDetails(request, 0, 'siteName', payload.siteName)
+    const { queryParams, siteIndex } = site
 
-    return h.redirect(routes.SAME_ACTIVITY_DATES)
+    updateExemptionSiteDetails(request, siteIndex, 'siteName', payload.siteName)
+
+    return h.redirect(routes.SAME_ACTIVITY_DATES + queryParams)
   }
 }

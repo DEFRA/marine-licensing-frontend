@@ -1,3 +1,6 @@
+import { getExemptionCache } from '~/src/server/common/helpers/session-cache/utils.js'
+import { getSiteNumber } from '~/src/server/exemption/site-details/utils/site-number.js'
+
 /**
  * Gets site details from exemption data with safe array access
  * @param { object } exemption - Exemption object
@@ -12,4 +15,36 @@ export const getSiteDetailsBySite = (exemption, siteIndex = 0) => {
   }
 
   return exemption.siteDetails?.[siteIndex] ?? {}
+}
+
+/**
+ * Gets site data for the current page
+ * @param { object } request - Request object
+ * @returns { object } Object containing data for site specific pages
+ */
+export const setSiteData = (request) => {
+  const exemption = getExemptionCache(request)
+
+  const siteNumber = getSiteNumber(exemption, request)
+
+  return {
+    queryParams: siteNumber === 1 ? '' : `?site=${siteNumber}`,
+    siteNumber,
+    siteIndex: siteNumber - 1,
+    siteDetails: getSiteDetailsBySite(exemption, siteNumber)
+  }
+}
+
+/**
+ * Uses setSiteData as a pre commit hooke
+ * @param { object } request - Request object
+ * @param {object} h - Hapi response toolkit
+ * @returns {object} Hapi response (continue)
+ */
+export const setSiteDataPreHandlerHook = {
+  method: (request, h) => {
+    request.site = setSiteData(request)
+
+    return h.continue
+  }
 }

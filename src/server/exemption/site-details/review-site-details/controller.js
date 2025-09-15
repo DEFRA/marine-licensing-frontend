@@ -1,6 +1,7 @@
 import {
   getExemptionCache,
-  resetExemptionSiteDetails
+  resetExemptionSiteDetails,
+  setExemptionCache
 } from '~/src/server/common/helpers/session-cache/utils.js'
 import { routes } from '~/src/server/common/constants/routes.js'
 import {
@@ -63,10 +64,24 @@ export const reviewSiteDetailsController = {
  */
 export const reviewSiteDetailsSubmitController = {
   async handler(request, h) {
+    const { payload } = request
+
     const exemption = getExemptionCache(request)
     const siteDetails = exemption.siteDetails
     const firstSite = siteDetails[0]
     try {
+      if (payload?.add) {
+        const updatedSiteDetails = [...siteDetails, {}]
+        setExemptionCache(request, {
+          ...exemption,
+          siteDetails: updatedSiteDetails
+        })
+
+        return h.redirect(
+          `${routes.SITE_NAME}?site=${updatedSiteDetails.length}`
+        )
+      }
+
       const dataToSave =
         firstSite.coordinatesType === 'file'
           ? prepareFileUploadDataForSave(siteDetails, request)

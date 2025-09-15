@@ -6,7 +6,7 @@
  */
 export const getSiteNumber = (exemption, request) => {
   const { siteDetails } = exemption || {}
-  const urlSiteIndex = request?.params?.siteIndex
+  const urlSiteIndex = request?.query?.site
 
   if (Array.isArray(siteDetails) && urlSiteIndex) {
     const siteNumber = parseInt(urlSiteIndex)

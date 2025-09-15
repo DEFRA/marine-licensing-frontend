@@ -4,6 +4,7 @@ import { COORDINATE_SYSTEMS } from '~/src/server/common/constants/exemptions.js'
 import { routes } from '~/src/server/common/constants/routes.js'
 import { getCoordinateSystem } from '~/src/server/common/helpers/coordinate-utils.js'
 import { createSiteDetailsDataJson } from '~/src/server/common/helpers/site-details.js'
+import { getSiteDetailsBySite } from '~/src/server/common/helpers/session-cache/site-utils.js'
 
 const isWGS84 = (coordinateSystem) =>
   coordinateSystem === COORDINATE_SYSTEMS.WGS84
@@ -242,7 +243,7 @@ export const getSiteDetails = async (
   exemption,
   authenticatedGetRequest
 ) => {
-  let siteDetails = exemption.siteDetails ?? {}
+  let siteDetails = getSiteDetailsBySite(exemption)
 
   // If we have an exemption ID but incomplete site details, load from DB
   if (exemption.id && exemption.siteDetails === undefined) {
@@ -252,7 +253,7 @@ export const getSiteDetails = async (
         `/exemption/${exemption.id}`
       )
       if (payload?.value?.siteDetails) {
-        siteDetails = payload.value.siteDetails
+        siteDetails = payload.value.siteDetails[0]
         request.logger.info(
           {
             exemptionId: exemption.id,
@@ -290,33 +291,38 @@ export const getSiteDetails = async (
  * @returns {object} Formatted data for API submission
  */
 export const prepareFileUploadDataForSave = (siteDetails, request) => {
-  const uploadedFile = siteDetails.uploadedFile
-  const geoJSON = siteDetails.geoJSON
-  const featureCount = siteDetails.featureCount || 0
+  const dataToSave = []
+  for (const site of siteDetails) {
+    const uploadedFile = site.uploadedFile
+    const geoJSON = site.geoJSON
+    const featureCount = site.featureCount || 0
 
-  const dataToSave = {
-    coordinatesType: 'file',
-    fileUploadType: siteDetails.fileUploadType,
-    geoJSON,
-    featureCount,
-    uploadedFile: {
-      filename: uploadedFile.filename // Save filename for display
-    },
-    s3Location: {
-      s3Bucket: uploadedFile.s3Location.s3Bucket,
-      s3Key: uploadedFile.s3Location.s3Key,
-      checksumSha256: uploadedFile.s3Location.checksumSha256
-    }
-  }
-
-  request.logger.info(
-    {
-      fileType: siteDetails.fileUploadType,
+    const siteToSave = {
+      coordinatesType: 'file',
+      fileUploadType: site.fileUploadType,
+      geoJSON,
       featureCount,
-      filename: uploadedFile.filename
-    },
-    'Saving file upload site details'
-  )
+      uploadedFile: {
+        filename: uploadedFile.filename // Save filename for display
+      },
+      s3Location: {
+        s3Bucket: uploadedFile.s3Location.s3Bucket,
+        s3Key: uploadedFile.s3Location.s3Key,
+        checksumSha256: uploadedFile.s3Location.checksumSha256
+      }
+    }
+
+    request.logger.info(
+      {
+        fileType: site.fileUploadType,
+        featureCount,
+        filename: uploadedFile.filename
+      },
+      'Saving file upload site details'
+    )
+
+    dataToSave.push(siteToSave)
+  }
 
   return dataToSave
 }
@@ -328,7 +334,7 @@ export const prepareFileUploadDataForSave = (siteDetails, request) => {
  * @returns {object} Formatted data for API submission
  */
 export const prepareManualCoordinateDataForSave = (exemption, request) => {
-  const siteDetails = exemption.siteDetails
+  const siteDetails = getSiteDetailsBySite(exemption)
 
   request.logger.info(
     {
@@ -353,8 +359,9 @@ export const prepareManualCoordinateDataForSave = (exemption, request) => {
  * @returns {object} Rendered view response
  */
 export const renderFileUploadReview = (h, options) => {
-  const { exemption, siteDetails, previousPage, reviewSiteDetailsPageData } =
+  const { exemption, previousPage, siteDetails, reviewSiteDetailsPageData } =
     options
+
   const fileUploadSummaryData = getFileUploadSummaryData({
     ...exemption,
     siteDetails
@@ -385,8 +392,9 @@ export const renderFileUploadReview = (h, options) => {
  * @returns {object} Rendered view response
  */
 export const renderManualCoordinateReview = (h, request, options) => {
-  const { exemption, siteDetails, previousPage, reviewSiteDetailsPageData } =
+  const { exemption, previousPage, siteDetails, reviewSiteDetailsPageData } =
     options
+
   const { coordinateSystem } = getCoordinateSystem(request)
   const summaryData = buildManualCoordinateSummaryData(
     siteDetails,

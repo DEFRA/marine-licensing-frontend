@@ -240,9 +240,11 @@ describe('coordinate-utils', () => {
 
     test('should return OSGB36 when coordinate system is set to OSGB36 in cache', () => {
       mockGetExemptionCache.mockReturnValue({
-        siteDetails: {
-          coordinateSystem: COORDINATE_SYSTEMS.OSGB36
-        }
+        siteDetails: [
+          {
+            coordinateSystem: COORDINATE_SYSTEMS.OSGB36
+          }
+        ]
       })
 
       const result = getCoordinateSystem(mockRequest)
@@ -255,9 +257,11 @@ describe('coordinate-utils', () => {
 
     test('should return WGS84 when coordinate system is set to WGS84 in cache', () => {
       mockGetExemptionCache.mockReturnValue({
-        siteDetails: {
-          coordinateSystem: COORDINATE_SYSTEMS.WGS84
-        }
+        siteDetails: [
+          {
+            coordinateSystem: COORDINATE_SYSTEMS.WGS84
+          }
+        ]
       })
 
       const result = getCoordinateSystem(mockRequest)
@@ -270,7 +274,7 @@ describe('coordinate-utils', () => {
 
     test('should default to WGS84 when coordinate system is not set in cache', () => {
       mockGetExemptionCache.mockReturnValue({
-        siteDetails: {}
+        siteDetails: [{}]
       })
 
       const result = getCoordinateSystem(mockRequest)
@@ -305,9 +309,11 @@ describe('coordinate-utils', () => {
 
     test('should default to WGS84 when coordinate system has an invalid value', () => {
       mockGetExemptionCache.mockReturnValue({
-        siteDetails: {
-          coordinateSystem: 'invalid-system'
-        }
+        siteDetails: [
+          {
+            coordinateSystem: 'invalid-system'
+          }
+        ]
       })
 
       const result = getCoordinateSystem(mockRequest)
@@ -320,9 +326,11 @@ describe('coordinate-utils', () => {
 
     test('should default to WGS84 when coordinate system is null', () => {
       mockGetExemptionCache.mockReturnValue({
-        siteDetails: {
-          coordinateSystem: null
-        }
+        siteDetails: [
+          {
+            coordinateSystem: null
+          }
+        ]
       })
 
       const result = getCoordinateSystem(mockRequest)
@@ -335,9 +343,11 @@ describe('coordinate-utils', () => {
 
     test('should default to WGS84 when coordinate system is undefined', () => {
       mockGetExemptionCache.mockReturnValue({
-        siteDetails: {
-          coordinateSystem: undefined
-        }
+        siteDetails: [
+          {
+            coordinateSystem: undefined
+          }
+        ]
       })
 
       const result = getCoordinateSystem(mockRequest)

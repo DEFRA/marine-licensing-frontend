@@ -11,17 +11,32 @@ export const defraId = {
     name: 'auth',
     register: async (server) => {
       const { authEnabled } = config.get('defraId')
+      const { cookie } = config.get('session')
 
       if (!authEnabled) {
         server.auth.strategy('defra-id', 'basic', {
           validate: () => ({ isValid: true })
         })
+
+        server.auth.strategy('session', 'cookie', {
+          cookie: {
+            name: 'userSession',
+            path: '/',
+            password: cookie.password,
+            isSecure: cookie.secure,
+            ttl: cookie.ttl,
+            isSameSite: 'Lax'
+          },
+          keepAlive: true,
+          redirectTo: '/login',
+          validate: () => ({ isValid: true })
+        })
+
         return
       }
 
       const oidcConfig = await getOidcConfig()
       const defra = openIdProvider('defraId', oidcConfig)
-      const { cookie } = config.get('session')
       const { clientId, clientSecret, serviceId, redirectUrl } =
         config.get('defraId')
 

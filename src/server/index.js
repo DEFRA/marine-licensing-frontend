@@ -65,6 +65,15 @@ export async function createServer() {
     segment: 'session'
   })
 
+  // Configure cookie state definitions for automatic decoding
+  server.state('cookies_policy', {
+    encoding: 'base64json',
+    ttl: 365 * 24 * 60 * 60 * 1000, // 1 year in milliseconds
+    path: '/',
+    isSecure: process.env.NODE_ENV === 'production',
+    isSameSite: 'Strict'
+  })
+
   await server.register([
     requestLogger,
     requestTracing,

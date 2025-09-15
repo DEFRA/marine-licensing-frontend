@@ -44,7 +44,7 @@ describe('#coordinatesEntry', () => {
         heading: 'How do you want to enter the coordinates?',
         backLink: routes.SITE_DETAILS_ACTIVITY_DESCRIPTION,
         payload: {
-          coordinatesEntry: mockExemption.siteDetails.coordinatesEntry
+          coordinatesEntry: mockExemption.siteDetails[0].coordinatesEntry
         },
         projectName: 'Test Project'
       })
@@ -263,6 +263,7 @@ describe('#coordinatesEntry', () => {
 
       expect(cacheUtils.updateExemptionSiteDetails).toHaveBeenCalledWith(
         mockRequest,
+        0,
         'coordinatesEntry',
         'single'
       )

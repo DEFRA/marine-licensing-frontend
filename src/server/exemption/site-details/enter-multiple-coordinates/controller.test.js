@@ -159,10 +159,12 @@ describe('#multipleCoordinates', () => {
     test('should render OSGB36 template with correct context', () => {
       getExemptionCacheSpy.mockReturnValueOnce({
         ...mockExemption,
-        siteDetails: {
-          coordinateSystem: COORDINATE_SYSTEMS.OSGB36,
-          coordinates: mockCoordinates.osgb36
-        }
+        siteDetails: [
+          {
+            coordinateSystem: COORDINATE_SYSTEMS.OSGB36,
+            coordinates: mockCoordinates.osgb36
+          }
+        ]
       })
       normaliseCoordinatesForDisplay.mockReturnValueOnce(mockCoordinates.osgb36)
 
@@ -244,6 +246,7 @@ describe('#multipleCoordinates', () => {
       )
       expect(updateExemptionSiteDetails).toHaveBeenCalledWith(
         request,
+        0,
         'coordinates',
         expectedCoordinates
       )
@@ -306,6 +309,7 @@ describe('#multipleCoordinates', () => {
       )
       expect(updateExemptionSiteDetails).toHaveBeenCalledWith(
         request,
+        0,
         'coordinates',
         expectedCoordinates
       )

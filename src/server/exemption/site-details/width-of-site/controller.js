@@ -2,6 +2,7 @@ import {
   getExemptionCache,
   updateExemptionSiteDetails
 } from '~/src/server/common/helpers/session-cache/utils.js'
+import { getSiteDetailsBySite } from '~/src/server/common/helpers/session-cache/site-utils.js'
 import {
   errorDescriptionByFieldName,
   mapErrorsForDisplay
@@ -36,7 +37,7 @@ export const errorMessages = {
 export const widthOfSiteController = {
   handler(request, h) {
     const exemption = getExemptionCache(request)
-    const siteDetails = exemption.siteDetails ?? {}
+    const siteDetails = getSiteDetailsBySite(exemption)
 
     return h.view(WIDTH_OF_SITE_VIEW_ROUTE, {
       ...widthOfSiteSettings,
@@ -88,7 +89,7 @@ export const widthOfSiteSubmitController = {
   handler(request, h) {
     const { payload } = request
 
-    updateExemptionSiteDetails(request, 'circleWidth', payload.width)
+    updateExemptionSiteDetails(request, 0, 'circleWidth', payload.width)
 
     return h.redirect(routes.REVIEW_SITE_DETAILS)
   }

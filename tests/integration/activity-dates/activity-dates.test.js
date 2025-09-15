@@ -47,7 +47,7 @@ describe('Activity dates - page structure & accessibility', () => {
   test('should display correct text when same activity dates for all sites', async () => {
     const mockExemptionWithSameActivityDates = {
       ...exemptionNoActivityDates,
-      siteDetails: {},
+      siteDetails: [{}],
       multipleSiteDetails: {
         multipleSitesEnabled: true,
         sameActivityDates: 'yes'
@@ -70,7 +70,7 @@ describe('Activity dates - page structure & accessibility', () => {
   test('should display correct text when variable activity dates for sites.', async () => {
     const mockExemptionWithDifferentActivityDates = {
       ...exemptionNoActivityDates,
-      siteDetails: {},
+      siteDetails: [{}],
       multipleSiteDetails: {
         multipleSitesEnabled: true,
         sameActivityDates: 'no'
@@ -94,7 +94,7 @@ describe('Activity dates - page structure & accessibility', () => {
   test('should have correct page content for single site journey', async () => {
     const mockExemptionSingleSite = {
       ...exemptionNoActivityDates,
-      siteDetails: {},
+      siteDetails: [{}],
       multipleSiteDetails: {
         multipleSitesEnabled: false
       }
@@ -114,7 +114,7 @@ describe('Activity dates - page structure & accessibility', () => {
   test('should have correct page content for multiple site journey', async () => {
     const mockExemptionSingleSite = {
       ...exemptionNoActivityDates,
-      siteDetails: {},
+      siteDetails: [{}],
       multipleSiteDetails: {
         multipleSitesEnabled: true
       }
@@ -140,7 +140,7 @@ describe('Activity dates - page structure & accessibility', () => {
   test('should have correct page content for multiple site journey with same dates', async () => {
     const mockExemptionSingleSite = {
       ...exemptionNoActivityDates,
-      siteDetails: {},
+      siteDetails: [{}],
       multipleSiteDetails: {
         multipleSitesEnabled: true,
         sameActivityDates: 'yes'

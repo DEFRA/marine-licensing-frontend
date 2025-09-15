@@ -5,6 +5,7 @@ import {
   getFileUploadSummaryData,
   getPolygonCoordinatesDisplayData
 } from '~/src/server/exemption/site-details/review-site-details/utils.js'
+import { getSiteDetailsBySite } from '~/src/server/common/helpers/session-cache/site-utils.js'
 
 export const errorMessages = {
   FILE_UPLOAD_DATA_ERROR: 'Error getting file upload summary data'
@@ -19,9 +20,11 @@ export const errorMessages = {
  */
 export const processFileUploadSiteDetails = (exemption, id, request) => {
   try {
+    const siteDetails = getSiteDetailsBySite(exemption)
     const fileUploadData = getFileUploadSummaryData(exemption)
+
     return {
-      ...exemption.siteDetails,
+      ...siteDetails,
       isFileUpload: true,
       method: fileUploadData.method,
       fileType: fileUploadData.fileType,
@@ -36,13 +39,14 @@ export const processFileUploadSiteDetails = (exemption, id, request) => {
       errorMessages.FILE_UPLOAD_DATA_ERROR
     )
     // Fallback to basic site details if file upload data unavailable
+    const siteDetails = getSiteDetailsBySite(exemption)
+
     return {
-      ...exemption.siteDetails,
+      ...siteDetails,
       isFileUpload: true,
       method: 'Upload a file with the coordinates of the site',
-      fileType:
-        exemption.siteDetails.fileUploadType === 'kml' ? 'KML' : 'Shapefile',
-      filename: exemption.siteDetails.uploadedFile?.filename || 'Unknown file'
+      fileType: siteDetails.fileUploadType === 'kml' ? 'KML' : 'Shapefile',
+      filename: siteDetails.uploadedFile?.filename || 'Unknown file'
     }
   }
 }
@@ -53,7 +57,7 @@ export const processFileUploadSiteDetails = (exemption, id, request) => {
  * @returns {object} Processed site details for manual coordinates
  */
 export const processManualSiteDetails = (exemption) => {
-  const { siteDetails } = exemption
+  const siteDetails = getSiteDetailsBySite(exemption)
   const { coordinateSystem, coordinatesEntry } = siteDetails
 
   const baseData = {
@@ -99,11 +103,13 @@ export const processManualSiteDetails = (exemption) => {
  * @returns {object|null} Processed site details or null
  */
 export const processSiteDetails = (exemption, id, request) => {
-  if (!exemption.siteDetails) {
+  if (!exemption.siteDetails?.length) {
     return null
   }
 
-  const { coordinatesType } = exemption.siteDetails
+  const siteDetails = getSiteDetailsBySite(exemption)
+
+  const { coordinatesType } = siteDetails
 
   if (coordinatesType === 'file') {
     return processFileUploadSiteDetails(exemption, id, request)

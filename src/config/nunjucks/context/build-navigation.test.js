@@ -11,6 +11,28 @@ function mockRequest(options) {
 }
 
 describe('#buildNavigation', () => {
+  test('Should provide expected navigation details', async () => {
+    expect(
+      await buildNavigation(mockRequest({ path: '/non-existent-path' }))
+    ).toEqual([
+      {
+        active: false,
+        text: 'Projects',
+        href: '/home'
+      }
+    ])
+  })
+
+  test('Should provide expected highlighted navigation details', async () => {
+    expect(await buildNavigation(mockRequest({ path: '/' }))).toEqual([
+      {
+        active: false,
+        text: 'Projects',
+        href: '/home'
+      }
+    ])
+  })
+
   test('Should mark Projects Home as active when on dashboard page', async () => {
     const request = { path: '/home' }
     const navigation = await buildNavigation(request)

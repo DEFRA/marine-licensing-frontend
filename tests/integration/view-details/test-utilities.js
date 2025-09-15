@@ -27,14 +27,16 @@ export const createExemptionWithSiteDetails = (overrides = {}) => {
     overrides
 
   return createSubmittedExemption({
-    siteDetails: {
-      coordinatesType: 'coordinates',
-      coordinatesEntry: 'single',
-      coordinateSystem: COORDINATE_SYSTEMS.WGS84,
-      coordinates: { latitude: '51.489676', longitude: '-0.231530' },
-      circleWidth: '100',
-      ...siteDetailsOverrides
-    },
+    siteDetails: [
+      {
+        coordinatesType: 'coordinates',
+        coordinatesEntry: 'single',
+        coordinateSystem: COORDINATE_SYSTEMS.WGS84,
+        coordinates: { latitude: '51.489676', longitude: '-0.231530' },
+        circleWidth: '100',
+        ...siteDetailsOverrides
+      }
+    ],
     ...otherOverrides
   })
 }
@@ -81,10 +83,10 @@ export const errorScenarios = {
   },
   exemptionWithoutSiteDetails: {
     ...baseSubmittedExemption,
-    siteDetails: null
+    siteDetails: [null]
   },
   exemptionWithMalformedSiteDetails: {
     ...baseSubmittedExemption,
-    siteDetails: { invalidStructure: true }
+    siteDetails: [{ invalidStructure: true }]
   }
 }

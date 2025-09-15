@@ -7,6 +7,7 @@ import {
   getExemptionCache,
   updateExemptionSiteDetails
 } from '~/src/server/common/helpers/session-cache/utils.js'
+import { getSiteDetailsBySite } from '~/src/server/common/helpers/session-cache/site-utils.js'
 import { getCoordinateSystem } from '~/src/server/common/helpers/coordinate-utils.js'
 import {
   MULTIPLE_COORDINATES_VIEW_ROUTES,
@@ -21,7 +22,9 @@ import { validateCoordinates } from '~/src/server/exemption/site-details/enter-m
 
 export const multipleCoordinatesController = {
   handler(request, h) {
-    const { projectName, siteDetails = {} } = getExemptionCache(request) || {}
+    const exemption = getExemptionCache(request) || {}
+    const { projectName } = exemption
+    const siteDetails = getSiteDetailsBySite(exemption)
 
     const coordinateSystem =
       siteDetails.coordinateSystem === COORDINATE_SYSTEMS.OSGB36
@@ -115,8 +118,7 @@ export const multipleCoordinatesSubmitController = {
       )
     }
 
-    updateExemptionSiteDetails(request, 'coordinates', coordinates)
-
+    updateExemptionSiteDetails(request, 0, 'coordinates', coordinates)
     if (payload.add) {
       const emptyCoordinate =
         coordinateSystem === COORDINATE_SYSTEMS.OSGB36

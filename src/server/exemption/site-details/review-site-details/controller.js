@@ -64,16 +64,16 @@ export const reviewSiteDetailsController = {
 export const reviewSiteDetailsSubmitController = {
   async handler(request, h) {
     const exemption = getExemptionCache(request)
-    const siteDetails = exemption.siteDetails ?? {}
-
+    const siteDetails = exemption.siteDetails
+    const firstSite = siteDetails[0]
     try {
       const dataToSave =
-        siteDetails.coordinatesType === 'file'
+        firstSite.coordinatesType === 'file'
           ? prepareFileUploadDataForSave(siteDetails, request)
           : prepareManualCoordinateDataForSave(exemption, request)
 
       await authenticatedPatchRequest(request, '/exemption/site-details', {
-        ...(siteDetails.coordinatesType === 'coordinates' && {
+        ...(firstSite.coordinatesType === 'coordinates' && {
           multipleSiteDetails: exemption.multipleSiteDetails
         }),
         siteDetails: dataToSave,

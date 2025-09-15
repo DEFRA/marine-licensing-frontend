@@ -1,4 +1,4 @@
-import clarity from '@microsoft/clarity'
+import Clarity from '@microsoft/clarity'
 import {
   Button,
   Checkboxes,
@@ -21,7 +21,26 @@ createAll(Radios)
 createAll(SkipLink)
 createAll(FileUpload)
 
+function syncClarityConsent() {
+  if (
+    window.clarity &&
+    typeof window.clarity === 'function' &&
+    typeof window.ANALYTICS_ENABLED === 'boolean'
+  ) {
+    try {
+      window.clarity('consent', window.ANALYTICS_ENABLED)
+    } catch {
+      // Silently handle Clarity consent errors
+    }
+  }
+}
+
 document.addEventListener('DOMContentLoaded', () => {
+  if (window.CLARITY_PROJECT_ID) {
+    Clarity.init(window.CLARITY_PROJECT_ID)
+    syncClarityConsent()
+  }
+
   const addAnotherElements = document.querySelectorAll(
     '[data-module="add-another-point"]'
   )
@@ -36,6 +55,3 @@ document.addEventListener('DOMContentLoaded', () => {
     new SiteDetailsMap(element) // eslint-disable-line no-new
   })
 })
-if (window.CLARITY_PROJECT_ID) {
-  clarity.init(window.CLARITY_PROJECT_ID)
-}

@@ -13,14 +13,19 @@
 
 {% block head %}
   <link href="{{ getAssetPath('stylesheets/application.scss') }}" rel="stylesheet">
-  <script>
-    window.CLARITY_PROJECT_ID = "{{ clarityProjectId | default('') }}";
-  </script>
-  <noscript>
+  {% if clarityProjectId %}
+    <script>
+      window.CLARITY_PROJECT_ID = "{{ clarityProjectId }}";
+      window.ANALYTICS_ENABLED = {{ analyticsEnabled | dump }};
+    </script>
+  {% endif %}
+
+    <noscript>
     <style>
       .hide-if-no-js {display:none !important;}
     </style>
   </noscript>
+
 {% endblock %}
 
 {% block header %}
@@ -71,7 +76,7 @@
           text: "Privacy"
         },
         {
-          href: "https://www.gov.uk/help/cookies",
+          href: "/help/cookies",
           text: "Cookies"
         }
       ]

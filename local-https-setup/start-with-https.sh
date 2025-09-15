@@ -1,4 +1,5 @@
 #!/bin/bash
+set -e
 
 # Script to start application with HTTPS support using nginx reverse proxy
 # This provides both HTTP and HTTPS access without port numbers
@@ -17,8 +18,8 @@ if [ ! -f "./local-https-setup/marine-licensing-frontend.test.cdp-int.defra.clou
 fi
 
 # Start nginx with HTTPS config
-echo "Starting nginx with HTTPS..."
-sudo nginx -c $(pwd)/local-https-setup/nginx-https.conf
+echo "Starting nginx with HTTPS using sudo..."
+sudo nginx -c "$(pwd)/local-https-setup/nginx-https.conf"
 
 # Start the development server in the background
 echo "Starting development server..."

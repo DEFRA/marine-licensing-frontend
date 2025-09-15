@@ -93,13 +93,35 @@ describe('defraId plugin', () => {
       if (key === 'defraId') {
         return { authEnabled: false }
       }
+      if (key === 'session') {
+        return {
+          cookie: {
+            password: 'test-cookie-password',
+            secure: true,
+            ttl: 3600000
+          }
+        }
+      }
       return undefined
     })
 
     await defraId.plugin.register(mockServer)
 
-    expect(mockServer.auth.strategy).toHaveBeenCalledTimes(1)
+    expect(mockServer.auth.strategy).toHaveBeenCalledTimes(2)
     expect(mockServer.auth.strategy).toHaveBeenCalledWith('defra-id', 'basic', {
+      validate: expect.any(Function)
+    })
+    expect(mockServer.auth.strategy).toHaveBeenCalledWith('session', 'cookie', {
+      cookie: {
+        name: 'userSession',
+        path: '/',
+        password: 'test-cookie-password',
+        isSecure: true,
+        ttl: 3600000,
+        isSameSite: 'Lax'
+      },
+      keepAlive: true,
+      redirectTo: '/login',
       validate: expect.any(Function)
     })
 

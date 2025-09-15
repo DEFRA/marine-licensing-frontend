@@ -66,9 +66,11 @@ describe('#coordinateSystem', () => {
     test('coordinateSystemController handler should render with correct context with existing cache data', () => {
       getExemptionCacheSpy.mockReturnValueOnce({
         projectName: mockExemption.projectName,
-        siteDetails: {
-          coordinateSystem: 'wgs84'
-        }
+        siteDetails: [
+          {
+            coordinateSystem: 'wgs84'
+          }
+        ]
       })
 
       const h = { view: jest.fn() }
@@ -155,9 +157,11 @@ describe('#coordinateSystem', () => {
 
       getExemptionCacheSpy.mockReturnValueOnce({
         projectName: 'Test Project',
-        siteDetails: {
-          coordinatesEntry: 'multiple'
-        }
+        siteDetails: [
+          {
+            coordinatesEntry: 'multiple'
+          }
+        ]
       })
 
       const h = {
@@ -201,9 +205,11 @@ describe('#coordinateSystem', () => {
 
       getExemptionCacheSpy.mockReturnValueOnce({
         projectName: 'Test Project',
-        siteDetails: {
-          coordinatesEntry: 'single'
-        }
+        siteDetails: [
+          {
+            coordinatesEntry: 'single'
+          }
+        ]
       })
 
       const h = {
@@ -342,6 +348,7 @@ describe('#coordinateSystem', () => {
 
       expect(cacheUtils.updateExemptionSiteDetails).toHaveBeenCalledWith(
         mockRequest,
+        0,
         'coordinateSystem',
         'wgs84'
       )

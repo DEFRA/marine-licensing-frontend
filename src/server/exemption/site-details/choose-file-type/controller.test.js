@@ -20,7 +20,7 @@ describe('#chooseFileType', () => {
 
   const mockExemptionState = {
     projectName: 'Test Project',
-    fileUploadType: 'shapefile'
+    siteDetails: [{ fileUploadType: 'shapefile' }]
   }
 
   beforeAll(async () => {
@@ -90,7 +90,9 @@ describe('#chooseFileType', () => {
       expect(h.view).toHaveBeenCalledWith(CHOOSE_FILE_UPLOAD_TYPE_VIEW_ROUTE, {
         pageTitle: 'Choose file type',
         heading: 'Which type of file do you want to upload?',
-        payload: { fileUploadType: mockExemptionState.fileUploadType },
+        payload: {
+          fileUploadType: mockExemptionState.siteDetails[0].fileUploadType
+        },
         projectName: mockExemptionState.projectName,
         backLink: routes.COORDINATES_TYPE_CHOICE
       })
@@ -267,6 +269,7 @@ describe('#chooseFileType', () => {
 
       expect(updateExemptionSiteDetailsSpy).toHaveBeenCalledWith(
         expect.anything(),
+        0,
         'fileUploadType',
         'shapefile'
       )

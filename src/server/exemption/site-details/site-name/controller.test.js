@@ -22,7 +22,9 @@ describe('#siteName', () => {
       const mockSiteName = 'Test Site Name'
       jest.mocked(getExemptionCache).mockReturnValueOnce({
         ...mockExemption,
-        siteDetails: { ...mockExemption.siteDetails, siteName: mockSiteName }
+        siteDetails: [
+          { ...mockExemption.siteDetails[0], siteName: mockSiteName }
+        ]
       })
 
       const h = { view: jest.fn() }
@@ -51,6 +53,7 @@ describe('#siteName', () => {
 
       expect(jest.mocked(updateExemptionSiteDetails)).toHaveBeenCalledWith(
         request,
+        0,
         'siteName',
         'Test Site Name'
       )

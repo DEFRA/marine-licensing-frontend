@@ -8,8 +8,8 @@ describe('#centreCoordinate models', () => {
   describe('#wgs84ValidationSchema model', () => {
     test('Should correctly validate on valid data', () => {
       const request = {
-        latitude: mockExemption.siteDetails.coordinates.latitude,
-        longitude: mockExemption.siteDetails.coordinates.longitude
+        latitude: mockExemption.siteDetails[0].coordinates.latitude,
+        longitude: mockExemption.siteDetails[0].coordinates.longitude
       }
 
       const result = wgs84ValidationSchema.validate(request)

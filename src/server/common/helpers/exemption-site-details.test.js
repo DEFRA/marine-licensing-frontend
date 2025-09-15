@@ -48,13 +48,15 @@ describe('exemption-site-details helper', () => {
   describe('processFileUploadSiteDetails', () => {
     const mockExemptionId = 'test-exemption-123'
     const baseFileUploadExemption = {
-      siteDetails: {
-        coordinatesType: 'file',
-        fileUploadType: 'kml',
-        uploadedFile: {
-          filename: 'test-site.kml'
+      siteDetails: [
+        {
+          coordinatesType: 'file',
+          fileUploadType: 'kml',
+          uploadedFile: {
+            filename: 'test-site.kml'
+          }
         }
-      }
+      ]
     }
 
     test('should process file upload site details successfully with KML file', () => {
@@ -82,7 +84,7 @@ describe('exemption-site-details helper', () => {
         baseFileUploadExemption
       )
       expect(result).toEqual({
-        ...baseFileUploadExemption.siteDetails,
+        ...baseFileUploadExemption.siteDetails[0],
         isFileUpload: true,
         method: 'Upload a file with the coordinates of the site',
         fileType: 'KML',
@@ -93,13 +95,15 @@ describe('exemption-site-details helper', () => {
 
     test('should process file upload site details successfully with Shapefile', () => {
       const shapefileExemption = {
-        siteDetails: {
-          coordinatesType: 'file',
-          fileUploadType: 'shapefile',
-          uploadedFile: {
-            filename: 'test-site.zip'
+        siteDetails: [
+          {
+            coordinatesType: 'file',
+            fileUploadType: 'shapefile',
+            uploadedFile: {
+              filename: 'test-site.zip'
+            }
           }
-        }
+        ]
       }
 
       const mockFileUploadData = {
@@ -130,7 +134,7 @@ describe('exemption-site-details helper', () => {
       )
 
       expect(result).toEqual({
-        ...shapefileExemption.siteDetails,
+        ...shapefileExemption.siteDetails[0],
         isFileUpload: true,
         method: 'Upload a file with the coordinates of the site',
         fileType: 'Shapefile',
@@ -140,13 +144,15 @@ describe('exemption-site-details helper', () => {
 
     test('should handle error from getFileUploadSummaryData and return fallback for KML', () => {
       const exemptionWithKml = {
-        siteDetails: {
-          coordinatesType: 'file',
-          fileUploadType: 'kml',
-          uploadedFile: {
-            filename: 'test-site.kml'
+        siteDetails: [
+          {
+            coordinatesType: 'file',
+            fileUploadType: 'kml',
+            uploadedFile: {
+              filename: 'test-site.kml'
+            }
           }
-        }
+        ]
       }
 
       const mockError = new Error('Failed to parse file upload data')
@@ -169,7 +175,7 @@ describe('exemption-site-details helper', () => {
       )
 
       expect(result).toEqual({
-        ...exemptionWithKml.siteDetails,
+        ...exemptionWithKml.siteDetails[0],
         isFileUpload: true,
         method: 'Upload a file with the coordinates of the site',
         fileType: 'KML',
@@ -179,13 +185,15 @@ describe('exemption-site-details helper', () => {
 
     test('should handle error from getFileUploadSummaryData and return fallback for Shapefile', () => {
       const exemptionWithShapefile = {
-        siteDetails: {
-          coordinatesType: 'file',
-          fileUploadType: 'shapefile',
-          uploadedFile: {
-            filename: 'test-site.zip'
+        siteDetails: [
+          {
+            coordinatesType: 'file',
+            fileUploadType: 'shapefile',
+            uploadedFile: {
+              filename: 'test-site.zip'
+            }
           }
-        }
+        ]
       }
 
       getFileUploadSummaryData.mockImplementation(() => {
@@ -199,7 +207,7 @@ describe('exemption-site-details helper', () => {
       )
 
       expect(result).toEqual({
-        ...exemptionWithShapefile.siteDetails,
+        ...exemptionWithShapefile.siteDetails[0],
         isFileUpload: true,
         method: 'Upload a file with the coordinates of the site',
         fileType: 'Shapefile',
@@ -209,11 +217,13 @@ describe('exemption-site-details helper', () => {
 
     test('should handle missing filename in uploadedFile', () => {
       const exemptionWithMissingFilename = {
-        siteDetails: {
-          coordinatesType: 'file',
-          fileUploadType: 'kml',
-          uploadedFile: {}
-        }
+        siteDetails: [
+          {
+            coordinatesType: 'file',
+            fileUploadType: 'kml',
+            uploadedFile: {}
+          }
+        ]
       }
 
       getFileUploadSummaryData.mockImplementation(() => {
@@ -232,16 +242,18 @@ describe('exemption-site-details helper', () => {
 
   describe('processManualSiteDetails', () => {
     const baseManualExemption = {
-      siteDetails: {
-        coordinatesType: 'coordinates',
-        coordinateSystem: 'wgs84',
-        coordinatesEntry: 'single',
-        coordinates: {
-          latitude: '51.5074',
-          longitude: '-0.1278'
-        },
-        circleWidth: '100'
-      }
+      siteDetails: [
+        {
+          coordinatesType: 'coordinates',
+          coordinateSystem: 'wgs84',
+          coordinatesEntry: 'single',
+          coordinates: {
+            latitude: '51.5074',
+            longitude: '-0.1278'
+          },
+          circleWidth: '100'
+        }
+      ]
     }
 
     beforeEach(() => {
@@ -255,10 +267,10 @@ describe('exemption-site-details helper', () => {
 
       expect(getCoordinateSystemText).toHaveBeenCalledWith('wgs84')
       expect(getReviewSummaryText).toHaveBeenCalledWith(
-        baseManualExemption.siteDetails
+        baseManualExemption.siteDetails[0]
       )
       expect(getCoordinateDisplayText).toHaveBeenCalledWith(
-        baseManualExemption.siteDetails,
+        baseManualExemption.siteDetails[0],
         'wgs84'
       )
 
@@ -281,16 +293,18 @@ describe('exemption-site-details helper', () => {
 
     test('should process single circular site with OSGB36 coordinates', () => {
       const osgb36Exemption = {
-        siteDetails: {
-          coordinatesType: 'coordinates',
-          coordinateSystem: 'osgb36',
-          coordinatesEntry: 'single',
-          coordinates: {
-            eastings: '425053',
-            northings: '564180'
-          },
-          circleWidth: '250'
-        }
+        siteDetails: [
+          {
+            coordinatesType: 'coordinates',
+            coordinateSystem: 'osgb36',
+            coordinatesEntry: 'single',
+            coordinates: {
+              eastings: '425053',
+              northings: '564180'
+            },
+            circleWidth: '250'
+          }
+        ]
       }
 
       getCoordinateSystemText.mockReturnValue('OSGB36 (eastings and northings)')
@@ -317,17 +331,19 @@ describe('exemption-site-details helper', () => {
 
     test('should process multiple polygon coordinates with WGS84', () => {
       const polygonExemption = {
-        siteDetails: {
-          coordinatesType: 'coordinates',
-          coordinateSystem: 'wgs84',
-          coordinatesEntry: 'multiple',
-          coordinates: [
-            { latitude: '51.5074', longitude: '-0.1278' },
-            { latitude: '51.5080', longitude: '-0.1285' },
-            { latitude: '51.5070', longitude: '-0.1290' }
-          ],
-          circleWidth: null
-        }
+        siteDetails: [
+          {
+            coordinatesType: 'coordinates',
+            coordinateSystem: 'wgs84',
+            coordinatesEntry: 'multiple',
+            coordinates: [
+              { latitude: '51.5074', longitude: '-0.1278' },
+              { latitude: '51.5080', longitude: '-0.1285' },
+              { latitude: '51.5070', longitude: '-0.1290' }
+            ],
+            circleWidth: null
+          }
+        ]
       }
 
       const mockPolygonData = [
@@ -342,7 +358,7 @@ describe('exemption-site-details helper', () => {
       const result = processManualSiteDetails(polygonExemption)
 
       expect(getPolygonCoordinatesDisplayData).toHaveBeenCalledWith(
-        polygonExemption.siteDetails,
+        polygonExemption.siteDetails[0],
         'wgs84'
       )
 
@@ -366,17 +382,19 @@ describe('exemption-site-details helper', () => {
 
     test('should process multiple polygon coordinates with OSGB36', () => {
       const osgb36PolygonExemption = {
-        siteDetails: {
-          coordinatesType: 'coordinates',
-          coordinateSystem: 'osgb36',
-          coordinatesEntry: 'multiple',
-          coordinates: [
-            { eastings: '425053', northings: '564180' },
-            { eastings: '426000', northings: '565000' },
-            { eastings: '427000', northings: '566000' }
-          ],
-          circleWidth: null
-        }
+        siteDetails: [
+          {
+            coordinatesType: 'coordinates',
+            coordinateSystem: 'osgb36',
+            coordinatesEntry: 'multiple',
+            coordinates: [
+              { eastings: '425053', northings: '564180' },
+              { eastings: '426000', northings: '565000' },
+              { eastings: '427000', northings: '566000' }
+            ],
+            circleWidth: null
+          }
+        ]
       }
 
       const mockPolygonData = [
@@ -401,7 +419,7 @@ describe('exemption-site-details helper', () => {
     const mockExemptionId = 'test-exemption-456'
 
     test('should return null when exemption has no siteDetails', () => {
-      const exemptionWithoutSiteDetails = {}
+      const exemptionWithoutSiteDetails = []
 
       const result = processSiteDetails(
         exemptionWithoutSiteDetails,
@@ -414,13 +432,15 @@ describe('exemption-site-details helper', () => {
 
     test('should route to processFileUploadSiteDetails for file coordinates', () => {
       const fileExemption = {
-        siteDetails: {
-          coordinatesType: 'file',
-          fileUploadType: 'kml',
-          uploadedFile: {
-            filename: 'test.kml'
+        siteDetails: [
+          {
+            coordinatesType: 'file',
+            fileUploadType: 'kml',
+            uploadedFile: {
+              filename: 'test.kml'
+            }
           }
-        }
+        ]
       }
 
       const mockFileUploadData = {
@@ -444,16 +464,18 @@ describe('exemption-site-details helper', () => {
 
     test('should route to processManualSiteDetails for manual coordinates', () => {
       const manualExemption = {
-        siteDetails: {
-          coordinatesType: 'coordinates',
-          coordinateSystem: 'wgs84',
-          coordinatesEntry: 'single',
-          coordinates: {
-            latitude: '51.5074',
-            longitude: '-0.1278'
-          },
-          circleWidth: '100'
-        }
+        siteDetails: [
+          {
+            coordinatesType: 'coordinates',
+            coordinateSystem: 'wgs84',
+            coordinatesEntry: 'single',
+            coordinates: {
+              latitude: '51.5074',
+              longitude: '-0.1278'
+            },
+            circleWidth: '100'
+          }
+        ]
       }
 
       getCoordinateSystemText.mockReturnValue('WGS84 (latitude and longitude)')
@@ -473,16 +495,18 @@ describe('exemption-site-details helper', () => {
 
     test('should default to processManualSiteDetails for unknown coordinatesType', () => {
       const unknownTypeExemption = {
-        siteDetails: {
-          coordinatesType: 'unknown',
-          coordinateSystem: 'wgs84',
-          coordinatesEntry: 'single',
-          coordinates: {
-            latitude: '51.5074',
-            longitude: '-0.1278'
-          },
-          circleWidth: '100'
-        }
+        siteDetails: [
+          {
+            coordinatesType: 'unknown',
+            coordinateSystem: 'wgs84',
+            coordinatesEntry: 'single',
+            coordinates: {
+              latitude: '51.5074',
+              longitude: '-0.1278'
+            },
+            circleWidth: '100'
+          }
+        ]
       }
 
       getCoordinateSystemText.mockReturnValue('WGS84 (latitude and longitude)')

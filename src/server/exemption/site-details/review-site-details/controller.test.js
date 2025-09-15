@@ -52,56 +52,62 @@ function createMockExemption(
   const baseExemption = {
     ...mockExemption,
     ...overrides,
-    siteDetails: {
-      coordinatesType: 'coordinates',
-      coordinateSystem
-    }
+    siteDetails: [
+      {
+        coordinatesType: 'coordinates',
+        coordinateSystem
+      }
+    ]
   }
 
   switch (type) {
     case 'multiple':
       return {
         ...baseExemption,
-        siteDetails: {
-          ...baseExemption.siteDetails,
-          coordinatesEntry: 'multiple',
-          coordinates:
-            coordinateSystem === COORDINATE_SYSTEMS.WGS84
-              ? [
-                  { latitude: '55.123456', longitude: '55.123456' },
-                  { latitude: '33.987654', longitude: '33.987654' },
-                  { latitude: '78.123456', longitude: '78.123456' }
-                ]
-              : [
-                  { eastings: '425053', northings: '564180' },
-                  { eastings: '426000', northings: '565000' },
-                  { eastings: '427000', northings: '566000' }
-                ]
-        }
+        siteDetails: [
+          {
+            ...baseExemption.siteDetails[0],
+            coordinatesEntry: 'multiple',
+            coordinates:
+              coordinateSystem === COORDINATE_SYSTEMS.WGS84
+                ? [
+                    { latitude: '55.123456', longitude: '55.123456' },
+                    { latitude: '33.987654', longitude: '33.987654' },
+                    { latitude: '78.123456', longitude: '78.123456' }
+                  ]
+                : [
+                    { eastings: '425053', northings: '564180' },
+                    { eastings: '426000', northings: '565000' },
+                    { eastings: '427000', northings: '566000' }
+                  ]
+          }
+        ]
       }
 
     case 'file':
       return {
         ...baseExemption,
-        siteDetails: {
-          coordinatesType: 'file',
-          fileUploadType: 'kml',
-          uploadedFile: {
-            filename: 'test-site.kml'
-          },
-          geoJSON: {
-            type: 'FeatureCollection',
-            features: [
-              {
-                type: 'Feature',
-                geometry: {
-                  type: 'Point',
-                  coordinates: [51.5074, -0.1278]
+        siteDetails: [
+          {
+            coordinatesType: 'file',
+            fileUploadType: 'kml',
+            uploadedFile: {
+              filename: 'test-site.kml'
+            },
+            geoJSON: {
+              type: 'FeatureCollection',
+              features: [
+                {
+                  type: 'Feature',
+                  geometry: {
+                    type: 'Point',
+                    coordinates: [51.5074, -0.1278]
+                  }
                 }
-              }
-            ]
+              ]
+            }
           }
-        }
+        ]
       }
 
     case 'empty':
@@ -114,18 +120,21 @@ function createMockExemption(
     default: // 'single'
       return {
         ...baseExemption,
-        siteDetails: {
-          ...baseExemption.siteDetails,
-          coordinatesEntry: 'single',
-          coordinates:
-            coordinateSystem === COORDINATE_SYSTEMS.WGS84
-              ? {
-                  latitude: mockExemption.siteDetails.coordinates.latitude,
-                  longitude: mockExemption.siteDetails.coordinates.longitude
-                }
-              : { eastings: '425053', northings: '564180' },
-          circleWidth: '100'
-        }
+        siteDetails: [
+          {
+            ...baseExemption.siteDetails[0],
+            coordinatesEntry: 'single',
+            coordinates:
+              coordinateSystem === COORDINATE_SYSTEMS.WGS84
+                ? {
+                    latitude: mockExemption.siteDetails[0].coordinates.latitude,
+                    longitude:
+                      mockExemption.siteDetails[0].coordinates.longitude
+                  }
+                : { eastings: '425053', northings: '564180' },
+            circleWidth: '100'
+          }
+        ]
       }
   }
 }
@@ -207,8 +216,8 @@ describe('#reviewSiteDetails', () => {
 
   const mockCoordinates = {
     [COORDINATE_SYSTEMS.WGS84]: {
-      latitude: mockExemption.siteDetails.coordinates.latitude,
-      longitude: mockExemption.siteDetails.coordinates.longitude
+      latitude: mockExemption.siteDetails[0].coordinates.latitude,
+      longitude: mockExemption.siteDetails[0].coordinates.longitude
     },
     [COORDINATE_SYSTEMS.OSGB36]: { eastings: '425053', northings: '564180' }
   }
@@ -227,22 +236,26 @@ describe('#reviewSiteDetails', () => {
 
   const mockPolygonExemptionWGS84 = {
     ...mockExemption,
-    siteDetails: {
-      coordinatesType: 'coordinates',
-      coordinatesEntry: 'multiple',
-      coordinateSystem: COORDINATE_SYSTEMS.WGS84,
-      coordinates: mockPolygonCoordinatesWGS84
-    }
+    siteDetails: [
+      {
+        coordinatesType: 'coordinates',
+        coordinatesEntry: 'multiple',
+        coordinateSystem: COORDINATE_SYSTEMS.WGS84,
+        coordinates: mockPolygonCoordinatesWGS84
+      }
+    ]
   }
 
   const mockPolygonExemptionOSGB36 = {
     ...mockExemption,
-    siteDetails: {
-      coordinatesType: 'coordinates',
-      coordinatesEntry: 'multiple',
-      coordinateSystem: COORDINATE_SYSTEMS.OSGB36,
-      coordinates: mockPolygonCoordinatesOSGB36
-    }
+    siteDetails: [
+      {
+        coordinatesType: 'coordinates',
+        coordinatesEntry: 'multiple',
+        coordinateSystem: COORDINATE_SYSTEMS.OSGB36,
+        coordinates: mockPolygonCoordinatesOSGB36
+      }
+    ]
   }
 
   const createMockRequest = () => ({
@@ -256,17 +269,39 @@ describe('#reviewSiteDetails', () => {
 
   const createFileUploadExemptionWithS3 = () => ({
     ...mockExemption,
-    siteDetails: {
+    siteDetails: [
+      {
+        coordinatesType: 'file',
+        fileUploadType: 'kml',
+        uploadedFile: {
+          filename: 'test-site.kml',
+          s3Location: {
+            s3Bucket: 'test-bucket',
+            s3Key: 'test-key',
+            checksumSha256: 'test-checksum'
+          }
+        },
+        geoJSON: {
+          type: 'FeatureCollection',
+          features: [
+            {
+              type: 'Feature',
+              geometry: {
+                type: 'Point',
+                coordinates: [51.5074, -0.1278]
+              }
+            }
+          ]
+        },
+        featureCount: 1
+      }
+    ]
+  })
+
+  const createExpectedSiteDetails = () => [
+    {
       coordinatesType: 'file',
       fileUploadType: 'kml',
-      uploadedFile: {
-        filename: 'test-site.kml',
-        s3Location: {
-          s3Bucket: 'test-bucket',
-          s3Key: 'test-key',
-          checksumSha256: 'test-checksum'
-        }
-      },
       geoJSON: {
         type: 'FeatureCollection',
         features: [
@@ -279,35 +314,17 @@ describe('#reviewSiteDetails', () => {
           }
         ]
       },
-      featureCount: 1
+      featureCount: 1,
+      uploadedFile: {
+        filename: 'test-site.kml'
+      },
+      s3Location: {
+        s3Bucket: 'test-bucket',
+        s3Key: 'test-key',
+        checksumSha256: 'test-checksum'
+      }
     }
-  })
-
-  const createExpectedSiteDetails = () => ({
-    coordinatesType: 'file',
-    fileUploadType: 'kml',
-    geoJSON: {
-      type: 'FeatureCollection',
-      features: [
-        {
-          type: 'Feature',
-          geometry: {
-            type: 'Point',
-            coordinates: [51.5074, -0.1278]
-          }
-        }
-      ]
-    },
-    featureCount: 1,
-    uploadedFile: {
-      filename: 'test-site.kml'
-    },
-    s3Location: {
-      s3Bucket: 'test-bucket',
-      s3Key: 'test-key',
-      checksumSha256: 'test-checksum'
-    }
-  })
+  ]
 
   beforeAll(async () => {
     server = await createServer()
@@ -398,7 +415,6 @@ describe('#reviewSiteDetails', () => {
 
         const h = createMockHandler()
         const mockRequest = createMockRequest()
-
         await reviewSiteDetailsController.handler(mockRequest, h)
 
         expect(authRequests.authenticatedGetRequest).toHaveBeenCalledWith(
@@ -691,10 +707,12 @@ describe('#reviewSiteDetails', () => {
           )
           const exemptionWithEmptyCoordinates = {
             ...baseExemption,
-            siteDetails: {
-              ...baseExemption.siteDetails,
-              coordinates: []
-            }
+            siteDetails: [
+              {
+                ...baseExemption.siteDetails[0],
+                coordinates: []
+              }
+            ]
           }
 
           getExemptionCacheSpy.mockReturnValueOnce(
@@ -736,15 +754,17 @@ describe('#reviewSiteDetails', () => {
           )
           const exemptionWithIncompleteCoordinates = {
             ...baseExemption,
-            siteDetails: {
-              ...baseExemption.siteDetails,
-              coordinates: [
-                { latitude: '55.123456', longitude: '55.123456' },
-                { latitude: '', longitude: '33.987654' }, // incomplete
-                { latitude: '78.123456', longitude: '78.123456' },
-                { latitude: null, longitude: null } // invalid
-              ]
-            }
+            siteDetails: [
+              {
+                ...baseExemption.siteDetails[0],
+                coordinates: [
+                  { latitude: '55.123456', longitude: '55.123456' },
+                  { latitude: '', longitude: '33.987654' }, // incomplete
+                  { latitude: '78.123456', longitude: '78.123456' },
+                  { latitude: null, longitude: null } // invalid
+                ]
+              }
+            ]
           }
 
           getExemptionCacheSpy.mockReturnValueOnce(
@@ -795,10 +815,12 @@ describe('#reviewSiteDetails', () => {
           )
           const exemptionWithSingleCoordinate = {
             ...baseExemption,
-            siteDetails: {
-              ...baseExemption.siteDetails,
-              coordinates: [{ latitude: '55.123456', longitude: '55.123456' }]
-            }
+            siteDetails: [
+              {
+                ...baseExemption.siteDetails[0],
+                coordinates: [{ latitude: '55.123456', longitude: '55.123456' }]
+              }
+            ]
           }
 
           getExemptionCacheSpy.mockReturnValueOnce(
@@ -834,10 +856,12 @@ describe('#reviewSiteDetails', () => {
           )
           const exemptionWithManyCoordinates = {
             ...baseExemption,
-            siteDetails: {
-              ...baseExemption.siteDetails,
-              coordinates: manyCoordinates
-            }
+            siteDetails: [
+              {
+                ...baseExemption.siteDetails[0],
+                coordinates: manyCoordinates
+              }
+            ]
           }
 
           getExemptionCacheSpy.mockReturnValueOnce(exemptionWithManyCoordinates)

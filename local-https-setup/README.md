@@ -13,10 +13,23 @@ This folder contains all the scripts and configuration files needed to run the M
    mkcert -install
    ```
 
+   Or with macports
+
+   ```bash
+   sudo port install mkcert
+   ```
+
 2. **Install nginx** (if not already installed):
 
    ```bash
    brew install nginx
+   ```
+
+   Or with macports:
+
+   ```bash
+   sudo port install nginx
+   #  Do not configure to run at startup
    ```
 
 3. **Set up nginx directories** (required for Homebrew nginx):
@@ -27,6 +40,8 @@ This folder contains all the scripts and configuration files needed to run the M
    ```
 
    > **⚠️ Important**: This step is required to set the working directory correctly for Homebrew installed nginx.
+
+   For Macports: the default config file is `/opt/local/etc/nginx/nginx.conf`
 
 4. **Generate SSL certificates** (first time only):
 

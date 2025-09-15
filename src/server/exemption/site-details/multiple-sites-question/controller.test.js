@@ -46,8 +46,8 @@ describe('#multipleSitesQuestion', () => {
       }
       const h = { redirect: jest.fn() }
 
-      const expectedSiteDetails = { ...mockExemption.siteDetails }
-      delete expectedSiteDetails.siteName
+      const expectedSiteDetails = [...mockExemption.siteDetails]
+      delete expectedSiteDetails[0].siteName
 
       multipleSitesSubmitController.handler(request, h)
 

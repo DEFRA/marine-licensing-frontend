@@ -31,21 +31,33 @@ export const mockExemption = {
     sameActivityDates: 'yes',
     sameActivityDescription: 'yes'
   },
-  siteDetails: {
-    coordinatesType: 'coordinates',
-    coordinatesEntry: 'single',
-    coordinateSystem: COORDINATE_SYSTEMS.WGS84,
-    coordinates: { latitude: '51.489676', longitude: '-0.231530' },
-    circleWidth: '100',
-    siteName: 'Mock site'
-  },
+  siteDetails: [
+    {
+      coordinatesType: 'coordinates',
+      coordinatesEntry: 'single',
+      coordinateSystem: COORDINATE_SYSTEMS.WGS84,
+      coordinates: { latitude: '51.489676', longitude: '-0.231530' },
+      circleWidth: '100',
+      siteName: 'Mock site'
+    },
+    {
+      coordinatesType: 'coordinates',
+      coordinatesEntry: 'single',
+      coordinateSystem: COORDINATE_SYSTEMS.OSGB36,
+      coordinates: { eastings: '532000', northings: '182000' },
+      circleWidth: '50',
+      siteName: 'Mock site 2'
+    }
+  ],
   taskList: mockExemptionTaskList,
   mcmsContext: mockExemptionMcmsContext
 }
 
 export const mockExemptionWithShapefile = {
   ...mockExemption,
-  siteDetails: { ...mockExemption.siteDetails, fileUploadType: 'shapefile' }
+  siteDetails: [
+    { ...mockExemption.siteDetails[0], fileUploadType: 'shapefile' }
+  ]
 }
 
 export const mockExemptionNoSiteDetails = {
@@ -57,14 +69,16 @@ export const mockExemptionNoSiteDetails = {
 
 export const mockExemptionWithUploadConfig = {
   ...mockExemption,
-  siteDetails: {
-    ...mockExemption.siteDetails,
-    uploadConfig: {
-      uploadId: 'test-upload-id',
-      statusUrl: 'test-status-url',
-      fileType: 'kml'
+  siteDetails: [
+    {
+      ...mockExemption.siteDetails[0],
+      uploadConfig: {
+        uploadId: 'test-upload-id',
+        statusUrl: 'test-status-url',
+        fileType: 'kml'
+      }
     }
-  }
+  ]
 }
 
 export const mockProjectList = [

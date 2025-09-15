@@ -2,6 +2,7 @@ import { config } from '~/src/config/config.js'
 import { routes } from '~/src/server/common/constants/routes.js'
 import { authenticatedPostRequest } from '~/src/server/common/helpers/authenticated-requests.js'
 import { extractCoordinatesFromGeoJSON } from '~/src/server/common/helpers/coordinate-utils.js'
+import { getSiteDetailsBySite } from '~/src/server/common/helpers/session-cache/site-utils.js'
 import {
   getExemptionCache,
   updateExemptionSiteDetails,
@@ -233,7 +234,7 @@ function handleCdpRejectionError(request, status, fileType) {
  * @param {object} request - Hapi request object
  */
 function clearUploadSession(request) {
-  updateExemptionSiteDetails(request, 'uploadConfig', null)
+  updateExemptionSiteDetails(request, 0, 'uploadConfig', null)
 }
 
 /**
@@ -243,7 +244,7 @@ function clearUploadSession(request) {
  * @param {string} fileType - File type for contextualized errors
  */
 function storeUploadError(request, errorDetails, fileType) {
-  updateExemptionSiteDetails(request, 'uploadError', {
+  updateExemptionSiteDetails(request, 0, 'uploadError', {
     message: errorDetails.message,
     fieldName: errorDetails.fieldName,
     fileType
@@ -460,7 +461,10 @@ export const uploadAndWaitController = {
     request.logger.debug(
       `uploadAndWaitController: exemption: ${JSON.stringify(exemption, null, 2)}`
     )
-    const { uploadConfig } = exemption.siteDetails || {}
+
+    const site = getSiteDetailsBySite(exemption)
+
+    const { uploadConfig } = site
 
     if (!uploadConfig) {
       return h.redirect(routes.CHOOSE_FILE_UPLOAD_TYPE)
@@ -489,7 +493,7 @@ export const uploadAndWaitController = {
       )
 
       // Clear upload config and redirect to file type selection
-      updateExemptionSiteDetails(request, 'uploadConfig', null)
+      updateExemptionSiteDetails(request, 0, 'uploadConfig', null)
       return h.redirect(routes.CHOOSE_FILE_UPLOAD_TYPE)
     }
   }

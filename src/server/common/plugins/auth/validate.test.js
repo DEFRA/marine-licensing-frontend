@@ -4,6 +4,7 @@ import { validateUserSession } from './validate.js'
 import { startServer } from '~/src/server/common/helpers/start-server.js'
 
 import * as authUtils from '~/src/server/common/plugins/auth/utils.js'
+import { AUTH_STRATEGIES } from '~/src/server/common/constants/auth.js'
 
 jest.mock('~/src/server/common/plugins/auth/utils.js', () => ({
   getUserSession: jest.fn(),
@@ -27,7 +28,9 @@ describe('validateUserSession', () => {
   beforeEach(async () => {
     jest.clearAllMocks()
 
-    mockRequest = {}
+    mockRequest = {
+      path: '/'
+    }
 
     mockSession = {
       sessionId: 'test-session-123'
@@ -36,7 +39,8 @@ describe('validateUserSession', () => {
     mockUserSession = {
       sessionId: 'test-session-123',
       expiresAt: '2024-01-01T12:00:00.000Z',
-      profile: { name: 'Test User' }
+      profile: { name: 'Test User' },
+      strategy: AUTH_STRATEGIES.DEFRA_ID
     }
 
     server = await startServer()
@@ -137,5 +141,88 @@ describe('validateUserSession', () => {
       mockSession
     )
     expect(authUtils.updateUserSession).not.toHaveBeenCalled()
+  })
+
+  describe('auth strategies', () => {
+    describe('DEFRA_ID strategy validation', () => {
+      beforeEach(() => {
+        mockUserSession.strategy = AUTH_STRATEGIES.DEFRA_ID
+        authUtils.getUserSession.mockResolvedValue(mockUserSession)
+        isPast.mockReturnValue(false)
+      })
+
+      test('should validate successfully for a route requiring defra ID', async () => {
+        mockRequest.path = '/exemption/task-list'
+        await server.app.cache.set(mockUserSession.sessionId, mockUserSession)
+
+        const result = await validateUserSession(mockRequest, mockSession)
+
+        expect(result).toEqual({
+          isValid: true,
+          credentials: mockUserSession
+        })
+      })
+
+      test('should fail validation for a route requiring entra ID', async () => {
+        mockRequest.path = '/view-details'
+        await server.app.cache.set(mockUserSession.sessionId, mockUserSession)
+
+        const result = await validateUserSession(mockRequest, mockSession)
+
+        expect(result).toEqual({
+          isValid: false
+        })
+      })
+    })
+
+    describe('ENTRA_ID strategy validation', () => {
+      beforeEach(() => {
+        mockUserSession.strategy = AUTH_STRATEGIES.ENTRA_ID
+        authUtils.getUserSession.mockResolvedValue(mockUserSession)
+        isPast.mockReturnValue(false)
+      })
+
+      test('should validate successfully for a route requiring entra ID', async () => {
+        mockRequest.path = '/view-details'
+        await server.app.cache.set(mockUserSession.sessionId, mockUserSession)
+
+        const result = await validateUserSession(mockRequest, mockSession)
+
+        expect(result).toEqual({
+          isValid: true,
+          credentials: mockUserSession
+        })
+      })
+
+      test('should fail validation for a route requiring defra ID', async () => {
+        mockRequest.path = '/exemption/task-list'
+        await server.app.cache.set(mockUserSession.sessionId, mockUserSession)
+
+        const result = await validateUserSession(mockRequest, mockSession)
+
+        expect(result).toEqual({
+          isValid: false
+        })
+      })
+    })
+
+    describe('No strategy set', () => {
+      beforeEach(() => {
+        mockUserSession.strategy = null
+        authUtils.getUserSession.mockResolvedValue(mockUserSession)
+        isPast.mockReturnValue(false)
+      })
+
+      test('should fail validation if no strategy is set', async () => {
+        mockRequest.path = '/exemption/task-list'
+        await server.app.cache.set(mockUserSession.sessionId, mockUserSession)
+
+        const result = await validateUserSession(mockRequest, mockSession)
+
+        expect(result).toEqual({
+          isValid: false
+        })
+      })
+    })
   })
 })

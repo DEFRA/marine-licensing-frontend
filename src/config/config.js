@@ -9,6 +9,7 @@ const oneDay = 1000 * 60 * 60 * 24
 const fourHoursMs = 14400000
 const oneWeekMs = 604800000
 const fiftyMB = 50_000_000 // 50 MB :== 50 * 1000 * 1000
+const localhost = 'http://localhost:3000'
 
 const isProduction = process.env.NODE_ENV === 'production'
 const isTest = process.env.NODE_ENV === 'test'
@@ -52,7 +53,7 @@ export const config = convict({
   appBaseUrl: {
     doc: 'Base URL for the application (used for CDP upload redirects)',
     format: String,
-    default: 'http://localhost:3000',
+    default: localhost,
     env: 'APP_BASE_URL'
   },
   root: {
@@ -274,7 +275,8 @@ export const config = convict({
       doc: 'The Defra Identity client secret.',
       format: String,
       default: 'test_value',
-      env: 'DEFRA_ID_CLIENT_SECRET'
+      env: 'DEFRA_ID_CLIENT_SECRET',
+      sensitive: true
     },
     serviceId: {
       doc: 'The Defra Identity service ID.',
@@ -292,7 +294,7 @@ export const config = convict({
     redirectUrl: {
       doc: 'The Defra Identity redirect URl.',
       format: String,
-      default: 'http://localhost:3000',
+      default: localhost,
       env: 'APP_BASE_URL'
     },
     refreshTokens: {
@@ -300,6 +302,47 @@ export const config = convict({
       format: Boolean,
       default: true,
       env: 'DEFRA_ID_REFRESH_TOKENS'
+    }
+  },
+  entraId: {
+    oidcConfigurationUrl: {
+      doc: 'Entra ID OIDC configuration URL',
+      format: String,
+      env: 'ENTRA_ID_OIDC_CONFIGURATION_URL',
+      default:
+        'http://localhost:3200/cdp-defra-id-stub/.well-known/openid-configuration'
+    },
+    authEnabled: {
+      doc: 'ENTRA ID Auth enabled',
+      format: Boolean,
+      env: 'ENTRA_ID_ENABLED',
+      default: false
+    },
+    clientId: {
+      doc: 'ENTRA ID client ID',
+      format: String,
+      env: 'ENTRA_ID_CLIENT_ID',
+      default: 'f68226cb-8dbc-44ef-a24e-d4e4835b16ff'
+    },
+    clientSecret: {
+      doc: 'ENTRA ID client secret',
+      format: String,
+      sensitive: true,
+      env: 'ENTRA_ID_CLIENT_SECRET',
+      default: 'test_value'
+    },
+    scopes: {
+      doc: 'ENTRA ID scopes',
+      format: Array,
+      sensitive: true,
+      env: 'ENTRA_ID_SCOPES',
+      default: ['api://f68226cb-8dbc-44ef-a24e-d4e4835b16ff/.default']
+    },
+    redirectUrl: {
+      doc: 'ENTRA ID redirect URl.',
+      format: String,
+      default: localhost,
+      env: 'APP_BASE_URL'
     }
   },
   cdpUploader: {

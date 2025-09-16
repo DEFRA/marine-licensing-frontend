@@ -1,5 +1,6 @@
 import { getUserSession } from '~/src/server/common/plugins/auth/utils.js'
 import { context } from '~/src/config/nunjucks/context/context.js'
+import { AUTH_STRATEGIES } from '~/src/server/common/constants/auth.js'
 
 const mockReadFileSync = jest.fn()
 const mockLoggerError = jest.fn()
@@ -78,7 +79,7 @@ describe('#context', () => {
     describe('When user is authenticated with defraId', () => {
       beforeEach(async () => {
         mockGetUserSession.mockResolvedValue({
-          strategy: 'defra-id',
+          strategy: AUTH_STRATEGIES.DEFRA_ID,
           displayName: 'John Doe'
         })
 

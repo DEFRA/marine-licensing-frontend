@@ -1,8 +1,11 @@
 import Jwt from '@hapi/jwt'
 import { config } from '~/src/config/config.js'
+import { getOidcConfig } from '~/src/server/common/plugins/auth/get-oidc-config.js'
 
-export const openIdProvider = (name, oidcConf) => {
-  const authConfig = config.get('defraId')
+export const openIdProvider = async (name) => {
+  const authConfig = config.get(name)
+
+  const oidcConf = await getOidcConfig(authConfig.oidcConfigurationUrl)
   return {
     name,
     protocol: 'oauth2',

@@ -346,7 +346,8 @@ describe('#centreCoordinates', () => {
 
     test('Should correctly handle validation errors', () => {
       const request = {
-        payload: { latitude: 'invalid' }
+        payload: { latitude: 'invalid' },
+        site: mockSite
       }
 
       const h = {

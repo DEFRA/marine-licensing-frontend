@@ -67,8 +67,8 @@ export const centreCoordinatesController = {
   },
   handler(request, h) {
     const exemption = getExemptionCache(request)
-    const { coordinateSystem } = getCoordinateSystem(request)
     const { siteIndex, queryParams } = request.site
+    const { coordinateSystem } = getCoordinateSystem(request, siteIndex)
 
     const siteDetails = getSiteDetailsBySite(exemption, siteIndex)
 
@@ -81,19 +81,16 @@ export const centreCoordinatesController = {
   }
 }
 
-export const centreCoordinatesSubmitFailHandler = (
-  request,
-  h,
-  error,
-  coordinateSystem
-) => {
+export const centreCoordinatesSubmitFailHandler = (request, h, error) => {
   const { payload } = request
 
   const site = setSiteData(request)
 
   const exemption = getExemptionCache(request)
 
-  const { queryParams } = site
+  const { queryParams, siteIndex } = site
+
+  const { coordinateSystem } = getCoordinateSystem(request, siteIndex)
 
   const { projectName } = exemption
 
@@ -137,7 +134,9 @@ export const centreCoordinatesSubmitController = {
   handler(request, h) {
     const { payload } = request
 
-    const { coordinateSystem } = getCoordinateSystem(request)
+    const { queryParams, siteIndex } = request.site
+
+    const { coordinateSystem } = getCoordinateSystem(request, siteIndex)
 
     const schema =
       coordinateSystem === COORDINATE_SYSTEMS.OSGB36
@@ -149,15 +148,9 @@ export const centreCoordinatesSubmitController = {
     })
 
     if (error) {
-      return centreCoordinatesSubmitFailHandler(
-        request,
-        h,
-        error,
-        coordinateSystem
-      )
+      return centreCoordinatesSubmitFailHandler(request, h, error)
     }
 
-    const { siteIndex, queryParams } = request.site
     updateExemptionSiteDetails(request, siteIndex, 'coordinates', payload)
 
     return h.redirect(routes.WIDTH_OF_SITE + queryParams)

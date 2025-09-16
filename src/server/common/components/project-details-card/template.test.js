@@ -86,9 +86,9 @@ describe('Project Details Card Component', () => {
       expect($component('#project-details-card')).toHaveLength(1)
     })
 
-    test('Should display project name', () => {
+    test('Should not display project name', () => {
       const htmlContent = $component.html()
-      expect(htmlContent).toContain('Test Marine Project')
+      expect(htmlContent).not.toContain('Test Marine Project')
     })
 
     test('Should not show Change link when read-only', () => {

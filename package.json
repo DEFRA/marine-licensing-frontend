@@ -59,7 +59,7 @@
     "cssnano": "^7.1.0",
     "cssnano-preset-default": "^7.0.9",
     "date-fns": "^4.1.0",
-    "dayjs": "^1.11.13",
+    "dayjs": "^1.11.18",
     "dotenv": "^17.2.1",
     "global-agent": "^3.0.0",
     "govuk-frontend": "^5.11.1",

@@ -1,4 +1,4 @@
-import { getNextRoute } from './utils.js'
+import { getBackRoute, getNextRoute } from './utils.js'
 import { routes } from '~/src/server/common/constants/routes.js'
 
 describe('#getNextRoute', () => {
@@ -40,5 +40,19 @@ describe('#getNextRoute', () => {
 
       expect(result).toBe(routes.SITE_DETAILS_ACTIVITY_DESCRIPTION)
     })
+  })
+})
+
+describe('#getBackRoute', () => {
+  test('correct back link for first site', () => {
+    const result = getBackRoute(0)
+
+    expect(result).toBe(routes.SAME_ACTIVITY_DATES)
+  })
+
+  test('correct back link for additional sites', () => {
+    const result = getBackRoute(1, '?site=1')
+
+    expect(result).toBe(`${routes.SITE_NAME}?site=1`)
   })
 })

@@ -25,3 +25,17 @@ export const getNextRoute = (
 
   return nextRoute + queryParams
 }
+
+/**
+ * Determines the back link
+ * @param {number} exemption - The exemptiIndex of site
+ * @param {string} queryParams - Query parameters to append to the route
+ * @returns {string} The route to redirect to
+ */
+export const getBackRoute = (siteIndex, queryParams = '') => {
+  if (siteIndex === 0) {
+    return routes.SAME_ACTIVITY_DATES
+  }
+
+  return routes.SITE_NAME + queryParams
+}

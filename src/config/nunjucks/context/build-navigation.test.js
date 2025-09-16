@@ -1,5 +1,6 @@
 import { buildNavigation } from '~/src/config/nunjucks/context/build-navigation.js'
 import { getUserSession } from '~/src/server/common/plugins/auth/utils.js'
+import { AUTH_STRATEGIES } from '~/src/server/common/constants/auth.js'
 
 jest.mock('~/src/server/common/plugins/auth/utils.js')
 
@@ -74,7 +75,9 @@ describe('#buildNavigation', () => {
   })
 
   test('should add a Defra account nav item if user authenticated with Defra ID', async () => {
-    jest.mocked(getUserSession).mockResolvedValue({ strategy: 'defra-id' })
+    jest
+      .mocked(getUserSession)
+      .mockResolvedValue({ strategy: AUTH_STRATEGIES.DEFRA_ID })
     expect(await buildNavigation(mockRequest({ path: '/home' }))).toEqual(
       expect.arrayContaining([
         {

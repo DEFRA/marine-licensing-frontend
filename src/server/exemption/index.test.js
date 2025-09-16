@@ -188,6 +188,10 @@ describe('exemption route', () => {
       }),
       expect.objectContaining({
         method: 'GET',
+        path: '/view-details/{exemptionId}'
+      }),
+      expect.objectContaining({
+        method: 'GET',
         path: '/exemption/confirmation'
       }),
       expect.objectContaining({

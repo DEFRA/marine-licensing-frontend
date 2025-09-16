@@ -62,8 +62,7 @@ describe('setPageCacheControlHeaders', () => {
       '/about',
       '/exemption/dashboard',
       '/health',
-      '/exemption/project-name',
-      '/auth/login'
+      '/exemption/project-name'
     ]
 
     pageRoutePaths.forEach((path) => {

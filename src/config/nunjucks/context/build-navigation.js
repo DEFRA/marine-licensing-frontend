@@ -1,6 +1,7 @@
 import { getUserSession } from '~/src/server/common/plugins/auth/utils.js'
 import { config } from '~/src/config/config.js'
 import { routes } from '~/src/server/common/constants/routes.js'
+import { AUTH_STRATEGIES } from '~/src/server/common/constants/auth.js'
 
 /**
  * @param {Partial<Request> | null} request
@@ -18,7 +19,7 @@ export const buildNavigation = async (request) => {
     }
   ]
 
-  if (authedUser?.strategy === 'defra-id') {
+  if (authedUser?.strategy === AUTH_STRATEGIES.DEFRA_ID) {
     navigation.push({
       text: 'Defra account',
       href: accountManagementUrl

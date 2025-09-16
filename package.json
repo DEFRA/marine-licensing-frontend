@@ -38,7 +38,7 @@
   "license": "OGL-UK-3.0",
   "dependencies": {
     "@babel/runtime": "^7.28.3",
-    "@defra/hapi-tracing": "^1.26.0",
+    "@defra/hapi-tracing": "^1.28.0",
     "@elastic/ecs-pino-format": "^1.5.0",
     "@hapi/basic": "^7.0.2",
     "@hapi/bell": "^13.1.0",

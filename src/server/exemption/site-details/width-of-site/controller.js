@@ -5,7 +5,7 @@ import {
 import {
   getSiteDetailsBySite,
   setSiteData,
-  setSiteDataPreHandlerHook
+  setSiteDataPreHandler
 } from '~/src/server/common/helpers/session-cache/site-utils.js'
 import {
   errorDescriptionByFieldName,
@@ -40,7 +40,7 @@ export const errorMessages = {
  */
 export const widthOfSiteController = {
   options: {
-    pre: [setSiteDataPreHandlerHook]
+    pre: [setSiteDataPreHandler]
   },
   handler(request, h) {
     const exemption = getExemptionCache(request)
@@ -65,7 +65,7 @@ export const widthOfSiteController = {
  */
 export const widthOfSiteSubmitController = {
   options: {
-    pre: [setSiteDataPreHandlerHook],
+    pre: [setSiteDataPreHandler],
     validate: {
       payload: circleWidthValidationSchema,
       failAction: (request, h, err) => {

@@ -9,7 +9,7 @@ import {
 } from '~/src/server/common/helpers/session-cache/utils.js'
 import {
   getSiteDetailsBySite,
-  setSiteDataPreHandlerHook
+  setSiteDataPreHandler
 } from '~/src/server/common/helpers/session-cache/site-utils.js'
 import { getCoordinateSystem } from '~/src/server/common/helpers/coordinate-utils.js'
 import {
@@ -25,7 +25,7 @@ import { validateCoordinates } from '~/src/server/exemption/site-details/enter-m
 
 export const multipleCoordinatesController = {
   options: {
-    pre: [setSiteDataPreHandlerHook]
+    pre: [setSiteDataPreHandler]
   },
   handler(request, h) {
     const exemption = getExemptionCache(request) || {}
@@ -91,7 +91,7 @@ function renderMultipleCoordinatesView(
 
 export const multipleCoordinatesSubmitController = {
   options: {
-    pre: [setSiteDataPreHandlerHook]
+    pre: [setSiteDataPreHandler]
   },
   handler(request, h) {
     const { payload } = request

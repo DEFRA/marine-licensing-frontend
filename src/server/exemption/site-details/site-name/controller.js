@@ -4,7 +4,7 @@ import {
 } from '~/src/server/common/helpers/session-cache/utils.js'
 import {
   setSiteData,
-  setSiteDataPreHandlerHook
+  setSiteDataPreHandler
 } from '~/src/server/common/helpers/session-cache/site-utils.js'
 import { routes } from '~/src/server/common/constants/routes.js'
 import {
@@ -69,7 +69,7 @@ const createValidationFailAction = (request, h, err) => {
 
 export const siteNameController = {
   options: {
-    pre: [setSiteDataPreHandlerHook]
+    pre: [setSiteDataPreHandler]
   },
   handler(request, h) {
     const exemption = getExemptionCache(request)
@@ -91,7 +91,7 @@ export const siteNameController = {
 
 export const siteNameSubmitController = {
   options: {
-    pre: [setSiteDataPreHandlerHook],
+    pre: [setSiteDataPreHandler],
     validate: {
       payload: joi.object({
         siteName: joi

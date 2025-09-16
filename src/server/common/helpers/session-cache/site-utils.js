@@ -43,7 +43,7 @@ export const setSiteData = (request) => {
  * @param {object} h - Hapi response toolkit
  * @returns {object} Hapi response (continue)
  */
-export const setSiteDataPreHandlerHook = {
+export const setSiteDataPreHandler = {
   method: (request, h) => {
     request.site = setSiteData(request)
 

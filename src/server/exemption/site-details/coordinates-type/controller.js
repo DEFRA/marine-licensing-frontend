@@ -4,7 +4,7 @@ import {
 } from '~/src/server/common/helpers/session-cache/utils.js'
 import {
   getSiteDetailsBySite,
-  setSiteDataPreHandlerHook
+  setSiteDataPreHandler
 } from '~/src/server/common/helpers/session-cache/site-utils.js'
 import {
   errorDescriptionByFieldName,
@@ -33,7 +33,7 @@ export const errorMessages = {
  */
 export const coordinatesTypeController = {
   options: {
-    pre: [setSiteDataPreHandlerHook]
+    pre: [setSiteDataPreHandler]
   },
   handler(request, h) {
     const exemption = getExemptionCache(request)
@@ -58,7 +58,7 @@ export const coordinatesTypeController = {
  */
 export const coordinatesTypeSubmitController = {
   options: {
-    pre: [setSiteDataPreHandlerHook],
+    pre: [setSiteDataPreHandler],
     validate: {
       payload: joi.object({
         coordinatesType: joi

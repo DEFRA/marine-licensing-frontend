@@ -5,7 +5,7 @@ import {
 import {
   getSiteDetailsBySite,
   setSiteData,
-  setSiteDataPreHandlerHook
+  setSiteDataPreHandler
 } from '~/src/server/common/helpers/session-cache/site-utils.js'
 import {
   errorDescriptionByFieldName,
@@ -33,7 +33,7 @@ export const errorMessages = {
  * @satisfies {Partial<ServerRoute>}
  */
 export const coordinateSystemController = {
-  options: { pre: [setSiteDataPreHandlerHook] },
+  options: { pre: [setSiteDataPreHandler] },
   handler(request, h) {
     const exemption = getExemptionCache(request)
     const { siteIndex, queryParams } = request.site
@@ -57,7 +57,7 @@ export const coordinateSystemController = {
  */
 export const coordinateSystemSubmitController = {
   options: {
-    pre: [setSiteDataPreHandlerHook],
+    pre: [setSiteDataPreHandler],
     validate: {
       payload: joi.object({
         coordinateSystem: joi

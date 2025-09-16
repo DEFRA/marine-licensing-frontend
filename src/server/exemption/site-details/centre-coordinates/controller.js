@@ -5,7 +5,7 @@ import {
 import {
   getSiteDetailsBySite,
   setSiteData,
-  setSiteDataPreHandlerHook
+  setSiteDataPreHandler
 } from '~/src/server/common/helpers/session-cache/site-utils.js'
 import { getCoordinateSystem } from '~/src/server/common/helpers/coordinate-utils.js'
 import {
@@ -63,7 +63,7 @@ export const errorMessages = {
  */
 export const centreCoordinatesController = {
   options: {
-    pre: [setSiteDataPreHandlerHook]
+    pre: [setSiteDataPreHandler]
   },
   handler(request, h) {
     const exemption = getExemptionCache(request)
@@ -129,7 +129,7 @@ export const centreCoordinatesSubmitFailHandler = (request, h, error) => {
  */
 export const centreCoordinatesSubmitController = {
   options: {
-    pre: [setSiteDataPreHandlerHook]
+    pre: [setSiteDataPreHandler]
   },
   handler(request, h) {
     const { payload } = request

@@ -25,7 +25,7 @@ import {
 } from '~/src/server/common/helpers/session-cache/utils.js'
 import {
   getSiteDetailsBySite,
-  setSiteDataPreHandlerHook
+  setSiteDataPreHandler
 } from '~/src/server/common/helpers/session-cache/site-utils.js'
 import { activityDatesSchema } from '~/src/server/common/schemas/date.js'
 import { getSiteNumber } from '~/src/server/exemption/site-details/utils/site-number.js'
@@ -101,7 +101,7 @@ const createTemplateData = (
 
 export const activityDatesController = {
   options: {
-    pre: [setSiteDataPreHandlerHook]
+    pre: [setSiteDataPreHandler]
   },
   handler(request, h) {
     const exemption = getExemptionCache(request)
@@ -149,7 +149,7 @@ function handleValidationErrors(request, h, err) {
 
 export const activityDatesSubmitController = {
   options: {
-    pre: [setSiteDataPreHandlerHook],
+    pre: [setSiteDataPreHandler],
     validate: {
       payload: activityDatesSchema,
       failAction: handleValidationErrors

@@ -9,7 +9,7 @@ import {
 } from '~/src/server/common/helpers/session-cache/utils.js'
 import {
   getSiteDetailsBySite,
-  setSiteDataPreHandlerHook
+  setSiteDataPreHandler
 } from '~/src/server/common/helpers/session-cache/site-utils.js'
 import { routes } from '~/src/server/common/constants/routes.js'
 import { authenticatedPatchRequest } from '~/src/server/common/helpers/authenticated-requests.js'
@@ -61,7 +61,7 @@ const getPageTemplateValues = (request) => {
  */
 export const activityDescriptionController = {
   options: {
-    pre: [setSiteDataPreHandlerHook]
+    pre: [setSiteDataPreHandler]
   },
   handler(request, h) {
     const exemption = getExemptionCache(request)
@@ -85,7 +85,7 @@ export const activityDescriptionController = {
  */
 export const activityDescriptionSubmitController = {
   options: {
-    pre: [setSiteDataPreHandlerHook],
+    pre: [setSiteDataPreHandler],
     validate: {
       payload: joi.object({
         activityDescription: joi

@@ -4,7 +4,7 @@ import {
   updateExemptionSiteDetails
 } from '~/src/server/common/helpers/session-cache/utils.js'
 import { routes } from '~/src/server/common/constants/routes.js'
-import { setSiteDataPreHandlerHook } from '~/src/server/common/helpers/session-cache/site-utils.js'
+import { setSiteDataPreHandler } from '~/src/server/common/helpers/session-cache/site-utils.js'
 import {
   errorDescriptionByFieldName,
   mapErrorsForDisplay
@@ -63,7 +63,7 @@ const createValidationFailAction = (request, h, err) => {
  */
 export const sameActivityDescriptionController = {
   options: {
-    pre: [setSiteDataPreHandlerHook]
+    pre: [setSiteDataPreHandler]
   },
   handler(request, h) {
     const { siteIndex, queryParams } = request.site
@@ -106,7 +106,7 @@ export const sameActivityDescriptionController = {
  */
 export const sameActivityDescriptionSubmitController = {
   options: {
-    pre: [setSiteDataPreHandlerHook],
+    pre: [setSiteDataPreHandler],
     validate: {
       payload: joi.object({
         sameActivityDescription: joi

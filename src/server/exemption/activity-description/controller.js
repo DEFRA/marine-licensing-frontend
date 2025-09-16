@@ -38,7 +38,7 @@ const getPageTemplateValues = (request) => {
   const siteDetailsFlow = isPageInSiteDetailsFlow(request)
   const exemption = getExemptionCache(request)
 
-  const { siteNumber, queryParams } = request.site ?? {}
+  const { siteNumber, siteIndex, queryParams } = request.site ?? {}
 
   const { multipleSiteDetails } = exemption
 
@@ -49,7 +49,7 @@ const getPageTemplateValues = (request) => {
     ...templateValues,
     isMultiSiteJourney: !!multipleSiteDetails?.multipleSitesEnabled,
     isSiteDetailsFlow: siteDetailsFlow,
-    backLink: getBackLink(exemption, siteDetailsFlow, queryParams),
+    backLink: getBackLink(exemption, siteDetailsFlow, siteIndex, queryParams),
     projectName: exemption.projectName,
     siteNumber: variableActivityDescription ? siteNumber : null
   }

@@ -37,7 +37,7 @@ export const viewDetailsController = {
       }
 
       const siteDetails = processSiteDetails(exemption, exemptionId, request)
-      const coordinateSystem = exemption.siteDetails?.coordinateSystem
+      const coordinateSystem = siteDetails?.coordinateSystem
       const siteDetailsData = createSiteDetailsDataJson(
         siteDetails,
         coordinateSystem
@@ -46,6 +46,8 @@ export const viewDetailsController = {
       // Format the page caption with application reference
       const pageCaption = `${exemption.applicationReference} - Exempt activity notification`
 
+      console.log('siteDetailsData', siteDetailsData)
+      console.log('siteDetails', siteDetails)
       return h.view(VIEW_DETAILS_VIEW_ROUTE, {
         pageTitle: exemption.projectName,
         pageCaption,

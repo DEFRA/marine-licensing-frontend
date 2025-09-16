@@ -275,7 +275,8 @@ export const config = convict({
       doc: 'The Defra Identity client secret.',
       format: String,
       default: 'test_value',
-      env: 'DEFRA_ID_CLIENT_SECRET'
+      env: 'DEFRA_ID_CLIENT_SECRET',
+      sensitive: true
     },
     serviceId: {
       doc: 'The Defra Identity service ID.',
@@ -328,7 +329,7 @@ export const config = convict({
       format: String,
       sensitive: true,
       env: 'ENTRA_ID_CLIENT_SECRET',
-      default: ''
+      default: 'test_value'
     },
     scopes: {
       doc: 'ENTRA ID scopes',

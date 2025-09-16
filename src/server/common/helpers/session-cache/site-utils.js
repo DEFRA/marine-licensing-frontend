@@ -27,11 +27,13 @@ export const setSiteData = (request) => {
 
   const siteNumber = getSiteNumber(exemption, request)
 
+  const siteIndex = siteNumber - 1
+
   return {
     queryParams: siteNumber === 1 ? '' : `?site=${siteNumber}`,
     siteNumber,
     siteIndex: siteNumber - 1,
-    siteDetails: getSiteDetailsBySite(exemption, siteNumber)
+    siteDetails: getSiteDetailsBySite(exemption, siteIndex)
   }
 }
 

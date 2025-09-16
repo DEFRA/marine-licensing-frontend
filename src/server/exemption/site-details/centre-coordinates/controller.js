@@ -2,7 +2,11 @@ import {
   getExemptionCache,
   updateExemptionSiteDetails
 } from '~/src/server/common/helpers/session-cache/utils.js'
-import { getSiteDetailsBySite } from '~/src/server/common/helpers/session-cache/site-utils.js'
+import {
+  getSiteDetailsBySite,
+  setSiteData,
+  setSiteDataPreHandlerHook
+} from '~/src/server/common/helpers/session-cache/site-utils.js'
 import { getCoordinateSystem } from '~/src/server/common/helpers/coordinate-utils.js'
 import {
   errorDescriptionByFieldName,
@@ -58,14 +62,19 @@ export const errorMessages = {
  * @satisfies {Partial<ServerRoute>}
  */
 export const centreCoordinatesController = {
+  options: {
+    pre: [setSiteDataPreHandlerHook]
+  },
   handler(request, h) {
     const exemption = getExemptionCache(request)
     const { coordinateSystem } = getCoordinateSystem(request)
+    const { siteIndex, queryParams } = request.site
 
-    const siteDetails = getSiteDetailsBySite(exemption)
+    const siteDetails = getSiteDetailsBySite(exemption, siteIndex)
 
     return h.view(COORDINATE_SYSTEM_VIEW_ROUTES[coordinateSystem], {
       ...centreCoordinatesPageData,
+      backLink: centreCoordinatesPageData.backLink + queryParams,
       projectName: exemption.projectName,
       payload: getPayload(siteDetails, coordinateSystem)
     })
@@ -79,7 +88,12 @@ export const centreCoordinatesSubmitFailHandler = (
   coordinateSystem
 ) => {
   const { payload } = request
+
+  const site = setSiteData(request)
+
   const exemption = getExemptionCache(request)
+
+  const { queryParams } = site
 
   const { projectName } = exemption
 
@@ -87,6 +101,7 @@ export const centreCoordinatesSubmitFailHandler = (
     return h
       .view(COORDINATE_SYSTEM_VIEW_ROUTES[coordinateSystem], {
         ...centreCoordinatesPageData,
+        backLink: centreCoordinatesPageData.backLink + queryParams,
         projectName,
         payload
       })
@@ -102,6 +117,7 @@ export const centreCoordinatesSubmitFailHandler = (
   return h
     .view(COORDINATE_SYSTEM_VIEW_ROUTES[coordinateSystem], {
       ...centreCoordinatesPageData,
+      backLink: centreCoordinatesPageData.backLink + queryParams,
       projectName,
       payload,
       errors,
@@ -115,6 +131,9 @@ export const centreCoordinatesSubmitFailHandler = (
  * @satisfies {Partial<ServerRoute>}
  */
 export const centreCoordinatesSubmitController = {
+  options: {
+    pre: [setSiteDataPreHandlerHook]
+  },
   handler(request, h) {
     const { payload } = request
 
@@ -138,8 +157,9 @@ export const centreCoordinatesSubmitController = {
       )
     }
 
-    updateExemptionSiteDetails(request, 0, 'coordinates', payload)
+    const { siteIndex, queryParams } = request.site
+    updateExemptionSiteDetails(request, siteIndex, 'coordinates', payload)
 
-    return h.redirect(routes.WIDTH_OF_SITE)
+    return h.redirect(routes.WIDTH_OF_SITE + queryParams)
   }
 }

@@ -29,18 +29,21 @@ export const errorMessages = {
   SITE_NAME_MAX_LENGTH: 'Site name should be 250 characters or less'
 }
 
+const getBackLink = (siteIndex) =>
+  siteIndex === 0 ? routes.MULTIPLE_SITES_CHOICE : routes.REVIEW_SITE_DETAILS
+
 const createValidationFailAction = (request, h, err) => {
   const { payload } = request
   const exemption = getExemptionCache(request)
 
   const site = setSiteData(request)
-  const { siteNumber } = site
+  const { siteNumber, siteIndex } = site
 
   if (!err.details) {
     return h
       .view(SITE_NAME_VIEW_ROUTE, {
         ...siteNameSettings,
-        backLink: routes.MULTIPLE_SITES_CHOICE,
+        backLink: getBackLink(siteIndex),
         payload,
         projectName: exemption.projectName,
         siteNumber
@@ -54,7 +57,7 @@ const createValidationFailAction = (request, h, err) => {
   return h
     .view(SITE_NAME_VIEW_ROUTE, {
       ...siteNameSettings,
-      backLink: routes.MULTIPLE_SITES_CHOICE,
+      backLink: getBackLink(siteIndex),
       payload,
       projectName: exemption.projectName,
       siteNumber,
@@ -72,11 +75,11 @@ export const siteNameController = {
     const exemption = getExemptionCache(request)
 
     const { site } = request
-    const { siteNumber, siteDetails } = site
+    const { siteNumber, siteIndex, siteDetails } = site
 
     return h.view(SITE_NAME_VIEW_ROUTE, {
       ...siteNameSettings,
-      backLink: routes.MULTIPLE_SITES_CHOICE,
+      backLink: getBackLink(siteIndex),
       projectName: exemption.projectName,
       siteNumber,
       payload: {

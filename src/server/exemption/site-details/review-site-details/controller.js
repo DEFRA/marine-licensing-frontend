@@ -71,7 +71,10 @@ export const reviewSiteDetailsSubmitController = {
     const firstSite = siteDetails[0]
     try {
       if (payload?.add) {
-        const updatedSiteDetails = [...siteDetails, {}]
+        const updatedSiteDetails = [
+          ...siteDetails,
+          { coordinatesType: siteDetails[0].coordinatesType }
+        ]
         setExemptionCache(request, {
           ...exemption,
           siteDetails: updatedSiteDetails

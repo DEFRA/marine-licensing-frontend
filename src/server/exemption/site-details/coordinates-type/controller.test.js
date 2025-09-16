@@ -5,7 +5,7 @@ import {
   PROVIDE_COORDINATES_CHOICE_VIEW_ROUTE
 } from '~/src/server/exemption/site-details/coordinates-type/controller.js'
 import * as cacheUtils from '~/src/server/common/helpers/session-cache/utils.js'
-import { mockExemption } from '~/src/server/test-helpers/mocks.js'
+import { mockExemption, mockSite } from '~/src/server/test-helpers/mocks.js'
 import { statusCodes } from '~/src/server/common/constants/status-codes.js'
 import { config } from '~/src/config/config.js'
 import { JSDOM } from 'jsdom'
@@ -37,7 +37,7 @@ describe('#coordinatesType', () => {
     test('coordinatesTypeController handler should render with correct context', () => {
       const h = { view: jest.fn() }
 
-      coordinatesTypeController.handler({}, h)
+      coordinatesTypeController.handler({ site: mockSite }, h)
 
       expect(h.view).toHaveBeenCalledWith(
         PROVIDE_COORDINATES_CHOICE_VIEW_ROUTE,
@@ -58,7 +58,7 @@ describe('#coordinatesType', () => {
 
       const h = { view: jest.fn() }
 
-      coordinatesTypeController.handler({}, h)
+      coordinatesTypeController.handler({ site: mockSite }, h)
 
       expect(h.view).toHaveBeenCalledWith(
         PROVIDE_COORDINATES_CHOICE_VIEW_ROUTE,
@@ -255,7 +255,10 @@ describe('#coordinatesType', () => {
       }
 
       await coordinatesTypeSubmitController.handler(
-        { payload: { coordinatesType: 'file' } },
+        {
+          payload: { coordinatesType: 'file' },
+          site: mockSite
+        },
         h
       )
 
@@ -272,7 +275,10 @@ describe('#coordinatesType', () => {
       }
 
       await coordinatesTypeSubmitController.handler(
-        { payload: { coordinatesType: 'coordinates' } },
+        {
+          payload: { coordinatesType: 'coordinates' },
+          site: mockSite
+        },
         h
       )
 
@@ -290,7 +296,10 @@ describe('#coordinatesType', () => {
         view: jest.fn()
       }
 
-      const mockRequest = { payload: { coordinatesType: 'file' } }
+      const mockRequest = {
+        payload: { coordinatesType: 'file' },
+        site: mockSite
+      }
 
       await coordinatesTypeSubmitController.handler(mockRequest, h)
 

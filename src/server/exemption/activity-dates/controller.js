@@ -23,7 +23,10 @@ import {
   setExemptionCache,
   updateExemptionSiteDetails
 } from '~/src/server/common/helpers/session-cache/utils.js'
-import { getSiteDetailsBySite } from '~/src/server/common/helpers/session-cache/site-utils.js'
+import {
+  getSiteDetailsBySite,
+  setSiteDataPreHandlerHook
+} from '~/src/server/common/helpers/session-cache/site-utils.js'
 import { activityDatesSchema } from '~/src/server/common/schemas/date.js'
 import { getSiteNumber } from '~/src/server/exemption/site-details/utils/site-number.js'
 import { getNextRoute } from './utils.js'
@@ -31,7 +34,12 @@ import { getNextRoute } from './utils.js'
 const isPageInSiteDetailsFlow = (request) =>
   request.url.pathname === routes.SITE_DETAILS_ACTIVITY_DATES
 
-const createTemplateData = (request, exemption, payload = null) => {
+const createTemplateData = (
+  request,
+  exemption,
+  payload = null,
+  siteIndex = 0
+) => {
   let dateFields
 
   const isInSiteDetailsFlow = isPageInSiteDetailsFlow(request)
@@ -41,12 +49,12 @@ const createTemplateData = (request, exemption, payload = null) => {
   } else {
     const startDateFields = createDateFieldsFromValue(
       isInSiteDetailsFlow
-        ? getSiteDetailsBySite(exemption).activityDates?.start
+        ? getSiteDetailsBySite(exemption, siteIndex).activityDates?.start
         : exemption.activityDates?.start
     )
     const endDateFields = createDateFieldsFromValue(
       isInSiteDetailsFlow
-        ? getSiteDetailsBySite(exemption)?.activityDates?.end
+        ? getSiteDetailsBySite(exemption, siteIndex)?.activityDates?.end
         : exemption.activityDates?.end
     )
 
@@ -91,18 +99,23 @@ const createTemplateData = (request, exemption, payload = null) => {
 }
 
 export const activityDatesController = {
+  options: {
+    pre: [setSiteDataPreHandlerHook]
+  },
   handler(request, h) {
     const exemption = getExemptionCache(request)
+    const { siteIndex } = request.site
     return h.view(
       ACTIVITY_DATES_VIEW_ROUTE,
-      createTemplateData(request, exemption)
+      createTemplateData(request, exemption, null, siteIndex)
     )
   }
 }
 
 function handleValidationErrors(request, h, err) {
   const exemption = getExemptionCache(request)
-  const { payload } = request
+  const { payload, site } = request
+  const { siteIndex } = site ?? {}
 
   const validationResult = processDateValidationErrors(
     err,
@@ -114,14 +127,14 @@ function handleValidationErrors(request, h, err) {
     return h
       .view(
         ACTIVITY_DATES_VIEW_ROUTE,
-        createTemplateData(request, exemption, payload)
+        createTemplateData(request, exemption, payload, siteIndex)
       )
       .takeover()
   }
 
   return h
     .view(ACTIVITY_DATES_VIEW_ROUTE, {
-      ...createTemplateData(request, exemption, payload),
+      ...createTemplateData(request, exemption, payload, siteIndex),
       ...validationResult
     })
     .takeover()
@@ -129,6 +142,7 @@ function handleValidationErrors(request, h, err) {
 
 export const activityDatesSubmitController = {
   options: {
+    pre: [setSiteDataPreHandlerHook],
     validate: {
       payload: activityDatesSchema,
       failAction: handleValidationErrors
@@ -154,7 +168,8 @@ export const activityDatesSubmitController = {
       const isInSiteDetailsFlow = isPageInSiteDetailsFlow(request)
 
       if (isInSiteDetailsFlow) {
-        updateExemptionSiteDetails(request, 0, 'activityDates', {
+        const { siteIndex } = request.site
+        updateExemptionSiteDetails(request, siteIndex, 'activityDates', {
           start,
           end
         })
@@ -173,7 +188,11 @@ export const activityDatesSubmitController = {
         })
       }
 
-      const nextRoute = getNextRoute(exemption, isInSiteDetailsFlow)
+      const nextRoute = getNextRoute(
+        exemption,
+        isInSiteDetailsFlow,
+        request.site?.queryParams
+      )
       return h.redirect(nextRoute)
     } catch (e) {
       const { details } = e.data?.payload?.validation ?? {}
@@ -188,8 +207,9 @@ export const activityDatesSubmitController = {
       )
       const errors = errorDescriptionByFieldName(errorSummary)
 
+      const { siteIndex } = request.site
       return h.view(ACTIVITY_DATES_VIEW_ROUTE, {
-        ...createTemplateData(request, exemption, payload),
+        ...createTemplateData(request, exemption, payload, siteIndex),
         errors,
         errorSummary
       })

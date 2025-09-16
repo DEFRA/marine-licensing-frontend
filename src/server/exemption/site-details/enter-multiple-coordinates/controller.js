@@ -7,7 +7,10 @@ import {
   getExemptionCache,
   updateExemptionSiteDetails
 } from '~/src/server/common/helpers/session-cache/utils.js'
-import { getSiteDetailsBySite } from '~/src/server/common/helpers/session-cache/site-utils.js'
+import {
+  getSiteDetailsBySite,
+  setSiteDataPreHandlerHook
+} from '~/src/server/common/helpers/session-cache/site-utils.js'
 import { getCoordinateSystem } from '~/src/server/common/helpers/coordinate-utils.js'
 import {
   MULTIPLE_COORDINATES_VIEW_ROUTES,
@@ -21,10 +24,15 @@ import {
 import { validateCoordinates } from '~/src/server/exemption/site-details/enter-multiple-coordinates/validation/validation.js'
 
 export const multipleCoordinatesController = {
+  options: {
+    pre: [setSiteDataPreHandlerHook]
+  },
   handler(request, h) {
     const exemption = getExemptionCache(request) || {}
     const { projectName } = exemption
-    const siteDetails = getSiteDetailsBySite(exemption)
+    const { site } = request
+    const { siteIndex } = site
+    const siteDetails = getSiteDetailsBySite(exemption, siteIndex)
 
     const coordinateSystem =
       siteDetails.coordinateSystem === COORDINATE_SYSTEMS.OSGB36
@@ -82,7 +90,9 @@ function renderMultipleCoordinatesView(
 }
 
 export const multipleCoordinatesSubmitController = {
-  options: {},
+  options: {
+    pre: [setSiteDataPreHandlerHook]
+  },
   handler(request, h) {
     const { payload } = request
     const exemption = getExemptionCache(request)
@@ -118,7 +128,9 @@ export const multipleCoordinatesSubmitController = {
       )
     }
 
-    updateExemptionSiteDetails(request, 0, 'coordinates', coordinates)
+    const { siteIndex, queryParams } = request.site
+
+    updateExemptionSiteDetails(request, siteIndex, 'coordinates', coordinates)
     if (payload.add) {
       const emptyCoordinate =
         coordinateSystem === COORDINATE_SYSTEMS.OSGB36
@@ -144,6 +156,6 @@ export const multipleCoordinatesSubmitController = {
       )
     }
 
-    return h.redirect(routes.REVIEW_SITE_DETAILS)
+    return h.redirect(routes.REVIEW_SITE_DETAILS + queryParams)
   }
 }

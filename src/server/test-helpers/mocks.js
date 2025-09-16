@@ -90,3 +90,10 @@ export const mockProjectList = [
     submittedAt: null
   }
 ]
+
+export const mockSite = {
+  siteIndex: 0,
+  siteNumber: 1,
+  queryParams: '',
+  siteDetails: mockExemption.siteDetails[0]
+}

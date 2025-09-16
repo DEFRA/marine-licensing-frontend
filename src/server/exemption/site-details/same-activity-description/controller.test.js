@@ -95,7 +95,7 @@ describe('sameActivityDescriptionController', () => {
       sameActivityDescriptionController.handler(mockRequestSecondSite, mockH)
 
       expect(mockH.redirect).toHaveBeenCalledWith(
-        '/exemption/activity-description?site=1'
+        '/exemption/site-details-activity-description?site=1'
       )
     })
 

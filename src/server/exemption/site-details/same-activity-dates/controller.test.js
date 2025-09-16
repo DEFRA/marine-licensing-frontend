@@ -96,7 +96,7 @@ describe('#sameActivityDates', () => {
       sameActivityDatesController.handler(mockRequestSecondSite, mockH)
 
       expect(mockH.redirect).toHaveBeenCalledWith(
-        '/exemption/activity-dates?site=1'
+        '/exemption/site-details-activity-dates?site=1'
       )
     })
 

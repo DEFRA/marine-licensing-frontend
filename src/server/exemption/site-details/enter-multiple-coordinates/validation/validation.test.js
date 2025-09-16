@@ -5,7 +5,7 @@ import osgb36TestCases from './validation-error-cases-osgb36.json'
 import successTestCases from './validation-success-cases-wgs84.json'
 import osgb36SuccessTestCases from './validation-success-cases-osgb36.json'
 
-describe('validateCoordinates', () => {
+describe('Validate multiple coordinates', () => {
   describe('WGS84 coordinate system', () => {
     test.each(successTestCases)('$description', ({ coordinates }) => {
       const exemptionId = 'test-id'

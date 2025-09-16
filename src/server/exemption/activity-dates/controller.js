@@ -39,7 +39,7 @@ const createTemplateData = (
   exemption,
   payload = null,
   siteIndex = 0,
-  queryParams
+  queryParams = ''
 ) => {
   let dateFields
 

@@ -37,7 +37,7 @@ const isPageInSiteDetailsFlow = (request) =>
 const createTemplateData = (
   request,
   exemption,
-  payload = null,
+  payload,
   siteIndex = 0,
   queryParams = ''
 ) => {

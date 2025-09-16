@@ -49,7 +49,7 @@ describe('#getBackLink', () => {
           }
         }
 
-        const result = getBackLink(exemption, true)
+        const result = getBackLink(exemption, true, 1)
 
         expect(result).toBe(routes.SAME_ACTIVITY_DESCRIPTION)
       })

@@ -70,6 +70,19 @@ export const reviewSiteDetailsSubmitController = {
     const siteDetails = exemption.siteDetails
     const firstSite = siteDetails[0]
     try {
+      const dataToSave =
+        firstSite.coordinatesType === 'file'
+          ? prepareFileUploadDataForSave(siteDetails, request)
+          : prepareManualCoordinateDataForSave(exemption, request)
+
+      await authenticatedPatchRequest(request, '/exemption/site-details', {
+        ...(firstSite.coordinatesType === 'coordinates' && {
+          multipleSiteDetails: exemption.multipleSiteDetails
+        }),
+        siteDetails: dataToSave,
+        id: exemption.id
+      })
+
       if (payload?.add) {
         const updatedSiteDetails = [
           ...siteDetails,
@@ -84,19 +97,6 @@ export const reviewSiteDetailsSubmitController = {
           `${routes.SITE_NAME}?site=${updatedSiteDetails.length}`
         )
       }
-
-      const dataToSave =
-        firstSite.coordinatesType === 'file'
-          ? prepareFileUploadDataForSave(siteDetails, request)
-          : prepareManualCoordinateDataForSave(exemption, request)
-
-      await authenticatedPatchRequest(request, '/exemption/site-details', {
-        ...(firstSite.coordinatesType === 'coordinates' && {
-          multipleSiteDetails: exemption.multipleSiteDetails
-        }),
-        siteDetails: dataToSave,
-        id: exemption.id
-      })
 
       resetExemptionSiteDetails(request)
       return h.redirect(routes.TASK_LIST)

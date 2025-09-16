@@ -334,15 +334,15 @@ export const prepareFileUploadDataForSave = (siteDetails, request) => {
  * @returns {object} Formatted data for API submission
  */
 export const prepareManualCoordinateDataForSave = (exemption, request) => {
-  const siteDetails = getSiteDetailsBySite(exemption)
-
-  request.logger.info(
-    {
-      coordinatesType: siteDetails.coordinatesType,
-      coordinatesEntry: siteDetails.coordinatesEntry
-    },
-    'Saving manual coordinate site details'
-  )
+  for (const site of exemption.siteDetails) {
+    request.logger.info(
+      {
+        coordinatesType: site.coordinatesType,
+        coordinatesEntry: site.coordinatesEntry
+      },
+      'Saving manual coordinate site details'
+    )
+  }
 
   // Manual coordinate entry flow - use existing data structure
   return exemption.siteDetails

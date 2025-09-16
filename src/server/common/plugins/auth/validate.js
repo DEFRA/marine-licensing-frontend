@@ -5,6 +5,18 @@ import {
   updateUserSession
 } from '~/src/server/common/plugins/auth/utils.js'
 import { isPast, parseISO, subMinutes } from 'date-fns'
+import { isEntraIdRoute } from '~/src/server/common/constants/routes.js'
+import { AUTH_STRATEGIES } from '~/src/server/common/constants/auth.js'
+
+const isAuthStrategyValidForRoute = (strategy, requestPath) => {
+  if (strategy === AUTH_STRATEGIES.ENTRA_ID) {
+    return isEntraIdRoute(requestPath)
+  }
+  if (strategy === AUTH_STRATEGIES.DEFRA_ID) {
+    return !isEntraIdRoute(requestPath)
+  }
+  return false
+}
 
 export const validateUserSession = async (request, session) => {
   const authedUser = await getUserSession(request, session)
@@ -36,7 +48,10 @@ export const validateUserSession = async (request, session) => {
   }
   const userSession = await request.server.app.cache.get(session.sessionId)
 
-  if (userSession) {
+  if (
+    userSession &&
+    isAuthStrategyValidForRoute(userSession.strategy, request.path)
+  ) {
     return {
       isValid: true,
       credentials: userSession

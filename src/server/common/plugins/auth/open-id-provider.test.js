@@ -1,17 +1,20 @@
-import { openIdProvider } from '~/src/server/common/plugins/auth/open-id.js'
+import { openIdProvider } from '~/src/server/common/plugins/auth/open-id-provider.js'
+import { getOidcConfig } from '~/src/server/common/plugins/auth/get-oidc-config.js'
 import expect from 'expect'
 import jwt from '@hapi/jwt'
+jest.mock('~/src/server/common/plugins/auth/get-oidc-config.js')
 
 describe('#openIdProvider', () => {
   let provider
 
-  beforeAll(() => {
+  beforeAll(async () => {
     const oidcConf = {
       authorization_endpoint: 'http://test-auth-endpoint',
       token_endpoint: 'http://test-token-endpoint',
       end_session_endpoint: 'http://test-end-session-endpoint'
     }
-    provider = openIdProvider('defraId', oidcConf)
+    jest.mocked(getOidcConfig).mockResolvedValue(oidcConf)
+    provider = await openIdProvider('defraId')
   })
 
   test('When credentials exist', async () => {

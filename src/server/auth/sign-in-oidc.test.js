@@ -24,7 +24,7 @@ describe('#signInOidcController', () => {
   test('should render the project name page', async () => {
     const { statusCode, headers } = await server.inject({
       method: 'GET',
-      url: routes.LOGIN
+      url: routes.SIGNIN
     })
 
     expect(statusCode).toBe(statusCodes.redirect)

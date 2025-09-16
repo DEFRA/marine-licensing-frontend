@@ -16,7 +16,7 @@ import { pulse } from '~/src/server/common/helpers/pulse.js'
 import { requestTracing } from '~/src/server/common/helpers/request-tracing.js'
 import { setupProxy } from '~/src/server/common/helpers/proxy/setup-proxy.js'
 import { csrf } from '~/src/server/common/helpers/csrf.js'
-import { defraId } from '~/src/server/common/plugins/defra-id.js'
+import { openId } from '~/src/server/common/plugins/open-id.js'
 import { setPageCacheControlHeaders } from '~/src/server/common/helpers/cache-control.js'
 
 export async function createServer() {
@@ -85,7 +85,7 @@ export async function createServer() {
     basic,
     nunjucksConfig,
     csrf,
-    defraId,
+    openId,
     router // Register all the controllers/routes defined in src/server/router.js
   ])
 

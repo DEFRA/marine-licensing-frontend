@@ -1,15 +1,11 @@
 import Wreck from '@hapi/wreck'
-import { config } from '~/src/config/config.js'
 import { statusCodes } from '~/src/server/common/constants/status-codes.js'
 import querystring from 'node:querystring'
 
-export const getOidcConfig = async () => {
-  const { payload } = await Wreck.get(
-    config.get('defraId.oidcConfigurationUrl'),
-    {
-      json: true
-    }
-  )
+export const getOidcConfig = async (configUrl) => {
+  const { payload } = await Wreck.get(configUrl, {
+    json: true
+  })
 
   return payload
 }

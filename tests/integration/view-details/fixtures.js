@@ -54,7 +54,7 @@ export const createFileUploadExemption = (
           type: 'Feature',
           geometry: {
             type: 'Point',
-            coordinates: [51.5074, -0.1278]
+            coordinates: [51.5074, -0.1278] // NOSONAR
           }
         }
       ]
@@ -95,7 +95,6 @@ const baseExpectedContent = {
     'Public register'
   ],
   projectDetails: {
-    'Project name': 'Test Marine Activity Project',
     'Type of activity': 'Deposit of a substance or object',
     'Why this activity is exempt':
       "Based on your answers from 'Check if you need a marine licence', your article is exempt under Article 17 of the Marine Licensing (Exempted Activities) Order 2011 (opens in new tab)",

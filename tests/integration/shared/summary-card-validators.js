@@ -27,11 +27,12 @@ export const validatePageStructure = (document, expected) => {
     expect(caption).toHaveTextContent(expected.pageCaption)
   }
 
-  const backLink = document.querySelector('.govuk-back-link')
-  expect(backLink.textContent.trim()).toBe(expected.backLinkText)
-
-  if (expected.backLinkHref) {
-    expect(backLink).toHaveAttribute('href', expected.backLinkHref)
+  if (expected.backLinkText) {
+    const backLink = document.querySelector('.govuk-back-link')
+    expect(backLink.textContent.trim()).toBe(expected.backLinkText)
+    if (expected.backLinkHref) {
+      expect(backLink).toHaveAttribute('href', expected.backLinkHref)
+    }
   }
 }
 

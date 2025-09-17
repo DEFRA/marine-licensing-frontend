@@ -15,6 +15,17 @@ export const getAuthToken = async (request) => {
   }
 }
 
+export const getAuthProvider = (request) => {
+  const strategy = request?.auth?.credentials?.strategy
+  if (strategy === 'entra-id') {
+    return 'entraId'
+  }
+  if (strategy === 'defra-id') {
+    return 'defraId'
+  }
+  return null
+}
+
 export const createAuthHeaders = async (request, additionalHeaders = {}) => {
   const token = await getAuthToken(request)
 

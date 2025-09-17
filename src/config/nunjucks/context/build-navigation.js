@@ -1,38 +1,35 @@
-import { getUserSession } from '~/src/server/common/plugins/auth/utils.js'
 import { config } from '~/src/config/config.js'
 import { routes } from '~/src/server/common/constants/routes.js'
 import { AUTH_STRATEGIES } from '~/src/server/common/constants/auth.js'
+import { getAuthProvider } from '~/src/server/common/helpers/authenticated-requests.js'
 
 /**
  * @param {Partial<Request> | null} request
  */
-export const buildNavigation = async (request) => {
+export const buildNavigation = (request) => {
   const { accountManagementUrl } = config.get('defraId')
 
-  const authedUser = await getUserSession(request, request.state?.userSession)
+  const authProvider = getAuthProvider(request)
 
-  const navigation = [
-    {
-      text: 'Projects',
-      href: routes.DASHBOARD,
-      active: request?.path === routes.DASHBOARD
-    }
-  ]
-
-  if (authedUser?.strategy === AUTH_STRATEGIES.DEFRA_ID) {
-    navigation.push({
-      text: 'Defra account',
-      href: accountManagementUrl
-    })
-  }
-  if (authedUser) {
-    navigation.push({
-      text: 'Sign out',
-      href: routes.SIGN_OUT
-    })
+  if (authProvider === AUTH_STRATEGIES.DEFRA_ID) {
+    return [
+      {
+        text: 'Projects',
+        href: routes.DASHBOARD,
+        active: request?.path === routes.DASHBOARD
+      },
+      {
+        text: 'Defra account',
+        href: accountManagementUrl
+      },
+      {
+        text: 'Sign out',
+        href: routes.SIGN_OUT
+      }
+    ]
   }
 
-  return navigation
+  return []
 }
 
 /**

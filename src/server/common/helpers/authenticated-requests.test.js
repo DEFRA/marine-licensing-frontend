@@ -324,7 +324,7 @@ describe('#authenticated-requests', () => {
   })
 
   describe('#getAuthProvider', () => {
-    test('should return "entraId" when strategy is "entra-id"', () => {
+    test('should return "entra-id" when strategy is "entra-id"', () => {
       const request = {
         auth: {
           credentials: {
@@ -335,10 +335,10 @@ describe('#authenticated-requests', () => {
 
       const result = getAuthProvider(request)
 
-      expect(result).toBe('entraId')
+      expect(result).toBe('entra-id')
     })
 
-    test('should return "defraId" when strategy is "defra-id"', () => {
+    test('should return "defra-id" when strategy is "defra-id"', () => {
       const request = {
         auth: {
           credentials: {
@@ -349,7 +349,7 @@ describe('#authenticated-requests', () => {
 
       const result = getAuthProvider(request)
 
-      expect(result).toBe('defraId')
+      expect(result).toBe('defra-id')
     })
 
     test('should return null when strategy is unknown', () => {

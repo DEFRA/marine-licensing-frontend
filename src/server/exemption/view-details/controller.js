@@ -6,6 +6,7 @@ import { processSiteDetails } from '~/src/server/common/helpers/exemption-site-d
 import { createSiteDetailsDataJson } from '~/src/server/common/helpers/site-details.js'
 import { getExemptionService } from '~/src/services/exemption-service/index.js'
 import { getAuthProvider } from '~/src/server/common/helpers/authenticated-requests.js'
+import { AUTH_STRATEGIES } from '~/src/server/common/constants/auth.js'
 
 export const VIEW_DETAILS_VIEW_ROUTE = 'exemption/view-details/index'
 
@@ -51,7 +52,9 @@ export const viewDetailsController = {
         pageTitle: exemption.projectName,
         pageCaption,
         backLink:
-          getAuthProvider(request) === 'entraId' ? null : routes.DASHBOARD,
+          getAuthProvider(request) === AUTH_STRATEGIES.ENTRA_ID
+            ? null
+            : routes.DASHBOARD,
         isReadOnly: true,
         ...exemption,
         siteDetails,

@@ -28,11 +28,11 @@ export function extractCoordinatesFromGeoJSON(geoJSON) {
 /**
  * Gets the coordinate system from the exemption cache with fallback to WGS84
  * @param {Request} request - Hapi request object
- * @param {number} siteIndex - Index of site to extract data
  * @returns {object} Object containing coordinateSystem property
  */
-export const getCoordinateSystem = (request, siteIndex = 0) => {
+export const getCoordinateSystem = (request) => {
   const existingCache = getExemptionCache(request)
+  const siteIndex = request.site?.siteIndex ?? 0
   const site = getSiteDetailsBySite(existingCache, siteIndex)
 
   const currentSystem = site.coordinateSystem

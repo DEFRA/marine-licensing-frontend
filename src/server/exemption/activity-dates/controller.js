@@ -45,7 +45,7 @@ const createTemplateData = (
 
   const isInSiteDetailsFlow = isPageInSiteDetailsFlow(request)
 
-  if (payload) {
+  if (Object.keys(payload).length > 0) {
     dateFields = extractMultipleDateFields(payload, DATE_EXTRACTION_CONFIG)
   } else {
     const startDateFields = createDateFieldsFromValue(
@@ -108,7 +108,7 @@ export const activityDatesController = {
     const { siteIndex, queryParams } = request.site
     return h.view(
       ACTIVITY_DATES_VIEW_ROUTE,
-      createTemplateData(request, exemption, null, siteIndex, queryParams)
+      createTemplateData(request, exemption, {}, siteIndex, queryParams)
     )
   }
 }

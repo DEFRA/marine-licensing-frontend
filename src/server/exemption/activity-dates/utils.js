@@ -28,7 +28,7 @@ export const getNextRoute = (
 
 /**
  * Determines the back link
- * @param {number} siteIndex - The exemptiIndex of site
+ * @param {number} siteIndex - The siteIndex of site
  * @param {string} queryParams - Query parameters to append to the route
  * @returns {string} The route to redirect to
  */

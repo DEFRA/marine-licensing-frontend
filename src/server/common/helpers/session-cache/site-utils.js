@@ -38,7 +38,7 @@ export const setSiteData = (request) => {
 }
 
 /**
- * Uses setSiteData as a pre commit hooke
+ * Uses setSiteData as a pre commit handler
  * @param { object } request - Request object
  * @param {object} h - Hapi response toolkit
  * @returns {object} Hapi response (continue)

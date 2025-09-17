@@ -97,7 +97,7 @@ export const multipleCoordinatesSubmitController = {
     const { payload } = request
     const exemption = getExemptionCache(request)
     const { siteIndex, queryParams } = request.site
-    const { coordinateSystem } = getCoordinateSystem(request, siteIndex)
+    const { coordinateSystem } = getCoordinateSystem(request)
 
     let coordinates = convertPayloadToCoordinatesArray(
       payload,

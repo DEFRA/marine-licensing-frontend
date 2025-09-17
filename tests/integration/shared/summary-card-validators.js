@@ -67,10 +67,21 @@ export const validateSummaryCardContent = (
 
   Object.entries(expectedContent).forEach(([key, value]) => {
     const rows = card.querySelectorAll('.govuk-summary-list__row')
-    const row = Array.from(rows).find((row) => {
-      const keyElement = row.querySelector('.govuk-summary-list__key')
+    const row = Array.from(rows).find((r) => {
+      const keyElement = r.querySelector('.govuk-summary-list__key')
       return keyElement && keyElement.textContent.trim() === key
     })
+
+    if (!row) {
+      const availableKeys = Array.from(rows).map((r) => {
+        const keyElement = r.querySelector('.govuk-summary-list__key')
+        return keyElement ? keyElement.textContent.trim() : 'NO_KEY'
+      })
+      throw new Error(
+        `Could not find row with key "${key}" in card "${cardSelector}". Available keys: ${availableKeys.join(', ')}`
+      )
+    }
+
     expect(row).toBeTruthy()
     const valueElement = row.querySelector('.govuk-summary-list__value')
     if (Array.isArray(value)) {
@@ -149,8 +160,8 @@ export const validateSiteDetails = (document, expectedPageContent) => {
     Object.entries(expectedPageContent.siteDetails[0]).forEach(
       ([key, value]) => {
         const rows = siteCard.querySelectorAll('.govuk-summary-list__row')
-        const row = Array.from(rows).find((row) => {
-          const keyElement = row.querySelector('.govuk-summary-list__key')
+        const row = Array.from(rows).find((r) => {
+          const keyElement = r.querySelector('.govuk-summary-list__key')
           return keyElement && keyElement.textContent.trim() === key
         })
         expect(row).toBeTruthy()

@@ -74,7 +74,7 @@ export const testScenarios = [
         'Project name': 'Hammersmith pontoon construction',
         'Type of activity': 'Deposit of a substance or object',
         'Why this activity is exempt':
-          "Based on your answers from 'Check if you need a marine licence', your article is exempt under Article 17 of the Marine Licensing (Exempted Activities) Order 2011 (opens in new tab)",
+          "Based on your answers from 'Check if you need a marine licence', your activity is exempt under Article 17 of the Marine Licensing (Exempted Activities) Order 2011 (opens in new tab)",
         "Your answers from 'Check if you need a marine licence'": [
           'Download a copy of your answers (PDF)',
           "If you need to change any of your 'Check if you need a marine licence' answers:",

@@ -96,6 +96,19 @@ export const validateSummaryCardContent = (
 }
 
 /**
+ * Validates application details summary card
+ * @param {Document} document - JSDOM document
+ * @param {object} expected - Expected page content
+ */
+export const validateApplicationDetails = (document, expected) => {
+  validateSummaryCardContent(
+    document,
+    '#application-details-card',
+    expected.applicationDetails
+  )
+}
+
+/**
  * Validates project details summary card
  * @param {Document} document - JSDOM document
  * @param {object} expected - Expected page content

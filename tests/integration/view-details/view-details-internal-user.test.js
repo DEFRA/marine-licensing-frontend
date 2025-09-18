@@ -18,6 +18,7 @@ import {
 import { routes } from '~/src/server/common/constants/routes.js'
 import { statusCodes } from '~/src/server/common/constants/status-codes.js'
 import { getAuthProvider } from '~/src/server/common/helpers/authenticated-requests.js'
+import { AUTH_STRATEGIES } from '~/src/server/common/constants/auth.js'
 
 jest.mock('~/src/server/common/helpers/authenticated-requests.js')
 
@@ -26,10 +27,10 @@ describe('View Details - Content Verification Integration Tests', () => {
 
   const getPageDocument = async (exemption) => {
     mockExemption(exemption)
-    jest.mocked(getAuthProvider).mockReturnValue('entraId')
+    jest.mocked(getAuthProvider).mockReturnValue(AUTH_STRATEGIES.ENTRA_ID)
     const response = await getServer().inject({
       method: 'GET',
-      url: `${routes.VIEW_DETAILS}/${exemption.id}`
+      url: `${routes.VIEW_DETAILS_INTERNAL_USER}/${exemption.id}`
     })
 
     validateResponse(response, statusCodes.ok)

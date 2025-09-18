@@ -212,5 +212,58 @@ export const testScenarios = [
         ]
       }
     }
+  },
+  {
+    name: 'Multiple sites scenario',
+    coordinateSystem: COORDINATE_SYSTEMS.WGS84,
+    exemption: {
+      ...basePolygonExemption,
+      multipleSiteDetails: { multipleSitesEnabled: true },
+      siteDetails: [
+        {
+          coordinatesType: 'coordinates',
+          coordinatesEntry: 'multiple',
+          coordinateSystem: 'wgs84',
+          coordinates: [
+            { latitude: '55.123456', longitude: '55.123456' },
+            { latitude: '33.987654', longitude: '33.987654' },
+            { latitude: '78.123456', longitude: '78.123456' }
+          ]
+        },
+        {
+          coordinatesType: 'coordinates',
+          coordinatesEntry: 'multiple',
+          coordinateSystem: 'wgs84',
+          coordinates: [
+            { latitude: '55.123456', longitude: '55.123456' },
+            { latitude: '33.987654', longitude: '33.987654' },
+            { latitude: '78.123456', longitude: '78.123456' }
+          ]
+        }
+      ]
+    },
+    expectedPageContent: {
+      projectName: 'Hammersmith pontoon construction',
+      siteDetails: {
+        method:
+          'Manually enter multiple sets of coordinates to mark the boundary of the site',
+        coordinateSystem:
+          'WGS84 (World Geodetic System 1984)Latitude and longitude',
+        polygonCoordinates: [
+          {
+            label: 'Start and end points',
+            value: '55.123456, 55.123456'
+          },
+          {
+            label: 'Point 2',
+            value: '33.987654, 33.987654'
+          },
+          {
+            label: 'Point 3',
+            value: '78.123456, 78.123456'
+          }
+        ]
+      }
+    }
   }
 ]

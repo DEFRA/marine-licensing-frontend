@@ -2,7 +2,10 @@ import {
   getExemptionCache,
   updateExemptionSiteDetails
 } from '~/src/server/common/helpers/session-cache/utils.js'
-import { getSiteDetailsBySite } from '~/src/server/common/helpers/session-cache/site-utils.js'
+import {
+  getSiteDetailsBySite,
+  setSiteDataPreHandler
+} from '~/src/server/common/helpers/session-cache/site-utils.js'
 import {
   errorDescriptionByFieldName,
   mapErrorsForDisplay
@@ -29,9 +32,14 @@ export const errorMessages = {
  * @satisfies {Partial<ServerRoute>}
  */
 export const coordinatesTypeController = {
+  options: {
+    pre: [setSiteDataPreHandler]
+  },
   handler(request, h) {
     const exemption = getExemptionCache(request)
-    const siteDetails = getSiteDetailsBySite(exemption)
+    const { site } = request
+    const { siteIndex } = site
+    const siteDetails = getSiteDetailsBySite(exemption, siteIndex)
 
     return h.view(PROVIDE_COORDINATES_CHOICE_VIEW_ROUTE, {
       ...provideCoordinatesSettings,
@@ -50,6 +58,7 @@ export const coordinatesTypeController = {
  */
 export const coordinatesTypeSubmitController = {
   options: {
+    pre: [setSiteDataPreHandler],
     validate: {
       payload: joi.object({
         coordinatesType: joi
@@ -64,7 +73,6 @@ export const coordinatesTypeSubmitController = {
       }),
       failAction: (request, h, err) => {
         const { payload } = request
-
         const { projectName } = getExemptionCache(request)
 
         if (!err.details) {
@@ -98,19 +106,21 @@ export const coordinatesTypeSubmitController = {
   handler(request, h) {
     const { payload } = request
 
+    const { siteIndex, queryParams } = request.site
+
     updateExemptionSiteDetails(
       request,
-      0,
+      siteIndex,
       'coordinatesType',
       payload.coordinatesType
     )
 
     if (payload.coordinatesType === 'coordinates') {
-      return h.redirect(routes.MULTIPLE_SITES_CHOICE).takeover()
+      return h.redirect(routes.MULTIPLE_SITES_CHOICE + queryParams).takeover()
     } else {
       // the 'file' case is at this point in the code flow is the only
       // reachable option, as the validator explicitly lists all available valid choices.
-      return h.redirect(routes.CHOOSE_FILE_UPLOAD_TYPE).takeover()
+      return h.redirect(routes.CHOOSE_FILE_UPLOAD_TYPE + queryParams).takeover()
     }
   }
 }

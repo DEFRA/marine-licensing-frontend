@@ -1,0 +1,22 @@
+[
+  {
+    "description": "Valid OSGB36 centre coordinates - London",
+    "payload": { "eastings": "531090", "northings": "181680" }
+  },
+  {
+    "description": "Valid OSGB36 centre coordinates - Edinburgh",
+    "payload": { "eastings": "325800", "northings": "674200" }
+  },
+  {
+    "description": "Valid OSGB36 centre coordinates - Cardiff",
+    "payload": { "eastings": "318200", "northings": "176800" }
+  },
+  {
+    "description": "Valid OSGB36 centre coordinates - Belfast",
+    "payload": { "eastings": "333500", "northings": "374200" }
+  },
+  {
+    "description": "Valid OSGB36 centre coordinates - Manchester",
+    "payload": { "eastings": "384000", "northings": "398000" }
+  }
+]

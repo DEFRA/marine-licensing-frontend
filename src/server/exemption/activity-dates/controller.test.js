@@ -10,7 +10,7 @@ import {
   activityDatesSubmitController
 } from '~/src/server/exemption/activity-dates/controller.js'
 import { createServer } from '~/src/server/index.js'
-import { mockExemption } from '~/src/server/test-helpers/mocks.js'
+import { mockExemption, mockSite } from '~/src/server/test-helpers/mocks.js'
 
 jest.mock('~/src/server/common/helpers/session-cache/utils.js')
 
@@ -64,7 +64,7 @@ describe('#activityDatesController', () => {
 
     test('should render with empty date fields when no existing data', () => {
       const h = { view: jest.fn() }
-      const request = { url: {} }
+      const request = { url: {}, site: mockSite }
 
       activityDatesController.handler(request, h)
 
@@ -95,7 +95,7 @@ describe('#activityDatesController', () => {
       getExemptionCacheSpy.mockReturnValue(exemptionWithDates)
 
       const h = { view: jest.fn() }
-      const request = { url: {} }
+      const request = { url: {}, site: mockSite }
 
       activityDatesController.handler(request, h)
 
@@ -1204,7 +1204,7 @@ describe('#activityDatesController', () => {
         'activity-end-date-year': (currentYear + 1).toString()
       }
 
-      const request = { payload, url: {} }
+      const request = { payload, url: {}, site: mockSite }
       const h = { redirect: jest.fn() }
 
       // This should trigger line 414 (throw e) since there are no validation details
@@ -1252,7 +1252,7 @@ describe('#activityDatesController', () => {
         'activity-end-date-year': (currentYear + 1).toString()
       }
 
-      const request = { payload, url: {} }
+      const request = { payload, url: {}, site: mockSite }
 
       // Call the handler directly to hit the catch block
       await activityDatesSubmitController.handler(request, h)
@@ -1316,7 +1316,7 @@ describe('#activityDatesController', () => {
       // Use empty payload to test the || '' fallback logic
       const payload = {}
 
-      const request = { payload, url: {} }
+      const request = { payload, url: {}, site: mockSite }
 
       // Call the handler directly to hit the catch block
       await activityDatesSubmitController.handler(request, h)

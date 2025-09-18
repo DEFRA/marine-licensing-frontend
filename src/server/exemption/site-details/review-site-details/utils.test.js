@@ -906,6 +906,7 @@ describe('siteDetails utils', () => {
         {
           pageTitle: 'Review site details',
           backLink: routes.WIDTH_OF_SITE,
+          isMultiSiteJourney: false,
           projectName: 'Test Project',
           summaryData: {
             method:

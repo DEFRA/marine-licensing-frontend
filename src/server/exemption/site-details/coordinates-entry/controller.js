@@ -2,13 +2,17 @@ import {
   getExemptionCache,
   updateExemptionSiteDetails
 } from '~/src/server/common/helpers/session-cache/utils.js'
-import { getSiteDetailsBySite } from '~/src/server/common/helpers/session-cache/site-utils.js'
+import {
+  getSiteDetailsBySite,
+  setSiteDataPreHandler
+} from '~/src/server/common/helpers/session-cache/site-utils.js'
 import {
   errorDescriptionByFieldName,
   mapErrorsForDisplay
 } from '~/src/server/common/helpers/errors.js'
 import joi from 'joi'
 import { routes } from '~/src/server/common/constants/routes.js'
+import { getBackRoute } from './utils.js'
 
 export const COORDINATES_ENTRY_VIEW_ROUTE =
   'exemption/site-details/coordinates-entry/index'
@@ -28,13 +32,19 @@ export const errorMessages = {
  * @satisfies {Partial<ServerRoute>}
  */
 export const coordinatesEntryController = {
+  options: {
+    pre: [setSiteDataPreHandler]
+  },
   handler(request, h) {
     const exemption = getExemptionCache(request)
+    const { site } = request
+    const { siteIndex } = site
 
-    const siteDetails = getSiteDetailsBySite(exemption)
+    const siteDetails = getSiteDetailsBySite(exemption, siteIndex)
 
     return h.view(COORDINATES_ENTRY_VIEW_ROUTE, {
       ...coordinatesEntrySettings,
+      backLink: getBackRoute(request, exemption),
       projectName: exemption.projectName,
       payload: {
         coordinatesEntry: siteDetails.coordinatesEntry
@@ -49,6 +59,7 @@ export const coordinatesEntryController = {
  */
 export const coordinatesEntrySubmitController = {
   options: {
+    pre: [setSiteDataPreHandler],
     validate: {
       payload: joi.object({
         coordinatesEntry: joi
@@ -63,7 +74,6 @@ export const coordinatesEntrySubmitController = {
       }),
       failAction: (request, h, err) => {
         const { payload } = request
-
         const { projectName } = getExemptionCache(request)
 
         if (!err.details) {
@@ -95,13 +105,15 @@ export const coordinatesEntrySubmitController = {
   handler(request, h) {
     const { payload } = request
 
+    const { siteIndex, queryParams } = request.site
+
     updateExemptionSiteDetails(
       request,
-      0,
+      siteIndex,
       'coordinatesEntry',
       payload.coordinatesEntry
     )
 
-    return h.redirect(routes.COORDINATE_SYSTEM_CHOICE)
+    return h.redirect(routes.COORDINATE_SYSTEM_CHOICE + queryParams)
   }
 }

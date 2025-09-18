@@ -1,0 +1,89 @@
+[
+  {
+    "description": "Valid WGS84 coordinates - set 1",
+    "coordinates": [
+      { "latitude": "55.019889", "longitude": "-1.399500" },
+      { "latitude": "55.019890", "longitude": "-1.399501" },
+      { "latitude": "55.019891", "longitude": "-1.399502" }
+    ]
+  },
+  {
+    "description": "Valid WGS84 coordinates - set 2",
+    "coordinates": [
+      { "latitude": "50.000000", "longitude": "-1.000000" },
+      { "latitude": "50.001000", "longitude": "-0.999000" },
+      { "latitude": "50.000500", "longitude": "-0.999500" }
+    ]
+  },
+  {
+    "description": "Valid WGS84 coordinates - set 3",
+    "coordinates": [
+      { "latitude": "51.507222", "longitude": "-0.127500" },
+      { "latitude": "51.508000", "longitude": "-0.126500" },
+      { "latitude": "51.507500", "longitude": "-0.127000" }
+    ]
+  },
+  {
+    "description": "Valid WGS84 coordinates - set 4",
+    "coordinates": [
+      { "latitude": "55.123456", "longitude": "1.234567" },
+      { "latitude": "55.124000", "longitude": "1.235000" },
+      { "latitude": "55.123700", "longitude": "1.234800" }
+    ]
+  },
+  {
+    "description": "Valid WGS84 coordinates - set 5",
+    "coordinates": [
+      { "latitude": "49.500000", "longitude": "-6.000000" },
+      { "latitude": "49.501000", "longitude": "-5.999000" },
+      { "latitude": "49.500500", "longitude": "-5.999500" }
+    ]
+  },
+  {
+    "description": "Valid WGS84 coordinates - Rectangular area 1",
+    "coordinates": [
+      { "latitude": "50.000000", "longitude": "-1.000000" },
+      { "latitude": "50.001000", "longitude": "-1.000000" },
+      { "latitude": "50.001000", "longitude": "-0.999000" },
+      { "latitude": "50.000000", "longitude": "-0.999000" }
+    ]
+  },
+  {
+    "description": "Valid WGS84 coordinates - Rectangular area 2",
+    "coordinates": [
+      { "latitude": "51.507222", "longitude": "-0.127500" },
+      { "latitude": "51.508000", "longitude": "-0.127500" },
+      { "latitude": "51.508000", "longitude": "-0.126500" },
+      { "latitude": "51.507222", "longitude": "-0.126500" }
+    ]
+  },
+  {
+    "description": "Valid WGS84 coordinates - Rectangular area 3",
+    "coordinates": [
+      { "latitude": "55.123456", "longitude": "1.234567" },
+      { "latitude": "55.124000", "longitude": "1.234567" },
+      { "latitude": "55.124000", "longitude": "1.235000" },
+      { "latitude": "55.123456", "longitude": "1.235000" }
+    ]
+  },
+  {
+    "description": "Valid WGS84 coordinates - Pentagon area 1",
+    "coordinates": [
+      { "latitude": "50.000000", "longitude": "-1.000000" },
+      { "latitude": "50.001000", "longitude": "-1.000000" },
+      { "latitude": "50.001500", "longitude": "-0.999500" },
+      { "latitude": "50.001000", "longitude": "-0.999000" },
+      { "latitude": "50.000000", "longitude": "-0.999000" }
+    ]
+  },
+  {
+    "description": "Valid WGS84 coordinates - Pentagon area 2",
+    "coordinates": [
+      { "latitude": "51.507000", "longitude": "-0.128000" },
+      { "latitude": "51.508000", "longitude": "-0.128000" },
+      { "latitude": "51.508500", "longitude": "-0.127500" },
+      { "latitude": "51.508000", "longitude": "-0.127000" },
+      { "latitude": "51.507000", "longitude": "-0.127000" }
+    ]
+  }
+]

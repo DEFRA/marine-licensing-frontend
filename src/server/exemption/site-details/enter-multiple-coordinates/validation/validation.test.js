@@ -1,16 +1,13 @@
 import { validateCoordinates } from '~/src/server/exemption/site-details/enter-multiple-coordinates/validation/validation.js'
 import { COORDINATE_SYSTEMS } from '~/src/server/common/constants/exemptions.js'
-import wgs84TestCases from './test-cases-wgs84.json'
-import osgb36TestCases from './test-cases-osgb36.json'
+import wgs84TestCases from './validation-error-cases-wgs84.json'
+import osgb36TestCases from './validation-error-cases-osgb36.json'
+import successTestCases from './validation-success-cases-wgs84.json'
+import osgb36SuccessTestCases from './validation-success-cases-osgb36.json'
 
-describe('validateCoordinates', () => {
+describe('Validate multiple coordinates', () => {
   describe('WGS84 coordinate system', () => {
-    test('valid coordinates', () => {
-      const coordinates = [
-        { latitude: '55.019889', longitude: '-1.399500' },
-        { latitude: '55.019890', longitude: '-1.399501' },
-        { latitude: '55.019891', longitude: '-1.399502' }
-      ]
+    test.each(successTestCases)('$description', ({ coordinates }) => {
       const exemptionId = 'test-id'
 
       const result = validateCoordinates(
@@ -41,12 +38,7 @@ describe('validateCoordinates', () => {
   })
 
   describe('OSGB36 coordinate system', () => {
-    it('valid coordinates', () => {
-      const coordinates = [
-        { eastings: '123456', northings: '654321' },
-        { eastings: '234567', northings: '765432' },
-        { eastings: '345678', northings: '876543' }
-      ]
+    test.each(osgb36SuccessTestCases)('$description', ({ coordinates }) => {
       const exemptionId = 'test-id'
 
       const result = validateCoordinates(

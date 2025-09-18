@@ -39,7 +39,7 @@ export const viewDetailsController = {
       }
 
       const siteDetails = processSiteDetails(exemption, exemptionId, request)
-      const coordinateSystem = exemption.siteDetails?.coordinateSystem
+      const coordinateSystem = siteDetails?.coordinateSystem
       const siteDetailsData = createSiteDetailsDataJson(
         siteDetails,
         coordinateSystem

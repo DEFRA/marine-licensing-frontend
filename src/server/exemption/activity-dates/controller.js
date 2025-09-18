@@ -23,30 +23,39 @@ import {
   setExemptionCache,
   updateExemptionSiteDetails
 } from '~/src/server/common/helpers/session-cache/utils.js'
-import { getSiteDetailsBySite } from '~/src/server/common/helpers/session-cache/site-utils.js'
+import {
+  getSiteDetailsBySite,
+  setSiteDataPreHandler
+} from '~/src/server/common/helpers/session-cache/site-utils.js'
 import { activityDatesSchema } from '~/src/server/common/schemas/date.js'
 import { getSiteNumber } from '~/src/server/exemption/site-details/utils/site-number.js'
-import { getNextRoute } from './utils.js'
+import { getBackRoute, getNextRoute } from './utils.js'
 
 const isPageInSiteDetailsFlow = (request) =>
   request.url.pathname === routes.SITE_DETAILS_ACTIVITY_DATES
 
-const createTemplateData = (request, exemption, payload = null) => {
+const createTemplateData = (
+  request,
+  exemption,
+  payload,
+  siteIndex = 0,
+  queryParams = ''
+) => {
   let dateFields
 
   const isInSiteDetailsFlow = isPageInSiteDetailsFlow(request)
 
-  if (payload) {
+  if (Object.keys(payload).length > 0) {
     dateFields = extractMultipleDateFields(payload, DATE_EXTRACTION_CONFIG)
   } else {
     const startDateFields = createDateFieldsFromValue(
       isInSiteDetailsFlow
-        ? getSiteDetailsBySite(exemption).activityDates?.start
+        ? getSiteDetailsBySite(exemption, siteIndex).activityDates?.start
         : exemption.activityDates?.start
     )
     const endDateFields = createDateFieldsFromValue(
       isInSiteDetailsFlow
-        ? getSiteDetailsBySite(exemption)?.activityDates?.end
+        ? getSiteDetailsBySite(exemption, siteIndex)?.activityDates?.end
         : exemption.activityDates?.end
     )
 
@@ -73,7 +82,7 @@ const createTemplateData = (request, exemption, payload = null) => {
       projectName: exemption.projectName,
       ...dateFields,
       backLink: multipleSiteDetails?.multipleSitesEnabled
-        ? routes.SAME_ACTIVITY_DATES
+        ? getBackRoute(siteIndex, queryParams)
         : routes.MULTIPLE_SITES_CHOICE,
       cancelLink: routes.TASK_LIST + '?cancel=site-details',
       isSiteDetailsFlow: true,
@@ -91,18 +100,23 @@ const createTemplateData = (request, exemption, payload = null) => {
 }
 
 export const activityDatesController = {
+  options: {
+    pre: [setSiteDataPreHandler]
+  },
   handler(request, h) {
     const exemption = getExemptionCache(request)
+    const { siteIndex, queryParams } = request.site
     return h.view(
       ACTIVITY_DATES_VIEW_ROUTE,
-      createTemplateData(request, exemption)
+      createTemplateData(request, exemption, {}, siteIndex, queryParams)
     )
   }
 }
 
 function handleValidationErrors(request, h, err) {
   const exemption = getExemptionCache(request)
-  const { payload } = request
+  const { payload, site } = request
+  const { siteIndex, queryParams } = site ?? {}
 
   const validationResult = processDateValidationErrors(
     err,
@@ -114,14 +128,20 @@ function handleValidationErrors(request, h, err) {
     return h
       .view(
         ACTIVITY_DATES_VIEW_ROUTE,
-        createTemplateData(request, exemption, payload)
+        createTemplateData(request, exemption, payload, siteIndex, queryParams)
       )
       .takeover()
   }
 
   return h
     .view(ACTIVITY_DATES_VIEW_ROUTE, {
-      ...createTemplateData(request, exemption, payload),
+      ...createTemplateData(
+        request,
+        exemption,
+        payload,
+        siteIndex,
+        queryParams
+      ),
       ...validationResult
     })
     .takeover()
@@ -129,6 +149,7 @@ function handleValidationErrors(request, h, err) {
 
 export const activityDatesSubmitController = {
   options: {
+    pre: [setSiteDataPreHandler],
     validate: {
       payload: activityDatesSchema,
       failAction: handleValidationErrors
@@ -154,7 +175,8 @@ export const activityDatesSubmitController = {
       const isInSiteDetailsFlow = isPageInSiteDetailsFlow(request)
 
       if (isInSiteDetailsFlow) {
-        updateExemptionSiteDetails(request, 0, 'activityDates', {
+        const { siteIndex } = request.site
+        updateExemptionSiteDetails(request, siteIndex, 'activityDates', {
           start,
           end
         })
@@ -173,7 +195,11 @@ export const activityDatesSubmitController = {
         })
       }
 
-      const nextRoute = getNextRoute(exemption, isInSiteDetailsFlow)
+      const nextRoute = getNextRoute(
+        exemption,
+        isInSiteDetailsFlow,
+        request.site?.queryParams
+      )
       return h.redirect(nextRoute)
     } catch (e) {
       const { details } = e.data?.payload?.validation ?? {}
@@ -188,8 +214,15 @@ export const activityDatesSubmitController = {
       )
       const errors = errorDescriptionByFieldName(errorSummary)
 
+      const { siteIndex, queryParams } = request.site
       return h.view(ACTIVITY_DATES_VIEW_ROUTE, {
-        ...createTemplateData(request, exemption, payload),
+        ...createTemplateData(
+          request,
+          exemption,
+          payload,
+          siteIndex,
+          queryParams
+        ),
         errors,
         errorSummary
       })

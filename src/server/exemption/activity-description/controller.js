@@ -7,12 +7,14 @@ import {
   setExemptionCache,
   updateExemptionSiteDetails
 } from '~/src/server/common/helpers/session-cache/utils.js'
-import { getSiteDetailsBySite } from '~/src/server/common/helpers/session-cache/site-utils.js'
+import {
+  getSiteDetailsBySite,
+  setSiteDataPreHandler
+} from '~/src/server/common/helpers/session-cache/site-utils.js'
 import { routes } from '~/src/server/common/constants/routes.js'
 import { authenticatedPatchRequest } from '~/src/server/common/helpers/authenticated-requests.js'
 import joi from 'joi'
 import { getBackLink } from './utils.js'
-import { getSiteNumber } from '~/src/server/exemption/site-details/utils/site-number.js'
 
 export const ACTIVITY_DESCRIPTION_VIEW_ROUTE =
   'exemption/activity-description/index'
@@ -35,7 +37,8 @@ const isPageInSiteDetailsFlow = (request) =>
 const getPageTemplateValues = (request) => {
   const siteDetailsFlow = isPageInSiteDetailsFlow(request)
   const exemption = getExemptionCache(request)
-  const siteNumber = getSiteNumber(exemption, request)
+
+  const { siteNumber, siteIndex, queryParams } = request.site ?? {}
 
   const { multipleSiteDetails } = exemption
 
@@ -46,7 +49,7 @@ const getPageTemplateValues = (request) => {
     ...templateValues,
     isMultiSiteJourney: !!multipleSiteDetails?.multipleSitesEnabled,
     isSiteDetailsFlow: siteDetailsFlow,
-    backLink: getBackLink(exemption, siteDetailsFlow),
+    backLink: getBackLink(exemption, siteDetailsFlow, siteIndex, queryParams),
     projectName: exemption.projectName,
     siteNumber: variableActivityDescription ? siteNumber : null
   }
@@ -57,12 +60,16 @@ const getPageTemplateValues = (request) => {
  * @satisfies {Partial<ServerRoute>}
  */
 export const activityDescriptionController = {
+  options: {
+    pre: [setSiteDataPreHandler]
+  },
   handler(request, h) {
     const exemption = getExemptionCache(request)
     const isInSiteDetailsFlow = isPageInSiteDetailsFlow(request)
+    const { siteIndex } = request.site ?? {}
 
     const activityDescription = isInSiteDetailsFlow
-      ? getSiteDetailsBySite(exemption)?.activityDescription
+      ? getSiteDetailsBySite(exemption, siteIndex)?.activityDescription
       : exemption.activityDescription
 
     return h.view(ACTIVITY_DESCRIPTION_VIEW_ROUTE, {
@@ -78,6 +85,7 @@ export const activityDescriptionController = {
  */
 export const activityDescriptionSubmitController = {
   options: {
+    pre: [setSiteDataPreHandler],
     validate: {
       payload: joi.object({
         activityDescription: joi
@@ -123,10 +131,12 @@ export const activityDescriptionSubmitController = {
     try {
       const isInSiteDetailsFlow = isPageInSiteDetailsFlow(request)
 
+      const { siteIndex, queryParams } = request.site
+
       if (isInSiteDetailsFlow) {
         updateExemptionSiteDetails(
           request,
-          0,
+          siteIndex,
           'activityDescription',
           payload.activityDescription
         )
@@ -144,9 +154,10 @@ export const activityDescriptionSubmitController = {
         })
       }
 
-      return h.redirect(
-        isInSiteDetailsFlow ? routes.COORDINATES_ENTRY_CHOICE : routes.TASK_LIST
-      )
+      const nextRoute = isInSiteDetailsFlow
+        ? routes.COORDINATES_ENTRY_CHOICE + queryParams
+        : routes.TASK_LIST
+      return h.redirect(nextRoute)
     } catch (e) {
       const { details } = e.data?.payload?.validation ?? {}
 

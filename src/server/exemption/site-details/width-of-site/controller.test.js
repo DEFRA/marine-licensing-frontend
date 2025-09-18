@@ -5,7 +5,7 @@ import {
   WIDTH_OF_SITE_VIEW_ROUTE
 } from '~/src/server/exemption/site-details/width-of-site/controller.js'
 import * as cacheUtils from '~/src/server/common/helpers/session-cache/utils.js'
-import { mockExemption } from '~/src/server/test-helpers/mocks.js'
+import { mockExemption, mockSite } from '~/src/server/test-helpers/mocks.js'
 import { statusCodes } from '~/src/server/common/constants/status-codes.js'
 import { config } from '~/src/config/config.js'
 import { JSDOM } from 'jsdom'
@@ -37,7 +37,7 @@ describe('#widthOfSite', () => {
     test('widthController handler should render with correct context', () => {
       const h = { view: jest.fn() }
 
-      widthOfSiteController.handler({}, h)
+      widthOfSiteController.handler({ site: mockSite }, h)
 
       expect(h.view).toHaveBeenCalledWith(WIDTH_OF_SITE_VIEW_ROUTE, {
         pageTitle: 'Enter the width of the circular site in metres',
@@ -57,7 +57,7 @@ describe('#widthOfSite', () => {
 
       const h = { view: jest.fn() }
 
-      widthOfSiteController.handler({}, h)
+      widthOfSiteController.handler({ site: mockSite }, h)
 
       expect(h.view).toHaveBeenCalledWith(WIDTH_OF_SITE_VIEW_ROUTE, {
         pageTitle: 'Enter the width of the circular site in metres',
@@ -197,7 +197,7 @@ describe('#widthOfSite', () => {
       }
 
       await widthOfSiteSubmitController.handler(
-        { payload: { width: 'single' } },
+        { payload: { width: 'single' }, site: mockSite },
         h
       )
 
@@ -212,7 +212,7 @@ describe('#widthOfSite', () => {
         view: jest.fn()
       }
 
-      const mockRequest = { payload: { width: 'single' } }
+      const mockRequest = { payload: { width: 'single' }, site: mockSite }
 
       await widthOfSiteSubmitController.handler(mockRequest, h)
 

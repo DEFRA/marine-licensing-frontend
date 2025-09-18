@@ -5,7 +5,7 @@ import {
   COORDINATES_ENTRY_VIEW_ROUTE
 } from '~/src/server/exemption/site-details/coordinates-entry/controller.js'
 import * as cacheUtils from '~/src/server/common/helpers/session-cache/utils.js'
-import { mockExemption } from '~/src/server/test-helpers/mocks.js'
+import { mockExemption, mockSite } from '~/src/server/test-helpers/mocks.js'
 import { statusCodes } from '~/src/server/common/constants/status-codes.js'
 import { config } from '~/src/config/config.js'
 import { JSDOM } from 'jsdom'
@@ -37,7 +37,12 @@ describe('#coordinatesEntry', () => {
     test('coordinatesEntryController handler should render with correct context', () => {
       const h = { view: jest.fn() }
 
-      coordinatesEntryController.handler({}, h)
+      coordinatesEntryController.handler(
+        {
+          site: mockSite
+        },
+        h
+      )
 
       expect(h.view).toHaveBeenCalledWith(COORDINATES_ENTRY_VIEW_ROUTE, {
         pageTitle: 'How do you want to enter the coordinates?',
@@ -57,7 +62,12 @@ describe('#coordinatesEntry', () => {
 
       const h = { view: jest.fn() }
 
-      coordinatesEntryController.handler({}, h)
+      coordinatesEntryController.handler(
+        {
+          site: mockSite
+        },
+        h
+      )
 
       expect(h.view).toHaveBeenCalledWith(COORDINATES_ENTRY_VIEW_ROUTE, {
         pageTitle: 'How do you want to enter the coordinates?',
@@ -242,7 +252,7 @@ describe('#coordinatesEntry', () => {
       }
 
       await coordinatesEntrySubmitController.handler(
-        { payload: { coordinatesEntry: 'single' } },
+        { payload: { coordinatesEntry: 'single' }, site: mockSite },
         h
       )
 
@@ -257,7 +267,10 @@ describe('#coordinatesEntry', () => {
         view: jest.fn()
       }
 
-      const mockRequest = { payload: { coordinatesEntry: 'single' } }
+      const mockRequest = {
+        payload: { coordinatesEntry: 'single' },
+        site: mockSite
+      }
 
       await coordinatesEntrySubmitController.handler(mockRequest, h)
 

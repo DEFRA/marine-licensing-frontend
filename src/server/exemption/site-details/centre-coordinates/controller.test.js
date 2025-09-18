@@ -8,7 +8,7 @@ import {
 import { COORDINATE_SYSTEMS } from '~/src/server/common/constants/exemptions.js'
 import * as cacheUtils from '~/src/server/common/helpers/session-cache/utils.js'
 import * as coordinateUtils from '~/src/server/common/helpers/coordinate-utils.js'
-import { mockExemption } from '~/src/server/test-helpers/mocks.js'
+import { mockExemption, mockSite } from '~/src/server/test-helpers/mocks.js'
 import { statusCodes } from '~/src/server/common/constants/status-codes.js'
 import { config } from '~/src/config/config.js'
 import { JSDOM } from 'jsdom'
@@ -53,7 +53,7 @@ describe('#centreCoordinates', () => {
       getExemptionCacheSpy.mockReturnValueOnce({})
       const h = { view: jest.fn() }
 
-      centreCoordinatesController.handler({}, h)
+      centreCoordinatesController.handler({ site: mockSite }, h)
 
       expect(h.view).toHaveBeenCalledWith(
         COORDINATE_SYSTEM_VIEW_ROUTES[COORDINATE_SYSTEMS.WGS84],
@@ -70,7 +70,7 @@ describe('#centreCoordinates', () => {
     test('centreCoordinatesController handler should render with correct context for wgs84', () => {
       const h = { view: jest.fn() }
 
-      centreCoordinatesController.handler({}, h)
+      centreCoordinatesController.handler({ site: mockSite }, h)
 
       expect(h.view).toHaveBeenCalledWith(
         COORDINATE_SYSTEM_VIEW_ROUTES[COORDINATE_SYSTEMS.WGS84],
@@ -101,7 +101,7 @@ describe('#centreCoordinates', () => {
         coordinateSystem: COORDINATE_SYSTEMS.OSGB36
       })
 
-      centreCoordinatesController.handler({}, h)
+      centreCoordinatesController.handler({ site: mockSite }, h)
 
       expect(h.view).toHaveBeenCalledWith(
         COORDINATE_SYSTEM_VIEW_ROUTES[COORDINATE_SYSTEMS.OSGB36],
@@ -126,7 +126,7 @@ describe('#centreCoordinates', () => {
 
       const h = { view: jest.fn() }
 
-      centreCoordinatesController.handler({}, h)
+      centreCoordinatesController.handler({ site: mockSite }, h)
 
       expect(h.view).toHaveBeenCalledWith(
         COORDINATE_SYSTEM_VIEW_ROUTES[COORDINATE_SYSTEMS.WGS84],
@@ -197,7 +197,8 @@ describe('#centreCoordinates', () => {
   describe('#centreCoordinatesSubmitController', () => {
     test('Should correctly format error data', () => {
       const request = {
-        payload: { latitude: 'invalid' }
+        payload: { latitude: 'invalid' },
+        site: mockSite
       }
 
       const h = {
@@ -297,7 +298,8 @@ describe('#centreCoordinates', () => {
       }
 
       const mockRequest = {
-        payload: mockExemption.siteDetails[0].coordinates
+        payload: mockExemption.siteDetails[0].coordinates,
+        site: mockSite
       }
 
       getCoordinateSystemSpy.mockReturnValueOnce({
@@ -322,7 +324,8 @@ describe('#centreCoordinates', () => {
       }
 
       const mockRequest = {
-        payload: mockCoordinates[COORDINATE_SYSTEMS.OSGB36]
+        payload: mockCoordinates[COORDINATE_SYSTEMS.OSGB36],
+        site: mockSite
       }
 
       getCoordinateSystemSpy.mockReturnValueOnce({
@@ -343,7 +346,8 @@ describe('#centreCoordinates', () => {
 
     test('Should correctly handle validation errors', () => {
       const request = {
-        payload: { latitude: 'invalid' }
+        payload: { latitude: 'invalid' },
+        site: mockSite
       }
 
       const h = {

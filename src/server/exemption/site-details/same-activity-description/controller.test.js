@@ -4,14 +4,17 @@ import {
 } from './controller.js'
 import {
   getExemptionCache,
-  updateExemptionMultipleSiteDetails
+  updateExemptionMultipleSiteDetails,
+  updateExemptionSiteDetails
 } from '~/src/server/common/helpers/session-cache/utils.js'
 import { routes } from '~/src/server/common/constants/routes.js'
+import { mockSite } from '~/src/server/test-helpers/mocks.js'
 
 jest.mock('~/src/server/common/helpers/session-cache/utils.js')
 
 describe('sameActivityDescriptionController', () => {
   const mockRequest = {
+    site: mockSite,
     logger: {
       info: jest.fn()
     }
@@ -25,7 +28,8 @@ describe('sameActivityDescriptionController', () => {
   const mockExemption = {
     id: 'test-exemption-id',
     projectName: 'Test Project Name',
-    multipleSiteDetails: {}
+    multipleSiteDetails: {},
+    siteDetails: [{ activityDescription: 'Test description' }]
   }
 
   beforeEach(() => {
@@ -69,6 +73,59 @@ describe('sameActivityDescriptionController', () => {
             sameActivityDescription: 'yes'
           }
         })
+      )
+    })
+
+    test('should skip page when not first site', () => {
+      const exemptionWithData = {
+        ...mockExemption,
+        multipleSiteDetails: {
+          sameActivityDescription: 'no'
+        }
+      }
+      jest.mocked(getExemptionCache).mockReturnValue(exemptionWithData)
+
+      const mockRequestSecondSite = { ...mockRequest }
+      mockRequestSecondSite.site = {
+        ...mockRequest.site,
+        siteIndex: 1,
+        queryParams: '?site=1'
+      }
+
+      sameActivityDescriptionController.handler(mockRequestSecondSite, mockH)
+
+      expect(mockH.redirect).toHaveBeenCalledWith(
+        '/exemption/site-details-activity-description?site=1'
+      )
+    })
+
+    test('should skip page and automatically update activity dates when not first site', () => {
+      const exemptionWithData = {
+        ...mockExemption,
+        multipleSiteDetails: {
+          sameActivityDescription: 'yes'
+        }
+      }
+      jest.mocked(getExemptionCache).mockReturnValue(exemptionWithData)
+
+      const mockRequestSecondSite = { ...mockRequest }
+      mockRequestSecondSite.site = {
+        ...mockRequest.site,
+        siteIndex: 1,
+        queryParams: '?site=1'
+      }
+
+      sameActivityDescriptionController.handler(mockRequestSecondSite, mockH)
+
+      expect(updateExemptionSiteDetails).toHaveBeenCalledWith(
+        mockRequestSecondSite,
+        1,
+        'activityDescription',
+        'Test description'
+      )
+
+      expect(mockH.redirect).toHaveBeenCalledWith(
+        '/exemption/how-do-you-want-to-enter-the-coordinates?site=1'
       )
     })
   })

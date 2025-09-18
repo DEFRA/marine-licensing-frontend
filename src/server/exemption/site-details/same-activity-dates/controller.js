@@ -1,8 +1,10 @@
 import {
   getExemptionCache,
-  updateExemptionMultipleSiteDetails
+  updateExemptionMultipleSiteDetails,
+  updateExemptionSiteDetails
 } from '~/src/server/common/helpers/session-cache/utils.js'
 import { routes } from '~/src/server/common/constants/routes.js'
+import { setSiteDataPreHandler } from '~/src/server/common/helpers/session-cache/site-utils.js'
 import {
   errorDescriptionByFieldName,
   mapErrorsForDisplay
@@ -59,8 +61,28 @@ const createValidationFailAction = (request, h, err) => {
  * @satisfies {Partial<ServerRoute>}
  */
 export const sameActivityDatesController = {
+  options: {
+    pre: [setSiteDataPreHandler]
+  },
   handler(request, h) {
+    const { siteIndex, queryParams } = request.site
     const exemption = getExemptionCache(request)
+
+    const { multipleSiteDetails } = exemption
+
+    if (siteIndex > 0 && multipleSiteDetails.sameActivityDates === 'yes') {
+      updateExemptionSiteDetails(
+        request,
+        siteIndex,
+        'activityDates',
+        exemption.siteDetails[0].activityDates
+      )
+      return h.redirect(routes.SAME_ACTIVITY_DESCRIPTION + queryParams)
+    }
+
+    if (siteIndex > 0 && multipleSiteDetails.sameActivityDates === 'no') {
+      return h.redirect(routes.SITE_DETAILS_ACTIVITY_DATES + queryParams)
+    }
 
     return h.view(SAME_ACTIVITY_DATES_VIEW_ROUTE, {
       ...sameActivityDatesSettings,
@@ -79,6 +101,7 @@ export const sameActivityDatesController = {
  */
 export const sameActivityDatesSubmitController = {
   options: {
+    pre: [setSiteDataPreHandler],
     validate: {
       payload: joi.object({
         sameActivityDates: joi.string().valid('yes', 'no').required().messages({
@@ -91,7 +114,8 @@ export const sameActivityDatesSubmitController = {
     }
   },
   handler(request, h) {
-    const { payload } = request
+    const { payload, site } = request
+    const { queryParams } = site
 
     updateExemptionMultipleSiteDetails(
       request,
@@ -99,6 +123,6 @@ export const sameActivityDatesSubmitController = {
       payload.sameActivityDates
     )
 
-    return h.redirect(routes.SITE_DETAILS_ACTIVITY_DATES)
+    return h.redirect(routes.SITE_DETAILS_ACTIVITY_DATES + queryParams)
   }
 }

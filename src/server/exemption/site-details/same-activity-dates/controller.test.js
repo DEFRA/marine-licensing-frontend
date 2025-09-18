@@ -5,7 +5,7 @@ import {
   SAME_ACTIVITY_DATES_VIEW_ROUTE
 } from './controller.js'
 import * as cacheUtils from '~/src/server/common/helpers/session-cache/utils.js'
-import { mockExemption } from '~/src/server/test-helpers/mocks.js'
+import { mockExemption, mockSite } from '~/src/server/test-helpers/mocks.js'
 import { routes } from '~/src/server/common/constants/routes.js'
 
 jest.mock('~/src/server/common/helpers/session-cache/utils.js')
@@ -14,6 +14,13 @@ describe('#sameActivityDates', () => {
   /** @type {Server} */
   let server
   let getExemptionCacheSpy
+
+  const sitePreHandlerHook = sameActivityDatesSubmitController.options.pre[0]
+
+  const mockH = {
+    view: jest.fn(),
+    redirect: jest.fn()
+  }
 
   beforeAll(async () => {
     server = await createServer()
@@ -34,7 +41,7 @@ describe('#sameActivityDates', () => {
     test('sameActivityDatesController handler should render with correct context', () => {
       const h = { view: jest.fn() }
 
-      sameActivityDatesController.handler({}, h)
+      sameActivityDatesController.handler({ site: mockSite }, h)
 
       expect(h.view).toHaveBeenCalledWith(SAME_ACTIVITY_DATES_VIEW_ROUTE, {
         pageTitle: 'Are the activity dates the same for every site?',
@@ -55,7 +62,9 @@ describe('#sameActivityDates', () => {
 
       const h = { view: jest.fn() }
 
-      sameActivityDatesController.handler({}, h)
+      const request = { site: mockSite }
+
+      sameActivityDatesController.handler(request, h)
 
       expect(h.view).toHaveBeenCalledWith(SAME_ACTIVITY_DATES_VIEW_ROUTE, {
         pageTitle: 'Are the activity dates the same for every site?',
@@ -64,6 +73,63 @@ describe('#sameActivityDates', () => {
         payload: { sameActivityDates: undefined },
         projectName: 'Test Project'
       })
+    })
+
+    test('should skip page when not first site', () => {
+      const exemptionWithData = {
+        ...mockExemption,
+        multipleSiteDetails: {
+          sameActivityDates: 'no'
+        }
+      }
+
+      getExemptionCacheSpy.mockReturnValueOnce(exemptionWithData)
+
+      const mockRequestSecondSite = {
+        site: {
+          ...mockSite,
+          siteIndex: 1,
+          queryParams: '?site=1'
+        }
+      }
+
+      sameActivityDatesController.handler(mockRequestSecondSite, mockH)
+
+      expect(mockH.redirect).toHaveBeenCalledWith(
+        '/exemption/site-details-activity-dates?site=1'
+      )
+    })
+
+    test('should skip page and automatically update activity dates when not first site', () => {
+      const exemptionWithData = {
+        ...mockExemption,
+        multipleSiteDetails: {
+          sameActivityDates: 'yes'
+        }
+      }
+
+      getExemptionCacheSpy.mockReturnValueOnce(exemptionWithData)
+
+      const mockRequestSecondSite = {
+        site: {
+          ...mockSite,
+          siteIndex: 1,
+          queryParams: '?site=1'
+        }
+      }
+
+      sameActivityDatesController.handler(mockRequestSecondSite, mockH)
+
+      expect(cacheUtils.updateExemptionSiteDetails).toHaveBeenCalledWith(
+        mockRequestSecondSite,
+        1,
+        'activityDates',
+        mockExemption.siteDetails[0].activityDates
+      )
+
+      expect(mockH.redirect).toHaveBeenCalledWith(
+        '/exemption/same-activity-description?site=1'
+      )
     })
   })
 
@@ -191,6 +257,8 @@ describe('#sameActivityDates', () => {
       const mockRequest = {
         payload: { sameActivityDates: 'yes' }
       }
+
+      sitePreHandlerHook.method(mockRequest, h)
 
       await sameActivityDatesSubmitController.handler(mockRequest, h)
 

@@ -1,0 +1,22 @@
+[
+  {
+    "description": "Valid WGS84 centre coordinates - London",
+    "payload": { "latitude": "51.507400", "longitude": "-0.127800" }
+  },
+  {
+    "description": "Valid WGS84 centre coordinates - New York",
+    "payload": { "latitude": "40.712800", "longitude": "-74.006000" }
+  },
+  {
+    "description": "Valid WGS84 centre coordinates - Edinburgh",
+    "payload": { "latitude": "55.953300", "longitude": "-3.188300" }
+  },
+  {
+    "description": "Valid WGS84 centre coordinates - Cardiff",
+    "payload": { "latitude": "51.481600", "longitude": "-3.179100" }
+  },
+  {
+    "description": "Valid WGS84 centre coordinates - Belfast",
+    "payload": { "latitude": "54.597300", "longitude": "-5.930100" }
+  }
+]

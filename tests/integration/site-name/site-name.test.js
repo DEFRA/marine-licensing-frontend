@@ -18,7 +18,7 @@ describe('Site name page', () => {
   const mockExemption = {
     id: 'test-exemption-123',
     projectName: 'Test Project',
-    siteDetails: []
+    siteDetails: [{}]
   }
 
   jest.mocked(getExemptionCache).mockReturnValue(mockExemption)
@@ -196,5 +196,26 @@ describe('Site name page', () => {
 
     const cancelLink = getByRole(document, 'link', { name: 'Cancel' })
     expect(cancelLink).toHaveAttribute('href', '/exemption/task-list')
+  })
+
+  test('should show correct content for multiple site flow', async () => {
+    jest.mocked(getExemptionCache).mockReturnValueOnce({
+      mockExemption,
+      siteDetails: [...mockExemption.siteDetails, {}]
+    })
+
+    const { result, statusCode } = await getServer().inject({
+      method: 'GET',
+      url: '/exemption/site-name?site=2'
+    })
+
+    expect(statusCode).toBe(statusCodes.ok)
+
+    const { document } = new JSDOM(result).window
+
+    expect(getByText(document, 'Site 2')).toBeInTheDocument()
+
+    const backLink = getByRole(document, 'link', { name: 'Back' })
+    expect(backLink).toHaveAttribute('href', '/exemption/review-site-details')
   })
 })

@@ -1,4 +1,7 @@
-import { routes } from '~/src/server/common/constants/routes.js'
+import {
+  redirectPathCacheKey,
+  routes
+} from '~/src/server/common/constants/routes.js'
 import { setUserSession } from './utils.js'
 import { config } from '~/src/config/config.js'
 import { AUTH_STRATEGIES } from '~/src/server/common/constants/auth.js'
@@ -17,7 +20,8 @@ export const signInOidcController = {
       request.logger.info('User has been successfully authenticated')
     }
 
-    const redirect = request.yar.flash('referrer')?.at(0) ?? routes.PROJECT_NAME
+    const redirect =
+      request.yar.flash(redirectPathCacheKey) ?? routes.PROJECT_NAME
 
     return h.redirect(redirect)
   }

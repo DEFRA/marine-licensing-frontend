@@ -1,4 +1,7 @@
-import { routes } from '~/src/server/common/constants/routes.js'
+import {
+  redirectPathCacheKey,
+  routes
+} from '~/src/server/common/constants/routes.js'
 import { setUserSession } from './utils.js'
 import { AUTH_STRATEGIES } from '~/src/server/common/constants/auth.js'
 
@@ -10,10 +13,7 @@ export const signInOidcEntraController = {
   },
   handler: async (request, h) => {
     await setUserSession(request)
-    request.logger.info('User has been successfully authenticated')
-
-    const redirect = request.yar.flash('redirectPath')
-
+    const redirect = request.yar.flash(redirectPathCacheKey)
     return h.redirect(redirect)
   }
 }

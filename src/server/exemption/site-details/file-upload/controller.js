@@ -9,8 +9,7 @@ import {
   errorDescriptionByFieldName,
   mapErrorsForDisplay
 } from '~/src/server/common/helpers/errors.js'
-import { getSiteDetailsBySite } from '~/src/server/common/helpers/session-cache/site-utils.js'
-
+import { getSiteDetailsBySite } from '~/src/server/common/helpers/session-cache/site-details-utils.js'
 export const FILE_UPLOAD_VIEW_ROUTE = 'exemption/site-details/file-upload/index'
 
 const UPLOAD_A_FILE = 'Upload a file'

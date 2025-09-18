@@ -32,7 +32,8 @@ export function extractCoordinatesFromGeoJSON(geoJSON) {
  */
 export const getCoordinateSystem = (request) => {
   const existingCache = getExemptionCache(request)
-  const site = getSiteDetailsBySite(existingCache)
+  const siteIndex = request.site?.siteIndex ?? 0
+  const site = getSiteDetailsBySite(existingCache, siteIndex)
 
   const currentSystem = site.coordinateSystem
 

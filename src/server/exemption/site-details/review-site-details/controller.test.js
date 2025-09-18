@@ -259,6 +259,7 @@ describe('#reviewSiteDetails', () => {
   }
 
   const createMockRequest = () => ({
+    payload: {},
     logger: {
       info: jest.fn(),
       error: jest.fn(),
@@ -373,6 +374,7 @@ describe('#reviewSiteDetails', () => {
 
         expect(h.view).toHaveBeenCalledWith(REVIEW_SITE_DETAILS_VIEW_ROUTE, {
           heading: 'Review site details',
+          isMultiSiteJourney: false,
           pageTitle: 'Review site details',
           backLink: routes.TASK_LIST,
           projectName: undefined,
@@ -432,6 +434,7 @@ describe('#reviewSiteDetails', () => {
           FILE_UPLOAD_REVIEW_VIEW_ROUTE,
           expect.objectContaining({
             heading: 'Review site details',
+            isMultiSiteJourney: false,
             pageTitle: 'Review site details',
             backLink: routes.FILE_UPLOAD,
             projectName: 'Test Project',
@@ -464,6 +467,7 @@ describe('#reviewSiteDetails', () => {
           FILE_UPLOAD_REVIEW_VIEW_ROUTE,
           expect.objectContaining({
             heading: 'Review site details',
+            isMultiSiteJourney: false,
             pageTitle: 'Review site details',
             backLink: routes.FILE_UPLOAD,
             projectName: 'Test Project',
@@ -490,6 +494,7 @@ describe('#reviewSiteDetails', () => {
 
         expect(h.view).toHaveBeenCalledWith(REVIEW_SITE_DETAILS_VIEW_ROUTE, {
           heading: 'Review site details',
+          isMultiSiteJourney: false,
           pageTitle: 'Review site details',
           backLink: routes.TASK_LIST,
           projectName: 'Test Project',
@@ -522,6 +527,7 @@ describe('#reviewSiteDetails', () => {
 
         expect(h.view).toHaveBeenCalledWith(REVIEW_SITE_DETAILS_VIEW_ROUTE, {
           heading: 'Review site details',
+          isMultiSiteJourney: false,
           pageTitle: 'Review site details',
           backLink: routes.TASK_LIST,
           projectName: 'Test Project',
@@ -623,6 +629,7 @@ describe('#reviewSiteDetails', () => {
 
           expect(h.view).toHaveBeenCalledWith(REVIEW_SITE_DETAILS_VIEW_ROUTE, {
             heading: 'Review site details',
+            isMultiSiteJourney: false,
             pageTitle: 'Review site details',
             backLink: routes.ENTER_MULTIPLE_COORDINATES,
             projectName: 'Test Project',
@@ -672,6 +679,7 @@ describe('#reviewSiteDetails', () => {
 
           expect(h.view).toHaveBeenCalledWith(REVIEW_SITE_DETAILS_VIEW_ROUTE, {
             heading: 'Review site details',
+            isMultiSiteJourney: false,
             pageTitle: 'Review site details',
             backLink: routes.ENTER_MULTIPLE_COORDINATES,
             projectName: 'Test Project',
@@ -732,6 +740,7 @@ describe('#reviewSiteDetails', () => {
 
           expect(h.view).toHaveBeenCalledWith(REVIEW_SITE_DETAILS_VIEW_ROUTE, {
             heading: 'Review site details',
+            isMultiSiteJourney: false,
             pageTitle: 'Review site details',
             backLink: routes.ENTER_MULTIPLE_COORDINATES,
             projectName: 'Test Project',
@@ -784,6 +793,7 @@ describe('#reviewSiteDetails', () => {
 
           expect(h.view).toHaveBeenCalledWith(REVIEW_SITE_DETAILS_VIEW_ROUTE, {
             heading: 'Review site details',
+            isMultiSiteJourney: false,
             pageTitle: 'Review site details',
             backLink: routes.ENTER_MULTIPLE_COORDINATES,
             projectName: 'Test Project',
@@ -1163,6 +1173,30 @@ describe('#reviewSiteDetails', () => {
         const { document } = new JSDOM(result).window
 
         expect(document.querySelector('h1').textContent.trim()).toBe('400')
+      })
+
+      test('should add another site correctly', async () => {
+        const { headers, statusCode } = await server.inject({
+          method: 'POST',
+          url: routes.REVIEW_SITE_DETAILS,
+          payload: { add: true }
+        })
+
+        expect(cacheUtils.setExemptionCache).toHaveBeenCalledWith(
+          expect.any(Object),
+          {
+            ...mockExemption,
+            siteDetails: [
+              ...mockExemption.siteDetails,
+              {
+                coordinatesType: 'coordinates'
+              }
+            ]
+          }
+        )
+
+        expect(statusCode).toBe(statusCodes.redirect)
+        expect(headers.location).toBe(`${routes.SITE_NAME}?site=3`)
       })
 
       describe('Polygon Coordinate Submission', () => {

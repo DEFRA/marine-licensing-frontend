@@ -1,5 +1,5 @@
 import { JSDOM } from 'jsdom'
-import { within } from '@testing-library/dom'
+import { getByText, within } from '@testing-library/dom'
 import { COORDINATE_SYSTEMS } from '~/src/server/common/constants/exemptions.js'
 import { routes } from '~/src/server/common/constants/routes.js'
 import { statusCodes } from '~/src/server/common/constants/status-codes.js'
@@ -54,6 +54,10 @@ describe('Review Site Details - Polygon Coordinates Integration Tests', () => {
       validateSiteDetailsCard(document, expectedPageContent)
       validatePolygonCoordinates(document, expectedPageContent)
       validateNavigationElements(document)
+
+      if (exemption.multipleSiteDetails?.multipleSitesEnabled) {
+        validateMultipleSites(document, expectedPageContent)
+      }
     }
   )
 
@@ -176,6 +180,37 @@ describe('Review Site Details - Polygon Coordinates Integration Tests', () => {
 
     const caption = document.querySelector('.govuk-caption-l')
     expect(caption.textContent.trim()).toBe(expected.projectName)
+
+    const backLink = document.querySelector('.govuk-back-link')
+    expect(backLink.textContent.trim()).toBe('Back')
+    expect(backLink.getAttribute('href')).toBe(
+      routes.ENTER_MULTIPLE_COORDINATES
+    )
+  }
+
+  const validateMultipleSites = (document, expected) => {
+    const heading = document.querySelector('h1')
+    expect(heading.textContent.trim()).toBe('Review site details')
+
+    const caption = document.querySelector('.govuk-caption-l')
+    expect(caption.textContent.trim()).toBe(expected.projectName)
+
+    expect(
+      within(document).getByRole('button', {
+        name: 'Save and add another site'
+      })
+    ).toHaveAttribute('type', 'submit')
+
+    expect(
+      getByText(
+        document,
+        `You can select 'Save and continue' if you're finished or you want to save your progress and return later.`
+      )
+    ).toBeInTheDocument()
+
+    expect(
+      within(document).getByRole('button', { name: 'Save and continue' })
+    ).toHaveAttribute('type', 'submit')
 
     const backLink = document.querySelector('.govuk-back-link')
     expect(backLink.textContent.trim()).toBe('Back')

@@ -58,7 +58,7 @@ describe('#getSiteNumber', () => {
     }
 
     const mockRequest = {
-      params: { siteIndex: '2' }
+      query: { site: '2' }
     }
 
     expect(getSiteNumber(mockExemption, mockRequest)).toBe(2)
@@ -72,7 +72,7 @@ describe('#getSiteNumber', () => {
     }
 
     const mockRequest = {
-      params: { siteIndex: '5' }
+      query: { site: '5' }
     }
 
     expect(getSiteNumber(mockExemption, mockRequest)).toBe(1)
@@ -86,7 +86,7 @@ describe('#getSiteNumber', () => {
     }
 
     const mockRequest = {
-      params: { siteIndex: 'invalid' }
+      query: { site: 'invalid' }
     }
 
     expect(getSiteNumber(mockExemption, mockRequest)).toBe(1)

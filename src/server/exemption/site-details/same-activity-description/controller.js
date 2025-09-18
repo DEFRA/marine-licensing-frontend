@@ -1,8 +1,10 @@
 import {
   getExemptionCache,
-  updateExemptionMultipleSiteDetails
+  updateExemptionMultipleSiteDetails,
+  updateExemptionSiteDetails
 } from '~/src/server/common/helpers/session-cache/utils.js'
 import { routes } from '~/src/server/common/constants/routes.js'
+import { setSiteDataPreHandler } from '~/src/server/common/helpers/session-cache/site-utils.js'
 import {
   errorDescriptionByFieldName,
   mapErrorsForDisplay
@@ -60,8 +62,31 @@ const createValidationFailAction = (request, h, err) => {
  * @satisfies {Partial<ServerRoute>}
  */
 export const sameActivityDescriptionController = {
+  options: {
+    pre: [setSiteDataPreHandler]
+  },
   handler(request, h) {
+    const { siteIndex, queryParams } = request.site
     const exemption = getExemptionCache(request)
+
+    const { multipleSiteDetails } = exemption
+
+    if (
+      siteIndex > 0 &&
+      multipleSiteDetails.sameActivityDescription === 'yes'
+    ) {
+      updateExemptionSiteDetails(
+        request,
+        siteIndex,
+        'activityDescription',
+        exemption.siteDetails[0].activityDescription
+      )
+      return h.redirect(routes.COORDINATES_ENTRY_CHOICE + queryParams)
+    }
+
+    if (siteIndex > 0 && multipleSiteDetails.sameActivityDescription === 'no') {
+      return h.redirect(routes.SITE_DETAILS_ACTIVITY_DESCRIPTION + queryParams)
+    }
 
     return h.view(SAME_ACTIVITY_DESCRIPTION_VIEW_ROUTE, {
       ...sameActivityDescriptionSettings,
@@ -81,6 +106,7 @@ export const sameActivityDescriptionController = {
  */
 export const sameActivityDescriptionSubmitController = {
   options: {
+    pre: [setSiteDataPreHandler],
     validate: {
       payload: joi.object({
         sameActivityDescription: joi
@@ -97,7 +123,8 @@ export const sameActivityDescriptionSubmitController = {
     }
   },
   handler(request, h) {
-    const { payload } = request
+    const { payload, site } = request
+    const { queryParams } = site
 
     updateExemptionMultipleSiteDetails(
       request,
@@ -105,6 +132,6 @@ export const sameActivityDescriptionSubmitController = {
       payload.sameActivityDescription
     )
 
-    return h.redirect(routes.SITE_DETAILS_ACTIVITY_DESCRIPTION)
+    return h.redirect(routes.SITE_DETAILS_ACTIVITY_DESCRIPTION + queryParams)
   }
 }

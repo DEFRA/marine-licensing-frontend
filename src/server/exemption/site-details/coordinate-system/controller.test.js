@@ -5,7 +5,7 @@ import {
   COORDINATE_SYSTEM_VIEW_ROUTE
 } from '~/src/server/exemption/site-details/coordinate-system/controller.js'
 import * as cacheUtils from '~/src/server/common/helpers/session-cache/utils.js'
-import { mockExemption } from '~/src/server/test-helpers/mocks.js'
+import { mockExemption, mockSite } from '~/src/server/test-helpers/mocks.js'
 import { statusCodes } from '~/src/server/common/constants/status-codes.js'
 import { config } from '~/src/config/config.js'
 import { JSDOM } from 'jsdom'
@@ -38,7 +38,7 @@ describe('#coordinateSystem', () => {
       getExemptionCacheSpy.mockReturnValueOnce({})
       const h = { view: jest.fn() }
 
-      coordinateSystemController.handler({}, h)
+      coordinateSystemController.handler({ site: mockSite }, h)
 
       expect(h.view).toHaveBeenCalledWith(COORDINATE_SYSTEM_VIEW_ROUTE, {
         pageTitle: 'Which coordinate system do you want to use?',
@@ -52,7 +52,7 @@ describe('#coordinateSystem', () => {
     test('coordinateSystemController handler should render with correct context', () => {
       const h = { view: jest.fn() }
 
-      coordinateSystemController.handler({}, h)
+      coordinateSystemController.handler({ site: mockSite }, h)
 
       expect(h.view).toHaveBeenCalledWith(COORDINATE_SYSTEM_VIEW_ROUTE, {
         pageTitle: 'Which coordinate system do you want to use?',
@@ -75,7 +75,7 @@ describe('#coordinateSystem', () => {
 
       const h = { view: jest.fn() }
 
-      coordinateSystemController.handler({}, h)
+      coordinateSystemController.handler({ site: mockSite }, h)
 
       expect(h.view).toHaveBeenCalledWith(COORDINATE_SYSTEM_VIEW_ROUTE, {
         pageTitle: 'Which coordinate system do you want to use?',
@@ -152,7 +152,8 @@ describe('#coordinateSystem', () => {
   describe('#coordinateSystemSubmitController', () => {
     test('Should redirect to multiple coordinates page when coordinatesEntry is multiple', async () => {
       const request = {
-        payload: { coordinateSystem: 'wgs84' }
+        payload: { coordinateSystem: 'wgs84' },
+        site: mockSite
       }
 
       getExemptionCacheSpy.mockReturnValueOnce({
@@ -174,7 +175,8 @@ describe('#coordinateSystem', () => {
 
     test('Should stay on the page when coordinatesEntry is neither single nor multiple', async () => {
       const request = {
-        payload: { coordinateSystem: 'wgs84' }
+        payload: { coordinateSystem: 'wgs84' },
+        site: mockSite
       }
 
       getExemptionCacheSpy.mockReturnValueOnce({
@@ -200,7 +202,8 @@ describe('#coordinateSystem', () => {
 
     test('Should redirect to centre coordinates page when coordinatesEntry is single', async () => {
       const request = {
-        payload: { coordinateSystem: 'wgs84' }
+        payload: { coordinateSystem: 'wgs84' },
+        site: mockSite
       }
 
       getExemptionCacheSpy.mockReturnValueOnce({
@@ -342,7 +345,10 @@ describe('#coordinateSystem', () => {
         redirect: jest.fn()
       }
 
-      const mockRequest = { payload: { coordinateSystem: 'wgs84' } }
+      const mockRequest = {
+        payload: { coordinateSystem: 'wgs84' },
+        site: mockSite
+      }
 
       await coordinateSystemSubmitController.handler(mockRequest, h)
 

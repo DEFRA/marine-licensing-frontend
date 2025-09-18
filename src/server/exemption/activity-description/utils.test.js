@@ -15,30 +15,72 @@ describe('#getBackLink', () => {
   })
 
   describe('when in site details flow', () => {
-    test('should return correct route when multipleSitesEnabled is true', () => {
-      const exemption = {
-        multipleSiteDetails: { multipleSitesEnabled: true }
-      }
+    describe('single site journey', () => {
+      test('should return correct route when multipleSitesEnabled is true', () => {
+        const exemption = {
+          multipleSiteDetails: { multipleSitesEnabled: true }
+        }
 
-      const result = getBackLink(exemption, true)
+        const result = getBackLink(exemption, true)
 
-      expect(result).toBe(routes.SAME_ACTIVITY_DESCRIPTION)
+        expect(result).toBe(routes.SAME_ACTIVITY_DESCRIPTION)
+      })
     })
 
-    test('should return correct route when multipleSitesEnabled is false', () => {
-      const exemption = {
-        multipleSiteDetails: { multipleSitesEnabled: false }
-      }
+    describe('multi site journey', () => {
+      test('should return correct route on a second site with the same activity description', () => {
+        const exemption = {
+          multipleSiteDetails: {
+            multipleSitesEnabled: true,
+            sameActivityDescription: 'yes'
+          }
+        }
 
-      const result = getBackLink(exemption, true)
+        const result = getBackLink(exemption, true, 1, '?site=1')
 
-      expect(result).toBe(routes.SITE_DETAILS_ACTIVITY_DATES)
-    })
+        expect(result).toBe(`${routes.SAME_ACTIVITY_DATES}?site=1`)
+      })
 
-    test('should return correct route when exemption is null', () => {
-      const result = getBackLink(null, true)
+      test('should return correct route on a second site with variable activity description', () => {
+        const exemption = {
+          multipleSiteDetails: {
+            multipleSitesEnabled: true,
+            sameActivityDescription: 'no'
+          }
+        }
 
-      expect(result).toBe(routes.SITE_DETAILS_ACTIVITY_DATES)
+        const result = getBackLink(exemption, true, 1)
+
+        expect(result).toBe(routes.SAME_ACTIVITY_DESCRIPTION)
+      })
+
+      test('should return correct route on a first site', () => {
+        const exemption = {
+          multipleSiteDetails: {
+            multipleSitesEnabled: true
+          }
+        }
+
+        const result = getBackLink(exemption, true, 0)
+
+        expect(result).toBe(routes.SAME_ACTIVITY_DESCRIPTION)
+      })
+
+      test('should return correct route when multipleSitesEnabled is false', () => {
+        const exemption = {
+          multipleSiteDetails: { multipleSitesEnabled: false }
+        }
+
+        const result = getBackLink(exemption, true)
+
+        expect(result).toBe(routes.SITE_DETAILS_ACTIVITY_DATES)
+      })
+
+      test('should return correct route when exemption is null', () => {
+        const result = getBackLink(null, true)
+
+        expect(result).toBe(routes.SITE_DETAILS_ACTIVITY_DATES)
+      })
     })
   })
 })

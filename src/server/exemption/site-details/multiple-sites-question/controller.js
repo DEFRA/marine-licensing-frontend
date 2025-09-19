@@ -2,7 +2,7 @@ import {
   getExemptionCache,
   setExemptionCache
 } from '~/src/server/common/helpers/session-cache/utils.js'
-import { getSiteDetailsBySite } from '~/src/server/common/helpers/session-cache/site-utils.js'
+import { getSiteDetailsBySite } from '~/src/server/common/helpers/session-cache/site-details-utils.js'
 import { routes } from '~/src/server/common/constants/routes.js'
 import {
   errorDescriptionByFieldName,

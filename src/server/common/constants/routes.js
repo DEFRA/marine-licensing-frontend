@@ -48,3 +48,5 @@ export const isEntraIdRoute = (route) => {
   }
   return entraIdRoutes.some((r) => r === route || route?.startsWith(r))
 }
+
+export const redirectPathCacheKey = 'redirectPath'

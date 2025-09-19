@@ -44,12 +44,14 @@
       isReadOnly: isReadOnly
     }) }}
       {% endif %}
+    {% if mcmsContext %}
     {{ appProjectDetailsCard({
       projectName: projectName,
       mcmsContext: mcmsContext,
       isReadOnly: isReadOnly,
       isInternalUser: isInternalUser
     }) }}
+    {% endif %}
     {{ appActivityDatesCard({
       activityDates: activityDates,
       isReadOnly: isReadOnly

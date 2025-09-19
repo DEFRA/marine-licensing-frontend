@@ -231,6 +231,22 @@ export const buildManualCoordinateSummaryData = (
 }
 
 /**
+ * Builds summary data for displayign multiple site information
+ * @param {object} multipleSiteDetails - Multiple site details from exemption
+ * @returns {object} Summary data for template
+ */
+export const buildManualCoordinateMultipleSitesSummaryData = (
+  multipleSiteDetails = {}
+) => {
+  const { multipleSitesEnabled } = multipleSiteDetails
+
+  return {
+    method: 'Enter the coordinates of the site manually',
+    multipleSiteDetails: multipleSitesEnabled ? 'Yes' : 'No'
+  }
+}
+
+/**
  * Loads site details from DB when session data is incomplete
  * @param {object} request - Hapi request object
  * @param {object} exemption - Current exemption from session
@@ -403,6 +419,9 @@ export const renderManualCoordinateReview = (h, request, options) => {
     coordinateSystem
   )
 
+  const multipleSiteDetailsData =
+    buildManualCoordinateMultipleSitesSummaryData(multipleSiteDetails)
+
   // Prepare site details data for map if needed
   const siteDetailsData = createSiteDetailsDataJson(
     siteDetails,
@@ -418,6 +437,7 @@ export const renderManualCoordinateReview = (h, request, options) => {
     projectName: exemption.projectName,
     summaryData,
     siteDetailsData,
+    multipleSiteDetailsData,
     isMultiSiteJourney: !!multipleSiteDetails?.multipleSitesEnabled
   })
 }

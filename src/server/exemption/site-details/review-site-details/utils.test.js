@@ -2,6 +2,7 @@ import Boom from '@hapi/boom'
 import { COORDINATE_SYSTEMS } from '~/src/server/common/constants/exemptions.js'
 import { routes } from '~/src/server/common/constants/routes.js'
 import {
+  buildManualCoordinateMultipleSitesSummaryData,
   buildManualCoordinateSummaryData,
   getCoordinateDisplayText,
   getCoordinateSystemText,
@@ -511,6 +512,39 @@ describe('siteDetails utils', () => {
     })
   })
 
+  describe('buildManualCoordinateMultipleSitesSummaryData util', () => {
+    test('buildManualCoordinateSummaryData correctly handles multiple sites', () => {
+      const result = buildManualCoordinateMultipleSitesSummaryData({
+        multipleSitesEnabled: true
+      })
+
+      expect(result).toEqual({
+        method: 'Enter the coordinates of the site manually',
+        multipleSiteDetails: 'Yes'
+      })
+    })
+
+    test('buildManualCoordinateSummaryData correctly handles single site', () => {
+      const result = buildManualCoordinateMultipleSitesSummaryData({
+        multipleSitesEnabled: false
+      })
+
+      expect(result).toEqual({
+        method: 'Enter the coordinates of the site manually',
+        multipleSiteDetails: 'No'
+      })
+    })
+
+    test('buildManualCoordinateSummaryData correctly handles empty object', () => {
+      const result = buildManualCoordinateMultipleSitesSummaryData({})
+
+      expect(result).toEqual({
+        method: 'Enter the coordinates of the site manually',
+        multipleSiteDetails: 'No'
+      })
+    })
+  })
+
   describe('getSiteDetails util', () => {
     const mockRequest = {
       logger: {
@@ -915,6 +949,10 @@ describe('siteDetails utils', () => {
               'WGS84 (World Geodetic System 1984)\nLatitude and longitude',
             coordinates: '51.5074, -0.1278',
             width: '100 metres'
+          },
+          multipleSiteDetailsData: {
+            method: 'Enter the coordinates of the site manually',
+            multipleSiteDetails: 'No'
           },
           siteDetailsData: JSON.stringify({
             coordinatesType: 'coordinates',

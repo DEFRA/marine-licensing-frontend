@@ -51,6 +51,7 @@ describe('Review Site Details - Polygon Coordinates Integration Tests', () => {
       const document = await getPageDocument(exemption)
 
       validatePageStructure(document, expectedPageContent)
+      validateMultipleSiteDetailsCard(document, expectedPageContent)
       validateSiteDetailsCard(document, expectedPageContent)
       validatePolygonCoordinates(document, expectedPageContent)
       validateNavigationElements(document)
@@ -77,7 +78,7 @@ describe('Review Site Details - Polygon Coordinates Integration Tests', () => {
       }
 
       const document = await getPageDocument(emptyPolygonExemption)
-      const summaryCard = document.querySelector('.govuk-summary-card')
+      const summaryCard = document.querySelectorAll('.govuk-summary-card')[1]
       expect(summaryCard).toBeTruthy()
 
       const methodRow = getRowByKey(
@@ -110,7 +111,7 @@ describe('Review Site Details - Polygon Coordinates Integration Tests', () => {
       }
 
       const document = await getPageDocument(incompleteCoordinatesExemption)
-      const summaryCard = document.querySelector('.govuk-summary-card')
+      const summaryCard = document.querySelectorAll('.govuk-summary-card')[1]
 
       const startEndRow = getRowByKey(summaryCard, 'Start and end points')
       const point2Row = getRowByKey(summaryCard, 'Point 2')
@@ -219,8 +220,24 @@ describe('Review Site Details - Polygon Coordinates Integration Tests', () => {
     )
   }
 
+  const validateMultipleSiteDetailsCard = (document, expected) => {
+    const siteCard = document.querySelectorAll('.govuk-summary-card')[0]
+    expect(siteCard).toBeTruthy()
+
+    const cardTitle = siteCard.querySelector('.govuk-summary-card__title')
+    expect(cardTitle.textContent.trim()).toBe('Providing the site location')
+
+    const methodRow = getRowByKey(siteCard, 'Method of providing site location')
+    expect(methodRow.textContent).toContain(expected.multipleSiteDetails.method)
+
+    const multiSiteRow = getRowByKey(siteCard, 'More than one site')
+    expect(multiSiteRow.textContent).toContain(
+      expected.multipleSiteDetails.multipleSiteDetails
+    )
+  }
+
   const validateSiteDetailsCard = (document, expected) => {
-    const siteCard = document.querySelector('.govuk-summary-card')
+    const siteCard = document.querySelectorAll('.govuk-summary-card')[1]
     expect(siteCard).toBeTruthy()
 
     const cardTitle = siteCard.querySelector('.govuk-summary-card__title')
@@ -236,7 +253,7 @@ describe('Review Site Details - Polygon Coordinates Integration Tests', () => {
   }
 
   const validatePolygonCoordinates = (document, expected) => {
-    const siteCard = document.querySelector('.govuk-summary-card')
+    const siteCard = document.querySelectorAll('.govuk-summary-card')[1]
 
     expected.siteDetails.polygonCoordinates.forEach((expectedCoordinate) => {
       const coordinateRow = getRowByKey(siteCard, expectedCoordinate.label)

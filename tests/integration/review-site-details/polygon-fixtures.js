@@ -1,6 +1,7 @@
 import { COORDINATE_SYSTEMS } from '~/src/server/common/constants/exemptions.js'
 
 const basePolygonExemption = {
+  multipleSiteDetails: {},
   id: 'test-polygon-exemption-123',
   projectName: 'Hammersmith pontoon construction',
   activityDates: {
@@ -16,6 +17,10 @@ const basePolygonExemption = {
     projectName: { status: 'completed' },
     activityDates: { status: 'completed' },
     activityDescription: { status: 'completed' },
+    multipleSiteDetails: {
+      method: 'Enter the coordinates of the site manually',
+      multipleSiteDetails: 'No'
+    },
     siteDetails: { status: 'completed' },
     publicRegister: { status: 'completed' }
   }
@@ -42,6 +47,10 @@ export const testScenarios = [
     },
     expectedPageContent: {
       projectName: 'Hammersmith pontoon construction',
+      multipleSiteDetails: {
+        method: 'Enter the coordinates of the site manually',
+        multipleSiteDetails: 'No'
+      },
       siteDetails: {
         method:
           'Manually enter multiple sets of coordinates to mark the boundary of the site',
@@ -84,6 +93,10 @@ export const testScenarios = [
     },
     expectedPageContent: {
       projectName: 'Hammersmith pontoon construction',
+      multipleSiteDetails: {
+        method: 'Enter the coordinates of the site manually',
+        multipleSiteDetails: 'No'
+      },
       siteDetails: {
         method:
           'Manually enter multiple sets of coordinates to mark the boundary of the site',
@@ -127,6 +140,10 @@ export const testScenarios = [
     },
     expectedPageContent: {
       projectName: 'Hammersmith pontoon construction',
+      multipleSiteDetails: {
+        method: 'Enter the coordinates of the site manually',
+        multipleSiteDetails: 'No'
+      },
       siteDetails: {
         method:
           'Manually enter multiple sets of coordinates to mark the boundary of the site',
@@ -180,6 +197,10 @@ export const testScenarios = [
     },
     expectedPageContent: {
       projectName: 'Hammersmith pontoon construction',
+      multipleSiteDetails: {
+        method: 'Enter the coordinates of the site manually',
+        multipleSiteDetails: 'No'
+      },
       siteDetails: {
         method:
           'Manually enter multiple sets of coordinates to mark the boundary of the site',
@@ -244,6 +265,10 @@ export const testScenarios = [
     },
     expectedPageContent: {
       projectName: 'Hammersmith pontoon construction',
+      multipleSiteDetails: {
+        method: 'Enter the coordinates of the site manually',
+        multipleSiteDetails: 'Yes'
+      },
       siteDetails: {
         method:
           'Manually enter multiple sets of coordinates to mark the boundary of the site',

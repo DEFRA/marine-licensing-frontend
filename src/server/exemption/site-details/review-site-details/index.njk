@@ -24,6 +24,36 @@
         <div class="govuk-grid-column-full">
             <span class="govuk-caption-l">{{ projectName }}</span>
             <h1 class="govuk-heading-l">{{ heading }}</h1>
+
+            {% set multipleSiteRows = [
+                {
+                    key: {
+                        text: "Method of providing site location"
+                    },
+                    value: {
+                        text: multipleSiteDetailsData.method
+                    }
+                },
+                {
+                    key: {
+                        text: "More than one site"
+                    },
+                    value: {
+                        html: multipleSiteDetailsData.multipleSiteDetails
+                    }
+                }
+            ] %}
+
+            {{ govukSummaryList({
+                card: {
+                    title: {
+                        text: "Providing the site location"
+                    }
+                },
+                rows: multipleSiteRows,
+                classes: "govuk-summary-list--full-width"
+            }) }}
+
             {% set summaryRows = [
                 {
                     key: {

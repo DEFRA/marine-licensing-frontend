@@ -174,8 +174,11 @@ function assertProjectNameCaption(document, expectedProjectName) {
  * @param {Array} expectedData - Array of {key, value} objects
  */
 function assertSummaryListData(document, expectedData) {
-  const summaryKeys = document.querySelectorAll('.govuk-summary-list__key')
-  const summaryValues = document.querySelectorAll('.govuk-summary-list__value')
+  const summaryCard = document.querySelectorAll('.govuk-summary-card')[1]
+  const summaryKeys = summaryCard.querySelectorAll('.govuk-summary-list__key')
+  const summaryValues = summaryCard.querySelectorAll(
+    '.govuk-summary-list__value'
+  )
 
   expectedData.forEach((item, index) => {
     expect(summaryKeys[index]?.textContent.trim()).toBe(item.key)
@@ -384,6 +387,10 @@ describe('#reviewSiteDetails', () => {
             coordinates: '',
             width: ''
           },
+          multipleSiteDetailsData: {
+            method: 'Enter the coordinates of the site manually',
+            multipleSiteDetails: 'No'
+          },
           siteDetailsData: '{"coordinatesType":"coordinates"}'
         })
       })
@@ -506,6 +513,10 @@ describe('#reviewSiteDetails', () => {
             coordinates: `${mockCoordinates[COORDINATE_SYSTEMS.WGS84].latitude}, ${mockCoordinates[COORDINATE_SYSTEMS.WGS84].longitude}`,
             width: '100 metres'
           },
+          multipleSiteDetailsData: {
+            method: 'Enter the coordinates of the site manually',
+            multipleSiteDetails: 'No'
+          },
           siteDetailsData:
             '{"coordinatesType":"coordinates","coordinateSystem":"wgs84","coordinatesEntry":"single","coordinates":{"latitude":"51.489676","longitude":"-0.231530"},"circleWidth":"100"}'
         })
@@ -538,6 +549,10 @@ describe('#reviewSiteDetails', () => {
             coordinates: `${mockCoordinates[COORDINATE_SYSTEMS.OSGB36].eastings}, ${mockCoordinates[COORDINATE_SYSTEMS.OSGB36].northings}`,
             width: '100 metres'
           },
+          multipleSiteDetailsData: {
+            method: 'Enter the coordinates of the site manually',
+            multipleSiteDetails: 'No'
+          },
           siteDetailsData:
             '{"coordinatesType":"coordinates","coordinateSystem":"osgb36","coordinatesEntry":"single","coordinates":{"eastings":"425053","northings":"564180"},"circleWidth":"100"}'
         })
@@ -569,9 +584,9 @@ describe('#reviewSiteDetails', () => {
         assertProjectNameCaption(document, mockExemption.projectName)
 
         // Summary card title
-        const summaryCardTitle = document.querySelector(
+        const summaryCardTitle = document.querySelectorAll(
           '.govuk-summary-card__title'
-        )
+        )[1]
         expect(summaryCardTitle.textContent.trim()).toBe('Site details')
 
         // Summary list data
@@ -653,6 +668,10 @@ describe('#reviewSiteDetails', () => {
                 }
               ]
             },
+            multipleSiteDetailsData: {
+              method: 'Enter the coordinates of the site manually',
+              multipleSiteDetails: 'No'
+            },
             siteDetailsData:
               '{"coordinatesType":"coordinates","coordinateSystem":"wgs84","coordinatesEntry":"multiple","coordinates":[{"latitude":"55.123456","longitude":"55.123456"},{"latitude":"33.987654","longitude":"33.987654"},{"latitude":"78.123456","longitude":"78.123456"}]}'
           })
@@ -703,6 +722,10 @@ describe('#reviewSiteDetails', () => {
                 }
               ]
             },
+            multipleSiteDetailsData: {
+              method: 'Enter the coordinates of the site manually',
+              multipleSiteDetails: 'No'
+            },
             siteDetailsData:
               '{"coordinatesType":"coordinates","coordinateSystem":"osgb36","coordinatesEntry":"multiple","coordinates":[{"eastings":"425053","northings":"564180"},{"eastings":"426000","northings":"565000"},{"eastings":"427000","northings":"566000"}]}'
           })
@@ -750,6 +773,10 @@ describe('#reviewSiteDetails', () => {
               coordinateSystem:
                 'WGS84 (World Geodetic System 1984)\nLatitude and longitude',
               polygonCoordinates: []
+            },
+            multipleSiteDetailsData: {
+              method: 'Enter the coordinates of the site manually',
+              multipleSiteDetails: 'No'
             },
             siteDetailsData:
               '{"coordinatesType":"coordinates","coordinateSystem":"wgs84","coordinatesEntry":"multiple","coordinates":[]}'
@@ -812,6 +839,10 @@ describe('#reviewSiteDetails', () => {
                   value: '78.123456, 78.123456'
                 }
               ]
+            },
+            multipleSiteDetailsData: {
+              method: 'Enter the coordinates of the site manually',
+              multipleSiteDetails: 'No'
             },
             siteDetailsData:
               '{"coordinatesType":"coordinates","coordinateSystem":"wgs84","coordinatesEntry":"multiple","coordinates":[{"latitude":"55.123456","longitude":"55.123456"},{"latitude":"","longitude":"33.987654"},{"latitude":"78.123456","longitude":"78.123456"},{"latitude":null,"longitude":null}]}'
@@ -889,94 +920,6 @@ describe('#reviewSiteDetails', () => {
             { label: 'Point 4', value: '53.123456, 53.123456' },
             { label: 'Point 5', value: '54.123456, 54.123456' }
           ])
-        })
-
-        test('should display polygon summary data in DOM', async () => {
-          getExemptionCacheSpy.mockReturnValueOnce(mockPolygonExemptionWGS84)
-
-          const { result, statusCode } = await server.inject({
-            method: 'GET',
-            url: routes.REVIEW_SITE_DETAILS,
-            headers: {
-              referer: `http://localhost${routes.ENTER_MULTIPLE_COORDINATES}`
-            }
-          })
-
-          expect(result).toEqual(
-            expect.stringContaining(
-              `Review site details | ${config.get('serviceName')}`
-            )
-          )
-
-          const { document } = new JSDOM(result).window
-
-          expect(document.querySelector('h1').textContent.trim()).toContain(
-            'Review site details'
-          )
-
-          expect(
-            document.querySelector('.govuk-caption-l').textContent.trim()
-          ).toBe(mockPolygonExemptionWGS84.projectName)
-
-          const summaryCardTitle = document.querySelector(
-            '.govuk-summary-card__title'
-          )
-          expect(summaryCardTitle.textContent.trim()).toBe('Site details')
-
-          const summaryKeys = document.querySelectorAll(
-            '.govuk-summary-list__key'
-          )
-          const summaryValues = document.querySelectorAll(
-            '.govuk-summary-list__value'
-          )
-
-          expect(summaryKeys[0].textContent.trim()).toBe(
-            'Method of providing site location'
-          )
-          expect(summaryValues[0].textContent.trim()).toBe(
-            'Manually enter multiple sets of coordinates to mark the boundary of the site'
-          )
-
-          expect(summaryKeys[1].textContent.trim()).toBe('Coordinate system')
-          expect(summaryValues[1].innerHTML.trim()).toContain(
-            'WGS84 (World Geodetic System 1984)'
-          )
-          expect(summaryValues[1].innerHTML.trim()).toContain(
-            'Latitude and longitude'
-          )
-
-          expect(summaryKeys[2].textContent.trim()).toBe('Start and end points')
-          expect(summaryValues[2].textContent.trim()).toBe(
-            '55.123456, 55.123456'
-          )
-
-          expect(summaryKeys[3].textContent.trim()).toBe('Point 2')
-          expect(summaryValues[3].textContent.trim()).toBe(
-            '33.987654, 33.987654'
-          )
-
-          expect(summaryKeys[4].textContent.trim()).toBe('Point 3')
-          expect(summaryValues[4].textContent.trim()).toBe(
-            '78.123456, 78.123456'
-          )
-
-          expect(
-            document
-              .querySelector(
-                `.govuk-back-link[href="${routes.ENTER_MULTIPLE_COORDINATES}"]`
-              )
-              .textContent.trim()
-          ).toBe('Back')
-
-          expect(
-            document
-              .querySelector(
-                '.govuk-link[href="/exemption/task-list?cancel=site-details"]'
-              )
-              .textContent.trim()
-          ).toBe('Cancel')
-
-          expect(statusCode).toBe(statusCodes.ok)
         })
       })
     })

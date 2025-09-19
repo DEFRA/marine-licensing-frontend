@@ -20,7 +20,7 @@ let webpackManifest
 /**
  * @param {Request | null} request
  */
-export async function context(request) {
+export function context(request) {
   if (!webpackManifest) {
     try {
       webpackManifest = JSON.parse(readFileSync(manifestPath, 'utf-8'))
@@ -30,7 +30,7 @@ export async function context(request) {
   }
 
   const navigation =
-    request.path === routes.PROJECT_NAME ? [] : await buildNavigation(request)
+    request.path === routes.PROJECT_NAME ? [] : buildNavigation(request)
   const analyticsEnabled = areAnalyticsCookiesAccepted(request)
   const isAuthenticated = request?.auth?.isAuthenticated ?? false
 

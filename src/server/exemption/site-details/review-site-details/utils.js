@@ -4,8 +4,7 @@ import { COORDINATE_SYSTEMS } from '~/src/server/common/constants/exemptions.js'
 import { routes } from '~/src/server/common/constants/routes.js'
 import { getCoordinateSystem } from '~/src/server/common/helpers/coordinate-utils.js'
 import { createSiteDetailsDataJson } from '~/src/server/common/helpers/site-details.js'
-import { getSiteDetailsBySite } from '~/src/server/common/helpers/session-cache/site-utils.js'
-
+import { getSiteDetailsBySite } from '~/src/server/common/helpers/session-cache/site-details-utils.js'
 const isWGS84 = (coordinateSystem) =>
   coordinateSystem === COORDINATE_SYSTEMS.WGS84
 
@@ -334,15 +333,15 @@ export const prepareFileUploadDataForSave = (siteDetails, request) => {
  * @returns {object} Formatted data for API submission
  */
 export const prepareManualCoordinateDataForSave = (exemption, request) => {
-  const siteDetails = getSiteDetailsBySite(exemption)
-
-  request.logger.info(
-    {
-      coordinatesType: siteDetails.coordinatesType,
-      coordinatesEntry: siteDetails.coordinatesEntry
-    },
-    'Saving manual coordinate site details'
-  )
+  for (const site of exemption.siteDetails) {
+    request.logger.info(
+      {
+        coordinatesType: site.coordinatesType,
+        coordinatesEntry: site.coordinatesEntry
+      },
+      'Saving manual coordinate site details'
+    )
+  }
 
   // Manual coordinate entry flow - use existing data structure
   return exemption.siteDetails
@@ -361,6 +360,7 @@ export const prepareManualCoordinateDataForSave = (exemption, request) => {
 export const renderFileUploadReview = (h, options) => {
   const { exemption, previousPage, siteDetails, reviewSiteDetailsPageData } =
     options
+  const { multipleSiteDetails } = exemption
 
   const fileUploadSummaryData = getFileUploadSummaryData({
     ...exemption,
@@ -376,7 +376,8 @@ export const renderFileUploadReview = (h, options) => {
     projectName: exemption.projectName,
     fileUploadSummaryData,
     siteDetailsData,
-    configEnv: config.get('env')
+    configEnv: config.get('env'),
+    isMultiSiteJourney: !!multipleSiteDetails?.multipleSitesEnabled
   })
 }
 
@@ -394,6 +395,7 @@ export const renderFileUploadReview = (h, options) => {
 export const renderManualCoordinateReview = (h, request, options) => {
   const { exemption, previousPage, siteDetails, reviewSiteDetailsPageData } =
     options
+  const { multipleSiteDetails } = exemption
 
   const { coordinateSystem } = getCoordinateSystem(request)
   const summaryData = buildManualCoordinateSummaryData(
@@ -415,7 +417,8 @@ export const renderManualCoordinateReview = (h, request, options) => {
     ),
     projectName: exemption.projectName,
     summaryData,
-    siteDetailsData
+    siteDetailsData,
+    isMultiSiteJourney: !!multipleSiteDetails?.multipleSitesEnabled
   })
 }
 

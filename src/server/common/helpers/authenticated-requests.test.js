@@ -5,7 +5,8 @@ import {
   authenticatedPostRequest,
   authenticatedPatchRequest,
   authenticatedPutRequest,
-  authenticatedRequest
+  authenticatedRequest,
+  getAuthProvider
 } from './authenticated-requests.js'
 import { getUserSession } from '~/src/server/common/plugins/auth/utils.js'
 
@@ -319,6 +320,62 @@ describe('#authenticated-requests', () => {
         }
       )
       expect(result).toEqual(mockResponse)
+    })
+  })
+
+  describe('#getAuthProvider', () => {
+    test('should return "entra-id" when strategy is "entra-id"', () => {
+      const request = {
+        auth: {
+          credentials: {
+            strategy: 'entra-id'
+          }
+        }
+      }
+
+      const result = getAuthProvider(request)
+
+      expect(result).toBe('entra-id')
+    })
+
+    test('should return "defra-id" when strategy is "defra-id"', () => {
+      const request = {
+        auth: {
+          credentials: {
+            strategy: 'defra-id'
+          }
+        }
+      }
+
+      const result = getAuthProvider(request)
+
+      expect(result).toBe('defra-id')
+    })
+
+    test('should return null when strategy is unknown', () => {
+      const request = {
+        auth: {
+          credentials: {
+            strategy: 'unknown-strategy'
+          }
+        }
+      }
+
+      const result = getAuthProvider(request)
+
+      expect(result).toBeNull()
+    })
+
+    test('should return null when strategy is undefined', () => {
+      const request = {
+        auth: {
+          credentials: {}
+        }
+      }
+
+      const result = getAuthProvider(request)
+
+      expect(result).toBeNull()
     })
   })
 })

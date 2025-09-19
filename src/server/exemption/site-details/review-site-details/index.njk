@@ -93,8 +93,25 @@
                 rows: summaryRows,
                     classes: "govuk-summary-list--full-width"
             }) }}
+
+
             <form method="POST">
                 <input type="hidden" name="csrfToken" value="{{ csrfToken }}">
+                    
+                    {% if isMultiSiteJourney %}
+                        <p>You can select 'Save and continue' if you're finished or you want to save your progress and return later.</p>
+
+                        {{ govukButton({
+                            text: "Save and add another site",
+                            classes: "govuk-button--secondary",
+                            attributes: {
+                                name: "add",
+                                value: "add",
+                                type: "submit"
+                            }
+                        }) }}
+                    {% endif %}
+                    
                     <div class="govuk-button-group">
                         {{ govukButton({
                         text: "Save and continue",

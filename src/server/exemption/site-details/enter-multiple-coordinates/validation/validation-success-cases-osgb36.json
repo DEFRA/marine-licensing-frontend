@@ -1,0 +1,81 @@
+[
+  {
+    "description": "Valid OSGB36 coordinates - Set 1",
+    "coordinates": [
+      { "eastings": "432675", "northings": "181310" },
+      { "eastings": "433000", "northings": "181500" },
+      { "eastings": "432800", "northings": "181700" }
+    ]
+  },
+  {
+    "description": "Valid OSGB36 coordinates - Set 2",
+    "coordinates": [
+      { "eastings": "529090", "northings": "181680" },
+      { "eastings": "529300", "northings": "181900" },
+      { "eastings": "529200", "northings": "182000" }
+    ]
+  },
+  {
+    "description": "Valid OSGB36 coordinates - Set 3",
+    "coordinates": [
+      { "eastings": "326398", "northings": "673781" },
+      { "eastings": "326600", "northings": "674000" },
+      { "eastings": "326500", "northings": "673900" }
+    ]
+  },
+  {
+    "description": "Valid OSGB36 coordinates - Set 4",
+    "coordinates": [
+      { "eastings": "456123", "northings": "234567" },
+      { "eastings": "456400", "northings": "234800" },
+      { "eastings": "456300", "northings": "234700" }
+    ]
+  },
+  {
+    "description": "Valid OSGB36 coordinates - Rectangular area 1",
+    "coordinates": [
+      { "eastings": "432675", "northings": "181310" },
+      { "eastings": "433000", "northings": "181310" },
+      { "eastings": "433000", "northings": "181500" },
+      { "eastings": "432675", "northings": "181500" }
+    ]
+  },
+  {
+    "description": "Valid OSGB36 coordinates - Rectangular area 2",
+    "coordinates": [
+      { "eastings": "529090", "northings": "181680" },
+      { "eastings": "529300", "northings": "181680" },
+      { "eastings": "529300", "northings": "181900" },
+      { "eastings": "529090", "northings": "181900" }
+    ]
+  },
+  {
+    "description": "Valid OSGB36 coordinates - Rectangular area 3",
+    "coordinates": [
+      { "eastings": "326398", "northings": "673781" },
+      { "eastings": "326600", "northings": "673781" },
+      { "eastings": "326600", "northings": "674000" },
+      { "eastings": "326398", "northings": "674000" }
+    ]
+  },
+  {
+    "description": "Valid OSGB36 coordinates - Pentagon area 1",
+    "coordinates": [
+      { "eastings": "432675", "northings": "181310" },
+      { "eastings": "433000", "northings": "181310" },
+      { "eastings": "433200", "northings": "181400" },
+      { "eastings": "433000", "northings": "181500" },
+      { "eastings": "432675", "northings": "181500" }
+    ]
+  },
+  {
+    "description": "Valid OSGB36 coordinates - Pentagon area 2",
+    "coordinates": [
+      { "eastings": "529090", "northings": "181680" },
+      { "eastings": "529300", "northings": "181680" },
+      { "eastings": "529400", "northings": "181800" },
+      { "eastings": "529300", "northings": "181900" },
+      { "eastings": "529090", "northings": "181900" }
+    ]
+  }
+]

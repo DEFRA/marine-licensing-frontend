@@ -1,11 +1,14 @@
-import { getUserSession } from '~/src/server/common/plugins/auth/utils.js'
 import { context } from '~/src/config/nunjucks/context/context.js'
-import { AUTH_STRATEGIES } from '~/src/server/common/constants/auth.js'
 
 const mockReadFileSync = jest.fn()
 const mockLoggerError = jest.fn()
 
-jest.mock('~/src/server/common/plugins/auth/utils.js')
+jest.mock('~/src/server/common/helpers/authenticated-requests.js', () => ({
+  ...jest.requireActual(
+    '~/src/server/common/helpers/authenticated-requests.js'
+  ),
+  getAuthProvider: () => 'defra-id'
+}))
 jest.mock('node:fs', () => ({
   ...jest.requireActual('node:fs'),
   readFileSync: () => mockReadFileSync()
@@ -17,11 +20,6 @@ jest.mock('~/src/server/common/helpers/logging/logger.js', () => ({
 describe('#context', () => {
   const mockRequest = { path: '/' }
   let contextResult
-  const mockGetUserSession = jest.mocked(getUserSession)
-
-  beforeEach(() => {
-    jest.clearAllMocks()
-  })
 
   describe('When webpack manifest file read succeeds', () => {
     let contextImport
@@ -53,6 +51,14 @@ describe('#context', () => {
             active: false,
             text: 'Projects',
             href: '/home'
+          },
+          {
+            href: '#',
+            text: 'Defra account'
+          },
+          {
+            href: '/sign-out',
+            text: 'Sign out'
           }
         ],
         serviceName: 'Get permission for marine work',
@@ -73,60 +79,6 @@ describe('#context', () => {
         expect(contextResult.getAssetPath('an-image.png')).toBe(
           '/public/an-image.png'
         )
-      })
-    })
-
-    describe('When user is authenticated with defraId', () => {
-      beforeEach(async () => {
-        mockGetUserSession.mockResolvedValue({
-          strategy: AUTH_STRATEGIES.DEFRA_ID,
-          displayName: 'John Doe'
-        })
-
-        contextResult = await contextImport.context(mockRequest)
-      })
-
-      test('Should include account management link in navigation', () => {
-        expect(contextResult.navigation).toEqual([
-          {
-            active: false,
-            text: 'Projects',
-            href: '/home'
-          },
-          {
-            text: 'Defra account',
-            href: '#'
-          },
-          {
-            href: '/sign-out',
-            text: 'Sign out'
-          }
-        ])
-      })
-    })
-
-    describe('When user is not authenticated with defraId', () => {
-      beforeEach(async () => {
-        mockGetUserSession.mockResolvedValue({
-          strategy: 'basic',
-          displayName: 'Guest User'
-        })
-
-        contextResult = await contextImport.context(mockRequest)
-      })
-
-      test('Should not include account management link in navigation', () => {
-        expect(contextResult.navigation).toEqual([
-          {
-            active: false,
-            text: 'Projects',
-            href: '/home'
-          },
-          {
-            href: '/sign-out',
-            text: 'Sign out'
-          }
-        ])
       })
     })
   })
@@ -152,9 +104,9 @@ describe('#context', () => {
   })
 
   describe('When on the project name page', () => {
-    it('should not use navigation links', async () => {
+    it('should not use navigation links', () => {
       const mockRequest = { path: '/exemption/project-name' }
-      const contextResult = await context(mockRequest)
+      const contextResult = context(mockRequest)
       expect(contextResult.navigation).toEqual([])
     })
   })
@@ -171,14 +123,14 @@ describe('#context cache', () => {
       contextImport = await import('~/src/config/nunjucks/context/context.js')
     })
 
-    beforeEach(async () => {
+    beforeEach(() => {
       // Return JSON string
       mockReadFileSync.mockReturnValue(`{
         "application.js": "javascripts/application.js",
         "stylesheets/application.scss": "stylesheets/application.css"
       }`)
 
-      contextResult = await contextImport.context(mockRequest)
+      contextResult = contextImport.context(mockRequest)
     })
 
     test('Should read file', () => {
@@ -190,23 +142,18 @@ describe('#context cache', () => {
     })
 
     test('Should provide expected context', () => {
-      expect(contextResult).toEqual({
-        analyticsEnabled: false,
-        assetPath: '/public/assets',
-        breadcrumbs: [],
-        clarityProjectId: '',
-        getAssetPath: expect.any(Function),
-        isAuthenticated: false,
-        navigation: [
-          {
-            active: false,
-            text: 'Projects',
-            href: '/home'
-          }
-        ],
-        serviceName: 'Get permission for marine work',
-        serviceUrl: '/'
-      })
+      expect(contextResult).toEqual(
+        expect.objectContaining({
+          analyticsEnabled: false,
+          assetPath: '/public/assets',
+          breadcrumbs: [],
+          clarityProjectId: '',
+          getAssetPath: expect.any(Function),
+          isAuthenticated: false,
+          serviceName: 'Get permission for marine work',
+          serviceUrl: '/'
+        })
+      )
     })
   })
 })

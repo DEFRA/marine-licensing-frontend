@@ -1,6 +1,7 @@
 import Wreck from '@hapi/wreck'
 import { config } from '~/src/config/config.js'
 import { getUserSession } from '~/src/server/common/plugins/auth/utils.js'
+import { AUTH_STRATEGIES } from '~/src/server/common/constants/auth.js'
 
 export const getAuthToken = async (request) => {
   try {
@@ -13,6 +14,15 @@ export const getAuthToken = async (request) => {
     request.logger.error(error, 'Error getting auth token from session')
     return null
   }
+}
+
+export const getAuthProvider = (request) => {
+  const strategy = request?.auth?.credentials?.strategy
+  const { DEFRA_ID, ENTRA_ID } = AUTH_STRATEGIES
+  if ([DEFRA_ID, ENTRA_ID].includes(strategy)) {
+    return strategy
+  }
+  return null
 }
 
 export const createAuthHeaders = async (request, additionalHeaders = {}) => {

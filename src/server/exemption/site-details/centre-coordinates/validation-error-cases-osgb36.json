@@ -1,0 +1,50 @@
+[
+  {
+    "expectedError": "EASTINGS_REQUIRED",
+    "payload": { "northings": "181680" }
+  },
+  {
+    "expectedError": "NORTHINGS_REQUIRED",
+    "payload": { "eastings": "531090" }
+  },
+  {
+    "expectedError": "EASTINGS_NON_NUMERIC",
+    "payload": { "eastings": "abc", "northings": "181680" }
+  },
+  {
+    "expectedError": "NORTHINGS_NON_NUMERIC",
+    "payload": { "eastings": "531090", "northings": "xyz" }
+  },
+  {
+    "expectedError": "EASTINGS_POSITIVE_NUMBER",
+    "payload": { "eastings": "-1", "northings": "181680" }
+  },
+  {
+    "expectedError": "NORTHINGS_POSITIVE_NUMBER",
+    "payload": { "eastings": "531090", "northings": "-1" }
+  },
+  {
+    "expectedError": "EASTINGS_POSITIVE_NUMBER",
+    "payload": { "eastings": "-123456", "northings": "181680" }
+  },
+  {
+    "expectedError": "EASTINGS_LENGTH",
+    "payload": { "eastings": "12345", "northings": "181680" }
+  },
+  {
+    "expectedError": "EASTINGS_LENGTH",
+    "payload": { "eastings": "1234567", "northings": "181680" }
+  },
+  {
+    "expectedError": "NORTHINGS_POSITIVE_NUMBER",
+    "payload": { "eastings": "531090", "northings": "-654321" }
+  },
+  {
+    "expectedError": "NORTHINGS_LENGTH",
+    "payload": { "eastings": "531090", "northings": "12345" }
+  },
+  {
+    "expectedError": "NORTHINGS_LENGTH",
+    "payload": { "eastings": "531090", "northings": "12345678" }
+  }
+]

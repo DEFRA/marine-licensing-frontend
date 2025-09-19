@@ -1,6 +1,9 @@
 import { createServer } from '~/src/server/index.js'
 import { statusCodes } from '~/src/server/common/constants/status-codes.js'
-import { routes } from '~/src/server/common/constants/routes.js'
+import {
+  redirectPathCacheKey,
+  routes
+} from '~/src/server/common/constants/routes.js'
 import { setUserSession } from '~/src/server/auth/utils.js'
 import { signInOidcController } from '~/src/server/auth/sign-in-oidc.js'
 import { config } from '~/src/config/config.js'
@@ -54,28 +57,28 @@ describe('#signInOidcController', () => {
 
     const mockRequest = {
       auth: { isAuthenticated: false },
-      yar: { flash: jest.fn().mockReturnValue([customRedirectRoute]) }
+      yar: { flash: jest.fn().mockReturnValue(customRedirectRoute) }
     }
 
     const mockH = { redirect: jest.fn() }
 
     await signInOidcController.handler(mockRequest, mockH)
 
-    expect(mockRequest.yar.flash).toHaveBeenCalledWith('referrer')
+    expect(mockRequest.yar.flash).toHaveBeenCalledWith(redirectPathCacheKey)
     expect(mockH.redirect).toHaveBeenCalledWith(customRedirectRoute)
   })
 
   test('should fall back to PROJECT_NAME route when no referrer in flash', async () => {
     const mockRequest = {
       auth: { isAuthenticated: false },
-      yar: { flash: jest.fn().mockReturnValue([]) }
+      yar: { flash: jest.fn().mockReturnValue(null) }
     }
 
     const mockH = { redirect: jest.fn() }
 
     await signInOidcController.handler(mockRequest, mockH)
 
-    expect(mockRequest.yar.flash).toHaveBeenCalledWith('referrer')
+    expect(mockRequest.yar.flash).toHaveBeenCalledWith(redirectPathCacheKey)
     expect(mockH.redirect).toHaveBeenCalledWith(routes.PROJECT_NAME)
   })
 })

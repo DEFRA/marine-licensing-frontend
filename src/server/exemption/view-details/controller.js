@@ -44,18 +44,18 @@ export const viewDetailsController = {
         siteDetails,
         coordinateSystem
       )
+      const isInternalUser =
+        getAuthProvider(request) === AUTH_STRATEGIES.ENTRA_ID
 
       // Format the page caption with application reference
-      const pageCaption = `${exemption.applicationReference} - Exempt activity notification`
+      const pageCaption = `${exemption.applicationReference}${isInternalUser ? '' : ' - Exempt activity notification'}`
 
       return h.view(VIEW_DETAILS_VIEW_ROUTE, {
         pageTitle: exemption.projectName,
         pageCaption,
-        backLink:
-          getAuthProvider(request) === AUTH_STRATEGIES.ENTRA_ID
-            ? null
-            : routes.DASHBOARD,
+        backLink: isInternalUser ? null : routes.DASHBOARD,
         isReadOnly: true,
+        isInternalUser,
         ...exemption,
         siteDetails,
         siteDetailsData

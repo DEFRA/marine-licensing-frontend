@@ -1,0 +1,38 @@
+{% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
+
+{{ govukSummaryList({
+  card: {
+    title: {
+      text: "Application details"
+    },
+    attributes: {
+      id: "application-details-card"
+    }
+  },
+  rows: [
+    {
+      key: {
+      text: "Application type"
+    },
+      value: {
+      text: 'Exempt activity notification'
+    }
+    },
+    {
+      key: {
+        text: "Reference number"
+      },
+        value: {
+        text: params.applicationReference
+      }
+    },
+    {
+      key: {
+        text: "Date submitted"
+      },
+        value: {
+        html: params.dateSubmitted | formatDate('d MMMM yyyy')
+      }
+    }
+  ]
+}) }}

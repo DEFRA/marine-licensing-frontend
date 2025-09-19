@@ -7,6 +7,7 @@ import { AUTH_STRATEGIES } from '~/src/server/common/constants/auth.js'
 import { validateUserSession } from '~/src/server/common/plugins/auth/validate.js'
 import { clearExemptionCache } from '~/src/server/common/helpers/session-cache/utils.js'
 import { cacheMcmsContextFromQueryParams } from '~/src/server/common/helpers/mcms-context/cache-mcms-context.js'
+import { redirectPathCacheKey } from '~/src/server/common/constants/routes.js'
 
 // Mock external dependencies that these strategy functions depend on
 jest.mock('~/src/config/config.js')
@@ -254,7 +255,7 @@ describe('Strategy Functions Integration Tests', () => {
         )
         expect(result).toBe('/signin')
         expect(mockRequest.yar.flash).toHaveBeenCalledWith(
-          'redirectPath',
+          redirectPathCacheKey,
           '/exemption/task-list',
           true
         )
@@ -270,7 +271,7 @@ describe('Strategy Functions Integration Tests', () => {
         )
         expect(result).toBe('/signin-entra')
         expect(mockRequest.yar.flash).toHaveBeenCalledWith(
-          'redirectPath',
+          redirectPathCacheKey,
           '/view-details',
           true
         )
@@ -286,7 +287,7 @@ describe('Strategy Functions Integration Tests', () => {
         )
         expect(result).toBe('/signin-entra')
         expect(mockRequest.yar.flash).toHaveBeenCalledWith(
-          'redirectPath',
+          redirectPathCacheKey,
           '/view-details/some-id',
           true
         )

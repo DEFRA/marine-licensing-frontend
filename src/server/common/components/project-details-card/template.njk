@@ -27,27 +27,34 @@
     text: "Type of activity"
   },
   value: {
-    html: params.mcmsContext.activityType.label if params.mcmsContext else "An error occurred saving the answers from 'Check if you need a marine licence'."
+    html: params.mcmsContext.activityType.label
   },
   classes: "govuk-summary-list__row--no-border"
 }), rows) %}
 
+{% set sentenceStart = "Based on the applicant's answers, their" if params.isInternalUser else "Based on your answers from \'Check if you need a marine licence\', your" %}
 {% set rows = (rows.push({
   key: {
     text: "Why this activity is exempt"
   },
   value: {
-    html: ('Based on your answers from \'Check if you need a marine licence\', your article is exempt under <a href="http://www.legislation.gov.uk/uksi/2011/409/article/' + params.mcmsContext.article + '" target="_blank" rel="noopener noreferrer">Article ' + params.mcmsContext.article + ' of the Marine Licensing (Exempted Activities) Order 2011 (opens in new tab)</a>') if params.mcmsContext else "An error occurred saving the answers from 'Check if you need a marine licence'."
+    html: (sentenceStart + ' activity is exempt under <a href="http://www.legislation.gov.uk/uksi/2011/409/article/' + params.mcmsContext.article + '" target="_blank" rel="noopener noreferrer">Article ' + params.mcmsContext.article + ' of the Marine Licensing (Exempted Activities) Order 2011 (opens in new tab)</a>')
   },
   classes: "govuk-summary-list__row--no-border"
 }), rows) %}
 
+{% set sentences = ['<p><a href="' + params.mcmsContext.pdfDownloadUrl + '" class="govuk-link">Download a copy of ' +  ('their' if params.isInternalUser else 'your') + ' answers (PDF)</a></p>'] %}
+
+{% if not params.isInternalUser %}
+  {% set sentences = (sentences.push('<hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible"><p class="govuk-body">If you need to change any of your \'Check if you need a marine licence\' answers:</p><ol class="govuk-list govuk-list--number"><li>Delete this project from your projects.</li><li>Restart the process by checking if you need a marine licence.</li></ol>'), sentences) %}
+{% endif %}
+
 {% set rows = (rows.push({
   key: {
-    text: "Your answers from 'Check if you need a marine licence'"
+    text: ("The applicant's answers" if params.isInternalUser else "Your answers") + " from 'Check if you need a marine licence'"
   },
   value: {
-    html: ('<p><a href="' + params.mcmsContext.pdfDownloadUrl + '" class="govuk-link">Download a copy of your answers (PDF)</a></p><hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible"><p class="govuk-body">If you need to change any of your \'Check if you need a marine licence\' answers:</p><ol class="govuk-list govuk-list--number"><li>Delete this project from your projects.</li><li>Restart the process by checking if you need a marine licence.</li></ol>') if params.mcmsContext else "An error occurred saving the answers from 'Check if you need a marine licence'."
+    html: sentences | join
   }
 }), rows) %}
 

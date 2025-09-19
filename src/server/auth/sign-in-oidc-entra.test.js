@@ -1,5 +1,8 @@
 import { createServer } from '~/src/server/index.js'
-import { routes } from '~/src/server/common/constants/routes.js'
+import {
+  redirectPathCacheKey,
+  routes
+} from '~/src/server/common/constants/routes.js'
 import { setUserSession } from '~/src/server/auth/utils.js'
 import { signInOidcEntraController } from '~/src/server/auth/sign-in-oidc-entra.js'
 import { config } from '~/src/config/config.js'
@@ -51,7 +54,7 @@ describe('#signInOidcEntraController', () => {
 
     await signInOidcEntraController.handler(mockRequest, mockH)
 
-    expect(mockRequest.yar.flash).toHaveBeenCalledWith('redirectPath')
+    expect(mockRequest.yar.flash).toHaveBeenCalledWith(redirectPathCacheKey)
     expect(mockH.redirect).toHaveBeenCalledWith(customRedirectRoute)
   })
 })

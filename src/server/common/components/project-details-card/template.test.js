@@ -17,7 +17,8 @@ describe('Project Details Card Component', () => {
           pdfDownloadUrl:
             'https://marinelicensingtest.marinemanagement.org.uk/mmofox5uat/journey…'
         },
-        isReadOnly: false
+        isReadOnly: false,
+        isInternalUser: false
       })
     })
 
@@ -55,7 +56,7 @@ describe('Project Details Card Component', () => {
       expect(htmlContent).toContain('Deposit of a substance or object')
       expect(htmlContent).toContain('Why this activity is exempt')
       expect(htmlContent).toContain(
-        "Based on your answers from 'Check if you need a marine licence', your article is exempt"
+        "Based on your answers from 'Check if you need a marine licence', your activity is exempt"
       )
       expect(htmlContent).toContain(
         'Article 17 of the Marine Licensing (Exempted Activities) Order 2011 (opens in new tab)'
@@ -98,6 +99,38 @@ describe('Project Details Card Component', () => {
     test('Should have correct card title', () => {
       expect($component('.govuk-summary-card__title').text().trim()).toBe(
         'Project summary'
+      )
+    })
+  })
+
+  describe('Internal user', () => {
+    beforeEach(() => {
+      $component = renderComponent('project-details-card', {
+        projectName: 'Test Marine Project',
+        mcmsContext: {
+          activityType: {
+            value: 'DEPOSIT',
+            label: 'Deposit of a substance or object'
+          },
+          article: '17',
+          pdfDownloadUrl:
+            'https://marinelicensingtest.marinemanagement.org.uk/mmofox5uat/journey…'
+        },
+        isReadOnly: false,
+        isInternalUser: true
+      })
+    })
+
+    test('Should display all activity detail rows', () => {
+      const htmlContent = $component.html()
+      expect(htmlContent).toContain('Type of activity')
+      expect(htmlContent).toContain('Deposit of a substance or object')
+      expect(htmlContent).toContain('Why this activity is exempt')
+      expect(htmlContent).toContain(
+        "Based on the applicant's answers, their activity is exempt"
+      )
+      expect(htmlContent).toContain(
+        'Article 17 of the Marine Licensing (Exempted Activities) Order 2011 (opens in new tab)'
       )
     })
   })

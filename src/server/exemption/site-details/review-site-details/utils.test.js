@@ -515,12 +515,36 @@ describe('siteDetails utils', () => {
   describe('buildManualCoordinateMultipleSitesSummaryData util', () => {
     test('buildManualCoordinateSummaryData correctly handles multiple sites', () => {
       const result = buildManualCoordinateMultipleSitesSummaryData({
-        multipleSitesEnabled: true
+        multipleSitesEnabled: true,
+        sameActivityDates: 'no',
+        sameActivityDescription: 'no'
       })
 
       expect(result).toEqual({
         method: 'Enter the coordinates of the site manually',
-        multipleSiteDetails: 'Yes'
+        multipleSiteDetails: 'Yes',
+        sameActivityDates: 'No',
+        sameActivityDescription: 'No'
+      })
+    })
+
+    test('buildManualCoordinateSummaryData correctly handles multiple sites with same dates and description', () => {
+      const result = buildManualCoordinateMultipleSitesSummaryData(
+        {
+          multipleSitesEnabled: true,
+          sameActivityDates: 'yes',
+          sameActivityDescription: 'yes'
+        },
+        mockExemption.siteDetails
+      )
+
+      expect(result).toEqual({
+        method: 'Enter the coordinates of the site manually',
+        multipleSiteDetails: 'Yes',
+        sameActivityDates: 'Yes',
+        sameActivityDescription: 'Yes',
+        activityDates: '1 January 2025 to 1 January 2025',
+        activityDescription: 'Test activity description'
       })
     })
 
@@ -531,7 +555,9 @@ describe('siteDetails utils', () => {
 
       expect(result).toEqual({
         method: 'Enter the coordinates of the site manually',
-        multipleSiteDetails: 'No'
+        multipleSiteDetails: 'No',
+        sameActivityDates: 'No',
+        sameActivityDescription: 'No'
       })
     })
 
@@ -540,7 +566,9 @@ describe('siteDetails utils', () => {
 
       expect(result).toEqual({
         method: 'Enter the coordinates of the site manually',
-        multipleSiteDetails: 'No'
+        multipleSiteDetails: 'No',
+        sameActivityDates: 'No',
+        sameActivityDescription: 'No'
       })
     })
   })
@@ -911,9 +939,6 @@ describe('siteDetails utils', () => {
     })
 
     test('renderManualCoordinateReview renders correct view with data', () => {
-      const exemption = {
-        projectName: 'Test Project'
-      }
       const siteDetails = {
         coordinatesEntry: 'single',
         coordinatesType: 'coordinates',
@@ -926,6 +951,11 @@ describe('siteDetails utils', () => {
       const previousPage = `http://hostname${routes.WIDTH_OF_SITE}`
       const reviewSiteDetailsPageData = {
         pageTitle: 'Review site details'
+      }
+
+      const exemption = {
+        projectName: 'Test Project',
+        siteDetails: [siteDetails]
       }
 
       renderManualCoordinateReview(mockH, mockRequest, {
@@ -952,7 +982,9 @@ describe('siteDetails utils', () => {
           },
           multipleSiteDetailsData: {
             method: 'Enter the coordinates of the site manually',
-            multipleSiteDetails: 'No'
+            multipleSiteDetails: 'No',
+            sameActivityDates: 'No',
+            sameActivityDescription: 'No'
           },
           siteDetailsData: JSON.stringify({
             coordinatesType: 'coordinates',

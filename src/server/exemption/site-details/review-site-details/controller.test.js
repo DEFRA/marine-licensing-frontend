@@ -54,6 +54,7 @@ function createMockExemption(
     ...overrides,
     siteDetails: [
       {
+        ...mockExemption.siteDetails[0],
         coordinatesType: 'coordinates',
         coordinateSystem
       }
@@ -174,7 +175,10 @@ function assertProjectNameCaption(document, expectedProjectName) {
  * @param {Array} expectedData - Array of {key, value} objects
  */
 function assertSummaryListData(document, expectedData) {
-  const summaryCard = document.querySelectorAll('.govuk-summary-card')[1]
+  const summaryCards = document.querySelectorAll('.govuk-summary-card')
+  const summaryCard = Array.from(summaryCards).find((card) =>
+    card.textContent.includes('Site details')
+  )
   const summaryKeys = summaryCard.querySelectorAll('.govuk-summary-list__key')
   const summaryValues = summaryCard.querySelectorAll(
     '.govuk-summary-list__value'
@@ -389,7 +393,9 @@ describe('#reviewSiteDetails', () => {
           },
           multipleSiteDetailsData: {
             method: 'Enter the coordinates of the site manually',
-            multipleSiteDetails: 'No'
+            multipleSiteDetails: 'No',
+            sameActivityDates: 'No',
+            sameActivityDescription: 'No'
           },
           siteDetailsData: '{"coordinatesType":"coordinates"}'
         })
@@ -514,8 +520,13 @@ describe('#reviewSiteDetails', () => {
             width: '100 metres'
           },
           multipleSiteDetailsData: {
+            activityDates: '1 January 2025 to 1 January 2025',
+            activityDescription: 'Test activity description',
             method: 'Enter the coordinates of the site manually',
-            multipleSiteDetails: 'No'
+            multipleSiteDetails: 'No',
+
+            sameActivityDates: 'Yes',
+            sameActivityDescription: 'Yes'
           },
           siteDetailsData:
             '{"coordinatesType":"coordinates","coordinateSystem":"wgs84","coordinatesEntry":"single","coordinates":{"latitude":"51.489676","longitude":"-0.231530"},"circleWidth":"100"}'
@@ -550,8 +561,12 @@ describe('#reviewSiteDetails', () => {
             width: '100 metres'
           },
           multipleSiteDetailsData: {
+            activityDates: '1 January 2025 to 1 January 2025',
+            activityDescription: 'Test activity description',
             method: 'Enter the coordinates of the site manually',
-            multipleSiteDetails: 'No'
+            multipleSiteDetails: 'No',
+            sameActivityDates: 'Yes',
+            sameActivityDescription: 'Yes'
           },
           siteDetailsData:
             '{"coordinatesType":"coordinates","coordinateSystem":"osgb36","coordinatesEntry":"single","coordinates":{"eastings":"425053","northings":"564180"},"circleWidth":"100"}'
@@ -584,9 +599,14 @@ describe('#reviewSiteDetails', () => {
         assertProjectNameCaption(document, mockExemption.projectName)
 
         // Summary card title
-        const summaryCardTitle = document.querySelectorAll(
+        const summaryCardTitles = document.querySelectorAll(
           '.govuk-summary-card__title'
-        )[1]
+        )
+
+        const summaryCardTitle = Array.from(summaryCardTitles).find((card) =>
+          card.textContent.includes('Site details')
+        )
+
         expect(summaryCardTitle.textContent.trim()).toBe('Site details')
 
         // Summary list data
@@ -669,11 +689,16 @@ describe('#reviewSiteDetails', () => {
               ]
             },
             multipleSiteDetailsData: {
+              activityDates: '1 January 2025 to 1 January 2025',
+              activityDescription: 'Test activity description',
               method: 'Enter the coordinates of the site manually',
-              multipleSiteDetails: 'No'
+              multipleSiteDetails: 'No',
+
+              sameActivityDates: 'Yes',
+              sameActivityDescription: 'Yes'
             },
             siteDetailsData:
-              '{"coordinatesType":"coordinates","coordinateSystem":"wgs84","coordinatesEntry":"multiple","coordinates":[{"latitude":"55.123456","longitude":"55.123456"},{"latitude":"33.987654","longitude":"33.987654"},{"latitude":"78.123456","longitude":"78.123456"}]}'
+              '{"coordinatesType":"coordinates","coordinateSystem":"wgs84","coordinatesEntry":"multiple","coordinates":[{"latitude":"55.123456","longitude":"55.123456"},{"latitude":"33.987654","longitude":"33.987654"},{"latitude":"78.123456","longitude":"78.123456"}],"circleWidth":"100"}'
           })
         })
 
@@ -723,11 +748,15 @@ describe('#reviewSiteDetails', () => {
               ]
             },
             multipleSiteDetailsData: {
+              activityDates: '1 January 2025 to 1 January 2025',
+              activityDescription: 'Test activity description',
               method: 'Enter the coordinates of the site manually',
-              multipleSiteDetails: 'No'
+              multipleSiteDetails: 'No',
+              sameActivityDates: 'Yes',
+              sameActivityDescription: 'Yes'
             },
             siteDetailsData:
-              '{"coordinatesType":"coordinates","coordinateSystem":"osgb36","coordinatesEntry":"multiple","coordinates":[{"eastings":"425053","northings":"564180"},{"eastings":"426000","northings":"565000"},{"eastings":"427000","northings":"566000"}]}'
+              '{"coordinatesType":"coordinates","coordinateSystem":"osgb36","coordinatesEntry":"multiple","coordinates":[{"eastings":"425053","northings":"564180"},{"eastings":"426000","northings":"565000"},{"eastings":"427000","northings":"566000"}],"circleWidth":"100"}'
           })
         })
 
@@ -775,11 +804,16 @@ describe('#reviewSiteDetails', () => {
               polygonCoordinates: []
             },
             multipleSiteDetailsData: {
+              activityDates: '1 January 2025 to 1 January 2025',
+              activityDescription: 'Test activity description',
               method: 'Enter the coordinates of the site manually',
-              multipleSiteDetails: 'No'
+              multipleSiteDetails: 'No',
+
+              sameActivityDates: 'Yes',
+              sameActivityDescription: 'Yes'
             },
             siteDetailsData:
-              '{"coordinatesType":"coordinates","coordinateSystem":"wgs84","coordinatesEntry":"multiple","coordinates":[]}'
+              '{"coordinatesType":"coordinates","coordinateSystem":"wgs84","coordinatesEntry":"multiple","coordinates":[],"circleWidth":"100"}'
           })
         })
 
@@ -841,11 +875,16 @@ describe('#reviewSiteDetails', () => {
               ]
             },
             multipleSiteDetailsData: {
+              activityDates: '1 January 2025 to 1 January 2025',
+              activityDescription: 'Test activity description',
               method: 'Enter the coordinates of the site manually',
-              multipleSiteDetails: 'No'
+              multipleSiteDetails: 'No',
+
+              sameActivityDates: 'Yes',
+              sameActivityDescription: 'Yes'
             },
             siteDetailsData:
-              '{"coordinatesType":"coordinates","coordinateSystem":"wgs84","coordinatesEntry":"multiple","coordinates":[{"latitude":"55.123456","longitude":"55.123456"},{"latitude":"","longitude":"33.987654"},{"latitude":"78.123456","longitude":"78.123456"},{"latitude":null,"longitude":null}]}'
+              '{"coordinatesType":"coordinates","coordinateSystem":"wgs84","coordinatesEntry":"multiple","coordinates":[{"latitude":"55.123456","longitude":"55.123456"},{"latitude":"","longitude":"33.987654"},{"latitude":"78.123456","longitude":"78.123456"},{"latitude":null,"longitude":null}],"circleWidth":"100"}'
           })
         })
 

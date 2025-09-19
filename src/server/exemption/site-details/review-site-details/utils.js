@@ -5,6 +5,7 @@ import { routes } from '~/src/server/common/constants/routes.js'
 import { getCoordinateSystem } from '~/src/server/common/helpers/coordinate-utils.js'
 import { createSiteDetailsDataJson } from '~/src/server/common/helpers/site-details.js'
 import { getSiteDetailsBySite } from '~/src/server/common/helpers/session-cache/site-details-utils.js'
+import { formatDate } from '~/src/server/common/helpers/dates/date-utils.js'
 const isWGS84 = (coordinateSystem) =>
   coordinateSystem === COORDINATE_SYSTEMS.WGS84
 
@@ -233,17 +234,38 @@ export const buildManualCoordinateSummaryData = (
 /**
  * Builds summary data for displayign multiple site information
  * @param {object} multipleSiteDetails - Multiple site details from exemption
+ * @param {object} siteDetails - Site details from exemption
  * @returns {object} Summary data for template
  */
 export const buildManualCoordinateMultipleSitesSummaryData = (
-  multipleSiteDetails = {}
+  multipleSiteDetails = {},
+  siteDetails
 ) => {
-  const { multipleSitesEnabled } = multipleSiteDetails
+  const { multipleSitesEnabled, sameActivityDates, sameActivityDescription } =
+    multipleSiteDetails
 
-  return {
+  const multipleSiteData = {
     method: 'Enter the coordinates of the site manually',
-    multipleSiteDetails: multipleSitesEnabled ? 'Yes' : 'No'
+    multipleSiteDetails: multipleSitesEnabled ? 'Yes' : 'No',
+    sameActivityDates: sameActivityDates === 'yes' ? 'Yes' : 'No',
+    sameActivityDescription: sameActivityDescription === 'yes' ? 'Yes' : 'No'
   }
+
+  if (!siteDetails) {
+    return multipleSiteData
+  }
+
+  const firstSite = siteDetails[0]
+
+  if (sameActivityDates === 'yes') {
+    multipleSiteData.activityDates = `${formatDate(firstSite.activityDates.start)} to ${formatDate(firstSite.activityDates.end)}`
+  }
+
+  if (sameActivityDescription === 'yes') {
+    multipleSiteData.activityDescription = firstSite.activityDescription
+  }
+
+  return multipleSiteData
 }
 
 /**
@@ -419,8 +441,10 @@ export const renderManualCoordinateReview = (h, request, options) => {
     coordinateSystem
   )
 
-  const multipleSiteDetailsData =
-    buildManualCoordinateMultipleSitesSummaryData(multipleSiteDetails)
+  const multipleSiteDetailsData = buildManualCoordinateMultipleSitesSummaryData(
+    multipleSiteDetails,
+    exemption.siteDetails
+  )
 
   // Prepare site details data for map if needed
   const siteDetailsData = createSiteDetailsDataJson(

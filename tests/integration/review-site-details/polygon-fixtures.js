@@ -1,4 +1,5 @@
 import { COORDINATE_SYSTEMS } from '~/src/server/common/constants/exemptions.js'
+import { mockExemption } from '~/src/server/test-helpers/mocks.js'
 
 const basePolygonExemption = {
   multipleSiteDetails: {},
@@ -239,9 +240,15 @@ export const testScenarios = [
     coordinateSystem: COORDINATE_SYSTEMS.WGS84,
     exemption: {
       ...basePolygonExemption,
-      multipleSiteDetails: { multipleSitesEnabled: true },
+      multipleSiteDetails: {
+        multipleSitesEnabled: true,
+        sameActivityDates: 'yes',
+        sameActivityDescription: 'yes'
+      },
       siteDetails: [
         {
+          activityDates: mockExemption.activityDates,
+          activityDescription: mockExemption.activityDescription,
           coordinatesType: 'coordinates',
           coordinatesEntry: 'multiple',
           coordinateSystem: 'wgs84',
@@ -267,9 +274,13 @@ export const testScenarios = [
       projectName: 'Hammersmith pontoon construction',
       multipleSiteDetails: {
         method: 'Enter the coordinates of the site manually',
-        multipleSiteDetails: 'Yes'
+        multipleSiteDetails: 'Yes',
+        sameActivityDates: 'Yes',
+        sameActivityDescription: 'Yes'
       },
       siteDetails: {
+        activityDates: '1 January 2025 to 1 January 2025',
+        activityDescription: mockExemption.siteDetails[0].activityDescription,
         method:
           'Manually enter multiple sets of coordinates to mark the boundary of the site',
         coordinateSystem:

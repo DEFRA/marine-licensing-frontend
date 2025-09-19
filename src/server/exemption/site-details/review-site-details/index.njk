@@ -54,6 +54,62 @@
                 classes: "govuk-summary-list--full-width"
             }) }}
 
+            {% if isMultiSiteJourney %}
+
+                {% set activityRows = [
+                    {
+                        key: {
+                            text: "Are the activity dates the same for every site?"
+                        },
+                        value: {
+                            text: multipleSiteDetailsData.sameActivityDates
+                        }
+                    }
+                ] %}
+
+                {% if multipleSiteDetailsData.activityDates %}
+                    {% set activityRows = (activityRows.push({
+                        key: {
+                            text: "Activity dates"
+                        },
+                        value: {
+                            text: multipleSiteDetailsData.activityDates
+                        }
+                    }), activityRows) %}
+                {% endif %}
+
+                {% set activityRows = (activityRows.push({
+                    key: {
+                        text: "Is the activity description the same for every site?"
+                    },
+                    value: {
+                        html: multipleSiteDetailsData.sameActivityDescription
+                    }
+                }), activityRows) %}
+                    
+                {% if multipleSiteDetailsData.activityDescription %}
+                    {% set activityRows = (activityRows.push({
+                        key: {
+                            text: "Activity description"
+                        },
+                        value: {
+                            text: multipleSiteDetailsData.activityDescription
+                        }
+                    }), activityRows) %}
+                {% endif %}
+                
+                {{ govukSummaryList({
+                    card: {
+                        title: {
+                            text: "Activity details"
+                        }
+                    },
+                    rows: activityRows,
+                    classes: "govuk-summary-list--full-width"
+                }) }}
+
+            {% endif %}
+
             {% set summaryRows = [
                 {
                     key: {

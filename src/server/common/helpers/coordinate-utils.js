@@ -1,7 +1,6 @@
 import { getExemptionCache } from './session-cache/utils.js'
 import { COORDINATE_SYSTEMS } from '~/src/server/common/constants/exemptions.js'
-import { getSiteDetailsBySite } from '~/src/server/common/helpers/session-cache/site-utils.js'
-
+import { getSiteDetailsBySite } from '~/src/server/common/helpers/session-cache/site-details-utils.js'
 /**
  * Extract coordinate data from GeoJSON for display purposes
  * @param {object} geoJSON - GeoJSON object containing features

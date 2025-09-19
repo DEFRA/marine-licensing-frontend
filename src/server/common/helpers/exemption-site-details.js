@@ -5,8 +5,7 @@ import {
   getFileUploadSummaryData,
   getPolygonCoordinatesDisplayData
 } from '~/src/server/exemption/site-details/review-site-details/utils.js'
-import { getSiteDetailsBySite } from '~/src/server/common/helpers/session-cache/site-utils.js'
-
+import { getSiteDetailsBySite } from '~/src/server/common/helpers/session-cache/site-details-utils.js'
 export const errorMessages = {
   FILE_UPLOAD_DATA_ERROR: 'Error getting file upload summary data'
 }

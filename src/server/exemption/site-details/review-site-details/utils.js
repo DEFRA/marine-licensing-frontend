@@ -4,8 +4,7 @@ import { COORDINATE_SYSTEMS } from '~/src/server/common/constants/exemptions.js'
 import { routes } from '~/src/server/common/constants/routes.js'
 import { getCoordinateSystem } from '~/src/server/common/helpers/coordinate-utils.js'
 import { createSiteDetailsDataJson } from '~/src/server/common/helpers/site-details.js'
-import { getSiteDetailsBySite } from '~/src/server/common/helpers/session-cache/site-utils.js'
-
+import { getSiteDetailsBySite } from '~/src/server/common/helpers/session-cache/site-details-utils.js'
 const isWGS84 = (coordinateSystem) =>
   coordinateSystem === COORDINATE_SYSTEMS.WGS84
 

@@ -2,7 +2,7 @@ import { config } from '~/src/config/config.js'
 import { routes } from '~/src/server/common/constants/routes.js'
 import { authenticatedPostRequest } from '~/src/server/common/helpers/authenticated-requests.js'
 import { extractCoordinatesFromGeoJSON } from '~/src/server/common/helpers/coordinate-utils.js'
-import { getSiteDetailsBySite } from '~/src/server/common/helpers/session-cache/site-utils.js'
+import { getSiteDetailsBySite } from '~/src/server/common/helpers/session-cache/site-details-utils.js'
 import {
   getExemptionCache,
   updateExemptionSiteDetails,

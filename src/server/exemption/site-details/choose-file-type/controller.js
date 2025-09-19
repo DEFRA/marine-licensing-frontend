@@ -9,8 +9,7 @@ import {
   errorDescriptionByFieldName,
   mapErrorsForDisplay
 } from '~/src/server/common/helpers/errors.js'
-import { getSiteDetailsBySite } from '~/src/server/common/helpers/session-cache/site-utils.js'
-
+import { getSiteDetailsBySite } from '~/src/server/common/helpers/session-cache/site-details-utils.js'
 const pageSettings = {
   pageTitle: 'Choose file type',
   heading: 'Which type of file do you want to upload?'

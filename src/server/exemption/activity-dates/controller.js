@@ -23,10 +23,8 @@ import {
   setExemptionCache,
   updateExemptionSiteDetails
 } from '~/src/server/common/helpers/session-cache/utils.js'
-import {
-  getSiteDetailsBySite,
-  setSiteDataPreHandler
-} from '~/src/server/common/helpers/session-cache/site-utils.js'
+import { setSiteDataPreHandler } from '~/src/server/common/helpers/session-cache/site-utils.js'
+import { getSiteDetailsBySite } from '~/src/server/common/helpers/session-cache/site-details-utils.js'
 import { activityDatesSchema } from '~/src/server/common/schemas/date.js'
 import { getSiteNumber } from '~/src/server/exemption/site-details/utils/site-number.js'
 import { getBackRoute, getNextRoute } from './utils.js'

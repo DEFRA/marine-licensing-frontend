@@ -78,6 +78,7 @@ describe('Review Site Details - Polygon Coordinates Integration Tests', () => {
       const emptyPolygonExemption = {
         id: 'test-exemption-empty',
         projectName: 'Empty Polygon Project',
+        multipleSiteDetails: {},
         siteDetails: [
           {
             coordinatesType: 'coordinates',
@@ -105,6 +106,7 @@ describe('Review Site Details - Polygon Coordinates Integration Tests', () => {
       const incompleteCoordinatesExemption = {
         id: 'test-exemption-incomplete',
         projectName: 'Incomplete Coordinates Project',
+        multipleSiteDetails: {},
         siteDetails: [
           {
             coordinatesType: 'coordinates',

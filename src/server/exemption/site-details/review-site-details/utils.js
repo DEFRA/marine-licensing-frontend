@@ -199,7 +199,11 @@ export const getFileUploadBackLink = (previousPage) => {
 const metresLabel = (metres) =>
   metres === '1' ? `${metres} metre` : `${metres} metres`
 
-const getActivityDatesSummaryText = (activityDates) => {
+const getActivityDatesSummaryText = (activityDates, showActivityDates) => {
+  if (!showActivityDates) {
+    return ''
+  }
+
   if (activityDates?.start && activityDates?.end) {
     return `${formatDate(activityDates.start)} to ${formatDate(activityDates.end)}`
   }
@@ -234,9 +238,10 @@ export const buildManualCoordinateSummaryData = (
 
   if (coordinatesEntry === 'multiple') {
     return {
-      activityDates: showActivityDates
-        ? getActivityDatesSummaryText(activityDates)
-        : '',
+      activityDates: getActivityDatesSummaryText(
+        activityDates,
+        showActivityDates
+      ),
       activityDescription:
         activityDescription && !!showActivityDescription
           ? activityDescription
@@ -255,9 +260,10 @@ export const buildManualCoordinateSummaryData = (
 
   // Default to circular site display
   return {
-    activityDates: showActivityDates
-      ? getActivityDatesSummaryText(activityDates)
-      : '',
+    activityDates: getActivityDatesSummaryText(
+      activityDates,
+      showActivityDates
+    ),
     activityDescription:
       activityDescription && !!showActivityDescription
         ? activityDescription
@@ -279,11 +285,11 @@ export const buildManualCoordinateSummaryData = (
  * @returns {object} Summary data for template
  */
 export const buildManualCoordinateMultipleSitesSummaryData = (
-  multipleSiteDetails = {},
+  multipleSiteDetails,
   siteDetails
 ) => {
   const { multipleSitesEnabled, sameActivityDates, sameActivityDescription } =
-    multipleSiteDetails
+    multipleSiteDetails ?? {}
 
   const multipleSiteData = {
     method: 'Enter the coordinates of the site manually',

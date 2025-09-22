@@ -1027,6 +1027,7 @@ describe('siteDetails utils', () => {
 
       const exemption = {
         projectName: 'Test Project',
+        multipleSiteDetails: {},
         siteDetails: [siteDetails]
       }
 

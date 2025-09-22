@@ -13,10 +13,11 @@ jest.mock('~/src/server/common/helpers/session-cache/utils.js')
 jest.mock('~/src/server/common/helpers/coordinate-utils.js')
 jest.mock('~/src/server/common/helpers/authenticated-requests.js')
 
-const getSiteDetailsCard = (document) => {
+const getSiteDetailsCard = (document, expected) => {
+  const cardName = expected?.siteDetails?.cardName ?? 'Site details'
   const siteCards = document.querySelectorAll('.govuk-summary-card')
   return Array.from(siteCards).find((card) =>
-    card.textContent.includes('Site details')
+    card.textContent.includes(cardName)
   )
 }
 
@@ -62,7 +63,7 @@ describe('Review Site Details - Polygon Coordinates Integration Tests', () => {
       validateSiteDetailsCard(
         document,
         expectedPageContent,
-        exemption.multipleSiteDetails?.multipleSitesEnabled ? 2 : 1
+        exemption.multipleSiteDetails?.multipleSitesEnabled
       )
       validatePolygonCoordinates(document, expectedPageContent)
       validateNavigationElements(document)
@@ -281,12 +282,11 @@ describe('Review Site Details - Polygon Coordinates Integration Tests', () => {
     )
   }
 
-  const validateSiteDetailsCard = (document, expected, cardIndex = 1) => {
-    const siteCard = document.querySelectorAll('.govuk-summary-card')[cardIndex]
-    expect(siteCard).toBeTruthy()
+  const validateSiteDetailsCard = (document, expected) => {
+    const siteCard = getSiteDetailsCard(document, expected)
 
     const cardTitle = siteCard.querySelector('.govuk-summary-card__title')
-    expect(cardTitle.textContent.trim()).toBe('Site details')
+    expect(cardTitle.textContent.trim()).toBe(expected.siteDetails.cardName)
 
     const methodRow = getRowByKey(siteCard, 'Method of providing site location')
     expect(methodRow.textContent).toContain(expected.siteDetails.method)
@@ -298,7 +298,7 @@ describe('Review Site Details - Polygon Coordinates Integration Tests', () => {
   }
 
   const validatePolygonCoordinates = (document, expected) => {
-    const siteCard = getSiteDetailsCard(document)
+    const siteCard = getSiteDetailsCard(document, expected)
 
     expected.siteDetails.polygonCoordinates.forEach((expectedCoordinate) => {
       const coordinateRow = getRowByKey(siteCard, expectedCoordinate.label)

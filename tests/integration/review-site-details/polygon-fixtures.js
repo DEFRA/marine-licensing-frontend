@@ -2,7 +2,9 @@ import { COORDINATE_SYSTEMS } from '~/src/server/common/constants/exemptions.js'
 import { mockExemption } from '~/src/server/test-helpers/mocks.js'
 
 const basePolygonExemption = {
-  multipleSiteDetails: {},
+  multipleSiteDetails: {
+    cardName: 'Site details'
+  },
   id: 'test-polygon-exemption-123',
   projectName: 'Hammersmith pontoon construction',
   activityDates: {
@@ -22,7 +24,9 @@ const basePolygonExemption = {
       method: 'Enter the coordinates of the site manually',
       multipleSiteDetails: 'No'
     },
-    siteDetails: { status: 'completed' },
+    siteDetails: {
+      status: 'completed'
+    },
     publicRegister: { status: 'completed' }
   }
 }
@@ -53,6 +57,7 @@ export const testScenarios = [
         multipleSiteDetails: 'No'
       },
       siteDetails: {
+        cardName: 'Site details',
         method:
           'Manually enter multiple sets of coordinates to mark the boundary of the site',
         coordinateSystem:
@@ -99,6 +104,7 @@ export const testScenarios = [
         multipleSiteDetails: 'No'
       },
       siteDetails: {
+        cardName: 'Site details',
         method:
           'Manually enter multiple sets of coordinates to mark the boundary of the site',
         coordinateSystem: 'OSGB36 (National Grid)Eastings and Northings',
@@ -146,6 +152,7 @@ export const testScenarios = [
         multipleSiteDetails: 'No'
       },
       siteDetails: {
+        cardName: 'Site details',
         method:
           'Manually enter multiple sets of coordinates to mark the boundary of the site',
         coordinateSystem:
@@ -203,6 +210,7 @@ export const testScenarios = [
         multipleSiteDetails: 'No'
       },
       siteDetails: {
+        cardName: 'Site details',
         method:
           'Manually enter multiple sets of coordinates to mark the boundary of the site',
         coordinateSystem: 'OSGB36 (National Grid)Eastings and Northings',
@@ -241,6 +249,7 @@ export const testScenarios = [
     exemption: {
       ...basePolygonExemption,
       multipleSiteDetails: {
+        cardName: 'Site details',
         multipleSitesEnabled: true,
         sameActivityDates: 'yes',
         sameActivityDescription: 'yes'
@@ -279,6 +288,7 @@ export const testScenarios = [
         sameActivityDescription: 'Yes'
       },
       siteDetails: {
+        cardName: 'Site 1 details',
         activityDates: '1 January 2025 to 1 January 2025',
         activityDescription: mockExemption.siteDetails[0].activityDescription,
         method:

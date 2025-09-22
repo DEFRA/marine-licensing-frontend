@@ -19,6 +19,15 @@
     }) }}
     </nav>
 {% endblock %}
+
+{% set summaryRowsHeading %}
+  {% if isMultiSiteJourney %}
+    Site 1 details
+  {% else %}
+    Site details
+  {% endif %}
+{% endset %}
+
 {% block content %}
     <div class="govuk-grid-row">
         <div class="govuk-grid-column-full">
@@ -173,7 +182,7 @@
             {{ govukSummaryList({
                 card: {
                     title: {
-                        text: "Site details"
+                        text: summaryRowsHeading
                     }
                 },
                 rows: summaryRows,

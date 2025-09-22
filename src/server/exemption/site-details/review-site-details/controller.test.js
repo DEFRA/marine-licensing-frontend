@@ -391,7 +391,10 @@ describe('#reviewSiteDetails', () => {
             method: '',
             coordinateSystem: '',
             coordinates: '',
-            width: ''
+            width: '',
+            showActivityDates: true,
+            showActivityDescription: true,
+            siteName: ''
           },
           multipleSiteDetailsData: {
             method: 'Enter the coordinates of the site manually',
@@ -521,7 +524,10 @@ describe('#reviewSiteDetails', () => {
             coordinateSystem:
               'WGS84 (World Geodetic System 1984)\nLatitude and longitude',
             coordinates: `${mockCoordinates[COORDINATE_SYSTEMS.WGS84].latitude}, ${mockCoordinates[COORDINATE_SYSTEMS.WGS84].longitude}`,
-            width: '100 metres'
+            width: '100 metres',
+            showActivityDates: true,
+            showActivityDescription: true,
+            siteName: 'Mock site'
           },
           multipleSiteDetailsData: {
             activityDates: '1 January 2025 to 1 January 2025',
@@ -564,7 +570,10 @@ describe('#reviewSiteDetails', () => {
               'Manually enter one set of coordinates and a width to create a circular site',
             coordinateSystem: 'OSGB36 (National Grid)\nEastings and Northings',
             coordinates: `${mockCoordinates[COORDINATE_SYSTEMS.OSGB36].eastings}, ${mockCoordinates[COORDINATE_SYSTEMS.OSGB36].northings}`,
-            width: '100 metres'
+            width: '100 metres',
+            showActivityDates: true,
+            showActivityDescription: true,
+            siteName: 'Mock site'
           },
           multipleSiteDetailsData: {
             activityDates: '1 January 2025 to 1 January 2025',
@@ -702,7 +711,10 @@ describe('#reviewSiteDetails', () => {
                   label: 'Point 3',
                   value: '78.123456, 78.123456'
                 }
-              ]
+              ],
+              showActivityDates: true,
+              showActivityDescription: true,
+              siteName: 'Mock site'
             },
             multipleSiteDetailsData: {
               activityDates: '1 January 2025 to 1 January 2025',
@@ -763,7 +775,10 @@ describe('#reviewSiteDetails', () => {
                   label: 'Point 3',
                   value: '427000, 566000'
                 }
-              ]
+              ],
+              showActivityDates: true,
+              showActivityDescription: true,
+              siteName: 'Mock site'
             },
             multipleSiteDetailsData: {
               activityDates: '1 January 2025 to 1 January 2025',
@@ -821,7 +836,10 @@ describe('#reviewSiteDetails', () => {
                 'Manually enter multiple sets of coordinates to mark the boundary of the site',
               coordinateSystem:
                 'WGS84 (World Geodetic System 1984)\nLatitude and longitude',
-              polygonCoordinates: []
+              polygonCoordinates: [],
+              showActivityDates: true,
+              showActivityDescription: true,
+              siteName: 'Mock site'
             },
             multipleSiteDetailsData: {
               activityDates: '1 January 2025 to 1 January 2025',
@@ -894,7 +912,10 @@ describe('#reviewSiteDetails', () => {
                   label: 'Point 2',
                   value: '78.123456, 78.123456'
                 }
-              ]
+              ],
+              showActivityDates: true,
+              showActivityDescription: true,
+              siteName: 'Mock site'
             },
             multipleSiteDetailsData: {
               activityDates: '1 January 2025 to 1 January 2025',
@@ -1457,7 +1478,10 @@ describe('#reviewSiteDetails', () => {
               { label: 'Start and end points', value: '55.123456, 55.123456' },
               { label: 'Point 2', value: '33.987654, 33.987654' },
               { label: 'Point 3', value: '78.123456, 78.123456' }
-            ]
+            ],
+            showActivityDates: true,
+            showActivityDescription: true,
+            siteName: ''
           })
         })
 
@@ -1488,6 +1512,9 @@ describe('#reviewSiteDetails', () => {
             coordinateSystem:
               'WGS84 (World Geodetic System 1984)\nLatitude and longitude',
             coordinates: '50.123456, -0.123456',
+            showActivityDates: true,
+            showActivityDescription: true,
+            siteName: '',
             width: '200 metres'
           })
         })

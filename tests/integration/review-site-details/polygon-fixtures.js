@@ -284,6 +284,7 @@ export const testScenarios = [
         {
           activityDates: mockExemption.activityDates,
           activityDescription: mockExemption.activityDescription,
+          siteName: 'Site 1',
           coordinatesType: 'coordinates',
           coordinatesEntry: 'multiple',
           coordinateSystem: 'wgs84',
@@ -294,6 +295,9 @@ export const testScenarios = [
           ]
         },
         {
+          activityDates: mockExemption.activityDates,
+          activityDescription: mockExemption.activityDescription,
+          siteName: 'Site 2',
           coordinatesType: 'coordinates',
           coordinatesEntry: 'multiple',
           coordinateSystem: 'wgs84',
@@ -316,6 +320,7 @@ export const testScenarios = [
         activityDescription: mockExemption.siteDetails[0].activityDescription
       },
       siteDetails: {
+        siteName: 'Site 1',
         cardName: 'Site 1 details',
         method:
           'Manually enter multiple sets of coordinates to mark the boundary of the site',
@@ -353,6 +358,7 @@ export const testScenarios = [
         {
           activityDates: mockExemption.activityDates,
           activityDescription: mockExemption.activityDescription,
+          siteName: 'Site 1',
           coordinatesType: 'coordinates',
           coordinatesEntry: 'multiple',
           coordinateSystem: 'wgs84',
@@ -365,6 +371,7 @@ export const testScenarios = [
         {
           activityDates: mockExemption.activityDates,
           activityDescription: mockExemption.activityDescription,
+          siteName: 'Site 2',
           coordinatesType: 'coordinates',
           coordinatesEntry: 'multiple',
           coordinateSystem: 'wgs84',
@@ -385,6 +392,7 @@ export const testScenarios = [
         sameActivityDescription: 'No'
       },
       siteDetails: {
+        siteName: 'Site 1',
         cardName: 'Site 1 details',
         activityDates: '1 January 2025 to 1 January 2025',
         activityDescription: mockExemption.siteDetails[0].activityDescription,

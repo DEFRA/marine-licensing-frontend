@@ -229,23 +229,6 @@ describe('Review Site Details - Polygon Coordinates Integration Tests', () => {
       routes.ENTER_MULTIPLE_COORDINATES
     )
   }
-
-  const validateMultipleSiteDetailsCard = (document, expected) => {
-    const siteCard = document.querySelectorAll('.govuk-summary-card')[0]
-    expect(siteCard).toBeTruthy()
-
-    const cardTitle = siteCard.querySelector('.govuk-summary-card__title')
-    expect(cardTitle.textContent.trim()).toBe('Providing the site location')
-
-    const methodRow = getRowByKey(siteCard, 'Method of providing site location')
-    expect(methodRow.textContent).toContain(expected.multipleSiteDetails.method)
-
-    const multiSiteRow = getRowByKey(siteCard, 'More than one site')
-    expect(multiSiteRow.textContent).toContain(
-      expected.multipleSiteDetails.multipleSiteDetails
-    )
-  }
-
   const validateMultSiteActivityDetailsCard = (document, expected) => {
     const siteCard = document.querySelectorAll('.govuk-summary-card')[1]
     expect(siteCard).toBeTruthy()
@@ -299,6 +282,13 @@ describe('Review Site Details - Polygon Coordinates Integration Tests', () => {
     expect(coordinateSystemRow.textContent).toContain(
       expected.siteDetails.coordinateSystem
     )
+
+    const siteNameRow = getRowByKey(siteCard, 'Site name')
+
+    expected.multipleSiteDetails.multipleSiteDetails === 'Yes'
+      ? expect(siteNameRow.textContent).toContain(expected.siteDetails.siteName)
+      : expect(siteNameRow).toBeFalsy()
+
     const shouldIncludeActivityDates =
       expected.multipleSiteDetails.multipleSiteDetails === 'No' ||
       expected.multipleSiteDetails.sameActivityDates === 'No'

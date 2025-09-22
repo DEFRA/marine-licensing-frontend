@@ -466,6 +466,9 @@ describe('siteDetails utils', () => {
         activityDescription: 'Test activity description',
         method:
           'Manually enter one set of coordinates and a width to create a circular site',
+        showActivityDates: true,
+        showActivityDescription: true,
+        siteName: '',
         coordinateSystem:
           'WGS84 (World Geodetic System 1984)\nLatitude and longitude',
         coordinates: '51.5074, -0.1278',
@@ -507,6 +510,9 @@ describe('siteDetails utils', () => {
         activityDescription: '',
         method:
           'Manually enter one set of coordinates and a width to create a circular site',
+        showActivityDates: false,
+        showActivityDescription: false,
+        siteName: '',
         coordinateSystem:
           'WGS84 (World Geodetic System 1984)\nLatitude and longitude',
         coordinates: '51.5074, -0.1278',
@@ -541,6 +547,9 @@ describe('siteDetails utils', () => {
         activityDescription: 'Test activity description',
         method:
           'Manually enter one set of coordinates and a width to create a circular site',
+        showActivityDates: true,
+        showActivityDescription: true,
+        siteName: '',
         coordinateSystem: 'OSGB36 (National Grid)\nEastings and Northings',
         coordinates: '425053, 564180',
         width: '200 metres'
@@ -1040,6 +1049,9 @@ describe('siteDetails utils', () => {
             activityDescription: 'Test activity description',
             method:
               'Manually enter one set of coordinates and a width to create a circular site',
+            showActivityDates: true,
+            showActivityDescription: true,
+            siteName: '',
             coordinateSystem:
               'WGS84 (World Geodetic System 1984)\nLatitude and longitude',
             coordinates: '51.5074, -0.1278',

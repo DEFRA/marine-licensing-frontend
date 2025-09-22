@@ -217,8 +217,13 @@ export const buildManualCoordinateSummaryData = (
   coordinateSystem,
   multipleSiteDetails = {}
 ) => {
-  const { circleWidth, coordinatesEntry, activityDates, activityDescription } =
-    siteDetails
+  const {
+    circleWidth,
+    coordinatesEntry,
+    activityDates,
+    activityDescription,
+    siteName
+  } = siteDetails
   const { multipleSitesEnabled, sameActivityDates, sameActivityDescription } =
     multipleSiteDetails
 
@@ -238,6 +243,7 @@ export const buildManualCoordinateSummaryData = (
           : '',
       showActivityDates,
       showActivityDescription,
+      siteName: siteName ?? '',
       method: getReviewSummaryText(siteDetails),
       coordinateSystem: getCoordinateSystemText(coordinateSystem),
       polygonCoordinates: getPolygonCoordinatesDisplayData(
@@ -258,6 +264,7 @@ export const buildManualCoordinateSummaryData = (
         : '',
     showActivityDates,
     showActivityDescription,
+    siteName: siteName ?? '',
     method: getReviewSummaryText(siteDetails),
     coordinateSystem: getCoordinateSystemText(coordinateSystem),
     coordinates: getCoordinateDisplayText(siteDetails, coordinateSystem),

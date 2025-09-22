@@ -121,6 +121,18 @@
 
            {% set summaryRows = [] %}
 
+            {% if isMultiSiteJourney %}
+                {% set summaryRows = (summaryRows.push({
+                    key: {
+                        text: "Site name"
+                    },
+                    value: {
+                        text: summaryData.siteName
+                    }
+                }), summaryRows) %}
+            {% endif %}
+
+
             {% if summaryData.showActivityDates %}
                 {% set summaryRows = (summaryRows.push({
                     key: {
@@ -131,7 +143,6 @@
                     }
                 }), summaryRows) %}
             {% endif %}
-
 
             {% if summaryData.showActivityDescription %}
                 {% set summaryRows = (summaryRows.push({

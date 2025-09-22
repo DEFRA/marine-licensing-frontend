@@ -244,7 +244,7 @@ export const testScenarios = [
     }
   },
   {
-    name: 'Multiple sites scenario',
+    name: 'Multiple sites scenario with the same dates and description',
     coordinateSystem: COORDINATE_SYSTEMS.WGS84,
     exemption: {
       ...basePolygonExemption,
@@ -286,6 +286,75 @@ export const testScenarios = [
         multipleSiteDetails: 'Yes',
         sameActivityDates: 'Yes',
         sameActivityDescription: 'Yes'
+      },
+      siteDetails: {
+        cardName: 'Site 1 details',
+        activityDates: '1 January 2025 to 1 January 2025',
+        activityDescription: mockExemption.siteDetails[0].activityDescription,
+        method:
+          'Manually enter multiple sets of coordinates to mark the boundary of the site',
+        coordinateSystem:
+          'WGS84 (World Geodetic System 1984)Latitude and longitude',
+        polygonCoordinates: [
+          {
+            label: 'Start and end points',
+            value: '55.123456, 55.123456'
+          },
+          {
+            label: 'Point 2',
+            value: '33.987654, 33.987654'
+          },
+          {
+            label: 'Point 3',
+            value: '78.123456, 78.123456'
+          }
+        ]
+      }
+    }
+  },
+  {
+    name: 'Multiple sites scenario with variable dates and description',
+    coordinateSystem: COORDINATE_SYSTEMS.WGS84,
+    exemption: {
+      ...basePolygonExemption,
+      multipleSiteDetails: {
+        cardName: 'Site details',
+        multipleSitesEnabled: true,
+        sameActivityDates: 'no',
+        sameActivityDescription: 'no'
+      },
+      siteDetails: [
+        {
+          activityDates: mockExemption.activityDates,
+          activityDescription: mockExemption.activityDescription,
+          coordinatesType: 'coordinates',
+          coordinatesEntry: 'multiple',
+          coordinateSystem: 'wgs84',
+          coordinates: [
+            { latitude: '55.123456', longitude: '55.123456' },
+            { latitude: '33.987654', longitude: '33.987654' },
+            { latitude: '78.123456', longitude: '78.123456' }
+          ]
+        },
+        {
+          coordinatesType: 'coordinates',
+          coordinatesEntry: 'multiple',
+          coordinateSystem: 'wgs84',
+          coordinates: [
+            { latitude: '55.123456', longitude: '55.123456' },
+            { latitude: '33.987654', longitude: '33.987654' },
+            { latitude: '78.123456', longitude: '78.123456' }
+          ]
+        }
+      ]
+    },
+    expectedPageContent: {
+      projectName: 'Hammersmith pontoon construction',
+      multipleSiteDetails: {
+        method: 'Enter the coordinates of the site manually',
+        multipleSiteDetails: 'Yes',
+        sameActivityDates: 'No',
+        sameActivityDescription: 'No'
       },
       siteDetails: {
         cardName: 'Site 1 details',

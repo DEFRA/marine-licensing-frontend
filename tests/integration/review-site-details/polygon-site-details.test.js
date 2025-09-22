@@ -58,18 +58,17 @@ describe('Review Site Details - Polygon Coordinates Integration Tests', () => {
 
       const document = await getPageDocument(exemption)
 
+      const isMultipleSites =
+        exemption.multipleSiteDetails?.multipleSitesEnabled
+
       validatePageStructure(document, expectedPageContent)
       validateMultipleSiteDetailsCard(document, expectedPageContent)
-      validateSiteDetailsCard(
-        document,
-        expectedPageContent,
-        exemption.multipleSiteDetails?.multipleSitesEnabled
-      )
+      validateSiteDetailsCard(document, expectedPageContent, isMultipleSites)
       validatePolygonCoordinates(document, expectedPageContent)
       validateNavigationElements(document)
 
-      if (exemption.multipleSiteDetails?.multipleSitesEnabled) {
-        validateActivityDetailsCard(document, expectedPageContent)
+      if (isMultipleSites) {
+        validateMultSiteActivityDetailsCard(document, expectedPageContent)
         validateMultipleSites(document, expectedPageContent)
       }
     }
@@ -248,7 +247,7 @@ describe('Review Site Details - Polygon Coordinates Integration Tests', () => {
     )
   }
 
-  const validateActivityDetailsCard = (document, expected) => {
+  const validateMultSiteActivityDetailsCard = (document, expected) => {
     const siteCard = document.querySelectorAll('.govuk-summary-card')[1]
     expect(siteCard).toBeTruthy()
 
@@ -264,9 +263,12 @@ describe('Review Site Details - Polygon Coordinates Integration Tests', () => {
     )
 
     const activityDatesRow = getRowByKey(siteCard, 'Activity dates')
-    expect(activityDatesRow.textContent).toContain(
-      expected.siteDetails.activityDates
-    )
+
+    expected.multipleSiteDetails.sameActivityDates === 'Yes'
+      ? expect(activityDatesRow.textContent).toContain(
+          expected.siteDetails.activityDates
+        )
+      : expect(activityDatesRow).toBeFalsy()
 
     const sameActivityDescriptionRow = getRowByKey(
       siteCard,
@@ -277,9 +279,12 @@ describe('Review Site Details - Polygon Coordinates Integration Tests', () => {
     )
 
     const activityDescriptionRow = getRowByKey(siteCard, 'Activity description')
-    expect(activityDescriptionRow.textContent).toContain(
-      expected.siteDetails.activityDescription
-    )
+
+    expected.multipleSiteDetails.sameActivityDescription === 'Yes'
+      ? expect(activityDescriptionRow.textContent).toContain(
+          expected.siteDetails.activityDescription
+        )
+      : expect(activityDescriptionRow).toBeFalsy()
   }
 
   const validateSiteDetailsCard = (document, expected) => {

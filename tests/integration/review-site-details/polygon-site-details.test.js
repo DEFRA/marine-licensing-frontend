@@ -62,8 +62,7 @@ describe('Review Site Details - Polygon Coordinates Integration Tests', () => {
         exemption.multipleSiteDetails?.multipleSitesEnabled
 
       validatePageStructure(document, expectedPageContent)
-      validateMultipleSiteDetailsCard(document, expectedPageContent)
-      validateSiteDetailsCard(document, expectedPageContent, isMultipleSites)
+      validateSiteDetailsCard(document, expectedPageContent)
       validatePolygonCoordinates(document, expectedPageContent)
       validateNavigationElements(document)
 
@@ -266,7 +265,7 @@ describe('Review Site Details - Polygon Coordinates Integration Tests', () => {
 
     expected.multipleSiteDetails.sameActivityDates === 'Yes'
       ? expect(activityDatesRow.textContent).toContain(
-          expected.siteDetails.activityDates
+          expected.multipleSiteDetails.activityDates
         )
       : expect(activityDatesRow).toBeFalsy()
 
@@ -282,7 +281,7 @@ describe('Review Site Details - Polygon Coordinates Integration Tests', () => {
 
     expected.multipleSiteDetails.sameActivityDescription === 'Yes'
       ? expect(activityDescriptionRow.textContent).toContain(
-          expected.siteDetails.activityDescription
+          expected.multipleSiteDetails.activityDescription
         )
       : expect(activityDescriptionRow).toBeFalsy()
   }
@@ -300,6 +299,29 @@ describe('Review Site Details - Polygon Coordinates Integration Tests', () => {
     expect(coordinateSystemRow.textContent).toContain(
       expected.siteDetails.coordinateSystem
     )
+    const shouldIncludeActivityDates =
+      expected.multipleSiteDetails.multipleSiteDetails === 'No' ||
+      expected.multipleSiteDetails.sameActivityDates === 'No'
+
+    const activityDatesRow = getRowByKey(siteCard, 'Activity dates')
+
+    shouldIncludeActivityDates
+      ? expect(activityDatesRow.textContent).toContain(
+          expected.siteDetails.activityDates
+        )
+      : expect(activityDatesRow).toBeFalsy()
+
+    const shouldIncludeActivityDescription =
+      expected.multipleSiteDetails.multipleSiteDetails === 'No' ||
+      expected.multipleSiteDetails.sameActivityDescription === 'No'
+
+    const activityDescriptionRow = getRowByKey(siteCard, 'Activity description')
+
+    shouldIncludeActivityDescription
+      ? expect(activityDescriptionRow.textContent).toContain(
+          expected.siteDetails.activityDescription
+        )
+      : expect(activityDescriptionRow).toBeFalsy()
   }
 
   const validatePolygonCoordinates = (document, expected) => {

@@ -386,6 +386,8 @@ describe('#reviewSiteDetails', () => {
           backLink: routes.TASK_LIST,
           projectName: undefined,
           summaryData: {
+            activityDates: '',
+            activityDescription: '',
             method: '',
             coordinateSystem: '',
             coordinates: '',
@@ -512,6 +514,8 @@ describe('#reviewSiteDetails', () => {
           backLink: routes.TASK_LIST,
           projectName: 'Test Project',
           summaryData: {
+            activityDates: '1 January 2025 to 1 January 2025',
+            activityDescription: 'Test activity description',
             method:
               'Manually enter one set of coordinates and a width to create a circular site',
             coordinateSystem:
@@ -554,6 +558,8 @@ describe('#reviewSiteDetails', () => {
           backLink: routes.TASK_LIST,
           projectName: 'Test Project',
           summaryData: {
+            activityDates: '1 January 2025 to 1 January 2025',
+            activityDescription: 'Test activity description',
             method:
               'Manually enter one set of coordinates and a width to create a circular site',
             coordinateSystem: 'OSGB36 (National Grid)\nEastings and Northings',
@@ -612,6 +618,14 @@ describe('#reviewSiteDetails', () => {
         // Summary list data
         const summaryData = [
           {
+            key: 'Activity dates',
+            value: '1 January 2025 to 1 January 2025'
+          },
+          {
+            key: 'Activity description',
+            value: 'Test activity description'
+          },
+          {
             key: 'Method of providing site location',
             value:
               'Manually enter one set of coordinates and a width to create a circular site'
@@ -669,6 +683,8 @@ describe('#reviewSiteDetails', () => {
             backLink: routes.ENTER_MULTIPLE_COORDINATES,
             projectName: 'Test Project',
             summaryData: {
+              activityDates: '1 January 2025 to 1 January 2025',
+              activityDescription: 'Test activity description',
               method:
                 'Manually enter multiple sets of coordinates to mark the boundary of the site',
               coordinateSystem:
@@ -728,6 +744,8 @@ describe('#reviewSiteDetails', () => {
             backLink: routes.ENTER_MULTIPLE_COORDINATES,
             projectName: 'Test Project',
             summaryData: {
+              activityDates: '1 January 2025 to 1 January 2025',
+              activityDescription: 'Test activity description',
               method:
                 'Manually enter multiple sets of coordinates to mark the boundary of the site',
               coordinateSystem:
@@ -797,6 +815,8 @@ describe('#reviewSiteDetails', () => {
             backLink: routes.ENTER_MULTIPLE_COORDINATES,
             projectName: 'Test Project',
             summaryData: {
+              activityDates: '1 January 2025 to 1 January 2025',
+              activityDescription: 'Test activity description',
               method:
                 'Manually enter multiple sets of coordinates to mark the boundary of the site',
               coordinateSystem:
@@ -859,6 +879,8 @@ describe('#reviewSiteDetails', () => {
             backLink: routes.ENTER_MULTIPLE_COORDINATES,
             projectName: 'Test Project',
             summaryData: {
+              activityDates: '1 January 2025 to 1 January 2025',
+              activityDescription: 'Test activity description',
               method:
                 'Manually enter multiple sets of coordinates to mark the boundary of the site',
               coordinateSystem:
@@ -1410,15 +1432,23 @@ describe('#reviewSiteDetails', () => {
           const siteDetails = {
             coordinatesEntry: 'multiple',
             coordinatesType: 'coordinates',
-            coordinates: mockPolygonCoordinatesWGS84
+            coordinates: mockPolygonCoordinatesWGS84,
+            activityDates: {
+              start: '2025-01-01T00:00:00.000Z',
+              end: '2025-01-01T00:00:00.000Z'
+            },
+            activityDescription: 'Test activity description'
           }
 
           const result = buildManualCoordinateSummaryData(
             siteDetails,
-            COORDINATE_SYSTEMS.WGS84
+            COORDINATE_SYSTEMS.WGS84,
+            { multipleSitesEnabled: false }
           )
 
           expect(result).toEqual({
+            activityDates: '1 January 2025 to 1 January 2025',
+            activityDescription: 'Test activity description',
             method:
               'Manually enter multiple sets of coordinates to mark the boundary of the site',
             coordinateSystem:
@@ -1436,15 +1466,23 @@ describe('#reviewSiteDetails', () => {
             coordinatesEntry: 'single',
             coordinatesType: 'coordinates',
             coordinates: { latitude: '50.123456', longitude: '-0.123456' },
-            circleWidth: '200'
+            circleWidth: '200',
+            activityDates: {
+              start: '2025-01-01T00:00:00.000Z',
+              end: '2025-01-01T00:00:00.000Z'
+            },
+            activityDescription: 'Test activity description'
           }
 
           const result = buildManualCoordinateSummaryData(
             siteDetails,
-            COORDINATE_SYSTEMS.WGS84
+            COORDINATE_SYSTEMS.WGS84,
+            { multipleSitesEnabled: false }
           )
 
           expect(result).toEqual({
+            activityDates: '1 January 2025 to 1 January 2025',
+            activityDescription: 'Test activity description',
             method:
               'Manually enter one set of coordinates and a width to create a circular site',
             coordinateSystem:

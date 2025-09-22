@@ -199,6 +199,13 @@ export const getFileUploadBackLink = (previousPage) => {
 const metresLabel = (metres) =>
   metres === '1' ? `${metres} metre` : `${metres} metres`
 
+const getActivityDatesSummaryText = (activityDates) => {
+  if (activityDates?.start && activityDates?.end) {
+    return `${formatDate(activityDates.start)} to ${formatDate(activityDates.end)}`
+  }
+  return ''
+}
+
 /**
  * Builds summary data for manual coordinate entry display
  * @param {object} siteDetails - Site details from exemption
@@ -207,12 +214,30 @@ const metresLabel = (metres) =>
  */
 export const buildManualCoordinateSummaryData = (
   siteDetails,
-  coordinateSystem
+  coordinateSystem,
+  multipleSiteDetails = {}
 ) => {
-  const { circleWidth, coordinatesEntry } = siteDetails
+  const { circleWidth, coordinatesEntry, activityDates, activityDescription } =
+    siteDetails
+  const { multipleSitesEnabled, sameActivityDates, sameActivityDescription } =
+    multipleSiteDetails
+
+  const showActivityDates = !multipleSitesEnabled || sameActivityDates === 'no'
+
+  const showActivityDescription =
+    !multipleSitesEnabled || sameActivityDescription === 'no'
 
   if (coordinatesEntry === 'multiple') {
     return {
+      activityDates: showActivityDates
+        ? getActivityDatesSummaryText(activityDates)
+        : '',
+      activityDescription:
+        activityDescription && !!showActivityDescription
+          ? activityDescription
+          : '',
+      showActivityDates,
+      showActivityDescription,
       method: getReviewSummaryText(siteDetails),
       coordinateSystem: getCoordinateSystemText(coordinateSystem),
       polygonCoordinates: getPolygonCoordinatesDisplayData(
@@ -224,6 +249,15 @@ export const buildManualCoordinateSummaryData = (
 
   // Default to circular site display
   return {
+    activityDates: showActivityDates
+      ? getActivityDatesSummaryText(activityDates)
+      : '',
+    activityDescription:
+      activityDescription && !!showActivityDescription
+        ? activityDescription
+        : '',
+    showActivityDates,
+    showActivityDescription,
     method: getReviewSummaryText(siteDetails),
     coordinateSystem: getCoordinateSystemText(coordinateSystem),
     coordinates: getCoordinateDisplayText(siteDetails, coordinateSystem),
@@ -438,7 +472,8 @@ export const renderManualCoordinateReview = (h, request, options) => {
   const { coordinateSystem } = getCoordinateSystem(request)
   const summaryData = buildManualCoordinateSummaryData(
     siteDetails,
-    coordinateSystem
+    coordinateSystem,
+    multipleSiteDetails
   )
 
   const multipleSiteDetailsData = buildManualCoordinateMultipleSitesSummaryData(

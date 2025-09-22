@@ -2,9 +2,7 @@ import { COORDINATE_SYSTEMS } from '~/src/server/common/constants/exemptions.js'
 import { mockExemption } from '~/src/server/test-helpers/mocks.js'
 
 const basePolygonExemption = {
-  multipleSiteDetails: {
-    cardName: 'Site details'
-  },
+  multipleSiteDetails: { multipleSiteDetails: false, sameActivityDates: 'no' },
   id: 'test-polygon-exemption-123',
   projectName: 'Hammersmith pontoon construction',
   activityDates: {
@@ -39,6 +37,11 @@ export const testScenarios = [
       ...basePolygonExemption,
       siteDetails: [
         {
+          activityDates: {
+            start: '2025-01-01T00:00:00.000Z',
+            end: '2025-01-01T00:00:00.000Z'
+          },
+          activityDescription: 'Test activity description',
           coordinatesType: 'coordinates',
           coordinatesEntry: 'multiple',
           coordinateSystem: 'wgs84',
@@ -57,6 +60,8 @@ export const testScenarios = [
         multipleSiteDetails: 'No'
       },
       siteDetails: {
+        activityDates: '1 January 2025 to 1 January 2025',
+        activityDescription: mockExemption.siteDetails[0].activityDescription,
         cardName: 'Site details',
         method:
           'Manually enter multiple sets of coordinates to mark the boundary of the site',
@@ -86,6 +91,11 @@ export const testScenarios = [
       ...basePolygonExemption,
       siteDetails: [
         {
+          activityDates: {
+            start: '2025-01-01T00:00:00.000Z',
+            end: '2025-01-01T00:00:00.000Z'
+          },
+          activityDescription: 'Test activity description',
           coordinatesType: 'coordinates',
           coordinatesEntry: 'multiple',
           coordinateSystem: 'osgb36',
@@ -104,6 +114,8 @@ export const testScenarios = [
         multipleSiteDetails: 'No'
       },
       siteDetails: {
+        activityDates: '1 January 2025 to 1 January 2025',
+        activityDescription: mockExemption.siteDetails[0].activityDescription,
         cardName: 'Site details',
         method:
           'Manually enter multiple sets of coordinates to mark the boundary of the site',
@@ -132,6 +144,11 @@ export const testScenarios = [
       ...basePolygonExemption,
       siteDetails: [
         {
+          activityDates: {
+            start: '2025-01-01T00:00:00.000Z',
+            end: '2025-01-01T00:00:00.000Z'
+          },
+          activityDescription: 'Test activity description',
           coordinatesType: 'coordinates',
           coordinatesEntry: 'multiple',
           coordinateSystem: 'wgs84',
@@ -152,6 +169,8 @@ export const testScenarios = [
         multipleSiteDetails: 'No'
       },
       siteDetails: {
+        activityDates: '1 January 2025 to 1 January 2025',
+        activityDescription: mockExemption.siteDetails[0].activityDescription,
         cardName: 'Site details',
         method:
           'Manually enter multiple sets of coordinates to mark the boundary of the site',
@@ -189,6 +208,11 @@ export const testScenarios = [
       ...basePolygonExemption,
       siteDetails: [
         {
+          activityDates: {
+            start: '2025-01-01T00:00:00.000Z',
+            end: '2025-01-01T00:00:00.000Z'
+          },
+          activityDescription: 'Test activity description',
           coordinatesType: 'coordinates',
           coordinatesEntry: 'multiple',
           coordinateSystem: 'osgb36',
@@ -210,6 +234,8 @@ export const testScenarios = [
         multipleSiteDetails: 'No'
       },
       siteDetails: {
+        activityDates: '1 January 2025 to 1 January 2025',
+        activityDescription: mockExemption.siteDetails[0].activityDescription,
         cardName: 'Site details',
         method:
           'Manually enter multiple sets of coordinates to mark the boundary of the site',
@@ -285,12 +311,12 @@ export const testScenarios = [
         method: 'Enter the coordinates of the site manually',
         multipleSiteDetails: 'Yes',
         sameActivityDates: 'Yes',
-        sameActivityDescription: 'Yes'
+        sameActivityDescription: 'Yes',
+        activityDates: '1 January 2025 to 1 January 2025',
+        activityDescription: mockExemption.siteDetails[0].activityDescription
       },
       siteDetails: {
         cardName: 'Site 1 details',
-        activityDates: '1 January 2025 to 1 January 2025',
-        activityDescription: mockExemption.siteDetails[0].activityDescription,
         method:
           'Manually enter multiple sets of coordinates to mark the boundary of the site',
         coordinateSystem:
@@ -337,6 +363,8 @@ export const testScenarios = [
           ]
         },
         {
+          activityDates: mockExemption.activityDates,
+          activityDescription: mockExemption.activityDescription,
           coordinatesType: 'coordinates',
           coordinatesEntry: 'multiple',
           coordinateSystem: 'wgs84',

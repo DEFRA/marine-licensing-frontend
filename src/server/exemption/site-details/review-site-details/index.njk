@@ -119,24 +119,47 @@
 
             {% endif %}
 
-            {% set summaryRows = [
-                {
+           {% set summaryRows = [] %}
+
+            {% if summaryData.showActivityDates %}
+                {% set summaryRows = (summaryRows.push({
                     key: {
-                        text: "Method of providing site location"
+                        text: "Activity dates"
                     },
                     value: {
-                        text: summaryData.method
+                        text: summaryData.activityDates
                     }
+                }), summaryRows) %}
+            {% endif %}
+
+
+            {% if summaryData.showActivityDescription %}
+                {% set summaryRows = (summaryRows.push({
+                    key: {
+                        text: "Activity description"
+                    },
+                    value: {
+                        text: summaryData.activityDescription
+                    }
+                }), summaryRows) %}
+            {% endif %}
+
+           {% set summaryRows = (summaryRows.push({
+                key: {
+                    text: "Method of providing site location"
                 },
-                {
-                    key: {
-                        text: "Coordinate system"
-                    },
-                    value: {
-                        html: summaryData.coordinateSystem | replace('\n', '<br>')
-                    }
+                value: {
+                    text: summaryData.method
                 }
-            ] %}
+            },{
+                key: {
+                    text: "Coordinate system"
+                },
+                value: {
+                    html: summaryData.coordinateSystem | replace('\n', '<br>')
+                }
+            }), summaryRows) %}
+
             {% if summaryData.polygonCoordinates %}
                 {# Polygon site - multiple coordinates #}
                 {% for coordinate in summaryData.polygonCoordinates %}

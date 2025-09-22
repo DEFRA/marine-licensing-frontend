@@ -210,6 +210,17 @@ const getActivityDatesSummaryText = (activityDates, showActivityDates) => {
   return ''
 }
 
+const getActivityDescriptionSummaryText = (
+  activityDescription,
+  showActivityDescription
+) => {
+  if (!showActivityDescription) {
+    return ''
+  }
+
+  return activityDescription ?? ''
+}
+
 /**
  * Builds summary data for manual coordinate entry display
  * @param {object} siteDetails - Site details from exemption
@@ -242,10 +253,10 @@ export const buildManualCoordinateSummaryData = (
         activityDates,
         showActivityDates
       ),
-      activityDescription:
-        activityDescription && !!showActivityDescription
-          ? activityDescription
-          : '',
+      activityDescription: getActivityDescriptionSummaryText(
+        activityDescription,
+        showActivityDescription
+      ),
       showActivityDates,
       showActivityDescription,
       siteName: siteName ?? '',
@@ -264,10 +275,10 @@ export const buildManualCoordinateSummaryData = (
       activityDates,
       showActivityDates
     ),
-    activityDescription:
-      activityDescription && !!showActivityDescription
-        ? activityDescription
-        : '',
+    activityDescription: getActivityDescriptionSummaryText(
+      activityDescription,
+      showActivityDescription
+    ),
     showActivityDates,
     showActivityDescription,
     siteName: siteName ?? '',

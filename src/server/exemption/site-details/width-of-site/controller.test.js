@@ -204,6 +204,22 @@ describe('#widthOfSite', () => {
       expect(h.redirect).toHaveBeenCalledWith(routes.REVIEW_SITE_DETAILS)
     })
 
+    test('Should trim spaces from the width string', async () => {
+      const h = {
+        redirect: jest.fn()
+      }
+
+      const mockRequest = { payload: { width: ' 50 ' }, site: mockSite }
+      await widthOfSiteSubmitController.handler(mockRequest, h)
+
+      expect(cacheUtils.updateExemptionSiteDetails).toHaveBeenCalledWith(
+        mockRequest,
+        0,
+        'circleWidth',
+        '50'
+      )
+    })
+
     test('Should correctly set the cache when submitting', async () => {
       const h = {
         redirect: jest.fn().mockReturnValue({

@@ -93,7 +93,7 @@ describe('Review Site Details - Polygon Coordinates Integration Tests', () => {
 
       const methodRow = getRowByKey(
         summaryCard,
-        'Method of providing site location'
+        'Single or multiple sets of coordinates'
       )
       expect(methodRow).toBeTruthy()
       expect(methodRow.textContent).toContain(
@@ -275,7 +275,10 @@ describe('Review Site Details - Polygon Coordinates Integration Tests', () => {
     const cardTitle = siteCard.querySelector('.govuk-summary-card__title')
     expect(cardTitle.textContent.trim()).toBe(expected.siteDetails.cardName)
 
-    const methodRow = getRowByKey(siteCard, 'Method of providing site location')
+    const methodRow = getRowByKey(
+      siteCard,
+      'Single or multiple sets of coordinates'
+    )
     expect(methodRow.textContent).toContain(expected.siteDetails.method)
 
     const coordinateSystemRow = getRowByKey(siteCard, 'Coordinate system')

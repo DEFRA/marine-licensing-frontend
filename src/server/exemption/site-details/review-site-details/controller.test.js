@@ -635,7 +635,7 @@ describe('#reviewSiteDetails', () => {
             value: 'Test activity description'
           },
           {
-            key: 'Method of providing site location',
+            key: 'Single or multiple sets of coordinates',
             value:
               'Manually enter one set of coordinates and a width to create a circular site'
           },

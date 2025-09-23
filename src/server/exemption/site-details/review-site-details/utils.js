@@ -290,9 +290,9 @@ export const buildManualCoordinateSummaryData = (
 }
 
 /**
- * Builds summary data for displayign multiple site information
+ * Builds summary data for displaying multiple site information
  * @param {object} multipleSiteDetails - Multiple site details from exemption
- * @param {object} siteDetails - Site details from exemption
+ * @param {Array} siteDetails - Site details from exemption
  * @returns {object} Summary data for template
  */
 export const buildManualCoordinateMultipleSitesSummaryData = (
@@ -315,8 +315,12 @@ export const buildManualCoordinateMultipleSitesSummaryData = (
 
   const firstSite = siteDetails[0]
 
+  if (!firstSite) {
+    return {}
+  }
+
   if (sameActivityDates === 'yes') {
-    multipleSiteData.activityDates = `${formatDate(firstSite.activityDates.start)} to ${formatDate(firstSite.activityDates.end)}`
+    multipleSiteData.activityDates = `${formatDate(firstSite.activityDates?.start)} to ${formatDate(firstSite.activityDates?.end)}`
   }
 
   if (sameActivityDescription === 'yes') {

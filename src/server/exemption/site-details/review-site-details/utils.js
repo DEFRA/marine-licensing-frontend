@@ -521,7 +521,8 @@ export const renderManualCoordinateReview = (h, request, options) => {
     summaryData,
     siteDetailsData,
     multipleSiteDetailsData,
-    isMultiSiteJourney: !!multipleSiteDetails?.multipleSitesEnabled
+    isMultiSiteJourney: !!multipleSiteDetails?.multipleSitesEnabled,
+    siteNumber: 1
   })
 }
 

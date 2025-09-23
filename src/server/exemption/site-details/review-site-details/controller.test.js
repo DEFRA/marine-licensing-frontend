@@ -385,6 +385,7 @@ describe('#reviewSiteDetails', () => {
           pageTitle: 'Review site details',
           backLink: routes.TASK_LIST,
           projectName: undefined,
+          siteNumber: 1,
           summaryData: {
             activityDates: '',
             activityDescription: '',
@@ -516,6 +517,7 @@ describe('#reviewSiteDetails', () => {
           pageTitle: 'Review site details',
           backLink: routes.TASK_LIST,
           projectName: 'Test Project',
+          siteNumber: 1,
           summaryData: {
             activityDates: '1 January 2025 to 1 January 2025',
             activityDescription: 'Test activity description',
@@ -563,6 +565,7 @@ describe('#reviewSiteDetails', () => {
           pageTitle: 'Review site details',
           backLink: routes.TASK_LIST,
           projectName: 'Test Project',
+          siteNumber: 1,
           summaryData: {
             activityDates: '1 January 2025 to 1 January 2025',
             activityDescription: 'Test activity description',
@@ -691,6 +694,7 @@ describe('#reviewSiteDetails', () => {
             pageTitle: 'Review site details',
             backLink: routes.ENTER_MULTIPLE_COORDINATES,
             projectName: 'Test Project',
+            siteNumber: 1,
             summaryData: {
               activityDates: '1 January 2025 to 1 January 2025',
               activityDescription: 'Test activity description',
@@ -755,6 +759,7 @@ describe('#reviewSiteDetails', () => {
             pageTitle: 'Review site details',
             backLink: routes.ENTER_MULTIPLE_COORDINATES,
             projectName: 'Test Project',
+            siteNumber: 1,
             summaryData: {
               activityDates: '1 January 2025 to 1 January 2025',
               activityDescription: 'Test activity description',
@@ -829,6 +834,7 @@ describe('#reviewSiteDetails', () => {
             pageTitle: 'Review site details',
             backLink: routes.ENTER_MULTIPLE_COORDINATES,
             projectName: 'Test Project',
+            siteNumber: 1,
             summaryData: {
               activityDates: '1 January 2025 to 1 January 2025',
               activityDescription: 'Test activity description',
@@ -896,6 +902,7 @@ describe('#reviewSiteDetails', () => {
             pageTitle: 'Review site details',
             backLink: routes.ENTER_MULTIPLE_COORDINATES,
             projectName: 'Test Project',
+            siteNumber: 1,
             summaryData: {
               activityDates: '1 January 2025 to 1 January 2025',
               activityDescription: 'Test activity description',

@@ -1045,6 +1045,7 @@ describe('siteDetails utils', () => {
           backLink: routes.WIDTH_OF_SITE,
           isMultiSiteJourney: false,
           projectName: 'Test Project',
+          siteNumber: 1,
           summaryData: {
             activityDates: '1 January 2025 to 1 January 2025',
             activityDescription: 'Test activity description',

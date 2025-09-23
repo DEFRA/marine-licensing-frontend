@@ -12,26 +12,15 @@ import {
 
 jest.mock('~/src/server/common/helpers/session-cache/utils.js')
 jest.mock('~/src/server/common/helpers/authenticated-requests.js')
-
-export const createTestServer = () => {
-  let server
-
-  const setup = async () => {
-    server = await createServer()
-    await server.initialize()
-    return server
-  }
-
-  const teardown = async () => {
-    if (server) {
-      await server.stop()
-    }
-  }
-
-  const getServer = () => server
-
-  return { setup, teardown, getServer }
-}
+jest.mock('~/src/server/common/plugins/auth/get-oidc-config.js', () => ({
+  ...jest.requireActual('~/src/server/common/plugins/auth/get-oidc-config'),
+  getOidcConfig: jest.fn().mockResolvedValue({
+    issuer: 'http://localhost:3200/cdp-defra-id-stub',
+    authorization_endpoint: 'http://localhost:3200/cdp-defra-id-stub/authorize',
+    token_endpoint: 'http://localhost:3200/cdp-defra-id-stub/token',
+    jwks_uri: 'http://localhost:3200/cdp-defra-id-stub/.well-known/jwks.json'
+  })
+}))
 
 export const responseToDocument = (response) => {
   return new JSDOM(response.result).window.document
@@ -50,7 +39,7 @@ export const setupTestServer = () => {
   })
 
   afterAll(async () => {
-    await server.stop()
+    await server?.stop()
   })
 
   return () => server

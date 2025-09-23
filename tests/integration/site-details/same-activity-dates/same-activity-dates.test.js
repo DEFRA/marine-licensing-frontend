@@ -1,17 +1,20 @@
 import { JSDOM } from 'jsdom'
 import { getByLabelText, getByRole, getByText } from '@testing-library/dom'
-import { createServer } from '~/src/server/index.js'
 import { statusCodes } from '~/src/server/common/constants/status-codes.js'
 import {
   getExemptionCache,
   updateExemptionMultipleSiteDetails
 } from '~/src/server/common/helpers/session-cache/utils.js'
 
+import {
+  makeGetRequest,
+  makePostRequest
+} from '~/src/server/test-helpers/server-requests.js'
+import { setupTestServer } from '~/tests/integration/shared/test-setup-helpers.js'
+
 jest.mock('~/src/server/common/helpers/session-cache/utils.js')
 
 describe('Same activity dates page', () => {
-  let server
-
   const mockExemption = {
     id: 'test-exemption-123',
     projectName: 'Test Project',
@@ -23,18 +26,11 @@ describe('Same activity dates page', () => {
   jest.mocked(getExemptionCache).mockReturnValue(mockExemption)
   jest.mocked(updateExemptionMultipleSiteDetails).mockReturnValue({})
 
-  beforeAll(async () => {
-    server = await createServer()
-    await server.initialize()
-  })
-
-  afterAll(async () => {
-    await server.stop()
-  })
+  const getServer = setupTestServer()
 
   test('should display the same activity dates page with correct content', async () => {
-    const { result, statusCode } = await server.inject({
-      method: 'GET',
+    const { result, statusCode } = await makeGetRequest({
+      server: getServer(),
       url: '/exemption/same-activity-dates'
     })
 
@@ -91,8 +87,8 @@ describe('Same activity dates page', () => {
       }
     })
 
-    const { result, statusCode } = await server.inject({
-      method: 'GET',
+    const { result, statusCode } = await makeGetRequest({
+      server: getServer(),
       url: '/exemption/same-activity-dates'
     })
 
@@ -114,8 +110,8 @@ describe('Same activity dates page', () => {
   })
 
   test('should have correct navigation links', async () => {
-    const { result } = await server.inject({
-      method: 'GET',
+    const { result } = await makeGetRequest({
+      server: getServer(),
       url: '/exemption/same-activity-dates'
     })
 
@@ -135,10 +131,9 @@ describe('Same activity dates page', () => {
   })
 
   test('should stay on same page when continue is clicked without selecting an option', async () => {
-    const { result, statusCode } = await server.inject({
-      method: 'POST',
+    const { result, statusCode } = await makePostRequest({
       url: '/exemption/same-activity-dates',
-      payload: {}
+      server: getServer()
     })
 
     expect(statusCode).toBe(statusCodes.ok)
@@ -160,10 +155,10 @@ describe('Same activity dates page', () => {
   })
 
   test('should redirect to coordinates entry choice when "yes" is selected', async () => {
-    const response = await server.inject({
-      method: 'POST',
+    const response = await makePostRequest({
       url: '/exemption/same-activity-dates',
-      payload: {
+      server: getServer(),
+      formData: {
         sameActivityDates: 'yes'
       }
     })
@@ -181,10 +176,10 @@ describe('Same activity dates page', () => {
   })
 
   test('should redirect to coordinates entry choice when "no" is selected', async () => {
-    const response = await server.inject({
-      method: 'POST',
+    const response = await makePostRequest({
       url: '/exemption/same-activity-dates',
-      payload: {
+      server: getServer(),
+      formData: {
         sameActivityDates: 'no'
       }
     })
@@ -202,8 +197,8 @@ describe('Same activity dates page', () => {
   })
 
   test('should redirect to task list when cancel is clicked', async () => {
-    const { result, statusCode } = await server.inject({
-      method: 'GET',
+    const { result, statusCode } = await makeGetRequest({
+      server: getServer(),
       url: '/exemption/same-activity-dates'
     })
 

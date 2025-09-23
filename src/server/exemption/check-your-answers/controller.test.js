@@ -1,11 +1,20 @@
-import * as cacheUtils from '~/src/server/common/helpers/session-cache/utils.js'
-import { createServer } from '~/src/server/index.js'
+import {
+  getExemptionCache,
+  clearExemptionCache
+} from '~/src/server/common/helpers/session-cache/utils.js'
+import { setupTestServer } from '~/tests/integration/shared/test-setup-helpers.js'
 import { mockExemption } from '~/src/server/test-helpers/mocks.js'
+import {
+  makeGetRequest,
+  makePostRequest
+} from '~/src/server/test-helpers/server-requests.js'
 import * as authRequests from '~/src/server/common/helpers/authenticated-requests.js'
 import * as authUtils from '~/src/server/common/plugins/auth/utils.js'
 import * as exemptionSiteDetailsHelpers from '~/src/server/common/helpers/exemption-site-details.js'
 import { createSubmittedExemption } from '~/tests/integration/view-details/test-utilities.js'
 import * as exemptionServiceModule from '~/src/services/exemption-service/index.js'
+
+jest.mock('~/src/server/common/helpers/session-cache/utils.js')
 
 const mockUserSession = {
   displayName: 'John Doe',
@@ -14,33 +23,18 @@ const mockUserSession = {
 }
 
 describe('check your answers controller', () => {
-  let server
-  let getExemptionCacheSpy
-  let clearExemptionCacheSpy
-
-  beforeAll(async () => {
-    server = await createServer()
-    await server.initialize()
-  })
+  const getServer = setupTestServer()
 
   beforeEach(() => {
     jest.spyOn(authUtils, 'getUserSession').mockResolvedValue(mockUserSession)
 
-    getExemptionCacheSpy = jest
-      .spyOn(cacheUtils, 'getExemptionCache')
-      .mockReturnValue(mockExemption)
+    jest.mocked(getExemptionCache).mockReturnValue(mockExemption)
 
-    clearExemptionCacheSpy = jest
-      .spyOn(cacheUtils, 'clearExemptionCache')
-      .mockImplementation(() => ({}))
+    jest.mocked(clearExemptionCache).mockImplementation(() => ({}))
 
     jest.spyOn(exemptionServiceModule, 'getExemptionService').mockReturnValue({
       getExemptionById: jest.fn().mockResolvedValue(createSubmittedExemption())
     })
-  })
-
-  afterAll(async () => {
-    await server.stop({ timeout: 0 })
   })
 
   describe('POST /exemption/check-your-answers', () => {
@@ -57,9 +51,9 @@ describe('check your answers controller', () => {
     })
 
     test('Should submit exemption and redirect to confirmation page after clearing exemption cache', async () => {
-      const { statusCode, headers } = await server.inject({
-        method: 'POST',
-        url: '/exemption/check-your-answers'
+      const { statusCode, headers } = await makePostRequest({
+        url: '/exemption/check-your-answers',
+        server: getServer()
       })
 
       expect(statusCode).toBe(302)
@@ -75,14 +69,14 @@ describe('check your answers controller', () => {
           userEmail: mockUserSession.email
         }
       )
-      expect(clearExemptionCacheSpy).toHaveBeenCalledWith(expect.any(Object))
+      expect(clearExemptionCache).toHaveBeenCalledWith(expect.any(Object))
     })
 
     test('Should handle missing exemption data on POST', async () => {
-      getExemptionCacheSpy.mockReturnValueOnce({ id: 'test-id' })
-      const { statusCode } = await server.inject({
-        method: 'POST',
-        url: '/exemption/check-your-answers'
+      getExemptionCache.mockReturnValueOnce({ id: 'test-id' })
+      const { statusCode } = await makePostRequest({
+        url: '/exemption/check-your-answers',
+        server: getServer()
       })
       expect(statusCode).toBe(302)
     })
@@ -92,13 +86,13 @@ describe('check your answers controller', () => {
         .spyOn(authRequests, 'authenticatedPostRequest')
         .mockRejectedValue(new Error('API Error'))
 
-      const { statusCode } = await server.inject({
-        method: 'POST',
-        url: '/exemption/check-your-answers'
+      const { statusCode } = await makePostRequest({
+        url: '/exemption/check-your-answers',
+        server: getServer()
       })
 
       expect(statusCode).toBe(400)
-      expect(clearExemptionCacheSpy).not.toHaveBeenCalled()
+      expect(clearExemptionCache).not.toHaveBeenCalled()
     })
 
     test('Should handle unexpected API response format', async () => {
@@ -106,13 +100,13 @@ describe('check your answers controller', () => {
         payload: { message: 'error', error: 'Something went wrong' }
       })
 
-      const { statusCode } = await server.inject({
-        method: 'POST',
-        url: '/exemption/check-your-answers'
+      const { statusCode } = await makePostRequest({
+        url: '/exemption/check-your-answers',
+        server: getServer()
       })
 
       expect(statusCode).toBe(400)
-      expect(clearExemptionCacheSpy).not.toHaveBeenCalled()
+      expect(clearExemptionCache).not.toHaveBeenCalled()
     })
 
     test('Should handle API response with missing value', async () => {
@@ -120,13 +114,13 @@ describe('check your answers controller', () => {
         payload: { message: 'success', value: null }
       })
 
-      const { statusCode } = await server.inject({
-        method: 'POST',
-        url: '/exemption/check-your-answers'
+      const { statusCode } = await makePostRequest({
+        url: '/exemption/check-your-answers',
+        server: getServer()
       })
 
       expect(statusCode).toBe(400)
-      expect(clearExemptionCacheSpy).not.toHaveBeenCalled()
+      expect(clearExemptionCache).not.toHaveBeenCalled()
     })
 
     test('Should redirect even with missing applicationReference when value exists', async () => {
@@ -134,16 +128,16 @@ describe('check your answers controller', () => {
         payload: { message: 'success', value: {} }
       })
 
-      const { statusCode, headers } = await server.inject({
-        method: 'POST',
-        url: '/exemption/check-your-answers'
+      const { statusCode, headers } = await makePostRequest({
+        url: '/exemption/check-your-answers',
+        server: getServer()
       })
 
       expect(statusCode).toBe(302)
       expect(headers.location).toBe(
         '/exemption/confirmation?applicationReference=undefined'
       )
-      expect(clearExemptionCacheSpy).toHaveBeenCalledWith(expect.any(Object))
+      expect(clearExemptionCache).toHaveBeenCalledWith(expect.any(Object))
     })
 
     test('Should handle API response with wrong message type', async () => {
@@ -154,9 +148,9 @@ describe('check your answers controller', () => {
         }
       })
 
-      const { statusCode } = await server.inject({
-        method: 'POST',
-        url: '/exemption/check-your-answers'
+      const { statusCode } = await makePostRequest({
+        url: '/exemption/check-your-answers',
+        server: getServer()
       })
 
       expect(statusCode).toBe(400)
@@ -165,9 +159,9 @@ describe('check your answers controller', () => {
     test('Should error if user session is missing', async () => {
       jest.spyOn(authUtils, 'getUserSession').mockResolvedValue(null)
 
-      const { statusCode } = await server.inject({
-        method: 'POST',
-        url: '/exemption/check-your-answers'
+      const { statusCode } = await makePostRequest({
+        url: '/exemption/check-your-answers',
+        server: getServer()
       })
 
       expect(statusCode).toBe(400)
@@ -179,9 +173,9 @@ describe('check your answers controller', () => {
         email: 'test@example.com'
       })
 
-      const { statusCode } = await server.inject({
-        method: 'POST',
-        url: '/exemption/check-your-answers'
+      const { statusCode } = await makePostRequest({
+        url: '/exemption/check-your-answers',
+        server: getServer()
       })
 
       expect(statusCode).toBe(400)
@@ -193,9 +187,9 @@ describe('check your answers controller', () => {
         email: null
       })
 
-      const { statusCode } = await server.inject({
-        method: 'POST',
-        url: '/exemption/check-your-answers'
+      const { statusCode } = await makePostRequest({
+        url: '/exemption/check-your-answers',
+        server: getServer()
       })
 
       expect(statusCode).toBe(400)
@@ -207,9 +201,9 @@ describe('check your answers controller', () => {
         email: 'test@example.com'
       })
 
-      const { statusCode } = await server.inject({
-        method: 'POST',
-        url: '/exemption/check-your-answers'
+      const { statusCode } = await makePostRequest({
+        url: '/exemption/check-your-answers',
+        server: getServer()
       })
 
       expect(statusCode).toBe(400)
@@ -221,9 +215,9 @@ describe('check your answers controller', () => {
         email: ''
       })
 
-      const { statusCode } = await server.inject({
-        method: 'POST',
-        url: '/exemption/check-your-answers'
+      const { statusCode } = await makePostRequest({
+        url: '/exemption/check-your-answers',
+        server: getServer()
       })
 
       expect(statusCode).toBe(400)
@@ -231,50 +225,50 @@ describe('check your answers controller', () => {
   })
 
   test('Should render page with empty exemption data', async () => {
-    getExemptionCacheSpy.mockReturnValueOnce({ id: 'test-id' })
-    const { statusCode } = await server.inject({
-      method: 'GET',
-      url: '/exemption/check-your-answers'
+    getExemptionCache.mockReturnValueOnce({ id: 'test-id' })
+    const { statusCode } = await makeGetRequest({
+      url: '/exemption/check-your-answers',
+      server: getServer()
     })
     expect(statusCode).toBe(200)
   })
 
   test('Should render page successfully', async () => {
-    const { statusCode } = await server.inject({
-      method: 'GET',
-      url: '/exemption/check-your-answers'
+    const { statusCode } = await makeGetRequest({
+      url: '/exemption/check-your-answers',
+      server: getServer()
     })
     expect(statusCode).toBe(200)
   })
 
   test('Should render page with exemption data', async () => {
-    const { statusCode } = await server.inject({
-      method: 'GET',
-      url: '/exemption/check-your-answers'
+    const { statusCode } = await makeGetRequest({
+      url: '/exemption/check-your-answers',
+      server: getServer()
     })
     expect(statusCode).toBe(200)
   })
 
   test('Should render page with valid exemption data', async () => {
-    const { statusCode } = await server.inject({
-      method: 'GET',
-      url: '/exemption/check-your-answers'
+    const { statusCode } = await makeGetRequest({
+      url: '/exemption/check-your-answers',
+      server: getServer()
     })
     expect(statusCode).toBe(200)
   })
 
   test('Should render page without API dependency', async () => {
-    const { statusCode } = await server.inject({
-      method: 'GET',
-      url: '/exemption/check-your-answers'
+    const { statusCode } = await makeGetRequest({
+      url: '/exemption/check-your-answers',
+      server: getServer()
     })
     expect(statusCode).toBe(200)
   })
 
   test('Should render page successfully with session data', async () => {
-    const { statusCode } = await server.inject({
-      method: 'GET',
-      url: '/exemption/check-your-answers'
+    const { statusCode } = await makeGetRequest({
+      url: '/exemption/check-your-answers',
+      server: getServer()
     })
     expect(statusCode).toBe(200)
   })
@@ -285,33 +279,33 @@ describe('check your answers controller', () => {
       siteDetails: null
     }
 
-    getExemptionCacheSpy.mockReturnValueOnce(exemptionWithoutSiteDetails)
+    getExemptionCache.mockReturnValueOnce(exemptionWithoutSiteDetails)
 
-    const { statusCode } = await server.inject({
-      method: 'GET',
-      url: '/exemption/check-your-answers'
+    const { statusCode } = await makeGetRequest({
+      url: '/exemption/check-your-answers',
+      server: getServer()
     })
     expect(statusCode).toBe(200)
   })
 
   describe('Controller error handling edge cases', () => {
     test('Should handle POST request with missing exemption cache', async () => {
-      getExemptionCacheSpy.mockReturnValueOnce(null)
+      getExemptionCache.mockReturnValueOnce(null)
 
-      const { statusCode } = await server.inject({
-        method: 'POST',
-        url: '/exemption/check-your-answers'
+      const { statusCode } = await makePostRequest({
+        url: '/exemption/check-your-answers',
+        server: getServer()
       })
 
       expect(statusCode).toBe(500)
     })
 
     test('Should handle GET request with missing exemption cache', async () => {
-      getExemptionCacheSpy.mockReturnValueOnce(null)
+      getExemptionCache.mockReturnValueOnce(null)
 
-      const { statusCode } = await server.inject({
-        method: 'GET',
-        url: '/exemption/check-your-answers'
+      const { statusCode } = await makeGetRequest({
+        url: '/exemption/check-your-answers',
+        server: getServer()
       })
 
       expect(statusCode).toBe(500)
@@ -322,22 +316,22 @@ describe('check your answers controller', () => {
         .spyOn(authUtils, 'getUserSession')
         .mockRejectedValueOnce(new Error('Session retrieval failed'))
 
-      const { statusCode } = await server.inject({
-        method: 'POST',
-        url: '/exemption/check-your-answers'
+      const { statusCode } = await makePostRequest({
+        url: '/exemption/check-your-answers',
+        server: getServer()
       })
 
       expect(statusCode).toBe(400)
     })
 
     test('Should handle session cache errors gracefully', async () => {
-      getExemptionCacheSpy.mockImplementation(() => {
+      getExemptionCache.mockImplementation(() => {
         throw new Error('Cache error')
       })
 
-      const { statusCode } = await server.inject({
-        method: 'GET',
-        url: '/exemption/check-your-answers'
+      const { statusCode } = await makeGetRequest({
+        url: '/exemption/check-your-answers',
+        server: getServer()
       })
 
       expect(statusCode).toBe(500)
@@ -355,7 +349,7 @@ describe('check your answers controller', () => {
         }
       }
 
-      getExemptionCacheSpy.mockReturnValueOnce(fileUploadExemption)
+      getExemptionCache.mockReturnValueOnce(fileUploadExemption)
 
       const mockProcessedSiteDetails = {
         isFileUpload: true,
@@ -368,9 +362,9 @@ describe('check your answers controller', () => {
         .spyOn(exemptionSiteDetailsHelpers, 'processSiteDetails')
         .mockReturnValue(mockProcessedSiteDetails)
 
-      const { statusCode } = await server.inject({
-        method: 'GET',
-        url: '/exemption/check-your-answers'
+      const { statusCode } = await makeGetRequest({
+        url: '/exemption/check-your-answers',
+        server: getServer()
       })
 
       expect(statusCode).toBe(200)
@@ -394,7 +388,7 @@ describe('check your answers controller', () => {
         }
       }
 
-      getExemptionCacheSpy.mockReturnValueOnce(shapefileExemption)
+      getExemptionCache.mockReturnValueOnce(shapefileExemption)
 
       const mockProcessedSiteDetails = {
         isFileUpload: true,
@@ -407,9 +401,9 @@ describe('check your answers controller', () => {
         .spyOn(exemptionSiteDetailsHelpers, 'processSiteDetails')
         .mockReturnValue(mockProcessedSiteDetails)
 
-      const { statusCode } = await server.inject({
-        method: 'GET',
-        url: '/exemption/check-your-answers'
+      const { statusCode } = await makeGetRequest({
+        url: '/exemption/check-your-answers',
+        server: getServer()
       })
 
       expect(statusCode).toBe(200)

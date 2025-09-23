@@ -1,4 +1,4 @@
-import { createServer } from '~/src/server/index.js'
+import { setupTestServer } from '~/tests/integration/shared/test-setup-helpers.js'
 import {
   widthOfSiteController,
   widthOfSiteSubmitController,
@@ -6,6 +6,7 @@ import {
 } from '~/src/server/exemption/site-details/width-of-site/controller.js'
 import * as cacheUtils from '~/src/server/common/helpers/session-cache/utils.js'
 import { mockExemption, mockSite } from '~/src/server/test-helpers/mocks.js'
+import { makeGetRequest } from '~/src/server/test-helpers/server-requests.js'
 import { statusCodes } from '~/src/server/common/constants/status-codes.js'
 import { config } from '~/src/config/config.js'
 import { JSDOM } from 'jsdom'
@@ -14,23 +15,13 @@ import { routes } from '~/src/server/common/constants/routes.js'
 jest.mock('~/src/server/common/helpers/session-cache/utils.js')
 
 describe('#widthOfSite', () => {
-  /** @type {Server} */
-  let server
+  const getServer = setupTestServer()
   let getExemptionCacheSpy
-
-  beforeAll(async () => {
-    server = await createServer()
-    await server.initialize()
-  })
 
   beforeEach(() => {
     getExemptionCacheSpy = jest
       .spyOn(cacheUtils, 'getExemptionCache')
       .mockReturnValue(mockExemption)
-  })
-
-  afterAll(async () => {
-    await server.stop({ timeout: 0 })
   })
 
   describe('#widthOfSiteController', () => {
@@ -69,9 +60,9 @@ describe('#widthOfSite', () => {
     })
 
     test('Should provide expected response and correctly pre populate data', async () => {
-      const { result, statusCode } = await server.inject({
-        method: 'GET',
-        url: routes.WIDTH_OF_SITE
+      const { result, statusCode } = await makeGetRequest({
+        url: routes.WIDTH_OF_SITE,
+        server: getServer()
       })
 
       expect(result).toEqual(

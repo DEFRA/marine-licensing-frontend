@@ -1,7 +1,11 @@
-import { createServer } from '~/src/server/index.js'
+import { setupTestServer } from '~/tests/integration/shared/test-setup-helpers.js'
 import { statusCodes } from '~/src/server/common/constants/status-codes.js'
 import { routes } from '~/src/server/common/constants/routes.js'
 import { mockExemption } from '~/src/server/test-helpers/mocks.js'
+import {
+  makeGetRequest,
+  makePostRequest
+} from '~/src/server/test-helpers/server-requests.js'
 import { config } from '~/src/config/config.js'
 import { JSDOM } from 'jsdom'
 import {
@@ -15,16 +19,11 @@ import * as authRequests from '~/src/server/common/helpers/authenticated-request
 jest.mock('~/src/server/common/helpers/session-cache/utils.js')
 
 describe('#activityDescriptionController', () => {
-  let server
+  const getServer = setupTestServer()
   let getExemptionCacheSpy
   const request = { url: {} }
 
   const mockExemptionState = {}
-
-  beforeAll(async () => {
-    server = await createServer()
-    await server.initialize()
-  })
 
   beforeEach(() => {
     jest
@@ -36,15 +35,11 @@ describe('#activityDescriptionController', () => {
       .mockReturnValue(mockExemptionState)
   })
 
-  afterAll(async () => {
-    await server.stop({ timeout: 0 })
-  })
-
   describe('activityDescriptionController GET', () => {
     test('should render the activity description page', async () => {
-      const { result, statusCode } = await server.inject({
-        method: 'GET',
-        url: routes.ACTIVITY_DESCRIPTION
+      const { result, statusCode } = await makeGetRequest({
+        url: routes.ACTIVITY_DESCRIPTION,
+        server: getServer()
       })
 
       expect(statusCode).toBe(statusCodes.ok)
@@ -146,10 +141,10 @@ describe('#activityDescriptionController', () => {
         payload: { data: 'test' }
       })
 
-      const { statusCode, headers } = await server.inject({
-        method: 'POST',
+      const { statusCode, headers } = await makePostRequest({
         url: routes.ACTIVITY_DESCRIPTION,
-        payload
+        server: getServer(),
+        formData: payload
       })
 
       expect(authRequests.authenticatedPatchRequest).toHaveBeenCalledWith(
@@ -182,10 +177,10 @@ describe('#activityDescriptionController', () => {
         activityDescription: 'New site activity description.'
       }
 
-      const { statusCode, headers } = await server.inject({
-        method: 'POST',
+      const { statusCode, headers } = await makePostRequest({
         url: routes.SITE_DETAILS_ACTIVITY_DESCRIPTION,
-        payload
+        server: getServer(),
+        formData: payload
       })
 
       expect(mockedUpdateExemptionSiteDetails).toHaveBeenCalledWith(
@@ -203,10 +198,10 @@ describe('#activityDescriptionController', () => {
         activityDescription: ''
       }
 
-      const { result, statusCode } = await server.inject({
-        method: 'POST',
+      const { result, statusCode } = await makePostRequest({
         url: routes.ACTIVITY_DESCRIPTION,
-        payload
+        server: getServer(),
+        formData: payload
       })
 
       expect(statusCode).toBe(statusCodes.ok)
@@ -242,10 +237,10 @@ describe('#activityDescriptionController', () => {
         data: {}
       })
 
-      const { result } = await server.inject({
-        method: 'POST',
+      const { result } = await makePostRequest({
         url: routes.ACTIVITY_DESCRIPTION,
-        payload: { activityDescription: 'test' }
+        server: getServer(),
+        formData: { activityDescription: 'test' }
       })
 
       expect(result).toContain('Something went wrong')
@@ -350,10 +345,10 @@ describe('#activityDescriptionController', () => {
 
       apiPatchMock.mockRejectedValueOnce(fakeError)
 
-      const { result, statusCode } = await server.inject({
-        method: 'POST',
+      const { result, statusCode } = await makePostRequest({
         url: routes.ACTIVITY_DESCRIPTION,
-        payload: { activityDescription: 'test' }
+        server: getServer(),
+        formData: { activityDescription: 'test' }
       })
 
       const { document } = new JSDOM(result).window

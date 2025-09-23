@@ -1,7 +1,6 @@
 import { routes } from '~/src/server/common/constants/routes.js'
 import { statusCodes } from '~/src/server/common/constants/status-codes.js'
 import { getExemptionCache } from '~/src/server/common/helpers/session-cache/utils.js'
-import { createServer } from '~/src/server/index.js'
 import { toHaveNoViolations } from 'jest-axe'
 import { runAxeChecks } from '~/.jest/axe-helper.js'
 import { authenticatedGetRequest } from '~/src/server/common/helpers/authenticated-requests.js'
@@ -11,6 +10,8 @@ import {
   mockExemptionWithShapefile,
   mockProjectList
 } from '~/src/server/test-helpers/mocks.js'
+import { setupTestServer } from '../shared/test-setup-helpers.js'
+import { makeGetRequest } from '~/src/server/test-helpers/server-requests.js'
 
 jest.mock('~/src/server/common/helpers/authenticated-requests.js')
 jest.mock('~/src/server/common/helpers/session-cache/utils.js')
@@ -18,16 +19,7 @@ jest.mock('~/src/server/common/helpers/session-cache/utils.js')
 expect.extend(toHaveNoViolations)
 
 describe('Page accessibility checks (Axe)', () => {
-  let server
-
-  beforeAll(async () => {
-    server = await createServer()
-    await server.initialize()
-  })
-
-  afterAll(async () => {
-    await server.stop()
-  })
+  const getServer = setupTestServer()
 
   beforeEach(() => {
     jest.spyOn(cdpUploadService, 'getCdpUploadService').mockReturnValue({
@@ -131,9 +123,9 @@ describe('Page accessibility checks (Axe)', () => {
             value: endpoint === '/exemptions' ? mockProjectList : exemption
           }
         }))
-      const response = await server.inject({
-        method: 'GET',
-        url
+      const response = await makeGetRequest({
+        url,
+        server: getServer()
       })
       expect(response.statusCode).toBe(statusCodes.ok)
       await runAxeChecks(response.result)

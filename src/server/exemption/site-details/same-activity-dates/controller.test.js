@@ -1,4 +1,3 @@
-import { createServer } from '~/src/server/index.js'
 import {
   sameActivityDatesController,
   sameActivityDatesSubmitController,
@@ -11,8 +10,6 @@ import { routes } from '~/src/server/common/constants/routes.js'
 jest.mock('~/src/server/common/helpers/session-cache/utils.js')
 
 describe('#sameActivityDates', () => {
-  /** @type {Server} */
-  let server
   let getExemptionCacheSpy
 
   const sitePreHandlerHook = sameActivityDatesSubmitController.options.pre[0]
@@ -22,19 +19,10 @@ describe('#sameActivityDates', () => {
     redirect: jest.fn()
   }
 
-  beforeAll(async () => {
-    server = await createServer()
-    await server.initialize()
-  })
-
   beforeEach(() => {
     getExemptionCacheSpy = jest
       .spyOn(cacheUtils, 'getExemptionCache')
       .mockReturnValue(mockExemption)
-  })
-
-  afterAll(async () => {
-    await server.stop({ timeout: 0 })
   })
 
   describe('#sameActivityDatesController', () => {

@@ -10,11 +10,6 @@ import { clearExemptionCache } from '~/src/server/common/helpers/session-cache/u
 
 export const createSessionStrategy = (server) => {
   const cookieConfig = config.get('session.cookie')
-  const defraIdConfig = config.get('defraId')
-  const entraIdConfig = config.get('entraId')
-  if (!defraIdConfig.authEnabled && !entraIdConfig.authEnabled) {
-    return
-  }
 
   server.auth.strategy('session', 'cookie', {
     cookie: {

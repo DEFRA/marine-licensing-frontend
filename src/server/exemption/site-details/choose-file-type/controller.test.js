@@ -1,4 +1,4 @@
-import { createServer } from '~/src/server/index.js'
+import { setupTestServer } from '~/tests/integration/shared/test-setup-helpers.js'
 import { statusCodes } from '~/src/server/common/constants/status-codes.js'
 import { routes } from '~/src/server/common/constants/routes.js'
 import { config } from '~/src/config/config.js'
@@ -9,13 +9,17 @@ import {
   CHOOSE_FILE_UPLOAD_TYPE_VIEW_ROUTE,
   errorMessages
 } from '~/src/server/exemption/site-details/choose-file-type/controller.js'
+
+import {
+  makeGetRequest,
+  makePostRequest
+} from '~/src/server/test-helpers/server-requests.js'
 import * as cacheUtils from '~/src/server/common/helpers/session-cache/utils.js'
 
 jest.mock('~/src/server/common/helpers/session-cache/utils.js')
 
 describe('#chooseFileType', () => {
-  /** @type {Server} */
-  let server
+  const getServer = setupTestServer()
   let getExemptionCacheSpy
 
   const mockExemptionState = {
@@ -23,26 +27,17 @@ describe('#chooseFileType', () => {
     siteDetails: [{ fileUploadType: 'shapefile' }]
   }
 
-  beforeAll(async () => {
-    server = await createServer()
-    await server.initialize()
-  })
-
   beforeEach(() => {
     getExemptionCacheSpy = jest
       .spyOn(cacheUtils, 'getExemptionCache')
       .mockReturnValue(mockExemptionState)
   })
 
-  afterAll(async () => {
-    await server.stop({ timeout: 0 })
-  })
-
   describe('#chooseFileTypeController', () => {
     test('Should provide expected response and correctly pre populate data', async () => {
-      const { result, statusCode } = await server.inject({
-        method: 'GET',
-        url: routes.CHOOSE_FILE_UPLOAD_TYPE
+      const { result, statusCode } = await makeGetRequest({
+        url: routes.CHOOSE_FILE_UPLOAD_TYPE,
+        server: getServer()
       })
 
       expect(result).toEqual(
@@ -64,9 +59,9 @@ describe('#chooseFileType', () => {
     test('Should provide expected response and correctly not pre-populate data if it is not present', async () => {
       getExemptionCacheSpy.mockReturnValueOnce({})
 
-      const { result, statusCode } = await server.inject({
-        method: 'GET',
-        url: routes.CHOOSE_FILE_UPLOAD_TYPE
+      const { result, statusCode } = await makeGetRequest({
+        url: routes.CHOOSE_FILE_UPLOAD_TYPE,
+        server: getServer()
       })
 
       expect(result).toEqual(
@@ -115,9 +110,9 @@ describe('#chooseFileType', () => {
     })
 
     test('Should render details and summary elements', async () => {
-      const { result, statusCode } = await server.inject({
-        method: 'GET',
-        url: routes.CHOOSE_FILE_UPLOAD_TYPE
+      const { result, statusCode } = await makeGetRequest({
+        url: routes.CHOOSE_FILE_UPLOAD_TYPE,
+        server: getServer()
       })
 
       const { document } = new JSDOM(result).window
@@ -155,10 +150,10 @@ describe('#chooseFileType', () => {
 
   describe('#chooseFileTypeSubmitController', () => {
     test('Should show error messages with invalid data', async () => {
-      const { result, statusCode } = await server.inject({
-        method: 'POST',
+      const { result, statusCode } = await makePostRequest({
         url: routes.CHOOSE_FILE_UPLOAD_TYPE,
-        payload: { fileUploadType: '' }
+        server: getServer(),
+        formData: { fileUploadType: '' }
       })
 
       const { document } = new JSDOM(result).window
@@ -261,10 +256,10 @@ describe('#chooseFileType', () => {
         'updateExemptionSiteDetails'
       )
 
-      const { statusCode } = await server.inject({
-        method: 'POST',
+      const { statusCode } = await makePostRequest({
         url: routes.CHOOSE_FILE_UPLOAD_TYPE,
-        payload: { fileUploadType: 'shapefile' }
+        server: getServer(),
+        formData: { fileUploadType: 'shapefile' }
       })
 
       expect(updateExemptionSiteDetailsSpy).toHaveBeenCalledWith(

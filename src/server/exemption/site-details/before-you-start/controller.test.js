@@ -1,10 +1,11 @@
-import { createServer } from '~/src/server/index.js'
+import { setupTestServer } from '~/tests/integration/shared/test-setup-helpers.js'
 import {
   beforeYouStartController,
   BEFORE_YOU_START_SITE_DETAILS_VIEW_ROUTE
 } from '~/src/server/exemption/site-details/before-you-start/controller.js'
 import { getExemptionCache } from '~/src/server/common/helpers/session-cache/utils.js'
 import { mockExemption } from '~/src/server/test-helpers/mocks.js'
+import { makeGetRequest } from '~/src/server/test-helpers/server-requests.js'
 import { statusCodes } from '~/src/server/common/constants/status-codes.js'
 import { config } from '~/src/config/config.js'
 import { routes } from '~/src/server/common/constants/routes.js'
@@ -12,20 +13,10 @@ import { routes } from '~/src/server/common/constants/routes.js'
 jest.mock('~/src/server/common/helpers/session-cache/utils.js')
 
 describe('#beforeYouStart', () => {
-  /** @type {Server} */
-  let server
-
-  beforeAll(async () => {
-    server = await createServer()
-    await server.initialize()
-  })
+  const getServer = setupTestServer()
 
   beforeEach(() => {
     jest.mocked(getExemptionCache).mockReturnValue(mockExemption)
-  })
-
-  afterAll(async () => {
-    await server.stop({ timeout: 0 })
   })
 
   describe('#beforeYouStartController', () => {
@@ -45,9 +36,9 @@ describe('#beforeYouStart', () => {
     })
 
     test('Should provide expected response and correctly display project name', async () => {
-      const { result, statusCode } = await server.inject({
-        method: 'GET',
-        url: routes.SITE_DETAILS
+      const { result, statusCode } = await makeGetRequest({
+        url: routes.SITE_DETAILS,
+        server: getServer()
       })
 
       expect(result).toEqual(

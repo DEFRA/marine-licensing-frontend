@@ -1,4 +1,3 @@
-import { createServer } from '~/src/server/index.js'
 import { statusCodes } from '~/src/server/common/constants/status-codes.js'
 import {
   catchAll,
@@ -6,23 +5,17 @@ import {
   mapErrorsForDisplay
 } from '~/src/server/common/helpers/errors.js'
 
+import { setupTestServer } from '~/tests/integration/shared/test-setup-helpers.js'
+import { makeGetRequest } from '~/src/server/test-helpers/server-requests.js'
+
 describe('#errors', () => {
   /** @type {Server} */
-  let server
-
-  beforeAll(async () => {
-    server = await createServer()
-    await server.initialize()
-  })
-
-  afterAll(async () => {
-    await server.stop({ timeout: 0 })
-  })
+  const getServer = setupTestServer()
 
   test('Should provide expected Not Found page', async () => {
-    const { result, statusCode } = await server.inject({
-      method: 'GET',
-      url: '/non-existent-path'
+    const { result, statusCode } = await makeGetRequest({
+      url: '/non-existent-path',
+      server: getServer()
     })
 
     expect(result).toEqual(

@@ -10,6 +10,11 @@ import { validateErrors } from '~/tests/integration/shared/expect-utils.js'
 
 import { setupTestServer } from '~/tests/integration/shared/test-setup-helpers.js'
 
+import {
+  makeGetRequest,
+  makePostRequest
+} from '~/src/server/test-helpers/server-requests.js'
+
 jest.mock('~/src/server/common/helpers/session-cache/utils.js')
 
 describe('Multiple sites question page', () => {
@@ -27,8 +32,8 @@ describe('Multiple sites question page', () => {
   })
 
   test('should display the multiple sites question page with correct content and multipleSiteDetails defaults to false', async () => {
-    const { result, statusCode } = await getServer().inject({
-      method: 'GET',
+    const { result, statusCode } = await makeGetRequest({
+      server: getServer(),
       url: '/exemption/does-your-project-involve-more-than-one-site'
     })
 
@@ -59,8 +64,8 @@ describe('Multiple sites question page', () => {
       multipleSiteDetails: { multipleSitesEnabled: 'yes' }
     })
 
-    const { result, statusCode } = await getServer().inject({
-      method: 'GET',
+    const { result, statusCode } = await makeGetRequest({
+      server: getServer(),
       url: '/exemption/does-your-project-involve-more-than-one-site'
     })
 
@@ -82,8 +87,8 @@ describe('Multiple sites question page', () => {
       multipleSiteDetails: { multipleSitesEnabled: 'yes' }
     })
 
-    const { statusCode } = await getServer().inject({
-      method: 'GET',
+    const { statusCode } = await makeGetRequest({
+      server: getServer(),
       url: '/exemption/does-your-project-involve-more-than-one-site'
     })
 
@@ -93,8 +98,8 @@ describe('Multiple sites question page', () => {
   })
 
   test('should have correct navigation links', async () => {
-    const { result } = await getServer().inject({
-      method: 'GET',
+    const { result } = await makeGetRequest({
+      server: getServer(),
       url: '/exemption/does-your-project-involve-more-than-one-site'
     })
 
@@ -117,10 +122,9 @@ describe('Multiple sites question page', () => {
   })
 
   test('should stay on same page when continue is clicked without selection', async () => {
-    const { result, statusCode } = await getServer().inject({
-      method: 'POST',
+    const { result, statusCode } = await makePostRequest({
       url: '/exemption/does-your-project-involve-more-than-one-site',
-      payload: {}
+      server: getServer()
     })
 
     expect(statusCode).toBe(statusCodes.ok)
@@ -155,10 +159,10 @@ describe('Multiple sites question page', () => {
   })
 
   test('should navigate to Site Name page when YES is selected and set multipleSiteDetails to true', async () => {
-    const response = await getServer().inject({
-      method: 'POST',
+    const response = await makePostRequest({
       url: '/exemption/does-your-project-involve-more-than-one-site',
-      payload: {
+      server: getServer(),
+      formData: {
         multipleSitesEnabled: 'yes'
       }
     })
@@ -173,10 +177,10 @@ describe('Multiple sites question page', () => {
   })
 
   test('should redirect to coordinates entry choice when NO is selected and set multipleSiteDetails to false', async () => {
-    const response = await getServer().inject({
-      method: 'POST',
+    const response = await makePostRequest({
       url: '/exemption/does-your-project-involve-more-than-one-site',
-      payload: {
+      server: getServer(),
+      formData: {
         multipleSitesEnabled: 'no'
       }
     })
@@ -193,8 +197,8 @@ describe('Multiple sites question page', () => {
   })
 
   test('should redirect to task list when cancel is clicked', async () => {
-    const { result, statusCode } = await getServer().inject({
-      method: 'GET',
+    const { result, statusCode } = await makeGetRequest({
+      server: getServer(),
       url: '/exemption/does-your-project-involve-more-than-one-site'
     })
 

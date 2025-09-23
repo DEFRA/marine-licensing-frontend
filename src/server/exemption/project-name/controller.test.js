@@ -9,6 +9,10 @@ import {
 import * as cacheUtils from '~/src/server/common/helpers/session-cache/utils.js'
 import * as authRequests from '~/src/server/common/helpers/authenticated-requests.js'
 import { setupTestServer } from '~/tests/integration/shared/test-setup-helpers.js'
+import {
+  makeGetRequest,
+  makePostRequest
+} from '~/src/server/test-helpers/server-requests.js'
 
 jest.mock('~/src/server/common/helpers/session-cache/utils.js')
 
@@ -30,8 +34,8 @@ describe('#projectName', () => {
 
   describe('#projectNameController', () => {
     test('Should return success response code', async () => {
-      const { statusCode } = await getServer().inject({
-        method: 'GET',
+      const { statusCode } = await makeGetRequest({
+        server: getServer(),
         url: routes.PROJECT_NAME
       })
 
@@ -47,10 +51,10 @@ describe('#projectName', () => {
         payload: { data: 'test' }
       })
 
-      const { statusCode, headers } = await getServer().inject({
-        method: 'POST',
+      const { statusCode, headers } = await makePostRequest({
         url: routes.PROJECT_NAME,
-        payload: { projectName: 'Project name' }
+        server: getServer(),
+        formData: { projectName: 'Project name' }
       })
 
       expect(authRequests.authenticatedPostRequest).toHaveBeenCalledWith(
@@ -75,10 +79,10 @@ describe('#projectName', () => {
         payload: { projectName: 'Project name' }
       })
 
-      const { statusCode, headers } = await getServer().inject({
-        method: 'POST',
+      const { statusCode, headers } = await makePostRequest({
         url: routes.PROJECT_NAME,
-        payload: { projectName: 'Project name' }
+        server: getServer(),
+        formData: { projectName: 'Project name' }
       })
 
       expect(authRequests.authenticatedPatchRequest).toHaveBeenCalledWith(
@@ -99,10 +103,10 @@ describe('#projectName', () => {
         data: {}
       })
 
-      const { result } = await getServer().inject({
-        method: 'POST',
+      const { result } = await makePostRequest({
         url: routes.PROJECT_NAME,
-        payload: { projectName: 'test' }
+        server: getServer(),
+        formData: { projectName: 'test' }
       })
 
       expect(result).toContain('Something went wrong')
@@ -209,10 +213,10 @@ describe('#projectName', () => {
     test('Should not call the back end when payload data is empty', async () => {
       const apiPostMock = jest.spyOn(authRequests, 'authenticatedPostRequest')
 
-      await getServer().inject({
-        method: 'POST',
+      await makePostRequest({
         url: routes.PROJECT_NAME,
-        payload: { projectName: '' }
+        server: getServer(),
+        formData: { projectName: '' }
       })
 
       expect(apiPostMock).not.toHaveBeenCalled()

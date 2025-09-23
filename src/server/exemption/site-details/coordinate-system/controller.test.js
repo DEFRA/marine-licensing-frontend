@@ -1,4 +1,4 @@
-import { createServer } from '~/src/server/index.js'
+import { setupTestServer } from '~/tests/integration/shared/test-setup-helpers.js'
 import {
   coordinateSystemController,
   coordinateSystemSubmitController,
@@ -6,6 +6,7 @@ import {
 } from '~/src/server/exemption/site-details/coordinate-system/controller.js'
 import * as cacheUtils from '~/src/server/common/helpers/session-cache/utils.js'
 import { mockExemption, mockSite } from '~/src/server/test-helpers/mocks.js'
+import { makeGetRequest } from '~/src/server/test-helpers/server-requests.js'
 import { statusCodes } from '~/src/server/common/constants/status-codes.js'
 import { config } from '~/src/config/config.js'
 import { JSDOM } from 'jsdom'
@@ -14,23 +15,13 @@ import { routes } from '~/src/server/common/constants/routes.js'
 jest.mock('~/src/server/common/helpers/session-cache/utils.js')
 
 describe('#coordinateSystem', () => {
-  /** @type {Server} */
-  let server
+  const getServer = setupTestServer()
   let getExemptionCacheSpy
-
-  beforeAll(async () => {
-    server = await createServer()
-    await server.initialize()
-  })
 
   beforeEach(() => {
     getExemptionCacheSpy = jest
       .spyOn(cacheUtils, 'getExemptionCache')
       .mockReturnValue(mockExemption)
-  })
-
-  afterAll(async () => {
-    await server.stop({ timeout: 0 })
   })
 
   describe('#coordinateSystemController', () => {
@@ -87,9 +78,9 @@ describe('#coordinateSystem', () => {
     })
 
     test('Should provide expected response and correctly pre populate data', async () => {
-      const { result, statusCode } = await server.inject({
-        method: 'GET',
-        url: routes.COORDINATE_SYSTEM_CHOICE
+      const { result, statusCode } = await makeGetRequest({
+        url: routes.COORDINATE_SYSTEM_CHOICE,
+        server: getServer()
       })
 
       expect(result).toEqual(

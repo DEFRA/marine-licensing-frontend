@@ -1,23 +1,15 @@
-import { createServer } from '~/src/server/index.js'
 import { statusCodes } from '~/src/server/common/constants/status-codes.js'
 import { routes } from '~/src/server/common/constants/routes.js'
+import { makeGetRequest } from '~/src/server/test-helpers/server-requests.js'
+import { setupTestServer } from '~/tests/integration/shared/test-setup-helpers.js'
 
 describe('#loginController', () => {
-  let server
-
-  beforeAll(async () => {
-    server = await createServer()
-    await server.initialize()
-  })
-
-  afterAll(async () => {
-    await server.stop({ timeout: 0 })
-  })
+  const getServer = setupTestServer()
 
   test('should render the project name page', async () => {
-    const { statusCode, headers } = await server.inject({
-      method: 'GET',
-      url: routes.SIGNIN
+    const { statusCode, headers } = await makeGetRequest({
+      url: routes.SIGNIN,
+      server: getServer()
     })
 
     expect(statusCode).toBe(statusCodes.redirect)

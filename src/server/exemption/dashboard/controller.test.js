@@ -1,4 +1,4 @@
-import { createServer } from '~/src/server/index.js'
+import { setupTestServer } from '~/tests/integration/shared/test-setup-helpers.js'
 import { statusCodes } from '~/src/server/common/constants/status-codes.js'
 import { routes } from '~/src/server/common/constants/routes.js'
 import { config } from '~/src/config/config.js'
@@ -8,25 +8,17 @@ import { authenticatedGetRequest } from '~/src/server/common/helpers/authenticat
 import { formatProjectsForDisplay } from './utils.js'
 import { formatDate } from '~/src/config/nunjucks/filters/format-date.js'
 
+import { makeGetRequest } from '~/src/server/test-helpers/server-requests.js'
+
 jest.mock('~/src/server/common/helpers/authenticated-requests.js')
 jest.mock('~/src/config/nunjucks/filters/format-date.js')
 jest.mock('~/src/server/exemption/task-list/controller.js')
 
 describe('#dashboard', () => {
-  /** @type {Server} */
-  let server
+  const getServer = setupTestServer()
 
   const authenticatedGetRequestMock = jest.mocked(authenticatedGetRequest)
   jest.mocked(formatDate).mockReturnValue('01 Jan 2024')
-
-  beforeAll(async () => {
-    server = await createServer()
-    await server.initialize()
-  })
-
-  afterAll(async () => {
-    await server.stop({ timeout: 0 })
-  })
 
   beforeEach(() => {
     jest.clearAllMocks()
@@ -38,9 +30,9 @@ describe('#dashboard', () => {
         payload: { value: [] }
       })
 
-      const { result, statusCode } = await server.inject({
-        method: 'GET',
-        url: routes.DASHBOARD
+      const { result, statusCode } = await makeGetRequest({
+        url: routes.DASHBOARD,
+        server: getServer()
       })
 
       expect(result).toEqual(
@@ -117,9 +109,9 @@ describe('#dashboard', () => {
         payload: { value: [] }
       })
 
-      const { result } = await server.inject({
-        method: 'GET',
-        url: routes.DASHBOARD
+      const { result } = await makeGetRequest({
+        url: routes.DASHBOARD,
+        server: getServer()
       })
 
       const { document } = new JSDOM(result).window
@@ -217,9 +209,9 @@ describe('#dashboard', () => {
         payload: { value: [draftExemption] }
       })
 
-      const { result } = await server.inject({
-        method: 'GET',
-        url: routes.DASHBOARD
+      const { result } = await makeGetRequest({
+        url: routes.DASHBOARD,
+        server: getServer()
       })
 
       const { document } = new JSDOM(result).window

@@ -1,18 +1,6 @@
-import { createServer } from '~/src/server/index.js'
 import { loginEntraController } from '~/src/server/auth/sign-in-entra.js'
 
 describe('#login with Entra ID', () => {
-  let server
-
-  beforeAll(async () => {
-    server = await createServer()
-    await server.initialize()
-  })
-
-  afterAll(async () => {
-    await server.stop({ timeout: 0 })
-  })
-
   test('should redirect to the stored URL', async () => {
     const redirectUrl = '/view-details/abc'
     const mockRequest = {

@@ -10,8 +10,12 @@ import {
   reviewSiteDetailsController,
   reviewSiteDetailsSubmitController
 } from '~/src/server/exemption/site-details/review-site-details/controller.js'
-import { createServer } from '~/src/server/index.js'
+import { setupTestServer } from '~/tests/integration/shared/test-setup-helpers.js'
 import { mockExemption } from '~/src/server/test-helpers/mocks.js'
+import {
+  makeGetRequest,
+  makePostRequest
+} from '~/src/server/test-helpers/server-requests.js'
 import { JSDOM } from 'jsdom'
 import { routes } from '~/src/server/common/constants/routes.js'
 import {
@@ -208,8 +212,7 @@ function assertNavigationLinks(document, backLink, cancelLink = null) {
 }
 
 describe('#reviewSiteDetails', () => {
-  /** @type {Server} */
-  let server
+  const getServer = setupTestServer()
   let getExemptionCacheSpy
   let getCoordinateSystemSpy
   let resetExemptionSiteDetailsSpy
@@ -327,11 +330,6 @@ describe('#reviewSiteDetails', () => {
     }
   ]
 
-  beforeAll(async () => {
-    server = await createServer()
-    await server.initialize()
-  })
-
   beforeEach(() => {
     jest.spyOn(authRequests, 'authenticatedPatchRequest').mockResolvedValue({
       payload: {
@@ -355,10 +353,6 @@ describe('#reviewSiteDetails', () => {
     resetExemptionSiteDetailsSpy = jest
       .spyOn(cacheUtils, 'resetExemptionSiteDetails')
       .mockReturnValue({ siteDetails: null })
-  })
-
-  afterAll(async () => {
-    await server.stop({ timeout: 0 })
   })
 
   describe('Unit Tests', () => {
@@ -548,9 +542,9 @@ describe('#reviewSiteDetails', () => {
   describe('Integration Tests', () => {
     describe('GET Handler - DOM Rendering', () => {
       test('should display summary data correctly in DOM', async () => {
-        const { result, statusCode } = await server.inject({
-          method: 'GET',
+        const { result, statusCode } = await makeGetRequest({
           url: routes.REVIEW_SITE_DETAILS,
+          server: getServer(),
           headers: {
             referer: `http://localhost/${routes.WIDTH_OF_SITE}`
           }
@@ -894,8 +888,8 @@ describe('#reviewSiteDetails', () => {
         test('should display polygon summary data in DOM', async () => {
           getExemptionCacheSpy.mockReturnValueOnce(mockPolygonExemptionWGS84)
 
-          const { result, statusCode } = await server.inject({
-            method: 'GET',
+          const { result, statusCode } = await makeGetRequest({
+            server: getServer(),
             url: routes.REVIEW_SITE_DETAILS,
             headers: {
               referer: `http://localhost${routes.ENTER_MULTIPLE_COORDINATES}`
@@ -983,10 +977,9 @@ describe('#reviewSiteDetails', () => {
 
     describe('POST Handler - Full Flow', () => {
       test('should redirect to task list and patch backend', async () => {
-        const { headers, statusCode } = await server.inject({
-          method: 'POST',
+        const { headers, statusCode } = await makePostRequest({
           url: routes.REVIEW_SITE_DETAILS,
-          payload: {},
+          server: getServer(),
           headers: {
             referer: `http://localhost/${routes.WIDTH_OF_SITE}`
           }
@@ -1131,10 +1124,9 @@ describe('#reviewSiteDetails', () => {
           }
         })
 
-        const { result, statusCode } = await server.inject({
-          method: 'POST',
+        const { result, statusCode } = await makePostRequest({
           url: routes.REVIEW_SITE_DETAILS,
-          payload: {},
+          server: getServer(),
           headers: {
             referer: `http://localhost/${routes.WIDTH_OF_SITE}`
           }
@@ -1159,10 +1151,9 @@ describe('#reviewSiteDetails', () => {
           data: {}
         })
 
-        const { result } = await server.inject({
-          method: 'POST',
+        const { result } = await makePostRequest({
           url: routes.REVIEW_SITE_DETAILS,
-          payload: {},
+          server: getServer(),
           headers: {
             referer: `http://localhost/${routes.WIDTH_OF_SITE}`
           }
@@ -1176,10 +1167,10 @@ describe('#reviewSiteDetails', () => {
       })
 
       test('should add another site correctly', async () => {
-        const { headers, statusCode } = await server.inject({
-          method: 'POST',
+        const { headers, statusCode } = await makePostRequest({
           url: routes.REVIEW_SITE_DETAILS,
-          payload: { add: true }
+          server: getServer(),
+          formData: { add: true }
         })
 
         expect(cacheUtils.setExemptionCache).toHaveBeenCalledWith(
@@ -1261,10 +1252,9 @@ describe('#reviewSiteDetails', () => {
         test('should handle polygon site POST request', async () => {
           getExemptionCacheSpy.mockReturnValueOnce(mockPolygonExemptionWGS84)
 
-          const { headers, statusCode } = await server.inject({
-            method: 'POST',
+          const { headers, statusCode } = await makePostRequest({
             url: routes.REVIEW_SITE_DETAILS,
-            payload: {},
+            server: getServer(),
             headers: {
               referer: `http://localhost${routes.ENTER_MULTIPLE_COORDINATES}`
             }
@@ -1311,10 +1301,9 @@ describe('#reviewSiteDetails', () => {
             }
           })
 
-          const { result, statusCode } = await server.inject({
-            method: 'POST',
+          const { result, statusCode } = await makePostRequest({
             url: routes.REVIEW_SITE_DETAILS,
-            payload: {},
+            server: getServer(),
             headers: {
               referer: `http://localhost${routes.ENTER_MULTIPLE_COORDINATES}`
             }

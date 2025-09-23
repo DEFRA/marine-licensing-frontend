@@ -1,7 +1,7 @@
 import { jest } from '@jest/globals'
 import { isPast } from 'date-fns'
 import { validateUserSession } from './validate.js'
-import { startServer } from '~/src/server/common/helpers/start-server.js'
+import { setupTestServer } from '~/tests/integration/shared/test-setup-helpers.js'
 
 import * as authUtils from '~/src/server/common/plugins/auth/utils.js'
 import { AUTH_STRATEGIES } from '~/src/server/common/constants/auth.js'
@@ -22,12 +22,11 @@ jest.mock('date-fns', () => ({
 describe('validateUserSession', () => {
   let mockRequest
   let mockSession
-  let server
   let mockUserSession
+  /** @type {Server} */
+  const getServer = setupTestServer()
 
-  beforeEach(async () => {
-    jest.clearAllMocks()
-
+  beforeEach(() => {
     mockRequest = {
       path: '/'
     }
@@ -43,12 +42,7 @@ describe('validateUserSession', () => {
       strategy: AUTH_STRATEGIES.DEFRA_ID
     }
 
-    server = await startServer()
-    mockRequest.server = server
-  })
-
-  afterEach(async () => {
-    await server.stop({ timeout: 0 })
+    mockRequest.server = getServer()
   })
 
   test('when user session does not exist', async () => {
@@ -61,7 +55,7 @@ describe('validateUserSession', () => {
     authUtils.getUserSession.mockResolvedValue(mockUserSession)
     isPast.mockReturnValue(false)
 
-    await server.app.cache.set(mockUserSession.sessionId, mockUserSession)
+    await getServer().app.cache.set(mockUserSession.sessionId, mockUserSession)
 
     const result = await validateUserSession(mockRequest, mockSession)
 
@@ -75,6 +69,7 @@ describe('validateUserSession', () => {
     authUtils.getUserSession.mockResolvedValue(mockUserSession)
     isPast.mockReturnValue(false)
 
+    await getServer().app.cache.set(mockUserSession.sessionId, null)
     const result = await validateUserSession(mockRequest, mockSession)
 
     expect(result).toEqual({
@@ -153,7 +148,10 @@ describe('validateUserSession', () => {
 
       test('should validate successfully for a route requiring defra ID', async () => {
         mockRequest.path = '/exemption/task-list'
-        await server.app.cache.set(mockUserSession.sessionId, mockUserSession)
+        await getServer().app.cache.set(
+          mockUserSession.sessionId,
+          mockUserSession
+        )
 
         const result = await validateUserSession(mockRequest, mockSession)
 
@@ -165,7 +163,10 @@ describe('validateUserSession', () => {
 
       test('should fail validation for a route requiring entra ID', async () => {
         mockRequest.path = '/view-details'
-        await server.app.cache.set(mockUserSession.sessionId, mockUserSession)
+        await getServer().app.cache.set(
+          mockUserSession.sessionId,
+          mockUserSession
+        )
 
         const result = await validateUserSession(mockRequest, mockSession)
 
@@ -184,7 +185,10 @@ describe('validateUserSession', () => {
 
       test('should validate successfully for a route requiring entra ID', async () => {
         mockRequest.path = '/view-details'
-        await server.app.cache.set(mockUserSession.sessionId, mockUserSession)
+        await getServer().app.cache.set(
+          mockUserSession.sessionId,
+          mockUserSession
+        )
 
         const result = await validateUserSession(mockRequest, mockSession)
 
@@ -196,7 +200,10 @@ describe('validateUserSession', () => {
 
       test('should fail validation for a route requiring defra ID', async () => {
         mockRequest.path = '/exemption/task-list'
-        await server.app.cache.set(mockUserSession.sessionId, mockUserSession)
+        await getServer().app.cache.set(
+          mockUserSession.sessionId,
+          mockUserSession
+        )
 
         const result = await validateUserSession(mockRequest, mockSession)
 
@@ -215,7 +222,10 @@ describe('validateUserSession', () => {
 
       test('should fail validation if no strategy is set', async () => {
         mockRequest.path = '/exemption/task-list'
-        await server.app.cache.set(mockUserSession.sessionId, mockUserSession)
+        await getServer().app.cache.set(
+          mockUserSession.sessionId,
+          mockUserSession
+        )
 
         const result = await validateUserSession(mockRequest, mockSession)
 
@@ -226,3 +236,7 @@ describe('validateUserSession', () => {
     })
   })
 })
+
+/**
+ * @import { Server } from '@hapi/hapi'
+ */

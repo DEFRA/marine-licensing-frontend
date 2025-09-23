@@ -21,7 +21,7 @@ export class SiteDetailsMap extends Component {
     }
 
     this.map = null
-    this.dataLoader = new SiteDataLoader()
+    this.dataLoader = new SiteDataLoader($root)
     this.mapFactory = null
     this.siteVisualiser = null
     this.moduleLoader = moduleLoader ?? new OpenLayersModuleLoader()

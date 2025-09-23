@@ -33,11 +33,6 @@ class MapViewManager {
         ])
       }
     } catch (error) {
-      // eslint-disable-next-line no-console
-      console.warn(
-        'Failed to fit map to extent, falling back to UK centre:',
-        error
-      )
       this.centreMapView(map, [
         DEFAULT_UK_CENTRE_LONGITUDE,
         DEFAULT_UK_CENTRE_LATITUDE

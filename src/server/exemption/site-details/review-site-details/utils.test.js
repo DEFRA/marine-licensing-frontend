@@ -461,7 +461,11 @@ describe('siteDetails utils', () => {
       ]
       const coordinateSystem = COORDINATE_SYSTEMS.WGS84
 
-      const result = buildManualCoordinateSummaryData(siteDetails)
+      const result = buildManualCoordinateSummaryData(
+        siteDetails,
+        {},
+        coordinateSystem
+      )
 
       expect(result).toEqual([
         {
@@ -505,11 +509,11 @@ describe('siteDetails utils', () => {
         sameActivityDates: 'yes',
         sameActivityDescription: 'yes'
       }
-      const coordinateSystem = COORDINATE_SYSTEMS.WGS84
 
       const result = buildManualCoordinateSummaryData(
         siteDetails,
-        multipleSiteDetails
+        multipleSiteDetails,
+        COORDINATE_SYSTEMS.WGS84
       )
 
       expect(result).toEqual([
@@ -549,7 +553,7 @@ describe('siteDetails utils', () => {
         }
       ]
 
-      const result = buildManualCoordinateSummaryData(siteDetails)
+      const result = buildManualCoordinateSummaryData(siteDetails, {})
 
       expect(result).toEqual([
         {
@@ -581,10 +585,14 @@ describe('siteDetails utils', () => {
         }
       ]
 
-      const result = buildManualCoordinateSummaryData(siteDetails, {
-        multipleSitesEnabled: true,
-        sameActivityDates: 'no'
-      })
+      const result = buildManualCoordinateSummaryData(
+        siteDetails,
+        {
+          multipleSitesEnabled: true,
+          sameActivityDates: 'no'
+        },
+        COORDINATE_SYSTEMS.WGS84
+      )
 
       expect(result[0].activityDates).toBe('')
       expect(result[0].activityDescription).toBe('')

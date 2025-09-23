@@ -37,13 +37,89 @@ describe('SiteDataLoader', () => {
       expect(result).toEqual(siteDetails)
     })
 
-    test('should throw error when JSON parsing fails', () => {
+    test('should handle invalid JSON gracefully and return null', () => {
       const mockElement = {
         textContent: 'invalid json'
       }
       document.getElementById.mockReturnValue(mockElement)
 
-      expect(() => siteDataLoader.loadSiteDetails()).toThrow()
+      const result = siteDataLoader.loadSiteDetails()
+
+      expect(result).toBeNull()
+    })
+
+    test('should load data from map element data attribute when provided', () => {
+      const siteDetails = { coordinatesType: 'coordinates', coordinates: {} }
+      const mockMapElement = {
+        getAttribute: jest.fn().mockReturnValue(JSON.stringify(siteDetails))
+      }
+
+      siteDataLoader = new SiteDataLoader(mockMapElement)
+      const result = siteDataLoader.loadSiteDetails()
+
+      expect(mockMapElement.getAttribute).toHaveBeenCalledWith(
+        'data-site-details'
+      )
+      expect(result).toEqual(siteDetails)
+      expect(document.getElementById).not.toHaveBeenCalled()
+    })
+
+    test('should fallback to global element when map element has no data', () => {
+      const siteDetails = { coordinatesType: 'file', geoJSON: {} }
+      const mockMapElement = {
+        getAttribute: jest.fn().mockReturnValue(null)
+      }
+      const mockElement = {
+        textContent: JSON.stringify(siteDetails)
+      }
+
+      document.getElementById.mockReturnValue(mockElement)
+      siteDataLoader = new SiteDataLoader(mockMapElement)
+
+      const result = siteDataLoader.loadSiteDetails()
+
+      expect(mockMapElement.getAttribute).toHaveBeenCalledWith(
+        'data-site-details'
+      )
+      expect(document.getElementById).toHaveBeenCalledWith('site-details-data')
+      expect(result).toEqual(siteDetails)
+    })
+
+    test('should handle invalid JSON in data attribute gracefully', () => {
+      const mockMapElement = {
+        getAttribute: jest.fn().mockReturnValue('invalid json')
+      }
+
+      document.getElementById.mockReturnValue(null)
+      siteDataLoader = new SiteDataLoader(mockMapElement)
+
+      const result = siteDataLoader.loadSiteDetails()
+      expect(result).toBeNull()
+    })
+
+    test('should prioritize data attribute over global element', () => {
+      const dataAttrSiteDetails = {
+        coordinatesType: 'coordinates',
+        source: 'data-attr'
+      }
+      const globalSiteDetails = { coordinatesType: 'file', source: 'global' }
+
+      const mockMapElement = {
+        getAttribute: jest
+          .fn()
+          .mockReturnValue(JSON.stringify(dataAttrSiteDetails))
+      }
+      const mockElement = {
+        textContent: JSON.stringify(globalSiteDetails)
+      }
+
+      document.getElementById.mockReturnValue(mockElement)
+      siteDataLoader = new SiteDataLoader(mockMapElement)
+
+      const result = siteDataLoader.loadSiteDetails()
+
+      expect(result).toEqual(dataAttrSiteDetails)
+      expect(document.getElementById).not.toHaveBeenCalled()
     })
   })
 

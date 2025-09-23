@@ -3,13 +3,12 @@
 {% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
 {% from "govuk/components/button/macro.njk" import govukButton %}
 {% from "cancel-button/macro.njk" import appCancelButton %}
-{% from "site-details-data-script/macro.njk" import appSiteDetailsDataScript %}
+{% from "site-details-map-div/macro.njk" import appSiteDetailsMapDiv %}
 {% block pageTitle %}
     Review site details | {{ serviceName }}
 {% endblock %}
 {% block head %}
     {{ super() }}
-    {{ appSiteDetailsDataScript(siteDetailsData) }}
 {% endblock %}
 {% block beforeContent %}
     <nav>
@@ -208,10 +207,10 @@
             {% set summaryRows = (summaryRows.push({
                 key: {
                     text: "Map view",
-                            classes: "govuk-summary-list__key--full-width"
+                    classes: "govuk-summary-list__key--full-width"
                 },
                 value: {
-                    html: '<div class="app-site-details-map" data-module="site-details-map"></div>',
+                    html: appSiteDetailsMapDiv(site.siteDetailsData),
                     classes: "govuk-summary-list__value--full-width"
                 }
             }), summaryRows) %}

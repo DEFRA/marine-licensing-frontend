@@ -2,7 +2,6 @@ import Boom from '@hapi/boom'
 import { config } from '~/src/config/config.js'
 import { COORDINATE_SYSTEMS } from '~/src/server/common/constants/exemptions.js'
 import { routes } from '~/src/server/common/constants/routes.js'
-import { getCoordinateSystem } from '~/src/server/common/helpers/coordinate-utils.js'
 import { createSiteDetailsDataJson } from '~/src/server/common/helpers/site-details.js'
 import { formatDate } from '~/src/server/common/helpers/dates/date-utils.js'
 import { getSiteDetailsBySite } from '~/src/server/common/helpers/session-cache/site-details-utils.js'
@@ -224,7 +223,7 @@ const getActivityDescriptionSummaryText = (
 /**
  * Builds summary data for manual coordinate entry display
  * @param {object} siteDetails - Site details from exemption
- * @param {string} coordinateSystem - Selected coordinate system
+ * @param {object} multipleSiteDetails - Multiple site configuration
  * @returns {object} Summary data for template
  */
 export const buildManualCoordinateSummaryData = (
@@ -255,6 +254,9 @@ export const buildManualCoordinateSummaryData = (
     const showActivityDescription =
       !multipleSitesEnabled || sameActivityDescription === 'no'
 
+    // Generate individual site details data for the map
+    const siteDetailsData = createSiteDetailsDataJson(site, coordinateSystem)
+
     if (coordinatesEntry === 'multiple') {
       summaryData.push({
         activityDates: getActivityDatesSummaryText(
@@ -274,7 +276,8 @@ export const buildManualCoordinateSummaryData = (
           site,
           coordinateSystem
         ),
-        siteNumber: index + 1
+        siteNumber: index + 1,
+        siteDetailsData
       })
     } else {
       // Default to circular site display
@@ -294,7 +297,8 @@ export const buildManualCoordinateSummaryData = (
         coordinateSystem: getCoordinateSystemText(coordinateSystem),
         coordinates: getCoordinateDisplayText(site, coordinateSystem),
         width: circleWidth ? metresLabel(circleWidth) : '',
-        siteNumber: index + 1
+        siteNumber: index + 1,
+        siteDetailsData
       })
     }
   }
@@ -512,7 +516,6 @@ export const renderManualCoordinateReview = (h, request, options) => {
 
   const firstSite = getSiteDetailsBySite(exemption)
 
-  const { coordinateSystem } = getCoordinateSystem(request)
   const summaryData = buildManualCoordinateSummaryData(
     siteDetails,
     multipleSiteDetails
@@ -523,15 +526,11 @@ export const renderManualCoordinateReview = (h, request, options) => {
     exemption.siteDetails
   )
 
-  // Prepare site details data for map if needed
-  const siteDetailsData = createSiteDetailsDataJson(firstSite, coordinateSystem)
-
   return h.view(REVIEW_SITE_DETAILS_VIEW_ROUTE, {
     ...reviewSiteDetailsPageData,
     backLink: getSiteDetailsBackLink(previousPage, firstSite.coordinatesEntry),
     projectName: exemption.projectName,
     summaryData,
-    siteDetailsData,
     multipleSiteDetailsData,
     isMultiSiteJourney: !!multipleSiteDetails?.multipleSitesEnabled
   })

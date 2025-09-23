@@ -249,7 +249,6 @@ describe('#reviewSiteDetails', () => {
         coordinatesType: 'coordinates',
         coordinateSystem: COORDINATE_SYSTEMS.WGS84,
         coordinatesEntry: 'multiple',
-        coordinateSystem: COORDINATE_SYSTEMS.WGS84,
         coordinates: mockPolygonCoordinatesWGS84
       }
     ]
@@ -262,7 +261,6 @@ describe('#reviewSiteDetails', () => {
         coordinatesType: 'coordinates',
         coordinateSystem: COORDINATE_SYSTEMS.WGS84,
         coordinatesEntry: 'multiple',
-        coordinateSystem: COORDINATE_SYSTEMS.OSGB36,
         coordinates: mockPolygonCoordinatesOSGB36
       }
     ]
@@ -1483,9 +1481,13 @@ describe('#reviewSiteDetails', () => {
             }
           ]
 
-          const result = buildManualCoordinateSummaryData(siteDetails, {
-            multipleSitesEnabled: false
-          })
+          const result = buildManualCoordinateSummaryData(
+            siteDetails,
+            {
+              multipleSitesEnabled: false
+            },
+            COORDINATE_SYSTEMS.WGS84
+          )
 
           expect(result).toEqual([
             {
@@ -1527,9 +1529,13 @@ describe('#reviewSiteDetails', () => {
             }
           ]
 
-          const result = buildManualCoordinateSummaryData(siteDetails, {
-            multipleSitesEnabled: false
-          })
+          const result = buildManualCoordinateSummaryData(
+            siteDetails,
+            {
+              multipleSitesEnabled: false
+            },
+            COORDINATE_SYSTEMS.WGS84
+          )
 
           expect(result).toEqual([
             {

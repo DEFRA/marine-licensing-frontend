@@ -2,7 +2,20 @@ import SiteDataLoader from './site-data-loader.js'
 
 Object.defineProperty(globalThis, 'document', {
   value: {
-    getElementById: jest.fn()
+    getElementById: jest.fn(),
+    createElement: jest.fn().mockImplementation((tagName) => {
+      const element = {
+        tagName: tagName.toUpperCase(),
+        attributes: {},
+        setAttribute: jest.fn().mockImplementation(function (name, value) {
+          this.attributes[name] = value
+        }),
+        getAttribute: jest.fn().mockImplementation(function (name) {
+          return this.attributes[name] || null
+        })
+      }
+      return element
+    })
   },
   writable: true
 })
@@ -48,37 +61,29 @@ describe('SiteDataLoader', () => {
 
     test('should load data from map element data attribute when provided', () => {
       const siteDetails = { coordinatesType: 'coordinates', coordinates: {} }
-      const mockMapElement = {
-        getAttribute: jest.fn().mockReturnValue(JSON.stringify(siteDetails))
-      }
+      const mapElement = document.createElement('div')
+      mapElement.setAttribute('data-site-details', JSON.stringify(siteDetails))
 
-      siteDataLoader = new SiteDataLoader(mockMapElement)
+      siteDataLoader = new SiteDataLoader(mapElement)
       const result = siteDataLoader.loadSiteDetails()
 
-      expect(mockMapElement.getAttribute).toHaveBeenCalledWith(
-        'data-site-details'
-      )
       expect(result).toEqual(siteDetails)
       expect(document.getElementById).not.toHaveBeenCalled()
     })
 
     test('should fallback to global element when map element has no data', () => {
       const siteDetails = { coordinatesType: 'file', geoJSON: {} }
-      const mockMapElement = {
-        getAttribute: jest.fn().mockReturnValue(null)
-      }
+      const mapElement = document.createElement('div')
+      // No data-site-details attribute set
       const mockElement = {
         textContent: JSON.stringify(siteDetails)
       }
 
       document.getElementById.mockReturnValue(mockElement)
-      siteDataLoader = new SiteDataLoader(mockMapElement)
+      siteDataLoader = new SiteDataLoader(mapElement)
 
       const result = siteDataLoader.loadSiteDetails()
 
-      expect(mockMapElement.getAttribute).toHaveBeenCalledWith(
-        'data-site-details'
-      )
       expect(document.getElementById).toHaveBeenCalledWith('site-details-data')
       expect(result).toEqual(siteDetails)
     })
@@ -90,17 +95,17 @@ describe('SiteDataLoader', () => {
       }
       const globalSiteDetails = { coordinatesType: 'file', source: 'global' }
 
-      const mockMapElement = {
-        getAttribute: jest
-          .fn()
-          .mockReturnValue(JSON.stringify(dataAttrSiteDetails))
-      }
+      const mapElement = document.createElement('div')
+      mapElement.setAttribute(
+        'data-site-details',
+        JSON.stringify(dataAttrSiteDetails)
+      )
       const mockElement = {
         textContent: JSON.stringify(globalSiteDetails)
       }
 
       document.getElementById.mockReturnValue(mockElement)
-      siteDataLoader = new SiteDataLoader(mockMapElement)
+      siteDataLoader = new SiteDataLoader(mapElement)
 
       const result = siteDataLoader.loadSiteDetails()
 

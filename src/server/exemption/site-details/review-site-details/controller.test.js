@@ -54,6 +54,7 @@ function createMockExemption(
     ...overrides,
     siteDetails: [
       {
+        ...mockExemption.siteDetails[0],
         coordinatesType: 'coordinates',
         coordinateSystem
       }
@@ -174,8 +175,14 @@ function assertProjectNameCaption(document, expectedProjectName) {
  * @param {Array} expectedData - Array of {key, value} objects
  */
 function assertSummaryListData(document, expectedData) {
-  const summaryKeys = document.querySelectorAll('.govuk-summary-list__key')
-  const summaryValues = document.querySelectorAll('.govuk-summary-list__value')
+  const summaryCards = document.querySelectorAll('.govuk-summary-card')
+  const summaryCard = Array.from(summaryCards).find((card) =>
+    card.textContent.includes('Site details')
+  )
+  const summaryKeys = summaryCard.querySelectorAll('.govuk-summary-list__key')
+  const summaryValues = summaryCard.querySelectorAll(
+    '.govuk-summary-list__value'
+  )
 
   expectedData.forEach((item, index) => {
     expect(summaryKeys[index]?.textContent.trim()).toBe(item.key)
@@ -378,11 +385,23 @@ describe('#reviewSiteDetails', () => {
           pageTitle: 'Review site details',
           backLink: routes.TASK_LIST,
           projectName: undefined,
+          siteNumber: 1,
           summaryData: {
+            activityDates: '',
+            activityDescription: '',
             method: '',
             coordinateSystem: '',
             coordinates: '',
-            width: ''
+            width: '',
+            showActivityDates: true,
+            showActivityDescription: true,
+            siteName: ''
+          },
+          multipleSiteDetailsData: {
+            method: 'Enter the coordinates of the site manually',
+            multipleSiteDetails: 'No',
+            sameActivityDates: 'No',
+            sameActivityDescription: 'No'
           },
           siteDetailsData: '{"coordinatesType":"coordinates"}'
         })
@@ -498,13 +517,28 @@ describe('#reviewSiteDetails', () => {
           pageTitle: 'Review site details',
           backLink: routes.TASK_LIST,
           projectName: 'Test Project',
+          siteNumber: 1,
           summaryData: {
+            activityDates: '1 January 2025 to 1 January 2025',
+            activityDescription: 'Test activity description',
             method:
               'Manually enter one set of coordinates and a width to create a circular site',
             coordinateSystem:
               'WGS84 (World Geodetic System 1984)\nLatitude and longitude',
             coordinates: `${mockCoordinates[COORDINATE_SYSTEMS.WGS84].latitude}, ${mockCoordinates[COORDINATE_SYSTEMS.WGS84].longitude}`,
-            width: '100 metres'
+            width: '100 metres',
+            showActivityDates: true,
+            showActivityDescription: true,
+            siteName: 'Mock site'
+          },
+          multipleSiteDetailsData: {
+            activityDates: '1 January 2025 to 1 January 2025',
+            activityDescription: 'Test activity description',
+            method: 'Enter the coordinates of the site manually',
+            multipleSiteDetails: 'No',
+
+            sameActivityDates: 'Yes',
+            sameActivityDescription: 'Yes'
           },
           siteDetailsData:
             '{"coordinatesType":"coordinates","coordinateSystem":"wgs84","coordinatesEntry":"single","coordinates":{"latitude":"51.489676","longitude":"-0.231530"},"circleWidth":"100"}'
@@ -531,12 +565,26 @@ describe('#reviewSiteDetails', () => {
           pageTitle: 'Review site details',
           backLink: routes.TASK_LIST,
           projectName: 'Test Project',
+          siteNumber: 1,
           summaryData: {
+            activityDates: '1 January 2025 to 1 January 2025',
+            activityDescription: 'Test activity description',
             method:
               'Manually enter one set of coordinates and a width to create a circular site',
             coordinateSystem: 'OSGB36 (National Grid)\nEastings and Northings',
             coordinates: `${mockCoordinates[COORDINATE_SYSTEMS.OSGB36].eastings}, ${mockCoordinates[COORDINATE_SYSTEMS.OSGB36].northings}`,
-            width: '100 metres'
+            width: '100 metres',
+            showActivityDates: true,
+            showActivityDescription: true,
+            siteName: 'Mock site'
+          },
+          multipleSiteDetailsData: {
+            activityDates: '1 January 2025 to 1 January 2025',
+            activityDescription: 'Test activity description',
+            method: 'Enter the coordinates of the site manually',
+            multipleSiteDetails: 'No',
+            sameActivityDates: 'Yes',
+            sameActivityDescription: 'Yes'
           },
           siteDetailsData:
             '{"coordinatesType":"coordinates","coordinateSystem":"osgb36","coordinatesEntry":"single","coordinates":{"eastings":"425053","northings":"564180"},"circleWidth":"100"}'
@@ -569,15 +617,28 @@ describe('#reviewSiteDetails', () => {
         assertProjectNameCaption(document, mockExemption.projectName)
 
         // Summary card title
-        const summaryCardTitle = document.querySelector(
+        const summaryCardTitles = document.querySelectorAll(
           '.govuk-summary-card__title'
         )
+
+        const summaryCardTitle = Array.from(summaryCardTitles).find((card) =>
+          card.textContent.includes('Site details')
+        )
+
         expect(summaryCardTitle.textContent.trim()).toBe('Site details')
 
         // Summary list data
         const summaryData = [
           {
-            key: 'Method of providing site location',
+            key: 'Activity dates',
+            value: '1 January 2025 to 1 January 2025'
+          },
+          {
+            key: 'Activity description',
+            value: 'Test activity description'
+          },
+          {
+            key: 'Single or multiple sets of coordinates',
             value:
               'Manually enter one set of coordinates and a width to create a circular site'
           },
@@ -633,7 +694,10 @@ describe('#reviewSiteDetails', () => {
             pageTitle: 'Review site details',
             backLink: routes.ENTER_MULTIPLE_COORDINATES,
             projectName: 'Test Project',
+            siteNumber: 1,
             summaryData: {
+              activityDates: '1 January 2025 to 1 January 2025',
+              activityDescription: 'Test activity description',
               method:
                 'Manually enter multiple sets of coordinates to mark the boundary of the site',
               coordinateSystem:
@@ -651,10 +715,22 @@ describe('#reviewSiteDetails', () => {
                   label: 'Point 3',
                   value: '78.123456, 78.123456'
                 }
-              ]
+              ],
+              showActivityDates: true,
+              showActivityDescription: true,
+              siteName: 'Mock site'
+            },
+            multipleSiteDetailsData: {
+              activityDates: '1 January 2025 to 1 January 2025',
+              activityDescription: 'Test activity description',
+              method: 'Enter the coordinates of the site manually',
+              multipleSiteDetails: 'No',
+
+              sameActivityDates: 'Yes',
+              sameActivityDescription: 'Yes'
             },
             siteDetailsData:
-              '{"coordinatesType":"coordinates","coordinateSystem":"wgs84","coordinatesEntry":"multiple","coordinates":[{"latitude":"55.123456","longitude":"55.123456"},{"latitude":"33.987654","longitude":"33.987654"},{"latitude":"78.123456","longitude":"78.123456"}]}'
+              '{"coordinatesType":"coordinates","coordinateSystem":"wgs84","coordinatesEntry":"multiple","coordinates":[{"latitude":"55.123456","longitude":"55.123456"},{"latitude":"33.987654","longitude":"33.987654"},{"latitude":"78.123456","longitude":"78.123456"}],"circleWidth":"100"}'
           })
         })
 
@@ -683,7 +759,10 @@ describe('#reviewSiteDetails', () => {
             pageTitle: 'Review site details',
             backLink: routes.ENTER_MULTIPLE_COORDINATES,
             projectName: 'Test Project',
+            siteNumber: 1,
             summaryData: {
+              activityDates: '1 January 2025 to 1 January 2025',
+              activityDescription: 'Test activity description',
               method:
                 'Manually enter multiple sets of coordinates to mark the boundary of the site',
               coordinateSystem:
@@ -701,10 +780,21 @@ describe('#reviewSiteDetails', () => {
                   label: 'Point 3',
                   value: '427000, 566000'
                 }
-              ]
+              ],
+              showActivityDates: true,
+              showActivityDescription: true,
+              siteName: 'Mock site'
+            },
+            multipleSiteDetailsData: {
+              activityDates: '1 January 2025 to 1 January 2025',
+              activityDescription: 'Test activity description',
+              method: 'Enter the coordinates of the site manually',
+              multipleSiteDetails: 'No',
+              sameActivityDates: 'Yes',
+              sameActivityDescription: 'Yes'
             },
             siteDetailsData:
-              '{"coordinatesType":"coordinates","coordinateSystem":"osgb36","coordinatesEntry":"multiple","coordinates":[{"eastings":"425053","northings":"564180"},{"eastings":"426000","northings":"565000"},{"eastings":"427000","northings":"566000"}]}'
+              '{"coordinatesType":"coordinates","coordinateSystem":"osgb36","coordinatesEntry":"multiple","coordinates":[{"eastings":"425053","northings":"564180"},{"eastings":"426000","northings":"565000"},{"eastings":"427000","northings":"566000"}],"circleWidth":"100"}'
           })
         })
 
@@ -744,15 +834,30 @@ describe('#reviewSiteDetails', () => {
             pageTitle: 'Review site details',
             backLink: routes.ENTER_MULTIPLE_COORDINATES,
             projectName: 'Test Project',
+            siteNumber: 1,
             summaryData: {
+              activityDates: '1 January 2025 to 1 January 2025',
+              activityDescription: 'Test activity description',
               method:
                 'Manually enter multiple sets of coordinates to mark the boundary of the site',
               coordinateSystem:
                 'WGS84 (World Geodetic System 1984)\nLatitude and longitude',
-              polygonCoordinates: []
+              polygonCoordinates: [],
+              showActivityDates: true,
+              showActivityDescription: true,
+              siteName: 'Mock site'
+            },
+            multipleSiteDetailsData: {
+              activityDates: '1 January 2025 to 1 January 2025',
+              activityDescription: 'Test activity description',
+              method: 'Enter the coordinates of the site manually',
+              multipleSiteDetails: 'No',
+
+              sameActivityDates: 'Yes',
+              sameActivityDescription: 'Yes'
             },
             siteDetailsData:
-              '{"coordinatesType":"coordinates","coordinateSystem":"wgs84","coordinatesEntry":"multiple","coordinates":[]}'
+              '{"coordinatesType":"coordinates","coordinateSystem":"wgs84","coordinatesEntry":"multiple","coordinates":[],"circleWidth":"100"}'
           })
         })
 
@@ -797,7 +902,10 @@ describe('#reviewSiteDetails', () => {
             pageTitle: 'Review site details',
             backLink: routes.ENTER_MULTIPLE_COORDINATES,
             projectName: 'Test Project',
+            siteNumber: 1,
             summaryData: {
+              activityDates: '1 January 2025 to 1 January 2025',
+              activityDescription: 'Test activity description',
               method:
                 'Manually enter multiple sets of coordinates to mark the boundary of the site',
               coordinateSystem:
@@ -811,10 +919,22 @@ describe('#reviewSiteDetails', () => {
                   label: 'Point 2',
                   value: '78.123456, 78.123456'
                 }
-              ]
+              ],
+              showActivityDates: true,
+              showActivityDescription: true,
+              siteName: 'Mock site'
+            },
+            multipleSiteDetailsData: {
+              activityDates: '1 January 2025 to 1 January 2025',
+              activityDescription: 'Test activity description',
+              method: 'Enter the coordinates of the site manually',
+              multipleSiteDetails: 'No',
+
+              sameActivityDates: 'Yes',
+              sameActivityDescription: 'Yes'
             },
             siteDetailsData:
-              '{"coordinatesType":"coordinates","coordinateSystem":"wgs84","coordinatesEntry":"multiple","coordinates":[{"latitude":"55.123456","longitude":"55.123456"},{"latitude":"","longitude":"33.987654"},{"latitude":"78.123456","longitude":"78.123456"},{"latitude":null,"longitude":null}]}'
+              '{"coordinatesType":"coordinates","coordinateSystem":"wgs84","coordinatesEntry":"multiple","coordinates":[{"latitude":"55.123456","longitude":"55.123456"},{"latitude":"","longitude":"33.987654"},{"latitude":"78.123456","longitude":"78.123456"},{"latitude":null,"longitude":null}],"circleWidth":"100"}'
           })
         })
 
@@ -889,94 +1009,6 @@ describe('#reviewSiteDetails', () => {
             { label: 'Point 4', value: '53.123456, 53.123456' },
             { label: 'Point 5', value: '54.123456, 54.123456' }
           ])
-        })
-
-        test('should display polygon summary data in DOM', async () => {
-          getExemptionCacheSpy.mockReturnValueOnce(mockPolygonExemptionWGS84)
-
-          const { result, statusCode } = await server.inject({
-            method: 'GET',
-            url: routes.REVIEW_SITE_DETAILS,
-            headers: {
-              referer: `http://localhost${routes.ENTER_MULTIPLE_COORDINATES}`
-            }
-          })
-
-          expect(result).toEqual(
-            expect.stringContaining(
-              `Review site details | ${config.get('serviceName')}`
-            )
-          )
-
-          const { document } = new JSDOM(result).window
-
-          expect(document.querySelector('h1').textContent.trim()).toContain(
-            'Review site details'
-          )
-
-          expect(
-            document.querySelector('.govuk-caption-l').textContent.trim()
-          ).toBe(mockPolygonExemptionWGS84.projectName)
-
-          const summaryCardTitle = document.querySelector(
-            '.govuk-summary-card__title'
-          )
-          expect(summaryCardTitle.textContent.trim()).toBe('Site details')
-
-          const summaryKeys = document.querySelectorAll(
-            '.govuk-summary-list__key'
-          )
-          const summaryValues = document.querySelectorAll(
-            '.govuk-summary-list__value'
-          )
-
-          expect(summaryKeys[0].textContent.trim()).toBe(
-            'Method of providing site location'
-          )
-          expect(summaryValues[0].textContent.trim()).toBe(
-            'Manually enter multiple sets of coordinates to mark the boundary of the site'
-          )
-
-          expect(summaryKeys[1].textContent.trim()).toBe('Coordinate system')
-          expect(summaryValues[1].innerHTML.trim()).toContain(
-            'WGS84 (World Geodetic System 1984)'
-          )
-          expect(summaryValues[1].innerHTML.trim()).toContain(
-            'Latitude and longitude'
-          )
-
-          expect(summaryKeys[2].textContent.trim()).toBe('Start and end points')
-          expect(summaryValues[2].textContent.trim()).toBe(
-            '55.123456, 55.123456'
-          )
-
-          expect(summaryKeys[3].textContent.trim()).toBe('Point 2')
-          expect(summaryValues[3].textContent.trim()).toBe(
-            '33.987654, 33.987654'
-          )
-
-          expect(summaryKeys[4].textContent.trim()).toBe('Point 3')
-          expect(summaryValues[4].textContent.trim()).toBe(
-            '78.123456, 78.123456'
-          )
-
-          expect(
-            document
-              .querySelector(
-                `.govuk-back-link[href="${routes.ENTER_MULTIPLE_COORDINATES}"]`
-              )
-              .textContent.trim()
-          ).toBe('Back')
-
-          expect(
-            document
-              .querySelector(
-                '.govuk-link[href="/exemption/task-list?cancel=site-details"]'
-              )
-              .textContent.trim()
-          ).toBe('Cancel')
-
-          expect(statusCode).toBe(statusCodes.ok)
         })
       })
     })
@@ -1428,15 +1460,23 @@ describe('#reviewSiteDetails', () => {
           const siteDetails = {
             coordinatesEntry: 'multiple',
             coordinatesType: 'coordinates',
-            coordinates: mockPolygonCoordinatesWGS84
+            coordinates: mockPolygonCoordinatesWGS84,
+            activityDates: {
+              start: '2025-01-01T00:00:00.000Z',
+              end: '2025-01-01T00:00:00.000Z'
+            },
+            activityDescription: 'Test activity description'
           }
 
           const result = buildManualCoordinateSummaryData(
             siteDetails,
-            COORDINATE_SYSTEMS.WGS84
+            COORDINATE_SYSTEMS.WGS84,
+            { multipleSitesEnabled: false }
           )
 
           expect(result).toEqual({
+            activityDates: '1 January 2025 to 1 January 2025',
+            activityDescription: 'Test activity description',
             method:
               'Manually enter multiple sets of coordinates to mark the boundary of the site',
             coordinateSystem:
@@ -1445,7 +1485,10 @@ describe('#reviewSiteDetails', () => {
               { label: 'Start and end points', value: '55.123456, 55.123456' },
               { label: 'Point 2', value: '33.987654, 33.987654' },
               { label: 'Point 3', value: '78.123456, 78.123456' }
-            ]
+            ],
+            showActivityDates: true,
+            showActivityDescription: true,
+            siteName: ''
           })
         })
 
@@ -1454,20 +1497,31 @@ describe('#reviewSiteDetails', () => {
             coordinatesEntry: 'single',
             coordinatesType: 'coordinates',
             coordinates: { latitude: '50.123456', longitude: '-0.123456' },
-            circleWidth: '200'
+            circleWidth: '200',
+            activityDates: {
+              start: '2025-01-01T00:00:00.000Z',
+              end: '2025-01-01T00:00:00.000Z'
+            },
+            activityDescription: 'Test activity description'
           }
 
           const result = buildManualCoordinateSummaryData(
             siteDetails,
-            COORDINATE_SYSTEMS.WGS84
+            COORDINATE_SYSTEMS.WGS84,
+            { multipleSitesEnabled: false }
           )
 
           expect(result).toEqual({
+            activityDates: '1 January 2025 to 1 January 2025',
+            activityDescription: 'Test activity description',
             method:
               'Manually enter one set of coordinates and a width to create a circular site',
             coordinateSystem:
               'WGS84 (World Geodetic System 1984)\nLatitude and longitude',
             coordinates: '50.123456, -0.123456',
+            showActivityDates: true,
+            showActivityDescription: true,
+            siteName: '',
             width: '200 metres'
           })
         })

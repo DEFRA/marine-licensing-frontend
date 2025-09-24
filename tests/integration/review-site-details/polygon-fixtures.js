@@ -1,6 +1,12 @@
 import { COORDINATE_SYSTEMS } from '~/src/server/common/constants/exemptions.js'
+import { mockExemption } from '~/src/server/test-helpers/mocks.js'
 
 const basePolygonExemption = {
+  multipleSiteDetails: {
+    multipleSiteDetails: false,
+    sameActivityDates: 'no',
+    sameActivityDescrption: 'no'
+  },
   id: 'test-polygon-exemption-123',
   projectName: 'Hammersmith pontoon construction',
   activityDates: {
@@ -16,7 +22,9 @@ const basePolygonExemption = {
     projectName: { status: 'completed' },
     activityDates: { status: 'completed' },
     activityDescription: { status: 'completed' },
-    siteDetails: { status: 'completed' },
+    siteDetails: {
+      status: 'completed'
+    },
     publicRegister: { status: 'completed' }
   }
 }
@@ -29,6 +37,11 @@ export const testScenarios = [
       ...basePolygonExemption,
       siteDetails: [
         {
+          activityDates: {
+            start: '2025-01-01T00:00:00.000Z',
+            end: '2025-01-01T00:00:00.000Z'
+          },
+          activityDescription: 'Test activity description',
           coordinatesType: 'coordinates',
           coordinatesEntry: 'multiple',
           coordinateSystem: 'wgs84',
@@ -42,7 +55,14 @@ export const testScenarios = [
     },
     expectedPageContent: {
       projectName: 'Hammersmith pontoon construction',
+      multipleSiteDetails: {
+        method: 'Enter the coordinates of the site manually',
+        multipleSiteDetails: 'No'
+      },
       siteDetails: {
+        activityDates: '1 January 2025 to 1 January 2025',
+        activityDescription: 'Test activity description',
+        cardName: 'Site details',
         method:
           'Manually enter multiple sets of coordinates to mark the boundary of the site',
         coordinateSystem:
@@ -71,6 +91,11 @@ export const testScenarios = [
       ...basePolygonExemption,
       siteDetails: [
         {
+          activityDates: {
+            start: '2025-01-01T00:00:00.000Z',
+            end: '2025-01-01T00:00:00.000Z'
+          },
+          activityDescription: 'Test activity description',
           coordinatesType: 'coordinates',
           coordinatesEntry: 'multiple',
           coordinateSystem: 'osgb36',
@@ -84,7 +109,14 @@ export const testScenarios = [
     },
     expectedPageContent: {
       projectName: 'Hammersmith pontoon construction',
+      multipleSiteDetails: {
+        method: 'Enter the coordinates of the site manually',
+        multipleSiteDetails: 'No'
+      },
       siteDetails: {
+        activityDates: '1 January 2025 to 1 January 2025',
+        activityDescription: 'Test activity description',
+        cardName: 'Site details',
         method:
           'Manually enter multiple sets of coordinates to mark the boundary of the site',
         coordinateSystem: 'OSGB36 (National Grid)Eastings and Northings',
@@ -112,6 +144,11 @@ export const testScenarios = [
       ...basePolygonExemption,
       siteDetails: [
         {
+          activityDates: {
+            start: '2025-01-01T00:00:00.000Z',
+            end: '2025-01-01T00:00:00.000Z'
+          },
+          activityDescription: 'Test activity description',
           coordinatesType: 'coordinates',
           coordinatesEntry: 'multiple',
           coordinateSystem: 'wgs84',
@@ -127,7 +164,14 @@ export const testScenarios = [
     },
     expectedPageContent: {
       projectName: 'Hammersmith pontoon construction',
+      multipleSiteDetails: {
+        method: 'Enter the coordinates of the site manually',
+        multipleSiteDetails: 'No'
+      },
       siteDetails: {
+        activityDates: '1 January 2025 to 1 January 2025',
+        activityDescription: 'Test activity description',
+        cardName: 'Site details',
         method:
           'Manually enter multiple sets of coordinates to mark the boundary of the site',
         coordinateSystem:
@@ -164,6 +208,11 @@ export const testScenarios = [
       ...basePolygonExemption,
       siteDetails: [
         {
+          activityDates: {
+            start: '2025-01-01T00:00:00.000Z',
+            end: '2025-01-01T00:00:00.000Z'
+          },
+          activityDescription: 'Test activity description',
           coordinatesType: 'coordinates',
           coordinatesEntry: 'multiple',
           coordinateSystem: 'osgb36',
@@ -180,7 +229,14 @@ export const testScenarios = [
     },
     expectedPageContent: {
       projectName: 'Hammersmith pontoon construction',
+      multipleSiteDetails: {
+        method: 'Enter the coordinates of the site manually',
+        multipleSiteDetails: 'No'
+      },
       siteDetails: {
+        activityDates: '1 January 2025 to 1 January 2025',
+        activityDescription: 'Test activity description',
+        cardName: 'Site details',
         method:
           'Manually enter multiple sets of coordinates to mark the boundary of the site',
         coordinateSystem: 'OSGB36 (National Grid)Eastings and Northings',
@@ -214,13 +270,20 @@ export const testScenarios = [
     }
   },
   {
-    name: 'Multiple sites scenario',
+    name: 'Multiple sites scenario with the same dates and description',
     coordinateSystem: COORDINATE_SYSTEMS.WGS84,
     exemption: {
       ...basePolygonExemption,
-      multipleSiteDetails: { multipleSitesEnabled: true },
+      multipleSiteDetails: {
+        multipleSitesEnabled: true,
+        sameActivityDates: 'yes',
+        sameActivityDescription: 'yes'
+      },
       siteDetails: [
         {
+          activityDates: mockExemption.siteDetails[0].activityDates,
+          activityDescription: mockExemption.siteDetails[0].activityDescription,
+          siteName: 'Site 1',
           coordinatesType: 'coordinates',
           coordinatesEntry: 'multiple',
           coordinateSystem: 'wgs84',
@@ -231,6 +294,9 @@ export const testScenarios = [
           ]
         },
         {
+          activityDates: mockExemption.siteDetails[1].activityDates,
+          activityDescription: mockExemption.siteDetails[1].activityDescription,
+          siteName: 'Site 2',
           coordinatesType: 'coordinates',
           coordinatesEntry: 'multiple',
           coordinateSystem: 'wgs84',
@@ -244,7 +310,90 @@ export const testScenarios = [
     },
     expectedPageContent: {
       projectName: 'Hammersmith pontoon construction',
+      multipleSiteDetails: {
+        method: 'Enter the coordinates of the site manually',
+        multipleSiteDetails: 'Yes',
+        sameActivityDates: 'Yes',
+        sameActivityDescription: 'Yes',
+        activityDates: '1 January 2025 to 1 January 2025',
+        activityDescription: 'Test activity description'
+      },
       siteDetails: {
+        siteName: 'Site 1',
+        cardName: 'Site 1 details',
+        method:
+          'Manually enter multiple sets of coordinates to mark the boundary of the site',
+        coordinateSystem:
+          'WGS84 (World Geodetic System 1984)Latitude and longitude',
+        polygonCoordinates: [
+          {
+            label: 'Start and end points',
+            value: '55.123456, 55.123456'
+          },
+          {
+            label: 'Point 2',
+            value: '33.987654, 33.987654'
+          },
+          {
+            label: 'Point 3',
+            value: '78.123456, 78.123456'
+          }
+        ]
+      }
+    }
+  },
+  {
+    name: 'Multiple sites scenario with variable dates and description',
+    coordinateSystem: COORDINATE_SYSTEMS.WGS84,
+    exemption: {
+      ...basePolygonExemption,
+      multipleSiteDetails: {
+        multipleSitesEnabled: true,
+        sameActivityDates: 'no',
+        sameActivityDescription: 'no'
+      },
+      siteDetails: [
+        {
+          activityDates: mockExemption.siteDetails[0].activityDates,
+          activityDescription: mockExemption.siteDetails[0].activityDescription,
+          siteName: 'Site 1',
+          coordinatesType: 'coordinates',
+          coordinatesEntry: 'multiple',
+          coordinateSystem: 'wgs84',
+          coordinates: [
+            { latitude: '55.123456', longitude: '55.123456' },
+            { latitude: '33.987654', longitude: '33.987654' },
+            { latitude: '78.123456', longitude: '78.123456' }
+          ]
+        },
+        {
+          activityDates: mockExemption.siteDetails[0].activityDates,
+          activityDescription: mockExemption.siteDetails[0].activityDescription,
+          siteName: 'Site 2',
+          coordinatesType: 'coordinates',
+          coordinatesEntry: 'multiple',
+          coordinateSystem: 'wgs84',
+          coordinates: [
+            { latitude: '55.123456', longitude: '55.123456' },
+            { latitude: '33.987654', longitude: '33.987654' },
+            { latitude: '78.123456', longitude: '78.123456' }
+          ]
+        }
+      ]
+    },
+    expectedPageContent: {
+      projectName: 'Hammersmith pontoon construction',
+      multipleSiteDetails: {
+        method: 'Enter the coordinates of the site manually',
+        multipleSiteDetails: 'Yes',
+        sameActivityDates: 'No',
+        sameActivityDescription: 'No'
+      },
+      siteDetails: {
+        siteName: 'Site 1',
+        cardName: 'Site 1 details',
+        activityDates: '1 January 2025 to 1 January 2025',
+        activityDescription: 'Test activity description',
         method:
           'Manually enter multiple sets of coordinates to mark the boundary of the site',
         coordinateSystem:

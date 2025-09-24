@@ -5,6 +5,7 @@ import { routes } from '~/src/server/common/constants/routes.js'
 import { getCoordinateSystem } from '~/src/server/common/helpers/coordinate-utils.js'
 import { createSiteDetailsDataJson } from '~/src/server/common/helpers/site-details.js'
 import { getSiteDetailsBySite } from '~/src/server/common/helpers/session-cache/site-details-utils.js'
+import { formatDate } from '~/src/server/common/helpers/dates/date-utils.js'
 const isWGS84 = (coordinateSystem) =>
   coordinateSystem === COORDINATE_SYSTEMS.WGS84
 
@@ -198,6 +199,28 @@ export const getFileUploadBackLink = (previousPage) => {
 const metresLabel = (metres) =>
   metres === '1' ? `${metres} metre` : `${metres} metres`
 
+const getActivityDatesSummaryText = (activityDates, showActivityDates) => {
+  if (!showActivityDates) {
+    return ''
+  }
+
+  if (activityDates?.start && activityDates?.end) {
+    return `${formatDate(activityDates.start)} to ${formatDate(activityDates.end)}`
+  }
+  return ''
+}
+
+const getActivityDescriptionSummaryText = (
+  activityDescription,
+  showActivityDescription
+) => {
+  if (!showActivityDescription) {
+    return ''
+  }
+
+  return activityDescription ?? ''
+}
+
 /**
  * Builds summary data for manual coordinate entry display
  * @param {object} siteDetails - Site details from exemption
@@ -206,12 +229,37 @@ const metresLabel = (metres) =>
  */
 export const buildManualCoordinateSummaryData = (
   siteDetails,
-  coordinateSystem
+  coordinateSystem,
+  multipleSiteDetails = {}
 ) => {
-  const { circleWidth, coordinatesEntry } = siteDetails
+  const {
+    circleWidth,
+    coordinatesEntry,
+    activityDates,
+    activityDescription,
+    siteName
+  } = siteDetails
+  const { multipleSitesEnabled, sameActivityDates, sameActivityDescription } =
+    multipleSiteDetails
+
+  const showActivityDates = !multipleSitesEnabled || sameActivityDates === 'no'
+
+  const showActivityDescription =
+    !multipleSitesEnabled || sameActivityDescription === 'no'
 
   if (coordinatesEntry === 'multiple') {
     return {
+      activityDates: getActivityDatesSummaryText(
+        activityDates,
+        showActivityDates
+      ),
+      activityDescription: getActivityDescriptionSummaryText(
+        activityDescription,
+        showActivityDescription
+      ),
+      showActivityDates,
+      showActivityDescription,
+      siteName: siteName ?? '',
       method: getReviewSummaryText(siteDetails),
       coordinateSystem: getCoordinateSystemText(coordinateSystem),
       polygonCoordinates: getPolygonCoordinatesDisplayData(
@@ -223,11 +271,63 @@ export const buildManualCoordinateSummaryData = (
 
   // Default to circular site display
   return {
+    activityDates: getActivityDatesSummaryText(
+      activityDates,
+      showActivityDates
+    ),
+    activityDescription: getActivityDescriptionSummaryText(
+      activityDescription,
+      showActivityDescription
+    ),
+    showActivityDates,
+    showActivityDescription,
+    siteName: siteName ?? '',
     method: getReviewSummaryText(siteDetails),
     coordinateSystem: getCoordinateSystemText(coordinateSystem),
     coordinates: getCoordinateDisplayText(siteDetails, coordinateSystem),
     width: circleWidth ? metresLabel(circleWidth) : ''
   }
+}
+
+/**
+ * Builds summary data for displaying multiple site information
+ * @param {object} multipleSiteDetails - Multiple site details from exemption
+ * @param {Array} siteDetails - Site details from exemption
+ * @returns {object} Summary data for template
+ */
+export const buildManualCoordinateMultipleSitesSummaryData = (
+  multipleSiteDetails,
+  siteDetails
+) => {
+  const { multipleSitesEnabled, sameActivityDates, sameActivityDescription } =
+    multipleSiteDetails ?? {}
+
+  const multipleSiteData = {
+    method: 'Enter the coordinates of the site manually',
+    multipleSiteDetails: multipleSitesEnabled ? 'Yes' : 'No',
+    sameActivityDates: sameActivityDates === 'yes' ? 'Yes' : 'No',
+    sameActivityDescription: sameActivityDescription === 'yes' ? 'Yes' : 'No'
+  }
+
+  if (!siteDetails) {
+    return multipleSiteData
+  }
+
+  const firstSite = siteDetails[0]
+
+  if (!firstSite) {
+    return {}
+  }
+
+  if (sameActivityDates === 'yes') {
+    multipleSiteData.activityDates = `${formatDate(firstSite.activityDates?.start)} to ${formatDate(firstSite.activityDates?.end)}`
+  }
+
+  if (sameActivityDescription === 'yes') {
+    multipleSiteData.activityDescription = firstSite.activityDescription
+  }
+
+  return multipleSiteData
 }
 
 /**
@@ -400,7 +500,13 @@ export const renderManualCoordinateReview = (h, request, options) => {
   const { coordinateSystem } = getCoordinateSystem(request)
   const summaryData = buildManualCoordinateSummaryData(
     siteDetails,
-    coordinateSystem
+    coordinateSystem,
+    multipleSiteDetails
+  )
+
+  const multipleSiteDetailsData = buildManualCoordinateMultipleSitesSummaryData(
+    multipleSiteDetails,
+    exemption.siteDetails
   )
 
   // Prepare site details data for map if needed
@@ -418,7 +524,9 @@ export const renderManualCoordinateReview = (h, request, options) => {
     projectName: exemption.projectName,
     summaryData,
     siteDetailsData,
-    isMultiSiteJourney: !!multipleSiteDetails?.multipleSitesEnabled
+    multipleSiteDetailsData,
+    isMultiSiteJourney: !!multipleSiteDetails?.multipleSitesEnabled,
+    siteNumber: 1
   })
 }
 

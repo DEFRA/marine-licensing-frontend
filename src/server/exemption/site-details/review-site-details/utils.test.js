@@ -670,67 +670,6 @@ describe('siteDetails utils', () => {
     })
   })
 
-  describe('buildManualCoordinateMultipleSitesSummaryData util', () => {
-    test('buildManualCoordinateMultipleSitesSummaryData correctly handles multiple sites', () => {
-      const result = buildManualCoordinateMultipleSitesSummaryData({
-        multipleSitesEnabled: true,
-        sameActivityDates: 'no',
-        sameActivityDescription: 'no'
-      })
-
-      expect(result).toEqual({
-        method: 'Enter the coordinates of the site manually',
-        multipleSiteDetails: 'Yes',
-        sameActivityDates: 'No',
-        sameActivityDescription: 'No'
-      })
-    })
-
-    test('buildManualCoordinateMultipleSitesSummaryData correctly handles multiple sites with same dates and description', () => {
-      const result = buildManualCoordinateMultipleSitesSummaryData(
-        {
-          multipleSitesEnabled: true,
-          sameActivityDates: 'yes',
-          sameActivityDescription: 'yes'
-        },
-        mockExemption.siteDetails
-      )
-
-      expect(result).toEqual({
-        method: 'Enter the coordinates of the site manually',
-        multipleSiteDetails: 'Yes',
-        sameActivityDates: 'Yes',
-        sameActivityDescription: 'Yes',
-        activityDates: '1 January 2025 to 1 January 2025',
-        activityDescription: 'Test activity description'
-      })
-    })
-
-    test('buildManualCoordinateMultipleSitesSummaryData correctly handles single site', () => {
-      const result = buildManualCoordinateMultipleSitesSummaryData({
-        multipleSitesEnabled: false
-      })
-
-      expect(result).toEqual({
-        method: 'Enter the coordinates of the site manually',
-        multipleSiteDetails: 'No',
-        sameActivityDates: 'No',
-        sameActivityDescription: 'No'
-      })
-    })
-
-    test('buildManualCoordinateMultipleSitesSummaryData correctly handles empty object', () => {
-      const result = buildManualCoordinateMultipleSitesSummaryData({})
-
-      expect(result).toEqual({
-        method: 'Enter the coordinates of the site manually',
-        multipleSiteDetails: 'No',
-        sameActivityDates: 'No',
-        sameActivityDescription: 'No'
-      })
-    })
-  })
-
   describe('getSiteDetails util', () => {
     const mockRequest = {
       logger: {

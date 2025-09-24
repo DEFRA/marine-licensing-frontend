@@ -37,15 +37,13 @@ describe('SiteDataLoader', () => {
       expect(result).toEqual(siteDetails)
     })
 
-    test('should handle invalid JSON gracefully and return null', () => {
+    test('should throw error when JSON parsing fails', () => {
       const mockElement = {
         textContent: 'invalid json'
       }
       document.getElementById.mockReturnValue(mockElement)
 
-      const result = siteDataLoader.loadSiteDetails()
-
-      expect(result).toBeNull()
+      expect(() => siteDataLoader.loadSiteDetails()).toThrow()
     })
 
     test('should load data from map element data attribute when provided', () => {
@@ -83,18 +81,6 @@ describe('SiteDataLoader', () => {
       )
       expect(document.getElementById).toHaveBeenCalledWith('site-details-data')
       expect(result).toEqual(siteDetails)
-    })
-
-    test('should handle invalid JSON in data attribute gracefully', () => {
-      const mockMapElement = {
-        getAttribute: jest.fn().mockReturnValue('invalid json')
-      }
-
-      document.getElementById.mockReturnValue(null)
-      siteDataLoader = new SiteDataLoader(mockMapElement)
-
-      const result = siteDataLoader.loadSiteDetails()
-      expect(result).toBeNull()
     })
 
     test('should prioritize data attribute over global element', () => {

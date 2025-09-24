@@ -9,6 +9,7 @@ import {
 import { setSiteDataPreHandler } from '~/src/server/common/helpers/session-cache/site-utils.js'
 import { authenticatedPatchRequest } from '~/src/server/common/helpers/authenticated-requests.js'
 import { routes } from '~/src/server/common/constants/routes.js'
+import { mockExemption } from '~/src/server/test-helpers/mocks.js'
 
 jest.mock('~/src/server/common/helpers/session-cache/utils.js')
 jest.mock('~/src/server/common/helpers/session-cache/site-utils.js')
@@ -22,7 +23,8 @@ const mockH = {
 const mockRequest = {
   site: {
     siteNumber: '1',
-    siteIndex: 0
+    siteIndex: 0,
+    siteDetails: mockExemption.siteDetails[0]
   },
   logger: {
     info: jest.fn(),
@@ -30,30 +32,15 @@ const mockRequest = {
   }
 }
 
-const mockExemption = {
-  id: 'test-exemption-id',
-  projectName: 'Test Project',
-  multipleSiteDetails: { multipleSitesEnabled: true },
-  siteDetails: [
-    {
-      siteName: 'Test Site 1',
-      coordinatesType: 'manual'
-    },
-    {
-      siteName: 'Test Site 2',
-      coordinatesType: 'manual'
-    }
-  ]
-}
-
 describe('deleteSiteController', () => {
   beforeEach(() => {
+    jest.clearAllMocks()
     getExemptionCache.mockReturnValue(mockExemption)
   })
 
   describe('deleteSiteController.handler', () => {
-    it('should render delete site view with correct data', () => {
-      deleteSiteController.handler(mockRequest, mockH)
+    it('should render delete site view with correct data for manual coordinates', async () => {
+      await deleteSiteController.handler(mockRequest, mockH)
 
       expect(mockH.view).toHaveBeenCalledWith(
         'exemption/site-details/delete-site/index',
@@ -65,6 +52,25 @@ describe('deleteSiteController', () => {
           routes
         }
       )
+    })
+
+    it('should redirect to review page for file upload sites without allowing delete', async () => {
+      const fileUploadRequest = {
+        ...mockRequest,
+        site: {
+          ...mockRequest.site,
+          siteDetails: {
+            siteName: 'File Upload Site',
+            coordinatesType: 'file'
+          }
+        }
+      }
+
+      await deleteSiteController.handler(fileUploadRequest, mockH)
+
+      expect(mockH.view).not.toHaveBeenCalled()
+      expect(authenticatedPatchRequest).not.toHaveBeenCalled()
+      expect(mockH.redirect).toHaveBeenCalledWith(routes.REVIEW_SITE_DETAILS)
     })
 
     it('should have setSiteDataPreHandler in options', () => {
@@ -82,12 +88,7 @@ describe('deleteSiteController', () => {
     it('should make authenticated patch request with site removed and redirect', async () => {
       await deleteSiteSubmitController.handler(mockRequest, mockH)
 
-      const expectedSiteDetails = [
-        {
-          siteName: 'Test Site 2',
-          coordinatesType: 'manual'
-        }
-      ]
+      const expectedSiteDetails = [mockExemption.siteDetails[1]]
 
       expect(authenticatedPatchRequest).toHaveBeenCalledWith(
         mockRequest,
@@ -105,7 +106,7 @@ describe('deleteSiteController', () => {
       })
 
       expect(mockRequest.logger.info).toHaveBeenCalledWith(
-        { siteNumber: '1', exemptionId: 'test-exemption-id' },
+        { siteNumber: '1', exemptionId: mockExemption.id },
         'Deleted site 1'
       )
       expect(mockH.redirect).toHaveBeenCalledWith(routes.REVIEW_SITE_DETAILS)
@@ -122,12 +123,7 @@ describe('deleteSiteController', () => {
 
       await deleteSiteSubmitController.handler(requestDeleteSecondSite, mockH)
 
-      const expectedSiteDetails = [
-        {
-          siteName: 'Test Site 1',
-          coordinatesType: 'manual'
-        }
-      ]
+      const expectedSiteDetails = [mockExemption.siteDetails[0]]
 
       expect(authenticatedPatchRequest).toHaveBeenCalledWith(
         requestDeleteSecondSite,
@@ -148,12 +144,7 @@ describe('deleteSiteController', () => {
     it('should redirect to task list when deleting the last site', async () => {
       const exemptionWithOneSite = {
         ...mockExemption,
-        siteDetails: [
-          {
-            siteName: 'Last Site',
-            coordinatesType: 'manual'
-          }
-        ]
+        siteDetails: [mockExemption.siteDetails[0]]
       }
       getExemptionCache.mockReturnValue(exemptionWithOneSite)
 

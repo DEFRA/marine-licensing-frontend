@@ -20,7 +20,11 @@ export const deleteSiteController = {
   },
   handler(request, h) {
     const { site } = request
-    const { siteNumber } = site
+    const { siteNumber, siteDetails } = site
+
+    if (!siteDetails || siteDetails.coordinatesType === 'file') {
+      return h.redirect(routes.REVIEW_SITE_DETAILS)
+    }
 
     return h.view(DELETE_SITE_VIEW_ROUTE, {
       pageTitle: DELETE_SITE_PAGE_TITLE,

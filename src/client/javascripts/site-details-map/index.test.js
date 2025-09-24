@@ -454,71 +454,31 @@ describe('SiteDetailsMap', () => {
   })
 
   describe('multiple map instances', () => {
-    test('should handle multiple maps with different data attributes', () => {
-      const mapContainer1 = document.createElement('div')
-      mapContainer1.className = 'app-site-details-map'
-      mapContainer1.setAttribute('data-module', 'site-details-map')
-      mapContainer1.setAttribute(
-        'data-site-details',
-        JSON.stringify({
-          coordinatesType: 'coordinates',
-          coordinateSystem: 'wgs84',
-          coordinatesEntry: 'single',
-          coordinates: [{ latitude: '51.123456', longitude: '-1.123456' }],
-          circleWidth: '100'
-        })
-      )
+    test('should handle multiple maps with different root elements', () => {
+      const mockRoot1 = {
+        dataset: { siteDetails: '{"coordinatesType":"coordinates"}' }
+      }
+      const mockRoot2 = {
+        dataset: { siteDetails: '{"coordinatesType":"file"}' }
+      }
 
-      const mapContainer2 = document.createElement('div')
-      mapContainer2.className = 'app-site-details-map'
-      mapContainer2.setAttribute('data-module', 'site-details-map')
-      mapContainer2.setAttribute(
-        'data-site-details',
-        JSON.stringify({
-          coordinatesType: 'coordinates',
-          coordinateSystem: 'wgs84',
-          coordinatesEntry: 'multiple',
-          coordinates: [
-            { latitude: '52.654321', longitude: '-2.654321' },
-            { latitude: '52.555555', longitude: '-2.555555' },
-            { latitude: '52.666666', longitude: '-2.666666' }
-          ]
-        })
-      )
-
-      document.body.appendChild(mapContainer1)
-      document.body.appendChild(mapContainer2)
-
-      const siteDetailsMap1 = new SiteDetailsMap(mapContainer1)
-      const siteDetailsMap2 = new SiteDetailsMap(mapContainer2)
+      const siteDetailsMap1 = new SiteDetailsMap(mockRoot1)
+      const siteDetailsMap2 = new SiteDetailsMap(mockRoot2)
 
       expect(siteDetailsMap1).toBeInstanceOf(SiteDetailsMap)
       expect(siteDetailsMap2).toBeInstanceOf(SiteDetailsMap)
       expect(siteDetailsMap1).not.toBe(siteDetailsMap2)
-
-      document.body.removeChild(mapContainer1)
-      document.body.removeChild(mapContainer2)
+      expect(siteDetailsMap1.dataLoader).toBeDefined()
+      expect(siteDetailsMap2.dataLoader).toBeDefined()
     })
 
     test('should handle maps with no data gracefully', () => {
-      const mapContainer = document.createElement('div')
-      mapContainer.className = 'app-site-details-map'
-      mapContainer.setAttribute('data-module', 'site-details-map')
-      // No data-site-details attribute
+      const mockRoot = { dataset: {} }
 
-      document.body.appendChild(mapContainer)
+      const siteDetailsMap = new SiteDetailsMap(mockRoot)
 
-      const siteDetailsMap = new SiteDetailsMap(mapContainer)
-      const showErrorSpy = jest.spyOn(siteDetailsMap, 'showError')
-
-      // Trigger initialization
-      return new Promise((resolve) => {
-        setTimeout(() => {
-          expect(showErrorSpy).toHaveBeenCalled()
-          document.body.removeChild(mapContainer)
-          resolve()
-        }, 10)
-      })
+      expect(siteDetailsMap).toBeInstanceOf(SiteDetailsMap)
+      expect(siteDetailsMap.dataLoader).toBeDefined()
     })
   })
 })

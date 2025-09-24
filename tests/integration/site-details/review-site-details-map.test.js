@@ -111,13 +111,14 @@ describe('Site Details Interactive Map Behaviour', () => {
     document = window.document
 
     mapContainer = document.querySelector('.app-site-details-map')
-    siteDataScript = document.querySelector('#site-details-data')
+    siteDataScript = mapContainer
 
     return { window, document, mapContainer, siteDataScript }
   }
 
-  const extractEmbeddedSiteData = (siteDataScript) => {
-    return JSON.parse(siteDataScript.textContent)
+  const extractEmbeddedSiteData = (mapContainer) => {
+    const siteDetailsAttr = mapContainer?.getAttribute('data-site-details')
+    return siteDetailsAttr ? JSON.parse(siteDetailsAttr) : null
   }
 
   describe('When map initialises with manual coordinate entry', () => {
@@ -331,9 +332,11 @@ describe('Site Details Interactive Map Behaviour', () => {
       await renderPageAndExtractMapElements(exemptionWithSpecificData)
 
       expect(siteDataScript).toBeInTheDocument()
-      expect(siteDataScript.tagName).toBe('SCRIPT')
-      expect(siteDataScript.getAttribute('type')).toBe('application/json')
-      expect(siteDataScript.getAttribute('id')).toBe('site-details-data')
+      expect(siteDataScript.tagName).toBe('DIV')
+      expect(siteDataScript.getAttribute('data-module')).toBe(
+        'site-details-map'
+      )
+      expect(siteDataScript.getAttribute('data-site-details')).toBeDefined()
 
       const siteData = extractEmbeddedSiteData(siteDataScript)
       expect(siteData.coordinateSystem).toBe(COORDINATE_SYSTEMS.OSGB36)

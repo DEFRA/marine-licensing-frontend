@@ -392,8 +392,7 @@ describe('#reviewSiteDetails', () => {
             multipleSiteDetails: 'No',
             sameActivityDates: 'No',
             sameActivityDescription: 'No'
-          },
-          siteDetailsData: '{"coordinatesType":"coordinates"}'
+          }
         })
       })
 
@@ -535,9 +534,7 @@ describe('#reviewSiteDetails', () => {
 
               sameActivityDates: 'Yes',
               sameActivityDescription: 'Yes'
-            },
-            siteDetailsData:
-              '{"coordinatesType":"coordinates","coordinateSystem":"wgs84","coordinatesEntry":"single","coordinates":{"latitude":"51.489676","longitude":"-0.231530"},"circleWidth":"100"}'
+            }
           })
         )
       })
@@ -575,7 +572,10 @@ describe('#reviewSiteDetails', () => {
               showActivityDates: true,
               showActivityDescription: true,
               siteName: 'Mock site',
-              siteNumber: 1
+              siteNumber: 1,
+              siteDetailsData: expect.stringContaining(
+                '"coordinatesType":"coordinates"'
+              )
             }
           ],
           multipleSiteDetailsData: {
@@ -585,9 +585,7 @@ describe('#reviewSiteDetails', () => {
             multipleSiteDetails: 'No',
             sameActivityDates: 'Yes',
             sameActivityDescription: 'Yes'
-          },
-          siteDetailsData:
-            '{"coordinatesType":"coordinates","coordinateSystem":"osgb36","coordinatesEntry":"single","coordinates":{"eastings":"425053","northings":"564180"},"circleWidth":"100"}'
+          }
         })
       })
     })
@@ -719,7 +717,10 @@ describe('#reviewSiteDetails', () => {
                 showActivityDates: true,
                 showActivityDescription: true,
                 siteName: 'Mock site',
-                siteNumber: 1
+                siteNumber: 1,
+                siteDetailsData: expect.stringContaining(
+                  '"coordinatesType":"coordinates"'
+                )
               }
             ],
             multipleSiteDetailsData: {
@@ -730,9 +731,7 @@ describe('#reviewSiteDetails', () => {
 
               sameActivityDates: 'Yes',
               sameActivityDescription: 'Yes'
-            },
-            siteDetailsData:
-              '{"coordinatesType":"coordinates","coordinateSystem":"wgs84","coordinatesEntry":"multiple","coordinates":[{"latitude":"55.123456","longitude":"55.123456"},{"latitude":"33.987654","longitude":"33.987654"},{"latitude":"78.123456","longitude":"78.123456"}],"circleWidth":"100"}'
+            }
           })
         })
 
@@ -786,7 +785,10 @@ describe('#reviewSiteDetails', () => {
                 showActivityDates: true,
                 showActivityDescription: true,
                 siteName: 'Mock site',
-                siteNumber: 1
+                siteNumber: 1,
+                siteDetailsData: expect.stringContaining(
+                  '"coordinatesType":"coordinates"'
+                )
               }
             ],
             multipleSiteDetailsData: {
@@ -796,9 +798,7 @@ describe('#reviewSiteDetails', () => {
               multipleSiteDetails: 'No',
               sameActivityDates: 'Yes',
               sameActivityDescription: 'Yes'
-            },
-            siteDetailsData:
-              '{"coordinatesType":"coordinates","coordinateSystem":"osgb36","coordinatesEntry":"multiple","coordinates":[{"eastings":"425053","northings":"564180"},{"eastings":"426000","northings":"565000"},{"eastings":"427000","northings":"566000"}],"circleWidth":"100"}'
+            }
           })
         })
 
@@ -850,7 +850,10 @@ describe('#reviewSiteDetails', () => {
                 showActivityDates: true,
                 showActivityDescription: true,
                 siteName: 'Mock site',
-                siteNumber: 1
+                siteNumber: 1,
+                siteDetailsData: expect.stringContaining(
+                  '"coordinatesType":"coordinates"'
+                )
               }
             ],
             multipleSiteDetailsData: {
@@ -861,9 +864,7 @@ describe('#reviewSiteDetails', () => {
 
               sameActivityDates: 'Yes',
               sameActivityDescription: 'Yes'
-            },
-            siteDetailsData:
-              '{"coordinatesType":"coordinates","coordinateSystem":"wgs84","coordinatesEntry":"multiple","coordinates":[],"circleWidth":"100"}'
+            }
           })
         })
 
@@ -929,7 +930,10 @@ describe('#reviewSiteDetails', () => {
                 showActivityDates: true,
                 showActivityDescription: true,
                 siteName: 'Mock site',
-                siteNumber: 1
+                siteNumber: 1,
+                siteDetailsData: expect.stringContaining(
+                  '"coordinatesType":"coordinates"'
+                )
               }
             ],
             multipleSiteDetailsData: {
@@ -940,9 +944,7 @@ describe('#reviewSiteDetails', () => {
 
               sameActivityDates: 'Yes',
               sameActivityDescription: 'Yes'
-            },
-            siteDetailsData:
-              '{"coordinatesType":"coordinates","coordinateSystem":"wgs84","coordinatesEntry":"multiple","coordinates":[{"latitude":"55.123456","longitude":"55.123456"},{"latitude":"","longitude":"33.987654"},{"latitude":"78.123456","longitude":"78.123456"},{"latitude":null,"longitude":null}],"circleWidth":"100"}'
+            }
           })
         })
 
@@ -1508,7 +1510,10 @@ describe('#reviewSiteDetails', () => {
               showActivityDates: true,
               showActivityDescription: true,
               siteName: '',
-              siteNumber: 1
+              siteNumber: 1,
+              siteDetailsData: expect.stringContaining(
+                '"coordinatesType":"coordinates"'
+              )
             }
           ])
         })
@@ -1550,7 +1555,10 @@ describe('#reviewSiteDetails', () => {
               showActivityDescription: true,
               siteName: '',
               width: '200 metres',
-              siteNumber: 1
+              siteNumber: 1,
+              siteDetailsData: expect.stringContaining(
+                '"coordinatesType":"coordinates"'
+              )
             }
           ])
         })

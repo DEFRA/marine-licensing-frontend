@@ -1,6 +1,10 @@
-import { createServer } from '~/src/server/index.js'
+import { setupTestServer } from '~/tests/integration/shared/test-setup-helpers.js'
 import { statusCodes } from '~/src/server/common/constants/status-codes.js'
 import { mockExemption } from '~/src/server/test-helpers/mocks.js'
+import {
+  makeGetRequest,
+  makePostRequest
+} from '~/src/server/test-helpers/server-requests.js'
 import { config } from '~/src/config/config.js'
 import { JSDOM } from 'jsdom'
 import {
@@ -16,19 +20,13 @@ import * as authRequests from '~/src/server/common/helpers/authenticated-request
 jest.mock('~/src/server/common/helpers/session-cache/utils.js')
 
 describe('#publicRegister', () => {
-  /** @type {Server} */
-  let server
+  const getServer = setupTestServer()
   let getExemptionCacheSpy
 
   const mockPublicRegisterState = {
     projectName: 'Test Project',
     publicRegister: { consent: 'yes', reason: 'Test reason' }
   }
-
-  beforeAll(async () => {
-    server = await createServer()
-    await server.initialize()
-  })
 
   beforeEach(() => {
     jest.spyOn(authRequests, 'authenticatedPatchRequest').mockResolvedValue({
@@ -43,15 +41,11 @@ describe('#publicRegister', () => {
       .mockReturnValue(mockExemption)
   })
 
-  afterAll(async () => {
-    await server.stop({ timeout: 0 })
-  })
-
   describe('#publicRegisterController', () => {
     test('Should provide expected responsea', async () => {
-      const { result, statusCode } = await server.inject({
-        method: 'GET',
-        url: routes.PUBLIC_REGISTER
+      const { result, statusCode } = await makeGetRequest({
+        url: routes.PUBLIC_REGISTER,
+        server: getServer()
       })
 
       expect(result).toEqual(
@@ -92,10 +86,10 @@ describe('#publicRegister', () => {
 
   describe('#publicRegisterSubmitController', () => {
     test('Should correctly redirect to the next page on success', async () => {
-      const { statusCode, headers } = await server.inject({
-        method: 'POST',
+      const { statusCode, headers } = await makePostRequest({
         url: routes.PUBLIC_REGISTER,
-        payload: { consent: 'yes', reason: 'Test reason' }
+        server: getServer(),
+        formData: { consent: 'yes', reason: 'Test reason' }
       })
 
       expect(authRequests.authenticatedPatchRequest).toHaveBeenCalledWith(
@@ -120,10 +114,10 @@ describe('#publicRegister', () => {
         data: {}
       })
 
-      const { result } = await server.inject({
-        method: 'POST',
+      const { result } = await makePostRequest({
         url: routes.PUBLIC_REGISTER,
-        payload: { consent: 'no' }
+        server: getServer(),
+        formData: { consent: 'no' }
       })
 
       expect(result).toContain('Something went wrong')
@@ -264,10 +258,10 @@ describe('#publicRegister', () => {
     test('Should show error messages without calling the back end when payload data is empty', async () => {
       const apiPostMock = jest.spyOn(authRequests, 'authenticatedPatchRequest')
 
-      const { result } = await server.inject({
-        method: 'POST',
+      const { result } = await makePostRequest({
         url: routes.PUBLIC_REGISTER,
-        payload: { consent: '' }
+        server: getServer(),
+        formData: { consent: '' }
       })
 
       expect(apiPostMock).not.toHaveBeenCalled()
@@ -280,10 +274,10 @@ describe('#publicRegister', () => {
     test('Should show error for reason being empty when consent is set to yes', async () => {
       const apiPostMock = jest.spyOn(authRequests, 'authenticatedPatchRequest')
 
-      const { result } = await server.inject({
-        method: 'POST',
+      const { result } = await makePostRequest({
         url: routes.PUBLIC_REGISTER,
-        payload: { consent: 'yes' }
+        server: getServer(),
+        formData: { consent: 'yes' }
       })
 
       expect(apiPostMock).not.toHaveBeenCalled()

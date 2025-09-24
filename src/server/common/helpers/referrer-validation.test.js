@@ -4,7 +4,8 @@ import {
   storeReferrer,
   getStoredReferrer,
   clearStoredReferrer,
-  getBackUrl
+  getBackUrl,
+  getValidatedReferrerPath
 } from './referrer-validation.js'
 
 const createMockRequest = () => ({
@@ -443,6 +444,64 @@ describe('referrer-validation', () => {
       expect(getBackUrl(mockRequest, '/fallback', ['/help/cookies'])).toBe(
         '/fallback'
       )
+    })
+  })
+
+  describe('getValidatedReferrerPath', () => {
+    it('should return null when referer header is null', () => {
+      expect(getValidatedReferrerPath(null, ['/help/cookies'])).toBeNull()
+    })
+
+    it('should return null when referer header is undefined', () => {
+      expect(getValidatedReferrerPath(undefined, ['/help/cookies'])).toBeNull()
+    })
+
+    it('should return null when referer header is empty string', () => {
+      expect(getValidatedReferrerPath('', ['/help/cookies'])).toBeNull()
+    })
+
+    it('should return valid path when URL is valid and path is allowed', () => {
+      expect(
+        getValidatedReferrerPath('http://localhost/exemption/task-list', [])
+      ).toBe('/exemption/task-list')
+    })
+
+    it('should return null when URL is valid but path is excluded', () => {
+      expect(
+        getValidatedReferrerPath('http://localhost/help/cookies', [
+          '/help/cookies'
+        ])
+      ).toBeNull()
+    })
+
+    it('should return null when URL is invalid', () => {
+      expect(getValidatedReferrerPath('not-a-valid-url', [])).toBeNull()
+    })
+
+    it('should return null for malicious URLs', () => {
+      expect(getValidatedReferrerPath('javascript:alert(1)', [])).toBeNull()
+      expect(getValidatedReferrerPath('data:text/html,<script>', [])).toBeNull()
+      expect(
+        getValidatedReferrerPath(
+          'http://localhost//path//with//double//slashes',
+          []
+        )
+      ).toBeNull()
+    })
+
+    it('should use empty array as default for excludedPaths parameter', () => {
+      expect(getValidatedReferrerPath('http://localhost/help/cookies')).toBe(
+        '/help/cookies'
+      )
+    })
+
+    it('should extract path from URL with query and fragment', () => {
+      expect(
+        getValidatedReferrerPath(
+          'http://localhost/path?query=value#fragment',
+          []
+        )
+      ).toBe('/path')
     })
   })
 

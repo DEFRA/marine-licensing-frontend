@@ -11,6 +11,11 @@ import {
   mockExemption
 } from '~/tests/integration/shared/test-setup-helpers.js'
 
+import {
+  makeGetRequest,
+  makePostRequest
+} from '~/src/server/test-helpers/server-requests.js'
+
 jest.mock('~/src/server/common/helpers/session-cache/utils.js')
 
 const exemptionWithMultipleSites = {
@@ -27,8 +32,8 @@ describe('Same activity description page', () => {
   beforeEach(() => mockExemption(exemptionWithMultipleSites))
 
   test('should display the same activity description page with correct content', async () => {
-    const { result, statusCode } = await getServer().inject({
-      method: 'GET',
+    const { result, statusCode } = await makeGetRequest({
+      server: getServer(),
       url: '/exemption/same-activity-description'
     })
 
@@ -100,8 +105,8 @@ describe('Same activity description page', () => {
       }
     })
 
-    const { result, statusCode } = await getServer().inject({
-      method: 'GET',
+    const { result, statusCode } = await makeGetRequest({
+      server: getServer(),
       url: '/exemption/same-activity-description'
     })
 
@@ -125,8 +130,8 @@ describe('Same activity description page', () => {
   })
 
   test('should have correct navigation links', async () => {
-    const { result } = await getServer().inject({
-      method: 'GET',
+    const { result } = await makeGetRequest({
+      server: getServer(),
       url: '/exemption/same-activity-description'
     })
 
@@ -149,10 +154,9 @@ describe('Same activity description page', () => {
   })
 
   test('should stay on same page when continue is clicked without selecting an option', async () => {
-    const { result, statusCode } = await getServer().inject({
-      method: 'POST',
+    const { result, statusCode } = await makePostRequest({
       url: '/exemption/same-activity-description',
-      payload: {}
+      server: getServer()
     })
 
     expect(statusCode).toBe(statusCodes.ok)
@@ -178,10 +182,10 @@ describe('Same activity description page', () => {
   })
 
   test('should redirect to coordinates entry choice when "yes" is selected', async () => {
-    const response = await getServer().inject({
-      method: 'POST',
+    const response = await makePostRequest({
       url: '/exemption/same-activity-description',
-      payload: {
+      server: getServer(),
+      formData: {
         sameActivityDescription: 'yes'
       }
     })
@@ -199,10 +203,10 @@ describe('Same activity description page', () => {
   })
 
   test('should redirect to coordinates entry choice when "no" is selected', async () => {
-    const response = await getServer().inject({
-      method: 'POST',
+    const response = await makePostRequest({
       url: '/exemption/same-activity-description',
-      payload: {
+      server: getServer(),
+      formData: {
         sameActivityDescription: 'no'
       }
     })
@@ -220,8 +224,8 @@ describe('Same activity description page', () => {
   })
 
   test('should redirect to task list when cancel is clicked', async () => {
-    const { result, statusCode } = await getServer().inject({
-      method: 'GET',
+    const { result, statusCode } = await makeGetRequest({
+      server: getServer(),
       url: '/exemption/same-activity-description'
     })
 

@@ -5,8 +5,9 @@ import { statusCodes } from '~/src/server/common/constants/status-codes.js'
 import * as authRequests from '~/src/server/common/helpers/authenticated-requests.js'
 import * as cacheUtils from '~/src/server/common/helpers/session-cache/utils.js'
 import * as coordinateUtils from '~/src/server/common/helpers/coordinate-utils.js'
-import { createServer } from '~/src/server/index.js'
 import { mockExemption } from '~/src/server/test-helpers/mocks.js'
+import { setupTestServer } from '~/tests/integration/shared/test-setup-helpers.js'
+import { makeGetRequest } from '~/src/server/test-helpers/server-requests.js'
 
 jest.mock('~/src/server/common/helpers/session-cache/utils.js')
 jest.mock('~/src/server/common/helpers/coordinate-utils.js')
@@ -45,20 +46,12 @@ const GEOJSON_POLYGON_FEATURE = {
 }
 
 describe('Site Details Interactive Map Behaviour', () => {
-  let server
   let mapContainer
   let siteDataScript
   let window
   let document
 
-  beforeAll(async () => {
-    server = await createServer()
-    await server.initialize()
-  })
-
-  afterAll(async () => {
-    await server.stop()
-  })
+  const getServer = setupTestServer()
 
   beforeEach(() => {
     jest
@@ -95,13 +88,9 @@ describe('Site Details Interactive Map Behaviour', () => {
       payload: { value: exemption }
     })
 
-    const response = await server.inject({
-      method: 'GET',
-      url: routes.REVIEW_SITE_DETAILS,
-      auth: {
-        strategy: 'session',
-        credentials: { userId: 'test-user-id', sessionId: 'test-session-id' }
-      }
+    const response = await makeGetRequest({
+      server: getServer(),
+      url: routes.REVIEW_SITE_DETAILS
     })
 
     expect(response.statusCode).toBe(statusCodes.ok)

@@ -7,13 +7,6 @@ export const createDefraIdStrategy = async (server) => {
   const defraIdConfig = config.get('defraId')
   const cookieConfig = config.get('session.cookie')
 
-  if (!defraIdConfig.authEnabled) {
-    server.auth.strategy(AUTH_STRATEGIES.DEFRA_ID, 'basic', {
-      validate: () => ({ isValid: true })
-    })
-    return
-  }
-
   const provider = await openIdProvider('defraId')
   server.auth.strategy(AUTH_STRATEGIES.DEFRA_ID, 'bell', {
     location: () =>

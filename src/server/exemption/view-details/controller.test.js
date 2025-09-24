@@ -1,7 +1,7 @@
 import Boom from '@hapi/boom'
-import { createServer } from '~/src/server/index.js'
+import { setupTestServer } from '~/tests/integration/shared/test-setup-helpers.js'
 import * as exemptionSiteDetailsHelpers from '~/src/server/common/helpers/exemption-site-details.js'
-import * as exemptionServiceModule from '~/src/services/exemption-service/index.js'
+import { getExemptionService } from '~/src/services/exemption-service/index.js'
 import { viewDetailsController, VIEW_DETAILS_VIEW_ROUTE } from './controller.js'
 import {
   createSubmittedExemption,
@@ -9,28 +9,24 @@ import {
   errorScenarios
 } from '~/tests/integration/view-details/test-utilities.js'
 
-describe('view details controller', () => {
-  let server
-  let mockExemptionService
-  let getExemptionServiceSpy
+import { makeGetRequest } from '~/src/server/test-helpers/server-requests.js'
+import { getAuthProvider } from '~/src/server/common/helpers/authenticated-requests.js'
 
-  beforeAll(async () => {
-    server = await createServer()
-    await server.initialize()
-  })
+jest.mock('~/src/services/exemption-service/index.js')
+jest.mock('~/src/server/common/helpers/authenticated-requests.js', () => ({
+  getAuthProvider: jest.fn().mockReturnValue('defra-id')
+}))
+
+describe('view details controller', () => {
+  const getServer = setupTestServer()
+  let mockExemptionService
 
   beforeEach(() => {
     mockExemptionService = {
       getExemptionById: jest.fn().mockResolvedValue(createSubmittedExemption())
     }
 
-    getExemptionServiceSpy = jest
-      .spyOn(exemptionServiceModule, 'getExemptionService')
-      .mockReturnValue(mockExemptionService)
-  })
-
-  afterAll(async () => {
-    await server.stop({ timeout: 0 })
+    jest.mocked(getExemptionService).mockReturnValue(mockExemptionService)
   })
 
   describe('GET /exemption/view-details/{exemptionId}', () => {
@@ -43,9 +39,9 @@ describe('view details controller', () => {
           submittedExemption
         )
 
-        const { statusCode } = await server.inject({
-          method: 'GET',
-          url: `/exemption/view-details/${validExemptionId}`
+        const { statusCode } = await makeGetRequest({
+          url: `/exemption/view-details/${validExemptionId}`,
+          server: getServer()
         })
 
         expect(statusCode).toBe(200)
@@ -57,12 +53,12 @@ describe('view details controller', () => {
           submittedExemption
         )
 
-        await server.inject({
-          method: 'GET',
-          url: `/exemption/view-details/${validExemptionId}`
+        await makeGetRequest({
+          url: `/exemption/view-details/${validExemptionId}`,
+          server: getServer()
         })
 
-        expect(getExemptionServiceSpy).toHaveBeenCalledWith(expect.any(Object))
+        expect(getExemptionService).toHaveBeenCalledWith(expect.any(Object))
         expect(mockExemptionService.getExemptionById).toHaveBeenCalledWith(
           validExemptionId
         )
@@ -78,9 +74,9 @@ describe('view details controller', () => {
           exemptionWithoutSiteDetails
         )
 
-        const { statusCode } = await server.inject({
-          method: 'GET',
-          url: `/exemption/view-details/${validExemptionId}`
+        const { statusCode } = await makeGetRequest({
+          url: `/exemption/view-details/${validExemptionId}`,
+          server: getServer()
         })
 
         expect(statusCode).toBe(200)
@@ -103,9 +99,9 @@ describe('view details controller', () => {
           .spyOn(exemptionSiteDetailsHelpers, 'processSiteDetails')
           .mockReturnValue(mockProcessedSiteDetails)
 
-        const { statusCode } = await server.inject({
-          method: 'GET',
-          url: `/exemption/view-details/${validExemptionId}`
+        const { statusCode } = await makeGetRequest({
+          url: `/exemption/view-details/${validExemptionId}`,
+          server: getServer()
         })
 
         expect(statusCode).toBe(200)
@@ -115,9 +111,9 @@ describe('view details controller', () => {
 
     describe('error scenarios', () => {
       test('should throw 404 when exemption ID is missing', async () => {
-        const { statusCode } = await server.inject({
-          method: 'GET',
-          url: '/exemption/view-details/'
+        const { statusCode } = await makeGetRequest({
+          url: '/exemption/view-details/',
+          server: getServer()
         })
 
         expect(statusCode).toBe(404)
@@ -128,9 +124,9 @@ describe('view details controller', () => {
           new Error('Exemption data not found')
         )
 
-        const { statusCode } = await server.inject({
-          method: 'GET',
-          url: `/exemption/view-details/${validExemptionId}`
+        const { statusCode } = await makeGetRequest({
+          url: `/exemption/view-details/${validExemptionId}`,
+          server: getServer()
         })
 
         expect(statusCode).toBe(500)
@@ -141,9 +137,9 @@ describe('view details controller', () => {
           new Error('Exemption data not found')
         )
 
-        const { statusCode } = await server.inject({
-          method: 'GET',
-          url: `/exemption/view-details/${validExemptionId}`
+        const { statusCode } = await makeGetRequest({
+          url: `/exemption/view-details/${validExemptionId}`,
+          server: getServer()
         })
 
         expect(statusCode).toBe(500)
@@ -154,9 +150,9 @@ describe('view details controller', () => {
           errorScenarios.draftExemption
         )
 
-        const { statusCode } = await server.inject({
-          method: 'GET',
-          url: `/exemption/view-details/${validExemptionId}`
+        const { statusCode } = await makeGetRequest({
+          url: `/exemption/view-details/${validExemptionId}`,
+          server: getServer()
         })
 
         expect(statusCode).toBe(403)
@@ -167,9 +163,9 @@ describe('view details controller', () => {
           errorScenarios.exemptionWithoutReference
         )
 
-        const { statusCode } = await server.inject({
-          method: 'GET',
-          url: `/exemption/view-details/${validExemptionId}`
+        const { statusCode } = await makeGetRequest({
+          url: `/exemption/view-details/${validExemptionId}`,
+          server: getServer()
         })
 
         expect(statusCode).toBe(403)
@@ -179,9 +175,9 @@ describe('view details controller', () => {
         const authError = Boom.forbidden('Forbidden')
         mockExemptionService.getExemptionById.mockRejectedValue(authError)
 
-        const { statusCode } = await server.inject({
-          method: 'GET',
-          url: `/exemption/view-details/${validExemptionId}`
+        const { statusCode } = await makeGetRequest({
+          url: `/exemption/view-details/${validExemptionId}`,
+          server: getServer()
         })
 
         expect(statusCode).toBe(403)
@@ -191,9 +187,9 @@ describe('view details controller', () => {
         const notFoundError = Boom.notFound('Not Found')
         mockExemptionService.getExemptionById.mockRejectedValue(notFoundError)
 
-        const { statusCode } = await server.inject({
-          method: 'GET',
-          url: `/exemption/view-details/${validExemptionId}`
+        const { statusCode } = await makeGetRequest({
+          url: `/exemption/view-details/${validExemptionId}`,
+          server: getServer()
         })
 
         expect(statusCode).toBe(404)
@@ -204,9 +200,9 @@ describe('view details controller', () => {
           new Error('Unexpected API error')
         )
 
-        const { statusCode } = await server.inject({
-          method: 'GET',
-          url: `/exemption/view-details/${validExemptionId}`
+        const { statusCode } = await makeGetRequest({
+          url: `/exemption/view-details/${validExemptionId}`,
+          server: getServer()
         })
 
         expect(statusCode).toBe(500)
@@ -217,9 +213,9 @@ describe('view details controller', () => {
           Boom.internal('Internal server error')
         )
 
-        const { statusCode } = await server.inject({
-          method: 'GET',
-          url: `/exemption/view-details/${validExemptionId}`
+        const { statusCode } = await makeGetRequest({
+          url: `/exemption/view-details/${validExemptionId}`,
+          server: getServer()
         })
 
         expect(statusCode).toBe(500)
@@ -234,7 +230,7 @@ describe('view details controller', () => {
         }
 
         jest
-          .spyOn(exemptionServiceModule, 'getExemptionService')
+          .mocked(getExemptionService)
           .mockReturnValue(mockExemptionServiceInstance)
 
         const mockRequest = {
@@ -268,8 +264,9 @@ describe('view details controller', () => {
         }
 
         jest
-          .spyOn(exemptionServiceModule, 'getExemptionService')
+          .mocked(getExemptionService)
           .mockReturnValue(mockExemptionServiceInstance)
+        jest.mocked(getAuthProvider).mockReturnValue('entra-id')
 
         const mockRequest = {
           params: { exemptionId: validExemptionId },
@@ -299,7 +296,7 @@ describe('view details controller', () => {
         }
 
         jest
-          .spyOn(exemptionServiceModule, 'getExemptionService')
+          .mocked(getExemptionService)
           .mockReturnValue(mockExemptionServiceInstance)
 
         const mockProcessedSiteDetails = {
@@ -355,7 +352,7 @@ describe('view details controller', () => {
         }
 
         jest
-          .spyOn(exemptionServiceModule, 'getExemptionService')
+          .mocked(getExemptionService)
           .mockReturnValue(mockExemptionServiceInstance)
 
         const mockProcessedSiteDetails = {
@@ -405,7 +402,7 @@ describe('view details controller', () => {
         }
 
         jest
-          .spyOn(exemptionServiceModule, 'getExemptionService')
+          .mocked(getExemptionService)
           .mockReturnValue(mockExemptionServiceInstance)
 
         const mockError = new Error('Site details processing failed')
@@ -438,7 +435,7 @@ describe('view details controller', () => {
         }
 
         jest
-          .spyOn(exemptionServiceModule, 'getExemptionService')
+          .mocked(getExemptionService)
           .mockReturnValue(mockExemptionServiceInstance)
 
         const mockRequest = {
@@ -460,7 +457,7 @@ describe('view details controller', () => {
         }
 
         jest
-          .spyOn(exemptionServiceModule, 'getExemptionService')
+          .mocked(getExemptionService)
           .mockReturnValue(mockExemptionServiceInstance)
 
         const mockRequest = {
@@ -492,9 +489,9 @@ describe('view details controller', () => {
           submittedExemption
         )
 
-        const { statusCode } = await server.inject({
-          method: 'GET',
-          url: `/exemption/view-details/${validExemptionId}`
+        const { statusCode } = await makeGetRequest({
+          url: `/exemption/view-details/${validExemptionId}`,
+          server: getServer()
         })
 
         expect(statusCode).toBe(200)
@@ -506,9 +503,9 @@ describe('view details controller', () => {
           submittedExemption
         )
 
-        const { statusCode } = await server.inject({
-          method: 'GET',
-          url: `/exemption/view-details/${validExemptionId}`
+        const { statusCode } = await makeGetRequest({
+          url: `/exemption/view-details/${validExemptionId}`,
+          server: getServer()
         })
 
         expect(statusCode).toBe(200)
@@ -521,9 +518,9 @@ describe('view details controller', () => {
           errorScenarios.exemptionWithEmptyReference
         )
 
-        const { statusCode } = await server.inject({
-          method: 'GET',
-          url: `/exemption/view-details/${validExemptionId}`
+        const { statusCode } = await makeGetRequest({
+          url: `/exemption/view-details/${validExemptionId}`,
+          server: getServer()
         })
 
         expect(statusCode).toBe(403)
@@ -534,9 +531,9 @@ describe('view details controller', () => {
           errorScenarios.exemptionWithMalformedSiteDetails
         )
 
-        const { statusCode } = await server.inject({
-          method: 'GET',
-          url: `/exemption/view-details/${validExemptionId}`
+        const { statusCode } = await makeGetRequest({
+          url: `/exemption/view-details/${validExemptionId}`,
+          server: getServer()
         })
 
         expect(statusCode).toBe(200)
@@ -548,9 +545,9 @@ describe('view details controller', () => {
           submittedExemption
         )
 
-        await server.inject({
-          method: 'GET',
-          url: `/exemption/view-details/${validExemptionId}`
+        await makeGetRequest({
+          url: `/exemption/view-details/${validExemptionId}`,
+          server: getServer()
         })
 
         expect(mockExemptionService.getExemptionById).toHaveBeenCalledTimes(1)

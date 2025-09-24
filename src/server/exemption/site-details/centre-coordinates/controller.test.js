@@ -1,4 +1,4 @@
-import { createServer } from '~/src/server/index.js'
+import { setupTestServer } from '~/tests/integration/shared/test-setup-helpers.js'
 import {
   centreCoordinatesController,
   centreCoordinatesSubmitController,
@@ -9,6 +9,7 @@ import { COORDINATE_SYSTEMS } from '~/src/server/common/constants/exemptions.js'
 import * as cacheUtils from '~/src/server/common/helpers/session-cache/utils.js'
 import * as coordinateUtils from '~/src/server/common/helpers/coordinate-utils.js'
 import { mockExemption, mockSite } from '~/src/server/test-helpers/mocks.js'
+import { makeGetRequest } from '~/src/server/test-helpers/server-requests.js'
 import { statusCodes } from '~/src/server/common/constants/status-codes.js'
 import { config } from '~/src/config/config.js'
 import { JSDOM } from 'jsdom'
@@ -17,8 +18,7 @@ import { routes } from '~/src/server/common/constants/routes.js'
 jest.mock('~/src/server/common/helpers/session-cache/utils.js')
 
 describe('#centreCoordinates', () => {
-  /** @type {Server} */
-  let server
+  const getServer = setupTestServer()
   let getExemptionCacheSpy
   let getCoordinateSystemSpy
 
@@ -30,11 +30,6 @@ describe('#centreCoordinates', () => {
     [COORDINATE_SYSTEMS.OSGB36]: { eastings: '425053', northings: '564180' }
   }
 
-  beforeAll(async () => {
-    server = await createServer()
-    await server.initialize()
-  })
-
   beforeEach(() => {
     getExemptionCacheSpy = jest
       .spyOn(cacheUtils, 'getExemptionCache')
@@ -42,10 +37,6 @@ describe('#centreCoordinates', () => {
     getCoordinateSystemSpy = jest
       .spyOn(coordinateUtils, 'getCoordinateSystem')
       .mockReturnValue({ coordinateSystem: COORDINATE_SYSTEMS.WGS84 })
-  })
-
-  afterAll(async () => {
-    await server.stop({ timeout: 0 })
   })
 
   describe('#centreCoordinatesController', () => {
@@ -141,9 +132,9 @@ describe('#centreCoordinates', () => {
     })
 
     test('Should provide expected response and correctly pre populate data', async () => {
-      const { result, statusCode } = await server.inject({
-        method: 'GET',
-        url: routes.CIRCLE_CENTRE_POINT
+      const { result, statusCode } = await makeGetRequest({
+        url: routes.CIRCLE_CENTRE_POINT,
+        server: getServer()
       })
 
       expect(result).toEqual(
@@ -318,6 +309,32 @@ describe('#centreCoordinates', () => {
       expect(h.redirect).toHaveBeenCalledWith(routes.WIDTH_OF_SITE)
     })
 
+    test('Should trim spaces from wgs84 data and save the converted values', async () => {
+      const h = {
+        redirect: jest.fn()
+      }
+
+      const mockRequest = {
+        payload: { latitude: ' 51.489676', longitude: '-0.231530 ' },
+        site: mockSite
+      }
+
+      getCoordinateSystemSpy.mockReturnValueOnce({
+        coordinateSystem: COORDINATE_SYSTEMS.WGS84
+      })
+
+      await centreCoordinatesSubmitController.handler(mockRequest, h)
+
+      expect(cacheUtils.updateExemptionSiteDetails).toHaveBeenCalledWith(
+        mockRequest,
+        0,
+        'coordinates',
+        { latitude: '51.489676', longitude: '-0.231530' }
+      )
+
+      expect(h.redirect).toHaveBeenCalledWith(routes.WIDTH_OF_SITE)
+    })
+
     test('Should correctly set the cache when submitting OSGB36 data', async () => {
       const h = {
         redirect: jest.fn()
@@ -339,6 +356,32 @@ describe('#centreCoordinates', () => {
         0,
         'coordinates',
         mockCoordinates[COORDINATE_SYSTEMS.OSGB36]
+      )
+
+      expect(h.redirect).toHaveBeenCalledWith(routes.WIDTH_OF_SITE)
+    })
+
+    test('Should trim spaces from OSGB36 data and save the converted values', async () => {
+      const h = {
+        redirect: jest.fn()
+      }
+
+      const mockRequest = {
+        payload: { eastings: ' 425053', northings: '564180 ' },
+        site: mockSite
+      }
+
+      getCoordinateSystemSpy.mockReturnValueOnce({
+        coordinateSystem: COORDINATE_SYSTEMS.OSGB36
+      })
+
+      await centreCoordinatesSubmitController.handler(mockRequest, h)
+
+      expect(cacheUtils.updateExemptionSiteDetails).toHaveBeenCalledWith(
+        mockRequest,
+        0,
+        'coordinates',
+        { eastings: '425053', northings: '564180' }
       )
 
       expect(h.redirect).toHaveBeenCalledWith(routes.WIDTH_OF_SITE)

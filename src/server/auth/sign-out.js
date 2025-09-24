@@ -11,11 +11,9 @@ export const signOutController = {
   method: 'GET',
   path: routes.SIGN_OUT,
   handler: async (request, h) => {
-    const { authEnabled } = config.get('defraId')
-
     const userSession = await getUserSession(request, request.auth.credentials)
 
-    if (!userSession || !authEnabled) {
+    if (!userSession) {
       return h.redirect(routes.PROJECT_NAME)
     }
 

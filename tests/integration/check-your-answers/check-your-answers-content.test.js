@@ -18,6 +18,7 @@ import {
   validateResponse
 } from '../shared/test-setup-helpers.js'
 import { mockExemptionMcmsContext } from '~/src/server/test-helpers/mocks.js'
+import { makeGetRequest } from '~/src/server/test-helpers/server-requests.js'
 
 jest.mock('~/src/server/common/helpers/authenticated-requests.js')
 
@@ -29,8 +30,8 @@ describe('Check your answers - page content Validation', () => {
       ...exemption,
       mcmsContext: mockExemptionMcmsContext
     })
-    const response = await getServer().inject({
-      method: 'GET',
+    const response = await makeGetRequest({
+      server: getServer(),
       url: routes.CHECK_YOUR_ANSWERS
     })
 

@@ -1,23 +1,15 @@
-import { createServer } from '~/src/server/index.js'
+import { setupTestServer } from '~/tests/integration/shared/test-setup-helpers.js'
 import { statusCodes } from '~/src/server/common/constants/status-codes.js'
 
+import { makeGetRequest } from '~/src/server/test-helpers/server-requests.js'
+
 describe('#healthController', () => {
-  /** @type {Server} */
-  let server
-
-  beforeAll(async () => {
-    server = await createServer()
-    await server.initialize()
-  })
-
-  afterAll(async () => {
-    await server.stop({ timeout: 0 })
-  })
+  const getServer = setupTestServer()
 
   test('Should provide expected response', async () => {
-    const { result, statusCode } = await server.inject({
-      method: 'GET',
-      url: '/health'
+    const { result, statusCode } = await makeGetRequest({
+      url: '/health',
+      server: getServer()
     })
 
     expect(result).toEqual({ message: 'success' })

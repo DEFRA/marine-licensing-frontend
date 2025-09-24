@@ -6,8 +6,13 @@ import { statusCodes } from '~/src/server/common/constants/status-codes.js'
 import * as authRequests from '~/src/server/common/helpers/authenticated-requests.js'
 import * as cacheUtils from '~/src/server/common/helpers/session-cache/utils.js'
 import * as coordinateUtils from '~/src/server/common/helpers/coordinate-utils.js'
-import { createServer } from '~/src/server/index.js'
 import { testScenarios } from './polygon-fixtures.js'
+
+import {
+  makeGetRequest,
+  makePostRequest
+} from '~/src/server/test-helpers/server-requests.js'
+import { setupTestServer } from '~/tests/integration/shared/test-setup-helpers.js'
 
 jest.mock('~/src/server/common/helpers/session-cache/utils.js')
 jest.mock('~/src/server/common/helpers/coordinate-utils.js')
@@ -23,16 +28,7 @@ const getSiteDetailsCard = (document, expected, siteIndex = 0) => {
 }
 
 describe('Review Site Details - Polygon Coordinates Integration Tests', () => {
-  let server
-
-  beforeAll(async () => {
-    server = await createServer()
-    await server.initialize()
-  })
-
-  afterAll(async () => {
-    await server.stop()
-  })
+  const getServer = setupTestServer()
 
   beforeEach(() => {
     jest
@@ -153,9 +149,10 @@ describe('Review Site Details - Polygon Coordinates Integration Tests', () => {
         payload: { id: polygonExemption.id }
       })
 
-      const response = await server.inject({
-        method: 'POST',
-        url: routes.REVIEW_SITE_DETAILS
+      const response = await makePostRequest({
+        url: routes.REVIEW_SITE_DETAILS,
+        server: getServer(),
+        formData: {}
       })
 
       expect(response.statusCode).toBe(statusCodes.redirect)
@@ -182,8 +179,8 @@ describe('Review Site Details - Polygon Coordinates Integration Tests', () => {
       payload: { value: { taskList: { id: exemption.id } } }
     })
 
-    const response = await server.inject({
-      method: 'GET',
+    const response = await makeGetRequest({
+      server: getServer(),
       url: routes.REVIEW_SITE_DETAILS,
       headers: {
         referer: `http://localhost${routes.ENTER_MULTIPLE_COORDINATES}`

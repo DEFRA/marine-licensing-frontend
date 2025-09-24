@@ -107,3 +107,8 @@ export const mockSite = {
   queryParams: '',
   siteDetails: mockExemption.siteDetails[0]
 }
+
+export const mockRequestAuth = {
+  strategy: 'defra-id',
+  credentials: { userId: 'test-user' }
+}

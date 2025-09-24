@@ -3,7 +3,6 @@ import {
   routes
 } from '~/src/server/common/constants/routes.js'
 import { setUserSession } from './utils.js'
-import { config } from '~/src/config/config.js'
 import { AUTH_STRATEGIES } from '~/src/server/common/constants/auth.js'
 
 export const signInOidcController = {
@@ -13,9 +12,7 @@ export const signInOidcController = {
     auth: { strategy: AUTH_STRATEGIES.DEFRA_ID, mode: 'try' }
   },
   handler: async (request, h) => {
-    const { authEnabled } = config.get('defraId')
-
-    if (authEnabled && request.auth?.isAuthenticated) {
+    if (request.auth?.isAuthenticated) {
       await setUserSession(request)
       request.logger.info('User has been successfully authenticated')
     }

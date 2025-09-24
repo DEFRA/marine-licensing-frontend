@@ -3,6 +3,11 @@ import { statusCodes } from '~/src/server/common/constants/status-codes.js'
 import { setupTestServer } from '~/tests/integration/shared/test-setup-helpers.js'
 import { config } from '~/src/config/config.js'
 
+import {
+  makeGetRequest,
+  makePostRequest
+} from '~/src/server/test-helpers/server-requests.js'
+
 jest.mock('~/src/config/config.js', () => {
   const actualConfig = jest.requireActual('~/src/config/config.js')
   return {
@@ -82,8 +87,8 @@ describe('MS Clarity Analytics Integration', () => {
 
   describe('Cookies page analytics integration', () => {
     test('Should include MS Clarity when analytics cookies are REJECTED (to allow consent withdrawal)', async () => {
-      const { result, statusCode } = await getServer().inject({
-        method: 'GET',
+      const { result, statusCode } = await makeGetRequest({
+        server: getServer(),
         url: '/help/cookies',
         headers: {
           cookie: createCookieHeaders(false)
@@ -103,8 +108,8 @@ describe('MS Clarity Analytics Integration', () => {
     })
 
     test('Should include MS Clarity with correct Project ID when analytics cookies are ACCEPTED', async () => {
-      const { result, statusCode } = await getServer().inject({
-        method: 'GET',
+      const { result, statusCode } = await makeGetRequest({
+        server: getServer(),
         url: '/help/cookies',
         headers: {
           cookie: createCookieHeaders(true)
@@ -121,8 +126,8 @@ describe('MS Clarity Analytics Integration', () => {
     })
 
     test('Should include MS Clarity by default (no cookie preference) to handle initial consent', async () => {
-      const { result, statusCode } = await getServer().inject({
-        method: 'GET',
+      const { result, statusCode } = await makeGetRequest({
+        server: getServer(),
         url: '/help/cookies'
       })
 
@@ -147,8 +152,8 @@ describe('MS Clarity Analytics Integration', () => {
         return actualConfig.config.get(key)
       })
 
-      const { result, statusCode } = await getServer().inject({
-        method: 'GET',
+      const { result, statusCode } = await makeGetRequest({
+        server: getServer(),
         url: '/help/cookies',
         headers: {
           cookie: createCookieHeaders(true)
@@ -173,8 +178,8 @@ describe('MS Clarity Analytics Integration', () => {
         return actualConfig.config.get(key)
       })
 
-      const { result, statusCode } = await getServer().inject({
-        method: 'GET',
+      const { result, statusCode } = await makeGetRequest({
+        server: getServer(),
         url: '/help/cookies',
         headers: {
           cookie: createCookieHeaders(true)
@@ -193,8 +198,8 @@ describe('MS Clarity Analytics Integration', () => {
   describe('Cookie preference workflow', () => {
     test('Should include MS Clarity with correct analytics state throughout preference workflow', async () => {
       // First request: No cookies, should include Clarity with analytics disabled
-      const firstResponse = await getServer().inject({
-        method: 'GET',
+      const firstResponse = await makeGetRequest({
+        server: getServer(),
         url: '/help/cookies'
       })
 
@@ -204,10 +209,10 @@ describe('MS Clarity Analytics Integration', () => {
       expect(getAnalyticsEnabled(document)).toBe(false)
 
       // Accept analytics cookies
-      const acceptResponse = await getServer().inject({
-        method: 'POST',
+      const acceptResponse = await makePostRequest({
+        server: getServer(),
+        formData: 'analytics=yes&csrfToken=',
         url: '/help/cookies',
-        payload: 'analytics=yes&csrfToken=',
         headers: {
           'content-type': 'application/x-www-form-urlencoded'
         }
@@ -222,8 +227,8 @@ describe('MS Clarity Analytics Integration', () => {
         : setCookieHeaders
 
       // Second request: With analytics accepted, should include Clarity with analytics enabled
-      const secondResponse = await getServer().inject({
-        method: 'GET',
+      const secondResponse = await makeGetRequest({
+        server: getServer(),
         url: '/help/cookies',
         headers: {
           cookie: cookies
@@ -236,10 +241,10 @@ describe('MS Clarity Analytics Integration', () => {
       expect(getAnalyticsEnabled(document)).toBe(true)
 
       // Reject analytics cookies
-      const rejectResponse = await getServer().inject({
-        method: 'POST',
+      const rejectResponse = await makePostRequest({
+        server: getServer(),
         url: '/help/cookies',
-        payload: 'analytics=no&csrfToken=',
+        formData: 'analytics=no&csrfToken=',
         headers: {
           'content-type': 'application/x-www-form-urlencoded',
           cookie: cookies
@@ -254,8 +259,8 @@ describe('MS Clarity Analytics Integration', () => {
         : rejectResponse.headers['set-cookie']
 
       // Third request: With analytics rejected, should still include Clarity but with analytics disabled
-      const thirdResponse = await getServer().inject({
-        method: 'GET',
+      const thirdResponse = await makeGetRequest({
+        server: getServer(),
         url: '/help/cookies',
         headers: {
           cookie: updatedCookies
@@ -272,8 +277,8 @@ describe('MS Clarity Analytics Integration', () => {
   describe('Other pages with analytics', () => {
     test('Should include MS Clarity with correct analytics state on privacy page', async () => {
       // Test with analytics rejected - Clarity should be present but analytics disabled
-      let response = await getServer().inject({
-        method: 'GET',
+      let response = await makeGetRequest({
+        server: getServer(),
         url: '/help/privacy',
         headers: {
           cookie: createCookieHeaders(false)
@@ -287,8 +292,8 @@ describe('MS Clarity Analytics Integration', () => {
       expect(getAnalyticsEnabled(document)).toBe(false)
 
       // Test with analytics accepted - Clarity should be present with analytics enabled
-      response = await getServer().inject({
-        method: 'GET',
+      response = await makeGetRequest({
+        server: getServer(),
         url: '/help/privacy',
         headers: {
           cookie: createCookieHeaders(true)

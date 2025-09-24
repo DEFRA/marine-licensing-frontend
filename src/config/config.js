@@ -252,12 +252,6 @@ export const config = convict({
       env: 'DEFRA_ID_ACCOUNT_MANAGEMENT_URL',
       default: '#'
     },
-    authEnabled: {
-      doc: 'DEFRA ID Auth enabled',
-      format: Boolean,
-      env: 'DEFRA_ID_ENABLED',
-      default: false
-    },
     oidcConfigurationUrl: {
       doc: 'Defra ID OIDC Configuration URL',
       format: String,
@@ -311,12 +305,6 @@ export const config = convict({
       env: 'ENTRA_ID_OIDC_CONFIGURATION_URL',
       default:
         'http://localhost:3200/cdp-defra-id-stub/.well-known/openid-configuration'
-    },
-    authEnabled: {
-      doc: 'ENTRA ID Auth enabled',
-      format: Boolean,
-      env: 'ENTRA_ID_ENABLED',
-      default: false
     },
     clientId: {
       doc: 'ENTRA ID client ID',

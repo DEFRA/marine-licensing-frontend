@@ -6,12 +6,7 @@ import { AUTH_STRATEGIES } from '~/src/server/common/constants/auth.js'
 export const createEntraIdStrategy = async (server) => {
   const entraIdConfig = config.get('entraId')
   const cookieConfig = config.get('session.cookie')
-  if (!entraIdConfig.authEnabled) {
-    server.auth.strategy(AUTH_STRATEGIES.ENTRA_ID, 'basic', {
-      validate: () => ({ isValid: true })
-    })
-    return
-  }
+
   const provider = await openIdProvider('entraId')
   server.auth.strategy(AUTH_STRATEGIES.ENTRA_ID, 'bell', {
     location: () =>

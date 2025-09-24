@@ -10,6 +10,11 @@ import { validateErrors } from '../shared/expect-utils.js'
 
 import { setupTestServer } from '~/tests/integration/shared/test-setup-helpers.js'
 
+import {
+  makeGetRequest,
+  makePostRequest
+} from '~/src/server/test-helpers/server-requests.js'
+
 jest.mock('~/src/server/common/helpers/session-cache/utils.js')
 
 describe('Site name page', () => {
@@ -26,8 +31,8 @@ describe('Site name page', () => {
   jest.mocked(setExemptionCache).mockReturnValue({})
 
   test('should display the site name page with correct content', async () => {
-    const { result, statusCode } = await getServer().inject({
-      method: 'GET',
+    const { result, statusCode } = await makeGetRequest({
+      server: getServer(),
       url: '/exemption/site-name'
     })
 
@@ -64,8 +69,8 @@ describe('Site name page', () => {
       siteDetails: [{ ...mockExemption.siteDetails[0], siteName: 'Test Site' }]
     })
 
-    const { result, statusCode } = await getServer().inject({
-      method: 'GET',
+    const { result, statusCode } = await makeGetRequest({
+      server: getServer(),
       url: '/exemption/site-name'
     })
 
@@ -82,8 +87,8 @@ describe('Site name page', () => {
   })
 
   test('should have correct navigation links', async () => {
-    const { result } = await getServer().inject({
-      method: 'GET',
+    const { result } = await makeGetRequest({
+      server: getServer(),
       url: '/exemption/site-name'
     })
 
@@ -103,10 +108,9 @@ describe('Site name page', () => {
   })
 
   test('should stay on same page when continue is clicked without entering site name', async () => {
-    const { result, statusCode } = await getServer().inject({
-      method: 'POST',
+    const { result, statusCode } = await makePostRequest({
       url: '/exemption/site-name',
-      payload: {}
+      server: getServer()
     })
 
     expect(statusCode).toBe(statusCodes.ok)
@@ -134,10 +138,10 @@ describe('Site name page', () => {
   test('should stay on same page when site name is too long', async () => {
     const siteName = 'A'.repeat(251)
 
-    const { result, statusCode } = await getServer().inject({
-      method: 'POST',
+    const { result, statusCode } = await makePostRequest({
       url: '/exemption/site-name',
-      payload: {
+      server: getServer(),
+      formData: {
         siteName
       }
     })
@@ -165,10 +169,10 @@ describe('Site name page', () => {
   })
 
   test('should redirect to same activity dates when valid site name is submitted', async () => {
-    const response = await getServer().inject({
-      method: 'POST',
+    const response = await makePostRequest({
       url: '/exemption/site-name',
-      payload: {
+      server: getServer(),
+      formData: {
         siteName: 'Test Site Name'
       }
     })
@@ -185,8 +189,8 @@ describe('Site name page', () => {
   })
 
   test('should redirect to task list when cancel is clicked', async () => {
-    const { result, statusCode } = await getServer().inject({
-      method: 'GET',
+    const { result, statusCode } = await makeGetRequest({
+      server: getServer(),
       url: '/exemption/site-name'
     })
 
@@ -204,8 +208,8 @@ describe('Site name page', () => {
       siteDetails: [...mockExemption.siteDetails, {}]
     })
 
-    const { result, statusCode } = await getServer().inject({
-      method: 'GET',
+    const { result, statusCode } = await makeGetRequest({
+      server: getServer(),
       url: '/exemption/site-name?site=2'
     })
 

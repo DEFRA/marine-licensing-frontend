@@ -1,4 +1,4 @@
-import { createServer } from '~/src/server/index.js'
+import { setupTestServer } from '~/tests/integration/shared/test-setup-helpers.js'
 import { statusCodes } from '~/src/server/common/constants/status-codes.js'
 import { config } from '~/src/config/config.js'
 import { JSDOM } from 'jsdom'
@@ -8,6 +8,7 @@ import {
   TASK_LIST_VIEW_ROUTE
 } from '~/src/server/exemption/task-list/controller.js'
 import { mockExemption } from '~/src/server/test-helpers/mocks.js'
+import { makeGetRequest } from '~/src/server/test-helpers/server-requests.js'
 import { routes } from '~/src/server/common/constants/routes.js'
 import * as authRequests from '~/src/server/common/helpers/authenticated-requests.js'
 import {
@@ -19,17 +20,11 @@ import {
 jest.mock('~/src/server/common/helpers/session-cache/utils.js')
 
 describe('#taskListController', () => {
-  /** @type {Server} */
-  let server
+  const getServer = setupTestServer()
 
   const mockExemptionState = { projectName: 'Test Project' }
   const getExemptionCacheMock = jest.mocked(getExemptionCache)
   const setExemptionCacheMock = jest.mocked(setExemptionCache)
-
-  beforeAll(async () => {
-    server = await createServer()
-    await server.initialize()
-  })
 
   beforeEach(() => {
     jest
@@ -39,14 +34,10 @@ describe('#taskListController', () => {
     getExemptionCacheMock.mockReturnValue(mockExemption)
   })
 
-  afterAll(async () => {
-    await server.stop({ timeout: 0 })
-  })
-
   test('Should provide expected response when loading page', async () => {
-    const { result, statusCode } = await server.inject({
-      method: 'GET',
-      url: routes.TASK_LIST
+    const { result, statusCode } = await makeGetRequest({
+      url: routes.TASK_LIST,
+      server: getServer()
     })
 
     expect(result).toEqual(
@@ -160,9 +151,9 @@ describe('#taskListController', () => {
       'resetExemptionSiteDetails'
     )
 
-    const { statusCode, headers } = await server.inject({
-      method: 'GET',
-      url: `${routes.TASK_LIST}?cancel=site-details`
+    const { statusCode, headers } = await makeGetRequest({
+      url: `${routes.TASK_LIST}?cancel=site-details`,
+      server: getServer()
     })
 
     expect(resetExemptionSiteDetailsSpy).toHaveBeenCalled()
@@ -176,9 +167,9 @@ describe('#taskListController', () => {
       'resetExemptionSiteDetails'
     )
 
-    const { statusCode, headers } = await server.inject({
-      method: 'GET',
-      url: `${routes.TASK_LIST}?cancel=does-not-exist`
+    const { statusCode, headers } = await makeGetRequest({
+      url: `${routes.TASK_LIST}?cancel=does-not-exist`,
+      server: getServer()
     })
 
     expect(resetExemptionSiteDetailsSpy).not.toHaveBeenCalled()
@@ -199,16 +190,10 @@ describe('#taskListController', () => {
 })
 
 describe('#taskListSelectExemptionController', () => {
-  /** @type {Server} */
-  let server
+  const getServer = setupTestServer()
 
   const clearExemptionCacheMock = jest.mocked(clearExemptionCache)
   const setExemptionCacheMock = jest.mocked(setExemptionCache)
-
-  beforeAll(async () => {
-    server = await createServer()
-    await server.initialize()
-  })
 
   beforeEach(() => {
     jest
@@ -216,14 +201,10 @@ describe('#taskListSelectExemptionController', () => {
       .mockResolvedValue({ payload: { value: mockExemption } })
   })
 
-  afterAll(async () => {
-    await server.stop({ timeout: 0 })
-  })
-
   test('should clear cache and return to task list', async () => {
-    const { statusCode, headers } = await server.inject({
-      method: 'GET',
-      url: '/exemption/task-list/abc123?from=dashboard'
+    const { statusCode, headers } = await makeGetRequest({
+      url: '/exemption/task-list/abc123?from=dashboard',
+      server: getServer()
     })
 
     expect(clearExemptionCacheMock).toHaveBeenCalled()

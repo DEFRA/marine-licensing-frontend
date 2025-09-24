@@ -127,18 +127,24 @@ export const multipleCoordinatesSubmitController = {
       )
     }
 
-    updateExemptionSiteDetails(request, siteIndex, 'coordinates', coordinates)
+    let validatedCoordinates = validationResult.value.coordinates
+    updateExemptionSiteDetails(
+      request,
+      siteIndex,
+      'coordinates',
+      validatedCoordinates
+    )
     if (payload.add) {
       const emptyCoordinate =
         coordinateSystem === COORDINATE_SYSTEMS.OSGB36
           ? { eastings: '', northings: '' }
           : { latitude: '', longitude: '' }
 
-      coordinates = [...coordinates, emptyCoordinate]
+      validatedCoordinates = [...validatedCoordinates, emptyCoordinate]
 
       return renderMultipleCoordinatesView(
         h,
-        coordinates,
+        validatedCoordinates,
         coordinateSystem,
         exemption?.projectName
       )
@@ -147,7 +153,7 @@ export const multipleCoordinatesSubmitController = {
     if (payload.remove) {
       return renderMultipleCoordinatesView(
         h,
-        coordinates,
+        validatedCoordinates,
         coordinateSystem,
         exemption?.projectName
       )

@@ -63,7 +63,6 @@ This folder contains all the scripts and configuration files needed to run the M
 
 ```
 DEFRA_ID_ACCOUNT_MANAGEMENT_URL=
-DEFRA_ID_ENABLED=true
 DEFRA_ID_OIDC_CONFIGURATION_URL=
 DEFRA_ID_CLIENT_ID=
 DEFRA_ID_CLIENT_SECRET=
@@ -79,7 +78,6 @@ APP_BASE_URL=https://marine-licensing-frontend.test.cdp-int.defra.cloud
 
 ```
 DEFRA_ID_JWKS_URI=
-DEFRA_ID_ENABLED=true
 ```
 
 Get the value for `DEFRA_ID_JWKS_URI` from here - https://github.com/DEFRA/cdp-app-config/blob/main/services/marine-licensing-backend/test/marine-licensing-backend.env#L3

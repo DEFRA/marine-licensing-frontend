@@ -3,34 +3,27 @@ import { JSDOM } from 'jsdom'
 import { routes } from '~/src/server/common/constants/routes.js'
 import { statusCodes } from '~/src/server/common/constants/status-codes.js'
 import { getExemptionCache } from '~/src/server/common/helpers/session-cache/utils.js'
-import { createServer } from '~/src/server/index.js'
+
+import { setupTestServer } from '../shared/test-setup-helpers.js'
+import { makeGetRequest } from '~/src/server/test-helpers/server-requests.js'
 
 jest.mock('~/src/server/common/helpers/session-cache/utils.js')
 
 describe('Before you start site details page', () => {
-  let server
-
   const mockExemption = {
     id: 'test-exemption-123',
     projectName: 'Test Project'
   }
 
-  beforeAll(async () => {
-    server = await createServer()
-    await server.initialize()
-  })
-
-  afterAll(async () => {
-    await server.stop()
-  })
+  const getServer = setupTestServer()
 
   beforeEach(() => {
     jest.mocked(getExemptionCache).mockReturnValue(mockExemption)
   })
 
   test('should display the before you start page with correct content', async () => {
-    const { result, statusCode } = await server.inject({
-      method: 'GET',
+    const { result, statusCode } = await makeGetRequest({
+      server: getServer(),
       url: routes.SITE_DETAILS
     })
 
@@ -63,8 +56,8 @@ describe('Before you start site details page', () => {
   })
 
   test('should have correct navigation links', async () => {
-    const { result } = await server.inject({
-      method: 'GET',
+    const { result } = await makeGetRequest({
+      server: getServer(),
       url: routes.SITE_DETAILS
     })
 
@@ -81,8 +74,8 @@ describe('Before you start site details page', () => {
   })
 
   test('should display all required content sections', async () => {
-    const { result } = await server.inject({
-      method: 'GET',
+    const { result } = await makeGetRequest({
+      server: getServer(),
       url: routes.SITE_DETAILS
     })
 
@@ -118,8 +111,8 @@ describe('Before you start site details page', () => {
   })
 
   test('should have properly structured lists for accessibility', async () => {
-    const { result } = await server.inject({
-      method: 'GET',
+    const { result } = await makeGetRequest({
+      server: getServer(),
       url: routes.SITE_DETAILS
     })
 

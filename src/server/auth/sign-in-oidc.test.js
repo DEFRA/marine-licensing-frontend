@@ -1,4 +1,3 @@
-import { createServer } from '~/src/server/index.js'
 import { statusCodes } from '~/src/server/common/constants/status-codes.js'
 import {
   redirectPathCacheKey,
@@ -6,28 +5,20 @@ import {
 } from '~/src/server/common/constants/routes.js'
 import { setUserSession } from '~/src/server/auth/utils.js'
 import { signInOidcController } from '~/src/server/auth/sign-in-oidc.js'
-import { config } from '~/src/config/config.js'
+import { setupTestServer } from '~/tests/integration/shared/test-setup-helpers.js'
+import { makeGetRequest } from '~/src/server/test-helpers/server-requests.js'
 
 jest.mock('~/src/server/auth/utils.js', () => ({
   setUserSession: jest.fn()
 }))
 
 describe('#signInOidcController', () => {
-  let server
-
-  beforeAll(async () => {
-    server = await createServer()
-    await server.initialize()
-  })
-
-  afterAll(async () => {
-    await server.stop({ timeout: 0 })
-  })
+  const getServer = setupTestServer()
 
   test('should render the project name page', async () => {
-    const { statusCode, headers } = await server.inject({
-      method: 'GET',
-      url: routes.SIGNIN
+    const { statusCode, headers } = await makeGetRequest({
+      url: routes.SIGNIN,
+      server: getServer()
     })
 
     expect(statusCode).toBe(statusCodes.redirect)
@@ -44,8 +35,6 @@ describe('#signInOidcController', () => {
     }
 
     const mockH = { redirect: jest.fn() }
-
-    config.set('defraId.authEnabled', true)
 
     await signInOidcController.handler(mockRequest, mockH)
 

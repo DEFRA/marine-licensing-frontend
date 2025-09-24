@@ -21,6 +21,7 @@ import { statusCodes } from '~/src/server/common/constants/status-codes.js'
 import { getAuthProvider } from '~/src/server/common/helpers/authenticated-requests.js'
 import { AUTH_STRATEGIES } from '~/src/server/common/constants/auth.js'
 import { format } from 'date-fns'
+import { makeGetRequest } from '~/src/server/test-helpers/server-requests.js'
 
 jest.mock('~/src/server/common/helpers/authenticated-requests.js')
 
@@ -30,9 +31,12 @@ describe('View Details - Content Verification Integration Tests', () => {
   const getPageDocument = async (exemption) => {
     mockExemption(exemption)
     jest.mocked(getAuthProvider).mockReturnValue(AUTH_STRATEGIES.ENTRA_ID)
-    const response = await getServer().inject({
-      method: 'GET',
-      url: `${routes.VIEW_DETAILS_INTERNAL_USER}/${exemption.id}`
+    const response = await makeGetRequest({
+      server: getServer(),
+      url: `${routes.VIEW_DETAILS_INTERNAL_USER}/${exemption.id}`,
+      headers: {
+        cookie: 'cookies_preferences_set=true'
+      }
     })
 
     validateResponse(response, statusCodes.ok)

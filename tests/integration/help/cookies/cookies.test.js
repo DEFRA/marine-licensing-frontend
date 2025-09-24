@@ -3,6 +3,11 @@ import { getByRole, getByText, within } from '@testing-library/dom'
 import { statusCodes } from '~/src/server/common/constants/status-codes.js'
 import { setupTestServer } from '~/tests/integration/shared/test-setup-helpers.js'
 
+import {
+  makeGetRequest,
+  makePostRequest
+} from '~/src/server/test-helpers/server-requests.js'
+
 const createCookiesPolicy = (analytics = false, timestamp = 1704040000) => ({
   essential: true,
   analytics,
@@ -48,8 +53,8 @@ describe('Cookies page', () => {
 
   describe('GET /help/cookies', () => {
     test('AC1: Should navigate to cookies page from footer link', async () => {
-      const { result, statusCode } = await getServer().inject({
-        method: 'GET',
+      const { result, statusCode } = await makeGetRequest({
+        server: getServer(),
         url: '/help/cookies'
       })
 
@@ -66,8 +71,8 @@ describe('Cookies page', () => {
     })
 
     test('AC2: Should display all cookie types with "No" selected when no decision made', async () => {
-      const { result, statusCode } = await getServer().inject({
-        method: 'GET',
+      const { result, statusCode } = await makeGetRequest({
+        server: getServer(),
         url: '/help/cookies'
       })
 
@@ -111,8 +116,8 @@ describe('Cookies page', () => {
 
     test('AC3: Should display "No" selected when analytics cookies not accepted', async () => {
       const cookiesPolicy = createCookiesPolicy(false)
-      const { result, statusCode } = await getServer().inject({
-        method: 'GET',
+      const { result, statusCode } = await makeGetRequest({
+        server: getServer(),
         url: '/help/cookies',
         headers: { cookie: createCookieHeaders(cookiesPolicy) }
       })
@@ -124,8 +129,8 @@ describe('Cookies page', () => {
 
     test('AC4: Should display "Yes" selected when analytics cookies accepted', async () => {
       const cookiesPolicy = createCookiesPolicy(true)
-      const { result, statusCode } = await getServer().inject({
-        method: 'GET',
+      const { result, statusCode } = await makeGetRequest({
+        server: getServer(),
         url: '/help/cookies',
         headers: { cookie: createCookieHeaders(cookiesPolicy) }
       })
@@ -136,8 +141,8 @@ describe('Cookies page', () => {
     })
 
     test('AC7: Should show back link that goes to previous page', async () => {
-      const { result, statusCode } = await getServer().inject({
-        method: 'GET',
+      const { result, statusCode } = await makeGetRequest({
+        server: getServer(),
         url: '/help/cookies',
         headers: {
           referer: 'http://localhost/exemption/task-list'
@@ -154,8 +159,8 @@ describe('Cookies page', () => {
     })
 
     test('Should not show back link to cookies page itself', async () => {
-      const { result, statusCode } = await getServer().inject({
-        method: 'GET',
+      const { result, statusCode } = await makeGetRequest({
+        server: getServer(),
         url: '/help/cookies',
         headers: {
           referer: 'http://localhost/help/cookies'
@@ -172,8 +177,8 @@ describe('Cookies page', () => {
     })
 
     test('Should show success banner when returning from save', async () => {
-      const { result, statusCode } = await getServer().inject({
-        method: 'GET',
+      const { result, statusCode } = await makeGetRequest({
+        server: getServer(),
         url: '/help/cookies?success=true'
       })
 
@@ -197,8 +202,8 @@ describe('Cookies page', () => {
     })
 
     test('AC10: Should not show Sign Out link for unauthenticated users', async () => {
-      const { result, statusCode } = await getServer().inject({
-        method: 'GET',
+      const { result, statusCode } = await makeGetRequest({
+        server: getServer(),
         url: '/help/cookies'
       })
 
@@ -225,10 +230,10 @@ describe('Cookies page', () => {
 
     postTestCases.forEach(({ name, analytics }) => {
       test(`${name}`, async () => {
-        const response = await getServer().inject({
-          method: 'POST',
+        const response = await makePostRequest({
+          server: getServer(),
           url: '/help/cookies',
-          payload: `analytics=${analytics}&csrfToken=`,
+          formData: `analytics=${analytics}&csrfToken=`,
           headers: {
             'content-type': 'application/x-www-form-urlencoded'
           }
@@ -239,10 +244,10 @@ describe('Cookies page', () => {
     })
 
     test('Should show validation error when no radio button selected', async () => {
-      const response = await getServer().inject({
-        method: 'POST',
+      const response = await makePostRequest({
+        server: getServer(),
         url: '/help/cookies',
-        payload: 'csrfToken=',
+        formData: 'csrfToken=',
         headers: {
           'content-type': 'application/x-www-form-urlencoded'
         }
@@ -280,8 +285,8 @@ describe('Cookies page', () => {
   describe('Cookie preferences functionality', () => {
     test('AC9: Should show correct back link on confirmation page', async () => {
       // Navigate to cookies page from a specific page
-      const getResponse = await getServer().inject({
-        method: 'GET',
+      const getResponse = await makeGetRequest({
+        server: getServer(),
         url: '/help/cookies',
         headers: { referer: 'http://localhost/exemption/site-name' }
       })
@@ -291,10 +296,10 @@ describe('Cookies page', () => {
         : getResponse.headers['set-cookie'] || ''
 
       // Save preferences
-      const postResponse = await getServer().inject({
-        method: 'POST',
+      const postResponse = await makePostRequest({
+        server: getServer(),
         url: '/help/cookies',
-        payload: 'analytics=yes&csrfToken=',
+        formData: 'analytics=yes&csrfToken=',
         headers: {
           cookie: sessionCookie,
           'content-type': 'application/x-www-form-urlencoded'
@@ -312,8 +317,8 @@ describe('Cookies page', () => {
         .filter((c) => c)
         .join('; ')
 
-      const successResponse = await getServer().inject({
-        method: 'GET',
+      const successResponse = await makeGetRequest({
+        server: getServer(),
         url: postResponse.headers.location,
         headers: { cookie: allCookies }
       })
@@ -334,8 +339,8 @@ describe('Cookies page', () => {
 
   describe('Form elements', () => {
     test('Should have correct form elements', async () => {
-      const { result, statusCode } = await getServer().inject({
-        method: 'GET',
+      const { result, statusCode } = await makeGetRequest({
+        server: getServer(),
         url: '/help/cookies'
       })
 

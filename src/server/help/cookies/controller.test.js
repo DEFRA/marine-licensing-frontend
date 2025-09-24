@@ -2,9 +2,13 @@ import joi from 'joi'
 import { cookiesController, cookiesSubmitController } from './controller.js'
 import * as cookiePreferences from '~/src/server/common/helpers/cookie-preferences.js'
 import * as referrerValidation from '~/src/server/common/helpers/referrer-validation.js'
+import * as cookieService from '~/src/server/common/helpers/cookie-service.js'
+import { config } from '~/src/config/config.js'
 
 jest.mock('~/src/server/common/helpers/cookie-preferences.js')
 jest.mock('~/src/server/common/helpers/referrer-validation.js')
+jest.mock('~/src/server/common/helpers/cookie-service.js')
+jest.mock('~/src/config/config.js')
 
 const createMockRequest = (overrides = {}) => ({
   headers: {},
@@ -33,6 +37,38 @@ const setupMocks = (preferences = DEFAULT_PREFERENCES) => {
   referrerValidation.storeReferrer.mockReturnValue(undefined)
   referrerValidation.getBackUrl.mockReturnValue('/')
   referrerValidation.clearStoredReferrer.mockReturnValue(undefined)
+  referrerValidation.getValidatedReferrerPath.mockReturnValue(
+    '/exemption/task-list'
+  )
+  cookieService.setCookiePreferences.mockImplementation(
+    (response, analytics) => {
+      // Mock the actual behavior of setCookiePreferences
+      const isSecure = config.get('isProduction')
+      response.state(
+        'cookies_policy',
+        {
+          essential: true,
+          analytics,
+          timestamp: Math.floor(Date.now() / 1000)
+        },
+        {
+          encoding: 'base64json',
+          ttl: 31536000000,
+          path: '/',
+          isSecure,
+          isSameSite: 'Strict'
+        }
+      )
+      response.state('cookies_preferences_set', 'true', {
+        ttl: 31536000000,
+        path: '/',
+        isSecure,
+        isSameSite: 'Strict'
+      })
+    }
+  )
+  cookieService.setConfirmationBanner.mockReturnValue(undefined)
+  config.get.mockReturnValue(false)
 }
 
 describe('Cookies Controller', () => {
@@ -198,6 +234,7 @@ describe('Cookies Controller', () => {
     let mockResponse
 
     beforeEach(() => {
+      setupMocks() // Ensure all referrer validation functions are mocked
       mockResponse = {
         state: jest.fn().mockReturnThis()
       }
@@ -270,12 +307,12 @@ describe('Cookies Controller', () => {
       })
 
       it('should set secure cookies in production environment', () => {
-        const originalEnv = process.env.NODE_ENV
-        process.env.NODE_ENV = 'production'
+        config.get.mockReturnValue(true)
         mockRequest.payload = { analytics: 'yes' }
 
         cookiesSubmitController.handler(mockRequest, mockH)
 
+        expect(config.get).toHaveBeenCalledWith('isProduction')
         expect(mockResponse.state).toHaveBeenCalledWith(
           'cookies_policy',
           expect.any(Object),
@@ -290,8 +327,92 @@ describe('Cookies Controller', () => {
             isSecure: true
           })
         )
+      })
+    })
 
-        process.env.NODE_ENV = originalEnv
+    describe('referer validation security', () => {
+      beforeEach(() => {
+        mockRequest.payload = { analytics: 'yes', source: 'banner' }
+      })
+
+      it('should redirect to valid referer when available', () => {
+        mockRequest.headers.referer = 'http://localhost/exemption/task-list'
+        referrerValidation.getValidatedReferrerPath.mockReturnValue(
+          '/exemption/task-list'
+        )
+
+        cookiesSubmitController.handler(mockRequest, mockH)
+
+        expect(
+          referrerValidation.getValidatedReferrerPath
+        ).toHaveBeenCalledWith('http://localhost/exemption/task-list', [
+          '/help/cookies'
+        ])
+        expect(mockH.redirect).toHaveBeenCalledWith('/exemption/task-list')
+      })
+
+      it('should redirect to homepage when referer is invalid', () => {
+        mockRequest.headers.referer = 'javascript:alert("xss")'
+        referrerValidation.getValidatedReferrerPath.mockReturnValue(null)
+
+        cookiesSubmitController.handler(mockRequest, mockH)
+
+        expect(
+          referrerValidation.getValidatedReferrerPath
+        ).toHaveBeenCalledWith('javascript:alert("xss")', ['/help/cookies'])
+        expect(mockH.redirect).toHaveBeenCalledWith('/')
+      })
+
+      it('should redirect to homepage when referer path is excluded', () => {
+        mockRequest.headers.referer = 'http://localhost/help/cookies'
+        referrerValidation.getValidatedReferrerPath.mockReturnValue(null)
+
+        cookiesSubmitController.handler(mockRequest, mockH)
+
+        expect(
+          referrerValidation.getValidatedReferrerPath
+        ).toHaveBeenCalledWith('http://localhost/help/cookies', [
+          '/help/cookies'
+        ])
+        expect(mockH.redirect).toHaveBeenCalledWith('/')
+      })
+
+      it('should redirect to homepage when no referer header present', () => {
+        mockRequest.headers.referer = undefined
+        referrerValidation.getValidatedReferrerPath.mockReturnValue(null)
+
+        cookiesSubmitController.handler(mockRequest, mockH)
+
+        expect(
+          referrerValidation.getValidatedReferrerPath
+        ).toHaveBeenCalledWith(undefined, ['/help/cookies'])
+        expect(mockH.redirect).toHaveBeenCalledWith('/')
+      })
+
+      it('should redirect to homepage when getValidatedReferrerPath returns null', () => {
+        mockRequest.headers.referer = 'invalid-url'
+        referrerValidation.getValidatedReferrerPath.mockReturnValue(null)
+
+        cookiesSubmitController.handler(mockRequest, mockH)
+
+        expect(
+          referrerValidation.getValidatedReferrerPath
+        ).toHaveBeenCalledWith('invalid-url', ['/help/cookies'])
+        expect(mockH.redirect).toHaveBeenCalledWith('/')
+      })
+
+      it('should not validate referer when not from banner (page submission)', () => {
+        mockRequest.payload.source = 'page'
+        mockRequest.headers.referer = 'http://localhost/exemption/task-list'
+
+        cookiesSubmitController.handler(mockRequest, mockH)
+
+        expect(
+          referrerValidation.getValidatedReferrerPath
+        ).not.toHaveBeenCalled()
+        expect(mockH.redirect).toHaveBeenCalledWith(
+          '/help/cookies?success=true'
+        )
       })
     })
 

@@ -5,7 +5,6 @@ import {
   FILE_UPLOAD_VIEW_ROUTE,
   fileUploadController
 } from '~/src/server/exemption/site-details/file-upload/controller.js'
-import { createServer } from '~/src/server/index.js'
 import { mockExemption } from '~/src/server/test-helpers/mocks.js'
 import * as cdpUploadService from '~/src/services/cdp-upload-service/index.js'
 
@@ -15,8 +14,6 @@ jest.mock('~/src/services/cdp-upload-service/index.js')
 /* eslint jest/expect-expect: ["error", { "assertFunctionNames": ["expect", "expectViewCalledWith"] }] */
 
 describe('#fileUpload', () => {
-  /** @type {Server} */
-  let server
   let getExemptionCacheSpy
   let updateExemptionSiteDetailsSpy
   let mockCdpService
@@ -75,11 +72,6 @@ describe('#fileUpload', () => {
     )
   }
 
-  beforeAll(async () => {
-    server = await createServer()
-    await server.initialize()
-  })
-
   beforeEach(() => {
     getExemptionCacheSpy = jest
       .spyOn(cacheUtils, 'getExemptionCache')
@@ -97,10 +89,6 @@ describe('#fileUpload', () => {
     jest
       .spyOn(cdpUploadService, 'getCdpUploadService')
       .mockReturnValue(mockCdpService)
-  })
-
-  afterAll(async () => {
-    await server.stop({ timeout: 0 })
   })
 
   describe('#fileUploadController', () => {

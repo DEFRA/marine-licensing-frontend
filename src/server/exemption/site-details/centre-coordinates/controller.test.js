@@ -318,6 +318,32 @@ describe('#centreCoordinates', () => {
       expect(h.redirect).toHaveBeenCalledWith(routes.WIDTH_OF_SITE)
     })
 
+    test('Should trim spaces from wgs84 data and save the converted values', async () => {
+      const h = {
+        redirect: jest.fn()
+      }
+
+      const mockRequest = {
+        payload: { latitude: ' 51.489676', longitude: '-0.231530 ' },
+        site: mockSite
+      }
+
+      getCoordinateSystemSpy.mockReturnValueOnce({
+        coordinateSystem: COORDINATE_SYSTEMS.WGS84
+      })
+
+      await centreCoordinatesSubmitController.handler(mockRequest, h)
+
+      expect(cacheUtils.updateExemptionSiteDetails).toHaveBeenCalledWith(
+        mockRequest,
+        0,
+        'coordinates',
+        { latitude: '51.489676', longitude: '-0.231530' }
+      )
+
+      expect(h.redirect).toHaveBeenCalledWith(routes.WIDTH_OF_SITE)
+    })
+
     test('Should correctly set the cache when submitting OSGB36 data', async () => {
       const h = {
         redirect: jest.fn()
@@ -339,6 +365,32 @@ describe('#centreCoordinates', () => {
         0,
         'coordinates',
         mockCoordinates[COORDINATE_SYSTEMS.OSGB36]
+      )
+
+      expect(h.redirect).toHaveBeenCalledWith(routes.WIDTH_OF_SITE)
+    })
+
+    test('Should trim spaces from OSGB36 data and save the converted values', async () => {
+      const h = {
+        redirect: jest.fn()
+      }
+
+      const mockRequest = {
+        payload: { eastings: ' 425053', northings: '564180 ' },
+        site: mockSite
+      }
+
+      getCoordinateSystemSpy.mockReturnValueOnce({
+        coordinateSystem: COORDINATE_SYSTEMS.OSGB36
+      })
+
+      await centreCoordinatesSubmitController.handler(mockRequest, h)
+
+      expect(cacheUtils.updateExemptionSiteDetails).toHaveBeenCalledWith(
+        mockRequest,
+        0,
+        'coordinates',
+        { eastings: '425053', northings: '564180' }
       )
 
       expect(h.redirect).toHaveBeenCalledWith(routes.WIDTH_OF_SITE)

@@ -50,8 +50,8 @@ const expectConfirmationBanner = (document, accepted = true) => {
   expect(banner).toBeInTheDocument()
 
   const expectedStartText = accepted
-    ? "You've accepted additional cookies. You can"
-    : "You've rejected additional cookies. You can"
+    ? 'You’ve accepted analytics cookies. You can'
+    : 'You’ve rejected analytics cookies. You can'
 
   // Check for the text content split across elements
   expect(banner.textContent).toContain(expectedStartText)

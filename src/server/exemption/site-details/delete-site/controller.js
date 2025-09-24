@@ -1,5 +1,8 @@
 import { routes } from '~/src/server/common/constants/routes.js'
-import { getExemptionCache } from '~/src/server/common/helpers/session-cache/utils.js'
+import {
+  getExemptionCache,
+  setExemptionCache
+} from '~/src/server/common/helpers/session-cache/utils.js'
 import { setSiteDataPreHandler } from '~/src/server/common/helpers/session-cache/site-utils.js'
 import { authenticatedPatchRequest } from '~/src/server/common/helpers/authenticated-requests.js'
 
@@ -51,6 +54,11 @@ export const deleteSiteSubmitController = {
         multipleSiteDetails: exemption.multipleSiteDetails,
         siteDetails: dataToSave,
         id: exemption.id
+      })
+
+      setExemptionCache(request, {
+        ...exemption,
+        siteDetails: dataToSave
       })
 
       request.logger.info(

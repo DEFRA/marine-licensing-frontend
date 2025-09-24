@@ -2,7 +2,10 @@ import {
   deleteSiteController,
   deleteSiteSubmitController
 } from './controller.js'
-import { getExemptionCache } from '~/src/server/common/helpers/session-cache/utils.js'
+import {
+  getExemptionCache,
+  setExemptionCache
+} from '~/src/server/common/helpers/session-cache/utils.js'
 import { setSiteDataPreHandler } from '~/src/server/common/helpers/session-cache/site-utils.js'
 import { authenticatedPatchRequest } from '~/src/server/common/helpers/authenticated-requests.js'
 import { routes } from '~/src/server/common/constants/routes.js'
@@ -95,6 +98,12 @@ describe('deleteSiteController', () => {
           id: mockExemption.id
         }
       )
+
+      expect(setExemptionCache).toHaveBeenCalledWith(mockRequest, {
+        ...mockExemption,
+        siteDetails: expectedSiteDetails
+      })
+
       expect(mockRequest.logger.info).toHaveBeenCalledWith(
         { siteNumber: '1', exemptionId: 'test-exemption-id' },
         'Deleted site 1'
@@ -129,6 +138,11 @@ describe('deleteSiteController', () => {
           id: mockExemption.id
         }
       )
+
+      expect(setExemptionCache).toHaveBeenCalledWith(requestDeleteSecondSite, {
+        ...mockExemption,
+        siteDetails: expectedSiteDetails
+      })
     })
 
     it('should redirect to task list when deleting the last site', async () => {
@@ -154,6 +168,11 @@ describe('deleteSiteController', () => {
           id: exemptionWithOneSite.id
         }
       )
+
+      expect(setExemptionCache).toHaveBeenCalledWith(mockRequest, {
+        ...exemptionWithOneSite,
+        siteDetails: []
+      })
 
       // Should redirect to task list instead of review site details
       expect(mockH.redirect).toHaveBeenCalledWith(routes.TASK_LIST)

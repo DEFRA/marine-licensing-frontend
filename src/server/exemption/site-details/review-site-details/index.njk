@@ -214,10 +214,23 @@
                     classes: "govuk-summary-list__value--full-width"
                 }
             }), summaryRows) %}
+
+           {% set deleteLink %}delete-site?site={{site.siteNumber}}{% endset %}
+           {% set deleteScreenReaderText %}for site {{site.siteNumber}}{% endset %}
+
             {{ govukSummaryList({
                 card: {
                     title: {
                         text: summaryRowsHeading
+                    },
+                    actions: {
+                        items: [
+                            {
+                                href: deleteLink,
+                                text: "Delete site",
+                                visuallyHiddenText: deleteScreenReaderText
+                            }
+                        ]
                     }
                 },
                 rows: summaryRows,

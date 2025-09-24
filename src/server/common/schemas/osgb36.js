@@ -103,6 +103,7 @@ export const createOsgb36CoordinateSchema = (
 ) => {
   return joi
     .string()
+    .trim()
     .required()
     .custom((value, helpers) =>
       validateCoordinatesWithPattern(value, helpers, coordinateType)

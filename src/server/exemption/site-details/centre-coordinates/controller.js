@@ -137,13 +137,16 @@ export const centreCoordinatesSubmitController = {
 
     const { coordinateSystem } = getCoordinateSystem(request)
 
-    const { error } = validateCentreCoordinates(payload, coordinateSystem)
+    const { error, value } = validateCentreCoordinates(
+      payload,
+      coordinateSystem
+    )
 
     if (error) {
       return centreCoordinatesSubmitFailHandler(request, h, error)
     }
 
-    updateExemptionSiteDetails(request, siteIndex, 'coordinates', payload)
+    updateExemptionSiteDetails(request, siteIndex, 'coordinates', value)
 
     return h.redirect(routes.WIDTH_OF_SITE + queryParams)
   }

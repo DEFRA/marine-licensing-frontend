@@ -33,6 +33,7 @@ class MapViewManager {
         ])
       }
     } catch (error) {
+      console.warn('Failed to fit map to extent, falling back to UK centre:', error)
       this.centreMapView(map, [
         DEFAULT_UK_CENTRE_LONGITUDE,
         DEFAULT_UK_CENTRE_LATITUDE

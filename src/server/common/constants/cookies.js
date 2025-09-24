@@ -13,7 +13,7 @@ export const FLASH_MESSAGE_KEYS = {
 export const COOKIE_OPTIONS = {
   TTL: oneYearInMilliseconds,
   PATH: '/',
-  IS_SAME_SITE: 'Strict'
+  IS_SAME_SITE: 'Lax'
 }
 
 export const COOKIE_OPTIONS_BASE64 = {

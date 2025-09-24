@@ -364,14 +364,14 @@ describe('Cookie Service', () => {
       )
     })
 
-    test('should use Strict SameSite policy for security', () => {
+    test('should use Lax SameSite policy', () => {
       setCookiePreferences(mockResponse, true)
 
       expect(mockResponse.state).toHaveBeenCalledWith(
         COOKIE_NAMES.POLICY,
         expect.any(Object),
         expect.objectContaining({
-          isSameSite: 'Strict'
+          isSameSite: 'Lax'
         })
       )
 
@@ -379,7 +379,7 @@ describe('Cookie Service', () => {
         COOKIE_NAMES.PREFERENCES_SET,
         'true',
         expect.objectContaining({
-          isSameSite: 'Strict'
+          isSameSite: 'Lax'
         })
       )
     })

@@ -480,7 +480,10 @@ describe('siteDetails utils', () => {
             'WGS84 (World Geodetic System 1984)\nLatitude and longitude',
           coordinates: '51.5074, -0.1278',
           width: '1 metre',
-          siteNumber: 1
+          siteNumber: 1,
+          siteDetailsData: expect.stringContaining(
+            '"coordinatesType":"coordinates"'
+          )
         }
       ])
     })
@@ -529,7 +532,10 @@ describe('siteDetails utils', () => {
             'WGS84 (World Geodetic System 1984)\nLatitude and longitude',
           coordinates: '51.5074, -0.1278',
           width: '1 metre',
-          siteNumber: 1
+          siteNumber: 1,
+          siteDetailsData: expect.stringContaining(
+            '"coordinatesType":"coordinates"'
+          )
         }
       ])
     })
@@ -567,7 +573,10 @@ describe('siteDetails utils', () => {
           coordinateSystem: 'OSGB36 (National Grid)\nEastings and Northings',
           coordinates: '425053, 564180',
           width: '200 metres',
-          siteNumber: 1
+          siteNumber: 1,
+          siteDetailsData: expect.stringContaining(
+            '"coordinatesType":"coordinates"'
+          )
         }
       ])
     })
@@ -722,7 +731,7 @@ describe('siteDetails utils', () => {
         mockAuthenticatedGetRequest
       )
 
-      expect(result).toEqual(mockMongoResponse.payload.value.siteDetails[0])
+      expect(result).toEqual([mockMongoResponse.payload.value.siteDetails[0]])
       expect(mockAuthenticatedGetRequest).toHaveBeenCalledWith(
         mockRequest,
         '/exemption/test-exemption-id'

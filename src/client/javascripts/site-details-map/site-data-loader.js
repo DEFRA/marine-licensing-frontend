@@ -12,7 +12,12 @@ class SiteDataLoader {
       // Multi site implementation, will become default eventually
       const siteDetailsAttr = this.mapElement.getAttribute('data-site-details')
       if (siteDetailsAttr) {
-        return JSON.parse(siteDetailsAttr)
+        try {
+          return JSON.parse(siteDetailsAttr)
+        } catch (error) {
+          console.warn('Failed to parse site details data attribute:', error)
+          return null
+        }
       }
     }
 
@@ -22,7 +27,12 @@ class SiteDataLoader {
       return null
     }
 
-    return JSON.parse(siteDataElement.textContent)
+    try {
+      return JSON.parse(siteDataElement.textContent)
+    } catch (error) {
+      console.warn('Failed to parse site details script content:', error)
+      return null
+    }
   }
 
   /**

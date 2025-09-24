@@ -3,7 +3,7 @@
 {% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
 {% from "govuk/components/button/macro.njk" import govukButton %}
 {% from "cancel-button/macro.njk" import appCancelButton %}
-{% from "site-details-map-div/macro.njk" import appSiteDetailsMapDiv %}
+{% from "site-details-map-div/macro.njk" import appSiteDetailsMap %}
 {% block pageTitle %}
     Review site details | {{ serviceName }}
 {% endblock %}
@@ -210,7 +210,7 @@
                     classes: "govuk-summary-list__key--full-width"
                 },
                 value: {
-                    html: appSiteDetailsMapDiv(site.siteDetailsData),
+                    html: appSiteDetailsMap(site.siteDetailsData),
                     classes: "govuk-summary-list__value--full-width"
                 }
             }), summaryRows) %}

@@ -15,10 +15,11 @@ jest.mock('~/src/server/common/helpers/authenticated-requests.js')
 
 const getSiteDetailsCard = (document, expected) => {
   const cardName = expected?.siteDetails?.cardName ?? 'Site details'
-  const siteCards = document.querySelectorAll('.govuk-summary-card')
-  return Array.from(siteCards).find((card) =>
-    card.textContent.includes(cardName)
-  )
+  const heading = within(document).getByRole('heading', {
+    level: 2,
+    name: cardName
+  })
+  return heading.closest('.govuk-summary-card')
 }
 
 describe('Review Site Details - Polygon Coordinates Integration Tests', () => {
@@ -235,7 +236,7 @@ describe('Review Site Details - Polygon Coordinates Integration Tests', () => {
     const siteCard = document.querySelectorAll('.govuk-summary-card')[1]
     expect(siteCard).toBeTruthy()
 
-    const cardTitle = siteCard.querySelector('.govuk-summary-card__title')
+    const cardTitle = within(siteCard).getByRole('heading', { level: 2 })
     expect(cardTitle.textContent.trim()).toBe('Activity details')
 
     const sameActivityDatesRow = getRowByKey(

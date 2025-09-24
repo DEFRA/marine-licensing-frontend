@@ -11,6 +11,7 @@ import {
 } from '~/src/server/exemption/activity-description/controller.js'
 import * as cacheUtils from '~/src/server/common/helpers/session-cache/utils.js'
 import * as authRequests from '~/src/server/common/helpers/authenticated-requests.js'
+import { getByRole } from '@testing-library/dom'
 
 jest.mock('~/src/server/common/helpers/session-cache/utils.js')
 
@@ -63,10 +64,8 @@ describe('#activityDescriptionController', () => {
       expect(document.querySelector('#activityDescription').value).toBe('')
       expect(document.querySelector('form').method).toBe('post')
       expect(
-        document
-          .querySelector('form:has(textarea) button[type="submit"]')
-          .textContent.trim()
-      ).toBe('Save and continue')
+        getByRole(document, 'button', { name: 'Save and continue' })
+      ).toHaveAttribute('type', 'submit')
     })
 
     test('handler should render with correct context', () => {

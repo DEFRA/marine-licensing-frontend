@@ -53,8 +53,8 @@ export const mockExemption = {
       circleWidth: '50',
       siteName: 'Mock site 2',
       activityDates: {
-        start: '2025-01-01T00:00:00.000Z',
-        end: '2025-01-01T00:00:00.000Z'
+        start: '2025-02-01T00:00:00.000Z',
+        end: '2025-02-01T00:00:00.000Z'
       },
       activityDescription: 'Test activity description 2'
     }

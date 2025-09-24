@@ -3,13 +3,12 @@
 {% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
 {% from "govuk/components/button/macro.njk" import govukButton %}
 {% from "cancel-button/macro.njk" import appCancelButton %}
-{% from "site-details-data-script/macro.njk" import appSiteDetailsDataScript %}
+{% from "site-details-map/macro.njk" import appSiteDetailsMap %}
 {% block pageTitle %}
     Review site details | {{ serviceName }}
 {% endblock %}
 {% block head %}
     {{ super() }}
-    {{ appSiteDetailsDataScript(siteDetailsData) }}
 {% endblock %}
 {% block beforeContent %}
     <nav>
@@ -19,14 +18,6 @@
     }) }}
     </nav>
 {% endblock %}
-
-{% set summaryRowsHeading %}
-  {% if isMultiSiteJourney %}
-    Site {{ siteNumber }} details
-  {% else %}
-    Site details
-  {% endif %}
-{% endset %}
 
 {% block content %}
     <div class="govuk-grid-row">
@@ -119,7 +110,17 @@
 
             {% endif %}
 
-           {% set summaryRows = [] %}
+         {% for site in summaryData %}
+
+            {% set summaryRows = [] %}
+
+            {% set summaryRowsHeading %}
+                {% if isMultiSiteJourney %}
+                    Site {{ site.siteNumber }} details
+                {% else %}
+                    Site details
+                {% endif %}
+            {% endset %}
 
             {% if isMultiSiteJourney %}
                 {% set summaryRows = (summaryRows.push({
@@ -127,30 +128,30 @@
                         text: "Site name"
                     },
                     value: {
-                        text: summaryData.siteName
+                        text: site.siteName
                     }
                 }), summaryRows) %}
             {% endif %}
 
 
-            {% if summaryData.showActivityDates %}
+            {% if site.showActivityDates %}
                 {% set summaryRows = (summaryRows.push({
                     key: {
                         text: "Activity dates"
                     },
                     value: {
-                        text: summaryData.activityDates
+                        text: site.activityDates
                     }
                 }), summaryRows) %}
             {% endif %}
 
-            {% if summaryData.showActivityDescription %}
+            {% if site.showActivityDescription %}
                 {% set summaryRows = (summaryRows.push({
                     key: {
                         text: "Activity description"
                     },
                     value: {
-                        text: summaryData.activityDescription
+                        text: site.activityDescription
                     }
                 }), summaryRows) %}
             {% endif %}
@@ -160,20 +161,20 @@
                     text: "Single or multiple sets of coordinates"
                 },
                 value: {
-                    text: summaryData.method
+                    text: site.method
                 }
             },{
                 key: {
                     text: "Coordinate system"
                 },
                 value: {
-                    html: summaryData.coordinateSystem | replace('\n', '<br>')
+                    html: site.coordinateSystem | replace('\n', '<br>')
                 }
             }), summaryRows) %}
 
-            {% if summaryData.polygonCoordinates %}
+            {% if site.polygonCoordinates %}
                 {# Polygon site - multiple coordinates #}
-                {% for coordinate in summaryData.polygonCoordinates %}
+                {% for coordinate in site.polygonCoordinates %}
                     {% set summaryRows = (summaryRows.push({
                         key: {
                             text: coordinate.label
@@ -190,7 +191,7 @@
                         text: "Coordinates at centre of site"
                     },
                     value: {
-                        text: summaryData.coordinates
+                        text: site.coordinates
                     }
                 }), summaryRows) %}
                 {% set summaryRows = (summaryRows.push({
@@ -198,7 +199,7 @@
                         text: "Width of circular site"
                     },
                     value: {
-                        text: summaryData.width
+                        text: site.width
                     }
                 }), summaryRows) %}
             {% endif %}
@@ -206,10 +207,10 @@
             {% set summaryRows = (summaryRows.push({
                 key: {
                     text: "Map view",
-                            classes: "govuk-summary-list__key--full-width"
+                    classes: "govuk-summary-list__key--full-width"
                 },
                 value: {
-                    html: '<div class="app-site-details-map" data-module="site-details-map"></div>',
+                    html: appSiteDetailsMap(site.siteDetailsData, loop.index0),
                     classes: "govuk-summary-list__value--full-width"
                 }
             }), summaryRows) %}
@@ -222,6 +223,8 @@
                 rows: summaryRows,
                     classes: "govuk-summary-list--full-width"
             }) }}
+
+            {% endfor %}
 
 
             <form method="POST">

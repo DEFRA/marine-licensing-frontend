@@ -41,7 +41,10 @@ describe('#activityDatesController', () => {
     test('should render the activity dates page', async () => {
       const { result, statusCode } = await makeGetRequest({
         url: routes.ACTIVITY_DATES,
-        server: getServer()
+        server: getServer(),
+        headers: {
+          cookie: 'cookies_preferences_set=true'
+        }
       })
 
       expect(statusCode).toBe(statusCodes.ok)
@@ -125,7 +128,10 @@ describe('#activityDatesController', () => {
       const { statusCode, headers } = await makePostRequest({
         url: routes.ACTIVITY_DATES,
         server: getServer(),
-        formData: payload
+        formData: payload,
+        headers: {
+          cookie: 'cookies_preferences_set=true'
+        }
       })
 
       expect(authRequests.authenticatedPatchRequest).toHaveBeenCalledWith(

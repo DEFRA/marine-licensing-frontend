@@ -8,9 +8,9 @@ export const validateCentreCoordinates = (payload, coordinateSystem) => {
       ? osgb36ValidationSchema
       : wgs84ValidationSchema
 
-  const { error } = schema.validate(payload, {
+  const { error, value } = schema.validate(payload, {
     abortEarly: false
   })
 
-  return { error }
+  return { error, value }
 }

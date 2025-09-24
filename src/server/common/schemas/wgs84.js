@@ -115,6 +115,7 @@ export const createCoordinateSchema = (
 ) => {
   return joi
     .string()
+    .trim()
     .required()
     .custom((value, helpers) =>
       validateCoordinatesWithPattern(value, helpers, coordinateType)

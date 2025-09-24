@@ -116,7 +116,7 @@ describe('#dashboard', () => {
 
       const { document } = new JSDOM(result).window
 
-      const emptyState = document.querySelector('.govuk-body')
+      const emptyState = document.querySelector('h1 + p')
       expect(emptyState.textContent).toContain(
         'You currently have no projects.'
       )

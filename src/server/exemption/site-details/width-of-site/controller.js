@@ -107,7 +107,12 @@ export const widthOfSiteSubmitController = {
 
     const { siteIndex, queryParams } = request.site
 
-    updateExemptionSiteDetails(request, siteIndex, 'circleWidth', payload.width)
+    updateExemptionSiteDetails(
+      request,
+      siteIndex,
+      'circleWidth',
+      payload.width.trim()
+    )
 
     return h.redirect(routes.REVIEW_SITE_DETAILS + queryParams)
   }

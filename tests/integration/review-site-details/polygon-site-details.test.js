@@ -289,6 +289,10 @@ describe('Review Site Details - Polygon Coordinates Integration Tests', () => {
       expected.siteDetails[siteIndex].cardName
     )
 
+    const cardActions = siteCard.querySelector('.govuk-summary-card__actions')
+    const deleteLink = within(cardActions).getByRole('link')
+    expect(deleteLink.textContent).toContain('Delete site')
+
     const methodRow = getRowByKey(
       siteCard,
       'Single or multiple sets of coordinates'

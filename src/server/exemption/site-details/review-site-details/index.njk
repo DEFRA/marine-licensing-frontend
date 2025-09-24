@@ -215,9 +215,6 @@
                 }
             }), summaryRows) %}
 
-           {% set deleteLink %}delete-site?site={{site.siteNumber}}{% endset %}
-           {% set deleteScreenReaderText %}for site {{site.siteNumber}}{% endset %}
-
             {{ govukSummaryList({
                 card: {
                     title: {
@@ -226,9 +223,9 @@
                     actions: {
                         items: [
                             {
-                                href: deleteLink,
+                                href: "delete-site?site=" + site.siteNumber,
                                 text: "Delete site",
-                                visuallyHiddenText: deleteScreenReaderText
+                                visuallyHiddenText: "for site " + site.siteNumber
                             }
                         ]
                     }

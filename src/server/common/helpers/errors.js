@@ -61,7 +61,7 @@ export function catchAll(request, h) {
     .view(template, {
       pageTitle: errorMessage
     })
-    .code(statusCode) // NOSONAR - this is a false positive and correct for HAPI
+    .code(statusCode)
 }
 
 /**

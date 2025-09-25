@@ -1,0 +1,31 @@
+{% extends 'layouts/page.njk' %}
+
+{% block beforeContent %}
+  {{ appBackLinkHistory() }}
+{% endblock %}
+
+{% block content %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+      <h1 class="govuk-heading-l">Page not found</h1>
+
+      <p class="govuk-body">If you typed the web address, check it is correct.</p>
+
+      <p class="govuk-body">If you pasted the web address, check you copied the entire web address.</p>
+
+      <p class="govuk-body">If the web address is correct or you selected a link or button, contact our helpline.</p>
+
+      <h2 class="govuk-heading-m govuk-!-margin-bottom-1">Phone</h2>
+      <p class="govuk-body">0191 376 2791</p>
+
+      <h2 class="govuk-heading-m govuk-!-margin-top-6 govuk-!-margin-bottom-1">Email</h2>
+      <p class="govuk-body">
+        <a href="mailto:marine.consents@marinemanagement.org.uk" class="govuk-link">marine.consents@marinemanagement.org.uk</a>
+      </p>
+
+      <h2 class="govuk-heading-m govuk-!-margin-top-6 govuk-!-margin-bottom-1">Opening times</h2>
+      <p class="govuk-body govuk-!-margin-bottom-1">Monday to Thursday: 9am to 4:30pm</p>
+      <p class="govuk-body govuk-!-margin-bottom-0">Friday: 9am to 4pm</p>
+    </div>
+  </div>
+{% endblock %}

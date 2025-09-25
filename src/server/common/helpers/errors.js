@@ -8,13 +8,32 @@ function statusCodeMessage(statusCode) {
     case statusCodes.notFound:
       return 'Page not found'
     case statusCodes.forbidden:
-      return 'Forbidden'
+      return 'You do not have permission to view this page'
     case statusCodes.unauthorized:
       return 'Unauthorized'
     case statusCodes.badRequest:
       return 'Bad Request'
+    case statusCodes.serviceUnavailable:
+      return 'Sorry, the service is unavailable'
     default:
-      return 'Something went wrong'
+      return 'There is a problem with the service'
+  }
+}
+
+/**
+ * @param {number} statusCode
+ */
+function getErrorTemplate(statusCode) {
+  switch (statusCode) {
+    case statusCodes.notFound:
+      return 'error/404-not-found'
+    case statusCodes.forbidden:
+      return 'error/403-forbidden'
+    case statusCodes.serviceUnavailable:
+      return 'error/503-service-unavailable'
+    case statusCodes.internalServerError:
+    default:
+      return 'error/500-server-error'
   }
 }
 
@@ -36,13 +55,13 @@ export function catchAll(request, h) {
     request.logger.error({ stack: response?.stack }, 'Error occurred')
   }
 
+  const template = getErrorTemplate(statusCode)
+
   return h
-    .view('error/index', {
-      pageTitle: errorMessage,
-      heading: statusCode,
-      message: errorMessage
+    .view(template, {
+      pageTitle: errorMessage
     })
-    .code(statusCode)
+    .code(statusCode) // NOSONAR - this is a false positive and correct for HAPI
 }
 
 /**

@@ -10,5 +10,6 @@ export const statusCodes = {
   notFound: 404,
   imATeapot: 418,
   internalServerError: 500,
+  serviceUnavailable: 503,
   redirect: 302
 }

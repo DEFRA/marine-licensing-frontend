@@ -1025,7 +1025,6 @@ describe('siteDetails utils', () => {
     const mockH = {
       view: jest.fn()
     }
-    const mockRequest = {}
 
     beforeEach(() => {
       jest.clearAllMocks()
@@ -1063,7 +1062,7 @@ describe('siteDetails utils', () => {
         siteDetails: [siteDetails]
       }
 
-      renderManualCoordinateReview(mockH, mockRequest, {
+      renderManualCoordinateReview(mockH, {
         exemption,
         siteDetails,
         previousPage,

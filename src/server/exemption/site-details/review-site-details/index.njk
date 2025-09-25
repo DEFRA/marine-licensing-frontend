@@ -214,10 +214,20 @@
                     classes: "govuk-summary-list__value--full-width"
                 }
             }), summaryRows) %}
+
             {{ govukSummaryList({
                 card: {
                     title: {
                         text: summaryRowsHeading
+                    },
+                    actions: {
+                        items: [
+                            {
+                                href: "delete-site?site=" + site.siteNumber,
+                                text: "Delete site",
+                                visuallyHiddenText: "for site " + site.siteNumber
+                            }
+                        ]
                     }
                 },
                 rows: summaryRows,

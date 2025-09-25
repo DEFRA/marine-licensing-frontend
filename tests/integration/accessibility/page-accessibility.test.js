@@ -108,6 +108,10 @@ describe('Page accessibility checks (Axe)', () => {
     {
       url: routes.COOKIES,
       title: 'Cookies on Get permission for marine work'
+    },
+    {
+      url: routes.DELETE_SITE,
+      title: 'Are you sure you want to delete this site?'
     }
   ]
 

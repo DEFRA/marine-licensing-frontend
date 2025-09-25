@@ -54,7 +54,7 @@ export const reviewSiteDetailsController = {
           previousPage,
           reviewSiteDetailsPageData
         })
-      : renderManualCoordinateReview(h, request, {
+      : renderManualCoordinateReview(h, {
           exemption,
           siteDetails,
           previousPage,

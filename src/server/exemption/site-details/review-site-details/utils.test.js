@@ -1025,7 +1025,6 @@ describe('siteDetails utils', () => {
     const mockH = {
       view: jest.fn()
     }
-    const mockRequest = {}
 
     beforeEach(() => {
       jest.clearAllMocks()

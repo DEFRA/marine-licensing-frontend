@@ -4,11 +4,8 @@
 {% from "govuk/components/back-link/macro.njk" import govukBackLink %}
 {% from "cancel-button/macro.njk" import appCancelButton %}
 
-{% block head %}
-    {{ super() }}
-{% endblock %}
-
 {% block beforeContent %}
+  {{ super() }}
   <nav>
     {{ govukBackLink({
       text: "Back",

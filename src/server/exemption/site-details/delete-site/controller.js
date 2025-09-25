@@ -20,7 +20,7 @@ export const deleteSiteController = {
   },
   handler(request, h) {
     const { site } = request
-    const { siteNumber, siteDetails } = site
+    const { siteNumber, siteIndex, siteDetails } = site
 
     if (!siteDetails || siteDetails.coordinatesType === 'file') {
       return h.redirect(routes.REVIEW_SITE_DETAILS)
@@ -30,6 +30,7 @@ export const deleteSiteController = {
       pageTitle: DELETE_SITE_PAGE_TITLE,
       heading: DELETE_SITE_PAGE_TITLE,
       siteNumber,
+      siteIndex,
       backLink: routes.REVIEW_SITE_DETAILS,
       routes
     })
@@ -38,20 +39,26 @@ export const deleteSiteController = {
 
 /**
  * Controller for handling the request to actually delete a site.
+ * Gets the siteIndex from form data to identify which site to delete.
  * @satisfies {Partial<ServerRoute>}
  */
 export const deleteSiteSubmitController = {
-  options: {
-    pre: [setSiteDataPreHandler]
-  },
   async handler(request, h) {
     const exemption = getExemptionCache(request)
-    const { site } = request
-    const { siteNumber, siteIndex } = site
+    const { siteIndex } = request.payload
+    const parsedSiteIndex = parseInt(siteIndex, 10)
+
+    if (!exemption.siteDetails[parsedSiteIndex]) {
+      request.logger.error(
+        { siteIndex, exemptionId: exemption.id },
+        'Invalid site index for deletion'
+      )
+      return h.redirect(routes.REVIEW_SITE_DETAILS)
+    }
 
     try {
       const dataToSave = exemption.siteDetails.filter(
-        (_, index) => index !== siteIndex
+        (_, index) => index !== parsedSiteIndex
       )
 
       await authenticatedPatchRequest(request, '/exemption/site-details', {
@@ -65,6 +72,8 @@ export const deleteSiteSubmitController = {
         siteDetails: dataToSave
       })
 
+      const siteNumber = parsedSiteIndex + 1
+
       request.logger.info(
         { siteNumber, exemptionId: exemption.id },
         `Deleted site ${siteNumber}`
@@ -76,7 +85,11 @@ export const deleteSiteSubmitController = {
       return h.redirect(redirectRoute)
     } catch (error) {
       request.logger.error(
-        { error, siteNumber, exemptionId: exemption.id },
+        {
+          error,
+          siteIndex: parsedSiteIndex,
+          exemptionId: exemption.id
+        },
         'Error deleting site'
       )
       return h.redirect(routes.REVIEW_SITE_DETAILS)

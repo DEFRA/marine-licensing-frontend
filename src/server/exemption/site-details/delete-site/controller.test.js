@@ -26,6 +26,9 @@ const mockRequest = {
     siteIndex: 0,
     siteDetails: mockExemption.siteDetails[0]
   },
+  payload: {
+    siteIndex: '0'
+  },
   logger: {
     info: jest.fn(),
     error: jest.fn()
@@ -48,6 +51,7 @@ describe('deleteSiteController', () => {
           pageTitle: 'Are you sure you want to delete this site?',
           heading: 'Are you sure you want to delete this site?',
           siteNumber: '1',
+          siteIndex: 0,
           backLink: routes.REVIEW_SITE_DETAILS,
           routes
         }
@@ -106,7 +110,7 @@ describe('deleteSiteController', () => {
       })
 
       expect(mockRequest.logger.info).toHaveBeenCalledWith(
-        { siteNumber: '1', exemptionId: mockExemption.id },
+        { siteNumber: 1, exemptionId: mockExemption.id },
         'Deleted site 1'
       )
       expect(mockH.redirect).toHaveBeenCalledWith(routes.REVIEW_SITE_DETAILS)
@@ -118,6 +122,9 @@ describe('deleteSiteController', () => {
         site: {
           siteNumber: '2',
           siteIndex: 1
+        },
+        payload: {
+          siteIndex: '1'
         }
       }
 
@@ -169,10 +176,22 @@ describe('deleteSiteController', () => {
       expect(mockH.redirect).toHaveBeenCalledWith(routes.TASK_LIST)
     })
 
-    it('should have setSiteDataPreHandler in options', () => {
-      expect(deleteSiteSubmitController.options.pre).toContain(
-        setSiteDataPreHandler
+    it('should handle invalid site index error', async () => {
+      const requestWithInvalidSite = {
+        ...mockRequest,
+        payload: {
+          siteIndex: '999'
+        }
+      }
+
+      await deleteSiteSubmitController.handler(requestWithInvalidSite, mockH)
+
+      expect(mockRequest.logger.error).toHaveBeenCalledWith(
+        { siteIndex: '999', exemptionId: mockExemption.id },
+        'Invalid site index for deletion'
       )
+      expect(mockH.redirect).toHaveBeenCalledWith(routes.REVIEW_SITE_DETAILS)
+      expect(authenticatedPatchRequest).not.toHaveBeenCalled()
     })
   })
 })

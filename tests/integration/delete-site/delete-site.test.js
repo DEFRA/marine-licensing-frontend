@@ -11,22 +11,7 @@ jest.mock('~/src/server/common/helpers/authenticated-requests.js')
 describe('Delete site', () => {
   const getServer = setupTestServer()
 
-  const testExemption = {
-    id: 'test-exemption-123',
-    projectName: 'Test Project',
-    siteDetails: [
-      {
-        siteName: 'Test Site 1',
-        coordinatesType: 'coordinates'
-      },
-      {
-        siteName: 'Test Site 2',
-        coordinatesType: 'coordinates'
-      }
-    ]
-  }
-
-  beforeEach(() => mockExemption(testExemption))
+  beforeEach(() => mockExemption(mockExemption))
 
   test('should display the delete site page', async () => {
     const document = await loadPage({

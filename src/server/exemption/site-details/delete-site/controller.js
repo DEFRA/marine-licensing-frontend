@@ -46,17 +46,17 @@ export const deleteSiteSubmitController = {
   async handler(request, h) {
     const exemption = getExemptionCache(request)
     const { siteIndex } = request.payload
-    const parsedSiteIndex = parseInt(siteIndex, 10)
-
-    if (!exemption.siteDetails[parsedSiteIndex]) {
-      request.logger.error(
-        { siteIndex, exemptionId: exemption.id },
-        'Invalid site index for deletion'
-      )
-      return h.redirect(routes.REVIEW_SITE_DETAILS)
-    }
+    const parsedSiteIndex = Number.parseInt(siteIndex, 10)
 
     try {
+      if (!exemption.siteDetails[parsedSiteIndex]) {
+        request.logger.error(
+          { siteIndex, exemptionId: exemption.id },
+          'Invalid site index for deletion'
+        )
+        return h.redirect(routes.REVIEW_SITE_DETAILS)
+      }
+
       const dataToSave = exemption.siteDetails.filter(
         (_, index) => index !== parsedSiteIndex
       )

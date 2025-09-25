@@ -188,5 +188,13 @@ describe('deleteSiteController', () => {
       expect(mockH.redirect).toHaveBeenCalledWith(routes.REVIEW_SITE_DETAILS)
       expect(authenticatedPatchRequest).not.toHaveBeenCalled()
     })
+
+    it('should handle errors', async () => {
+      authenticatedPatchRequest.mockRejectedValueOnce('test error')
+
+      await deleteSiteSubmitController.handler(mockRequest, mockH)
+
+      expect(mockH.redirect).toHaveBeenCalledWith(routes.REVIEW_SITE_DETAILS)
+    })
   })
 })

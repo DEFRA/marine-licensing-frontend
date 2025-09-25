@@ -625,6 +625,17 @@ describe('siteDetails utils', () => {
       })
     })
 
+    test('buildManualCoordinateMultipleSitesSummaryData correctly empty sites', () => {
+      const result = buildManualCoordinateMultipleSitesSummaryData(
+        {
+          multipleSitesEnabled: true
+        },
+        {}
+      )
+
+      expect(result).toEqual({})
+    })
+
     test('buildManualCoordinateMultipleSitesSummaryData correctly handles multiple sites with same dates and description', () => {
       const result = buildManualCoordinateMultipleSitesSummaryData(
         {

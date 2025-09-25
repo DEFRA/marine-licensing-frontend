@@ -15,25 +15,28 @@ function statusCodeMessage(statusCode) {
       return 'Bad Request'
     case statusCodes.serviceUnavailable:
       return 'Sorry, the service is unavailable'
-    default:
+    case statusCodes.internalServerError:
       return 'There is a problem with the service'
+    default:
+      return 'Something went wrong'
   }
 }
 
 /**
  * @param {number} statusCode
  */
-function getErrorTemplate(statusCode) {
+function getCustomTemplate(statusCode) {
   switch (statusCode) {
-    case statusCodes.notFound:
-      return 'error/404-not-found'
     case statusCodes.forbidden:
       return 'error/403-forbidden'
+    case statusCodes.notFound:
+      return 'error/404-not-found'
+    case statusCodes.internalServerError:
+      return 'error/500-server-error'
     case statusCodes.serviceUnavailable:
       return 'error/503-service-unavailable'
-    case statusCodes.internalServerError:
     default:
-      return 'error/500-server-error'
+      return null
   }
 }
 
@@ -55,13 +58,23 @@ export function catchAll(request, h) {
     request.logger.error({ stack: response?.stack }, 'Error occurred')
   }
 
-  const template = getErrorTemplate(statusCode)
+  const template = getCustomTemplate(statusCode)
 
-  return h
-    .view(template, {
-      pageTitle: errorMessage
-    })
-    .code(statusCode)
+  if (template !== null) {
+    return h
+      .view(template, {
+        pageTitle: errorMessage
+      })
+      .code(statusCode)
+  } else {
+    return h
+      .view('error/index', {
+        pageTitle: errorMessage,
+        heading: statusCode,
+        message: errorMessage
+      })
+      .code(statusCode)
+  }
 }
 
 /**

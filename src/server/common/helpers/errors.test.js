@@ -29,6 +29,11 @@ describe('#catchAll', () => {
   const mockErrorLogger = jest.fn()
   const mockStack = 'Mock error stack'
   const errorPage = 'error/index'
+  const customErrorPages = {
+    403: 'error/403-forbidden',
+    404: 'error/404-not-found',
+    500: 'error/500-server-error'
+  }
   const mockRequest = (/** @type {number} */ statusCode) => ({
     response: {
       isBoom: true,
@@ -50,10 +55,8 @@ describe('#catchAll', () => {
     catchAll(mockRequest(statusCodes.notFound), mockToolkit)
 
     expect(mockErrorLogger).not.toHaveBeenCalledWith(mockStack)
-    expect(mockToolkitView).toHaveBeenCalledWith(errorPage, {
-      pageTitle: 'Page not found',
-      heading: statusCodes.notFound,
-      message: 'Page not found'
+    expect(mockToolkitView).toHaveBeenCalledWith(customErrorPages['404'], {
+      pageTitle: 'Page not found'
     })
     expect(mockToolkitCode).toHaveBeenCalledWith(statusCodes.notFound)
   })
@@ -62,10 +65,8 @@ describe('#catchAll', () => {
     catchAll(mockRequest(statusCodes.forbidden), mockToolkit)
 
     expect(mockErrorLogger).not.toHaveBeenCalledWith(mockStack)
-    expect(mockToolkitView).toHaveBeenCalledWith(errorPage, {
-      pageTitle: 'Forbidden',
-      heading: statusCodes.forbidden,
-      message: 'Forbidden'
+    expect(mockToolkitView).toHaveBeenCalledWith(customErrorPages['403'], {
+      pageTitle: 'You do not have permission to view this page'
     })
     expect(mockToolkitCode).toHaveBeenCalledWith(statusCodes.forbidden)
   })
@@ -106,18 +107,18 @@ describe('#catchAll', () => {
     expect(mockToolkitCode).toHaveBeenCalledWith(statusCodes.imATeapot)
   })
 
-  test('Should provide expected "Something went wrong" page and log error for internalServerError', () => {
+  test('Should provide expected 500-error page and log error for internalServerError', () => {
     catchAll(mockRequest(statusCodes.internalServerError), mockToolkit)
 
     expect(mockErrorLogger).toHaveBeenCalledWith(
       { stack: mockStack },
       'Error occurred'
     )
-    expect(mockToolkitView).toHaveBeenCalledWith(errorPage, {
-      pageTitle: 'Something went wrong',
-      heading: statusCodes.internalServerError,
-      message: 'Something went wrong'
+
+    expect(mockToolkitView).toHaveBeenCalledWith(customErrorPages['500'], {
+      pageTitle: 'There is a problem with the service'
     })
+
     expect(mockToolkitCode).toHaveBeenCalledWith(
       statusCodes.internalServerError
     )

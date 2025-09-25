@@ -37,7 +37,6 @@ const mockRequest = {
 
 describe('deleteSiteController', () => {
   beforeEach(() => {
-    jest.clearAllMocks()
     getExemptionCache.mockReturnValue(mockExemption)
   })
 
@@ -109,10 +108,6 @@ describe('deleteSiteController', () => {
         siteDetails: expectedSiteDetails
       })
 
-      expect(mockRequest.logger.info).toHaveBeenCalledWith(
-        { siteNumber: 1, exemptionId: mockExemption.id },
-        'Deleted site 1'
-      )
       expect(mockH.redirect).toHaveBeenCalledWith(routes.REVIEW_SITE_DETAILS)
     })
 

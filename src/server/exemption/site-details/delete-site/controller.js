@@ -72,13 +72,6 @@ export const deleteSiteSubmitController = {
         siteDetails: dataToSave
       })
 
-      const siteNumber = parsedSiteIndex + 1
-
-      request.logger.info(
-        { siteNumber, exemptionId: exemption.id },
-        `Deleted site ${siteNumber}`
-      )
-
       const redirectRoute =
         dataToSave.length === 0 ? routes.TASK_LIST : routes.REVIEW_SITE_DETAILS
 

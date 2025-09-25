@@ -10,7 +10,7 @@ class SiteDataLoader {
   loadSiteDetails() {
     if (this.mapElement) {
       // Multi site implementation, will become default eventually
-      const siteDetailsAttr = this.mapElement.dataSet.siteDetails
+      const siteDetailsAttr = this.mapElement.dataSet?.siteDetails
       if (siteDetailsAttr) {
         return JSON.parse(siteDetailsAttr)
       }

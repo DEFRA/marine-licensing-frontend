@@ -4,6 +4,10 @@
 {% from "govuk/components/back-link/macro.njk" import govukBackLink %}
 {% from "cancel-button/macro.njk" import appCancelButton %}
 
+{% block head %}
+    {{ super() }}
+{% endblock %}
+
 {% block beforeContent %}
   <nav>
     {{ govukBackLink({
@@ -30,6 +34,7 @@
         <div class="govuk-button-group">
           {{ govukButton({
             text: "Yes, delete site",
+            preventDoubleClick: true,
             classes: "govuk-button--warning",
             type: "submit",
             attributes: {

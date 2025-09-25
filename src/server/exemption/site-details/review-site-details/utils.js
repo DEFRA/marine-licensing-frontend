@@ -501,7 +501,6 @@ export const renderFileUploadReview = (h, options) => {
 /**
  * Handles manual coordinate review view rendering
  * @param {object} h - Hapi response toolkit
- * @param {object} request - Hapi request object
  * @param {object} options - Rendering options
  * @param {object} options.exemption - Current exemption from session
  * @param {object} options.siteDetails - Site details object
@@ -509,7 +508,7 @@ export const renderFileUploadReview = (h, options) => {
  * @param {object} options.reviewSiteDetailsPageData - Common page data
  * @returns {object} Rendered view response
  */
-export const renderManualCoordinateReview = (h, request, options) => {
+export const renderManualCoordinateReview = (h, options) => {
   const { exemption, previousPage, siteDetails, reviewSiteDetailsPageData } =
     options
   const { multipleSiteDetails } = exemption

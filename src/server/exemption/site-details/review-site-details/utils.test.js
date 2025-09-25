@@ -1063,7 +1063,7 @@ describe('siteDetails utils', () => {
         siteDetails: [siteDetails]
       }
 
-      renderManualCoordinateReview(mockH, mockRequest, {
+      renderManualCoordinateReview(mockH, {
         exemption,
         siteDetails,
         previousPage,

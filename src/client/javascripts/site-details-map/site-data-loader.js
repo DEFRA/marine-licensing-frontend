@@ -10,7 +10,7 @@ class SiteDataLoader {
   loadSiteDetails() {
     if (this.mapElement) {
       // Multi site implementation, will become default eventually
-      const siteDetailsAttr = this.mapElement.dataSet?.siteDetails
+      const siteDetailsAttr = this.mapElement.getAttribute('data-site-details') // NOSONAR
       if (siteDetailsAttr) {
         return JSON.parse(siteDetailsAttr)
       }
@@ -53,6 +53,7 @@ class SiteDataLoader {
    * @returns {boolean} True if has valid manual coordinates
    */
   hasValidManualCoordinates(siteDetails) {
+    console.log('siteDetails', siteDetails)
     return !!(this.hasManualCoordinates(siteDetails) && siteDetails.coordinates)
   }
 }

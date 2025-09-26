@@ -7,10 +7,11 @@ Object.defineProperty(globalThis, 'document', {
       const element = {
         tagName: tagName.toUpperCase(),
         attributes: {},
-        dataSet: {},
+        getAttribute: jest.fn().mockImplementation(function (name) {
+          return this.attributes[name] || null
+        }),
         setAttribute: jest.fn().mockImplementation(function (name, value) {
           this.attributes[name] = value
-          this.dataSet.siteDetails = value
         })
       }
       return element

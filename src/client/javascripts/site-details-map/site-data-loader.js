@@ -53,7 +53,6 @@ class SiteDataLoader {
    * @returns {boolean} True if has valid manual coordinates
    */
   hasValidManualCoordinates(siteDetails) {
-    console.log('siteDetails', siteDetails)
     return !!(this.hasManualCoordinates(siteDetails) && siteDetails.coordinates)
   }
 }

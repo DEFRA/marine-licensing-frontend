@@ -12,6 +12,7 @@
   <link href="/public/stylesheets/ol.css" rel="stylesheet">
   {% endblock %}
   {% block beforeContent %}
+    {{ super() }}
   <nav>
     {{ govukBackLink({
     text: "Back",

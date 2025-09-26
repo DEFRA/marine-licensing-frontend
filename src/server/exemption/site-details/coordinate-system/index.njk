@@ -4,6 +4,7 @@
 {% from "radio-page/macro.njk" import appRadioPage %}
 
 {% block beforeContent %}
+{{ super() }}
 <nav>
   {{ govukBackLink({
     text: "Back",

@@ -34,7 +34,7 @@ describe('#openIdProvider', () => {
         enrolmentCount: 1,
         enrolmentRequestCount: 1,
         currentRelationshipId: 'testRelationshipId',
-        relationships: 'testRelationships',
+        relationships: ['testRelationshipId:testOrgId:Test Organisation Ltd'],
         roles: 'testRoles',
         aud: 'test',
         iss: 'test',
@@ -71,13 +71,55 @@ describe('#openIdProvider', () => {
         enrolmentCount: 1,
         enrolmentRequestCount: 1,
         currentRelationshipId: 'testRelationshipId',
-        relationships: 'testRelationships',
+        relationships: ['testRelationshipId:testOrgId:Test Organisation Ltd'],
+        applicantOrganisationId: 'testOrgId',
+        applicantOrganisationName: 'Test Organisation Ltd',
         roles: 'testRoles',
         idToken: 'test-id-token',
         tokenUrl: 'http://test-token-endpoint',
         logoutUrl: 'http://test-end-session-endpoint'
       })
     )
+  })
+
+  test('When relationships array is empty or undefined', async () => {
+    const token = jwt.token.generate(
+      {
+        sub: 'testSub',
+        correlationId: 'testCorrelationId',
+        sessionId: 'testSessionId',
+        contactId: 'testContactId',
+        serviceId: 'testServiceId',
+        firstName: 'Test',
+        lastName: 'User',
+        email: 'testEmail',
+        uniqueReference: 'testUniqueRef',
+        loa: 'testLoa',
+        aal: 'testAal',
+        enrolmentCount: 1,
+        enrolmentRequestCount: 1,
+        currentRelationshipId: 'testRelationshipId',
+        relationships: [],
+        roles: 'testRoles',
+        aud: 'test',
+        iss: 'test',
+        user: 'Test User'
+      },
+      {
+        key: 'test',
+        algorithm: 'HS256'
+      },
+      {
+        ttlSec: 1
+      }
+    )
+
+    const credentials = { token }
+
+    await provider.profile(credentials, { id_token: 'test-id-token' }, {})
+
+    expect(credentials.profile.applicantOrganisationId).toBeUndefined()
+    expect(credentials.profile.applicantOrganisationName).toBeUndefined()
   })
 
   test('When credential do not exist', () => {

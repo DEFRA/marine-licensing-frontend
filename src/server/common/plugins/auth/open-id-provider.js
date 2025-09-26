@@ -25,6 +25,11 @@ export const openIdProvider = async (name) => {
       const displayName = [payload.firstName, payload.lastName]
         .filter((part) => part)
         .join(' ')
+      const [
+        _relationshipId,
+        applicantOrganisationId,
+        applicantOrganisationName
+      ] = payload.relationships[0]?.split(':') || []
 
       credentials.profile = {
         id: payload.sub,
@@ -43,6 +48,8 @@ export const openIdProvider = async (name) => {
         enrolmentRequestCount: payload.enrolmentRequestCount,
         currentRelationshipId: payload.currentRelationshipId,
         relationships: payload.relationships,
+        applicantOrganisationId,
+        applicantOrganisationName,
         roles: payload.roles,
         idToken: params.id_token,
         tokenUrl: oidcConf.token_endpoint,

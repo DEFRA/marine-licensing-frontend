@@ -131,9 +131,7 @@ describe('#catchAll', () => {
       pageTitle: 'Sorry, the service is unavailable'
     })
 
-    expect(mockToolkitCode).toHaveBeenCalledWith(
-      statusCodes.serviceUnavailable
-    )
+    expect(mockToolkitCode).toHaveBeenCalledWith(statusCodes.serviceUnavailable)
   })
 })
 

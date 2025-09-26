@@ -32,7 +32,8 @@ describe('#catchAll', () => {
   const customErrorPages = {
     403: 'error/403-forbidden',
     404: 'error/404-not-found',
-    500: 'error/500-server-error'
+    500: 'error/500-server-error',
+    503: 'error/503-service-unavailable'
   }
   const mockRequest = (/** @type {number} */ statusCode) => ({
     response: {
@@ -121,6 +122,17 @@ describe('#catchAll', () => {
 
     expect(mockToolkitCode).toHaveBeenCalledWith(
       statusCodes.internalServerError
+    )
+  })
+
+  test('Should provide expected 503 server temporarily unavailable page', () => {
+    catchAll(mockRequest(statusCodes.serviceUnavailable), mockToolkit)
+    expect(mockToolkitView).toHaveBeenCalledWith(customErrorPages['503'], {
+      pageTitle: 'Sorry, the service is unavailable'
+    })
+
+    expect(mockToolkitCode).toHaveBeenCalledWith(
+      statusCodes.serviceUnavailable
     )
   })
 })

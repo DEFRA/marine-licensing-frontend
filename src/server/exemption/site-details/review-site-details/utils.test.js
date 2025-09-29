@@ -425,9 +425,11 @@ describe('siteDetails utils', () => {
       )
     })
 
-    test('getFileUploadBackLink correctly returns file upload when coming from other pages', () => {
+    test('getFileUploadBackLink correctly returns file upload route', () => {
       expect(
-        getFileUploadBackLink(`http://hostname${routes.WIDTH_OF_SITE}`)
+        getFileUploadBackLink(
+          `http://hostname${routes.SITE_DETAILS_ACTIVITY_DESCRIPTION}`
+        )
       ).toBe(routes.SITE_DETAILS_ACTIVITY_DESCRIPTION)
     })
 
@@ -1014,7 +1016,7 @@ describe('siteDetails utils', () => {
         'exemption/site-details/review-site-details/file-upload-review',
         expect.objectContaining({
           pageTitle: 'Review site details',
-          backLink: routes.SITE_DETAILS_ACTIVITY_DESCRIPTION,
+          backLink: routes.FILE_UPLOAD,
           projectName: 'Test Project',
           fileUploadSummaryData: expect.objectContaining({
             method: 'Upload a file with the coordinates of the site',

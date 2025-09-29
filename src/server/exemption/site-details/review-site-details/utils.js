@@ -191,8 +191,8 @@ export const getFileUploadBackLink = (previousPage) => {
     return routes.TASK_LIST
   }
 
-  // Otherwise, return to file upload page
-  return routes.SITE_DETAILS_ACTIVITY_DESCRIPTION
+  // Otherwise, return to correct page for file upload upload journey
+  return previousPath
 }
 
 const metresLabel = (metres) =>

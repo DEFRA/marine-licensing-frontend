@@ -129,13 +129,20 @@ export const sameActivityDatesSubmitController = {
   },
   handler(request, h) {
     const { payload, site } = request
-    const { queryParams } = site
+    const { queryParams, siteDetails } = site
 
     updateExemptionMultipleSiteDetails(
       request,
       'sameActivityDates',
       payload.sameActivityDates
     )
+
+    if (
+      siteDetails.coordinatesType === 'file' &&
+      payload.sameActivityDates === 'no'
+    ) {
+      return h.redirect(routes.SAME_ACTIVITY_DESCRIPTION)
+    }
 
     return h.redirect(routes.SITE_DETAILS_ACTIVITY_DATES + queryParams)
   }

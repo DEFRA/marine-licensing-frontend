@@ -1136,7 +1136,7 @@ describe('#reviewSiteDetails', () => {
 
         const { document } = new JSDOM(result).window
 
-        expect(document.querySelector('h1').textContent.trim()).toContain('400')
+        expect(document.querySelector('h1').textContent.trim()).toContain('There is a problem with the service')
 
         expect(statusCode).toBe(statusCodes.badRequest)
       })
@@ -1163,7 +1163,7 @@ describe('#reviewSiteDetails', () => {
 
         const { document } = new JSDOM(result).window
 
-        expect(document.querySelector('h1').textContent.trim()).toBe('400')
+        expect(document.querySelector('h1').textContent.trim()).toBe('There is a problem with the service')
       })
 
       test('should add another site correctly', async () => {
@@ -1313,7 +1313,7 @@ describe('#reviewSiteDetails', () => {
 
           const { document } = new JSDOM(result).window
           expect(document.querySelector('h1').textContent.trim()).toContain(
-            '400'
+            'There is a problem with the service'
           )
           expect(statusCode).toBe(statusCodes.badRequest)
         })

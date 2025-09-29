@@ -3,28 +3,6 @@ import { statusCodes } from '~/src/server/common/constants/status-codes.js'
 /**
  * @param {number} statusCode
  */
-function statusCodeMessage(statusCode) {
-  switch (statusCode) {
-    case statusCodes.notFound:
-      return 'Page not found'
-    case statusCodes.forbidden:
-      return 'You do not have permission to view this page'
-    case statusCodes.unauthorized:
-      return 'Unauthorized'
-    case statusCodes.badRequest:
-      return 'Bad Request'
-    case statusCodes.serviceUnavailable:
-      return 'Sorry, the service is unavailable'
-    case statusCodes.internalServerError:
-      return 'There is a problem with the service'
-    default:
-      return 'Something went wrong'
-  }
-}
-
-/**
- * @param {number} statusCode
- */
 function getCustomTemplate(statusCode) {
   switch (statusCode) {
     case statusCodes.forbidden:
@@ -36,7 +14,8 @@ function getCustomTemplate(statusCode) {
     case statusCodes.serviceUnavailable:
       return 'error/503-service-unavailable'
     default:
-      return null
+      // Use the 500 as the generic template
+      return 'error/500-server-error'
   }
 }
 
@@ -52,7 +31,6 @@ export function catchAll(request, h) {
   }
 
   const statusCode = response.output.statusCode
-  const errorMessage = statusCodeMessage(statusCode)
 
   if (statusCode >= statusCodes.internalServerError) {
     request.logger.error({ stack: response?.stack }, 'Error occurred')
@@ -60,21 +38,7 @@ export function catchAll(request, h) {
 
   const template = getCustomTemplate(statusCode)
 
-  if (template !== null) {
-    return h
-      .view(template, {
-        pageTitle: errorMessage
-      })
-      .code(statusCode)
-  } else {
-    return h
-      .view('error/index', {
-        pageTitle: errorMessage,
-        heading: statusCode,
-        message: errorMessage
-      })
-      .code(statusCode)
-  }
+  return h.view(template).code(statusCode)
 }
 
 /**

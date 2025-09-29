@@ -28,7 +28,10 @@ describe('#errors', () => {
 describe('#catchAll', () => {
   const mockErrorLogger = jest.fn()
   const mockStack = 'Mock error stack'
-  const errorPage = 'error/index'
+
+  // The 500 custom error page is also doing double duty as our generic error page.
+  const genericErrorPage = 'error/500-server-error'
+
   const customErrorPages = {
     403: 'error/403-forbidden',
     404: 'error/404-not-found',
@@ -76,11 +79,10 @@ describe('#catchAll', () => {
     catchAll(mockRequest(statusCodes.unauthorized), mockToolkit)
 
     expect(mockErrorLogger).not.toHaveBeenCalledWith(mockStack)
-    expect(mockToolkitView).toHaveBeenCalledWith(errorPage, {
-      pageTitle: 'Unauthorized',
-      heading: statusCodes.unauthorized,
-      message: 'Unauthorized'
+    expect(mockToolkitView).toHaveBeenCalledWith(genericErrorPage, {
+      pageTitle: 'Unauthorized'
     })
+
     expect(mockToolkitCode).toHaveBeenCalledWith(statusCodes.unauthorized)
   })
 
@@ -88,7 +90,7 @@ describe('#catchAll', () => {
     catchAll(mockRequest(statusCodes.badRequest), mockToolkit)
 
     expect(mockErrorLogger).not.toHaveBeenCalledWith(mockStack)
-    expect(mockToolkitView).toHaveBeenCalledWith(errorPage, {
+    expect(mockToolkitView).toHaveBeenCalledWith(genericErrorPage, {
       pageTitle: 'Bad Request',
       heading: statusCodes.badRequest,
       message: 'Bad Request'
@@ -100,7 +102,7 @@ describe('#catchAll', () => {
     catchAll(mockRequest(statusCodes.imATeapot), mockToolkit)
 
     expect(mockErrorLogger).not.toHaveBeenCalledWith(mockStack)
-    expect(mockToolkitView).toHaveBeenCalledWith(errorPage, {
+    expect(mockToolkitView).toHaveBeenCalledWith(genericErrorPage, {
       pageTitle: 'Something went wrong',
       heading: statusCodes.imATeapot,
       message: 'Something went wrong'

@@ -37,7 +37,7 @@
   "author": "Defra DDTS",
   "license": "OGL-UK-3.0",
   "dependencies": {
-    "@babel/runtime": "^7.28.3",
+    "@babel/runtime": "^7.28.4",
     "@defra/hapi-tracing": "^1.28.0",
     "@elastic/ecs-pino-format": "^1.5.0",
     "@hapi/basic": "^7.0.2",
@@ -79,7 +79,7 @@
   },
   "devDependencies": {
     "@babel/cli": "^7.28.3",
-    "@babel/core": "^7.28.3",
+    "@babel/core": "^7.28.4",
     "@babel/preset-env": "^7.28.3",
     "@faker-js/faker": "^9.9.0",
     "@stryker-mutator/core": "^9.0.1",
@@ -131,10 +131,10 @@
     "stylelint": "^16.24.0",
     "stylelint-config-gds": "^2.0.0",
     "terser-webpack-plugin": "^5.3.14",
-    "tsx": "^4.20.4",
+    "tsx": "^4.20.6",
     "typescript": "^5.9.2",
     "webpack": "^5.101.3",
-    "webpack-assets-manifest": "^5.2.1",
-    "webpack-cli": "^5.1.4"
+    "webpack-assets-manifest": "^6.2.2",
+    "webpack-cli": "^6.0.1"
   }
 }

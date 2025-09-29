@@ -81,9 +81,7 @@ export const reviewSiteDetailsSubmitController = {
           : prepareManualCoordinateDataForSave(exemption, request)
 
       await authenticatedPatchRequest(request, '/exemption/site-details', {
-        ...(firstSite.coordinatesType === 'coordinates' && {
-          multipleSiteDetails: exemption.multipleSiteDetails
-        }),
+        multipleSiteDetails: exemption.multipleSiteDetails,
         siteDetails: dataToSave,
         id: exemption.id
       })

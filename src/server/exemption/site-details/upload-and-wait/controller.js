@@ -5,11 +5,13 @@ import { extractCoordinatesFromGeoJSON } from '~/src/server/common/helpers/coord
 import { getSiteDetailsBySite } from '~/src/server/common/helpers/session-cache/site-details-utils.js'
 import {
   getExemptionCache,
+  updateExemptionMultipleSiteDetails,
   updateExemptionSiteDetails,
   updateExemptionSiteDetailsBatch
 } from '~/src/server/common/helpers/session-cache/utils.js'
 import { getCdpUploadService } from '~/src/services/cdp-upload-service/index.js'
 import { getFileValidationService } from '~/src/services/file-validation/index.js'
+import { isMultipleSitesFile } from '~/src/server/exemption/site-details/upload-and-wait/utils.js'
 
 export const UPLOAD_AND_WAIT_VIEW_ROUTE =
   'exemption/site-details/upload-and-wait/index'
@@ -262,6 +264,12 @@ function storeUploadError(request, errorDetails, fileType) {
  * @param {string} s3Location.s3Key - S3 object key
  */
 function storeSuccessfulUpload(request, status, coordinateData, s3Location) {
+  updateExemptionMultipleSiteDetails(
+    request,
+    'multipleSitesEnabled',
+    isMultipleSitesFile(coordinateData)
+  )
+
   updateExemptionSiteDetailsBatch(request, {
     uploadedFile: {
       ...status,
@@ -337,6 +345,11 @@ const processValidatedFile = async (status, uploadConfig, request, h) => {
       request
     )
     logSuccessfulProcessing(request, status, uploadConfig, coordinateData)
+
+    if (isMultipleSitesFile(coordinateData)) {
+      return h.redirect(routes.SAME_ACTIVITY_DATES)
+    }
+
     return h.redirect(routes.REVIEW_SITE_DETAILS)
   } catch (error) {
     handleGeoParserError(request, error, status.filename, uploadConfig.fileType)

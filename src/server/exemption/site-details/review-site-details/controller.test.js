@@ -1080,6 +1080,7 @@ describe('#reviewSiteDetails', () => {
           expect.any(Object),
           '/exemption/site-details',
           {
+            multipleSiteDetails: mockExemption.multipleSiteDetails,
             siteDetails: createExpectedSiteDetails(),
             id: mockExemption.id
           }

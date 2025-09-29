@@ -192,7 +192,7 @@ export const getFileUploadBackLink = (previousPage) => {
   }
 
   // Otherwise, return to file upload page
-  return routes.FILE_UPLOAD
+  return routes.SITE_DETAILS_ACTIVITY_DESCRIPTION
 }
 
 const metresLabel = (metres) =>
@@ -415,6 +415,8 @@ export const prepareFileUploadDataForSave = (siteDetails, request) => {
 
     const siteToSave = {
       coordinatesType: 'file',
+      activityDates: site.activityDates,
+      activityDescription: site.activityDescription,
       fileUploadType: site.fileUploadType,
       geoJSON,
       featureCount,

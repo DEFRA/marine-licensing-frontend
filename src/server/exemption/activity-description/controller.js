@@ -12,7 +12,7 @@ import { getSiteDetailsBySite } from '~/src/server/common/helpers/session-cache/
 import { routes } from '~/src/server/common/constants/routes.js'
 import { authenticatedPatchRequest } from '~/src/server/common/helpers/authenticated-requests.js'
 import joi from 'joi'
-import { getBackLink } from './utils.js'
+import { getBackLink, getNextRoute } from './utils.js'
 
 export const ACTIVITY_DESCRIPTION_VIEW_ROUTE =
   'exemption/activity-description/index'
@@ -129,7 +129,7 @@ export const activityDescriptionSubmitController = {
     try {
       const isInSiteDetailsFlow = isPageInSiteDetailsFlow(request)
 
-      const { siteIndex, queryParams } = request.site
+      const { siteIndex } = request.site
 
       if (isInSiteDetailsFlow) {
         updateExemptionSiteDetails(
@@ -152,9 +152,8 @@ export const activityDescriptionSubmitController = {
         })
       }
 
-      const nextRoute = isInSiteDetailsFlow
-        ? routes.COORDINATES_ENTRY_CHOICE + queryParams
-        : routes.TASK_LIST
+      const nextRoute = getNextRoute(isInSiteDetailsFlow, request.site)
+
       return h.redirect(nextRoute)
     } catch (e) {
       const { details } = e.data?.payload?.validation ?? {}

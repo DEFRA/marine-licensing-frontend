@@ -19,7 +19,7 @@ describe('#errors', () => {
     })
 
     expect(result).toEqual(
-      expect.stringContaining('Page not found | Get permission for marine work')
+      expect.stringContaining('Page not found')
     )
     expect(statusCode).toBe(statusCodes.notFound)
   })
@@ -59,9 +59,7 @@ describe('#catchAll', () => {
     catchAll(mockRequest(statusCodes.notFound), mockToolkit)
 
     expect(mockErrorLogger).not.toHaveBeenCalledWith(mockStack)
-    expect(mockToolkitView).toHaveBeenCalledWith(customErrorPages['404'], {
-      pageTitle: 'Page not found'
-    })
+    expect(mockToolkitView).toHaveBeenCalledWith(customErrorPages['404'])
     expect(mockToolkitCode).toHaveBeenCalledWith(statusCodes.notFound)
   })
 
@@ -69,9 +67,7 @@ describe('#catchAll', () => {
     catchAll(mockRequest(statusCodes.forbidden), mockToolkit)
 
     expect(mockErrorLogger).not.toHaveBeenCalledWith(mockStack)
-    expect(mockToolkitView).toHaveBeenCalledWith(customErrorPages['403'], {
-      pageTitle: 'You do not have permission to view this page'
-    })
+    expect(mockToolkitView).toHaveBeenCalledWith(customErrorPages['403'])
     expect(mockToolkitCode).toHaveBeenCalledWith(statusCodes.forbidden)
   })
 
@@ -79,10 +75,7 @@ describe('#catchAll', () => {
     catchAll(mockRequest(statusCodes.unauthorized), mockToolkit)
 
     expect(mockErrorLogger).not.toHaveBeenCalledWith(mockStack)
-    expect(mockToolkitView).toHaveBeenCalledWith(genericErrorPage, {
-      pageTitle: 'Unauthorized'
-    })
-
+    expect(mockToolkitView).toHaveBeenCalledWith(genericErrorPage)
     expect(mockToolkitCode).toHaveBeenCalledWith(statusCodes.unauthorized)
   })
 
@@ -90,11 +83,7 @@ describe('#catchAll', () => {
     catchAll(mockRequest(statusCodes.badRequest), mockToolkit)
 
     expect(mockErrorLogger).not.toHaveBeenCalledWith(mockStack)
-    expect(mockToolkitView).toHaveBeenCalledWith(genericErrorPage, {
-      pageTitle: 'Bad Request',
-      heading: statusCodes.badRequest,
-      message: 'Bad Request'
-    })
+    expect(mockToolkitView).toHaveBeenCalledWith(genericErrorPage)
     expect(mockToolkitCode).toHaveBeenCalledWith(statusCodes.badRequest)
   })
 
@@ -102,11 +91,7 @@ describe('#catchAll', () => {
     catchAll(mockRequest(statusCodes.imATeapot), mockToolkit)
 
     expect(mockErrorLogger).not.toHaveBeenCalledWith(mockStack)
-    expect(mockToolkitView).toHaveBeenCalledWith(genericErrorPage, {
-      pageTitle: 'Something went wrong',
-      heading: statusCodes.imATeapot,
-      message: 'Something went wrong'
-    })
+    expect(mockToolkitView).toHaveBeenCalledWith(genericErrorPage)
     expect(mockToolkitCode).toHaveBeenCalledWith(statusCodes.imATeapot)
   })
 
@@ -118,10 +103,7 @@ describe('#catchAll', () => {
       'Error occurred'
     )
 
-    expect(mockToolkitView).toHaveBeenCalledWith(customErrorPages['500'], {
-      pageTitle: 'There is a problem with the service'
-    })
-
+    expect(mockToolkitView).toHaveBeenCalledWith(customErrorPages['500'])
     expect(mockToolkitCode).toHaveBeenCalledWith(
       statusCodes.internalServerError
     )
@@ -129,10 +111,7 @@ describe('#catchAll', () => {
 
   test('Should provide expected 503 server temporarily unavailable page', () => {
     catchAll(mockRequest(statusCodes.serviceUnavailable), mockToolkit)
-    expect(mockToolkitView).toHaveBeenCalledWith(customErrorPages['503'], {
-      pageTitle: 'Sorry, the service is unavailable'
-    })
-
+    expect(mockToolkitView).toHaveBeenCalledWith(customErrorPages['503'])
     expect(mockToolkitCode).toHaveBeenCalledWith(statusCodes.serviceUnavailable)
   })
 })

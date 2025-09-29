@@ -18,9 +18,7 @@ describe('#errors', () => {
       server: getServer()
     })
 
-    expect(result).toEqual(
-      expect.stringContaining('Page not found')
-    )
+    expect(result).toEqual(expect.stringContaining('Page not found'))
     expect(statusCode).toBe(statusCodes.notFound)
   })
 })

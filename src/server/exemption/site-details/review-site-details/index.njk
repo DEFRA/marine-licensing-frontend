@@ -3,13 +3,12 @@
 {% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
 {% from "govuk/components/button/macro.njk" import govukButton %}
 {% from "cancel-button/macro.njk" import appCancelButton %}
-{% from "site-details-data-script/macro.njk" import appSiteDetailsDataScript %}
+{% from "site-details-map/macro.njk" import appSiteDetailsMap %}
 {% block pageTitle %}
     Review site details | {{ serviceName }}
 {% endblock %}
 {% block head %}
     {{ super() }}
-    {{ appSiteDetailsDataScript(siteDetailsData) }}
 {% endblock %}
 {% block beforeContent %}
     <nav>
@@ -19,32 +18,163 @@
     }) }}
     </nav>
 {% endblock %}
+
 {% block content %}
     <div class="govuk-grid-row">
         <div class="govuk-grid-column-full">
             <span class="govuk-caption-l">{{ projectName }}</span>
             <h1 class="govuk-heading-l">{{ heading }}</h1>
-            {% set summaryRows = [
+
+            {% set multipleSiteRows = [
                 {
                     key: {
                         text: "Method of providing site location"
                     },
                     value: {
-                        text: summaryData.method
+                        text: multipleSiteDetailsData.method
                     }
                 },
                 {
                     key: {
-                        text: "Coordinate system"
+                        text: "More than one site"
                     },
                     value: {
-                        html: summaryData.coordinateSystem | replace('\n', '<br>')
+                        html: multipleSiteDetailsData.multipleSiteDetails
                     }
                 }
             ] %}
-            {% if summaryData.polygonCoordinates %}
+
+            {{ govukSummaryList({
+                card: {
+                    title: {
+                        text: "Providing the site location"
+                    }
+                },
+                rows: multipleSiteRows,
+                classes: "govuk-summary-list--full-width"
+            }) }}
+
+            {% if isMultiSiteJourney %}
+
+                {% set activityRows = [
+                    {
+                        key: {
+                            text: "Are the activity dates the same for every site?"
+                        },
+                        value: {
+                            text: multipleSiteDetailsData.sameActivityDates
+                        }
+                    }
+                ] %}
+
+                {% if multipleSiteDetailsData.activityDates %}
+                    {% set activityRows = (activityRows.push({
+                        key: {
+                            text: "Activity dates"
+                        },
+                        value: {
+                            text: multipleSiteDetailsData.activityDates
+                        }
+                    }), activityRows) %}
+                {% endif %}
+
+                {% set activityRows = (activityRows.push({
+                    key: {
+                        text: "Is the activity description the same for every site?"
+                    },
+                    value: {
+                        html: multipleSiteDetailsData.sameActivityDescription
+                    }
+                }), activityRows) %}
+                    
+                {% if multipleSiteDetailsData.activityDescription %}
+                    {% set activityRows = (activityRows.push({
+                        key: {
+                            text: "Activity description"
+                        },
+                        value: {
+                            text: multipleSiteDetailsData.activityDescription
+                        }
+                    }), activityRows) %}
+                {% endif %}
+                
+                {{ govukSummaryList({
+                    card: {
+                        title: {
+                            text: "Activity details"
+                        }
+                    },
+                    rows: activityRows,
+                    classes: "govuk-summary-list--full-width"
+                }) }}
+
+            {% endif %}
+
+         {% for site in summaryData %}
+
+            {% set summaryRows = [] %}
+
+            {% set summaryRowsHeading %}
+                {% if isMultiSiteJourney %}
+                    Site {{ site.siteNumber }} details
+                {% else %}
+                    Site details
+                {% endif %}
+            {% endset %}
+
+            {% if isMultiSiteJourney %}
+                {% set summaryRows = (summaryRows.push({
+                    key: {
+                        text: "Site name"
+                    },
+                    value: {
+                        text: site.siteName
+                    }
+                }), summaryRows) %}
+            {% endif %}
+
+
+            {% if site.showActivityDates %}
+                {% set summaryRows = (summaryRows.push({
+                    key: {
+                        text: "Activity dates"
+                    },
+                    value: {
+                        text: site.activityDates
+                    }
+                }), summaryRows) %}
+            {% endif %}
+
+            {% if site.showActivityDescription %}
+                {% set summaryRows = (summaryRows.push({
+                    key: {
+                        text: "Activity description"
+                    },
+                    value: {
+                        text: site.activityDescription
+                    }
+                }), summaryRows) %}
+            {% endif %}
+
+           {% set summaryRows = (summaryRows.push({
+                key: {
+                    text: "Single or multiple sets of coordinates"
+                },
+                value: {
+                    text: site.method
+                }
+            },{
+                key: {
+                    text: "Coordinate system"
+                },
+                value: {
+                    html: site.coordinateSystem | replace('\n', '<br>')
+                }
+            }), summaryRows) %}
+
+            {% if site.polygonCoordinates %}
                 {# Polygon site - multiple coordinates #}
-                {% for coordinate in summaryData.polygonCoordinates %}
+                {% for coordinate in site.polygonCoordinates %}
                     {% set summaryRows = (summaryRows.push({
                         key: {
                             text: coordinate.label
@@ -61,7 +191,7 @@
                         text: "Coordinates at centre of site"
                     },
                     value: {
-                        text: summaryData.coordinates
+                        text: site.coordinates
                     }
                 }), summaryRows) %}
                 {% set summaryRows = (summaryRows.push({
@@ -69,7 +199,7 @@
                         text: "Width of circular site"
                     },
                     value: {
-                        text: summaryData.width
+                        text: site.width
                     }
                 }), summaryRows) %}
             {% endif %}
@@ -77,39 +207,52 @@
             {% set summaryRows = (summaryRows.push({
                 key: {
                     text: "Map view",
-                            classes: "govuk-summary-list__key--full-width"
+                    classes: "govuk-summary-list__key--full-width"
                 },
                 value: {
-                    html: '<div class="app-site-details-map" data-module="site-details-map"></div>',
+                    html: appSiteDetailsMap(site.siteDetailsData, loop.index0),
                     classes: "govuk-summary-list__value--full-width"
                 }
             }), summaryRows) %}
+
             {{ govukSummaryList({
                 card: {
                     title: {
-                        text: "Site details"
+                        text: summaryRowsHeading
+                    },
+                    actions: {
+                        items: [
+                            {
+                                href: "delete-site?site=" + site.siteNumber,
+                                text: "Delete site",
+                                visuallyHiddenText: "for site " + site.siteNumber
+                            }
+                        ]
                     }
                 },
                 rows: summaryRows,
                     classes: "govuk-summary-list--full-width"
             }) }}
 
+            {% endfor %}
+
 
             <form method="POST">
                 <input type="hidden" name="csrfToken" value="{{ csrfToken }}">
                     
                     {% if isMultiSiteJourney %}
-                        <p>You can select 'Save and continue' if you're finished or you want to save your progress and return later.</p>
-
                         {{ govukButton({
                             text: "Save and add another site",
-                            classes: "govuk-button--secondary",
+                            classes: "govuk-button--secondary govuk-!-margin-bottom-7",
                             attributes: {
                                 name: "add",
                                 value: "add",
                                 type: "submit"
                             }
                         }) }}
+
+                        <p>You can select 'Save and continue' if you're finished or you want to save your progress and return later.</p>
+                        
                     {% endif %}
                     
                     <div class="govuk-button-group">

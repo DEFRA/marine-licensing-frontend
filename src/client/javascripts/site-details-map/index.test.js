@@ -137,7 +137,7 @@ describe('SiteDetailsMap', () => {
     test('should initialise service dependencies', () => {
       siteDetailsMap = new SiteDetailsMap(mockRoot)
 
-      expect(SiteDataLoader).toHaveBeenCalled()
+      expect(SiteDataLoader).toHaveBeenCalledWith(mockRoot)
       expect(OpenLayersModuleLoader).toHaveBeenCalled()
     })
 
@@ -450,6 +450,35 @@ describe('SiteDetailsMap', () => {
       expect(showErrorSpy).toHaveBeenCalledTimes(1)
       expect(hasValidSpy).not.toHaveBeenCalled()
       expect(mockModuleLoader.loadModules).not.toHaveBeenCalled()
+    })
+  })
+
+  describe('multiple map instances', () => {
+    test('should handle multiple maps with different root elements', () => {
+      const mockRoot1 = {
+        dataset: { siteDetails: '{"coordinatesType":"coordinates"}' }
+      }
+      const mockRoot2 = {
+        dataset: { siteDetails: '{"coordinatesType":"file"}' }
+      }
+
+      const siteDetailsMap1 = new SiteDetailsMap(mockRoot1)
+      const siteDetailsMap2 = new SiteDetailsMap(mockRoot2)
+
+      expect(siteDetailsMap1).toBeInstanceOf(SiteDetailsMap)
+      expect(siteDetailsMap2).toBeInstanceOf(SiteDetailsMap)
+      expect(siteDetailsMap1).not.toBe(siteDetailsMap2)
+      expect(siteDetailsMap1.dataLoader).toBeDefined()
+      expect(siteDetailsMap2.dataLoader).toBeDefined()
+    })
+
+    test('should handle maps with no data gracefully', () => {
+      const mockRoot = { dataset: {} }
+
+      const siteDetailsMap = new SiteDetailsMap(mockRoot)
+
+      expect(siteDetailsMap).toBeInstanceOf(SiteDetailsMap)
+      expect(siteDetailsMap.dataLoader).toBeDefined()
     })
   })
 })

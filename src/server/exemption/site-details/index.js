@@ -13,6 +13,7 @@ import { fileUploadRoutes } from '~/src/server/exemption/site-details/file-uploa
 import { uploadAndWaitRoutes } from '~/src/server/exemption/site-details/upload-and-wait/index.js'
 import { chooseFileTypeRoutes } from '~/src/server/exemption/site-details/choose-file-type/index.js'
 import { beforeYouStartRoutes } from '~/src/server/exemption/site-details/before-you-start/index.js'
+import { deleteSiteRoutes } from '~/src/server/exemption/site-details/delete-site/index.js'
 
 /**
  * Sets up the routes used in the Site Details section
@@ -37,7 +38,8 @@ export const siteDetailsRoutes = [
   ...chooseFileTypeRoutes,
   ...fileUploadRoutes,
   ...uploadAndWaitRoutes,
-  ...beforeYouStartRoutes
+  ...beforeYouStartRoutes,
+  ...deleteSiteRoutes
 ]
 
 /**

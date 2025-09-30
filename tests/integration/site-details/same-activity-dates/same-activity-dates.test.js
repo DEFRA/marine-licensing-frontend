@@ -20,7 +20,8 @@ describe('Same activity dates page', () => {
     projectName: 'Test Project',
     multipleSiteDetails: {
       multipleSitesEnabled: true
-    }
+    },
+    siteDetails: [{ coordinatesType: 'coordinates' }]
   }
 
   jest.mocked(getExemptionCache).mockReturnValue(mockExemption)
@@ -109,7 +110,7 @@ describe('Same activity dates page', () => {
     expect(updateExemptionMultipleSiteDetails).not.toHaveBeenCalled()
   })
 
-  test('should have correct navigation links', async () => {
+  test('should have correct navigation links for manual coordinates', async () => {
     const { result } = await makeGetRequest({
       server: getServer(),
       url: '/exemption/same-activity-dates'
@@ -128,6 +129,34 @@ describe('Same activity dates page', () => {
 
     const backLink = getByRole(document, 'link', { name: 'Back' })
     expect(backLink).toHaveAttribute('href', '/exemption/site-name')
+  })
+
+  test('should have correct navigation links for file upload', async () => {
+    jest.mocked(getExemptionCache).mockReturnValueOnce({
+      ...mockExemption,
+      siteDetails: mockExemption.siteDetails.map((site) => ({
+        ...site,
+        coordinatesType: 'file'
+      }))
+    })
+    const { result } = await makeGetRequest({
+      server: getServer(),
+      url: '/exemption/same-activity-dates'
+    })
+
+    const { document } = new JSDOM(result).window
+
+    const continueButton = getByRole(document, 'button', { name: 'Continue' })
+    expect(continueButton).toBeInTheDocument()
+
+    const cancelLink = getByRole(document, 'link', { name: 'Cancel' })
+    expect(cancelLink).toHaveAttribute(
+      'href',
+      '/exemption/task-list?cancel=site-details'
+    )
+
+    const backLink = getByRole(document, 'link', { name: 'Back' })
+    expect(backLink).toHaveAttribute('href', '/exemption/upload-file')
   })
 
   test('should stay on same page when continue is clicked without selecting an option', async () => {
@@ -187,6 +216,35 @@ describe('Same activity dates page', () => {
     expect(response.statusCode).toBe(statusCodes.redirect)
     expect(response.headers.location).toBe(
       '/exemption/site-details-activity-dates'
+    )
+
+    expect(updateExemptionMultipleSiteDetails).toHaveBeenCalledWith(
+      expect.any(Object),
+      'sameActivityDates',
+      'no'
+    )
+  })
+
+  test('should redirect to same-activity-description when "no" is selected in a file upload', async () => {
+    jest.mocked(getExemptionCache).mockReturnValueOnce({
+      ...mockExemption,
+      siteDetails: mockExemption.siteDetails.map((site) => ({
+        ...site,
+        coordinatesType: 'file'
+      }))
+    })
+
+    const response = await makePostRequest({
+      url: '/exemption/same-activity-dates',
+      server: getServer(),
+      formData: {
+        sameActivityDates: 'no'
+      }
+    })
+
+    expect(response.statusCode).toBe(statusCodes.redirect)
+    expect(response.headers.location).toBe(
+      '/exemption/same-activity-description'
     )
 
     expect(updateExemptionMultipleSiteDetails).toHaveBeenCalledWith(

@@ -23,7 +23,8 @@ const exemptionWithMultipleSites = {
   projectName: 'Test Project',
   multipleSiteDetails: {
     multipleSitesEnabled: true
-  }
+  },
+  siteDetails: [{ coordinatesType: 'coordinates' }]
 }
 
 describe('Same activity description page', () => {
@@ -153,6 +154,35 @@ describe('Same activity description page', () => {
     )
   })
 
+  test('should have correct navigation links for file upload', async () => {
+    mockExemption({
+      ...exemptionWithMultipleSites,
+      siteDetails: exemptionWithMultipleSites.siteDetails.map((site) => ({
+        ...site,
+        coordinatesType: 'file'
+      }))
+    })
+
+    const { result } = await makeGetRequest({
+      server: getServer(),
+      url: '/exemption/same-activity-dates'
+    })
+
+    const { document } = new JSDOM(result).window
+
+    const continueButton = getByRole(document, 'button', { name: 'Continue' })
+    expect(continueButton).toBeInTheDocument()
+
+    const cancelLink = getByRole(document, 'link', { name: 'Cancel' })
+    expect(cancelLink).toHaveAttribute(
+      'href',
+      '/exemption/task-list?cancel=site-details'
+    )
+
+    const backLink = getByRole(document, 'link', { name: 'Back' })
+    expect(backLink).toHaveAttribute('href', '/exemption/upload-file')
+  })
+
   test('should stay on same page when continue is clicked without selecting an option', async () => {
     const { result, statusCode } = await makePostRequest({
       url: '/exemption/same-activity-description',
@@ -199,6 +229,33 @@ describe('Same activity description page', () => {
       expect.any(Object),
       'sameActivityDescription',
       'yes'
+    )
+  })
+
+  test('should redirect to review site details "no" is selected in a file upload', async () => {
+    mockExemption({
+      ...exemptionWithMultipleSites,
+      siteDetails: exemptionWithMultipleSites.siteDetails.map((site) => ({
+        ...site,
+        coordinatesType: 'file'
+      }))
+    })
+
+    const response = await makePostRequest({
+      url: '/exemption/same-activity-description',
+      server: getServer(),
+      formData: {
+        sameActivityDescription: 'no'
+      }
+    })
+
+    expect(response.statusCode).toBe(statusCodes.redirect)
+    expect(response.headers.location).toBe('/exemption/review-site-details')
+
+    expect(updateExemptionMultipleSiteDetails).toHaveBeenCalledWith(
+      expect.any(Object),
+      'sameActivityDescription',
+      'no'
     )
   })
 

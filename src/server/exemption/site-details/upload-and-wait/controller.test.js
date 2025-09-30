@@ -77,21 +77,19 @@ const createMockRequest = () => ({
   }
 })
 
-const createMockGeoJsonResponse = () => ({
+const createMockGeoJsonResponse = (featureCount = 1) => ({
   statusCode: 200,
   payload: {
     message: 'success',
     value: {
       type: 'FeatureCollection',
-      features: [
-        {
-          type: 'Feature',
-          geometry: {
-            type: 'Point',
-            coordinates: [1, 2] // Simple test coordinates
-          }
+      features: Array.from({ length: featureCount }, (_, index) => ({
+        type: 'Feature',
+        geometry: {
+          type: 'Point',
+          coordinates: [index + 1, index + 2]
         }
-      ]
+      }))
     }
   }
 })
@@ -112,7 +110,11 @@ const setupMockConfig = () => {
   })
 }
 
-const expectSuccessfulFileProcessing = (spies, request) => {
+const expectSuccessfulFileProcessing = (
+  spies,
+  request,
+  isMultipleSites = false
+) => {
   const { updateExemptionSiteDetailsBatchSpy } = spies
 
   // Verify batch update was called with all the required data including clearing upload config
@@ -121,7 +123,7 @@ const expectSuccessfulFileProcessing = (spies, request) => {
     expect.any(Object),
     expect.any(Object),
     expect.any(Object),
-    false
+    isMultipleSites
   )
 }
 
@@ -168,7 +170,7 @@ const setupCacheSpies = () => {
 const setupAuthenticatedRequestSpy = () => {
   return jest
     .spyOn(authenticatedRequests, 'authenticatedPostRequest')
-    .mockResolvedValue(createMockGeoJsonResponse())
+    .mockResolvedValue(createMockGeoJsonResponse(1))
 }
 
 // Error Testing Helpers
@@ -450,6 +452,59 @@ describe('#uploadAndWait', () => {
 
           // And user is redirected to review page
           expect(h.redirect).toHaveBeenCalledWith(routes.REVIEW_SITE_DETAILS)
+        })
+
+        test('should process file and redirect to same activity dates page for multiple sites', async () => {
+          // Given exemption with upload config and ready status
+          getExemptionCacheSpy.mockReturnValue(createMockExemption())
+          const statusResponse = createMockStatusResponse('ready')
+          mockCdpService.getStatus.mockResolvedValue(statusResponse)
+
+          // And successful file validation
+          mockFileValidationService.validateFileExtension.mockReturnValue({
+            isValid: true,
+            extension: 'kml',
+            errorMessage: null
+          })
+
+          // And geo-parser API returns multiple features (multiple sites)
+          authenticatedPostRequestSpy.mockResolvedValue(
+            createMockGeoJsonResponse(3)
+          )
+
+          const h = createMockResponseHandler()
+
+          // When handler is called
+          await uploadAndWaitController.handler(mockRequest, h)
+
+          // Then file validation is performed
+          expect(
+            mockFileValidationService.validateFileExtension
+          ).toHaveBeenCalledWith('test.kml', ['kml'])
+
+          // And geo-parser API is called
+          expect(authenticatedPostRequestSpy).toHaveBeenCalledWith(
+            mockRequest,
+            '/geo-parser/extract',
+            {
+              s3Bucket: 'test-bucket',
+              s3Key: 'test-key',
+              fileType: 'kml'
+            }
+          )
+
+          // And file processing data is stored correctly
+          expectSuccessfulFileProcessing(
+            {
+              updateExemptionSiteDetailsSpy,
+              updateExemptionSiteDetailsBatchSpy
+            },
+            mockRequest,
+            true // Multiple sites scenario
+          )
+
+          // And user is redirected to same activity dates page for multiple sites
+          expect(h.redirect).toHaveBeenCalledWith(routes.SAME_ACTIVITY_DATES)
         })
       })
 

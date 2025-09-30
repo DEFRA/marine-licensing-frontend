@@ -286,12 +286,12 @@ describe('#reviewSiteDetails', () => {
         coordinatesType: 'file',
         fileUploadType: 'kml',
         uploadedFile: {
-          filename: 'test-site.kml',
-          s3Location: {
-            s3Bucket: 'test-bucket',
-            s3Key: 'test-key',
-            checksumSha256: 'test-checksum'
-          }
+          filename: 'test-site.kml'
+        },
+        s3Location: {
+          s3Bucket: 'test-bucket',
+          s3Key: 'test-key',
+          checksumSha256: 'test-checksum'
         },
         geoJSON: {
           type: 'FeatureCollection',

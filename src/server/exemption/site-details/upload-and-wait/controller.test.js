@@ -116,13 +116,13 @@ const expectSuccessfulFileProcessing = (spies, request) => {
   const { updateExemptionSiteDetailsBatchSpy } = spies
 
   // Verify batch update was called with all the required data including clearing upload config
-  expect(updateExemptionSiteDetailsBatchSpy).toHaveBeenCalledWith(request, {
-    uploadedFile: expect.any(Object),
-    extractedCoordinates: expect.any(Array),
-    geoJSON: expect.any(Object),
-    featureCount: expect.any(Number),
-    uploadConfig: null // Verify upload config is cleared as part of batch operation
-  })
+  expect(updateExemptionSiteDetailsBatchSpy).toHaveBeenCalledWith(
+    request,
+    expect.any(Object),
+    expect.any(Object),
+    expect.any(Object),
+    false
+  )
 }
 
 // Service Mock Setup Helpers

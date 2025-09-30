@@ -871,12 +871,12 @@ describe('siteDetails utils', () => {
           },
           featureCount: 1,
           uploadedFile: {
-            filename: 'test-site.kml',
-            s3Location: {
-              s3Bucket: 'test-bucket',
-              s3Key: 'test-key',
-              checksumSha256: 'test-checksum'
-            }
+            filename: 'test-site.kml'
+          },
+          s3Location: {
+            s3Bucket: 'test-bucket',
+            s3Key: 'test-key',
+            checksumSha256: 'test-checksum'
           }
         }
       ]
@@ -914,12 +914,12 @@ describe('siteDetails utils', () => {
           fileUploadType: 'shapefile',
           geoJSON: { type: 'FeatureCollection', features: [] },
           uploadedFile: {
-            filename: 'test.shp',
-            s3Location: {
-              s3Bucket: 'bucket',
-              s3Key: 'key',
-              checksumSha256: 'checksum'
-            }
+            filename: 'test.shp'
+          },
+          s3Location: {
+            s3Bucket: 'bucket',
+            s3Key: 'key',
+            checksumSha256: 'checksum'
           }
         }
       ]

@@ -109,6 +109,7 @@ async function extractCoordinatesFromFile(request, s3Bucket, s3Key, fileType) {
   try {
     request.logger.info({ s3Bucket, s3Key, fileType }, 'Calling geo-parser API')
     const response = await callGeoParserAPI(request, s3Bucket, s3Key, fileType)
+
     const geoJSON = validateAndExtractGeoJSON(response)
     const extractedCoordinates = extractCoordinatesFromGeoJSON(geoJSON)
 
@@ -270,22 +271,13 @@ function storeSuccessfulUpload(request, status, coordinateData, s3Location) {
     isMultipleSitesFile(coordinateData)
   )
 
-  updateExemptionSiteDetailsBatch(request, {
-    uploadedFile: {
-      ...status,
-      s3Location: {
-        s3Bucket: s3Location.s3Bucket,
-        s3Key: s3Location.s3Key,
-        fileId: status.s3Location.fileId,
-        s3Url: status.s3Location.s3Url,
-        checksumSha256: status.s3Location.checksumSha256
-      }
-    },
-    extractedCoordinates: coordinateData.extractedCoordinates,
-    geoJSON: coordinateData.geoJSON,
-    featureCount: coordinateData.featureCount,
-    uploadConfig: null // Clear upload config
-  })
+  updateExemptionSiteDetailsBatch(
+    request,
+    status,
+    coordinateData,
+    s3Location,
+    isMultipleSitesFile(coordinateData)
+  )
 }
 
 /**

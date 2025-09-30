@@ -543,7 +543,7 @@ describe('#activityDatesController', () => {
       })
 
       expect(statusCode).toBe(statusCodes.internalServerError)
-      expect(result).toContain('500')
+      expect(result).toContain('There is a problem with the service')
     })
 
     test('should handle API validation errors', async () => {

@@ -19,6 +19,8 @@ import { csrf } from '~/src/server/common/helpers/csrf.js'
 import { openId } from '~/src/server/common/plugins/open-id.js'
 import { cookies } from '~/src/server/common/plugins/cookies.js'
 import { setPageCacheControlHeaders } from '~/src/server/common/helpers/cache-control.js'
+import { contentSecurityPolicy } from '~/src/server/common/helpers/content-security-policy.js'
+import Scooter from '@hapi/scooter'
 
 export async function createServer() {
   setupProxy()
@@ -70,12 +72,14 @@ export async function createServer() {
     requestLogger,
     requestTracing,
     secureContext,
+    Scooter, // Required by Blankie
     pulse,
     sessionCache,
     bell,
     cookie,
     basic,
     nunjucksConfig,
+    contentSecurityPolicy,
     csrf,
     openId,
     cookies,

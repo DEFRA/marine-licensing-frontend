@@ -48,6 +48,7 @@ describe('Confirmation page', () => {
       'href',
       'https://defragroup.eu.qualtrics.com/jfe/form/SV_8p5Cle8p7Yov9FI'
     )
+    expect(feedbackLink).toHaveAttribute('rel', 'noopener noreferrer')
     expect(feedbackLink).toHaveClass('govuk-link')
   })
 

@@ -2,8 +2,8 @@ import Boom from '@hapi/boom'
 import { config } from '~/src/config/config.js'
 import { COORDINATE_SYSTEMS } from '~/src/server/common/constants/exemptions.js'
 import { routes } from '~/src/server/common/constants/routes.js'
-import { getCoordinateSystem } from '~/src/server/common/helpers/coordinate-utils.js'
 import { createSiteDetailsDataJson } from '~/src/server/common/helpers/site-details.js'
+import { formatDate } from '~/src/server/common/helpers/dates/date-utils.js'
 import { getSiteDetailsBySite } from '~/src/server/common/helpers/session-cache/site-details-utils.js'
 const isWGS84 = (coordinateSystem) =>
   coordinateSystem === COORDINATE_SYSTEMS.WGS84
@@ -198,36 +198,153 @@ export const getFileUploadBackLink = (previousPage) => {
 const metresLabel = (metres) =>
   metres === '1' ? `${metres} metre` : `${metres} metres`
 
+const getActivityDatesSummaryText = (activityDates, showActivityDates) => {
+  if (!showActivityDates) {
+    return ''
+  }
+
+  if (activityDates?.start && activityDates?.end) {
+    return `${formatDate(activityDates.start)} to ${formatDate(activityDates.end)}`
+  }
+  return ''
+}
+
+const getActivityDescriptionSummaryText = (
+  activityDescription,
+  showActivityDescription
+) => {
+  if (!showActivityDescription) {
+    return ''
+  }
+
+  return activityDescription ?? ''
+}
+
 /**
  * Builds summary data for manual coordinate entry display
  * @param {object} siteDetails - Site details from exemption
- * @param {string} coordinateSystem - Selected coordinate system
+ * @param {object} multipleSiteDetails - Multiple site configuration
  * @returns {object} Summary data for template
  */
 export const buildManualCoordinateSummaryData = (
   siteDetails,
-  coordinateSystem
+  multipleSiteDetails = {}
 ) => {
-  const { circleWidth, coordinatesEntry } = siteDetails
+  const summaryData = []
 
-  if (coordinatesEntry === 'multiple') {
-    return {
-      method: getReviewSummaryText(siteDetails),
-      coordinateSystem: getCoordinateSystemText(coordinateSystem),
-      polygonCoordinates: getPolygonCoordinatesDisplayData(
-        siteDetails,
-        coordinateSystem
-      )
+  if (!siteDetails || !Array.isArray(siteDetails)) {
+    return []
+  }
+
+  for (const [index, site] of siteDetails.entries()) {
+    const {
+      circleWidth,
+      coordinatesEntry,
+      coordinateSystem,
+      activityDates,
+      activityDescription,
+      siteName
+    } = site
+    const { multipleSitesEnabled, sameActivityDates, sameActivityDescription } =
+      multipleSiteDetails
+
+    const showActivityDates =
+      !multipleSitesEnabled || sameActivityDates === 'no'
+
+    const showActivityDescription =
+      !multipleSitesEnabled || sameActivityDescription === 'no'
+
+    // Generate individual site details data for the map
+    const siteDetailsData = createSiteDetailsDataJson(site, coordinateSystem)
+
+    if (coordinatesEntry === 'multiple') {
+      summaryData.push({
+        activityDates: getActivityDatesSummaryText(
+          activityDates,
+          showActivityDates
+        ),
+        activityDescription: getActivityDescriptionSummaryText(
+          activityDescription,
+          showActivityDescription
+        ),
+        showActivityDates,
+        showActivityDescription,
+        siteName: siteName ?? '',
+        method: getReviewSummaryText(site),
+        coordinateSystem: getCoordinateSystemText(coordinateSystem),
+        polygonCoordinates: getPolygonCoordinatesDisplayData(
+          site,
+          coordinateSystem
+        ),
+        siteNumber: index + 1,
+        siteDetailsData
+      })
+    } else {
+      // Default to circular site display
+      summaryData.push({
+        activityDates: getActivityDatesSummaryText(
+          activityDates,
+          showActivityDates
+        ),
+        activityDescription: getActivityDescriptionSummaryText(
+          activityDescription,
+          showActivityDescription
+        ),
+        showActivityDates,
+        showActivityDescription,
+        siteName: siteName ?? '',
+        method: getReviewSummaryText(site),
+        coordinateSystem: getCoordinateSystemText(coordinateSystem),
+        coordinates: getCoordinateDisplayText(site, coordinateSystem),
+        width: circleWidth ? metresLabel(circleWidth) : '',
+        siteNumber: index + 1,
+        siteDetailsData
+      })
     }
   }
 
-  // Default to circular site display
-  return {
-    method: getReviewSummaryText(siteDetails),
-    coordinateSystem: getCoordinateSystemText(coordinateSystem),
-    coordinates: getCoordinateDisplayText(siteDetails, coordinateSystem),
-    width: circleWidth ? metresLabel(circleWidth) : ''
+  return summaryData
+}
+
+/**
+ * Builds summary data for displaying multiple site information
+ * @param {object} multipleSiteDetails - Multiple site details from exemption
+ * @param {Array} siteDetails - Site details from exemption
+ * @returns {object} Summary data for template
+ */
+export const buildManualCoordinateMultipleSitesSummaryData = (
+  multipleSiteDetails,
+  siteDetails
+) => {
+  const { multipleSitesEnabled, sameActivityDates, sameActivityDescription } =
+    multipleSiteDetails ?? {}
+
+  const multipleSiteData = {
+    method: 'Enter the coordinates of the site manually',
+    multipleSiteDetails: multipleSitesEnabled ? 'Yes' : 'No',
+    sameActivityDates: sameActivityDates === 'yes' ? 'Yes' : 'No',
+    sameActivityDescription: sameActivityDescription === 'yes' ? 'Yes' : 'No'
   }
+
+  if (!siteDetails) {
+    return multipleSiteData
+  }
+
+  const firstSite = siteDetails[0]
+
+  if (!firstSite) {
+    return {}
+  }
+
+  if (sameActivityDates === 'yes') {
+    multipleSiteData.activityDates = `${formatDate(firstSite.activityDates?.start)} to ${formatDate(firstSite.activityDates?.end)}`
+  }
+
+  if (sameActivityDescription === 'yes') {
+    multipleSiteData.activityDescription = firstSite.activityDescription
+  }
+
+  return multipleSiteData
 }
 
 /**
@@ -242,7 +359,7 @@ export const getSiteDetails = async (
   exemption,
   authenticatedGetRequest
 ) => {
-  let siteDetails = getSiteDetailsBySite(exemption)
+  let siteDetails = exemption.siteDetails
 
   // If we have an exemption ID but incomplete site details, load from DB
   if (exemption.id && exemption.siteDetails === undefined) {
@@ -252,11 +369,11 @@ export const getSiteDetails = async (
         `/exemption/${exemption.id}`
       )
       if (payload?.value?.siteDetails) {
-        siteDetails = payload.value.siteDetails[0]
+        siteDetails = payload.value.siteDetails
         request.logger.info(
           {
             exemptionId: exemption.id,
-            coordinatesType: siteDetails.coordinatesType
+            coordinatesType: siteDetails[0].coordinatesType
           },
           'Loaded site details from MongoDB for display'
         )
@@ -384,7 +501,6 @@ export const renderFileUploadReview = (h, options) => {
 /**
  * Handles manual coordinate review view rendering
  * @param {object} h - Hapi response toolkit
- * @param {object} request - Hapi request object
  * @param {object} options - Rendering options
  * @param {object} options.exemption - Current exemption from session
  * @param {object} options.siteDetails - Site details object
@@ -392,32 +508,29 @@ export const renderFileUploadReview = (h, options) => {
  * @param {object} options.reviewSiteDetailsPageData - Common page data
  * @returns {object} Rendered view response
  */
-export const renderManualCoordinateReview = (h, request, options) => {
+export const renderManualCoordinateReview = (h, options) => {
   const { exemption, previousPage, siteDetails, reviewSiteDetailsPageData } =
     options
   const { multipleSiteDetails } = exemption
 
-  const { coordinateSystem } = getCoordinateSystem(request)
+  const firstSite = getSiteDetailsBySite(exemption)
+
   const summaryData = buildManualCoordinateSummaryData(
     siteDetails,
-    coordinateSystem
+    multipleSiteDetails
   )
 
-  // Prepare site details data for map if needed
-  const siteDetailsData = createSiteDetailsDataJson(
-    siteDetails,
-    coordinateSystem
+  const multipleSiteDetailsData = buildManualCoordinateMultipleSitesSummaryData(
+    multipleSiteDetails,
+    exemption.siteDetails
   )
 
   return h.view(REVIEW_SITE_DETAILS_VIEW_ROUTE, {
     ...reviewSiteDetailsPageData,
-    backLink: getSiteDetailsBackLink(
-      previousPage,
-      siteDetails.coordinatesEntry
-    ),
+    backLink: getSiteDetailsBackLink(previousPage, firstSite.coordinatesEntry),
     projectName: exemption.projectName,
     summaryData,
-    siteDetailsData,
+    multipleSiteDetailsData,
     isMultiSiteJourney: !!multipleSiteDetails?.multipleSitesEnabled
   })
 }

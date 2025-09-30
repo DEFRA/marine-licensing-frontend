@@ -2,7 +2,20 @@ import SiteDataLoader from './site-data-loader.js'
 
 Object.defineProperty(globalThis, 'document', {
   value: {
-    getElementById: jest.fn()
+    getElementById: jest.fn(),
+    createElement: jest.fn().mockImplementation((tagName) => {
+      const element = {
+        tagName: tagName.toUpperCase(),
+        attributes: {},
+        getAttribute: jest.fn().mockImplementation(function (name) {
+          return this.attributes[name] || null
+        }),
+        setAttribute: jest.fn().mockImplementation(function (name, value) {
+          this.attributes[name] = value
+        })
+      }
+      return element
+    })
   },
   writable: true
 })
@@ -44,6 +57,60 @@ describe('SiteDataLoader', () => {
       document.getElementById.mockReturnValue(mockElement)
 
       expect(() => siteDataLoader.loadSiteDetails()).toThrow()
+    })
+
+    test('should load data from map element data attribute when provided', () => {
+      const siteDetails = { coordinatesType: 'coordinates', coordinates: {} }
+      const mapElement = document.createElement('div')
+      mapElement.setAttribute('data-site-details', JSON.stringify(siteDetails))
+
+      siteDataLoader = new SiteDataLoader(mapElement)
+      const result = siteDataLoader.loadSiteDetails()
+
+      expect(result).toEqual(siteDetails)
+      expect(document.getElementById).not.toHaveBeenCalled()
+    })
+
+    test('should fallback to global element when map element has no data', () => {
+      const siteDetails = { coordinatesType: 'file', geoJSON: {} }
+      const mapElement = document.createElement('div')
+      // No data-site-details attribute set
+      const mockElement = {
+        textContent: JSON.stringify(siteDetails)
+      }
+
+      document.getElementById.mockReturnValue(mockElement)
+      siteDataLoader = new SiteDataLoader(mapElement)
+
+      const result = siteDataLoader.loadSiteDetails()
+
+      expect(document.getElementById).toHaveBeenCalledWith('site-details-data')
+      expect(result).toEqual(siteDetails)
+    })
+
+    test('should prioritize data attribute over global element', () => {
+      const dataAttrSiteDetails = {
+        coordinatesType: 'coordinates',
+        source: 'data-attr'
+      }
+      const globalSiteDetails = { coordinatesType: 'file', source: 'global' }
+
+      const mapElement = document.createElement('div')
+      mapElement.setAttribute(
+        'data-site-details',
+        JSON.stringify(dataAttrSiteDetails)
+      )
+      const mockElement = {
+        textContent: JSON.stringify(globalSiteDetails)
+      }
+
+      document.getElementById.mockReturnValue(mockElement)
+      siteDataLoader = new SiteDataLoader(mapElement)
+
+      const result = siteDataLoader.loadSiteDetails()
+
+      expect(result).toEqual(dataAttrSiteDetails)
+      expect(document.getElementById).not.toHaveBeenCalled()
     })
   })
 

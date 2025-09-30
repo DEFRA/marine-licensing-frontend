@@ -16,6 +16,7 @@ import {
   authenticatedPatchRequest,
   authenticatedGetRequest
 } from '~/src/server/common/helpers/authenticated-requests.js'
+import { getSiteDetailsBySite } from '~/src/server/common/helpers/session-cache/site-details-utils.js'
 
 export const REVIEW_SITE_DETAILS_VIEW_ROUTE =
   'exemption/site-details/review-site-details/index'
@@ -36,20 +37,24 @@ export const reviewSiteDetailsController = {
   async handler(request, h) {
     const previousPage = request.headers?.referer
     const exemption = getExemptionCache(request)
+
     const siteDetails = await getSiteDetails(
       request,
       exemption,
       authenticatedGetRequest
     )
 
-    return siteDetails.coordinatesType === 'file'
+    const firstSite = getSiteDetailsBySite({ ...exemption, siteDetails })
+    const { coordinatesType } = firstSite
+
+    return coordinatesType === 'file'
       ? renderFileUploadReview(h, {
           exemption,
-          siteDetails,
+          siteDetails: firstSite,
           previousPage,
           reviewSiteDetailsPageData
         })
-      : renderManualCoordinateReview(h, request, {
+      : renderManualCoordinateReview(h, {
           exemption,
           siteDetails,
           previousPage,

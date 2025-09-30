@@ -1,9 +1,22 @@
 class SiteDataLoader {
+  constructor(mapElement = null) {
+    this.mapElement = mapElement
+  }
+
   /**
    * Load site details from DOM element
    * @returns {object|null} Site details object or null if not found/invalid
    */
   loadSiteDetails() {
+    if (this.mapElement) {
+      // Multi site implementation, will become default eventually
+      const siteDetailsAttr = this.mapElement.getAttribute('data-site-details') // NOSONAR
+      if (siteDetailsAttr) {
+        return JSON.parse(siteDetailsAttr)
+      }
+    }
+
+    // Fallback for single site only pages
     const siteDataElement = document.getElementById('site-details-data')
     if (!siteDataElement) {
       return null

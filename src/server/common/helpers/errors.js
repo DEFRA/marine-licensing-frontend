@@ -3,18 +3,19 @@ import { statusCodes } from '~/src/server/common/constants/status-codes.js'
 /**
  * @param {number} statusCode
  */
-function statusCodeMessage(statusCode) {
+function getCustomTemplate(statusCode) {
   switch (statusCode) {
-    case statusCodes.notFound:
-      return 'Page not found'
     case statusCodes.forbidden:
-      return 'Forbidden'
-    case statusCodes.unauthorized:
-      return 'Unauthorized'
-    case statusCodes.badRequest:
-      return 'Bad Request'
+      return 'error/403-forbidden'
+    case statusCodes.notFound:
+      return 'error/404-not-found'
+    case statusCodes.internalServerError:
+      return 'error/500-server-error'
+    case statusCodes.serviceUnavailable:
+      return 'error/503-service-unavailable'
     default:
-      return 'Something went wrong'
+      // Use the 500 as the generic template
+      return 'error/500-server-error'
   }
 }
 
@@ -30,19 +31,14 @@ export function catchAll(request, h) {
   }
 
   const statusCode = response.output.statusCode
-  const errorMessage = statusCodeMessage(statusCode)
 
   if (statusCode >= statusCodes.internalServerError) {
     request.logger.error({ stack: response?.stack }, 'Error occurred')
   }
 
-  return h
-    .view('error/index', {
-      pageTitle: errorMessage,
-      heading: statusCode,
-      message: errorMessage
-    })
-    .code(statusCode)
+  const template = getCustomTemplate(statusCode)
+
+  return h.view(template).code(statusCode)
 }
 
 /**

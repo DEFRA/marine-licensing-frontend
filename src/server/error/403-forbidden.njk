@@ -1,0 +1,18 @@
+{% extends 'layouts/page.njk' %}
+
+{% block beforeContent %}
+  {{ appBackLinkHistory() }}
+{% endblock %}
+
+{% block content %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+
+      <h1 class="govuk-heading-l">You do not have permission to view this page</h1>
+
+      <p class="govuk-body govuk-!-margin-bottom-0">If you think you should have access, contact:
+        <a href="mailto:marine.consents@marinemanagement.org.uk" class="govuk-link">marine.consents@marinemanagement.org.uk</a>
+      </p>
+    </div>
+  </div>
+{% endblock %}

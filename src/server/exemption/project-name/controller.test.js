@@ -109,11 +109,13 @@ describe('#projectName', () => {
         formData: { projectName: 'test' }
       })
 
-      expect(result).toContain('Something went wrong')
+      expect(result).toContain('There is a problem with the service')
 
       const { document } = new JSDOM(result).window
 
-      expect(document.querySelector('h1').textContent.trim()).toBe('500')
+      expect(document.querySelector('h1').textContent.trim()).toBe(
+        'There is a problem with the service'
+      )
     })
 
     test('Should correctly validate on empty data', () => {

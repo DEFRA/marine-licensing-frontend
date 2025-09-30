@@ -18,9 +18,7 @@ describe('#errors', () => {
       server: getServer()
     })
 
-    expect(result).toEqual(
-      expect.stringContaining('Page not found | Get permission for marine work')
-    )
+    expect(result).toEqual(expect.stringContaining('Page not found'))
     expect(statusCode).toBe(statusCodes.notFound)
   })
 })
@@ -28,7 +26,16 @@ describe('#errors', () => {
 describe('#catchAll', () => {
   const mockErrorLogger = jest.fn()
   const mockStack = 'Mock error stack'
-  const errorPage = 'error/index'
+
+  // The 500 custom error page is also doing double duty as our generic error page.
+  const genericErrorPage = 'error/500-server-error'
+
+  const customErrorPages = {
+    403: 'error/403-forbidden',
+    404: 'error/404-not-found',
+    500: 'error/500-server-error',
+    503: 'error/503-service-unavailable'
+  }
   const mockRequest = (/** @type {number} */ statusCode) => ({
     response: {
       isBoom: true,
@@ -50,11 +57,7 @@ describe('#catchAll', () => {
     catchAll(mockRequest(statusCodes.notFound), mockToolkit)
 
     expect(mockErrorLogger).not.toHaveBeenCalledWith(mockStack)
-    expect(mockToolkitView).toHaveBeenCalledWith(errorPage, {
-      pageTitle: 'Page not found',
-      heading: statusCodes.notFound,
-      message: 'Page not found'
-    })
+    expect(mockToolkitView).toHaveBeenCalledWith(customErrorPages['404'])
     expect(mockToolkitCode).toHaveBeenCalledWith(statusCodes.notFound)
   })
 
@@ -62,11 +65,7 @@ describe('#catchAll', () => {
     catchAll(mockRequest(statusCodes.forbidden), mockToolkit)
 
     expect(mockErrorLogger).not.toHaveBeenCalledWith(mockStack)
-    expect(mockToolkitView).toHaveBeenCalledWith(errorPage, {
-      pageTitle: 'Forbidden',
-      heading: statusCodes.forbidden,
-      message: 'Forbidden'
-    })
+    expect(mockToolkitView).toHaveBeenCalledWith(customErrorPages['403'])
     expect(mockToolkitCode).toHaveBeenCalledWith(statusCodes.forbidden)
   })
 
@@ -74,11 +73,7 @@ describe('#catchAll', () => {
     catchAll(mockRequest(statusCodes.unauthorized), mockToolkit)
 
     expect(mockErrorLogger).not.toHaveBeenCalledWith(mockStack)
-    expect(mockToolkitView).toHaveBeenCalledWith(errorPage, {
-      pageTitle: 'Unauthorized',
-      heading: statusCodes.unauthorized,
-      message: 'Unauthorized'
-    })
+    expect(mockToolkitView).toHaveBeenCalledWith(genericErrorPage)
     expect(mockToolkitCode).toHaveBeenCalledWith(statusCodes.unauthorized)
   })
 
@@ -86,11 +81,7 @@ describe('#catchAll', () => {
     catchAll(mockRequest(statusCodes.badRequest), mockToolkit)
 
     expect(mockErrorLogger).not.toHaveBeenCalledWith(mockStack)
-    expect(mockToolkitView).toHaveBeenCalledWith(errorPage, {
-      pageTitle: 'Bad Request',
-      heading: statusCodes.badRequest,
-      message: 'Bad Request'
-    })
+    expect(mockToolkitView).toHaveBeenCalledWith(genericErrorPage)
     expect(mockToolkitCode).toHaveBeenCalledWith(statusCodes.badRequest)
   })
 
@@ -98,29 +89,28 @@ describe('#catchAll', () => {
     catchAll(mockRequest(statusCodes.imATeapot), mockToolkit)
 
     expect(mockErrorLogger).not.toHaveBeenCalledWith(mockStack)
-    expect(mockToolkitView).toHaveBeenCalledWith(errorPage, {
-      pageTitle: 'Something went wrong',
-      heading: statusCodes.imATeapot,
-      message: 'Something went wrong'
-    })
+    expect(mockToolkitView).toHaveBeenCalledWith(genericErrorPage)
     expect(mockToolkitCode).toHaveBeenCalledWith(statusCodes.imATeapot)
   })
 
-  test('Should provide expected "Something went wrong" page and log error for internalServerError', () => {
+  test('Should provide expected 500-error page and log error for internalServerError', () => {
     catchAll(mockRequest(statusCodes.internalServerError), mockToolkit)
 
     expect(mockErrorLogger).toHaveBeenCalledWith(
       { stack: mockStack },
       'Error occurred'
     )
-    expect(mockToolkitView).toHaveBeenCalledWith(errorPage, {
-      pageTitle: 'Something went wrong',
-      heading: statusCodes.internalServerError,
-      message: 'Something went wrong'
-    })
+
+    expect(mockToolkitView).toHaveBeenCalledWith(customErrorPages['500'])
     expect(mockToolkitCode).toHaveBeenCalledWith(
       statusCodes.internalServerError
     )
+  })
+
+  test('Should provide expected 503 server temporarily unavailable page', () => {
+    catchAll(mockRequest(statusCodes.serviceUnavailable), mockToolkit)
+    expect(mockToolkitView).toHaveBeenCalledWith(customErrorPages['503'])
+    expect(mockToolkitCode).toHaveBeenCalledWith(statusCodes.serviceUnavailable)
   })
 })
 

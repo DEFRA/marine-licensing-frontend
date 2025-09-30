@@ -120,11 +120,13 @@ describe('#publicRegister', () => {
         formData: { consent: 'no' }
       })
 
-      expect(result).toContain('Something went wrong')
+      expect(result).toContain('Try again later.')
 
       const { document } = new JSDOM(result).window
 
-      expect(document.querySelector('h1').textContent.trim()).toBe('500')
+      expect(document.querySelector('h1').textContent.trim()).toBe(
+        'There is a problem with the service'
+      )
     })
 
     test('Should correctly validate on empty data', () => {

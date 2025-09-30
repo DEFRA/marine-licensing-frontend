@@ -1174,11 +1174,11 @@ describe('#reviewSiteDetails', () => {
           }
         })
 
-        expect(result).toEqual(expect.stringContaining('Bad Request'))
-
         const { document } = new JSDOM(result).window
 
-        expect(document.querySelector('h1').textContent.trim()).toContain('400')
+        expect(document.querySelector('h1').textContent.trim()).toContain(
+          'There is a problem with the service'
+        )
 
         expect(statusCode).toBe(statusCodes.badRequest)
       })
@@ -1201,11 +1201,11 @@ describe('#reviewSiteDetails', () => {
           }
         })
 
-        expect(result).toContain('Bad Request')
-
         const { document } = new JSDOM(result).window
 
-        expect(document.querySelector('h1').textContent.trim()).toBe('400')
+        expect(document.querySelector('h1').textContent.trim()).toBe(
+          'There is a problem with the service'
+        )
       })
 
       test('should add another site correctly', async () => {
@@ -1351,11 +1351,13 @@ describe('#reviewSiteDetails', () => {
             }
           })
 
-          expect(result).toEqual(expect.stringContaining('Bad Request'))
+          expect(result).toEqual(
+            expect.stringContaining('There is a problem with the service') // generic error page reusing the custom 500 one
+          )
 
           const { document } = new JSDOM(result).window
           expect(document.querySelector('h1').textContent.trim()).toContain(
-            '400'
+            'There is a problem with the service'
           )
           expect(statusCode).toBe(statusCodes.badRequest)
         })

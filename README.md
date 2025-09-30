@@ -153,7 +153,6 @@ Benefits of using knip:
 
 For automatic fixes, knip can remove unused code with the `--fix` flag, though this should be used with caution and proper version control.
 
-
 ### Formatting
 
 #### Windows prettier issue

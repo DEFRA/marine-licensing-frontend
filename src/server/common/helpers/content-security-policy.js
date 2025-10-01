@@ -11,19 +11,20 @@ const contentSecurityPolicy = {
       'cdpUploader.cdpUploadServiceBaseUrl'
     )
     const cspDirectives = {
+      'base-uri': "'self'",
+      'connect-src': "'self'",
       'default-src': "'self'",
-      'font-src': "'self' data:",
-      'connect-src': "'self' data:",
+      'font-src': "'self'",
+      'form-action': `'self' ${uploaderServiceHost}`,
+      'frame-src': "'self'",
+      'frame-ancestors': "'none'",
+      'img-src': "'self' data: https://tile.openstreetmap.org",
+      'manifest-src': "'self'",
       'media-src': "'self'",
-      'style-src': "'self'",
+      'object-src': "'none'",
       'script-src':
         "'self' 'sha256-GUQ5ad8JK5KmEWmROf3LZd9ge94daqNvd8xy9YS1iDw='",
-      'img-src': "'self' data: https://tile.openstreetmap.org",
-      'frame-src': "'self'",
-      'object-src': "'none'",
-      'frame-ancestors': "'none'",
-      'form-action': `'self' ${uploaderServiceHost}`,
-      'manifest-src': "'self'"
+      'style-src': "'self'"
     }
 
     const cspHeader = Object.entries(cspDirectives)
@@ -32,11 +33,7 @@ const contentSecurityPolicy = {
 
     server.ext('onPreResponse', (request, h) => {
       const response = request.response
-
-      if (!response.isBoom) {
-        response.header('Content-Security-Policy', cspHeader)
-      }
-
+      response.header?.('Content-Security-Policy', cspHeader)
       return h.continue
     })
   }

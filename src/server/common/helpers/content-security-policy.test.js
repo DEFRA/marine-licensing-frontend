@@ -35,27 +35,140 @@ describe('contentSecurityPolicy', () => {
       onPreResponseHandler = server.ext.mock.calls[0][1]
     })
 
-    it('should set CSP header with correct directives', () => {
-      const result = onPreResponseHandler(mockRequest, mockH)
+    it('should register onPreResponse hook', () => {
+      onPreResponseHandler(mockRequest, mockH)
 
       expect(server.ext).toHaveBeenCalledWith(
         'onPreResponse',
         expect.any(Function)
       )
-      expect(result).toBe(mockH.continue)
-      expect(mockResponse.header).toHaveBeenCalledWith(
-        'Content-Security-Policy',
-        "default-src 'self'; font-src 'self' data:; connect-src 'self' data:; media-src 'self'; style-src 'self'; script-src 'self' 'sha256-GUQ5ad8JK5KmEWmROf3LZd9ge94daqNvd8xy9YS1iDw='; img-src 'self' data: https://tile.openstreetmap.org; frame-src 'self'; object-src 'none'; frame-ancestors 'none'; form-action 'self' http://localhost:7337; manifest-src 'self'"
-      )
     })
 
-    it('should not set CSP header for Boom errors', () => {
-      mockRequest.response.isBoom = true
-
+    it('should return h.continue', () => {
       const result = onPreResponseHandler(mockRequest, mockH)
 
       expect(result).toBe(mockH.continue)
-      expect(mockResponse.header).not.toHaveBeenCalled()
+    })
+
+    it('should set base-uri directive', () => {
+      onPreResponseHandler(mockRequest, mockH)
+
+      expect(mockResponse.header).toHaveBeenCalledWith(
+        'Content-Security-Policy',
+        expect.stringContaining("base-uri 'self'")
+      )
+    })
+
+    it('should set default-src directive', () => {
+      onPreResponseHandler(mockRequest, mockH)
+
+      expect(mockResponse.header).toHaveBeenCalledWith(
+        'Content-Security-Policy',
+        expect.stringContaining("default-src 'self'")
+      )
+    })
+
+    it('should set connect-src directive', () => {
+      onPreResponseHandler(mockRequest, mockH)
+
+      expect(mockResponse.header).toHaveBeenCalledWith(
+        'Content-Security-Policy',
+        expect.stringContaining("connect-src 'self'")
+      )
+    })
+
+    it('should set font-src directive', () => {
+      onPreResponseHandler(mockRequest, mockH)
+
+      expect(mockResponse.header).toHaveBeenCalledWith(
+        'Content-Security-Policy',
+        expect.stringContaining("font-src 'self'")
+      )
+    })
+
+    it('should set form-action directive', () => {
+      onPreResponseHandler(mockRequest, mockH)
+
+      expect(mockResponse.header).toHaveBeenCalledWith(
+        'Content-Security-Policy',
+        expect.stringContaining("form-action 'self' http://localhost:7337")
+      )
+    })
+
+    it('should set frame-src directive', () => {
+      onPreResponseHandler(mockRequest, mockH)
+
+      expect(mockResponse.header).toHaveBeenCalledWith(
+        'Content-Security-Policy',
+        expect.stringContaining("frame-src 'self'")
+      )
+    })
+
+    it('should set frame-ancestors directive', () => {
+      onPreResponseHandler(mockRequest, mockH)
+
+      expect(mockResponse.header).toHaveBeenCalledWith(
+        'Content-Security-Policy',
+        expect.stringContaining("frame-ancestors 'none'")
+      )
+    })
+
+    it('should set img-src directive', () => {
+      onPreResponseHandler(mockRequest, mockH)
+
+      expect(mockResponse.header).toHaveBeenCalledWith(
+        'Content-Security-Policy',
+        expect.stringContaining(
+          "img-src 'self' data: https://tile.openstreetmap.org"
+        )
+      )
+    })
+
+    it('should set manifest-src directive', () => {
+      onPreResponseHandler(mockRequest, mockH)
+
+      expect(mockResponse.header).toHaveBeenCalledWith(
+        'Content-Security-Policy',
+        expect.stringContaining("manifest-src 'self'")
+      )
+    })
+
+    it('should set media-src directive', () => {
+      onPreResponseHandler(mockRequest, mockH)
+
+      expect(mockResponse.header).toHaveBeenCalledWith(
+        'Content-Security-Policy',
+        expect.stringContaining("media-src 'self'")
+      )
+    })
+
+    it('should set object-src directive', () => {
+      onPreResponseHandler(mockRequest, mockH)
+
+      expect(mockResponse.header).toHaveBeenCalledWith(
+        'Content-Security-Policy',
+        expect.stringContaining("object-src 'none'")
+      )
+    })
+
+    it('should set script-src directive', () => {
+      onPreResponseHandler(mockRequest, mockH)
+
+      expect(mockResponse.header).toHaveBeenCalledWith(
+        'Content-Security-Policy',
+        expect.stringContaining(
+          "script-src 'self' 'sha256-GUQ5ad8JK5KmEWmROf3LZd9ge94daqNvd8xy9YS1iDw='"
+        )
+      )
+    })
+
+    it('should set style-src directive', () => {
+      onPreResponseHandler(mockRequest, mockH)
+
+      expect(mockResponse.header).toHaveBeenCalledWith(
+        'Content-Security-Policy',
+        expect.stringContaining("style-src 'self'")
+      )
     })
   })
 })

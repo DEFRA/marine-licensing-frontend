@@ -10,7 +10,6 @@ export default {
   testMatch: ['**/src/**/*.test.js', '**/tests/**/*.test.js'],
   testPathIgnorePatterns: [
     '/node_modules/',
-    '<rootDir>/.stryker-tmp/',
     '<rootDir>/tests/integration/utils/'
   ],
   reporters: [

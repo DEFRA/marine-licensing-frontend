@@ -14,6 +14,7 @@ import { routes } from '~/src/server/common/constants/routes.js'
 
 import joi from 'joi'
 import { getMcmsContextFromCache } from '~/src/server/common/helpers/mcms-context/cache-mcms-context.js'
+import { getUserSession } from '~/src/server/common/plugins/auth/utils.js'
 
 const errorMessages = {
   PROJECT_NAME_REQUIRED: 'Enter the project name',
@@ -88,6 +89,8 @@ export const projectNameSubmitController = {
     const { payload } = request
     try {
       const exemption = getExemptionCache(request)
+      const { applicantOrganisationId, applicantOrganisationName } =
+        await getUserSession(request, request.state?.userSession)
 
       const isUpdate = !!exemption.id
       const mcmsContext = getMcmsContextFromCache(request)
@@ -98,7 +101,10 @@ export const projectNameSubmitController = {
           })
         : await authenticatedPostRequest(request, '/exemption/project-name', {
             ...payload,
-            mcmsContext
+            mcmsContext,
+            ...(applicantOrganisationId
+              ? { applicantOrganisationId, applicantOrganisationName }
+              : {})
           })
 
       setExemptionCache(request, {

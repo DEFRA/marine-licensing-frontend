@@ -71,6 +71,7 @@
 {% endset %}
 
 {% block beforeContent %}
+{{ super() }}
 <nav>
   {{ govukBackLink({
         text: "Back",

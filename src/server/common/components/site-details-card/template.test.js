@@ -39,7 +39,6 @@ import nunjucks from 'nunjucks'
 import { JSDOM } from 'jsdom'
 import { camelCase } from 'lodash'
 import * as filters from '~/src/config/nunjucks/filters/filters.js'
-import * as globals from '~/src/config/nunjucks/globals.js'
 
 const dirname = path.dirname(fileURLToPath(import.meta.url))
 
@@ -72,11 +71,6 @@ function renderComponentWithJSDOM(componentName, params, callBlock) {
       lstripBlocks: true
     }
   )
-
-  // Add filters and globals
-  Object.entries(globals).forEach(([name, global]) => {
-    nunjucksTestEnv.addGlobal(name, global)
-  })
 
   Object.entries(filters).forEach(([name, filter]) => {
     nunjucksTestEnv.addFilter(name, filter)

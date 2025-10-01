@@ -4,7 +4,11 @@ import {
   SAME_ACTIVITY_DATES_VIEW_ROUTE
 } from './controller.js'
 import * as cacheUtils from '~/src/server/common/helpers/session-cache/utils.js'
-import { mockExemption, mockSite } from '~/src/server/test-helpers/mocks.js'
+import {
+  mockExemption,
+  mockFileUploadExemption,
+  mockSite
+} from '~/src/server/test-helpers/mocks.js'
 import { routes } from '~/src/server/common/constants/routes.js'
 
 jest.mock('~/src/server/common/helpers/session-cache/utils.js')
@@ -174,9 +178,10 @@ describe('#sameActivityDates', () => {
       expect(h.view().takeover).toHaveBeenCalled()
     })
 
-    test('Should correctly output page with no error data in object', () => {
+    test('Should correctly output page with no error data in object for manual uploads', () => {
       const request = {
-        payload: { sameActivityDates: 'invalid' }
+        payload: { sameActivityDates: 'invalid' },
+        site: { siteDetails: mockExemption.siteDetails[0] }
       }
 
       const h = {
@@ -195,6 +200,37 @@ describe('#sameActivityDates', () => {
         pageTitle: 'Are the activity dates the same for every site?',
         heading: 'Are the activity dates the same for every site?',
         backLink: routes.SITE_NAME,
+        projectName: 'Test Project',
+        payload: { sameActivityDates: 'invalid' }
+      })
+
+      expect(h.view().takeover).toHaveBeenCalled()
+    })
+
+    test('Should correctly output page with no error data in object for file uploads', () => {
+      const request = {
+        payload: { sameActivityDates: 'invalid' },
+        site: { siteDetails: mockFileUploadExemption.siteDetails[0] }
+      }
+
+      getExemptionCacheSpy.mockReturnValue(mockFileUploadExemption)
+
+      const h = {
+        view: jest.fn().mockReturnValue({
+          takeover: jest.fn()
+        })
+      }
+
+      sameActivityDatesSubmitController.options.validate.failAction(
+        request,
+        h,
+        {}
+      )
+
+      expect(h.view).toHaveBeenCalledWith(SAME_ACTIVITY_DATES_VIEW_ROUTE, {
+        pageTitle: 'Are the activity dates the same for every site?',
+        heading: 'Are the activity dates the same for every site?',
+        backLink: routes.FILE_UPLOAD,
         projectName: 'Test Project',
         payload: { sameActivityDates: 'invalid' }
       })

@@ -8,6 +8,7 @@
 {# Import custom components globally #}
 {% from "heading/macro.njk" import appHeading %}
 {% from "back-link-history/macro.njk" import appBackLinkHistory %}
+{% from "organisation-heading/macro.njk" import appOrganisationHeading %}
 {% from "contact-details/macro.njk" import appContactDetails %}
 
 {% set mainClasses = "app-main-wrapper" %}
@@ -31,7 +32,7 @@
 
 {% block header %}
   {% include "partials/cookie-banner.njk" %}
-  
+
   {{ govukHeader({
     homepageUrl: "https://www.gov.uk/",
     classes: "govuk-header--full-width-border",
@@ -66,6 +67,9 @@
     html: 'This is a new service. Help us improve it and <a class="govuk-link" target="_blank" rel="noopener noreferrer" href="https://defragroup.eu.qualtrics.com/jfe/form/SV_8p5Cle8p7Yov9FI">give your feedback (opens in new tab)</a>.'
   }) }}
   </div>
+  {{ appOrganisationHeading({
+    applicantOrganisationName: commonPageViewData.applicantOrganisationName
+  }) }}
 {% endblock %}
 
 {% block content %}{% endblock %}

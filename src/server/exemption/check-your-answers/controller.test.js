@@ -314,7 +314,8 @@ describe('check your answers controller', () => {
     test('Should handle getUserSession throwing an error', async () => {
       jest
         .spyOn(authUtils, 'getUserSession')
-        .mockRejectedValueOnce(new Error('Session retrieval failed'))
+        .mockResolvedValueOnce(mockUserSession) // used by server prehandler
+        .mockRejectedValueOnce(new Error('Session retrieval failed')) // used by controller
 
       const { statusCode } = await makePostRequest({
         url: '/exemption/check-your-answers',

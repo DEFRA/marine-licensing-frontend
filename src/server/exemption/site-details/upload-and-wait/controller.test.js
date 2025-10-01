@@ -123,7 +123,7 @@ const expectSuccessfulFileProcessing = (
     expect.any(Object),
     expect.any(Object),
     expect.any(Object),
-    isMultipleSites
+    { isMultipleSitesFile: isMultipleSites }
   )
 }
 

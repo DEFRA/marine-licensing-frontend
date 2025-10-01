@@ -399,7 +399,7 @@ describe('#utils', () => {
         mockStatus,
         mockCoordinateData,
         mockS3Location,
-        false
+        { isMultipleSitesFile: false }
       )
 
       const expected = {
@@ -486,7 +486,7 @@ describe('#utils', () => {
         mockStatus,
         mockCoordinateData,
         mockS3Location,
-        true
+        { isMultipleSitesFile: true }
       )
 
       const expected = [
@@ -575,7 +575,7 @@ describe('#utils', () => {
         mockStatus,
         mockCoordinateData,
         mockS3Location,
-        false
+        { isMultipleSitesFile: false }
       )
 
       const expected = {

@@ -86,15 +86,17 @@ export const resetExemptionSiteDetails = (request) => {
  * @param { object } status - Upload status response from CDP
  * @param { object } coordinateData - Extracted coordinate data
  * @param { object } s3Location - S3 location details
- * @param { boolean } isMultipleSitesFile - Is the upload for multiple sites
+ * @param { object } options - Configuration options
+ * @param { boolean } options.isMultipleSitesFile - Is the upload for multiple sites
  */
 export const updateExemptionSiteDetailsBatch = (
   request,
   status,
   coordinateData,
   s3Location,
-  isMultipleSitesFile
+  options
 ) => {
+  const { isMultipleSitesFile } = options
   const existingCache = getExemptionCache(request)
 
   const firstSiteDetails = getSiteDetailsBySite(existingCache)

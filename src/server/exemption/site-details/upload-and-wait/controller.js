@@ -271,13 +271,9 @@ function storeSuccessfulUpload(request, status, coordinateData, s3Location) {
     isMultipleSitesFile(coordinateData)
   )
 
-  updateExemptionSiteDetailsBatch(
-    request,
-    status,
-    coordinateData,
-    s3Location,
-    isMultipleSitesFile(coordinateData)
-  )
+  updateExemptionSiteDetailsBatch(request, status, coordinateData, s3Location, {
+    isMultipleSitesFile: isMultipleSitesFile(coordinateData)
+  })
 }
 
 /**

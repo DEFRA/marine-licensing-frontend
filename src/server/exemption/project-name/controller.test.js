@@ -8,6 +8,7 @@ import {
 } from '~/src/server/exemption/project-name/controller.js'
 import * as cacheUtils from '~/src/server/common/helpers/session-cache/utils.js'
 import * as authRequests from '~/src/server/common/helpers/authenticated-requests.js'
+import * as authUtils from '~/src/server/common/plugins/auth/utils.js'
 import { setupTestServer } from '~/tests/integration/shared/test-setup-helpers.js'
 import {
   makeGetRequest,
@@ -15,6 +16,7 @@ import {
 } from '~/src/server/test-helpers/server-requests.js'
 
 jest.mock('~/src/server/common/helpers/session-cache/utils.js')
+jest.mock('~/src/server/common/plugins/auth/utils.js')
 
 describe('#projectName', () => {
   const getServer = setupTestServer()
@@ -30,6 +32,11 @@ describe('#projectName', () => {
     getExemptionCacheSpy = jest
       .spyOn(cacheUtils, 'getExemptionCache')
       .mockReturnValue(mockExemptionState)
+
+    jest.spyOn(authUtils, 'getUserSession').mockResolvedValue({
+      applicantOrganisationId: 'test-org-id',
+      applicantOrganisationName: 'Test Organisation Ltd'
+    })
   })
 
   describe('#projectNameController', () => {
@@ -62,7 +69,9 @@ describe('#projectName', () => {
         `/exemption/project-name`,
         expect.objectContaining({
           projectName: 'Project name',
-          mcmsContext: null
+          mcmsContext: null,
+          applicantOrganisationId: 'test-org-id',
+          applicantOrganisationName: 'Test Organisation Ltd'
         })
       )
 
@@ -273,7 +282,9 @@ describe('#projectName', () => {
           article: '17',
           pdfDownloadUrl: 'https://example.com/test.pdf'
         },
-        projectName: 'Project name'
+        projectName: 'Project name',
+        applicantOrganisationId: 'test-org-id',
+        applicantOrganisationName: 'Test Organisation Ltd'
       })
     })
 
@@ -291,6 +302,33 @@ describe('#projectName', () => {
       await projectNameSubmitController.handler(mockRequest, h)
 
       expect(mockRequest.yar.flash).toHaveBeenCalledWith('mcmsContext')
+    })
+
+    test('Should handle missing organisation data when creating a new exemption', async () => {
+      jest.spyOn(authUtils, 'getUserSession').mockResolvedValue({})
+
+      const apiPostMock = jest.spyOn(authRequests, 'authenticatedPostRequest')
+      apiPostMock.mockResolvedValueOnce({
+        res: { statusCode: 200 },
+        payload: { data: 'test' }
+      })
+
+      const { statusCode } = await makePostRequest({
+        url: routes.PROJECT_NAME,
+        server: getServer(),
+        formData: { projectName: 'Project name' }
+      })
+
+      expect(authRequests.authenticatedPostRequest).toHaveBeenCalledWith(
+        expect.any(Object),
+        `/exemption/project-name`,
+        expect.objectContaining({
+          projectName: 'Project name',
+          mcmsContext: null
+        })
+      )
+
+      expect(statusCode).toBe(302)
     })
   })
 })

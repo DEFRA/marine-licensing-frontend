@@ -1,13 +1,30 @@
 import { exemption } from '~/src/server/exemption/index.js'
+import { getPageViewCommonData } from '~/src/server/common/helpers/page-view-common-data.js'
+
+jest.mock('~/src/server/common/helpers/page-view-common-data.js')
 
 describe('exemption route', () => {
+  beforeEach(() => {
+    jest.clearAllMocks()
+  })
+
   test('route is registered correctly', () => {
     const server = {
-      route: jest.fn()
+      route: jest.fn(),
+      ext: jest.fn()
     }
 
     exemption.plugin.register(server)
 
+    expect(server.ext).toHaveBeenCalledTimes(2)
+    expect(server.ext).toHaveBeenCalledWith(
+      'onPreHandler',
+      expect.any(Function)
+    )
+    expect(server.ext).toHaveBeenCalledWith(
+      'onPreResponse',
+      expect.any(Function)
+    )
     expect(server.route).toHaveBeenCalledTimes(1)
     expect(server.route).toHaveBeenCalledWith([
       expect.objectContaining({
@@ -229,7 +246,8 @@ describe('exemption route', () => {
     expect.assertions(1)
 
     const server = {
-      route: jest.fn()
+      route: jest.fn(),
+      ext: jest.fn()
     }
 
     exemption.plugin.register(server)
@@ -248,5 +266,117 @@ describe('exemption route', () => {
     exemptionRoute.handler(mockRequest, mockToolkit)
 
     expect(mockToolkit.redirect).toHaveBeenCalledWith('/exemption/project-name')
+  })
+
+  test('onPreHandler extension should set commonPageViewData', async () => {
+    getPageViewCommonData.mockResolvedValue({
+      applicantOrganisationName: 'Test Organisation'
+    })
+
+    const server = {
+      route: jest.fn(),
+      ext: jest.fn()
+    }
+
+    exemption.plugin.register(server)
+
+    const onPreHandlerCallback = server.ext.mock.calls.find(
+      (call) => call[0] === 'onPreHandler'
+    )[1]
+
+    const mockRequest = { app: {}, state: { userSession: 'mockSession' } }
+    const mockH = { continue: 'continue' }
+
+    const result = await onPreHandlerCallback(mockRequest, mockH)
+
+    expect(getPageViewCommonData).toHaveBeenCalledWith(mockRequest)
+    expect(mockRequest.app.commonPageViewData).toEqual({
+      applicantOrganisationName: 'Test Organisation'
+    })
+    expect(result).toBe('continue')
+  })
+
+  test('onPreHandler extension should handle no user session', async () => {
+    getPageViewCommonData.mockResolvedValue({})
+
+    const server = {
+      route: jest.fn(),
+      ext: jest.fn()
+    }
+
+    exemption.plugin.register(server)
+
+    const onPreHandlerCallback = server.ext.mock.calls.find(
+      (call) => call[0] === 'onPreHandler'
+    )[1]
+
+    const mockRequest = { app: {}, state: {} }
+    const mockH = { continue: 'continue' }
+
+    const result = await onPreHandlerCallback(mockRequest, mockH)
+
+    expect(getPageViewCommonData).toHaveBeenCalledWith(mockRequest)
+    expect(mockRequest.app.commonPageViewData).toEqual({})
+    expect(result).toBe('continue')
+  })
+
+  test('onPreResponse extension should merge context for view responses', () => {
+    const server = {
+      route: jest.fn(),
+      ext: jest.fn()
+    }
+
+    exemption.plugin.register(server)
+
+    const onPreResponseCallback = server.ext.mock.calls.find(
+      (call) => call[0] === 'onPreResponse'
+    )[1]
+
+    const mockRequest = { app: { testAppData: 'value' } }
+    const mockResponse = {
+      variety: 'view',
+      source: {
+        context: { existingContext: 'data' }
+      }
+    }
+    const mockH = { continue: 'continue' }
+
+    const result = onPreResponseCallback(
+      { ...mockRequest, response: mockResponse },
+      mockH
+    )
+
+    expect(mockResponse.source.context).toEqual({
+      testAppData: 'value',
+      existingContext: 'data'
+    })
+    expect(result).toBe('continue')
+  })
+
+  test('onPreResponse extension should handle non-view responses', () => {
+    const server = {
+      route: jest.fn(),
+      ext: jest.fn()
+    }
+
+    exemption.plugin.register(server)
+
+    const onPreResponseCallback = server.ext.mock.calls.find(
+      (call) => call[0] === 'onPreResponse'
+    )[1]
+
+    const mockRequest = { app: { testAppData: 'value' } }
+    const mockResponse = {
+      variety: 'plain',
+      source: { context: { existingContext: 'data' } }
+    }
+    const mockH = { continue: 'continue' }
+
+    const result = onPreResponseCallback(
+      { ...mockRequest, response: mockResponse },
+      mockH
+    )
+
+    expect(result).toBe('continue')
   })
 })

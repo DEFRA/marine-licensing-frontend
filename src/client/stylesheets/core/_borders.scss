@@ -1,0 +1,5 @@
+@use 'govuk-frontend' as *;
+
+.app-border-bottom {
+  border-bottom: 1px solid $govuk-border-colour;
+}

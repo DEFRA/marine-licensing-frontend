@@ -11,6 +11,7 @@ import { routes } from '~/src/server/common/constants/routes.js'
 import { dashboardRoutes } from './dashboard/index.js'
 import { deleteExemptionRoutes } from './delete/index.js'
 import { viewExemptionInternalUserRoutes } from '~/src/server/exemption/view-exemption-internal-user/index.js'
+import { getPageViewCommonData } from '~/src/server/common/helpers/page-view-common-data.js'
 
 /**
  * Sets up the routes used in the exemption home page.
@@ -24,6 +25,22 @@ export const exemption = {
   plugin: {
     name: 'exemption',
     register(server) {
+      server.ext('onPreHandler', async (request, h) => {
+        request.app.commonPageViewData = await getPageViewCommonData(request)
+        return h.continue
+      })
+
+      server.ext('onPreResponse', (request, h) => {
+        const response = request.response
+        if (response.variety === 'view') {
+          response.source.context = {
+            ...(request.app || {}),
+            ...(response.source.context || {})
+          }
+        }
+        return h.continue
+      })
+
       server.route([
         ...projectNameRoutes,
         ...publicRegisterRoutes,

@@ -20,7 +20,7 @@ describe('#signOutController', () => {
   const getServer = setupTestServer()
 
   test('should render the project name page when no auth user', async () => {
-    getUserSession.mockReturnValueOnce(null)
+    getUserSession.mockReturnValue(null)
 
     const { statusCode, headers } = await makeGetRequest({
       url: routes.SIGN_OUT,
@@ -32,7 +32,7 @@ describe('#signOutController', () => {
   })
 
   test('should render remove session and redirect when user is logged in', async () => {
-    getUserSession.mockReturnValueOnce({
+    getUserSession.mockReturnValue({
       logoutUrl: 'testLogout',
       idToken: 'testId'
     })

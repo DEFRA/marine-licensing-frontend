@@ -16,8 +16,7 @@ Core delivery platform Node.js Frontend Template.
   - [Production](#production)
   - [Npm scripts](#npm-scripts)
   - [Update dependencies](#update-dependencies)
-  - [Code Analysis with Knip](#code-analysis-with-knip)
-  - [Mutation Testing](#mutation-testing)
+- [Code Analysis with Knip](#code-analysis-with-knip)
   - [Formatting](#formatting)
     - [Windows prettier issue](#windows-prettier-issue)
 - [Docker](#docker)
@@ -153,47 +152,6 @@ Benefits of using knip:
 - Helps prevent version conflicts and security vulnerabilities from unused packages
 
 For automatic fixes, knip can remove unused code with the `--fix` flag, though this should be used with caution and proper version control.
-
-### Mutation Testing
-
-We use [Stryker](https://stryker-mutator.io/) for mutation testing to assess the quality of our test suite by introducing small code changes (mutations) and verifying that tests catch them.
-
-To run mutation testing:
-
-```bash
-npm run test:mutation
-```
-
-#### Configuration
-
-The mutation testing is configured in `stryker.conf.cjs` with the following key settings:
-
-**Files to mutate:**
-
-- All JavaScript files in `src/` directory
-- Excludes test files (`*.test.js`, `*.spec.js`)
-- Excludes test helpers in `src/server/test-helpers/`
-- Excludes problematic files that cause issues during mutation
-
-**Test runner settings:**
-
-- Uses Jest as the test runner with our existing `jest.config.js`
-- Enables per-test coverage analysis for more precise mutation testing
-- Disables `findRelatedTests` for better performance
-
-**Output and reporting:**
-
-- Generates HTML report in `reports/mutation/mutation.html`
-- Provides clear-text and progress output during execution
-- Runs with 4 concurrent workers for optimal performance
-
-**Quality thresholds:**
-
-- High threshold: 80% (good mutation score)
-- Low threshold: 60% (minimum acceptable score)
-- No break threshold (won't fail the build)
-
-Reports help identify areas where test coverage could be improved by showing which mutations weren't caught by existing tests.
 
 ### Formatting
 

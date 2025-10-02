@@ -16,6 +16,7 @@
   {{ appSiteDetailsDataScript(siteDetailsData) }}
 {% endblock %}
 {% block beforeContent %}
+  {{ super() }}
   <nav>
     {{ govukBackLink({
         text: "Go back to your project",

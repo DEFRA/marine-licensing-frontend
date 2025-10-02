@@ -1,4 +1,4 @@
-import { jest } from '@jest/globals'
+import { vi } from 'vitest'
 import { isPast } from 'date-fns'
 import { validateUserSession } from './validate.js'
 import { setupTestServer } from '~/tests/integration/shared/test-setup-helpers.js'
@@ -6,17 +6,17 @@ import { setupTestServer } from '~/tests/integration/shared/test-setup-helpers.j
 import * as authUtils from '~/src/server/common/plugins/auth/utils.js'
 import { AUTH_STRATEGIES } from '~/src/server/common/constants/auth.js'
 
-jest.mock('~/src/server/common/plugins/auth/utils.js', () => ({
-  getUserSession: jest.fn(),
-  removeUserSession: jest.fn(),
-  refreshAccessToken: jest.fn(),
-  updateUserSession: jest.fn()
+vi.mock('~/src/server/common/plugins/auth/utils.js', () => ({
+  getUserSession: vi.fn(),
+  removeUserSession: vi.fn(),
+  refreshAccessToken: vi.fn(),
+  updateUserSession: vi.fn()
 }))
 
-jest.mock('date-fns', () => ({
-  isPast: jest.fn(),
-  parseISO: jest.fn(),
-  subMinutes: jest.fn()
+vi.mock('date-fns', () => ({
+  isPast: vi.fn(),
+  parseISO: vi.fn(),
+  subMinutes: vi.fn()
 }))
 
 describe('validateUserSession', () => {

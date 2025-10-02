@@ -1,3 +1,4 @@
+import { vi } from 'vitest'
 import {
   mockExemption,
   setupTestServer
@@ -6,7 +7,7 @@ import { routes } from '~/src/server/common/constants/routes.js'
 import { loadPage } from '~/tests/integration/shared/app-server.js'
 import { within } from '@testing-library/dom'
 
-jest.mock('~/src/server/common/helpers/authenticated-requests.js')
+vi.mock('~/src/server/common/helpers/authenticated-requests.js')
 
 describe('Delete site', () => {
   const getServer = setupTestServer()

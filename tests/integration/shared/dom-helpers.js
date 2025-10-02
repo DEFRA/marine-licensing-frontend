@@ -1,10 +1,6 @@
-/**
- * DOM manipulation and assertion helpers for integration tests
- * Provides utilities for common DOM operations and validations
- * @jest-environment jsdom
- */
+// @vitest-environment jsdom
 
-/* eslint-env jest */
+/* eslint-env vitest */
 
 import { within } from '@testing-library/dom'
 

@@ -1,3 +1,4 @@
+import { vi } from 'vitest'
 import { statusCodes } from '~/src/server/common/constants/status-codes.js'
 import { routes } from '~/src/server/common/constants/routes.js'
 import { mockExemption } from '~/src/server/test-helpers/mocks.js'
@@ -15,8 +16,8 @@ import {
   makePostRequest
 } from '~/src/server/test-helpers/server-requests.js'
 
-jest.mock('~/src/server/common/helpers/session-cache/utils.js')
-jest.mock('~/src/server/common/plugins/auth/utils.js')
+vi.mock('~/src/server/common/helpers/session-cache/utils.js')
+vi.mock('~/src/server/common/plugins/auth/utils.js')
 
 describe('#projectName', () => {
   const getServer = setupTestServer()
@@ -25,15 +26,15 @@ describe('#projectName', () => {
   const mockExemptionState = { projectName: 'Test Project' }
 
   beforeEach(() => {
-    jest
-      .spyOn(authRequests, 'authenticatedPostRequest')
-      .mockReturnValue({ payload: { id: mockExemption.id } })
+    vi.spyOn(authRequests, 'authenticatedPostRequest').mockReturnValue({
+      payload: { id: mockExemption.id }
+    })
 
-    getExemptionCacheSpy = jest
+    getExemptionCacheSpy = vi
       .spyOn(cacheUtils, 'getExemptionCache')
       .mockReturnValue(mockExemptionState)
 
-    jest.spyOn(authUtils, 'getUserSession').mockResolvedValue({
+    vi.spyOn(authUtils, 'getUserSession').mockResolvedValue({
       applicantOrganisationId: 'test-org-id',
       applicantOrganisationName: 'Test Organisation Ltd'
     })
@@ -52,7 +53,7 @@ describe('#projectName', () => {
 
   describe('#projectNameSubmitController', () => {
     test('Should correctly create new project and redirect to the next page on success', async () => {
-      const apiPostMock = jest.spyOn(authRequests, 'authenticatedPostRequest')
+      const apiPostMock = vi.spyOn(authRequests, 'authenticatedPostRequest')
       apiPostMock.mockResolvedValueOnce({
         res: { statusCode: 200 },
         payload: { data: 'test' }
@@ -83,7 +84,7 @@ describe('#projectName', () => {
     test('Should correctly update existing project and redirect to the next page on success', async () => {
       getExemptionCacheSpy.mockReturnValueOnce(mockExemption)
 
-      const apiPatchMock = jest.spyOn(authRequests, 'authenticatedPatchRequest')
+      const apiPatchMock = vi.spyOn(authRequests, 'authenticatedPatchRequest')
       apiPatchMock.mockResolvedValue({
         payload: { projectName: 'Project name' }
       })
@@ -106,7 +107,7 @@ describe('#projectName', () => {
     })
 
     test('Should pass error to global catchAll behaviour if it is not a validation error', async () => {
-      const apiPostMock = jest.spyOn(authRequests, 'authenticatedPostRequest')
+      const apiPostMock = vi.spyOn(authRequests, 'authenticatedPostRequest')
       apiPostMock.mockRejectedValueOnce({
         res: { statusCode: 500 },
         data: {}
@@ -133,8 +134,8 @@ describe('#projectName', () => {
       }
 
       const h = {
-        view: jest.fn().mockReturnValue({
-          takeover: jest.fn()
+        view: vi.fn().mockReturnValue({
+          takeover: vi.fn()
         })
       }
 
@@ -179,8 +180,8 @@ describe('#projectName', () => {
       }
 
       const h = {
-        view: jest.fn().mockReturnValue({
-          takeover: jest.fn()
+        view: vi.fn().mockReturnValue({
+          takeover: vi.fn()
         })
       }
 
@@ -205,8 +206,8 @@ describe('#projectName', () => {
       }
 
       const h = {
-        view: jest.fn().mockReturnValue({
-          takeover: jest.fn()
+        view: vi.fn().mockReturnValue({
+          takeover: vi.fn()
         })
       }
 
@@ -222,7 +223,7 @@ describe('#projectName', () => {
     })
 
     test('Should not call the back end when payload data is empty', async () => {
-      const apiPostMock = jest.spyOn(authRequests, 'authenticatedPostRequest')
+      const apiPostMock = vi.spyOn(authRequests, 'authenticatedPostRequest')
 
       await makePostRequest({
         url: routes.PROJECT_NAME,
@@ -235,19 +236,19 @@ describe('#projectName', () => {
 
     test('Should correctly set the cache when submitting a project name', async () => {
       const h = {
-        redirect: jest.fn().mockReturnValue({
-          takeover: jest.fn()
+        redirect: vi.fn().mockReturnValue({
+          takeover: vi.fn()
         }),
-        view: jest.fn()
+        view: vi.fn()
       }
 
       const mockRequest = {
         payload: { projectName: 'Project name' },
         yar: {
-          flash: jest.fn().mockReturnValue([])
+          flash: vi.fn().mockReturnValue([])
         },
         url: 'http://example.com/project-name',
-        logger: { error: jest.fn() }
+        logger: { error: vi.fn() }
       }
 
       await projectNameSubmitController.handler(mockRequest, h)
@@ -258,8 +259,8 @@ describe('#projectName', () => {
     })
 
     test('Should correctly retrieve cached MCMS context when creating a new exemption', async () => {
-      const h = { redirect: jest.fn() }
-      const apiPostMock = jest.spyOn(authRequests, 'authenticatedPostRequest')
+      const h = { redirect: vi.fn() }
+      const apiPostMock = vi.spyOn(authRequests, 'authenticatedPostRequest')
       const mockMcmsContext = {
         activityType: 'CON',
         activitySubtype: 'maintenance',
@@ -269,7 +270,7 @@ describe('#projectName', () => {
       const mockRequest = {
         payload: { projectName: 'Project name' },
         yar: {
-          flash: jest.fn().mockReturnValue([mockMcmsContext])
+          flash: vi.fn().mockReturnValue([mockMcmsContext])
         }
       }
 
@@ -289,14 +290,14 @@ describe('#projectName', () => {
     })
 
     test('Should handle missing MCMS context when creating a new exemption', async () => {
-      const h = { redirect: jest.fn() }
+      const h = { redirect: vi.fn() }
       const mockRequest = {
         payload: { projectName: 'Project name' },
         yar: {
-          flash: jest.fn().mockReturnValue([])
+          flash: vi.fn().mockReturnValue([])
         },
         url: 'http://example.com/project-name',
-        logger: { error: jest.fn() }
+        logger: { error: vi.fn() }
       }
 
       await projectNameSubmitController.handler(mockRequest, h)
@@ -305,9 +306,9 @@ describe('#projectName', () => {
     })
 
     test('Should handle missing organisation data when creating a new exemption', async () => {
-      jest.spyOn(authUtils, 'getUserSession').mockResolvedValue({})
+      vi.spyOn(authUtils, 'getUserSession').mockResolvedValue({})
 
-      const apiPostMock = jest.spyOn(authRequests, 'authenticatedPostRequest')
+      const apiPostMock = vi.spyOn(authRequests, 'authenticatedPostRequest')
       apiPostMock.mockResolvedValueOnce({
         res: { statusCode: 200 },
         payload: { data: 'test' }

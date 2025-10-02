@@ -1,3 +1,4 @@
+import { vi } from 'vitest'
 import {
   getUserSession,
   removeUserSession,
@@ -9,11 +10,11 @@ import { getOpenIdRefreshToken } from './get-oidc-config.js'
 import jwt from '@hapi/jwt'
 import { addSeconds } from 'date-fns'
 
-jest.mock('~/src/config/config.js')
-jest.mock('./get-oidc-config.js')
-jest.mock('@hapi/jwt')
-jest.mock('date-fns', () => ({
-  addSeconds: jest.fn()
+vi.mock('~/src/config/config.js')
+vi.mock('./get-oidc-config.js')
+vi.mock('@hapi/jwt')
+vi.mock('date-fns', () => ({
+  addSeconds: vi.fn()
 }))
 
 describe('#utils', () => {
@@ -22,11 +23,9 @@ describe('#utils', () => {
   let mockAuthedUser
   let mockRefreshedSession
 
-  const mockedGetOpenIdRefreshToken = jest.mocked(getOpenIdRefreshToken)
+  const mockedGetOpenIdRefreshToken = vi.mocked(getOpenIdRefreshToken)
 
   beforeEach(() => {
-    jest.clearAllMocks()
-
     config.get.mockImplementation(() => ({
       clientId: 'test-client-id',
       clientSecret: 'test-client-secret',
@@ -38,17 +37,17 @@ describe('#utils', () => {
       server: {
         app: {
           cache: {
-            get: jest.fn(),
-            drop: jest.fn(),
-            set: jest.fn()
+            get: vi.fn(),
+            drop: vi.fn(),
+            set: vi.fn()
           }
         }
       },
       cookieAuth: {
-        clear: jest.fn()
+        clear: vi.fn()
       },
       logger: {
-        setBindings: jest.fn()
+        setBindings: vi.fn()
       },
       state: {
         userSession: {
@@ -102,7 +101,7 @@ describe('#utils', () => {
 
     const mockDate = new Date('2023-01-01T12:00:00Z')
     addSeconds.mockReturnValue(mockDate)
-    mockDate.toISOString = jest.fn().mockReturnValue('2023-01-01T12:00:00.000Z')
+    mockDate.toISOString = vi.fn().mockReturnValue('2023-01-01T12:00:00.000Z')
 
     mockedGetOpenIdRefreshToken.mockResolvedValue(mockRefreshedSession)
   })

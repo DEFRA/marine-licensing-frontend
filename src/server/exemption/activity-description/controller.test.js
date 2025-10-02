@@ -1,3 +1,4 @@
+import { vi } from 'vitest'
 import { setupTestServer } from '~/tests/integration/shared/test-setup-helpers.js'
 import { statusCodes } from '~/src/server/common/constants/status-codes.js'
 import { routes } from '~/src/server/common/constants/routes.js'
@@ -17,7 +18,7 @@ import * as cacheUtils from '~/src/server/common/helpers/session-cache/utils.js'
 import * as authRequests from '~/src/server/common/helpers/authenticated-requests.js'
 import { getByRole } from '@testing-library/dom'
 
-jest.mock('~/src/server/common/helpers/session-cache/utils.js')
+vi.mock('~/src/server/common/helpers/session-cache/utils.js')
 
 describe('#activityDescriptionController', () => {
   const getServer = setupTestServer()
@@ -27,11 +28,11 @@ describe('#activityDescriptionController', () => {
   const mockExemptionState = {}
 
   beforeEach(() => {
-    jest
-      .spyOn(authRequests, 'authenticatedPatchRequest')
-      .mockResolvedValue({ payload: { id: mockExemption.id } })
+    vi.spyOn(authRequests, 'authenticatedPatchRequest').mockResolvedValue({
+      payload: { id: mockExemption.id }
+    })
 
-    getExemptionCacheSpy = jest
+    getExemptionCacheSpy = vi
       .spyOn(cacheUtils, 'getExemptionCache')
       .mockReturnValue(mockExemptionState)
   })
@@ -64,7 +65,7 @@ describe('#activityDescriptionController', () => {
     })
 
     test('handler should render with correct context', () => {
-      const h = { view: jest.fn() }
+      const h = { view: vi.fn() }
 
       activityDescriptionController.handler(request, h)
 
@@ -100,7 +101,7 @@ describe('#activityDescriptionController', () => {
     })
 
     test('handler should render with correct context for site details flow', () => {
-      const h = { view: jest.fn() }
+      const h = { view: vi.fn() }
       const request = {
         url: { pathname: routes.SITE_DETAILS_ACTIVITY_DESCRIPTION }
       }
@@ -132,7 +133,7 @@ describe('#activityDescriptionController', () => {
 
   describe('activityDescriptionController POST', () => {
     test('should handle form submission with valid data', async () => {
-      const apiPatchMock = jest.spyOn(authRequests, 'authenticatedPatchRequest')
+      const apiPatchMock = vi.spyOn(authRequests, 'authenticatedPatchRequest')
       const payload = {
         activityDescription: 'This is a test activity description.'
       }
@@ -161,7 +162,7 @@ describe('#activityDescriptionController', () => {
     })
 
     test('should call updateExemptionSiteDetails when in site details flow', async () => {
-      const mockedUpdateExemptionSiteDetails = jest.mocked(
+      const mockedUpdateExemptionSiteDetails = vi.mocked(
         cacheUtils.updateExemptionSiteDetails
       )
 
@@ -238,7 +239,7 @@ describe('#activityDescriptionController', () => {
     })
 
     test('should pass error to global catchAll handler', async () => {
-      const apiPatchMock = jest.spyOn(authRequests, 'authenticatedPatchRequest')
+      const apiPatchMock = vi.spyOn(authRequests, 'authenticatedPatchRequest')
       apiPatchMock.mockRejectedValueOnce({
         res: { statusCode: 500 },
         data: {}
@@ -264,8 +265,8 @@ describe('#activityDescriptionController', () => {
       }
 
       const h = {
-        view: jest.fn().mockReturnThis(),
-        takeover: jest.fn()
+        view: vi.fn().mockReturnThis(),
+        takeover: vi.fn()
       }
 
       const err = {
@@ -318,8 +319,8 @@ describe('#activityDescriptionController', () => {
       }
 
       const h = {
-        view: jest.fn().mockReturnThis(),
-        takeover: jest.fn()
+        view: vi.fn().mockReturnThis(),
+        takeover: vi.fn()
       }
 
       const err = {}
@@ -334,7 +335,7 @@ describe('#activityDescriptionController', () => {
     })
 
     test('should show error message with empty activity description', async () => {
-      const apiPatchMock = jest.spyOn(authRequests, 'authenticatedPatchRequest')
+      const apiPatchMock = vi.spyOn(authRequests, 'authenticatedPatchRequest')
       const fakeError = new Error('Bad Request')
       fakeError.data = {
         payload: {

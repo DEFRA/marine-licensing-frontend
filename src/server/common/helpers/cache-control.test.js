@@ -1,3 +1,4 @@
+import { vi } from 'vitest'
 import { setPageCacheControlHeaders } from './cache-control.js'
 
 describe('setPageCacheControlHeaders', () => {
@@ -7,7 +8,7 @@ describe('setPageCacheControlHeaders', () => {
 
   beforeEach(() => {
     mockResponse = {
-      header: jest.fn().mockReturnThis()
+      header: vi.fn().mockReturnThis()
     }
     mockRequest = {
       path: '/test',

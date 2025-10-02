@@ -1,3 +1,4 @@
+import { vi } from 'vitest'
 import { setupTestServer } from '~/tests/integration/shared/test-setup-helpers.js'
 import {
   beforeYouStartController,
@@ -10,18 +11,18 @@ import { statusCodes } from '~/src/server/common/constants/status-codes.js'
 import { config } from '~/src/config/config.js'
 import { routes } from '~/src/server/common/constants/routes.js'
 
-jest.mock('~/src/server/common/helpers/session-cache/utils.js')
+vi.mock('~/src/server/common/helpers/session-cache/utils.js')
 
 describe('#beforeYouStart', () => {
   const getServer = setupTestServer()
 
   beforeEach(() => {
-    jest.mocked(getExemptionCache).mockReturnValue(mockExemption)
+    vi.mocked(getExemptionCache).mockReturnValue(mockExemption)
   })
 
   describe('#beforeYouStartController', () => {
     test('beforeYouStartController handler should render with correct context', () => {
-      const h = { view: jest.fn() }
+      const h = { view: vi.fn() }
 
       beforeYouStartController.handler({}, h)
 

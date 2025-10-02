@@ -1,9 +1,10 @@
+import { vi } from 'vitest'
 import { about } from '~/src/server/about/index.js'
 
 describe('about route', () => {
   test('route is registered correctly', () => {
     const server = {
-      route: jest.fn()
+      route: vi.fn()
     }
 
     about.plugin.register(server)

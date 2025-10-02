@@ -1,3 +1,4 @@
+import { vi } from 'vitest'
 import { FilenameHandler } from './filename-handler.js'
 import rfc2047 from 'rfc2047'
 
@@ -6,12 +7,10 @@ describe('FilenameHandler', () => {
   let mockLogger
 
   beforeEach(() => {
-    jest.clearAllMocks()
-
     mockLogger = {
-      info: jest.fn(),
-      warn: jest.fn(),
-      error: jest.fn()
+      info: vi.fn(),
+      warn: vi.fn(),
+      error: vi.fn()
     }
 
     filenameHandler = new FilenameHandler(mockLogger)
@@ -69,7 +68,7 @@ describe('FilenameHandler', () => {
     })
 
     it('handles an error thrown', () => {
-      jest.spyOn(rfc2047, 'decode').mockImplementation(() => {
+      vi.spyOn(rfc2047, 'decode').mockImplementation(() => {
         throw new Error('invalid encoding')
       })
       const fname = filenameHandler.decodeRfc2047Filename(

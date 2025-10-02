@@ -1,10 +1,9 @@
+import { vi } from 'vitest'
 import { JSDOM } from 'jsdom'
 import { getByText, within } from '@testing-library/dom'
 import { COORDINATE_SYSTEMS } from '~/src/server/common/constants/exemptions.js'
 import { routes } from '~/src/server/common/constants/routes.js'
 import { statusCodes } from '~/src/server/common/constants/status-codes.js'
-import * as authRequests from '~/src/server/common/helpers/authenticated-requests.js'
-import * as cacheUtils from '~/src/server/common/helpers/session-cache/utils.js'
 import * as coordinateUtils from '~/src/server/common/helpers/coordinate-utils.js'
 import { testScenarios } from './polygon-fixtures.js'
 
@@ -12,11 +11,12 @@ import {
   makeGetRequest,
   makePostRequest
 } from '~/src/server/test-helpers/server-requests.js'
-import { setupTestServer } from '~/tests/integration/shared/test-setup-helpers.js'
+import {
+  mockExemption,
+  setupTestServer
+} from '~/tests/integration/shared/test-setup-helpers.js'
 
-jest.mock('~/src/server/common/helpers/session-cache/utils.js')
-jest.mock('~/src/server/common/helpers/coordinate-utils.js')
-jest.mock('~/src/server/common/helpers/authenticated-requests.js')
+vi.mock('~/src/server/common/helpers/coordinate-utils.js')
 
 const getSiteDetailsCard = (document, expected, siteIndex = 0) => {
   const cardName = expected?.siteDetails[siteIndex]?.cardName ?? 'Site details'
@@ -31,26 +31,18 @@ describe('Review Site Details - Polygon Coordinates Integration Tests', () => {
   const getServer = setupTestServer()
 
   beforeEach(() => {
-    jest
-      .spyOn(cacheUtils, 'setExemptionCache')
-      .mockImplementation(() => undefined)
-    jest
-      .spyOn(coordinateUtils, 'getCoordinateSystem')
-      .mockReturnValue({ coordinateSystem: COORDINATE_SYSTEMS.WGS84 })
-    jest
-      .spyOn(cacheUtils, 'resetExemptionSiteDetails')
-      .mockImplementation(() => undefined)
+    vi.spyOn(coordinateUtils, 'getCoordinateSystem').mockReturnValue({
+      coordinateSystem: COORDINATE_SYSTEMS.WGS84
+    })
   })
 
   test.each(testScenarios)(
     '$name - validates polygon coordinate display',
     async ({ exemption, expectedPageContent, coordinateSystem }) => {
-      expect.hasAssertions()
-
       if (coordinateSystem) {
-        jest
-          .spyOn(coordinateUtils, 'getCoordinateSystem')
-          .mockReturnValue({ coordinateSystem })
+        vi.spyOn(coordinateUtils, 'getCoordinateSystem').mockReturnValue({
+          coordinateSystem
+        })
       }
 
       const document = await getPageDocument(exemption)
@@ -141,13 +133,7 @@ describe('Review Site Details - Polygon Coordinates Integration Tests', () => {
   describe('Form Submission', () => {
     test('should successfully submit polygon site details', async () => {
       const polygonExemption = testScenarios[0].exemption
-
-      jest
-        .spyOn(cacheUtils, 'getExemptionCache')
-        .mockReturnValue(polygonExemption)
-      jest.spyOn(authRequests, 'authenticatedPatchRequest').mockResolvedValue({
-        payload: { id: polygonExemption.id }
-      })
+      const { authenticatedPatchRequest } = mockExemption(polygonExemption)
 
       const response = await makePostRequest({
         url: routes.REVIEW_SITE_DETAILS,
@@ -157,7 +143,7 @@ describe('Review Site Details - Polygon Coordinates Integration Tests', () => {
 
       expect(response.statusCode).toBe(statusCodes.redirect)
       expect(response.headers.location).toBe(routes.TASK_LIST)
-      expect(authRequests.authenticatedPatchRequest).toHaveBeenCalledWith(
+      expect(authenticatedPatchRequest).toHaveBeenCalledWith(
         expect.any(Object),
         '/exemption/site-details',
         expect.objectContaining({
@@ -174,10 +160,7 @@ describe('Review Site Details - Polygon Coordinates Integration Tests', () => {
   })
 
   const getPageDocument = async (exemption) => {
-    jest.spyOn(cacheUtils, 'getExemptionCache').mockReturnValue(exemption)
-    jest.spyOn(authRequests, 'authenticatedGetRequest').mockResolvedValue({
-      payload: { value: { taskList: { id: exemption.id } } }
-    })
+    mockExemption(exemption)
 
     const response = await makeGetRequest({
       server: getServer(),

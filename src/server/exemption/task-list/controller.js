@@ -27,11 +27,10 @@ export const taskListController = {
   async handler(request, h) {
     const exemption = getExemptionCache(request)
 
-    const { id } = exemption
-
-    if (!id) {
-      throw Boom.notFound(`Exemption not found`, { id })
+    if (!exemption?.id) {
+      throw Boom.notFound(`Exemption not found`)
     }
+    const { id } = exemption
 
     const { query } = request
 

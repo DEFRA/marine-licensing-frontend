@@ -1,10 +1,6 @@
 import { JSDOM } from 'jsdom'
 import { getByLabelText, getByRole, getByText } from '@testing-library/dom'
 import { statusCodes } from '~/src/server/common/constants/status-codes.js'
-import {
-  getExemptionCache,
-  updateExemptionMultipleSiteDetails
-} from '~/src/server/common/helpers/session-cache/utils.js'
 import { validateErrors } from '~/tests/integration/shared/expect-utils.js'
 import {
   setupTestServer,
@@ -15,8 +11,6 @@ import {
   makeGetRequest,
   makePostRequest
 } from '~/src/server/test-helpers/server-requests.js'
-
-jest.mock('~/src/server/common/helpers/session-cache/utils.js')
 
 const exemptionWithMultipleSites = {
   id: 'test-exemption-123',
@@ -32,6 +26,9 @@ describe('Same activity description page', () => {
   beforeEach(() => mockExemption(exemptionWithMultipleSites))
 
   test('should display the same activity description page with correct content', async () => {
+    const { updateExemptionMultipleSiteDetails } = mockExemption(
+      exemptionWithMultipleSites
+    )
     const { result, statusCode } = await makeGetRequest({
       server: getServer(),
       url: '/exemption/same-activity-description'
@@ -97,7 +94,7 @@ describe('Same activity description page', () => {
   })
 
   test('should pre-populate radio when sameActivityDescription value exists in cache', async () => {
-    jest.mocked(getExemptionCache).mockReturnValue({
+    const { updateExemptionMultipleSiteDetails } = mockExemption({
       ...exemptionWithMultipleSites,
       multipleSiteDetails: {
         ...exemptionWithMultipleSites.multipleSiteDetails,
@@ -182,6 +179,9 @@ describe('Same activity description page', () => {
   })
 
   test('should redirect to coordinates entry choice when "yes" is selected', async () => {
+    const { updateExemptionMultipleSiteDetails } = mockExemption(
+      exemptionWithMultipleSites
+    )
     const response = await makePostRequest({
       url: '/exemption/same-activity-description',
       server: getServer(),
@@ -203,6 +203,9 @@ describe('Same activity description page', () => {
   })
 
   test('should redirect to coordinates entry choice when "no" is selected', async () => {
+    const { updateExemptionMultipleSiteDetails } = mockExemption(
+      exemptionWithMultipleSites
+    )
     const response = await makePostRequest({
       url: '/exemption/same-activity-description',
       server: getServer(),

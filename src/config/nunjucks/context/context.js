@@ -2,12 +2,10 @@ import path from 'node:path'
 import { readFileSync } from 'node:fs'
 
 import { config } from '~/src/config/config.js'
-import { createLogger } from '~/src/server/common/helpers/logging/logger.js'
 import { buildNavigation } from '~/src/config/nunjucks/context/build-navigation.js'
 import { routes } from '~/src/server/common/constants/routes.js'
 import { areAnalyticsCookiesAccepted } from '~/src/server/common/helpers/cookie-preferences.js'
 
-const logger = createLogger()
 const assetPath = config.get('assetPath')
 const manifestPath = path.join(
   config.get('root'),
@@ -25,7 +23,7 @@ export function context(request) {
     try {
       webpackManifest = JSON.parse(readFileSync(manifestPath, 'utf-8'))
     } catch {
-      logger.error(`Webpack ${path.basename(manifestPath)} not found`)
+      request.logger.error(`Webpack ${path.basename(manifestPath)} not found`)
     }
   }
 

@@ -1,14 +1,13 @@
-/**
- * @jest-environment jsdom
- */
+import { vi } from 'vitest'
+// @vitest-environment jsdom
 
 import { AddAnotherPoint } from './index.js'
 
-jest.mock('govuk-frontend', () => ({
+vi.mock('govuk-frontend', () => ({
   Component: class {
     constructor($root) {
       this.$root = $root
-      this.on = jest.fn()
+      this.on = vi.fn()
     }
   }
 }))
@@ -546,7 +545,7 @@ describe('AddAnotherPoint', () => {
     })
 
     it('should return early if getNewItem returns null', () => {
-      jest.spyOn(component, 'getNewItem').mockReturnValue(null)
+      vi.spyOn(component, 'getNewItem').mockReturnValue(null)
 
       const button = document.createElement('button')
       button.classList.add('add-another-point__add-button')
@@ -576,7 +575,7 @@ describe('AddAnotherPoint', () => {
       const component = new AddAnotherPoint($root)
       const fakeItem = document.createElement('div')
 
-      jest.spyOn(component, 'getNewItem').mockReturnValue(fakeItem)
+      vi.spyOn(component, 'getNewItem').mockReturnValue(fakeItem)
 
       const $addButton = document.createElement('button')
       $addButton.className = 'add-another-point__add-button'
@@ -590,8 +589,8 @@ describe('AddAnotherPoint', () => {
   describe('onRemoveButtonClick', () => {
     it('should prevent default and stop propagation', () => {
       const event = {
-        preventDefault: jest.fn(),
-        stopPropagation: jest.fn(),
+        preventDefault: vi.fn(),
+        stopPropagation: vi.fn(),
         target: document.createElement('div')
       }
 
@@ -604,8 +603,8 @@ describe('AddAnotherPoint', () => {
     it('should return early if button is not HTMLButtonElement', () => {
       const span = document.createElement('span')
       const event = {
-        preventDefault: jest.fn(),
-        stopPropagation: jest.fn(),
+        preventDefault: vi.fn(),
+        stopPropagation: vi.fn(),
         target: span
       }
 
@@ -615,8 +614,8 @@ describe('AddAnotherPoint', () => {
     it('should return early if button does not have remove button class', () => {
       const button = document.createElement('button')
       const event = {
-        preventDefault: jest.fn(),
-        stopPropagation: jest.fn(),
+        preventDefault: vi.fn(),
+        stopPropagation: vi.fn(),
         target: button
       }
 
@@ -627,12 +626,12 @@ describe('AddAnotherPoint', () => {
       const button = document.createElement('button')
       button.classList.add('add-another-point__remove-button')
       const event = {
-        preventDefault: jest.fn(),
-        stopPropagation: jest.fn(),
+        preventDefault: vi.fn(),
+        stopPropagation: vi.fn(),
         target: button
       }
 
-      jest.spyOn(component, 'getItems').mockReturnValue([{}, {}])
+      vi.spyOn(component, 'getItems').mockReturnValue([{}, {}])
 
       expect(() => component.onRemoveButtonClick(event)).not.toThrow()
     })
@@ -652,8 +651,8 @@ describe('AddAnotherPoint', () => {
       expect(removeButton).not.toBeNull()
 
       const event = {
-        preventDefault: jest.fn(),
-        stopPropagation: jest.fn(),
+        preventDefault: vi.fn(),
+        stopPropagation: vi.fn(),
         target: removeButton
       }
       component.onRemoveButtonClick(event)
@@ -682,7 +681,7 @@ describe('AddAnotherPoint', () => {
 
     it('should call cleanRemovedErrors if error summary list is present but has no errors', () => {
       addErrorSummaryListItems()
-      const spy = jest.spyOn(component, 'cleanRemovedErrors')
+      const spy = vi.spyOn(component, 'cleanRemovedErrors')
       component.updateErrorSummaryAfterRemoval()
       expect(spy).toHaveBeenCalled()
     })
@@ -738,7 +737,7 @@ describe('AddAnotherPoint', () => {
     })
 
     it('should call updatePointNumberText correctly', () => {
-      const spy = jest.spyOn(component, 'updatePointNumberText')
+      const spy = vi.spyOn(component, 'updatePointNumberText')
 
       const $errorSummaryList = addErrorSummaryListItems()
 

@@ -1,18 +1,19 @@
+import { vi } from 'vitest'
 import { getFileValidationService, FileValidationService } from './index.js'
 
 describe('#File Validation Service Index', () => {
   afterEach(() => {
-    jest.restoreAllMocks()
+    vi.restoreAllMocks()
   })
 
   describe('getFileValidationService factory function', () => {
     test('should create a FileValidationService instance with provided logger', () => {
       // Given
       const mockLogger = {
-        debug: jest.fn(),
-        info: jest.fn(),
-        warn: jest.fn(),
-        error: jest.fn()
+        debug: vi.fn(),
+        info: vi.fn(),
+        warn: vi.fn(),
+        error: vi.fn()
       }
 
       // When
@@ -25,7 +26,7 @@ describe('#File Validation Service Index', () => {
 
     test('should create a new instance each time it is called', () => {
       // Given
-      const mockLogger = { debug: jest.fn() }
+      const mockLogger = { debug: vi.fn() }
 
       // When
       const service1 = getFileValidationService(mockLogger)

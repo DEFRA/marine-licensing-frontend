@@ -1,3 +1,4 @@
+import { vi } from 'vitest'
 import { JSDOM } from 'jsdom'
 import { ACTIVITY_DATES_VIEW_ROUTE } from '~/src/server/common/constants/activity-dates.js'
 import { routes } from '~/src/server/common/constants/routes.js'
@@ -16,7 +17,7 @@ import {
   makePostRequest
 } from '~/src/server/test-helpers/server-requests.js'
 
-jest.mock('~/src/server/common/helpers/session-cache/utils.js')
+vi.mock('~/src/server/common/helpers/session-cache/utils.js')
 
 describe('#activityDatesController', () => {
   const getServer = setupTestServer()
@@ -28,13 +29,13 @@ describe('#activityDatesController', () => {
   }
 
   beforeEach(() => {
-    getExemptionCacheSpy = jest
+    getExemptionCacheSpy = vi
       .spyOn(cacheUtils, 'getExemptionCache')
       .mockReturnValue(mockExemptionState)
 
-    jest
-      .spyOn(authRequests, 'authenticatedPatchRequest')
-      .mockResolvedValue({ payload: { id: mockExemption.id } })
+    vi.spyOn(authRequests, 'authenticatedPatchRequest').mockResolvedValue({
+      payload: { id: mockExemption.id }
+    })
   })
 
   describe('activityDatesController GET', () => {
@@ -61,7 +62,7 @@ describe('#activityDatesController', () => {
     })
 
     test('should render with empty date fields when no existing data', () => {
-      const h = { view: jest.fn() }
+      const h = { view: vi.fn() }
       const request = { url: {}, site: mockSite }
 
       activityDatesController.handler(request, h)
@@ -92,7 +93,7 @@ describe('#activityDatesController', () => {
 
       getExemptionCacheSpy.mockReturnValue(exemptionWithDates)
 
-      const h = { view: jest.fn() }
+      const h = { view: vi.fn() }
       const request = { url: {}, site: mockSite }
 
       activityDatesController.handler(request, h)
@@ -148,7 +149,7 @@ describe('#activityDatesController', () => {
     })
 
     test('should call setExemptionCache when not in site details flow', async () => {
-      const mockedSetExemptionCache = jest.mocked(cacheUtils.setExemptionCache)
+      const mockedSetExemptionCache = vi.mocked(cacheUtils.setExemptionCache)
 
       const currentYear = new Date().getFullYear()
       const payload = {
@@ -179,7 +180,7 @@ describe('#activityDatesController', () => {
     })
 
     test('should call updateExemptionSiteDetails when in site details flow with a single site', async () => {
-      const mockedUpdateExemptionSiteDetails = jest.mocked(
+      const mockedUpdateExemptionSiteDetails = vi.mocked(
         cacheUtils.updateExemptionSiteDetails
       )
 
@@ -224,7 +225,7 @@ describe('#activityDatesController', () => {
     })
 
     test('should call updateExemptionSiteDetails when in site details flow with a multi site', async () => {
-      const mockedUpdateExemptionSiteDetails = jest.mocked(
+      const mockedUpdateExemptionSiteDetails = vi.mocked(
         cacheUtils.updateExemptionSiteDetails
       )
 
@@ -520,7 +521,7 @@ describe('#activityDatesController', () => {
     })
 
     test('should handle API errors gracefully', async () => {
-      const apiPatchMock = jest.spyOn(authRequests, 'authenticatedPatchRequest')
+      const apiPatchMock = vi.spyOn(authRequests, 'authenticatedPatchRequest')
       apiPatchMock.mockRejectedValueOnce({
         res: { statusCode: 500 },
         data: {}
@@ -547,7 +548,7 @@ describe('#activityDatesController', () => {
     })
 
     test('should handle API validation errors', async () => {
-      const apiPatchMock = jest.spyOn(authRequests, 'authenticatedPatchRequest')
+      const apiPatchMock = vi.spyOn(authRequests, 'authenticatedPatchRequest')
       apiPatchMock.mockRejectedValueOnce({
         data: {
           payload: {
@@ -672,8 +673,8 @@ describe('#activityDatesController', () => {
 
     test('should correctly identify missing complete start date', () => {
       const h = {
-        view: jest.fn().mockReturnThis(),
-        takeover: jest.fn()
+        view: vi.fn().mockReturnThis(),
+        takeover: vi.fn()
       }
 
       const err = {
@@ -708,8 +709,8 @@ describe('#activityDatesController', () => {
 
     test('should correctly identify custom validation errors', () => {
       const h = {
-        view: jest.fn().mockReturnThis(),
-        takeover: jest.fn()
+        view: vi.fn().mockReturnThis(),
+        takeover: vi.fn()
       }
 
       const err = {
@@ -741,8 +742,8 @@ describe('#activityDatesController', () => {
 
     test('should correctly handle individual field errors', () => {
       const h = {
-        view: jest.fn().mockReturnThis(),
-        takeover: jest.fn()
+        view: vi.fn().mockReturnThis(),
+        takeover: vi.fn()
       }
 
       const err = {
@@ -770,8 +771,8 @@ describe('#activityDatesController', () => {
 
     test('should handle start date invalid custom error', () => {
       const h = {
-        view: jest.fn().mockReturnThis(),
-        takeover: jest.fn()
+        view: vi.fn().mockReturnThis(),
+        takeover: vi.fn()
       }
 
       const err = {
@@ -799,8 +800,8 @@ describe('#activityDatesController', () => {
 
     test('should handle start date month error', () => {
       const h = {
-        view: jest.fn().mockReturnThis(),
-        takeover: jest.fn()
+        view: vi.fn().mockReturnThis(),
+        takeover: vi.fn()
       }
 
       const err = {
@@ -828,8 +829,8 @@ describe('#activityDatesController', () => {
 
     test('should return null for start date when no errors match', () => {
       const h = {
-        view: jest.fn().mockReturnThis(),
-        takeover: jest.fn()
+        view: vi.fn().mockReturnThis(),
+        takeover: vi.fn()
       }
 
       const err = {
@@ -855,8 +856,8 @@ describe('#activityDatesController', () => {
 
     test('should handle end date missing complete error', () => {
       const h = {
-        view: jest.fn().mockReturnThis(),
-        takeover: jest.fn()
+        view: vi.fn().mockReturnThis(),
+        takeover: vi.fn()
       }
 
       const err = {
@@ -891,8 +892,8 @@ describe('#activityDatesController', () => {
 
     test('should handle end date invalid custom error', () => {
       const h = {
-        view: jest.fn().mockReturnThis(),
-        takeover: jest.fn()
+        view: vi.fn().mockReturnThis(),
+        takeover: vi.fn()
       }
 
       const err = {
@@ -920,8 +921,8 @@ describe('#activityDatesController', () => {
 
     test('should handle end date day error', () => {
       const h = {
-        view: jest.fn().mockReturnThis(),
-        takeover: jest.fn()
+        view: vi.fn().mockReturnThis(),
+        takeover: vi.fn()
       }
 
       const err = {
@@ -949,8 +950,8 @@ describe('#activityDatesController', () => {
 
     test('should handle end date month error', () => {
       const h = {
-        view: jest.fn().mockReturnThis(),
-        takeover: jest.fn()
+        view: vi.fn().mockReturnThis(),
+        takeover: vi.fn()
       }
 
       const err = {
@@ -978,8 +979,8 @@ describe('#activityDatesController', () => {
 
     test('should return null for end date when no errors match', () => {
       const h = {
-        view: jest.fn().mockReturnThis(),
-        takeover: jest.fn()
+        view: vi.fn().mockReturnThis(),
+        takeover: vi.fn()
       }
 
       const err = {
@@ -1004,7 +1005,7 @@ describe('#activityDatesController', () => {
     })
 
     test('should handle API errors without validation details', async () => {
-      const apiPatchMock = jest.spyOn(authRequests, 'authenticatedPatchRequest')
+      const apiPatchMock = vi.spyOn(authRequests, 'authenticatedPatchRequest')
       apiPatchMock.mockRejectedValueOnce({
         message: 'Network error',
         data: {}
@@ -1031,8 +1032,8 @@ describe('#activityDatesController', () => {
 
     test('should handle start date year error specifically', () => {
       const h = {
-        view: jest.fn().mockReturnThis(),
-        takeover: jest.fn()
+        view: vi.fn().mockReturnThis(),
+        takeover: vi.fn()
       }
 
       const err = {
@@ -1060,8 +1061,8 @@ describe('#activityDatesController', () => {
 
     test('should handle end date year error specifically', () => {
       const h = {
-        view: jest.fn().mockReturnThis(),
-        takeover: jest.fn()
+        view: vi.fn().mockReturnThis(),
+        takeover: vi.fn()
       }
 
       const err = {
@@ -1089,8 +1090,8 @@ describe('#activityDatesController', () => {
 
     test('should cover line 132 - end date invalid custom error in addCustomValidationErrors', () => {
       const h = {
-        view: jest.fn().mockReturnThis(),
-        takeover: jest.fn()
+        view: vi.fn().mockReturnThis(),
+        takeover: vi.fn()
       }
 
       const err = {
@@ -1120,8 +1121,8 @@ describe('#activityDatesController', () => {
 
     test('should cover line 233 - end date today or future error message', () => {
       const h = {
-        view: jest.fn().mockReturnThis(),
-        takeover: jest.fn()
+        view: vi.fn().mockReturnThis(),
+        takeover: vi.fn()
       }
 
       const err = {
@@ -1150,8 +1151,8 @@ describe('#activityDatesController', () => {
 
     test('should cover line 314 - return h.view when no error details in failAction', () => {
       const h = {
-        view: jest.fn().mockReturnThis(),
-        takeover: jest.fn()
+        view: vi.fn().mockReturnThis(),
+        takeover: vi.fn()
       }
 
       // Create an error without details to trigger line 314 (return h)
@@ -1183,7 +1184,7 @@ describe('#activityDatesController', () => {
     })
 
     test('should cover line 414 - throw error when no validation details in handler', async () => {
-      const apiPatchMock = jest.spyOn(authRequests, 'authenticatedPatchRequest')
+      const apiPatchMock = vi.spyOn(authRequests, 'authenticatedPatchRequest')
       // Create an error without validation details to trigger the throw on line 414
       const networkError = new Error('Network error')
       networkError.data = { payload: {} } // No validation property
@@ -1206,7 +1207,7 @@ describe('#activityDatesController', () => {
       }
 
       const request = { payload, url: {}, site: mockSite }
-      const h = { redirect: jest.fn() }
+      const h = { redirect: vi.fn() }
 
       // This should trigger line 414 (throw e) since there are no validation details
       await expect(
@@ -1216,7 +1217,7 @@ describe('#activityDatesController', () => {
 
     test('should cover lines 423-428 - API error with validation details', async () => {
       // Mock the API to return an error with validation details
-      const apiPatchMock = jest.spyOn(authRequests, 'authenticatedPatchRequest')
+      const apiPatchMock = vi.spyOn(authRequests, 'authenticatedPatchRequest')
       const apiError = new Error('API validation error')
       apiError.data = {
         payload: {
@@ -1240,7 +1241,7 @@ describe('#activityDatesController', () => {
       })
 
       const h = {
-        view: jest.fn()
+        view: vi.fn()
       }
 
       const currentYear = new Date().getFullYear()
@@ -1287,7 +1288,7 @@ describe('#activityDatesController', () => {
 
     test('should cover lines 423-428 with empty payload values - API error fallback', async () => {
       // Mock the API to return an error with validation details
-      const apiPatchMock = jest.spyOn(authRequests, 'authenticatedPatchRequest')
+      const apiPatchMock = vi.spyOn(authRequests, 'authenticatedPatchRequest')
       const apiError = new Error('API validation error')
       apiError.data = {
         payload: {
@@ -1311,7 +1312,7 @@ describe('#activityDatesController', () => {
       })
 
       const h = {
-        view: jest.fn()
+        view: vi.fn()
       }
 
       // Use empty payload to test the || '' fallback logic

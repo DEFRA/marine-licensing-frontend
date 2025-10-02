@@ -1,69 +1,89 @@
-import hapi from '@hapi/hapi'
+import { vi, beforeEach, afterEach } from 'vitest'
 
-const mockLoggerInfo = jest.fn()
-const mockLoggerError = jest.fn()
+const mockLoggerInfo = vi.fn()
+const mockLoggerError = vi.fn()
 
-const mockHapiLoggerInfo = jest.fn()
-const mockHapiLoggerError = jest.fn()
+const mockHapiLoggerInfo = vi.fn()
+const mockHapiLoggerError = vi.fn()
 
-jest.mock('hapi-pino', () => ({
-  register: (server) => {
-    server.decorate('server', 'logger', {
-      info: mockHapiLoggerInfo,
-      error: mockHapiLoggerError
-    })
-  },
-  name: 'mock-hapi-pino'
+const mockCreateServer = vi.fn()
+
+vi.mock('hapi-pino', () => ({
+  default: {
+    register: (server) => {
+      server.decorate('server', 'logger', {
+        info: mockHapiLoggerInfo,
+        error: mockHapiLoggerError
+      })
+    },
+    name: 'mock-hapi-pino'
+  }
 }))
-jest.mock('~/src/server/common/helpers/logging/logger.js', () => ({
+vi.mock('~/src/server/common/helpers/logging/logger.js', () => ({
   createLogger: () => ({
     info: (...args) => mockLoggerInfo(...args),
     error: (...args) => mockLoggerError(...args)
   })
 }))
+vi.mock('~/src/server/index.js', () => ({
+  createServer: () => mockCreateServer()
+}))
 
 describe('#startServer', () => {
   const PROCESS_ENV = process.env
-  let createServerSpy
-  let hapiServerSpy
   let startServerImport
-  let createServerImport
 
   beforeAll(async () => {
     process.env = { ...PROCESS_ENV }
-    process.env.PORT = '3097' // Set to obscure port to avoid conflicts
+    process.env.PORT = '3097'
 
-    createServerImport = await import('~/src/server/index.js')
     startServerImport = await import(
       '~/src/server/common/helpers/start-server.js'
     )
-
-    createServerSpy = jest.spyOn(createServerImport, 'createServer')
-    hapiServerSpy = jest.spyOn(hapi, 'server')
   })
 
   afterAll(() => {
     process.env = PROCESS_ENV
   })
 
+  beforeEach(() => {
+    vi.clearAllMocks()
+  })
+
   describe('When server starts', () => {
     let server
 
-    afterAll(async () => {
+    beforeEach(() => {
+      server = {
+        start: vi.fn(),
+        stop: vi.fn(),
+        logger: {
+          info: mockHapiLoggerInfo,
+          error: mockHapiLoggerError
+        }
+      }
+      mockCreateServer.mockResolvedValue(server)
+    })
+
+    afterEach(async () => {
       await server?.stop({ timeout: 0 })
     })
 
     test('Should start up server as expected', async () => {
-      server = await startServerImport.startServer()
+      const result = await startServerImport.startServer()
 
-      expect(createServerSpy).toHaveBeenCalled()
-      expect(hapiServerSpy).toHaveBeenCalled()
+      expect(mockCreateServer).toHaveBeenCalled()
+      expect(server.start).toHaveBeenCalled()
+      expect(mockHapiLoggerInfo).toHaveBeenCalledWith(
+        'Server started successfully'
+      )
+      expect(result).toBe(server)
     })
   })
 
   describe('When server start fails', () => {
-    beforeAll(() => {
-      createServerSpy.mockRejectedValue(new Error('Server failed to start'))
+    beforeEach(() => {
+      mockCreateServer.mockRejectedValue(new Error('Server failed to start'))
     })
 
     test('Should log failed startup message', async () => {

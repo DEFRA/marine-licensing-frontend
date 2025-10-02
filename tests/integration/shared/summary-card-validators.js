@@ -1,10 +1,6 @@
-/**
- * Shared validation utilities for summary card testing
- * Used across check-your-answers and view-details integration tests
- * @jest-environment jsdom
- */
+// @vitest-environment jsdom
 
-/* eslint-env jest */
+/* eslint-env vitest */
 
 /**
  * Validates the basic page structure (heading and back link)

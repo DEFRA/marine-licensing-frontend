@@ -1,3 +1,4 @@
+import { vi } from 'vitest'
 import Boom from '@hapi/boom'
 import { COORDINATE_SYSTEMS } from '~/src/server/common/constants/exemptions.js'
 import { routes } from '~/src/server/common/constants/routes.js'
@@ -23,9 +24,9 @@ import { mockExemption } from '~/src/server/test-helpers/mocks.js'
 import { getCoordinateSystem } from '~/src/server/common/helpers/coordinate-utils.js'
 
 // Mock the getCoordinateSystem helper
-jest.mock('~/src/server/common/helpers/coordinate-utils.js', () => ({
-  getCoordinateSystem: jest.fn(),
-  extractCoordinatesFromGeoJSON: jest.fn()
+vi.mock('~/src/server/common/helpers/coordinate-utils.js', () => ({
+  getCoordinateSystem: vi.fn(),
+  extractCoordinatesFromGeoJSON: vi.fn()
 }))
 
 describe('siteDetails utils', () => {
@@ -684,15 +685,11 @@ describe('siteDetails utils', () => {
   describe('getSiteDetails util', () => {
     const mockRequest = {
       logger: {
-        info: jest.fn(),
-        error: jest.fn()
+        info: vi.fn(),
+        error: vi.fn()
       }
     }
-    const mockAuthenticatedGetRequest = jest.fn()
-
-    beforeEach(() => {
-      jest.clearAllMocks()
-    })
+    const mockAuthenticatedGetRequest = vi.fn()
 
     test('getSiteDetails returns existing site details when available', async () => {
       const exemption = {
@@ -789,9 +786,9 @@ describe('siteDetails utils', () => {
 
       const mockRequest = {
         logger: {
-          info: jest.fn(),
-          error: jest.fn(),
-          warn: jest.fn()
+          info: vi.fn(),
+          error: vi.fn(),
+          warn: vi.fn()
         }
       }
 
@@ -843,13 +840,9 @@ describe('siteDetails utils', () => {
   describe('prepareFileUploadDataForSave util', () => {
     const mockRequest = {
       logger: {
-        info: jest.fn()
+        info: vi.fn()
       }
     }
-
-    beforeEach(() => {
-      jest.clearAllMocks()
-    })
 
     test('prepareFileUploadDataForSave correctly formats data for API submission', () => {
       const siteDetails = [
@@ -931,13 +924,9 @@ describe('siteDetails utils', () => {
   describe('prepareManualCoordinateDataForSave util', () => {
     const mockRequest = {
       logger: {
-        info: jest.fn()
+        info: vi.fn()
       }
     }
-
-    beforeEach(() => {
-      jest.clearAllMocks()
-    })
 
     test('prepareManualCoordinateDataForSave returns site details and logs correctly', () => {
       const exemption = {
@@ -969,12 +958,8 @@ describe('siteDetails utils', () => {
 
   describe('renderFileUploadReview util', () => {
     const mockH = {
-      view: jest.fn()
+      view: vi.fn()
     }
-
-    beforeEach(() => {
-      jest.clearAllMocks()
-    })
 
     test('renderFileUploadReview renders correct view with data', () => {
       const exemption = {
@@ -1034,11 +1019,10 @@ describe('siteDetails utils', () => {
 
   describe('renderManualCoordinateReview util', () => {
     const mockH = {
-      view: jest.fn()
+      view: vi.fn()
     }
 
     beforeEach(() => {
-      jest.clearAllMocks()
       // Mock the getCoordinateSystem helper
       getCoordinateSystem.mockReturnValue({
         coordinateSystem: COORDINATE_SYSTEMS.WGS84
@@ -1112,13 +1096,9 @@ describe('siteDetails utils', () => {
   describe('handleSubmissionError util', () => {
     const mockRequest = {
       logger: {
-        error: jest.fn()
+        error: vi.fn()
       }
     }
-
-    beforeEach(() => {
-      jest.clearAllMocks()
-    })
 
     test('handleSubmissionError logs error and returns Boom error', () => {
       const error = new Error('Test error message')

@@ -1,9 +1,9 @@
+import { vi } from 'vitest'
 import {
-  getExemptionCache,
-  clearExemptionCache
-} from '~/src/server/common/helpers/session-cache/utils.js'
-import { setupTestServer } from '~/tests/integration/shared/test-setup-helpers.js'
-import { mockExemption } from '~/src/server/test-helpers/mocks.js'
+  mockExemption,
+  setupTestServer
+} from '~/tests/integration/shared/test-setup-helpers.js'
+import { mockExemption as mockExemptionData } from '~/src/server/test-helpers/mocks.js'
 import {
   makeGetRequest,
   makePostRequest
@@ -11,10 +11,7 @@ import {
 import * as authRequests from '~/src/server/common/helpers/authenticated-requests.js'
 import * as authUtils from '~/src/server/common/plugins/auth/utils.js'
 import * as exemptionSiteDetailsHelpers from '~/src/server/common/helpers/exemption-site-details.js'
-import { createSubmittedExemption } from '~/tests/integration/view-details/test-utilities.js'
 import * as exemptionServiceModule from '~/src/services/exemption-service/index.js'
-
-jest.mock('~/src/server/common/helpers/session-cache/utils.js')
 
 const mockUserSession = {
   displayName: 'John Doe',
@@ -26,20 +23,16 @@ describe('check your answers controller', () => {
   const getServer = setupTestServer()
 
   beforeEach(() => {
-    jest.spyOn(authUtils, 'getUserSession').mockResolvedValue(mockUserSession)
-
-    jest.mocked(getExemptionCache).mockReturnValue(mockExemption)
-
-    jest.mocked(clearExemptionCache).mockImplementation(() => ({}))
-
-    jest.spyOn(exemptionServiceModule, 'getExemptionService').mockReturnValue({
-      getExemptionById: jest.fn().mockResolvedValue(createSubmittedExemption())
+    vi.spyOn(authUtils, 'getUserSession').mockResolvedValue(mockUserSession)
+    mockExemption(mockExemptionData)
+    vi.spyOn(exemptionServiceModule, 'getExemptionService').mockReturnValue({
+      getExemptionById: vi.fn().mockResolvedValue(mockExemptionData)
     })
   })
 
   describe('POST /exemption/check-your-answers', () => {
     beforeEach(() => {
-      jest.spyOn(authRequests, 'authenticatedPostRequest').mockResolvedValue({
+      vi.spyOn(authRequests, 'authenticatedPostRequest').mockResolvedValue({
         payload: {
           message: 'success',
           value: {
@@ -51,6 +44,7 @@ describe('check your answers controller', () => {
     })
 
     test('Should submit exemption and redirect to confirmation page after clearing exemption cache', async () => {
+      const { clearExemptionCache } = mockExemption(mockExemptionData)
       const { statusCode, headers } = await makePostRequest({
         url: '/exemption/check-your-answers',
         server: getServer()
@@ -64,7 +58,7 @@ describe('check your answers controller', () => {
         expect.any(Object),
         '/exemption/submit',
         {
-          id: mockExemption.id,
+          id: mockExemptionData.id,
           userName: mockUserSession.displayName,
           userEmail: mockUserSession.email
         }
@@ -73,7 +67,7 @@ describe('check your answers controller', () => {
     })
 
     test('Should handle missing exemption data on POST', async () => {
-      getExemptionCache.mockReturnValueOnce({ id: 'test-id' })
+      mockExemption({ id: 'test-id' })
       const { statusCode } = await makePostRequest({
         url: '/exemption/check-your-answers',
         server: getServer()
@@ -82,9 +76,10 @@ describe('check your answers controller', () => {
     })
 
     test('Should handle API errors gracefully', async () => {
-      jest
-        .spyOn(authRequests, 'authenticatedPostRequest')
-        .mockRejectedValue(new Error('API Error'))
+      const { clearExemptionCache } = mockExemption(mockExemptionData)
+      vi.spyOn(authRequests, 'authenticatedPostRequest').mockRejectedValue(
+        new Error('API Error')
+      )
 
       const { statusCode } = await makePostRequest({
         url: '/exemption/check-your-answers',
@@ -96,7 +91,8 @@ describe('check your answers controller', () => {
     })
 
     test('Should handle unexpected API response format', async () => {
-      jest.spyOn(authRequests, 'authenticatedPostRequest').mockResolvedValue({
+      const { clearExemptionCache } = mockExemption(mockExemptionData)
+      vi.spyOn(authRequests, 'authenticatedPostRequest').mockResolvedValue({
         payload: { message: 'error', error: 'Something went wrong' }
       })
 
@@ -110,7 +106,8 @@ describe('check your answers controller', () => {
     })
 
     test('Should handle API response with missing value', async () => {
-      jest.spyOn(authRequests, 'authenticatedPostRequest').mockResolvedValue({
+      const { clearExemptionCache } = mockExemption(mockExemptionData)
+      vi.spyOn(authRequests, 'authenticatedPostRequest').mockResolvedValue({
         payload: { message: 'success', value: null }
       })
 
@@ -124,7 +121,8 @@ describe('check your answers controller', () => {
     })
 
     test('Should redirect even with missing applicationReference when value exists', async () => {
-      jest.spyOn(authRequests, 'authenticatedPostRequest').mockResolvedValue({
+      const { clearExemptionCache } = mockExemption(mockExemptionData)
+      vi.spyOn(authRequests, 'authenticatedPostRequest').mockResolvedValue({
         payload: { message: 'success', value: {} }
       })
 
@@ -141,7 +139,7 @@ describe('check your answers controller', () => {
     })
 
     test('Should handle API response with wrong message type', async () => {
-      jest.spyOn(authRequests, 'authenticatedPostRequest').mockResolvedValue({
+      vi.spyOn(authRequests, 'authenticatedPostRequest').mockResolvedValue({
         payload: {
           message: 'pending',
           value: { applicationReference: 'APP-123' }
@@ -157,7 +155,7 @@ describe('check your answers controller', () => {
     })
 
     test('Should error if user session is missing', async () => {
-      jest.spyOn(authUtils, 'getUserSession').mockResolvedValue(null)
+      vi.spyOn(authUtils, 'getUserSession').mockResolvedValue(null)
 
       const { statusCode } = await makePostRequest({
         url: '/exemption/check-your-answers',
@@ -168,7 +166,7 @@ describe('check your answers controller', () => {
     })
 
     test('Should error if user session has missing displayName', async () => {
-      jest.spyOn(authUtils, 'getUserSession').mockResolvedValue({
+      vi.spyOn(authUtils, 'getUserSession').mockResolvedValue({
         displayName: null,
         email: 'test@example.com'
       })
@@ -182,7 +180,7 @@ describe('check your answers controller', () => {
     })
 
     test('Should error if user session has missing email', async () => {
-      jest.spyOn(authUtils, 'getUserSession').mockResolvedValue({
+      vi.spyOn(authUtils, 'getUserSession').mockResolvedValue({
         displayName: 'Test User',
         email: null
       })
@@ -196,7 +194,7 @@ describe('check your answers controller', () => {
     })
 
     test('Should error if user session has empty displayName', async () => {
-      jest.spyOn(authUtils, 'getUserSession').mockResolvedValue({
+      vi.spyOn(authUtils, 'getUserSession').mockResolvedValue({
         displayName: '',
         email: 'test@example.com'
       })
@@ -210,7 +208,7 @@ describe('check your answers controller', () => {
     })
 
     test('Should error if user session has empty email', async () => {
-      jest.spyOn(authUtils, 'getUserSession').mockResolvedValue({
+      vi.spyOn(authUtils, 'getUserSession').mockResolvedValue({
         displayName: 'Test User',
         email: ''
       })
@@ -225,7 +223,7 @@ describe('check your answers controller', () => {
   })
 
   test('Should render page with empty exemption data', async () => {
-    getExemptionCache.mockReturnValueOnce({ id: 'test-id' })
+    mockExemption({ id: 'test-id' })
     const { statusCode } = await makeGetRequest({
       url: '/exemption/check-your-answers',
       server: getServer()
@@ -275,11 +273,11 @@ describe('check your answers controller', () => {
 
   test('Should render page when exemption has no siteDetails', async () => {
     const exemptionWithoutSiteDetails = {
-      ...mockExemption,
+      ...mockExemptionData,
       siteDetails: null
     }
 
-    getExemptionCache.mockReturnValueOnce(exemptionWithoutSiteDetails)
+    mockExemption(exemptionWithoutSiteDetails)
 
     const { statusCode } = await makeGetRequest({
       url: '/exemption/check-your-answers',
@@ -290,7 +288,7 @@ describe('check your answers controller', () => {
 
   describe('Controller error handling edge cases', () => {
     test('Should handle POST request with missing exemption cache', async () => {
-      getExemptionCache.mockReturnValueOnce(null)
+      mockExemption(null)
 
       const { statusCode } = await makePostRequest({
         url: '/exemption/check-your-answers',
@@ -301,7 +299,7 @@ describe('check your answers controller', () => {
     })
 
     test('Should handle GET request with missing exemption cache', async () => {
-      getExemptionCache.mockReturnValueOnce(null)
+      mockExemption(null)
 
       const { statusCode } = await makeGetRequest({
         url: '/exemption/check-your-answers',
@@ -312,8 +310,7 @@ describe('check your answers controller', () => {
     })
 
     test('Should handle getUserSession throwing an error', async () => {
-      jest
-        .spyOn(authUtils, 'getUserSession')
+      vi.spyOn(authUtils, 'getUserSession')
         .mockResolvedValueOnce(mockUserSession) // used by server prehandler
         .mockRejectedValueOnce(new Error('Session retrieval failed')) // used by controller
 
@@ -326,9 +323,7 @@ describe('check your answers controller', () => {
     })
 
     test('Should handle session cache errors gracefully', async () => {
-      getExemptionCache.mockImplementation(() => {
-        throw new Error('Cache error')
-      })
+      mockExemption(new Error('Cache error'))
 
       const { statusCode } = await makeGetRequest({
         url: '/exemption/check-your-answers',
@@ -340,7 +335,7 @@ describe('check your answers controller', () => {
 
     test('Should handle file upload processing error and use fallback data', async () => {
       const fileUploadExemption = {
-        ...mockExemption,
+        ...mockExemptionData,
         siteDetails: {
           coordinatesType: 'file',
           fileUploadType: 'kml',
@@ -350,7 +345,7 @@ describe('check your answers controller', () => {
         }
       }
 
-      getExemptionCache.mockReturnValueOnce(fileUploadExemption)
+      mockExemption(fileUploadExemption)
 
       const mockProcessedSiteDetails = {
         isFileUpload: true,
@@ -359,7 +354,7 @@ describe('check your answers controller', () => {
         filename: 'test.kml'
       }
 
-      const processSiteDetailsSpy = jest
+      const processSiteDetailsSpy = vi
         .spyOn(exemptionSiteDetailsHelpers, 'processSiteDetails')
         .mockReturnValue(mockProcessedSiteDetails)
 
@@ -379,7 +374,7 @@ describe('check your answers controller', () => {
 
     test('Should handle file upload processing error and use Shapefile and Unknown file fallbacks', async () => {
       const shapefileExemption = {
-        ...mockExemption,
+        ...mockExemptionData,
         siteDetails: {
           coordinatesType: 'file',
           fileUploadType: 'shapefile',
@@ -389,7 +384,7 @@ describe('check your answers controller', () => {
         }
       }
 
-      getExemptionCache.mockReturnValueOnce(shapefileExemption)
+      mockExemption(shapefileExemption)
 
       const mockProcessedSiteDetails = {
         isFileUpload: true,
@@ -398,7 +393,7 @@ describe('check your answers controller', () => {
         filename: 'Unknown file'
       }
 
-      const processSiteDetailsSpy = jest
+      const processSiteDetailsSpy = vi
         .spyOn(exemptionSiteDetailsHelpers, 'processSiteDetails')
         .mockReturnValue(mockProcessedSiteDetails)
 

@@ -1,3 +1,4 @@
+import { vi } from 'vitest'
 import { routes } from '~/src/server/common/constants/routes.js'
 import { statusCodes } from '~/src/server/common/constants/status-codes.js'
 import { testScenarios } from './fixtures.js'
@@ -20,7 +21,7 @@ import {
 import { mockExemptionMcmsContext } from '~/src/server/test-helpers/mocks.js'
 import { makeGetRequest } from '~/src/server/test-helpers/server-requests.js'
 
-jest.mock('~/src/server/common/helpers/authenticated-requests.js')
+vi.mock('~/src/server/common/helpers/authenticated-requests.js')
 
 describe('Check your answers - page content Validation', () => {
   const getServer = setupTestServer()

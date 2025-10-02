@@ -1,3 +1,4 @@
+import { vi } from 'vitest'
 import {
   redirectPathCacheKey,
   routes
@@ -5,8 +6,8 @@ import {
 import { setUserSession } from '~/src/server/auth/utils.js'
 import { signInOidcEntraController } from '~/src/server/auth/sign-in-oidc-entra.js'
 
-jest.mock('~/src/server/auth/utils.js', () => ({
-  setUserSession: jest.fn()
+vi.mock('~/src/server/auth/utils.js', () => ({
+  setUserSession: vi.fn()
 }))
 
 describe('#signInOidcEntraController', () => {
@@ -15,11 +16,11 @@ describe('#signInOidcEntraController', () => {
       auth: {
         isAuthenticated: true
       },
-      logger: { info: jest.fn() },
-      yar: { flash: jest.fn().mockReturnValue([routes.PROJECT_NAME]) }
+      logger: { info: vi.fn() },
+      yar: { flash: vi.fn().mockReturnValue([routes.PROJECT_NAME]) }
     }
 
-    const mockH = { redirect: jest.fn() }
+    const mockH = { redirect: vi.fn() }
 
     await signInOidcEntraController.handler(mockRequest, mockH)
 
@@ -31,11 +32,11 @@ describe('#signInOidcEntraController', () => {
 
     const mockRequest = {
       auth: { isAuthenticated: false },
-      yar: { flash: jest.fn().mockReturnValue(customRedirectRoute) },
-      logger: { info: jest.fn() }
+      yar: { flash: vi.fn().mockReturnValue(customRedirectRoute) },
+      logger: { info: vi.fn() }
     }
 
-    const mockH = { redirect: jest.fn() }
+    const mockH = { redirect: vi.fn() }
 
     await signInOidcEntraController.handler(mockRequest, mockH)
 

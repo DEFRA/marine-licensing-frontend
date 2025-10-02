@@ -1,9 +1,10 @@
+import { vi } from 'vitest'
 import CircleGeometryCalculator from './circle-geometry-calculator.js'
 import FeatureFactory from './feature-factory.js'
 
-jest.mock('./circle-geometry-calculator.js', () => ({
+vi.mock('./circle-geometry-calculator.js', () => ({
   default: {
-    createGeographicCircle: jest.fn()
+    createGeographicCircle: vi.fn()
   }
 }))
 
@@ -13,19 +14,17 @@ describe('FeatureFactory', () => {
   let mockGeoJSONFormat
 
   beforeEach(() => {
-    jest.clearAllMocks()
-
-    CircleGeometryCalculator.createGeographicCircle = jest.fn()
+    CircleGeometryCalculator.createGeographicCircle = vi.fn()
 
     mockOlModules = {
-      Feature: jest.fn(),
-      Polygon: jest.fn(),
-      fromLonLat: jest.fn(),
-      toLonLat: jest.fn()
+      Feature: vi.fn(),
+      Polygon: vi.fn(),
+      fromLonLat: vi.fn(),
+      toLonLat: vi.fn()
     }
 
     mockGeoJSONFormat = {
-      readFeatures: jest.fn()
+      readFeatures: vi.fn()
     }
 
     featureFactory = new FeatureFactory()

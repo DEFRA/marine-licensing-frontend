@@ -1,16 +1,16 @@
-import { jest } from '@jest/globals'
+import { vi } from 'vitest'
 import { deleteExemptionRoutes } from './index.js'
 import { routes } from '~/src/server/common/constants/routes.js'
 
-jest.mock('./controller.js', () => ({
+vi.mock('./controller.js', () => ({
   deleteExemptionController: {
-    handler: jest.fn()
+    handler: vi.fn()
   },
   deleteExemptionSelectController: {
-    handler: jest.fn()
+    handler: vi.fn()
   },
   deleteExemptionSubmitController: {
-    handler: jest.fn()
+    handler: vi.fn()
   }
 }))
 

@@ -1,3 +1,4 @@
+import { vi } from 'vitest'
 import { statusCodes } from '~/src/server/common/constants/status-codes.js'
 import {
   catchAll,
@@ -24,7 +25,7 @@ describe('#errors', () => {
 })
 
 describe('#catchAll', () => {
-  const mockErrorLogger = jest.fn()
+  const mockErrorLogger = vi.fn()
   const mockStack = 'Mock error stack'
 
   // The 500 custom error page is also doing double duty as our generic error page.
@@ -46,12 +47,17 @@ describe('#catchAll', () => {
     },
     logger: { error: mockErrorLogger }
   })
-  const mockToolkitView = jest.fn()
-  const mockToolkitCode = jest.fn()
+  const mockToolkitView = vi.fn()
+  const mockToolkitCode = vi.fn()
   const mockToolkit = {
-    view: mockToolkitView.mockReturnThis(),
-    code: mockToolkitCode.mockReturnThis()
+    view: mockToolkitView,
+    code: mockToolkitCode
   }
+
+  beforeEach(() => {
+    mockToolkitView.mockReturnValue(mockToolkit)
+    mockToolkitCode.mockReturnValue(mockToolkit)
+  })
 
   test('Should provide expected "Not Found" page', () => {
     catchAll(mockRequest(statusCodes.notFound), mockToolkit)
@@ -111,6 +117,12 @@ describe('#catchAll', () => {
     catchAll(mockRequest(statusCodes.serviceUnavailable), mockToolkit)
     expect(mockToolkitView).toHaveBeenCalledWith(customErrorPages['503'])
     expect(mockToolkitCode).toHaveBeenCalledWith(statusCodes.serviceUnavailable)
+  })
+
+  it('returns h.continue for non-Boom response', () => {
+    const h = { continue: Symbol('continue') }
+    const result = catchAll({ response: {} }, h)
+    expect(result).toBe(h.continue)
   })
 })
 
@@ -203,12 +215,6 @@ describe('mapErrorsForDisplay', () => {
   test('can handle empty input array', () => {
     const result = mapErrorsForDisplay()
     expect(result).toEqual([])
-  })
-
-  it('returns h.continue for non-Boom response', () => {
-    const h = {}
-    const result = catchAll({ response: {} }, h)
-    expect(result).toBe(h.continue)
   })
 })
 

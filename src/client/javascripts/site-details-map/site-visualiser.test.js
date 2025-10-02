@@ -1,30 +1,31 @@
+import { vi } from 'vitest'
 import CircleGeometryCalculator from './circle-geometry-calculator.js'
 import FeatureFactory from './feature-factory.js'
 import MapViewManager from './map-view-manager.js'
 import SiteVisualiser from './site-visualiser.js'
 
-jest.mock('./circle-geometry-calculator.js', () => ({
+vi.mock('./circle-geometry-calculator.js', () => ({
   default: {
-    createGeographicCircle: jest.fn()
+    createGeographicCircle: vi.fn()
   }
 }))
 
-jest.mock('./map-view-manager.js', () => {
-  return jest.fn().mockImplementation(() => ({
-    fitMapToExtent: jest.fn(),
-    fitMapToGeometry: jest.fn(),
-    fitMapToAllFeatures: jest.fn(),
-    centreMapView: jest.fn()
+vi.mock('./map-view-manager.js', () => ({
+  default: vi.fn().mockImplementation(() => ({
+    fitMapToExtent: vi.fn(),
+    fitMapToGeometry: vi.fn(),
+    fitMapToAllFeatures: vi.fn(),
+    centreMapView: vi.fn()
   }))
-})
+}))
 
-jest.mock('./feature-factory.js', () => {
-  return jest.fn().mockImplementation(() => ({
-    createCircleFeature: jest.fn(),
-    createPolygonFeature: jest.fn(),
-    createFeaturesFromGeoJSON: jest.fn()
+vi.mock('./feature-factory.js', () => ({
+  default: vi.fn().mockImplementation(() => ({
+    createCircleFeature: vi.fn(),
+    createPolygonFeature: vi.fn(),
+    createFeaturesFromGeoJSON: vi.fn()
   }))
-})
+}))
 
 describe('SiteVisualiser', () => {
   let siteVisualiser
@@ -36,53 +37,51 @@ describe('SiteVisualiser', () => {
   let mockFeatureFactory
 
   beforeEach(() => {
-    jest.clearAllMocks()
-
-    CircleGeometryCalculator.createGeographicCircle = jest.fn()
+    CircleGeometryCalculator.createGeographicCircle = vi.fn()
 
     MapViewManager.mockClear()
     FeatureFactory.mockClear()
 
     mockMapViewManager = {
-      fitMapToExtent: jest.fn(),
-      fitMapToGeometry: jest.fn(),
-      fitMapToAllFeatures: jest.fn(),
-      centreMapView: jest.fn()
+      fitMapToExtent: vi.fn(),
+      fitMapToGeometry: vi.fn(),
+      fitMapToAllFeatures: vi.fn(),
+      centreMapView: vi.fn()
     }
 
     mockFeatureFactory = {
-      createCircleFeature: jest.fn(),
-      createPolygonFeature: jest.fn(),
-      createFeaturesFromGeoJSON: jest.fn()
+      createCircleFeature: vi.fn(),
+      createPolygonFeature: vi.fn(),
+      createFeaturesFromGeoJSON: vi.fn()
     }
 
     MapViewManager.mockImplementation(() => mockMapViewManager)
     FeatureFactory.mockImplementation(() => mockFeatureFactory)
 
     mockOlModules = {
-      Feature: jest.fn(),
-      Point: jest.fn(),
-      Polygon: jest.fn(),
-      fromLonLat: jest.fn(),
-      toLonLat: jest.fn()
+      Feature: vi.fn(),
+      Point: vi.fn(),
+      Polygon: vi.fn(),
+      fromLonLat: vi.fn(),
+      toLonLat: vi.fn()
     }
 
     mockVectorSource = {
-      addFeature: jest.fn(),
-      addFeatures: jest.fn(),
-      clear: jest.fn(),
-      getExtent: jest.fn()
+      addFeature: vi.fn(),
+      addFeatures: vi.fn(),
+      clear: vi.fn(),
+      getExtent: vi.fn()
     }
 
     mockGeoJSONFormat = {
-      readFeatures: jest.fn()
+      readFeatures: vi.fn()
     }
 
     mockMap = {
-      getView: jest.fn().mockReturnValue({
-        fit: jest.fn(),
-        setCenter: jest.fn(),
-        setZoom: jest.fn()
+      getView: vi.fn().mockReturnValue({
+        fit: vi.fn(),
+        setCenter: vi.fn(),
+        setZoom: vi.fn()
       })
     }
 
@@ -106,7 +105,7 @@ describe('SiteVisualiser', () => {
   const createMockFeatureWithGeometry = (
     geometry = { mockGeometry: true }
   ) => ({
-    getGeometry: jest.fn().mockReturnValue(geometry)
+    getGeometry: vi.fn().mockReturnValue(geometry)
   })
 
   const getFeatureDisplayTestData = () => ({
@@ -144,9 +143,7 @@ describe('SiteVisualiser', () => {
           featureType === 'point'
             ? createBasicMockFeature()
             : createMockFeatureWithGeometry()
-        mockFeatureFactory[factoryMethod] = jest
-          .fn()
-          .mockReturnValue(mockFeature)
+        mockFeatureFactory[factoryMethod] = vi.fn().mockReturnValue(mockFeature)
 
         siteVisualiser[displayMethod](...testData.args)
 
@@ -162,7 +159,7 @@ describe('SiteVisualiser', () => {
       const testData = getFeatureDisplayTestData().circle
       const mockGeometry = { mockGeometry: true }
       const mockFeature = createMockFeatureWithGeometry(mockGeometry)
-      mockFeatureFactory.createCircleFeature = jest
+      mockFeatureFactory.createCircleFeature = vi
         .fn()
         .mockReturnValue(mockFeature)
 
@@ -179,7 +176,7 @@ describe('SiteVisualiser', () => {
       const testData = getFeatureDisplayTestData().circleSmall
       const mockGeometry = { mockGeometry: true }
       const mockFeature = createMockFeatureWithGeometry(mockGeometry)
-      mockFeatureFactory.createCircleFeature = jest
+      mockFeatureFactory.createCircleFeature = vi
         .fn()
         .mockReturnValue(mockFeature)
 
@@ -196,7 +193,7 @@ describe('SiteVisualiser', () => {
       const testData = getFeatureDisplayTestData().polygon
       const mockGeometry = { mockGeometry: true }
       const mockFeature = createMockFeatureWithGeometry(mockGeometry)
-      mockFeatureFactory.createPolygonFeature = jest
+      mockFeatureFactory.createPolygonFeature = vi
         .fn()
         .mockReturnValue(mockFeature)
 
@@ -216,7 +213,7 @@ describe('SiteVisualiser', () => {
     ]
 
     const setupPolygonFeatureFactory = (returnValue) => {
-      mockFeatureFactory.createPolygonFeature = jest
+      mockFeatureFactory.createPolygonFeature = vi
         .fn()
         .mockReturnValue(returnValue)
     }
@@ -325,17 +322,19 @@ describe('SiteVisualiser', () => {
         circleWidth
       }
       mockCoordinateParser.parseCoordinates.mockReturnValue(coordinates)
-      jest.spyOn(siteVisualiser, 'displayPolygonSite').mockImplementation()
+      vi.spyOn(siteVisualiser, 'displayPolygonSite').mockImplementation()
 
       return { siteDetails, coordinates }
     }
 
     beforeEach(() => {
       mockCoordinateParser = {
-        parseCoordinates: jest.fn()
+        parseCoordinates: vi.fn()
       }
       siteVisualiser.coordinateParser = mockCoordinateParser
-      jest.spyOn(siteVisualiser, 'displayCircularSite').mockImplementation()
+      vi.spyOn(siteVisualiser, 'displayCircularSite').mockImplementation(
+        () => undefined
+      )
     })
 
     test('handles missing site coordinates gracefully', () => {
@@ -380,6 +379,7 @@ describe('SiteVisualiser', () => {
       const siteDetails = { ...commonSiteDetails, circleWidth: 100 }
       const mapCoordinates = getThamesEstuaryCoordinates()
       setupCoordinateMock(mapCoordinates)
+      vi.spyOn(siteVisualiser, 'displayPolygonSite').mockImplementation()
 
       const result = siteVisualiser.displayManualCoordinates(siteDetails)
 
@@ -458,6 +458,7 @@ describe('SiteVisualiser', () => {
       }
       const mapCoordinates = [3000, 4000]
       mockCoordinateParser.parseCoordinates.mockReturnValue(mapCoordinates)
+      vi.spyOn(siteVisualiser, 'displayPolygonSite').mockImplementation()
 
       const result = siteVisualiser.displayManualCoordinates(siteDetails)
 

@@ -1,3 +1,4 @@
+import { vi } from 'vitest'
 import {
   processFileUploadSiteDetails,
   processManualSiteDetails,
@@ -13,14 +14,14 @@ import {
   getPolygonCoordinatesDisplayData
 } from '~/src/server/exemption/site-details/review-site-details/utils.js'
 
-jest.mock(
+vi.mock(
   '~/src/server/exemption/site-details/review-site-details/utils.js',
   () => ({
-    getCoordinateSystemText: jest.fn(),
-    getCoordinateDisplayText: jest.fn(),
-    getReviewSummaryText: jest.fn(),
-    getFileUploadSummaryData: jest.fn(),
-    getPolygonCoordinatesDisplayData: jest.fn()
+    getCoordinateSystemText: vi.fn(),
+    getCoordinateDisplayText: vi.fn(),
+    getReviewSummaryText: vi.fn(),
+    getFileUploadSummaryData: vi.fn(),
+    getPolygonCoordinatesDisplayData: vi.fn()
   })
 )
 
@@ -30,7 +31,7 @@ describe('exemption-site-details helper', () => {
 
   beforeEach(() => {
     mockLogger = {
-      error: jest.fn()
+      error: vi.fn()
     }
     mockRequest = {
       logger: mockLogger

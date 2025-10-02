@@ -1,12 +1,13 @@
+import { vi } from 'vitest'
 import { deleteSiteRoutes } from './index.js'
 import { routes } from '~/src/server/common/constants/routes.js'
 
-jest.mock('./controller.js', () => ({
+vi.mock('./controller.js', () => ({
   deleteSiteController: {
-    handler: jest.fn()
+    handler: vi.fn()
   },
   deleteSiteSubmitController: {
-    handler: jest.fn()
+    handler: vi.fn()
   }
 }))
 

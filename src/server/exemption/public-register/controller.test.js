@@ -1,3 +1,4 @@
+import { vi } from 'vitest'
 import { setupTestServer } from '~/tests/integration/shared/test-setup-helpers.js'
 import { statusCodes } from '~/src/server/common/constants/status-codes.js'
 import { mockExemption } from '~/src/server/test-helpers/mocks.js'
@@ -17,7 +18,7 @@ import * as cacheUtils from '~/src/server/common/helpers/session-cache/utils.js'
 import { routes } from '~/src/server/common/constants/routes.js'
 import * as authRequests from '~/src/server/common/helpers/authenticated-requests.js'
 
-jest.mock('~/src/server/common/helpers/session-cache/utils.js')
+vi.mock('~/src/server/common/helpers/session-cache/utils.js')
 
 describe('#publicRegister', () => {
   const getServer = setupTestServer()
@@ -29,14 +30,14 @@ describe('#publicRegister', () => {
   }
 
   beforeEach(() => {
-    jest.spyOn(authRequests, 'authenticatedPatchRequest').mockResolvedValue({
+    vi.spyOn(authRequests, 'authenticatedPatchRequest').mockResolvedValue({
       payload: {
         id: mockExemption.id,
         ...mockExemption.publicRegister
       }
     })
 
-    getExemptionCacheSpy = jest
+    getExemptionCacheSpy = vi
       .spyOn(cacheUtils, 'getExemptionCache')
       .mockReturnValue(mockExemption)
   })
@@ -58,7 +59,7 @@ describe('#publicRegister', () => {
     })
 
     test('publicRegisterController handler should render with correct context', () => {
-      const h = { view: jest.fn() }
+      const h = { view: vi.fn() }
 
       publicRegisterController.handler({}, h)
 
@@ -108,7 +109,7 @@ describe('#publicRegister', () => {
     })
 
     test('Should pass error to global catchAll behaviour if it contains no validation data', async () => {
-      const apiPostMock = jest.spyOn(authRequests, 'authenticatedPatchRequest')
+      const apiPostMock = vi.spyOn(authRequests, 'authenticatedPatchRequest')
       apiPostMock.mockRejectedValueOnce({
         res: { statusCode: 500 },
         data: {}
@@ -135,8 +136,8 @@ describe('#publicRegister', () => {
       }
 
       const h = {
-        view: jest.fn().mockReturnValue({
-          takeover: jest.fn()
+        view: vi.fn().mockReturnValue({
+          takeover: vi.fn()
         })
       }
 
@@ -186,8 +187,8 @@ describe('#publicRegister', () => {
       }
 
       const h = {
-        view: jest.fn().mockReturnValue({
-          takeover: jest.fn()
+        view: vi.fn().mockReturnValue({
+          takeover: vi.fn()
         })
       }
 
@@ -217,8 +218,8 @@ describe('#publicRegister', () => {
       }
 
       const h = {
-        view: jest.fn().mockReturnValue({
-          takeover: jest.fn()
+        view: vi.fn().mockReturnValue({
+          takeover: vi.fn()
         })
       }
 
@@ -240,8 +241,8 @@ describe('#publicRegister', () => {
       }
 
       const h = {
-        view: jest.fn().mockReturnValue({
-          takeover: jest.fn()
+        view: vi.fn().mockReturnValue({
+          takeover: vi.fn()
         })
       }
 
@@ -258,7 +259,7 @@ describe('#publicRegister', () => {
     })
 
     test('Should show error messages without calling the back end when payload data is empty', async () => {
-      const apiPostMock = jest.spyOn(authRequests, 'authenticatedPatchRequest')
+      const apiPostMock = vi.spyOn(authRequests, 'authenticatedPatchRequest')
 
       const { result } = await makePostRequest({
         url: routes.PUBLIC_REGISTER,
@@ -274,7 +275,7 @@ describe('#publicRegister', () => {
     })
 
     test('Should show error for reason being empty when consent is set to yes', async () => {
-      const apiPostMock = jest.spyOn(authRequests, 'authenticatedPatchRequest')
+      const apiPostMock = vi.spyOn(authRequests, 'authenticatedPatchRequest')
 
       const { result } = await makePostRequest({
         url: routes.PUBLIC_REGISTER,
@@ -295,10 +296,10 @@ describe('#publicRegister', () => {
 
     test('Should correctly set the cache when submitting public register', async () => {
       const h = {
-        redirect: jest.fn().mockReturnValue({
-          takeover: jest.fn()
+        redirect: vi.fn().mockReturnValue({
+          takeover: vi.fn()
         }),
-        view: jest.fn()
+        view: vi.fn()
       }
 
       const mockRequest = { payload: { consent: 'yes', reason: 'Test reason' } }

@@ -1,9 +1,10 @@
+import { vi } from 'vitest'
 import CoordinateParser from './coordinate-parser.js'
 import GeographicCoordinateConverter from './geographic-coordinate-converter.js'
 
-jest.mock('./geographic-coordinate-converter.js', () => ({
+vi.mock('./geographic-coordinate-converter.js', () => ({
   default: {
-    osgb36ToWgs84: jest.fn()
+    osgb36ToWgs84: vi.fn()
   }
 }))
 
@@ -12,10 +13,9 @@ describe('CoordinateParser', () => {
   let mockFromLonLat
 
   beforeEach(() => {
-    jest.clearAllMocks()
-    GeographicCoordinateConverter.osgb36ToWgs84 = jest.fn()
+    GeographicCoordinateConverter.osgb36ToWgs84 = vi.fn()
     coordinateParser = new CoordinateParser()
-    mockFromLonLat = jest.fn()
+    mockFromLonLat = vi.fn()
   })
 
   const setupOSGB36Test = (webMercatorResult = [56000, 6708000]) => {
@@ -271,7 +271,7 @@ describe('CoordinateParser', () => {
       mockFromLonLat.mockReturnValue([1000, 2000])
 
       const originalParseCoordinates = coordinateParser.parseCoordinates
-      coordinateParser.parseCoordinates = jest
+      coordinateParser.parseCoordinates = vi
         .fn()
         .mockReturnValueOnce([1000, 2000])
         .mockReturnValueOnce(null)

@@ -1,37 +1,33 @@
+import { vi } from 'vitest'
 import { JSDOM } from 'jsdom'
 import { getByRole, getByText } from '@testing-library/dom'
 import { statusCodes } from '~/src/server/common/constants/status-codes.js'
-import {
-  getExemptionCache,
-  updateExemptionSiteDetails,
-  setExemptionCache
-} from '~/src/server/common/helpers/session-cache/utils.js'
 import { validateErrors } from '~/tests/integration/shared/expect-utils.js'
 
-import { setupTestServer } from '~/tests/integration/shared/test-setup-helpers.js'
+import {
+  mockExemption,
+  setupTestServer
+} from '~/tests/integration/shared/test-setup-helpers.js'
 
 import {
   makeGetRequest,
   makePostRequest
 } from '~/src/server/test-helpers/server-requests.js'
 
-jest.mock('~/src/server/common/helpers/session-cache/utils.js')
+vi.mock('~/src/server/common/helpers/session-cache/utils.js')
 
 describe('Multiple sites question page', () => {
   const getServer = setupTestServer()
 
-  const mockExemption = {
+  const mockExemptionData = {
     id: 'test-exemption-123',
     projectName: 'Test Project'
   }
 
-  beforeEach(() => {
-    jest.mocked(getExemptionCache).mockReturnValue(mockExemption)
-    jest.mocked(updateExemptionSiteDetails).mockReturnValue({})
-    jest.mocked(setExemptionCache).mockReturnValue({})
-  })
+  beforeEach(() => mockExemption(mockExemptionData))
 
   test('should display the multiple sites question page with correct content and multipleSiteDetails defaults to false', async () => {
+    const { setExemptionCache } = mockExemption(mockExemptionData)
     const { result, statusCode } = await makeGetRequest({
       server: getServer(),
       url: '/exemption/does-your-project-involve-more-than-one-site'
@@ -47,7 +43,9 @@ describe('Multiple sites question page', () => {
         name: 'Do you need to tell us about more than one site?'
       })
     ).toBeInTheDocument()
-    expect(getByText(document, mockExemption.projectName)).toBeInTheDocument()
+    expect(
+      getByText(document, mockExemptionData.projectName)
+    ).toBeInTheDocument()
 
     const yesRadio = getByRole(document, 'radio', { name: 'Yes' })
     const noRadio = getByRole(document, 'radio', { name: 'No' })
@@ -59,8 +57,8 @@ describe('Multiple sites question page', () => {
   })
 
   test('should pre-populate radio button when multipleSiteDetails value exists in cache', async () => {
-    jest.mocked(getExemptionCache).mockReturnValue({
-      ...mockExemption,
+    const { setExemptionCache } = mockExemption({
+      ...mockExemptionData,
       multipleSiteDetails: { multipleSitesEnabled: 'yes' }
     })
 
@@ -82,8 +80,8 @@ describe('Multiple sites question page', () => {
   })
 
   test('should not overwrite existing multipleSiteDetails value on GET route', async () => {
-    jest.mocked(getExemptionCache).mockReturnValue({
-      ...mockExemption,
+    const { setExemptionCache } = mockExemption({
+      ...mockExemptionData,
       multipleSiteDetails: { multipleSitesEnabled: 'yes' }
     })
 
@@ -159,6 +157,7 @@ describe('Multiple sites question page', () => {
   })
 
   test('should navigate to Site Name page when YES is selected and set multipleSiteDetails to true', async () => {
+    const { setExemptionCache } = mockExemption(mockExemptionData)
     const response = await makePostRequest({
       url: '/exemption/does-your-project-involve-more-than-one-site',
       server: getServer(),
@@ -171,12 +170,13 @@ describe('Multiple sites question page', () => {
     expect(response.headers.location).toBe('/exemption/site-name')
 
     expect(setExemptionCache).toHaveBeenCalledWith(expect.any(Object), {
-      ...mockExemption,
+      ...mockExemptionData,
       multipleSiteDetails: { multipleSitesEnabled: true }
     })
   })
 
   test('should redirect to coordinates entry choice when NO is selected and set multipleSiteDetails to false', async () => {
+    const { setExemptionCache } = mockExemption(mockExemptionData)
     const response = await makePostRequest({
       url: '/exemption/does-your-project-involve-more-than-one-site',
       server: getServer(),
@@ -191,7 +191,7 @@ describe('Multiple sites question page', () => {
     )
 
     expect(setExemptionCache).toHaveBeenCalledWith(expect.any(Object), {
-      ...mockExemption,
+      ...mockExemptionData,
       multipleSiteDetails: { multipleSitesEnabled: false }
     })
   })

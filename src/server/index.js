@@ -19,6 +19,7 @@ import { csrf } from '~/src/server/common/helpers/csrf.js'
 import { openId } from '~/src/server/common/plugins/open-id.js'
 import { cookies } from '~/src/server/common/plugins/cookies.js'
 import { setPageCacheControlHeaders } from '~/src/server/common/helpers/cache-control.js'
+import { contentSecurityPolicy } from '~/src/server/common/helpers/content-security-policy.js'
 
 export async function createServer() {
   setupProxy()
@@ -76,6 +77,7 @@ export async function createServer() {
     cookie,
     basic,
     nunjucksConfig,
+    contentSecurityPolicy,
     csrf,
     openId,
     cookies,

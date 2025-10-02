@@ -5,7 +5,6 @@ import { load } from 'cheerio'
 import { JSDOM } from 'jsdom'
 import { camelCase } from 'lodash'
 import * as filters from '~/src/config/nunjucks/filters/filters.js'
-import * as globals from '~/src/config/nunjucks/globals.js'
 
 const dirname = path.dirname(fileURLToPath(import.meta.url))
 const nunjucksTestEnv = nunjucks.configure(
@@ -19,10 +18,6 @@ const nunjucksTestEnv = nunjucks.configure(
     lstripBlocks: true
   }
 )
-
-Object.entries(globals).forEach(([name, global]) => {
-  nunjucksTestEnv.addGlobal(name, global)
-})
 
 Object.entries(filters).forEach(([name, filter]) => {
   nunjucksTestEnv.addFilter(name, filter)

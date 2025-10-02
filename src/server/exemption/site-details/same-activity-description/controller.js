@@ -4,12 +4,16 @@ import {
   updateExemptionSiteDetails
 } from '~/src/server/common/helpers/session-cache/utils.js'
 import { routes } from '~/src/server/common/constants/routes.js'
-import { setSiteDataPreHandler } from '~/src/server/common/helpers/session-cache/site-utils.js'
+import {
+  setSiteDataPreHandler,
+  setSiteData
+} from '~/src/server/common/helpers/session-cache/site-utils.js'
 import {
   errorDescriptionByFieldName,
   mapErrorsForDisplay
 } from '~/src/server/common/helpers/errors.js'
 import joi from 'joi'
+import { getBackLink } from './utils.js'
 
 export const SAME_ACTIVITY_DESCRIPTION_VIEW_ROUTE =
   'exemption/site-details/same-activity-description/index'
@@ -30,12 +34,13 @@ export const errorMessages = {
 const createValidationFailAction = (request, h, err) => {
   const { payload } = request
   const exemption = getExemptionCache(request)
+  const site = setSiteData(request)
 
   if (!err.details) {
     return h
       .view(SAME_ACTIVITY_DESCRIPTION_VIEW_ROUTE, {
         ...sameActivityDescriptionSettings,
-        backLink: routes.SITE_DETAILS_ACTIVITY_DATES,
+        backLink: getBackLink(exemption, site.siteDetails),
         payload,
         projectName: exemption.projectName
       })
@@ -48,7 +53,7 @@ const createValidationFailAction = (request, h, err) => {
   return h
     .view(SAME_ACTIVITY_DESCRIPTION_VIEW_ROUTE, {
       ...sameActivityDescriptionSettings,
-      backLink: routes.SITE_DETAILS_ACTIVITY_DATES,
+      backLink: getBackLink(exemption, site.siteDetails),
       payload,
       projectName: exemption.projectName,
       errors,
@@ -66,7 +71,7 @@ export const sameActivityDescriptionController = {
     pre: [setSiteDataPreHandler]
   },
   handler(request, h) {
-    const { siteIndex, queryParams } = request.site
+    const { siteIndex, siteDetails, queryParams } = request.site
     const exemption = getExemptionCache(request)
 
     const { multipleSiteDetails } = exemption
@@ -90,7 +95,7 @@ export const sameActivityDescriptionController = {
 
     return h.view(SAME_ACTIVITY_DESCRIPTION_VIEW_ROUTE, {
       ...sameActivityDescriptionSettings,
-      backLink: routes.SITE_DETAILS_ACTIVITY_DATES,
+      backLink: getBackLink(exemption, siteDetails),
       projectName: exemption.projectName,
       payload: {
         sameActivityDescription:
@@ -124,13 +129,20 @@ export const sameActivityDescriptionSubmitController = {
   },
   handler(request, h) {
     const { payload, site } = request
-    const { queryParams } = site
+    const { queryParams, siteDetails } = site
 
     updateExemptionMultipleSiteDetails(
       request,
       'sameActivityDescription',
       payload.sameActivityDescription
     )
+
+    if (
+      siteDetails.coordinatesType === 'file' &&
+      payload.sameActivityDescription === 'no'
+    ) {
+      return h.redirect(routes.REVIEW_SITE_DETAILS)
+    }
 
     return h.redirect(routes.SITE_DETAILS_ACTIVITY_DESCRIPTION + queryParams)
   }

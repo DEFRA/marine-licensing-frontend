@@ -321,6 +321,22 @@ describe('#utils', () => {
   describe('updateExemptionSiteDetailsBatch', () => {
     let mockRequest
 
+    const mockStatus = {
+      filename: 'test-file',
+      status: 'ready',
+      s3Location: {
+        s3Bucket: 'test-bucket',
+        s3Key: 'test-key',
+        checksumSha256: 'test-checksum'
+      }
+    }
+
+    const mockS3Location = {
+      s3Bucket: 'test-bucket',
+      s3Key: 'test-key',
+      checksumSha256: 'test-checksum'
+    }
+
     beforeEach(() => {
       mockRequest = {
         yar: {
@@ -330,65 +346,252 @@ describe('#utils', () => {
       }
     })
 
-    test('should update multiple siteDetails properties in a single operation', () => {
+    test('should update multiple siteDetails properties in a single operation for a single site', () => {
       const existingCache = {
         projectName: 'Test Project',
         siteDetails: [
           {
             coordinatesType: 'file',
-            existingProperty: 'keepThis'
+            fileUploadType: 'kml'
           }
         ]
       }
 
       mockRequest.yar.get.mockReturnValue(existingCache)
 
-      const updates = {
-        uploadedFile: { filename: 'test.kml', status: 'ready' },
-        extractedCoordinates: [{ lat: 50, lng: -1 }],
-        geoJSON: { type: 'FeatureCollection', features: [] },
-        featureCount: 1
+      const mockCoordinateData = {
+        extractedCoordinates: [],
+        geoJSON: {
+          type: 'FeatureCollection',
+          features: [
+            {
+              type: 'Feature',
+              geometry: {
+                type: 'Polygon',
+                coordinates: [
+                  [
+                    [-1.2345, 50.9876],
+                    [-1.2335, 50.9876],
+                    [-1.2335, 50.9886],
+                    [-1.2345, 50.9886],
+                    [-1.2345, 50.9876]
+                  ]
+                ]
+              }
+            }
+          ]
+        }
       }
 
-      const result = updateExemptionSiteDetailsBatch(mockRequest, updates)
+      const result = updateExemptionSiteDetailsBatch(
+        mockRequest,
+        mockStatus,
+        mockCoordinateData,
+        mockS3Location,
+        { isMultipleSitesFile: false }
+      )
+
+      const expected = {
+        coordinatesType: 'file',
+        fileUploadType: 'kml',
+        uploadedFile: {
+          filename: 'test-file',
+          status: 'ready',
+          s3Location: {
+            checksumSha256: 'test-checksum',
+            s3Bucket: 'test-bucket',
+            s3Key: 'test-key'
+          }
+        },
+        s3Location: mockS3Location,
+        extractedCoordinates: expect.any(Array),
+        geoJSON: mockCoordinateData.geoJSON,
+        featureCount: 1,
+        uploadConfig: null
+      }
 
       expect(mockRequest.yar.set).toHaveBeenCalledWith(EXEMPTION_CACHE_KEY, {
+        projectName: 'Test Project',
+        siteDetails: [expected]
+      })
+
+      expect(result).toEqual([expected])
+    })
+
+    test('should update multiple siteDetails properties in a single operation for a multiple sites', () => {
+      const existingCache = {
         projectName: 'Test Project',
         siteDetails: [
           {
             coordinatesType: 'file',
-            existingProperty: 'keepThis',
-            uploadedFile: { filename: 'test.kml', status: 'ready' },
-            extractedCoordinates: [{ lat: 50, lng: -1 }],
-            geoJSON: { type: 'FeatureCollection', features: [] },
-            featureCount: 1
+            fileUploadType: 'kml'
           }
         ]
+      }
+
+      mockRequest.yar.get.mockReturnValue(existingCache)
+
+      const mockCoordinateData = {
+        extractedCoordinates: [[[-1.2345, 50.9876]], [[-1.2345, 50.9876]]],
+        geoJSON: {
+          type: 'FeatureCollection',
+          features: [
+            {
+              type: 'Feature',
+              geometry: {
+                type: 'Polygon',
+                coordinates: [
+                  [
+                    [-1.2345, 50.9876],
+                    [-1.2335, 50.9876],
+                    [-1.2335, 50.9886],
+                    [-1.2345, 50.9886],
+                    [-1.2345, 50.9876]
+                  ]
+                ]
+              }
+            },
+            {
+              type: 'Feature',
+              geometry: {
+                type: 'Polygon',
+                coordinates: [
+                  [
+                    [-1.1345, 51.9876],
+                    [-1.1335, 51.9876],
+                    [-1.1335, 51.9886],
+                    [-1.1345, 51.9886],
+                    [-1.1345, 51.9876]
+                  ]
+                ]
+              }
+            }
+          ]
+        }
+      }
+
+      const result = updateExemptionSiteDetailsBatch(
+        mockRequest,
+        mockStatus,
+        mockCoordinateData,
+        mockS3Location,
+        { isMultipleSitesFile: true }
+      )
+
+      const expected = [
+        {
+          coordinatesType: 'file',
+          fileUploadType: 'kml',
+          uploadedFile: {
+            filename: 'test-file',
+            status: 'ready',
+            s3Location: {
+              checksumSha256: 'test-checksum',
+              s3Bucket: 'test-bucket',
+              s3Key: 'test-key'
+            }
+          },
+          s3Location: mockS3Location,
+          extractedCoordinates: expect.any(Array),
+          geoJSON: {
+            type: 'FeatureCollection',
+            features: [mockCoordinateData.geoJSON.features[0]]
+          },
+          featureCount: 1,
+          uploadConfig: null
+        },
+        {
+          coordinatesType: 'file',
+          fileUploadType: 'kml',
+          uploadedFile: {
+            filename: 'test-file',
+            status: 'ready',
+            s3Location: {
+              checksumSha256: 'test-checksum',
+              s3Bucket: 'test-bucket',
+              s3Key: 'test-key'
+            }
+          },
+          s3Location: mockS3Location,
+          extractedCoordinates: expect.any(Array),
+          geoJSON: {
+            type: 'FeatureCollection',
+            features: [mockCoordinateData.geoJSON.features[1]]
+          },
+          featureCount: 1,
+          uploadConfig: null
+        }
+      ]
+
+      expect(mockRequest.yar.set).toHaveBeenCalledWith(EXEMPTION_CACHE_KEY, {
+        projectName: 'Test Project',
+        siteDetails: expected
       })
 
-      expect(result).toEqual({
-        coordinatesType: 'file',
-        existingProperty: 'keepThis',
-        uploadedFile: { filename: 'test.kml', status: 'ready' },
-        extractedCoordinates: [{ lat: 50, lng: -1 }],
-        geoJSON: { type: 'FeatureCollection', features: [] },
-        featureCount: 1
-      })
+      expect(result).toEqual(expected)
     })
 
     test('should handle empty siteDetails', () => {
       const existingCache = { projectName: 'Test Project' }
       mockRequest.yar.get.mockReturnValue(existingCache)
 
-      const updates = { newProperty: 'newValue' }
-      const result = updateExemptionSiteDetailsBatch(mockRequest, updates)
+      const mockCoordinateData = {
+        extractedCoordinates: [],
+        geoJSON: {
+          type: 'FeatureCollection',
+          features: [
+            {
+              type: 'Feature',
+              geometry: {
+                type: 'Polygon',
+                coordinates: [
+                  [
+                    [-1.2345, 50.9876],
+                    [-1.2335, 50.9876],
+                    [-1.2335, 50.9886],
+                    [-1.2345, 50.9886],
+                    [-1.2345, 50.9876]
+                  ]
+                ]
+              }
+            }
+          ]
+        }
+      }
+
+      const result = updateExemptionSiteDetailsBatch(
+        mockRequest,
+        mockStatus,
+        mockCoordinateData,
+        mockS3Location,
+        { isMultipleSitesFile: false }
+      )
+
+      const expected = {
+        coordinatesType: undefined,
+        fileUploadType: undefined,
+        uploadedFile: {
+          filename: 'test-file',
+          status: 'ready',
+          s3Location: {
+            checksumSha256: 'test-checksum',
+            s3Bucket: 'test-bucket',
+            s3Key: 'test-key'
+          }
+        },
+        s3Location: mockS3Location,
+        extractedCoordinates: expect.any(Array),
+        geoJSON: mockCoordinateData.geoJSON,
+        featureCount: 1,
+        uploadConfig: null
+      }
 
       expect(mockRequest.yar.set).toHaveBeenCalledWith(EXEMPTION_CACHE_KEY, {
         projectName: 'Test Project',
-        siteDetails: [{ newProperty: 'newValue' }]
+        siteDetails: [expected]
       })
 
-      expect(result).toEqual({ newProperty: 'newValue' })
+      expect(result).toEqual([expected])
     })
   })
 

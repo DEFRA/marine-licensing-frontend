@@ -69,6 +69,50 @@ export const mockExemptionWithShapefile = {
     { ...mockExemption.siteDetails[0], fileUploadType: 'shapefile' }
   ]
 }
+export const mockFileUploadExemption = {
+  ...mockExemption,
+  siteDetails: [
+    {
+      coordinatesType: 'file',
+      fileUploadType: 'kml',
+      uploadConfig: {
+        uploadId: 'test-upload-id',
+        statusUrl: 'test-status-url',
+        fileType: 'kml'
+      },
+      s3Location: {
+        checksumSha256: 'test-checksum',
+        s3Bucket: 'test-bucket',
+        s3Key: 'test-key'
+      },
+      geoJSON: {
+        type: 'FeatureCollection',
+        features: [
+          {
+            type: 'Feature',
+            geometry: {
+              type: 'Polygon',
+              coordinates: [
+                [
+                  [-1.2345, 50.9876],
+                  [-1.2335, 50.9876],
+                  [-1.2335, 50.9886],
+                  [-1.2345, 50.9886],
+                  [-1.2345, 50.9876]
+                ]
+              ]
+            }
+          }
+        ]
+      },
+      activityDates: {
+        start: '2025-01-01T00:00:00.000Z',
+        end: '2025-01-01T00:00:00.000Z'
+      },
+      activityDescription: 'Test activity description'
+    }
+  ]
+}
 
 export const mockExemptionNoSiteDetails = {
   ...mockExemption,

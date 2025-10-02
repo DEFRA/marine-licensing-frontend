@@ -82,23 +82,80 @@ export const resetExemptionSiteDetails = (request) => {
 }
 
 /**
- * @param { Request } request
- * @param { object } updates - Object containing key-value pairs to update in siteDetails
+ * @param { Request } request - Hapi request object
+ * @param { object } status - Upload status response from CDP
+ * @param { object } coordinateData - Extracted coordinate data
+ * @param { object } s3Location - S3 location details
+ * @param { object } options - Configuration options
+ * @param { boolean } options.isMultipleSitesFile - Is the upload for multiple sites
  */
-export const updateExemptionSiteDetailsBatch = (request, updates) => {
+export const updateExemptionSiteDetailsBatch = (
+  request,
+  status,
+  coordinateData,
+  s3Location,
+  options
+) => {
+  const { isMultipleSitesFile } = options
   const existingCache = getExemptionCache(request)
 
-  const existingSiteDetails = getSiteDetailsBySite(existingCache)
+  const firstSiteDetails = getSiteDetailsBySite(existingCache)
 
-  // Apply all updates in a single operation
-  const updatedSiteDetails = {
-    ...existingSiteDetails,
-    ...updates
+  const { coordinatesType, fileUploadType } = firstSiteDetails
+
+  const uploadSiteData = {
+    coordinatesType,
+    fileUploadType,
+    uploadedFile: {
+      ...status
+    },
+    s3Location: {
+      s3Bucket: s3Location.s3Bucket,
+      s3Key: s3Location.s3Key,
+      fileId: status.s3Location.fileId,
+      s3Url: status.s3Location.s3Url,
+      checksumSha256: status.s3Location.checksumSha256
+    },
+    featureCount: 1,
+    uploadConfig: null
+  }
+
+  if (!isMultipleSitesFile) {
+    const updatedSite = {
+      ...uploadSiteData,
+      extractedCoordinates: coordinateData.extractedCoordinates,
+      geoJSON: coordinateData.geoJSON
+    }
+
+    request.yar.set(EXEMPTION_CACHE_KEY, {
+      ...existingCache,
+      siteDetails: [updatedSite]
+    })
+
+    return [updatedSite]
+  }
+
+  const updatedSiteDetails = []
+
+  for (const [index] of coordinateData.geoJSON.features.entries()) {
+    const existingSiteDetails = getSiteDetailsBySite(existingCache, index)
+
+    const updatedSite = {
+      ...existingSiteDetails,
+      ...uploadSiteData,
+      extractedCoordinates: coordinateData.extractedCoordinates[index],
+      geoJSON: {
+        type: coordinateData.geoJSON.type,
+        features: [coordinateData.geoJSON.features[index]]
+      }
+    }
+
+    updatedSiteDetails.push(updatedSite)
   }
 
   request.yar.set(EXEMPTION_CACHE_KEY, {
     ...existingCache,
-    siteDetails: [updatedSiteDetails]
+    siteDetails: updatedSiteDetails
   })
 
   return updatedSiteDetails

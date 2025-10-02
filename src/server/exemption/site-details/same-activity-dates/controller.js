@@ -4,7 +4,10 @@ import {
   updateExemptionSiteDetails
 } from '~/src/server/common/helpers/session-cache/utils.js'
 import { routes } from '~/src/server/common/constants/routes.js'
-import { setSiteDataPreHandler } from '~/src/server/common/helpers/session-cache/site-utils.js'
+import {
+  setSiteDataPreHandler,
+  setSiteData
+} from '~/src/server/common/helpers/session-cache/site-utils.js'
 import {
   errorDescriptionByFieldName,
   mapErrorsForDisplay
@@ -30,11 +33,19 @@ const createValidationFailAction = (request, h, err) => {
   const { payload } = request
   const exemption = getExemptionCache(request)
 
+  const site = setSiteData(request)
+  const { siteDetails } = site
+
+  const backLink =
+    siteDetails.coordinatesType === 'file'
+      ? routes.FILE_UPLOAD
+      : routes.SITE_NAME
+
   if (!err.details) {
     return h
       .view(SAME_ACTIVITY_DATES_VIEW_ROUTE, {
         ...sameActivityDatesSettings,
-        backLink: routes.SITE_NAME,
+        backLink,
         payload,
         projectName: exemption.projectName
       })
@@ -47,7 +58,7 @@ const createValidationFailAction = (request, h, err) => {
   return h
     .view(SAME_ACTIVITY_DATES_VIEW_ROUTE, {
       ...sameActivityDatesSettings,
-      backLink: routes.SITE_NAME,
+      backLink,
       payload,
       projectName: exemption.projectName,
       errors,
@@ -65,7 +76,7 @@ export const sameActivityDatesController = {
     pre: [setSiteDataPreHandler]
   },
   handler(request, h) {
-    const { siteIndex, queryParams } = request.site
+    const { siteIndex, siteDetails, queryParams } = request.site
     const exemption = getExemptionCache(request)
 
     const { multipleSiteDetails } = exemption
@@ -86,7 +97,10 @@ export const sameActivityDatesController = {
 
     return h.view(SAME_ACTIVITY_DATES_VIEW_ROUTE, {
       ...sameActivityDatesSettings,
-      backLink: routes.SITE_NAME,
+      backLink:
+        siteDetails.coordinatesType === 'file'
+          ? routes.FILE_UPLOAD
+          : routes.SITE_NAME,
       projectName: exemption.projectName,
       payload: {
         sameActivityDates: exemption.multipleSiteDetails?.sameActivityDates
@@ -115,13 +129,20 @@ export const sameActivityDatesSubmitController = {
   },
   handler(request, h) {
     const { payload, site } = request
-    const { queryParams } = site
+    const { queryParams, siteDetails } = site
 
     updateExemptionMultipleSiteDetails(
       request,
       'sameActivityDates',
       payload.sameActivityDates
     )
+
+    if (
+      siteDetails.coordinatesType === 'file' &&
+      payload.sameActivityDates === 'no'
+    ) {
+      return h.redirect(routes.SAME_ACTIVITY_DESCRIPTION)
+    }
 
     return h.redirect(routes.SITE_DETAILS_ACTIVITY_DATES + queryParams)
   }

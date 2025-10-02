@@ -191,8 +191,8 @@ export const getFileUploadBackLink = (previousPage) => {
     return routes.TASK_LIST
   }
 
-  // Otherwise, return to file upload page
-  return routes.FILE_UPLOAD
+  // Otherwise, return to correct page for file upload upload journey
+  return previousPath
 }
 
 const metresLabel = (metres) =>
@@ -408,6 +408,7 @@ export const getSiteDetails = async (
  */
 export const prepareFileUploadDataForSave = (siteDetails, request) => {
   const dataToSave = []
+
   for (const site of siteDetails) {
     const uploadedFile = site.uploadedFile
     const geoJSON = site.geoJSON
@@ -415,16 +416,18 @@ export const prepareFileUploadDataForSave = (siteDetails, request) => {
 
     const siteToSave = {
       coordinatesType: 'file',
+      activityDates: site.activityDates,
+      activityDescription: site.activityDescription,
       fileUploadType: site.fileUploadType,
       geoJSON,
       featureCount,
       uploadedFile: {
-        filename: uploadedFile.filename // Save filename for display
+        filename: uploadedFile.filename
       },
       s3Location: {
-        s3Bucket: uploadedFile.s3Location.s3Bucket,
-        s3Key: uploadedFile.s3Location.s3Key,
-        checksumSha256: uploadedFile.s3Location.checksumSha256
+        s3Bucket: site.s3Location.s3Bucket,
+        s3Key: site.s3Location.s3Key,
+        checksumSha256: site.s3Location.checksumSha256
       }
     }
 

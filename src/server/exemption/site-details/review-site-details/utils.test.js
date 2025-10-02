@@ -426,10 +426,12 @@ describe('siteDetails utils', () => {
       )
     })
 
-    test('getFileUploadBackLink correctly returns file upload when coming from other pages', () => {
+    test('getFileUploadBackLink correctly returns file upload route', () => {
       expect(
-        getFileUploadBackLink(`http://hostname${routes.WIDTH_OF_SITE}`)
-      ).toBe(routes.FILE_UPLOAD)
+        getFileUploadBackLink(
+          `http://hostname${routes.SITE_DETAILS_ACTIVITY_DESCRIPTION}`
+        )
+      ).toBe(routes.SITE_DETAILS_ACTIVITY_DESCRIPTION)
     })
 
     test('getFileUploadBackLink correctly returns file upload as fallback', () => {
@@ -862,12 +864,12 @@ describe('siteDetails utils', () => {
           },
           featureCount: 1,
           uploadedFile: {
-            filename: 'test-site.kml',
-            s3Location: {
-              s3Bucket: 'test-bucket',
-              s3Key: 'test-key',
-              checksumSha256: 'test-checksum'
-            }
+            filename: 'test-site.kml'
+          },
+          s3Location: {
+            s3Bucket: 'test-bucket',
+            s3Key: 'test-key',
+            checksumSha256: 'test-checksum'
           }
         }
       ]
@@ -905,12 +907,12 @@ describe('siteDetails utils', () => {
           fileUploadType: 'shapefile',
           geoJSON: { type: 'FeatureCollection', features: [] },
           uploadedFile: {
-            filename: 'test.shp',
-            s3Location: {
-              s3Bucket: 'bucket',
-              s3Key: 'key',
-              checksumSha256: 'checksum'
-            }
+            filename: 'test.shp'
+          },
+          s3Location: {
+            s3Bucket: 'bucket',
+            s3Key: 'key',
+            checksumSha256: 'checksum'
           }
         }
       ]

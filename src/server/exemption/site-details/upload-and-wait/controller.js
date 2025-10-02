@@ -5,11 +5,13 @@ import { extractCoordinatesFromGeoJSON } from '~/src/server/common/helpers/coord
 import { getSiteDetailsBySite } from '~/src/server/common/helpers/session-cache/site-details-utils.js'
 import {
   getExemptionCache,
+  updateExemptionMultipleSiteDetails,
   updateExemptionSiteDetails,
   updateExemptionSiteDetailsBatch
 } from '~/src/server/common/helpers/session-cache/utils.js'
 import { getCdpUploadService } from '~/src/services/cdp-upload-service/index.js'
 import { getFileValidationService } from '~/src/services/file-validation/index.js'
+import { isMultipleSitesFile } from '~/src/server/exemption/site-details/upload-and-wait/utils.js'
 
 export const UPLOAD_AND_WAIT_VIEW_ROUTE =
   'exemption/site-details/upload-and-wait/index'
@@ -107,6 +109,7 @@ async function extractCoordinatesFromFile(request, s3Bucket, s3Key, fileType) {
   try {
     request.logger.info({ s3Bucket, s3Key, fileType }, 'Calling geo-parser API')
     const response = await callGeoParserAPI(request, s3Bucket, s3Key, fileType)
+
     const geoJSON = validateAndExtractGeoJSON(response)
     const extractedCoordinates = extractCoordinatesFromGeoJSON(geoJSON)
 
@@ -262,21 +265,14 @@ function storeUploadError(request, errorDetails, fileType) {
  * @param {string} s3Location.s3Key - S3 object key
  */
 function storeSuccessfulUpload(request, status, coordinateData, s3Location) {
-  updateExemptionSiteDetailsBatch(request, {
-    uploadedFile: {
-      ...status,
-      s3Location: {
-        s3Bucket: s3Location.s3Bucket,
-        s3Key: s3Location.s3Key,
-        fileId: status.s3Location.fileId,
-        s3Url: status.s3Location.s3Url,
-        checksumSha256: status.s3Location.checksumSha256
-      }
-    },
-    extractedCoordinates: coordinateData.extractedCoordinates,
-    geoJSON: coordinateData.geoJSON,
-    featureCount: coordinateData.featureCount,
-    uploadConfig: null // Clear upload config
+  updateExemptionMultipleSiteDetails(
+    request,
+    'multipleSitesEnabled',
+    isMultipleSitesFile(coordinateData)
+  )
+
+  updateExemptionSiteDetailsBatch(request, status, coordinateData, s3Location, {
+    isMultipleSitesFile: isMultipleSitesFile(coordinateData)
   })
 }
 
@@ -337,6 +333,11 @@ const processValidatedFile = async (status, uploadConfig, request, h) => {
       request
     )
     logSuccessfulProcessing(request, status, uploadConfig, coordinateData)
+
+    if (isMultipleSitesFile(coordinateData)) {
+      return h.redirect(routes.SAME_ACTIVITY_DATES)
+    }
+
     return h.redirect(routes.REVIEW_SITE_DETAILS)
   } catch (error) {
     handleGeoParserError(request, error, status.filename, uploadConfig.fileType)

@@ -1,0 +1,40 @@
+import { routes } from '~/src/server/common/constants/routes.js'
+import { getBackLink } from './utils.js'
+import { mockExemption } from '~/src/server/test-helpers/mocks.js'
+
+describe('sameActivityDescription utils', () => {
+  describe('getBackLink util', () => {
+    test('getBackLink correctly returns in manual journey', () => {
+      expect(
+        getBackLink(mockExemption, {
+          ...mockExemption.siteDetails[0],
+          coordinatesType: 'coordinates'
+        })
+      ).toBe(routes.SITE_DETAILS_ACTIVITY_DATES)
+    })
+
+    test('getBackLink correctly returns in file journey with same dates selected', () => {
+      expect(
+        getBackLink(mockExemption, {
+          ...mockExemption.siteDetails[0],
+          coordinatesType: 'file'
+        })
+      ).toBe(routes.SITE_DETAILS_ACTIVITY_DATES)
+    })
+
+    test('getBackLink correctly returns in file journey with variable dates selected', () => {
+      expect(
+        getBackLink(
+          {
+            ...mockExemption,
+            multipleSiteDetails: {
+              ...mockExemption.multipleSiteDetails,
+              sameActivityDates: 'no'
+            }
+          },
+          { ...mockExemption.siteDetails[0], coordinatesType: 'file' }
+        )
+      ).toBe(routes.SAME_ACTIVITY_DATES)
+    })
+  })
+})

@@ -233,7 +233,7 @@ describe('Same activity description page', () => {
   })
 
   test('should redirect to review site details "no" is selected in a file upload', async () => {
-    mockExemption({
+    const { updateExemptionMultipleSiteDetails } = mockExemption({
       ...exemptionWithMultipleSites,
       siteDetails: exemptionWithMultipleSites.siteDetails.map((site) => ({
         ...site,

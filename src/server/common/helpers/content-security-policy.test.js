@@ -1,3 +1,4 @@
+import { vi } from 'vitest'
 import { contentSecurityPolicy } from './content-security-policy.js'
 
 describe('contentSecurityPolicy', () => {
@@ -8,7 +9,7 @@ describe('contentSecurityPolicy', () => {
 
   beforeEach(() => {
     mockResponse = {
-      header: jest.fn().mockReturnThis(),
+      header: vi.fn().mockReturnThis(),
       isBoom: false
     }
     mockRequest = {
@@ -18,7 +19,7 @@ describe('contentSecurityPolicy', () => {
       continue: Symbol('continue')
     }
     server = {
-      ext: jest.fn()
+      ext: vi.fn()
     }
   })
 

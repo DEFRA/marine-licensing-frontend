@@ -217,8 +217,8 @@ describe('#sameActivityDates', () => {
       getExemptionCacheSpy.mockReturnValue(mockFileUploadExemption)
 
       const h = {
-        view: jest.fn().mockReturnValue({
-          takeover: jest.fn()
+        view: vi.fn().mockReturnValue({
+          takeover: vi.fn()
         })
       }
 

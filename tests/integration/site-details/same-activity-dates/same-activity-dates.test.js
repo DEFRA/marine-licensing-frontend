@@ -130,9 +130,9 @@ describe('Same activity dates page', () => {
   })
 
   test('should have correct navigation links for file upload', async () => {
-    jest.mocked(getExemptionCache).mockReturnValueOnce({
-      ...mockExemption,
-      siteDetails: mockExemption.siteDetails.map((site) => ({
+    mockExemption({
+      ...mockExemptionData,
+      siteDetails: mockExemptionData.siteDetails.map((site) => ({
         ...site,
         coordinatesType: 'file'
       }))
@@ -228,9 +228,9 @@ describe('Same activity dates page', () => {
   })
 
   test('should redirect to same-activity-description when "no" is selected in a file upload', async () => {
-    jest.mocked(getExemptionCache).mockReturnValueOnce({
-      ...mockExemption,
-      siteDetails: mockExemption.siteDetails.map((site) => ({
+    const { updateExemptionMultipleSiteDetails } = mockExemption({
+      ...mockExemptionData,
+      siteDetails: mockExemptionData.siteDetails.map((site) => ({
         ...site,
         coordinatesType: 'file'
       }))

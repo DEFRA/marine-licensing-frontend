@@ -1,5 +1,5 @@
 /**
- * Is the fle upload for multiple site
+ * Is the file upload for multiple site
  * @param {object} coordinateData - Extracted coordinate data
  * @returns {boolean} True for multiple sites
  */

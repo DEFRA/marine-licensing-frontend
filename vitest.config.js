@@ -5,7 +5,7 @@ export default defineConfig({
   test: {
     globals: true,
     environment: 'jsdom',
-    setupFiles: ['.vite/setup-files.js'],
+    setupFiles: ['.vite/setup-files.js', 'allure-vitest/setup'],
     include: ['**/src/**/*.test.js', '**/tests/**/*.test.js'],
     exclude: [
       '**/node_modules/**',
@@ -21,12 +21,21 @@ export default defineConfig({
         '**/.public/**',
         '**/src/server/test-helpers/**',
         '**/src/client/javascripts/application.js',
-        '**/src/client/javascripts/add-another-point/index.js',
         '**/src/index.js'
       ],
-      reportsDirectory: 'coverage'
+      reportsDirectory: 'coverage',
+      reporter: ['text', 'lcov']
     },
-    reporters: ['default', 'verbose'],
+    reporters: [
+      'default',
+      ['github-actions', { silent: false }],
+      [
+        'allure-vitest/reporter',
+        {
+          resultsDir: 'allure-results'
+        }
+      ]
+    ],
     clearMocks: true,
     restoreMocks: true
   },

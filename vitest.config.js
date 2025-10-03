@@ -4,7 +4,12 @@ import { defineConfig } from 'vitest/config'
 export default defineConfig({
   test: {
     globals: true,
-    pool: 'threads',
+    pool: 'forks',
+    poolOptions: {
+      forks: {
+        singleFork: true // Run all tests in same process but isolated
+      }
+    },
     setupFiles: ['.vite/setup-files.js', 'allure-vitest/setup'],
     include: ['**/src/**/*.test.js', '**/tests/**/*.test.js'],
     exclude: [
@@ -26,16 +31,7 @@ export default defineConfig({
       reportsDirectory: 'coverage',
       reporter: ['text', 'lcov']
     },
-    reporters: [
-      'default',
-      ['github-actions', { silent: false }],
-      [
-        'allure-vitest/reporter',
-        {
-          resultsDir: 'allure-results'
-        }
-      ]
-    ],
+    reporters: ['default', ['github-actions', { silent: false }]],
     clearMocks: true,
     restoreMocks: true
   },

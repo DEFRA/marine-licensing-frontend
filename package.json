@@ -24,7 +24,7 @@
     "lint:types": "tsc --build tsconfig.json",
     "lint:scss": "stylelint \"src/**/*.scss\" --cache --cache-location .cache/stylelint --cache-strategy content --color --ignore-path .gitignore",
     "postversion": "git add package.json package-lock.json && git commit -m $npm_package_version",
-    "test": "vitest run --coverage",
+    "test": "vitest --run --silent --coverage",
     "test:watch": "vitest",
     "test:integration:allure": "npx vitest run tests/ --coverage=false && npx allure generate allure-results --single-file --clean --name marine-licensing-dom-testing-library-tests",
     "server:watch": "nodemon --exec tsx --enable-source-maps ./src",

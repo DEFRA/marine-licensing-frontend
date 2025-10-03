@@ -381,12 +381,7 @@ describe('#reviewSiteDetails', () => {
           backLink: routes.TASK_LIST,
           projectName: undefined,
           summaryData: [],
-          multipleSiteDetailsData: {
-            method: 'Enter the coordinates of the site manually',
-            multipleSiteDetails: 'No',
-            sameActivityDates: 'No',
-            sameActivityDescription: 'No'
-          }
+          multipleSiteDetailsData: {}
         })
       })
 
@@ -440,16 +435,20 @@ describe('#reviewSiteDetails', () => {
             pageTitle: 'Review site details',
             backLink: routes.FILE_UPLOAD,
             projectName: 'Test Project',
-            fileUploadSummaryData: expect.objectContaining({
+            summaryData: expect.arrayContaining([
+              expect.objectContaining({
+                coordinates: [
+                  {
+                    type: 'Point',
+                    coordinates: [51.5074, -0.1278]
+                  }
+                ]
+              })
+            ]),
+            multipleSiteDetailsData: expect.objectContaining({
               method: 'Upload a file with the coordinates of the site',
               fileType: 'KML',
-              filename: 'test-site.kml',
-              coordinates: [
-                {
-                  type: 'Point',
-                  coordinates: [51.5074, -0.1278]
-                }
-              ]
+              filename: 'test-site.kml'
             })
           })
         )
@@ -475,16 +474,20 @@ describe('#reviewSiteDetails', () => {
             pageTitle: 'Review site details',
             backLink: routes.FILE_UPLOAD,
             projectName: 'Test Project',
-            fileUploadSummaryData: expect.objectContaining({
+            summaryData: expect.arrayContaining([
+              expect.objectContaining({
+                coordinates: [
+                  {
+                    type: 'Point',
+                    coordinates: [51.5074, -0.1278]
+                  }
+                ]
+              })
+            ]),
+            multipleSiteDetailsData: expect.objectContaining({
               method: 'Upload a file with the coordinates of the site',
               fileType: 'KML',
-              filename: 'test-site.kml',
-              coordinates: [
-                {
-                  type: 'Point',
-                  coordinates: [51.5074, -0.1278]
-                }
-              ]
+              filename: 'test-site.kml'
             })
           })
         )

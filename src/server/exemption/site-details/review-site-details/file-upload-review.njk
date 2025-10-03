@@ -3,14 +3,13 @@
 {% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
 {% from "govuk/components/button/macro.njk" import govukButton %}
 {% from "cancel-button/macro.njk" import appCancelButton %}
-{% from "site-details-data-script/macro.njk" import appSiteDetailsDataScript %}
+{% from "site-details-map/macro.njk" import appSiteDetailsMap %}
 {% block pageTitle %}
   Review site details | {{ serviceName }}
 {% endblock %}
 {% block head %}
   {{ super() }}
-  <link href="/public/stylesheets/ol.css" rel="stylesheet">
-  {% endblock %}
+{% endblock %}
   {% block beforeContent %}
     {{ super() }}
   <nav>
@@ -24,30 +23,57 @@
     {#  This javascript variable is only for testing purposes. #}
     {% if configEnv !== 'production' %}
       <script>
-        var geoJSON = {{ fileUploadSummaryData.geoJSON | dump | safe }};
+        var geoJSON = {{ summaryData[0].geoJSON | dump | safe }};
       </script>
     {% endif %}
     <div class="govuk-grid-row">
       <div class="govuk-grid-column-full">
         <span class="govuk-caption-l">{{ projectName }}</span>
         <h1 class="govuk-heading-l">Review site details</h1>
-        {% if fileUploadSummaryData %}
+
+            {% set multipleSiteRows = [
+                {
+                    key: {
+                      text: "Method of providing site location"
+                    },
+                    value: {
+                      text: multipleSiteDetailsData.method
+                    }
+                },
+                {
+                    key: {
+                      text: "File type"
+                    },
+                    value: {
+                      text: multipleSiteDetailsData.fileType | default('')
+                    }
+                },
+                {
+                    key: {
+                      text: "File uploaded"
+                    },
+                    value: { 
+                      text: multipleSiteDetailsData.filename | sanitiseFilename 
+                    }
+                }
+            ] %}
+
+            {{ govukSummaryList({
+                card: {
+                    title: {
+                        text: "Providing the site location"
+                    }
+                },
+                rows: multipleSiteRows,
+                classes: "govuk-summary-list--full-width"
+            }) }}
+
+        
+        {% for site in summaryData %}
           {% set rows = [] %}
           {% set _ = rows.push({
-          key: { text: "Method of providing site location" },
-          value: { text: fileUploadSummaryData.method | default('') }
-        }) %}
-          {% set _ = rows.push({
-          key: { text: "File type" },
-          value: { text: fileUploadSummaryData.fileType | default('') }
-        }) %}
-          {% set _ = rows.push({
-          key: { text: "File uploaded" },
-          value: { text: fileUploadSummaryData.filename | sanitiseFilename }
-        }) %}
-          {% set _ = rows.push({
           key: { text: "Map view", classes: "govuk-summary-list__key--full-width" },
-          value: { html: '<div class="app-site-details-map" data-module="site-details-map"></div>', classes: "govuk-summary-list__value--full-width" }
+          value: { html: appSiteDetailsMap(site.siteDetailsData, loop.index0), classes: "govuk-summary-list__value--full-width" }
         }) %}
           {{ govukSummaryList({
           card: {
@@ -58,8 +84,8 @@
           rows: rows,
         classes: "govuk-summary-list--full-width"
         }) }}
-        {% endif %}
-        {{ appSiteDetailsDataScript(siteDetailsData) }}
+        {% endfor %}
+
         <form method="POST">
           <input type="hidden" name="csrfToken" value="{{ csrfToken }}">
             <div class="govuk-button-group">

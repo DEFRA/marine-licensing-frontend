@@ -128,16 +128,11 @@ export const getPolygonCoordinatesDisplayData = (
 
 export const getFileUploadSummaryData = (exemption) => {
   const siteDetails = exemption.siteDetails || {}
-  const uploadedFile = siteDetails.uploadedFile || {}
   const geoJSON = siteDetails.geoJSON || {}
 
   const coordinates = parseGeoJSONCoordinates(geoJSON)
-  const fileType = getFileTypeText(siteDetails.fileUploadType)
 
   return {
-    method: 'Upload a file with the coordinates of the site',
-    fileType,
-    filename: uploadedFile.filename,
     coordinates,
     geoJSON
   }
@@ -312,29 +307,29 @@ export const buildManualCoordinateSummaryData = (
  * @param {Array} siteDetails - Site details from exemption
  * @returns {object} Summary data for template
  */
-export const buildManualCoordinateMultipleSitesSummaryData = (
+export const buildMultipleSitesSummaryData = (
   multipleSiteDetails,
   siteDetails
 ) => {
+  if (!siteDetails?.[0]) {
+    return {}
+  }
+
   const { multipleSitesEnabled, sameActivityDates, sameActivityDescription } =
     multipleSiteDetails ?? {}
 
   const multipleSiteData = {
-    method: 'Enter the coordinates of the site manually',
     multipleSiteDetails: multipleSitesEnabled ? 'Yes' : 'No',
     sameActivityDates: sameActivityDates === 'yes' ? 'Yes' : 'No',
     sameActivityDescription: sameActivityDescription === 'yes' ? 'Yes' : 'No'
   }
 
-  if (!siteDetails) {
-    return multipleSiteData
-  }
-
   const firstSite = siteDetails[0]
 
-  if (!firstSite) {
-    return {}
-  }
+  multipleSiteData.method =
+    firstSite.coordinatesType === 'coordinates'
+      ? 'Enter the coordinates of the site manually'
+      : 'Upload a file with the coordinates of the site'
 
   if (sameActivityDates === 'yes') {
     multipleSiteData.activityDates = `${formatDate(firstSite.activityDates?.start)} to ${formatDate(firstSite.activityDates?.end)}`
@@ -342,6 +337,12 @@ export const buildManualCoordinateMultipleSitesSummaryData = (
 
   if (sameActivityDescription === 'yes') {
     multipleSiteData.activityDescription = firstSite.activityDescription
+  }
+
+  if (firstSite.coordinatesType === 'file') {
+    multipleSiteData.fileType =
+      firstSite.fileUploadType === 'kml' ? 'KML' : 'Shapefile'
+    multipleSiteData.filename = firstSite.uploadedFile.filename
   }
 
   return multipleSiteData
@@ -482,20 +483,32 @@ export const renderFileUploadReview = (h, options) => {
     options
   const { multipleSiteDetails } = exemption
 
-  const fileUploadSummaryData = getFileUploadSummaryData({
-    ...exemption,
+  const multipleSiteDetailsData = buildMultipleSitesSummaryData(
+    multipleSiteDetails,
     siteDetails
-  })
+  )
 
-  // Prepare site details data for map if needed
-  const siteDetailsData = createSiteDetailsDataJson(siteDetails)
+  const summaryData = siteDetails.map((site, index) => {
+    const fileUploadSummaryData = getFileUploadSummaryData({
+      ...exemption,
+      siteDetails: site
+    })
+
+    const siteDetailsData = createSiteDetailsDataJson(site)
+
+    return {
+      ...fileUploadSummaryData,
+      siteDetailsData,
+      siteNumber: index + 1
+    }
+  })
 
   return h.view(FILE_UPLOAD_REVIEW_VIEW_ROUTE, {
     ...reviewSiteDetailsPageData,
     backLink: getFileUploadBackLink(previousPage),
     projectName: exemption.projectName,
-    fileUploadSummaryData,
-    siteDetailsData,
+    summaryData,
+    multipleSiteDetailsData,
     configEnv: config.get('env'),
     isMultiSiteJourney: !!multipleSiteDetails?.multipleSitesEnabled
   })
@@ -523,7 +536,7 @@ export const renderManualCoordinateReview = (h, options) => {
     multipleSiteDetails
   )
 
-  const multipleSiteDetailsData = buildManualCoordinateMultipleSitesSummaryData(
+  const multipleSiteDetailsData = buildMultipleSitesSummaryData(
     multipleSiteDetails,
     exemption.siteDetails
   )

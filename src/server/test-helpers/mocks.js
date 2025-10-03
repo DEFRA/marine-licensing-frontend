@@ -75,10 +75,8 @@ export const mockFileUploadExemption = {
     {
       coordinatesType: 'file',
       fileUploadType: 'kml',
-      uploadConfig: {
-        uploadId: 'test-upload-id',
-        statusUrl: 'test-status-url',
-        fileType: 'kml'
+      uploadedFile: {
+        filename: 'test-upload-id'
       },
       s3Location: {
         checksumSha256: 'test-checksum',

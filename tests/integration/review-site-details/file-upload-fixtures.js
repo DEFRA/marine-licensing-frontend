@@ -1,0 +1,67 @@
+import { COORDINATE_SYSTEMS } from '~/src/server/common/constants/exemptions.js'
+import { mockFileUploadExemption } from '~/src/server/test-helpers/mocks.js'
+
+const baseFileUploadExemption = {
+  multipleSiteDetails: {
+    multipleSiteDetails: false,
+    sameActivityDates: 'no',
+    sameActivityDescrption: 'no'
+  },
+  id: 'test-polygon-exemption-123',
+  projectName: 'Hammersmith pontoon construction',
+  activityDates: {
+    start: '2025-07-01',
+    end: '2025-07-07'
+  },
+  activityDescription:
+    'We will be installing a pontoon approximately 20 metres squared at the east of our garden that backs onto the river.',
+  publicRegister: {
+    withholdFromPublicRegister: false
+  },
+  taskList: {
+    projectName: { status: 'completed' },
+    activityDates: { status: 'completed' },
+    activityDescription: { status: 'completed' },
+    siteDetails: {
+      status: 'completed'
+    },
+    publicRegister: { status: 'completed' }
+  },
+  siteDetails: mockFileUploadExemption.siteDetails
+}
+
+export const testScenarios = [
+  {
+    name: 'File Upload - KML - Single Site',
+    coordinateSystem: COORDINATE_SYSTEMS.WGS84,
+    exemption: {
+      ...baseFileUploadExemption,
+      multipleSiteDetails: {
+        multipleSitesEnabled: true,
+        sameActivityDates: 'yes',
+        sameActivityDescription: 'yes'
+      }
+    },
+    expectedPageContent: {
+      projectName: 'Hammersmith pontoon construction',
+      multipleSiteDetails: {
+        method: 'Upload a file with the coordinates of the site',
+        fileType: 'KML',
+        fileUploaded: 'test-upload-id'
+      }
+    }
+  },
+  {
+    name: 'File Upload - KML - Multiple Sites',
+    coordinateSystem: COORDINATE_SYSTEMS.WGS84,
+    exemption: baseFileUploadExemption,
+    expectedPageContent: {
+      projectName: 'Hammersmith pontoon construction',
+      multipleSiteDetails: {
+        method: 'Upload a file with the coordinates of the site',
+        fileType: 'KML',
+        fileUploaded: 'test-upload-id'
+      }
+    }
+  }
+]

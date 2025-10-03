@@ -38,11 +38,12 @@ export const testScenarios = [
     expectedPageContent: {
       projectName: 'Hammersmith pontoon construction',
       multipleSiteDetails: {
+        multipleSiteDetails: 'No',
         method: 'Upload a file with the coordinates of the site',
         fileType: 'KML',
         fileUploaded: 'test-upload-id'
       },
-      siteDetails: [{}]
+      siteDetails: [{ cardName: 'Site details' }]
     }
   },
   {
@@ -56,13 +57,20 @@ export const testScenarios = [
         sameActivityDescription: 'yes'
       },
       siteDetails: [
-        mockFileUploadExemption.siteDetails[0],
-        mockFileUploadExemption.siteDetails[0]
+        {
+          ...mockFileUploadExemption.siteDetails[0],
+          siteName: null
+        },
+        {
+          ...mockFileUploadExemption.siteDetails[0],
+          siteName: 'test site name 2'
+        }
       ]
     },
     expectedPageContent: {
       projectName: 'Hammersmith pontoon construction',
       multipleSiteDetails: {
+        multipleSiteDetails: 'Yes',
         method: 'Upload a file with the coordinates of the site',
         fileType: 'KML',
         fileUploaded: 'test-upload-id',
@@ -71,7 +79,10 @@ export const testScenarios = [
         activityDates: '1 January 2025 to 1 January 2025',
         activityDescription: 'Test activity description'
       },
-      siteDetails: [{}, {}]
+      siteDetails: [
+        { siteName: 'Incomplete', cardName: 'Site 1 details' },
+        { siteName: 'test site name 2', cardName: 'Site 2 details' }
+      ]
     }
   },
   {
@@ -85,13 +96,20 @@ export const testScenarios = [
         sameActivityDescription: 'no'
       },
       siteDetails: [
-        mockFileUploadExemption.siteDetails[0],
-        mockFileUploadExemption.siteDetails[0]
+        {
+          ...mockFileUploadExemption.siteDetails[0],
+          siteName: null
+        },
+        {
+          ...mockFileUploadExemption.siteDetails[0],
+          siteName: 'test site name 2'
+        }
       ]
     },
     expectedPageContent: {
       projectName: 'Hammersmith pontoon construction',
       multipleSiteDetails: {
+        multipleSiteDetails: 'Yes',
         method: 'Upload a file with the coordinates of the site',
         fileType: 'KML',
         fileUploaded: 'test-upload-id',
@@ -100,11 +118,15 @@ export const testScenarios = [
       },
       siteDetails: [
         {
+          siteName: 'Incomplete',
+          cardName: 'Site 1 details',
           activityDates: mockFileUploadExemption.siteDetails[0].activityDates,
           activityDescription:
             mockFileUploadExemption.siteDetails[0].activityDescription
         },
         {
+          siteName: 'test site name 2',
+          cardName: 'Site 2 details',
           activityDates: mockFileUploadExemption.siteDetails[0].activityDates,
           activityDescription:
             mockFileUploadExemption.siteDetails[0].activityDescription

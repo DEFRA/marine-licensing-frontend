@@ -498,6 +498,7 @@ export const renderFileUploadReview = (h, options) => {
 
     return {
       ...fileUploadSummaryData,
+      siteName: site.siteName,
       siteDetailsData,
       siteNumber: index + 1
     }

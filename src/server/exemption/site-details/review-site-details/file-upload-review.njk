@@ -4,6 +4,7 @@
 {% from "govuk/components/button/macro.njk" import govukButton %}
 {% from "cancel-button/macro.njk" import appCancelButton %}
 {% from "site-details-map/macro.njk" import appSiteDetailsMap %}
+{% from "incomplete-field/macro.njk" import appIncompleteField %}
 {% block pageTitle %}
   Review site details | {{ serviceName }}
 {% endblock %}
@@ -137,10 +138,19 @@
           {% endset %}
 
           {% set rows = [] %}
+
+          {% if isMultiSiteJourney %}
+            {% set _ = rows.push({
+              key: { text: "Site name"},
+              value: { html: appIncompleteField(site.siteName)}
+            }) %}
+          {% endif %}
+          
           {% set _ = rows.push({
-          key: { text: "Map view", classes: "govuk-summary-list__key--full-width" },
-          value: { html: appSiteDetailsMap(site.siteDetailsData, loop.index0), classes: "govuk-summary-list__value--full-width" }
-        }) %}
+            key: { text: "Map view", classes: "govuk-summary-list__key--full-width" },
+            value: { html: appSiteDetailsMap(site.siteDetailsData, loop.index0), classes: "govuk-summary-list__value--full-width" }
+          }) %}
+
           {{ govukSummaryList({
           card: {
             title: {

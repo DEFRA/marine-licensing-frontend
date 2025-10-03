@@ -75,6 +75,7 @@ export const mockFileUploadExemption = {
     {
       coordinatesType: 'file',
       fileUploadType: 'kml',
+      siteName: 'test site name',
       uploadedFile: {
         filename: 'test-upload-id'
       },

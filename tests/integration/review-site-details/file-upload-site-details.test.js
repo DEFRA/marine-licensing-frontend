@@ -38,7 +38,7 @@ describe('Review Site Details - File Upload Integration Tests', () => {
   })
 
   test.each(testScenarios)(
-    '$name - validates polygon coordinate display',
+    '$name - validates file upload display',
     async ({ exemption, expectedPageContent }) => {
       expect.hasAssertions()
 
@@ -54,13 +54,13 @@ describe('Review Site Details - File Upload Integration Tests', () => {
         validateMultSiteActivityDetailsCard(document, expectedPageContent)
         validateMultipleSites(document, expectedPageContent)
 
-        // for (const site of expectedPageContent.siteDetails.keys()) {
-        //   validatePolygonCoordinates(document, expectedPageContent, site)
-        //   validateSiteDetailsCard(document, expectedPageContent, site)
-        // }
+        for (const site of expectedPageContent.siteDetails.keys()) {
+          // validatePolygonCoordinates(document, expectedPageContent, site)
+          validateSiteDetailsCard(document, expectedPageContent, site)
+        }
       } else {
         // validatePolygonCoordinates(document, expectedPageContent, 0)
-        // validateSiteDetailsCard(document, expectedPageContent, 0)
+        validateSiteDetailsCard(document, expectedPageContent, 0)
       }
     }
   )
@@ -218,63 +218,22 @@ describe('Review Site Details - File Upload Integration Tests', () => {
       : expect(activityDescriptionRow).toBeFalsy()
   }
 
-  // const validateSiteDetailsCard = (document, expected, siteIndex) => {
-  //   const siteCard = getSiteDetailsCard(document, expected, siteIndex)
+  const validateSiteDetailsCard = (document, expected, siteIndex) => {
+    const siteCard = getSiteDetailsCard(document, expected, siteIndex)
 
-  //   const cardTitle = siteCard.querySelector('.govuk-summary-card__title')
-  //   expect(cardTitle.textContent.trim()).toBe(
-  //     expected.siteDetails[siteIndex].cardName
-  //   )
+    const cardTitle = siteCard.querySelector('.govuk-summary-card__title')
+    expect(cardTitle.textContent.trim()).toBe(
+      expected.siteDetails[siteIndex].cardName
+    )
 
-  //   const cardActions = siteCard.querySelector('.govuk-summary-card__actions')
-  //   const deleteLink = within(cardActions).getByRole('link')
-  //   expect(deleteLink.textContent).toContain('Delete site')
+    const siteNameRow = getRowByKey(siteCard, 'Site name')
 
-  //   const methodRow = getRowByKey(
-  //     siteCard,
-  //     'Single or multiple sets of coordinates'
-  //   )
-  //   expect(methodRow.textContent).toContain(
-  //     expected.siteDetails[siteIndex].method
-  //   )
-
-  //   const coordinateSystemRow = getRowByKey(siteCard, 'Coordinate system')
-  //   expect(coordinateSystemRow.textContent).toContain(
-  //     expected.siteDetails[siteIndex].coordinateSystem
-  //   )
-
-  //   const siteNameRow = getRowByKey(siteCard, 'Site name')
-
-  //   expected.multipleSiteDetails.multipleSiteDetails === 'Yes'
-  //     ? expect(siteNameRow.textContent).toContain(
-  //         expected.siteDetails[siteIndex].siteName
-  //       )
-  //     : expect(siteNameRow).toBeFalsy()
-
-  //   const shouldIncludeActivityDates =
-  //     expected.multipleSiteDetails.multipleSiteDetails === 'No' ||
-  //     expected.multipleSiteDetails.sameActivityDates === 'No'
-
-  //   const activityDatesRow = getRowByKey(siteCard, 'Activity dates')
-
-  //   shouldIncludeActivityDates
-  //     ? expect(activityDatesRow.textContent).toContain(
-  //         expected.siteDetails[siteIndex].activityDates
-  //       )
-  //     : expect(activityDatesRow).toBeFalsy()
-
-  //   const shouldIncludeActivityDescription =
-  //     expected.multipleSiteDetails.multipleSiteDetails === 'No' ||
-  //     expected.multipleSiteDetails.sameActivityDescription === 'No'
-
-  //   const activityDescriptionRow = getRowByKey(siteCard, 'Activity description')
-
-  //   shouldIncludeActivityDescription
-  //     ? expect(activityDescriptionRow.textContent).toContain(
-  //         expected.siteDetails[siteIndex].activityDescription
-  //       )
-  //     : expect(activityDescriptionRow).toBeFalsy()
-  // }
+    expected.multipleSiteDetails.multipleSiteDetails === 'Yes'
+      ? expect(siteNameRow.textContent).toContain(
+          expected.siteDetails[siteIndex].siteName
+        )
+      : expect(siteNameRow).toBeFalsy()
+  }
 
   const validateNavigationElements = (document) => {
     expect(

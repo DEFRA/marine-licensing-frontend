@@ -487,6 +487,13 @@ export const renderFileUploadReview = (h, options) => {
     siteDetails
   )
 
+  const { multipleSitesEnabled, sameActivityDates, sameActivityDescription } =
+    multipleSiteDetails ?? {}
+
+  const showActivityDates = !multipleSitesEnabled || sameActivityDates === 'no'
+  const showActivityDescription =
+    !multipleSitesEnabled || sameActivityDescription === 'no'
+
   const summaryData = siteDetails.map((site, index) => {
     const fileUploadSummaryData = getFileUploadSummaryData({
       ...exemption,
@@ -498,6 +505,16 @@ export const renderFileUploadReview = (h, options) => {
     return {
       ...fileUploadSummaryData,
       siteName: site.siteName,
+      activityDates: getActivityDatesSummaryText(
+        site.activityDates,
+        showActivityDates
+      ),
+      activityDescription: getActivityDescriptionSummaryText(
+        site.activityDescription,
+        showActivityDescription
+      ),
+      showActivityDates,
+      showActivityDescription,
       siteDetailsData,
       siteNumber: index + 1
     }

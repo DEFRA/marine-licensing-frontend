@@ -161,6 +161,20 @@
               value: { html: appIncompleteField(site.siteName)}
             }) %}
           {% endif %}
+
+          {% if isMultiSiteJourney and site.showActivityDates %}
+            {% set _ = rows.push({
+              key: { text: "Activity dates"},
+              value: { html: appIncompleteField(site.activityDates)}
+            }) %}
+          {% endif %}
+
+          {% if isMultiSiteJourney and site.showActivityDescription %}
+            {% set _ = rows.push({
+              key: { text: "Activity description"},
+              value: { html: appIncompleteField(site.activityDescription)}
+            }) %}
+          {% endif %}
           
           {% set _ = rows.push({
             key: { text: "Map view", classes: "govuk-summary-list__key--full-width" },

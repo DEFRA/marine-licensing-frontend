@@ -122,16 +122,14 @@ export const testScenarios = [
         {
           siteName: 'Incomplete',
           cardName: 'Site 1 details',
-          activityDates: mockFileUploadExemption.siteDetails[0].activityDates,
-          activityDescription:
-            mockFileUploadExemption.siteDetails[0].activityDescription
+          activityDates: '1 January 2025 to 1 January 2025',
+          activityDescription: 'Test activity description'
         },
         {
           siteName: 'test site name 2',
           cardName: 'Site 2 details',
-          activityDates: mockFileUploadExemption.siteDetails[0].activityDates,
-          activityDescription:
-            mockFileUploadExemption.siteDetails[0].activityDescription
+          activityDates: '1 January 2025 to 1 January 2025',
+          activityDescription: 'Test activity description'
         }
       ]
     }

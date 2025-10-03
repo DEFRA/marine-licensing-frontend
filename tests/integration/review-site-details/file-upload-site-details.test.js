@@ -265,6 +265,30 @@ describe('Review Site Details - File Upload Integration Tests', () => {
           expected.siteDetails[siteIndex].siteName
         )
       : expect(siteNameRow).toBeFalsy()
+
+    const shouldIncludeActivityDates =
+      expected.multipleSiteDetails.multipleSiteDetails === 'Yes' &&
+      expected.multipleSiteDetails.sameActivityDates === 'No'
+
+    const activityDatesRow = getRowByKey(siteCard, 'Activity dates')
+
+    shouldIncludeActivityDates
+      ? expect(activityDatesRow.textContent).toContain(
+          expected.siteDetails[siteIndex].activityDates
+        )
+      : expect(activityDatesRow).toBeFalsy()
+
+    const shouldIncludeActivityDescription =
+      expected.multipleSiteDetails.multipleSiteDetails === 'Yes' &&
+      expected.multipleSiteDetails.sameActivityDescription === 'No'
+
+    const activityDescriptionRow = getRowByKey(siteCard, 'Activity description')
+
+    shouldIncludeActivityDescription
+      ? expect(activityDescriptionRow.textContent).toContain(
+          expected.siteDetails[siteIndex].activityDescription
+        )
+      : expect(activityDescriptionRow).toBeFalsy()
   }
 
   const validateFileUpload = (document, expected, siteIndex) => {

@@ -1,3 +1,4 @@
+// @vitest-environment jsdom
 import { vi } from 'vitest'
 import { routes } from '~/src/server/common/constants/routes.js'
 import { statusCodes } from '~/src/server/common/constants/status-codes.js'

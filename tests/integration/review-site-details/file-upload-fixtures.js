@@ -27,21 +27,14 @@ const baseFileUploadExemption = {
     },
     publicRegister: { status: 'completed' }
   },
-  siteDetails: mockFileUploadExemption.siteDetails
+  siteDetails: [mockFileUploadExemption.siteDetails[0]]
 }
 
 export const testScenarios = [
   {
     name: 'File Upload - KML - Single Site',
     coordinateSystem: COORDINATE_SYSTEMS.WGS84,
-    exemption: {
-      ...baseFileUploadExemption,
-      multipleSiteDetails: {
-        multipleSitesEnabled: true,
-        sameActivityDates: 'yes',
-        sameActivityDescription: 'yes'
-      }
-    },
+    exemption: baseFileUploadExemption,
     expectedPageContent: {
       projectName: 'Hammersmith pontoon construction',
       multipleSiteDetails: {
@@ -53,17 +46,70 @@ export const testScenarios = [
     }
   },
   {
-    name: 'File Upload - KML - Multiple Sites',
+    name: 'File Upload - KML - Multiple Sites - Same Dates and Description',
     coordinateSystem: COORDINATE_SYSTEMS.WGS84,
-    exemption: baseFileUploadExemption,
+    exemption: {
+      ...baseFileUploadExemption,
+      multipleSiteDetails: {
+        multipleSitesEnabled: true,
+        sameActivityDates: 'yes',
+        sameActivityDescription: 'yes'
+      },
+      siteDetails: [
+        mockFileUploadExemption.siteDetails[0],
+        mockFileUploadExemption.siteDetails[0]
+      ]
+    },
     expectedPageContent: {
       projectName: 'Hammersmith pontoon construction',
       multipleSiteDetails: {
         method: 'Upload a file with the coordinates of the site',
         fileType: 'KML',
-        fileUploaded: 'test-upload-id'
+        fileUploaded: 'test-upload-id',
+        sameActivityDates: 'Yes',
+        sameActivityDescription: 'Yes',
+        activityDates: '1 January 2025 to 1 January 2025',
+        activityDescription: 'Test activity description'
       },
       siteDetails: [{}, {}]
+    }
+  },
+  {
+    name: 'File Upload - KML - Multiple Sites - Variable Dates and Description',
+    coordinateSystem: COORDINATE_SYSTEMS.WGS84,
+    exemption: {
+      ...baseFileUploadExemption,
+      multipleSiteDetails: {
+        multipleSitesEnabled: true,
+        sameActivityDates: 'no',
+        sameActivityDescription: 'no'
+      },
+      siteDetails: [
+        mockFileUploadExemption.siteDetails[0],
+        mockFileUploadExemption.siteDetails[0]
+      ]
+    },
+    expectedPageContent: {
+      projectName: 'Hammersmith pontoon construction',
+      multipleSiteDetails: {
+        method: 'Upload a file with the coordinates of the site',
+        fileType: 'KML',
+        fileUploaded: 'test-upload-id',
+        sameActivityDates: 'No',
+        sameActivityDescription: 'No'
+      },
+      siteDetails: [
+        {
+          activityDates: mockFileUploadExemption.siteDetails[0].activityDates,
+          activityDescription:
+            mockFileUploadExemption.siteDetails[0].activityDescription
+        },
+        {
+          activityDates: mockFileUploadExemption.siteDetails[0].activityDates,
+          activityDescription:
+            mockFileUploadExemption.siteDetails[0].activityDescription
+        }
+      ]
     }
   }
 ]

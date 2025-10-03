@@ -51,7 +51,7 @@ describe('Review Site Details - File Upload Integration Tests', () => {
       validateNavigationElements(document)
 
       if (isMultipleSites) {
-        // validateMultSiteActivityDetailsCard(document, expectedPageContent)
+        validateMultSiteActivityDetailsCard(document, expectedPageContent)
         validateMultipleSites(document, expectedPageContent)
 
         // for (const site of expectedPageContent.siteDetails.keys()) {
@@ -177,45 +177,46 @@ describe('Review Site Details - File Upload Integration Tests', () => {
     expect(backLink.textContent.trim()).toBe('Back')
     expect(backLink.getAttribute('href')).toBe(routes.FILE_UPLOAD)
   }
-  // const validateMultSiteActivityDetailsCard = (document, expected) => {
-  //   const siteCard = document.querySelectorAll('.govuk-summary-card')[1]
-  //   expect(siteCard).toBeTruthy()
 
-  //   const cardTitle = within(siteCard).getByRole('heading', { level: 2 })
-  //   expect(cardTitle.textContent.trim()).toBe('Activity details')
+  const validateMultSiteActivityDetailsCard = (document, expected) => {
+    const siteCard = document.querySelectorAll('.govuk-summary-card')[1]
+    expect(siteCard).toBeTruthy()
 
-  //   const sameActivityDatesRow = getRowByKey(
-  //     siteCard,
-  //     'Are the activity dates the same for every site?'
-  //   )
-  //   expect(sameActivityDatesRow.textContent).toContain(
-  //     expected.multipleSiteDetails.sameActivityDates
-  //   )
+    const cardTitle = within(siteCard).getByRole('heading', { level: 2 })
+    expect(cardTitle.textContent.trim()).toBe('Activity details')
 
-  //   const activityDatesRow = getRowByKey(siteCard, 'Activity dates')
+    const sameActivityDatesRow = getRowByKey(
+      siteCard,
+      'Are the activity dates the same for every site?'
+    )
+    expect(sameActivityDatesRow.textContent).toContain(
+      expected.multipleSiteDetails.sameActivityDates
+    )
 
-  //   expected.multipleSiteDetails.sameActivityDates === 'Yes'
-  //     ? expect(activityDatesRow.textContent).toContain(
-  //         expected.multipleSiteDetails.activityDates
-  //       )
-  //     : expect(activityDatesRow).toBeFalsy()
+    const activityDatesRow = getRowByKey(siteCard, 'Activity dates')
 
-  //   const sameActivityDescriptionRow = getRowByKey(
-  //     siteCard,
-  //     'Is the activity description the same for every site?'
-  //   )
-  //   expect(sameActivityDescriptionRow.textContent).toContain(
-  //     expected.multipleSiteDetails.sameActivityDescription
-  //   )
+    expected.multipleSiteDetails.sameActivityDates === 'Yes'
+      ? expect(activityDatesRow.textContent).toContain(
+          expected.multipleSiteDetails.activityDates
+        )
+      : expect(activityDatesRow).toBeFalsy()
 
-  //   const activityDescriptionRow = getRowByKey(siteCard, 'Activity description')
+    const sameActivityDescriptionRow = getRowByKey(
+      siteCard,
+      'Is the activity description the same for every site?'
+    )
+    expect(sameActivityDescriptionRow.textContent).toContain(
+      expected.multipleSiteDetails.sameActivityDescription
+    )
 
-  //   expected.multipleSiteDetails.sameActivityDescription === 'Yes'
-  //     ? expect(activityDescriptionRow.textContent).toContain(
-  //         expected.multipleSiteDetails.activityDescription
-  //       )
-  //     : expect(activityDescriptionRow).toBeFalsy()
-  // }
+    const activityDescriptionRow = getRowByKey(siteCard, 'Activity description')
+
+    expected.multipleSiteDetails.sameActivityDescription === 'Yes'
+      ? expect(activityDescriptionRow.textContent).toContain(
+          expected.multipleSiteDetails.activityDescription
+        )
+      : expect(activityDescriptionRow).toBeFalsy()
+  }
 
   // const validateSiteDetailsCard = (document, expected, siteIndex) => {
   //   const siteCard = getSiteDetailsCard(document, expected, siteIndex)

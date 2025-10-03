@@ -503,6 +503,8 @@ export const renderFileUploadReview = (h, options) => {
     }
   })
 
+  const isMultiSiteJourney = !!multipleSiteDetails?.multipleSitesEnabled
+
   return h.view(FILE_UPLOAD_REVIEW_VIEW_ROUTE, {
     ...reviewSiteDetailsPageData,
     backLink: getFileUploadBackLink(previousPage),
@@ -510,7 +512,10 @@ export const renderFileUploadReview = (h, options) => {
     summaryData,
     multipleSiteDetailsData,
     configEnv: config.get('env'),
-    isMultiSiteJourney: !!multipleSiteDetails?.multipleSitesEnabled
+    isMultiSiteJourney,
+    hasIncompleteFields:
+      isMultiSiteJourney &&
+      hasIncompleteFields(siteDetails, multipleSiteDetails)
   })
 }
 
@@ -549,6 +554,43 @@ export const renderManualCoordinateReview = (h, options) => {
     multipleSiteDetailsData,
     isMultiSiteJourney: !!multipleSiteDetails?.multipleSitesEnabled
   })
+}
+
+/**
+ * Checks if there are any incomplete fields across all sites
+ * @param {Array} siteDetails - Array of site details
+ * @param {object} multipleSiteDetails - Multiple site configuration
+ * @returns {boolean} True if any field is incomplete, false otherwise
+ */
+export const hasIncompleteFields = (siteDetails, multipleSiteDetails) => {
+  if (!siteDetails || siteDetails.length === 0) {
+    return false
+  }
+
+  const { sameActivityDates, sameActivityDescription } =
+    multipleSiteDetails ?? {}
+
+  for (const site of siteDetails) {
+    if (!site.siteName || site.siteName.trim() === '') {
+      return true
+    }
+
+    if (
+      sameActivityDates === 'no' &&
+      (!site.activityDates?.start || !site.activityDates?.end)
+    ) {
+      return true
+    }
+
+    if (
+      sameActivityDescription === 'no' &&
+      (!site.activityDescription || site.activityDescription.trim() === '')
+    ) {
+      return true
+    }
+  }
+
+  return false
 }
 
 /**

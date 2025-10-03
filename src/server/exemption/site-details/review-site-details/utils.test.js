@@ -13,6 +13,7 @@ import {
   getSiteDetails,
   getSiteDetailsBackLink,
   handleSubmissionError,
+  hasIncompleteFields,
   prepareFileUploadDataForSave,
   prepareManualCoordinateDataForSave,
   renderFileUploadReview,
@@ -1264,6 +1265,145 @@ describe('siteDetails utils', () => {
       expect(Boom.isBoom(result)).toBe(true)
       expect(result.output.statusCode).toBe(400)
       expect(result.message).toBe('Error submitting site review')
+    })
+  })
+
+  describe('hasIncompleteFields util', () => {
+    test('should return false for null, undefined, or empty inputs', () => {
+      expect(hasIncompleteFields(null, {})).toBe(false)
+      expect(hasIncompleteFields(undefined, {})).toBe(false)
+      expect(hasIncompleteFields([], {})).toBe(false)
+      expect(hasIncompleteFields([{ siteName: 'Test' }], null)).toBe(false)
+    })
+
+    test('should return true when siteName is missing or empty in multi-site journey', () => {
+      const multipleSiteDetails = { multipleSitesEnabled: true }
+
+      expect(
+        hasIncompleteFields(
+          [{ activityDates: { start: '2025-01-01', end: '2025-01-02' } }],
+          multipleSiteDetails
+        )
+      ).toBe(true)
+
+      expect(hasIncompleteFields([{ siteName: '' }], multipleSiteDetails)).toBe(
+        true
+      )
+
+      expect(
+        hasIncompleteFields([{ siteName: '   ' }], multipleSiteDetails)
+      ).toBe(true)
+    })
+
+    test('should return true when activity dates are missing and sameActivityDates is no', () => {
+      const multipleSiteDetails = {
+        multipleSitesEnabled: true,
+        sameActivityDates: 'no'
+      }
+
+      expect(
+        hasIncompleteFields(
+          [{ siteName: 'Test Site', activityDescription: 'Test' }],
+          multipleSiteDetails
+        )
+      ).toBe(true)
+
+      expect(
+        hasIncompleteFields(
+          [
+            {
+              siteName: 'Test Site',
+              activityDates: { start: '2025-01-01' }
+            }
+          ],
+          multipleSiteDetails
+        )
+      ).toBe(true)
+    })
+
+    test('should return true when activity description is missing and sameActivityDescription is no', () => {
+      const multipleSiteDetails = {
+        multipleSitesEnabled: true,
+        sameActivityDescription: 'no'
+      }
+
+      expect(
+        hasIncompleteFields(
+          [
+            {
+              siteName: 'Test Site',
+              activityDates: { start: '2025-01-01', end: '2025-01-02' }
+            }
+          ],
+          multipleSiteDetails
+        )
+      ).toBe(true)
+
+      expect(
+        hasIncompleteFields(
+          [
+            {
+              siteName: 'Test Site',
+              activityDescription: '   '
+            }
+          ],
+          multipleSiteDetails
+        )
+      ).toBe(true)
+    })
+
+    test('should return false when all required fields are present', () => {
+      expect(
+        hasIncompleteFields(
+          [
+            {
+              siteName: 'Site 1',
+              activityDates: { start: '2025-01-01', end: '2025-01-02' },
+              activityDescription: 'Description 1'
+            },
+            {
+              siteName: 'Site 2',
+              activityDates: { start: '2025-01-03', end: '2025-01-04' },
+              activityDescription: 'Description 2'
+            }
+          ],
+          {
+            multipleSitesEnabled: true,
+            sameActivityDates: 'no',
+            sameActivityDescription: 'no'
+          }
+        )
+      ).toBe(false)
+    })
+
+    test('should return false when sameActivityDates or sameActivityDescription is yes', () => {
+      expect(
+        hasIncompleteFields([{ siteName: 'Test Site' }], {
+          multipleSitesEnabled: true,
+          sameActivityDates: 'yes',
+          sameActivityDescription: 'yes'
+        })
+      ).toBe(false)
+    })
+
+    test('should return true when any site in multiple sites is incomplete', () => {
+      expect(
+        hasIncompleteFields(
+          [
+            {
+              siteName: 'Site 1',
+              activityDates: { start: '2025-01-01', end: '2025-01-02' },
+              activityDescription: 'Description 1'
+            },
+            {
+              siteName: '',
+              activityDates: { start: '2025-01-03', end: '2025-01-04' },
+              activityDescription: 'Description 2'
+            }
+          ],
+          { multipleSitesEnabled: true }
+        )
+      ).toBe(true)
     })
   })
 })

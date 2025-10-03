@@ -77,7 +77,8 @@ export const testScenarios = [
         sameActivityDates: 'Yes',
         sameActivityDescription: 'Yes',
         activityDates: '1 January 2025 to 1 January 2025',
-        activityDescription: 'Test activity description'
+        activityDescription: 'Test activity description',
+        warning: true
       },
       siteDetails: [
         { siteName: 'Incomplete', cardName: 'Site 1 details' },
@@ -114,7 +115,8 @@ export const testScenarios = [
         fileType: 'KML',
         fileUploaded: 'test-upload-id',
         sameActivityDates: 'No',
-        sameActivityDescription: 'No'
+        sameActivityDescription: 'No',
+        warning: true
       },
       siteDetails: [
         {

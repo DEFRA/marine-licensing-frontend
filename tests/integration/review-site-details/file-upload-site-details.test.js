@@ -1,5 +1,5 @@
 import { JSDOM } from 'jsdom'
-import { within } from '@testing-library/dom'
+import { getByText, queryByText, within } from '@testing-library/dom'
 import { routes } from '~/src/server/common/constants/routes.js'
 import { statusCodes } from '~/src/server/common/constants/status-codes.js'
 import * as authRequests from '~/src/server/common/helpers/authenticated-requests.js'
@@ -55,11 +55,11 @@ describe('Review Site Details - File Upload Integration Tests', () => {
         validateMultipleSites(document, expectedPageContent)
 
         for (const site of expectedPageContent.siteDetails.keys()) {
-          // validatePolygonCoordinates(document, expectedPageContent, site)
+          validateFileUpload(document, expectedPageContent, site)
           validateSiteDetailsCard(document, expectedPageContent, site)
         }
       } else {
-        // validatePolygonCoordinates(document, expectedPageContent, 0)
+        validateFileUpload(document, expectedPageContent, 0)
         validateSiteDetailsCard(document, expectedPageContent, 0)
       }
     }
@@ -163,6 +163,38 @@ describe('Review Site Details - File Upload Integration Tests', () => {
     const caption = document.querySelector('.govuk-caption-l')
     expect(caption.textContent.trim()).toBe(expected.projectName)
 
+    if (expected.multipleSiteDetails.warning) {
+      expect(
+        getByText(document, `The site details you've provided are saved`)
+      ).toBeInTheDocument()
+
+      expect(
+        getByText(document, /You must complete all sections marked/i)
+      ).toBeInTheDocument()
+
+      expect(
+        getByText(
+          document,
+          `If you cannot finish now, you can return to this page later.`
+        )
+      ).toBeInTheDocument()
+    } else {
+      expect(
+        queryByText(document, `The site details you've provided are saved`)
+      ).not.toBeInTheDocument()
+
+      expect(
+        queryByText(document, /You must complete all sections marked/i)
+      ).not.toBeInTheDocument()
+
+      expect(
+        queryByText(
+          document,
+          `If you cannot finish now, you can return to this page later.`
+        )
+      ).not.toBeInTheDocument()
+    }
+
     const cards = document.querySelectorAll('.govuk-summary-card')
     const siteDetailsCards = Array.from(cards).filter((card) =>
       card.textContent.match(/Site \d+ details/g)
@@ -233,6 +265,19 @@ describe('Review Site Details - File Upload Integration Tests', () => {
           expected.siteDetails[siteIndex].siteName
         )
       : expect(siteNameRow).toBeFalsy()
+  }
+
+  const validateFileUpload = (document, expected, siteIndex) => {
+    const siteCard = getSiteDetailsCard(document, expected, siteIndex)
+
+    const mapViewRow = getRowByKey(siteCard, 'Map view')
+    expect(mapViewRow).toBeTruthy()
+    expect(mapViewRow.textContent.trim()).toBe('Map view')
+
+    const mapDiv = mapViewRow.querySelector(
+      '.app-site-details-map[data-module="site-details-map"]'
+    )
+    expect(mapDiv).toBeTruthy()
   }
 
   const validateNavigationElements = (document) => {

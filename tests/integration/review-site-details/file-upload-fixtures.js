@@ -48,7 +48,8 @@ export const testScenarios = [
         method: 'Upload a file with the coordinates of the site',
         fileType: 'KML',
         fileUploaded: 'test-upload-id'
-      }
+      },
+      siteDetails: [{}]
     }
   },
   {
@@ -61,7 +62,8 @@ export const testScenarios = [
         method: 'Upload a file with the coordinates of the site',
         fileType: 'KML',
         fileUploaded: 'test-upload-id'
-      }
+      },
+      siteDetails: [{}, {}]
     }
   }
 ]

@@ -68,8 +68,18 @@
                 classes: "govuk-summary-list--full-width"
             }) }}
 
+
         
         {% for site in summaryData %}
+
+          {% set summaryRowsHeading %}
+            {% if isMultiSiteJourney %}
+              Site {{ site.siteNumber }} details
+            {% else %}
+              Site details
+            {% endif %}
+          {% endset %}
+
           {% set rows = [] %}
           {% set _ = rows.push({
           key: { text: "Map view", classes: "govuk-summary-list__key--full-width" },
@@ -78,7 +88,7 @@
           {{ govukSummaryList({
           card: {
             title: {
-              text: "Site details"
+              text: summaryRowsHeading
             }
           },
           rows: rows,

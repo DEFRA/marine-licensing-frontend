@@ -163,11 +163,11 @@ describe('Review Site Details - File Upload Integration Tests', () => {
     const caption = document.querySelector('.govuk-caption-l')
     expect(caption.textContent.trim()).toBe(expected.projectName)
 
-    // const cards = document.querySelectorAll('.govuk-summary-card')
-    // const siteDetailsCards = Array.from(cards).filter((card) =>
-    //   card.textContent.match(/Site \d+ details/g)
-    // )
-    // expect(siteDetailsCards).toHaveLength(expected.siteDetails.length)
+    const cards = document.querySelectorAll('.govuk-summary-card')
+    const siteDetailsCards = Array.from(cards).filter((card) =>
+      card.textContent.match(/Site \d+ details/g)
+    )
+    expect(siteDetailsCards).toHaveLength(expected.siteDetails.length)
 
     expect(
       within(document).getByRole('button', { name: 'Save and continue' })

@@ -573,6 +573,23 @@ export const renderManualCoordinateReview = (h, options) => {
   })
 }
 
+const hasMissingRequiredFields = (site, multipleSiteDetails) => {
+  const { sameActivityDates, sameActivityDescription } =
+    multipleSiteDetails ?? {}
+
+  const isSiteNameMissing = !site.siteName || site.siteName.trim() === ''
+  const areActivityDatesMissing =
+    sameActivityDates === 'no' &&
+    (!site.activityDates?.start || !site.activityDates?.end)
+  const isActivityDescriptionMissing =
+    sameActivityDescription === 'no' &&
+    (!site.activityDescription || site.activityDescription.trim() === '')
+
+  return (
+    isSiteNameMissing || areActivityDatesMissing || isActivityDescriptionMissing
+  )
+}
+
 /**
  * Checks if there are any incomplete fields across all sites
  * @param {Array} siteDetails - Array of site details
@@ -584,30 +601,9 @@ export const hasIncompleteFields = (siteDetails, multipleSiteDetails) => {
     return false
   }
 
-  const { sameActivityDates, sameActivityDescription } =
-    multipleSiteDetails ?? {}
-
-  for (const site of siteDetails) {
-    if (!site.siteName || site.siteName.trim() === '') {
-      return true
-    }
-
-    if (
-      sameActivityDates === 'no' &&
-      (!site.activityDates?.start || !site.activityDates?.end)
-    ) {
-      return true
-    }
-
-    if (
-      sameActivityDescription === 'no' &&
-      (!site.activityDescription || site.activityDescription.trim() === '')
-    ) {
-      return true
-    }
-  }
-
-  return false
+  return siteDetails.some((site) =>
+    hasMissingRequiredFields(site, multipleSiteDetails)
+  )
 }
 
 /**

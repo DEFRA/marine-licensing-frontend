@@ -1,5 +1,5 @@
 import { JSDOM } from 'jsdom'
-import { getByText, within } from '@testing-library/dom'
+import { within } from '@testing-library/dom'
 import { routes } from '~/src/server/common/constants/routes.js'
 import { statusCodes } from '~/src/server/common/constants/status-codes.js'
 import * as authRequests from '~/src/server/common/helpers/authenticated-requests.js'

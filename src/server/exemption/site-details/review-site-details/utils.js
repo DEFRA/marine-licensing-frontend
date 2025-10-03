@@ -340,8 +340,7 @@ export const buildMultipleSitesSummaryData = (
   }
 
   if (firstSite.coordinatesType === 'file') {
-    multipleSiteData.fileType =
-      firstSite.fileUploadType === 'kml' ? 'KML' : 'Shapefile'
+    multipleSiteData.fileType = getFileTypeText(firstSite.fileUploadType)
     multipleSiteData.filename = firstSite.uploadedFile.filename
   }
 

@@ -5,6 +5,7 @@ export default defineConfig({
   test: {
     globals: true,
     environment: 'jsdom',
+    pool: 'threads',
     setupFiles: ['.vite/setup-files.js', 'allure-vitest/setup'],
     include: ['**/src/**/*.test.js', '**/tests/**/*.test.js'],
     exclude: [

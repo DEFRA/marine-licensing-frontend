@@ -1,4 +1,4 @@
-import { axe } from 'jest-axe'
+import { axe } from 'vitest-axe'
 
 /**
  * Runs axe accessibility checks against a DOM node

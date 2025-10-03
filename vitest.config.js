@@ -12,11 +12,7 @@ export default defineConfig({
     },
     setupFiles: ['.vite/setup-files.js', 'allure-vitest/setup'],
     include: ['**/src/**/*.test.js', '**/tests/**/*.test.js'],
-    exclude: [
-      '**/node_modules/**',
-      '**/.stryker-tmp/**',
-      '**/tests/integration/utils/**'
-    ],
+    exclude: ['**/node_modules/**', '**/tests/integration/utils/**'],
     coverage: {
       provider: 'v8',
       include: ['src/**/*.js'],
@@ -31,7 +27,16 @@ export default defineConfig({
       reportsDirectory: 'coverage',
       reporter: ['text', 'lcov']
     },
-    reporters: ['default', ['github-actions', { silent: false }]],
+    reporters: [
+      'default',
+      ['github-actions', { silent: false }],
+      [
+        'allure-vitest/reporter',
+        {
+          resultsDir: 'allure-results'
+        }
+      ]
+    ],
     clearMocks: true,
     restoreMocks: true
   },

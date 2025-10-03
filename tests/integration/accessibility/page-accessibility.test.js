@@ -2,7 +2,8 @@
 import { vi } from 'vitest'
 import { routes } from '~/src/server/common/constants/routes.js'
 import { statusCodes } from '~/src/server/common/constants/status-codes.js'
-import { toHaveNoViolations } from 'jest-axe'
+// eslint-disable-next-line import/extensions
+import { toHaveNoViolations } from 'vitest-axe/matchers'
 import { runAxeChecks } from '~/.vite/axe-helper.js'
 import { authenticatedGetRequest } from '~/src/server/common/helpers/authenticated-requests.js'
 import * as cdpUploadService from '~/src/services/cdp-upload-service/index.js'

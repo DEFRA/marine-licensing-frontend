@@ -141,7 +141,7 @@
 
             {#  This javascript variable is only for testing purposes. #}
             {% if configEnv !== 'production' %}
-              <script>
+              <script nonce='{{ cspNonce }}'>
                 var geoJSON{{loop.index}} = {{ site.geoJSON | dump | safe }};
               </script>
             {% endif %}

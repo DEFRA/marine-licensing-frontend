@@ -159,21 +159,21 @@
           {% if isMultiSiteJourney %}
             {% set _ = rows.push({
               key: { text: "Site name"},
-              value: { html: appIncompleteField(site.siteName)}
+              value: { html: appIncompleteField({text: site.siteName})}
             }) %}
           {% endif %}
 
           {% if isMultiSiteJourney and site.showActivityDates %}
             {% set _ = rows.push({
               key: { text: "Activity dates"},
-              value: { html: appIncompleteField(site.activityDates)}
+              value: { html: appIncompleteField({text: site.activityDates})}
             }) %}
           {% endif %}
 
           {% if isMultiSiteJourney and site.showActivityDescription %}
             {% set _ = rows.push({
               key: { text: "Activity description"},
-              value: { html: appIncompleteField(site.activityDescription)}
+              value: { html: appIncompleteField({ text: site.activityDescription })}
             }) %}
           {% endif %}
           

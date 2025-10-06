@@ -26,8 +26,8 @@ export const processFileUploadSiteDetails = (exemption, id, request) => {
       ...siteDetails,
       isFileUpload: true,
       method: fileUploadData.method,
-      fileType: fileUploadData.fileType,
-      filename: fileUploadData.filename
+      fileType: fileUploadData.fileUploadType,
+      filename: fileUploadData.uploadedFile.filename
     }
   } catch (error) {
     request.logger.error(

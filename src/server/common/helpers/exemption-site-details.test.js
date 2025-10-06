@@ -62,8 +62,8 @@ describe('exemption-site-details helper', () => {
     test('should process file upload site details successfully with KML file', () => {
       const mockFileUploadData = {
         method: 'Upload a file with the coordinates of the site',
-        fileType: 'KML',
-        filename: 'test-site.kml',
+        fileUploadType: 'KML',
+        uploadedFile: { filename: 'test-site.kml' },
         coordinates: [
           {
             type: 'Point',
@@ -108,8 +108,8 @@ describe('exemption-site-details helper', () => {
 
       const mockFileUploadData = {
         method: 'Upload a file with the coordinates of the site',
-        fileType: 'Shapefile',
-        filename: 'test-site.shp',
+        fileUploadType: 'Shapefile',
+        uploadedFile: { filename: 'test-site.shp' },
         coordinates: [
           {
             type: 'Polygon',

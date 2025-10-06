@@ -1,6 +1,6 @@
 import { vi } from 'vitest'
 import { confirmationController } from './controller.js'
-import { getExemptionCache } from '~/src/server/common/helpers/session-cache/utils.js'
+import { getExemptionCache } from '#src/server/common/helpers/session-cache/utils.js'
 
 // Mock dependencies
 vi.mock('~/src/server/common/helpers/session-cache/utils.js')

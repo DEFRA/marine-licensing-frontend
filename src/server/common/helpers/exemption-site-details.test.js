@@ -12,7 +12,7 @@ import {
   getReviewSummaryText,
   getFileUploadSummaryData,
   getPolygonCoordinatesDisplayData
-} from '~/src/server/exemption/site-details/review-site-details/utils.js'
+} from '#src/server/exemption/site-details/review-site-details/utils.js'
 
 vi.mock(
   '~/src/server/exemption/site-details/review-site-details/utils.js',

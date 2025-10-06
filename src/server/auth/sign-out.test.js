@@ -1,12 +1,12 @@
 import { vi } from 'vitest'
-import { statusCodes } from '~/src/server/common/constants/status-codes.js'
-import { routes } from '~/src/server/common/constants/routes.js'
+import { statusCodes } from '#src/server/common/constants/status-codes.js'
+import { routes } from '#src/server/common/constants/routes.js'
 import {
   getUserSession,
   removeUserSession
-} from '~/src/server/common/plugins/auth/utils.js'
-import { setupTestServer } from '~/tests/integration/shared/test-setup-helpers.js'
-import { makeGetRequest } from '~/src/server/test-helpers/server-requests.js'
+} from '#src/server/common/plugins/auth/utils.js'
+import { setupTestServer } from '#tests/integration/shared/test-setup-helpers.js'
+import { makeGetRequest } from '#src/server/test-helpers/server-requests.js'
 
 vi.mock('~/src/server/common/plugins/auth/utils.js', () => ({
   getUserSession: vi.fn(),

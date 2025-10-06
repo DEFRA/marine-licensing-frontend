@@ -1,6 +1,6 @@
 import { vi } from 'vitest'
 import { deleteExemptionRoutes } from './index.js'
-import { routes } from '~/src/server/common/constants/routes.js'
+import { routes } from '#src/server/common/constants/routes.js'
 
 vi.mock('./controller.js', () => ({
   deleteExemptionController: {

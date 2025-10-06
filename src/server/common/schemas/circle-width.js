@@ -1,4 +1,4 @@
-import { JOI_ERRORS } from '~/src/server/common/constants/joi.js'
+import { JOI_ERRORS } from '#src/server/common/constants/joi.js'
 import joi from 'joi'
 
 export const circleWidthValidationSchema = joi.object({

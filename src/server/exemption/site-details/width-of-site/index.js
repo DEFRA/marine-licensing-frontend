@@ -1,8 +1,8 @@
 import {
   widthOfSiteController,
   widthOfSiteSubmitController
-} from '~/src/server/exemption/site-details/width-of-site/controller.js'
-import { routes } from '~/src/server/common/constants/routes.js'
+} from '#src/server/exemption/site-details/width-of-site/controller.js'
+import { routes } from '#src/server/common/constants/routes.js'
 
 /**
  * Sets up the routes used in the provide the width of site page.

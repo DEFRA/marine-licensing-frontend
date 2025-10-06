@@ -2,7 +2,7 @@ import joi from 'joi'
 import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc.js'
 import customParseFormat from 'dayjs/plugin/customParseFormat.js'
-import { JOI_ERRORS } from '~/src/server/common/constants/joi.js'
+import { JOI_ERRORS } from '#src/server/common/constants/joi.js'
 
 dayjs.extend(utc)
 dayjs.extend(customParseFormat)

@@ -4,8 +4,8 @@ import {
   StorageResolution
 } from 'aws-embedded-metrics'
 
-import { config } from '~/src/config/config.js'
-import { createLogger } from '~/src/server/common/helpers/logging/logger.js'
+import { config } from '#src/config/config.js'
+import { createLogger } from '#src/server/common/helpers/logging/logger.js'
 
 /**
  * Aws embedded metrics wrapper

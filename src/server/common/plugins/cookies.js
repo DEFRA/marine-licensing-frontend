@@ -2,9 +2,9 @@ import {
   COOKIE_NAMES,
   COOKIE_OPTIONS_BASE64,
   FLASH_MESSAGE_KEYS
-} from '~/src/server/common/constants/cookies.js'
-import { getCookiePreferences } from '~/src/server/common/helpers/cookie-preferences.js'
-import { config } from '~/src/config/config.js'
+} from '#src/server/common/constants/cookies.js'
+import { getCookiePreferences } from '#src/server/common/helpers/cookie-preferences.js'
+import { config } from '#src/config/config.js'
 
 export const cookies = {
   name: 'cookie-policy',

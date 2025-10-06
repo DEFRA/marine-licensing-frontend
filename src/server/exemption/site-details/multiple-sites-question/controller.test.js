@@ -4,13 +4,13 @@ import {
   multipleSitesSubmitController,
   MULTIPLE_SITES_VIEW_ROUTE,
   errorMessages
-} from '~/src/server/exemption/site-details/multiple-sites-question/controller.js'
+} from '#src/server/exemption/site-details/multiple-sites-question/controller.js'
 import {
   getExemptionCache,
   setExemptionCache
-} from '~/src/server/common/helpers/session-cache/utils.js'
-import { mockExemption } from '~/src/server/test-helpers/mocks.js'
-import { routes } from '~/src/server/common/constants/routes.js'
+} from '#src/server/common/helpers/session-cache/utils.js'
+import { mockExemption } from '#src/server/test-helpers/mocks.js'
+import { routes } from '#src/server/common/constants/routes.js'
 
 vi.mock('~/src/server/common/helpers/session-cache/utils.js')
 

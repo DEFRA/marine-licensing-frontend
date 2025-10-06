@@ -1,31 +1,31 @@
 import { vi } from 'vitest'
-import { config } from '~/src/config/config.js'
-import { COORDINATE_SYSTEMS } from '~/src/server/common/constants/exemptions.js'
-import { statusCodes } from '~/src/server/common/constants/status-codes.js'
-import * as authRequests from '~/src/server/common/helpers/authenticated-requests.js'
-import * as cacheUtils from '~/src/server/common/helpers/session-cache/utils.js'
-import * as coordinateUtils from '~/src/server/common/helpers/coordinate-utils.js'
+import { config } from '#src/config/config.js'
+import { COORDINATE_SYSTEMS } from '#src/server/common/constants/exemptions.js'
+import { statusCodes } from '#src/server/common/constants/status-codes.js'
+import * as authRequests from '#src/server/common/helpers/authenticated-requests.js'
+import * as cacheUtils from '#src/server/common/helpers/session-cache/utils.js'
+import * as coordinateUtils from '#src/server/common/helpers/coordinate-utils.js'
 import {
   FILE_UPLOAD_REVIEW_VIEW_ROUTE,
   REVIEW_SITE_DETAILS_VIEW_ROUTE,
   reviewSiteDetailsController,
   reviewSiteDetailsSubmitController
-} from '~/src/server/exemption/site-details/review-site-details/controller.js'
-import { setupTestServer } from '~/tests/integration/shared/test-setup-helpers.js'
-import { mockExemption } from '~/src/server/test-helpers/mocks.js'
+} from '#src/server/exemption/site-details/review-site-details/controller.js'
+import { setupTestServer } from '#tests/integration/shared/test-setup-helpers.js'
+import { mockExemption } from '#src/server/test-helpers/mocks.js'
 import {
   makeGetRequest,
   makePostRequest
-} from '~/src/server/test-helpers/server-requests.js'
+} from '#src/server/test-helpers/server-requests.js'
 import { JSDOM } from 'jsdom'
-import { routes } from '~/src/server/common/constants/routes.js'
+import { routes } from '#src/server/common/constants/routes.js'
 import {
   getPolygonCoordinatesDisplayData,
   buildManualCoordinateSummaryData,
   getSiteDetailsBackLink,
   getReviewSummaryText,
   getCoordinateSystemText
-} from '~/src/server/exemption/site-details/review-site-details/utils.js'
+} from '#src/server/exemption/site-details/review-site-details/utils.js'
 
 vi.mock('~/src/server/common/helpers/session-cache/utils.js')
 vi.mock('~/src/server/common/helpers/coordinate-utils.js')

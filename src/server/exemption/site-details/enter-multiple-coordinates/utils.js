@@ -1,10 +1,10 @@
 import {
   COORDINATE_SYSTEMS,
   POLYGON_MIN_COORDINATE_POINTS
-} from '~/src/server/common/constants/exemptions.js'
-import { routes } from '~/src/server/common/constants/routes.js'
-import { getExemptionCache } from '~/src/server/common/helpers/session-cache/utils.js'
-import { generatePointSpecificErrorMessage } from '~/src/server/common/helpers/site-details.js'
+} from '#src/server/common/constants/exemptions.js'
+import { routes } from '#src/server/common/constants/routes.js'
+import { getExemptionCache } from '#src/server/common/helpers/session-cache/utils.js'
+import { generatePointSpecificErrorMessage } from '#src/server/common/helpers/site-details.js'
 
 // ============================================================================
 // CONSTANTS AND CONFIGURATION

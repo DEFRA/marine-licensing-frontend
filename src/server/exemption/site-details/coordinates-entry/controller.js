@@ -1,15 +1,15 @@
 import {
   getExemptionCache,
   updateExemptionSiteDetails
-} from '~/src/server/common/helpers/session-cache/utils.js'
-import { getSiteDetailsBySite } from '~/src/server/common/helpers/session-cache/site-details-utils.js'
-import { setSiteDataPreHandler } from '~/src/server/common/helpers/session-cache/site-utils.js'
+} from '#src/server/common/helpers/session-cache/utils.js'
+import { getSiteDetailsBySite } from '#src/server/common/helpers/session-cache/site-details-utils.js'
+import { setSiteDataPreHandler } from '#src/server/common/helpers/session-cache/site-utils.js'
 import {
   errorDescriptionByFieldName,
   mapErrorsForDisplay
-} from '~/src/server/common/helpers/errors.js'
+} from '#src/server/common/helpers/errors.js'
 import joi from 'joi'
-import { routes } from '~/src/server/common/constants/routes.js'
+import { routes } from '#src/server/common/constants/routes.js'
 import { getBackRoute } from './utils.js'
 
 export const COORDINATES_ENTRY_VIEW_ROUTE =

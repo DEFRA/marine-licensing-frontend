@@ -2,16 +2,16 @@ import {
   getExemptionCache,
   updateExemptionMultipleSiteDetails,
   updateExemptionSiteDetails
-} from '~/src/server/common/helpers/session-cache/utils.js'
-import { routes } from '~/src/server/common/constants/routes.js'
+} from '#src/server/common/helpers/session-cache/utils.js'
+import { routes } from '#src/server/common/constants/routes.js'
 import {
   setSiteDataPreHandler,
   setSiteData
-} from '~/src/server/common/helpers/session-cache/site-utils.js'
+} from '#src/server/common/helpers/session-cache/site-utils.js'
 import {
   errorDescriptionByFieldName,
   mapErrorsForDisplay
-} from '~/src/server/common/helpers/errors.js'
+} from '#src/server/common/helpers/errors.js'
 import joi from 'joi'
 
 export const SAME_ACTIVITY_DATES_VIEW_ROUTE =

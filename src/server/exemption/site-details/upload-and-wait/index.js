@@ -1,5 +1,5 @@
-import { uploadAndWaitController } from '~/src/server/exemption/site-details/upload-and-wait/controller.js'
-import { routes } from '~/src/server/common/constants/routes.js'
+import { uploadAndWaitController } from '#src/server/exemption/site-details/upload-and-wait/controller.js'
+import { routes } from '#src/server/common/constants/routes.js'
 
 /**
  * Sets up the routes used in the upload complete page.

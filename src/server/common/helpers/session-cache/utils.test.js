@@ -9,7 +9,7 @@ import {
   updateExemptionSiteDetails,
   updateExemptionSiteDetailsBatch,
   updateExemptionMultipleSiteDetails
-} from '~/src/server/common/helpers/session-cache/utils.js'
+} from '#src/server/common/helpers/session-cache/utils.js'
 
 vi.mock('@hapi/hoek', () => ({
   clone: vi.fn((data) => ({ ...data }))

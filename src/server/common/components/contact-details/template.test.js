@@ -1,5 +1,5 @@
 import { getByRole, getByText } from '@testing-library/dom'
-import { renderComponentJSDOM } from '~/src/server/test-helpers/component-helpers.js'
+import { renderComponentJSDOM } from '#src/server/test-helpers/component-helpers.js'
 
 describe('Contact Details Component', () => {
   /** @type {Document} */

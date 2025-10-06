@@ -1,17 +1,17 @@
 import { vi } from 'vitest'
 import Boom from '@hapi/boom'
-import { setupTestServer } from '~/tests/integration/shared/test-setup-helpers.js'
-import * as exemptionSiteDetailsHelpers from '~/src/server/common/helpers/exemption-site-details.js'
-import { getExemptionService } from '~/src/services/exemption-service/index.js'
+import { setupTestServer } from '#tests/integration/shared/test-setup-helpers.js'
+import * as exemptionSiteDetailsHelpers from '#src/server/common/helpers/exemption-site-details.js'
+import { getExemptionService } from '#src/services/exemption-service/index.js'
 import { viewDetailsController, VIEW_DETAILS_VIEW_ROUTE } from './controller.js'
 import {
   createSubmittedExemption,
   createFileUploadExemption,
   errorScenarios
-} from '~/tests/integration/view-details/test-utilities.js'
+} from '#tests/integration/view-details/test-utilities.js'
 
-import { makeGetRequest } from '~/src/server/test-helpers/server-requests.js'
-import { getAuthProvider } from '~/src/server/common/helpers/authenticated-requests.js'
+import { makeGetRequest } from '#src/server/test-helpers/server-requests.js'
+import { getAuthProvider } from '#src/server/common/helpers/authenticated-requests.js'
 
 vi.mock('~/src/services/exemption-service/index.js')
 vi.mock('~/src/server/common/helpers/authenticated-requests.js', () => ({

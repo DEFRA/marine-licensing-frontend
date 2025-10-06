@@ -1,8 +1,8 @@
 import {
   coordinateSystemController,
   coordinateSystemSubmitController
-} from '~/src/server/exemption/site-details/coordinate-system/controller.js'
-import { routes } from '~/src/server/common/constants/routes.js'
+} from '#src/server/exemption/site-details/coordinate-system/controller.js'
+import { routes } from '#src/server/common/constants/routes.js'
 
 /**
  * Sets up the routes used in the coordinate system choice page.

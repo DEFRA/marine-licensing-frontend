@@ -3,19 +3,19 @@ import joi from 'joi'
 import {
   mapErrorsForDisplay,
   errorDescriptionByFieldName
-} from '~/src/server/common/helpers/errors.js'
+} from '#src/server/common/helpers/errors.js'
 import {
   storeReferrer,
   getBackUrl,
   clearStoredReferrer,
   getValidatedReferrerPath
-} from '~/src/server/common/helpers/referrer-validation.js'
-import { getCookiePreferences } from '~/src/server/common/helpers/cookie-preferences.js'
+} from '#src/server/common/helpers/referrer-validation.js'
+import { getCookiePreferences } from '#src/server/common/helpers/cookie-preferences.js'
 import {
   setCookiePreferences,
   setConfirmationBanner
-} from '~/src/server/common/helpers/cookie-service.js'
-import { routes } from '~/src/server/common/constants/routes.js'
+} from '#src/server/common/helpers/cookie-service.js'
+import { routes } from '#src/server/common/constants/routes.js'
 
 const COOKIES_VIEW_ROUTE = 'help/cookies/index'
 

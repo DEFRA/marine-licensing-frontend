@@ -1,8 +1,8 @@
 import {
   taskListController,
   taskListSelectExemptionController
-} from '~/src/server/exemption/task-list/controller.js'
-import { routes } from '~/src/server/common/constants/routes.js'
+} from '#src/server/exemption/task-list/controller.js'
+import { routes } from '#src/server/common/constants/routes.js'
 
 /**
  * Sets up the routes used in the task list page.

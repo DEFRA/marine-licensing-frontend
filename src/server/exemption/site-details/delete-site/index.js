@@ -1,8 +1,8 @@
 import {
   deleteSiteController,
   deleteSiteSubmitController
-} from '~/src/server/exemption/site-details/delete-site/controller.js'
-import { routes } from '~/src/server/common/constants/routes.js'
+} from '#src/server/exemption/site-details/delete-site/controller.js'
+import { routes } from '#src/server/common/constants/routes.js'
 
 /**
  * Sets up the routes used in the delete site page.

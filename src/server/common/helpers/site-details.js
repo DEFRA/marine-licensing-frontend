@@ -1,4 +1,4 @@
-import { COORDINATE_SYSTEMS } from '~/src/server/common/constants/exemptions.js'
+import { COORDINATE_SYSTEMS } from '#src/server/common/constants/exemptions.js'
 
 /**
  * Standard error messages for coordinate validation

@@ -1,5 +1,5 @@
-import { beforeYouStartController } from '~/src/server/exemption/site-details/before-you-start/controller.js'
-import { routes } from '~/src/server/common/constants/routes.js'
+import { beforeYouStartController } from '#src/server/exemption/site-details/before-you-start/controller.js'
+import { routes } from '#src/server/common/constants/routes.js'
 
 /**
  * Sets up the routes used in the before you start site details page.

@@ -1,8 +1,8 @@
-import { routes } from '~/src/server/common/constants/routes.js'
+import { routes } from '#src/server/common/constants/routes.js'
 import {
   checkYourAnswersController,
   checkYourAnswersSubmitController
-} from '~/src/server/exemption/check-your-answers/controller.js'
+} from '#src/server/exemption/check-your-answers/controller.js'
 
 export const checkYourAnswersRoutes = [
   {

@@ -2,9 +2,9 @@ import { vi } from 'vitest'
 import {
   extractCoordinatesFromGeoJSON,
   getCoordinateSystem
-} from '~/src/server/common/helpers/coordinate-utils.js'
+} from '#src/server/common/helpers/coordinate-utils.js'
 import { getExemptionCache } from './session-cache/utils.js'
-import { COORDINATE_SYSTEMS } from '~/src/server/common/constants/exemptions.js'
+import { COORDINATE_SYSTEMS } from '#src/server/common/constants/exemptions.js'
 
 // Mock the session cache utils
 vi.mock('./session-cache/utils.js')

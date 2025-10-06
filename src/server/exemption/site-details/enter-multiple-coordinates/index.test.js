@@ -1,5 +1,5 @@
-import { enterMultipleCoordinatesRoutes } from '~/src/server/exemption/site-details/enter-multiple-coordinates/index.js'
-import { routes } from '~/src/server/common/constants/routes.js'
+import { enterMultipleCoordinatesRoutes } from '#src/server/exemption/site-details/enter-multiple-coordinates/index.js'
+import { routes } from '#src/server/common/constants/routes.js'
 
 describe('Enter Multiple Coordinates Routes', () => {
   it('should export an array of routes', () => {

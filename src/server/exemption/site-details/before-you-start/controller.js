@@ -1,4 +1,4 @@
-import { getExemptionCache } from '~/src/server/common/helpers/session-cache/utils.js'
+import { getExemptionCache } from '#src/server/common/helpers/session-cache/utils.js'
 
 export const BEFORE_YOU_START_SITE_DETAILS_VIEW_ROUTE =
   'exemption/site-details/before-you-start/index'

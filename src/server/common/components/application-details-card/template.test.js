@@ -1,4 +1,4 @@
-import { renderComponent } from '~/src/server/test-helpers/component-helpers.js'
+import { renderComponent } from '#src/server/test-helpers/component-helpers.js'
 
 describe('Application Details Card Component', () => {
   /** @type {CheerioAPI} */

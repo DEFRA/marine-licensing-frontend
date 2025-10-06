@@ -1,6 +1,6 @@
-import { getSiteDetailsBySite } from '~/src/server/common/helpers/session-cache/site-details-utils.js'
-import { getExemptionCache } from '~/src/server/common/helpers/session-cache/utils.js'
-import { getSiteNumber } from '~/src/server/exemption/site-details/utils/site-number.js'
+import { getSiteDetailsBySite } from '#src/server/common/helpers/session-cache/site-details-utils.js'
+import { getExemptionCache } from '#src/server/common/helpers/session-cache/utils.js'
+import { getSiteNumber } from '#src/server/exemption/site-details/utils/site-number.js'
 
 /**
  * Gets site data for the current page

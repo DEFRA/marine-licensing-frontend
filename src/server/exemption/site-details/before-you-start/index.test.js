@@ -1,5 +1,5 @@
-import { beforeYouStartRoutes } from '~/src/server/exemption/site-details/before-you-start/index.js'
-import { routes } from '~/src/server/common/constants/routes.js'
+import { beforeYouStartRoutes } from '#src/server/exemption/site-details/before-you-start/index.js'
+import { routes } from '#src/server/common/constants/routes.js'
 
 describe('#beforeYouStartRoutes', () => {
   test('should export an array of routes', () => {

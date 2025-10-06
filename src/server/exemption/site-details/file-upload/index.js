@@ -1,5 +1,5 @@
-import { fileUploadController } from '~/src/server/exemption/site-details/file-upload/controller.js'
-import { routes } from '~/src/server/common/constants/routes.js'
+import { fileUploadController } from '#src/server/exemption/site-details/file-upload/controller.js'
+import { routes } from '#src/server/common/constants/routes.js'
 
 /**
  * Sets up the routes used in the file upload page.

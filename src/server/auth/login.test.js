@@ -1,7 +1,7 @@
-import { statusCodes } from '~/src/server/common/constants/status-codes.js'
-import { routes } from '~/src/server/common/constants/routes.js'
-import { makeGetRequest } from '~/src/server/test-helpers/server-requests.js'
-import { setupTestServer } from '~/tests/integration/shared/test-setup-helpers.js'
+import { statusCodes } from '#src/server/common/constants/status-codes.js'
+import { routes } from '#src/server/common/constants/routes.js'
+import { makeGetRequest } from '#src/server/test-helpers/server-requests.js'
+import { setupTestServer } from '#tests/integration/shared/test-setup-helpers.js'
 
 describe('#loginController', () => {
   const getServer = setupTestServer()

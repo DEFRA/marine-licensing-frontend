@@ -1,6 +1,6 @@
 import { vi } from 'vitest'
 import { formatProjectsForDisplay, getActionButtons } from './utils.js'
-import { routes } from '~/src/server/common/constants/routes.js'
+import { routes } from '#src/server/common/constants/routes.js'
 
 vi.mock('~/src/config/nunjucks/filters/format-date.js', () => ({
   formatDate: vi.fn((date) => {

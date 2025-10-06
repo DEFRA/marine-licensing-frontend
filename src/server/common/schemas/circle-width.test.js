@@ -1,4 +1,4 @@
-import { circleWidthValidationSchema } from '~/src/server/common/schemas/circle-width.js'
+import { circleWidthValidationSchema } from '#src/server/common/schemas/circle-width.js'
 
 describe('#osgb36ValidationSchema model', () => {
   test('Should correctly validate on valid data', () => {

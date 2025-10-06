@@ -1,13 +1,13 @@
 import {
   authenticatedRequest,
   authenticatedGetRequest
-} from '~/src/server/common/helpers/authenticated-requests.js'
-import { routes } from '~/src/server/common/constants/routes.js'
+} from '#src/server/common/helpers/authenticated-requests.js'
+import { routes } from '#src/server/common/constants/routes.js'
 import {
   getExemptionCache,
   setExemptionCache,
   clearExemptionCache
-} from '~/src/server/common/helpers/session-cache/utils.js'
+} from '#src/server/common/helpers/session-cache/utils.js'
 import Boom from '@hapi/boom'
 
 export const DELETE_EXEMPTION_VIEW_ROUTE = 'exemption/delete/index'

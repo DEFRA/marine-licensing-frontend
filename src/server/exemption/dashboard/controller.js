@@ -1,4 +1,4 @@
-import { authenticatedGetRequest } from '~/src/server/common/helpers/authenticated-requests.js'
+import { authenticatedGetRequest } from '#src/server/common/helpers/authenticated-requests.js'
 import { formatProjectsForDisplay } from './utils.js'
 
 export const DASHBOARD_VIEW_ROUTE = 'exemption/dashboard/index.njk'

@@ -1,7 +1,7 @@
 import { vi } from 'vitest'
-import { config } from '~/src/config/config.js'
+import { config } from '#src/config/config.js'
 
-import { getCacheEngine } from '~/src/server/common/helpers/session-cache/cache-engine.js'
+import { getCacheEngine } from '#src/server/common/helpers/session-cache/cache-engine.js'
 import { Engine as CatboxRedis } from '@hapi/catbox-redis'
 import { Engine as CatboxMemory } from '@hapi/catbox-memory'
 

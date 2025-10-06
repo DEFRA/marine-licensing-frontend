@@ -1,4 +1,4 @@
-import { routes } from '~/src/server/common/constants/routes.js'
+import { routes } from '#src/server/common/constants/routes.js'
 
 /**
  * Determines the next route after activity dates submission

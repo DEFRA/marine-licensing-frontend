@@ -1,8 +1,8 @@
 import {
   chooseFileTypeController,
   chooseFileTypeSubmitController
-} from '~/src/server/exemption/site-details/choose-file-type/controller.js'
-import { routes } from '~/src/server/common/constants/routes.js'
+} from '#src/server/exemption/site-details/choose-file-type/controller.js'
+import { routes } from '#src/server/common/constants/routes.js'
 
 /**
  * @satisfies {ServerRegisterPluginObject<void>}

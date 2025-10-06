@@ -1,6 +1,6 @@
 import Wreck from '@hapi/wreck'
-import { config } from '~/src/config/config.js'
-import { createLogger } from '~/src/server/common/helpers/logging/logger.js'
+import { config } from '#src/config/config.js'
+import { createLogger } from '#src/server/common/helpers/logging/logger.js'
 import { CdpLoggingHelper } from './cdp-logging-helper.js'
 import { S3LocationBuilder } from './s3-location-builder.js'
 import { FilenameHandler } from './filename-handler.js'

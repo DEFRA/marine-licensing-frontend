@@ -1,7 +1,7 @@
-import { config } from '~/src/config/config.js'
-import { routes } from '~/src/server/common/constants/routes.js'
-import { AUTH_STRATEGIES } from '~/src/server/common/constants/auth.js'
-import { getAuthProvider } from '~/src/server/common/helpers/authenticated-requests.js'
+import { config } from '#src/config/config.js'
+import { routes } from '#src/server/common/constants/routes.js'
+import { AUTH_STRATEGIES } from '#src/server/common/constants/auth.js'
+import { getAuthProvider } from '#src/server/common/helpers/authenticated-requests.js'
 
 /**
  * @param {Partial<Request> | null} request

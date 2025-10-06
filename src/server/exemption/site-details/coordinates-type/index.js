@@ -1,8 +1,8 @@
 import {
   coordinatesTypeController,
   coordinatesTypeSubmitController
-} from '~/src/server/exemption/site-details/coordinates-type/controller.js'
-import { routes } from '~/src/server/common/constants/routes.js'
+} from '#src/server/exemption/site-details/coordinates-type/controller.js'
+import { routes } from '#src/server/common/constants/routes.js'
 
 /**
  * Sets up the routes used in the provide the coordinates choice page.

@@ -23,12 +23,6 @@
 {% endblock %}
 
   {% block content %}
-    {#  This javascript variable is only for testing purposes. #}
-    {% if configEnv !== 'production' %}
-      <script>
-        var geoJSON = {{ summaryData[0].geoJSON | dump | safe }};
-      </script>
-    {% endif %}
     <div class="govuk-grid-row">
       <div class="govuk-grid-column-full">
         <span class="govuk-caption-l">{{ projectName }}</span>
@@ -144,6 +138,13 @@
 
         
         {% for site in summaryData %}
+
+            {#  This javascript variable is only for testing purposes. #}
+            {% if configEnv !== 'production' %}
+              <script>
+                var geoJSON{{loop.index}} = {{ site.geoJSON | dump | safe }};
+              </script>
+            {% endif %}
 
           {% set summaryRowsHeading %}
             {% if isMultiSiteJourney %}

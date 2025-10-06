@@ -4,12 +4,6 @@ import { defineConfig } from 'vitest/config'
 export default defineConfig({
   test: {
     globals: true,
-    pool: 'forks',
-    poolOptions: {
-      forks: {
-        singleFork: true // Run all tests in same process but isolated
-      }
-    },
     setupFiles: ['.vite/setup-files.js', 'allure-vitest/setup'],
     include: ['**/src/**/*.test.js', '**/tests/**/*.test.js'],
     exclude: ['**/node_modules/**', '**/tests/integration/utils/**'],

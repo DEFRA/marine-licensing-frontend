@@ -1,4 +1,5 @@
 import { config } from '~/src/config/config.js'
+import { randomBytes } from 'crypto'
 
 /**
  * Manage content security policies.
@@ -10,9 +11,10 @@ const contentSecurityPolicy = {
     const uploaderServiceHost = config.get(
       'cdpUploader.cdpUploadServiceBaseUrl'
     )
+    const clarityProjectId = config.get('clarityProjectId')
     const cspDirectives = {
       'base-uri': "'self'",
-      'connect-src': "'self'",
+      'connect-src': "'self' https://*.clarity.ms/collect",
       'default-src': "'self'",
       'font-src': "'self'",
       'form-action': `'self' ${uploaderServiceHost}`,
@@ -22,10 +24,6 @@ const contentSecurityPolicy = {
       'manifest-src': "'self'",
       'media-src': "'self'",
       'object-src': "'none'",
-      // Hash 'sha256-GUQ5ad8JK5KmEWmROf3LZd9ge94daqNvd8xy9YS1iDw=' is to support a GOV.UK frontend script bundled within Nunjucks macros
-      // https://frontend.design-system.service.gov.uk/import-javascript/#if-our-inline-javascript-snippet-is-blocked-by-a-content-security-policy
-      'script-src':
-        "'self' 'sha256-GUQ5ad8JK5KmEWmROf3LZd9ge94daqNvd8xy9YS1iDw='",
       'style-src': "'self'"
     }
 
@@ -35,7 +33,17 @@ const contentSecurityPolicy = {
 
     server.ext('onPreResponse', (request, h) => {
       const response = request.response
-      response.header?.('Content-Security-Policy', cspHeader)
+      const cspNonce = randomBytes(16).toString('hex')
+      // Hash 'sha256-GUQ5ad8JK5KmEWmROf3LZd9ge94daqNvd8xy9YS1iDw=' is to support a GOV.UK frontend script bundled within Nunjucks macros
+      // https://frontend.design-system.service.gov.uk/import-javascript/#if-our-inline-javascript-snippet-is-blocked-by-a-content-security-policy
+      const scriptSrc = `; script-src 'self' 'sha256-GUQ5ad8JK5KmEWmROf3LZd9ge94daqNvd8xy9YS1iDw=' https://www.clarity.ms/tag/${clarityProjectId} https://scripts.clarity.ms 'nonce-${cspNonce}'`
+      response.header?.('Content-Security-Policy', cspHeader + scriptSrc)
+      if (response.variety === 'view') {
+        response.source.context = {
+          ...(response.source.context || {}),
+          cspNonce
+        }
+      }
       return h.continue
     })
   }

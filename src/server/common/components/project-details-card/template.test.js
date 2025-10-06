@@ -1,7 +1,6 @@
 import { renderComponent } from '#src/server/test-helpers/component-helpers.js'
 
 describe('Project Details Card Component', () => {
-  /** @type {CheerioAPI} */
   let $component
 
   describe('With Change links (isReadOnly: false)', () => {
@@ -135,7 +134,3 @@ describe('Project Details Card Component', () => {
     })
   })
 })
-
-/**
- * @import { CheerioAPI } from 'cheerio'
- */

@@ -333,7 +333,3 @@ describe('#projectName', () => {
     })
   })
 })
-
-/**
- * @import { Server } from '@hapi/hapi'
- */

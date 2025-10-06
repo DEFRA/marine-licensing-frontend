@@ -11,13 +11,7 @@ const manifestPath = path.join(
   config.get('root'),
   '.public/assets-manifest.json'
 )
-
-/** @type {Record<string, string> | undefined} */
 let webpackManifest
-
-/**
- * @param {Request | null} request
- */
 export function context(request) {
   if (!webpackManifest) {
     try {
@@ -41,16 +35,9 @@ export function context(request) {
     isAuthenticated,
     analyticsEnabled,
     clarityProjectId: config.get('clarityProjectId'),
-    /**
-     * @param {string} asset
-     */
     getAssetPath(asset) {
       const webpackAssetPath = webpackManifest?.[asset]
       return `${assetPath}/${webpackAssetPath ?? asset}`
     }
   }
 }
-
-/**
- * @import { Request } from '@hapi/hapi'
- */

@@ -65,13 +65,6 @@ export function getBackUrl(request, fallbackUrl = '/', excludedPaths = []) {
   const storedReferrer = getStoredReferrer(request, excludedPaths)
   return storedReferrer || fallbackUrl
 }
-
-/**
- * Safely validate and extract referrer path for redirect
- * @param {string} refererHeader - The referer header from the request
- * @param {string[]} excludedPaths - Paths to exclude from validation
- * @returns {string|null} Valid referrer path or null if invalid
- */
 export function getValidatedReferrerPath(refererHeader, excludedPaths = []) {
   if (!refererHeader) {
     return null

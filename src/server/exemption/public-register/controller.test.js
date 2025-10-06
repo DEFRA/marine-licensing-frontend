@@ -315,7 +315,3 @@ describe('#publicRegister', () => {
     })
   })
 })
-
-/**
- * @import { Server } from '@hapi/hapi'
- */

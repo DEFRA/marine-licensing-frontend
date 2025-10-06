@@ -6,7 +6,7 @@
   "main": "src/index.js",
   "type": "module",
   "engines": {
-    "node": ">=22.13.1"
+    "node": ">=22.16.0"
   },
   "imports": {
     "#*": "./*"

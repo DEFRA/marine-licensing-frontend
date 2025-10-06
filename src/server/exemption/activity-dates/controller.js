@@ -227,7 +227,3 @@ export const activityDatesSubmitController = {
     }
   }
 }
-
-/**
- * @import { ServerRoute } from '@hapi/hapi'
- */

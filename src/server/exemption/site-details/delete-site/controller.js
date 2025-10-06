@@ -8,12 +8,6 @@ import { authenticatedPatchRequest } from '#src/server/common/helpers/authentica
 
 export const DELETE_SITE_VIEW_ROUTE = 'exemption/site-details/delete-site/index'
 const DELETE_SITE_PAGE_TITLE = 'Are you sure you want to delete this site?'
-
-/**
- * Controller for the delete site confirmation page.
- * Uses setSiteDataPreHandler to get site data from the URL.
- * @satisfies {Partial<ServerRoute>}
- */
 export const deleteSiteController = {
   options: {
     pre: [setSiteDataPreHandler]
@@ -36,12 +30,6 @@ export const deleteSiteController = {
     })
   }
 }
-
-/**
- * Controller for handling the request to actually delete a site.
- * Gets the siteIndex from form data to identify which site to delete.
- * @satisfies {Partial<ServerRoute>}
- */
 export const deleteSiteSubmitController = {
   async handler(request, h) {
     const exemption = getExemptionCache(request)

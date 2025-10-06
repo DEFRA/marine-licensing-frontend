@@ -3,13 +3,6 @@ class MapFactory {
     this.olModules = olModules
   }
 
-  /**
-   * Create a new map instance with zoom controls and responsive attribution
-   * @param {HTMLElement} target - DOM element to attach map to
-   * @param {object} options - Map options (centre, zoom)
-   * @param {object} vectorLayer - Vector layer for features
-   * @returns {object} OpenLayers Map instance
-   */
   createMap(target, options, vectorLayer) {
     const {
       OpenLayersMap,
@@ -51,11 +44,6 @@ class MapFactory {
     return map
   }
 
-  /**
-   * Set up responsive attribution that collapses on small maps
-   * @param {object} map - OpenLayers Map instance
-   * @param {object} attribution - Attribution control instance
-   */
   setupResponsiveAttribution(map, attribution) {
     const SMALL_MAP_SIZE = 600
     const checkSize = () => {
@@ -68,10 +56,6 @@ class MapFactory {
     checkSize()
   }
 
-  /**
-   * Create vector source and layer for map features
-   * @returns {object} object containing vectorSource and vectorLayer
-   */
   createMapLayers() {
     const { VectorSource, VectorLayer } = this.olModules
     const vectorSource = new VectorSource()
@@ -83,10 +67,6 @@ class MapFactory {
     return { vectorSource, vectorLayer }
   }
 
-  /**
-   * Create default styling for map features
-   * @returns {object} OpenLayers Style instance
-   */
   createDefaultStyle() {
     const { Style, Fill, Stroke, Circle } = this.olModules
     const STROKE_WIDTH_PIXELS = 2
@@ -112,10 +92,6 @@ class MapFactory {
     })
   }
 
-  /**
-   * initialise GeoJSON format for reading features
-   * @returns {object} GeoJSON format instance
-   */
   initialiseGeoJSONFormat() {
     const { GeoJSON } = this.olModules
     return new GeoJSON()

@@ -187,7 +187,3 @@ describe('#taskListController', () => {
     expect(headers.location).toBe('/exemption/task-list')
   })
 })
-
-/**
- * @import { Server } from '@hapi/hapi'
- */

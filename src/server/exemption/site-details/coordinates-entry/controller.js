@@ -24,11 +24,6 @@ const coordinatesEntrySettings = {
 export const errorMessages = {
   COORDINATES_ENTRY_REQUIRED: 'Select how you want to enter the coordinates'
 }
-
-/**
- * A GDS styled page controller for the coordinates entry page.
- * @satisfies {Partial<ServerRoute>}
- */
 export const coordinatesEntryController = {
   options: {
     pre: [setSiteDataPreHandler]
@@ -50,11 +45,6 @@ export const coordinatesEntryController = {
     })
   }
 }
-
-/**
- * A GDS styled page controller for the POST route in the coordinates entry page.
- * @satisfies {Partial<ServerRoute>}
- */
 export const coordinatesEntrySubmitController = {
   options: {
     pre: [setSiteDataPreHandler],

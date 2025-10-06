@@ -9,11 +9,6 @@ import { getAuthProvider } from '#src/server/common/helpers/authenticated-reques
 import { AUTH_STRATEGIES } from '#src/server/common/constants/auth.js'
 
 export const VIEW_DETAILS_VIEW_ROUTE = 'exemption/view-details/index'
-
-/**
- * View details controller for displaying read-only exemption details
- * @satisfies {Partial<ServerRoute>}
- */
 export const viewDetailsController = {
   async handler(request, h) {
     const { exemptionId } = request.params

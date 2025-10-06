@@ -14,15 +14,6 @@ import { uploadAndWaitRoutes } from '#src/server/exemption/site-details/upload-a
 import { chooseFileTypeRoutes } from '#src/server/exemption/site-details/choose-file-type/index.js'
 import { beforeYouStartRoutes } from '#src/server/exemption/site-details/before-you-start/index.js'
 import { deleteSiteRoutes } from '#src/server/exemption/site-details/delete-site/index.js'
-
-/**
- * Sets up the routes used in the Site Details section
- * These routes are registered in src/server/router.js.
- */
-
-/**
- * @satisfies {ServerRegisterPluginObject<void>}
- */
 export const siteDetailsRoutes = [
   ...coordinatesTypeRoutes,
   ...coordinatesEntryRoutes,
@@ -41,7 +32,3 @@ export const siteDetailsRoutes = [
   ...beforeYouStartRoutes,
   ...deleteSiteRoutes
 ]
-
-/**
- * @import { ServerRegisterPluginObject } from '@hapi/hapi'
- */

@@ -27,11 +27,6 @@ const projectNameViewSettings = {
   pageTitle: 'Project name',
   heading: 'Project Name'
 }
-
-/**
- * A GDS styled project name page controller.
- * @satisfies {Partial<ServerRoute>}
- */
 export const projectNameController = {
   handler(request, h) {
     const exemption = getExemptionCache(request)
@@ -45,11 +40,6 @@ export const projectNameController = {
     })
   }
 }
-
-/**
- * A GDS styled project name page controller.
- * @satisfies {Partial<ServerRoute>}
- */
 export const projectNameSubmitController = {
   options: {
     validate: {
@@ -134,7 +124,3 @@ export const projectNameSubmitController = {
     }
   }
 }
-
-/**
- * @import { ServerRoute } from '@hapi/hapi'
- */

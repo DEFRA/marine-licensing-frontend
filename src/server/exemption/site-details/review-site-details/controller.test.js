@@ -29,26 +29,12 @@ import {
 
 vi.mock('~/src/server/common/helpers/session-cache/utils.js')
 vi.mock('~/src/server/common/helpers/coordinate-utils.js')
-
-/**
- * Creates a mock Hapi response toolkit
- * @param {string} type - Handler type: 'view' or 'redirect'
- * @returns {object} Mock response toolkit
- */
 function createMockHandler(type = 'view') {
   if (type === 'redirect') {
     return { redirect: vi.fn() }
   }
   return { view: vi.fn() }
 }
-
-/**
- * Creates mock exemption data for different coordinate scenarios
- * @param {string} type - Type: 'single', 'multiple', 'file', 'empty'
- * @param {string} coordinateSystem - Coordinate system: 'wgs84' or 'osgb36'
- * @param {object} overrides - Optional overrides for id, projectName, etc.
- * @returns {object} Mock exemption object
- */
 function createMockExemption(
   type = 'single',
   coordinateSystem = COORDINATE_SYSTEMS.WGS84,
@@ -145,13 +131,6 @@ function createMockExemption(
       }
   }
 }
-
-/**
- * DOM assertion helper for page titles and headings
- * @param {Document} document - JSDOM document
- * @param {string} expectedTitle - Expected page title
- * @param {string} expectedHeading - Expected h1 content
- */
 function assertPageTitleAndHeading(
   document,
   expectedTitle,
@@ -164,22 +143,10 @@ function assertPageTitleAndHeading(
   const pageTitle = document.querySelector('title')?.textContent ?? ''
   expect(pageTitle).toContain(expectedTitle)
 }
-
-/**
- * DOM assertion helper for project name caption
- * @param {Document} document - JSDOM document
- * @param {string} expectedProjectName - Expected project name
- */
 function assertProjectNameCaption(document, expectedProjectName) {
   const caption = document.querySelector('.govuk-caption-l')
   expect(caption?.textContent.trim()).toBe(expectedProjectName)
 }
-
-/**
- * DOM assertion helper for summary list data
- * @param {Document} document - JSDOM document
- * @param {Array} expectedData - Array of {key, value} objects
- */
 function assertSummaryListData(document, expectedData) {
   const summaryCards = document.querySelectorAll('.govuk-summary-card')
   const summaryCard = Array.from(summaryCards).find((card) =>
@@ -199,13 +166,6 @@ function assertSummaryListData(document, expectedData) {
     }
   })
 }
-
-/**
- * DOM assertion helper for navigation links
- * @param {Document} document - JSDOM document
- * @param {string} backLink - Expected back link href
- * @param {string} cancelLink - Expected cancel link href (optional)
- */
 function assertNavigationLinks(document, backLink, cancelLink = null) {
   const backElement = document.querySelector(
     `.govuk-back-link[href="${backLink}"]`
@@ -1662,7 +1622,3 @@ describe('#reviewSiteDetails', () => {
     })
   })
 })
-
-/**
- * @import { Server } from '@hapi/hapi'
- */

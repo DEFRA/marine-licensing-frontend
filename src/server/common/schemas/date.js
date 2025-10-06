@@ -13,16 +13,6 @@ const MAX_YEAR = MIN_YEAR + MAX_YEAR_OFFSET
 
 // Date format constants
 const DATE_FORMAT_ISO = 'YYYY-MM-DD'
-
-/**
- * Creates individual date field validation schema
- * @param {object} config - Configuration object
- * @param {string} config.prefix - Field prefix (e.g., 'activity-start-date')
- * @param {number} config.minYear - Minimum allowed year (default: current year)
- * @param {number} config.maxYear - Maximum allowed year (default: current year + 75)
- * @param {string} config.minYearError - Error message for minimum year validation
- * @returns {object} Joi schema object for day, month, year fields
- */
 export const individualDate = ({
   prefix,
   minYear = MIN_YEAR,
@@ -62,14 +52,6 @@ export const individualDate = ({
       'number.max': `${prefix}-year`
     })
 })
-
-/**
- * Validates if date components form a valid Day.js date
- * @param {number} year - Year component
- * @param {number} month - Month component (1-12)
- * @param {number} day - Day component (1-31)
- * @returns {boolean} True if date is valid
- */
 const isValidDate = (year, month, day) => {
   // Create the date with strict parsing
   const date = dayjs.utc(
@@ -91,10 +73,6 @@ const isValidDate = (year, month, day) => {
     date.date() === day
   )
 }
-
-/**
- * Activity dates schema for start and end date validation using Day.js
- */
 export const activityDatesSchema = joi
   .object({
     ...individualDate({

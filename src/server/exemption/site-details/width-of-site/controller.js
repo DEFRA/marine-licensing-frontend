@@ -33,11 +33,6 @@ export const errorMessages = {
   WIDTH_NON_INTEGER:
     'The width of the circular site must be a whole number, like 10'
 }
-
-/**
- * A GDS styled page controller for the width of site page.
- * @satisfies {Partial<ServerRoute>}
- */
 export const widthOfSiteController = {
   options: {
     pre: [setSiteDataPreHandler]
@@ -58,11 +53,6 @@ export const widthOfSiteController = {
     })
   }
 }
-
-/**
- * A GDS styled page controller for the POST route in the width of site page.
- * @satisfies {Partial<ServerRoute>}
- */
 export const widthOfSiteSubmitController = {
   options: {
     pre: [setSiteDataPreHandler],

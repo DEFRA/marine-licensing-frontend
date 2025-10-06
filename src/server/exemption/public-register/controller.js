@@ -26,11 +26,6 @@ const publicRegisterSettings = {
   pageTitle: 'Public register',
   heading: 'Public register'
 }
-
-/**
- * A GDS styled public register page controller.
- * @satisfies {Partial<ServerRoute>}
- */
 export const publicRegisterController = {
   handler(request, h) {
     const exemption = getExemptionCache(request)
@@ -42,11 +37,6 @@ export const publicRegisterController = {
     })
   }
 }
-
-/**
- * A GDS styled public register page controller.
- * @satisfies {Partial<ServerRoute>}
- */
 export const publicRegisterSubmitController = {
   options: {
     validate: {

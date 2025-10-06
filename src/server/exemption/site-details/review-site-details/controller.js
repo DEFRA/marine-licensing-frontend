@@ -28,11 +28,6 @@ const reviewSiteDetailsPageData = {
   pageTitle: 'Review site details',
   heading: 'Review site details'
 }
-
-/**
- * A GDS styled page controller for the review site details page.
- * @satisfies {Partial<ServerRoute>}
- */
 export const reviewSiteDetailsController = {
   async handler(request, h) {
     const previousPage = request.headers?.referer
@@ -62,11 +57,6 @@ export const reviewSiteDetailsController = {
         })
   }
 }
-
-/**
- * A GDS styled page controller for the POST route in the review site details page.
- * @satisfies {Partial<ServerRoute>}
- */
 export const reviewSiteDetailsSubmitController = {
   async handler(request, h) {
     const { payload } = request

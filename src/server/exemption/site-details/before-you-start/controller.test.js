@@ -50,7 +50,3 @@ describe('#beforeYouStart', () => {
     })
   })
 })
-
-/**
- * @import { Server } from '@hapi/hapi'
- */

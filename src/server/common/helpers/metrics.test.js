@@ -90,7 +90,3 @@ describe('#metrics', () => {
     })
   })
 })
-
-/**
- * @import { Server } from '@hapi/hapi'
- */

@@ -304,7 +304,3 @@ describe('#coordinatesType', () => {
     })
   })
 })
-
-/**
- * @import { Server } from '@hapi/hapi'
- */

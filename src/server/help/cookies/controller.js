@@ -24,11 +24,6 @@ const cookiesPageSettings = {
 }
 
 const EXCLUDED_REFERRER_PATHS = [routes.COOKIES]
-
-/**
- * Cookies page GET controller
- * @satisfies {Partial<ServerRoute>}
- */
 export const cookiesController = {
   options: {
     auth: false
@@ -59,11 +54,6 @@ export const cookiesController = {
     })
   }
 }
-
-/**
- * Cookie preferences POST controller - handles both page form and banner submissions
- * @satisfies {Partial<ServerRoute>}
- */
 export const cookiesSubmitController = {
   options: {
     auth: false,

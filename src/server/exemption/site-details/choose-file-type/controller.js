@@ -21,11 +21,6 @@ export const CHOOSE_FILE_UPLOAD_TYPE_VIEW_ROUTE =
 export const errorMessages = {
   FILE_TYPE_ENTRY_REQUIRED: 'Select which type of file you want to upload'
 }
-
-/**
- * A GDS styled project name page controller.
- * @satisfies {Partial<ServerRoute>}
- */
 export const chooseFileTypeController = {
   handler(request, h) {
     const exemption = getExemptionCache(request)
@@ -39,11 +34,6 @@ export const chooseFileTypeController = {
     })
   }
 }
-
-/**
- * A GDS styled page controller for the POST route in the coordinates type page.
- * @satisfies {Partial<ServerRoute>}
- */
 export const chooseFileTypeSubmitController = {
   options: {
     validate: {

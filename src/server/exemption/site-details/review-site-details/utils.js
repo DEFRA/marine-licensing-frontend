@@ -219,13 +219,6 @@ const getActivityDescriptionSummaryText = (
 
   return activityDescription ?? ''
 }
-
-/**
- * Builds summary data for manual coordinate entry display
- * @param {object} siteDetails - Site details from exemption
- * @param {object} multipleSiteDetails - Multiple site configuration
- * @returns {object} Summary data for template
- */
 export const buildManualCoordinateSummaryData = (
   siteDetails,
   multipleSiteDetails = {}
@@ -305,13 +298,6 @@ export const buildManualCoordinateSummaryData = (
 
   return summaryData
 }
-
-/**
- * Builds summary data for displaying multiple site information
- * @param {object} multipleSiteDetails - Multiple site details from exemption
- * @param {Array} siteDetails - Site details from exemption
- * @returns {object} Summary data for template
- */
 export const buildManualCoordinateMultipleSitesSummaryData = (
   multipleSiteDetails,
   siteDetails
@@ -346,14 +332,6 @@ export const buildManualCoordinateMultipleSitesSummaryData = (
 
   return multipleSiteData
 }
-
-/**
- * Loads site details from DB when session data is incomplete
- * @param {object} request - Hapi request object
- * @param {object} exemption - Current exemption from session
- * @param {Function} authenticatedGetRequest - Function to make authenticated API calls
- * @returns {Promise<object>} Site details object
- */
 export const getSiteDetails = async (
   request,
   exemption,
@@ -399,13 +377,6 @@ export const getSiteDetails = async (
 
   return siteDetails
 }
-
-/**
- * Prepares file upload data for saving to MongoDB
- * @param {object} siteDetails - Site details from exemption
- * @param {object} request - Hapi request object for logging
- * @returns {object} Formatted data for API submission
- */
 export const prepareFileUploadDataForSave = (siteDetails, request) => {
   const dataToSave = []
 
@@ -445,13 +416,6 @@ export const prepareFileUploadDataForSave = (siteDetails, request) => {
 
   return dataToSave
 }
-
-/**
- * Prepares manual coordinate data for saving to MongoDB
- * @param {object} exemption - Current exemption from session
- * @param {object} request - Hapi request object for logging
- * @returns {object} Formatted data for API submission
- */
 export const prepareManualCoordinateDataForSave = (exemption, request) => {
   for (const site of exemption.siteDetails) {
     request.logger.info(
@@ -466,17 +430,6 @@ export const prepareManualCoordinateDataForSave = (exemption, request) => {
   // Manual coordinate entry flow - use existing data structure
   return exemption.siteDetails
 }
-
-/**
- * Handles file upload review view rendering
- * @param {object} h - Hapi response toolkit
- * @param {object} options - Rendering options
- * @param {object} options.exemption - Current exemption from session
- * @param {object} options.siteDetails - Site details object
- * @param {string} options.previousPage - Previous page URL for back link
- * @param {object} options.reviewSiteDetailsPageData - Common page data
- * @returns {object} Rendered view response
- */
 export const renderFileUploadReview = (h, options) => {
   const { exemption, previousPage, siteDetails, reviewSiteDetailsPageData } =
     options
@@ -500,17 +453,6 @@ export const renderFileUploadReview = (h, options) => {
     isMultiSiteJourney: !!multipleSiteDetails?.multipleSitesEnabled
   })
 }
-
-/**
- * Handles manual coordinate review view rendering
- * @param {object} h - Hapi response toolkit
- * @param {object} options - Rendering options
- * @param {object} options.exemption - Current exemption from session
- * @param {object} options.siteDetails - Site details object
- * @param {string} options.previousPage - Previous page URL for back link
- * @param {object} options.reviewSiteDetailsPageData - Common page data
- * @returns {object} Rendered view response
- */
 export const renderManualCoordinateReview = (h, options) => {
   const { exemption, previousPage, siteDetails, reviewSiteDetailsPageData } =
     options
@@ -537,15 +479,6 @@ export const renderManualCoordinateReview = (h, options) => {
     isMultiSiteJourney: !!multipleSiteDetails?.multipleSitesEnabled
   })
 }
-
-/**
- * Handles errors during site details submission
- * @param {object} request - Hapi request object
- * @param {Error} error - The error that occurred
- * @param {string} exemptionId - ID of the exemption
- * @param {string} coordinatesType - Type of coordinates being saved
- * @returns {Boom} Standardized error response
- */
 export const handleSubmissionError = (
   request,
   error,

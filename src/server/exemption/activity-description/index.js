@@ -3,10 +3,6 @@ import {
   activityDescriptionController,
   activityDescriptionSubmitController
 } from '#src/server/exemption/activity-description/controller.js'
-
-/**
- * @satisfies {ServerRegisterPluginObject<void>}
- */
 export const activityDescriptionRoutes = [
   {
     method: 'GET',

@@ -2,7 +2,6 @@ import { getByRole, getByText } from '@testing-library/dom'
 import { renderComponentJSDOM } from '#src/server/test-helpers/component-helpers.js'
 
 describe('Contact Details Component', () => {
-  /** @type {Document} */
   let document
 
   beforeEach(() => {
@@ -65,7 +64,3 @@ describe('Contact Details Component', () => {
     expect(emailLink.classList.contains('govuk-link')).toBe(true)
   })
 })
-
-/**
- * @import { Document } from 'jsdom'
- */

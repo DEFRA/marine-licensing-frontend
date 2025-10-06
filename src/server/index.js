@@ -51,9 +51,7 @@ export async function createServer() {
     cache: [
       {
         name: config.get('session.cache.name'),
-        engine: getCacheEngine(
-          /** @type {Engine} */ (config.get('session.cache.engine'))
-        )
+        engine: getCacheEngine(config.get('session.cache.engine'))
       }
     ],
     state: {
@@ -91,5 +89,5 @@ export async function createServer() {
 }
 
 /**
- * @import {Engine} from '#src/server/common/helpers/session-cache/cache-engine.js'
+ * @import {Engine} from '~/src/server/common/helpers/session-cache/cache-engine.js'
  */

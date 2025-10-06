@@ -55,11 +55,6 @@ export const errorMessages = {
       'Northings must be a positive 6 or 7-digit number, like 123456'
   }
 }
-
-/**
- * A GDS styled page controller for the centre coordinates page.
- * @satisfies {Partial<ServerRoute>}
- */
 export const centreCoordinatesController = {
   options: {
     pre: [setSiteDataPreHandler]
@@ -121,11 +116,6 @@ export const centreCoordinatesSubmitFailHandler = (request, h, error) => {
     })
     .takeover()
 }
-
-/**
- * A GDS styled page controller for the POST route in the centre coordinates page.
- * @satisfies {Partial<ServerRoute>}
- */
 export const centreCoordinatesSubmitController = {
   options: {
     pre: [setSiteDataPreHandler]

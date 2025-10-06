@@ -1,9 +1,4 @@
 import { config } from '#src/config/config.js'
-
-/**
- * Manage content security policies.
- * @satisfies {import('@hapi/hapi').Plugin}
- */
 const contentSecurityPolicy = {
   name: 'content-security-policy',
   register: (server) => {

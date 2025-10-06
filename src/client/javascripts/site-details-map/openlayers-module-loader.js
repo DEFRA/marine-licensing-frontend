@@ -1,8 +1,4 @@
 class OpenLayersModuleLoader {
-  /**
-   * Load all required OpenLayers modules dynamically
-   * @returns {Promise<object>} Object containing all OpenLayers modules
-   */
   async loadModules() {
     const [
       { default: OpenLayersMap },

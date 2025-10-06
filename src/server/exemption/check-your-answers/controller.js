@@ -24,11 +24,6 @@ const checkYourAnswersViewContent = {
 
 export const CHECK_YOUR_ANSWERS_VIEW_ROUTE =
   'exemption/check-your-answers/index'
-
-/**
- * A GDS styled check your answers page controller.
- * @satisfies {Partial<ServerRoute>}
- */
 export const checkYourAnswersController = {
   async handler(request, h) {
     const cachedExemption = getExemptionCache(request)
@@ -52,11 +47,6 @@ export const checkYourAnswersController = {
     })
   }
 }
-
-/**
- * A GDS styled check your answers submission controller.
- * @satisfies {Partial<ServerRoute>}
- */
 export const checkYourAnswersSubmitController = {
   async handler(request, h) {
     const exemption = getExemptionCache(request)

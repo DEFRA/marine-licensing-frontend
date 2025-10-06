@@ -16,7 +16,3 @@ describe('#aboutController', () => {
     expect(statusCode).toBe(statusCodes.ok)
   })
 })
-
-/**
- * @import { Server } from '@hapi/hapi'
- */

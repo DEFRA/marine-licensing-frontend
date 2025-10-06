@@ -18,11 +18,6 @@ const taskListViewSettings = {
   heading: 'Task list',
   type: EXEMPTION_TYPE
 }
-
-/**
- * A GDS styled task list page controller.
- * @satisfies {Partial<ServerRoute>}
- */
 export const taskListController = {
   async handler(request, h) {
     const exemption = getExemptionCache(request)
@@ -81,10 +76,6 @@ export const taskListController = {
     })
   }
 }
-
-/**
- * Controller for selecting an exemption and redirecting to the task list.
- */
 export const taskListSelectExemptionController = {
   handler(request, h) {
     const { exemptionId } = request.params
@@ -93,7 +84,3 @@ export const taskListSelectExemptionController = {
     return h.redirect(routes.TASK_LIST)
   }
 }
-
-/**
- * @import { ServerRoute } from '@hapi/hapi'
- */

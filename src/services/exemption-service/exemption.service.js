@@ -9,10 +9,6 @@ const apiPaths = {
 }
 
 export class ExemptionService {
-  /**
-   * @param {object} request -Hapi req object
-   * @param {object} logger - Logger instance
-   */
   constructor(request, logger = null) {
     this.request = request
     this.logger = logger ?? createLogger()

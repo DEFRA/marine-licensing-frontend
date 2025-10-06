@@ -7,11 +7,6 @@ const beforeYouStartSettings = {
   pageTitle: 'Site details',
   heading: 'Site details'
 }
-
-/**
- * A GDS styled page controller for the before you start site details page.
- * @satisfies {Partial<ServerRoute>}
- */
 export const beforeYouStartController = {
   handler(request, h) {
     const exemption = getExemptionCache(request)

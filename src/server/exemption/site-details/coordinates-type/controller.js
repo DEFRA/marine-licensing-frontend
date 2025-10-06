@@ -24,11 +24,6 @@ export const errorMessages = {
   PROVIDE_COORDINATES_CHOICE_REQUIRED:
     'Select how you want to provide the site location'
 }
-
-/**
- * A GDS styled page controller for the coordinates type page.
- * @satisfies {Partial<ServerRoute>}
- */
 export const coordinatesTypeController = {
   options: {
     pre: [setSiteDataPreHandler]
@@ -49,11 +44,6 @@ export const coordinatesTypeController = {
     })
   }
 }
-
-/**
- * A GDS styled page controller for the POST route in the coordinates type page.
- * @satisfies {Partial<ServerRoute>}
- */
 export const coordinatesTypeSubmitController = {
   options: {
     pre: [setSiteDataPreHandler],

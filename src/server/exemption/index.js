@@ -12,15 +12,6 @@ import { dashboardRoutes } from './dashboard/index.js'
 import { deleteExemptionRoutes } from './delete/index.js'
 import { viewExemptionInternalUserRoutes } from '#src/server/exemption/view-exemption-internal-user/index.js'
 import { getPageViewCommonData } from '#src/server/common/helpers/page-view-common-data.js'
-
-/**
- * Sets up the routes used in the exemption home page.
- * These routes are registered in src/server/router.js.
- */
-
-/**
- * @satisfies {ServerRegisterPluginObject<void>}
- */
 export const exemption = {
   plugin: {
     name: 'exemption',
@@ -65,7 +56,3 @@ export const exemption = {
     }
   }
 }
-
-/**
- * @import { ServerRegisterPluginObject } from '@hapi/hapi'
- */

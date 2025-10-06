@@ -17,12 +17,6 @@ const pageSettings = {
   pageTitle: UPLOAD_A_FILE,
   heading: UPLOAD_A_FILE
 }
-
-/**
- * Get file type specific page content
- * @param {string} fileUploadType - 'kml' or 'shapefile'
- * @returns {object} Page content configuration
- */
 const getFileTypeContent = (fileUploadType) => {
   if (fileUploadType === 'kml') {
     return {
@@ -41,13 +35,6 @@ const getFileTypeContent = (fileUploadType) => {
     }
   }
 }
-
-/**
- * Create error summary and field errors for display
- * @param {string} message - Error message
- * @param {string} fieldName - Field name for error
- * @returns {object} Error summary and field errors
- */
 const createErrorDisplay = (message, fieldName) => {
   const errorDetail = {
     path: [fieldName], // Must be array to match Joi validation format
@@ -65,10 +52,6 @@ const createErrorDisplay = (message, fieldName) => {
 }
 
 const s3PathForExemptions = 'exemptions'
-/**
- * A GDS styled file upload page controller.
- * @satisfies {Partial<ServerRoute>}
- */
 export const fileUploadController = {
   async handler(request, h) {
     const exemption = getExemptionCache(request)

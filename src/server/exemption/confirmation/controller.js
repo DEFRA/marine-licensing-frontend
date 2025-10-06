@@ -7,13 +7,6 @@ const confirmationViewContent = {
 }
 
 const CONFIRMATION_VIEW_ROUTE = 'exemption/confirmation/index'
-
-/**
- * Controller for displaying the confirmation page after successful submission
- * @param {object} request - Hapi request object
- * @param {object} h - Hapi response toolkit
- * @returns {object} Rendered confirmation page
- */
 export const confirmationController = {
   handler(request, h) {
     const exemption = getExemptionCache(request)

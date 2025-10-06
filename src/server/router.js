@@ -7,10 +7,6 @@ import { about } from '#src/server/about/index.js'
 import { exemption } from '#src/server/exemption/index.js'
 import { auth } from '#src/server/auth/index.js'
 import { help } from '#src/server/help/index.js'
-
-/**
- * @satisfies {ServerRegisterPluginObject<void>}
- */
 export const router = {
   plugin: {
     name: 'router',
@@ -28,7 +24,3 @@ export const router = {
     }
   }
 }
-
-/**
- * @import { ServerRegisterPluginObject } from '@hapi/hapi'
- */

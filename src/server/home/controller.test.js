@@ -18,7 +18,6 @@ vi.mock(
 )
 
 describe('#homeController', () => {
-  /** @type {Server} */
   const getServer = setupTestServer()
 
   test('Should redirect to exemption and clear exemption cache when no referer header', async () => {
@@ -59,7 +58,3 @@ describe('#homeController', () => {
     expect(clearExemptionCache).toHaveBeenCalledWith(expect.any(Object))
   })
 })
-
-/**
- * @import { Server } from '@hapi/hapi'
- */

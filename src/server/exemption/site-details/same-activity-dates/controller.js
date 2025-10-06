@@ -66,11 +66,6 @@ const createValidationFailAction = (request, h, err) => {
     })
     .takeover()
 }
-
-/**
- * A GDS styled page controller for the same activity dates page.
- * @satisfies {Partial<ServerRoute>}
- */
 export const sameActivityDatesController = {
   options: {
     pre: [setSiteDataPreHandler]
@@ -108,11 +103,6 @@ export const sameActivityDatesController = {
     })
   }
 }
-
-/**
- * A GDS styled page controller for the POST route in the same activity dates page.
- * @satisfies {Partial<ServerRoute>}
- */
 export const sameActivityDatesSubmitController = {
   options: {
     pre: [setSiteDataPreHandler],

@@ -1,7 +1,3 @@
-/**
- * @param {Request} request
- * @param {ResponseToolkit} h
- */
 export function setPageCacheControlHeaders(request, h) {
   const { response } = request
 
@@ -23,7 +19,3 @@ export function setPageCacheControlHeaders(request, h) {
 
   return h.continue
 }
-
-/**
- * @import { Request, ResponseToolkit } from '@hapi/hapi'
- */

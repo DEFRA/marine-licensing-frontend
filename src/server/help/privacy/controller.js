@@ -1,8 +1,3 @@
-/**
- * A GDS styled example about page controller.
- * Provided as an example, remove or modify as required.
- * @satisfies {Partial<ServerRoute>}
- */
 export const privacyController = {
   handler(_request, h) {
     return h.view('help/privacy/index', {
@@ -11,7 +6,3 @@ export const privacyController = {
     })
   }
 }
-
-/**
- * @import { ServerRoute } from '@hapi/hapi'
- */

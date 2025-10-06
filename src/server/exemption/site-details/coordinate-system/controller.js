@@ -27,11 +27,6 @@ const coordinateSystemSettings = {
 export const errorMessages = {
   COORDINATE_SYSTEM_REQUIRED: 'Select which coordinate system you want to use'
 }
-
-/**
- * A GDS styled page controller for the coordinate system page.
- * @satisfies {Partial<ServerRoute>}
- */
 export const coordinateSystemController = {
   options: { pre: [setSiteDataPreHandler] },
   handler(request, h) {
@@ -50,11 +45,6 @@ export const coordinateSystemController = {
     })
   }
 }
-
-/**
- * A GDS styled page controller for the POST route in the coordinate system page.
- * @satisfies {Partial<ServerRoute>}
- */
 export const coordinateSystemSubmitController = {
   options: {
     pre: [setSiteDataPreHandler],

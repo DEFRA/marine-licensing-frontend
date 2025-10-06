@@ -23,7 +23,6 @@ describe('validateUserSession', () => {
   let mockRequest
   let mockSession
   let mockUserSession
-  /** @type {Server} */
   const getServer = setupTestServer()
 
   beforeEach(() => {
@@ -236,7 +235,3 @@ describe('validateUserSession', () => {
     })
   })
 })
-
-/**
- * @import { Server } from '@hapi/hapi'
- */

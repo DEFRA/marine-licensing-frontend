@@ -16,7 +16,7 @@
 {% block head %}
   <link href="{{ getAssetPath('stylesheets/application.scss') }}" rel="stylesheet">
   {% if clarityProjectId %}
-    <script>
+    <script nonce='{{ cspNonce }}'>
       window.CLARITY_PROJECT_ID = "{{ clarityProjectId }}";
       window.ANALYTICS_ENABLED = {{ analyticsEnabled | dump }};
     </script>

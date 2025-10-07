@@ -3,63 +3,196 @@
 {% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
 {% from "govuk/components/button/macro.njk" import govukButton %}
 {% from "cancel-button/macro.njk" import appCancelButton %}
-{% from "site-details-data-script/macro.njk" import appSiteDetailsDataScript %}
+{% from "site-details-map/macro.njk" import appSiteDetailsMap %}
+{% from "incomplete-field/macro.njk" import appIncompleteField %}
+{% from "govuk/components/inset-text/macro.njk" import govukInsetText %}
 {% block pageTitle %}
   Review site details | {{ serviceName }}
 {% endblock %}
 {% block head %}
   {{ super() }}
-  <link href="/public/stylesheets/ol.css" rel="stylesheet">
-  {% endblock %}
-  {% block beforeContent %}
-    {{ super() }}
-  <nav>
-    {{ govukBackLink({
-    text: "Back",
-    href: backLink
-  }) }}
-  </nav>
-  {% endblock %}
+{% endblock %}
+{% block beforeContent %}
+  {{ super() }}
+<nav>
+  {{ govukBackLink({
+  text: "Back",
+  href: backLink
+}) }}
+</nav>
+{% endblock %}
+
   {% block content %}
-    {#  This javascript variable is only for testing purposes. #}
-    {% if configEnv !== 'production' %}
-      <script>
-        var geoJSON = {{ fileUploadSummaryData.geoJSON | dump | safe }};
-      </script>
-    {% endif %}
     <div class="govuk-grid-row">
       <div class="govuk-grid-column-full">
         <span class="govuk-caption-l">{{ projectName }}</span>
         <h1 class="govuk-heading-l">Review site details</h1>
-        {% if fileUploadSummaryData %}
+
+            {% if isMultiSiteJourney and hasIncompleteFields %}
+
+              {% set incompleteWarningText %}
+                <p class="govuk-!-margin-bottom-3">The site details you've provided are saved</p>
+                <p class="govuk-!-margin-bottom-3">You must complete all sections marked {{appIncompleteField()}} before you can send your information.</p>
+                <p class="govuk-!-margin-bottom-0">If you cannot finish now, you can return to this page later.</p>
+              {% endset %}
+
+              {{ govukInsetText({
+                html: incompleteWarningText
+              }) }}
+
+            {% endif  %}
+
+            {% set multipleSiteRows = [
+                {
+                    key: {
+                      text: "Method of providing site location"
+                    },
+                    value: {
+                      text: multipleSiteDetailsData.method
+                    }
+                },
+                {
+                    key: {
+                      text: "File type"
+                    },
+                    value: {
+                      text: multipleSiteDetailsData.fileType | default('')
+                    }
+                },
+                {
+                    key: {
+                      text: "File uploaded"
+                    },
+                    value: { 
+                      text: multipleSiteDetailsData.filename | sanitiseFilename 
+                    }
+                }
+            ] %}
+
+            {{ govukSummaryList({
+                card: {
+                    title: {
+                        text: "Providing the site location"
+                    }
+                },
+                rows: multipleSiteRows,
+                classes: "govuk-summary-list--full-width"
+            }) }}
+
+
+        {% if isMultiSiteJourney %}
+
+          {% set activityRows = [
+              {
+                  key: {
+                      text: "Are the activity dates the same for every site?"
+                  },
+                  value: {
+                      text: multipleSiteDetailsData.sameActivityDates
+                  }
+              }
+          ] %}
+
+          {% if multipleSiteDetailsData.activityDates %}
+              {% set activityRows = (activityRows.push({
+                  key: {
+                      text: "Activity dates"
+                  },
+                  value: {
+                      text: multipleSiteDetailsData.activityDates
+                  }
+              }), activityRows) %}
+          {% endif %}
+
+          {% set activityRows = (activityRows.push({
+              key: {
+                  text: "Is the activity description the same for every site?"
+              },
+              value: {
+                  html: multipleSiteDetailsData.sameActivityDescription
+              }
+          }), activityRows) %}
+                    
+          {% if multipleSiteDetailsData.activityDescription %}
+              {% set activityRows = (activityRows.push({
+                  key: {
+                      text: "Activity description"
+                  },
+                  value: {
+                      text: multipleSiteDetailsData.activityDescription
+                  }
+              }), activityRows) %}
+          {% endif %}
+                
+          {{ govukSummaryList({
+              card: {
+                  title: {
+                      text: "Activity details"
+                  }
+              },
+              rows: activityRows,
+              classes: "govuk-summary-list--full-width"
+          }) }}
+
+        {% endif %}
+
+        
+        {% for site in summaryData %}
+
+            {#  This javascript variable is only for testing purposes. #}
+            {% if configEnv !== 'production' %}
+              <script nonce='{{ cspNonce }}'>
+                var geoJSON{{loop.index}} = {{ site.geoJSON | dump | safe }};
+              </script>
+            {% endif %}
+
+          {% set summaryRowsHeading %}
+            {% if isMultiSiteJourney %}
+              Site {{ site.siteNumber }} details
+            {% else %}
+              Site details
+            {% endif %}
+          {% endset %}
+
           {% set rows = [] %}
+
+          {% if isMultiSiteJourney %}
+            {% set _ = rows.push({
+              key: { text: "Site name"},
+              value: { html: appIncompleteField({text: site.siteName})}
+            }) %}
+          {% endif %}
+
+          {% if isMultiSiteJourney and site.showActivityDates %}
+            {% set _ = rows.push({
+              key: { text: "Activity dates"},
+              value: { html: appIncompleteField({text: site.activityDates})}
+            }) %}
+          {% endif %}
+
+          {% if isMultiSiteJourney and site.showActivityDescription %}
+            {% set _ = rows.push({
+              key: { text: "Activity description"},
+              value: { html: appIncompleteField({ text: site.activityDescription })}
+            }) %}
+          {% endif %}
+          
           {% set _ = rows.push({
-          key: { text: "Method of providing site location" },
-          value: { text: fileUploadSummaryData.method | default('') }
-        }) %}
-          {% set _ = rows.push({
-          key: { text: "File type" },
-          value: { text: fileUploadSummaryData.fileType | default('') }
-        }) %}
-          {% set _ = rows.push({
-          key: { text: "File uploaded" },
-          value: { text: fileUploadSummaryData.filename | sanitiseFilename }
-        }) %}
-          {% set _ = rows.push({
-          key: { text: "Map view", classes: "govuk-summary-list__key--full-width" },
-          value: { html: '<div class="app-site-details-map" data-module="site-details-map"></div>', classes: "govuk-summary-list__value--full-width" }
-        }) %}
+            key: { text: "Map view", classes: "govuk-summary-list__key--full-width" },
+            value: { html: appSiteDetailsMap(site.siteDetailsData, loop.index0), classes: "govuk-summary-list__value--full-width" }
+          }) %}
+
           {{ govukSummaryList({
           card: {
             title: {
-              text: "Site details"
+              text: summaryRowsHeading
             }
           },
           rows: rows,
         classes: "govuk-summary-list--full-width"
         }) }}
-        {% endif %}
-        {{ appSiteDetailsDataScript(siteDetailsData) }}
+        {% endfor %}
+
         <form method="POST">
           <input type="hidden" name="csrfToken" value="{{ csrfToken }}">
             <div class="govuk-button-group">

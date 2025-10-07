@@ -1,3 +1,4 @@
+import { vi } from 'vitest'
 import joi from 'joi'
 import { JOI_ERRORS } from '~/src/server/common/constants/joi.js'
 import {
@@ -12,13 +13,13 @@ describe('activityDatesSchema', () => {
 
   beforeAll(() => {
     // Mock the current date using Jest's built-in date mocking
-    jest.useFakeTimers()
-    jest.setSystemTime(MOCK_DATE)
+    vi.useFakeTimers()
+    vi.setSystemTime(MOCK_DATE)
   })
 
   afterAll(() => {
     // Restore real timers
-    jest.useRealTimers()
+    vi.useRealTimers()
   })
 
   describe('Valid data', () => {
@@ -431,7 +432,7 @@ describe('activityDatesSchema', () => {
 
       // Create a mock Date that returns a specific date for "new Date()" calls
       // to make start date appear past but end date appear future
-      const mockDate = jest.fn().mockImplementation((...args) => {
+      const mockDate = vi.fn().mockImplementation((...args) => {
         if (args.length === 0) {
           // new Date() calls - return a date between our start and end dates
           return new OriginalDate('2025-07-15T12:00:00.000Z') // Mid-year

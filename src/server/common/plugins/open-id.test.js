@@ -1,4 +1,4 @@
-import { jest } from '@jest/globals'
+import { vi } from 'vitest'
 import { config } from '~/src/config/config.js'
 import { createDefraIdStrategy } from '~/src/server/common/plugins/auth/defra-id-strategy.js'
 import { createEntraIdStrategy } from '~/src/server/common/plugins/auth/entra-id-strategy.js'
@@ -10,27 +10,26 @@ import { cacheMcmsContextFromQueryParams } from '~/src/server/common/helpers/mcm
 import { redirectPathCacheKey } from '~/src/server/common/constants/routes.js'
 
 // Mock external dependencies that these strategy functions depend on
-jest.mock('~/src/config/config.js')
-jest.mock('~/src/server/common/plugins/auth/open-id-provider.js')
-jest.mock('~/src/server/common/plugins/auth/validate.js')
-jest.mock('~/src/server/common/helpers/session-cache/utils.js')
-jest.mock('~/src/server/common/helpers/mcms-context/cache-mcms-context.js')
+vi.mock('~/src/config/config.js')
+vi.mock('~/src/server/common/plugins/auth/open-id-provider.js')
+vi.mock('~/src/server/common/plugins/auth/validate.js')
+vi.mock('~/src/server/common/helpers/session-cache/utils.js')
+vi.mock('~/src/server/common/helpers/mcms-context/cache-mcms-context.js')
 
 // Helper to create a mock server that tracks strategy calls
 const createMockServer = () => ({
   auth: {
-    strategy: jest.fn(),
-    default: jest.fn()
+    strategy: vi.fn(),
+    default: vi.fn()
   }
 })
 
 describe('Strategy Functions Integration Tests', () => {
   let mockServer
-  const mockConfig = jest.mocked(config)
+  const mockConfig = vi.mocked(config)
 
   beforeEach(() => {
     mockServer = createMockServer()
-    jest.clearAllMocks()
   })
 
   describe('createDefraIdStrategy', () => {
@@ -136,7 +135,7 @@ describe('Strategy Functions Integration Tests', () => {
     describe('redirectTo method', () => {
       let redirectToFn
       let mockRequest
-      const mockCacheMcmsContextFromQueryParams = jest.mocked(
+      const mockCacheMcmsContextFromQueryParams = vi.mocked(
         cacheMcmsContextFromQueryParams
       )
 
@@ -153,7 +152,7 @@ describe('Strategy Functions Integration Tests', () => {
         mockRequest = {
           path: '/some/path',
           yar: {
-            flash: jest.fn()
+            flash: vi.fn()
           }
         }
       })
@@ -211,8 +210,8 @@ describe('Strategy Functions Integration Tests', () => {
       let validateFn
       let mockRequest
       let mockSession
-      const mockValidateUserSession = jest.mocked(validateUserSession)
-      const mockClearExemptionCache = jest.mocked(clearExemptionCache)
+      const mockValidateUserSession = vi.mocked(validateUserSession)
+      const mockClearExemptionCache = vi.mocked(clearExemptionCache)
 
       beforeEach(() => {
         mockConfig.get.mockImplementation((key) => {
@@ -227,7 +226,7 @@ describe('Strategy Functions Integration Tests', () => {
         mockRequest = {
           path: '/some/path',
           yar: {
-            flash: jest.fn()
+            flash: vi.fn()
           }
         }
 

@@ -1,16 +1,17 @@
+import { vi } from 'vitest'
 import SiteDataLoader from './site-data-loader.js'
 
 Object.defineProperty(globalThis, 'document', {
   value: {
-    getElementById: jest.fn(),
-    createElement: jest.fn().mockImplementation((tagName) => {
+    getElementById: vi.fn(),
+    createElement: vi.fn().mockImplementation((tagName) => {
       const element = {
         tagName: tagName.toUpperCase(),
         attributes: {},
-        getAttribute: jest.fn().mockImplementation(function (name) {
+        getAttribute: vi.fn().mockImplementation(function (name) {
           return this.attributes[name] || null
         }),
-        setAttribute: jest.fn().mockImplementation(function (name, value) {
+        setAttribute: vi.fn().mockImplementation(function (name, value) {
           this.attributes[name] = value
         })
       }
@@ -24,7 +25,20 @@ describe('SiteDataLoader', () => {
   let siteDataLoader
 
   beforeEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
+    document.createElement.mockImplementation((tagName) => {
+      const element = {
+        tagName: tagName.toUpperCase(),
+        attributes: {},
+        getAttribute: vi.fn().mockImplementation(function (name) {
+          return this.attributes[name] || null
+        }),
+        setAttribute: vi.fn().mockImplementation(function (name, value) {
+          this.attributes[name] = value
+        })
+      }
+      return element
+    })
     siteDataLoader = new SiteDataLoader()
   })
 

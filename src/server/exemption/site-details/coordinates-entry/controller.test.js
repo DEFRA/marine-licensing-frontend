@@ -1,3 +1,4 @@
+import { vi } from 'vitest'
 import { setupTestServer } from '~/tests/integration/shared/test-setup-helpers.js'
 import {
   coordinatesEntryController,
@@ -12,21 +13,21 @@ import { config } from '~/src/config/config.js'
 import { JSDOM } from 'jsdom'
 import { routes } from '~/src/server/common/constants/routes.js'
 
-jest.mock('~/src/server/common/helpers/session-cache/utils.js')
+vi.mock('~/src/server/common/helpers/session-cache/utils.js')
 
 describe('#coordinatesEntry', () => {
   const getServer = setupTestServer()
   let getExemptionCacheSpy
 
   beforeEach(() => {
-    getExemptionCacheSpy = jest
+    getExemptionCacheSpy = vi
       .spyOn(cacheUtils, 'getExemptionCache')
       .mockReturnValue(mockExemption)
   })
 
   describe('#coordinatesEntryController', () => {
     test('coordinatesEntryController handler should render with correct context', () => {
-      const h = { view: jest.fn() }
+      const h = { view: vi.fn() }
 
       coordinatesEntryController.handler(
         {
@@ -51,7 +52,7 @@ describe('#coordinatesEntry', () => {
         projectName: mockExemption.projectName
       })
 
-      const h = { view: jest.fn() }
+      const h = { view: vi.fn() }
 
       coordinatesEntryController.handler(
         {
@@ -128,8 +129,8 @@ describe('#coordinatesEntry', () => {
       }
 
       const h = {
-        view: jest.fn().mockReturnValue({
-          takeover: jest.fn()
+        view: vi.fn().mockReturnValue({
+          takeover: vi.fn()
         })
       }
 
@@ -180,8 +181,8 @@ describe('#coordinatesEntry', () => {
       }
 
       const h = {
-        view: jest.fn().mockReturnValue({
-          takeover: jest.fn()
+        view: vi.fn().mockReturnValue({
+          takeover: vi.fn()
         })
       }
 
@@ -239,7 +240,7 @@ describe('#coordinatesEntry', () => {
 
     test('Should correctly navigate to next page when POST is successful', async () => {
       const h = {
-        redirect: jest.fn()
+        redirect: vi.fn()
       }
 
       await coordinatesEntrySubmitController.handler(
@@ -252,10 +253,10 @@ describe('#coordinatesEntry', () => {
 
     test('Should correctly set the cache when submitting', async () => {
       const h = {
-        redirect: jest.fn().mockReturnValue({
-          takeover: jest.fn()
+        redirect: vi.fn().mockReturnValue({
+          takeover: vi.fn()
         }),
-        view: jest.fn()
+        view: vi.fn()
       }
 
       const mockRequest = {

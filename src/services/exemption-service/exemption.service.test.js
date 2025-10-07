@@ -1,11 +1,12 @@
+import { vi } from 'vitest'
 import { ExemptionService } from './exemption.service.js'
 import { errorMessages } from '~/src/server/common/constants/error-messages.js'
 import { createLogger } from '~/src/server/common/helpers/logging/logger.js'
 import { authenticatedGetRequest } from '~/src/server/common/helpers/authenticated-requests.js'
 import { mockExemption } from '~/src/server/test-helpers/mocks.js'
 
-jest.mock('~/src/server/common/helpers/logging/logger.js')
-jest.mock('~/src/server/common/helpers/authenticated-requests.js')
+vi.mock('~/src/server/common/helpers/logging/logger.js')
+vi.mock('~/src/server/common/helpers/authenticated-requests.js')
 
 describe('ExemptionService', () => {
   let service
@@ -14,25 +15,23 @@ describe('ExemptionService', () => {
   let mockAuthenticatedGetRequest
 
   beforeEach(() => {
-    jest.clearAllMocks()
-
     mockRequest = {
       logger: {
-        error: jest.fn(),
-        info: jest.fn(),
-        debug: jest.fn()
+        error: vi.fn(),
+        info: vi.fn(),
+        debug: vi.fn()
       }
     }
 
     mockLogger = {
-      error: jest.fn(),
-      info: jest.fn(),
-      debug: jest.fn(),
-      warn: jest.fn()
+      error: vi.fn(),
+      info: vi.fn(),
+      debug: vi.fn(),
+      warn: vi.fn()
     }
 
-    mockAuthenticatedGetRequest = jest.mocked(authenticatedGetRequest)
-    jest.mocked(createLogger).mockReturnValue(mockLogger)
+    mockAuthenticatedGetRequest = vi.mocked(authenticatedGetRequest)
+    vi.mocked(createLogger).mockReturnValue(mockLogger)
   })
 
   describe('constructor', () => {
@@ -45,7 +44,7 @@ describe('ExemptionService', () => {
     })
 
     test('should initialize with provided request and custom logger', () => {
-      const customLogger = { error: jest.fn(), info: jest.fn() }
+      const customLogger = { error: vi.fn(), info: vi.fn() }
       service = new ExemptionService(mockRequest, customLogger)
 
       expect(service.request).toBe(mockRequest)

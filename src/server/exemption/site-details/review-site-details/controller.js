@@ -50,7 +50,7 @@ export const reviewSiteDetailsController = {
     return coordinatesType === 'file'
       ? renderFileUploadReview(h, {
           exemption,
-          siteDetails: firstSite,
+          siteDetails,
           previousPage,
           reviewSiteDetailsPageData
         })

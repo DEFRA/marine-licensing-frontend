@@ -1,8 +1,9 @@
+import { vi } from 'vitest'
 import Boom from '@hapi/boom'
 import { COORDINATE_SYSTEMS } from '~/src/server/common/constants/exemptions.js'
 import { routes } from '~/src/server/common/constants/routes.js'
 import {
-  buildManualCoordinateMultipleSitesSummaryData,
+  buildMultipleSitesSummaryData,
   buildManualCoordinateSummaryData,
   getCoordinateDisplayText,
   getCoordinateSystemText,
@@ -13,6 +14,7 @@ import {
   getSiteDetails,
   getSiteDetailsBackLink,
   handleSubmissionError,
+  hasIncompleteFields,
   prepareFileUploadDataForSave,
   prepareManualCoordinateDataForSave,
   renderFileUploadReview,
@@ -23,9 +25,9 @@ import { mockExemption } from '~/src/server/test-helpers/mocks.js'
 import { getCoordinateSystem } from '~/src/server/common/helpers/coordinate-utils.js'
 
 // Mock the getCoordinateSystem helper
-jest.mock('~/src/server/common/helpers/coordinate-utils.js', () => ({
-  getCoordinateSystem: jest.fn(),
-  extractCoordinatesFromGeoJSON: jest.fn()
+vi.mock('~/src/server/common/helpers/coordinate-utils.js', () => ({
+  getCoordinateSystem: vi.fn(),
+  extractCoordinatesFromGeoJSON: vi.fn()
 }))
 
 describe('siteDetails utils', () => {
@@ -87,31 +89,53 @@ describe('siteDetails utils', () => {
 
       const result = getFileUploadSummaryData(exemption)
 
-      expect(result).toEqual(
-        expect.objectContaining({
-          method: 'Upload a file with the coordinates of the site',
-          fileType: 'KML',
-          filename: 'test-site.kml',
-          coordinates: [
+      expect(result).toEqual({
+        coordinates: [
+          {
+            type: 'Point',
+            coordinates: [51.5074, -0.1278]
+          },
+          {
+            type: 'Polygon',
+            coordinates: [
+              [
+                [0, 0],
+                [1, 0],
+                [1, 1],
+                [0, 1],
+                [0, 0]
+              ]
+            ]
+          }
+        ],
+        geoJSON: {
+          type: 'FeatureCollection',
+          features: [
             {
-              type: 'Point',
-              coordinates: [51.5074, -0.1278]
+              type: 'Feature',
+              geometry: {
+                type: 'Point',
+                coordinates: [51.5074, -0.1278]
+              }
             },
             {
-              type: 'Polygon',
-              coordinates: [
-                [
-                  [0, 0],
-                  [1, 0],
-                  [1, 1],
-                  [0, 1],
-                  [0, 0]
+              type: 'Feature',
+              geometry: {
+                type: 'Polygon',
+                coordinates: [
+                  [
+                    [0, 0],
+                    [1, 0],
+                    [1, 1],
+                    [0, 1],
+                    [0, 0]
+                  ]
                 ]
-              ]
+              }
             }
           ]
-        })
-      )
+        }
+      })
     })
 
     test('getFileUploadSummaryData correctly parses coordinates from geoJSON for Shapefile', () => {
@@ -142,23 +166,34 @@ describe('siteDetails utils', () => {
 
       const result = getFileUploadSummaryData(exemption)
 
-      expect(result).toEqual(
-        expect.objectContaining({
-          method: 'Upload a file with the coordinates of the site',
-          fileType: 'Shapefile',
-          filename: 'test-site.shp',
-          coordinates: [
+      expect(result).toEqual({
+        coordinates: [
+          {
+            type: 'LineString',
+            coordinates: [
+              [0, 0],
+              [1, 1],
+              [2, 2]
+            ]
+          }
+        ],
+        geoJSON: {
+          type: 'FeatureCollection',
+          features: [
             {
-              type: 'LineString',
-              coordinates: [
-                [0, 0],
-                [1, 1],
-                [2, 2]
-              ]
+              type: 'Feature',
+              geometry: {
+                type: 'LineString',
+                coordinates: [
+                  [0, 0],
+                  [1, 1],
+                  [2, 2]
+                ]
+              }
             }
           ]
-        })
-      )
+        }
+      })
     })
 
     test('getFileUploadSummaryData handles empty or missing geoJSON', () => {
@@ -174,22 +209,21 @@ describe('siteDetails utils', () => {
 
       const result = getFileUploadSummaryData(exemption)
 
-      expect(result).toEqual(
-        expect.objectContaining({
-          method: 'Upload a file with the coordinates of the site',
-          fileType: 'KML',
-          filename: 'test-site.kml',
-          coordinates: []
-        })
-      )
+      expect(result).toEqual({
+        coordinates: [],
+        geoJSON: {}
+      })
     })
 
     test('getFileUploadSummaryData handles missing site details', () => {
       const exemption = {}
 
-      expect(() => getFileUploadSummaryData(exemption)).toThrow(
-        'Unsupported file type for site details'
-      )
+      const result = getFileUploadSummaryData(exemption)
+
+      expect(result).toEqual({
+        coordinates: [],
+        geoJSON: {}
+      })
     })
 
     test('getFileUploadSummaryData handles invalid file type', () => {
@@ -208,9 +242,12 @@ describe('siteDetails utils', () => {
         ]
       }
 
-      expect(() => getFileUploadSummaryData(exemption)).toThrow(
-        'Unsupported file type for site details'
-      )
+      const result = getFileUploadSummaryData(exemption)
+
+      expect(result).toEqual({
+        coordinates: [],
+        geoJSON: {}
+      })
     })
   })
 
@@ -611,13 +648,16 @@ describe('siteDetails utils', () => {
     })
   })
 
-  describe('buildManualCoordinateMultipleSitesSummaryData util', () => {
-    test('buildManualCoordinateMultipleSitesSummaryData correctly handles multiple sites', () => {
-      const result = buildManualCoordinateMultipleSitesSummaryData({
-        multipleSitesEnabled: true,
-        sameActivityDates: 'no',
-        sameActivityDescription: 'no'
-      })
+  describe('buildMultipleSitesSummaryData util', () => {
+    test('buildMultipleSitesSummaryData correctly handles multiple sites', () => {
+      const result = buildMultipleSitesSummaryData(
+        {
+          multipleSitesEnabled: true,
+          sameActivityDates: 'no',
+          sameActivityDescription: 'no'
+        },
+        mockExemption.siteDetails
+      )
 
       expect(result).toEqual({
         method: 'Enter the coordinates of the site manually',
@@ -627,8 +667,8 @@ describe('siteDetails utils', () => {
       })
     })
 
-    test('buildManualCoordinateMultipleSitesSummaryData correctly empty sites', () => {
-      const result = buildManualCoordinateMultipleSitesSummaryData(
+    test('buildMultipleSitesSummaryData correctly empty sites', () => {
+      const result = buildMultipleSitesSummaryData(
         {
           multipleSitesEnabled: true
         },
@@ -638,8 +678,8 @@ describe('siteDetails utils', () => {
       expect(result).toEqual({})
     })
 
-    test('buildManualCoordinateMultipleSitesSummaryData correctly handles multiple sites with same dates and description', () => {
-      const result = buildManualCoordinateMultipleSitesSummaryData(
+    test('buildMultipleSitesSummaryData correctly handles multiple sites with same dates and description', () => {
+      const result = buildMultipleSitesSummaryData(
         {
           multipleSitesEnabled: true,
           sameActivityDates: 'yes',
@@ -658,10 +698,13 @@ describe('siteDetails utils', () => {
       })
     })
 
-    test('buildManualCoordinateMultipleSitesSummaryData correctly handles single site', () => {
-      const result = buildManualCoordinateMultipleSitesSummaryData({
-        multipleSitesEnabled: false
-      })
+    test('buildMultipleSitesSummaryData correctly handles single site', () => {
+      const result = buildMultipleSitesSummaryData(
+        {
+          multipleSitesEnabled: false
+        },
+        [mockExemption.siteDetails[0]]
+      )
 
       expect(result).toEqual({
         method: 'Enter the coordinates of the site manually',
@@ -671,30 +714,92 @@ describe('siteDetails utils', () => {
       })
     })
 
-    test('buildManualCoordinateMultipleSitesSummaryData correctly handles empty object', () => {
-      const result = buildManualCoordinateMultipleSitesSummaryData({})
+    test('buildMultipleSitesSummaryData correctly handles file upload with KML', () => {
+      const siteDetails = [
+        {
+          coordinatesType: 'file',
+          fileUploadType: 'kml',
+          uploadedFile: {
+            filename: 'test-site.kml'
+          },
+          activityDates: {
+            start: '2025-01-01T00:00:00.000Z',
+            end: '2025-01-01T00:00:00.000Z'
+          },
+          activityDescription: 'Test activity description'
+        }
+      ]
+
+      const result = buildMultipleSitesSummaryData(
+        {
+          multipleSitesEnabled: true,
+          sameActivityDates: 'yes',
+          sameActivityDescription: 'yes'
+        },
+        siteDetails
+      )
 
       expect(result).toEqual({
-        method: 'Enter the coordinates of the site manually',
+        method: 'Upload a file with the coordinates of the site',
+        multipleSiteDetails: 'Yes',
+        sameActivityDates: 'Yes',
+        sameActivityDescription: 'Yes',
+        activityDates: '1 January 2025 to 1 January 2025',
+        activityDescription: 'Test activity description',
+        fileType: 'KML',
+        filename: 'test-site.kml'
+      })
+    })
+
+    test('buildMultipleSitesSummaryData correctly handles file upload with Shapefile', () => {
+      const siteDetails = [
+        {
+          coordinatesType: 'file',
+          fileUploadType: 'shapefile',
+          uploadedFile: {
+            filename: 'test-site.zip'
+          },
+          activityDates: {
+            start: '2025-01-01T00:00:00.000Z',
+            end: '2025-01-01T00:00:00.000Z'
+          }
+        }
+      ]
+
+      const result = buildMultipleSitesSummaryData(
+        {
+          multipleSitesEnabled: false,
+          sameActivityDates: 'no',
+          sameActivityDescription: 'no'
+        },
+        siteDetails
+      )
+
+      expect(result).toEqual({
+        method: 'Upload a file with the coordinates of the site',
         multipleSiteDetails: 'No',
         sameActivityDates: 'No',
-        sameActivityDescription: 'No'
+        sameActivityDescription: 'No',
+        fileType: 'Shapefile',
+        filename: 'test-site.zip'
       })
+    })
+
+    test('buildMultipleSitesSummaryData correctly handles empty object', () => {
+      const result = buildMultipleSitesSummaryData({})
+
+      expect(result).toEqual({})
     })
   })
 
   describe('getSiteDetails util', () => {
     const mockRequest = {
       logger: {
-        info: jest.fn(),
-        error: jest.fn()
+        info: vi.fn(),
+        error: vi.fn()
       }
     }
-    const mockAuthenticatedGetRequest = jest.fn()
-
-    beforeEach(() => {
-      jest.clearAllMocks()
-    })
+    const mockAuthenticatedGetRequest = vi.fn()
 
     test('getSiteDetails returns existing site details when available', async () => {
       const exemption = {
@@ -791,9 +896,9 @@ describe('siteDetails utils', () => {
 
       const mockRequest = {
         logger: {
-          info: jest.fn(),
-          error: jest.fn(),
-          warn: jest.fn()
+          info: vi.fn(),
+          error: vi.fn(),
+          warn: vi.fn()
         }
       }
 
@@ -845,13 +950,9 @@ describe('siteDetails utils', () => {
   describe('prepareFileUploadDataForSave util', () => {
     const mockRequest = {
       logger: {
-        info: jest.fn()
+        info: vi.fn()
       }
     }
-
-    beforeEach(() => {
-      jest.clearAllMocks()
-    })
 
     test('prepareFileUploadDataForSave correctly formats data for API submission', () => {
       const siteDetails = [
@@ -933,13 +1034,9 @@ describe('siteDetails utils', () => {
   describe('prepareManualCoordinateDataForSave util', () => {
     const mockRequest = {
       logger: {
-        info: jest.fn()
+        info: vi.fn()
       }
     }
-
-    beforeEach(() => {
-      jest.clearAllMocks()
-    })
 
     test('prepareManualCoordinateDataForSave returns site details and logs correctly', () => {
       const exemption = {
@@ -971,35 +1068,35 @@ describe('siteDetails utils', () => {
 
   describe('renderFileUploadReview util', () => {
     const mockH = {
-      view: jest.fn()
+      view: vi.fn()
     }
-
-    beforeEach(() => {
-      jest.clearAllMocks()
-    })
 
     test('renderFileUploadReview renders correct view with data', () => {
       const exemption = {
+        multipleSiteDetails: { multipleSitesEnabled: false },
         projectName: 'Test Project'
       }
-      const siteDetails = {
-        fileUploadType: 'kml',
-        uploadedFile: {
-          filename: 'test-site.kml'
-        },
-        geoJSON: {
-          type: 'FeatureCollection',
-          features: [
-            {
-              type: 'Feature',
-              geometry: {
-                type: 'Point',
-                coordinates: [51.5074, -0.1278]
+      const siteDetails = [
+        {
+          coordinatesType: 'file',
+          fileUploadType: 'kml',
+          uploadedFile: {
+            filename: 'test-site.kml'
+          },
+          geoJSON: {
+            type: 'FeatureCollection',
+            features: [
+              {
+                type: 'Feature',
+                geometry: {
+                  type: 'Point',
+                  coordinates: [51.5074, -0.1278]
+                }
               }
-            }
-          ]
+            ]
+          }
         }
-      }
+      ]
       const previousPage = `http://hostname${routes.FILE_UPLOAD}`
       const reviewSiteDetailsPageData = {
         pageTitle: 'Review site details'
@@ -1018,16 +1115,23 @@ describe('siteDetails utils', () => {
           pageTitle: 'Review site details',
           backLink: routes.FILE_UPLOAD,
           projectName: 'Test Project',
-          fileUploadSummaryData: expect.objectContaining({
+          summaryData: expect.arrayContaining([
+            expect.objectContaining({
+              coordinates: [
+                {
+                  type: 'Point',
+                  coordinates: [51.5074, -0.1278]
+                }
+              ]
+            })
+          ]),
+          multipleSiteDetailsData: expect.objectContaining({
             method: 'Upload a file with the coordinates of the site',
+            multipleSiteDetails: 'No',
+            sameActivityDates: 'No',
+            sameActivityDescription: 'No',
             fileType: 'KML',
-            filename: 'test-site.kml',
-            coordinates: [
-              {
-                type: 'Point',
-                coordinates: [51.5074, -0.1278]
-              }
-            ]
+            filename: 'test-site.kml'
           })
         })
       )
@@ -1036,11 +1140,10 @@ describe('siteDetails utils', () => {
 
   describe('renderManualCoordinateReview util', () => {
     const mockH = {
-      view: jest.fn()
+      view: vi.fn()
     }
 
     beforeEach(() => {
-      jest.clearAllMocks()
       // Mock the getCoordinateSystem helper
       getCoordinateSystem.mockReturnValue({
         coordinateSystem: COORDINATE_SYSTEMS.WGS84
@@ -1072,7 +1175,7 @@ describe('siteDetails utils', () => {
       const exemption = {
         projectName: 'Test Project',
         multipleSiteDetails: {},
-        siteDetails: [siteDetails]
+        siteDetails
       }
 
       renderManualCoordinateReview(mockH, {
@@ -1114,13 +1217,9 @@ describe('siteDetails utils', () => {
   describe('handleSubmissionError util', () => {
     const mockRequest = {
       logger: {
-        error: jest.fn()
+        error: vi.fn()
       }
     }
-
-    beforeEach(() => {
-      jest.clearAllMocks()
-    })
 
     test('handleSubmissionError logs error and returns Boom error', () => {
       const error = new Error('Test error message')
@@ -1146,6 +1245,145 @@ describe('siteDetails utils', () => {
       expect(Boom.isBoom(result)).toBe(true)
       expect(result.output.statusCode).toBe(400)
       expect(result.message).toBe('Error submitting site review')
+    })
+  })
+
+  describe('hasIncompleteFields util', () => {
+    test('should return false for null, undefined, or empty inputs', () => {
+      expect(hasIncompleteFields(null, {})).toBe(false)
+      expect(hasIncompleteFields(undefined, {})).toBe(false)
+      expect(hasIncompleteFields([], {})).toBe(false)
+      expect(hasIncompleteFields([{ siteName: 'Test' }], null)).toBe(false)
+    })
+
+    test('should return true when siteName is missing or empty in multi-site journey', () => {
+      const multipleSiteDetails = { multipleSitesEnabled: true }
+
+      expect(
+        hasIncompleteFields(
+          [{ activityDates: { start: '2025-01-01', end: '2025-01-02' } }],
+          multipleSiteDetails
+        )
+      ).toBe(true)
+
+      expect(hasIncompleteFields([{ siteName: '' }], multipleSiteDetails)).toBe(
+        true
+      )
+
+      expect(
+        hasIncompleteFields([{ siteName: '   ' }], multipleSiteDetails)
+      ).toBe(true)
+    })
+
+    test('should return true when activity dates are missing and sameActivityDates is no', () => {
+      const multipleSiteDetails = {
+        multipleSitesEnabled: true,
+        sameActivityDates: 'no'
+      }
+
+      expect(
+        hasIncompleteFields(
+          [{ siteName: 'Test Site', activityDescription: 'Test' }],
+          multipleSiteDetails
+        )
+      ).toBe(true)
+
+      expect(
+        hasIncompleteFields(
+          [
+            {
+              siteName: 'Test Site',
+              activityDates: { start: '2025-01-01' }
+            }
+          ],
+          multipleSiteDetails
+        )
+      ).toBe(true)
+    })
+
+    test('should return true when activity description is missing and sameActivityDescription is no', () => {
+      const multipleSiteDetails = {
+        multipleSitesEnabled: true,
+        sameActivityDescription: 'no'
+      }
+
+      expect(
+        hasIncompleteFields(
+          [
+            {
+              siteName: 'Test Site',
+              activityDates: { start: '2025-01-01', end: '2025-01-02' }
+            }
+          ],
+          multipleSiteDetails
+        )
+      ).toBe(true)
+
+      expect(
+        hasIncompleteFields(
+          [
+            {
+              siteName: 'Test Site',
+              activityDescription: '   '
+            }
+          ],
+          multipleSiteDetails
+        )
+      ).toBe(true)
+    })
+
+    test('should return false when all required fields are present', () => {
+      expect(
+        hasIncompleteFields(
+          [
+            {
+              siteName: 'Site 1',
+              activityDates: { start: '2025-01-01', end: '2025-01-02' },
+              activityDescription: 'Description 1'
+            },
+            {
+              siteName: 'Site 2',
+              activityDates: { start: '2025-01-03', end: '2025-01-04' },
+              activityDescription: 'Description 2'
+            }
+          ],
+          {
+            multipleSitesEnabled: true,
+            sameActivityDates: 'no',
+            sameActivityDescription: 'no'
+          }
+        )
+      ).toBe(false)
+    })
+
+    test('should return false when sameActivityDates or sameActivityDescription is yes', () => {
+      expect(
+        hasIncompleteFields([{ siteName: 'Test Site' }], {
+          multipleSitesEnabled: true,
+          sameActivityDates: 'yes',
+          sameActivityDescription: 'yes'
+        })
+      ).toBe(false)
+    })
+
+    test('should return true when any site in multiple sites is incomplete', () => {
+      expect(
+        hasIncompleteFields(
+          [
+            {
+              siteName: 'Site 1',
+              activityDates: { start: '2025-01-01', end: '2025-01-02' },
+              activityDescription: 'Description 1'
+            },
+            {
+              siteName: '',
+              activityDates: { start: '2025-01-03', end: '2025-01-04' },
+              activityDescription: 'Description 2'
+            }
+          ],
+          { multipleSitesEnabled: true }
+        )
+      ).toBe(true)
     })
   })
 })

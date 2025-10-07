@@ -1,3 +1,4 @@
+import { vi } from 'vitest'
 import { setupTestServer } from '~/tests/integration/shared/test-setup-helpers.js'
 import {
   coordinateSystemController,
@@ -12,14 +13,14 @@ import { config } from '~/src/config/config.js'
 import { JSDOM } from 'jsdom'
 import { routes } from '~/src/server/common/constants/routes.js'
 
-jest.mock('~/src/server/common/helpers/session-cache/utils.js')
+vi.mock('~/src/server/common/helpers/session-cache/utils.js')
 
 describe('#coordinateSystem', () => {
   const getServer = setupTestServer()
   let getExemptionCacheSpy
 
   beforeEach(() => {
-    getExemptionCacheSpy = jest
+    getExemptionCacheSpy = vi
       .spyOn(cacheUtils, 'getExemptionCache')
       .mockReturnValue(mockExemption)
   })
@@ -27,7 +28,7 @@ describe('#coordinateSystem', () => {
   describe('#coordinateSystemController', () => {
     test('coordinateSystemController handler should render with correct context with no existing data', () => {
       getExemptionCacheSpy.mockReturnValueOnce({})
-      const h = { view: jest.fn() }
+      const h = { view: vi.fn() }
 
       coordinateSystemController.handler({ site: mockSite }, h)
 
@@ -41,7 +42,7 @@ describe('#coordinateSystem', () => {
     })
 
     test('coordinateSystemController handler should render with correct context', () => {
-      const h = { view: jest.fn() }
+      const h = { view: vi.fn() }
 
       coordinateSystemController.handler({ site: mockSite }, h)
 
@@ -64,7 +65,7 @@ describe('#coordinateSystem', () => {
         ]
       })
 
-      const h = { view: jest.fn() }
+      const h = { view: vi.fn() }
 
       coordinateSystemController.handler({ site: mockSite }, h)
 
@@ -157,7 +158,7 @@ describe('#coordinateSystem', () => {
       })
 
       const h = {
-        redirect: jest.fn()
+        redirect: vi.fn()
       }
 
       await coordinateSystemSubmitController.handler(request, h)
@@ -178,7 +179,7 @@ describe('#coordinateSystem', () => {
       })
 
       const h = {
-        view: jest.fn()
+        view: vi.fn()
       }
 
       await coordinateSystemSubmitController.handler(request, h)
@@ -207,7 +208,7 @@ describe('#coordinateSystem', () => {
       })
 
       const h = {
-        redirect: jest.fn()
+        redirect: vi.fn()
       }
 
       await coordinateSystemSubmitController.handler(request, h)
@@ -220,8 +221,8 @@ describe('#coordinateSystem', () => {
       }
 
       const h = {
-        view: jest.fn().mockReturnValue({
-          takeover: jest.fn()
+        view: vi.fn().mockReturnValue({
+          takeover: vi.fn()
         })
       }
 
@@ -272,8 +273,8 @@ describe('#coordinateSystem', () => {
       }
 
       const h = {
-        view: jest.fn().mockReturnValue({
-          takeover: jest.fn()
+        view: vi.fn().mockReturnValue({
+          takeover: vi.fn()
         })
       }
 
@@ -333,7 +334,7 @@ describe('#coordinateSystem', () => {
 
     test('Should correctly set the cache when submitting', async () => {
       const h = {
-        redirect: jest.fn()
+        redirect: vi.fn()
       }
 
       const mockRequest = {

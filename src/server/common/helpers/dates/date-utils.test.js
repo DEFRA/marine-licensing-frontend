@@ -1,3 +1,4 @@
+import { vi } from 'vitest'
 import {
   createDateISO,
   extractDateComponents,
@@ -153,12 +154,12 @@ describe('date-utils', () => {
 
   describe('isTodayOrFuture', () => {
     beforeEach(() => {
-      jest.useFakeTimers()
-      jest.setSystemTime(new Date('2025-06-15T12:00:00.000Z'))
+      vi.useFakeTimers()
+      vi.setSystemTime(new Date('2025-06-15T12:00:00.000Z'))
     })
 
     afterEach(() => {
-      jest.useRealTimers()
+      vi.useRealTimers()
     })
 
     test('returns true for future date', () => {

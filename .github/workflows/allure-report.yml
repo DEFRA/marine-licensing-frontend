@@ -31,7 +31,7 @@ jobs:
         run: npm run build
 
       - name: Run integration tests with Allure
-        run: npx jest tests/ --coverage=false
+        run: npx vitest tests/ --coverage=false
         env:
           CI: true
 

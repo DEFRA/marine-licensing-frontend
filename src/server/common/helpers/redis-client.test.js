@@ -1,51 +1,49 @@
-import { Cluster, Redis } from 'ioredis'
-import { buildRedisClient } from '~/src/server/common/helpers/redis-client.js'
-import {
-  __loggerInfoMock,
-  __loggerErrorMock
-} from '~/src/server/common/helpers/logging/logger.js'
+import { vi, beforeEach, describe, it, expect } from 'vitest'
 
-const mockRedisEventHandlers = new Map()
-const mockClusterEventHandlers = new Map()
+const mockLoggerInfo = vi.fn()
+const mockLoggerError = vi.fn()
 
-jest.mock('ioredis', () => {
-  return {
-    Redis: jest.fn().mockImplementation((options) => ({
-      __options: options,
-      on: jest.fn((event, cb) => {
-        mockRedisEventHandlers.set(event, cb)
-      })
+// Mock logger first
+vi.mock('~/src/server/common/helpers/logging/logger.js', () => ({
+  createLogger: () => ({
+    info: (...args) => mockLoggerInfo(...args),
+    error: (...args) => mockLoggerError(...args)
+  })
+}))
+
+// Let's try mocking the module at runtime for each test
+let buildRedisClient
+let Redis
+let Cluster
+
+beforeEach(async () => {
+  vi.resetModules()
+
+  // Mock ioredis dynamically
+  vi.doMock('ioredis', () => ({
+    Redis: vi.fn().mockImplementation((options) => ({
+      on: vi.fn(),
+      __options: options
     })),
-    Cluster: jest.fn().mockImplementation((nodes, options) => ({
+    Cluster: vi.fn().mockImplementation((nodes, options) => ({
+      on: vi.fn(),
       __nodes: nodes,
-      __options: options,
-      on: jest.fn((event, cb) => {
-        mockClusterEventHandlers.set(event, cb)
-      })
+      __options: options
     }))
-  }
-})
+  }))
 
-jest.mock('~/src/server/common/helpers/logging/logger.js', () => {
-  const loggerInfoMockLocal = jest.fn()
-  const loggerErrorMockLocal = jest.fn()
-  return {
-    createLogger: jest.fn(() => ({
-      info: loggerInfoMockLocal,
-      error: loggerErrorMockLocal
-    })),
-    __loggerInfoMock: loggerInfoMockLocal,
-    __loggerErrorMock: loggerErrorMockLocal
-  }
+  // Import after mocking
+  const ioredis = await import('ioredis')
+  Redis = ioredis.Redis
+  Cluster = ioredis.Cluster
+
+  const redisClientModule = await import(
+    '~/src/server/common/helpers/redis-client.js'
+  )
+  buildRedisClient = redisClientModule.buildRedisClient
 })
 
 describe('buildRedisClient', () => {
-  beforeEach(() => {
-    jest.clearAllMocks()
-    mockRedisEventHandlers.clear()
-    mockClusterEventHandlers.clear()
-  })
-
   describe('When using single Redis instance', () => {
     const redisConfigSingle = {
       host: '127.0.0.1',
@@ -68,28 +66,30 @@ describe('buildRedisClient', () => {
         db: 0,
         keyPrefix: 'marine-licensing-frontend:'
       })
-      expect(client.__options).toMatchObject({
-        port: 6379,
-        host: '127.0.0.1',
-        db: 0,
-        keyPrefix: 'marine-licensing-frontend:'
-      })
+      expect(client.on).toHaveBeenCalledWith('connect', expect.any(Function))
+      expect(client.on).toHaveBeenCalledWith('error', expect.any(Function))
     })
 
     it('should call logger.info on connect event', () => {
-      const connectCallback = mockRedisEventHandlers.get('connect')
-      expect(connectCallback).toBeDefined()
-      connectCallback()
-      expect(__loggerInfoMock).toHaveBeenCalledWith('Connected to Redis server')
+      // Get the mock on function and call the connect handler
+      const onFn = client.on
+      const connectCall = onFn.mock.calls.find((call) => call[0] === 'connect')
+      expect(connectCall).toBeDefined()
+      const connectHandler = connectCall[1]
+      connectHandler()
+      expect(mockLoggerInfo).toHaveBeenCalledWith('Connected to Redis server')
     })
 
     it('should call logger.error on error event', () => {
-      const errorCallback = mockRedisEventHandlers.get('error')
-      expect(errorCallback).toBeDefined()
-      const error = new Error('Test Error')
-      errorCallback(error)
-      expect(__loggerErrorMock).toHaveBeenCalledWith(
-        `Redis connection error ${error.toString()}`
+      // Get the mock on function and call the error handler
+      const onFn = client.on
+      const errorCall = onFn.mock.calls.find((call) => call[0] === 'error')
+      expect(errorCall).toBeDefined()
+      const errorHandler = errorCall[1]
+      const testError = new Error('Test Error')
+      errorHandler(testError)
+      expect(mockLoggerError).toHaveBeenCalledWith(
+        `Redis connection error ${testError.toString()}`
       )
     })
   })
@@ -119,23 +119,30 @@ describe('buildRedisClient', () => {
           redisOptions: { db: 0, username: 'user', password: 'pass', tls: {} }
         }
       )
-      expect(client.__nodes).toEqual([{ host: '127.0.0.1', port: 6379 }])
+      expect(client.on).toHaveBeenCalledWith('connect', expect.any(Function))
+      expect(client.on).toHaveBeenCalledWith('error', expect.any(Function))
     })
 
     it('should call logger.info on connect event for cluster', () => {
-      const connectCallback = mockClusterEventHandlers.get('connect')
-      expect(connectCallback).toBeDefined()
-      connectCallback()
-      expect(__loggerInfoMock).toHaveBeenCalledWith('Connected to Redis server')
+      // Get the mock on function and call the connect handler
+      const onFn = client.on
+      const connectCall = onFn.mock.calls.find((call) => call[0] === 'connect')
+      expect(connectCall).toBeDefined()
+      const connectHandler = connectCall[1]
+      connectHandler()
+      expect(mockLoggerInfo).toHaveBeenCalledWith('Connected to Redis server')
     })
 
     it('should call logger.error on error event for cluster', () => {
-      const errorCallback = mockClusterEventHandlers.get('error')
-      expect(errorCallback).toBeDefined()
-      const error = new Error('Cluster Error')
-      errorCallback(error)
-      expect(__loggerErrorMock).toHaveBeenCalledWith(
-        `Redis connection error ${error.toString()}`
+      // Get the mock on function and call the error handler
+      const onFn = client.on
+      const errorCall = onFn.mock.calls.find((call) => call[0] === 'error')
+      expect(errorCall).toBeDefined()
+      const errorHandler = errorCall[1]
+      const testError = new Error('Cluster Error')
+      errorHandler(testError)
+      expect(mockLoggerError).toHaveBeenCalledWith(
+        `Redis connection error ${testError.toString()}`
       )
     })
   })

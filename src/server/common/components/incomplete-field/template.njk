@@ -1,0 +1,8 @@
+{%- from "govuk/components/tag/macro.njk" import govukTag -%}
+
+{% if not params.text or params.text == "" %}
+    {{ govukTag({
+        text: "Incomplete",
+        classes: "govuk-tag--red"
+    }) }}
+{% else %}{{params.text}}{% endif %}

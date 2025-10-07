@@ -1,3 +1,4 @@
+import { vi } from 'vitest'
 import {
   extractCoordinatesFromGeoJSON,
   getCoordinateSystem
@@ -6,7 +7,7 @@ import { getExemptionCache } from './session-cache/utils.js'
 import { COORDINATE_SYSTEMS } from '~/src/server/common/constants/exemptions.js'
 
 // Mock the session cache utils
-jest.mock('./session-cache/utils.js')
+vi.mock('./session-cache/utils.js')
 
 describe('coordinate-utils', () => {
   describe('extractCoordinatesFromGeoJSON', () => {
@@ -232,11 +233,7 @@ describe('coordinate-utils', () => {
 
   describe('getCoordinateSystem', () => {
     const mockRequest = {}
-    const mockGetExemptionCache = jest.mocked(getExemptionCache)
-
-    beforeEach(() => {
-      jest.clearAllMocks()
-    })
+    const mockGetExemptionCache = vi.mocked(getExemptionCache)
 
     test('should return OSGB36 when coordinate system is set to OSGB36 in cache', () => {
       mockGetExemptionCache.mockReturnValue({

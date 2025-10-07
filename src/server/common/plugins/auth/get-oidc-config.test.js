@@ -1,15 +1,9 @@
+import { vi } from 'vitest'
 import wreck from '@hapi/wreck'
 import {
   getOidcConfig,
   getOpenIdRefreshToken
 } from '~/src/server/common/plugins/auth/get-oidc-config.js'
-
-const mockPost = jest.fn()
-
-jest.mock('@hapi/wreck', () => ({
-  get: jest.fn().mockReturnValue({}),
-  post: (...args) => mockPost(...args)
-}))
 
 const oidcConfigUrl =
   'http://localhost:3200/cdp-defra-id-stub/.well-known/openid-configuration'
@@ -18,20 +12,24 @@ const oidcRefreshUrl = 'https://some-token-refresh-endpoint'
 describe('#getOidcConfig utils', () => {
   describe('#getOpenIdConfig', () => {
     test('Should call wreck get', async () => {
+      const getSpy = vi.spyOn(wreck, 'get').mockResolvedValue({})
+
       await getOidcConfig(oidcConfigUrl)
 
-      expect(wreck.get).toHaveBeenCalledWith(
+      expect(getSpy).toHaveBeenCalledWith(
         oidcConfigUrl,
         expect.objectContaining({
           json: true
         })
       )
+
+      getSpy.mockRestore()
     })
   })
 
   describe('#getOpenIdRefreshToken', () => {
     test('Should return ok response', async () => {
-      mockPost.mockReturnValue({
+      const postSpy = vi.spyOn(wreck, 'post').mockResolvedValue({
         res: {
           statusCode: 200
         },
@@ -50,7 +48,7 @@ describe('#getOidcConfig utils', () => {
 
       const result = await getOpenIdRefreshToken(oidcRefreshUrl, params)
 
-      expect(mockPost).toHaveBeenCalledWith(
+      expect(postSpy).toHaveBeenCalledWith(
         oidcRefreshUrl,
         expect.objectContaining({
           headers: {
@@ -67,10 +65,12 @@ describe('#getOidcConfig utils', () => {
           access_token: 'FOO'
         })
       )
+
+      postSpy.mockRestore()
     })
 
     test('Should return not ok response', async () => {
-      mockPost.mockReturnValue({
+      const postSpy = vi.spyOn(wreck, 'post').mockResolvedValue({
         res: {
           statusCode: 500
         }
@@ -87,7 +87,7 @@ describe('#getOidcConfig utils', () => {
 
       const result = await getOpenIdRefreshToken(oidcRefreshUrl, params)
 
-      expect(mockPost).toHaveBeenCalledWith(
+      expect(postSpy).toHaveBeenCalledWith(
         oidcRefreshUrl,
         expect.objectContaining({
           headers: {
@@ -104,10 +104,14 @@ describe('#getOidcConfig utils', () => {
           json: expect.anything()
         })
       )
+
+      postSpy.mockRestore()
     })
 
     test('Should return not ok response if there is an error', async () => {
-      mockPost.mockReturnValue({ res: { statusCode: 200 } })
+      const postSpy = vi
+        .spyOn(wreck, 'post')
+        .mockResolvedValue({ res: { statusCode: 200 } })
 
       const params = {
         client_id: 'some-client-id',
@@ -122,6 +126,8 @@ describe('#getOidcConfig utils', () => {
 
       expect(result.ok).toBeFalsy()
       expect(result.error).toBeTruthy()
+
+      postSpy.mockRestore()
     })
   })
 
@@ -137,7 +143,7 @@ describe('#getOidcConfig utils', () => {
           '{ "access_token": "FOO", "expires_in": 1000, "id_token": "FOO" }'
       }
     ])('Should return not ok response', async ({ refreshPayload }) => {
-      mockPost.mockReturnValue({
+      const postSpy = vi.spyOn(wreck, 'post').mockResolvedValue({
         res: {
           statusCode: 200
         },
@@ -155,7 +161,7 @@ describe('#getOidcConfig utils', () => {
 
       const result = await getOpenIdRefreshToken(oidcRefreshUrl, params)
 
-      expect(mockPost).toHaveBeenCalledWith(
+      expect(postSpy).toHaveBeenCalledWith(
         oidcRefreshUrl,
         expect.objectContaining({
           headers: {
@@ -172,6 +178,8 @@ describe('#getOidcConfig utils', () => {
           json: expect.anything()
         })
       )
+
+      postSpy.mockRestore()
     })
   })
 })

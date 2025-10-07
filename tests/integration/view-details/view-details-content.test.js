@@ -1,3 +1,4 @@
+import { vi } from 'vitest'
 import { testScenarios } from './fixtures.js'
 import {
   validatePageStructure,
@@ -19,7 +20,7 @@ import { routes } from '~/src/server/common/constants/routes.js'
 import { statusCodes } from '~/src/server/common/constants/status-codes.js'
 import { makeGetRequest } from '~/src/server/test-helpers/server-requests.js'
 
-jest.mock('~/src/server/common/helpers/authenticated-requests.js')
+vi.mock('~/src/server/common/helpers/authenticated-requests.js')
 
 describe('View Details - Content Verification Integration Tests', () => {
   const getServer = setupTestServer()

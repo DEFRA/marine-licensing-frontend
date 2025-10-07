@@ -1,3 +1,4 @@
+import { vi } from 'vitest'
 import { CdpLoggingHelper } from './cdp-logging-helper.js'
 
 describe('CdpLoggingHelper', () => {
@@ -5,12 +6,8 @@ describe('CdpLoggingHelper', () => {
   let helper
 
   beforeEach(() => {
-    logger = { debug: jest.fn() }
+    logger = { debug: vi.fn() }
     helper = new CdpLoggingHelper(logger)
-  })
-
-  afterEach(() => {
-    jest.clearAllMocks()
   })
 
   describe('logFileDataExtraction', () => {

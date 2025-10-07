@@ -1,3 +1,4 @@
+import { vi } from 'vitest'
 import { clone } from '@hapi/hoek'
 import {
   EXEMPTION_CACHE_KEY,
@@ -10,8 +11,8 @@ import {
   updateExemptionMultipleSiteDetails
 } from '~/src/server/common/helpers/session-cache/utils.js'
 
-jest.mock('@hapi/hoek', () => ({
-  clone: jest.fn((data) => ({ ...data }))
+vi.mock('@hapi/hoek', () => ({
+  clone: vi.fn((data) => ({ ...data }))
 }))
 
 describe('#utils', () => {
@@ -19,11 +20,9 @@ describe('#utils', () => {
     let mockRequest
 
     beforeEach(() => {
-      jest.clearAllMocks()
-
       mockRequest = {
         yar: {
-          clear: jest.fn()
+          clear: vi.fn()
         }
       }
     })
@@ -38,11 +37,9 @@ describe('#utils', () => {
     let mockRequest
 
     beforeEach(() => {
-      jest.clearAllMocks()
-
       mockRequest = {
         yar: {
-          get: jest.fn()
+          get: vi.fn()
         }
       }
     })
@@ -84,12 +81,10 @@ describe('#utils', () => {
     let mockRequest
 
     beforeEach(() => {
-      jest.clearAllMocks()
-
       mockRequest = {
         yar: {
-          get: jest.fn(),
-          set: jest.fn()
+          get: vi.fn(),
+          set: vi.fn()
         }
       }
     })
@@ -133,12 +128,10 @@ describe('#utils', () => {
     let mockRequest
 
     beforeEach(() => {
-      jest.clearAllMocks()
-
       mockRequest = {
         yar: {
-          get: jest.fn(),
-          set: jest.fn()
+          get: vi.fn(),
+          set: vi.fn()
         }
       }
     })
@@ -214,12 +207,10 @@ describe('#utils', () => {
     let mockRequest
 
     beforeEach(() => {
-      jest.clearAllMocks()
-
       mockRequest = {
         yar: {
-          get: jest.fn(),
-          set: jest.fn()
+          get: vi.fn(),
+          set: vi.fn()
         }
       }
     })
@@ -347,12 +338,10 @@ describe('#utils', () => {
     }
 
     beforeEach(() => {
-      jest.clearAllMocks()
-
       mockRequest = {
         yar: {
-          get: jest.fn(),
-          set: jest.fn()
+          get: vi.fn(),
+          set: vi.fn()
         }
       }
     })
@@ -610,12 +599,10 @@ describe('#utils', () => {
     let mockRequest
 
     beforeEach(() => {
-      jest.clearAllMocks()
-
       mockRequest = {
         yar: {
-          get: jest.fn(),
-          set: jest.fn()
+          get: vi.fn(),
+          set: vi.fn()
         }
       }
     })

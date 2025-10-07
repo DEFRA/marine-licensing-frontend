@@ -1,3 +1,4 @@
+import { vi } from 'vitest'
 import { config } from '~/src/config/config.js'
 import { routes } from '~/src/server/common/constants/routes.js'
 import * as cacheUtils from '~/src/server/common/helpers/session-cache/utils.js'
@@ -8,10 +9,10 @@ import {
 import { mockExemption } from '~/src/server/test-helpers/mocks.js'
 import * as cdpUploadService from '~/src/services/cdp-upload-service/index.js'
 
-jest.mock('~/src/server/common/helpers/session-cache/utils.js')
-jest.mock('~/src/services/cdp-upload-service/index.js')
+vi.mock('~/src/server/common/helpers/session-cache/utils.js')
+vi.mock('~/src/services/cdp-upload-service/index.js')
 
-/* eslint jest/expect-expect: ["error", { "assertFunctionNames": ["expect", "expectViewCalledWith"] }] */
+/* eslint vitest/expect-expect: ["error", { "assertFunctionNames": ["expect", "expectViewCalledWith"] }] */
 
 describe('#fileUpload', () => {
   let getExemptionCacheSpy
@@ -20,22 +21,26 @@ describe('#fileUpload', () => {
 
   const createMockRequest = () => ({
     logger: {
-      debug: jest.fn(),
-      warn: jest.fn(),
-      error: jest.fn()
+      debug: vi.fn(),
+      warn: vi.fn(),
+      error: vi.fn()
     },
     server: {
       plugins: {
         crumb: {
-          generate: jest.fn().mockReturnValue('mock-csrf-token')
+          generate: vi.fn().mockReturnValue('mock-csrf-token')
         }
       }
+    },
+    yar: {
+      get: vi.fn(),
+      set: vi.fn()
     }
   })
 
   const createMockH = () => ({
-    view: jest.fn(),
-    redirect: jest.fn()
+    view: vi.fn(),
+    redirect: vi.fn()
   })
 
   const createStandardUploadConfig = () => ({
@@ -73,22 +78,22 @@ describe('#fileUpload', () => {
   }
 
   beforeEach(() => {
-    getExemptionCacheSpy = jest
+    getExemptionCacheSpy = vi
       .spyOn(cacheUtils, 'getExemptionCache')
       .mockReturnValue(mockExemption)
 
-    updateExemptionSiteDetailsSpy = jest
+    updateExemptionSiteDetailsSpy = vi
       .spyOn(cacheUtils, 'updateExemptionSiteDetails')
       .mockImplementation()
 
     mockCdpService = {
-      initiate: jest.fn(),
-      getStatus: jest.fn()
+      initiate: vi.fn(),
+      getStatus: vi.fn()
     }
 
-    jest
-      .spyOn(cdpUploadService, 'getCdpUploadService')
-      .mockReturnValue(mockCdpService)
+    vi.spyOn(cdpUploadService, 'getCdpUploadService').mockReturnValue(
+      mockCdpService
+    )
   })
 
   describe('#fileUploadController', () => {
@@ -618,7 +623,6 @@ describe('#fileUpload', () => {
       const falsyValues = [null, undefined, false, 0, '']
 
       for (const falsyValue of falsyValues) {
-        jest.clearAllMocks()
         await setupMutationTest({ fileUploadType: falsyValue }, false)
 
         expect(mockH.redirect).toHaveBeenCalledWith(

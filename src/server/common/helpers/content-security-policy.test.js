@@ -1,8 +1,9 @@
+import { vi } from 'vitest'
 import { contentSecurityPolicy } from './content-security-policy.js'
 
-jest.mock('~/src/config/config.js', () => ({
+vi.mock('~/src/config/config.js', () => ({
   config: {
-    get: jest.fn((key) =>
+    get: vi.fn((key) =>
       key === 'cdpUploader.cdpUploadServiceBaseUrl' ? 'http://uploader' : '123'
     ) // clarityProjectId
   }
@@ -16,7 +17,7 @@ describe('contentSecurityPolicy', () => {
 
   beforeEach(() => {
     mockResponse = {
-      header: jest.fn().mockReturnThis(),
+      header: vi.fn().mockReturnThis(),
       isBoom: false
     }
     mockRequest = {
@@ -26,7 +27,7 @@ describe('contentSecurityPolicy', () => {
       continue: Symbol('continue')
     }
     server = {
-      ext: jest.fn()
+      ext: vi.fn()
     }
   })
 

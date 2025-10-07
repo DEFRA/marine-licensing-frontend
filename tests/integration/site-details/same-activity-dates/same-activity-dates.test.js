@@ -2,20 +2,16 @@ import { JSDOM } from 'jsdom'
 import { getByLabelText, getByRole, getByText } from '@testing-library/dom'
 import { statusCodes } from '~/src/server/common/constants/status-codes.js'
 import {
-  getExemptionCache,
-  updateExemptionMultipleSiteDetails
-} from '~/src/server/common/helpers/session-cache/utils.js'
-
-import {
   makeGetRequest,
   makePostRequest
 } from '~/src/server/test-helpers/server-requests.js'
-import { setupTestServer } from '~/tests/integration/shared/test-setup-helpers.js'
-
-jest.mock('~/src/server/common/helpers/session-cache/utils.js')
+import {
+  mockExemption,
+  setupTestServer
+} from '~/tests/integration/shared/test-setup-helpers.js'
 
 describe('Same activity dates page', () => {
-  const mockExemption = {
+  const mockExemptionData = {
     id: 'test-exemption-123',
     projectName: 'Test Project',
     multipleSiteDetails: {
@@ -23,13 +19,13 @@ describe('Same activity dates page', () => {
     },
     siteDetails: [{ coordinatesType: 'coordinates' }]
   }
-
-  jest.mocked(getExemptionCache).mockReturnValue(mockExemption)
-  jest.mocked(updateExemptionMultipleSiteDetails).mockReturnValue({})
+  beforeEach(() => mockExemption(mockExemptionData))
 
   const getServer = setupTestServer()
 
   test('should display the same activity dates page with correct content', async () => {
+    const { updateExemptionMultipleSiteDetails } =
+      mockExemption(mockExemptionData)
     const { result, statusCode } = await makeGetRequest({
       server: getServer(),
       url: '/exemption/same-activity-dates'
@@ -45,7 +41,9 @@ describe('Same activity dates page', () => {
         name: 'Are the activity dates the same for every site?'
       })
     ).toBeInTheDocument()
-    expect(getByText(document, mockExemption.projectName)).toBeInTheDocument()
+    expect(
+      getByText(document, mockExemptionData.projectName)
+    ).toBeInTheDocument()
 
     const yesRadio = getByRole(document, 'radio', {
       name: 'Yes, the dates are the same for every site'
@@ -80,10 +78,10 @@ describe('Same activity dates page', () => {
   })
 
   test('should pre-populate radio when sameActivityDates value exists in cache', async () => {
-    jest.mocked(getExemptionCache).mockReturnValue({
-      ...mockExemption,
+    const { updateExemptionMultipleSiteDetails } = mockExemption({
+      ...mockExemptionData,
       multipleSiteDetails: {
-        ...mockExemption.multipleSiteDetails,
+        ...mockExemptionData.multipleSiteDetails,
         sameActivityDates: 'yes'
       }
     })
@@ -132,9 +130,9 @@ describe('Same activity dates page', () => {
   })
 
   test('should have correct navigation links for file upload', async () => {
-    jest.mocked(getExemptionCache).mockReturnValueOnce({
-      ...mockExemption,
-      siteDetails: mockExemption.siteDetails.map((site) => ({
+    mockExemption({
+      ...mockExemptionData,
+      siteDetails: mockExemptionData.siteDetails.map((site) => ({
         ...site,
         coordinatesType: 'file'
       }))
@@ -184,6 +182,8 @@ describe('Same activity dates page', () => {
   })
 
   test('should redirect to coordinates entry choice when "yes" is selected', async () => {
+    const { updateExemptionMultipleSiteDetails } =
+      mockExemption(mockExemptionData)
     const response = await makePostRequest({
       url: '/exemption/same-activity-dates',
       server: getServer(),
@@ -205,6 +205,8 @@ describe('Same activity dates page', () => {
   })
 
   test('should redirect to coordinates entry choice when "no" is selected', async () => {
+    const { updateExemptionMultipleSiteDetails } =
+      mockExemption(mockExemptionData)
     const response = await makePostRequest({
       url: '/exemption/same-activity-dates',
       server: getServer(),
@@ -226,9 +228,9 @@ describe('Same activity dates page', () => {
   })
 
   test('should redirect to same-activity-description when "no" is selected in a file upload', async () => {
-    jest.mocked(getExemptionCache).mockReturnValueOnce({
-      ...mockExemption,
-      siteDetails: mockExemption.siteDetails.map((site) => ({
+    const { updateExemptionMultipleSiteDetails } = mockExemption({
+      ...mockExemptionData,
+      siteDetails: mockExemptionData.siteDetails.map((site) => ({
         ...site,
         coordinatesType: 'file'
       }))

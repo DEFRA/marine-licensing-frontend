@@ -1,3 +1,4 @@
+import { vi } from 'vitest'
 import { JSDOM } from 'jsdom'
 import { statusCodes } from '~/src/server/common/constants/status-codes.js'
 import { setupTestServer } from '~/tests/integration/shared/test-setup-helpers.js'
@@ -8,17 +9,15 @@ import {
   makePostRequest
 } from '~/src/server/test-helpers/server-requests.js'
 
-jest.mock('~/src/config/config.js', () => {
-  const actualConfig = jest.requireActual('~/src/config/config.js')
+vi.mock('~/src/config/config.js', async () => {
+  const actualConfig = await vi.importActual('~/src/config/config.js')
   return {
     config: {
       ...actualConfig.config,
-      get: jest.fn((key) => {
-        // Mock clarityProjectId specifically
+      get: vi.fn((key) => {
         if (key === 'clarityProjectId') {
           return 'test-clarity-id-123'
         }
-        // Use the actual config for all other keys
         return actualConfig.config.get(key)
       })
     }
@@ -29,12 +28,12 @@ describe('MS Clarity Analytics Integration', () => {
   const getServer = setupTestServer()
   const CLARITY_PROJECT_ID = 'test-clarity-id-123'
 
-  beforeEach(() => {
+  beforeEach(async () => {
+    const actualConfig = await vi.importActual('~/src/config/config.js')
     config.get.mockImplementation((key) => {
       if (key === 'clarityProjectId') {
         return CLARITY_PROJECT_ID
       }
-      const actualConfig = jest.requireActual('~/src/config/config.js')
       return actualConfig.config.get(key)
     })
   })
@@ -144,11 +143,11 @@ describe('MS Clarity Analytics Integration', () => {
     })
 
     test('Should handle empty CLARITY_PROJECT_ID gracefully', async () => {
+      const actualConfig = await vi.importActual('~/src/config/config.js')
       config.get.mockImplementation((key) => {
         if (key === 'clarityProjectId') {
           return ''
         }
-        const actualConfig = jest.requireActual('~/src/config/config.js')
         return actualConfig.config.get(key)
       })
 
@@ -169,12 +168,11 @@ describe('MS Clarity Analytics Integration', () => {
     })
 
     test('Should handle missing CLARITY_PROJECT_ID config', async () => {
-      // Mock undefined project ID
+      const actualConfig = await vi.importActual('~/src/config/config.js')
       config.get.mockImplementation((key) => {
         if (key === 'clarityProjectId') {
           return undefined
         }
-        const actualConfig = jest.requireActual('~/src/config/config.js')
         return actualConfig.config.get(key)
       })
 

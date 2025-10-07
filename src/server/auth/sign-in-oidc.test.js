@@ -1,3 +1,4 @@
+import { vi } from 'vitest'
 import { statusCodes } from '~/src/server/common/constants/status-codes.js'
 import {
   redirectPathCacheKey,
@@ -8,8 +9,8 @@ import { signInOidcController } from '~/src/server/auth/sign-in-oidc.js'
 import { setupTestServer } from '~/tests/integration/shared/test-setup-helpers.js'
 import { makeGetRequest } from '~/src/server/test-helpers/server-requests.js'
 
-jest.mock('~/src/server/auth/utils.js', () => ({
-  setUserSession: jest.fn()
+vi.mock('~/src/server/auth/utils.js', () => ({
+  setUserSession: vi.fn()
 }))
 
 describe('#signInOidcController', () => {
@@ -30,11 +31,11 @@ describe('#signInOidcController', () => {
       auth: {
         isAuthenticated: true
       },
-      logger: { info: jest.fn() },
-      yar: { flash: jest.fn().mockReturnValue([routes.PROJECT_NAME]) }
+      logger: { info: vi.fn() },
+      yar: { flash: vi.fn().mockReturnValue([routes.PROJECT_NAME]) }
     }
 
-    const mockH = { redirect: jest.fn() }
+    const mockH = { redirect: vi.fn() }
 
     await signInOidcController.handler(mockRequest, mockH)
 
@@ -46,10 +47,10 @@ describe('#signInOidcController', () => {
 
     const mockRequest = {
       auth: { isAuthenticated: false },
-      yar: { flash: jest.fn().mockReturnValue(customRedirectRoute) }
+      yar: { flash: vi.fn().mockReturnValue(customRedirectRoute) }
     }
 
-    const mockH = { redirect: jest.fn() }
+    const mockH = { redirect: vi.fn() }
 
     await signInOidcController.handler(mockRequest, mockH)
 
@@ -60,10 +61,10 @@ describe('#signInOidcController', () => {
   test('should fall back to PROJECT_NAME route when no referrer in flash', async () => {
     const mockRequest = {
       auth: { isAuthenticated: false },
-      yar: { flash: jest.fn().mockReturnValue(null) }
+      yar: { flash: vi.fn().mockReturnValue(null) }
     }
 
-    const mockH = { redirect: jest.fn() }
+    const mockH = { redirect: vi.fn() }
 
     await signInOidcController.handler(mockRequest, mockH)
 

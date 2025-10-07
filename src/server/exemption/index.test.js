@@ -1,17 +1,14 @@
+import { vi } from 'vitest'
 import { exemption } from '~/src/server/exemption/index.js'
 import { getPageViewCommonData } from '~/src/server/common/helpers/page-view-common-data.js'
 
-jest.mock('~/src/server/common/helpers/page-view-common-data.js')
+vi.mock('~/src/server/common/helpers/page-view-common-data.js')
 
 describe('exemption route', () => {
-  beforeEach(() => {
-    jest.clearAllMocks()
-  })
-
   test('route is registered correctly', () => {
     const server = {
-      route: jest.fn(),
-      ext: jest.fn()
+      route: vi.fn(),
+      ext: vi.fn()
     }
 
     exemption.plugin.register(server)
@@ -246,8 +243,8 @@ describe('exemption route', () => {
     expect.assertions(1)
 
     const server = {
-      route: jest.fn(),
-      ext: jest.fn()
+      route: vi.fn(),
+      ext: vi.fn()
     }
 
     exemption.plugin.register(server)
@@ -260,7 +257,7 @@ describe('exemption route', () => {
 
     const mockRequest = {}
     const mockToolkit = {
-      redirect: jest.fn()
+      redirect: vi.fn()
     }
 
     exemptionRoute.handler(mockRequest, mockToolkit)
@@ -274,8 +271,8 @@ describe('exemption route', () => {
     })
 
     const server = {
-      route: jest.fn(),
-      ext: jest.fn()
+      route: vi.fn(),
+      ext: vi.fn()
     }
 
     exemption.plugin.register(server)
@@ -300,8 +297,8 @@ describe('exemption route', () => {
     getPageViewCommonData.mockResolvedValue({})
 
     const server = {
-      route: jest.fn(),
-      ext: jest.fn()
+      route: vi.fn(),
+      ext: vi.fn()
     }
 
     exemption.plugin.register(server)
@@ -322,8 +319,8 @@ describe('exemption route', () => {
 
   test('onPreResponse extension should merge context for view responses', () => {
     const server = {
-      route: jest.fn(),
-      ext: jest.fn()
+      route: vi.fn(),
+      ext: vi.fn()
     }
 
     exemption.plugin.register(server)
@@ -355,8 +352,8 @@ describe('exemption route', () => {
 
   test('onPreResponse extension should handle non-view responses', () => {
     const server = {
-      route: jest.fn(),
-      ext: jest.fn()
+      route: vi.fn(),
+      ext: vi.fn()
     }
 
     exemption.plugin.register(server)

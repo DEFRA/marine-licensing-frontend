@@ -1,3 +1,4 @@
+import { vi } from 'vitest'
 import {
   createCookiePolicy,
   setCookiePreferences,
@@ -11,15 +12,15 @@ import {
 } from '~/src/server/common/constants/cookies.js'
 import { config } from '~/src/config/config.js'
 
-jest.mock('~/src/config/config.js')
+vi.mock('~/src/config/config.js')
 
 const createMockResponse = () => ({
-  state: jest.fn().mockReturnThis()
+  state: vi.fn().mockReturnThis()
 })
 
 const createMockRequest = () => ({
   yar: {
-    flash: jest.fn()
+    flash: vi.fn()
   }
 })
 
@@ -30,8 +31,8 @@ describe('Cookie Service', () => {
   beforeEach(() => {
     mockResponse = createMockResponse()
     mockRequest = createMockRequest()
-    jest.clearAllMocks()
-    jest.spyOn(Date, 'now').mockReturnValue(1234567890000)
+
+    vi.spyOn(Date, 'now').mockReturnValue(1234567890000)
   })
 
   afterEach(() => {

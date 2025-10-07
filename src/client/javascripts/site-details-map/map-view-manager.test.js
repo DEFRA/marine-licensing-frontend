@@ -1,3 +1,4 @@
+import { vi } from 'vitest'
 import MapViewManager from './map-view-manager.js'
 
 describe('MapViewManager', () => {
@@ -6,16 +7,14 @@ describe('MapViewManager', () => {
   let mockView
 
   beforeEach(() => {
-    jest.clearAllMocks()
-
     mockView = {
-      fit: jest.fn(),
-      setCenter: jest.fn(),
-      setZoom: jest.fn()
+      fit: vi.fn(),
+      setCenter: vi.fn(),
+      setZoom: vi.fn()
     }
 
     mockMap = {
-      getView: jest.fn().mockReturnValue(mockView)
+      getView: vi.fn().mockReturnValue(mockView)
     }
 
     mapViewManager = new MapViewManager()
@@ -81,7 +80,7 @@ describe('MapViewManager', () => {
 
     test('should fall back to centre view when fit throws an error', () => {
       const extent = [100, 200, 300, 400]
-      const consoleWarnSpy = jest.spyOn(console, 'warn').mockImplementation()
+      const consoleWarnSpy = vi.spyOn(console, 'warn').mockImplementation()
 
       mockView.fit.mockImplementation(() => {
         throw new Error('Fit failed')
@@ -98,7 +97,7 @@ describe('MapViewManager', () => {
     test('should log specific warning message when fit throws an error', () => {
       const extent = [100, 200, 300, 400]
       const testError = new Error('Fit failed')
-      const consoleWarnSpy = jest.spyOn(console, 'warn').mockImplementation()
+      const consoleWarnSpy = vi.spyOn(console, 'warn').mockImplementation()
 
       mockView.fit.mockImplementation(() => {
         throw testError
@@ -137,7 +136,7 @@ describe('MapViewManager', () => {
 
       const { mockSource } = setupFitTest(
         'fitMapToGeometry',
-        (extent) => ({ getExtent: jest.fn().mockReturnValue(extent) }),
+        (extent) => ({ getExtent: vi.fn().mockReturnValue(extent) }),
         extent,
         options
       )
@@ -155,7 +154,7 @@ describe('MapViewManager', () => {
 
       const { mockSource } = setupFitTest(
         'fitMapToAllFeatures',
-        (extent) => ({ getExtent: jest.fn().mockReturnValue(extent) }),
+        (extent) => ({ getExtent: vi.fn().mockReturnValue(extent) }),
         extent,
         options
       )

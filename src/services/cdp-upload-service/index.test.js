@@ -1,3 +1,4 @@
+import { vi } from 'vitest'
 import {
   getCdpUploadService,
   CdpUploadService,
@@ -6,7 +7,7 @@ import {
 
 describe('#CDP Upload Service Index', () => {
   afterEach(() => {
-    jest.restoreAllMocks()
+    vi.restoreAllMocks()
   })
 
   describe('getCdpUploadService factory function', () => {

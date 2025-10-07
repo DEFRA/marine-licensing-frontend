@@ -1,3 +1,4 @@
+import { vi } from 'vitest'
 import { testScenarios } from './fixtures.js'
 import {
   validatePageStructure,
@@ -23,14 +24,14 @@ import { AUTH_STRATEGIES } from '~/src/server/common/constants/auth.js'
 import { format } from 'date-fns'
 import { makeGetRequest } from '~/src/server/test-helpers/server-requests.js'
 
-jest.mock('~/src/server/common/helpers/authenticated-requests.js')
+vi.mock('~/src/server/common/helpers/authenticated-requests.js')
 
 describe('View Details - Content Verification Integration Tests', () => {
   const getServer = setupTestServer()
 
   const getPageDocument = async (exemption) => {
     mockExemption(exemption)
-    jest.mocked(getAuthProvider).mockReturnValue(AUTH_STRATEGIES.ENTRA_ID)
+    vi.mocked(getAuthProvider).mockReturnValue(AUTH_STRATEGIES.ENTRA_ID)
     const response = await makeGetRequest({
       server: getServer(),
       url: `${routes.VIEW_DETAILS_INTERNAL_USER}/${exemption.id}`,

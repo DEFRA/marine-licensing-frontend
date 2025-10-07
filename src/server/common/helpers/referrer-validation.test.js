@@ -1,3 +1,4 @@
+import { vi } from 'vitest'
 import {
   isValidReferrerPath,
   extractReferrerPath,
@@ -10,9 +11,9 @@ import {
 
 const createMockRequest = () => ({
   yar: {
-    get: jest.fn(),
-    set: jest.fn(),
-    clear: jest.fn()
+    get: vi.fn(),
+    set: vi.fn(),
+    clear: vi.fn()
   }
 })
 
@@ -249,7 +250,6 @@ describe('referrer-validation', () => {
 
     beforeEach(() => {
       mockRequest = createMockRequest()
-      jest.clearAllMocks()
     })
 
     const validReferrerTests = [
@@ -319,7 +319,6 @@ describe('referrer-validation', () => {
 
     beforeEach(() => {
       mockRequest = createMockRequest()
-      jest.clearAllMocks()
     })
 
     const validStoredReferrers = [
@@ -369,7 +368,6 @@ describe('referrer-validation', () => {
 
     beforeEach(() => {
       mockRequest = createMockRequest()
-      jest.clearAllMocks()
     })
 
     it('should clear the stored referrer', () => {
@@ -389,7 +387,6 @@ describe('referrer-validation', () => {
 
     beforeEach(() => {
       mockRequest = createMockRequest()
-      jest.clearAllMocks()
     })
 
     it('should return stored referrer when valid', () => {
@@ -510,7 +507,6 @@ describe('referrer-validation', () => {
 
     beforeEach(() => {
       mockRequest = createMockRequest()
-      jest.clearAllMocks()
     })
 
     it('should handle complete workflow: store -> get -> clear', () => {

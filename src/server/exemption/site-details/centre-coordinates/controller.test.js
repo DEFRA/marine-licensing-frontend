@@ -1,3 +1,4 @@
+import { vi } from 'vitest'
 import { setupTestServer } from '~/tests/integration/shared/test-setup-helpers.js'
 import {
   centreCoordinatesController,
@@ -15,7 +16,7 @@ import { config } from '~/src/config/config.js'
 import { JSDOM } from 'jsdom'
 import { routes } from '~/src/server/common/constants/routes.js'
 
-jest.mock('~/src/server/common/helpers/session-cache/utils.js')
+vi.mock('~/src/server/common/helpers/session-cache/utils.js')
 
 describe('#centreCoordinates', () => {
   const getServer = setupTestServer()
@@ -31,10 +32,10 @@ describe('#centreCoordinates', () => {
   }
 
   beforeEach(() => {
-    getExemptionCacheSpy = jest
+    getExemptionCacheSpy = vi
       .spyOn(cacheUtils, 'getExemptionCache')
       .mockReturnValue(mockExemption)
-    getCoordinateSystemSpy = jest
+    getCoordinateSystemSpy = vi
       .spyOn(coordinateUtils, 'getCoordinateSystem')
       .mockReturnValue({ coordinateSystem: COORDINATE_SYSTEMS.WGS84 })
   })
@@ -42,7 +43,7 @@ describe('#centreCoordinates', () => {
   describe('#centreCoordinatesController', () => {
     test('centreCoordinatesController handler should render with correct context with no existing data', () => {
       getExemptionCacheSpy.mockReturnValueOnce({})
-      const h = { view: jest.fn() }
+      const h = { view: vi.fn() }
 
       centreCoordinatesController.handler({ site: mockSite }, h)
 
@@ -59,7 +60,7 @@ describe('#centreCoordinates', () => {
     })
 
     test('centreCoordinatesController handler should render with correct context for wgs84', () => {
-      const h = { view: jest.fn() }
+      const h = { view: vi.fn() }
 
       centreCoordinatesController.handler({ site: mockSite }, h)
 
@@ -76,7 +77,7 @@ describe('#centreCoordinates', () => {
     })
 
     test('centreCoordinatesController handler should render with correct context for osgb36', () => {
-      const h = { view: jest.fn() }
+      const h = { view: vi.fn() }
 
       getExemptionCacheSpy.mockReturnValueOnce({
         ...mockExemption,
@@ -115,7 +116,7 @@ describe('#centreCoordinates', () => {
         }
       })
 
-      const h = { view: jest.fn() }
+      const h = { view: vi.fn() }
 
       centreCoordinatesController.handler({ site: mockSite }, h)
 
@@ -193,8 +194,8 @@ describe('#centreCoordinates', () => {
       }
 
       const h = {
-        view: jest.fn().mockReturnValue({
-          takeover: jest.fn()
+        view: vi.fn().mockReturnValue({
+          takeover: vi.fn()
         })
       }
 
@@ -252,8 +253,8 @@ describe('#centreCoordinates', () => {
       }
 
       const h = {
-        view: jest.fn().mockReturnValue({
-          takeover: jest.fn()
+        view: vi.fn().mockReturnValue({
+          takeover: vi.fn()
         })
       }
 
@@ -285,7 +286,7 @@ describe('#centreCoordinates', () => {
 
     test('Should correctly set the cache when submitting wgs84 data', async () => {
       const h = {
-        redirect: jest.fn()
+        redirect: vi.fn()
       }
 
       const mockRequest = {
@@ -311,7 +312,7 @@ describe('#centreCoordinates', () => {
 
     test('Should trim spaces from wgs84 data and save the converted values', async () => {
       const h = {
-        redirect: jest.fn()
+        redirect: vi.fn()
       }
 
       const mockRequest = {
@@ -337,7 +338,7 @@ describe('#centreCoordinates', () => {
 
     test('Should correctly set the cache when submitting OSGB36 data', async () => {
       const h = {
-        redirect: jest.fn()
+        redirect: vi.fn()
       }
 
       const mockRequest = {
@@ -363,7 +364,7 @@ describe('#centreCoordinates', () => {
 
     test('Should trim spaces from OSGB36 data and save the converted values', async () => {
       const h = {
-        redirect: jest.fn()
+        redirect: vi.fn()
       }
 
       const mockRequest = {
@@ -394,8 +395,8 @@ describe('#centreCoordinates', () => {
       }
 
       const h = {
-        view: jest.fn().mockReturnValue({
-          takeover: jest.fn()
+        view: vi.fn().mockReturnValue({
+          takeover: vi.fn()
         })
       }
 

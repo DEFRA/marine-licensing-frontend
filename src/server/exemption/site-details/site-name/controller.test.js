@@ -1,37 +1,40 @@
+import { vi } from 'vitest'
 import {
   siteNameController,
   siteNameSubmitController,
   SITE_NAME_VIEW_ROUTE,
   errorMessages
 } from '~/src/server/exemption/site-details/site-name/controller.js'
-import {
-  getExemptionCache,
-  updateExemptionSiteDetails
-} from '~/src/server/common/helpers/session-cache/utils.js'
-import { mockExemption } from '~/src/server/test-helpers/mocks.js'
+import { mockExemption as mockExemptionData } from '~/src/server/test-helpers/mocks.js'
 import { routes } from '~/src/server/common/constants/routes.js'
+import * as cacheUtils from '~/src/server/common/helpers/session-cache/utils.js'
 
-jest.mock('~/src/server/common/helpers/session-cache/utils.js')
+vi.mock('~/src/server/common/helpers/session-cache/utils.js')
 
 describe('#siteName', () => {
-  jest.mocked(getExemptionCache).mockReturnValue(mockExemption)
-  jest.mocked(updateExemptionSiteDetails).mockReturnValue({})
+  let getExemptionCacheSpy
 
   const sitePreHandlerHook = siteNameController.options.pre[0]
+
+  beforeEach(() => {
+    getExemptionCacheSpy = vi
+      .spyOn(cacheUtils, 'getExemptionCache')
+      .mockReturnValue(mockExemptionData)
+  })
 
   describe('#siteNameController', () => {
     test('should render with correct context and call utils function', () => {
       const mockSiteName = 'Test Site Name'
-      jest.mocked(getExemptionCache).mockReturnValueOnce({
-        ...mockExemption,
+      const h = { view: vi.fn() }
+      const request = {}
+
+      getExemptionCacheSpy.mockReturnValueOnce({
+        ...mockExemptionData,
         siteDetails: [
-          { ...mockExemption.siteDetails[0], siteName: mockSiteName }
+          { ...mockExemptionData.siteDetails[0], siteName: mockSiteName }
         ]
       })
 
-      const h = { view: jest.fn() }
-
-      const request = {}
       sitePreHandlerHook.method(request, h)
 
       siteNameController.handler(request, h)
@@ -49,15 +52,20 @@ describe('#siteName', () => {
 
   describe('#siteNameSubmitController', () => {
     test('should redirect to next page when valid site name is submitted', () => {
+      const updateExemptionSiteDetailsSpy = vi.spyOn(
+        cacheUtils,
+        'updateExemptionSiteDetails'
+      )
+
       const request = {
         payload: { siteName: 'Test Site Name' }
       }
-      const h = { redirect: jest.fn() }
+      const h = { redirect: vi.fn() }
 
       sitePreHandlerHook.method(request, h)
       siteNameSubmitController.handler(request, h)
 
-      expect(jest.mocked(updateExemptionSiteDetails)).toHaveBeenCalledWith(
+      expect(updateExemptionSiteDetailsSpy).toHaveBeenCalledWith(
         request,
         0,
         'siteName',
@@ -94,7 +102,7 @@ describe('#siteName', () => {
       const request = {
         payload: { siteName: '' }
       }
-      const h = { view: jest.fn().mockReturnValue({ takeover: jest.fn() }) }
+      const h = { view: vi.fn().mockReturnValue({ takeover: vi.fn() }) }
 
       const err = {
         details: [
@@ -125,7 +133,7 @@ describe('#siteName', () => {
       const request = {
         payload: { siteName: 'invalid' }
       }
-      const h = { view: jest.fn().mockReturnValue({ takeover: jest.fn() }) }
+      const h = { view: vi.fn().mockReturnValue({ takeover: vi.fn() }) }
 
       sitePreHandlerHook.method(request, h)
 

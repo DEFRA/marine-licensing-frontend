@@ -1,3 +1,4 @@
+import { vi } from 'vitest'
 import {
   multipleCoordinatesController,
   multipleCoordinatesSubmitController
@@ -14,16 +15,14 @@ import {
 } from '~/src/server/exemption/site-details/enter-multiple-coordinates/utils.js'
 import { mockSite } from '~/src/server/test-helpers/mocks.js'
 
-jest.mock('~/src/server/common/helpers/session-cache/utils.js')
-jest.mock(
+vi.mock('~/src/server/common/helpers/session-cache/utils.js')
+vi.mock(
   '~/src/server/exemption/site-details/enter-multiple-coordinates/utils.js',
-  () => {
-    const actualUtils = jest.requireActual(
-      '~/src/server/exemption/site-details/enter-multiple-coordinates/utils.js'
-    )
+  async (importOriginal) => {
+    const mod = await importOriginal()
     return {
-      ...actualUtils,
-      handleValidationFailure: jest.fn()
+      ...mod,
+      handleValidationFailure: vi.fn()
     }
   }
 )
@@ -60,17 +59,17 @@ describe('#multipleCoordinates', () => {
   }
 
   beforeEach(() => {
-    jest.resetAllMocks()
-    getExemptionCacheSpy = jest
+    vi.resetAllMocks()
+    getExemptionCacheSpy = vi
       .spyOn(cacheUtils, 'getExemptionCache')
       .mockReturnValue(mockExemption)
-    getCoordinateSystemSpy = jest
+    getCoordinateSystemSpy = vi
       .spyOn(coordinateUtils, 'getCoordinateSystem')
       .mockReturnValue({ coordinateSystem: COORDINATE_SYSTEMS.WGS84 })
 
     handleValidationFailure.mockImplementation((request, h) => {
       const mockViewResult = {
-        takeover: jest.fn()
+        takeover: vi.fn()
       }
       h.view.mockReturnValue(mockViewResult)
       return h
@@ -86,7 +85,7 @@ describe('#multipleCoordinates', () => {
   })
 
   describe('#multipleCoordinatesController', () => {
-    const mockH = { view: jest.fn() }
+    const mockH = { view: vi.fn() }
 
     beforeEach(() => {
       mockH.view.mockClear()
@@ -149,13 +148,13 @@ describe('#multipleCoordinates', () => {
   })
 
   describe('#multipleCoordinatesSubmitController', () => {
-    const mockTakeover = jest.fn()
+    const mockTakeover = vi.fn()
     const mockViewResult = {
       takeover: mockTakeover
     }
     const mockH = {
-      view: jest.fn().mockReturnValue(mockViewResult),
-      redirect: jest.fn()
+      view: vi.fn().mockReturnValue(mockViewResult),
+      redirect: vi.fn()
     }
 
     beforeEach(() => {

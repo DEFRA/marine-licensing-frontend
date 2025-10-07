@@ -1,3 +1,4 @@
+import { vi } from 'vitest'
 import { setupTestServer } from '~/tests/integration/shared/test-setup-helpers.js'
 import { statusCodes } from '~/src/server/common/constants/status-codes.js'
 import { routes } from '~/src/server/common/constants/routes.js'
@@ -10,19 +11,15 @@ import { formatDate } from '~/src/config/nunjucks/filters/format-date.js'
 
 import { makeGetRequest } from '~/src/server/test-helpers/server-requests.js'
 
-jest.mock('~/src/server/common/helpers/authenticated-requests.js')
-jest.mock('~/src/config/nunjucks/filters/format-date.js')
-jest.mock('~/src/server/exemption/task-list/controller.js')
+vi.mock('~/src/server/common/helpers/authenticated-requests.js')
+vi.mock('~/src/config/nunjucks/filters/format-date.js')
+vi.mock('~/src/server/exemption/task-list/controller.js')
 
 describe('#dashboard', () => {
   const getServer = setupTestServer()
 
-  const authenticatedGetRequestMock = jest.mocked(authenticatedGetRequest)
-  jest.mocked(formatDate).mockReturnValue('01 Jan 2024')
-
-  beforeEach(() => {
-    jest.clearAllMocks()
-  })
+  const authenticatedGetRequestMock = vi.mocked(authenticatedGetRequest)
+  vi.mocked(formatDate).mockReturnValue('01 Jan 2024')
 
   describe('#dashboardController', () => {
     test('Should provide expected response with correct page title', async () => {
@@ -47,8 +44,8 @@ describe('#dashboard', () => {
         payload: { value: [] }
       })
 
-      const h = { view: jest.fn() }
-      const request = { logger: { error: jest.fn() } }
+      const h = { view: vi.fn() }
+      const request = { logger: { error: vi.fn() } }
 
       await dashboardController.handler(request, h)
 
@@ -60,8 +57,8 @@ describe('#dashboard', () => {
     })
 
     test('Should display sortable table with correct structure when projects exist', async () => {
-      const h = { view: jest.fn() }
-      const request = { logger: { error: jest.fn() } }
+      const h = { view: vi.fn() }
+      const request = { logger: { error: vi.fn() } }
 
       const projects = [
         {
@@ -123,8 +120,8 @@ describe('#dashboard', () => {
     })
 
     test('Should display projects data when projects exist', async () => {
-      const h = { view: jest.fn() }
-      const request = { logger: { error: jest.fn() } }
+      const h = { view: vi.fn() }
+      const request = { logger: { error: vi.fn() } }
 
       const projects = [
         {
@@ -159,8 +156,8 @@ describe('#dashboard', () => {
     })
 
     test('Should handle API errors gracefully', async () => {
-      const h = { view: jest.fn() }
-      const request = { logger: { error: jest.fn() } }
+      const h = { view: vi.fn() }
+      const request = { logger: { error: vi.fn() } }
 
       authenticatedGetRequestMock.mockRejectedValueOnce(new Error('API Error'))
 
@@ -179,8 +176,8 @@ describe('#dashboard', () => {
     })
 
     test('Should handle null payload value from API', async () => {
-      const h = { view: jest.fn() }
-      const request = { logger: { error: jest.fn() } }
+      const h = { view: vi.fn() }
+      const request = { logger: { error: vi.fn() } }
 
       authenticatedGetRequestMock.mockResolvedValue({
         payload: {}

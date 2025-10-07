@@ -45,7 +45,7 @@ module.exports = {
         'jsdoc/check-tag-names': [
           'warn',
           {
-            definedTags: ['jest-environment']
+            definedTags: ['vi-environment']
           }
         ],
         // Turn off strict type checking rules
@@ -127,25 +127,19 @@ module.exports = {
       files: ['src/client/**/*.js']
     },
     {
-      env: {
-        'jest/globals': true
-      },
-      extends: [
-        'plugin:jest-formatting/recommended',
-        'plugin:jest/recommended',
-        'plugin:jest/style'
-      ],
       files: [
         '**/*.test.{cjs,js}',
         '**/__mocks__/**',
         '**/tests/integration/**/*.js'
       ],
-      plugins: ['jest'],
+      plugins: ['vitest'],
+      extends: ['plugin:vitest-globals/recommended'],
+      env: {
+        'vitest-globals/env': true
+      },
       rules: {
-        // Allow Jest to assert on mocked unbound methods
         '@typescript-eslint/unbound-method': 'off',
-        'jest/unbound-method': 'error',
-        'jest/expect-expect': 'off',
+        'vitest/expect-expect': 'off',
         'n/no-unpublished-import': ['off']
       }
     }

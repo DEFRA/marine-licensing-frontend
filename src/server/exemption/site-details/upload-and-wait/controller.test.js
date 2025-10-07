@@ -1,3 +1,4 @@
+import { vi } from 'vitest'
 import {
   uploadAndWaitController,
   UPLOAD_AND_WAIT_VIEW_ROUTE
@@ -10,14 +11,14 @@ import { mockExemption } from '~/src/server/test-helpers/mocks.js'
 import { routes } from '~/src/server/common/constants/routes.js'
 import { config } from '~/src/config/config.js'
 
-jest.mock('~/src/server/common/helpers/session-cache/utils.js')
-jest.mock('~/src/services/cdp-upload-service/index.js')
-jest.mock('~/src/services/file-validation/index.js')
-jest.mock('~/src/server/common/helpers/authenticated-requests.js')
-jest.mock('~/src/config/config.js')
+vi.mock('~/src/server/common/helpers/session-cache/utils.js')
+vi.mock('~/src/services/cdp-upload-service/index.js')
+vi.mock('~/src/services/file-validation/index.js')
+vi.mock('~/src/server/common/helpers/authenticated-requests.js')
+vi.mock('~/src/config/config.js')
 
 // Mock logger configuration
-jest.mock('~/src/server/common/helpers/logging/logger-options.js', () => ({
+vi.mock('~/src/server/common/helpers/logging/logger-options.js', () => ({
   loggerOptions: {
     enabled: true,
     ignorePaths: ['/health'],
@@ -28,12 +29,12 @@ jest.mock('~/src/server/common/helpers/logging/logger-options.js', () => ({
 }))
 
 // Mock logger
-jest.mock('~/src/server/common/helpers/logging/logger.js', () => ({
-  createLogger: jest.fn().mockReturnValue({
-    info: jest.fn(),
-    error: jest.fn(),
-    warn: jest.fn(),
-    debug: jest.fn()
+vi.mock('~/src/server/common/helpers/logging/logger.js', () => ({
+  createLogger: vi.fn().mockReturnValue({
+    info: vi.fn(),
+    error: vi.fn(),
+    warn: vi.fn(),
+    debug: vi.fn()
   })
 }))
 
@@ -70,11 +71,12 @@ const createMockExemption = (overrides = {}) => ({
 
 const createMockRequest = () => ({
   logger: {
-    debug: jest.fn(),
-    warn: jest.fn(),
-    error: jest.fn(),
-    info: jest.fn()
-  }
+    debug: vi.fn(),
+    warn: vi.fn(),
+    error: vi.fn(),
+    info: vi.fn()
+  },
+  yar: { get: vi.fn(), set: vi.fn() }
 })
 
 const createMockGeoJsonResponse = (featureCount = 1) => ({
@@ -95,8 +97,8 @@ const createMockGeoJsonResponse = (featureCount = 1) => ({
 })
 
 const createMockResponseHandler = () => ({
-  view: jest.fn(),
-  redirect: jest.fn()
+  view: vi.fn(),
+  redirect: vi.fn()
 })
 
 // Mock Configuration Setup
@@ -130,33 +132,33 @@ const expectSuccessfulFileProcessing = (
 // Service Mock Setup Helpers
 const setupMockServices = () => {
   const mockCdpService = {
-    getStatus: jest.fn()
+    getStatus: vi.fn()
   }
 
   const mockFileValidationService = {
-    validateFileExtension: jest.fn()
+    validateFileExtension: vi.fn()
   }
 
-  jest
-    .spyOn(cdpUploadService, 'getCdpUploadService')
-    .mockReturnValue(mockCdpService)
-  jest
-    .spyOn(fileValidationService, 'getFileValidationService')
-    .mockReturnValue(mockFileValidationService)
+  vi.spyOn(cdpUploadService, 'getCdpUploadService').mockReturnValue(
+    mockCdpService
+  )
+  vi.spyOn(fileValidationService, 'getFileValidationService').mockReturnValue(
+    mockFileValidationService
+  )
 
   return { mockCdpService, mockFileValidationService }
 }
 
 const setupCacheSpies = () => {
-  const getExemptionCacheSpy = jest
+  const getExemptionCacheSpy = vi
     .spyOn(cacheUtils, 'getExemptionCache')
     .mockReturnValue(mockExemption)
 
-  const updateExemptionSiteDetailsSpy = jest
+  const updateExemptionSiteDetailsSpy = vi
     .spyOn(cacheUtils, 'updateExemptionSiteDetails')
     .mockImplementation()
 
-  const updateExemptionSiteDetailsBatchSpy = jest
+  const updateExemptionSiteDetailsBatchSpy = vi
     .spyOn(cacheUtils, 'updateExemptionSiteDetailsBatch')
     .mockImplementation()
 
@@ -168,7 +170,7 @@ const setupCacheSpies = () => {
 }
 
 const setupAuthenticatedRequestSpy = () => {
-  return jest
+  return vi
     .spyOn(authenticatedRequests, 'authenticatedPostRequest')
     .mockResolvedValue(createMockGeoJsonResponse(1))
 }
@@ -569,7 +571,7 @@ describe('#uploadAndWait', () => {
     })
 
     describe('when file validation fails', () => {
-      /* eslint-disable jest/expect-expect */
+      /* eslint-disable vitest/expect-expect */
       test('should redirect to file upload with error for wrong extension', async () => {
         await expectFileValidationFailure(
           mockRequest,
@@ -584,7 +586,7 @@ describe('#uploadAndWait', () => {
         )
       })
 
-      /* eslint-disable jest/expect-expect */
+      /* eslint-disable vitest/expect-expect */
       test('should handle unknown file type in getAllowedExtensions default case', async () => {
         await expectFileValidationFailure(
           mockRequest,
@@ -601,7 +603,7 @@ describe('#uploadAndWait', () => {
     })
 
     describe('when upload is rejected', () => {
-      /* eslint-disable jest/expect-expect */
+      /* eslint-disable vitest/expect-expect */
       test('should redirect to file upload with virus error message', async () => {
         await expectRejectedStatusHandling(
           mockRequest,
@@ -650,7 +652,7 @@ describe('#uploadAndWait', () => {
         expect(h.redirect).toHaveBeenCalledWith(routes.FILE_UPLOAD)
       })
 
-      /* eslint-disable jest/expect-expect */
+      /* eslint-disable vitest/expect-expect */
       test('should handle different error message types correctly', async () => {
         const testCases = [
           { message: 'file is empty', expected: 'The selected file is empty' },
@@ -684,7 +686,7 @@ describe('#uploadAndWait', () => {
         }
       })
 
-      /* eslint-disable jest/expect-expect */
+      /* eslint-disable vitest/expect-expect */
       test('should handle unknown file type message correctly', async () => {
         await expectRejectedStatusHandling(
           mockRequest,
@@ -697,7 +699,7 @@ describe('#uploadAndWait', () => {
         )
       })
 
-      /* eslint-disable jest/expect-expect */
+      /* eslint-disable vitest/expect-expect */
       test('should handle shapefile error message correctly', async () => {
         await expectRejectedStatusHandling(
           mockRequest,

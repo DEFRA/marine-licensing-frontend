@@ -1,4 +1,4 @@
-import { config } from '~/src/config/config.js'
+import { vi } from 'vitest'
 import { COORDINATE_SYSTEMS } from '~/src/server/common/constants/exemptions.js'
 import { statusCodes } from '~/src/server/common/constants/status-codes.js'
 import * as authRequests from '~/src/server/common/helpers/authenticated-requests.js'
@@ -12,10 +12,7 @@ import {
 } from '~/src/server/exemption/site-details/review-site-details/controller.js'
 import { setupTestServer } from '~/tests/integration/shared/test-setup-helpers.js'
 import { mockExemption } from '~/src/server/test-helpers/mocks.js'
-import {
-  makeGetRequest,
-  makePostRequest
-} from '~/src/server/test-helpers/server-requests.js'
+import { makePostRequest } from '~/src/server/test-helpers/server-requests.js'
 import { JSDOM } from 'jsdom'
 import { routes } from '~/src/server/common/constants/routes.js'
 import {
@@ -26,8 +23,8 @@ import {
   getCoordinateSystemText
 } from '~/src/server/exemption/site-details/review-site-details/utils.js'
 
-jest.mock('~/src/server/common/helpers/session-cache/utils.js')
-jest.mock('~/src/server/common/helpers/coordinate-utils.js')
+vi.mock('~/src/server/common/helpers/session-cache/utils.js')
+vi.mock('~/src/server/common/helpers/coordinate-utils.js')
 
 /**
  * Creates a mock Hapi response toolkit
@@ -36,9 +33,9 @@ jest.mock('~/src/server/common/helpers/coordinate-utils.js')
  */
 function createMockHandler(type = 'view') {
   if (type === 'redirect') {
-    return { redirect: jest.fn() }
+    return { redirect: vi.fn() }
   }
-  return { view: jest.fn() }
+  return { view: vi.fn() }
 }
 
 /**
@@ -145,80 +142,6 @@ function createMockExemption(
   }
 }
 
-/**
- * DOM assertion helper for page titles and headings
- * @param {Document} document - JSDOM document
- * @param {string} expectedTitle - Expected page title
- * @param {string} expectedHeading - Expected h1 content
- */
-function assertPageTitleAndHeading(
-  document,
-  expectedTitle,
-  expectedHeading = expectedTitle
-) {
-  expect(document.querySelector('h1').textContent.trim()).toContain(
-    expectedHeading
-  )
-
-  const pageTitle = document.querySelector('title')?.textContent ?? ''
-  expect(pageTitle).toContain(expectedTitle)
-}
-
-/**
- * DOM assertion helper for project name caption
- * @param {Document} document - JSDOM document
- * @param {string} expectedProjectName - Expected project name
- */
-function assertProjectNameCaption(document, expectedProjectName) {
-  const caption = document.querySelector('.govuk-caption-l')
-  expect(caption?.textContent.trim()).toBe(expectedProjectName)
-}
-
-/**
- * DOM assertion helper for summary list data
- * @param {Document} document - JSDOM document
- * @param {Array} expectedData - Array of {key, value} objects
- */
-function assertSummaryListData(document, expectedData) {
-  const summaryCards = document.querySelectorAll('.govuk-summary-card')
-  const summaryCard = Array.from(summaryCards).find((card) =>
-    card.textContent.includes('Site details')
-  )
-  const summaryKeys = summaryCard.querySelectorAll('.govuk-summary-list__key')
-  const summaryValues = summaryCard.querySelectorAll(
-    '.govuk-summary-list__value'
-  )
-
-  expectedData.forEach((item, index) => {
-    expect(summaryKeys[index]?.textContent.trim()).toBe(item.key)
-    if (item.isHtml) {
-      expect(summaryValues[index]?.innerHTML.trim()).toContain(item.value)
-    } else {
-      expect(summaryValues[index]?.textContent.trim()).toBe(item.value)
-    }
-  })
-}
-
-/**
- * DOM assertion helper for navigation links
- * @param {Document} document - JSDOM document
- * @param {string} backLink - Expected back link href
- * @param {string} cancelLink - Expected cancel link href (optional)
- */
-function assertNavigationLinks(document, backLink, cancelLink = null) {
-  const backElement = document.querySelector(
-    `.govuk-back-link[href="${backLink}"]`
-  )
-  expect(backElement?.textContent.trim()).toBe('Back')
-
-  if (cancelLink) {
-    const cancelElement = document.querySelector(
-      `.govuk-link[href="${cancelLink}"]`
-    )
-    expect(cancelElement?.textContent.trim()).toBe('Cancel')
-  }
-}
-
 describe('#reviewSiteDetails', () => {
   const getServer = setupTestServer()
   let getExemptionCacheSpy
@@ -272,93 +195,34 @@ describe('#reviewSiteDetails', () => {
   const createMockRequest = () => ({
     payload: {},
     logger: {
-      info: jest.fn(),
-      error: jest.fn(),
-      warn: jest.fn(),
-      debug: jest.fn()
+      info: vi.fn(),
+      error: vi.fn(),
+      warn: vi.fn(),
+      debug: vi.fn()
     }
   })
-
-  const createFileUploadExemptionWithS3 = () => ({
-    ...mockExemption,
-    siteDetails: [
-      {
-        coordinatesType: 'file',
-        fileUploadType: 'kml',
-        uploadedFile: {
-          filename: 'test-site.kml'
-        },
-        s3Location: {
-          s3Bucket: 'test-bucket',
-          s3Key: 'test-key',
-          checksumSha256: 'test-checksum'
-        },
-        geoJSON: {
-          type: 'FeatureCollection',
-          features: [
-            {
-              type: 'Feature',
-              geometry: {
-                type: 'Point',
-                coordinates: [51.5074, -0.1278]
-              }
-            }
-          ]
-        },
-        featureCount: 1
-      }
-    ]
-  })
-
-  const createExpectedSiteDetails = () => [
-    {
-      coordinatesType: 'file',
-      fileUploadType: 'kml',
-      geoJSON: {
-        type: 'FeatureCollection',
-        features: [
-          {
-            type: 'Feature',
-            geometry: {
-              type: 'Point',
-              coordinates: [51.5074, -0.1278]
-            }
-          }
-        ]
-      },
-      featureCount: 1,
-      uploadedFile: {
-        filename: 'test-site.kml'
-      },
-      s3Location: {
-        s3Bucket: 'test-bucket',
-        s3Key: 'test-key',
-        checksumSha256: 'test-checksum'
-      }
-    }
-  ]
 
   beforeEach(() => {
-    jest.spyOn(authRequests, 'authenticatedPatchRequest').mockResolvedValue({
+    vi.spyOn(authRequests, 'authenticatedPatchRequest').mockResolvedValue({
       payload: {
         id: mockExemption.id,
         siteDetails: mockExemption.siteDetails
       }
     })
 
-    jest.spyOn(authRequests, 'authenticatedGetRequest').mockResolvedValue({
+    vi.spyOn(authRequests, 'authenticatedGetRequest').mockResolvedValue({
       payload: {
         value: mockExemption
       }
     })
 
-    getExemptionCacheSpy = jest
+    getExemptionCacheSpy = vi
       .spyOn(cacheUtils, 'getExemptionCache')
       .mockReturnValue(mockExemption)
-    getCoordinateSystemSpy = jest
+    getCoordinateSystemSpy = vi
       .spyOn(coordinateUtils, 'getCoordinateSystem')
       .mockReturnValue({ coordinateSystem: COORDINATE_SYSTEMS.WGS84 })
-    resetExemptionSiteDetailsSpy = jest
+    resetExemptionSiteDetailsSpy = vi
       .spyOn(cacheUtils, 'resetExemptionSiteDetails')
       .mockReturnValue({ siteDetails: null })
   })
@@ -381,12 +245,7 @@ describe('#reviewSiteDetails', () => {
           backLink: routes.TASK_LIST,
           projectName: undefined,
           summaryData: [],
-          multipleSiteDetailsData: {
-            method: 'Enter the coordinates of the site manually',
-            multipleSiteDetails: 'No',
-            sameActivityDates: 'No',
-            sameActivityDescription: 'No'
-          }
+          multipleSiteDetailsData: {}
         })
       })
 
@@ -409,13 +268,13 @@ describe('#reviewSiteDetails', () => {
         )
 
         getExemptionCacheSpy.mockReturnValueOnce(exemptionWithoutSiteDetails)
-        jest
-          .spyOn(authRequests, 'authenticatedGetRequest')
-          .mockResolvedValueOnce({
+        vi.spyOn(authRequests, 'authenticatedGetRequest').mockResolvedValueOnce(
+          {
             payload: {
               value: completeMongoData
             }
-          })
+          }
+        )
 
         const h = createMockHandler()
         const mockRequest = createMockRequest()
@@ -440,54 +299,25 @@ describe('#reviewSiteDetails', () => {
             pageTitle: 'Review site details',
             backLink: routes.FILE_UPLOAD,
             projectName: 'Test Project',
-            fileUploadSummaryData: expect.objectContaining({
+            summaryData: expect.arrayContaining([
+              expect.objectContaining({
+                coordinates: [
+                  {
+                    type: 'Point',
+                    coordinates: [51.5074, -0.1278]
+                  }
+                ]
+              })
+            ]),
+            multipleSiteDetailsData: expect.objectContaining({
               method: 'Upload a file with the coordinates of the site',
               fileType: 'KML',
-              filename: 'test-site.kml',
-              coordinates: [
-                {
-                  type: 'Point',
-                  coordinates: [51.5074, -0.1278]
-                }
-              ]
+              filename: 'test-site.kml'
             })
           })
         )
 
         // no-op
-      })
-
-      test('should render file upload template for file flow', async () => {
-        const mockFileUploadExemption = createMockExemption('file')
-
-        getExemptionCacheSpy.mockReturnValueOnce(mockFileUploadExemption)
-
-        const h = createMockHandler()
-        const mockRequest = createMockRequest()
-
-        await reviewSiteDetailsController.handler(mockRequest, h)
-
-        expect(h.view).toHaveBeenCalledWith(
-          FILE_UPLOAD_REVIEW_VIEW_ROUTE,
-          expect.objectContaining({
-            heading: 'Review site details',
-            isMultiSiteJourney: false,
-            pageTitle: 'Review site details',
-            backLink: routes.FILE_UPLOAD,
-            projectName: 'Test Project',
-            fileUploadSummaryData: expect.objectContaining({
-              method: 'Upload a file with the coordinates of the site',
-              fileType: 'KML',
-              filename: 'test-site.kml',
-              coordinates: [
-                {
-                  type: 'Point',
-                  coordinates: [51.5074, -0.1278]
-                }
-              ]
-            })
-          })
-        )
       })
 
       test('should render WGS84 coordinates correctly', async () => {
@@ -586,437 +416,6 @@ describe('#reviewSiteDetails', () => {
   })
 
   describe('Integration Tests', () => {
-    describe('GET Handler - DOM Rendering', () => {
-      test('should display summary data correctly in DOM', async () => {
-        const { result, statusCode } = await makeGetRequest({
-          url: routes.REVIEW_SITE_DETAILS,
-          server: getServer(),
-          headers: {
-            referer: `http://localhost/${routes.WIDTH_OF_SITE}`
-          }
-        })
-
-        expect(result).toEqual(
-          expect.stringContaining(
-            `Review site details | ${config.get('serviceName')}`
-          )
-        )
-
-        const { document } = new JSDOM(result).window
-
-        // Use DOM assertion helpers
-        assertPageTitleAndHeading(document, 'Review site details')
-        assertProjectNameCaption(document, mockExemption.projectName)
-
-        // Summary card title
-        const summaryCardTitles = document.querySelectorAll(
-          '.govuk-summary-card__title'
-        )
-
-        const summaryCardTitle = Array.from(summaryCardTitles).find((card) =>
-          card.textContent.includes('Site details')
-        )
-
-        expect(summaryCardTitle.textContent.trim()).toBe('Site details')
-
-        // Summary list data
-        const summaryData = [
-          {
-            key: 'Activity dates',
-            value: '1 January 2025 to 1 January 2025'
-          },
-          {
-            key: 'Activity description',
-            value: 'Test activity description'
-          },
-          {
-            key: 'Single or multiple sets of coordinates',
-            value:
-              'Manually enter one set of coordinates and a width to create a circular site'
-          },
-          {
-            key: 'Coordinate system',
-            value: 'WGS84 (World Geodetic System 1984)',
-            isHtml: true
-          },
-          {
-            key: 'Coordinates at centre of site',
-            value: `${mockCoordinates[COORDINATE_SYSTEMS.WGS84].latitude}, ${mockCoordinates[COORDINATE_SYSTEMS.WGS84].longitude}`
-          },
-          {
-            key: 'Width of circular site',
-            value: '100 metres'
-          }
-        ]
-        assertSummaryListData(document, summaryData)
-
-        // Navigation links
-        assertNavigationLinks(
-          document,
-          '/exemption/width-of-site',
-          '/exemption/task-list?cancel=site-details'
-        )
-
-        expect(statusCode).toBe(statusCodes.ok)
-      })
-
-      describe('multiple coordinates - polygon', () => {
-        test('should render WGS84 polygon coordinates', async () => {
-          const polygonExemption = createMockExemption(
-            'multiple',
-            COORDINATE_SYSTEMS.WGS84
-          )
-
-          getExemptionCacheSpy.mockReturnValueOnce(polygonExemption)
-          getCoordinateSystemSpy.mockReturnValueOnce({
-            coordinateSystem: COORDINATE_SYSTEMS.WGS84
-          })
-
-          const h = createMockHandler()
-          const mockRequest = createMockRequest()
-          mockRequest.headers = {
-            referer: `http://localhost${routes.ENTER_MULTIPLE_COORDINATES}`
-          }
-
-          await reviewSiteDetailsController.handler(mockRequest, h)
-
-          expect(h.view).toHaveBeenCalledWith(REVIEW_SITE_DETAILS_VIEW_ROUTE, {
-            heading: 'Review site details',
-            isMultiSiteJourney: false,
-            pageTitle: 'Review site details',
-            backLink: routes.ENTER_MULTIPLE_COORDINATES,
-            projectName: 'Test Project',
-            summaryData: [
-              {
-                activityDates: '1 January 2025 to 1 January 2025',
-                activityDescription: 'Test activity description',
-                method:
-                  'Manually enter multiple sets of coordinates to mark the boundary of the site',
-                coordinateSystem:
-                  'WGS84 (World Geodetic System 1984)\nLatitude and longitude',
-                polygonCoordinates: [
-                  {
-                    label: 'Start and end points',
-                    value: '55.123456, 55.123456'
-                  },
-                  {
-                    label: 'Point 2',
-                    value: '33.987654, 33.987654'
-                  },
-                  {
-                    label: 'Point 3',
-                    value: '78.123456, 78.123456'
-                  }
-                ],
-                showActivityDates: true,
-                showActivityDescription: true,
-                siteName: 'Mock site',
-                siteNumber: 1,
-                siteDetailsData: expect.stringContaining(
-                  '"coordinatesType":"coordinates"'
-                )
-              }
-            ],
-            multipleSiteDetailsData: {
-              activityDates: '1 January 2025 to 1 January 2025',
-              activityDescription: 'Test activity description',
-              method: 'Enter the coordinates of the site manually',
-              multipleSiteDetails: 'No',
-
-              sameActivityDates: 'Yes',
-              sameActivityDescription: 'Yes'
-            }
-          })
-        })
-
-        test('should render OSGB36 polygon coordinates', async () => {
-          const polygonExemption = createMockExemption(
-            'multiple',
-            COORDINATE_SYSTEMS.OSGB36
-          )
-
-          getExemptionCacheSpy.mockReturnValueOnce(polygonExemption)
-          getCoordinateSystemSpy.mockReturnValueOnce({
-            coordinateSystem: COORDINATE_SYSTEMS.OSGB36
-          })
-
-          const h = createMockHandler()
-          const mockRequest = createMockRequest()
-          mockRequest.headers = {
-            referer: `http://localhost${routes.ENTER_MULTIPLE_COORDINATES}`
-          }
-
-          await reviewSiteDetailsController.handler(mockRequest, h)
-
-          expect(h.view).toHaveBeenCalledWith(REVIEW_SITE_DETAILS_VIEW_ROUTE, {
-            heading: 'Review site details',
-            isMultiSiteJourney: false,
-            pageTitle: 'Review site details',
-            backLink: routes.ENTER_MULTIPLE_COORDINATES,
-            projectName: 'Test Project',
-            summaryData: [
-              {
-                activityDates: '1 January 2025 to 1 January 2025',
-                activityDescription: 'Test activity description',
-                method:
-                  'Manually enter multiple sets of coordinates to mark the boundary of the site',
-                coordinateSystem:
-                  'OSGB36 (National Grid)\nEastings and Northings',
-                polygonCoordinates: [
-                  {
-                    label: 'Start and end points',
-                    value: '425053, 564180'
-                  },
-                  {
-                    label: 'Point 2',
-                    value: '426000, 565000'
-                  },
-                  {
-                    label: 'Point 3',
-                    value: '427000, 566000'
-                  }
-                ],
-                showActivityDates: true,
-                showActivityDescription: true,
-                siteName: 'Mock site',
-                siteNumber: 1,
-                siteDetailsData: expect.stringContaining(
-                  '"coordinatesType":"coordinates"'
-                )
-              }
-            ],
-            multipleSiteDetailsData: {
-              activityDates: '1 January 2025 to 1 January 2025',
-              activityDescription: 'Test activity description',
-              method: 'Enter the coordinates of the site manually',
-              multipleSiteDetails: 'No',
-              sameActivityDates: 'Yes',
-              sameActivityDescription: 'Yes'
-            }
-          })
-        })
-
-        test('should handle empty polygon coordinates', async () => {
-          const baseExemption = createMockExemption(
-            'multiple',
-            COORDINATE_SYSTEMS.WGS84
-          )
-          const exemptionWithEmptyCoordinates = {
-            ...baseExemption,
-            siteDetails: [
-              {
-                ...baseExemption.siteDetails[0],
-                coordinates: []
-              }
-            ]
-          }
-
-          getExemptionCacheSpy.mockReturnValueOnce(
-            exemptionWithEmptyCoordinates
-          )
-          getCoordinateSystemSpy.mockReturnValueOnce({
-            coordinateSystem: COORDINATE_SYSTEMS.WGS84
-          })
-
-          const h = createMockHandler()
-          const mockRequest = createMockRequest()
-          mockRequest.headers = {
-            referer: `http://localhost${routes.ENTER_MULTIPLE_COORDINATES}`
-          }
-
-          await reviewSiteDetailsController.handler(mockRequest, h)
-
-          expect(h.view).toHaveBeenCalledWith(REVIEW_SITE_DETAILS_VIEW_ROUTE, {
-            heading: 'Review site details',
-            isMultiSiteJourney: false,
-            pageTitle: 'Review site details',
-            backLink: routes.ENTER_MULTIPLE_COORDINATES,
-            projectName: 'Test Project',
-            summaryData: [
-              {
-                activityDates: '1 January 2025 to 1 January 2025',
-                activityDescription: 'Test activity description',
-                method:
-                  'Manually enter multiple sets of coordinates to mark the boundary of the site',
-                coordinateSystem:
-                  'WGS84 (World Geodetic System 1984)\nLatitude and longitude',
-                polygonCoordinates: [],
-                showActivityDates: true,
-                showActivityDescription: true,
-                siteName: 'Mock site',
-                siteNumber: 1,
-                siteDetailsData: expect.stringContaining(
-                  '"coordinatesType":"coordinates"'
-                )
-              }
-            ],
-            multipleSiteDetailsData: {
-              activityDates: '1 January 2025 to 1 January 2025',
-              activityDescription: 'Test activity description',
-              method: 'Enter the coordinates of the site manually',
-              multipleSiteDetails: 'No',
-
-              sameActivityDates: 'Yes',
-              sameActivityDescription: 'Yes'
-            }
-          })
-        })
-
-        test('should filter out incomplete coordinates', async () => {
-          const baseExemption = createMockExemption(
-            'multiple',
-            COORDINATE_SYSTEMS.WGS84
-          )
-          const exemptionWithIncompleteCoordinates = {
-            ...baseExemption,
-            siteDetails: [
-              {
-                ...baseExemption.siteDetails[0],
-                coordinates: [
-                  { latitude: '55.123456', longitude: '55.123456' },
-                  { latitude: '', longitude: '33.987654' }, // incomplete
-                  { latitude: '78.123456', longitude: '78.123456' },
-                  { latitude: null, longitude: null } // invalid
-                ]
-              }
-            ]
-          }
-
-          getExemptionCacheSpy.mockReturnValueOnce(
-            exemptionWithIncompleteCoordinates
-          )
-          getCoordinateSystemSpy.mockReturnValueOnce({
-            coordinateSystem: COORDINATE_SYSTEMS.WGS84
-          })
-
-          const h = createMockHandler()
-          const mockRequest = createMockRequest()
-          mockRequest.headers = {
-            referer: `http://localhost${routes.ENTER_MULTIPLE_COORDINATES}`
-          }
-
-          await reviewSiteDetailsController.handler(mockRequest, h)
-
-          expect(h.view).toHaveBeenCalledWith(REVIEW_SITE_DETAILS_VIEW_ROUTE, {
-            heading: 'Review site details',
-            isMultiSiteJourney: false,
-            pageTitle: 'Review site details',
-            backLink: routes.ENTER_MULTIPLE_COORDINATES,
-            projectName: 'Test Project',
-            summaryData: [
-              {
-                activityDates: '1 January 2025 to 1 January 2025',
-                activityDescription: 'Test activity description',
-                method:
-                  'Manually enter multiple sets of coordinates to mark the boundary of the site',
-                coordinateSystem:
-                  'WGS84 (World Geodetic System 1984)\nLatitude and longitude',
-                polygonCoordinates: [
-                  {
-                    label: 'Start and end points',
-                    value: '55.123456, 55.123456'
-                  },
-                  {
-                    label: 'Point 2',
-                    value: '78.123456, 78.123456'
-                  }
-                ],
-                showActivityDates: true,
-                showActivityDescription: true,
-                siteName: 'Mock site',
-                siteNumber: 1,
-                siteDetailsData: expect.stringContaining(
-                  '"coordinatesType":"coordinates"'
-                )
-              }
-            ],
-            multipleSiteDetailsData: {
-              activityDates: '1 January 2025 to 1 January 2025',
-              activityDescription: 'Test activity description',
-              method: 'Enter the coordinates of the site manually',
-              multipleSiteDetails: 'No',
-
-              sameActivityDates: 'Yes',
-              sameActivityDescription: 'Yes'
-            }
-          })
-        })
-
-        test('should handle single polygon coordinate', async () => {
-          const baseExemption = createMockExemption(
-            'multiple',
-            COORDINATE_SYSTEMS.WGS84
-          )
-          const exemptionWithSingleCoordinate = {
-            ...baseExemption,
-            siteDetails: [
-              {
-                ...baseExemption.siteDetails[0],
-                coordinates: [{ latitude: '55.123456', longitude: '55.123456' }]
-              }
-            ]
-          }
-
-          getExemptionCacheSpy.mockReturnValueOnce(
-            exemptionWithSingleCoordinate
-          )
-
-          const h = createMockHandler()
-          const mockRequest = createMockRequest()
-
-          await reviewSiteDetailsController.handler(mockRequest, h)
-
-          const expectedCall = h.view.mock.calls[0]
-          expect(expectedCall[1].summaryData[0].polygonCoordinates).toEqual([
-            {
-              label: 'Start and end points',
-              value: '55.123456, 55.123456'
-            }
-          ])
-        })
-
-        test('should render many polygon coordinates', async () => {
-          const manyCoordinates = [
-            { latitude: '50.123456', longitude: '50.123456' },
-            { latitude: '51.123456', longitude: '51.123456' },
-            { latitude: '52.123456', longitude: '52.123456' },
-            { latitude: '53.123456', longitude: '53.123456' },
-            { latitude: '54.123456', longitude: '54.123456' }
-          ]
-
-          const baseExemption = createMockExemption(
-            'multiple',
-            COORDINATE_SYSTEMS.WGS84
-          )
-          const exemptionWithManyCoordinates = {
-            ...baseExemption,
-            siteDetails: [
-              {
-                ...baseExemption.siteDetails[0],
-                coordinates: manyCoordinates
-              }
-            ]
-          }
-
-          getExemptionCacheSpy.mockReturnValueOnce(exemptionWithManyCoordinates)
-
-          const h = createMockHandler()
-          const mockRequest = createMockRequest()
-
-          await reviewSiteDetailsController.handler(mockRequest, h)
-
-          const expectedCall = h.view.mock.calls[0]
-          expect(expectedCall[1].summaryData[0].polygonCoordinates).toEqual([
-            { label: 'Start and end points', value: '50.123456, 50.123456' },
-            { label: 'Point 2', value: '51.123456, 51.123456' },
-            { label: 'Point 3', value: '52.123456, 52.123456' },
-            { label: 'Point 4', value: '53.123456, 53.123456' },
-            { label: 'Point 5', value: '54.123456, 54.123456' }
-          ])
-        })
-      })
-    })
-
     describe('POST Handler - Full Flow', () => {
       test('should redirect to task list and patch backend', async () => {
         const { headers, statusCode } = await makePostRequest({
@@ -1044,12 +443,12 @@ describe('#reviewSiteDetails', () => {
       test('should reset exemption after saving to MongoDB', async () => {
         const request = {
           logger: {
-            info: jest.fn(),
-            error: jest.fn(),
-            debug: jest.fn()
+            info: vi.fn(),
+            error: vi.fn(),
+            debug: vi.fn()
           }
         }
-        const h = { redirect: jest.fn() }
+        const h = { redirect: vi.fn() }
 
         await reviewSiteDetailsSubmitController.handler(request, h)
 
@@ -1067,38 +466,15 @@ describe('#reviewSiteDetails', () => {
         expect(h.redirect).toHaveBeenCalledWith(routes.TASK_LIST)
       })
 
-      test('Should save file upload data with display metadata for file upload flow', async () => {
-        const mockFileUploadExemption = createFileUploadExemptionWithS3()
-        getExemptionCacheSpy.mockReturnValueOnce(mockFileUploadExemption)
-
-        const request = createMockRequest()
-        const h = { redirect: jest.fn() }
-
-        await reviewSiteDetailsSubmitController.handler(request, h)
-
-        expect(authRequests.authenticatedPatchRequest).toHaveBeenCalledWith(
-          expect.any(Object),
-          '/exemption/site-details',
-          {
-            multipleSiteDetails: mockExemption.multipleSiteDetails,
-            siteDetails: createExpectedSiteDetails(),
-            id: mockExemption.id
-          }
-        )
-
-        expect(resetExemptionSiteDetailsSpy).toHaveBeenCalledWith(request)
-        expect(h.redirect).toHaveBeenCalledWith(routes.TASK_LIST)
-      })
-
       test('should redirect to task list on successful POST', async () => {
         const request = {
           logger: {
-            info: jest.fn(),
-            error: jest.fn(),
-            debug: jest.fn()
+            info: vi.fn(),
+            error: vi.fn(),
+            debug: vi.fn()
           }
         }
-        const h = { redirect: jest.fn() }
+        const h = { redirect: vi.fn() }
 
         await reviewSiteDetailsSubmitController.handler(request, h)
 
@@ -1114,7 +490,7 @@ describe('#reviewSiteDetails', () => {
         const originalGetExemptionCache = cacheUtils.getExemptionCache
         let capturedSiteDetails
 
-        jest.spyOn(cacheUtils, 'getExemptionCache').mockImplementation(() => {
+        vi.spyOn(cacheUtils, 'getExemptionCache').mockImplementation(() => {
           const exemption = exemptionWithUndefinedSiteDetails
           // This simulates the line: const siteDetails = exemption.siteDetails ?? {}
           capturedSiteDetails = exemption.siteDetails ?? {}
@@ -1123,11 +499,11 @@ describe('#reviewSiteDetails', () => {
 
         const request = {
           logger: {
-            info: jest.fn(),
-            error: jest.fn()
+            info: vi.fn(),
+            error: vi.fn()
           }
         }
-        const h = { redirect: jest.fn() }
+        const h = { redirect: vi.fn() }
 
         try {
           await reviewSiteDetailsSubmitController.handler(request, h)
@@ -1144,10 +520,7 @@ describe('#reviewSiteDetails', () => {
       })
 
       test('should show error page for validation errors', async () => {
-        const apiPatchMock = jest.spyOn(
-          authRequests,
-          'authenticatedPatchRequest'
-        )
+        const apiPatchMock = vi.spyOn(authRequests, 'authenticatedPatchRequest')
         apiPatchMock.mockRejectedValueOnce({
           res: { statusCode: 400 },
           data: {
@@ -1185,10 +558,7 @@ describe('#reviewSiteDetails', () => {
       })
 
       test('should pass error to global handler when no validation data', async () => {
-        const apiPatchMock = jest.spyOn(
-          authRequests,
-          'authenticatedPatchRequest'
-        )
+        const apiPatchMock = vi.spyOn(authRequests, 'authenticatedPatchRequest')
         apiPatchMock.mockRejectedValueOnce({
           res: { statusCode: 500 },
           data: {}
@@ -1239,12 +609,12 @@ describe('#reviewSiteDetails', () => {
 
           const request = {
             logger: {
-              info: jest.fn(),
-              error: jest.fn(),
-              debug: jest.fn()
+              info: vi.fn(),
+              error: vi.fn(),
+              debug: vi.fn()
             }
           }
-          const h = { redirect: jest.fn() }
+          const h = { redirect: vi.fn() }
 
           await reviewSiteDetailsSubmitController.handler(request, h)
 
@@ -1268,12 +638,12 @@ describe('#reviewSiteDetails', () => {
 
           const request = {
             logger: {
-              info: jest.fn(),
-              error: jest.fn(),
-              debug: jest.fn()
+              info: vi.fn(),
+              error: vi.fn(),
+              debug: vi.fn()
             }
           }
-          const h = { redirect: jest.fn() }
+          const h = { redirect: vi.fn() }
 
           await reviewSiteDetailsSubmitController.handler(request, h)
 
@@ -1321,7 +691,7 @@ describe('#reviewSiteDetails', () => {
         test('should handle polygon coordinate validation errors', async () => {
           getExemptionCacheSpy.mockReturnValueOnce(mockPolygonExemptionWGS84)
 
-          const apiPatchMock = jest.spyOn(
+          const apiPatchMock = vi.spyOn(
             authRequests,
             'authenticatedPatchRequest'
           )

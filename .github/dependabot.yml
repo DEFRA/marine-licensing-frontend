@@ -37,10 +37,9 @@ updates:
 
       tools:
         patterns:
-          - 'babel-jest'
           - 'husky'
-          - 'jest'
-          - 'jest-*'
+          - 'vitest'
+          - 'vitest-*'
           - 'nodemon'
           - 'npm-run-all'
           - 'lodash'

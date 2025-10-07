@@ -1,4 +1,4 @@
-import { jest } from '@jest/globals'
+import { vi } from 'vitest'
 
 import {
   authenticatedRequest,
@@ -17,34 +17,32 @@ import {
   deleteExemptionSubmitController
 } from './controller.js'
 
-jest.mock('~/src/server/common/helpers/authenticated-requests.js')
-jest.mock('~/src/server/common/helpers/session-cache/utils.js')
+vi.mock('~/src/server/common/helpers/authenticated-requests.js')
+vi.mock('~/src/server/common/helpers/session-cache/utils.js')
 
 describe('#delete', () => {
   let mockRequest
   let mockH
 
-  const mockedAuthenticatedGetRequest = jest.mocked(authenticatedGetRequest)
-  const mockedAuthenticatedRequest = jest.mocked(authenticatedRequest)
+  const mockedAuthenticatedGetRequest = vi.mocked(authenticatedGetRequest)
+  const mockedAuthenticatedRequest = vi.mocked(authenticatedRequest)
 
-  const mockedGetExemptionCache = jest.mocked(getExemptionCache)
-  const mockedSetExemptionCache = jest.mocked(setExemptionCache)
-  const mockedClearExemptionCache = jest.mocked(clearExemptionCache)
+  const mockedGetExemptionCache = vi.mocked(getExemptionCache)
+  const mockedSetExemptionCache = vi.mocked(setExemptionCache)
+  const mockedClearExemptionCache = vi.mocked(clearExemptionCache)
 
   beforeEach(() => {
     mockRequest = {
       logger: {
-        error: jest.fn(),
-        info: jest.fn()
+        error: vi.fn(),
+        info: vi.fn()
       }
     }
 
     mockH = {
-      view: jest.fn().mockReturnValue('view-response'),
-      redirect: jest.fn().mockReturnValue('redirect-response')
+      view: vi.fn().mockReturnValue('view-response'),
+      redirect: vi.fn().mockReturnValue('redirect-response')
     }
-
-    jest.clearAllMocks()
   })
 
   describe('deleteExemptionController', () => {

@@ -1,12 +1,8 @@
-import { routes } from '~/src/server/common/constants/routes.js'
+import { routes } from '#src/server/common/constants/routes.js'
 import {
   activityDescriptionController,
   activityDescriptionSubmitController
-} from '~/src/server/exemption/activity-description/controller.js'
-
-/**
- * @satisfies {ServerRegisterPluginObject<void>}
- */
+} from '#src/server/exemption/activity-description/controller.js'
 export const activityDescriptionRoutes = [
   {
     method: 'GET',

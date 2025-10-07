@@ -1,12 +1,12 @@
-import { config } from '~/src/config/config.js'
+import { config } from '#src/config/config.js'
 import {
   isEntraIdRoute,
   redirectPathCacheKey,
   routes
-} from '~/src/server/common/constants/routes.js'
-import { validateUserSession } from '~/src/server/common/plugins/auth/validate.js'
-import { cacheMcmsContextFromQueryParams } from '~/src/server/common/helpers/mcms-context/cache-mcms-context.js'
-import { clearExemptionCache } from '~/src/server/common/helpers/session-cache/utils.js'
+} from '#src/server/common/constants/routes.js'
+import { validateUserSession } from '#src/server/common/plugins/auth/validate.js'
+import { cacheMcmsContextFromQueryParams } from '#src/server/common/helpers/mcms-context/cache-mcms-context.js'
+import { clearExemptionCache } from '#src/server/common/helpers/session-cache/utils.js'
 
 export const createSessionStrategy = (server) => {
   const cookieConfig = config.get('session.cookie')

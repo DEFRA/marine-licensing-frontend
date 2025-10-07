@@ -1,7 +1,7 @@
 import {
   errorDescriptionByFieldName,
   mapErrorsForDisplay
-} from '~/src/server/common/helpers/errors.js'
+} from '#src/server/common/helpers/errors.js'
 import {
   createErrorTypeMap,
   generateDateErrorMessages,

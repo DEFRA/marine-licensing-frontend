@@ -1,24 +1,18 @@
 import {
   authenticatedRequest,
   authenticatedGetRequest
-} from '~/src/server/common/helpers/authenticated-requests.js'
-import { routes } from '~/src/server/common/constants/routes.js'
+} from '#src/server/common/helpers/authenticated-requests.js'
+import { routes } from '#src/server/common/constants/routes.js'
 import {
   getExemptionCache,
   setExemptionCache,
   clearExemptionCache
-} from '~/src/server/common/helpers/session-cache/utils.js'
+} from '#src/server/common/helpers/session-cache/utils.js'
 import Boom from '@hapi/boom'
 
 export const DELETE_EXEMPTION_VIEW_ROUTE = 'exemption/delete/index'
 const DELETE_EXEMPTION_PAGE_TITLE =
   'Are you sure you want to delete this project?'
-
-/**
- * Controller for the delete exemption confirmation page.
- * Gets exemption ID from session cache instead of URL params.
- * @satisfies {Partial<ServerRoute>}
- */
 export const deleteExemptionController = {
   handler: async (request, h) => {
     const exemption = getExemptionCache(request)
@@ -54,11 +48,6 @@ export const deleteExemptionController = {
     }
   }
 }
-
-/**
- * Controller for selecting an exemption and redirecting to the delete page.
- * Sets the exemption ID in session cache.
- */
 export const deleteExemptionSelectController = {
   handler(request, h) {
     const { exemptionId } = request.params
@@ -67,11 +56,6 @@ export const deleteExemptionSelectController = {
     return h.redirect(routes.DELETE_EXEMPTION)
   }
 }
-
-/**
- * Controller for handling the request to actually delete an exemption.
- * @satisfies {Partial<ServerRoute>}
- */
 export const deleteExemptionSubmitController = {
   handler: async (request, h) => {
     try {
@@ -103,7 +87,3 @@ export const deleteExemptionSubmitController = {
     }
   }
 }
-
-/**
- * @import { ServerRoute } from '@hapi/hapi'
- */

@@ -1,5 +1,5 @@
 import { validateCentreCoordinates } from './validate.js'
-import { COORDINATE_SYSTEMS } from '~/src/server/common/constants/exemptions.js'
+import { COORDINATE_SYSTEMS } from '#src/server/common/constants/exemptions.js'
 import wgs84SuccessTestCases from './validation-success-cases-wgs84.json'
 import osgb36SuccessTestCases from './validation-success-cases-osgb36.json'
 import wgs84ErrorTestCases from './validation-error-cases-wgs84.json'

@@ -1,16 +1,15 @@
 import { vi } from 'vitest'
-import { statusCodes } from '~/src/server/common/constants/status-codes.js'
+import { statusCodes } from '#src/server/common/constants/status-codes.js'
 import {
   catchAll,
   errorDescriptionByFieldName,
   mapErrorsForDisplay
-} from '~/src/server/common/helpers/errors.js'
+} from '#src/server/common/helpers/errors.js'
 
-import { setupTestServer } from '~/tests/integration/shared/test-setup-helpers.js'
-import { makeGetRequest } from '~/src/server/test-helpers/server-requests.js'
+import { setupTestServer } from '#tests/integration/shared/test-setup-helpers.js'
+import { makeGetRequest } from '#src/server/test-helpers/server-requests.js'
 
 describe('#errors', () => {
-  /** @type {Server} */
   const getServer = setupTestServer()
 
   test('Should provide expected Not Found page', async () => {
@@ -217,7 +216,3 @@ describe('mapErrorsForDisplay', () => {
     expect(result).toEqual([])
   })
 })
-
-/**
- * @import { Server } from '@hapi/hapi'
- */

@@ -3,7 +3,7 @@ import wreck from '@hapi/wreck'
 import {
   getOidcConfig,
   getOpenIdRefreshToken
-} from '~/src/server/common/plugins/auth/get-oidc-config.js'
+} from '#src/server/common/plugins/auth/get-oidc-config.js'
 
 const oidcConfigUrl =
   'http://localhost:3200/cdp-defra-id-stub/.well-known/openid-configuration'

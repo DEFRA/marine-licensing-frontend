@@ -1,5 +1,5 @@
-import { routes } from '~/src/server/common/constants/routes.js'
-import { AUTH_STRATEGIES } from '~/src/server/common/constants/auth.js'
+import { routes } from '#src/server/common/constants/routes.js'
+import { AUTH_STRATEGIES } from '#src/server/common/constants/auth.js'
 
 export const loginController = {
   method: 'GET',

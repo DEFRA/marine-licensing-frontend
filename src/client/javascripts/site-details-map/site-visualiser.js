@@ -13,11 +13,6 @@ class SiteVisualiser {
     this.featureFactory = new FeatureFactory()
   }
 
-  /**
-   * Display a circular site on the map
-   * @param {Array} centreCoordinates - Web Mercator centre coordinates [x, y]
-   * @param {number} diameterInMetres - Diameter (width) in metres
-   */
   displayCircularSite(centreCoordinates, diameterInMetres) {
     const circleFeature = this.featureFactory.createCircleFeature(
       this.olModules,
@@ -40,10 +35,6 @@ class SiteVisualiser {
     )
   }
 
-  /**
-   * Display file upload data on the map
-   * @param {object} geoJSON - GeoJSON data from file upload
-   */
   displayFileUploadData(geoJSON) {
     const features = this.featureFactory.createFeaturesFromGeoJSON(
       this.geoJSONFormat,
@@ -59,11 +50,6 @@ class SiteVisualiser {
     this.mapViewManager.fitMapToAllFeatures(this.map, this.vectorSource)
   }
 
-  /**
-   * Display manual coordinates (circle, or polygon)
-   * @param {object} siteDetails - Site details with manual coordinates
-   * @returns {string} The action taken: 'polygon', 'circle', 'no-coordinates', 'modules-unavailable', 'invalid-coordinates', or 'no-action'
-   */
   displayManualCoordinates(siteDetails) {
     const fromLonLat = this.olModules?.fromLonLat
     if (!fromLonLat) {
@@ -117,10 +103,6 @@ class SiteVisualiser {
     return 'no-action'
   }
 
-  /**
-   * Display a polygon site on the map
-   * @param {Array} coordinatesArray - Array of Web Mercator coordinates [[x, y], [x, y], ...]
-   */
   displayPolygonSite(coordinatesArray) {
     const polygonFeature = this.featureFactory.createPolygonFeature(
       this.olModules,

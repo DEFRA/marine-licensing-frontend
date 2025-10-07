@@ -1,8 +1,8 @@
 import { vi } from 'vitest'
 import { StorageResolution, Unit } from 'aws-embedded-metrics'
 
-import { config } from '~/src/config/config.js'
-import { metricsCounter } from '~/src/server/common/helpers/metrics.js'
+import { config } from '#src/config/config.js'
+import { metricsCounter } from '#src/server/common/helpers/metrics.js'
 
 const mockPutMetric = vi.fn()
 const mockFlush = vi.fn()
@@ -90,7 +90,3 @@ describe('#metrics', () => {
     })
   })
 })
-
-/**
- * @import { Server } from '@hapi/hapi'
- */

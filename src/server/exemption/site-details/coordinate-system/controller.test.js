@@ -1,17 +1,17 @@
 import { vi } from 'vitest'
-import { setupTestServer } from '~/tests/integration/shared/test-setup-helpers.js'
+import { setupTestServer } from '#tests/integration/shared/test-setup-helpers.js'
 import {
   coordinateSystemController,
   coordinateSystemSubmitController,
   COORDINATE_SYSTEM_VIEW_ROUTE
-} from '~/src/server/exemption/site-details/coordinate-system/controller.js'
-import * as cacheUtils from '~/src/server/common/helpers/session-cache/utils.js'
-import { mockExemption, mockSite } from '~/src/server/test-helpers/mocks.js'
-import { makeGetRequest } from '~/src/server/test-helpers/server-requests.js'
-import { statusCodes } from '~/src/server/common/constants/status-codes.js'
-import { config } from '~/src/config/config.js'
+} from '#src/server/exemption/site-details/coordinate-system/controller.js'
+import * as cacheUtils from '#src/server/common/helpers/session-cache/utils.js'
+import { mockExemption, mockSite } from '#src/server/test-helpers/mocks.js'
+import { makeGetRequest } from '#src/server/test-helpers/server-requests.js'
+import { statusCodes } from '#src/server/common/constants/status-codes.js'
+import { config } from '#src/config/config.js'
 import { JSDOM } from 'jsdom'
-import { routes } from '~/src/server/common/constants/routes.js'
+import { routes } from '#src/server/common/constants/routes.js'
 
 vi.mock('~/src/server/common/helpers/session-cache/utils.js')
 

@@ -1,5 +1,5 @@
 import { getPageViewCommonData } from './page-view-common-data.js'
-import { getUserSession } from '~/src/server/common/plugins/auth/utils.js'
+import { getUserSession } from '#src/server/common/plugins/auth/utils.js'
 
 vi.mock('~/src/server/common/plugins/auth/utils.js', () => ({
   getUserSession: vi.fn()

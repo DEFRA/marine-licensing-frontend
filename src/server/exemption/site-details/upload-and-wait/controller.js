@@ -1,17 +1,17 @@
-import { config } from '~/src/config/config.js'
-import { routes } from '~/src/server/common/constants/routes.js'
-import { authenticatedPostRequest } from '~/src/server/common/helpers/authenticated-requests.js'
-import { extractCoordinatesFromGeoJSON } from '~/src/server/common/helpers/coordinate-utils.js'
-import { getSiteDetailsBySite } from '~/src/server/common/helpers/session-cache/site-details-utils.js'
+import { config } from '#src/config/config.js'
+import { routes } from '#src/server/common/constants/routes.js'
+import { authenticatedPostRequest } from '#src/server/common/helpers/authenticated-requests.js'
+import { extractCoordinatesFromGeoJSON } from '#src/server/common/helpers/coordinate-utils.js'
+import { getSiteDetailsBySite } from '#src/server/common/helpers/session-cache/site-details-utils.js'
 import {
   getExemptionCache,
   updateExemptionMultipleSiteDetails,
   updateExemptionSiteDetails,
   updateExemptionSiteDetailsBatch
-} from '~/src/server/common/helpers/session-cache/utils.js'
-import { getCdpUploadService } from '~/src/services/cdp-upload-service/index.js'
-import { getFileValidationService } from '~/src/services/file-validation/index.js'
-import { isMultipleSitesFile } from '~/src/server/exemption/site-details/upload-and-wait/utils.js'
+} from '#src/server/common/helpers/session-cache/utils.js'
+import { getCdpUploadService } from '#src/services/cdp-upload-service/index.js'
+import { getFileValidationService } from '#src/services/file-validation/index.js'
+import { isMultipleSitesFile } from '#src/server/exemption/site-details/upload-and-wait/utils.js'
 
 export const UPLOAD_AND_WAIT_VIEW_ROUTE =
   'exemption/site-details/upload-and-wait/index'
@@ -21,13 +21,6 @@ const pageSettings = {
   heading: 'Checking your file...',
   pageRefreshTimeInSeconds: 2
 }
-
-/**
- * Transform CDP error message to validation error format
- * @param {string} message - CDP error message
- * @param {string} fileType - File type for contextualized errors
- * @returns {object} Validation error object with message and fieldName
- */
 const transformCdpErrorToValidationError = (message, fileType) => {
   const errorMessage = getErrorMessage(message, fileType)
 
@@ -80,12 +73,6 @@ const getFileTypeErrorMessage = (fileType) => {
     'The selected file could not be uploaded – try again'
   )
 }
-
-/**
- * Gets allowed extensions for file type
- * @param {string} fileType - The file type ('kml' or 'shapefile')
- * @returns {string[]} Allowed extensions
- */
 function getAllowedExtensions(fileType) {
   switch (fileType) {
     case 'kml':
@@ -96,15 +83,6 @@ function getAllowedExtensions(fileType) {
       return []
   }
 }
-
-/**
- * Extract coordinates from uploaded file using geo-parser API
- * @param {Request} request - Hapi request object
- * @param {string} s3Bucket - S3 bucket name
- * @param {string} s3Key - S3 object key
- * @param {string} fileType - File type ('kml' or 'shapefile')
- * @returns {Promise<object>} Extracted coordinates and GeoJSON
- */
 async function extractCoordinatesFromFile(request, s3Bucket, s3Key, fileType) {
   try {
     request.logger.info({ s3Bucket, s3Key, fileType }, 'Calling geo-parser API')
@@ -170,14 +148,6 @@ const logExtractionError = (request, error, fileContext) => {
     'Failed to extract coordinates from file'
   )
 }
-
-/**
- * Handle file validation errors
- * @param {object} request - Hapi request object
- * @param {object} validation - Validation result object
- * @param {string} fileType - File type for contextualized errors
- * @returns {object} Error details for redirection
- */
 function handleValidationError(request, validation, fileType) {
   const errorDetails = transformCdpErrorToValidationError(
     validation.errorMessage,
@@ -186,15 +156,6 @@ function handleValidationError(request, validation, fileType) {
   storeUploadError(request, errorDetails, fileType)
   return { redirect: routes.FILE_UPLOAD }
 }
-
-/**
- * Handle geo-parser processing errors
- * @param {object} request - Hapi request object
- * @param {Error} error - The caught error
- * @param {string} filename - Upload filename for logging
- * @param {string} fileType - File type for contextualized errors
- * @returns {object} Error details for redirection
- */
 function handleGeoParserError(request, error, filename, fileType) {
   const errorDetails = {
     message: 'The selected file could not be processed – try again',
@@ -215,14 +176,6 @@ function handleGeoParserError(request, error, filename, fileType) {
 
   return { redirect: routes.FILE_UPLOAD }
 }
-
-/**
- * Handle CDP rejection or error statuses
- * @param {object} request - Hapi request object
- * @param {object} status - Upload status response from CDP
- * @param {string} fileType - File type for contextualized errors
- * @returns {object} Error details for redirection
- */
 function handleCdpRejectionError(request, status, fileType) {
   const errorDetails = transformCdpErrorToValidationError(
     status.message,
@@ -231,21 +184,9 @@ function handleCdpRejectionError(request, status, fileType) {
   storeUploadError(request, errorDetails, fileType)
   return { redirect: routes.FILE_UPLOAD }
 }
-
-/**
- * Clear upload configuration from session
- * @param {object} request - Hapi request object
- */
 function clearUploadSession(request) {
   updateExemptionSiteDetails(request, 0, 'uploadConfig', null)
 }
-
-/**
- * Store upload error details in session and clear upload config
- * @param {object} request - Hapi request object
- * @param {object} errorDetails - Error details with message and fieldName
- * @param {string} fileType - File type for contextualized errors
- */
 function storeUploadError(request, errorDetails, fileType) {
   updateExemptionSiteDetails(request, 0, 'uploadError', {
     message: errorDetails.message,
@@ -254,16 +195,6 @@ function storeUploadError(request, errorDetails, fileType) {
   })
   clearUploadSession(request)
 }
-
-/**
- * Store successful upload data and coordinate extraction results in session
- * @param {object} request - Hapi request object
- * @param {object} status - Upload status response from CDP
- * @param {object} coordinateData - Extracted coordinate data
- * @param {object} s3Location - S3 location details
- * @param {string} s3Location.s3Bucket - S3 bucket name
- * @param {string} s3Location.s3Key - S3 object key
- */
 function storeSuccessfulUpload(request, status, coordinateData, s3Location) {
   updateExemptionMultipleSiteDetails(
     request,
@@ -275,14 +206,6 @@ function storeSuccessfulUpload(request, status, coordinateData, s3Location) {
     isMultipleSitesFile: isMultipleSitesFile(coordinateData)
   })
 }
-
-/**
- * Handle upload status when file is still being processed
- * @param {object} status - Upload status response from CDP
- * @param {object} exemption - Exemption data from session
- * @param {object} h - Hapi response toolkit
- * @returns {object} Hapi response (view with processing status)
- */
 function handleProcessingStatus(status, exemption, h) {
   // Show waiting page with meta refresh
   return h.view(UPLOAD_AND_WAIT_VIEW_ROUTE, {
@@ -292,15 +215,6 @@ function handleProcessingStatus(status, exemption, h) {
     filename: status.filename
   })
 }
-
-/**
- * Handle upload status when file is ready for processing
- * @param {object} status - Upload status response from CDP
- * @param {object} uploadConfig - Upload configuration from session
- * @param {object} request - Hapi request object
- * @param {object} h - Hapi response toolkit
- * @returns {Promise<object>} Hapi response (redirect)
- */
 async function handleReadyStatus(status, uploadConfig, request, h) {
   const validationResult = validateUploadedFile(status, uploadConfig, request)
   if (!validationResult.isValid) {
@@ -376,29 +290,11 @@ const logSuccessfulProcessing = (
     }
   )
 }
-
-/**
- * Handle upload status when file is rejected or has an error
- * @param {object} status - Upload status response from CDP
- * @param {object} uploadConfig - Upload configuration from session
- * @param {object} request - Hapi request object
- * @param {object} h - Hapi response toolkit
- * @returns {object} Hapi response (redirect)
- */
 function handleRejectedStatus(status, uploadConfig, request, h) {
   // Handle CDP rejection/error and redirect
   handleCdpRejectionError(request, status, uploadConfig.fileType)
   return h.redirect(routes.FILE_UPLOAD)
 }
-
-/**
- * Handle unknown upload status
- * @param {object} request - Hapi request object
- * @param {object} uploadConfig - Upload configuration from session
- * @param {object} status - Upload status response from CDP
- * @param {object} h - Hapi response toolkit
- * @returns {object} Hapi response (redirect)
- */
 function handleUnknownStatus(request, uploadConfig, status, h) {
   // Unknown status - redirect to file type selection
   request.logger.warn(
@@ -411,17 +307,6 @@ function handleUnknownStatus(request, uploadConfig, status, h) {
 
   return h.redirect(routes.CHOOSE_FILE_UPLOAD_TYPE)
 }
-
-/**
- * Process upload status and handle appropriate response
- * @param {object} status - Upload status response from CDP
- * @param {object} context - Processing context
- * @param {object} context.uploadConfig - Upload configuration from session
- * @param {object} context.request - Hapi request object
- * @param {object} context.h - Hapi response toolkit
- * @param {object} context.exemption - Exemption data from session
- * @returns {Promise<object>} Hapi response (view or redirect)
- */
 async function processUploadStatus(status, context) {
   const { uploadConfig, request, h, exemption } = context
   request.logger.debug(
@@ -451,11 +336,6 @@ async function processUploadStatus(status, context) {
   // Unknown status
   return handleUnknownStatus(request, uploadConfig, status, h)
 }
-
-/**
- * A GDS styled upload complete page controller.
- * @satisfies {Partial<ServerRoute>}
- */
 export const uploadAndWaitController = {
   async handler(request, h) {
     const exemption = getExemptionCache(request)

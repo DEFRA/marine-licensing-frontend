@@ -1,13 +1,13 @@
 import { vi } from 'vitest'
-import { config } from '~/src/config/config.js'
-import { createDefraIdStrategy } from '~/src/server/common/plugins/auth/defra-id-strategy.js'
-import { createEntraIdStrategy } from '~/src/server/common/plugins/auth/entra-id-strategy.js'
-import { createSessionStrategy } from '~/src/server/common/plugins/auth/session-strategy.js'
-import { AUTH_STRATEGIES } from '~/src/server/common/constants/auth.js'
-import { validateUserSession } from '~/src/server/common/plugins/auth/validate.js'
-import { clearExemptionCache } from '~/src/server/common/helpers/session-cache/utils.js'
-import { cacheMcmsContextFromQueryParams } from '~/src/server/common/helpers/mcms-context/cache-mcms-context.js'
-import { redirectPathCacheKey } from '~/src/server/common/constants/routes.js'
+import { config } from '#src/config/config.js'
+import { createDefraIdStrategy } from '#src/server/common/plugins/auth/defra-id-strategy.js'
+import { createEntraIdStrategy } from '#src/server/common/plugins/auth/entra-id-strategy.js'
+import { createSessionStrategy } from '#src/server/common/plugins/auth/session-strategy.js'
+import { AUTH_STRATEGIES } from '#src/server/common/constants/auth.js'
+import { validateUserSession } from '#src/server/common/plugins/auth/validate.js'
+import { clearExemptionCache } from '#src/server/common/helpers/session-cache/utils.js'
+import { cacheMcmsContextFromQueryParams } from '#src/server/common/helpers/mcms-context/cache-mcms-context.js'
+import { redirectPathCacheKey } from '#src/server/common/constants/routes.js'
 
 // Mock external dependencies that these strategy functions depend on
 vi.mock('~/src/config/config.js')
@@ -35,13 +35,14 @@ describe('Strategy Functions Integration Tests', () => {
   describe('createDefraIdStrategy', () => {
     test('should try to register bell strategy', async () => {
       mockConfig.get.mockImplementation((key) => {
-        if (key === 'defraId')
+        if (key === 'defraId') {
           return {
             clientId: 'test',
             clientSecret: 'test',
             redirectUrl: 'http://test',
             serviceId: 'test'
           }
+        }
         if (key === 'session.cookie') return { password: 'test', secure: true }
         return {}
       })
@@ -71,13 +72,14 @@ describe('Strategy Functions Integration Tests', () => {
   describe('createEntraIdStrategy', () => {
     test('should try to register bell strategy', async () => {
       mockConfig.get.mockImplementation((key) => {
-        if (key === 'entraId')
+        if (key === 'entraId') {
           return {
             clientId: 'test',
             clientSecret: 'test',
             redirectUrl: 'http://test',
             serviceId: 'test'
           }
+        }
         if (key === 'session.cookie') return { password: 'test', secure: true }
         return {}
       })
@@ -107,8 +109,9 @@ describe('Strategy Functions Integration Tests', () => {
   describe('createSessionStrategy', () => {
     test('should register session strategy', () => {
       mockConfig.get.mockImplementation((key) => {
-        if (key === 'session.cookie')
+        if (key === 'session.cookie') {
           return { password: 'test', secure: true, ttl: 3600000 }
+        }
         return {}
       })
 
@@ -141,8 +144,9 @@ describe('Strategy Functions Integration Tests', () => {
 
       beforeEach(() => {
         mockConfig.get.mockImplementation((key) => {
-          if (key === 'session.cookie')
+          if (key === 'session.cookie') {
             return { password: 'test', secure: true, ttl: 3600000 }
+          }
           return {}
         })
 
@@ -215,8 +219,9 @@ describe('Strategy Functions Integration Tests', () => {
 
       beforeEach(() => {
         mockConfig.get.mockImplementation((key) => {
-          if (key === 'session.cookie')
+          if (key === 'session.cookie') {
             return { password: 'test', secure: true, ttl: 3600000 }
+          }
           return {}
         })
 

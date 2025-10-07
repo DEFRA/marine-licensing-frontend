@@ -1,5 +1,5 @@
-import { publicRegisterRoutes } from '~/src/server/exemption/public-register/index.js'
-import { routes } from '~/src/server/common/constants/routes.js'
+import { publicRegisterRoutes } from '#src/server/exemption/public-register/index.js'
+import { routes } from '#src/server/common/constants/routes.js'
 
 describe('publicRegisterRoutes routes', () => {
   test('get route is formatted correctly', () => {

@@ -1,4 +1,4 @@
-import { createOsgb36MultipleCoordinatesSchema } from '~/src/server/common/schemas/osgb36.js'
+import { createOsgb36MultipleCoordinatesSchema } from '#src/server/common/schemas/osgb36.js'
 
 describe('#multipleCoordinates OSGB36 schema', () => {
   describe('#createOsgb36MultipleCoordinatesSchema', () => {

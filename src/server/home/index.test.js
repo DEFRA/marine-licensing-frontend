@@ -1,5 +1,5 @@
 import { vi } from 'vitest'
-import { home } from '~/src/server/home/index.js'
+import { home } from '#src/server/home/index.js'
 
 describe('home route', () => {
   test('route is registered correctly', () => {

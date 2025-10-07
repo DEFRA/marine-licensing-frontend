@@ -2,16 +2,8 @@ import {
   deleteExemptionController,
   deleteExemptionSelectController,
   deleteExemptionSubmitController
-} from '~/src/server/exemption/delete/controller.js'
-import { routes } from '~/src/server/common/constants/routes.js'
-
-/**
- * Sets up the routes used in the delete exemption page.
- * These routes are registered in src/server/router.js.
- */
-/**
- * @satisfies {ServerRegisterPluginObject<void>}
- */
+} from '#src/server/exemption/delete/controller.js'
+import { routes } from '#src/server/common/constants/routes.js'
 export const deleteExemptionRoutes = [
   {
     method: 'GET',
@@ -29,7 +21,3 @@ export const deleteExemptionRoutes = [
     ...deleteExemptionSubmitController
   }
 ]
-
-/**
- * @import { ServerRegisterPluginObject } from '@hapi/hapi'
- */

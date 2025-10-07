@@ -1,64 +1,11 @@
-/**
- * JSDOM-Based Component Testing Pattern
- * ====================================
- *
- * This test file demonstrates the new JSDOM-based testing approach for Nunjucks components,
- * replacing the previous Cheerio-based pattern. This approach provides:
- *
- * Benefits:
- * - Full DOM API compatibility (querySelector, classList, etc.)
- * - Better performance and modern JavaScript support
- * - More accurate browser-like environment
- * - Consistent with controller testing patterns
- *
- * Key Features:
- * - Custom renderComponentWithJSDOM helper function
- * - Comprehensive test coverage for all component variants
- * - Edge case and error scenario testing
- * - Accessibility and semantic structure validation
- * - Proper GOV.UK Design System pattern testing
- *
- * Test Structure:
- * - Organized by component variant (Point/Circle, Polygon, File Upload)
- * - Separate test groups for read-only vs editable modes
- * - Edge cases and accessibility testing
- * - Follows AAA pattern (Arrange, Act, Assert)
- *
- * Usage Pattern:
- * 1. Use renderComponentWithJSDOM() to render component
- * 2. Use standard DOM methods (querySelector, etc.) for assertions
- * 3. Test both functionality and accessibility
- * 4. Include edge cases and error scenarios
- *
- * This pattern should be used for all new component tests going forward.
- */
-
 import { fileURLToPath } from 'node:url'
 import path from 'path'
 import nunjucks from 'nunjucks'
 import { JSDOM } from 'jsdom'
 import { camelCase } from 'lodash'
-import * as filters from '~/src/config/nunjucks/filters/filters.js'
+import * as filters from '#src/config/nunjucks/filters/filters.js'
 
 const dirname = path.dirname(fileURLToPath(import.meta.url))
-
-/**
- * JSDOM-based component renderer for modern testing
- *
- * This replaces the Cheerio-based approach with JSDOM for better DOM API compatibility.
- * This helper can be extracted to a shared test utility if needed across multiple components.
- * @param {string} componentName - Name of the component (e.g., 'site-details-card')
- * @param {object} params - Parameters to pass to the component macro
- * @param {string} [callBlock] - Optional call block content for macro
- * @returns {Document} DOM document for testing with full DOM API support
- * @example
- * const document = renderComponentWithJSDOM('site-details-card', {
- *   siteDetails: { isFileUpload: false },
- *   isReadOnly: true
- * })
- * const card = document.querySelector('#site-details-card')
- * expect(card).toBeTruthy()
- */
 function renderComponentWithJSDOM(componentName, params, callBlock) {
   const nunjucksTestEnv = nunjucks.configure(
     [
@@ -97,7 +44,6 @@ function renderComponentWithJSDOM(componentName, params, callBlock) {
 
 describe('Site Details Card Component', () => {
   describe('Point/Circle Site Details', () => {
-    /** @type {Document} */
     let document
 
     describe('With Change links (isReadOnly: false)', () => {
@@ -217,7 +163,6 @@ describe('Site Details Card Component', () => {
   })
 
   describe('Polygon Site Details', () => {
-    /** @type {Document} */
     let document
 
     describe('With Change links (isReadOnly: false)', () => {
@@ -353,7 +298,6 @@ describe('Site Details Card Component', () => {
   })
 
   describe('File Upload Site Details', () => {
-    /** @type {Document} */
     let document
 
     describe('With Change links (isReadOnly: false)', () => {

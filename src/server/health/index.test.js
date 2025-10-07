@@ -1,5 +1,5 @@
 import { vi } from 'vitest'
-import { health } from '~/src/server/health/index.js'
+import { health } from '#src/server/health/index.js'
 
 describe('health route', () => {
   test('route is registered correctly', () => {

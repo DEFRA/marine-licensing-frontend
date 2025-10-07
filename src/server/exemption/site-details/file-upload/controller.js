@@ -1,15 +1,15 @@
 import {
   getExemptionCache,
   updateExemptionSiteDetails
-} from '~/src/server/common/helpers/session-cache/utils.js'
-import { getCdpUploadService } from '~/src/services/cdp-upload-service/index.js'
-import { routes } from '~/src/server/common/constants/routes.js'
-import { config } from '~/src/config/config.js'
+} from '#src/server/common/helpers/session-cache/utils.js'
+import { getCdpUploadService } from '#src/services/cdp-upload-service/index.js'
+import { routes } from '#src/server/common/constants/routes.js'
+import { config } from '#src/config/config.js'
 import {
   errorDescriptionByFieldName,
   mapErrorsForDisplay
-} from '~/src/server/common/helpers/errors.js'
-import { getSiteDetailsBySite } from '~/src/server/common/helpers/session-cache/site-details-utils.js'
+} from '#src/server/common/helpers/errors.js'
+import { getSiteDetailsBySite } from '#src/server/common/helpers/session-cache/site-details-utils.js'
 export const FILE_UPLOAD_VIEW_ROUTE = 'exemption/site-details/file-upload/index'
 
 const UPLOAD_A_FILE = 'Upload a file'
@@ -17,12 +17,6 @@ const pageSettings = {
   pageTitle: UPLOAD_A_FILE,
   heading: UPLOAD_A_FILE
 }
-
-/**
- * Get file type specific page content
- * @param {string} fileUploadType - 'kml' or 'shapefile'
- * @returns {object} Page content configuration
- */
 const getFileTypeContent = (fileUploadType) => {
   if (fileUploadType === 'kml') {
     return {
@@ -41,13 +35,6 @@ const getFileTypeContent = (fileUploadType) => {
     }
   }
 }
-
-/**
- * Create error summary and field errors for display
- * @param {string} message - Error message
- * @param {string} fieldName - Field name for error
- * @returns {object} Error summary and field errors
- */
 const createErrorDisplay = (message, fieldName) => {
   const errorDetail = {
     path: [fieldName], // Must be array to match Joi validation format
@@ -65,10 +52,6 @@ const createErrorDisplay = (message, fieldName) => {
 }
 
 const s3PathForExemptions = 'exemptions'
-/**
- * A GDS styled file upload page controller.
- * @satisfies {Partial<ServerRoute>}
- */
 export const fileUploadController = {
   async handler(request, h) {
     const exemption = getExemptionCache(request)

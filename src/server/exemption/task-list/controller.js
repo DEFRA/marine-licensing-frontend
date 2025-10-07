@@ -3,11 +3,11 @@ import {
   resetExemptionSiteDetails,
   clearExemptionCache,
   setExemptionCache
-} from '~/src/server/common/helpers/session-cache/utils.js'
-import { transformTaskList } from '~/src/server/exemption/task-list/utils.js'
-import { routes } from '~/src/server/common/constants/routes.js'
-import { authenticatedGetRequest } from '~/src/server/common/helpers/authenticated-requests.js'
-import { EXEMPTION_TYPE } from '~/src/server/common/constants/exemptions.js'
+} from '#src/server/common/helpers/session-cache/utils.js'
+import { transformTaskList } from '#src/server/exemption/task-list/utils.js'
+import { routes } from '#src/server/common/constants/routes.js'
+import { authenticatedGetRequest } from '#src/server/common/helpers/authenticated-requests.js'
+import { EXEMPTION_TYPE } from '#src/server/common/constants/exemptions.js'
 
 import Boom from '@hapi/boom'
 
@@ -18,11 +18,6 @@ const taskListViewSettings = {
   heading: 'Task list',
   type: EXEMPTION_TYPE
 }
-
-/**
- * A GDS styled task list page controller.
- * @satisfies {Partial<ServerRoute>}
- */
 export const taskListController = {
   async handler(request, h) {
     const exemption = getExemptionCache(request)
@@ -81,10 +76,6 @@ export const taskListController = {
     })
   }
 }
-
-/**
- * Controller for selecting an exemption and redirecting to the task list.
- */
 export const taskListSelectExemptionController = {
   handler(request, h) {
     const { exemptionId } = request.params
@@ -93,7 +84,3 @@ export const taskListSelectExemptionController = {
     return h.redirect(routes.TASK_LIST)
   }
 }
-
-/**
- * @import { ServerRoute } from '@hapi/hapi'
- */

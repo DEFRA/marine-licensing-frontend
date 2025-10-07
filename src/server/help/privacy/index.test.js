@@ -1,4 +1,4 @@
-import { privacyRoutes } from '~/src/server/help/privacy/index.js'
+import { privacyRoutes } from '#src/server/help/privacy/index.js'
 
 describe('privacy route', () => {
   test('route is registered correctly', () => {

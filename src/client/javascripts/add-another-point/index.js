@@ -1,6 +1,3 @@
-/**
- * TODO - ML-529 to extend the MOJ Library
- */
 import { Component } from 'govuk-frontend'
 
 const REMOVE_BUTTON_CLASS = 'add-another-point__remove-button'

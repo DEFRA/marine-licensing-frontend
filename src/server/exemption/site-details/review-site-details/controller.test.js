@@ -1,50 +1,36 @@
 import { vi } from 'vitest'
-import { COORDINATE_SYSTEMS } from '~/src/server/common/constants/exemptions.js'
-import { statusCodes } from '~/src/server/common/constants/status-codes.js'
-import * as authRequests from '~/src/server/common/helpers/authenticated-requests.js'
-import * as cacheUtils from '~/src/server/common/helpers/session-cache/utils.js'
-import * as coordinateUtils from '~/src/server/common/helpers/coordinate-utils.js'
+import { COORDINATE_SYSTEMS } from '#src/server/common/constants/exemptions.js'
+import { statusCodes } from '#src/server/common/constants/status-codes.js'
+import * as authRequests from '#src/server/common/helpers/authenticated-requests.js'
+import * as cacheUtils from '#src/server/common/helpers/session-cache/utils.js'
+import * as coordinateUtils from '#src/server/common/helpers/coordinate-utils.js'
 import {
   FILE_UPLOAD_REVIEW_VIEW_ROUTE,
   REVIEW_SITE_DETAILS_VIEW_ROUTE,
   reviewSiteDetailsController,
   reviewSiteDetailsSubmitController
-} from '~/src/server/exemption/site-details/review-site-details/controller.js'
-import { setupTestServer } from '~/tests/integration/shared/test-setup-helpers.js'
-import { mockExemption } from '~/src/server/test-helpers/mocks.js'
-import { makePostRequest } from '~/src/server/test-helpers/server-requests.js'
+} from '#src/server/exemption/site-details/review-site-details/controller.js'
+import { setupTestServer } from '#tests/integration/shared/test-setup-helpers.js'
+import { mockExemption } from '#src/server/test-helpers/mocks.js'
+import { makePostRequest } from '#src/server/test-helpers/server-requests.js'
 import { JSDOM } from 'jsdom'
-import { routes } from '~/src/server/common/constants/routes.js'
+import { routes } from '#src/server/common/constants/routes.js'
 import {
   getPolygonCoordinatesDisplayData,
   buildManualCoordinateSummaryData,
   getSiteDetailsBackLink,
   getReviewSummaryText,
   getCoordinateSystemText
-} from '~/src/server/exemption/site-details/review-site-details/utils.js'
+} from '#src/server/exemption/site-details/review-site-details/utils.js'
 
 vi.mock('~/src/server/common/helpers/session-cache/utils.js')
 vi.mock('~/src/server/common/helpers/coordinate-utils.js')
-
-/**
- * Creates a mock Hapi response toolkit
- * @param {string} type - Handler type: 'view' or 'redirect'
- * @returns {object} Mock response toolkit
- */
 function createMockHandler(type = 'view') {
   if (type === 'redirect') {
     return { redirect: vi.fn() }
   }
   return { view: vi.fn() }
 }
-
-/**
- * Creates mock exemption data for different coordinate scenarios
- * @param {string} type - Type: 'single', 'multiple', 'file', 'empty'
- * @param {string} coordinateSystem - Coordinate system: 'wgs84' or 'osgb36'
- * @param {object} overrides - Optional overrides for id, projectName, etc.
- * @returns {object} Mock exemption object
- */
 function createMockExemption(
   type = 'single',
   coordinateSystem = COORDINATE_SYSTEMS.WGS84,
@@ -1037,7 +1023,3 @@ describe('#reviewSiteDetails', () => {
     })
   })
 })
-
-/**
- * @import { Server } from '@hapi/hapi'
- */

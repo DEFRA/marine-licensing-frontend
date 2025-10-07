@@ -1,9 +1,9 @@
 import {
   redirectPathCacheKey,
   routes
-} from '~/src/server/common/constants/routes.js'
+} from '#src/server/common/constants/routes.js'
 import { setUserSession } from './utils.js'
-import { AUTH_STRATEGIES } from '~/src/server/common/constants/auth.js'
+import { AUTH_STRATEGIES } from '#src/server/common/constants/auth.js'
 
 export const signInOidcEntraController = {
   method: ['GET', 'POST'],

@@ -1,4 +1,4 @@
-import { activityTypes } from '~/src/server/common/constants/mcms-context.js'
+import { activityTypes } from '#src/server/common/constants/mcms-context.js'
 
 export const transformMcmsContextForDisplay = (mcmsContext) => {
   if (!mcmsContext) {

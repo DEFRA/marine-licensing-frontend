@@ -104,18 +104,12 @@ describe('Site Details Interactive Map Behaviour', () => {
     return { window, document, mapContainer, siteDataScript }
   }
 
-  const extractEmbeddedSiteData = (siteDataScript, mapContainer = null) => {
-    // For manual coordinates, check data attribute first
+  const extractEmbeddedSiteData = (mapContainer) => {
     if (mapContainer) {
       const siteDetailsAttr = mapContainer.getAttribute('data-site-details')
       if (siteDetailsAttr) {
         return JSON.parse(siteDetailsAttr)
       }
-    }
-
-    // For file uploads, use global script tag
-    if (siteDataScript) {
-      return JSON.parse(siteDataScript.textContent)
     }
 
     return null
@@ -171,7 +165,7 @@ describe('Site Details Interactive Map Behaviour', () => {
         expect(mapContainer).toBeInTheDocument()
         expect(mapContainer.getAttribute('data-site-details')).toBeDefined()
 
-        const siteData = extractEmbeddedSiteData(siteDataScript, mapContainer)
+        const siteData = extractEmbeddedSiteData(mapContainer)
         expect(mapContainer.getAttribute('data-module')).toBe(
           'site-details-map'
         )
@@ -199,8 +193,9 @@ describe('Site Details Interactive Map Behaviour', () => {
 
       await renderPageAndExtractMapElements(exemptionWithShapefileUpload)
 
-      expect(siteDataScript).toBeInTheDocument()
-      const siteData = extractEmbeddedSiteData(siteDataScript)
+      expect(mapContainer).toBeInTheDocument()
+
+      const siteData = extractEmbeddedSiteData(mapContainer)
 
       expect(siteData.coordinatesType).toBe('file')
       expect(siteData.fileUploadType).toBe('shapefile')
@@ -251,8 +246,9 @@ describe('Site Details Interactive Map Behaviour', () => {
 
         await renderPageAndExtractMapElements(exemption)
 
-        expect(siteDataScript).toBeInTheDocument()
-        const siteData = extractEmbeddedSiteData(siteDataScript)
+        expect(mapContainer).toBeInTheDocument()
+
+        const siteData = extractEmbeddedSiteData(mapContainer)
 
         expect(siteData.coordinatesType).toBe('file')
         expect(siteData.fileUploadType).toBe(fileUploadType)
@@ -274,7 +270,7 @@ describe('Site Details Interactive Map Behaviour', () => {
       expect(mapContainer).toBeInTheDocument()
       expect(mapContainer.getAttribute('data-site-details')).toBeDefined()
 
-      const siteData = extractEmbeddedSiteData(siteDataScript, mapContainer)
+      const siteData = extractEmbeddedSiteData(mapContainer)
       expect(mapContainer.getAttribute('data-module')).toBe('site-details-map')
       expect(siteData).toBeDefined()
     })
@@ -294,7 +290,7 @@ describe('Site Details Interactive Map Behaviour', () => {
       expect(mapContainer).toBeInTheDocument()
       expect(mapContainer.getAttribute('data-site-details')).toBeDefined()
 
-      const siteData = extractEmbeddedSiteData(siteDataScript, mapContainer)
+      const siteData = extractEmbeddedSiteData(mapContainer)
       expect(siteData.coordinateSystem).toBe(COORDINATE_SYSTEMS.WGS84)
       expect(siteData.coordinates.latitude).toBe('invalid-latitude')
       expect(siteData.coordinates.longitude).toBe('invalid-longitude')
@@ -331,7 +327,7 @@ describe('Site Details Interactive Map Behaviour', () => {
       expect(mapContainer.getAttribute('data-module')).toBe('site-details-map')
       expect(mapContainer.getAttribute('data-site-details')).toBeDefined()
 
-      const siteData = extractEmbeddedSiteData(siteDataScript, mapContainer)
+      const siteData = extractEmbeddedSiteData(mapContainer)
       expect(siteData.coordinateSystem).toBe(COORDINATE_SYSTEMS.OSGB36)
       expect(siteData.coordinates).toEqual(OSGB36_EASTINGS_NORTHINGS)
       expect(siteData.circleWidth).toBe(CIRCLE_WIDTH_100M)

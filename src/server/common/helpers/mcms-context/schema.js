@@ -16,6 +16,7 @@ export const paramsSchema = Joi.object({
     .valid(...articleCodes)
     .required(),
   [pdfDownloadUrl]: Joi.string()
+    // https://{subdomain}.marinemanagement.org.uk/{path}/journey/self-service/outcome-document/{guid}
     .pattern(
       /^https:\/\/[^/]+\.marinemanagement\.org\.uk\/[^/]+\/journey\/self-service\/outcome-document\/[a-zA-Z0-9-]+$/
     )

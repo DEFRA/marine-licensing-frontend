@@ -131,7 +131,7 @@ describe('#activityDescriptionController', () => {
     })
 
     test('should set back link to correct page for single site file upload', () => {
-      const h = { view: jest.fn() }
+      const h = { view: vi.fn() }
       const request = {
         url: { pathname: routes.SITE_DETAILS_ACTIVITY_DESCRIPTION },
         site: { siteIndex: 0, siteDetails: { coordinatesType: 'file' } }

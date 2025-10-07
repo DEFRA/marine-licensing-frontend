@@ -129,7 +129,7 @@ describe('#activityDatesController', () => {
 
       getExemptionCacheSpy.mockReturnValue(exemptionWithFileUpload)
 
-      const h = { view: jest.fn() }
+      const h = { view: vi.fn() }
       const request = {
         url: { pathname: routes.SITE_DETAILS_ACTIVITY_DATES },
         site: { siteIndex: 0 }

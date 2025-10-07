@@ -30,12 +30,10 @@ vi.mock('~/src/server/index.js', () => ({
 }))
 
 describe('#startServer', () => {
-  const PROCESS_ENV = process.env
   let startServerImport
 
   beforeAll(async () => {
-    process.env = { ...PROCESS_ENV }
-    process.env.PORT = '3097'
+    vi.stubEnv('PORT', '3097')
 
     startServerImport = await import(
       '~/src/server/common/helpers/start-server.js'
@@ -43,11 +41,7 @@ describe('#startServer', () => {
   })
 
   afterAll(() => {
-    process.env = PROCESS_ENV
-  })
-
-  beforeEach(() => {
-    vi.clearAllMocks()
+    vi.unstubAllEnvs()
   })
 
   describe('When server starts', () => {

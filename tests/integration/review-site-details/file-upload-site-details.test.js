@@ -237,6 +237,23 @@ describe('Review Site Details - File Upload Integration Tests', () => {
       : expect(activityDescriptionRow).toBeFalsy()
   }
 
+  const validateActionLink = (row, value, siteIndex) => {
+    const actionList = row.querySelector('.govuk-summary-list__actions')
+    expect(actionList).toBeTruthy()
+
+    const actionLink = actionList.querySelector('a')
+    expect(actionLink).toBeTruthy()
+
+    const hasValue = value && value !== '' && value !== 'Incomplete'
+    const expectedText = hasValue ? 'Change' : 'Add'
+    expect(actionLink.textContent.trim()).toContain(expectedText)
+
+    const siteNumber = siteIndex + 1
+    expect(actionLink.getAttribute('href')).toContain(
+      `site=${siteNumber}&action=${hasValue ? 'change' : 'add'}`
+    )
+  }
+
   const validateSiteDetailsCard = (document, expected, siteIndex) => {
     const siteCard = getSiteDetailsCard(document, expected, siteIndex)
 
@@ -247,11 +264,18 @@ describe('Review Site Details - File Upload Integration Tests', () => {
 
     const siteNameRow = getRowByKey(siteCard, 'Site name')
 
-    expected.multipleSiteDetails.multipleSiteDetails === 'Yes'
-      ? expect(siteNameRow.textContent).toContain(
-          expected.siteDetails[siteIndex].siteName
-        )
-      : expect(siteNameRow).toBeFalsy()
+    if (expected.multipleSiteDetails.multipleSiteDetails === 'Yes') {
+      expect(siteNameRow.textContent).toContain(
+        expected.siteDetails[siteIndex].siteName
+      )
+      validateActionLink(
+        siteNameRow,
+        expected.siteDetails[siteIndex].siteName,
+        siteIndex
+      )
+    } else {
+      expect(siteNameRow).toBeFalsy()
+    }
 
     const shouldIncludeActivityDates =
       expected.multipleSiteDetails.multipleSiteDetails === 'No' ||
@@ -259,11 +283,18 @@ describe('Review Site Details - File Upload Integration Tests', () => {
 
     const activityDatesRow = getRowByKey(siteCard, 'Activity dates')
 
-    shouldIncludeActivityDates
-      ? expect(activityDatesRow.textContent).toContain(
-          expected.siteDetails[siteIndex].activityDates
-        )
-      : expect(activityDatesRow).toBeFalsy()
+    if (shouldIncludeActivityDates) {
+      expect(activityDatesRow.textContent).toContain(
+        expected.siteDetails[siteIndex].activityDates
+      )
+      validateActionLink(
+        activityDatesRow,
+        expected.siteDetails[siteIndex].activityDates,
+        siteIndex
+      )
+    } else {
+      expect(activityDatesRow).toBeFalsy()
+    }
 
     const shouldIncludeActivityDescription =
       expected.multipleSiteDetails.multipleSiteDetails === 'No' ||
@@ -271,11 +302,18 @@ describe('Review Site Details - File Upload Integration Tests', () => {
 
     const activityDescriptionRow = getRowByKey(siteCard, 'Activity description')
 
-    shouldIncludeActivityDescription
-      ? expect(activityDescriptionRow.textContent).toContain(
-          expected.siteDetails[siteIndex].activityDescription
-        )
-      : expect(activityDescriptionRow).toBeFalsy()
+    if (shouldIncludeActivityDescription) {
+      expect(activityDescriptionRow.textContent).toContain(
+        expected.siteDetails[siteIndex].activityDescription
+      )
+      validateActionLink(
+        activityDescriptionRow,
+        expected.siteDetails[siteIndex].activityDescription,
+        siteIndex
+      )
+    } else {
+      expect(activityDescriptionRow).toBeFalsy()
+    }
   }
 
   const validateFileUpload = (document, expected, siteIndex) => {

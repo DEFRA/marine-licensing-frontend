@@ -157,27 +157,30 @@
           {% if isMultiSiteJourney %}
             {% set _ = rows.push({
               key: { text: "Site name"},
-              value: { html: appIncompleteField({text: site.siteName})}
+              value: { html: appIncompleteField({text: site.siteName})},
+              actions: setSiteDetailsAction(site.siteName, 'site-name', site.siteNumber)
             }) %}
           {% endif %}
 
           {% if site.showActivityDates %}
             {% set _ = rows.push({
               key: { text: "Activity dates"},
-              value: { html: appIncompleteField({text: site.activityDates})}
+              value: { html: appIncompleteField({text: site.activityDates})},
+              actions: setSiteDetailsAction(site.activityDates, 'site-details-activity-dates', site.siteNumber)
             }) %}
           {% endif %}
 
           {% if site.showActivityDescription %}
             {% set _ = rows.push({
               key: { text: "Activity description"},
-              value: { html: appIncompleteField({ text: site.activityDescription })}
+              value: { html: appIncompleteField({ text: site.activityDescription })},
+              actions: setSiteDetailsAction(site.activityDescription, 'site-details-activity-description', site.siteNumber)
             }) %}
           {% endif %}
           
           {% set _ = rows.push({
             key: { text: "Map view", classes: "govuk-summary-list__key--full-width" },
-            value: { html: appSiteDetailsMap(site.siteDetailsData, loop.index0), classes: "govuk-summary-list__value--full-width" }
+            value: { html: appSiteDetailsMap(site.siteDetailsData, loop.index), classes: "govuk-summary-list__value--full-width" }
           }) %}
 
           {{ govukSummaryList({

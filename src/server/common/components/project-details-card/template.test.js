@@ -134,6 +134,50 @@ describe('Project Details Card Component', () => {
       )
     })
   })
+
+  describe('Activity purpose field', () => {
+    test('Should render "The purpose of the activity" when purpose is provided', () => {
+      $component = renderComponent('project-details-card', {
+        projectName: 'Test Marine Project',
+        mcmsContext: {
+          activityType: {
+            value: 'DEPOSIT',
+            label: 'Deposit of a substance or object',
+            purpose: 'Scientific research purposes'
+          },
+          article: '17',
+          pdfDownloadUrl:
+            'https://marinelicensingtest.marinemanagement.org.uk/mmofox5uat/journey…'
+        },
+        isReadOnly: false,
+        isInternalUser: false
+      })
+
+      const htmlContent = $component.html()
+      expect(htmlContent).toContain('The purpose of the activity')
+      expect(htmlContent).toContain('Scientific research purposes')
+    })
+
+    test('Should not render "The purpose of the activity" when purpose is not provided', () => {
+      $component = renderComponent('project-details-card', {
+        projectName: 'Test Marine Project',
+        mcmsContext: {
+          activityType: {
+            value: 'DEPOSIT',
+            label: 'Deposit of a substance or object'
+          },
+          article: '17',
+          pdfDownloadUrl:
+            'https://marinelicensingtest.marinemanagement.org.uk/mmofox5uat/journey…'
+        },
+        isReadOnly: false,
+        isInternalUser: false
+      })
+
+      const htmlContent = $component.html()
+      expect(htmlContent).not.toContain('The purpose of the activity')
+    })
+  })
 })
 
 /**

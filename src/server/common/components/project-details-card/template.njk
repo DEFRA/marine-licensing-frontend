@@ -32,6 +32,18 @@
   classes: "govuk-summary-list__row--no-border"
 }), rows) %}
 
+{% if params.mcmsContext.activityType.purpose %}
+  {% set rows = (rows.push({
+    key: {
+      text: "The purpose of the activity"
+    },
+    value: {
+      html: params.mcmsContext.activityType.purpose
+    },
+    classes: "govuk-summary-list__row--no-border"
+  }), rows) %}
+{% endif %}
+
 {% set sentenceStart = "Based on the applicant's answers, their" if params.isInternalUser else "Based on your answers from \'Check if you need a marine licence\', your" %}
 {% set rows = (rows.push({
   key: {

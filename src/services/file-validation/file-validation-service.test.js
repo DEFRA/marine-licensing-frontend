@@ -1,3 +1,4 @@
+import { vi } from 'vitest'
 import { FileValidationService } from './file-validation-service.js'
 
 describe('FileValidationService', () => {
@@ -6,16 +7,12 @@ describe('FileValidationService', () => {
 
   beforeEach(() => {
     mockLogger = {
-      debug: jest.fn(),
-      info: jest.fn(),
-      warn: jest.fn(),
-      error: jest.fn()
+      debug: vi.fn(),
+      info: vi.fn(),
+      warn: vi.fn(),
+      error: vi.fn()
     }
     service = new FileValidationService(mockLogger)
-  })
-
-  afterEach(() => {
-    jest.clearAllMocks()
   })
 
   describe('constructor', () => {

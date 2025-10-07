@@ -1,3 +1,4 @@
+import { vi } from 'vitest'
 import {
   deleteSiteController,
   deleteSiteSubmitController
@@ -11,13 +12,13 @@ import { authenticatedPatchRequest } from '~/src/server/common/helpers/authentic
 import { routes } from '~/src/server/common/constants/routes.js'
 import { mockExemption } from '~/src/server/test-helpers/mocks.js'
 
-jest.mock('~/src/server/common/helpers/session-cache/utils.js')
-jest.mock('~/src/server/common/helpers/session-cache/site-utils.js')
-jest.mock('~/src/server/common/helpers/authenticated-requests.js')
+vi.mock('~/src/server/common/helpers/session-cache/utils.js')
+vi.mock('~/src/server/common/helpers/session-cache/site-utils.js')
+vi.mock('~/src/server/common/helpers/authenticated-requests.js')
 
 const mockH = {
-  view: jest.fn(),
-  redirect: jest.fn()
+  view: vi.fn(),
+  redirect: vi.fn()
 }
 
 const mockRequest = {
@@ -30,8 +31,8 @@ const mockRequest = {
     siteIndex: '0'
   },
   logger: {
-    info: jest.fn(),
-    error: jest.fn()
+    info: vi.fn(),
+    error: vi.fn()
   }
 }
 

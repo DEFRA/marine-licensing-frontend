@@ -1,15 +1,16 @@
+import { vi } from 'vitest'
 import Wreck from '@hapi/wreck'
 import { CdpUploadService, UPLOAD_STATUSES } from './cdp-upload-service.js'
 import { config } from '~/src/config/config.js'
 
 // Mock dependencies
-const mockLoggerDebug = jest.fn()
-const mockLoggerInfo = jest.fn()
-const mockLoggerWarn = jest.fn()
-const mockLoggerError = jest.fn()
+const mockLoggerDebug = vi.fn()
+const mockLoggerInfo = vi.fn()
+const mockLoggerWarn = vi.fn()
+const mockLoggerError = vi.fn()
 
-jest.mock('@hapi/wreck')
-jest.mock('~/src/server/common/helpers/logging/logger.js', () => ({
+vi.mock('@hapi/wreck')
+vi.mock('~/src/server/common/helpers/logging/logger.js', () => ({
   createLogger: () => ({
     debug: (...args) => mockLoggerDebug(...args),
     info: (...args) => mockLoggerInfo(...args),
@@ -31,12 +32,8 @@ const mockAllowedMimeTypes = [
 describe('#CdpUploadService', () => {
   let service
 
-  beforeEach(() => {
-    jest.clearAllMocks()
-  })
-
   afterEach(() => {
-    jest.restoreAllMocks()
+    vi.restoreAllMocks()
   })
 
   describe('Constructor', () => {

@@ -1,32 +1,34 @@
+// @vitest-environment jsdom
+import { vi } from 'vitest'
 import { routes } from '~/src/server/common/constants/routes.js'
 import { statusCodes } from '~/src/server/common/constants/status-codes.js'
-import { getExemptionCache } from '~/src/server/common/helpers/session-cache/utils.js'
-import { toHaveNoViolations } from 'jest-axe'
-import { runAxeChecks } from '~/.jest/axe-helper.js'
+// eslint-disable-next-line import/extensions
+import { toHaveNoViolations } from 'vitest-axe/matchers'
+import { runAxeChecks } from '~/.vite/axe-helper.js'
 import { authenticatedGetRequest } from '~/src/server/common/helpers/authenticated-requests.js'
 import * as cdpUploadService from '~/src/services/cdp-upload-service/index.js'
 import {
-  mockExemption,
+  mockExemption as mockExemptionData,
   mockExemptionWithShapefile,
   mockProjectList
 } from '~/src/server/test-helpers/mocks.js'
-import { setupTestServer } from '../shared/test-setup-helpers.js'
+import { mockExemption, setupTestServer } from '../shared/test-setup-helpers.js'
 import { makeGetRequest } from '~/src/server/test-helpers/server-requests.js'
 
-jest.mock('~/src/server/common/helpers/authenticated-requests.js')
-jest.mock('~/src/server/common/helpers/session-cache/utils.js')
-
-expect.extend(toHaveNoViolations)
+vi.mock('~/src/server/common/helpers/authenticated-requests.js')
 
 describe('Page accessibility checks (Axe)', () => {
+  beforeAll(() => {
+    expect.extend(toHaveNoViolations)
+  })
   const getServer = setupTestServer()
 
   beforeEach(() => {
-    jest.spyOn(cdpUploadService, 'getCdpUploadService').mockReturnValue({
-      getStatus: jest.fn().mockResolvedValue({
+    vi.spyOn(cdpUploadService, 'getCdpUploadService').mockReturnValue({
+      getStatus: vi.fn().mockResolvedValue({
         status: 'pending'
       }),
-      initiate: jest.fn().mockResolvedValue({
+      initiate: vi.fn().mockResolvedValue({
         uploadId: 'test-upload-id',
         statusUrl: 'test-status-url',
         fileType: 'kml'
@@ -117,16 +119,16 @@ describe('Page accessibility checks (Axe)', () => {
 
   test.each(pages)(
     '"$title" page',
-    async ({ url, exemption = mockExemption }) => {
-      jest.mocked(getExemptionCache).mockReturnValue(exemption)
-      jest
-        .mocked(authenticatedGetRequest)
-        .mockImplementation((_request, endpoint) => ({
+    async ({ url, exemption = mockExemptionData }) => {
+      mockExemption(exemption)
+      vi.mocked(authenticatedGetRequest).mockImplementation(
+        (_request, endpoint) => ({
           payload: {
             message: 'success',
             value: endpoint === '/exemptions' ? mockProjectList : exemption
           }
-        }))
+        })
+      )
       const response = await makeGetRequest({
         url,
         server: getServer()

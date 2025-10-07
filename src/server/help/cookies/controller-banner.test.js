@@ -1,18 +1,19 @@
+import { vi } from 'vitest'
 import { cookiesSubmitController } from './controller.js'
 import * as cookieService from '~/src/server/common/helpers/cookie-service.js'
 
-jest.mock('~/src/server/common/helpers/cookie-service.js')
+vi.mock('~/src/server/common/helpers/cookie-service.js')
 
 const createMockRequest = (overrides = {}) => ({
   headers: {},
   payload: {},
-  logger: { error: jest.fn() },
+  logger: { error: vi.fn() },
   ...overrides
 })
 
 const createMockH = () => ({
-  redirect: jest.fn().mockReturnValue({
-    state: jest.fn().mockReturnThis()
+  redirect: vi.fn().mockReturnValue({
+    state: vi.fn().mockReturnThis()
   })
 })
 
@@ -23,7 +24,6 @@ describe('Cookie Controller Error Handling', () => {
   beforeEach(() => {
     mockRequest = createMockRequest()
     mockH = createMockH()
-    jest.clearAllMocks()
 
     cookieService.setCookiePreferences.mockImplementation(() => undefined)
     cookieService.setConfirmationBanner.mockImplementation(() => undefined)

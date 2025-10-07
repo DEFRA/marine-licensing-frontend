@@ -1,9 +1,9 @@
-import { jest } from '@jest/globals'
+import { vi } from 'vitest'
 import { addSeconds } from 'date-fns'
 import { setUserSession } from './utils.js'
 
-jest.mock('date-fns', () => ({
-  addSeconds: jest.fn()
+vi.mock('date-fns', () => ({
+  addSeconds: vi.fn()
 }))
 
 describe('utils', () => {
@@ -13,14 +13,12 @@ describe('utils', () => {
     let mockCookieAuth
 
     beforeEach(() => {
-      jest.clearAllMocks()
-
       mockCache = {
-        set: jest.fn().mockResolvedValue()
+        set: vi.fn().mockResolvedValue()
       }
 
       mockCookieAuth = {
-        set: jest.fn()
+        set: vi.fn()
       }
 
       const mockExpiryDate = new Date('2024-01-01T12:00:00.000Z')

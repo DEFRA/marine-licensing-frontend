@@ -1,20 +1,20 @@
 import { JSDOM } from 'jsdom'
+import { vi } from 'vitest'
 import { getByText, queryByText, within } from '@testing-library/dom'
 import { routes } from '~/src/server/common/constants/routes.js'
 import { statusCodes } from '~/src/server/common/constants/status-codes.js'
-import * as authRequests from '~/src/server/common/helpers/authenticated-requests.js'
-import * as cacheUtils from '~/src/server/common/helpers/session-cache/utils.js'
 import { testScenarios } from './file-upload-fixtures.js'
 
 import {
   makeGetRequest,
   makePostRequest
 } from '~/src/server/test-helpers/server-requests.js'
-import { setupTestServer } from '~/tests/integration/shared/test-setup-helpers.js'
+import {
+  mockExemption,
+  setupTestServer
+} from '~/tests/integration/shared/test-setup-helpers.js'
 
-jest.mock('~/src/server/common/helpers/session-cache/utils.js')
-jest.mock('~/src/server/common/helpers/coordinate-utils.js')
-jest.mock('~/src/server/common/helpers/authenticated-requests.js')
+vi.mock('~/src/server/common/helpers/coordinate-utils.js')
 
 const getSiteDetailsCard = (document, expected, siteIndex = 0) => {
   const cardName = expected?.siteDetails[siteIndex]?.cardName ?? 'Site details'
@@ -28,14 +28,7 @@ const getSiteDetailsCard = (document, expected, siteIndex = 0) => {
 describe('Review Site Details - File Upload Integration Tests', () => {
   const getServer = setupTestServer()
 
-  beforeEach(() => {
-    jest
-      .spyOn(cacheUtils, 'setExemptionCache')
-      .mockImplementation(() => undefined)
-    jest
-      .spyOn(cacheUtils, 'resetExemptionSiteDetails')
-      .mockImplementation(() => undefined)
-  })
+  beforeEach(() => mockExemption())
 
   test.each(testScenarios)(
     '$name - validates file upload display',
@@ -69,10 +62,7 @@ describe('Review Site Details - File Upload Integration Tests', () => {
     test('should successfully submit file upload details', async () => {
       const fileExemption = testScenarios[0].exemption
 
-      jest.spyOn(cacheUtils, 'getExemptionCache').mockReturnValue(fileExemption)
-      jest.spyOn(authRequests, 'authenticatedPatchRequest').mockResolvedValue({
-        payload: { id: fileExemption.id }
-      })
+      const { authenticatedPatchRequest } = mockExemption(fileExemption)
 
       const response = await makePostRequest({
         url: routes.REVIEW_SITE_DETAILS,
@@ -82,7 +72,7 @@ describe('Review Site Details - File Upload Integration Tests', () => {
 
       expect(response.statusCode).toBe(statusCodes.redirect)
       expect(response.headers.location).toBe(routes.TASK_LIST)
-      expect(authRequests.authenticatedPatchRequest).toHaveBeenCalledWith(
+      expect(authenticatedPatchRequest).toHaveBeenCalledWith(
         expect.any(Object),
         '/exemption/site-details',
         expect.objectContaining({
@@ -98,10 +88,7 @@ describe('Review Site Details - File Upload Integration Tests', () => {
   })
 
   const getPageDocument = async (exemption) => {
-    jest.spyOn(cacheUtils, 'getExemptionCache').mockReturnValue(exemption)
-    jest.spyOn(authRequests, 'authenticatedGetRequest').mockResolvedValue({
-      payload: { value: { taskList: { id: exemption.id } } }
-    })
+    mockExemption(exemption)
 
     const response = await makeGetRequest({
       server: getServer(),

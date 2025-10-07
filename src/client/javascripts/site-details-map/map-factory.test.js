@@ -1,8 +1,9 @@
+import { vi } from 'vitest'
 import MapFactory from './map-factory.js'
 
 Object.defineProperty(globalThis, 'document', {
   value: {
-    createElement: jest.fn().mockReturnValue({})
+    createElement: vi.fn().mockReturnValue({})
   },
   writable: true
 })
@@ -13,23 +14,23 @@ describe('MapFactory', () => {
 
   beforeEach(() => {
     mockOlModules = {
-      OpenLayersMap: jest.fn(),
-      View: jest.fn(),
-      TileLayer: jest.fn(),
-      OSM: jest.fn(),
-      VectorLayer: jest.fn(),
-      VectorSource: jest.fn(),
-      Style: jest.fn(),
-      Fill: jest.fn(),
-      Stroke: jest.fn(),
-      Circle: jest.fn(),
-      GeoJSON: jest.fn(),
+      OpenLayersMap: vi.fn(),
+      View: vi.fn(),
+      TileLayer: vi.fn(),
+      OSM: vi.fn(),
+      VectorLayer: vi.fn(),
+      VectorSource: vi.fn(),
+      Style: vi.fn(),
+      Fill: vi.fn(),
+      Stroke: vi.fn(),
+      Circle: vi.fn(),
+      GeoJSON: vi.fn(),
 
-      Attribution: jest.fn(),
-      defaultControls: jest.fn().mockReturnValue({
-        extend: jest.fn().mockReturnValue([])
+      Attribution: vi.fn(),
+      defaultControls: vi.fn().mockReturnValue({
+        extend: vi.fn().mockReturnValue([])
       }),
-      ScaleLine: jest.fn()
+      ScaleLine: vi.fn()
     }
 
     mapFactory = new MapFactory(mockOlModules)
@@ -157,7 +158,7 @@ describe('MapFactory', () => {
 
       mockOlModules.VectorSource.mockReturnValue(mockVectorSource)
       mockOlModules.VectorLayer.mockReturnValue(mockVectorLayer)
-      mapFactory.createDefaultStyle = jest.fn().mockReturnValue(mockStyle)
+      mapFactory.createDefaultStyle = vi.fn().mockReturnValue(mockStyle)
 
       const result = mapFactory.createMapLayers()
 
@@ -277,12 +278,12 @@ describe('MapFactory', () => {
   describe('setupResponsiveAttribution', () => {
     const createMocks = (mapSize = [800, 600]) => ({
       mockMap: {
-        on: jest.fn(),
-        getSize: jest.fn().mockReturnValue(mapSize)
+        on: vi.fn(),
+        getSize: vi.fn().mockReturnValue(mapSize)
       },
       mockAttribution: {
-        setCollapsible: jest.fn(),
-        setCollapsed: jest.fn()
+        setCollapsible: vi.fn(),
+        setCollapsed: vi.fn()
       }
     })
 

@@ -1,3 +1,4 @@
+import { vi } from 'vitest'
 import { setupTestServer } from '~/tests/integration/shared/test-setup-helpers.js'
 import {
   widthOfSiteController,
@@ -12,21 +13,21 @@ import { config } from '~/src/config/config.js'
 import { JSDOM } from 'jsdom'
 import { routes } from '~/src/server/common/constants/routes.js'
 
-jest.mock('~/src/server/common/helpers/session-cache/utils.js')
+vi.mock('~/src/server/common/helpers/session-cache/utils.js')
 
 describe('#widthOfSite', () => {
   const getServer = setupTestServer()
   let getExemptionCacheSpy
 
   beforeEach(() => {
-    getExemptionCacheSpy = jest
+    getExemptionCacheSpy = vi
       .spyOn(cacheUtils, 'getExemptionCache')
       .mockReturnValue(mockExemption)
   })
 
   describe('#widthOfSiteController', () => {
     test('widthController handler should render with correct context', () => {
-      const h = { view: jest.fn() }
+      const h = { view: vi.fn() }
 
       widthOfSiteController.handler({ site: mockSite }, h)
 
@@ -46,7 +47,7 @@ describe('#widthOfSite', () => {
         projectName: mockExemption.projectName
       })
 
-      const h = { view: jest.fn() }
+      const h = { view: vi.fn() }
 
       widthOfSiteController.handler({ site: mockSite }, h)
 
@@ -116,8 +117,8 @@ describe('#widthOfSite', () => {
       }
 
       const h = {
-        view: jest.fn().mockReturnValue({
-          takeover: jest.fn()
+        view: vi.fn().mockReturnValue({
+          takeover: vi.fn()
         })
       }
 
@@ -164,8 +165,8 @@ describe('#widthOfSite', () => {
       }
 
       const h = {
-        view: jest.fn().mockReturnValue({
-          takeover: jest.fn()
+        view: vi.fn().mockReturnValue({
+          takeover: vi.fn()
         })
       }
 
@@ -184,7 +185,7 @@ describe('#widthOfSite', () => {
 
     test('Should redirect to review site details page when POST is successful', async () => {
       const h = {
-        redirect: jest.fn()
+        redirect: vi.fn()
       }
 
       await widthOfSiteSubmitController.handler(
@@ -197,7 +198,7 @@ describe('#widthOfSite', () => {
 
     test('Should trim spaces from the width string', async () => {
       const h = {
-        redirect: jest.fn()
+        redirect: vi.fn()
       }
 
       const mockRequest = { payload: { width: ' 50 ' }, site: mockSite }
@@ -213,10 +214,10 @@ describe('#widthOfSite', () => {
 
     test('Should correctly set the cache when submitting', async () => {
       const h = {
-        redirect: jest.fn().mockReturnValue({
-          takeover: jest.fn()
+        redirect: vi.fn().mockReturnValue({
+          takeover: vi.fn()
         }),
-        view: jest.fn()
+        view: vi.fn()
       }
 
       const mockRequest = { payload: { width: 'single' }, site: mockSite }

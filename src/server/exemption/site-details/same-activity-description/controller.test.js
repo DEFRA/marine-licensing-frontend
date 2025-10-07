@@ -1,3 +1,4 @@
+import { vi } from 'vitest'
 import {
   sameActivityDescriptionController,
   sameActivityDescriptionSubmitController
@@ -10,19 +11,19 @@ import {
 import { routes } from '~/src/server/common/constants/routes.js'
 import { mockSite } from '~/src/server/test-helpers/mocks.js'
 
-jest.mock('~/src/server/common/helpers/session-cache/utils.js')
+vi.mock('~/src/server/common/helpers/session-cache/utils.js')
 
 describe('sameActivityDescriptionController', () => {
   const mockRequest = {
     site: mockSite,
     logger: {
-      info: jest.fn()
+      info: vi.fn()
     }
   }
 
   const mockH = {
-    view: jest.fn(),
-    redirect: jest.fn()
+    view: vi.fn(),
+    redirect: vi.fn()
   }
 
   const mockExemption = {
@@ -33,8 +34,7 @@ describe('sameActivityDescriptionController', () => {
   }
 
   beforeEach(() => {
-    jest.clearAllMocks()
-    jest.mocked(getExemptionCache).mockReturnValue(mockExemption)
+    vi.mocked(getExemptionCache).mockReturnValue(mockExemption)
   })
 
   describe('GET handler', () => {
@@ -62,7 +62,7 @@ describe('sameActivityDescriptionController', () => {
           sameActivityDescription: 'yes'
         }
       }
-      jest.mocked(getExemptionCache).mockReturnValue(exemptionWithData)
+      vi.mocked(getExemptionCache).mockReturnValue(exemptionWithData)
 
       sameActivityDescriptionController.handler(mockRequest, mockH)
 
@@ -83,7 +83,7 @@ describe('sameActivityDescriptionController', () => {
           sameActivityDescription: 'no'
         }
       }
-      jest.mocked(getExemptionCache).mockReturnValue(exemptionWithData)
+      vi.mocked(getExemptionCache).mockReturnValue(exemptionWithData)
 
       const mockRequestSecondSite = { ...mockRequest }
       mockRequestSecondSite.site = {
@@ -106,7 +106,7 @@ describe('sameActivityDescriptionController', () => {
           sameActivityDescription: 'yes'
         }
       }
-      jest.mocked(getExemptionCache).mockReturnValue(exemptionWithData)
+      vi.mocked(getExemptionCache).mockReturnValue(exemptionWithData)
 
       const mockRequestSecondSite = { ...mockRequest }
       mockRequestSecondSite.site = {

@@ -1,7 +1,8 @@
+import { vi } from 'vitest'
 import { activityDescriptionRoutes } from '~/src/server/exemption/activity-description/index.js'
 import { routes } from '~/src/server/common/constants/routes.js'
 
-jest.mock('~/src/server/common/helpers/session-cache/utils.js')
+vi.mock('~/src/server/common/helpers/session-cache/utils.js')
 
 describe('activityDescriptionRoutes routes', () => {
   it('GET route is exists and matches route constant', () => {

@@ -1,3 +1,4 @@
+import { vi } from 'vitest'
 import { statusCodes } from '~/src/server/common/constants/status-codes.js'
 import { config } from '~/src/config/config.js'
 import { routes } from '~/src/server/common/constants/routes.js'
@@ -5,10 +6,16 @@ import { setupTestServer } from '~/tests/integration/shared/test-setup-helpers.j
 import { makeGetRequest } from '~/src/server/test-helpers/server-requests.js'
 import { clearExemptionCache } from '~/src/server/common/helpers/session-cache/utils.js'
 
-jest.mock('~/src/server/common/helpers/session-cache/utils.js', () => ({
-  ...jest.requireActual('~/src/server/common/helpers/session-cache/utils.js'),
-  clearExemptionCache: jest.fn()
-}))
+vi.mock(
+  '~/src/server/common/helpers/session-cache/utils.js',
+  async (importOriginal) => {
+    const mod = await importOriginal()
+    return {
+      ...mod,
+      clearExemptionCache: vi.fn()
+    }
+  }
+)
 
 describe('#homeController', () => {
   /** @type {Server} */

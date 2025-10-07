@@ -1,13 +1,14 @@
+import { vi } from 'vitest'
 import { buildNavigation } from '~/src/config/nunjucks/context/build-navigation.js'
 import { getAuthProvider } from '~/src/server/common/helpers/authenticated-requests.js'
 import { AUTH_STRATEGIES } from '~/src/server/common/constants/auth.js'
 
-jest.mock('~/src/server/common/helpers/authenticated-requests.js')
+vi.mock('~/src/server/common/helpers/authenticated-requests.js')
 
 describe('#buildNavigation', () => {
   describe('defra ID user', () => {
     beforeEach(() =>
-      jest.mocked(getAuthProvider).mockReturnValue(AUTH_STRATEGIES.DEFRA_ID)
+      vi.mocked(getAuthProvider).mockReturnValue(AUTH_STRATEGIES.DEFRA_ID)
     )
 
     test('Should provide expected navigation details', () => {
@@ -59,7 +60,7 @@ describe('#buildNavigation', () => {
 
   describe('entra ID user', () => {
     test('should return no nav items', () => {
-      jest.mocked(getAuthProvider).mockReturnValue(AUTH_STRATEGIES.ENTRA_ID)
+      vi.mocked(getAuthProvider).mockReturnValue(AUTH_STRATEGIES.ENTRA_ID)
       expect(buildNavigation({ path: '/home' })).toEqual([])
     })
   })

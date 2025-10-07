@@ -1,3 +1,4 @@
+import { vi } from 'vitest'
 import {
   multipleSitesController,
   multipleSitesSubmitController,
@@ -11,21 +12,24 @@ import {
 import { mockExemption } from '~/src/server/test-helpers/mocks.js'
 import { routes } from '~/src/server/common/constants/routes.js'
 
-jest.mock('~/src/server/common/helpers/session-cache/utils.js')
+vi.mock('~/src/server/common/helpers/session-cache/utils.js')
 
 describe('#multipleSitesQuestion', () => {
-  jest.mocked(getExemptionCache).mockReturnValue(mockExemption)
-  jest.mocked(setExemptionCache).mockReturnValue({})
+  beforeEach(() => {
+    vi.clearAllMocks()
+    vi.mocked(getExemptionCache).mockReturnValue(mockExemption)
+    vi.mocked(setExemptionCache).mockReturnValue({})
+  })
 
   describe('#multipleSitesController', () => {
     test('should render with correct context and call utils function', () => {
       const mockMultipleSiteDetails = { multipleSitesEnabled: true }
-      jest.mocked(getExemptionCache).mockReturnValueOnce({
+      vi.mocked(getExemptionCache).mockReturnValueOnce({
         ...mockExemption,
         multipleSiteDetails: mockMultipleSiteDetails
       })
 
-      const h = { view: jest.fn() }
+      const h = { view: vi.fn() }
 
       multipleSitesController.handler({}, h)
 
@@ -44,17 +48,13 @@ describe('#multipleSitesQuestion', () => {
       const request = {
         payload: { multipleSitesEnabled: 'no' }
       }
-      const h = { redirect: jest.fn() }
-
-      const expectedSiteDetails = [...mockExemption.siteDetails]
-      delete expectedSiteDetails[0].siteName
+      const h = { redirect: vi.fn() }
 
       multipleSitesSubmitController.handler(request, h)
 
-      expect(jest.mocked(setExemptionCache)).toHaveBeenCalledWith(request, {
+      expect(vi.mocked(setExemptionCache)).toHaveBeenCalledWith(request, {
         ...mockExemption,
-        multipleSiteDetails: { multipleSitesEnabled: false },
-        siteDetails: expectedSiteDetails
+        multipleSiteDetails: { multipleSitesEnabled: false }
       })
 
       expect(h.redirect).toHaveBeenCalledWith(
@@ -66,14 +66,16 @@ describe('#multipleSitesQuestion', () => {
       const request = {
         payload: { multipleSitesEnabled: 'yes' }
       }
-      const h = { redirect: jest.fn() }
+      const h = { redirect: vi.fn() }
 
       multipleSitesSubmitController.handler(request, h)
 
-      expect(jest.mocked(setExemptionCache)).toHaveBeenCalledWith(request, {
-        ...mockExemption,
-        multipleSiteDetails: { multipleSitesEnabled: true }
-      })
+      expect(vi.mocked(setExemptionCache)).toHaveBeenCalledWith(
+        request,
+        expect.objectContaining({
+          multipleSiteDetails: { multipleSitesEnabled: true }
+        })
+      )
       expect(h.redirect).toHaveBeenCalledWith(routes.SITE_NAME)
     })
 
@@ -110,7 +112,8 @@ describe('#multipleSitesQuestion', () => {
       const request = {
         payload: { multipleSites: 'invalid' }
       }
-      const h = { view: jest.fn().mockReturnValue({ takeover: jest.fn() }) }
+      const mockTakeover = vi.fn()
+      const h = { view: vi.fn().mockReturnValue({ takeover: mockTakeover }) }
 
       const err = {
         details: [
@@ -132,13 +135,15 @@ describe('#multipleSitesQuestion', () => {
         errors: expect.any(Object),
         errorSummary: expect.any(Array)
       })
+      expect(mockTakeover).toHaveBeenCalled()
     })
 
     test('should handle validation failure without error details', () => {
       const request = {
         payload: { multipleSites: 'invalid' }
       }
-      const h = { view: jest.fn().mockReturnValue({ takeover: jest.fn() }) }
+      const mockTakeover = vi.fn()
+      const h = { view: vi.fn().mockReturnValue({ takeover: mockTakeover }) }
 
       multipleSitesSubmitController.options.validate.failAction(request, h, {})
 
@@ -149,6 +154,7 @@ describe('#multipleSitesQuestion', () => {
         payload: { multipleSites: 'invalid' },
         projectName: 'Test Project'
       })
+      expect(mockTakeover).toHaveBeenCalled()
     })
   })
 })

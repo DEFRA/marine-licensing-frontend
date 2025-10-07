@@ -1,3 +1,4 @@
+import { vi } from 'vitest'
 import {
   cacheMcmsContextFromQueryParams,
   getMcmsContextFromCache
@@ -8,13 +9,13 @@ describe('Cache / get MCMS context', () => {
   let logError
 
   beforeEach(() => {
-    logError = jest.fn()
+    logError = vi.fn()
     mockRequest = {
       path: '/',
       query: {},
       url: 'http://example.com/?ACTIVITY_TYPE=CON&ARTICLE=17',
       yar: {
-        flash: jest.fn()
+        flash: vi.fn()
       },
       logger: {
         error: logError

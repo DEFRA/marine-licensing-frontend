@@ -1,19 +1,12 @@
+// @vitest-environment jsdom
+import { vi } from 'vitest'
 import { SiteDetailsMap } from './index.js'
 import MapFactory from './map-factory.js'
 import OpenLayersModuleLoader from './openlayers-module-loader.js'
 import SiteDataLoader from './site-data-loader.js'
 import SiteVisualiser from './site-visualiser.js'
 
-Object.defineProperty(globalThis, 'document', {
-  value: {
-    createElement: jest.fn().mockReturnValue({
-      innerHTML: ''
-    })
-  },
-  writable: true
-})
-
-jest.mock('govuk-frontend', () => ({
+vi.mock('govuk-frontend', () => ({
   Component: class MockComponent {
     constructor($root) {
       this.$root = $root
@@ -21,12 +14,12 @@ jest.mock('govuk-frontend', () => ({
   }
 }))
 
-jest.mock('./openlayers-module-loader.js')
-jest.mock('./site-data-loader.js')
-jest.mock('./map-factory.js')
-jest.mock('./site-visualiser.js')
+vi.mock('./openlayers-module-loader.js')
+vi.mock('./site-data-loader.js')
+vi.mock('./map-factory.js')
+vi.mock('./site-visualiser.js')
 
-const mockSetTimeout = jest.fn()
+const mockSetTimeout = vi.fn()
 globalThis.setTimeout = mockSetTimeout
 
 describe('SiteDetailsMap', () => {
@@ -56,62 +49,61 @@ describe('SiteDetailsMap', () => {
   }
 
   beforeEach(() => {
-    jest.clearAllMocks()
     mockSetTimeout.mockClear()
 
     mockRoot = document.createElement('div')
     mockRoot.innerHTML = ''
 
     mockDataLoader = {
-      loadSiteDetails: jest.fn(),
-      hasValidFileCoordinates: jest.fn(),
-      hasValidManualCoordinates: jest.fn()
+      loadSiteDetails: vi.fn(),
+      hasValidFileCoordinates: vi.fn(),
+      hasValidManualCoordinates: vi.fn()
     }
 
     mockSiteVisualiser = {
-      clearFeatures: jest.fn(),
-      displayFileUploadData: jest.fn(),
-      centreMapView: jest.fn(),
-      displayCircularSite: jest.fn(),
-      displayPointSite: jest.fn(),
-      displayManualCoordinates: jest.fn(),
+      clearFeatures: vi.fn(),
+      displayFileUploadData: vi.fn(),
+      centreMapView: vi.fn(),
+      displayCircularSite: vi.fn(),
+      displayPointSite: vi.fn(),
+      displayManualCoordinates: vi.fn(),
       olModules: {
-        fromLonLat: jest.fn()
+        fromLonLat: vi.fn()
       }
     }
 
     mockModuleLoader = {
-      loadModules: jest.fn().mockResolvedValue({
-        OpenLayersMap: jest.fn(),
-        View: jest.fn(),
-        TileLayer: jest.fn(),
-        OSM: jest.fn(),
-        VectorLayer: jest.fn(),
-        VectorSource: jest.fn(),
-        Feature: jest.fn(),
-        Point: jest.fn(),
-        Polygon: jest.fn(),
-        Style: jest.fn(),
-        Fill: jest.fn(),
-        Stroke: jest.fn(),
-        Circle: jest.fn(),
-        fromLonLat: jest.fn(),
-        toLonLat: jest.fn(),
-        GeoJSON: jest.fn(),
-        Attribution: jest.fn(),
-        defaultControls: jest.fn()
+      loadModules: vi.fn().mockResolvedValue({
+        OpenLayersMap: vi.fn(),
+        View: vi.fn(),
+        TileLayer: vi.fn(),
+        OSM: vi.fn(),
+        VectorLayer: vi.fn(),
+        VectorSource: vi.fn(),
+        Feature: vi.fn(),
+        Point: vi.fn(),
+        Polygon: vi.fn(),
+        Style: vi.fn(),
+        Fill: vi.fn(),
+        Stroke: vi.fn(),
+        Circle: vi.fn(),
+        fromLonLat: vi.fn(),
+        toLonLat: vi.fn(),
+        GeoJSON: vi.fn(),
+        Attribution: vi.fn(),
+        defaultControls: vi.fn()
       })
     }
 
     SiteDataLoader.mockImplementation(() => mockDataLoader)
     SiteVisualiser.mockImplementation(() => mockSiteVisualiser)
     MapFactory.mockImplementation(() => ({
-      createMapLayers: jest.fn().mockReturnValue({
+      createMapLayers: vi.fn().mockReturnValue({
         vectorSource: {},
         vectorLayer: {}
       }),
-      initialiseGeoJSONFormat: jest.fn().mockReturnValue({}),
-      createMap: jest.fn().mockReturnValue({})
+      initialiseGeoJSONFormat: vi.fn().mockReturnValue({}),
+      createMap: vi.fn().mockReturnValue({})
     }))
     OpenLayersModuleLoader.mockImplementation(() => mockModuleLoader)
   })
@@ -149,7 +141,7 @@ describe('SiteDetailsMap', () => {
     })
 
     test('should accept injected module loader', () => {
-      const customModuleLoader = { loadModules: jest.fn() }
+      const customModuleLoader = { loadModules: vi.fn() }
 
       siteDetailsMap = new SiteDetailsMap(mockRoot, {}, customModuleLoader)
 
@@ -226,7 +218,7 @@ describe('SiteDetailsMap', () => {
       mockDataLoader.hasValidFileCoordinates.mockReturnValue(false)
       mockDataLoader.hasValidManualCoordinates.mockReturnValue(false)
 
-      const showErrorSpy = jest.spyOn(siteDetailsMap, 'showError')
+      const showErrorSpy = vi.spyOn(siteDetailsMap, 'showError')
 
       const result = siteDetailsMap.displaySiteDetails(siteDetails)
 
@@ -306,7 +298,7 @@ describe('SiteDetailsMap', () => {
   describe('scheduleMapInitialisation', () => {
     test('should call setTimeout with initialisation function', () => {
       siteDetailsMap = new SiteDetailsMap(mockRoot)
-      jest.spyOn(siteDetailsMap, 'initialiseMap').mockResolvedValue()
+      vi.spyOn(siteDetailsMap, 'initialiseMap').mockResolvedValue()
 
       siteDetailsMap.scheduleMapInitialisation()
 
@@ -315,10 +307,10 @@ describe('SiteDetailsMap', () => {
 
     test('should handle initialiseMap errors', async () => {
       siteDetailsMap = new SiteDetailsMap(mockRoot)
-      const showErrorSpy = jest.spyOn(siteDetailsMap, 'showError')
-      jest
-        .spyOn(siteDetailsMap, 'initialiseMap')
-        .mockRejectedValue(new Error('Init failed'))
+      const showErrorSpy = vi.spyOn(siteDetailsMap, 'showError')
+      vi.spyOn(siteDetailsMap, 'initialiseMap').mockRejectedValue(
+        new Error('Init failed')
+      )
 
       siteDetailsMap.scheduleMapInitialisation()
       const [callback] = mockSetTimeout.mock.calls[0]
@@ -345,25 +337,25 @@ describe('SiteDetailsMap', () => {
       setupValidSiteDetailsData()
 
       const customModuleLoader = {
-        loadModules: jest.fn().mockResolvedValue({
-          OpenLayersMap: jest.fn(),
-          View: jest.fn(),
-          TileLayer: jest.fn(),
-          OSM: jest.fn(),
-          VectorLayer: jest.fn(),
-          VectorSource: jest.fn(),
-          Feature: jest.fn(),
-          Point: jest.fn(),
-          Polygon: jest.fn(),
-          Style: jest.fn(),
-          Fill: jest.fn(),
-          Stroke: jest.fn(),
-          Circle: jest.fn(),
-          fromLonLat: jest.fn(),
-          toLonLat: jest.fn(),
-          GeoJSON: jest.fn(),
-          Attribution: jest.fn(),
-          defaultControls: jest.fn()
+        loadModules: vi.fn().mockResolvedValue({
+          OpenLayersMap: vi.fn(),
+          View: vi.fn(),
+          TileLayer: vi.fn(),
+          OSM: vi.fn(),
+          VectorLayer: vi.fn(),
+          VectorSource: vi.fn(),
+          Feature: vi.fn(),
+          Point: vi.fn(),
+          Polygon: vi.fn(),
+          Style: vi.fn(),
+          Fill: vi.fn(),
+          Stroke: vi.fn(),
+          Circle: vi.fn(),
+          fromLonLat: vi.fn(),
+          toLonLat: vi.fn(),
+          GeoJSON: vi.fn(),
+          Attribution: vi.fn(),
+          defaultControls: vi.fn()
         })
       }
 
@@ -384,7 +376,7 @@ describe('SiteDetailsMap', () => {
       setupValidSiteDetailsData()
 
       const failingModuleLoader = {
-        loadModules: jest
+        loadModules: vi
           .fn()
           .mockRejectedValue(new Error('Module loading failed'))
       }
@@ -400,8 +392,8 @@ describe('SiteDetailsMap', () => {
     test('should show error when no site details exist', async () => {
       mockDataLoader.loadSiteDetails.mockReturnValue(null)
       siteDetailsMap = new SiteDetailsMap(mockRoot)
-      const errorSpy = jest.spyOn(siteDetailsMap, 'showError')
-      const hasValidSiteDetailsSpy = jest.spyOn(
+      const errorSpy = vi.spyOn(siteDetailsMap, 'showError')
+      const hasValidSiteDetailsSpy = vi.spyOn(
         siteDetailsMap,
         'hasValidSiteDetails'
       )
@@ -423,7 +415,7 @@ describe('SiteDetailsMap', () => {
       mockDataLoader.hasValidManualCoordinates.mockReturnValue(false)
 
       siteDetailsMap = new SiteDetailsMap(mockRoot)
-      const errorSpy = jest.spyOn(siteDetailsMap, 'showError')
+      const errorSpy = vi.spyOn(siteDetailsMap, 'showError')
 
       await siteDetailsMap.initialiseMap()
 
@@ -438,10 +430,10 @@ describe('SiteDetailsMap', () => {
       mockDataLoader.loadSiteDetails.mockReturnValue(null)
       siteDetailsMap = new SiteDetailsMap(mockRoot)
 
-      const showErrorSpy = jest
+      const showErrorSpy = vi
         .spyOn(siteDetailsMap, 'showError')
         .mockImplementation()
-      const hasValidSpy = jest
+      const hasValidSpy = vi
         .spyOn(siteDetailsMap, 'hasValidSiteDetails')
         .mockImplementation()
 

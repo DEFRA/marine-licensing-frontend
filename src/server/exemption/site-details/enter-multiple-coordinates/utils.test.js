@@ -1,3 +1,4 @@
+import { vi } from 'vitest'
 import { COORDINATE_SYSTEMS } from '~/src/server/common/constants/exemptions.js'
 import { routes } from '~/src/server/common/constants/routes.js'
 import { getExemptionCache } from '~/src/server/common/helpers/session-cache/utils.js'
@@ -20,10 +21,10 @@ import {
   removeCoordinateAtIndex
 } from './utils.js'
 
-jest.mock('~/src/server/common/helpers/session-cache/utils.js')
-jest.mock('~/src/server/common/helpers/site-details.js')
-jest.mock('~/src/server/common/schemas/osgb36.js')
-jest.mock('~/src/server/common/schemas/wgs84.js')
+vi.mock('~/src/server/common/helpers/session-cache/utils.js')
+vi.mock('~/src/server/common/helpers/site-details.js')
+vi.mock('~/src/server/common/schemas/osgb36.js')
+vi.mock('~/src/server/common/schemas/wgs84.js')
 
 const EMPTY_WGS84_COORDINATE = { latitude: '', longitude: '' }
 const EMPTY_OSGB36_COORDINATE = { eastings: '', northings: '' }
@@ -520,12 +521,15 @@ describe('enter-multiple-coordinates utils', () => {
         'coordinates[0][longitude]': '-0.1278'
       }
     }
+    const mockTakeover = vi.fn()
     const mockH = {
-      view: jest.fn().mockReturnValue({ takeover: jest.fn() })
+      view: vi.fn().mockReturnValue({ takeover: mockTakeover })
     }
     const mockExemption = { projectName: 'Test Project' }
 
     beforeEach(() => {
+      vi.clearAllMocks()
+      mockH.view.mockReturnValue({ takeover: mockTakeover })
       getExemptionCache.mockReturnValue(mockExemption)
       generatePointSpecificErrorMessage.mockImplementation(
         (message, index) => `Point ${index + 1}: ${message}`

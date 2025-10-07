@@ -1,3 +1,4 @@
+import { vi } from 'vitest'
 import Wreck from '@hapi/wreck'
 import { config } from '~/src/config/config.js'
 import {
@@ -10,19 +11,17 @@ import {
 } from './authenticated-requests.js'
 import { getUserSession } from '~/src/server/common/plugins/auth/utils.js'
 
-jest.mock('~/src/server/common/plugins/auth/utils.js')
-jest.mock('@hapi/wreck')
-jest.mock('~/src/config/config.js')
+vi.mock('~/src/server/common/plugins/auth/utils.js')
+vi.mock('@hapi/wreck')
+vi.mock('~/src/config/config.js')
 
 describe('#authenticated-requests', () => {
   let mockRequest
   let mockHeaders
 
-  const getUserSessionMock = jest.mocked(getUserSession)
+  const getUserSessionMock = vi.mocked(getUserSession)
 
   beforeEach(() => {
-    jest.clearAllMocks()
-
     mockRequest = {
       state: {
         userSession: {
@@ -35,7 +34,7 @@ describe('#authenticated-requests', () => {
         }
       },
       logger: {
-        error: jest.fn()
+        error: vi.fn()
       }
     }
 

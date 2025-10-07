@@ -1,8 +1,9 @@
+import { vi } from 'vitest'
 import { confirmationController } from './controller.js'
 import { getExemptionCache } from '~/src/server/common/helpers/session-cache/utils.js'
 
 // Mock dependencies
-jest.mock('~/src/server/common/helpers/session-cache/utils.js')
+vi.mock('~/src/server/common/helpers/session-cache/utils.js')
 
 describe('Confirmation Controller', () => {
   const mockRequest = {
@@ -12,7 +13,7 @@ describe('Confirmation Controller', () => {
   }
 
   const mockH = {
-    view: jest.fn()
+    view: vi.fn()
   }
 
   const mockExemption = {
@@ -21,7 +22,6 @@ describe('Confirmation Controller', () => {
   }
 
   beforeEach(() => {
-    jest.clearAllMocks()
     getExemptionCache.mockReturnValue(mockExemption)
   })
 

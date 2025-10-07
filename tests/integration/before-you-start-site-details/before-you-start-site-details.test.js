@@ -2,15 +2,12 @@ import { getByRole, getByText } from '@testing-library/dom'
 import { JSDOM } from 'jsdom'
 import { routes } from '~/src/server/common/constants/routes.js'
 import { statusCodes } from '~/src/server/common/constants/status-codes.js'
-import { getExemptionCache } from '~/src/server/common/helpers/session-cache/utils.js'
 
-import { setupTestServer } from '../shared/test-setup-helpers.js'
+import { mockExemption, setupTestServer } from '../shared/test-setup-helpers.js'
 import { makeGetRequest } from '~/src/server/test-helpers/server-requests.js'
 
-jest.mock('~/src/server/common/helpers/session-cache/utils.js')
-
 describe('Before you start site details page', () => {
-  const mockExemption = {
+  const mockExemptionData = {
     id: 'test-exemption-123',
     projectName: 'Test Project'
   }
@@ -18,7 +15,7 @@ describe('Before you start site details page', () => {
   const getServer = setupTestServer()
 
   beforeEach(() => {
-    jest.mocked(getExemptionCache).mockReturnValue(mockExemption)
+    mockExemption(mockExemptionData)
   })
 
   test('should display the before you start page with correct content', async () => {
@@ -34,7 +31,9 @@ describe('Before you start site details page', () => {
     expect(
       getByRole(document, 'heading', { name: 'Site details' })
     ).toBeInTheDocument()
-    expect(getByText(document, mockExemption.projectName)).toBeInTheDocument()
+    expect(
+      getByText(document, mockExemptionData.projectName)
+    ).toBeInTheDocument()
 
     expect(
       getByRole(document, 'heading', { name: 'Before you start' })

@@ -1,15 +1,15 @@
 import { getPageViewCommonData } from './page-view-common-data.js'
 import { getUserSession } from '~/src/server/common/plugins/auth/utils.js'
 
-jest.mock('~/src/server/common/plugins/auth/utils.js', () => ({
-  getUserSession: jest.fn()
+vi.mock('~/src/server/common/plugins/auth/utils.js', () => ({
+  getUserSession: vi.fn()
 }))
 
 describe('getPageViewCommonData', () => {
-  const mockGetUserSession = jest.mocked(getUserSession)
+  const mockGetUserSession = vi.mocked(getUserSession)
 
   beforeEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   test('should return empty object when no user session exists', async () => {

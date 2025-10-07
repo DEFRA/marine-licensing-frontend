@@ -1,3 +1,4 @@
+import { vi } from 'vitest'
 import { setupTestServer } from '~/tests/integration/shared/test-setup-helpers.js'
 import { statusCodes } from '~/src/server/common/constants/status-codes.js'
 import { routes } from '~/src/server/common/constants/routes.js'
@@ -16,7 +17,7 @@ import {
 } from '~/src/server/test-helpers/server-requests.js'
 import * as cacheUtils from '~/src/server/common/helpers/session-cache/utils.js'
 
-jest.mock('~/src/server/common/helpers/session-cache/utils.js')
+vi.mock('~/src/server/common/helpers/session-cache/utils.js')
 
 describe('#chooseFileType', () => {
   const getServer = setupTestServer()
@@ -28,7 +29,7 @@ describe('#chooseFileType', () => {
   }
 
   beforeEach(() => {
-    getExemptionCacheSpy = jest
+    getExemptionCacheSpy = vi
       .spyOn(cacheUtils, 'getExemptionCache')
       .mockReturnValue(mockExemptionState)
   })
@@ -78,7 +79,7 @@ describe('#chooseFileType', () => {
     })
 
     test('chooseFileTypeController handler should render view with correct page title, heading, and pre-populated data from cache', () => {
-      const h = { view: jest.fn() }
+      const h = { view: vi.fn() }
 
       chooseFileTypeController.handler({}, h)
 
@@ -172,8 +173,8 @@ describe('#chooseFileType', () => {
       }
 
       const h = {
-        view: jest.fn().mockReturnValue({
-          takeover: jest.fn()
+        view: vi.fn().mockReturnValue({
+          takeover: vi.fn()
         })
       }
 
@@ -224,8 +225,8 @@ describe('#chooseFileType', () => {
       }
 
       const h = {
-        view: jest.fn().mockReturnValue({
-          takeover: jest.fn()
+        view: vi.fn().mockReturnValue({
+          takeover: vi.fn()
         })
       }
 
@@ -251,7 +252,7 @@ describe('#chooseFileType', () => {
     })
 
     test('Should successfully update exemption cache and return 302 status code', async () => {
-      const updateExemptionSiteDetailsSpy = jest.spyOn(
+      const updateExemptionSiteDetailsSpy = vi.spyOn(
         cacheUtils,
         'updateExemptionSiteDetails'
       )

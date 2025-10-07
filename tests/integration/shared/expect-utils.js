@@ -1,4 +1,4 @@
-/* eslint-env jest */
+import { vi } from 'vitest'
 
 import {
   getByLabelText,
@@ -11,8 +11,8 @@ import {
   getInputInFieldset
 } from '~/tests/integration/shared/dom-helpers.js'
 
-jest.mock('~/src/server/common/helpers/session-cache/utils.js')
-jest.mock('~/src/server/common/helpers/authenticated-requests.js')
+vi.mock('~/src/server/common/helpers/session-cache/utils.js')
+vi.mock('~/src/server/common/helpers/authenticated-requests.js')
 
 export const expectDateInputValues = ({
   document,

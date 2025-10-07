@@ -1,3 +1,4 @@
+import { vi } from 'vitest'
 import { JSDOM } from 'jsdom'
 import { COORDINATE_SYSTEMS } from '~/src/server/common/constants/exemptions.js'
 import { routes } from '~/src/server/common/constants/routes.js'
@@ -5,13 +6,15 @@ import { statusCodes } from '~/src/server/common/constants/status-codes.js'
 import * as authRequests from '~/src/server/common/helpers/authenticated-requests.js'
 import * as cacheUtils from '~/src/server/common/helpers/session-cache/utils.js'
 import * as coordinateUtils from '~/src/server/common/helpers/coordinate-utils.js'
-import { mockExemption } from '~/src/server/test-helpers/mocks.js'
-import { setupTestServer } from '~/tests/integration/shared/test-setup-helpers.js'
+import { mockExemption as mockExemptionData } from '~/src/server/test-helpers/mocks.js'
+import {
+  mockExemption,
+  setupTestServer
+} from '~/tests/integration/shared/test-setup-helpers.js'
 import { makeGetRequest } from '~/src/server/test-helpers/server-requests.js'
 
-jest.mock('~/src/server/common/helpers/session-cache/utils.js')
-jest.mock('~/src/server/common/helpers/coordinate-utils.js')
-jest.mock('~/src/server/common/helpers/authenticated-requests.js')
+vi.mock('~/src/server/common/helpers/coordinate-utils.js')
+vi.mock('~/src/server/common/helpers/authenticated-requests.js')
 
 const OSGB36_EASTINGS_NORTHINGS = { eastings: '123456', northings: '654321' }
 const WGS84_LATITUDE_LONGITUDE = {
@@ -54,37 +57,33 @@ describe('Site Details Interactive Map Behaviour', () => {
   const getServer = setupTestServer()
 
   beforeEach(() => {
-    jest
-      .spyOn(cacheUtils, 'setExemptionCache')
-      .mockImplementation(() => undefined)
-    jest
-      .spyOn(cacheUtils, 'resetExemptionSiteDetails')
-      .mockReturnValue({ siteDetails: null })
-    jest.spyOn(authRequests, 'authenticatedPatchRequest').mockResolvedValue({
-      payload: { id: mockExemption.id, siteDetails: mockExemption.siteDetails }
+    vi.spyOn(cacheUtils, 'resetExemptionSiteDetails').mockReturnValue({
+      siteDetails: null
     })
   })
 
   const createExemptionWithSiteDetails = (siteDetailsOverride = {}) => ({
-    ...mockExemption,
+    ...mockExemptionData,
     siteDetails: [
       {
-        ...mockExemption.siteDetails[0],
+        ...mockExemptionData.siteDetails[0],
         ...siteDetailsOverride
       }
     ]
   })
 
-  const renderPageAndExtractMapElements = async (exemption = mockExemption) => {
-    jest.spyOn(cacheUtils, 'getExemptionCache').mockReturnValue(exemption)
+  const renderPageAndExtractMapElements = async (
+    exemption = mockExemptionData
+  ) => {
+    mockExemption(exemption)
 
     if (exemption.siteDetails?.[0]?.coordinateSystem) {
-      jest.spyOn(coordinateUtils, 'getCoordinateSystem').mockReturnValue({
+      vi.spyOn(coordinateUtils, 'getCoordinateSystem').mockReturnValue({
         coordinateSystem: exemption.siteDetails[0].coordinateSystem
       })
     }
 
-    jest.spyOn(authRequests, 'authenticatedGetRequest').mockResolvedValue({
+    vi.spyOn(authRequests, 'authenticatedGetRequest').mockResolvedValue({
       payload: { value: exemption }
     })
 
@@ -185,8 +184,6 @@ describe('Site Details Interactive Map Behaviour', () => {
 
   describe('When map initialises with uploaded file coordinates', () => {
     test('prepares GeoJSON polygon data for shapefile visualisation', async () => {
-      expect.hasAssertions()
-
       const exemptionWithShapefileUpload = createExemptionWithSiteDetails({
         coordinatesType: 'file',
         fileUploadType: 'shapefile',
@@ -238,8 +235,6 @@ describe('Site Details Interactive Map Behaviour', () => {
     ])(
       'prepares GeoJSON point data for %s',
       async (testName, fileUploadType, filename, coordinates) => {
-        expect.hasAssertions()
-
         const geoJSONPointFeature = createPointGeoJSON(coordinates)
 
         const exemption = createExemptionWithSiteDetails({
@@ -281,8 +276,6 @@ describe('Site Details Interactive Map Behaviour', () => {
     })
 
     test('embeds invalid coordinate data for map error handling', async () => {
-      expect.hasAssertions()
-
       const exemptionWithInvalidCoordinates = createExemptionWithSiteDetails({
         coordinateSystem: COORDINATE_SYSTEMS.WGS84,
         coordinates: {

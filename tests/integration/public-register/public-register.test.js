@@ -94,6 +94,7 @@ describe('Project name', () => {
   })
 
   test('should show a validation error when submitted without a decision', async () => {
+    mockExemption(exemption)
     const submitProjectNameForm = async (formData) => {
       const { document } = await submitForm({
         requestUrl: routes.PUBLIC_REGISTER,

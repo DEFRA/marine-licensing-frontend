@@ -1,26 +1,38 @@
-/* eslint-env jest */
+import { vi } from 'vitest'
 import { JSDOM } from 'jsdom'
 import { createServer } from '~/src/server/index.js'
 import {
   getExemptionCache,
-  setExemptionCache
+  setExemptionCache,
+  clearExemptionCache,
+  updateExemptionSiteDetails,
+  updateExemptionMultipleSiteDetails,
+  resetExemptionSiteDetails
 } from '~/src/server/common/helpers/session-cache/utils.js'
 import {
   authenticatedPatchRequest,
   authenticatedGetRequest
 } from '~/src/server/common/helpers/authenticated-requests.js'
 
-jest.mock('~/src/server/common/helpers/session-cache/utils.js')
-jest.mock('~/src/server/common/helpers/authenticated-requests.js')
-jest.mock('~/src/server/common/plugins/auth/get-oidc-config.js', () => ({
-  ...jest.requireActual('~/src/server/common/plugins/auth/get-oidc-config'),
-  getOidcConfig: jest.fn().mockResolvedValue({
-    issuer: 'http://localhost:3200/cdp-defra-id-stub',
-    authorization_endpoint: 'http://localhost:3200/cdp-defra-id-stub/authorize',
-    token_endpoint: 'http://localhost:3200/cdp-defra-id-stub/token',
-    jwks_uri: 'http://localhost:3200/cdp-defra-id-stub/.well-known/jwks.json'
-  })
-}))
+vi.mock('~/src/server/common/helpers/session-cache/utils.js')
+vi.mock('~/src/server/common/helpers/authenticated-requests.js')
+vi.mock(
+  '~/src/server/common/plugins/auth/get-oidc-config.js',
+  async (importOriginal) => {
+    const mod = await importOriginal()
+    return {
+      ...mod,
+      getOidcConfig: vi.fn().mockResolvedValue({
+        issuer: 'http://localhost:3200/cdp-defra-id-stub',
+        authorization_endpoint:
+          'http://localhost:3200/cdp-defra-id-stub/authorize',
+        token_endpoint: 'http://localhost:3200/cdp-defra-id-stub/token',
+        jwks_uri:
+          'http://localhost:3200/cdp-defra-id-stub/.well-known/jwks.json'
+      })
+    }
+  }
+)
 
 export const responseToDocument = (response) => {
   return new JSDOM(response.result).window.document
@@ -46,13 +58,28 @@ export const setupTestServer = () => {
 }
 
 export const mockExemption = (mockExemption) => {
-  jest.mocked(getExemptionCache).mockReturnValue(mockExemption)
-  jest.mocked(setExemptionCache).mockImplementation(() => undefined)
-  jest
-    .mocked(authenticatedPatchRequest)
-    .mockResolvedValue({ payload: { id: mockExemption.id } })
-
-  jest.mocked(authenticatedGetRequest).mockResolvedValue({
+  vi.mocked(getExemptionCache).mockImplementation(() => {
+    if (mockExemption?.constructor === Error) {
+      throw mockExemption
+    }
+    return mockExemption
+  })
+  vi.mocked(setExemptionCache).mockImplementation(() => undefined)
+  vi.mocked(authenticatedPatchRequest).mockResolvedValue({
+    payload: { id: mockExemption?.id, siteDetails: mockExemption?.siteDetails }
+  })
+  vi.mocked(authenticatedGetRequest).mockResolvedValue({
     payload: { message: 'success', value: mockExemption }
   })
+  vi.mocked(updateExemptionMultipleSiteDetails).mockReturnValue({})
+  vi.mocked(resetExemptionSiteDetails).mockReturnValue(undefined)
+  return {
+    setExemptionCache,
+    clearExemptionCache,
+    updateExemptionSiteDetails,
+    resetExemptionSiteDetails,
+    updateExemptionMultipleSiteDetails,
+    authenticatedGetRequest,
+    authenticatedPatchRequest
+  }
 }

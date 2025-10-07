@@ -1,3 +1,4 @@
+import { vi } from 'vitest'
 import { setupTestServer } from '~/tests/integration/shared/test-setup-helpers.js'
 import {
   coordinatesTypeController,
@@ -12,21 +13,21 @@ import { config } from '~/src/config/config.js'
 import { JSDOM } from 'jsdom'
 import { routes } from '~/src/server/common/constants/routes.js'
 
-jest.mock('~/src/server/common/helpers/session-cache/utils.js')
+vi.mock('~/src/server/common/helpers/session-cache/utils.js')
 
 describe('#coordinatesType', () => {
   const getServer = setupTestServer()
   let getExemptionCacheSpy
 
   beforeEach(() => {
-    getExemptionCacheSpy = jest
+    getExemptionCacheSpy = vi
       .spyOn(cacheUtils, 'getExemptionCache')
       .mockReturnValue(mockExemption)
   })
 
   describe('#coordinatesTypeController', () => {
     test('coordinatesTypeController handler should render with correct context', () => {
-      const h = { view: jest.fn() }
+      const h = { view: vi.fn() }
 
       coordinatesTypeController.handler({ site: mockSite }, h)
 
@@ -47,7 +48,7 @@ describe('#coordinatesType', () => {
         projectName: mockExemption.projectName
       })
 
-      const h = { view: jest.fn() }
+      const h = { view: vi.fn() }
 
       coordinatesTypeController.handler({ site: mockSite }, h)
 
@@ -122,8 +123,8 @@ describe('#coordinatesType', () => {
       }
 
       const h = {
-        view: jest.fn().mockReturnValue({
-          takeover: jest.fn()
+        view: vi.fn().mockReturnValue({
+          takeover: vi.fn()
         })
       }
 
@@ -177,8 +178,8 @@ describe('#coordinatesType', () => {
       }
 
       const h = {
-        view: jest.fn().mockReturnValue({
-          takeover: jest.fn()
+        view: vi.fn().mockReturnValue({
+          takeover: vi.fn()
         })
       }
 
@@ -239,9 +240,9 @@ describe('#coordinatesType', () => {
 
     test('Should correctly redirect when file option is selected', async () => {
       const h = {
-        view: jest.fn(),
-        redirect: jest.fn().mockReturnValue({
-          takeover: jest.fn()
+        view: vi.fn(),
+        redirect: vi.fn().mockReturnValue({
+          takeover: vi.fn()
         })
       }
 
@@ -259,9 +260,9 @@ describe('#coordinatesType', () => {
 
     test('Should correctly redirect to coordinates entry page when coordinates option is selected', async () => {
       const h = {
-        view: jest.fn(),
-        redirect: jest.fn().mockReturnValue({
-          takeover: jest.fn()
+        view: vi.fn(),
+        redirect: vi.fn().mockReturnValue({
+          takeover: vi.fn()
         })
       }
 
@@ -281,10 +282,10 @@ describe('#coordinatesType', () => {
 
     test('Should correctly set the cache when submitting', async () => {
       const h = {
-        redirect: jest.fn().mockReturnValue({
-          takeover: jest.fn()
+        redirect: vi.fn().mockReturnValue({
+          takeover: vi.fn()
         }),
-        view: jest.fn()
+        view: vi.fn()
       }
 
       const mockRequest = {

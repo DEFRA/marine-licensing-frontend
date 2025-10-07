@@ -1,9 +1,10 @@
+import { vi } from 'vitest'
 import { health } from '~/src/server/health/index.js'
 
 describe('health route', () => {
   test('route is registered correctly', () => {
     const server = {
-      route: jest.fn()
+      route: vi.fn()
     }
 
     health.plugin.register(server)

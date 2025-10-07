@@ -1,3 +1,4 @@
+import { vi } from 'vitest'
 import { getExemptionService, ExemptionService } from './index.js'
 
 describe('exemption-service index', () => {
@@ -5,8 +6,8 @@ describe('exemption-service index', () => {
     test('should create and return new ExemptionService instance', () => {
       const mockRequest = {
         logger: {
-          error: jest.fn(),
-          info: jest.fn()
+          error: vi.fn(),
+          info: vi.fn()
         }
       }
 

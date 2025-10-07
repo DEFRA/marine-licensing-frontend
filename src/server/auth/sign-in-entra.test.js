@@ -1,3 +1,4 @@
+import { vi } from 'vitest'
 import { loginEntraController } from '~/src/server/auth/sign-in-entra.js'
 
 describe('#login with Entra ID', () => {
@@ -5,9 +6,9 @@ describe('#login with Entra ID', () => {
     const redirectUrl = '/view-details/abc'
     const mockRequest = {
       auth: { isAuthenticated: false },
-      yar: { flash: jest.fn().mockReturnValue(redirectUrl) }
+      yar: { flash: vi.fn().mockReturnValue(redirectUrl) }
     }
-    const mockH = { redirect: jest.fn() }
+    const mockH = { redirect: vi.fn() }
     await loginEntraController.handler(mockRequest, mockH)
 
     expect(mockH.redirect).toHaveBeenCalledWith(redirectUrl)
@@ -16,9 +17,9 @@ describe('#login with Entra ID', () => {
   test('should redirect to a fallback path if no stored URL', async () => {
     const mockRequest = {
       auth: { isAuthenticated: false },
-      yar: { flash: jest.fn().mockReturnValue(null) }
+      yar: { flash: vi.fn().mockReturnValue(null) }
     }
-    const mockH = { redirect: jest.fn() }
+    const mockH = { redirect: vi.fn() }
     await loginEntraController.handler(mockRequest, mockH)
 
     expect(mockH.redirect).toHaveBeenCalledWith('/')

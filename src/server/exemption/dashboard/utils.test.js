@@ -1,21 +1,17 @@
-import { formatDate } from '~/src/config/nunjucks/filters/format-date.js'
+import { vi } from 'vitest'
 import { formatProjectsForDisplay, getActionButtons } from './utils.js'
 import { routes } from '~/src/server/common/constants/routes.js'
 
-jest.mock('~/src/config/nunjucks/filters/format-date.js')
-
-describe('#formatProjectsForDisplay', () => {
-  jest.mocked(formatDate).mockImplementation((date) => {
-    if (!date) return null
+vi.mock('~/src/config/nunjucks/filters/format-date.js', () => ({
+  formatDate: vi.fn((date) => {
+    if (!date) return ''
     if (date === '2024-01-15') return '15 Jan 2024'
     if (date === '2024-06-25') return '25 Jun 2024'
     return '01 Jan 2024'
   })
+}))
 
-  beforeEach(() => {
-    jest.clearAllMocks()
-  })
-
+describe('#formatProjectsForDisplay', () => {
   test('Should format a complete project with all fields', () => {
     const projects = [
       {

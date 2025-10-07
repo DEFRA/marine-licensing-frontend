@@ -1,3 +1,4 @@
+import { vi } from 'vitest'
 import { COORDINATE_SYSTEMS } from '~/src/server/common/constants/exemptions.js'
 import { statusCodes } from '~/src/server/common/constants/status-codes.js'
 import * as authRequests from '~/src/server/common/helpers/authenticated-requests.js'
@@ -22,8 +23,8 @@ import {
   getCoordinateSystemText
 } from '~/src/server/exemption/site-details/review-site-details/utils.js'
 
-jest.mock('~/src/server/common/helpers/session-cache/utils.js')
-jest.mock('~/src/server/common/helpers/coordinate-utils.js')
+vi.mock('~/src/server/common/helpers/session-cache/utils.js')
+vi.mock('~/src/server/common/helpers/coordinate-utils.js')
 
 /**
  * Creates a mock Hapi response toolkit
@@ -32,9 +33,9 @@ jest.mock('~/src/server/common/helpers/coordinate-utils.js')
  */
 function createMockHandler(type = 'view') {
   if (type === 'redirect') {
-    return { redirect: jest.fn() }
+    return { redirect: vi.fn() }
   }
-  return { view: jest.fn() }
+  return { view: vi.fn() }
 }
 
 /**
@@ -194,34 +195,34 @@ describe('#reviewSiteDetails', () => {
   const createMockRequest = () => ({
     payload: {},
     logger: {
-      info: jest.fn(),
-      error: jest.fn(),
-      warn: jest.fn(),
-      debug: jest.fn()
+      info: vi.fn(),
+      error: vi.fn(),
+      warn: vi.fn(),
+      debug: vi.fn()
     }
   })
 
   beforeEach(() => {
-    jest.spyOn(authRequests, 'authenticatedPatchRequest').mockResolvedValue({
+    vi.spyOn(authRequests, 'authenticatedPatchRequest').mockResolvedValue({
       payload: {
         id: mockExemption.id,
         siteDetails: mockExemption.siteDetails
       }
     })
 
-    jest.spyOn(authRequests, 'authenticatedGetRequest').mockResolvedValue({
+    vi.spyOn(authRequests, 'authenticatedGetRequest').mockResolvedValue({
       payload: {
         value: mockExemption
       }
     })
 
-    getExemptionCacheSpy = jest
+    getExemptionCacheSpy = vi
       .spyOn(cacheUtils, 'getExemptionCache')
       .mockReturnValue(mockExemption)
-    getCoordinateSystemSpy = jest
+    getCoordinateSystemSpy = vi
       .spyOn(coordinateUtils, 'getCoordinateSystem')
       .mockReturnValue({ coordinateSystem: COORDINATE_SYSTEMS.WGS84 })
-    resetExemptionSiteDetailsSpy = jest
+    resetExemptionSiteDetailsSpy = vi
       .spyOn(cacheUtils, 'resetExemptionSiteDetails')
       .mockReturnValue({ siteDetails: null })
   })
@@ -267,13 +268,13 @@ describe('#reviewSiteDetails', () => {
         )
 
         getExemptionCacheSpy.mockReturnValueOnce(exemptionWithoutSiteDetails)
-        jest
-          .spyOn(authRequests, 'authenticatedGetRequest')
-          .mockResolvedValueOnce({
+        vi.spyOn(authRequests, 'authenticatedGetRequest').mockResolvedValueOnce(
+          {
             payload: {
               value: completeMongoData
             }
-          })
+          }
+        )
 
         const h = createMockHandler()
         const mockRequest = createMockRequest()
@@ -442,12 +443,12 @@ describe('#reviewSiteDetails', () => {
       test('should reset exemption after saving to MongoDB', async () => {
         const request = {
           logger: {
-            info: jest.fn(),
-            error: jest.fn(),
-            debug: jest.fn()
+            info: vi.fn(),
+            error: vi.fn(),
+            debug: vi.fn()
           }
         }
-        const h = { redirect: jest.fn() }
+        const h = { redirect: vi.fn() }
 
         await reviewSiteDetailsSubmitController.handler(request, h)
 
@@ -468,12 +469,12 @@ describe('#reviewSiteDetails', () => {
       test('should redirect to task list on successful POST', async () => {
         const request = {
           logger: {
-            info: jest.fn(),
-            error: jest.fn(),
-            debug: jest.fn()
+            info: vi.fn(),
+            error: vi.fn(),
+            debug: vi.fn()
           }
         }
-        const h = { redirect: jest.fn() }
+        const h = { redirect: vi.fn() }
 
         await reviewSiteDetailsSubmitController.handler(request, h)
 
@@ -489,7 +490,7 @@ describe('#reviewSiteDetails', () => {
         const originalGetExemptionCache = cacheUtils.getExemptionCache
         let capturedSiteDetails
 
-        jest.spyOn(cacheUtils, 'getExemptionCache').mockImplementation(() => {
+        vi.spyOn(cacheUtils, 'getExemptionCache').mockImplementation(() => {
           const exemption = exemptionWithUndefinedSiteDetails
           // This simulates the line: const siteDetails = exemption.siteDetails ?? {}
           capturedSiteDetails = exemption.siteDetails ?? {}
@@ -498,11 +499,11 @@ describe('#reviewSiteDetails', () => {
 
         const request = {
           logger: {
-            info: jest.fn(),
-            error: jest.fn()
+            info: vi.fn(),
+            error: vi.fn()
           }
         }
-        const h = { redirect: jest.fn() }
+        const h = { redirect: vi.fn() }
 
         try {
           await reviewSiteDetailsSubmitController.handler(request, h)
@@ -519,10 +520,7 @@ describe('#reviewSiteDetails', () => {
       })
 
       test('should show error page for validation errors', async () => {
-        const apiPatchMock = jest.spyOn(
-          authRequests,
-          'authenticatedPatchRequest'
-        )
+        const apiPatchMock = vi.spyOn(authRequests, 'authenticatedPatchRequest')
         apiPatchMock.mockRejectedValueOnce({
           res: { statusCode: 400 },
           data: {
@@ -560,10 +558,7 @@ describe('#reviewSiteDetails', () => {
       })
 
       test('should pass error to global handler when no validation data', async () => {
-        const apiPatchMock = jest.spyOn(
-          authRequests,
-          'authenticatedPatchRequest'
-        )
+        const apiPatchMock = vi.spyOn(authRequests, 'authenticatedPatchRequest')
         apiPatchMock.mockRejectedValueOnce({
           res: { statusCode: 500 },
           data: {}
@@ -614,12 +609,12 @@ describe('#reviewSiteDetails', () => {
 
           const request = {
             logger: {
-              info: jest.fn(),
-              error: jest.fn(),
-              debug: jest.fn()
+              info: vi.fn(),
+              error: vi.fn(),
+              debug: vi.fn()
             }
           }
-          const h = { redirect: jest.fn() }
+          const h = { redirect: vi.fn() }
 
           await reviewSiteDetailsSubmitController.handler(request, h)
 
@@ -643,12 +638,12 @@ describe('#reviewSiteDetails', () => {
 
           const request = {
             logger: {
-              info: jest.fn(),
-              error: jest.fn(),
-              debug: jest.fn()
+              info: vi.fn(),
+              error: vi.fn(),
+              debug: vi.fn()
             }
           }
-          const h = { redirect: jest.fn() }
+          const h = { redirect: vi.fn() }
 
           await reviewSiteDetailsSubmitController.handler(request, h)
 
@@ -696,7 +691,7 @@ describe('#reviewSiteDetails', () => {
         test('should handle polygon coordinate validation errors', async () => {
           getExemptionCacheSpy.mockReturnValueOnce(mockPolygonExemptionWGS84)
 
-          const apiPatchMock = jest.spyOn(
+          const apiPatchMock = vi.spyOn(
             authRequests,
             'authenticatedPatchRequest'
           )

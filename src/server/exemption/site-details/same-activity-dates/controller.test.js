@@ -1,3 +1,4 @@
+import { vi } from 'vitest'
 import {
   sameActivityDatesController,
   sameActivityDatesSubmitController,
@@ -11,7 +12,7 @@ import {
 } from '~/src/server/test-helpers/mocks.js'
 import { routes } from '~/src/server/common/constants/routes.js'
 
-jest.mock('~/src/server/common/helpers/session-cache/utils.js')
+vi.mock('~/src/server/common/helpers/session-cache/utils.js')
 
 describe('#sameActivityDates', () => {
   let getExemptionCacheSpy
@@ -19,19 +20,19 @@ describe('#sameActivityDates', () => {
   const sitePreHandlerHook = sameActivityDatesSubmitController.options.pre[0]
 
   const mockH = {
-    view: jest.fn(),
-    redirect: jest.fn()
+    view: vi.fn(),
+    redirect: vi.fn()
   }
 
   beforeEach(() => {
-    getExemptionCacheSpy = jest
+    getExemptionCacheSpy = vi
       .spyOn(cacheUtils, 'getExemptionCache')
       .mockReturnValue(mockExemption)
   })
 
   describe('#sameActivityDatesController', () => {
     test('sameActivityDatesController handler should render with correct context', () => {
-      const h = { view: jest.fn() }
+      const h = { view: vi.fn() }
 
       sameActivityDatesController.handler({ site: mockSite }, h)
 
@@ -52,7 +53,7 @@ describe('#sameActivityDates', () => {
         projectName: mockExemption.projectName
       })
 
-      const h = { view: jest.fn() }
+      const h = { view: vi.fn() }
 
       const request = { site: mockSite }
 
@@ -132,8 +133,8 @@ describe('#sameActivityDates', () => {
       }
 
       const h = {
-        view: jest.fn().mockReturnValue({
-          takeover: jest.fn()
+        view: vi.fn().mockReturnValue({
+          takeover: vi.fn()
         })
       }
 
@@ -185,8 +186,8 @@ describe('#sameActivityDates', () => {
       }
 
       const h = {
-        view: jest.fn().mockReturnValue({
-          takeover: jest.fn()
+        view: vi.fn().mockReturnValue({
+          takeover: vi.fn()
         })
       }
 
@@ -216,8 +217,8 @@ describe('#sameActivityDates', () => {
       getExemptionCacheSpy.mockReturnValue(mockFileUploadExemption)
 
       const h = {
-        view: jest.fn().mockReturnValue({
-          takeover: jest.fn()
+        view: vi.fn().mockReturnValue({
+          takeover: vi.fn()
         })
       }
 
@@ -275,7 +276,7 @@ describe('#sameActivityDates', () => {
 
     test('Should correctly navigate to next page when POST is successful', async () => {
       const h = {
-        redirect: jest.fn()
+        redirect: vi.fn()
       }
 
       const mockRequest = {

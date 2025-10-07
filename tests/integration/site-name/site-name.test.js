@@ -1,34 +1,32 @@
+import { vi } from 'vitest'
 import { JSDOM } from 'jsdom'
 import { getByLabelText, getByRole, getByText } from '@testing-library/dom'
 import { statusCodes } from '~/src/server/common/constants/status-codes.js'
-import {
-  getExemptionCache,
-  updateExemptionSiteDetails,
-  setExemptionCache
-} from '~/src/server/common/helpers/session-cache/utils.js'
+import { setExemptionCache } from '~/src/server/common/helpers/session-cache/utils.js'
 import { validateErrors } from '../shared/expect-utils.js'
 
-import { setupTestServer } from '~/tests/integration/shared/test-setup-helpers.js'
+import {
+  mockExemption,
+  setupTestServer
+} from '~/tests/integration/shared/test-setup-helpers.js'
 
 import {
   makeGetRequest,
   makePostRequest
 } from '~/src/server/test-helpers/server-requests.js'
 
-jest.mock('~/src/server/common/helpers/session-cache/utils.js')
+vi.mock('~/src/server/common/helpers/session-cache/utils.js')
 
 describe('Site name page', () => {
   const getServer = setupTestServer()
 
-  const mockExemption = {
+  const mockExemptionData = {
     id: 'test-exemption-123',
     projectName: 'Test Project',
     siteDetails: [{}]
   }
 
-  jest.mocked(getExemptionCache).mockReturnValue(mockExemption)
-  jest.mocked(updateExemptionSiteDetails).mockReturnValue({})
-  jest.mocked(setExemptionCache).mockReturnValue({})
+  beforeEach(() => mockExemption(mockExemptionData))
 
   test('should display the site name page with correct content', async () => {
     const { result, statusCode } = await makeGetRequest({
@@ -46,7 +44,9 @@ describe('Site name page', () => {
         name: 'Site name'
       })
     ).toBeInTheDocument()
-    expect(getByText(document, mockExemption.projectName)).toBeInTheDocument()
+    expect(
+      getByText(document, mockExemptionData.projectName)
+    ).toBeInTheDocument()
     expect(getByText(document, 'Site 1')).toBeInTheDocument()
 
     const siteNameInput = getByLabelText(document, 'Site name', {
@@ -64,9 +64,11 @@ describe('Site name page', () => {
   })
 
   test('should pre-populate input when siteName value exists in cache', async () => {
-    jest.mocked(getExemptionCache).mockReturnValue({
-      ...mockExemption,
-      siteDetails: [{ ...mockExemption.siteDetails[0], siteName: 'Test Site' }]
+    const { setExemptionCache } = mockExemption({
+      ...mockExemptionData,
+      siteDetails: [
+        { ...mockExemptionData.siteDetails[0], siteName: 'Test Site' }
+      ]
     })
 
     const { result, statusCode } = await makeGetRequest({
@@ -169,6 +171,7 @@ describe('Site name page', () => {
   })
 
   test('should redirect to same activity dates when valid site name is submitted', async () => {
+    const { updateExemptionSiteDetails } = mockExemption(mockExemptionData)
     const response = await makePostRequest({
       url: '/exemption/site-name',
       server: getServer(),
@@ -203,9 +206,9 @@ describe('Site name page', () => {
   })
 
   test('should show correct content for multiple site flow', async () => {
-    jest.mocked(getExemptionCache).mockReturnValueOnce({
-      mockExemption,
-      siteDetails: [...mockExemption.siteDetails, {}]
+    mockExemption({
+      mockExemption: mockExemptionData,
+      siteDetails: [...mockExemptionData.siteDetails, {}]
     })
 
     const { result, statusCode } = await makeGetRequest({

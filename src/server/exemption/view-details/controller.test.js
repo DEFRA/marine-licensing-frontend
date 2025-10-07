@@ -1,3 +1,4 @@
+import { vi } from 'vitest'
 import Boom from '@hapi/boom'
 import { setupTestServer } from '~/tests/integration/shared/test-setup-helpers.js'
 import * as exemptionSiteDetailsHelpers from '~/src/server/common/helpers/exemption-site-details.js'
@@ -12,9 +13,9 @@ import {
 import { makeGetRequest } from '~/src/server/test-helpers/server-requests.js'
 import { getAuthProvider } from '~/src/server/common/helpers/authenticated-requests.js'
 
-jest.mock('~/src/services/exemption-service/index.js')
-jest.mock('~/src/server/common/helpers/authenticated-requests.js', () => ({
-  getAuthProvider: jest.fn().mockReturnValue('defra-id')
+vi.mock('~/src/services/exemption-service/index.js')
+vi.mock('~/src/server/common/helpers/authenticated-requests.js', () => ({
+  getAuthProvider: vi.fn().mockReturnValue('defra-id')
 }))
 
 describe('view details controller', () => {
@@ -23,10 +24,10 @@ describe('view details controller', () => {
 
   beforeEach(() => {
     mockExemptionService = {
-      getExemptionById: jest.fn().mockResolvedValue(createSubmittedExemption())
+      getExemptionById: vi.fn().mockResolvedValue(createSubmittedExemption())
     }
 
-    jest.mocked(getExemptionService).mockReturnValue(mockExemptionService)
+    vi.mocked(getExemptionService).mockReturnValue(mockExemptionService)
   })
 
   describe('GET /exemption/view-details/{exemptionId}', () => {
@@ -95,7 +96,7 @@ describe('view details controller', () => {
           filename: 'test.kml'
         }
 
-        const processSiteDetailsSpy = jest
+        const processSiteDetailsSpy = vi
           .spyOn(exemptionSiteDetailsHelpers, 'processSiteDetails')
           .mockReturnValue(mockProcessedSiteDetails)
 
@@ -226,18 +227,18 @@ describe('view details controller', () => {
       test('should call view with correct data structure', async () => {
         const submittedExemption = createSubmittedExemption()
         const mockExemptionServiceInstance = {
-          getExemptionById: jest.fn().mockResolvedValue(submittedExemption)
+          getExemptionById: vi.fn().mockResolvedValue(submittedExemption)
         }
 
-        jest
-          .mocked(getExemptionService)
-          .mockReturnValue(mockExemptionServiceInstance)
+        vi.mocked(getExemptionService).mockReturnValue(
+          mockExemptionServiceInstance
+        )
 
         const mockRequest = {
           params: { exemptionId: validExemptionId },
-          logger: { error: jest.fn() }
+          logger: { error: vi.fn() }
         }
-        const mockH = { view: jest.fn() }
+        const mockH = { view: vi.fn() }
 
         await viewDetailsController.handler(mockRequest, mockH)
 
@@ -260,20 +261,20 @@ describe('view details controller', () => {
       test('should omit the back link if user is authenticated with entra ID', async () => {
         const submittedExemption = createSubmittedExemption()
         const mockExemptionServiceInstance = {
-          getExemptionById: jest.fn().mockResolvedValue(submittedExemption)
+          getExemptionById: vi.fn().mockResolvedValue(submittedExemption)
         }
 
-        jest
-          .mocked(getExemptionService)
-          .mockReturnValue(mockExemptionServiceInstance)
-        jest.mocked(getAuthProvider).mockReturnValue('entra-id')
+        vi.mocked(getExemptionService).mockReturnValue(
+          mockExemptionServiceInstance
+        )
+        vi.mocked(getAuthProvider).mockReturnValue('entra-id')
 
         const mockRequest = {
           params: { exemptionId: validExemptionId },
-          logger: { error: jest.fn() },
+          logger: { error: vi.fn() },
           auth: { credentials: { strategy: 'entra-id' } }
         }
-        const mockH = { view: jest.fn() }
+        const mockH = { view: vi.fn() }
 
         await viewDetailsController.handler(mockRequest, mockH)
 
@@ -292,12 +293,12 @@ describe('view details controller', () => {
           }
         )
         const mockExemptionServiceInstance = {
-          getExemptionById: jest.fn().mockResolvedValue(fileUploadExemption)
+          getExemptionById: vi.fn().mockResolvedValue(fileUploadExemption)
         }
 
-        jest
-          .mocked(getExemptionService)
-          .mockReturnValue(mockExemptionServiceInstance)
+        vi.mocked(getExemptionService).mockReturnValue(
+          mockExemptionServiceInstance
+        )
 
         const mockProcessedSiteDetails = {
           isFileUpload: true,
@@ -306,15 +307,15 @@ describe('view details controller', () => {
           filename: 'Unknown file'
         }
 
-        const processSiteDetailsSpy = jest
+        const processSiteDetailsSpy = vi
           .spyOn(exemptionSiteDetailsHelpers, 'processSiteDetails')
           .mockReturnValue(mockProcessedSiteDetails)
 
         const mockRequest = {
           params: { exemptionId: validExemptionId },
-          logger: { error: jest.fn() }
+          logger: { error: vi.fn() }
         }
-        const mockH = { view: jest.fn() }
+        const mockH = { view: vi.fn() }
 
         await viewDetailsController.handler(mockRequest, mockH)
 
@@ -348,12 +349,12 @@ describe('view details controller', () => {
           }
         )
         const mockExemptionServiceInstance = {
-          getExemptionById: jest.fn().mockResolvedValue(kmlFileUploadExemption)
+          getExemptionById: vi.fn().mockResolvedValue(kmlFileUploadExemption)
         }
 
-        jest
-          .mocked(getExemptionService)
-          .mockReturnValue(mockExemptionServiceInstance)
+        vi.mocked(getExemptionService).mockReturnValue(
+          mockExemptionServiceInstance
+        )
 
         const mockProcessedSiteDetails = {
           isFileUpload: true,
@@ -362,15 +363,15 @@ describe('view details controller', () => {
           filename: 'Unknown file'
         }
 
-        const processSiteDetailsSpy = jest
+        const processSiteDetailsSpy = vi
           .spyOn(exemptionSiteDetailsHelpers, 'processSiteDetails')
           .mockReturnValue(mockProcessedSiteDetails)
 
         const mockRequest = {
           params: { exemptionId: validExemptionId },
-          logger: { error: jest.fn() }
+          logger: { error: vi.fn() }
         }
-        const mockH = { view: jest.fn() }
+        const mockH = { view: vi.fn() }
 
         await viewDetailsController.handler(mockRequest, mockH)
 
@@ -398,15 +399,15 @@ describe('view details controller', () => {
       test('should handle non-Boom errors', async () => {
         const submittedExemption = createSubmittedExemption()
         const mockExemptionServiceInstance = {
-          getExemptionById: jest.fn().mockResolvedValue(submittedExemption)
+          getExemptionById: vi.fn().mockResolvedValue(submittedExemption)
         }
 
-        jest
-          .mocked(getExemptionService)
-          .mockReturnValue(mockExemptionServiceInstance)
+        vi.mocked(getExemptionService).mockReturnValue(
+          mockExemptionServiceInstance
+        )
 
         const mockError = new Error('Site details processing failed')
-        const mockH = { view: jest.fn() }
+        const mockH = { view: vi.fn() }
 
         mockH.view.mockImplementation(() => {
           throw mockError
@@ -414,7 +415,7 @@ describe('view details controller', () => {
 
         const mockRequest = {
           params: { exemptionId: validExemptionId },
-          logger: { error: jest.fn() }
+          logger: { error: vi.fn() }
         }
 
         await expect(
@@ -429,20 +430,20 @@ describe('view details controller', () => {
 
       test('should handle missing exemption ID in params', async () => {
         const mockExemptionServiceInstance = {
-          getExemptionById: jest
+          getExemptionById: vi
             .fn()
             .mockRejectedValue(new Error('Exemption not found'))
         }
 
-        jest
-          .mocked(getExemptionService)
-          .mockReturnValue(mockExemptionServiceInstance)
+        vi.mocked(getExemptionService).mockReturnValue(
+          mockExemptionServiceInstance
+        )
 
         const mockRequest = {
           params: {},
-          logger: { error: jest.fn() }
+          logger: { error: vi.fn() }
         }
-        const mockH = { view: jest.fn() }
+        const mockH = { view: vi.fn() }
 
         await expect(
           viewDetailsController.handler(mockRequest, mockH)
@@ -451,20 +452,20 @@ describe('view details controller', () => {
 
       test('should log errors appropriately', async () => {
         const mockExemptionServiceInstance = {
-          getExemptionById: jest
+          getExemptionById: vi
             .fn()
             .mockRejectedValue(new Error('Exemption data not found'))
         }
 
-        jest
-          .mocked(getExemptionService)
-          .mockReturnValue(mockExemptionServiceInstance)
+        vi.mocked(getExemptionService).mockReturnValue(
+          mockExemptionServiceInstance
+        )
 
         const mockRequest = {
           params: { exemptionId: 'invalid-id' },
-          logger: { error: jest.fn() }
+          logger: { error: vi.fn() }
         }
-        const mockH = { view: jest.fn() }
+        const mockH = { view: vi.fn() }
 
         await expect(
           viewDetailsController.handler(mockRequest, mockH)

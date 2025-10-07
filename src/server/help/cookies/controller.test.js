@@ -1,3 +1,4 @@
+import { vi } from 'vitest'
 import joi from 'joi'
 import { cookiesController, cookiesSubmitController } from './controller.js'
 import * as cookiePreferences from '~/src/server/common/helpers/cookie-preferences.js'
@@ -5,25 +6,25 @@ import * as referrerValidation from '~/src/server/common/helpers/referrer-valida
 import * as cookieService from '~/src/server/common/helpers/cookie-service.js'
 import { config } from '~/src/config/config.js'
 
-jest.mock('~/src/server/common/helpers/cookie-preferences.js')
-jest.mock('~/src/server/common/helpers/referrer-validation.js')
-jest.mock('~/src/server/common/helpers/cookie-service.js')
-jest.mock('~/src/config/config.js')
+vi.mock('~/src/server/common/helpers/cookie-preferences.js')
+vi.mock('~/src/server/common/helpers/referrer-validation.js')
+vi.mock('~/src/server/common/helpers/cookie-service.js')
+vi.mock('~/src/config/config.js')
 
 const createMockRequest = (overrides = {}) => ({
   headers: {},
   auth: { isAuthenticated: false },
   query: {},
   payload: {},
-  logger: { error: jest.fn() },
+  logger: { error: vi.fn() },
   state: {},
-  yar: { get: jest.fn(), set: jest.fn(), clear: jest.fn() },
+  yar: { get: vi.fn(), set: vi.fn(), clear: vi.fn() },
   ...overrides
 })
 
 const createMockH = () => ({
-  view: jest.fn(),
-  redirect: jest.fn().mockReturnValue({ state: jest.fn().mockReturnThis() })
+  view: vi.fn(),
+  redirect: vi.fn().mockReturnValue({ state: vi.fn().mockReturnThis() })
 })
 
 const DEFAULT_PREFERENCES = {
@@ -78,7 +79,6 @@ describe('Cookies Controller', () => {
   beforeEach(() => {
     mockRequest = createMockRequest()
     mockH = createMockH()
-    jest.clearAllMocks()
   })
 
   describe('cookiesController (GET)', () => {
@@ -236,11 +236,11 @@ describe('Cookies Controller', () => {
     beforeEach(() => {
       setupMocks() // Ensure all referrer validation functions are mocked
       mockResponse = {
-        state: jest.fn().mockReturnThis()
+        state: vi.fn().mockReturnThis()
       }
       mockH.redirect.mockReturnValue(mockResponse)
 
-      jest.spyOn(Date, 'now').mockReturnValue(1234567890000)
+      vi.spyOn(Date, 'now').mockReturnValue(1234567890000)
     })
 
     afterEach(() => {
@@ -493,7 +493,7 @@ describe('Cookies Controller', () => {
 
       it('should pass excluded paths to getBackUrl in failAction', () => {
         mockRequest.payload = { analytics: '' }
-        const mockTakeoverResponse = { takeover: jest.fn().mockReturnThis() }
+        const mockTakeoverResponse = { takeover: vi.fn().mockReturnThis() }
         mockH.view.mockReturnValue(mockTakeoverResponse)
 
         cookiesSubmitController.options.validate.failAction(
@@ -511,7 +511,7 @@ describe('Cookies Controller', () => {
 
       it('should handle validation errors with error details', () => {
         mockRequest.payload = { analytics: '' }
-        const mockTakeoverResponse = { takeover: jest.fn().mockReturnThis() }
+        const mockTakeoverResponse = { takeover: vi.fn().mockReturnThis() }
         mockH.view.mockReturnValue(mockTakeoverResponse)
 
         const result = cookiesSubmitController.options.validate.failAction(
@@ -546,7 +546,7 @@ describe('Cookies Controller', () => {
       it('should handle validation errors without error details', () => {
         mockRequest.payload = { analytics: 'invalid' }
         mockErr.details = undefined
-        const mockTakeoverResponse = { takeover: jest.fn().mockReturnThis() }
+        const mockTakeoverResponse = { takeover: vi.fn().mockReturnThis() }
         mockH.view.mockReturnValue(mockTakeoverResponse)
 
         const result = cookiesSubmitController.options.validate.failAction(
@@ -569,7 +569,7 @@ describe('Cookies Controller', () => {
       it('should use authenticated status in error response', () => {
         mockRequest.auth.isAuthenticated = true
         mockRequest.payload = { analytics: '' }
-        const mockTakeoverResponse = { takeover: jest.fn().mockReturnThis() }
+        const mockTakeoverResponse = { takeover: vi.fn().mockReturnThis() }
         mockH.view.mockReturnValue(mockTakeoverResponse)
 
         cookiesSubmitController.options.validate.failAction(
@@ -589,13 +589,23 @@ describe('Cookies Controller', () => {
   })
 
   describe('cookie options configuration', () => {
+    let mockResponse
+
+    beforeEach(() => {
+      setupMocks()
+      mockResponse = {
+        state: vi.fn().mockReturnThis()
+      }
+      mockH.redirect.mockReturnValue(mockResponse)
+    })
+
     it('should set correct TTL (1 year in milliseconds)', () => {
       mockRequest.payload = { analytics: 'yes' }
       const expectedTtl = 365 * 24 * 60 * 60 * 1000
 
       cookiesSubmitController.handler(mockRequest, mockH)
 
-      expect(mockH.redirect().state).toHaveBeenCalledWith(
+      expect(mockResponse.state).toHaveBeenCalledWith(
         expect.any(String),
         expect.any(Object),
         expect.objectContaining({
@@ -609,7 +619,7 @@ describe('Cookies Controller', () => {
 
       cookiesSubmitController.handler(mockRequest, mockH)
 
-      expect(mockH.redirect().state).toHaveBeenCalledWith(
+      expect(mockResponse.state).toHaveBeenCalledWith(
         expect.any(String),
         expect.any(Object),
         expect.objectContaining({
@@ -623,7 +633,7 @@ describe('Cookies Controller', () => {
 
       cookiesSubmitController.handler(mockRequest, mockH)
 
-      expect(mockH.redirect().state).toHaveBeenCalledWith(
+      expect(mockResponse.state).toHaveBeenCalledWith(
         expect.any(String),
         expect.any(Object),
         expect.objectContaining({
@@ -634,13 +644,23 @@ describe('Cookies Controller', () => {
   })
 
   describe('timestamp generation', () => {
+    let mockResponse
+
+    beforeEach(() => {
+      setupMocks()
+      mockResponse = {
+        state: vi.fn().mockReturnThis()
+      }
+      mockH.redirect.mockReturnValue(mockResponse)
+    })
+
     it('should generate timestamp in seconds (Unix timestamp)', () => {
       mockRequest.payload = { analytics: 'yes' }
-      jest.spyOn(Date, 'now').mockReturnValue(1234567890123)
+      vi.spyOn(Date, 'now').mockReturnValue(1234567890123)
 
       cookiesSubmitController.handler(mockRequest, mockH)
 
-      expect(mockH.redirect().state).toHaveBeenCalledWith(
+      expect(mockResponse.state).toHaveBeenCalledWith(
         'cookies_policy',
         expect.objectContaining({
           timestamp: 1234567890

@@ -1,3 +1,4 @@
+import { vi } from 'vitest'
 import { cookies } from './cookies.js'
 import { getCookiePreferences } from '~/src/server/common/helpers/cookie-preferences.js'
 import {
@@ -7,19 +8,19 @@ import {
 } from '~/src/server/common/constants/cookies.js'
 import { config } from '~/src/config/config.js'
 
-jest.mock('~/src/server/common/helpers/cookie-preferences.js')
-jest.mock('~/src/config/config.js')
+vi.mock('~/src/server/common/helpers/cookie-preferences.js')
+vi.mock('~/src/config/config.js')
 
 const createMockServer = () => ({
-  state: jest.fn(),
-  ext: jest.fn(),
+  state: vi.fn(),
+  ext: vi.fn(),
   plugins: {}
 })
 
 const createMockRequest = (overrides = {}) => ({
   state: {},
   yar: {
-    flash: jest.fn()
+    flash: vi.fn()
   },
   path: '/',
   url: { search: '' },
@@ -49,7 +50,7 @@ describe('Cookies Plugin', () => {
     mockRequest = createMockRequest()
     mockH = createMockH()
     mockResponse = createMockResponse()
-    jest.clearAllMocks()
+
     config.get.mockReturnValue(false) // Default to development environment
   })
 

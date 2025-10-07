@@ -4,8 +4,13 @@ export const transformMcmsContextForDisplay = (mcmsContext) => {
   if (!mcmsContext) {
     return null
   }
+  const { value, label, purpose } = activityTypes[mcmsContext.activityType]
+  const purposeLabel = purpose?.find(
+    (p) => p.article === mcmsContext.article
+  )?.label
+
   return {
     ...mcmsContext,
-    activityType: activityTypes[mcmsContext.activityType]
+    activityType: { value, label, purpose: purposeLabel }
   }
 }

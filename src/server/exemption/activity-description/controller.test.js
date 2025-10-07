@@ -128,6 +128,41 @@ describe('#activityDescriptionController', () => {
         siteNumber: null
       })
     })
+
+    test('should set back link to correct page for single site file upload', () => {
+      const h = { view: jest.fn() }
+      const request = {
+        url: { pathname: routes.SITE_DETAILS_ACTIVITY_DESCRIPTION },
+        site: { siteIndex: 0, siteDetails: { coordinatesType: 'file' } }
+      }
+
+      const exemptionWithFileUpload = {
+        projectName: 'Test Project',
+        siteDetails: [
+          {
+            coordinatesType: 'file',
+            fileUploadType: 'kml',
+            activityDescription: 'Test file upload activity'
+          }
+        ],
+        multipleSiteDetails: {
+          multipleSitesEnabled: false
+        }
+      }
+
+      getExemptionCacheSpy.mockReturnValue(exemptionWithFileUpload)
+
+      activityDescriptionController.handler(request, h)
+
+      expect(h.view).toHaveBeenCalledWith(
+        ACTIVITY_DESCRIPTION_VIEW_ROUTE,
+        expect.objectContaining({
+          backLink: routes.SITE_DETAILS_ACTIVITY_DATES,
+          isSiteDetailsFlow: true,
+          isMultiSiteJourney: false
+        })
+      )
+    })
   })
 
   describe('activityDescriptionController POST', () => {

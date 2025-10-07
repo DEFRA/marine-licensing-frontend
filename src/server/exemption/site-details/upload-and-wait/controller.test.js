@@ -407,7 +407,7 @@ describe('#uploadAndWait', () => {
 
     describe('when file upload is ready', () => {
       describe('with valid KML file', () => {
-        test('should process file and redirect to review page', async () => {
+        test('should process file and redirect to activity dates for single site', async () => {
           // Given exemption with upload config and ready status
           getExemptionCacheSpy.mockReturnValue(createMockExemption())
           const statusResponse = createMockStatusResponse('ready')
@@ -450,8 +450,9 @@ describe('#uploadAndWait', () => {
             mockRequest
           )
 
-          // And user is redirected to review page
-          expect(h.redirect).toHaveBeenCalledWith(routes.REVIEW_SITE_DETAILS)
+          expect(h.redirect).toHaveBeenCalledWith(
+            routes.SITE_DETAILS_ACTIVITY_DATES
+          )
         })
 
         test('should process file and redirect to same activity dates page for multiple sites', async () => {
@@ -509,7 +510,7 @@ describe('#uploadAndWait', () => {
       })
 
       describe('with valid Shapefile', () => {
-        test('should process shapefile and redirect to review page', async () => {
+        test('should process shapefile and redirect to activity dates for single site', async () => {
           // Given exemption with shapefile upload config
           const shapefileUploadConfig = createMockUploadConfig({
             fileType: 'shapefile'
@@ -562,8 +563,9 @@ describe('#uploadAndWait', () => {
             mockRequest
           )
 
-          // And user is redirected to review page
-          expect(h.redirect).toHaveBeenCalledWith(routes.REVIEW_SITE_DETAILS)
+          expect(h.redirect).toHaveBeenCalledWith(
+            routes.SITE_DETAILS_ACTIVITY_DATES
+          )
         })
       })
     })

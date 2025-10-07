@@ -267,7 +267,7 @@ describe('Review Site Details - File Upload Integration Tests', () => {
       : expect(siteNameRow).toBeFalsy()
 
     const shouldIncludeActivityDates =
-      expected.multipleSiteDetails.multipleSiteDetails === 'Yes' &&
+      expected.multipleSiteDetails.multipleSiteDetails === 'No' ||
       expected.multipleSiteDetails.sameActivityDates === 'No'
 
     const activityDatesRow = getRowByKey(siteCard, 'Activity dates')
@@ -279,7 +279,7 @@ describe('Review Site Details - File Upload Integration Tests', () => {
       : expect(activityDatesRow).toBeFalsy()
 
     const shouldIncludeActivityDescription =
-      expected.multipleSiteDetails.multipleSiteDetails === 'Yes' &&
+      expected.multipleSiteDetails.multipleSiteDetails === 'No' ||
       expected.multipleSiteDetails.sameActivityDescription === 'No'
 
     const activityDescriptionRow = getRowByKey(siteCard, 'Activity description')

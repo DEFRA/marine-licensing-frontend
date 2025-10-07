@@ -163,14 +163,14 @@
             }) %}
           {% endif %}
 
-          {% if isMultiSiteJourney and site.showActivityDates %}
+          {% if site.showActivityDates %}
             {% set _ = rows.push({
               key: { text: "Activity dates"},
               value: { html: appIncompleteField({text: site.activityDates})}
             }) %}
           {% endif %}
 
-          {% if isMultiSiteJourney and site.showActivityDescription %}
+          {% if site.showActivityDescription %}
             {% set _ = rows.push({
               key: { text: "Activity description"},
               value: { html: appIncompleteField({ text: site.activityDescription })}

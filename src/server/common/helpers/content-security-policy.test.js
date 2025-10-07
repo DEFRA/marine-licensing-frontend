@@ -1,6 +1,14 @@
 import { vi } from 'vitest'
 import { contentSecurityPolicy } from './content-security-policy.js'
 
+vi.mock('~/src/config/config.js', () => ({
+  config: {
+    get: vi.fn((key) =>
+      key === 'cdpUploader.cdpUploadServiceBaseUrl' ? 'http://uploader' : '123'
+    ) // clarityProjectId
+  }
+}))
+
 describe('contentSecurityPolicy', () => {
   let server
   let mockResponse
@@ -74,7 +82,9 @@ describe('contentSecurityPolicy', () => {
 
       expect(mockResponse.header).toHaveBeenCalledWith(
         'Content-Security-Policy',
-        expect.stringContaining("connect-src 'self'")
+        expect.stringContaining(
+          "connect-src 'self' https://*.clarity.ms/collect"
+        )
       )
     })
 
@@ -92,7 +102,7 @@ describe('contentSecurityPolicy', () => {
 
       expect(mockResponse.header).toHaveBeenCalledWith(
         'Content-Security-Policy',
-        expect.stringContaining("form-action 'self' http://localhost:7337")
+        expect.stringContaining("form-action 'self' http://uploader")
       )
     })
 
@@ -158,7 +168,7 @@ describe('contentSecurityPolicy', () => {
       expect(mockResponse.header).toHaveBeenCalledWith(
         'Content-Security-Policy',
         expect.stringContaining(
-          "script-src 'self' 'sha256-GUQ5ad8JK5KmEWmROf3LZd9ge94daqNvd8xy9YS1iDw='"
+          "script-src 'self' 'sha256-GUQ5ad8JK5KmEWmROf3LZd9ge94daqNvd8xy9YS1iDw=' https://www.clarity.ms/tag/123 https://scripts.clarity.ms 'nonce-"
         )
       )
     })

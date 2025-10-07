@@ -6,6 +6,7 @@ export default defineConfig({
     setupFiles: ['.vite/setup-files.js', 'allure-vitest/setup'],
     include: ['**/src/**/*.test.js', '**/tests/**/*.test.js'],
     exclude: ['**/node_modules/**', '**/tests/integration/utils/**'],
+    silent: 'passed-only',
     coverage: {
       provider: 'v8',
       include: ['src/**/*.js'],

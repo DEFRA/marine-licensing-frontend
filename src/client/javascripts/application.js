@@ -23,12 +23,12 @@ createAll(FileUpload)
 
 function syncClarityConsent() {
   if (
-    window.clarity &&
-    typeof window.clarity === 'function' &&
-    typeof window.ANALYTICS_ENABLED === 'boolean'
+    globalThis.clarity &&
+    typeof globalThis.clarity === 'function' &&
+    typeof globalThis.ANALYTICS_ENABLED === 'boolean'
   ) {
     try {
-      window.clarity('consent', window.ANALYTICS_ENABLED)
+      globalThis.clarity('consent', globalThis.ANALYTICS_ENABLED)
     } catch {
       // Silently handle Clarity consent errors
     }
@@ -36,8 +36,8 @@ function syncClarityConsent() {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-  if (window.CLARITY_PROJECT_ID) {
-    Clarity.init(window.CLARITY_PROJECT_ID)
+  if (globalThis.CLARITY_PROJECT_ID) {
+    Clarity.init(globalThis.CLARITY_PROJECT_ID)
     syncClarityConsent()
   }
 

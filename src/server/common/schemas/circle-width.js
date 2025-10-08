@@ -8,7 +8,7 @@ export const circleWidthValidationSchema = joi.object({
     .custom((value, helpers) => {
       const width = Number(value)
 
-      if (isNaN(width)) {
+      if (Number.isNaN(width)) {
         return helpers.error(JOI_ERRORS.NUMBER_BASE)
       }
 

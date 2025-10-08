@@ -1,5 +1,5 @@
 import { config } from '~/src/config/config.js'
-import { randomBytes } from 'crypto'
+import { randomBytes } from 'node:crypto'
 
 /**
  * Manage content security policies.
@@ -40,7 +40,7 @@ const contentSecurityPolicy = {
       response.header?.('Content-Security-Policy', cspHeader + scriptSrc)
       if (response.variety === 'view') {
         response.source.context = {
-          ...(response.source.context || {}),
+          ...response.source.context,
           cspNonce
         }
       }

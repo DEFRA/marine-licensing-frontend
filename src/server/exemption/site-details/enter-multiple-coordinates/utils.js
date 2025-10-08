@@ -137,7 +137,7 @@ export const normaliseCoordinatesForDisplay = (
 
 export const extractCoordinateIndexFromFieldName = (fieldName) => {
   const indexMatch = fieldName.match(/coordinates(\d+)/)
-  return indexMatch ? parseInt(indexMatch[1], 10) : 0
+  return indexMatch ? Number.parseInt(indexMatch[1], 10) : 0
 }
 
 export const sanitiseFieldName = (fieldPath) =>

@@ -29,17 +29,19 @@ export const errorMessages = {
   SITE_NAME_MAX_LENGTH: 'Site name should be 250 characters or less'
 }
 
-const getBackLink = (siteIndex, action) => {
+const getBackLink = (siteIndex, action, siteNumber) => {
   if (action) {
-    return routes.REVIEW_SITE_DETAILS
+    return `${routes.REVIEW_SITE_DETAILS}#site-details-${siteNumber}`
   }
   return siteIndex === 0
     ? routes.MULTIPLE_SITES_CHOICE
     : routes.REVIEW_SITE_DETAILS
 }
 
-const getCancelLink = (action) => {
-  return action ? routes.REVIEW_SITE_DETAILS : routes.TASK_LIST
+const getCancelLink = (action, siteNumber) => {
+  return action
+    ? `${routes.REVIEW_SITE_DETAILS}#site-details-${siteNumber}`
+    : routes.TASK_LIST
 }
 
 const createValidationFailAction = (request, h, err) => {
@@ -54,8 +56,8 @@ const createValidationFailAction = (request, h, err) => {
     return h
       .view(SITE_NAME_VIEW_ROUTE, {
         ...siteNameSettings,
-        backLink: getBackLink(siteIndex, action),
-        cancelLink: getCancelLink(action),
+        backLink: getBackLink(siteIndex, action, siteNumber),
+        cancelLink: getCancelLink(action, siteNumber),
         payload,
         projectName: exemption.projectName,
         siteNumber,
@@ -70,8 +72,8 @@ const createValidationFailAction = (request, h, err) => {
   return h
     .view(SITE_NAME_VIEW_ROUTE, {
       ...siteNameSettings,
-      backLink: getBackLink(siteIndex, action),
-      cancelLink: getCancelLink(action),
+      backLink: getBackLink(siteIndex, action, siteNumber),
+      cancelLink: getCancelLink(action, siteNumber),
       payload,
       projectName: exemption.projectName,
       siteNumber,
@@ -95,8 +97,8 @@ export const siteNameController = {
 
     return h.view(SITE_NAME_VIEW_ROUTE, {
       ...siteNameSettings,
-      backLink: getBackLink(siteIndex, action),
-      cancelLink: getCancelLink(action),
+      backLink: getBackLink(siteIndex, action, siteNumber),
+      cancelLink: getCancelLink(action, siteNumber),
       projectName: exemption.projectName,
       siteNumber,
       action,
@@ -129,13 +131,13 @@ export const siteNameSubmitController = {
   handler(request, h) {
     const { payload, site } = request
 
-    const { queryParams, siteIndex } = site
+    const { queryParams, siteIndex, siteNumber } = site
     const action = request.query?.action
 
     updateExemptionSiteDetails(request, siteIndex, 'siteName', payload.siteName)
 
     const redirectRoute = action
-      ? routes.REVIEW_SITE_DETAILS
+      ? `${routes.REVIEW_SITE_DETAILS}#site-details-${siteNumber}`
       : routes.SAME_ACTIVITY_DATES + queryParams
 
     return h.redirect(redirectRoute)

@@ -241,10 +241,16 @@ describe('Site name page', () => {
     ).toBeInTheDocument()
 
     const backLink = getByRole(document, 'link', { name: 'Back' })
-    expect(backLink).toHaveAttribute('href', '/exemption/review-site-details')
+    expect(backLink).toHaveAttribute(
+      'href',
+      '/exemption/review-site-details#site-details-1'
+    )
 
     const cancelLink = getByRole(document, 'link', { name: 'Cancel' })
-    expect(cancelLink).toHaveAttribute('href', '/exemption/review-site-details')
+    expect(cancelLink).toHaveAttribute(
+      'href',
+      '/exemption/review-site-details#site-details-1'
+    )
   })
 
   test('should redirect to review site details after submit when action parameter is present', async () => {
@@ -259,7 +265,9 @@ describe('Site name page', () => {
     })
 
     expect(response.statusCode).toBe(statusCodes.redirect)
-    expect(response.headers.location).toBe('/exemption/review-site-details')
+    expect(response.headers.location).toBe(
+      '/exemption/review-site-details#site-details-1'
+    )
 
     expect(updateExemptionSiteDetails).toHaveBeenCalledWith(
       expect.any(Object),
@@ -284,7 +292,9 @@ describe('Site name page', () => {
     })
 
     expect(response.statusCode).toBe(statusCodes.redirect)
-    expect(response.headers.location).toBe('/exemption/review-site-details')
+    expect(response.headers.location).toBe(
+      '/exemption/review-site-details#site-details-2'
+    )
 
     expect(updateExemptionSiteDetails).toHaveBeenCalledWith(
       expect.any(Object),
@@ -321,9 +331,15 @@ describe('Site name page', () => {
     ).toBeInTheDocument()
 
     const backLink = getByRole(document, 'link', { name: 'Back' })
-    expect(backLink).toHaveAttribute('href', '/exemption/review-site-details')
+    expect(backLink).toHaveAttribute(
+      'href',
+      '/exemption/review-site-details#site-details-1'
+    )
 
     const cancelLink = getByRole(document, 'link', { name: 'Cancel' })
-    expect(cancelLink).toHaveAttribute('href', '/exemption/review-site-details')
+    expect(cancelLink).toHaveAttribute(
+      'href',
+      '/exemption/review-site-details#site-details-1'
+    )
   })
 })

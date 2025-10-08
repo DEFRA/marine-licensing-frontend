@@ -184,13 +184,16 @@
           }) %}
 
           {{ govukSummaryList({
-          card: {
-            title: {
-              text: summaryRowsHeading
-            }
-          },
-          rows: rows,
-        classes: "govuk-summary-list--full-width"
+            card: {
+              attributes: {
+                id: "site-details-" + site.siteNumber
+              },
+              title: {
+                text: summaryRowsHeading
+              }
+            },
+            rows: rows,
+          classes: "govuk-summary-list--full-width"
         }) }}
         {% endfor %}
 

@@ -77,8 +77,8 @@ describe('#siteName', () => {
       expect(h.view).toHaveBeenCalledWith(
         SITE_NAME_VIEW_ROUTE,
         expect.objectContaining({
-          backLink: routes.REVIEW_SITE_DETAILS,
-          cancelLink: routes.REVIEW_SITE_DETAILS
+          backLink: `${routes.REVIEW_SITE_DETAILS}#site-details-1`,
+          cancelLink: `${routes.REVIEW_SITE_DETAILS}#site-details-1`
         })
       )
     })
@@ -129,7 +129,9 @@ describe('#siteName', () => {
         'siteName',
         'New Site'
       )
-      expect(h.redirect).toHaveBeenCalledWith(routes.REVIEW_SITE_DETAILS)
+      expect(h.redirect).toHaveBeenCalledWith(
+        `${routes.REVIEW_SITE_DETAILS}#site-details-1`
+      )
     })
 
     test('should redirect to review site details when action=change', () => {
@@ -153,7 +155,9 @@ describe('#siteName', () => {
         'siteName',
         'Updated Site'
       )
-      expect(h.redirect).toHaveBeenCalledWith(routes.REVIEW_SITE_DETAILS)
+      expect(h.redirect).toHaveBeenCalledWith(
+        `${routes.REVIEW_SITE_DETAILS}#site-details-1`
+      )
     })
 
     test('should redirect to review site details with site parameter when both present', () => {
@@ -185,7 +189,9 @@ describe('#siteName', () => {
         'siteName',
         'Site 2 Name'
       )
-      expect(h.redirect).toHaveBeenCalledWith(routes.REVIEW_SITE_DETAILS)
+      expect(h.redirect).toHaveBeenCalledWith(
+        `${routes.REVIEW_SITE_DETAILS}#site-details-2`
+      )
     })
 
     test('should validate payload correctly', () => {
@@ -291,8 +297,8 @@ describe('#siteName', () => {
         SITE_NAME_VIEW_ROUTE,
         expect.objectContaining({
           action: 'add',
-          backLink: routes.REVIEW_SITE_DETAILS,
-          cancelLink: routes.REVIEW_SITE_DETAILS
+          backLink: `${routes.REVIEW_SITE_DETAILS}#site-details-1`,
+          cancelLink: `${routes.REVIEW_SITE_DETAILS}#site-details-1`
         })
       )
     })

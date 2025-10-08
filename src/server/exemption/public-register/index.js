@@ -1,17 +1,8 @@
 import {
   publicRegisterController,
   publicRegisterSubmitController
-} from '~/src/server/exemption/public-register/controller.js'
-import { routes } from '~/src/server/common/constants/routes.js'
-
-/**
- * Sets up the routes used in the public register page.
- * These routes are registered in src/server/router.js.
- */
-
-/**
- * @satisfies {ServerRegisterPluginObject<void>}
- */
+} from '#src/server/exemption/public-register/controller.js'
+import { routes } from '#src/server/common/constants/routes.js'
 export const publicRegisterRoutes = [
   {
     method: 'GET',
@@ -24,7 +15,3 @@ export const publicRegisterRoutes = [
     ...publicRegisterSubmitController
   }
 ]
-
-/**
- * @import { ServerRegisterPluginObject } from '@hapi/hapi'
- */

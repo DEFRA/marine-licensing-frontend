@@ -1,7 +1,7 @@
-import { setupTestServer } from '~/tests/integration/shared/test-setup-helpers.js'
-import { statusCodes } from '~/src/server/common/constants/status-codes.js'
+import { setupTestServer } from '#tests/integration/shared/test-setup-helpers.js'
+import { statusCodes } from '#src/server/common/constants/status-codes.js'
 
-import { makeGetRequest } from '~/src/server/test-helpers/server-requests.js'
+import { makeGetRequest } from '#src/server/test-helpers/server-requests.js'
 
 describe('#healthController', () => {
   const getServer = setupTestServer()
@@ -16,7 +16,3 @@ describe('#healthController', () => {
     expect(statusCode).toBe(statusCodes.ok)
   })
 })
-
-/**
- * @import { Server } from '@hapi/hapi'
- */

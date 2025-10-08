@@ -1,20 +1,20 @@
 import {
   errorDescriptionByFieldName,
   mapErrorsForDisplay
-} from '~/src/server/common/helpers/errors.js'
+} from '#src/server/common/helpers/errors.js'
 import {
   getExemptionCache,
   setExemptionCache
-} from '~/src/server/common/helpers/session-cache/utils.js'
+} from '#src/server/common/helpers/session-cache/utils.js'
 import {
   authenticatedPostRequest,
   authenticatedPatchRequest
-} from '~/src/server/common/helpers/authenticated-requests.js'
-import { routes } from '~/src/server/common/constants/routes.js'
+} from '#src/server/common/helpers/authenticated-requests.js'
+import { routes } from '#src/server/common/constants/routes.js'
 
 import joi from 'joi'
-import { getMcmsContextFromCache } from '~/src/server/common/helpers/mcms-context/cache-mcms-context.js'
-import { getUserSession } from '~/src/server/common/plugins/auth/utils.js'
+import { getMcmsContextFromCache } from '#src/server/common/helpers/mcms-context/cache-mcms-context.js'
+import { getUserSession } from '#src/server/common/plugins/auth/utils.js'
 
 const errorMessages = {
   PROJECT_NAME_REQUIRED: 'Enter the project name',
@@ -27,11 +27,6 @@ const projectNameViewSettings = {
   pageTitle: 'Project name',
   heading: 'Project Name'
 }
-
-/**
- * A GDS styled project name page controller.
- * @satisfies {Partial<ServerRoute>}
- */
 export const projectNameController = {
   handler(request, h) {
     const exemption = getExemptionCache(request)
@@ -45,11 +40,6 @@ export const projectNameController = {
     })
   }
 }
-
-/**
- * A GDS styled project name page controller.
- * @satisfies {Partial<ServerRoute>}
- */
 export const projectNameSubmitController = {
   options: {
     validate: {
@@ -134,7 +124,3 @@ export const projectNameSubmitController = {
     }
   }
 }
-
-/**
- * @import { ServerRoute } from '@hapi/hapi'
- */

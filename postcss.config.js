@@ -2,9 +2,6 @@ import autoprefixer from 'autoprefixer'
 import cssnano from 'cssnano'
 import cssnanoPresetDefault from 'cssnano-preset-default'
 
-/**
- * @type {Config}
- */
 export default {
   plugins: [
     // Add vendor prefixes
@@ -20,7 +17,3 @@ export default {
     })
   ]
 }
-
-/**
- * @import { Config } from 'postcss-load-config'
- */

@@ -1,10 +1,10 @@
 import { vi } from 'vitest'
-import { setSiteData } from '~/src/server/common/helpers/session-cache/site-utils.js'
+import { setSiteData } from '#src/server/common/helpers/session-cache/site-utils.js'
 import {
   createMockRequest,
   mockExemption as mockExemptionData
-} from '~/src/server/test-helpers/mocks.js'
-import * as utils from '~/src/server/common/helpers/session-cache/utils.js'
+} from '#src/server/test-helpers/mocks.js'
+import * as utils from '#src/server/common/helpers/session-cache/utils.js'
 
 describe('#siteUtils', () => {
   beforeEach(() => {

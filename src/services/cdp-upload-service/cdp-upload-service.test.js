@@ -1,7 +1,7 @@
 import { vi } from 'vitest'
 import Wreck from '@hapi/wreck'
 import { CdpUploadService, UPLOAD_STATUSES } from './cdp-upload-service.js'
-import { config } from '~/src/config/config.js'
+import { config } from '#src/config/config.js'
 
 // Mock dependencies
 const mockLoggerDebug = vi.fn()

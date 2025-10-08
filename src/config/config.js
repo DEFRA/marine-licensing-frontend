@@ -109,13 +109,13 @@ export const config = convict({
         : []
     }
   },
-  httpProxy: /** @type {SchemaObj<string | null>} */ ({
+  httpProxy: {
     doc: 'HTTP Proxy',
     format: String,
     nullable: true,
     default: null,
     env: 'HTTP_PROXY'
-  }),
+  },
   isSecureContextEnabled: {
     doc: 'Enable Secure Context',
     format: Boolean,
@@ -171,7 +171,7 @@ export const config = convict({
       }
     }
   },
-  redis: /** @type {Schema<RedisConfig>} */ ({
+  redis: {
     host: {
       doc: 'Redis cache host',
       format: String,
@@ -215,7 +215,7 @@ export const config = convict({
       default: isProduction,
       env: 'REDIS_TLS'
     }
-  }),
+  },
   nunjucks: {
     watch: {
       doc: 'Reload templates when they are changed.',
@@ -368,8 +368,3 @@ export const config = convict({
 })
 
 config.validate({ allowed: 'strict' })
-
-/**
- * @import { Schema, SchemaObj } from 'convict'
- * @import { RedisConfig } from '~/src/server/common/helpers/redis-client.js'
- */

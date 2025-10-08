@@ -1,15 +1,15 @@
 import {
   getExemptionCache,
   updateExemptionSiteDetails
-} from '~/src/server/common/helpers/session-cache/utils.js'
-import { getSiteDetailsBySite } from '~/src/server/common/helpers/session-cache/site-details-utils.js'
-import { setSiteDataPreHandler } from '~/src/server/common/helpers/session-cache/site-utils.js'
+} from '#src/server/common/helpers/session-cache/utils.js'
+import { getSiteDetailsBySite } from '#src/server/common/helpers/session-cache/site-details-utils.js'
+import { setSiteDataPreHandler } from '#src/server/common/helpers/session-cache/site-utils.js'
 import {
   errorDescriptionByFieldName,
   mapErrorsForDisplay
-} from '~/src/server/common/helpers/errors.js'
+} from '#src/server/common/helpers/errors.js'
 import joi from 'joi'
-import { routes } from '~/src/server/common/constants/routes.js'
+import { routes } from '#src/server/common/constants/routes.js'
 import { getBackRoute } from './utils.js'
 
 export const COORDINATES_ENTRY_VIEW_ROUTE =
@@ -24,11 +24,6 @@ const coordinatesEntrySettings = {
 export const errorMessages = {
   COORDINATES_ENTRY_REQUIRED: 'Select how you want to enter the coordinates'
 }
-
-/**
- * A GDS styled page controller for the coordinates entry page.
- * @satisfies {Partial<ServerRoute>}
- */
 export const coordinatesEntryController = {
   options: {
     pre: [setSiteDataPreHandler]
@@ -50,11 +45,6 @@ export const coordinatesEntryController = {
     })
   }
 }
-
-/**
- * A GDS styled page controller for the POST route in the coordinates entry page.
- * @satisfies {Partial<ServerRoute>}
- */
 export const coordinatesEntrySubmitController = {
   options: {
     pre: [setSiteDataPreHandler],

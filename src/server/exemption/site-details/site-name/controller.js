@@ -1,16 +1,16 @@
 import {
   getExemptionCache,
   updateExemptionSiteDetails
-} from '~/src/server/common/helpers/session-cache/utils.js'
+} from '#src/server/common/helpers/session-cache/utils.js'
 import {
   setSiteData,
   setSiteDataPreHandler
-} from '~/src/server/common/helpers/session-cache/site-utils.js'
-import { routes } from '~/src/server/common/constants/routes.js'
+} from '#src/server/common/helpers/session-cache/site-utils.js'
+import { routes } from '#src/server/common/constants/routes.js'
 import {
   errorDescriptionByFieldName,
   mapErrorsForDisplay
-} from '~/src/server/common/helpers/errors.js'
+} from '#src/server/common/helpers/errors.js'
 import joi from 'joi'
 
 const SITE_NAME_MAX_LENGTH = 250

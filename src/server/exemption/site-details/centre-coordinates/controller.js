@@ -1,21 +1,21 @@
 import {
   getExemptionCache,
   updateExemptionSiteDetails
-} from '~/src/server/common/helpers/session-cache/utils.js'
-import { getSiteDetailsBySite } from '~/src/server/common/helpers/session-cache/site-details-utils.js'
+} from '#src/server/common/helpers/session-cache/utils.js'
+import { getSiteDetailsBySite } from '#src/server/common/helpers/session-cache/site-details-utils.js'
 import {
   setSiteData,
   setSiteDataPreHandler
-} from '~/src/server/common/helpers/session-cache/site-utils.js'
-import { getCoordinateSystem } from '~/src/server/common/helpers/coordinate-utils.js'
+} from '#src/server/common/helpers/session-cache/site-utils.js'
+import { getCoordinateSystem } from '#src/server/common/helpers/coordinate-utils.js'
 import {
   errorDescriptionByFieldName,
   mapErrorsForDisplay
-} from '~/src/server/common/helpers/errors.js'
-import { routes } from '~/src/server/common/constants/routes.js'
-import { COORDINATE_SYSTEMS } from '~/src/server/common/constants/exemptions.js'
-import { getPayload } from '~/src/server/exemption/site-details/centre-coordinates/utils.js'
-import { validateCentreCoordinates } from '~/src/server/exemption/site-details/centre-coordinates/validate.js'
+} from '#src/server/common/helpers/errors.js'
+import { routes } from '#src/server/common/constants/routes.js'
+import { COORDINATE_SYSTEMS } from '#src/server/common/constants/exemptions.js'
+import { getPayload } from '#src/server/exemption/site-details/centre-coordinates/utils.js'
+import { validateCentreCoordinates } from '#src/server/exemption/site-details/centre-coordinates/validate.js'
 
 export const COORDINATE_SYSTEM_VIEW_ROUTES = {
   [COORDINATE_SYSTEMS.WGS84]: 'exemption/site-details/centre-coordinates/wgs84',
@@ -55,11 +55,6 @@ export const errorMessages = {
       'Northings must be a positive 6 or 7-digit number, like 123456'
   }
 }
-
-/**
- * A GDS styled page controller for the centre coordinates page.
- * @satisfies {Partial<ServerRoute>}
- */
 export const centreCoordinatesController = {
   options: {
     pre: [setSiteDataPreHandler]
@@ -121,11 +116,6 @@ export const centreCoordinatesSubmitFailHandler = (request, h, error) => {
     })
     .takeover()
 }
-
-/**
- * A GDS styled page controller for the POST route in the centre coordinates page.
- * @satisfies {Partial<ServerRoute>}
- */
 export const centreCoordinatesSubmitController = {
   options: {
     pre: [setSiteDataPreHandler]

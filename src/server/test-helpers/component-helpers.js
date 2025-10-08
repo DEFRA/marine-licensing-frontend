@@ -4,7 +4,7 @@ import nunjucks from 'nunjucks'
 import { load } from 'cheerio'
 import { JSDOM } from 'jsdom'
 import { camelCase } from 'lodash'
-import * as filters from '~/src/config/nunjucks/filters/filters.js'
+import * as filters from '#src/config/nunjucks/filters/filters.js'
 
 const dirname = path.dirname(fileURLToPath(import.meta.url))
 const nunjucksTestEnv = nunjucks.configure(
@@ -22,12 +22,6 @@ const nunjucksTestEnv = nunjucks.configure(
 Object.entries(filters).forEach(([name, filter]) => {
   nunjucksTestEnv.addFilter(name, filter)
 })
-
-/**
- * @param {string} componentName
- * @param {object} params
- * @param {string} [callBlock]
- */
 export function renderComponent(componentName, params, callBlock) {
   const macroPath = `${componentName}/macro.njk`
   const macroName = `app${
@@ -44,14 +38,6 @@ export function renderComponent(componentName, params, callBlock) {
 
   return load(nunjucksTestEnv.renderString(macroString, {}))
 }
-
-/**
- * JSDOM-based component renderer - eliminates Cheerio dependency
- * @param {string} componentName
- * @param {object} params
- * @param {string} [callBlock]
- * @returns {Document}
- */
 export function renderComponentJSDOM(componentName, params, callBlock) {
   const macroPath = `${componentName}/macro.njk`
   const macroName = `app${

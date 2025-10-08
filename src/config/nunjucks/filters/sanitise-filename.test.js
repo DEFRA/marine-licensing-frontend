@@ -1,4 +1,4 @@
-import { sanitiseFilename } from '~/src/config/nunjucks/filters/sanitise-filename.js'
+import { sanitiseFilename } from '#src/config/nunjucks/filters/sanitise-filename.js'
 
 describe('#sanitiseFilename', () => {
   describe('With normal filenames', () => {

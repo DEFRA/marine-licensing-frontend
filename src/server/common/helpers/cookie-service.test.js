@@ -9,8 +9,8 @@ import {
   COOKIE_OPTIONS,
   COOKIE_OPTIONS_BASE64,
   FLASH_MESSAGE_KEYS
-} from '~/src/server/common/constants/cookies.js'
-import { config } from '~/src/config/config.js'
+} from '#src/server/common/constants/cookies.js'
+import { config } from '#src/config/config.js'
 
 vi.mock('~/src/config/config.js')
 

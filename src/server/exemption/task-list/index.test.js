@@ -1,4 +1,4 @@
-import { taskListRoutes } from '~/src/server/exemption/task-list/index.js'
+import { taskListRoutes } from '#src/server/exemption/task-list/index.js'
 
 describe('taskList routes', () => {
   test('get route is formatted correctly', () => {

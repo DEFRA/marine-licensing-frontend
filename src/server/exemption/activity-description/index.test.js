@@ -1,6 +1,6 @@
 import { vi } from 'vitest'
-import { activityDescriptionRoutes } from '~/src/server/exemption/activity-description/index.js'
-import { routes } from '~/src/server/common/constants/routes.js'
+import { activityDescriptionRoutes } from '#src/server/exemption/activity-description/index.js'
+import { routes } from '#src/server/common/constants/routes.js'
 
 vi.mock('~/src/server/common/helpers/session-cache/utils.js')
 

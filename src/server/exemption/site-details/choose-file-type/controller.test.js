@@ -1,21 +1,21 @@
 import { vi } from 'vitest'
-import { setupTestServer } from '~/tests/integration/shared/test-setup-helpers.js'
-import { statusCodes } from '~/src/server/common/constants/status-codes.js'
-import { routes } from '~/src/server/common/constants/routes.js'
-import { config } from '~/src/config/config.js'
+import { setupTestServer } from '#tests/integration/shared/test-setup-helpers.js'
+import { statusCodes } from '#src/server/common/constants/status-codes.js'
+import { routes } from '#src/server/common/constants/routes.js'
+import { config } from '#src/config/config.js'
 import { JSDOM } from 'jsdom'
 import {
   chooseFileTypeController,
   chooseFileTypeSubmitController,
   CHOOSE_FILE_UPLOAD_TYPE_VIEW_ROUTE,
   errorMessages
-} from '~/src/server/exemption/site-details/choose-file-type/controller.js'
+} from '#src/server/exemption/site-details/choose-file-type/controller.js'
 
 import {
   makeGetRequest,
   makePostRequest
-} from '~/src/server/test-helpers/server-requests.js'
-import * as cacheUtils from '~/src/server/common/helpers/session-cache/utils.js'
+} from '#src/server/test-helpers/server-requests.js'
+import * as cacheUtils from '#src/server/common/helpers/session-cache/utils.js'
 
 vi.mock('~/src/server/common/helpers/session-cache/utils.js')
 

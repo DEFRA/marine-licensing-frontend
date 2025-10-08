@@ -1,6 +1,6 @@
-import { createWgs84MultipleCoordinatesSchema } from '~/src/server/common/schemas/wgs84.js'
-import { createOsgb36MultipleCoordinatesSchema } from '~/src/server/common/schemas/osgb36.js'
-import { isWGS84 } from '~/src/server/exemption/site-details/enter-multiple-coordinates/utils.js'
+import { createWgs84MultipleCoordinatesSchema } from '#src/server/common/schemas/wgs84.js'
+import { createOsgb36MultipleCoordinatesSchema } from '#src/server/common/schemas/osgb36.js'
+import { isWGS84 } from '#src/server/exemption/site-details/enter-multiple-coordinates/utils.js'
 
 export const getValidationSchema = (coordinateSystem) => {
   return isWGS84(coordinateSystem)

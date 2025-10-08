@@ -73,12 +73,6 @@ export class SiteDetailsMap extends Component {
       this.dataLoader.hasValidManualCoordinates(siteDetails)
     )
   }
-
-  /**
-   * Display site details based on coordinate type
-   * @param {object} siteDetails - Site details data
-   * @returns {string|null} - Type of display action taken: 'file', 'manual', 'error', or null if no visualiser
-   */
   displaySiteDetails(siteDetails) {
     if (!this.siteVisualiser) {
       return null

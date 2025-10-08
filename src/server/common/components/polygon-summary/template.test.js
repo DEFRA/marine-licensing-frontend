@@ -1,7 +1,6 @@
-import { renderComponent } from '~/src/server/test-helpers/component-helpers.js'
+import { renderComponent } from '#src/server/test-helpers/component-helpers.js'
 
 describe('Polygon Summary Component', () => {
-  /** @type {CheerioAPI} */
   let $component
 
   describe('With Change links (isReadOnly: false)', () => {

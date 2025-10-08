@@ -1,4 +1,4 @@
-import { routes as routePaths } from '~/src/server/common/constants/routes.js'
+import { routes as routePaths } from '#src/server/common/constants/routes.js'
 import { confirmationController } from './controller.js'
 
 const routes = [

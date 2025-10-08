@@ -1,21 +1,21 @@
 import { vi } from 'vitest'
 import { JSDOM } from 'jsdom'
-import { ACTIVITY_DATES_VIEW_ROUTE } from '~/src/server/common/constants/activity-dates.js'
-import { routes } from '~/src/server/common/constants/routes.js'
-import { statusCodes } from '~/src/server/common/constants/status-codes.js'
-import * as authRequests from '~/src/server/common/helpers/authenticated-requests.js'
-import { createDateISO } from '~/src/server/common/helpers/dates/date-utils.js'
-import * as cacheUtils from '~/src/server/common/helpers/session-cache/utils.js'
+import { ACTIVITY_DATES_VIEW_ROUTE } from '#src/server/common/constants/activity-dates.js'
+import { routes } from '#src/server/common/constants/routes.js'
+import { statusCodes } from '#src/server/common/constants/status-codes.js'
+import * as authRequests from '#src/server/common/helpers/authenticated-requests.js'
+import { createDateISO } from '#src/server/common/helpers/dates/date-utils.js'
+import * as cacheUtils from '#src/server/common/helpers/session-cache/utils.js'
 import {
   activityDatesController,
   activityDatesSubmitController
-} from '~/src/server/exemption/activity-dates/controller.js'
-import { setupTestServer } from '~/tests/integration/shared/test-setup-helpers.js'
-import { mockExemption, mockSite } from '~/src/server/test-helpers/mocks.js'
+} from '#src/server/exemption/activity-dates/controller.js'
+import { setupTestServer } from '#tests/integration/shared/test-setup-helpers.js'
+import { mockExemption, mockSite } from '#src/server/test-helpers/mocks.js'
 import {
   makeGetRequest,
   makePostRequest
-} from '~/src/server/test-helpers/server-requests.js'
+} from '#src/server/test-helpers/server-requests.js'
 
 vi.mock('~/src/server/common/helpers/session-cache/utils.js')
 

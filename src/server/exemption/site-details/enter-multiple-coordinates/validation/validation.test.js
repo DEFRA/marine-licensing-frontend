@@ -1,5 +1,5 @@
-import { validateCoordinates } from '~/src/server/exemption/site-details/enter-multiple-coordinates/validation/validation.js'
-import { COORDINATE_SYSTEMS } from '~/src/server/common/constants/exemptions.js'
+import { validateCoordinates } from '#src/server/exemption/site-details/enter-multiple-coordinates/validation/validation.js'
+import { COORDINATE_SYSTEMS } from '#src/server/common/constants/exemptions.js'
 import wgs84TestCases from './validation-error-cases-wgs84.json'
 import osgb36TestCases from './validation-error-cases-osgb36.json'
 import successTestCases from './validation-success-cases-wgs84.json'

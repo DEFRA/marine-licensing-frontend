@@ -4,19 +4,11 @@ import {
   getReviewSummaryText,
   getFileUploadSummaryData,
   getPolygonCoordinatesDisplayData
-} from '~/src/server/exemption/site-details/review-site-details/utils.js'
-import { getSiteDetailsBySite } from '~/src/server/common/helpers/session-cache/site-details-utils.js'
+} from '#src/server/exemption/site-details/review-site-details/utils.js'
+import { getSiteDetailsBySite } from '#src/server/common/helpers/session-cache/site-details-utils.js'
 export const errorMessages = {
   FILE_UPLOAD_DATA_ERROR: 'Error getting file upload summary data'
 }
-
-/**
- * Processes file upload site details with error handling
- * @param {object} exemption - Exemption data
- * @param {string} id - Exemption ID
- * @param {object} request - Hapi request object
- * @returns {object} Processed site details for file upload
- */
 export const processFileUploadSiteDetails = (exemption, id, request) => {
   try {
     const siteDetails = getSiteDetailsBySite(exemption)
@@ -49,12 +41,6 @@ export const processFileUploadSiteDetails = (exemption, id, request) => {
     }
   }
 }
-
-/**
- * Processes manual coordinate site details
- * @param {object} exemption - Exemption data
- * @returns {object} Processed site details for manual coordinates
- */
 export const processManualSiteDetails = (exemption) => {
   const siteDetails = getSiteDetailsBySite(exemption)
   const { coordinateSystem, coordinatesEntry } = siteDetails
@@ -93,14 +79,6 @@ export const processManualSiteDetails = (exemption) => {
     circleWidth: siteDetails.circleWidth
   }
 }
-
-/**
- * Processes site details based on coordinates type
- * @param {object} exemption - Exemption data
- * @param {string} id - Exemption ID
- * @param {object} request - Hapi request object
- * @returns {object|null} Processed site details or null
- */
 export const processSiteDetails = (exemption, id, request) => {
   if (!exemption.siteDetails?.length) {
     return null

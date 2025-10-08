@@ -2,17 +2,17 @@ import { vi } from 'vitest'
 import {
   setupTestServer,
   mockExemption
-} from '~/tests/integration/shared/test-setup-helpers.js'
-import { statusCodes } from '~/src/server/common/constants/status-codes.js'
-import { config } from '~/src/config/config.js'
+} from '#tests/integration/shared/test-setup-helpers.js'
+import { statusCodes } from '#src/server/common/constants/status-codes.js'
+import { config } from '#src/config/config.js'
 import { JSDOM } from 'jsdom'
 import {
   taskListController,
   TASK_LIST_VIEW_ROUTE
-} from '~/src/server/exemption/task-list/controller.js'
-import { mockExemption as mockExemptionData } from '~/src/server/test-helpers/mocks.js'
-import { makeGetRequest } from '~/src/server/test-helpers/server-requests.js'
-import { routes } from '~/src/server/common/constants/routes.js'
+} from '#src/server/exemption/task-list/controller.js'
+import { mockExemption as mockExemptionData } from '#src/server/test-helpers/mocks.js'
+import { makeGetRequest } from '#src/server/test-helpers/server-requests.js'
+import { routes } from '#src/server/common/constants/routes.js'
 
 describe('#taskListController', () => {
   const getServer = setupTestServer()
@@ -187,7 +187,3 @@ describe('#taskListController', () => {
     expect(headers.location).toBe('/exemption/task-list')
   })
 })
-
-/**
- * @import { Server } from '@hapi/hapi'
- */

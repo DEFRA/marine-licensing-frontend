@@ -1,10 +1,10 @@
 import {
   COORDINATE_SYSTEMS,
   POLYGON_MIN_COORDINATE_POINTS
-} from '~/src/server/common/constants/exemptions.js'
-import { routes } from '~/src/server/common/constants/routes.js'
-import { getExemptionCache } from '~/src/server/common/helpers/session-cache/utils.js'
-import { generatePointSpecificErrorMessage } from '~/src/server/common/helpers/site-details.js'
+} from '#src/server/common/constants/exemptions.js'
+import { routes } from '#src/server/common/constants/routes.js'
+import { getExemptionCache } from '#src/server/common/helpers/session-cache/utils.js'
+import { generatePointSpecificErrorMessage } from '#src/server/common/helpers/site-details.js'
 
 // ============================================================================
 // CONSTANTS AND CONFIGURATION
@@ -62,22 +62,9 @@ const createDefaultCoordinates = (coordinateSystem) => {
 // ============================================================================
 // DATA TRANSFORMATION FUNCTIONS
 // ============================================================================
-
-/**
- * Check if coordinates array is empty or has invalid first coordinate
- * @param {Array} coordinates - Array of coordinates
- * @returns {boolean} True if coordinates are empty or invalid
- */
 const areCoordinatesEmptyOrInvalid = (coordinates) => {
   return coordinates.length === 0 || !coordinates[0]
 }
-
-/**
- * Check if coordinate data has fields for the expected coordinate system
- * @param {object} coordinate - First coordinate object
- * @param {string} coordinateSystem - Expected coordinate system
- * @returns {boolean} True if coordinate has the required fields for the system
- */
 const doesCoordinateSystemMatchData = (coordinate, coordinateSystem) => {
   const hasWgs84Fields = coordinate?.latitude !== undefined
   const hasOsgb36Fields = coordinate?.eastings !== undefined
@@ -92,13 +79,6 @@ const doesCoordinateSystemMatchData = (coordinate, coordinateSystem) => {
 
   return false
 }
-
-/**
- * Extract only the relevant fields for the coordinate system from a coordinate object
- * @param {object} coordinate - Coordinate object that may have mixed field types
- * @param {string} coordinateSystem - Target coordinate system
- * @returns {object} Coordinate with only the relevant fields
- */
 const extractRelevantCoordinateFields = (coordinate, coordinateSystem) => {
   const fields = getCoordinateFields(coordinateSystem)
   return {
@@ -106,13 +86,6 @@ const extractRelevantCoordinateFields = (coordinate, coordinateSystem) => {
     [fields.secondary]: coordinate[fields.secondary] || ''
   }
 }
-
-/**
- * Normalise coordinates for display - ensures minimum 3 coordinates with empty defaults
- * @param {string} coordinateSystem - Coordinate system type
- * @param {Array} coordinates - Coordinate data
- * @returns {Array} Array of all coordinates
- */
 export const normaliseCoordinatesForDisplay = (
   coordinateSystem,
   coordinates = []
@@ -272,13 +245,6 @@ export const handleValidationFailure = (
 // ============================================================================
 // ARRAY MANIPULATION UTILITIES
 // ============================================================================
-
-/**
- * Remove a coordinate at a given index, but only if index >= 3 and at least 3 remain after removal
- * @param {Array} coordinates - Array of coordinates
- * @param {number} index - Index to remove
- * @returns {Array} New array with coordinate removed if allowed, else original array
- */
 export const removeCoordinateAtIndex = (coordinates, index) => {
   if (
     index >= POLYGON_MIN_COORDINATE_POINTS &&

@@ -225,4 +225,105 @@ describe('Site name page', () => {
     const backLink = getByRole(document, 'link', { name: 'Back' })
     expect(backLink).toHaveAttribute('href', '/exemption/review-site-details')
   })
+
+  test('should show "Save and continue" button and review site details back link when action parameter is present', async () => {
+    const { result, statusCode } = await makeGetRequest({
+      server: getServer(),
+      url: '/exemption/site-name?action=add'
+    })
+
+    expect(statusCode).toBe(statusCodes.ok)
+
+    const { document } = new JSDOM(result).window
+
+    expect(
+      getByRole(document, 'button', { name: 'Save and continue' })
+    ).toBeInTheDocument()
+
+    const backLink = getByRole(document, 'link', { name: 'Back' })
+    expect(backLink).toHaveAttribute('href', '/exemption/review-site-details')
+
+    const cancelLink = getByRole(document, 'link', { name: 'Cancel' })
+    expect(cancelLink).toHaveAttribute('href', '/exemption/review-site-details')
+  })
+
+  test('should redirect to review site details after submit when action parameter is present', async () => {
+    const { updateExemptionSiteDetails } = mockExemption(mockExemptionData)
+
+    const response = await makePostRequest({
+      url: '/exemption/site-name?action=add',
+      server: getServer(),
+      formData: {
+        siteName: 'New Site Name'
+      }
+    })
+
+    expect(response.statusCode).toBe(statusCodes.redirect)
+    expect(response.headers.location).toBe('/exemption/review-site-details')
+
+    expect(updateExemptionSiteDetails).toHaveBeenCalledWith(
+      expect.any(Object),
+      0,
+      'siteName',
+      'New Site Name'
+    )
+  })
+
+  test('should redirect to review site details after submit', async () => {
+    const { updateExemptionSiteDetails } = mockExemption({
+      ...mockExemptionData,
+      siteDetails: [{ siteName: 'Site 1' }, { siteName: 'Site 2' }]
+    })
+
+    const response = await makePostRequest({
+      url: '/exemption/site-name?site=2&action=change',
+      server: getServer(),
+      formData: {
+        siteName: 'Updated Site 2 Name'
+      }
+    })
+
+    expect(response.statusCode).toBe(statusCodes.redirect)
+    expect(response.headers.location).toBe('/exemption/review-site-details')
+
+    expect(updateExemptionSiteDetails).toHaveBeenCalledWith(
+      expect.any(Object),
+      1,
+      'siteName',
+      'Updated Site 2 Name'
+    )
+  })
+
+  test('should preserve action parameter in validation errors', async () => {
+    const { result, statusCode } = await makePostRequest({
+      url: '/exemption/site-name?action=add',
+      server: getServer(),
+      formData: {
+        siteName: ''
+      }
+    })
+
+    expect(statusCode).toBe(statusCodes.ok)
+
+    const { document } = new JSDOM(result).window
+
+    const expectedErrors = [
+      {
+        field: 'siteName',
+        message: 'Enter the site name'
+      }
+    ]
+
+    validateErrors(expectedErrors, document)
+
+    expect(
+      getByRole(document, 'button', { name: 'Save and continue' })
+    ).toBeInTheDocument()
+
+    const backLink = getByRole(document, 'link', { name: 'Back' })
+    expect(backLink).toHaveAttribute('href', '/exemption/review-site-details')
+
+    const cancelLink = getByRole(document, 'link', { name: 'Cancel' })
+    expect(cancelLink).toHaveAttribute('href', '/exemption/review-site-details')
+  })
 })

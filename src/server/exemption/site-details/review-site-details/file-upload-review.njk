@@ -180,7 +180,7 @@
           
           {% set _ = rows.push({
             key: { text: "Map view", classes: "govuk-summary-list__key--full-width" },
-            value: { html: appSiteDetailsMap(site.siteDetailsData, loop.index), classes: "govuk-summary-list__value--full-width" }
+            value: { html: appSiteDetailsMap(site.siteDetailsData, loop.index0), classes: "govuk-summary-list__value--full-width" }
           }) %}
 
           {{ govukSummaryList({

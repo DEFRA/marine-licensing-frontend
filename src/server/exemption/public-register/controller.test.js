@@ -1,22 +1,22 @@
 import { vi } from 'vitest'
-import { setupTestServer } from '~/tests/integration/shared/test-setup-helpers.js'
-import { statusCodes } from '~/src/server/common/constants/status-codes.js'
-import { mockExemption } from '~/src/server/test-helpers/mocks.js'
+import { setupTestServer } from '#tests/integration/shared/test-setup-helpers.js'
+import { statusCodes } from '#src/server/common/constants/status-codes.js'
+import { mockExemption } from '#src/server/test-helpers/mocks.js'
 import {
   makeGetRequest,
   makePostRequest
-} from '~/src/server/test-helpers/server-requests.js'
-import { config } from '~/src/config/config.js'
+} from '#src/server/test-helpers/server-requests.js'
+import { config } from '#src/config/config.js'
 import { JSDOM } from 'jsdom'
 import {
   publicRegisterController,
   publicRegisterSubmitController,
   PUBLIC_REGISTER_VIEW_ROUTE,
   errorMessages
-} from '~/src/server/exemption/public-register/controller.js'
-import * as cacheUtils from '~/src/server/common/helpers/session-cache/utils.js'
-import { routes } from '~/src/server/common/constants/routes.js'
-import * as authRequests from '~/src/server/common/helpers/authenticated-requests.js'
+} from '#src/server/exemption/public-register/controller.js'
+import * as cacheUtils from '#src/server/common/helpers/session-cache/utils.js'
+import { routes } from '#src/server/common/constants/routes.js'
+import * as authRequests from '#src/server/common/helpers/authenticated-requests.js'
 
 vi.mock('~/src/server/common/helpers/session-cache/utils.js')
 
@@ -315,7 +315,3 @@ describe('#publicRegister', () => {
     })
   })
 })
-
-/**
- * @import { Server } from '@hapi/hapi'
- */

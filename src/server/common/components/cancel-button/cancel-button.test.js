@@ -1,7 +1,6 @@
-import { renderComponent } from '~/src/server/test-helpers/component-helpers.js'
+import { renderComponent } from '#src/server/test-helpers/component-helpers.js'
 
 describe('cancelButton Component', () => {
-  /** @type {CheerioAPI} */
   let $cancelButton
 
   test('Should render cancel button correctly with default text', () => {
@@ -18,7 +17,3 @@ describe('cancelButton Component', () => {
     )
   })
 })
-
-/**
- * @import { CheerioAPI } from 'cheerio'
- */

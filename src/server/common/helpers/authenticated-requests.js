@@ -1,7 +1,7 @@
 import Wreck from '@hapi/wreck'
-import { config } from '~/src/config/config.js'
-import { getUserSession } from '~/src/server/common/plugins/auth/utils.js'
-import { AUTH_STRATEGIES } from '~/src/server/common/constants/auth.js'
+import { config } from '#src/config/config.js'
+import { getUserSession } from '#src/server/common/plugins/auth/utils.js'
+import { AUTH_STRATEGIES } from '#src/server/common/constants/auth.js'
 
 export const getAuthToken = async (request) => {
   try {

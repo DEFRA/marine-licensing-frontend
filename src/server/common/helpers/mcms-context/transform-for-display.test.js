@@ -1,5 +1,5 @@
-import { activityTypes } from '~/src/server/common/constants/mcms-context.js'
-import { transformMcmsContextForDisplay } from '~/src/server/common/helpers/mcms-context/transform-for-display.js'
+import { activityTypes } from '#src/server/common/constants/mcms-context.js'
+import { transformMcmsContextForDisplay } from '#src/server/common/helpers/mcms-context/transform-for-display.js'
 
 describe('transformMcmsContextForDisplay', () => {
   it('should return correct labels for each activity type when used in transform function', () => {

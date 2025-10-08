@@ -1,9 +1,4 @@
-import { routes } from '~/src/server/common/constants/routes.js'
-
-/**
- * Set text for front end display
- * @param { string } task
- */
+import { routes } from '#src/server/common/constants/routes.js'
 const setStatus = (task) => {
   if (!task) {
     return {
@@ -18,11 +13,6 @@ const setStatus = (task) => {
     text: 'Completed'
   }
 }
-
-/**
- * Format task list to work with front end component
- * @param { {[key: string]: string} } taskList
- */
 export const transformTaskList = (taskList) => {
   return [
     {

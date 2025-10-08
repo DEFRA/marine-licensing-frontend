@@ -1,6 +1,6 @@
 import { vi } from 'vitest'
 import Wreck from '@hapi/wreck'
-import { config } from '~/src/config/config.js'
+import { config } from '#src/config/config.js'
 import {
   authenticatedGetRequest,
   authenticatedPostRequest,
@@ -9,7 +9,7 @@ import {
   authenticatedRequest,
   getAuthProvider
 } from './authenticated-requests.js'
-import { getUserSession } from '~/src/server/common/plugins/auth/utils.js'
+import { getUserSession } from '#src/server/common/plugins/auth/utils.js'
 
 vi.mock('~/src/server/common/plugins/auth/utils.js')
 vi.mock('@hapi/wreck')

@@ -1,23 +1,17 @@
 import path from 'node:path'
 import { readFileSync } from 'node:fs'
 
-import { config } from '~/src/config/config.js'
-import { buildNavigation } from '~/src/config/nunjucks/context/build-navigation.js'
-import { routes } from '~/src/server/common/constants/routes.js'
-import { areAnalyticsCookiesAccepted } from '~/src/server/common/helpers/cookie-preferences.js'
+import { config } from '#src/config/config.js'
+import { buildNavigation } from '#src/config/nunjucks/context/build-navigation.js'
+import { routes } from '#src/server/common/constants/routes.js'
+import { areAnalyticsCookiesAccepted } from '#src/server/common/helpers/cookie-preferences.js'
 
 const assetPath = config.get('assetPath')
 const manifestPath = path.join(
   config.get('root'),
   '.public/assets-manifest.json'
 )
-
-/** @type {Record<string, string> | undefined} */
 let webpackManifest
-
-/**
- * @param {Request | null} request
- */
 export function context(request) {
   if (!webpackManifest) {
     try {
@@ -41,16 +35,9 @@ export function context(request) {
     isAuthenticated,
     analyticsEnabled,
     clarityProjectId: config.get('clarityProjectId'),
-    /**
-     * @param {string} asset
-     */
     getAssetPath(asset) {
       const webpackAssetPath = webpackManifest?.[asset]
       return `${assetPath}/${webpackAssetPath ?? asset}`
     }
   }
 }
-
-/**
- * @import { Request } from '@hapi/hapi'
- */

@@ -2,16 +2,16 @@ import { vi } from 'vitest'
 import {
   mockExemption,
   setupTestServer
-} from '~/tests/integration/shared/test-setup-helpers.js'
-import { mockExemption as mockExemptionData } from '~/src/server/test-helpers/mocks.js'
+} from '#tests/integration/shared/test-setup-helpers.js'
+import { mockExemption as mockExemptionData } from '#src/server/test-helpers/mocks.js'
 import {
   makeGetRequest,
   makePostRequest
-} from '~/src/server/test-helpers/server-requests.js'
-import * as authRequests from '~/src/server/common/helpers/authenticated-requests.js'
-import * as authUtils from '~/src/server/common/plugins/auth/utils.js'
-import * as exemptionSiteDetailsHelpers from '~/src/server/common/helpers/exemption-site-details.js'
-import * as exemptionServiceModule from '~/src/services/exemption-service/index.js'
+} from '#src/server/test-helpers/server-requests.js'
+import * as authRequests from '#src/server/common/helpers/authenticated-requests.js'
+import * as authUtils from '#src/server/common/plugins/auth/utils.js'
+import * as exemptionSiteDetailsHelpers from '#src/server/common/helpers/exemption-site-details.js'
+import * as exemptionServiceModule from '#src/services/exemption-service/index.js'
 
 const mockUserSession = {
   displayName: 'John Doe',

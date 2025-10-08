@@ -1,7 +1,7 @@
-import { errorMessages } from '~/src/server/common/constants/error-messages.js'
-import { createLogger } from '~/src/server/common/helpers/logging/logger.js'
-import { authenticatedGetRequest } from '~/src/server/common/helpers/authenticated-requests.js'
-import { transformMcmsContextForDisplay } from '~/src/server/common/helpers/mcms-context/transform-for-display.js'
+import { errorMessages } from '#src/server/common/constants/error-messages.js'
+import { createLogger } from '#src/server/common/helpers/logging/logger.js'
+import { authenticatedGetRequest } from '#src/server/common/helpers/authenticated-requests.js'
+import { transformMcmsContextForDisplay } from '#src/server/common/helpers/mcms-context/transform-for-display.js'
 
 const apiPaths = {
   getExemption: (id) => `/exemption/${id}`,
@@ -9,10 +9,6 @@ const apiPaths = {
 }
 
 export class ExemptionService {
-  /**
-   * @param {object} request -Hapi req object
-   * @param {object} logger - Logger instance
-   */
   constructor(request, logger = null) {
     this.request = request
     this.logger = logger ?? createLogger()

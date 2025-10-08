@@ -1,7 +1,6 @@
-import { renderComponent } from '~/src/server/test-helpers/component-helpers.js'
+import { renderComponent } from '#src/server/test-helpers/component-helpers.js'
 
 describe('Heading Component', () => {
-  /** @type {CheerioAPI} */
   let $heading
 
   describe('With caption', () => {
@@ -29,7 +28,3 @@ describe('Heading Component', () => {
     })
   })
 })
-
-/**
- * @import { CheerioAPI } from 'cheerio'
- */

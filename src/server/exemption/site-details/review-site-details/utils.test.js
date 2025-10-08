@@ -1,7 +1,7 @@
 import { vi } from 'vitest'
 import Boom from '@hapi/boom'
-import { COORDINATE_SYSTEMS } from '~/src/server/common/constants/exemptions.js'
-import { routes } from '~/src/server/common/constants/routes.js'
+import { COORDINATE_SYSTEMS } from '#src/server/common/constants/exemptions.js'
+import { routes } from '#src/server/common/constants/routes.js'
 import {
   buildMultipleSitesSummaryData,
   buildManualCoordinateSummaryData,
@@ -19,10 +19,10 @@ import {
   prepareManualCoordinateDataForSave,
   renderFileUploadReview,
   renderManualCoordinateReview
-} from '~/src/server/exemption/site-details/review-site-details/utils.js'
-import { mockExemption } from '~/src/server/test-helpers/mocks.js'
+} from '#src/server/exemption/site-details/review-site-details/utils.js'
+import { mockExemption } from '#src/server/test-helpers/mocks.js'
 
-import { getCoordinateSystem } from '~/src/server/common/helpers/coordinate-utils.js'
+import { getCoordinateSystem } from '#src/server/common/helpers/coordinate-utils.js'
 
 // Mock the getCoordinateSystem helper
 vi.mock('~/src/server/common/helpers/coordinate-utils.js', () => ({

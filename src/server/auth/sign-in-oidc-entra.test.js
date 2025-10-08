@@ -2,9 +2,9 @@ import { vi } from 'vitest'
 import {
   redirectPathCacheKey,
   routes
-} from '~/src/server/common/constants/routes.js'
-import { setUserSession } from '~/src/server/auth/utils.js'
-import { signInOidcEntraController } from '~/src/server/auth/sign-in-oidc-entra.js'
+} from '#src/server/common/constants/routes.js'
+import { setUserSession } from '#src/server/auth/utils.js'
+import { signInOidcEntraController } from '#src/server/auth/sign-in-oidc-entra.js'
 
 vi.mock('~/src/server/auth/utils.js', () => ({
   setUserSession: vi.fn()

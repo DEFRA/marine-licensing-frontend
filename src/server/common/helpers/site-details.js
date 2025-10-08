@@ -1,9 +1,4 @@
-import { COORDINATE_SYSTEMS } from '~/src/server/common/constants/exemptions.js'
-
-/**
- * Standard error messages for coordinate validation
- * These can be used across different coordinate validation contexts
- */
+import { COORDINATE_SYSTEMS } from '#src/server/common/constants/exemptions.js'
 export const COORDINATE_ERROR_MESSAGES = {
   [COORDINATE_SYSTEMS.WGS84]: {
     LATITUDE_REQUIRED: 'Enter the latitude',
@@ -32,13 +27,6 @@ export const COORDINATE_ERROR_MESSAGES = {
     NORTHINGS_WHOLE_NUMBER: 'Northings must be a whole number'
   }
 }
-
-/**
- * Generate point-specific error message for multiple coordinates
- * @param {string} baseMessage - Base error message
- * @param {number} index - Coordinate index
- * @returns {string} Point-specific error message
- */
 export const generatePointSpecificErrorMessage = (baseMessage, index) => {
   const pointName = index === 0 ? 'start and end point' : `point ${index + 1}`
 
@@ -66,13 +54,6 @@ export const generatePointSpecificErrorMessage = (baseMessage, index) => {
 
   return messageMap[baseMessage] || baseMessage
 }
-
-/**
- * Create site details data JSON for map visualization
- * @param {object} siteDetails - Site details object containing coordinate and file information
- * @param {string} coordinateSystem - Coordinate system identifier ('wgs84' or 'osgb36')
- * @returns {string} JSON string containing site details data for map
- */
 export const createSiteDetailsDataJson = (siteDetails, coordinateSystem) => {
   if (!siteDetails) {
     return JSON.stringify({

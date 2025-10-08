@@ -1,5 +1,5 @@
-import { uploadAndWaitRoutes } from '~/src/server/exemption/site-details/upload-and-wait/index.js'
-import { routes } from '~/src/server/common/constants/routes.js'
+import { uploadAndWaitRoutes } from '#src/server/exemption/site-details/upload-and-wait/index.js'
+import { routes } from '#src/server/common/constants/routes.js'
 
 describe('uploadAndWaitRoutes routes', () => {
   test('get route is formatted correctly', () => {

@@ -1,8 +1,3 @@
-/**
- * A GDS styled example about page controller.
- * Provided as an example, remove or modify as required.
- * @satisfies {Partial<ServerRoute>}
- */
 export const aboutController = {
   handler(_request, h) {
     return h.view('about/index', {
@@ -20,7 +15,3 @@ export const aboutController = {
     })
   }
 }
-
-/**
- * @import { ServerRoute } from '@hapi/hapi'
- */

@@ -3,13 +3,13 @@ import joi from 'joi'
 import {
   getExemptionCache,
   updateExemptionSiteDetails
-} from '~/src/server/common/helpers/session-cache/utils.js'
-import { routes } from '~/src/server/common/constants/routes.js'
+} from '#src/server/common/helpers/session-cache/utils.js'
+import { routes } from '#src/server/common/constants/routes.js'
 import {
   errorDescriptionByFieldName,
   mapErrorsForDisplay
-} from '~/src/server/common/helpers/errors.js'
-import { getSiteDetailsBySite } from '~/src/server/common/helpers/session-cache/site-details-utils.js'
+} from '#src/server/common/helpers/errors.js'
+import { getSiteDetailsBySite } from '#src/server/common/helpers/session-cache/site-details-utils.js'
 const pageSettings = {
   pageTitle: 'Choose file type',
   heading: 'Which type of file do you want to upload?'
@@ -21,11 +21,6 @@ export const CHOOSE_FILE_UPLOAD_TYPE_VIEW_ROUTE =
 export const errorMessages = {
   FILE_TYPE_ENTRY_REQUIRED: 'Select which type of file you want to upload'
 }
-
-/**
- * A GDS styled project name page controller.
- * @satisfies {Partial<ServerRoute>}
- */
 export const chooseFileTypeController = {
   handler(request, h) {
     const exemption = getExemptionCache(request)
@@ -39,11 +34,6 @@ export const chooseFileTypeController = {
     })
   }
 }
-
-/**
- * A GDS styled page controller for the POST route in the coordinates type page.
- * @satisfies {Partial<ServerRoute>}
- */
 export const chooseFileTypeSubmitController = {
   options: {
     validate: {

@@ -1,12 +1,12 @@
 import { vi } from 'vitest'
 import { cookies } from './cookies.js'
-import { getCookiePreferences } from '~/src/server/common/helpers/cookie-preferences.js'
+import { getCookiePreferences } from '#src/server/common/helpers/cookie-preferences.js'
 import {
   COOKIE_NAMES,
   COOKIE_OPTIONS_BASE64,
   FLASH_MESSAGE_KEYS
-} from '~/src/server/common/constants/cookies.js'
-import { config } from '~/src/config/config.js'
+} from '#src/server/common/constants/cookies.js'
+import { config } from '#src/config/config.js'
 
 vi.mock('~/src/server/common/helpers/cookie-preferences.js')
 vi.mock('~/src/config/config.js')

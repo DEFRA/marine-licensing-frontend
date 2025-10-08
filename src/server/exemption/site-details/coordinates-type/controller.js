@@ -1,14 +1,14 @@
 import {
   getExemptionCache,
   updateExemptionSiteDetails
-} from '~/src/server/common/helpers/session-cache/utils.js'
-import { getSiteDetailsBySite } from '~/src/server/common/helpers/session-cache/site-details-utils.js'
-import { setSiteDataPreHandler } from '~/src/server/common/helpers/session-cache/site-utils.js'
+} from '#src/server/common/helpers/session-cache/utils.js'
+import { getSiteDetailsBySite } from '#src/server/common/helpers/session-cache/site-details-utils.js'
+import { setSiteDataPreHandler } from '#src/server/common/helpers/session-cache/site-utils.js'
 import {
   errorDescriptionByFieldName,
   mapErrorsForDisplay
-} from '~/src/server/common/helpers/errors.js'
-import { routes } from '~/src/server/common/constants/routes.js'
+} from '#src/server/common/helpers/errors.js'
+import { routes } from '#src/server/common/constants/routes.js'
 
 import joi from 'joi'
 
@@ -24,11 +24,6 @@ export const errorMessages = {
   PROVIDE_COORDINATES_CHOICE_REQUIRED:
     'Select how you want to provide the site location'
 }
-
-/**
- * A GDS styled page controller for the coordinates type page.
- * @satisfies {Partial<ServerRoute>}
- */
 export const coordinatesTypeController = {
   options: {
     pre: [setSiteDataPreHandler]
@@ -49,11 +44,6 @@ export const coordinatesTypeController = {
     })
   }
 }
-
-/**
- * A GDS styled page controller for the POST route in the coordinates type page.
- * @satisfies {Partial<ServerRoute>}
- */
 export const coordinatesTypeSubmitController = {
   options: {
     pre: [setSiteDataPreHandler],

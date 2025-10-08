@@ -1,5 +1,5 @@
 import { vi } from 'vitest'
-import { loginEntraController } from '~/src/server/auth/sign-in-entra.js'
+import { loginEntraController } from '#src/server/auth/sign-in-entra.js'
 
 describe('#login with Entra ID', () => {
   test('should redirect to the stored URL', async () => {

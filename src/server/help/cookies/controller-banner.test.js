@@ -1,6 +1,6 @@
 import { vi } from 'vitest'
 import { cookiesSubmitController } from './controller.js'
-import * as cookieService from '~/src/server/common/helpers/cookie-service.js'
+import * as cookieService from '#src/server/common/helpers/cookie-service.js'
 
 vi.mock('~/src/server/common/helpers/cookie-service.js')
 

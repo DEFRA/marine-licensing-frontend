@@ -1,16 +1,16 @@
 import {
   errorDescriptionByFieldName,
   mapErrorsForDisplay
-} from '~/src/server/common/helpers/errors.js'
+} from '#src/server/common/helpers/errors.js'
 import {
   getExemptionCache,
   setExemptionCache,
   updateExemptionSiteDetails
-} from '~/src/server/common/helpers/session-cache/utils.js'
-import { setSiteDataPreHandler } from '~/src/server/common/helpers/session-cache/site-utils.js'
-import { getSiteDetailsBySite } from '~/src/server/common/helpers/session-cache/site-details-utils.js'
-import { routes } from '~/src/server/common/constants/routes.js'
-import { authenticatedPatchRequest } from '~/src/server/common/helpers/authenticated-requests.js'
+} from '#src/server/common/helpers/session-cache/utils.js'
+import { setSiteDataPreHandler } from '#src/server/common/helpers/session-cache/site-utils.js'
+import { getSiteDetailsBySite } from '#src/server/common/helpers/session-cache/site-details-utils.js'
+import { routes } from '#src/server/common/constants/routes.js'
+import { authenticatedPatchRequest } from '#src/server/common/helpers/authenticated-requests.js'
 import joi from 'joi'
 import { getBackLink, getNextRoute } from './utils.js'
 
@@ -52,11 +52,6 @@ const getPageTemplateValues = (request) => {
     siteNumber: variableActivityDescription ? siteNumber : null
   }
 }
-
-/**
- * A GDS styled activity description page GET controller.
- * @satisfies {Partial<ServerRoute>}
- */
 export const activityDescriptionController = {
   options: {
     pre: [setSiteDataPreHandler]
@@ -76,11 +71,6 @@ export const activityDescriptionController = {
     })
   }
 }
-
-/**
- * A GDS styled activity description PATCH page controller.
- * @satisfies {Partial<ServerRoute>}
- */
 export const activityDescriptionSubmitController = {
   options: {
     pre: [setSiteDataPreHandler],

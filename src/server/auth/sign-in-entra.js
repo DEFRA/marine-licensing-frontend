@@ -1,8 +1,8 @@
 import {
   redirectPathCacheKey,
   routes
-} from '~/src/server/common/constants/routes.js'
-import { AUTH_STRATEGIES } from '~/src/server/common/constants/auth.js'
+} from '#src/server/common/constants/routes.js'
+import { AUTH_STRATEGIES } from '#src/server/common/constants/auth.js'
 
 export const loginEntraController = {
   method: 'GET',

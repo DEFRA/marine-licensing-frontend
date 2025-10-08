@@ -4,8 +4,8 @@ import {
   removeUserSession,
   refreshAccessToken,
   updateUserSession
-} from '~/src/server/common/plugins/auth/utils.js'
-import { config } from '~/src/config/config.js'
+} from '#src/server/common/plugins/auth/utils.js'
+import { config } from '#src/config/config.js'
 import { getOpenIdRefreshToken } from './get-oidc-config.js'
 import jwt from '@hapi/jwt'
 import { addSeconds } from 'date-fns'

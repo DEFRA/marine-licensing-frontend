@@ -1,11 +1,7 @@
-import { config } from '~/src/config/config.js'
-import { routes } from '~/src/server/common/constants/routes.js'
-import { AUTH_STRATEGIES } from '~/src/server/common/constants/auth.js'
-import { getAuthProvider } from '~/src/server/common/helpers/authenticated-requests.js'
-
-/**
- * @param {Partial<Request> | null} request
- */
+import { config } from '#src/config/config.js'
+import { routes } from '#src/server/common/constants/routes.js'
+import { AUTH_STRATEGIES } from '#src/server/common/constants/auth.js'
+import { getAuthProvider } from '#src/server/common/helpers/authenticated-requests.js'
 export const buildNavigation = (request) => {
   const { accountManagementUrl } = config.get('defraId')
 
@@ -31,7 +27,3 @@ export const buildNavigation = (request) => {
 
   return []
 }
-
-/**
- * @import { Request } from '@hapi/hapi'
- */

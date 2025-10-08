@@ -5,28 +5,28 @@ import {
   ACTIVITY_DATES_VIEW_ROUTE,
   ACTIVITY_DATES_VIEW_SETTINGS,
   DATE_EXTRACTION_CONFIG
-} from '~/src/server/common/constants/activity-dates.js'
-import { routes } from '~/src/server/common/constants/routes.js'
-import { authenticatedPatchRequest } from '~/src/server/common/helpers/authenticated-requests.js'
-import { processDateValidationErrors } from '~/src/server/common/helpers/dates/date-form-utils.js'
+} from '#src/server/common/constants/activity-dates.js'
+import { routes } from '#src/server/common/constants/routes.js'
+import { authenticatedPatchRequest } from '#src/server/common/helpers/authenticated-requests.js'
+import { processDateValidationErrors } from '#src/server/common/helpers/dates/date-form-utils.js'
 import {
   createDateFieldsFromValue,
   createDateISO,
   extractMultipleDateFields
-} from '~/src/server/common/helpers/dates/date-utils.js'
+} from '#src/server/common/helpers/dates/date-utils.js'
 import {
   errorDescriptionByFieldName,
   mapErrorsForDisplay
-} from '~/src/server/common/helpers/errors.js'
+} from '#src/server/common/helpers/errors.js'
 import {
   getExemptionCache,
   setExemptionCache,
   updateExemptionSiteDetails
-} from '~/src/server/common/helpers/session-cache/utils.js'
-import { setSiteDataPreHandler } from '~/src/server/common/helpers/session-cache/site-utils.js'
-import { getSiteDetailsBySite } from '~/src/server/common/helpers/session-cache/site-details-utils.js'
-import { activityDatesSchema } from '~/src/server/common/schemas/date.js'
-import { getSiteNumber } from '~/src/server/exemption/site-details/utils/site-number.js'
+} from '#src/server/common/helpers/session-cache/utils.js'
+import { setSiteDataPreHandler } from '#src/server/common/helpers/session-cache/site-utils.js'
+import { getSiteDetailsBySite } from '#src/server/common/helpers/session-cache/site-details-utils.js'
+import { activityDatesSchema } from '#src/server/common/schemas/date.js'
+import { getSiteNumber } from '#src/server/exemption/site-details/utils/site-number.js'
 import { getBackRoute, getNextRoute } from './utils.js'
 
 const isPageInSiteDetailsFlow = (request) =>
@@ -227,7 +227,3 @@ export const activityDatesSubmitController = {
     }
   }
 }
-
-/**
- * @import { ServerRoute } from '@hapi/hapi'
- */

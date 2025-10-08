@@ -1,7 +1,6 @@
-import { renderComponent } from '~/src/server/test-helpers/component-helpers.js'
+import { renderComponent } from '#src/server/test-helpers/component-helpers.js'
 
 describe('appOrganisationHeading Component', () => {
-  /** @type {CheerioAPI} */
   let $component
 
   test('Should render correctly with org name', () => {
@@ -12,7 +11,3 @@ describe('appOrganisationHeading Component', () => {
     expect($component('span').text().trim()).toBe('Test Org')
   })
 })
-
-/**
- * @import { CheerioAPI } from 'cheerio'
- */

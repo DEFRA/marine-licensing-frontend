@@ -4,7 +4,7 @@ import {
   validActivitySubtypes,
   activityTypes,
   articleCodes
-} from '~/src/server/common/constants/mcms-context.js'
+} from '#src/server/common/constants/mcms-context.js'
 
 const { ACTIVITY_TYPE, ARTICLE, pdfDownloadUrl } = requiredQueryParams
 

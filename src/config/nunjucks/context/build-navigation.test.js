@@ -1,7 +1,7 @@
 import { vi } from 'vitest'
-import { buildNavigation } from '~/src/config/nunjucks/context/build-navigation.js'
-import { getAuthProvider } from '~/src/server/common/helpers/authenticated-requests.js'
-import { AUTH_STRATEGIES } from '~/src/server/common/constants/auth.js'
+import { buildNavigation } from '#src/config/nunjucks/context/build-navigation.js'
+import { getAuthProvider } from '#src/server/common/helpers/authenticated-requests.js'
+import { AUTH_STRATEGIES } from '#src/server/common/constants/auth.js'
 
 vi.mock('~/src/server/common/helpers/authenticated-requests.js')
 

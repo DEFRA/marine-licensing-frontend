@@ -1,9 +1,3 @@
-/**
- * Determines the site number for the current site
- * @param {object} exemption - The exemption data from cache
- * @param {object} request - The Hapi request object
- * @returns {number} The site number
- */
 export const getSiteNumber = (exemption, request) => {
   const { siteDetails } = exemption || {}
   const urlSiteIndex = request?.query?.site

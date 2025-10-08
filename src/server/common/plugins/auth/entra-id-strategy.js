@@ -1,7 +1,7 @@
-import { config } from '~/src/config/config.js'
-import { openIdProvider } from '~/src/server/common/plugins/auth/open-id-provider.js'
-import { routes } from '~/src/server/common/constants/routes.js'
-import { AUTH_STRATEGIES } from '~/src/server/common/constants/auth.js'
+import { config } from '#src/config/config.js'
+import { openIdProvider } from '#src/server/common/plugins/auth/open-id-provider.js'
+import { routes } from '#src/server/common/constants/routes.js'
+import { AUTH_STRATEGIES } from '#src/server/common/constants/auth.js'
 
 export const createEntraIdStrategy = async (server) => {
   const entraIdConfig = config.get('entraId')

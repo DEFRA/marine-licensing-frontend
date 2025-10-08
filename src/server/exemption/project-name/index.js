@@ -1,17 +1,8 @@
 import {
   projectNameController,
   projectNameSubmitController
-} from '~/src/server/exemption/project-name/controller.js'
-import { routes } from '~/src/server/common/constants/routes.js'
-
-/**
- * Sets up the routes used in the project name page.
- * These routes are registered in src/server/router.js.
- */
-
-/**
- * @satisfies {ServerRegisterPluginObject<void>}
- */
+} from '#src/server/exemption/project-name/controller.js'
+import { routes } from '#src/server/common/constants/routes.js'
 export const projectNameRoutes = [
   {
     method: 'GET',
@@ -24,7 +15,3 @@ export const projectNameRoutes = [
     ...projectNameSubmitController
   }
 ]
-
-/**
- * @import { ServerRegisterPluginObject } from '@hapi/hapi'
- */

@@ -1,10 +1,10 @@
 import { vi } from 'vitest'
 import { isPast } from 'date-fns'
 import { validateUserSession } from './validate.js'
-import { setupTestServer } from '~/tests/integration/shared/test-setup-helpers.js'
+import { setupTestServer } from '#tests/integration/shared/test-setup-helpers.js'
 
-import * as authUtils from '~/src/server/common/plugins/auth/utils.js'
-import { AUTH_STRATEGIES } from '~/src/server/common/constants/auth.js'
+import * as authUtils from '#src/server/common/plugins/auth/utils.js'
+import { AUTH_STRATEGIES } from '#src/server/common/constants/auth.js'
 
 vi.mock('~/src/server/common/plugins/auth/utils.js', () => ({
   getUserSession: vi.fn(),
@@ -23,7 +23,6 @@ describe('validateUserSession', () => {
   let mockRequest
   let mockSession
   let mockUserSession
-  /** @type {Server} */
   const getServer = setupTestServer()
 
   beforeEach(() => {
@@ -236,7 +235,3 @@ describe('validateUserSession', () => {
     })
   })
 })
-
-/**
- * @import { Server } from '@hapi/hapi'
- */

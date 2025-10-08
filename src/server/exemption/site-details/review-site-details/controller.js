@@ -2,8 +2,8 @@ import {
   getExemptionCache,
   resetExemptionSiteDetails,
   setExemptionCache
-} from '~/src/server/common/helpers/session-cache/utils.js'
-import { routes } from '~/src/server/common/constants/routes.js'
+} from '#src/server/common/helpers/session-cache/utils.js'
+import { routes } from '#src/server/common/constants/routes.js'
 import {
   getSiteDetails,
   prepareFileUploadDataForSave,
@@ -15,8 +15,8 @@ import {
 import {
   authenticatedPatchRequest,
   authenticatedGetRequest
-} from '~/src/server/common/helpers/authenticated-requests.js'
-import { getSiteDetailsBySite } from '~/src/server/common/helpers/session-cache/site-details-utils.js'
+} from '#src/server/common/helpers/authenticated-requests.js'
+import { getSiteDetailsBySite } from '#src/server/common/helpers/session-cache/site-details-utils.js'
 
 export const REVIEW_SITE_DETAILS_VIEW_ROUTE =
   'exemption/site-details/review-site-details/index'
@@ -28,11 +28,6 @@ const reviewSiteDetailsPageData = {
   pageTitle: 'Review site details',
   heading: 'Review site details'
 }
-
-/**
- * A GDS styled page controller for the review site details page.
- * @satisfies {Partial<ServerRoute>}
- */
 export const reviewSiteDetailsController = {
   async handler(request, h) {
     const previousPage = request.headers?.referer
@@ -62,11 +57,6 @@ export const reviewSiteDetailsController = {
         })
   }
 }
-
-/**
- * A GDS styled page controller for the POST route in the review site details page.
- * @satisfies {Partial<ServerRoute>}
- */
 export const reviewSiteDetailsSubmitController = {
   async handler(request, h) {
     const { payload } = request

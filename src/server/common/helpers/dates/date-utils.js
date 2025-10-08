@@ -46,13 +46,6 @@ export function extractDateComponents(isoDate) {
 export function formatDate(date, format = 'D MMMM YYYY') {
   return dayjs.utc(date).format(format)
 }
-
-/**
- * @param {string|number} year
- * @param {string|number} month
- * @param {string|number} day
- * @returns {boolean}
- */
 export function isValidDateComponents(year, month, day) {
   const date = dayjs.utc(`${year}-${month}-${day}`, DATE_FORMAT_FLEXIBLE, true)
   return date.isValid()

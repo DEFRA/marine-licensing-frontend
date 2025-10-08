@@ -4,13 +4,13 @@ import {
   sameActivityDatesSubmitController,
   SAME_ACTIVITY_DATES_VIEW_ROUTE
 } from './controller.js'
-import * as cacheUtils from '~/src/server/common/helpers/session-cache/utils.js'
+import * as cacheUtils from '#src/server/common/helpers/session-cache/utils.js'
 import {
   mockExemption,
   mockFileUploadExemption,
   mockSite
-} from '~/src/server/test-helpers/mocks.js'
-import { routes } from '~/src/server/common/constants/routes.js'
+} from '#src/server/test-helpers/mocks.js'
+import { routes } from '#src/server/common/constants/routes.js'
 
 vi.mock('~/src/server/common/helpers/session-cache/utils.js')
 

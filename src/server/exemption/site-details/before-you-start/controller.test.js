@@ -1,15 +1,15 @@
 import { vi } from 'vitest'
-import { setupTestServer } from '~/tests/integration/shared/test-setup-helpers.js'
+import { setupTestServer } from '#tests/integration/shared/test-setup-helpers.js'
 import {
   beforeYouStartController,
   BEFORE_YOU_START_SITE_DETAILS_VIEW_ROUTE
-} from '~/src/server/exemption/site-details/before-you-start/controller.js'
-import { getExemptionCache } from '~/src/server/common/helpers/session-cache/utils.js'
-import { mockExemption } from '~/src/server/test-helpers/mocks.js'
-import { makeGetRequest } from '~/src/server/test-helpers/server-requests.js'
-import { statusCodes } from '~/src/server/common/constants/status-codes.js'
-import { config } from '~/src/config/config.js'
-import { routes } from '~/src/server/common/constants/routes.js'
+} from '#src/server/exemption/site-details/before-you-start/controller.js'
+import { getExemptionCache } from '#src/server/common/helpers/session-cache/utils.js'
+import { mockExemption } from '#src/server/test-helpers/mocks.js'
+import { makeGetRequest } from '#src/server/test-helpers/server-requests.js'
+import { statusCodes } from '#src/server/common/constants/status-codes.js'
+import { config } from '#src/config/config.js'
+import { routes } from '#src/server/common/constants/routes.js'
 
 vi.mock('~/src/server/common/helpers/session-cache/utils.js')
 
@@ -50,7 +50,3 @@ describe('#beforeYouStart', () => {
     })
   })
 })
-
-/**
- * @import { Server } from '@hapi/hapi'
- */

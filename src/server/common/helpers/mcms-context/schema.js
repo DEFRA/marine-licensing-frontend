@@ -15,7 +15,12 @@ export const paramsSchema = Joi.object({
   [ARTICLE]: Joi.string()
     .valid(...articleCodes)
     .required(),
-  [pdfDownloadUrl]: Joi.string().required(),
+  [pdfDownloadUrl]: Joi.string()
+    // https://{subdomain}.marinemanagement.org.uk/{path}/journey/self-service/outcome-document/{guid}
+    .pattern(
+      /^https:\/\/[^/]+\.marinemanagement\.org\.uk\/[^/]+\/journey\/self-service\/outcome-document\/[a-zA-Z0-9-]+$/
+    )
+    .required(),
   EXE_ACTIVITY_SUBTYPE_CONSTRUCTION: Joi.when(ACTIVITY_TYPE, {
     is: activityTypes.CON.value,
     then: Joi.string()

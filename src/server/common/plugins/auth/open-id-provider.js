@@ -23,7 +23,7 @@ export const openIdProvider = async (name) => {
 
       const payload = Jwt.token.decode(credentials.token).decoded.payload
       const displayName = [payload.firstName, payload.lastName]
-        .filter((part) => part)
+        .filter(Boolean)
         .join(' ')
       // destructure the relationships array eg
       // 81d48d6c-6e94-f011-b4cc-000d3ac28f39:27d48d6c-6e94-f011-b4cc-000d3ac28f39:CDP Child Org 1:0:Employee:0

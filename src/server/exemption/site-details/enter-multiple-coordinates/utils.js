@@ -141,7 +141,7 @@ export const extractCoordinateIndexFromFieldName = (fieldName) => {
 }
 
 export const sanitiseFieldName = (fieldPath) =>
-  fieldPath.join('').replace(PATTERNS.FIELD_BRACKETS, '')
+  fieldPath.join('').replaceAll(PATTERNS.FIELD_BRACKETS, '')
 
 export const sanitiseFieldId = (fieldName) =>
   fieldName
@@ -224,10 +224,10 @@ export const createErrorSummary = (validationError) => {
 export const createFieldErrors = (validationError) => {
   const errors = {}
 
-  validationError.details.forEach((detail) => {
+  for (const detail of validationError.details) {
     const { fieldName, enhancedMessage } = processErrorDetail(detail)
     errors[fieldName] = { text: enhancedMessage }
-  })
+  }
 
   return errors
 }

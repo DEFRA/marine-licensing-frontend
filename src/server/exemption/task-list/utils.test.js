@@ -33,6 +33,43 @@ describe('taskList utils', () => {
     ])
   })
 
+  test('transformTaskList correctly returns In Progress', () => {
+    expect(
+      transformTaskList({
+        ...mockExemptionTaskList,
+        siteDetails: 'IN_PROGRESS'
+      })
+    ).toEqual([
+      {
+        href: routes.PROJECT_NAME,
+        status: { text: 'Completed' },
+        title: { text: 'Project name' }
+      },
+      {
+        href: routes.ACTIVITY_DATES,
+        status: { text: 'Completed' },
+        title: { text: 'Activity dates' }
+      },
+      {
+        href: routes.ACTIVITY_DESCRIPTION,
+        status: { tag: { text: 'Incomplete', classes: 'govuk-tag--blue' } },
+        title: { text: 'Activity description' }
+      },
+      {
+        href: routes.REVIEW_SITE_DETAILS,
+        status: {
+          tag: { text: 'In Progress', classes: 'govuk-tag--light-blue' }
+        },
+        title: { text: 'Site details' }
+      },
+      {
+        href: routes.PUBLIC_REGISTER,
+        status: { text: 'Completed' },
+        title: { text: 'Public register' }
+      }
+    ])
+  })
+
   test('transformTaskList correctly returns task list when site details is empty', () => {
     expect(
       transformTaskList({

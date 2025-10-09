@@ -55,9 +55,9 @@ export const nunjucksConfig = {
   }
 }
 
-Object.entries(filters).forEach(([name, filter]) => {
+for (const [name, filter] of Object.entries(filters)) {
   nunjucksEnvironment.addFilter(name, filter)
-})
+}
 
 /**
  * @import { ServerRegisterPluginObject } from '@hapi/hapi'

@@ -17,9 +17,6 @@ const govukFrontendPath = path.dirname(
 
 const ruleTypeAssetResource = 'asset/resource'
 
-/**
- * @type {Configuration}
- */
 export default {
   context: path.resolve(dirname, 'src/client'),
   entry: {

@@ -6,8 +6,10 @@ export function setSiteDetailsAction(
 ) {
   const hasValue = value && value !== ''
 
+  const action = hasValue ? 'change' : 'add'
+
   const hrefWithSite = href
-    ? `${href}?site=${siteNumber}&action=${hasValue ? 'change' : 'add'}`
+    ? `${href}?site=${siteNumber}&action=${action}`
     : '#'
 
   return {

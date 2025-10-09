@@ -27,9 +27,9 @@ const nunjucksEnvironment = nunjucks.configure(
 
 nunjucksEnvironment.addGlobal('govukRebrand', true)
 
-Object.entries(globals).forEach(([name, filter]) => {
+for (const [name, filter] of Object.entries(globals)) {
   nunjucksEnvironment.addGlobal(name, filter)
-})
+}
 
 /**
  * @satisfies {ServerRegisterPluginObject<ServerViewsConfiguration>}

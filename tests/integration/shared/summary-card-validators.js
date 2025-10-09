@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 
 /* eslint-env vitest */
-
+const GOV_UK_SUMMARY_LIST_KEY = '.govuk-summary-list__key'
 /**
  * Validates the basic page structure (heading and back link)
  * @param {Document} document - JSDOM document
@@ -65,13 +65,13 @@ export const validateSummaryCardContent = (
   Object.entries(expectedContent).forEach(([key, value]) => {
     const rows = card.querySelectorAll('.govuk-summary-list__row')
     const row = Array.from(rows).find((r) => {
-      const keyElement = r.querySelector('.govuk-summary-list__key')
+      const keyElement = r.querySelector(GOV_UK_SUMMARY_LIST_KEY)
       return keyElement && keyElement.textContent.trim() === key
     })
 
     if (!row) {
       const availableKeys = Array.from(rows).map((r) => {
-        const keyElement = r.querySelector('.govuk-summary-list__key')
+        const keyElement = r.querySelector(GOV_UK_SUMMARY_LIST_KEY)
         return keyElement ? keyElement.textContent.trim() : 'NO_KEY'
       })
       throw new Error(
@@ -82,9 +82,9 @@ export const validateSummaryCardContent = (
     expect(row).toBeTruthy()
     const valueElement = row.querySelector('.govuk-summary-list__value')
     if (Array.isArray(value)) {
-      value.forEach((expectedValue) => {
+      for (const expectedValue of value) {
         expect(valueElement.textContent.trim()).toContain(expectedValue)
-      })
+      }
     } else {
       expect(valueElement.textContent.trim()).toBe(value)
     }
@@ -167,18 +167,18 @@ export const validateSiteDetails = (document, expectedPageContent) => {
 
   // Validate basic site details if present
   if (expectedPageContent.siteDetails.length) {
-    Object.entries(expectedPageContent.siteDetails[0]).forEach(
-      ([key, value]) => {
-        const rows = siteCard.querySelectorAll('.govuk-summary-list__row')
-        const row = Array.from(rows).find((r) => {
-          const keyElement = r.querySelector('.govuk-summary-list__key')
-          return keyElement && keyElement.textContent.trim() === key
-        })
-        expect(row).toBeTruthy()
-        const valueElement = row.querySelector('.govuk-summary-list__value')
-        expect(valueElement.textContent.trim()).toBe(value)
-      }
-    )
+    for (const [key, value] of Object.entries(
+      expectedPageContent.siteDetails[0]
+    )) {
+      const rows = siteCard.querySelectorAll('.govuk-summary-list__row')
+      const row = Array.from(rows).find((r) => {
+        const keyElement = r.querySelector(GOV_UK_SUMMARY_LIST_KEY)
+        return keyElement && keyElement.textContent.trim() === key
+      })
+      expect(row).toBeTruthy()
+      const valueElement = row.querySelector('.govuk-summary-list__value')
+      expect(valueElement.textContent.trim()).toBe(value)
+    }
   }
 
   // Validate extended site details (coordinate points) if present

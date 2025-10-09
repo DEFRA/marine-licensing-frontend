@@ -35,7 +35,7 @@ describe('#formatProjectsForDisplay', () => {
         },
         { text: '15 Jan 2024' },
         {
-          html: '<a href="/exemption/task-list/abc123" class="govuk-link govuk-!-margin-right-4 govuk-link--no-visited-state" aria-label="Continue to task list">Continue</a><a href="/exemption/delete/abc123" class="govuk-link" aria-label="Delete Test Project">Delete</a>'
+          html: '<a href="/exemption/task-list/abc123" class="govuk-link govuk-!-margin-right-4 govuk-link--no-visited-state" aria-label="Continue to task list">Continue</a><a href="/exemption/delete/abc123" class="govuk-link govuk-link--no-visited-state" aria-label="Delete Test Project">Delete</a>'
         }
       ]
     ])
@@ -65,7 +65,7 @@ describe('#formatProjectsForDisplay', () => {
         },
         { text: '-' },
         {
-          html: '<a href="/exemption/task-list/abc123" class="govuk-link govuk-!-margin-right-4 govuk-link--no-visited-state" aria-label="Continue to task list">Continue</a><a href="/exemption/delete/abc123" class="govuk-link" aria-label="Delete Test Project">Delete</a>'
+          html: '<a href="/exemption/task-list/abc123" class="govuk-link govuk-!-margin-right-4 govuk-link--no-visited-state" aria-label="Continue to task list">Continue</a><a href="/exemption/delete/abc123" class="govuk-link govuk-link--no-visited-state" aria-label="Delete Test Project">Delete</a>'
         }
       ]
     ])
@@ -103,7 +103,7 @@ describe('#formatProjectsForDisplay', () => {
       },
       { text: '15 Jan 2024' },
       {
-        html: '<a href="/exemption/task-list/abc123" class="govuk-link govuk-!-margin-right-4 govuk-link--no-visited-state" aria-label="Continue to task list">Continue</a><a href="/exemption/delete/abc123" class="govuk-link" aria-label="Delete Project 1">Delete</a>'
+        html: '<a href="/exemption/task-list/abc123" class="govuk-link govuk-!-margin-right-4 govuk-link--no-visited-state" aria-label="Continue to task list">Continue</a><a href="/exemption/delete/abc123" class="govuk-link govuk-link--no-visited-state" aria-label="Delete Project 1">Delete</a>'
       }
     ])
     expect(result[1]).toEqual([
@@ -115,7 +115,7 @@ describe('#formatProjectsForDisplay', () => {
       },
       { text: '25 Jun 2024' },
       {
-        html: '<a href="/exemption/view-details/def456" class="govuk-link" aria-label="View details of Project 2">View details</a>'
+        html: '<a href="/exemption/view-details/def456" class="govuk-link govuk-link--no-visited-state" aria-label="View details of Project 2">View details</a>'
       }
     ])
   })
@@ -162,7 +162,7 @@ describe('getActionButtons', () => {
     }
     const result = getActionButtons(draft)
     expect(result).toBe(
-      `<a href="${routes.TASK_LIST}/abc123" class="govuk-link govuk-!-margin-right-4 govuk-link--no-visited-state" aria-label="Continue to task list">Continue</a><a href="${routes.DELETE_EXEMPTION}/abc123" class="govuk-link" aria-label="Delete Test Project">Delete</a>`
+      `<a href="${routes.TASK_LIST}/abc123" class="govuk-link govuk-!-margin-right-4 govuk-link--no-visited-state" aria-label="Continue to task list">Continue</a><a href="${routes.DELETE_EXEMPTION}/abc123" class="govuk-link govuk-link--no-visited-state" aria-label="Delete Test Project">Delete</a>`
     )
   })
 
@@ -174,7 +174,7 @@ describe('getActionButtons', () => {
     }
     const result = getActionButtons(submitted)
     expect(result).toBe(
-      '<a href="/exemption/view-details/abc123" class="govuk-link" aria-label="View details of Test Project">View details</a>'
+      '<a href="/exemption/view-details/abc123" class="govuk-link govuk-link--no-visited-state" aria-label="View details of Test Project">View details</a>'
     )
   })
 
@@ -186,7 +186,7 @@ describe('getActionButtons', () => {
     }
     const result = getActionButtons(submitted)
     expect(result).toBe(
-      '<a href="/exemption/view-details/def456" class="govuk-link" aria-label="View details of Another Project">View details</a>'
+      '<a href="/exemption/view-details/def456" class="govuk-link govuk-link--no-visited-state" aria-label="View details of Another Project">View details</a>'
     )
   })
 
@@ -198,7 +198,7 @@ describe('getActionButtons', () => {
     }
     const result = getActionButtons(unknown)
     expect(result).toBe(
-      '<a href="/exemption/view-details/ghi789" class="govuk-link" aria-label="View details of Unknown Status Project">View details</a>'
+      '<a href="/exemption/view-details/ghi789" class="govuk-link govuk-link--no-visited-state" aria-label="View details of Unknown Status Project">View details</a>'
     )
   })
 })

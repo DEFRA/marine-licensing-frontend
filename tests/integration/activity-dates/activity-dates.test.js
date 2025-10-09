@@ -1,5 +1,6 @@
 import { getByRole, getByText } from '@testing-library/dom'
 import { routes } from '~/src/server/common/constants/routes.js'
+import { statusCodes } from '~/src/server/common/constants/status-codes.js'
 import { exemptionNoActivityDates } from '~/tests/integration/activity-dates/fixtures.js'
 import { expectDateInputValues } from '~/tests/integration/shared/expect-utils.js'
 import {
@@ -7,6 +8,8 @@ import {
   setupTestServer
 } from '~/tests/integration/shared/test-setup-helpers.js'
 import { loadPage } from '~/tests/integration/shared/app-server.js'
+import { makePostRequest } from '~/src/server/test-helpers/server-requests.js'
+import { getToday, getNextYear } from '~/tests/integration/shared/dates.js'
 
 describe('Activity dates - page structure & accessibility', () => {
   const getServer = setupTestServer()
@@ -162,5 +165,83 @@ describe('Activity dates - page structure & accessibility', () => {
         exact: false
       })
     ).toBeInTheDocument()
+  })
+
+  test('should display Save and continue button when action parameter is present', async () => {
+    const document = await loadPage({
+      requestUrl: `${routes.SITE_DETAILS_ACTIVITY_DATES}?action=add`,
+      server: getServer()
+    })
+
+    expect(
+      getByRole(document, 'button', { name: 'Save and continue' })
+    ).toBeInTheDocument()
+  })
+
+  test('should redirect to review site details after submit when action parameter is present', async () => {
+    const { updateExemptionSiteDetails } = mockExemption(
+      exemptionNoActivityDates
+    )
+    const today = getToday()
+    const nextYear = getNextYear()
+
+    const response = await makePostRequest({
+      url: `${routes.SITE_DETAILS_ACTIVITY_DATES}?action=add`,
+      server: getServer(),
+      formData: {
+        'activity-start-date-day': today.day,
+        'activity-start-date-month': today.month,
+        'activity-start-date-year': today.year,
+        'activity-end-date-day': today.day,
+        'activity-end-date-month': today.month,
+        'activity-end-date-year': nextYear
+      }
+    })
+
+    expect(response.statusCode).toBe(statusCodes.redirect)
+    expect(response.headers.location).toBe(
+      '/exemption/review-site-details#site-details-1'
+    )
+
+    expect(updateExemptionSiteDetails).toHaveBeenCalledWith(
+      expect.any(Object),
+      0,
+      'activityDates',
+      expect.any(Object)
+    )
+  })
+
+  test('should redirect to review site details after submit when action parameter is present for specific site', async () => {
+    const { updateExemptionSiteDetails } = mockExemption({
+      ...exemptionNoActivityDates,
+      siteDetails: [{}, {}]
+    })
+    const today = getToday()
+    const nextYear = getNextYear()
+
+    const response = await makePostRequest({
+      url: `${routes.SITE_DETAILS_ACTIVITY_DATES}?site=2&action=change`,
+      server: getServer(),
+      formData: {
+        'activity-start-date-day': today.day,
+        'activity-start-date-month': today.month,
+        'activity-start-date-year': today.year,
+        'activity-end-date-day': today.day,
+        'activity-end-date-month': today.month,
+        'activity-end-date-year': nextYear
+      }
+    })
+
+    expect(response.statusCode).toBe(statusCodes.redirect)
+    expect(response.headers.location).toBe(
+      '/exemption/review-site-details#site-details-2'
+    )
+
+    expect(updateExemptionSiteDetails).toHaveBeenCalledWith(
+      expect.any(Object),
+      1,
+      'activityDates',
+      expect.any(Object)
+    )
   })
 })

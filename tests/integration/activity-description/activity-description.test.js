@@ -6,12 +6,14 @@ import {
   queryByText
 } from '@testing-library/dom'
 import { routes } from '~/src/server/common/constants/routes.js'
+import { statusCodes } from '~/src/server/common/constants/status-codes.js'
 import { exemptionNoActivityDescription } from '~/tests/integration/activity-description/fixtures.js'
 import {
   mockExemption,
   setupTestServer
 } from '~/tests/integration/shared/test-setup-helpers.js'
 import { loadPage } from '~/tests/integration/shared/app-server.js'
+import { makePostRequest } from '~/src/server/test-helpers/server-requests.js'
 
 describe('Activity description - page structure & accessibility', () => {
   const getServer = setupTestServer()
@@ -171,5 +173,69 @@ describe('Activity description - page structure & accessibility', () => {
         `Briefly describe what you'll do at this site, how you'll do it, and why.`
       )
     ).toBeInTheDocument()
+  })
+
+  test('should display Save and continue button when action parameter is present', async () => {
+    const document = await loadPage({
+      requestUrl: `${routes.SITE_DETAILS_ACTIVITY_DESCRIPTION}?action=add`,
+      server: getServer()
+    })
+
+    expect(
+      getByRole(document, 'button', { name: 'Save and continue' })
+    ).toBeInTheDocument()
+  })
+
+  test('should redirect to correct page after submit when action parameter is present', async () => {
+    const { updateExemptionSiteDetails } = mockExemption(
+      exemptionNoActivityDescription
+    )
+
+    const response = await makePostRequest({
+      url: `${routes.SITE_DETAILS_ACTIVITY_DESCRIPTION}?action=add`,
+      server: getServer(),
+      formData: {
+        activityDescription: 'Test activity description for site'
+      }
+    })
+
+    expect(response.statusCode).toBe(statusCodes.redirect)
+    expect(response.headers.location).toBe(
+      '/exemption/review-site-details#site-details-1'
+    )
+
+    expect(updateExemptionSiteDetails).toHaveBeenCalledWith(
+      expect.any(Object),
+      0,
+      'activityDescription',
+      'Test activity description for site'
+    )
+  })
+
+  test('should redirect to correct page after submit when action parameter is present for specific site', async () => {
+    const { updateExemptionSiteDetails } = mockExemption({
+      ...exemptionNoActivityDescription,
+      siteDetails: [{}, {}]
+    })
+
+    const response = await makePostRequest({
+      url: `${routes.SITE_DETAILS_ACTIVITY_DESCRIPTION}?site=2&action=change`,
+      server: getServer(),
+      formData: {
+        activityDescription: 'Updated activity description for site 2'
+      }
+    })
+
+    expect(response.statusCode).toBe(statusCodes.redirect)
+    expect(response.headers.location).toBe(
+      '/exemption/review-site-details#site-details-2'
+    )
+
+    expect(updateExemptionSiteDetails).toHaveBeenCalledWith(
+      expect.any(Object),
+      1,
+      'activityDescription',
+      'Updated activity description for site 2'
+    )
   })
 })

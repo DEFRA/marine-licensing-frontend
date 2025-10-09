@@ -70,7 +70,9 @@ describe('#activityDescriptionController', () => {
       activityDescriptionController.handler(request, h)
 
       expect(h.view).toHaveBeenCalledWith(ACTIVITY_DESCRIPTION_VIEW_ROUTE, {
+        action: undefined,
         backLink: routes.TASK_LIST,
+        cancelLink: routes.TASK_LIST + '?cancel=site-details',
         isMultiSiteJourney: false,
         isSiteDetailsFlow: false,
         pageTitle: 'Activity description',
@@ -88,7 +90,9 @@ describe('#activityDescriptionController', () => {
         2,
         ACTIVITY_DESCRIPTION_VIEW_ROUTE,
         {
+          action: undefined,
           backLink: routes.TASK_LIST,
+          cancelLink: routes.TASK_LIST + '?cancel=site-details',
           isMultiSiteJourney: false,
           isSiteDetailsFlow: false,
           pageTitle: 'Activity description',
@@ -119,7 +123,9 @@ describe('#activityDescriptionController', () => {
       activityDescriptionController.handler(request, h)
 
       expect(h.view).toHaveBeenCalledWith(ACTIVITY_DESCRIPTION_VIEW_ROUTE, {
+        action: undefined,
         backLink: routes.SITE_DETAILS_ACTIVITY_DATES,
+        cancelLink: routes.TASK_LIST + '?cancel=site-details',
         isMultiSiteJourney: false,
         isSiteDetailsFlow: true,
         pageTitle: 'Activity description',
@@ -321,7 +327,9 @@ describe('#activityDescriptionController', () => {
       )
 
       expect(h.view).toHaveBeenCalledWith(ACTIVITY_DESCRIPTION_VIEW_ROUTE, {
+        action: undefined,
         backLink: routes.TASK_LIST,
+        cancelLink: routes.TASK_LIST + '?cancel=site-details',
         isMultiSiteJourney: false,
         isSiteDetailsFlow: false,
         errorSummary: [

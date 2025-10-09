@@ -43,9 +43,9 @@ function buildSimplifiedErrorSummary(errorDetails, dateConfigs, errorMessages) {
     config.prefix.includes('start') ? -1 : 1
   )
 
-  sortedConfigs.forEach((config) => {
+  for (const config of sortedConfigs) {
     validateConfigFields(config, errors, errorSummary, errorTypeMap)
-  })
+  }
 
   addNonDateErrors(basicErrorSummary, dateConfigs, errorSummary)
 
@@ -112,7 +112,7 @@ function hasCustomValidationError(config, errorTypeMap, errorSummary) {
 }
 
 function addNonDateErrors(basicErrorSummary, dateConfigs, errorSummary) {
-  basicErrorSummary.forEach((error) => {
+  for (const error of basicErrorSummary) {
     const isDateError = dateConfigs.some((config) =>
       error.field?.[0]?.includes(config.prefix)
     )
@@ -121,7 +121,7 @@ function addNonDateErrors(basicErrorSummary, dateConfigs, errorSummary) {
     if (!isDateError && hasValidHref) {
       errorSummary.push(error)
     }
-  })
+  }
 }
 
 export function processDateValidationErrors(err, dateConfigs, errorMessages) {

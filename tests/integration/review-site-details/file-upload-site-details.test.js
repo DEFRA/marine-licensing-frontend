@@ -152,7 +152,7 @@ describe('Review Site Details - File Upload Integration Tests', () => {
 
     if (expected.multipleSiteDetails.warning) {
       expect(
-        getByText(document, `The site details you've provided are saved`)
+        getByText(document, `The site details you've provided are saved.`)
       ).toBeInTheDocument()
 
       expect(
@@ -167,7 +167,7 @@ describe('Review Site Details - File Upload Integration Tests', () => {
       ).toBeInTheDocument()
     } else {
       expect(
-        queryByText(document, `The site details you've provided are saved`)
+        queryByText(document, `The site details you've provided are saved.`)
       ).not.toBeInTheDocument()
 
       expect(

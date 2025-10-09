@@ -44,14 +44,14 @@ document.addEventListener('DOMContentLoaded', () => {
   const addAnotherElements = document.querySelectorAll(
     '[data-module="add-another-point"]'
   )
-  addAnotherElements.forEach((element) => {
+  for (const element of addAnotherElements) {
     new AddAnotherPoint(element) // eslint-disable-line no-new
-  })
+  }
 
   const mapElements = document.querySelectorAll(
     '[data-module="site-details-map"]'
   )
-  mapElements.forEach((element) => {
+  for (const element of mapElements) {
     new SiteDetailsMap(element) // eslint-disable-line no-new
-  })
+  }
 })

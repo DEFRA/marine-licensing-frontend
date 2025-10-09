@@ -1,7 +1,7 @@
 import { mockRequestAuth } from '~/src/server/test-helpers/mocks.js'
 
 export const makeGetRequest = async ({ url, server, headers = {} }) => {
-  return server.inject({
+  return await server.inject({
     auth: mockRequestAuth,
     method: 'GET',
     url,
@@ -15,7 +15,7 @@ export const makePostRequest = async ({
   formData = {},
   headers = {}
 }) => {
-  return server.inject({
+  return await server.inject({
     auth: mockRequestAuth,
     method: 'POST',
     url,

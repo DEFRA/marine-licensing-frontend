@@ -88,7 +88,7 @@ export function generateDateErrorMessages({
     return errorMap
   }, {})
 
-  dateConfigs.forEach((config) => {
+  for (const config of dateConfigs) {
     const isDateMissing = isCompleteDateMissing(
       errors,
       config.prefix,
@@ -104,7 +104,7 @@ export function generateDateErrorMessages({
     })
 
     dateErrorMessages[config.errorMessageKey] = errorMessage
-  })
+  }
 
   return dateErrorMessages
 }

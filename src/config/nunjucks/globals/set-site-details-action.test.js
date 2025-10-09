@@ -12,6 +12,7 @@ describe('setSiteDetailsAction', () => {
     expect(result).toEqual({
       items: [
         {
+          classes: 'govuk-link--no-visited-state',
           href: '/site-details?site=1&action=change',
           text: 'Change',
           visuallyHiddenText: 'site name'
@@ -31,6 +32,7 @@ describe('setSiteDetailsAction', () => {
     expect(result).toEqual({
       items: [
         {
+          classes: 'govuk-link--no-visited-state',
           href: '/another-page?site=5&action=change',
           text: 'Change',
           visuallyHiddenText: 'for site 5'
@@ -45,6 +47,7 @@ describe('setSiteDetailsAction', () => {
     expect(result).toEqual({
       items: [
         {
+          classes: 'govuk-link--no-visited-state',
           href: '/site-details?site=1&action=add',
           text: 'Add'
         }
@@ -58,6 +61,7 @@ describe('setSiteDetailsAction', () => {
     expect(result).toEqual({
       items: [
         {
+          classes: 'govuk-link--no-visited-state',
           href: '/site-details?site=1&action=add',
           text: 'Add'
         }
@@ -71,6 +75,7 @@ describe('setSiteDetailsAction', () => {
     expect(result).toEqual({
       items: [
         {
+          classes: 'govuk-link--no-visited-state',
           href: '/site-details?site=1&action=add',
           text: 'Add'
         }
@@ -84,6 +89,7 @@ describe('setSiteDetailsAction', () => {
     expect(result).toEqual({
       items: [
         {
+          classes: 'govuk-link--no-visited-state',
           href: '/site-details?site=1&action=change',
           text: 'Change'
         }
@@ -97,6 +103,7 @@ describe('setSiteDetailsAction', () => {
     expect(result).toEqual({
       items: [
         {
+          classes: 'govuk-link--no-visited-state',
           href: '#',
           text: 'Change'
         }
@@ -110,6 +117,7 @@ describe('setSiteDetailsAction', () => {
     expect(result).toEqual({
       items: [
         {
+          classes: 'govuk-link--no-visited-state',
           href: '#',
           text: 'Change'
         }

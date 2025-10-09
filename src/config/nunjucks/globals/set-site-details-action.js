@@ -17,7 +17,8 @@ export function setSiteDetailsAction(
       {
         href: hrefWithSite,
         text: hasValue ? 'Change' : 'Add',
-        ...(visuallyHiddenText && { visuallyHiddenText })
+        ...(visuallyHiddenText && { visuallyHiddenText }),
+        classes: 'govuk-link--no-visited-state'
       }
     ]
   }

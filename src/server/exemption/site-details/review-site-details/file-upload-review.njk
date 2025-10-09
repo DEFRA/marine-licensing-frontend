@@ -63,8 +63,8 @@
                     key: {
                       text: "File uploaded"
                     },
-                    value: { 
-                      text: multipleSiteDetailsData.filename | sanitiseFilename 
+                    value: {
+                      text: multipleSiteDetailsData.filename | sanitiseFilename
                     }
                 }
             ] %}
@@ -75,8 +75,7 @@
                         text: "Providing the site location"
                     }
                 },
-                rows: multipleSiteRows,
-                classes: "govuk-summary-list--full-width"
+                rows: multipleSiteRows
             }) }}
 
 
@@ -112,7 +111,7 @@
                   html: multipleSiteDetailsData.sameActivityDescription
               }
           }), activityRows) %}
-                    
+
           {% if multipleSiteDetailsData.activityDescription %}
               {% set activityRows = (activityRows.push({
                   key: {
@@ -123,20 +122,19 @@
                   }
               }), activityRows) %}
           {% endif %}
-                
+
           {{ govukSummaryList({
               card: {
                   title: {
                       text: "Activity details"
                   }
               },
-              rows: activityRows,
-              classes: "govuk-summary-list--full-width"
+              rows: activityRows
           }) }}
 
         {% endif %}
 
-        
+
         {% for site in summaryData %}
 
             {#  This javascript variable is only for testing purposes. #}
@@ -174,10 +172,10 @@
               value: { html: appIncompleteField({ text: site.activityDescription })}
             }) %}
           {% endif %}
-          
+
           {% set _ = rows.push({
-            key: { text: "Map view", classes: "govuk-summary-list__key--full-width" },
-            value: { html: appSiteDetailsMap(site.siteDetailsData, loop.index0), classes: "govuk-summary-list__value--full-width" }
+            key: { text: "Map view" },
+            value: { html: appSiteDetailsMap(site.siteDetailsData, loop.index0) }
           }) %}
 
           {{ govukSummaryList({
@@ -186,8 +184,7 @@
               text: summaryRowsHeading
             }
           },
-          rows: rows,
-        classes: "govuk-summary-list--full-width"
+          rows: rows
         }) }}
         {% endfor %}
 

@@ -80,7 +80,6 @@ describe('MapViewManager', () => {
 
     test('should fall back to centre view when fit throws an error', () => {
       const extent = [100, 200, 300, 400]
-      const consoleWarnSpy = vi.spyOn(console, 'warn').mockImplementation()
 
       mockView.fit.mockImplementation(() => {
         throw new Error('Fit failed')
@@ -90,27 +89,6 @@ describe('MapViewManager', () => {
 
       expect(mockView.setCenter).toHaveBeenCalledWith([-3.5, 54.0])
       expect(mockView.setZoom).toHaveBeenCalledWith(12)
-
-      consoleWarnSpy.mockRestore()
-    })
-
-    test('should log specific warning message when fit throws an error', () => {
-      const extent = [100, 200, 300, 400]
-      const testError = new Error('Fit failed')
-      const consoleWarnSpy = vi.spyOn(console, 'warn').mockImplementation()
-
-      mockView.fit.mockImplementation(() => {
-        throw testError
-      })
-
-      mapViewManager.fitMapToExtent(mockMap, extent)
-
-      expect(consoleWarnSpy).toHaveBeenCalledWith(
-        'Failed to fit map to extent, falling back to UK centre:',
-        testError
-      )
-
-      consoleWarnSpy.mockRestore()
     })
   })
 

@@ -146,8 +146,8 @@ export const sanitiseFieldName = (fieldPath) =>
 export const sanitiseFieldId = (fieldName) =>
   fieldName
     .join('')
-    .replace(PATTERNS.FIELD_BRACKETS, '')
-    .replace(/(\d+)/g, '-$1-')
+    .replaceAll(PATTERNS.FIELD_BRACKETS, '')
+    .replaceAll(/(\d+)/g, '-$1-')
 
 export const convertPayloadToCoordinatesArray = (payload, coordinateSystem) => {
   const coordinates = []

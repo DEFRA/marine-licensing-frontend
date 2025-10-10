@@ -18,7 +18,10 @@ export const getNextRoute = (
   return nextRoute + queryParams
 }
 
-export const getBackRoute = (siteIndex, queryParams = '', exemption = null) => {
+export const getBackRoute = (
+  { siteIndex, queryParams = '' },
+  exemption = null
+) => {
   if (siteIndex === 0) {
     const isMultipleSites = exemption?.multipleSiteDetails?.multipleSitesEnabled
 

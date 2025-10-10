@@ -31,9 +31,6 @@ for (const [name, filter] of Object.entries(globals)) {
   nunjucksEnvironment.addGlobal(name, filter)
 }
 
-/**
- * @satisfies {ServerRegisterPluginObject<ServerViewsConfiguration>}
- */
 export const nunjucksConfig = {
   plugin: hapiVision,
   options: {

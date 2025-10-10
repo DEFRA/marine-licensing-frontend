@@ -241,14 +241,22 @@ describe('Review Site Details - File Upload Integration Tests', () => {
     const actionList = row.querySelector('.govuk-summary-list__actions')
     expect(actionList).toBeTruthy()
 
-    const actionLink = actionList.querySelector('a')
-    expect(actionLink).toBeTruthy()
-
     const hasValue = value && value !== '' && value !== 'Incomplete'
-    const expectedText = hasValue ? 'Change' : 'Add'
-    expect(actionLink.textContent.trim()).toContain(expectedText)
+    const expectedText = hasValue ? /Change/i : /Add/i
+
+    const actionLink = within(actionList).getByRole('link', {
+      name: expectedText
+    })
 
     const siteNumber = siteIndex + 1
+
+    expect(actionLink).toHaveAttribute(
+      'href',
+      expect.stringContaining(
+        `site=${siteNumber}&action=${hasValue ? 'change' : 'add'}`
+      )
+    )
+
     expect(actionLink.getAttribute('href')).toContain(
       `site=${siteNumber}&action=${hasValue ? 'change' : 'add'}`
     )

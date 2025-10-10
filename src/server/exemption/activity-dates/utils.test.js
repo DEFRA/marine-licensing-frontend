@@ -50,13 +50,13 @@ describe('#getBackRoute', () => {
       siteDetails: [{}]
     }
 
-    const result = getBackRoute(0, '', exemption)
+    const result = getBackRoute({ siteIndex: 0, queryParams: '' }, exemption)
 
     expect(result).toBe(routes.SAME_ACTIVITY_DATES)
   })
 
   test('correct back link for additional sites', () => {
-    const result = getBackRoute(1, '?site=1')
+    const result = getBackRoute({ siteIndex: 1, queryParams: '?site=1' })
 
     expect(result).toBe(`${routes.SITE_NAME}?site=1`)
   })
@@ -67,7 +67,7 @@ describe('#getBackRoute', () => {
       siteDetails: [{ coordinatesType: 'file' }]
     }
 
-    const result = getBackRoute(0, '', exemption)
+    const result = getBackRoute({ siteIndex: 0, queryParams: '' }, exemption)
 
     expect(result).toBe(routes.FILE_UPLOAD)
   })
@@ -78,13 +78,13 @@ describe('#getBackRoute', () => {
       siteDetails: [{ coordinatesType: 'file' }]
     }
 
-    const result = getBackRoute(0, '', exemption)
+    const result = getBackRoute({ siteIndex: 0, queryParams: '' }, exemption)
 
     expect(result).toBe(routes.SAME_ACTIVITY_DATES)
   })
 
   test('should return MULTIPLE_SITES_CHOICE when no exemption provided (defaults to single site)', () => {
-    const result = getBackRoute(0, '', null)
+    const result = getBackRoute({ siteIndex: 0, queryParams: '' }, null)
 
     expect(result).toBe(routes.MULTIPLE_SITES_CHOICE)
   })
@@ -95,7 +95,7 @@ describe('#getBackRoute', () => {
       siteDetails: [{ coordinatesType: 'coordinates' }]
     }
 
-    const result = getBackRoute(0, '', exemption)
+    const result = getBackRoute({ siteIndex: 0, queryParams: '' }, exemption)
 
     expect(result).toBe(routes.MULTIPLE_SITES_CHOICE)
   })

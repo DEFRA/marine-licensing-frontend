@@ -104,7 +104,6 @@ describe('setSiteDetailsAction', () => {
       items: [
         {
           classes: 'govuk-link--no-visited-state',
-          href: '#',
           text: 'Change'
         }
       ]
@@ -118,7 +117,6 @@ describe('setSiteDetailsAction', () => {
       items: [
         {
           classes: 'govuk-link--no-visited-state',
-          href: '#',
           text: 'Change'
         }
       ]

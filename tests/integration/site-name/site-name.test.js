@@ -4,6 +4,7 @@ import { getByLabelText, getByRole, getByText } from '@testing-library/dom'
 import { statusCodes } from '~/src/server/common/constants/status-codes.js'
 import { setExemptionCache } from '~/src/server/common/helpers/session-cache/utils.js'
 import { validateErrors } from '../shared/expect-utils.js'
+import { loadPage } from '~/tests/integration/shared/app-server.js'
 
 import {
   mockExemption,
@@ -227,14 +228,10 @@ describe('Site name page', () => {
   })
 
   test('should show "Save and continue" button and review site details back link when action parameter is present', async () => {
-    const { result, statusCode } = await makeGetRequest({
-      server: getServer(),
-      url: '/exemption/site-name?action=add'
+    const document = await loadPage({
+      requestUrl: '/exemption/site-name?action=add',
+      server: getServer()
     })
-
-    expect(statusCode).toBe(statusCodes.ok)
-
-    const { document } = new JSDOM(result).window
 
     expect(
       getByRole(document, 'button', { name: 'Save and continue' })

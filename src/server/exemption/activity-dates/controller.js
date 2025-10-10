@@ -42,7 +42,7 @@ const getBackLink = (siteIndex, action, siteNumber, queryParams, exemption) => {
   if (action) {
     return `${routes.REVIEW_SITE_DETAILS}#site-details-${siteNumber}`
   }
-  return getBackRoute(siteIndex, queryParams, exemption)
+  return getBackRoute({ siteIndex, queryParams }, exemption)
 }
 
 const createTemplateData = (

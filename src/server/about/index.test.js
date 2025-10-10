@@ -1,5 +1,5 @@
 import { vi } from 'vitest'
-import { about } from '~/src/server/about/index.js'
+import { about } from '#src/server/about/index.js'
 
 describe('about route', () => {
   test('route is registered correctly', () => {

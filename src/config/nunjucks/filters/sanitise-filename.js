@@ -1,9 +1,3 @@
-/**
- * Sanitises and truncates a filename for safe display
- * @param {string | null | undefined} value - The filename to sanitise
- * @param {number} maxLength - Maximum length before truncation (default: 64)
- * @returns {string} The sanitised and potentially truncated filename
- */
 export function sanitiseFilename(value, maxLength = 64) {
   const truncationToken = '...'
   const truncationTokenLength = truncationToken.length

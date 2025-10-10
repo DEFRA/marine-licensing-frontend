@@ -1,5 +1,5 @@
-import { projectNameRoutes } from '~/src/server/exemption/project-name/index.js'
-import { routes } from '~/src/server/common/constants/routes.js'
+import { projectNameRoutes } from '#src/server/exemption/project-name/index.js'
+import { routes } from '#src/server/common/constants/routes.js'
 
 describe('projectNameRoutes routes', () => {
   test('get route is formatted correctly', () => {

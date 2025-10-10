@@ -7,9 +7,9 @@ import {
   getExemptionCache,
   updateExemptionMultipleSiteDetails,
   updateExemptionSiteDetails
-} from '~/src/server/common/helpers/session-cache/utils.js'
-import { routes } from '~/src/server/common/constants/routes.js'
-import { mockSite } from '~/src/server/test-helpers/mocks.js'
+} from '#src/server/common/helpers/session-cache/utils.js'
+import { routes } from '#src/server/common/constants/routes.js'
+import { mockSite } from '#src/server/test-helpers/mocks.js'
 
 vi.mock('~/src/server/common/helpers/session-cache/utils.js')
 

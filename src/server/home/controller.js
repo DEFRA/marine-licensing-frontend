@@ -1,12 +1,6 @@
-import { config } from '~/src/config/config.js'
-import { routes } from '~/src/server/common/constants/routes.js'
-import { clearExemptionCache } from '~/src/server/common/helpers/session-cache/utils.js'
-
-/**
- * A GDS styled example home page controller.
- * Provided as an example, remove or modify as required.
- * @satisfies {Partial<ServerRoute>}
- */
+import { config } from '#src/config/config.js'
+import { routes } from '#src/server/common/constants/routes.js'
+import { clearExemptionCache } from '#src/server/common/helpers/session-cache/utils.js'
 export const homeController = {
   handler(request, h) {
     const { accountManagementUrl } = config.get('defraId')
@@ -20,7 +14,3 @@ export const homeController = {
     return h.redirect('/exemption')
   }
 }
-
-/**
- * @import { ServerRoute } from '@hapi/hapi'
- */

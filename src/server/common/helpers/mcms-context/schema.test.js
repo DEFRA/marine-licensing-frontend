@@ -1,11 +1,12 @@
 import { paramsSchema } from './schema.js'
+import { mcmsAnswersDownloadUrl } from '~/src/server/test-helpers/mocks.js'
 
 describe('mcms-context schema', () => {
   describe('paramsSchema validation and transformation', () => {
     const validBaseParams = {
       ACTIVITY_TYPE: 'CON',
       ARTICLE: '17',
-      pdfDownloadUrl: 'https://example.com/test.pdf'
+      pdfDownloadUrl: mcmsAnswersDownloadUrl
     }
 
     describe('validation', () => {
@@ -124,6 +125,62 @@ describe('mcms-context schema', () => {
           'EXE_ACTIVITY_SUBTYPE_CONSTRUCTION'
         ])
       })
+
+      it('should validate pdfDownloadUrl matching the required pattern', () => {
+        const validUrls = [
+          'https://marinelicensing.marinemanagement.org.uk/path/journey/self-service/outcome-document/b87ae3f7-48f3-470d-b29b-5a5abfdaa49f',
+          'https://marinelicensingtest.marinemanagement.org.uk/somepath/journey/self-service/outcome-document/a1b2c3d4-e5f6-7890-abcd-ef1234567890'
+        ]
+
+        validUrls.forEach((url) => {
+          const params = {
+            ...validBaseParams,
+            pdfDownloadUrl: url,
+            ACTIVITY_TYPE: 'INCINERATION'
+          }
+
+          const { error } = paramsSchema.validate(params)
+          expect(error).toBeUndefined()
+        })
+      })
+
+      it('should reject pdfDownloadUrl not matching the required pattern', () => {
+        const invalidUrls = [
+          'https://example.com/test.pdf',
+          'http://marinelicensing.marinemanagement.org.uk/path/journey/self-service/outcome-document/b87ae3f7-48f3-470d-b29b-5a5abfdaa49f',
+          'https://marinemanagement.org.uk/path/journey/self-service/outcome-document/b87ae3f7-48f3-470d-b29b-5a5abfdaa49f',
+          'https://marinelicensing.marinemanagement.org.uk/journey/self-service/outcome-document/b87ae3f7-48f3-470d-b29b-5a5abfdaa49f',
+          'https://marinelicensing.marinemanagement.org.uk/path/journey/outcome-document/b87ae3f7-48f3-470d-b29b-5a5abfdaa49f',
+          'https://marinelicensing.marinemanagement.co.uk/path/journey/self-service/outcome-document/b87ae3f7-48f3-470d-b29b-5a5abfdaa49f',
+          'https://marinelicensing.marinemanagement.org.uk/path/journey/self-service/other/b87ae3f7-48f3-470d-b29b-5a5abfdaa49f',
+          'https://marinelicensing.marinemanagement.org.uk/path/journey/self-service/outcome-document/invalid/path',
+          'https://marinelicensing.marinemanagement.org.uk/path/journey/self-service/outcome-document/has spaces',
+          'https://marinelicensing.marinemanagement.org.uk/path/journey/self-service/outcome-document/invalid@char'
+        ]
+
+        invalidUrls.forEach((url) => {
+          const params = {
+            ...validBaseParams,
+            pdfDownloadUrl: url,
+            ACTIVITY_TYPE: 'INCINERATION'
+          }
+
+          const { error } = paramsSchema.validate(params)
+          expect(error).toBeDefined()
+          expect(error.details[0].path).toEqual(['pdfDownloadUrl'])
+        })
+      })
+
+      it('should require pdfDownloadUrl', () => {
+        const params = {
+          ACTIVITY_TYPE: 'INCINERATION',
+          ARTICLE: '17'
+        }
+
+        const { error } = paramsSchema.validate(params)
+        expect(error).toBeDefined()
+        expect(error.details[0].path).toEqual(['pdfDownloadUrl'])
+      })
     })
 
     describe('transformation', () => {
@@ -140,7 +197,8 @@ describe('mcms-context schema', () => {
           activityType: 'CON',
           activitySubtype: 'maintenance',
           article: '17',
-          pdfDownloadUrl: 'https://example.com/test.pdf'
+          pdfDownloadUrl:
+            'https://marinelicensing.marinemanagement.org.uk/path/journey/self-service/outcome-document/b87ae3f7-48f3-470d-b29b-5a5abfdaa49f'
         })
       })
 
@@ -157,7 +215,8 @@ describe('mcms-context schema', () => {
           activityType: 'DEPOSIT',
           activitySubtype: 'dredgedMaterial',
           article: '17',
-          pdfDownloadUrl: 'https://example.com/test.pdf'
+          pdfDownloadUrl:
+            'https://marinelicensing.marinemanagement.org.uk/path/journey/self-service/outcome-document/b87ae3f7-48f3-470d-b29b-5a5abfdaa49f'
         })
       })
 
@@ -172,7 +231,8 @@ describe('mcms-context schema', () => {
         expect(value).toEqual({
           activityType: 'INCINERATION',
           article: '17',
-          pdfDownloadUrl: 'https://example.com/test.pdf'
+          pdfDownloadUrl:
+            'https://marinelicensing.marinemanagement.org.uk/path/journey/self-service/outcome-document/b87ae3f7-48f3-470d-b29b-5a5abfdaa49f'
         })
       })
 

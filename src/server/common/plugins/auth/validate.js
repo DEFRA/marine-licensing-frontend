@@ -3,10 +3,10 @@ import {
   removeUserSession,
   refreshAccessToken,
   updateUserSession
-} from '~/src/server/common/plugins/auth/utils.js'
+} from '#src/server/common/plugins/auth/utils.js'
 import { isPast, parseISO, subMinutes } from 'date-fns'
-import { isEntraIdRoute } from '~/src/server/common/constants/routes.js'
-import { AUTH_STRATEGIES } from '~/src/server/common/constants/auth.js'
+import { isEntraIdRoute } from '#src/server/common/constants/routes.js'
+import { AUTH_STRATEGIES } from '#src/server/common/constants/auth.js'
 
 const isAuthStrategyValidForRoute = (strategy, requestPath) => {
   if (strategy === AUTH_STRATEGIES.ENTRA_ID) {

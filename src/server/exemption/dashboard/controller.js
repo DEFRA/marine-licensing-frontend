@@ -1,13 +1,8 @@
-import { authenticatedGetRequest } from '~/src/server/common/helpers/authenticated-requests.js'
+import { authenticatedGetRequest } from '#src/server/common/helpers/authenticated-requests.js'
 import { formatProjectsForDisplay } from './utils.js'
 
 export const DASHBOARD_VIEW_ROUTE = 'exemption/dashboard/index.njk'
 const DASHBOARD_PAGE_TITLE = 'Your projects'
-
-/**
- * @param {import('@hapi/hapi').Request} request
- * @param {import('@hapi/hapi').ResponseToolkit} h
- */
 export const dashboardController = {
   handler: async (request, h) => {
     try {

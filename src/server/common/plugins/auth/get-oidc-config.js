@@ -1,5 +1,5 @@
 import Wreck from '@hapi/wreck'
-import { statusCodes } from '~/src/server/common/constants/status-codes.js'
+import { statusCodes } from '#src/server/common/constants/status-codes.js'
 import querystring from 'node:querystring'
 
 export const getOidcConfig = async (configUrl) => {

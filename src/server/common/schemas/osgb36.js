@@ -1,9 +1,9 @@
 import joi from 'joi'
-import { JOI_ERRORS } from '~/src/server/common/constants/joi.js'
+import { JOI_ERRORS } from '#src/server/common/constants/joi.js'
 import {
   POLYGON_MIN_COORDINATE_POINTS,
   OSGB36_CONSTANTS
-} from '~/src/server/common/constants/exemptions.js'
+} from '#src/server/common/constants/exemptions.js'
 
 const { MIN_EASTINGS, MAX_EASTINGS, MIN_NORTHINGS, MAX_NORTHINGS } =
   OSGB36_CONSTANTS

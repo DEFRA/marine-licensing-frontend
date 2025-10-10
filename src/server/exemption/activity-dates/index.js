@@ -1,4 +1,4 @@
-import { routes } from '~/src/server/common/constants/routes.js'
+import { routes } from '#src/server/common/constants/routes.js'
 import {
   activityDatesController,
   activityDatesSubmitController

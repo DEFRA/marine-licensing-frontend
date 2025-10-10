@@ -2,8 +2,8 @@ import joi from 'joi'
 import {
   POLYGON_MIN_COORDINATE_POINTS,
   WGS84_CONSTANTS
-} from '~/src/server/common/constants/exemptions.js'
-import { JOI_ERRORS } from '~/src/server/common/constants/joi.js'
+} from '#src/server/common/constants/exemptions.js'
+import { JOI_ERRORS } from '#src/server/common/constants/joi.js'
 
 const {
   MIN_LATITUDE,

@@ -1,15 +1,15 @@
 import {
   COORDINATE_SYSTEMS,
   POLYGON_MIN_COORDINATE_POINTS
-} from '~/src/server/common/constants/exemptions.js'
-import { routes } from '~/src/server/common/constants/routes.js'
+} from '#src/server/common/constants/exemptions.js'
+import { routes } from '#src/server/common/constants/routes.js'
 import {
   getExemptionCache,
   updateExemptionSiteDetails
-} from '~/src/server/common/helpers/session-cache/utils.js'
-import { setSiteDataPreHandler } from '~/src/server/common/helpers/session-cache/site-utils.js'
-import { getSiteDetailsBySite } from '~/src/server/common/helpers/session-cache/site-details-utils.js'
-import { getCoordinateSystem } from '~/src/server/common/helpers/coordinate-utils.js'
+} from '#src/server/common/helpers/session-cache/utils.js'
+import { setSiteDataPreHandler } from '#src/server/common/helpers/session-cache/site-utils.js'
+import { getSiteDetailsBySite } from '#src/server/common/helpers/session-cache/site-details-utils.js'
+import { getCoordinateSystem } from '#src/server/common/helpers/coordinate-utils.js'
 import {
   MULTIPLE_COORDINATES_VIEW_ROUTES,
   normaliseCoordinatesForDisplay,
@@ -19,7 +19,7 @@ import {
   handleValidationFailure,
   removeCoordinateAtIndex
 } from './utils.js'
-import { validateCoordinates } from '~/src/server/exemption/site-details/enter-multiple-coordinates/validation/validation.js'
+import { validateCoordinates } from '#src/server/exemption/site-details/enter-multiple-coordinates/validation/validation.js'
 
 export const multipleCoordinatesController = {
   options: {

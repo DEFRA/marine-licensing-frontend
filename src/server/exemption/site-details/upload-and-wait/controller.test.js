@@ -2,14 +2,14 @@ import { vi } from 'vitest'
 import {
   uploadAndWaitController,
   UPLOAD_AND_WAIT_VIEW_ROUTE
-} from '~/src/server/exemption/site-details/upload-and-wait/controller.js'
-import * as cacheUtils from '~/src/server/common/helpers/session-cache/utils.js'
-import * as cdpUploadService from '~/src/services/cdp-upload-service/index.js'
-import * as fileValidationService from '~/src/services/file-validation/index.js'
-import * as authenticatedRequests from '~/src/server/common/helpers/authenticated-requests.js'
-import { mockExemption } from '~/src/server/test-helpers/mocks.js'
-import { routes } from '~/src/server/common/constants/routes.js'
-import { config } from '~/src/config/config.js'
+} from '#src/server/exemption/site-details/upload-and-wait/controller.js'
+import * as cacheUtils from '#src/server/common/helpers/session-cache/utils.js'
+import * as cdpUploadService from '#src/services/cdp-upload-service/index.js'
+import * as fileValidationService from '#src/services/file-validation/index.js'
+import * as authenticatedRequests from '#src/server/common/helpers/authenticated-requests.js'
+import { mockExemption } from '#src/server/test-helpers/mocks.js'
+import { routes } from '#src/server/common/constants/routes.js'
+import { config } from '#src/config/config.js'
 
 vi.mock('~/src/server/common/helpers/session-cache/utils.js')
 vi.mock('~/src/services/cdp-upload-service/index.js')
@@ -571,7 +571,6 @@ describe('#uploadAndWait', () => {
     })
 
     describe('when file validation fails', () => {
-      /* eslint-disable vitest/expect-expect */
       test('should redirect to file upload with error for wrong extension', async () => {
         await expectFileValidationFailure(
           mockRequest,
@@ -586,7 +585,6 @@ describe('#uploadAndWait', () => {
         )
       })
 
-      /* eslint-disable vitest/expect-expect */
       test('should handle unknown file type in getAllowedExtensions default case', async () => {
         await expectFileValidationFailure(
           mockRequest,
@@ -603,7 +601,6 @@ describe('#uploadAndWait', () => {
     })
 
     describe('when upload is rejected', () => {
-      /* eslint-disable vitest/expect-expect */
       test('should redirect to file upload with virus error message', async () => {
         await expectRejectedStatusHandling(
           mockRequest,
@@ -652,7 +649,6 @@ describe('#uploadAndWait', () => {
         expect(h.redirect).toHaveBeenCalledWith(routes.FILE_UPLOAD)
       })
 
-      /* eslint-disable vitest/expect-expect */
       test('should handle different error message types correctly', async () => {
         const testCases = [
           { message: 'file is empty', expected: 'The selected file is empty' },
@@ -686,7 +682,6 @@ describe('#uploadAndWait', () => {
         }
       })
 
-      /* eslint-disable vitest/expect-expect */
       test('should handle unknown file type message correctly', async () => {
         await expectRejectedStatusHandling(
           mockRequest,
@@ -699,7 +694,6 @@ describe('#uploadAndWait', () => {
         )
       })
 
-      /* eslint-disable vitest/expect-expect */
       test('should handle shapefile error message correctly', async () => {
         await expectRejectedStatusHandling(
           mockRequest,

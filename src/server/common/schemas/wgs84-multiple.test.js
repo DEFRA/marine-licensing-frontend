@@ -1,4 +1,4 @@
-import { createWgs84MultipleCoordinatesSchema } from '~/src/server/common/schemas/wgs84.js'
+import { createWgs84MultipleCoordinatesSchema } from '#src/server/common/schemas/wgs84.js'
 
 describe('#multipleCoordinates WGS84 schema', () => {
   describe('#createWgs84MultipleCoordinatesSchema', () => {

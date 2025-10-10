@@ -9,18 +9,9 @@ module.exports = {
     [
       '@babel/preset-env',
       {
-        modules: NODE_ENV === 'test' ? 'auto' : false
-      }
-    ]
-  ],
-  plugins: [
-    [
-      'module-resolver',
-      {
-        root: ['./'],
-        alias: {
-          '~': '.'
-        }
+        modules: NODE_ENV === 'test' ? 'auto' : true,
+        bugfixes: true,
+        loose: true
       }
     ]
   ],

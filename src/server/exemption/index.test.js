@@ -1,6 +1,6 @@
 import { vi } from 'vitest'
-import { exemption } from '~/src/server/exemption/index.js'
-import { getPageViewCommonData } from '~/src/server/common/helpers/page-view-common-data.js'
+import { exemption } from '#src/server/exemption/index.js'
+import { getPageViewCommonData } from '#src/server/common/helpers/page-view-common-data.js'
 
 vi.mock('~/src/server/common/helpers/page-view-common-data.js')
 

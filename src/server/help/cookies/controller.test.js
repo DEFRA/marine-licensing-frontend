@@ -1,10 +1,10 @@
 import { vi } from 'vitest'
 import joi from 'joi'
 import { cookiesController, cookiesSubmitController } from './controller.js'
-import * as cookiePreferences from '~/src/server/common/helpers/cookie-preferences.js'
-import * as referrerValidation from '~/src/server/common/helpers/referrer-validation.js'
-import * as cookieService from '~/src/server/common/helpers/cookie-service.js'
-import { config } from '~/src/config/config.js'
+import * as cookiePreferences from '#src/server/common/helpers/cookie-preferences.js'
+import * as referrerValidation from '#src/server/common/helpers/referrer-validation.js'
+import * as cookieService from '#src/server/common/helpers/cookie-service.js'
+import { config } from '#src/config/config.js'
 
 vi.mock('~/src/server/common/helpers/cookie-preferences.js')
 vi.mock('~/src/server/common/helpers/referrer-validation.js')

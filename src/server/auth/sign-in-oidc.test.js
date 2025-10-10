@@ -1,13 +1,13 @@
 import { vi } from 'vitest'
-import { statusCodes } from '~/src/server/common/constants/status-codes.js'
+import { statusCodes } from '#src/server/common/constants/status-codes.js'
 import {
   redirectPathCacheKey,
   routes
-} from '~/src/server/common/constants/routes.js'
-import { setUserSession } from '~/src/server/auth/utils.js'
-import { signInOidcController } from '~/src/server/auth/sign-in-oidc.js'
-import { setupTestServer } from '~/tests/integration/shared/test-setup-helpers.js'
-import { makeGetRequest } from '~/src/server/test-helpers/server-requests.js'
+} from '#src/server/common/constants/routes.js'
+import { setUserSession } from '#src/server/auth/utils.js'
+import { signInOidcController } from '#src/server/auth/sign-in-oidc.js'
+import { setupTestServer } from '#tests/integration/shared/test-setup-helpers.js'
+import { makeGetRequest } from '#src/server/test-helpers/server-requests.js'
 
 vi.mock('~/src/server/auth/utils.js', () => ({
   setUserSession: vi.fn()

@@ -3,7 +3,7 @@ import {
   generatePointSpecificErrorMessage,
   createSiteDetailsDataJson
 } from './site-details.js'
-import { COORDINATE_SYSTEMS } from '~/src/server/common/constants/exemptions.js'
+import { COORDINATE_SYSTEMS } from '#src/server/common/constants/exemptions.js'
 
 describe('site-details helper', () => {
   describe('COORDINATE_ERROR_MESSAGES', () => {

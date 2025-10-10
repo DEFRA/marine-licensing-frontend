@@ -1,9 +1,5 @@
-import { config } from '~/src/config/config.js'
-import { statusCodes } from '~/src/server/common/constants/status-codes.js'
-
-/**
- * @satisfies {ServerRegisterPluginObject<void>}
- */
+import { config } from '#src/config/config.js'
+import { statusCodes } from '#src/server/common/constants/status-codes.js'
 export const serveStaticFiles = {
   plugin: {
     name: 'staticFiles',
@@ -44,7 +40,3 @@ export const serveStaticFiles = {
     }
   }
 }
-
-/**
- * @import { ServerRegisterPluginObject } from '@hapi/hapi'
- */

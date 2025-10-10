@@ -1,13 +1,4 @@
-import { routes } from '~/src/server/common/constants/routes.js'
-
-/**
- * Determines the back link for activity description page
- * @param {object} exemption - The exemption data from cache
- * @param {boolean} isInSiteDetailsFlow - Whether we're in the site details flow
- * @param {number} siteIndex - Index of site
- * @param {string} queryParams - Query parameters to append to the route
- * @returns {string} The route to redirect to
- */
+import { routes } from '#src/server/common/constants/routes.js'
 export const getBackLink = (
   exemption,
   isInSiteDetailsFlow,
@@ -36,13 +27,6 @@ export const getBackLink = (
 
   return backLink + queryParams
 }
-
-/**
- * Determines the next route after activity description submission
- * @param {boolean} isInSiteDetailsFlow - Whether we're in the site details flow
- * @param {string} site - current site details
- * @returns {string} The route to redirect to
- */
 export const getNextRoute = (isInSiteDetailsFlow, site) => {
   if (!isInSiteDetailsFlow) {
     return routes.TASK_LIST

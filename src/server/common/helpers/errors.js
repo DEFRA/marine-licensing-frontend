@@ -1,8 +1,4 @@
-import { statusCodes } from '~/src/server/common/constants/status-codes.js'
-
-/**
- * @param {number} statusCode
- */
+import { statusCodes } from '#src/server/common/constants/status-codes.js'
 function getCustomTemplate(statusCode) {
   switch (statusCode) {
     case statusCodes.forbidden:
@@ -18,11 +14,6 @@ function getCustomTemplate(statusCode) {
       return 'error/500-server-error'
   }
 }
-
-/**
- * @param { Request } request
- * @param { ResponseToolkit } h
- */
 export function catchAll(request, h) {
   const { response } = request
 
@@ -40,23 +31,12 @@ export function catchAll(request, h) {
 
   return h.view(template).code(statusCode)
 }
-
-/**
- * Outputs all errors to an object with the field name as the key
- * @param { ValidationError[] } errors
- */
 export const errorDescriptionByFieldName = (errors = []) => {
   return errors.reduce((error, obj) => {
     error[obj.field] = obj
     return error
   }, {})
 }
-
-/**
- * Format errors for error summary component, returning one error per field
- * @param { ValidationError[] } errors
- * @param { {[key: string]: string} } messages
- */
 export const mapErrorsForDisplay = (errors = [], messages = {}) => {
   const errorFields = new Set()
 
@@ -79,7 +59,3 @@ export const mapErrorsForDisplay = (errors = [], messages = {}) => {
       }
     })
 }
-
-/**
- * @import { Request, ResponseToolkit, ValidationError } from '@hapi/hapi'
- */

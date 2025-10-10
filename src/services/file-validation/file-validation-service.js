@@ -1,19 +1,8 @@
-/**
- * File Validation Service
- *
- * Simple, reusable file validation focused on filename validation
- */
 export class FileValidationService {
   constructor(logger) {
     this.logger = logger
   }
 
-  /**
-   * Validates if filename has allowed extension
-   * @param {string} filename - The filename to validate
-   * @param {string[]} allowedExtensions - Array of allowed extensions (case-insensitive)
-   * @returns {object} Validation result with isValid and errorMessage
-   */
   validateFileExtension(filename, allowedExtensions) {
     if (!filename || typeof filename !== 'string') {
       return {
@@ -54,12 +43,6 @@ export class FileValidationService {
     }
   }
 
-  /**
-   * Extracts file extension from filename
-   * @param {string} filename - The filename
-   * @returns {string} The file extension without the dot
-   * @private
-   */
   _extractExtension(filename) {
     const lastDotIndex = filename.lastIndexOf('.')
     if (lastDotIndex === -1 || lastDotIndex === filename.length - 1) {
@@ -68,12 +51,6 @@ export class FileValidationService {
     return filename.substring(lastDotIndex + 1)
   }
 
-  /**
-   * Builds user-friendly error message based on allowed extensions
-   * @param {string[]} allowedExtensions - Normalized allowed extensions
-   * @returns {string} Error message
-   * @private
-   */
   _buildErrorMessage(allowedExtensions) {
     if (allowedExtensions.length === 1) {
       const ext = allowedExtensions[0]

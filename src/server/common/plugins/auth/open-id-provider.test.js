@@ -1,6 +1,6 @@
 import { vi } from 'vitest'
-import { openIdProvider } from '~/src/server/common/plugins/auth/open-id-provider.js'
-import { getOidcConfig } from '~/src/server/common/plugins/auth/get-oidc-config.js'
+import { openIdProvider } from '#src/server/common/plugins/auth/open-id-provider.js'
+import { getOidcConfig } from '#src/server/common/plugins/auth/get-oidc-config.js'
 import jwt from '@hapi/jwt'
 vi.mock('~/src/server/common/plugins/auth/get-oidc-config.js')
 

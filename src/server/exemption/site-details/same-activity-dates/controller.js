@@ -2,16 +2,16 @@ import {
   getExemptionCache,
   updateExemptionMultipleSiteDetails,
   updateExemptionSiteDetails
-} from '~/src/server/common/helpers/session-cache/utils.js'
-import { routes } from '~/src/server/common/constants/routes.js'
+} from '#src/server/common/helpers/session-cache/utils.js'
+import { routes } from '#src/server/common/constants/routes.js'
 import {
   setSiteDataPreHandler,
   setSiteData
-} from '~/src/server/common/helpers/session-cache/site-utils.js'
+} from '#src/server/common/helpers/session-cache/site-utils.js'
 import {
   errorDescriptionByFieldName,
   mapErrorsForDisplay
-} from '~/src/server/common/helpers/errors.js'
+} from '#src/server/common/helpers/errors.js'
 import joi from 'joi'
 
 export const SAME_ACTIVITY_DATES_VIEW_ROUTE =
@@ -66,11 +66,6 @@ const createValidationFailAction = (request, h, err) => {
     })
     .takeover()
 }
-
-/**
- * A GDS styled page controller for the same activity dates page.
- * @satisfies {Partial<ServerRoute>}
- */
 export const sameActivityDatesController = {
   options: {
     pre: [setSiteDataPreHandler]
@@ -108,11 +103,6 @@ export const sameActivityDatesController = {
     })
   }
 }
-
-/**
- * A GDS styled page controller for the POST route in the same activity dates page.
- * @satisfies {Partial<ServerRoute>}
- */
 export const sameActivityDatesSubmitController = {
   options: {
     pre: [setSiteDataPreHandler],

@@ -1,37 +1,17 @@
 import { clone } from '@hapi/hoek'
-import { getSiteDetailsBySite } from '~/src/server/common/helpers/session-cache/site-details-utils.js'
+import { getSiteDetailsBySite } from '#src/server/common/helpers/session-cache/site-details-utils.js'
 export const EXEMPTION_CACHE_KEY = 'exemption'
-
-/**
- * @param { Request } request
- */
 export const clearExemptionCache = (request) => {
   request.yar.clear(EXEMPTION_CACHE_KEY)
 }
-
-/**
- * @param { Request } request
- */
 export const getExemptionCache = (request) => {
   return clone(request.yar.get(EXEMPTION_CACHE_KEY) || {})
 }
-
-/**
- * @param { Request } request
- * @param { {} } value
- */
 export const setExemptionCache = (request, value) => {
   const cacheValue = value || {}
   request.yar.set(EXEMPTION_CACHE_KEY, value || {})
   return cacheValue
 }
-
-/**
- * @param { Request } request
- * @param { number } siteIndex
- * @param { string } key
- * @param { {} } value
- */
 export const updateExemptionSiteDetails = (request, siteIndex, key, value) => {
   const existingCache = getExemptionCache(request)
   const existingSiteDetails = existingCache.siteDetails || []
@@ -51,12 +31,6 @@ export const updateExemptionSiteDetails = (request, siteIndex, key, value) => {
 
   return { [key]: cacheValue }
 }
-
-/**
- * @param { Request } request
- * @param { string } key
- * @param { {} } value
- */
 export const updateExemptionMultipleSiteDetails = (request, key, value) => {
   const existingCache = getExemptionCache(request)
   const existingMultipleSiteDetails = existingCache.multipleSiteDetails
@@ -69,10 +43,6 @@ export const updateExemptionMultipleSiteDetails = (request, key, value) => {
 
   return { [key]: cacheValue }
 }
-
-/**
- * @param { Request } request
- */
 export const resetExemptionSiteDetails = (request) => {
   const existingCache = getExemptionCache(request)
   delete existingCache.multipleSiteDetails
@@ -80,15 +50,6 @@ export const resetExemptionSiteDetails = (request) => {
   request.yar.set(EXEMPTION_CACHE_KEY, existingCache)
   return { siteDetails: null }
 }
-
-/**
- * @param { Request } request - Hapi request object
- * @param { object } status - Upload status response from CDP
- * @param { object } coordinateData - Extracted coordinate data
- * @param { object } s3Location - S3 location details
- * @param { object } options - Configuration options
- * @param { boolean } options.isMultipleSitesFile - Is the upload for multiple sites
- */
 export const updateExemptionSiteDetailsBatch = (
   request,
   status,

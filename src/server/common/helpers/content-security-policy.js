@@ -1,10 +1,6 @@
-import { config } from '~/src/config/config.js'
+import { config } from '#src/config/config.js'
 import { randomBytes } from 'node:crypto'
 
-/**
- * Manage content security policies.
- * @satisfies {import('@hapi/hapi').Plugin}
- */
 const contentSecurityPolicy = {
   name: 'content-security-policy',
   register: (server) => {

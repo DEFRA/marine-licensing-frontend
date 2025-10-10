@@ -1,5 +1,5 @@
-import { config } from '~/src/config/config.js'
-import { routes } from '~/src/server/common/constants/routes.js'
+import { config } from '#src/config/config.js'
+import { routes } from '#src/server/common/constants/routes.js'
 import { getOpenIdRefreshToken } from './get-oidc-config.js'
 import jwt from '@hapi/jwt'
 import { addSeconds } from 'date-fns'

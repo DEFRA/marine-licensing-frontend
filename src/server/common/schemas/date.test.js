@@ -1,10 +1,10 @@
 import { vi } from 'vitest'
 import joi from 'joi'
-import { JOI_ERRORS } from '~/src/server/common/constants/joi.js'
+import { JOI_ERRORS } from '#src/server/common/constants/joi.js'
 import {
   activityDatesSchema,
   individualDate
-} from '~/src/server/common/schemas/date.js'
+} from '#src/server/common/schemas/date.js'
 
 describe('activityDatesSchema', () => {
   // Mock a fixed date to ensure consistent test results

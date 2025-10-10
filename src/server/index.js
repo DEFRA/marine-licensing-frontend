@@ -4,22 +4,22 @@ import hapi from '@hapi/hapi'
 import bell from '@hapi/bell'
 import cookie from '@hapi/cookie'
 import basic from '@hapi/basic'
-import { config } from '~/src/config/config.js'
-import { nunjucksConfig } from '~/src/config/nunjucks/nunjucks.js'
+import { config } from '#src/config/config.js'
+import { nunjucksConfig } from '#src/config/nunjucks/nunjucks.js'
 import { router } from './router.js'
-import { requestLogger } from '~/src/server/common/helpers/logging/request-logger.js'
-import { catchAll } from '~/src/server/common/helpers/errors.js'
-import { secureContext } from '~/src/server/common/helpers/secure-context/index.js'
-import { sessionCache } from '~/src/server/common/helpers/session-cache/session-cache.js'
-import { getCacheEngine } from '~/src/server/common/helpers/session-cache/cache-engine.js'
-import { pulse } from '~/src/server/common/helpers/pulse.js'
-import { requestTracing } from '~/src/server/common/helpers/request-tracing.js'
-import { setupProxy } from '~/src/server/common/helpers/proxy/setup-proxy.js'
-import { csrf } from '~/src/server/common/helpers/csrf.js'
-import { openId } from '~/src/server/common/plugins/open-id.js'
-import { cookies } from '~/src/server/common/plugins/cookies.js'
-import { setPageCacheControlHeaders } from '~/src/server/common/helpers/cache-control.js'
-import { contentSecurityPolicy } from '~/src/server/common/helpers/content-security-policy.js'
+import { requestLogger } from '#src/server/common/helpers/logging/request-logger.js'
+import { catchAll } from '#src/server/common/helpers/errors.js'
+import { secureContext } from '@defra/hapi-secure-context'
+import { sessionCache } from '#src/server/common/helpers/session-cache/session-cache.js'
+import { getCacheEngine } from '#src/server/common/helpers/session-cache/cache-engine.js'
+import { pulse } from '#src/server/common/helpers/pulse.js'
+import { requestTracing } from '#src/server/common/helpers/request-tracing.js'
+import { setupProxy } from '#src/server/common/helpers/proxy/setup-proxy.js'
+import { csrf } from '#src/server/common/helpers/csrf.js'
+import { openId } from '#src/server/common/plugins/open-id.js'
+import { cookies } from '#src/server/common/plugins/cookies.js'
+import { setPageCacheControlHeaders } from '#src/server/common/helpers/cache-control.js'
+import { contentSecurityPolicy } from '#src/server/common/helpers/content-security-policy.js'
 
 export async function createServer() {
   setupProxy()
@@ -51,9 +51,7 @@ export async function createServer() {
     cache: [
       {
         name: config.get('session.cache.name'),
-        engine: getCacheEngine(
-          /** @type {Engine} */ (config.get('session.cache.engine'))
-        )
+        engine: getCacheEngine(config.get('session.cache.engine'))
       }
     ],
     state: {

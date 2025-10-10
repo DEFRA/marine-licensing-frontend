@@ -1,7 +1,6 @@
-import { renderComponent } from '~/src/server/test-helpers/component-helpers.js'
+import { renderComponent } from '#src/server/test-helpers/component-helpers.js'
 
 describe('backLinkHistory Component', () => {
-  /** @type {CheerioAPI} */
   let $backLink
 
   test('Should render back link correctly with default text', () => {
@@ -14,7 +13,3 @@ describe('backLinkHistory Component', () => {
     expect($backLink('a').hasClass('govuk-back-link')).toBe(true)
   })
 })
-
-/**
- * @import { CheerioAPI } from 'cheerio'
- */

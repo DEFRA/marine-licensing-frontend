@@ -1,5 +1,5 @@
 import { getBackLink, getNextRoute } from './utils.js'
-import { routes } from '~/src/server/common/constants/routes.js'
+import { routes } from '#src/server/common/constants/routes.js'
 
 describe('#getBackLink', () => {
   describe('when not in site details flow', () => {

@@ -1,6 +1,6 @@
 import { vi } from 'vitest'
 import { deleteSiteRoutes } from './index.js'
-import { routes } from '~/src/server/common/constants/routes.js'
+import { routes } from '#src/server/common/constants/routes.js'
 
 vi.mock('./controller.js', () => ({
   deleteSiteController: {

@@ -1,9 +1,9 @@
-import { COORDINATE_SYSTEMS } from '~/src/server/common/constants/exemptions.js'
+import { COORDINATE_SYSTEMS } from '#src/server/common/constants/exemptions.js'
 import {
   osgb36ValidationSchema,
   createOsgb36MultipleCoordinatesSchema,
   createOsgb36CoordinateSchema
-} from '~/src/server/common/schemas/osgb36.js'
+} from '#src/server/common/schemas/osgb36.js'
 
 const mockCoordinates = {
   [COORDINATE_SYSTEMS.OSGB36]: { eastings: '425053', northings: '564180' }

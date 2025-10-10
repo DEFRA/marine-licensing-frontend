@@ -1,6 +1,6 @@
-import { transformTaskList } from '~/src/server/exemption/task-list/utils.js'
-import { mockExemptionTaskList } from '~/src/server/test-helpers/mocks.js'
-import { routes } from '~/src/server/common/constants/routes.js'
+import { transformTaskList } from '#src/server/exemption/task-list/utils.js'
+import { mockExemptionTaskList } from '#src/server/test-helpers/mocks.js'
+import { routes } from '#src/server/common/constants/routes.js'
 
 describe('taskList utils', () => {
   test('transformTaskList correctly returns task list', () => {

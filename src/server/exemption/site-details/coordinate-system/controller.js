@@ -1,17 +1,17 @@
 import {
   getExemptionCache,
   updateExemptionSiteDetails
-} from '~/src/server/common/helpers/session-cache/utils.js'
+} from '#src/server/common/helpers/session-cache/utils.js'
 import {
   setSiteData,
   setSiteDataPreHandler
-} from '~/src/server/common/helpers/session-cache/site-utils.js'
-import { getSiteDetailsBySite } from '~/src/server/common/helpers/session-cache/site-details-utils.js'
+} from '#src/server/common/helpers/session-cache/site-utils.js'
+import { getSiteDetailsBySite } from '#src/server/common/helpers/session-cache/site-details-utils.js'
 import {
   errorDescriptionByFieldName,
   mapErrorsForDisplay
-} from '~/src/server/common/helpers/errors.js'
-import { routes } from '~/src/server/common/constants/routes.js'
+} from '#src/server/common/helpers/errors.js'
+import { routes } from '#src/server/common/constants/routes.js'
 
 import joi from 'joi'
 
@@ -27,11 +27,6 @@ const coordinateSystemSettings = {
 export const errorMessages = {
   COORDINATE_SYSTEM_REQUIRED: 'Select which coordinate system you want to use'
 }
-
-/**
- * A GDS styled page controller for the coordinate system page.
- * @satisfies {Partial<ServerRoute>}
- */
 export const coordinateSystemController = {
   options: { pre: [setSiteDataPreHandler] },
   handler(request, h) {
@@ -50,11 +45,6 @@ export const coordinateSystemController = {
     })
   }
 }
-
-/**
- * A GDS styled page controller for the POST route in the coordinate system page.
- * @satisfies {Partial<ServerRoute>}
- */
 export const coordinateSystemSubmitController = {
   options: {
     pre: [setSiteDataPreHandler],

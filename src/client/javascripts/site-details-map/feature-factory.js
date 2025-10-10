@@ -3,13 +3,6 @@ import CircleGeometryCalculator from './circle-geometry-calculator.js'
 const MINIMUM_POLYGON_COORDINATES = 3
 
 class FeatureFactory {
-  /**
-   * Create a circular feature
-   * @param {object} olModules - OpenLayers modules
-   * @param {Array} centreCoordinates - Web Mercator centre coordinates [x, y]
-   * @param {number} diameterInMetres - Diameter (width) in metres
-   * @returns {object} OpenLayers Feature with Polygon geometry
-   */
   createCircleFeature(olModules, centreCoordinates, diameterInMetres) {
     const { Feature, Polygon, fromLonLat, toLonLat } = olModules
     const centreWGS84 = toLonLat(centreCoordinates)
@@ -28,12 +21,6 @@ class FeatureFactory {
     })
   }
 
-  /**
-   * Create a polygon feature from multiple coordinates
-   * @param {object} olModules - OpenLayers modules
-   * @param {Array} coordinatesArray - Array of Web Mercator coordinates [[x, y], [x, y], ...]
-   * @returns {object} OpenLayers Feature with Polygon geometry
-   */
   createPolygonFeature(olModules, coordinatesArray) {
     const { Feature, Polygon } = olModules
 
@@ -58,12 +45,6 @@ class FeatureFactory {
     })
   }
 
-  /**
-   * Create features from GeoJSON data
-   * @param {object} geoJSONFormat - OpenLayers GeoJSON format instance
-   * @param {object} geoJSON - GeoJSON data from file upload
-   * @returns {Array} Array of OpenLayers Features
-   */
   createFeaturesFromGeoJSON(geoJSONFormat, geoJSON) {
     if (!geoJSON.features || !Array.isArray(geoJSON.features)) {
       return []

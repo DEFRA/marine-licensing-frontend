@@ -2,18 +2,18 @@ import { vi } from 'vitest'
 import {
   multipleCoordinatesController,
   multipleCoordinatesSubmitController
-} from '~/src/server/exemption/site-details/enter-multiple-coordinates/controller.js'
-import { COORDINATE_SYSTEMS } from '~/src/server/common/constants/exemptions.js'
-import * as cacheUtils from '~/src/server/common/helpers/session-cache/utils.js'
-import * as coordinateUtils from '~/src/server/common/helpers/coordinate-utils.js'
-import { routes } from '~/src/server/common/constants/routes.js'
-import { updateExemptionSiteDetails } from '~/src/server/common/helpers/session-cache/utils.js'
+} from '#src/server/exemption/site-details/enter-multiple-coordinates/controller.js'
+import { COORDINATE_SYSTEMS } from '#src/server/common/constants/exemptions.js'
+import * as cacheUtils from '#src/server/common/helpers/session-cache/utils.js'
+import * as coordinateUtils from '#src/server/common/helpers/coordinate-utils.js'
+import { routes } from '#src/server/common/constants/routes.js'
+import { updateExemptionSiteDetails } from '#src/server/common/helpers/session-cache/utils.js'
 import {
   MULTIPLE_COORDINATES_VIEW_ROUTES,
   multipleCoordinatesPageData,
   handleValidationFailure
-} from '~/src/server/exemption/site-details/enter-multiple-coordinates/utils.js'
-import { mockSite } from '~/src/server/test-helpers/mocks.js'
+} from '#src/server/exemption/site-details/enter-multiple-coordinates/utils.js'
+import { mockSite } from '#src/server/test-helpers/mocks.js'
 
 vi.mock('~/src/server/common/helpers/session-cache/utils.js')
 vi.mock(

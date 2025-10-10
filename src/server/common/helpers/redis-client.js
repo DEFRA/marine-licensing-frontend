@@ -1,25 +1,6 @@
 import { Cluster, Redis } from 'ioredis'
 
-import { createLogger } from '~/src/server/common/helpers/logging/logger.js'
-
-/**
- * @typedef {object} RedisConfig
- * @property {string} host
- * @property {string} username
- * @property {string} password
- * @property {string} keyPrefix
- * @property {boolean} useSingleInstanceCache
- * @property {boolean} useTLS
- */
-
-/**
- * Setup Redis and provide a redis client
- *
- * Local development - 1 Redis instance
- * Environments - Elasticache / Redis Cluster with username and password
- * @param {RedisConfig} redisConfig - Redis config
- * @returns {Cluster | Redis}
- */
+import { createLogger } from '#src/server/common/helpers/logging/logger.js'
 export function buildRedisClient(redisConfig) {
   const logger = createLogger()
   const port = 6379

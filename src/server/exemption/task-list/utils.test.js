@@ -8,7 +8,11 @@ describe('taskList utils', () => {
       {
         href: routes.PROJECT_NAME,
         status: { text: 'Completed' },
-        title: { text: 'Project name', classes: 'govuk-link--no-visited-state' }
+        title: {
+          classes: 'govuk-link--no-visited-state',
+          text: 'Project name',
+          classes: 'govuk-link--no-visited-state'
+        }
       },
       {
         href: routes.ACTIVITY_DATES,
@@ -29,7 +33,11 @@ describe('taskList utils', () => {
       {
         href: routes.REVIEW_SITE_DETAILS,
         status: { text: 'Completed' },
-        title: { text: 'Site details', classes: 'govuk-link--no-visited-state' }
+        title: {
+          classes: 'govuk-link--no-visited-state',
+          text: 'Site details',
+          classes: 'govuk-link--no-visited-state'
+        }
       },
       {
         href: routes.PUBLIC_REGISTER,
@@ -52,29 +60,38 @@ describe('taskList utils', () => {
       {
         href: routes.PROJECT_NAME,
         status: { text: 'Completed' },
-        title: { text: 'Project name' }
+        title: { classes: 'govuk-link--no-visited-state', text: 'Project name' }
       },
       {
         href: routes.ACTIVITY_DATES,
         status: { text: 'Completed' },
-        title: { text: 'Activity dates' }
+        title: {
+          classes: 'govuk-link--no-visited-state',
+          text: 'Activity dates'
+        }
       },
       {
         href: routes.ACTIVITY_DESCRIPTION,
         status: { tag: { text: 'Incomplete', classes: 'govuk-tag--blue' } },
-        title: { text: 'Activity description' }
+        title: {
+          classes: 'govuk-link--no-visited-state',
+          text: 'Activity description'
+        }
       },
       {
         href: routes.REVIEW_SITE_DETAILS,
         status: {
           tag: { text: 'In Progress', classes: 'govuk-tag--light-blue' }
         },
-        title: { text: 'Site details' }
+        title: { classes: 'govuk-link--no-visited-state', text: 'Site details' }
       },
       {
         href: routes.PUBLIC_REGISTER,
         status: { text: 'Completed' },
-        title: { text: 'Public register' }
+        title: {
+          classes: 'govuk-link--no-visited-state',
+          text: 'Public register'
+        }
       }
     ])
   })
@@ -89,7 +106,11 @@ describe('taskList utils', () => {
       {
         href: routes.PROJECT_NAME,
         status: { text: 'Completed' },
-        title: { text: 'Project name', classes: 'govuk-link--no-visited-state' }
+        title: {
+          classes: 'govuk-link--no-visited-state',
+          text: 'Project name',
+          classes: 'govuk-link--no-visited-state'
+        }
       },
       {
         href: routes.ACTIVITY_DATES,
@@ -110,7 +131,11 @@ describe('taskList utils', () => {
       {
         href: routes.SITE_DETAILS,
         status: { tag: { text: 'Incomplete', classes: 'govuk-tag--blue' } },
-        title: { text: 'Site details', classes: 'govuk-link--no-visited-state' }
+        title: {
+          classes: 'govuk-link--no-visited-state',
+          text: 'Site details',
+          classes: 'govuk-link--no-visited-state'
+        }
       },
       {
         href: routes.PUBLIC_REGISTER,
@@ -128,7 +153,11 @@ describe('taskList utils', () => {
       {
         href: routes.PROJECT_NAME,
         status: { tag: { text: 'Incomplete', classes: 'govuk-tag--blue' } },
-        title: { text: 'Project name', classes: 'govuk-link--no-visited-state' }
+        title: {
+          classes: 'govuk-link--no-visited-state',
+          text: 'Project name',
+          classes: 'govuk-link--no-visited-state'
+        }
       },
       {
         href: routes.ACTIVITY_DATES,
@@ -149,7 +178,11 @@ describe('taskList utils', () => {
       {
         href: routes.SITE_DETAILS,
         status: { tag: { text: 'Incomplete', classes: 'govuk-tag--blue' } },
-        title: { text: 'Site details', classes: 'govuk-link--no-visited-state' }
+        title: {
+          classes: 'govuk-link--no-visited-state',
+          text: 'Site details',
+          classes: 'govuk-link--no-visited-state'
+        }
       },
       {
         href: routes.PUBLIC_REGISTER,

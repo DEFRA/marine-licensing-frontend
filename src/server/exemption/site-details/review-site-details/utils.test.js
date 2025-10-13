@@ -20,17 +20,22 @@ import {
   renderFileUploadReview,
   renderManualCoordinateReview
 } from '#src/server/exemption/site-details/review-site-details/utils.js'
-import { mockExemption } from '#src/server/test-helpers/mocks.js'
+import {
+  createMockRequest,
+  mockExemption
+} from '#src/server/test-helpers/mocks.js'
 
 import { getCoordinateSystem } from '#src/server/common/helpers/coordinate-utils.js'
 
 // Mock the getCoordinateSystem helper
-vi.mock('~/src/server/common/helpers/coordinate-utils.js', () => ({
+vi.mock('#src/server/common/helpers/coordinate-utils.js', () => ({
   getCoordinateSystem: vi.fn(),
   extractCoordinatesFromGeoJSON: vi.fn()
 }))
 
 describe('siteDetails utils', () => {
+  const mockRequest = createMockRequest()
+
   describe('getSiteDetailsBackLink util', () => {
     test('getSiteDetailsBackLink correctly returns task list when coming from the task list', () => {
       expect(getSiteDetailsBackLink(`http://hostname${routes.TASK_LIST}`)).toBe(
@@ -495,7 +500,8 @@ describe('siteDetails utils', () => {
             latitude: '51.5074',
             longitude: '-0.1278'
           },
-          circleWidth: '1'
+          circleWidth: '1',
+          siteName: 'Test Site 1'
         }
       ]
       const coordinateSystem = COORDINATE_SYSTEMS.WGS84
@@ -514,7 +520,7 @@ describe('siteDetails utils', () => {
             'Manually enter one set of coordinates and a width to create a circular site',
           showActivityDates: true,
           showActivityDescription: true,
-          siteName: '',
+          siteName: 'Test Site 1',
           coordinateSystem:
             'WGS84 (World Geodetic System 1984)\nLatitude and longitude',
           coordinates: '51.5074, -0.1278',
@@ -542,7 +548,8 @@ describe('siteDetails utils', () => {
             latitude: '51.5074',
             longitude: '-0.1278'
           },
-          circleWidth: '1'
+          circleWidth: '1',
+          siteName: 'Test Site 2'
         }
       ]
 
@@ -566,7 +573,7 @@ describe('siteDetails utils', () => {
             'Manually enter one set of coordinates and a width to create a circular site',
           showActivityDates: false,
           showActivityDescription: false,
-          siteName: '',
+          siteName: 'Test Site 2',
           coordinateSystem:
             'WGS84 (World Geodetic System 1984)\nLatitude and longitude',
           coordinates: '51.5074, -0.1278',
@@ -594,7 +601,8 @@ describe('siteDetails utils', () => {
             start: '2025-01-01T00:00:00.000Z',
             end: '2025-01-01T00:00:00.000Z'
           },
-          activityDescription: 'Test activity description'
+          activityDescription: 'Test activity description',
+          siteName: 'Test Site 3'
         }
       ]
 
@@ -608,7 +616,7 @@ describe('siteDetails utils', () => {
             'Manually enter one set of coordinates and a width to create a circular site',
           showActivityDates: true,
           showActivityDescription: true,
-          siteName: '',
+          siteName: 'Test Site 3',
           coordinateSystem: 'OSGB36 (National Grid)\nEastings and Northings',
           coordinates: '425053, 564180',
           width: '200 metres',
@@ -629,7 +637,8 @@ describe('siteDetails utils', () => {
           coordinates: {
             latitude: '51.5074',
             longitude: '-0.1278'
-          }
+          },
+          siteName: 'Test Site 4'
         }
       ]
 
@@ -793,12 +802,6 @@ describe('siteDetails utils', () => {
   })
 
   describe('getSiteDetails util', () => {
-    const mockRequest = {
-      logger: {
-        info: vi.fn(),
-        error: vi.fn()
-      }
-    }
     const mockAuthenticatedGetRequest = vi.fn()
 
     test('getSiteDetails returns existing site details when available', async () => {
@@ -894,14 +897,6 @@ describe('siteDetails utils', () => {
         siteDetails: undefined
       }
 
-      const mockRequest = {
-        logger: {
-          info: vi.fn(),
-          error: vi.fn(),
-          warn: vi.fn()
-        }
-      }
-
       const mockMongoResponse = {
         payload: {
           value: {
@@ -948,12 +943,6 @@ describe('siteDetails utils', () => {
   })
 
   describe('prepareFileUploadDataForSave util', () => {
-    const mockRequest = {
-      logger: {
-        info: vi.fn()
-      }
-    }
-
     test('prepareFileUploadDataForSave correctly formats data for API submission', () => {
       const siteDetails = [
         {
@@ -1032,12 +1021,6 @@ describe('siteDetails utils', () => {
   })
 
   describe('prepareManualCoordinateDataForSave util', () => {
-    const mockRequest = {
-      logger: {
-        info: vi.fn()
-      }
-    }
-
     test('prepareManualCoordinateDataForSave returns site details and logs correctly', () => {
       const exemption = {
         siteDetails: [
@@ -1094,7 +1077,8 @@ describe('siteDetails utils', () => {
                 }
               }
             ]
-          }
+          },
+          siteName: 'File Upload Site 1'
         }
       ]
       const previousPage = `http://hostname${routes.FILE_UPLOAD}`
@@ -1164,7 +1148,8 @@ describe('siteDetails utils', () => {
             latitude: '51.5074',
             longitude: '-0.1278'
           },
-          circleWidth: '100'
+          circleWidth: '100',
+          siteName: 'Manual Coordinate Site 1'
         }
       ]
       const previousPage = `http://hostname${routes.WIDTH_OF_SITE}`
@@ -1200,7 +1185,7 @@ describe('siteDetails utils', () => {
                 'Manually enter one set of coordinates and a width to create a circular site',
               showActivityDates: true,
               showActivityDescription: true,
-              siteName: ''
+              siteName: 'Manual Coordinate Site 1'
             })
           ]),
           multipleSiteDetailsData: expect.objectContaining({
@@ -1215,12 +1200,6 @@ describe('siteDetails utils', () => {
   })
 
   describe('handleSubmissionError util', () => {
-    const mockRequest = {
-      logger: {
-        error: vi.fn()
-      }
-    }
-
     test('handleSubmissionError logs error and returns Boom error', () => {
       const error = new Error('Test error message')
       const exemptionId = 'test-exemption-id'

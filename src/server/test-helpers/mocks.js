@@ -1,4 +1,5 @@
 import { faker } from '@faker-js/faker'
+import { vi } from 'vitest'
 import { COORDINATE_SYSTEMS } from '#src/server/common/constants/exemptions.js'
 
 export const mockExemptionTaskList = {
@@ -157,3 +158,23 @@ export const mockRequestAuth = {
   strategy: 'defra-id',
   credentials: { userId: 'test-user' }
 }
+
+export const createMockRequest = (overrides = {}) => ({
+  params: {},
+  query: {},
+  payload: {},
+  headers: {},
+  yar: {
+    get: vi.fn(),
+    set: vi.fn(),
+    clear: vi.fn(),
+    flash: vi.fn()
+  },
+  logger: {
+    debug: vi.fn(),
+    warn: vi.fn(),
+    error: vi.fn(),
+    info: vi.fn()
+  },
+  ...overrides
+})

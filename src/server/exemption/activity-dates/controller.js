@@ -32,6 +32,19 @@ import { getBackRoute, getNextRoute } from './utils.js'
 const isPageInSiteDetailsFlow = (request) =>
   request.url.pathname === routes.SITE_DETAILS_ACTIVITY_DATES
 
+const getCancelLink = (action, siteNumber) => {
+  return action
+    ? `${routes.REVIEW_SITE_DETAILS}#site-details-${siteNumber}`
+    : routes.TASK_LIST + '?cancel=site-details'
+}
+
+const getBackLink = (siteIndex, action, siteNumber, queryParams, exemption) => {
+  if (action) {
+    return `${routes.REVIEW_SITE_DETAILS}#site-details-${siteNumber}`
+  }
+  return getBackRoute({ siteIndex, queryParams }, exemption)
+}
+
 const createTemplateData = (
   request,
   exemption,
@@ -42,6 +55,7 @@ const createTemplateData = (
   let dateFields
 
   const isInSiteDetailsFlow = isPageInSiteDetailsFlow(request)
+  const action = request.query?.action
 
   if (Object.keys(payload).length > 0) {
     dateFields = extractMultipleDateFields(payload, DATE_EXTRACTION_CONFIG)
@@ -79,14 +93,19 @@ const createTemplateData = (
       ...ACTIVITY_DATES_VIEW_SETTINGS,
       projectName: exemption.projectName,
       ...dateFields,
-      backLink: multipleSiteDetails?.multipleSitesEnabled
-        ? getBackRoute(siteIndex, queryParams)
-        : routes.MULTIPLE_SITES_CHOICE,
-      cancelLink: routes.TASK_LIST + '?cancel=site-details',
+      backLink: getBackLink(
+        siteIndex,
+        action,
+        siteNumber,
+        queryParams,
+        exemption
+      ),
+      cancelLink: getCancelLink(action, siteNumber),
       isSiteDetailsFlow: true,
       isMultiSiteJourney: !!multipleSiteDetails?.multipleSitesEnabled,
       isSameActivityDates: multipleSiteDetails?.sameActivityDates === 'yes',
-      siteNumber: variableActivityDates ? siteNumber : null
+      siteNumber: variableActivityDates ? siteNumber : null,
+      action
     }
   }
 
@@ -193,11 +212,16 @@ export const activityDatesSubmitController = {
         })
       }
 
-      const nextRoute = getNextRoute(
-        exemption,
-        isInSiteDetailsFlow,
-        request.site?.queryParams
-      )
+      const action = request.query?.action
+      const { siteNumber } = request.site
+
+      const nextRoute = action
+        ? `${routes.REVIEW_SITE_DETAILS}#site-details-${siteNumber}`
+        : getNextRoute(
+            exemption,
+            isInSiteDetailsFlow,
+            request.site?.queryParams
+          )
       return h.redirect(nextRoute)
     } catch (e) {
       const { details } = e.data?.payload?.validation ?? {}

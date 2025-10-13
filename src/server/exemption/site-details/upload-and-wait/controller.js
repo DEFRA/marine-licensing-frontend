@@ -252,7 +252,7 @@ const processValidatedFile = async (status, uploadConfig, request, h) => {
       return h.redirect(routes.SAME_ACTIVITY_DATES)
     }
 
-    return h.redirect(routes.REVIEW_SITE_DETAILS)
+    return h.redirect(routes.SITE_DETAILS_ACTIVITY_DATES)
   } catch (error) {
     handleGeoParserError(request, error, status.filename, uploadConfig.fileType)
     return h.redirect(routes.FILE_UPLOAD)

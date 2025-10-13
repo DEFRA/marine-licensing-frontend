@@ -32,9 +32,30 @@ const templateValues = {
 const isPageInSiteDetailsFlow = (request) =>
   request.url.pathname === routes.SITE_DETAILS_ACTIVITY_DESCRIPTION
 
+const getCancelLink = (action, siteNumber) => {
+  return action
+    ? `${routes.REVIEW_SITE_DETAILS}#site-details-${siteNumber}`
+    : routes.TASK_LIST + '?cancel=site-details'
+}
+
+const getBackLinkForAction = (
+  action,
+  siteNumber,
+  exemption,
+  siteDetailsFlow,
+  siteIndex,
+  queryParams
+) => {
+  if (action) {
+    return `${routes.REVIEW_SITE_DETAILS}#site-details-${siteNumber}`
+  }
+  return getBackLink(exemption, siteDetailsFlow, siteIndex, queryParams)
+}
+
 const getPageTemplateValues = (request) => {
   const siteDetailsFlow = isPageInSiteDetailsFlow(request)
   const exemption = getExemptionCache(request)
+  const action = request.query?.action
 
   const { siteNumber, siteIndex, queryParams } = request.site ?? {}
 
@@ -47,9 +68,18 @@ const getPageTemplateValues = (request) => {
     ...templateValues,
     isMultiSiteJourney: !!multipleSiteDetails?.multipleSitesEnabled,
     isSiteDetailsFlow: siteDetailsFlow,
-    backLink: getBackLink(exemption, siteDetailsFlow, siteIndex, queryParams),
+    backLink: getBackLinkForAction(
+      action,
+      siteNumber,
+      exemption,
+      siteDetailsFlow,
+      siteIndex,
+      queryParams
+    ),
+    cancelLink: getCancelLink(action, siteNumber),
     projectName: exemption.projectName,
-    siteNumber: variableActivityDescription ? siteNumber : null
+    siteNumber: variableActivityDescription ? siteNumber : null,
+    action
   }
 }
 export const activityDescriptionController = {
@@ -142,7 +172,12 @@ export const activityDescriptionSubmitController = {
         })
       }
 
-      const nextRoute = getNextRoute(isInSiteDetailsFlow, request.site)
+      const action = request.query?.action
+      const { siteNumber } = request.site
+
+      const nextRoute = action
+        ? `${routes.REVIEW_SITE_DETAILS}#site-details-${siteNumber}`
+        : getNextRoute(isInSiteDetailsFlow, request.site)
 
       return h.redirect(nextRoute)
     } catch (e) {

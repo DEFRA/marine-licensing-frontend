@@ -3,7 +3,7 @@ import { mockFileUploadExemption } from '~/src/server/test-helpers/mocks.js'
 
 const baseFileUploadExemption = {
   multipleSiteDetails: {
-    multipleSiteDetails: false,
+    multipleSitesEnabled: false,
     sameActivityDates: 'no',
     sameActivityDescrption: 'no'
   },
@@ -43,7 +43,13 @@ export const testScenarios = [
         fileType: 'KML',
         fileUploaded: 'test-upload-id'
       },
-      siteDetails: [{ cardName: 'Site details' }]
+      siteDetails: [
+        {
+          cardName: 'Site details',
+          activityDates: '1 January 2025 to 1 January 2025',
+          activityDescription: 'Test activity description'
+        }
+      ]
     }
   },
   {

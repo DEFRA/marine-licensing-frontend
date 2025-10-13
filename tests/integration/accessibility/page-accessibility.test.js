@@ -113,6 +113,10 @@ describe('Page accessibility checks (Axe)', () => {
     {
       url: routes.DELETE_SITE,
       title: 'Are you sure you want to delete this site?'
+    },
+    {
+      url: routes.DELETE_ALL_SITES,
+      title: 'Are you sure you want to delete all site details?'
     }
   ]
 

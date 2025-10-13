@@ -49,9 +49,10 @@ export const transformTaskList = (taskList) => {
       title: {
         text: 'Site details'
       },
-      href: taskList.siteDetails
-        ? routes.REVIEW_SITE_DETAILS
-        : routes.SITE_DETAILS,
+      href:
+        !taskList.siteDetails || taskList.siteDetails === 'INCOMPLETE'
+          ? routes.SITE_DETAILS
+          : routes.REVIEW_SITE_DETAILS,
       status: setStatus(taskList.siteDetails)
     },
     {

@@ -10,8 +10,7 @@ describe('taskList utils', () => {
         status: { text: 'Completed' },
         title: {
           classes: 'govuk-link--no-visited-state',
-          text: 'Project name',
-          classes: 'govuk-link--no-visited-state'
+          text: 'Project name'
         }
       },
       {
@@ -35,8 +34,7 @@ describe('taskList utils', () => {
         status: { text: 'Completed' },
         title: {
           classes: 'govuk-link--no-visited-state',
-          text: 'Site details',
-          classes: 'govuk-link--no-visited-state'
+          text: 'Site details'
         }
       },
       {
@@ -108,8 +106,7 @@ describe('taskList utils', () => {
         status: { text: 'Completed' },
         title: {
           classes: 'govuk-link--no-visited-state',
-          text: 'Project name',
-          classes: 'govuk-link--no-visited-state'
+          text: 'Project name'
         }
       },
       {
@@ -133,8 +130,7 @@ describe('taskList utils', () => {
         status: { tag: { text: 'Incomplete', classes: 'govuk-tag--blue' } },
         title: {
           classes: 'govuk-link--no-visited-state',
-          text: 'Site details',
-          classes: 'govuk-link--no-visited-state'
+          text: 'Site details'
         }
       },
       {
@@ -155,8 +151,7 @@ describe('taskList utils', () => {
         status: { tag: { text: 'Incomplete', classes: 'govuk-tag--blue' } },
         title: {
           classes: 'govuk-link--no-visited-state',
-          text: 'Project name',
-          classes: 'govuk-link--no-visited-state'
+          text: 'Project name'
         }
       },
       {
@@ -180,8 +175,7 @@ describe('taskList utils', () => {
         status: { tag: { text: 'Incomplete', classes: 'govuk-tag--blue' } },
         title: {
           classes: 'govuk-link--no-visited-state',
-          text: 'Site details',
-          classes: 'govuk-link--no-visited-state'
+          text: 'Site details'
         }
       },
       {

@@ -53,6 +53,8 @@ describe('Review Site Details - Polygon Coordinates Integration Tests', () => {
       validatePageStructure(document, expectedPageContent)
       validateNavigationElements(document)
 
+      validateSummaryCard(document, expectedPageContent)
+
       if (isMultipleSites) {
         validateMultSiteActivityDetailsCard(document, expectedPageContent)
         validateMultipleSites(document, expectedPageContent)
@@ -224,6 +226,33 @@ describe('Review Site Details - Polygon Coordinates Integration Tests', () => {
       routes.ENTER_MULTIPLE_COORDINATES
     )
   }
+
+  const validateSummaryCard = (document, expected) => {
+    const siteLocationCard = document.querySelectorAll('.govuk-summary-card')[0]
+
+    const siteLocationCardTitle = siteLocationCard.querySelector(
+      '.govuk-summary-card__title'
+    )
+
+    expect(siteLocationCardTitle.textContent.trim()).toBe(
+      'Providing the site location'
+    )
+
+    const actionList = siteLocationCard.querySelector(
+      '.govuk-summary-card__actions'
+    )
+    expect(actionList).toBeTruthy()
+
+    const deleteLink = within(actionList).getByRole('link', {
+      name: /Delete all site details/i
+    })
+
+    expect(deleteLink).toHaveAttribute(
+      'href',
+      expect.stringContaining(`delete-all-sites`)
+    )
+  }
+
   const validateMultSiteActivityDetailsCard = (document, expected) => {
     const siteCard = document.querySelectorAll('.govuk-summary-card')[1]
     expect(siteCard).toBeTruthy()

@@ -47,3 +47,4 @@ describe('deleteAllSitesRoutes', () => {
     expect(typeof route.handler).toBe('function')
   })
 })
+

@@ -1,7 +1,7 @@
 import { routes } from '#src/server/common/constants/routes.js'
 import {
   getExemptionCache,
-  setExemptionCache
+  resetExemptionSiteDetails
 } from '#src/server/common/helpers/session-cache/utils.js'
 import { authenticatedPatchRequest } from '#src/server/common/helpers/authenticated-requests.js'
 
@@ -44,11 +44,7 @@ export const deleteAllSitesSubmitController = {
         id: exemption.id
       })
 
-      setExemptionCache(request, {
-        ...exemption,
-        multipleSiteDetails: {},
-        siteDetails: null
-      })
+      resetExemptionSiteDetails(request)
 
       return h.redirect(routes.TASK_LIST)
     } catch (error) {

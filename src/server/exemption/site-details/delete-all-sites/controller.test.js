@@ -5,7 +5,7 @@ import {
 } from './controller.js'
 import {
   getExemptionCache,
-  setExemptionCache
+  resetExemptionSiteDetails
 } from '#src/server/common/helpers/session-cache/utils.js'
 import { authenticatedPatchRequest } from '#src/server/common/helpers/authenticated-requests.js'
 import { routes } from '#src/server/common/constants/routes.js'
@@ -94,11 +94,7 @@ describe('deleteAllSitesController', () => {
         }
       )
 
-      expect(setExemptionCache).toHaveBeenCalledWith(mockRequest, {
-        ...mockExemption,
-        multipleSiteDetails: {},
-        siteDetails: null
-      })
+      expect(resetExemptionSiteDetails).toHaveBeenCalledWith(mockRequest)
 
       expect(mockH.redirect).toHaveBeenCalledWith(routes.TASK_LIST)
     })

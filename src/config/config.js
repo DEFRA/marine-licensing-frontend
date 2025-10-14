@@ -267,7 +267,7 @@ export const config = convict({
       nullable: true,
       default: 'http://localhost:3001',
       env: 'MARINE_LICENSING_BACKEND_API_URL',
-      invalidProduction: ['http://localhost:3001', null, '']
+      invalidProduction: [null, '']
     }
   },
   defraId: {
@@ -381,8 +381,7 @@ export const config = convict({
       doc: 'S3 Bucket for uploads to be placed in after the virus scan',
       format: requiredInProd,
       default: 'mmo-uploads',
-      env: 'CDP_UPLOAD_BUCKET',
-      invalidProduction: []
+      env: 'CDP_UPLOAD_BUCKET'
     }
   },
   clarityProjectId: {

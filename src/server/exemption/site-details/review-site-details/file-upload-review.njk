@@ -31,7 +31,7 @@
             {% if isMultiSiteJourney and hasIncompleteFields %}
 
               {% set incompleteWarningText %}
-                <p class="govuk-!-margin-bottom-3">The site details you've provided are saved</p>
+                <p class="govuk-!-margin-bottom-3">The site details you've provided are saved.</p>
                 <p class="govuk-!-margin-bottom-3">You must complete all sections marked {{appIncompleteField()}} before you can send your information.</p>
                 <p class="govuk-!-margin-bottom-0">If you cannot finish now, you can return to this page later.</p>
               {% endset %}
@@ -63,8 +63,8 @@
                     key: {
                       text: "File uploaded"
                     },
-                    value: { 
-                      text: multipleSiteDetailsData.filename | sanitiseFilename 
+                    value: {
+                      text: multipleSiteDetailsData.filename | sanitiseFilename
                     }
                 }
             ] %}
@@ -75,8 +75,7 @@
                         text: "Providing the site location"
                     }
                 },
-                rows: multipleSiteRows,
-                classes: "govuk-summary-list--full-width"
+                rows: multipleSiteRows
             }) }}
 
 
@@ -112,7 +111,7 @@
                   html: multipleSiteDetailsData.sameActivityDescription
               }
           }), activityRows) %}
-                    
+
           {% if multipleSiteDetailsData.activityDescription %}
               {% set activityRows = (activityRows.push({
                   key: {
@@ -123,20 +122,19 @@
                   }
               }), activityRows) %}
           {% endif %}
-                
+
           {{ govukSummaryList({
               card: {
                   title: {
                       text: "Activity details"
                   }
               },
-              rows: activityRows,
-              classes: "govuk-summary-list--full-width"
+              rows: activityRows
           }) }}
 
         {% endif %}
 
-        
+
         {% for site in summaryData %}
 
             {#  This javascript variable is only for testing purposes. #}
@@ -157,37 +155,42 @@
           {% if isMultiSiteJourney %}
             {% set _ = rows.push({
               key: { text: "Site name"},
-              value: { html: appIncompleteField({text: site.siteName})}
+              value: { html: appIncompleteField({text: site.siteName})},
+              actions: setSiteDetailsAction(site.siteName, 'site-name', site.siteNumber)
             }) %}
           {% endif %}
 
-          {% if isMultiSiteJourney and site.showActivityDates %}
+          {% if site.showActivityDates %}
             {% set _ = rows.push({
               key: { text: "Activity dates"},
-              value: { html: appIncompleteField({text: site.activityDates})}
+              value: { html: appIncompleteField({text: site.activityDates})},
+              actions: setSiteDetailsAction(site.activityDates, 'site-details-activity-dates', site.siteNumber)
             }) %}
           {% endif %}
 
-          {% if isMultiSiteJourney and site.showActivityDescription %}
+          {% if site.showActivityDescription %}
             {% set _ = rows.push({
               key: { text: "Activity description"},
-              value: { html: appIncompleteField({ text: site.activityDescription })}
+              value: { html: appIncompleteField({ text: site.activityDescription })},
+              actions: setSiteDetailsAction(site.activityDescription, 'site-details-activity-description', site.siteNumber)
             }) %}
           {% endif %}
-          
+
           {% set _ = rows.push({
-            key: { text: "Map view", classes: "govuk-summary-list__key--full-width" },
-            value: { html: appSiteDetailsMap(site.siteDetailsData, loop.index0), classes: "govuk-summary-list__value--full-width" }
+            key: { text: "Map view" },
+            value: { html: appSiteDetailsMap(site.siteDetailsData, loop.index0) }
           }) %}
 
           {{ govukSummaryList({
-          card: {
-            title: {
-              text: summaryRowsHeading
-            }
-          },
-          rows: rows,
-        classes: "govuk-summary-list--full-width"
+            card: {
+              attributes: {
+                id: "site-details-" + site.siteNumber
+              },
+              title: {
+                text: summaryRowsHeading
+              }
+            },
+            rows: rows
         }) }}
         {% endfor %}
 

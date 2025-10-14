@@ -38,7 +38,9 @@
 
 
 {% set buttonText %}
-  {% if isSiteDetailsFlow %}
+  {% if action %}
+    Save and continue
+  {% elif isSiteDetailsFlow %}
     Continue
   {% else %}
     Save and continue
@@ -76,7 +78,7 @@
               classes: "govuk-button--primary"
             }) }}
           {{ appCancelButton({
-                cancelLink: '/exemption/task-list'
+                cancelLink: cancelLink
             }) }}
         </div>
       </form>

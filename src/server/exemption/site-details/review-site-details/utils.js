@@ -390,6 +390,7 @@ export const prepareFileUploadDataForSave = (siteDetails, request) => {
       coordinatesType: 'file',
       activityDates: site.activityDates,
       activityDescription: site.activityDescription,
+      siteName: site.siteName,
       fileUploadType: site.fileUploadType,
       geoJSON,
       featureCount,

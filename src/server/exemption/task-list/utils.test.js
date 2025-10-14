@@ -8,27 +8,36 @@ describe('taskList utils', () => {
       {
         href: routes.PROJECT_NAME,
         status: { text: 'Completed' },
-        title: { text: 'Project name' }
+        title: { text: 'Project name', classes: 'govuk-link--no-visited-state' }
       },
       {
         href: routes.ACTIVITY_DATES,
         status: { text: 'Completed' },
-        title: { text: 'Activity dates' }
+        title: {
+          text: 'Activity dates',
+          classes: 'govuk-link--no-visited-state'
+        }
       },
       {
         href: routes.ACTIVITY_DESCRIPTION,
         status: { tag: { text: 'Incomplete', classes: 'govuk-tag--blue' } },
-        title: { text: 'Activity description' }
+        title: {
+          text: 'Activity description',
+          classes: 'govuk-link--no-visited-state'
+        }
       },
       {
         href: routes.REVIEW_SITE_DETAILS,
         status: { text: 'Completed' },
-        title: { text: 'Site details' }
+        title: { text: 'Site details', classes: 'govuk-link--no-visited-state' }
       },
       {
         href: routes.PUBLIC_REGISTER,
         status: { text: 'Completed' },
-        title: { text: 'Public register' }
+        title: {
+          text: 'Public register',
+          classes: 'govuk-link--no-visited-state'
+        }
       }
     ])
   })
@@ -43,27 +52,36 @@ describe('taskList utils', () => {
       {
         href: routes.PROJECT_NAME,
         status: { text: 'Completed' },
-        title: { text: 'Project name' }
+        title: { text: 'Project name', classes: 'govuk-link--no-visited-state' }
       },
       {
         href: routes.ACTIVITY_DATES,
         status: { text: 'Completed' },
-        title: { text: 'Activity dates' }
+        title: {
+          text: 'Activity dates',
+          classes: 'govuk-link--no-visited-state'
+        }
       },
       {
         href: routes.ACTIVITY_DESCRIPTION,
         status: { tag: { text: 'Incomplete', classes: 'govuk-tag--blue' } },
-        title: { text: 'Activity description' }
+        title: {
+          text: 'Activity description',
+          classes: 'govuk-link--no-visited-state'
+        }
       },
       {
         href: routes.SITE_DETAILS,
         status: { tag: { text: 'Incomplete', classes: 'govuk-tag--blue' } },
-        title: { text: 'Site details' }
+        title: { text: 'Site details', classes: 'govuk-link--no-visited-state' }
       },
       {
         href: routes.PUBLIC_REGISTER,
         status: { text: 'Completed' },
-        title: { text: 'Public register' }
+        title: {
+          text: 'Public register',
+          classes: 'govuk-link--no-visited-state'
+        }
       }
     ])
   })
@@ -73,27 +91,36 @@ describe('taskList utils', () => {
       {
         href: routes.PROJECT_NAME,
         status: { tag: { text: 'Incomplete', classes: 'govuk-tag--blue' } },
-        title: { text: 'Project name' }
+        title: { text: 'Project name', classes: 'govuk-link--no-visited-state' }
       },
       {
         href: routes.ACTIVITY_DATES,
         status: { tag: { text: 'Incomplete', classes: 'govuk-tag--blue' } },
-        title: { text: 'Activity dates' }
+        title: {
+          text: 'Activity dates',
+          classes: 'govuk-link--no-visited-state'
+        }
       },
       {
         href: routes.ACTIVITY_DESCRIPTION,
         status: { tag: { text: 'Incomplete', classes: 'govuk-tag--blue' } },
-        title: { text: 'Activity description' }
+        title: {
+          text: 'Activity description',
+          classes: 'govuk-link--no-visited-state'
+        }
       },
       {
         href: routes.SITE_DETAILS,
         status: { tag: { text: 'Incomplete', classes: 'govuk-tag--blue' } },
-        title: { text: 'Site details' }
+        title: { text: 'Site details', classes: 'govuk-link--no-visited-state' }
       },
       {
         href: routes.PUBLIC_REGISTER,
         status: { tag: { text: 'Incomplete', classes: 'govuk-tag--blue' } },
-        title: { text: 'Public register' }
+        title: {
+          text: 'Public register',
+          classes: 'govuk-link--no-visited-state'
+        }
       }
     ])
   })

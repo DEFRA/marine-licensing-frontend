@@ -45,9 +45,11 @@ export const updateExemptionMultipleSiteDetails = (request, key, value) => {
 }
 export const resetExemptionSiteDetails = (request) => {
   const existingCache = getExemptionCache(request)
-  delete existingCache.multipleSiteDetails
-  delete existingCache.siteDetails
-  request.yar.set(EXEMPTION_CACHE_KEY, existingCache)
+  request.yar.set(EXEMPTION_CACHE_KEY, {
+    ...existingCache,
+    multipleSiteDetails: {},
+    siteDetails: []
+  })
   return { siteDetails: null }
 }
 export const updateExemptionSiteDetailsBatch = (

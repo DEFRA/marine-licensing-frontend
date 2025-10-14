@@ -610,7 +610,10 @@ describe('#utils', () => {
     test('should clear the value in cache', () => {
       const result = resetExemptionSiteDetails(mockRequest)
 
-      expect(mockRequest.yar.set).toHaveBeenCalledWith(EXEMPTION_CACHE_KEY, {})
+      expect(mockRequest.yar.set).toHaveBeenCalledWith(EXEMPTION_CACHE_KEY, {
+        multipleSiteDetails: {},
+        siteDetails: []
+      })
       expect(result).toEqual({ siteDetails: null })
     })
   })

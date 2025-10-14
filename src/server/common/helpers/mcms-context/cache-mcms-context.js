@@ -6,13 +6,13 @@ export const cacheMcmsContextFromQueryParams = (request) => {
   if (request.path === '/') {
     const { error, value } = paramsSchema.validate(request.query)
 
-    if (!error) {
-      request.yar.flash(mcmsContextCacheKey, value)
-    } else {
+    if (error) {
       request.logger.error(
         error,
         `Missing or invalid MCMS query string context on URL: ${request.url} - ${error.message}`
       )
+    } else {
+      request.yar.flash(mcmsContextCacheKey, value)
     }
   }
 }

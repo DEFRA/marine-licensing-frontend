@@ -18,7 +18,7 @@ class MapViewManager {
     const fitOptions = { ...defaultOptions, ...options }
 
     try {
-      if (extent?.every((coord) => isFinite(coord))) {
+      if (extent?.every((coord) => Number.isFinite(coord))) {
         map.getView().fit(extent, fitOptions)
       } else {
         this.centreMapView(map, [

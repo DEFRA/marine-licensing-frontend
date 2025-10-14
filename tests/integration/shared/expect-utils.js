@@ -130,7 +130,7 @@ export const validateErrors = (expectedErrors, document) => {
   expect(errorSummary).toBeInTheDocument()
   expect(getByText(errorSummary, 'There is a problem')).toBeInTheDocument()
 
-  expectedErrors.forEach(({ field, message, summaryMessage }) => {
+  for (const { field, message, summaryMessage } of expectedErrors) {
     const summaryList = within(errorSummary).getByRole('list')
     const summaryLink = within(summaryList).getByText(summaryMessage || message)
     expect(summaryLink).toBeInTheDocument()
@@ -154,5 +154,5 @@ export const validateErrors = (expectedErrors, document) => {
       formGroup?.classList.contains('govuk-form-group--error') ??
       fieldContainer.querySelectorAll('.govuk-input--error').length > 0
     expect(hasErrorStyling).toBe(true)
-  })
+  }
 }

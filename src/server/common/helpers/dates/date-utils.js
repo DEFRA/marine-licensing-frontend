@@ -103,12 +103,12 @@ export function extractDateFieldsFromPayload(payload, prefix) {
 
 export function extractMultipleDateFields(payload, dateConfigs) {
   const result = {}
-  dateConfigs.forEach(({ key, prefix }) => {
+  for (const { key, prefix } of dateConfigs) {
     const dateFields = extractDateFieldsFromPayload(payload, prefix)
     result[`${key}Day`] = dateFields.day
     result[`${key}Month`] = dateFields.month
     result[`${key}Year`] = dateFields.year
-  })
+  }
   return result
 }
 

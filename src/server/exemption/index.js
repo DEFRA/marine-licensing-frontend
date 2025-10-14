@@ -25,8 +25,8 @@ export const exemption = {
         const response = request.response
         if (response.variety === 'view') {
           response.source.context = {
-            ...(request.app || {}),
-            ...(response.source.context || {})
+            ...response.source.context,
+            ...request.app
           }
         }
         return h.continue

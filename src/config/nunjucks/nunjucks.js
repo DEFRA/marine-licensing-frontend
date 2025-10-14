@@ -5,6 +5,7 @@ import hapiVision from '@hapi/vision'
 
 import { config } from '#src/config/config.js'
 import { context } from './context/context.js'
+import * as globals from './globals/globals.js'
 import * as filters from './filters/filters.js'
 
 const dirname = path.dirname(fileURLToPath(import.meta.url))
@@ -25,6 +26,11 @@ const nunjucksEnvironment = nunjucks.configure(
 )
 
 nunjucksEnvironment.addGlobal('govukRebrand', true)
+
+for (const [name, filter] of Object.entries(globals)) {
+  nunjucksEnvironment.addGlobal(name, filter)
+}
+
 export const nunjucksConfig = {
   plugin: hapiVision,
   options: {

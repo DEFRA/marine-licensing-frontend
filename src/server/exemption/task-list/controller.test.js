@@ -84,6 +84,7 @@ describe('#taskListController', () => {
             text: 'Completed'
           },
           title: {
+            classes: 'govuk-link--no-visited-state',
             text: 'Project name'
           }
         },
@@ -93,6 +94,7 @@ describe('#taskListController', () => {
             text: 'Completed'
           },
           title: {
+            classes: 'govuk-link--no-visited-state',
             text: 'Activity dates'
           }
         },
@@ -105,6 +107,7 @@ describe('#taskListController', () => {
             }
           },
           title: {
+            classes: 'govuk-link--no-visited-state',
             text: 'Activity description'
           }
         },
@@ -114,6 +117,7 @@ describe('#taskListController', () => {
             text: 'Completed'
           },
           title: {
+            classes: 'govuk-link--no-visited-state',
             text: 'Site details'
           }
         },
@@ -123,6 +127,7 @@ describe('#taskListController', () => {
             text: 'Completed'
           },
           title: {
+            classes: 'govuk-link--no-visited-state',
             text: 'Public register'
           }
         }

@@ -63,7 +63,9 @@
 {% endset %}
 
 {% set buttonText %}
-  {% if isSiteDetailsFlow %}
+  {% if action %}
+    Save and continue
+  {% elif isSiteDetailsFlow %}
     Continue
   {% else %}
     Save and continue

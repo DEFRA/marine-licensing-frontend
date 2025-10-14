@@ -70,7 +70,9 @@ describe('#activityDescriptionController', () => {
       activityDescriptionController.handler(request, h)
 
       expect(h.view).toHaveBeenCalledWith(ACTIVITY_DESCRIPTION_VIEW_ROUTE, {
+        action: undefined,
         backLink: routes.TASK_LIST,
+        cancelLink: routes.TASK_LIST + '?cancel=site-details',
         isMultiSiteJourney: false,
         isSiteDetailsFlow: false,
         pageTitle: 'Activity description',
@@ -88,7 +90,9 @@ describe('#activityDescriptionController', () => {
         2,
         ACTIVITY_DESCRIPTION_VIEW_ROUTE,
         {
+          action: undefined,
           backLink: routes.TASK_LIST,
+          cancelLink: routes.TASK_LIST + '?cancel=site-details',
           isMultiSiteJourney: false,
           isSiteDetailsFlow: false,
           pageTitle: 'Activity description',
@@ -119,7 +123,9 @@ describe('#activityDescriptionController', () => {
       activityDescriptionController.handler(request, h)
 
       expect(h.view).toHaveBeenCalledWith(ACTIVITY_DESCRIPTION_VIEW_ROUTE, {
+        action: undefined,
         backLink: routes.SITE_DETAILS_ACTIVITY_DATES,
+        cancelLink: routes.TASK_LIST + '?cancel=site-details',
         isMultiSiteJourney: false,
         isSiteDetailsFlow: true,
         pageTitle: 'Activity description',
@@ -128,6 +134,41 @@ describe('#activityDescriptionController', () => {
         projectName: undefined,
         siteNumber: null
       })
+    })
+
+    test('should set back link to correct page for single site file upload', () => {
+      const h = { view: vi.fn() }
+      const request = {
+        url: { pathname: routes.SITE_DETAILS_ACTIVITY_DESCRIPTION },
+        site: { siteIndex: 0, siteDetails: { coordinatesType: 'file' } }
+      }
+
+      const exemptionWithFileUpload = {
+        projectName: 'Test Project',
+        siteDetails: [
+          {
+            coordinatesType: 'file',
+            fileUploadType: 'kml',
+            activityDescription: 'Test file upload activity'
+          }
+        ],
+        multipleSiteDetails: {
+          multipleSitesEnabled: false
+        }
+      }
+
+      getExemptionCacheSpy.mockReturnValue(exemptionWithFileUpload)
+
+      activityDescriptionController.handler(request, h)
+
+      expect(h.view).toHaveBeenCalledWith(
+        ACTIVITY_DESCRIPTION_VIEW_ROUTE,
+        expect.objectContaining({
+          backLink: routes.SITE_DETAILS_ACTIVITY_DATES,
+          isSiteDetailsFlow: true,
+          isMultiSiteJourney: false
+        })
+      )
     })
   })
 
@@ -286,7 +327,9 @@ describe('#activityDescriptionController', () => {
       )
 
       expect(h.view).toHaveBeenCalledWith(ACTIVITY_DESCRIPTION_VIEW_ROUTE, {
+        action: undefined,
         backLink: routes.TASK_LIST,
+        cancelLink: routes.TASK_LIST + '?cancel=site-details',
         isMultiSiteJourney: false,
         isSiteDetailsFlow: false,
         errorSummary: [

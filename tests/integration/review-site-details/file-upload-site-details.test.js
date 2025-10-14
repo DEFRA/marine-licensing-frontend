@@ -152,7 +152,7 @@ describe('Review Site Details - File Upload Integration Tests', () => {
 
     if (expected.multipleSiteDetails.warning) {
       expect(
-        getByText(document, `The site details you've provided are saved`)
+        getByText(document, `The site details you've provided are saved.`)
       ).toBeInTheDocument()
 
       expect(
@@ -167,7 +167,7 @@ describe('Review Site Details - File Upload Integration Tests', () => {
       ).toBeInTheDocument()
     } else {
       expect(
-        queryByText(document, `The site details you've provided are saved`)
+        queryByText(document, `The site details you've provided are saved.`)
       ).not.toBeInTheDocument()
 
       expect(
@@ -237,6 +237,31 @@ describe('Review Site Details - File Upload Integration Tests', () => {
       : expect(activityDescriptionRow).toBeFalsy()
   }
 
+  const validateActionLink = (row, value, siteIndex) => {
+    const actionList = row.querySelector('.govuk-summary-list__actions')
+    expect(actionList).toBeTruthy()
+
+    const hasValue = value && value !== '' && value !== 'Incomplete'
+    const expectedText = hasValue ? /Change/i : /Add/i
+
+    const actionLink = within(actionList).getByRole('link', {
+      name: expectedText
+    })
+
+    const siteNumber = siteIndex + 1
+
+    expect(actionLink).toHaveAttribute(
+      'href',
+      expect.stringContaining(
+        `site=${siteNumber}&action=${hasValue ? 'change' : 'add'}`
+      )
+    )
+
+    expect(actionLink.getAttribute('href')).toContain(
+      `site=${siteNumber}&action=${hasValue ? 'change' : 'add'}`
+    )
+  }
+
   const validateSiteDetailsCard = (document, expected, siteIndex) => {
     const siteCard = getSiteDetailsCard(document, expected, siteIndex)
 
@@ -247,35 +272,56 @@ describe('Review Site Details - File Upload Integration Tests', () => {
 
     const siteNameRow = getRowByKey(siteCard, 'Site name')
 
-    expected.multipleSiteDetails.multipleSiteDetails === 'Yes'
-      ? expect(siteNameRow.textContent).toContain(
-          expected.siteDetails[siteIndex].siteName
-        )
-      : expect(siteNameRow).toBeFalsy()
+    if (expected.multipleSiteDetails.multipleSiteDetails === 'Yes') {
+      expect(siteNameRow.textContent).toContain(
+        expected.siteDetails[siteIndex].siteName
+      )
+      validateActionLink(
+        siteNameRow,
+        expected.siteDetails[siteIndex].siteName,
+        siteIndex
+      )
+    } else {
+      expect(siteNameRow).toBeFalsy()
+    }
 
     const shouldIncludeActivityDates =
-      expected.multipleSiteDetails.multipleSiteDetails === 'Yes' &&
+      expected.multipleSiteDetails.multipleSiteDetails === 'No' ||
       expected.multipleSiteDetails.sameActivityDates === 'No'
 
     const activityDatesRow = getRowByKey(siteCard, 'Activity dates')
 
-    shouldIncludeActivityDates
-      ? expect(activityDatesRow.textContent).toContain(
-          expected.siteDetails[siteIndex].activityDates
-        )
-      : expect(activityDatesRow).toBeFalsy()
+    if (shouldIncludeActivityDates) {
+      expect(activityDatesRow.textContent).toContain(
+        expected.siteDetails[siteIndex].activityDates
+      )
+      validateActionLink(
+        activityDatesRow,
+        expected.siteDetails[siteIndex].activityDates,
+        siteIndex
+      )
+    } else {
+      expect(activityDatesRow).toBeFalsy()
+    }
 
     const shouldIncludeActivityDescription =
-      expected.multipleSiteDetails.multipleSiteDetails === 'Yes' &&
+      expected.multipleSiteDetails.multipleSiteDetails === 'No' ||
       expected.multipleSiteDetails.sameActivityDescription === 'No'
 
     const activityDescriptionRow = getRowByKey(siteCard, 'Activity description')
 
-    shouldIncludeActivityDescription
-      ? expect(activityDescriptionRow.textContent).toContain(
-          expected.siteDetails[siteIndex].activityDescription
-        )
-      : expect(activityDescriptionRow).toBeFalsy()
+    if (shouldIncludeActivityDescription) {
+      expect(activityDescriptionRow.textContent).toContain(
+        expected.siteDetails[siteIndex].activityDescription
+      )
+      validateActionLink(
+        activityDescriptionRow,
+        expected.siteDetails[siteIndex].activityDescription,
+        siteIndex
+      )
+    } else {
+      expect(activityDescriptionRow).toBeFalsy()
+    }
   }
 
   const validateFileUpload = (document, expected, siteIndex) => {

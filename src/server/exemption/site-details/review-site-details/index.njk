@@ -51,8 +51,7 @@
                         text: "Providing the site location"
                     }
                 },
-                rows: multipleSiteRows,
-                classes: "govuk-summary-list--full-width"
+                rows: multipleSiteRows
             }) }}
 
             {% if isMultiSiteJourney %}
@@ -87,7 +86,7 @@
                         html: multipleSiteDetailsData.sameActivityDescription
                     }
                 }), activityRows) %}
-                    
+
                 {% if multipleSiteDetailsData.activityDescription %}
                     {% set activityRows = (activityRows.push({
                         key: {
@@ -98,15 +97,14 @@
                         }
                     }), activityRows) %}
                 {% endif %}
-                
+
                 {{ govukSummaryList({
                     card: {
                         title: {
                             text: "Activity details"
                         }
                     },
-                    rows: activityRows,
-                    classes: "govuk-summary-list--full-width"
+                    rows: activityRows
                 }) }}
 
             {% endif %}
@@ -207,12 +205,10 @@
             {# Add map view row for all coordinate types #}
             {% set summaryRows = (summaryRows.push({
                 key: {
-                    text: "Map view",
-                    classes: "govuk-summary-list__key--full-width"
+                    text: "Map view"
                 },
                 value: {
-                    html: appSiteDetailsMap(site.siteDetailsData, loop.index0),
-                    classes: "govuk-summary-list__value--full-width"
+                    html: appSiteDetailsMap(site.siteDetailsData, loop.index0)
                 }
             }), summaryRows) %}
 
@@ -231,8 +227,7 @@
                         ]
                     }
                 },
-                rows: summaryRows,
-                    classes: "govuk-summary-list--full-width"
+                rows: summaryRows
             }) }}
 
             {% endfor %}
@@ -240,7 +235,7 @@
 
             <form method="POST">
                 <input type="hidden" name="csrfToken" value="{{ csrfToken }}">
-                    
+
                     {% if isMultiSiteJourney %}
                         {{ govukButton({
                             text: "Save and add another site",
@@ -253,9 +248,9 @@
                         }) }}
 
                         <p>You can select 'Save and continue' if you're finished or you want to save your progress and return later.</p>
-                        
+
                     {% endif %}
-                    
+
                     <div class="govuk-button-group">
                         {{ govukButton({
                         text: "Save and continue",

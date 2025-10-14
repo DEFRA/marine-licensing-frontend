@@ -17,8 +17,25 @@ export const getNextRoute = (
 
   return nextRoute + queryParams
 }
-export const getBackRoute = (siteIndex, queryParams = '') => {
+
+export const getBackRoute = (
+  { siteIndex, queryParams = '' },
+  exemption = null
+) => {
   if (siteIndex === 0) {
+    const isMultipleSites = exemption?.multipleSiteDetails?.multipleSitesEnabled
+
+    if (
+      !isMultipleSites &&
+      exemption?.siteDetails?.[0]?.coordinatesType === 'file'
+    ) {
+      return routes.FILE_UPLOAD
+    }
+
+    if (!isMultipleSites) {
+      return routes.MULTIPLE_SITES_CHOICE
+    }
+
     return routes.SAME_ACTIVITY_DATES
   }
 

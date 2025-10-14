@@ -15,9 +15,33 @@ const isProduction = process.env.NODE_ENV === 'production'
 const isTest = process.env.NODE_ENV === 'test'
 const isDevelopment = process.env.NODE_ENV === 'development'
 
+// Custom convict format that requires an env var ovverride for vars that have non-prod default values set.
+const requiredInProd = 'required-in-prod'
+
 if (isDevelopment) {
   configDotenv()
 }
+
+convict.addFormat({
+  name: requiredInProd,
+  validate: function (val, schema) {
+    const env = process.env.ENVIRONMENT ?? 'local'
+    if (env !== 'prod' && env !== 'perf-test') {
+      return
+    }
+
+    const invalidValues = schema.default ? [schema.default] : [] // never allow the default
+    if (schema.invalidProduction !== undefined) {
+      invalidValues.push(...schema.invalidProduction)
+    }
+
+    if (invalidValues.includes(val)) {
+      throw new Error(
+        `${schema.env || 'Configuration value'} must be set for ${env} environment (current value is invalid for production)`
+      )
+    }
+  }
+})
 
 export const config = convict({
   serviceVersion: {
@@ -52,7 +76,7 @@ export const config = convict({
   },
   appBaseUrl: {
     doc: 'Base URL for the application (used for CDP upload redirects)',
-    format: String,
+    format: requiredInProd,
     default: localhost,
     env: 'APP_BASE_URL'
   },
@@ -158,7 +182,7 @@ export const config = convict({
       },
       password: {
         doc: 'session cookie password',
-        format: String,
+        format: requiredInProd,
         default: 'the-password-must-be-at-least-32-characters-long',
         env: 'SESSION_COOKIE_PASSWORD',
         sensitive: true
@@ -174,19 +198,19 @@ export const config = convict({
   redis: {
     host: {
       doc: 'Redis cache host',
-      format: String,
+      format: requiredInProd,
       default: '127.0.0.1',
       env: 'REDIS_HOST'
     },
     username: {
       doc: 'Redis cache username',
-      format: String,
+      format: requiredInProd,
       default: '',
       env: 'REDIS_USERNAME'
     },
     password: {
       doc: 'Redis cache password',
-      format: '*',
+      format: requiredInProd,
       default: '',
       sensitive: true,
       env: 'REDIS_PASSWORD'
@@ -239,42 +263,43 @@ export const config = convict({
   backend: {
     apiUrl: {
       doc: 'Endpoint for the backend API service',
-      format: String,
+      format: requiredInProd,
       nullable: true,
       default: 'http://localhost:3001',
-      env: 'MARINE_LICENSING_BACKEND_API_URL'
+      env: 'MARINE_LICENSING_BACKEND_API_URL',
+      invalidProduction: ['http://localhost:3001', null, '']
     }
   },
   defraId: {
     accountManagementUrl: {
       doc: 'Defra ID account management portal URL',
-      format: String,
+      format: requiredInProd,
       env: 'DEFRA_ID_ACCOUNT_MANAGEMENT_URL',
       default: '#'
     },
     oidcConfigurationUrl: {
       doc: 'Defra ID OIDC Configuration URL',
-      format: String,
+      format: requiredInProd,
       default:
         'http://localhost:3200/cdp-defra-id-stub/.well-known/openid-configuration',
       env: 'DEFRA_ID_OIDC_CONFIGURATION_URL'
     },
     clientId: {
       doc: 'The Defra Identity client ID.',
-      format: String,
+      format: requiredInProd,
       default: '2fb0d715-affa-4bf1-836e-44a464e3fbea',
       env: 'DEFRA_ID_CLIENT_ID'
     },
     clientSecret: {
       doc: 'The Defra Identity client secret.',
-      format: String,
+      format: requiredInProd,
       default: 'test_value',
       env: 'DEFRA_ID_CLIENT_SECRET',
       sensitive: true
     },
     serviceId: {
       doc: 'The Defra Identity service ID.',
-      format: String,
+      format: requiredInProd,
       default: 'service-test',
       env: 'DEFRA_ID_SERVICE_ID'
     },
@@ -301,20 +326,20 @@ export const config = convict({
   entraId: {
     oidcConfigurationUrl: {
       doc: 'Entra ID OIDC configuration URL',
-      format: String,
+      format: requiredInProd,
       env: 'ENTRA_ID_OIDC_CONFIGURATION_URL',
       default:
         'http://localhost:3200/cdp-defra-id-stub/.well-known/openid-configuration'
     },
     clientId: {
       doc: 'ENTRA ID client ID',
-      format: String,
+      format: requiredInProd,
       env: 'ENTRA_ID_CLIENT_ID',
       default: 'f68226cb-8dbc-44ef-a24e-d4e4835b16ff'
     },
     clientSecret: {
       doc: 'ENTRA ID client secret',
-      format: String,
+      format: requiredInProd,
       sensitive: true,
       env: 'ENTRA_ID_CLIENT_SECRET',
       default: 'test_value'
@@ -336,7 +361,7 @@ export const config = convict({
   cdpUploader: {
     cdpUploadServiceBaseUrl: {
       doc: 'CDP Uploader service base URL',
-      format: String,
+      format: requiredInProd,
       default: 'http://localhost:7337',
       env: 'CDP_UPLOADER_BASE_URL'
     },
@@ -354,9 +379,10 @@ export const config = convict({
     },
     s3Bucket: {
       doc: 'S3 Bucket for uploads to be placed in after the virus scan',
-      format: String,
+      format: requiredInProd,
       default: 'mmo-uploads',
-      env: 'CDP_UPLOAD_BUCKET'
+      env: 'CDP_UPLOAD_BUCKET',
+      invalidProduction: []
     }
   },
   clarityProjectId: {
@@ -382,3 +408,14 @@ export const config = convict({
 })
 
 config.validate({ allowed: 'strict' })
+
+const environment = config.get('cdpEnvironment')
+if (
+  (environment === 'prod' || environment === 'perf-test') &&
+  !config.get('clarityProjectId')
+) {
+  // eslint-disable-next-line no-console
+  console.warn(
+    `\n⚠️  WARNING: CLARITY_PROJECT_ID is not set for ${environment} environment\n`
+  )
+}

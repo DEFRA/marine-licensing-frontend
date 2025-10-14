@@ -30,7 +30,7 @@ export const openIdProvider = async (name) => {
       // which is colon-separated with the following parts:
       // relationshipId:organisationId:organisationName:organisationLoa:relationship:relationshipLoa.
       const [, applicantOrganisationId, applicantOrganisationName] =
-        payload.relationships[0]?.split(':') || []
+        payload.relationships?.[0]?.split(':') || []
 
       credentials.profile = {
         id: payload.sub,

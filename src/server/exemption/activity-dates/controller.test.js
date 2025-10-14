@@ -112,6 +112,39 @@ describe('#activityDatesController', () => {
         activityEndDateYear: '2025'
       })
     })
+
+    test('should set back link to file upload page for single site file upload', () => {
+      const exemptionWithFileUpload = {
+        ...mockExemptionState,
+        siteDetails: [
+          {
+            coordinatesType: 'file',
+            fileUploadType: 'kml'
+          }
+        ],
+        multipleSiteDetails: {
+          multipleSitesEnabled: false
+        }
+      }
+
+      getExemptionCacheSpy.mockReturnValue(exemptionWithFileUpload)
+
+      const h = { view: vi.fn() }
+      const request = {
+        url: { pathname: routes.SITE_DETAILS_ACTIVITY_DATES },
+        site: { siteIndex: 0 }
+      }
+
+      activityDatesController.handler(request, h)
+
+      expect(h.view).toHaveBeenCalledWith(
+        ACTIVITY_DATES_VIEW_ROUTE,
+        expect.objectContaining({
+          backLink: routes.FILE_UPLOAD,
+          isSiteDetailsFlow: true
+        })
+      )
+    })
   })
 
   describe('activityDatesController POST', () => {

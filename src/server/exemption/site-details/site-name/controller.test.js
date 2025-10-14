@@ -5,7 +5,10 @@ import {
   SITE_NAME_VIEW_ROUTE,
   errorMessages
 } from '#src/server/exemption/site-details/site-name/controller.js'
-import { mockExemption as mockExemptionData } from '#src/server/test-helpers/mocks.js'
+import {
+  mockExemption as mockExemptionData,
+  createMockRequest
+} from '#src/server/test-helpers/mocks.js'
 import { routes } from '#src/server/common/constants/routes.js'
 import * as cacheUtils from '#src/server/common/helpers/session-cache/utils.js'
 
@@ -26,7 +29,7 @@ describe('#siteName', () => {
     test('should render with correct context and call utils function', () => {
       const mockSiteName = 'Test Site Name'
       const h = { view: vi.fn() }
-      const request = {}
+      const request = createMockRequest()
 
       getExemptionCacheSpy.mockReturnValueOnce({
         ...mockExemptionData,
@@ -43,10 +46,43 @@ describe('#siteName', () => {
         pageTitle: 'Site name',
         heading: 'Site name',
         backLink: routes.MULTIPLE_SITES_CHOICE,
+        cancelLink: routes.TASK_LIST,
         payload: { siteName: mockSiteName },
         projectName: 'Test Project',
-        siteNumber: 1
+        siteNumber: 1,
+        action: undefined
       })
+    })
+
+    test('should include action in view context when action parameter is present', () => {
+      const h = { view: vi.fn() }
+      const request = createMockRequest({ query: { action: 'add' } })
+
+      sitePreHandlerHook.method(request, h)
+      siteNameController.handler(request, h)
+
+      expect(h.view).toHaveBeenCalledWith(
+        SITE_NAME_VIEW_ROUTE,
+        expect.objectContaining({
+          action: 'add'
+        })
+      )
+    })
+
+    test('should use review site details as back link and cancel link when action parameter is present', () => {
+      const h = { view: vi.fn() }
+      const request = createMockRequest({ query: { action: 'change' } })
+
+      sitePreHandlerHook.method(request, h)
+      siteNameController.handler(request, h)
+
+      expect(h.view).toHaveBeenCalledWith(
+        SITE_NAME_VIEW_ROUTE,
+        expect.objectContaining({
+          backLink: `${routes.REVIEW_SITE_DETAILS}#site-details-1`,
+          cancelLink: `${routes.REVIEW_SITE_DETAILS}#site-details-1`
+        })
+      )
     })
   })
 
@@ -57,9 +93,9 @@ describe('#siteName', () => {
         'updateExemptionSiteDetails'
       )
 
-      const request = {
+      const request = createMockRequest({
         payload: { siteName: 'Test Site Name' }
-      }
+      })
       const h = { redirect: vi.fn() }
 
       sitePreHandlerHook.method(request, h)
@@ -72,6 +108,92 @@ describe('#siteName', () => {
         'Test Site Name'
       )
       expect(h.redirect).toHaveBeenCalledWith(routes.SAME_ACTIVITY_DATES)
+    })
+
+    test('should redirect to review site details when action=add', () => {
+      const updateExemptionSiteDetailsSpy = vi.spyOn(
+        cacheUtils,
+        'updateExemptionSiteDetails'
+      )
+
+      const request = createMockRequest({
+        payload: { siteName: 'New Site' },
+        query: { action: 'add' }
+      })
+      const h = { redirect: vi.fn() }
+
+      sitePreHandlerHook.method(request, h)
+      siteNameSubmitController.handler(request, h)
+
+      expect(updateExemptionSiteDetailsSpy).toHaveBeenCalledWith(
+        request,
+        0,
+        'siteName',
+        'New Site'
+      )
+      expect(h.redirect).toHaveBeenCalledWith(
+        `${routes.REVIEW_SITE_DETAILS}#site-details-1`
+      )
+    })
+
+    test('should redirect to review site details when action=change', () => {
+      const updateExemptionSiteDetailsSpy = vi.spyOn(
+        cacheUtils,
+        'updateExemptionSiteDetails'
+      )
+
+      const request = createMockRequest({
+        payload: { siteName: 'Updated Site' },
+        query: { action: 'change' }
+      })
+      const h = { redirect: vi.fn() }
+
+      sitePreHandlerHook.method(request, h)
+      siteNameSubmitController.handler(request, h)
+
+      expect(updateExemptionSiteDetailsSpy).toHaveBeenCalledWith(
+        request,
+        0,
+        'siteName',
+        'Updated Site'
+      )
+      expect(h.redirect).toHaveBeenCalledWith(
+        `${routes.REVIEW_SITE_DETAILS}#site-details-1`
+      )
+    })
+
+    test('should redirect to review site details with site parameter when both present', () => {
+      const updateExemptionSiteDetailsSpy = vi.spyOn(
+        cacheUtils,
+        'updateExemptionSiteDetails'
+      )
+
+      getExemptionCacheSpy.mockReturnValueOnce({
+        ...mockExemptionData,
+        siteDetails: [
+          mockExemptionData.siteDetails[0],
+          mockExemptionData.siteDetails[0]
+        ]
+      })
+
+      const request = createMockRequest({
+        payload: { siteName: 'Site 2 Name' },
+        query: { site: '2', action: 'change' }
+      })
+      const h = { redirect: vi.fn() }
+
+      sitePreHandlerHook.method(request, h)
+      siteNameSubmitController.handler(request, h)
+
+      expect(updateExemptionSiteDetailsSpy).toHaveBeenCalledWith(
+        request,
+        1,
+        'siteName',
+        'Site 2 Name'
+      )
+      expect(h.redirect).toHaveBeenCalledWith(
+        `${routes.REVIEW_SITE_DETAILS}#site-details-2`
+      )
     })
 
     test('should validate payload correctly', () => {
@@ -99,9 +221,9 @@ describe('#siteName', () => {
     })
 
     test('should handle validation failure with error details', () => {
-      const request = {
+      const request = createMockRequest({
         payload: { siteName: '' }
-      }
+      })
       const h = { view: vi.fn().mockReturnValue({ takeover: vi.fn() }) }
 
       const err = {
@@ -121,18 +243,20 @@ describe('#siteName', () => {
         pageTitle: 'Site name',
         heading: 'Site name',
         backLink: routes.MULTIPLE_SITES_CHOICE,
+        cancelLink: routes.TASK_LIST,
         payload: { siteName: '' },
         projectName: 'Test Project',
         siteNumber: 1,
+        action: undefined,
         errors: expect.any(Object),
         errorSummary: expect.any(Array)
       })
     })
 
     test('should handle validation failure without error details', () => {
-      const request = {
+      const request = createMockRequest({
         payload: { siteName: 'invalid' }
-      }
+      })
       const h = { view: vi.fn().mockReturnValue({ takeover: vi.fn() }) }
 
       sitePreHandlerHook.method(request, h)
@@ -143,10 +267,42 @@ describe('#siteName', () => {
         pageTitle: 'Site name',
         heading: 'Site name',
         backLink: routes.MULTIPLE_SITES_CHOICE,
+        cancelLink: routes.TASK_LIST,
         payload: { siteName: 'invalid' },
         projectName: 'Test Project',
-        siteNumber: 1
+        siteNumber: 1,
+        action: undefined
       })
+    })
+
+    test('should preserve action parameter in validation failure', () => {
+      const request = createMockRequest({
+        payload: { siteName: '' },
+        query: { action: 'add' }
+      })
+      const h = { view: vi.fn().mockReturnValue({ takeover: vi.fn() }) }
+
+      const err = {
+        details: [
+          {
+            message: 'SITE_NAME_REQUIRED',
+            field: ['siteName']
+          }
+        ]
+      }
+
+      sitePreHandlerHook.method(request, h)
+
+      siteNameSubmitController.options.validate.failAction(request, h, err)
+
+      expect(h.view).toHaveBeenCalledWith(
+        SITE_NAME_VIEW_ROUTE,
+        expect.objectContaining({
+          action: 'add',
+          backLink: `${routes.REVIEW_SITE_DETAILS}#site-details-1`,
+          cancelLink: `${routes.REVIEW_SITE_DETAILS}#site-details-1`
+        })
+      )
     })
   })
 })

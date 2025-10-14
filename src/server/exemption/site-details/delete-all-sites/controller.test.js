@@ -9,7 +9,10 @@ import {
 } from '#src/server/common/helpers/session-cache/utils.js'
 import { authenticatedPatchRequest } from '#src/server/common/helpers/authenticated-requests.js'
 import { routes } from '#src/server/common/constants/routes.js'
-import { mockExemption } from '#src/server/test-helpers/mocks.js'
+import {
+  createMockRequest,
+  mockExemption
+} from '#src/server/test-helpers/mocks.js'
 
 vi.mock('~/src/server/common/helpers/session-cache/utils.js')
 vi.mock('~/src/server/common/helpers/authenticated-requests.js')
@@ -19,12 +22,7 @@ const mockH = {
   redirect: vi.fn()
 }
 
-const mockRequest = {
-  logger: {
-    info: vi.fn(),
-    error: vi.fn()
-  }
-}
+const mockRequest = createMockRequest()
 
 describe('deleteAllSitesController', () => {
   beforeEach(() => {
@@ -46,7 +44,7 @@ describe('deleteAllSitesController', () => {
       )
     })
 
-    it('should redirect to review page when no sites exist', async () => {
+    it('should redirect to correct page when no sites exist', async () => {
       const exemptionWithNoSites = {
         ...mockExemption,
         siteDetails: []
@@ -56,7 +54,7 @@ describe('deleteAllSitesController', () => {
       await deleteAllSitesController.handler(mockRequest, mockH)
 
       expect(mockH.view).not.toHaveBeenCalled()
-      expect(mockH.redirect).toHaveBeenCalledWith(routes.REVIEW_SITE_DETAILS)
+      expect(mockH.redirect).toHaveBeenCalledWith(routes.TASK_LIST)
     })
 
     it('should redirect to review page when siteDetails is null', async () => {
@@ -70,7 +68,7 @@ describe('deleteAllSitesController', () => {
       await deleteAllSitesController.handler(mockRequest, mockH)
 
       expect(mockH.view).not.toHaveBeenCalled()
-      expect(mockH.redirect).toHaveBeenCalledWith(routes.REVIEW_SITE_DETAILS)
+      expect(mockH.redirect).toHaveBeenCalledWith(routes.TASK_LIST)
     })
   })
 
@@ -109,7 +107,7 @@ describe('deleteAllSitesController', () => {
 
       await deleteAllSitesSubmitController.handler(mockRequest, mockH)
 
-      expect(mockH.redirect).toHaveBeenCalledWith(routes.REVIEW_SITE_DETAILS)
+      expect(mockH.redirect).toHaveBeenCalledWith(routes.TASK_LIST)
       expect(authenticatedPatchRequest).not.toHaveBeenCalled()
     })
 
@@ -123,7 +121,7 @@ describe('deleteAllSitesController', () => {
 
       await deleteAllSitesSubmitController.handler(mockRequest, mockH)
 
-      expect(mockH.redirect).toHaveBeenCalledWith(routes.REVIEW_SITE_DETAILS)
+      expect(mockH.redirect).toHaveBeenCalledWith(routes.TASK_LIST)
       expect(authenticatedPatchRequest).not.toHaveBeenCalled()
     })
 

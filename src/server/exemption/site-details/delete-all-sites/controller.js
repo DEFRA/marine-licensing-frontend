@@ -16,7 +16,7 @@ export const deleteAllSitesController = {
     const { siteDetails } = exemption
 
     if (!siteDetails || siteDetails.length === 0) {
-      return h.redirect(routes.REVIEW_SITE_DETAILS)
+      return h.redirect(routes.TASK_LIST)
     }
 
     return h.view(DELETE_ALL_SITES_VIEW_ROUTE, {
@@ -35,7 +35,7 @@ export const deleteAllSitesSubmitController = {
 
     try {
       if (!siteDetails || siteDetails.length === 0) {
-        return h.redirect(routes.REVIEW_SITE_DETAILS)
+        return h.redirect(routes.TASK_LIST)
       }
 
       await authenticatedPatchRequest(request, '/exemption/site-details', {

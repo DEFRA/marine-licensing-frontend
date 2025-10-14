@@ -160,6 +160,41 @@ describe('#openIdProvider', () => {
     expect(credentials.profile.hasMultipleOrganisations).toEqual(false)
   })
 
+  test('When relationships array is undefined (eg Entra ID token)', async () => {
+    const token = jwt.token.generate(
+      {
+        sub: 'testSub',
+        correlationId: 'testCorrelationId',
+        sessionId: 'testSessionId',
+        contactId: 'testContactId',
+        serviceId: 'testServiceId',
+        firstName: 'Test',
+        lastName: 'User',
+        email: 'testEmail',
+        uniqueReference: 'testUniqueRef',
+        loa: 'testLoa',
+        aal: 'testAal',
+        aud: 'test',
+        iss: 'test',
+        user: 'Test User'
+      },
+      {
+        key: 'test',
+        algorithm: 'HS256'
+      },
+      {
+        ttlSec: 1
+      }
+    )
+
+    const credentials = { token }
+
+    await provider.profile(credentials, { id_token: 'test-id-token' }, {})
+
+    expect(credentials.profile.applicantOrganisationId).toBeNull()
+    expect(credentials.profile.applicantOrganisationName).toBeNull()
+  })
+
   test('When credential do not exist', () => {
     expect(() => provider.profile({ credentials: null }, {}, {})).toThrow(
       'defraId Auth Access Token not present. Unable to retrieve profile.'

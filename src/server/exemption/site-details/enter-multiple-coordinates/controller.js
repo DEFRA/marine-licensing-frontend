@@ -105,7 +105,7 @@ export const multipleCoordinatesSubmitController = {
     if (payload.remove) {
       coordinates = removeCoordinateAtIndex(
         coordinates,
-        parseInt(payload.remove)
+        Number.parseInt(payload.remove)
       )
     }
 

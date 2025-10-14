@@ -57,19 +57,19 @@ export const setupTestServer = () => {
   return () => server
 }
 
-export const mockExemption = (mockExemption) => {
+export const mockExemption = (e) => {
   vi.mocked(getExemptionCache).mockImplementation(() => {
-    if (mockExemption?.constructor === Error) {
-      throw mockExemption
+    if (e?.constructor === Error) {
+      throw e
     }
-    return mockExemption
+    return e
   })
   vi.mocked(setExemptionCache).mockImplementation(() => undefined)
   vi.mocked(authenticatedPatchRequest).mockResolvedValue({
-    payload: { id: mockExemption?.id, siteDetails: mockExemption?.siteDetails }
+    payload: { id: e?.id, siteDetails: e?.siteDetails }
   })
   vi.mocked(authenticatedGetRequest).mockResolvedValue({
-    payload: { message: 'success', value: mockExemption }
+    payload: { message: 'success', value: e }
   })
   vi.mocked(updateExemptionMultipleSiteDetails).mockReturnValue({})
   vi.mocked(resetExemptionSiteDetails).mockReturnValue(undefined)

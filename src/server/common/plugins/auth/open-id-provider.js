@@ -26,7 +26,7 @@ export const openIdProvider = async (name) => {
       const payload = Jwt.token.decode(credentials.token).decoded.payload
 
       const displayName = [payload.firstName, payload.lastName]
-        .filter((part) => part)
+        .filter(Boolean)
         .join(' ')
 
       const {

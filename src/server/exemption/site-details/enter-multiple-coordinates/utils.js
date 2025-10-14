@@ -110,17 +110,17 @@ export const normaliseCoordinatesForDisplay = (
 
 export const extractCoordinateIndexFromFieldName = (fieldName) => {
   const indexMatch = fieldName.match(/coordinates(\d+)/)
-  return indexMatch ? parseInt(indexMatch[1], 10) : 0
+  return indexMatch ? Number.parseInt(indexMatch[1], 10) : 0
 }
 
 export const sanitiseFieldName = (fieldPath) =>
-  fieldPath.join('').replace(PATTERNS.FIELD_BRACKETS, '')
+  fieldPath.join('').replaceAll(PATTERNS.FIELD_BRACKETS, '')
 
 export const sanitiseFieldId = (fieldName) =>
   fieldName
     .join('')
-    .replace(PATTERNS.FIELD_BRACKETS, '')
-    .replace(/(\d+)/g, '-$1-')
+    .replaceAll(PATTERNS.FIELD_BRACKETS, '')
+    .replaceAll(/(\d+)/g, '-$1-')
 
 export const convertPayloadToCoordinatesArray = (payload, coordinateSystem) => {
   const coordinates = []
@@ -197,10 +197,10 @@ export const createErrorSummary = (validationError) => {
 export const createFieldErrors = (validationError) => {
   const errors = {}
 
-  validationError.details.forEach((detail) => {
+  for (const detail of validationError.details) {
     const { fieldName, enhancedMessage } = processErrorDetail(detail)
     errors[fieldName] = { text: enhancedMessage }
-  })
+  }
 
   return errors
 }

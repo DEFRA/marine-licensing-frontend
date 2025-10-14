@@ -11,9 +11,9 @@ export function sanitiseFilename(value, maxLength = 64) {
   // Remove control characters and potentially dangerous characters
   // Keep alphanumeric, spaces, dots, hyphens, underscores, and basic punctuation
   const sanitised = value
-    .replace(/[^ -~]/g, '') // e.g. allow space through to tilde
-    .replace(/[<>:"/\\|?*]/g, '') // Remove characters dangerous in filenames/HTML
-    .replace(/\s+/g, ' ') // Normalise whitespace
+    .replaceAll(/[^ -~]/g, '') // e.g. allow space through to tilde
+    .replaceAll(/[<>:"/\\|?*]/g, '') // Remove characters dangerous in filenames/HTML
+    .replaceAll(/\s+/g, ' ') // Normalise whitespace
     .trim()
 
   // Handle truncation

@@ -1,10 +1,19 @@
 import { routes } from '#src/server/common/constants/routes.js'
 const setStatus = (task) => {
-  if (!task) {
+  if (!task || task === 'INCOMPLETE') {
     return {
       tag: {
         text: 'Incomplete',
         classes: 'govuk-tag--blue'
+      }
+    }
+  }
+
+  if (task === 'IN_PROGRESS') {
+    return {
+      tag: {
+        text: 'In Progress',
+        classes: 'govuk-tag--light-blue'
       }
     }
   }
@@ -45,9 +54,10 @@ export const transformTaskList = (taskList) => {
         text: 'Site details',
         classes
       },
-      href: taskList.siteDetails
-        ? routes.REVIEW_SITE_DETAILS
-        : routes.SITE_DETAILS,
+      href:
+        !taskList.siteDetails || taskList.siteDetails === 'INCOMPLETE'
+          ? routes.SITE_DETAILS
+          : routes.REVIEW_SITE_DETAILS,
       status: setStatus(taskList.siteDetails)
     },
     {

@@ -1,6 +1,6 @@
 import { createRequire } from 'node:module'
 import { fileURLToPath } from 'node:url'
-import path from 'path'
+import path from 'node:path'
 import CopyPlugin from 'copy-webpack-plugin'
 import { CleanWebpackPlugin } from 'clean-webpack-plugin'
 import TerserPlugin from 'terser-webpack-plugin'

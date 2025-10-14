@@ -2,7 +2,7 @@ import { createDateFieldNames } from './date-utils.js'
 
 export function createErrorTypeMap(errorDetails) {
   const errorTypeMap = {}
-  errorDetails.forEach((detail) => {
+  for (const detail of errorDetails) {
     errorTypeMap[detail.type] = detail
     if (detail.path && detail.path.length > 0) {
       errorTypeMap[detail.path[0]] = detail
@@ -10,7 +10,7 @@ export function createErrorTypeMap(errorDetails) {
     if (detail.message !== detail.type) {
       errorTypeMap[detail.message] = detail
     }
-  })
+  }
   return errorTypeMap
 }
 
@@ -88,7 +88,7 @@ export function generateDateErrorMessages({
     return errorMap
   }, {})
 
-  dateConfigs.forEach((config) => {
+  for (const config of dateConfigs) {
     const isDateMissing = isCompleteDateMissing(
       errors,
       config.prefix,
@@ -104,7 +104,7 @@ export function generateDateErrorMessages({
     })
 
     dateErrorMessages[config.errorMessageKey] = errorMessage
-  })
+  }
 
   return dateErrorMessages
 }

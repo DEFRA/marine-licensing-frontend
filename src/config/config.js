@@ -15,7 +15,7 @@ const isProduction = process.env.NODE_ENV === 'production'
 const isTest = process.env.NODE_ENV === 'test'
 const isDevelopment = process.env.NODE_ENV === 'development'
 
-// Custom convict format that requires an env var ovverride for vars that have non-prod default values set.
+// Custom convict format that requires an env var override for vars that have non-prod default values set.
 const requiredInProd = 'required-in-prod'
 
 if (isDevelopment) {
@@ -31,9 +31,6 @@ convict.addFormat({
     }
 
     const invalidValues = schema.default ? [schema.default] : [] // never allow the default
-    if (schema.invalidProduction !== undefined) {
-      invalidValues.push(...schema.invalidProduction)
-    }
 
     if (invalidValues.includes(val)) {
       throw new Error(
@@ -266,8 +263,7 @@ export const config = convict({
       format: requiredInProd,
       nullable: true,
       default: 'http://localhost:3001',
-      env: 'MARINE_LICENSING_BACKEND_API_URL',
-      invalidProduction: [null, '']
+      env: 'MARINE_LICENSING_BACKEND_API_URL'
     }
   },
   defraId: {

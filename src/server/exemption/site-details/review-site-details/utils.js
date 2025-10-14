@@ -5,6 +5,7 @@ import { routes } from '#src/server/common/constants/routes.js'
 import { createSiteDetailsDataJson } from '#src/server/common/helpers/site-details.js'
 import { formatDate } from '#src/server/common/helpers/dates/date-utils.js'
 import { getSiteDetailsBySite } from '#src/server/common/helpers/session-cache/site-details-utils.js'
+import { getExemptionCache } from '#src/server/common/helpers/session-cache/utils.js'
 const isWGS84 = (coordinateSystem) =>
   coordinateSystem === COORDINATE_SYSTEMS.WGS84
 
@@ -380,6 +381,25 @@ export const getSiteDetails = async (
 }
 export const prepareFileUploadDataForSave = (siteDetails, request) => {
   const dataToSave = []
+
+  const exemption = getExemptionCache(request)
+  if (exemption.multipleSiteDetails?.sameActivityDescription === 'yes') {
+    const firstSiteDescription = siteDetails[0]?.activityDescription
+    if (firstSiteDescription) {
+      for (const site of siteDetails.slice(1)) {
+        site.activityDescription = firstSiteDescription
+      }
+    }
+  }
+
+  if (exemption.multipleSiteDetails?.sameActivityDates === 'yes') {
+    const firstSiteDates = siteDetails[0]?.activityDates
+    if (firstSiteDates) {
+      for (const site of siteDetails.slice(1)) {
+        site.activityDates = firstSiteDates
+      }
+    }
+  }
 
   for (const site of siteDetails) {
     const uploadedFile = site.uploadedFile

@@ -1,4 +1,4 @@
-import { vi } from 'vitest'
+import { beforeEach, vi } from 'vitest'
 import Boom from '@hapi/boom'
 import { COORDINATE_SYSTEMS } from '#src/server/common/constants/exemptions.js'
 import { routes } from '#src/server/common/constants/routes.js'
@@ -26,6 +26,9 @@ import {
 } from '#src/server/test-helpers/mocks.js'
 
 import { getCoordinateSystem } from '#src/server/common/helpers/coordinate-utils.js'
+import { getExemptionCache } from '#src/server/common/helpers/session-cache/utils.js'
+
+vi.mock('~/src/server/common/helpers/session-cache/utils.js')
 
 // Mock the getCoordinateSystem helper
 vi.mock('#src/server/common/helpers/coordinate-utils.js', () => ({
@@ -35,6 +38,13 @@ vi.mock('#src/server/common/helpers/coordinate-utils.js', () => ({
 
 describe('siteDetails utils', () => {
   const mockRequest = createMockRequest()
+  let mockGetExemptionCache
+
+  beforeEach(() => {
+    mockGetExemptionCache = vi
+      .mocked(getExemptionCache)
+      .mockReturnValue(mockExemption)
+  })
 
   describe('getSiteDetailsBackLink util', () => {
     test('getSiteDetailsBackLink correctly returns task list when coming from the task list', () => {
@@ -943,10 +953,12 @@ describe('siteDetails utils', () => {
   })
 
   describe('prepareFileUploadDataForSave util', () => {
-    test('prepareFileUploadDataForSave correctly formats data for API submission', () => {
+    test('prepareFileUploadDataForSave correctly formats data for API submission and copies activity data when same flags are yes', () => {
       const siteDetails = [
         {
           fileUploadType: 'kml',
+          activityDescription: 'First site description',
+          activityDates: { start: '2025-01-01', end: '2025-01-02' },
           geoJSON: {
             type: 'FeatureCollection',
             features: [
@@ -968,14 +980,49 @@ describe('siteDetails utils', () => {
             s3Key: 'test-key',
             checksumSha256: 'test-checksum'
           }
+        },
+        {
+          fileUploadType: 'kml',
+          activityDescription: 'Different description',
+          activityDates: { start: '2025-01-03', end: '2025-01-04' },
+          geoJSON: {
+            type: 'FeatureCollection',
+            features: [
+              {
+                type: 'Feature',
+                geometry: {
+                  type: 'Point',
+                  coordinates: [51.5075, -0.1279]
+                }
+              }
+            ]
+          },
+          featureCount: 1,
+          uploadedFile: {
+            filename: 'test-site.kml'
+          },
+          s3Location: {
+            s3Bucket: 'test-bucket',
+            s3Key: 'test-key-2',
+            checksumSha256: 'test-checksum-2'
+          }
         }
       ]
 
-      const result = prepareFileUploadDataForSave(siteDetails, mockRequest)[0]
+      mockGetExemptionCache.mockReturnValueOnce({
+        multipleSiteDetails: {
+          sameActivityDescription: 'yes',
+          sameActivityDates: 'yes'
+        }
+      })
 
-      expect(result).toEqual({
+      const result = prepareFileUploadDataForSave(siteDetails, mockRequest)
+
+      expect(result[0]).toEqual({
         coordinatesType: 'file',
         fileUploadType: 'kml',
+        activityDescription: 'First site description',
+        activityDates: { start: '2025-01-01', end: '2025-01-02' },
         geoJSON: siteDetails[0].geoJSON,
         featureCount: 1,
         uploadedFile: {
@@ -985,6 +1032,23 @@ describe('siteDetails utils', () => {
           s3Bucket: 'test-bucket',
           s3Key: 'test-key',
           checksumSha256: 'test-checksum'
+        }
+      })
+
+      expect(result[1]).toEqual({
+        coordinatesType: 'file',
+        fileUploadType: 'kml',
+        activityDescription: 'First site description', // Copied from first site
+        activityDates: { start: '2025-01-01', end: '2025-01-02' }, // Copied from first site
+        geoJSON: siteDetails[1].geoJSON,
+        featureCount: 1,
+        uploadedFile: {
+          filename: 'test-site.kml'
+        },
+        s3Location: {
+          s3Bucket: 'test-bucket',
+          s3Key: 'test-key-2',
+          checksumSha256: 'test-checksum-2'
         }
       })
 

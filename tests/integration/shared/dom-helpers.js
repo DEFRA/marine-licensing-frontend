@@ -29,52 +29,6 @@ export const validateSubmissionSection = (document, expected) => {
   expect(confirmButton.textContent.trim()).toBe(expected.submitButton)
 }
 
-/**
- * Finds an element by text content within a container
- * @param {Element} container - Container element to search within
- * @param {string} text - Text to search for
- * @param {object} [options] - Search options
- * @param {boolean} [options.exact] - Whether to match exact text
- * @returns {Element|null} Found element or null
- */
-export const findByText = (container, text, options = { exact: true }) => {
-  const elements = container.querySelectorAll('*')
-  return (
-    Array.from(elements).find((element) => {
-      const elementText = element.textContent.trim()
-      return options.exact ? elementText === text : elementText.includes(text)
-    }) ?? null
-  )
-}
-
-/**
- * Validates that an element contains expected text
- * @param {Element} element - Element to check
- * @param {string} expectedText - Expected text content
- * @param {boolean} [exact] - Whether to match exact text
- */
-export const validateElementText = (element, expectedText, exact = true) => {
-  expect(element).toBeTruthy()
-  const actualText = element.textContent.trim()
-  if (exact) {
-    expect(actualText).toBe(expectedText)
-  } else {
-    expect(actualText).toContain(expectedText)
-  }
-}
-
-/**
- * Validates that an element has expected attributes
- * @param {Element} element - Element to check
- * @param {object} expectedAttributes - Object with attribute name-value pairs
- */
-export const validateElementAttributes = (element, expectedAttributes) => {
-  expect(element).toBeTruthy()
-  Object.entries(expectedAttributes).forEach(([attr, value]) => {
-    expect(element).toHaveAttribute(attr, value)
-  })
-}
-
 export const getInputInFieldset = ({ document, fieldsetLabel, inputLabel }) => {
   const fieldset = getFieldsetByLabel({ document, fieldsetLabel })
   return within(fieldset).getByLabelText(inputLabel)

@@ -33,7 +33,7 @@ class FeatureFactory {
 
     const closedCoordinates = [...coordinatesArray]
     const firstCoord = coordinatesArray[0]
-    const lastCoord = coordinatesArray[coordinatesArray.length - 1]
+    const lastCoord = coordinatesArray.at(-1)
 
     if (firstCoord[0] !== lastCoord[0] || firstCoord[1] !== lastCoord[1]) {
       closedCoordinates.push(firstCoord)

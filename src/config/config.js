@@ -16,12 +16,21 @@ const isTest = process.env.NODE_ENV === 'test'
 const isDevelopment = process.env.NODE_ENV === 'development'
 
 // Custom convict format that requires an env var override for vars that have non-prod default values set.
+// Applied to sensitive configs like API URLs, credentials, and service endpoints.
 const requiredInProd = 'required-in-prod'
 
 if (isDevelopment) {
   configDotenv()
 }
 
+/**
+ * 'required-in-prod' format: When you absolutely must have an env var override the default value.
+ * This is used for sensitive vars that take local-config default values and the prod values MUST come from the
+ * environment.
+ *
+ * This is concerned with cdpEnvironments: prod (which is production), and perf-test (which is the equivalent of
+ * pre-production).
+ */
 convict.addFormat({
   name: requiredInProd,
   validate: function (val, schema) {
@@ -30,7 +39,7 @@ convict.addFormat({
       return
     }
 
-    const invalidValues = schema.default ? [schema.default] : [] // never allow the default
+    const invalidValues = schema.default !== undefined ? [schema.default] : [] // never allow the default
 
     if (invalidValues.includes(val)) {
       throw new Error(

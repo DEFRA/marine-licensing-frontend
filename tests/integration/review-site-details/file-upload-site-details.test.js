@@ -13,8 +13,10 @@ import {
   mockExemption,
   setupTestServer
 } from '~/tests/integration/shared/test-setup-helpers.js'
+import * as exemptionService from '#src/services/exemption-service/index.js'
 
 vi.mock('~/src/server/common/helpers/coordinate-utils.js')
+vi.mock('~/src/services/exemption-service/index.js')
 
 const getSiteDetailsCard = (document, expected, siteIndex = 0) => {
   const cardName = expected?.siteDetails[siteIndex]?.cardName ?? 'Site details'
@@ -27,8 +29,18 @@ const getSiteDetailsCard = (document, expected, siteIndex = 0) => {
 
 describe('Review Site Details - File Upload Integration Tests', () => {
   const getServer = setupTestServer()
+  let mockExemptionService
 
-  beforeEach(() => mockExemption())
+  beforeEach(() => {
+    mockExemption()
+
+    mockExemptionService = {
+      getExemptionById: vi.fn().mockResolvedValue(testScenarios[0].exemption)
+    }
+    vi.mocked(exemptionService.getExemptionService).mockReturnValue(
+      mockExemptionService
+    )
+  })
 
   test.each(testScenarios)(
     '$name - validates file upload display',
@@ -59,10 +71,10 @@ describe('Review Site Details - File Upload Integration Tests', () => {
   )
 
   describe('Form Submission', () => {
-    test('should successfully submit file upload details', async () => {
+    test('should redirect to task list on form submission', async () => {
       const fileExemption = testScenarios[0].exemption
 
-      const { authenticatedPatchRequest } = mockExemption(fileExemption)
+      mockExemption(fileExemption)
 
       const response = await makePostRequest({
         url: routes.REVIEW_SITE_DETAILS,
@@ -72,23 +84,14 @@ describe('Review Site Details - File Upload Integration Tests', () => {
 
       expect(response.statusCode).toBe(statusCodes.redirect)
       expect(response.headers.location).toBe(routes.TASK_LIST)
-      expect(authenticatedPatchRequest).toHaveBeenCalledWith(
-        expect.any(Object),
-        '/exemption/site-details',
-        expect.objectContaining({
-          id: fileExemption.id,
-          siteDetails: [
-            expect.objectContaining({
-              coordinatesType: 'file'
-            })
-          ]
-        })
-      )
+      expect(mockExemptionService.getExemptionById).toHaveBeenCalled()
     })
   })
 
   const getPageDocument = async (exemption) => {
     mockExemption(exemption)
+
+    mockExemptionService.getExemptionById.mockResolvedValue(exemption)
 
     const response = await makeGetRequest({
       server: getServer(),

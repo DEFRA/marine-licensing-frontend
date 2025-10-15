@@ -334,51 +334,7 @@ export const buildMultipleSitesSummaryData = (
 
   return multipleSiteData
 }
-export const getSiteDetails = async (
-  request,
-  exemption,
-  authenticatedGetRequest
-) => {
-  let siteDetails = exemption.siteDetails
 
-  // If we have an exemption ID but incomplete site details, load from DB
-  if (exemption.id && exemption.siteDetails === undefined) {
-    try {
-      const { payload } = await authenticatedGetRequest(
-        request,
-        `/exemption/${exemption.id}`
-      )
-      if (payload?.value?.siteDetails) {
-        siteDetails = payload.value.siteDetails
-        request.logger.info(
-          {
-            exemptionId: exemption.id,
-            coordinatesType: siteDetails[0].coordinatesType
-          },
-          'Loaded site details from MongoDB for display'
-        )
-      } else {
-        request.logger.warn(
-          {
-            exemptionId: exemption.id
-          },
-          'No site details found in MongoDB response'
-        )
-        // Continue with session data when no site details found
-      }
-    } catch (error) {
-      request.logger.error(
-        {
-          error: error.message,
-          exemptionId: exemption.id
-        },
-        'Failed to load exemption data from MongoDB'
-      )
-    }
-  }
-
-  return siteDetails
-}
 export const prepareFileUploadDataForSave = (siteDetails, request) => {
   const dataToSave = []
 

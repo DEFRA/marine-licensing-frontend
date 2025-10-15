@@ -58,6 +58,22 @@ describe('#signInOidcController', () => {
     expect(mockH.redirect).toHaveBeenCalledWith(customRedirectRoute)
   })
 
+  test('should use request.yar.flash to get an array of referrers and redirect to the first', async () => {
+    const customRedirectRoute = '/some/custom/route'
+
+    const mockRequest = {
+      auth: { isAuthenticated: false },
+      yar: { flash: vi.fn().mockReturnValue([customRedirectRoute]) }
+    }
+
+    const mockH = { redirect: vi.fn() }
+
+    await signInOidcController.handler(mockRequest, mockH)
+
+    expect(mockRequest.yar.flash).toHaveBeenCalledWith(redirectPathCacheKey)
+    expect(mockH.redirect).toHaveBeenCalledWith(customRedirectRoute)
+  })
+
   test('should fall back to PROJECT_NAME route when no referrer in flash', async () => {
     const mockRequest = {
       auth: { isAuthenticated: false },

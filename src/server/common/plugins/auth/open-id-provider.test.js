@@ -31,11 +31,11 @@ describe('#openIdProvider', () => {
         uniqueReference: 'testUniqueRef',
         loa: 'testLoa',
         aal: 'testAal',
-        enrolmentCount: 1,
+        enrolmentCount: 2,
         enrolmentRequestCount: 1,
         currentRelationshipId: 'testRelationshipId',
         relationships: ['testRelationshipId:testOrgId:Test Organisation Ltd'],
-        roles: 'testRoles',
+        roles: ['testRoles'],
         aud: 'test',
         iss: 'test',
         user: 'Test User'
@@ -68,13 +68,14 @@ describe('#openIdProvider', () => {
         uniqueReference: 'testUniqueRef',
         loa: 'testLoa',
         aal: 'testAal',
-        enrolmentCount: 1,
+        enrolmentCount: 2,
         enrolmentRequestCount: 1,
         currentRelationshipId: 'testRelationshipId',
         relationships: ['testRelationshipId:testOrgId:Test Organisation Ltd'],
         applicantOrganisationId: 'testOrgId',
         applicantOrganisationName: 'Test Organisation Ltd',
-        roles: 'testRoles',
+        hasMultipleOrganisations: true,
+        roles: ['testRoles'],
         idToken: 'test-id-token',
         tokenUrl: 'http://test-token-endpoint',
         logoutUrl: 'http://test-end-session-endpoint'
@@ -100,7 +101,7 @@ describe('#openIdProvider', () => {
         enrolmentRequestCount: 1,
         currentRelationshipId: 'testRelationshipId',
         relationships: [],
-        roles: 'testRoles',
+        roles: ['testRoles'],
         aud: 'test',
         iss: 'test',
         user: 'Test User'
@@ -118,8 +119,9 @@ describe('#openIdProvider', () => {
 
     await provider.profile(credentials, { id_token: 'test-id-token' }, {})
 
-    expect(credentials.profile.applicantOrganisationId).toBeUndefined()
-    expect(credentials.profile.applicantOrganisationName).toBeUndefined()
+    expect(credentials.profile.applicantOrganisationId).toBeNull()
+    expect(credentials.profile.applicantOrganisationName).toBeNull()
+    expect(credentials.profile.hasMultipleOrganisations).toEqual(false)
   })
 
   test('When relationships array is undefined (eg Entra ID token)', async () => {
@@ -153,8 +155,44 @@ describe('#openIdProvider', () => {
 
     await provider.profile(credentials, { id_token: 'test-id-token' }, {})
 
-    expect(credentials.profile.applicantOrganisationId).toBeUndefined()
-    expect(credentials.profile.applicantOrganisationName).toBeUndefined()
+    expect(credentials.profile.applicantOrganisationId).toBeNull()
+    expect(credentials.profile.applicantOrganisationName).toBeNull()
+    expect(credentials.profile.hasMultipleOrganisations).toEqual(false)
+  })
+
+  test('When relationships array is undefined (eg Entra ID token)', async () => {
+    const token = jwt.token.generate(
+      {
+        sub: 'testSub',
+        correlationId: 'testCorrelationId',
+        sessionId: 'testSessionId',
+        contactId: 'testContactId',
+        serviceId: 'testServiceId',
+        firstName: 'Test',
+        lastName: 'User',
+        email: 'testEmail',
+        uniqueReference: 'testUniqueRef',
+        loa: 'testLoa',
+        aal: 'testAal',
+        aud: 'test',
+        iss: 'test',
+        user: 'Test User'
+      },
+      {
+        key: 'test',
+        algorithm: 'HS256'
+      },
+      {
+        ttlSec: 1
+      }
+    )
+
+    const credentials = { token }
+
+    await provider.profile(credentials, { id_token: 'test-id-token' }, {})
+
+    expect(credentials.profile.applicantOrganisationId).toBeNull()
+    expect(credentials.profile.applicantOrganisationName).toBeNull()
   })
 
   test('When credential do not exist', () => {

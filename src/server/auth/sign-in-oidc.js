@@ -16,9 +16,9 @@ export const signInOidcController = {
       await setUserSession(request)
       request.logger.info('User has been successfully authenticated')
     }
-
-    const redirect =
-      request.yar.flash(redirectPathCacheKey) ?? routes.PROJECT_NAME
+    const redirects = request.yar.flash(redirectPathCacheKey)
+    const redirectPath = Array.isArray(redirects) ? redirects[0] : redirects
+    const redirect = redirectPath ?? routes.PROJECT_NAME
 
     return h.redirect(redirect)
   }

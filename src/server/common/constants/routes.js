@@ -18,6 +18,7 @@ export const routes = {
   SIGNIN: '/signin',
   SIGNIN_ENTRA: '/signin-entra',
   SIGN_OUT: '/sign-out',
+  CHANGE_ORGANISATION: '/change-organisation',
   WIDTH_OF_SITE: '/exemption/width-of-site',
   CHOOSE_FILE_UPLOAD_TYPE: '/exemption/choose-file-type-to-upload',
   FILE_UPLOAD: '/exemption/upload-file',
@@ -51,3 +52,5 @@ export const isEntraIdRoute = (route) => {
 }
 
 export const redirectPathCacheKey = 'redirectPath'
+
+export const changeOrganisationQueryParam = 'change-organisation'

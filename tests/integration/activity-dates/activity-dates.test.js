@@ -10,6 +10,9 @@ import {
 import { loadPage } from '~/tests/integration/shared/app-server.js'
 import { makePostRequest } from '~/src/server/test-helpers/server-requests.js'
 import { getToday, getNextYear } from '~/tests/integration/shared/dates.js'
+import { saveSiteDetailsToBackend } from '#src/server/common/helpers/save-site-details.js'
+
+vi.mock('#src/server/common/helpers/save-site-details.js')
 
 describe('Activity dates - page structure & accessibility', () => {
   const getServer = setupTestServer()
@@ -209,6 +212,7 @@ describe('Activity dates - page structure & accessibility', () => {
       'activityDates',
       expect.any(Object)
     )
+    expect(saveSiteDetailsToBackend).toHaveBeenCalledWith(expect.any(Object))
   })
 
   test('should redirect to review site details after submit when action parameter is present for specific site', async () => {
@@ -243,5 +247,41 @@ describe('Activity dates - page structure & accessibility', () => {
       'activityDates',
       expect.any(Object)
     )
+    expect(saveSiteDetailsToBackend).toHaveBeenCalledWith(expect.any(Object))
+  })
+
+  test('should redirect to correct page after submit', async () => {
+    const { updateExemptionSiteDetails } = mockExemption({
+      ...exemptionNoActivityDates,
+      siteDetails: [{}, {}]
+    })
+    const today = getToday()
+    const nextYear = getNextYear()
+
+    const response = await makePostRequest({
+      url: routes.SITE_DETAILS_ACTIVITY_DATES,
+      server: getServer(),
+      formData: {
+        'activity-start-date-day': today.day,
+        'activity-start-date-month': today.month,
+        'activity-start-date-year': today.year,
+        'activity-end-date-day': today.day,
+        'activity-end-date-month': today.month,
+        'activity-end-date-year': nextYear
+      }
+    })
+
+    expect(response.statusCode).toBe(statusCodes.redirect)
+    expect(response.headers.location).toBe(
+      '/exemption/site-details-activity-description'
+    )
+
+    expect(updateExemptionSiteDetails).toHaveBeenCalledWith(
+      expect.any(Object),
+      0,
+      'activityDates',
+      expect.any(Object)
+    )
+    expect(saveSiteDetailsToBackend).not.toHaveBeenCalled()
   })
 })

@@ -14,8 +14,6 @@ import {
   getSiteDetailsBackLink,
   handleSubmissionError,
   hasIncompleteFields,
-  prepareFileUploadDataForSave,
-  prepareManualCoordinateDataForSave,
   renderFileUploadReview,
   renderManualCoordinateReview
 } from '#src/server/exemption/site-details/review-site-details/utils.js'
@@ -25,7 +23,6 @@ import {
 } from '#src/server/test-helpers/mocks.js'
 
 import { getCoordinateSystem } from '#src/server/common/helpers/coordinate-utils.js'
-import { getExemptionCache } from '#src/server/common/helpers/session-cache/utils.js'
 
 vi.mock('~/src/server/common/helpers/session-cache/utils.js')
 
@@ -37,13 +34,6 @@ vi.mock('#src/server/common/helpers/coordinate-utils.js', () => ({
 
 describe('siteDetails utils', () => {
   const mockRequest = createMockRequest()
-  let mockGetExemptionCache
-
-  beforeEach(() => {
-    mockGetExemptionCache = vi
-      .mocked(getExemptionCache)
-      .mockReturnValue(mockExemption)
-  })
 
   describe('getSiteDetailsBackLink util', () => {
     test('getSiteDetailsBackLink correctly returns task list when coming from the task list', () => {
@@ -807,167 +797,6 @@ describe('siteDetails utils', () => {
       const result = buildMultipleSitesSummaryData({})
 
       expect(result).toEqual({})
-    })
-  })
-
-  describe('prepareFileUploadDataForSave util', () => {
-    test('prepareFileUploadDataForSave correctly formats data for API submission and copies activity data when same flags are yes', () => {
-      const siteDetails = [
-        {
-          fileUploadType: 'kml',
-          activityDescription: 'First site description',
-          activityDates: { start: '2025-01-01', end: '2025-01-02' },
-          geoJSON: {
-            type: 'FeatureCollection',
-            features: [
-              {
-                type: 'Feature',
-                geometry: {
-                  type: 'Point',
-                  coordinates: [51.5074, -0.1278]
-                }
-              }
-            ]
-          },
-          featureCount: 1,
-          uploadedFile: {
-            filename: 'test-site.kml'
-          },
-          s3Location: {
-            s3Bucket: 'test-bucket',
-            s3Key: 'test-key',
-            checksumSha256: 'test-checksum'
-          }
-        },
-        {
-          fileUploadType: 'kml',
-          activityDescription: 'Different description',
-          activityDates: { start: '2025-01-03', end: '2025-01-04' },
-          geoJSON: {
-            type: 'FeatureCollection',
-            features: [
-              {
-                type: 'Feature',
-                geometry: {
-                  type: 'Point',
-                  coordinates: [51.5075, -0.1279]
-                }
-              }
-            ]
-          },
-          featureCount: 1,
-          uploadedFile: {
-            filename: 'test-site.kml'
-          },
-          s3Location: {
-            s3Bucket: 'test-bucket',
-            s3Key: 'test-key-2',
-            checksumSha256: 'test-checksum-2'
-          }
-        }
-      ]
-
-      mockGetExemptionCache.mockReturnValueOnce({
-        multipleSiteDetails: {
-          sameActivityDescription: 'yes',
-          sameActivityDates: 'yes'
-        }
-      })
-
-      const result = prepareFileUploadDataForSave(siteDetails, mockRequest)
-
-      expect(result[0]).toEqual({
-        coordinatesType: 'file',
-        fileUploadType: 'kml',
-        activityDescription: 'First site description',
-        activityDates: { start: '2025-01-01', end: '2025-01-02' },
-        geoJSON: siteDetails[0].geoJSON,
-        featureCount: 1,
-        uploadedFile: {
-          filename: 'test-site.kml'
-        },
-        s3Location: {
-          s3Bucket: 'test-bucket',
-          s3Key: 'test-key',
-          checksumSha256: 'test-checksum'
-        }
-      })
-
-      expect(result[1]).toEqual({
-        coordinatesType: 'file',
-        fileUploadType: 'kml',
-        activityDescription: 'First site description', // Copied from first site
-        activityDates: { start: '2025-01-01', end: '2025-01-02' }, // Copied from first site
-        geoJSON: siteDetails[1].geoJSON,
-        featureCount: 1,
-        uploadedFile: {
-          filename: 'test-site.kml'
-        },
-        s3Location: {
-          s3Bucket: 'test-bucket',
-          s3Key: 'test-key-2',
-          checksumSha256: 'test-checksum-2'
-        }
-      })
-
-      expect(mockRequest.logger.info).toHaveBeenCalledWith(
-        {
-          fileType: 'kml',
-          featureCount: 1,
-          filename: 'test-site.kml'
-        },
-        'Saving file upload site details'
-      )
-    })
-
-    test('prepareFileUploadDataForSave handles missing featureCount', () => {
-      const siteDetails = [
-        {
-          fileUploadType: 'shapefile',
-          geoJSON: { type: 'FeatureCollection', features: [] },
-          uploadedFile: {
-            filename: 'test.shp'
-          },
-          s3Location: {
-            s3Bucket: 'bucket',
-            s3Key: 'key',
-            checksumSha256: 'checksum'
-          }
-        }
-      ]
-
-      const result = prepareFileUploadDataForSave(siteDetails, mockRequest)[0]
-
-      expect(result.featureCount).toBe(0)
-    })
-  })
-
-  describe('prepareManualCoordinateDataForSave util', () => {
-    test('prepareManualCoordinateDataForSave returns site details and logs correctly', () => {
-      const exemption = {
-        siteDetails: [
-          {
-            coordinatesType: 'coordinates',
-            coordinatesEntry: 'single',
-            coordinates: {
-              latitude: '51.5074',
-              longitude: '-0.1278'
-            },
-            circleWidth: '100'
-          }
-        ]
-      }
-
-      const result = prepareManualCoordinateDataForSave(exemption, mockRequest)
-
-      expect(result).toEqual(exemption.siteDetails)
-      expect(mockRequest.logger.info).toHaveBeenCalledWith(
-        {
-          coordinatesType: 'coordinates',
-          coordinatesEntry: 'single'
-        },
-        'Saving manual coordinate site details'
-      )
     })
   })
 

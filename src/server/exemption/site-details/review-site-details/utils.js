@@ -5,7 +5,6 @@ import { routes } from '#src/server/common/constants/routes.js'
 import { createSiteDetailsDataJson } from '#src/server/common/helpers/site-details.js'
 import { formatDate } from '#src/server/common/helpers/dates/date-utils.js'
 import { getSiteDetailsBySite } from '#src/server/common/helpers/session-cache/site-details-utils.js'
-import { getExemptionCache } from '#src/server/common/helpers/session-cache/utils.js'
 const isWGS84 = (coordinateSystem) =>
   coordinateSystem === COORDINATE_SYSTEMS.WGS84
 
@@ -335,79 +334,6 @@ export const buildMultipleSitesSummaryData = (
   return multipleSiteData
 }
 
-export const prepareFileUploadDataForSave = (siteDetails, request) => {
-  const dataToSave = []
-
-  const exemption = getExemptionCache(request)
-  if (exemption.multipleSiteDetails?.sameActivityDescription === 'yes') {
-    const firstSiteDescription = siteDetails[0]?.activityDescription
-    if (firstSiteDescription) {
-      for (const site of siteDetails.slice(1)) {
-        site.activityDescription = firstSiteDescription
-      }
-    }
-  }
-
-  if (exemption.multipleSiteDetails?.sameActivityDates === 'yes') {
-    const firstSiteDates = siteDetails[0]?.activityDates
-    if (firstSiteDates) {
-      for (const site of siteDetails.slice(1)) {
-        site.activityDates = firstSiteDates
-      }
-    }
-  }
-
-  for (const site of siteDetails) {
-    const uploadedFile = site.uploadedFile
-    const geoJSON = site.geoJSON
-    const featureCount = site.featureCount || 0
-
-    const siteToSave = {
-      coordinatesType: 'file',
-      activityDates: site.activityDates,
-      activityDescription: site.activityDescription,
-      siteName: site.siteName,
-      fileUploadType: site.fileUploadType,
-      geoJSON,
-      featureCount,
-      uploadedFile: {
-        filename: uploadedFile.filename
-      },
-      s3Location: {
-        s3Bucket: site.s3Location.s3Bucket,
-        s3Key: site.s3Location.s3Key,
-        checksumSha256: site.s3Location.checksumSha256
-      }
-    }
-
-    request.logger.info(
-      {
-        fileType: site.fileUploadType,
-        featureCount,
-        filename: uploadedFile.filename
-      },
-      'Saving file upload site details'
-    )
-
-    dataToSave.push(siteToSave)
-  }
-
-  return dataToSave
-}
-export const prepareManualCoordinateDataForSave = (exemption, request) => {
-  for (const site of exemption.siteDetails) {
-    request.logger.info(
-      {
-        coordinatesType: site.coordinatesType,
-        coordinatesEntry: site.coordinatesEntry
-      },
-      'Saving manual coordinate site details'
-    )
-  }
-
-  // Manual coordinate entry flow - use existing data structure
-  return exemption.siteDetails
-}
 export const renderFileUploadReview = (h, options) => {
   const { exemption, previousPage, siteDetails, reviewSiteDetailsPageData } =
     options

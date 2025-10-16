@@ -26,12 +26,10 @@ export const reviewSiteDetailsController = {
     const previousPage = request.headers?.referer
     const exemption = getExemptionCache(request)
 
-    // If no exemption ID, redirect to task list
     if (!exemption.id) {
       return h.redirect(routes.TASK_LIST)
     }
 
-    // Use existing ExemptionService
     const exemptionService = getExemptionService(request)
     const completeExemption = await exemptionService.getExemptionById(
       exemption.id

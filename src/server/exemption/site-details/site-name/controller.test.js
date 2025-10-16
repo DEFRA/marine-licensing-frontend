@@ -11,8 +11,10 @@ import {
 } from '#src/server/test-helpers/mocks.js'
 import { routes } from '#src/server/common/constants/routes.js'
 import * as cacheUtils from '#src/server/common/helpers/session-cache/utils.js'
+import { saveSiteDetailsToBackend } from '#src/server/common/helpers/save-site-details.js'
 
 vi.mock('~/src/server/common/helpers/session-cache/utils.js')
+vi.mock('~/src/server/common/helpers/save-site-details.js')
 
 describe('#siteName', () => {
   let getExemptionCacheSpy
@@ -23,6 +25,8 @@ describe('#siteName', () => {
     getExemptionCacheSpy = vi
       .spyOn(cacheUtils, 'getExemptionCache')
       .mockReturnValue(mockExemptionData)
+
+    vi.mocked(saveSiteDetailsToBackend).mockResolvedValue()
   })
 
   describe('#siteNameController', () => {
@@ -107,10 +111,11 @@ describe('#siteName', () => {
         'siteName',
         'Test Site Name'
       )
+      expect(vi.mocked(saveSiteDetailsToBackend)).not.toHaveBeenCalled()
       expect(h.redirect).toHaveBeenCalledWith(routes.SAME_ACTIVITY_DATES)
     })
 
-    test('should redirect to review site details when action=add', () => {
+    test('should redirect to review site details when action is add', async () => {
       const updateExemptionSiteDetailsSpy = vi.spyOn(
         cacheUtils,
         'updateExemptionSiteDetails'
@@ -123,7 +128,7 @@ describe('#siteName', () => {
       const h = { redirect: vi.fn() }
 
       sitePreHandlerHook.method(request, h)
-      siteNameSubmitController.handler(request, h)
+      await siteNameSubmitController.handler(request, h)
 
       expect(updateExemptionSiteDetailsSpy).toHaveBeenCalledWith(
         request,
@@ -136,7 +141,7 @@ describe('#siteName', () => {
       )
     })
 
-    test('should redirect to review site details when action=change', () => {
+    test('should redirect to review site details when action=change', async () => {
       const updateExemptionSiteDetailsSpy = vi.spyOn(
         cacheUtils,
         'updateExemptionSiteDetails'
@@ -149,7 +154,7 @@ describe('#siteName', () => {
       const h = { redirect: vi.fn() }
 
       sitePreHandlerHook.method(request, h)
-      siteNameSubmitController.handler(request, h)
+      await siteNameSubmitController.handler(request, h)
 
       expect(updateExemptionSiteDetailsSpy).toHaveBeenCalledWith(
         request,
@@ -162,7 +167,20 @@ describe('#siteName', () => {
       )
     })
 
-    test('should redirect to review site details with site parameter when both present', () => {
+    test('should save site details to backend when action parameter is present', async () => {
+      const request = createMockRequest({
+        payload: { siteName: 'Updated Site' },
+        query: { action: 'change' }
+      })
+      const h = { redirect: vi.fn() }
+
+      sitePreHandlerHook.method(request, h)
+      await siteNameSubmitController.handler(request, h)
+
+      expect(vi.mocked(saveSiteDetailsToBackend)).toHaveBeenCalledWith(request)
+    })
+
+    test('should redirect to review site details with site parameter when both present', async () => {
       const updateExemptionSiteDetailsSpy = vi.spyOn(
         cacheUtils,
         'updateExemptionSiteDetails'
@@ -183,7 +201,7 @@ describe('#siteName', () => {
       const h = { redirect: vi.fn() }
 
       sitePreHandlerHook.method(request, h)
-      siteNameSubmitController.handler(request, h)
+      await siteNameSubmitController.handler(request, h)
 
       expect(updateExemptionSiteDetailsSpy).toHaveBeenCalledWith(
         request,

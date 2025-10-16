@@ -16,9 +16,12 @@ import {
 } from '#src/server/exemption/activity-description/controller.js'
 import * as cacheUtils from '#src/server/common/helpers/session-cache/utils.js'
 import * as authRequests from '#src/server/common/helpers/authenticated-requests.js'
+import * as saveSiteDetails from '#src/server/common/helpers/save-site-details.js'
 import { getByRole } from '@testing-library/dom'
 
 vi.mock('~/src/server/common/helpers/session-cache/utils.js')
+vi.mock('~/src/server/common/helpers/save-site-details.js')
+vi.mock('~/src/server/common/helpers/authenticated-requests.js')
 
 describe('#activityDescriptionController', () => {
   const getServer = setupTestServer()
@@ -31,6 +34,8 @@ describe('#activityDescriptionController', () => {
     vi.spyOn(authRequests, 'authenticatedPatchRequest').mockResolvedValue({
       payload: { id: mockExemption.id }
     })
+
+    vi.mocked(saveSiteDetails.saveSiteDetailsToBackend).mockResolvedValue()
 
     getExemptionCacheSpy = vi
       .spyOn(cacheUtils, 'getExemptionCache')
@@ -416,6 +421,66 @@ describe('#activityDescriptionController', () => {
       )
       expect(document.querySelector('.govuk-error-summary')).toBeTruthy()
       expect(statusCode).toBe(statusCodes.ok)
+    })
+
+    test('should save site details to backend when action parameter is present and in site details flow', async () => {
+      const payload = { activityDescription: 'Updated activity description' }
+
+      const request = {
+        payload,
+        query: { action: 'change' },
+        url: { pathname: routes.SITE_DETAILS_ACTIVITY_DESCRIPTION },
+        site: { siteIndex: 0, siteNumber: 1 }
+      }
+      const h = { redirect: vi.fn() }
+
+      await activityDescriptionSubmitController.handler(request, h)
+
+      expect(
+        vi.mocked(saveSiteDetails.saveSiteDetailsToBackend)
+      ).toHaveBeenCalledWith(request)
+    })
+
+    test('should save site details to backend when going to review site details (file upload flow)', async () => {
+      const payload = { activityDescription: 'Activity description' }
+
+      const request = {
+        payload,
+        url: { pathname: routes.SITE_DETAILS_ACTIVITY_DESCRIPTION },
+        site: {
+          siteIndex: 0,
+          siteNumber: 1,
+          siteDetails: { coordinatesType: 'file' }
+        }
+      }
+      const h = { redirect: vi.fn() }
+
+      await activityDescriptionSubmitController.handler(request, h)
+
+      expect(
+        vi.mocked(saveSiteDetails.saveSiteDetailsToBackend)
+      ).toHaveBeenCalledWith(request)
+    })
+
+    test('should not save site details to backend when action parameter is not present and not going to review', async () => {
+      const payload = { activityDescription: 'Activity description' }
+
+      const request = {
+        payload,
+        url: { pathname: routes.SITE_DETAILS_ACTIVITY_DESCRIPTION },
+        site: {
+          siteIndex: 0,
+          siteNumber: 1,
+          siteDetails: { coordinatesType: 'coordinates' }
+        }
+      }
+      const h = { redirect: vi.fn() }
+
+      await activityDescriptionSubmitController.handler(request, h)
+
+      expect(
+        vi.mocked(saveSiteDetails.saveSiteDetailsToBackend)
+      ).not.toHaveBeenCalled()
     })
   })
 })

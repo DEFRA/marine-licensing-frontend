@@ -374,6 +374,21 @@ describe('#reviewSiteDetails', () => {
         expect(statusCode).toBe(statusCodes.redirect)
       })
 
+      test('should redirect to task list if no id is present', async () => {
+        cacheUtils.getExemptionCache.mockReturnValue({})
+
+        const { headers, statusCode } = await makePostRequest({
+          url: routes.REVIEW_SITE_DETAILS,
+          server: getServer(),
+          headers: {
+            referer: `http://localhost/${routes.WIDTH_OF_SITE}`
+          }
+        })
+
+        expect(headers.location).toBe(routes.TASK_LIST)
+        expect(statusCode).toBe(statusCodes.redirect)
+      })
+
       test('should reset exemption and redirect to task list', async () => {
         const request = {
           logger: {

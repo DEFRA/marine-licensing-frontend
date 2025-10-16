@@ -206,19 +206,19 @@ describe('Review Site Details - Polygon Coordinates Integration Tests', () => {
 
     expect(
       within(document).getByRole('button', {
-        name: 'Save and add another site'
+        name: 'Add another site'
       })
     ).toHaveAttribute('type', 'submit')
 
     expect(
       getByText(
         document,
-        `You can select 'Save and continue' if you're finished or you want to save your progress and return later.`
+        `The site details you've provided are saved. You can return to this page and make changes at any time before you send your information.`
       )
     ).toBeInTheDocument()
 
     expect(
-      within(document).getByRole('button', { name: 'Save and continue' })
+      within(document).getByRole('button', { name: 'Continue' })
     ).toHaveAttribute('type', 'submit')
 
     const backLink = document.querySelector('.govuk-back-link')
@@ -376,11 +376,8 @@ describe('Review Site Details - Polygon Coordinates Integration Tests', () => {
 
   const validateNavigationElements = (document) => {
     expect(
-      within(document).getByRole('button', { name: 'Save and continue' })
+      within(document).getByRole('button', { name: 'Continue' })
     ).toHaveAttribute('type', 'submit')
-    expect(
-      within(document).getByRole('link', { name: 'Cancel' })
-    ).toHaveAttribute('href', '/exemption/task-list?cancel=site-details')
   }
 
   const getRowByKey = (card, keyText) => {

@@ -206,7 +206,7 @@ describe('Review Site Details - File Upload Integration Tests', () => {
     expect(siteDetailsCards).toHaveLength(expected.siteDetails.length)
 
     expect(
-      within(document).getByRole('button', { name: 'Save and continue' })
+      within(document).getByRole('button', { name: 'Continue' })
     ).toHaveAttribute('type', 'submit')
 
     const backLink = document.querySelector('.govuk-back-link')
@@ -356,11 +356,8 @@ describe('Review Site Details - File Upload Integration Tests', () => {
 
   const validateNavigationElements = (document) => {
     expect(
-      within(document).getByRole('button', { name: 'Save and continue' })
+      within(document).getByRole('button', { name: 'Continue' })
     ).toHaveAttribute('type', 'submit')
-    expect(
-      within(document).getByRole('link', { name: 'Cancel' })
-    ).toHaveAttribute('href', '/exemption/task-list?cancel=site-details')
   }
 
   const getRowByKey = (card, keyText) => {

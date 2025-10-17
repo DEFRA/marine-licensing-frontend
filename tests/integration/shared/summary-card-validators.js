@@ -118,19 +118,6 @@ export const validateProjectDetails = (document, expected) => {
 }
 
 /**
- * Validates activity dates summary card
- * @param {Document} document - JSDOM document
- * @param {object} expected - Expected page content
- */
-export const validateActivityDates = (document, expected) => {
-  validateSummaryCardContent(
-    document,
-    '#activity-dates-card',
-    expected.activityDates
-  )
-}
-
-/**
  * Validates activity details summary card
  * @param {Document} document - JSDOM document
  * @param {object} expected - Expected page content

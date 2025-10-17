@@ -35,22 +35,6 @@ export const transformTaskList = (taskList) => {
     },
     {
       title: {
-        text: 'Activity dates',
-        classes
-      },
-      href: routes.ACTIVITY_DATES,
-      status: setStatus(taskList.activityDates)
-    },
-    {
-      title: {
-        text: 'Activity description',
-        classes
-      },
-      href: routes.ACTIVITY_DESCRIPTION,
-      status: setStatus(taskList.activityDescription)
-    },
-    {
-      title: {
         text: 'Site details',
         classes
       },

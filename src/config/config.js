@@ -23,6 +23,12 @@ if (isDevelopment) {
   configDotenv()
 }
 
+export const isCdpProductionLikeEnvironment = (env) =>
+  ['prod', 'perf-test', 'test'].includes(env)
+
+export const isNotCdpProductionLikeEnvironment = (env) =>
+  !isCdpProductionLikeEnvironment(env)
+
 /**
  * 'required-from-env-in-cdp' format: When you must have an env var override the default value.
  * This is used for sensitive vars that take local-config default values and the prod values MUST come from the
@@ -36,11 +42,12 @@ convict.addFormat({
   validate: function (val, schema) {
     const env = process.env.ENVIRONMENT ?? 'local'
     // Validate that `requiredFromEnvInCdp` env vars are set from the environment on these CDP environments
-    if (env !== 'prod' && env !== 'perf-test' && env !== 'test') {
+    if (isNotCdpProductionLikeEnvironment(env)) {
       return
     }
 
-    const invalidValues = schema.default !== undefined ? [schema.default] : [] // never allow the default
+    const invalidValues = schema.default === undefined ? [] : [schema.default] // never allow the default
+    invalidValues.push('') // dont allow empty strings
 
     if (invalidValues.includes(val)) {
       throw new Error(
@@ -398,14 +405,7 @@ export const config = convict({
   },
   cdpEnvironment: {
     doc: 'The CDP environment the app is currently in, with the addition of "local"',
-    format: [
-      'local',
-      'dev',
-      'test',
-      'perf-test',
-      'ext-test',
-      'prod'
-    ],
+    format: ['local', 'dev', 'test', 'perf-test', 'ext-test', 'prod'],
     default: process.env.ENVIRONMENT ?? 'local'
   }
 })

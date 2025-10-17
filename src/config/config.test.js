@@ -1,5 +1,52 @@
 import { beforeEach, describe, expect, test, vi } from 'vitest'
 
+describe('isCdpProductionLikeEnvironment', () => {
+  test('should return true for prod environment', async () => {
+    const { isCdpProductionLikeEnvironment } = await import('./config.js')
+    expect(isCdpProductionLikeEnvironment('prod')).toBe(true)
+  })
+
+  test('should return true for perf-test environment', async () => {
+    const { isCdpProductionLikeEnvironment } = await import('./config.js')
+    expect(isCdpProductionLikeEnvironment('perf-test')).toBe(true)
+  })
+
+  test('should return true for test environment', async () => {
+    const { isCdpProductionLikeEnvironment } = await import('./config.js')
+    expect(isCdpProductionLikeEnvironment('test')).toBe(true)
+  })
+
+  test('should return false for local environment', async () => {
+    const { isCdpProductionLikeEnvironment } = await import('./config.js')
+    expect(isCdpProductionLikeEnvironment('local')).toBe(false)
+  })
+
+  test('should return false for dev environment', async () => {
+    const { isCdpProductionLikeEnvironment } = await import('./config.js')
+    expect(isCdpProductionLikeEnvironment('dev')).toBe(false)
+  })
+
+  test('should return false for ext-test environment', async () => {
+    const { isCdpProductionLikeEnvironment } = await import('./config.js')
+    expect(isCdpProductionLikeEnvironment('ext-test')).toBe(false)
+  })
+
+  test('should return false for undefined environment', async () => {
+    const { isCdpProductionLikeEnvironment } = await import('./config.js')
+    expect(isCdpProductionLikeEnvironment(undefined)).toBe(false)
+  })
+
+  test('should return false for null environment', async () => {
+    const { isCdpProductionLikeEnvironment } = await import('./config.js')
+    expect(isCdpProductionLikeEnvironment(null)).toBe(false)
+  })
+
+  test('should return false for unknown environment', async () => {
+    const { isCdpProductionLikeEnvironment } = await import('./config.js')
+    expect(isCdpProductionLikeEnvironment('unknown')).toBe(false)
+  })
+})
+
 describe('config validation', () => {
   let originalEnv
 
@@ -49,6 +96,16 @@ describe('config validation', () => {
       await expect(async () => {
         await import('./config.js')
       }).rejects.toThrow(/must be set for perf-test environment/)
+    })
+
+    test('should reject empty string values in prod environment', async () => {
+      process.env.ENVIRONMENT = 'prod'
+      process.env.NODE_ENV = 'production'
+      process.env.SESSION_COOKIE_PASSWORD = ''
+
+      await expect(async () => {
+        await import('./config.js')
+      }).rejects.toThrow(/must be set for prod environment/)
     })
 
     test('should accept overridden values in prod environment', async () => {

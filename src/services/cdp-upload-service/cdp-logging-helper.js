@@ -5,11 +5,11 @@ export class CdpLoggingHelper {
     this.logger = logger
   }
 
-  logDebug(message, data) {
+  logDebug(message) {
     this.logger.debug(`${this.logSystem}: ${message}`)
   }
 
-  logInfo(message, data) {
+  logInfo(message) {
     this.logger.info(`${this.logSystem}: ${message}`)
   }
 

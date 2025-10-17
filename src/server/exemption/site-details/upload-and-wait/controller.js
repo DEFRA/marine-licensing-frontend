@@ -356,10 +356,6 @@ async function processUploadStatus(status, context) {
 export const uploadAndWaitController = {
   async handler(request, h) {
     const exemption = getExemptionCache(request)
-    request.logger.debug(
-      `FileUpload: uploadAndWaitController: exemption: ${JSON.stringify(exemption, null, 2)}`
-    )
-
     const site = getSiteDetailsBySite(exemption)
 
     const { uploadConfig } = site

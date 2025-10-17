@@ -166,6 +166,14 @@ describe('exemption route', () => {
       }),
       expect.objectContaining({
         method: 'GET',
+        path: '/exemption/delete-all-sites'
+      }),
+      expect.objectContaining({
+        method: 'POST',
+        path: '/exemption/delete-all-sites'
+      }),
+      expect.objectContaining({
+        method: 'GET',
         path: '/exemption/activity-dates'
       }),
       expect.objectContaining({

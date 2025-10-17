@@ -14,6 +14,7 @@ import { uploadAndWaitRoutes } from '#src/server/exemption/site-details/upload-a
 import { chooseFileTypeRoutes } from '#src/server/exemption/site-details/choose-file-type/index.js'
 import { beforeYouStartRoutes } from '#src/server/exemption/site-details/before-you-start/index.js'
 import { deleteSiteRoutes } from '#src/server/exemption/site-details/delete-site/index.js'
+import { deleteAllSitesRoutes } from '#src/server/exemption/site-details/delete-all-sites/index.js'
 export const siteDetailsRoutes = [
   ...coordinatesTypeRoutes,
   ...coordinatesEntryRoutes,
@@ -30,5 +31,6 @@ export const siteDetailsRoutes = [
   ...fileUploadRoutes,
   ...uploadAndWaitRoutes,
   ...beforeYouStartRoutes,
-  ...deleteSiteRoutes
+  ...deleteSiteRoutes,
+  ...deleteAllSitesRoutes
 ]

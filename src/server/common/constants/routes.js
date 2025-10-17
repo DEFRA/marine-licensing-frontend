@@ -38,6 +38,7 @@ export const routes = {
   DASHBOARD: '/home',
   DELETE_EXEMPTION: '/exemption/delete',
   DELETE_SITE: '/exemption/delete-site',
+  DELETE_ALL_SITES: '/exemption/delete-all-sites',
   COOKIES: '/help/cookies',
   PRIVACY: '/help/privacy'
 }

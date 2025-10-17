@@ -71,9 +71,18 @@
 
             {{ govukSummaryList({
                 card: {
-                    title: {
-                        text: "Providing the site location"
-                    }
+                  title: {
+                    text: "Providing the site location"
+                  },
+                  actions: {
+                    items: [
+                      {
+                        href: "delete-all-sites",
+                        text: "Delete all site details",
+                        classes: "govuk-link--no-visited-state"
+                      }
+                    ]
+                  }
                 },
                 rows: multipleSiteRows
             }) }}

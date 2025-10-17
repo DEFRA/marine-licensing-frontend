@@ -119,6 +119,20 @@ describe('Review Site Details - File Upload Integration Tests', () => {
       'Providing the site location'
     )
 
+    const actionList = siteLocationCard.querySelector(
+      '.govuk-summary-card__actions'
+    )
+    expect(actionList).toBeTruthy()
+
+    const deleteLink = within(actionList).getByRole('link', {
+      name: /Delete all site details/i
+    })
+
+    expect(deleteLink).toHaveAttribute(
+      'href',
+      expect.stringContaining(`delete-all-sites`)
+    )
+
     const methodRow = getRowByKey(
       siteLocationCard,
       'Method of providing site location'

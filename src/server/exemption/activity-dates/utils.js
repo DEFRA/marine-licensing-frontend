@@ -1,13 +1,5 @@
 import { routes } from '#src/server/common/constants/routes.js'
-export const getNextRoute = (
-  exemption,
-  isInSiteDetailsFlow,
-  queryParams = ''
-) => {
-  if (!isInSiteDetailsFlow) {
-    return routes.TASK_LIST
-  }
-
+export const getNextRoute = (exemption, queryParams = '') => {
   const multipleSitesEnabled =
     exemption?.multipleSiteDetails?.multipleSitesEnabled
 

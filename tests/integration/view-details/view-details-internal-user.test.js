@@ -5,8 +5,6 @@ import {
   validateAllSummaryCardsExist,
   validateApplicationDetails,
   validateProjectDetails,
-  validateActivityDates,
-  validateActivityDetails,
   validateSiteDetails,
   validatePublicRegister
 } from '../shared/summary-card-validators.js'

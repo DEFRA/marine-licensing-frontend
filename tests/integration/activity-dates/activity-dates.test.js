@@ -18,7 +18,7 @@ describe('Activity dates - page structure & accessibility', () => {
 
   test('should render form with correct structure when no errors', async () => {
     const document = await loadPage({
-      requestUrl: routes.ACTIVITY_DATES,
+      requestUrl: routes.SITE_DETAILS_ACTIVITY_DATES,
       server: getServer()
     })
     const emptyDate = { day: '', month: '', year: '' }
@@ -37,7 +37,7 @@ describe('Activity dates - page structure & accessibility', () => {
       ...emptyDate
     })
     getByRole(document, 'button', {
-      name: 'Save and continue'
+      name: 'Continue'
     })
 
     expect(

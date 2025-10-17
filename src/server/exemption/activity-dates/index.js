@@ -7,18 +7,8 @@ import {
 export const activityDatesRoutes = [
   {
     method: 'GET',
-    path: routes.ACTIVITY_DATES,
-    ...activityDatesController
-  },
-  {
-    method: 'GET',
     path: routes.SITE_DETAILS_ACTIVITY_DATES,
     ...activityDatesController
-  },
-  {
-    method: 'POST',
-    path: routes.ACTIVITY_DATES,
-    ...activityDatesSubmitController
   },
   {
     method: 'POST',

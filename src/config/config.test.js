@@ -12,7 +12,7 @@ describe('config validation', () => {
     process.env = originalEnv
   })
 
-  describe('required-in-prod format', () => {
+  describe('required-from-env-in-cdp format', () => {
     test('should allow default values in local environment', async () => {
       process.env.ENVIRONMENT = 'local'
       process.env.NODE_ENV = 'test'

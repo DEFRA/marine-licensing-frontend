@@ -14,6 +14,7 @@ import {
 import { circleWidthValidationSchema } from '#src/server/common/schemas/circle-width.js'
 
 import { routes } from '#src/server/common/constants/routes.js'
+import { saveSiteDetailsToBackend } from '#src/server/common/helpers/save-site-details.js'
 
 export const WIDTH_OF_SITE_VIEW_ROUTE =
   'exemption/site-details/width-of-site/index'
@@ -92,7 +93,7 @@ export const widthOfSiteSubmitController = {
       }
     }
   },
-  handler(request, h) {
+  async handler(request, h) {
     const { payload } = request
 
     const { siteIndex, queryParams } = request.site
@@ -103,6 +104,8 @@ export const widthOfSiteSubmitController = {
       'circleWidth',
       payload.width.trim()
     )
+
+    await saveSiteDetailsToBackend(request)
 
     return h.redirect(routes.REVIEW_SITE_DETAILS + queryParams)
   }

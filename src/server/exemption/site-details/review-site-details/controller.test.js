@@ -1,9 +1,9 @@
 import { vi } from 'vitest'
 import { COORDINATE_SYSTEMS } from '#src/server/common/constants/exemptions.js'
 import { statusCodes } from '#src/server/common/constants/status-codes.js'
-import * as authRequests from '#src/server/common/helpers/authenticated-requests.js'
 import * as cacheUtils from '#src/server/common/helpers/session-cache/utils.js'
 import * as coordinateUtils from '#src/server/common/helpers/coordinate-utils.js'
+import * as exemptionService from '#src/services/exemption-service/index.js'
 import {
   FILE_UPLOAD_REVIEW_VIEW_ROUTE,
   REVIEW_SITE_DETAILS_VIEW_ROUTE,
@@ -13,7 +13,6 @@ import {
 import { setupTestServer } from '#tests/integration/shared/test-setup-helpers.js'
 import { mockExemption } from '#src/server/test-helpers/mocks.js'
 import { makePostRequest } from '#src/server/test-helpers/server-requests.js'
-import { JSDOM } from 'jsdom'
 import { routes } from '#src/server/common/constants/routes.js'
 import {
   getPolygonCoordinatesDisplayData,
@@ -25,6 +24,7 @@ import {
 
 vi.mock('~/src/server/common/helpers/session-cache/utils.js')
 vi.mock('~/src/server/common/helpers/coordinate-utils.js')
+vi.mock('~/src/services/exemption-service/index.js')
 function createMockHandler(type = 'view') {
   if (type === 'redirect') {
     return { redirect: vi.fn() }
@@ -154,30 +154,6 @@ describe('#reviewSiteDetails', () => {
     { eastings: '427000', northings: '566000' }
   ]
 
-  const mockPolygonExemptionWGS84 = {
-    ...mockExemption,
-    siteDetails: [
-      {
-        coordinatesType: 'coordinates',
-        coordinateSystem: COORDINATE_SYSTEMS.WGS84,
-        coordinatesEntry: 'multiple',
-        coordinates: mockPolygonCoordinatesWGS84
-      }
-    ]
-  }
-
-  const mockPolygonExemptionOSGB36 = {
-    ...mockExemption,
-    siteDetails: [
-      {
-        coordinatesType: 'coordinates',
-        coordinateSystem: COORDINATE_SYSTEMS.WGS84,
-        coordinatesEntry: 'multiple',
-        coordinates: mockPolygonCoordinatesOSGB36
-      }
-    ]
-  }
-
   const createMockRequest = () => ({
     payload: {},
     logger: {
@@ -189,18 +165,13 @@ describe('#reviewSiteDetails', () => {
   })
 
   beforeEach(() => {
-    vi.spyOn(authRequests, 'authenticatedPatchRequest').mockResolvedValue({
-      payload: {
-        id: mockExemption.id,
-        siteDetails: mockExemption.siteDetails
-      }
-    })
-
-    vi.spyOn(authRequests, 'authenticatedGetRequest').mockResolvedValue({
-      payload: {
-        value: mockExemption
-      }
-    })
+    // Mock ExemptionService
+    const mockExemptionServiceInstance = {
+      getExemptionById: vi.fn().mockResolvedValue(mockExemption)
+    }
+    vi.spyOn(exemptionService, 'getExemptionService').mockReturnValue(
+      mockExemptionServiceInstance
+    )
 
     getExemptionCacheSpy = vi
       .spyOn(cacheUtils, 'getExemptionCache')
@@ -215,36 +186,19 @@ describe('#reviewSiteDetails', () => {
 
   describe('Unit Tests', () => {
     describe('GET Handler', () => {
-      test('should render empty context when no data exists', async () => {
+      test('should redirect to task list when no exemption ID exists', async () => {
         getExemptionCacheSpy.mockReturnValueOnce({})
-        getCoordinateSystemSpy.mockReturnValueOnce({})
 
-        const h = createMockHandler()
+        const h = createMockHandler('redirect')
         const mockRequest = createMockRequest()
 
         await reviewSiteDetailsController.handler(mockRequest, h)
 
-        expect(h.view).toHaveBeenCalledWith(REVIEW_SITE_DETAILS_VIEW_ROUTE, {
-          heading: 'Review site details',
-          isMultiSiteJourney: false,
-          pageTitle: 'Review site details',
-          backLink: routes.TASK_LIST,
-          projectName: undefined,
-          summaryData: [],
-          multipleSiteDetailsData: {}
-        })
+        expect(h.redirect).toHaveBeenCalledWith(routes.TASK_LIST)
       })
 
-      test('should load data from MongoDB when session lacks siteDetails', async () => {
-        const exemptionWithoutSiteDetails = createMockExemption(
-          'empty',
-          COORDINATE_SYSTEMS.WGS84,
-          {
-            id: 'test-id',
-            projectName: 'Test Project'
-          }
-        )
-        const completeMongoData = createMockExemption(
+      test('should load data from ExemptionService', async () => {
+        const fileExemption = createMockExemption(
           'file',
           COORDINATE_SYSTEMS.WGS84,
           {
@@ -253,30 +207,26 @@ describe('#reviewSiteDetails', () => {
           }
         )
 
-        getExemptionCacheSpy.mockReturnValueOnce(exemptionWithoutSiteDetails)
-        vi.spyOn(authRequests, 'authenticatedGetRequest').mockResolvedValueOnce(
-          {
-            payload: {
-              value: completeMongoData
-            }
-          }
+        getExemptionCacheSpy.mockReturnValueOnce({ id: 'test-id' })
+
+        // Mock the ExemptionService to return file exemption data
+        const mockExemptionServiceInstance = {
+          getExemptionById: vi.fn().mockResolvedValue(fileExemption)
+        }
+        vi.spyOn(exemptionService, 'getExemptionService').mockReturnValue(
+          mockExemptionServiceInstance
         )
 
         const h = createMockHandler()
         const mockRequest = createMockRequest()
         await reviewSiteDetailsController.handler(mockRequest, h)
 
-        expect(authRequests.authenticatedGetRequest).toHaveBeenCalledWith(
-          mockRequest,
-          '/exemption/test-id'
+        expect(exemptionService.getExemptionService).toHaveBeenCalledWith(
+          mockRequest
         )
-        expect(mockRequest.logger.info).toHaveBeenCalledWith(
-          {
-            exemptionId: 'test-id',
-            coordinatesType: 'file'
-          },
-          'Loaded site details from MongoDB for display'
-        )
+        expect(
+          mockExemptionServiceInstance.getExemptionById
+        ).toHaveBeenCalledWith('test-id')
         expect(h.view).toHaveBeenCalledWith(
           FILE_UPLOAD_REVIEW_VIEW_ROUTE,
           expect.objectContaining({
@@ -302,8 +252,6 @@ describe('#reviewSiteDetails', () => {
             })
           })
         )
-
-        // no-op
       })
 
       test('should render WGS84 coordinates correctly', async () => {
@@ -353,8 +301,18 @@ describe('#reviewSiteDetails', () => {
         const h = createMockHandler()
         const mockRequest = createMockRequest()
 
-        getExemptionCacheSpy.mockReturnValueOnce(
-          createMockExemption('single', COORDINATE_SYSTEMS.OSGB36)
+        const osgb36Exemption = createMockExemption(
+          'single',
+          COORDINATE_SYSTEMS.OSGB36
+        )
+        getExemptionCacheSpy.mockReturnValueOnce({ id: 'test-id' })
+
+        // Mock the ExemptionService to return OSGB36 data
+        const mockExemptionServiceInstance = {
+          getExemptionById: vi.fn().mockResolvedValue(osgb36Exemption)
+        }
+        vi.spyOn(exemptionService, 'getExemptionService').mockReturnValue(
+          mockExemptionServiceInstance
         )
 
         getCoordinateSystemSpy.mockReturnValueOnce({
@@ -402,8 +360,8 @@ describe('#reviewSiteDetails', () => {
   })
 
   describe('Integration Tests', () => {
-    describe('POST Handler - Full Flow', () => {
-      test('should redirect to task list and patch backend', async () => {
+    describe('POST Handler - Read-Only Flow', () => {
+      test('should redirect to task list without saving to database', async () => {
         const { headers, statusCode } = await makePostRequest({
           url: routes.REVIEW_SITE_DETAILS,
           server: getServer(),
@@ -412,21 +370,26 @@ describe('#reviewSiteDetails', () => {
           }
         })
 
-        expect(authRequests.authenticatedPatchRequest).toHaveBeenCalledWith(
-          expect.any(Object),
-          '/exemption/site-details',
-          {
-            multipleSiteDetails: mockExemption.multipleSiteDetails,
-            siteDetails: mockExemption.siteDetails,
-            id: mockExemption.id
+        expect(headers.location).toBe(routes.TASK_LIST)
+        expect(statusCode).toBe(statusCodes.redirect)
+      })
+
+      test('should redirect to task list if no id is present', async () => {
+        cacheUtils.getExemptionCache.mockReturnValue({})
+
+        const { headers, statusCode } = await makePostRequest({
+          url: routes.REVIEW_SITE_DETAILS,
+          server: getServer(),
+          headers: {
+            referer: `http://localhost/${routes.WIDTH_OF_SITE}`
           }
-        )
+        })
 
         expect(headers.location).toBe(routes.TASK_LIST)
         expect(statusCode).toBe(statusCodes.redirect)
       })
 
-      test('should reset exemption after saving to MongoDB', async () => {
+      test('should reset exemption and redirect to task list', async () => {
         const request = {
           logger: {
             info: vi.fn(),
@@ -437,16 +400,6 @@ describe('#reviewSiteDetails', () => {
         const h = { redirect: vi.fn() }
 
         await reviewSiteDetailsSubmitController.handler(request, h)
-
-        expect(authRequests.authenticatedPatchRequest).toHaveBeenCalledWith(
-          expect.any(Object),
-          '/exemption/site-details',
-          {
-            multipleSiteDetails: mockExemption.multipleSiteDetails,
-            siteDetails: mockExemption.siteDetails,
-            id: mockExemption.id
-          }
-        )
 
         expect(resetExemptionSiteDetailsSpy).toHaveBeenCalledWith(request)
         expect(h.redirect).toHaveBeenCalledWith(routes.TASK_LIST)
@@ -505,66 +458,6 @@ describe('#reviewSiteDetails', () => {
         )
       })
 
-      test('should show error page for validation errors', async () => {
-        const apiPatchMock = vi.spyOn(authRequests, 'authenticatedPatchRequest')
-        apiPatchMock.mockRejectedValueOnce({
-          res: { statusCode: 400 },
-          data: {
-            payload: {
-              validation: {
-                source: 'payload',
-                keys: ['siteDetails'],
-                details: [
-                  {
-                    field: 'siteDetails',
-                    message: 'SITE_DETAILS_INVALID',
-                    type: 'any.invalid'
-                  }
-                ]
-              }
-            }
-          }
-        })
-
-        const { result, statusCode } = await makePostRequest({
-          url: routes.REVIEW_SITE_DETAILS,
-          server: getServer(),
-          headers: {
-            referer: `http://localhost/${routes.WIDTH_OF_SITE}`
-          }
-        })
-
-        const { document } = new JSDOM(result).window
-
-        expect(document.querySelector('h1').textContent.trim()).toContain(
-          'There is a problem with the service'
-        )
-
-        expect(statusCode).toBe(statusCodes.badRequest)
-      })
-
-      test('should pass error to global handler when no validation data', async () => {
-        const apiPatchMock = vi.spyOn(authRequests, 'authenticatedPatchRequest')
-        apiPatchMock.mockRejectedValueOnce({
-          res: { statusCode: 500 },
-          data: {}
-        })
-
-        const { result } = await makePostRequest({
-          url: routes.REVIEW_SITE_DETAILS,
-          server: getServer(),
-          headers: {
-            referer: `http://localhost/${routes.WIDTH_OF_SITE}`
-          }
-        })
-
-        const { document } = new JSDOM(result).window
-
-        expect(document.querySelector('h1').textContent.trim()).toBe(
-          'There is a problem with the service'
-        )
-      })
-
       test('should add another site correctly', async () => {
         const { headers, statusCode } = await makePostRequest({
           url: routes.REVIEW_SITE_DETAILS,
@@ -587,137 +480,6 @@ describe('#reviewSiteDetails', () => {
 
         expect(statusCode).toBe(statusCodes.redirect)
         expect(headers.location).toBe(`${routes.SITE_NAME}?site=3`)
-      })
-
-      describe('Polygon Coordinate Submission', () => {
-        test('should save WGS84 polygon data correctly', async () => {
-          getExemptionCacheSpy.mockReturnValueOnce(mockPolygonExemptionWGS84)
-
-          const request = {
-            logger: {
-              info: vi.fn(),
-              error: vi.fn(),
-              debug: vi.fn()
-            }
-          }
-          const h = { redirect: vi.fn() }
-
-          await reviewSiteDetailsSubmitController.handler(request, h)
-
-          expect(authRequests.authenticatedPatchRequest).toHaveBeenCalledWith(
-            expect.any(Object),
-            '/exemption/site-details',
-            {
-              multipleSiteDetails:
-                mockPolygonExemptionWGS84.multipleSiteDetails,
-              siteDetails: mockPolygonExemptionWGS84.siteDetails,
-              id: mockPolygonExemptionWGS84.id
-            }
-          )
-
-          expect(resetExemptionSiteDetailsSpy).toHaveBeenCalledWith(request)
-          expect(h.redirect).toHaveBeenCalledWith(routes.TASK_LIST)
-        })
-
-        test('should save OSGB36 polygon data correctly', async () => {
-          getExemptionCacheSpy.mockReturnValueOnce(mockPolygonExemptionOSGB36)
-
-          const request = {
-            logger: {
-              info: vi.fn(),
-              error: vi.fn(),
-              debug: vi.fn()
-            }
-          }
-          const h = { redirect: vi.fn() }
-
-          await reviewSiteDetailsSubmitController.handler(request, h)
-
-          expect(authRequests.authenticatedPatchRequest).toHaveBeenCalledWith(
-            expect.any(Object),
-            '/exemption/site-details',
-            {
-              multipleSiteDetails:
-                mockPolygonExemptionOSGB36.multipleSiteDetails,
-              siteDetails: mockPolygonExemptionOSGB36.siteDetails,
-              id: mockPolygonExemptionOSGB36.id
-            }
-          )
-
-          expect(resetExemptionSiteDetailsSpy).toHaveBeenCalledWith(request)
-          expect(h.redirect).toHaveBeenCalledWith(routes.TASK_LIST)
-        })
-
-        test('should handle polygon site POST request', async () => {
-          getExemptionCacheSpy.mockReturnValueOnce(mockPolygonExemptionWGS84)
-
-          const { headers, statusCode } = await makePostRequest({
-            url: routes.REVIEW_SITE_DETAILS,
-            server: getServer(),
-            headers: {
-              referer: `http://localhost${routes.ENTER_MULTIPLE_COORDINATES}`
-            }
-          })
-
-          expect(authRequests.authenticatedPatchRequest).toHaveBeenCalledWith(
-            expect.any(Object),
-            '/exemption/site-details',
-            {
-              multipleSiteDetails:
-                mockPolygonExemptionWGS84.multipleSiteDetails,
-              siteDetails: mockPolygonExemptionWGS84.siteDetails,
-              id: mockPolygonExemptionWGS84.id
-            }
-          )
-
-          expect(headers.location).toBe(routes.TASK_LIST)
-          expect(statusCode).toBe(statusCodes.redirect)
-        })
-
-        test('should handle polygon coordinate validation errors', async () => {
-          getExemptionCacheSpy.mockReturnValueOnce(mockPolygonExemptionWGS84)
-
-          const apiPatchMock = vi.spyOn(
-            authRequests,
-            'authenticatedPatchRequest'
-          )
-          apiPatchMock.mockRejectedValueOnce({
-            res: { statusCode: 400 },
-            data: {
-              payload: {
-                validation: {
-                  source: 'payload',
-                  keys: ['siteDetails.coordinates'],
-                  details: [
-                    {
-                      field: 'siteDetails.coordinates',
-                      message: 'POLYGON_COORDINATES_INVALID',
-                      type: 'array.min'
-                    }
-                  ]
-                }
-              }
-            }
-          })
-
-          const { result, statusCode } = await makePostRequest({
-            url: routes.REVIEW_SITE_DETAILS,
-            server: getServer(),
-            headers: {
-              referer: `http://localhost${routes.ENTER_MULTIPLE_COORDINATES}`
-            }
-          })
-
-          expect(result).toEqual(
-            expect.stringContaining('There is a problem with the service') // generic error page reusing the custom 500 one
-          )
-
-          const { document } = new JSDOM(result).window
-          expect(document.querySelector('h1').textContent.trim()).toContain(
-            'There is a problem with the service'
-          )
-          expect(statusCode).toBe(statusCodes.badRequest)
-        })
       })
     })
   })

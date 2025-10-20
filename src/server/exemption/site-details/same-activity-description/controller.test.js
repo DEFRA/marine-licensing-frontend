@@ -10,8 +10,10 @@ import {
 } from '#src/server/common/helpers/session-cache/utils.js'
 import { routes } from '#src/server/common/constants/routes.js'
 import { mockSite } from '#src/server/test-helpers/mocks.js'
+import { saveSiteDetailsToBackend } from '#src/server/common/helpers/save-site-details.js'
 
 vi.mock('~/src/server/common/helpers/session-cache/utils.js')
+vi.mock('~/src/server/common/helpers/save-site-details.js')
 
 describe('sameActivityDescriptionController', () => {
   const mockRequest = {
@@ -146,6 +148,9 @@ describe('sameActivityDescriptionController', () => {
         'sameActivityDescription',
         'yes'
       )
+
+      expect(saveSiteDetailsToBackend).not.toHaveBeenCalled()
+
       expect(mockH.redirect).toHaveBeenCalledWith(
         routes.SITE_DETAILS_ACTIVITY_DESCRIPTION
       )

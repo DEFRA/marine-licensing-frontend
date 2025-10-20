@@ -7,6 +7,7 @@ import {
   DATE_EXTRACTION_CONFIG
 } from '#src/server/common/constants/activity-dates.js'
 import { routes } from '#src/server/common/constants/routes.js'
+import { saveSiteDetailsToBackend } from '#src/server/common/helpers/save-site-details.js'
 import { processDateValidationErrors } from '#src/server/common/helpers/dates/date-form-utils.js'
 import {
   createDateFieldsFromValue,
@@ -181,6 +182,10 @@ export const activityDatesSubmitController = {
       const nextRoute = action
         ? `${routes.REVIEW_SITE_DETAILS}#site-details-${siteNumber}`
         : getNextRoute(exemption, request.site?.queryParams)
+
+      if (action) {
+        await saveSiteDetailsToBackend(request)
+      }
 
       return h.redirect(nextRoute)
     } catch (e) {

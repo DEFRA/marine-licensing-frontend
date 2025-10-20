@@ -20,6 +20,7 @@ import {
   removeCoordinateAtIndex
 } from './utils.js'
 import { validateCoordinates } from '#src/server/exemption/site-details/enter-multiple-coordinates/validation/validation.js'
+import { saveSiteDetailsToBackend } from '#src/server/common/helpers/save-site-details.js'
 
 export const multipleCoordinatesController = {
   options: {
@@ -91,7 +92,7 @@ export const multipleCoordinatesSubmitController = {
   options: {
     pre: [setSiteDataPreHandler]
   },
-  handler(request, h) {
+  async handler(request, h) {
     const { payload } = request
     const exemption = getExemptionCache(request)
     const { siteIndex, queryParams } = request.site
@@ -158,6 +159,8 @@ export const multipleCoordinatesSubmitController = {
         exemption?.projectName
       )
     }
+
+    await saveSiteDetailsToBackend(request)
 
     return h.redirect(routes.REVIEW_SITE_DETAILS + queryParams)
   }

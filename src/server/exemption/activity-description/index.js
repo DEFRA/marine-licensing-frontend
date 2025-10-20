@@ -6,18 +6,8 @@ import {
 export const activityDescriptionRoutes = [
   {
     method: 'GET',
-    path: routes.ACTIVITY_DESCRIPTION,
-    ...activityDescriptionController
-  },
-  {
-    method: 'GET',
     path: routes.SITE_DETAILS_ACTIVITY_DESCRIPTION,
     ...activityDescriptionController
-  },
-  {
-    method: 'POST',
-    path: routes.ACTIVITY_DESCRIPTION,
-    ...activityDescriptionSubmitController
   },
   {
     method: 'POST',

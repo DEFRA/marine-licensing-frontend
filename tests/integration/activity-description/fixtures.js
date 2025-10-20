@@ -1,5 +1,6 @@
+import { mockExemption } from '#src/server/test-helpers/mocks.js'
+
 export const exemptionNoActivityDescription = {
-  id: 'test-exemption-123',
-  projectName: 'Test Marine Activity Project',
-  activityDescription: null
+  ...mockExemption,
+  siteDetails: [{ ...mockExemption.siteDetails[0], activityDescription: null }]
 }

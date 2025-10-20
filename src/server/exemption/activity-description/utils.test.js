@@ -2,18 +2,6 @@ import { getBackLink, getNextRoute } from './utils.js'
 import { routes } from '#src/server/common/constants/routes.js'
 
 describe('#getBackLink', () => {
-  describe('when not in site details flow', () => {
-    test('should return correct route route regardless of exemption data', () => {
-      const exemption = {
-        multipleSiteDetails: { multipleSitesEnabled: false }
-      }
-
-      const result = getBackLink(exemption, false)
-
-      expect(result).toBe(routes.TASK_LIST)
-    })
-  })
-
   describe('when in site details flow', () => {
     describe('single site journey', () => {
       test('should return correct route when multipleSitesEnabled is true', () => {
@@ -21,9 +9,19 @@ describe('#getBackLink', () => {
           multipleSiteDetails: { multipleSitesEnabled: true }
         }
 
-        const result = getBackLink(exemption, true)
+        const result = getBackLink(exemption)
 
         expect(result).toBe(routes.SAME_ACTIVITY_DESCRIPTION)
+      })
+
+      test('should return correct route route regardless of exemption data', () => {
+        const exemption = {
+          multipleSiteDetails: { multipleSitesEnabled: false }
+        }
+
+        const result = getBackLink(exemption)
+
+        expect(result).toBe(routes.SITE_DETAILS_ACTIVITY_DATES)
       })
     })
 
@@ -36,7 +34,7 @@ describe('#getBackLink', () => {
           }
         }
 
-        const result = getBackLink(exemption, true, 1, '?site=1')
+        const result = getBackLink(exemption, 1, '?site=1')
 
         expect(result).toBe(`${routes.SAME_ACTIVITY_DATES}?site=1`)
       })
@@ -49,7 +47,7 @@ describe('#getBackLink', () => {
           }
         }
 
-        const result = getBackLink(exemption, true, 1)
+        const result = getBackLink(exemption, 1)
 
         expect(result).toBe(routes.SAME_ACTIVITY_DESCRIPTION)
       })
@@ -61,7 +59,7 @@ describe('#getBackLink', () => {
           }
         }
 
-        const result = getBackLink(exemption, true, 0)
+        const result = getBackLink(exemption, 0)
 
         expect(result).toBe(routes.SAME_ACTIVITY_DESCRIPTION)
       })
@@ -71,13 +69,13 @@ describe('#getBackLink', () => {
           multipleSiteDetails: { multipleSitesEnabled: false }
         }
 
-        const result = getBackLink(exemption, true)
+        const result = getBackLink(exemption)
 
         expect(result).toBe(routes.SITE_DETAILS_ACTIVITY_DATES)
       })
 
       test('should return correct route when exemption is null', () => {
-        const result = getBackLink(null, true)
+        const result = getBackLink(null)
 
         expect(result).toBe(routes.SITE_DETAILS_ACTIVITY_DATES)
       })
@@ -86,13 +84,8 @@ describe('#getBackLink', () => {
 })
 
 describe('#getNextRoute', () => {
-  test('should return correct route when not in site details', () => {
-    const result = getNextRoute(false)
-    expect(result).toBe(routes.TASK_LIST, {})
-  })
-
   test('should return correct route for file journey', () => {
-    const result = getNextRoute(true, {
+    const result = getNextRoute({
       siteDetails: { coordinatesType: 'file' },
       queryParams: {}
     })
@@ -100,7 +93,7 @@ describe('#getNextRoute', () => {
   })
 
   test('should return correct route for manual journey', () => {
-    const result = getNextRoute(true, {
+    const result = getNextRoute({
       siteDetails: { coordinatesType: 'coordinates' },
       queryParams: '&site=1'
     })

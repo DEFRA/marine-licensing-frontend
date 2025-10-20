@@ -7,13 +7,13 @@ import {
 } from '@testing-library/dom'
 import { routes } from '~/src/server/common/constants/routes.js'
 import { statusCodes } from '~/src/server/common/constants/status-codes.js'
-import { exemptionNoActivityDescription } from '~/tests/integration/activity-description/fixtures.js'
 import {
   mockExemption,
   setupTestServer
 } from '~/tests/integration/shared/test-setup-helpers.js'
 import { loadPage } from '~/tests/integration/shared/app-server.js'
 import { makePostRequest } from '~/src/server/test-helpers/server-requests.js'
+import { exemptionNoActivityDescription } from '~/tests/integration/activity-description/fixtures.js'
 
 describe('Activity description - page structure & accessibility', () => {
   const getServer = setupTestServer()
@@ -22,7 +22,7 @@ describe('Activity description - page structure & accessibility', () => {
 
   test('should render form with correct structure when no errors', async () => {
     const document = await loadPage({
-      requestUrl: routes.ACTIVITY_DESCRIPTION,
+      requestUrl: routes.SITE_DETAILS_ACTIVITY_DESCRIPTION,
       server: getServer()
     })
 
@@ -31,7 +31,7 @@ describe('Activity description - page structure & accessibility', () => {
     )
 
     getByRole(document, 'button', {
-      name: 'Save and continue'
+      name: 'Continue'
     })
 
     const input = getByLabelText(document, `Activity description`, {
@@ -49,7 +49,7 @@ describe('Activity description - page structure & accessibility', () => {
       getByRole(document, 'link', {
         name: 'Back'
       })
-    ).toHaveAttribute('href', routes.TASK_LIST)
+    ).toHaveAttribute('href', routes.SITE_DETAILS_ACTIVITY_DATES)
 
     expect(
       queryByRole(document, 'link', {
@@ -67,7 +67,7 @@ describe('Activity description - page structure & accessibility', () => {
 
   test('should have correct page content for single site journey', async () => {
     const mockExemptionSingleSite = {
-      ...exemptionNoActivityDescription,
+      ...mockExemption,
       siteDetails: {},
       multipleSiteDetails: {
         multipleSitesEnabled: false
@@ -103,7 +103,7 @@ describe('Activity description - page structure & accessibility', () => {
 
   test('should have correct page content for multiple site journey with all sites the same', async () => {
     const mockExemptionMultipleSite = {
-      ...exemptionNoActivityDescription,
+      ...mockExemption,
       siteDetails: {},
       multipleSiteDetails: {
         multipleSitesEnabled: true,
@@ -140,7 +140,7 @@ describe('Activity description - page structure & accessibility', () => {
 
   test('should have correct page content for multiple site journey with variable answers', async () => {
     const mockExemptionMultipleSite = {
-      ...exemptionNoActivityDescription,
+      ...mockExemption,
       siteDetails: {},
       multipleSiteDetails: {
         multipleSitesEnabled: true,
@@ -187,9 +187,7 @@ describe('Activity description - page structure & accessibility', () => {
   })
 
   test('should redirect to correct page after submit when action parameter is present', async () => {
-    const { updateExemptionSiteDetails } = mockExemption(
-      exemptionNoActivityDescription
-    )
+    const { updateExemptionSiteDetails } = mockExemption(mockExemption)
 
     const response = await makePostRequest({
       url: `${routes.SITE_DETAILS_ACTIVITY_DESCRIPTION}?action=add`,
@@ -214,7 +212,7 @@ describe('Activity description - page structure & accessibility', () => {
 
   test('should redirect to correct page after submit when action parameter is present for specific site', async () => {
     const { updateExemptionSiteDetails } = mockExemption({
-      ...exemptionNoActivityDescription,
+      ...mockExemption,
       siteDetails: [{}, {}]
     })
 

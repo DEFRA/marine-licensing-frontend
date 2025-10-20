@@ -375,8 +375,7 @@ describe('#reviewSiteDetails', () => {
               activityDescription: 'Test activity description',
               method:
                 'Manually enter one set of coordinates and a width to create a circular site',
-              coordinateSystem:
-                'OSGB36 (National Grid)\nEastings and Northings',
+              coordinateSystem: 'British National Grid (OSGB36)\nEastings and Northings',
               coordinates: `${mockCoordinates[COORDINATE_SYSTEMS.OSGB36].eastings}, ${mockCoordinates[COORDINATE_SYSTEMS.OSGB36].northings}`,
               width: '100 metres',
               showActivityDates: true,
@@ -1005,7 +1004,9 @@ describe('#reviewSiteDetails', () => {
         test('should return OSGB36 text', () => {
           const result = getCoordinateSystemText(COORDINATE_SYSTEMS.OSGB36)
 
-          expect(result).toBe('OSGB36 (National Grid)\nEastings and Northings')
+          expect(result).toBe(
+            'British National Grid (OSGB36)\nEastings and Northings'
+          )
         })
 
         test('should handle null coordinate system', () => {

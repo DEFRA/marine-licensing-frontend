@@ -15,9 +15,47 @@ const isProduction = process.env.NODE_ENV === 'production'
 const isTest = process.env.NODE_ENV === 'test'
 const isDevelopment = process.env.NODE_ENV === 'development'
 
+// Custom convict format that requires an env var override for vars that have non-prod default values set.
+// Applied to sensitive configs like API URLs, credentials, and service endpoints.
+const requiredFromEnvInCdp = 'required-from-env-in-cdp'
+
 if (isDevelopment) {
   configDotenv()
 }
+
+export const isCdpProductionLikeEnvironment = (env) =>
+  ['prod', 'perf-test', 'test'].includes(env)
+
+export const isNotCdpProductionLikeEnvironment = (env) =>
+  !isCdpProductionLikeEnvironment(env)
+
+/**
+ * 'required-from-env-in-cdp' format: When you must have an env var override the default value.
+ * This is used for sensitive vars that take local-config default values and the prod values MUST come from the
+ * environment.
+ *
+ * This is concerned with cdpEnvironments: prod (which is production), and perf-test (which is the equivalent of
+ * pre-production), and test.
+ */
+convict.addFormat({
+  name: requiredFromEnvInCdp,
+  validate: function (val, schema) {
+    const env = process.env.ENVIRONMENT ?? 'local'
+    // Validate that `requiredFromEnvInCdp` env vars are set from the environment on these CDP environments
+    if (isNotCdpProductionLikeEnvironment(env)) {
+      return
+    }
+
+    const invalidValues = schema.default === undefined ? [] : [schema.default] // never allow the default
+    invalidValues.push('') // dont allow empty strings
+
+    if (invalidValues.includes(val)) {
+      throw new Error(
+        `${schema.env || 'Configuration value'} must be set for ${env} environment (current value is invalid for production)`
+      )
+    }
+  }
+})
 
 export const config = convict({
   serviceVersion: {
@@ -52,7 +90,7 @@ export const config = convict({
   },
   appBaseUrl: {
     doc: 'Base URL for the application (used for CDP upload redirects)',
-    format: String,
+    format: requiredFromEnvInCdp,
     default: localhost,
     env: 'APP_BASE_URL'
   },
@@ -158,7 +196,7 @@ export const config = convict({
       },
       password: {
         doc: 'session cookie password',
-        format: String,
+        format: requiredFromEnvInCdp,
         default: 'the-password-must-be-at-least-32-characters-long',
         env: 'SESSION_COOKIE_PASSWORD',
         sensitive: true
@@ -174,19 +212,19 @@ export const config = convict({
   redis: {
     host: {
       doc: 'Redis cache host',
-      format: String,
+      format: requiredFromEnvInCdp,
       default: '127.0.0.1',
       env: 'REDIS_HOST'
     },
     username: {
       doc: 'Redis cache username',
-      format: String,
+      format: requiredFromEnvInCdp,
       default: '',
       env: 'REDIS_USERNAME'
     },
     password: {
       doc: 'Redis cache password',
-      format: '*',
+      format: requiredFromEnvInCdp,
       default: '',
       sensitive: true,
       env: 'REDIS_PASSWORD'
@@ -239,7 +277,7 @@ export const config = convict({
   backend: {
     apiUrl: {
       doc: 'Endpoint for the backend API service',
-      format: String,
+      format: requiredFromEnvInCdp,
       nullable: true,
       default: 'http://localhost:3001',
       env: 'MARINE_LICENSING_BACKEND_API_URL'
@@ -248,33 +286,33 @@ export const config = convict({
   defraId: {
     accountManagementUrl: {
       doc: 'Defra ID account management portal URL',
-      format: String,
+      format: requiredFromEnvInCdp,
       env: 'DEFRA_ID_ACCOUNT_MANAGEMENT_URL',
       default: '#'
     },
     oidcConfigurationUrl: {
       doc: 'Defra ID OIDC Configuration URL',
-      format: String,
+      format: requiredFromEnvInCdp,
       default:
         'http://localhost:3200/cdp-defra-id-stub/.well-known/openid-configuration',
       env: 'DEFRA_ID_OIDC_CONFIGURATION_URL'
     },
     clientId: {
       doc: 'The Defra Identity client ID.',
-      format: String,
+      format: requiredFromEnvInCdp,
       default: '2fb0d715-affa-4bf1-836e-44a464e3fbea',
       env: 'DEFRA_ID_CLIENT_ID'
     },
     clientSecret: {
       doc: 'The Defra Identity client secret.',
-      format: String,
+      format: requiredFromEnvInCdp,
       default: 'test_value',
       env: 'DEFRA_ID_CLIENT_SECRET',
       sensitive: true
     },
     serviceId: {
       doc: 'The Defra Identity service ID.',
-      format: String,
+      format: requiredFromEnvInCdp,
       default: 'service-test',
       env: 'DEFRA_ID_SERVICE_ID'
     },
@@ -301,20 +339,20 @@ export const config = convict({
   entraId: {
     oidcConfigurationUrl: {
       doc: 'Entra ID OIDC configuration URL',
-      format: String,
+      format: requiredFromEnvInCdp,
       env: 'ENTRA_ID_OIDC_CONFIGURATION_URL',
       default:
         'http://localhost:3200/cdp-defra-id-stub/.well-known/openid-configuration'
     },
     clientId: {
       doc: 'ENTRA ID client ID',
-      format: String,
+      format: requiredFromEnvInCdp,
       env: 'ENTRA_ID_CLIENT_ID',
       default: 'f68226cb-8dbc-44ef-a24e-d4e4835b16ff'
     },
     clientSecret: {
       doc: 'ENTRA ID client secret',
-      format: String,
+      format: requiredFromEnvInCdp,
       sensitive: true,
       env: 'ENTRA_ID_CLIENT_SECRET',
       default: 'test_value'
@@ -336,7 +374,7 @@ export const config = convict({
   cdpUploader: {
     cdpUploadServiceBaseUrl: {
       doc: 'CDP Uploader service base URL',
-      format: String,
+      format: requiredFromEnvInCdp,
       default: 'http://localhost:7337',
       env: 'CDP_UPLOADER_BASE_URL'
     },
@@ -354,7 +392,7 @@ export const config = convict({
     },
     s3Bucket: {
       doc: 'S3 Bucket for uploads to be placed in after the virus scan',
-      format: String,
+      format: requiredFromEnvInCdp,
       default: 'mmo-uploads',
       env: 'CDP_UPLOAD_BUCKET'
     }
@@ -364,7 +402,23 @@ export const config = convict({
     format: String,
     default: '',
     env: 'CLARITY_PROJECT_ID'
+  },
+  cdpEnvironment: {
+    doc: 'The CDP environment the app is currently in, with the addition of "local"',
+    format: ['local', 'dev', 'test', 'perf-test', 'ext-test', 'prod'],
+    default: process.env.ENVIRONMENT ?? 'local'
   }
 })
 
 config.validate({ allowed: 'strict' })
+
+const environment = config.get('cdpEnvironment')
+if (
+  (environment === 'prod' || environment === 'perf-test') &&
+  !config.get('clarityProjectId')
+) {
+  // eslint-disable-next-line no-console
+  console.warn(
+    `\n⚠️  WARNING: CLARITY_PROJECT_ID is not set for ${environment} environment\n`
+  )
+}

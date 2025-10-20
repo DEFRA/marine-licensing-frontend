@@ -7,6 +7,7 @@ import {
   setSiteDataPreHandler
 } from '#src/server/common/helpers/session-cache/site-utils.js'
 import { routes } from '#src/server/common/constants/routes.js'
+import { saveSiteDetailsToBackend } from '#src/server/common/helpers/save-site-details.js'
 import {
   errorDescriptionByFieldName,
   mapErrorsForDisplay
@@ -128,7 +129,7 @@ export const siteNameSubmitController = {
       failAction: createValidationFailAction
     }
   },
-  handler(request, h) {
+  async handler(request, h) {
     const { payload, site } = request
 
     const { queryParams, siteIndex, siteNumber } = site
@@ -139,6 +140,10 @@ export const siteNameSubmitController = {
     const redirectRoute = action
       ? `${routes.REVIEW_SITE_DETAILS}#site-details-${siteNumber}`
       : routes.SAME_ACTIVITY_DATES + queryParams
+
+    if (action) {
+      await saveSiteDetailsToBackend(request)
+    }
 
     return h.redirect(redirectRoute)
   }

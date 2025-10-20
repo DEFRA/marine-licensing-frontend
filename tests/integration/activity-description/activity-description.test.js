@@ -14,6 +14,9 @@ import {
 } from '~/tests/integration/shared/test-setup-helpers.js'
 import { loadPage } from '~/tests/integration/shared/app-server.js'
 import { makePostRequest } from '~/src/server/test-helpers/server-requests.js'
+import { saveSiteDetailsToBackend } from '#src/server/common/helpers/save-site-details.js'
+
+vi.mock('#src/server/common/helpers/save-site-details.js')
 
 describe('Activity description - page structure & accessibility', () => {
   const getServer = setupTestServer()
@@ -210,6 +213,8 @@ describe('Activity description - page structure & accessibility', () => {
       'activityDescription',
       'Test activity description for site'
     )
+
+    expect(saveSiteDetailsToBackend).toHaveBeenCalledWith(expect.any(Object))
   })
 
   test('should redirect to correct page after submit when action parameter is present for specific site', async () => {
@@ -237,5 +242,6 @@ describe('Activity description - page structure & accessibility', () => {
       'activityDescription',
       'Updated activity description for site 2'
     )
+    expect(saveSiteDetailsToBackend).toHaveBeenCalledWith(expect.any(Object))
   })
 })

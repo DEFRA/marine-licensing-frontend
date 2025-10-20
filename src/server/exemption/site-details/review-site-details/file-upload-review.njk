@@ -207,13 +207,10 @@
           <input type="hidden" name="csrfToken" value="{{ csrfToken }}">
             <div class="govuk-button-group">
               {{ govukButton({
-            text: "Save and continue",
+            text: "Continue",
             attributes: {
               id: "continue"
             }
-          }) }}
-              {{ appCancelButton({
-            cancelLink: "/exemption/task-list?cancel=site-details"
           }) }}
             </div>
           </form>

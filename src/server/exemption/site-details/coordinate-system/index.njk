@@ -21,18 +21,18 @@
     shows how far east or west it is. WGS84 is widely used in GPS and mapping
     tools like Google Maps.
   </p>
-  <h2 class="govuk-heading-s">OSGB36 (National Grid)</h2>
+  <h2 class="govuk-heading-s">British National Grid (OSGB36)</h2>
   <p>
-      Also known as the British National Grid (BNG), OSGB36 is a system used to map
-      Great Britain. It divides the country into squares using numerical east and
-      north positions, known as eastings and northings.
+    The British National Grid maps Great Britain using numerical east and north positions, called eastings and
+    northings. It’s based on the OSGB36 reference system used by Ordnance Survey. For example, easting 438493,
+    northing 569648.
   </p>
 {% endset %}
 
 {% set helperText %}
-  {{ govukDetails({ 
-      html:helperHtml, 
-      summaryText: "Help with the coordinate systems" 
+  {{ govukDetails({
+      html:helperHtml,
+      summaryText: "Help with the coordinate systems"
   }) }}
 {% endset %}
 
@@ -58,7 +58,7 @@
         },
         {
           value: "osgb36",
-          text: "OSGB36 (National Grid)",
+          text: "British National Grid (OSGB36)",
           hint: {
             text: "Uses eastings and northings"
           }
@@ -69,4 +69,4 @@
     })
   }}
 
-{% endblock %} 
+{% endblock %}

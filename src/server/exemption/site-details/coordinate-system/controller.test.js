@@ -124,7 +124,7 @@ describe('#coordinateSystem', () => {
       expect(
         document
           .querySelector(
-            '.govuk-back-link[href="/exemption/how-do-you-want-to-enter-the-coordinates"'
+            '.govuk-back-link[href="/exemption/how-do-you-want-to-enter-the-coordinates"]'
           )
           .textContent.trim()
       ).toBe('Back')
@@ -132,7 +132,7 @@ describe('#coordinateSystem', () => {
       expect(
         document
           .querySelector(
-            '.govuk-link[href="/exemption/task-list?cancel=site-details"'
+            '.govuk-link[href="/exemption/task-list?cancel=site-details"]'
           )
           .textContent.trim()
       ).toBe('Cancel')

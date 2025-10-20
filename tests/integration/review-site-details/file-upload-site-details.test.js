@@ -4,6 +4,7 @@ import { getByText, queryByText, within } from '@testing-library/dom'
 import { routes } from '~/src/server/common/constants/routes.js'
 import { statusCodes } from '~/src/server/common/constants/status-codes.js'
 import { testScenarios } from './file-upload-fixtures.js'
+import { validateActionLink } from './review-site-details-utils.js'
 
 import {
   makeGetRequest,
@@ -252,31 +253,6 @@ describe('Review Site Details - File Upload Integration Tests', () => {
           expected.multipleSiteDetails.activityDescription
         )
       : expect(activityDescriptionRow).toBeFalsy()
-  }
-
-  const validateActionLink = (row, value, siteIndex) => {
-    const actionList = row.querySelector('.govuk-summary-list__actions')
-    expect(actionList).toBeTruthy()
-
-    const hasValue = value && value !== '' && value !== 'Incomplete'
-    const expectedText = hasValue ? /Change/i : /Add/i
-
-    const actionLink = within(actionList).getByRole('link', {
-      name: expectedText
-    })
-
-    const siteNumber = siteIndex + 1
-
-    expect(actionLink).toHaveAttribute(
-      'href',
-      expect.stringContaining(
-        `site=${siteNumber}&action=${hasValue ? 'change' : 'add'}`
-      )
-    )
-
-    expect(actionLink.getAttribute('href')).toContain(
-      `site=${siteNumber}&action=${hasValue ? 'change' : 'add'}`
-    )
   }
 
   const validateSiteDetailsCard = (document, expected, siteIndex) => {

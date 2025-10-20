@@ -16,6 +16,7 @@ import {
   setupTestServer
 } from '~/tests/integration/shared/test-setup-helpers.js'
 import * as exemptionService from '#src/services/exemption-service/index.js'
+import { validateActionLink } from './review-site-details-utils.js'
 
 vi.mock('~/src/server/common/helpers/coordinate-utils.js')
 vi.mock('~/src/services/exemption-service/index.js')
@@ -321,11 +322,18 @@ describe('Review Site Details - Polygon Coordinates Integration Tests', () => {
 
     const siteNameRow = getRowByKey(siteCard, 'Site name')
 
-    expected.multipleSiteDetails.multipleSiteDetails === 'Yes'
-      ? expect(siteNameRow.textContent).toContain(
-          expected.siteDetails[siteIndex].siteName
-        )
-      : expect(siteNameRow).toBeFalsy()
+    if (expected.multipleSiteDetails.multipleSiteDetails === 'Yes') {
+      expect(siteNameRow.textContent).toContain(
+        expected.siteDetails[siteIndex].siteName
+      )
+      validateActionLink(
+        siteNameRow,
+        expected.siteDetails[siteIndex].siteName,
+        siteIndex
+      )
+    } else {
+      expect(siteNameRow).toBeFalsy()
+    }
 
     const shouldIncludeActivityDates =
       expected.multipleSiteDetails.multipleSiteDetails === 'No' ||

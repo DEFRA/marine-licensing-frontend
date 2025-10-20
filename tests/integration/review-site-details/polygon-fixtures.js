@@ -350,8 +350,8 @@ export const testScenarios = [
           ]
         },
         {
-          siteName: 'Site 1',
-          cardName: 'Site 1 details',
+          siteName: 'Site 2',
+          cardName: 'Site 2 details',
           method:
             'Manually enter multiple sets of coordinates to mark the boundary of the site',
           coordinateSystem:

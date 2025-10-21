@@ -1,5 +1,10 @@
 import { getOrganisationFromToken } from '#src/server/common/plugins/auth/get-organisation-from-auth-token.js'
 
+const errorLogger = vi.fn()
+vi.mock('#src/server/common/helpers/logging/logger.js', () => ({
+  createLogger: vi.fn(() => ({ error: errorLogger }))
+}))
+
 describe('#getOrganisationFromToken', () => {
   describe('Employee relationship type', () => {
     test('When token has valid Employee relationship data', () => {
@@ -207,7 +212,8 @@ describe('#getOrganisationFromToken', () => {
       const result = getOrganisationFromToken(decodedToken)
 
       expect(result).toEqual({
-        hasMultipleOrganisations: false
+        hasMultipleOrganisations: false,
+        userRelationshipType: 'Citizen'
       })
     })
 
@@ -238,10 +244,32 @@ describe('#getOrganisationFromToken', () => {
 
       expect(result).toEqual({
         organisationId: '27d48d6c',
-        organisationName: undefined,
-        userRelationshipType: undefined,
+        userRelationshipType: 'Citizen',
         hasMultipleOrganisations: false
       })
+    })
+
+    test('When relationship role is an invalid value', () => {
+      const decodedToken = {
+        currentRelationshipId: '81d48d6c-6e94-f011-b4cc-000d3ac28f39',
+        relationships: [
+          '81d48d6c-6e94-f011-b4cc-000d3ac28f39:27d48d6c-6e94-f011-b4cc-000d3ac28f39:CDP Child Org 1:0:InvalidRole:0'
+        ],
+        enrolmentCount: 1,
+        roles: ['role1']
+      }
+
+      const result = getOrganisationFromToken(decodedToken)
+
+      expect(result).toEqual({
+        organisationId: '27d48d6c-6e94-f011-b4cc-000d3ac28f39',
+        organisationName: 'CDP Child Org 1',
+        userRelationshipType: 'Citizen',
+        hasMultipleOrganisations: false
+      })
+      expect(errorLogger).toHaveBeenCalledWith(
+        'Invalid relationship type: InvalidRole'
+      )
     })
   })
 })

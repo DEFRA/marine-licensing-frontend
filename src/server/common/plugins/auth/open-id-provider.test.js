@@ -197,7 +197,7 @@ describe('#openIdProvider', () => {
 
     expect(credentials.profile.organisationId).toBeUndefined()
     expect(credentials.profile.organisationName).toBeUndefined()
-    expect(credentials.profile.userRelationshipType).toBeUndefined()
+    expect(credentials.profile.userRelationshipType).toEqual('Citizen')
     expect(credentials.profile.hasMultipleOrganisations).toEqual(false)
   })
 

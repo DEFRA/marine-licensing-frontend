@@ -12,8 +12,10 @@ import { statusCodes } from '#src/server/common/constants/status-codes.js'
 import { config } from '#src/config/config.js'
 import { JSDOM } from 'jsdom'
 import { routes } from '#src/server/common/constants/routes.js'
+import { saveSiteDetailsToBackend } from '#src/server/common/helpers/save-site-details.js'
 
 vi.mock('~/src/server/common/helpers/session-cache/utils.js')
+vi.mock('~/src/server/common/helpers/save-site-details.js')
 
 describe('#widthOfSite', () => {
   const getServer = setupTestServer()
@@ -23,6 +25,8 @@ describe('#widthOfSite', () => {
     getExemptionCacheSpy = vi
       .spyOn(cacheUtils, 'getExemptionCache')
       .mockReturnValue(mockExemption)
+
+    vi.mocked(saveSiteDetailsToBackend).mockResolvedValue()
   })
 
   describe('#widthOfSiteController', () => {
@@ -210,6 +214,8 @@ describe('#widthOfSite', () => {
         'circleWidth',
         '50'
       )
+
+      expect(saveSiteDetailsToBackend).toHaveBeenCalledWith(mockRequest)
     })
 
     test('Should correctly set the cache when submitting', async () => {
@@ -230,6 +236,7 @@ describe('#widthOfSite', () => {
         'circleWidth',
         'single'
       )
+      expect(saveSiteDetailsToBackend).toHaveBeenCalledWith(mockRequest)
     })
   })
 })

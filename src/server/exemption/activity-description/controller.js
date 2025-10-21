@@ -11,6 +11,7 @@ import { setSiteDataPreHandler } from '#src/server/common/helpers/session-cache/
 import { getSiteDetailsBySite } from '#src/server/common/helpers/session-cache/site-details-utils.js'
 import { routes } from '#src/server/common/constants/routes.js'
 import { authenticatedPatchRequest } from '#src/server/common/helpers/authenticated-requests.js'
+import { saveSiteDetailsToBackend } from '#src/server/common/helpers/save-site-details.js'
 import joi from 'joi'
 import { getBackLink, getNextRoute } from './utils.js'
 
@@ -178,6 +179,13 @@ export const activityDescriptionSubmitController = {
       const nextRoute = action
         ? `${routes.REVIEW_SITE_DETAILS}#site-details-${siteNumber}`
         : getNextRoute(isInSiteDetailsFlow, request.site)
+
+      if (
+        isInSiteDetailsFlow &&
+        (nextRoute === routes.REVIEW_SITE_DETAILS || action)
+      ) {
+        await saveSiteDetailsToBackend(request)
+      }
 
       return h.redirect(nextRoute)
     } catch (e) {

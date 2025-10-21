@@ -231,6 +231,7 @@
                             {
                                 href: "delete-site?site=" + site.siteNumber,
                                 text: "Delete site",
+                                classes: 'govuk-link--no-visited-state',
                                 visuallyHiddenText: "for site " + site.siteNumber
                             }
                         ]
@@ -247,7 +248,7 @@
 
                     {% if isMultiSiteJourney %}
                         {{ govukButton({
-                            text: "Save and add another site",
+                            text: "Add another site",
                             classes: "govuk-button--secondary govuk-!-margin-bottom-7",
                             attributes: {
                                 name: "add",
@@ -256,19 +257,16 @@
                             }
                         }) }}
 
-                        <p>You can select 'Save and continue' if you're finished or you want to save your progress and return later.</p>
+                        <p>The site details you've provided are saved. You can return to this page and make changes at any time before you send your information.</p>
 
                     {% endif %}
 
                     <div class="govuk-button-group">
                         {{ govukButton({
-                        text: "Save and continue",
+                        text: "Continue",
                         attributes: {
                             id: "continue"
                         }
-                    }) }}
-                        {{ appCancelButton({
-                        cancelLink: "/exemption/task-list?cancel=site-details"
                     }) }}
                     </div>
                 </form>

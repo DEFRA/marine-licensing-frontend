@@ -14,6 +14,7 @@ import {
 } from '#src/server/common/helpers/errors.js'
 import joi from 'joi'
 import { getBackLink } from './utils.js'
+import { saveSiteDetailsToBackend } from '#src/server/common/helpers/save-site-details.js'
 
 export const SAME_ACTIVITY_DESCRIPTION_VIEW_ROUTE =
   'exemption/site-details/same-activity-description/index'
@@ -117,7 +118,7 @@ export const sameActivityDescriptionSubmitController = {
       failAction: createValidationFailAction
     }
   },
-  handler(request, h) {
+  async handler(request, h) {
     const { payload, site } = request
     const { queryParams, siteDetails } = site
 
@@ -131,6 +132,7 @@ export const sameActivityDescriptionSubmitController = {
       siteDetails.coordinatesType === 'file' &&
       payload.sameActivityDescription === 'no'
     ) {
+      await saveSiteDetailsToBackend(request)
       return h.redirect(routes.REVIEW_SITE_DETAILS)
     }
 

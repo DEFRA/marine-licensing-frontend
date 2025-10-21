@@ -25,7 +25,7 @@ describe('Activity description - page structure & accessibility', () => {
 
   test('should render form with correct structure when no errors', async () => {
     const document = await loadPage({
-      requestUrl: routes.SITE_DETAILS_ACTIVITY_DESCRIPTION,
+      requestUrl: routes.ACTIVITY_DESCRIPTION,
       server: getServer()
     })
 
@@ -52,7 +52,7 @@ describe('Activity description - page structure & accessibility', () => {
       getByRole(document, 'link', {
         name: 'Back'
       })
-    ).toHaveAttribute('href', routes.SITE_DETAILS_ACTIVITY_DATES)
+    ).toHaveAttribute('href', routes.ACTIVITY_DATES)
 
     expect(
       queryByRole(document, 'link', {
@@ -80,12 +80,12 @@ describe('Activity description - page structure & accessibility', () => {
     mockExemption(mockExemptionSingleSite)
 
     const document = await loadPage({
-      requestUrl: routes.SITE_DETAILS_ACTIVITY_DESCRIPTION,
+      requestUrl: routes.ACTIVITY_DESCRIPTION,
       server: getServer()
     })
 
     const backLink = getByRole(document, 'link', { name: 'Back' })
-    expect(backLink).toHaveAttribute('href', routes.SITE_DETAILS_ACTIVITY_DATES)
+    expect(backLink).toHaveAttribute('href', routes.ACTIVITY_DATES)
 
     expect(queryByText(document, 'Site 1')).not.toBeInTheDocument()
 
@@ -117,7 +117,7 @@ describe('Activity description - page structure & accessibility', () => {
     mockExemption(mockExemptionMultipleSite)
 
     const document = await loadPage({
-      requestUrl: routes.SITE_DETAILS_ACTIVITY_DESCRIPTION,
+      requestUrl: routes.ACTIVITY_DESCRIPTION,
       server: getServer()
     })
 
@@ -154,7 +154,7 @@ describe('Activity description - page structure & accessibility', () => {
     mockExemption(mockExemptionMultipleSite)
 
     const document = await loadPage({
-      requestUrl: routes.SITE_DETAILS_ACTIVITY_DESCRIPTION,
+      requestUrl: routes.ACTIVITY_DESCRIPTION,
       server: getServer()
     })
 
@@ -180,7 +180,7 @@ describe('Activity description - page structure & accessibility', () => {
 
   test('should display Save and continue button when action parameter is present', async () => {
     const document = await loadPage({
-      requestUrl: `${routes.SITE_DETAILS_ACTIVITY_DESCRIPTION}?action=add`,
+      requestUrl: `${routes.ACTIVITY_DESCRIPTION}?action=add`,
       server: getServer()
     })
 
@@ -193,7 +193,7 @@ describe('Activity description - page structure & accessibility', () => {
     const { updateExemptionSiteDetails } = mockExemption(mockExemption)
 
     const response = await makePostRequest({
-      url: `${routes.SITE_DETAILS_ACTIVITY_DESCRIPTION}?action=add`,
+      url: `${routes.ACTIVITY_DESCRIPTION}?action=add`,
       server: getServer(),
       formData: {
         activityDescription: 'Test activity description for site'
@@ -222,7 +222,7 @@ describe('Activity description - page structure & accessibility', () => {
     })
 
     const response = await makePostRequest({
-      url: `${routes.SITE_DETAILS_ACTIVITY_DESCRIPTION}?site=2&action=change`,
+      url: `${routes.ACTIVITY_DESCRIPTION}?site=2&action=change`,
       server: getServer(),
       formData: {
         activityDescription: 'Updated activity description for site 2'

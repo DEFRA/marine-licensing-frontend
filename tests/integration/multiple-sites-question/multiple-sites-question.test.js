@@ -186,9 +186,7 @@ describe('Multiple sites question page', () => {
     })
 
     expect(response.statusCode).toBe(statusCodes.redirect)
-    expect(response.headers.location).toBe(
-      '/exemption/site-details-activity-dates'
-    )
+    expect(response.headers.location).toBe('/exemption/activity-dates')
 
     expect(setExemptionCache).toHaveBeenCalledWith(expect.any(Object), {
       ...mockExemptionData,

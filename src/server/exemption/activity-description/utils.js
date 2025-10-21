@@ -4,7 +4,7 @@ export const getBackLink = (exemption, siteIndex = 0, queryParams = '') => {
     exemption?.multipleSiteDetails?.multipleSitesEnabled
 
   if (!multipleSitesEnabled) {
-    return routes.SITE_DETAILS_ACTIVITY_DATES
+    return routes.ACTIVITY_DATES
   }
 
   if (siteIndex === 0) {

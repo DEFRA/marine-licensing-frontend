@@ -26,7 +26,7 @@ describe('Activity dates - form validation', () => {
 
   const submitActivityDatesForm = async (formData) => {
     const { document } = await submitForm({
-      requestUrl: routes.SITE_DETAILS_ACTIVITY_DATES,
+      requestUrl: routes.ACTIVITY_DATES,
       server: getServer(),
       formData
     })
@@ -175,7 +175,7 @@ describe('Activity dates - form validation', () => {
   describe('Order of start and end dates', () => {
     test('a start and end date of today is valid', async () => {
       const { response } = await submitForm({
-        requestUrl: routes.SITE_DETAILS_ACTIVITY_DATES,
+        requestUrl: routes.ACTIVITY_DATES,
         server: getServer(),
         formData: requestBody({ startDate: getToday(), endDate: getToday() })
       })

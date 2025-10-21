@@ -86,7 +86,7 @@ export const sameActivityDescriptionController = {
     }
 
     if (siteIndex > 0 && multipleSiteDetails.sameActivityDescription === 'no') {
-      return h.redirect(routes.SITE_DETAILS_ACTIVITY_DESCRIPTION + queryParams)
+      return h.redirect(routes.ACTIVITY_DESCRIPTION + queryParams)
     }
 
     return h.view(SAME_ACTIVITY_DESCRIPTION_VIEW_ROUTE, {
@@ -136,6 +136,6 @@ export const sameActivityDescriptionSubmitController = {
       return h.redirect(routes.REVIEW_SITE_DETAILS)
     }
 
-    return h.redirect(routes.SITE_DETAILS_ACTIVITY_DESCRIPTION + queryParams)
+    return h.redirect(routes.ACTIVITY_DESCRIPTION + queryParams)
   }
 }

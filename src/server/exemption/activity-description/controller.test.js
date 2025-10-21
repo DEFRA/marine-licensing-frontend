@@ -45,7 +45,7 @@ describe('#activityDescriptionController', () => {
   describe('activityDescriptionController GET', () => {
     test('should render the activity description page', async () => {
       const { result, statusCode } = await makeGetRequest({
-        url: routes.SITE_DETAILS_ACTIVITY_DESCRIPTION,
+        url: routes.ACTIVITY_DESCRIPTION,
         server: getServer()
       })
 
@@ -76,7 +76,7 @@ describe('#activityDescriptionController', () => {
 
       expect(h.view).toHaveBeenCalledWith(ACTIVITY_DESCRIPTION_VIEW_ROUTE, {
         action: undefined,
-        backLink: routes.SITE_DETAILS_ACTIVITY_DATES,
+        backLink: routes.ACTIVITY_DATES,
         cancelLink: routes.TASK_LIST + '?cancel=site-details',
         isMultiSiteJourney: false,
 
@@ -96,7 +96,7 @@ describe('#activityDescriptionController', () => {
         ACTIVITY_DESCRIPTION_VIEW_ROUTE,
         {
           action: undefined,
-          backLink: routes.SITE_DETAILS_ACTIVITY_DATES,
+          backLink: routes.ACTIVITY_DATES,
           cancelLink: routes.TASK_LIST + '?cancel=site-details',
           isMultiSiteJourney: false,
 
@@ -112,7 +112,7 @@ describe('#activityDescriptionController', () => {
     test('handler should render with correct context for site details flow', () => {
       const h = { view: vi.fn() }
       const request = {
-        url: { pathname: routes.SITE_DETAILS_ACTIVITY_DESCRIPTION }
+        url: { pathname: routes.ACTIVITY_DESCRIPTION }
       }
       const exemptionWithSiteDetails = {
         ...mockExemptionState,
@@ -129,7 +129,7 @@ describe('#activityDescriptionController', () => {
 
       expect(h.view).toHaveBeenCalledWith(ACTIVITY_DESCRIPTION_VIEW_ROUTE, {
         action: undefined,
-        backLink: routes.SITE_DETAILS_ACTIVITY_DATES,
+        backLink: routes.ACTIVITY_DATES,
         cancelLink: routes.TASK_LIST + '?cancel=site-details',
         isMultiSiteJourney: false,
         pageTitle: 'Activity description',
@@ -143,7 +143,7 @@ describe('#activityDescriptionController', () => {
     test('should set back link to correct page for single site file upload', () => {
       const h = { view: vi.fn() }
       const request = {
-        url: { pathname: routes.SITE_DETAILS_ACTIVITY_DESCRIPTION },
+        url: { pathname: routes.ACTIVITY_DESCRIPTION },
         site: { siteIndex: 0, siteDetails: { coordinatesType: 'file' } }
       }
 
@@ -168,7 +168,7 @@ describe('#activityDescriptionController', () => {
       expect(h.view).toHaveBeenCalledWith(
         ACTIVITY_DESCRIPTION_VIEW_ROUTE,
         expect.objectContaining({
-          backLink: routes.SITE_DETAILS_ACTIVITY_DATES,
+          backLink: routes.ACTIVITY_DATES,
 
           isMultiSiteJourney: false
         })
@@ -189,7 +189,7 @@ describe('#activityDescriptionController', () => {
       })
 
       const { statusCode, headers } = await makePostRequest({
-        url: routes.SITE_DETAILS_ACTIVITY_DESCRIPTION,
+        url: routes.ACTIVITY_DESCRIPTION,
         server: getServer(),
         formData: payload,
         headers: {
@@ -198,7 +198,7 @@ describe('#activityDescriptionController', () => {
       })
 
       // The API call should be made when NOT in site details flow
-      // Since this test is using SITE_DETAILS_ACTIVITY_DESCRIPTION, it's in site details flow
+      // Since this test is using ACTIVITY_DESCRIPTION, it's in site details flow
       // so the API call won't be made - instead updateExemptionSiteDetails will be called
       expect(authRequests.authenticatedPatchRequest).not.toHaveBeenCalled()
       expect(statusCode).toBe(statusCodes.redirect)
@@ -227,7 +227,7 @@ describe('#activityDescriptionController', () => {
       }
 
       const { statusCode, headers } = await makePostRequest({
-        url: routes.SITE_DETAILS_ACTIVITY_DESCRIPTION,
+        url: routes.ACTIVITY_DESCRIPTION,
         server: getServer(),
         formData: payload
       })
@@ -248,7 +248,7 @@ describe('#activityDescriptionController', () => {
       }
 
       const { result, statusCode } = await makePostRequest({
-        url: routes.SITE_DETAILS_ACTIVITY_DESCRIPTION,
+        url: routes.ACTIVITY_DESCRIPTION,
         server: getServer(),
         formData: payload,
         headers: {
@@ -290,7 +290,7 @@ describe('#activityDescriptionController', () => {
       })
 
       const response = await makePostRequest({
-        url: routes.SITE_DETAILS_ACTIVITY_DESCRIPTION,
+        url: routes.ACTIVITY_DESCRIPTION,
         server: getServer(),
         formData: { activityDescription: 'test' }
       })
@@ -329,7 +329,7 @@ describe('#activityDescriptionController', () => {
 
       expect(h.view).toHaveBeenCalledWith(ACTIVITY_DESCRIPTION_VIEW_ROUTE, {
         action: undefined,
-        backLink: routes.SITE_DETAILS_ACTIVITY_DATES,
+        backLink: routes.ACTIVITY_DATES,
         cancelLink: routes.TASK_LIST + '?cancel=site-details',
         isMultiSiteJourney: false,
         errorSummary: [
@@ -399,7 +399,7 @@ describe('#activityDescriptionController', () => {
       apiPatchMock.mockRejectedValueOnce(fakeError)
 
       const response = await makePostRequest({
-        url: routes.SITE_DETAILS_ACTIVITY_DESCRIPTION,
+        url: routes.ACTIVITY_DESCRIPTION,
         server: getServer(),
         formData: { activityDescription: 'test' },
         headers: {
@@ -419,7 +419,7 @@ describe('#activityDescriptionController', () => {
       const request = {
         payload,
         query: { action: 'change' },
-        url: { pathname: routes.SITE_DETAILS_ACTIVITY_DESCRIPTION },
+        url: { pathname: routes.ACTIVITY_DESCRIPTION },
         site: { siteIndex: 0, siteNumber: 1 }
       }
       const h = { redirect: vi.fn() }
@@ -436,7 +436,7 @@ describe('#activityDescriptionController', () => {
 
       const request = {
         payload,
-        url: { pathname: routes.SITE_DETAILS_ACTIVITY_DESCRIPTION },
+        url: { pathname: routes.ACTIVITY_DESCRIPTION },
         site: {
           siteIndex: 0,
           siteNumber: 1,
@@ -457,7 +457,7 @@ describe('#activityDescriptionController', () => {
 
       const request = {
         payload,
-        url: { pathname: routes.SITE_DETAILS_ACTIVITY_DESCRIPTION },
+        url: { pathname: routes.ACTIVITY_DESCRIPTION },
         site: {
           siteIndex: 0,
           siteNumber: 1,

@@ -12,7 +12,6 @@ export const routes = {
   PROJECT_NAME: '/exemption/project-name',
   PUBLIC_REGISTER: '/exemption/public-register',
   TASK_LIST: '/exemption/task-list',
-  ACTIVITY_DESCRIPTION: '/exemption/activity-description',
   AUTH_DEFRA_ID_CALLBACK: '/signin-oidc',
   AUTH_ENTRA_ID_CALLBACK: '/auth',
   SIGNIN: '/signin',
@@ -24,9 +23,7 @@ export const routes = {
   FILE_UPLOAD: '/exemption/upload-file',
   UPLOAD_AND_WAIT: '/exemption/upload-and-wait',
   ACTIVITY_DATES: '/exemption/activity-dates',
-  SITE_DETAILS_ACTIVITY_DATES: '/exemption/site-details-activity-dates',
-  SITE_DETAILS_ACTIVITY_DESCRIPTION:
-    '/exemption/site-details-activity-description',
+  ACTIVITY_DESCRIPTION: '/exemption/activity-description',
   CHECK_YOUR_ANSWERS: '/exemption/check-your-answers',
   VIEW_DETAILS: '/exemption/view-details',
   VIEW_DETAILS_INTERNAL_USER: '/view-details',

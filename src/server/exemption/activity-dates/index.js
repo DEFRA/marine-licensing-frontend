@@ -7,12 +7,12 @@ import {
 export const activityDatesRoutes = [
   {
     method: 'GET',
-    path: routes.SITE_DETAILS_ACTIVITY_DATES,
+    path: routes.ACTIVITY_DATES,
     ...activityDatesController
   },
   {
     method: 'POST',
-    path: routes.SITE_DETAILS_ACTIVITY_DATES,
+    path: routes.ACTIVITY_DATES,
     ...activityDatesSubmitController
   }
 ]

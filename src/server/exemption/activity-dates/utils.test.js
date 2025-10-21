@@ -20,13 +20,13 @@ describe('#getNextRoute', () => {
 
       const result = getNextRoute(exemption)
 
-      expect(result).toBe(routes.SITE_DETAILS_ACTIVITY_DESCRIPTION)
+      expect(result).toBe(routes.ACTIVITY_DESCRIPTION)
     })
 
     test('should return correct route when exemption is null', () => {
       const result = getNextRoute(null)
 
-      expect(result).toBe(routes.SITE_DETAILS_ACTIVITY_DESCRIPTION)
+      expect(result).toBe(routes.ACTIVITY_DESCRIPTION)
     })
   })
 })

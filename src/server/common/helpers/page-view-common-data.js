@@ -6,12 +6,12 @@ export const getPageViewCommonData = async (request) => {
   if (!userSession) {
     return {}
   }
-  const { applicantOrganisationName, hasMultipleOrganisations, displayName } =
+  const { organisationName, hasMultipleOrganisations, displayName } =
     userSession
   const showChangeOrganisationLink =
     hasMultipleOrganisations && request.path === routes.DASHBOARD
   const orgOrUserName = hasMultipleOrganisations
-    ? applicantOrganisationName || displayName
+    ? organisationName || displayName
     : null
   return { orgOrUserName, showChangeOrganisationLink }
 }

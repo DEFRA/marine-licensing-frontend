@@ -15,6 +15,9 @@ vi.mock('~/src/server/common/plugins/auth/open-id-provider.js')
 vi.mock('~/src/server/common/plugins/auth/validate.js')
 vi.mock('~/src/server/common/helpers/session-cache/utils.js')
 vi.mock('~/src/server/common/helpers/mcms-context/cache-mcms-context.js')
+vi.mock('#src/server/common/helpers/logging/logger.js', () => ({
+  createLogger: vi.fn(() => ({ error: vi.fn() }))
+}))
 
 // Helper to create a mock server that tracks strategy calls
 const createMockServer = () => ({

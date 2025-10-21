@@ -300,7 +300,7 @@ export const config = convict({
     clientId: {
       doc: 'The Defra Identity client ID.',
       format: requiredFromEnvInCdp,
-      default: '2fb0d715-affa-4bf1-836e-44a464e3fbea',
+      default: 'client-test',
       env: 'DEFRA_ID_CLIENT_ID'
     },
     clientSecret: {
@@ -348,7 +348,7 @@ export const config = convict({
       doc: 'ENTRA ID client ID',
       format: requiredFromEnvInCdp,
       env: 'ENTRA_ID_CLIENT_ID',
-      default: 'f68226cb-8dbc-44ef-a24e-d4e4835b16ff'
+      default: 'entra-test'
     },
     clientSecret: {
       doc: 'ENTRA ID client secret',

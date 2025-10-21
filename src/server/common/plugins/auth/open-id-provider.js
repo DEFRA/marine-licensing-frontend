@@ -2,7 +2,7 @@ import Jwt from '@hapi/jwt'
 import { config } from '#src/config/config.js'
 import { getOidcConfig } from '#src/server/common/plugins/auth/get-oidc-config.js'
 
-import { getApplicantOrganisationFromToken } from '#src/server/common/plugins/auth/get-applicant-organisation.js'
+import { getOrganisationFromToken } from '#src/server/common/plugins/auth/get-organisation-from-auth-token.js'
 
 export const openIdProvider = async (name) => {
   const authConfig = config.get(name)
@@ -30,10 +30,11 @@ export const openIdProvider = async (name) => {
         .join(' ')
 
       const {
-        applicantOrganisationId,
-        applicantOrganisationName,
+        organisationId,
+        organisationName,
+        userRelationshipType,
         hasMultipleOrganisations
-      } = getApplicantOrganisationFromToken(payload)
+      } = getOrganisationFromToken(payload)
 
       credentials.profile = {
         id: payload.sub,
@@ -52,8 +53,9 @@ export const openIdProvider = async (name) => {
         enrolmentRequestCount: payload.enrolmentRequestCount,
         currentRelationshipId: payload.currentRelationshipId,
         relationships: payload.relationships,
-        applicantOrganisationId,
-        applicantOrganisationName,
+        organisationId,
+        organisationName,
+        userRelationshipType,
         hasMultipleOrganisations,
         roles: payload.roles,
         idToken: params.id_token,

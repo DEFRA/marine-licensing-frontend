@@ -5,17 +5,10 @@ import {
 } from '#src/server/common/helpers/session-cache/utils.js'
 import { routes } from '#src/server/common/constants/routes.js'
 import {
-  getSiteDetails,
-  prepareFileUploadDataForSave,
-  prepareManualCoordinateDataForSave,
   renderFileUploadReview,
-  renderManualCoordinateReview,
-  handleSubmissionError
+  renderManualCoordinateReview
 } from './utils.js'
-import {
-  authenticatedPatchRequest,
-  authenticatedGetRequest
-} from '#src/server/common/helpers/authenticated-requests.js'
+import { getExemptionService } from '#src/services/exemption-service/index.js'
 import { getSiteDetailsBySite } from '#src/server/common/helpers/session-cache/site-details-utils.js'
 
 export const REVIEW_SITE_DETAILS_VIEW_ROUTE =
@@ -33,24 +26,31 @@ export const reviewSiteDetailsController = {
     const previousPage = request.headers?.referer
     const exemption = getExemptionCache(request)
 
-    const siteDetails = await getSiteDetails(
-      request,
-      exemption,
-      authenticatedGetRequest
+    if (!exemption.id) {
+      return h.redirect(routes.TASK_LIST)
+    }
+
+    const exemptionService = getExemptionService(request)
+    const completeExemption = await exemptionService.getExemptionById(
+      exemption.id
     )
 
-    const firstSite = getSiteDetailsBySite({ ...exemption, siteDetails })
+    const siteDetails = completeExemption.siteDetails
+    const firstSite = getSiteDetailsBySite({
+      ...completeExemption,
+      siteDetails
+    })
     const { coordinatesType } = firstSite
 
     return coordinatesType === 'file'
       ? renderFileUploadReview(h, {
-          exemption,
+          exemption: completeExemption,
           siteDetails,
           previousPage,
           reviewSiteDetailsPageData
         })
       : renderManualCoordinateReview(h, {
-          exemption,
+          exemption: completeExemption,
           siteDetails,
           previousPage,
           reviewSiteDetailsPageData
@@ -60,46 +60,33 @@ export const reviewSiteDetailsController = {
 export const reviewSiteDetailsSubmitController = {
   async handler(request, h) {
     const { payload } = request
-
     const exemption = getExemptionCache(request)
-    const siteDetails = exemption.siteDetails
-    const firstSite = siteDetails[0]
-    try {
-      const dataToSave =
-        firstSite.coordinatesType === 'file'
-          ? prepareFileUploadDataForSave(siteDetails, request)
-          : prepareManualCoordinateDataForSave(exemption, request)
 
-      await authenticatedPatchRequest(request, '/exemption/site-details', {
-        multipleSiteDetails: exemption.multipleSiteDetails,
-        siteDetails: dataToSave,
-        id: exemption.id
+    if (!exemption.id) {
+      return h.redirect(routes.TASK_LIST)
+    }
+
+    const exemptionService = getExemptionService(request)
+    const completeExemption = await exemptionService.getExemptionById(
+      exemption.id
+    )
+
+    const siteDetails = completeExemption.siteDetails
+
+    if (payload?.add) {
+      const updatedSiteDetails = [
+        ...siteDetails,
+        { coordinatesType: siteDetails[0].coordinatesType }
+      ]
+      setExemptionCache(request, {
+        ...completeExemption,
+        siteDetails: updatedSiteDetails
       })
 
-      if (payload?.add) {
-        const updatedSiteDetails = [
-          ...siteDetails,
-          { coordinatesType: siteDetails[0].coordinatesType }
-        ]
-        setExemptionCache(request, {
-          ...exemption,
-          siteDetails: updatedSiteDetails
-        })
-
-        return h.redirect(
-          `${routes.SITE_NAME}?site=${updatedSiteDetails.length}`
-        )
-      }
-
-      resetExemptionSiteDetails(request)
-      return h.redirect(routes.TASK_LIST)
-    } catch (error) {
-      throw handleSubmissionError(
-        request,
-        error,
-        exemption.id,
-        siteDetails.coordinatesType
-      )
+      return h.redirect(`${routes.SITE_NAME}?site=${updatedSiteDetails.length}`)
     }
+
+    resetExemptionSiteDetails(request)
+    return h.redirect(routes.TASK_LIST)
   }
 }

@@ -79,7 +79,7 @@ export const projectNameSubmitController = {
     const { payload } = request
     try {
       const exemption = getExemptionCache(request)
-      const { applicantOrganisationId, applicantOrganisationName } =
+      const { organisationId, organisationName, userRelationshipType } =
         await getUserSession(request, request.state?.userSession)
 
       const isUpdate = !!exemption.id
@@ -92,9 +92,8 @@ export const projectNameSubmitController = {
         : await authenticatedPostRequest(request, '/exemption/project-name', {
             ...payload,
             mcmsContext,
-            ...(applicantOrganisationId
-              ? { applicantOrganisationId, applicantOrganisationName }
-              : {})
+            ...(organisationId ? { organisationId, organisationName } : {}),
+            userRelationshipType
           })
 
       setExemptionCache(request, {

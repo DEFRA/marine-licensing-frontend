@@ -15,8 +15,10 @@ import {
   mockExemption,
   setupTestServer
 } from '~/tests/integration/shared/test-setup-helpers.js'
+import * as exemptionService from '#src/services/exemption-service/index.js'
 
 vi.mock('~/src/server/common/helpers/coordinate-utils.js')
+vi.mock('~/src/services/exemption-service/index.js')
 
 const getSiteDetailsCard = (document, expected, siteIndex = 0) => {
   const cardName = expected?.siteDetails[siteIndex]?.cardName ?? 'Site details'
@@ -29,11 +31,19 @@ const getSiteDetailsCard = (document, expected, siteIndex = 0) => {
 
 describe('Review Site Details - Polygon Coordinates Integration Tests', () => {
   const getServer = setupTestServer()
+  let mockExemptionService
 
   beforeEach(() => {
     vi.spyOn(coordinateUtils, 'getCoordinateSystem').mockReturnValue({
       coordinateSystem: COORDINATE_SYSTEMS.WGS84
     })
+
+    mockExemptionService = {
+      getExemptionById: vi.fn().mockResolvedValue(testScenarios[0].exemption)
+    }
+    vi.mocked(exemptionService.getExemptionService).mockReturnValue(
+      mockExemptionService
+    )
   })
 
   test.each(testScenarios)(
@@ -133,9 +143,10 @@ describe('Review Site Details - Polygon Coordinates Integration Tests', () => {
   })
 
   describe('Form Submission', () => {
-    test('should successfully submit polygon site details', async () => {
+    test('should redirect to task list on form submission', async () => {
       const polygonExemption = testScenarios[0].exemption
-      const { authenticatedPatchRequest } = mockExemption(polygonExemption)
+
+      mockExemption(polygonExemption)
 
       const response = await makePostRequest({
         url: routes.REVIEW_SITE_DETAILS,
@@ -145,24 +156,14 @@ describe('Review Site Details - Polygon Coordinates Integration Tests', () => {
 
       expect(response.statusCode).toBe(statusCodes.redirect)
       expect(response.headers.location).toBe(routes.TASK_LIST)
-      expect(authenticatedPatchRequest).toHaveBeenCalledWith(
-        expect.any(Object),
-        '/exemption/site-details',
-        expect.objectContaining({
-          id: polygonExemption.id,
-          siteDetails: [
-            expect.objectContaining({
-              coordinatesType: 'coordinates',
-              coordinatesEntry: 'multiple'
-            })
-          ]
-        })
-      )
+      expect(mockExemptionService.getExemptionById).toHaveBeenCalled()
     })
   })
 
   const getPageDocument = async (exemption) => {
     mockExemption(exemption)
+
+    mockExemptionService.getExemptionById.mockResolvedValue(exemption)
 
     const response = await makeGetRequest({
       server: getServer(),
@@ -205,19 +206,19 @@ describe('Review Site Details - Polygon Coordinates Integration Tests', () => {
 
     expect(
       within(document).getByRole('button', {
-        name: 'Save and add another site'
+        name: 'Add another site'
       })
     ).toHaveAttribute('type', 'submit')
 
     expect(
       getByText(
         document,
-        `You can select 'Save and continue' if you're finished or you want to save your progress and return later.`
+        `The site details you've provided are saved. You can return to this page and make changes at any time before you send your information.`
       )
     ).toBeInTheDocument()
 
     expect(
-      within(document).getByRole('button', { name: 'Save and continue' })
+      within(document).getByRole('button', { name: 'Continue' })
     ).toHaveAttribute('type', 'submit')
 
     const backLink = document.querySelector('.govuk-back-link')
@@ -375,11 +376,8 @@ describe('Review Site Details - Polygon Coordinates Integration Tests', () => {
 
   const validateNavigationElements = (document) => {
     expect(
-      within(document).getByRole('button', { name: 'Save and continue' })
+      within(document).getByRole('button', { name: 'Continue' })
     ).toHaveAttribute('type', 'submit')
-    expect(
-      within(document).getByRole('link', { name: 'Cancel' })
-    ).toHaveAttribute('href', '/exemption/task-list?cancel=site-details')
   }
 
   const getRowByKey = (card, keyText) => {

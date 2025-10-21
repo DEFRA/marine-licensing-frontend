@@ -23,7 +23,7 @@ describe('getPageViewCommonData', () => {
 
   test('should return showChangeOrganisationLink false when not on dashboard page', async () => {
     const mockUserSession = {
-      applicantOrganisationName: 'Test Organisation Ltd',
+      organisationName: 'Test Organisation Ltd',
       hasMultipleOrganisations: false
     }
     mockGetUserSession.mockResolvedValue(mockUserSession)
@@ -40,7 +40,7 @@ describe('getPageViewCommonData', () => {
 
   test('should return showChangeOrganisationLink false when user has single organisation on dashboard', async () => {
     const mockUserSession = {
-      applicantOrganisationName: 'Test Organisation Ltd',
+      organisationName: 'Test Organisation Ltd',
       hasMultipleOrganisations: false
     }
     mockGetUserSession.mockResolvedValue(mockUserSession)
@@ -57,7 +57,7 @@ describe('getPageViewCommonData', () => {
 
   test('should return showChangeOrganisationLink true when user has multiple organisations on dashboard', async () => {
     const mockUserSession = {
-      applicantOrganisationName: 'Test Organisation Ltd',
+      organisationName: 'Test Organisation Ltd',
       hasMultipleOrganisations: true
     }
     mockGetUserSession.mockResolvedValue(mockUserSession)
@@ -74,7 +74,7 @@ describe('getPageViewCommonData', () => {
 
   test('should return showChangeOrganisationLink false when user has multiple organisations but not on dashboard', async () => {
     const mockUserSession = {
-      applicantOrganisationName: 'Test Organisation Ltd',
+      organisationName: 'Test Organisation Ltd',
       hasMultipleOrganisations: true
     }
     mockGetUserSession.mockResolvedValue(mockUserSession)
@@ -114,9 +114,9 @@ describe('getPageViewCommonData', () => {
     expect(result).toEqual({})
   })
 
-  test("should return orgOrUserName set to applicantOrganisationName when it's set and user has multiple organisations", async () => {
+  test("should return orgOrUserName set to organisationName when it's set and user has multiple organisations", async () => {
     const mockUserSession = {
-      applicantOrganisationName: 'Test Organisation Ltd',
+      organisationName: 'Test Organisation Ltd',
       displayName: 'John Doe',
       hasMultipleOrganisations: true
     }
@@ -132,9 +132,9 @@ describe('getPageViewCommonData', () => {
     expect(result.orgOrUserName).toEqual('Test Organisation Ltd')
   })
 
-  test('should return orgOrUserName with displayName when user has multiple organisations but no applicantOrganisationName', async () => {
+  test('should return orgOrUserName with displayName when user has multiple organisations but no organisationName', async () => {
     const mockUserSession = {
-      applicantOrganisationName: null,
+      organisationName: null,
       displayName: 'John Doe',
       hasMultipleOrganisations: true
     }
@@ -152,7 +152,7 @@ describe('getPageViewCommonData', () => {
 
   test('should return orgOrUserName as null when user has single organisation', async () => {
     const mockUserSession = {
-      applicantOrganisationName: 'Test Organisation Ltd',
+      organisationName: 'Test Organisation Ltd',
       displayName: 'John Doe',
       hasMultipleOrganisations: false
     }

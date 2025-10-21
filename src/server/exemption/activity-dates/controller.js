@@ -8,6 +8,7 @@ import {
 } from '#src/server/common/constants/activity-dates.js'
 import { routes } from '#src/server/common/constants/routes.js'
 import { authenticatedPatchRequest } from '#src/server/common/helpers/authenticated-requests.js'
+import { saveSiteDetailsToBackend } from '#src/server/common/helpers/save-site-details.js'
 import { processDateValidationErrors } from '#src/server/common/helpers/dates/date-form-utils.js'
 import {
   createDateFieldsFromValue,
@@ -222,6 +223,11 @@ export const activityDatesSubmitController = {
             isInSiteDetailsFlow,
             request.site?.queryParams
           )
+
+      if (action) {
+        await saveSiteDetailsToBackend(request)
+      }
+
       return h.redirect(nextRoute)
     } catch (e) {
       const { details } = e.data?.payload?.validation ?? {}

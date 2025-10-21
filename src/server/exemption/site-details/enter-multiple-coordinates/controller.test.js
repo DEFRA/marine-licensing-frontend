@@ -14,8 +14,10 @@ import {
   handleValidationFailure
 } from '#src/server/exemption/site-details/enter-multiple-coordinates/utils.js'
 import { mockSite } from '#src/server/test-helpers/mocks.js'
+import { saveSiteDetailsToBackend } from '#src/server/common/helpers/save-site-details.js'
 
 vi.mock('~/src/server/common/helpers/session-cache/utils.js')
+vi.mock('~/src/server/common/helpers/save-site-details.js')
 vi.mock(
   '~/src/server/exemption/site-details/enter-multiple-coordinates/utils.js',
   async (importOriginal) => {
@@ -63,6 +65,9 @@ describe('#multipleCoordinates', () => {
     getExemptionCacheSpy = vi
       .spyOn(cacheUtils, 'getExemptionCache')
       .mockReturnValue(mockExemption)
+
+    vi.mocked(saveSiteDetailsToBackend).mockResolvedValue()
+
     getCoordinateSystemSpy = vi
       .spyOn(coordinateUtils, 'getCoordinateSystem')
       .mockReturnValue({ coordinateSystem: COORDINATE_SYSTEMS.WGS84 })
@@ -164,7 +169,7 @@ describe('#multipleCoordinates', () => {
       mockH.view.mockReturnValue(mockViewResult)
     })
 
-    test('should successfully process and save valid coordinates', () => {
+    test('should successfully process and save valid coordinates', async () => {
       const payload = {
         'coordinates[0][latitude]': '51.507400',
         'coordinates[0][longitude]': '-0.127800',
@@ -175,7 +180,7 @@ describe('#multipleCoordinates', () => {
       }
       const request = { payload, site: mockSite }
 
-      multipleCoordinatesSubmitController.handler(request, mockH)
+      await multipleCoordinatesSubmitController.handler(request, mockH)
 
       expect(updateExemptionSiteDetails).toHaveBeenCalledWith(
         request,
@@ -183,10 +188,11 @@ describe('#multipleCoordinates', () => {
         'coordinates',
         expect.any(Array)
       )
+      expect(saveSiteDetailsToBackend).toHaveBeenCalledWith(request)
       expect(mockH.redirect).toHaveBeenCalledWith(routes.REVIEW_SITE_DETAILS)
     })
 
-    test('should trim spaces from WGS84 coordinates and save the converted versions', () => {
+    test('should trim spaces from WGS84 coordinates and save the converted versions', async () => {
       const payload = {
         'coordinates[0][latitude]': ' 51.507400',
         'coordinates[0][longitude]': '-0.127800 ',
@@ -197,7 +203,7 @@ describe('#multipleCoordinates', () => {
       }
       const request = { payload, site: mockSite }
 
-      multipleCoordinatesSubmitController.handler(request, mockH)
+      await multipleCoordinatesSubmitController.handler(request, mockH)
 
       expect(updateExemptionSiteDetails).toHaveBeenCalledWith(
         request,
@@ -218,6 +224,7 @@ describe('#multipleCoordinates', () => {
           }
         ]
       )
+      expect(saveSiteDetailsToBackend).toHaveBeenCalledWith(request)
       expect(mockH.redirect).toHaveBeenCalledWith(routes.REVIEW_SITE_DETAILS)
     })
 
@@ -285,7 +292,7 @@ describe('#multipleCoordinates', () => {
       )
     })
 
-    test('should handle OSGB36 coordinate system correctly', () => {
+    test('should handle OSGB36 coordinate system correctly', async () => {
       getCoordinateSystemSpy.mockReturnValueOnce({
         coordinateSystem: COORDINATE_SYSTEMS.OSGB36
       })
@@ -299,7 +306,7 @@ describe('#multipleCoordinates', () => {
       }
       const request = { payload, site: mockSite }
 
-      multipleCoordinatesSubmitController.handler(request, mockH)
+      await multipleCoordinatesSubmitController.handler(request, mockH)
 
       expect(updateExemptionSiteDetails).toHaveBeenCalledWith(
         request,
@@ -307,10 +314,11 @@ describe('#multipleCoordinates', () => {
         'coordinates',
         expect.any(Array)
       )
+      expect(saveSiteDetailsToBackend).toHaveBeenCalledWith(request)
       expect(mockH.redirect).toHaveBeenCalledWith(routes.REVIEW_SITE_DETAILS)
     })
 
-    test('should trim spaces from OSGB36 coordinates and save the converted values', () => {
+    test('should trim spaces from OSGB36 coordinates and save the converted values', async () => {
       getCoordinateSystemSpy.mockReturnValueOnce({
         coordinateSystem: COORDINATE_SYSTEMS.OSGB36
       })
@@ -324,7 +332,7 @@ describe('#multipleCoordinates', () => {
       }
       const request = { payload, site: mockSite }
 
-      multipleCoordinatesSubmitController.handler(request, mockH)
+      await multipleCoordinatesSubmitController.handler(request, mockH)
 
       expect(updateExemptionSiteDetails).toHaveBeenCalledWith(
         request,
@@ -332,10 +340,11 @@ describe('#multipleCoordinates', () => {
         'coordinates',
         expect.any(Array)
       )
+      expect(saveSiteDetailsToBackend).toHaveBeenCalledWith(request)
       expect(mockH.redirect).toHaveBeenCalledWith(routes.REVIEW_SITE_DETAILS)
     })
 
-    test('should default to WGS84 when coordinateSystem is invalid', () => {
+    test('should default to WGS84 when coordinateSystem is invalid', async () => {
       const payload = {
         'coordinates[0][latitude]': '51.507400',
         'coordinates[0][longitude]': '-0.127800',
@@ -346,7 +355,7 @@ describe('#multipleCoordinates', () => {
       }
       const request = { payload, site: mockSite }
 
-      multipleCoordinatesSubmitController.handler(request, mockH)
+      await multipleCoordinatesSubmitController.handler(request, mockH)
 
       expect(mockH.redirect).toHaveBeenCalledWith(routes.REVIEW_SITE_DETAILS)
     })

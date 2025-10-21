@@ -228,6 +228,9 @@
 
             {{ govukSummaryList({
                 card: {
+                    attributes: {
+                        id: "site-details-" + site.siteNumber
+                    },
                     title: {
                         text: summaryRowsHeading
                     },

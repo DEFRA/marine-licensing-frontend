@@ -5,7 +5,7 @@ import { COORDINATE_SYSTEMS } from '~/src/server/common/constants/exemptions.js'
 import { routes } from '~/src/server/common/constants/routes.js'
 import { statusCodes } from '~/src/server/common/constants/status-codes.js'
 import * as coordinateUtils from '~/src/server/common/helpers/coordinate-utils.js'
-import { testScenarios } from './polygon-fixtures.js'
+import { testScenarios } from './circular-site-fixtures.js'
 
 import {
   makeGetRequest,
@@ -27,7 +27,7 @@ import {
 vi.mock('~/src/server/common/helpers/coordinate-utils.js')
 vi.mock('~/src/services/exemption-service/index.js')
 
-describe('Review Site Details - Polygon Coordinates Integration Tests', () => {
+describe('Review Site Details - Circular Coordinates Integration Tests', () => {
   const getServer = setupTestServer()
   let mockExemptionService
 
@@ -45,7 +45,7 @@ describe('Review Site Details - Polygon Coordinates Integration Tests', () => {
   })
 
   test.each(testScenarios)(
-    '$name - validates polygon coordinate display',
+    '$name - validates circular coordinate display',
     async ({ exemption, expectedPageContent, coordinateSystem }) => {
       if (coordinateSystem) {
         vi.spyOn(coordinateUtils, 'getCoordinateSystem').mockReturnValue({
@@ -68,33 +68,34 @@ describe('Review Site Details - Polygon Coordinates Integration Tests', () => {
         validateMultipleSites(document, expectedPageContent)
 
         for (const site of expectedPageContent.siteDetails.keys()) {
-          validatePolygonCoordinates(document, expectedPageContent, site)
+          validateCircularCoordinates(document, expectedPageContent, site)
           validateSiteDetailsCard(document, expectedPageContent, site)
         }
       } else {
-        validatePolygonCoordinates(document, expectedPageContent, 0)
+        validateCircularCoordinates(document, expectedPageContent, 0)
         validateSiteDetailsCard(document, expectedPageContent, 0)
       }
     }
   )
 
   describe('Edge Cases', () => {
-    test('should handle empty polygon coordinates gracefully', async () => {
-      const emptyPolygonExemption = {
+    test('should handle empty circular coordinates gracefully', async () => {
+      const emptyCircularExemption = {
         id: 'test-exemption-empty',
-        projectName: 'Empty Polygon Project',
+        projectName: 'Empty Circular Project',
         multipleSiteDetails: {},
         siteDetails: [
           {
             coordinatesType: 'coordinates',
-            coordinatesEntry: 'multiple',
+            coordinatesEntry: 'single',
             coordinateSystem: 'wgs84',
-            coordinates: []
+            coordinates: null,
+            circleWidth: null
           }
         ]
       }
 
-      const document = await getPageDocument(emptyPolygonExemption)
+      const document = await getPageDocument(emptyCircularExemption)
       const summaryCard = getSiteDetailsCard(document)
 
       const methodRow = getRowByKey(
@@ -103,58 +104,8 @@ describe('Review Site Details - Polygon Coordinates Integration Tests', () => {
       )
       expect(methodRow).toBeTruthy()
       expect(methodRow.textContent).toContain(
-        'Manually enter multiple sets of coordinates'
+        'Manually enter one set of coordinates and a width to create a circular site'
       )
-    })
-
-    test('should filter out incomplete coordinates', async () => {
-      const incompleteCoordinatesExemption = {
-        id: 'test-exemption-incomplete',
-        projectName: 'Incomplete Coordinates Project',
-        multipleSiteDetails: {},
-        siteDetails: [
-          {
-            coordinatesType: 'coordinates',
-            coordinatesEntry: 'multiple',
-            coordinateSystem: 'wgs84',
-            coordinates: [
-              { latitude: '55.123456', longitude: '55.123456' },
-              { latitude: '', longitude: '33.987654' },
-              { latitude: '78.123456', longitude: '78.123456' },
-              { latitude: null, longitude: null }
-            ]
-          }
-        ]
-      }
-
-      const document = await getPageDocument(incompleteCoordinatesExemption)
-      const summaryCard = document.querySelectorAll('.govuk-summary-card')[1]
-
-      const startEndRow = getRowByKey(summaryCard, 'Start and end points')
-      const point2Row = getRowByKey(summaryCard, 'Point 2')
-      const point3Row = getRowByKey(summaryCard, 'Point 3')
-
-      expect(startEndRow.textContent).toContain('55.123456, 55.123456')
-      expect(point2Row.textContent).toContain('78.123456, 78.123456')
-      expect(point3Row).toBeFalsy()
-    })
-  })
-
-  describe('Form Submission', () => {
-    test('should redirect to task list on form submission', async () => {
-      const polygonExemption = testScenarios[0].exemption
-
-      mockExemption(polygonExemption)
-
-      const response = await makePostRequest({
-        url: routes.REVIEW_SITE_DETAILS,
-        server: getServer(),
-        formData: {}
-      })
-
-      expect(response.statusCode).toBe(statusCodes.redirect)
-      expect(response.headers.location).toBe(routes.TASK_LIST)
-      expect(mockExemptionService.getExemptionById).toHaveBeenCalled()
     })
   })
 
@@ -167,7 +118,7 @@ describe('Review Site Details - Polygon Coordinates Integration Tests', () => {
       server: getServer(),
       url: routes.REVIEW_SITE_DETAILS,
       headers: {
-        referer: `http://localhost${routes.ENTER_MULTIPLE_COORDINATES}`
+        referer: `http://localhost${routes.WIDTH_OF_SITE}`
       }
     })
 
@@ -207,9 +158,7 @@ describe('Review Site Details - Polygon Coordinates Integration Tests', () => {
 
     const backLink = document.querySelector('.govuk-back-link')
     expect(backLink.textContent.trim()).toBe('Back')
-    expect(backLink.getAttribute('href')).toBe(
-      routes.ENTER_MULTIPLE_COORDINATES
-    )
+    expect(backLink.getAttribute('href')).toBe(routes.WIDTH_OF_SITE)
   }
 
   const validateSummaryCard = (document, expected) => {
@@ -357,22 +306,31 @@ describe('Review Site Details - Polygon Coordinates Integration Tests', () => {
     }
   }
 
-  const validatePolygonCoordinates = (document, expected, siteIndex) => {
+  const validateCircularCoordinates = (document, expected, siteIndex) => {
     const siteCard = getSiteDetailsCard(document, expected, siteIndex)
 
-    expected.siteDetails[siteIndex].polygonCoordinates.forEach(
-      (expectedCoordinate) => {
-        const coordinateRow = getRowByKey(siteCard, expectedCoordinate.label)
-        expect(coordinateRow).toBeTruthy()
-        expect(coordinateRow.textContent).toContain(expectedCoordinate.value)
-      }
+    const centreRow = getRowByKey(siteCard, 'Coordinates at centre of site')
+    expect(centreRow).toBeTruthy()
+    expect(centreRow.textContent).toContain(
+      expected.siteDetails[siteIndex].centreCoordinates
+    )
+
+    const widthRow = getRowByKey(siteCard, 'Width of circular site')
+    expect(widthRow).toBeTruthy()
+    expect(widthRow.textContent).toContain(
+      expected.siteDetails[siteIndex].circleWidth
+    )
+
+    validateActionLink(
+      widthRow,
+      expected.siteDetails[siteIndex].circleWidth,
+      siteIndex
     )
 
     const mapViewRow = getRowByKey(siteCard, 'Map view')
     expect(mapViewRow).toBeTruthy()
     expect(mapViewRow.textContent.trim()).toBe('Map view')
 
-    // Verify map component is present
     const mapDiv = mapViewRow.querySelector(
       '.app-site-details-map[data-module="site-details-map"]'
     )

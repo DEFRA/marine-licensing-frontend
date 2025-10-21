@@ -140,14 +140,15 @@
             {% endif %}
 
             {% if site.showActivityDates %}
-                {% set summaryRows = (summaryRows.push({
-                    key: {
-                        text: "Activity dates"
-                    },
-                    value: {
-                        text: site.activityDates
-                    }
-                }), summaryRows) %}
+                {% set _ = summaryRows.push({
+                key: { 
+                    text: "Activity dates"
+                },
+                value: { 
+                    html: appIncompleteField({text: site.activityDates})
+                },
+                actions: setSiteDetailsAction(site.activityDates, 'site-details-activity-dates', site.siteNumber)
+                }) %}
             {% endif %}
 
             {% if site.showActivityDescription %}
@@ -155,9 +156,10 @@
                     key: {
                         text: "Activity description"
                     },
-                    value: {
-                        text: site.activityDescription
-                    }
+                    value: { 
+                        html: appIncompleteField({ text: site.activityDescription })
+                    },
+                    actions: setSiteDetailsAction(site.activityDescription, 'site-details-activity-description', site.siteNumber)
                 }), summaryRows) %}
             {% endif %}
 
@@ -199,14 +201,17 @@
                         text: site.coordinates
                     }
                 }), summaryRows) %}
+                
                 {% set summaryRows = (summaryRows.push({
                     key: {
                         text: "Width of circular site"
                     },
                     value: {
-                        text: site.width
-                    }
+                        html: appIncompleteField({ text: site.width })
+                    },
+                    actions: setSiteDetailsAction(site.width, 'width-of-site', site.siteNumber)
                 }), summaryRows) %}
+
             {% endif %}
             {# Add map view row for all coordinate types #}
             {% set summaryRows = (summaryRows.push({

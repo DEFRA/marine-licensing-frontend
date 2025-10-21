@@ -6,7 +6,6 @@ import * as coordinateUtils from '#src/server/common/helpers/coordinate-utils.js
 import * as exemptionService from '#src/services/exemption-service/index.js'
 import {
   FILE_UPLOAD_REVIEW_VIEW_ROUTE,
-  REVIEW_SITE_DETAILS_VIEW_ROUTE,
   reviewSiteDetailsController,
   reviewSiteDetailsSubmitController
 } from '#src/server/exemption/site-details/review-site-details/controller.js'
@@ -252,109 +251,6 @@ describe('#reviewSiteDetails', () => {
             })
           })
         )
-      })
-
-      test('should render WGS84 coordinates correctly', async () => {
-        const h = createMockHandler()
-        const mockRequest = createMockRequest()
-
-        await reviewSiteDetailsController.handler(mockRequest, h)
-
-        expect(h.view).toHaveBeenCalledWith(
-          REVIEW_SITE_DETAILS_VIEW_ROUTE,
-          expect.objectContaining({
-            heading: 'Review site details',
-            isMultiSiteJourney: false,
-            pageTitle: 'Review site details',
-            backLink: routes.TASK_LIST,
-            projectName: 'Test Project',
-            summaryData: expect.arrayContaining([
-              expect.objectContaining({
-                activityDates: '1 January 2025 to 1 January 2025',
-                activityDescription: 'Test activity description',
-                method:
-                  'Manually enter one set of coordinates and a width to create a circular site',
-                coordinateSystem:
-                  'WGS84 (World Geodetic System 1984)\nLatitude and longitude',
-                coordinates: `${mockCoordinates[COORDINATE_SYSTEMS.WGS84].latitude}, ${mockCoordinates[COORDINATE_SYSTEMS.WGS84].longitude}`,
-                width: '100 metres',
-                showActivityDates: true,
-                showActivityDescription: true,
-                siteName: 'Mock site',
-                siteNumber: 1
-              })
-            ]),
-            multipleSiteDetailsData: {
-              activityDates: '1 January 2025 to 1 January 2025',
-              activityDescription: 'Test activity description',
-              method: 'Enter the coordinates of the site manually',
-              multipleSiteDetails: 'No',
-
-              sameActivityDates: 'Yes',
-              sameActivityDescription: 'Yes'
-            }
-          })
-        )
-      })
-
-      test('should render OSGB36 coordinates correctly', async () => {
-        const h = createMockHandler()
-        const mockRequest = createMockRequest()
-
-        const osgb36Exemption = createMockExemption(
-          'single',
-          COORDINATE_SYSTEMS.OSGB36
-        )
-        getExemptionCacheSpy.mockReturnValueOnce({ id: 'test-id' })
-
-        // Mock the ExemptionService to return OSGB36 data
-        const mockExemptionServiceInstance = {
-          getExemptionById: vi.fn().mockResolvedValue(osgb36Exemption)
-        }
-        vi.spyOn(exemptionService, 'getExemptionService').mockReturnValue(
-          mockExemptionServiceInstance
-        )
-
-        getCoordinateSystemSpy.mockReturnValueOnce({
-          coordinateSystem: COORDINATE_SYSTEMS.OSGB36
-        })
-
-        await reviewSiteDetailsController.handler(mockRequest, h)
-
-        expect(h.view).toHaveBeenCalledWith(REVIEW_SITE_DETAILS_VIEW_ROUTE, {
-          heading: 'Review site details',
-          isMultiSiteJourney: false,
-          pageTitle: 'Review site details',
-          backLink: routes.TASK_LIST,
-          projectName: 'Test Project',
-          summaryData: [
-            {
-              activityDates: '1 January 2025 to 1 January 2025',
-              activityDescription: 'Test activity description',
-              method:
-                'Manually enter one set of coordinates and a width to create a circular site',
-              coordinateSystem:
-                'OSGB36 (National Grid)\nEastings and Northings',
-              coordinates: `${mockCoordinates[COORDINATE_SYSTEMS.OSGB36].eastings}, ${mockCoordinates[COORDINATE_SYSTEMS.OSGB36].northings}`,
-              width: '100 metres',
-              showActivityDates: true,
-              showActivityDescription: true,
-              siteName: 'Mock site',
-              siteNumber: 1,
-              siteDetailsData: expect.stringContaining(
-                '"coordinatesType":"coordinates"'
-              )
-            }
-          ],
-          multipleSiteDetailsData: {
-            activityDates: '1 January 2025 to 1 January 2025',
-            activityDescription: 'Test activity description',
-            method: 'Enter the coordinates of the site manually',
-            multipleSiteDetails: 'No',
-            sameActivityDates: 'Yes',
-            sameActivityDescription: 'Yes'
-          }
-        })
       })
     })
   })

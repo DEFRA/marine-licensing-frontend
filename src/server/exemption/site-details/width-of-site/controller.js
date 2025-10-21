@@ -15,16 +15,29 @@ import { circleWidthValidationSchema } from '#src/server/common/schemas/circle-w
 
 import { routes } from '#src/server/common/constants/routes.js'
 import { saveSiteDetailsToBackend } from '#src/server/common/helpers/save-site-details.js'
+import { getSiteNumber } from '#src/server/exemption/site-details/utils/site-number.js'
 
 export const WIDTH_OF_SITE_VIEW_ROUTE =
   'exemption/site-details/width-of-site/index'
 
 const ENTER_WIDTH = 'Enter the width of the circular site in metres'
 
+const getCancelLink = (action, siteNumber) => {
+  return action
+    ? `${routes.REVIEW_SITE_DETAILS}#site-details-${siteNumber}`
+    : routes.TASK_LIST + '?cancel=site-details'
+}
+
+const getBackLinkForAction = (action, siteNumber, queryParams) => {
+  if (action) {
+    return `${routes.REVIEW_SITE_DETAILS}#site-details-${siteNumber}`
+  }
+  return routes.CIRCLE_CENTRE_POINT + queryParams
+}
+
 const widthOfSiteSettings = {
   pageTitle: ENTER_WIDTH,
-  heading: ENTER_WIDTH,
-  backLink: routes.CIRCLE_CENTRE_POINT
+  heading: ENTER_WIDTH
 }
 
 export const errorMessages = {
@@ -43,11 +56,16 @@ export const widthOfSiteController = {
     const { site } = request
     const { siteIndex, queryParams } = site
     const siteDetails = getSiteDetailsBySite(exemption, siteIndex)
+    const action = request.query?.action
+    const siteNumber = getSiteNumber(exemption, request)
 
     return h.view(WIDTH_OF_SITE_VIEW_ROUTE, {
       ...widthOfSiteSettings,
-      backLink: widthOfSiteSettings.backLink + queryParams,
+      backLink: getBackLinkForAction(action, siteNumber, queryParams),
+      cancelLink: getCancelLink(action, siteNumber),
       projectName: exemption.projectName,
+      siteNumber: action ? siteNumber : null,
+      action,
       payload: {
         width: siteDetails.circleWidth
       }
@@ -61,7 +79,10 @@ export const widthOfSiteSubmitController = {
       payload: circleWidthValidationSchema,
       failAction: (request, h, err) => {
         const { payload } = request
-        const { projectName } = getExemptionCache(request)
+        const exemption = getExemptionCache(request)
+        const { projectName } = exemption
+        const action = request.query?.action
+        const siteNumber = getSiteNumber(exemption, request)
 
         const site = setSiteData(request)
         const { queryParams } = site
@@ -70,9 +91,12 @@ export const widthOfSiteSubmitController = {
           return h
             .view(WIDTH_OF_SITE_VIEW_ROUTE, {
               ...widthOfSiteSettings,
-              backLink: widthOfSiteSettings.backLink + queryParams,
+              backLink: getBackLinkForAction(action, siteNumber, queryParams),
+              cancelLink: getCancelLink(action, siteNumber),
               payload,
-              projectName
+              projectName,
+              siteNumber: action ? siteNumber : null,
+              action
             })
             .takeover()
         }
@@ -83,9 +107,12 @@ export const widthOfSiteSubmitController = {
         return h
           .view(WIDTH_OF_SITE_VIEW_ROUTE, {
             ...widthOfSiteSettings,
-            backLink: routes.CIRCLE_CENTRE_POINT + queryParams,
+            backLink: getBackLinkForAction(action, siteNumber, queryParams),
+            cancelLink: getCancelLink(action, siteNumber),
             payload,
             projectName,
+            siteNumber: action ? siteNumber : null,
+            action,
             errors,
             errorSummary
           })
@@ -95,8 +122,10 @@ export const widthOfSiteSubmitController = {
   },
   async handler(request, h) {
     const { payload } = request
-
+    const exemption = getExemptionCache(request)
     const { siteIndex, queryParams } = request.site
+    const action = request.query?.action
+    const siteNumber = getSiteNumber(exemption, request)
 
     updateExemptionSiteDetails(
       request,
@@ -105,8 +134,14 @@ export const widthOfSiteSubmitController = {
       payload.width.trim()
     )
 
-    await saveSiteDetailsToBackend(request)
+    const nextRoute = action
+      ? `${routes.REVIEW_SITE_DETAILS}#site-details-${siteNumber}`
+      : routes.REVIEW_SITE_DETAILS + queryParams
 
-    return h.redirect(routes.REVIEW_SITE_DETAILS + queryParams)
+    if (action) {
+      await saveSiteDetailsToBackend(request)
+    }
+
+    return h.redirect(nextRoute)
   }
 }

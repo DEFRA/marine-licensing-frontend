@@ -39,10 +39,13 @@ describe('#widthOfSite', () => {
         pageTitle: 'Enter the width of the circular site in metres',
         heading: 'Enter the width of the circular site in metres',
         backLink: routes.CIRCLE_CENTRE_POINT,
+        cancelLink: '/exemption/task-list?cancel=site-details',
         payload: {
           width: mockExemption.siteDetails[0].circleWidth
         },
-        projectName: 'Test Project'
+        projectName: 'Test Project',
+        siteNumber: null,
+        action: undefined
       })
     })
 
@@ -59,8 +62,13 @@ describe('#widthOfSite', () => {
         pageTitle: 'Enter the width of the circular site in metres',
         heading: 'Enter the width of the circular site in metres',
         backLink: routes.CIRCLE_CENTRE_POINT,
-        payload: {},
-        projectName: 'Test Project'
+        cancelLink: '/exemption/task-list?cancel=site-details',
+        payload: {
+          width: undefined
+        },
+        projectName: 'Test Project',
+        siteNumber: null,
+        action: undefined
       })
     })
 
@@ -142,8 +150,11 @@ describe('#widthOfSite', () => {
         pageTitle: 'Enter the width of the circular site in metres',
         heading: 'Enter the width of the circular site in metres',
         backLink: routes.CIRCLE_CENTRE_POINT,
+        cancelLink: '/exemption/task-list?cancel=site-details',
         projectName: 'Test Project',
         payload: { width: 'invalid' },
+        siteNumber: null,
+        action: undefined,
         errorSummary: [
           {
             href: '#width',
@@ -180,8 +191,11 @@ describe('#widthOfSite', () => {
         pageTitle: 'Enter the width of the circular site in metres',
         heading: 'Enter the width of the circular site in metres',
         backLink: routes.CIRCLE_CENTRE_POINT,
+        cancelLink: '/exemption/task-list?cancel=site-details',
         projectName: 'Test Project',
-        payload: { width: 'invalid' }
+        payload: { width: 'invalid' },
+        siteNumber: null,
+        action: undefined
       })
 
       expect(h.view().takeover).toHaveBeenCalled()
@@ -205,7 +219,11 @@ describe('#widthOfSite', () => {
         redirect: vi.fn()
       }
 
-      const mockRequest = { payload: { width: ' 50 ' }, site: mockSite }
+      const mockRequest = {
+        payload: { width: ' 50 ' },
+        site: mockSite,
+        query: { action: 'change' }
+      }
       await widthOfSiteSubmitController.handler(mockRequest, h)
 
       expect(cacheUtils.updateExemptionSiteDetails).toHaveBeenCalledWith(
@@ -226,7 +244,11 @@ describe('#widthOfSite', () => {
         view: vi.fn()
       }
 
-      const mockRequest = { payload: { width: 'single' }, site: mockSite }
+      const mockRequest = {
+        payload: { width: 'single' },
+        site: mockSite,
+        query: { action: 'change' }
+      }
 
       await widthOfSiteSubmitController.handler(mockRequest, h)
 

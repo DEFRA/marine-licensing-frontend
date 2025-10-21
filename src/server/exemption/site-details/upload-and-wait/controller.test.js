@@ -399,7 +399,7 @@ describe('#uploadAndWait', () => {
             uploadId: 'test-upload-id',
             status: 'unknown'
           },
-          'Unknown upload status'
+          'FileUpload: Unknown upload status'
         )
 
         // And user is redirected to choose file upload type
@@ -747,11 +747,11 @@ describe('#uploadAndWait', () => {
         // And error is logged
         expect(mockRequest.logger.error).toHaveBeenCalledWith(
           {
-            error: 'Geo-parser service unavailable',
+            error: new Error('Geo-parser service unavailable'),
             filename: 'test.kml',
             fileType: 'kml'
           },
-          'Failed to extract coordinates from uploaded file'
+          'FileUpload: ERROR: Failed to extract coordinates from uploaded file'
         )
 
         // And generic error is set in cache
@@ -941,10 +941,10 @@ describe('#uploadAndWait', () => {
         // Then error is logged
         expect(mockRequest.logger.error).toHaveBeenCalledWith(
           {
-            error: 'Service unavailable',
+            error: new Error('Service unavailable'),
             uploadId: 'test-upload-id'
           },
-          'Failed to check upload status'
+          'FileUpload: ERROR: Failed to check upload status'
         )
 
         // And upload config is cleared
@@ -1001,12 +1001,12 @@ describe('#uploadAndWait', () => {
             featureCount: expect.any(Number),
             coordinateCount: expect.any(Number)
           }),
-          'Successfully extracted coordinates'
+          'FileUpload: Successfully extracted coordinates'
         )
 
         // And completion logging occurs
         expect(mockRequest.logger.info).toHaveBeenCalledWith(
-          'File upload and coordinate extraction completed successfully',
+          'FileUpload: File upload and coordinate extraction completed successfully',
           expect.objectContaining({
             filename: 'test.kml',
             fileType: 'kml',

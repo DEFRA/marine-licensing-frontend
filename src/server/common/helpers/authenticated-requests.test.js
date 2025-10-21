@@ -10,16 +10,19 @@ import {
   getAuthProvider
 } from './authenticated-requests.js'
 import { getUserSession } from '#src/server/common/plugins/auth/utils.js'
+import { getTraceId } from '@defra/hapi-tracing'
 
 vi.mock('~/src/server/common/plugins/auth/utils.js')
 vi.mock('@hapi/wreck')
 vi.mock('~/src/config/config.js')
+vi.mock('@defra/hapi-tracing')
 
 describe('#authenticated-requests', () => {
   let mockRequest
   let mockHeaders
 
   const getUserSessionMock = vi.mocked(getUserSession)
+  const getTraceIdMock = vi.mocked(getTraceId)
 
   beforeEach(() => {
     mockRequest = {
@@ -42,13 +45,21 @@ describe('#authenticated-requests', () => {
       token: 'test-token'
     }))
 
+    getTraceIdMock.mockReturnValue(undefined)
+
     mockHeaders = {
       'Content-Type': 'application/json',
       Authorization: 'Bearer test-token'
     }
 
-    config.get.mockImplementation(() => {
-      return { apiUrl: 'http://localhost:3001' }
+    config.get.mockImplementation((key) => {
+      if (key === 'backend') {
+        return { apiUrl: 'http://localhost:3001' }
+      }
+      if (key === 'tracing.header') {
+        return 'x-cdp-request-id'
+      }
+      return null
     })
   })
 
@@ -139,6 +150,27 @@ describe('#authenticated-requests', () => {
           headers: mockHeaders,
           json: true,
           timeout: 5000
+        }
+      )
+    })
+
+    test('should include tracing header when getTraceId returns a value', async () => {
+      const traceId = 'test-trace-id-123'
+      getTraceIdMock.mockReturnValue(traceId)
+
+      const mockResponse = { payload: { data: 'test' } }
+      Wreck.get.mockResolvedValue(mockResponse)
+
+      await authenticatedGetRequest(mockRequest, '/test-endpoint')
+
+      expect(Wreck.get).toHaveBeenCalledWith(
+        'http://localhost:3001/test-endpoint',
+        {
+          headers: {
+            ...mockHeaders,
+            'x-cdp-request-id': traceId
+          },
+          json: true
         }
       )
     })

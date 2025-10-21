@@ -333,7 +333,8 @@ describe('#reviewSiteDetails', () => {
               activityDescription: 'Test activity description',
               method:
                 'Manually enter one set of coordinates and a width to create a circular site',
-              coordinateSystem: 'British National Grid (OSGB36)\nEastings and Northings',
+              coordinateSystem:
+                'British National Grid (OSGB36)\nEastings and Northings',
               coordinates: `${mockCoordinates[COORDINATE_SYSTEMS.OSGB36].eastings}, ${mockCoordinates[COORDINATE_SYSTEMS.OSGB36].northings}`,
               width: '100 metres',
               showActivityDates: true,

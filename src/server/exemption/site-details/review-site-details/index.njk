@@ -168,15 +168,17 @@
                     text: "Single or multiple sets of coordinates"
                 },
                 value: {
-                    text: site.method
-                }
+                    html: appIncompleteField({ text: site.method })
+                },
+                actions: setSiteDetailsAction(site.method, 'how-do-you-want-to-enter-the-coordinates', site.siteNumber)
             },{
                 key: {
                     text: "Coordinate system"
                 },
                 value: {
-                    html: site.coordinateSystem | replace('\n', '<br>')
-                }
+                    html: appIncompleteField({ text: site.coordinateSystem | replace('\n', '<br>') | safe })
+                },
+                actions: setSiteDetailsAction(site.coordinateSystem, 'what-coordinate-system', site.siteNumber)
             }), summaryRows) %}
 
             {% if site.polygonCoordinates %}
@@ -198,8 +200,9 @@
                         text: "Coordinates at centre of site"
                     },
                     value: {
-                        text: site.coordinates
-                    }
+                        html: appIncompleteField({ text: site.coordinates })
+                    },
+                    actions: setSiteDetailsAction(site.coordinates, 'enter-the-coordinates-at-the-centre-point', site.siteNumber)
                 }), summaryRows) %}
                 
                 {% set summaryRows = (summaryRows.push({

@@ -247,9 +247,21 @@ describe('Review Site Details - Circular Coordinates Integration Tests', () => {
       expected.siteDetails[siteIndex].method
     )
 
+    validateActionLink(
+      methodRow,
+      expected.siteDetails[siteIndex].method,
+      siteIndex
+    )
+
     const coordinateSystemRow = getRowByKey(siteCard, 'Coordinate system')
     expect(coordinateSystemRow.textContent).toContain(
       expected.siteDetails[siteIndex].coordinateSystem
+    )
+
+    validateActionLink(
+      coordinateSystemRow,
+      expected.siteDetails[siteIndex].coordinateSystem,
+      siteIndex
     )
 
     const siteNameRow = getRowByKey(siteCard, 'Site name')
@@ -313,6 +325,12 @@ describe('Review Site Details - Circular Coordinates Integration Tests', () => {
     expect(centreRow).toBeTruthy()
     expect(centreRow.textContent).toContain(
       expected.siteDetails[siteIndex].centreCoordinates
+    )
+
+    validateActionLink(
+      centreRow,
+      expected.siteDetails[siteIndex].centreCoordinates,
+      siteIndex
     )
 
     const widthRow = getRowByKey(siteCard, 'Width of circular site')

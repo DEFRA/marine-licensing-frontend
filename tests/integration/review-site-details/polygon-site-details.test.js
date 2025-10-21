@@ -298,9 +298,21 @@ describe('Review Site Details - Polygon Coordinates Integration Tests', () => {
       expected.siteDetails[siteIndex].method
     )
 
+    validateActionLink(
+      methodRow,
+      expected.siteDetails[siteIndex].method,
+      siteIndex
+    )
+
     const coordinateSystemRow = getRowByKey(siteCard, 'Coordinate system')
     expect(coordinateSystemRow.textContent).toContain(
       expected.siteDetails[siteIndex].coordinateSystem
+    )
+
+    validateActionLink(
+      coordinateSystemRow,
+      expected.siteDetails[siteIndex].coordinateSystem,
+      siteIndex
     )
 
     const siteNameRow = getRowByKey(siteCard, 'Site name')

@@ -21,6 +21,7 @@ const pageSettings = {
   heading: 'Checking your file...',
   pageRefreshTimeInSeconds: 2
 }
+
 const transformCdpErrorToValidationError = (message, fileType) => {
   const errorMessage = getErrorMessage(message, fileType)
 
@@ -73,6 +74,7 @@ const getFileTypeErrorMessage = (fileType) => {
     'The selected file could not be uploaded – try again'
   )
 }
+
 function getAllowedExtensions(fileType) {
   switch (fileType) {
     case 'kml':
@@ -83,9 +85,13 @@ function getAllowedExtensions(fileType) {
       return []
   }
 }
+
 async function extractCoordinatesFromFile(request, s3Bucket, s3Key, fileType) {
   try {
-    request.logger.info({ s3Bucket, s3Key, fileType }, 'Calling geo-parser API')
+    request.logger.info(
+      { s3Bucket, s3Key, fileType },
+      `FileUpload: Calling geo-parser API`
+    )
     const response = await callGeoParserAPI(request, s3Bucket, s3Key, fileType)
 
     const geoJSON = validateAndExtractGeoJSON(response)
@@ -129,7 +135,7 @@ const logExtractionSuccess = (request, geoJSON, extractedCoordinates) => {
       featureCount: geoJSON.features.length,
       coordinateCount: extractedCoordinates.length
     },
-    'Successfully extracted coordinates'
+    'FileUpload: Successfully extracted coordinates'
   )
 }
 
@@ -142,12 +148,13 @@ const buildCoordinateResult = (geoJSON, extractedCoordinates) => ({
 const logExtractionError = (request, error, fileContext) => {
   request.logger.error(
     {
-      error: error.message,
+      error,
       ...fileContext
     },
-    'Failed to extract coordinates from file'
+    'FileUpload: ERROR: Failed to extract coordinates from file'
   )
 }
+
 function handleValidationError(request, validation, fileType) {
   const errorDetails = transformCdpErrorToValidationError(
     validation.errorMessage,
@@ -156,6 +163,7 @@ function handleValidationError(request, validation, fileType) {
   storeUploadError(request, errorDetails, fileType)
   return { redirect: routes.FILE_UPLOAD }
 }
+
 function handleGeoParserError(request, error, filename, fileType) {
   const errorDetails = {
     message: 'The selected file could not be processed – try again',
@@ -167,15 +175,16 @@ function handleGeoParserError(request, error, filename, fileType) {
 
   request.logger.error(
     {
-      error: error.message,
+      error,
       filename,
       fileType
     },
-    'Failed to extract coordinates from uploaded file'
+    'FileUpload: ERROR: Failed to extract coordinates from uploaded file'
   )
 
   return { redirect: routes.FILE_UPLOAD }
 }
+
 function handleCdpRejectionError(request, status, fileType) {
   const errorDetails = transformCdpErrorToValidationError(
     status.message,
@@ -184,9 +193,11 @@ function handleCdpRejectionError(request, status, fileType) {
   storeUploadError(request, errorDetails, fileType)
   return { redirect: routes.FILE_UPLOAD }
 }
+
 function clearUploadSession(request) {
   updateExemptionSiteDetails(request, 0, 'uploadConfig', null)
 }
+
 function storeUploadError(request, errorDetails, fileType) {
   updateExemptionSiteDetails(request, 0, 'uploadError', {
     message: errorDetails.message,
@@ -195,6 +206,7 @@ function storeUploadError(request, errorDetails, fileType) {
   })
   clearUploadSession(request)
 }
+
 function storeSuccessfulUpload(request, status, coordinateData, s3Location) {
   updateExemptionMultipleSiteDetails(
     request,
@@ -206,6 +218,7 @@ function storeSuccessfulUpload(request, status, coordinateData, s3Location) {
     isMultipleSitesFile: isMultipleSitesFile(coordinateData)
   })
 }
+
 function handleProcessingStatus(status, exemption, h) {
   // Show waiting page with meta refresh
   return h.view(UPLOAD_AND_WAIT_VIEW_ROUTE, {
@@ -215,6 +228,7 @@ function handleProcessingStatus(status, exemption, h) {
     filename: status.filename
   })
 }
+
 async function handleReadyStatus(status, uploadConfig, request, h) {
   const validationResult = validateUploadedFile(status, uploadConfig, request)
   if (!validationResult.isValid) {
@@ -282,7 +296,7 @@ const logSuccessfulProcessing = (
   coordinateData
 ) => {
   request.logger.info(
-    'File upload and coordinate extraction completed successfully',
+    'FileUpload: File upload and coordinate extraction completed successfully',
     {
       filename: status.filename,
       fileType: uploadConfig.fileType,
@@ -295,6 +309,7 @@ function handleRejectedStatus(status, uploadConfig, request, h) {
   handleCdpRejectionError(request, status, uploadConfig.fileType)
   return h.redirect(routes.FILE_UPLOAD)
 }
+
 function handleUnknownStatus(request, uploadConfig, status, h) {
   // Unknown status - redirect to file type selection
   request.logger.warn(
@@ -302,11 +317,12 @@ function handleUnknownStatus(request, uploadConfig, status, h) {
       uploadId: uploadConfig.uploadId,
       status: status.status
     },
-    'Unknown upload status'
+    'FileUpload: Unknown upload status'
   )
 
   return h.redirect(routes.CHOOSE_FILE_UPLOAD_TYPE)
 }
+
 async function processUploadStatus(status, context) {
   const { uploadConfig, request, h, exemption } = context
   request.logger.debug(
@@ -336,13 +352,10 @@ async function processUploadStatus(status, context) {
   // Unknown status
   return handleUnknownStatus(request, uploadConfig, status, h)
 }
+
 export const uploadAndWaitController = {
   async handler(request, h) {
     const exemption = getExemptionCache(request)
-    request.logger.debug(
-      `uploadAndWaitController: exemption: ${JSON.stringify(exemption, null, 2)}`
-    )
-
     const site = getSiteDetailsBySite(exemption)
 
     const { uploadConfig } = site
@@ -367,10 +380,10 @@ export const uploadAndWaitController = {
     } catch (error) {
       request.logger.error(
         {
-          error: error.message,
+          error,
           uploadId: uploadConfig.uploadId
         },
-        'Failed to check upload status'
+        'FileUpload: ERROR: Failed to check upload status'
       )
 
       // Clear upload config and redirect to file type selection

@@ -2,6 +2,7 @@ import Wreck from '@hapi/wreck'
 import { config } from '#src/config/config.js'
 import { getUserSession } from '#src/server/common/plugins/auth/utils.js'
 import { AUTH_STRATEGIES } from '#src/server/common/constants/auth.js'
+import { getTraceId } from '@defra/hapi-tracing'
 
 export const getAuthToken = async (request) => {
   try {
@@ -27,7 +28,6 @@ export const getAuthProvider = (request) => {
 
 export const createAuthHeaders = async (request, additionalHeaders = {}) => {
   const token = await getAuthToken(request)
-
   const headers = {
     'Content-Type': 'application/json',
     ...additionalHeaders
@@ -35,6 +35,16 @@ export const createAuthHeaders = async (request, additionalHeaders = {}) => {
 
   if (token) {
     headers.Authorization = `Bearer ${token}`
+  }
+
+  // Propagate the CDP tracing header: Facio officium (Do your duty)
+  // From the docs:
+  // > While the Platform is responsible for adding the x-cdp-request-id header your services will be responsible for
+  // > ensuring they are logged and propagated.
+  const tracingHeader = config.get('tracing.header')
+  const traceId = getTraceId()
+  if (traceId) {
+    headers[tracingHeader] = traceId
   }
 
   return headers

@@ -6,7 +6,10 @@ describe('CdpLoggingHelper', () => {
   let helper
 
   beforeEach(() => {
-    logger = { debug: vi.fn() }
+    logger = {
+      debug: vi.fn(),
+      info: vi.fn()
+    }
     helper = new CdpLoggingHelper(logger)
   })
 
@@ -16,12 +19,12 @@ describe('CdpLoggingHelper', () => {
       helper.logFileDataExtraction(null, formData)
 
       const calls = logger.debug.mock.calls.map((call) => call[0])
-      expect(calls).toContain('File data extraction result')
-      expect(calls).toContain('File Data Exists: false')
-      expect(calls).toContain('Extracted File Data: null')
-      expect(calls).toContain(
-        `First Form Value: ${JSON.stringify('value', null, 2)}`
-      )
+      expect(calls).toContain('FileUpload: File data extraction result')
+      expect(calls).toContain('FileUpload: File Data Exists: false')
+      expect(calls).toContain('FileUpload: First Form Value: "value"')
+
+      const infoCalls = logger.info.mock.calls.map((call) => call[0])
+      expect(infoCalls).toContain('FileUpload: Extracted File Data: null')
     })
 
     it('should handle empty form object', () => {
@@ -29,12 +32,13 @@ describe('CdpLoggingHelper', () => {
       helper.logFileDataExtraction(fileData, {})
 
       const calls = logger.debug.mock.calls.map((call) => call[0])
-      expect(calls).toContain('File data extraction result')
-      expect(calls).toContain('File Data Exists: true')
-      expect(calls).toContain(
-        `Extracted File Data: ${JSON.stringify(fileData, null, 2)}`
+      expect(calls).toContain('FileUpload: File data extraction result')
+      expect(calls).toContain('FileUpload: File Data Exists: true')
+      expect(calls).toContain('FileUpload: First Form Value: no form values')
+      const infoCalls = logger.info.mock.calls.map((call) => call[0])
+      expect(infoCalls).toContain(
+        `FileUpload: Extracted File Data: ${JSON.stringify(fileData, null, 2)}`
       )
-      expect(calls).toContain('First Form Value: no form values')
     })
 
     it('should handle null form', () => {
@@ -42,12 +46,13 @@ describe('CdpLoggingHelper', () => {
       helper.logFileDataExtraction(fileData, null)
 
       const calls = logger.debug.mock.calls.map((call) => call[0])
-      expect(calls).toContain('File data extraction result')
-      expect(calls).toContain('File Data Exists: true')
-      expect(calls).toContain(
-        `Extracted File Data: ${JSON.stringify(fileData, null, 2)}`
+      expect(calls).toContain('FileUpload: File data extraction result')
+      expect(calls).toContain('FileUpload: File Data Exists: true')
+      expect(calls).toContain('FileUpload: First Form Value: no form values')
+      const infoCalls = logger.info.mock.calls.map((call) => call[0])
+      expect(infoCalls).toContain(
+        `FileUpload: Extracted File Data: ${JSON.stringify(fileData, null, 2)}`
       )
-      expect(calls).toContain('First Form Value: no form values')
     })
   })
 })

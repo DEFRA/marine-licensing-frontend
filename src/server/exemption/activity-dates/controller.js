@@ -7,7 +7,6 @@ import {
   DATE_EXTRACTION_CONFIG
 } from '#src/server/common/constants/activity-dates.js'
 import { routes } from '#src/server/common/constants/routes.js'
-import { authenticatedPatchRequest } from '#src/server/common/helpers/authenticated-requests.js'
 import { saveSiteDetailsToBackend } from '#src/server/common/helpers/save-site-details.js'
 import { processDateValidationErrors } from '#src/server/common/helpers/dates/date-form-utils.js'
 import {
@@ -21,7 +20,6 @@ import {
 } from '#src/server/common/helpers/errors.js'
 import {
   getExemptionCache,
-  setExemptionCache,
   updateExemptionSiteDetails
 } from '#src/server/common/helpers/session-cache/utils.js'
 import { setSiteDataPreHandler } from '#src/server/common/helpers/session-cache/site-utils.js'
@@ -29,9 +27,6 @@ import { getSiteDetailsBySite } from '#src/server/common/helpers/session-cache/s
 import { activityDatesSchema } from '#src/server/common/schemas/date.js'
 import { getSiteNumber } from '#src/server/exemption/site-details/utils/site-number.js'
 import { getBackRoute, getNextRoute } from './utils.js'
-
-const isPageInSiteDetailsFlow = (request) =>
-  request.url.pathname === routes.SITE_DETAILS_ACTIVITY_DATES
 
 const getCancelLink = (action, siteNumber) => {
   return action
@@ -55,21 +50,16 @@ const createTemplateData = (
 ) => {
   let dateFields
 
-  const isInSiteDetailsFlow = isPageInSiteDetailsFlow(request)
   const action = request.query?.action
 
   if (Object.keys(payload).length > 0) {
     dateFields = extractMultipleDateFields(payload, DATE_EXTRACTION_CONFIG)
   } else {
     const startDateFields = createDateFieldsFromValue(
-      isInSiteDetailsFlow
-        ? getSiteDetailsBySite(exemption, siteIndex).activityDates?.start
-        : exemption.activityDates?.start
+      getSiteDetailsBySite(exemption, siteIndex).activityDates?.start
     )
     const endDateFields = createDateFieldsFromValue(
-      isInSiteDetailsFlow
-        ? getSiteDetailsBySite(exemption, siteIndex)?.activityDates?.end
-        : exemption.activityDates?.end
+      getSiteDetailsBySite(exemption, siteIndex)?.activityDates?.end
     )
 
     dateFields = {
@@ -82,38 +72,28 @@ const createTemplateData = (
     }
   }
 
-  if (isInSiteDetailsFlow) {
-    const { multipleSiteDetails } = exemption
+  const { multipleSiteDetails } = exemption
 
-    const siteNumber = getSiteNumber(exemption, request)
+  const siteNumber = getSiteNumber(exemption, request)
 
-    const variableActivityDates =
-      multipleSiteDetails?.sameActivityDates === 'no'
-
-    return {
-      ...ACTIVITY_DATES_VIEW_SETTINGS,
-      projectName: exemption.projectName,
-      ...dateFields,
-      backLink: getBackLink(
-        siteIndex,
-        action,
-        siteNumber,
-        queryParams,
-        exemption
-      ),
-      cancelLink: getCancelLink(action, siteNumber),
-      isSiteDetailsFlow: true,
-      isMultiSiteJourney: !!multipleSiteDetails?.multipleSitesEnabled,
-      isSameActivityDates: multipleSiteDetails?.sameActivityDates === 'yes',
-      siteNumber: variableActivityDates ? siteNumber : null,
-      action
-    }
-  }
+  const variableActivityDates = multipleSiteDetails?.sameActivityDates === 'no'
 
   return {
     ...ACTIVITY_DATES_VIEW_SETTINGS,
     projectName: exemption.projectName,
-    ...dateFields
+    ...dateFields,
+    backLink: getBackLink(
+      siteIndex,
+      action,
+      siteNumber,
+      queryParams,
+      exemption
+    ),
+    cancelLink: getCancelLink(action, siteNumber),
+    isMultiSiteJourney: !!multipleSiteDetails?.multipleSitesEnabled,
+    isSameActivityDates: multipleSiteDetails?.sameActivityDates === 'yes',
+    siteNumber: variableActivityDates ? siteNumber : null,
+    action
   }
 }
 
@@ -190,39 +170,18 @@ export const activityDatesSubmitController = {
         payload[ACTIVITY_DATE_FIELD_NAMES.END_DATE_DAY]
       )
 
-      const isInSiteDetailsFlow = isPageInSiteDetailsFlow(request)
-
-      if (isInSiteDetailsFlow) {
-        const { siteIndex } = request.site
-        updateExemptionSiteDetails(request, siteIndex, 'activityDates', {
-          start,
-          end
-        })
-      } else {
-        await authenticatedPatchRequest(request, '/exemption/activity-dates', {
-          id: exemption.id,
-          start,
-          end
-        })
-        setExemptionCache(request, {
-          ...exemption,
-          activityDates: {
-            start,
-            end
-          }
-        })
-      }
+      const { siteIndex } = request.site
+      updateExemptionSiteDetails(request, siteIndex, 'activityDates', {
+        start,
+        end
+      })
 
       const action = request.query?.action
       const { siteNumber } = request.site
 
       const nextRoute = action
         ? `${routes.REVIEW_SITE_DETAILS}#site-details-${siteNumber}`
-        : getNextRoute(
-            exemption,
-            isInSiteDetailsFlow,
-            request.site?.queryParams
-          )
+        : getNextRoute(exemption, request.site?.queryParams)
 
       if (action) {
         await saveSiteDetailsToBackend(request)

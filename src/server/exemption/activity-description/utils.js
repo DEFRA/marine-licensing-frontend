@@ -1,19 +1,10 @@
 import { routes } from '#src/server/common/constants/routes.js'
-export const getBackLink = (
-  exemption,
-  isInSiteDetailsFlow,
-  siteIndex = 0,
-  queryParams = ''
-) => {
-  if (!isInSiteDetailsFlow) {
-    return routes.TASK_LIST
-  }
-
+export const getBackLink = (exemption, siteIndex = 0, queryParams = '') => {
   const multipleSitesEnabled =
     exemption?.multipleSiteDetails?.multipleSitesEnabled
 
   if (!multipleSitesEnabled) {
-    return routes.SITE_DETAILS_ACTIVITY_DATES
+    return routes.ACTIVITY_DATES
   }
 
   if (siteIndex === 0) {
@@ -27,11 +18,7 @@ export const getBackLink = (
 
   return backLink + queryParams
 }
-export const getNextRoute = (isInSiteDetailsFlow, site) => {
-  if (!isInSiteDetailsFlow) {
-    return routes.TASK_LIST
-  }
-
+export const getNextRoute = (site) => {
   const { siteDetails, queryParams } = site
 
   if (siteDetails.coordinatesType === 'file') {

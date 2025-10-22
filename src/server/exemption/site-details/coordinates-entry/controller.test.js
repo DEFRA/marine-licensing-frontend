@@ -39,7 +39,7 @@ describe('#coordinatesEntry', () => {
       expect(h.view).toHaveBeenCalledWith(COORDINATES_ENTRY_VIEW_ROUTE, {
         pageTitle: 'How do you want to enter the coordinates?',
         heading: 'How do you want to enter the coordinates?',
-        backLink: routes.SITE_DETAILS_ACTIVITY_DESCRIPTION,
+        backLink: routes.ACTIVITY_DESCRIPTION,
         payload: {
           coordinatesEntry: mockExemption.siteDetails[0].coordinatesEntry
         },
@@ -64,7 +64,7 @@ describe('#coordinatesEntry', () => {
       expect(h.view).toHaveBeenCalledWith(COORDINATES_ENTRY_VIEW_ROUTE, {
         pageTitle: 'How do you want to enter the coordinates?',
         heading: 'How do you want to enter the coordinates?',
-        backLink: routes.SITE_DETAILS_ACTIVITY_DESCRIPTION,
+        backLink: routes.ACTIVITY_DESCRIPTION,
         payload: { coordinatesEntry: undefined },
         projectName: 'Test Project'
       })
@@ -105,7 +105,7 @@ describe('#coordinatesEntry', () => {
       expect(
         document
           .querySelector(
-            `.govuk-back-link[href="${routes.SITE_DETAILS_ACTIVITY_DESCRIPTION}"`
+            `.govuk-back-link[href="${routes.ACTIVITY_DESCRIPTION}"`
           )
           .textContent.trim()
       ).toBe('Back')
@@ -153,7 +153,7 @@ describe('#coordinatesEntry', () => {
       expect(h.view).toHaveBeenCalledWith(COORDINATES_ENTRY_VIEW_ROUTE, {
         pageTitle: 'How do you want to enter the coordinates?',
         heading: 'How do you want to enter the coordinates?',
-        backLink: routes.SITE_DETAILS_ACTIVITY_DESCRIPTION,
+        backLink: routes.ACTIVITY_DESCRIPTION,
         projectName: 'Test Project',
         payload: { coordinatesEntry: 'invalid' },
         errorSummary: [
@@ -195,7 +195,7 @@ describe('#coordinatesEntry', () => {
       expect(h.view).toHaveBeenCalledWith(COORDINATES_ENTRY_VIEW_ROUTE, {
         pageTitle: 'How do you want to enter the coordinates?',
         heading: 'How do you want to enter the coordinates?',
-        backLink: routes.SITE_DETAILS_ACTIVITY_DESCRIPTION,
+        backLink: routes.ACTIVITY_DESCRIPTION,
         projectName: 'Test Project',
         payload: { coordinatesEntry: 'invalid' }
       })

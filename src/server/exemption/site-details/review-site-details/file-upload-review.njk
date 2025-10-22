@@ -173,7 +173,7 @@
             {% set _ = rows.push({
               key: { text: "Activity dates"},
               value: { html: appIncompleteField({text: site.activityDates})},
-              actions: setSiteDetailsAction(site.activityDates, 'site-details-activity-dates', site.siteNumber)
+              actions: setSiteDetailsAction(site.activityDates, 'activity-dates', site.siteNumber)
             }) %}
           {% endif %}
 
@@ -181,7 +181,7 @@
             {% set _ = rows.push({
               key: { text: "Activity description"},
               value: { html: appIncompleteField({ text: site.activityDescription })},
-              actions: setSiteDetailsAction(site.activityDescription, 'site-details-activity-description', site.siteNumber)
+              actions: setSiteDetailsAction(site.activityDescription, 'activity-description', site.siteNumber)
             }) %}
           {% endif %}
 

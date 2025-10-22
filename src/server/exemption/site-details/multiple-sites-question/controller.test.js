@@ -57,9 +57,7 @@ describe('#multipleSitesQuestion', () => {
         multipleSiteDetails: { multipleSitesEnabled: false }
       })
 
-      expect(h.redirect).toHaveBeenCalledWith(
-        routes.SITE_DETAILS_ACTIVITY_DATES
-      )
+      expect(h.redirect).toHaveBeenCalledWith(routes.ACTIVITY_DATES)
     })
 
     test('should redirect to site name when "yes" is selected', () => {

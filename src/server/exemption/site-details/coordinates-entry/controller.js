@@ -45,6 +45,19 @@ export const coordinatesEntryController = {
 
     const siteDetails = getSiteDetailsBySite(exemption, siteIndex)
 
+    if (action) {
+      const savedSiteDetails = request.yar.get('savedSiteDetails') || {}
+
+      if (!savedSiteDetails.originalCoordinatesEntry) {
+        savedSiteDetails.originalCoordinatesEntry = siteDetails.coordinatesEntry
+      }
+      if (!savedSiteDetails.originalCoordinateSystem) {
+        savedSiteDetails.originalCoordinateSystem = siteDetails.coordinateSystem
+      }
+
+      request.yar.set('savedSiteDetails', savedSiteDetails)
+    }
+
     return h.view(COORDINATES_ENTRY_VIEW_ROUTE, {
       ...coordinatesEntrySettings,
       backLink: getBackRoute(request, exemption, action),
@@ -119,12 +132,6 @@ export const coordinatesEntrySubmitController = {
     const { siteIndex, queryParams } = request.site
     const action = request.query?.action
 
-    const exemption = getExemptionCache(request)
-    const existingValue = getSiteDetailsBySite(
-      exemption,
-      siteIndex
-    )?.coordinatesEntry
-
     updateExemptionSiteDetails(
       request,
       siteIndex,
@@ -133,13 +140,22 @@ export const coordinatesEntrySubmitController = {
     )
 
     if (action) {
-      return payload.coordinatesEntry === existingValue
-        ? h.redirect(
-            `${routes.REVIEW_SITE_DETAILS}#site-details-${request.site.siteNumber}`
-          )
-        : h.redirect(
-            `${routes.COORDINATE_SYSTEM_CHOICE}?site=${request.site.siteNumber}&action=${action}`
-          )
+      const { originalCoordinatesEntry } =
+        request.yar.get('savedSiteDetails') || {}
+
+      if (payload.coordinatesEntry === originalCoordinatesEntry) {
+        return h.redirect(
+          `${routes.REVIEW_SITE_DETAILS}#site-details-${request.site.siteNumber}`
+        )
+      } else {
+        updateExemptionSiteDetails(request, siteIndex, 'coordinateSystem', null)
+        updateExemptionSiteDetails(request, siteIndex, 'coordinates', null)
+        updateExemptionSiteDetails(request, siteIndex, 'circleWidth', null)
+
+        return h.redirect(
+          `${routes.COORDINATE_SYSTEM_CHOICE}?site=${request.site.siteNumber}&action=${action}`
+        )
+      }
     }
 
     return h.redirect(routes.COORDINATE_SYSTEM_CHOICE + queryParams)

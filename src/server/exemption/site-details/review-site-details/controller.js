@@ -26,6 +26,8 @@ export const reviewSiteDetailsController = {
     const previousPage = request.headers?.referer
     const exemption = getExemptionCache(request)
 
+    request.yar.clear('savedSiteDetails')
+
     if (!exemption.id) {
       return h.redirect(routes.TASK_LIST)
     }

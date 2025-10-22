@@ -160,6 +160,9 @@ describe('#reviewSiteDetails', () => {
       error: vi.fn(),
       warn: vi.fn(),
       debug: vi.fn()
+    },
+    yar: {
+      clear: vi.fn()
     }
   })
 

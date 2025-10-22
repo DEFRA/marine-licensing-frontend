@@ -63,7 +63,7 @@ describe('#coordinatesEntryUtils', () => {
         site: {
           ...mockSite,
           siteIndex: 0,
-          siteNumber: 1,
+          siteNumber: 1
         }
       }
 

@@ -153,7 +153,8 @@ describe('#getOrganisationFromToken', () => {
       const result = getOrganisationFromToken(decodedToken)
 
       expect(result).toEqual({
-        hasMultipleOrgPickerEntries: false
+        hasMultipleOrgPickerEntries: false,
+        userRelationshipType: 'Citizen'
       })
     })
 
@@ -169,7 +170,8 @@ describe('#getOrganisationFromToken', () => {
       const result = getOrganisationFromToken(decodedToken)
 
       expect(result).toEqual({
-        hasMultipleOrgPickerEntries: false
+        hasMultipleOrgPickerEntries: false,
+        userRelationshipType: 'Citizen'
       })
     })
 
@@ -184,7 +186,8 @@ describe('#getOrganisationFromToken', () => {
       const result = getOrganisationFromToken(decodedToken)
 
       expect(result).toEqual({
-        hasMultipleOrgPickerEntries: false
+        hasMultipleOrgPickerEntries: false,
+        userRelationshipType: 'Citizen'
       })
     })
 
@@ -201,7 +204,8 @@ describe('#getOrganisationFromToken', () => {
       const result = getOrganisationFromToken(decodedToken)
 
       expect(result).toEqual({
-        hasMultipleOrgPickerEntries: false
+        hasMultipleOrgPickerEntries: false,
+        userRelationshipType: 'Citizen'
       })
     })
 
@@ -237,7 +241,8 @@ describe('#getOrganisationFromToken', () => {
       const result = getOrganisationFromToken(decodedToken)
 
       expect(result).toEqual({
-        hasMultipleOrgPickerEntries: false
+        hasMultipleOrgPickerEntries: false,
+        userRelationshipType: 'Citizen'
       })
     })
 

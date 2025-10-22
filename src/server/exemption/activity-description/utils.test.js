@@ -21,7 +21,7 @@ describe('#getBackLink', () => {
 
         const result = getBackLink(exemption)
 
-        expect(result).toBe(routes.SITE_DETAILS_ACTIVITY_DATES)
+        expect(result).toBe(routes.ACTIVITY_DATES)
       })
     })
 
@@ -71,13 +71,13 @@ describe('#getBackLink', () => {
 
         const result = getBackLink(exemption)
 
-        expect(result).toBe(routes.SITE_DETAILS_ACTIVITY_DATES)
+        expect(result).toBe(routes.ACTIVITY_DATES)
       })
 
       test('should return correct route when exemption is null', () => {
         const result = getBackLink(null)
 
-        expect(result).toBe(routes.SITE_DETAILS_ACTIVITY_DATES)
+        expect(result).toBe(routes.ACTIVITY_DATES)
       })
     })
   })

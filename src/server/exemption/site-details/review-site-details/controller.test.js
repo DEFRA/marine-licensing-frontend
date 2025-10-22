@@ -130,16 +130,7 @@ function createMockExemption(
 describe('#reviewSiteDetails', () => {
   const getServer = setupTestServer()
   let getExemptionCacheSpy
-  let getCoordinateSystemSpy
   let resetExemptionSiteDetailsSpy
-
-  const mockCoordinates = {
-    [COORDINATE_SYSTEMS.WGS84]: {
-      latitude: mockExemption.siteDetails[0].coordinates.latitude,
-      longitude: mockExemption.siteDetails[0].coordinates.longitude
-    },
-    [COORDINATE_SYSTEMS.OSGB36]: { eastings: '425053', northings: '564180' }
-  }
 
   const mockPolygonCoordinatesWGS84 = [
     { latitude: '55.123456', longitude: '55.123456' },
@@ -666,7 +657,9 @@ describe('#reviewSiteDetails', () => {
         test('should return OSGB36 text', () => {
           const result = getCoordinateSystemText(COORDINATE_SYSTEMS.OSGB36)
 
-          expect(result).toBe('OSGB36 (National Grid)\nEastings and Northings')
+          expect(result).toBe(
+            'British National Grid (OSGB36)\nEastings and Northings'
+          )
         })
 
         test('should handle null coordinate system', () => {

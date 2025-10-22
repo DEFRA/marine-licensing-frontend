@@ -108,7 +108,7 @@ export const multipleSitesSubmitController = {
     })
 
     if (payload.multipleSitesEnabled === 'no') {
-      return h.redirect(routes.SITE_DETAILS_ACTIVITY_DATES)
+      return h.redirect(routes.ACTIVITY_DATES)
     } else {
       return h.redirect(routes.SITE_NAME)
     }

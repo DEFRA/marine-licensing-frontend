@@ -5,7 +5,7 @@ export const getNextRoute = (exemption, queryParams = '') => {
 
   const nextRoute = multipleSitesEnabled
     ? routes.SAME_ACTIVITY_DESCRIPTION
-    : routes.SITE_DETAILS_ACTIVITY_DESCRIPTION
+    : routes.ACTIVITY_DESCRIPTION
 
   return nextRoute + queryParams
 }

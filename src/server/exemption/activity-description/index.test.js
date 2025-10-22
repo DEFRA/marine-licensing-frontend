@@ -9,7 +9,7 @@ describe('activityDescriptionRoutes routes', () => {
     expect(activityDescriptionRoutes[0]).toEqual(
       expect.objectContaining({
         method: 'GET',
-        path: routes.SITE_DETAILS_ACTIVITY_DESCRIPTION
+        path: routes.ACTIVITY_DESCRIPTION
       })
     )
   })
@@ -18,7 +18,7 @@ describe('activityDescriptionRoutes routes', () => {
     expect(activityDescriptionRoutes[1]).toEqual(
       expect.objectContaining({
         method: 'POST',
-        path: routes.SITE_DETAILS_ACTIVITY_DESCRIPTION
+        path: routes.ACTIVITY_DESCRIPTION
       })
     )
   })

@@ -139,7 +139,7 @@ describe('#activityDatesController', () => {
 
       const h = { view: vi.fn() }
       const request = {
-        url: { pathname: routes.SITE_DETAILS_ACTIVITY_DATES },
+        url: { pathname: routes.ACTIVITY_DATES },
         site: { siteIndex: 0 }
       }
 
@@ -176,7 +176,7 @@ describe('#activityDatesController', () => {
       })
 
       expect(statusCode).toBe(statusCodes.redirect)
-      expect(headers.location).toBe(routes.SITE_DETAILS_ACTIVITY_DESCRIPTION)
+      expect(headers.location).toBe(routes.ACTIVITY_DESCRIPTION)
     })
 
     test('should update session cache with activity dates and redirect correctly', async () => {
@@ -195,7 +195,7 @@ describe('#activityDatesController', () => {
       }
 
       const { statusCode, headers } = await makePostRequest({
-        url: routes.SITE_DETAILS_ACTIVITY_DATES,
+        url: routes.ACTIVITY_DATES,
         server: getServer(),
         formData: payload
       })
@@ -210,7 +210,7 @@ describe('#activityDatesController', () => {
         })
       )
       expect(statusCode).toBe(statusCodes.redirect)
-      expect(headers.location).toBe(routes.SITE_DETAILS_ACTIVITY_DESCRIPTION)
+      expect(headers.location).toBe(routes.ACTIVITY_DESCRIPTION)
     })
 
     test('should handle validation errors for missing start date', async () => {

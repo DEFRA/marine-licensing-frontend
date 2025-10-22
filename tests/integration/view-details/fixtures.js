@@ -7,12 +7,6 @@ const baseSubmittedExemption = {
   applicationReference: 'EXE/2025/00003',
   submittedAt: '2025-01-01T10:00:00.000Z',
   projectName: 'Test Marine Activity Project',
-  activityDates: {
-    start: '2025-06-15',
-    end: '2025-08-30'
-  },
-  activityDescription:
-    'Marine construction activities including pile driving and dredging operations.',
   publicRegister: {
     consent: 'no'
   },
@@ -87,13 +81,7 @@ const baseExpectedContent = {
   pageCaption: 'EXE/2025/00003 - Exempt activity notification',
   backLinkText: 'Back',
   backLinkHref: '/home',
-  summaryCards: [
-    'Project summary',
-    'Activity dates',
-    'Activity details',
-    'Site details',
-    'Public register'
-  ],
+  summaryCards: ['Project summary', 'Site details', 'Public register'],
   projectDetails: {
     'Type of activity': 'Deposit of a substance or object',
     'Why this activity is exempt':
@@ -106,14 +94,6 @@ const baseExpectedContent = {
       'Delete this project from your projects.',
       'Restart the process by checking if you need a marine licence.'
     ]
-  },
-  activityDates: {
-    'Start date': '15 June 2025',
-    'End date': '30 August 2025'
-  },
-  activityDetails: {
-    'Activity description':
-      'Marine construction activities including pile driving and dredging operations.'
   },
   publicRegister: {
     'Information withheld from public register': 'No'

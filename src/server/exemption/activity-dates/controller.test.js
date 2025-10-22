@@ -3,7 +3,6 @@ import { JSDOM } from 'jsdom'
 import { ACTIVITY_DATES_VIEW_ROUTE } from '#src/server/common/constants/activity-dates.js'
 import { routes } from '#src/server/common/constants/routes.js'
 import { statusCodes } from '#src/server/common/constants/status-codes.js'
-import * as authRequests from '#src/server/common/helpers/authenticated-requests.js'
 import { createDateISO } from '#src/server/common/helpers/dates/date-utils.js'
 import * as cacheUtils from '#src/server/common/helpers/session-cache/utils.js'
 import {
@@ -11,7 +10,7 @@ import {
   activityDatesSubmitController
 } from '#src/server/exemption/activity-dates/controller.js'
 import { setupTestServer } from '#tests/integration/shared/test-setup-helpers.js'
-import { mockExemption, mockSite } from '#src/server/test-helpers/mocks.js'
+import { mockSite } from '#src/server/test-helpers/mocks.js'
 import {
   makeGetRequest,
   makePostRequest
@@ -33,10 +32,6 @@ describe('#activityDatesController', () => {
     getExemptionCacheSpy = vi
       .spyOn(cacheUtils, 'getExemptionCache')
       .mockReturnValue(mockExemptionState)
-
-    vi.spyOn(authRequests, 'authenticatedPatchRequest').mockResolvedValue({
-      payload: { id: mockExemption.id }
-    })
   })
 
   describe('activityDatesController GET', () => {
@@ -59,7 +54,7 @@ describe('#activityDatesController', () => {
       expect(document.querySelector('form').method).toBe('post')
       expect(
         document.querySelector('button[type="submit"]').textContent.trim()
-      ).toBe('Save and continue')
+      ).toBe('Continue')
     })
 
     test('should render with empty date fields when no existing data', () => {
@@ -71,25 +66,33 @@ describe('#activityDatesController', () => {
       expect(h.view).toHaveBeenCalledWith(ACTIVITY_DATES_VIEW_ROUTE, {
         title: 'Activity dates',
         pageTitle: 'Activity dates',
-        backLink: routes.TASK_LIST,
-        cancelLink: routes.TASK_LIST,
+        backLink: routes.MULTIPLE_SITES_CHOICE,
+        cancelLink: routes.TASK_LIST + '?cancel=site-details',
         projectName: mockExemptionState.projectName,
         activityStartDateDay: '',
         activityStartDateMonth: '',
         activityStartDateYear: '',
         activityEndDateDay: '',
         activityEndDateMonth: '',
-        activityEndDateYear: ''
+        activityEndDateYear: '',
+        action: undefined,
+        isMultiSiteJourney: false,
+        isSameActivityDates: false,
+        siteNumber: null
       })
     })
 
     test('should pre-populate form with existing activity dates', () => {
       const exemptionWithDates = {
         ...mockExemptionState,
-        activityDates: {
-          start: '2025-06-15T00:00:00.000Z',
-          end: '2025-06-30T00:00:00.000Z'
-        }
+        siteDetails: [
+          {
+            activityDates: {
+              start: '2025-06-15T00:00:00.000Z',
+              end: '2025-06-30T00:00:00.000Z'
+            }
+          }
+        ]
       }
 
       getExemptionCacheSpy.mockReturnValue(exemptionWithDates)
@@ -101,16 +104,20 @@ describe('#activityDatesController', () => {
 
       expect(h.view).toHaveBeenCalledWith(ACTIVITY_DATES_VIEW_ROUTE, {
         title: 'Activity dates',
-        backLink: routes.TASK_LIST,
-        cancelLink: routes.TASK_LIST,
         pageTitle: 'Activity dates',
+        backLink: routes.MULTIPLE_SITES_CHOICE,
+        cancelLink: routes.TASK_LIST + '?cancel=site-details',
         projectName: exemptionWithDates.projectName,
         activityStartDateDay: '15',
         activityStartDateMonth: '6',
         activityStartDateYear: '2025',
         activityEndDateDay: '30',
         activityEndDateMonth: '6',
-        activityEndDateYear: '2025'
+        activityEndDateYear: '2025',
+        action: undefined,
+        isMultiSiteJourney: false,
+        isSameActivityDates: false,
+        siteNumber: null
       })
     })
 
@@ -132,7 +139,7 @@ describe('#activityDatesController', () => {
 
       const h = { view: vi.fn() }
       const request = {
-        url: { pathname: routes.SITE_DETAILS_ACTIVITY_DATES },
+        url: { pathname: routes.ACTIVITY_DATES },
         site: { siteIndex: 0 }
       }
 
@@ -141,8 +148,7 @@ describe('#activityDatesController', () => {
       expect(h.view).toHaveBeenCalledWith(
         ACTIVITY_DATES_VIEW_ROUTE,
         expect.objectContaining({
-          backLink: routes.FILE_UPLOAD,
-          isSiteDetailsFlow: true
+          backLink: routes.FILE_UPLOAD
         })
       )
     })
@@ -169,21 +175,14 @@ describe('#activityDatesController', () => {
         }
       })
 
-      expect(authRequests.authenticatedPatchRequest).toHaveBeenCalledWith(
-        expect.any(Object),
-        '/exemption/activity-dates',
-        expect.objectContaining({
-          id: mockExemptionState.id,
-          start: expect.any(String),
-          end: expect.any(String)
-        })
-      )
       expect(statusCode).toBe(statusCodes.redirect)
-      expect(headers.location).toBe(routes.TASK_LIST)
+      expect(headers.location).toBe(routes.ACTIVITY_DESCRIPTION)
     })
 
-    test('should call setExemptionCache when not in site details flow', async () => {
-      const mockedSetExemptionCache = vi.mocked(cacheUtils.setExemptionCache)
+    test('should update session cache with activity dates and redirect correctly', async () => {
+      const mockedUpdateExemptionSiteDetails = vi.mocked(
+        cacheUtils.updateExemptionSiteDetails
+      )
 
       const currentYear = new Date().getFullYear()
       const payload = {
@@ -195,112 +194,23 @@ describe('#activityDatesController', () => {
         'activity-end-date-year': (currentYear + 1).toString()
       }
 
-      await makePostRequest({
+      const { statusCode, headers } = await makePostRequest({
         url: routes.ACTIVITY_DATES,
         server: getServer(),
         formData: payload
       })
 
-      expect(mockedSetExemptionCache).toHaveBeenCalledWith(
+      expect(mockedUpdateExemptionSiteDetails).toHaveBeenCalledWith(
         expect.any(Object),
+        expect.any(Number),
+        'activityDates',
         expect.objectContaining({
-          ...mockExemptionState,
-          activityDates: {
-            start: expect.any(String),
-            end: expect.any(String)
-          }
+          start: expect.any(String),
+          end: expect.any(String)
         })
       )
-    })
-
-    test('should call updateExemptionSiteDetails when in site details flow with a single site', async () => {
-      const mockedUpdateExemptionSiteDetails = vi.mocked(
-        cacheUtils.updateExemptionSiteDetails
-      )
-
-      const exemptionWithDates = {
-        ...mockExemptionState,
-        multipleSiteDetails: { multipleSitesEnabled: false },
-        activityDates: {
-          start: '2025-06-15T00:00:00.000Z',
-          end: '2025-06-30T00:00:00.000Z'
-        }
-      }
-
-      getExemptionCacheSpy.mockReturnValue(exemptionWithDates)
-
-      const currentYear = new Date().getFullYear()
-      const payload = {
-        'activity-start-date-day': '1',
-        'activity-start-date-month': '6',
-        'activity-start-date-year': (currentYear + 1).toString(),
-        'activity-end-date-day': '15',
-        'activity-end-date-month': '6',
-        'activity-end-date-year': (currentYear + 1).toString()
-      }
-
-      const { statusCode, headers } = await makePostRequest({
-        url: routes.SITE_DETAILS_ACTIVITY_DATES,
-        server: getServer(),
-        formData: payload
-      })
-
-      expect(mockedUpdateExemptionSiteDetails).toHaveBeenCalledWith(
-        expect.any(Object),
-        0,
-        'activityDates',
-        {
-          end: '2026-06-15T00:00:00.000Z',
-          start: '2026-06-01T00:00:00.000Z'
-        }
-      )
       expect(statusCode).toBe(statusCodes.redirect)
-      expect(headers.location).toBe(routes.SITE_DETAILS_ACTIVITY_DESCRIPTION)
-    })
-
-    test('should call updateExemptionSiteDetails when in site details flow with a multi site', async () => {
-      const mockedUpdateExemptionSiteDetails = vi.mocked(
-        cacheUtils.updateExemptionSiteDetails
-      )
-
-      const exemptionWithDates = {
-        ...mockExemptionState,
-        multipleSiteDetails: { multipleSitesEnabled: true },
-        activityDates: {
-          start: '2025-06-15T00:00:00.000Z',
-          end: '2025-06-30T00:00:00.000Z'
-        }
-      }
-
-      getExemptionCacheSpy.mockReturnValue(exemptionWithDates)
-
-      const currentYear = new Date().getFullYear()
-      const payload = {
-        'activity-start-date-day': '1',
-        'activity-start-date-month': '6',
-        'activity-start-date-year': (currentYear + 1).toString(),
-        'activity-end-date-day': '15',
-        'activity-end-date-month': '6',
-        'activity-end-date-year': (currentYear + 1).toString()
-      }
-
-      const { statusCode, headers } = await makePostRequest({
-        url: routes.SITE_DETAILS_ACTIVITY_DATES,
-        server: getServer(),
-        formData: payload
-      })
-
-      expect(mockedUpdateExemptionSiteDetails).toHaveBeenCalledWith(
-        expect.any(Object),
-        0,
-        'activityDates',
-        {
-          start: '2026-06-01T00:00:00.000Z',
-          end: '2026-06-15T00:00:00.000Z'
-        }
-      )
-      expect(statusCode).toBe(statusCodes.redirect)
-      expect(headers.location).toBe(routes.SAME_ACTIVITY_DESCRIPTION)
+      expect(headers.location).toBe(routes.ACTIVITY_DESCRIPTION)
     })
 
     test('should handle validation errors for missing start date', async () => {
@@ -552,71 +462,6 @@ describe('#activityDatesController', () => {
       const errorTexts = errorLinks.map((link) => link.textContent.trim())
       const uniqueErrors = new Set(errorTexts)
       expect(uniqueErrors.size).toBe(errorTexts.length)
-    })
-
-    test('should handle API errors gracefully', async () => {
-      const apiPatchMock = vi.spyOn(authRequests, 'authenticatedPatchRequest')
-      apiPatchMock.mockRejectedValueOnce({
-        res: { statusCode: 500 },
-        data: {}
-      })
-
-      const currentYear = new Date().getFullYear()
-      const payload = {
-        'activity-start-date-day': '1',
-        'activity-start-date-month': '6',
-        'activity-start-date-year': (currentYear + 1).toString(),
-        'activity-end-date-day': '15',
-        'activity-end-date-month': '6',
-        'activity-end-date-year': (currentYear + 1).toString()
-      }
-
-      const { result, statusCode } = await makePostRequest({
-        url: routes.ACTIVITY_DATES,
-        server: getServer(),
-        formData: payload
-      })
-
-      expect(statusCode).toBe(statusCodes.internalServerError)
-      expect(result).toContain('There is a problem with the service')
-    })
-
-    test('should handle API validation errors', async () => {
-      const apiPatchMock = vi.spyOn(authRequests, 'authenticatedPatchRequest')
-      apiPatchMock.mockRejectedValueOnce({
-        data: {
-          payload: {
-            validation: {
-              details: [
-                {
-                  path: ['start'],
-                  message: 'CUSTOM_START_DATE_INVALID',
-                  type: 'custom.startDate.invalid'
-                }
-              ]
-            }
-          }
-        }
-      })
-
-      const currentYear = new Date().getFullYear()
-      const payload = {
-        'activity-start-date-day': '1',
-        'activity-start-date-month': '6',
-        'activity-start-date-year': (currentYear + 1).toString(),
-        'activity-end-date-day': '15',
-        'activity-end-date-month': '6',
-        'activity-end-date-year': (currentYear + 1).toString()
-      }
-
-      const { result, statusCode } = await makePostRequest({
-        url: routes.ACTIVITY_DATES,
-        server: getServer(),
-        formData: payload
-      })
-
-      expect(statusCode).toBe(statusCodes.ok)
-      expect(result).toContain('Activity dates')
     })
 
     test('should handle impossible dates with field-level real date errors', async () => {
@@ -1038,32 +883,6 @@ describe('#activityDatesController', () => {
       expect(viewData.endDateErrorMessage).toBeNull()
     })
 
-    test('should handle API errors without validation details', async () => {
-      const apiPatchMock = vi.spyOn(authRequests, 'authenticatedPatchRequest')
-      apiPatchMock.mockRejectedValueOnce({
-        message: 'Network error',
-        data: {}
-      })
-
-      const currentYear = new Date().getFullYear()
-      const payload = {
-        'activity-start-date-day': '1',
-        'activity-start-date-month': '6',
-        'activity-start-date-year': (currentYear + 1).toString(),
-        'activity-end-date-day': '15',
-        'activity-end-date-month': '6',
-        'activity-end-date-year': (currentYear + 1).toString()
-      }
-
-      const { statusCode } = await makePostRequest({
-        url: routes.ACTIVITY_DATES,
-        server: getServer(),
-        formData: payload
-      })
-
-      expect(statusCode).toBe(statusCodes.internalServerError)
-    })
-
     test('should handle start date year error specifically', () => {
       const h = {
         view: vi.fn().mockReturnThis(),
@@ -1215,157 +1034,6 @@ describe('#activityDatesController', () => {
         })
       )
       expect(h.takeover).toHaveBeenCalled()
-    })
-
-    test('should cover line 414 - throw error when no validation details in handler', async () => {
-      const apiPatchMock = vi.spyOn(authRequests, 'authenticatedPatchRequest')
-      // Create an error without validation details to trigger the throw on line 414
-      const networkError = new Error('Network error')
-      networkError.data = { payload: {} } // No validation property
-      apiPatchMock.mockRejectedValueOnce(networkError)
-
-      // Mock getExemptionCache to return a valid exemption
-      getExemptionCacheSpy.mockReturnValueOnce({
-        id: 'test-id',
-        projectName: 'Test Project'
-      })
-
-      const currentYear = new Date().getFullYear()
-      const payload = {
-        'activity-start-date-day': '1',
-        'activity-start-date-month': '6',
-        'activity-start-date-year': (currentYear + 1).toString(),
-        'activity-end-date-day': '15',
-        'activity-end-date-month': '6',
-        'activity-end-date-year': (currentYear + 1).toString()
-      }
-
-      const request = { payload, url: {}, site: mockSite }
-      const h = { redirect: vi.fn() }
-
-      // This should trigger line 414 (throw e) since there are no validation details
-      await expect(
-        activityDatesSubmitController.handler(request, h)
-      ).rejects.toThrow('Network error')
-    })
-
-    test('should cover lines 423-428 - API error with validation details', async () => {
-      // Mock the API to return an error with validation details
-      const apiPatchMock = vi.spyOn(authRequests, 'authenticatedPatchRequest')
-      const apiError = new Error('API validation error')
-      apiError.data = {
-        payload: {
-          validation: {
-            details: [
-              {
-                type: 'activity-start-date-day',
-                path: ['activity-start-date-day'],
-                message: 'Start date day is invalid'
-              }
-            ]
-          }
-        }
-      }
-      apiPatchMock.mockRejectedValueOnce(apiError)
-
-      // Mock getExemptionCache to return a valid exemption
-      getExemptionCacheSpy.mockReturnValueOnce({
-        id: 'test-id',
-        projectName: 'Test Project'
-      })
-
-      const h = {
-        view: vi.fn()
-      }
-
-      const currentYear = new Date().getFullYear()
-      const payload = {
-        'activity-start-date-day': '1',
-        'activity-start-date-month': '6',
-        'activity-start-date-year': (currentYear + 1).toString(),
-        'activity-end-date-day': '15',
-        'activity-end-date-month': '6',
-        'activity-end-date-year': (currentYear + 1).toString()
-      }
-
-      const request = { payload, url: {}, site: mockSite }
-
-      // Call the handler directly to hit the catch block
-      await activityDatesSubmitController.handler(request, h)
-
-      // Verify that h.view was called with the correct parameters (lines 423-428)
-      expect(h.view).toHaveBeenCalledWith(
-        ACTIVITY_DATES_VIEW_ROUTE,
-        expect.objectContaining({
-          projectName: 'Test Project',
-          activityStartDateDay: '1',
-          activityStartDateMonth: '6',
-          activityStartDateYear: (currentYear + 1).toString(),
-          activityEndDateDay: '15',
-          activityEndDateMonth: '6',
-          activityEndDateYear: (currentYear + 1).toString(),
-          errors: expect.any(Object),
-          errorSummary: expect.any(Array)
-        })
-      )
-
-      // Verify specific payload assignments that should cover lines 423-428
-      const viewCall = h.view.mock.calls[0]
-      const viewData = viewCall[1]
-      expect(viewData.activityStartDateDay).toBe('1') // Line 423
-      expect(viewData.activityStartDateMonth).toBe('6') // Line 424
-      expect(viewData.activityStartDateYear).toBe((currentYear + 1).toString()) // Line 425
-      expect(viewData.activityEndDateDay).toBe('15') // Line 426
-      expect(viewData.activityEndDateMonth).toBe('6') // Line 427
-      expect(viewData.activityEndDateYear).toBe((currentYear + 1).toString()) // Line 428
-    })
-
-    test('should cover lines 423-428 with empty payload values - API error fallback', async () => {
-      // Mock the API to return an error with validation details
-      const apiPatchMock = vi.spyOn(authRequests, 'authenticatedPatchRequest')
-      const apiError = new Error('API validation error')
-      apiError.data = {
-        payload: {
-          validation: {
-            details: [
-              {
-                type: 'activity-start-date-day',
-                path: ['activity-start-date-day'],
-                message: 'Start date day is invalid'
-              }
-            ]
-          }
-        }
-      }
-      apiPatchMock.mockRejectedValueOnce(apiError)
-
-      // Mock getExemptionCache to return a valid exemption
-      getExemptionCacheSpy.mockReturnValueOnce({
-        id: 'test-id',
-        projectName: 'Test Project'
-      })
-
-      const h = {
-        view: vi.fn()
-      }
-
-      // Use empty payload to test the || '' fallback logic
-      const payload = {}
-
-      const request = { payload, url: {}, site: mockSite }
-
-      // Call the handler directly to hit the catch block
-      await activityDatesSubmitController.handler(request, h)
-
-      // Verify that h.view was called with empty string fallbacks (lines 423-428)
-      const viewCall = h.view.mock.calls[0]
-      const viewData = viewCall[1]
-      expect(viewData.activityStartDateDay).toBe('') // Line 423 fallback
-      expect(viewData.activityStartDateMonth).toBe('') // Line 424 fallback
-      expect(viewData.activityStartDateYear).toBe('') // Line 425 fallback
-      expect(viewData.activityEndDateDay).toBe('') // Line 426 fallback
-      expect(viewData.activityEndDateMonth).toBe('') // Line 427 fallback
-      expect(viewData.activityEndDateYear).toBe('') // Line 428 fallback
     })
   })
 })

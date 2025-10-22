@@ -4,13 +4,11 @@ import {
 } from '#src/server/common/helpers/errors.js'
 import {
   getExemptionCache,
-  setExemptionCache,
   updateExemptionSiteDetails
 } from '#src/server/common/helpers/session-cache/utils.js'
 import { setSiteDataPreHandler } from '#src/server/common/helpers/session-cache/site-utils.js'
 import { getSiteDetailsBySite } from '#src/server/common/helpers/session-cache/site-details-utils.js'
 import { routes } from '#src/server/common/constants/routes.js'
-import { authenticatedPatchRequest } from '#src/server/common/helpers/authenticated-requests.js'
 import { saveSiteDetailsToBackend } from '#src/server/common/helpers/save-site-details.js'
 import joi from 'joi'
 import { getBackLink, getNextRoute } from './utils.js'
@@ -30,9 +28,6 @@ const templateValues = {
   heading: 'Activity description'
 }
 
-const isPageInSiteDetailsFlow = (request) =>
-  request.url.pathname === routes.SITE_DETAILS_ACTIVITY_DESCRIPTION
-
 const getCancelLink = (action, siteNumber) => {
   return action
     ? `${routes.REVIEW_SITE_DETAILS}#site-details-${siteNumber}`
@@ -43,18 +38,16 @@ const getBackLinkForAction = (
   action,
   siteNumber,
   exemption,
-  siteDetailsFlow,
   siteIndex,
   queryParams
 ) => {
   if (action) {
     return `${routes.REVIEW_SITE_DETAILS}#site-details-${siteNumber}`
   }
-  return getBackLink(exemption, siteDetailsFlow, siteIndex, queryParams)
+  return getBackLink(exemption, siteIndex, queryParams)
 }
 
 const getPageTemplateValues = (request) => {
-  const siteDetailsFlow = isPageInSiteDetailsFlow(request)
   const exemption = getExemptionCache(request)
   const action = request.query?.action
 
@@ -68,12 +61,10 @@ const getPageTemplateValues = (request) => {
   return {
     ...templateValues,
     isMultiSiteJourney: !!multipleSiteDetails?.multipleSitesEnabled,
-    isSiteDetailsFlow: siteDetailsFlow,
     backLink: getBackLinkForAction(
       action,
       siteNumber,
       exemption,
-      siteDetailsFlow,
       siteIndex,
       queryParams
     ),
@@ -89,12 +80,12 @@ export const activityDescriptionController = {
   },
   handler(request, h) {
     const exemption = getExemptionCache(request)
-    const isInSiteDetailsFlow = isPageInSiteDetailsFlow(request)
     const { siteIndex } = request.site ?? {}
 
-    const activityDescription = isInSiteDetailsFlow
-      ? getSiteDetailsBySite(exemption, siteIndex)?.activityDescription
-      : exemption.activityDescription
+    const activityDescription = getSiteDetailsBySite(
+      exemption,
+      siteIndex
+    )?.activityDescription
 
     return h.view(ACTIVITY_DESCRIPTION_VIEW_ROUTE, {
       ...getPageTemplateValues(request),
@@ -145,52 +136,31 @@ export const activityDescriptionSubmitController = {
   },
   async handler(request, h) {
     const { payload } = request
-    const exemption = getExemptionCache(request)
 
     try {
-      const isInSiteDetailsFlow = isPageInSiteDetailsFlow(request)
-
       const { siteIndex } = request.site
 
-      if (isInSiteDetailsFlow) {
-        updateExemptionSiteDetails(
-          request,
-          siteIndex,
-          'activityDescription',
-          payload.activityDescription
-        )
-      } else {
-        const { payload: responsePayload } = await authenticatedPatchRequest(
-          request,
-          '/exemption/activity-description',
-          { ...payload, id: exemption.id }
-        )
-
-        setExemptionCache(request, {
-          ...exemption,
-          ...responsePayload.value,
-          activityDescription: payload.activityDescription
-        })
-      }
+      updateExemptionSiteDetails(
+        request,
+        siteIndex,
+        'activityDescription',
+        payload.activityDescription
+      )
 
       const action = request.query?.action
       const { siteNumber } = request.site
 
       const nextRoute = action
         ? `${routes.REVIEW_SITE_DETAILS}#site-details-${siteNumber}`
-        : getNextRoute(isInSiteDetailsFlow, request.site)
+        : getNextRoute(request.site)
 
-      if (
-        isInSiteDetailsFlow &&
-        (nextRoute === routes.REVIEW_SITE_DETAILS || action)
-      ) {
+      if (nextRoute === routes.REVIEW_SITE_DETAILS || action) {
         await saveSiteDetailsToBackend(request)
       }
 
       return h.redirect(nextRoute)
     } catch (e) {
       const { details } = e.data?.payload?.validation ?? {}
-
       if (!details) {
         throw e
       }

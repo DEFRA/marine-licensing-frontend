@@ -14,22 +14,6 @@ describe('taskList utils', () => {
         }
       },
       {
-        href: routes.ACTIVITY_DATES,
-        status: { text: 'Completed' },
-        title: {
-          text: 'Activity dates',
-          classes: 'govuk-link--no-visited-state'
-        }
-      },
-      {
-        href: routes.ACTIVITY_DESCRIPTION,
-        status: { tag: { text: 'Incomplete', classes: 'govuk-tag--blue' } },
-        title: {
-          text: 'Activity description',
-          classes: 'govuk-link--no-visited-state'
-        }
-      },
-      {
         href: routes.REVIEW_SITE_DETAILS,
         status: { text: 'Completed' },
         title: {
@@ -59,22 +43,6 @@ describe('taskList utils', () => {
         href: routes.PROJECT_NAME,
         status: { text: 'Completed' },
         title: { classes: 'govuk-link--no-visited-state', text: 'Project name' }
-      },
-      {
-        href: routes.ACTIVITY_DATES,
-        status: { text: 'Completed' },
-        title: {
-          classes: 'govuk-link--no-visited-state',
-          text: 'Activity dates'
-        }
-      },
-      {
-        href: routes.ACTIVITY_DESCRIPTION,
-        status: { tag: { text: 'Incomplete', classes: 'govuk-tag--blue' } },
-        title: {
-          classes: 'govuk-link--no-visited-state',
-          text: 'Activity description'
-        }
       },
       {
         href: routes.REVIEW_SITE_DETAILS,
@@ -109,22 +77,7 @@ describe('taskList utils', () => {
           text: 'Project name'
         }
       },
-      {
-        href: routes.ACTIVITY_DATES,
-        status: { text: 'Completed' },
-        title: {
-          text: 'Activity dates',
-          classes: 'govuk-link--no-visited-state'
-        }
-      },
-      {
-        href: routes.ACTIVITY_DESCRIPTION,
-        status: { tag: { text: 'Incomplete', classes: 'govuk-tag--blue' } },
-        title: {
-          text: 'Activity description',
-          classes: 'govuk-link--no-visited-state'
-        }
-      },
+
       {
         href: routes.SITE_DETAILS,
         status: { tag: { text: 'Incomplete', classes: 'govuk-tag--blue' } },
@@ -152,22 +105,6 @@ describe('taskList utils', () => {
         title: {
           classes: 'govuk-link--no-visited-state',
           text: 'Project name'
-        }
-      },
-      {
-        href: routes.ACTIVITY_DATES,
-        status: { tag: { text: 'Incomplete', classes: 'govuk-tag--blue' } },
-        title: {
-          text: 'Activity dates',
-          classes: 'govuk-link--no-visited-state'
-        }
-      },
-      {
-        href: routes.ACTIVITY_DESCRIPTION,
-        status: { tag: { text: 'Incomplete', classes: 'govuk-tag--blue' } },
-        title: {
-          text: 'Activity description',
-          classes: 'govuk-link--no-visited-state'
         }
       },
       {

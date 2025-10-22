@@ -89,7 +89,7 @@ describe('#sameActivityDates', () => {
       sameActivityDatesController.handler(mockRequestSecondSite, mockH)
 
       expect(mockH.redirect).toHaveBeenCalledWith(
-        '/exemption/site-details-activity-dates?site=1'
+        '/exemption/activity-dates?site=1'
       )
     })
 
@@ -291,9 +291,7 @@ describe('#sameActivityDates', () => {
         cacheUtils.updateExemptionMultipleSiteDetails
       ).toHaveBeenCalledWith(mockRequest, 'sameActivityDates', 'yes')
 
-      expect(h.redirect).toHaveBeenCalledWith(
-        routes.SITE_DETAILS_ACTIVITY_DATES
-      )
+      expect(h.redirect).toHaveBeenCalledWith(routes.ACTIVITY_DATES)
     })
   })
 })

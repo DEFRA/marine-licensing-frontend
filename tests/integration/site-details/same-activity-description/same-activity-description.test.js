@@ -148,10 +148,7 @@ describe('Same activity description page', () => {
     )
 
     const backLink = getByRole(document, 'link', { name: 'Back' })
-    expect(backLink).toHaveAttribute(
-      'href',
-      '/exemption/site-details-activity-dates'
-    )
+    expect(backLink).toHaveAttribute('href', '/exemption/activity-dates')
   })
 
   test('should have correct navigation links for file upload', async () => {
@@ -224,9 +221,7 @@ describe('Same activity description page', () => {
     })
 
     expect(response.statusCode).toBe(statusCodes.redirect)
-    expect(response.headers.location).toBe(
-      '/exemption/site-details-activity-description'
-    )
+    expect(response.headers.location).toBe('/exemption/activity-description')
 
     expect(updateExemptionMultipleSiteDetails).toHaveBeenCalledWith(
       expect.any(Object),
@@ -275,9 +270,7 @@ describe('Same activity description page', () => {
     })
 
     expect(response.statusCode).toBe(statusCodes.redirect)
-    expect(response.headers.location).toBe(
-      '/exemption/site-details-activity-description'
-    )
+    expect(response.headers.location).toBe('/exemption/activity-description')
 
     expect(updateExemptionMultipleSiteDetails).toHaveBeenCalledWith(
       expect.any(Object),

@@ -45,8 +45,6 @@ export const taskListController = {
     const {
       id: exemptionId,
       taskList,
-      activityDates,
-      activityDescription,
       projectName,
       publicRegister,
       multipleSiteDetails,
@@ -60,8 +58,6 @@ export const taskListController = {
 
     setExemptionCache(request, {
       id: exemptionId,
-      activityDates,
-      activityDescription,
       projectName,
       publicRegister,
       multipleSiteDetails,

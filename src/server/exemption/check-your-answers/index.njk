@@ -3,14 +3,13 @@
 {% from "govuk/components/button/macro.njk" import govukButton %}
 {% from "site-details-data-script/macro.njk" import appSiteDetailsDataScript %}
 {% from "project-details-card/macro.njk" import appProjectDetailsCard %}
-{% from "activity-dates-card/macro.njk" import appActivityDatesCard %}
-{% from "activity-details-card/macro.njk" import appActivityDetailsCard %}
 {% from "site-details-card/macro.njk" import appSiteDetailsCard %}
 {% from "public-register-card/macro.njk" import appPublicRegisterCard %}
 
 {% block pageTitle %}
   {{ title }} - {{ serviceName }}
 {% endblock %}
+
 {% block head %}
   {{ super() }}
   {{ appSiteDetailsDataScript(siteDetailsData) }}
@@ -39,14 +38,6 @@
       isReadOnly: isReadOnly
     }) }}
     {% endif %}
-    {{ appActivityDatesCard({
-      activityDates: activityDates,
-      isReadOnly: isReadOnly
-    }) }}
-    {{ appActivityDetailsCard({
-      activityDescription: activityDescription,
-      isReadOnly: isReadOnly
-    }) }}
     {{ appSiteDetailsCard({
       siteDetails: siteDetails,
       isReadOnly: isReadOnly

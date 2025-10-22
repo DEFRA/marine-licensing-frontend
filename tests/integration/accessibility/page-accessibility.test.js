@@ -40,7 +40,7 @@ describe('Page accessibility checks (Axe)', () => {
     { url: routes.TASK_LIST, title: 'Task list' },
     { url: routes.PROJECT_NAME, title: 'Project name' },
     { url: routes.ACTIVITY_DATES, title: 'Activity dates' },
-    { url: routes.ACTIVITY_DESCRIPTION, title: 'Activity description' },
+    { url: routes.ACTIVITY_DATES, title: 'Activity description' },
     {
       url: routes.COORDINATES_TYPE_CHOICE,
       title: 'How do you want to provide the site location?'

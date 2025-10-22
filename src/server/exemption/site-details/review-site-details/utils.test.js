@@ -468,10 +468,8 @@ describe('siteDetails utils', () => {
 
     test('getFileUploadBackLink correctly returns file upload route', () => {
       expect(
-        getFileUploadBackLink(
-          `http://hostname${routes.SITE_DETAILS_ACTIVITY_DESCRIPTION}`
-        )
-      ).toBe(routes.SITE_DETAILS_ACTIVITY_DESCRIPTION)
+        getFileUploadBackLink(`http://hostname${routes.ACTIVITY_DESCRIPTION}`)
+      ).toBe(routes.ACTIVITY_DESCRIPTION)
     })
 
     test('getFileUploadBackLink correctly returns file upload as fallback', () => {

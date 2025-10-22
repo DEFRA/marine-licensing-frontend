@@ -40,10 +40,13 @@ describe('#coordinatesEntry', () => {
         pageTitle: 'How do you want to enter the coordinates?',
         heading: 'How do you want to enter the coordinates?',
         backLink: routes.SITE_DETAILS_ACTIVITY_DESCRIPTION,
+        cancelLink: routes.TASK_LIST + '?cancel=site-details',
         payload: {
           coordinatesEntry: mockExemption.siteDetails[0].coordinatesEntry
         },
-        projectName: 'Test Project'
+        projectName: 'Test Project',
+        siteNumber: null,
+        action: undefined
       })
     })
 
@@ -65,8 +68,11 @@ describe('#coordinatesEntry', () => {
         pageTitle: 'How do you want to enter the coordinates?',
         heading: 'How do you want to enter the coordinates?',
         backLink: routes.SITE_DETAILS_ACTIVITY_DESCRIPTION,
+        cancelLink: routes.TASK_LIST + '?cancel=site-details',
         payload: { coordinatesEntry: undefined },
-        projectName: 'Test Project'
+        projectName: 'Test Project',
+        siteNumber: null,
+        action: undefined
       })
     })
 
@@ -125,7 +131,8 @@ describe('#coordinatesEntry', () => {
   describe('#coordinatesEntrySubmitController', () => {
     test('Should correctly format error data', () => {
       const request = {
-        payload: { coordinatesEntry: 'invalid' }
+        payload: { coordinatesEntry: 'invalid' },
+        site: mockSite
       }
 
       const h = {
@@ -154,7 +161,10 @@ describe('#coordinatesEntry', () => {
         pageTitle: 'How do you want to enter the coordinates?',
         heading: 'How do you want to enter the coordinates?',
         backLink: routes.SITE_DETAILS_ACTIVITY_DESCRIPTION,
+        cancelLink: routes.TASK_LIST + '?cancel=site-details',
         projectName: 'Test Project',
+        siteNumber: null,
+        action: undefined,
         payload: { coordinatesEntry: 'invalid' },
         errorSummary: [
           {
@@ -177,7 +187,8 @@ describe('#coordinatesEntry', () => {
 
     test('Should correctly output page with no error data in object', () => {
       const request = {
-        payload: { coordinatesEntry: 'invalid' }
+        payload: { coordinatesEntry: 'invalid' },
+        site: mockSite
       }
 
       const h = {
@@ -196,7 +207,10 @@ describe('#coordinatesEntry', () => {
         pageTitle: 'How do you want to enter the coordinates?',
         heading: 'How do you want to enter the coordinates?',
         backLink: routes.SITE_DETAILS_ACTIVITY_DESCRIPTION,
+        cancelLink: routes.TASK_LIST + '?cancel=site-details',
         projectName: 'Test Project',
+        siteNumber: null,
+        action: undefined,
         payload: { coordinatesEntry: 'invalid' }
       })
 

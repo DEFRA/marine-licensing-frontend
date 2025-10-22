@@ -57,5 +57,27 @@ describe('#coordinatesEntryUtils', () => {
 
       expect(result).toBe(routes.SITE_DETAILS_ACTIVITY_DESCRIPTION + '?site=1')
     })
+
+    test('should return to correct page when we have an action', () => {
+      const request = {
+        site: {
+          ...mockSite,
+          siteIndex: 0,
+          siteNumber: 1,
+        }
+      }
+
+      const exemption = {
+        ...mockExemption,
+        multipleSiteDetails: {
+          ...mockExemption.multipleSiteDetails,
+          sameActivityDescription: 'no'
+        }
+      }
+
+      const result = getBackRoute(request, exemption, 'add')
+
+      expect(result).toBe(`${routes.REVIEW_SITE_DETAILS}#site-details-${1}`)
+    })
   })
 })

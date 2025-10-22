@@ -138,9 +138,7 @@ export const widthOfSiteSubmitController = {
       ? `${routes.REVIEW_SITE_DETAILS}#site-details-${siteNumber}`
       : routes.REVIEW_SITE_DETAILS + queryParams
 
-    if (action) {
-      await saveSiteDetailsToBackend(request)
-    }
+    await saveSiteDetailsToBackend(request)
 
     return h.redirect(nextRoute)
   }

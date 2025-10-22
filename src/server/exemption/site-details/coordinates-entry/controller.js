@@ -11,6 +11,7 @@ import {
 import joi from 'joi'
 import { routes } from '#src/server/common/constants/routes.js'
 import { getBackRoute } from './utils.js'
+import { getSiteNumber } from '#src/server/exemption/site-details/utils/site-number.js'
 
 export const COORDINATES_ENTRY_VIEW_ROUTE =
   'exemption/site-details/coordinates-entry/index'
@@ -24,6 +25,13 @@ const coordinatesEntrySettings = {
 export const errorMessages = {
   COORDINATES_ENTRY_REQUIRED: 'Select how you want to enter the coordinates'
 }
+
+const getCancelLink = (action, siteNumber) => {
+  return action
+    ? `${routes.REVIEW_SITE_DETAILS}#site-details-${siteNumber}`
+    : routes.TASK_LIST + '?cancel=site-details'
+}
+
 export const coordinatesEntryController = {
   options: {
     pre: [setSiteDataPreHandler]
@@ -32,13 +40,18 @@ export const coordinatesEntryController = {
     const exemption = getExemptionCache(request)
     const { site } = request
     const { siteIndex } = site
+    const action = request.query?.action
+    const siteNumber = getSiteNumber(exemption, request)
 
     const siteDetails = getSiteDetailsBySite(exemption, siteIndex)
 
     return h.view(COORDINATES_ENTRY_VIEW_ROUTE, {
       ...coordinatesEntrySettings,
-      backLink: getBackRoute(request, exemption),
+      backLink: getBackRoute(request, exemption, action),
+      cancelLink: getCancelLink(action, siteNumber),
       projectName: exemption.projectName,
+      siteNumber: action ? siteNumber : null,
+      action,
       payload: {
         coordinatesEntry: siteDetails.coordinatesEntry
       }
@@ -62,14 +75,21 @@ export const coordinatesEntrySubmitController = {
       }),
       failAction: (request, h, err) => {
         const { payload } = request
-        const { projectName } = getExemptionCache(request)
+        const exemption = getExemptionCache(request)
+        const { projectName } = exemption
+        const action = request.query?.action
+        const siteNumber = getSiteNumber(exemption, request)
 
         if (!err.details) {
           return h
             .view(COORDINATES_ENTRY_VIEW_ROUTE, {
               ...coordinatesEntrySettings,
+              backLink: getBackRoute(request, exemption, action),
+              cancelLink: getCancelLink(action, siteNumber),
               payload,
-              projectName
+              projectName,
+              siteNumber: action ? siteNumber : null,
+              action
             })
             .takeover()
         }
@@ -81,8 +101,12 @@ export const coordinatesEntrySubmitController = {
         return h
           .view(COORDINATES_ENTRY_VIEW_ROUTE, {
             ...coordinatesEntrySettings,
+            backLink: getBackRoute(request, exemption, action),
+            cancelLink: getCancelLink(action, siteNumber),
             payload,
             projectName,
+            siteNumber: action ? siteNumber : null,
+            action,
             errors,
             errorSummary
           })
@@ -92,8 +116,14 @@ export const coordinatesEntrySubmitController = {
   },
   handler(request, h) {
     const { payload } = request
-
     const { siteIndex, queryParams } = request.site
+    const action = request.query?.action
+
+    const exemption = getExemptionCache(request)
+    const existingValue = getSiteDetailsBySite(
+      exemption,
+      siteIndex
+    )?.coordinatesEntry
 
     updateExemptionSiteDetails(
       request,
@@ -101,6 +131,16 @@ export const coordinatesEntrySubmitController = {
       'coordinatesEntry',
       payload.coordinatesEntry
     )
+
+    if (action) {
+      return payload.coordinatesEntry === existingValue
+        ? h.redirect(
+            `${routes.REVIEW_SITE_DETAILS}#site-details-${request.site.siteNumber}`
+          )
+        : h.redirect(
+            `${routes.COORDINATE_SYSTEM_CHOICE}?site=${request.site.siteNumber}&action=${action}`
+          )
+    }
 
     return h.redirect(routes.COORDINATE_SYSTEM_CHOICE + queryParams)
   }

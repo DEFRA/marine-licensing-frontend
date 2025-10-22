@@ -40,7 +40,7 @@ describe('Activity dates - page structure & accessibility', () => {
       ...emptyDate
     })
     getByRole(document, 'button', {
-      name: 'Save and continue'
+      name: 'Continue'
     })
 
     expect(
@@ -62,7 +62,7 @@ describe('Activity dates - page structure & accessibility', () => {
 
     mockExemption(mockExemptionWithSameActivityDates)
     const document = await loadPage({
-      requestUrl: routes.SITE_DETAILS_ACTIVITY_DATES,
+      requestUrl: routes.ACTIVITY_DATES,
       server: getServer()
     })
 
@@ -86,7 +86,7 @@ describe('Activity dates - page structure & accessibility', () => {
     mockExemption(mockExemptionWithDifferentActivityDates)
 
     const document = await loadPage({
-      requestUrl: routes.SITE_DETAILS_ACTIVITY_DATES,
+      requestUrl: routes.ACTIVITY_DATES,
       server: getServer()
     })
 
@@ -109,7 +109,7 @@ describe('Activity dates - page structure & accessibility', () => {
     mockExemption(mockExemptionSingleSite)
 
     const document = await loadPage({
-      requestUrl: routes.SITE_DETAILS_ACTIVITY_DATES,
+      requestUrl: routes.ACTIVITY_DATES,
       server: getServer()
     })
 
@@ -129,7 +129,7 @@ describe('Activity dates - page structure & accessibility', () => {
     mockExemption(mockExemptionSingleSite)
 
     const document = await loadPage({
-      requestUrl: routes.SITE_DETAILS_ACTIVITY_DATES,
+      requestUrl: routes.ACTIVITY_DATES,
       server: getServer()
     })
 
@@ -156,7 +156,7 @@ describe('Activity dates - page structure & accessibility', () => {
     mockExemption(mockExemptionSingleSite)
 
     const document = await loadPage({
-      requestUrl: routes.SITE_DETAILS_ACTIVITY_DATES,
+      requestUrl: routes.ACTIVITY_DATES,
       server: getServer()
     })
 
@@ -172,7 +172,7 @@ describe('Activity dates - page structure & accessibility', () => {
 
   test('should display Save and continue button when action parameter is present', async () => {
     const document = await loadPage({
-      requestUrl: `${routes.SITE_DETAILS_ACTIVITY_DATES}?action=add`,
+      requestUrl: `${routes.ACTIVITY_DATES}?action=add`,
       server: getServer()
     })
 
@@ -189,7 +189,7 @@ describe('Activity dates - page structure & accessibility', () => {
     const nextYear = getNextYear()
 
     const response = await makePostRequest({
-      url: `${routes.SITE_DETAILS_ACTIVITY_DATES}?action=add`,
+      url: `${routes.ACTIVITY_DATES}?action=add`,
       server: getServer(),
       formData: {
         'activity-start-date-day': today.day,
@@ -224,7 +224,7 @@ describe('Activity dates - page structure & accessibility', () => {
     const nextYear = getNextYear()
 
     const response = await makePostRequest({
-      url: `${routes.SITE_DETAILS_ACTIVITY_DATES}?site=2&action=change`,
+      url: `${routes.ACTIVITY_DATES}?site=2&action=change`,
       server: getServer(),
       formData: {
         'activity-start-date-day': today.day,
@@ -259,7 +259,7 @@ describe('Activity dates - page structure & accessibility', () => {
     const nextYear = getNextYear()
 
     const response = await makePostRequest({
-      url: routes.SITE_DETAILS_ACTIVITY_DATES,
+      url: routes.ACTIVITY_DATES,
       server: getServer(),
       formData: {
         'activity-start-date-day': today.day,
@@ -272,9 +272,7 @@ describe('Activity dates - page structure & accessibility', () => {
     })
 
     expect(response.statusCode).toBe(statusCodes.redirect)
-    expect(response.headers.location).toBe(
-      '/exemption/site-details-activity-description'
-    )
+    expect(response.headers.location).toBe('/exemption/activity-description')
 
     expect(updateExemptionSiteDetails).toHaveBeenCalledWith(
       expect.any(Object),

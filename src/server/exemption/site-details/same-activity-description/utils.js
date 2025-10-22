@@ -7,5 +7,5 @@ export const getBackLink = (exemption, siteDetails) => {
     return routes.SAME_ACTIVITY_DATES
   }
 
-  return routes.SITE_DETAILS_ACTIVITY_DATES
+  return routes.ACTIVITY_DATES
 }

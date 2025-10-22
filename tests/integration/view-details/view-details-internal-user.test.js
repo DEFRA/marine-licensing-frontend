@@ -5,8 +5,6 @@ import {
   validateAllSummaryCardsExist,
   validateApplicationDetails,
   validateProjectDetails,
-  validateActivityDates,
-  validateActivityDetails,
   validateSiteDetails,
   validatePublicRegister
 } from '../shared/summary-card-validators.js'
@@ -70,8 +68,6 @@ describe('View Details - Content Verification Integration Tests', () => {
     validateAllSummaryCardsExist(document, expectedContent)
     validateProjectDetails(document, expectedContent)
     validateApplicationDetails(document, expectedContent)
-    validateActivityDates(document, expectedContent)
-    validateActivityDetails(document, expectedContent)
     validateSiteDetails(document, expectedContent)
     validatePublicRegister(document, expectedContent)
     validateReadOnlyBehavior(document)

@@ -1,12 +1,6 @@
 const baseExemption = {
   id: 'test-exemption-123',
   projectName: 'Hammersmith pontoon construction',
-  activityDates: {
-    start: '2025-07-01',
-    end: '2025-07-07'
-  },
-  activityDescription:
-    'We will be installing a pontoon approximately 20 metres squared at the east of our garden that backs onto the river.',
   siteDetails: [
     {
       coordinatesType: 'file',
@@ -37,8 +31,6 @@ const baseExemption = {
   },
   taskList: {
     projectName: { status: 'completed' },
-    activityDates: { status: 'completed' },
-    activityDescription: { status: 'completed' },
     siteDetails: { status: 'completed' },
     publicRegister: { status: 'completed' }
   }
@@ -63,13 +55,7 @@ export const testScenarios = [
     expectedPageContent: {
       pageTitle: 'Check your answers before sending your information',
       backLinkText: 'Go back to your project',
-      summaryCards: [
-        'Project summary',
-        'Activity dates',
-        'Activity details',
-        'Site details',
-        'Public register'
-      ],
+      summaryCards: ['Project summary', 'Site details', 'Public register'],
       projectDetails: {
         'Project name': 'Hammersmith pontoon construction',
         'Type of activity': 'Deposit of a substance or object',
@@ -81,14 +67,6 @@ export const testScenarios = [
           'Delete this project from your projects.',
           'Restart the process by checking if you need a marine licence.'
         ]
-      },
-      activityDates: {
-        'Start date': '1 July 2025',
-        'End date': '7 July 2025'
-      },
-      activityDetails: {
-        'Activity description':
-          'We will be installing a pontoon approximately 20 metres squared at the east of our garden that backs onto the river.'
       },
       siteDetails: {
         'Method of providing site location':
@@ -119,23 +97,9 @@ export const testScenarios = [
     expectedPageContent: {
       pageTitle: 'Check your answers before sending your information',
       backLinkText: 'Go back to your project',
-      summaryCards: [
-        'Project summary',
-        'Activity dates',
-        'Activity details',
-        'Site details',
-        'Public register'
-      ],
+      summaryCards: ['Project summary', 'Site details', 'Public register'],
       projectDetails: {
         'Project name': 'Hammersmith pontoon construction'
-      },
-      activityDates: {
-        'Start date': '1 July 2025',
-        'End date': '7 July 2025'
-      },
-      activityDetails: {
-        'Activity description':
-          'We will be installing a pontoon approximately 20 metres squared at the east of our garden that backs onto the river.'
       },
       siteDetails: {
         'Method of providing site location':
@@ -166,23 +130,9 @@ export const testScenarios = [
     expectedPageContent: {
       pageTitle: 'Check your answers before sending your information',
       backLinkText: 'Go back to your project',
-      summaryCards: [
-        'Project summary',
-        'Activity dates',
-        'Activity details',
-        'Site details',
-        'Public register'
-      ],
+      summaryCards: ['Project summary', 'Site details', 'Public register'],
       projectDetails: {
         'Project name': 'Hammersmith pontoon construction'
-      },
-      activityDates: {
-        'Start date': '1 July 2025',
-        'End date': '7 July 2025'
-      },
-      activityDetails: {
-        'Activity description':
-          'We will be installing a pontoon approximately 20 metres squared at the east of our garden that backs onto the river.'
       },
       siteDetails: {
         'Method of providing site location':
@@ -217,23 +167,9 @@ export const testScenarios = [
     expectedPageContent: {
       pageTitle: 'Check your answers before sending your information',
       backLinkText: 'Go back to your project',
-      summaryCards: [
-        'Project summary',
-        'Activity dates',
-        'Activity details',
-        'Site details',
-        'Public register'
-      ],
+      summaryCards: ['Project summary', 'Site details', 'Public register'],
       projectDetails: {
         'Project name': 'Hammersmith pontoon construction'
-      },
-      activityDates: {
-        'Start date': '1 July 2025',
-        'End date': '7 July 2025'
-      },
-      activityDetails: {
-        'Activity description':
-          'We will be installing a pontoon approximately 20 metres squared at the east of our garden that backs onto the river.'
       },
       siteDetails: {
         'Method of providing site location':
@@ -270,23 +206,9 @@ export const testScenarios = [
     expectedPageContent: {
       pageTitle: 'Check your answers before sending your information',
       backLinkText: 'Go back to your project',
-      summaryCards: [
-        'Project summary',
-        'Activity dates',
-        'Activity details',
-        'Site details',
-        'Public register'
-      ],
+      summaryCards: ['Project summary', 'Site details', 'Public register'],
       projectDetails: {
         'Project name': 'Hammersmith pontoon construction'
-      },
-      activityDates: {
-        'Start date': '1 July 2025',
-        'End date': '7 July 2025'
-      },
-      activityDetails: {
-        'Activity description':
-          'We will be installing a pontoon approximately 20 metres squared at the east of our garden that backs onto the river.'
       },
       siteDetails: {
         'Method of providing site location':
@@ -323,23 +245,9 @@ export const testScenarios = [
     expectedPageContent: {
       pageTitle: 'Check your answers before sending your information',
       backLinkText: 'Go back to your project',
-      summaryCards: [
-        'Project summary',
-        'Activity dates',
-        'Activity details',
-        'Site details',
-        'Public register'
-      ],
+      summaryCards: ['Project summary', 'Site details', 'Public register'],
       projectDetails: {
         'Project name': 'Hammersmith pontoon construction'
-      },
-      activityDates: {
-        'Start date': '1 July 2025',
-        'End date': '7 July 2025'
-      },
-      activityDetails: {
-        'Activity description':
-          'We will be installing a pontoon approximately 20 metres squared at the east of our garden that backs onto the river.'
       },
       siteDetails: {
         'Method of providing site location':
@@ -378,23 +286,9 @@ export const testScenarios = [
     expectedPageContent: {
       pageTitle: 'Check your answers before sending your information',
       backLinkText: 'Go back to your project',
-      summaryCards: [
-        'Project summary',
-        'Activity dates',
-        'Activity details',
-        'Site details',
-        'Public register'
-      ],
+      summaryCards: ['Project summary', 'Site details', 'Public register'],
       projectDetails: {
         'Project name': 'Hammersmith pontoon construction'
-      },
-      activityDates: {
-        'Start date': '1 July 2025',
-        'End date': '7 July 2025'
-      },
-      activityDetails: {
-        'Activity description':
-          'We will be installing a pontoon approximately 20 metres squared at the east of our garden that backs onto the river.'
       },
       siteDetails: {
         'Method of providing site location':

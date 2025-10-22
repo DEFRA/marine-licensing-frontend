@@ -89,29 +89,6 @@ describe('#taskListController', () => {
           }
         },
         {
-          href: routes.ACTIVITY_DATES,
-          status: {
-            text: 'Completed'
-          },
-          title: {
-            classes: 'govuk-link--no-visited-state',
-            text: 'Activity dates'
-          }
-        },
-        {
-          href: routes.ACTIVITY_DESCRIPTION,
-          status: {
-            tag: {
-              classes: 'govuk-tag--blue',
-              text: 'Incomplete'
-            }
-          },
-          title: {
-            classes: 'govuk-link--no-visited-state',
-            text: 'Activity description'
-          }
-        },
-        {
           href: routes.REVIEW_SITE_DETAILS,
           status: {
             text: 'Completed'
@@ -132,7 +109,7 @@ describe('#taskListController', () => {
           }
         }
       ],
-      hasCompletedAllTasks: false
+      hasCompletedAllTasks: true
     })
   })
 

@@ -10,7 +10,7 @@ describe('sameActivityDescription utils', () => {
           ...mockExemption.siteDetails[0],
           coordinatesType: 'coordinates'
         })
-      ).toBe(routes.SITE_DETAILS_ACTIVITY_DATES)
+      ).toBe(routes.ACTIVITY_DATES)
     })
 
     test('getBackLink correctly returns in file journey with same dates selected', () => {
@@ -19,7 +19,7 @@ describe('sameActivityDescription utils', () => {
           ...mockExemption.siteDetails[0],
           coordinatesType: 'file'
         })
-      ).toBe(routes.SITE_DETAILS_ACTIVITY_DATES)
+      ).toBe(routes.ACTIVITY_DATES)
     })
 
     test('getBackLink correctly returns in file journey with variable dates selected', () => {

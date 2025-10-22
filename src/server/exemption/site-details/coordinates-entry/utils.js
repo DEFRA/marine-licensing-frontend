@@ -4,10 +4,10 @@ export const getBackRoute = (request, exemption) => {
   const { multipleSiteDetails } = exemption
 
   if (siteIndex === 0) {
-    return routes.SITE_DETAILS_ACTIVITY_DESCRIPTION
+    return routes.ACTIVITY_DESCRIPTION
   }
 
   return multipleSiteDetails.sameActivityDescription === 'yes'
     ? routes.SITE_NAME + queryParams
-    : routes.SITE_DETAILS_ACTIVITY_DESCRIPTION + queryParams
+    : routes.ACTIVITY_DESCRIPTION + queryParams
 }

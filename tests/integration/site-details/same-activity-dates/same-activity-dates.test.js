@@ -193,9 +193,7 @@ describe('Same activity dates page', () => {
     })
 
     expect(response.statusCode).toBe(statusCodes.redirect)
-    expect(response.headers.location).toBe(
-      '/exemption/site-details-activity-dates'
-    )
+    expect(response.headers.location).toBe('/exemption/activity-dates')
 
     expect(updateExemptionMultipleSiteDetails).toHaveBeenCalledWith(
       expect.any(Object),
@@ -216,9 +214,7 @@ describe('Same activity dates page', () => {
     })
 
     expect(response.statusCode).toBe(statusCodes.redirect)
-    expect(response.headers.location).toBe(
-      '/exemption/site-details-activity-dates'
-    )
+    expect(response.headers.location).toBe('/exemption/activity-dates')
 
     expect(updateExemptionMultipleSiteDetails).toHaveBeenCalledWith(
       expect.any(Object),

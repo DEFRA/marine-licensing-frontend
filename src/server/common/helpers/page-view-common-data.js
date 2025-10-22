@@ -6,11 +6,15 @@ export const getPageViewCommonData = async (request) => {
   if (!userSession) {
     return {}
   }
-  const { organisationName, hasMultipleOrganisations, displayName } =
-    userSession
+  const {
+    organisationName,
+    hasMultipleOrgPickerEntries,
+    shouldShowOrgOrUserName,
+    displayName
+  } = userSession
   const showChangeOrganisationLink =
-    hasMultipleOrganisations && request.path === routes.DASHBOARD
-  const orgOrUserName = hasMultipleOrganisations
+    hasMultipleOrgPickerEntries && request.path === routes.DASHBOARD
+  const orgOrUserName = shouldShowOrgOrUserName
     ? organisationName || displayName
     : null
   return { orgOrUserName, showChangeOrganisationLink }

@@ -177,32 +177,16 @@ describe('exemption route', () => {
         path: '/exemption/activity-dates'
       }),
       expect.objectContaining({
-        method: 'GET',
-        path: '/exemption/site-details-activity-dates'
-      }),
-      expect.objectContaining({
         method: 'POST',
         path: '/exemption/activity-dates'
       }),
       expect.objectContaining({
-        method: 'POST',
-        path: '/exemption/site-details-activity-dates'
-      }),
-      expect.objectContaining({
         method: 'GET',
         path: '/exemption/activity-description'
       }),
       expect.objectContaining({
-        method: 'GET',
-        path: '/exemption/site-details-activity-description'
-      }),
-      expect.objectContaining({
         method: 'POST',
         path: '/exemption/activity-description'
-      }),
-      expect.objectContaining({
-        method: 'POST',
-        path: '/exemption/site-details-activity-description'
       }),
       expect.objectContaining({
         method: 'GET',

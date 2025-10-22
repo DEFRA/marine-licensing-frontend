@@ -11,7 +11,7 @@ describe('#coordinatesEntryUtils', () => {
 
       const result = getBackRoute(request, mockExemption)
 
-      expect(result).toBe(routes.SITE_DETAILS_ACTIVITY_DESCRIPTION)
+      expect(result).toBe(routes.ACTIVITY_DESCRIPTION)
     })
 
     test('should return to correct page when same activity description for all sites is chosen', () => {
@@ -55,7 +55,7 @@ describe('#coordinatesEntryUtils', () => {
 
       const result = getBackRoute(request, exemption)
 
-      expect(result).toBe(routes.SITE_DETAILS_ACTIVITY_DESCRIPTION + '?site=1')
+      expect(result).toBe(routes.ACTIVITY_DESCRIPTION + '?site=1')
     })
   })
 })

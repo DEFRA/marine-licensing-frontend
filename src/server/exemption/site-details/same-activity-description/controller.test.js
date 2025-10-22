@@ -48,7 +48,7 @@ describe('sameActivityDescriptionController', () => {
         {
           pageTitle: 'Is the activity description the same for every site?',
           heading: 'Is the activity description the same for every site?',
-          backLink: routes.SITE_DETAILS_ACTIVITY_DATES,
+          backLink: routes.ACTIVITY_DATES,
           projectName: mockExemption.projectName,
           payload: {
             sameActivityDescription: undefined
@@ -97,7 +97,7 @@ describe('sameActivityDescriptionController', () => {
       sameActivityDescriptionController.handler(mockRequestSecondSite, mockH)
 
       expect(mockH.redirect).toHaveBeenCalledWith(
-        '/exemption/site-details-activity-description?site=1'
+        '/exemption/activity-description?site=1'
       )
     })
 
@@ -151,9 +151,7 @@ describe('sameActivityDescriptionController', () => {
 
       expect(saveSiteDetailsToBackend).not.toHaveBeenCalled()
 
-      expect(mockH.redirect).toHaveBeenCalledWith(
-        routes.SITE_DETAILS_ACTIVITY_DESCRIPTION
-      )
+      expect(mockH.redirect).toHaveBeenCalledWith(routes.ACTIVITY_DESCRIPTION)
     })
 
     test('should update cache and redirect to coordinates entry choice when "no" is selected', () => {
@@ -171,9 +169,7 @@ describe('sameActivityDescriptionController', () => {
         'sameActivityDescription',
         'no'
       )
-      expect(mockH.redirect).toHaveBeenCalledWith(
-        routes.SITE_DETAILS_ACTIVITY_DESCRIPTION
-      )
+      expect(mockH.redirect).toHaveBeenCalledWith(routes.ACTIVITY_DESCRIPTION)
     })
   })
 

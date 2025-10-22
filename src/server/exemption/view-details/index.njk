@@ -3,8 +3,6 @@
 {% from "site-details-data-script/macro.njk" import appSiteDetailsDataScript %}
 {% from "application-details-card/macro.njk" import appApplicationDetailsCard %}
 {% from "project-details-card/macro.njk" import appProjectDetailsCard %}
-{% from "activity-dates-card/macro.njk" import appActivityDatesCard %}
-{% from "activity-details-card/macro.njk" import appActivityDetailsCard %}
 {% from "site-details-card/macro.njk" import appSiteDetailsCard %}
 {% from "public-register-card/macro.njk" import appPublicRegisterCard %}
 
@@ -52,14 +50,6 @@
       isInternalUser: isInternalUser
     }) }}
     {% endif %}
-    {{ appActivityDatesCard({
-      activityDates: activityDates,
-      isReadOnly: isReadOnly
-    }) }}
-    {{ appActivityDetailsCard({
-      activityDescription: activityDescription,
-      isReadOnly: isReadOnly
-    }) }}
     {{ appSiteDetailsCard({
       siteDetails: siteDetails,
       isReadOnly: isReadOnly

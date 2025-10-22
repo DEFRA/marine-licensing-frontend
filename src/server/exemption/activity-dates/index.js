@@ -11,18 +11,8 @@ export const activityDatesRoutes = [
     ...activityDatesController
   },
   {
-    method: 'GET',
-    path: routes.SITE_DETAILS_ACTIVITY_DATES,
-    ...activityDatesController
-  },
-  {
     method: 'POST',
     path: routes.ACTIVITY_DATES,
-    ...activityDatesSubmitController
-  },
-  {
-    method: 'POST',
-    path: routes.SITE_DETAILS_ACTIVITY_DATES,
     ...activityDatesSubmitController
   }
 ]

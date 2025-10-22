@@ -35,7 +35,7 @@ describe('appOrganisationHeading Component', () => {
   test('should not show a Change who you’re representing link if param set to false', () => {
     $component = renderComponentJSDOM('organisation-heading', {
       orgOrUserName: 'Test Org',
-      hasMultipleOrganisations: false
+      hasMultipleOrgPickerEntries: false
     })
     expect(
       within($component).queryByRole('link', {

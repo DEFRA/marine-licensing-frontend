@@ -452,9 +452,7 @@ describe('#uploadAndWait', () => {
             mockRequest
           )
 
-          expect(h.redirect).toHaveBeenCalledWith(
-            routes.SITE_DETAILS_ACTIVITY_DATES
-          )
+          expect(h.redirect).toHaveBeenCalledWith(routes.ACTIVITY_DATES)
         })
 
         test('should process file and redirect to same activity dates page for multiple sites', async () => {
@@ -565,9 +563,7 @@ describe('#uploadAndWait', () => {
             mockRequest
           )
 
-          expect(h.redirect).toHaveBeenCalledWith(
-            routes.SITE_DETAILS_ACTIVITY_DATES
-          )
+          expect(h.redirect).toHaveBeenCalledWith(routes.ACTIVITY_DATES)
         })
       })
     })

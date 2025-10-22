@@ -1,3 +1,41 @@
+@use 'govuk-frontend' as *;
+
 .govuk-summary-list__key {
   vertical-align: top;
+}
+
+@include govuk-media-query($from: tablet) {
+  .govuk-summary-list--full-width {
+    &.govuk-summary-list {
+      display: block;
+    }
+
+    .govuk-summary-list__row {
+      display: flex;
+    }
+
+    .govuk-summary-list__row--no-actions:has(
+        .govuk-summary-list__value--full-width
+      )::after {
+      content: none;
+    }
+
+    .govuk-summary-list__key {
+      display: block;
+      flex: 0 0 30%;
+      padding-right: 20px;
+      width: auto;
+    }
+
+    .govuk-summary-list__value {
+      display: block;
+      flex-grow: 1;
+      padding-right: 0;
+    }
+
+    .govuk-summary-list__actions {
+      display: block;
+      flex: 0 0 20%;
+    }
+  }
 }

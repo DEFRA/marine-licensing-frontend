@@ -33,7 +33,8 @@ export const openIdProvider = async (name) => {
         organisationId,
         organisationName,
         userRelationshipType,
-        hasMultipleOrganisations
+        hasMultipleOrgPickerEntries,
+        shouldShowOrgOrUserName
       } = getOrganisationFromToken(payload)
 
       credentials.profile = {
@@ -56,7 +57,8 @@ export const openIdProvider = async (name) => {
         organisationId,
         organisationName,
         userRelationshipType,
-        hasMultipleOrganisations,
+        hasMultipleOrgPickerEntries,
+        shouldShowOrgOrUserName,
         roles: payload.roles,
         idToken: params.id_token,
         tokenUrl: oidcConf.token_endpoint,

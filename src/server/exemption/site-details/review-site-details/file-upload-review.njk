@@ -187,7 +187,7 @@
 
           {% set _ = rows.push({
             key: { text: "Map view" },
-            value: { html: appSiteDetailsMap(site.siteDetailsData, loop.index0) }
+            value: { html: appSiteDetailsMap(site.siteDetailsData, loop.index0), classes: "govuk-summary-list__value--full-width" }
           }) %}
 
           {{ govukSummaryList({
@@ -199,6 +199,7 @@
                 text: summaryRowsHeading
               }
             },
+            classes: 'govuk-summary-list--full-width',
             rows: rows
         }) }}
         {% endfor %}

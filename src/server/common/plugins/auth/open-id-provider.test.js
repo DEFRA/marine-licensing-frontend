@@ -79,7 +79,7 @@ describe('#openIdProvider', () => {
         organisationId: 'testOrgId',
         organisationName: 'Test Organisation Ltd',
         userRelationshipType: 'Employee',
-        hasMultipleOrganisations: true,
+        hasMultipleOrgPickerEntries: true,
         roles: ['testRoles'],
         idToken: 'test-id-token',
         tokenUrl: 'http://test-token-endpoint',
@@ -150,7 +150,7 @@ describe('#openIdProvider', () => {
         organisationId: 'beneficiaryOrgId',
         organisationName: 'Beneficiary Organisation',
         userRelationshipType: 'Agent',
-        hasMultipleOrganisations: false,
+        hasMultipleOrgPickerEntries: false,
         roles: ['testRoles'],
         idToken: 'test-id-token',
         tokenUrl: 'http://test-token-endpoint',
@@ -198,7 +198,7 @@ describe('#openIdProvider', () => {
     expect(credentials.profile.organisationId).toBeUndefined()
     expect(credentials.profile.organisationName).toBeUndefined()
     expect(credentials.profile.userRelationshipType).toEqual('Citizen')
-    expect(credentials.profile.hasMultipleOrganisations).toEqual(false)
+    expect(credentials.profile.hasMultipleOrgPickerEntries).toEqual(false)
   })
 
   test('When relationships array is undefined (eg Entra ID token)', async () => {
@@ -234,8 +234,8 @@ describe('#openIdProvider', () => {
 
     expect(credentials.profile.organisationId).toBeUndefined()
     expect(credentials.profile.organisationName).toBeUndefined()
-    expect(credentials.profile.userRelationshipType).toBeUndefined()
-    expect(credentials.profile.hasMultipleOrganisations).toEqual(false)
+    expect(credentials.profile.userRelationshipType).toEqual('Citizen')
+    expect(credentials.profile.hasMultipleOrgPickerEntries).toEqual(false)
   })
 
   test('When credential do not exist', () => {

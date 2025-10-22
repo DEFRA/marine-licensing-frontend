@@ -5,6 +5,7 @@ export const getOrganisationFromToken = (decodedToken) => {
   // relationships - The relationships the user has selected to sign into the service in, within their current session.
   // enrolmentCount - The number of enrolments assigned to the user for this service, across all organisations.
   // The roles related to the relationship the user has selected within their current session.
+  const defaultUserRelationshipType = 'Citizen'
   const { currentRelationshipId, relationships, enrolmentCount, roles } =
     decodedToken
   if (
@@ -14,7 +15,8 @@ export const getOrganisationFromToken = (decodedToken) => {
     !Array.isArray(roles)
   ) {
     return {
-      hasMultipleOrganisations: false
+      hasMultipleOrgPickerEntries: false,
+      userRelationshipType: defaultUserRelationshipType
     }
   }
   const relationship = relationships.find((r) =>
@@ -34,16 +36,20 @@ export const getOrganisationFromToken = (decodedToken) => {
   if (!['Employee', 'Agent', 'Citizen'].includes(userRelationshipType)) {
     const logger = createLogger()
     logger.error(`Invalid relationship type: ${userRelationshipType}`)
-    userRelationshipType = 'Citizen'
+    userRelationshipType = defaultUserRelationshipType
   }
 
-  const hasMultipleOrganisations =
+  const hasMultipleOrgPickerEntries =
     enrolmentCount > roles.length || relationships.length > 1
+
+  const shouldShowOrgOrUserName =
+    hasMultipleOrgPickerEntries || userRelationshipType === 'Employee'
 
   return {
     organisationId,
     organisationName,
     userRelationshipType,
-    hasMultipleOrganisations
+    hasMultipleOrgPickerEntries,
+    shouldShowOrgOrUserName
   }
 }

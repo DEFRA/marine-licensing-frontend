@@ -35,8 +35,8 @@ describe('#projectName', () => {
       .mockReturnValue(mockExemptionState)
 
     vi.spyOn(authUtils, 'getUserSession').mockResolvedValue({
-      applicantOrganisationId: 'test-org-id',
-      applicantOrganisationName: 'Test Organisation Ltd'
+      organisationId: 'test-org-id',
+      organisationName: 'Test Organisation Ltd'
     })
   })
 
@@ -71,8 +71,8 @@ describe('#projectName', () => {
         expect.objectContaining({
           projectName: 'Project name',
           mcmsContext: null,
-          applicantOrganisationId: 'test-org-id',
-          applicantOrganisationName: 'Test Organisation Ltd'
+          organisationId: 'test-org-id',
+          organisationName: 'Test Organisation Ltd'
         })
       )
 
@@ -284,8 +284,8 @@ describe('#projectName', () => {
           pdfDownloadUrl: 'https://example.com/test.pdf'
         },
         projectName: 'Project name',
-        applicantOrganisationId: 'test-org-id',
-        applicantOrganisationName: 'Test Organisation Ltd'
+        organisationId: 'test-org-id',
+        organisationName: 'Test Organisation Ltd'
       })
     })
 
@@ -330,6 +330,78 @@ describe('#projectName', () => {
       )
 
       expect(statusCode).toBe(302)
+    })
+
+    test('Should include organisation data when user is an Agent', async () => {
+      vi.spyOn(authUtils, 'getUserSession').mockResolvedValue({
+        organisationId: 'beneficiary-org-id',
+        organisationName: 'Beneficiary Organisation Ltd',
+        userRelationshipType: 'Agent'
+      })
+
+      const apiPostMock = vi.spyOn(authRequests, 'authenticatedPostRequest')
+      apiPostMock.mockResolvedValueOnce({
+        res: { statusCode: 200 },
+        payload: { data: 'test' }
+      })
+
+      await makePostRequest({
+        url: routes.PROJECT_NAME,
+        server: getServer(),
+        formData: { projectName: 'Project name' }
+      })
+
+      expect(authRequests.authenticatedPostRequest).toHaveBeenCalledWith(
+        expect.any(Object),
+        `/exemption/project-name`,
+        expect.objectContaining({
+          projectName: 'Project name',
+          mcmsContext: null,
+          organisationId: 'beneficiary-org-id',
+          organisationName: 'Beneficiary Organisation Ltd',
+          userRelationshipType: 'Agent'
+        })
+      )
+
+      const callArgs = apiPostMock.mock.calls[0][2]
+      expect(callArgs).toHaveProperty('organisationId')
+      expect(callArgs).toHaveProperty('organisationName')
+    })
+
+    test('Should include organisation data when user is an Employee', async () => {
+      vi.spyOn(authUtils, 'getUserSession').mockResolvedValue({
+        organisationId: 'applicant-org-id',
+        organisationName: 'Applicant Organisation Ltd',
+        userRelationshipType: 'Employee'
+      })
+
+      const apiPostMock = vi.spyOn(authRequests, 'authenticatedPostRequest')
+      apiPostMock.mockResolvedValueOnce({
+        res: { statusCode: 200 },
+        payload: { data: 'test' }
+      })
+
+      await makePostRequest({
+        url: routes.PROJECT_NAME,
+        server: getServer(),
+        formData: { projectName: 'Project name' }
+      })
+
+      expect(authRequests.authenticatedPostRequest).toHaveBeenCalledWith(
+        expect.any(Object),
+        `/exemption/project-name`,
+        expect.objectContaining({
+          projectName: 'Project name',
+          mcmsContext: null,
+          organisationId: 'applicant-org-id',
+          organisationName: 'Applicant Organisation Ltd',
+          userRelationshipType: 'Employee'
+        })
+      )
+
+      const callArgs = apiPostMock.mock.calls[0][2]
+      expect(callArgs).toHaveProperty('organisationId')
+      expect(callArgs).toHaveProperty('organisationName')
     })
   })
 })

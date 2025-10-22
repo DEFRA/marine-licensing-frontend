@@ -2,7 +2,9 @@ import { vi } from 'vitest'
 import { getDefraIdConfig } from '#src/server/common/plugins/auth/defra-id-strategy.js'
 import { config } from '#src/config/config.js'
 import { routes } from '#src/server/common/constants/routes.js'
-
+vi.mock('#src/server/common/helpers/logging/logger.js', () => ({
+  createLogger: vi.fn(() => ({ error: vi.fn() }))
+}))
 vi.mock('~/src/config/config.js')
 
 describe('#getDefraIdConfig', () => {

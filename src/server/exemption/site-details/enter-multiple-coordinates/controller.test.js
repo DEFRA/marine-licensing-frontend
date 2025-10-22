@@ -103,8 +103,12 @@ describe('#multipleCoordinates', () => {
         MULTIPLE_COORDINATES_VIEW_ROUTES[COORDINATE_SYSTEMS.WGS84],
         {
           ...multipleCoordinatesPageData,
+          action: undefined,
+          backLink: routes.COORDINATE_SYSTEM_CHOICE,
+          cancelLink: routes.TASK_LIST + '?cancel=site-details',
           coordinates: [...mockCoordinates.wgs84, paddedCoordinates.wgs84],
-          projectName: 'Test Project'
+          projectName: 'Test Project',
+          siteNumber: null
         }
       )
     })
@@ -126,8 +130,12 @@ describe('#multipleCoordinates', () => {
         MULTIPLE_COORDINATES_VIEW_ROUTES[COORDINATE_SYSTEMS.OSGB36],
         {
           ...multipleCoordinatesPageData,
+          action: undefined,
+          backLink: routes.COORDINATE_SYSTEM_CHOICE,
+          cancelLink: routes.TASK_LIST + '?cancel=site-details',
           coordinates: [...mockCoordinates.osgb36, paddedCoordinates.osgb36],
-          projectName: 'Test Project'
+          projectName: 'Test Project',
+          siteNumber: null
         }
       )
     })

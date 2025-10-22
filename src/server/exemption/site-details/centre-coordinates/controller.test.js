@@ -50,11 +50,14 @@ describe('#centreCoordinates', () => {
       expect(h.view).toHaveBeenCalledWith(
         COORDINATE_SYSTEM_VIEW_ROUTES[COORDINATE_SYSTEMS.WGS84],
         {
+          action: undefined,
+          backLink: routes.COORDINATE_SYSTEM_CHOICE,
+          cancelLink: '/exemption/task-list?cancel=site-details',
           heading: 'Enter the coordinates at the centre point of the site',
           pageTitle: 'Enter the coordinates at the centre point of the site',
-          backLink: routes.COORDINATE_SYSTEM_CHOICE,
           payload: { latitude: undefined, longitude: undefined },
-          projectName: undefined
+          projectName: undefined,
+          siteNumber: null
         }
       )
     })
@@ -67,11 +70,14 @@ describe('#centreCoordinates', () => {
       expect(h.view).toHaveBeenCalledWith(
         COORDINATE_SYSTEM_VIEW_ROUTES[COORDINATE_SYSTEMS.WGS84],
         {
+          action: undefined,
+          backLink: routes.COORDINATE_SYSTEM_CHOICE,
+          cancelLink: '/exemption/task-list?cancel=site-details',
           heading: 'Enter the coordinates at the centre point of the site',
           pageTitle: 'Enter the coordinates at the centre point of the site',
-          backLink: routes.COORDINATE_SYSTEM_CHOICE,
           payload: { ...mockCoordinates[COORDINATE_SYSTEMS.WGS84] },
-          projectName: 'Test Project'
+          projectName: 'Test Project',
+          siteNumber: null
         }
       )
     })
@@ -98,11 +104,14 @@ describe('#centreCoordinates', () => {
       expect(h.view).toHaveBeenCalledWith(
         COORDINATE_SYSTEM_VIEW_ROUTES[COORDINATE_SYSTEMS.OSGB36],
         {
+          action: undefined,
+          backLink: routes.COORDINATE_SYSTEM_CHOICE,
+          cancelLink: '/exemption/task-list?cancel=site-details',
           heading: 'Enter the coordinates at the centre point of the site',
           pageTitle: 'Enter the coordinates at the centre point of the site',
-          backLink: routes.COORDINATE_SYSTEM_CHOICE,
           payload: { ...mockCoordinates[COORDINATE_SYSTEMS.OSGB36] },
-          projectName: 'Test Project'
+          projectName: 'Test Project',
+          siteNumber: null
         }
       )
     })
@@ -123,11 +132,14 @@ describe('#centreCoordinates', () => {
       expect(h.view).toHaveBeenCalledWith(
         COORDINATE_SYSTEM_VIEW_ROUTES[COORDINATE_SYSTEMS.WGS84],
         {
+          action: undefined,
+          backLink: routes.COORDINATE_SYSTEM_CHOICE,
+          cancelLink: '/exemption/task-list?cancel=site-details',
           heading: 'Enter the coordinates at the centre point of the site',
           pageTitle: 'Enter the coordinates at the centre point of the site',
-          backLink: routes.COORDINATE_SYSTEM_CHOICE,
           payload: { ...mockCoordinates[COORDINATE_SYSTEMS.WGS84] },
-          projectName: 'Test Project'
+          projectName: 'Test Project',
+          siteNumber: null
         }
       )
     })
@@ -219,11 +231,14 @@ describe('#centreCoordinates', () => {
       expect(h.view).toHaveBeenCalledWith(
         COORDINATE_SYSTEM_VIEW_ROUTES[COORDINATE_SYSTEMS.WGS84],
         {
+          action: undefined,
+          backLink: routes.COORDINATE_SYSTEM_CHOICE,
+          cancelLink: '/exemption/task-list?cancel=site-details',
           heading: 'Enter the coordinates at the centre point of the site',
           pageTitle: 'Enter the coordinates at the centre point of the site',
           projectName: 'Test Project',
-          backLink: routes.COORDINATE_SYSTEM_CHOICE,
           payload: { latitude: 'invalid' },
+          siteNumber: null,
           errorSummary: [
             {
               href: '#latitude',
@@ -270,14 +285,17 @@ describe('#centreCoordinates', () => {
       expect(h.view).toHaveBeenCalledWith(
         COORDINATE_SYSTEM_VIEW_ROUTES[COORDINATE_SYSTEMS.WGS84],
         {
+          action: undefined,
+          backLink: routes.COORDINATE_SYSTEM_CHOICE,
+          cancelLink: '/exemption/task-list?cancel=site-details',
           heading: 'Enter the coordinates at the centre point of the site',
           pageTitle: 'Enter the coordinates at the centre point of the site',
           projectName: 'Test Project',
-          backLink: routes.COORDINATE_SYSTEM_CHOICE,
           payload: {
             ...mockCoordinates[COORDINATE_SYSTEMS.WGS84],
             latitude: 'invalid'
-          }
+          },
+          siteNumber: null
         }
       )
 

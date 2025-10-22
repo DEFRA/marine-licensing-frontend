@@ -16,6 +16,8 @@ import { routes } from '#src/server/common/constants/routes.js'
 import { COORDINATE_SYSTEMS } from '#src/server/common/constants/exemptions.js'
 import { getPayload } from '#src/server/exemption/site-details/centre-coordinates/utils.js'
 import { validateCentreCoordinates } from '#src/server/exemption/site-details/centre-coordinates/validate.js'
+import { getSiteNumber } from '#src/server/exemption/site-details/utils/site-number.js'
+import { saveSiteDetailsToBackend } from '#src/server/common/helpers/save-site-details.js'
 
 export const COORDINATE_SYSTEM_VIEW_ROUTES = {
   [COORDINATE_SYSTEMS.WGS84]: 'exemption/site-details/centre-coordinates/wgs84',
@@ -55,6 +57,26 @@ export const errorMessages = {
       'Northings must be a positive 6 or 7-digit number, like 123456'
   }
 }
+const getCancelLink = (action, siteNumber) => {
+  return action
+    ? `${routes.REVIEW_SITE_DETAILS}#site-details-${siteNumber}`
+    : routes.TASK_LIST + '?cancel=site-details'
+}
+
+const getBackLinkForAction = (action, siteNumber, queryParams, request) => {
+  if (action) {
+    const savedSiteDetails = request.yar.get('savedSiteDetails') || {}
+
+    if (savedSiteDetails.originalCoordinateSystem !== undefined) {
+      return `${routes.COORDINATE_SYSTEM_CHOICE}?site=${siteNumber}&action=${action}`
+    }
+
+    return `${routes.REVIEW_SITE_DETAILS}#site-details-${siteNumber}`
+  }
+
+  return centreCoordinatesPageData.backLink + queryParams
+}
+
 export const centreCoordinatesController = {
   options: {
     pre: [setSiteDataPreHandler]
@@ -63,13 +85,23 @@ export const centreCoordinatesController = {
     const exemption = getExemptionCache(request)
     const { siteIndex, queryParams } = request.site
     const { coordinateSystem } = getCoordinateSystem(request)
+    const action = request.query?.action
+    const siteNumber = getSiteNumber(exemption, request)
 
     const siteDetails = getSiteDetailsBySite(exemption, siteIndex)
 
+    if (action) {
+      const savedSiteDetails = request.yar.get('savedSiteDetails')
+      request.yar.set('savedSiteDetails', savedSiteDetails || {})
+    }
+
     return h.view(COORDINATE_SYSTEM_VIEW_ROUTES[coordinateSystem], {
       ...centreCoordinatesPageData,
-      backLink: centreCoordinatesPageData.backLink + queryParams,
+      backLink: getBackLinkForAction(action, siteNumber, queryParams, request),
+      cancelLink: getCancelLink(action, siteNumber),
       projectName: exemption.projectName,
+      siteNumber: action ? siteNumber : null,
+      action,
       payload: getPayload(siteDetails, coordinateSystem)
     })
   }
@@ -77,23 +109,28 @@ export const centreCoordinatesController = {
 
 export const centreCoordinatesSubmitFailHandler = (request, h, error) => {
   const { payload } = request
-
   const site = setSiteData(request)
-
   const exemption = getExemptionCache(request)
-
   const { queryParams } = site
-
   const { coordinateSystem } = getCoordinateSystem(request)
-
   const { projectName } = exemption
+  const action = request.query?.action
+  const siteNumber = getSiteNumber(exemption, request)
 
   if (!error.details) {
     return h
       .view(COORDINATE_SYSTEM_VIEW_ROUTES[coordinateSystem], {
         ...centreCoordinatesPageData,
-        backLink: centreCoordinatesPageData.backLink + queryParams,
+        backLink: getBackLinkForAction(
+          action,
+          siteNumber,
+          queryParams,
+          request
+        ),
+        cancelLink: getCancelLink(action, siteNumber),
         projectName,
+        siteNumber: action ? siteNumber : null,
+        action,
         payload
       })
       .takeover()
@@ -108,8 +145,11 @@ export const centreCoordinatesSubmitFailHandler = (request, h, error) => {
   return h
     .view(COORDINATE_SYSTEM_VIEW_ROUTES[coordinateSystem], {
       ...centreCoordinatesPageData,
-      backLink: centreCoordinatesPageData.backLink + queryParams,
+      backLink: getBackLinkForAction(action, siteNumber, queryParams, request),
+      cancelLink: getCancelLink(action, siteNumber),
       projectName,
+      siteNumber: action ? siteNumber : null,
+      action,
       payload,
       errors,
       errorSummary
@@ -120,10 +160,11 @@ export const centreCoordinatesSubmitController = {
   options: {
     pre: [setSiteDataPreHandler]
   },
-  handler(request, h) {
+  async handler(request, h) {
     const { payload } = request
-
     const { queryParams, siteIndex } = request.site
+    const action = request.query?.action
+    const siteNumber = getSiteNumber(getExemptionCache(request), request)
 
     const { coordinateSystem } = getCoordinateSystem(request)
 
@@ -138,6 +179,14 @@ export const centreCoordinatesSubmitController = {
 
     updateExemptionSiteDetails(request, siteIndex, 'coordinates', value)
 
-    return h.redirect(routes.WIDTH_OF_SITE + queryParams)
+    const nextRoute = action
+      ? `${routes.REVIEW_SITE_DETAILS}#site-details-${siteNumber}`
+      : routes.WIDTH_OF_SITE + queryParams
+
+    if (action) {
+      await saveSiteDetailsToBackend(request)
+    }
+
+    return h.redirect(nextRoute)
   }
 }

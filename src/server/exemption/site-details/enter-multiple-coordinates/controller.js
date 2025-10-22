@@ -21,6 +21,27 @@ import {
 } from './utils.js'
 import { validateCoordinates } from '#src/server/exemption/site-details/enter-multiple-coordinates/validation/validation.js'
 import { saveSiteDetailsToBackend } from '#src/server/common/helpers/save-site-details.js'
+import { getSiteNumber } from '#src/server/exemption/site-details/utils/site-number.js'
+
+const getCancelLink = (action, siteNumber) => {
+  return action
+    ? `${routes.REVIEW_SITE_DETAILS}#site-details-${siteNumber}`
+    : routes.TASK_LIST + '?cancel=site-details'
+}
+
+const getBackLinkForAction = (action, siteNumber, queryParams, request) => {
+  if (action) {
+    const savedSiteDetails = request.yar.get('savedSiteDetails') || {}
+
+    if (savedSiteDetails.originalCoordinateSystem !== undefined) {
+      return `${routes.COORDINATE_SYSTEM_CHOICE}?site=${siteNumber}&action=${action}`
+    }
+
+    return `${routes.REVIEW_SITE_DETAILS}#site-details-${siteNumber}`
+  }
+
+  return routes.COORDINATE_SYSTEM_CHOICE + queryParams
+}
 
 export const multipleCoordinatesController = {
   options: {
@@ -30,8 +51,15 @@ export const multipleCoordinatesController = {
     const exemption = getExemptionCache(request) || {}
     const { projectName } = exemption
     const { site } = request
-    const { siteIndex } = site
+    const { siteIndex, queryParams } = site
+    const action = request.query?.action
+    const siteNumber = getSiteNumber(exemption, request)
     const siteDetails = getSiteDetailsBySite(exemption, siteIndex)
+
+    if (action) {
+      const savedSiteDetails = request.yar.get('savedSiteDetails')
+      request.yar.set('savedSiteDetails', savedSiteDetails || {})
+    }
 
     const coordinateSystem =
       siteDetails.coordinateSystem === COORDINATE_SYSTEMS.OSGB36
@@ -55,8 +83,12 @@ export const multipleCoordinatesController = {
 
     return h.view(MULTIPLE_COORDINATES_VIEW_ROUTES[coordinateSystem], {
       ...multipleCoordinatesPageData,
+      backLink: getBackLinkForAction(action, siteNumber, queryParams, request),
+      cancelLink: getCancelLink(action, siteNumber),
       coordinates: paddedCoordinates,
-      projectName
+      projectName,
+      siteNumber: action ? siteNumber : null,
+      action
     })
   }
 }
@@ -96,6 +128,8 @@ export const multipleCoordinatesSubmitController = {
     const { payload } = request
     const exemption = getExemptionCache(request)
     const { siteIndex, queryParams } = request.site
+    const action = request.query?.action
+    const siteNumber = getSiteNumber(exemption, request)
     const { coordinateSystem } = getCoordinateSystem(request)
 
     let coordinates = convertPayloadToCoordinatesArray(
@@ -160,8 +194,12 @@ export const multipleCoordinatesSubmitController = {
       )
     }
 
+    const nextRoute = action
+      ? `${routes.REVIEW_SITE_DETAILS}#site-details-${siteNumber}`
+      : routes.REVIEW_SITE_DETAILS + queryParams
+
     await saveSiteDetailsToBackend(request)
 
-    return h.redirect(routes.REVIEW_SITE_DETAILS + queryParams)
+    return h.redirect(nextRoute)
   }
 }

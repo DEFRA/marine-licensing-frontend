@@ -15,3 +15,7 @@
     }
   }
 }
+
+.govuk-summary-list__row:has(.site-details-map--error) {
+  display: none;
+}

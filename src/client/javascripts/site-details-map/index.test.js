@@ -213,18 +213,18 @@ describe('SiteDetailsMap', () => {
       )
     })
 
-    test('should show error when no valid coordinates exist', () => {
+    test('should add an error class when no valid coordinates exist', () => {
       const siteDetails = {}
       mockDataLoader.hasValidFileCoordinates.mockReturnValue(false)
       mockDataLoader.hasValidManualCoordinates.mockReturnValue(false)
-
-      const showErrorSpy = vi.spyOn(siteDetailsMap, 'showError')
 
       const result = siteDetailsMap.displaySiteDetails(siteDetails)
 
       expect(result).toBe('error')
       expect(mockSiteVisualiser.clearFeatures).toHaveBeenCalled()
-      expect(showErrorSpy).toHaveBeenCalled()
+      expect(mockRoot.classList.contains('site-details-map--error')).toEqual(
+        true
+      )
     })
 
     test('should return early if siteVisualiser is not available', () => {
@@ -284,14 +284,14 @@ describe('SiteDetailsMap', () => {
   })
 
   describe('error handling', () => {
-    test('should display error message in root element', () => {
+    test('should add an error class to the root element', () => {
       siteDetailsMap = new SiteDetailsMap(mockRoot)
 
       siteDetailsMap.showError()
 
-      expect(mockRoot.innerHTML).toContain('Failed to load map')
-      expect(mockRoot.innerHTML).toContain('app-site-details-map__error')
-      expect(mockRoot.innerHTML).toContain('Please refresh the page')
+      expect(mockRoot.classList.contains('site-details-map--error')).toEqual(
+        true
+      )
     })
   })
 

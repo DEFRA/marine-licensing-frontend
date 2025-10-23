@@ -58,7 +58,7 @@ export const coordinatesEntryController = {
     return h.view(COORDINATES_ENTRY_VIEW_ROUTE, {
       ...coordinatesEntrySettings,
       backLink: getBackRoute(request, exemption, action),
-      cancelLink: getCancelLink(action, siteNumber),
+      cancelLink: getCancelLink(action),
       projectName: exemption.projectName,
       siteNumber: action ? siteNumber : null,
       action,
@@ -95,7 +95,7 @@ export const coordinatesEntrySubmitController = {
             .view(COORDINATES_ENTRY_VIEW_ROUTE, {
               ...coordinatesEntrySettings,
               backLink: getBackRoute(request, exemption, action),
-              cancelLink: getCancelLink(action, siteNumber),
+              cancelLink: getCancelLink(action),
               payload,
               projectName,
               siteNumber: action ? siteNumber : null,
@@ -112,7 +112,7 @@ export const coordinatesEntrySubmitController = {
           .view(COORDINATES_ENTRY_VIEW_ROUTE, {
             ...coordinatesEntrySettings,
             backLink: getBackRoute(request, exemption, action),
-            cancelLink: getCancelLink(action, siteNumber),
+            cancelLink: getCancelLink(action),
             payload,
             projectName,
             siteNumber: action ? siteNumber : null,

@@ -39,7 +39,7 @@ const getBackLink = (siteIndex, action, siteNumber) => {
     : routes.REVIEW_SITE_DETAILS
 }
 
-const getCancelLink = (action, siteNumber) => {
+const getCancelLink = (action) => {
   return action ? undefined : routes.TASK_LIST
 }
 
@@ -56,7 +56,7 @@ const createValidationFailAction = (request, h, err) => {
       .view(SITE_NAME_VIEW_ROUTE, {
         ...siteNameSettings,
         backLink: getBackLink(siteIndex, action, siteNumber),
-        cancelLink: getCancelLink(action, siteNumber),
+        cancelLink: getCancelLink(action),
         payload,
         projectName: exemption.projectName,
         siteNumber,
@@ -72,7 +72,7 @@ const createValidationFailAction = (request, h, err) => {
     .view(SITE_NAME_VIEW_ROUTE, {
       ...siteNameSettings,
       backLink: getBackLink(siteIndex, action, siteNumber),
-      cancelLink: getCancelLink(action, siteNumber),
+      cancelLink: getCancelLink(action),
       payload,
       projectName: exemption.projectName,
       siteNumber,
@@ -97,7 +97,7 @@ export const siteNameController = {
     return h.view(SITE_NAME_VIEW_ROUTE, {
       ...siteNameSettings,
       backLink: getBackLink(siteIndex, action, siteNumber),
-      cancelLink: getCancelLink(action, siteNumber),
+      cancelLink: getCancelLink(action),
       projectName: exemption.projectName,
       siteNumber,
       action,

@@ -95,7 +95,7 @@ export const centreCoordinatesController = {
     return h.view(COORDINATE_SYSTEM_VIEW_ROUTES[coordinateSystem], {
       ...centreCoordinatesPageData,
       backLink: getBackLinkForAction(action, siteNumber, queryParams, request),
-      cancelLink: getCancelLink(action, siteNumber),
+      cancelLink: getCancelLink(action),
       projectName: exemption.projectName,
       siteNumber: action ? siteNumber : null,
       action,
@@ -124,7 +124,7 @@ export const centreCoordinatesSubmitFailHandler = (request, h, error) => {
           queryParams,
           request
         ),
-        cancelLink: getCancelLink(action, siteNumber),
+        cancelLink: getCancelLink(action),
         projectName,
         siteNumber: action ? siteNumber : null,
         action,
@@ -143,7 +143,7 @@ export const centreCoordinatesSubmitFailHandler = (request, h, error) => {
     .view(COORDINATE_SYSTEM_VIEW_ROUTES[coordinateSystem], {
       ...centreCoordinatesPageData,
       backLink: getBackLinkForAction(action, siteNumber, queryParams, request),
-      cancelLink: getCancelLink(action, siteNumber),
+      cancelLink: getCancelLink(action),
       projectName,
       siteNumber: action ? siteNumber : null,
       action,

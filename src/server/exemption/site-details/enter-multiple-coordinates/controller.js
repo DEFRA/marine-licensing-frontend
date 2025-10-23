@@ -81,7 +81,7 @@ export const multipleCoordinatesController = {
     return h.view(MULTIPLE_COORDINATES_VIEW_ROUTES[coordinateSystem], {
       ...multipleCoordinatesPageData,
       backLink: getBackLinkForAction(action, siteNumber, queryParams, request),
-      cancelLink: getCancelLink(action, siteNumber),
+      cancelLink: getCancelLink(action),
       coordinates: paddedCoordinates,
       projectName,
       siteNumber: action ? siteNumber : null,

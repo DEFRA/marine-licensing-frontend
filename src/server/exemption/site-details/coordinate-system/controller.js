@@ -70,7 +70,7 @@ export const coordinateSystemController = {
         queryParams,
         siteDetails.coordinateSystem
       ),
-      cancelLink: getCancelLink(action, siteNumber),
+      cancelLink: getCancelLink(action),
       projectName: exemption.projectName,
       siteNumber: action ? siteNumber : null,
       action,
@@ -116,7 +116,7 @@ export const coordinateSystemSubmitController = {
                 queryParams,
                 siteDetails.coordinateSystem
               ),
-              cancelLink: getCancelLink(action, siteNumber),
+              cancelLink: getCancelLink(action),
               payload,
               projectName,
               siteNumber: action ? siteNumber : null,
@@ -138,7 +138,7 @@ export const coordinateSystemSubmitController = {
               queryParams,
               siteDetails.coordinateSystem
             ),
-            cancelLink: getCancelLink(action, siteNumber),
+            cancelLink: getCancelLink(action),
             payload,
             projectName,
             siteNumber: action ? siteNumber : null,

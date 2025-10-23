@@ -28,7 +28,7 @@ import { activityDatesSchema } from '#src/server/common/schemas/date.js'
 import { getSiteNumber } from '#src/server/exemption/site-details/utils/site-number.js'
 import { getBackRoute, getNextRoute } from './utils.js'
 
-const getCancelLink = (action, siteNumber) => {
+const getCancelLink = (action) => {
   return action ? undefined : routes.TASK_LIST + '?cancel=site-details'
 }
 
@@ -87,7 +87,7 @@ const createTemplateData = (
       queryParams,
       exemption
     ),
-    cancelLink: getCancelLink(action, siteNumber),
+    cancelLink: getCancelLink(action),
     isMultiSiteJourney: !!multipleSiteDetails?.multipleSitesEnabled,
     isSameActivityDates: multipleSiteDetails?.sameActivityDates === 'yes',
     siteNumber: variableActivityDates ? siteNumber : null,

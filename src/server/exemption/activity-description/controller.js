@@ -28,7 +28,7 @@ const templateValues = {
   heading: 'Activity description'
 }
 
-const getCancelLink = (action, siteNumber) => {
+const getCancelLink = (action) => {
   return action ? undefined : routes.TASK_LIST + '?cancel=site-details'
 }
 
@@ -66,7 +66,7 @@ const getPageTemplateValues = (request) => {
       siteIndex,
       queryParams
     ),
-    cancelLink: getCancelLink(action, siteNumber),
+    cancelLink: getCancelLink(action),
     projectName: exemption.projectName,
     siteNumber: variableActivityDescription ? siteNumber : null,
     action

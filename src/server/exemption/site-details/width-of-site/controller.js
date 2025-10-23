@@ -59,7 +59,7 @@ export const widthOfSiteController = {
     return h.view(WIDTH_OF_SITE_VIEW_ROUTE, {
       ...widthOfSiteSettings,
       backLink: getBackLinkForAction(action, siteNumber, queryParams),
-      cancelLink: getCancelLink(action, siteNumber),
+      cancelLink: getCancelLink(action),
       projectName: exemption.projectName,
       siteNumber: action ? siteNumber : null,
       action,
@@ -89,7 +89,7 @@ export const widthOfSiteSubmitController = {
             .view(WIDTH_OF_SITE_VIEW_ROUTE, {
               ...widthOfSiteSettings,
               backLink: getBackLinkForAction(action, siteNumber, queryParams),
-              cancelLink: getCancelLink(action, siteNumber),
+              cancelLink: getCancelLink(action),
               payload,
               projectName,
               siteNumber: action ? siteNumber : null,
@@ -105,7 +105,7 @@ export const widthOfSiteSubmitController = {
           .view(WIDTH_OF_SITE_VIEW_ROUTE, {
             ...widthOfSiteSettings,
             backLink: getBackLinkForAction(action, siteNumber, queryParams),
-            cancelLink: getCancelLink(action, siteNumber),
+            cancelLink: getCancelLink(action),
             payload,
             projectName,
             siteNumber: action ? siteNumber : null,

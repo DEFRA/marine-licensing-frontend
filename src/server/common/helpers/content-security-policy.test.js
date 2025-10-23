@@ -129,9 +129,7 @@ describe('contentSecurityPolicy', () => {
 
       expect(mockResponse.header).toHaveBeenCalledWith(
         'Content-Security-Policy',
-        expect.stringContaining(
-          "img-src 'self' data: https://tile.openstreetmap.org"
-        )
+        expect.stringContaining("img-src 'self' https://tile.openstreetmap.org")
       )
     })
 

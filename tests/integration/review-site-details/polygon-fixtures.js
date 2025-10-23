@@ -122,7 +122,8 @@ export const testScenarios = [
           cardName: 'Site details',
           method:
             'Manually enter multiple sets of coordinates to mark the boundary of the site',
-          coordinateSystem: 'OSGB36 (National Grid)Eastings and Northings',
+          coordinateSystem:
+            'British National Grid (OSGB36)Eastings and Northings',
           polygonCoordinates: [
             {
               label: 'Start and end points',
@@ -246,7 +247,8 @@ export const testScenarios = [
           cardName: 'Site details',
           method:
             'Manually enter multiple sets of coordinates to mark the boundary of the site',
-          coordinateSystem: 'OSGB36 (National Grid)Eastings and Northings',
+          coordinateSystem:
+            'British National Grid (OSGB36)Eastings and Northings',
           polygonCoordinates: [
             {
               label: 'Start and end points',
@@ -453,7 +455,8 @@ export const testScenarios = [
           activityDescription: 'Test activity description',
           method:
             'Manually enter multiple sets of coordinates to mark the boundary of the site',
-          coordinateSystem: 'OSGB36 (National Grid)Eastings and Northings',
+          coordinateSystem:
+            'British National Grid (OSGB36)Eastings and Northings',
           polygonCoordinates: [
             {
               label: 'Start and end points',

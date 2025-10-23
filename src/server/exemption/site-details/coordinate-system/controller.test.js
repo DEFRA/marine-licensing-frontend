@@ -113,7 +113,7 @@ describe('#coordinateSystem', () => {
         '<h2 class="govuk-heading-s">WGS84 (World Geodetic System 1984)</h2>'
       )
       expect(hint.innerHTML).toContain(
-        '<h2 class="govuk-heading-s">OSGB36 (National Grid)</h2>'
+        '<h2 class="govuk-heading-s">British National Grid (OSGB36)</h2>'
       )
 
       const hintSummary = document.querySelector('.govuk-details__summary-text')
@@ -124,7 +124,7 @@ describe('#coordinateSystem', () => {
       expect(
         document
           .querySelector(
-            '.govuk-back-link[href="/exemption/how-do-you-want-to-enter-the-coordinates"'
+            '.govuk-back-link[href="/exemption/how-do-you-want-to-enter-the-coordinates"]'
           )
           .textContent.trim()
       ).toBe('Back')
@@ -132,7 +132,7 @@ describe('#coordinateSystem', () => {
       expect(
         document
           .querySelector(
-            '.govuk-link[href="/exemption/task-list?cancel=site-details"'
+            '.govuk-link[href="/exemption/task-list?cancel=site-details"]'
           )
           .textContent.trim()
       ).toBe('Cancel')

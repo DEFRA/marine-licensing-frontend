@@ -275,7 +275,7 @@ describe('siteDetails utils', () => {
   describe('getCoordinateSystemText utils', () => {
     test('getCoordinateSystemText correctly returns text for OSGB36', () => {
       expect(getCoordinateSystemText(COORDINATE_SYSTEMS.OSGB36)).toBe(
-        'OSGB36 (National Grid)\nEastings and Northings'
+        'British National Grid (OSGB36)\nEastings and Northings'
       )
     })
 
@@ -614,7 +614,8 @@ describe('siteDetails utils', () => {
           showActivityDates: true,
           showActivityDescription: true,
           siteName: 'Test Site 3',
-          coordinateSystem: 'OSGB36 (National Grid)\nEastings and Northings',
+          coordinateSystem:
+            'British National Grid (OSGB36)\nEastings and Northings',
           coordinates: '425053, 564180',
           width: '200 metres',
           siteNumber: 1,

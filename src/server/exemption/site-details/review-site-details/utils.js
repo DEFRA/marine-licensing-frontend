@@ -92,7 +92,7 @@ export const getCoordinateSystemText = (coordinateSystem) => {
 
   return isWGS84(coordinateSystem)
     ? 'WGS84 (World Geodetic System 1984)\nLatitude and longitude'
-    : 'OSGB36 (National Grid)\nEastings and Northings'
+    : 'British National Grid (OSGB36)\nEastings and Northings'
 }
 
 export const getCoordinateDisplayText = (siteDetails, coordinateSystem) => {

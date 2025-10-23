@@ -133,7 +133,8 @@ describe('Site Details Card Component', () => {
             isFileUpload: false,
             isPolygonSite: false,
             reviewSummaryText: 'Draw/enter coordinates',
-            coordinateSystemText: 'OSGB36\nBritish National Grid',
+            coordinateSystemText:
+              'British National Grid (OSGB36)\nEastings and Northings',
             coordinateDisplayText: '425053, 564180',
             circleWidth: '250'
           },
@@ -155,7 +156,9 @@ describe('Site Details Card Component', () => {
         const html = document.documentElement.innerHTML
 
         expect(html).toContain('Draw/enter coordinates')
-        expect(html).toContain('OSGB36<br> British National Grid')
+        expect(html).toContain(
+          'British National Grid (OSGB36)<br> Eastings and Northings'
+        )
         expect(html).toContain('425053, 564180')
         expect(html).toContain('250 metres')
       })
@@ -241,7 +244,8 @@ describe('Site Details Card Component', () => {
             isFileUpload: false,
             isPolygonSite: true,
             reviewSummaryText: 'Draw/enter coordinates',
-            coordinateSystemText: 'OSGB36\nBritish National Grid',
+            coordinateSystemText:
+              'British National Grid (OSGB36)\nEastings and Northings',
             polygonCoordinates: [
               { label: 'Point A', value: '425053, 564180' },
               { label: 'Point B', value: '425054, 564181' }

@@ -93,8 +93,7 @@ export class SiteDetailsMap extends Component {
   }
 
   showError() {
-    this.$root.innerHTML =
-      '<div class="app-site-details-map__error">Failed to load map. Please refresh the page.</div>'
+    this.$root.classList.add('site-details-map--error')
   }
 }
 

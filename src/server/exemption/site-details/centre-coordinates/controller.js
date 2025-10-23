@@ -160,7 +160,7 @@ export const centreCoordinatesSubmitController = {
   },
   async handler(request, h) {
     const { payload } = request
-    const { queryParams, siteIndex, siteNumber } = request.site
+    const { queryParams, siteIndex, siteNumber, siteDetails } = request.site
     const action = request.query.action
 
     const { coordinateSystem } = getCoordinateSystem(request)
@@ -176,11 +176,14 @@ export const centreCoordinatesSubmitController = {
 
     updateExemptionSiteDetails(request, siteIndex, 'coordinates', value)
 
-    const nextRoute = action
-      ? `${routes.REVIEW_SITE_DETAILS}#site-details-${siteNumber}`
-      : routes.WIDTH_OF_SITE + queryParams
+    const hasCircleWidthEntry = siteDetails.circleWidth
 
-    if (action) {
+    const nextRoute =
+      action && hasCircleWidthEntry
+        ? `${routes.REVIEW_SITE_DETAILS}#site-details-${siteNumber}`
+        : routes.WIDTH_OF_SITE + queryParams
+
+    if (action && hasCircleWidthEntry) {
       await saveSiteDetailsToBackend(request)
     }
 

@@ -561,10 +561,11 @@ describe('#centreCoordinates', () => {
       expect(h.view().takeover).toHaveBeenCalled()
     })
 
-    test('Should correctly handle change link submit', async () => {
+    test('Should correctly handle change link submit when only changing this page value', async () => {
       getExemptionCacheSpy.mockReturnValueOnce({
         projectName: mockExemption.projectName,
-        multipleSiteDetails: { multipleSitesEnabled: true }
+        multipleSiteDetails: { multipleSitesEnabled: true },
+        siteDetails: mockExemption.siteDetails
       })
 
       const request = {
@@ -582,6 +583,30 @@ describe('#centreCoordinates', () => {
       expect(h.redirect).toHaveBeenCalledWith(
         routes.REVIEW_SITE_DETAILS + '#site-details-1'
       )
+    })
+
+    test('Should correctly handle change link submit when arriving from earlier pages in the flow', async () => {
+      getExemptionCacheSpy.mockReturnValueOnce({
+        projectName: mockExemption.projectName,
+        multipleSiteDetails: { multipleSitesEnabled: true }
+      })
+
+      const request = {
+        payload: { latitude: '51.489676', longitude: '-0.231530 ' },
+        site: {
+          ...mockSite,
+          siteDetails: { ...mockSite.siteDetails, circleWidth: null }
+        },
+        query: { action: 'change' }
+      }
+
+      const h = { redirect: vi.fn() }
+
+      const mockRequest = createMockRequest(request)
+      await centreCoordinatesSubmitController.handler(mockRequest, h)
+
+      expect(saveSiteDetailsToBackend).not.toHaveBeenCalled()
+      expect(h.redirect).toHaveBeenCalledWith(routes.WIDTH_OF_SITE)
     })
 
     test('Should correctly handle invalid change link submit', async () => {

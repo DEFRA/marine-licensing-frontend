@@ -24,6 +24,10 @@ export const updateExemptionSiteDetails = (request, siteIndex, key, value) => {
     [key]: cacheValue
   }
 
+  if (cacheValue === null) {
+    delete updatedSiteDetails[siteIndex][key]
+  }
+
   request.yar.set(EXEMPTION_CACHE_KEY, {
     ...existingCache,
     siteDetails: updatedSiteDetails

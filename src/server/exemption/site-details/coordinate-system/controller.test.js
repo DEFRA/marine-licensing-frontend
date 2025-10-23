@@ -174,7 +174,10 @@ describe('#coordinateSystem', () => {
     test('should redirect to multiple coordinates page when coordinatesEntry is multiple', async () => {
       const request = createMockRequest({
         payload: { coordinateSystem: 'wgs84' },
-        site: mockSite
+        site: {
+          ...mockSite,
+          siteDetails: { ...mockSite.siteDetails, coordinatesEntry: 'multiple' }
+        }
       })
 
       getExemptionCacheSpy.mockReturnValueOnce({
@@ -191,12 +194,14 @@ describe('#coordinateSystem', () => {
     test('should stay on page when coordinatesEntry is neither single nor multiple', async () => {
       const request = createMockRequest({
         payload: { coordinateSystem: 'wgs84' },
-        site: mockSite
+        site: {
+          ...mockSite,
+          siteDetails: { ...mockSite.siteDetails, coordinatesEntry: 'invalid' }
+        }
       })
 
       getExemptionCacheSpy.mockReturnValueOnce({
-        projectName: 'Test Project',
-        siteDetails: { coordinatesEntry: 'other' }
+        projectName: 'Test Project'
       })
 
       const h = { view: vi.fn() }
@@ -409,7 +414,7 @@ describe('#coordinateSystem', () => {
       coordinateSystemSubmitController.handler(request, h)
 
       expect(h.redirect).toHaveBeenCalledWith(
-        routes.ENTER_MULTIPLE_COORDINATES + '?site=1&action=change'
+        routes.CIRCLE_CENTRE_POINT + '?site=1&action=change'
       )
     })
 

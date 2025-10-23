@@ -157,7 +157,7 @@ export const coordinateSystemSubmitController = {
   },
   handler(request, h) {
     const { payload, site } = request
-    const { siteIndex, queryParams } = site
+    const { siteIndex, queryParams, siteDetails } = site
     const action = request.query.action
 
     const exemption = getExemptionCache(request)
@@ -173,17 +173,20 @@ export const coordinateSystemSubmitController = {
       const { originalCoordinateSystem } =
         request.yar.get('savedSiteDetails') || {}
 
-      if (payload.coordinateSystem === originalCoordinateSystem) {
+      if (
+        !siteDetails.coordinates ||
+        payload.coordinateSystem !== originalCoordinateSystem
+      ) {
+        updateExemptionSiteDetails(request, siteIndex, 'coordinates', null)
+        updateExemptionSiteDetails(request, siteIndex, 'circleWidth', null)
+      } else if (payload.coordinateSystem === originalCoordinateSystem) {
         return h.redirect(
           `${routes.REVIEW_SITE_DETAILS}#site-details-${site.siteNumber}`
         )
       }
     }
 
-    const coordinatesEntry = getSiteDetailsBySite(
-      exemption,
-      siteIndex
-    )?.coordinatesEntry
+    const coordinatesEntry = siteDetails.coordinatesEntry
 
     if (coordinatesEntry === 'single') {
       const nextRoute = action

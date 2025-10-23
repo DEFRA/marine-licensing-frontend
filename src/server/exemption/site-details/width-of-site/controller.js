@@ -22,11 +22,8 @@ export const WIDTH_OF_SITE_VIEW_ROUTE =
 
 const ENTER_WIDTH = 'Enter the width of the circular site in metres'
 
-const getCancelLink = (action, siteNumber) => {
-  return action
-    ? `${routes.REVIEW_SITE_DETAILS}#site-details-${siteNumber}`
-    : routes.TASK_LIST + '?cancel=site-details'
-}
+const getCancelLink = (action) =>
+  action ? undefined : routes.TASK_LIST + '?cancel=site-details'
 
 const getBackLinkForAction = (action, siteNumber, queryParams) => {
   if (action) {
@@ -56,7 +53,7 @@ export const widthOfSiteController = {
     const { site } = request
     const { siteIndex, queryParams } = site
     const siteDetails = getSiteDetailsBySite(exemption, siteIndex)
-    const action = request.query?.action
+    const action = request.query.action
     const siteNumber = getSiteNumber(exemption, request)
 
     return h.view(WIDTH_OF_SITE_VIEW_ROUTE, {
@@ -81,7 +78,7 @@ export const widthOfSiteSubmitController = {
         const { payload } = request
         const exemption = getExemptionCache(request)
         const { projectName } = exemption
-        const action = request.query?.action
+        const action = request.query.action
         const siteNumber = getSiteNumber(exemption, request)
 
         const site = setSiteData(request)
@@ -124,7 +121,7 @@ export const widthOfSiteSubmitController = {
     const { payload } = request
     const exemption = getExemptionCache(request)
     const { siteIndex, queryParams } = request.site
-    const action = request.query?.action
+    const action = request.query.action
     const siteNumber = getSiteNumber(exemption, request)
 
     updateExemptionSiteDetails(

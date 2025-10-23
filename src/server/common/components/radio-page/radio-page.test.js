@@ -25,7 +25,8 @@ describe('radioPage Component', () => {
     $radioPage = renderComponent('radio-page', {
       ...commonTestData,
       isPageHeading: true,
-      heading: 'Test heading'
+      heading: 'Test heading',
+      cancelLink: '#'
     })
 
     const legend = $radioPage('.govuk-fieldset__legend')
@@ -46,7 +47,8 @@ describe('radioPage Component', () => {
   test('Should render radio buttons page correctly with a seperate heading', () => {
     $radioPage = renderComponent('radio-page', {
       ...commonTestData,
-      heading: 'Test heading'
+      heading: 'Test heading',
+      cancelLink: '#'
     })
 
     expect($radioPage('h1').text().trim()).toBe('Test heading')
@@ -66,6 +68,7 @@ describe('radioPage Component', () => {
       ...commonTestData,
       isPageHeading: true,
       heading: 'Test heading',
+      cancelLink: '#',
       errorSummary: [
         {
           href: '#test-name',
@@ -92,6 +95,7 @@ describe('radioPage Component', () => {
       ...commonTestData,
       isPageHeading: true,
       heading: 'Test heading',
+      cancelLink: '#',
       hint: { html: '<h2>test hint text</h2>' }
     })
 

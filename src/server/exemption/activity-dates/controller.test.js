@@ -10,7 +10,7 @@ import {
   activityDatesSubmitController
 } from '#src/server/exemption/activity-dates/controller.js'
 import { setupTestServer } from '#tests/integration/shared/test-setup-helpers.js'
-import { mockSite } from '#src/server/test-helpers/mocks.js'
+import { mockSite, createMockRequest } from '#src/server/test-helpers/mocks.js'
 import {
   makeGetRequest,
   makePostRequest
@@ -59,7 +59,7 @@ describe('#activityDatesController', () => {
 
     test('should render with empty date fields when no existing data', () => {
       const h = { view: vi.fn() }
-      const request = { url: {}, site: mockSite }
+      const request = createMockRequest({ url: {}, site: mockSite })
 
       activityDatesController.handler(request, h)
 
@@ -98,7 +98,7 @@ describe('#activityDatesController', () => {
       getExemptionCacheSpy.mockReturnValue(exemptionWithDates)
 
       const h = { view: vi.fn() }
-      const request = { url: {}, site: mockSite }
+      const request = createMockRequest({ url: {}, site: mockSite })
 
       activityDatesController.handler(request, h)
 
@@ -138,10 +138,11 @@ describe('#activityDatesController', () => {
       getExemptionCacheSpy.mockReturnValue(exemptionWithFileUpload)
 
       const h = { view: vi.fn() }
-      const request = {
+
+      const request = createMockRequest({
         url: { pathname: routes.ACTIVITY_DATES },
         site: { siteIndex: 0 }
-      }
+      })
 
       activityDatesController.handler(request, h)
 
@@ -573,7 +574,9 @@ describe('#activityDatesController', () => {
         ]
       }
 
-      const request = { payload: {}, url: {} }
+      const request = createMockRequest({
+        payload: {}
+      })
 
       activityDatesSubmitController.options.validate.failAction(request, h, err)
 
@@ -602,7 +605,9 @@ describe('#activityDatesController', () => {
         ]
       }
 
-      const request = { payload: {}, url: {} }
+      const request = createMockRequest({
+        payload: {}
+      })
 
       activityDatesSubmitController.options.validate.failAction(request, h, err)
 
@@ -635,7 +640,9 @@ describe('#activityDatesController', () => {
         ]
       }
 
-      const request = { payload: {}, url: {} }
+      const request = createMockRequest({
+        payload: {}
+      })
 
       activityDatesSubmitController.options.validate.failAction(request, h, err)
 
@@ -664,7 +671,9 @@ describe('#activityDatesController', () => {
         ]
       }
 
-      const request = { payload: {}, url: {} }
+      const request = createMockRequest({
+        payload: {}
+      })
 
       activityDatesSubmitController.options.validate.failAction(request, h, err)
 
@@ -693,7 +702,9 @@ describe('#activityDatesController', () => {
         ]
       }
 
-      const request = { payload: {}, url: {} }
+      const request = createMockRequest({
+        payload: {}
+      })
 
       activityDatesSubmitController.options.validate.failAction(request, h, err)
 
@@ -722,7 +733,9 @@ describe('#activityDatesController', () => {
         ]
       }
 
-      const request = { payload: {}, url: {} }
+      const request = createMockRequest({
+        payload: {}
+      })
 
       activityDatesSubmitController.options.validate.failAction(request, h, err)
 
@@ -756,7 +769,9 @@ describe('#activityDatesController', () => {
         ]
       }
 
-      const request = { payload: {}, url: {} }
+      const request = createMockRequest({
+        payload: {}
+      })
 
       activityDatesSubmitController.options.validate.failAction(request, h, err)
 
@@ -785,7 +800,9 @@ describe('#activityDatesController', () => {
         ]
       }
 
-      const request = { payload: {}, url: {} }
+      const request = createMockRequest({
+        payload: {}
+      })
 
       activityDatesSubmitController.options.validate.failAction(request, h, err)
 
@@ -814,7 +831,9 @@ describe('#activityDatesController', () => {
         ]
       }
 
-      const request = { payload: {}, url: {} }
+      const request = createMockRequest({
+        payload: {}
+      })
 
       activityDatesSubmitController.options.validate.failAction(request, h, err)
 
@@ -843,7 +862,9 @@ describe('#activityDatesController', () => {
         ]
       }
 
-      const request = { payload: {}, url: {} }
+      const request = createMockRequest({
+        payload: {}
+      })
 
       activityDatesSubmitController.options.validate.failAction(request, h, err)
 
@@ -872,7 +893,9 @@ describe('#activityDatesController', () => {
         ]
       }
 
-      const request = { payload: {}, url: {} }
+      const request = createMockRequest({
+        payload: {}
+      })
 
       activityDatesSubmitController.options.validate.failAction(request, h, err)
 
@@ -899,7 +922,9 @@ describe('#activityDatesController', () => {
         ]
       }
 
-      const request = { payload: {}, url: {} }
+      const request = createMockRequest({
+        payload: {}
+      })
 
       activityDatesSubmitController.options.validate.failAction(request, h, err)
 
@@ -928,7 +953,9 @@ describe('#activityDatesController', () => {
         ]
       }
 
-      const request = { payload: {}, url: {} }
+      const request = createMockRequest({
+        payload: {}
+      })
 
       activityDatesSubmitController.options.validate.failAction(request, h, err)
 
@@ -957,7 +984,9 @@ describe('#activityDatesController', () => {
         ]
       }
 
-      const request = { payload: {}, url: {} }
+      const request = createMockRequest({
+        payload: {}
+      })
 
       activityDatesSubmitController.options.validate.failAction(request, h, err)
 
@@ -988,7 +1017,9 @@ describe('#activityDatesController', () => {
         ]
       }
 
-      const request = { payload: {}, url: {} }
+      const request = createMockRequest({
+        payload: {}
+      })
 
       activityDatesSubmitController.options.validate.failAction(request, h, err)
 
@@ -1011,7 +1042,9 @@ describe('#activityDatesController', () => {
       // Create an error without details to trigger line 314 (return h)
       const err = {} // No details property
 
-      const request = { payload: { 'test-field': 'test-value' }, url: {} }
+      const request = createMockRequest({
+        payload: { 'test-field': 'test-value' }
+      })
 
       getExemptionCacheSpy.mockReturnValueOnce({
         projectName: 'Test Project'

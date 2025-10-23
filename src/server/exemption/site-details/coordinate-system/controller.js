@@ -29,11 +29,8 @@ export const errorMessages = {
   COORDINATE_SYSTEM_REQUIRED: 'Select which coordinate system you want to use'
 }
 
-const getCancelLink = (action, siteNumber) => {
-  return action
-    ? `${routes.REVIEW_SITE_DETAILS}#site-details-${siteNumber}`
-    : routes.TASK_LIST + '?cancel=site-details'
-}
+const getCancelLink = (action) =>
+  action ? undefined : routes.TASK_LIST + '?cancel=site-details'
 
 const getBackLink = (action, siteNumber, queryParams, coordinateSystem) => {
   if (action) {
@@ -50,7 +47,7 @@ export const coordinateSystemController = {
   handler(request, h) {
     const exemption = getExemptionCache(request)
     const { siteIndex, queryParams } = request.site
-    const action = request.query?.action
+    const action = request.query.action
     const siteNumber = getSiteNumber(exemption, request)
 
     const siteDetails = getSiteDetailsBySite(exemption, siteIndex)
@@ -102,7 +99,7 @@ export const coordinateSystemSubmitController = {
         const { payload } = request
         const exemption = getExemptionCache(request)
         const { projectName } = exemption
-        const action = request.query?.action
+        const action = request.query.action
         const siteNumber = getSiteNumber(exemption, request)
 
         const site = setSiteData(request)
@@ -156,7 +153,7 @@ export const coordinateSystemSubmitController = {
   handler(request, h) {
     const { payload, site } = request
     const { siteIndex, queryParams } = site
-    const action = request.query?.action
+    const action = request.query.action
 
     const exemption = getExemptionCache(request)
 

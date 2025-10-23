@@ -26,11 +26,8 @@ export const errorMessages = {
   COORDINATES_ENTRY_REQUIRED: 'Select how you want to enter the coordinates'
 }
 
-const getCancelLink = (action, siteNumber) => {
-  return action
-    ? `${routes.REVIEW_SITE_DETAILS}#site-details-${siteNumber}`
-    : routes.TASK_LIST + '?cancel=site-details'
-}
+const getCancelLink = (action) =>
+  action ? undefined : routes.TASK_LIST + '?cancel=site-details'
 
 export const coordinatesEntryController = {
   options: {
@@ -40,7 +37,7 @@ export const coordinatesEntryController = {
     const exemption = getExemptionCache(request)
     const { site } = request
     const { siteIndex } = site
-    const action = request.query?.action
+    const action = request.query.action
     const siteNumber = getSiteNumber(exemption, request)
 
     const siteDetails = getSiteDetailsBySite(exemption, siteIndex)
@@ -90,7 +87,7 @@ export const coordinatesEntrySubmitController = {
         const { payload } = request
         const exemption = getExemptionCache(request)
         const { projectName } = exemption
-        const action = request.query?.action
+        const action = request.query.action
         const siteNumber = getSiteNumber(exemption, request)
 
         if (!err.details) {
@@ -130,7 +127,7 @@ export const coordinatesEntrySubmitController = {
   handler(request, h) {
     const { payload } = request
     const { siteIndex, queryParams } = request.site
-    const action = request.query?.action
+    const action = request.query.action
 
     updateExemptionSiteDetails(
       request,

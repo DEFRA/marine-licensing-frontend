@@ -6,7 +6,11 @@ import {
   COORDINATE_SYSTEM_VIEW_ROUTE
 } from '#src/server/exemption/site-details/coordinate-system/controller.js'
 import * as cacheUtils from '#src/server/common/helpers/session-cache/utils.js'
-import { mockExemption, mockSite } from '#src/server/test-helpers/mocks.js'
+import {
+  mockExemption,
+  mockSite,
+  createMockRequest
+} from '#src/server/test-helpers/mocks.js'
 import { makeGetRequest } from '#src/server/test-helpers/server-requests.js'
 import { statusCodes } from '#src/server/common/constants/status-codes.js'
 import { config } from '#src/config/config.js'
@@ -30,7 +34,8 @@ describe('#coordinateSystem', () => {
       getExemptionCacheSpy.mockReturnValueOnce({})
       const h = { view: vi.fn() }
 
-      coordinateSystemController.handler({ site: mockSite }, h)
+      const request = createMockRequest({ site: mockSite })
+      coordinateSystemController.handler(request, h)
 
       expect(h.view).toHaveBeenCalledWith(COORDINATE_SYSTEM_VIEW_ROUTE, {
         pageTitle: 'Which coordinate system do you want to use?',
@@ -113,7 +118,7 @@ describe('#coordinateSystem', () => {
       })
 
       const h = { view: vi.fn() }
-      const request = {
+      const request = createMockRequest({
         site: mockSite,
         query: { action: 'change', site: '1' },
         yar: {
@@ -121,7 +126,7 @@ describe('#coordinateSystem', () => {
           get: vi.fn().mockReturnValue({}),
           set: vi.fn()
         }
-      }
+      })
 
       coordinateSystemController.handler(request, h)
 
@@ -129,7 +134,7 @@ describe('#coordinateSystem', () => {
         pageTitle: 'Which coordinate system do you want to use?',
         heading: 'Which coordinate system do you want to use?',
         backLink: `${routes.REVIEW_SITE_DETAILS}#site-details-1`,
-        cancelLink: `${routes.REVIEW_SITE_DETAILS}#site-details-1`,
+        cancelLink: undefined,
         payload: { coordinateSystem: 'wgs84' },
         projectName: 'Test Project',
         siteNumber: 1,
@@ -140,10 +145,10 @@ describe('#coordinateSystem', () => {
 
   describe('#coordinateSystemSubmitController', () => {
     test('should redirect to multiple coordinates page when coordinatesEntry is multiple', async () => {
-      const request = {
+      const request = createMockRequest({
         payload: { coordinateSystem: 'wgs84' },
         site: mockSite
-      }
+      })
 
       getExemptionCacheSpy.mockReturnValueOnce({
         projectName: 'Test Project',
@@ -157,10 +162,10 @@ describe('#coordinateSystem', () => {
     })
 
     test('should stay on page when coordinatesEntry is neither single nor multiple', async () => {
-      const request = {
+      const request = createMockRequest({
         payload: { coordinateSystem: 'wgs84' },
         site: mockSite
-      }
+      })
 
       getExemptionCacheSpy.mockReturnValueOnce({
         projectName: 'Test Project',
@@ -180,9 +185,9 @@ describe('#coordinateSystem', () => {
     })
 
     test('Should correctly format error data', () => {
-      const request = {
+      const request = createMockRequest({
         payload: { coordinateSystem: 'invalid' }
-      }
+      })
 
       const h = {
         view: vi.fn().mockReturnValue({
@@ -235,9 +240,9 @@ describe('#coordinateSystem', () => {
     })
 
     test('Should still render page if no error details are provided', () => {
-      const request = {
+      const request = createMockRequest({
         payload: { coordinateSystem: 'invalid' }
-      }
+      })
 
       const h = {
         view: vi.fn().mockReturnValue({
@@ -286,10 +291,11 @@ describe('#coordinateSystem', () => {
         site: mockSite
       }
 
-      await coordinateSystemSubmitController.handler(mockRequest, h)
+      const request = createMockRequest(mockRequest)
+      await coordinateSystemSubmitController.handler(request, h)
 
       expect(cacheUtils.updateExemptionSiteDetails).toHaveBeenCalledWith(
-        mockRequest,
+        request,
         0,
         'coordinateSystem',
         'wgs84'

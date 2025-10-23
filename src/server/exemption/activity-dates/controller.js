@@ -29,9 +29,7 @@ import { getSiteNumber } from '#src/server/exemption/site-details/utils/site-num
 import { getBackRoute, getNextRoute } from './utils.js'
 
 const getCancelLink = (action, siteNumber) => {
-  return action
-    ? `${routes.REVIEW_SITE_DETAILS}#site-details-${siteNumber}`
-    : routes.TASK_LIST + '?cancel=site-details'
+  return action ? undefined : routes.TASK_LIST + '?cancel=site-details'
 }
 
 const getBackLink = (siteIndex, action, siteNumber, queryParams, exemption) => {
@@ -50,7 +48,7 @@ const createTemplateData = (
 ) => {
   let dateFields
 
-  const action = request.query?.action
+  const action = request.query.action
 
   if (Object.keys(payload).length > 0) {
     dateFields = extractMultipleDateFields(payload, DATE_EXTRACTION_CONFIG)
@@ -176,7 +174,7 @@ export const activityDatesSubmitController = {
         end
       })
 
-      const action = request.query?.action
+      const action = request.query.action
       const { siteNumber } = request.site
 
       const nextRoute = action

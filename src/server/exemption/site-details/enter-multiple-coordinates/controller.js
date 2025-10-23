@@ -23,11 +23,8 @@ import { validateCoordinates } from '#src/server/exemption/site-details/enter-mu
 import { saveSiteDetailsToBackend } from '#src/server/common/helpers/save-site-details.js'
 import { getSiteNumber } from '#src/server/exemption/site-details/utils/site-number.js'
 
-const getCancelLink = (action, siteNumber) => {
-  return action
-    ? `${routes.REVIEW_SITE_DETAILS}#site-details-${siteNumber}`
-    : routes.TASK_LIST + '?cancel=site-details'
-}
+const getCancelLink = (action) =>
+  action ? undefined : routes.TASK_LIST + '?cancel=site-details'
 
 const getBackLinkForAction = (action, siteNumber, queryParams, request) => {
   if (action) {
@@ -52,7 +49,7 @@ export const multipleCoordinatesController = {
     const { projectName } = exemption
     const { site } = request
     const { siteIndex, queryParams } = site
-    const action = request.query?.action
+    const action = request.query.action
     const siteNumber = getSiteNumber(exemption, request)
     const siteDetails = getSiteDetailsBySite(exemption, siteIndex)
 
@@ -128,7 +125,7 @@ export const multipleCoordinatesSubmitController = {
     const { payload } = request
     const exemption = getExemptionCache(request)
     const { siteIndex, queryParams } = request.site
-    const action = request.query?.action
+    const action = request.query.action
     const siteNumber = getSiteNumber(exemption, request)
     const { coordinateSystem } = getCoordinateSystem(request)
 

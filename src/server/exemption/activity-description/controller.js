@@ -29,9 +29,7 @@ const templateValues = {
 }
 
 const getCancelLink = (action, siteNumber) => {
-  return action
-    ? `${routes.REVIEW_SITE_DETAILS}#site-details-${siteNumber}`
-    : routes.TASK_LIST + '?cancel=site-details'
+  return action ? undefined : routes.TASK_LIST + '?cancel=site-details'
 }
 
 const getBackLinkForAction = (
@@ -49,7 +47,7 @@ const getBackLinkForAction = (
 
 const getPageTemplateValues = (request) => {
   const exemption = getExemptionCache(request)
-  const action = request.query?.action
+  const action = request.query.action
 
   const { siteNumber, siteIndex, queryParams } = request.site ?? {}
 
@@ -147,7 +145,7 @@ export const activityDescriptionSubmitController = {
         payload.activityDescription
       )
 
-      const action = request.query?.action
+      const action = request.query.action
       const { siteNumber } = request.site
 
       const nextRoute = action

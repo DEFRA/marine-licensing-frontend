@@ -6,7 +6,11 @@ import {
   COORDINATES_ENTRY_VIEW_ROUTE
 } from '#src/server/exemption/site-details/coordinates-entry/controller.js'
 import * as cacheUtils from '#src/server/common/helpers/session-cache/utils.js'
-import { mockExemption, mockSite } from '#src/server/test-helpers/mocks.js'
+import {
+  mockExemption,
+  mockSite,
+  createMockRequest
+} from '#src/server/test-helpers/mocks.js'
 import { makeGetRequest } from '#src/server/test-helpers/server-requests.js'
 import { statusCodes } from '#src/server/common/constants/status-codes.js'
 import { config } from '#src/config/config.js'
@@ -28,13 +32,9 @@ describe('#coordinatesEntry', () => {
   describe('#coordinatesEntryController', () => {
     test('coordinatesEntryController handler should render with correct context', () => {
       const h = { view: vi.fn() }
+      const request = createMockRequest({ site: mockSite })
 
-      coordinatesEntryController.handler(
-        {
-          site: mockSite
-        },
-        h
-      )
+      coordinatesEntryController.handler(request, h)
 
       expect(h.view).toHaveBeenCalledWith(COORDINATES_ENTRY_VIEW_ROUTE, {
         pageTitle: 'How do you want to enter the coordinates?',
@@ -57,12 +57,8 @@ describe('#coordinatesEntry', () => {
 
       const h = { view: vi.fn() }
 
-      coordinatesEntryController.handler(
-        {
-          site: mockSite
-        },
-        h
-      )
+      const request = createMockRequest({ site: mockSite })
+      coordinatesEntryController.handler(request, h)
 
       expect(h.view).toHaveBeenCalledWith(COORDINATES_ENTRY_VIEW_ROUTE, {
         pageTitle: 'How do you want to enter the coordinates?',
@@ -131,6 +127,7 @@ describe('#coordinatesEntry', () => {
   describe('#coordinatesEntrySubmitController', () => {
     test('Should correctly format error data', () => {
       const request = {
+        query: {},
         payload: { coordinatesEntry: 'invalid' },
         site: mockSite
       }
@@ -187,6 +184,7 @@ describe('#coordinatesEntry', () => {
 
     test('Should correctly output page with no error data in object', () => {
       const request = {
+        query: {},
         payload: { coordinatesEntry: 'invalid' },
         site: mockSite
       }
@@ -257,10 +255,11 @@ describe('#coordinatesEntry', () => {
         redirect: vi.fn()
       }
 
-      await coordinatesEntrySubmitController.handler(
-        { payload: { coordinatesEntry: 'single' }, site: mockSite },
-        h
-      )
+      const request = createMockRequest({
+        payload: { coordinatesEntry: 'single' },
+        site: mockSite
+      })
+      await coordinatesEntrySubmitController.handler(request, h)
 
       expect(h.redirect).toHaveBeenCalledWith(routes.COORDINATE_SYSTEM_CHOICE)
     })
@@ -278,10 +277,11 @@ describe('#coordinatesEntry', () => {
         site: mockSite
       }
 
-      await coordinatesEntrySubmitController.handler(mockRequest, h)
+      const request = createMockRequest(mockRequest)
+      await coordinatesEntrySubmitController.handler(request, h)
 
       expect(cacheUtils.updateExemptionSiteDetails).toHaveBeenCalledWith(
-        mockRequest,
+        request,
         0,
         'coordinatesEntry',
         'single'

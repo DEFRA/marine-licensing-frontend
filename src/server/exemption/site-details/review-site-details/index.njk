@@ -61,6 +61,7 @@
                         ]
                   }
                 },
+                classes: 'govuk-summary-list--full-width',
                 rows: multipleSiteRows
             }) }}
 
@@ -147,7 +148,7 @@
                 value: { 
                     html: appIncompleteField({text: site.activityDates})
                 },
-                actions: setSiteDetailsAction(site.activityDates, 'site-details-activity-dates', site.siteNumber)
+                actions: setSiteDetailsAction(site.activityDates, 'activity-dates', site.siteNumber)
                 }) %}
             {% endif %}
 
@@ -159,7 +160,7 @@
                     value: { 
                         html: appIncompleteField({ text: site.activityDescription })
                     },
-                    actions: setSiteDetailsAction(site.activityDescription, 'site-details-activity-description', site.siteNumber)
+                    actions: setSiteDetailsAction(site.activityDescription, 'activity-description', site.siteNumber)
                 }), summaryRows) %}
             {% endif %}
 

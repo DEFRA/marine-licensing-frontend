@@ -57,11 +57,8 @@ export const errorMessages = {
       'Northings must be a positive 6 or 7-digit number, like 123456'
   }
 }
-const getCancelLink = (action, siteNumber) => {
-  return action
-    ? `${routes.REVIEW_SITE_DETAILS}#site-details-${siteNumber}`
-    : routes.TASK_LIST + '?cancel=site-details'
-}
+const getCancelLink = (action) =>
+  action ? undefined : routes.TASK_LIST + '?cancel=site-details'
 
 const getBackLinkForAction = (action, siteNumber, queryParams, request) => {
   if (action) {
@@ -85,7 +82,7 @@ export const centreCoordinatesController = {
     const exemption = getExemptionCache(request)
     const { siteIndex, queryParams } = request.site
     const { coordinateSystem } = getCoordinateSystem(request)
-    const action = request.query?.action
+    const action = request.query.action
     const siteNumber = getSiteNumber(exemption, request)
 
     const siteDetails = getSiteDetailsBySite(exemption, siteIndex)
@@ -114,7 +111,7 @@ export const centreCoordinatesSubmitFailHandler = (request, h, error) => {
   const { queryParams } = site
   const { coordinateSystem } = getCoordinateSystem(request)
   const { projectName } = exemption
-  const action = request.query?.action
+  const action = request.query.action
   const siteNumber = getSiteNumber(exemption, request)
 
   if (!error.details) {
@@ -163,7 +160,7 @@ export const centreCoordinatesSubmitController = {
   async handler(request, h) {
     const { payload } = request
     const { queryParams, siteIndex } = request.site
-    const action = request.query?.action
+    const action = request.query.action
     const siteNumber = getSiteNumber(getExemptionCache(request), request)
 
     const { coordinateSystem } = getCoordinateSystem(request)

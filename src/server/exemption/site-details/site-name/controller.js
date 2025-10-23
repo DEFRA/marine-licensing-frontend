@@ -40,9 +40,7 @@ const getBackLink = (siteIndex, action, siteNumber) => {
 }
 
 const getCancelLink = (action, siteNumber) => {
-  return action
-    ? `${routes.REVIEW_SITE_DETAILS}#site-details-${siteNumber}`
-    : routes.TASK_LIST
+  return action ? undefined : routes.TASK_LIST
 }
 
 const createValidationFailAction = (request, h, err) => {
@@ -51,7 +49,7 @@ const createValidationFailAction = (request, h, err) => {
 
   const site = setSiteData(request)
   const { siteNumber, siteIndex } = site
-  const action = request.query?.action
+  const action = request.query.action
 
   if (!err.details) {
     return h
@@ -94,7 +92,7 @@ export const siteNameController = {
 
     const { site } = request
     const { siteNumber, siteIndex, siteDetails } = site
-    const action = request.query?.action
+    const action = request.query.action
 
     return h.view(SITE_NAME_VIEW_ROUTE, {
       ...siteNameSettings,
@@ -133,7 +131,7 @@ export const siteNameSubmitController = {
     const { payload, site } = request
 
     const { queryParams, siteIndex, siteNumber } = site
-    const action = request.query?.action
+    const action = request.query.action
 
     updateExemptionSiteDetails(request, siteIndex, 'siteName', payload.siteName)
 

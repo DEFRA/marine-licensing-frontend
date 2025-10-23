@@ -6,7 +6,11 @@ import {
   WIDTH_OF_SITE_VIEW_ROUTE
 } from '#src/server/exemption/site-details/width-of-site/controller.js'
 import * as cacheUtils from '#src/server/common/helpers/session-cache/utils.js'
-import { mockExemption, mockSite } from '#src/server/test-helpers/mocks.js'
+import {
+  createMockRequest,
+  mockExemption,
+  mockSite
+} from '#src/server/test-helpers/mocks.js'
 import { makeGetRequest } from '#src/server/test-helpers/server-requests.js'
 import { statusCodes } from '#src/server/common/constants/status-codes.js'
 import { config } from '#src/config/config.js'
@@ -33,7 +37,7 @@ describe('#widthOfSite', () => {
     test('widthController handler should render with correct context', () => {
       const h = { view: vi.fn() }
 
-      widthOfSiteController.handler({ site: mockSite }, h)
+      widthOfSiteController.handler({ query: {}, site: mockSite }, h)
 
       expect(h.view).toHaveBeenCalledWith(WIDTH_OF_SITE_VIEW_ROUTE, {
         pageTitle: 'Enter the width of the circular site in metres',
@@ -56,7 +60,7 @@ describe('#widthOfSite', () => {
 
       const h = { view: vi.fn() }
 
-      widthOfSiteController.handler({ site: mockSite }, h)
+      widthOfSiteController.handler({ query: {}, site: mockSite }, h)
 
       expect(h.view).toHaveBeenCalledWith(WIDTH_OF_SITE_VIEW_ROUTE, {
         pageTitle: 'Enter the width of the circular site in metres',
@@ -69,6 +73,34 @@ describe('#widthOfSite', () => {
         projectName: 'Test Project',
         siteNumber: null,
         action: undefined
+      })
+    })
+
+    test('widthController handler should render correctly when using a change link', () => {
+      getExemptionCacheSpy.mockReturnValueOnce({
+        projectName: mockExemption.projectName
+      })
+
+      const h = { view: vi.fn() }
+
+      const request = createMockRequest({
+        query: { action: 'change' },
+        site: mockSite
+      })
+
+      widthOfSiteController.handler(request, h)
+
+      expect(h.view).toHaveBeenCalledWith(WIDTH_OF_SITE_VIEW_ROUTE, {
+        pageTitle: 'Enter the width of the circular site in metres',
+        heading: 'Enter the width of the circular site in metres',
+        backLink: routes.REVIEW_SITE_DETAILS + '#site-details-1',
+        cancelLink: undefined,
+        payload: {
+          width: undefined
+        },
+        projectName: 'Test Project',
+        siteNumber: 1,
+        action: 'change'
       })
     })
 
@@ -125,6 +157,7 @@ describe('#widthOfSite', () => {
   describe('#widthOfSiteSubmitController', () => {
     test('Should correctly format error data', () => {
       const request = {
+        query: {},
         payload: { width: 'invalid' }
       }
 
@@ -176,6 +209,7 @@ describe('#widthOfSite', () => {
 
     test('Should correctly output page with no error data in object', () => {
       const request = {
+        query: {},
         payload: { width: 'invalid' }
       }
 
@@ -207,7 +241,7 @@ describe('#widthOfSite', () => {
       }
 
       await widthOfSiteSubmitController.handler(
-        { payload: { width: 'single' }, site: mockSite },
+        { query: {}, payload: { width: 'single' }, site: mockSite },
         h
       )
 

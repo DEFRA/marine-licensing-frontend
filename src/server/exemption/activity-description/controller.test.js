@@ -45,7 +45,7 @@ describe('#activityDescriptionController', () => {
   describe('activityDescriptionController GET', () => {
     test('should render the activity description page', async () => {
       const { result, statusCode } = await makeGetRequest({
-        url: routes.SITE_DETAILS_ACTIVITY_DESCRIPTION,
+        url: routes.ACTIVITY_DESCRIPTION,
         server: getServer()
       })
 
@@ -189,7 +189,7 @@ describe('#activityDescriptionController', () => {
       })
 
       const { statusCode, headers } = await makePostRequest({
-        url: routes.SITE_DETAILS_ACTIVITY_DESCRIPTION,
+        url: routes.ACTIVITY_DESCRIPTION,
         server: getServer(),
         formData: payload,
         headers: {
@@ -248,7 +248,7 @@ describe('#activityDescriptionController', () => {
       }
 
       const { result, statusCode } = await makePostRequest({
-        url: routes.SITE_DETAILS_ACTIVITY_DESCRIPTION,
+        url: routes.ACTIVITY_DESCRIPTION,
         server: getServer(),
         formData: payload,
         headers: {

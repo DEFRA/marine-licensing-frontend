@@ -2,7 +2,6 @@ import { vi } from 'vitest'
 import { COORDINATE_SYSTEMS } from '#src/server/common/constants/exemptions.js'
 import { statusCodes } from '#src/server/common/constants/status-codes.js'
 import * as cacheUtils from '#src/server/common/helpers/session-cache/utils.js'
-import * as coordinateUtils from '#src/server/common/helpers/coordinate-utils.js'
 import * as exemptionService from '#src/services/exemption-service/index.js'
 import {
   FILE_UPLOAD_REVIEW_VIEW_ROUTE,
@@ -169,9 +168,7 @@ describe('#reviewSiteDetails', () => {
     getExemptionCacheSpy = vi
       .spyOn(cacheUtils, 'getExemptionCache')
       .mockReturnValue(mockExemption)
-    getCoordinateSystemSpy = vi
-      .spyOn(coordinateUtils, 'getCoordinateSystem')
-      .mockReturnValue({ coordinateSystem: COORDINATE_SYSTEMS.WGS84 })
+
     resetExemptionSiteDetailsSpy = vi
       .spyOn(cacheUtils, 'resetExemptionSiteDetails')
       .mockReturnValue({ siteDetails: null })

@@ -7,10 +7,7 @@ import { statusCodes } from '~/src/server/common/constants/status-codes.js'
 import * as coordinateUtils from '~/src/server/common/helpers/coordinate-utils.js'
 import { testScenarios } from './circular-site-fixtures.js'
 
-import {
-  makeGetRequest,
-  makePostRequest
-} from '~/src/server/test-helpers/server-requests.js'
+import { makeGetRequest } from '~/src/server/test-helpers/server-requests.js'
 import {
   mockExemption,
   setupTestServer

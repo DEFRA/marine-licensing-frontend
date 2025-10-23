@@ -37,7 +37,7 @@ describe('#activityDatesController', () => {
   describe('activityDatesController GET', () => {
     test('should render the activity dates page', async () => {
       const { result, statusCode } = await makeGetRequest({
-        url: routes.SITE_DETAILS_ACTIVITY_DATES,
+        url: routes.ACTIVITY_DATES,
         server: getServer(),
         headers: {
           cookie: 'cookies_preferences_set=true'
@@ -167,7 +167,7 @@ describe('#activityDatesController', () => {
       }
 
       const { statusCode, headers } = await makePostRequest({
-        url: routes.SITE_DETAILS_ACTIVITY_DATES,
+        url: routes.ACTIVITY_DATES,
         server: getServer(),
         formData: payload,
         headers: {
@@ -224,7 +224,7 @@ describe('#activityDatesController', () => {
       }
 
       const { result, statusCode } = await makePostRequest({
-        url: routes.SITE_DETAILS_ACTIVITY_DATES,
+        url: routes.ACTIVITY_DATES,
         server: getServer(),
         formData: payload
       })
@@ -248,7 +248,7 @@ describe('#activityDatesController', () => {
       }
 
       const { result, statusCode } = await makePostRequest({
-        url: routes.SITE_DETAILS_ACTIVITY_DATES,
+        url: routes.ACTIVITY_DATES,
         server: getServer(),
         formData: payload
       })
@@ -279,7 +279,7 @@ describe('#activityDatesController', () => {
       }
 
       const { result, statusCode } = await makePostRequest({
-        url: routes.SITE_DETAILS_ACTIVITY_DATES,
+        url: routes.ACTIVITY_DATES,
         server: getServer(),
         formData: payload
       })
@@ -314,7 +314,7 @@ describe('#activityDatesController', () => {
       }
 
       const { result, statusCode } = await makePostRequest({
-        url: routes.SITE_DETAILS_ACTIVITY_DATES,
+        url: routes.ACTIVITY_DATES,
         server: getServer(),
         formData: payload
       })
@@ -352,7 +352,7 @@ describe('#activityDatesController', () => {
       }
 
       const { result, statusCode } = await makePostRequest({
-        url: routes.SITE_DETAILS_ACTIVITY_DATES,
+        url: routes.ACTIVITY_DATES,
         server: getServer(),
         formData: payload
       })
@@ -387,7 +387,7 @@ describe('#activityDatesController', () => {
       }
 
       const { result, statusCode } = await makePostRequest({
-        url: routes.SITE_DETAILS_ACTIVITY_DATES,
+        url: routes.ACTIVITY_DATES,
         server: getServer(),
         formData: payload
       })
@@ -401,7 +401,7 @@ describe('#activityDatesController', () => {
 
     test('should handle validation errors for past dates', async () => {
       const { result, statusCode } = await makePostRequest({
-        url: routes.SITE_DETAILS_ACTIVITY_DATES,
+        url: routes.ACTIVITY_DATES,
         server: getServer(),
         formData: {
           'activity-start-date-day': '15',
@@ -440,7 +440,7 @@ describe('#activityDatesController', () => {
 
     test('should not show duplicate error messages for past dates', async () => {
       const { result, statusCode } = await makePostRequest({
-        url: routes.SITE_DETAILS_ACTIVITY_DATES,
+        url: routes.ACTIVITY_DATES,
         server: getServer(),
         formData: {
           'activity-start-date-day': '15',
@@ -477,7 +477,7 @@ describe('#activityDatesController', () => {
 
       const { result: resultMonth14, statusCode: statusCodeMonth14 } =
         await makePostRequest({
-          url: routes.SITE_DETAILS_ACTIVITY_DATES,
+          url: routes.ACTIVITY_DATES,
           server: getServer(),
           formData: payloadMonth14
         })
@@ -513,7 +513,7 @@ describe('#activityDatesController', () => {
 
       const { result: resultDay32, statusCode: statusCodeDay32 } =
         await makePostRequest({
-          url: routes.SITE_DETAILS_ACTIVITY_DATES,
+          url: routes.ACTIVITY_DATES,
           server: getServer(),
           formData: payloadDay32
         })

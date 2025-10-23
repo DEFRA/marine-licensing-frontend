@@ -25,7 +25,7 @@ describe('Activity description - page structure & accessibility', () => {
 
   test('should render form with correct structure when no errors', async () => {
     const document = await loadPage({
-      requestUrl: routes.SITE_DETAILS_ACTIVITY_DESCRIPTION,
+      requestUrl: routes.ACTIVITY_DESCRIPTION,
       server: getServer()
     })
 

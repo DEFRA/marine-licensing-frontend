@@ -101,7 +101,8 @@ export const testScenarios = [
           cardName: 'Site details',
           method:
             'Manually enter one set of coordinates and a width to create a circular site',
-          coordinateSystem: 'OSGB36 (National Grid)Eastings and Northings',
+          coordinateSystem:
+            'British National Grid (OSGB36)Eastings and Northings',
           centreCoordinates: '425053, 564180',
           circleWidth: '250 metres'
         }
@@ -238,7 +239,8 @@ export const testScenarios = [
           activityDescription: 'Test activity description',
           method:
             'Manually enter one set of coordinates and a width to create a circular site',
-          coordinateSystem: 'OSGB36 (National Grid)Eastings and Northings',
+          coordinateSystem:
+            'British National Grid (OSGB36)Eastings and Northings',
           centreCoordinates: '425053, 564180',
           circleWidth: '300 metres'
         }

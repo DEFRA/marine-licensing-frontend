@@ -11,7 +11,6 @@ import {
 import joi from 'joi'
 import { routes } from '#src/server/common/constants/routes.js'
 import { getBackRoute } from './utils.js'
-import { getSiteNumber } from '#src/server/exemption/site-details/utils/site-number.js'
 
 export const COORDINATES_ENTRY_VIEW_ROUTE =
   'exemption/site-details/coordinates-entry/index'
@@ -36,9 +35,8 @@ export const coordinatesEntryController = {
   handler(request, h) {
     const exemption = getExemptionCache(request)
     const { site } = request
-    const { siteIndex } = site
+    const { siteIndex, siteNumber } = site
     const action = request.query.action
-    const siteNumber = getSiteNumber(exemption, request)
 
     const siteDetails = getSiteDetailsBySite(exemption, siteIndex)
 
@@ -60,7 +58,9 @@ export const coordinatesEntryController = {
       backLink: getBackRoute(request, exemption, action),
       cancelLink: getCancelLink(action),
       projectName: exemption.projectName,
-      siteNumber: action ? siteNumber : null,
+      siteNumber: exemption.multipleSiteDetails?.multipleSitesEnabled
+        ? siteNumber
+        : null,
       action,
       payload: {
         coordinatesEntry: siteDetails.coordinatesEntry
@@ -88,7 +88,12 @@ export const coordinatesEntrySubmitController = {
         const exemption = getExemptionCache(request)
         const { projectName } = exemption
         const action = request.query.action
-        const siteNumber = getSiteNumber(exemption, request)
+        const { siteNumber } = request.site
+
+        const siteNumberDisplay = exemption.multipleSiteDetails
+          ?.multipleSitesEnabled
+          ? siteNumber
+          : null
 
         if (!err.details) {
           return h
@@ -98,7 +103,7 @@ export const coordinatesEntrySubmitController = {
               cancelLink: getCancelLink(action),
               payload,
               projectName,
-              siteNumber: action ? siteNumber : null,
+              siteNumber: siteNumberDisplay,
               action
             })
             .takeover()
@@ -115,7 +120,7 @@ export const coordinatesEntrySubmitController = {
             cancelLink: getCancelLink(action),
             payload,
             projectName,
-            siteNumber: action ? siteNumber : null,
+            siteNumber: siteNumberDisplay,
             action,
             errors,
             errorSummary

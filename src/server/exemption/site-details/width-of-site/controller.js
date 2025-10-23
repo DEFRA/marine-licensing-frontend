@@ -15,7 +15,6 @@ import { circleWidthValidationSchema } from '#src/server/common/schemas/circle-w
 
 import { routes } from '#src/server/common/constants/routes.js'
 import { saveSiteDetailsToBackend } from '#src/server/common/helpers/save-site-details.js'
-import { getSiteNumber } from '#src/server/exemption/site-details/utils/site-number.js'
 
 export const WIDTH_OF_SITE_VIEW_ROUTE =
   'exemption/site-details/width-of-site/index'
@@ -51,17 +50,18 @@ export const widthOfSiteController = {
   handler(request, h) {
     const exemption = getExemptionCache(request)
     const { site } = request
-    const { siteIndex, queryParams } = site
+    const { siteIndex, siteNumber, queryParams } = site
     const siteDetails = getSiteDetailsBySite(exemption, siteIndex)
     const action = request.query.action
-    const siteNumber = getSiteNumber(exemption, request)
 
     return h.view(WIDTH_OF_SITE_VIEW_ROUTE, {
       ...widthOfSiteSettings,
       backLink: getBackLinkForAction(action, siteNumber, queryParams),
       cancelLink: getCancelLink(action),
       projectName: exemption.projectName,
-      siteNumber: action ? siteNumber : null,
+      siteNumber: exemption.multipleSiteDetails?.multipleSitesEnabled
+        ? siteNumber
+        : null,
       action,
       payload: {
         width: siteDetails.circleWidth
@@ -79,10 +79,14 @@ export const widthOfSiteSubmitController = {
         const exemption = getExemptionCache(request)
         const { projectName } = exemption
         const action = request.query.action
-        const siteNumber = getSiteNumber(exemption, request)
 
         const site = setSiteData(request)
-        const { queryParams } = site
+        const { queryParams, siteNumber } = site
+
+        const siteNumberDisplay = exemption.multipleSiteDetails
+          ?.multipleSitesEnabled
+          ? siteNumber
+          : null
 
         if (!err.details) {
           return h
@@ -92,7 +96,7 @@ export const widthOfSiteSubmitController = {
               cancelLink: getCancelLink(action),
               payload,
               projectName,
-              siteNumber: action ? siteNumber : null,
+              siteNumber: siteNumberDisplay,
               action
             })
             .takeover()
@@ -108,7 +112,7 @@ export const widthOfSiteSubmitController = {
             cancelLink: getCancelLink(action),
             payload,
             projectName,
-            siteNumber: action ? siteNumber : null,
+            siteNumber: siteNumberDisplay,
             action,
             errors,
             errorSummary
@@ -119,10 +123,8 @@ export const widthOfSiteSubmitController = {
   },
   async handler(request, h) {
     const { payload } = request
-    const exemption = getExemptionCache(request)
-    const { siteIndex, queryParams } = request.site
+    const { siteIndex, siteNumber, queryParams } = request.site
     const action = request.query.action
-    const siteNumber = getSiteNumber(exemption, request)
 
     updateExemptionSiteDetails(
       request,

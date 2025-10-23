@@ -78,7 +78,8 @@ describe('#widthOfSite', () => {
 
     test('widthController handler should render correctly when using a change link', () => {
       getExemptionCacheSpy.mockReturnValueOnce({
-        projectName: mockExemption.projectName
+        projectName: mockExemption.projectName,
+        multipleSiteDetails: { multipleSitesEnabled: true }
       })
 
       const h = { view: vi.fn() }
@@ -235,6 +236,39 @@ describe('#widthOfSite', () => {
       expect(h.view().takeover).toHaveBeenCalled()
     })
 
+    test('Should correctly output errors for multiple sites', () => {
+      getExemptionCacheSpy.mockReturnValueOnce({
+        projectName: mockExemption.projectName,
+        multipleSiteDetails: { multipleSitesEnabled: true }
+      })
+
+      const request = {
+        query: {},
+        payload: { width: 'invalid' }
+      }
+
+      const h = {
+        view: vi.fn().mockReturnValue({
+          takeover: vi.fn()
+        })
+      }
+
+      widthOfSiteSubmitController.options.validate.failAction(request, h, {})
+
+      expect(h.view).toHaveBeenCalledWith(WIDTH_OF_SITE_VIEW_ROUTE, {
+        pageTitle: 'Enter the width of the circular site in metres',
+        heading: 'Enter the width of the circular site in metres',
+        backLink: routes.CIRCLE_CENTRE_POINT,
+        cancelLink: '/exemption/task-list?cancel=site-details',
+        projectName: 'Test Project',
+        payload: { width: 'invalid' },
+        siteNumber: 1,
+        action: undefined
+      })
+
+      expect(h.view().takeover).toHaveBeenCalled()
+    })
+
     test('Should redirect to review site details page when POST is successful', async () => {
       const h = {
         redirect: vi.fn()
@@ -278,11 +312,11 @@ describe('#widthOfSite', () => {
         view: vi.fn()
       }
 
-      const mockRequest = {
+      const mockRequest = createMockRequest({
         payload: { width: 'single' },
         site: mockSite,
         query: { action: 'change' }
-      }
+      })
 
       await widthOfSiteSubmitController.handler(mockRequest, h)
 

@@ -122,6 +122,33 @@ describe('#coordinatesEntry', () => {
 
       expect(statusCode).toBe(statusCodes.ok)
     })
+
+    test('coordinatesEntryController handler should render correctly when using a change link', () => {
+      getExemptionCacheSpy.mockReturnValueOnce({
+        projectName: mockExemption.projectName,
+        multipleSiteDetails: { multipleSitesEnabled: true }
+      })
+
+      const h = { view: vi.fn() }
+
+      const request = createMockRequest({
+        query: { action: 'change' },
+        site: mockSite
+      })
+
+      coordinatesEntryController.handler(request, h)
+
+      expect(h.view).toHaveBeenCalledWith(COORDINATES_ENTRY_VIEW_ROUTE, {
+        pageTitle: 'How do you want to enter the coordinates?',
+        heading: 'How do you want to enter the coordinates?',
+        backLink: routes.REVIEW_SITE_DETAILS + '#site-details-1',
+        cancelLink: undefined,
+        payload: { coordinatesEntry: undefined },
+        projectName: 'Test Project',
+        siteNumber: 1,
+        action: 'change'
+      })
+    })
   })
 
   describe('#coordinatesEntrySubmitController', () => {
@@ -215,6 +242,44 @@ describe('#coordinatesEntry', () => {
       expect(h.view().takeover).toHaveBeenCalled()
     })
 
+    test('Should correctly output errors for multiple sites', () => {
+      getExemptionCacheSpy.mockReturnValueOnce({
+        projectName: mockExemption.projectName,
+        multipleSiteDetails: { multipleSitesEnabled: true }
+      })
+
+      const request = {
+        query: {},
+        payload: { coordinatesEntry: 'invalid' },
+        site: mockSite
+      }
+
+      const h = {
+        view: vi.fn().mockReturnValue({
+          takeover: vi.fn()
+        })
+      }
+
+      coordinatesEntrySubmitController.options.validate.failAction(
+        request,
+        h,
+        {}
+      )
+
+      expect(h.view).toHaveBeenCalledWith(COORDINATES_ENTRY_VIEW_ROUTE, {
+        pageTitle: 'How do you want to enter the coordinates?',
+        heading: 'How do you want to enter the coordinates?',
+        cancelLink: routes.TASK_LIST + '?cancel=site-details',
+        backLink: routes.ACTIVITY_DESCRIPTION,
+        projectName: 'Test Project',
+        siteNumber: 1,
+        action: undefined,
+        payload: { coordinatesEntry: 'invalid' }
+      })
+
+      expect(h.view().takeover).toHaveBeenCalled()
+    })
+
     test('Should correctly validate on valid data', () => {
       const request = {
         coordinatesEntry: 'single'
@@ -285,6 +350,51 @@ describe('#coordinatesEntry', () => {
         0,
         'coordinatesEntry',
         'single'
+      )
+    })
+
+    test('coordinatesEntryController handler should submit correctly when using a change link when data is the same', () => {
+      getExemptionCacheSpy.mockReturnValueOnce({
+        projectName: mockExemption.projectName,
+        multipleSiteDetails: { multipleSitesEnabled: true }
+      })
+
+      const h = { view: vi.fn(), redirect: vi.fn() }
+
+      const request = createMockRequest({
+        query: { action: 'change' },
+        site: mockSite
+      })
+
+      coordinatesEntrySubmitController.handler(request, h)
+
+      expect(h.redirect).toHaveBeenCalledWith(
+        routes.REVIEW_SITE_DETAILS + '#site-details-1'
+      )
+    })
+
+    test('coordinatesEntryController handler should submit correctly when using a change link when data is different', () => {
+      getExemptionCacheSpy.mockReturnValueOnce({
+        projectName: mockExemption.projectName,
+        multipleSiteDetails: { multipleSitesEnabled: true }
+      })
+
+      const h = { view: vi.fn(), redirect: vi.fn() }
+
+      const request = createMockRequest({
+        query: { action: 'change' },
+        site: mockSite,
+        payload: { coordinatesEntry: 'multiple' }
+      })
+
+      request.yar.flash.mockReturnValueOnce({
+        savedSiteDetails: { originalCoordinatesEntry: 'single' }
+      })
+
+      coordinatesEntrySubmitController.handler(request, h)
+
+      expect(h.redirect).toHaveBeenCalledWith(
+        routes.COORDINATE_SYSTEM_CHOICE + '?site=1&action=change'
       )
     })
   })

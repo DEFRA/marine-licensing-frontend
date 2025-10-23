@@ -19,8 +19,10 @@ import { statusCodes } from '#src/server/common/constants/status-codes.js'
 import { config } from '#src/config/config.js'
 import { JSDOM } from 'jsdom'
 import { routes } from '#src/server/common/constants/routes.js'
+import { saveSiteDetailsToBackend } from '#src/server/common/helpers/save-site-details.js'
 
 vi.mock('~/src/server/common/helpers/session-cache/utils.js')
+vi.mock('~/src/server/common/helpers/save-site-details.js')
 
 describe('#centreCoordinates', () => {
   const getServer = setupTestServer()
@@ -36,6 +38,7 @@ describe('#centreCoordinates', () => {
   }
 
   beforeEach(() => {
+    vi.mocked(saveSiteDetailsToBackend).mockResolvedValue()
     getExemptionCacheSpy = vi
       .spyOn(cacheUtils, 'getExemptionCache')
       .mockReturnValue(mockExemption)
@@ -204,6 +207,76 @@ describe('#centreCoordinates', () => {
 
       expect(statusCode).toBe(statusCodes.ok)
     })
+
+    test('centreCoordinatesController handler should render correctly when using a change link', () => {
+      getExemptionCacheSpy.mockReturnValueOnce({
+        projectName: mockExemption.projectName,
+        multipleSiteDetails: { multipleSitesEnabled: true },
+        siteDetails: {
+          ...mockExemption.siteDetails,
+          coordinates: mockCoordinates[COORDINATE_SYSTEMS.WGS84]
+        }
+      })
+
+      const h = { view: vi.fn() }
+
+      const request = createMockRequest({
+        query: { action: 'change' },
+        site: mockSite
+      })
+
+      centreCoordinatesController.handler(request, h)
+
+      expect(h.view).toHaveBeenCalledWith(
+        COORDINATE_SYSTEM_VIEW_ROUTES[COORDINATE_SYSTEMS.WGS84],
+        {
+          backLink: routes.REVIEW_SITE_DETAILS + '#site-details-1',
+          cancelLink: undefined,
+          heading: 'Enter the coordinates at the centre point of the site',
+          pageTitle: 'Enter the coordinates at the centre point of the site',
+          payload: { ...mockCoordinates[COORDINATE_SYSTEMS.WGS84] },
+          projectName: 'Test Project',
+          siteNumber: 1,
+          action: 'change'
+        }
+      )
+    })
+
+    test('centreCoordinatesController handler should render correctly when using a change link on previous page', () => {
+      getExemptionCacheSpy.mockReturnValueOnce({
+        projectName: mockExemption.projectName,
+        multipleSiteDetails: { multipleSitesEnabled: true },
+        siteDetails: {
+          ...mockExemption.siteDetails,
+          coordinates: mockCoordinates[COORDINATE_SYSTEMS.WGS84]
+        }
+      })
+
+      const h = { view: vi.fn() }
+
+      const request = createMockRequest({
+        query: { action: 'change' },
+        site: mockSite
+      })
+
+      request.yar.get.mockReturnValue({ originalCoordinateSystem: 'osgb36' })
+
+      centreCoordinatesController.handler(request, h)
+
+      expect(h.view).toHaveBeenCalledWith(
+        COORDINATE_SYSTEM_VIEW_ROUTES[COORDINATE_SYSTEMS.WGS84],
+        {
+          backLink: routes.COORDINATE_SYSTEM_CHOICE + '?site=1&action=change',
+          cancelLink: undefined,
+          heading: 'Enter the coordinates at the centre point of the site',
+          pageTitle: 'Enter the coordinates at the centre point of the site',
+          payload: { ...mockCoordinates[COORDINATE_SYSTEMS.WGS84] },
+          projectName: 'Test Project',
+          siteNumber: 1,
+          action: 'change'
+        }
+      )
+    })
   })
 
   describe('#centreCoordinatesSubmitController', () => {
@@ -269,13 +342,13 @@ describe('#centreCoordinates', () => {
     })
 
     test('Should still render page if no error details are provided', () => {
-      const request = {
+      const request = createMockRequest({
         query: {},
         payload: {
           ...mockCoordinates[COORDINATE_SYSTEMS.WGS84],
           latitude: 'invalid'
         }
-      }
+      })
 
       const h = {
         view: vi.fn().mockReturnValue({
@@ -444,6 +517,95 @@ describe('#centreCoordinates', () => {
 
       expect(h.view().takeover).toHaveBeenCalled()
       expect(cacheUtils.updateExemptionSiteDetails).not.toHaveBeenCalled()
+    })
+
+    test('Should correctly output errors for multiple sites', () => {
+      getExemptionCacheSpy.mockReturnValueOnce({
+        projectName: mockExemption.projectName,
+        multipleSiteDetails: { multipleSitesEnabled: true }
+      })
+
+      const request = {
+        query: {},
+        payload: { latitude: 'invalid' },
+        site: mockSite
+      }
+
+      const h = {
+        view: vi.fn().mockReturnValue({
+          takeover: vi.fn()
+        })
+      }
+
+      centreCoordinatesSubmitFailHandler(
+        request,
+        h,
+        {},
+        COORDINATE_SYSTEMS.WGS84
+      )
+
+      expect(h.view).toHaveBeenCalledWith(
+        COORDINATE_SYSTEM_VIEW_ROUTES[COORDINATE_SYSTEMS.WGS84],
+        {
+          action: undefined,
+          backLink: routes.COORDINATE_SYSTEM_CHOICE,
+          cancelLink: '/exemption/task-list?cancel=site-details',
+          heading: 'Enter the coordinates at the centre point of the site',
+          pageTitle: 'Enter the coordinates at the centre point of the site',
+          projectName: 'Test Project',
+          payload: { latitude: 'invalid' },
+          siteNumber: null
+        }
+      )
+
+      expect(h.view().takeover).toHaveBeenCalled()
+    })
+
+    test('Should correctly handle change link submit', async () => {
+      getExemptionCacheSpy.mockReturnValueOnce({
+        projectName: mockExemption.projectName,
+        multipleSiteDetails: { multipleSitesEnabled: true }
+      })
+
+      const request = {
+        payload: { latitude: '51.489676', longitude: '-0.231530 ' },
+        site: mockSite,
+        query: { action: 'change' }
+      }
+
+      const h = { redirect: vi.fn() }
+
+      const mockRequest = createMockRequest(request)
+      await centreCoordinatesSubmitController.handler(mockRequest, h)
+
+      expect(saveSiteDetailsToBackend).toHaveBeenCalled()
+      expect(h.redirect).toHaveBeenCalledWith(
+        routes.REVIEW_SITE_DETAILS + '#site-details-1'
+      )
+    })
+
+    test('Should correctly handle invalid change link submit', async () => {
+      getExemptionCacheSpy.mockReturnValue({
+        projectName: mockExemption.projectName,
+        multipleSiteDetails: { multipleSitesEnabled: true }
+      })
+
+      const request = {
+        payload: { latitude: 'invalid' },
+        site: mockSite,
+        query: { action: 'change' }
+      }
+
+      const h = {
+        view: vi.fn().mockReturnValue({
+          takeover: vi.fn()
+        })
+      }
+
+      const mockRequest = createMockRequest(request)
+      await centreCoordinatesSubmitController.handler(mockRequest, h)
+
+      expect(h.view).toHaveBeenCalled()
     })
   })
 })

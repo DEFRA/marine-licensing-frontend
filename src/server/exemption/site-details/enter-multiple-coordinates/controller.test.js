@@ -150,15 +150,19 @@ describe('#multipleCoordinates', () => {
 
       expect(mockH.view).toHaveBeenCalledWith(
         MULTIPLE_COORDINATES_VIEW_ROUTES[COORDINATE_SYSTEMS.WGS84],
-        expect.objectContaining({
+        {
           ...multipleCoordinatesPageData,
+          action: undefined,
+          backLink: routes.COORDINATE_SYSTEM_CHOICE,
+          cancelLink: routes.TASK_LIST + '?cancel=site-details',
           coordinates: [
             paddedCoordinates.wgs84,
             paddedCoordinates.wgs84,
             paddedCoordinates.wgs84
           ],
-          projectName: undefined
-        })
+          projectName: undefined,
+          siteNumber: null
+        }
       )
     })
   })
@@ -453,6 +457,153 @@ describe('#multipleCoordinates', () => {
           projectName: 'Test Project'
         })
       )
+    })
+
+    test('Should correctly output errors for multiple sites', () => {
+      getExemptionCacheSpy.mockReturnValueOnce({
+        projectName: mockExemption.projectName,
+        multipleSiteDetails: { multipleSitesEnabled: true },
+        siteDetails: [
+          {
+            coordinateSystem: COORDINATE_SYSTEMS.WGS84,
+            coordinates: mockCoordinates.wgs84
+          }
+        ]
+      })
+
+      const request = createMockRequest({ site: mockSite })
+      multipleCoordinatesController.handler(request, mockH)
+
+      expect(mockH.view).toHaveBeenCalledWith(
+        MULTIPLE_COORDINATES_VIEW_ROUTES[COORDINATE_SYSTEMS.WGS84],
+        {
+          ...multipleCoordinatesPageData,
+          action: undefined,
+          backLink: routes.COORDINATE_SYSTEM_CHOICE,
+          cancelLink: routes.TASK_LIST + '?cancel=site-details',
+          coordinates: [...mockCoordinates.wgs84, paddedCoordinates.wgs84],
+          projectName: 'Test Project',
+          siteNumber: 1
+        }
+      )
+    })
+
+    test('multipleCoordinatesController handler should render correctly when using a change link', () => {
+      getExemptionCacheSpy.mockReturnValueOnce({
+        projectName: mockExemption.projectName,
+        multipleSiteDetails: { multipleSitesEnabled: true },
+        siteDetails: [
+          {
+            coordinateSystem: COORDINATE_SYSTEMS.WGS84,
+            coordinates: mockCoordinates.wgs84
+          }
+        ]
+      })
+
+      const request = createMockRequest({
+        query: { action: 'change' },
+        site: mockSite
+      })
+
+      multipleCoordinatesController.handler(request, mockH)
+
+      expect(mockH.view).toHaveBeenCalledWith(
+        MULTIPLE_COORDINATES_VIEW_ROUTES[COORDINATE_SYSTEMS.WGS84],
+        {
+          ...multipleCoordinatesPageData,
+          action: 'change',
+          backLink: routes.REVIEW_SITE_DETAILS + '#site-details-1',
+          cancelLink: undefined,
+          coordinates: [...mockCoordinates.wgs84, paddedCoordinates.wgs84],
+          projectName: 'Test Project',
+          siteNumber: 1
+        }
+      )
+    })
+
+    test('multipleCoordinatesController handler should render correctly when using a change link on previous page', () => {
+      getExemptionCacheSpy.mockReturnValueOnce({
+        projectName: mockExemption.projectName,
+        multipleSiteDetails: { multipleSitesEnabled: true },
+        siteDetails: [
+          {
+            coordinateSystem: COORDINATE_SYSTEMS.WGS84,
+            coordinates: mockCoordinates.wgs84
+          }
+        ]
+      })
+
+      const request = createMockRequest({
+        query: { action: 'change' },
+        site: mockSite
+      })
+
+      request.yar.get.mockReturnValue({ originalCoordinateSystem: 'osgb36' })
+
+      multipleCoordinatesController.handler(request, mockH)
+
+      expect(mockH.view).toHaveBeenCalledWith(
+        MULTIPLE_COORDINATES_VIEW_ROUTES[COORDINATE_SYSTEMS.WGS84],
+        {
+          ...multipleCoordinatesPageData,
+          action: 'change',
+          backLink: routes.COORDINATE_SYSTEM_CHOICE + '?site=1&action=change',
+          cancelLink: undefined,
+          coordinates: [...mockCoordinates.wgs84, paddedCoordinates.wgs84],
+          projectName: 'Test Project',
+          siteNumber: 1
+        }
+      )
+    })
+
+    test('Should correctly handle change link submit', async () => {
+      getExemptionCacheSpy.mockReturnValueOnce({
+        projectName: mockExemption.projectName,
+        multipleSiteDetails: { multipleSitesEnabled: true }
+      })
+
+      const payload = {
+        'coordinates[0][latitude]': '51.507400',
+        'coordinates[0][longitude]': '-0.127800',
+        'coordinates[1][latitude]': '51.517500',
+        'coordinates[1][longitude]': '-0.137600',
+        'coordinates[2][latitude]': '51.527600',
+        'coordinates[2][longitude]': '-0.147700'
+      }
+
+      const request = createMockRequest({
+        payload,
+        site: mockSite,
+        query: { action: 'change' }
+      })
+
+      await multipleCoordinatesSubmitController.handler(request, mockH)
+
+      expect(saveSiteDetailsToBackend).toHaveBeenCalled()
+      expect(mockH.redirect).toHaveBeenCalledWith(
+        routes.REVIEW_SITE_DETAILS + '#site-details-1'
+      )
+    })
+
+    test('Should correctly handle invalid change link submit', async () => {
+      getExemptionCacheSpy.mockReturnValue({
+        projectName: mockExemption.projectName,
+        multipleSiteDetails: { multipleSitesEnabled: true }
+      })
+
+      const payload = {
+        'coordinates[0][latitude]': 'invalid'
+      }
+
+      const request = createMockRequest({
+        payload,
+        site: mockSite,
+        query: { action: 'change' }
+      })
+
+      await multipleCoordinatesSubmitController.handler(request, mockH)
+
+      expect(handleValidationFailure).toHaveBeenCalled()
     })
   })
 })

@@ -12,7 +12,6 @@ import {
   mapErrorsForDisplay
 } from '#src/server/common/helpers/errors.js'
 import { routes } from '#src/server/common/constants/routes.js'
-import { getSiteNumber } from '#src/server/exemption/site-details/utils/site-number.js'
 
 import joi from 'joi'
 
@@ -46,9 +45,8 @@ export const coordinateSystemController = {
   options: { pre: [setSiteDataPreHandler] },
   handler(request, h) {
     const exemption = getExemptionCache(request)
-    const { siteIndex, queryParams } = request.site
+    const { siteIndex, queryParams, siteNumber } = request.site
     const action = request.query.action
-    const siteNumber = getSiteNumber(exemption, request)
 
     const siteDetails = getSiteDetailsBySite(exemption, siteIndex)
 
@@ -72,7 +70,9 @@ export const coordinateSystemController = {
       ),
       cancelLink: getCancelLink(action),
       projectName: exemption.projectName,
-      siteNumber: action ? siteNumber : null,
+      siteNumber: exemption.multipleSiteDetails?.multipleSitesEnabled
+        ? siteNumber
+        : null,
       action,
       payload: {
         coordinateSystem: siteDetails.coordinateSystem
@@ -100,11 +100,16 @@ export const coordinateSystemSubmitController = {
         const exemption = getExemptionCache(request)
         const { projectName } = exemption
         const action = request.query.action
-        const siteNumber = getSiteNumber(exemption, request)
+        const { siteNumber } = request.site
 
         const site = setSiteData(request)
         const { queryParams, siteIndex } = site
         const siteDetails = getSiteDetailsBySite(exemption, siteIndex)
+
+        const siteNumberDisplay = exemption.multipleSiteDetails
+          ?.multipleSitesEnabled
+          ? siteNumber
+          : null
 
         if (!err.details) {
           return h
@@ -119,7 +124,7 @@ export const coordinateSystemSubmitController = {
               cancelLink: getCancelLink(action),
               payload,
               projectName,
-              siteNumber: action ? siteNumber : null,
+              siteNumber: siteNumberDisplay,
               action
             })
             .takeover()
@@ -141,7 +146,7 @@ export const coordinateSystemSubmitController = {
             cancelLink: getCancelLink(action),
             payload,
             projectName,
-            siteNumber: action ? siteNumber : null,
+            siteNumber: siteNumberDisplay,
             action,
             errors,
             errorSummary
@@ -172,8 +177,6 @@ export const coordinateSystemSubmitController = {
         return h.redirect(
           `${routes.REVIEW_SITE_DETAILS}#site-details-${site.siteNumber}`
         )
-      } else {
-        updateExemptionSiteDetails(request, siteIndex, 'coordinates', null)
       }
     }
 

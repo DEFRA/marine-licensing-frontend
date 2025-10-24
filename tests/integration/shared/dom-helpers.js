@@ -2,7 +2,7 @@
 
 /* eslint-env vitest */
 
-import { within } from '@testing-library/dom'
+import { getAllByRole, getByRole, within } from '@testing-library/dom'
 
 /**
  * Validates that no "Change" links are present (read-only mode)
@@ -40,3 +40,12 @@ export const getFieldsetByLabel = ({ document, fieldsetLabel }) =>
       selector: 'legend'
     })
     .closest('fieldset')
+
+export const getExemptionsTableRow = ({ document, name }) => {
+  const table = getByRole(document, 'table', { name: 'Your projects' })
+  expect(table).toBeInTheDocument()
+  const row = getByRole(table, 'cell', {
+    name
+  }).closest('tr')
+  return getAllByRole(row, 'cell')
+}

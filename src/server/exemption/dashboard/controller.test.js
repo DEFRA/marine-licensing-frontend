@@ -1,44 +1,18 @@
 import { vi } from 'vitest'
-import { setupTestServer } from '#tests/integration/shared/test-setup-helpers.js'
-import { statusCodes } from '#src/server/common/constants/status-codes.js'
-import { routes } from '#src/server/common/constants/routes.js'
-import { config } from '#src/config/config.js'
-import { JSDOM } from 'jsdom'
 import { dashboardController, DASHBOARD_VIEW_ROUTE } from './controller.js'
 import { authenticatedGetRequest } from '#src/server/common/helpers/authenticated-requests.js'
 import { formatProjectsForDisplay } from './utils.js'
 import { formatDate } from '#src/config/nunjucks/filters/format-date.js'
-
-import { makeGetRequest } from '#src/server/test-helpers/server-requests.js'
 
 vi.mock('~/src/server/common/helpers/authenticated-requests.js')
 vi.mock('~/src/config/nunjucks/filters/format-date.js')
 vi.mock('~/src/server/exemption/task-list/controller.js')
 
 describe('#dashboard', () => {
-  const getServer = setupTestServer()
-
   const authenticatedGetRequestMock = vi.mocked(authenticatedGetRequest)
   vi.mocked(formatDate).mockReturnValue('01 Jan 2024')
 
   describe('#dashboardController', () => {
-    test('Should provide expected response with correct page title', async () => {
-      authenticatedGetRequestMock.mockResolvedValueOnce({
-        payload: { value: [] }
-      })
-
-      const { result, statusCode } = await makeGetRequest({
-        url: routes.DASHBOARD,
-        server: getServer()
-      })
-
-      expect(result).toEqual(
-        expect.stringContaining(`Your projects | ${config.get('serviceName')}`)
-      )
-
-      expect(statusCode).toBe(statusCodes.ok)
-    })
-
     test('Should render dashboard template with correct context', async () => {
       authenticatedGetRequestMock.mockResolvedValueOnce({
         payload: { value: [] }
@@ -56,7 +30,7 @@ describe('#dashboard', () => {
       })
     })
 
-    test('Should display sortable table with correct structure when projects exist', async () => {
+    test('Should display table with correct structure when projects exist', async () => {
       const h = { view: vi.fn() }
       const request = { logger: { error: vi.fn() } }
 
@@ -99,24 +73,6 @@ describe('#dashboard', () => {
         heading: 'Your projects',
         projects: expectedFormattedProjects
       })
-    })
-
-    test('Should display empty state when no projects exist', async () => {
-      authenticatedGetRequestMock.mockResolvedValueOnce({
-        payload: { value: [] }
-      })
-
-      const { result } = await makeGetRequest({
-        url: routes.DASHBOARD,
-        server: getServer()
-      })
-
-      const { document } = new JSDOM(result).window
-
-      const emptyState = document.querySelector('h1 + p')
-      expect(emptyState.textContent).toContain(
-        'You currently have no projects.'
-      )
     })
 
     test('Should display projects data when projects exist', async () => {
@@ -190,36 +146,6 @@ describe('#dashboard', () => {
         heading: 'Your projects',
         projects: []
       })
-    })
-
-    test('Should display Continue link for draft exemptions pointing to /exemption/task-list/{id}', async () => {
-      const draftExemption = {
-        projectName: 'Draft Exemption',
-
-        reference: 'ML-2024-003',
-        status: 'Draft',
-        submittedAt: null,
-        id: 'abc123'
-      }
-
-      authenticatedGetRequestMock.mockResolvedValueOnce({
-        payload: { value: [draftExemption] }
-      })
-
-      const { result } = await makeGetRequest({
-        url: routes.DASHBOARD,
-        server: getServer()
-      })
-
-      const { document } = new JSDOM(result).window
-
-      const continueLink = Array.from(
-        document.querySelectorAll('a,button')
-      ).find((el) => el.textContent.trim() === 'Continue')
-      expect(continueLink).toBeTruthy()
-      expect(continueLink.getAttribute('href')).toBe(
-        `/exemption/task-list/${draftExemption.id}`
-      )
     })
   })
 })

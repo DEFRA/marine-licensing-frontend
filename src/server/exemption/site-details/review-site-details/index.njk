@@ -223,7 +223,8 @@
                     text: "Map view"
                 },
                 value: {
-                    html: appSiteDetailsMap(site.siteDetailsData, loop.index0)
+                    html: appSiteDetailsMap(site.siteDetailsData, loop.index0),
+                    classes: "govuk-summary-list__value--full-width"
                 }
             }), summaryRows) %}
 
@@ -246,7 +247,8 @@
                         ]
                     }
                 },
-                rows: summaryRows
+                rows: summaryRows,
+                classes: 'govuk-summary-list--full-width'
             }) }}
 
             {% endfor %}

@@ -37,7 +37,17 @@ export const reviewSiteDetailsController = {
       exemption.id
     )
 
-    const siteDetails = completeExemption.siteDetails
+    const { projectName, publicRegister, multipleSiteDetails, siteDetails } =
+      completeExemption
+
+    setExemptionCache(request, {
+      id: exemption.id,
+      projectName,
+      publicRegister,
+      multipleSiteDetails,
+      siteDetails
+    })
+
     const firstSite = getSiteDetailsBySite({
       ...completeExemption,
       siteDetails

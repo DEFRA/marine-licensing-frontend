@@ -176,13 +176,12 @@ describe('#coordinateSystem', () => {
         payload: { coordinateSystem: 'wgs84' },
         site: {
           ...mockSite,
-          siteDetails: { ...mockSite.siteDetails, coordinatesEntry: 'multiple' }
+          siteDetails: { coordinatesEntry: 'multiple' }
         }
       })
 
       getExemptionCacheSpy.mockReturnValueOnce({
-        projectName: 'Test Project',
-        siteDetails: [{ coordinatesEntry: 'multiple' }]
+        projectName: 'Test Project'
       })
 
       const h = { redirect: vi.fn() }
@@ -191,12 +190,35 @@ describe('#coordinateSystem', () => {
       expect(h.redirect).toHaveBeenCalledWith(routes.ENTER_MULTIPLE_COORDINATES)
     })
 
+    test('should redirect to multiple coordinates with action params when action is present', async () => {
+      const request = createMockRequest({
+        payload: { coordinateSystem: 'wgs84' },
+        site: {
+          ...mockSite,
+          siteNumber: 1,
+          siteDetails: { coordinatesEntry: 'multiple' }
+        },
+        query: { action: 'change' }
+      })
+
+      getExemptionCacheSpy.mockReturnValueOnce({
+        projectName: 'Test Project'
+      })
+
+      const h = { redirect: vi.fn() }
+
+      await coordinateSystemSubmitController.handler(request, h)
+      expect(h.redirect).toHaveBeenCalledWith(
+        `${routes.ENTER_MULTIPLE_COORDINATES}?site=1&action=change`
+      )
+    })
+
     test('should stay on page when coordinatesEntry is neither single nor multiple', async () => {
       const request = createMockRequest({
         payload: { coordinateSystem: 'wgs84' },
         site: {
           ...mockSite,
-          siteDetails: { ...mockSite.siteDetails, coordinatesEntry: 'invalid' }
+          siteDetails: { coordinatesEntry: 'invalid' }
         }
       })
 
@@ -204,7 +226,7 @@ describe('#coordinateSystem', () => {
         projectName: 'Test Project'
       })
 
-      const h = { view: vi.fn() }
+      const h = { view: vi.fn(), redirect: vi.fn() }
 
       await coordinateSystemSubmitController.handler(request, h)
       expect(h.view).toHaveBeenCalledWith(COORDINATE_SYSTEM_VIEW_ROUTE, {

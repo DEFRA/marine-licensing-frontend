@@ -129,6 +129,7 @@ function createMockExemption(
 describe('#reviewSiteDetails', () => {
   const getServer = setupTestServer()
   let getExemptionCacheSpy
+  let setExemptionCacheSpy
   let resetExemptionSiteDetailsSpy
 
   const mockPolygonCoordinatesWGS84 = [
@@ -168,6 +169,10 @@ describe('#reviewSiteDetails', () => {
     getExemptionCacheSpy = vi
       .spyOn(cacheUtils, 'getExemptionCache')
       .mockReturnValue(mockExemption)
+
+    setExemptionCacheSpy = vi
+      .spyOn(cacheUtils, 'setExemptionCache')
+      .mockResolvedValue(true)
 
     resetExemptionSiteDetailsSpy = vi
       .spyOn(cacheUtils, 'resetExemptionSiteDetails')
@@ -214,6 +219,9 @@ describe('#reviewSiteDetails', () => {
         expect(exemptionService.getExemptionService).toHaveBeenCalledWith(
           mockRequest
         )
+
+        expect(setExemptionCacheSpy).toHaveBeenCalled()
+
         expect(
           mockExemptionServiceInstance.getExemptionById
         ).toHaveBeenCalledWith('test-id')

@@ -51,11 +51,6 @@ export const multipleCoordinatesController = {
     const action = request.query.action
     const siteDetails = getSiteDetailsBySite(exemption, siteIndex)
 
-    if (action) {
-      const savedSiteDetails = request.yar.get('savedSiteDetails')
-      request.yar.set('savedSiteDetails', savedSiteDetails || {})
-    }
-
     const coordinateSystem =
       siteDetails.coordinateSystem === COORDINATE_SYSTEMS.OSGB36
         ? COORDINATE_SYSTEMS.OSGB36

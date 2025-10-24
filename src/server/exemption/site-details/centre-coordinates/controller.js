@@ -83,11 +83,6 @@ export const centreCoordinatesController = {
 
     const siteDetails = getSiteDetailsBySite(exemption, siteIndex)
 
-    if (action) {
-      const savedSiteDetails = request.yar.get('savedSiteDetails')
-      request.yar.set('savedSiteDetails', savedSiteDetails || {})
-    }
-
     return h.view(COORDINATE_SYSTEM_VIEW_ROUTES[coordinateSystem], {
       ...centreCoordinatesPageData,
       backLink: getBackLinkForAction(action, siteNumber, queryParams, request),

@@ -131,7 +131,7 @@ export const coordinatesEntrySubmitController = {
   },
   handler(request, h) {
     const { payload } = request
-    const { siteIndex, queryParams } = request.site
+    const { siteIndex, siteDetails, queryParams } = request.site
     const action = request.query.action
 
     updateExemptionSiteDetails(
@@ -145,19 +145,26 @@ export const coordinatesEntrySubmitController = {
       const { originalCoordinatesEntry } =
         request.yar.get('savedSiteDetails') || {}
 
-      if (payload.coordinatesEntry === originalCoordinatesEntry) {
+      const isStartOfChangeJourney = !!siteDetails.coordinateSystem
+
+      const isValueUnchanged =
+        payload.coordinatesEntry === originalCoordinatesEntry
+
+      if (isStartOfChangeJourney && isValueUnchanged) {
         return h.redirect(
           `${routes.REVIEW_SITE_DETAILS}#site-details-${request.site.siteNumber}`
         )
-      } else {
+      }
+
+      if (isStartOfChangeJourney) {
         updateExemptionSiteDetails(request, siteIndex, 'coordinateSystem', null)
         updateExemptionSiteDetails(request, siteIndex, 'coordinates', null)
         updateExemptionSiteDetails(request, siteIndex, 'circleWidth', null)
-
-        return h.redirect(
-          `${routes.COORDINATE_SYSTEM_CHOICE}?site=${request.site.siteNumber}&action=${action}`
-        )
       }
+
+      return h.redirect(
+        `${routes.COORDINATE_SYSTEM_CHOICE}?site=${request.site.siteNumber}&action=${action}`
+      )
     }
 
     return h.redirect(routes.COORDINATE_SYSTEM_CHOICE + queryParams)

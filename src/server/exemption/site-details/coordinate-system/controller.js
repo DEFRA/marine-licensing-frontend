@@ -173,16 +173,20 @@ export const coordinateSystemSubmitController = {
       const { originalCoordinateSystem } =
         request.yar.get('savedSiteDetails') || {}
 
-      if (
-        !siteDetails.coordinates ||
-        payload.coordinateSystem !== originalCoordinateSystem
-      ) {
-        updateExemptionSiteDetails(request, siteIndex, 'coordinates', null)
-        updateExemptionSiteDetails(request, siteIndex, 'circleWidth', null)
-      } else if (payload.coordinateSystem === originalCoordinateSystem) {
+      const isStartOfChangeJourney = !!siteDetails.coordinates
+
+      const isValueUnchanged =
+        payload.coordinateSystem === originalCoordinateSystem
+
+      if (isStartOfChangeJourney && isValueUnchanged) {
         return h.redirect(
           `${routes.REVIEW_SITE_DETAILS}#site-details-${site.siteNumber}`
         )
+      }
+
+      if (isStartOfChangeJourney) {
+        updateExemptionSiteDetails(request, siteIndex, 'coordinates', null)
+        updateExemptionSiteDetails(request, siteIndex, 'circleWidth', null)
       }
     }
 

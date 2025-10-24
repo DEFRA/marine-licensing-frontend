@@ -60,6 +60,7 @@ describe('#centreCoordinates', () => {
         {
           action: undefined,
           backLink: routes.COORDINATE_SYSTEM_CHOICE,
+          buttonText: 'Continue',
           cancelLink: '/exemption/task-list?cancel=site-details',
           heading: 'Enter the coordinates at the centre point of the site',
           pageTitle: 'Enter the coordinates at the centre point of the site',
@@ -81,6 +82,7 @@ describe('#centreCoordinates', () => {
         {
           action: undefined,
           backLink: routes.COORDINATE_SYSTEM_CHOICE,
+          buttonText: 'Continue',
           cancelLink: '/exemption/task-list?cancel=site-details',
           heading: 'Enter the coordinates at the centre point of the site',
           pageTitle: 'Enter the coordinates at the centre point of the site',
@@ -116,6 +118,7 @@ describe('#centreCoordinates', () => {
         {
           action: undefined,
           backLink: routes.COORDINATE_SYSTEM_CHOICE,
+          buttonText: 'Continue',
           cancelLink: '/exemption/task-list?cancel=site-details',
           heading: 'Enter the coordinates at the centre point of the site',
           pageTitle: 'Enter the coordinates at the centre point of the site',
@@ -145,6 +148,7 @@ describe('#centreCoordinates', () => {
         {
           action: undefined,
           backLink: routes.COORDINATE_SYSTEM_CHOICE,
+          buttonText: 'Continue',
           cancelLink: '/exemption/task-list?cancel=site-details',
           heading: 'Enter the coordinates at the centre point of the site',
           pageTitle: 'Enter the coordinates at the centre point of the site',
@@ -208,7 +212,7 @@ describe('#centreCoordinates', () => {
       expect(statusCode).toBe(statusCodes.ok)
     })
 
-    test('centreCoordinatesController handler should render correctly when using a change link', () => {
+    test('centreCoordinatesController handler should render correctly when using a change link (direct change, no originalCoordinatesEntry)', () => {
       getExemptionCacheSpy.mockReturnValueOnce({
         projectName: mockExemption.projectName,
         multipleSiteDetails: { multipleSitesEnabled: true },
@@ -231,6 +235,7 @@ describe('#centreCoordinates', () => {
         COORDINATE_SYSTEM_VIEW_ROUTES[COORDINATE_SYSTEMS.WGS84],
         {
           backLink: routes.REVIEW_SITE_DETAILS + '#site-details-1',
+          buttonText: 'Save and continue',
           cancelLink: undefined,
           heading: 'Enter the coordinates at the centre point of the site',
           pageTitle: 'Enter the coordinates at the centre point of the site',
@@ -242,7 +247,7 @@ describe('#centreCoordinates', () => {
       )
     })
 
-    test('centreCoordinatesController handler should render correctly when using a change link on previous page', () => {
+    test('centreCoordinatesController handler should render correctly when using a change link on previous page (with originalCoordinateSystem)', () => {
       getExemptionCacheSpy.mockReturnValueOnce({
         projectName: mockExemption.projectName,
         multipleSiteDetails: { multipleSitesEnabled: true },
@@ -267,6 +272,47 @@ describe('#centreCoordinates', () => {
         COORDINATE_SYSTEM_VIEW_ROUTES[COORDINATE_SYSTEMS.WGS84],
         {
           backLink: routes.COORDINATE_SYSTEM_CHOICE + '?site=1&action=change',
+          buttonText: 'Continue',
+          cancelLink: undefined,
+          heading: 'Enter the coordinates at the centre point of the site',
+          pageTitle: 'Enter the coordinates at the centre point of the site',
+          payload: { ...mockCoordinates[COORDINATE_SYSTEMS.WGS84] },
+          projectName: 'Test Project',
+          siteNumber: 1,
+          action: 'change'
+        }
+      )
+    })
+
+    test('centreCoordinatesController handler should show Continue button when coming through flow after Coordinates Entry change', () => {
+      getExemptionCacheSpy.mockReturnValueOnce({
+        projectName: mockExemption.projectName,
+        multipleSiteDetails: { multipleSitesEnabled: true },
+        siteDetails: {
+          ...mockExemption.siteDetails,
+          coordinates: mockCoordinates[COORDINATE_SYSTEMS.WGS84]
+        }
+      })
+
+      const h = { view: vi.fn() }
+
+      const request = createMockRequest({
+        query: { action: 'change' },
+        site: mockSite
+      })
+
+      request.yar.get.mockReturnValue({
+        originalCoordinateSystem: 'osgb36',
+        originalCoordinatesEntry: 'single'
+      })
+
+      centreCoordinatesController.handler(request, h)
+
+      expect(h.view).toHaveBeenCalledWith(
+        COORDINATE_SYSTEM_VIEW_ROUTES[COORDINATE_SYSTEMS.WGS84],
+        {
+          backLink: routes.COORDINATE_SYSTEM_CHOICE + '?site=1&action=change',
+          buttonText: 'Continue',
           cancelLink: undefined,
           heading: 'Enter the coordinates at the centre point of the site',
           pageTitle: 'Enter the coordinates at the centre point of the site',
@@ -315,6 +361,7 @@ describe('#centreCoordinates', () => {
         {
           action: undefined,
           backLink: routes.COORDINATE_SYSTEM_CHOICE,
+          buttonText: 'Continue',
           cancelLink: '/exemption/task-list?cancel=site-details',
           heading: 'Enter the coordinates at the centre point of the site',
           pageTitle: 'Enter the coordinates at the centre point of the site',
@@ -370,6 +417,7 @@ describe('#centreCoordinates', () => {
         {
           action: undefined,
           backLink: routes.COORDINATE_SYSTEM_CHOICE,
+          buttonText: 'Continue',
           cancelLink: '/exemption/task-list?cancel=site-details',
           heading: 'Enter the coordinates at the centre point of the site',
           pageTitle: 'Enter the coordinates at the centre point of the site',
@@ -549,6 +597,7 @@ describe('#centreCoordinates', () => {
         {
           action: undefined,
           backLink: routes.COORDINATE_SYSTEM_CHOICE,
+          buttonText: 'Continue',
           cancelLink: '/exemption/task-list?cancel=site-details',
           heading: 'Enter the coordinates at the centre point of the site',
           pageTitle: 'Enter the coordinates at the centre point of the site',

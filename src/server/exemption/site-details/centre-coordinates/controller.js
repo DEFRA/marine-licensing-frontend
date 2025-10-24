@@ -71,6 +71,16 @@ const getBackLinkForAction = (action, siteNumber, queryParams, request) => {
   return centreCoordinatesPageData.backLink + queryParams
 }
 
+const getButtonText = (action, request) => {
+  if (!action) {
+    return 'Continue'
+  }
+  const savedSiteDetails = request.yar.get('savedSiteDetails') || {}
+  return savedSiteDetails.originalCoordinateSystem
+    ? 'Continue'
+    : 'Save and continue'
+}
+
 export const centreCoordinatesController = {
   options: {
     pre: [setSiteDataPreHandler]
@@ -92,6 +102,7 @@ export const centreCoordinatesController = {
         ? siteNumber
         : null,
       action,
+      buttonText: getButtonText(action, request),
       payload: getPayload(siteDetails, coordinateSystem)
     })
   }
@@ -124,6 +135,7 @@ export const centreCoordinatesSubmitFailHandler = (request, h, error) => {
         projectName,
         siteNumber: siteNumberDisplay,
         action,
+        buttonText: getButtonText(action, request),
         payload
       })
       .takeover()
@@ -143,6 +155,7 @@ export const centreCoordinatesSubmitFailHandler = (request, h, error) => {
       projectName,
       siteNumber: siteNumberDisplay,
       action,
+      buttonText: getButtonText(action, request),
       payload,
       errors,
       errorSummary

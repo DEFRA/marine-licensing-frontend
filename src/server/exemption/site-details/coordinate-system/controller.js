@@ -6,7 +6,6 @@ import {
   setSiteData,
   setSiteDataPreHandler
 } from '#src/server/common/helpers/session-cache/site-utils.js'
-import { getSiteDetailsBySite } from '#src/server/common/helpers/session-cache/site-details-utils.js'
 import {
   errorDescriptionByFieldName,
   mapErrorsForDisplay
@@ -31,9 +30,10 @@ export const errorMessages = {
 const getCancelLink = (action) =>
   action ? undefined : routes.TASK_LIST + '?cancel=site-details'
 
-const getBackLink = (action, siteNumber, queryParams, coordinateSystem) => {
+const getBackLink = (action, siteNumber, queryParams, request) => {
   if (action) {
-    if (coordinateSystem === null || coordinateSystem === undefined) {
+    const savedSiteDetails = request.yar.get('savedSiteDetails') || {}
+    if (savedSiteDetails.originalCoordinatesEntry) {
       return `${routes.COORDINATES_ENTRY_CHOICE}?site=${siteNumber}&action=${action}`
     }
     return `${routes.REVIEW_SITE_DETAILS}#site-details-${siteNumber}`
@@ -45,10 +45,8 @@ export const coordinateSystemController = {
   options: { pre: [setSiteDataPreHandler] },
   handler(request, h) {
     const exemption = getExemptionCache(request)
-    const { siteIndex, queryParams, siteNumber } = request.site
+    const { queryParams, siteNumber, siteDetails } = request.site
     const action = request.query.action
-
-    const siteDetails = getSiteDetailsBySite(exemption, siteIndex)
 
     if (action) {
       const savedSiteDetails = request.yar.get('savedSiteDetails') || {}
@@ -62,12 +60,7 @@ export const coordinateSystemController = {
 
     return h.view(COORDINATE_SYSTEM_VIEW_ROUTE, {
       ...coordinateSystemSettings,
-      backLink: getBackLink(
-        action,
-        siteNumber,
-        queryParams,
-        siteDetails.coordinateSystem
-      ),
+      backLink: getBackLink(action, siteNumber, queryParams, request),
       cancelLink: getCancelLink(action),
       projectName: exemption.projectName,
       siteNumber: exemption.multipleSiteDetails?.multipleSitesEnabled
@@ -103,8 +96,7 @@ export const coordinateSystemSubmitController = {
         const { siteNumber } = request.site
 
         const site = setSiteData(request)
-        const { queryParams, siteIndex } = site
-        const siteDetails = getSiteDetailsBySite(exemption, siteIndex)
+        const { queryParams } = site
 
         const siteNumberDisplay = exemption.multipleSiteDetails
           ?.multipleSitesEnabled
@@ -115,12 +107,7 @@ export const coordinateSystemSubmitController = {
           return h
             .view(COORDINATE_SYSTEM_VIEW_ROUTE, {
               ...coordinateSystemSettings,
-              backLink: getBackLink(
-                action,
-                siteNumber,
-                queryParams,
-                siteDetails.coordinateSystem
-              ),
+              backLink: getBackLink(action, siteNumber, queryParams, request),
               cancelLink: getCancelLink(action),
               payload,
               projectName,
@@ -137,12 +124,7 @@ export const coordinateSystemSubmitController = {
         return h
           .view(COORDINATE_SYSTEM_VIEW_ROUTE, {
             ...coordinateSystemSettings,
-            backLink: getBackLink(
-              action,
-              siteNumber,
-              queryParams,
-              siteDetails.coordinateSystem
-            ),
+            backLink: getBackLink(action, siteNumber, queryParams, request),
             cancelLink: getCancelLink(action),
             payload,
             projectName,

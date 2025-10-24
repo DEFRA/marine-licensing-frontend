@@ -49,7 +49,7 @@
                                 
                <div class="govuk-button-group">
                     {{ govukButton({
-                        text: "Continue",
+                        text: buttonText if buttonText else "Continue",
                         attributes: {
                             id: "continue"
                         }

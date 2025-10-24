@@ -160,6 +160,35 @@ describe('#coordinateSystem', () => {
       expect(h.view).toHaveBeenCalledWith(COORDINATE_SYSTEM_VIEW_ROUTE, {
         pageTitle: 'Which coordinate system do you want to use?',
         heading: 'Which coordinate system do you want to use?',
+        backLink: `${routes.REVIEW_SITE_DETAILS}#site-details-1`,
+        cancelLink: undefined,
+        payload: { coordinateSystem: undefined },
+        projectName: 'Test Project',
+        siteNumber: 1,
+        action: 'change'
+      })
+    })
+
+    test('coordinateSystemController handler should render back to coordinates entry when originalCoordinatesEntry exists', () => {
+      getExemptionCacheSpy.mockReturnValueOnce({
+        projectName: mockExemption.projectName,
+        multipleSiteDetails: { multipleSitesEnabled: true }
+      })
+
+      const h = { view: vi.fn() }
+
+      const request = createMockRequest({
+        query: { action: 'change' },
+        site: mockSite
+      })
+
+      request.yar.get.mockReturnValue({ originalCoordinatesEntry: 'single' })
+
+      coordinateSystemController.handler(request, h)
+
+      expect(h.view).toHaveBeenCalledWith(COORDINATE_SYSTEM_VIEW_ROUTE, {
+        pageTitle: 'Which coordinate system do you want to use?',
+        heading: 'Which coordinate system do you want to use?',
         backLink: `${routes.COORDINATES_ENTRY_CHOICE}?site=1&action=change`,
         cancelLink: undefined,
         payload: { coordinateSystem: undefined },

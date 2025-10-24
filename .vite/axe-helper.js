@@ -1,12 +1,12 @@
-import { axe } from 'vitest-axe'
+import { configureAxe } from 'vitest-axe'
 
-/**
- * Runs axe accessibility checks against a DOM node
- * @param {Element} container - The DOM element to test
- * @param {Object} options - Axe configuration options
- * @returns {Promise<Object>} Axe results
- */
+export const configuredAxe = configureAxe({
+  globalOptions: {
+    checks: [{ id: 'wcag21a' }, { id: 'wcag21aa' }]
+  }
+})
+
 export async function runAxeChecks(container, options = {}) {
-  const results = await axe(container, options)
-  return results
+  const results = await configuredAxe(container, options)
+  expect(results).toHaveNoViolations()
 }

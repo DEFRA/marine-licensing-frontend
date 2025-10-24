@@ -108,7 +108,8 @@
                   },
                   value: {
                       text: multipleSiteDetailsData.activityDates
-                  }
+                  },
+                  actions: setSiteDetailsAction(multipleSiteDetailsData.activityDates, 'activity-dates')
               }), activityRows) %}
           {% endif %}
 
@@ -128,7 +129,8 @@
                   },
                   value: {
                       text: multipleSiteDetailsData.activityDescription
-                  }
+                  },
+                  actions: setSiteDetailsAction(multipleSiteDetailsData.activityDescription, 'activity-description')
               }), activityRows) %}
           {% endif %}
 

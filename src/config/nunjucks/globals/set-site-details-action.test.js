@@ -41,6 +41,20 @@ describe('setSiteDetailsAction', () => {
     })
   })
 
+  test('should handle no site number', () => {
+    const result = setSiteDetailsAction('Existing data', '/another-page')
+
+    expect(result).toEqual({
+      items: [
+        {
+          classes: 'govuk-link--no-visited-state',
+          href: '/another-page?action=change',
+          text: 'Change'
+        }
+      ]
+    })
+  })
+
   test('should return "Add" text when value is null', () => {
     const result = setSiteDetailsAction(null, '/site-details', 1)
 

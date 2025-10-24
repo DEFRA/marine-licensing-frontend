@@ -11,7 +11,9 @@ export function setSiteDetailsAction(
   return {
     items: [
       {
-        ...(href && { href: `${href}?site=${siteNumber}&action=${action}` }),
+        ...(href && {
+          href: `${href}?${siteNumber ? 'site=' + siteNumber + '&' : ''}action=${action}`
+        }),
         text: hasValue ? 'Change' : 'Add',
         ...(visuallyHiddenText && { visuallyHiddenText }),
         classes: 'govuk-link--no-visited-state'

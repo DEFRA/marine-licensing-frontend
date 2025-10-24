@@ -255,11 +255,18 @@ describe('Review Site Details - Polygon Coordinates Integration Tests', () => {
 
     const activityDatesRow = getRowByKey(siteCard, 'Activity dates')
 
-    expected.multipleSiteDetails.sameActivityDates === 'Yes'
-      ? expect(activityDatesRow.textContent).toContain(
-          expected.multipleSiteDetails.activityDates
-        )
-      : expect(activityDatesRow).toBeFalsy()
+    if (expected.multipleSiteDetails.sameActivityDates === 'Yes') {
+      expect(activityDatesRow.textContent).toContain(
+        expected.multipleSiteDetails.activityDates
+      )
+
+      validateActionLink(
+        activityDatesRow,
+        expected.multipleSiteDetails.activityDates
+      )
+    } else {
+      expect(activityDatesRow).toBeFalsy()
+    }
 
     const sameActivityDescriptionRow = getRowByKey(
       siteCard,
@@ -271,11 +278,18 @@ describe('Review Site Details - Polygon Coordinates Integration Tests', () => {
 
     const activityDescriptionRow = getRowByKey(siteCard, 'Activity description')
 
-    expected.multipleSiteDetails.sameActivityDescription === 'Yes'
-      ? expect(activityDescriptionRow.textContent).toContain(
-          expected.multipleSiteDetails.activityDescription
-        )
-      : expect(activityDescriptionRow).toBeFalsy()
+    if (expected.multipleSiteDetails.sameActivityDescription === 'Yes') {
+      expect(activityDescriptionRow.textContent).toContain(
+        expected.multipleSiteDetails.activityDescription
+      )
+
+      validateActionLink(
+        activityDescriptionRow,
+        expected.multipleSiteDetails.activityDescription
+      )
+    } else {
+      expect(activityDescriptionRow).toBeFalsy()
+    }
   }
 
   const validateSiteDetailsCard = (document, expected, siteIndex) => {

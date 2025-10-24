@@ -280,7 +280,8 @@ describe('#coordinateSystem', () => {
 
     test('Should correctly format error data', () => {
       const request = createMockRequest({
-        payload: { coordinateSystem: 'invalid' }
+        payload: { coordinateSystem: 'invalid' },
+        site: {}
       })
 
       const h = {
@@ -335,7 +336,8 @@ describe('#coordinateSystem', () => {
 
     test('Should still render page if no error details are provided', () => {
       const request = createMockRequest({
-        payload: { coordinateSystem: 'invalid' }
+        payload: { coordinateSystem: 'invalid' },
+        site: {}
       })
 
       const h = {

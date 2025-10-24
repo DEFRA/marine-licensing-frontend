@@ -158,7 +158,6 @@ export const createMockRequest = (overrides = {}) => ({
   query: {},
   payload: {},
   headers: {},
-  site: {},
   yar: {
     get: vi.fn(),
     set: vi.fn(),

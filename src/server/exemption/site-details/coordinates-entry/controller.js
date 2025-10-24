@@ -11,6 +11,7 @@ import {
 import joi from 'joi'
 import { routes } from '#src/server/common/constants/routes.js'
 import { getBackRoute } from './utils.js'
+import { getCancelLink } from '#src/server/exemption/site-details/utils/cancel-link.js'
 
 export const COORDINATES_ENTRY_VIEW_ROUTE =
   'exemption/site-details/coordinates-entry/index'
@@ -24,9 +25,6 @@ const coordinatesEntrySettings = {
 export const errorMessages = {
   COORDINATES_ENTRY_REQUIRED: 'Select how you want to enter the coordinates'
 }
-
-const getCancelLink = (action) =>
-  action ? undefined : routes.TASK_LIST + '?cancel=site-details'
 
 export const coordinatesEntryController = {
   options: {

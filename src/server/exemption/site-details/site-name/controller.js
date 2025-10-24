@@ -12,6 +12,7 @@ import {
   errorDescriptionByFieldName,
   mapErrorsForDisplay
 } from '#src/server/common/helpers/errors.js'
+import { getCancelLink } from '#src/server/exemption/site-details/utils/cancel-link.js'
 import joi from 'joi'
 
 const SITE_NAME_MAX_LENGTH = 250
@@ -37,10 +38,6 @@ const getBackLink = (siteIndex, action, siteNumber) => {
   return siteIndex === 0
     ? routes.MULTIPLE_SITES_CHOICE
     : routes.REVIEW_SITE_DETAILS
-}
-
-const getCancelLink = (action) => {
-  return action ? undefined : routes.TASK_LIST
 }
 
 const createValidationFailAction = (request, h, err) => {

@@ -17,6 +17,7 @@ import { COORDINATE_SYSTEMS } from '#src/server/common/constants/exemptions.js'
 import { getPayload } from '#src/server/exemption/site-details/centre-coordinates/utils.js'
 import { validateCentreCoordinates } from '#src/server/exemption/site-details/centre-coordinates/validate.js'
 import { saveSiteDetailsToBackend } from '#src/server/common/helpers/save-site-details.js'
+import { getCancelLink } from '#src/server/exemption/site-details/utils/cancel-link.js'
 
 export const COORDINATE_SYSTEM_VIEW_ROUTES = {
   [COORDINATE_SYSTEMS.WGS84]: 'exemption/site-details/centre-coordinates/wgs84',
@@ -56,8 +57,6 @@ export const errorMessages = {
       'Northings must be a positive 6 or 7-digit number, like 123456'
   }
 }
-const getCancelLink = (action) =>
-  action ? undefined : routes.TASK_LIST + '?cancel=site-details'
 
 const getBackLinkForAction = (action, siteNumber, queryParams, request) => {
   if (action) {

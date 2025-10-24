@@ -11,6 +11,7 @@ import {
   mapErrorsForDisplay
 } from '#src/server/common/helpers/errors.js'
 import { routes } from '#src/server/common/constants/routes.js'
+import { getCancelLink } from '#src/server/exemption/site-details/utils/cancel-link.js'
 
 import joi from 'joi'
 
@@ -26,9 +27,6 @@ const coordinateSystemSettings = {
 export const errorMessages = {
   COORDINATE_SYSTEM_REQUIRED: 'Select which coordinate system you want to use'
 }
-
-const getCancelLink = (action) =>
-  action ? undefined : routes.TASK_LIST + '?cancel=site-details'
 
 const getBackLink = (action, siteNumber, queryParams, request) => {
   if (action) {

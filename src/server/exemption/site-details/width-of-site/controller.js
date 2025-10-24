@@ -15,14 +15,12 @@ import { circleWidthValidationSchema } from '#src/server/common/schemas/circle-w
 
 import { routes } from '#src/server/common/constants/routes.js'
 import { saveSiteDetailsToBackend } from '#src/server/common/helpers/save-site-details.js'
+import { getCancelLink } from '#src/server/exemption/site-details/utils/cancel-link.js'
 
 export const WIDTH_OF_SITE_VIEW_ROUTE =
   'exemption/site-details/width-of-site/index'
 
 const ENTER_WIDTH = 'Enter the width of the circular site in metres'
-
-const getCancelLink = (action) =>
-  action ? undefined : routes.TASK_LIST + '?cancel=site-details'
 
 const getBackLinkForAction = (action, siteNumber, queryParams) => {
   if (action) {

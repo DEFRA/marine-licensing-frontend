@@ -11,6 +11,8 @@ export const beforeYouStartController = {
   handler(request, h) {
     const exemption = getExemptionCache(request)
 
+    request.yar.clear('savedSiteDetails')
+
     return h.view(BEFORE_YOU_START_SITE_DETAILS_VIEW_ROUTE, {
       ...beforeYouStartSettings,
       projectName: exemption.projectName

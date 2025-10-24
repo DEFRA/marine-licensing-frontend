@@ -34,7 +34,12 @@ describe('#coordinateSystem', () => {
       getExemptionCacheSpy.mockReturnValueOnce({})
       const h = { view: vi.fn() }
 
-      const request = createMockRequest({ site: mockSite })
+      const request = createMockRequest({
+        site: {
+          ...mockSite,
+          siteDetails: {}
+        }
+      })
       coordinateSystemController.handler(request, h)
 
       expect(h.view).toHaveBeenCalledWith(COORDINATE_SYSTEM_VIEW_ROUTE, {
@@ -152,7 +157,10 @@ describe('#coordinateSystem', () => {
 
       const request = createMockRequest({
         query: { action: 'change' },
-        site: mockSite
+        site: {
+          ...mockSite,
+          siteDetails: {}
+        }
       })
 
       coordinateSystemController.handler(request, h)
@@ -179,7 +187,10 @@ describe('#coordinateSystem', () => {
 
       const request = createMockRequest({
         query: { action: 'change' },
-        site: mockSite
+        site: {
+          ...mockSite,
+          siteDetails: {}
+        }
       })
 
       request.yar.get.mockReturnValue({ originalCoordinatesEntry: 'single' })

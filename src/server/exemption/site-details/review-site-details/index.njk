@@ -74,7 +74,8 @@
                         },
                         value: {
                             text: multipleSiteDetailsData.sameActivityDates
-                        }
+                        },
+                        actions: setSiteDetailsAction(multipleSiteDetailsData.sameActivityDates, 'same-activity-dates')
                     }
                 ] %}
 
@@ -96,7 +97,8 @@
                     },
                     value: {
                         html: multipleSiteDetailsData.sameActivityDescription
-                    }
+                    },
+                    actions: setSiteDetailsAction(multipleSiteDetailsData.sameActivityDescription, 'same-activity-description')
                 }), activityRows) %}
 
                 {% if multipleSiteDetailsData.activityDescription %}

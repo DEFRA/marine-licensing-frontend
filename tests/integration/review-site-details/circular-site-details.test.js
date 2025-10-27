@@ -199,6 +199,11 @@ describe('Review Site Details - Circular Coordinates Integration Tests', () => {
       expected.multipleSiteDetails.sameActivityDates
     )
 
+    validateActionLink(
+      sameActivityDatesRow,
+      expected.multipleSiteDetails.sameActivityDates
+    )
+
     const activityDatesRow = getRowByKey(siteCard, 'Activity dates')
 
     if (expected.multipleSiteDetails.sameActivityDates === 'Yes') {
@@ -219,6 +224,11 @@ describe('Review Site Details - Circular Coordinates Integration Tests', () => {
       'Is the activity description the same for every site?'
     )
     expect(sameActivityDescriptionRow.textContent).toContain(
+      expected.multipleSiteDetails.sameActivityDescription
+    )
+
+    validateActionLink(
+      sameActivityDescriptionRow,
       expected.multipleSiteDetails.sameActivityDescription
     )
 

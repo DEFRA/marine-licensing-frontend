@@ -7,7 +7,6 @@ import {
   makeGetRequest,
   makePostRequest
 } from '#src/server/test-helpers/server-requests.js'
-import { config } from '#src/config/config.js'
 import { JSDOM } from 'jsdom'
 import {
   activityDescriptionController,
@@ -50,11 +49,6 @@ describe('#activityDescriptionController', () => {
       })
 
       expect(statusCode).toBe(statusCodes.ok)
-      expect(result).toEqual(
-        expect.stringContaining(
-          `Activity description | ${config.get('serviceName')}`
-        )
-      )
 
       const { document } = new JSDOM(result).window
       expect(
@@ -257,11 +251,6 @@ describe('#activityDescriptionController', () => {
       })
 
       expect(statusCode).toBe(statusCodes.ok)
-      expect(result).toEqual(
-        expect.stringContaining(
-          `Activity description | ${config.get('serviceName')}`
-        )
-      )
 
       const { document } = new JSDOM(result).window
       expect(

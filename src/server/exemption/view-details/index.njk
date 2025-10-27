@@ -6,9 +6,6 @@
 {% from "site-details-card/macro.njk" import appSiteDetailsCard %}
 {% from "public-register-card/macro.njk" import appPublicRegisterCard %}
 
-{% block pageTitle %}
-  {{ title }} - {{ serviceName }}
-{% endblock %}
 {% block head %}
   {{ super() }}
   {{ appSiteDetailsDataScript(siteDetailsData) }}

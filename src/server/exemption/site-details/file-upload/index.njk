@@ -5,10 +5,6 @@
 {% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
 {% from "cancel-button/macro.njk" import appCancelButton %}
 
-{% block pageTitle %}
-  {% if errorSummary %}Error: {% endif %}{{ heading }} - {{ serviceName }}
-{% endblock %}
-
 {% block beforeContent %}
 {{ super() }}
 <nav>

@@ -91,10 +91,9 @@ export const coordinateSystemSubmitController = {
         const exemption = getExemptionCache(request)
         const { projectName } = exemption
         const action = request.query.action
-        const { siteNumber } = request.site
 
         const site = setSiteData(request)
-        const { queryParams } = site
+        const { queryParams, siteNumber } = site
 
         const siteNumberDisplay = exemption.multipleSiteDetails
           ?.multipleSitesEnabled

@@ -33,7 +33,7 @@ describe('Public register', () => {
       })
     ).toHaveAttribute('href', routes.TASK_LIST)
     expect(getByRole(document, 'heading', { level: 1 })).toHaveTextContent(
-      'Sharing your information publicly'
+      'Sharing your project information publicly'
     )
     expect(
       getByRole(document, 'link', {

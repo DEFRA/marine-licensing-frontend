@@ -3,7 +3,7 @@
 {% set rows = [] %}
 
 {% set _ = rows.push({
-     key: { text:  "Consent to publish your information" },
+     key: { text:  "Consent to publish your project information" },
      value: { html: "Yes" if params.publicRegister.consent === 'yes' else "No" }
    })
 %}
@@ -20,7 +20,7 @@
 {{ govukSummaryList({
     card: {
       title: {
-        text: "Sharing your information publicly"
+        text: "Sharing your project information publicly"
       },
       actions: {
         items: [

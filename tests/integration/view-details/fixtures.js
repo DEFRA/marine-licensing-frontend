@@ -84,7 +84,7 @@ const baseExpectedContent = {
   summaryCards: [
     'Project summary',
     'Site details',
-    'Sharing your information publicly'
+    'Sharing your project information publicly'
   ],
   projectDetails: {
     'Type of activity': 'Deposit of a substance or object',
@@ -100,7 +100,7 @@ const baseExpectedContent = {
     ]
   },
   publicRegister: {
-    'Consent to publish your information': 'No'
+    'Consent to publish your project information': 'No'
   }
 }
 
@@ -243,7 +243,7 @@ export const testScenarios = [
         'Width of circular site': '100 metres'
       },
       publicRegister: {
-        'Consent to publish your information': 'No',
+        'Consent to publish your project information': 'No',
         'Why you do not consent': 'Lorem ipsum dolor sit amet'
       }
     }

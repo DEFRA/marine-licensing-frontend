@@ -23,8 +23,8 @@ export const errorMessages = {
 }
 
 const publicRegisterSettings = {
-  pageTitle: 'Sharing your information publicly',
-  heading: 'Sharing your information publicly'
+  pageTitle: 'Sharing your project information publicly',
+  heading: 'Sharing your project information publicly'
 }
 export const publicRegisterController = {
   handler(request, h) {

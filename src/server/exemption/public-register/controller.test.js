@@ -46,7 +46,7 @@ describe('#publicRegister', () => {
 
       expect(result).toEqual(
         expect.stringContaining(
-          `Sharing your information publicly | ${config.get('serviceName')}`
+          `Sharing your project information publicly | ${config.get('serviceName')}`
         )
       )
 
@@ -59,8 +59,8 @@ describe('#publicRegister', () => {
       publicRegisterController.handler({}, h)
 
       expect(h.view).toHaveBeenCalledWith(PUBLIC_REGISTER_VIEW_ROUTE, {
-        pageTitle: 'Sharing your information publicly',
-        heading: 'Sharing your information publicly',
+        pageTitle: 'Sharing your project information publicly',
+        heading: 'Sharing your project information publicly',
         projectName: mockExemption.projectName,
         payload: {
           ...mockExemption.publicRegister
@@ -72,8 +72,8 @@ describe('#publicRegister', () => {
       publicRegisterController.handler({}, h)
 
       expect(h.view).toHaveBeenNthCalledWith(2, PUBLIC_REGISTER_VIEW_ROUTE, {
-        pageTitle: 'Sharing your information publicly',
-        heading: 'Sharing your information publicly',
+        pageTitle: 'Sharing your project information publicly',
+        heading: 'Sharing your project information publicly',
         projectName: undefined,
         payload: undefined
       })
@@ -153,8 +153,8 @@ describe('#publicRegister', () => {
       )
 
       expect(h.view).toHaveBeenCalledWith(PUBLIC_REGISTER_VIEW_ROUTE, {
-        pageTitle: 'Sharing your information publicly',
-        heading: 'Sharing your information publicly',
+        pageTitle: 'Sharing your project information publicly',
+        heading: 'Sharing your project information publicly',
         projectName: mockExemption.projectName,
         payload: { consent: '' },
         errorSummary: [
@@ -198,8 +198,8 @@ describe('#publicRegister', () => {
       )
 
       expect(h.view).toHaveBeenCalledWith(PUBLIC_REGISTER_VIEW_ROUTE, {
-        heading: 'Sharing your information publicly',
-        pageTitle: 'Sharing your information publicly',
+        heading: 'Sharing your project information publicly',
+        pageTitle: 'Sharing your project information publicly',
         projectName: 'Test Project',
         payload: { consent: '' }
       })
@@ -221,8 +221,8 @@ describe('#publicRegister', () => {
       publicRegisterSubmitController.options.validate.failAction(request, h, {})
 
       expect(h.view).toHaveBeenCalledWith(PUBLIC_REGISTER_VIEW_ROUTE, {
-        heading: 'Sharing your information publicly',
-        pageTitle: 'Sharing your information publicly',
+        heading: 'Sharing your project information publicly',
+        pageTitle: 'Sharing your project information publicly',
         projectName: 'Test Project',
         payload: { consent: '' }
       })
@@ -244,8 +244,8 @@ describe('#publicRegister', () => {
       publicRegisterSubmitController.options.validate.failAction(request, h, {})
 
       expect(h.view).toHaveBeenCalledWith(PUBLIC_REGISTER_VIEW_ROUTE, {
-        heading: 'Sharing your information publicly',
-        pageTitle: 'Sharing your information publicly',
+        heading: 'Sharing your project information publicly',
+        pageTitle: 'Sharing your project information publicly',
         projectName: 'Test Project',
         payload: { consent: 'invalid' }
       })

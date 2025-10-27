@@ -105,7 +105,7 @@ describe('#taskListController', () => {
           },
           title: {
             classes: 'govuk-link--no-visited-state',
-            text: 'Sharing your information publicly'
+            text: 'Sharing your project information publicly'
           }
         }
       ],

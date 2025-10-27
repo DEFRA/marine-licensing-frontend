@@ -58,7 +58,7 @@ export const testScenarios = [
       summaryCards: [
         'Project summary',
         'Site details',
-        'Sharing your information publicly'
+        'Sharing your project information publicly'
       ],
       projectDetails: {
         'Project name': 'Hammersmith pontoon construction',
@@ -80,7 +80,7 @@ export const testScenarios = [
         'Map view': ''
       },
       publicRegister: {
-        'Consent to publish your information': 'No'
+        'Consent to publish your project information': 'No'
       },
       submitButton: 'Confirm and send'
     }
@@ -104,7 +104,7 @@ export const testScenarios = [
       summaryCards: [
         'Project summary',
         'Site details',
-        'Sharing your information publicly'
+        'Sharing your project information publicly'
       ],
       projectDetails: {
         'Project name': 'Hammersmith pontoon construction'
@@ -117,7 +117,7 @@ export const testScenarios = [
         'Map view': ''
       },
       publicRegister: {
-        'Consent to publish your information': 'No'
+        'Consent to publish your project information': 'No'
       },
       submitButton: 'Confirm and send'
     }
@@ -141,7 +141,7 @@ export const testScenarios = [
       summaryCards: [
         'Project summary',
         'Site details',
-        'Sharing your information publicly'
+        'Sharing your project information publicly'
       ],
       projectDetails: {
         'Project name': 'Hammersmith pontoon construction'
@@ -154,7 +154,7 @@ export const testScenarios = [
         'Map view': ''
       },
       publicRegister: {
-        'Consent to publish your information': 'No'
+        'Consent to publish your project information': 'No'
       },
       submitButton: 'Confirm and send'
     }
@@ -182,7 +182,7 @@ export const testScenarios = [
       summaryCards: [
         'Project summary',
         'Site details',
-        'Sharing your information publicly'
+        'Sharing your project information publicly'
       ],
       projectDetails: {
         'Project name': 'Hammersmith pontoon construction'
@@ -197,7 +197,7 @@ export const testScenarios = [
         'Map view': ''
       },
       publicRegister: {
-        'Consent to publish your information': 'No'
+        'Consent to publish your project information': 'No'
       },
       submitButton: 'Confirm and send'
     }
@@ -225,7 +225,7 @@ export const testScenarios = [
       summaryCards: [
         'Project summary',
         'Site details',
-        'Sharing your information publicly'
+        'Sharing your project information publicly'
       ],
       projectDetails: {
         'Project name': 'Hammersmith pontoon construction'
@@ -239,7 +239,7 @@ export const testScenarios = [
         'Map view': ''
       },
       publicRegister: {
-        'Consent to publish your information': 'No'
+        'Consent to publish your project information': 'No'
       },
       submitButton: 'Confirm and send'
     }
@@ -268,7 +268,7 @@ export const testScenarios = [
       summaryCards: [
         'Project summary',
         'Site details',
-        'Sharing your information publicly'
+        'Sharing your project information publicly'
       ],
       projectDetails: {
         'Project name': 'Hammersmith pontoon construction'
@@ -284,7 +284,7 @@ export const testScenarios = [
         'Map view': ''
       },
       publicRegister: {
-        'Consent to publish your information': 'No'
+        'Consent to publish your project information': 'No'
       },
       submitButton: 'Confirm and send'
     }
@@ -313,7 +313,7 @@ export const testScenarios = [
       summaryCards: [
         'Project summary',
         'Site details',
-        'Sharing your information publicly'
+        'Sharing your project information publicly'
       ],
       projectDetails: {
         'Project name': 'Hammersmith pontoon construction'
@@ -328,7 +328,7 @@ export const testScenarios = [
         'Map view': ''
       },
       publicRegister: {
-        'Consent to publish your information': 'No'
+        'Consent to publish your project information': 'No'
       },
       submitButton: 'Confirm and send'
     }

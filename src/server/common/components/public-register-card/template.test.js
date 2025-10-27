@@ -20,7 +20,9 @@ describe('Public Register Card Component', () => {
 
       test('Should display "Yes" for consent to publish', () => {
         const htmlContent = $component.html()
-        expect(htmlContent).toContain('Consent to publish your information')
+        expect(htmlContent).toContain(
+          'Consent to publish your project information'
+        )
         expect(htmlContent).toContain('Yes')
       })
 
@@ -37,7 +39,7 @@ describe('Public Register Card Component', () => {
 
       test('Should have correct card title', () => {
         expect($component('.govuk-summary-card__title').text().trim()).toBe(
-          'Sharing your information publicly'
+          'Sharing your project information publicly'
         )
       })
     })
@@ -59,7 +61,9 @@ describe('Public Register Card Component', () => {
 
       test('Should display "No" for consent to publish', () => {
         const htmlContent = $component.html()
-        expect(htmlContent).toContain('Consent to publish your information')
+        expect(htmlContent).toContain(
+          'Consent to publish your project information'
+        )
         expect(htmlContent).toContain('No')
       })
 
@@ -79,7 +83,7 @@ describe('Public Register Card Component', () => {
 
       test('Should have correct card title', () => {
         expect($component('.govuk-summary-card__title').text().trim()).toBe(
-          'Sharing your information publicly'
+          'Sharing your project information publicly'
         )
       })
     })
@@ -120,7 +124,9 @@ describe('Public Register Card Component', () => {
 
       test('Should display "Yes" for consent to publish', () => {
         const htmlContent = $component.html()
-        expect(htmlContent).toContain('Consent to publish your information')
+        expect(htmlContent).toContain(
+          'Consent to publish your project information'
+        )
         expect(htmlContent).toContain('Yes')
       })
 
@@ -135,7 +141,7 @@ describe('Public Register Card Component', () => {
 
       test('Should have correct card title', () => {
         expect($component('.govuk-summary-card__title').text().trim()).toBe(
-          'Sharing your information publicly'
+          'Sharing your project information publicly'
         )
       })
     })
@@ -157,7 +163,9 @@ describe('Public Register Card Component', () => {
 
       test('Should display "No" for consent to publish', () => {
         const htmlContent = $component.html()
-        expect(htmlContent).toContain('Consent to publish your information')
+        expect(htmlContent).toContain(
+          'Consent to publish your project information'
+        )
         expect(htmlContent).toContain('No')
       })
 
@@ -175,7 +183,7 @@ describe('Public Register Card Component', () => {
 
       test('Should have correct card title', () => {
         expect($component('.govuk-summary-card__title').text().trim()).toBe(
-          'Sharing your information publicly'
+          'Sharing your project information publicly'
         )
       })
     })

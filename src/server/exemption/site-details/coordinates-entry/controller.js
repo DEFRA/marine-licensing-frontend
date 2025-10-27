@@ -3,7 +3,10 @@ import {
   updateExemptionSiteDetails
 } from '#src/server/common/helpers/session-cache/utils.js'
 import { getSiteDetailsBySite } from '#src/server/common/helpers/session-cache/site-details-utils.js'
-import { setSiteDataPreHandler } from '#src/server/common/helpers/session-cache/site-utils.js'
+import {
+  setSiteDataPreHandler,
+  setSiteData
+} from '#src/server/common/helpers/session-cache/site-utils.js'
 import {
   errorDescriptionByFieldName,
   mapErrorsForDisplay
@@ -53,7 +56,7 @@ export const coordinatesEntryController = {
 
     return h.view(COORDINATES_ENTRY_VIEW_ROUTE, {
       ...coordinatesEntrySettings,
-      backLink: getBackRoute(request, exemption, action),
+      backLink: getBackRoute(site, exemption, action),
       cancelLink: getCancelLink(action),
       projectName: exemption.projectName,
       siteNumber: exemption.multipleSiteDetails?.multipleSitesEnabled
@@ -86,7 +89,9 @@ export const coordinatesEntrySubmitController = {
         const exemption = getExemptionCache(request)
         const { projectName } = exemption
         const action = request.query.action
-        const { siteNumber } = request.site
+
+        const site = setSiteData(request)
+        const { siteNumber } = site
 
         const siteNumberDisplay = exemption.multipleSiteDetails
           ?.multipleSitesEnabled
@@ -97,7 +102,7 @@ export const coordinatesEntrySubmitController = {
           return h
             .view(COORDINATES_ENTRY_VIEW_ROUTE, {
               ...coordinatesEntrySettings,
-              backLink: getBackRoute(request, exemption, action),
+              backLink: getBackRoute(site, exemption, action),
               cancelLink: getCancelLink(action),
               payload,
               projectName,
@@ -114,7 +119,7 @@ export const coordinatesEntrySubmitController = {
         return h
           .view(COORDINATES_ENTRY_VIEW_ROUTE, {
             ...coordinatesEntrySettings,
-            backLink: getBackRoute(request, exemption, action),
+            backLink: getBackRoute(site, exemption, action),
             cancelLink: getCancelLink(action),
             payload,
             projectName,

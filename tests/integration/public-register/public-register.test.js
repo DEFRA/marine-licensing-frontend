@@ -63,7 +63,7 @@ describe('Public register', () => {
       getInputInFieldset({
         document,
         fieldsetLabel:
-          'Do you consent to the MMO publishing your information publicly?',
+          'Do you consent to the MMO publishing your project information publicly?',
         inputLabel: 'Yes'
       })
     ).not.toBeChecked()
@@ -82,14 +82,14 @@ describe('Public register', () => {
       getInputInFieldset({
         document,
         fieldsetLabel:
-          'Do you consent to the MMO publishing your information publicly?',
+          'Do you consent to the MMO publishing your project information publicly?',
         inputLabel: 'No'
       })
     ).toBeChecked()
     expectInputValue({
       document,
       inputLabel:
-        'Provide details of why you do not consent to your information being published',
+        'Provide details of why you do not consent to your project information being published',
       value: 'Test reason'
     })
   })
@@ -108,9 +108,9 @@ describe('Public register', () => {
     expectFieldsetError({
       document,
       fieldsetLabel:
-        'Do you consent to the MMO publishing your information publicly?',
+        'Do you consent to the MMO publishing your project information publicly?',
       errorMessage:
-        'Select whether you consent to the MMO publishing your information publicly'
+        'Select whether you consent to the MMO publishing your project information publicly'
     })
   })
 })

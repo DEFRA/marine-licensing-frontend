@@ -22,7 +22,7 @@ export const mockExemptionMcmsContext = {
 export const mockExemption = {
   id: faker.database.mongodbObjectId(),
   projectName: 'Test Project',
-  publicRegister: { consent: 'yes', reason: 'Test reason' },
+  publicRegister: { consent: 'no', reason: 'Test reason' },
   multipleSiteDetails: {
     multipleSitesEnabled: false,
     sameActivityDates: 'yes',

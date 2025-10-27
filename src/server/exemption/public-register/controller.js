@@ -15,16 +15,16 @@ export const PUBLIC_REGISTER_VIEW_ROUTE = 'exemption/public-register/index'
 
 export const errorMessages = {
   PUBLIC_REGISTER_REASON_REQUIRED:
-    'Details of why the information should be withheld cannot be blank',
+    'Provide details of why you do not consent to your information being published',
   PUBLIC_REGISTER_REASON_MAX_LENGTH:
-    'Details of why the information should be witheld must be 1000 characters or less',
+    'Details of why you do not consent must be 1000 characters or less',
   PUBLIC_REGISTER_CONSENT_REQUIRED:
-    'Select whether you believe your information should be withheld from the public register'
+    'Select whether you consent to the MMO publishing your information publicly'
 }
 
 const publicRegisterSettings = {
-  pageTitle: 'Public register',
-  heading: 'Public register'
+  pageTitle: 'Sharing your information publicly',
+  heading: 'Sharing your information publicly'
 }
 export const publicRegisterController = {
   handler(request, h) {
@@ -32,8 +32,8 @@ export const publicRegisterController = {
 
     return h.view(PUBLIC_REGISTER_VIEW_ROUTE, {
       ...publicRegisterSettings,
-      projectName: exemption.projectName,
-      payload: exemption.publicRegister
+      projectName: exemption?.projectName,
+      payload: exemption?.publicRegister
     })
   }
 }
@@ -47,7 +47,8 @@ export const publicRegisterSubmitController = {
           'any.required': 'PUBLIC_REGISTER_CONSENT_REQUIRED'
         }),
         reason: joi.when('consent', {
-          is: 'yes',
+          // Reason required when consent: 'no'
+          is: 'no',
           then: joi.string().required().messages({
             'string.empty': 'PUBLIC_REGISTER_REASON_REQUIRED',
             'any.required': 'PUBLIC_REGISTER_REASON_REQUIRED'
@@ -91,11 +92,12 @@ export const publicRegisterSubmitController = {
     const exemption = getExemptionCache(request)
 
     try {
-      const isAnswerYes = payload.consent === 'yes'
+      // consent: 'yes' = user consents to publish, consent: 'no' = user declines consent
+      const userDeclinesConsent = payload.consent === 'no'
 
       await authenticatedPatchRequest(request, '/exemption/public-register', {
         consent: payload.consent,
-        ...(isAnswerYes && { reason: payload.reason }),
+        ...(userDeclinesConsent && { reason: payload.reason }),
         id: exemption.id
       })
 
@@ -103,7 +105,7 @@ export const publicRegisterSubmitController = {
         ...exemption,
         publicRegister: {
           consent: payload.consent,
-          ...(isAnswerYes && { reason: payload.reason })
+          ...(userDeclinesConsent && { reason: payload.reason })
         }
       })
 

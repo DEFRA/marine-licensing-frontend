@@ -16,7 +16,7 @@ const contentSecurityPolicy = {
       'form-action': `'self' ${uploaderServiceHost}`,
       'frame-src': "'self'",
       'frame-ancestors': "'none'",
-      'img-src': "'self' data: https://tile.openstreetmap.org",
+      'img-src': "'self' https://tile.openstreetmap.org",
       'manifest-src': "'self'",
       'media-src': "'self'",
       'object-src': "'none'",

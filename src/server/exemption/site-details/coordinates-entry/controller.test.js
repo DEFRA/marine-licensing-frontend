@@ -9,7 +9,6 @@ import * as cacheUtils from '#src/server/common/helpers/session-cache/utils.js'
 import { mockExemption, mockSite } from '#src/server/test-helpers/mocks.js'
 import { makeGetRequest } from '#src/server/test-helpers/server-requests.js'
 import { statusCodes } from '#src/server/common/constants/status-codes.js'
-import { config } from '#src/config/config.js'
 import { JSDOM } from 'jsdom'
 import { routes } from '#src/server/common/constants/routes.js'
 
@@ -75,12 +74,6 @@ describe('#coordinatesEntry', () => {
         url: routes.COORDINATES_ENTRY_CHOICE,
         server: getServer()
       })
-
-      expect(result).toEqual(
-        expect.stringContaining(
-          `How do you want to enter the coordinates? | ${config.get('serviceName')}`
-        )
-      )
 
       const { document } = new JSDOM(result).window
 

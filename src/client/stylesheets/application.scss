@@ -1,8 +1,11 @@
 @use 'govuk-frontend';
 @use 'govuk-frontend-overrides';
+$moj-assets-path: "~@ministryofjustice/frontend/moj/assets/";
+@use "@ministryofjustice/frontend/moj/components/page-header-actions/page-header-actions";
 
 @use 'variables';
 @use 'helpers';
 @use 'core';
 @use 'components';
 @use 'partials';
+

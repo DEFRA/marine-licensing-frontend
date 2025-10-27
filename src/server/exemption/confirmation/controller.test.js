@@ -32,7 +32,8 @@ describe('Confirmation Controller', () => {
       expect(mockH.view).toHaveBeenCalledWith(
         'exemption/confirmation/index',
         expect.objectContaining({
-          title: 'Application complete - Defra SDLC Governance Checklist',
+          pageTitle:
+            'Your exemption application has been submitted successfully',
           description:
             'Your exemption application has been submitted successfully.',
           applicationReference: 'REF123456',

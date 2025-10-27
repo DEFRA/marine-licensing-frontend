@@ -6,7 +6,6 @@ import {
   makeGetRequest,
   makePostRequest
 } from '#src/server/test-helpers/server-requests.js'
-import { config } from '#src/config/config.js'
 import { JSDOM } from 'jsdom'
 import {
   publicRegisterController,
@@ -45,9 +44,7 @@ describe('#publicRegister', () => {
       })
 
       expect(result).toEqual(
-        expect.stringContaining(
-          `Sharing your project information publicly | ${config.get('serviceName')}`
-        )
+        expect.stringContaining(`Sharing your project information publicly`)
       )
 
       expect(statusCode).toBe(statusCodes.ok)

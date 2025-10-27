@@ -8,11 +8,11 @@ describe('#aboutController', () => {
 
   test('Should provide expected response', async () => {
     const { result, statusCode } = await makeGetRequest({
-      url: '/about',
+      url: '/help/privacy',
       server: getServer()
     })
 
-    expect(result).toEqual(expect.stringContaining('About |'))
+    expect(result).toEqual(expect.stringContaining('Privacy notice'))
     expect(statusCode).toBe(statusCodes.ok)
   })
 })

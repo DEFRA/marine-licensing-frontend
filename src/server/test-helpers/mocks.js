@@ -60,6 +60,10 @@ export const mockExemption = {
   mcmsContext: mockExemptionMcmsContext
 }
 
+export const mockExemptionSubmitted = {
+  ...mockExemption,
+  applicationReference: 'EXE/2025/10264'
+}
 export const mockExemptionWithShapefile = {
   ...mockExemption,
   siteDetails: [

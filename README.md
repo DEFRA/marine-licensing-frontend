@@ -4,7 +4,7 @@
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=DEFRA_marine-licensing-frontend&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=DEFRA_marine-licensing-frontend)
 [![Coverage](https://sonarcloud.io/api/project_badges/measure?project=DEFRA_marine-licensing-frontend&metric=coverage)](https://sonarcloud.io/summary/new_code?id=DEFRA_marine-licensing-frontend)
 
-The Marine Licensing Frontend is part of a GDS-compliant replacement of the Marine Case Management System (MCMS).
+The Marine Licensing Frontend is the start of a GDS-compliant application that will eventually replace the Marine Case Management System (MCMS). It is under development and currently offers the ability to create licence exemption notifications.
 
 - [Prerequisites](#prerequisites)
 - [Local development](#local-development)

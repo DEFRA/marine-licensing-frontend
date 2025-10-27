@@ -1,6 +1,6 @@
 import { routes } from '#src/server/common/constants/routes.js'
-export const getBackRoute = (request, exemption, action) => {
-  const { siteIndex, siteNumber, queryParams } = request.site
+export const getBackRoute = (site, exemption, action) => {
+  const { siteIndex, siteNumber, queryParams } = site
   const { multipleSiteDetails } = exemption
 
   if (action) {

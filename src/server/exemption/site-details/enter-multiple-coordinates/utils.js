@@ -24,6 +24,8 @@ export const MULTIPLE_COORDINATES_VIEW_ROUTES = {
 export const multipleCoordinatesPageData = {
   heading:
     'Enter multiple sets of coordinates to mark the boundary of the site',
+  pageTitle:
+    'Enter multiple sets of coordinates to mark the boundary of the site',
   backLink: routes.COORDINATE_SYSTEM_CHOICE
 }
 

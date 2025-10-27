@@ -6,7 +6,6 @@ import {
   makeGetRequest,
   makePostRequest
 } from '#src/server/test-helpers/server-requests.js'
-import { config } from '#src/config/config.js'
 import { JSDOM } from 'jsdom'
 import {
   publicRegisterController,
@@ -43,17 +42,13 @@ describe('#publicRegister', () => {
   })
 
   describe('#publicRegisterController', () => {
-    test('Should provide expected responsea', async () => {
+    test('Should provide expected response', async () => {
       const { result, statusCode } = await makeGetRequest({
         url: routes.PUBLIC_REGISTER,
         server: getServer()
       })
 
-      expect(result).toEqual(
-        expect.stringContaining(
-          `Public register | ${config.get('serviceName')}`
-        )
-      )
+      expect(result).toEqual(expect.stringContaining(`Public register`))
 
       expect(statusCode).toBe(statusCodes.ok)
     })

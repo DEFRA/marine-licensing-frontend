@@ -13,7 +13,6 @@ import {
 } from '#src/server/test-helpers/mocks.js'
 import { makeGetRequest } from '#src/server/test-helpers/server-requests.js'
 import { statusCodes } from '#src/server/common/constants/status-codes.js'
-import { config } from '#src/config/config.js'
 import { JSDOM } from 'jsdom'
 import { routes } from '#src/server/common/constants/routes.js'
 import { saveSiteDetailsToBackend } from '#src/server/common/helpers/save-site-details.js'
@@ -110,12 +109,6 @@ describe('#widthOfSite', () => {
         url: routes.WIDTH_OF_SITE,
         server: getServer()
       })
-
-      expect(result).toEqual(
-        expect.stringContaining(
-          `Enter the width of the circular site in metres | ${config.get('serviceName')}`
-        )
-      )
 
       const { document } = new JSDOM(result).window
 

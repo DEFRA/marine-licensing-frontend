@@ -17,8 +17,7 @@ const apiPaths = {
 }
 
 const checkYourAnswersViewContent = {
-  title: 'Check your answers',
-  description: 'Please review your answers before submitting your application.',
+  pageTitle: 'Check your answers before sending your information',
   backLink: routes.TASK_LIST
 }
 

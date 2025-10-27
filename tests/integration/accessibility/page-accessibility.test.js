@@ -8,11 +8,13 @@ import { authenticatedGetRequest } from '~/src/server/common/helpers/authenticat
 import * as cdpUploadService from '~/src/services/cdp-upload-service/index.js'
 import {
   mockExemption as mockExemptionData,
+  mockExemptionSubmitted,
   mockExemptionWithShapefile,
   mockProjectList
 } from '~/src/server/test-helpers/mocks.js'
 import { mockExemption, setupTestServer } from '../shared/test-setup-helpers.js'
 import { makeGetRequest } from '~/src/server/test-helpers/server-requests.js'
+import { JSDOM } from 'jsdom'
 
 vi.mock('~/src/server/common/helpers/authenticated-requests.js')
 
@@ -39,19 +41,18 @@ describe('Page accessibility checks (Axe)', () => {
     { url: routes.DASHBOARD, title: 'Your projects' },
     { url: routes.TASK_LIST, title: 'Task list' },
     { url: routes.PROJECT_NAME, title: 'Project name' },
-    { url: routes.ACTIVITY_DATES, title: 'Activity dates' },
-    { url: routes.ACTIVITY_DATES, title: 'Activity description' },
+    { url: routes.SITE_DETAILS, title: 'Site details' },
     {
       url: routes.COORDINATES_TYPE_CHOICE,
       title: 'How do you want to provide the site location?'
     },
     {
       url: routes.CHOOSE_FILE_UPLOAD_TYPE,
-      title: 'Which type of file do you want to upload?'
+      title: 'Choose file type'
     },
     {
       url: routes.FILE_UPLOAD,
-      title: 'Upload a <shapefile | KML file>',
+      title: 'Upload a file',
       exemption: mockExemptionWithShapefile
     },
     // TODO: Uncomment when upload and wait a11y issue fixed (use of meta refresh)
@@ -81,17 +82,31 @@ describe('Page accessibility checks (Axe)', () => {
       title:
         'Enter multiple sets of coordinates to mark the boundary of the site'
     },
+    { url: routes.ACTIVITY_DATES, title: 'Activity dates' },
+    { url: routes.ACTIVITY_DESCRIPTION, title: 'Activity description' },
     {
       url: routes.REVIEW_SITE_DETAILS,
       title: 'Review site details'
     },
     { url: routes.PUBLIC_REGISTER, title: 'Public register' },
-    { url: routes.CHECK_YOUR_ANSWERS, title: 'Check your answers' },
+    {
+      url: routes.CHECK_YOUR_ANSWERS,
+      title: 'Check your answers before sending your information'
+    },
     {
       url: `${routes.CONFIRMATION}?applicationReference=123`,
-      title: 'Application complete'
+      title: 'Your exemption application has been submitted successfully'
+    },
+    {
+      url: `${routes.VIEW_DETAILS}/${mockExemptionSubmitted.id}`,
+      title: mockExemptionSubmitted.projectName,
+      exemption: mockExemptionSubmitted
     },
     { url: routes.SITE_NAME, title: 'Site name' },
+    {
+      url: routes.MULTIPLE_SITES_CHOICE,
+      title: 'Do you need to tell us about more than one site?'
+    },
     {
       url: routes.SAME_ACTIVITY_DATES,
       title: 'Are the activity dates the same for every site?'
@@ -100,8 +115,6 @@ describe('Page accessibility checks (Axe)', () => {
       url: routes.SAME_ACTIVITY_DESCRIPTION,
       title: 'Is the activity description the same for every site?'
     },
-    { url: routes.DASHBOARD, title: 'Your projects' },
-    { url: routes.SITE_DETAILS, title: 'Site details' },
     {
       url: routes.PRIVACY,
       title: 'Privacy notice – Get permission for marine work'
@@ -122,7 +135,7 @@ describe('Page accessibility checks (Axe)', () => {
 
   test.each(pages)(
     '"$title" page',
-    async ({ url, exemption = mockExemptionData }) => {
+    async ({ title, url, exemption = mockExemptionData }) => {
       mockExemption(exemption)
       vi.mocked(authenticatedGetRequest).mockImplementation(
         (_request, endpoint) => ({
@@ -137,7 +150,12 @@ describe('Page accessibility checks (Axe)', () => {
         server: getServer()
       })
       expect(response.statusCode).toBe(statusCodes.ok)
-      await runAxeChecks(response.result)
-    }
+      const { document } = new JSDOM(response.result).window
+      expect(document.querySelector('title')).toHaveTextContent(
+        `${title} - Get permission for marine work`
+      )
+      await runAxeChecks(document.documentElement)
+    },
+    10000
   )
 })

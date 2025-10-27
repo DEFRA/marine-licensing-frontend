@@ -18,6 +18,7 @@ vi.mock('~/src/server/common/helpers/save-site-details.js')
 describe('sameActivityDescriptionController', () => {
   const mockRequest = {
     site: mockSite,
+    query: {},
     logger: {
       info: vi.fn()
     }
@@ -49,6 +50,7 @@ describe('sameActivityDescriptionController', () => {
           pageTitle: 'Is the activity description the same for every site?',
           heading: 'Is the activity description the same for every site?',
           backLink: routes.ACTIVITY_DATES,
+          cancelLink: routes.TASK_LIST + '?cancel=site-details',
           projectName: mockExemption.projectName,
           payload: {
             sameActivityDescription: undefined
@@ -130,6 +132,29 @@ describe('sameActivityDescriptionController', () => {
         '/exemption/how-do-you-want-to-enter-the-coordinates?site=1'
       )
     })
+
+    test('should render with RSD backlink and no cancelLink when action param is present', () => {
+      const requestWithAction = {
+        ...mockRequest,
+        query: { action: 'change' }
+      }
+
+      sameActivityDescriptionController.handler(requestWithAction, mockH)
+
+      expect(mockH.view).toHaveBeenCalledWith(
+        'exemption/site-details/same-activity-description/index',
+        {
+          pageTitle: 'Is the activity description the same for every site?',
+          heading: 'Is the activity description the same for every site?',
+          backLink: routes.REVIEW_SITE_DETAILS,
+          cancelLink: undefined,
+          projectName: mockExemption.projectName,
+          payload: {
+            sameActivityDescription: undefined
+          }
+        }
+      )
+    })
   })
 
   describe('POST handler', () => {
@@ -170,6 +195,116 @@ describe('sameActivityDescriptionController', () => {
         'no'
       )
       expect(mockH.redirect).toHaveBeenCalledWith(routes.ACTIVITY_DESCRIPTION)
+    })
+
+    test('should redirect to RSD when action param present and answer unchanged', async () => {
+      const exemptionWithData = {
+        ...mockExemption,
+        multipleSiteDetails: {
+          sameActivityDescription: 'yes'
+        }
+      }
+      vi.mocked(getExemptionCache).mockReturnValue(exemptionWithData)
+
+      const requestWithPayload = {
+        ...mockRequest,
+        query: { action: 'change' },
+        payload: {
+          sameActivityDescription: 'yes'
+        }
+      }
+
+      await sameActivityDescriptionSubmitController.handler(
+        requestWithPayload,
+        mockH
+      )
+
+      expect(mockH.redirect).toHaveBeenCalledWith(routes.REVIEW_SITE_DETAILS)
+    })
+
+    test('should redirect to activity-description with action param when changing from no to yes', async () => {
+      const exemptionWithData = {
+        ...mockExemption,
+        multipleSiteDetails: {
+          sameActivityDescription: 'no'
+        }
+      }
+      vi.mocked(getExemptionCache).mockReturnValue(exemptionWithData)
+
+      const requestWithPayload = {
+        ...mockRequest,
+        query: { action: 'change' },
+        payload: {
+          sameActivityDescription: 'yes'
+        }
+      }
+
+      await sameActivityDescriptionSubmitController.handler(
+        requestWithPayload,
+        mockH
+      )
+
+      expect(updateExemptionMultipleSiteDetails).toHaveBeenCalledWith(
+        requestWithPayload,
+        'sameActivityDescription',
+        'yes'
+      )
+
+      expect(mockH.redirect).toHaveBeenCalledWith(
+        routes.ACTIVITY_DESCRIPTION + '?action=change'
+      )
+    })
+
+    test('should copy description to all sites and save when changing from yes to no with action param', async () => {
+      const exemptionWithData = {
+        ...mockExemption,
+        multipleSiteDetails: {
+          sameActivityDescription: 'yes'
+        },
+        siteDetails: [
+          { activityDescription: 'Shared description' },
+          {},
+          {}
+        ]
+      }
+      vi.mocked(getExemptionCache).mockReturnValue(exemptionWithData)
+
+      const requestWithPayload = {
+        ...mockRequest,
+        query: { action: 'change' },
+        payload: {
+          sameActivityDescription: 'no'
+        }
+      }
+
+      await sameActivityDescriptionSubmitController.handler(
+        requestWithPayload,
+        mockH
+      )
+
+      expect(updateExemptionMultipleSiteDetails).toHaveBeenCalledWith(
+        requestWithPayload,
+        'sameActivityDescription',
+        'no'
+      )
+
+      expect(updateExemptionSiteDetails).toHaveBeenCalledWith(
+        requestWithPayload,
+        1,
+        'activityDescription',
+        'Shared description'
+      )
+
+      expect(updateExemptionSiteDetails).toHaveBeenCalledWith(
+        requestWithPayload,
+        2,
+        'activityDescription',
+        'Shared description'
+      )
+
+      expect(saveSiteDetailsToBackend).toHaveBeenCalledWith(requestWithPayload)
+
+      expect(mockH.redirect).toHaveBeenCalledWith(routes.REVIEW_SITE_DETAILS)
     })
   })
 

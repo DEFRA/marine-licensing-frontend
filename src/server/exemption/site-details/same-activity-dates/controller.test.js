@@ -11,8 +11,10 @@ import {
   mockSite
 } from '#src/server/test-helpers/mocks.js'
 import { routes } from '#src/server/common/constants/routes.js'
+import { saveSiteDetailsToBackend } from '#src/server/common/helpers/save-site-details.js'
 
 vi.mock('~/src/server/common/helpers/session-cache/utils.js')
+vi.mock('~/src/server/common/helpers/save-site-details.js')
 
 describe('#sameActivityDates', () => {
   let getExemptionCacheSpy
@@ -34,12 +36,13 @@ describe('#sameActivityDates', () => {
     test('sameActivityDatesController handler should render with correct context', () => {
       const h = { view: vi.fn() }
 
-      sameActivityDatesController.handler({ site: mockSite }, h)
+      sameActivityDatesController.handler({ site: mockSite, query: {} }, h)
 
       expect(h.view).toHaveBeenCalledWith(SAME_ACTIVITY_DATES_VIEW_ROUTE, {
         pageTitle: 'Are the activity dates the same for every site?',
         heading: 'Are the activity dates the same for every site?',
         backLink: routes.SITE_NAME,
+        cancelLink: routes.TASK_LIST + '?cancel=site-details',
         payload: {
           sameActivityDates:
             mockExemption.multipleSiteDetails?.sameActivityDates
@@ -55,7 +58,7 @@ describe('#sameActivityDates', () => {
 
       const h = { view: vi.fn() }
 
-      const request = { site: mockSite }
+      const request = { site: mockSite, query: {} }
 
       sameActivityDatesController.handler(request, h)
 
@@ -63,6 +66,7 @@ describe('#sameActivityDates', () => {
         pageTitle: 'Are the activity dates the same for every site?',
         heading: 'Are the activity dates the same for every site?',
         backLink: routes.SITE_NAME,
+        cancelLink: routes.TASK_LIST + '?cancel=site-details',
         payload: { sameActivityDates: undefined },
         projectName: 'Test Project'
       })
@@ -83,7 +87,8 @@ describe('#sameActivityDates', () => {
           ...mockSite,
           siteIndex: 1,
           queryParams: '?site=1'
-        }
+        },
+        query: {}
       }
 
       sameActivityDatesController.handler(mockRequestSecondSite, mockH)
@@ -108,7 +113,8 @@ describe('#sameActivityDates', () => {
           ...mockSite,
           siteIndex: 1,
           queryParams: '?site=1'
-        }
+        },
+        query: {}
       }
 
       sameActivityDatesController.handler(mockRequestSecondSite, mockH)
@@ -124,12 +130,36 @@ describe('#sameActivityDates', () => {
         '/exemption/same-activity-description?site=1'
       )
     })
+
+    test('should render with RSD backlink and no cancelLink when action param is present', () => {
+      const h = { view: vi.fn() }
+
+      const request = {
+        site: mockSite,
+        query: { action: 'change' }
+      }
+
+      sameActivityDatesController.handler(request, h)
+
+      expect(h.view).toHaveBeenCalledWith(SAME_ACTIVITY_DATES_VIEW_ROUTE, {
+        pageTitle: 'Are the activity dates the same for every site?',
+        heading: 'Are the activity dates the same for every site?',
+        backLink: routes.REVIEW_SITE_DETAILS,
+        cancelLink: undefined,
+        payload: {
+          sameActivityDates:
+            mockExemption.multipleSiteDetails?.sameActivityDates
+        },
+        projectName: 'Test Project'
+      })
+    })
   })
 
   describe('#sameActivityDatesSubmitController', () => {
     test('Should correctly format error data', () => {
       const request = {
-        payload: { sameActivityDates: 'invalid' }
+        payload: { sameActivityDates: 'invalid' },
+        query: {}
       }
 
       const h = {
@@ -158,6 +188,7 @@ describe('#sameActivityDates', () => {
         pageTitle: 'Are the activity dates the same for every site?',
         heading: 'Are the activity dates the same for every site?',
         backLink: routes.SITE_NAME,
+        cancelLink: routes.TASK_LIST + '?cancel=site-details',
         projectName: 'Test Project',
         payload: { sameActivityDates: 'invalid' },
         errorSummary: [
@@ -182,7 +213,8 @@ describe('#sameActivityDates', () => {
     test('Should correctly output page with no error data in object for manual uploads', () => {
       const request = {
         payload: { sameActivityDates: 'invalid' },
-        site: { siteDetails: mockExemption.siteDetails[0] }
+        site: { siteDetails: mockExemption.siteDetails[0] },
+        query: {}
       }
 
       const h = {
@@ -201,6 +233,7 @@ describe('#sameActivityDates', () => {
         pageTitle: 'Are the activity dates the same for every site?',
         heading: 'Are the activity dates the same for every site?',
         backLink: routes.SITE_NAME,
+        cancelLink: routes.TASK_LIST + '?cancel=site-details',
         projectName: 'Test Project',
         payload: { sameActivityDates: 'invalid' }
       })
@@ -211,7 +244,8 @@ describe('#sameActivityDates', () => {
     test('Should correctly output page with no error data in object for file uploads', () => {
       const request = {
         payload: { sameActivityDates: 'invalid' },
-        site: { siteDetails: mockFileUploadExemption.siteDetails[0] }
+        site: { siteDetails: mockFileUploadExemption.siteDetails[0] },
+        query: {}
       }
 
       getExemptionCacheSpy.mockReturnValue(mockFileUploadExemption)
@@ -232,6 +266,7 @@ describe('#sameActivityDates', () => {
         pageTitle: 'Are the activity dates the same for every site?',
         heading: 'Are the activity dates the same for every site?',
         backLink: routes.FILE_UPLOAD,
+        cancelLink: routes.TASK_LIST + '?cancel=site-details',
         projectName: 'Test Project',
         payload: { sameActivityDates: 'invalid' }
       })
@@ -280,7 +315,8 @@ describe('#sameActivityDates', () => {
       }
 
       const mockRequest = {
-        payload: { sameActivityDates: 'yes' }
+        payload: { sameActivityDates: 'yes' },
+        query: {}
       }
 
       sitePreHandlerHook.method(mockRequest, h)
@@ -292,6 +328,114 @@ describe('#sameActivityDates', () => {
       ).toHaveBeenCalledWith(mockRequest, 'sameActivityDates', 'yes')
 
       expect(h.redirect).toHaveBeenCalledWith(routes.ACTIVITY_DATES)
+    })
+
+    test('Should redirect to RSD when action param present and answer unchanged', async () => {
+      const h = { redirect: vi.fn() }
+
+      const exemptionWithData = {
+        ...mockExemption,
+        multipleSiteDetails: {
+          sameActivityDates: 'yes'
+        }
+      }
+
+      getExemptionCacheSpy.mockReturnValue(exemptionWithData)
+
+      const mockRequest = {
+        payload: { sameActivityDates: 'yes' },
+        query: { action: 'change' },
+        site: mockSite
+      }
+
+      sitePreHandlerHook.method(mockRequest, h)
+
+      await sameActivityDatesSubmitController.handler(mockRequest, h)
+
+      expect(h.redirect).toHaveBeenCalledWith(routes.REVIEW_SITE_DETAILS)
+    })
+
+    test('Should redirect to activity-dates with action param when changing from no to yes', async () => {
+      const h = { redirect: vi.fn() }
+
+      const exemptionWithData = {
+        ...mockExemption,
+        multipleSiteDetails: {
+          sameActivityDates: 'no'
+        }
+      }
+
+      getExemptionCacheSpy.mockReturnValue(exemptionWithData)
+
+      const mockRequest = {
+        payload: { sameActivityDates: 'yes' },
+        query: { action: 'change' },
+        site: mockSite
+      }
+
+      sitePreHandlerHook.method(mockRequest, h)
+
+      await sameActivityDatesSubmitController.handler(mockRequest, h)
+
+      expect(
+        cacheUtils.updateExemptionMultipleSiteDetails
+      ).toHaveBeenCalledWith(mockRequest, 'sameActivityDates', 'yes')
+
+      expect(h.redirect).toHaveBeenCalledWith(
+        routes.ACTIVITY_DATES + '?action=change'
+      )
+    })
+
+    test('Should copy dates to all sites and save when changing from yes to no with action param', async () => {
+      const h = { redirect: vi.fn() }
+
+      const exemptionWithData = {
+        ...mockExemption,
+        multipleSiteDetails: {
+          sameActivityDates: 'yes'
+        },
+        siteDetails: [
+          {
+            activityDates: { start: '2024-01-01', end: '2024-12-31' }
+          },
+          {},
+          {}
+        ]
+      }
+
+      getExemptionCacheSpy.mockReturnValue(exemptionWithData)
+
+      const mockRequest = {
+        payload: { sameActivityDates: 'no' },
+        query: { action: 'change' },
+        site: mockSite
+      }
+
+      sitePreHandlerHook.method(mockRequest, h)
+
+      await sameActivityDatesSubmitController.handler(mockRequest, h)
+
+      expect(
+        cacheUtils.updateExemptionMultipleSiteDetails
+      ).toHaveBeenCalledWith(mockRequest, 'sameActivityDates', 'no')
+
+      expect(cacheUtils.updateExemptionSiteDetails).toHaveBeenCalledWith(
+        mockRequest,
+        1,
+        'activityDates',
+        { start: '2024-01-01', end: '2024-12-31' }
+      )
+
+      expect(cacheUtils.updateExemptionSiteDetails).toHaveBeenCalledWith(
+        mockRequest,
+        2,
+        'activityDates',
+        { start: '2024-01-01', end: '2024-12-31' }
+      )
+
+      expect(saveSiteDetailsToBackend).toHaveBeenCalledWith(mockRequest)
+
+      expect(h.redirect).toHaveBeenCalledWith(routes.REVIEW_SITE_DETAILS)
     })
   })
 })

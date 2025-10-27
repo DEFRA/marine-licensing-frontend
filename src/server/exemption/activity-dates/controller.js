@@ -26,11 +26,8 @@ import { setSiteDataPreHandler } from '#src/server/common/helpers/session-cache/
 import { getSiteDetailsBySite } from '#src/server/common/helpers/session-cache/site-details-utils.js'
 import { activityDatesSchema } from '#src/server/common/schemas/date.js'
 import { getSiteNumber } from '#src/server/exemption/site-details/utils/site-number.js'
+import { getCancelLink } from '#src/server/exemption/site-details/utils/cancel-link.js'
 import { getBackRoute, getNextRoute } from './utils.js'
-
-const getCancelLink = (action) => {
-  return action ? undefined : routes.TASK_LIST + '?cancel=site-details'
-}
 
 const getBackLink = (siteIndex, action, siteNumber, queryParams, exemption) => {
   if (action) {

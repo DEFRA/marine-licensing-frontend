@@ -10,6 +10,7 @@ import { setSiteDataPreHandler } from '#src/server/common/helpers/session-cache/
 import { getSiteDetailsBySite } from '#src/server/common/helpers/session-cache/site-details-utils.js'
 import { routes } from '#src/server/common/constants/routes.js'
 import { saveSiteDetailsToBackend } from '#src/server/common/helpers/save-site-details.js'
+import { getCancelLink } from '#src/server/exemption/site-details/utils/cancel-link.js'
 import joi from 'joi'
 import { getBackLink, getNextRoute } from './utils.js'
 
@@ -26,10 +27,6 @@ export const errorMessages = {
 const templateValues = {
   pageTitle: 'Activity description',
   heading: 'Activity description'
-}
-
-const getCancelLink = (action) => {
-  return action ? undefined : routes.TASK_LIST + '?cancel=site-details'
 }
 
 const getBackLinkForAction = (

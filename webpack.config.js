@@ -92,6 +92,9 @@ export default {
             options: {
               sassOptions: {
                 loadPaths: [
+                  '.',
+                  'node_modules/@ministryofjustice/frontend',
+                  'node_modules/govuk-frontend/dist',
                   path.join(dirname, 'src/client/stylesheets'),
                   path.join(dirname, 'src/server/common/components'),
                   path.join(dirname, 'src/server/common/templates/partials')

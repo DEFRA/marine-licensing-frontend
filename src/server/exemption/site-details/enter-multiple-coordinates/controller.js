@@ -21,9 +21,7 @@ import {
 } from './utils.js'
 import { validateCoordinates } from '#src/server/exemption/site-details/enter-multiple-coordinates/validation/validation.js'
 import { saveSiteDetailsToBackend } from '#src/server/common/helpers/save-site-details.js'
-
-const getCancelLink = (action) =>
-  action ? undefined : routes.TASK_LIST + '?cancel=site-details'
+import { getCancelLink } from '#src/server/exemption/site-details/utils/cancel-link.js'
 
 const getBackLinkForAction = (action, siteNumber, queryParams, request) => {
   if (action) {

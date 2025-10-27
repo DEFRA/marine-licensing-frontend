@@ -11,7 +11,7 @@ describe('#aboutController', () => {
       server: getServer()
     })
 
-    expect(result).toEqual(expect.stringContaining('About |'))
+    expect(result).toEqual(expect.stringContaining('About -'))
     expect(statusCode).toBe(statusCodes.ok)
   })
 })

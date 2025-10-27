@@ -227,6 +227,8 @@ describe('enter-multiple-coordinates utils', () => {
       expect(multipleCoordinatesPageData).toEqual({
         heading:
           'Enter multiple sets of coordinates to mark the boundary of the site',
+        pageTitle:
+          'Enter multiple sets of coordinates to mark the boundary of the site',
         backLink: routes.COORDINATE_SYSTEM_CHOICE
       })
     })

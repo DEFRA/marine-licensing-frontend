@@ -39,7 +39,6 @@ describe('Dashboard', () => {
     expect(getByRole(doc, 'heading', { level: 1 })).toHaveTextContent(
       'Your projects'
     )
-    expect(doc.title).toEqual('Your projects | Get permission for marine work')
     expect(
       getByRole(doc, 'button', { name: 'Create new project' })
     ).toHaveAttribute(

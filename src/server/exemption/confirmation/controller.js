@@ -2,7 +2,7 @@ import Boom from '@hapi/boom'
 import { getExemptionCache } from '#src/server/common/helpers/session-cache/utils.js'
 
 const confirmationViewContent = {
-  title: 'Application complete - Defra SDLC Governance Checklist',
+  pageTitle: 'Your exemption application has been submitted successfully',
   description: 'Your exemption application has been submitted successfully.'
 }
 

@@ -8,7 +8,6 @@ import { getExemptionCache } from '#src/server/common/helpers/session-cache/util
 import { mockExemption } from '#src/server/test-helpers/mocks.js'
 import { makeGetRequest } from '#src/server/test-helpers/server-requests.js'
 import { statusCodes } from '#src/server/common/constants/status-codes.js'
-import { config } from '#src/config/config.js'
 import { routes } from '#src/server/common/constants/routes.js'
 
 vi.mock('~/src/server/common/helpers/session-cache/utils.js')
@@ -36,15 +35,11 @@ describe('#beforeYouStart', () => {
       )
     })
 
-    test('Should provide expected response and correctly display project name', async () => {
-      const { result, statusCode } = await makeGetRequest({
+    test('Should provide expected response', async () => {
+      const { statusCode } = await makeGetRequest({
         url: routes.SITE_DETAILS,
         server: getServer()
       })
-
-      expect(result).toEqual(
-        expect.stringContaining(`Site details | ${config.get('serviceName')}`)
-      )
 
       expect(statusCode).toBe(statusCodes.ok)
     })

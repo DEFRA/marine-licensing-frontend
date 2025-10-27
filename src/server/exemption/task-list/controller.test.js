@@ -4,7 +4,6 @@ import {
   mockExemption
 } from '#tests/integration/shared/test-setup-helpers.js'
 import { statusCodes } from '#src/server/common/constants/status-codes.js'
-import { config } from '#src/config/config.js'
 import { JSDOM } from 'jsdom'
 import {
   taskListController,
@@ -26,10 +25,6 @@ describe('#taskListController', () => {
       url: routes.TASK_LIST,
       server: getServer()
     })
-
-    expect(result).toEqual(
-      expect.stringContaining(`Task list | ${config.get('serviceName')}`)
-    )
 
     const { document } = new JSDOM(result).window
 

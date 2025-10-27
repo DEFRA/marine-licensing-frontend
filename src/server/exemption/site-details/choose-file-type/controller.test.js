@@ -2,7 +2,6 @@ import { vi } from 'vitest'
 import { setupTestServer } from '#tests/integration/shared/test-setup-helpers.js'
 import { statusCodes } from '#src/server/common/constants/status-codes.js'
 import { routes } from '#src/server/common/constants/routes.js'
-import { config } from '#src/config/config.js'
 import { JSDOM } from 'jsdom'
 import {
   chooseFileTypeController,
@@ -41,12 +40,6 @@ describe('#chooseFileType', () => {
         server: getServer()
       })
 
-      expect(result).toEqual(
-        expect.stringContaining(
-          `Choose file type | ${config.get('serviceName')}`
-        )
-      )
-
       const { document } = new JSDOM(result).window
 
       expect(
@@ -64,12 +57,6 @@ describe('#chooseFileType', () => {
         url: routes.CHOOSE_FILE_UPLOAD_TYPE,
         server: getServer()
       })
-
-      expect(result).toEqual(
-        expect.stringContaining(
-          `Choose file type | ${config.get('serviceName')}`
-        )
-      )
 
       const { document } = new JSDOM(result).window
       expect(

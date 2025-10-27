@@ -89,7 +89,10 @@ describe('Page accessibility checks (Axe)', () => {
       title: 'Review site details'
     },
     { url: routes.PUBLIC_REGISTER, title: 'Public register' },
-    { url: routes.CHECK_YOUR_ANSWERS, title: 'Check your answers' },
+    {
+      url: routes.CHECK_YOUR_ANSWERS,
+      title: 'Check your answers before sending your information'
+    },
     {
       url: `${routes.CONFIRMATION}?applicationReference=123`,
       title: 'Your exemption application has been submitted successfully'
@@ -149,7 +152,7 @@ describe('Page accessibility checks (Axe)', () => {
       expect(response.statusCode).toBe(statusCodes.ok)
       const { document } = new JSDOM(response.result).window
       expect(document.querySelector('title')).toHaveTextContent(
-        `${title} | Get permission for marine work`
+        `${title} - Get permission for marine work`
       )
       await runAxeChecks(document.documentElement)
     },

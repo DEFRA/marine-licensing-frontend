@@ -59,10 +59,7 @@ This folder contains all the scripts and configuration files needed to run the M
    ./local-https-setup/toggle-local-dns.sh
    ```
 
-6. Rename the .env.template file in the frontend repo root, to .env (it will be git-ignored) and obtain the missing secret values from another team member.:
-
-- including AUTH_DEFRA_ID_SCOPES and DEFRA_ID_CLIENT_SECRET from secrets
-- compare other values with here https://github.com/DEFRA/cdp-app-config/blob/main/services/marine-licensing-frontend/test/marine-licensing-frontend.env
+6. Rename the .env.template file in the frontend repo root, to .env (it will be git-ignored) and obtain the missing secret values from another team member. Compare other values with here https://github.com/DEFRA/cdp-app-config/blob/main/services/marine-licensing-frontend/test/marine-licensing-frontend.env
 
 7. Rename the .env.template in the backend repo root as .env and check the values are the same as https://github.com/DEFRA/cdp-app-config/blob/main/services/marine-licensing-backend/test/marine-licensing-backend.env
 

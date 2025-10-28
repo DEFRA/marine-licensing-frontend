@@ -261,11 +261,7 @@ describe('sameActivityDescriptionController', () => {
         multipleSiteDetails: {
           sameActivityDescription: 'yes'
         },
-        siteDetails: [
-          { activityDescription: 'Shared description' },
-          {},
-          {}
-        ]
+        siteDetails: [{ activityDescription: 'Shared description' }, {}, {}]
       }
       vi.mocked(getExemptionCache).mockReturnValue(exemptionWithData)
 

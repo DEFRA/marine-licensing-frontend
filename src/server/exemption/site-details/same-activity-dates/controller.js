@@ -16,7 +16,7 @@ import { saveSiteDetailsToBackend } from '#src/server/common/helpers/save-site-d
 import { getCancelLink } from '#src/server/exemption/site-details/utils/cancel-link.js'
 import { copySameActivityDatesToAllSites } from '#src/server/common/helpers/copy-same-activity-data.js'
 import joi from 'joi'
-import { answerChangedFromNoToYes, answerChangedFromYesToNo } from './utils'
+import { answerChangedFromNoToYes, answerChangedFromYesToNo } from './utils.js'
 
 export const SAME_ACTIVITY_DATES_VIEW_ROUTE =
   'exemption/site-details/same-activity-dates/index'

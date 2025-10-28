@@ -13,7 +13,11 @@ import {
   mapErrorsForDisplay
 } from '#src/server/common/helpers/errors.js'
 import joi from 'joi'
-import { getBackLink } from './utils.js'
+import {
+  answerChangedFromNoToYes,
+  answerChangedFromYesToNo,
+  getBackLink
+} from './utils.js'
 import { saveSiteDetailsToBackend } from '#src/server/common/helpers/save-site-details.js'
 import { getCancelLink } from '#src/server/exemption/site-details/utils/cancel-link.js'
 import { copySameActivityDescriptionToAllSites } from '#src/server/common/helpers/copy-same-activity-data.js'
@@ -34,20 +38,13 @@ export const errorMessages = {
     'Select whether the activity description is the same for every site'
 }
 
-const getBackLinkForAction = (action, exemption, siteDetails) => {
-  if (action) {
-    return routes.REVIEW_SITE_DETAILS
-  }
-  return getBackLink(exemption, siteDetails)
-}
-
 const createValidationFailAction = (request, h, err) => {
   const { payload } = request
   const exemption = getExemptionCache(request)
   const site = setSiteData(request)
   const action = request.query.action
 
-  const backLink = getBackLinkForAction(action, exemption, site.siteDetails)
+  const backLink = getBackLink(exemption, site.siteDetails, action)
   const cancelLink = getCancelLink(action)
 
   if (!err.details) {
@@ -107,7 +104,7 @@ export const sameActivityDescriptionController = {
 
     return h.view(SAME_ACTIVITY_DESCRIPTION_VIEW_ROUTE, {
       ...sameActivityDescriptionSettings,
-      backLink: getBackLinkForAction(action, exemption, siteDetails),
+      backLink: getBackLink(exemption, siteDetails, action),
       cancelLink: getCancelLink(action),
       projectName: exemption.projectName,
       payload: {
@@ -156,17 +153,11 @@ export const sameActivityDescriptionSubmitController = {
     )
 
     if (action) {
-      if (
-        previousAnswer === 'no' &&
-        payload.sameActivityDescription === 'yes'
-      ) {
+      if (answerChangedFromNoToYes(previousAnswer, payload)) {
         return h.redirect(routes.ACTIVITY_DESCRIPTION + '?action=change')
       }
 
-      if (
-        previousAnswer === 'yes' &&
-        payload.sameActivityDescription === 'no'
-      ) {
+      if (answerChangedFromYesToNo(previousAnswer, payload)) {
         copySameActivityDescriptionToAllSites(request)
         await saveSiteDetailsToBackend(request)
         return h.redirect(routes.REVIEW_SITE_DETAILS)

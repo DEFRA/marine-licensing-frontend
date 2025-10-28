@@ -16,6 +16,7 @@ import { saveSiteDetailsToBackend } from '#src/server/common/helpers/save-site-d
 import { getCancelLink } from '#src/server/exemption/site-details/utils/cancel-link.js'
 import { copySameActivityDatesToAllSites } from '#src/server/common/helpers/copy-same-activity-data.js'
 import joi from 'joi'
+import { answerChangedFromNoToYes, answerChangedFromYesToNo } from './utils'
 
 export const SAME_ACTIVITY_DATES_VIEW_ROUTE =
   'exemption/site-details/same-activity-dates/index'
@@ -149,11 +150,11 @@ export const sameActivityDatesSubmitController = {
     )
 
     if (action) {
-      if (previousAnswer === 'no' && payload.sameActivityDates === 'yes') {
+      if (answerChangedFromNoToYes(previousAnswer, payload)) {
         return h.redirect(routes.ACTIVITY_DATES + '?action=change')
       }
 
-      if (previousAnswer === 'yes' && payload.sameActivityDates === 'no') {
+      if (answerChangedFromYesToNo(previousAnswer, payload)) {
         copySameActivityDatesToAllSites(request)
         await saveSiteDetailsToBackend(request)
         return h.redirect(routes.REVIEW_SITE_DETAILS)

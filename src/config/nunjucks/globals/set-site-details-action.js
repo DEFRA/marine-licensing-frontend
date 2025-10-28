@@ -8,11 +8,15 @@ export function setSiteDetailsAction(
 
   const action = hasValue ? 'change' : 'add'
 
+  const queryString = siteNumber
+    ? `site=${siteNumber}&action=${action}`
+    : `action=${action}`
+
   return {
     items: [
       {
         ...(href && {
-          href: `${href}?${siteNumber ? `site=${siteNumber}&` : ''}action=${action}`
+          href: `${href}?${queryString}`
         }),
         text: hasValue ? 'Change' : 'Add',
         ...(visuallyHiddenText && { visuallyHiddenText }),

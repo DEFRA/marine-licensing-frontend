@@ -16,18 +16,16 @@ import {
   setupTestServer
 } from '~/tests/integration/shared/test-setup-helpers.js'
 import * as exemptionService from '#src/services/exemption-service/index.js'
+import {
+  getRowByKey,
+  getSiteDetailsCard,
+  validateActionLink,
+  validatePageStructure,
+  validateNavigationElements
+} from './review-site-details-utils.js'
 
 vi.mock('~/src/server/common/helpers/coordinate-utils.js')
 vi.mock('~/src/services/exemption-service/index.js')
-
-const getSiteDetailsCard = (document, expected, siteIndex = 0) => {
-  const cardName = expected?.siteDetails[siteIndex]?.cardName ?? 'Site details'
-  const heading = within(document).getByRole('heading', {
-    level: 2,
-    name: cardName
-  })
-  return heading.closest('.govuk-summary-card')
-}
 
 describe('Review Site Details - Polygon Coordinates Integration Tests', () => {
   const getServer = setupTestServer()
@@ -177,20 +175,6 @@ describe('Review Site Details - Polygon Coordinates Integration Tests', () => {
     return new JSDOM(response.result).window.document
   }
 
-  const validatePageStructure = (document, expected) => {
-    const heading = document.querySelector('h1')
-    expect(heading.textContent.trim()).toBe('Review site details')
-
-    const caption = document.querySelector('.govuk-caption-l')
-    expect(caption.textContent.trim()).toBe(expected.projectName)
-
-    const backLink = document.querySelector('.govuk-back-link')
-    expect(backLink.textContent.trim()).toBe('Back')
-    expect(backLink.getAttribute('href')).toBe(
-      routes.ENTER_MULTIPLE_COORDINATES
-    )
-  }
-
   const validateMultipleSites = (document, expected) => {
     const heading = document.querySelector('h1')
     expect(heading.textContent.trim()).toBe('Review site details')
@@ -314,18 +298,37 @@ describe('Review Site Details - Polygon Coordinates Integration Tests', () => {
       expected.siteDetails[siteIndex].method
     )
 
+    validateActionLink(
+      methodRow,
+      expected.siteDetails[siteIndex].method,
+      siteIndex
+    )
+
     const coordinateSystemRow = getRowByKey(siteCard, 'Coordinate system')
     expect(coordinateSystemRow.textContent).toContain(
       expected.siteDetails[siteIndex].coordinateSystem
     )
 
+    validateActionLink(
+      coordinateSystemRow,
+      expected.siteDetails[siteIndex].coordinateSystem,
+      siteIndex
+    )
+
     const siteNameRow = getRowByKey(siteCard, 'Site name')
 
-    expected.multipleSiteDetails.multipleSiteDetails === 'Yes'
-      ? expect(siteNameRow.textContent).toContain(
-          expected.siteDetails[siteIndex].siteName
-        )
-      : expect(siteNameRow).toBeFalsy()
+    if (expected.multipleSiteDetails.multipleSiteDetails === 'Yes') {
+      expect(siteNameRow.textContent).toContain(
+        expected.siteDetails[siteIndex].siteName
+      )
+      validateActionLink(
+        siteNameRow,
+        expected.siteDetails[siteIndex].siteName,
+        siteIndex
+      )
+    } else {
+      expect(siteNameRow).toBeFalsy()
+    }
 
     const shouldIncludeActivityDates =
       expected.multipleSiteDetails.multipleSiteDetails === 'No' ||
@@ -333,11 +336,18 @@ describe('Review Site Details - Polygon Coordinates Integration Tests', () => {
 
     const activityDatesRow = getRowByKey(siteCard, 'Activity dates')
 
-    shouldIncludeActivityDates
-      ? expect(activityDatesRow.textContent).toContain(
-          expected.siteDetails[siteIndex].activityDates
-        )
-      : expect(activityDatesRow).toBeFalsy()
+    if (shouldIncludeActivityDates) {
+      expect(activityDatesRow.textContent).toContain(
+        expected.siteDetails[siteIndex].activityDates
+      )
+      validateActionLink(
+        activityDatesRow,
+        expected.siteDetails[siteIndex].activityDates,
+        siteIndex
+      )
+    } else {
+      expect(activityDatesRow).toBeFalsy()
+    }
 
     const shouldIncludeActivityDescription =
       expected.multipleSiteDetails.multipleSiteDetails === 'No' ||
@@ -345,11 +355,18 @@ describe('Review Site Details - Polygon Coordinates Integration Tests', () => {
 
     const activityDescriptionRow = getRowByKey(siteCard, 'Activity description')
 
-    shouldIncludeActivityDescription
-      ? expect(activityDescriptionRow.textContent).toContain(
-          expected.siteDetails[siteIndex].activityDescription
-        )
-      : expect(activityDescriptionRow).toBeFalsy()
+    if (shouldIncludeActivityDescription) {
+      expect(activityDescriptionRow.textContent).toContain(
+        expected.siteDetails[siteIndex].activityDescription
+      )
+      validateActionLink(
+        activityDescriptionRow,
+        expected.siteDetails[siteIndex].activityDescription,
+        siteIndex
+      )
+    } else {
+      expect(activityDescriptionRow).toBeFalsy()
+    }
   }
 
   const validatePolygonCoordinates = (document, expected, siteIndex) => {
@@ -372,19 +389,5 @@ describe('Review Site Details - Polygon Coordinates Integration Tests', () => {
       '.app-site-details-map[data-module="site-details-map"]'
     )
     expect(mapDiv).toBeTruthy()
-  }
-
-  const validateNavigationElements = (document) => {
-    expect(
-      within(document).getByRole('button', { name: 'Continue' })
-    ).toHaveAttribute('type', 'submit')
-  }
-
-  const getRowByKey = (card, keyText) => {
-    const rows = card.querySelectorAll('.govuk-summary-list__row')
-    return Array.from(rows).find((row) => {
-      const keyElement = row.querySelector('.govuk-summary-list__key')
-      return keyElement && keyElement.textContent.trim() === keyText
-    })
   }
 })

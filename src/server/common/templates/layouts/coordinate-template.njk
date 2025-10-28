@@ -29,6 +29,9 @@
             {% endif %}
             
             <span class="govuk-caption-l">{{ projectName }}</span>
+            {% if siteNumber %}
+                <span class="govuk-caption-l">Site {{ siteNumber }}</span>
+            {% endif %}
             <h1 class="govuk-heading-l">{{ heading }}</h1>
 
             {% block introText %}{% endblock %}
@@ -46,14 +49,14 @@
                                 
                <div class="govuk-button-group">
                     {{ govukButton({
-                        text: "Continue",
+                        text: buttonText if buttonText else "Continue",
                         attributes: {
                             id: "continue"
                         }
                     }) }}
 
                     {{ appCancelButton({
-                        cancelLink: "/exemption/task-list?cancel=site-details"
+                        cancelLink: cancelLink
                     }) }}
                 </div>
             </form>

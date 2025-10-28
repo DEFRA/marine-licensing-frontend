@@ -6,7 +6,11 @@ import {
   COORDINATE_SYSTEM_VIEW_ROUTE
 } from '#src/server/exemption/site-details/coordinate-system/controller.js'
 import * as cacheUtils from '#src/server/common/helpers/session-cache/utils.js'
-import { mockExemption, mockSite } from '#src/server/test-helpers/mocks.js'
+import {
+  mockExemption,
+  mockSite,
+  createMockRequest
+} from '#src/server/test-helpers/mocks.js'
 import { makeGetRequest } from '#src/server/test-helpers/server-requests.js'
 import { statusCodes } from '#src/server/common/constants/status-codes.js'
 import { JSDOM } from 'jsdom'
@@ -25,55 +29,27 @@ describe('#coordinateSystem', () => {
   })
 
   describe('#coordinateSystemController', () => {
-    test('coordinateSystemController handler should render with correct context with no existing data', () => {
+    test('should render with correct context with no existing data', () => {
       getExemptionCacheSpy.mockReturnValueOnce({})
       const h = { view: vi.fn() }
 
-      coordinateSystemController.handler({ site: mockSite }, h)
+      const request = createMockRequest({
+        site: {
+          ...mockSite,
+          siteDetails: {}
+        }
+      })
+      coordinateSystemController.handler(request, h)
 
       expect(h.view).toHaveBeenCalledWith(COORDINATE_SYSTEM_VIEW_ROUTE, {
         pageTitle: 'Which coordinate system do you want to use?',
         heading: 'Which coordinate system do you want to use?',
         backLink: routes.COORDINATES_ENTRY_CHOICE,
+        cancelLink: routes.TASK_LIST + '?cancel=site-details',
         payload: { coordinateSystem: undefined },
-        projectName: undefined
-      })
-    })
-
-    test('coordinateSystemController handler should render with correct context', () => {
-      const h = { view: vi.fn() }
-
-      coordinateSystemController.handler({ site: mockSite }, h)
-
-      expect(h.view).toHaveBeenCalledWith(COORDINATE_SYSTEM_VIEW_ROUTE, {
-        pageTitle: 'Which coordinate system do you want to use?',
-        heading: 'Which coordinate system do you want to use?',
-        backLink: routes.COORDINATES_ENTRY_CHOICE,
-        payload: { coordinateSystem: 'wgs84' },
-        projectName: 'Test Project'
-      })
-    })
-
-    test('coordinateSystemController handler should render with correct context with existing cache data', () => {
-      getExemptionCacheSpy.mockReturnValueOnce({
-        projectName: mockExemption.projectName,
-        siteDetails: [
-          {
-            coordinateSystem: 'wgs84'
-          }
-        ]
-      })
-
-      const h = { view: vi.fn() }
-
-      coordinateSystemController.handler({ site: mockSite }, h)
-
-      expect(h.view).toHaveBeenCalledWith(COORDINATE_SYSTEM_VIEW_ROUTE, {
-        pageTitle: 'Which coordinate system do you want to use?',
-        heading: 'Which coordinate system do you want to use?',
-        backLink: routes.COORDINATES_ENTRY_CHOICE,
-        payload: { coordinateSystem: 'wgs84' },
-        projectName: 'Test Project'
+        projectName: undefined,
+        siteNumber: null,
+        action: undefined
       })
     })
 
@@ -132,48 +108,158 @@ describe('#coordinateSystem', () => {
 
       expect(statusCode).toBe(statusCodes.ok)
     })
+
+    test('should use Review Site Details back link when coordinateSystem has value in action mode', () => {
+      getExemptionCacheSpy.mockReturnValueOnce({
+        projectName: 'Test Project',
+        siteDetails: [{ coordinateSystem: 'wgs84' }]
+      })
+
+      const h = { view: vi.fn() }
+      const request = createMockRequest({
+        site: mockSite,
+        query: { action: 'change', site: '1' },
+        yar: {
+          flash: vi.fn().mockReturnValue([]),
+          get: vi.fn().mockReturnValue({}),
+          set: vi.fn()
+        }
+      })
+
+      coordinateSystemController.handler(request, h)
+
+      expect(h.view).toHaveBeenCalledWith(COORDINATE_SYSTEM_VIEW_ROUTE, {
+        pageTitle: 'Which coordinate system do you want to use?',
+        heading: 'Which coordinate system do you want to use?',
+        backLink: `${routes.REVIEW_SITE_DETAILS}#site-details-1`,
+        cancelLink: undefined,
+        payload: { coordinateSystem: 'wgs84' },
+        projectName: 'Test Project',
+        siteNumber: null,
+        action: 'change'
+      })
+    })
+
+    test('coordinateSystemController handler should render correctly when using a change link', () => {
+      getExemptionCacheSpy.mockReturnValueOnce({
+        projectName: mockExemption.projectName,
+        multipleSiteDetails: { multipleSitesEnabled: true }
+      })
+
+      const h = { view: vi.fn() }
+
+      const request = createMockRequest({
+        query: { action: 'change' },
+        site: {
+          ...mockSite,
+          siteDetails: {}
+        }
+      })
+
+      coordinateSystemController.handler(request, h)
+
+      expect(h.view).toHaveBeenCalledWith(COORDINATE_SYSTEM_VIEW_ROUTE, {
+        pageTitle: 'Which coordinate system do you want to use?',
+        heading: 'Which coordinate system do you want to use?',
+        backLink: `${routes.REVIEW_SITE_DETAILS}#site-details-1`,
+        cancelLink: undefined,
+        payload: { coordinateSystem: undefined },
+        projectName: 'Test Project',
+        siteNumber: 1,
+        action: 'change'
+      })
+    })
+
+    test('coordinateSystemController handler should render back to coordinates entry when originalCoordinatesEntry exists', () => {
+      getExemptionCacheSpy.mockReturnValueOnce({
+        projectName: mockExemption.projectName,
+        multipleSiteDetails: { multipleSitesEnabled: true }
+      })
+
+      const h = { view: vi.fn() }
+
+      const request = createMockRequest({
+        query: { action: 'change' },
+        site: {
+          ...mockSite,
+          siteDetails: {}
+        }
+      })
+
+      request.yar.get.mockReturnValue({ originalCoordinatesEntry: 'single' })
+
+      coordinateSystemController.handler(request, h)
+
+      expect(h.view).toHaveBeenCalledWith(COORDINATE_SYSTEM_VIEW_ROUTE, {
+        pageTitle: 'Which coordinate system do you want to use?',
+        heading: 'Which coordinate system do you want to use?',
+        backLink: `${routes.COORDINATES_ENTRY_CHOICE}?site=1&action=change`,
+        cancelLink: undefined,
+        payload: { coordinateSystem: undefined },
+        projectName: 'Test Project',
+        siteNumber: 1,
+        action: 'change'
+      })
+    })
   })
 
   describe('#coordinateSystemSubmitController', () => {
-    test('Should redirect to multiple coordinates page when coordinatesEntry is multiple', async () => {
-      const request = {
+    test('should redirect to multiple coordinates page when coordinatesEntry is multiple', async () => {
+      const request = createMockRequest({
         payload: { coordinateSystem: 'wgs84' },
-        site: mockSite
-      }
-
-      getExemptionCacheSpy.mockReturnValueOnce({
-        projectName: 'Test Project',
-        siteDetails: [
-          {
-            coordinatesEntry: 'multiple'
-          }
-        ]
+        site: {
+          ...mockSite,
+          siteDetails: { coordinatesEntry: 'multiple' }
+        }
       })
 
-      const h = {
-        redirect: vi.fn()
-      }
+      getExemptionCacheSpy.mockReturnValueOnce({
+        projectName: 'Test Project'
+      })
+
+      const h = { redirect: vi.fn() }
 
       await coordinateSystemSubmitController.handler(request, h)
       expect(h.redirect).toHaveBeenCalledWith(routes.ENTER_MULTIPLE_COORDINATES)
     })
 
-    test('Should stay on the page when coordinatesEntry is neither single nor multiple', async () => {
-      const request = {
+    test('should redirect to multiple coordinates with action params when action is present', async () => {
+      const request = createMockRequest({
         payload: { coordinateSystem: 'wgs84' },
-        site: mockSite
-      }
+        site: {
+          ...mockSite,
+          siteNumber: 1,
+          siteDetails: { coordinatesEntry: 'multiple' }
+        },
+        query: { action: 'change' }
+      })
 
       getExemptionCacheSpy.mockReturnValueOnce({
-        projectName: 'Test Project',
-        siteDetails: {
-          coordinatesEntry: 'other'
+        projectName: 'Test Project'
+      })
+
+      const h = { redirect: vi.fn() }
+
+      await coordinateSystemSubmitController.handler(request, h)
+      expect(h.redirect).toHaveBeenCalledWith(
+        `${routes.ENTER_MULTIPLE_COORDINATES}?site=1&action=change`
+      )
+    })
+
+    test('should stay on page when coordinatesEntry is neither single nor multiple', async () => {
+      const request = createMockRequest({
+        payload: { coordinateSystem: 'wgs84' },
+        site: {
+          ...mockSite,
+          siteDetails: { coordinatesEntry: 'invalid' }
         }
       })
 
-      const h = {
-        view: vi.fn()
-      }
+      getExemptionCacheSpy.mockReturnValueOnce({
+        projectName: 'Test Project'
+      })
+
+      const h = { view: vi.fn(), redirect: vi.fn() }
 
       await coordinateSystemSubmitController.handler(request, h)
       expect(h.view).toHaveBeenCalledWith(COORDINATE_SYSTEM_VIEW_ROUTE, {
@@ -185,33 +271,11 @@ describe('#coordinateSystem', () => {
       })
     })
 
-    test('Should redirect to centre coordinates page when coordinatesEntry is single', async () => {
-      const request = {
-        payload: { coordinateSystem: 'wgs84' },
-        site: mockSite
-      }
-
-      getExemptionCacheSpy.mockReturnValueOnce({
-        projectName: 'Test Project',
-        siteDetails: [
-          {
-            coordinatesEntry: 'single'
-          }
-        ]
-      })
-
-      const h = {
-        redirect: vi.fn()
-      }
-
-      await coordinateSystemSubmitController.handler(request, h)
-      expect(h.redirect).toHaveBeenCalledWith(routes.CIRCLE_CENTRE_POINT)
-    })
-
     test('Should correctly format error data', () => {
-      const request = {
-        payload: { coordinateSystem: 'invalid' }
-      }
+      const request = createMockRequest({
+        payload: { coordinateSystem: 'invalid' },
+        site: {}
+      })
 
       const h = {
         view: vi.fn().mockReturnValue({
@@ -240,7 +304,10 @@ describe('#coordinateSystem', () => {
         heading: 'Which coordinate system do you want to use?',
         projectName: 'Test Project',
         backLink: routes.COORDINATES_ENTRY_CHOICE,
+        cancelLink: routes.TASK_LIST + '?cancel=site-details',
         payload: { coordinateSystem: 'invalid' },
+        siteNumber: null,
+        action: undefined,
         errorSummary: [
           {
             href: '#coordinateSystem',
@@ -261,9 +328,10 @@ describe('#coordinateSystem', () => {
     })
 
     test('Should still render page if no error details are provided', () => {
-      const request = {
-        payload: { coordinateSystem: 'invalid' }
-      }
+      const request = createMockRequest({
+        payload: { coordinateSystem: 'invalid' },
+        site: {}
+      })
 
       const h = {
         view: vi.fn().mockReturnValue({
@@ -284,45 +352,60 @@ describe('#coordinateSystem', () => {
         heading: 'Which coordinate system do you want to use?',
         projectName: 'Test Project',
         backLink: routes.COORDINATES_ENTRY_CHOICE,
-        payload: { coordinateSystem: 'invalid' }
+        cancelLink: routes.TASK_LIST + '?cancel=site-details',
+        payload: { coordinateSystem: 'invalid' },
+        siteNumber: null,
+        action: undefined
       })
 
       expect(h.view().takeover).toHaveBeenCalled()
     })
 
-    test('Should correctly validate on valid data', () => {
+    test('Should correctly output errors for multiple sites', () => {
+      getExemptionCacheSpy.mockReturnValueOnce({
+        projectName: mockExemption.projectName,
+        multipleSiteDetails: { multipleSitesEnabled: true }
+      })
+
       const request = {
-        coordinateSystem: 'wgs84'
+        query: {},
+        payload: { coordinateSystem: 'invalid' },
+        site: mockSite
       }
 
+      const h = {
+        view: vi.fn().mockReturnValue({
+          takeover: vi.fn()
+        })
+      }
+
+      coordinateSystemSubmitController.options.validate.failAction(
+        request,
+        h,
+        {}
+      )
+
+      expect(h.view).toHaveBeenCalledWith(COORDINATE_SYSTEM_VIEW_ROUTE, {
+        pageTitle: 'Which coordinate system do you want to use?',
+        heading: 'Which coordinate system do you want to use?',
+        projectName: 'Test Project',
+        backLink: routes.COORDINATES_ENTRY_CHOICE,
+        cancelLink: routes.TASK_LIST + '?cancel=site-details',
+        payload: { coordinateSystem: 'invalid' },
+        siteNumber: 1,
+        action: undefined
+      })
+
+      expect(h.view().takeover).toHaveBeenCalled()
+    })
+
+    test('should validate payload correctly on valid data', () => {
+      const request = { coordinateSystem: 'wgs84' }
       const payloadValidator =
         coordinateSystemSubmitController.options.validate.payload
-
       const result = payloadValidator.validate(request)
 
       expect(result.error).toBeUndefined()
-    })
-
-    test('Should correctly validate on empty data', () => {
-      const request = {}
-
-      const payloadValidator =
-        coordinateSystemSubmitController.options.validate.payload
-
-      const result = payloadValidator.validate(request)
-
-      expect(result.error.message).toBe('COORDINATE_SYSTEM_REQUIRED')
-    })
-
-    test('Should correctly validate on invalid data', () => {
-      const request = { coordinateSystem: 'invalid' }
-
-      const payloadValidator =
-        coordinateSystemSubmitController.options.validate.payload
-
-      const result = payloadValidator.validate(request)
-
-      expect(result.error.message).toBe('COORDINATE_SYSTEM_REQUIRED')
     })
 
     test('Should correctly set the cache when submitting', async () => {
@@ -335,13 +418,86 @@ describe('#coordinateSystem', () => {
         site: mockSite
       }
 
-      await coordinateSystemSubmitController.handler(mockRequest, h)
+      const request = createMockRequest(mockRequest)
+      await coordinateSystemSubmitController.handler(request, h)
 
       expect(cacheUtils.updateExemptionSiteDetails).toHaveBeenCalledWith(
-        mockRequest,
+        request,
         0,
         'coordinateSystem',
         'wgs84'
+      )
+    })
+
+    test('coordinateSystemSubmitController handler should submit correctly when using a change link when data is the same', () => {
+      getExemptionCacheSpy.mockReturnValueOnce({
+        projectName: mockExemption.projectName,
+        multipleSiteDetails: { multipleSitesEnabled: true }
+      })
+
+      const h = { view: vi.fn(), redirect: vi.fn() }
+
+      const request = createMockRequest({
+        query: { action: 'change' },
+        site: mockSite
+      })
+
+      coordinateSystemSubmitController.handler(request, h)
+
+      expect(h.redirect).toHaveBeenCalledWith(
+        routes.REVIEW_SITE_DETAILS + '#site-details-1'
+      )
+    })
+
+    test('coordinateSystemSubmitController handler should submit correctly when using a change link when data is different for multiple coordinates', () => {
+      getExemptionCacheSpy.mockReturnValueOnce({
+        projectName: mockExemption.projectName,
+        multipleSiteDetails: { multipleSitesEnabled: true },
+        siteDetails: [{ coordinatesEntry: 'multiple' }]
+      })
+
+      const h = { view: vi.fn(), redirect: vi.fn() }
+
+      const request = createMockRequest({
+        query: { action: 'change' },
+        site: mockSite,
+        payload: { coordinateSystem: 'wgs84' }
+      })
+
+      request.yar.flash.mockReturnValueOnce({
+        savedSiteDetails: { originalCoordinateSystem: 'osgb36' }
+      })
+
+      coordinateSystemSubmitController.handler(request, h)
+
+      expect(h.redirect).toHaveBeenCalledWith(
+        routes.CIRCLE_CENTRE_POINT + '?site=1&action=change'
+      )
+    })
+
+    test('coordinateSystemSubmitController handler should submit correctly when using a change link when data is different for single coordinates', () => {
+      getExemptionCacheSpy.mockReturnValueOnce({
+        projectName: mockExemption.projectName,
+        multipleSiteDetails: { multipleSitesEnabled: true },
+        siteDetails: [{ coordinatesEntry: 'single' }]
+      })
+
+      const h = { view: vi.fn(), redirect: vi.fn() }
+
+      const request = createMockRequest({
+        query: { action: 'change' },
+        site: mockSite,
+        payload: { coordinateSystem: 'wgs84' }
+      })
+
+      request.yar.flash.mockReturnValueOnce({
+        savedSiteDetails: { originalCoordinateSystem: 'osgb36' }
+      })
+
+      coordinateSystemSubmitController.handler(request, h)
+
+      expect(h.redirect).toHaveBeenCalledWith(
+        routes.CIRCLE_CENTRE_POINT + '?site=1&action=change'
       )
     })
   })

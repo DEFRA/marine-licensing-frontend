@@ -36,6 +36,8 @@ describe('loggerOptions', () => {
   it('should have correct properties based on config and ecsFormat', () => {
     expect(loggerOptions.enabled).toBe(true)
     expect(loggerOptions.ignorePaths).toEqual(['/health'])
+    expect(loggerOptions.ignoreFunc).toBeDefined()
+    expect(typeof loggerOptions.ignoreFunc).toBe('function')
     expect(loggerOptions.redact).toEqual({
       paths: ['req.headers.authorization'],
       remove: true
@@ -55,5 +57,20 @@ describe('loggerOptions', () => {
   it('mixin returns empty object when getTraceId returns undefined', () => {
     getTraceId.mockReturnValue(undefined)
     expect(loggerOptions.mixin()).toEqual({})
+  })
+
+  it('ignoreFunc should return true for paths starting with /public/', () => {
+    const request = { path: '/public/assets/script.js' }
+    expect(loggerOptions.ignoreFunc({}, request)).toBe(true)
+  })
+
+  it('ignoreFunc should return false for paths not starting with /public/', () => {
+    const request = { path: '/api/endpoint' }
+    expect(loggerOptions.ignoreFunc({}, request)).toBe(false)
+  })
+
+  it('ignoreFunc should return false for /public without trailing path', () => {
+    const request = { path: '/public' }
+    expect(loggerOptions.ignoreFunc({}, request)).toBe(false)
   })
 })

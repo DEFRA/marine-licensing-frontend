@@ -32,8 +32,8 @@ export const publicRegisterController = {
 
     return h.view(PUBLIC_REGISTER_VIEW_ROUTE, {
       ...publicRegisterSettings,
-      projectName: exemption?.projectName,
-      payload: exemption?.publicRegister
+      projectName: exemption.projectName,
+      payload: exemption.publicRegister
     })
   }
 }

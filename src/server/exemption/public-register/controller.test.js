@@ -64,7 +64,7 @@ describe('#publicRegister', () => {
         }
       })
 
-      getExemptionCacheSpy.mockReturnValueOnce(null)
+      getExemptionCacheSpy.mockReturnValueOnce({})
 
       publicRegisterController.handler({}, h)
 

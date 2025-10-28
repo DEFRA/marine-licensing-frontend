@@ -1,39 +1,37 @@
-import { JSDOM } from 'jsdom'
 import { vi } from 'vitest'
-import { getByText, queryByText, within } from '@testing-library/dom'
+import { JSDOM } from 'jsdom'
+import { getByText, within } from '@testing-library/dom'
+import { COORDINATE_SYSTEMS } from '~/src/server/common/constants/exemptions.js'
 import { routes } from '~/src/server/common/constants/routes.js'
 import { statusCodes } from '~/src/server/common/constants/status-codes.js'
-import { testScenarios } from './file-upload-fixtures.js'
-import { validateActionLink } from './review-site-details-utils.js'
+import * as coordinateUtils from '~/src/server/common/helpers/coordinate-utils.js'
+import { testScenarios } from './circular-site-fixtures.js'
 
-import {
-  makeGetRequest,
-  makePostRequest
-} from '~/src/server/test-helpers/server-requests.js'
+import { makeGetRequest } from '~/src/server/test-helpers/server-requests.js'
 import {
   mockExemption,
   setupTestServer
 } from '~/tests/integration/shared/test-setup-helpers.js'
 import * as exemptionService from '#src/services/exemption-service/index.js'
+import {
+  getRowByKey,
+  getSiteDetailsCard,
+  validateActionLink,
+  validatePageStructure,
+  validateNavigationElements
+} from './review-site-details-utils.js'
 
 vi.mock('~/src/server/common/helpers/coordinate-utils.js')
 vi.mock('~/src/services/exemption-service/index.js')
 
-const getSiteDetailsCard = (document, expected, siteIndex = 0) => {
-  const cardName = expected?.siteDetails[siteIndex]?.cardName ?? 'Site details'
-  const heading = within(document).getByRole('heading', {
-    level: 2,
-    name: cardName
-  })
-  return heading.closest('.govuk-summary-card')
-}
-
-describe('Review Site Details - File Upload Integration Tests', () => {
+describe('Review Site Details - Circular Coordinates Integration Tests', () => {
   const getServer = setupTestServer()
   let mockExemptionService
 
   beforeEach(() => {
-    mockExemption()
+    vi.spyOn(coordinateUtils, 'getCoordinateSystem').mockReturnValue({
+      coordinateSystem: COORDINATE_SYSTEMS.WGS84
+    })
 
     mockExemptionService = {
       getExemptionById: vi.fn().mockResolvedValue(testScenarios[0].exemption)
@@ -44,9 +42,13 @@ describe('Review Site Details - File Upload Integration Tests', () => {
   })
 
   test.each(testScenarios)(
-    '$name - validates file upload display',
-    async ({ exemption, expectedPageContent }) => {
-      expect.hasAssertions()
+    '$name - validates circular coordinate display',
+    async ({ exemption, expectedPageContent, coordinateSystem }) => {
+      if (coordinateSystem) {
+        vi.spyOn(coordinateUtils, 'getCoordinateSystem').mockReturnValue({
+          coordinateSystem
+        })
+      }
 
       const document = await getPageDocument(exemption)
 
@@ -56,36 +58,51 @@ describe('Review Site Details - File Upload Integration Tests', () => {
       validatePageStructure(document, expectedPageContent)
       validateNavigationElements(document)
 
+      validateSummaryCard(document, expectedPageContent)
+
       if (isMultipleSites) {
         validateMultSiteActivityDetailsCard(document, expectedPageContent)
         validateMultipleSites(document, expectedPageContent)
 
         for (const site of expectedPageContent.siteDetails.keys()) {
-          validateFileUpload(document, expectedPageContent, site)
+          validateCircularCoordinates(document, expectedPageContent, site)
           validateSiteDetailsCard(document, expectedPageContent, site)
         }
       } else {
-        validateFileUpload(document, expectedPageContent, 0)
+        validateCircularCoordinates(document, expectedPageContent, 0)
         validateSiteDetailsCard(document, expectedPageContent, 0)
       }
     }
   )
 
-  describe('Form Submission', () => {
-    test('should redirect to task list on form submission', async () => {
-      const fileExemption = testScenarios[0].exemption
+  describe('Edge Cases', () => {
+    test('should handle empty circular coordinates gracefully', async () => {
+      const emptyCircularExemption = {
+        id: 'test-exemption-empty',
+        projectName: 'Empty Circular Project',
+        multipleSiteDetails: {},
+        siteDetails: [
+          {
+            coordinatesType: 'coordinates',
+            coordinatesEntry: 'single',
+            coordinateSystem: 'wgs84',
+            coordinates: null,
+            circleWidth: null
+          }
+        ]
+      }
 
-      mockExemption(fileExemption)
+      const document = await getPageDocument(emptyCircularExemption)
+      const summaryCard = getSiteDetailsCard(document)
 
-      const response = await makePostRequest({
-        url: routes.REVIEW_SITE_DETAILS,
-        server: getServer(),
-        formData: {}
-      })
-
-      expect(response.statusCode).toBe(statusCodes.redirect)
-      expect(response.headers.location).toBe(routes.TASK_LIST)
-      expect(mockExemptionService.getExemptionById).toHaveBeenCalled()
+      const methodRow = getRowByKey(
+        summaryCard,
+        'Single or multiple sets of coordinates'
+      )
+      expect(methodRow).toBeTruthy()
+      expect(methodRow.textContent).toContain(
+        'Manually enter one set of coordinates and a width to create a circular site'
+      )
     })
   })
 
@@ -98,7 +115,7 @@ describe('Review Site Details - File Upload Integration Tests', () => {
       server: getServer(),
       url: routes.REVIEW_SITE_DETAILS,
       headers: {
-        referer: `http://localhost${routes.FILE_UPLOAD}`
+        referer: `http://localhost${routes.WIDTH_OF_SITE}`
       }
     })
 
@@ -106,13 +123,42 @@ describe('Review Site Details - File Upload Integration Tests', () => {
     return new JSDOM(response.result).window.document
   }
 
-  const validatePageStructure = (document, expected) => {
+  const validateMultipleSites = (document, expected) => {
     const heading = document.querySelector('h1')
     expect(heading.textContent.trim()).toBe('Review site details')
 
     const caption = document.querySelector('.govuk-caption-l')
     expect(caption.textContent.trim()).toBe(expected.projectName)
 
+    const cards = document.querySelectorAll('.govuk-summary-card')
+    const siteDetailsCards = Array.from(cards).filter((card) =>
+      card.textContent.match(/Site \d+ details/g)
+    )
+    expect(siteDetailsCards).toHaveLength(expected.siteDetails.length)
+
+    expect(
+      within(document).getByRole('button', {
+        name: 'Add another site'
+      })
+    ).toHaveAttribute('type', 'submit')
+
+    expect(
+      getByText(
+        document,
+        `The site details you've provided are saved. You can return to this page and make changes at any time before you send your information.`
+      )
+    ).toBeInTheDocument()
+
+    expect(
+      within(document).getByRole('button', { name: 'Continue' })
+    ).toHaveAttribute('type', 'submit')
+
+    const backLink = document.querySelector('.govuk-back-link')
+    expect(backLink.textContent.trim()).toBe('Back')
+    expect(backLink.getAttribute('href')).toBe(routes.WIDTH_OF_SITE)
+  }
+
+  const validateSummaryCard = (document, expected) => {
     const siteLocationCard = document.querySelectorAll('.govuk-summary-card')[0]
 
     const siteLocationCardTitle = siteLocationCard.querySelector(
@@ -136,83 +182,6 @@ describe('Review Site Details - File Upload Integration Tests', () => {
       'href',
       expect.stringContaining(`delete-all-sites`)
     )
-
-    const methodRow = getRowByKey(
-      siteLocationCard,
-      'Method of providing site location'
-    )
-    expect(methodRow).toBeTruthy()
-    expect(methodRow.textContent).toContain(expected.multipleSiteDetails.method)
-
-    const fileTypeRow = getRowByKey(siteLocationCard, 'File type')
-    expect(fileTypeRow).toBeTruthy()
-    expect(fileTypeRow.textContent).toContain(
-      expected.multipleSiteDetails.fileType
-    )
-
-    const fileUploadedRow = getRowByKey(siteLocationCard, 'File uploaded')
-    expect(fileUploadedRow).toBeTruthy()
-    expect(fileUploadedRow.textContent).toContain(
-      expected.multipleSiteDetails.fileUploaded
-    )
-
-    const backLink = document.querySelector('.govuk-back-link')
-    expect(backLink.textContent.trim()).toBe('Back')
-    expect(backLink.getAttribute('href')).toBe(routes.FILE_UPLOAD)
-  }
-
-  const validateMultipleSites = (document, expected) => {
-    const heading = document.querySelector('h1')
-    expect(heading.textContent.trim()).toBe('Review site details')
-
-    const caption = document.querySelector('.govuk-caption-l')
-    expect(caption.textContent.trim()).toBe(expected.projectName)
-
-    if (expected.multipleSiteDetails.warning) {
-      expect(
-        getByText(document, `The site details you've provided are saved.`)
-      ).toBeInTheDocument()
-
-      expect(
-        getByText(document, /You must complete all sections marked/i)
-      ).toBeInTheDocument()
-
-      expect(
-        getByText(
-          document,
-          `If you cannot finish now, you can return to this page later.`
-        )
-      ).toBeInTheDocument()
-    } else {
-      expect(
-        queryByText(document, `The site details you've provided are saved.`)
-      ).not.toBeInTheDocument()
-
-      expect(
-        queryByText(document, /You must complete all sections marked/i)
-      ).not.toBeInTheDocument()
-
-      expect(
-        queryByText(
-          document,
-          `If you cannot finish now, you can return to this page later.`
-        )
-      ).not.toBeInTheDocument()
-    }
-
-    const cards = document.querySelectorAll('.govuk-summary-card')
-    const siteDetailsCards = Array.from(cards).filter((card) =>
-      card.textContent.match(/Site \d+ details/g)
-    )
-    expect(siteDetailsCards).toHaveLength(expected.siteDetails.length)
-
-    expect(
-      within(document).getByRole('button', { name: 'Continue' })
-    ).toHaveAttribute('type', 'submit')
-
-    const backLink = document.querySelector('.govuk-back-link')
-    expect(backLink.textContent.trim()).toBe('Back')
-    expect(backLink.getAttribute('href')).toBe(routes.FILE_UPLOAD)
   }
 
   const validateMultSiteActivityDetailsCard = (document, expected) => {
@@ -261,6 +230,35 @@ describe('Review Site Details - File Upload Integration Tests', () => {
     const cardTitle = siteCard.querySelector('.govuk-summary-card__title')
     expect(cardTitle.textContent.trim()).toBe(
       expected.siteDetails[siteIndex].cardName
+    )
+
+    const cardActions = siteCard.querySelector('.govuk-summary-card__actions')
+    const deleteLink = within(cardActions).getByRole('link')
+    expect(deleteLink.textContent).toContain('Delete site')
+
+    const methodRow = getRowByKey(
+      siteCard,
+      'Single or multiple sets of coordinates'
+    )
+    expect(methodRow.textContent).toContain(
+      expected.siteDetails[siteIndex].method
+    )
+
+    validateActionLink(
+      methodRow,
+      expected.siteDetails[siteIndex].method,
+      siteIndex
+    )
+
+    const coordinateSystemRow = getRowByKey(siteCard, 'Coordinate system')
+    expect(coordinateSystemRow.textContent).toContain(
+      expected.siteDetails[siteIndex].coordinateSystem
+    )
+
+    validateActionLink(
+      coordinateSystemRow,
+      expected.siteDetails[siteIndex].coordinateSystem,
+      siteIndex
     )
 
     const siteNameRow = getRowByKey(siteCard, 'Site name')
@@ -317,8 +315,32 @@ describe('Review Site Details - File Upload Integration Tests', () => {
     }
   }
 
-  const validateFileUpload = (document, expected, siteIndex) => {
+  const validateCircularCoordinates = (document, expected, siteIndex) => {
     const siteCard = getSiteDetailsCard(document, expected, siteIndex)
+
+    const centreRow = getRowByKey(siteCard, 'Coordinates at centre of site')
+    expect(centreRow).toBeTruthy()
+    expect(centreRow.textContent).toContain(
+      expected.siteDetails[siteIndex].centreCoordinates
+    )
+
+    validateActionLink(
+      centreRow,
+      expected.siteDetails[siteIndex].centreCoordinates,
+      siteIndex
+    )
+
+    const widthRow = getRowByKey(siteCard, 'Width of circular site')
+    expect(widthRow).toBeTruthy()
+    expect(widthRow.textContent).toContain(
+      expected.siteDetails[siteIndex].circleWidth
+    )
+
+    validateActionLink(
+      widthRow,
+      expected.siteDetails[siteIndex].circleWidth,
+      siteIndex
+    )
 
     const mapViewRow = getRowByKey(siteCard, 'Map view')
     expect(mapViewRow).toBeTruthy()
@@ -328,19 +350,5 @@ describe('Review Site Details - File Upload Integration Tests', () => {
       '.app-site-details-map[data-module="site-details-map"]'
     )
     expect(mapDiv).toBeTruthy()
-  }
-
-  const validateNavigationElements = (document) => {
-    expect(
-      within(document).getByRole('button', { name: 'Continue' })
-    ).toHaveAttribute('type', 'submit')
-  }
-
-  const getRowByKey = (card, keyText) => {
-    const rows = card.querySelectorAll('.govuk-summary-list__row')
-    return Array.from(rows).find((row) => {
-      const keyElement = row.querySelector('.govuk-summary-list__key')
-      return keyElement && keyElement.textContent.trim() === keyText
-    })
   }
 })

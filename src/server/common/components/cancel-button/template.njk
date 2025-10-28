@@ -1,2 +1,3 @@
-
-<a class="govuk-link govuk-link--no-visited-state" href="{{params.cancelLink}}">Cancel</a>
+{% if params.cancelLink %}
+    <a class="govuk-link govuk-link--no-visited-state" href="{{params.cancelLink}}">Cancel</a>
+{% endif %}

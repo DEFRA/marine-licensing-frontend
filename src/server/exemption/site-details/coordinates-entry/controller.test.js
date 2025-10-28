@@ -6,7 +6,11 @@ import {
   COORDINATES_ENTRY_VIEW_ROUTE
 } from '#src/server/exemption/site-details/coordinates-entry/controller.js'
 import * as cacheUtils from '#src/server/common/helpers/session-cache/utils.js'
-import { mockExemption, mockSite } from '#src/server/test-helpers/mocks.js'
+import {
+  mockExemption,
+  mockSite,
+  createMockRequest
+} from '#src/server/test-helpers/mocks.js'
 import { makeGetRequest } from '#src/server/test-helpers/server-requests.js'
 import { statusCodes } from '#src/server/common/constants/status-codes.js'
 import { JSDOM } from 'jsdom'
@@ -27,22 +31,21 @@ describe('#coordinatesEntry', () => {
   describe('#coordinatesEntryController', () => {
     test('coordinatesEntryController handler should render with correct context', () => {
       const h = { view: vi.fn() }
+      const request = createMockRequest({ site: mockSite })
 
-      coordinatesEntryController.handler(
-        {
-          site: mockSite
-        },
-        h
-      )
+      coordinatesEntryController.handler(request, h)
 
       expect(h.view).toHaveBeenCalledWith(COORDINATES_ENTRY_VIEW_ROUTE, {
         pageTitle: 'How do you want to enter the coordinates?',
         heading: 'How do you want to enter the coordinates?',
+        cancelLink: routes.TASK_LIST + '?cancel=site-details',
         backLink: routes.ACTIVITY_DESCRIPTION,
         payload: {
           coordinatesEntry: mockExemption.siteDetails[0].coordinatesEntry
         },
-        projectName: 'Test Project'
+        projectName: 'Test Project',
+        siteNumber: null,
+        action: undefined
       })
     })
 
@@ -53,19 +56,18 @@ describe('#coordinatesEntry', () => {
 
       const h = { view: vi.fn() }
 
-      coordinatesEntryController.handler(
-        {
-          site: mockSite
-        },
-        h
-      )
+      const request = createMockRequest({ site: mockSite })
+      coordinatesEntryController.handler(request, h)
 
       expect(h.view).toHaveBeenCalledWith(COORDINATES_ENTRY_VIEW_ROUTE, {
         pageTitle: 'How do you want to enter the coordinates?',
         heading: 'How do you want to enter the coordinates?',
+        cancelLink: routes.TASK_LIST + '?cancel=site-details',
         backLink: routes.ACTIVITY_DESCRIPTION,
         payload: { coordinatesEntry: undefined },
-        projectName: 'Test Project'
+        projectName: 'Test Project',
+        siteNumber: null,
+        action: undefined
       })
     })
 
@@ -113,12 +115,41 @@ describe('#coordinatesEntry', () => {
 
       expect(statusCode).toBe(statusCodes.ok)
     })
+
+    test('coordinatesEntryController handler should render correctly when using a change link', () => {
+      getExemptionCacheSpy.mockReturnValueOnce({
+        projectName: mockExemption.projectName,
+        multipleSiteDetails: { multipleSitesEnabled: true }
+      })
+
+      const h = { view: vi.fn() }
+
+      const request = createMockRequest({
+        query: { action: 'change' },
+        site: mockSite
+      })
+
+      coordinatesEntryController.handler(request, h)
+
+      expect(h.view).toHaveBeenCalledWith(COORDINATES_ENTRY_VIEW_ROUTE, {
+        pageTitle: 'How do you want to enter the coordinates?',
+        heading: 'How do you want to enter the coordinates?',
+        backLink: routes.REVIEW_SITE_DETAILS + '#site-details-1',
+        cancelLink: undefined,
+        payload: { coordinatesEntry: undefined },
+        projectName: 'Test Project',
+        siteNumber: 1,
+        action: 'change'
+      })
+    })
   })
 
   describe('#coordinatesEntrySubmitController', () => {
     test('Should correctly format error data', () => {
       const request = {
-        payload: { coordinatesEntry: 'invalid' }
+        query: {},
+        payload: { coordinatesEntry: 'invalid' },
+        site: mockSite
       }
 
       const h = {
@@ -146,8 +177,11 @@ describe('#coordinatesEntry', () => {
       expect(h.view).toHaveBeenCalledWith(COORDINATES_ENTRY_VIEW_ROUTE, {
         pageTitle: 'How do you want to enter the coordinates?',
         heading: 'How do you want to enter the coordinates?',
+        cancelLink: routes.TASK_LIST + '?cancel=site-details',
         backLink: routes.ACTIVITY_DESCRIPTION,
         projectName: 'Test Project',
+        siteNumber: null,
+        action: undefined,
         payload: { coordinatesEntry: 'invalid' },
         errorSummary: [
           {
@@ -170,7 +204,9 @@ describe('#coordinatesEntry', () => {
 
     test('Should correctly output page with no error data in object', () => {
       const request = {
-        payload: { coordinatesEntry: 'invalid' }
+        query: {},
+        payload: { coordinatesEntry: 'invalid' },
+        site: mockSite
       }
 
       const h = {
@@ -188,8 +224,49 @@ describe('#coordinatesEntry', () => {
       expect(h.view).toHaveBeenCalledWith(COORDINATES_ENTRY_VIEW_ROUTE, {
         pageTitle: 'How do you want to enter the coordinates?',
         heading: 'How do you want to enter the coordinates?',
+        cancelLink: routes.TASK_LIST + '?cancel=site-details',
         backLink: routes.ACTIVITY_DESCRIPTION,
         projectName: 'Test Project',
+        siteNumber: null,
+        action: undefined,
+        payload: { coordinatesEntry: 'invalid' }
+      })
+
+      expect(h.view().takeover).toHaveBeenCalled()
+    })
+
+    test('Should correctly output errors for multiple sites', () => {
+      getExemptionCacheSpy.mockReturnValueOnce({
+        projectName: mockExemption.projectName,
+        multipleSiteDetails: { multipleSitesEnabled: true }
+      })
+
+      const request = {
+        query: {},
+        payload: { coordinatesEntry: 'invalid' },
+        site: mockSite
+      }
+
+      const h = {
+        view: vi.fn().mockReturnValue({
+          takeover: vi.fn()
+        })
+      }
+
+      coordinatesEntrySubmitController.options.validate.failAction(
+        request,
+        h,
+        {}
+      )
+
+      expect(h.view).toHaveBeenCalledWith(COORDINATES_ENTRY_VIEW_ROUTE, {
+        pageTitle: 'How do you want to enter the coordinates?',
+        heading: 'How do you want to enter the coordinates?',
+        cancelLink: routes.TASK_LIST + '?cancel=site-details',
+        backLink: routes.ACTIVITY_DESCRIPTION,
+        projectName: 'Test Project',
+        siteNumber: 1,
+        action: undefined,
         payload: { coordinatesEntry: 'invalid' }
       })
 
@@ -236,10 +313,11 @@ describe('#coordinatesEntry', () => {
         redirect: vi.fn()
       }
 
-      await coordinatesEntrySubmitController.handler(
-        { payload: { coordinatesEntry: 'single' }, site: mockSite },
-        h
-      )
+      const request = createMockRequest({
+        payload: { coordinatesEntry: 'single' },
+        site: mockSite
+      })
+      await coordinatesEntrySubmitController.handler(request, h)
 
       expect(h.redirect).toHaveBeenCalledWith(routes.COORDINATE_SYSTEM_CHOICE)
     })
@@ -257,13 +335,59 @@ describe('#coordinatesEntry', () => {
         site: mockSite
       }
 
-      await coordinatesEntrySubmitController.handler(mockRequest, h)
+      const request = createMockRequest(mockRequest)
+      await coordinatesEntrySubmitController.handler(request, h)
 
       expect(cacheUtils.updateExemptionSiteDetails).toHaveBeenCalledWith(
-        mockRequest,
+        request,
         0,
         'coordinatesEntry',
         'single'
+      )
+    })
+
+    test('coordinatesEntryController handler should submit correctly when using a change link when data is the same', () => {
+      getExemptionCacheSpy.mockReturnValueOnce({
+        projectName: mockExemption.projectName,
+        multipleSiteDetails: { multipleSitesEnabled: true }
+      })
+
+      const h = { view: vi.fn(), redirect: vi.fn() }
+
+      const request = createMockRequest({
+        query: { action: 'change' },
+        site: mockSite
+      })
+
+      coordinatesEntrySubmitController.handler(request, h)
+
+      expect(h.redirect).toHaveBeenCalledWith(
+        routes.REVIEW_SITE_DETAILS + '#site-details-1'
+      )
+    })
+
+    test('coordinatesEntryController handler should submit correctly when using a change link when data is different', () => {
+      getExemptionCacheSpy.mockReturnValueOnce({
+        projectName: mockExemption.projectName,
+        multipleSiteDetails: { multipleSitesEnabled: true }
+      })
+
+      const h = { view: vi.fn(), redirect: vi.fn() }
+
+      const request = createMockRequest({
+        query: { action: 'change' },
+        site: mockSite,
+        payload: { coordinatesEntry: 'multiple' }
+      })
+
+      request.yar.flash.mockReturnValueOnce({
+        savedSiteDetails: { originalCoordinatesEntry: 'single' }
+      })
+
+      coordinatesEntrySubmitController.handler(request, h)
+
+      expect(h.redirect).toHaveBeenCalledWith(
+        routes.COORDINATE_SYSTEM_CHOICE + '?site=1&action=change'
       )
     })
   })

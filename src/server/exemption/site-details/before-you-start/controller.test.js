@@ -23,7 +23,7 @@ describe('#beforeYouStart', () => {
     test('beforeYouStartController handler should render with correct context', () => {
       const h = { view: vi.fn() }
 
-      beforeYouStartController.handler({}, h)
+      beforeYouStartController.handler({ yar: { clear: vi.fn() } }, h)
 
       expect(h.view).toHaveBeenCalledWith(
         BEFORE_YOU_START_SITE_DETAILS_VIEW_ROUTE,

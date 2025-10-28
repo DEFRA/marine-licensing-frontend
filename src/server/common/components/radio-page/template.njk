@@ -7,6 +7,9 @@
     {% if params.projectName %}
         <span class="govuk-caption-l">{{ params.projectName }}</span>
     {% endif %}
+    {% if params.siteNumber %}
+      <span class="govuk-caption-l">Site {{ params.siteNumber }}</span>
+    {% endif %}
     <h1 class="govuk-heading-l govuk-!-margin-bottom-0">{{ params.heading }}</h1>
 {% endset %}
 

@@ -163,7 +163,7 @@ describe('#utils', () => {
       )
 
       expect(mockRequest.yar.set).toHaveBeenCalledWith(EXEMPTION_CACHE_KEY, {
-        siteDetails: [{ coordinatesType: null }]
+        siteDetails: [{}]
       })
       expect(result).toEqual({ coordinatesType: null })
     })
@@ -179,7 +179,7 @@ describe('#utils', () => {
       )
 
       expect(mockRequest.yar.set).toHaveBeenCalledWith(EXEMPTION_CACHE_KEY, {
-        siteDetails: [{ coordinatesType: null }]
+        siteDetails: [{}]
       })
 
       expect(result).toEqual({ coordinatesType: null })
@@ -196,7 +196,7 @@ describe('#utils', () => {
       )
 
       expect(mockRequest.yar.set).toHaveBeenCalledWith(EXEMPTION_CACHE_KEY, {
-        siteDetails: [{ coordinatesType: null }]
+        siteDetails: [{}]
       })
 
       expect(result).toEqual({ coordinatesType: null })

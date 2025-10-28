@@ -2,7 +2,10 @@ import { vi } from 'vitest'
 import { setupTestServer } from '#tests/integration/shared/test-setup-helpers.js'
 import { statusCodes } from '#src/server/common/constants/status-codes.js'
 import { routes } from '#src/server/common/constants/routes.js'
-import { mockExemption } from '#src/server/test-helpers/mocks.js'
+import {
+  mockExemption,
+  createMockRequest
+} from '#src/server/test-helpers/mocks.js'
 import {
   makeGetRequest,
   makePostRequest
@@ -25,7 +28,7 @@ vi.mock('~/src/server/common/helpers/authenticated-requests.js')
 describe('#activityDescriptionController', () => {
   const getServer = setupTestServer()
   let getExemptionCacheSpy
-  const request = { url: {} }
+  const request = createMockRequest({ url: {} })
 
   const mockExemptionState = {}
 
@@ -105,9 +108,9 @@ describe('#activityDescriptionController', () => {
 
     test('handler should render with correct context for site details flow', () => {
       const h = { view: vi.fn() }
-      const request = {
+      const request = createMockRequest({
         url: { pathname: routes.ACTIVITY_DESCRIPTION }
-      }
+      })
       const exemptionWithSiteDetails = {
         ...mockExemptionState,
         siteDetails: [
@@ -136,10 +139,10 @@ describe('#activityDescriptionController', () => {
 
     test('should set back link to correct page for single site file upload', () => {
       const h = { view: vi.fn() }
-      const request = {
+      const request = createMockRequest({
         url: { pathname: routes.ACTIVITY_DESCRIPTION },
         site: { siteIndex: 0, siteDetails: { coordinatesType: 'file' } }
-      }
+      })
 
       const exemptionWithFileUpload = {
         projectName: 'Test Project',
@@ -295,6 +298,10 @@ describe('#activityDescriptionController', () => {
         activityDescription: ''
       }
 
+      const request = createMockRequest({
+        payload
+      })
+
       const h = {
         view: vi.fn().mockReturnThis(),
         takeover: vi.fn()
@@ -311,7 +318,7 @@ describe('#activityDescriptionController', () => {
       }
 
       activityDescriptionSubmitController.options.validate.failAction(
-        { payload, url: {} },
+        request,
         h,
         err
       )
@@ -355,10 +362,14 @@ describe('#activityDescriptionController', () => {
         takeover: vi.fn()
       }
 
+      const request = createMockRequest({
+        payload
+      })
+
       const err = {}
 
       activityDescriptionSubmitController.options.validate.failAction(
-        { payload, url: {} },
+        request,
         h,
         err
       )
@@ -405,12 +416,12 @@ describe('#activityDescriptionController', () => {
     test('should save site details to backend when action parameter is present and in site details flow', async () => {
       const payload = { activityDescription: 'Updated activity description' }
 
-      const request = {
+      const request = createMockRequest({
         payload,
         query: { action: 'change' },
         url: { pathname: routes.ACTIVITY_DESCRIPTION },
         site: { siteIndex: 0, siteNumber: 1 }
-      }
+      })
       const h = { redirect: vi.fn() }
 
       await activityDescriptionSubmitController.handler(request, h)
@@ -423,7 +434,7 @@ describe('#activityDescriptionController', () => {
     test('should save site details to backend when going to review site details (file upload flow)', async () => {
       const payload = { activityDescription: 'Activity description' }
 
-      const request = {
+      const request = createMockRequest({
         payload,
         url: { pathname: routes.ACTIVITY_DESCRIPTION },
         site: {
@@ -431,7 +442,8 @@ describe('#activityDescriptionController', () => {
           siteNumber: 1,
           siteDetails: { coordinatesType: 'file' }
         }
-      }
+      })
+
       const h = { redirect: vi.fn() }
 
       await activityDescriptionSubmitController.handler(request, h)
@@ -444,7 +456,7 @@ describe('#activityDescriptionController', () => {
     test('should not save site details to backend when action parameter is not present and not going to review', async () => {
       const payload = { activityDescription: 'Activity description' }
 
-      const request = {
+      const request = createMockRequest({
         payload,
         url: { pathname: routes.ACTIVITY_DESCRIPTION },
         site: {
@@ -452,7 +464,8 @@ describe('#activityDescriptionController', () => {
           siteNumber: 1,
           siteDetails: { coordinatesType: 'coordinates' }
         }
-      }
+      })
+
       const h = { redirect: vi.fn() }
 
       await activityDescriptionSubmitController.handler(request, h)

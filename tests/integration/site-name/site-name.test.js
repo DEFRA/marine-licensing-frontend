@@ -1,6 +1,11 @@
 import { vi } from 'vitest'
 import { JSDOM } from 'jsdom'
-import { getByLabelText, getByRole, getByText } from '@testing-library/dom'
+import {
+  getByLabelText,
+  getByRole,
+  getByText,
+  queryByRole
+} from '@testing-library/dom'
 import { statusCodes } from '~/src/server/common/constants/status-codes.js'
 import { setExemptionCache } from '~/src/server/common/helpers/session-cache/utils.js'
 import { validateErrors } from '../shared/expect-utils.js'
@@ -101,7 +106,10 @@ describe('Site name page', () => {
     expect(continueButton).toBeInTheDocument()
 
     const cancelLink = getByRole(document, 'link', { name: 'Cancel' })
-    expect(cancelLink).toHaveAttribute('href', '/exemption/task-list')
+    expect(cancelLink).toHaveAttribute(
+      'href',
+      '/exemption/task-list?cancel=site-details'
+    )
 
     const backLink = getByRole(document, 'link', { name: 'Back' })
     expect(backLink).toHaveAttribute(
@@ -203,7 +211,10 @@ describe('Site name page', () => {
     const { document } = new JSDOM(result).window
 
     const cancelLink = getByRole(document, 'link', { name: 'Cancel' })
-    expect(cancelLink).toHaveAttribute('href', '/exemption/task-list')
+    expect(cancelLink).toHaveAttribute(
+      'href',
+      '/exemption/task-list?cancel=site-details'
+    )
   })
 
   test('should show correct content for multiple site flow', async () => {
@@ -243,11 +254,8 @@ describe('Site name page', () => {
       '/exemption/review-site-details#site-details-1'
     )
 
-    const cancelLink = getByRole(document, 'link', { name: 'Cancel' })
-    expect(cancelLink).toHaveAttribute(
-      'href',
-      '/exemption/review-site-details#site-details-1'
-    )
+    const cancelLink = queryByRole(document, 'link', { name: 'Cancel' })
+    expect(cancelLink).not.toBeInTheDocument()
   })
 
   test('should redirect to review site details after submit when action parameter is present', async () => {
@@ -333,10 +341,7 @@ describe('Site name page', () => {
       '/exemption/review-site-details#site-details-1'
     )
 
-    const cancelLink = getByRole(document, 'link', { name: 'Cancel' })
-    expect(cancelLink).toHaveAttribute(
-      'href',
-      '/exemption/review-site-details#site-details-1'
-    )
+    const cancelLink = queryByRole(document, 'link', { name: 'Cancel' })
+    expect(cancelLink).not.toBeInTheDocument()
   })
 })

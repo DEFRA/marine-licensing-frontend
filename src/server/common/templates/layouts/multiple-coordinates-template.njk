@@ -30,6 +30,9 @@
       {% endif %}
 
       <span class="govuk-caption-l">{{ projectName }}</span>
+      {% if siteNumber %}
+        <span class="govuk-caption-l">Site {{ siteNumber }}</span>
+      {% endif %}
       <h1 class="govuk-heading-l">{{ heading }}</h1>
 
       <p>{{ introText }}</p>
@@ -123,7 +126,7 @@
             }
           }) }}
           {{ appCancelButton({
-            cancelLink: "/exemption/task-list?cancel=site-details"
+            cancelLink: cancelLink
           }) }}
         </div>
 

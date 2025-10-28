@@ -12,6 +12,7 @@ import {
   errorDescriptionByFieldName,
   mapErrorsForDisplay
 } from '#src/server/common/helpers/errors.js'
+import { getCancelLink } from '#src/server/exemption/site-details/utils/cancel-link.js'
 import joi from 'joi'
 
 const SITE_NAME_MAX_LENGTH = 250
@@ -39,26 +40,20 @@ const getBackLink = (siteIndex, action, siteNumber) => {
     : routes.REVIEW_SITE_DETAILS
 }
 
-const getCancelLink = (action, siteNumber) => {
-  return action
-    ? `${routes.REVIEW_SITE_DETAILS}#site-details-${siteNumber}`
-    : routes.TASK_LIST
-}
-
 const createValidationFailAction = (request, h, err) => {
   const { payload } = request
   const exemption = getExemptionCache(request)
 
   const site = setSiteData(request)
   const { siteNumber, siteIndex } = site
-  const action = request.query?.action
+  const action = request.query.action
 
   if (!err.details) {
     return h
       .view(SITE_NAME_VIEW_ROUTE, {
         ...siteNameSettings,
         backLink: getBackLink(siteIndex, action, siteNumber),
-        cancelLink: getCancelLink(action, siteNumber),
+        cancelLink: getCancelLink(action),
         payload,
         projectName: exemption.projectName,
         siteNumber,
@@ -74,7 +69,7 @@ const createValidationFailAction = (request, h, err) => {
     .view(SITE_NAME_VIEW_ROUTE, {
       ...siteNameSettings,
       backLink: getBackLink(siteIndex, action, siteNumber),
-      cancelLink: getCancelLink(action, siteNumber),
+      cancelLink: getCancelLink(action),
       payload,
       projectName: exemption.projectName,
       siteNumber,
@@ -94,12 +89,12 @@ export const siteNameController = {
 
     const { site } = request
     const { siteNumber, siteIndex, siteDetails } = site
-    const action = request.query?.action
+    const action = request.query.action
 
     return h.view(SITE_NAME_VIEW_ROUTE, {
       ...siteNameSettings,
       backLink: getBackLink(siteIndex, action, siteNumber),
-      cancelLink: getCancelLink(action, siteNumber),
+      cancelLink: getCancelLink(action),
       projectName: exemption.projectName,
       siteNumber,
       action,
@@ -133,7 +128,7 @@ export const siteNameSubmitController = {
     const { payload, site } = request
 
     const { queryParams, siteIndex, siteNumber } = site
-    const action = request.query?.action
+    const action = request.query.action
 
     updateExemptionSiteDetails(request, siteIndex, 'siteName', payload.siteName)
 

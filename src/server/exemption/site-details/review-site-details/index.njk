@@ -4,6 +4,7 @@
 {% from "govuk/components/button/macro.njk" import govukButton %}
 {% from "cancel-button/macro.njk" import appCancelButton %}
 {% from "site-details-map/macro.njk" import appSiteDetailsMap %}
+{% from "incomplete-field/macro.njk" import appIncompleteField %}
 {% block head %}
     {{ super() }}
 {% endblock %}
@@ -57,6 +58,7 @@
                         ]
                   }
                 },
+                classes: 'govuk-summary-list--full-width',
                 rows: multipleSiteRows
             }) }}
 
@@ -128,26 +130,23 @@
             {% endset %}
 
             {% if isMultiSiteJourney %}
-                {% set summaryRows = (summaryRows.push({
-                    key: {
-                        text: "Site name"
-                    },
-                    value: {
-                        text: site.siteName
-                    }
-                }), summaryRows) %}
+                {% set _ = summaryRows.push({
+                    key: { text: "Site name"},
+                    value: { html: appIncompleteField({text: site.siteName})},
+                    actions: setSiteDetailsAction(site.siteName, 'site-name', site.siteNumber)
+                }) %}
             {% endif %}
 
-
             {% if site.showActivityDates %}
-                {% set summaryRows = (summaryRows.push({
-                    key: {
-                        text: "Activity dates"
-                    },
-                    value: {
-                        text: site.activityDates
-                    }
-                }), summaryRows) %}
+                {% set _ = summaryRows.push({
+                key: { 
+                    text: "Activity dates"
+                },
+                value: { 
+                    html: appIncompleteField({text: site.activityDates})
+                },
+                actions: setSiteDetailsAction(site.activityDates, 'activity-dates', site.siteNumber)
+                }) %}
             {% endif %}
 
             {% if site.showActivityDescription %}
@@ -155,9 +154,10 @@
                     key: {
                         text: "Activity description"
                     },
-                    value: {
-                        text: site.activityDescription
-                    }
+                    value: { 
+                        html: appIncompleteField({ text: site.activityDescription })
+                    },
+                    actions: setSiteDetailsAction(site.activityDescription, 'activity-description', site.siteNumber)
                 }), summaryRows) %}
             {% endif %}
 
@@ -166,15 +166,17 @@
                     text: "Single or multiple sets of coordinates"
                 },
                 value: {
-                    text: site.method
-                }
+                    html: appIncompleteField({ text: site.method })
+                },
+                actions: setSiteDetailsAction(site.method, 'how-do-you-want-to-enter-the-coordinates', site.siteNumber)
             },{
                 key: {
                     text: "Coordinate system"
                 },
                 value: {
-                    html: site.coordinateSystem | replace('\n', '<br>')
-                }
+                    html: appIncompleteField({ text: site.coordinateSystem | replace('\n', '<br>') | safe })
+                },
+                actions: setSiteDetailsAction(site.coordinateSystem, 'what-coordinate-system', site.siteNumber)
             }), summaryRows) %}
 
             {% if site.polygonCoordinates %}
@@ -196,17 +198,21 @@
                         text: "Coordinates at centre of site"
                     },
                     value: {
-                        text: site.coordinates
-                    }
+                        html: appIncompleteField({ text: site.coordinates })
+                    },
+                    actions: setSiteDetailsAction(site.coordinates, 'enter-the-coordinates-at-the-centre-point', site.siteNumber)
                 }), summaryRows) %}
+                
                 {% set summaryRows = (summaryRows.push({
                     key: {
                         text: "Width of circular site"
                     },
                     value: {
-                        text: site.width
-                    }
+                        html: appIncompleteField({ text: site.width })
+                    },
+                    actions: setSiteDetailsAction(site.width, 'width-of-site', site.siteNumber)
                 }), summaryRows) %}
+
             {% endif %}
             {# Add map view row for all coordinate types #}
             {% set summaryRows = (summaryRows.push({
@@ -214,12 +220,16 @@
                     text: "Map view"
                 },
                 value: {
-                    html: appSiteDetailsMap(site.siteDetailsData, loop.index0)
+                    html: appSiteDetailsMap(site.siteDetailsData, loop.index0),
+                    classes: "govuk-summary-list__value--full-width"
                 }
             }), summaryRows) %}
 
             {{ govukSummaryList({
                 card: {
+                    attributes: {
+                        id: "site-details-" + site.siteNumber
+                    },
                     title: {
                         text: summaryRowsHeading
                     },
@@ -234,7 +244,8 @@
                         ]
                     }
                 },
-                rows: summaryRows
+                rows: summaryRows,
+                classes: 'govuk-summary-list--full-width'
             }) }}
 
             {% endfor %}

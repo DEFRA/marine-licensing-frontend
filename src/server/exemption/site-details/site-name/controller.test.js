@@ -50,7 +50,7 @@ describe('#siteName', () => {
         pageTitle: 'Site name',
         heading: 'Site name',
         backLink: routes.MULTIPLE_SITES_CHOICE,
-        cancelLink: routes.TASK_LIST,
+        cancelLink: routes.TASK_LIST + '?cancel=site-details',
         payload: { siteName: mockSiteName },
         projectName: 'Test Project',
         siteNumber: 1,
@@ -84,7 +84,7 @@ describe('#siteName', () => {
         SITE_NAME_VIEW_ROUTE,
         expect.objectContaining({
           backLink: `${routes.REVIEW_SITE_DETAILS}#site-details-1`,
-          cancelLink: `${routes.REVIEW_SITE_DETAILS}#site-details-1`
+          cancelLink: undefined
         })
       )
     })
@@ -261,7 +261,7 @@ describe('#siteName', () => {
         pageTitle: 'Site name',
         heading: 'Site name',
         backLink: routes.MULTIPLE_SITES_CHOICE,
-        cancelLink: routes.TASK_LIST,
+        cancelLink: routes.TASK_LIST + '?cancel=site-details',
         payload: { siteName: '' },
         projectName: 'Test Project',
         siteNumber: 1,
@@ -285,7 +285,7 @@ describe('#siteName', () => {
         pageTitle: 'Site name',
         heading: 'Site name',
         backLink: routes.MULTIPLE_SITES_CHOICE,
-        cancelLink: routes.TASK_LIST,
+        cancelLink: routes.TASK_LIST + '?cancel=site-details',
         payload: { siteName: 'invalid' },
         projectName: 'Test Project',
         siteNumber: 1,
@@ -318,7 +318,7 @@ describe('#siteName', () => {
         expect.objectContaining({
           action: 'add',
           backLink: `${routes.REVIEW_SITE_DETAILS}#site-details-1`,
-          cancelLink: `${routes.REVIEW_SITE_DETAILS}#site-details-1`
+          cancelLink: undefined
         })
       )
     })

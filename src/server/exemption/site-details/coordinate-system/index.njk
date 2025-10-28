@@ -47,6 +47,7 @@
       value: payload.coordinateSystem,
       errorMessage: errors['coordinateSystem'],
       projectName: projectName,
+      siteNumber: siteNumber,
       hint: { html: helperText },
       items: [
         {
@@ -65,7 +66,7 @@
         }
       ],
       csrfToken: csrfToken,
-      cancelLink: "/exemption/task-list?cancel=site-details"
+      cancelLink: cancelLink
     })
   }}
 

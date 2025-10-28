@@ -10,6 +10,7 @@ import { setSiteDataPreHandler } from '#src/server/common/helpers/session-cache/
 import { getSiteDetailsBySite } from '#src/server/common/helpers/session-cache/site-details-utils.js'
 import { routes } from '#src/server/common/constants/routes.js'
 import { saveSiteDetailsToBackend } from '#src/server/common/helpers/save-site-details.js'
+import { getCancelLink } from '#src/server/exemption/site-details/utils/cancel-link.js'
 import joi from 'joi'
 import { getBackLink, getNextRoute } from './utils.js'
 
@@ -28,12 +29,6 @@ const templateValues = {
   heading: 'Activity description'
 }
 
-const getCancelLink = (action, siteNumber) => {
-  return action
-    ? `${routes.REVIEW_SITE_DETAILS}#site-details-${siteNumber}`
-    : routes.TASK_LIST + '?cancel=site-details'
-}
-
 const getBackLinkForAction = (
   action,
   siteNumber,
@@ -49,7 +44,7 @@ const getBackLinkForAction = (
 
 const getPageTemplateValues = (request) => {
   const exemption = getExemptionCache(request)
-  const action = request.query?.action
+  const action = request.query.action
 
   const { siteNumber, siteIndex, queryParams } = request.site ?? {}
 
@@ -68,7 +63,7 @@ const getPageTemplateValues = (request) => {
       siteIndex,
       queryParams
     ),
-    cancelLink: getCancelLink(action, siteNumber),
+    cancelLink: getCancelLink(action),
     projectName: exemption.projectName,
     siteNumber: variableActivityDescription ? siteNumber : null,
     action
@@ -147,7 +142,7 @@ export const activityDescriptionSubmitController = {
         payload.activityDescription
       )
 
-      const action = request.query?.action
+      const action = request.query.action
       const { siteNumber } = request.site
 
       const nextRoute = action

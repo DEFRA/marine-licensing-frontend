@@ -4,84 +4,43 @@
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=DEFRA_marine-licensing-frontend&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=DEFRA_marine-licensing-frontend)
 [![Coverage](https://sonarcloud.io/api/project_badges/measure?project=DEFRA_marine-licensing-frontend&metric=coverage)](https://sonarcloud.io/summary/new_code?id=DEFRA_marine-licensing-frontend)
 
-Core delivery platform Node.js Frontend Template.
+The Marine Licensing Frontend is the start of a GDS-compliant application that will eventually
+replace the Marine Case Management System (MCMS). It is under development and currently offers the
+ability to create licence exemption notifications.
 
-- [Requirements](#requirements)
-  - [Node.js](#nodejs)
-- [Server-side Caching](#server-side-caching)
-- [Redis](#redis)
-- [Local Development](#local-development)
+- [Prerequisites](#prerequisites)
+- [Local development](#local-development)
   - [Setup](#setup)
   - [Development](#development)
   - [Production](#production)
   - [Npm scripts](#npm-scripts)
-  - [Update dependencies](#update-dependencies)
-- [Code Analysis with Knip](#code-analysis-with-knip)
-  - [Formatting](#formatting)
-    - [Windows prettier issue](#windows-prettier-issue)
+  - [Routes](#routes)
+  - [Authentication](#authentication)
+  - [Dependency updates](#dependency-updates)
+  - [Environment variables](#environment-variables)
+- [Server-side caching](#server-side-caching)
 - [Docker](#docker)
   - [Development image](#development-image)
   - [Production image](#production-image)
   - [Docker Compose](#docker-compose)
-  - [Dependabot](#dependabot)
-  - [SonarCloud](#sonarcloud)
+- [SonarCloud](#sonarcloud)
 - [Licence](#licence)
   - [About the licence](#about-the-licence)
 
-## Requirements
+## Prerequisites
 
-### Node.js
+For latest minimum versions of Node.js and NPM, see the [package.json](./package.json) 'engines'
+property.
 
-Please install [Node.js](http://nodejs.org/) `>= v18` and [npm](https://nodejs.org/) `>= v9`. You will find it
-easier to use the Node Version Manager [nvm](https://github.com/creationix/nvm)
+- [Node.js](http://nodejs.org/)
+- [npm](https://nodejs.org/)
+- [Docker](https://www.docker.com/)
 
-To use the correct version of Node.js for this application, via nvm:
+You may find it easier to manage Node.js versions using a version manager such
+as [nvm](https://github.com/creationix/nvm) or [n](https://www.npmjs.com/package/n). From within the
+project folder you can then either run `nvm use` or `n auto` to install the required version.
 
-```bash
-cd marine-licensing-frontend
-nvm use
-```
-
-## Server-side Caching
-
-We use Catbox for server-side caching. By default the service will use CatboxRedis when deployed and CatboxMemory for
-local development.
-You can override the default behaviour by setting the `SESSION_CACHE_ENGINE` environment variable to either `redis` or
-`memory`.
-
-Please note: CatboxMemory (`memory`) is _not_ suitable for production use! The cache will not be shared between each
-instance of the service and it will not persist between restarts.
-
-## Redis
-
-Redis is an in-memory key-value store. Every instance of a service has access to the same Redis key-value store similar
-to how services might have a database (or MongoDB). All frontend services are given access to a namespaced prefixed that
-matches the service name. e.g. `my-service` will have access to everything in Redis that is prefixed with `my-service`.
-
-If your service does not require a session cache to be shared between instances or if you don't require Redis, you can
-disable setting `SESSION_CACHE_ENGINE=false` or changing the default value in `~/src/config/index.js`.
-
-## Proxy
-
-We are using forward-proxy which is set up by default. To make use of this: `import { fetch } from 'undici'` then because of the `setGlobalDispatcher(new ProxyAgent(proxyUrl))` calls will use the ProxyAgent Dispatcher
-
-If you are not using Wreck, Axios or Undici or a similar http that uses `Request`. Then you may have to provide the proxy dispatcher:
-
-To add the dispatcher to your own client:
-
-```javascript
-import { ProxyAgent } from 'undici'
-
-return await fetch(url, {
-  dispatcher: new ProxyAgent({
-    uri: proxyUrl,
-    keepAliveTimeout: 10,
-    keepAliveMaxTimeout: 10
-  })
-})
-```
-
-## Local Development
+## Local development
 
 ### Setup
 
@@ -91,13 +50,20 @@ Install application dependencies:
 npm install
 ```
 
-### Development
+### Development mode
+
+Note - to get all dependent services up you should also run `docker compose up --build -d` in both
+this repo and in marine-licensing-backend. Then stop the marine-licensing-frontend container.
 
 To run the application in `development` mode run:
 
 ```bash
 npm run dev
 ```
+
+and hit <http://localhost:3000> in your browser. This will
+use [Defra ID stub](https://github.com/DEFRA/cdp-defra-id-stub?tab=readme-ov-file#cdp-defra-id-stub)
+for login.
 
 ### Production
 
@@ -116,54 +82,62 @@ To view them in your command line run:
 npm run
 ```
 
-### Update dependencies
+### Routes
 
-To update dependencies use [npm-check-updates](https://github.com/raineorshine/npm-check-updates):
+The routes for this service are defined in [src/server/router.js](./src/server/router.js).
 
-> The following script is a good start. Check out all the options on
-> the [npm-check-updates](https://github.com/raineorshine/npm-check-updates)
+### Authentication
 
-```bash
-ncu --interactive --format group
-```
+For authentication when running locally, there are 2 options:
 
-### Code Analysis with Knip
+#### Defra ID stub
 
-We use [Knip](https://knip.dev/) to find and remove unused dependencies, exports, and files in the codebase. Knip helps keep projects clean by identifying dead code, unused dependencies, and unreferenced files.
+The out-of-the-box config will use
+the [cdp-defra-id-stub](https://github.com/DEFRA/cdp-defra-id-stub). If you run this with docker
+compose (see section below) you will also get an instance of Redis, which can be used for session
+caching.
 
-To run knip:
+#### Real Defra ID and Entra ID
 
-```bash
-npm run knip
-```
+To properly use features like organisation switching, you will need to use real Defra ID (not the
+stub) and Entra ID.
 
-Knip analyses the entire project and reports:
+All pages are authenticated with Defra ID, except the view exemption details page for Dynamics 365
+users, which is authenticated with Entra ID.
 
-- Unused dependencies in `package.json`
-- Unused exports that aren't imported anywhere
-- Unreferenced files that aren't used
-- Missing dependencies that should be added to `package.json`
+To set this up and run it, [instructions are here](./local-https-setup/README.md)
 
-Benefits of using knip:
+### Environment variables
 
-- Reduces bundle sizes by identifying code that can be removed
-- Improves build performance by eliminating unnecessary dependencies
-- Makes the codebase easier to maintain and navigate
-- Helps prevent version conflicts and security vulnerabilities from unused packages
+For most local development, you shouldn't need to override any of the env var defaults that are
+in [config.js](./src/config/config.js).
 
-For automatic fixes, knip can remove unused code with the `--fix` flag, though this should be used with caution and proper version control.
+## The deployed app
 
-### Formatting
+[Dev environment](https://marine-licensing-frontend.dev.cdp-int.defra.cloud/) - login uses Defra ID
+stub
 
-#### Windows prettier issue
+The other environments use real Defra ID and Entra ID for login:
+[Test environment](https://marine-licensing-frontend.test.cdp-int.defra.cloud)
+[Perf-test environment](https://marine-licensing-frontend.perf-test.cdp-int.defra.cloud)
+[Production environment](https://marine-licensing-frontend.prod.cdp-int.defra.cloud/)
 
-If you are having issues with formatting of line breaks on Windows update your global git config by running:
+Those links and all the tools to deploy, view logs etc are on
+the [Core Delivery Platform page](https://portal.cdp-int.defra.cloud/services/marine-licensing-frontend)
 
-```bash
-git config --global core.autocrlf false
-```
+## Server-side caching
+
+We use Catbox for server-side caching. By default the service will use CatboxRedis when deployed and
+CatboxMemory for
+local development. You can override the default behaviour by setting the `SESSION_CACHE_ENGINE`
+environment variable to either `redis` or `memory`.
+
+Please note: CatboxMemory (`memory`) is _not_ suitable for production use! The cache will not be
+shared between each instance of the service and it will not persist between restarts.
 
 ## Docker
+
+Ensure you have run `npm install` before running any Docker commands.
 
 ### Development image
 
@@ -200,27 +174,21 @@ A local environment with:
 - Localstack for AWS services (S3, SQS)
 - Redis
 - MongoDB
-- This service.
-- A commented out backend example.
+- This service
+- A commented out backend example
 
 ```bash
 docker compose up --build -d
 ```
 
-### Dependabot
+## SonarCloud
 
-We have added an example dependabot configuration file to the repository. You can enable it by renaming
-the [.github/example.dependabot.yml](.github/example.dependabot.yml) to `.github/dependabot.yml`
+Instructions for setting up SonarCloud can be found
+in [sonar-project.properties](./sonar-project.properties).
 
-### SonarCloud
+## Dependency updates
 
-Instructions for setting up SonarCloud can be found in [sonar-project.properties](./sonar-project.properties).
-
-## Releases
-
-### [1.0.0](https://eaflood.atlassian.net/projects/ML/versions/23736/tab/release-report-all-issues)
-
-Initial release of the marine licensing frontend application but wont be used by public.
+Dependabot automatically creates pull requests to update dependencies.
 
 ## Licence
 
@@ -228,14 +196,18 @@ THIS INFORMATION IS LICENSED UNDER THE CONDITIONS OF THE OPEN GOVERNMENT LICENCE
 
 <http://www.nationalarchives.gov.uk/doc/open-government-licence/version/3>
 
-The following attribution statement MUST be cited in your products and applications when using this information.
+The following attribution statement MUST be cited in your products and applications when using this
+information.
 
 > Contains public sector information licensed under the Open Government license v3
 
 ### About the licence
 
-The Open Government Licence (OGL) was developed by the Controller of Her Majesty's Stationery Office (HMSO) to enable
-information providers in the public sector to license the use and re-use of their information under a common open
+The Open Government Licence (OGL) was developed by the Controller of Her Majesty's Stationery
+Office (HMSO) to enable
+information providers in the public sector to license the use and re-use of their information under
+a common open
 licence.
 
-It is designed to encourage use and re-use of information freely and flexibly, with only a few conditions.
+It is designed to encourage use and re-use of information freely and flexibly, with only a few
+conditions.

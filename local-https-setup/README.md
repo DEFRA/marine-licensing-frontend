@@ -59,28 +59,9 @@ This folder contains all the scripts and configuration files needed to run the M
    ./local-https-setup/toggle-local-dns.sh
    ```
 
-6. Create a .env in the frontend repo root for all defra id related changes\*\* (it will be git-ignored) :
+6. Rename the .env.template file in the frontend repo root, to .env (it will be git-ignored) and obtain the missing secret values from another team member. Compare other values with here https://github.com/DEFRA/cdp-app-config/blob/main/services/marine-licensing-frontend/test/marine-licensing-frontend.env
 
-```
-DEFRA_ID_ACCOUNT_MANAGEMENT_URL=
-DEFRA_ID_OIDC_CONFIGURATION_URL=
-DEFRA_ID_CLIENT_ID=
-DEFRA_ID_CLIENT_SECRET=
-DEFRA_ID_SERVICE_ID=
-AUTH_DEFRA_ID_SCOPES=
-APP_BASE_URL=https://marine-licensing-frontend.test.cdp-int.defra.cloud
-```
-
-- including AUTH_DEFRA_ID_SCOPES and DEFRA_ID_CLIENT_SECRET from secrets
-- use other values from here https://github.com/DEFRA/cdp-app-config/blob/fac3e76ed9485599c2c93868e04863321c60f48a/services/marine-licensing-frontend/test/marine-licensing-frontend.env#L4
-
-7. Create a .env in the backend repo root:
-
-```
-DEFRA_ID_JWKS_URI=
-```
-
-Get the value for `DEFRA_ID_JWKS_URI` from here - https://github.com/DEFRA/cdp-app-config/blob/main/services/marine-licensing-backend/test/marine-licensing-backend.env#L3
+7. Rename the .env.template in the backend repo root as .env and check the values are the same as https://github.com/DEFRA/cdp-app-config/blob/main/services/marine-licensing-backend/test/marine-licensing-backend.env
 
 ### Start the Application
 

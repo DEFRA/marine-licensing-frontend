@@ -12,7 +12,7 @@ export function setSiteDetailsAction(
     items: [
       {
         ...(href && {
-          href: `${href}?${siteNumber ? 'site=' + siteNumber + '&' : ''}action=${action}`
+          href: `${href}?${siteNumber ? `site=${siteNumber}&` : ''}action=${action}`
         }),
         text: hasValue ? 'Change' : 'Add',
         ...(visuallyHiddenText && { visuallyHiddenText }),

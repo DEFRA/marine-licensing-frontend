@@ -354,4 +354,118 @@ describe('sameActivityDescriptionController', () => {
       )
     })
   })
+
+  describe('sameActivityDescriptionController', () => {
+    test('Should handle validation failure with err.details in failAction', () => {
+      const request = {
+        payload: { sameActivityDescription: 'invalid' },
+        query: {}
+      }
+
+      const h = {
+        view: vi.fn().mockReturnValue({
+          takeover: vi.fn()
+        })
+      }
+
+      const err = {
+        details: [
+          {
+            path: ['sameActivityDescription'],
+            message: 'SAME_ACTIVITY_DESCRIPTION_REQUIRED',
+            type: 'any.only'
+          }
+        ]
+      }
+
+      sameActivityDescriptionSubmitController.options.validate.failAction(
+        request,
+        h,
+        err
+      )
+
+      expect(h.view).toHaveBeenCalledWith(
+        'exemption/site-details/same-activity-description/index',
+        {
+          pageTitle: 'Is the activity description the same for every site?',
+          heading: 'Is the activity description the same for every site?',
+          backLink: routes.ACTIVITY_DATES,
+          cancelLink: routes.TASK_LIST + '?cancel=site-details',
+          projectName: 'Test Project Name',
+          payload: { sameActivityDescription: 'invalid' },
+          errorSummary: [
+            {
+              href: '#sameActivityDescription',
+              text: 'Select whether the activity description is the same for every site',
+              field: ['sameActivityDescription']
+            }
+          ],
+          errors: {
+            sameActivityDescription: {
+              field: ['sameActivityDescription'],
+              href: '#sameActivityDescription',
+              text: 'Select whether the activity description is the same for every site'
+            }
+          }
+        }
+      )
+
+      expect(h.view().takeover).toHaveBeenCalled()
+    })
+
+    test('Should handle validation failure without err.details in failAction', () => {
+      const request = {
+        payload: { sameActivityDescription: 'invalid' },
+        query: {}
+      }
+
+      const h = {
+        view: vi.fn().mockReturnValue({
+          takeover: vi.fn()
+        })
+      }
+
+      const err = {}
+
+      sameActivityDescriptionSubmitController.options.validate.failAction(
+        request,
+        h,
+        err
+      )
+
+      expect(h.view).toHaveBeenCalledWith(
+        'exemption/site-details/same-activity-description/index',
+        {
+          pageTitle: 'Is the activity description the same for every site?',
+          heading: 'Is the activity description the same for every site?',
+          backLink: routes.ACTIVITY_DATES,
+          cancelLink: routes.TASK_LIST + '?cancel=site-details',
+          projectName: 'Test Project Name',
+          payload: { sameActivityDescription: 'invalid' }
+        }
+      )
+
+      expect(h.view().takeover).toHaveBeenCalled()
+    })
+
+    test('Should handle successful validation in handler', async () => {
+      const h = { redirect: vi.fn() }
+
+      const mockRequest = {
+        payload: { sameActivityDescription: 'yes' },
+        query: {},
+        site: mockSite
+      }
+
+      await sameActivityDescriptionSubmitController.handler(mockRequest, h)
+
+      expect(updateExemptionMultipleSiteDetails).toHaveBeenCalledWith(
+        mockRequest,
+        'sameActivityDescription',
+        'yes'
+      )
+
+      expect(h.redirect).toHaveBeenCalledWith(routes.ACTIVITY_DESCRIPTION)
+    })
+  })
 })

@@ -117,7 +117,7 @@ const callGeoParserAPI = async (request, s3Bucket, s3Key, fileType) => {
 const validateAndExtractGeoJSON = (response) => {
   const { payload } = response
 
-  if (!payload || payload.message !== 'success') {
+  if (payload?.message !== 'success') {
     throw new Error('Invalid geo-parser response')
   }
 

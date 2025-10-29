@@ -8,10 +8,16 @@ export function setSiteDetailsAction(
 
   const action = hasValue ? 'change' : 'add'
 
+  const queryString = siteNumber
+    ? `site=${siteNumber}&action=${action}`
+    : `action=${action}`
+
   return {
     items: [
       {
-        ...(href && { href: `${href}?site=${siteNumber}&action=${action}` }),
+        ...(href && {
+          href: `${href}?${queryString}`
+        }),
         text: hasValue ? 'Change' : 'Add',
         ...(visuallyHiddenText && { visuallyHiddenText }),
         classes: 'govuk-link--no-visited-state'

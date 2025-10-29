@@ -12,7 +12,11 @@ import {
   errorDescriptionByFieldName,
   mapErrorsForDisplay
 } from '#src/server/common/helpers/errors.js'
+import { saveSiteDetailsToBackend } from '#src/server/common/helpers/save-site-details.js'
+import { getCancelLink } from '#src/server/exemption/site-details/utils/cancel-link.js'
+import { copySameActivityDatesToAllSites } from '#src/server/common/helpers/copy-same-activity-data.js'
 import joi from 'joi'
+import { answerChangedFromNoToYes, answerChangedFromYesToNo } from './utils.js'
 
 export const SAME_ACTIVITY_DATES_VIEW_ROUTE =
   'exemption/site-details/same-activity-dates/index'
@@ -29,23 +33,32 @@ export const errorMessages = {
     'Select whether the activity dates are the same for every site'
 }
 
+const getBackLinkForAction = (action, siteDetails) => {
+  if (action) {
+    return routes.REVIEW_SITE_DETAILS
+  }
+  return siteDetails.coordinatesType === 'file'
+    ? routes.FILE_UPLOAD
+    : routes.SITE_NAME
+}
+
 const createValidationFailAction = (request, h, err) => {
   const { payload } = request
   const exemption = getExemptionCache(request)
+  const action = request.query.action
 
   const site = setSiteData(request)
   const { siteDetails } = site
 
-  const backLink =
-    siteDetails.coordinatesType === 'file'
-      ? routes.FILE_UPLOAD
-      : routes.SITE_NAME
+  const backLink = getBackLinkForAction(action, siteDetails)
+  const cancelLink = getCancelLink(action)
 
   if (!err.details) {
     return h
       .view(SAME_ACTIVITY_DATES_VIEW_ROUTE, {
         ...sameActivityDatesSettings,
         backLink,
+        cancelLink,
         payload,
         projectName: exemption.projectName
       })
@@ -59,6 +72,7 @@ const createValidationFailAction = (request, h, err) => {
     .view(SAME_ACTIVITY_DATES_VIEW_ROUTE, {
       ...sameActivityDatesSettings,
       backLink,
+      cancelLink,
       payload,
       projectName: exemption.projectName,
       errors,
@@ -73,6 +87,7 @@ export const sameActivityDatesController = {
   handler(request, h) {
     const { siteIndex, siteDetails, queryParams } = request.site
     const exemption = getExemptionCache(request)
+    const action = request.query.action
 
     const { multipleSiteDetails } = exemption
 
@@ -92,10 +107,8 @@ export const sameActivityDatesController = {
 
     return h.view(SAME_ACTIVITY_DATES_VIEW_ROUTE, {
       ...sameActivityDatesSettings,
-      backLink:
-        siteDetails.coordinatesType === 'file'
-          ? routes.FILE_UPLOAD
-          : routes.SITE_NAME,
+      backLink: getBackLinkForAction(action, siteDetails),
+      cancelLink: getCancelLink(action),
       projectName: exemption.projectName,
       payload: {
         sameActivityDates: exemption.multipleSiteDetails?.sameActivityDates
@@ -117,15 +130,36 @@ export const sameActivityDatesSubmitController = {
       failAction: createValidationFailAction
     }
   },
-  handler(request, h) {
+  async handler(request, h) {
     const { payload, site } = request
     const { queryParams, siteDetails } = site
+    const action = request.query.action
+    const exemption = getExemptionCache(request)
+
+    const previousAnswer = exemption.multipleSiteDetails?.sameActivityDates
+    const answerChanged = previousAnswer !== payload.sameActivityDates
+
+    if (action && !answerChanged) {
+      return h.redirect(routes.REVIEW_SITE_DETAILS)
+    }
 
     updateExemptionMultipleSiteDetails(
       request,
       'sameActivityDates',
       payload.sameActivityDates
     )
+
+    if (action) {
+      if (answerChangedFromNoToYes(previousAnswer, payload)) {
+        return h.redirect(routes.ACTIVITY_DATES + '?action=change')
+      }
+
+      if (answerChangedFromYesToNo(previousAnswer, payload)) {
+        copySameActivityDatesToAllSites(request)
+        await saveSiteDetailsToBackend(request)
+        return h.redirect(routes.REVIEW_SITE_DETAILS)
+      }
+    }
 
     if (
       siteDetails.coordinatesType === 'file' &&

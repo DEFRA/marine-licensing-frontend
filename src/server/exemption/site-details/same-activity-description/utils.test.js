@@ -36,5 +36,18 @@ describe('sameActivityDescription utils', () => {
         )
       ).toBe(routes.SAME_ACTIVITY_DATES)
     })
+
+    test('getBackLink correctly returns when we have an action value', () => {
+      expect(
+        getBackLink(
+          mockExemption,
+          {
+            ...mockExemption.siteDetails[0],
+            coordinatesType: 'file'
+          },
+          'change'
+        )
+      ).toBe(routes.REVIEW_SITE_DETAILS)
+    })
   })
 })

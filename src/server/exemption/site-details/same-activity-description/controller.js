@@ -13,8 +13,14 @@ import {
   mapErrorsForDisplay
 } from '#src/server/common/helpers/errors.js'
 import joi from 'joi'
-import { getBackLink } from './utils.js'
+import {
+  answerChangedFromNoToYes,
+  answerChangedFromYesToNo,
+  getBackLink
+} from './utils.js'
 import { saveSiteDetailsToBackend } from '#src/server/common/helpers/save-site-details.js'
+import { getCancelLink } from '#src/server/exemption/site-details/utils/cancel-link.js'
+import { copySameActivityDescriptionToAllSites } from '#src/server/common/helpers/copy-same-activity-data.js'
 
 export const SAME_ACTIVITY_DESCRIPTION_VIEW_ROUTE =
   'exemption/site-details/same-activity-description/index'
@@ -36,12 +42,17 @@ const createValidationFailAction = (request, h, err) => {
   const { payload } = request
   const exemption = getExemptionCache(request)
   const site = setSiteData(request)
+  const action = request.query.action
+
+  const backLink = getBackLink(exemption, site.siteDetails, action)
+  const cancelLink = getCancelLink(action)
 
   if (!err.details) {
     return h
       .view(SAME_ACTIVITY_DESCRIPTION_VIEW_ROUTE, {
         ...sameActivityDescriptionSettings,
-        backLink: getBackLink(exemption, site.siteDetails),
+        backLink,
+        cancelLink,
         payload,
         projectName: exemption.projectName
       })
@@ -54,7 +65,8 @@ const createValidationFailAction = (request, h, err) => {
   return h
     .view(SAME_ACTIVITY_DESCRIPTION_VIEW_ROUTE, {
       ...sameActivityDescriptionSettings,
-      backLink: getBackLink(exemption, site.siteDetails),
+      backLink,
+      cancelLink,
       payload,
       projectName: exemption.projectName,
       errors,
@@ -69,6 +81,7 @@ export const sameActivityDescriptionController = {
   handler(request, h) {
     const { siteIndex, siteDetails, queryParams } = request.site
     const exemption = getExemptionCache(request)
+    const action = request.query.action
 
     const { multipleSiteDetails } = exemption
 
@@ -91,7 +104,8 @@ export const sameActivityDescriptionController = {
 
     return h.view(SAME_ACTIVITY_DESCRIPTION_VIEW_ROUTE, {
       ...sameActivityDescriptionSettings,
-      backLink: getBackLink(exemption, siteDetails),
+      backLink: getBackLink(exemption, siteDetails, action),
+      cancelLink: getCancelLink(action),
       projectName: exemption.projectName,
       payload: {
         sameActivityDescription:
@@ -121,12 +135,34 @@ export const sameActivityDescriptionSubmitController = {
   async handler(request, h) {
     const { payload, site } = request
     const { queryParams, siteDetails } = site
+    const action = request.query.action
+    const exemption = getExemptionCache(request)
+
+    const previousAnswer =
+      exemption.multipleSiteDetails?.sameActivityDescription
+    const answerChanged = previousAnswer !== payload.sameActivityDescription
+
+    if (action && !answerChanged) {
+      return h.redirect(routes.REVIEW_SITE_DETAILS)
+    }
 
     updateExemptionMultipleSiteDetails(
       request,
       'sameActivityDescription',
       payload.sameActivityDescription
     )
+
+    if (action) {
+      if (answerChangedFromNoToYes(previousAnswer, payload)) {
+        return h.redirect(routes.ACTIVITY_DESCRIPTION + '?action=change')
+      }
+
+      if (answerChangedFromYesToNo(previousAnswer, payload)) {
+        copySameActivityDescriptionToAllSites(request)
+        await saveSiteDetailsToBackend(request)
+        return h.redirect(routes.REVIEW_SITE_DETAILS)
+      }
+    }
 
     if (
       siteDetails.coordinatesType === 'file' &&

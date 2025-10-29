@@ -71,7 +71,8 @@
                         },
                         value: {
                             text: multipleSiteDetailsData.sameActivityDates
-                        }
+                        },
+                        actions: setSiteDetailsAction(multipleSiteDetailsData.sameActivityDates, 'same-activity-dates')
                     }
                 ] %}
 
@@ -82,7 +83,8 @@
                         },
                         value: {
                             text: multipleSiteDetailsData.activityDates
-                        }
+                        },
+                        actions: setSiteDetailsAction(multipleSiteDetailsData.activityDates, 'activity-dates')
                     }), activityRows) %}
                 {% endif %}
 
@@ -92,7 +94,8 @@
                     },
                     value: {
                         html: multipleSiteDetailsData.sameActivityDescription
-                    }
+                    },
+                    actions: setSiteDetailsAction(multipleSiteDetailsData.sameActivityDescription, 'same-activity-description')
                 }), activityRows) %}
 
                 {% if multipleSiteDetailsData.activityDescription %}
@@ -102,7 +105,8 @@
                         },
                         value: {
                             text: multipleSiteDetailsData.activityDescription
-                        }
+                        },
+                        actions: setSiteDetailsAction(multipleSiteDetailsData.activityDescription, 'activity-description')
                     }), activityRows) %}
                 {% endif %}
 

@@ -31,18 +31,12 @@ export const validateActionLink = (row, value, siteIndex) => {
     name: expectedText
   })
 
-  const siteNumber = siteIndex + 1
+  const siteHref =
+    typeof siteIndex !== 'undefined'
+      ? `?site=${siteIndex + 1}&action=${hasValue ? 'change' : 'add'}`
+      : `?action=${hasValue ? 'change' : 'add'}`
 
-  expect(actionLink).toHaveAttribute(
-    'href',
-    expect.stringContaining(
-      `site=${siteNumber}&action=${hasValue ? 'change' : 'add'}`
-    )
-  )
-
-  expect(actionLink.getAttribute('href')).toContain(
-    `site=${siteNumber}&action=${hasValue ? 'change' : 'add'}`
-  )
+  expect(actionLink).toHaveAttribute('href', expect.stringContaining(siteHref))
 }
 
 export const validateNavigationElements = (document) => {

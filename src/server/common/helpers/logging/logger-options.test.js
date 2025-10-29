@@ -35,7 +35,6 @@ vi.mock('~/src/config/config.js', () => ({
 describe('loggerOptions', () => {
   it('should have correct properties based on config and ecsFormat', () => {
     expect(loggerOptions.enabled).toBe(true)
-    expect(loggerOptions.ignorePaths).toEqual(['/health'])
     expect(loggerOptions.ignoreFunc).toBeDefined()
     expect(typeof loggerOptions.ignoreFunc).toBe('function')
     expect(loggerOptions.redact).toEqual({
@@ -61,6 +60,11 @@ describe('loggerOptions', () => {
 
   it('ignoreFunc should return true for paths starting with /public/', () => {
     const request = { path: '/public/assets/script.js' }
+    expect(loggerOptions.ignoreFunc({}, request)).toBe(true)
+  })
+
+  it('ignoreFunc should return true for /health', () => {
+    const request = { path: '/health' }
     expect(loggerOptions.ignoreFunc({}, request)).toBe(true)
   })
 

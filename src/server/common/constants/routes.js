@@ -10,7 +10,7 @@ export const routes = {
   ENTER_MULTIPLE_COORDINATES: '/exemption/enter-multiple-coordinates',
   REVIEW_SITE_DETAILS: '/exemption/review-site-details',
   PROJECT_NAME: '/exemption/project-name',
-  PUBLIC_REGISTER: '/exemption/public-register',
+  PUBLIC_REGISTER: '/exemption/sharing-your-project-information-publicly',
   TASK_LIST: '/exemption/task-list',
   AUTH_DEFRA_ID_CALLBACK: '/signin-oidc',
   AUTH_ENTRA_ID_CALLBACK: '/auth',

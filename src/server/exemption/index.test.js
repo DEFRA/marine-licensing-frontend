@@ -34,11 +34,11 @@ describe('exemption route', () => {
       }),
       expect.objectContaining({
         method: 'GET',
-        path: '/exemption/public-register'
+        path: '/exemption/sharing-your-project-information-publicly'
       }),
       expect.objectContaining({
         method: 'POST',
-        path: '/exemption/public-register'
+        path: '/exemption/sharing-your-project-information-publicly'
       }),
       expect.objectContaining({
         method: 'GET',

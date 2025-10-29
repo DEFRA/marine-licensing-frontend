@@ -46,7 +46,7 @@ export const transformTaskList = (taskList) => {
     },
     {
       title: {
-        text: 'Public register',
+        text: 'Sharing your project information publicly',
         classes
       },
       href: routes.PUBLIC_REGISTER,

@@ -88,7 +88,10 @@ describe('Page accessibility checks (Axe)', () => {
       url: routes.REVIEW_SITE_DETAILS,
       title: 'Review site details'
     },
-    { url: routes.PUBLIC_REGISTER, title: 'Public register' },
+    {
+      url: routes.PUBLIC_REGISTER,
+      title: 'Sharing your project information publicly'
+    },
     {
       url: routes.CHECK_YOUR_ANSWERS,
       title: 'Check your answers before sending your information'

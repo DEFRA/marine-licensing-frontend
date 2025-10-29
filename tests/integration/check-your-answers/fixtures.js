@@ -55,7 +55,11 @@ export const testScenarios = [
     expectedPageContent: {
       pageTitle: 'Check your answers before sending your information',
       backLinkText: 'Go back to your project',
-      summaryCards: ['Project summary', 'Site details', 'Public register'],
+      summaryCards: [
+        'Project summary',
+        'Site details',
+        'Sharing your project information publicly'
+      ],
       projectDetails: {
         'Project name': 'Hammersmith pontoon construction',
         'Type of activity': 'Deposit of a substance or object',
@@ -76,7 +80,7 @@ export const testScenarios = [
         'Map view': ''
       },
       publicRegister: {
-        'Information withheld from public register': 'No'
+        'Consent to publish your project information': 'No'
       },
       submitButton: 'Confirm and send'
     }
@@ -97,7 +101,11 @@ export const testScenarios = [
     expectedPageContent: {
       pageTitle: 'Check your answers before sending your information',
       backLinkText: 'Go back to your project',
-      summaryCards: ['Project summary', 'Site details', 'Public register'],
+      summaryCards: [
+        'Project summary',
+        'Site details',
+        'Sharing your project information publicly'
+      ],
       projectDetails: {
         'Project name': 'Hammersmith pontoon construction'
       },
@@ -109,7 +117,7 @@ export const testScenarios = [
         'Map view': ''
       },
       publicRegister: {
-        'Information withheld from public register': 'No'
+        'Consent to publish your project information': 'No'
       },
       submitButton: 'Confirm and send'
     }
@@ -130,7 +138,11 @@ export const testScenarios = [
     expectedPageContent: {
       pageTitle: 'Check your answers before sending your information',
       backLinkText: 'Go back to your project',
-      summaryCards: ['Project summary', 'Site details', 'Public register'],
+      summaryCards: [
+        'Project summary',
+        'Site details',
+        'Sharing your project information publicly'
+      ],
       projectDetails: {
         'Project name': 'Hammersmith pontoon construction'
       },
@@ -142,7 +154,7 @@ export const testScenarios = [
         'Map view': ''
       },
       publicRegister: {
-        'Information withheld from public register': 'No'
+        'Consent to publish your project information': 'No'
       },
       submitButton: 'Confirm and send'
     }
@@ -167,7 +179,11 @@ export const testScenarios = [
     expectedPageContent: {
       pageTitle: 'Check your answers before sending your information',
       backLinkText: 'Go back to your project',
-      summaryCards: ['Project summary', 'Site details', 'Public register'],
+      summaryCards: [
+        'Project summary',
+        'Site details',
+        'Sharing your project information publicly'
+      ],
       projectDetails: {
         'Project name': 'Hammersmith pontoon construction'
       },
@@ -181,7 +197,7 @@ export const testScenarios = [
         'Map view': ''
       },
       publicRegister: {
-        'Information withheld from public register': 'No'
+        'Consent to publish your project information': 'No'
       },
       submitButton: 'Confirm and send'
     }
@@ -206,7 +222,11 @@ export const testScenarios = [
     expectedPageContent: {
       pageTitle: 'Check your answers before sending your information',
       backLinkText: 'Go back to your project',
-      summaryCards: ['Project summary', 'Site details', 'Public register'],
+      summaryCards: [
+        'Project summary',
+        'Site details',
+        'Sharing your project information publicly'
+      ],
       projectDetails: {
         'Project name': 'Hammersmith pontoon construction'
       },
@@ -219,7 +239,7 @@ export const testScenarios = [
         'Map view': ''
       },
       publicRegister: {
-        'Information withheld from public register': 'No'
+        'Consent to publish your project information': 'No'
       },
       submitButton: 'Confirm and send'
     }
@@ -245,7 +265,11 @@ export const testScenarios = [
     expectedPageContent: {
       pageTitle: 'Check your answers before sending your information',
       backLinkText: 'Go back to your project',
-      summaryCards: ['Project summary', 'Site details', 'Public register'],
+      summaryCards: [
+        'Project summary',
+        'Site details',
+        'Sharing your project information publicly'
+      ],
       projectDetails: {
         'Project name': 'Hammersmith pontoon construction'
       },
@@ -260,7 +284,7 @@ export const testScenarios = [
         'Map view': ''
       },
       publicRegister: {
-        'Information withheld from public register': 'No'
+        'Consent to publish your project information': 'No'
       },
       submitButton: 'Confirm and send'
     }
@@ -286,7 +310,11 @@ export const testScenarios = [
     expectedPageContent: {
       pageTitle: 'Check your answers before sending your information',
       backLinkText: 'Go back to your project',
-      summaryCards: ['Project summary', 'Site details', 'Public register'],
+      summaryCards: [
+        'Project summary',
+        'Site details',
+        'Sharing your project information publicly'
+      ],
       projectDetails: {
         'Project name': 'Hammersmith pontoon construction'
       },
@@ -300,7 +328,7 @@ export const testScenarios = [
         'Map view': ''
       },
       publicRegister: {
-        'Information withheld from public register': 'No'
+        'Consent to publish your project information': 'No'
       },
       submitButton: 'Confirm and send'
     }

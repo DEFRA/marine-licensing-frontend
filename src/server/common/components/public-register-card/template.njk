@@ -3,15 +3,15 @@
 {% set rows = [] %}
 
 {% set _ = rows.push({
-     key: { text:  "Information withheld from public register" },
+     key: { text:  "Consent to publish your project information" },
      value: { html: "Yes" if params.publicRegister.consent === 'yes' else "No" }
    })
 %}
 
-{%  if params.publicRegister.consent === 'yes' %}
+{%  if params.publicRegister.consent === 'no' %}
 
 {% set _ = rows.push({
-  key: { text: "Why the information should be withheld" },
+  key: { text: "Why you do not consent" },
   value: { html: params.publicRegister.reason | default('') }
 }) %}
 
@@ -20,7 +20,7 @@
 {{ govukSummaryList({
     card: {
       title: {
-        text: "Public register"
+        text: "Sharing your project information publicly"
       },
       actions: {
         items: [

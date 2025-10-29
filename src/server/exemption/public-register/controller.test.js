@@ -23,11 +23,6 @@ describe('#publicRegister', () => {
   const getServer = setupTestServer()
   let getExemptionCacheSpy
 
-  const mockPublicRegisterState = {
-    projectName: 'Test Project',
-    publicRegister: { consent: 'yes', reason: 'Test reason' }
-  }
-
   beforeEach(() => {
     vi.spyOn(authRequests, 'authenticatedPatchRequest').mockResolvedValue({
       payload: {
@@ -48,7 +43,9 @@ describe('#publicRegister', () => {
         server: getServer()
       })
 
-      expect(result).toEqual(expect.stringContaining(`Public register`))
+      expect(result).toEqual(
+        expect.stringContaining(`Sharing your project information publicly`)
+      )
 
       expect(statusCode).toBe(statusCodes.ok)
     })
@@ -59,21 +56,21 @@ describe('#publicRegister', () => {
       publicRegisterController.handler({}, h)
 
       expect(h.view).toHaveBeenCalledWith(PUBLIC_REGISTER_VIEW_ROUTE, {
-        pageTitle: 'Public register',
-        heading: 'Public register',
-        projectName: mockPublicRegisterState.projectName,
+        pageTitle: 'Sharing your project information publicly',
+        heading: 'Sharing your project information publicly',
+        projectName: mockExemption.projectName,
         payload: {
-          ...mockPublicRegisterState.publicRegister
+          ...mockExemption.publicRegister
         }
       })
 
-      getExemptionCacheSpy.mockResolvedValueOnce(null)
+      getExemptionCacheSpy.mockReturnValueOnce({})
 
       publicRegisterController.handler({}, h)
 
       expect(h.view).toHaveBeenNthCalledWith(2, PUBLIC_REGISTER_VIEW_ROUTE, {
-        pageTitle: 'Public register',
-        heading: 'Public register',
+        pageTitle: 'Sharing your project information publicly',
+        heading: 'Sharing your project information publicly',
         projectName: undefined,
         payload: undefined
       })
@@ -85,7 +82,7 @@ describe('#publicRegister', () => {
       const { statusCode, headers } = await makePostRequest({
         url: routes.PUBLIC_REGISTER,
         server: getServer(),
-        formData: { consent: 'yes', reason: 'Test reason' }
+        formData: { consent: 'no', reason: 'Test reason' }
       })
 
       expect(authRequests.authenticatedPatchRequest).toHaveBeenCalledWith(
@@ -93,7 +90,7 @@ describe('#publicRegister', () => {
         '/exemption/public-register',
         {
           id: mockExemption.id,
-          consent: 'yes',
+          consent: 'no',
           reason: 'Test reason'
         }
       )
@@ -113,7 +110,7 @@ describe('#publicRegister', () => {
       const { result } = await makePostRequest({
         url: routes.PUBLIC_REGISTER,
         server: getServer(),
-        formData: { consent: 'no' }
+        formData: { consent: 'no', reason: 'Test reason' }
       })
 
       expect(result).toContain('Try again later.')
@@ -153,8 +150,8 @@ describe('#publicRegister', () => {
       )
 
       expect(h.view).toHaveBeenCalledWith(PUBLIC_REGISTER_VIEW_ROUTE, {
-        pageTitle: 'Public register',
-        heading: 'Public register',
+        pageTitle: 'Sharing your project information publicly',
+        heading: 'Sharing your project information publicly',
         projectName: mockExemption.projectName,
         payload: { consent: '' },
         errorSummary: [
@@ -198,8 +195,8 @@ describe('#publicRegister', () => {
       )
 
       expect(h.view).toHaveBeenCalledWith(PUBLIC_REGISTER_VIEW_ROUTE, {
-        heading: 'Public register',
-        pageTitle: 'Public register',
+        heading: 'Sharing your project information publicly',
+        pageTitle: 'Sharing your project information publicly',
         projectName: 'Test Project',
         payload: { consent: '' }
       })
@@ -221,8 +218,8 @@ describe('#publicRegister', () => {
       publicRegisterSubmitController.options.validate.failAction(request, h, {})
 
       expect(h.view).toHaveBeenCalledWith(PUBLIC_REGISTER_VIEW_ROUTE, {
-        heading: 'Public register',
-        pageTitle: 'Public register',
+        heading: 'Sharing your project information publicly',
+        pageTitle: 'Sharing your project information publicly',
         projectName: 'Test Project',
         payload: { consent: '' }
       })
@@ -244,8 +241,8 @@ describe('#publicRegister', () => {
       publicRegisterSubmitController.options.validate.failAction(request, h, {})
 
       expect(h.view).toHaveBeenCalledWith(PUBLIC_REGISTER_VIEW_ROUTE, {
-        heading: 'Public register',
-        pageTitle: 'Public register',
+        heading: 'Sharing your project information publicly',
+        pageTitle: 'Sharing your project information publicly',
         projectName: 'Test Project',
         payload: { consent: 'invalid' }
       })
@@ -269,13 +266,13 @@ describe('#publicRegister', () => {
       expect(document.querySelector('.govuk-error-summary')).toBeTruthy()
     })
 
-    test('Should show error for reason being empty when consent is set to yes', async () => {
+    test('Should show error for reason being empty when consent is set to no', async () => {
       const apiPostMock = vi.spyOn(authRequests, 'authenticatedPatchRequest')
 
       const { result } = await makePostRequest({
         url: routes.PUBLIC_REGISTER,
         server: getServer(),
-        formData: { consent: 'yes' }
+        formData: { consent: 'no' }
       })
 
       expect(apiPostMock).not.toHaveBeenCalled()
@@ -297,10 +294,10 @@ describe('#publicRegister', () => {
         view: vi.fn()
       }
 
-      const mockRequest = { payload: { consent: 'yes', reason: 'Test reason' } }
+      const mockRequest = { payload: { consent: 'no', reason: 'Test reason' } }
 
       await publicRegisterSubmitController.handler(
-        { payload: { consent: 'yes', reason: 'Test reason' } },
+        { payload: { consent: 'no', reason: 'Test reason' } },
         h
       )
       expect(cacheUtils.setExemptionCache).toHaveBeenCalledWith(

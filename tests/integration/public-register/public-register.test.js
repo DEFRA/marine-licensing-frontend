@@ -11,7 +11,7 @@ import {
 } from '~/tests/integration/shared/expect-utils.js'
 import { getInputInFieldset } from '~/tests/integration/shared/dom-helpers.js'
 
-describe('Project name', () => {
+describe('Public register', () => {
   const getServer = setupTestServer()
   const exemption = {
     id: 'test-exemption-123',
@@ -33,15 +33,15 @@ describe('Project name', () => {
       })
     ).toHaveAttribute('href', routes.TASK_LIST)
     expect(getByRole(document, 'heading', { level: 1 })).toHaveTextContent(
-      'Public register'
+      'Sharing your project information publicly'
     )
     expect(
       getByRole(document, 'link', {
-        name: 'public register (opens in new tab)'
+        name: 'Explore Marine Plans (opens in new tab)'
       })
     ).toHaveAttribute(
       'href',
-      'https://marinelicensing.marinemanagement.org.uk/mmo/fox/live/MMO_PUBLIC_REGISTER'
+      'https://www.gov.uk/guidance/explore-marine-plans'
     )
     getByRole(document, 'button', {
       name: 'Save and continue'
@@ -63,7 +63,7 @@ describe('Project name', () => {
       getInputInFieldset({
         document,
         fieldsetLabel:
-          'Do you believe the information you have provided should be withheld from the public register?',
+          'Do you consent to the MMO publishing your project information publicly?',
         inputLabel: 'Yes'
       })
     ).not.toBeChecked()
@@ -72,7 +72,7 @@ describe('Project name', () => {
   test('public register decision set', async () => {
     mockExemption({
       ...exemption,
-      publicRegister: { consent: 'yes', reason: 'Test reason' }
+      publicRegister: { consent: 'no', reason: 'Test reason' }
     })
     const document = await loadPage({
       requestUrl: routes.PUBLIC_REGISTER,
@@ -82,13 +82,14 @@ describe('Project name', () => {
       getInputInFieldset({
         document,
         fieldsetLabel:
-          'Do you believe the information you have provided should be withheld from the public register?',
-        inputLabel: 'Yes'
+          'Do you consent to the MMO publishing your project information publicly?',
+        inputLabel: 'No'
       })
     ).toBeChecked()
     expectInputValue({
       document,
-      inputLabel: 'Provide details of why the information should be withheld',
+      inputLabel:
+        'Provide details of why you do not consent to your project information being published',
       value: 'Test reason'
     })
   })
@@ -107,9 +108,9 @@ describe('Project name', () => {
     expectFieldsetError({
       document,
       fieldsetLabel:
-        'Do you believe the information you have provided should be withheld from the public register?',
+        'Do you consent to the MMO publishing your project information publicly?',
       errorMessage:
-        'Select whether you believe your information should be withheld from the public register'
+        'Select whether you consent to the MMO publishing your project information publicly'
     })
   })
 })

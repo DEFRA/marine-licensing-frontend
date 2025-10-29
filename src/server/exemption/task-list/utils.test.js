@@ -25,7 +25,7 @@ describe('taskList utils', () => {
         href: routes.PUBLIC_REGISTER,
         status: { text: 'Completed' },
         title: {
-          text: 'Public register',
+          text: 'Sharing your project information publicly',
           classes: 'govuk-link--no-visited-state'
         }
       }
@@ -56,7 +56,7 @@ describe('taskList utils', () => {
         status: { text: 'Completed' },
         title: {
           classes: 'govuk-link--no-visited-state',
-          text: 'Public register'
+          text: 'Sharing your project information publicly'
         }
       }
     ])
@@ -90,7 +90,7 @@ describe('taskList utils', () => {
         href: routes.PUBLIC_REGISTER,
         status: { text: 'Completed' },
         title: {
-          text: 'Public register',
+          text: 'Sharing your project information publicly',
           classes: 'govuk-link--no-visited-state'
         }
       }
@@ -119,7 +119,7 @@ describe('taskList utils', () => {
         href: routes.PUBLIC_REGISTER,
         status: { tag: { text: 'Incomplete', classes: 'govuk-tag--blue' } },
         title: {
-          text: 'Public register',
+          text: 'Sharing your project information publicly',
           classes: 'govuk-link--no-visited-state'
         }
       }

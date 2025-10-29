@@ -23,7 +23,8 @@ const formatters = {
 export const loggerOptions = {
   enabled: logConfig.enabled,
   ignoreFunc: (_options, request) =>
-    request.path.startsWith('/public/') || request.path === '/health',
+    request.path.startsWith('/public/') ||
+    ['/health', '/favicon.ico'].includes(request.path),
   redact: {
     paths: logConfig.redact,
     remove: true

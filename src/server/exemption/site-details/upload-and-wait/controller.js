@@ -12,6 +12,13 @@ import {
 import { getCdpUploadService } from '#src/services/cdp-upload-service/index.js'
 import { getFileValidationService } from '#src/services/file-validation/index.js'
 import { isMultipleSitesFile } from '#src/server/exemption/site-details/upload-and-wait/utils.js'
+import {
+  GEO_PARSER_ERROR_MESSAGES,
+  CDP_ERROR_MESSAGES,
+  FILE_TYPE_ERROR_MESSAGES,
+  DEFAULT_ERROR_MESSAGE,
+  DEFAULT_GEO_PARSER_ERROR_MESSAGE
+} from './error-messages.js'
 
 export const UPLOAD_AND_WAIT_VIEW_ROUTE =
   'exemption/site-details/upload-and-wait/index'
@@ -22,57 +29,18 @@ const pageSettings = {
   pageRefreshTimeInSeconds: 2
 }
 
-const transformCdpErrorToValidationError = (message, fileType) => {
-  const errorMessage = getErrorMessage(message, fileType)
-
-  return {
-    message: errorMessage,
-    fieldName: 'file'
-  }
-}
-
-const getErrorMessage = (message, fileType) => {
-  const errorMappings = [
-    {
-      condition: (msg) => msg.includes('Select a file to upload'),
-      message: 'Select a file to upload'
-    },
-    {
-      condition: (msg) => msg.includes('virus'),
-      message: 'The selected file contains a virus'
-    },
-    {
-      condition: (msg) => msg.includes('empty'),
-      message: 'The selected file is empty'
-    },
-    {
-      condition: (msg) => msg.includes('smaller than'),
-      message: 'The selected file must be smaller than 50 MB'
-    },
-    {
-      condition: (msg) => msg.includes('must be a'),
-      message: getFileTypeErrorMessage(fileType)
-    }
-  ]
-
-  const matchedMapping = errorMappings.find((mapping) =>
-    mapping.condition(message)
-  )
-  return matchedMapping
-    ? matchedMapping.message
-    : 'The selected file could not be uploaded – try again'
-}
-
-const getFileTypeErrorMessage = (fileType) => {
-  const fileTypeMessages = {
-    kml: 'The selected file must be a KML file',
-    shapefile: 'The selected file must be a Shapefile'
-  }
-
+const getGeoParserErrorMessage = (errorCode) => {
   return (
-    fileTypeMessages[fileType] ||
-    'The selected file could not be uploaded – try again'
+    GEO_PARSER_ERROR_MESSAGES[errorCode] || DEFAULT_GEO_PARSER_ERROR_MESSAGE
   )
+}
+
+const getCdpErrorMessageFromCode = (errorCode, fileType) => {
+  if (errorCode === 'INVALID_FILE_TYPE') {
+    return FILE_TYPE_ERROR_MESSAGES[fileType] || CDP_ERROR_MESSAGES[errorCode]
+  }
+
+  return CDP_ERROR_MESSAGES[errorCode] || DEFAULT_ERROR_MESSAGE
 }
 
 function getAllowedExtensions(fileType) {
@@ -156,17 +124,24 @@ const logExtractionError = (request, error, fileContext) => {
 }
 
 function handleValidationError(request, validation, fileType) {
-  const errorDetails = transformCdpErrorToValidationError(
-    validation.errorMessage,
-    fileType
-  )
+  const errorDetails = {
+    message: validation.errorMessage,
+    fieldName: 'file'
+  }
   storeUploadError(request, errorDetails, fileType)
   return { redirect: routes.FILE_UPLOAD }
 }
 
 function handleGeoParserError(request, error, filename, fileType) {
+  let errorCode = null
+
+  if (error.data?.payload?.message) {
+    errorCode = error.data.payload.message
+  }
+  const message = getGeoParserErrorMessage(errorCode)
+
   const errorDetails = {
-    message: 'The selected file could not be processed – try again',
+    message,
     fieldName: 'file',
     fileType
   }
@@ -177,7 +152,9 @@ function handleGeoParserError(request, error, filename, fileType) {
     {
       error,
       filename,
-      fileType
+      fileType,
+      errorCode,
+      mappedMessage: message
     },
     'FileUpload: ERROR: Failed to extract coordinates from uploaded file'
   )
@@ -186,10 +163,25 @@ function handleGeoParserError(request, error, filename, fileType) {
 }
 
 function handleCdpRejectionError(request, status, fileType) {
-  const errorDetails = transformCdpErrorToValidationError(
-    status.message,
-    fileType
+  const errorMessage = status.errorCode
+    ? getCdpErrorMessageFromCode(status.errorCode, fileType)
+    : DEFAULT_ERROR_MESSAGE
+
+  const errorDetails = {
+    message: errorMessage,
+    fieldName: 'file'
+  }
+
+  request.logger.error(
+    {
+      errorCode: status.errorCode,
+      errorMessage: status.message,
+      mappedMessage: errorMessage,
+      fileType
+    },
+    'FileUpload: CDP rejection error'
   )
+
   storeUploadError(request, errorDetails, fileType)
   return { redirect: routes.FILE_UPLOAD }
 }

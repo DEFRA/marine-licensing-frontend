@@ -439,5 +439,6 @@ export const UPLOAD_STATUSES = {
   ...CDP_CONSTANTS.APP_STATUS
 }
 
-// Export the organized constants for advanced usage
+export const CDP_ERROR_CODES = CDP_CONSTANTS.ERROR_CODES
+
 export { CDP_CONSTANTS }

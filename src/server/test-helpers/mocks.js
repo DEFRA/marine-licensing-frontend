@@ -170,7 +170,8 @@ export const createMockRequest = (overrides = {}) => ({
     get: vi.fn(),
     set: vi.fn(),
     clear: vi.fn(),
-    flash: vi.fn()
+    flash: vi.fn(),
+    commit: vi.fn()
   },
   logger: {
     debug: vi.fn(),

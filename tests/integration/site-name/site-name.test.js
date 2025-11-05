@@ -194,6 +194,7 @@ describe('Site name page', () => {
 
     expect(updateExemptionSiteDetails).toHaveBeenCalledWith(
       expect.any(Object),
+      expect.any(Object),
       0,
       'siteName',
       'Test Site Name'
@@ -276,6 +277,7 @@ describe('Site name page', () => {
 
     expect(updateExemptionSiteDetails).toHaveBeenCalledWith(
       expect.any(Object),
+      expect.any(Object),
       0,
       'siteName',
       'New Site Name'
@@ -302,6 +304,7 @@ describe('Site name page', () => {
     )
 
     expect(updateExemptionSiteDetails).toHaveBeenCalledWith(
+      expect.any(Object),
       expect.any(Object),
       1,
       'siteName',

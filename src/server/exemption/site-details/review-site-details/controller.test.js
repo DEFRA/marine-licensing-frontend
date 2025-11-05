@@ -362,6 +362,7 @@ describe('#reviewSiteDetails', () => {
 
         expect(cacheUtils.setExemptionCache).toHaveBeenCalledWith(
           expect.any(Object),
+          expect.any(Object),
           {
             ...mockExemption,
             siteDetails: [

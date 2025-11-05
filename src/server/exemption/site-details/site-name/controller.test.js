@@ -91,7 +91,7 @@ describe('#siteName', () => {
   })
 
   describe('#siteNameSubmitController', () => {
-    test('should redirect to next page when valid site name is submitted', () => {
+    test('should redirect to next page when valid site name is submitted', async () => {
       const updateExemptionSiteDetailsSpy = vi.spyOn(
         cacheUtils,
         'updateExemptionSiteDetails'
@@ -103,10 +103,11 @@ describe('#siteName', () => {
       const h = { redirect: vi.fn() }
 
       sitePreHandlerHook.method(request, h)
-      siteNameSubmitController.handler(request, h)
+      await siteNameSubmitController.handler(request, h)
 
       expect(updateExemptionSiteDetailsSpy).toHaveBeenCalledWith(
         request,
+        h,
         0,
         'siteName',
         'Test Site Name'
@@ -132,6 +133,7 @@ describe('#siteName', () => {
 
       expect(updateExemptionSiteDetailsSpy).toHaveBeenCalledWith(
         request,
+        h,
         0,
         'siteName',
         'New Site'
@@ -158,6 +160,7 @@ describe('#siteName', () => {
 
       expect(updateExemptionSiteDetailsSpy).toHaveBeenCalledWith(
         request,
+        h,
         0,
         'siteName',
         'Updated Site'
@@ -177,7 +180,10 @@ describe('#siteName', () => {
       sitePreHandlerHook.method(request, h)
       await siteNameSubmitController.handler(request, h)
 
-      expect(vi.mocked(saveSiteDetailsToBackend)).toHaveBeenCalledWith(request)
+      expect(vi.mocked(saveSiteDetailsToBackend)).toHaveBeenCalledWith(
+        request,
+        h
+      )
     })
 
     test('should redirect to review site details with site parameter when both present', async () => {
@@ -205,6 +211,7 @@ describe('#siteName', () => {
 
       expect(updateExemptionSiteDetailsSpy).toHaveBeenCalledWith(
         request,
+        h,
         1,
         'siteName',
         'Site 2 Name'

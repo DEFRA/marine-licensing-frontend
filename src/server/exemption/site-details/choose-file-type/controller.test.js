@@ -252,6 +252,7 @@ describe('#chooseFileType', () => {
 
       expect(updateExemptionSiteDetailsSpy).toHaveBeenCalledWith(
         expect.anything(),
+        expect.anything(),
         0,
         'fileUploadType',
         'shapefile'

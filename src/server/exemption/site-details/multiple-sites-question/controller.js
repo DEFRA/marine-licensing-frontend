@@ -91,7 +91,7 @@ export const multipleSitesSubmitController = {
       failAction: createValidationFailAction
     }
   },
-  handler(request, h) {
+  async handler(request, h) {
     const { payload } = request
     const exemption = getExemptionCache(request)
 
@@ -102,7 +102,7 @@ export const multipleSitesSubmitController = {
       delete siteDetails.siteName
     }
 
-    setExemptionCache(request, {
+    await setExemptionCache(request, h, {
       ...exemption,
       multipleSiteDetails: { multipleSitesEnabled: multiSiteValue }
     })

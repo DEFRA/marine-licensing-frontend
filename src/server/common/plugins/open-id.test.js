@@ -159,7 +159,8 @@ describe('Strategy Functions Integration Tests', () => {
         mockRequest = {
           path: '/some/path',
           yar: {
-            flash: vi.fn()
+            flash: vi.fn(),
+            clear: vi.fn()
           }
         }
       })
@@ -234,7 +235,8 @@ describe('Strategy Functions Integration Tests', () => {
         mockRequest = {
           path: '/some/path',
           yar: {
-            flash: vi.fn()
+            flash: vi.fn(),
+            clear: vi.fn()
           }
         }
 
@@ -270,7 +272,7 @@ describe('Strategy Functions Integration Tests', () => {
           mockRequest,
           mockSession
         )
-        expect(mockClearExemptionCache).toHaveBeenCalledWith(mockRequest)
+        expect(mockRequest.yar.clear).toHaveBeenCalledWith('exemption')
         expect(result).toEqual({ isValid: false })
       })
 

@@ -302,6 +302,7 @@ describe('#publicRegister', () => {
       )
       expect(cacheUtils.setExemptionCache).toHaveBeenCalledWith(
         mockRequest,
+        expect.any(Object),
         mockExemption
       )
     })

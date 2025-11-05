@@ -342,6 +342,7 @@ describe('#coordinatesEntry', () => {
 
       expect(cacheUtils.updateExemptionSiteDetails).toHaveBeenCalledWith(
         request,
+        h,
         0,
         'coordinatesEntry',
         'single'

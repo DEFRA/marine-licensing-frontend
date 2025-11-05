@@ -84,7 +84,7 @@ export const sameActivityDatesController = {
   options: {
     pre: [setSiteDataPreHandler]
   },
-  handler(request, h) {
+  async handler(request, h) {
     const { siteIndex, siteDetails, queryParams } = request.site
     const exemption = getExemptionCache(request)
     const action = request.query.action
@@ -92,8 +92,9 @@ export const sameActivityDatesController = {
     const { multipleSiteDetails } = exemption
 
     if (siteIndex > 0 && multipleSiteDetails.sameActivityDates === 'yes') {
-      updateExemptionSiteDetails(
+      await updateExemptionSiteDetails(
         request,
+        h,
         siteIndex,
         'activityDates',
         exemption.siteDetails[0].activityDates
@@ -143,8 +144,9 @@ export const sameActivityDatesSubmitController = {
       return h.redirect(routes.REVIEW_SITE_DETAILS)
     }
 
-    updateExemptionMultipleSiteDetails(
+    await updateExemptionMultipleSiteDetails(
       request,
+      h,
       'sameActivityDates',
       payload.sameActivityDates
     )
@@ -155,8 +157,8 @@ export const sameActivityDatesSubmitController = {
       }
 
       if (answerChangedFromYesToNo(previousAnswer, payload)) {
-        copySameActivityDatesToAllSites(request)
-        await saveSiteDetailsToBackend(request)
+        await copySameActivityDatesToAllSites(request, h)
+        await saveSiteDetailsToBackend(request, h)
         return h.redirect(routes.REVIEW_SITE_DETAILS)
       }
     }

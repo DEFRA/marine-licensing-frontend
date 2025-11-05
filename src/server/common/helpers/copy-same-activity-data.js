@@ -3,15 +3,16 @@ import {
   updateExemptionSiteDetails
 } from '#src/server/common/helpers/session-cache/utils.js'
 
-export const copySameActivityDatesToAllSites = (request) => {
+export const copySameActivityDatesToAllSites = async (request, h) => {
   const exemption = getExemptionCache(request)
   const firstSiteDates = exemption.siteDetails[0]?.activityDates
 
   if (firstSiteDates) {
     for (const [index] of exemption.siteDetails.entries()) {
       if (index > 0) {
-        updateExemptionSiteDetails(
+        await updateExemptionSiteDetails(
           request,
+          h,
           index,
           'activityDates',
           firstSiteDates
@@ -21,15 +22,16 @@ export const copySameActivityDatesToAllSites = (request) => {
   }
 }
 
-export const copySameActivityDescriptionToAllSites = (request) => {
+export const copySameActivityDescriptionToAllSites = async (request, h) => {
   const exemption = getExemptionCache(request)
   const firstSiteDescription = exemption.siteDetails[0]?.activityDescription
 
   if (firstSiteDescription) {
     for (const [index] of exemption.siteDetails.entries()) {
       if (index > 0) {
-        updateExemptionSiteDetails(
+        await updateExemptionSiteDetails(
           request,
+          h,
           index,
           'activityDescription',
           firstSiteDescription

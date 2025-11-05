@@ -169,7 +169,7 @@ describe('Multiple sites question page', () => {
     expect(response.statusCode).toBe(statusCodes.redirect)
     expect(response.headers.location).toBe('/exemption/site-name')
 
-    expect(setExemptionCache).toHaveBeenCalledWith(expect.any(Object), {
+    expect(setExemptionCache).toHaveBeenCalledWith(expect.any(Object), expect.any(Object), {
       ...mockExemptionData,
       multipleSiteDetails: { multipleSitesEnabled: true }
     })
@@ -188,7 +188,7 @@ describe('Multiple sites question page', () => {
     expect(response.statusCode).toBe(statusCodes.redirect)
     expect(response.headers.location).toBe('/exemption/activity-dates')
 
-    expect(setExemptionCache).toHaveBeenCalledWith(expect.any(Object), {
+    expect(setExemptionCache).toHaveBeenCalledWith(expect.any(Object), expect.any(Object), {
       ...mockExemptionData,
       multipleSiteDetails: { multipleSitesEnabled: false }
     })

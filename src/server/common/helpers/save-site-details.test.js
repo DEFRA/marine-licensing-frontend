@@ -17,9 +17,11 @@ vi.mock('./session-cache/utils.js')
 
 describe('save-site-details', () => {
   const mockRequest = createMockRequest()
+  const mockH = {}
 
   beforeEach(() => {
     vi.mocked(getExemptionCache).mockReturnValue(mockFileUploadExemption)
+    vi.mocked(setExemptionCache).mockResolvedValue({})
   })
 
   describe('prepareFileUploadDataForSave', () => {
@@ -275,7 +277,7 @@ describe('save-site-details', () => {
         payload: { success: true }
       })
 
-      await saveSiteDetailsToBackend(mockRequest)
+      await saveSiteDetailsToBackend(mockRequest, mockH)
 
       expect(authenticatedPatchRequest).toHaveBeenCalledWith(
         mockRequest,
@@ -289,6 +291,7 @@ describe('save-site-details', () => {
 
       expect(vi.mocked(setExemptionCache)).toHaveBeenCalledWith(
         mockRequest,
+        mockH,
         expect.objectContaining({
           ...mockFileUploadExemption,
           siteDetails: expect.any(Array)
@@ -321,7 +324,7 @@ describe('save-site-details', () => {
         payload: { success: true }
       })
 
-      await saveSiteDetailsToBackend(mockRequest)
+      await saveSiteDetailsToBackend(mockRequest, mockH)
 
       expect(authenticatedPatchRequest).toHaveBeenCalledWith(
         mockRequest,
@@ -340,7 +343,7 @@ describe('save-site-details', () => {
         id: null
       })
 
-      await expect(saveSiteDetailsToBackend(mockRequest)).rejects.toThrow(
+      await expect(saveSiteDetailsToBackend(mockRequest, mockH)).rejects.toThrow(
         'Exemption ID is required to save site details'
       )
     })
@@ -351,7 +354,7 @@ describe('save-site-details', () => {
         siteDetails: []
       })
 
-      await expect(saveSiteDetailsToBackend(mockRequest)).rejects.toThrow(
+      await expect(saveSiteDetailsToBackend(mockRequest, mockH)).rejects.toThrow(
         'Site details are required to save'
       )
     })
@@ -360,7 +363,7 @@ describe('save-site-details', () => {
       const error = new Error('Save failed')
       vi.mocked(authenticatedPatchRequest).mockRejectedValue(error)
 
-      await expect(saveSiteDetailsToBackend(mockRequest)).rejects.toThrow(
+      await expect(saveSiteDetailsToBackend(mockRequest, mockH)).rejects.toThrow(
         'Save failed'
       )
     })

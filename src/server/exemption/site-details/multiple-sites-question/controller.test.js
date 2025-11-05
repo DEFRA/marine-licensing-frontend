@@ -44,15 +44,15 @@ describe('#multipleSitesQuestion', () => {
   })
 
   describe('#multipleSitesSubmitController', () => {
-    test('should redirect to coordinates entry choice when "no" is selected', () => {
+    test('should redirect to coordinates entry choice when "no" is selected', async () => {
       const request = {
         payload: { multipleSitesEnabled: 'no' }
       }
       const h = { redirect: vi.fn() }
 
-      multipleSitesSubmitController.handler(request, h)
+      await multipleSitesSubmitController.handler(request, h)
 
-      expect(vi.mocked(setExemptionCache)).toHaveBeenCalledWith(request, {
+      expect(vi.mocked(setExemptionCache)).toHaveBeenCalledWith(request, h, {
         ...mockExemption,
         multipleSiteDetails: { multipleSitesEnabled: false }
       })
@@ -60,16 +60,17 @@ describe('#multipleSitesQuestion', () => {
       expect(h.redirect).toHaveBeenCalledWith(routes.ACTIVITY_DATES)
     })
 
-    test('should redirect to site name when "yes" is selected', () => {
+    test('should redirect to site name when "yes" is selected', async () => {
       const request = {
         payload: { multipleSitesEnabled: 'yes' }
       }
       const h = { redirect: vi.fn() }
 
-      multipleSitesSubmitController.handler(request, h)
+      await multipleSitesSubmitController.handler(request, h)
 
       expect(vi.mocked(setExemptionCache)).toHaveBeenCalledWith(
         request,
+        h,
         expect.objectContaining({
           multipleSiteDetails: { multipleSitesEnabled: true }
         })

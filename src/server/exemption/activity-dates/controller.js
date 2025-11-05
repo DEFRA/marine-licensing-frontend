@@ -166,7 +166,7 @@ export const activityDatesSubmitController = {
       )
 
       const { siteIndex } = request.site
-      updateExemptionSiteDetails(request, siteIndex, 'activityDates', {
+      await updateExemptionSiteDetails(request, h, siteIndex, 'activityDates', {
         start,
         end
       })
@@ -179,7 +179,7 @@ export const activityDatesSubmitController = {
         : getNextRoute(exemption, request.site?.queryParams)
 
       if (action) {
-        await saveSiteDetailsToBackend(request)
+        await saveSiteDetailsToBackend(request, h)
       }
 
       return h.redirect(nextRoute)

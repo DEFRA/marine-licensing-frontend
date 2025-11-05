@@ -32,7 +32,8 @@ describe('#fileUpload', () => {
     },
     yar: {
       get: vi.fn(),
-      set: vi.fn()
+      set: vi.fn(),
+      commit: vi.fn()
     }
   })
 
@@ -178,6 +179,7 @@ describe('#fileUpload', () => {
         // Then - Should store upload config in session
         expect(updateExemptionSiteDetailsSpy).toHaveBeenCalledWith(
           mockRequest,
+          expect.any(Object),
           0,
           'uploadConfig',
           {
@@ -236,6 +238,7 @@ describe('#fileUpload', () => {
 
         expect(updateExemptionSiteDetailsSpy).toHaveBeenCalledWith(
           mockRequest,
+          expect.any(Object),
           0,
           'uploadError',
           null

@@ -41,7 +41,7 @@ describe('sameActivityDescriptionController', () => {
   })
 
   describe('GET handler', () => {
-    test('should render page with correct template and data', () => {
+    test('should render page with correct template and data', async () => {
       sameActivityDescriptionController.handler(mockRequest, mockH)
 
       expect(mockH.view).toHaveBeenCalledWith(
@@ -59,7 +59,7 @@ describe('sameActivityDescriptionController', () => {
       )
     })
 
-    test('should pre-populate form when sameActivityDescription exists in cache', () => {
+    test('should pre-populate form when sameActivityDescription exists in cache', async () => {
       const exemptionWithData = {
         ...mockExemption,
         multipleSiteDetails: {
@@ -80,7 +80,7 @@ describe('sameActivityDescriptionController', () => {
       )
     })
 
-    test('should skip page when not first site', () => {
+    test('should skip page when not first site', async () => {
       const exemptionWithData = {
         ...mockExemption,
         multipleSiteDetails: {
@@ -96,14 +96,17 @@ describe('sameActivityDescriptionController', () => {
         queryParams: '?site=1'
       }
 
-      sameActivityDescriptionController.handler(mockRequestSecondSite, mockH)
+      await sameActivityDescriptionController.handler(
+        mockRequestSecondSite,
+        mockH
+      )
 
       expect(mockH.redirect).toHaveBeenCalledWith(
         '/exemption/activity-description?site=1'
       )
     })
 
-    test('should skip page and automatically update activity dates when not first site', () => {
+    test('should skip page and automatically update activity dates when not first site', async () => {
       const exemptionWithData = {
         ...mockExemption,
         multipleSiteDetails: {
@@ -119,10 +122,14 @@ describe('sameActivityDescriptionController', () => {
         queryParams: '?site=1'
       }
 
-      sameActivityDescriptionController.handler(mockRequestSecondSite, mockH)
+      await sameActivityDescriptionController.handler(
+        mockRequestSecondSite,
+        mockH
+      )
 
       expect(updateExemptionSiteDetails).toHaveBeenCalledWith(
         mockRequestSecondSite,
+        mockH,
         1,
         'activityDescription',
         'Test description'
@@ -158,7 +165,7 @@ describe('sameActivityDescriptionController', () => {
   })
 
   describe('POST handler', () => {
-    test('should update cache and redirect to coordinates entry choice when "yes" is selected', () => {
+    test('should update cache and redirect to coordinates entry choice when "yes" is selected', async () => {
       const requestWithPayload = {
         ...mockRequest,
         payload: {
@@ -166,10 +173,14 @@ describe('sameActivityDescriptionController', () => {
         }
       }
 
-      sameActivityDescriptionSubmitController.handler(requestWithPayload, mockH)
+      await sameActivityDescriptionSubmitController.handler(
+        requestWithPayload,
+        mockH
+      )
 
       expect(updateExemptionMultipleSiteDetails).toHaveBeenCalledWith(
         requestWithPayload,
+        mockH,
         'sameActivityDescription',
         'yes'
       )
@@ -179,7 +190,7 @@ describe('sameActivityDescriptionController', () => {
       expect(mockH.redirect).toHaveBeenCalledWith(routes.ACTIVITY_DESCRIPTION)
     })
 
-    test('should update cache and redirect to coordinates entry choice when "no" is selected', () => {
+    test('should update cache and redirect to coordinates entry choice when "no" is selected', async () => {
       const requestWithPayload = {
         ...mockRequest,
         payload: {
@@ -187,10 +198,14 @@ describe('sameActivityDescriptionController', () => {
         }
       }
 
-      sameActivityDescriptionSubmitController.handler(requestWithPayload, mockH)
+      await sameActivityDescriptionSubmitController.handler(
+        requestWithPayload,
+        mockH
+      )
 
       expect(updateExemptionMultipleSiteDetails).toHaveBeenCalledWith(
         requestWithPayload,
+        mockH,
         'sameActivityDescription',
         'no'
       )
@@ -246,6 +261,7 @@ describe('sameActivityDescriptionController', () => {
 
       expect(updateExemptionMultipleSiteDetails).toHaveBeenCalledWith(
         requestWithPayload,
+        mockH,
         'sameActivityDescription',
         'yes'
       )
@@ -280,12 +296,14 @@ describe('sameActivityDescriptionController', () => {
 
       expect(updateExemptionMultipleSiteDetails).toHaveBeenCalledWith(
         requestWithPayload,
+        mockH,
         'sameActivityDescription',
         'no'
       )
 
       expect(updateExemptionSiteDetails).toHaveBeenCalledWith(
         requestWithPayload,
+        mockH,
         1,
         'activityDescription',
         'Shared description'
@@ -293,12 +311,16 @@ describe('sameActivityDescriptionController', () => {
 
       expect(updateExemptionSiteDetails).toHaveBeenCalledWith(
         requestWithPayload,
+        mockH,
         2,
         'activityDescription',
         'Shared description'
       )
 
-      expect(saveSiteDetailsToBackend).toHaveBeenCalledWith(requestWithPayload)
+      expect(saveSiteDetailsToBackend).toHaveBeenCalledWith(
+        requestWithPayload,
+        mockH
+      )
 
       expect(mockH.redirect).toHaveBeenCalledWith(routes.REVIEW_SITE_DETAILS)
     })
@@ -461,6 +483,7 @@ describe('sameActivityDescriptionController', () => {
 
       expect(updateExemptionMultipleSiteDetails).toHaveBeenCalledWith(
         mockRequest,
+        h,
         'sameActivityDescription',
         'yes'
       )

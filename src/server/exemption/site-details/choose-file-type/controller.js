@@ -79,11 +79,12 @@ export const chooseFileTypeSubmitController = {
       }
     }
   },
-  handler(request, h) {
+  async handler(request, h) {
     const { payload } = request
 
-    updateExemptionSiteDetails(
+    await updateExemptionSiteDetails(
       request,
+      h,
       0,
       'fileUploadType',
       payload.fileUploadType

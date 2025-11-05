@@ -65,7 +65,7 @@ describe('#taskListController', () => {
     delete exemptionWithoutTaskList.taskList
     delete exemptionWithoutTaskList.mcmsContext
 
-    expect(setExemptionCache).toHaveBeenCalledWith({}, exemptionWithoutTaskList)
+    expect(setExemptionCache).toHaveBeenCalledWith(expect.any(Object), expect.any(Object), exemptionWithoutTaskList)
 
     expect(h.view).toHaveBeenCalledWith(TASK_LIST_VIEW_ROUTE, {
       pageTitle: 'Task list',
@@ -156,7 +156,7 @@ describe('#taskListController', () => {
 
     expect(clearExemptionCache).toHaveBeenCalled()
 
-    expect(setExemptionCache).toHaveBeenCalledWith(expect.any(Object), {
+    expect(setExemptionCache).toHaveBeenCalledWith(expect.any(Object), expect.any(Object), {
       id: 'abc123'
     })
 

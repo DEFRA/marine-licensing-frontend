@@ -253,7 +253,7 @@ describe('#projectName', () => {
 
       await projectNameSubmitController.handler(mockRequest, h)
 
-      expect(cacheUtils.setExemptionCache).toHaveBeenCalledWith(mockRequest, {
+      expect(cacheUtils.setExemptionCache).toHaveBeenCalledWith(mockRequest, expect.any(Object), {
         projectName: 'Project name'
       })
     })

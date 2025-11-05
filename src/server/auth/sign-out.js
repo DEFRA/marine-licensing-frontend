@@ -19,7 +19,7 @@ export const signOutController = {
 
     removeUserSession(request, request.auth.credentials)
 
-    clearExemptionCache(request)
+    await clearExemptionCache(request, h)
 
     const referrer = `${config.get('defraId.redirectUrl')}${routes.PROJECT_NAME}`
     const { idToken } = userSession

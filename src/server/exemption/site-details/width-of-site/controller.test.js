@@ -289,12 +289,13 @@ describe('#widthOfSite', () => {
 
       expect(cacheUtils.updateExemptionSiteDetails).toHaveBeenCalledWith(
         mockRequest,
+        h,
         0,
         'circleWidth',
         '50'
       )
 
-      expect(saveSiteDetailsToBackend).toHaveBeenCalledWith(mockRequest)
+      expect(saveSiteDetailsToBackend).toHaveBeenCalledWith(mockRequest, h)
     })
 
     test('Should correctly set the cache when submitting', async () => {
@@ -315,11 +316,12 @@ describe('#widthOfSite', () => {
 
       expect(cacheUtils.updateExemptionSiteDetails).toHaveBeenCalledWith(
         mockRequest,
+        h,
         0,
         'circleWidth',
         'single'
       )
-      expect(saveSiteDetailsToBackend).toHaveBeenCalledWith(mockRequest)
+      expect(saveSiteDetailsToBackend).toHaveBeenCalledWith(mockRequest, h)
     })
   })
 })

@@ -124,8 +124,9 @@ export const widthOfSiteSubmitController = {
     const { siteIndex, siteNumber, queryParams } = request.site
     const action = request.query.action
 
-    updateExemptionSiteDetails(
+    await updateExemptionSiteDetails(
       request,
+      h,
       siteIndex,
       'circleWidth',
       payload.width.trim()
@@ -135,7 +136,7 @@ export const widthOfSiteSubmitController = {
       ? `${routes.REVIEW_SITE_DETAILS}#site-details-${siteNumber}`
       : routes.REVIEW_SITE_DETAILS + queryParams
 
-    await saveSiteDetailsToBackend(request)
+    await saveSiteDetailsToBackend(request, h)
 
     return h.redirect(nextRoute)
   }

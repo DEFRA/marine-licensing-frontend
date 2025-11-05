@@ -101,7 +101,7 @@ export const publicRegisterSubmitController = {
         id: exemption.id
       })
 
-      setExemptionCache(request, {
+      await setExemptionCache(request, h, {
         ...exemption,
         publicRegister: {
           consent: payload.consent,

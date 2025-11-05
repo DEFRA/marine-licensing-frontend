@@ -130,14 +130,14 @@ export const siteNameSubmitController = {
     const { queryParams, siteIndex, siteNumber } = site
     const action = request.query.action
 
-    updateExemptionSiteDetails(request, siteIndex, 'siteName', payload.siteName)
+    await updateExemptionSiteDetails(request, h, siteIndex, 'siteName', payload.siteName)
 
     const redirectRoute = action
       ? `${routes.REVIEW_SITE_DETAILS}#site-details-${siteNumber}`
       : routes.SAME_ACTIVITY_DATES + queryParams
 
     if (action) {
-      await saveSiteDetailsToBackend(request)
+      await saveSiteDetailsToBackend(request, h)
     }
 
     return h.redirect(redirectRoute)

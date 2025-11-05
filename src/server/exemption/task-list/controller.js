@@ -56,7 +56,7 @@ export const taskListController = {
       (task) => task.status.text === 'Completed'
     )
 
-    setExemptionCache(request, {
+    await setExemptionCache(request, h, {
       id: exemptionId,
       projectName,
       publicRegister,
@@ -73,10 +73,10 @@ export const taskListController = {
   }
 }
 export const taskListSelectExemptionController = {
-  handler(request, h) {
+  async handler(request, h) {
     const { exemptionId } = request.params
-    clearExemptionCache(request)
-    setExemptionCache(request, { id: exemptionId })
+    await clearExemptionCache(request, h)
+    await setExemptionCache(request, h, { id: exemptionId })
     return h.redirect(routes.TASK_LIST)
   }
 }

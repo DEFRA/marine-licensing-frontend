@@ -23,6 +23,7 @@ describe('#coordinateSystem', () => {
   let getExemptionCacheSpy
 
   vi.mocked(cacheUtils.setSavedSiteDetails)
+  vi.mocked(cacheUtils.updateExemptionSiteDetails)
 
   beforeEach(() => {
     getExemptionCacheSpy = vi
@@ -426,13 +427,14 @@ describe('#coordinateSystem', () => {
 
       expect(cacheUtils.updateExemptionSiteDetails).toHaveBeenCalledWith(
         request,
+        h,
         0,
         'coordinateSystem',
         'wgs84'
       )
     })
 
-    test('coordinateSystemSubmitController handler should submit correctly when using a change link when data is the same', () => {
+    test('coordinateSystemSubmitController handler should submit correctly when using a change link when data is the same', async () => {
       getExemptionCacheSpy.mockReturnValueOnce({
         projectName: mockExemption.projectName,
         multipleSiteDetails: { multipleSitesEnabled: true }
@@ -445,14 +447,14 @@ describe('#coordinateSystem', () => {
         site: mockSite
       })
 
-      coordinateSystemSubmitController.handler(request, h)
+      await coordinateSystemSubmitController.handler(request, h)
 
       expect(h.redirect).toHaveBeenCalledWith(
         routes.REVIEW_SITE_DETAILS + '#site-details-1'
       )
     })
 
-    test('coordinateSystemSubmitController handler should submit correctly when using a change link when data is different for multiple coordinates', () => {
+    test('coordinateSystemSubmitController handler should submit correctly when using a change link when data is different for multiple coordinates', async () => {
       getExemptionCacheSpy.mockReturnValueOnce({
         projectName: mockExemption.projectName,
         multipleSiteDetails: { multipleSitesEnabled: true },
@@ -471,14 +473,14 @@ describe('#coordinateSystem', () => {
         savedSiteDetails: { originalCoordinateSystem: 'osgb36' }
       })
 
-      coordinateSystemSubmitController.handler(request, h)
+      await coordinateSystemSubmitController.handler(request, h)
 
       expect(h.redirect).toHaveBeenCalledWith(
         routes.CIRCLE_CENTRE_POINT + '?site=1&action=change'
       )
     })
 
-    test('coordinateSystemSubmitController handler should submit correctly when using a change link when data is different for single coordinates', () => {
+    test('coordinateSystemSubmitController handler should submit correctly when using a change link when data is different for single coordinates', async () => {
       getExemptionCacheSpy.mockReturnValueOnce({
         projectName: mockExemption.projectName,
         multipleSiteDetails: { multipleSitesEnabled: true },
@@ -497,7 +499,7 @@ describe('#coordinateSystem', () => {
         savedSiteDetails: { originalCoordinateSystem: 'osgb36' }
       })
 
-      coordinateSystemSubmitController.handler(request, h)
+      await coordinateSystemSubmitController.handler(request, h)
 
       expect(h.redirect).toHaveBeenCalledWith(
         routes.CIRCLE_CENTRE_POINT + '?site=1&action=change'

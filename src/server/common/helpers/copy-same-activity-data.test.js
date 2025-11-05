@@ -9,13 +9,15 @@ vi.mock('~/src/server/common/helpers/session-cache/utils.js')
 
 describe('copy-same-activity-data', () => {
   const mockRequest = {}
+  const mockH = {}
 
   beforeEach(() => {
     vi.clearAllMocks()
+    vi.mocked(cacheUtils.updateExemptionSiteDetails).mockResolvedValue({})
   })
 
   describe('copySameActivityDatesToAllSites', () => {
-    test('should copy activity dates from first site to all other sites', () => {
+    test('should copy activity dates from first site to all other sites', async () => {
       const mockExemption = {
         siteDetails: [
           { activityDates: { start: '2024-01-01', end: '2024-12-31' } },
@@ -26,24 +28,26 @@ describe('copy-same-activity-data', () => {
 
       vi.mocked(cacheUtils.getExemptionCache).mockReturnValue(mockExemption)
 
-      copySameActivityDatesToAllSites(mockRequest)
+      await copySameActivityDatesToAllSites(mockRequest, mockH)
 
       expect(cacheUtils.updateExemptionSiteDetails).toHaveBeenCalledTimes(2)
       expect(cacheUtils.updateExemptionSiteDetails).toHaveBeenCalledWith(
         mockRequest,
+        mockH,
         1,
         'activityDates',
         { start: '2024-01-01', end: '2024-12-31' }
       )
       expect(cacheUtils.updateExemptionSiteDetails).toHaveBeenCalledWith(
         mockRequest,
+        mockH,
         2,
         'activityDates',
         { start: '2024-01-01', end: '2024-12-31' }
       )
     })
 
-    test('should handle single site without copying', () => {
+    test('should handle single site without copying', async () => {
       const mockExemption = {
         siteDetails: [
           { activityDates: { start: '2024-01-01', end: '2024-12-31' } }
@@ -52,24 +56,24 @@ describe('copy-same-activity-data', () => {
 
       vi.mocked(cacheUtils.getExemptionCache).mockReturnValue(mockExemption)
 
-      copySameActivityDatesToAllSites(mockRequest)
+      await copySameActivityDatesToAllSites(mockRequest, mockH)
 
       expect(cacheUtils.updateExemptionSiteDetails).not.toHaveBeenCalled()
     })
 
-    test('should handle missing first site dates gracefully', () => {
+    test('should handle missing first site dates gracefully', async () => {
       const mockExemption = {
         siteDetails: [{ activityDates: null }, { activityDates: null }]
       }
 
       vi.mocked(cacheUtils.getExemptionCache).mockReturnValue(mockExemption)
 
-      copySameActivityDatesToAllSites(mockRequest)
+      await copySameActivityDatesToAllSites(mockRequest, mockH)
 
       expect(cacheUtils.updateExemptionSiteDetails).not.toHaveBeenCalled()
     })
 
-    test('should copy dates to multiple sites correctly', () => {
+    test('should copy dates to multiple sites correctly', async () => {
       const mockExemption = {
         siteDetails: [
           { activityDates: { start: '2024-01-01', end: '2024-12-31' } },
@@ -81,12 +85,13 @@ describe('copy-same-activity-data', () => {
 
       vi.mocked(cacheUtils.getExemptionCache).mockReturnValue(mockExemption)
 
-      copySameActivityDatesToAllSites(mockRequest)
+      await copySameActivityDatesToAllSites(mockRequest, mockH)
 
       expect(cacheUtils.updateExemptionSiteDetails).toHaveBeenCalledTimes(3)
       expect(cacheUtils.updateExemptionSiteDetails).toHaveBeenNthCalledWith(
         1,
         mockRequest,
+        mockH,
         1,
         'activityDates',
         { start: '2024-01-01', end: '2024-12-31' }
@@ -94,6 +99,7 @@ describe('copy-same-activity-data', () => {
       expect(cacheUtils.updateExemptionSiteDetails).toHaveBeenNthCalledWith(
         2,
         mockRequest,
+        mockH,
         2,
         'activityDates',
         { start: '2024-01-01', end: '2024-12-31' }
@@ -101,6 +107,7 @@ describe('copy-same-activity-data', () => {
       expect(cacheUtils.updateExemptionSiteDetails).toHaveBeenNthCalledWith(
         3,
         mockRequest,
+        mockH,
         3,
         'activityDates',
         { start: '2024-01-01', end: '2024-12-31' }
@@ -109,7 +116,7 @@ describe('copy-same-activity-data', () => {
   })
 
   describe('copySameActivityDescriptionToAllSites', () => {
-    test('should copy activity description from first site to all other sites', () => {
+    test('should copy activity description from first site to all other sites', async () => {
       const mockExemption = {
         siteDetails: [
           { activityDescription: 'Shared description' },
@@ -120,36 +127,38 @@ describe('copy-same-activity-data', () => {
 
       vi.mocked(cacheUtils.getExemptionCache).mockReturnValue(mockExemption)
 
-      copySameActivityDescriptionToAllSites(mockRequest)
+      await copySameActivityDescriptionToAllSites(mockRequest, mockH)
 
       expect(cacheUtils.updateExemptionSiteDetails).toHaveBeenCalledTimes(2)
       expect(cacheUtils.updateExemptionSiteDetails).toHaveBeenCalledWith(
         mockRequest,
+        mockH,
         1,
         'activityDescription',
         'Shared description'
       )
       expect(cacheUtils.updateExemptionSiteDetails).toHaveBeenCalledWith(
         mockRequest,
+        mockH,
         2,
         'activityDescription',
         'Shared description'
       )
     })
 
-    test('should handle single site without copying', () => {
+    test('should handle single site without copying', async () => {
       const mockExemption = {
         siteDetails: [{ activityDescription: 'Shared description' }]
       }
 
       vi.mocked(cacheUtils.getExemptionCache).mockReturnValue(mockExemption)
 
-      copySameActivityDescriptionToAllSites(mockRequest)
+      await copySameActivityDescriptionToAllSites(mockRequest, mockH)
 
       expect(cacheUtils.updateExemptionSiteDetails).not.toHaveBeenCalled()
     })
 
-    test('should handle missing first site description gracefully', () => {
+    test('should handle missing first site description gracefully', async () => {
       const mockExemption = {
         siteDetails: [
           { activityDescription: null },
@@ -159,24 +168,24 @@ describe('copy-same-activity-data', () => {
 
       vi.mocked(cacheUtils.getExemptionCache).mockReturnValue(mockExemption)
 
-      copySameActivityDescriptionToAllSites(mockRequest)
+      await copySameActivityDescriptionToAllSites(mockRequest, mockH)
 
       expect(cacheUtils.updateExemptionSiteDetails).not.toHaveBeenCalled()
     })
 
-    test('should handle empty first site gracefully', () => {
+    test('should handle empty first site gracefully', async () => {
       const mockExemption = {
         siteDetails: [undefined, { activityDescription: null }]
       }
 
       vi.mocked(cacheUtils.getExemptionCache).mockReturnValue(mockExemption)
 
-      copySameActivityDescriptionToAllSites(mockRequest)
+      await copySameActivityDescriptionToAllSites(mockRequest, mockH)
 
       expect(cacheUtils.updateExemptionSiteDetails).not.toHaveBeenCalled()
     })
 
-    test('should copy description to multiple sites correctly', () => {
+    test('should copy description to multiple sites correctly', async () => {
       const mockExemption = {
         siteDetails: [
           { activityDescription: 'New description' },
@@ -188,12 +197,13 @@ describe('copy-same-activity-data', () => {
 
       vi.mocked(cacheUtils.getExemptionCache).mockReturnValue(mockExemption)
 
-      copySameActivityDescriptionToAllSites(mockRequest)
+      await copySameActivityDescriptionToAllSites(mockRequest, mockH)
 
       expect(cacheUtils.updateExemptionSiteDetails).toHaveBeenCalledTimes(3)
       expect(cacheUtils.updateExemptionSiteDetails).toHaveBeenNthCalledWith(
         1,
         mockRequest,
+        mockH,
         1,
         'activityDescription',
         'New description'
@@ -201,6 +211,7 @@ describe('copy-same-activity-data', () => {
       expect(cacheUtils.updateExemptionSiteDetails).toHaveBeenNthCalledWith(
         2,
         mockRequest,
+        mockH,
         2,
         'activityDescription',
         'New description'
@@ -208,6 +219,7 @@ describe('copy-same-activity-data', () => {
       expect(cacheUtils.updateExemptionSiteDetails).toHaveBeenNthCalledWith(
         3,
         mockRequest,
+        mockH,
         3,
         'activityDescription',
         'New description'

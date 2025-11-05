@@ -22,6 +22,8 @@ describe('#coordinateSystem', () => {
   const getServer = setupTestServer()
   let getExemptionCacheSpy
 
+  vi.mocked(cacheUtils.setSavedSiteDetails)
+
   beforeEach(() => {
     getExemptionCacheSpy = vi
       .spyOn(cacheUtils, 'getExemptionCache')
@@ -29,7 +31,7 @@ describe('#coordinateSystem', () => {
   })
 
   describe('#coordinateSystemController', () => {
-    test('should render with correct context with no existing data', () => {
+    test('should render with correct context with no existing data', async () => {
       getExemptionCacheSpy.mockReturnValueOnce({})
       const h = { view: vi.fn() }
 
@@ -39,7 +41,8 @@ describe('#coordinateSystem', () => {
           siteDetails: {}
         }
       })
-      coordinateSystemController.handler(request, h)
+
+      await coordinateSystemController.handler(request, h)
 
       expect(h.view).toHaveBeenCalledWith(COORDINATE_SYSTEM_VIEW_ROUTE, {
         pageTitle: 'Which coordinate system do you want to use?',
@@ -109,7 +112,7 @@ describe('#coordinateSystem', () => {
       expect(statusCode).toBe(statusCodes.ok)
     })
 
-    test('should use Review Site Details back link when coordinateSystem has value in action mode', () => {
+    test('should use Review Site Details back link when coordinateSystem has value in action mode', async () => {
       getExemptionCacheSpy.mockReturnValueOnce({
         projectName: 'Test Project',
         siteDetails: [{ coordinateSystem: 'wgs84' }]
@@ -126,7 +129,7 @@ describe('#coordinateSystem', () => {
         }
       })
 
-      coordinateSystemController.handler(request, h)
+      await coordinateSystemController.handler(request, h)
 
       expect(h.view).toHaveBeenCalledWith(COORDINATE_SYSTEM_VIEW_ROUTE, {
         pageTitle: 'Which coordinate system do you want to use?',
@@ -140,7 +143,7 @@ describe('#coordinateSystem', () => {
       })
     })
 
-    test('coordinateSystemController handler should render correctly when using a change link', () => {
+    test('coordinateSystemController handler should render correctly when using a change link', async () => {
       getExemptionCacheSpy.mockReturnValueOnce({
         projectName: mockExemption.projectName,
         multipleSiteDetails: { multipleSitesEnabled: true }
@@ -156,7 +159,7 @@ describe('#coordinateSystem', () => {
         }
       })
 
-      coordinateSystemController.handler(request, h)
+      await coordinateSystemController.handler(request, h)
 
       expect(h.view).toHaveBeenCalledWith(COORDINATE_SYSTEM_VIEW_ROUTE, {
         pageTitle: 'Which coordinate system do you want to use?',
@@ -170,7 +173,7 @@ describe('#coordinateSystem', () => {
       })
     })
 
-    test('coordinateSystemController handler should render back to coordinates entry when originalCoordinatesEntry exists', () => {
+    test('coordinateSystemController handler should render back to coordinates entry when originalCoordinatesEntry exists', async () => {
       getExemptionCacheSpy.mockReturnValueOnce({
         projectName: mockExemption.projectName,
         multipleSiteDetails: { multipleSitesEnabled: true }
@@ -188,7 +191,7 @@ describe('#coordinateSystem', () => {
 
       request.yar.get.mockReturnValue({ originalCoordinatesEntry: 'single' })
 
-      coordinateSystemController.handler(request, h)
+      await coordinateSystemController.handler(request, h)
 
       expect(h.view).toHaveBeenCalledWith(COORDINATE_SYSTEM_VIEW_ROUTE, {
         pageTitle: 'Which coordinate system do you want to use?',

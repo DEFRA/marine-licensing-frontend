@@ -8,7 +8,10 @@ import {
   setExemptionCache,
   updateExemptionSiteDetails,
   updateExemptionSiteDetailsBatch,
-  updateExemptionMultipleSiteDetails
+  updateExemptionMultipleSiteDetails,
+  clearSavedSiteDetails,
+  SAVED_SITE_DETAILS_CACHE_KEY,
+  setSavedSiteDetails
 } from '#src/server/common/helpers/session-cache/utils.js'
 
 vi.mock('@hapi/hoek', () => ({
@@ -615,6 +618,43 @@ describe('#utils', () => {
         siteDetails: []
       })
       expect(result).toEqual({ siteDetails: null })
+    })
+  })
+
+  describe('clearSavedSiteDetails', () => {
+    test('should clear the value in cache', async () => {
+      const mockRequest = {
+        yar: {
+          clear: vi.fn(),
+          commit: vi.fn()
+        }
+      }
+
+      await clearSavedSiteDetails(mockRequest)
+
+      expect(mockRequest.yar.clear).toHaveBeenCalledWith(
+        SAVED_SITE_DETAILS_CACHE_KEY
+      )
+      expect(mockRequest.yar.commit).toHaveBeenCalled()
+    })
+  })
+
+  describe('setSavedSiteDetails', () => {
+    test('should update the value in cache', async () => {
+      const mockRequest = {
+        yar: {
+          set: vi.fn(),
+          commit: vi.fn()
+        }
+      }
+
+      await setSavedSiteDetails(mockRequest)
+
+      expect(mockRequest.yar.set).toHaveBeenCalledWith(
+        SAVED_SITE_DETAILS_CACHE_KEY,
+        {}
+      )
+      expect(mockRequest.yar.commit).toHaveBeenCalled()
     })
   })
 })

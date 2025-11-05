@@ -1,5 +1,6 @@
 import {
   getExemptionCache,
+  setSavedSiteDetails,
   updateExemptionSiteDetails
 } from '#src/server/common/helpers/session-cache/utils.js'
 import { getSiteDetailsBySite } from '#src/server/common/helpers/session-cache/site-details-utils.js'
@@ -33,7 +34,7 @@ export const coordinatesEntryController = {
   options: {
     pre: [setSiteDataPreHandler]
   },
-  handler(request, h) {
+  async handler(request, h) {
     const exemption = getExemptionCache(request)
     const { site } = request
     const { siteIndex, siteNumber } = site
@@ -51,7 +52,7 @@ export const coordinatesEntryController = {
         savedSiteDetails.originalCoordinateSystem = siteDetails.coordinateSystem
       }
 
-      request.yar.set('savedSiteDetails', savedSiteDetails)
+      await setSavedSiteDetails(request, h, savedSiteDetails)
     }
 
     return h.view(COORDINATES_ENTRY_VIEW_ROUTE, {

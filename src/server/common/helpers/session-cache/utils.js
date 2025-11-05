@@ -1,6 +1,9 @@
 import { clone } from '@hapi/hoek'
 import { getSiteDetailsBySite } from '#src/server/common/helpers/session-cache/site-details-utils.js'
+
 export const EXEMPTION_CACHE_KEY = 'exemption'
+export const SAVED_SITE_DETAILS_CACHE_KEY = 'savedSiteDetails'
+
 export const clearExemptionCache = (request) => {
   request.yar.clear(EXEMPTION_CACHE_KEY)
 }
@@ -126,4 +129,20 @@ export const updateExemptionSiteDetailsBatch = (
   })
 
   return updatedSiteDetails
+}
+
+export const clearSavedSiteDetails = async (request, h) => {
+  request.yar.clear(SAVED_SITE_DETAILS_CACHE_KEY)
+
+  await request.yar.commit(h)
+}
+
+export const setSavedSiteDetails = async (request, h, value) => {
+  const cacheValue = value || {}
+
+  request.yar.set(SAVED_SITE_DETAILS_CACHE_KEY, cacheValue)
+
+  await request.yar.commit(h)
+
+  return cacheValue
 }

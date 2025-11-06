@@ -1,4 +1,4 @@
-export const getSiteNumber = (exemption, request, h) => {
+export const getSiteNumber = (exemption, request) => {
   const { siteDetails } = exemption || {}
   const urlSiteIndex = request?.query?.site
 

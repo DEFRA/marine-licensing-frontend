@@ -3,7 +3,7 @@ import { getExemptionCache } from '#src/server/common/helpers/session-cache/util
 import { getSiteNumber } from '#src/server/exemption/site-details/utils/site-number.js'
 import { routes } from '#src/server/common/constants/routes.js'
 
-export const setSiteData = (request, h) => {
+export const setSiteData = (request) => {
   const exemption = getExemptionCache(request)
 
   const siteNumber = getSiteNumber(exemption, request)

@@ -199,7 +199,13 @@ async function storeUploadError(request, h, errorDetails, fileType) {
   await clearUploadSession(request, h)
 }
 
-async function storeSuccessfulUpload(request, h, status, coordinateData, s3Location) {
+async function storeSuccessfulUpload(
+  request,
+  h,
+  status,
+  coordinateData,
+  s3Location
+) {
   await updateExemptionMultipleSiteDetails(
     request,
     h,
@@ -223,7 +229,12 @@ function handleProcessingStatus(status, exemption, h) {
 }
 
 async function handleReadyStatus(status, uploadConfig, request, h) {
-  const validationResult = await validateUploadedFile(status, uploadConfig, request, h)
+  const validationResult = await validateUploadedFile(
+    status,
+    uploadConfig,
+    request,
+    h
+  )
   if (!validationResult.isValid) {
     return h.redirect(routes.FILE_UPLOAD)
   }
@@ -262,7 +273,13 @@ const processValidatedFile = async (status, uploadConfig, request, h) => {
 
     return h.redirect(routes.ACTIVITY_DATES)
   } catch (error) {
-    await handleGeoParserError(request, h, error, status.filename, uploadConfig.fileType)
+    await handleGeoParserError(
+      request,
+      h,
+      error,
+      status.filename,
+      uploadConfig.fileType
+    )
     return h.redirect(routes.FILE_UPLOAD)
   }
 }
@@ -278,7 +295,10 @@ const extractAndStoreCoordinates = async (status, uploadConfig, request, h) => {
     s3Key,
     uploadConfig.fileType
   )
-  await storeSuccessfulUpload(request, h, status, coordinateData, { s3Bucket, s3Key })
+  await storeSuccessfulUpload(request, h, status, coordinateData, {
+    s3Bucket,
+    s3Key
+  })
 
   return coordinateData
 }

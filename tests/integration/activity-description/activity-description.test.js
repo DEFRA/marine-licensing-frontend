@@ -213,7 +213,10 @@ describe('Activity description - page structure & accessibility', () => {
       'Test activity description for site'
     )
 
-    expect(saveSiteDetailsToBackend).toHaveBeenCalledWith(expect.any(Object), expect.any(Object))
+    expect(saveSiteDetailsToBackend).toHaveBeenCalledWith(
+      expect.any(Object),
+      expect.any(Object)
+    )
   })
 
   test('should redirect to correct page after submit when action parameter is present for specific site', async () => {
@@ -242,6 +245,9 @@ describe('Activity description - page structure & accessibility', () => {
       'activityDescription',
       'Updated activity description for site 2'
     )
-    expect(saveSiteDetailsToBackend).toHaveBeenCalledWith(expect.any(Object), expect.any(Object))
+    expect(saveSiteDetailsToBackend).toHaveBeenCalledWith(
+      expect.any(Object),
+      expect.any(Object)
+    )
   })
 })

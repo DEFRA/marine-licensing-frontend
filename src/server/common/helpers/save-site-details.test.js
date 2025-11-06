@@ -343,9 +343,9 @@ describe('save-site-details', () => {
         id: null
       })
 
-      await expect(saveSiteDetailsToBackend(mockRequest, mockH)).rejects.toThrow(
-        'Exemption ID is required to save site details'
-      )
+      await expect(
+        saveSiteDetailsToBackend(mockRequest, mockH)
+      ).rejects.toThrow('Exemption ID is required to save site details')
     })
 
     test('should throw error when site details are missing', async () => {
@@ -354,18 +354,18 @@ describe('save-site-details', () => {
         siteDetails: []
       })
 
-      await expect(saveSiteDetailsToBackend(mockRequest, mockH)).rejects.toThrow(
-        'Site details are required to save'
-      )
+      await expect(
+        saveSiteDetailsToBackend(mockRequest, mockH)
+      ).rejects.toThrow('Site details are required to save')
     })
 
     test('should handle save failure and log error', async () => {
       const error = new Error('Save failed')
       vi.mocked(authenticatedPatchRequest).mockRejectedValue(error)
 
-      await expect(saveSiteDetailsToBackend(mockRequest, mockH)).rejects.toThrow(
-        'Save failed'
-      )
+      await expect(
+        saveSiteDetailsToBackend(mockRequest, mockH)
+      ).rejects.toThrow('Save failed')
     })
   })
 })

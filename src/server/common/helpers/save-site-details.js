@@ -103,7 +103,10 @@ export const saveSiteDetailsToBackend = async (request, h) => {
       id: exemption.id
     })
 
-    await setExemptionCache(request, h, { ...exemption, siteDetails: dataToSave })
+    await setExemptionCache(request, h, {
+      ...exemption,
+      siteDetails: dataToSave
+    })
 
     request.logger.info(
       {

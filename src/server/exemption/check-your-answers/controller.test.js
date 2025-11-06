@@ -63,7 +63,10 @@ describe('check your answers controller', () => {
           userEmail: mockUserSession.email
         }
       )
-      expect(clearExemptionCache).toHaveBeenCalledWith(expect.any(Object), expect.any(Object))
+      expect(clearExemptionCache).toHaveBeenCalledWith(
+        expect.any(Object),
+        expect.any(Object)
+      )
     })
 
     test('Should handle missing exemption data on POST', async () => {
@@ -135,7 +138,10 @@ describe('check your answers controller', () => {
       expect(headers.location).toBe(
         '/exemption/confirmation?applicationReference=undefined'
       )
-      expect(clearExemptionCache).toHaveBeenCalledWith(expect.any(Object), expect.any(Object))
+      expect(clearExemptionCache).toHaveBeenCalledWith(
+        expect.any(Object),
+        expect.any(Object)
+      )
     })
 
     test('Should handle API response with wrong message type', async () => {

@@ -87,16 +87,7 @@ export const reviewSiteDetailsSubmitController = {
     const siteDetails = completeExemption.siteDetails
 
     if (payload?.add) {
-      const updatedSiteDetails = [
-        ...siteDetails,
-        { coordinatesType: siteDetails[0].coordinatesType }
-      ]
-      await setExemptionCache(request, h, {
-        ...completeExemption,
-        siteDetails: updatedSiteDetails
-      })
-
-      return h.redirect(`${routes.SITE_NAME}?site=${updatedSiteDetails.length}`)
+      return h.redirect(`${routes.SITE_NAME}?site=${siteDetails.length + 1}`)
     }
 
     resetExemptionSiteDetails(request)

@@ -181,7 +181,13 @@ export const centreCoordinatesSubmitController = {
       return centreCoordinatesSubmitFailHandler(request, h, error)
     }
 
-    await updateExemptionSiteDetails(request, h, siteIndex, 'coordinates', value)
+    await updateExemptionSiteDetails(
+      request,
+      h,
+      siteIndex,
+      'coordinates',
+      value
+    )
 
     const hasCircleWidthEntry = siteDetails.circleWidth
 

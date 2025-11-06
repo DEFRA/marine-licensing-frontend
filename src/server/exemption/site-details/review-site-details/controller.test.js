@@ -360,20 +360,6 @@ describe('#reviewSiteDetails', () => {
           formData: { add: true }
         })
 
-        expect(cacheUtils.setExemptionCache).toHaveBeenCalledWith(
-          expect.any(Object),
-          expect.any(Object),
-          {
-            ...mockExemption,
-            siteDetails: [
-              ...mockExemption.siteDetails,
-              {
-                coordinatesType: 'coordinates'
-              }
-            ]
-          }
-        )
-
         expect(statusCode).toBe(statusCodes.redirect)
         expect(headers.location).toBe(`${routes.SITE_NAME}?site=3`)
       })

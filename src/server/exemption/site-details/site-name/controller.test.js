@@ -19,8 +19,6 @@ vi.mock('~/src/server/common/helpers/save-site-details.js')
 describe('#siteName', () => {
   let getExemptionCacheSpy
 
-  const sitePreHandlerHook = siteNameController.options.pre[0]
-
   beforeEach(() => {
     getExemptionCacheSpy = vi
       .spyOn(cacheUtils, 'getExemptionCache')
@@ -42,8 +40,6 @@ describe('#siteName', () => {
         ]
       })
 
-      sitePreHandlerHook.method(request, h)
-
       siteNameController.handler(request, h)
 
       expect(h.view).toHaveBeenCalledWith(SITE_NAME_VIEW_ROUTE, {
@@ -62,7 +58,6 @@ describe('#siteName', () => {
       const h = { view: vi.fn() }
       const request = createMockRequest({ query: { action: 'add' } })
 
-      sitePreHandlerHook.method(request, h)
       siteNameController.handler(request, h)
 
       expect(h.view).toHaveBeenCalledWith(
@@ -77,7 +72,6 @@ describe('#siteName', () => {
       const h = { view: vi.fn() }
       const request = createMockRequest({ query: { action: 'change' } })
 
-      sitePreHandlerHook.method(request, h)
       siteNameController.handler(request, h)
 
       expect(h.view).toHaveBeenCalledWith(
@@ -102,7 +96,6 @@ describe('#siteName', () => {
       })
       const h = { redirect: vi.fn() }
 
-      sitePreHandlerHook.method(request, h)
       await siteNameSubmitController.handler(request, h)
 
       expect(updateExemptionSiteDetailsSpy).toHaveBeenCalledWith(
@@ -128,7 +121,6 @@ describe('#siteName', () => {
       })
       const h = { redirect: vi.fn() }
 
-      sitePreHandlerHook.method(request, h)
       await siteNameSubmitController.handler(request, h)
 
       expect(updateExemptionSiteDetailsSpy).toHaveBeenCalledWith(
@@ -155,7 +147,6 @@ describe('#siteName', () => {
       })
       const h = { redirect: vi.fn() }
 
-      sitePreHandlerHook.method(request, h)
       await siteNameSubmitController.handler(request, h)
 
       expect(updateExemptionSiteDetailsSpy).toHaveBeenCalledWith(
@@ -177,7 +168,6 @@ describe('#siteName', () => {
       })
       const h = { redirect: vi.fn() }
 
-      sitePreHandlerHook.method(request, h)
       await siteNameSubmitController.handler(request, h)
 
       expect(vi.mocked(saveSiteDetailsToBackend)).toHaveBeenCalledWith(
@@ -206,7 +196,6 @@ describe('#siteName', () => {
       })
       const h = { redirect: vi.fn() }
 
-      sitePreHandlerHook.method(request, h)
       await siteNameSubmitController.handler(request, h)
 
       expect(updateExemptionSiteDetailsSpy).toHaveBeenCalledWith(
@@ -260,8 +249,6 @@ describe('#siteName', () => {
         ]
       }
 
-      sitePreHandlerHook.method(request, h)
-
       siteNameSubmitController.options.validate.failAction(request, h, err)
 
       expect(h.view).toHaveBeenCalledWith(SITE_NAME_VIEW_ROUTE, {
@@ -283,8 +270,6 @@ describe('#siteName', () => {
         payload: { siteName: 'invalid' }
       })
       const h = { view: vi.fn().mockReturnValue({ takeover: vi.fn() }) }
-
-      sitePreHandlerHook.method(request, h)
 
       siteNameSubmitController.options.validate.failAction(request, h, {})
 
@@ -315,8 +300,6 @@ describe('#siteName', () => {
           }
         ]
       }
-
-      sitePreHandlerHook.method(request, h)
 
       siteNameSubmitController.options.validate.failAction(request, h, err)
 

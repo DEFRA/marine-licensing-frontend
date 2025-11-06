@@ -162,9 +162,27 @@ export const coordinatesEntrySubmitController = {
       }
 
       if (isStartOfChangeJourney) {
-        await updateExemptionSiteDetails(request, h, siteIndex, 'coordinateSystem', null)
-        await updateExemptionSiteDetails(request, h, siteIndex, 'coordinates', null)
-        await updateExemptionSiteDetails(request, h, siteIndex, 'circleWidth', null)
+        await updateExemptionSiteDetails(
+          request,
+          h,
+          siteIndex,
+          'coordinateSystem',
+          null
+        )
+        await updateExemptionSiteDetails(
+          request,
+          h,
+          siteIndex,
+          'coordinates',
+          null
+        )
+        await updateExemptionSiteDetails(
+          request,
+          h,
+          siteIndex,
+          'circleWidth',
+          null
+        )
       }
 
       return h.redirect(

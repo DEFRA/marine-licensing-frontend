@@ -127,7 +127,10 @@ describe('#delete', () => {
     it('should clear cache, set exemption ID in cache, and redirect to delete page', async () => {
       mockRequest.params = { exemptionId: 'test-project-id' }
 
-      const result = await deleteExemptionSelectController.handler(mockRequest, mockH)
+      const result = await deleteExemptionSelectController.handler(
+        mockRequest,
+        mockH
+      )
 
       expect(mockedClearExemptionCache).toHaveBeenCalledWith(mockRequest, mockH)
       expect(mockedSetExemptionCache).toHaveBeenCalledWith(mockRequest, mockH, {

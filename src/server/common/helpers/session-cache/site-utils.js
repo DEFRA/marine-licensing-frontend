@@ -20,7 +20,7 @@ export const setSiteData = (request) => {
 
 export const setSiteDataPreHandler = {
   method: (request, h) => {
-    request.site = setSiteData(request, h)
+    request.site = setSiteData(request)
 
     if (!request.site?.siteNumber) {
       return h.redirect(routes.TASK_LIST).takeover()

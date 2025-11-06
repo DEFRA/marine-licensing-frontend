@@ -4,7 +4,7 @@ export const shouldAddNewSite = (site, exemption) =>
   site && site > exemption.siteDetails.length
 
 export const getSiteDataFromParam = (site) => ({
-  siteIndex: site ? site - 1 : 0,
+  siteIndex: site ? Number.parseInt(site, 10) - 1 : 0,
   siteNumber: site ?? 1
 })
 
@@ -23,4 +23,10 @@ export const addNewSite = async (request, h, exemption, payload) => {
     ...exemption,
     siteDetails: updatedSiteDetails
   })
+}
+
+export const hasInvalidSiteNumber = (siteNumber, siteDetails) => {
+  const editingExistingSite = siteNumber <= siteDetails.length
+  const addingNewSite = siteNumber === siteDetails.length + 1
+  return !editingExistingSite && !addingNewSite
 }

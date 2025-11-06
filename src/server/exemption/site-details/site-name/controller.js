@@ -10,7 +10,12 @@ import {
 } from '#src/server/common/helpers/errors.js'
 import { getCancelLink } from '#src/server/exemption/site-details/utils/cancel-link.js'
 import joi from 'joi'
-import { addNewSite, getSiteDataFromParam, shouldAddNewSite } from './utils.js'
+import {
+  addNewSite,
+  getSiteDataFromParam,
+  hasInvalidSiteNumber,
+  shouldAddNewSite
+} from './utils.js'
 
 const SITE_NAME_MAX_LENGTH = 250
 
@@ -85,6 +90,10 @@ export const siteNameController = {
     const { siteDetails } = exemption
 
     const { siteIndex, siteNumber } = getSiteDataFromParam(site)
+
+    if (site && hasInvalidSiteNumber(siteNumber, siteDetails)) {
+      return h.redirect(routes.TASK_LIST)
+    }
 
     const siteName = siteDetails?.[siteIndex]?.siteName ?? ''
 

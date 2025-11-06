@@ -64,7 +64,7 @@ describe('#getSiteNumber', () => {
     expect(getSiteNumber(mockExemption, mockRequest)).toBe(2)
   })
 
-  test('should default to 1 when URL parameter is invalid', () => {
+  test('should return undefined if this is an invalid number', () => {
     const mockExemption = {
       id: 'test-exemption-123',
       projectName: 'Test Project',
@@ -75,10 +75,10 @@ describe('#getSiteNumber', () => {
       query: { site: '5' }
     }
 
-    expect(getSiteNumber(mockExemption, mockRequest)).toBe(1)
+    expect(getSiteNumber(mockExemption, mockRequest)).toBeUndefined()
   })
 
-  test('should default to 1 when URL parameter is not a number', () => {
+  test('should return undefined if argument is not a number', () => {
     const mockExemption = {
       id: 'test-exemption-123',
       projectName: 'Test Project',
@@ -89,7 +89,7 @@ describe('#getSiteNumber', () => {
       query: { site: 'invalid' }
     }
 
-    expect(getSiteNumber(mockExemption, mockRequest)).toBe(1)
+    expect(getSiteNumber(mockExemption, mockRequest)).toBeUndefined()
   })
 
   test('should handle null exemption gracefully', () => {

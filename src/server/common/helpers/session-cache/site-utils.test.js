@@ -1,10 +1,14 @@
 import { vi } from 'vitest'
-import { setSiteData } from '#src/server/common/helpers/session-cache/site-utils.js'
+import {
+  setSiteData,
+  setSiteDataPreHandler
+} from '#src/server/common/helpers/session-cache/site-utils.js'
 import {
   createMockRequest,
   mockExemption as mockExemptionData
 } from '#src/server/test-helpers/mocks.js'
 import * as utils from '#src/server/common/helpers/session-cache/utils.js'
+import { routes } from '#src/server/common/constants/routes.js'
 
 describe('#siteUtils', () => {
   beforeEach(() => {
@@ -47,5 +51,28 @@ describe('#siteUtils', () => {
       siteIndex: 0,
       siteDetails: mockExemptionData.siteDetails[0]
     })
+  })
+
+  test('should redirect user if they try to enter an invalid site', () => {
+    const mockH = {
+      redirect: vi.fn().mockReturnValue({
+        takeover: vi.fn()
+      })
+    }
+    const site = setSiteData({ ...mockRequest, query: { site: '10' } }, mockH)
+    expect(site.siteNumber).toBeUndefined()
+  })
+
+  test('should redirect user if they try to enter an invalid site using preHandler', () => {
+    const mockH = {
+      redirect: vi.fn().mockReturnValue({
+        takeover: vi.fn()
+      })
+    }
+    setSiteDataPreHandler.method(
+      { ...mockRequest, query: { site: '10' } },
+      mockH
+    )
+    expect(mockH.redirect).toHaveBeenCalledWith(routes.TASK_LIST)
   })
 })

@@ -161,7 +161,7 @@ export const activityDescriptionSubmitController = {
 
       if (nextRoute === routes.REVIEW_SITE_DETAILS || action) {
         if (hasSameActivityDescriptionAcrossSites) {
-          await copySameActivityDescriptionToAllSites(request)
+          await copySameActivityDescriptionToAllSites(request, h)
         }
 
         await saveSiteDetailsToBackend(request, h)

@@ -7,7 +7,7 @@ export const sessionCache = {
   plugin: yar,
   options: {
     name: sessionConfig.cache.name,
-    maxCookieSize: 0,
+    maxCookieSize: 0, // this enforces the use of server-side caching
     cache: {
       cache: sessionConfig.cache.name,
       expiresIn: sessionConfig.cache.ttl

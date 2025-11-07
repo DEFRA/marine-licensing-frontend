@@ -166,5 +166,5 @@ export const setSavedSiteDetails = async (request, h, value) => {
 
   await request.yar.commit(h)
 
-  return cacheValue
+  return request.yar.get(SAVED_SITE_DETAILS_CACHE_KEY)
 }

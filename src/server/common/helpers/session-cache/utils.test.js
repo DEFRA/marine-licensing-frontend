@@ -675,14 +675,16 @@ describe('#utils', () => {
 
   describe('setSavedSiteDetails', () => {
     test('should update the value in cache', async () => {
+      const value = { originalCoordinatesEntry: 'single' }
+
       const mockH = {}
       const mockRequest = {
         yar: {
           set: vi.fn(),
+          get: vi.fn().mockReturnValue(value),
           commit: vi.fn().mockResolvedValue()
         }
       }
-      const value = { originalCoordinatesEntry: 'single' }
 
       const result = await setSavedSiteDetails(mockRequest, mockH, value)
 
@@ -698,6 +700,7 @@ describe('#utils', () => {
       const mockH = {}
       const mockRequest = {
         yar: {
+          get: vi.fn().mockResolvedValue({}),
           set: vi.fn(),
           commit: vi.fn().mockResolvedValue()
         }

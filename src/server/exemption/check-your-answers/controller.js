@@ -5,12 +5,11 @@ import {
 } from '#src/server/common/helpers/session-cache/utils.js'
 import { authenticatedPostRequest } from '#src/server/common/helpers/authenticated-requests.js'
 import { routes } from '#src/server/common/constants/routes.js'
-import { createSiteDetailsDataJson } from '#src/server/common/helpers/site-details.js'
-import { getCoordinateSystem } from '#src/server/common/helpers/coordinate-utils.js'
 import { getUserSession } from '#src/server/common/plugins/auth/utils.js'
 import { processSiteDetails } from '#src/server/common/helpers/exemption-site-details.js'
 import { errorMessages } from '#src/server/common/constants/error-messages.js'
 import { getExemptionService } from '#src/services/exemption-service/index.js'
+import { buildSiteLocationData } from '#src/server/common/helpers/site-location-data.js'
 
 const apiPaths = {
   submitExemption: '/exemption/submit'
@@ -26,22 +25,24 @@ export const CHECK_YOUR_ANSWERS_VIEW_ROUTE =
 export const checkYourAnswersController = {
   async handler(request, h) {
     const cachedExemption = getExemptionCache(request)
-    const { id } = cachedExemption
+    const { id, multipleSiteDetails } = cachedExemption
     const siteDetails = processSiteDetails(cachedExemption, id, request)
-    const { coordinateSystem } = getCoordinateSystem(request)
-    const siteDetailsData = createSiteDetailsDataJson(
-      siteDetails,
-      coordinateSystem
-    )
+
     const exemptionService = getExemptionService(request)
     const savedExemption = await exemptionService.getExemptionById(id)
+
+    const siteLocationData = buildSiteLocationData(
+      cachedExemption.multipleSiteDetails,
+      cachedExemption.siteDetails
+    )
 
     return h.view(CHECK_YOUR_ANSWERS_VIEW_ROUTE, {
       ...checkYourAnswersViewContent,
       ...cachedExemption,
       mcmsContext: savedExemption.mcmsContext,
       siteDetails,
-      siteDetailsData,
+      siteLocationData,
+      multipleSiteDetails,
       isReadOnly: false
     })
   }

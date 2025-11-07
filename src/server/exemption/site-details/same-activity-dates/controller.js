@@ -14,7 +14,10 @@ import {
 } from '#src/server/common/helpers/errors.js'
 import { saveSiteDetailsToBackend } from '#src/server/common/helpers/save-site-details.js'
 import { getCancelLink } from '#src/server/exemption/site-details/utils/cancel-link.js'
-import { copySameActivityDatesToAllSites } from '#src/server/common/helpers/copy-same-activity-data.js'
+import {
+  clearActivityData,
+  copySameActivityDatesToAllSites
+} from '#src/server/common/helpers/copy-same-activity-data.js'
 import joi from 'joi'
 import { answerChangedFromNoToYes, answerChangedFromYesToNo } from './utils.js'
 
@@ -153,6 +156,8 @@ export const sameActivityDatesSubmitController = {
 
     if (action) {
       if (answerChangedFromNoToYes(previousAnswer, payload)) {
+        clearActivityData(request, 'activityDates')
+
         return h.redirect(routes.ACTIVITY_DATES + '?action=change')
       }
 

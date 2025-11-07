@@ -222,6 +222,7 @@ describe('Activity description - page structure & accessibility', () => {
   test('should redirect to correct page after submit when action parameter is present for specific site', async () => {
     const { updateExemptionSiteDetails } = mockExemption({
       ...mockExemption,
+      multipleSiteDetails: { sameActivityDescription: 'yes' },
       siteDetails: [{}, {}]
     })
 
@@ -234,9 +235,7 @@ describe('Activity description - page structure & accessibility', () => {
     })
 
     expect(response.statusCode).toBe(statusCodes.redirect)
-    expect(response.headers.location).toBe(
-      '/exemption/review-site-details#site-details-2'
-    )
+    expect(response.headers.location).toBe('/exemption/review-site-details')
 
     expect(updateExemptionSiteDetails).toHaveBeenCalledWith(
       expect.any(Object),

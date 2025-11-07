@@ -1,14 +1,14 @@
 {% extends 'layouts/page.njk' %}
 {% from "govuk/components/back-link/macro.njk" import govukBackLink %}
 {% from "govuk/components/button/macro.njk" import govukButton %}
-{% from "site-details-data-script/macro.njk" import appSiteDetailsDataScript %}
 {% from "project-details-card/macro.njk" import appProjectDetailsCard %}
+{% from "site-location-card/macro.njk" import appSiteLocationCard %}
+{% from "activity-details-card/macro.njk" import appActivityDetailsCard %}
 {% from "site-details-card/macro.njk" import appSiteDetailsCard %}
 {% from "public-register-card/macro.njk" import appPublicRegisterCard %}
 
 {% block head %}
   {{ super() }}
-  {{ appSiteDetailsDataScript(siteDetailsData) }}
 {% endblock %}
 {% block beforeContent %}
   {{ super() }}
@@ -34,10 +34,26 @@
       isReadOnly: isReadOnly
     }) }}
     {% endif %}
-    {{ appSiteDetailsCard({
-      siteDetails: siteDetails,
+    
+    {{ appSiteLocationCard({
+      siteLocationData: siteLocationData,
       isReadOnly: isReadOnly
     }) }}
+
+    {{ appActivityDetailsCard({
+      activityDetailsData: siteLocationData,
+      isReadOnly: isReadOnly
+    }) }}
+
+    {% for site in siteDetails %}
+    {{ appSiteDetailsCard({
+      siteDetails: site,
+      siteNumber: site.siteNumber,
+      multipleSiteDetails: multipleSiteDetails,
+      siteDetailsData: siteDetailsData,
+      isReadOnly: isReadOnly
+    }) }}
+    {% endfor %}
     {{ appPublicRegisterCard({
       publicRegister: publicRegister,
       isReadOnly: isReadOnly

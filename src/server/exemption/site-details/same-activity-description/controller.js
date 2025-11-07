@@ -20,7 +20,10 @@ import {
 } from './utils.js'
 import { saveSiteDetailsToBackend } from '#src/server/common/helpers/save-site-details.js'
 import { getCancelLink } from '#src/server/exemption/site-details/utils/cancel-link.js'
-import { copySameActivityDescriptionToAllSites } from '#src/server/common/helpers/copy-same-activity-data.js'
+import {
+  clearActivityData,
+  copySameActivityDescriptionToAllSites
+} from '#src/server/common/helpers/copy-same-activity-data.js'
 
 export const SAME_ACTIVITY_DESCRIPTION_VIEW_ROUTE =
   'exemption/site-details/same-activity-description/index'
@@ -156,6 +159,8 @@ export const sameActivityDescriptionSubmitController = {
 
     if (action) {
       if (answerChangedFromNoToYes(previousAnswer, payload)) {
+        clearActivityData(request, 'activityDescription')
+
         return h.redirect(routes.ACTIVITY_DESCRIPTION + '?action=change')
       }
 

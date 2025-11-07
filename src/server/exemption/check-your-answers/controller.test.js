@@ -353,12 +353,14 @@ describe('check your answers controller', () => {
 
       mockExemption(fileUploadExemption)
 
-      const mockProcessedSiteDetails = {
-        isFileUpload: true,
-        method: 'Upload a file with the coordinates of the site',
-        fileType: 'KML',
-        filename: 'test.kml'
-      }
+      const mockProcessedSiteDetails = [
+        {
+          isFileUpload: true,
+          method: 'Upload a file with the coordinates of the site',
+          fileType: 'KML',
+          filename: 'test.kml'
+        }
+      ]
 
       const processSiteDetailsSpy = vi
         .spyOn(exemptionSiteDetailsHelpers, 'processSiteDetails')
@@ -392,12 +394,14 @@ describe('check your answers controller', () => {
 
       mockExemption(shapefileExemption)
 
-      const mockProcessedSiteDetails = {
-        isFileUpload: true,
-        method: 'Upload a file with the coordinates of the site',
-        fileType: 'Shapefile',
-        filename: 'Unknown file'
-      }
+      const mockProcessedSiteDetails = [
+        {
+          isFileUpload: true,
+          method: 'Upload a file with the coordinates of the site',
+          fileType: 'Shapefile',
+          filename: 'Unknown file'
+        }
+      ]
 
       const processSiteDetailsSpy = vi
         .spyOn(exemptionSiteDetailsHelpers, 'processSiteDetails')

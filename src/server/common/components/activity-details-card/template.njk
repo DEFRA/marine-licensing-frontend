@@ -1,32 +1,68 @@
 {% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
 
-{{ govukSummaryList({
-    card: {
-      title: {
-        text: "Activity details"
-      },
-      attributes: {
-        id: "activity-details-card"
-      }
+{% if params.activityDetailsData and params.activityDetailsData.multipleSitesEnabled %}
+
+{% set activityRows = [
+  {
+    key: {
+      text: "Are the activity dates the same for every site?"
     },
-    rows: [
-      {
-        key: {
-          text: "Activity description"
-        },
-        value: {
-          html: params.activityDescription
-        },
-        classes: "",
-        actions: {
-          items: [
-            {
-              href: "#",
-              text: "Change",
-              visuallyHiddenText: "activity description"
-            }
-          ]
-        } if not params.isReadOnly
-      }
-    ]
-  }) }}
+    value: {
+      text: params.activityDetailsData.sameActivityDates
+    }
+  }
+] %}
+
+{% if params.activityDetailsData.activityDates %}
+  {% set activityRows = (activityRows.push({
+    key: {
+      text: "Activity dates"
+    },
+    value: {
+      text: params.activityDetailsData.activityDates
+    }
+  }), activityRows) %}
+{% endif %}
+
+{% set activityRows = (activityRows.push({
+  key: {
+    text: "Is the activity description the same for every site?"
+  },
+  value: {
+    text: params.activityDetailsData.sameActivityDescription
+  }
+}), activityRows) %}
+
+{% if params.activityDetailsData.activityDescription %}
+  {% set activityRows = (activityRows.push({
+    key: {
+      text: "Activity description"
+    },
+    value: {
+      text: params.activityDetailsData.activityDescription
+    }
+  }), activityRows) %}
+{% endif %}
+
+{{ govukSummaryList({
+  card: {
+    title: {
+      text: "Activity details"
+    },
+    actions: {
+      items: [
+        {
+          href: "#",
+          text: "Change",
+          classes: "govuk-link--no-visited-state"
+        }
+      ]
+    } if not params.isReadOnly,
+    attributes: {
+      id: "activity-details-card"
+    }
+  },
+  rows: activityRows
+}) }}
+
+{% endif %}

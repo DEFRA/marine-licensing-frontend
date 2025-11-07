@@ -67,6 +67,7 @@ export const articleCodes = [
   '21',
   '25',
   '25A',
+  '26',
   '26A',
   '34',
   '35'

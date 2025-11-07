@@ -16,9 +16,9 @@ import {
   getPolygonCoordinatesDisplayData,
   buildManualCoordinateSummaryData,
   getSiteDetailsBackLink,
-  getReviewSummaryText,
   getCoordinateSystemText
 } from '#src/server/exemption/site-details/review-site-details/utils.js'
+import { getReviewSummaryText } from '#src/server/common/helpers/exemption-site-details.js'
 
 vi.mock('~/src/server/common/helpers/session-cache/utils.js')
 vi.mock('~/src/server/common/helpers/coordinate-utils.js')
@@ -488,7 +488,7 @@ describe('#reviewSiteDetails', () => {
               activityDates: '1 January 2025 to 1 January 2025',
               activityDescription: 'Test activity description',
               method:
-                'Manually enter multiple sets of coordinates to mark the boundary of the site',
+                'Enter multiple sets of coordinates to mark the boundary of the site',
               coordinateSystem:
                 'WGS84 (World Geodetic System 1984)\nLatitude and longitude',
               polygonCoordinates: [
@@ -539,7 +539,7 @@ describe('#reviewSiteDetails', () => {
               activityDates: '1 January 2025 to 1 January 2025',
               activityDescription: 'Test activity description',
               method:
-                'Manually enter one set of coordinates and a width to create a circular site',
+                'Enter one set of coordinates and a width to create a circular site',
               coordinateSystem:
                 'WGS84 (World Geodetic System 1984)\nLatitude and longitude',
               coordinates: '50.123456, -0.123456',
@@ -606,7 +606,7 @@ describe('#reviewSiteDetails', () => {
           const result = getReviewSummaryText(siteDetails)
 
           expect(result).toBe(
-            'Manually enter multiple sets of coordinates to mark the boundary of the site'
+            'Enter multiple sets of coordinates to mark the boundary of the site'
           )
         })
 
@@ -620,7 +620,7 @@ describe('#reviewSiteDetails', () => {
           const result = getReviewSummaryText(siteDetails)
 
           expect(result).toBe(
-            'Manually enter one set of coordinates and a width to create a circular site'
+            'Enter one set of coordinates and a width to create a circular site'
           )
         })
 

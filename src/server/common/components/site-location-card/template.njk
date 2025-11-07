@@ -1,0 +1,7 @@
+{% if params.siteLocationData.isFileUpload %}
+  {%- include "./file-upload.njk" -%}
+{% else %}
+  {%- include "./coordinates.njk" -%}
+{% endif %}
+
+

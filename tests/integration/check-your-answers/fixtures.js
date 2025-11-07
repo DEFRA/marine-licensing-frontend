@@ -1,6 +1,9 @@
 const baseExemption = {
   id: 'test-exemption-123',
   projectName: 'Hammersmith pontoon construction',
+  multipleSiteDetails: {
+    multipleSitesEnabled: false
+  },
   siteDetails: [
     {
       coordinatesType: 'file',
@@ -23,7 +26,12 @@ const baseExemption = {
             }
           }
         ]
-      }
+      },
+      activityDates: {
+        start: '2025-01-01T00:00:00.000Z',
+        end: '2025-01-31T00:00:00.000Z'
+      },
+      activityDescription: 'Test activity description'
     }
   ],
   publicRegister: {
@@ -57,6 +65,7 @@ export const testScenarios = [
       backLinkText: 'Go back to your project',
       summaryCards: [
         'Project summary',
+        'Providing the site location',
         'Site details',
         'Sharing your project information publicly'
       ],
@@ -72,13 +81,13 @@ export const testScenarios = [
           'Restart the process by checking if you need a marine licence.'
         ]
       },
-      siteDetails: {
-        'Method of providing site location':
-          'Upload a file with the coordinates of the site',
-        'File type': 'Shapefile',
-        'File uploaded': 'Cavendish_Dock_Boundary_Polygon_WGS84.zip',
-        'Map view': ''
-      },
+      siteDetails: [
+        {
+          'Activity dates': '1 January 2025 to 31 January 2025',
+          'Activity description': 'Test activity description',
+          'Map view': ''
+        }
+      ],
       publicRegister: {
         'Consent to publish your project information': 'No'
       },
@@ -103,6 +112,7 @@ export const testScenarios = [
       backLinkText: 'Go back to your project',
       summaryCards: [
         'Project summary',
+        'Providing the site location',
         'Site details',
         'Sharing your project information publicly'
       ],
@@ -110,10 +120,8 @@ export const testScenarios = [
         'Project name': 'Hammersmith pontoon construction'
       },
       siteDetails: {
-        'Method of providing site location':
-          'Upload a file with the coordinates of the site',
-        'File type': 'KML',
-        'File uploaded': 'coordinates.kml',
+        'Activity dates': '1 January 2025 to 31 January 2025',
+        'Activity description': 'Test activity description',
         'Map view': ''
       },
       publicRegister: {
@@ -140,6 +148,7 @@ export const testScenarios = [
       backLinkText: 'Go back to your project',
       summaryCards: [
         'Project summary',
+        'Providing the site location',
         'Site details',
         'Sharing your project information publicly'
       ],
@@ -147,10 +156,8 @@ export const testScenarios = [
         'Project name': 'Hammersmith pontoon construction'
       },
       siteDetails: {
-        'Method of providing site location':
-          'Upload a file with the coordinates of the site',
-        'File type': 'Shapefile',
-        'File uploaded': 'OSGB36_Site_Boundary.zip',
+        'Activity dates': '1 January 2025 to 31 January 2025',
+        'Activity description': 'Test activity description',
         'Map view': ''
       },
       publicRegister: {
@@ -172,7 +179,12 @@ export const testScenarios = [
             latitude: '54.726200',
             longitude: '-1.599400'
           },
-          circleWidth: '100'
+          circleWidth: '100',
+          activityDates: {
+            start: '2025-01-01T00:00:00.000Z',
+            end: '2025-01-31T00:00:00.000Z'
+          },
+          activityDescription: 'Test activity description'
         }
       ]
     },
@@ -181,6 +193,7 @@ export const testScenarios = [
       backLinkText: 'Go back to your project',
       summaryCards: [
         'Project summary',
+        'Providing the site location',
         'Site details',
         'Sharing your project information publicly'
       ],
@@ -188,8 +201,10 @@ export const testScenarios = [
         'Project name': 'Hammersmith pontoon construction'
       },
       siteDetails: {
-        'Method of providing site location':
-          'Manually enter one set of coordinates and a width to create a circular site',
+        'Activity dates': '1 January 2025 to 31 January 2025',
+        'Activity description': 'Test activity description',
+        'Single or multiple sets of coordinates':
+          'Enter one set of coordinates and a width to create a circular site',
         'Coordinate system':
           'WGS84 (World Geodetic System 1984) Latitude and longitude',
         'Coordinates at centre of site': '54.726200, -1.599400',
@@ -215,7 +230,12 @@ export const testScenarios = [
             eastings: '425053',
             northings: '564180'
           },
-          circleWidth: '100'
+          circleWidth: '100',
+          activityDates: {
+            start: '2025-01-01T00:00:00.000Z',
+            end: '2025-01-31T00:00:00.000Z'
+          },
+          activityDescription: 'Test activity description'
         }
       ]
     },
@@ -224,6 +244,7 @@ export const testScenarios = [
       backLinkText: 'Go back to your project',
       summaryCards: [
         'Project summary',
+        'Providing the site location',
         'Site details',
         'Sharing your project information publicly'
       ],
@@ -231,9 +252,12 @@ export const testScenarios = [
         'Project name': 'Hammersmith pontoon construction'
       },
       siteDetails: {
-        'Method of providing site location':
-          'Manually enter one set of coordinates and a width to create a circular site',
-        'Coordinate system': 'OSGB36 (National Grid) Eastings and Northings',
+        'Activity dates': '1 January 2025 to 31 January 2025',
+        'Activity description': 'Test activity description',
+        'Single or multiple sets of coordinates':
+          'Enter one set of coordinates and a width to create a circular site',
+        'Coordinate system':
+          'British National Grid (OSGB36) Eastings and Northings',
         'Coordinates at centre of site': '425053, 564180',
         'Width of circular site': '100 metres',
         'Map view': ''
@@ -258,7 +282,12 @@ export const testScenarios = [
             { latitude: '54.725000', longitude: '-1.590000' },
             { latitude: '54.729000', longitude: '-1.585000' }
           ],
-          circleWidth: '100'
+          circleWidth: '100',
+          activityDates: {
+            start: '2025-01-01T00:00:00.000Z',
+            end: '2025-01-31T00:00:00.000Z'
+          },
+          activityDescription: 'Test activity description'
         }
       ]
     },
@@ -267,6 +296,7 @@ export const testScenarios = [
       backLinkText: 'Go back to your project',
       summaryCards: [
         'Project summary',
+        'Providing the site location',
         'Site details',
         'Sharing your project information publicly'
       ],
@@ -274,8 +304,10 @@ export const testScenarios = [
         'Project name': 'Hammersmith pontoon construction'
       },
       siteDetails: {
-        'Method of providing site location':
-          'Manually enter multiple sets of coordinates to mark the boundary of the site',
+        'Activity dates': '1 January 2025 to 31 January 2025',
+        'Activity description': 'Test activity description',
+        'Single or multiple sets of coordinates':
+          'Enter multiple sets of coordinates to mark the boundary of the site',
         'Coordinate system':
           'WGS84 (World Geodetic System 1984) Latitude and longitude',
         'Start and end points': '54.721000, -1.595000',
@@ -303,7 +335,12 @@ export const testScenarios = [
             { eastings: '426000', northings: '565000' },
             { eastings: '427000', northings: '566000' }
           ],
-          circleWidth: '100'
+          circleWidth: '100',
+          activityDates: {
+            start: '2025-01-01T00:00:00.000Z',
+            end: '2025-01-31T00:00:00.000Z'
+          },
+          activityDescription: 'Test activity description'
         }
       ]
     },
@@ -312,6 +349,7 @@ export const testScenarios = [
       backLinkText: 'Go back to your project',
       summaryCards: [
         'Project summary',
+        'Providing the site location',
         'Site details',
         'Sharing your project information publicly'
       ],
@@ -319,14 +357,218 @@ export const testScenarios = [
         'Project name': 'Hammersmith pontoon construction'
       },
       siteDetails: {
-        'Method of providing site location':
-          'Manually enter multiple sets of coordinates to mark the boundary of the site',
-        'Coordinate system': 'OSGB36 (National Grid) Eastings and Northings',
+        'Activity dates': '1 January 2025 to 31 January 2025',
+        'Activity description': 'Test activity description',
+        'Single or multiple sets of coordinates':
+          'Enter multiple sets of coordinates to mark the boundary of the site',
+        'Coordinate system':
+          'British National Grid (OSGB36) Eastings and Northings',
         'Start and end points': '425053, 564180',
         'Point 2': '426000, 565000',
         'Point 3': '427000, 566000',
         'Map view': ''
       },
+      publicRegister: {
+        'Consent to publish your project information': 'No'
+      },
+      submitButton: 'Confirm and send'
+    }
+  },
+  {
+    name: 'Multiple sites - manual coordinates with different activity dates',
+    exemption: {
+      ...baseExemption,
+      multipleSiteDetails: {
+        multipleSitesEnabled: true,
+        sameActivityDates: 'no',
+        sameActivityDescription: 'yes'
+      },
+      siteDetails: [
+        {
+          coordinatesType: 'coordinates',
+          coordinatesEntry: 'single',
+          coordinateSystem: 'wgs84',
+          coordinates: {
+            latitude: '54.726200',
+            longitude: '-1.599400'
+          },
+          circleWidth: '100',
+          siteName: 'North Dock',
+          activityDates: {
+            start: '2025-01-01T00:00:00.000Z',
+            end: '2025-01-31T00:00:00.000Z'
+          },
+          activityDescription: 'Pontoon construction works'
+        },
+        {
+          coordinatesType: 'coordinates',
+          coordinatesEntry: 'single',
+          coordinateSystem: 'wgs84',
+          coordinates: {
+            latitude: '54.730000',
+            longitude: '-1.610000'
+          },
+          circleWidth: '150',
+          siteName: 'South Dock',
+          activityDates: {
+            start: '2025-02-01T00:00:00.000Z',
+            end: '2025-02-28T00:00:00.000Z'
+          },
+          activityDescription: 'Pontoon construction works'
+        }
+      ]
+    },
+    expectedPageContent: {
+      pageTitle: 'Check your answers before sending your information',
+      backLinkText: 'Go back to your project',
+      summaryCards: [
+        'Project summary',
+        'Providing the site location',
+        'Activity details',
+        'Site 1 details',
+        'Site 2 details',
+        'Sharing your project information publicly'
+      ],
+      projectDetails: {
+        'Project name': 'Hammersmith pontoon construction'
+      },
+      siteLocation: {
+        'Method of providing site location':
+          'Enter the coordinates of the site manually',
+        'More than one site': 'Yes'
+      },
+      activityDetails: {
+        'Are the activity dates the same for every site?': 'No',
+        'Is the activity description the same for every site?': 'Yes',
+        'Activity description': 'Pontoon construction works'
+      },
+      siteDetails: [
+        {
+          'Site name': 'North Dock',
+          'Activity dates': '1 January 2025 to 31 January 2025',
+          'Single or multiple sets of coordinates':
+            'Enter one set of coordinates and a width to create a circular site',
+          'Coordinate system':
+            'WGS84 (World Geodetic System 1984) Latitude and longitude',
+          'Coordinates at centre of site': '54.726200, -1.599400',
+          'Width of circular site': '100 metres',
+          'Map view': ''
+        },
+        {
+          'Site name': 'South Dock',
+          'Activity dates': '1 February 2025 to 28 February 2025',
+          'Single or multiple sets of coordinates':
+            'Enter one set of coordinates and a width to create a circular site',
+          'Coordinate system':
+            'WGS84 (World Geodetic System 1984) Latitude and longitude',
+          'Coordinates at centre of site': '54.730000, -1.610000',
+          'Width of circular site': '150 metres',
+          'Map view': ''
+        }
+      ],
+      publicRegister: {
+        'Consent to publish your project information': 'No'
+      },
+      submitButton: 'Confirm and send'
+    }
+  },
+  {
+    name: 'Multiple sites - file upload with different descriptions',
+    exemption: {
+      ...baseExemption,
+      multipleSiteDetails: {
+        multipleSitesEnabled: true,
+        sameActivityDates: 'yes',
+        sameActivityDescription: 'no'
+      },
+      siteDetails: [
+        {
+          coordinatesType: 'file',
+          coordinateSystem: 'wgs84',
+          fileUploadType: 'kml',
+          uploadedFile: { filename: 'site1.kml' },
+          siteName: 'North Site',
+          activityDates: {
+            start: '2025-01-01T00:00:00.000Z',
+            end: '2025-12-31T00:00:00.000Z'
+          },
+          activityDescription: 'Dredging and survey work',
+          geoJSON: {
+            type: 'FeatureCollection',
+            features: [
+              {
+                type: 'Feature',
+                geometry: {
+                  type: 'Point',
+                  coordinates: [-1.2345, 50.9876]
+                }
+              }
+            ]
+          }
+        },
+        {
+          coordinatesType: 'file',
+          coordinateSystem: 'wgs84',
+          fileUploadType: 'kml',
+          uploadedFile: { filename: 'site2.kml' },
+          siteName: 'South Site',
+          activityDates: {
+            start: '2025-01-01T00:00:00.000Z',
+            end: '2025-12-31T00:00:00.000Z'
+          },
+          activityDescription: 'Cable laying operations',
+          geoJSON: {
+            type: 'FeatureCollection',
+            features: [
+              {
+                type: 'Feature',
+                geometry: {
+                  type: 'Point',
+                  coordinates: [-1.25, 50.99]
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    expectedPageContent: {
+      pageTitle: 'Check your answers before sending your information',
+      backLinkText: 'Go back to your project',
+      summaryCards: [
+        'Project summary',
+        'Providing the site location',
+        'Activity details',
+        'Site 1 details',
+        'Site 2 details',
+        'Sharing your project information publicly'
+      ],
+      projectDetails: {
+        'Project name': 'Hammersmith pontoon construction'
+      },
+      siteLocation: {
+        'Method of providing site location':
+          'Upload a file with the coordinates of the site',
+        'File type': 'KML',
+        'File uploaded': 'site1.kml'
+      },
+      activityDetails: {
+        'Are the activity dates the same for every site?': 'Yes',
+        'Activity dates': '1 January 2025 to 31 December 2025',
+        'Is the activity description the same for every site?': 'No'
+      },
+      siteDetails: [
+        {
+          'Site name': 'North Site',
+          'Activity description': 'Dredging and survey work',
+          'Map view': ''
+        },
+        {
+          'Site name': 'South Site',
+          'Activity description': 'Cable laying operations',
+          'Map view': ''
+        }
+      ],
       publicRegister: {
         'Consent to publish your project information': 'No'
       },

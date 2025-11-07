@@ -6,6 +6,8 @@ import {
   validatePageStructure,
   validateAllSummaryCardsExist,
   validateProjectDetails,
+  validateSiteLocation,
+  validateActivityDetails,
   validateSiteDetails,
   validatePublicRegister
 } from '../shared/summary-card-validators.js'
@@ -46,6 +48,8 @@ describe('Check your answers - page content Validation', () => {
       validatePageStructure(document, expectedPageContent)
       validateAllSummaryCardsExist(document, expectedPageContent)
       validateProjectDetails(document, expectedPageContent)
+      validateSiteLocation(document, expectedPageContent)
+      validateActivityDetails(document, expectedPageContent)
       validateSiteDetails(document, expectedPageContent)
       validatePublicRegister(document, expectedPageContent)
       validateSubmissionSection(document, expectedPageContent)

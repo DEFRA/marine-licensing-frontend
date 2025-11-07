@@ -40,3 +40,10 @@ export const copySameActivityDescriptionToAllSites = async (request, h) => {
     }
   }
 }
+
+export const clearActivityData = (request, key) => {
+  const exemption = getExemptionCache(request)
+  for (const [index] of exemption.siteDetails.entries()) {
+    updateExemptionSiteDetails(request, index, key, null)
+  }
+}

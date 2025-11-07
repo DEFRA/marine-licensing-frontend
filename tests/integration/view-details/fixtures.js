@@ -10,7 +10,10 @@ const baseSubmittedExemption = {
   publicRegister: {
     consent: 'no'
   },
-  mcmsContext: mockExemptionMcmsContext
+  mcmsContext: mockExemptionMcmsContext,
+  multipleSiteDetails: {
+    multipleSitesEnabled: false
+  }
 }
 
 export const createSubmittedExemption = (overrides = {}) => ({
@@ -27,6 +30,11 @@ export const createExemptionWithSiteDetails = (siteDetailsOverrides = {}) =>
         coordinateSystem: COORDINATE_SYSTEMS.WGS84,
         coordinates: { latitude: '51.489676', longitude: '-0.231530' },
         circleWidth: '100',
+        activityDates: {
+          startDate: { day: '1', month: '1', year: '2025' },
+          endDate: { day: '31', month: '1', year: '2025' }
+        },
+        activityDescription: 'Test activity description',
         ...siteDetailsOverrides
       }
     ]
@@ -118,7 +126,7 @@ export const testScenarios = [
       ...baseExpectedContent,
       siteDetails: {
         'Method of providing site location':
-          'Manually enter one set of coordinates and a width to create a circular site',
+          'Enter one set of coordinates and a width to create a circular site',
         'Coordinate system':
           'WGS84 (World Geodetic System 1984) Latitude and longitude',
         'Coordinates at centre of site': '51.489676, -0.231530',
@@ -139,7 +147,7 @@ export const testScenarios = [
       ...baseExpectedContent,
       siteDetails: {
         'Method of providing site location':
-          'Manually enter one set of coordinates and a width to create a circular site',
+          'Enter one set of coordinates and a width to create a circular site',
         'Coordinate system': 'OSGB36 (National Grid) Eastings and Northings',
         'Coordinates at centre of site': '123456, 654321',
         'Width of circular site': '250 metres'
@@ -182,7 +190,7 @@ export const testScenarios = [
       ...baseExpectedContent,
       siteDetails: {
         'Method of providing site location':
-          'Manually enter multiple sets of coordinates to mark the boundary of the site',
+          'Enter multiple sets of coordinates to mark the boundary of the site',
         'Coordinate system':
           'WGS84 (World Geodetic System 1984) Latitude and longitude'
       },
@@ -206,7 +214,7 @@ export const testScenarios = [
       ...baseExpectedContent,
       siteDetails: {
         'Method of providing site location':
-          'Manually enter multiple sets of coordinates to mark the boundary of the site',
+          'Enter multiple sets of coordinates to mark the boundary of the site',
         'Coordinate system': 'OSGB36 (National Grid) Eastings and Northings'
       },
       siteDetailsExtended: {
@@ -236,7 +244,7 @@ export const testScenarios = [
       ...baseExpectedContent,
       siteDetails: {
         'Method of providing site location':
-          'Manually enter one set of coordinates and a width to create a circular site',
+          'Enter one set of coordinates and a width to create a circular site',
         'Coordinate system':
           'WGS84 (World Geodetic System 1984) Latitude and longitude',
         'Coordinates at centre of site': '51.489676, -0.231530',

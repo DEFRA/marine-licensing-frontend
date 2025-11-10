@@ -1,5 +1,6 @@
 import {
   getExemptionCache,
+  setSavedSiteDetails,
   updateExemptionSiteDetails
 } from '#src/server/common/helpers/session-cache/utils.js'
 import { getSiteDetailsBySite } from '#src/server/common/helpers/session-cache/site-details-utils.js'
@@ -33,7 +34,7 @@ export const coordinatesEntryController = {
   options: {
     pre: [setSiteDataPreHandler]
   },
-  handler(request, h) {
+  async handler(request, h) {
     const exemption = getExemptionCache(request)
     const { site } = request
     const { siteIndex, siteNumber } = site
@@ -51,7 +52,7 @@ export const coordinatesEntryController = {
         savedSiteDetails.originalCoordinateSystem = siteDetails.coordinateSystem
       }
 
-      request.yar.set('savedSiteDetails', savedSiteDetails)
+      await setSavedSiteDetails(request, h, savedSiteDetails)
     }
 
     return h.view(COORDINATES_ENTRY_VIEW_ROUTE, {
@@ -132,13 +133,14 @@ export const coordinatesEntrySubmitController = {
       }
     }
   },
-  handler(request, h) {
+  async handler(request, h) {
     const { payload } = request
     const { siteIndex, siteDetails, queryParams } = request.site
     const action = request.query.action
 
-    updateExemptionSiteDetails(
+    await updateExemptionSiteDetails(
       request,
+      h,
       siteIndex,
       'coordinatesEntry',
       payload.coordinatesEntry
@@ -160,9 +162,27 @@ export const coordinatesEntrySubmitController = {
       }
 
       if (isStartOfChangeJourney) {
-        updateExemptionSiteDetails(request, siteIndex, 'coordinateSystem', null)
-        updateExemptionSiteDetails(request, siteIndex, 'coordinates', null)
-        updateExemptionSiteDetails(request, siteIndex, 'circleWidth', null)
+        await updateExemptionSiteDetails(
+          request,
+          h,
+          siteIndex,
+          'coordinateSystem',
+          null
+        )
+        await updateExemptionSiteDetails(
+          request,
+          h,
+          siteIndex,
+          'coordinates',
+          null
+        )
+        await updateExemptionSiteDetails(
+          request,
+          h,
+          siteIndex,
+          'circleWidth',
+          null
+        )
       }
 
       return h.redirect(

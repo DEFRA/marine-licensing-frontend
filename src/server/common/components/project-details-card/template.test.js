@@ -8,11 +8,12 @@ describe('Project Details Card Component', () => {
       $component = renderComponent('project-details-card', {
         projectName: 'Test Marine Project',
         mcmsContext: {
-          activityType: {
+          activity: {
             value: 'DEPOSIT',
-            label: 'Deposit of a substance or object'
+            label: 'Deposit of a substance or object',
+            purpose: 'Deposit purposes'
           },
-          article: '17',
+          articleCode: '17',
           pdfDownloadUrl:
             'https://marinelicensingtest.marinemanagement.org.uk/mmofox5uat/journey…'
         },
@@ -107,11 +108,12 @@ describe('Project Details Card Component', () => {
       $component = renderComponent('project-details-card', {
         projectName: 'Test Marine Project',
         mcmsContext: {
-          activityType: {
-            value: 'DEPOSIT',
-            label: 'Deposit of a substance or object'
+          activity: {
+            code: 'DEPOSIT',
+            label: 'Deposit of a substance or object',
+            purpose: 'Scientific research purposes'
           },
-          article: '17',
+          articleCode: '17',
           pdfDownloadUrl:
             'https://marinelicensingtest.marinemanagement.org.uk/mmofox5uat/journey…'
         },
@@ -139,12 +141,12 @@ describe('Project Details Card Component', () => {
       $component = renderComponent('project-details-card', {
         projectName: 'Test Marine Project',
         mcmsContext: {
-          activityType: {
+          activity: {
             value: 'DEPOSIT',
             label: 'Deposit of a substance or object',
             purpose: 'Scientific research purposes'
           },
-          article: '17',
+          articleCode: '17',
           pdfDownloadUrl:
             'https://marinelicensingtest.marinemanagement.org.uk/mmofox5uat/journey…'
         },
@@ -161,11 +163,11 @@ describe('Project Details Card Component', () => {
       $component = renderComponent('project-details-card', {
         projectName: 'Test Marine Project',
         mcmsContext: {
-          activityType: {
+          activity: {
             value: 'DEPOSIT',
             label: 'Deposit of a substance or object'
           },
-          article: '17',
+          articleCode: '17',
           pdfDownloadUrl:
             'https://marinelicensingtest.marinemanagement.org.uk/mmofox5uat/journey…'
         },

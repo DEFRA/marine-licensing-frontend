@@ -207,17 +207,22 @@ describe('Activity description - page structure & accessibility', () => {
 
     expect(updateExemptionSiteDetails).toHaveBeenCalledWith(
       expect.any(Object),
+      expect.any(Object),
       0,
       'activityDescription',
       'Test activity description for site'
     )
 
-    expect(saveSiteDetailsToBackend).toHaveBeenCalledWith(expect.any(Object))
+    expect(saveSiteDetailsToBackend).toHaveBeenCalledWith(
+      expect.any(Object),
+      expect.any(Object)
+    )
   })
 
   test('should redirect to correct page after submit when action parameter is present for specific site', async () => {
     const { updateExemptionSiteDetails } = mockExemption({
       ...mockExemption,
+      multipleSiteDetails: { sameActivityDescription: 'yes' },
       siteDetails: [{}, {}]
     })
 
@@ -230,16 +235,18 @@ describe('Activity description - page structure & accessibility', () => {
     })
 
     expect(response.statusCode).toBe(statusCodes.redirect)
-    expect(response.headers.location).toBe(
-      '/exemption/review-site-details#site-details-2'
-    )
+    expect(response.headers.location).toBe('/exemption/review-site-details')
 
     expect(updateExemptionSiteDetails).toHaveBeenCalledWith(
+      expect.any(Object),
       expect.any(Object),
       1,
       'activityDescription',
       'Updated activity description for site 2'
     )
-    expect(saveSiteDetailsToBackend).toHaveBeenCalledWith(expect.any(Object))
+    expect(saveSiteDetailsToBackend).toHaveBeenCalledWith(
+      expect.any(Object),
+      expect.any(Object)
+    )
   })
 })

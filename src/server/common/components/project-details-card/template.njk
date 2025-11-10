@@ -27,18 +27,18 @@
     text: "Type of activity"
   },
   value: {
-    html: params.mcmsContext.activityType.label
+    html: params.mcmsContext.activity.label
   },
   classes: "govuk-summary-list__row--no-border"
 }), rows) %}
 
-{% if params.mcmsContext.activityType.purpose %}
+{% if params.mcmsContext.activity.purpose %}
   {% set rows = (rows.push({
     key: {
       text: "The purpose of the activity"
     },
     value: {
-      html: params.mcmsContext.activityType.purpose
+      html: params.mcmsContext.activity.purpose
     },
     classes: "govuk-summary-list__row--no-border"
   }), rows) %}
@@ -50,7 +50,7 @@
     text: "Why this activity is exempt"
   },
   value: {
-    html: (sentenceStart + ' activity is exempt under <a href="http://www.legislation.gov.uk/uksi/2011/409/article/' + params.mcmsContext.article + '" target="_blank" rel="noopener noreferrer">Article ' + params.mcmsContext.article + ' of the Marine Licensing (Exempted Activities) Order 2011 (opens in new tab)</a>')
+    html: (sentenceStart + ' activity is exempt under <a href="http://www.legislation.gov.uk/uksi/2011/409/article/' + params.mcmsContext.articleCode + '" target="_blank" rel="noopener noreferrer">Article ' + params.mcmsContext.articleCode + ' of the Marine Licensing (Exempted Activities) Order 2011 (opens in new tab)</a>')
   },
   classes: "govuk-summary-list__row--no-border"
 }), rows) %}

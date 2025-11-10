@@ -445,6 +445,7 @@ describe('#centreCoordinates', () => {
 
       expect(cacheUtils.updateExemptionSiteDetails).toHaveBeenCalledWith(
         request,
+        h,
         0,
         'coordinates',
         mockExemption.siteDetails[0].coordinates
@@ -472,6 +473,7 @@ describe('#centreCoordinates', () => {
 
       expect(cacheUtils.updateExemptionSiteDetails).toHaveBeenCalledWith(
         request,
+        h,
         0,
         'coordinates',
         { latitude: '51.489676', longitude: '-0.231530' }
@@ -499,6 +501,7 @@ describe('#centreCoordinates', () => {
 
       expect(cacheUtils.updateExemptionSiteDetails).toHaveBeenCalledWith(
         request,
+        h,
         0,
         'coordinates',
         mockCoordinates[COORDINATE_SYSTEMS.OSGB36]
@@ -526,6 +529,7 @@ describe('#centreCoordinates', () => {
 
       expect(cacheUtils.updateExemptionSiteDetails).toHaveBeenCalledWith(
         request,
+        h,
         0,
         'coordinates',
         { eastings: '425053', northings: '564180' }
@@ -621,7 +625,7 @@ describe('#centreCoordinates', () => {
       const mockRequest = createMockRequest(request)
       await centreCoordinatesSubmitController.handler(mockRequest, h)
 
-      expect(saveSiteDetailsToBackend).toHaveBeenCalled()
+      expect(saveSiteDetailsToBackend).toHaveBeenCalledWith(mockRequest, h)
       expect(h.redirect).toHaveBeenCalledWith(
         routes.REVIEW_SITE_DETAILS + '#site-details-1'
       )

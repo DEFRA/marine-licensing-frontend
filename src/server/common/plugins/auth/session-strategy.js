@@ -6,7 +6,7 @@ import {
 } from '#src/server/common/constants/routes.js'
 import { validateUserSession } from '#src/server/common/plugins/auth/validate.js'
 import { cacheMcmsContextFromQueryParams } from '#src/server/common/helpers/mcms-context/cache-mcms-context.js'
-import { clearExemptionCache } from '#src/server/common/helpers/session-cache/utils.js'
+import { EXEMPTION_CACHE_KEY } from '#src/server/common/helpers/session-cache/utils.js'
 
 export const createSessionStrategy = (server) => {
   const cookieConfig = config.get('session.cookie')
@@ -29,7 +29,8 @@ export const createSessionStrategy = (server) => {
     validate: async (request, session) => {
       const validity = await validateUserSession(request, session)
       if (validity.isValid === false) {
-        clearExemptionCache(request)
+        // clearExemptionCache requires 'h' but validate function doesn't have access to it
+        request.yar.clear(EXEMPTION_CACHE_KEY)
       }
       return validity
     }

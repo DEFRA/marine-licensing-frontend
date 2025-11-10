@@ -22,6 +22,8 @@ describe('#coordinatesEntry', () => {
   const getServer = setupTestServer()
   let getExemptionCacheSpy
 
+  vi.mocked(cacheUtils.setSavedSiteDetails)
+
   beforeEach(() => {
     getExemptionCacheSpy = vi
       .spyOn(cacheUtils, 'getExemptionCache')
@@ -29,11 +31,11 @@ describe('#coordinatesEntry', () => {
   })
 
   describe('#coordinatesEntryController', () => {
-    test('coordinatesEntryController handler should render with correct context', () => {
+    test('coordinatesEntryController handler should render with correct context', async () => {
       const h = { view: vi.fn() }
       const request = createMockRequest({ site: mockSite })
 
-      coordinatesEntryController.handler(request, h)
+      await coordinatesEntryController.handler(request, h)
 
       expect(h.view).toHaveBeenCalledWith(COORDINATES_ENTRY_VIEW_ROUTE, {
         pageTitle: 'How do you want to enter the coordinates?',
@@ -49,7 +51,7 @@ describe('#coordinatesEntry', () => {
       })
     })
 
-    test('coordinatesEntryController handler should render with correct context with no existing cache data', () => {
+    test('coordinatesEntryController handler should render with correct context with no existing cache data', async () => {
       getExemptionCacheSpy.mockReturnValueOnce({
         projectName: mockExemption.projectName
       })
@@ -57,7 +59,7 @@ describe('#coordinatesEntry', () => {
       const h = { view: vi.fn() }
 
       const request = createMockRequest({ site: mockSite })
-      coordinatesEntryController.handler(request, h)
+      await coordinatesEntryController.handler(request, h)
 
       expect(h.view).toHaveBeenCalledWith(COORDINATES_ENTRY_VIEW_ROUTE, {
         pageTitle: 'How do you want to enter the coordinates?',
@@ -116,7 +118,7 @@ describe('#coordinatesEntry', () => {
       expect(statusCode).toBe(statusCodes.ok)
     })
 
-    test('coordinatesEntryController handler should render correctly when using a change link', () => {
+    test('coordinatesEntryController handler should render correctly when using a change link', async () => {
       getExemptionCacheSpy.mockReturnValueOnce({
         projectName: mockExemption.projectName,
         multipleSiteDetails: { multipleSitesEnabled: true }
@@ -129,7 +131,7 @@ describe('#coordinatesEntry', () => {
         site: mockSite
       })
 
-      coordinatesEntryController.handler(request, h)
+      await coordinatesEntryController.handler(request, h)
 
       expect(h.view).toHaveBeenCalledWith(COORDINATES_ENTRY_VIEW_ROUTE, {
         pageTitle: 'How do you want to enter the coordinates?',
@@ -340,13 +342,14 @@ describe('#coordinatesEntry', () => {
 
       expect(cacheUtils.updateExemptionSiteDetails).toHaveBeenCalledWith(
         request,
+        h,
         0,
         'coordinatesEntry',
         'single'
       )
     })
 
-    test('coordinatesEntryController handler should submit correctly when using a change link when data is the same', () => {
+    test('coordinatesEntryController handler should submit correctly when using a change link when data is the same', async () => {
       getExemptionCacheSpy.mockReturnValueOnce({
         projectName: mockExemption.projectName,
         multipleSiteDetails: { multipleSitesEnabled: true }
@@ -356,17 +359,22 @@ describe('#coordinatesEntry', () => {
 
       const request = createMockRequest({
         query: { action: 'change' },
-        site: mockSite
+        site: mockSite,
+        payload: { coordinatesEntry: 'single' }
       })
 
-      coordinatesEntrySubmitController.handler(request, h)
+      request.yar.get.mockReturnValue({
+        originalCoordinatesEntry: 'single'
+      })
+
+      await coordinatesEntrySubmitController.handler(request, h)
 
       expect(h.redirect).toHaveBeenCalledWith(
         routes.REVIEW_SITE_DETAILS + '#site-details-1'
       )
     })
 
-    test('coordinatesEntryController handler should submit correctly when using a change link when data is different', () => {
+    test('coordinatesEntryController handler should submit correctly when using a change link when data is different', async () => {
       getExemptionCacheSpy.mockReturnValueOnce({
         projectName: mockExemption.projectName,
         multipleSiteDetails: { multipleSitesEnabled: true }
@@ -380,11 +388,11 @@ describe('#coordinatesEntry', () => {
         payload: { coordinatesEntry: 'multiple' }
       })
 
-      request.yar.flash.mockReturnValueOnce({
-        savedSiteDetails: { originalCoordinatesEntry: 'single' }
+      request.yar.get.mockReturnValue({
+        originalCoordinatesEntry: 'single'
       })
 
-      coordinatesEntrySubmitController.handler(request, h)
+      await coordinatesEntrySubmitController.handler(request, h)
 
       expect(h.redirect).toHaveBeenCalledWith(
         routes.COORDINATE_SYSTEM_CHOICE + '?site=1&action=change'

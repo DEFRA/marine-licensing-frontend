@@ -152,8 +152,9 @@ export const multipleCoordinatesSubmitController = {
     }
 
     let validatedCoordinates = validationResult.value.coordinates
-    updateExemptionSiteDetails(
+    await updateExemptionSiteDetails(
       request,
+      h,
       siteIndex,
       'coordinates',
       validatedCoordinates
@@ -187,7 +188,7 @@ export const multipleCoordinatesSubmitController = {
       ? `${routes.REVIEW_SITE_DETAILS}#site-details-${siteNumber}`
       : routes.REVIEW_SITE_DETAILS + queryParams
 
-    await saveSiteDetailsToBackend(request)
+    await saveSiteDetailsToBackend(request, h)
 
     return h.redirect(nextRoute)
   }

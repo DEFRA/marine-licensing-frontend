@@ -4,7 +4,10 @@ import {
   beforeYouStartController,
   BEFORE_YOU_START_SITE_DETAILS_VIEW_ROUTE
 } from '#src/server/exemption/site-details/before-you-start/controller.js'
-import { getExemptionCache } from '#src/server/common/helpers/session-cache/utils.js'
+import {
+  clearSavedSiteDetails,
+  getExemptionCache
+} from '#src/server/common/helpers/session-cache/utils.js'
 import { mockExemption } from '#src/server/test-helpers/mocks.js'
 import { makeGetRequest } from '#src/server/test-helpers/server-requests.js'
 import { statusCodes } from '#src/server/common/constants/status-codes.js'
@@ -17,13 +20,14 @@ describe('#beforeYouStart', () => {
 
   beforeEach(() => {
     vi.mocked(getExemptionCache).mockReturnValue(mockExemption)
+    vi.mocked(clearSavedSiteDetails)
   })
 
   describe('#beforeYouStartController', () => {
-    test('beforeYouStartController handler should render with correct context', () => {
+    test('beforeYouStartController handler should render with correct context', async () => {
       const h = { view: vi.fn() }
 
-      beforeYouStartController.handler({ yar: { clear: vi.fn() } }, h)
+      await beforeYouStartController.handler({ yar: { clear: vi.fn() } }, h)
 
       expect(h.view).toHaveBeenCalledWith(
         BEFORE_YOU_START_SITE_DETAILS_VIEW_ROUTE,

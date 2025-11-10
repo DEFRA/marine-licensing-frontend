@@ -1,0 +1,52 @@
+{% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
+
+{% set multipleSitesText = params.siteLocationData.multipleSiteDetails %}
+
+{% set rows = [
+  {
+    key: {
+      text: "Method of providing site location"
+    },
+    value: {
+      text: params.siteLocationData.method
+    }
+  },
+  {
+    key: {
+      text: "File type"
+    },
+    value: {
+      text: params.siteLocationData.fileType
+    }
+  },
+  {
+    key: {
+      text: "File uploaded"
+    },
+    value: {
+      text: params.siteLocationData.filename
+    }
+  }
+] %}
+
+{{ govukSummaryList({
+  card: {
+    title: {
+      text: "Providing the site location"
+    },
+    actions: {
+      items: [
+        {
+          href: "#",
+          text: "Change",
+          classes: 'govuk-link--no-visited-state'
+        }
+      ]
+    } if not params.isReadOnly,
+    attributes: {
+      id: "site-location-card"
+    }
+  },
+  rows: rows
+}) }}
+

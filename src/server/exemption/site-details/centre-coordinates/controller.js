@@ -181,7 +181,13 @@ export const centreCoordinatesSubmitController = {
       return centreCoordinatesSubmitFailHandler(request, h, error)
     }
 
-    updateExemptionSiteDetails(request, siteIndex, 'coordinates', value)
+    await updateExemptionSiteDetails(
+      request,
+      h,
+      siteIndex,
+      'coordinates',
+      value
+    )
 
     const hasCircleWidthEntry = siteDetails.circleWidth
 
@@ -191,7 +197,7 @@ export const centreCoordinatesSubmitController = {
         : routes.WIDTH_OF_SITE + queryParams
 
     if (action && hasCircleWidthEntry) {
-      await saveSiteDetailsToBackend(request)
+      await saveSiteDetailsToBackend(request, h)
     }
 
     return h.redirect(nextRoute)

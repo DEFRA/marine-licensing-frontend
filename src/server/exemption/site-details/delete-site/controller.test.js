@@ -104,7 +104,7 @@ describe('deleteSiteController', () => {
         }
       )
 
-      expect(setExemptionCache).toHaveBeenCalledWith(mockRequest, {
+      expect(setExemptionCache).toHaveBeenCalledWith(mockRequest, mockH, {
         ...mockExemption,
         siteDetails: expectedSiteDetails
       })
@@ -138,10 +138,14 @@ describe('deleteSiteController', () => {
         }
       )
 
-      expect(setExemptionCache).toHaveBeenCalledWith(requestDeleteSecondSite, {
-        ...mockExemption,
-        siteDetails: expectedSiteDetails
-      })
+      expect(setExemptionCache).toHaveBeenCalledWith(
+        requestDeleteSecondSite,
+        mockH,
+        {
+          ...mockExemption,
+          siteDetails: expectedSiteDetails
+        }
+      )
     })
 
     it('should redirect to task list when deleting the last site', async () => {
@@ -163,7 +167,7 @@ describe('deleteSiteController', () => {
         }
       )
 
-      expect(setExemptionCache).toHaveBeenCalledWith(mockRequest, {
+      expect(setExemptionCache).toHaveBeenCalledWith(mockRequest, mockH, {
         ...exemptionWithOneSite,
         siteDetails: []
       })

@@ -80,7 +80,7 @@ export const fileUploadController = {
       errors = errorDisplay.errors
 
       // Clear error from session after retrieving
-      updateExemptionSiteDetails(request, 0, 'uploadError', null)
+      await updateExemptionSiteDetails(request, h, 0, 'uploadError', null)
 
       request.logger.debug(
         {
@@ -110,7 +110,7 @@ export const fileUploadController = {
       })
 
       // Store upload configuration in session
-      updateExemptionSiteDetails(request, 0, 'uploadConfig', {
+      await updateExemptionSiteDetails(request, h, 0, 'uploadConfig', {
         uploadId: uploadConfig.uploadId,
         statusUrl: uploadConfig.statusUrl,
         fileType: fileUploadType

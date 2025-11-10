@@ -98,7 +98,7 @@ describe('#sameActivityDates', () => {
       )
     })
 
-    test('should skip page and automatically update activity dates when not first site', () => {
+    test('should skip page and automatically update activity dates when not first site', async () => {
       const exemptionWithData = {
         ...mockExemption,
         multipleSiteDetails: {
@@ -117,10 +117,11 @@ describe('#sameActivityDates', () => {
         query: {}
       }
 
-      sameActivityDatesController.handler(mockRequestSecondSite, mockH)
+      await sameActivityDatesController.handler(mockRequestSecondSite, mockH)
 
       expect(cacheUtils.updateExemptionSiteDetails).toHaveBeenCalledWith(
         mockRequestSecondSite,
+        mockH,
         1,
         'activityDates',
         mockExemption.siteDetails[0].activityDates
@@ -325,7 +326,7 @@ describe('#sameActivityDates', () => {
 
       expect(
         cacheUtils.updateExemptionMultipleSiteDetails
-      ).toHaveBeenCalledWith(mockRequest, 'sameActivityDates', 'yes')
+      ).toHaveBeenCalledWith(mockRequest, h, 'sameActivityDates', 'yes')
 
       expect(h.redirect).toHaveBeenCalledWith(routes.ACTIVITY_DATES)
     })
@@ -379,7 +380,7 @@ describe('#sameActivityDates', () => {
 
       expect(
         cacheUtils.updateExemptionMultipleSiteDetails
-      ).toHaveBeenCalledWith(mockRequest, 'sameActivityDates', 'yes')
+      ).toHaveBeenCalledWith(mockRequest, h, 'sameActivityDates', 'yes')
 
       expect(h.redirect).toHaveBeenCalledWith(
         routes.ACTIVITY_DATES + '?action=change'
@@ -417,10 +418,11 @@ describe('#sameActivityDates', () => {
 
       expect(
         cacheUtils.updateExemptionMultipleSiteDetails
-      ).toHaveBeenCalledWith(mockRequest, 'sameActivityDates', 'no')
+      ).toHaveBeenCalledWith(mockRequest, h, 'sameActivityDates', 'no')
 
       expect(cacheUtils.updateExemptionSiteDetails).toHaveBeenCalledWith(
         mockRequest,
+        h,
         1,
         'activityDates',
         { start: '2024-01-01', end: '2024-12-31' }
@@ -428,12 +430,13 @@ describe('#sameActivityDates', () => {
 
       expect(cacheUtils.updateExemptionSiteDetails).toHaveBeenCalledWith(
         mockRequest,
+        h,
         2,
         'activityDates',
         { start: '2024-01-01', end: '2024-12-31' }
       )
 
-      expect(saveSiteDetailsToBackend).toHaveBeenCalledWith(mockRequest)
+      expect(saveSiteDetailsToBackend).toHaveBeenCalledWith(mockRequest, h)
 
       expect(h.redirect).toHaveBeenCalledWith(routes.REVIEW_SITE_DETAILS)
     })

@@ -1,5 +1,6 @@
 import {
   getExemptionCache,
+  setSavedSiteDetails,
   updateExemptionSiteDetails
 } from '#src/server/common/helpers/session-cache/utils.js'
 import {
@@ -41,7 +42,7 @@ const getBackLink = (action, siteNumber, queryParams, request) => {
 
 export const coordinateSystemController = {
   options: { pre: [setSiteDataPreHandler] },
-  handler(request, h) {
+  async handler(request, h) {
     const exemption = getExemptionCache(request)
     const { queryParams, siteNumber, siteDetails } = request.site
     const action = request.query.action
@@ -53,7 +54,7 @@ export const coordinateSystemController = {
         savedSiteDetails.originalCoordinateSystem = siteDetails.coordinateSystem
       }
 
-      request.yar.set('savedSiteDetails', savedSiteDetails)
+      await setSavedSiteDetails(request, h, savedSiteDetails)
     }
 
     return h.view(COORDINATE_SYSTEM_VIEW_ROUTE, {
@@ -134,15 +135,16 @@ export const coordinateSystemSubmitController = {
       }
     }
   },
-  handler(request, h) {
+  async handler(request, h) {
     const { payload, site } = request
     const { siteIndex, queryParams, siteDetails } = site
     const action = request.query.action
 
     const exemption = getExemptionCache(request)
 
-    updateExemptionSiteDetails(
+    await updateExemptionSiteDetails(
       request,
+      h,
       siteIndex,
       'coordinateSystem',
       payload.coordinateSystem
@@ -164,8 +166,20 @@ export const coordinateSystemSubmitController = {
       }
 
       if (isStartOfChangeJourney) {
-        updateExemptionSiteDetails(request, siteIndex, 'coordinates', null)
-        updateExemptionSiteDetails(request, siteIndex, 'circleWidth', null)
+        await updateExemptionSiteDetails(
+          request,
+          h,
+          siteIndex,
+          'coordinates',
+          null
+        )
+        await updateExemptionSiteDetails(
+          request,
+          h,
+          siteIndex,
+          'circleWidth',
+          null
+        )
       }
     }
 

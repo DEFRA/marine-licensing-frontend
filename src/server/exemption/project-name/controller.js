@@ -96,7 +96,7 @@ export const projectNameSubmitController = {
             userRelationshipType
           })
 
-      setExemptionCache(request, {
+      await setExemptionCache(request, h, {
         ...exemption,
         ...(!isUpdate && responsePayload.value),
         projectName: payload.projectName

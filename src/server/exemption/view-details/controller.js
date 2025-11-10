@@ -3,7 +3,6 @@ import { errorMessages } from '#src/server/common/constants/error-messages.js'
 import { EXEMPTION_STATUS } from '#src/server/common/constants/exemptions.js'
 import { routes } from '#src/server/common/constants/routes.js'
 import { processSiteDetails } from '#src/server/common/helpers/exemption-site-details.js'
-import { createSiteDetailsDataJson } from '#src/server/common/helpers/site-details.js'
 import { getExemptionService } from '#src/services/exemption-service/index.js'
 import { getAuthProvider } from '#src/server/common/helpers/authenticated-requests.js'
 import { AUTH_STRATEGIES } from '#src/server/common/constants/auth.js'
@@ -34,11 +33,7 @@ export const viewDetailsController = {
       }
 
       const siteDetails = processSiteDetails(exemption, exemptionId, request)
-      const coordinateSystem = siteDetails?.coordinateSystem
-      const siteDetailsData = createSiteDetailsDataJson(
-        siteDetails,
-        coordinateSystem
-      )
+      const { multipleSiteDetails } = exemption
       const isInternalUser =
         getAuthProvider(request) === AUTH_STRATEGIES.ENTRA_ID
 
@@ -53,7 +48,7 @@ export const viewDetailsController = {
         isInternalUser,
         ...exemption,
         siteDetails,
-        siteDetailsData
+        multipleSiteDetails
       })
     } catch (error) {
       if (error.isBoom) {

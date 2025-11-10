@@ -74,7 +74,7 @@ const createMockRequest = () => ({
     error: vi.fn(),
     info: vi.fn()
   },
-  yar: { get: vi.fn(), set: vi.fn() }
+  yar: { get: vi.fn(), set: vi.fn(), commit: vi.fn() }
 })
 
 const createMockGeoJsonResponse = (featureCount = 1) => ({
@@ -204,6 +204,7 @@ const expectRejectedStatusHandling = async (
   // Then expected error handling occurs
   expect(updateExemptionSiteDetailsSpy).toHaveBeenCalledWith(
     mockRequest,
+    expect.any(Object),
     0,
     'uploadError',
     {
@@ -214,6 +215,7 @@ const expectRejectedStatusHandling = async (
   )
   expect(updateExemptionSiteDetailsSpy).toHaveBeenCalledWith(
     mockRequest,
+    expect.any(Object),
     0,
     'uploadConfig',
     null
@@ -263,6 +265,7 @@ const expectFileValidationFailure = async (
   // And error handling occurs
   expect(updateExemptionSiteDetailsSpy).toHaveBeenCalledWith(
     mockRequest,
+    expect.any(Object),
     0,
     'uploadError',
     {
@@ -273,6 +276,7 @@ const expectFileValidationFailure = async (
   )
   expect(updateExemptionSiteDetailsSpy).toHaveBeenCalledWith(
     mockRequest,
+    expect.any(Object),
     0,
     'uploadConfig',
     null
@@ -627,6 +631,7 @@ describe('#uploadAndWait', () => {
         // Then error is set in cache
         expect(updateExemptionSiteDetailsSpy).toHaveBeenCalledWith(
           mockRequest,
+          expect.any(Object),
           0,
           'uploadError',
           {
@@ -639,6 +644,7 @@ describe('#uploadAndWait', () => {
         // And upload config is cleared
         expect(updateExemptionSiteDetailsSpy).toHaveBeenCalledWith(
           mockRequest,
+          expect.any(Object),
           0,
           'uploadConfig',
           null
@@ -768,6 +774,7 @@ describe('#uploadAndWait', () => {
         // And generic error is set in cache
         expect(updateExemptionSiteDetailsSpy).toHaveBeenCalledWith(
           mockRequest,
+          expect.any(Object),
           0,
           'uploadError',
           {
@@ -780,6 +787,7 @@ describe('#uploadAndWait', () => {
         // And upload config is cleared
         expect(updateExemptionSiteDetailsSpy).toHaveBeenCalledWith(
           mockRequest,
+          expect.any(Object),
           0,
           'uploadConfig',
           null
@@ -818,6 +826,7 @@ describe('#uploadAndWait', () => {
         // Then error handling occurs
         expect(updateExemptionSiteDetailsSpy).toHaveBeenCalledWith(
           mockRequest,
+          expect.any(Object),
           0,
           'uploadError',
           {
@@ -829,6 +838,7 @@ describe('#uploadAndWait', () => {
 
         expect(updateExemptionSiteDetailsSpy).toHaveBeenCalledWith(
           mockRequest,
+          expect.any(Object),
           0,
           'uploadConfig',
           null
@@ -866,6 +876,7 @@ describe('#uploadAndWait', () => {
         // Then error handling occurs
         expect(updateExemptionSiteDetailsSpy).toHaveBeenCalledWith(
           mockRequest,
+          expect.any(Object),
           0,
           'uploadError',
           {
@@ -877,6 +888,7 @@ describe('#uploadAndWait', () => {
 
         expect(updateExemptionSiteDetailsSpy).toHaveBeenCalledWith(
           mockRequest,
+          expect.any(Object),
           0,
           'uploadConfig',
           null
@@ -917,6 +929,7 @@ describe('#uploadAndWait', () => {
         // Then error handling occurs
         expect(updateExemptionSiteDetailsSpy).toHaveBeenCalledWith(
           mockRequest,
+          expect.any(Object),
           0,
           'uploadError',
           {
@@ -928,6 +941,7 @@ describe('#uploadAndWait', () => {
 
         expect(updateExemptionSiteDetailsSpy).toHaveBeenCalledWith(
           mockRequest,
+          expect.any(Object),
           0,
           'uploadConfig',
           null
@@ -982,6 +996,7 @@ describe('#uploadAndWait', () => {
 
         expect(updateExemptionSiteDetailsSpy).toHaveBeenCalledWith(
           mockRequest,
+          expect.any(Object),
           0,
           'uploadError',
           {
@@ -993,6 +1008,7 @@ describe('#uploadAndWait', () => {
 
         expect(updateExemptionSiteDetailsSpy).toHaveBeenCalledWith(
           mockRequest,
+          expect.any(Object),
           0,
           'uploadConfig',
           null
@@ -1047,6 +1063,7 @@ describe('#uploadAndWait', () => {
 
         expect(updateExemptionSiteDetailsSpy).toHaveBeenCalledWith(
           mockRequest,
+          expect.any(Object),
           0,
           'uploadError',
           {
@@ -1058,6 +1075,7 @@ describe('#uploadAndWait', () => {
 
         expect(updateExemptionSiteDetailsSpy).toHaveBeenCalledWith(
           mockRequest,
+          expect.any(Object),
           0,
           'uploadConfig',
           null
@@ -1113,6 +1131,7 @@ describe('#uploadAndWait', () => {
 
         expect(updateExemptionSiteDetailsSpy).toHaveBeenCalledWith(
           mockRequest,
+          expect.any(Object),
           0,
           'uploadError',
           {
@@ -1124,6 +1143,7 @@ describe('#uploadAndWait', () => {
 
         expect(updateExemptionSiteDetailsSpy).toHaveBeenCalledWith(
           mockRequest,
+          expect.any(Object),
           0,
           'uploadConfig',
           null
@@ -1158,6 +1178,7 @@ describe('#uploadAndWait', () => {
         // And upload config is cleared
         expect(updateExemptionSiteDetailsSpy).toHaveBeenCalledWith(
           mockRequest,
+          expect.any(Object),
           0,
           'uploadConfig',
           null
@@ -1247,6 +1268,7 @@ describe('#uploadAndWait', () => {
         // Then error handling occurs due to missing s3Location
         expect(updateExemptionSiteDetailsSpy).toHaveBeenCalledWith(
           mockRequest,
+          expect.any(Object),
           0,
           'uploadError',
           {
@@ -1258,6 +1280,7 @@ describe('#uploadAndWait', () => {
 
         expect(updateExemptionSiteDetailsSpy).toHaveBeenCalledWith(
           mockRequest,
+          expect.any(Object),
           0,
           'uploadConfig',
           null

@@ -78,7 +78,7 @@ export const prepareManualCoordinateDataForSave = (exemption, request) => {
   return exemption.siteDetails
 }
 
-export const saveSiteDetailsToBackend = async (request) => {
+export const saveSiteDetailsToBackend = async (request, h) => {
   const exemption = getExemptionCache(request)
   const { siteDetails } = exemption
   const coordinatesType = siteDetails[0]?.coordinatesType
@@ -103,7 +103,10 @@ export const saveSiteDetailsToBackend = async (request) => {
       id: exemption.id
     })
 
-    setExemptionCache(request, { ...exemption, siteDetails: dataToSave })
+    await setExemptionCache(request, h, {
+      ...exemption,
+      siteDetails: dataToSave
+    })
 
     request.logger.info(
       {

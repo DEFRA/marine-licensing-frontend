@@ -1,15 +1,9 @@
 {% extends 'layouts/page.njk' %}
 {% from "govuk/components/back-link/macro.njk" import govukBackLink %}
-{% from "site-details-data-script/macro.njk" import appSiteDetailsDataScript %}
 {% from "application-details-card/macro.njk" import appApplicationDetailsCard %}
 {% from "project-details-card/macro.njk" import appProjectDetailsCard %}
 {% from "site-details-card/macro.njk" import appSiteDetailsCard %}
 {% from "public-register-card/macro.njk" import appPublicRegisterCard %}
-
-{% block head %}
-  {{ super() }}
-  {{ appSiteDetailsDataScript(siteDetailsData) }}
-{% endblock %}
 
 {% block beforeContent %}
   {{ super() }}
@@ -47,10 +41,14 @@
       isInternalUser: isInternalUser
     }) }}
     {% endif %}
+    {% for site in siteDetails %}
     {{ appSiteDetailsCard({
-      siteDetails: siteDetails,
+      siteDetails: site,
+      siteNumber: site.siteNumber,
+      multipleSiteDetails: multipleSiteDetails,
       isReadOnly: isReadOnly
     }) }}
+    {% endfor %}
     {{ appPublicRegisterCard({
       publicRegister: publicRegister,
       isReadOnly: isReadOnly

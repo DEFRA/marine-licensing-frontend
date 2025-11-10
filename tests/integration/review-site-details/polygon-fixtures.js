@@ -61,7 +61,7 @@ export const testScenarios = [
           activityDescription: 'Test activity description',
           cardName: 'Site details',
           method:
-            'Manually enter multiple sets of coordinates to mark the boundary of the site',
+            'Enter multiple sets of coordinates to mark the boundary of the site',
           coordinateSystem:
             'WGS84 (World Geodetic System 1984)Latitude and longitude',
           polygonCoordinates: [
@@ -118,7 +118,7 @@ export const testScenarios = [
           activityDescription: 'Test activity description',
           cardName: 'Site details',
           method:
-            'Manually enter multiple sets of coordinates to mark the boundary of the site',
+            'Enter multiple sets of coordinates to mark the boundary of the site',
           coordinateSystem:
             'British National Grid (OSGB36)Eastings and Northings',
           polygonCoordinates: [
@@ -177,7 +177,7 @@ export const testScenarios = [
           activityDescription: 'Test activity description',
           cardName: 'Site details',
           method:
-            'Manually enter multiple sets of coordinates to mark the boundary of the site',
+            'Enter multiple sets of coordinates to mark the boundary of the site',
           coordinateSystem:
             'WGS84 (World Geodetic System 1984)Latitude and longitude',
           polygonCoordinates: [
@@ -245,7 +245,7 @@ export const testScenarios = [
           activityDescription: 'Test activity description',
           cardName: 'Site details',
           method:
-            'Manually enter multiple sets of coordinates to mark the boundary of the site',
+            'Enter multiple sets of coordinates to mark the boundary of the site',
           coordinateSystem:
             'British National Grid (OSGB36)Eastings and Northings',
           polygonCoordinates: [
@@ -333,7 +333,7 @@ export const testScenarios = [
           siteName: 'Site 1',
           cardName: 'Site 1 details',
           method:
-            'Manually enter multiple sets of coordinates to mark the boundary of the site',
+            'Enter multiple sets of coordinates to mark the boundary of the site',
           coordinateSystem:
             'WGS84 (World Geodetic System 1984)Latitude and longitude',
           polygonCoordinates: [
@@ -355,7 +355,7 @@ export const testScenarios = [
           siteName: 'Site 2',
           cardName: 'Site 2 details',
           method:
-            'Manually enter multiple sets of coordinates to mark the boundary of the site',
+            'Enter multiple sets of coordinates to mark the boundary of the site',
           coordinateSystem:
             'WGS84 (World Geodetic System 1984)Latitude and longitude',
           polygonCoordinates: [
@@ -431,7 +431,7 @@ export const testScenarios = [
           activityDates: '1 January 2025 to 1 January 2025',
           activityDescription: 'Test activity description',
           method:
-            'Manually enter multiple sets of coordinates to mark the boundary of the site',
+            'Enter multiple sets of coordinates to mark the boundary of the site',
           coordinateSystem:
             'WGS84 (World Geodetic System 1984)Latitude and longitude',
           polygonCoordinates: [
@@ -455,7 +455,7 @@ export const testScenarios = [
           activityDates: '1 February 2025 to 1 February 2025',
           activityDescription: 'Test activity description',
           method:
-            'Manually enter multiple sets of coordinates to mark the boundary of the site',
+            'Enter multiple sets of coordinates to mark the boundary of the site',
           coordinateSystem:
             'British National Grid (OSGB36)Eastings and Northings',
           polygonCoordinates: [

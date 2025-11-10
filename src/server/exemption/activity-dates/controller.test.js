@@ -203,6 +203,7 @@ describe('#activityDatesController', () => {
 
       expect(mockedUpdateExemptionSiteDetails).toHaveBeenCalledWith(
         expect.any(Object),
+        expect.any(Object),
         expect.any(Number),
         'activityDates',
         expect.objectContaining({

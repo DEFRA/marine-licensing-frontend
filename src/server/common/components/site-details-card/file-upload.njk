@@ -1,9 +1,64 @@
 {% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
+{% from "site-details-map/macro.njk" import appSiteDetailsMap %}
+
+{% set cardTitle %}
+  {% if params.multipleSiteDetails and params.multipleSiteDetails.multipleSitesEnabled %}
+    Site {{ params.siteNumber }} details
+  {% else %}
+    Site details
+  {% endif %}
+{% endset %}
+
+{% set siteDetailsRows = [] %}
+
+{% if params.multipleSiteDetails and params.multipleSiteDetails.multipleSitesEnabled %}
+  {% set siteDetailsRows = (siteDetailsRows.push({
+    key: {
+      text: "Site name"
+    },
+    value: {
+      text: params.siteDetails.siteName
+    }
+  }), siteDetailsRows) %}
+{% endif %}
+
+{% if params.siteDetails.showActivityDates %}
+  {% set siteDetailsRows = (siteDetailsRows.push({
+    key: {
+      text: "Activity dates"
+    },
+    value: {
+      text: params.siteDetails.activityDates
+    }
+  }), siteDetailsRows) %}
+{% endif %}
+
+{% if params.siteDetails.showActivityDescription %}
+  {% set siteDetailsRows = (siteDetailsRows.push({
+    key: {
+      text: "Activity description"
+    },
+    value: {
+      text: params.siteDetails.activityDescription
+    }
+  }), siteDetailsRows) %}
+{% endif %}
+
+{% set siteDetailsRows = (siteDetailsRows.push({
+  key: {
+    text: "Map view"
+  },
+  value: 
+  { 
+    html: appSiteDetailsMap(params.siteDetails.siteDetailsData, params.siteNumber - 1), 
+    classes: "govuk-summary-list__value--full-width" 
+  }
+}), siteDetailsRows) %}
 
 {{ govukSummaryList({
     card: {
       title: {
-        text: "Site details"
+        text: cardTitle
       },
       actions: {
         items: [
@@ -17,38 +72,5 @@
         id: "site-details-card"
       }
     },
-    rows: [
-      {
-        key: {
-          text: "Method of providing site location"
-        },
-        value: {
-          html: params.siteDetails.method
-        }
-      },
-      {
-        key: {
-          text: "File type"
-        },
-        value: {
-          html: params.siteDetails.fileType
-        }
-      },
-      {
-        key: {
-          text: "File uploaded"
-        },
-        value: {
-          html: params.siteDetails.filename
-        }
-      },
-      {
-        key: {
-          text: "Map view"
-        },
-        value: {
-          html: '<div class="app-site-details-map" data-module="site-details-map"></div>'
-        }
-      }
-    ]
+    rows: siteDetailsRows
   }) }}

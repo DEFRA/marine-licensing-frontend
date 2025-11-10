@@ -124,13 +124,16 @@ describe('#delete', () => {
   })
 
   describe('deleteExemptionSelectController', () => {
-    it('should clear cache, set exemption ID in cache, and redirect to delete page', () => {
+    it('should clear cache, set exemption ID in cache, and redirect to delete page', async () => {
       mockRequest.params = { exemptionId: 'test-project-id' }
 
-      const result = deleteExemptionSelectController.handler(mockRequest, mockH)
+      const result = await deleteExemptionSelectController.handler(
+        mockRequest,
+        mockH
+      )
 
-      expect(mockedClearExemptionCache).toHaveBeenCalledWith(mockRequest)
-      expect(mockedSetExemptionCache).toHaveBeenCalledWith(mockRequest, {
+      expect(mockedClearExemptionCache).toHaveBeenCalledWith(mockRequest, mockH)
+      expect(mockedSetExemptionCache).toHaveBeenCalledWith(mockRequest, mockH, {
         id: 'test-project-id'
       })
       expect(mockH.redirect).toHaveBeenCalledWith(routes.DELETE_EXEMPTION)
@@ -155,7 +158,7 @@ describe('#delete', () => {
         'DELETE',
         '/exemption/test-project-id'
       )
-      expect(mockedClearExemptionCache).toHaveBeenCalledWith(mockRequest)
+      expect(mockedClearExemptionCache).toHaveBeenCalledWith(mockRequest, mockH)
       expect(mockH.redirect).toHaveBeenCalledWith(routes.DASHBOARD)
       expect(result).toBe('redirect-response')
     })

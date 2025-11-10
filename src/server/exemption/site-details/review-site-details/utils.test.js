@@ -3,14 +3,12 @@ import Boom from '@hapi/boom'
 import { COORDINATE_SYSTEMS } from '#src/server/common/constants/exemptions.js'
 import { routes } from '#src/server/common/constants/routes.js'
 import {
-  buildMultipleSitesSummaryData,
   buildManualCoordinateSummaryData,
   getCoordinateDisplayText,
   getCoordinateSystemText,
   getFileUploadBackLink,
   getFileUploadSummaryData,
   getPolygonCoordinatesDisplayData,
-  getReviewSummaryText,
   getSiteDetailsBackLink,
   handleSubmissionError,
   hasIncompleteFields,
@@ -252,23 +250,6 @@ describe('siteDetails utils', () => {
         coordinates: [],
         geoJSON: {}
       })
-    })
-  })
-
-  describe('getReviewSummaryText utils', () => {
-    test('getReviewSummaryText correctly returns text for site details circle width text', () => {
-      expect(
-        getReviewSummaryText({
-          coordinatesEntry: 'single',
-          coordinatesType: 'coordinates'
-        })
-      ).toBe(
-        'Manually enter one set of coordinates and a width to create a circular site'
-      )
-    })
-
-    test('getReviewSummaryText correctly returns blank otherwise', () => {
-      expect(getReviewSummaryText({})).toBe('')
     })
   })
 
@@ -514,7 +495,7 @@ describe('siteDetails utils', () => {
           activityDates: '1 January 2025 to 1 January 2025',
           activityDescription: 'Test activity description',
           method:
-            'Manually enter one set of coordinates and a width to create a circular site',
+            'Enter one set of coordinates and a width to create a circular site',
           showActivityDates: true,
           showActivityDescription: true,
           siteName: 'Test Site 1',
@@ -567,7 +548,7 @@ describe('siteDetails utils', () => {
           activityDates: '',
           activityDescription: '',
           method:
-            'Manually enter one set of coordinates and a width to create a circular site',
+            'Enter one set of coordinates and a width to create a circular site',
           showActivityDates: false,
           showActivityDescription: false,
           siteName: 'Test Site 2',
@@ -610,7 +591,7 @@ describe('siteDetails utils', () => {
           activityDates: '1 January 2025 to 1 January 2025',
           activityDescription: 'Test activity description',
           method:
-            'Manually enter one set of coordinates and a width to create a circular site',
+            'Enter one set of coordinates and a width to create a circular site',
           showActivityDates: true,
           showActivityDescription: true,
           siteName: 'Test Site 3',
@@ -652,150 +633,6 @@ describe('siteDetails utils', () => {
       expect(result[0].activityDates).toBe('')
       expect(result[0].activityDescription).toBe('')
       expect(result[0].width).toBe('')
-    })
-  })
-
-  describe('buildMultipleSitesSummaryData util', () => {
-    test('buildMultipleSitesSummaryData correctly handles multiple sites', () => {
-      const result = buildMultipleSitesSummaryData(
-        {
-          multipleSitesEnabled: true,
-          sameActivityDates: 'no',
-          sameActivityDescription: 'no'
-        },
-        mockExemption.siteDetails
-      )
-
-      expect(result).toEqual({
-        method: 'Enter the coordinates of the site manually',
-        multipleSiteDetails: 'Yes',
-        sameActivityDates: 'No',
-        sameActivityDescription: 'No'
-      })
-    })
-
-    test('buildMultipleSitesSummaryData correctly empty sites', () => {
-      const result = buildMultipleSitesSummaryData(
-        {
-          multipleSitesEnabled: true
-        },
-        {}
-      )
-
-      expect(result).toEqual({})
-    })
-
-    test('buildMultipleSitesSummaryData correctly handles multiple sites with same dates and description', () => {
-      const result = buildMultipleSitesSummaryData(
-        {
-          multipleSitesEnabled: true,
-          sameActivityDates: 'yes',
-          sameActivityDescription: 'yes'
-        },
-        mockExemption.siteDetails
-      )
-
-      expect(result).toEqual({
-        method: 'Enter the coordinates of the site manually',
-        multipleSiteDetails: 'Yes',
-        sameActivityDates: 'Yes',
-        sameActivityDescription: 'Yes',
-        activityDates: '1 January 2025 to 1 January 2025',
-        activityDescription: 'Test activity description'
-      })
-    })
-
-    test('buildMultipleSitesSummaryData correctly handles single site', () => {
-      const result = buildMultipleSitesSummaryData(
-        {
-          multipleSitesEnabled: false
-        },
-        [mockExemption.siteDetails[0]]
-      )
-
-      expect(result).toEqual({
-        method: 'Enter the coordinates of the site manually',
-        multipleSiteDetails: 'No',
-        sameActivityDates: 'No',
-        sameActivityDescription: 'No'
-      })
-    })
-
-    test('buildMultipleSitesSummaryData correctly handles file upload with KML', () => {
-      const siteDetails = [
-        {
-          coordinatesType: 'file',
-          fileUploadType: 'kml',
-          uploadedFile: {
-            filename: 'test-site.kml'
-          },
-          activityDates: {
-            start: '2025-01-01T00:00:00.000Z',
-            end: '2025-01-01T00:00:00.000Z'
-          },
-          activityDescription: 'Test activity description'
-        }
-      ]
-
-      const result = buildMultipleSitesSummaryData(
-        {
-          multipleSitesEnabled: true,
-          sameActivityDates: 'yes',
-          sameActivityDescription: 'yes'
-        },
-        siteDetails
-      )
-
-      expect(result).toEqual({
-        method: 'Upload a file with the coordinates of the site',
-        multipleSiteDetails: 'Yes',
-        sameActivityDates: 'Yes',
-        sameActivityDescription: 'Yes',
-        activityDates: '1 January 2025 to 1 January 2025',
-        activityDescription: 'Test activity description',
-        fileType: 'KML',
-        filename: 'test-site.kml'
-      })
-    })
-
-    test('buildMultipleSitesSummaryData correctly handles file upload with Shapefile', () => {
-      const siteDetails = [
-        {
-          coordinatesType: 'file',
-          fileUploadType: 'shapefile',
-          uploadedFile: {
-            filename: 'test-site.zip'
-          },
-          activityDates: {
-            start: '2025-01-01T00:00:00.000Z',
-            end: '2025-01-01T00:00:00.000Z'
-          }
-        }
-      ]
-
-      const result = buildMultipleSitesSummaryData(
-        {
-          multipleSitesEnabled: false,
-          sameActivityDates: 'no',
-          sameActivityDescription: 'no'
-        },
-        siteDetails
-      )
-
-      expect(result).toEqual({
-        method: 'Upload a file with the coordinates of the site',
-        multipleSiteDetails: 'No',
-        sameActivityDates: 'No',
-        sameActivityDescription: 'No',
-        fileType: 'Shapefile',
-        filename: 'test-site.zip'
-      })
-    })
-
-    test('buildMultipleSitesSummaryData correctly handles empty object', () => {
-      const result = buildMultipleSitesSummaryData({})
-
-      expect(result).toEqual({})
     })
   })
 
@@ -932,7 +769,7 @@ describe('siteDetails utils', () => {
               activityDates: '1 January 2025 to 1 January 2025',
               activityDescription: 'Test activity description',
               method:
-                'Manually enter one set of coordinates and a width to create a circular site',
+                'Enter one set of coordinates and a width to create a circular site',
               showActivityDates: true,
               showActivityDescription: true,
               siteName: 'Manual Coordinate Site 1'

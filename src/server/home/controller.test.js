@@ -27,7 +27,10 @@ describe('#homeController', () => {
     })
     expect(statusCode).toBe(statusCodes.redirect)
     expect(headers.location).toBe('/exemption')
-    expect(clearExemptionCache).toHaveBeenCalledWith(expect.any(Object))
+    expect(clearExemptionCache).toHaveBeenCalledWith(
+      expect.any(Object),
+      expect.any(Object)
+    )
   })
 
   test('Should redirect to dashboard when coming from account management page', async () => {
@@ -55,6 +58,9 @@ describe('#homeController', () => {
     })
     expect(statusCode).toBe(statusCodes.redirect)
     expect(headers.location).toBe('/exemption')
-    expect(clearExemptionCache).toHaveBeenCalledWith(expect.any(Object))
+    expect(clearExemptionCache).toHaveBeenCalledWith(
+      expect.any(Object),
+      expect.any(Object)
+    )
   })
 })

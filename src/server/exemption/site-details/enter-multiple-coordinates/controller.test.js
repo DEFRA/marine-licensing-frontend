@@ -199,11 +199,12 @@ describe('#multipleCoordinates', () => {
 
       expect(updateExemptionSiteDetails).toHaveBeenCalledWith(
         request,
+        mockH,
         0,
         'coordinates',
         expect.any(Array)
       )
-      expect(saveSiteDetailsToBackend).toHaveBeenCalledWith(request)
+      expect(saveSiteDetailsToBackend).toHaveBeenCalledWith(request, mockH)
       expect(mockH.redirect).toHaveBeenCalledWith(routes.REVIEW_SITE_DETAILS)
     })
 
@@ -222,6 +223,7 @@ describe('#multipleCoordinates', () => {
 
       expect(updateExemptionSiteDetails).toHaveBeenCalledWith(
         request,
+        mockH,
         0,
         'coordinates',
         [
@@ -239,7 +241,7 @@ describe('#multipleCoordinates', () => {
           }
         ]
       )
-      expect(saveSiteDetailsToBackend).toHaveBeenCalledWith(request)
+      expect(saveSiteDetailsToBackend).toHaveBeenCalledWith(request, mockH)
       expect(mockH.redirect).toHaveBeenCalledWith(routes.REVIEW_SITE_DETAILS)
     })
 
@@ -325,11 +327,12 @@ describe('#multipleCoordinates', () => {
 
       expect(updateExemptionSiteDetails).toHaveBeenCalledWith(
         request,
+        mockH,
         0,
         'coordinates',
         expect.any(Array)
       )
-      expect(saveSiteDetailsToBackend).toHaveBeenCalledWith(request)
+      expect(saveSiteDetailsToBackend).toHaveBeenCalledWith(request, mockH)
       expect(mockH.redirect).toHaveBeenCalledWith(routes.REVIEW_SITE_DETAILS)
     })
 
@@ -351,11 +354,12 @@ describe('#multipleCoordinates', () => {
 
       expect(updateExemptionSiteDetails).toHaveBeenCalledWith(
         request,
+        mockH,
         0,
         'coordinates',
         expect.any(Array)
       )
-      expect(saveSiteDetailsToBackend).toHaveBeenCalledWith(request)
+      expect(saveSiteDetailsToBackend).toHaveBeenCalledWith(request, mockH)
       expect(mockH.redirect).toHaveBeenCalledWith(routes.REVIEW_SITE_DETAILS)
     })
 
@@ -375,7 +379,7 @@ describe('#multipleCoordinates', () => {
       expect(mockH.redirect).toHaveBeenCalledWith(routes.REVIEW_SITE_DETAILS)
     })
 
-    test('should re-render the page with an added wgs84 point when the add point button is clicked', () => {
+    test('should re-render the page with an added wgs84 point when the add point button is clicked', async () => {
       const payload = {
         'coordinates[0][latitude]': '51.507400',
         'coordinates[0][longitude]': '-0.127800',
@@ -391,7 +395,7 @@ describe('#multipleCoordinates', () => {
         coordinateSystem: COORDINATE_SYSTEMS.WGS84
       })
 
-      multipleCoordinatesSubmitController.handler(request, mockH)
+      await multipleCoordinatesSubmitController.handler(request, mockH)
 
       expect(mockH.view).toHaveBeenCalledWith(
         MULTIPLE_COORDINATES_VIEW_ROUTES[COORDINATE_SYSTEMS.WGS84],
@@ -403,7 +407,7 @@ describe('#multipleCoordinates', () => {
       )
     })
 
-    test('should re-render the page with an added osgb36 point when the add point button is clicked', () => {
+    test('should re-render the page with an added osgb36 point when the add point button is clicked', async () => {
       const payload = {
         'coordinates[0][eastings]': '530000',
         'coordinates[0][northings]': '181000',
@@ -419,7 +423,7 @@ describe('#multipleCoordinates', () => {
         coordinateSystem: COORDINATE_SYSTEMS.OSGB36
       })
 
-      multipleCoordinatesSubmitController.handler(request, mockH)
+      await multipleCoordinatesSubmitController.handler(request, mockH)
 
       expect(mockH.view).toHaveBeenCalledWith(
         MULTIPLE_COORDINATES_VIEW_ROUTES[COORDINATE_SYSTEMS.OSGB36],
@@ -431,7 +435,7 @@ describe('#multipleCoordinates', () => {
       )
     })
 
-    test('should re-render the page with a removed point when the remove button is clicked', () => {
+    test('should re-render the page with a removed point when the remove button is clicked', async () => {
       const payload = {
         'coordinates[0][eastings]': '530000',
         'coordinates[0][northings]': '181000',
@@ -447,7 +451,7 @@ describe('#multipleCoordinates', () => {
         coordinateSystem: COORDINATE_SYSTEMS.OSGB36
       })
 
-      multipleCoordinatesSubmitController.handler(request, mockH)
+      await multipleCoordinatesSubmitController.handler(request, mockH)
 
       expect(mockH.view).toHaveBeenCalledWith(
         MULTIPLE_COORDINATES_VIEW_ROUTES[COORDINATE_SYSTEMS.OSGB36],

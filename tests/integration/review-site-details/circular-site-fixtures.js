@@ -58,7 +58,7 @@ export const testScenarios = [
           activityDescription: 'Test activity description',
           cardName: 'Site details',
           method:
-            'Manually enter one set of coordinates and a width to create a circular site',
+            'Enter one set of coordinates and a width to create a circular site',
           coordinateSystem:
             'WGS84 (World Geodetic System 1984)Latitude and longitude',
           centreCoordinates: '55.123456, 55.123456',
@@ -100,7 +100,7 @@ export const testScenarios = [
           activityDescription: 'Test activity description',
           cardName: 'Site details',
           method:
-            'Manually enter one set of coordinates and a width to create a circular site',
+            'Enter one set of coordinates and a width to create a circular site',
           coordinateSystem:
             'British National Grid (OSGB36)Eastings and Northings',
           centreCoordinates: '425053, 564180',
@@ -158,7 +158,7 @@ export const testScenarios = [
           siteName: 'Site 1',
           cardName: 'Site 1 details',
           method:
-            'Manually enter one set of coordinates and a width to create a circular site',
+            'Enter one set of coordinates and a width to create a circular site',
           coordinateSystem:
             'WGS84 (World Geodetic System 1984)Latitude and longitude',
           centreCoordinates: '55.123456, 55.123456',
@@ -168,7 +168,7 @@ export const testScenarios = [
           siteName: 'Site 2',
           cardName: 'Site 2 details',
           method:
-            'Manually enter one set of coordinates and a width to create a circular site',
+            'Enter one set of coordinates and a width to create a circular site',
           coordinateSystem:
             'WGS84 (World Geodetic System 1984)Latitude and longitude',
           centreCoordinates: '51.489676, -0.231530',
@@ -226,7 +226,7 @@ export const testScenarios = [
           activityDates: '1 January 2025 to 1 January 2025',
           activityDescription: 'Test activity description',
           method:
-            'Manually enter one set of coordinates and a width to create a circular site',
+            'Enter one set of coordinates and a width to create a circular site',
           coordinateSystem:
             'WGS84 (World Geodetic System 1984)Latitude and longitude',
           centreCoordinates: '55.123456, 55.123456',
@@ -238,7 +238,7 @@ export const testScenarios = [
           activityDates: '1 February 2025 to 1 February 2025',
           activityDescription: 'Test activity description',
           method:
-            'Manually enter one set of coordinates and a width to create a circular site',
+            'Enter one set of coordinates and a width to create a circular site',
           coordinateSystem:
             'British National Grid (OSGB36)Eastings and Northings',
           centreCoordinates: '425053, 564180',

@@ -20,8 +20,9 @@ import {
   makeGetRequest,
   makePostRequest
 } from '~/src/server/test-helpers/server-requests.js'
-
+import { saveSiteDetailsToBackend } from '#src/server/common/helpers/save-site-details.js'
 vi.mock('~/src/server/common/helpers/session-cache/utils.js')
+vi.mock('#src/server/common/helpers/save-site-details.js')
 
 describe('Site name page', () => {
   const getServer = setupTestServer()
@@ -32,7 +33,11 @@ describe('Site name page', () => {
     siteDetails: [{}]
   }
 
-  beforeEach(() => mockExemption(mockExemptionData))
+  beforeEach(() => {
+    mockExemption(mockExemptionData)
+    vi.mocked(saveSiteDetailsToBackend).mockResolvedValue(undefined)
+    vi.mocked(setExemptionCache).mockResolvedValue(undefined)
+  })
 
   test('should display the site name page with correct content', async () => {
     const { result, statusCode } = await makeGetRequest({
@@ -194,6 +199,7 @@ describe('Site name page', () => {
 
     expect(updateExemptionSiteDetails).toHaveBeenCalledWith(
       expect.any(Object),
+      expect.any(Object),
       0,
       'siteName',
       'Test Site Name'
@@ -276,10 +282,30 @@ describe('Site name page', () => {
 
     expect(updateExemptionSiteDetails).toHaveBeenCalledWith(
       expect.any(Object),
+      expect.any(Object),
       0,
       'siteName',
       'New Site Name'
     )
+  })
+
+  test('should add new site when coming from add another point ', async () => {
+    const { setExemptionCache } = mockExemption(mockExemptionData)
+
+    const response = await makePostRequest({
+      url: '/exemption/site-name?site=2',
+      server: getServer(),
+      formData: {
+        siteName: 'New Site Name'
+      }
+    })
+
+    expect(response.statusCode).toBe(statusCodes.redirect)
+    expect(response.headers.location).toBe(
+      '/exemption/same-activity-dates?site=2'
+    )
+
+    expect(setExemptionCache).toHaveBeenCalled()
   })
 
   test('should redirect to review site details after submit', async () => {
@@ -302,6 +328,7 @@ describe('Site name page', () => {
     )
 
     expect(updateExemptionSiteDetails).toHaveBeenCalledWith(
+      expect.any(Object),
       expect.any(Object),
       1,
       'siteName',

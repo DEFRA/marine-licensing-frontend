@@ -91,13 +91,14 @@ export const coordinatesTypeSubmitController = {
       }
     }
   },
-  handler(request, h) {
+  async handler(request, h) {
     const { payload } = request
 
     const { siteIndex, queryParams } = request.site
 
-    updateExemptionSiteDetails(
+    await updateExemptionSiteDetails(
       request,
+      h,
       siteIndex,
       'coordinatesType',
       payload.coordinatesType

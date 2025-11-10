@@ -208,11 +208,15 @@ describe('Activity dates - page structure & accessibility', () => {
 
     expect(updateExemptionSiteDetails).toHaveBeenCalledWith(
       expect.any(Object),
+      expect.any(Object),
       0,
       'activityDates',
       expect.any(Object)
     )
-    expect(saveSiteDetailsToBackend).toHaveBeenCalledWith(expect.any(Object))
+    expect(saveSiteDetailsToBackend).toHaveBeenCalledWith(
+      expect.any(Object),
+      expect.any(Object)
+    )
   })
 
   test('should redirect to review site details after submit when action parameter is present for specific site', async () => {
@@ -243,11 +247,15 @@ describe('Activity dates - page structure & accessibility', () => {
 
     expect(updateExemptionSiteDetails).toHaveBeenCalledWith(
       expect.any(Object),
+      expect.any(Object),
       1,
       'activityDates',
       expect.any(Object)
     )
-    expect(saveSiteDetailsToBackend).toHaveBeenCalledWith(expect.any(Object))
+    expect(saveSiteDetailsToBackend).toHaveBeenCalledWith(
+      expect.any(Object),
+      expect.any(Object)
+    )
   })
 
   test('should redirect to correct page after submit', async () => {
@@ -275,6 +283,7 @@ describe('Activity dates - page structure & accessibility', () => {
     expect(response.headers.location).toBe('/exemption/activity-description')
 
     expect(updateExemptionSiteDetails).toHaveBeenCalledWith(
+      expect.any(Object),
       expect.any(Object),
       0,
       'activityDates',

@@ -2,10 +2,6 @@ import {
   getExemptionCache,
   updateExemptionSiteDetails
 } from '#src/server/common/helpers/session-cache/utils.js'
-import {
-  setSiteData,
-  setSiteDataPreHandler
-} from '#src/server/common/helpers/session-cache/site-utils.js'
 import { routes } from '#src/server/common/constants/routes.js'
 import { saveSiteDetailsToBackend } from '#src/server/common/helpers/save-site-details.js'
 import {
@@ -14,6 +10,12 @@ import {
 } from '#src/server/common/helpers/errors.js'
 import { getCancelLink } from '#src/server/exemption/site-details/utils/cancel-link.js'
 import joi from 'joi'
+import {
+  addNewSite,
+  getSiteDataFromParam,
+  hasInvalidSiteNumber,
+  shouldAddNewSite
+} from './utils.js'
 
 const SITE_NAME_MAX_LENGTH = 250
 
@@ -44,9 +46,9 @@ const createValidationFailAction = (request, h, err) => {
   const { payload } = request
   const exemption = getExemptionCache(request)
 
-  const site = setSiteData(request)
-  const { siteNumber, siteIndex } = site
-  const action = request.query.action
+  const { action, site } = request.query
+
+  const { siteIndex, siteNumber } = getSiteDataFromParam(site)
 
   if (!err.details) {
     return h
@@ -81,15 +83,19 @@ const createValidationFailAction = (request, h, err) => {
 }
 
 export const siteNameController = {
-  options: {
-    pre: [setSiteDataPreHandler]
-  },
   handler(request, h) {
     const exemption = getExemptionCache(request)
 
-    const { site } = request
-    const { siteNumber, siteIndex, siteDetails } = site
-    const action = request.query.action
+    const { action, site } = request.query
+    const { siteDetails } = exemption
+
+    const { siteIndex, siteNumber } = getSiteDataFromParam(site)
+
+    if (site && hasInvalidSiteNumber(siteNumber, siteDetails)) {
+      return h.redirect(routes.TASK_LIST)
+    }
+
+    const siteName = siteDetails?.[siteIndex]?.siteName ?? ''
 
     return h.view(SITE_NAME_VIEW_ROUTE, {
       ...siteNameSettings,
@@ -99,7 +105,7 @@ export const siteNameController = {
       siteNumber,
       action,
       payload: {
-        siteName: siteDetails?.siteName
+        siteName
       }
     })
   }
@@ -107,7 +113,6 @@ export const siteNameController = {
 
 export const siteNameSubmitController = {
   options: {
-    pre: [setSiteDataPreHandler],
     validate: {
       payload: joi.object({
         siteName: joi
@@ -125,19 +130,34 @@ export const siteNameSubmitController = {
     }
   },
   async handler(request, h) {
-    const { payload, site } = request
+    const exemption = getExemptionCache(request)
 
-    const { queryParams, siteIndex, siteNumber } = site
-    const action = request.query.action
+    const { payload } = request
 
-    updateExemptionSiteDetails(request, siteIndex, 'siteName', payload.siteName)
+    const { action, site } = request.query
+
+    const { siteIndex, siteNumber } = getSiteDataFromParam(site)
+
+    const queryParams = site ? `?site=${site}` : ''
 
     const redirectRoute = action
       ? `${routes.REVIEW_SITE_DETAILS}#site-details-${siteNumber}`
-      : routes.SAME_ACTIVITY_DATES + queryParams
+      : `${routes.SAME_ACTIVITY_DATES}${queryParams}`
+
+    if (shouldAddNewSite(site, exemption)) {
+      await addNewSite(request, h, exemption, payload)
+    } else {
+      await updateExemptionSiteDetails(
+        request,
+        h,
+        siteIndex,
+        'siteName',
+        payload.siteName
+      )
+    }
 
     if (action) {
-      await saveSiteDetailsToBackend(request)
+      await saveSiteDetailsToBackend(request, h)
     }
 
     return h.redirect(redirectRoute)

@@ -117,17 +117,29 @@ export const validateProjectDetails = (document, expected) => {
   )
 }
 
+export const validateSiteLocation = (document, expected) => {
+  if (expected.siteLocation) {
+    validateSummaryCardContent(
+      document,
+      '#site-location-card',
+      expected.siteLocation
+    )
+  }
+}
+
 /**
  * Validates activity details summary card
  * @param {Document} document - JSDOM document
  * @param {object} expected - Expected page content
  */
 export const validateActivityDetails = (document, expected) => {
-  validateSummaryCardContent(
-    document,
-    '#activity-details-card',
-    expected.activityDetails
-  )
+  if (expected.activityDetails) {
+    validateSummaryCardContent(
+      document,
+      '#activity-details-card',
+      expected.activityDetails
+    )
+  }
 }
 
 /**
@@ -149,29 +161,36 @@ export const validatePublicRegister = (document, expected) => {
  * @param {object} expectedPageContent - Expected page content
  */
 export const validateSiteDetails = (document, expectedPageContent) => {
-  const siteCard = document.querySelector('#site-details-card')
-  expect(siteCard).toBeTruthy()
+  const siteDetailsData = expectedPageContent.siteDetails
+  const multipleSiteDetails =
+    expectedPageContent.multipleSiteDetails?.multipleSitesEnabled
 
-  // Validate basic site details if present
-  if (expectedPageContent.siteDetails.length) {
-    for (const [key, value] of Object.entries(
-      expectedPageContent.siteDetails[0]
-    )) {
-      const rows = siteCard.querySelectorAll('.govuk-summary-list__row')
-      const row = Array.from(rows).find((r) => {
-        const keyElement = r.querySelector(GOV_UK_SUMMARY_LIST_KEY)
-        return keyElement && keyElement.textContent.trim() === key
-      })
-      expect(row).toBeTruthy()
-      const valueElement = row.querySelector('.govuk-summary-list__value')
-      expect(valueElement.textContent.trim()).toBe(value)
+  if (multipleSiteDetails) {
+    siteDetailsData.forEach((siteDetails, index) => {
+      validateSummaryCardContent(
+        document,
+        `#site-details-card:nth-of-type(${index + 1})`,
+        siteDetails
+      )
+    })
+  } else {
+    const siteCard = document.querySelector('#site-details-card')
+    expect(siteCard).toBeTruthy()
+
+    // Validate basic site details if present
+    if (siteDetailsData.length) {
+      validateSummaryCardContent(
+        document,
+        '#site-details-card',
+        siteDetailsData[0]
+      )
     }
-  }
 
-  // Validate extended site details (coordinate points) if present
-  const coords = expectedPageContent.siteDetailsExtended?.coordinatePoints ?? []
-  for (const point of coords) {
-    const pointText = siteCard.textContent.includes(point)
-    expect(pointText).toBe(true)
+    // Validate extended site details (coordinate points) if present
+    const coords =
+      expectedPageContent.siteDetailsExtended?.coordinatePoints ?? []
+    for (const point of coords) {
+      expect(siteCard).toHaveTextContent(point)
+    }
   }
 }

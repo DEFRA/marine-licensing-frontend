@@ -169,10 +169,14 @@ describe('Multiple sites question page', () => {
     expect(response.statusCode).toBe(statusCodes.redirect)
     expect(response.headers.location).toBe('/exemption/site-name')
 
-    expect(setExemptionCache).toHaveBeenCalledWith(expect.any(Object), {
-      ...mockExemptionData,
-      multipleSiteDetails: { multipleSitesEnabled: true }
-    })
+    expect(setExemptionCache).toHaveBeenCalledWith(
+      expect.any(Object),
+      expect.any(Object),
+      {
+        ...mockExemptionData,
+        multipleSiteDetails: { multipleSitesEnabled: true }
+      }
+    )
   })
 
   test('should redirect to coordinates entry choice when NO is selected and set multipleSiteDetails to false', async () => {
@@ -188,10 +192,14 @@ describe('Multiple sites question page', () => {
     expect(response.statusCode).toBe(statusCodes.redirect)
     expect(response.headers.location).toBe('/exemption/activity-dates')
 
-    expect(setExemptionCache).toHaveBeenCalledWith(expect.any(Object), {
-      ...mockExemptionData,
-      multipleSiteDetails: { multipleSitesEnabled: false }
-    })
+    expect(setExemptionCache).toHaveBeenCalledWith(
+      expect.any(Object),
+      expect.any(Object),
+      {
+        ...mockExemptionData,
+        multipleSiteDetails: { multipleSitesEnabled: false }
+      }
+    )
   })
 
   test('should redirect to task list when cancel is clicked', async () => {

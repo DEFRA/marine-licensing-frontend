@@ -103,7 +103,7 @@ describe('Review Site Details - Polygon Coordinates Integration Tests', () => {
       )
       expect(methodRow).toBeTruthy()
       expect(methodRow.textContent).toContain(
-        'Manually enter multiple sets of coordinates'
+        'Enter multiple sets of coordinates to mark the boundary of the site'
       )
     })
 

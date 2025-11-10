@@ -64,15 +64,17 @@ export const mockExemption = (e) => {
     }
     return e
   })
-  vi.mocked(setExemptionCache).mockImplementation(() => undefined)
+  vi.mocked(setExemptionCache).mockResolvedValue(undefined)
+  vi.mocked(updateExemptionSiteDetails).mockResolvedValue(undefined)
+  vi.mocked(clearExemptionCache).mockResolvedValue(undefined)
   vi.mocked(authenticatedPatchRequest).mockResolvedValue({
     payload: { id: e?.id, siteDetails: e?.siteDetails }
   })
   vi.mocked(authenticatedGetRequest).mockResolvedValue({
     payload: { message: 'success', value: e }
   })
-  vi.mocked(updateExemptionMultipleSiteDetails).mockReturnValue({})
-  vi.mocked(resetExemptionSiteDetails).mockReturnValue(undefined)
+  vi.mocked(updateExemptionMultipleSiteDetails).mockResolvedValue({})
+  vi.mocked(resetExemptionSiteDetails).mockResolvedValue(undefined)
   return {
     setExemptionCache,
     clearExemptionCache,

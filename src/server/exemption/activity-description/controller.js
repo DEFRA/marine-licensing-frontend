@@ -13,6 +13,7 @@ import { saveSiteDetailsToBackend } from '#src/server/common/helpers/save-site-d
 import { getCancelLink } from '#src/server/exemption/site-details/utils/cancel-link.js'
 import joi from 'joi'
 import { getBackLink, getNextRoute } from './utils.js'
+import { copySameActivityDescriptionToAllSites } from '#src/server/common/helpers/copy-same-activity-data.js'
 
 export const ACTIVITY_DESCRIPTION_VIEW_ROUTE =
   'exemption/activity-description/index'
@@ -133,24 +134,37 @@ export const activityDescriptionSubmitController = {
     const { payload } = request
 
     try {
+      const exemption = getExemptionCache(request)
       const { siteIndex } = request.site
 
-      updateExemptionSiteDetails(
+      await updateExemptionSiteDetails(
         request,
+        h,
         siteIndex,
         'activityDescription',
         payload.activityDescription
       )
 
+      const hasSameActivityDescriptionAcrossSites =
+        exemption.multipleSiteDetails?.sameActivityDescription === 'yes'
+
       const action = request.query.action
       const { siteNumber } = request.site
 
+      const anchor = hasSameActivityDescriptionAcrossSites
+        ? ''
+        : `#site-details-${siteNumber}`
+
       const nextRoute = action
-        ? `${routes.REVIEW_SITE_DETAILS}#site-details-${siteNumber}`
+        ? `${routes.REVIEW_SITE_DETAILS}${anchor}`
         : getNextRoute(request.site)
 
       if (nextRoute === routes.REVIEW_SITE_DETAILS || action) {
-        await saveSiteDetailsToBackend(request)
+        if (hasSameActivityDescriptionAcrossSites) {
+          await copySameActivityDescriptionToAllSites(request, h)
+        }
+
+        await saveSiteDetailsToBackend(request, h)
       }
 
       return h.redirect(nextRoute)

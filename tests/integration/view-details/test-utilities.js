@@ -14,6 +14,9 @@ export const baseSubmittedExemption = {
     'Marine construction activities including pile driving and dredging operations.',
   publicRegister: {
     consent: 'no'
+  },
+  multipleSiteDetails: {
+    multipleSitesEnabled: false
   }
 }
 
@@ -34,6 +37,11 @@ export const createExemptionWithSiteDetails = (overrides = {}) => {
         coordinateSystem: COORDINATE_SYSTEMS.WGS84,
         coordinates: { latitude: '51.489676', longitude: '-0.231530' },
         circleWidth: '100',
+        activityDates: {
+          startDate: { day: '1', month: '1', year: '2025' },
+          endDate: { day: '31', month: '1', year: '2025' }
+        },
+        activityDescription: 'Test activity description',
         ...siteDetailsOverrides
       }
     ],
@@ -87,6 +95,15 @@ export const errorScenarios = {
   },
   exemptionWithMalformedSiteDetails: {
     ...baseSubmittedExemption,
-    siteDetails: [{ invalidStructure: true }]
+    siteDetails: [
+      {
+        invalidStructure: true,
+        activityDates: {
+          startDate: { day: '1', month: '1', year: '2025' },
+          endDate: { day: '31', month: '1', year: '2025' }
+        },
+        activityDescription: 'Test activity description'
+      }
+    ]
   }
 }

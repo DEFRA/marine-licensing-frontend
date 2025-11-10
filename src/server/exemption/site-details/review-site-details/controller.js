@@ -1,4 +1,5 @@
 import {
+  clearSavedSiteDetails,
   getExemptionCache,
   resetExemptionSiteDetails,
   setExemptionCache
@@ -26,7 +27,7 @@ export const reviewSiteDetailsController = {
     const previousPage = request.headers?.referer
     const exemption = getExemptionCache(request)
 
-    request.yar.clear('savedSiteDetails')
+    await clearSavedSiteDetails(request, h)
 
     if (!exemption.id) {
       return h.redirect(routes.TASK_LIST)
@@ -40,7 +41,7 @@ export const reviewSiteDetailsController = {
     const { projectName, publicRegister, multipleSiteDetails, siteDetails } =
       completeExemption
 
-    setExemptionCache(request, {
+    await setExemptionCache(request, h, {
       id: exemption.id,
       projectName,
       publicRegister,
@@ -86,16 +87,7 @@ export const reviewSiteDetailsSubmitController = {
     const siteDetails = completeExemption.siteDetails
 
     if (payload?.add) {
-      const updatedSiteDetails = [
-        ...siteDetails,
-        { coordinatesType: siteDetails[0].coordinatesType }
-      ]
-      setExemptionCache(request, {
-        ...completeExemption,
-        siteDetails: updatedSiteDetails
-      })
-
-      return h.redirect(`${routes.SITE_NAME}?site=${updatedSiteDetails.length}`)
+      return h.redirect(`${routes.SITE_NAME}?site=${siteDetails.length + 1}`)
     }
 
     resetExemptionSiteDetails(request)

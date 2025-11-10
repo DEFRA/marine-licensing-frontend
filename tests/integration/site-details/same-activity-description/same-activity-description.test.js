@@ -225,6 +225,7 @@ describe('Same activity description page', () => {
 
     expect(updateExemptionMultipleSiteDetails).toHaveBeenCalledWith(
       expect.any(Object),
+      expect.any(Object),
       'sameActivityDescription',
       'yes'
     )
@@ -249,8 +250,12 @@ describe('Same activity description page', () => {
 
     expect(response.statusCode).toBe(statusCodes.redirect)
     expect(response.headers.location).toBe('/exemption/review-site-details')
-    expect(saveSiteDetailsToBackend).toHaveBeenCalledWith(expect.any(Object))
+    expect(saveSiteDetailsToBackend).toHaveBeenCalledWith(
+      expect.any(Object),
+      expect.any(Object)
+    )
     expect(updateExemptionMultipleSiteDetails).toHaveBeenCalledWith(
+      expect.any(Object),
       expect.any(Object),
       'sameActivityDescription',
       'no'
@@ -273,6 +278,7 @@ describe('Same activity description page', () => {
     expect(response.headers.location).toBe('/exemption/activity-description')
 
     expect(updateExemptionMultipleSiteDetails).toHaveBeenCalledWith(
+      expect.any(Object),
       expect.any(Object),
       'sameActivityDescription',
       'no'

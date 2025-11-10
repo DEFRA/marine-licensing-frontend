@@ -1,23 +1,64 @@
 {% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
+{% from "site-details-map/macro.njk" import appSiteDetailsMap %}
 
-{% set siteDetailsRows = [
-  {
+{% set cardTitle %}
+  {% if params.multipleSiteDetails and params.multipleSiteDetails.multipleSitesEnabled %}
+    Site {{ params.siteNumber }} details
+  {% else %}
+    Site details
+  {% endif %}
+{% endset %}
+
+{% set siteDetailsRows = [] %}
+
+{% if params.multipleSiteDetails and params.multipleSiteDetails.multipleSitesEnabled %}
+  {% set siteDetailsRows = (siteDetailsRows.push({
     key: {
-      text: "Method of providing site location"
+      text: "Site name"
     },
     value: {
-      html: params.siteDetails.reviewSummaryText
+      text: params.siteDetails.siteName
     }
+  }), siteDetailsRows) %}
+{% endif %}
+
+{% if params.siteDetails.showActivityDates %}
+  {% set siteDetailsRows = (siteDetailsRows.push({
+    key: {
+      text: "Activity dates"
+    },
+    value: {
+      text: params.siteDetails.activityDates
+    }
+  }), siteDetailsRows) %}
+{% endif %}
+
+{% if params.siteDetails.showActivityDescription %}
+  {% set siteDetailsRows = (siteDetailsRows.push({
+    key: {
+      text: "Activity description"
+    },
+    value: {
+      text: params.siteDetails.activityDescription
+    }
+  }), siteDetailsRows) %}
+{% endif %}
+
+{% set siteDetailsRows = (siteDetailsRows.push({
+  key: {
+    text: "Single or multiple sets of coordinates"
   },
-  {
-    key: {
-      text: "Coordinate system"
-    },
-    value: {
-      html: params.siteDetails.coordinateSystemText | replace('\n', '<br> ')
-    }
+  value: {
+    html: params.siteDetails.reviewSummaryText
   }
-] %}
+},{
+  key: {
+    text: "Coordinate system"
+  },
+  value: {
+    html: params.siteDetails.coordinateSystemText | replace('\n', '<br> ')
+  }
+}), siteDetailsRows) %}
 
 {% for coordinate in params.siteDetails.polygonCoordinates %}
   {% set siteDetailsRows = (siteDetailsRows.push({
@@ -30,19 +71,23 @@
   }), siteDetailsRows) %}
 {% endfor %}
 
-{% set siteDetailsRows = (siteDetailsRows.push({
+{% set siteDetailsRows = (siteDetailsRows.push(
+{
   key: {
     text: "Map view"
   },
-  value: {
-    html: '<div class="app-site-details-map" data-module="site-details-map"></div>'
+  value: 
+  { 
+    html: appSiteDetailsMap(params.siteDetails.siteDetailsData, params.siteNumber - 1), 
+    classes: "govuk-summary-list__value--full-width" 
   }
-}), siteDetailsRows) %}
+}
+), siteDetailsRows) %}
 
 {{ govukSummaryList({
     card: {
       title: {
-        text: "Site details"
+        text: cardTitle
       },
       actions: {
         items: [

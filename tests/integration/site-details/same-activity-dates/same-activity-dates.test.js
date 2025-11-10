@@ -197,6 +197,7 @@ describe('Same activity dates page', () => {
 
     expect(updateExemptionMultipleSiteDetails).toHaveBeenCalledWith(
       expect.any(Object),
+      expect.any(Object),
       'sameActivityDates',
       'yes'
     )
@@ -217,6 +218,7 @@ describe('Same activity dates page', () => {
     expect(response.headers.location).toBe('/exemption/activity-dates')
 
     expect(updateExemptionMultipleSiteDetails).toHaveBeenCalledWith(
+      expect.any(Object),
       expect.any(Object),
       'sameActivityDates',
       'no'
@@ -246,6 +248,7 @@ describe('Same activity dates page', () => {
     )
 
     expect(updateExemptionMultipleSiteDetails).toHaveBeenCalledWith(
+      expect.any(Object),
       expect.any(Object),
       'sameActivityDates',
       'no'

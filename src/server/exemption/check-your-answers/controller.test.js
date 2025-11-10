@@ -63,7 +63,10 @@ describe('check your answers controller', () => {
           userEmail: mockUserSession.email
         }
       )
-      expect(clearExemptionCache).toHaveBeenCalledWith(expect.any(Object))
+      expect(clearExemptionCache).toHaveBeenCalledWith(
+        expect.any(Object),
+        expect.any(Object)
+      )
     })
 
     test('Should handle missing exemption data on POST', async () => {
@@ -135,7 +138,10 @@ describe('check your answers controller', () => {
       expect(headers.location).toBe(
         '/exemption/confirmation?applicationReference=undefined'
       )
-      expect(clearExemptionCache).toHaveBeenCalledWith(expect.any(Object))
+      expect(clearExemptionCache).toHaveBeenCalledWith(
+        expect.any(Object),
+        expect.any(Object)
+      )
     })
 
     test('Should handle API response with wrong message type', async () => {
@@ -347,12 +353,14 @@ describe('check your answers controller', () => {
 
       mockExemption(fileUploadExemption)
 
-      const mockProcessedSiteDetails = {
-        isFileUpload: true,
-        method: 'Upload a file with the coordinates of the site',
-        fileType: 'KML',
-        filename: 'test.kml'
-      }
+      const mockProcessedSiteDetails = [
+        {
+          isFileUpload: true,
+          method: 'Upload a file with the coordinates of the site',
+          fileType: 'KML',
+          filename: 'test.kml'
+        }
+      ]
 
       const processSiteDetailsSpy = vi
         .spyOn(exemptionSiteDetailsHelpers, 'processSiteDetails')
@@ -386,12 +394,14 @@ describe('check your answers controller', () => {
 
       mockExemption(shapefileExemption)
 
-      const mockProcessedSiteDetails = {
-        isFileUpload: true,
-        method: 'Upload a file with the coordinates of the site',
-        fileType: 'Shapefile',
-        filename: 'Unknown file'
-      }
+      const mockProcessedSiteDetails = [
+        {
+          isFileUpload: true,
+          method: 'Upload a file with the coordinates of the site',
+          fileType: 'Shapefile',
+          filename: 'Unknown file'
+        }
+      ]
 
       const processSiteDetailsSpy = vi
         .spyOn(exemptionSiteDetailsHelpers, 'processSiteDetails')

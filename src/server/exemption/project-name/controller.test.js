@@ -253,9 +253,13 @@ describe('#projectName', () => {
 
       await projectNameSubmitController.handler(mockRequest, h)
 
-      expect(cacheUtils.setExemptionCache).toHaveBeenCalledWith(mockRequest, {
-        projectName: 'Project name'
-      })
+      expect(cacheUtils.setExemptionCache).toHaveBeenCalledWith(
+        mockRequest,
+        expect.any(Object),
+        {
+          projectName: 'Project name'
+        }
+      )
     })
 
     test('Should correctly retrieve cached MCMS context when creating a new exemption', async () => {

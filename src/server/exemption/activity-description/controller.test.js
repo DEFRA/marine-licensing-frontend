@@ -231,6 +231,7 @@ describe('#activityDescriptionController', () => {
 
       expect(mockedUpdateExemptionSiteDetails).toHaveBeenCalledWith(
         expect.any(Object),
+        expect.any(Object),
         0,
         'activityDescription',
         'New site activity description.'
@@ -428,7 +429,7 @@ describe('#activityDescriptionController', () => {
 
       expect(
         vi.mocked(saveSiteDetails.saveSiteDetailsToBackend)
-      ).toHaveBeenCalledWith(request)
+      ).toHaveBeenCalledWith(request, h)
     })
 
     test('should save site details to backend when going to review site details (file upload flow)', async () => {
@@ -450,7 +451,7 @@ describe('#activityDescriptionController', () => {
 
       expect(
         vi.mocked(saveSiteDetails.saveSiteDetailsToBackend)
-      ).toHaveBeenCalledWith(request)
+      ).toHaveBeenCalledWith(request, h)
     })
 
     test('should not save site details to backend when action parameter is not present and not going to review', async () => {

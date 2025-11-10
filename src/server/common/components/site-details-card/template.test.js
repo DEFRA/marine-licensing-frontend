@@ -83,7 +83,9 @@ describe('Site Details Card Component', () => {
           '.govuk-summary-card__actions a'
         )
         expect(changeLink).toBeTruthy()
-        expect(changeLink.textContent.trim()).toBe('Change (Site details)')
+        expect(changeLink.textContent.replace(/\s+/g, ' ').trim()).toBe(
+          'Change ( Site details )'
+        )
         expect(changeLink.getAttribute('href')).toBe('#')
       })
 
@@ -92,7 +94,6 @@ describe('Site Details Card Component', () => {
           document.querySelectorAll('.govuk-summary-list__key')
         ).map((el) => el.textContent.trim())
 
-        expect(keys).toContain('Method of providing site location')
         expect(keys).toContain('Coordinate system')
         expect(keys).toContain('Coordinates at centre of site')
         expect(keys).toContain('Width of circular site')
@@ -202,7 +203,9 @@ describe('Site Details Card Component', () => {
           '.govuk-summary-card__actions a'
         )
         expect(changeLink).toBeTruthy()
-        expect(changeLink.textContent.trim()).toBe('Change (Site details)')
+        expect(changeLink.textContent.replace(/\s+/g, ' ').trim()).toBe(
+          'Change ( Site details )'
+        )
       })
 
       test('should display base polygon fields', () => {
@@ -210,7 +213,6 @@ describe('Site Details Card Component', () => {
           document.querySelectorAll('.govuk-summary-list__key')
         ).map((el) => el.textContent.trim())
 
-        expect(keys).toContain('Method of providing site location')
         expect(keys).toContain('Coordinate system')
         expect(keys).toContain('Map view')
       })
@@ -294,7 +296,6 @@ describe('Site Details Card Component', () => {
         ).map((el) => el.textContent.trim())
 
         // Should still have base fields and map view
-        expect(keys).toContain('Method of providing site location')
         expect(keys).toContain('Coordinate system')
         expect(keys).toContain('Map view')
       })
@@ -333,7 +334,9 @@ describe('Site Details Card Component', () => {
           '.govuk-summary-card__actions a'
         )
         expect(changeLink).toBeTruthy()
-        expect(changeLink.textContent.trim()).toBe('Change (Site details)')
+        expect(changeLink.textContent.replace(/\s+/g, ' ').trim()).toBe(
+          'Change ( Site details )'
+        )
       })
 
       test('should display all required file upload fields', () => {
@@ -341,18 +344,12 @@ describe('Site Details Card Component', () => {
           document.querySelectorAll('.govuk-summary-list__key')
         ).map((el) => el.textContent.trim())
 
-        expect(keys).toContain('Method of providing site location')
-        expect(keys).toContain('File type')
-        expect(keys).toContain('File uploaded')
         expect(keys).toContain('Map view')
       })
 
       test('should display correct file upload values', () => {
-        const html = document.documentElement.innerHTML
-
-        expect(html).toContain('Upload a file')
-        expect(html).toContain('Shapefile (.shp)')
-        expect(html).toContain('site-boundaries.shp')
+        const mapDiv = document.querySelector('.app-site-details-map')
+        expect(mapDiv).toBeTruthy()
       })
 
       test('should include map view', () => {
@@ -382,11 +379,8 @@ describe('Site Details Card Component', () => {
       })
 
       test('should display file upload values in read-only mode', () => {
-        const html = document.documentElement.innerHTML
-
-        expect(html).toContain('Upload a file')
-        expect(html).toContain('KML (.kml)')
-        expect(html).toContain('marine-area.kml')
+        const mapDiv = document.querySelector('.app-site-details-map')
+        expect(mapDiv).toBeTruthy()
       })
     })
   })

@@ -55,7 +55,7 @@ export const deleteSiteSubmitController = {
         id: exemption.id
       })
 
-      setExemptionCache(request, {
+      await setExemptionCache(request, h, {
         ...exemption,
         siteDetails: dataToSave
       })

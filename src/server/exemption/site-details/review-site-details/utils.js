@@ -59,7 +59,9 @@ export const getSiteDetailsBackLink = (
   returnToCheckYourAnswers = false
 ) => {
   if (returnToCheckYourAnswers) {
-    return routes.CHECK_YOUR_ANSWERS
+    return typeof returnToCheckYourAnswers === 'string'
+      ? returnToCheckYourAnswers
+      : routes.CHECK_YOUR_ANSWERS
   }
 
   if (!previousPage || !URL.canParse(previousPage)) {
@@ -163,7 +165,9 @@ export const getFileUploadBackLink = (
   returnToCheckYourAnswers = false
 ) => {
   if (returnToCheckYourAnswers) {
-    return routes.CHECK_YOUR_ANSWERS
+    return typeof returnToCheckYourAnswers === 'string'
+      ? returnToCheckYourAnswers
+      : routes.CHECK_YOUR_ANSWERS
   }
 
   if (!previousPage || !URL.canParse(previousPage)) {

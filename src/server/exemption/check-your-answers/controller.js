@@ -1,7 +1,6 @@
 import Boom from '@hapi/boom'
 import {
   clearExemptionCache,
-  clearReturnToCheckYourAnswersFlag,
   getExemptionCache
 } from '#src/server/common/helpers/session-cache/utils.js'
 import { authenticatedPostRequest } from '#src/server/common/helpers/authenticated-requests.js'
@@ -36,7 +35,7 @@ export const checkYourAnswersController = {
       cachedExemption.multipleSiteDetails,
       cachedExemption.siteDetails
     )
-    await clearReturnToCheckYourAnswersFlag(request, h)
+    request.yar.flash('returnTo', routes.CHECK_YOUR_ANSWERS, true)
 
     const siteLocationChangeLink = `${routes.REVIEW_SITE_DETAILS}?from=check-your-answers#site-location-card`
     const activityDetailsChangeLink = `${routes.REVIEW_SITE_DETAILS}?from=check-your-answers#activity-details-card`

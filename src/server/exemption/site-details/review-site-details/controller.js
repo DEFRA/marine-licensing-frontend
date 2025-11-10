@@ -1,11 +1,8 @@
 import {
-  clearReturnToCheckYourAnswersFlag,
   clearSavedSiteDetails,
   getExemptionCache,
-  getReturnToCheckYourAnswersFlag,
   resetExemptionSiteDetails,
-  setExemptionCache,
-  setReturnToCheckYourAnswersFlag
+  setExemptionCache
 } from '#src/server/common/helpers/session-cache/utils.js'
 import { routes } from '#src/server/common/constants/routes.js'
 import {
@@ -33,12 +30,6 @@ export const reviewSiteDetailsController = {
 
     await clearSavedSiteDetails(request, h)
 
-    if (fromCheckYourAnswers) {
-      await setReturnToCheckYourAnswersFlag(request, h)
-    } else {
-      await clearReturnToCheckYourAnswersFlag(request, h)
-    }
-
     if (!exemption.id) {
       return h.redirect(routes.TASK_LIST)
     }
@@ -65,7 +56,9 @@ export const reviewSiteDetailsController = {
     })
     const { coordinatesType } = firstSite
 
-    const returnToCheckYourAnswers = getReturnToCheckYourAnswersFlag(request)
+    const returnToCheckYourAnswers = fromCheckYourAnswers
+      ? routes.CHECK_YOUR_ANSWERS
+      : false
 
     return coordinatesType === 'file'
       ? renderFileUploadReview(h, {
@@ -104,10 +97,10 @@ export const reviewSiteDetailsSubmitController = {
       return h.redirect(`${routes.SITE_NAME}?site=${siteDetails.length + 1}`)
     }
 
-    const returnToCheckYourAnswers = getReturnToCheckYourAnswersFlag(request)
-    if (returnToCheckYourAnswers) {
-      await clearReturnToCheckYourAnswersFlag(request, h)
-      return h.redirect(routes.CHECK_YOUR_ANSWERS)
+    const returnTo = request.yar.flash('returnTo')
+    const redirectPath = Array.isArray(returnTo) ? returnTo[0] : returnTo
+    if (redirectPath) {
+      return h.redirect(redirectPath)
     }
 
     resetExemptionSiteDetails(request)

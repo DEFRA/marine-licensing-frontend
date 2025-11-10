@@ -2,14 +2,10 @@ import { vi } from 'vitest'
 import { clone } from '@hapi/hoek'
 import {
   EXEMPTION_CACHE_KEY,
-  RETURN_TO_CHECK_YOUR_ANSWERS_FLAG_KEY,
   clearExemptionCache,
-  clearReturnToCheckYourAnswersFlag,
   getExemptionCache,
-  getReturnToCheckYourAnswersFlag,
   resetExemptionSiteDetails,
   setExemptionCache,
-  setReturnToCheckYourAnswersFlag,
   updateExemptionSiteDetails,
   updateExemptionSiteDetailsBatch,
   updateExemptionMultipleSiteDetails,
@@ -655,87 +651,6 @@ describe('#utils', () => {
         siteDetails: []
       })
       expect(result).toEqual({ siteDetails: null })
-    })
-  })
-
-  describe('setReturnToCheckYourAnswersFlag', () => {
-    test('should set the flag to true in cache', async () => {
-      const mockH = {}
-      const mockRequest = {
-        yar: {
-          set: vi.fn(),
-          commit: vi.fn().mockResolvedValue(undefined)
-        }
-      }
-      await setReturnToCheckYourAnswersFlag(mockRequest, mockH)
-
-      expect(mockRequest.yar.set).toHaveBeenCalledWith(
-        RETURN_TO_CHECK_YOUR_ANSWERS_FLAG_KEY,
-        true
-      )
-      expect(mockRequest.yar.commit).toHaveBeenCalledWith(mockH)
-    })
-  })
-
-  describe('getReturnToCheckYourAnswersFlag', () => {
-    let mockRequest
-
-    beforeEach(() => {
-      mockRequest = {
-        yar: {
-          get: vi.fn()
-        }
-      }
-    })
-
-    test('should return true when flag is set to true', () => {
-      mockRequest.yar.get.mockReturnValue(true)
-
-      const result = getReturnToCheckYourAnswersFlag(mockRequest)
-
-      expect(mockRequest.yar.get).toHaveBeenCalledWith(
-        RETURN_TO_CHECK_YOUR_ANSWERS_FLAG_KEY
-      )
-      expect(result).toBe(true)
-    })
-
-    test('should return false when flag is falsy', () => {
-      mockRequest.yar.get.mockReturnValue(undefined)
-
-      const result = getReturnToCheckYourAnswersFlag(mockRequest)
-
-      expect(mockRequest.yar.get).toHaveBeenCalledWith(
-        RETURN_TO_CHECK_YOUR_ANSWERS_FLAG_KEY
-      )
-      expect(result).toBe(false)
-    })
-
-    test('should return false when flag is set to a truthy value that is not true', () => {
-      mockRequest.yar.get.mockReturnValue('yes')
-
-      const result = getReturnToCheckYourAnswersFlag(mockRequest)
-
-      expect(mockRequest.yar.get).toHaveBeenCalledWith(
-        RETURN_TO_CHECK_YOUR_ANSWERS_FLAG_KEY
-      )
-      expect(result).toBe(false)
-    })
-  })
-
-  describe('clearReturnToCheckYourAnswersFlag', () => {
-    test('should clear the value in cache', async () => {
-      const mockH = {}
-      const mockRequest = {
-        yar: {
-          clear: vi.fn(),
-          commit: vi.fn().mockResolvedValue(undefined)
-        }
-      }
-      await clearReturnToCheckYourAnswersFlag(mockRequest, mockH)
-
-      expect(mockRequest.yar.clear).toHaveBeenCalledWith(
-        RETURN_TO_CHECK_YOUR_ANSWERS_FLAG_KEY
-      )
     })
   })
 

@@ -1,6 +1,5 @@
 import {
   clearExemptionCache,
-  clearReturnToCheckYourAnswersFlag,
   getExemptionCache,
   resetExemptionSiteDetails,
   setExemptionCache
@@ -65,7 +64,7 @@ export const taskListController = {
       siteDetails
     })
 
-    await clearReturnToCheckYourAnswersFlag(request, h)
+    request.yar.flash('returnTo')
 
     return h.view(TASK_LIST_VIEW_ROUTE, {
       ...taskListViewSettings,

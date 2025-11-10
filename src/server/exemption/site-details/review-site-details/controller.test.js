@@ -153,7 +153,8 @@ describe('#reviewSiteDetails', () => {
       debug: vi.fn()
     },
     yar: {
-      clear: vi.fn()
+      clear: vi.fn(),
+      flash: vi.fn()
     }
   })
 
@@ -189,21 +190,7 @@ describe('#reviewSiteDetails', () => {
 
         await reviewSiteDetailsController.handler(mockRequest, h)
 
-        expect(cacheUtils.clearReturnToCheckYourAnswersFlag).toHaveBeenCalled()
-
-        expect(h.redirect).toHaveBeenCalledWith(routes.TASK_LIST)
-      })
-
-      test('should set flag if coming from check your answers page', async () => {
-        getExemptionCacheSpy.mockReturnValueOnce({})
-
-        const h = createMockHandler('redirect')
-        const mockRequest = createMockRequest()
-        mockRequest.query = { from: 'check-your-answers' }
-
-        await reviewSiteDetailsController.handler(mockRequest, h)
-
-        expect(cacheUtils.setReturnToCheckYourAnswersFlag).toHaveBeenCalled()
+        expect(mockRequest.yar.flash).not.toHaveBeenCalled()
 
         expect(h.redirect).toHaveBeenCalledWith(routes.TASK_LIST)
       })
@@ -302,12 +289,17 @@ describe('#reviewSiteDetails', () => {
 
       test('should reset exemption and redirect to task list', async () => {
         const request = {
+          payload: {},
           logger: {
             info: vi.fn(),
             error: vi.fn(),
             debug: vi.fn()
+          },
+          yar: {
+            flash: vi.fn().mockReturnValue([])
           }
         }
+        getExemptionCacheSpy.mockReturnValue(mockExemption)
         const h = { redirect: vi.fn() }
 
         await reviewSiteDetailsSubmitController.handler(request, h)
@@ -318,17 +310,40 @@ describe('#reviewSiteDetails', () => {
 
       test('should redirect to task list on successful POST', async () => {
         const request = {
+          payload: {},
           logger: {
             info: vi.fn(),
             error: vi.fn(),
             debug: vi.fn()
+          },
+          yar: {
+            flash: vi.fn().mockReturnValue([])
           }
         }
+        getExemptionCacheSpy.mockReturnValue(mockExemption)
         const h = { redirect: vi.fn() }
 
         await reviewSiteDetailsSubmitController.handler(request, h)
 
         expect(h.redirect).toHaveBeenCalledWith(routes.TASK_LIST)
+      })
+
+      test('should redirect to check your answers when returnTo flash is set', async () => {
+        const request = {
+          payload: {},
+          logger: {},
+          yar: {
+            flash: vi.fn().mockReturnValue([routes.CHECK_YOUR_ANSWERS])
+          }
+        }
+        getExemptionCacheSpy.mockReturnValue(mockExemption)
+        const h = { redirect: vi.fn() }
+
+        await reviewSiteDetailsSubmitController.handler(request, h)
+
+        expect(request.yar.flash).toHaveBeenCalledWith('returnTo')
+        expect(h.redirect).toHaveBeenCalledWith(routes.CHECK_YOUR_ANSWERS)
+        expect(resetExemptionSiteDetailsSpy).not.toHaveBeenCalled()
       })
 
       test('should handle undefined siteDetails gracefully', async () => {
@@ -361,7 +376,6 @@ describe('#reviewSiteDetails', () => {
           // Expected to fail since the function expects real siteDetails data
         }
 
-        // Verify that the nullish coalescing operator worked correctly
         expect(capturedSiteDetails).toEqual({})
 
         cacheUtils.getExemptionCache.mockImplementation(
@@ -381,18 +395,26 @@ describe('#reviewSiteDetails', () => {
       })
 
       test('should handle redirect to check your answers correctly', async () => {
-        vi.mocked(cacheUtils.getReturnToCheckYourAnswersFlag).mockReturnValue(
-          true
-        )
+        const mockFlash = vi.fn().mockReturnValue([routes.CHECK_YOUR_ANSWERS])
+        const request = {
+          payload: {},
+          logger: {
+            info: vi.fn(),
+            error: vi.fn(),
+            debug: vi.fn()
+          },
+          yar: {
+            flash: mockFlash
+          }
+        }
+        getExemptionCacheSpy.mockReturnValue(mockExemption)
+        const h = { redirect: vi.fn() }
 
-        const { headers, statusCode } = await makePostRequest({
-          url: routes.REVIEW_SITE_DETAILS,
-          server: getServer(),
-          formData: {}
-        })
+        await reviewSiteDetailsSubmitController.handler(request, h)
 
-        expect(statusCode).toBe(statusCodes.redirect)
-        expect(headers.location).toBe(`${routes.CHECK_YOUR_ANSWERS}`)
+        expect(mockFlash).toHaveBeenCalledWith('returnTo')
+        expect(h.redirect).toHaveBeenCalledWith(routes.CHECK_YOUR_ANSWERS)
+        expect(resetExemptionSiteDetailsSpy).not.toHaveBeenCalled()
       })
     })
   })

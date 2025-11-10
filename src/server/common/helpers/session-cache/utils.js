@@ -3,7 +3,6 @@ import { getSiteDetailsBySite } from '#src/server/common/helpers/session-cache/s
 
 export const EXEMPTION_CACHE_KEY = 'exemption'
 export const SAVED_SITE_DETAILS_CACHE_KEY = 'savedSiteDetails'
-export const RETURN_TO_CHECK_YOUR_ANSWERS_FLAG_KEY = 'returnToCheckYourAnswers'
 
 export const clearExemptionCache = async (request, h) => {
   request.yar.clear(EXEMPTION_CACHE_KEY)
@@ -152,20 +151,6 @@ export const updateExemptionSiteDetailsBatch = (
   })
 
   return updatedSiteDetails
-}
-
-export const setReturnToCheckYourAnswersFlag = async (request, h) => {
-  request.yar.set(RETURN_TO_CHECK_YOUR_ANSWERS_FLAG_KEY, true)
-  await request.yar.commit(h)
-}
-
-export const getReturnToCheckYourAnswersFlag = (request) => {
-  return request.yar.get(RETURN_TO_CHECK_YOUR_ANSWERS_FLAG_KEY) === true
-}
-
-export const clearReturnToCheckYourAnswersFlag = async (request, h) => {
-  request.yar.clear(RETURN_TO_CHECK_YOUR_ANSWERS_FLAG_KEY)
-  await request.yar.commit(h)
 }
 
 export const clearSavedSiteDetails = async (request, h) => {

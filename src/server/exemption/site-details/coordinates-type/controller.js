@@ -103,7 +103,7 @@ export const coordinatesTypeSubmitController = {
       exemption.siteDetails?.[siteIndex].coordinatesType
 
     if (hasChangedCoordinatesType) {
-      await clearSiteDetails(request, exemption)
+      await clearSiteDetails(request, exemption, h)
     }
 
     await updateExemptionSiteDetails(

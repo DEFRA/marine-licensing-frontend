@@ -146,7 +146,8 @@ describe('#utils', () => {
       const mockRequest = {
         yar: {
           get: vi.fn().mockReturnValue(expected),
-          set: vi.fn()
+          set: vi.fn(),
+          commit: vi.fn()
         }
       }
 

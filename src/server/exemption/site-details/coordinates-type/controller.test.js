@@ -290,7 +290,8 @@ describe('#coordinatesType', () => {
 
       expect(cacheUtils.clearSiteDetails).toHaveBeenCalledWith(
         mockRequest,
-        mockExemption
+        mockExemption,
+        h
       )
 
       expect(cacheUtils.updateExemptionSiteDetails).toHaveBeenCalledWith(

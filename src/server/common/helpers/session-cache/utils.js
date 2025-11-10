@@ -22,12 +22,14 @@ export const setExemptionCache = async (request, h, value) => {
   return cacheValue
 }
 
-export const clearSiteDetails = async (request, exemption) => {
+export const clearSiteDetails = async (request, exemption, h) => {
   const updatedExemption = { ...exemption }
   delete updatedExemption.multipleSiteDetails
   delete updatedExemption.siteDetails
 
   request.yar.set(EXEMPTION_CACHE_KEY, updatedExemption)
+
+  await request.yar.commit(h)
 
   return request.yar.get(EXEMPTION_CACHE_KEY)
 }

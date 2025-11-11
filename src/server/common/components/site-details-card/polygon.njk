@@ -92,13 +92,14 @@
       actions: {
         items: [
           {
-            href: "#",
-            text: "Change"
+            href: params.changeLink,
+            text: "Change",
+            classes: "govuk-link--no-visited-state"
           }
         ]
       } if not params.isReadOnly,
       attributes: {
-        id: "site-details-card"
+        id: "site-details-" + params.siteNumber
       }
     },
     rows: siteDetailsRows

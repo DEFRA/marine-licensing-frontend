@@ -1,7 +1,7 @@
 import {
+  clearExemptionCache,
   getExemptionCache,
   resetExemptionSiteDetails,
-  clearExemptionCache,
   setExemptionCache
 } from '#src/server/common/helpers/session-cache/utils.js'
 import { transformTaskList } from '#src/server/exemption/task-list/utils.js'
@@ -10,6 +10,7 @@ import { authenticatedGetRequest } from '#src/server/common/helpers/authenticate
 import { EXEMPTION_TYPE } from '#src/server/common/constants/exemptions.js'
 
 import Boom from '@hapi/boom'
+import { RETURN_TO_CACHE_KEY } from '#src/server/common/constants/cache.js'
 
 export const TASK_LIST_VIEW_ROUTE = 'exemption/task-list/index'
 
@@ -63,6 +64,8 @@ export const taskListController = {
       multipleSiteDetails,
       siteDetails
     })
+
+    request.yar.flash(RETURN_TO_CACHE_KEY)
 
     return h.view(TASK_LIST_VIEW_ROUTE, {
       ...taskListViewSettings,

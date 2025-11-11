@@ -12,7 +12,7 @@
 <nav>
   {{ govukBackLink({
     text: "Back",
-    href: '/exemption/task-list'
+    href: backLink
   }) }}
 </nav>
 {% endblock %}
@@ -93,7 +93,7 @@
             }) }}
 
             {{ appCancelButton({
-                cancelLink: '/exemption/task-list'
+                cancelLink: backLink
             }) }}
           </div>
         </form>

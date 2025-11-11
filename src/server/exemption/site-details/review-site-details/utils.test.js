@@ -49,6 +49,12 @@ describe('siteDetails utils', () => {
     test('getSiteDetailsBackLink correctly returns fallback option', () => {
       expect(getSiteDetailsBackLink(undefined)).toBe(routes.TASK_LIST)
     })
+
+    test('getSiteDetailsBackLink correctly returns to check your answers', () => {
+      expect(getSiteDetailsBackLink('any page', 'multiple', true)).toBe(
+        routes.CHECK_YOUR_ANSWERS
+      )
+    })
   })
 
   describe('getFileUploadSummaryData util', () => {
@@ -459,6 +465,12 @@ describe('siteDetails utils', () => {
 
     test('getFileUploadBackLink correctly handles invalid URLs', () => {
       expect(getFileUploadBackLink('invalid-url')).toBe(routes.FILE_UPLOAD)
+    })
+
+    test('getFileUploadBackLink correctly handles check your answers redirect', () => {
+      expect(getFileUploadBackLink('any page', true)).toBe(
+        routes.CHECK_YOUR_ANSWERS
+      )
     })
   })
 

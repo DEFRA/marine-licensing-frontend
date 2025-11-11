@@ -11,6 +11,7 @@ import {
 } from './utils.js'
 import { getExemptionService } from '#src/services/exemption-service/index.js'
 import { getSiteDetailsBySite } from '#src/server/common/helpers/session-cache/site-details-utils.js'
+import { RETURN_TO_CACHE_KEY } from '#src/server/common/constants/cache.js'
 
 export const REVIEW_SITE_DETAILS_VIEW_ROUTE =
   'exemption/site-details/review-site-details/index'
@@ -26,6 +27,7 @@ export const reviewSiteDetailsController = {
   async handler(request, h) {
     const previousPage = request.headers?.referer
     const exemption = getExemptionCache(request)
+    const fromCheckYourAnswers = request.query?.from === 'check-your-answers'
 
     await clearSavedSiteDetails(request, h)
 
@@ -55,18 +57,24 @@ export const reviewSiteDetailsController = {
     })
     const { coordinatesType } = firstSite
 
+    const returnToCheckYourAnswers = fromCheckYourAnswers
+      ? routes.CHECK_YOUR_ANSWERS
+      : false
+
     return coordinatesType === 'file'
       ? renderFileUploadReview(h, {
           exemption: completeExemption,
           siteDetails,
           previousPage,
-          reviewSiteDetailsPageData
+          reviewSiteDetailsPageData,
+          returnToCheckYourAnswers
         })
       : renderManualCoordinateReview(h, {
           exemption: completeExemption,
           siteDetails,
           previousPage,
-          reviewSiteDetailsPageData
+          reviewSiteDetailsPageData,
+          returnToCheckYourAnswers
         })
   }
 }
@@ -88,6 +96,12 @@ export const reviewSiteDetailsSubmitController = {
 
     if (payload?.add) {
       return h.redirect(`${routes.SITE_NAME}?site=${siteDetails.length + 1}`)
+    }
+
+    const returnTo = request.yar.flash(RETURN_TO_CACHE_KEY)
+    const redirectPath = Array.isArray(returnTo) ? returnTo[0] : returnTo
+    if (redirectPath) {
+      return h.redirect(redirectPath)
     }
 
     resetExemptionSiteDetails(request)

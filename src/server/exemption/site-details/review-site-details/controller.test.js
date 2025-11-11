@@ -19,6 +19,7 @@ import {
   getCoordinateSystemText
 } from '#src/server/exemption/site-details/review-site-details/utils.js'
 import { getReviewSummaryText } from '#src/server/common/helpers/exemption-site-details.js'
+import { RETURN_TO_CACHE_KEY } from '#src/server/common/constants/cache.js'
 
 vi.mock('~/src/server/common/helpers/session-cache/utils.js')
 vi.mock('~/src/server/common/helpers/coordinate-utils.js')
@@ -153,7 +154,8 @@ describe('#reviewSiteDetails', () => {
       debug: vi.fn()
     },
     yar: {
-      clear: vi.fn()
+      clear: vi.fn(),
+      flash: vi.fn()
     }
   })
 
@@ -188,6 +190,8 @@ describe('#reviewSiteDetails', () => {
         const mockRequest = createMockRequest()
 
         await reviewSiteDetailsController.handler(mockRequest, h)
+
+        expect(mockRequest.yar.flash).not.toHaveBeenCalled()
 
         expect(h.redirect).toHaveBeenCalledWith(routes.TASK_LIST)
       })
@@ -286,12 +290,17 @@ describe('#reviewSiteDetails', () => {
 
       test('should reset exemption and redirect to task list', async () => {
         const request = {
+          payload: {},
           logger: {
             info: vi.fn(),
             error: vi.fn(),
             debug: vi.fn()
+          },
+          yar: {
+            flash: vi.fn().mockReturnValue([])
           }
         }
+        getExemptionCacheSpy.mockReturnValue(mockExemption)
         const h = { redirect: vi.fn() }
 
         await reviewSiteDetailsSubmitController.handler(request, h)
@@ -302,17 +311,40 @@ describe('#reviewSiteDetails', () => {
 
       test('should redirect to task list on successful POST', async () => {
         const request = {
+          payload: {},
           logger: {
             info: vi.fn(),
             error: vi.fn(),
             debug: vi.fn()
+          },
+          yar: {
+            flash: vi.fn().mockReturnValue([])
           }
         }
+        getExemptionCacheSpy.mockReturnValue(mockExemption)
         const h = { redirect: vi.fn() }
 
         await reviewSiteDetailsSubmitController.handler(request, h)
 
         expect(h.redirect).toHaveBeenCalledWith(routes.TASK_LIST)
+      })
+
+      test('should redirect to check your answers when returnTo flash is set', async () => {
+        const request = {
+          payload: {},
+          logger: {},
+          yar: {
+            flash: vi.fn().mockReturnValue([routes.CHECK_YOUR_ANSWERS])
+          }
+        }
+        getExemptionCacheSpy.mockReturnValue(mockExemption)
+        const h = { redirect: vi.fn() }
+
+        await reviewSiteDetailsSubmitController.handler(request, h)
+
+        expect(request.yar.flash).toHaveBeenCalledWith(RETURN_TO_CACHE_KEY)
+        expect(h.redirect).toHaveBeenCalledWith(routes.CHECK_YOUR_ANSWERS)
+        expect(resetExemptionSiteDetailsSpy).not.toHaveBeenCalled()
       })
 
       test('should handle undefined siteDetails gracefully', async () => {
@@ -345,7 +377,6 @@ describe('#reviewSiteDetails', () => {
           // Expected to fail since the function expects real siteDetails data
         }
 
-        // Verify that the nullish coalescing operator worked correctly
         expect(capturedSiteDetails).toEqual({})
 
         cacheUtils.getExemptionCache.mockImplementation(
@@ -362,6 +393,29 @@ describe('#reviewSiteDetails', () => {
 
         expect(statusCode).toBe(statusCodes.redirect)
         expect(headers.location).toBe(`${routes.SITE_NAME}?site=3`)
+      })
+
+      test('should handle redirect to check your answers correctly', async () => {
+        const mockFlash = vi.fn().mockReturnValue([routes.CHECK_YOUR_ANSWERS])
+        const request = {
+          payload: {},
+          logger: {
+            info: vi.fn(),
+            error: vi.fn(),
+            debug: vi.fn()
+          },
+          yar: {
+            flash: mockFlash
+          }
+        }
+        getExemptionCacheSpy.mockReturnValue(mockExemption)
+        const h = { redirect: vi.fn() }
+
+        await reviewSiteDetailsSubmitController.handler(request, h)
+
+        expect(mockFlash).toHaveBeenCalledWith(RETURN_TO_CACHE_KEY)
+        expect(h.redirect).toHaveBeenCalledWith(routes.CHECK_YOUR_ANSWERS)
+        expect(resetExemptionSiteDetailsSpy).not.toHaveBeenCalled()
       })
     })
   })

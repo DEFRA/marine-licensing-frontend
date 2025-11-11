@@ -12,7 +12,7 @@
   <nav>
     {{ govukBackLink({
       text: "Back",
-      href: payload.backLink
+      href: backLink
     }) }}
   </nav>
   {% endif %}
@@ -57,7 +57,7 @@
           }) }}
             {% if payload.projectName %}
           {{ appCancelButton({
-            cancelLink: payload.backLink
+            cancelLink: backLink
           }) }}
             {% endif %}
           </div>

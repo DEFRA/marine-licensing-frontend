@@ -190,16 +190,19 @@
 
             {% if site.polygonCoordinates %}
                 {# Polygon site - multiple coordinates #}
+                {% set hasCoordinates = false %}
                 {% for coordinate in site.polygonCoordinates %}
+                    {% set hasCoordinates = true %}
                     {% set coordinateKey = { text: coordinate.label } %}
-                    {% set coordinateValue = { text: coordinate.value } %}
                     {% if loop.first %}
+                        {% set coordinateValue = { html: appIncompleteField({ text: coordinate.value }) } %}
                         {% set coordinateRow = {
                             key: coordinateKey,
                             value: coordinateValue,
                             actions: setSiteDetailsAction(site.polygonCoordinates, 'enter-multiple-coordinates', site.siteNumber)
                         } %}
                     {% else %}
+                        {% set coordinateValue = { text: coordinate.value } %}
                         {% set coordinateRow = {
                             key: coordinateKey,
                             value: coordinateValue
@@ -207,6 +210,17 @@
                     {% endif %}
                     {% set summaryRows = (summaryRows.push(coordinateRow), summaryRows) %}
                 {% endfor %}
+                {% if not hasCoordinates %}
+                    {% set summaryRows = (summaryRows.push({
+                        key: {
+                            text: "Start and end points"
+                        },
+                        value: {
+                            html: appIncompleteField({ text: "" })
+                        },
+                        actions: setSiteDetailsAction(site.polygonCoordinates, 'enter-multiple-coordinates', site.siteNumber)
+                    }), summaryRows) %}
+                {% endif %}
             {% else %}
                 {# Circular site - single coordinate and width #}
                     {% set summaryRows = (summaryRows.push({

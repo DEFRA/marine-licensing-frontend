@@ -288,6 +288,42 @@ describe('#coordinatesType', () => {
 
       await coordinatesTypeSubmitController.handler(mockRequest, h)
 
+      expect(cacheUtils.clearSiteDetails).toHaveBeenCalledWith(
+        mockRequest,
+        mockExemption,
+        h
+      )
+
+      expect(cacheUtils.updateExemptionSiteDetails).toHaveBeenCalledWith(
+        mockRequest,
+        h,
+        0,
+        'coordinatesType',
+        'file'
+      )
+    })
+
+    test('Should correctly set the cache when submitting without clearing when there is no change', async () => {
+      const h = {
+        redirect: vi.fn().mockReturnValue({
+          takeover: vi.fn()
+        }),
+        view: vi.fn()
+      }
+
+      const mockExemptionWithNoChange = { ...mockExemption }
+      mockExemptionWithNoChange.siteDetails[0].coordinatesType = 'file'
+      getExemptionCacheSpy.mockReturnValue(mockExemptionWithNoChange)
+
+      const mockRequest = {
+        payload: { coordinatesType: 'file' },
+        site: mockSite
+      }
+
+      await coordinatesTypeSubmitController.handler(mockRequest, h)
+
+      expect(cacheUtils.clearSiteDetails).not.toHaveBeenCalled()
+
       expect(cacheUtils.updateExemptionSiteDetails).toHaveBeenCalledWith(
         mockRequest,
         h,

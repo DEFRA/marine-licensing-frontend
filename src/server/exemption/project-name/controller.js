@@ -23,6 +23,11 @@ const errorMessages = {
 
 export const PROJECT_NAME_VIEW_ROUTE = 'exemption/project-name/index'
 
+const getBackLink = (request) => {
+  const fromCheckYourAnswers = request.query?.from === 'check-your-answers'
+  return fromCheckYourAnswers ? routes.CHECK_YOUR_ANSWERS : routes.TASK_LIST
+}
+
 const projectNameViewSettings = {
   pageTitle: 'Project name',
   heading: 'Project Name'
@@ -31,11 +36,13 @@ export const projectNameController = {
   handler(request, h) {
     const exemption = getExemptionCache(request)
 
+    const backLink = getBackLink(request)
+
     return h.view(PROJECT_NAME_VIEW_ROUTE, {
       ...projectNameViewSettings,
+      backLink,
       payload: {
-        projectName: exemption.projectName,
-        backLink: routes.TASK_LIST
+        projectName: exemption.projectName
       }
     })
   }
@@ -51,11 +58,16 @@ export const projectNameSubmitController = {
       failAction: (request, h, err) => {
         const { payload } = request
 
+        const backLink = getBackLink(request)
+
         if (!err.details) {
           return h
             .view(PROJECT_NAME_VIEW_ROUTE, {
               ...projectNameViewSettings,
-              payload
+              backLink,
+              payload: {
+                ...payload
+              }
             })
             .takeover()
         }
@@ -67,7 +79,10 @@ export const projectNameSubmitController = {
         return h
           .view(PROJECT_NAME_VIEW_ROUTE, {
             ...projectNameViewSettings,
-            payload,
+            backLink,
+            payload: {
+              ...payload
+            },
             errors,
             errorSummary
           })
@@ -102,7 +117,10 @@ export const projectNameSubmitController = {
         projectName: payload.projectName
       })
 
-      return h.redirect(routes.TASK_LIST)
+      const fromCheckYourAnswers = request.query?.from === 'check-your-answers'
+      return h.redirect(
+        fromCheckYourAnswers ? routes.CHECK_YOUR_ANSWERS : routes.TASK_LIST
+      )
     } catch (e) {
       const { details } = e.data?.payload?.validation ?? {}
 
@@ -114,8 +132,11 @@ export const projectNameSubmitController = {
 
       const errors = errorDescriptionByFieldName(errorSummary)
 
+      const backLink = getBackLink(request)
+
       return h.view(PROJECT_NAME_VIEW_ROUTE, {
         ...projectNameViewSettings,
+        backLink,
         payload,
         errors,
         errorSummary

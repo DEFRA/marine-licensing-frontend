@@ -26,6 +26,12 @@ const publicRegisterSettings = {
   pageTitle: 'Sharing your project information publicly',
   heading: 'Sharing your project information publicly'
 }
+
+const getBackLink = (request) => {
+  const fromCheckYourAnswers = request.query?.from === 'check-your-answers'
+  return fromCheckYourAnswers ? routes.CHECK_YOUR_ANSWERS : routes.TASK_LIST
+}
+
 export const publicRegisterController = {
   handler(request, h) {
     const exemption = getExemptionCache(request)
@@ -33,7 +39,8 @@ export const publicRegisterController = {
     return h.view(PUBLIC_REGISTER_VIEW_ROUTE, {
       ...publicRegisterSettings,
       projectName: exemption.projectName,
-      payload: exemption.publicRegister
+      payload: exemption.publicRegister,
+      backLink: getBackLink(request)
     })
   }
 }
@@ -59,13 +66,15 @@ export const publicRegisterSubmitController = {
         const { payload } = request
 
         const { projectName } = getExemptionCache(request)
+        const backLink = getBackLink(request)
 
         if (!err.details) {
           return h
             .view(PUBLIC_REGISTER_VIEW_ROUTE, {
               ...publicRegisterSettings,
               payload,
-              projectName
+              projectName,
+              backLink
             })
             .takeover()
         }
@@ -79,6 +88,7 @@ export const publicRegisterSubmitController = {
             ...publicRegisterSettings,
             payload,
             projectName,
+            backLink,
             errors,
             errorSummary
           })
@@ -109,7 +119,7 @@ export const publicRegisterSubmitController = {
         }
       })
 
-      return h.redirect(routes.TASK_LIST)
+      return h.redirect(getBackLink(request))
     } catch (e) {
       const validation = e.data?.payload?.validation
       const details = validation?.details
@@ -126,6 +136,7 @@ export const publicRegisterSubmitController = {
         ...publicRegisterSettings,
         payload,
         projectName: exemption.projectName,
+        backLink: getBackLink(request),
         errors,
         errorSummary
       })

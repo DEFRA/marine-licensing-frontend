@@ -56,6 +56,7 @@ describe('#publicRegister', () => {
       publicRegisterController.handler({}, h)
 
       expect(h.view).toHaveBeenCalledWith(PUBLIC_REGISTER_VIEW_ROUTE, {
+        backLink: routes.TASK_LIST,
         pageTitle: 'Sharing your project information publicly',
         heading: 'Sharing your project information publicly',
         projectName: mockExemption.projectName,
@@ -69,6 +70,7 @@ describe('#publicRegister', () => {
       publicRegisterController.handler({}, h)
 
       expect(h.view).toHaveBeenNthCalledWith(2, PUBLIC_REGISTER_VIEW_ROUTE, {
+        backLink: routes.TASK_LIST,
         pageTitle: 'Sharing your project information publicly',
         heading: 'Sharing your project information publicly',
         projectName: undefined,
@@ -122,6 +124,69 @@ describe('#publicRegister', () => {
       )
     })
 
+    test('Should handle API validation errors in catch block', async () => {
+      const apiPostMock = vi.spyOn(authRequests, 'authenticatedPatchRequest')
+      apiPostMock.mockRejectedValueOnce({
+        data: {
+          payload: {
+            validation: {
+              details: [
+                {
+                  path: ['consent'],
+                  message: 'PUBLIC_REGISTER_CONSENT_REQUIRED',
+                  type: 'any.required'
+                }
+              ]
+            }
+          }
+        }
+      })
+
+      const { result, statusCode } = await makePostRequest({
+        url: routes.PUBLIC_REGISTER,
+        server: getServer(),
+        formData: { consent: 'no', reason: 'Test reason' }
+      })
+
+      expect(statusCode).toBe(statusCodes.ok)
+      expect(result).toContain('Sharing your project information publicly')
+
+      const { document } = new JSDOM(result).window
+      expect(document.querySelector('.govuk-error-summary')).toBeTruthy()
+    })
+
+    test('Should handle API validation errors in catch block with from=check-your-answers parameter', async () => {
+      const apiPostMock = vi.spyOn(authRequests, 'authenticatedPatchRequest')
+      apiPostMock.mockRejectedValueOnce({
+        data: {
+          payload: {
+            validation: {
+              details: [
+                {
+                  path: ['consent'],
+                  message: 'PUBLIC_REGISTER_CONSENT_REQUIRED',
+                  type: 'any.required'
+                }
+              ]
+            }
+          }
+        }
+      })
+
+      const { result, statusCode } = await makePostRequest({
+        url: routes.PUBLIC_REGISTER + '?from=check-your-answers',
+        server: getServer(),
+        formData: { consent: 'no', reason: 'Test reason' }
+      })
+
+      expect(statusCode).toBe(statusCodes.ok)
+      expect(result).toContain('Sharing your project information publicly')
+      expect(result).toContain(routes.CHECK_YOUR_ANSWERS)
+
+      const { document } = new JSDOM(result).window
+      expect(document.querySelector('.govuk-error-summary')).toBeTruthy()
+    })
+
     test('Should correctly validate on empty data', () => {
       const request = {
         payload: { consent: '' }
@@ -150,6 +215,7 @@ describe('#publicRegister', () => {
       )
 
       expect(h.view).toHaveBeenCalledWith(PUBLIC_REGISTER_VIEW_ROUTE, {
+        backLink: routes.TASK_LIST,
         pageTitle: 'Sharing your project information publicly',
         heading: 'Sharing your project information publicly',
         projectName: mockExemption.projectName,
@@ -195,6 +261,7 @@ describe('#publicRegister', () => {
       )
 
       expect(h.view).toHaveBeenCalledWith(PUBLIC_REGISTER_VIEW_ROUTE, {
+        backLink: routes.TASK_LIST,
         heading: 'Sharing your project information publicly',
         pageTitle: 'Sharing your project information publicly',
         projectName: 'Test Project',
@@ -218,6 +285,7 @@ describe('#publicRegister', () => {
       publicRegisterSubmitController.options.validate.failAction(request, h, {})
 
       expect(h.view).toHaveBeenCalledWith(PUBLIC_REGISTER_VIEW_ROUTE, {
+        backLink: routes.TASK_LIST,
         heading: 'Sharing your project information publicly',
         pageTitle: 'Sharing your project information publicly',
         projectName: 'Test Project',
@@ -241,6 +309,7 @@ describe('#publicRegister', () => {
       publicRegisterSubmitController.options.validate.failAction(request, h, {})
 
       expect(h.view).toHaveBeenCalledWith(PUBLIC_REGISTER_VIEW_ROUTE, {
+        backLink: routes.TASK_LIST,
         heading: 'Sharing your project information publicly',
         pageTitle: 'Sharing your project information publicly',
         projectName: 'Test Project',
@@ -264,6 +333,28 @@ describe('#publicRegister', () => {
       const { document } = new JSDOM(result).window
 
       expect(document.querySelector('.govuk-error-summary')).toBeTruthy()
+    })
+
+    test('Should correctly redirect to check your answers when parameter is present', async () => {
+      const { statusCode, headers } = await makePostRequest({
+        url: routes.PUBLIC_REGISTER + '?from=check-your-answers',
+        server: getServer(),
+        formData: { consent: 'no', reason: 'Test reason' }
+      })
+
+      expect(authRequests.authenticatedPatchRequest).toHaveBeenCalledWith(
+        expect.any(Object),
+        '/exemption/public-register',
+        {
+          id: mockExemption.id,
+          consent: 'no',
+          reason: 'Test reason'
+        }
+      )
+
+      expect(statusCode).toBe(302)
+
+      expect(headers.location).toBe(routes.CHECK_YOUR_ANSWERS)
     })
 
     test('Should show error for reason being empty when consent is set to no', async () => {

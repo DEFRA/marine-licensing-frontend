@@ -53,7 +53,17 @@ const REVIEW_SITE_DETAILS_VIEW_ROUTE =
 const FILE_UPLOAD_REVIEW_VIEW_ROUTE =
   'exemption/site-details/review-site-details/file-upload-review'
 
-export const getSiteDetailsBackLink = (previousPage, coordinatesEntry) => {
+export const getSiteDetailsBackLink = (
+  previousPage,
+  coordinatesEntry,
+  returnToCheckYourAnswers = false
+) => {
+  if (returnToCheckYourAnswers) {
+    return typeof returnToCheckYourAnswers === 'string'
+      ? returnToCheckYourAnswers
+      : routes.CHECK_YOUR_ANSWERS
+  }
+
   if (!previousPage || !URL.canParse(previousPage)) {
     return routes.TASK_LIST
   }
@@ -150,7 +160,16 @@ const extractCoordinateData = (feature) => ({
   coordinates: feature.geometry.coordinates
 })
 
-export const getFileUploadBackLink = (previousPage) => {
+export const getFileUploadBackLink = (
+  previousPage,
+  returnToCheckYourAnswers = false
+) => {
+  if (returnToCheckYourAnswers) {
+    return typeof returnToCheckYourAnswers === 'string'
+      ? returnToCheckYourAnswers
+      : routes.CHECK_YOUR_ANSWERS
+  }
+
   if (!previousPage || !URL.canParse(previousPage)) {
     return routes.FILE_UPLOAD
   }
@@ -272,8 +291,13 @@ export const buildManualCoordinateSummaryData = (
 }
 
 export const renderFileUploadReview = (h, options) => {
-  const { exemption, previousPage, siteDetails, reviewSiteDetailsPageData } =
-    options
+  const {
+    exemption,
+    previousPage,
+    siteDetails,
+    reviewSiteDetailsPageData,
+    returnToCheckYourAnswers = false
+  } = options
   const { multipleSiteDetails } = exemption
 
   const multipleSiteDetailsData = buildSiteLocationData(
@@ -318,7 +342,7 @@ export const renderFileUploadReview = (h, options) => {
 
   return h.view(FILE_UPLOAD_REVIEW_VIEW_ROUTE, {
     ...reviewSiteDetailsPageData,
-    backLink: getFileUploadBackLink(previousPage),
+    backLink: getFileUploadBackLink(previousPage, returnToCheckYourAnswers),
     projectName: exemption.projectName,
     summaryData,
     multipleSiteDetailsData,
@@ -330,8 +354,13 @@ export const renderFileUploadReview = (h, options) => {
   })
 }
 export const renderManualCoordinateReview = (h, options) => {
-  const { exemption, previousPage, siteDetails, reviewSiteDetailsPageData } =
-    options
+  const {
+    exemption,
+    previousPage,
+    siteDetails,
+    reviewSiteDetailsPageData,
+    returnToCheckYourAnswers = false
+  } = options
   const { multipleSiteDetails } = exemption
 
   const firstSite = getSiteDetailsBySite(exemption)
@@ -348,7 +377,11 @@ export const renderManualCoordinateReview = (h, options) => {
 
   return h.view(REVIEW_SITE_DETAILS_VIEW_ROUTE, {
     ...reviewSiteDetailsPageData,
-    backLink: getSiteDetailsBackLink(previousPage, firstSite.coordinatesEntry),
+    backLink: getSiteDetailsBackLink(
+      previousPage,
+      firstSite.coordinatesEntry,
+      returnToCheckYourAnswers
+    ),
     projectName: exemption.projectName,
     summaryData,
     multipleSiteDetailsData,

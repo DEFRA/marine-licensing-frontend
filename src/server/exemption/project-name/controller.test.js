@@ -106,6 +106,31 @@ describe('#projectName', () => {
       expect(headers.location).toBe(routes.TASK_LIST)
     })
 
+    test('Should correctly update existing project and redirect to check your answers when parameter is present', async () => {
+      getExemptionCacheSpy.mockReturnValueOnce(mockExemption)
+
+      const apiPatchMock = vi.spyOn(authRequests, 'authenticatedPatchRequest')
+      apiPatchMock.mockResolvedValue({
+        payload: { projectName: 'Project name' }
+      })
+
+      const { statusCode, headers } = await makePostRequest({
+        url: routes.PROJECT_NAME + '?from=check-your-answers',
+        server: getServer(),
+        formData: { projectName: 'Project name' }
+      })
+
+      expect(authRequests.authenticatedPatchRequest).toHaveBeenCalledWith(
+        expect.any(Object),
+        `/exemption/project-name`,
+        { projectName: 'Project name', id: mockExemption.id }
+      )
+
+      expect(statusCode).toBe(302)
+
+      expect(headers.location).toBe(routes.CHECK_YOUR_ANSWERS)
+    })
+
     test('Should pass error to global catchAll behaviour if it is not a validation error', async () => {
       const apiPostMock = vi.spyOn(authRequests, 'authenticatedPostRequest')
       apiPostMock.mockRejectedValueOnce({
@@ -126,6 +151,69 @@ describe('#projectName', () => {
       expect(document.querySelector('h1').textContent.trim()).toBe(
         'There is a problem with the service'
       )
+    })
+
+    test('Should handle API validation errors in catch block', async () => {
+      const apiPostMock = vi.spyOn(authRequests, 'authenticatedPostRequest')
+      apiPostMock.mockRejectedValueOnce({
+        data: {
+          payload: {
+            validation: {
+              details: [
+                {
+                  path: ['projectName'],
+                  message: 'PROJECT_NAME_REQUIRED',
+                  type: 'string.empty'
+                }
+              ]
+            }
+          }
+        }
+      })
+
+      const { result, statusCode } = await makePostRequest({
+        url: routes.PROJECT_NAME,
+        server: getServer(),
+        formData: { projectName: 'test' }
+      })
+
+      expect(statusCode).toBe(statusCodes.ok)
+      expect(result).toContain('Project name')
+
+      const { document } = new JSDOM(result).window
+      expect(document.querySelector('.govuk-error-summary')).toBeTruthy()
+    })
+
+    test('Should handle API validation errors in catch block with from=check-your-answers parameter', async () => {
+      const apiPostMock = vi.spyOn(authRequests, 'authenticatedPostRequest')
+      apiPostMock.mockRejectedValueOnce({
+        data: {
+          payload: {
+            validation: {
+              details: [
+                {
+                  path: ['projectName'],
+                  message: 'PROJECT_NAME_REQUIRED',
+                  type: 'string.empty'
+                }
+              ]
+            }
+          }
+        }
+      })
+
+      const { result, statusCode } = await makePostRequest({
+        url: routes.PROJECT_NAME + '?from=check-your-answers',
+        server: getServer(),
+        formData: { projectName: 'test' }
+      })
+
+      expect(statusCode).toBe(statusCodes.ok)
+      expect(result).toContain('Project name')
+      expect(result).toContain(routes.CHECK_YOUR_ANSWERS)
+
+      const { document } = new JSDOM(result).window
+      expect(document.querySelector('.govuk-error-summary')).toBeTruthy()
     })
 
     test('Should correctly validate on empty data', () => {
@@ -152,6 +240,7 @@ describe('#projectName', () => {
       projectNameSubmitController.options.validate.failAction(request, h, err)
 
       expect(h.view).toHaveBeenCalledWith(PROJECT_NAME_VIEW_ROUTE, {
+        backLink: routes.TASK_LIST,
         heading: 'Project Name',
         pageTitle: 'Project name',
         payload: { projectName: '' },
@@ -192,6 +281,7 @@ describe('#projectName', () => {
       projectNameSubmitController.options.validate.failAction(request, h, err)
 
       expect(h.view).toHaveBeenCalledWith(PROJECT_NAME_VIEW_ROUTE, {
+        backLink: routes.TASK_LIST,
         heading: 'Project Name',
         pageTitle: 'Project name',
         payload: { projectName: '' }
@@ -214,6 +304,7 @@ describe('#projectName', () => {
       projectNameSubmitController.options.validate.failAction(request, h, {})
 
       expect(h.view).toHaveBeenCalledWith(PROJECT_NAME_VIEW_ROUTE, {
+        backLink: routes.TASK_LIST,
         heading: 'Project Name',
         pageTitle: 'Project name',
         payload: { projectName: '' }

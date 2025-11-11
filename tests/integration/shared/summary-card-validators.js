@@ -169,19 +169,19 @@ export const validateSiteDetails = (document, expectedPageContent) => {
     siteDetailsData.forEach((siteDetails, index) => {
       validateSummaryCardContent(
         document,
-        `#site-details-card:nth-of-type(${index + 1})`,
+        `#site-details-${index + 1}`,
         siteDetails
       )
     })
   } else {
-    const siteCard = document.querySelector('#site-details-card')
+    const siteCard = document.querySelector('#site-details-1')
     expect(siteCard).toBeTruthy()
 
     // Validate basic site details if present
     if (siteDetailsData.length) {
       validateSummaryCardContent(
         document,
-        '#site-details-card',
+        '#site-details-1',
         siteDetailsData[0]
       )
     }

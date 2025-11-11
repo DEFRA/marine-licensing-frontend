@@ -45,6 +45,24 @@ describe('Project name', () => {
     ).not.toBeInTheDocument()
   })
 
+  test('project name from Check Your Answers', async () => {
+    const exemptionProjectName = {
+      id: 'test-exemption-123',
+      projectName: 'Test Project'
+    }
+    mockExemption(exemptionProjectName)
+
+    const document = await loadPage({
+      requestUrl: routes.PROJECT_NAME + '?from=check-your-answers',
+      server: getServer()
+    })
+    expect(
+      getByRole(document, 'link', {
+        name: 'Back'
+      })
+    ).toHaveAttribute('href', routes.CHECK_YOUR_ANSWERS)
+  })
+
   test('should render page elements when a project name is set', async () => {
     const exemptionNoProjectName = {
       id: 'test-exemption-123',

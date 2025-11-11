@@ -53,6 +53,19 @@ describe('Public register', () => {
     ).toHaveAttribute('href', routes.TASK_LIST)
   })
 
+  test('public register from Check Your Answers', async () => {
+    mockExemption(exemption)
+    const document = await loadPage({
+      requestUrl: routes.PUBLIC_REGISTER + '?from=check-your-answers',
+      server: getServer()
+    })
+    expect(
+      getByRole(document, 'link', {
+        name: 'Back'
+      })
+    ).toHaveAttribute('href', routes.CHECK_YOUR_ANSWERS)
+  })
+
   test('public register decision not set', async () => {
     mockExemption(exemption)
     const document = await loadPage({

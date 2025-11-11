@@ -37,11 +37,13 @@
     
     {{ appSiteLocationCard({
       siteLocationData: siteLocationData,
+      changeLink: siteLocationData.changeLink,
       isReadOnly: isReadOnly
     }) }}
 
     {{ appActivityDetailsCard({
       activityDetailsData: siteLocationData,
+      changeLink: activityDetailsChangeLink,
       isReadOnly: isReadOnly
     }) }}
 
@@ -49,6 +51,7 @@
     {{ appSiteDetailsCard({
       siteDetails: site,
       siteNumber: site.siteNumber,
+      changeLink: reviewSiteDetailsRoute + "?from=check-your-answers#site-details-" + site.siteNumber,
       multipleSiteDetails: multipleSiteDetails,
       siteDetailsData: siteDetailsData,
       isReadOnly: isReadOnly

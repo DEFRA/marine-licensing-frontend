@@ -58,12 +58,14 @@ describe('Site Details Card Component', () => {
             coordinateDisplayText: '50.7234, -1.8795',
             circleWidth: '100'
           },
+          siteNumber: 1,
+          changeLink: '#',
           isReadOnly: false
         })
       })
 
       test('should render site details card with correct structure', () => {
-        const card = document.querySelector('#site-details-card')
+        const card = document.querySelector('#site-details-1')
         expect(card).toBeTruthy()
         expect(card.classList.contains('govuk-summary-card')).toBe(true)
 
@@ -139,12 +141,13 @@ describe('Site Details Card Component', () => {
             coordinateDisplayText: '425053, 564180',
             circleWidth: '250'
           },
+          siteNumber: 1,
           isReadOnly: true
         })
       })
 
       test('should render site details card', () => {
-        const card = document.querySelector('#site-details-card')
+        const card = document.querySelector('#site-details-1')
         expect(card).toBeTruthy()
       })
 
@@ -184,12 +187,14 @@ describe('Site Details Card Component', () => {
               { label: 'Point 3', value: '50.7236, -1.8797' }
             ]
           },
+          siteNumber: 1,
+          changeLink: '#',
           isReadOnly: false
         })
       })
 
       test('should render polygon site details card', () => {
-        const card = document.querySelector('#site-details-card')
+        const card = document.querySelector('#site-details-1')
         expect(card).toBeTruthy()
       })
 
@@ -253,6 +258,7 @@ describe('Site Details Card Component', () => {
               { label: 'Point B', value: '425054, 564181' }
             ]
           },
+          siteNumber: 1,
           isReadOnly: true
         })
       })
@@ -283,12 +289,14 @@ describe('Site Details Card Component', () => {
               'WGS84\nLatitude and longitude in decimal degrees',
             polygonCoordinates: []
           },
+          siteNumber: 1,
+          changeLink: '#',
           isReadOnly: false
         })
       })
 
       test('should handle empty polygon coordinates gracefully', () => {
-        const card = document.querySelector('#site-details-card')
+        const card = document.querySelector('#site-details-1')
         expect(card).toBeTruthy()
 
         const keys = Array.from(
@@ -315,12 +323,14 @@ describe('Site Details Card Component', () => {
             fileType: 'Shapefile (.shp)',
             filename: 'site-boundaries.shp'
           },
+          siteNumber: 1,
+          changeLink: '#',
           isReadOnly: false
         })
       })
 
       test('should render file upload site details card', () => {
-        const card = document.querySelector('#site-details-card')
+        const card = document.querySelector('#site-details-1')
         expect(card).toBeTruthy()
       })
 
@@ -369,6 +379,7 @@ describe('Site Details Card Component', () => {
             fileType: 'KML (.kml)',
             filename: 'marine-area.kml'
           },
+          siteNumber: 1,
           isReadOnly: true
         })
       })
@@ -389,6 +400,8 @@ describe('Site Details Card Component', () => {
     test('should handle missing siteDetails gracefully', () => {
       expect(() => {
         renderComponentWithJSDOM('site-details-card', {
+          siteNumber: 1,
+          changeLink: '#',
           isReadOnly: false
         })
       }).not.toThrow()
@@ -400,10 +413,11 @@ describe('Site Details Card Component', () => {
           isFileUpload: false,
           isPolygonSite: false,
           reviewSummaryText: 'Test'
-        }
+        },
+        siteNumber: 1
       })
 
-      const card = document.querySelector('#site-details-card')
+      const card = document.querySelector('#site-details-1')
       expect(card).toBeTruthy()
     })
 
@@ -416,10 +430,12 @@ describe('Site Details Card Component', () => {
           coordinateDisplayText: '50.7234, -1.8795',
           circleWidth: '100'
         },
+        siteNumber: 1,
+        changeLink: '#',
         isReadOnly: false
       })
 
-      const card = document.querySelector('#site-details-card')
+      const card = document.querySelector('#site-details-1')
       expect(card).toBeTruthy()
     })
 
@@ -429,10 +445,12 @@ describe('Site Details Card Component', () => {
           isFileUpload: true,
           isPolygonSite: false
         },
+        siteNumber: 1,
+        changeLink: '#',
         isReadOnly: false
       })
 
-      const card = document.querySelector('#site-details-card')
+      const card = document.querySelector('#site-details-1')
       expect(card).toBeTruthy()
     })
   })

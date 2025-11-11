@@ -12,6 +12,8 @@ import {
 import { mockExemption as mockExemptionData } from '#src/server/test-helpers/mocks.js'
 import { makeGetRequest } from '#src/server/test-helpers/server-requests.js'
 import { routes } from '#src/server/common/constants/routes.js'
+import { RETURN_TO_CACHE_KEY } from '#src/server/common/constants/cache.js'
+vi.mock('#src/server/common/helpers/session-cache/utils.js')
 
 describe('#taskListController', () => {
   const getServer = setupTestServer()
@@ -50,11 +52,16 @@ describe('#taskListController', () => {
   })
 
   test('taskListController handler should render with correct context', async () => {
+    const mockRequest = {
+      yar: {
+        flash: vi.fn()
+      }
+    }
     const h = { view: vi.fn() }
     const { authenticatedGetRequest, setExemptionCache } =
       mockExemption(mockExemptionData)
 
-    await taskListController.handler({}, h)
+    await taskListController.handler(mockRequest, h)
 
     expect(authenticatedGetRequest).toHaveBeenCalledWith(
       expect.any(Object),
@@ -70,6 +77,8 @@ describe('#taskListController', () => {
       expect.any(Object),
       exemptionWithoutTaskList
     )
+
+    expect(mockRequest.yar.flash).toHaveBeenCalledWith(RETURN_TO_CACHE_KEY)
 
     expect(h.view).toHaveBeenCalledWith(TASK_LIST_VIEW_ROUTE, {
       pageTitle: 'Task list',

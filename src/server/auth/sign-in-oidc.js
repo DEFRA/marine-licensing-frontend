@@ -9,7 +9,7 @@ export const signInOidcController = {
   method: ['GET', 'POST'],
   path: routes.AUTH_DEFRA_ID_CALLBACK,
   options: {
-    auth: { strategy: AUTH_STRATEGIES.DEFRA_ID, mode: 'try' }
+    auth: { strategy: AUTH_STRATEGIES.DEFRA_ID }
   },
   handler: async (request, h) => {
     if (request.auth?.isAuthenticated) {

@@ -186,26 +186,33 @@
             {% if site.polygonCoordinates %}
                 {# Polygon site - multiple coordinates #}
                 {% for coordinate in site.polygonCoordinates %}
-                    {% set summaryRows = (summaryRows.push({
-                        key: {
-                            text: coordinate.label
-                        },
-                        value: {
-                            text: coordinate.value
-                        }
-                    }), summaryRows) %}
+                    {% set coordinateKey = { text: coordinate.label } %}
+                    {% set coordinateValue = { text: coordinate.value } %}
+                    {% if loop.first %}
+                        {% set coordinateRow = {
+                            key: coordinateKey,
+                            value: coordinateValue,
+                            actions: setSiteDetailsAction(site.polygonCoordinates, 'enter-multiple-coordinates', site.siteNumber)
+                        } %}
+                    {% else %}
+                        {% set coordinateRow = {
+                            key: coordinateKey,
+                            value: coordinateValue
+                        } %}
+                    {% endif %}
+                    {% set summaryRows = (summaryRows.push(coordinateRow), summaryRows) %}
                 {% endfor %}
             {% else %}
                 {# Circular site - single coordinate and width #}
-                {% set summaryRows = (summaryRows.push({
-                    key: {
-                        text: "Coordinates at centre of site"
-                    },
-                    value: {
-                        html: appIncompleteField({ text: site.coordinates })
-                    },
-                    actions: setSiteDetailsAction(site.coordinates, 'enter-the-coordinates-at-the-centre-point', site.siteNumber)
-                }), summaryRows) %}
+                    {% set summaryRows = (summaryRows.push({
+                        key: {
+                            text: "Coordinates at centre of site"
+                        },
+                        value: {
+                            html: appIncompleteField({ text: site.coordinates })
+                        },
+                        actions: setSiteDetailsAction(site.coordinates, 'enter-the-coordinates-at-the-centre-point', site.siteNumber)
+                    }), summaryRows) %}
                 
                 {% set summaryRows = (summaryRows.push({
                     key: {

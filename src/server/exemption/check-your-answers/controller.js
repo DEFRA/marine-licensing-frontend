@@ -10,6 +10,7 @@ import { processSiteDetails } from '#src/server/common/helpers/exemption-site-de
 import { errorMessages } from '#src/server/common/constants/error-messages.js'
 import { getExemptionService } from '#src/services/exemption-service/index.js'
 import { buildSiteLocationData } from '#src/server/common/helpers/site-location-data.js'
+import { RETURN_TO_CACHE_KEY } from '#src/server/common/constants/cache.js'
 
 const apiPaths = {
   submitExemption: '/exemption/submit'
@@ -35,7 +36,7 @@ export const checkYourAnswersController = {
       cachedExemption.multipleSiteDetails,
       cachedExemption.siteDetails
     )
-    request.yar.flash('returnTo', routes.CHECK_YOUR_ANSWERS, true)
+    request.yar.flash(RETURN_TO_CACHE_KEY, routes.CHECK_YOUR_ANSWERS, true)
 
     const siteLocationChangeLink = `${routes.REVIEW_SITE_DETAILS}?from=check-your-answers#site-location-card`
     const activityDetailsChangeLink = `${routes.REVIEW_SITE_DETAILS}?from=check-your-answers#activity-details-card`

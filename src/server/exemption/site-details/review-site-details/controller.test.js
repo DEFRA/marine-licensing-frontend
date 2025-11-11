@@ -19,6 +19,7 @@ import {
   getCoordinateSystemText
 } from '#src/server/exemption/site-details/review-site-details/utils.js'
 import { getReviewSummaryText } from '#src/server/common/helpers/exemption-site-details.js'
+import { RETURN_TO_CACHE_KEY } from '#src/server/common/constants/cache.js'
 
 vi.mock('~/src/server/common/helpers/session-cache/utils.js')
 vi.mock('~/src/server/common/helpers/coordinate-utils.js')
@@ -341,7 +342,7 @@ describe('#reviewSiteDetails', () => {
 
         await reviewSiteDetailsSubmitController.handler(request, h)
 
-        expect(request.yar.flash).toHaveBeenCalledWith('returnTo')
+        expect(request.yar.flash).toHaveBeenCalledWith(RETURN_TO_CACHE_KEY)
         expect(h.redirect).toHaveBeenCalledWith(routes.CHECK_YOUR_ANSWERS)
         expect(resetExemptionSiteDetailsSpy).not.toHaveBeenCalled()
       })
@@ -412,7 +413,7 @@ describe('#reviewSiteDetails', () => {
 
         await reviewSiteDetailsSubmitController.handler(request, h)
 
-        expect(mockFlash).toHaveBeenCalledWith('returnTo')
+        expect(mockFlash).toHaveBeenCalledWith(RETURN_TO_CACHE_KEY)
         expect(h.redirect).toHaveBeenCalledWith(routes.CHECK_YOUR_ANSWERS)
         expect(resetExemptionSiteDetailsSpy).not.toHaveBeenCalled()
       })

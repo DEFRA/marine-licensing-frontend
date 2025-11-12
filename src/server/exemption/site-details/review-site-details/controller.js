@@ -104,7 +104,7 @@ export const reviewSiteDetailsSubmitController = {
       return h.redirect(redirectPath)
     }
 
-    resetExemptionSiteDetails(request)
+    await resetExemptionSiteDetails(request, h)
     return h.redirect(routes.TASK_LIST)
   }
 }

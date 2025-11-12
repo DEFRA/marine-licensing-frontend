@@ -32,7 +32,7 @@ export const taskListController = {
 
     if (query?.cancel) {
       if (query.cancel === 'site-details') {
-        resetExemptionSiteDetails(request)
+        await resetExemptionSiteDetails(request, h)
       }
 
       return h.redirect(routes.TASK_LIST)

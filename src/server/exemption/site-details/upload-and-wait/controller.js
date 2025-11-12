@@ -174,10 +174,11 @@ async function handleCdpRejectionError(request, h, status, fileType) {
 
   request.logger.error(
     {
-      errorCode: status.errorCode,
-      errorMessage: status.message,
-      mappedMessage: errorMessage,
-      fileType
+      error: {
+        code: status.errorCode,
+        message: status.message,
+        type: fileType
+      }
     },
     'FileUpload: CDP rejection error'
   )

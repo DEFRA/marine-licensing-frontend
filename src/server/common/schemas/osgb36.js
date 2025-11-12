@@ -5,24 +5,46 @@ import {
   OSGB36_CONSTANTS
 } from '#src/server/common/constants/exemptions.js'
 
-const { MIN_EASTINGS, MAX_EASTINGS, MIN_NORTHINGS, MAX_NORTHINGS } =
-  OSGB36_CONSTANTS
+// Eastings minimum is 000000 and maximum 700000. Unpadded 0 also allowed as a value.
+// Northings minimum is 000000 and maximum 1200000. Unpadded 0 also allowed as a value.
+// Any value within the ranges has to be 6 characters for eastings or 6/7 characters for northings, and should be left-padded with zeroes to achieve that eg eastings - 000700
+
+const {
+  MIN_EASTINGS,
+  MAX_EASTINGS,
+  MIN_NORTHINGS,
+  MAX_NORTHINGS,
+  VALID_EASTINGS_LENGTH,
+  MIN_VALID_NORTHINGS_LENGTH,
+  MAX_VALID_NORTHINGS_LENGTH
+} = OSGB36_CONSTANTS
 
 const isEastingsInRange = (value, numericValue) => {
-  if (numericValue === 0) return true
-  if (value.length !== 6) return false
+  if (numericValue === 0) {
+    return true
+  }
+  if (value.length !== VALID_EASTINGS_LENGTH) {
+    return false
+  }
   return numericValue >= MIN_EASTINGS && numericValue <= MAX_EASTINGS
 }
 
 const isNorthingsInRange = (value, numericValue) => {
-  if (numericValue === 0) return true
-  if (value.length !== 6 && value.length !== 7) return false
+  if (numericValue === 0) {
+    return true
+  }
+  if (
+    value.length !== MIN_VALID_NORTHINGS_LENGTH &&
+    value.length !== MAX_VALID_NORTHINGS_LENGTH
+  ) {
+    return false
+  }
   return numericValue >= MIN_NORTHINGS && numericValue <= MAX_NORTHINGS
 }
 
 const validateCoordinates = (value, helpers, type) => {
   const coordinate = Number(value)
-  const isNegative = value.startsWith('-')
+  const isNegative = coordinate < 0
 
   if (isNegative) {
     return helpers.error(JOI_ERRORS.NUMBER_POSITIVE)

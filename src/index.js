@@ -8,7 +8,7 @@ await startServer()
 process.on('unhandledRejection', (error) => {
   const logger = createLogger()
   logger.info('Unhandled rejection detected')
-  
+
   // Log with ECS format structure for proper error tracking
   logger.error(
     {
@@ -20,6 +20,6 @@ process.on('unhandledRejection', (error) => {
     },
     'Unhandled rejection error'
   )
-  
+
   process.exitCode = 1
 })

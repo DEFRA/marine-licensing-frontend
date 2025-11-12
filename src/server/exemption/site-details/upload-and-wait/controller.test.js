@@ -761,7 +761,7 @@ describe('#uploadAndWait', () => {
         // And error is logged with error code and mapped message
         expect(mockRequest.logger.error).toHaveBeenCalledWith(
           {
-            error: new Error('Geo-parser service unavailable'),
+            err: expect.any(Error),
             filename: 'test.kml',
             fileType: 'kml',
             errorCode: null,
@@ -984,7 +984,7 @@ describe('#uploadAndWait', () => {
 
         expect(mockRequest.logger.error).toHaveBeenCalledWith(
           {
-            error: geoParserError,
+            err: geoParserError,
             filename: 'coordinates.zip',
             fileType: 'shapefile',
             errorCode: 'SHAPEFILE_MISSING_CORE_FILES',
@@ -1052,7 +1052,7 @@ describe('#uploadAndWait', () => {
 
         expect(mockRequest.logger.error).toHaveBeenCalledWith(
           {
-            error: geoParserError,
+            err: geoParserError,
             filename: 'coordinates.zip',
             fileType: 'shapefile',
             errorCode: 'SHAPEFILE_MISSING_PRJ_FILE',
@@ -1119,7 +1119,7 @@ describe('#uploadAndWait', () => {
 
         expect(mockRequest.logger.error).toHaveBeenCalledWith(
           {
-            error: geoParserError,
+            err: geoParserError,
             filename: 'coordinates.zip',
             fileType: 'shapefile',
             errorCode: 'SHAPEFILE_PRJ_FILE_TOO_LARGE',
@@ -1169,7 +1169,7 @@ describe('#uploadAndWait', () => {
         // Then error is logged
         expect(mockRequest.logger.error).toHaveBeenCalledWith(
           {
-            error: new Error('Service unavailable'),
+            err: expect.any(Error),
             uploadId: 'test-upload-id'
           },
           'FileUpload: ERROR: Failed to check upload status'

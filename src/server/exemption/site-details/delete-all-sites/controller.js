@@ -50,7 +50,7 @@ export const deleteAllSitesSubmitController = {
     } catch (error) {
       request.logger.error(
         {
-          error,
+          err: error,
           exemptionId: exemption.id
         },
         'Error deleting all sites'

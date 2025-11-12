@@ -44,7 +44,9 @@ describe('#catchAll', () => {
         statusCode
       }
     },
-    logger: { error: mockErrorLogger }
+    logger: { error: mockErrorLogger },
+    path: '/test-path',
+    method: 'GET'
   })
   const mockToolkitView = vi.fn()
   const mockToolkitCode = vi.fn()
@@ -99,10 +101,16 @@ describe('#catchAll', () => {
   })
 
   test('Should provide expected 500-error page and log error for internalServerError', () => {
-    catchAll(mockRequest(statusCodes.internalServerError), mockToolkit)
+    const request = mockRequest(statusCodes.internalServerError)
+    catchAll(request, mockToolkit)
 
     expect(mockErrorLogger).toHaveBeenCalledWith(
-      { stack: mockStack },
+      {
+        err: request.response,
+        statusCode: statusCodes.internalServerError,
+        path: request.path,
+        method: request.method
+      },
       'Error occurred'
     )
 

@@ -133,7 +133,7 @@ export const fileUploadController = {
     } catch (error) {
       request.logger.error(
         {
-          error: error.message,
+          err: error,
           exemptionId: exemption.id,
           fileUploadType
         },

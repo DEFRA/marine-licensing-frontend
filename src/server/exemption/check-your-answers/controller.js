@@ -91,7 +91,7 @@ export const checkYourAnswersSubmitController = {
     } catch (error) {
       request.logger.error(
         {
-          error: error.message,
+          err: error,
           exemptionId: id
         },
         errorMessages.SUBMISSION_FAILED

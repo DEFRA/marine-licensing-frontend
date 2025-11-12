@@ -132,7 +132,7 @@ describe('deleteAllSitesController', () => {
 
       expect(mockRequest.logger.error).toHaveBeenCalledWith(
         {
-          error: 'test error',
+          err: 'test error',
           exemptionId: mockExemption.id
         },
         'Error deleting all sites'

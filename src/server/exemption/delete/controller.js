@@ -42,7 +42,7 @@ export const deleteExemptionController = {
         routes
       })
     } catch (error) {
-      request.logger.error({ error }, 'Error fetching project for delete')
+      request.logger.error({ err: error }, 'Error fetching project for delete')
 
       return h.redirect(routes.DASHBOARD)
     }
@@ -82,7 +82,7 @@ export const deleteExemptionSubmitController = {
 
       return h.redirect(routes.DASHBOARD)
     } catch (error) {
-      request.logger.error({ error }, 'Error deleting exemption')
+      request.logger.error({ err: error }, 'Error deleting exemption')
       return h.redirect(routes.DASHBOARD)
     }
   }

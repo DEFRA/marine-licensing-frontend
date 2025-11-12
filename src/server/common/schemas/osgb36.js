@@ -8,26 +8,31 @@ import {
 const { MIN_EASTINGS, MAX_EASTINGS, MIN_NORTHINGS, MAX_NORTHINGS } =
   OSGB36_CONSTANTS
 
-const isPositiveCoordinate = (coordinate) => coordinate > 0
+const isEastingsInRange = (value, numericValue) => {
+  if (numericValue === 0) return true
+  if (value.length !== 6) return false
+  return numericValue >= MIN_EASTINGS && numericValue <= MAX_EASTINGS
+}
 
-const isEastingsInRange = (coordinate) =>
-  coordinate >= MIN_EASTINGS && coordinate <= MAX_EASTINGS
-
-const isNorthingsInRange = (coordinate) =>
-  coordinate >= MIN_NORTHINGS && coordinate <= MAX_NORTHINGS
+const isNorthingsInRange = (value, numericValue) => {
+  if (numericValue === 0) return true
+  if (value.length !== 6 && value.length !== 7) return false
+  return numericValue >= MIN_NORTHINGS && numericValue <= MAX_NORTHINGS
+}
 
 const validateCoordinates = (value, helpers, type) => {
   const coordinate = Number(value)
+  const isNegative = value.startsWith('-')
 
-  if (!isPositiveCoordinate(coordinate)) {
+  if (isNegative) {
     return helpers.error(JOI_ERRORS.NUMBER_POSITIVE)
   }
 
-  if (type === 'eastings' && !isEastingsInRange(coordinate)) {
+  if (type === 'eastings' && !isEastingsInRange(value, coordinate)) {
     return helpers.error(JOI_ERRORS.NUMBER_RANGE)
   }
 
-  if (type === 'northings' && !isNorthingsInRange(coordinate)) {
+  if (type === 'northings' && !isNorthingsInRange(value, coordinate)) {
     return helpers.error(JOI_ERRORS.NUMBER_RANGE)
   }
 

@@ -39,8 +39,6 @@ describe('#catchAll', () => {
   const mockRequest = (/** @type {number} */ statusCode) => ({
     response: {
       isBoom: true,
-      message: 'Mock error message',
-      name: 'Error',
       stack: mockStack,
       output: {
         statusCode
@@ -108,22 +106,10 @@ describe('#catchAll', () => {
 
     expect(mockErrorLogger).toHaveBeenCalledWith(
       {
-        error: {
-          message: request.response.message,
-          stack_trace: mockStack,
-          type: expect.any(String)
-        },
-        http: {
-          request: {
-            method: request.method
-          },
-          response: {
-            status_code: statusCodes.internalServerError
-          }
-        },
-        url: {
-          path: request.path
-        }
+        err: request.response,
+        statusCode: statusCodes.internalServerError,
+        path: request.path,
+        method: request.method
       },
       'Error occurred'
     )

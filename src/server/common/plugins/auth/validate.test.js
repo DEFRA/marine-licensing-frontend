@@ -27,7 +27,11 @@ describe('validateUserSession', () => {
 
   beforeEach(() => {
     mockRequest = {
-      path: '/'
+      path: '/',
+      logger: {
+        info: vi.fn(),
+        error: vi.fn()
+      }
     }
 
     mockSession = {

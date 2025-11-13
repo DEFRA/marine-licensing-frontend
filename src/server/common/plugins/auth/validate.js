@@ -20,7 +20,6 @@ const isAuthStrategyValidForRoute = (strategy, requestPath) => {
 
 export const validateUserSession = async (request, session) => {
   const authedUser = await getUserSession(request, session)
-
   if (!authedUser) {
     return { isValid: false }
   }
@@ -28,22 +27,41 @@ export const validateUserSession = async (request, session) => {
   const tokenHasExpired = isPast(subMinutes(parseISO(authedUser.expiresAt), 1))
 
   if (tokenHasExpired) {
-    const response = await refreshAccessToken(request, session)
+    try {
+      request.logger.info('token has expired')
+      const response = await refreshAccessToken(request, session)
+      request.logger.info(response.ok, 'response.ok')
 
-    if (!response.ok) {
+      if (!response.ok) {
+        removeUserSession(request, session)
+        return { isValid: false }
+      }
+
+      const refreshAccessTokenJson = response.json
+      const updatedSession = await updateUserSession(
+        request,
+        refreshAccessTokenJson
+      )
+
+      return {
+        isValid: true,
+        credentials: updatedSession
+      }
+    } catch (error) {
+      request.logger.error(
+        {
+          error: {
+            message: error?.message || String(error),
+            stack_trace: error?.stack,
+            type:
+              error?.name || error?.constructor?.name || 'UnhandledRejection'
+          }
+        },
+        'refresh rejection error'
+      )
+      request.logger.info('error thrown in refresh')
       removeUserSession(request, session)
       return { isValid: false }
-    }
-
-    const refreshAccessTokenJson = response.json
-    const updatedSession = await updateUserSession(
-      request,
-      refreshAccessTokenJson
-    )
-
-    return {
-      isValid: true,
-      credentials: updatedSession
     }
   }
   const userSession = await request.server.app.cache.get(session.sessionId)

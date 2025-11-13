@@ -5,21 +5,12 @@ Help with eastings and northings formats
 {% endset %}
 
 {% set detailsHTML %}
-    <p>How accurate your eastings and northings coordinates are, depends on how many digits you use for each:</p>
-    <ul class="govuk-list govuk-list--bullet">
-      <li>2 + 2 digits (4 in total) - accurate to 1 square kilometre</li>
-      <li>3 + 3 digits (6 in total) - accurate to 100 square metres</li>
-      <li>4 + 4 digits (8 in total) - accurate to 10 square metres</li>
-	  <li>6 + 6 digits (12 in total) - accurate to 1 square metre</li>
-    </ul>
-    <p>Some places further north, such as the Shetland Islands, may need 7 digits for the northing coordinate.</p>
-    <p>Enter 2 values, each with at least 6 digits - one for eastings and one for northings. For example, 438493, 569648.</p>
-    <p>Always enter eastings first, then northings, in their separate fields.</p>
+    {% include "partials/coordinate-entry/osgb36-hint-details.njk" %}
 {% endset %}
 
-{% block introText %}
-    <p>Eastings and northings should only include numbers. For example: 438493, 569648.</p>
-{% endblock %} 
+{% set introText %}
+  {% include "partials/coordinate-entry/osgb36-intro.njk" %}
+{% endset %}
 
 {% block coordinateFields %}
     {{ govukInput({
@@ -43,4 +34,4 @@ Help with eastings and northings formats
         errorMessage: errors.northings,
         classes: "govuk-!-width-one-half"
     }) }}
-{% endblock %} 
+{% endblock %}

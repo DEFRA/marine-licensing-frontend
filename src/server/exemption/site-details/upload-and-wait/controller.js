@@ -116,7 +116,7 @@ const buildCoordinateResult = (geoJSON, extractedCoordinates) => ({
 const logExtractionError = (request, error, fileContext) => {
   request.logger.error(
     {
-      error,
+      err: error,
       ...fileContext
     },
     'FileUpload: ERROR: Failed to extract coordinates from file'
@@ -150,7 +150,7 @@ async function handleGeoParserError(request, h, error, filename, fileType) {
 
   request.logger.error(
     {
-      error,
+      err: error,
       filename,
       fileType,
       errorCode,
@@ -174,10 +174,11 @@ async function handleCdpRejectionError(request, h, status, fileType) {
 
   request.logger.error(
     {
-      errorCode: status.errorCode,
-      errorMessage: status.message,
-      mappedMessage: errorMessage,
-      fileType
+      error: {
+        code: status.errorCode,
+        message: status.message,
+        type: fileType
+      }
     },
     'FileUpload: CDP rejection error'
   )
@@ -394,7 +395,7 @@ export const uploadAndWaitController = {
     } catch (error) {
       request.logger.error(
         {
-          error,
+          err: error,
           uploadId: uploadConfig.uploadId
         },
         'FileUpload: ERROR: Failed to check upload status'

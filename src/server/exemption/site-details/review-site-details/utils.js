@@ -424,7 +424,7 @@ export const handleSubmissionError = (
 ) => {
   request.logger.error(
     {
-      error: error.message,
+      err: error,
       exemptionId,
       coordinatesType
     },

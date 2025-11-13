@@ -271,7 +271,7 @@ describe('#fileUpload', () => {
         // Then - Should log error and redirect to file type selection
         expect(mockRequest.logger.error).toHaveBeenCalledWith(
           expect.objectContaining({
-            error: 'CDP service unavailable',
+            err: expect.any(Error),
             exemptionId: mockExemption.id,
             fileUploadType: 'kml'
           }),

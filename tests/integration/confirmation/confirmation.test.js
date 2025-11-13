@@ -46,7 +46,7 @@ describe('Confirmation page', () => {
     expect(feedbackLink).toBeInTheDocument()
     expect(feedbackLink).toHaveAttribute(
       'href',
-      'https://defragroup.eu.qualtrics.com/jfe/form/SV_9GjBVwAH3a9ED6C'
+      'https://forms.office.com/pages/responsepage.aspx?id=UCQKdycCYkyQx044U38RAjXEiYXnHG1DvkWr_VjRfzZURFMxRkhCSzQyVlRKQzdZNDEyVDhSMFdSNy4u&route=shorturl'
     )
     expect(feedbackLink).toHaveAttribute('rel', 'noopener noreferrer')
     expect(feedbackLink).toHaveClass('govuk-link')

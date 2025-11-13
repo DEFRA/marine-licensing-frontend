@@ -397,10 +397,25 @@ describe('Review Site Details - Polygon Coordinates Integration Tests', () => {
     const siteCard = getSiteDetailsCard(document, expected, siteIndex)
 
     expected.siteDetails[siteIndex].polygonCoordinates.forEach(
-      (expectedCoordinate) => {
+      (expectedCoordinate, coordinateIndex) => {
         const coordinateRow = getRowByKey(siteCard, expectedCoordinate.label)
         expect(coordinateRow).toBeTruthy()
         expect(coordinateRow.textContent).toContain(expectedCoordinate.value)
+
+        const actionList = coordinateRow.querySelector(
+          '.govuk-summary-list__actions'
+        )
+
+        if (coordinateIndex === 0) {
+          expect(actionList).toBeTruthy()
+          validateActionLink(
+            coordinateRow,
+            expected.siteDetails[siteIndex].polygonCoordinates[0].value,
+            siteIndex
+          )
+        } else {
+          expect(actionList).toBeFalsy()
+        }
       }
     )
 

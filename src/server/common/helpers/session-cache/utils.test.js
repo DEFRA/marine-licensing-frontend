@@ -9,7 +9,6 @@ import {
   updateExemptionSiteDetails,
   updateExemptionSiteDetailsBatch,
   updateExemptionMultipleSiteDetails,
-  clearSiteDetails,
   clearSavedSiteDetails,
   SAVED_SITE_DETAILS_CACHE_KEY,
   setSavedSiteDetails
@@ -136,35 +135,6 @@ describe('#utils', () => {
       expect(mockRequest.yar.commit).toHaveBeenCalledWith(mockH)
 
       expect(cache).toEqual({})
-    })
-  })
-
-  describe('clearSiteDetails', () => {
-    test('should reset value', async () => {
-      const expected = { projectName: 'Test project' }
-
-      const mockRequest = {
-        yar: {
-          get: vi.fn().mockReturnValue(expected),
-          set: vi.fn(),
-          commit: vi.fn()
-        }
-      }
-
-      const value = {
-        projectName: 'Test project',
-        siteDetails: [{ siteName: 'test' }],
-        multipleSiteDetails: { multipleSitesEnabled: true }
-      }
-
-      const result = await clearSiteDetails(mockRequest, value)
-
-      expect(mockRequest.yar.set).toHaveBeenCalledWith(
-        EXEMPTION_CACHE_KEY,
-        expected
-      )
-
-      expect(result).toBe(expected)
     })
   })
 
@@ -668,13 +638,15 @@ describe('#utils', () => {
       mockRequest = {
         yar: {
           get: vi.fn(),
-          set: vi.fn()
+          set: vi.fn(),
+          commit: vi.fn()
         }
       }
     })
 
-    test('should clear the value in cache', () => {
-      const result = resetExemptionSiteDetails(mockRequest)
+    test('should clear the value in cache', async () => {
+      const mockH = {}
+      const result = await resetExemptionSiteDetails(mockRequest, mockH)
 
       expect(mockRequest.yar.set).toHaveBeenCalledWith(EXEMPTION_CACHE_KEY, {
         multipleSiteDetails: {},

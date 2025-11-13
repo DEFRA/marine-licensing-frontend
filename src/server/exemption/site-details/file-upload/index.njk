@@ -25,6 +25,12 @@
       {{ heading }}
     </label>
   </h1>
+
+  {% if fileUploadType == 'shapefile' %}
+    <p class="govuk-body">Upload a ZIP file containing all the files for your shapefile. Your shapefile must include
+      .shp, .shx, .dbf and .prj files.</p>
+    <p class="govuk-body">You can include more than one site.</p>
+  {% endif %}
 {% endset %}
 
 {% block content %}
@@ -36,12 +42,6 @@
           titleText: "There is a problem",
           errorList: errorSummary
         }) }}
-      {% endif %}
-
-      {% if fileUploadType == 'shapefile' %}
-        <p class="govuk-body">Upload a ZIP file containing all the files for your shapefile. Your shapefile must include
-          .shp, .shx, .dbf and .prj files.</p>
-        <p class="govuk-body">You can include more than one site.</p>
       {% endif %}
 
         <form action="{{ uploadUrl }}" method="post" enctype="multipart/form-data" novalidate>

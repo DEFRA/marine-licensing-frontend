@@ -41,6 +41,24 @@ describe('#osgb36ValidationSchema model', () => {
 
       expect(result.error).toBeUndefined()
     })
+
+    test('minimum eastings and northings with leading zeroes', () => {
+      const result = osgb36ValidationSchema.validate({
+        eastings: '000001',
+        northings: '000001'
+      })
+
+      expect(result.error).toBeUndefined()
+    })
+
+    test('northing 7 digits with leading zeroes', () => {
+      const result = osgb36ValidationSchema.validate({
+        eastings: '000001',
+        northings: '0870840'
+      })
+
+      expect(result.error).toBeUndefined()
+    })
   })
 
   describe('Fail validation', () => {

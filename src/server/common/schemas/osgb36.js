@@ -5,29 +5,56 @@ import {
   OSGB36_CONSTANTS
 } from '#src/server/common/constants/exemptions.js'
 
-const { MIN_EASTINGS, MAX_EASTINGS, MIN_NORTHINGS, MAX_NORTHINGS } =
-  OSGB36_CONSTANTS
+// Eastings minimum is 000000 and maximum 700000. Unpadded 0 also allowed as a value.
+// Northings minimum is 000000 and maximum 1200000. Unpadded 0 also allowed as a value.
+// Any value within the ranges has to be 6 characters for eastings or 6/7 characters for northings, and should be left-padded with zeroes to achieve that eg eastings - 000700
 
-const isPositiveCoordinate = (coordinate) => coordinate > 0
+const {
+  MIN_EASTINGS,
+  MAX_EASTINGS,
+  MIN_NORTHINGS,
+  MAX_NORTHINGS,
+  VALID_EASTINGS_LENGTH,
+  MIN_VALID_NORTHINGS_LENGTH,
+  MAX_VALID_NORTHINGS_LENGTH
+} = OSGB36_CONSTANTS
 
-const isEastingsInRange = (coordinate) =>
-  coordinate >= MIN_EASTINGS && coordinate <= MAX_EASTINGS
+const isEastingsInRange = (value, numericValue) => {
+  if (numericValue === 0) {
+    return true
+  }
+  if (value.length !== VALID_EASTINGS_LENGTH) {
+    return false
+  }
+  return numericValue >= MIN_EASTINGS && numericValue <= MAX_EASTINGS
+}
 
-const isNorthingsInRange = (coordinate) =>
-  coordinate >= MIN_NORTHINGS && coordinate <= MAX_NORTHINGS
+const isNorthingsInRange = (value, numericValue) => {
+  if (numericValue === 0) {
+    return true
+  }
+  if (
+    value.length !== MIN_VALID_NORTHINGS_LENGTH &&
+    value.length !== MAX_VALID_NORTHINGS_LENGTH
+  ) {
+    return false
+  }
+  return numericValue >= MIN_NORTHINGS && numericValue <= MAX_NORTHINGS
+}
 
 const validateCoordinates = (value, helpers, type) => {
   const coordinate = Number(value)
+  const isNegative = coordinate < 0
 
-  if (!isPositiveCoordinate(coordinate)) {
+  if (isNegative) {
     return helpers.error(JOI_ERRORS.NUMBER_POSITIVE)
   }
 
-  if (type === 'eastings' && !isEastingsInRange(coordinate)) {
+  if (type === 'eastings' && !isEastingsInRange(value, coordinate)) {
     return helpers.error(JOI_ERRORS.NUMBER_RANGE)
   }
 
-  if (type === 'northings' && !isNorthingsInRange(coordinate)) {
+  if (type === 'northings' && !isNorthingsInRange(value, coordinate)) {
     return helpers.error(JOI_ERRORS.NUMBER_RANGE)
   }
 

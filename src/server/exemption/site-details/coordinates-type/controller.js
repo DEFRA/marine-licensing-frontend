@@ -1,6 +1,6 @@
 import {
-  clearSiteDetails,
   getExemptionCache,
+  resetExemptionSiteDetails,
   updateExemptionSiteDetails
 } from '#src/server/common/helpers/session-cache/utils.js'
 import { getSiteDetailsBySite } from '#src/server/common/helpers/session-cache/site-details-utils.js'
@@ -98,12 +98,14 @@ export const coordinatesTypeSubmitController = {
 
     const { siteIndex, queryParams } = request.site
 
+    const currentSite = exemption.siteDetails?.[siteIndex]
+
     const hasChangedCoordinatesType =
-      payload.coordinatesType !==
-      exemption.siteDetails?.[siteIndex].coordinatesType
+      currentSite?.coordinatesType &&
+      payload.coordinatesType !== currentSite.coordinatesType
 
     if (hasChangedCoordinatesType) {
-      await clearSiteDetails(request, exemption, h)
+      await resetExemptionSiteDetails(request, h)
     }
 
     await updateExemptionSiteDetails(

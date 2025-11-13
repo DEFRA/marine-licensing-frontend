@@ -44,7 +44,7 @@ export const deleteAllSitesSubmitController = {
         id: exemption.id
       })
 
-      resetExemptionSiteDetails(request)
+      await resetExemptionSiteDetails(request, h)
 
       return h.redirect(routes.TASK_LIST)
     } catch (error) {

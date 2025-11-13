@@ -92,7 +92,7 @@ describe('deleteAllSitesController', () => {
         }
       )
 
-      expect(resetExemptionSiteDetails).toHaveBeenCalledWith(mockRequest)
+      expect(resetExemptionSiteDetails).toHaveBeenCalledWith(mockRequest, mockH)
 
       expect(mockH.redirect).toHaveBeenCalledWith(routes.TASK_LIST)
     })

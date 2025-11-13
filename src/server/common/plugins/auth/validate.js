@@ -21,12 +21,21 @@ const isAuthStrategyValidForRoute = (strategy, requestPath) => {
 export const validateUserSession = async (request, session) => {
   const authedUser = await getUserSession(request, session)
   if (!authedUser) {
+    request.logger.info(
+      {
+        sessionId: session?.sessionId
+      },
+      'validateUserSession: getUserSession returned null, returning invalid'
+    )
     return { isValid: false }
   }
 
-  const tokenHasExpired = isPast(subMinutes(parseISO(authedUser.expiresAt), 1))
+  const minutesBeforeExpiry = 5
+  const tokenIsExpiring = isPast(
+    subMinutes(parseISO(authedUser.expiresAt), minutesBeforeExpiry)
+  )
 
-  if (tokenHasExpired) {
+  if (tokenIsExpiring) {
     try {
       request.logger.info('token has expired')
       const response = await refreshAccessToken(request, session)

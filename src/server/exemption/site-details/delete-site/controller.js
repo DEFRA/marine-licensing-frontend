@@ -67,7 +67,7 @@ export const deleteSiteSubmitController = {
     } catch (error) {
       request.logger.error(
         {
-          error,
+          err: error,
           siteIndex: parsedSiteIndex,
           exemptionId: exemption.id
         },

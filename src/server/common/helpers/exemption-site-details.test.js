@@ -172,7 +172,7 @@ describe('exemption-site-details helper', () => {
 
       expect(mockLogger.error).toHaveBeenCalledWith(
         {
-          error: 'Failed to parse file upload data',
+          err: expect.any(Error),
           exemptionId: mockExemptionId
         },
         'Error getting file upload summary data'

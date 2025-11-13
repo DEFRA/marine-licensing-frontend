@@ -20,33 +20,33 @@
 {% block content %}
     <div class="govuk-grid-row">
         <div class="govuk-grid-column-two-thirds">
-            
+
             {% if errorSummary %}
                 {{ govukErrorSummary({
                     titleText: "There is a problem",
                     errorList: errorSummary
                 }) }}
             {% endif %}
-            
+
             <span class="govuk-caption-l">{{ projectName }}</span>
             {% if siteNumber %}
                 <span class="govuk-caption-l">Site {{ siteNumber }}</span>
             {% endif %}
             <h1 class="govuk-heading-l">{{ heading }}</h1>
 
-            {% block introText %}{% endblock %}
+          <p>{{ introText }}</p>
 
             {{ govukDetails({
                 summaryText: detailsSummary,
                 html: detailsHTML
             }) }}
-            
+
             <form method="POST">
 
                 <input type="hidden" name="csrfToken" value="{{csrfToken}}">
 
                 {% block coordinateFields %}{% endblock %}
-                                
+
                <div class="govuk-button-group">
                     {{ govukButton({
                         text: buttonText if buttonText else "Continue",
@@ -60,7 +60,7 @@
                     }) }}
                 </div>
             </form>
-            
+
         </div>
     </div>
-{% endblock %} 
+{% endblock %}

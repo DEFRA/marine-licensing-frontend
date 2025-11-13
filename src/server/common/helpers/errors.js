@@ -24,7 +24,15 @@ export function catchAll(request, h) {
   const statusCode = response.output.statusCode
 
   if (statusCode >= statusCodes.internalServerError) {
-    request.logger.error({ stack: response?.stack }, 'Error occurred')
+    request.logger.error(
+      {
+        err: response, // Pino automatically serializes Error objects with stack trace
+        statusCode,
+        path: request.path,
+        method: request.method
+      },
+      'Error occurred'
+    )
   }
 
   const template = getCustomTemplate(statusCode)

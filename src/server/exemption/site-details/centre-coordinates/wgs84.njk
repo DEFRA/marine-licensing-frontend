@@ -5,19 +5,12 @@ Help with latitude and longitude formats
 {% endset %}
 
 {% set detailsHTML %}
-    <p>Latitude and longitude can be written in different formats, including: </p>
-    <ul class="govuk-list govuk-list--bullet">
-        <li>decimal degrees (DD) - 55.019889 or -1.399500</li>
-        <li>degrees, minutes and seconds (DMS) - 55°01'11.6"N 1°23'58.2"WE</li>
-        <li>degrees and decimal minutes (DMM) - 55° 1.19334', 1° 23.97'</li>
-    </ul>
-    <p>Enter coordinates in decimal degree (DD) format only.</p>
-    <p>Latitude ranges from -90 to 90, and longitude ranges from -180 to 180. Always enter latitude first, then longitude, in their separate fields.</p> 
+  {% include "partials/coordinate-entry/wgs84-hint-details.njk" %}
 {% endset %}
 
-{% block introText %}
-    <p>Enter in the decimal degree format. For example, 55.019889 or -1.399500.</p>
-{% endblock %} 
+{% set introText %}
+  {% include "partials/coordinate-entry/wgs84-intro.njk" %}
+{% endset %}
 
 {% block coordinateFields %}
     {{ govukInput({
@@ -41,4 +34,4 @@ Help with latitude and longitude formats
         errorMessage: errors.longitude,
         classes: "govuk-!-width-one-half"
     }) }}
-{% endblock %} 
+{% endblock %}

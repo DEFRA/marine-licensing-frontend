@@ -238,9 +238,9 @@ describe('view details controller', () => {
           mockExemptionServiceInstance
         )
 
-        vi.mocked(siteLocationDataHelpers.buildSiteLocationData).mockReturnValue(
-          null
-        )
+        vi.mocked(
+          siteLocationDataHelpers.buildSiteLocationData
+        ).mockReturnValue(null)
 
         const mockRequest = {
           params: { exemptionId: validExemptionId },
@@ -328,9 +328,9 @@ describe('view details controller', () => {
           filename: 'test-boundary.zip'
         }
 
-        vi.mocked(siteLocationDataHelpers.buildSiteLocationData).mockReturnValue(
-          mockSiteLocationData
-        )
+        vi.mocked(
+          siteLocationDataHelpers.buildSiteLocationData
+        ).mockReturnValue(mockSiteLocationData)
 
         const mockRequest = {
           params: { exemptionId: validExemptionId },
@@ -404,9 +404,9 @@ describe('view details controller', () => {
           filename: 'test-area.kml'
         }
 
-        vi.mocked(siteLocationDataHelpers.buildSiteLocationData).mockReturnValue(
-          mockSiteLocationData
-        )
+        vi.mocked(
+          siteLocationDataHelpers.buildSiteLocationData
+        ).mockReturnValue(mockSiteLocationData)
 
         const mockRequest = {
           params: { exemptionId: validExemptionId },

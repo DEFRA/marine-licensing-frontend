@@ -91,9 +91,15 @@ const baseExpectedContent = {
   backLinkHref: '/home',
   summaryCards: [
     'Project summary',
+    'Providing the site location',
     'Site details',
     'Sharing your project information publicly'
   ],
+  siteLocation: {
+    'Method of providing site location':
+      'Enter the coordinates of the site manually',
+    'More than one site': 'No'
+  },
   projectDetails: {
     'Type of activity': 'Deposit of a substance or object',
     'Why this activity is exempt':
@@ -159,6 +165,12 @@ export const testScenarios = [
     exemption: createFileUploadExemption('kml', 'test_site.kml'),
     expectedPageContent: {
       ...baseExpectedContent,
+      siteLocation: {
+        'Method of providing site location':
+          'Upload a file with the coordinates of the site',
+        'File type': 'KML',
+        'File uploaded': 'test_site.kml'
+      },
       siteDetails: {
         'Method of providing site location':
           'Upload a file with the coordinates of the site',
@@ -172,6 +184,12 @@ export const testScenarios = [
     exemption: createFileUploadExemption('shapefile', 'site_boundary.zip'),
     expectedPageContent: {
       ...baseExpectedContent,
+      siteLocation: {
+        'Method of providing site location':
+          'Upload a file with the coordinates of the site',
+        'File type': 'Shapefile',
+        'File uploaded': 'site_boundary.zip'
+      },
       siteDetails: {
         'Method of providing site location':
           'Upload a file with the coordinates of the site',

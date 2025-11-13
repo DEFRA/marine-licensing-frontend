@@ -2,6 +2,8 @@
 {% from "govuk/components/back-link/macro.njk" import govukBackLink %}
 {% from "application-details-card/macro.njk" import appApplicationDetailsCard %}
 {% from "project-details-card/macro.njk" import appProjectDetailsCard %}
+{% from "site-location-card/macro.njk" import appSiteLocationCard %}
+{% from "activity-details-card/macro.njk" import appActivityDetailsCard %}
 {% from "site-details-card/macro.njk" import appSiteDetailsCard %}
 {% from "public-register-card/macro.njk" import appPublicRegisterCard %}
 
@@ -35,12 +37,22 @@
       {% endif %}
     {% if mcmsContext %}
     {{ appProjectDetailsCard({
-      projectName: projectName,
       mcmsContext: mcmsContext,
       isReadOnly: isReadOnly,
       isInternalUser: isInternalUser
     }) }}
     {% endif %}
+
+    {{ appSiteLocationCard({
+      siteLocationData: siteLocationData,
+      isReadOnly: isReadOnly
+    }) }}
+
+    {{ appActivityDetailsCard({
+      activityDetailsData: siteLocationData,
+      isReadOnly: isReadOnly
+    }) }}
+
     {% for site in siteDetails %}
     {{ appSiteDetailsCard({
       siteDetails: site,

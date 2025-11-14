@@ -2,6 +2,7 @@ import { vi } from 'vitest'
 import Boom from '@hapi/boom'
 import { setupTestServer } from '#tests/integration/shared/test-setup-helpers.js'
 import * as exemptionSiteDetailsHelpers from '#src/server/common/helpers/exemption-site-details.js'
+import * as siteLocationDataHelpers from '#src/server/common/helpers/site-location-data.js'
 import { getExemptionService } from '#src/services/exemption-service/index.js'
 import { viewDetailsController, VIEW_DETAILS_VIEW_ROUTE } from './controller.js'
 import {
@@ -16,6 +17,9 @@ import { getAuthProvider } from '#src/server/common/helpers/authenticated-reques
 vi.mock('~/src/services/exemption-service/index.js')
 vi.mock('~/src/server/common/helpers/authenticated-requests.js', () => ({
   getAuthProvider: vi.fn().mockReturnValue('defra-id')
+}))
+vi.mock('~/src/server/common/helpers/site-location-data.js', () => ({
+  buildSiteLocationData: vi.fn().mockReturnValue(null)
 }))
 
 describe('view details controller', () => {
@@ -234,6 +238,10 @@ describe('view details controller', () => {
           mockExemptionServiceInstance
         )
 
+        vi.mocked(
+          siteLocationDataHelpers.buildSiteLocationData
+        ).mockReturnValue(null)
+
         const mockRequest = {
           params: { exemptionId: validExemptionId },
           logger: { error: vi.fn() }
@@ -253,7 +261,8 @@ describe('view details controller', () => {
             activityDates: submittedExemption.activityDates,
             activityDescription: submittedExemption.activityDescription,
             publicRegister: submittedExemption.publicRegister,
-            siteDetails: expect.any(Object)
+            siteDetails: expect.any(Array),
+            siteLocationData: null
           })
         )
       })
@@ -311,6 +320,18 @@ describe('view details controller', () => {
           .spyOn(exemptionSiteDetailsHelpers, 'processSiteDetails')
           .mockReturnValue(mockProcessedSiteDetails)
 
+        const mockSiteLocationData = {
+          multipleSiteDetails: 'No',
+          method: 'Upload a file with the coordinates of the site',
+          isFileUpload: true,
+          fileType: 'Shapefile',
+          filename: 'test-boundary.zip'
+        }
+
+        vi.mocked(
+          siteLocationDataHelpers.buildSiteLocationData
+        ).mockReturnValue(mockSiteLocationData)
+
         const mockRequest = {
           params: { exemptionId: validExemptionId },
           logger: { error: vi.fn() }
@@ -325,6 +346,13 @@ describe('view details controller', () => {
           expect.any(Object)
         )
 
+        expect(
+          vi.mocked(siteLocationDataHelpers.buildSiteLocationData)
+        ).toHaveBeenCalledWith(
+          fileUploadExemption.multipleSiteDetails,
+          fileUploadExemption.siteDetails
+        )
+
         expect(mockH.view).toHaveBeenCalledWith(
           VIEW_DETAILS_VIEW_ROUTE,
           expect.objectContaining({
@@ -333,7 +361,8 @@ describe('view details controller', () => {
               method: 'Upload a file with the coordinates of the site',
               fileType: 'Shapefile',
               filename: 'Unknown file'
-            })
+            }),
+            siteLocationData: mockSiteLocationData
           })
         )
 
@@ -367,6 +396,18 @@ describe('view details controller', () => {
           .spyOn(exemptionSiteDetailsHelpers, 'processSiteDetails')
           .mockReturnValue(mockProcessedSiteDetails)
 
+        const mockSiteLocationData = {
+          multipleSiteDetails: 'No',
+          method: 'Upload a file with the coordinates of the site',
+          isFileUpload: true,
+          fileType: 'KML',
+          filename: 'test-area.kml'
+        }
+
+        vi.mocked(
+          siteLocationDataHelpers.buildSiteLocationData
+        ).mockReturnValue(mockSiteLocationData)
+
         const mockRequest = {
           params: { exemptionId: validExemptionId },
           logger: { error: vi.fn() }
@@ -381,6 +422,13 @@ describe('view details controller', () => {
           expect.any(Object)
         )
 
+        expect(
+          vi.mocked(siteLocationDataHelpers.buildSiteLocationData)
+        ).toHaveBeenCalledWith(
+          kmlFileUploadExemption.multipleSiteDetails,
+          kmlFileUploadExemption.siteDetails
+        )
+
         expect(mockH.view).toHaveBeenCalledWith(
           VIEW_DETAILS_VIEW_ROUTE,
           expect.objectContaining({
@@ -389,7 +437,8 @@ describe('view details controller', () => {
               method: 'Upload a file with the coordinates of the site',
               fileType: 'KML',
               filename: 'Unknown file'
-            })
+            }),
+            siteLocationData: mockSiteLocationData
           })
         )
 

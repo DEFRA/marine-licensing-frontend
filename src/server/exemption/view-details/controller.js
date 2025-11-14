@@ -3,6 +3,7 @@ import { errorMessages } from '#src/server/common/constants/error-messages.js'
 import { EXEMPTION_STATUS } from '#src/server/common/constants/exemptions.js'
 import { routes } from '#src/server/common/constants/routes.js'
 import { processSiteDetails } from '#src/server/common/helpers/exemption-site-details.js'
+import { buildSiteLocationData } from '#src/server/common/helpers/site-location-data.js'
 import { getExemptionService } from '#src/services/exemption-service/index.js'
 import { getAuthProvider } from '#src/server/common/helpers/authenticated-requests.js'
 import { AUTH_STRATEGIES } from '#src/server/common/constants/auth.js'
@@ -37,6 +38,11 @@ export const viewDetailsController = {
       const isInternalUser =
         getAuthProvider(request) === AUTH_STRATEGIES.ENTRA_ID
 
+      const siteLocationData = buildSiteLocationData(
+        multipleSiteDetails,
+        exemption.siteDetails
+      )
+
       // Format the page caption with application reference
       const pageCaption = `${exemption.applicationReference}${isInternalUser ? '' : ' - Exempt activity notification'}`
 
@@ -48,7 +54,8 @@ export const viewDetailsController = {
         isInternalUser,
         ...exemption,
         siteDetails,
-        multipleSiteDetails
+        multipleSiteDetails,
+        siteLocationData
       })
     } catch (error) {
       if (error.isBoom) {

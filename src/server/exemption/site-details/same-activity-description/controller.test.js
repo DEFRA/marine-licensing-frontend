@@ -11,11 +11,14 @@ import {
 import { routes } from '#src/server/common/constants/routes.js'
 import { mockSite } from '#src/server/test-helpers/mocks.js'
 import { saveSiteDetailsToBackend } from '#src/server/common/helpers/save-site-details.js'
+import * as copyActivityData from '#src/server/common/helpers/copy-same-activity-data.js'
 
 vi.mock('~/src/server/common/helpers/session-cache/utils.js')
 vi.mock('~/src/server/common/helpers/save-site-details.js')
 
 describe('sameActivityDescriptionController', () => {
+  let clearActivityDataMock
+
   const mockRequest = {
     site: mockSite,
     query: {},
@@ -37,6 +40,7 @@ describe('sameActivityDescriptionController', () => {
   }
 
   beforeEach(() => {
+    clearActivityDataMock = vi.spyOn(copyActivityData, 'clearActivityData')
     vi.mocked(getExemptionCache).mockReturnValue(mockExemption)
   })
 
@@ -256,6 +260,12 @@ describe('sameActivityDescriptionController', () => {
 
       await sameActivityDescriptionSubmitController.handler(
         requestWithPayload,
+        mockH
+      )
+
+      expect(clearActivityDataMock).toHaveBeenCalledWith(
+        requestWithPayload,
+        'activityDescription',
         mockH
       )
 

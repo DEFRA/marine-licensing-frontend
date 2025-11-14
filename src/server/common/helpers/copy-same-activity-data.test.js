@@ -234,12 +234,15 @@ describe('copy-same-activity-data', () => {
         siteDetails: [{}]
       }
 
+      const mockH = {}
+
       vi.mocked(cacheUtils.getExemptionCache).mockReturnValue(mockExemption)
 
-      clearActivityData(mockRequest, 'activityDates')
+      clearActivityData(mockRequest, 'activityDates', mockH)
 
       expect(cacheUtils.updateExemptionSiteDetails).toHaveBeenCalledWith(
         {},
+        mockH,
         0,
         'activityDates',
         null

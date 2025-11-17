@@ -192,7 +192,7 @@ Dependabot automatically creates pull requests to update dependencies.
 
 ## Releases
 
-### [2.0.0] (https://eaflood.atlassian.net/projects/ML/versions/23737/tab/release-report-all-issues)
+### [2.0.0](https://eaflood.atlassian.net/projects/ML/versions/23737/tab/release-report-all-issues)
 
 Release of marine licensing frontend application that would be accessible by the public. The link lists all the features within the application
 

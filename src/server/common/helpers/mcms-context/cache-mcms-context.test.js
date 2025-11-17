@@ -8,13 +8,20 @@ import { mcmsAnswersDownloadUrl } from '~/src/server/test-helpers/mocks.js'
 describe('Cache / get MCMS context', () => {
   let mockRequest
   let logError
+  const iatQueryString =
+    '?ADV_TYPE=EXE&ARTICLE=17&outcomeType=WO_EXE_AVAILABLE_ARTICLE_17&pdfDownloadUrl=https://marinelicensingtest.marinemanagement.org.uk/mmofox5uat/journey/self-service/outcome-document/b87ae3f7-48f3-470d-b29b-5a5abfdaa49f&ACTIVITY_TYPE=CON&EXE_ACTIVITY_SUBTYPE_CON=scientificResearch'
 
   beforeEach(() => {
     logError = vi.fn()
     mockRequest = {
       path: '/',
       query: {},
-      url: 'http://example.com/?ACTIVITY_TYPE=CON&ARTICLE=17',
+      url: `http://example.com/${iatQueryString}`,
+      raw: {
+        req: {
+          url: `/${iatQueryString}`
+        }
+      },
       yar: {
         flash: vi.fn()
       },
@@ -29,17 +36,16 @@ describe('Cache / get MCMS context', () => {
       mockRequest.query = {
         ACTIVITY_TYPE: 'CON',
         ARTICLE: '17',
-        pdfDownloadUrl: mcmsAnswersDownloadUrl,
-        EXE_ACTIVITY_SUBTYPE_CONSTRUCTION: 'maintenance'
+        pdfDownloadUrl: mcmsAnswersDownloadUrl
       }
 
       cacheMcmsContextFromQueryParams(mockRequest)
 
       const expectedTransformedValue = {
         activityType: 'CON',
-        activitySubtype: 'maintenance',
         article: '17',
-        pdfDownloadUrl: mcmsAnswersDownloadUrl
+        pdfDownloadUrl: mcmsAnswersDownloadUrl,
+        iatQueryString
       }
 
       expect(mockRequest.yar.flash).toHaveBeenCalledWith(
@@ -49,7 +55,7 @@ describe('Cache / get MCMS context', () => {
       expect(logError).not.toHaveBeenCalled()
     })
 
-    it('should log error and not cache when validation fails', () => {
+    it('should log error and cache iatQueryString when validation fails', () => {
       mockRequest.query = {
         ACTIVITY_TYPE: 'INVALID_TYPE',
         ARTICLE: '17',
@@ -58,9 +64,11 @@ describe('Cache / get MCMS context', () => {
 
       cacheMcmsContextFromQueryParams(mockRequest)
 
-      expect(mockRequest.yar.flash).not.toHaveBeenCalled()
+      expect(mockRequest.yar.flash).toHaveBeenCalledWith('mcmsContext', {
+        iatQueryString
+      })
       expect(logError.mock.calls[0][1]).toBe(
-        'Missing or invalid MCMS query string context on URL: http://example.com/?ACTIVITY_TYPE=CON&ARTICLE=17 - "ACTIVITY_TYPE" must be one of [CON, DEPOSIT, REMOVAL, DREDGE, INCINERATION, EXPLOSIVES, SCUTTLING]'
+        `Missing or invalid MCMS query string context on URL: http://example.com/${iatQueryString} - "ACTIVITY_TYPE" must be one of [CON, DEPOSIT, REMOVAL, DREDGE, INCINERATION, EXPLOSIVES, SCUTTLING]`
       )
     })
 
@@ -73,29 +81,39 @@ describe('Cache / get MCMS context', () => {
     })
 
     it('should handle empty query params', () => {
-      mockRequest.query = {}
+      cacheMcmsContextFromQueryParams({
+        ...mockRequest,
+        query: {},
+        url: 'http://example.com/',
+        raw: { req: { url: '/' } }
+      })
 
-      cacheMcmsContextFromQueryParams(mockRequest)
-
-      expect(mockRequest.yar.flash).not.toHaveBeenCalled()
+      expect(mockRequest.yar.flash).toHaveBeenCalledWith('mcmsContext', {
+        iatQueryString: ''
+      })
       expect(logError.mock.calls[0][1]).toBe(
-        'Missing or invalid MCMS query string context on URL: http://example.com/?ACTIVITY_TYPE=CON&ARTICLE=17 - "ACTIVITY_TYPE" is required'
+        'Missing or invalid MCMS query string context on URL: http://example.com/ - "ACTIVITY_TYPE" is required'
       )
     })
 
-    it("should cache valid query params without subtype if the activity type doesn't require one", () => {
-      mockRequest.query = {
-        ACTIVITY_TYPE: 'INCINERATION',
-        ARTICLE: '34',
-        pdfDownloadUrl: mcmsAnswersDownloadUrl
-      }
-
-      cacheMcmsContextFromQueryParams(mockRequest)
+    it('should cache valid query params with iatQueryString, and ignore others', () => {
+      cacheMcmsContextFromQueryParams({
+        ...mockRequest,
+        query: {
+          ADV_TYPE: 'EXE',
+          outcomeType: 'WO_EXE_AVAILABLE_ARTICLE',
+          EXE_ACTIVITY_SUBTYPE_DEPOSIT: 'scientificResearch',
+          ACTIVITY_TYPE: 'INCINERATION',
+          ARTICLE: '34',
+          pdfDownloadUrl: mcmsAnswersDownloadUrl
+        }
+      })
 
       expect(mockRequest.yar.flash).toHaveBeenCalledWith('mcmsContext', {
         activityType: 'INCINERATION',
         article: '34',
-        pdfDownloadUrl: mcmsAnswersDownloadUrl
+        pdfDownloadUrl: mcmsAnswersDownloadUrl,
+        iatQueryString
       })
     })
   })
@@ -104,9 +122,9 @@ describe('Cache / get MCMS context', () => {
     it('should return cached MCMS context when available', () => {
       const cachedContext = {
         activityType: 'CON',
-        activitySubtype: 'maintenance',
         article: '17',
-        pdfDownloadUrl: mcmsAnswersDownloadUrl
+        pdfDownloadUrl: mcmsAnswersDownloadUrl,
+        iatQueryString: 'ACTIVITY_TYPE=CON&ARTICLE=17'
       }
 
       mockRequest.yar.flash.mockReturnValue([cachedContext])
@@ -126,22 +144,22 @@ describe('Cache / get MCMS context', () => {
       expect(mockRequest.yar.flash).toHaveBeenCalledWith('mcmsContext')
       expect(result).toBeNull()
       expect(logError).toHaveBeenCalledWith(
-        `Missing MCMS query string context on URL: ${mockRequest.url}`
+        `No MCMS context cached for URL: ${mockRequest.url}`
       )
     })
 
     it('should return first context and log error when multiple cached contexts', () => {
       const firstContext = {
         activityType: 'CON',
-        activitySubtype: 'maintenance',
         article: '17',
-        pdfDownloadUrl: mcmsAnswersDownloadUrl
+        pdfDownloadUrl: mcmsAnswersDownloadUrl,
+        iatQueryString: 'ACTIVITY_TYPE=CON&ARTICLE=17'
       }
       const secondContext = {
         activityType: 'DEPOSIT',
-        activitySubtype: 'dredgedMaterial',
         article: '18A',
-        pdfDownloadUrl: mcmsAnswersDownloadUrl
+        pdfDownloadUrl: mcmsAnswersDownloadUrl,
+        iatQueryString: 'ACTIVITY_TYPE=DEPOSIT&ARTICLE=18A'
       }
 
       mockRequest.yar.flash.mockReturnValue([firstContext, secondContext])

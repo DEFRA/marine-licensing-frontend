@@ -159,7 +159,7 @@ export const sameActivityDescriptionSubmitController = {
 
     if (action) {
       if (answerChangedFromNoToYes(previousAnswer, payload)) {
-        clearActivityData(request, 'activityDescription')
+        await clearActivityData(request, 'activityDescription', h)
 
         return h.redirect(routes.ACTIVITY_DESCRIPTION + '?action=change')
       }

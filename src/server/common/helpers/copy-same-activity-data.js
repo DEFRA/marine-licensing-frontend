@@ -41,9 +41,9 @@ export const copySameActivityDescriptionToAllSites = async (request, h) => {
   }
 }
 
-export const clearActivityData = (request, key) => {
+export const clearActivityData = async (request, key, h) => {
   const exemption = getExemptionCache(request)
   for (const [index] of exemption.siteDetails.entries()) {
-    updateExemptionSiteDetails(request, index, key, null)
+    await updateExemptionSiteDetails(request, h, index, key, null)
   }
 }

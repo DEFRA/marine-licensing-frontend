@@ -12,12 +12,14 @@ import {
 } from '#src/server/test-helpers/mocks.js'
 import { routes } from '#src/server/common/constants/routes.js'
 import { saveSiteDetailsToBackend } from '#src/server/common/helpers/save-site-details.js'
+import * as copyActivityData from '#src/server/common/helpers/copy-same-activity-data.js'
 
 vi.mock('~/src/server/common/helpers/session-cache/utils.js')
 vi.mock('~/src/server/common/helpers/save-site-details.js')
 
 describe('#sameActivityDates', () => {
   let getExemptionCacheSpy
+  let clearActivityDataMock
 
   const sitePreHandlerHook = sameActivityDatesSubmitController.options.pre[0]
 
@@ -27,6 +29,7 @@ describe('#sameActivityDates', () => {
   }
 
   beforeEach(() => {
+    clearActivityDataMock = vi.spyOn(copyActivityData, 'clearActivityData')
     getExemptionCacheSpy = vi
       .spyOn(cacheUtils, 'getExemptionCache')
       .mockReturnValue(mockExemption)
@@ -377,6 +380,12 @@ describe('#sameActivityDates', () => {
       sitePreHandlerHook.method(mockRequest, h)
 
       await sameActivityDatesSubmitController.handler(mockRequest, h)
+
+      expect(clearActivityDataMock).toHaveBeenCalledWith(
+        mockRequest,
+        'activityDates',
+        h
+      )
 
       expect(
         cacheUtils.updateExemptionMultipleSiteDetails

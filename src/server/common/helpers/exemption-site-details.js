@@ -42,7 +42,7 @@ export const processFileUploadSiteDetails = (
   } catch (error) {
     request.logger.error(
       {
-        error: error.message,
+        err: error,
         exemptionId: id
       },
       errorMessages.FILE_UPLOAD_DATA_ERROR

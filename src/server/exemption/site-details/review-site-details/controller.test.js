@@ -305,7 +305,7 @@ describe('#reviewSiteDetails', () => {
 
         await reviewSiteDetailsSubmitController.handler(request, h)
 
-        expect(resetExemptionSiteDetailsSpy).toHaveBeenCalledWith(request)
+        expect(resetExemptionSiteDetailsSpy).toHaveBeenCalledWith(request, h)
         expect(h.redirect).toHaveBeenCalledWith(routes.TASK_LIST)
       })
 

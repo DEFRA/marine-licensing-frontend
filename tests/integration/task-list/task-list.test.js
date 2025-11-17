@@ -51,7 +51,7 @@ describe('Task List', () => {
     expect(feedbackLink).toHaveAttribute('rel', 'noopener noreferrer')
     expect(feedbackLink).toHaveAttribute(
       'href',
-      'https://defragroup.eu.qualtrics.com/jfe/form/SV_8p5Cle8p7Yov9FI'
+      'https://forms.office.com/pages/responsepage.aspx?id=UCQKdycCYkyQx044U38RAjXEiYXnHG1DvkWr_VjRfzZUNERIRURNOFNVT0tXSlo1NUdONUYxQjNKUy4u&route=shorturl'
     )
   })
 })

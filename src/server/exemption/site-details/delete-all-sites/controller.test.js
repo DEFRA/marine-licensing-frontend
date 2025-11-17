@@ -92,7 +92,7 @@ describe('deleteAllSitesController', () => {
         }
       )
 
-      expect(resetExemptionSiteDetails).toHaveBeenCalledWith(mockRequest)
+      expect(resetExemptionSiteDetails).toHaveBeenCalledWith(mockRequest, mockH)
 
       expect(mockH.redirect).toHaveBeenCalledWith(routes.TASK_LIST)
     })
@@ -132,7 +132,7 @@ describe('deleteAllSitesController', () => {
 
       expect(mockRequest.logger.error).toHaveBeenCalledWith(
         {
-          error: 'test error',
+          err: 'test error',
           exemptionId: mockExemption.id
         },
         'Error deleting all sites'

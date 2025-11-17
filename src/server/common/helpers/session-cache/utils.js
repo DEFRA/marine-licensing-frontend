@@ -22,18 +22,6 @@ export const setExemptionCache = async (request, h, value) => {
   return cacheValue
 }
 
-export const clearSiteDetails = async (request, exemption, h) => {
-  const updatedExemption = { ...exemption }
-  delete updatedExemption.multipleSiteDetails
-  delete updatedExemption.siteDetails
-
-  request.yar.set(EXEMPTION_CACHE_KEY, updatedExemption)
-
-  await request.yar.commit(h)
-
-  return request.yar.get(EXEMPTION_CACHE_KEY)
-}
-
 export const updateExemptionSiteDetails = async (
   request,
   h,
@@ -84,13 +72,17 @@ export const updateExemptionMultipleSiteDetails = async (
 
   return { [key]: cacheValue }
 }
-export const resetExemptionSiteDetails = (request) => {
+export const resetExemptionSiteDetails = async (request, h) => {
   const existingCache = getExemptionCache(request)
+
   request.yar.set(EXEMPTION_CACHE_KEY, {
     ...existingCache,
     multipleSiteDetails: {},
     siteDetails: []
   })
+
+  await request.yar.commit(h)
+
   return { siteDetails: null }
 }
 export const updateExemptionSiteDetailsBatch = (

@@ -813,7 +813,7 @@ describe('siteDetails utils', () => {
 
       expect(mockRequest.logger.error).toHaveBeenCalledWith(
         {
-          error: 'Test error message',
+          err: expect.any(Error),
           exemptionId: 'test-exemption-id',
           coordinatesType: 'coordinates'
         },

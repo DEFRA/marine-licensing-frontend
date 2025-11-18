@@ -1,3 +1,4 @@
+import { ErrorTracking } from './error-tracking.js'
 import Clarity from '@microsoft/clarity'
 import {
   Button,
@@ -12,6 +13,10 @@ import {
 
 import { AddAnotherPoint } from './add-another-point/index.js'
 import { SiteDetailsMap } from './site-details-map/index.js'
+
+// Initialize error tracking
+const errorTracking = new ErrorTracking()
+errorTracking.init()
 
 createAll(Button)
 createAll(Checkboxes)

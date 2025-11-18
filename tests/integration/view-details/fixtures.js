@@ -273,5 +273,23 @@ export const testScenarios = [
         'Why you do not consent': 'Lorem ipsum dolor sit amet'
       }
     }
+  },
+  {
+    name: 'No MCMS context',
+    exemption: { ...createExemptionWithSiteDetails(), mcmsContext: null },
+    expectedPageContent: {
+      ...baseExpectedContent,
+      summaryCards: [
+        'Providing the site location',
+        'Site details',
+        'Sharing your project information publicly'
+      ],
+      summaryCardsMissing: ['Project summary'],
+      projectDetails: null,
+      siteDetails: {
+        'Method of providing site location':
+          'Enter one set of coordinates and a width to create a circular site'
+      }
+    }
   }
 ]

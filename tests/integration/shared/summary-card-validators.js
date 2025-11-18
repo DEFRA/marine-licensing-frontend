@@ -36,7 +36,6 @@ export const validatePageStructure = (document, expected) => {
  * Validates that all expected summary cards exist on the page
  * @param {Document} document - JSDOM document
  * @param {object} expected - Expected page content
- * @param {string[]} expected.summaryCards - Array of expected card titles
  */
 export const validateAllSummaryCardsExist = (document, expected) => {
   for (const expectedTitle of expected.summaryCards) {
@@ -45,6 +44,20 @@ export const validateAllSummaryCardsExist = (document, expected) => {
       (title) => title.textContent.trim() === expectedTitle
     )
     expect(foundCard).toBeTruthy()
+  }
+}
+/**
+ * Validates that any summary cards expected to be missing, are not on the page
+ * @param {Document} document - JSDOM document
+ * @param {object} expected - Expected page content
+ */
+export const validateAnySummaryCardsMissing = (document, expected) => {
+  for (const expectedTitle of expected.summaryCardsMissing ?? []) {
+    const cardTitles = document.querySelectorAll('.govuk-summary-card__title')
+    const foundCard = Array.from(cardTitles).find(
+      (title) => title.textContent.trim() === expectedTitle
+    )
+    expect(foundCard).toBeFalsy()
   }
 }
 
@@ -60,6 +73,10 @@ export const validateSummaryCardContent = (
   expectedContent
 ) => {
   const card = document.querySelector(cardSelector)
+  if (expectedContent === null) {
+    expect(card).toBeFalsy()
+    return
+  }
   expect(card).toBeTruthy()
 
   for (const [key, value] of Object.entries(expectedContent)) {

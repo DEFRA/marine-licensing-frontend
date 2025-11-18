@@ -339,7 +339,7 @@ describe('#projectName', () => {
           flash: vi.fn().mockReturnValue([])
         },
         url: 'http://example.com/project-name',
-        logger: { error: vi.fn() }
+        logger: { info: vi.fn() }
       }
 
       await projectNameSubmitController.handler(mockRequest, h)
@@ -392,7 +392,7 @@ describe('#projectName', () => {
           flash: vi.fn().mockReturnValue([])
         },
         url: 'http://example.com/project-name',
-        logger: { error: vi.fn() }
+        logger: { info: vi.fn() }
       }
 
       await projectNameSubmitController.handler(mockRequest, h)

@@ -18,7 +18,6 @@ import {
   setupTestServer,
   validateResponse
 } from '../shared/test-setup-helpers.js'
-import { mockExemptionMcmsContext } from '~/src/server/test-helpers/mocks.js'
 import { makeGetRequest } from '~/src/server/test-helpers/server-requests.js'
 
 vi.mock('~/src/server/common/helpers/authenticated-requests.js')
@@ -27,10 +26,7 @@ describe('Check your answers - page content Validation', () => {
   const getServer = setupTestServer()
 
   const getPageDocument = async (exemption) => {
-    mockExemption({
-      ...exemption,
-      mcmsContext: mockExemptionMcmsContext
-    })
+    mockExemption(exemption)
     const response = await makeGetRequest({
       server: getServer(),
       url: routes.CHECK_YOUR_ANSWERS

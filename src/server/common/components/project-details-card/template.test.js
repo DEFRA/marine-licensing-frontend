@@ -9,7 +9,6 @@ describe('Project Details Card Component', () => {
         projectName: 'Test Marine Project',
         mcmsContext: {
           activity: {
-            value: 'DEPOSIT',
             label: 'Deposit of a substance or object',
             purpose: 'Deposit purposes'
           },
@@ -75,6 +74,22 @@ describe('Project Details Card Component', () => {
     })
   })
 
+  describe('With no MCMS activity details', () => {
+    beforeEach(() => {
+      $component = renderComponent('project-details-card', {
+        projectName: 'Test Marine Project',
+        mcmsContext: { iatQueryString: 'test' },
+        isReadOnly: false,
+        isInternalUser: false
+      })
+    })
+
+    it('Should not display the activity details section', () => {
+      const htmlContent = $component.html()
+      expect(htmlContent).not.toContain('Type of activity')
+    })
+  })
+
   describe('Read-only mode (isReadOnly: true)', () => {
     beforeEach(() => {
       $component = renderComponent('project-details-card', {
@@ -109,7 +124,6 @@ describe('Project Details Card Component', () => {
         projectName: 'Test Marine Project',
         mcmsContext: {
           activity: {
-            code: 'DEPOSIT',
             label: 'Deposit of a substance or object',
             purpose: 'Scientific research purposes'
           },
@@ -142,7 +156,6 @@ describe('Project Details Card Component', () => {
         projectName: 'Test Marine Project',
         mcmsContext: {
           activity: {
-            value: 'DEPOSIT',
             label: 'Deposit of a substance or object',
             purpose: 'Scientific research purposes'
           },
@@ -164,7 +177,6 @@ describe('Project Details Card Component', () => {
         projectName: 'Test Marine Project',
         mcmsContext: {
           activity: {
-            value: 'DEPOSIT',
             label: 'Deposit of a substance or object'
           },
           articleCode: '17',

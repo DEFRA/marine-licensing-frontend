@@ -1,7 +1,6 @@
 import Joi from 'joi'
 import {
   requiredQueryParams,
-  validActivitySubtypes,
   activityTypes,
   articleCodes
 } from '#src/server/common/constants/mcms-context.js'
@@ -20,48 +19,12 @@ export const paramsSchema = Joi.object({
     .pattern(
       /^https:\/\/[^/]+\.marinemanagement\.org\.uk\/[^/]+\/journey\/self-service\/outcome-document\/[a-zA-Z0-9-]+$/
     )
-    .required(),
-  EXE_ACTIVITY_SUBTYPE_CONSTRUCTION: Joi.when(ACTIVITY_TYPE, {
-    is: activityTypes.CON.value,
-    then: Joi.string()
-      .valid(...validActivitySubtypes)
-      .required(),
-    otherwise: Joi.forbidden()
-  }),
-  EXE_ACTIVITY_SUBTYPE_DEPOSIT: Joi.when(ACTIVITY_TYPE, {
-    is: activityTypes.DEPOSIT.value,
-    then: Joi.string()
-      .valid(...validActivitySubtypes)
-      .required(),
-    otherwise: Joi.forbidden()
-  }),
-  EXE_ACTIVITY_SUBTYPE_REMOVAL: Joi.when(ACTIVITY_TYPE, {
-    is: activityTypes.REMOVAL.value,
-    then: Joi.string()
-      .valid(...validActivitySubtypes)
-      .required(),
-    otherwise: Joi.forbidden()
-  }),
-  EXE_ACTIVITY_SUBTYPE_DREDGING: Joi.when(ACTIVITY_TYPE, {
-    is: activityTypes.DREDGE.value,
-    then: Joi.string()
-      .valid(...validActivitySubtypes)
-      .required(),
-    otherwise: Joi.forbidden()
-  })
+    .required()
 })
   .unknown(true)
   .custom((value) => {
-    const activitySubtype =
-      value.EXE_ACTIVITY_SUBTYPE_CONSTRUCTION ||
-      value.EXE_ACTIVITY_SUBTYPE_DEPOSIT ||
-      value.EXE_ACTIVITY_SUBTYPE_REMOVAL ||
-      value.EXE_ACTIVITY_SUBTYPE_DREDGING ||
-      undefined
-
     return {
       activityType: value[ACTIVITY_TYPE],
-      activitySubtype,
       article: value[ARTICLE],
       pdfDownloadUrl: value[pdfDownloadUrl]
     }

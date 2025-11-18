@@ -10,53 +10,20 @@ describe('mcms-context schema', () => {
     }
 
     describe('validation', () => {
-      it('should validate valid params with construction subtype', () => {
+      it('should validate valid params', () => {
         const params = {
-          ...validBaseParams,
-          EXE_ACTIVITY_SUBTYPE_CONSTRUCTION: 'maintenance'
+          ...validBaseParams
         }
 
         const { error } = paramsSchema.validate(params)
         expect(error).toBeUndefined()
       })
 
-      it('should validate valid params with deposit subtype', () => {
+      it('should validate params and ignore unknown fields', () => {
         const params = {
           ...validBaseParams,
-          ACTIVITY_TYPE: 'DEPOSIT',
-          EXE_ACTIVITY_SUBTYPE_DEPOSIT: 'dredgedMaterial'
-        }
-
-        const { error } = paramsSchema.validate(params)
-        expect(error).toBeUndefined()
-      })
-
-      it('should validate valid params with removal subtype', () => {
-        const params = {
-          ...validBaseParams,
-          ACTIVITY_TYPE: 'REMOVAL',
-          EXE_ACTIVITY_SUBTYPE_REMOVAL: 'emergency'
-        }
-
-        const { error } = paramsSchema.validate(params)
-        expect(error).toBeUndefined()
-      })
-
-      it('should validate valid params with dredging subtype', () => {
-        const params = {
-          ...validBaseParams,
-          ACTIVITY_TYPE: 'DREDGE',
-          EXE_ACTIVITY_SUBTYPE_DREDGING: 'navigationalDredging'
-        }
-
-        const { error } = paramsSchema.validate(params)
-        expect(error).toBeUndefined()
-      })
-
-      it('should validate params without subtype for non-requiring activity types', () => {
-        const params = {
-          ...validBaseParams,
-          ACTIVITY_TYPE: 'INCINERATION'
+          EXE_ACTIVITY_SUBTYPE_CONSTRUCTION: 'maintenance',
+          extraField: 'ignored'
         }
 
         const { error } = paramsSchema.validate(params)
@@ -83,47 +50,6 @@ describe('mcms-context schema', () => {
         const { error } = paramsSchema.validate(params)
         expect(error).toBeDefined()
         expect(error.details[0].path).toEqual(['ARTICLE'])
-      })
-
-      it('should require EXE_ACTIVITY_SUBTYPE_CONSTRUCTION when ACTIVITY_TYPE is CON', () => {
-        const params = {
-          ...validBaseParams,
-          ACTIVITY_TYPE: 'CON'
-        }
-
-        const { error } = paramsSchema.validate(params)
-        expect(error).toBeDefined()
-        expect(error.details[0].path).toEqual([
-          'EXE_ACTIVITY_SUBTYPE_CONSTRUCTION'
-        ])
-      })
-
-      it('should reject EXE_ACTIVITY_SUBTYPE_CONSTRUCTION when ACTIVITY_TYPE is not CON', () => {
-        const params = {
-          ...validBaseParams,
-          ACTIVITY_TYPE: 'DEPOSIT',
-          EXE_ACTIVITY_SUBTYPE_CONSTRUCTION: 'maintenance'
-        }
-
-        const { error } = paramsSchema.validate(params)
-        expect(error).toBeDefined()
-        expect(error.details[0].path).toEqual([
-          'EXE_ACTIVITY_SUBTYPE_CONSTRUCTION'
-        ])
-      })
-
-      it('should reject invalid activity subtype value', () => {
-        const params = {
-          ...validBaseParams,
-          ACTIVITY_TYPE: 'CON',
-          EXE_ACTIVITY_SUBTYPE_CONSTRUCTION: 'invalidSubtype'
-        }
-
-        const { error } = paramsSchema.validate(params)
-        expect(error).toBeDefined()
-        expect(error.details[0].path).toEqual([
-          'EXE_ACTIVITY_SUBTYPE_CONSTRUCTION'
-        ])
       })
 
       it('should validate pdfDownloadUrl matching the required pattern', () => {
@@ -184,7 +110,7 @@ describe('mcms-context schema', () => {
     })
 
     describe('transformation', () => {
-      it('should transform valid params with construction subtype', () => {
+      it('should transform valid params and ignore extra fields', () => {
         const params = {
           ...validBaseParams,
           EXE_ACTIVITY_SUBTYPE_CONSTRUCTION: 'maintenance',
@@ -195,32 +121,13 @@ describe('mcms-context schema', () => {
         expect(error).toBeUndefined()
         expect(value).toEqual({
           activityType: 'CON',
-          activitySubtype: 'maintenance',
           article: '17',
           pdfDownloadUrl:
             'https://marinelicensing.marinemanagement.org.uk/path/journey/self-service/outcome-document/b87ae3f7-48f3-470d-b29b-5a5abfdaa49f'
         })
       })
 
-      it('should transform valid params with deposit subtype', () => {
-        const params = {
-          ...validBaseParams,
-          ACTIVITY_TYPE: 'DEPOSIT',
-          EXE_ACTIVITY_SUBTYPE_DEPOSIT: 'dredgedMaterial'
-        }
-
-        const { error, value } = paramsSchema.validate(params)
-        expect(error).toBeUndefined()
-        expect(value).toEqual({
-          activityType: 'DEPOSIT',
-          activitySubtype: 'dredgedMaterial',
-          article: '17',
-          pdfDownloadUrl:
-            'https://marinelicensing.marinemanagement.org.uk/path/journey/self-service/outcome-document/b87ae3f7-48f3-470d-b29b-5a5abfdaa49f'
-        })
-      })
-
-      it('should transform valid params with null subtype for non-requiring activity types', () => {
+      it('should transform valid params for all activity types', () => {
         const params = {
           ...validBaseParams,
           ACTIVITY_TYPE: 'INCINERATION'
@@ -280,17 +187,6 @@ describe('mcms-context schema', () => {
           const params = {
             ...validBaseParams,
             ACTIVITY_TYPE: activityType
-          }
-
-          // Add required subtype for specific activity types
-          if (activityType === 'CON') {
-            params.EXE_ACTIVITY_SUBTYPE_CONSTRUCTION = 'maintenance'
-          } else if (activityType === 'DEPOSIT') {
-            params.EXE_ACTIVITY_SUBTYPE_DEPOSIT = 'dredgedMaterial'
-          } else if (activityType === 'REMOVAL') {
-            params.EXE_ACTIVITY_SUBTYPE_REMOVAL = 'emergency'
-          } else if (activityType === 'DREDGE') {
-            params.EXE_ACTIVITY_SUBTYPE_DREDGING = 'navigationalDredging'
           }
 
           const { error, value } = paramsSchema.validate(params)

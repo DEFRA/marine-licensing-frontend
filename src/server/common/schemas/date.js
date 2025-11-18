@@ -3,57 +3,51 @@ import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc.js'
 import customParseFormat from 'dayjs/plugin/customParseFormat.js'
 import { JOI_ERRORS } from '#src/server/common/constants/joi.js'
+import { validateYearWithinAllowedRange } from './date-schema-utils.js'
 
 dayjs.extend(utc)
 dayjs.extend(customParseFormat)
 
-const MIN_YEAR = dayjs().year()
-const MAX_YEAR_OFFSET = 75
-const MAX_YEAR = MIN_YEAR + MAX_YEAR_OFFSET
-
-// Date format constants
 const DATE_FORMAT_ISO = 'YYYY-MM-DD'
-export const individualDate = ({
-  prefix,
-  minYear = MIN_YEAR,
-  maxYear = MAX_YEAR,
-  minYearError
-}) => ({
-  [`${prefix}-day`]: joi
-    .number()
-    .integer()
-    .min(1)
-    .required()
-    .messages({
-      'any.required': `${prefix}-day`,
-      'number.base': `${prefix}-day`,
-      'number.min': `${prefix}-day`
-    }),
-  [`${prefix}-month`]: joi
-    .number()
-    .integer()
-    .min(1)
-    .required()
-    .messages({
-      'any.required': `${prefix}-month`,
-      'number.base': `${prefix}-month`,
-      'number.min': `${prefix}-month`
-    }),
-  [`${prefix}-year`]: joi
-    .number()
-    .integer()
-    .min(minYear)
-    .max(maxYear)
-    .required()
-    .messages({
-      'any.required': `${prefix}-year`,
-      'number.base': `${prefix}-year`,
-      'number.min': minYearError || `${prefix}-year`,
-      'number.max': `${prefix}-year`
-    })
-})
+
+export const individualDate = ({ prefix, minYearError }) => {
+  return {
+    [`${prefix}-day`]: joi
+      .number()
+      .integer()
+      .min(1)
+      .required()
+      .messages({
+        'any.required': `${prefix}-day`,
+        'number.base': `${prefix}-day`,
+        'number.min': `${prefix}-day`
+      }),
+    [`${prefix}-month`]: joi
+      .number()
+      .integer()
+      .min(1)
+      .required()
+      .messages({
+        'any.required': `${prefix}-month`,
+        'number.base': `${prefix}-month`,
+        'number.min': `${prefix}-month`
+      }),
+    [`${prefix}-year`]: joi
+      .number()
+      .integer()
+      .required()
+      .custom((value, helpers) =>
+        validateYearWithinAllowedRange(value, helpers)
+      )
+      .messages({
+        'any.required': `${prefix}-year`,
+        'number.base': `${prefix}-year`,
+        'number.min': minYearError || `${prefix}-year`,
+        'number.max': `${prefix}-year`
+      })
+  }
+}
 const isValidDate = (year, month, day) => {
-  // Create the date with strict parsing
   const date = dayjs.utc(
     `${year}-${month.toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}`,
     DATE_FORMAT_ISO,
@@ -77,14 +71,10 @@ export const activityDatesSchema = joi
   .object({
     ...individualDate({
       prefix: 'activity-start-date',
-      minYear: MIN_YEAR,
-      maxYear: MAX_YEAR,
       minYearError: JOI_ERRORS.CUSTOM_START_DATE_TODAY_OR_FUTURE
     }),
     ...individualDate({
       prefix: 'activity-end-date',
-      minYear: MIN_YEAR,
-      maxYear: MAX_YEAR,
       minYearError: JOI_ERRORS.CUSTOM_END_DATE_TODAY_OR_FUTURE
     })
   })
@@ -98,17 +88,18 @@ export const activityDatesSchema = joi
       'activity-end-date-year': endYear
     } = value
 
-    // Validate start date components form a valid date
-    if (!isValidDate(startYear, startMonth, startDay)) {
+    const startDateValid = isValidDate(startYear, startMonth, startDay)
+
+    if (!startDateValid) {
       return helpers.error('custom.startDate.invalid')
     }
 
-    // Validate end date components form a valid date
-    if (!isValidDate(endYear, endMonth, endDay)) {
+    const endDateValid = isValidDate(endYear, endMonth, endDay)
+
+    if (!endDateValid) {
       return helpers.error('custom.endDate.invalid')
     }
 
-    // Create Day.js dates for comparison (we know they're valid now)
     const startDate = dayjs.utc(
       `${startYear}-${startMonth.toString().padStart(2, '0')}-${startDay.toString().padStart(2, '0')}`,
       DATE_FORMAT_ISO
@@ -120,7 +111,6 @@ export const activityDatesSchema = joi
     const today = dayjs.utc().startOf('day')
 
     // Check date order first - if end date is before start date, show that error
-    // regardless of whether dates are in the past
     if (endDate.isBefore(startDate, 'day')) {
       return helpers.error('custom.endDate.before.startDate')
     }
@@ -130,7 +120,6 @@ export const activityDatesSchema = joi
       return helpers.error('custom.endDate.todayOrFuture')
     }
 
-    // Check start date future validation last
     if (startDate.isBefore(today, 'day')) {
       return helpers.error('custom.startDate.todayOrFuture')
     }

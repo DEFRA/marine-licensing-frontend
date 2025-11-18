@@ -1,6 +1,6 @@
 /**
  * Transform browser error event to ECS (Elastic Common Schema) format
- * Follows CDP-allowed subset of ECS fields
+ * Uses only CDP-allowed subset of ECS fields
  * @param {Object} event - Browser error event payload
  * @returns {Object} ECS-formatted log entry
  */
@@ -10,20 +10,16 @@ export function toEcs(event) {
     message: event.message,
     log: {
       level: event.level || 'error',
-      logger: 'browser',
-      origin: {
-        file: event.source || undefined,
-        line: event.line || undefined
-      }
+      logger: 'browser'
     },
     event: {
-      action: event.type,
-      sequence: event.occurrenceCount || undefined
+      action: event.type
     },
     error: event.stack
       ? {
           message: event.message,
-          stack_trace: event.stack
+          stack_trace: event.stack,
+          type: event.errorType || 'Error'
         }
       : undefined,
     user_agent: {

@@ -7,14 +7,13 @@ export const browserLogsController = {
       crumb: false // Disable CSRF for sendBeacon() requests
     }
   },
+  /**
+   * Logging API endpoint, requires Authentication via cookie
+   */
   handler(request, h) {
     try {
       const browserEvent = request.payload
-
-      // Transform to ECS format
       const ecsLog = toEcs(browserEvent)
-
-      // Log via request.logger
       const logLevel = browserEvent.level || 'error'
       request.logger[logLevel](ecsLog, ecsLog.message)
 

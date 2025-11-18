@@ -57,7 +57,8 @@ export class ErrorTracking {
       source,
       line,
       col,
-      stack: error?.stack || null
+      stack: error?.stack || null,
+      errorType: error?.name || 'Error'
     })
   }
 
@@ -68,7 +69,8 @@ export class ErrorTracking {
     this.sendLog({
       type: 'unhandled_promise',
       message: event.reason?.message || String(event.reason),
-      stack: event.reason?.stack || null
+      stack: event.reason?.stack || null,
+      errorType: event.reason?.name || 'Error'
     })
   }
 

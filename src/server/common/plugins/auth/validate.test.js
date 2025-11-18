@@ -176,9 +176,6 @@ describe('validateUserSession', () => {
         },
         'refresh rejection error'
       )
-      expect(mockRequest.logger.info).toHaveBeenCalledWith(
-        'error thrown in refresh'
-      )
     })
 
     test('error without name but with constructor.name', async () => {

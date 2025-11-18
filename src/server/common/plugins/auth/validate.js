@@ -68,8 +68,9 @@ export const validateUserSession = async (request, session) => {
         },
         'refresh rejection error'
       )
-      request.logger.info('error thrown in refresh')
+
       removeUserSession(request, session)
+
       return { isValid: false }
     }
   }

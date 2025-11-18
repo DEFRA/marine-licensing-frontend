@@ -10,7 +10,7 @@ dayjs.extend(customParseFormat)
 
 const DATE_FORMAT_ISO = 'YYYY-MM-DD'
 
-export const individualDate = ({ prefix, minYearError }) => {
+export const individualDate = ({ prefix, minYearError, field }) => {
   return {
     [`${prefix}-day`]: joi
       .number()
@@ -37,7 +37,7 @@ export const individualDate = ({ prefix, minYearError }) => {
       .integer()
       .required()
       .custom((value, helpers) =>
-        validateYearWithinAllowedRange(value, helpers)
+        validateYearWithinAllowedRange(value, helpers, field)
       )
       .messages({
         'any.required': `${prefix}-year`,
@@ -71,10 +71,12 @@ export const activityDatesSchema = joi
   .object({
     ...individualDate({
       prefix: 'activity-start-date',
+      field: 'startDate',
       minYearError: JOI_ERRORS.CUSTOM_START_DATE_TODAY_OR_FUTURE
     }),
     ...individualDate({
       prefix: 'activity-end-date',
+      field: 'endDate',
       minYearError: JOI_ERRORS.CUSTOM_END_DATE_TODAY_OR_FUTURE
     })
   })
@@ -139,5 +141,8 @@ export const activityDatesSchema = joi
     'custom.endDate.invalid': JOI_ERRORS.CUSTOM_END_DATE_INVALID,
     'custom.endDate.todayOrFuture': JOI_ERRORS.CUSTOM_END_DATE_TODAY_OR_FUTURE,
     'custom.endDate.before.startDate':
-      JOI_ERRORS.CUSTOM_END_DATE_BEFORE_START_DATE
+      JOI_ERRORS.CUSTOM_END_DATE_BEFORE_START_DATE,
+    'custom.startDate.tooFarFuture':
+      JOI_ERRORS.CUSTOM_START_DATE_TOO_FAR_FUTURE,
+    'custom.endDate.tooFarFuture': JOI_ERRORS.CUSTOM_END_DATE_TOO_FAR_FUTURE
   })

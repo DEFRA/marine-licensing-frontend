@@ -15,7 +15,7 @@ const getMaxYear = () => {
   return getMinYear() + MAX_YEAR_OFFSET
 }
 
-export const validateYearWithinAllowedRange = (value, helpers) => {
+export const validateYearWithinAllowedRange = (value, helpers, field) => {
   const currentMinYear = getMinYear()
   const currentMaxYear = getMaxYear()
 
@@ -28,7 +28,7 @@ export const validateYearWithinAllowedRange = (value, helpers) => {
   const isAboveMaximumYear = value > currentMaxYear
 
   if (isAboveMaximumYear) {
-    return helpers.error('number.max')
+    return helpers.error(`custom.${field}.tooFarFuture`)
   }
 
   return value

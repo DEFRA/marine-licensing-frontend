@@ -108,6 +108,10 @@ function hasCustomValidationError(config, errorTypeMap, errorSummary) {
     {
       key: errorKeys.BEFORE_OTHER_DATE,
       message: errorMessages[errorKeys.BEFORE_OTHER_DATE]
+    },
+    {
+      key: errorKeys.TOO_FAR_FUTURE,
+      message: errorMessages[errorKeys.TOO_FAR_FUTURE]
     }
   ]
 

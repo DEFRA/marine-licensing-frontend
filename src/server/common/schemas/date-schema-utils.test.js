@@ -17,7 +17,7 @@ describe('#dateSchemaUtils', () => {
     const helpersMock = { error: vi.fn() }
 
     test('Should validate minimum date', () => {
-      validateYearWithinAllowedRange(0, helpersMock)
+      validateYearWithinAllowedRange(0, helpersMock, 'startDate')
 
       expect(helpersMock.error).toHaveBeenCalledWith('number.min')
     })
@@ -26,14 +26,24 @@ describe('#dateSchemaUtils', () => {
       const futureDate = new Date(MOCK_DATE)
       futureDate.setFullYear(futureDate.getFullYear() + 11)
 
-      validateYearWithinAllowedRange(futureDate.getFullYear(), helpersMock)
+      validateYearWithinAllowedRange(
+        futureDate.getFullYear(),
+        helpersMock,
+        'startDate'
+      )
 
-      expect(helpersMock.error).toHaveBeenCalledWith('number.max')
+      expect(helpersMock.error).toHaveBeenCalledWith(
+        'custom.startDate.tooFarFuture'
+      )
     })
 
     test('Should return value if all dates are valid', () => {
       const currentYear = MOCK_DATE.getFullYear()
-      const result = validateYearWithinAllowedRange(currentYear, helpersMock)
+      const result = validateYearWithinAllowedRange(
+        currentYear,
+        helpersMock,
+        'startDate'
+      )
 
       expect(helpersMock.error).not.toHaveBeenCalled()
       expect(result).toBe(currentYear)

@@ -209,6 +209,70 @@ describe('Activity dates - form validation', () => {
     )
   })
 
+  describe('Dates too far in the future', () => {
+    const getDateMoreThan10YearsInFuture = () => {
+      const today = new Date()
+      const futureDate = new Date(today)
+      futureDate.setFullYear(today.getFullYear() + 11)
+      return {
+        day: futureDate.getDate().toString(),
+        month: (futureDate.getMonth() + 1).toString(),
+        year: futureDate.getFullYear().toString()
+      }
+    }
+
+    const getDateExactly10YearsInFuture = () => {
+      const today = new Date()
+      const futureDate = new Date(today)
+      futureDate.setFullYear(today.getFullYear() + 10)
+      return {
+        day: futureDate.getDate().toString(),
+        month: (futureDate.getMonth() + 1).toString(),
+        year: futureDate.getFullYear().toString()
+      }
+    }
+
+    test('should show error when start date is more than 10 years in the future', async () => {
+      const startDate = getDateMoreThan10YearsInFuture()
+      const endDate = getDateMoreThan10YearsInFuture()
+      const document = await submitActivityDatesForm(
+        requestBody({ startDate, endDate })
+      )
+      expectFieldsetError({
+        document,
+        fieldsetLabel: 'Start date',
+        errorMessage: 'Activity start date must be within the next 10 years'
+      })
+    })
+
+    test('should show error when end date is more than 10 years in the future', async () => {
+      const startDate = getNextYear()
+      const endDate = getDateMoreThan10YearsInFuture()
+      const document = await submitActivityDatesForm(
+        requestBody({
+          startDate: { day: '1', month: '1', year: startDate },
+          endDate
+        })
+      )
+      expectFieldsetError({
+        document,
+        fieldsetLabel: 'End date',
+        errorMessage: 'Activity end date must be within the next 10 years'
+      })
+    })
+
+    test('should accept dates exactly 10 years in the future', async () => {
+      const startDate = getDateExactly10YearsInFuture()
+      const endDate = getDateExactly10YearsInFuture()
+      const { response } = await submitForm({
+        requestUrl: routes.ACTIVITY_DATES,
+        server: getServer(),
+        formData: requestBody({ startDate, endDate })
+      })
+      expect(response.statusCode).toBe(statusCodes.redirect)
+    })
+  })
+
   test('maintain form values after a validation error', async () => {
     const startDate = { day: '18', month: '1', year: '2024' }
     const endDate = { day: '1', month: '1', year: '2028' }

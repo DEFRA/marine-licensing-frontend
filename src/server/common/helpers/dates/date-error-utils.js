@@ -54,6 +54,10 @@ export function getDateErrorMessage({
     return { text: errorMessages[errorKeys.BEFORE_OTHER_DATE] }
   }
 
+  if (hasSpecificDateError(errorKeys, errorTypeMap, 'TOO_FAR_FUTURE')) {
+    return { text: errorMessages[errorKeys.TOO_FAR_FUTURE] }
+  }
+
   if (hasFieldError(errors, errorKeys, 'DAY')) {
     return { text: errorMessages[errorKeys.DAY] }
   }

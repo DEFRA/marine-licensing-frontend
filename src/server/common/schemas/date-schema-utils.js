@@ -15,14 +15,23 @@ const getMaxYear = () => {
   return getMinYear() + MAX_YEAR_OFFSET
 }
 
+const shouldSkipArticles = (helpers) => {
+  const articleCode = helpers.prefs.context?.articleCode
+  return articleCode === '20' || articleCode === '34'
+}
+
 export const validateYearWithinAllowedRange = (value, helpers, field) => {
   const currentMinYear = getMinYear()
   const currentMaxYear = getMaxYear()
 
-  const isBelowMinimumYear = value < currentMinYear
+  const shouldSkipMinimumYearCheck = shouldSkipArticles(helpers)
 
-  if (isBelowMinimumYear) {
-    return helpers.error('number.min')
+  if (!shouldSkipMinimumYearCheck) {
+    const isBelowMinimumYear = value < currentMinYear
+
+    if (isBelowMinimumYear) {
+      return helpers.error('number.min')
+    }
   }
 
   const isAboveMaximumYear = value > currentMaxYear
@@ -36,10 +45,31 @@ export const validateYearWithinAllowedRange = (value, helpers, field) => {
 
 export const validateDateTooFarApart = (startDate, endDate, helpers) => {
   const oneYearFromStartDate = startDate.add(1, 'year')
-  const isEndDateMoreThanOneYearFromStart = endDate.isAfter(oneYearFromStartDate, 'day')
+  const isEndDateMoreThanOneYearFromStart = endDate.isAfter(
+    oneYearFromStartDate,
+    'day'
+  )
 
   if (isEndDateMoreThanOneYearFromStart) {
     return helpers.error('custom.endDate.tooFarApart')
+  }
+
+  return null
+}
+
+export const validateDatesNotInPast = (startDate, endDate, today, helpers) => {
+  const shouldSkipPastDateValidation = shouldSkipArticles(helpers)
+
+  if (shouldSkipPastDateValidation) {
+    return null
+  }
+
+  if (endDate.isBefore(today, 'day')) {
+    return helpers.error('custom.endDate.todayOrFuture')
+  }
+
+  if (startDate.isBefore(today, 'day')) {
+    return helpers.error('custom.startDate.todayOrFuture')
   }
 
   return null

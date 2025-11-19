@@ -1,6 +1,5 @@
 import { vi } from 'vitest'
 import joi from 'joi'
-import { JOI_ERRORS } from '#src/server/common/constants/joi.js'
 import {
   activityDatesSchema,
   individualDate

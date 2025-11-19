@@ -1,5 +1,6 @@
 import { describe, expect, vi } from 'vitest'
 import {
+  validateDatesNotInPast,
   validateDateTooFarApart,
   validateYearWithinAllowedRange
 } from './date-schema-utils'
@@ -12,7 +13,7 @@ describe('#dateSchemaUtils', () => {
   beforeAll(() => {
     vi.useFakeTimers()
     vi.setSystemTime(MOCK_DATE)
-    helpersMock = { error: vi.fn() }
+    helpersMock = { error: vi.fn(), prefs: { context: {} } }
   })
 
   afterAll(() => {
@@ -20,8 +21,6 @@ describe('#dateSchemaUtils', () => {
   })
 
   describe('validateYearWithinAllowedRange', () => {
-    const helpersMock = { error: vi.fn() }
-
     test('Should validate minimum date', () => {
       validateYearWithinAllowedRange(0, helpersMock, 'startDate')
 
@@ -54,6 +53,21 @@ describe('#dateSchemaUtils', () => {
       expect(helpersMock.error).not.toHaveBeenCalled()
       expect(result).toBe(currentYear)
     })
+
+    test('should allow past years for article 20', () => {
+      const pastYear = MOCK_DATE.getFullYear() - 1
+
+      helpersMock.prefs.context.articleCode = '20'
+
+      const result = validateYearWithinAllowedRange(
+        pastYear,
+        helpersMock,
+        'startDate'
+      )
+
+      expect(helpersMock.error).not.toHaveBeenCalled()
+      expect(result).toBe(pastYear)
+    })
   })
 
   describe('validateDateTooFarApart', () => {
@@ -84,6 +98,108 @@ describe('#dateSchemaUtils', () => {
 
       expect(helpersMock.error).not.toHaveBeenCalled()
       expect(result).toBeNull()
+    })
+  })
+
+  describe('validateDatesNotInPast', () => {
+    const dayJsDate = createDayjsDate(
+      MOCK_DATE.getFullYear(),
+      MOCK_DATE.getMonth(),
+      MOCK_DATE.getDay()
+    )
+
+    beforeAll(() => {
+      vi.useFakeTimers()
+      vi.setSystemTime(MOCK_DATE)
+      helpersMock = { error: vi.fn(), prefs: { context: {} } }
+    })
+
+    test('should bypass validation when appropriate mcms context is set for section 20', () => {
+      const futureDate = dayJsDate.add('1', 'year')
+
+      helpersMock.prefs.context.articleCode = '20'
+
+      const result = validateDatesNotInPast(
+        dayJsDate,
+        futureDate,
+        new Date(),
+        helpersMock
+      )
+
+      expect(helpersMock.error).not.toHaveBeenCalled()
+      expect(result).toBeNull()
+    })
+
+    test('should bypass validation when appropriate mcms context is set for section 20', () => {
+      const futureDate = dayJsDate.add('8', 'year')
+
+      helpersMock.prefs.context.articleCode = '34'
+
+      const result = validateDatesNotInPast(
+        dayJsDate,
+        futureDate,
+        new Date(),
+        helpersMock
+      )
+
+      expect(helpersMock.error).not.toHaveBeenCalled()
+      expect(result).toBeNull()
+    })
+
+    test('should return null for valid dates', () => {
+      const futureDate = dayJsDate.add('1', 'day')
+
+      const today = dayJsDate.subtract('1', 'day')
+
+      helpersMock.prefs.context.articleCode = '1'
+
+      const result = validateDatesNotInPast(
+        dayJsDate,
+        futureDate,
+        today,
+        helpersMock
+      )
+
+      expect(helpersMock.error).not.toHaveBeenCalled()
+      expect(result).toBeNull()
+    })
+
+    test('should return error for invalid start dates', () => {
+      const futureDate = dayJsDate.add('1', 'day')
+
+      const today = dayJsDate.subtract('1', 'day')
+
+      helpersMock.prefs.context.articleCode = '1'
+
+      validateDatesNotInPast(
+        dayJsDate.subtract('1', 'month'),
+        futureDate,
+        today,
+        helpersMock
+      )
+
+      expect(helpersMock.error).toHaveBeenCalledWith(
+        'custom.startDate.todayOrFuture'
+      )
+    })
+
+    test('should return error for invalid end dates', () => {
+      const futureDate = dayJsDate.add('1', 'day')
+
+      const today = dayJsDate.subtract('1', 'day')
+
+      helpersMock.prefs.context.articleCode = '1'
+
+      validateDatesNotInPast(
+        dayJsDate,
+        futureDate.subtract('1', 'month'),
+        today,
+        helpersMock
+      )
+
+      expect(helpersMock.error).toHaveBeenCalledWith(
+        'custom.endDate.todayOrFuture'
+      )
     })
   })
 })

@@ -5,7 +5,8 @@ import customParseFormat from 'dayjs/plugin/customParseFormat.js'
 import { JOI_ERRORS } from '#src/server/common/constants/joi.js'
 import {
   validateYearWithinAllowedRange,
-  validateDateTooFarApart
+  validateDateTooFarApart,
+  validateDatesNotInPast
 } from './date-schema-utils.js'
 
 dayjs.extend(utc)
@@ -130,13 +131,15 @@ export const activityDatesSchema = joi
       return areDatesTooFarApart
     }
 
-    // Then check future date validation for end date
-    if (endDate.isBefore(today, 'day')) {
-      return helpers.error('custom.endDate.todayOrFuture')
-    }
+    const pastDateValidationError = validateDatesNotInPast(
+      startDate,
+      endDate,
+      today,
+      helpers
+    )
 
-    if (startDate.isBefore(today, 'day')) {
-      return helpers.error('custom.startDate.todayOrFuture')
+    if (pastDateValidationError) {
+      return pastDateValidationError
     }
 
     return value

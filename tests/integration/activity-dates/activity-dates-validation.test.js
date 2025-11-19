@@ -18,6 +18,7 @@ import {
 } from '~/tests/integration/shared/test-setup-helpers.js'
 import { getNextYear, getToday } from '~/tests/integration/shared/dates.js'
 import { submitForm } from '~/tests/integration/shared/app-server.js'
+import { mockExemptions } from '../shared/test-setup-helpers.js'
 
 describe('Activity dates - form validation', () => {
   const getServer = setupTestServer()
@@ -350,6 +351,101 @@ describe('Activity dates - form validation', () => {
         formData: requestBody({ startDate, endDate })
       })
       expect(response.statusCode).toBe(statusCodes.redirect)
+    })
+
+    test('should accept past dates for article 20', async () => {
+      const exemptionWithArticle20 = {
+        ...exemptionNoActivityDates,
+        mcmsContext: {
+          articleCode: '20'
+        }
+      }
+      mockExemption(exemptionWithArticle20)
+
+      const today = getToday()
+      const pastDate = new Date(
+        parseInt(today.year),
+        parseInt(today.month) - 1,
+        parseInt(today.day)
+      )
+      pastDate.setFullYear(pastDate.getFullYear() - 1)
+      const startDate = {
+        day: pastDate.getDate().toString(),
+        month: (pastDate.getMonth() + 1).toString(),
+        year: pastDate.getFullYear().toString()
+      }
+      const endDate = { ...startDate }
+
+      const { response } = await submitForm({
+        requestUrl: routes.ACTIVITY_DATES,
+        server: getServer(),
+        formData: requestBody({ startDate, endDate })
+      })
+      expect(response.statusCode).toBe(statusCodes.redirect)
+    })
+
+    test('should accept past dates for article 34', async () => {
+      const exemptionWithArticle34 = {
+        ...exemptionNoActivityDates,
+        mcmsContext: {
+          articleCode: '34'
+        }
+      }
+      mockExemptions(exemptionWithArticle34)
+
+      const today = getToday()
+      const pastDate = new Date(
+        parseInt(today.year),
+        parseInt(today.month) - 1,
+        parseInt(today.day)
+      )
+      pastDate.setFullYear(pastDate.getFullYear() - 1)
+      const startDate = {
+        day: pastDate.getDate().toString(),
+        month: (pastDate.getMonth() + 1).toString(),
+        year: pastDate.getFullYear().toString()
+      }
+      const endDate = { ...startDate }
+
+      const { response } = await submitForm({
+        requestUrl: routes.ACTIVITY_DATES,
+        server: getServer(),
+        formData: requestBody({ startDate, endDate })
+      })
+      expect(response.statusCode).toBe(statusCodes.redirect)
+    })
+
+    test('should show error for past dates with other articles', async () => {
+      const exemptionWithOtherArticle = {
+        ...exemptionNoActivityDates,
+        mcmsContext: {
+          articleCode: '17'
+        }
+      }
+      mockExemptions(exemptionWithOtherArticle)
+
+      const today = getToday()
+      const pastDate = new Date(
+        parseInt(today.year),
+        parseInt(today.month) - 1,
+        parseInt(today.day)
+      )
+      pastDate.setFullYear(pastDate.getFullYear() - 1)
+      const startDate = {
+        day: pastDate.getDate().toString(),
+        month: (pastDate.getMonth() + 1).toString(),
+        year: pastDate.getFullYear().toString()
+      }
+      const endDate = { ...startDate }
+
+      const document = await submitActivityDatesForm(
+        requestBody({ startDate, endDate })
+      )
+      expectFieldsetError({
+        document,
+        fieldsetLabel: 'Start date',
+        errorMessage: 'The start date must be today or in the future'
+      })
     })
   })
 

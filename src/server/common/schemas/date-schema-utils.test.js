@@ -1,12 +1,18 @@
 import { describe, expect, vi } from 'vitest'
-import { validateYearWithinAllowedRange } from './date-schema-utils'
+import {
+  validateDateTooFarApart,
+  validateYearWithinAllowedRange
+} from './date-schema-utils'
+import { createDayjsDate } from '../helpers/dates/date-utils'
 
 describe('#dateSchemaUtils', () => {
   const MOCK_DATE = new Date('2024-06-15T10:00:00.000Z') // June 15, 2024 at 10:00 AM UTC
+  let helpersMock
 
   beforeAll(() => {
     vi.useFakeTimers()
     vi.setSystemTime(MOCK_DATE)
+    helpersMock = { error: vi.fn() }
   })
 
   afterAll(() => {
@@ -47,6 +53,37 @@ describe('#dateSchemaUtils', () => {
 
       expect(helpersMock.error).not.toHaveBeenCalled()
       expect(result).toBe(currentYear)
+    })
+  })
+
+  describe('validateDateTooFarApart', () => {
+    test('should return correct response when dates are too far apart', () => {
+      const dayJsDate = createDayjsDate(
+        MOCK_DATE.getFullYear(),
+        MOCK_DATE.getMonth(),
+        MOCK_DATE.getDay()
+      )
+
+      const futureDate = dayJsDate.add('8', 'year')
+      validateDateTooFarApart(dayJsDate, futureDate, helpersMock)
+
+      expect(helpersMock.error).toHaveBeenCalledWith(
+        'custom.endDate.tooFarApart'
+      )
+    })
+
+    test('should return null when valid', () => {
+      const dayJsDate = createDayjsDate(
+        MOCK_DATE.getFullYear(),
+        MOCK_DATE.getMonth(),
+        MOCK_DATE.getDay()
+      )
+
+      const futureDate = dayJsDate.add('6', 'month')
+      const result = validateDateTooFarApart(dayJsDate, futureDate, helpersMock)
+
+      expect(helpersMock.error).not.toHaveBeenCalled()
+      expect(result).toBeNull()
     })
   })
 })

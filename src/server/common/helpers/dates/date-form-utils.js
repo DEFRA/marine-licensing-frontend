@@ -112,6 +112,10 @@ function hasCustomValidationError(config, errorTypeMap, errorSummary) {
     {
       key: errorKeys.TOO_FAR_FUTURE,
       message: errorMessages[errorKeys.TOO_FAR_FUTURE]
+    },
+    {
+      key: errorKeys.TOO_FAR_APART,
+      message: errorMessages[errorKeys.TOO_FAR_APART]
     }
   ]
 

@@ -3,7 +3,10 @@ import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc.js'
 import customParseFormat from 'dayjs/plugin/customParseFormat.js'
 import { JOI_ERRORS } from '#src/server/common/constants/joi.js'
-import { validateYearWithinAllowedRange } from './date-schema-utils.js'
+import {
+  validateYearWithinAllowedRange,
+  validateDateTooFarApart
+} from './date-schema-utils.js'
 
 dayjs.extend(utc)
 dayjs.extend(customParseFormat)
@@ -117,6 +120,16 @@ export const activityDatesSchema = joi
       return helpers.error('custom.endDate.before.startDate')
     }
 
+    const areDatesTooFarApart = validateDateTooFarApart(
+      startDate,
+      endDate,
+      helpers
+    )
+
+    if (areDatesTooFarApart) {
+      return areDatesTooFarApart
+    }
+
     // Then check future date validation for end date
     if (endDate.isBefore(today, 'day')) {
       return helpers.error('custom.endDate.todayOrFuture')
@@ -144,5 +157,6 @@ export const activityDatesSchema = joi
       JOI_ERRORS.CUSTOM_END_DATE_BEFORE_START_DATE,
     'custom.startDate.tooFarFuture':
       JOI_ERRORS.CUSTOM_START_DATE_TOO_FAR_FUTURE,
-    'custom.endDate.tooFarFuture': JOI_ERRORS.CUSTOM_END_DATE_TOO_FAR_FUTURE
+    'custom.endDate.tooFarFuture': JOI_ERRORS.CUSTOM_END_DATE_TOO_FAR_FUTURE,
+    'custom.endDate.tooFarApart': JOI_ERRORS.CUSTOM_END_DATE_TOO_FAR_APART
   })

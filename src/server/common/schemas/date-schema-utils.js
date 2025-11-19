@@ -33,3 +33,14 @@ export const validateYearWithinAllowedRange = (value, helpers, field) => {
 
   return value
 }
+
+export const validateDateTooFarApart = (startDate, endDate, helpers) => {
+  const oneYearFromStartDate = startDate.add(1, 'year')
+  const isEndDateMoreThanOneYearFromStart = endDate.isAfter(oneYearFromStartDate, 'day')
+
+  if (isEndDateMoreThanOneYearFromStart) {
+    return helpers.error('custom.endDate.tooFarApart')
+  }
+
+  return null
+}

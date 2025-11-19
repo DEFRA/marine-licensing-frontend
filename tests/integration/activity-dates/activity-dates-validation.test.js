@@ -209,6 +209,86 @@ describe('Activity dates - form validation', () => {
     )
   })
 
+  describe('Dates too far apart', () => {
+    const getDateExactlyOneYearAfterStart = (startDate) => {
+      const start = new Date(
+        parseInt(startDate.year),
+        parseInt(startDate.month) - 1,
+        parseInt(startDate.day)
+      )
+      const end = new Date(start)
+      end.setFullYear(start.getFullYear() + 1)
+      return {
+        day: end.getDate().toString(),
+        month: (end.getMonth() + 1).toString(),
+        year: end.getFullYear().toString()
+      }
+    }
+
+    const getDateMoreThanOneYearAfterStart = (startDate) => {
+      const start = new Date(
+        parseInt(startDate.year),
+        parseInt(startDate.month) - 1,
+        parseInt(startDate.day)
+      )
+      const end = new Date(start)
+      end.setFullYear(start.getFullYear() + 1)
+      end.setDate(end.getDate() + 1)
+      return {
+        day: end.getDate().toString(),
+        month: (end.getMonth() + 1).toString(),
+        year: end.getFullYear().toString()
+      }
+    }
+
+    test('should show error when end date is more than 1 year after start date', async () => {
+      const startDate = getToday()
+      const endDate = getDateMoreThanOneYearAfterStart(startDate)
+      const document = await submitActivityDatesForm(
+        requestBody({ startDate, endDate })
+      )
+      expectFieldsetError({
+        document,
+        fieldsetLabel: 'End date',
+        errorMessage:
+          'Activity end date must be within 1 year of the start date'
+      })
+    })
+
+    test('should accept dates exactly 1 year apart', async () => {
+      const startDate = getToday()
+      const endDate = getDateExactlyOneYearAfterStart(startDate)
+      const { response } = await submitForm({
+        requestUrl: routes.ACTIVITY_DATES,
+        server: getServer(),
+        formData: requestBody({ startDate, endDate })
+      })
+      expect(response.statusCode).toBe(statusCodes.redirect)
+    })
+
+    test('should accept dates less than 1 year apart', async () => {
+      const startDate = getToday()
+      const start = new Date(
+        parseInt(startDate.year),
+        parseInt(startDate.month) - 1,
+        parseInt(startDate.day)
+      )
+      const end = new Date(start)
+      end.setMonth(start.getMonth() + 6)
+      const endDateSixMonths = {
+        day: end.getDate().toString(),
+        month: (end.getMonth() + 1).toString(),
+        year: end.getFullYear().toString()
+      }
+      const { response } = await submitForm({
+        requestUrl: routes.ACTIVITY_DATES,
+        server: getServer(),
+        formData: requestBody({ startDate, endDate: endDateSixMonths })
+      })
+      expect(response.statusCode).toBe(statusCodes.redirect)
+    })
+  })
+
   describe('Dates too far in the future', () => {
     const getDateMoreThan10YearsInFuture = () => {
       const today = new Date()

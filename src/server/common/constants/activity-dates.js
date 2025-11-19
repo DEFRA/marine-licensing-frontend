@@ -49,7 +49,9 @@ export const ACTIVITY_DATES_ERROR_MESSAGES = {
   [JOI_ERRORS.CUSTOM_START_DATE_TOO_FAR_FUTURE]:
     'Activity start date must be within the next 10 years',
   [JOI_ERRORS.CUSTOM_END_DATE_TOO_FAR_FUTURE]:
-    'Activity end date must be within the next 10 years'
+    'Activity end date must be within the next 10 years',
+  [JOI_ERRORS.CUSTOM_END_DATE_TOO_FAR_APART]:
+    'Activity end date must be within 1 year of the start date'
 }
 
 function createDateConfig(prefix, errorMessageKey, errorKeys) {
@@ -91,6 +93,7 @@ export const ACTIVITY_DATES_CONFIG = [
     TODAY_OR_FUTURE: JOI_ERRORS.CUSTOM_END_DATE_TODAY_OR_FUTURE,
     BEFORE_OTHER_DATE: JOI_ERRORS.CUSTOM_END_DATE_BEFORE_START_DATE,
     TOO_FAR_FUTURE: JOI_ERRORS.CUSTOM_END_DATE_TOO_FAR_FUTURE,
+    TOO_FAR_APART: JOI_ERRORS.CUSTOM_END_DATE_TOO_FAR_APART,
     DAY: JOI_ERRORS.ACTIVITY_END_DATE_DAY,
     MONTH: JOI_ERRORS.ACTIVITY_END_DATE_MONTH,
     YEAR: JOI_ERRORS.ACTIVITY_END_DATE_YEAR

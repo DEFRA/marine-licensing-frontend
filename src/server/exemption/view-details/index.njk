@@ -35,7 +35,7 @@
       isReadOnly: isReadOnly
     }) }}
       {% endif %}
-    {% if mcmsContext %}
+    {% if mcmsContext and mcmsContext.activity %}
     {{ appProjectDetailsCard({
       mcmsContext: mcmsContext,
       isReadOnly: isReadOnly,

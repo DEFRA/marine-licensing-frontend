@@ -23,53 +23,56 @@
   }), rows) %}
 {% endif %}
 
-{% set rows = (rows.push({
-  key: {
-    text: "Type of activity"
-  },
-  value: {
-    html: params.mcmsContext.activity.label
-  },
-  classes: "govuk-summary-list__row--no-border"
-}), rows) %}
-
-{% if params.mcmsContext.activity.purpose %}
+{% if params.mcmsContext and params.mcmsContext.activity %}
   {% set rows = (rows.push({
     key: {
-      text: "The purpose of the activity"
+      text: "Type of activity"
     },
     value: {
-      html: params.mcmsContext.activity.purpose
+      html: params.mcmsContext.activity.label
     },
     classes: "govuk-summary-list__row--no-border"
   }), rows) %}
+
+    {% if params.mcmsContext.activity.purpose %}
+      {% set rows = (rows.push({
+        key: {
+          text: "The purpose of the activity"
+        },
+        value: {
+          html: params.mcmsContext.activity.purpose
+        },
+        classes: "govuk-summary-list__row--no-border"
+      }), rows) %}
+    {% endif %}
+
+    {% set sentenceStart = "Based on the applicant's answers, their" if params.isInternalUser else "Based on your answers from \'Check if you need a marine licence\', your" %}
+    {% set rows = (rows.push({
+      key: {
+        text: "Why this activity is exempt"
+      },
+      value: {
+        html: (sentenceStart + ' activity is exempt under <a href="http://www.legislation.gov.uk/uksi/2011/409/article/' + params.mcmsContext.articleCode + '" target="_blank" rel="noopener noreferrer">Article ' + params.mcmsContext.articleCode + ' of the Marine Licensing (Exempted Activities) Order 2011 (opens in new tab)</a>')
+      },
+      classes: "govuk-summary-list__row--no-border"
+    }), rows) %}
+
+    {% set sentences = ['<p><a href="' + params.mcmsContext.pdfDownloadUrl + '" class="govuk-link">Download a copy of ' +  ('their' if params.isInternalUser else 'your') + ' answers (PDF)</a></p>'] %}
+
+    {% if not params.isInternalUser %}
+      {% set sentences = (sentences.push('<hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible"><p class="govuk-body">If you need to change any of your \'Check if you need a marine licence\' answers:</p><ol class="govuk-list govuk-list--number"><li>Delete this project from your projects.</li><li>Restart the process by checking if you need a marine licence.</li></ol>'), sentences) %}
+    {% endif %}
+
+    {% set rows = (rows.push({
+      key: {
+        text: ("The applicant's answers" if params.isInternalUser else "Your answers") + " from 'Check if you need a marine licence'"
+      },
+      value: {
+        html: sentences | join
+      }
+    }), rows) %}
+
 {% endif %}
-
-{% set sentenceStart = "Based on the applicant's answers, their" if params.isInternalUser else "Based on your answers from \'Check if you need a marine licence\', your" %}
-{% set rows = (rows.push({
-  key: {
-    text: "Why this activity is exempt"
-  },
-  value: {
-    html: (sentenceStart + ' activity is exempt under <a href="http://www.legislation.gov.uk/uksi/2011/409/article/' + params.mcmsContext.articleCode + '" target="_blank" rel="noopener noreferrer">Article ' + params.mcmsContext.articleCode + ' of the Marine Licensing (Exempted Activities) Order 2011 (opens in new tab)</a>')
-  },
-  classes: "govuk-summary-list__row--no-border"
-}), rows) %}
-
-{% set sentences = ['<p><a href="' + params.mcmsContext.pdfDownloadUrl + '" class="govuk-link">Download a copy of ' +  ('their' if params.isInternalUser else 'your') + ' answers (PDF)</a></p>'] %}
-
-{% if not params.isInternalUser %}
-  {% set sentences = (sentences.push('<hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible"><p class="govuk-body">If you need to change any of your \'Check if you need a marine licence\' answers:</p><ol class="govuk-list govuk-list--number"><li>Delete this project from your projects.</li><li>Restart the process by checking if you need a marine licence.</li></ol>'), sentences) %}
-{% endif %}
-
-{% set rows = (rows.push({
-  key: {
-    text: ("The applicant's answers" if params.isInternalUser else "Your answers") + " from 'Check if you need a marine licence'"
-  },
-  value: {
-    html: sentences | join
-  }
-}), rows) %}
 
 {{ govukSummaryList({
   card: {

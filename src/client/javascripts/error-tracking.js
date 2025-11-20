@@ -1,12 +1,7 @@
-/*
-  Browser error logger
-  Sends error events to /api/browser-logs via beacon
-  Includes deduplication and burst protection
-*/
-
 /**
- * ErrorTracking component for capturing and reporting browser errors
- * Follows GOV.UK Frontend component pattern for consistency and testability
+ *   Browser error logger
+ *   Sends error events to /api/browser-logs via beacon
+ *   Includes deduplication and burst protection
  */
 export class ErrorTracking {
   constructor(config = {}) {

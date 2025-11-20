@@ -58,23 +58,27 @@ export class ErrorTracking {
   }
 
   /**
+   * Serialize a value to string, with JSON for objects
+   */
+  serializeValue(value) {
+    if (typeof value === 'string') {
+      return value
+    }
+    if (typeof value === 'object' && value !== null) {
+      try {
+        return JSON.stringify(value)
+      } catch {
+        return String(value)
+      }
+    }
+    return String(value)
+  }
+
+  /**
    * Handle unhandled promise rejections
    */
   handleRejection(event) {
-    let message
-    if (event.reason?.message) {
-      message = event.reason.message
-    } else if (typeof event.reason === 'string') {
-      message = event.reason
-    } else if (typeof event.reason === 'object' && event.reason !== null) {
-      try {
-        message = JSON.stringify(event.reason)
-      } catch {
-        message = String(event.reason)
-      }
-    } else {
-      message = String(event.reason)
-    }
+    const message = event.reason?.message || this.serializeValue(event.reason)
 
     this.sendLog({
       type: 'unhandled_promise',
@@ -90,21 +94,7 @@ export class ErrorTracking {
   handleConsoleError(args) {
     this.sendLog({
       type: 'console_error',
-      message: args
-        .map((arg) => {
-          if (typeof arg === 'string') {
-            return arg
-          }
-          if (typeof arg === 'object' && arg !== null) {
-            try {
-              return JSON.stringify(arg)
-            } catch {
-              return String(arg)
-            }
-          }
-          return String(arg)
-        })
-        .join(' ')
+      message: args.map((arg) => this.serializeValue(arg)).join(' ')
     })
   }
 

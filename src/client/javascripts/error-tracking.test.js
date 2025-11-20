@@ -236,16 +236,60 @@ describe('ErrorTracking', () => {
     })
   })
 
+  describe('serializeValue', () => {
+    test('should return strings as-is', () => {
+      expect(errorTracking.serializeValue('test string')).toBe('test string')
+    })
+
+    test('should serialize objects to JSON', () => {
+      expect(errorTracking.serializeValue({ key: 'value' })).toBe(
+        '{"key":"value"}'
+      )
+    })
+
+    test('should serialize arrays to JSON', () => {
+      expect(errorTracking.serializeValue([1, 2, 3])).toBe('[1,2,3]')
+    })
+
+    test('should serialize null to string', () => {
+      expect(errorTracking.serializeValue(null)).toBe('null')
+    })
+
+    test('should handle circular references', () => {
+      const circular = { a: 1 }
+      circular.self = circular
+
+      expect(errorTracking.serializeValue(circular)).toBe('[object Object]')
+    })
+
+    test('should convert numbers to strings', () => {
+      expect(errorTracking.serializeValue(42)).toBe('42')
+    })
+
+    test('should convert booleans to strings', () => {
+      expect(errorTracking.serializeValue(true)).toBe('true')
+      expect(errorTracking.serializeValue(false)).toBe('false')
+    })
+
+    test('should convert undefined to string', () => {
+      expect(errorTracking.serializeValue(undefined)).toBe('undefined')
+    })
+
+    test('should serialize nested objects', () => {
+      expect(errorTracking.serializeValue({ a: { b: { c: 1 } } })).toBe(
+        '{"a":{"b":{"c":1}}}'
+      )
+    })
+  })
+
   describe('handleRejection', () => {
     beforeEach(() => {
       vi.spyOn(errorTracking, 'sendLog')
     })
 
-    test('should send log with rejection details', () => {
+    test('should send log with error message when reason has message property', () => {
       const error = new Error('Promise rejection')
-      const event = {
-        reason: error
-      }
+      const event = { reason: error }
 
       errorTracking.handleRejection(event)
 
@@ -257,22 +301,20 @@ describe('ErrorTracking', () => {
       })
     })
 
-    test('should handle non-Error rejection reasons', () => {
-      const event = {
-        reason: 'String rejection reason'
-      }
+    test('should serialize reason when no message property', () => {
+      const event = { reason: { code: 500 } }
 
       errorTracking.handleRejection(event)
 
       expect(errorTracking.sendLog).toHaveBeenCalledWith({
         type: 'unhandled_promise',
-        message: 'String rejection reason',
+        message: '{"code":500}',
         stack: null,
         errorType: 'Error'
       })
     })
 
-    test('should handle rejection with custom error type', () => {
+    test('should extract error type from reason', () => {
       const error = new TypeError('Type mismatch')
       const event = { reason: error }
 
@@ -285,56 +327,15 @@ describe('ErrorTracking', () => {
       )
     })
 
-    test('should serialize non-string, non-error reasons to JSON', () => {
-      const event = {
-        reason: { code: 500 }
-      }
+    test('should include stack when available', () => {
+      const error = new Error('Test')
+      const event = { reason: error }
 
       errorTracking.handleRejection(event)
 
       expect(errorTracking.sendLog).toHaveBeenCalledWith(
         expect.objectContaining({
-          message: '{"code":500}'
-        })
-      )
-    })
-
-    test('should handle circular references in rejection reasons', () => {
-      const circular = { a: 1 }
-      circular.self = circular
-      const event = { reason: circular }
-
-      errorTracking.handleRejection(event)
-
-      expect(errorTracking.sendLog).toHaveBeenCalledWith(
-        expect.objectContaining({
-          message: '[object Object]'
-        })
-      )
-    })
-
-    test('should handle primitive non-string rejection reasons', () => {
-      const event = { reason: 42 }
-
-      errorTracking.handleRejection(event)
-
-      expect(errorTracking.sendLog).toHaveBeenCalledWith(
-        expect.objectContaining({
-          message: '42'
-        })
-      )
-    })
-
-    test('should handle rejection without stack', () => {
-      const event = {
-        reason: { name: 'CustomError', message: 'Custom rejection' }
-      }
-
-      errorTracking.handleRejection(event)
-
-      expect(errorTracking.sendLog).toHaveBeenCalledWith(
-        expect.objectContaining({
-          stack: null
+          stack: error.stack
         })
       )
     })
@@ -345,7 +346,7 @@ describe('ErrorTracking', () => {
       vi.spyOn(errorTracking, 'sendLog')
     })
 
-    test('should send log with console error message', () => {
+    test('should send log with single argument', () => {
       errorTracking.handleConsoleError(['Error message'])
 
       expect(errorTracking.sendLog).toHaveBeenCalledWith({
@@ -355,51 +356,24 @@ describe('ErrorTracking', () => {
     })
 
     test('should join multiple arguments with spaces', () => {
-      errorTracking.handleConsoleError(['Error:', 'Multiple', 'args'])
+      errorTracking.handleConsoleError(['Error:', 'code', 500])
 
       expect(errorTracking.sendLog).toHaveBeenCalledWith({
         type: 'console_error',
-        message: 'Error: Multiple args'
+        message: 'Error: code 500'
       })
     })
 
-    test('should serialise non-string arguments to JSON', () => {
-      errorTracking.handleConsoleError([{ key: 'value' }, 123, true])
+    test('should serialize each argument using serializeValue', () => {
+      vi.spyOn(errorTracking, 'serializeValue')
 
-      expect(errorTracking.sendLog).toHaveBeenCalledWith({
-        type: 'console_error',
-        message: '{"key":"value"} 123 true'
+      errorTracking.handleConsoleError(['Error:', { key: 'value' }, 123])
+
+      expect(errorTracking.serializeValue).toHaveBeenCalledWith('Error:')
+      expect(errorTracking.serializeValue).toHaveBeenCalledWith({
+        key: 'value'
       })
-    })
-
-    test('should handle circular references gracefully', () => {
-      const circular = { a: 1 }
-      circular.self = circular
-
-      errorTracking.handleConsoleError(['Error:', circular])
-
-      expect(errorTracking.sendLog).toHaveBeenCalledWith({
-        type: 'console_error',
-        message: 'Error: [object Object]'
-      })
-    })
-
-    test('should serialize arrays properly', () => {
-      errorTracking.handleConsoleError(['Items:', [1, 2, 3]])
-
-      expect(errorTracking.sendLog).toHaveBeenCalledWith({
-        type: 'console_error',
-        message: 'Items: [1,2,3]'
-      })
-    })
-
-    test('should handle null values', () => {
-      errorTracking.handleConsoleError(['Value is:', null])
-
-      expect(errorTracking.sendLog).toHaveBeenCalledWith({
-        type: 'console_error',
-        message: 'Value is: null'
-      })
+      expect(errorTracking.serializeValue).toHaveBeenCalledWith(123)
     })
 
     test('should handle empty arguments array', () => {

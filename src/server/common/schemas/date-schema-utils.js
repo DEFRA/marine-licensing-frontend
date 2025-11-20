@@ -43,6 +43,24 @@ export const validateYearWithinAllowedRange = (value, helpers, field) => {
   return value
 }
 
+export const validateDateTooFarInFuture = (startDate, endDate, helpers) => {
+  const maxDate = dayjs().add(MAX_YEAR_OFFSET, 'years')
+
+  const isStartDateTooFarInFuture = startDate.isAfter(maxDate)
+
+  if (isStartDateTooFarInFuture) {
+    return helpers.error('custom.endDate.tooFarFuture')
+  }
+
+  const isEndtDateTooFarInFuture = endDate.isAfter(maxDate)
+
+  if (isEndtDateTooFarInFuture) {
+    return helpers.error('custom.endDate.tooFarFuture')
+  }
+
+  return null
+}
+
 export const validateDateTooFarApart = (startDate, endDate, helpers) => {
   const oneYearFromStartDate = startDate.add(1, 'year')
   const isEndDateMoreThanOneYearFromStart = endDate.isAfter(

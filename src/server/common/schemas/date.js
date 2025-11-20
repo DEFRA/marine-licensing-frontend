@@ -6,7 +6,8 @@ import { JOI_ERRORS } from '#src/server/common/constants/joi.js'
 import {
   validateYearWithinAllowedRange,
   validateDateTooFarApart,
-  validateDatesNotInPast
+  validateDatesNotInPast,
+  validateDateTooFarInFuture
 } from './date-schema-utils.js'
 
 dayjs.extend(utc)
@@ -119,6 +120,16 @@ export const activityDatesSchema = joi
     // Check date order first - if end date is before start date, show that error
     if (endDate.isBefore(startDate, 'day')) {
       return helpers.error('custom.endDate.before.startDate')
+    }
+
+    const areDatesTooFarInFuture = validateDateTooFarInFuture(
+      startDate,
+      endDate,
+      helpers
+    )
+
+    if (areDatesTooFarInFuture) {
+      return areDatesTooFarInFuture
     }
 
     const areDatesTooFarApart = validateDateTooFarApart(

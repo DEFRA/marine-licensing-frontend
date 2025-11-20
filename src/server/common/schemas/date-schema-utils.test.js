@@ -2,10 +2,14 @@ import { describe, expect, vi } from 'vitest'
 import {
   validateDatesNotInPast,
   validateDateTooFarApart,
+  validateDateTooFarInFuture,
   validateYearWithinAllowedRange
 } from './date-schema-utils'
 import { createDayjsDate } from '../helpers/dates/date-utils'
+import dayjs from 'dayjs'
+import utc from 'dayjs/plugin/utc.js'
 
+dayjs.extend(utc)
 describe('#dateSchemaUtils', () => {
   const MOCK_DATE = new Date('2024-06-15T10:00:00.000Z') // June 15, 2024 at 10:00 AM UTC
   let helpersMock
@@ -67,6 +71,55 @@ describe('#dateSchemaUtils', () => {
 
       expect(helpersMock.error).not.toHaveBeenCalled()
       expect(result).toBe(pastYear)
+    })
+  })
+
+  describe('validateDateTooFarInFuture', () => {
+    const validDate = createDayjsDate(
+      MOCK_DATE.getFullYear(),
+      MOCK_DATE.getMonth(),
+      MOCK_DATE.getDate()
+    )
+
+    const outOfRangeDate = dayjs(MOCK_DATE).add(10, 'years').add(1, 'day')
+
+    test('should return error when start date is too far in the future', () => {
+      const result = validateDateTooFarInFuture(
+        outOfRangeDate,
+        validDate,
+        helpersMock
+      )
+
+      expect(helpersMock.error).toHaveBeenCalledWith(
+        'custom.endDate.tooFarFuture'
+      )
+      expect(result).toBe(helpersMock.error.mock.results[0].value)
+    })
+
+    test('should return error when end date is too far in the future', () => {
+      const result = validateDateTooFarInFuture(
+        validDate,
+        outOfRangeDate,
+        helpersMock
+      )
+
+      expect(helpersMock.error).toHaveBeenCalledWith(
+        'custom.endDate.tooFarFuture'
+      )
+      expect(result).toBe(helpersMock.error.mock.results[0].value)
+    })
+
+    test('should return null when both dates are within range', () => {
+      const withinRangeDate = dayjs(MOCK_DATE).add(5, 'years')
+
+      const result = validateDateTooFarInFuture(
+        withinRangeDate,
+        validDate,
+        helpersMock
+      )
+
+      expect(helpersMock.error).not.toHaveBeenCalled()
+      expect(result).toBeNull()
     })
   })
 

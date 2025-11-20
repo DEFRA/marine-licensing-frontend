@@ -80,7 +80,21 @@ export class ErrorTracking {
   handleConsoleError(args) {
     this.sendLog({
       type: 'console_error',
-      message: args.map(String).join(' ')
+      message: args
+        .map((arg) => {
+          if (typeof arg === 'string') {
+            return arg
+          }
+          if (typeof arg === 'object' && arg !== null) {
+            try {
+              return JSON.stringify(arg)
+            } catch {
+              return String(arg)
+            }
+          }
+          return String(arg)
+        })
+        .join(' ')
     })
   }
 

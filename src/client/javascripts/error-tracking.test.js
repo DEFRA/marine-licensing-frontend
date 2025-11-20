@@ -101,9 +101,20 @@ describe('ErrorTracking', () => {
   })
 
   describe('init', () => {
+    let originalOnerror
+    let rejectionHandler
+
     beforeEach(() => {
+      originalOnerror = globalThis.onerror
       globalThis.onerror = null
-      globalThis.removeEventListener('unhandledrejection', () => {})
+      rejectionHandler = null
+    })
+
+    afterEach(() => {
+      globalThis.onerror = originalOnerror
+      if (rejectionHandler) {
+        globalThis.removeEventListener('unhandledrejection', rejectionHandler)
+      }
     })
 
     test('should attach global error handler', () => {
@@ -122,6 +133,9 @@ describe('ErrorTracking', () => {
         'unhandledrejection',
         expect.any(Function)
       )
+
+      // Capture the handler for cleanup
+      rejectionHandler = addEventListenerSpy.mock.calls[0][1]
     })
 
     test('should wrap console.error', () => {
@@ -323,12 +337,42 @@ describe('ErrorTracking', () => {
       })
     })
 
-    test('should convert non-string arguments to strings', () => {
+    test('should serialise non-string arguments to JSON', () => {
       errorTracking.handleConsoleError([{ key: 'value' }, 123, true])
 
       expect(errorTracking.sendLog).toHaveBeenCalledWith({
         type: 'console_error',
-        message: '[object Object] 123 true'
+        message: '{"key":"value"} 123 true'
+      })
+    })
+
+    test('should handle circular references gracefully', () => {
+      const circular = { a: 1 }
+      circular.self = circular
+
+      errorTracking.handleConsoleError(['Error:', circular])
+
+      expect(errorTracking.sendLog).toHaveBeenCalledWith({
+        type: 'console_error',
+        message: 'Error: [object Object]'
+      })
+    })
+
+    test('should serialize arrays properly', () => {
+      errorTracking.handleConsoleError(['Items:', [1, 2, 3]])
+
+      expect(errorTracking.sendLog).toHaveBeenCalledWith({
+        type: 'console_error',
+        message: 'Items: [1,2,3]'
+      })
+    })
+
+    test('should handle null values', () => {
+      errorTracking.handleConsoleError(['Value is:', null])
+
+      expect(errorTracking.sendLog).toHaveBeenCalledWith({
+        type: 'console_error',
+        message: 'Value is: null'
       })
     })
 

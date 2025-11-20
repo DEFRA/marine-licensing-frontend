@@ -1,4 +1,4 @@
-import { ErrorTracking } from './error-tracking.js'
+import { ErrorTracking } from './error-tracking/error-tracking.js'
 import Clarity from '@microsoft/clarity'
 import {
   Button,

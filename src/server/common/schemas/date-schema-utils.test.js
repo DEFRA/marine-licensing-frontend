@@ -91,7 +91,7 @@ describe('#dateSchemaUtils', () => {
       )
 
       expect(helpersMock.error).toHaveBeenCalledWith(
-        'custom.endDate.tooFarFuture'
+        'custom.startDate.tooFarFuture'
       )
       expect(result).toBe(helpersMock.error.mock.results[0].value)
     })

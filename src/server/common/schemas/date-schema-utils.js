@@ -49,7 +49,7 @@ export const validateDateTooFarInFuture = (startDate, endDate, helpers) => {
   const isStartDateTooFarInFuture = startDate.isAfter(maxDate)
 
   if (isStartDateTooFarInFuture) {
-    return helpers.error('custom.endDate.tooFarFuture')
+    return helpers.error('custom.startDate.tooFarFuture')
   }
 
   const isEndtDateTooFarInFuture = endDate.isAfter(maxDate)

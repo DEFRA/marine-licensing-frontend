@@ -285,19 +285,45 @@ describe('ErrorTracking', () => {
       )
     })
 
-    // test('should convert non-string, non-error reasons to string', () => {
-    //   const event = {
-    //     reason: { code: 500 }
-    //   }
-    //
-    //   errorTracking.handleRejection(event)
-    //
-    //   expect(errorTracking.sendLog).toHaveBeenCalledWith(
-    //     expect.objectContaining({
-    //       message: '[object Object]'
-    //     })
-    //   )
-    // })
+    test('should serialize non-string, non-error reasons to JSON', () => {
+      const event = {
+        reason: { code: 500 }
+      }
+
+      errorTracking.handleRejection(event)
+
+      expect(errorTracking.sendLog).toHaveBeenCalledWith(
+        expect.objectContaining({
+          message: '{"code":500}'
+        })
+      )
+    })
+
+    test('should handle circular references in rejection reasons', () => {
+      const circular = { a: 1 }
+      circular.self = circular
+      const event = { reason: circular }
+
+      errorTracking.handleRejection(event)
+
+      expect(errorTracking.sendLog).toHaveBeenCalledWith(
+        expect.objectContaining({
+          message: '[object Object]'
+        })
+      )
+    })
+
+    test('should handle primitive non-string rejection reasons', () => {
+      const event = { reason: 42 }
+
+      errorTracking.handleRejection(event)
+
+      expect(errorTracking.sendLog).toHaveBeenCalledWith(
+        expect.objectContaining({
+          message: '42'
+        })
+      )
+    })
 
     test('should handle rejection without stack', () => {
       const event = {

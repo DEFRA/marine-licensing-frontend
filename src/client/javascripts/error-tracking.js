@@ -66,9 +66,24 @@ export class ErrorTracking {
    * Handle unhandled promise rejections
    */
   handleRejection(event) {
+    let message
+    if (event.reason?.message) {
+      message = event.reason.message
+    } else if (typeof event.reason === 'string') {
+      message = event.reason
+    } else if (typeof event.reason === 'object' && event.reason !== null) {
+      try {
+        message = JSON.stringify(event.reason)
+      } catch {
+        message = String(event.reason)
+      }
+    } else {
+      message = String(event.reason)
+    }
+
     this.sendLog({
       type: 'unhandled_promise',
-      message: event.reason?.message || String(event.reason),
+      message,
       stack: event.reason?.stack || null,
       errorType: event.reason?.name || 'Error'
     })

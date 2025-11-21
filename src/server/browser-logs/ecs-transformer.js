@@ -5,8 +5,13 @@
  * @returns {Object} ECS-formatted log entry
  */
 export function toEcs(event) {
+  const ts = typeof event.timestamp === 'string' ? Number(event.timestamp) : event.timestamp
+  const timestamp = new Date(ts)
+  const timestampStr =
+    Number.isNaN(timestamp.getTime()) ? new Date().toISOString() : timestamp.toISOString()
+
   return {
-    '@timestamp': new Date(event.timestamp).toISOString(),
+    '@timestamp': timestampStr,
     message: event.message,
     log: {
       level: event.level || 'error',

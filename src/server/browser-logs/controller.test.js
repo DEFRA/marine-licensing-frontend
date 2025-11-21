@@ -226,7 +226,7 @@ describe('browserLogsController', () => {
         throw new Error('Logger failed')
       })
 
-      const result = browserLogsController.handler(mockRequest, mockH)
+      browserLogsController.handler(mockRequest, mockH)
 
       expect(mockRequest.logger.error).toHaveBeenCalledTimes(2)
       expect(mockRequest.logger.error).toHaveBeenLastCalledWith(

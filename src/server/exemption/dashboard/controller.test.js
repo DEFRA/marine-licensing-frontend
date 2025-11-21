@@ -24,8 +24,8 @@ describe('#dashboard', () => {
       await dashboardController.handler(request, h)
 
       expect(h.view).toHaveBeenCalledWith(DASHBOARD_VIEW_ROUTE, {
-        pageTitle: 'Your projects',
-        heading: 'Your projects',
+        pageTitle: 'Projects',
+        heading: 'Projects',
         projects: []
       })
     })
@@ -69,8 +69,8 @@ describe('#dashboard', () => {
       await dashboardController.handler(request, h)
 
       expect(h.view).toHaveBeenCalledWith(DASHBOARD_VIEW_ROUTE, {
-        pageTitle: 'Your projects',
-        heading: 'Your projects',
+        pageTitle: 'Projects',
+        heading: 'Projects',
         projects: expectedFormattedProjects
       })
     })
@@ -105,8 +105,8 @@ describe('#dashboard', () => {
       await dashboardController.handler(request, h)
 
       expect(h.view).toHaveBeenCalledWith(DASHBOARD_VIEW_ROUTE, {
-        pageTitle: 'Your projects',
-        heading: 'Your projects',
+        pageTitle: 'Projects',
+        heading: 'Projects',
         projects: expectedFormattedProjects
       })
     })
@@ -125,8 +125,8 @@ describe('#dashboard', () => {
       )
 
       expect(h.view).toHaveBeenCalledWith(DASHBOARD_VIEW_ROUTE, {
-        pageTitle: 'Your projects',
-        heading: 'Your projects',
+        pageTitle: 'Projects',
+        heading: 'Projects',
         projects: []
       })
     })
@@ -142,8 +142,8 @@ describe('#dashboard', () => {
       await dashboardController.handler(request, h)
 
       expect(h.view).toHaveBeenCalledWith(DASHBOARD_VIEW_ROUTE, {
-        pageTitle: 'Your projects',
-        heading: 'Your projects',
+        pageTitle: 'Projects',
+        heading: 'Projects',
         projects: []
       })
     })

@@ -42,7 +42,7 @@ export const getFieldsetByLabel = ({ document, fieldsetLabel }) =>
     .closest('fieldset')
 
 export const getExemptionsTableRow = ({ document, name }) => {
-  const table = getByRole(document, 'table', { name: 'Your projects' })
+  const table = getByRole(document, 'table', { name: 'Projects' })
   expect(table).toBeInTheDocument()
   const row = getByRole(table, 'cell', {
     name

@@ -16,11 +16,11 @@ const getMaxYear = () => {
 }
 
 // the following article codes should skip validation and allow past dates
-const skipArticleCodes = ['20', '34']
+const skipArticleCodes = new Set(['20', '34'])
 
 const shouldSkipArticles = (helpers) => {
   const articleCode = helpers.prefs.context?.articleCode
-  return skipArticleCodes.includes(articleCode)
+  return skipArticleCodes.has(articleCode)
 }
 
 export const validateYearWithinAllowedRange = (value, helpers, field) => {

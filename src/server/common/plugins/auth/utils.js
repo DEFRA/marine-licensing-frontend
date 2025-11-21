@@ -33,7 +33,7 @@ export const refreshAccessToken = async (request) => {
     client_secret: clientSecret,
     grant_type: 'refresh_token',
     refresh_token: refreshToken,
-    scope: scopes,
+    scope: scopes.join(' '),
     redirect_uri: redirectUri
   }
 

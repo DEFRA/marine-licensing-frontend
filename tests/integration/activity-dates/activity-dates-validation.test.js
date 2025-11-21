@@ -256,6 +256,50 @@ describe('Activity dates - form validation', () => {
       })
     })
 
+    test('should still show error with article 20', async () => {
+      const exemptionWithArticle20 = {
+        ...exemptionNoActivityDates,
+        mcmsContext: {
+          articleCode: '20'
+        }
+      }
+      mockExemptions(exemptionWithArticle20)
+
+      const startDate = getToday()
+      const endDate = getDateMoreThanOneYearAfterStart(startDate)
+      const document = await submitActivityDatesForm(
+        requestBody({ startDate, endDate })
+      )
+      expectFieldsetError({
+        document,
+        fieldsetLabel: 'End date',
+        errorMessage:
+          'Activity end date must be within 1 year of the start date'
+      })
+    })
+
+    test('should still show error with article 34', async () => {
+      const exemptionWithArticle20 = {
+        ...exemptionNoActivityDates,
+        mcmsContext: {
+          articleCode: '34'
+        }
+      }
+      mockExemptions(exemptionWithArticle20)
+
+      const startDate = getToday()
+      const endDate = getDateMoreThanOneYearAfterStart(startDate)
+      const document = await submitActivityDatesForm(
+        requestBody({ startDate, endDate })
+      )
+      expectFieldsetError({
+        document,
+        fieldsetLabel: 'End date',
+        errorMessage:
+          'Activity end date must be within 1 year of the start date'
+      })
+    })
+
     test('should accept dates exactly 1 year apart', async () => {
       const startDate = getToday()
       const endDate = getDateExactlyOneYearAfterStart(startDate)

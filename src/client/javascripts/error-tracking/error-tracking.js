@@ -1,4 +1,10 @@
 /**
+ * MAX_SAME_ERROR_DEFAULT: the number of repeated same errors from a single client before suppression.
+ * Repeated errors are detected using error fingerprinting.
+ */
+const MAX_SAME_ERROR_DEFAULT = 3
+
+/**
  *   Browser error logger
  *   Sends error events to /api/browser-logs via beacon
  *   Includes deduplication and burst protection
@@ -7,7 +13,7 @@ export class ErrorTracking {
   constructor(config = {}) {
     this.config = {
       endpoint: config.endpoint || '/api/browser-logs',
-      maxSameError: config.maxSameError || 3,
+      maxSameError: config.maxSameError || MAX_SAME_ERROR_DEFAULT,
       burstWindow: config.burstWindow || 10000, // in milliseconds so 10 seconds
       maxBurst: config.maxBurst || 10,
       // Allow dependency injection for testing

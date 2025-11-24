@@ -87,7 +87,7 @@
     "@vitest/ui": "^3.2.4",
     "allure-commandline": "^2.34.1",
     "allure-vitest": "^3.4.2",
-    "autoprefixer": "^10.4.21",
+    "autoprefixer": "^10.4.22",
     "babel-loader": "^10.0.0",
     "cheerio": "^1.1.2",
     "clean-webpack-plugin": "^4.0.0",
@@ -110,8 +110,8 @@
     "vitest": "^3.2.4",
     "vitest-axe": "^0.1.0",
     "vitest-fetch-mock": "^0.4.5",
-    "webpack": "^5.102.1",
-    "webpack-assets-manifest": "6.3.0",
+    "webpack": "^5.103.0",
+    "webpack-assets-manifest": "6.4.0",
     "webpack-cli": "6.0.1"
   }
 }

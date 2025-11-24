@@ -53,7 +53,7 @@
     "@hapi/yar": "^11.0.3",
     "@microsoft/clarity": "^1.0.0",
     "@ministryofjustice/frontend": "^7.1.0",
-    "aws-embedded-metrics": "^4.2.0",
+    "aws-embedded-metrics": "^4.2.1",
     "convict": "^6.2.4",
     "cssnano": "^7.1.2",
     "cssnano-preset-default": "^7.0.10",

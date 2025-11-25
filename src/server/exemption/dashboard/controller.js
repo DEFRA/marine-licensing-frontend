@@ -2,7 +2,7 @@ import { authenticatedGetRequest } from '#src/server/common/helpers/authenticate
 import { formatProjectsForDisplay } from './utils.js'
 
 export const DASHBOARD_VIEW_ROUTE = 'exemption/dashboard/index.njk'
-const DASHBOARD_PAGE_TITLE = 'Your projects'
+const DASHBOARD_PAGE_TITLE = 'Projects'
 export const dashboardController = {
   handler: async (request, h) => {
     try {

@@ -37,7 +37,7 @@ describe('Dashboard', () => {
     mockExemptions(exemptions)
     const doc = await loadDashboardPage()
     expect(getByRole(doc, 'heading', { level: 1 })).toHaveTextContent(
-      'Your projects'
+      'Projects'
     )
     expect(
       getByRole(doc, 'button', { name: 'Create new project' })
@@ -95,7 +95,7 @@ describe('Dashboard', () => {
   it('should render a message if there are no exemptions', async () => {
     mockExemptions([])
     const doc = await loadDashboardPage()
-    const table = queryByRole(doc, 'table', { name: 'Your projects' })
+    const table = queryByRole(doc, 'table', { name: 'Projects' })
     expect(table).not.toBeInTheDocument()
     expect(
       getByText(doc, 'You currently have no projects.')

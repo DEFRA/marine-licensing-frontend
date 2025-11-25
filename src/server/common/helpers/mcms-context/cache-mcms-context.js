@@ -16,6 +16,7 @@ export const cacheMcmsContextFromQueryParams = (request) => {
         })
       }
     } else {
+      request.yar.clear(mcmsContextCacheKey)
       request.yar.flash(mcmsContextCacheKey, { ...value, iatQueryString })
     }
   }

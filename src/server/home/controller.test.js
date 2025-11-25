@@ -5,6 +5,9 @@ import { routes } from '#src/server/common/constants/routes.js'
 import { setupTestServer } from '#tests/integration/shared/test-setup-helpers.js'
 import { makeGetRequest } from '#src/server/test-helpers/server-requests.js'
 import { clearExemptionCache } from '#src/server/common/helpers/session-cache/utils.js'
+import { cacheMcmsContextFromQueryParams } from '#src/server/common/helpers/mcms-context/cache-mcms-context.js'
+
+vi.mock('#src/server/common/helpers/mcms-context/cache-mcms-context.js')
 
 vi.mock(
   '~/src/server/common/helpers/session-cache/utils.js',
@@ -20,7 +23,7 @@ vi.mock(
 describe('#homeController', () => {
   const getServer = setupTestServer()
 
-  test('Should redirect to exemption and clear exemption cache when no referer header', async () => {
+  test('Should redirect to exemption, clear exemption cache and cache MCMS context when no referer header', async () => {
     const { headers, statusCode } = await makeGetRequest({
       server: getServer(),
       url: '/'
@@ -31,6 +34,7 @@ describe('#homeController', () => {
       expect.any(Object),
       expect.any(Object)
     )
+    expect(cacheMcmsContextFromQueryParams).toHaveBeenCalled()
   })
 
   test('Should redirect to dashboard when coming from account management page', async () => {

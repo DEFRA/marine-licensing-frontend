@@ -22,6 +22,7 @@ export const createSessionStrategy = (server) => {
     },
     keepAlive: true,
     redirectTo: (request) => {
+      // in case the user is not logged in and comes from the IAT tool / MCMS
       cacheMcmsContextFromQueryParams(request)
       request.yar.flash(redirectPathCacheKey, request.path, true)
       return isEntraIdRoute(request.path) ? routes.SIGNIN_ENTRA : routes.SIGNIN

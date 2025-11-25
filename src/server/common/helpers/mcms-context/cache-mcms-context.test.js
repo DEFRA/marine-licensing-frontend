@@ -23,7 +23,8 @@ describe('Cache / get MCMS context', () => {
         }
       },
       yar: {
-        flash: vi.fn()
+        flash: vi.fn(),
+        clear: vi.fn()
       },
       logger: {
         info: logInfo
@@ -44,7 +45,7 @@ describe('Cache / get MCMS context', () => {
           pdfDownloadUrl: mcmsAnswersDownloadUrl
         }
       })
-
+      expect(mockRequest.yar.clear).toHaveBeenCalledWith('mcmsContext')
       expect(mockRequest.yar.flash).toHaveBeenCalledWith('mcmsContext', {
         activityType: 'INCINERATION',
         article: '34',

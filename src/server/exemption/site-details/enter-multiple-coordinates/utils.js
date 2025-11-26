@@ -5,6 +5,7 @@ import {
 import { routes } from '#src/server/common/constants/routes.js'
 import { getExemptionCache } from '#src/server/common/helpers/session-cache/utils.js'
 import { generatePointSpecificErrorMessage } from '#src/server/common/helpers/site-details.js'
+import { getCancelLink } from '#src/server/exemption/site-details/utils/cancel-link.js'
 
 // ============================================================================
 // CONSTANTS AND CONFIGURATION
@@ -26,7 +27,8 @@ export const multipleCoordinatesPageData = {
     'Enter multiple sets of coordinates to mark the boundary of the site',
   pageTitle:
     'Enter multiple sets of coordinates to mark the boundary of the site',
-  backLink: routes.COORDINATE_SYSTEM_CHOICE
+  backLink: routes.COORDINATE_SYSTEM_CHOICE,
+  cancelLink: getCancelLink()
 }
 
 export const COORDINATE_FIELDS = {

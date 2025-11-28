@@ -17,6 +17,7 @@ export const cacheMcmsContextFromQueryParams = (request) => {
   }
 }
 
+// retrieve the value and clear the cache
 export const getMcmsContextFromCache = (request) => {
   const cachedParams = request.yar.flash(mcmsContextCacheKey)
   if (!cachedParams?.length) {

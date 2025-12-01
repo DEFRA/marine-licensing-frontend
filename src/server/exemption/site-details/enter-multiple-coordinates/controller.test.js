@@ -10,24 +10,13 @@ import { routes } from '#src/server/common/constants/routes.js'
 import { updateExemptionSiteDetails } from '#src/server/common/helpers/session-cache/utils.js'
 import {
   MULTIPLE_COORDINATES_VIEW_ROUTES,
-  multipleCoordinatesPageData,
-  handleValidationFailure
+  multipleCoordinatesPageData
 } from '#src/server/exemption/site-details/enter-multiple-coordinates/utils.js'
 import { mockSite, createMockRequest } from '#src/server/test-helpers/mocks.js'
 import { saveSiteDetailsToBackend } from '#src/server/common/helpers/save-site-details.js'
 
 vi.mock('~/src/server/common/helpers/session-cache/utils.js')
 vi.mock('~/src/server/common/helpers/save-site-details.js')
-vi.mock(
-  '~/src/server/exemption/site-details/enter-multiple-coordinates/utils.js',
-  async (importOriginal) => {
-    const mod = await importOriginal()
-    return {
-      ...mod,
-      handleValidationFailure: vi.fn()
-    }
-  }
-)
 
 describe('#multipleCoordinates', () => {
   let getExemptionCacheSpy
@@ -71,22 +60,6 @@ describe('#multipleCoordinates', () => {
     getCoordinateSystemSpy = vi
       .spyOn(coordinateUtils, 'getCoordinateSystem')
       .mockReturnValue({ coordinateSystem: COORDINATE_SYSTEMS.WGS84 })
-
-    handleValidationFailure.mockImplementation((request, h) => {
-      const mockViewResult = {
-        takeover: vi.fn()
-      }
-      h.view.mockReturnValue(mockViewResult)
-      return h
-        .view(MULTIPLE_COORDINATES_VIEW_ROUTES[COORDINATE_SYSTEMS.WGS84], {
-          heading:
-            'Enter multiple sets of coordinates to mark the boundary of the site',
-          backLink: routes.COORDINATE_SYSTEM_CHOICE,
-          coordinates: expect.any(Array),
-          projectName: mockExemption.projectName
-        })
-        .takeover()
-    })
   })
 
   describe('#multipleCoordinatesController', () => {
@@ -245,7 +218,7 @@ describe('#multipleCoordinates', () => {
       expect(mockH.redirect).toHaveBeenCalledWith(routes.REVIEW_SITE_DETAILS)
     })
 
-    test('should handle validation errors by calling handleValidationFailure', () => {
+    test('should handle validation errors by rendering the view with errors', () => {
       const payload = {
         'coordinates[0][latitude]': 'invalid'
       }
@@ -253,59 +226,50 @@ describe('#multipleCoordinates', () => {
 
       multipleCoordinatesSubmitController.handler(request, mockH)
 
-      expect(handleValidationFailure).toHaveBeenCalledWith(
-        request,
-        mockH,
+      expect(mockH.view).toHaveBeenCalledWith(
+        MULTIPLE_COORDINATES_VIEW_ROUTES[COORDINATE_SYSTEMS.WGS84],
         {
-          _original: {
-            coordinates: [
-              {
-                latitude: 'invalid',
-                longitude: ''
-              }
-            ],
-            id: 'test-exemption-id'
-          },
-          details: [
+          backLink: '/exemption/what-coordinate-system',
+          cancelLink: '/exemption/task-list?cancel=site-details',
+          heading:
+            'Enter multiple sets of coordinates to mark the boundary of the site',
+          pageTitle:
+            'Enter multiple sets of coordinates to mark the boundary of the site',
+          projectName: 'Test Project',
+          coordinates: [
             {
-              context: {
-                key: 'latitude',
-                label: 'coordinates[0].latitude',
-                value: 'invalid'
-              },
-              message: 'Latitude must be a number',
-              path: ['coordinates[0][latitude]'],
-              type: 'string.pattern.base'
-            },
-            {
-              context: {
-                key: 'longitude',
-                label: 'coordinates[0].longitude',
-                value: ''
-              },
-              message: 'Enter the longitude',
-              path: ['coordinates[0][longitude]'],
-              type: 'string.empty'
-            },
-            {
-              context: {
-                key: 'coordinates',
-                label: 'coordinates',
-                limit: 3,
-                value: [
-                  {
-                    latitude: 'invalid',
-                    longitude: ''
-                  }
-                ]
-              },
-              message: 'You must provide at least 3 coordinate points',
-              path: ['coordinates'],
-              type: 'array.min'
+              latitude: 'invalid',
+              longitude: ''
             }
-          ]
-        },
-        COORDINATE_SYSTEMS.WGS84
+          ],
+          errorSummary: [
+            {
+              href: '#coordinates-0-latitude',
+              text: 'Latitude of start and end point must be a number'
+            },
+            {
+              href: '#coordinates-0-longitude',
+              text: 'Enter the longitude of start and end point'
+            },
+            {
+              href: '#coordinates',
+              text: 'You must provide at least 3 coordinate points'
+            }
+          ],
+          errors: {
+            coordinates: {
+              text: 'You must provide at least 3 coordinate points'
+            },
+
+            coordinates0latitude: {
+              text: 'Latitude of start and end point must be a number'
+            },
+
+            coordinates0longitude: {
+              text: 'Enter the longitude of start and end point'
+            }
+          }
+        }
       )
     })
 
@@ -607,7 +571,49 @@ describe('#multipleCoordinates', () => {
 
       await multipleCoordinatesSubmitController.handler(request, mockH)
 
-      expect(handleValidationFailure).toHaveBeenCalled()
+      expect(mockH.view).toHaveBeenCalledWith(
+        MULTIPLE_COORDINATES_VIEW_ROUTES[COORDINATE_SYSTEMS.WGS84],
+        {
+          backLink: '/exemption/what-coordinate-system',
+          cancelLink: '/exemption/task-list?cancel=site-details',
+          coordinates: [
+            {
+              latitude: 'invalid',
+              longitude: ''
+            }
+          ],
+          errorSummary: [
+            {
+              href: '#coordinates-0-latitude',
+              text: 'Latitude of start and end point must be a number'
+            },
+            {
+              href: '#coordinates-0-longitude',
+              text: 'Enter the longitude of start and end point'
+            },
+            {
+              href: '#coordinates',
+              text: 'You must provide at least 3 coordinate points'
+            }
+          ],
+          errors: {
+            coordinates: {
+              text: 'You must provide at least 3 coordinate points'
+            },
+            coordinates0latitude: {
+              text: 'Latitude of start and end point must be a number'
+            },
+            coordinates0longitude: {
+              text: 'Enter the longitude of start and end point'
+            }
+          },
+          heading:
+            'Enter multiple sets of coordinates to mark the boundary of the site',
+          pageTitle:
+            'Enter multiple sets of coordinates to mark the boundary of the site',
+          projectName: 'Test Project'
+        }
+      )
     })
   })
 })

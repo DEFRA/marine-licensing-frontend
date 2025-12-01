@@ -7,7 +7,8 @@ import {
   validateSiteLocation,
   validateActivityDetails,
   validateSiteDetails,
-  validatePublicRegister
+  validatePublicRegister,
+  validateAnySummaryCardsMissing
 } from '../shared/summary-card-validators.js'
 import { validateReadOnlyBehavior } from '../shared/dom-helpers.js'
 import {
@@ -46,6 +47,7 @@ describe('View Details - Content Verification Integration Tests', () => {
 
       validatePageStructure(document, expectedPageContent)
       validateAllSummaryCardsExist(document, expectedPageContent)
+      validateAnySummaryCardsMissing(document, expectedPageContent)
       validateProjectDetails(document, expectedPageContent)
       validateSiteLocation(document, expectedPageContent)
       validateActivityDetails(document, expectedPageContent)

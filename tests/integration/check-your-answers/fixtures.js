@@ -1,3 +1,5 @@
+import { mockExemptionMcmsContext } from '~/src/server/test-helpers/mocks.js'
+
 const baseExemption = {
   id: 'test-exemption-123',
   projectName: 'Hammersmith pontoon construction',
@@ -46,7 +48,7 @@ const baseExemption = {
 
 export const testScenarios = [
   {
-    name: 'Shapefile upload',
+    name: 'Shapefile upload with MCMS context',
     exemption: {
       ...baseExemption,
       siteDetails: [
@@ -58,7 +60,8 @@ export const testScenarios = [
             filename: 'Cavendish_Dock_Boundary_Polygon_WGS84.zip'
           }
         }
-      ]
+      ],
+      mcmsContext: mockExemptionMcmsContext
     },
     expectedPageContent: {
       pageTitle: 'Check your answers before sending your information',
@@ -72,6 +75,8 @@ export const testScenarios = [
       projectDetails: {
         'Project name': 'Hammersmith pontoon construction',
         'Type of activity': 'Deposit of a substance or object',
+        'The purpose of the activity':
+          'Scientific instruments and associated equipment',
         'Why this activity is exempt':
           "Based on your answers from 'Check if you need a marine licence', your activity is exempt under Article 17 of the Marine Licensing (Exempted Activities) Order 2011 (opens in new tab)",
         "Your answers from 'Check if you need a marine licence'": [

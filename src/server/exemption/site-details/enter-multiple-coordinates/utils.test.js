@@ -229,7 +229,8 @@ describe('enter-multiple-coordinates utils', () => {
           'Enter multiple sets of coordinates to mark the boundary of the site',
         pageTitle:
           'Enter multiple sets of coordinates to mark the boundary of the site',
-        backLink: routes.COORDINATE_SYSTEM_CHOICE
+        backLink: routes.COORDINATE_SYSTEM_CHOICE,
+        cancelLink: '/exemption/task-list?cancel=site-details'
       })
     })
   })

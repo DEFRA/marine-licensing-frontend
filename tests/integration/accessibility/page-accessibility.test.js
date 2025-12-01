@@ -38,7 +38,7 @@ describe('Page accessibility checks (Axe)', () => {
   })
 
   const pages = [
-    { url: routes.DASHBOARD, title: 'Your projects' },
+    { url: routes.DASHBOARD, title: 'Projects' },
     { url: routes.TASK_LIST, title: 'Task list' },
     { url: routes.PROJECT_NAME, title: 'Project name' },
     { url: routes.SITE_DETAILS, title: 'Site details' },

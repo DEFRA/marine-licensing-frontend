@@ -29,7 +29,7 @@ describe('#utils', () => {
     config.get.mockImplementation(() => ({
       clientId: 'test-client-id',
       clientSecret: 'test-client-secret',
-      scopes: 'test-scopes',
+      scopes: ['test-scopes'],
       redirectUrl: 'http://test-redirect-url'
     }))
 

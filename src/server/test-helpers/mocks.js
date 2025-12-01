@@ -20,7 +20,8 @@ export const mockExemptionMcmsContext = {
     subType: 'scientificResearch'
   },
   articleCode: '17',
-  pdfDownloadUrl: mcmsAnswersDownloadUrl
+  pdfDownloadUrl: mcmsAnswersDownloadUrl,
+  iatQueryString: '?activity=DEPOSIT&articleCode=17'
 }
 
 export const mockExemption = {

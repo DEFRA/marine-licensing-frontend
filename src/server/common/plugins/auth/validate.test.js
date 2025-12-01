@@ -27,7 +27,11 @@ describe('validateUserSession', () => {
 
   beforeEach(() => {
     mockRequest = {
-      path: '/'
+      path: '/',
+      logger: {
+        info: vi.fn(),
+        error: vi.fn()
+      }
     }
 
     mockSession = {
@@ -135,6 +139,152 @@ describe('validateUserSession', () => {
       mockSession
     )
     expect(authUtils.updateUserSession).not.toHaveBeenCalled()
+  })
+
+  describe('When token has expired and refresh throws an error', () => {
+    beforeEach(() => {
+      authUtils.getUserSession.mockResolvedValue(mockUserSession)
+      isPast.mockReturnValue(true)
+    })
+
+    test('error with name property', async () => {
+      const mockError = new Error('Network error')
+      mockError.name = 'NetworkError'
+      mockError.stack = 'Error: Network error\n    at refreshAccessToken'
+
+      authUtils.refreshAccessToken.mockRejectedValue(mockError)
+
+      const result = await validateUserSession(mockRequest, mockSession)
+
+      expect(result).toEqual({ isValid: false })
+      expect(authUtils.refreshAccessToken).toHaveBeenCalledWith(
+        mockRequest,
+        mockSession
+      )
+      expect(authUtils.removeUserSession).toHaveBeenCalledWith(
+        mockRequest,
+        mockSession
+      )
+      expect(authUtils.updateUserSession).not.toHaveBeenCalled()
+      expect(mockRequest.logger.error).toHaveBeenCalledWith(
+        {
+          error: {
+            message: 'Network error',
+            stack_trace: 'Error: Network error\n    at refreshAccessToken',
+            type: 'NetworkError'
+          }
+        },
+        'refresh rejection error'
+      )
+    })
+
+    test('error without name but with constructor.name', async () => {
+      class CustomError extends Error {
+        constructor(message) {
+          super(message)
+          this.message = message
+        }
+      }
+      const mockError = new CustomError('Custom error message')
+      mockError.stack =
+        'CustomError: Custom error message\n    at refreshAccessToken'
+
+      authUtils.refreshAccessToken.mockRejectedValue(mockError)
+
+      const result = await validateUserSession(mockRequest, mockSession)
+
+      expect(result).toEqual({ isValid: false })
+      expect(authUtils.removeUserSession).toHaveBeenCalledWith(
+        mockRequest,
+        mockSession
+      )
+      expect(mockRequest.logger.error).toHaveBeenCalledWith(
+        {
+          error: {
+            message: 'Custom error message',
+            stack_trace:
+              'CustomError: Custom error message\n    at refreshAccessToken',
+            type: 'Error'
+          }
+        },
+        'refresh rejection error'
+      )
+    })
+
+    test('error without name or constructor.name', async () => {
+      const mockError = Object.create(null)
+      mockError.message = 'Some error'
+
+      authUtils.refreshAccessToken.mockRejectedValue(mockError)
+
+      const result = await validateUserSession(mockRequest, mockSession)
+
+      expect(result).toEqual({ isValid: false })
+      expect(authUtils.removeUserSession).toHaveBeenCalledWith(
+        mockRequest,
+        mockSession
+      )
+      expect(mockRequest.logger.error).toHaveBeenCalledWith(
+        {
+          error: {
+            message: 'Some error',
+            stack_trace: undefined,
+            type: 'UnhandledRejection'
+          }
+        },
+        'refresh rejection error'
+      )
+    })
+
+    test('error without message uses String(error)', async () => {
+      const mockError = 'String error without message property'
+
+      authUtils.refreshAccessToken.mockRejectedValue(mockError)
+
+      const result = await validateUserSession(mockRequest, mockSession)
+
+      expect(result).toEqual({ isValid: false })
+      expect(authUtils.removeUserSession).toHaveBeenCalledWith(
+        mockRequest,
+        mockSession
+      )
+      expect(mockRequest.logger.error).toHaveBeenCalledWith(
+        {
+          error: {
+            message: 'String error without message property',
+            stack_trace: undefined,
+            type: 'String'
+          }
+        },
+        'refresh rejection error'
+      )
+    })
+
+    test('error without stack trace', async () => {
+      const mockError = new Error('Error without stack')
+      mockError.name = 'TestError'
+      delete mockError.stack
+
+      authUtils.refreshAccessToken.mockRejectedValue(mockError)
+
+      const result = await validateUserSession(mockRequest, mockSession)
+
+      expect(result).toEqual({ isValid: false })
+      expect(authUtils.removeUserSession).toHaveBeenCalledWith(
+        mockRequest,
+        mockSession
+      )
+      expect(mockRequest.logger.error).toHaveBeenCalledWith(
+        {
+          error: {
+            message: 'Error without stack',
+            stack_trace: undefined,
+            type: 'TestError'
+          }
+        },
+        'refresh rejection error'
+      )
+    })
   })
 
   describe('auth strategies', () => {

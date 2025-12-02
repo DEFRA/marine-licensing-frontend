@@ -36,17 +36,6 @@ describe('#homeController', () => {
     expect(cacheMcmsContextFromQueryParams).toHaveBeenCalled()
   })
 
-  test('should redirect to new exemption if an already signed in user has come to / path with a IAT query string', async () => {
-    const { headers, statusCode } = await makeGetRequest({
-      url: '/?ACTIVITY_TYPE=deposit',
-      server: getServer()
-    })
-    expect(statusCode).toBe(statusCodes.redirect)
-    expect(headers.location).toBe('/exemption')
-    expect(clearExemptionCache).toHaveBeenCalled()
-    expect(cacheMcmsContextFromQueryParams).toHaveBeenCalled()
-  })
-
   test("should go to new exemption and cache MCMS if there's a IAT query string", async () => {
     const { headers, statusCode } = await makeGetRequest({
       url: '/?ACTIVITY_TYPE=deposit',

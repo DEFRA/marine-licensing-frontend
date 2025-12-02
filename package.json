@@ -51,7 +51,7 @@
     "@hapi/vision": "^7.0.3",
     "@hapi/wreck": "^18.1.0",
     "@hapi/yar": "^11.0.3",
-    "@microsoft/clarity": "^1.0.0",
+    "@microsoft/clarity": "^1.0.2",
     "@ministryofjustice/frontend": "^7.1.0",
     "aws-embedded-metrics": "^4.2.1",
     "convict": "^6.2.4",

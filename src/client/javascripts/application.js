@@ -14,10 +14,6 @@ import {
 import { AddAnotherPoint } from './add-another-point/index.js'
 import { SiteDetailsMap } from './site-details-map/index.js'
 
-// Initialize error tracking
-const errorTracking = new ErrorTracking()
-errorTracking.init()
-
 createAll(Button)
 createAll(Checkboxes)
 createAll(ErrorSummary)
@@ -41,6 +37,10 @@ function syncClarityConsent() {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
+  if (globalThis.ENABLE_BROWSER_LOGGING) {
+    const errorTracking = new ErrorTracking()
+    errorTracking.init()
+  }
   if (globalThis.CLARITY_PROJECT_ID) {
     Clarity.init(globalThis.CLARITY_PROJECT_ID)
     syncClarityConsent()

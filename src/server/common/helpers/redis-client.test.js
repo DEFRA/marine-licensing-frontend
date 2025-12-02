@@ -37,9 +37,8 @@ beforeEach(async () => {
   Redis = ioredis.Redis
   Cluster = ioredis.Cluster
 
-  const redisClientModule = await import(
-    '~/src/server/common/helpers/redis-client.js'
-  )
+  const redisClientModule =
+    await import('~/src/server/common/helpers/redis-client.js')
   buildRedisClient = redisClientModule.buildRedisClient
 })
 

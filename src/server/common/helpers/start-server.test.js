@@ -35,9 +35,8 @@ describe('#startServer', () => {
   beforeAll(async () => {
     vi.stubEnv('PORT', '3097')
 
-    startServerImport = await import(
-      '~/src/server/common/helpers/start-server.js'
-    )
+    startServerImport =
+      await import('~/src/server/common/helpers/start-server.js')
   })
 
   afterAll(() => {

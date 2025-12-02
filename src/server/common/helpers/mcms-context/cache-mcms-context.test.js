@@ -77,6 +77,7 @@ describe('Cache / get MCMS context', () => {
       cacheMcmsContextFromQueryParams(mockRequest)
 
       expect(mockRequest.yar.flash).not.toHaveBeenCalled()
+      expect(logInfo).not.toHaveBeenCalled()
     })
 
     it('should not cache MCMS context if no querystring', () => {

@@ -22,9 +22,25 @@ const formatters = {
 }
 export const loggerOptions = {
   enabled: logConfig.enabled,
-  ignoreFunc: (_options, request) =>
-    request.path.startsWith('/public/') ||
-    ['/health', '/favicon.ico'].includes(request.path),
+  ignoreFunc: (_options, request) => {
+    if (request.path.startsWith('/public/')) {
+      return true
+    }
+
+    if (['/health', '/favicon.ico'].includes(request.path)) {
+      return true
+    }
+
+    // Browser logs will ordinarily generate two log entries: a) the line we deliberately output using
+    // request.logger.info(), and b) the standard (uninteresting) log to indicate a what URL was hit that has the
+    // payload for the logs.  This drops the uninteresting line and keeps the line with the error message which
+    // is the one that doesn't have a payload on the request obj.  This may seem slightly counter-intuitive.
+    if (request.path === '/api/browser-logs' && request.payload !== undefined) {
+      return true
+    }
+
+    return false
+  },
   redact: {
     paths: logConfig.redact,
     remove: true

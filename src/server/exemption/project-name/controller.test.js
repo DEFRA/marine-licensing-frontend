@@ -34,6 +34,8 @@ describe('#projectName', () => {
       .spyOn(cacheUtils, 'getExemptionCache')
       .mockReturnValue(mockExemptionState)
 
+    vi.spyOn(cacheUtils, 'setExemptionCache').mockResolvedValue()
+
     vi.spyOn(authUtils, 'getUserSession').mockResolvedValue({
       organisationId: 'test-org-id',
       organisationName: 'Test Organisation Ltd'
@@ -41,13 +43,28 @@ describe('#projectName', () => {
   })
 
   describe('#projectNameController', () => {
-    test('Should return success response code', async () => {
+    test('Should return success response code for an existing exemption', async () => {
+      getExemptionCacheSpy.mockReturnValueOnce({
+        projectName: 'Test Project',
+        id: 'test-id'
+      })
       const { statusCode } = await makeGetRequest({
         server: getServer(),
         url: routes.PROJECT_NAME
       })
 
       expect(statusCode).toBe(statusCodes.ok)
+    })
+
+    test('should redirect to dashboard if a new exemption with no MCMS context in the request cache', async () => {
+      getExemptionCacheSpy.mockReturnValueOnce({})
+      const { statusCode, headers } = await makeGetRequest({
+        server: getServer(),
+        url: routes.PROJECT_NAME
+      })
+
+      expect(statusCode).toBe(statusCodes.redirect)
+      expect(headers.location).toBe(routes.DASHBOARD)
     })
   })
 
@@ -336,7 +353,8 @@ describe('#projectName', () => {
       const mockRequest = {
         payload: { projectName: 'Project name' },
         yar: {
-          flash: vi.fn().mockReturnValue([])
+          get: vi.fn().mockReturnValue([]),
+          clear: vi.fn()
         },
         url: 'http://example.com/project-name',
         logger: { info: vi.fn() }
@@ -365,7 +383,8 @@ describe('#projectName', () => {
       const mockRequest = {
         payload: { projectName: 'Project name' },
         yar: {
-          flash: vi.fn().mockReturnValue([mockMcmsContext])
+          get: vi.fn().mockReturnValue(mockMcmsContext),
+          clear: vi.fn()
         }
       }
 
@@ -384,20 +403,25 @@ describe('#projectName', () => {
       })
     })
 
-    test('Should handle missing MCMS context when creating a new exemption', async () => {
+    test('Should not clear MCMS context if an error occurs when creating a new exemption', async () => {
       const h = { redirect: vi.fn() }
       const mockRequest = {
         payload: { projectName: 'Project name' },
         yar: {
-          flash: vi.fn().mockReturnValue([])
+          get: vi.fn().mockReturnValue([]),
+          clear: vi.fn()
         },
         url: 'http://example.com/project-name',
         logger: { info: vi.fn() }
       }
+      vi.spyOn(authRequests, 'authenticatedPostRequest').mockRejectedValue(
+        new Error('API error')
+      )
+      await expect(() =>
+        projectNameSubmitController.handler(mockRequest, h)
+      ).rejects.toThrow()
 
-      await projectNameSubmitController.handler(mockRequest, h)
-
-      expect(mockRequest.yar.flash).toHaveBeenCalledWith('mcmsContext')
+      expect(mockRequest.yar.clear).not.toHaveBeenCalled()
     })
 
     test('Should handle missing organisation data when creating a new exemption', async () => {

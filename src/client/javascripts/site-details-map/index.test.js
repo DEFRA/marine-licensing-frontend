@@ -74,38 +74,46 @@ describe('SiteDetailsMap', () => {
 
     mockModuleLoader = {
       loadModules: vi.fn().mockResolvedValue({
-        OpenLayersMap: vi.fn(),
-        View: vi.fn(),
-        TileLayer: vi.fn(),
-        OSM: vi.fn(),
-        VectorLayer: vi.fn(),
-        VectorSource: vi.fn(),
-        Feature: vi.fn(),
-        Point: vi.fn(),
-        Polygon: vi.fn(),
-        Style: vi.fn(),
-        Fill: vi.fn(),
-        Stroke: vi.fn(),
-        Circle: vi.fn(),
+        OpenLayersMap: vi.fn(function () {}),
+        View: vi.fn(function () {}),
+        TileLayer: vi.fn(function () {}),
+        OSM: vi.fn(function () {}),
+        VectorLayer: vi.fn(function () {}),
+        VectorSource: vi.fn(function () {}),
+        Feature: vi.fn(function () {}),
+        Point: vi.fn(function () {}),
+        Polygon: vi.fn(function () {}),
+        Style: vi.fn(function () {}),
+        Fill: vi.fn(function () {}),
+        Stroke: vi.fn(function () {}),
+        Circle: vi.fn(function () {}),
         fromLonLat: vi.fn(),
         toLonLat: vi.fn(),
-        GeoJSON: vi.fn(),
-        Attribution: vi.fn(),
+        GeoJSON: vi.fn(function () {}),
+        Attribution: vi.fn(function () {}),
         defaultControls: vi.fn()
       })
     }
 
-    SiteDataLoader.mockImplementation(() => mockDataLoader)
-    SiteVisualiser.mockImplementation(() => mockSiteVisualiser)
-    MapFactory.mockImplementation(() => ({
-      createMapLayers: vi.fn().mockReturnValue({
-        vectorSource: {},
-        vectorLayer: {}
-      }),
-      initialiseGeoJSONFormat: vi.fn().mockReturnValue({}),
-      createMap: vi.fn().mockReturnValue({})
-    }))
-    OpenLayersModuleLoader.mockImplementation(() => mockModuleLoader)
+    SiteDataLoader.mockImplementation(function () {
+      return mockDataLoader
+    })
+    SiteVisualiser.mockImplementation(function () {
+      return mockSiteVisualiser
+    })
+    MapFactory.mockImplementation(function () {
+      return {
+        createMapLayers: vi.fn().mockReturnValue({
+          vectorSource: {},
+          vectorLayer: {}
+        }),
+        initialiseGeoJSONFormat: vi.fn().mockReturnValue({}),
+        createMap: vi.fn().mockReturnValue({})
+      }
+    })
+    OpenLayersModuleLoader.mockImplementation(function () {
+      return mockModuleLoader
+    })
   })
 
   describe('constructor', () => {
@@ -338,23 +346,23 @@ describe('SiteDetailsMap', () => {
 
       const customModuleLoader = {
         loadModules: vi.fn().mockResolvedValue({
-          OpenLayersMap: vi.fn(),
-          View: vi.fn(),
-          TileLayer: vi.fn(),
-          OSM: vi.fn(),
-          VectorLayer: vi.fn(),
-          VectorSource: vi.fn(),
-          Feature: vi.fn(),
-          Point: vi.fn(),
-          Polygon: vi.fn(),
-          Style: vi.fn(),
-          Fill: vi.fn(),
-          Stroke: vi.fn(),
-          Circle: vi.fn(),
+          OpenLayersMap: vi.fn(function () {}),
+          View: vi.fn(function () {}),
+          TileLayer: vi.fn(function () {}),
+          OSM: vi.fn(function () {}),
+          VectorLayer: vi.fn(function () {}),
+          VectorSource: vi.fn(function () {}),
+          Feature: vi.fn(function () {}),
+          Point: vi.fn(function () {}),
+          Polygon: vi.fn(function () {}),
+          Style: vi.fn(function () {}),
+          Fill: vi.fn(function () {}),
+          Stroke: vi.fn(function () {}),
+          Circle: vi.fn(function () {}),
           fromLonLat: vi.fn(),
           toLonLat: vi.fn(),
-          GeoJSON: vi.fn(),
-          Attribution: vi.fn(),
+          GeoJSON: vi.fn(function () {}),
+          Attribution: vi.fn(function () {}),
           defaultControls: vi.fn()
         })
       }

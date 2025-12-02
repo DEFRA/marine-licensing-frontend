@@ -13,7 +13,10 @@ import {
 import { routes } from '#src/server/common/constants/routes.js'
 
 import joi from 'joi'
-import { getMcmsContextFromCache } from '#src/server/common/helpers/mcms-context/cache-mcms-context.js'
+import {
+  isMcmsContextInCache,
+  getMcmsContextFromCache
+} from '#src/server/common/helpers/mcms-context/cache-mcms-context.js'
 import { getUserSession } from '#src/server/common/plugins/auth/utils.js'
 
 const errorMessages = {
@@ -32,9 +35,16 @@ const projectNameViewSettings = {
   pageTitle: 'Project name',
   heading: 'Project Name'
 }
+
 export const projectNameController = {
   handler(request, h) {
     const exemption = getExemptionCache(request)
+
+    // if it's a new exemption (rather than editing an existing one), and
+    // there's no MCMS context in the cache, redirect to the dashboard page
+    if (!exemption.id && !isMcmsContextInCache(request)) {
+      return h.redirect(routes.DASHBOARD)
+    }
 
     const backLink = getBackLink(request)
 

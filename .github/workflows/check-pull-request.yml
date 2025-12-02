@@ -66,7 +66,7 @@ jobs:
       - name: Run npm audit and fail on high/critical vulnerabilities
         run: |
           npm ci
-          npm audit --audit-level=high --production
+          npm audit --audit-level=high || (echo 'Vulnerabilities found!' && exit 1)
 
   test-journey:
     name: Run Journey Tests

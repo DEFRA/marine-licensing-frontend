@@ -25,6 +25,7 @@
     "lint:scss": "stylelint \"src/**/*.scss\" --cache --cache-location .cache/stylelint --cache-strategy content --color --ignore-path .gitignore",
     "postversion": "git add package.json package-lock.json && git commit -m $npm_package_version",
     "test": "TZ=UTC vitest run --coverage",
+    "test:ci": "CI=true TZ=UTC vitest run --coverage",
     "test:watch": "TZ=UTC vitest",
     "test:integration:allure": "npx vitest run tests/ --coverage=false && npx allure generate allure-results --single-file --clean --name marine-licensing-dom-testing-library-tests",
     "server:watch": "nodemon --inspect=0.0.0.0 --ext js,json --legacy-watch ./src",

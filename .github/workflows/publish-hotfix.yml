@@ -32,7 +32,7 @@ jobs:
           npm run build
           npm run format:check
           npm run lint
-          npm test
+          npm run test:ci
 
       - name: Publish Hot Fix
         uses: DEFRA/cdp-build-action/build-hotfix@main

@@ -34,6 +34,11 @@ jobs:
           npm run format:check
           npm run lint
           npm test
+      
+      - name: Security audit
+        run: |
+          npm ci
+          npm audit --audit-level=high || (echo 'Vulnerabilities found!' && exit 1)
 
       - name: Test Docker Image Build
         run: |
@@ -63,10 +68,7 @@ jobs:
         with:
           node-version-file: .nvmrc
           cache: npm
-      - name: Run npm audit and fail on high/critical vulnerabilities
-        run: |
-          npm ci
-          npm audit --audit-level=high --production || (echo 'Vulnerabilities found!' && exit 1)
+      
 
   security:
       name: Snyk Security Scan

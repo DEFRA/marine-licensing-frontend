@@ -408,7 +408,7 @@ export const config = convict({
     format: ['local', 'dev', 'test', 'perf-test', 'ext-test', 'prod'],
     default: process.env.ENVIRONMENT ?? 'local'
   },
-  browserLogging: {
+  enableBrowserLogging: {
     doc: 'Enable / disable browser logging in the browser and at the api level',
     format: Boolean,
     default: true,

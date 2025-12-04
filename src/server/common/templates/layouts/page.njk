@@ -22,7 +22,7 @@
       window.ANALYTICS_ENABLED = {{ analyticsEnabled | dump }};
       {% endif %}
       {% if enableBrowserLogging %}
-      window.ENABLE_BROWSER_LOGGING = "{{ enableBrowserLogging }}";
+      window.ENABLE_BROWSER_LOGGING = {{ enableBrowserLogging }};
       {% endif %}
     </script>
   {% endif %}

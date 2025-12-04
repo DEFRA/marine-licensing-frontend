@@ -2,8 +2,14 @@ import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { browserLogsController } from './controller.js'
 import { statusCodes } from '#src/server/common/constants/status-codes.js'
 import * as ecsTransformer from '#src/server/browser-logs/ecs-transformer.js'
+import { config } from '#src/config/config.js'
 
 vi.mock('#src/server/browser-logs/ecs-transformer.js')
+vi.mock('#src/config/config.js', () => ({
+  config: {
+    get: vi.fn()
+  }
+}))
 
 const createMockRequest = (overrides = {}) => ({
   payload: {},
@@ -12,6 +18,9 @@ const createMockRequest = (overrides = {}) => ({
     warn: vi.fn(),
     info: vi.fn(),
     debug: vi.fn()
+  },
+  auth: {
+    isAuthenticated: true
   },
   ...overrides
 })
@@ -115,11 +124,18 @@ describe('browserLogsController', () => {
     mockRequest = createMockRequest()
     mockH = createMockH()
     mockResponse = mockH.response()
+
+    // Enable browser logging by default for tests
+    config.get.mockReturnValue(true)
   })
 
   describe('controller options', () => {
     it('should disable CSRF protection for sendBeacon requests', () => {
       expect(browserLogsController.options.plugins.crumb).toBe(false)
+    })
+
+    it('should require session authentication', () => {
+      expect(browserLogsController.options.auth).toBe('session')
     })
   })
 
@@ -330,4 +346,24 @@ describe('browserLogsController', () => {
       expect(result).toBe(mockResponse)
     })
   })
+
+  describe('handler - browser logging disabled', () => {
+    beforeEach(() => {
+      config.get.mockReturnValue(false)
+    })
+
+    it('should return 404 when browser logging is disabled', () => {
+      mockRequest.payload = browserEvents.error
+      const result = browserLogsController.handler(mockRequest, mockH)
+
+      expect(ecsTransformer.toEcs).not.toHaveBeenCalled()
+      expect(mockRequest.logger.error).not.toHaveBeenCalled()
+      expect(mockH.response).toHaveBeenCalled()
+      expect(mockResponse.code).toHaveBeenCalledWith(statusCodes.notFound)
+      expect(result).toBe(mockResponse)
+    })
+  })
+
+  // Note: Authentication is handled by Hapi's auth strategy (auth: 'session')
+  // The handler will only be called if the user is already authenticated
 })

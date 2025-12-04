@@ -1,8 +1,10 @@
 import { statusCodes } from '#src/server/common/constants/status-codes.js'
 import { toEcs } from '#src/server/browser-logs/ecs-transformer.js'
+import { config } from '#src/config/config.js'
 
 export const browserLogsController = {
   options: {
+    auth: 'session',
     plugins: {
       crumb: false // Disable CSRF for sendBeacon() requests
     }
@@ -11,6 +13,11 @@ export const browserLogsController = {
    * Logging API endpoint, requires Authentication via cookie
    */
   handler(request, h) {
+    // Check if browser logging is enabled
+    if (!config.get('enableBrowserLogging')) {
+      return h.response().code(statusCodes.notFound)
+    }
+
     try {
       const browserEvent = request.payload
       const ecsLog = toEcs(browserEvent)

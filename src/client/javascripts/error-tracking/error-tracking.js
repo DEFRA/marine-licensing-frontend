@@ -38,7 +38,7 @@ export class ErrorTracking {
     this.config = {
       endpoint: config.endpoint || '/api/browser-logs',
       maxSameError: config.maxSameError || MAX_SAME_ERROR_DEFAULT,
-      burstWindow: config.burstWindow ||  MAX_BURST_WINDOW_MS,
+      burstWindow: config.burstWindow || MAX_BURST_WINDOW_MS,
       maxBurst: config.maxBurst || MAX_BURST_ERRORS,
       // Allow dependency injection for testing
       navigator: config.navigator || globalThis.navigator,

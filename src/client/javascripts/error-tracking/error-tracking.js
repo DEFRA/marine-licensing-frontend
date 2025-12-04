@@ -1,8 +1,32 @@
 /**
  * MAX_SAME_ERROR_DEFAULT: the number of repeated same errors from a single client before suppression.
  * Repeated errors are detected using error fingerprinting.
+ * @type {number}
  */
 const MAX_SAME_ERROR_DEFAULT = 3
+
+/**
+ * MAX_BURST_WINDOW_MS: the time window in order to detect burst errors
+ * @type {number}
+ */
+const MAX_BURST_WINDOW_MS = 10_000
+
+/**
+ * MAX_BURST_ERRORS The maximum number of errors allowed inside of the MAX_BURST_MS time window before logs are supressed
+ * @type {number}
+ */
+const MAX_BURST_ERRORS = 10
+
+/**
+ * @typedef {Object} ErrorEvent
+ * @property {string} type - Error type (js_error, console_error, unhandled_promise)
+ * @property {string} message - Error message
+ * @property {string} [source] - Source file
+ * @property {number} [line] - Line number
+ * @property {number} [col] - Column number
+ * @property {string} [stack] - Stack trace
+ * @property {string} [errorType] - Error constructor name
+ */
 
 /**
  *   Browser error logger
@@ -14,8 +38,8 @@ export class ErrorTracking {
     this.config = {
       endpoint: config.endpoint || '/api/browser-logs',
       maxSameError: config.maxSameError || MAX_SAME_ERROR_DEFAULT,
-      burstWindow: config.burstWindow || 10000, // in milliseconds so 10 seconds
-      maxBurst: config.maxBurst || 10,
+      burstWindow: config.burstWindow ||  MAX_BURST_WINDOW_MS,
+      maxBurst: config.maxBurst || MAX_BURST_ERRORS,
       // Allow dependency injection for testing
       navigator: config.navigator || globalThis.navigator,
       location: config.location || globalThis.location,
@@ -50,6 +74,11 @@ export class ErrorTracking {
 
   /**
    * Handle uncaught JavaScript errors
+   * @param {string} message - Error message
+   * @param {string} source - Source file URL
+   * @param {number} line - Line number
+   * @param {number} col - Column number
+   * @param {Error} error - Error object
    */
   handleError(message, source, line, col, error) {
     this.sendLog({
@@ -106,6 +135,8 @@ export class ErrorTracking {
 
   /**
    * Create unique fingerprint for error deduplication
+   * @param {ErrorEvent} event - The error event to fingerprint
+   * @returns {string} Unique fingerprint for the error
    */
   getErrorFingerprint(event) {
     const type = event.type || 'unknown'
@@ -117,6 +148,7 @@ export class ErrorTracking {
 
   /**
    * Check if error should be logged (deduplication + burst protection)
+   * @param {ErrorEvent} event - The error event to check
    * @returns {boolean} true if should log, false if should suppress
    */
   shouldSendLog(event) {
@@ -159,6 +191,7 @@ export class ErrorTracking {
 
   /**
    * Send error log to backend
+   * @param {ErrorEvent} event - The error event to send
    */
   sendLog(event) {
     if (!this.shouldSendLog(event)) {

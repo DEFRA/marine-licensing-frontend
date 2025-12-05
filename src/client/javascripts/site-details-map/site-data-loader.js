@@ -4,21 +4,25 @@ class SiteDataLoader {
   }
 
   loadSiteDetails() {
-    if (this.mapElement) {
-      // Multi site implementation, will become default eventually
-      const siteDetailsAttr = this.mapElement.getAttribute('data-site-details') // NOSONAR
-      if (siteDetailsAttr) {
-        return JSON.parse(siteDetailsAttr)
+    try {
+      if (this.mapElement) {
+        const siteDetailsAttr =
+          this.mapElement.getAttribute('data-site-details')
+        if (siteDetailsAttr) {
+          return JSON.parse(siteDetailsAttr)
+        }
       }
-    }
 
-    // Fallback for single site only pages
-    const siteDataElement = document.getElementById('site-details-data')
-    if (!siteDataElement) {
+      const siteDataElement = document.getElementById('site-details-data')
+      if (!siteDataElement) {
+        return null
+      }
+
+      return JSON.parse(siteDataElement.textContent)
+    } catch (error) {
+      console.error('Failed to parse site details from DOM:', error)
       return null
     }
-
-    return JSON.parse(siteDataElement.textContent)
   }
 
   hasValidFileCoordinates(siteDetails) {

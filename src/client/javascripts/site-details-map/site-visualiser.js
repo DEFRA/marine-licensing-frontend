@@ -36,49 +36,68 @@ class SiteVisualiser {
   }
 
   displayFileUploadData(geoJSON) {
-    const features = this.featureFactory.createFeaturesFromGeoJSON(
-      this.geoJSONFormat,
-      geoJSON
-    )
+    try {
+      const features = this.featureFactory.createFeaturesFromGeoJSON(
+        this.geoJSONFormat,
+        geoJSON
+      )
 
-    if (features.length === 0) {
-      return
+      if (features.length === 0) {
+        console.error('Map display failed: No features created from GeoJSON')
+        return
+      }
+
+      this.vectorSource.addFeatures(features)
+
+      this.mapViewManager.fitMapToAllFeatures(this.map, this.vectorSource)
+    } catch (error) {
+      console.error('Failed to display file upload data on map:', error)
+      throw error
     }
-
-    this.vectorSource.addFeatures(features)
-
-    this.mapViewManager.fitMapToAllFeatures(this.map, this.vectorSource)
   }
 
   displayManualCoordinates(siteDetails) {
-    const fromLonLat = this.olModules?.fromLonLat
-    if (!fromLonLat) {
-      return 'modules-unavailable'
+    try {
+      const fromLonLat = this.olModules?.fromLonLat
+      if (!fromLonLat) {
+        console.error('Map display failed: OpenLayers modules unavailable')
+        return 'modules-unavailable'
+      }
+
+      const validationResult = this.validateSiteDetailsForDisplay(siteDetails)
+      if (validationResult !== 'valid') {
+        console.error(
+          `Map display failed: Invalid site details - ${validationResult}`
+        )
+        return validationResult
+      }
+
+      const { coordinateSystem, coordinates, circleWidth, coordinatesEntry } =
+        siteDetails
+
+      const mapCoordinates = this.coordinateParser.parseCoordinates(
+        coordinateSystem,
+        coordinates,
+        fromLonLat
+      )
+
+      if (!mapCoordinates) {
+        console.error('Map display failed: Could not parse coordinates', {
+          coordinateSystem,
+          coordinates
+        })
+        return 'invalid-coordinates'
+      }
+
+      return this.displayCoordinatesByType(
+        mapCoordinates,
+        coordinatesEntry,
+        circleWidth
+      )
+    } catch (error) {
+      console.error('Failed to display manual coordinates on map:', error)
+      throw error
     }
-
-    const validationResult = this.validateSiteDetailsForDisplay(siteDetails)
-    if (validationResult !== 'valid') {
-      return validationResult
-    }
-
-    const { coordinateSystem, coordinates, circleWidth, coordinatesEntry } =
-      siteDetails
-
-    const mapCoordinates = this.coordinateParser.parseCoordinates(
-      coordinateSystem,
-      coordinates,
-      fromLonLat
-    )
-
-    if (!mapCoordinates) {
-      return 'invalid-coordinates'
-    }
-
-    return this.displayCoordinatesByType(
-      mapCoordinates,
-      coordinatesEntry,
-      circleWidth
-    )
   }
 
   validateSiteDetailsForDisplay(siteDetails) {

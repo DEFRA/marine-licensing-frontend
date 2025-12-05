@@ -31,7 +31,8 @@ export class SiteDetailsMap extends Component {
 
   scheduleMapInitialisation() {
     setTimeout(() => {
-      this.initialiseMap().catch(() => {
+      this.initialiseMap().catch((error) => {
+        console.error('Site details map initialization failed:', error)
         this.showError()
       })
     }, 0)
@@ -40,11 +41,16 @@ export class SiteDetailsMap extends Component {
   async initialiseMap() {
     const siteDetails = this.dataLoader.loadSiteDetails()
     if (!siteDetails) {
+      console.error('Map initialization failed: No site details found in DOM')
       this.showError()
       return
     }
 
     if (!this.hasValidSiteDetails(siteDetails)) {
+      console.error(
+        'Map initialization failed: Invalid site details',
+        siteDetails
+      )
       this.showError()
       return
     }

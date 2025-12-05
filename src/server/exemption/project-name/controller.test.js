@@ -1,7 +1,10 @@
 import { vi } from 'vitest'
 import { statusCodes } from '#src/server/common/constants/status-codes.js'
 import { routes } from '#src/server/common/constants/routes.js'
-import { mockExemption } from '#src/server/test-helpers/mocks.js'
+import {
+  createMockRequest,
+  mockExemption
+} from '#src/server/test-helpers/mocks.js'
 import { JSDOM } from 'jsdom'
 import {
   projectNameSubmitController,
@@ -380,13 +383,13 @@ describe('#projectName', () => {
         article: '17',
         pdfDownloadUrl: 'https://example.com/test.pdf'
       }
-      const mockRequest = {
+      const mockRequest = createMockRequest({
         payload: { projectName: 'Project name' },
         yar: {
           get: vi.fn().mockReturnValue(mockMcmsContext),
           clear: vi.fn()
         }
-      }
+      })
 
       await projectNameSubmitController.handler(mockRequest, h)
 
@@ -405,15 +408,14 @@ describe('#projectName', () => {
 
     test('Should not clear MCMS context if an error occurs when creating a new exemption', async () => {
       const h = { redirect: vi.fn() }
-      const mockRequest = {
+      const mockRequest = createMockRequest({
         payload: { projectName: 'Project name' },
         yar: {
           get: vi.fn().mockReturnValue([]),
           clear: vi.fn()
         },
-        url: 'http://example.com/project-name',
-        logger: { info: vi.fn() }
-      }
+        url: 'http://example.com/project-name'
+      })
       vi.spyOn(authRequests, 'authenticatedPostRequest').mockRejectedValue(
         new Error('API error')
       )

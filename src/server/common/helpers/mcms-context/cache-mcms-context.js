@@ -30,8 +30,10 @@ export const cacheMcmsContextFromQueryParams = (request) => {
 
 export const getMcmsContextFromCache = (request) => {
   const cachedParams = request.yar.get(mcmsContextCacheKey)
+  request.logger.info(
+    `getMcmsContextFromCache: ${JSON.stringify(cachedParams)}`
+  )
   if (!cachedParams) {
-    request.logger.info(`No MCMS context cached for URL: ${request.url}`)
     return null
   }
   return cachedParams
@@ -40,6 +42,7 @@ export const getMcmsContextFromCache = (request) => {
 // check if there's a value and leave it in cache
 export const isMcmsContextInCache = (request) => {
   const cachedParams = request.yar.get(mcmsContextCacheKey)
+  request.logger.info(`isMcmsContextInCache: ${JSON.stringify(cachedParams)}`)
   return Boolean(cachedParams)
 }
 

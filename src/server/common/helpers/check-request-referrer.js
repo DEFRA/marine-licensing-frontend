@@ -13,13 +13,3 @@ export const isUserReferredFromDefraAccount = (request) => {
   }
   return result
 }
-
-export const isUserReferredFromSignIn = (request) => {
-  const referer = request.headers.referer
-
-  const result = Boolean(referer?.includes('/signin-oidc'))
-  request.logger.info(
-    `User has ${!result ? 'not' : ''} come from signin. Referer header: ${referer}`
-  )
-  return result
-}

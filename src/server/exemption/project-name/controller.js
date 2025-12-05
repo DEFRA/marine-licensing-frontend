@@ -14,7 +14,6 @@ import { routes } from '#src/server/common/constants/routes.js'
 
 import joi from 'joi'
 import {
-  isMcmsContextInCache,
   getMcmsContextFromCache,
   clearMcmsContextCache
 } from '#src/server/common/helpers/mcms-context/cache-mcms-context.js'
@@ -43,7 +42,7 @@ export const projectNameController = {
 
     // if it's a new exemption (rather than editing an existing one), and
     // there's no MCMS context in the cache, redirect to the dashboard page
-    if (!exemption.id && !isMcmsContextInCache(request)) {
+    if (!exemption.id && !getMcmsContextFromCache(request)) {
       return h.redirect(routes.DASHBOARD)
     }
 

@@ -39,13 +39,6 @@ export const getMcmsContextFromCache = (request) => {
   return cachedParams
 }
 
-// check if there's a value and leave it in cache
-export const isMcmsContextInCache = (request) => {
-  const cachedParams = request.yar.get(mcmsContextCacheKey)
-  request.logger.info(`isMcmsContextInCache: ${JSON.stringify(cachedParams)}`)
-  return Boolean(cachedParams)
-}
-
 export const clearMcmsContextCache = (request) => {
   request.yar.clear(mcmsContextCacheKey)
 }

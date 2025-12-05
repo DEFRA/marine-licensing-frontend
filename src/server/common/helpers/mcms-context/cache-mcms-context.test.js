@@ -47,7 +47,7 @@ describe('cache-mcms-context', () => {
         pdfDownloadUrl: mcmsAnswersDownloadUrl,
         iatQueryString
       })
-      expect(mockRequest.logger.info).not.toHaveBeenCalled()
+      expect(mockRequest.logger.info).toHaveBeenCalledTimes(2)
     })
 
     test('should log info and cache iatQueryString when validation fails', () => {

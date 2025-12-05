@@ -4,6 +4,7 @@ const mcmsContextCacheKey = 'mcmsContext'
 
 export const cacheMcmsContextFromQueryParams = (request) => {
   if (request.path === '/') {
+    request.logger.info(`Root path / hit with URL: ${request.raw?.req?.url}`)
     const { error, value } = paramsSchema.validate(request.query)
     const iatQueryString = request.raw?.req?.url.substring(1)
     if (error) {
@@ -17,6 +18,12 @@ export const cacheMcmsContextFromQueryParams = (request) => {
       }
     } else {
       request.yar.set(mcmsContextCacheKey, { ...value, iatQueryString })
+      const cachedParams = request.yar.get(mcmsContextCacheKey)
+      if (!cachedParams) {
+        request.logger.info(
+          `cacheMcmsContextFromQueryParams: failed to cache MCMS context for URL: ${request.url}`
+        )
+      }
     }
   }
 }

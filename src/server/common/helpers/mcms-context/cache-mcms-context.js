@@ -4,7 +4,7 @@ const mcmsContextCacheKey = 'mcmsContext'
 
 export const cacheMcmsContextFromQueryParams = (request) => {
   if (request.path === '/') {
-    request.logger.info(`Root path / hit with URL: ${request.raw?.req?.url}`)
+    request.logger.info(`Root path / hit with querystring: ${request.url}`)
     const { error, value } = paramsSchema.validate(request.query)
     const iatQueryString = request.raw?.req?.url.substring(1)
     if (error) {

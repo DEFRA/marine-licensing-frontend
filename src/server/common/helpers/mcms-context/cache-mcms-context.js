@@ -18,12 +18,6 @@ export const cacheMcmsContextFromQueryParams = (request) => {
       }
     } else {
       request.yar.set(mcmsContextCacheKey, { ...value, iatQueryString })
-      const cachedParams = request.yar.get(mcmsContextCacheKey)
-      if (!cachedParams) {
-        request.logger.info(
-          `cacheMcmsContextFromQueryParams: failed to cache MCMS context for URL: ${request.url}`
-        )
-      }
     }
   }
 }

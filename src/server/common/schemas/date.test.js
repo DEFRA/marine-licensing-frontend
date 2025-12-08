@@ -432,7 +432,7 @@ describe('activityDatesSchema', () => {
 
       // Create a mock Date that returns a specific date for "new Date()" calls
       // to make start date appear past but end date appear future
-      const mockDate = vi.fn().mockImplementation((...args) => {
+      const mockDate = vi.fn(function (...args) {
         if (args.length === 0) {
           // new Date() calls - return a date between our start and end dates
           return new OriginalDate('2025-07-15T12:00:00.000Z') // Mid-year

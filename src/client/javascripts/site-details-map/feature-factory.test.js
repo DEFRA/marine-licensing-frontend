@@ -17,8 +17,8 @@ describe('FeatureFactory', () => {
     CircleGeometryCalculator.createGeographicCircle = vi.fn()
 
     mockOlModules = {
-      Feature: vi.fn(),
-      Polygon: vi.fn(),
+      Feature: vi.fn(function () {}),
+      Polygon: vi.fn(function () {}),
       fromLonLat: vi.fn(),
       toLonLat: vi.fn()
     }
@@ -47,8 +47,12 @@ describe('FeatureFactory', () => {
       mockOlModules.fromLonLat.mockImplementation((coord) =>
         coord.map((c) => c * 1000)
       )
-      mockOlModules.Polygon.mockReturnValue(mockPolygon)
-      mockOlModules.Feature.mockReturnValue(mockFeature)
+      mockOlModules.Polygon.mockImplementation(function () {
+        return mockPolygon
+      })
+      mockOlModules.Feature.mockImplementation(function () {
+        return mockFeature
+      })
       CircleGeometryCalculator.createGeographicCircle.mockReturnValue(
         circleCoords
       )
@@ -81,8 +85,12 @@ describe('FeatureFactory', () => {
     const setupPolygonMocks = () => {
       const mockPolygon = {}
       const mockFeature = {}
-      mockOlModules.Polygon.mockReturnValue(mockPolygon)
-      mockOlModules.Feature.mockReturnValue(mockFeature)
+      mockOlModules.Polygon.mockImplementation(function () {
+        return mockPolygon
+      })
+      mockOlModules.Feature.mockImplementation(function () {
+        return mockFeature
+      })
       return { mockPolygon, mockFeature }
     }
 

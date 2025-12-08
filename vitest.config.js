@@ -21,16 +21,18 @@ export default defineConfig({
       reportsDirectory: 'coverage',
       reporter: ['text', 'lcov']
     },
-    reporters: [
-      'default',
-      ['github-actions', { silent: false }],
-      [
-        'allure-vitest/reporter',
-        {
-          resultsDir: 'allure-results'
-        }
-      ]
-    ],
+    reporters: process.env.CI
+      ? [
+          'default',
+          ['github-actions', { silent: false }],
+          [
+            'allure-vitest/reporter',
+            {
+              resultsDir: 'allure-results'
+            }
+          ]
+        ]
+      : ['default'],
     clearMocks: true,
     restoreMocks: true
   },

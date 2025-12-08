@@ -14,23 +14,23 @@ describe('MapFactory', () => {
 
   beforeEach(() => {
     mockOlModules = {
-      OpenLayersMap: vi.fn(),
-      View: vi.fn(),
-      TileLayer: vi.fn(),
-      OSM: vi.fn(),
-      VectorLayer: vi.fn(),
-      VectorSource: vi.fn(),
-      Style: vi.fn(),
-      Fill: vi.fn(),
-      Stroke: vi.fn(),
-      Circle: vi.fn(),
-      GeoJSON: vi.fn(),
+      OpenLayersMap: vi.fn(function () {}),
+      View: vi.fn(function () {}),
+      TileLayer: vi.fn(function () {}),
+      OSM: vi.fn(function () {}),
+      VectorLayer: vi.fn(function () {}),
+      VectorSource: vi.fn(function () {}),
+      Style: vi.fn(function () {}),
+      Fill: vi.fn(function () {}),
+      Stroke: vi.fn(function () {}),
+      Circle: vi.fn(function () {}),
+      GeoJSON: vi.fn(function () {}),
 
-      Attribution: vi.fn(),
+      Attribution: vi.fn(function () {}),
       defaultControls: vi.fn().mockReturnValue({
         extend: vi.fn().mockReturnValue([])
       }),
-      ScaleLine: vi.fn()
+      ScaleLine: vi.fn(function () {})
     }
 
     mapFactory = new MapFactory(mockOlModules)
@@ -51,12 +51,24 @@ describe('MapFactory', () => {
   })
 
   const setupMapMocks = (setup) => {
-    mockOlModules.TileLayer.mockReturnValue(setup.mocks.tileLayer)
-    mockOlModules.OSM.mockReturnValue(setup.mocks.osm)
-    mockOlModules.View.mockReturnValue(setup.mocks.view)
-    mockOlModules.Attribution.mockReturnValue(setup.mocks.attribution)
-    mockOlModules.ScaleLine.mockReturnValue(setup.mocks.scaleLine)
-    mockOlModules.OpenLayersMap.mockReturnValue(setup.mocks.map)
+    mockOlModules.TileLayer.mockImplementation(function () {
+      return setup.mocks.tileLayer
+    })
+    mockOlModules.OSM.mockImplementation(function () {
+      return setup.mocks.osm
+    })
+    mockOlModules.View.mockImplementation(function () {
+      return setup.mocks.view
+    })
+    mockOlModules.Attribution.mockImplementation(function () {
+      return setup.mocks.attribution
+    })
+    mockOlModules.ScaleLine.mockImplementation(function () {
+      return setup.mocks.scaleLine
+    })
+    mockOlModules.OpenLayersMap.mockImplementation(function () {
+      return setup.mocks.map
+    })
   }
 
   describe('createMap', () => {
@@ -156,8 +168,12 @@ describe('MapFactory', () => {
       const mockVectorLayer = {}
       const mockStyle = {}
 
-      mockOlModules.VectorSource.mockReturnValue(mockVectorSource)
-      mockOlModules.VectorLayer.mockReturnValue(mockVectorLayer)
+      mockOlModules.VectorSource.mockImplementation(function () {
+        return mockVectorSource
+      })
+      mockOlModules.VectorLayer.mockImplementation(function () {
+        return mockVectorLayer
+      })
       mapFactory.createDefaultStyle = vi.fn().mockReturnValue(mockStyle)
 
       const result = mapFactory.createMapLayers()
@@ -181,10 +197,18 @@ describe('MapFactory', () => {
       const mockStroke = {}
       const mockCircle = {}
 
-      mockOlModules.Style.mockReturnValue(mockStyle)
-      mockOlModules.Fill.mockReturnValue(mockFill)
-      mockOlModules.Stroke.mockReturnValue(mockStroke)
-      mockOlModules.Circle.mockReturnValue(mockCircle)
+      mockOlModules.Style.mockImplementation(function () {
+        return mockStyle
+      })
+      mockOlModules.Fill.mockImplementation(function () {
+        return mockFill
+      })
+      mockOlModules.Stroke.mockImplementation(function () {
+        return mockStroke
+      })
+      mockOlModules.Circle.mockImplementation(function () {
+        return mockCircle
+      })
 
       const result = mapFactory.createDefaultStyle()
 
@@ -210,7 +234,9 @@ describe('MapFactory', () => {
 
     test('should create stroke style with correct properties', () => {
       const mockStroke = {}
-      mockOlModules.Stroke.mockReturnValue(mockStroke)
+      mockOlModules.Stroke.mockImplementation(function () {
+        return mockStroke
+      })
 
       mapFactory.createDefaultStyle()
 
@@ -227,7 +253,9 @@ describe('MapFactory', () => {
 
     test('should create fill styles with correct colors', () => {
       const mockFill = {}
-      mockOlModules.Fill.mockReturnValue(mockFill)
+      mockOlModules.Fill.mockImplementation(function () {
+        return mockFill
+      })
 
       mapFactory.createDefaultStyle()
 
@@ -248,9 +276,15 @@ describe('MapFactory', () => {
       const mockFill = {}
       const mockStroke = {}
 
-      mockOlModules.Circle.mockReturnValue(mockCircle)
-      mockOlModules.Fill.mockReturnValue(mockFill)
-      mockOlModules.Stroke.mockReturnValue(mockStroke)
+      mockOlModules.Circle.mockImplementation(function () {
+        return mockCircle
+      })
+      mockOlModules.Fill.mockImplementation(function () {
+        return mockFill
+      })
+      mockOlModules.Stroke.mockImplementation(function () {
+        return mockStroke
+      })
 
       mapFactory.createDefaultStyle()
 
@@ -266,7 +300,9 @@ describe('MapFactory', () => {
   describe('initialiseGeoJSONFormat', () => {
     test('should create GeoJSON format instance', () => {
       const mockInstance = {}
-      mockOlModules.GeoJSON.mockReturnValue(mockInstance)
+      mockOlModules.GeoJSON.mockImplementation(function () {
+        return mockInstance
+      })
 
       const result = mapFactory.initialiseGeoJSONFormat()
 

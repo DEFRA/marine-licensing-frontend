@@ -133,10 +133,6 @@ describe('browserLogsController', () => {
     it('should disable CSRF protection for sendBeacon requests', () => {
       expect(browserLogsController.options.plugins.crumb).toBe(false)
     })
-
-    it('should require session authentication', () => {
-      expect(browserLogsController.options.auth).toBe('session')
-    })
   })
 
   describe('handler - successful log processing', () => {

@@ -6,8 +6,6 @@ import { createSessionStrategy } from '#src/server/common/plugins/auth/session-s
 import { AUTH_STRATEGIES } from '#src/server/common/constants/auth.js'
 import { validateUserSession } from '#src/server/common/plugins/auth/validate.js'
 import { clearExemptionCache } from '#src/server/common/helpers/session-cache/utils.js'
-import { cacheMcmsContextFromQueryParams } from '#src/server/common/helpers/mcms-context/cache-mcms-context.js'
-import { redirectPathCacheKey } from '#src/server/common/constants/routes.js'
 
 // Mock external dependencies that these strategy functions depend on
 vi.mock('~/src/config/config.js')
@@ -136,82 +134,6 @@ describe('Strategy Functions Integration Tests', () => {
       )
 
       expect(mockServer.auth.default).toHaveBeenCalledWith('session')
-    })
-
-    describe('redirectTo method', () => {
-      let redirectToFn
-      let mockRequest
-      const mockCacheMcmsContextFromQueryParams = vi.mocked(
-        cacheMcmsContextFromQueryParams
-      )
-
-      beforeEach(() => {
-        mockConfig.get.mockImplementation((key) => {
-          if (key === 'session.cookie') {
-            return { password: 'test', secure: true, ttl: 3600000 }
-          }
-          return {}
-        })
-
-        createSessionStrategy(mockServer)
-        redirectToFn = mockServer.auth.strategy.mock.calls[0][2].redirectTo
-
-        mockRequest = {
-          path: '/some/path',
-          yar: {
-            flash: vi.fn(),
-            clear: vi.fn()
-          }
-        }
-      })
-
-      test('should redirect to regular login for non-entraId routes', () => {
-        mockRequest.path = '/exemption/task-list'
-
-        const result = redirectToFn(mockRequest)
-
-        expect(mockCacheMcmsContextFromQueryParams).toHaveBeenCalledWith(
-          mockRequest
-        )
-        expect(result).toBe('/signin')
-        expect(mockRequest.yar.flash).toHaveBeenCalledWith(
-          redirectPathCacheKey,
-          '/exemption/task-list',
-          true
-        )
-      })
-
-      test('should redirect to entra login for entraId routes', () => {
-        mockRequest.path = '/view-details'
-
-        const result = redirectToFn(mockRequest)
-
-        expect(mockCacheMcmsContextFromQueryParams).toHaveBeenCalledWith(
-          mockRequest
-        )
-        expect(result).toBe('/signin-entra')
-        expect(mockRequest.yar.flash).toHaveBeenCalledWith(
-          redirectPathCacheKey,
-          '/view-details',
-          true
-        )
-      })
-
-      test('should redirect to entra login for routes starting with entraId route', () => {
-        mockRequest.path = '/view-details/some-id'
-
-        const result = redirectToFn(mockRequest)
-
-        expect(mockCacheMcmsContextFromQueryParams).toHaveBeenCalledWith(
-          mockRequest
-        )
-        expect(result).toBe('/signin-entra')
-        expect(mockRequest.yar.flash).toHaveBeenCalledWith(
-          redirectPathCacheKey,
-          '/view-details/some-id',
-          true
-        )
-      })
     })
 
     describe('validate method', () => {

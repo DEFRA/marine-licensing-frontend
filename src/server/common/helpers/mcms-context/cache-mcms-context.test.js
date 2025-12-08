@@ -2,7 +2,6 @@ import { describe, test, expect, beforeEach } from 'vitest'
 import {
   cacheMcmsContextFromQueryParams,
   getMcmsContextFromCache,
-  isMcmsContextInCache,
   clearMcmsContextCache
 } from './cache-mcms-context.js'
 import {
@@ -47,7 +46,7 @@ describe('cache-mcms-context', () => {
         pdfDownloadUrl: mcmsAnswersDownloadUrl,
         iatQueryString
       })
-      expect(mockRequest.logger.info).not.toHaveBeenCalled()
+      expect(mockRequest.logger.info).toHaveBeenCalledTimes(1)
     })
 
     test('should log info and cache iatQueryString when validation fails', () => {
@@ -133,7 +132,9 @@ describe('cache-mcms-context', () => {
 
       expect(mockRequest.yar.get).toHaveBeenCalledWith('mcmsContext')
       expect(result).toEqual(cachedContext)
-      expect(mockRequest.logger.info).not.toHaveBeenCalled()
+      expect(mockRequest.logger.info).toHaveBeenCalledWith(
+        'getMcmsContextFromCache: {"activityType":"CON","article":"17","pdfDownloadUrl":"https://marinelicensing.marinemanagement.org.uk/path/journey/self-service/outcome-document/b87ae3f7-48f3-470d-b29b-5a5abfdaa49f","iatQueryString":"ACTIVITY_TYPE=CON&ARTICLE=17"}'
+      )
     })
 
     test('should return null and log info when no cached context', () => {
@@ -144,7 +145,7 @@ describe('cache-mcms-context', () => {
       expect(mockRequest.yar.get).toHaveBeenCalledWith('mcmsContext')
       expect(result).toBeNull()
       expect(mockRequest.logger.info).toHaveBeenCalledWith(
-        'No MCMS context cached for URL: http://example.com/test'
+        'getMcmsContextFromCache: null'
       )
     })
 
@@ -155,72 +156,20 @@ describe('cache-mcms-context', () => {
 
       expect(result).toBeNull()
       expect(mockRequest.logger.info).toHaveBeenCalledWith(
-        'No MCMS context cached for URL: http://example.com/test'
+        'getMcmsContextFromCache: undefined'
       )
     })
 
-    test('should still clear cache and return value when empty object is cached', () => {
+    test('should still return value when empty object is cached', () => {
       mockRequest.yar.get.mockReturnValue({})
 
       const result = getMcmsContextFromCache(mockRequest)
 
       expect(mockRequest.yar.get).toHaveBeenCalledWith('mcmsContext')
       expect(result).toEqual({})
-      expect(mockRequest.logger.info).not.toHaveBeenCalled()
-    })
-  })
-
-  describe('isMcmsContextInCache', () => {
-    let mockRequest
-
-    beforeEach(() => {
-      mockRequest = createMockRequest()
-    })
-
-    test('should return true when MCMS context exists in cache', () => {
-      mockRequest.yar.get.mockReturnValue({
-        activityType: 'CON',
-        article: '17',
-        pdfDownloadUrl: mcmsAnswersDownloadUrl
-      })
-
-      const result = isMcmsContextInCache(mockRequest)
-
-      expect(mockRequest.yar.get).toHaveBeenCalledWith('mcmsContext')
-      expect(result).toBe(true)
-    })
-
-    test('should return false when MCMS context does not exist', () => {
-      mockRequest.yar.get.mockReturnValue(null)
-
-      const result = isMcmsContextInCache(mockRequest)
-
-      expect(mockRequest.yar.get).toHaveBeenCalledWith('mcmsContext')
-      expect(result).toBe(false)
-    })
-
-    test('should return false when MCMS context is undefined', () => {
-      mockRequest.yar.get.mockReturnValue(undefined)
-
-      const result = isMcmsContextInCache(mockRequest)
-
-      expect(result).toBe(false)
-    })
-
-    test('should return true when empty object is cached', () => {
-      mockRequest.yar.get.mockReturnValue({})
-
-      const result = isMcmsContextInCache(mockRequest)
-
-      expect(result).toBe(true)
-    })
-
-    test('should not clear cache when checking', () => {
-      mockRequest.yar.get.mockReturnValue({ activityType: 'CON' })
-
-      isMcmsContextInCache(mockRequest)
-
-      expect(mockRequest.yar.clear).not.toHaveBeenCalled()
+      expect(mockRequest.logger.info).toHaveBeenCalledWith(
+        'getMcmsContextFromCache: {}'
+      )
     })
   })
 

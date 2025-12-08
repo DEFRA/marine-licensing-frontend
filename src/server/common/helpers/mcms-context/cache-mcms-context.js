@@ -11,24 +11,31 @@ export const cacheMcmsContextFromQueryParams = (request) => {
         `Missing or invalid MCMS query string context on URL: ${request.url} - ${error.message}`
       )
       if (Object.keys(request.query).length) {
-        request.yar.flash(mcmsContextCacheKey, {
+        request.yar.set(mcmsContextCacheKey, {
           iatQueryString
         })
       }
     } else {
-      request.yar.flash(mcmsContextCacheKey, { ...value, iatQueryString })
+      request.yar.set(mcmsContextCacheKey, { ...value, iatQueryString })
     }
   }
 }
 
 export const getMcmsContextFromCache = (request) => {
-  const cachedParams = request.yar.flash(mcmsContextCacheKey)
-  if (!cachedParams?.length) {
+  const cachedParams = request.yar.get(mcmsContextCacheKey)
+  if (!cachedParams) {
     request.logger.info(`No MCMS context cached for URL: ${request.url}`)
     return null
   }
-  if (cachedParams.length > 1) {
-    request.logger.info(`Multiple MCMS contexts cached for URL: ${request.url}`)
-  }
-  return cachedParams[0]
+  return cachedParams
+}
+
+// check if there's a value and leave it in cache
+export const isMcmsContextInCache = (request) => {
+  const cachedParams = request.yar.get(mcmsContextCacheKey)
+  return Boolean(cachedParams)
+}
+
+export const clearMcmsContextCache = (request) => {
+  request.yar.clear(mcmsContextCacheKey)
 }

@@ -4,6 +4,7 @@ const mcmsContextCacheKey = 'mcmsContext'
 
 export const cacheMcmsContextFromQueryParams = (request) => {
   if (request.path === '/') {
+    request.logger.info(`Root path / hit with querystring: ${request.url}`)
     const { error, value } = paramsSchema.validate(request.query)
     const iatQueryString = request.raw?.req?.url.substring(1)
     if (error) {
@@ -23,17 +24,13 @@ export const cacheMcmsContextFromQueryParams = (request) => {
 
 export const getMcmsContextFromCache = (request) => {
   const cachedParams = request.yar.get(mcmsContextCacheKey)
+  request.logger.info(
+    `getMcmsContextFromCache: ${JSON.stringify(cachedParams)}`
+  )
   if (!cachedParams) {
-    request.logger.info(`No MCMS context cached for URL: ${request.url}`)
     return null
   }
   return cachedParams
-}
-
-// check if there's a value and leave it in cache
-export const isMcmsContextInCache = (request) => {
-  const cachedParams = request.yar.get(mcmsContextCacheKey)
-  return Boolean(cachedParams)
 }
 
 export const clearMcmsContextCache = (request) => {

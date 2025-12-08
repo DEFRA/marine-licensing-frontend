@@ -1,3 +1,5 @@
+import { logger } from '../error-tracking/logger.js'
+
 class SiteDataLoader {
   constructor(mapElement = null) {
     this.mapElement = mapElement
@@ -6,8 +8,7 @@ class SiteDataLoader {
   loadSiteDetails() {
     try {
       if (this.mapElement) {
-        const siteDetailsAttr =
-          this.mapElement.getAttribute('data-site-details')
+        const siteDetailsAttr = this.mapElement.dataset.siteDetails
         if (siteDetailsAttr) {
           return JSON.parse(siteDetailsAttr)
         }
@@ -20,7 +21,7 @@ class SiteDataLoader {
 
       return JSON.parse(siteDataElement.textContent)
     } catch (error) {
-      console.error('Failed to parse site details from DOM:', error)
+      logger.error('Failed to parse site details from DOM:', error)
       return null
     }
   }

@@ -1,6 +1,7 @@
 import CoordinateParser from './coordinate-parser.js'
 import FeatureFactory from './feature-factory.js'
 import MapViewManager from './map-view-manager.js'
+import { logger } from '../error-tracking/logger.js'
 
 class SiteVisualiser {
   constructor(olModules, vectorSource, geoJSONFormat, map) {
@@ -43,7 +44,7 @@ class SiteVisualiser {
       )
 
       if (features.length === 0) {
-        console.error('Map display failed: No features created from GeoJSON')
+        logger.error('Map display failed: No features created from GeoJSON')
         return
       }
 
@@ -51,7 +52,7 @@ class SiteVisualiser {
 
       this.mapViewManager.fitMapToAllFeatures(this.map, this.vectorSource)
     } catch (error) {
-      console.error('Failed to display file upload data on map:', error)
+      logger.error('Failed to display file upload data on map:', error)
       throw error
     }
   }
@@ -60,13 +61,13 @@ class SiteVisualiser {
     try {
       const fromLonLat = this.olModules?.fromLonLat
       if (!fromLonLat) {
-        console.error('Map display failed: OpenLayers modules unavailable')
+        logger.error('Map display failed: OpenLayers modules unavailable')
         return 'modules-unavailable'
       }
 
       const validationResult = this.validateSiteDetailsForDisplay(siteDetails)
       if (validationResult !== 'valid') {
-        console.error(
+        logger.error(
           `Map display failed: Invalid site details - ${validationResult}`
         )
         return validationResult
@@ -82,7 +83,7 @@ class SiteVisualiser {
       )
 
       if (!mapCoordinates) {
-        console.error('Map display failed: Could not parse coordinates', {
+        logger.error('Map display failed: Could not parse coordinates', {
           coordinateSystem,
           coordinates
         })
@@ -95,7 +96,7 @@ class SiteVisualiser {
         circleWidth
       )
     } catch (error) {
-      console.error('Failed to display manual coordinates on map:', error)
+      logger.error('Failed to display manual coordinates on map:', error)
       throw error
     }
   }

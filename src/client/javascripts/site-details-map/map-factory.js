@@ -1,3 +1,5 @@
+import { logger } from '../error-tracking/logger.js'
+
 class MapFactory {
   constructor(olModules) {
     this.olModules = olModules
@@ -44,7 +46,7 @@ class MapFactory {
 
       return map
     } catch (error) {
-      console.error('Failed to create OpenLayers map:', error)
+      logger.error('Failed to create OpenLayers map:', error)
       throw error
     }
   }

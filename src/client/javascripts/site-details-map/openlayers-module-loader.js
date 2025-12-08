@@ -1,3 +1,5 @@
+import { logger } from '../error-tracking/logger.js'
+
 class OpenLayersModuleLoader {
   async loadModules() {
     try {
@@ -69,7 +71,7 @@ class OpenLayersModuleLoader {
         ScaleLine
       }
     } catch (error) {
-      console.error('Failed to load OpenLayers modules:', error)
+      logger.error('Failed to load OpenLayers modules:', error)
       throw new Error('OpenLayers module loading failed')
     }
   }

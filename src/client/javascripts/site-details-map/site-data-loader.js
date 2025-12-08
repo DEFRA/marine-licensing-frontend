@@ -8,7 +8,8 @@ class SiteDataLoader {
   loadSiteDetails() {
     try {
       if (this.mapElement) {
-        const siteDetailsAttr = this.mapElement.getAttribute('data-site-details') // NOSONAR
+        const siteDetailsAttr =
+          this.mapElement.getAttribute('data-site-details') // NOSONAR
         if (siteDetailsAttr) {
           return JSON.parse(siteDetailsAttr)
         }

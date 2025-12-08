@@ -4,7 +4,6 @@ import { config } from '#src/config/config.js'
 
 export const browserLogsController = {
   options: {
-    auth: 'session',
     plugins: {
       crumb: false // Disable CSRF for sendBeacon() requests
     }

@@ -29,10 +29,10 @@ describe('ErrorTracking', () => {
       now: vi.fn().mockReturnValue(1234567890)
     }
 
-    mockBlob = vi.fn((content, options) => ({
-      content,
-      options
-    }))
+    mockBlob = vi.fn(function (content, options) {
+      this.content = content
+      this.options = options
+    })
 
     errorTracking = new ErrorTracking({
       navigator: mockNavigator,
@@ -754,11 +754,15 @@ describe('ErrorTracking', () => {
 
   describe('sendLog', () => {
     beforeEach(() => {
-      vi.spyOn(errorTracking, 'shouldSendLog').mockReturnValue(true)
+      vi.spyOn(errorTracking, 'shouldSendLog').mockImplementation(function () {
+        return true
+      })
     })
 
     test('should not send when shouldSendLog returns false', () => {
-      errorTracking.shouldSendLog.mockReturnValue(false)
+      errorTracking.shouldSendLog.mockImplementation(function () {
+        return false
+      })
       const event = {
         type: 'js_error',
         message: 'Test',
@@ -844,14 +848,20 @@ describe('ErrorTracking', () => {
         source: 'a.js',
         line: 1
       }
-      errorTracking.shouldSendLog.mockRestore()
+      const tracker = new ErrorTracking({
+        navigator: mockNavigator,
+        location: mockLocation,
+        console: mockConsole,
+        Date: mockDate,
+        Blob: mockBlob
+      })
 
-      errorTracking.sendLog(event)
+      tracker.sendLog(event)
       const [[, blob1]] = mockNavigator.sendBeacon.mock.calls
       const payload1 = JSON.parse(blob1.content[0])
       expect(payload1.occurrenceCount).toBe(1)
 
-      errorTracking.sendLog(event)
+      tracker.sendLog(event)
       const [[, blob2]] = mockNavigator.sendBeacon.mock.calls.slice(-1)
       const payload2 = JSON.parse(blob2.content[0])
       expect(payload2.occurrenceCount).toBe(2)

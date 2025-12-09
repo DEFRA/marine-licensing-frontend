@@ -22,9 +22,8 @@ describe('#context', () => {
     vi.resetModules()
     readFileSync.mockClear()
     mockRequest.logger.error.mockClear()
-    const contextModule = await import(
-      '~/src/config/nunjucks/context/context.js'
-    )
+    const contextModule =
+      await import('~/src/config/nunjucks/context/context.js')
     context = contextModule.context
   })
 

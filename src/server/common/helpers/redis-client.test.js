@@ -21,15 +21,19 @@ beforeEach(async () => {
 
   // Mock ioredis dynamically
   vi.doMock('ioredis', () => ({
-    Redis: vi.fn().mockImplementation((options) => ({
-      on: vi.fn(),
-      __options: options
-    })),
-    Cluster: vi.fn().mockImplementation((nodes, options) => ({
-      on: vi.fn(),
-      __nodes: nodes,
-      __options: options
-    }))
+    Redis: vi.fn(function (options) {
+      return {
+        on: vi.fn(),
+        __options: options
+      }
+    }),
+    Cluster: vi.fn(function (nodes, options) {
+      return {
+        on: vi.fn(),
+        __nodes: nodes,
+        __options: options
+      }
+    })
   }))
 
   // Import after mocking
@@ -37,9 +41,8 @@ beforeEach(async () => {
   Redis = ioredis.Redis
   Cluster = ioredis.Cluster
 
-  const redisClientModule = await import(
-    '~/src/server/common/helpers/redis-client.js'
-  )
+  const redisClientModule =
+    await import('~/src/server/common/helpers/redis-client.js')
   buildRedisClient = redisClientModule.buildRedisClient
 })
 

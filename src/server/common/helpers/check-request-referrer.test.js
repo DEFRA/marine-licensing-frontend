@@ -1,8 +1,5 @@
 import { describe, test, expect, beforeEach, vi } from 'vitest'
-import {
-  isUserReferredFromDefraAccount,
-  isUserReferredFromSignIn
-} from './check-request-referrer.js'
+import { isUserReferredFromDefraAccount } from './check-request-referrer.js'
 import { createMockRequest } from '#src/server/test-helpers/mocks.js'
 import { config } from '#src/config/config.js'
 
@@ -91,72 +88,6 @@ describe('check-request-referrer', () => {
       mockRequest.headers.referer = 'https://some-site.com'
 
       const result = isUserReferredFromDefraAccount(mockRequest)
-
-      expect(result).toBeFalsy()
-    })
-  })
-
-  describe('isUserReferredFromSignIn', () => {
-    let mockRequest
-
-    beforeEach(() => {
-      mockRequest = createMockRequest()
-    })
-
-    test('should return true when referer contains /signin-oidc', () => {
-      mockRequest.headers.referer = 'https://example.com/signin-oidc'
-
-      const result = isUserReferredFromSignIn(mockRequest)
-
-      expect(result).toBe(true)
-    })
-
-    test('should return true when referer contains /signin-oidc with query params', () => {
-      mockRequest.headers.referer =
-        'https://example.com/signin-oidc?redirect=/home'
-
-      const result = isUserReferredFromSignIn(mockRequest)
-
-      expect(result).toBe(true)
-    })
-
-    test('should return true when referer contains /signin-oidc in the path', () => {
-      mockRequest.headers.referer =
-        'https://example.com/auth/signin-oidc/callback'
-
-      const result = isUserReferredFromSignIn(mockRequest)
-
-      expect(result).toBe(true)
-    })
-
-    test('should return false when referer does not contain /signin-oidc', () => {
-      mockRequest.headers.referer = 'https://example.com/signin'
-
-      const result = isUserReferredFromSignIn(mockRequest)
-
-      expect(result).toBe(false)
-    })
-
-    test('should return false when referer is undefined', () => {
-      mockRequest.headers.referer = undefined
-
-      const result = isUserReferredFromSignIn(mockRequest)
-
-      expect(result).toBeFalsy()
-    })
-
-    test('should return false when referer is null', () => {
-      mockRequest.headers.referer = null
-
-      const result = isUserReferredFromSignIn(mockRequest)
-
-      expect(result).toBeFalsy()
-    })
-
-    test('should return false when referer is empty string', () => {
-      mockRequest.headers.referer = ''
-
-      const result = isUserReferredFromSignIn(mockRequest)
 
       expect(result).toBeFalsy()
     })

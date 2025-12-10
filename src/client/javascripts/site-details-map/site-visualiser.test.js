@@ -11,20 +11,24 @@ vi.mock('./circle-geometry-calculator.js', () => ({
 }))
 
 vi.mock('./map-view-manager.js', () => ({
-  default: vi.fn().mockImplementation(() => ({
-    fitMapToExtent: vi.fn(),
-    fitMapToGeometry: vi.fn(),
-    fitMapToAllFeatures: vi.fn(),
-    centreMapView: vi.fn()
-  }))
+  default: vi.fn(function () {
+    return {
+      fitMapToExtent: vi.fn(),
+      fitMapToGeometry: vi.fn(),
+      fitMapToAllFeatures: vi.fn(),
+      centreMapView: vi.fn()
+    }
+  })
 }))
 
 vi.mock('./feature-factory.js', () => ({
-  default: vi.fn().mockImplementation(() => ({
-    createCircleFeature: vi.fn(),
-    createPolygonFeature: vi.fn(),
-    createFeaturesFromGeoJSON: vi.fn()
-  }))
+  default: vi.fn(function () {
+    return {
+      createCircleFeature: vi.fn(),
+      createPolygonFeature: vi.fn(),
+      createFeaturesFromGeoJSON: vi.fn()
+    }
+  })
 }))
 
 describe('SiteVisualiser', () => {
@@ -55,13 +59,17 @@ describe('SiteVisualiser', () => {
       createFeaturesFromGeoJSON: vi.fn()
     }
 
-    MapViewManager.mockImplementation(() => mockMapViewManager)
-    FeatureFactory.mockImplementation(() => mockFeatureFactory)
+    MapViewManager.mockImplementation(function () {
+      return mockMapViewManager
+    })
+    FeatureFactory.mockImplementation(function () {
+      return mockFeatureFactory
+    })
 
     mockOlModules = {
-      Feature: vi.fn(),
-      Point: vi.fn(),
-      Polygon: vi.fn(),
+      Feature: vi.fn(function () {}),
+      Point: vi.fn(function () {}),
+      Polygon: vi.fn(function () {}),
       fromLonLat: vi.fn(),
       toLonLat: vi.fn()
     }

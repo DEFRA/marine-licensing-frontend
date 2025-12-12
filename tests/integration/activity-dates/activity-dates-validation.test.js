@@ -212,6 +212,7 @@ describe('Activity dates - form validation', () => {
 
   describe('Dates too far apart', () => {
     const getDateExactlyOneYearAfterStart = (startDate) => {
+      // JavaScript Date months are 0-indexed, so subtract 1 from 1-indexed month values
       const start = new Date(
         parseInt(startDate.year),
         parseInt(startDate.month) - 1,

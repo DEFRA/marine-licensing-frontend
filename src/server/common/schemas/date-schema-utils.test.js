@@ -183,7 +183,7 @@ describe('#dateSchemaUtils', () => {
       expect(result).toBeNull()
     })
 
-    test('should bypass validation when appropriate mcms context is set for section 20', () => {
+    test('should bypass validation when appropriate mcms context is set for article code 34', () => {
       const futureDate = dayJsDate.add('8', 'year')
 
       helpersMock.prefs.context.articleCode = '34'

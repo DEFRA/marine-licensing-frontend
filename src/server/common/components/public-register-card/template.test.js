@@ -1,189 +1,237 @@
-import { renderComponent } from '#src/server/test-helpers/component-helpers.js'
+import { renderComponentJSDOM } from '#src/server/test-helpers/component-helpers.js'
+import { within } from '@testing-library/dom'
+import { validatePublicRegister } from '#tests/integration/shared/summary-card-validators.js'
 
 describe('Public Register Card Component', () => {
-  let $component
-
-  describe('With Change links (isReadOnly: false)', () => {
+  describe('Applicant is viewing exemption', () => {
     describe('When consent is "yes"', () => {
-      beforeEach(() => {
-        $component = renderComponent('public-register-card', {
+      const renderComponent = (params) => {
+        return renderComponentJSDOM('public-register-card', {
           publicRegister: {
             consent: 'yes'
           },
-          isReadOnly: false
+          isApplicantView: true,
+          isReadOnly: true,
+          ...params
         })
-      })
+      }
 
-      test('Should render public register card component', () => {
-        expect($component('#public-register-card')).toHaveLength(1)
+      test('Should have correct card title', () => {
+        const component = renderComponent()
+        expect(
+          within(component).getByRole('heading', { level: 2 })
+        ).toHaveTextContent('Sharing your project information publicly')
       })
 
       test('Should display "Yes" for consent to publish', () => {
-        const htmlContent = $component.html()
-        expect(htmlContent).toContain(
-          'Consent to publish your project information'
-        )
-        expect(htmlContent).toContain('Yes')
+        const component = renderComponent()
+        validatePublicRegister(component, {
+          publicRegister: {
+            'Consent to publish your project information': 'Yes'
+          }
+        })
       })
 
       test('Should not display reason field when consent is "yes"', () => {
-        const htmlContent = $component.html()
-        expect(htmlContent).not.toContain('Why you do not consent')
-      })
-
-      test('Should show Change link when not read-only', () => {
+        const component = renderComponent()
         expect(
-          $component('.govuk-summary-card__actions a').text().trim()
-        ).toContain('Change')
+          within(component).queryByText('Why you do not consent')
+        ).not.toBeInTheDocument()
       })
 
-      test('Should have correct card title', () => {
-        expect($component('.govuk-summary-card__title').text().trim()).toBe(
-          'Sharing your project information publicly'
+      test('should not show a change link when read-only', () => {
+        const component = renderComponent()
+        expect(
+          within(component).queryByRole('link', {
+            name: /Change/
+          })
+        ).not.toBeInTheDocument()
+      })
+
+      test('should show a change link when not read-only', () => {
+        const component = renderComponent({ isReadOnly: false })
+        expect(
+          within(component).getByRole('link', {
+            name: /Change/
+          })
+        ).toHaveAttribute(
+          'href',
+          '/exemption/sharing-your-project-information-publicly?from=check-your-answers'
         )
       })
     })
 
     describe('When consent is "no"', () => {
-      beforeEach(() => {
-        $component = renderComponent('public-register-card', {
+      const renderComponent = (params) => {
+        return renderComponentJSDOM('public-register-card', {
           publicRegister: {
             consent: 'no',
             reason: 'Commercial sensitivity - contains proprietary information'
           },
-          isReadOnly: false
+          isApplicantView: true,
+          isReadOnly: true,
+          ...params
         })
-      })
-
-      test('Should render public register card component', () => {
-        expect($component('#public-register-card')).toHaveLength(1)
-      })
-
-      test('Should display "No" for consent to publish', () => {
-        const htmlContent = $component.html()
-        expect(htmlContent).toContain(
-          'Consent to publish your project information'
-        )
-        expect(htmlContent).toContain('No')
-      })
-
-      test('Should display reason field when consent is "no"', () => {
-        const htmlContent = $component.html()
-        expect(htmlContent).toContain('Why you do not consent')
-        expect(htmlContent).toContain(
-          'Commercial sensitivity - contains proprietary information'
-        )
-      })
-
-      test('Should show Change link when not read-only', () => {
-        expect(
-          $component('.govuk-summary-card__actions a').text().trim()
-        ).toContain('Change')
-      })
+      }
 
       test('Should have correct card title', () => {
-        expect($component('.govuk-summary-card__title').text().trim()).toBe(
-          'Sharing your project information publicly'
-        )
+        const component = renderComponent()
+        expect(
+          within(component).getByRole('heading', { level: 2 })
+        ).toHaveTextContent('Sharing your project information publicly')
       })
-    })
 
-    describe('When consent is "no" but no reason provided', () => {
-      beforeEach(() => {
-        $component = renderComponent('public-register-card', {
+      test('Should display "No" for consent to publish, and the reason', () => {
+        const component = renderComponent()
+        validatePublicRegister(component, {
           publicRegister: {
-            consent: 'no'
-            // No reason provided
-          },
-          isReadOnly: false
+            'Consent to publish your project information': 'No',
+            'Why you do not consent':
+              'Commercial sensitivity - contains proprietary information'
+          }
         })
       })
 
-      test('Should display empty reason field', () => {
-        const htmlContent = $component.html()
-        expect(htmlContent).toContain('Why you do not consent')
-        // Should show the field but with empty content due to default('')
+      test("should show nothing in the reason field if one wasn't provided", () => {
+        const component = renderComponent({ publicRegister: { consent: 'no' } })
+        validatePublicRegister(component, {
+          publicRegister: {
+            'Consent to publish your project information': 'No',
+            'Why you do not consent': ''
+          }
+        })
+      })
+
+      test('should not show a change link when read-only', () => {
+        const component = renderComponent()
+        expect(
+          within(component).queryByRole('link', {
+            name: /Change/
+          })
+        ).not.toBeInTheDocument()
+      })
+
+      test('should show a change link when not read-only', () => {
+        const component = renderComponent({ isReadOnly: false })
+        expect(
+          within(component).getByRole('link', {
+            name: /Change/
+          })
+        ).toHaveAttribute(
+          'href',
+          '/exemption/sharing-your-project-information-publicly?from=check-your-answers'
+        )
       })
     })
   })
 
-  describe('Read-only mode (isReadOnly: true)', () => {
+  describe('Internal user or public user is viewing exemption', () => {
     describe('When consent is "yes"', () => {
-      beforeEach(() => {
-        $component = renderComponent('public-register-card', {
+      const renderComponent = (params) => {
+        return renderComponentJSDOM('public-register-card', {
           publicRegister: {
             consent: 'yes'
           },
-          isReadOnly: true
+          isApplicantView: false,
+          isReadOnly: true,
+          ...params
         })
-      })
+      }
 
-      test('Should render public register card component', () => {
-        expect($component('#public-register-card')).toHaveLength(1)
+      test('Should have correct card title', () => {
+        const component = renderComponent()
+        expect(
+          within(component).getByRole('heading', { level: 2 })
+        ).toHaveTextContent('Sharing project information publicly')
       })
 
       test('Should display "Yes" for consent to publish', () => {
-        const htmlContent = $component.html()
-        expect(htmlContent).toContain(
-          'Consent to publish your project information'
-        )
-        expect(htmlContent).toContain('Yes')
+        const component = renderComponent()
+        validatePublicRegister(component, {
+          publicRegister: {
+            'Consent to publish project information': 'Yes'
+          }
+        })
       })
 
       test('Should not display reason field when consent is "yes"', () => {
-        const htmlContent = $component.html()
-        expect(htmlContent).not.toContain('Why you do not consent')
+        const component = renderComponent()
+        expect(
+          within(component).queryByText('Why you do not consent')
+        ).not.toBeInTheDocument()
       })
 
-      test('Should not show Change link when read-only', () => {
-        expect($component('.govuk-summary-card__actions')).toHaveLength(0)
+      test('should not show a change link when read-only', () => {
+        const component = renderComponent()
+        expect(
+          within(component).queryByRole('link', {
+            name: /Change/
+          })
+        ).not.toBeInTheDocument()
       })
 
-      test('Should have correct card title', () => {
-        expect($component('.govuk-summary-card__title').text().trim()).toBe(
-          'Sharing your project information publicly'
+      test('should show a change link when not read-only', () => {
+        const component = renderComponent({ isReadOnly: false })
+        expect(
+          within(component).getByRole('link', {
+            name: /Change/
+          })
+        ).toHaveAttribute(
+          'href',
+          '/exemption/sharing-your-project-information-publicly?from=check-your-answers'
         )
       })
     })
 
     describe('When consent is "no"', () => {
-      beforeEach(() => {
-        $component = renderComponent('public-register-card', {
+      const renderComponent = (params) => {
+        return renderComponentJSDOM('public-register-card', {
           publicRegister: {
             consent: 'no',
-            reason: 'Legal privilege - contains confidential legal advice'
+            reason: 'Commercial sensitivity - contains proprietary information'
           },
-          isReadOnly: true
+          isApplicantView: false,
+          isReadOnly: true,
+          ...params
+        })
+      }
+
+      test('Should have correct card title', () => {
+        const component = renderComponent()
+        expect(
+          within(component).getByRole('heading', { level: 2 })
+        ).toHaveTextContent('Sharing project information publicly')
+      })
+
+      test('Should display "No" for consent to publish, and the reason', () => {
+        const component = renderComponent()
+        validatePublicRegister(component, {
+          publicRegister: {
+            'Consent to publish project information': 'No',
+            'Why the applicant did not consent':
+              'Commercial sensitivity - contains proprietary information'
+          }
         })
       })
 
-      test('Should render public register card component', () => {
-        expect($component('#public-register-card')).toHaveLength(1)
+      test('should not show a change link when read-only', () => {
+        const component = renderComponent()
+        expect(
+          within(component).queryByRole('link', {
+            name: /Change/
+          })
+        ).not.toBeInTheDocument()
       })
 
-      test('Should display "No" for consent to publish', () => {
-        const htmlContent = $component.html()
-        expect(htmlContent).toContain(
-          'Consent to publish your project information'
-        )
-        expect(htmlContent).toContain('No')
-      })
-
-      test('Should display reason field when consent is "no"', () => {
-        const htmlContent = $component.html()
-        expect(htmlContent).toContain('Why you do not consent')
-        expect(htmlContent).toContain(
-          'Legal privilege - contains confidential legal advice'
-        )
-      })
-
-      test('Should not show Change link when read-only', () => {
-        expect($component('.govuk-summary-card__actions')).toHaveLength(0)
-      })
-
-      test('Should have correct card title', () => {
-        expect($component('.govuk-summary-card__title').text().trim()).toBe(
-          'Sharing your project information publicly'
+      test('should show a change link when not read-only', () => {
+        const component = renderComponent({ isReadOnly: false })
+        expect(
+          within(component).getByRole('link', {
+            name: /Change/
+          })
+        ).toHaveAttribute(
+          'href',
+          '/exemption/sharing-your-project-information-publicly?from=check-your-answers'
         )
       })
     })

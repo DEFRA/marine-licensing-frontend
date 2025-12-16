@@ -30,7 +30,8 @@
     {{ appProjectDetailsCard({
       projectName: projectName,
       mcmsContext: mcmsContext,
-      isReadOnly: isReadOnly
+      isReadOnly: isReadOnly,
+      isApplicantView: true
     }) }}
 
     {{ appSiteLocationCard({
@@ -57,7 +58,8 @@
     {% endfor %}
     {{ appPublicRegisterCard({
       publicRegister: publicRegister,
-      isReadOnly: isReadOnly
+      isReadOnly: isReadOnly,
+      isApplicantView: true
     }) }}
     <form method="post">
       <input type="hidden" name="csrfToken" value="{{ csrfToken }}"/>

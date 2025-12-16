@@ -105,5 +105,10 @@ export const errorScenarios = {
         activityDescription: 'Test activity description'
       }
     ]
+  },
+  exemptionWithoutPublicConsent: {
+    ...baseSubmittedExemption,
+    status: 'Submitted',
+    publicRegister: { consent: 'no' }
   }
 }

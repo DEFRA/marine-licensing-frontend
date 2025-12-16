@@ -27,6 +27,7 @@ export const routes = {
   CHECK_YOUR_ANSWERS: '/exemption/check-your-answers',
   VIEW_DETAILS: '/exemption/view-details',
   VIEW_DETAILS_INTERNAL_USER: '/view-details',
+  VIEW_DETAILS_PUBLIC: '/exemption/view-public-details',
   CONFIRMATION: '/exemption/confirmation',
   SITE_DETAILS: '/exemption/site-details',
   SITE_NAME: '/exemption/site-name',

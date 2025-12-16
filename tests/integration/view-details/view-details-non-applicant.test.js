@@ -45,6 +45,12 @@ describe('View Details (non-applicant ie internal user, or public)', () => {
   const savedExemption = { ...exemption, whoExemptionIsFor: 'Dredging Co' }
   const expectedContent = {
     ...expectedPageContent,
+    summaryCards: [
+      'Project summary',
+      'Providing the site location',
+      'Site details',
+      'Sharing project information publicly'
+    ],
     pageCaption: savedExemption.applicationReference,
     backLinkText: null,
     projectDetails: {
@@ -62,6 +68,10 @@ describe('View Details (non-applicant ie internal user, or public)', () => {
       'Reference number': savedExemption.applicationReference,
       'Who the exemption is for': 'Dredging Co',
       'Date submitted': format(savedExemption.submittedAt, 'd MMMM yyyy')
+    },
+    publicRegister: {
+      'Consent to publish project information': 'No',
+      'Why the applicant did not consent': 'Legal reasons'
     }
   }
 

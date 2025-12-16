@@ -44,6 +44,12 @@ describe('View Details (non-applicant ie internal user, or public)', () => {
   const { exemption, expectedPageContent } = testScenarios[0]
   const expectedContent = {
     ...expectedPageContent,
+    summaryCards: [
+      'Project summary',
+      'Providing the site location',
+      'Site details',
+      'Sharing project information publicly'
+    ],
     pageCaption: exemption.applicationReference,
     backLinkText: null,
     projectDetails: {
@@ -60,6 +66,10 @@ describe('View Details (non-applicant ie internal user, or public)', () => {
       'Application type': 'Exempt activity notification',
       'Reference number': exemption.applicationReference,
       'Date submitted': format(exemption.submittedAt, 'd MMMM yyyy')
+    },
+    publicRegister: {
+      'Consent to publish project information': 'No',
+      'Why the applicant did not consent': 'Legal reasons'
     }
   }
 

@@ -10,12 +10,50 @@ on:
       - reopened
       - synchronize
       - ready_for_review
+  # Allows manual execution on a Dependabot PR branch to validate the lockfile normalisation job
+  workflow_dispatch:
 
 permissions:
   contents: read
   pull-requests: write
 
 jobs:
+  dependabot-lockfile:
+    name: Normalize package-lock.json (Dependabot)
+    # Runs for Dependabot-authored PRs, OR manually via workflow_dispatch for testing on a PR branch
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event.pull_request.user.login == 'dependabot[bot]' }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout PR branch
+        uses: actions/checkout@v6
+        with:
+          # pull_request -> github.head_ref; workflow_dispatch -> github.ref_name
+          ref: ${{ github.head_ref || github.ref_name }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      - name: Regenerate lockfile with repo npm
+        run: npm install --package-lock-only
+
+      - name: Commit lockfile if changed
+        run: |
+          if git diff --quiet package-lock.json; then
+            echo "No lockfile changes"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add package-lock.json
+          git commit -m "chore: normalize package-lock.json (auto)"
+          git push
+
   pr-validator:
     name: Run Pull Request Checks
     runs-on: ubuntu-latest
@@ -47,34 +85,34 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-      
+
   security:
-      name: Snyk Security Scan and audit
-      runs-on: ubuntu-latest
-      if: github.actor != 'dependabot[bot]'
-      steps:
-        - name: Checkout code
-          uses: actions/checkout@v6
+    name: Snyk Security Scan and audit
+    runs-on: ubuntu-latest
+    if: github.actor != 'dependabot[bot]'
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
 
-        - name: Setup Node.js
-          uses: actions/setup-node@v6
-          with:
-            node-version-file: '.nvmrc'
-            cache: npm
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version-file: '.nvmrc'
+          cache: npm
 
-        - name: Install dependencies
-          run: npm ci
+      - name: Install dependencies
+        run: npm ci
 
-        - name: Run Snyk test
-          uses: snyk/actions/node@master
-          env:
-            SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+      - name: Run Snyk test
+        uses: snyk/actions/node@master
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
 
-        - name: Security audit
-          run: |
-              npm ci
-              npm audit --audit-level=high || (echo 'Vulnerabilities found!' && exit 1)
-                
+      - name: Security audit
+        run: |
+          npm ci
+          npm audit --audit-level=high || (echo 'Vulnerabilities found!' && exit 1)
+
   test-journey:
     name: Run Journey Tests
     runs-on: ubuntu-latest

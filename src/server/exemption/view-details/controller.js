@@ -60,7 +60,10 @@ export const viewDetailsController = {
         ...exemption,
         siteDetails,
         multipleSiteDetails,
-        siteLocationData
+        siteLocationData,
+        whoExemptionIsFor: isApplicantView
+          ? undefined
+          : exemption.organisation?.name
       })
     } catch (error) {
       if (error.isBoom) {

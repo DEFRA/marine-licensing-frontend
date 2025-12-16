@@ -28,7 +28,7 @@
     {% endif %}
 
     <h1 class="govuk-heading-l" id="view-details-heading">{{ pageTitle }}</h1>
-      {% if isInternalUser %}
+      {% if not isApplicantView %}
     {{ appApplicationDetailsCard({
       applicationReference: applicationReference,
       dateSubmitted: submittedAt,
@@ -39,7 +39,7 @@
     {{ appProjectDetailsCard({
       mcmsContext: mcmsContext,
       isReadOnly: isReadOnly,
-      isInternalUser: isInternalUser
+      isApplicantView: isApplicantView
     }) }}
     {% endif %}
 

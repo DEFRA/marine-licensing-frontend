@@ -46,7 +46,7 @@
       }), rows) %}
     {% endif %}
 
-    {% set sentenceStart = "Based on the applicant's answers, their" if params.isInternalUser else "Based on your answers from \'Check if you need a marine licence\', your" %}
+    {% set sentenceStart = "Based on your answers from \'Check if you need a marine licence\', your" if params.isApplicantView else "Based on the applicant's answers, their" %}
     {% set rows = (rows.push({
       key: {
         text: "Why this activity is exempt"
@@ -57,15 +57,15 @@
       classes: "govuk-summary-list__row--no-border"
     }), rows) %}
 
-    {% set sentences = ['<p><a href="' + params.mcmsContext.pdfDownloadUrl + '" class="govuk-link">Download a copy of ' +  ('their' if params.isInternalUser else 'your') + ' answers (PDF)</a></p>'] %}
+    {% set sentences = ['<p><a href="' + params.mcmsContext.pdfDownloadUrl + '" class="govuk-link">Download a copy of ' +  ('your' if params.isApplicantView else 'their') + ' answers (PDF)</a></p>'] %}
 
-    {% if not params.isInternalUser %}
+    {% if params.isApplicantView %}
       {% set sentences = (sentences.push('<hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible"><p class="govuk-body">If you need to change any of your \'Check if you need a marine licence\' answers:</p><ol class="govuk-list govuk-list--number"><li>Delete this project from your projects.</li><li>Restart the process by checking if you need a marine licence.</li></ol>'), sentences) %}
     {% endif %}
 
     {% set rows = (rows.push({
       key: {
-        text: ("The applicant's answers" if params.isInternalUser else "Your answers") + " from 'Check if you need a marine licence'"
+        text: ("Your answers" if params.isApplicantView else "The applicant's answers") + " from 'Check if you need a marine licence'"
       },
       value: {
         html: sentences | join

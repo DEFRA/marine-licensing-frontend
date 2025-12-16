@@ -4,6 +4,7 @@ import { authenticatedGetRequest } from '#src/server/common/helpers/authenticate
 
 const apiPaths = {
   getExemption: (id) => `/exemption/${id}`,
+  getPublicExemption: (id) => `/public/exemption/${id}`,
   submitExemption: '/exemption/submit'
 }
 
@@ -14,15 +15,22 @@ export class ExemptionService {
   }
 
   async getExemptionById(id) {
+    return this.getExemptionData({ id })
+  }
+
+  async getPublicExemptionById(id) {
+    return this.getExemptionData({ id, isPublic: true })
+  }
+
+  async getExemptionData({ id, isPublic = false }) {
     if (!id) {
       this.logger.error({ id }, errorMessages.EXEMPTION_NOT_FOUND)
       throw new Error(errorMessages.EXEMPTION_NOT_FOUND)
     }
-
-    const { payload } = await authenticatedGetRequest(
-      this.request,
-      apiPaths.getExemption(id)
-    )
+    const endpoint = isPublic
+      ? apiPaths.getPublicExemption(id)
+      : apiPaths.getExemption(id)
+    const { payload } = await authenticatedGetRequest(this.request, endpoint)
 
     if (payload?.message !== 'success' || !payload.value) {
       this.logger.error({ id }, errorMessages.EXEMPTION_DATA_NOT_FOUND)

@@ -1,38 +1,36 @@
-import { renderComponent } from '#src/server/test-helpers/component-helpers.js'
+import { renderComponentJSDOM } from '#src/server/test-helpers/component-helpers.js'
+import { validateApplicationDetails } from '#tests/integration/shared/summary-card-validators.js'
+import { within } from '@testing-library/dom'
 
 describe('Application Details Card Component', () => {
-  let $component
+  test('should display all card content', () => {
+    const card = renderComponentJSDOM('application-details-card', {
+      applicationReference: 'EXE/2025/10121',
+      dateSubmitted: '2025-09-18T08:56:34.000Z',
+      whoExemptionIsFor: 'Test Organisation',
+      isReadOnly: true
+    })
+    expect(within(card).getByRole('heading', { level: 2 })).toHaveTextContent(
+      'Application details'
+    )
+    validateApplicationDetails(card, {
+      applicationDetails: {
+        'Application type': 'Exempt activity notification',
+        'Reference number': 'EXE/2025/10121',
+        'Who the exemption is for': 'Test Organisation',
+        'Date submitted': '18 September 2025'
+      }
+    })
+  })
 
-  beforeEach(() => {
-    $component = renderComponent('application-details-card', {
+  test('should not display who the exemption is for if it is not provided', () => {
+    const card = renderComponentJSDOM('application-details-card', {
       applicationReference: 'EXE/2025/10121',
       dateSubmitted: '2025-09-18T08:56:34.000Z',
       isReadOnly: true
     })
-  })
-
-  test('Should render project details card component', () => {
-    expect($component('#application-details-card')).toHaveLength(1)
-  })
-
-  test('Should display application type', () => {
-    const htmlContent = $component.html()
-    expect(htmlContent).toContain('Exempt activity notification')
-  })
-
-  test('Should display application reference', () => {
-    const htmlContent = $component.html()
-    expect(htmlContent).toContain('EXE/2025/10121')
-  })
-
-  test('Should display submitted date', () => {
-    const htmlContent = $component.html()
-    expect(htmlContent).toContain('18 September 2025')
-  })
-
-  test('Should have correct card title', () => {
-    expect($component('.govuk-summary-card__title').text().trim()).toBe(
-      'Application details'
-    )
+    expect(
+      within(card).queryByText('Who the exemption is for')
+    ).not.toBeInTheDocument()
   })
 })

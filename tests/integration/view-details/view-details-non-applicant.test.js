@@ -42,9 +42,10 @@ describe('View Details (non-applicant ie internal user, or public)', () => {
   }
 
   const { exemption, expectedPageContent } = testScenarios[0]
+  const savedExemption = { ...exemption, organisation: { name: 'Dredging Co' } }
   const expectedContent = {
     ...expectedPageContent,
-    pageCaption: exemption.applicationReference,
+    pageCaption: savedExemption.applicationReference,
     backLinkText: null,
     projectDetails: {
       'Type of activity': 'Deposit of a substance or object',
@@ -58,16 +59,17 @@ describe('View Details (non-applicant ie internal user, or public)', () => {
     },
     applicationDetails: {
       'Application type': 'Exempt activity notification',
-      'Reference number': exemption.applicationReference,
-      'Date submitted': format(exemption.submittedAt, 'd MMMM yyyy')
+      'Reference number': savedExemption.applicationReference,
+      'Who the exemption is for': savedExemption.organisation.name,
+      'Date submitted': format(savedExemption.submittedAt, 'd MMMM yyyy')
     }
   }
 
   test('internal user', async () => {
     vi.mocked(getAuthProvider).mockReturnValue(AUTH_STRATEGIES.ENTRA_ID)
     const document = await getPageDocument(
-      exemption,
-      `${routes.VIEW_DETAILS_INTERNAL_USER}/${exemption.id}`
+      savedExemption,
+      `${routes.VIEW_DETAILS_INTERNAL_USER}/${savedExemption.id}`
     )
 
     validatePageStructure(document, expectedContent)
@@ -81,8 +83,8 @@ describe('View Details (non-applicant ie internal user, or public)', () => {
 
   test('public user', async () => {
     const document = await getPageDocument(
-      exemption,
-      `${routes.VIEW_DETAILS_PUBLIC}/${exemption.id}`
+      savedExemption,
+      `${routes.VIEW_DETAILS_PUBLIC}/${savedExemption.id}`
     )
 
     validatePageStructure(document, expectedContent)

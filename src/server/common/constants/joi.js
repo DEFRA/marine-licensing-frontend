@@ -22,5 +22,8 @@ export const JOI_ERRORS = {
   CUSTOM_END_DATE_INVALID: 'custom.endDate.invalid',
   CUSTOM_START_DATE_TODAY_OR_FUTURE: 'custom.startDate.todayOrFuture',
   CUSTOM_END_DATE_TODAY_OR_FUTURE: 'custom.endDate.todayOrFuture',
-  CUSTOM_END_DATE_BEFORE_START_DATE: 'custom.endDate.before.startDate'
+  CUSTOM_END_DATE_BEFORE_START_DATE: 'custom.endDate.before.startDate',
+  CUSTOM_START_DATE_TOO_FAR_FUTURE: 'custom.startDate.tooFarFuture',
+  CUSTOM_END_DATE_TOO_FAR_FUTURE: 'custom.endDate.tooFarFuture',
+  CUSTOM_END_DATE_TOO_FAR_APART: 'custom.endDate.tooFarApart'
 }

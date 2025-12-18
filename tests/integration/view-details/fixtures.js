@@ -8,7 +8,8 @@ const baseSubmittedExemption = {
   submittedAt: '2025-01-01T10:00:00.000Z',
   projectName: 'Test Marine Activity Project',
   publicRegister: {
-    consent: 'no'
+    consent: 'no',
+    reason: 'Legal reasons'
   },
   mcmsContext: mockExemptionMcmsContext,
   multipleSiteDetails: {
@@ -114,7 +115,8 @@ const baseExpectedContent = {
     ]
   },
   publicRegister: {
-    'Consent to publish your project information': 'No'
+    'Consent to publish your project information': 'No',
+    'Why you do not consent': 'Legal reasons'
   }
 }
 

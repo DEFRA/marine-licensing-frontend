@@ -1,6 +1,8 @@
 // @vitest-environment jsdom
 
 /* eslint-env vitest */
+import { within } from '@testing-library/dom'
+
 const GOV_UK_SUMMARY_LIST_KEY = '.govuk-summary-list__key'
 /**
  * Validates the basic page structure (heading and back link)
@@ -39,11 +41,9 @@ export const validatePageStructure = (document, expected) => {
  */
 export const validateAllSummaryCardsExist = (document, expected) => {
   for (const expectedTitle of expected.summaryCards) {
-    const cardTitles = document.querySelectorAll('.govuk-summary-card__title')
-    const foundCard = Array.from(cardTitles).find(
-      (title) => title.textContent.trim() === expectedTitle
-    )
-    expect(foundCard).toBeTruthy()
+    expect(
+      within(document).getByRole('heading', { level: 2, name: expectedTitle })
+    ).toBeInTheDocument()
   }
 }
 /**
@@ -53,11 +53,9 @@ export const validateAllSummaryCardsExist = (document, expected) => {
  */
 export const validateAnySummaryCardsMissing = (document, expected) => {
   for (const expectedTitle of expected.summaryCardsMissing ?? []) {
-    const cardTitles = document.querySelectorAll('.govuk-summary-card__title')
-    const foundCard = Array.from(cardTitles).find(
-      (title) => title.textContent.trim() === expectedTitle
-    )
-    expect(foundCard).toBeFalsy()
+    expect(
+      within(document).queryByRole('heading', { level: 2, name: expectedTitle })
+    ).not.toBeInTheDocument()
   }
 }
 

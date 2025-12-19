@@ -20,7 +20,7 @@ export const homeController = {
       !getMcmsContextFromCache(request) &&
       !request.query.ACTIVITY_TYPE
     ) {
-      return h.redirect(routes.DASHBOARD)
+      return h.redirect(routes.SERVICE_HOME)
     }
 
     // redirect to start a new exemption

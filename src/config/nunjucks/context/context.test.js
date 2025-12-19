@@ -48,7 +48,7 @@ describe('#context', () => {
           {
             active: false,
             text: 'Projects',
-            href: '/home'
+            href: '/projects'
           },
           {
             href: '#',

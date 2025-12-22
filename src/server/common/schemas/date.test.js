@@ -1,6 +1,5 @@
 import { vi } from 'vitest'
 import joi from 'joi'
-import { JOI_ERRORS } from '#src/server/common/constants/joi.js'
 import {
   activityDatesSchema,
   individualDate
@@ -174,7 +173,7 @@ describe('activityDatesSchema', () => {
       expect(result.error).toBeDefined()
 
       const errorTypes = result.error.details.map((d) => d.type)
-      expect(errorTypes).toContain('number.max')
+      expect(errorTypes).toContain('custom.startDate.tooFarFuture')
     })
 
     test('should reject invalid day (< 1)', () => {
@@ -485,9 +484,7 @@ describe('activityDatesSchema', () => {
         .object({
           ...individualDate({
             prefix: 'start-date',
-            minYear: 2020,
-            maxYear: 2030,
-            minYearError: JOI_ERRORS.CUSTOM_START_DATE_TODAY_OR_FUTURE
+            field: 'startDate'
           })
         })
         .validate(
@@ -508,8 +505,7 @@ describe('activityDatesSchema', () => {
         .object({
           ...individualDate({
             prefix: 'test-date',
-            minYear: 2020,
-            maxYear: 2030
+            field: 'startDate'
           })
         })
         .validate({
@@ -526,8 +522,7 @@ describe('activityDatesSchema', () => {
         .object({
           ...individualDate({
             prefix: 'custom-date',
-            minYear: 2025,
-            maxYear: 2030,
+            field: 'startDate',
             minYearError: customError
           })
         })
@@ -546,51 +541,13 @@ describe('activityDatesSchema', () => {
         .object({
           ...individualDate({
             prefix: 'default-min-year',
-            maxYear: 2030
-            // minYear not provided - should default to MIN_YEAR (current year)
+            field: 'startDate'
           })
         })
         .validate({
           'default-min-year-day': 15,
           'default-min-year-month': 6,
           'default-min-year-year': 2020 // Should fail because it's less than MIN_YEAR (2025)
-        })
-      expect(result.error).toBeDefined()
-      expect(result.error.details[0].type).toBe('number.min')
-    })
-
-    test('should use default maxYear when not provided (line 23)', () => {
-      // Test that default maxYear = MAX_YEAR is used when not explicitly set
-      const result = joi
-        .object({
-          ...individualDate({
-            prefix: 'default-max-year',
-            minYear: 2020
-            // maxYear not provided - should default to MAX_YEAR (current year + 75)
-          })
-        })
-        .validate({
-          'default-max-year-day': 15,
-          'default-max-year-month': 6,
-          'default-max-year-year': 2200 // Should fail because it's greater than MAX_YEAR (2100)
-        })
-      expect(result.error).toBeDefined()
-      expect(result.error.details[0].type).toBe('number.max')
-    })
-
-    test('should use both default minYear and maxYear when neither provided', () => {
-      // Test that both default values are used when only prefix is provided
-      const result = joi
-        .object({
-          ...individualDate({
-            prefix: 'all-defaults'
-            // Both minYear and maxYear not provided - should use defaults
-          })
-        })
-        .validate({
-          'all-defaults-day': 15,
-          'all-defaults-month': 6,
-          'all-defaults-year': 2020 // Should fail because it's less than MIN_YEAR
         })
       expect(result.error).toBeDefined()
       expect(result.error.details[0].type).toBe('number.min')

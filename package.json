@@ -84,7 +84,7 @@
     "@testing-library/dom": "^10.4.1",
     "@testing-library/jest-dom": "^6.9.1",
     "@vitest/coverage-v8": "^4.0.14",
-    "@vitest/runner": "^4.0.14",
+    "@vitest/runner": "^4.0.16",
     "@vitest/ui": "^4.0.14",
     "allure-commandline": "^2.34.1",
     "allure-vitest": "^3.4.2",

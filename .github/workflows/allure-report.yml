@@ -50,7 +50,7 @@ jobs:
 
       - name: Upload Allure Report Artifact
         if: always()
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: allure-report-${{ github.run_number }}
           path: allure-report/

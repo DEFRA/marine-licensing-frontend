@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 @use 'govuk-frontend' as *;
 
 // Imported MOJ Experimental Styles: https://design-patterns.service.justice.gov.uk/components/card/#code-tab
@@ -145,3 +146,85 @@
 }
 
 // stylelint-enable no-duplicate-selectors
+=======
+.card-grid {
+  display: grid;
+  gap: 20px;
+  margin-bottom: 40px;
+}
+
+@media (min-width: 768px) {
+  .card-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1200px) {
+  .card-grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 30px;
+    margin-bottom: 60px;
+  }
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  background: #efefef;
+  padding: 20px;
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease;
+  cursor: pointer;
+  text-decoration: none !important;
+}
+
+.card h2 {
+  margin-bottom: 15px;
+  color: #1d70b8;
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 2px;
+}
+
+.card p {
+  line-height: 1.5;
+  transition: color 0.2s ease;
+  text-decoration: none !important;
+}
+
+.card h1 a:hover,
+.card h2 a:hover,
+.card h3 a:hover,
+.card h4 a:hover,
+.card h5 a:hover,
+.card h6 a:hover,
+.card p a:hover {
+  text-decoration: underline;
+}
+
+.haslink {
+  outline: none;
+  outline-offset: 0.3rem;
+}
+
+.haslink:hover {
+  cursor: pointer;
+  color: #fff;
+  background-color: #003078;
+}
+
+.haslink:hover a {
+  color: #fff;
+}
+
+.haslink:hover h1,
+.haslink:hover h2,
+.haslink:hover h3,
+.haslink:hover h4,
+.haslink:hover h5,
+.haslink:hover h6,
+.haslink:hover p {
+  color: #fff;
+}
+>>>>>>> 9cec8885 (Add cards for service home)

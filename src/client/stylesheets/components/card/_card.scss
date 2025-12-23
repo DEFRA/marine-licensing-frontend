@@ -27,7 +27,7 @@
     background-color 0.2s ease,
     color 0.2s ease;
   cursor: pointer;
-  text-decoration: none !important;
+  text-decoration: none;
 }
 
 .card h2 {
@@ -41,7 +41,7 @@
 .card p {
   line-height: 1.5;
   transition: color 0.2s ease;
-  text-decoration: none !important;
+  text-decoration: none;
 }
 
 .card h1 a:hover,
@@ -61,12 +61,12 @@
 
 .haslink:hover {
   cursor: pointer;
-  color: #fff;
+  color: #ffffff;
   background-color: #003078;
 }
 
 .haslink:hover a {
-  color: #fff;
+  color: #ffffff;
 }
 
 .haslink:hover h1,
@@ -76,5 +76,5 @@
 .haslink:hover h5,
 .haslink:hover h6,
 .haslink:hover p {
-  color: #fff;
+  color: #ffffff;
 }

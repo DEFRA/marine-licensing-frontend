@@ -407,6 +407,12 @@ export const config = convict({
     doc: 'The CDP environment the app is currently in, with the addition of "local"',
     format: ['local', 'dev', 'test', 'perf-test', 'ext-test', 'prod'],
     default: process.env.ENVIRONMENT ?? 'local'
+  },
+  enableBrowserLogging: {
+    doc: 'Enable / disable browser logging in the browser and at the api level',
+    format: Boolean,
+    default: true,
+    env: 'ENABLE_BROWSER_LOGGING'
   }
 })
 

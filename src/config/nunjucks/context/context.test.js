@@ -42,6 +42,7 @@ describe('#context', () => {
         assetPath: '/public/assets',
         breadcrumbs: [],
         clarityProjectId: '',
+        enableBrowserLogging: true,
         getAssetPath: expect.any(Function),
         isAuthenticated: false,
         navigation: [

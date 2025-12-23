@@ -23,9 +23,11 @@ Object.defineProperty(globalThis, 'document', {
 
 describe('SiteDataLoader', () => {
   let siteDataLoader
+  let consoleErrorSpy
 
   beforeEach(() => {
     vi.clearAllMocks()
+    consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
     document.createElement.mockImplementation((tagName) => {
       const element = {
         tagName: tagName.toUpperCase(),
@@ -40,6 +42,10 @@ describe('SiteDataLoader', () => {
       return element
     })
     siteDataLoader = new SiteDataLoader()
+  })
+
+  afterEach(() => {
+    consoleErrorSpy.mockRestore()
   })
 
   describe('loadSiteDetails', () => {
@@ -64,13 +70,19 @@ describe('SiteDataLoader', () => {
       expect(result).toEqual(siteDetails)
     })
 
-    test('should throw error when JSON parsing fails', () => {
+    test('should log error and return null when JSON parsing fails', () => {
       const mockElement = {
         textContent: 'invalid json'
       }
       document.getElementById.mockReturnValue(mockElement)
 
-      expect(() => siteDataLoader.loadSiteDetails()).toThrow()
+      const result = siteDataLoader.loadSiteDetails()
+
+      expect(result).toBeNull()
+      expect(consoleErrorSpy).toHaveBeenCalledWith(
+        'Failed to parse site details from DOM:',
+        expect.any(Error)
+      )
     })
 
     test('should load data from map element data attribute when provided', () => {

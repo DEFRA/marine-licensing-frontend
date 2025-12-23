@@ -1,3 +1,4 @@
+import { ErrorTracking } from './error-tracking/error-tracking.js'
 import Clarity from '@microsoft/clarity'
 import {
   Button,
@@ -36,6 +37,10 @@ function syncClarityConsent() {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
+  if (globalThis.ENABLE_BROWSER_LOGGING) {
+    const errorTracking = new ErrorTracking()
+    errorTracking.init()
+  }
   if (globalThis.CLARITY_PROJECT_ID) {
     Clarity.init(globalThis.CLARITY_PROJECT_ID)
     syncClarityConsent()

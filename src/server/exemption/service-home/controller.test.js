@@ -39,7 +39,26 @@ describe('#serviceHome', () => {
 
       expect(h.view).toHaveBeenCalledWith(SERVICE_HOME_VIEW_ROUTE, {
         pageTitle: 'Home',
-        heading: 'Home'
+        heading: 'Home',
+        cards: [
+          {
+            description: 'View all of the existing projects in this account.',
+            link: '/projects',
+            title: 'View Projects'
+          },
+          {
+            description:
+              "Find out if an activity needs a marine licence or if it's exempt.",
+            link: 'https://marinelicensing.marinemanagement.org.uk/mmofox5/journey/self-service/start',
+            title: 'Check if I need a marine licence'
+          },
+          {
+            description:
+              'View or manage projects not available in this account.',
+            link: 'https://marinelicensing.marinemanagement.org.uk/mmofox5/fox/live/MMO_LOGIN/login',
+            title: 'Sign in to the Marine Case Management System'
+          }
+        ]
       })
     })
 

@@ -8,9 +8,25 @@
       {% if commonPageViewData.orgOrUserName %}
         <span class="govuk-caption-l">{{ commonPageViewData.orgOrUserName }}</span>
       {% endif %}
-      <h1 class="govuk-heading-xl">{{ heading }}</h1>
+      <h1 class="govuk-heading-l">{{ heading }}</h1>
+      </div>
+  </div>  
+
+
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-full">
+      <div class="card-grid">
+
+        {% for card in cards %}
+          <a href="{{ card.link }}" class="card haslink" aria-label="{{ card.title }}">
+            <h2 class="govuk-heading-m">{{ card.title }}</h2>
+            <p class="govuk-body">{{ card.description }}</p>
+          </a>
+        {% endfor %}
+
     </div>
   </div>
+</div>
 
 {% endblock %}
 

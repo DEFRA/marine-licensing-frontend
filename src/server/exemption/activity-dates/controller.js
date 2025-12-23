@@ -29,6 +29,7 @@ import { getSiteNumber } from '#src/server/exemption/site-details/utils/site-num
 import { getCancelLink } from '#src/server/exemption/site-details/utils/cancel-link.js'
 import { getBackRoute, getNextRoute } from './utils.js'
 import { copySameActivityDatesToAllSites } from '#src/server/common/helpers/copy-same-activity-data.js'
+import { getExemptionService } from '#src/services/exemption-service/index.js'
 
 const getBackLink = (siteIndex, action, siteNumber, queryParams, exemption) => {
   if (action) {
@@ -107,7 +108,7 @@ export const activityDatesController = {
   }
 }
 
-function handleValidationErrors(request, h, err) {
+export function handleValidationErrors(request, h, err) {
   const exemption = getExemptionCache(request)
   const { payload, site } = request
   const { siteIndex, queryParams } = site ?? {}
@@ -141,13 +142,29 @@ function handleValidationErrors(request, h, err) {
     .takeover()
 }
 
+const validateActivityDates = async (request, h) => {
+  const exemption = getExemptionCache(request)
+
+  const exemptionService = getExemptionService(request)
+  const savedExemption = await exemptionService.getExemptionById(exemption.id)
+
+  const articleCode = savedExemption.mcmsContext?.articleCode
+
+  const { error } = activityDatesSchema.validate(request.payload, {
+    context: { articleCode },
+    abortEarly: false
+  })
+
+  if (error) {
+    return handleValidationErrors(request, h, error)
+  }
+
+  return h.continue
+}
+
 export const activityDatesSubmitController = {
   options: {
-    pre: [setSiteDataPreHandler],
-    validate: {
-      payload: activityDatesSchema,
-      failAction: handleValidationErrors
-    }
+    pre: [setSiteDataPreHandler, validateActivityDates]
   },
   async handler(request, h) {
     const { payload } = request

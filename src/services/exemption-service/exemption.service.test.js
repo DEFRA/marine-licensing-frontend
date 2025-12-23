@@ -383,4 +383,127 @@ describe('ExemptionService', () => {
       })
     })
   })
+
+  describe('getPublicExemptionById', () => {
+    beforeEach(() => {
+      service = new ExemptionService(mockRequest, mockLogger)
+    })
+
+    describe('successful scenarios', () => {
+      test('should return exemption data for valid ID using public endpoint', async () => {
+        const exemptionId = '507f1f77bcf86cd799439011'
+        const expectedExemption = {
+          id: exemptionId,
+          projectName: 'Test Project',
+          status: 'Submitted'
+        }
+
+        mockAuthenticatedGetRequest.mockResolvedValue({
+          payload: {
+            message: 'success',
+            value: expectedExemption
+          }
+        })
+
+        const result = await service.getPublicExemptionById(exemptionId)
+
+        expect(mockAuthenticatedGetRequest).toHaveBeenCalledWith(
+          mockRequest,
+          `/public/exemption/${exemptionId}`
+        )
+        expect(result).toEqual(expectedExemption)
+        expect(mockLogger.error).not.toHaveBeenCalled()
+      })
+    })
+
+    describe('validation errors', () => {
+      test('should throw error when ID is null', async () => {
+        await expect(service.getPublicExemptionById(null)).rejects.toThrow(
+          errorMessages.EXEMPTION_NOT_FOUND
+        )
+
+        expect(mockLogger.error).toHaveBeenCalledWith(
+          { id: null },
+          errorMessages.EXEMPTION_NOT_FOUND
+        )
+        expect(mockAuthenticatedGetRequest).not.toHaveBeenCalled()
+      })
+
+      test('should throw error when ID is undefined', async () => {
+        await expect(service.getPublicExemptionById(undefined)).rejects.toThrow(
+          errorMessages.EXEMPTION_NOT_FOUND
+        )
+
+        expect(mockLogger.error).toHaveBeenCalledWith(
+          { id: undefined },
+          errorMessages.EXEMPTION_NOT_FOUND
+        )
+        expect(mockAuthenticatedGetRequest).not.toHaveBeenCalled()
+      })
+
+      test('should throw error when ID is empty string', async () => {
+        await expect(service.getPublicExemptionById('')).rejects.toThrow(
+          errorMessages.EXEMPTION_NOT_FOUND
+        )
+
+        expect(mockLogger.error).toHaveBeenCalledWith(
+          { id: '' },
+          errorMessages.EXEMPTION_NOT_FOUND
+        )
+        expect(mockAuthenticatedGetRequest).not.toHaveBeenCalled()
+      })
+    })
+
+    describe('API response errors', () => {
+      const validId = '507f1f77bcf86cd799439011'
+
+      test('should throw error when API response message is not success', async () => {
+        mockAuthenticatedGetRequest.mockResolvedValue({
+          payload: {
+            message: 'error',
+            value: null
+          }
+        })
+
+        await expect(service.getPublicExemptionById(validId)).rejects.toThrow(
+          errorMessages.EXEMPTION_DATA_NOT_FOUND
+        )
+
+        expect(mockLogger.error).toHaveBeenCalledWith(
+          { id: validId },
+          errorMessages.EXEMPTION_DATA_NOT_FOUND
+        )
+      })
+
+      test('should throw error when API response value is null', async () => {
+        mockAuthenticatedGetRequest.mockResolvedValue({
+          payload: {
+            message: 'success',
+            value: null
+          }
+        })
+
+        await expect(service.getPublicExemptionById(validId)).rejects.toThrow(
+          errorMessages.EXEMPTION_DATA_NOT_FOUND
+        )
+      })
+    })
+
+    describe('network errors', () => {
+      test('should propagate network errors from authenticatedGetRequest', async () => {
+        const validId = '507f1f77bcf86cd799439011'
+        const networkError = new Error('Network timeout')
+        mockAuthenticatedGetRequest.mockRejectedValue(networkError)
+
+        await expect(service.getPublicExemptionById(validId)).rejects.toThrow(
+          'Network timeout'
+        )
+
+        expect(mockAuthenticatedGetRequest).toHaveBeenCalledWith(
+          mockRequest,
+          `/public/exemption/${validId}`
+        )
+      })
+    })
+  })
 })

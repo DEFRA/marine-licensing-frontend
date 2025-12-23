@@ -7,7 +7,8 @@ import { createDateISO } from '#src/server/common/helpers/dates/date-utils.js'
 import * as cacheUtils from '#src/server/common/helpers/session-cache/utils.js'
 import {
   activityDatesController,
-  activityDatesSubmitController
+  activityDatesSubmitController,
+  handleValidationErrors
 } from '#src/server/exemption/activity-dates/controller.js'
 import { setupTestServer } from '#tests/integration/shared/test-setup-helpers.js'
 import { mockSite, createMockRequest } from '#src/server/test-helpers/mocks.js'
@@ -15,9 +16,11 @@ import {
   makeGetRequest,
   makePostRequest
 } from '#src/server/test-helpers/server-requests.js'
+import { getExemptionService } from '#src/services/exemption-service/index.js'
 
 vi.mock('~/src/server/common/helpers/session-cache/utils.js')
 vi.mock('~/src/server/common/helpers/save-site-details.js')
+vi.mock('~/src/services/exemption-service/index.js')
 
 describe('#activityDatesController', () => {
   const getServer = setupTestServer()
@@ -32,6 +35,11 @@ describe('#activityDatesController', () => {
     getExemptionCacheSpy = vi
       .spyOn(cacheUtils, 'getExemptionCache')
       .mockReturnValue(mockExemptionState)
+
+    const mockExemptionService = {
+      getExemptionById: vi.fn().mockResolvedValue(mockExemptionState)
+    }
+    vi.mocked(getExemptionService).mockReturnValue(mockExemptionService)
   })
 
   describe('activityDatesController GET', () => {
@@ -579,7 +587,7 @@ describe('#activityDatesController', () => {
         payload: {}
       })
 
-      activityDatesSubmitController.options.validate.failAction(request, h, err)
+      handleValidationErrors(request, h, err)
 
       expect(h.view).toHaveBeenCalled()
       const viewCall = h.view.mock.calls[0]
@@ -610,7 +618,7 @@ describe('#activityDatesController', () => {
         payload: {}
       })
 
-      activityDatesSubmitController.options.validate.failAction(request, h, err)
+      handleValidationErrors(request, h, err)
 
       expect(h.view).toHaveBeenCalled()
       const viewCall = h.view.mock.calls[0]
@@ -645,7 +653,7 @@ describe('#activityDatesController', () => {
         payload: {}
       })
 
-      activityDatesSubmitController.options.validate.failAction(request, h, err)
+      handleValidationErrors(request, h, err)
 
       expect(h.view).toHaveBeenCalled()
       const viewCall = h.view.mock.calls[0]
@@ -676,7 +684,7 @@ describe('#activityDatesController', () => {
         payload: {}
       })
 
-      activityDatesSubmitController.options.validate.failAction(request, h, err)
+      handleValidationErrors(request, h, err)
 
       expect(h.view).toHaveBeenCalled()
       const viewCall = h.view.mock.calls[0]
@@ -707,7 +715,7 @@ describe('#activityDatesController', () => {
         payload: {}
       })
 
-      activityDatesSubmitController.options.validate.failAction(request, h, err)
+      handleValidationErrors(request, h, err)
 
       expect(h.view).toHaveBeenCalled()
       const viewCall = h.view.mock.calls[0]
@@ -738,7 +746,7 @@ describe('#activityDatesController', () => {
         payload: {}
       })
 
-      activityDatesSubmitController.options.validate.failAction(request, h, err)
+      handleValidationErrors(request, h, err)
 
       expect(h.view).toHaveBeenCalled()
       const viewCall = h.view.mock.calls[0]
@@ -774,7 +782,7 @@ describe('#activityDatesController', () => {
         payload: {}
       })
 
-      activityDatesSubmitController.options.validate.failAction(request, h, err)
+      handleValidationErrors(request, h, err)
 
       expect(h.view).toHaveBeenCalled()
       const viewCall = h.view.mock.calls[0]
@@ -805,7 +813,7 @@ describe('#activityDatesController', () => {
         payload: {}
       })
 
-      activityDatesSubmitController.options.validate.failAction(request, h, err)
+      handleValidationErrors(request, h, err)
 
       expect(h.view).toHaveBeenCalled()
       const viewCall = h.view.mock.calls[0]
@@ -836,7 +844,7 @@ describe('#activityDatesController', () => {
         payload: {}
       })
 
-      activityDatesSubmitController.options.validate.failAction(request, h, err)
+      handleValidationErrors(request, h, err)
 
       expect(h.view).toHaveBeenCalled()
       const viewCall = h.view.mock.calls[0]
@@ -867,7 +875,7 @@ describe('#activityDatesController', () => {
         payload: {}
       })
 
-      activityDatesSubmitController.options.validate.failAction(request, h, err)
+      handleValidationErrors(request, h, err)
 
       expect(h.view).toHaveBeenCalled()
       const viewCall = h.view.mock.calls[0]
@@ -898,7 +906,7 @@ describe('#activityDatesController', () => {
         payload: {}
       })
 
-      activityDatesSubmitController.options.validate.failAction(request, h, err)
+      handleValidationErrors(request, h, err)
 
       expect(h.view).toHaveBeenCalled()
       const viewCall = h.view.mock.calls[0]
@@ -927,7 +935,7 @@ describe('#activityDatesController', () => {
         payload: {}
       })
 
-      activityDatesSubmitController.options.validate.failAction(request, h, err)
+      handleValidationErrors(request, h, err)
 
       expect(h.view).toHaveBeenCalled()
       const viewCall = h.view.mock.calls[0]
@@ -958,7 +966,7 @@ describe('#activityDatesController', () => {
         payload: {}
       })
 
-      activityDatesSubmitController.options.validate.failAction(request, h, err)
+      handleValidationErrors(request, h, err)
 
       expect(h.view).toHaveBeenCalled()
       const viewCall = h.view.mock.calls[0]
@@ -989,7 +997,7 @@ describe('#activityDatesController', () => {
         payload: {}
       })
 
-      activityDatesSubmitController.options.validate.failAction(request, h, err)
+      handleValidationErrors(request, h, err)
 
       expect(h.view).toHaveBeenCalled()
       const viewCall = h.view.mock.calls[0]
@@ -1022,7 +1030,7 @@ describe('#activityDatesController', () => {
         payload: {}
       })
 
-      activityDatesSubmitController.options.validate.failAction(request, h, err)
+      handleValidationErrors(request, h, err)
 
       expect(h.view).toHaveBeenCalled()
       const viewCall = h.view.mock.calls[0]
@@ -1051,7 +1059,7 @@ describe('#activityDatesController', () => {
         projectName: 'Test Project'
       })
 
-      activityDatesSubmitController.options.validate.failAction(request, h, err)
+      handleValidationErrors(request, h, err)
 
       expect(h.view).toHaveBeenCalledWith(
         ACTIVITY_DATES_VIEW_ROUTE,
@@ -1068,6 +1076,46 @@ describe('#activityDatesController', () => {
         })
       )
       expect(h.takeover).toHaveBeenCalled()
+    })
+  })
+
+  describe('validateActivityDates', () => {
+    test('should validate payload with articleCode context and return continue on success', async () => {
+      const validateActivityDates = activityDatesSubmitController.options.pre[1]
+      const exemption = {
+        id: 'test-exemption-id',
+        mcmsContext: { articleCode: '20' }
+      }
+      const savedExemption = {
+        id: 'test-exemption-id',
+        mcmsContext: { articleCode: '20' }
+      }
+      vi.mocked(cacheUtils.getExemptionCache).mockReturnValue(exemption)
+
+      const mockExemptionService = {
+        getExemptionById: vi.fn().mockResolvedValue(savedExemption)
+      }
+      vi.mocked(getExemptionService).mockReturnValue(mockExemptionService)
+
+      const currentYear = new Date().getFullYear()
+      const request = {
+        payload: {
+          'activity-start-date-day': '1',
+          'activity-start-date-month': '6',
+          'activity-start-date-year': (currentYear + 1).toString(),
+          'activity-end-date-day': '15',
+          'activity-end-date-month': '6',
+          'activity-end-date-year': (currentYear + 1).toString()
+        }
+      }
+      const h = { continue: Symbol('continue') }
+
+      const result = await validateActivityDates(request, h)
+
+      expect(mockExemptionService.getExemptionById).toHaveBeenCalledWith(
+        'test-exemption-id'
+      )
+      expect(result).toBe(h.continue)
     })
   })
 })

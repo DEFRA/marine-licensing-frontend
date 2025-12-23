@@ -72,13 +72,23 @@ function validateConfigFields(config, errors, errorSummary, errorTypeMap) {
   const yearError = errors[fieldErrorKeys[fieldNames.YEAR]]
 
   if (dayError) {
+    const dayMaxKey = `${fieldNames.DAY}-max`
+    const errorKey = errorTypeMap[dayMaxKey] ? dayMaxKey : errorKeys.DAY
     errorSummary.push(
-      createErrorSummaryItem(prefix, errorMessages[errorKeys.DAY])
+      createErrorSummaryItem(
+        prefix,
+        errorMessages[errorKey] || errorMessages[errorKeys.DAY]
+      )
     )
   }
   if (monthError) {
+    const monthMaxKey = `${fieldNames.MONTH}-max`
+    const errorKey = errorTypeMap[monthMaxKey] ? monthMaxKey : errorKeys.MONTH
     errorSummary.push(
-      createErrorSummaryItem(prefix, errorMessages[errorKeys.MONTH])
+      createErrorSummaryItem(
+        prefix,
+        errorMessages[errorKey] || errorMessages[errorKeys.MONTH]
+      )
     )
   }
   if (yearError) {
@@ -87,7 +97,6 @@ function validateConfigFields(config, errors, errorSummary, errorTypeMap) {
     )
   }
 }
-
 function hasCustomValidationError(config, errorTypeMap, errorSummary) {
   const { prefix, errorKeys, errorMessages } = config
   const checks = [
@@ -99,6 +108,14 @@ function hasCustomValidationError(config, errorTypeMap, errorSummary) {
     {
       key: errorKeys.BEFORE_OTHER_DATE,
       message: errorMessages[errorKeys.BEFORE_OTHER_DATE]
+    },
+    {
+      key: errorKeys.TOO_FAR_FUTURE,
+      message: errorMessages[errorKeys.TOO_FAR_FUTURE]
+    },
+    {
+      key: errorKeys.TOO_FAR_APART,
+      message: errorMessages[errorKeys.TOO_FAR_APART]
     }
   ]
 

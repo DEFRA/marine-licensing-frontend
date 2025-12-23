@@ -1,47 +1,54 @@
+import { logger } from '../error-tracking/logger.js'
+
 class MapFactory {
   constructor(olModules) {
     this.olModules = olModules
   }
 
   createMap(target, options, vectorLayer) {
-    const {
-      OpenLayersMap,
-      View,
-      TileLayer,
-      OSM,
-      Attribution,
-      defaultControls,
-      ScaleLine
-    } = this.olModules
+    try {
+      const {
+        OpenLayersMap,
+        View,
+        TileLayer,
+        OSM,
+        Attribution,
+        defaultControls,
+        ScaleLine
+      } = this.olModules
 
-    const attribution = new Attribution({
-      collapsible: false,
-      collapsed: false
-    })
-
-    const scaleLine = new ScaleLine({
-      units: 'metric'
-    })
-
-    const map = new OpenLayersMap({
-      target,
-      layers: [
-        new TileLayer({
-          source: new OSM()
-        }),
-        vectorLayer
-      ],
-      controls: defaultControls({ attribution: false }).extend([
-        attribution,
-        scaleLine
-      ]),
-      view: new View({
-        center: options.center,
-        zoom: options.zoom
+      const attribution = new Attribution({
+        collapsible: false,
+        collapsed: false
       })
-    })
 
-    return map
+      const scaleLine = new ScaleLine({
+        units: 'metric'
+      })
+
+      const map = new OpenLayersMap({
+        target,
+        layers: [
+          new TileLayer({
+            source: new OSM()
+          }),
+          vectorLayer
+        ],
+        controls: defaultControls({ attribution: false }).extend([
+          attribution,
+          scaleLine
+        ]),
+        view: new View({
+          center: options.center,
+          zoom: options.zoom
+        })
+      })
+
+      return map
+    } catch (error) {
+      logger.error('Failed to create OpenLayers map:', error)
+      throw error
+    }
   }
 
   setupResponsiveAttribution(map, attribution) {

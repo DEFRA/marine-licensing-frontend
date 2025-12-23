@@ -28,7 +28,10 @@ describe('view details controller', () => {
 
   beforeEach(() => {
     mockExemptionService = {
-      getExemptionById: vi.fn().mockResolvedValue(createSubmittedExemption())
+      getExemptionById: vi.fn().mockResolvedValue(createSubmittedExemption()),
+      getPublicExemptionById: vi
+        .fn()
+        .mockResolvedValue(createSubmittedExemption())
     }
 
     vi.mocked(getExemptionService).mockReturnValue(mockExemptionService)
@@ -176,6 +179,18 @@ describe('view details controller', () => {
         expect(statusCode).toBe(403)
       })
 
+      test('should throw any 403 returned from the backend when the public view has been requested by the exemption does not have consent to be public', async () => {
+        const authError = Boom.forbidden('Forbidden')
+        mockExemptionService.getPublicExemptionById.mockRejectedValue(authError)
+
+        const { statusCode } = await makeGetRequest({
+          url: `/exemption/view-public-details/${validExemptionId}`,
+          server: getServer()
+        })
+
+        expect(statusCode).toBe(403)
+      })
+
       test('should handle API authentication errors (403)', async () => {
         const authError = Boom.forbidden('Forbidden')
         mockExemptionService.getExemptionById.mockRejectedValue(authError)
@@ -228,8 +243,10 @@ describe('view details controller', () => {
     })
 
     describe('controller unit tests', () => {
-      test('should call view with correct data structure', async () => {
-        const submittedExemption = createSubmittedExemption()
+      test('should call view with correct data structure for applicant', async () => {
+        const submittedExemption = createSubmittedExemption({
+          organisation: { name: 'Dredging Co' }
+        })
         const mockExemptionServiceInstance = {
           getExemptionById: vi.fn().mockResolvedValue(submittedExemption)
         }
@@ -243,6 +260,7 @@ describe('view details controller', () => {
         ).mockReturnValue(null)
 
         const mockRequest = {
+          path: '/exemption/view-details/:exemptionId',
           params: { exemptionId: validExemptionId },
           logger: { error: vi.fn() }
         }
@@ -253,6 +271,7 @@ describe('view details controller', () => {
         expect(mockH.view).toHaveBeenCalledWith(
           VIEW_DETAILS_VIEW_ROUTE,
           expect.objectContaining({
+            isApplicantView: true,
             pageTitle: submittedExemption.projectName,
             pageCaption: 'EXE/2025/00003 - Exempt activity notification',
             backLink: '/home',
@@ -267,7 +286,52 @@ describe('view details controller', () => {
         )
       })
 
-      test('should omit the back link if user is authenticated with entra ID', async () => {
+      test('should call view with correct data structure for internal user', async () => {
+        const submittedExemption = createSubmittedExemption({
+          whoExemptionIsFor: 'Dave Barnett'
+        })
+        const mockExemptionServiceInstance = {
+          getExemptionById: vi.fn().mockResolvedValue(submittedExemption)
+        }
+
+        vi.mocked(getExemptionService).mockReturnValue(
+          mockExemptionServiceInstance
+        )
+
+        vi.mocked(
+          siteLocationDataHelpers.buildSiteLocationData
+        ).mockReturnValue(null)
+
+        const mockRequest = {
+          path: '/view-details/:exemptionId',
+          params: { exemptionId: validExemptionId },
+          logger: { error: vi.fn() }
+        }
+        const mockH = { view: vi.fn() }
+        vi.mocked(getAuthProvider).mockReturnValue('entra-id')
+
+        await viewDetailsController.handler(mockRequest, mockH)
+
+        expect(mockH.view).toHaveBeenCalledWith(
+          VIEW_DETAILS_VIEW_ROUTE,
+          expect.objectContaining({
+            isApplicantView: false,
+            pageTitle: submittedExemption.projectName,
+            pageCaption: 'EXE/2025/00003',
+            backLink: null,
+            isReadOnly: true,
+            projectName: submittedExemption.projectName,
+            activityDates: submittedExemption.activityDates,
+            activityDescription: submittedExemption.activityDescription,
+            publicRegister: submittedExemption.publicRegister,
+            siteDetails: expect.any(Array),
+            siteLocationData: null,
+            whoExemptionIsFor: 'Dave Barnett'
+          })
+        )
+      })
+
+      test('should omit the back link if user if accessing the internal user page', async () => {
         const submittedExemption = createSubmittedExemption()
         const mockExemptionServiceInstance = {
           getExemptionById: vi.fn().mockResolvedValue(submittedExemption)
@@ -279,6 +343,7 @@ describe('view details controller', () => {
         vi.mocked(getAuthProvider).mockReturnValue('entra-id')
 
         const mockRequest = {
+          path: '/view-details/:exemptionId',
           params: { exemptionId: validExemptionId },
           logger: { error: vi.fn() },
           auth: { credentials: { strategy: 'entra-id' } }
@@ -288,6 +353,55 @@ describe('view details controller', () => {
         await viewDetailsController.handler(mockRequest, mockH)
 
         expect(mockH.view.mock.calls[0][1].backLink).toBeNull()
+      })
+
+      test('should pass whoExemptionIsFor as undefined if organisation is not set in the exemption', async () => {
+        const submittedExemption = createSubmittedExemption({
+          organisation: undefined
+        })
+        const mockExemptionServiceInstance = {
+          getExemptionById: vi.fn().mockResolvedValue(submittedExemption)
+        }
+
+        vi.mocked(getExemptionService).mockReturnValue(
+          mockExemptionServiceInstance
+        )
+        vi.mocked(getAuthProvider).mockReturnValue('entra-id')
+
+        const mockRequest = {
+          path: '/view-details/:exemptionId',
+          params: { exemptionId: validExemptionId },
+          logger: { error: vi.fn() },
+          auth: { credentials: { strategy: 'entra-id' } }
+        }
+        const mockH = { view: vi.fn() }
+
+        await viewDetailsController.handler(mockRequest, mockH)
+        expect(mockH.view.mock.calls[0][1].whoExemptionIsFor).toBeUndefined()
+      })
+
+      test('should pass whoExemptionIsFor as undefined if the applicant is viewing the page', async () => {
+        const submittedExemption = createSubmittedExemption({
+          organisation: { name: 'Test' }
+        })
+        const mockExemptionServiceInstance = {
+          getExemptionById: vi.fn().mockResolvedValue(submittedExemption)
+        }
+
+        vi.mocked(getExemptionService).mockReturnValue(
+          mockExemptionServiceInstance
+        )
+
+        const mockRequest = {
+          path: '/exemption/view-details/:exemptionId',
+          params: { exemptionId: validExemptionId },
+          logger: { error: vi.fn() },
+          auth: { credentials: { strategy: 'defra-id' } }
+        }
+        const mockH = { view: vi.fn() }
+
+        await viewDetailsController.handler(mockRequest, mockH)
+        expect(mockH.view.mock.calls[0][1].whoExemptionIsFor).toBeUndefined()
       })
 
       test('should handle file upload data error and use fallback', async () => {
@@ -333,6 +447,7 @@ describe('view details controller', () => {
         ).mockReturnValue(mockSiteLocationData)
 
         const mockRequest = {
+          path: '/exemption/view-details/:exemptionId',
           params: { exemptionId: validExemptionId },
           logger: { error: vi.fn() }
         }
@@ -409,6 +524,7 @@ describe('view details controller', () => {
         ).mockReturnValue(mockSiteLocationData)
 
         const mockRequest = {
+          path: '/exemption/view-details/:exemptionId',
           params: { exemptionId: validExemptionId },
           logger: { error: vi.fn() }
         }
@@ -463,6 +579,7 @@ describe('view details controller', () => {
         })
 
         const mockRequest = {
+          path: '/exemption/view-details/:exemptionId',
           params: { exemptionId: validExemptionId },
           logger: { error: vi.fn() }
         }
@@ -489,6 +606,7 @@ describe('view details controller', () => {
         )
 
         const mockRequest = {
+          path: '/exemption/view-details/:exemptionId',
           params: {},
           logger: { error: vi.fn() }
         }
@@ -511,6 +629,7 @@ describe('view details controller', () => {
         )
 
         const mockRequest = {
+          path: '/exemption/view-details/:exemptionId',
           params: { exemptionId: 'invalid-id' },
           logger: { error: vi.fn() }
         }

@@ -42,7 +42,7 @@ describe('View Details (non-applicant ie internal user, or public)', () => {
   }
 
   const { exemption, expectedPageContent } = testScenarios[0]
-  const savedExemption = { ...exemption, organisation: { name: 'Dredging Co' } }
+  const savedExemption = { ...exemption, whoExemptionIsFor: 'Dredging Co' }
   const expectedContent = {
     ...expectedPageContent,
     summaryCards: [
@@ -66,7 +66,7 @@ describe('View Details (non-applicant ie internal user, or public)', () => {
     applicationDetails: {
       'Application type': 'Exempt activity notification',
       'Reference number': savedExemption.applicationReference,
-      'Who the exemption is for': savedExemption.organisation.name,
+      'Who the exemption is for': 'Dredging Co',
       'Date submitted': format(savedExemption.submittedAt, 'd MMMM yyyy')
     },
     publicRegister: {

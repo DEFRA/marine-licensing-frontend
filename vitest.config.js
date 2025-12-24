@@ -16,7 +16,8 @@ export default defineConfig({
         '**/.public/**',
         '**/src/server/test-helpers/**',
         '**/src/client/javascripts/application.js',
-        '**/src/index.js'
+        '**/src/index.js',
+        '**/*.json'
       ],
       reportsDirectory: 'coverage',
       reporter: ['text', 'lcov']

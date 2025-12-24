@@ -1,4 +1,9 @@
-import { renderComponent } from '#src/server/test-helpers/component-helpers.js'
+import {
+  renderComponent,
+  renderComponentJSDOM
+} from '#src/server/test-helpers/component-helpers.js'
+import { getByRole } from '@testing-library/dom'
+import { validateProjectDetails } from '#tests/integration/shared/summary-card-validators.js'
 
 describe('Project Details Card Component', () => {
   let $component
@@ -17,7 +22,7 @@ describe('Project Details Card Component', () => {
             'https://marinelicensingtest.marinemanagement.org.uk/mmofox5uat/journey…'
         },
         isReadOnly: false,
-        isInternalUser: false
+        isApplicantView: true
       })
     })
 
@@ -74,22 +79,6 @@ describe('Project Details Card Component', () => {
     })
   })
 
-  describe('With no MCMS activity details', () => {
-    beforeEach(() => {
-      $component = renderComponent('project-details-card', {
-        projectName: 'Test Marine Project',
-        mcmsContext: { iatQueryString: 'test' },
-        isReadOnly: false,
-        isInternalUser: false
-      })
-    })
-
-    it('Should not display the activity details section', () => {
-      const htmlContent = $component.html()
-      expect(htmlContent).not.toContain('Type of activity')
-    })
-  })
-
   describe('Read-only mode (isReadOnly: true)', () => {
     beforeEach(() => {
       $component = renderComponent('project-details-card', {
@@ -118,77 +107,131 @@ describe('Project Details Card Component', () => {
     })
   })
 
-  describe('Internal user', () => {
-    beforeEach(() => {
+  describe('MCMS details', () => {
+    it('Should not display the activity details section if no MCMS context', () => {
       $component = renderComponent('project-details-card', {
         projectName: 'Test Marine Project',
-        mcmsContext: {
-          activity: {
-            label: 'Deposit of a substance or object',
-            purpose: 'Scientific research purposes'
-          },
-          articleCode: '17',
-          pdfDownloadUrl:
-            'https://marinelicensingtest.marinemanagement.org.uk/mmofox5uat/journey…'
-        },
+        mcmsContext: { iatQueryString: 'test' },
         isReadOnly: false,
-        isInternalUser: true
+        isApplicantView: true
+      })
+      const htmlContent = $component.html()
+      expect(htmlContent).not.toContain('Type of activity')
+    })
+
+    describe('Applicant view', () => {
+      test('Should display MCMS context', () => {
+        const document = renderComponentJSDOM('project-details-card', {
+          projectName: 'Test Marine Project',
+          mcmsContext: {
+            activity: {
+              label: 'Deposit of a substance or object',
+              purpose: 'Scientific research purposes'
+            },
+            articleCode: '17',
+            pdfDownloadUrl:
+              'https://marinelicensingtest.marinemanagement.org.uk/mmofox5uat/journey…'
+          },
+          isReadOnly: true,
+          isApplicantView: true
+        })
+        expect(
+          getByRole(document, 'heading', {
+            level: 2,
+            name: 'Project summary'
+          })
+        ).toBeInTheDocument()
+        validateProjectDetails(document, {
+          projectDetails: {
+            'Type of activity': 'Deposit of a substance or object',
+            'The purpose of the activity': 'Scientific research purposes',
+            'Why this activity is exempt':
+              "Based on your answers from 'Check if you need a marine licence', your activity is exempt under Article 17 of the Marine Licensing (Exempted Activities) Order 2011 (opens in new tab)",
+            "Your answers from 'Check if you need a marine licence'": [
+              'Download a copy of your answers (PDF)',
+              "If you need to change any of your 'Check if you need a marine licence' answers:",
+              'Delete this project from your projects.',
+              'Restart the process by checking if you need a marine licence.'
+            ]
+          }
+        })
       })
     })
 
-    test('Should display all activity detail rows', () => {
-      const htmlContent = $component.html()
-      expect(htmlContent).toContain('Type of activity')
-      expect(htmlContent).toContain('Deposit of a substance or object')
-      expect(htmlContent).toContain('Why this activity is exempt')
-      expect(htmlContent).toContain(
-        "Based on the applicant's answers, their activity is exempt"
-      )
-      expect(htmlContent).toContain(
-        'Article 17 of the Marine Licensing (Exempted Activities) Order 2011 (opens in new tab)'
-      )
-    })
-  })
-
-  describe('Activity purpose field', () => {
-    test('Should render "The purpose of the activity" when purpose is provided', () => {
-      $component = renderComponent('project-details-card', {
-        projectName: 'Test Marine Project',
-        mcmsContext: {
-          activity: {
-            label: 'Deposit of a substance or object',
-            purpose: 'Scientific research purposes'
+    describe('Internal user or public view', () => {
+      test('Should display MCMS context', () => {
+        const document = renderComponentJSDOM('project-details-card', {
+          projectName: 'Test Marine Project',
+          mcmsContext: {
+            activity: {
+              label: 'Deposit of a substance or object',
+              purpose: 'Scientific research purposes'
+            },
+            articleCode: '17',
+            pdfDownloadUrl:
+              'https://marinelicensingtest.marinemanagement.org.uk/mmofox5uat/journey…'
           },
-          articleCode: '17',
-          pdfDownloadUrl:
-            'https://marinelicensingtest.marinemanagement.org.uk/mmofox5uat/journey…'
-        },
-        isReadOnly: false,
-        isInternalUser: false
+          isReadOnly: true,
+          isApplicantView: false
+        })
+        expect(
+          getByRole(document, 'heading', {
+            level: 2,
+            name: 'Project summary'
+          })
+        ).toBeInTheDocument()
+        validateProjectDetails(document, {
+          projectDetails: {
+            'Type of activity': 'Deposit of a substance or object',
+            'The purpose of the activity': 'Scientific research purposes',
+            'Why this activity is exempt':
+              "Based on the applicant's answers, their activity is exempt under Article 17 of the Marine Licensing (Exempted Activities) Order 2011 (opens in new tab)",
+            "The applicant's answers from 'Check if you need a marine licence'":
+              ['Download a copy of their answers (PDF)']
+          }
+        })
+      })
+    })
+    describe('Activity purpose field', () => {
+      test('Should render "The purpose of the activity" when purpose is provided', () => {
+        $component = renderComponent('project-details-card', {
+          projectName: 'Test Marine Project',
+          mcmsContext: {
+            activity: {
+              label: 'Deposit of a substance or object',
+              purpose: 'Scientific research purposes'
+            },
+            articleCode: '17',
+            pdfDownloadUrl:
+              'https://marinelicensingtest.marinemanagement.org.uk/mmofox5uat/journey…'
+          },
+          isReadOnly: false,
+          isApplicantView: true
+        })
+
+        const htmlContent = $component.html()
+        expect(htmlContent).toContain('The purpose of the activity')
+        expect(htmlContent).toContain('Scientific research purposes')
       })
 
-      const htmlContent = $component.html()
-      expect(htmlContent).toContain('The purpose of the activity')
-      expect(htmlContent).toContain('Scientific research purposes')
-    })
-
-    test('Should not render "The purpose of the activity" when purpose is not provided', () => {
-      $component = renderComponent('project-details-card', {
-        projectName: 'Test Marine Project',
-        mcmsContext: {
-          activity: {
-            label: 'Deposit of a substance or object'
+      test('Should not render "The purpose of the activity" when purpose is not provided', () => {
+        $component = renderComponent('project-details-card', {
+          projectName: 'Test Marine Project',
+          mcmsContext: {
+            activity: {
+              label: 'Deposit of a substance or object'
+            },
+            articleCode: '17',
+            pdfDownloadUrl:
+              'https://marinelicensingtest.marinemanagement.org.uk/mmofox5uat/journey…'
           },
-          articleCode: '17',
-          pdfDownloadUrl:
-            'https://marinelicensingtest.marinemanagement.org.uk/mmofox5uat/journey…'
-        },
-        isReadOnly: false,
-        isInternalUser: false
-      })
+          isReadOnly: false,
+          isApplicantView: true
+        })
 
-      const htmlContent = $component.html()
-      expect(htmlContent).not.toContain('The purpose of the activity')
+        const htmlContent = $component.html()
+        expect(htmlContent).not.toContain('The purpose of the activity')
+      })
     })
   })
 })

@@ -73,6 +73,16 @@ describe('loggerOptions', () => {
     expect(loggerOptions.ignoreFunc({}, request)).toBe(true)
   })
 
+  it('ignoreFunc should return false for /api/browser-logs when the payload is undefined', () => {
+    const request = { path: '/api/browser-logs', payload: undefined }
+    expect(loggerOptions.ignoreFunc({}, request)).toBe(false)
+  })
+
+  it('ignoreFunc should return true for /api/browser-logs when the payload is defined', () => {
+    const request = { path: '/api/browser-logs', payload: { foo: 'bar' } }
+    expect(loggerOptions.ignoreFunc({}, request)).toBe(true)
+  })
+
   it('ignoreFunc should return false for paths not starting with /public/', () => {
     const request = { path: '/api/endpoint' }
     expect(loggerOptions.ignoreFunc({}, request)).toBe(false)

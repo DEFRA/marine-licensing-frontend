@@ -12,10 +12,18 @@ export const VIEW_DETAILS_VIEW_ROUTE = 'exemption/view-details/index'
 export const viewDetailsController = {
   async handler(request, h) {
     const { exemptionId } = request.params
+    const isInternalUserView =
+      request.path.startsWith(routes.VIEW_DETAILS_INTERNAL_USER) &&
+      getAuthProvider(request) === AUTH_STRATEGIES.ENTRA_ID
+    const isPublicView = request.path.startsWith(routes.VIEW_DETAILS_PUBLIC)
+    const isApplicantView = !isInternalUserView && !isPublicView
 
     try {
+      const serviceMethod = isPublicView
+        ? 'getPublicExemptionById'
+        : 'getExemptionById'
       const exemptionService = getExemptionService(request)
-      const exemption = await exemptionService.getExemptionById(exemptionId)
+      const exemption = await exemptionService[serviceMethod](exemptionId)
 
       if (
         exemption.status === EXEMPTION_STATUS.DRAFT ||
@@ -32,11 +40,8 @@ export const viewDetailsController = {
 
         throw Boom.forbidden(errorMessages.EXEMPTION_NOT_SUBMITTED)
       }
-
       const siteDetails = processSiteDetails(exemption, exemptionId, request)
       const { multipleSiteDetails } = exemption
-      const isInternalUser =
-        getAuthProvider(request) === AUTH_STRATEGIES.ENTRA_ID
 
       const siteLocationData = buildSiteLocationData(
         multipleSiteDetails,
@@ -44,14 +49,14 @@ export const viewDetailsController = {
       )
 
       // Format the page caption with application reference
-      const pageCaption = `${exemption.applicationReference}${isInternalUser ? '' : ' - Exempt activity notification'}`
+      const pageCaption = `${exemption.applicationReference}${isApplicantView ? ' - Exempt activity notification' : ''}`
 
       return h.view(VIEW_DETAILS_VIEW_ROUTE, {
         pageTitle: exemption.projectName,
         pageCaption,
-        backLink: isInternalUser ? null : routes.DASHBOARD,
+        backLink: isApplicantView ? routes.DASHBOARD : null,
         isReadOnly: true,
-        isInternalUser,
+        isApplicantView,
         ...exemption,
         siteDetails,
         multipleSiteDetails,

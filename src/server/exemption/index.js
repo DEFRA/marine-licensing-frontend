@@ -12,6 +12,7 @@ import { dashboardRoutes } from './dashboard/index.js'
 import { deleteExemptionRoutes } from './delete/index.js'
 import { viewExemptionInternalUserRoutes } from '#src/server/exemption/view-exemption-internal-user/index.js'
 import { getPageViewCommonData } from '#src/server/common/helpers/page-view-common-data.js'
+import { viewExemptionPublicUserRoutes } from '#src/server/exemption/view-exemption-public/index.js'
 export const exemption = {
   plugin: {
     name: 'exemption',
@@ -42,6 +43,7 @@ export const exemption = {
         ...checkYourAnswersRoutes,
         ...viewDetailsRoutes,
         ...viewExemptionInternalUserRoutes,
+        ...viewExemptionPublicUserRoutes,
         ...confirmationRoutes,
         ...dashboardRoutes,
         ...deleteExemptionRoutes,

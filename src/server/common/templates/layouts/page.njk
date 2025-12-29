@@ -15,14 +15,19 @@
 
 {% block head %}
   <link href="{{ getAssetPath('stylesheets/application.scss') }}" rel="stylesheet">
-  {% if clarityProjectId %}
+  {% if clarityProjectId or enableBrowserLogging %}
     <script nonce='{{ cspNonce }}'>
+      {% if clarityProjectId %}
       window.CLARITY_PROJECT_ID = "{{ clarityProjectId }}";
       window.ANALYTICS_ENABLED = {{ analyticsEnabled | dump }};
+      {% endif %}
+      {% if enableBrowserLogging %}
+      window.ENABLE_BROWSER_LOGGING = {{ enableBrowserLogging }};
+      {% endif %}
     </script>
   {% endif %}
 
-    <noscript>
+  <noscript>
     <style>
       .hide-if-no-js {display:none !important;}
     </style>

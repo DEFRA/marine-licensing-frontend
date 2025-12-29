@@ -83,7 +83,7 @@
     "@faker-js/faker": "^10.1.0",
     "@testing-library/dom": "^10.4.1",
     "@testing-library/jest-dom": "^6.9.1",
-    "@vitest/coverage-v8": "^4.0.14",
+    "@vitest/coverage-v8": "^4.0.16",
     "@vitest/runner": "^4.0.14",
     "@vitest/ui": "^4.0.14",
     "allure-commandline": "^2.34.1",

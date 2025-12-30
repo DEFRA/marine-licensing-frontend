@@ -31,7 +31,7 @@ describe('journeyLogger', () => {
       const result = handler(request, h)
 
       expect(request.logger.setBindings).toHaveBeenCalledWith({
-        transaction: { id: 'test-session-id-123' }
+        'transaction.id': 'test-session-id-123'
       })
       expect(result).toBe(h.continue)
     })

@@ -5,7 +5,7 @@ export const journeyLogger = {
       server.ext('onPostAuth', (request, h) => {
         if (request.yar?.id && request.logger?.setBindings) {
           request.logger.setBindings({
-            transaction: { id: request.yar.id }
+            'transaction.id': request.yar.id
           })
         }
         return h.continue

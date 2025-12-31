@@ -30,7 +30,10 @@ export const formatProjectsForDisplay = (projects) =>
       {
         text: project.submittedAt
           ? formatDate(project.submittedAt, 'd MMM yyyy')
-          : '-'
+          : '-',
+        attributes: {
+          'data-sort-value': project.submittedAt ?? 0
+        }
       },
       { html: getActionButtons(project) }
     ]

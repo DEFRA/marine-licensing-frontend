@@ -2,6 +2,16 @@ import { formatDate } from '#src/config/nunjucks/filters/format-date.js'
 import { routes } from '#src/server/common/constants/routes.js'
 import { EXEMPTION_TYPE } from '#src/server/common/constants/exemptions.js'
 
+export const sortProjectsByStatus = (projects) => {
+  return [...projects].sort((a, b) => {
+    const statusA = a.status ?? ''
+    const statusB = b.status ?? ''
+    if (statusB > statusA) { return 1 }
+    if (statusB < statusA)  { return -1 }
+    return 0
+  })
+}
+
 export const getActionButtons = (project) => {
   let buttons = ''
 

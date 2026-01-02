@@ -1,5 +1,9 @@
 import { vi } from 'vitest'
-import { formatProjectsForDisplay, getActionButtons } from './utils.js'
+import {
+  sortProjectsByStatus,
+  formatProjectsForDisplay,
+  getActionButtons
+} from './utils.js'
 import { routes } from '#src/server/common/constants/routes.js'
 
 vi.mock('~/src/config/nunjucks/filters/format-date.js', () => ({
@@ -10,6 +14,68 @@ vi.mock('~/src/config/nunjucks/filters/format-date.js', () => ({
     return '01 Jan 2024'
   })
 }))
+
+describe('#sortProjectsByStatus', () => {
+  it('sorts projects by status Z-A (Draft before Active)', () => {
+    const projects = [
+      { projectName: 'Project A', status: 'Active' },
+      { projectName: 'Project B', status: 'Draft' }
+    ]
+
+    const result = sortProjectsByStatus(projects)
+
+    expect(result[0].status).toBe('Draft')
+    expect(result[1].status).toBe('Active')
+  })
+
+  it('maintains original order for projects with same status', () => {
+    const projects = [
+      { projectName: 'Alpha', status: 'Draft' },
+      { projectName: 'Beta', status: 'Draft' }
+    ]
+
+    const result = sortProjectsByStatus(projects)
+
+    expect(result[0].projectName).toBe('Alpha')
+    expect(result[1].projectName).toBe('Beta')
+  })
+
+  it('returns empty array for empty input', () => {
+    expect(sortProjectsByStatus([])).toEqual([])
+  })
+
+  it('returns single project unchanged', () => {
+    const projects = [{ projectName: 'Solo', status: 'Draft' }]
+
+    const result = sortProjectsByStatus(projects)
+
+    expect(result).toEqual(projects)
+  })
+
+  it('does not mutate the original array', () => {
+    const projects = [
+      { projectName: 'A', status: 'Active' },
+      { projectName: 'B', status: 'Draft' }
+    ]
+    const originalFirst = projects[0]
+
+    sortProjectsByStatus(projects)
+
+    expect(projects[0]).toBe(originalFirst)
+  })
+
+  it('handles projects with null or undefined status', () => {
+    const projects = [
+      { projectName: 'Project A', status: 'Draft' },
+      { projectName: 'Project B', status: null },
+      { projectName: 'Project C', status: undefined }
+    ]
+
+    const result = sortProjectsByStatus(projects)
+
+    expect(result[0].status).toBe('Draft')
+  })
+})
 
 describe('#formatProjectsForDisplay', () => {
   test('Should format a complete project with all fields', () => {
@@ -33,7 +99,10 @@ describe('#formatProjectsForDisplay', () => {
         {
           html: '<strong class="govuk-tag govuk-tag--light-blue">Draft</strong>'
         },
-        { text: '15 Jan 2024' },
+        {
+          text: '15 Jan 2024',
+          attributes: { 'data-sort-value': '2024-01-15' }
+        },
         {
           html: '<a href="/exemption/task-list/abc123" class="govuk-link govuk-!-margin-right-4 govuk-link--no-visited-state" aria-label="Continue to task list">Continue</a><a href="/exemption/delete/abc123" class="govuk-link govuk-link--no-visited-state" aria-label="Delete Test Project">Delete</a>'
         }
@@ -63,7 +132,10 @@ describe('#formatProjectsForDisplay', () => {
         {
           html: '<strong class="govuk-tag govuk-tag--light-blue">Draft</strong>'
         },
-        { text: '-' },
+        {
+          text: '-',
+          attributes: { 'data-sort-value': 0 }
+        },
         {
           html: '<a href="/exemption/task-list/abc123" class="govuk-link govuk-!-margin-right-4 govuk-link--no-visited-state" aria-label="Continue to task list">Continue</a><a href="/exemption/delete/abc123" class="govuk-link govuk-link--no-visited-state" aria-label="Delete Test Project">Delete</a>'
         }
@@ -101,7 +173,10 @@ describe('#formatProjectsForDisplay', () => {
       {
         html: '<strong class="govuk-tag govuk-tag--light-blue">Draft</strong>'
       },
-      { text: '15 Jan 2024' },
+      {
+        text: '15 Jan 2024',
+        attributes: { 'data-sort-value': '2024-01-15' }
+      },
       {
         html: '<a href="/exemption/task-list/abc123" class="govuk-link govuk-!-margin-right-4 govuk-link--no-visited-state" aria-label="Continue to task list">Continue</a><a href="/exemption/delete/abc123" class="govuk-link govuk-link--no-visited-state" aria-label="Delete Project 1">Delete</a>'
       }
@@ -113,7 +188,10 @@ describe('#formatProjectsForDisplay', () => {
       {
         html: '<strong class="govuk-tag govuk-tag--green">Active</strong>'
       },
-      { text: '25 Jun 2024' },
+      {
+        text: '25 Jun 2024',
+        attributes: { 'data-sort-value': '2024-06-25' }
+      },
       {
         html: '<a href="/exemption/view-details/def456" class="govuk-link govuk-link--no-visited-state" aria-label="View details of Project 2">View details</a>'
       }

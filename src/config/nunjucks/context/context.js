@@ -35,6 +35,7 @@ export function context(request) {
     isAuthenticated,
     analyticsEnabled,
     clarityProjectId: config.get('clarityProjectId'),
+    enableBrowserLogging: config.get('enableBrowserLogging'),
     getAssetPath(asset) {
       const webpackAssetPath = webpackManifest?.[asset]
       return `${assetPath}/${webpackAssetPath ?? asset}`

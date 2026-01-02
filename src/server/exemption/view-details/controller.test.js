@@ -281,15 +281,14 @@ describe('view details controller', () => {
             activityDescription: submittedExemption.activityDescription,
             publicRegister: submittedExemption.publicRegister,
             siteDetails: expect.any(Array),
-            siteLocationData: null,
-            whoExemptionIsFor: undefined
+            siteLocationData: null
           })
         )
       })
 
       test('should call view with correct data structure for internal user', async () => {
         const submittedExemption = createSubmittedExemption({
-          organisation: { name: 'Dredging Co' }
+          whoExemptionIsFor: 'Dave Barnett'
         })
         const mockExemptionServiceInstance = {
           getExemptionById: vi.fn().mockResolvedValue(submittedExemption)
@@ -327,7 +326,7 @@ describe('view details controller', () => {
             publicRegister: submittedExemption.publicRegister,
             siteDetails: expect.any(Array),
             siteLocationData: null,
-            whoExemptionIsFor: submittedExemption.organisation.name
+            whoExemptionIsFor: 'Dave Barnett'
           })
         )
       })

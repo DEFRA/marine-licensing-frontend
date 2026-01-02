@@ -1,4 +1,4 @@
-import { getNextYear } from '~/tests/integration/shared/dates.js'
+import { getNextYear, getThisYear } from '#tests/integration/shared/dates.js'
 
 const nextYear = getNextYear()
 
@@ -28,34 +28,34 @@ export const DATE_ORDER_TESTS = [
   {
     startDay: '15',
     startMonth: '6',
-    startYear: '2025',
+    startYear: getThisYear(),
     endDay: '14',
     endMonth: '6',
-    endYear: '2025'
+    endYear: getThisYear()
   },
   {
     startDay: '20',
     startMonth: '8',
-    startYear: '2025',
+    startYear: getThisYear(),
     endDay: '19',
     endMonth: '8',
-    endYear: '2025'
+    endYear: getThisYear()
   },
   {
     startDay: '1',
     startMonth: '12',
-    startYear: '2025',
+    startYear: getThisYear(),
     endDay: '30',
     endMonth: '11',
-    endYear: '2025'
+    endYear: getThisYear()
   },
   {
     startDay: '15',
     startMonth: '6',
-    startYear: '2026',
+    startYear: getNextYear(),
     endDay: '15',
     endMonth: '6',
-    endYear: '2025'
+    endYear: getThisYear()
   }
 ]
 

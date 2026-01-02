@@ -1,6 +1,14 @@
+export const getThisYear = () => {
+  return getFutureYear(0)
+}
+
 export const getNextYear = () => {
+  return getFutureYear(1)
+}
+
+export const getFutureYear = (yearsToAdd) => {
   const today = new Date()
-  return (today.getFullYear() + 1).toString()
+  return (today.getFullYear() + yearsToAdd).toString()
 }
 
 export const getToday = () => {

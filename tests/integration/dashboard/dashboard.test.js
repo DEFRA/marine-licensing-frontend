@@ -166,7 +166,7 @@ describe('Dashboard', () => {
     })
   })
 
-  describe('AC7 - default sort order', () => {
+  describe('default sort order', () => {
     it('should render projects sorted by status Z-A (Draft before Active)', async () => {
       const unsortedExemptions = [
         {

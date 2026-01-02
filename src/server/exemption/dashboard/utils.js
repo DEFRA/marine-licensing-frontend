@@ -6,8 +6,12 @@ export const sortProjectsByStatus = (projects) => {
   return [...projects].sort((a, b) => {
     const statusA = a.status ?? ''
     const statusB = b.status ?? ''
-    if (statusB > statusA) { return 1 }
-    if (statusB < statusA)  { return -1 }
+    if (statusB > statusA) {
+      return 1
+    }
+    if (statusB < statusA) {
+      return -1
+    }
     return 0
   })
 }

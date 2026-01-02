@@ -17,6 +17,7 @@ import {
   makePostRequest
 } from '#src/server/test-helpers/server-requests.js'
 import { getExemptionService } from '#src/services/exemption-service/index.js'
+import { getNextYear, getThisYear } from '#tests/integration/shared/dates.js'
 
 vi.mock('~/src/server/common/helpers/session-cache/utils.js')
 vi.mock('~/src/server/common/helpers/save-site-details.js')
@@ -282,10 +283,10 @@ describe('#activityDatesController', () => {
       const payload = {
         'activity-start-date-day': '15',
         'activity-start-date-month': '6',
-        'activity-start-date-year': '2025',
+        'activity-start-date-year': getThisYear(),
         'activity-end-date-day': '14',
         'activity-end-date-month': '6',
-        'activity-end-date-year': '2025'
+        'activity-end-date-year': getThisYear()
       }
 
       const { result, statusCode } = await makePostRequest({
@@ -317,10 +318,10 @@ describe('#activityDatesController', () => {
       const payload = {
         'activity-start-date-day': '15',
         'activity-start-date-month': '6',
-        'activity-start-date-year': '2026',
+        'activity-start-date-year': getNextYear(),
         'activity-end-date-day': '15',
         'activity-end-date-month': '6',
-        'activity-end-date-year': '2025'
+        'activity-end-date-year': getThisYear()
       }
 
       const { result, statusCode } = await makePostRequest({
@@ -458,7 +459,7 @@ describe('#activityDatesController', () => {
           'activity-start-date-year': '2025',
           'activity-end-date-day': '16',
           'activity-end-date-month': '6',
-          'activity-end-date-year': '2025'
+          'activity-end-date-year': getThisYear()
         }
       })
 

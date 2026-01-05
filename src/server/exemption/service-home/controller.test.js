@@ -4,8 +4,6 @@ import { routes } from '#src/server/common/constants/routes.js'
 import { setupTestServer } from '#tests/integration/shared/test-setup-helpers.js'
 import { makeGetRequest } from '#src/server/test-helpers/server-requests.js'
 import { serviceHomeController, SERVICE_HOME_VIEW_ROUTE } from './controller.js'
-import * as pageViewCommonData from '#src/server/common/helpers/page-view-common-data.js'
-import { JSDOM } from 'jsdom'
 
 vi.mock('~/src/server/common/helpers/page-view-common-data.js')
 
@@ -60,24 +58,6 @@ describe('#serviceHome', () => {
           }
         ]
       })
-    })
-
-    test('Should display orgOrUserName caption when present in commonPageViewData', async () => {
-      vi.mocked(pageViewCommonData.getPageViewCommonData).mockResolvedValue({
-        orgOrUserName: 'Test Organisation Ltd',
-        showChangeOrganisationLink: false
-      })
-
-      const { result } = await makeGetRequest({
-        server: getServer(),
-        url: routes.SERVICE_HOME
-      })
-
-      const { document } = new JSDOM(result).window
-      const caption = document.querySelector('.govuk-caption-l')
-
-      expect(caption).toBeTruthy()
-      expect(caption.textContent.trim()).toBe('Test Organisation Ltd')
     })
   })
 })

@@ -2,7 +2,7 @@
 
 .card {
   margin-bottom: 40px;
-  background: #fff;
+  background: #ffffff;
   border: 1px solid #d9dadb;
   position: relative;
   width: 100%;
@@ -41,9 +41,9 @@
 .card--clickable:active .card__link:focus {
   outline: 3px solid transparent;
   color: #0b0c0c;
-  background-color: #fd0;
+  background-color: #ffdd00;
   box-shadow:
-    0 -2px #fd0,
+    0 -2px #ffdd00,
     0 4px #0b0c0c;
   text-decoration: none;
 }
@@ -103,6 +103,7 @@
   }
 }
 
+// stylelint-disable no-duplicate-selectors
 .card {
   background: #efefef;
   text-decoration: none;
@@ -110,20 +111,23 @@
   transition:
     background-color 0.2s ease,
     color 0.2s ease;
-}
 
-.card:hover,
-.card:focus {
-  background-color: #003078;
-  box-shadow: none;
+  &:hover,
+  &:focus {
+    background-color: #003078;
 
-  .card__description {
-    color: #ffffff;
+    .card__description {
+      color: #ffffff;
+    }
+
+    .card__heading {
+      color: #ffffff;
+      text-decoration: underline;
+    }
   }
 
-  .card__heading {
-    color: #ffffff;
-    text-decoration: underline;
+  &:focus {
+    outline: 3px solid #ffdd00;
   }
 }
 
@@ -131,3 +135,5 @@
   color: #1d70b8;
   text-decoration: underline;
 }
+
+// stylelint-enable no-duplicate-selectors

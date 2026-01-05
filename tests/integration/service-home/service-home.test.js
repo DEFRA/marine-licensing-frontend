@@ -18,11 +18,10 @@ describe('Service Home', () => {
     expect(getByRole(doc, 'heading', { level: 1 })).toHaveTextContent('Home')
 
     const viewProjectsLink = getByRole(doc, 'link', {
-      name: 'View Projects'
+      name: /View Projects/i
     })
     expect(viewProjectsLink).toHaveAttribute('href', routes.DASHBOARD)
     expect(viewProjectsLink).toHaveClass('card')
-    expect(viewProjectsLink).toHaveAttribute('aria-label', 'View Projects')
     const viewProjectsHeading = getByRole(viewProjectsLink, 'heading', {
       level: 2
     })
@@ -32,17 +31,13 @@ describe('Service Home', () => {
     )
 
     const checkLicenceLink = getByRole(doc, 'link', {
-      name: 'Check if I need a marine licence'
+      name: /Check if I need a marine licence/i
     })
     expect(checkLicenceLink).toHaveAttribute(
       'href',
       'https://marinelicensing.marinemanagement.org.uk/mmofox5/journey/self-service/start'
     )
     expect(checkLicenceLink).toHaveClass('card')
-    expect(checkLicenceLink).toHaveAttribute(
-      'aria-label',
-      'Check if I need a marine licence'
-    )
     const checkLicenceHeading = getByRole(checkLicenceLink, 'heading', {
       level: 2
     })
@@ -54,17 +49,13 @@ describe('Service Home', () => {
     )
 
     const signInLink = getByRole(doc, 'link', {
-      name: 'Sign in to the Marine Case Management System'
+      name: /Sign in to the Marine Case Management System/i
     })
     expect(signInLink).toHaveAttribute(
       'href',
       'https://marinelicensing.marinemanagement.org.uk/mmofox5/fox/live/MMO_LOGIN/login'
     )
     expect(signInLink).toHaveClass('card')
-    expect(signInLink).toHaveAttribute(
-      'aria-label',
-      'Sign in to the Marine Case Management System'
-    )
     const signInHeading = getByRole(signInLink, 'heading', { level: 2 })
     expect(signInHeading).toHaveTextContent(
       'Sign in to the Marine Case Management System'

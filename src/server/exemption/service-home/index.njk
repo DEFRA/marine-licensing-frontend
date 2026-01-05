@@ -13,18 +13,20 @@
 
 
 <div class="govuk-grid-row">
-    <div class="govuk-grid-column-full">
-      <div class="card-grid">
+      <ul class="card-group">
 
         {% for card in cards %}
-          <a href="{{ card.link }}" class="card haslink" aria-label="{{ card.title }}">
-            <h2 class="govuk-heading-m">{{ card.title }}</h2>
-            <p class="govuk-body">{{ card.description }}</p>
-          </a>
+            <li class="govuk-grid-column-one-third-from-desktop card-group__item">
+              <a href="{{ card.link }}" class="card card--clickable">
+                <h2 class="govuk-heading-m card__heading">
+                  {{ card.title }}
+                </h2>
+                <p class="govuk-body card__description">{{ card.description }}</p>
+              </a>
+            </li>
         {% endfor %}
 
-    </div>
-  </div>
+      </ul>
 </div>
 
 {% endblock %}

@@ -1,80 +1,133 @@
-.card-grid {
-  display: grid;
-  gap: 20px;
+// Imported MOJ Experimental Styles: https://design-patterns.service.justice.gov.uk/components/card/#code-tab
+
+.card {
   margin-bottom: 40px;
+  background: #fff;
+  border: 1px solid #d9dadb;
+  position: relative;
+  width: 100%;
+  padding: 25px;
 }
 
-@media (min-width: 768px) {
-  .card-grid {
-    grid-template-columns: repeat(2, 1fr);
+.card__heading {
+  margin-top: 0;
+  margin-bottom: 15px;
+}
+
+.card__description {
+  margin-bottom: 0;
+}
+
+.card--clickable {
+  border-bottom-width: 5px;
+}
+
+.card--clickable:hover,
+.card--clickable:active {
+  cursor: pointer;
+}
+
+.card--clickable:hover .card__heading a,
+.card--clickable:hover .card__link,
+.card--clickable:active .card__heading a,
+.card--clickable:active .card__link {
+  color: #003078;
+  text-decoration: none;
+}
+
+.card--clickable:hover .card__heading a:focus,
+.card--clickable:hover .card__link:focus,
+.card--clickable:active .card__heading a:focus,
+.card--clickable:active .card__link:focus {
+  outline: 3px solid transparent;
+  color: #0b0c0c;
+  background-color: #fd0;
+  box-shadow:
+    0 -2px #fd0,
+    0 4px #0b0c0c;
+  text-decoration: none;
+}
+
+.card--clickable:hover {
+  border-color: #b1b4b6;
+}
+
+.card--clickable:active {
+  border-color: #b1b4b6;
+  bottom: -1px;
+}
+
+.card-group {
+  display: flex;
+  flex-wrap: wrap;
+  margin-bottom: 15px;
+  padding: 0;
+}
+
+@media (max-width: 48.0525em) {
+  .card-group {
+    margin-bottom: 30px;
   }
 }
 
-@media (min-width: 1200px) {
-  .card-grid {
-    grid-template-columns: repeat(3, 1fr);
-    gap: 30px;
-    margin-bottom: 60px;
+.card-group__item {
+  display: flex;
+  list-style-type: none;
+  margin-bottom: 0;
+}
+
+@media (max-width: 48.0525em) {
+  .card-group__item {
+    flex: 0 0 100%;
+  }
+}
+
+.card-group__item .card {
+  margin-bottom: 25px;
+}
+
+@media (max-width: 48.0525em) {
+  .card-group__item .card {
+    margin-bottom: 15px;
+  }
+
+  .card-group__item:last-child .card {
+    margin-bottom: 0;
+  }
+}
+
+// Custom styles
+@media (min-width: 40.0625em) and (max-width: 48.0525em) {
+  .card-group__item {
+    flex: 0 0 50%;
   }
 }
 
 .card {
-  display: flex;
-  flex-direction: column;
   background: #efefef;
-  padding: 20px;
+  text-decoration: none;
+  border: none;
   transition:
     background-color 0.2s ease,
     color 0.2s ease;
-  cursor: pointer;
-  text-decoration: none;
 }
 
-.card h2 {
-  margin-bottom: 15px;
+.card:hover,
+.card:focus {
+  background-color: #003078;
+  box-shadow: none;
+
+  .card__description {
+    color: #ffffff;
+  }
+
+  .card__heading {
+    color: #ffffff;
+    text-decoration: underline;
+  }
+}
+
+.card__heading {
   color: #1d70b8;
   text-decoration: underline;
-  text-decoration-thickness: 2px;
-  text-underline-offset: 2px;
-}
-
-.card p {
-  line-height: 1.5;
-  transition: color 0.2s ease;
-  text-decoration: none;
-}
-
-.card h1 a:hover,
-.card h2 a:hover,
-.card h3 a:hover,
-.card h4 a:hover,
-.card h5 a:hover,
-.card h6 a:hover,
-.card p a:hover {
-  text-decoration: underline;
-}
-
-.haslink {
-  outline: none;
-  outline-offset: 0.3rem;
-}
-
-.haslink:hover {
-  cursor: pointer;
-  color: #ffffff;
-  background-color: #003078;
-}
-
-.haslink:hover a {
-  color: #ffffff;
-}
-
-.haslink:hover h1,
-.haslink:hover h2,
-.haslink:hover h3,
-.haslink:hover h4,
-.haslink:hover h5,
-.haslink:hover h6,
-.haslink:hover p {
-  color: #ffffff;
 }

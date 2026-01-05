@@ -39,10 +39,7 @@ describe('#serviceHome', () => {
       expect(h.view).toHaveBeenCalledWith(SERVICE_HOME_VIEW_ROUTE, {
         pageTitle: 'Home',
         heading: 'Home',
-<<<<<<< HEAD
         marineLicenseEnabled: false,
-=======
->>>>>>> 9cec8885 (Add cards for service home)
         cards: [
           {
             description: 'View all of the existing projects in this account.',

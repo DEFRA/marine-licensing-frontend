@@ -20,6 +20,7 @@ import { openId } from '#src/server/common/plugins/open-id.js'
 import { cookies } from '#src/server/common/plugins/cookies.js'
 import { setPageCacheControlHeaders } from '#src/server/common/helpers/cache-control.js'
 import { contentSecurityPolicy } from '#src/server/common/helpers/content-security-policy.js'
+import { journeyLogger } from '#src/server/common/helpers/logging/journey-logger.js'
 
 export async function createServer() {
   setupProxy()
@@ -71,6 +72,7 @@ export async function createServer() {
     secureContext,
     pulse,
     sessionCache,
+    journeyLogger,
     bell,
     cookie,
     basic,

@@ -114,7 +114,7 @@
 
   &:hover,
   &:focus {
-    background-color: #003078;
+    background-color: #1d70b8;
 
     .card__description {
       color: #ffffff;
@@ -134,6 +134,12 @@
 .card__heading {
   color: #1d70b8;
   text-decoration: underline;
+}
+
+@media (max-width: 48.0525em) {
+  .card-group__item .card {
+    margin-bottom: 30px;
+  }
 }
 
 // stylelint-enable no-duplicate-selectors

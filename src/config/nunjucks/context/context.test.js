@@ -48,6 +48,11 @@ describe('#context', () => {
         navigation: [
           {
             active: false,
+            text: 'Home',
+            href: '/home'
+          },
+          {
+            active: false,
             text: 'Projects',
             href: '/projects'
           },

@@ -2,6 +2,14 @@ import { formatDate } from '#src/config/nunjucks/filters/format-date.js'
 import { routes } from '#src/server/common/constants/routes.js'
 import { EXEMPTION_TYPE } from '#src/server/common/constants/exemptions.js'
 
+export const sortProjectsByStatus = (projects) => {
+  return [...projects].sort((a, b) => {
+    const statusA = a.status ?? ''
+    const statusB = b.status ?? ''
+    return statusB.localeCompare(statusA)
+  })
+}
+
 export const getActionButtons = (project) => {
   let buttons = ''
 
@@ -30,7 +38,10 @@ export const formatProjectsForDisplay = (projects) =>
       {
         text: project.submittedAt
           ? formatDate(project.submittedAt, 'd MMM yyyy')
-          : '-'
+          : '-',
+        attributes: {
+          'data-sort-value': project.submittedAt ?? 0
+        }
       },
       { html: getActionButtons(project) }
     ]

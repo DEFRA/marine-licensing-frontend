@@ -53,7 +53,7 @@
     "@hapi/wreck": "^18.1.0",
     "@hapi/yar": "^11.0.3",
     "@microsoft/clarity": "^1.0.2",
-    "@ministryofjustice/frontend": "^7.1.1",
+    "@ministryofjustice/frontend": "^8.0.0",
     "aws-embedded-metrics": "^4.2.1",
     "convict": "^6.2.4",
     "cssnano": "^7.1.2",

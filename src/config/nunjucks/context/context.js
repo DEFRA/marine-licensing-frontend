@@ -5,6 +5,7 @@ import { config } from '#src/config/config.js'
 import { buildNavigation } from '#src/config/nunjucks/context/build-navigation.js'
 import { routes } from '#src/server/common/constants/routes.js'
 import { areAnalyticsCookiesAccepted } from '#src/server/common/helpers/cookie-preferences.js'
+import { getExemptionCache } from '#src/server/common/helpers/session-cache/utils.js'
 
 const assetPath = config.get('assetPath')
 const manifestPath = path.join(
@@ -21,15 +22,20 @@ export function context(request) {
     }
   }
 
+  const exemption = getExemptionCache(request)
+  const isProjectNameLandingPage =
+    request.path === routes.PROJECT_NAME && !exemption?.id
+
   const navigation =
     request.path === routes.PROJECT_NAME ? [] : buildNavigation(request)
+  const serviceUrl = isProjectNameLandingPage ? '' : '/'
   const analyticsEnabled = areAnalyticsCookiesAccepted(request)
   const isAuthenticated = request?.auth?.isAuthenticated ?? false
 
   return {
     assetPath: `${assetPath}/assets`,
     serviceName: config.get('serviceName'),
-    serviceUrl: '/',
+    serviceUrl,
     breadcrumbs: [],
     navigation,
     isAuthenticated,

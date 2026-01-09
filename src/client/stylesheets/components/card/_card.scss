@@ -1,3 +1,5 @@
+@use 'govuk-frontend' as *;
+
 // Imported MOJ Experimental Styles: https://design-patterns.service.justice.gov.uk/components/card/#code-tab
 
 .card {
@@ -31,7 +33,7 @@
 .card--clickable:hover .card__link,
 .card--clickable:active .card__heading a,
 .card--clickable:active .card__link {
-  color: #003078;
+  color: $govuk-link-hover-colour;
   text-decoration: none;
 }
 
@@ -40,20 +42,20 @@
 .card--clickable:active .card__heading a:focus,
 .card--clickable:active .card__link:focus {
   outline: 3px solid transparent;
-  color: #0b0c0c;
-  background-color: #ffdd00;
+  color: $govuk-input-border-colour;
+  background-color: $govuk-focus-colour;
   box-shadow:
-    0 -2px #ffdd00,
-    0 4px #0b0c0c;
+    0 -2px $govuk-focus-colour,
+    0 4px $govuk-input-border-colour;
   text-decoration: none;
 }
 
 .card--clickable:hover {
-  border-color: #b1b4b6;
+  border-color: $govuk-border-colour;
 }
 
 .card--clickable:active {
-  border-color: #b1b4b6;
+  border-color: $govuk-border-colour;
   bottom: -1px;
 }
 
@@ -114,7 +116,7 @@
 
   &:hover,
   &:focus {
-    background-color: #1d70b8;
+    background-color: $govuk-link-colour;
 
     .card__description {
       color: #ffffff;
@@ -127,12 +129,12 @@
   }
 
   &:focus {
-    outline: 3px solid #ffdd00;
+    outline: 3px solid $govuk-focus-colour;
   }
 }
 
 .card__heading {
-  color: #1d70b8;
+  color: $govuk-link-colour;
   text-decoration: underline;
 }
 

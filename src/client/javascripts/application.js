@@ -64,7 +64,9 @@ document.addEventListener('DOMContentLoaded', () => {
   const projectFilterElements = document.querySelectorAll(
     '[data-module~="app-project-filter"]'
   )
+
   for (const element of projectFilterElements) {
-    new ProjectFilter(element) // eslint-disable-line no-new
+    // eslint-disable-next-line no-new
+    new ProjectFilter(element) // nosonar
   }
 })

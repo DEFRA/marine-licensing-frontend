@@ -79,7 +79,7 @@
               <tr class="govuk-table__row app-project-row{% if isHidden %} app-hidden{% endif %}"
                   data-is-own-project="{{ project.attributes['data-is-own-project'] }}">
                 {% for cell in project.cells %}
-                  <td class="govuk-table__cell">
+                  <td class="govuk-table__cell"{% if cell.attributes and cell.attributes['data-sort-value'] is defined %} data-sort-value="{{ cell.attributes['data-sort-value'] }}"{% endif %}>
                     {% if cell.html %}
                       {{ cell.html | safe }}
                     {% else %}

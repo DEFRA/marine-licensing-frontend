@@ -62,13 +62,13 @@
           <caption class="govuk-table__caption govuk-visually-hidden">{{ heading }}</caption>
           <thead class="govuk-table__head">
             <tr class="govuk-table__row">
-              <th scope="col" class="govuk-table__header">Name</th>
-              <th scope="col" class="govuk-table__header">Type</th>
-              <th scope="col" class="govuk-table__header">Reference</th>
+              <th scope="col" class="govuk-table__header" aria-sort="none">Name</th>
+              <th scope="col" class="govuk-table__header" aria-sort="none">Type</th>
+              <th scope="col" class="govuk-table__header" aria-sort="none">Reference</th>
               <th scope="col" class="govuk-table__header" aria-sort="descending">Status</th>
-              <th scope="col" class="govuk-table__header">Date submitted</th>
+              <th scope="col" class="govuk-table__header" aria-sort="none">Date submitted</th>
               {% if isEmployee %}
-                <th scope="col" class="govuk-table__header">Owner</th>
+                <th scope="col" class="govuk-table__header" aria-sort="none">Owner</th>
               {% endif %}
               <th scope="col" class="govuk-table__header">Actions</th>
             </tr>

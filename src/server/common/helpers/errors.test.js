@@ -48,11 +48,17 @@ describe('#catchAll', () => {
     path: '/test-path',
     method: 'GET'
   })
+
   const mockToolkitView = vi.fn()
   const mockToolkitCode = vi.fn()
+  const mockToolkitRedirect = vi.fn().mockReturnValue({
+    takeover: vi.fn()
+  })
+
   const mockToolkit = {
     view: mockToolkitView,
-    code: mockToolkitCode
+    code: mockToolkitCode,
+    redirect: mockToolkitRedirect
   }
 
   beforeEach(() => {
@@ -100,6 +106,14 @@ describe('#catchAll', () => {
     expect(mockToolkitCode).toHaveBeenCalledWith(statusCodes.imATeapot)
   })
 
+  test('Should provide expected default page', () => {
+    catchAll(mockRequest(statusCodes.imATeapot), mockToolkit)
+
+    expect(mockErrorLogger).not.toHaveBeenCalledWith(mockStack)
+    expect(mockToolkitView).toHaveBeenCalledWith(genericErrorPage)
+    expect(mockToolkitCode).toHaveBeenCalledWith(statusCodes.imATeapot)
+  })
+
   test('Should provide expected 500-error page and log error for internalServerError', () => {
     const request = mockRequest(statusCodes.internalServerError)
     catchAll(request, mockToolkit)
@@ -130,6 +144,13 @@ describe('#catchAll', () => {
     const h = { continue: Symbol('continue') }
     const result = catchAll({ response: {} }, h)
     expect(result).toBe(h.continue)
+  })
+
+  test('Should redirect if redirectPath param is present', () => {
+    const req = mockRequest(statusCodes.unauthorized)
+    req.response.redirectPath = '/'
+    catchAll(req, mockToolkit)
+    expect(mockToolkitRedirect).toHaveBeenCalledWith('/')
   })
 })
 

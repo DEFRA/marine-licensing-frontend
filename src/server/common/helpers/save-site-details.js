@@ -3,6 +3,8 @@ import {
   getExemptionCache,
   setExemptionCache
 } from '#src/server/common/helpers/session-cache/utils.js'
+import { routes } from '#src/server/common/constants/routes.js'
+import Boom from '@hapi/boom'
 
 export const prepareFileUploadDataForSave = (siteDetails, request) => {
   const dataToSave = []
@@ -84,7 +86,12 @@ export const saveSiteDetailsToBackend = async (request, h) => {
   const coordinatesType = siteDetails[0]?.coordinatesType
 
   if (!exemption.id) {
-    throw new Error('Exemption ID is required to save site details')
+    request.logger.error('Exemption ID is required to save site details')
+    const error = Boom.unauthorized(
+      'Exemption ID is required to save site details'
+    )
+    error.redirectPath = routes.DASHBOARD
+    throw error
   }
 
   if (!siteDetails || siteDetails.length === 0) {

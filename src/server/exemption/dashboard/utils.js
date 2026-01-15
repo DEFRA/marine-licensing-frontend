@@ -3,6 +3,14 @@ import { routes } from '#src/server/common/constants/routes.js'
 import { EXEMPTION_TYPE } from '#src/server/common/constants/exemptions.js'
 import escapeHtml from 'lodash/escape.js'
 
+export const sortProjectsByStatus = (projects) => {
+  return [...projects].sort((a, b) => {
+    const statusA = a.status ?? ''
+    const statusB = b.status ?? ''
+    return statusB.localeCompare(statusA)
+  })
+}
+
 export const getActionButtons = (project) => {
   const isOwnProject = project.isOwnProject ?? true
   const escapedProjectName = escapeHtml(project.projectName)
@@ -37,7 +45,10 @@ export const formatProjectsForDisplay = (projects, isEmployee = false) =>
       {
         text: project.submittedAt
           ? formatDate(project.submittedAt, 'd MMM yyyy')
-          : '-'
+          : '-',
+        attributes: {
+          'data-sort-value': project.submittedAt ?? 0
+        }
       }
     ]
 

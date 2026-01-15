@@ -3,7 +3,6 @@
 {%- from "govuk/components/radios/macro.njk" import govukRadios -%}
 {%- from "govuk/components/button/macro.njk" import govukButton -%}
 {% from "moj/components/page-header-actions/macro.njk" import mojPageHeaderActions %}
-
 {% extends "layouts/page.njk" %}
 
 {% set bodyClasses = "govuk-wide-template" %}
@@ -59,7 +58,7 @@
       {% endif %}
 
       {% if projects and projects.length > 0 %}
-        <table class="govuk-table">
+        <table class="govuk-table" data-module="moj-sortable-table">
           <caption class="govuk-table__caption govuk-visually-hidden">{{ heading }}</caption>
           <thead class="govuk-table__head">
             <tr class="govuk-table__row">

@@ -10,6 +10,7 @@ import {
   Radios,
   SkipLink
 } from 'govuk-frontend'
+import { SortableTable } from '@ministryofjustice/frontend'
 
 import { AddAnotherPoint } from './add-another-point/index.js'
 import { ProjectFilter } from './project-filter/index.js'
@@ -22,6 +23,7 @@ createAll(Header)
 createAll(Radios)
 createAll(SkipLink)
 createAll(FileUpload)
+createAll(SortableTable)
 
 function syncClarityConsent() {
   if (

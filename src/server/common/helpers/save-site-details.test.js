@@ -11,6 +11,7 @@ import {
   mockExemption,
   mockFileUploadExemption
 } from '#src/server/test-helpers/mocks.js'
+import Boom from '@hapi/boom'
 
 vi.mock('./authenticated-requests.js')
 vi.mock('./session-cache/utils.js')
@@ -343,9 +344,14 @@ describe('save-site-details', () => {
         id: null
       })
 
+      const expectedError = Boom.unauthorized(
+        'Exemption ID is required to save site details'
+      )
+      expectedError.redirectPath = '/home'
+
       await expect(
         saveSiteDetailsToBackend(mockRequest, mockH)
-      ).rejects.toThrow('Exemption ID is required to save site details')
+      ).rejects.toThrow(expectedError)
     })
 
     test('should throw error when site details are missing', async () => {

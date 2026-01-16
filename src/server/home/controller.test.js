@@ -62,11 +62,11 @@ describe('#homeController', () => {
       }
     })
     expect(statusCode).toBe(statusCodes.redirect)
-    expect(headers.location).toBe(routes.DASHBOARD)
+    expect(headers.location).toBe(routes.SERVICE_HOME)
     expect(clearExemptionCache).not.toHaveBeenCalled()
   })
 
-  test('should redirect to dashboard if a signed in user has come to / path without a IAT query string and MCMS context is not in cache', async () => {
+  test('should redirect to service home if a signed in user has come to / path without a IAT query string and MCMS context is not in cache', async () => {
     getMcmsContextFromCache.mockReturnValue(null)
     const { headers, statusCode } = await makeGetRequest({
       url: '/',

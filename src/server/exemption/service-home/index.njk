@@ -1,0 +1,32 @@
+{% extends 'layouts/page.njk' %}
+
+{% block content %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+      {% if commonPageViewData.orgOrUserName %}
+        <span class="govuk-caption-l">{{ commonPageViewData.orgOrUserName }}</span>
+      {% endif %}
+      <h1 class="govuk-heading-l">{{ heading }}</h1>
+    </div>
+  </div>  
+
+
+<div class="govuk-grid-row">
+      <ul class="card-group">
+
+        {% for card in cards %}
+            <li class="govuk-grid-column-one-third-from-desktop card-group__item">
+              <a href="{{ card.link }}" class="card card--clickable">
+                <h2 class="govuk-heading-m card__heading">
+                  {{ card.title }}
+                </h2>
+                <p class="govuk-body card__description">{{ card.description }}</p>
+              </a>
+            </li>
+        {% endfor %}
+
+      </ul>
+</div>
+
+{% endblock %}
+

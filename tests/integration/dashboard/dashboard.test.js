@@ -39,12 +39,6 @@ describe('Dashboard', () => {
     expect(getByRole(doc, 'heading', { level: 1 })).toHaveTextContent(
       'Projects'
     )
-    expect(
-      getByRole(doc, 'button', { name: 'Create new project' })
-    ).toHaveAttribute(
-      'href',
-      'https://marinelicensing.marinemanagement.org.uk/mmofox5/journey/self-service/start'
-    )
   })
 
   it('should render a draft exemption', async () => {

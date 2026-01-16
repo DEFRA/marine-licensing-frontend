@@ -70,7 +70,7 @@ describe('#delete', () => {
         heading: 'Are you sure you want to delete this project?',
         projectName: 'Test Project',
         exemptionId: 'test-project-id',
-        backLink: '/home',
+        backLink: '/projects',
         routes
       })
       expect(result).toBe('view-response')

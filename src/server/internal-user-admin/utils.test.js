@@ -1,10 +1,11 @@
 import { formatProjectsForDisplay } from './utils.js'
 
 describe('#formatProjectsForDisplay', () => {
+  const csrfToken = '123'
   test('Should format multiple projects correctly', () => {
     const projects = [
       {
-        id: 'abc123',
+        _id: 'abc123',
         projectName: 'Project 1',
 
         applicationReference: 'ML-2024-001',
@@ -12,7 +13,7 @@ describe('#formatProjectsForDisplay', () => {
         submittedAt: '2024-01-15T08:00:00.000Z'
       },
       {
-        id: 'def456',
+        _id: 'def456',
         projectName: 'Project 2',
 
         applicationReference: 'ML-2024-002',
@@ -21,7 +22,7 @@ describe('#formatProjectsForDisplay', () => {
       }
     ]
 
-    const result = formatProjectsForDisplay(projects)
+    const result = formatProjectsForDisplay(projects, csrfToken)
 
     expect(result).toHaveLength(2)
     expect(result[0]).toEqual([
@@ -32,8 +33,8 @@ describe('#formatProjectsForDisplay', () => {
       },
       {
         html: `<form method="POST">
-        <input type="hidden" name="csrfToken" value="undefined">
-        <input type="hidden" name="exemptionId" value="undefined">
+        <input type="hidden" name="csrfToken" value="123">
+        <input type="hidden" name="exemptionId" value="abc123">
         <button type="submit" class="govuk-button govuk-button--secondary" data-module="govuk-button">
           Send to EMP
         </button>
@@ -48,8 +49,8 @@ describe('#formatProjectsForDisplay', () => {
       },
       {
         html: `<form method="POST">
-        <input type="hidden" name="csrfToken" value="undefined">
-        <input type="hidden" name="exemptionId" value="undefined">
+        <input type="hidden" name="csrfToken" value="123">
+        <input type="hidden" name="exemptionId" value="def456">
         <button type="submit" class="govuk-button govuk-button--secondary" data-module="govuk-button">
           Send to EMP
         </button>
@@ -59,7 +60,7 @@ describe('#formatProjectsForDisplay', () => {
   })
 
   test('Should handle empty projects array', () => {
-    const result = formatProjectsForDisplay([])
+    const result = formatProjectsForDisplay([], csrfToken)
 
     expect(result).toEqual([])
   })

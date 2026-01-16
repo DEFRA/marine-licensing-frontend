@@ -23,7 +23,7 @@ sudo nginx -c "$(pwd)/local-https-setup/nginx-https.conf"
 
 # Start the development server in the background
 echo "Starting development server..."
-npm run dev:debug &
+npm run dev &
 DEV_PID=$!
 
 # Wait for the server to start

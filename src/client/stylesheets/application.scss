@@ -2,6 +2,7 @@
 @use 'govuk-frontend-overrides';
 $moj-assets-path: "~@ministryofjustice/frontend/moj/assets/";
 @use "@ministryofjustice/frontend/moj/components/page-header-actions/page-header-actions";
+@use "@ministryofjustice/frontend/moj/components/sortable-table/sortable-table";
 
 @use 'variables';
 @use 'helpers';

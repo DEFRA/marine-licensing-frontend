@@ -91,3 +91,9 @@ export const mockExemptions = (exemptions) => {
     payload: { message: 'success', value: exemptions }
   })
 }
+
+export const mockEmployeeExemptions = (exemptions) => {
+  vi.mocked(authenticatedGetRequest).mockResolvedValue({
+    payload: { message: 'success', value: exemptions, isEmployee: true }
+  })
+}

@@ -38,7 +38,7 @@ export const deleteExemptionController = {
         heading: DELETE_EXEMPTION_PAGE_TITLE,
         projectName: project.projectName,
         exemptionId,
-        backLink: '/home',
+        backLink: routes.DASHBOARD,
         routes
       })
     } catch (error) {

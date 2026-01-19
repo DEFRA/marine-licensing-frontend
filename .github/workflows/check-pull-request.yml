@@ -18,42 +18,6 @@ permissions:
   pull-requests: write
 
 jobs:
-  dependabot-lockfile:
-    name: Normalize package-lock.json (Dependabot)
-    # Runs for Dependabot-authored PRs, OR manually via workflow_dispatch for testing on a PR branch
-    if: ${{ github.event_name == 'workflow_dispatch' || github.event.pull_request.user.login == 'dependabot[bot]' }}
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write
-    steps:
-      - name: Checkout PR branch
-        uses: actions/checkout@v6
-        with:
-          # pull_request -> github.head_ref; workflow_dispatch -> github.ref_name
-          ref: ${{ github.head_ref || github.ref_name }}
-          token: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v6
-        with:
-          node-version-file: .nvmrc
-          cache: npm
-
-      - name: Regenerate lockfile with repo npm
-        run: npm install --package-lock-only
-
-      - name: Commit lockfile if changed
-        run: |
-          if git diff --quiet package-lock.json; then
-            echo "No lockfile changes"
-            exit 0
-          fi
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add package-lock.json
-          git commit -m "chore: normalize package-lock.json (auto)"
-          git push
-
   pr-validator:
     name: Run Pull Request Checks
     runs-on: ubuntu-latest

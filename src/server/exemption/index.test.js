@@ -26,6 +26,10 @@ describe('exemption route', () => {
     expect(server.route).toHaveBeenCalledWith([
       expect.objectContaining({
         method: 'GET',
+        path: '/home'
+      }),
+      expect.objectContaining({
+        method: 'GET',
         path: '/exemption/project-name'
       }),
       expect.objectContaining({
@@ -217,7 +221,7 @@ describe('exemption route', () => {
       }),
       expect.objectContaining({
         method: 'GET',
-        path: '/home'
+        path: '/projects'
       }),
       expect.objectContaining({
         method: 'GET',

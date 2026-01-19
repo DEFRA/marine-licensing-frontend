@@ -1,0 +1,20 @@
+{
+  "userId": "3d403f24-0a0b-4081-89af-518a8561a125",
+  "contactId": "bf5edec1-79eb-ee11-a1fe-000d3a86c43e",
+  "email": "jason.bourne@example.com",
+  "firstName": "Jason",
+  "lastName": "Bourne",
+  "loa": "1",
+  "aal": "1",
+  "enrolmentCount": 1,
+  "enrolmentRequestCount": 1,
+  "relationships": [
+    {
+      "organisationName": "Some Org",
+      "relationshipId": "661273f1-c989-4e90-8637-d9a1e915f5a7",
+      "relationshipRole": "Agent",
+      "roleName": "Some Agentic Role",
+      "roleStatus": "1"
+    }
+  ]
+}

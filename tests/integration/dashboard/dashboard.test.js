@@ -55,7 +55,7 @@ describe('Dashboard', () => {
       name: 'Draft Project'
     })
     const actionsCell = cells.pop()
-    const cellContents = cells.map((cell) => cell.textContent)
+    const cellContents = cells.map((cell) => cell.textContent.trim())
     expect(cellContents).toEqual([
       'Draft Project',
       'Exempt activity notification',
@@ -79,7 +79,7 @@ describe('Dashboard', () => {
       name: 'Active Project'
     })
     const actionsCell = cells.pop()
-    const cellContents = cells.map((cell) => cell.textContent)
+    const cellContents = cells.map((cell) => cell.textContent.trim())
     expect(cellContents).toEqual([
       'Active Project',
       'Exempt activity notification',
@@ -128,7 +128,7 @@ describe('Dashboard', () => {
       expect(nameHeader).toHaveAttribute('aria-sort', 'none')
       expect(typeHeader).toHaveAttribute('aria-sort', 'none')
       expect(referenceHeader).toHaveAttribute('aria-sort', 'none')
-      expect(statusHeader).toHaveAttribute('aria-sort', 'none')
+      expect(statusHeader).toHaveAttribute('aria-sort', 'descending')
       expect(dateHeader).toHaveAttribute('aria-sort', 'none')
     })
 

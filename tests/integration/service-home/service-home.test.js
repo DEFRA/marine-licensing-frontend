@@ -14,7 +14,7 @@ describe('Service Home', () => {
     })
 
   describe('when marine license is disabled', () => {
-    it('should render 3 cards with 3-column layout and no Apply for Marine License tile', async () => {
+    test('should render cards without Apply for Marine License tile and correct layout', async () => {
       const doc = await loadServiceHomePage()
 
       expect(getByRole(doc, 'heading', { level: 1 })).toHaveTextContent('Home')
@@ -91,7 +91,7 @@ describe('Service Home', () => {
       config.set('marineLicense.enabled', false)
     })
 
-    it('should include Apply for Marine License card and use 2-column layout', async () => {
+    test('should include Apply for Marine License card and use correct card layout', async () => {
       const doc = await loadServiceHomePage()
 
       const cards = doc.querySelectorAll('.card')

@@ -7,6 +7,7 @@ export const formatProjectsForDisplay = (projects, csrfToken) =>
     {
       text: formatDate(project.submittedAt, 'd MMM yyyy')
     },
+    { text: formatDate(project.previouslyFailedAt, 'd MMM yyyy HH:mm') },
     {
       html: `<form method="POST">
         <input type="hidden" name="csrfToken" value="${csrfToken}">

@@ -15,11 +15,12 @@ export const adminExemptionsController = {
         request,
         '/exemptions/send-to-emp'
       )
-      const projects = payload.value
+      const projects = payload.value.unsentExemptions
       return h.view(DASHBOARD_VIEW_ROUTE, {
         pageTitle: DASHBOARD_PAGE_TITLE,
         heading: DASHBOARD_PAGE_TITLE,
-        projects: formatProjectsForDisplay(projects, request.plugins.crumb)
+        projects: formatProjectsForDisplay(projects, request.plugins.crumb),
+        failedPendingRetries: payload.value.failedPendingRetries
       })
     } catch (error) {
       request.logger.error(

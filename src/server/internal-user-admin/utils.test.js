@@ -10,7 +10,8 @@ describe('#formatProjectsForDisplay', () => {
 
         applicationReference: 'ML-2024-001',
         status: 'Draft',
-        submittedAt: '2024-01-15T08:00:00.000Z'
+        submittedAt: '2024-01-15T08:00:00.000Z',
+        previouslyFailedAt: '2024-01-14T10:30:00.000Z'
       },
       {
         _id: 'def456',
@@ -18,7 +19,8 @@ describe('#formatProjectsForDisplay', () => {
 
         applicationReference: 'ML-2024-002',
         status: 'Active',
-        submittedAt: '2024-06-25T12:15:30.000Z'
+        submittedAt: '2024-06-25T12:15:30.000Z',
+        previouslyFailedAt: '2024-06-24T14:45:00.000Z'
       }
     ]
 
@@ -30,6 +32,9 @@ describe('#formatProjectsForDisplay', () => {
       { text: 'ML-2024-001' },
       {
         text: '15 Jan 2024'
+      },
+      {
+        text: '14 Jan 2024 10:30'
       },
       {
         html: `<form method="POST">
@@ -46,6 +51,9 @@ describe('#formatProjectsForDisplay', () => {
       { text: 'ML-2024-002' },
       {
         text: '25 Jun 2024'
+      },
+      {
+        text: '24 Jun 2024 14:45'
       },
       {
         html: `<form method="POST">

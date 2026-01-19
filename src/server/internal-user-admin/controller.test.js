@@ -25,7 +25,7 @@ describe('Admin dashboard to send exemptions to EMP', () => {
   describe('#adminExemptionsController', () => {
     test('Should render dashboard template with correct context', async () => {
       authenticatedGetRequestMock.mockResolvedValueOnce({
-        payload: { value: [] }
+        payload: { value: { unsentExemptions: [], failedPendingRetries: 0 } }
       })
 
       const { h, request } = createRequest()
@@ -35,7 +35,8 @@ describe('Admin dashboard to send exemptions to EMP', () => {
       expect(h.view).toHaveBeenCalledWith(DASHBOARD_VIEW_ROUTE, {
         pageTitle: 'Exemptions not sent to EMP',
         heading: 'Exemptions not sent to EMP',
-        projects: []
+        projects: [],
+        failedPendingRetries: 0
       })
     })
 
@@ -44,17 +45,21 @@ describe('Admin dashboard to send exemptions to EMP', () => {
 
       const projects = [
         {
+          _id: 'abc123',
           projectName: 'Test Project 1',
           applicationReference: 'ML-2024-001',
           status: 'Active',
-          submittedAt: '2024-02-15'
+          submittedAt: '2024-02-15',
+          previouslyFailedAt: '2024-02-14T10:30:00.000Z'
         },
         {
+          _id: 'def456',
           projectName: 'Test Project 2',
 
           applicationReference: 'ML-2024-002',
           status: 'Active',
-          submittedAt: '2024-01-15'
+          submittedAt: '2024-01-15',
+          previouslyFailedAt: '2024-01-14T14:45:00.000Z'
         }
       ]
 
@@ -64,7 +69,9 @@ describe('Admin dashboard to send exemptions to EMP', () => {
       )
 
       authenticatedGetRequestMock.mockResolvedValueOnce({
-        payload: { value: projects }
+        payload: {
+          value: { unsentExemptions: projects, failedPendingRetries: 0 }
+        }
       })
 
       await adminExemptionsController.handler(request, h)
@@ -72,7 +79,8 @@ describe('Admin dashboard to send exemptions to EMP', () => {
       expect(h.view).toHaveBeenCalledWith(DASHBOARD_VIEW_ROUTE, {
         pageTitle: 'Exemptions not sent to EMP',
         heading: 'Exemptions not sent to EMP',
-        projects: expectedFormattedProjects
+        projects: expectedFormattedProjects,
+        failedPendingRetries: 0
       })
     })
 

@@ -8,7 +8,7 @@ import { isUserReferredFromDefraAccount } from '#src/server/common/helpers/check
 export const homeController = {
   async handler(request, h) {
     if (isUserReferredFromDefraAccount(request)) {
-      return h.redirect(routes.DASHBOARD)
+      return h.redirect(routes.SERVICE_HOME)
     }
 
     // if the user is already logged in,
@@ -20,7 +20,7 @@ export const homeController = {
       !getMcmsContextFromCache(request) &&
       !request.query.ACTIVITY_TYPE
     ) {
-      return h.redirect(routes.DASHBOARD)
+      return h.redirect(routes.SERVICE_HOME)
     }
 
     // redirect to start a new exemption

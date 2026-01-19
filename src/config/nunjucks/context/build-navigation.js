@@ -10,6 +10,11 @@ export const buildNavigation = (request) => {
   if (authProvider === AUTH_STRATEGIES.DEFRA_ID) {
     return [
       {
+        text: 'Home',
+        href: routes.SERVICE_HOME,
+        active: request?.path === routes.SERVICE_HOME
+      },
+      {
         text: 'Projects',
         href: routes.DASHBOARD,
         active: request?.path === routes.DASHBOARD

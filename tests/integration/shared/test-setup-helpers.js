@@ -13,9 +13,15 @@ import {
   authenticatedPatchRequest,
   authenticatedGetRequest
 } from '~/src/server/common/helpers/authenticated-requests.js'
+import {
+  getMcmsContextFromCache,
+  clearMcmsContextCache
+} from '~/src/server/common/helpers/mcms-context/cache-mcms-context.js'
+import { mockExemptionMcmsContext as mockExemptionMcmsContextMock } from '~/tests/integration/shared/test-setup-helpers.js'
 
 vi.mock('~/src/server/common/helpers/session-cache/utils.js')
 vi.mock('~/src/server/common/helpers/authenticated-requests.js')
+vi.mock('~/src/server/common/helpers/mcms-context/cache-mcms-context.js')
 vi.mock(
   '~/src/server/common/plugins/auth/get-oidc-config.js',
   async (importOriginal) => {
@@ -90,4 +96,15 @@ export const mockExemptions = (exemptions) => {
   vi.mocked(authenticatedGetRequest).mockResolvedValue({
     payload: { message: 'success', value: exemptions }
   })
+}
+
+export const mockExemptionMcmsContext = (
+  context = mockExemptionMcmsContextMock
+) => {
+  vi.mocked(getMcmsContextFromCache).mockReturnValue(context)
+  vi.mocked(clearMcmsContextCache).mockReturnValue(undefined)
+  return {
+    getMcmsContextFromCache,
+    clearMcmsContextCache
+  }
 }

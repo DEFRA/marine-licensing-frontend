@@ -67,7 +67,7 @@ describe('#projectName', () => {
       })
 
       expect(statusCode).toBe(statusCodes.redirect)
-      expect(headers.location).toBe(routes.DASHBOARD)
+      expect(headers.location).toBe(routes.SERVICE_HOME)
     })
   })
 

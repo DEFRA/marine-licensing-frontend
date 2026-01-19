@@ -89,7 +89,7 @@ const baseExpectedContent = {
   pageTitle: 'Test Marine Activity Project',
   pageCaption: 'EXE/2025/00003 - Exempt activity notification',
   backLinkText: 'Back',
-  backLinkHref: '/home',
+  backLinkHref: '/projects',
   summaryCards: [
     'Project summary',
     'Providing the site location',

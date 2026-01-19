@@ -1,0 +1,147 @@
+@use 'govuk-frontend' as *;
+
+// Imported MOJ Experimental Styles: https://design-patterns.service.justice.gov.uk/components/card/#code-tab
+
+.card {
+  margin-bottom: 40px;
+  background: #ffffff;
+  border: 1px solid #d9dadb;
+  position: relative;
+  width: 100%;
+  padding: 25px;
+}
+
+.card__heading {
+  margin-top: 0;
+  margin-bottom: 15px;
+}
+
+.card__description {
+  margin-bottom: 0;
+}
+
+.card--clickable {
+  border-bottom-width: 5px;
+}
+
+.card--clickable:hover,
+.card--clickable:active {
+  cursor: pointer;
+}
+
+.card--clickable:hover .card__heading a,
+.card--clickable:hover .card__link,
+.card--clickable:active .card__heading a,
+.card--clickable:active .card__link {
+  color: $govuk-link-hover-colour;
+  text-decoration: none;
+}
+
+.card--clickable:hover .card__heading a:focus,
+.card--clickable:hover .card__link:focus,
+.card--clickable:active .card__heading a:focus,
+.card--clickable:active .card__link:focus {
+  outline: 3px solid transparent;
+  color: $govuk-input-border-colour;
+  background-color: $govuk-focus-colour;
+  box-shadow:
+    0 -2px $govuk-focus-colour,
+    0 4px $govuk-input-border-colour;
+  text-decoration: none;
+}
+
+.card--clickable:hover {
+  border-color: $govuk-border-colour;
+}
+
+.card--clickable:active {
+  border-color: $govuk-border-colour;
+  bottom: -1px;
+}
+
+.card-group {
+  display: flex;
+  flex-wrap: wrap;
+  margin-bottom: 15px;
+  padding: 0;
+}
+
+@media (max-width: 48.0525em) {
+  .card-group {
+    margin-bottom: 30px;
+  }
+}
+
+.card-group__item {
+  display: flex;
+  list-style-type: none;
+  margin-bottom: 0;
+}
+
+@media (max-width: 48.0525em) {
+  .card-group__item {
+    flex: 0 0 100%;
+  }
+}
+
+.card-group__item .card {
+  margin-bottom: 25px;
+}
+
+@media (max-width: 48.0525em) {
+  .card-group__item .card {
+    margin-bottom: 15px;
+  }
+
+  .card-group__item:last-child .card {
+    margin-bottom: 0;
+  }
+}
+
+// Custom styles
+@media (min-width: 40.0625em) and (max-width: 48.0525em) {
+  .card-group__item {
+    flex: 0 0 50%;
+  }
+}
+
+// stylelint-disable no-duplicate-selectors
+.card {
+  background: #efefef;
+  text-decoration: none;
+  border: none;
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease;
+
+  &:hover,
+  &:focus {
+    background-color: $govuk-link-colour;
+
+    .card__description {
+      color: #ffffff;
+    }
+
+    .card__heading {
+      color: #ffffff;
+      text-decoration: underline;
+    }
+  }
+
+  &:focus {
+    outline: 3px solid $govuk-focus-colour;
+  }
+}
+
+.card__heading {
+  color: $govuk-link-colour;
+  text-decoration: underline;
+}
+
+@media (max-width: 48.0525em) {
+  .card-group__item .card {
+    margin-bottom: 30px;
+  }
+}
+
+// stylelint-enable no-duplicate-selectors

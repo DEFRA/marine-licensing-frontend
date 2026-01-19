@@ -1,5 +1,6 @@
 import { beforeEach, describe, expect, test, vi, it } from 'vitest'
 import { readFileSync } from 'node:fs'
+import { getExemptionCache } from '#src/server/common/helpers/session-cache/utils.js'
 
 vi.mock(
   '~/src/server/common/helpers/authenticated-requests.js',
@@ -12,6 +13,7 @@ vi.mock(
   }
 )
 vi.mock('node:fs')
+vi.mock('~/src/server/common/helpers/session-cache/utils.js')
 
 describe('#context', () => {
   const mockRequest = { path: '/', logger: { error: vi.fn() } }
@@ -22,6 +24,7 @@ describe('#context', () => {
     vi.resetModules()
     readFileSync.mockClear()
     mockRequest.logger.error.mockClear()
+    vi.mocked(getExemptionCache).mockReturnValue({})
     const contextModule =
       await import('~/src/config/nunjucks/context/context.js')
     context = contextModule.context
@@ -48,8 +51,13 @@ describe('#context', () => {
         navigation: [
           {
             active: false,
-            text: 'Projects',
+            text: 'Home',
             href: '/home'
+          },
+          {
+            active: false,
+            text: 'Projects',
+            href: '/projects'
           },
           {
             href: '#',

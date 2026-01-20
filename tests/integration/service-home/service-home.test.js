@@ -100,10 +100,7 @@ describe('Service Home', () => {
       const applyForLicenseLink = getByRole(doc, 'link', {
         name: /Apply for a Marine License/i
       })
-      expect(applyForLicenseLink).toHaveAttribute(
-        'href',
-        routes.MARINE_LICENSE_SERVICE_HOME
-      )
+      expect(applyForLicenseLink).toHaveAttribute('href', routes.SERVICE_HOME)
       expect(applyForLicenseLink.parentElement).toHaveClass(
         'govuk-grid-column-one-half-from-desktop'
       )

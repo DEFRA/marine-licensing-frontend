@@ -225,7 +225,7 @@ describe('exemption route', () => {
       }),
       expect.objectContaining({
         method: 'POST',
-        path: '/home'
+        path: '/projects'
       }),
       expect.objectContaining({
         method: 'GET',

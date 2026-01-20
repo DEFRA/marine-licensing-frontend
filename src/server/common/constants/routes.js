@@ -43,6 +43,10 @@ export const routes = {
   ADMIN_EXEMPTIONS: '/admin/exemptions'
 }
 
+export const marineLicenseRoutes = {
+  PROJECT_NAME: '/marine-license/project-name'
+}
+
 export const entraIdRoutes = [
   routes.VIEW_DETAILS_INTERNAL_USER,
   routes.ADMIN_EXEMPTIONS

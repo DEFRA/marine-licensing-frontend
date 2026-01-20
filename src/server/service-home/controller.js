@@ -1,4 +1,7 @@
-import { routes } from '#src/server/common/constants/routes.js'
+import {
+  marineLicenseRoutes,
+  routes
+} from '#src/server/common/constants/routes.js'
 import { config } from '#src/config/config.js'
 
 export const SERVICE_HOME_VIEW_ROUTE = 'service-home/index'
@@ -30,7 +33,7 @@ const cards = [
 const filteredCards = [
   {
     title: 'Apply for a Marine License',
-    link: routes.MARINE_LICENSE_PROJECT_NAME
+    link: marineLicenseRoutes.PROJECT_NAME
   }
 ]
 

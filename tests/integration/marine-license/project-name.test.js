@@ -1,10 +1,15 @@
 import { JSDOM } from 'jsdom'
-import { getByRole } from '@testing-library/dom'
+import { getByRole, queryByRole } from '@testing-library/dom'
 import { config } from '~/src/config/config.js'
 import { marineLicenseRoutes } from '~/src/server/common/constants/routes.js'
 import { statusCodes } from '~/src/server/common/constants/status-codes.js'
 import { setupTestServer } from '~/tests/integration/shared/test-setup-helpers.js'
 import { makeGetRequest } from '~/src/server/test-helpers/server-requests.js'
+import { loadPage, submitForm } from '~/tests/integration/shared/app-server.js'
+import {
+  expectInputError,
+  expectInputValue
+} from '~/tests/integration/shared/expect-utils.js'
 
 describe('Marine License - Project name', () => {
   const getServer = setupTestServer()
@@ -41,21 +46,61 @@ describe('Marine License - Project name', () => {
       config.set('marineLicense.enabled', false)
     })
 
-    test('should render project name page when feature is enabled', async () => {
-      const { result, statusCode } = await makeGetRequest({
-        server: getServer(),
-        url: marineLicenseRoutes.PROJECT_NAME
+    test('should render project name page when feature is enabled and no project name set', async () => {
+      const document = await loadPage({
+        requestUrl: marineLicenseRoutes.PROJECT_NAME,
+        server: getServer()
       })
 
-      expect(statusCode).toBe(statusCodes.ok)
+      expect(getByRole(document, 'heading', { level: 1 })).toHaveTextContent(
+        'Project name'
+      )
 
-      const document = new JSDOM(result).window.document
-
-      const heading = getByRole(document, 'heading', {
-        name: 'Project Name',
-        level: 1
+      getByRole(document, 'button', {
+        name: 'Save and continue'
       })
-      expect(heading).toBeInTheDocument()
+
+      expectInputValue({
+        document,
+        inputLabel: 'Project name',
+        value: ''
+      })
+
+      expect(
+        queryByRole(document, 'link', {
+          name: 'Back'
+        })
+      ).not.toBeInTheDocument()
+
+      expect(
+        queryByRole(document, 'link', {
+          name: 'Cancel'
+        })
+      ).not.toBeInTheDocument()
+
+      const serviceName = document.querySelector(
+        '.govuk-service-navigation__link'
+      )
+
+      expect(serviceName).not.toBeInTheDocument()
+    })
+
+    test('should show a validation error when submitted without a project name', async () => {
+      const submitProjectNameForm = async (formData) => {
+        const { document } = await submitForm({
+          requestUrl: marineLicenseRoutes.PROJECT_NAME,
+          server: getServer(),
+          formData
+        })
+        return document
+      }
+
+      const document = await submitProjectNameForm({ projectName: '' })
+      expectInputError({
+        document,
+        inputLabel: 'Project name',
+        errorMessage: 'Enter the project name'
+      })
     })
   })
 })

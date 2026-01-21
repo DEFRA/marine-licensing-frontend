@@ -15,12 +15,13 @@ export const adminExemptionsController = {
         request,
         '/exemptions/send-to-emp'
       )
-      const projects = payload.value.unsentExemptions
+      const projects = payload?.value?.unsentExemptions || []
+      const failedPendingRetries = payload?.value?.failedPendingRetries || []
       return h.view(DASHBOARD_VIEW_ROUTE, {
         pageTitle: DASHBOARD_PAGE_TITLE,
         heading: DASHBOARD_PAGE_TITLE,
         projects: formatProjectsForDisplay(projects, request.plugins.crumb),
-        failedPendingRetries: payload.value.failedPendingRetries
+        failedPendingRetries
       })
     } catch (error) {
       request.logger.error(
@@ -31,7 +32,8 @@ export const adminExemptionsController = {
       return h.view(DASHBOARD_VIEW_ROUTE, {
         pageTitle: DASHBOARD_PAGE_TITLE,
         heading: DASHBOARD_PAGE_TITLE,
-        projects: []
+        projects: [],
+        failedPendingRetries: []
       })
     }
   }

@@ -36,7 +36,7 @@ describe('Admin dashboard to send exemptions to EMP', () => {
         pageTitle: 'Exemptions not sent to EMP',
         heading: 'Exemptions not sent to EMP',
         projects: [],
-        failedPendingRetries: 0
+        failedPendingRetries: []
       })
     })
 
@@ -80,7 +80,7 @@ describe('Admin dashboard to send exemptions to EMP', () => {
         pageTitle: 'Exemptions not sent to EMP',
         heading: 'Exemptions not sent to EMP',
         projects: expectedFormattedProjects,
-        failedPendingRetries: 0
+        failedPendingRetries: []
       })
     })
 
@@ -99,7 +99,8 @@ describe('Admin dashboard to send exemptions to EMP', () => {
       expect(h.view).toHaveBeenCalledWith(DASHBOARD_VIEW_ROUTE, {
         pageTitle: 'Exemptions not sent to EMP',
         heading: 'Exemptions not sent to EMP',
-        projects: []
+        projects: [],
+        failedPendingRetries: []
       })
     })
 
@@ -115,7 +116,8 @@ describe('Admin dashboard to send exemptions to EMP', () => {
       expect(h.view).toHaveBeenCalledWith(DASHBOARD_VIEW_ROUTE, {
         pageTitle: 'Exemptions not sent to EMP',
         heading: 'Exemptions not sent to EMP',
-        projects: []
+        projects: [],
+        failedPendingRetries: []
       })
     })
   })

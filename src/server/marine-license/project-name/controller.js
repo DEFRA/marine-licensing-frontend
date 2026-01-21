@@ -6,7 +6,12 @@ import {
   errorDescriptionByFieldName,
   mapErrorsForDisplay
 } from '#src/server/common/helpers/errors.js'
-import { routes } from '#src/server/common/constants/routes.js'
+import { authenticatedPostRequest } from '#src/server/common/helpers/authenticated-requests.js'
+import {
+  clearMcmsContextCache,
+  getMcmsContextFromCache
+} from '#src/server/common/helpers/mcms-context/cache-mcms-context.js'
+import { getUserSession } from '#src/server/common/plugins/auth/utils.js'
 
 const errorMessages = {
   PROJECT_NAME_REQUIRED: 'Enter the project name',
@@ -16,12 +21,11 @@ export const PROJECT_NAME_VIEW_ROUTE = 'marine-license/project-name/index'
 
 const projectNameViewSettings = {
   pageTitle: 'Project name',
-  heading: 'Project Name',
-  backLink: routes.SERVICE_HOME
+  heading: 'Project Name'
 }
 
 export const projectNameController = {
-  handler(_request, h) {
+  handler(request, h) {
     const marineLicenseConfig = config.get('marineLicense')
 
     if (!marineLicenseConfig.enabled) {
@@ -69,7 +73,7 @@ export const projectNameSubmitController = {
       }
     }
   },
-  handler(request, h) {
+  async handler(request, h) {
     const { payload } = request
 
     try {
@@ -79,12 +83,25 @@ export const projectNameSubmitController = {
         throw Boom.forbidden('Marine License journey is not enabled')
       }
 
+      const { organisationId, organisationName, userRelationshipType } =
+        await getUserSession(request, request.state?.userSession)
+
+      const mcmsContext = getMcmsContextFromCache(request)
+
+      await authenticatedPostRequest(request, '/marine-license/project-name', {
+        ...payload,
+        mcmsContext,
+        ...(organisationId ? { organisationId, organisationName } : {}),
+        userRelationshipType
+      })
+
+      clearMcmsContextCache(request)
+
       return h.view(PROJECT_NAME_VIEW_ROUTE, {
         ...projectNameViewSettings
       })
     } catch (e) {
       const { details } = e.data?.payload?.validation ?? {}
-
       if (!details) {
         throw e
       }

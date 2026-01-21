@@ -1,6 +1,10 @@
 import { describe, test, expect, beforeEach, vi } from 'vitest'
 import { isUserReferredFromDefraAccount } from './check-request-referrer.js'
+<<<<<<< HEAD
 import { createMockRequest } from '#src/server/test-helpers/mocks/helpers.js'
+=======
+import { createMockRequest } from '#src/server/test-helpers/mocks/exemption-mocks.js'
+>>>>>>> cc6e5b2b (Request to the backend for Marine License)
 import { config } from '#src/config/config.js'
 
 const DEFRA_ACCOUNT_URL =

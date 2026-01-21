@@ -32,11 +32,7 @@ export const router = {
         help,
         internalUserAdmin,
         marineLicense,
-        serviceHome,
-        about,
-        home,
-        auth,
-        help
+        serviceHome
       ])
 
       // Static assets

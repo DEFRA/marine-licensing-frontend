@@ -283,6 +283,14 @@ export const config = convict({
       env: 'MARINE_LICENSING_BACKEND_API_URL'
     }
   },
+  marineLicense: {
+    enabled: {
+      doc: 'Enable the Marine License journey',
+      format: Boolean,
+      default: false,
+      env: 'ENABLE_MARINE_LICENSE'
+    }
+  },
   defraId: {
     accountManagementUrl: {
       doc: 'Defra ID account management portal URL',

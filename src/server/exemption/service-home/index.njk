@@ -15,7 +15,7 @@
       <ul class="card-group">
 
         {% for card in cards %}
-            <li class="govuk-grid-column-one-third-from-desktop card-group__item">
+            <li class="{% if marineLicenseEnabled %}govuk-grid-column-one-half-from-desktop{% else %}govuk-grid-column-one-third-from-desktop{% endif %} card-group__item">
               <a href="{{ card.link }}" class="card card--clickable">
                 <h2 class="govuk-heading-m card__heading">
                   {{ card.title }}
@@ -29,4 +29,3 @@
 </div>
 
 {% endblock %}
-

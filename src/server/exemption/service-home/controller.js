@@ -1,4 +1,5 @@
 import { routes } from '#src/server/common/constants/routes.js'
+import { config } from '#src/config/config.js'
 
 export const SERVICE_HOME_VIEW_ROUTE = 'exemption/service-home/index'
 
@@ -26,11 +27,25 @@ const cards = [
   }
 ]
 
+const filteredCards = [
+  {
+    title: 'Apply for a Marine License',
+    link: routes.SERVICE_HOME
+  }
+]
+
 export const serviceHomeController = {
   handler(_request, h) {
+    const marineLicense = config.get('marineLicense')
+
+    const displayCards = marineLicense.enabled
+      ? [...cards.slice(0, 2), ...filteredCards, ...cards.slice(2)]
+      : cards
+
     return h.view(SERVICE_HOME_VIEW_ROUTE, {
       ...serviceHomeViewSettings,
-      cards
+      cards: displayCards,
+      marineLicenseEnabled: marineLicense.enabled
     })
   }
 }

@@ -17,10 +17,10 @@ const manifestPath = path.join(
 )
 let webpackManifest
 
-const hideNavigationRoutes = [
+const hideNavigationRoutes = new Set([
   routes.PROJECT_NAME,
   marineLicenseRoutes.PROJECT_NAME
-]
+])
 
 export function context(request) {
   if (!webpackManifest) {
@@ -34,9 +34,9 @@ export function context(request) {
   const exemption = getExemptionCache(request)
 
   const isProjectNameLandingPage =
-    hideNavigationRoutes.includes(request.path) && !exemption?.id
+    hideNavigationRoutes.has(request.path) && !exemption?.id
 
-  const navigation = hideNavigationRoutes.includes(request.path)
+  const navigation = hideNavigationRoutes.has(request.path)
     ? []
     : buildNavigation(request)
 

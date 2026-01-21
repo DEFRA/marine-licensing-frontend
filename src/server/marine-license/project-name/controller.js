@@ -25,7 +25,7 @@ const projectNameViewSettings = {
 }
 
 export const projectNameController = {
-  handler(request, h) {
+  handler(_request, h) {
     const marineLicenseConfig = config.get('marineLicense')
 
     if (!marineLicenseConfig.enabled) {

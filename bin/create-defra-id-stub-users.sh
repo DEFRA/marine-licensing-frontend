@@ -3,8 +3,15 @@
 set -e
 
 SCRIPT_DIR="$(cd "$(dirname "$(readlink -f "$0")")" && pwd)"
+USERS_DIR="$SCRIPT_DIR/../compose/users"
 
-curl -sS -H "Content-Type: application/json" -X POST -d @"$SCRIPT_DIR"/users/some-org-emp-1.json http://localhost:3200/cdp-defra-id-stub/API/register | jq
-curl -sS -H "Content-Type: application/json" -X POST -d @"$SCRIPT_DIR"/users/some-org-emp-2.json http://localhost:3200/cdp-defra-id-stub/API/register | jq
-curl -sS -H "Content-Type: application/json" -X POST -d @"$SCRIPT_DIR"/users/some-individual-1.json http://localhost:3200/cdp-defra-id-stub/API/register | jq
-curl -sS -H "Content-Type: application/json" -X POST -d @"$SCRIPT_DIR"/users/some-agent-1.json http://localhost:3200/cdp-defra-id-stub/API/register | jq
+echo "Registering DEFRA ID stub users from $USERS_DIR"
+
+for user_file in "$USERS_DIR"/*.json; do
+  if [ -f "$user_file" ]; then
+    echo "Registering: $(basename "$user_file")"
+    curl -sS -H "Content-Type: application/json" -X POST -d @"$user_file" http://localhost:3200/cdp-defra-id-stub/API/register | jq
+  fi
+done
+
+echo "All users registered"

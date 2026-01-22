@@ -8,6 +8,7 @@ import { exemption } from '#src/server/exemption/index.js'
 import { auth } from '#src/server/auth/index.js'
 import { help } from '#src/server/help/index.js'
 import { browserLogs } from '#src/server/browser-logs/index.js'
+import { internalUserAdmin } from '#src/server/internal-user-admin/index.js'
 export const router = {
   plugin: {
     name: 'router',
@@ -21,7 +22,14 @@ export const router = {
       await server.register([browserLogs])
 
       // Application specific routes, add your own routes here
-      await server.register([exemption, about, home, auth, help])
+      await server.register([
+        exemption,
+        about,
+        home,
+        auth,
+        help,
+        internalUserAdmin
+      ])
 
       // Static assets
       await server.register([serveStaticFiles])

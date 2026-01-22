@@ -64,6 +64,9 @@ describe('#catchAll', () => {
   beforeEach(() => {
     mockToolkitView.mockReturnValue(mockToolkit)
     mockToolkitCode.mockReturnValue(mockToolkit)
+    mockToolkitRedirect.mockReturnValue({
+      takeover: vi.fn()
+    })
   })
 
   test('Should provide expected "Not Found" page', () => {

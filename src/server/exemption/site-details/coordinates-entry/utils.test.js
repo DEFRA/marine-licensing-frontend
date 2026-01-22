@@ -1,6 +1,9 @@
 import { getBackRoute } from '#src/server/exemption/site-details/coordinates-entry/utils.js'
 import { routes } from '#src/server/common/constants/routes.js'
-import { mockExemption, mockSite } from '#src/server/test-helpers/mocks.js'
+import {
+  mockExemption,
+  mockSite
+} from '#src/server/test-helpers/mocks/exemption.js'
 
 describe('#coordinatesEntryUtils', () => {
   describe('#getBackRoute', () => {

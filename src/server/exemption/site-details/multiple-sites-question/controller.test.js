@@ -9,7 +9,7 @@ import {
   getExemptionCache,
   setExemptionCache
 } from '#src/server/common/helpers/session-cache/utils.js'
-import { mockExemption } from '#src/server/test-helpers/mocks.js'
+import { mockExemption } from '#src/server/test-helpers/mocks/exemption.js'
 import { routes } from '#src/server/common/constants/routes.js'
 
 vi.mock('~/src/server/common/helpers/session-cache/utils.js')

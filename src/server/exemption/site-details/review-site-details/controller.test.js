@@ -9,7 +9,7 @@ import {
   reviewSiteDetailsSubmitController
 } from '#src/server/exemption/site-details/review-site-details/controller.js'
 import { setupTestServer } from '#tests/integration/shared/test-setup-helpers.js'
-import { mockExemption } from '#src/server/test-helpers/mocks.js'
+import { mockExemption } from '#src/server/test-helpers/mocks/exemption.js'
 import { makePostRequest } from '#src/server/test-helpers/server-requests.js'
 import { routes } from '#src/server/common/constants/routes.js'
 import {

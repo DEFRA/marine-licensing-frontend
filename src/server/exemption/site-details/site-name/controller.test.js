@@ -5,10 +5,8 @@ import {
   SITE_NAME_VIEW_ROUTE,
   errorMessages
 } from '#src/server/exemption/site-details/site-name/controller.js'
-import {
-  mockExemption as mockExemptionData,
-  createMockRequest
-} from '#src/server/test-helpers/mocks.js'
+import { mockExemption as mockExemptionData } from '#src/server/test-helpers/mocks/exemption.js'
+import { createMockRequest } from '#src/server/test-helpers/mocks/helpers.js'
 import { routes } from '#src/server/common/constants/routes.js'
 import * as cacheUtils from '#src/server/common/helpers/session-cache/utils.js'
 import { saveSiteDetailsToBackend } from '#src/server/common/helpers/save-site-details.js'

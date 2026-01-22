@@ -1,6 +1,6 @@
 import { faker } from '@faker-js/faker'
-import { vi } from 'vitest'
 import { COORDINATE_SYSTEMS } from '#src/server/common/constants/exemptions.js'
+import { mcmsAnswersDownloadUrl } from './mcms.js'
 
 export const mockExemptionTaskList = {
   projectName: 'COMPLETED',
@@ -8,9 +8,6 @@ export const mockExemptionTaskList = {
   publicRegister: 'COMPLETED',
   siteDetails: 'COMPLETED'
 }
-
-export const mcmsAnswersDownloadUrl =
-  'https://marinelicensing.marinemanagement.org.uk/path/journey/self-service/outcome-document/b87ae3f7-48f3-470d-b29b-5a5abfdaa49f'
 
 export const mockExemptionMcmsContext = {
   activity: {
@@ -156,29 +153,3 @@ export const mockSite = {
   queryParams: '',
   siteDetails: mockExemption.siteDetails[0]
 }
-
-export const mockRequestAuth = {
-  strategy: 'defra-id',
-  credentials: { userId: 'test-user' }
-}
-
-export const createMockRequest = (overrides = {}) => ({
-  params: {},
-  query: {},
-  payload: {},
-  headers: {},
-  yar: {
-    get: vi.fn(),
-    set: vi.fn(),
-    clear: vi.fn(),
-    flash: vi.fn(),
-    commit: vi.fn()
-  },
-  logger: {
-    debug: vi.fn(),
-    warn: vi.fn(),
-    error: vi.fn(),
-    info: vi.fn()
-  },
-  ...overrides
-})

@@ -3,7 +3,7 @@ import {
   mockExemption,
   setupTestServer
 } from '#tests/integration/shared/test-setup-helpers.js'
-import { mockExemption as mockExemptionData } from '#src/server/test-helpers/mocks.js'
+import { mockExemption as mockExemptionData } from '#src/server/test-helpers/mocks/exemption.js'
 import {
   makeGetRequest,
   makePostRequest

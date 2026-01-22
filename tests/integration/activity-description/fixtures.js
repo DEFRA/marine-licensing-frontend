@@ -1,4 +1,4 @@
-import { mockExemption } from '#src/server/test-helpers/mocks.js'
+import { mockExemption } from '#src/server/test-helpers/mocks/exemption.js'
 
 export const exemptionNoActivityDescription = {
   ...mockExemption,

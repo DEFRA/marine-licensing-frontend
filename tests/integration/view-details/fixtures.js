@@ -1,5 +1,5 @@
 import { COORDINATE_SYSTEMS } from '~/src/server/common/constants/exemptions.js'
-import { mockExemptionMcmsContext } from '~/src/server/test-helpers/mocks.js'
+import { mockExemptionMcmsContext } from '~/src/server/test-helpers/mocks/exemption.js'
 
 const baseSubmittedExemption = {
   id: '507f1f77bcf86cd799439011',

@@ -7,7 +7,7 @@ import * as cacheUtils from '#src/server/common/helpers/session-cache/utils.js'
 import * as cdpUploadService from '#src/services/cdp-upload-service/index.js'
 import * as fileValidationService from '#src/services/file-validation/index.js'
 import * as authenticatedRequests from '#src/server/common/helpers/authenticated-requests.js'
-import { mockExemption } from '#src/server/test-helpers/mocks.js'
+import { mockExemption } from '#src/server/test-helpers/mocks/exemption.js'
 import { routes } from '#src/server/common/constants/routes.js'
 import { config } from '#src/config/config.js'
 

@@ -9,10 +9,8 @@ import {
 } from '#src/server/common/helpers/session-cache/utils.js'
 import { authenticatedPatchRequest } from '#src/server/common/helpers/authenticated-requests.js'
 import { routes } from '#src/server/common/constants/routes.js'
-import {
-  createMockRequest,
-  mockExemption
-} from '#src/server/test-helpers/mocks.js'
+import { mockExemption } from '#src/server/test-helpers/mocks/exemption.js'
+import { createMockRequest } from '#src/server/test-helpers/mocks/helpers.js'
 
 vi.mock('~/src/server/common/helpers/session-cache/utils.js')
 vi.mock('~/src/server/common/helpers/authenticated-requests.js')

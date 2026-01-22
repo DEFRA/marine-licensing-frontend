@@ -12,7 +12,8 @@ import {
   MULTIPLE_COORDINATES_VIEW_ROUTES,
   multipleCoordinatesPageData
 } from '#src/server/exemption/site-details/enter-multiple-coordinates/utils.js'
-import { mockSite, createMockRequest } from '#src/server/test-helpers/mocks.js'
+import { mockSite } from '#src/server/test-helpers/mocks/exemption.js'
+import { createMockRequest } from '#src/server/test-helpers/mocks/helpers.js'
 import { saveSiteDetailsToBackend } from '#src/server/common/helpers/save-site-details.js'
 
 vi.mock('~/src/server/common/helpers/session-cache/utils.js')

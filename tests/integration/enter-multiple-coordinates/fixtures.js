@@ -1,4 +1,4 @@
-import { mockExemptionNoSiteDetails } from '~/src/server/test-helpers/mocks.js'
+import { mockExemptionNoSiteDetails } from '~/src/server/test-helpers/mocks/exemption.js'
 import { COORDINATE_SYSTEMS } from '~/src/server/common/constants/exemptions.js'
 
 export const exemptionWgs84Coordinates = {

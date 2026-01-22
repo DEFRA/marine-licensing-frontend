@@ -1,4 +1,4 @@
-import { mockRequestAuth } from '#src/server/test-helpers/mocks.js'
+import { mockRequestAuth } from '#src/server/test-helpers/mocks/auth.js'
 
 export const makeGetRequest = async ({ url, server, headers = {} }) => {
   return await server.inject({

@@ -6,7 +6,10 @@ import {
   PROVIDE_COORDINATES_CHOICE_VIEW_ROUTE
 } from '#src/server/exemption/site-details/coordinates-type/controller.js'
 import * as cacheUtils from '#src/server/common/helpers/session-cache/utils.js'
-import { mockExemption, mockSite } from '#src/server/test-helpers/mocks.js'
+import {
+  mockExemption,
+  mockSite
+} from '#src/server/test-helpers/mocks/exemption.js'
 import { makeGetRequest } from '#src/server/test-helpers/server-requests.js'
 import { statusCodes } from '#src/server/common/constants/status-codes.js'
 import { JSDOM } from 'jsdom'

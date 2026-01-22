@@ -15,10 +15,8 @@ import {
   renderFileUploadReview,
   renderManualCoordinateReview
 } from '#src/server/exemption/site-details/review-site-details/utils.js'
-import {
-  createMockRequest,
-  mockExemption
-} from '#src/server/test-helpers/mocks.js'
+import { mockExemption } from '#src/server/test-helpers/mocks/exemption.js'
+import { createMockRequest } from '#src/server/test-helpers/mocks/helpers.js'
 
 import { getCoordinateSystem } from '#src/server/common/helpers/coordinate-utils.js'
 

@@ -3,7 +3,7 @@ import { ExemptionService } from './exemption.service.js'
 import { errorMessages } from '#src/server/common/constants/error-messages.js'
 import { createLogger } from '#src/server/common/helpers/logging/logger.js'
 import { authenticatedGetRequest } from '#src/server/common/helpers/authenticated-requests.js'
-import { mockExemption } from '#src/server/test-helpers/mocks.js'
+import { mockExemption } from '#src/server/test-helpers/mocks/exemption.js'
 
 vi.mock('~/src/server/common/helpers/logging/logger.js')
 vi.mock('~/src/server/common/helpers/authenticated-requests.js')

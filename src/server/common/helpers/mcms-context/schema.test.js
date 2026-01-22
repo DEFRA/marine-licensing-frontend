@@ -1,5 +1,5 @@
 import { paramsSchema } from './schema.js'
-import { mcmsAnswersDownloadUrl } from '~/src/server/test-helpers/mocks.js'
+import { mcmsAnswersDownloadUrl } from '~/src/server/test-helpers/mocks/mcms.js'
 
 describe('mcms-context schema', () => {
   describe('paramsSchema validation and transformation', () => {

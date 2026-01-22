@@ -11,7 +11,8 @@ import {
   handleValidationErrors
 } from '#src/server/exemption/activity-dates/controller.js'
 import { setupTestServer } from '#tests/integration/shared/test-setup-helpers.js'
-import { mockSite, createMockRequest } from '#src/server/test-helpers/mocks.js'
+import { mockSite } from '#src/server/test-helpers/mocks/exemption.js'
+import { createMockRequest } from '#src/server/test-helpers/mocks/helpers.js'
 import {
   makeGetRequest,
   makePostRequest

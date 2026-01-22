@@ -8,9 +8,9 @@ import {
 import * as cacheUtils from '#src/server/common/helpers/session-cache/utils.js'
 import {
   mockExemption,
-  mockSite,
-  createMockRequest
-} from '#src/server/test-helpers/mocks.js'
+  mockSite
+} from '#src/server/test-helpers/mocks/exemption.js'
+import { createMockRequest } from '#src/server/test-helpers/mocks/helpers.js'
 import { makeGetRequest } from '#src/server/test-helpers/server-requests.js'
 import { statusCodes } from '#src/server/common/constants/status-codes.js'
 import { JSDOM } from 'jsdom'

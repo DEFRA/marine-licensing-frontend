@@ -1,4 +1,4 @@
-import { mockExemptionMcmsContext } from '~/src/server/test-helpers/mocks.js'
+import { mockExemptionMcmsContext } from '~/src/server/test-helpers/mocks/exemption.js'
 
 const baseExemption = {
   id: 'test-exemption-123',

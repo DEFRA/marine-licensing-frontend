@@ -138,9 +138,11 @@ describe('ProjectFilter', () => {
   })
 
   describe('init', () => {
-    it('should hide submit button by adding app-hidden class', () => {
+    it('should hide submit button by adding govuk-!-display-none class', () => {
       component = new ProjectFilter($module)
-      expect(component.submitButton.classList.contains('app-hidden')).toBe(true)
+      expect(
+        component.submitButton.classList.contains('govuk-!-display-none')
+      ).toBe(true)
     })
 
     it('should not throw if submit button is missing', () => {
@@ -176,7 +178,7 @@ describe('ProjectFilter', () => {
 
       const rows = document.querySelectorAll('.app-project-row')
       rows.forEach((row) => {
-        expect(row.classList.contains('app-hidden')).toBe(false)
+        expect(row.classList.contains('govuk-!-display-none')).toBe(false)
       })
     })
 
@@ -186,7 +188,9 @@ describe('ProjectFilter', () => {
       const otherProjectRow = document.querySelector(
         '[data-is-own-project="false"]'
       )
-      expect(otherProjectRow.classList.contains('app-hidden')).toBe(true)
+      expect(otherProjectRow.classList.contains('govuk-!-display-none')).toBe(
+        true
+      )
     })
 
     it('should show own project rows when "my-projects" is selected', () => {
@@ -195,25 +199,29 @@ describe('ProjectFilter', () => {
       const ownProjectRow = document.querySelector(
         '[data-is-own-project="true"]'
       )
-      expect(ownProjectRow.classList.contains('app-hidden')).toBe(false)
+      expect(ownProjectRow.classList.contains('govuk-!-display-none')).toBe(
+        false
+      )
     })
 
-    it('should add app-hidden class to hidden rows', () => {
+    it('should add govuk-!-display-none class to hidden rows', () => {
       component.filterProjects('my-projects')
 
       const hiddenRow = document.querySelector('[data-is-own-project="false"]')
-      expect(hiddenRow.classList.contains('app-hidden')).toBe(true)
+      expect(hiddenRow.classList.contains('govuk-!-display-none')).toBe(true)
     })
 
-    it('should remove app-hidden class from visible rows', () => {
+    it('should remove govuk-!-display-none class from visible rows', () => {
       const ownProjectRow = document.querySelector(
         '[data-is-own-project="true"]'
       )
-      ownProjectRow.classList.add('app-hidden')
+      ownProjectRow.classList.add('govuk-!-display-none')
 
       component.filterProjects('all-projects')
 
-      expect(ownProjectRow.classList.contains('app-hidden')).toBe(false)
+      expect(ownProjectRow.classList.contains('govuk-!-display-none')).toBe(
+        false
+      )
     })
 
     it('should handle rows with only own projects', () => {
@@ -230,7 +238,7 @@ describe('ProjectFilter', () => {
 
       const rows = document.querySelectorAll('.app-project-row')
       rows.forEach((row) => {
-        expect(row.classList.contains('app-hidden')).toBe(false)
+        expect(row.classList.contains('govuk-!-display-none')).toBe(false)
       })
     })
 
@@ -248,7 +256,7 @@ describe('ProjectFilter', () => {
 
       const rows = document.querySelectorAll('.app-project-row')
       rows.forEach((row) => {
-        expect(row.classList.contains('app-hidden')).toBe(true)
+        expect(row.classList.contains('govuk-!-display-none')).toBe(true)
       })
     })
 
@@ -289,12 +297,16 @@ describe('ProjectFilter', () => {
       const otherProjectRow = document.querySelector(
         '[data-is-own-project="false"]'
       )
-      expect(otherProjectRow.classList.contains('app-hidden')).toBe(true)
+      expect(otherProjectRow.classList.contains('govuk-!-display-none')).toBe(
+        true
+      )
 
       const allProjectsRadio = document.querySelector('#filter-all')
       allProjectsRadio.dispatchEvent(new Event('change'))
 
-      expect(otherProjectRow.classList.contains('app-hidden')).toBe(false)
+      expect(otherProjectRow.classList.contains('govuk-!-display-none')).toBe(
+        false
+      )
     })
 
     it('should filter correctly when switching from all-projects to my-projects', () => {
@@ -302,12 +314,16 @@ describe('ProjectFilter', () => {
       const otherProjectRow = document.querySelector(
         '[data-is-own-project="false"]'
       )
-      expect(otherProjectRow.classList.contains('app-hidden')).toBe(false)
+      expect(otherProjectRow.classList.contains('govuk-!-display-none')).toBe(
+        false
+      )
 
       const myProjectsRadio = document.querySelector('#filter-my')
       myProjectsRadio.dispatchEvent(new Event('change'))
 
-      expect(otherProjectRow.classList.contains('app-hidden')).toBe(true)
+      expect(otherProjectRow.classList.contains('govuk-!-display-none')).toBe(
+        true
+      )
     })
   })
 
@@ -327,10 +343,10 @@ describe('ProjectFilter', () => {
       component.filterProjects('my-projects')
 
       const rows = document.querySelectorAll('.app-project-row')
-      expect(rows[0].classList.contains('app-hidden')).toBe(false)
-      expect(rows[1].classList.contains('app-hidden')).toBe(true)
-      expect(rows[2].classList.contains('app-hidden')).toBe(false)
-      expect(rows[3].classList.contains('app-hidden')).toBe(true)
+      expect(rows[0].classList.contains('govuk-!-display-none')).toBe(false)
+      expect(rows[1].classList.contains('govuk-!-display-none')).toBe(true)
+      expect(rows[2].classList.contains('govuk-!-display-none')).toBe(false)
+      expect(rows[3].classList.contains('govuk-!-display-none')).toBe(true)
     })
 
     it('should show all projects regardless of ownership when all-projects selected', () => {
@@ -349,7 +365,7 @@ describe('ProjectFilter', () => {
 
       const rows = document.querySelectorAll('.app-project-row')
       rows.forEach((row) => {
-        expect(row.classList.contains('app-hidden')).toBe(false)
+        expect(row.classList.contains('govuk-!-display-none')).toBe(false)
       })
     })
   })

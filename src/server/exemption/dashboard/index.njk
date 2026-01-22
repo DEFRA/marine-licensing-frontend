@@ -71,7 +71,7 @@
           <tbody class="govuk-table__body">
             {% for project in projects %}
               {% set isHidden = isEmployee and filterValue == filterMyProjects and project.attributes['data-is-own-project'] == 'false' %}
-              <tr class="govuk-table__row app-project-row{% if isHidden %} app-hidden{% endif %}"
+              <tr class="govuk-table__row app-project-row{% if isHidden %} govuk-!-display-none{% endif %}"
                   data-is-own-project="{{ project.attributes['data-is-own-project'] }}">
                 {% for cell in project.cells %}
                   <td class="govuk-table__cell"{% if cell.attributes and cell.attributes['data-sort-value'] is defined %} data-sort-value="{{ cell.attributes['data-sort-value'] }}"{% endif %}>

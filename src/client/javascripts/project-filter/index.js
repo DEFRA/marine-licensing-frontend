@@ -11,7 +11,7 @@ export class ProjectFilter {
 
   init() {
     if (this.submitButton) {
-      this.submitButton.classList.add('app-hidden')
+      this.submitButton.classList.add('govuk-!-display-none')
     }
 
     for (const radio of this.radios) {
@@ -25,8 +25,7 @@ export class ProjectFilter {
     for (const row of this.rows) {
       const isOwnProject = row.dataset.isOwnProject === 'true'
       const shouldHide = filterValue === 'my-projects' && !isOwnProject
-
-      row.classList.toggle('app-hidden', shouldHide)
+      row.classList.toggle('govuk-!-display-none', shouldHide)
     }
   }
 }

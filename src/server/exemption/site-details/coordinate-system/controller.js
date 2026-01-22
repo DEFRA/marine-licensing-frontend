@@ -2,11 +2,11 @@ import {
   getExemptionCache,
   setSavedSiteDetails,
   updateExemptionSiteDetails
-} from '#src/server/common/helpers/session-cache/utils.js'
+} from '#src/server/common/helpers/exemptions/session-cache/utils.js'
 import {
   setSiteData,
   setSiteDataPreHandler
-} from '#src/server/common/helpers/session-cache/site-utils.js'
+} from '#src/server/common/helpers/exemptions/session-cache/site-utils.js'
 import {
   errorDescriptionByFieldName,
   mapErrorsForDisplay

@@ -11,7 +11,7 @@ import {
   mockExemptionSubmitted,
   mockExemptionWithShapefile,
   mockProjectList
-} from '~/src/server/test-helpers/mocks.js'
+} from '~/src/server/test-helpers/mocks/exemption.js'
 import { mockExemption, setupTestServer } from '../shared/test-setup-helpers.js'
 import { makeGetRequest } from '~/src/server/test-helpers/server-requests.js'
 import { JSDOM } from 'jsdom'

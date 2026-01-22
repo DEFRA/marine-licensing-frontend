@@ -1,4 +1,4 @@
-import { setExemptionCache } from '#src/server/common/helpers/session-cache/utils.js'
+import { setExemptionCache } from '#src/server/common/helpers/exemptions/session-cache/utils.js'
 
 export const shouldAddNewSite = (site, exemption) =>
   site && site > exemption.siteDetails.length

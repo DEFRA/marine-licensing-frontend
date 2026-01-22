@@ -5,20 +5,20 @@ import {
   widthOfSiteSubmitController,
   WIDTH_OF_SITE_VIEW_ROUTE
 } from '#src/server/exemption/site-details/width-of-site/controller.js'
-import * as cacheUtils from '#src/server/common/helpers/session-cache/utils.js'
+import * as cacheUtils from '#src/server/common/helpers/exemptions/session-cache/utils.js'
 import {
-  createMockRequest,
   mockExemption,
   mockSite
-} from '#src/server/test-helpers/mocks.js'
+} from '#src/server/test-helpers/mocks/exemption.js'
+import { createMockRequest } from '#src/server/test-helpers/mocks/helpers.js'
 import { makeGetRequest } from '#src/server/test-helpers/server-requests.js'
 import { statusCodes } from '#src/server/common/constants/status-codes.js'
 import { JSDOM } from 'jsdom'
 import { routes } from '#src/server/common/constants/routes.js'
-import { saveSiteDetailsToBackend } from '#src/server/common/helpers/save-site-details.js'
+import { saveSiteDetailsToBackend } from '#src/server/common/helpers/exemptions/save-site-details.js'
 
-vi.mock('~/src/server/common/helpers/session-cache/utils.js')
-vi.mock('~/src/server/common/helpers/save-site-details.js')
+vi.mock('~/src/server/common/helpers/exemptions/session-cache/utils.js')
+vi.mock('~/src/server/common/helpers/exemptions/save-site-details.js')
 
 describe('#widthOfSite', () => {
   const getServer = setupTestServer()

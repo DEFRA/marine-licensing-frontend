@@ -4,14 +4,15 @@ import { ACTIVITY_DATES_VIEW_ROUTE } from '#src/server/common/constants/activity
 import { routes } from '#src/server/common/constants/routes.js'
 import { statusCodes } from '#src/server/common/constants/status-codes.js'
 import { createDateISO } from '#src/server/common/helpers/dates/date-utils.js'
-import * as cacheUtils from '#src/server/common/helpers/session-cache/utils.js'
+import * as cacheUtils from '#src/server/common/helpers/exemptions/session-cache/utils.js'
 import {
   activityDatesController,
   activityDatesSubmitController,
   handleValidationErrors
 } from '#src/server/exemption/activity-dates/controller.js'
 import { setupTestServer } from '#tests/integration/shared/test-setup-helpers.js'
-import { mockSite, createMockRequest } from '#src/server/test-helpers/mocks.js'
+import { mockSite } from '#src/server/test-helpers/mocks/exemption.js'
+import { createMockRequest } from '#src/server/test-helpers/mocks/helpers.js'
 import {
   makeGetRequest,
   makePostRequest
@@ -19,8 +20,8 @@ import {
 import { getExemptionService } from '#src/services/exemption-service/index.js'
 import { getNextYear, getThisYear } from '#tests/integration/shared/dates.js'
 
-vi.mock('~/src/server/common/helpers/session-cache/utils.js')
-vi.mock('~/src/server/common/helpers/save-site-details.js')
+vi.mock('~/src/server/common/helpers/exemptions/session-cache/utils.js')
+vi.mock('~/src/server/common/helpers/exemptions/save-site-details.js')
 vi.mock('~/src/services/exemption-service/index.js')
 
 describe('#activityDatesController', () => {

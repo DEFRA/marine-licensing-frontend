@@ -7,7 +7,7 @@ import {
   queryByRole
 } from '@testing-library/dom'
 import { statusCodes } from '~/src/server/common/constants/status-codes.js'
-import { setExemptionCache } from '~/src/server/common/helpers/session-cache/utils.js'
+import { setExemptionCache } from '~/src/server/common/helpers/exemptions/session-cache/utils.js'
 import { validateErrors } from '../shared/expect-utils.js'
 import { loadPage } from '~/tests/integration/shared/app-server.js'
 
@@ -20,9 +20,9 @@ import {
   makeGetRequest,
   makePostRequest
 } from '~/src/server/test-helpers/server-requests.js'
-import { saveSiteDetailsToBackend } from '#src/server/common/helpers/save-site-details.js'
-vi.mock('~/src/server/common/helpers/session-cache/utils.js')
-vi.mock('#src/server/common/helpers/save-site-details.js')
+import { saveSiteDetailsToBackend } from '#src/server/common/helpers/exemptions/save-site-details.js'
+vi.mock('~/src/server/common/helpers/exemptions/session-cache/utils.js')
+vi.mock('#src/server/common/helpers/exemptions/save-site-details.js')
 
 describe('Site name page', () => {
   const getServer = setupTestServer()

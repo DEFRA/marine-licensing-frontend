@@ -4,18 +4,18 @@ import {
   sameActivityDatesSubmitController,
   SAME_ACTIVITY_DATES_VIEW_ROUTE
 } from './controller.js'
-import * as cacheUtils from '#src/server/common/helpers/session-cache/utils.js'
+import * as cacheUtils from '#src/server/common/helpers/exemptions/session-cache/utils.js'
 import {
   mockExemption,
   mockFileUploadExemption,
   mockSite
-} from '#src/server/test-helpers/mocks.js'
+} from '#src/server/test-helpers/mocks/exemption.js'
 import { routes } from '#src/server/common/constants/routes.js'
-import { saveSiteDetailsToBackend } from '#src/server/common/helpers/save-site-details.js'
-import * as copyActivityData from '#src/server/common/helpers/copy-same-activity-data.js'
+import { saveSiteDetailsToBackend } from '#src/server/common/helpers/exemptions/save-site-details.js'
+import * as copyActivityData from '#src/server/common/helpers/exemptions/copy-same-activity-data.js'
 
-vi.mock('~/src/server/common/helpers/session-cache/utils.js')
-vi.mock('~/src/server/common/helpers/save-site-details.js')
+vi.mock('~/src/server/common/helpers/exemptions/session-cache/utils.js')
+vi.mock('~/src/server/common/helpers/exemptions/save-site-details.js')
 
 describe('#sameActivityDates', () => {
   let getExemptionCacheSpy

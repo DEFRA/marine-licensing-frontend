@@ -1,11 +1,9 @@
-import { setExemptionCache } from '#src/server/common/helpers/session-cache/utils.js'
-import {
-  createMockRequest,
-  mockExemption
-} from '#src/server/test-helpers/mocks.js'
+import { setExemptionCache } from '#src/server/common/helpers/exemptions/session-cache/utils.js'
+import { mockExemption } from '#src/server/test-helpers/mocks/exemption.js'
+import { createMockRequest } from '#src/server/test-helpers/mocks/helpers.js'
 import { addNewSite, hasInvalidSiteNumber } from './utils'
 
-vi.mock('#src/server/common/helpers/session-cache/utils.js')
+vi.mock('#src/server/common/helpers/exemptions/session-cache/utils.js')
 
 describe('#site name utils', () => {
   describe('#addNewSite', () => {

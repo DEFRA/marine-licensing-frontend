@@ -1,7 +1,7 @@
 import { vi } from 'vitest'
 import { COORDINATE_SYSTEMS } from '#src/server/common/constants/exemptions.js'
 import { statusCodes } from '#src/server/common/constants/status-codes.js'
-import * as cacheUtils from '#src/server/common/helpers/session-cache/utils.js'
+import * as cacheUtils from '#src/server/common/helpers/exemptions/session-cache/utils.js'
 import * as exemptionService from '#src/services/exemption-service/index.js'
 import {
   FILE_UPLOAD_REVIEW_VIEW_ROUTE,
@@ -9,7 +9,7 @@ import {
   reviewSiteDetailsSubmitController
 } from '#src/server/exemption/site-details/review-site-details/controller.js'
 import { setupTestServer } from '#tests/integration/shared/test-setup-helpers.js'
-import { mockExemption } from '#src/server/test-helpers/mocks.js'
+import { mockExemption } from '#src/server/test-helpers/mocks/exemption.js'
 import { makePostRequest } from '#src/server/test-helpers/server-requests.js'
 import { routes } from '#src/server/common/constants/routes.js'
 import {
@@ -18,10 +18,10 @@ import {
   getSiteDetailsBackLink,
   getCoordinateSystemText
 } from '#src/server/exemption/site-details/review-site-details/utils.js'
-import { getReviewSummaryText } from '#src/server/common/helpers/exemption-site-details.js'
+import { getReviewSummaryText } from '#src/server/common/helpers/exemptions/exemption-site-details.js'
 import { RETURN_TO_CACHE_KEY } from '#src/server/common/constants/cache.js'
 
-vi.mock('~/src/server/common/helpers/session-cache/utils.js')
+vi.mock('~/src/server/common/helpers/exemptions/session-cache/utils.js')
 vi.mock('~/src/server/common/helpers/coordinate-utils.js')
 vi.mock('~/src/services/exemption-service/index.js')
 function createMockHandler(type = 'view') {

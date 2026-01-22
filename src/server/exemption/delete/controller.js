@@ -7,7 +7,7 @@ import {
   getExemptionCache,
   setExemptionCache,
   clearExemptionCache
-} from '#src/server/common/helpers/session-cache/utils.js'
+} from '#src/server/common/helpers/exemptions/session-cache/utils.js'
 import Boom from '@hapi/boom'
 
 export const DELETE_EXEMPTION_VIEW_ROUTE = 'exemption/delete/index'

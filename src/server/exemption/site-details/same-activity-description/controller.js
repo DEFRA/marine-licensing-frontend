@@ -2,12 +2,12 @@ import {
   getExemptionCache,
   updateExemptionMultipleSiteDetails,
   updateExemptionSiteDetails
-} from '#src/server/common/helpers/session-cache/utils.js'
+} from '#src/server/common/helpers/exemptions/session-cache/utils.js'
 import { routes } from '#src/server/common/constants/routes.js'
 import {
   setSiteDataPreHandler,
   setSiteData
-} from '#src/server/common/helpers/session-cache/site-utils.js'
+} from '#src/server/common/helpers/exemptions/session-cache/site-utils.js'
 import {
   errorDescriptionByFieldName,
   mapErrorsForDisplay
@@ -18,12 +18,12 @@ import {
   answerChangedFromYesToNo,
   getBackLink
 } from './utils.js'
-import { saveSiteDetailsToBackend } from '#src/server/common/helpers/save-site-details.js'
+import { saveSiteDetailsToBackend } from '#src/server/common/helpers/exemptions/save-site-details.js'
 import { getCancelLink } from '#src/server/exemption/site-details/utils/cancel-link.js'
 import {
   clearActivityData,
   copySameActivityDescriptionToAllSites
-} from '#src/server/common/helpers/copy-same-activity-data.js'
+} from '#src/server/common/helpers/exemptions/copy-same-activity-data.js'
 
 export const SAME_ACTIVITY_DESCRIPTION_VIEW_ROUTE =
   'exemption/site-details/same-activity-description/index'

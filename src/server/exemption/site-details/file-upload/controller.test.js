@@ -1,15 +1,15 @@
 import { vi } from 'vitest'
 import { config } from '#src/config/config.js'
 import { routes } from '#src/server/common/constants/routes.js'
-import * as cacheUtils from '#src/server/common/helpers/session-cache/utils.js'
+import * as cacheUtils from '#src/server/common/helpers/exemptions/session-cache/utils.js'
 import {
   FILE_UPLOAD_VIEW_ROUTE,
   fileUploadController
 } from '#src/server/exemption/site-details/file-upload/controller.js'
-import { mockExemption } from '#src/server/test-helpers/mocks.js'
+import { mockExemption } from '#src/server/test-helpers/mocks/exemption.js'
 import * as cdpUploadService from '#src/services/cdp-upload-service/index.js'
 
-vi.mock('~/src/server/common/helpers/session-cache/utils.js')
+vi.mock('~/src/server/common/helpers/exemptions/session-cache/utils.js')
 vi.mock('~/src/services/cdp-upload-service/index.js')
 
 describe('#fileUpload', () => {

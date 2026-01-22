@@ -2,10 +2,8 @@ import { vi } from 'vitest'
 import { setupTestServer } from '#tests/integration/shared/test-setup-helpers.js'
 import { statusCodes } from '#src/server/common/constants/status-codes.js'
 import { routes } from '#src/server/common/constants/routes.js'
-import {
-  mockExemption,
-  createMockRequest
-} from '#src/server/test-helpers/mocks.js'
+import { mockExemption } from '#src/server/test-helpers/mocks/exemption.js'
+import { createMockRequest } from '#src/server/test-helpers/mocks/helpers.js'
 import {
   makeGetRequest,
   makePostRequest
@@ -16,13 +14,13 @@ import {
   activityDescriptionSubmitController,
   ACTIVITY_DESCRIPTION_VIEW_ROUTE
 } from '#src/server/exemption/activity-description/controller.js'
-import * as cacheUtils from '#src/server/common/helpers/session-cache/utils.js'
+import * as cacheUtils from '#src/server/common/helpers/exemptions/session-cache/utils.js'
 import * as authRequests from '#src/server/common/helpers/authenticated-requests.js'
-import * as saveSiteDetails from '#src/server/common/helpers/save-site-details.js'
+import * as saveSiteDetails from '#src/server/common/helpers/exemptions/save-site-details.js'
 import { getByRole } from '@testing-library/dom'
 
-vi.mock('~/src/server/common/helpers/session-cache/utils.js')
-vi.mock('~/src/server/common/helpers/save-site-details.js')
+vi.mock('~/src/server/common/helpers/exemptions/session-cache/utils.js')
+vi.mock('~/src/server/common/helpers/exemptions/save-site-details.js')
 vi.mock('~/src/server/common/helpers/authenticated-requests.js')
 
 describe('#activityDescriptionController', () => {

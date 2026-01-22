@@ -1,7 +1,7 @@
 import { vi } from 'vitest'
 import { setupTestServer } from '#tests/integration/shared/test-setup-helpers.js'
 import { statusCodes } from '#src/server/common/constants/status-codes.js'
-import { mockExemption } from '#src/server/test-helpers/mocks.js'
+import { mockExemption } from '#src/server/test-helpers/mocks/exemption.js'
 import {
   makeGetRequest,
   makePostRequest
@@ -13,11 +13,11 @@ import {
   PUBLIC_REGISTER_VIEW_ROUTE,
   errorMessages
 } from '#src/server/exemption/public-register/controller.js'
-import * as cacheUtils from '#src/server/common/helpers/session-cache/utils.js'
+import * as cacheUtils from '#src/server/common/helpers/exemptions/session-cache/utils.js'
 import { routes } from '#src/server/common/constants/routes.js'
 import * as authRequests from '#src/server/common/helpers/authenticated-requests.js'
 
-vi.mock('~/src/server/common/helpers/session-cache/utils.js')
+vi.mock('~/src/server/common/helpers/exemptions/session-cache/utils.js')
 
 describe('#publicRegister', () => {
   const getServer = setupTestServer()

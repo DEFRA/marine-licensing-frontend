@@ -39,10 +39,14 @@ export const routes = {
   DELETE_SITE: '/exemption/delete-site',
   DELETE_ALL_SITES: '/exemption/delete-all-sites',
   COOKIES: '/help/cookies',
-  PRIVACY: '/help/privacy'
+  PRIVACY: '/help/privacy',
+  ADMIN_EXEMPTIONS: '/admin/exemptions'
 }
 
-export const entraIdRoutes = [routes.VIEW_DETAILS_INTERNAL_USER]
+export const entraIdRoutes = [
+  routes.VIEW_DETAILS_INTERNAL_USER,
+  routes.ADMIN_EXEMPTIONS
+]
 
 export const isEntraIdRoute = (route) => {
   if (!route) {

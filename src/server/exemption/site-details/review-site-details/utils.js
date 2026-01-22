@@ -4,9 +4,9 @@ import { COORDINATE_SYSTEMS } from '#src/server/common/constants/exemptions.js'
 import { routes } from '#src/server/common/constants/routes.js'
 import { createSiteDetailsDataJson } from '#src/server/common/helpers/site-details.js'
 import { formatDate } from '#src/server/common/helpers/dates/date-utils.js'
-import { getSiteDetailsBySite } from '#src/server/common/helpers/session-cache/site-details-utils.js'
+import { getSiteDetailsBySite } from '#src/server/common/helpers/exemptions/session-cache/site-details-utils.js'
 import { buildSiteLocationData } from '#src/server/common/helpers/site-location-data.js'
-import { getReviewSummaryText } from '#src/server/common/helpers/exemption-site-details.js'
+import { getReviewSummaryText } from '#src/server/common/helpers/exemptions/exemption-site-details.js'
 const isWGS84 = (coordinateSystem) =>
   coordinateSystem === COORDINATE_SYSTEMS.WGS84
 

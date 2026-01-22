@@ -2,12 +2,10 @@ import { vi } from 'vitest'
 import {
   setSiteData,
   setSiteDataPreHandler
-} from '#src/server/common/helpers/session-cache/site-utils.js'
-import {
-  createMockRequest,
-  mockExemption as mockExemptionData
-} from '#src/server/test-helpers/mocks.js'
-import * as utils from '#src/server/common/helpers/session-cache/utils.js'
+} from '#src/server/common/helpers/exemptions/session-cache/site-utils.js'
+import { mockExemption as mockExemptionData } from '#src/server/test-helpers/mocks/exemption.js'
+import { createMockRequest } from '#src/server/test-helpers/mocks/helpers.js'
+import * as utils from '#src/server/common/helpers/exemptions/session-cache/utils.js'
 import { routes } from '#src/server/common/constants/routes.js'
 
 describe('#siteUtils', () => {

@@ -1,5 +1,5 @@
 import Boom from '@hapi/boom'
-import { getExemptionCache } from '#src/server/common/helpers/session-cache/utils.js'
+import { getExemptionCache } from '#src/server/common/helpers/exemptions/session-cache/utils.js'
 
 const confirmationViewContent = {
   pageTitle: 'Your exemption application has been submitted successfully',

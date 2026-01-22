@@ -1,7 +1,7 @@
 import {
   getExemptionCache,
   updateExemptionSiteDetails
-} from '#src/server/common/helpers/session-cache/utils.js'
+} from '#src/server/common/helpers/exemptions/session-cache/utils.js'
 import { getCdpUploadService } from '#src/services/cdp-upload-service/index.js'
 import { routes } from '#src/server/common/constants/routes.js'
 import { config } from '#src/config/config.js'
@@ -9,7 +9,7 @@ import {
   errorDescriptionByFieldName,
   mapErrorsForDisplay
 } from '#src/server/common/helpers/errors.js'
-import { getSiteDetailsBySite } from '#src/server/common/helpers/session-cache/site-details-utils.js'
+import { getSiteDetailsBySite } from '#src/server/common/helpers/exemptions/session-cache/site-details-utils.js'
 export const FILE_UPLOAD_VIEW_ROUTE = 'exemption/site-details/file-upload/index'
 
 const UPLOAD_A_FILE = 'Upload a file'

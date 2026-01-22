@@ -1,12 +1,12 @@
 import {
   getExemptionCache,
   updateExemptionSiteDetails
-} from '#src/server/common/helpers/session-cache/utils.js'
-import { getSiteDetailsBySite } from '#src/server/common/helpers/session-cache/site-details-utils.js'
+} from '#src/server/common/helpers/exemptions/session-cache/utils.js'
+import { getSiteDetailsBySite } from '#src/server/common/helpers/exemptions/session-cache/site-details-utils.js'
 import {
   setSiteData,
   setSiteDataPreHandler
-} from '#src/server/common/helpers/session-cache/site-utils.js'
+} from '#src/server/common/helpers/exemptions/session-cache/site-utils.js'
 import { getCoordinateSystem } from '#src/server/common/helpers/coordinate-utils.js'
 import {
   errorDescriptionByFieldName,
@@ -16,7 +16,7 @@ import { routes } from '#src/server/common/constants/routes.js'
 import { COORDINATE_SYSTEMS } from '#src/server/common/constants/exemptions.js'
 import { getPayload } from '#src/server/exemption/site-details/centre-coordinates/utils.js'
 import { validateCentreCoordinates } from '#src/server/exemption/site-details/centre-coordinates/validate.js'
-import { saveSiteDetailsToBackend } from '#src/server/common/helpers/save-site-details.js'
+import { saveSiteDetailsToBackend } from '#src/server/common/helpers/exemptions/save-site-details.js'
 import { getCancelLink } from '#src/server/exemption/site-details/utils/cancel-link.js'
 
 export const COORDINATE_SYSTEM_VIEW_ROUTES = {

@@ -1,7 +1,7 @@
 import { vi } from 'vitest'
 import { COORDINATE_SYSTEMS } from '#src/server/common/constants/exemptions.js'
 import { routes } from '#src/server/common/constants/routes.js'
-import { getExemptionCache } from '#src/server/common/helpers/session-cache/utils.js'
+import { getExemptionCache } from '#src/server/common/helpers/exemptions/session-cache/utils.js'
 import { generatePointSpecificErrorMessage } from '#src/server/common/helpers/site-details.js'
 import {
   PATTERNS,
@@ -21,7 +21,7 @@ import {
   removeCoordinateAtIndex
 } from './utils.js'
 
-vi.mock('~/src/server/common/helpers/session-cache/utils.js')
+vi.mock('~/src/server/common/helpers/exemptions/session-cache/utils.js')
 vi.mock('~/src/server/common/helpers/site-details.js')
 vi.mock('~/src/server/common/schemas/osgb36.js')
 vi.mock('~/src/server/common/schemas/wgs84.js')

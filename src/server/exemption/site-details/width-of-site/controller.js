@@ -1,12 +1,12 @@
 import {
   getExemptionCache,
   updateExemptionSiteDetails
-} from '#src/server/common/helpers/session-cache/utils.js'
-import { getSiteDetailsBySite } from '#src/server/common/helpers/session-cache/site-details-utils.js'
+} from '#src/server/common/helpers/exemptions/session-cache/utils.js'
+import { getSiteDetailsBySite } from '#src/server/common/helpers/exemptions/session-cache/site-details-utils.js'
 import {
   setSiteData,
   setSiteDataPreHandler
-} from '#src/server/common/helpers/session-cache/site-utils.js'
+} from '#src/server/common/helpers/exemptions/session-cache/site-utils.js'
 import {
   errorDescriptionByFieldName,
   mapErrorsForDisplay
@@ -14,7 +14,7 @@ import {
 import { circleWidthValidationSchema } from '#src/server/common/schemas/circle-width.js'
 
 import { routes } from '#src/server/common/constants/routes.js'
-import { saveSiteDetailsToBackend } from '#src/server/common/helpers/save-site-details.js'
+import { saveSiteDetailsToBackend } from '#src/server/common/helpers/exemptions/save-site-details.js'
 import { getCancelLink } from '#src/server/exemption/site-details/utils/cancel-link.js'
 
 export const WIDTH_OF_SITE_VIEW_ROUTE =

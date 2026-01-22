@@ -4,10 +4,8 @@ import {
   getMcmsContextFromCache,
   clearMcmsContextCache
 } from './cache-mcms-context.js'
-import {
-  createMockRequest,
-  mcmsAnswersDownloadUrl
-} from '#src/server/test-helpers/mocks.js'
+import { createMockRequest } from '#src/server/test-helpers/mocks/helpers.js'
+import { mcmsAnswersDownloadUrl } from '#src/server/test-helpers/mocks/mcms.js'
 
 describe('cache-mcms-context', () => {
   const iatQueryString =

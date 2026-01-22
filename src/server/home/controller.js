@@ -3,7 +3,7 @@ import {
   cacheMcmsContextFromQueryParams,
   getMcmsContextFromCache
 } from '#src/server/common/helpers/mcms-context/cache-mcms-context.js'
-import { clearExemptionCache } from '#src/server/common/helpers/session-cache/utils.js'
+import { clearExemptionCache } from '#src/server/common/helpers/exemptions/session-cache/utils.js'
 import { isUserReferredFromDefraAccount } from '#src/server/common/helpers/check-request-referrer.js'
 export const homeController = {
   async handler(request, h) {

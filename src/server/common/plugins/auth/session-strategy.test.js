@@ -2,7 +2,7 @@ import { vi, describe, test, expect, beforeEach } from 'vitest'
 import { createSessionStrategy } from './session-strategy.js'
 import * as validateModule from '#src/server/common/plugins/auth/validate.js'
 import { routes } from '#src/server/common/constants/routes.js'
-import { createMockRequest } from '#src/server/test-helpers/mocks.js'
+import { createMockRequest } from '#src/server/test-helpers/mocks/helpers.js'
 import { cacheMcmsContextFromQueryParams } from '#src/server/common/helpers/mcms-context/cache-mcms-context.js'
 
 vi.mock('#src/server/common/plugins/auth/validate.js', () => ({

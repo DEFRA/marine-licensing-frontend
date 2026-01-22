@@ -4,19 +4,20 @@ import {
   multipleCoordinatesSubmitController
 } from '#src/server/exemption/site-details/enter-multiple-coordinates/controller.js'
 import { COORDINATE_SYSTEMS } from '#src/server/common/constants/exemptions.js'
-import * as cacheUtils from '#src/server/common/helpers/session-cache/utils.js'
+import * as cacheUtils from '#src/server/common/helpers/exemptions/session-cache/utils.js'
 import * as coordinateUtils from '#src/server/common/helpers/coordinate-utils.js'
 import { routes } from '#src/server/common/constants/routes.js'
-import { updateExemptionSiteDetails } from '#src/server/common/helpers/session-cache/utils.js'
+import { updateExemptionSiteDetails } from '#src/server/common/helpers/exemptions/session-cache/utils.js'
 import {
   MULTIPLE_COORDINATES_VIEW_ROUTES,
   multipleCoordinatesPageData
 } from '#src/server/exemption/site-details/enter-multiple-coordinates/utils.js'
-import { mockSite, createMockRequest } from '#src/server/test-helpers/mocks.js'
-import { saveSiteDetailsToBackend } from '#src/server/common/helpers/save-site-details.js'
+import { mockSite } from '#src/server/test-helpers/mocks/exemption.js'
+import { createMockRequest } from '#src/server/test-helpers/mocks/helpers.js'
+import { saveSiteDetailsToBackend } from '#src/server/common/helpers/exemptions/save-site-details.js'
 
-vi.mock('~/src/server/common/helpers/session-cache/utils.js')
-vi.mock('~/src/server/common/helpers/save-site-details.js')
+vi.mock('~/src/server/common/helpers/exemptions/session-cache/utils.js')
+vi.mock('~/src/server/common/helpers/exemptions/save-site-details.js')
 
 describe('#multipleCoordinates', () => {
   let getExemptionCacheSpy

@@ -9,11 +9,11 @@ import {
   taskListController,
   TASK_LIST_VIEW_ROUTE
 } from '#src/server/exemption/task-list/controller.js'
-import { mockExemption as mockExemptionData } from '#src/server/test-helpers/mocks.js'
+import { mockExemption as mockExemptionData } from '#src/server/test-helpers/mocks/exemption.js'
 import { makeGetRequest } from '#src/server/test-helpers/server-requests.js'
 import { routes } from '#src/server/common/constants/routes.js'
 import { RETURN_TO_CACHE_KEY } from '#src/server/common/constants/cache.js'
-vi.mock('#src/server/common/helpers/session-cache/utils.js')
+vi.mock('#src/server/common/helpers/exemptions/session-cache/utils.js')
 
 describe('#taskListController', () => {
   const getServer = setupTestServer()

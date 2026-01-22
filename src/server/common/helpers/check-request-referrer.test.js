@@ -1,6 +1,6 @@
 import { describe, test, expect, beforeEach, vi } from 'vitest'
 import { isUserReferredFromDefraAccount } from './check-request-referrer.js'
-import { createMockRequest } from '#src/server/test-helpers/mocks.js'
+import { createMockRequest } from '#src/server/test-helpers/mocks/helpers.js'
 import { config } from '#src/config/config.js'
 
 const DEFRA_ACCOUNT_URL =

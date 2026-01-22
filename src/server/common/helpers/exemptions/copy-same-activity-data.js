@@ -1,7 +1,7 @@
 import {
   getExemptionCache,
   updateExemptionSiteDetails
-} from '#src/server/common/helpers/session-cache/utils.js'
+} from '#src/server/common/helpers/exemptions/session-cache/utils.js'
 
 export const copySameActivityDatesToAllSites = async (request, h) => {
   const exemption = getExemptionCache(request)

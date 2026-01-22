@@ -15,14 +15,12 @@ import {
   renderFileUploadReview,
   renderManualCoordinateReview
 } from '#src/server/exemption/site-details/review-site-details/utils.js'
-import {
-  createMockRequest,
-  mockExemption
-} from '#src/server/test-helpers/mocks.js'
+import { mockExemption } from '#src/server/test-helpers/mocks/exemption.js'
+import { createMockRequest } from '#src/server/test-helpers/mocks/helpers.js'
 
 import { getCoordinateSystem } from '#src/server/common/helpers/coordinate-utils.js'
 
-vi.mock('~/src/server/common/helpers/session-cache/utils.js')
+vi.mock('~/src/server/common/helpers/exemptions/session-cache/utils.js')
 
 // Mock the getCoordinateSystem helper
 vi.mock('#src/server/common/helpers/coordinate-utils.js', () => ({

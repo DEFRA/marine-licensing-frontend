@@ -6,9 +6,9 @@ import { routes } from '#src/server/common/constants/routes.js'
 import {
   getExemptionCache,
   updateExemptionSiteDetails
-} from '#src/server/common/helpers/session-cache/utils.js'
-import { setSiteDataPreHandler } from '#src/server/common/helpers/session-cache/site-utils.js'
-import { getSiteDetailsBySite } from '#src/server/common/helpers/session-cache/site-details-utils.js'
+} from '#src/server/common/helpers/exemptions/session-cache/utils.js'
+import { setSiteDataPreHandler } from '#src/server/common/helpers/exemptions/session-cache/site-utils.js'
+import { getSiteDetailsBySite } from '#src/server/common/helpers/exemptions/session-cache/site-details-utils.js'
 import { getCoordinateSystem } from '#src/server/common/helpers/coordinate-utils.js'
 import {
   MULTIPLE_COORDINATES_VIEW_ROUTES,
@@ -20,7 +20,7 @@ import {
   removeCoordinateAtIndex
 } from './utils.js'
 import { validateCoordinates } from '#src/server/exemption/site-details/enter-multiple-coordinates/validation/validation.js'
-import { saveSiteDetailsToBackend } from '#src/server/common/helpers/save-site-details.js'
+import { saveSiteDetailsToBackend } from '#src/server/common/helpers/exemptions/save-site-details.js'
 import { getCancelLink } from '#src/server/exemption/site-details/utils/cancel-link.js'
 
 const getBackLinkForAction = (action, siteNumber, queryParams, request) => {

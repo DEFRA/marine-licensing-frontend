@@ -2,7 +2,7 @@ import {
   wgs84ValidationSchema,
   createCoordinateSchema
 } from '#src/server/common/schemas/wgs84.js'
-import { mockExemption } from '#src/server/test-helpers/mocks.js'
+import { mockExemption } from '#src/server/test-helpers/mocks/exemption.js'
 
 describe('#centreCoordinate models', () => {
   describe('#wgs84ValidationSchema model', () => {

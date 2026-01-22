@@ -1,5 +1,5 @@
 import { clone } from '@hapi/hoek'
-import { getSiteDetailsBySite } from '#src/server/common/helpers/session-cache/site-details-utils.js'
+import { getSiteDetailsBySite } from '#src/server/common/helpers/exemptions/session-cache/site-details-utils.js'
 
 export const EXEMPTION_CACHE_KEY = 'exemption'
 export const SAVED_SITE_DETAILS_CACHE_KEY = 'savedSiteDetails'

@@ -14,9 +14,9 @@ import {
 import { loadPage } from '~/tests/integration/shared/app-server.js'
 import { makePostRequest } from '~/src/server/test-helpers/server-requests.js'
 import { exemptionNoActivityDescription } from '~/tests/integration/activity-description/fixtures.js'
-import { saveSiteDetailsToBackend } from '#src/server/common/helpers/save-site-details.js'
+import { saveSiteDetailsToBackend } from '#src/server/common/helpers/exemptions/save-site-details.js'
 
-vi.mock('#src/server/common/helpers/save-site-details.js')
+vi.mock('#src/server/common/helpers/exemptions/save-site-details.js')
 
 describe('Activity description - page structure & accessibility', () => {
   const getServer = setupTestServer()

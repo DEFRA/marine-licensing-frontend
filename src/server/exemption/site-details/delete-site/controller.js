@@ -2,8 +2,8 @@ import { routes } from '#src/server/common/constants/routes.js'
 import {
   getExemptionCache,
   setExemptionCache
-} from '#src/server/common/helpers/session-cache/utils.js'
-import { setSiteDataPreHandler } from '#src/server/common/helpers/session-cache/site-utils.js'
+} from '#src/server/common/helpers/exemptions/session-cache/utils.js'
+import { setSiteDataPreHandler } from '#src/server/common/helpers/exemptions/session-cache/site-utils.js'
 import { authenticatedPatchRequest } from '#src/server/common/helpers/authenticated-requests.js'
 
 export const DELETE_SITE_VIEW_ROUTE = 'exemption/site-details/delete-site/index'

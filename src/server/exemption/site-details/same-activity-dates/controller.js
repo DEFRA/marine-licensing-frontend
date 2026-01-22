@@ -2,22 +2,22 @@ import {
   getExemptionCache,
   updateExemptionMultipleSiteDetails,
   updateExemptionSiteDetails
-} from '#src/server/common/helpers/session-cache/utils.js'
+} from '#src/server/common/helpers/exemptions/session-cache/utils.js'
 import { routes } from '#src/server/common/constants/routes.js'
 import {
   setSiteDataPreHandler,
   setSiteData
-} from '#src/server/common/helpers/session-cache/site-utils.js'
+} from '#src/server/common/helpers/exemptions/session-cache/site-utils.js'
 import {
   errorDescriptionByFieldName,
   mapErrorsForDisplay
 } from '#src/server/common/helpers/errors.js'
-import { saveSiteDetailsToBackend } from '#src/server/common/helpers/save-site-details.js'
+import { saveSiteDetailsToBackend } from '#src/server/common/helpers/exemptions/save-site-details.js'
 import { getCancelLink } from '#src/server/exemption/site-details/utils/cancel-link.js'
 import {
   clearActivityData,
   copySameActivityDatesToAllSites
-} from '#src/server/common/helpers/copy-same-activity-data.js'
+} from '#src/server/common/helpers/exemptions/copy-same-activity-data.js'
 import joi from 'joi'
 import { answerChangedFromNoToYes, answerChangedFromYesToNo } from './utils.js'
 

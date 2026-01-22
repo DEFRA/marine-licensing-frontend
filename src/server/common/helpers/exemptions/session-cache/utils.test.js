@@ -12,7 +12,7 @@ import {
   clearSavedSiteDetails,
   SAVED_SITE_DETAILS_CACHE_KEY,
   setSavedSiteDetails
-} from '#src/server/common/helpers/session-cache/utils.js'
+} from '#src/server/common/helpers/exemptions/session-cache/utils.js'
 
 vi.mock('@hapi/hoek', () => ({
   clone: vi.fn((data) => ({ ...data }))

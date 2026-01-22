@@ -4,14 +4,14 @@ import { config } from '#src/config/config.js'
 import { routes } from '#src/server/common/constants/routes.js'
 import { setupTestServer } from '#tests/integration/shared/test-setup-helpers.js'
 import { makeGetRequest } from '#src/server/test-helpers/server-requests.js'
-import { clearExemptionCache } from '#src/server/common/helpers/session-cache/utils.js'
+import { clearExemptionCache } from '#src/server/common/helpers/exemptions/session-cache/utils.js'
 import {
   cacheMcmsContextFromQueryParams,
   getMcmsContextFromCache
 } from '#src/server/common/helpers/mcms-context/cache-mcms-context.js'
 
 vi.mock(
-  '~/src/server/common/helpers/session-cache/utils.js',
+  '~/src/server/common/helpers/exemptions/session-cache/utils.js',
   async (importOriginal) => {
     const mod = await importOriginal()
     return {

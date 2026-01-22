@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, test, vi, it } from 'vitest'
 import { readFileSync } from 'node:fs'
-import { getExemptionCache } from '#src/server/common/helpers/session-cache/utils.js'
+import { getExemptionCache } from '#src/server/common/helpers/exemptions/session-cache/utils.js'
 
 vi.mock(
   '~/src/server/common/helpers/authenticated-requests.js',
@@ -13,7 +13,7 @@ vi.mock(
   }
 )
 vi.mock('node:fs')
-vi.mock('~/src/server/common/helpers/session-cache/utils.js')
+vi.mock('~/src/server/common/helpers/exemptions/session-cache/utils.js')
 
 describe('#context', () => {
   const mockRequest = { path: '/', logger: { error: vi.fn() } }

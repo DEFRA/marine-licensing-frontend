@@ -1,0 +1,56 @@
+{%- from "govuk/components/table/macro.njk" import govukTable -%}
+{%- from "govuk/components/tag/macro.njk" import govukTag -%}
+{% from "moj/components/page-header-actions/macro.njk" import mojPageHeaderActions %}
+{% extends "layouts/page.njk" %}
+
+{% set bodyClasses = "govuk-wide-template" %}
+
+{% block content %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-full">
+      {{ mojPageHeaderActions({
+        heading: {
+          text: heading,
+          classes: 'govuk-heading-l'
+        }
+      }) }}
+
+      {% if projects and projects.length > 0 %}
+
+        {{ govukTable({
+          caption: heading,
+          captionClasses: "govuk-visually-hidden",
+          head: [
+            {
+              text: "Name"
+            },
+            {
+              text: "Reference"
+            },
+            {
+              text: "Submitted"
+            },
+            { text: "Previously failed after retries"},
+            {
+              text: "Actions"
+            }
+          ],
+          rows: projects
+        }) }}
+
+      {% else %}
+        <p class="govuk-body">
+          You currently have no projects.
+        </p>
+      {% endif %}
+      {% if failedPendingRetries.length %}
+        <div class="govuk-!-margin-top-9">
+          <h2 class="govuk-heading-m">Failed pending retries</h2>
+          <ul class="govuk-list govuk-list--bullet">
+            {% for item in failedPendingRetries %}<li>{{ item.applicationReference }} (retries: {{ item.retries }})</li>{% endfor %}
+          </ul>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+{% endblock %}

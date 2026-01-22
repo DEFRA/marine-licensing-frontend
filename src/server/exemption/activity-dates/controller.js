@@ -7,7 +7,7 @@ import {
   DATE_EXTRACTION_CONFIG
 } from '#src/server/common/constants/activity-dates.js'
 import { routes } from '#src/server/common/constants/routes.js'
-import { saveSiteDetailsToBackend } from '#src/server/common/helpers/save-site-details.js'
+import { saveSiteDetailsToBackend } from '#src/server/common/helpers/exemptions/save-site-details.js'
 import { processDateValidationErrors } from '#src/server/common/helpers/dates/date-form-utils.js'
 import {
   createDateFieldsFromValue,
@@ -21,14 +21,14 @@ import {
 import {
   getExemptionCache,
   updateExemptionSiteDetails
-} from '#src/server/common/helpers/session-cache/utils.js'
-import { setSiteDataPreHandler } from '#src/server/common/helpers/session-cache/site-utils.js'
-import { getSiteDetailsBySite } from '#src/server/common/helpers/session-cache/site-details-utils.js'
+} from '#src/server/common/helpers/exemptions/session-cache/utils.js'
+import { setSiteDataPreHandler } from '#src/server/common/helpers/exemptions/session-cache/site-utils.js'
+import { getSiteDetailsBySite } from '#src/server/common/helpers/exemptions/session-cache/site-details-utils.js'
 import { activityDatesSchema } from '#src/server/common/schemas/date.js'
 import { getSiteNumber } from '#src/server/exemption/site-details/utils/site-number.js'
 import { getCancelLink } from '#src/server/exemption/site-details/utils/cancel-link.js'
 import { getBackRoute, getNextRoute } from './utils.js'
-import { copySameActivityDatesToAllSites } from '#src/server/common/helpers/copy-same-activity-data.js'
+import { copySameActivityDatesToAllSites } from '#src/server/common/helpers/exemptions/copy-same-activity-data.js'
 import { getExemptionService } from '#src/services/exemption-service/index.js'
 
 const getBackLink = (siteIndex, action, siteNumber, queryParams, exemption) => {

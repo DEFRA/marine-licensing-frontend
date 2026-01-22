@@ -7,14 +7,14 @@ import {
   getExemptionCache,
   updateExemptionMultipleSiteDetails,
   updateExemptionSiteDetails
-} from '#src/server/common/helpers/session-cache/utils.js'
+} from '#src/server/common/helpers/exemptions/session-cache/utils.js'
 import { routes } from '#src/server/common/constants/routes.js'
-import { mockSite } from '#src/server/test-helpers/mocks.js'
-import { saveSiteDetailsToBackend } from '#src/server/common/helpers/save-site-details.js'
-import * as copyActivityData from '#src/server/common/helpers/copy-same-activity-data.js'
+import { mockSite } from '#src/server/test-helpers/mocks/exemption.js'
+import { saveSiteDetailsToBackend } from '#src/server/common/helpers/exemptions/save-site-details.js'
+import * as copyActivityData from '#src/server/common/helpers/exemptions/copy-same-activity-data.js'
 
-vi.mock('~/src/server/common/helpers/session-cache/utils.js')
-vi.mock('~/src/server/common/helpers/save-site-details.js')
+vi.mock('~/src/server/common/helpers/exemptions/session-cache/utils.js')
+vi.mock('~/src/server/common/helpers/exemptions/save-site-details.js')
 
 describe('sameActivityDescriptionController', () => {
   let clearActivityDataMock

@@ -8,7 +8,7 @@ import {
   getExemptionCache,
   setExemptionCache,
   clearExemptionCache
-} from '#src/server/common/helpers/session-cache/utils.js'
+} from '#src/server/common/helpers/exemptions/session-cache/utils.js'
 import { routes } from '#src/server/common/constants/routes.js'
 
 import {
@@ -18,7 +18,7 @@ import {
 } from './controller.js'
 
 vi.mock('~/src/server/common/helpers/authenticated-requests.js')
-vi.mock('~/src/server/common/helpers/session-cache/utils.js')
+vi.mock('~/src/server/common/helpers/exemptions/session-cache/utils.js')
 
 describe('#delete', () => {
   let mockRequest

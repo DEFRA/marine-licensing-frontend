@@ -1,16 +1,14 @@
 import { vi } from 'vitest'
 import { statusCodes } from '#src/server/common/constants/status-codes.js'
 import { routes } from '#src/server/common/constants/routes.js'
-import {
-  createMockRequest,
-  mockExemption
-} from '#src/server/test-helpers/mocks.js'
+import { mockExemption } from '#src/server/test-helpers/mocks/exemption.js'
+import { createMockRequest } from '#src/server/test-helpers/mocks/helpers.js'
 import { JSDOM } from 'jsdom'
 import {
   projectNameSubmitController,
   PROJECT_NAME_VIEW_ROUTE
 } from '#src/server/exemption/project-name/controller.js'
-import * as cacheUtils from '#src/server/common/helpers/session-cache/utils.js'
+import * as cacheUtils from '#src/server/common/helpers/exemptions/session-cache/utils.js'
 import * as authRequests from '#src/server/common/helpers/authenticated-requests.js'
 import * as authUtils from '#src/server/common/plugins/auth/utils.js'
 import { setupTestServer } from '#tests/integration/shared/test-setup-helpers.js'
@@ -19,7 +17,7 @@ import {
   makePostRequest
 } from '#src/server/test-helpers/server-requests.js'
 
-vi.mock('~/src/server/common/helpers/session-cache/utils.js')
+vi.mock('~/src/server/common/helpers/exemptions/session-cache/utils.js')
 vi.mock('~/src/server/common/plugins/auth/utils.js')
 
 describe('#projectName', () => {

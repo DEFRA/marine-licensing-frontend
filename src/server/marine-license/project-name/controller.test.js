@@ -1,7 +1,7 @@
 import { vi } from 'vitest'
 import { statusCodes } from '#src/server/common/constants/status-codes.js'
 import { marineLicenseRoutes } from '#src/server/common/constants/routes.js'
-import { createMockRequest } from '#src/server/test-helpers/mocks/exemption-mocks.js'
+import { createMockRequest } from '#src/server/test-helpers/mocks/helpers.js'
 import { JSDOM } from 'jsdom'
 import {
   projectNameSubmitController,

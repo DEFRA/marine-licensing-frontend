@@ -3,7 +3,7 @@ import {
   POLYGON_MIN_COORDINATE_POINTS
 } from '#src/server/common/constants/exemptions.js'
 import { routes } from '#src/server/common/constants/routes.js'
-import { getExemptionCache } from '#src/server/common/helpers/session-cache/utils.js'
+import { getExemptionCache } from '#src/server/common/helpers/exemptions/session-cache/utils.js'
 import { generatePointSpecificErrorMessage } from '#src/server/common/helpers/site-details.js'
 import { getCancelLink } from '#src/server/exemption/site-details/utils/cancel-link.js'
 

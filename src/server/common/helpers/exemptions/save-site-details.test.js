@@ -4,7 +4,7 @@ import {
   prepareFileUploadDataForSave,
   prepareManualCoordinateDataForSave
 } from './save-site-details.js'
-import { authenticatedPatchRequest } from './authenticated-requests.js'
+import { authenticatedPatchRequest } from '../authenticated-requests.js'
 import { getExemptionCache, setExemptionCache } from './session-cache/utils.js'
 import {
   mockExemption,
@@ -13,7 +13,7 @@ import {
 import { createMockRequest } from '#src/server/test-helpers/mocks/helpers.js'
 import Boom from '@hapi/boom'
 
-vi.mock('./authenticated-requests.js')
+vi.mock('../authenticated-requests.js')
 vi.mock('./session-cache/utils.js')
 
 describe('save-site-details', () => {

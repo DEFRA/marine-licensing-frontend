@@ -3,7 +3,7 @@ import {
   getExemptionCache,
   resetExemptionSiteDetails,
   setExemptionCache
-} from '#src/server/common/helpers/session-cache/utils.js'
+} from '#src/server/common/helpers/exemptions/session-cache/utils.js'
 import { transformTaskList } from '#src/server/exemption/task-list/utils.js'
 import { routes } from '#src/server/common/constants/routes.js'
 import { authenticatedGetRequest } from '#src/server/common/helpers/authenticated-requests.js'

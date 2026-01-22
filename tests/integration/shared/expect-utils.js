@@ -11,7 +11,7 @@ import {
   getInputInFieldset
 } from '~/tests/integration/shared/dom-helpers.js'
 
-vi.mock('~/src/server/common/helpers/session-cache/utils.js')
+vi.mock('~/src/server/common/helpers/exemptions/session-cache/utils.js')
 vi.mock('~/src/server/common/helpers/authenticated-requests.js')
 
 export const expectDateInputValues = ({

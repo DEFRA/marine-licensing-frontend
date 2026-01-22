@@ -10,7 +10,7 @@ import {
 } from '#src/server/test-helpers/server-requests.js'
 import * as authRequests from '#src/server/common/helpers/authenticated-requests.js'
 import * as authUtils from '#src/server/common/plugins/auth/utils.js'
-import * as exemptionSiteDetailsHelpers from '#src/server/common/helpers/exemption-site-details.js'
+import * as exemptionSiteDetailsHelpers from '#src/server/common/helpers/exemptions/exemption-site-details.js'
 import * as exemptionServiceModule from '#src/services/exemption-service/index.js'
 
 const mockUserSession = {

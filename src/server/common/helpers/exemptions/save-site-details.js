@@ -2,7 +2,7 @@ import { authenticatedPatchRequest } from '#src/server/common/helpers/authentica
 import {
   getExemptionCache,
   setExemptionCache
-} from '#src/server/common/helpers/session-cache/utils.js'
+} from '#src/server/common/helpers/exemptions/session-cache/utils.js'
 import { routes } from '#src/server/common/constants/routes.js'
 import Boom from '@hapi/boom'
 

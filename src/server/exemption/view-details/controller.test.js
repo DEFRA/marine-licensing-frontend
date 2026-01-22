@@ -1,7 +1,7 @@
 import { vi } from 'vitest'
 import Boom from '@hapi/boom'
 import { setupTestServer } from '#tests/integration/shared/test-setup-helpers.js'
-import * as exemptionSiteDetailsHelpers from '#src/server/common/helpers/exemption-site-details.js'
+import * as exemptionSiteDetailsHelpers from '#src/server/common/helpers/exemptions/exemption-site-details.js'
 import * as siteLocationDataHelpers from '#src/server/common/helpers/site-location-data.js'
 import { getExemptionService } from '#src/services/exemption-service/index.js'
 import { viewDetailsController, VIEW_DETAILS_VIEW_ROUTE } from './controller.js'

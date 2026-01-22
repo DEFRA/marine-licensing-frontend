@@ -2,13 +2,13 @@ import { config } from '#src/config/config.js'
 import { routes } from '#src/server/common/constants/routes.js'
 import { authenticatedPostRequest } from '#src/server/common/helpers/authenticated-requests.js'
 import { extractCoordinatesFromGeoJSON } from '#src/server/common/helpers/coordinate-utils.js'
-import { getSiteDetailsBySite } from '#src/server/common/helpers/session-cache/site-details-utils.js'
+import { getSiteDetailsBySite } from '#src/server/common/helpers/exemptions/session-cache/site-details-utils.js'
 import {
   getExemptionCache,
   updateExemptionMultipleSiteDetails,
   updateExemptionSiteDetails,
   updateExemptionSiteDetailsBatch
-} from '#src/server/common/helpers/session-cache/utils.js'
+} from '#src/server/common/helpers/exemptions/session-cache/utils.js'
 import { getCdpUploadService } from '#src/services/cdp-upload-service/index.js'
 import { getFileValidationService } from '#src/services/file-validation/index.js'
 import { isMultipleSitesFile } from '#src/server/exemption/site-details/upload-and-wait/utils.js'

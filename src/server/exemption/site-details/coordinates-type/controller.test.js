@@ -5,7 +5,7 @@ import {
   coordinatesTypeSubmitController,
   PROVIDE_COORDINATES_CHOICE_VIEW_ROUTE
 } from '#src/server/exemption/site-details/coordinates-type/controller.js'
-import * as cacheUtils from '#src/server/common/helpers/session-cache/utils.js'
+import * as cacheUtils from '#src/server/common/helpers/exemptions/session-cache/utils.js'
 import {
   mockExemption,
   mockSite
@@ -15,7 +15,7 @@ import { statusCodes } from '#src/server/common/constants/status-codes.js'
 import { JSDOM } from 'jsdom'
 import { routes } from '#src/server/common/constants/routes.js'
 
-vi.mock('~/src/server/common/helpers/session-cache/utils.js')
+vi.mock('~/src/server/common/helpers/exemptions/session-cache/utils.js')
 
 describe('#coordinatesType', () => {
   const getServer = setupTestServer()

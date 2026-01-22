@@ -2,7 +2,7 @@ import { routes } from '#src/server/common/constants/routes.js'
 import {
   getExemptionCache,
   resetExemptionSiteDetails
-} from '#src/server/common/helpers/session-cache/utils.js'
+} from '#src/server/common/helpers/exemptions/session-cache/utils.js'
 import { authenticatedPatchRequest } from '#src/server/common/helpers/authenticated-requests.js'
 
 export const DELETE_ALL_SITES_VIEW_ROUTE =

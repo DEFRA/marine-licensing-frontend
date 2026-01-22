@@ -4,7 +4,7 @@ import {
   getFileUploadSummaryData,
   getPolygonCoordinatesDisplayData
 } from '#src/server/exemption/site-details/review-site-details/utils.js'
-import { getSiteDetailsBySite } from '#src/server/common/helpers/session-cache/site-details-utils.js'
+import { getSiteDetailsBySite } from '#src/server/common/helpers/exemptions/session-cache/site-details-utils.js'
 import { formatDate } from '#src/server/common/helpers/dates/date-utils.js'
 import { createSiteDetailsDataJson } from '#src/server/common/helpers/site-details.js'
 

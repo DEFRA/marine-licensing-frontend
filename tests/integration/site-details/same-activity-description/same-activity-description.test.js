@@ -11,9 +11,9 @@ import {
   makeGetRequest,
   makePostRequest
 } from '~/src/server/test-helpers/server-requests.js'
-import { saveSiteDetailsToBackend } from '#src/server/common/helpers/save-site-details.js'
+import { saveSiteDetailsToBackend } from '#src/server/common/helpers/exemptions/save-site-details.js'
 
-vi.mock('#src/server/common/helpers/save-site-details.js')
+vi.mock('#src/server/common/helpers/exemptions/save-site-details.js')
 
 const exemptionWithMultipleSites = {
   id: 'test-exemption-123',

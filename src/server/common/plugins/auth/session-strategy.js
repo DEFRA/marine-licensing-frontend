@@ -6,7 +6,7 @@ import {
 } from '#src/server/common/constants/routes.js'
 import { validateUserSession } from '#src/server/common/plugins/auth/validate.js'
 import { cacheMcmsContextFromQueryParams } from '#src/server/common/helpers/mcms-context/cache-mcms-context.js'
-import { EXEMPTION_CACHE_KEY } from '#src/server/common/helpers/session-cache/utils.js'
+import { EXEMPTION_CACHE_KEY } from '#src/server/common/helpers/exemptions/session-cache/utils.js'
 import { isUserReferredFromDefraAccount } from '#src/server/common/helpers/check-request-referrer.js'
 
 export const createSessionStrategy = (server) => {

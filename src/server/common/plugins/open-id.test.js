@@ -5,13 +5,13 @@ import { createEntraIdStrategy } from '#src/server/common/plugins/auth/entra-id-
 import { createSessionStrategy } from '#src/server/common/plugins/auth/session-strategy.js'
 import { AUTH_STRATEGIES } from '#src/server/common/constants/auth.js'
 import { validateUserSession } from '#src/server/common/plugins/auth/validate.js'
-import { clearExemptionCache } from '#src/server/common/helpers/session-cache/utils.js'
+import { clearExemptionCache } from '#src/server/common/helpers/exemptions/session-cache/utils.js'
 
 // Mock external dependencies that these strategy functions depend on
 vi.mock('~/src/config/config.js')
 vi.mock('~/src/server/common/plugins/auth/open-id-provider.js')
 vi.mock('~/src/server/common/plugins/auth/validate.js')
-vi.mock('~/src/server/common/helpers/session-cache/utils.js')
+vi.mock('~/src/server/common/helpers/exemptions/session-cache/utils.js')
 vi.mock('~/src/server/common/helpers/mcms-context/cache-mcms-context.js')
 vi.mock('#src/server/common/helpers/logging/logger.js', () => ({
   createLogger: vi.fn(() => ({ error: vi.fn() }))

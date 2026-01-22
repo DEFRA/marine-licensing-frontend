@@ -5,7 +5,7 @@ import {
 } from '#src/server/common/plugins/auth/utils.js'
 
 import { config } from '#src/config/config.js'
-import { clearExemptionCache } from '#src/server/common/helpers/session-cache/utils.js'
+import { clearExemptionCache } from '#src/server/common/helpers/exemptions/session-cache/utils.js'
 
 export const signOutController = {
   method: 'GET',

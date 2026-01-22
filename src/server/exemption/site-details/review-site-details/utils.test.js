@@ -20,7 +20,7 @@ import { createMockRequest } from '#src/server/test-helpers/mocks/helpers.js'
 
 import { getCoordinateSystem } from '#src/server/common/helpers/coordinate-utils.js'
 
-vi.mock('~/src/server/common/helpers/session-cache/utils.js')
+vi.mock('~/src/server/common/helpers/exemptions/session-cache/utils.js')
 
 // Mock the getCoordinateSystem helper
 vi.mock('#src/server/common/helpers/coordinate-utils.js', () => ({

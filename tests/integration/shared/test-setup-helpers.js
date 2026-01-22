@@ -8,7 +8,7 @@ import {
   updateExemptionSiteDetails,
   updateExemptionMultipleSiteDetails,
   resetExemptionSiteDetails
-} from '~/src/server/common/helpers/session-cache/utils.js'
+} from '~/src/server/common/helpers/exemptions/session-cache/utils.js'
 import {
   authenticatedPatchRequest,
   authenticatedGetRequest
@@ -19,7 +19,7 @@ import {
 } from '~/src/server/common/helpers/mcms-context/cache-mcms-context.js'
 import { mockExemptionMcmsContext as mockExemptionMcmsContextMock } from '~/tests/integration/shared/test-setup-helpers.js'
 
-vi.mock('~/src/server/common/helpers/session-cache/utils.js')
+vi.mock('~/src/server/common/helpers/exemptions/session-cache/utils.js')
 vi.mock('~/src/server/common/helpers/authenticated-requests.js')
 vi.mock('~/src/server/common/helpers/mcms-context/cache-mcms-context.js')
 vi.mock(

@@ -2,11 +2,11 @@ import Boom from '@hapi/boom'
 import {
   clearExemptionCache,
   getExemptionCache
-} from '#src/server/common/helpers/session-cache/utils.js'
+} from '#src/server/common/helpers/exemptions/session-cache/utils.js'
 import { authenticatedPostRequest } from '#src/server/common/helpers/authenticated-requests.js'
 import { routes } from '#src/server/common/constants/routes.js'
 import { getUserSession } from '#src/server/common/plugins/auth/utils.js'
-import { processSiteDetails } from '#src/server/common/helpers/exemption-site-details.js'
+import { processSiteDetails } from '#src/server/common/helpers/exemptions/exemption-site-details.js'
 import { errorMessages } from '#src/server/common/constants/error-messages.js'
 import { getExemptionService } from '#src/services/exemption-service/index.js'
 import { buildSiteLocationData } from '#src/server/common/helpers/site-location-data.js'

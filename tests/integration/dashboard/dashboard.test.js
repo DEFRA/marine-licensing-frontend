@@ -98,7 +98,7 @@ describe('Dashboard', () => {
     const table = queryByRole(doc, 'table', { name: 'Projects' })
     expect(table).not.toBeInTheDocument()
     expect(
-      getByText(doc, 'You currently have no projects.')
+      getByText(doc, 'There are no projects to display.')
     ).toBeInTheDocument()
   })
 

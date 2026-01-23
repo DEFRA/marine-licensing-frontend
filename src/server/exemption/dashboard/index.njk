@@ -12,7 +12,7 @@
     <div class="govuk-grid-column-full">
       {{ mojPageHeaderActions({
         heading: {
-          text: heading,
+          html: '<span class="govuk-caption-l">' + (organisationName | e) + '</span>' + (heading | e),
           classes: 'govuk-heading-l'
         }
       }) }}
@@ -91,7 +91,7 @@
         </table>
       {% else %}
         <p class="govuk-body">
-          You currently have no projects.
+         There are no projects to display.
         </p>
       {% endif %}
     </div>

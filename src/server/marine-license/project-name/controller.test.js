@@ -61,6 +61,35 @@ describe('#marineLicense/projectName', () => {
   })
 
   describe('#projectNameSubmitController', () => {
+    test('Should correctly throw an error if feature is disabled', async () => {
+      config.set('marineLicense.enabled', false)
+
+      const requestWithError = await makePostRequest({
+        url: marineLicenseRoutes.PROJECT_NAME,
+        server: getServer(),
+        payload: { data: 'test' }
+      })
+
+      expect(requestWithError.statusCode).toBe(403)
+
+      expect(requestWithError.headers.location).toBe(
+        marineLicenseRoutes.TASK_LIST
+      )
+
+      const requestWithoutError = await makePostRequest({
+        url: marineLicenseRoutes.PROJECT_NAME,
+        server: getServer()
+      })
+
+      expect(requestWithoutError.statusCode).toBe(403)
+
+      expect(requestWithoutError.headers.location).toBe(
+        marineLicenseRoutes.TASK_LIST
+      )
+
+      config.set('marineLicense.enabled', true)
+    })
+
     test('Should correctly create new project and stay on same page', async () => {
       apiPostMock.mockResolvedValueOnce({
         res: { statusCode: 200 },
@@ -177,7 +206,7 @@ describe('#marineLicense/projectName', () => {
       expect(apiPostMock).not.toHaveBeenCalled()
     })
 
-    test('Should correctly retrieve cached MCMS context when creating a new exemption', async () => {
+    test('Should correctly retrieve cached MCMS context when creating a new marine license', async () => {
       const h = { view: vi.fn() }
       const mockMcmsContext = {
         activityType: 'CON',
@@ -208,7 +237,7 @@ describe('#marineLicense/projectName', () => {
       })
     })
 
-    test('Should not clear MCMS context if an error occurs when creating a new exemption', async () => {
+    test('Should not clear MCMS context if an error occurs when creating a new marine license', async () => {
       const h = { redirect: vi.fn() }
       const mockRequest = createMockRequest({
         payload: { projectName: 'Project name' },
@@ -226,7 +255,7 @@ describe('#marineLicense/projectName', () => {
       expect(mockRequest.yar.clear).not.toHaveBeenCalled()
     })
 
-    test('Should handle missing organisation data when creating a new exemption', async () => {
+    test('Should handle missing organisation data when creating a new marine license', async () => {
       apiPostMock.mockResolvedValueOnce({
         res: { statusCode: 200 },
         payload: { data: 'test' }

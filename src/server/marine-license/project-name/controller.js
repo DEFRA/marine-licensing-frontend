@@ -47,6 +47,12 @@ export const projectNameSubmitController = {
         })
       }),
       failAction: (request, h, err) => {
+        const marineLicenseConfig = config.get('marineLicense')
+
+        if (!marineLicenseConfig.enabled) {
+          throw Boom.forbidden('Marine License journey is not enabled')
+        }
+
         const { payload } = request
 
         if (!err.details) {

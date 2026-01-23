@@ -19,7 +19,7 @@ let webpackManifest
 
 const hideNavigationRoutes = new Set([
   routes.PROJECT_NAME,
-  marineLicenseRoutes.PROJECT_NAME
+  marineLicenseRoutes.MARINE_LICENSE_PROJECT_NAME
 ])
 
 export function context(request) {

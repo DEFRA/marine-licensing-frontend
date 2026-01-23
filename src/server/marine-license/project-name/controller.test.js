@@ -48,7 +48,7 @@ describe('#marineLicense/projectName', () => {
       config.set('marineLicense.enabled', false)
 
       const { statusCode, headers } = await makeGetRequest({
-        url: marineLicenseRoutes.PROJECT_NAME,
+        url: marineLicenseRoutes.MARINE_LICENSE_PROJECT_NAME,
         server: getServer()
       })
 
@@ -65,7 +65,7 @@ describe('#marineLicense/projectName', () => {
       config.set('marineLicense.enabled', false)
 
       const requestWithError = await makePostRequest({
-        url: marineLicenseRoutes.PROJECT_NAME,
+        url: marineLicenseRoutes.MARINE_LICENSE_PROJECT_NAME,
         server: getServer()
       })
 
@@ -76,7 +76,7 @@ describe('#marineLicense/projectName', () => {
       )
 
       const requestWithoutError = await makePostRequest({
-        url: marineLicenseRoutes.PROJECT_NAME,
+        url: marineLicenseRoutes.MARINE_LICENSE_PROJECT_NAME,
         server: getServer(),
         formData: { projectName: 'Project name' }
       })
@@ -97,7 +97,7 @@ describe('#marineLicense/projectName', () => {
       })
 
       const { statusCode, headers } = await makePostRequest({
-        url: marineLicenseRoutes.PROJECT_NAME,
+        url: marineLicenseRoutes.MARINE_LICENSE_PROJECT_NAME,
         server: getServer(),
         formData: { projectName: 'Project name' }
       })
@@ -136,7 +136,7 @@ describe('#marineLicense/projectName', () => {
       })
 
       const { result, statusCode } = await makePostRequest({
-        url: marineLicenseRoutes.PROJECT_NAME,
+        url: marineLicenseRoutes.MARINE_LICENSE_PROJECT_NAME,
         server: getServer(),
         formData: { projectName: 'test' }
       })
@@ -198,7 +198,7 @@ describe('#marineLicense/projectName', () => {
 
     test('Should not call the back end when payload data is empty', async () => {
       await makePostRequest({
-        url: marineLicenseRoutes.PROJECT_NAME,
+        url: marineLicenseRoutes.MARINE_LICENSE_PROJECT_NAME,
         server: getServer(),
         formData: { projectName: '' }
       })
@@ -262,7 +262,7 @@ describe('#marineLicense/projectName', () => {
       })
 
       const { statusCode } = await makePostRequest({
-        url: marineLicenseRoutes.PROJECT_NAME,
+        url: marineLicenseRoutes.MARINE_LICENSE_PROJECT_NAME,
         server: getServer(),
         formData: { projectName: 'Project name' }
       })
@@ -292,7 +292,7 @@ describe('#marineLicense/projectName', () => {
       })
 
       await makePostRequest({
-        url: marineLicenseRoutes.PROJECT_NAME,
+        url: marineLicenseRoutes.MARINE_LICENSE_PROJECT_NAME,
         server: getServer(),
         formData: { projectName: 'Project name' }
       })
@@ -327,7 +327,7 @@ describe('#marineLicense/projectName', () => {
       })
 
       await makePostRequest({
-        url: marineLicenseRoutes.PROJECT_NAME,
+        url: marineLicenseRoutes.MARINE_LICENSE_PROJECT_NAME,
         server: getServer(),
         formData: { projectName: 'Project name' }
       })

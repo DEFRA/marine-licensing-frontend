@@ -103,7 +103,7 @@ describe('Service Home', () => {
       })
       expect(applyForLicenseLink).toHaveAttribute(
         'href',
-        marineLicenseRoutes.PROJECT_NAME
+        marineLicenseRoutes.MARINE_LICENSE_PROJECT_NAME
       )
       expect(applyForLicenseLink.parentElement).toHaveClass(
         'govuk-grid-column-one-half-from-desktop'

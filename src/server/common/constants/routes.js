@@ -36,7 +36,7 @@ export const exemptionRoutes = {
 }
 
 export const marineLicenseRoutes = {
-  PROJECT_NAME: '/marine-license/project-name'
+  MARINE_LICENSE_PROJECT_NAME: '/marine-license/project-name'
 }
 
 export const routes = {

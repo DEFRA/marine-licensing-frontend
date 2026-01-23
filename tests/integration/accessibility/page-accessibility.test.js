@@ -144,7 +144,7 @@ describe('Page accessibility checks (Axe)', () => {
       title: 'Home'
     },
     {
-      url: marineLicenseRoutes.PROJECT_NAME,
+      url: marineLicenseRoutes.MARINE_LICENSE_PROJECT_NAME,
       title: 'Project name'
     }
   ]

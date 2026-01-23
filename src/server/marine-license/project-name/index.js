@@ -7,12 +7,12 @@ import { marineLicenseRoutes } from '#src/server/common/constants/routes.js'
 export const projectNameRoutes = [
   {
     method: 'GET',
-    path: marineLicenseRoutes.PROJECT_NAME,
+    path: marineLicenseRoutes.MARINE_LICENSE_PROJECT_NAME,
     ...projectNameController
   },
   {
     method: 'POST',
-    path: marineLicenseRoutes.PROJECT_NAME,
+    path: marineLicenseRoutes.MARINE_LICENSE_PROJECT_NAME,
     ...projectNameSubmitController
   }
 ]

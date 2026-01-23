@@ -33,7 +33,7 @@ const cards = [
 const filteredCards = [
   {
     title: 'Apply for a Marine License',
-    link: marineLicenseRoutes.PROJECT_NAME
+    link: marineLicenseRoutes.MARINE_LICENSE_PROJECT_NAME
   }
 ]
 

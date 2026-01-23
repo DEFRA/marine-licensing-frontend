@@ -22,7 +22,7 @@ describe('Marine License - Project name', () => {
     test('should render 403 error page when feature is disabled', async () => {
       const { result, statusCode } = await makeGetRequest({
         server: getServer(),
-        url: marineLicenseRoutes.PROJECT_NAME
+        url: marineLicenseRoutes.MARINE_LICENSE_PROJECT_NAME
       })
 
       expect(statusCode).toBe(statusCodes.forbidden)
@@ -48,7 +48,7 @@ describe('Marine License - Project name', () => {
 
     test('should render project name page when feature is enabled and no project name set', async () => {
       const document = await loadPage({
-        requestUrl: marineLicenseRoutes.PROJECT_NAME,
+        requestUrl: marineLicenseRoutes.MARINE_LICENSE_PROJECT_NAME,
         server: getServer()
       })
 
@@ -88,7 +88,7 @@ describe('Marine License - Project name', () => {
     test('should show a validation error when submitted without a project name', async () => {
       const submitProjectNameForm = async (formData) => {
         const { document } = await submitForm({
-          requestUrl: marineLicenseRoutes.PROJECT_NAME,
+          requestUrl: marineLicenseRoutes.MARINE_LICENSE_PROJECT_NAME,
           server: getServer(),
           formData
         })

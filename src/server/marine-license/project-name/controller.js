@@ -24,12 +24,14 @@ const projectNameViewSettings = {
   heading: 'Project Name'
 }
 
+const marineLicenseDisabledError = 'Marine License journey is not enabled'
+
 export const projectNameController = {
   handler(_request, h) {
     const marineLicenseConfig = config.get('marineLicense')
 
     if (!marineLicenseConfig.enabled) {
-      throw Boom.forbidden('Marine License journey is not enabled')
+      throw Boom.forbidden(marineLicenseDisabledError)
     }
 
     return h.view(PROJECT_NAME_VIEW_ROUTE, {
@@ -50,7 +52,7 @@ export const projectNameSubmitController = {
         const marineLicenseConfig = config.get('marineLicense')
 
         if (!marineLicenseConfig.enabled) {
-          throw Boom.forbidden('Marine License journey is not enabled')
+          throw Boom.forbidden(marineLicenseDisabledError)
         }
 
         const { payload } = request
@@ -86,7 +88,7 @@ export const projectNameSubmitController = {
       const marineLicenseConfig = config.get('marineLicense')
 
       if (!marineLicenseConfig.enabled) {
-        throw Boom.forbidden('Marine License journey is not enabled')
+        throw Boom.forbidden(marineLicenseDisabledError)
       }
 
       const { organisationId, organisationName, userRelationshipType } =

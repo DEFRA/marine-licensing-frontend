@@ -66,8 +66,7 @@ describe('#marineLicense/projectName', () => {
 
       const requestWithError = await makePostRequest({
         url: marineLicenseRoutes.PROJECT_NAME,
-        server: getServer(),
-        payload: { data: 'test' }
+        server: getServer()
       })
 
       expect(requestWithError.statusCode).toBe(403)
@@ -78,7 +77,8 @@ describe('#marineLicense/projectName', () => {
 
       const requestWithoutError = await makePostRequest({
         url: marineLicenseRoutes.PROJECT_NAME,
-        server: getServer()
+        server: getServer(),
+        formData: { projectName: 'Project name' }
       })
 
       expect(requestWithoutError.statusCode).toBe(403)
@@ -93,7 +93,7 @@ describe('#marineLicense/projectName', () => {
     test('Should correctly create new project and stay on same page', async () => {
       apiPostMock.mockResolvedValueOnce({
         res: { statusCode: 200 },
-        payload: { data: 'test' }
+        payload: { projectName: 'test' }
       })
 
       const { statusCode, headers } = await makePostRequest({

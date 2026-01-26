@@ -60,11 +60,14 @@ describe('ProjectFilter', () => {
     return `
       <div>
         ${formHtml}
-        <table class="govuk-table">
+        <table class="govuk-table" id="ex-projects-table">
           <tbody class="govuk-table__body">
             ${rowsHtml}
           </tbody>
         </table>
+        <p class="govuk-body app-empty-message govuk-!-display-none">
+          There are no projects to display.
+        </p>
       </div>
     `
   }
@@ -109,6 +112,20 @@ describe('ProjectFilter', () => {
       component = new ProjectFilter($module)
       expect(component.rows).toHaveLength(2)
       expect(component.rows[0].classList.contains('app-project-row')).toBe(true)
+    })
+
+    it('should find table element', () => {
+      component = new ProjectFilter($module)
+      expect(component.table).toBeInstanceOf(HTMLTableElement)
+      expect(component.table.id).toBe('ex-projects-table')
+    })
+
+    it('should find empty message element', () => {
+      component = new ProjectFilter($module)
+      expect(component.emptyMessage).toBeInstanceOf(HTMLParagraphElement)
+      expect(
+        component.emptyMessage.classList.contains('app-empty-message')
+      ).toBe(true)
     })
 
     it('should handle missing form element gracefully', () => {
@@ -367,6 +384,77 @@ describe('ProjectFilter', () => {
       rows.forEach((row) => {
         expect(row.classList.contains('govuk-!-display-none')).toBe(false)
       })
+    })
+  })
+
+  describe('table and empty message visibility', () => {
+    it('should show table and hide empty message when there are visible rows', () => {
+      component = new ProjectFilter($module)
+
+      component.filterProjects('all-projects')
+
+      const table = document.querySelector('#ex-projects-table')
+      const emptyMessage = document.querySelector('.app-empty-message')
+      expect(table.classList.contains('govuk-!-display-none')).toBe(false)
+      expect(emptyMessage.classList.contains('govuk-!-display-none')).toBe(true)
+    })
+
+    it('should hide table and show empty message when no rows are visible', () => {
+      document.body.innerHTML = createFilterHtml({
+        rows: [
+          { name: 'Other Project 1', isOwn: false },
+          { name: 'Other Project 2', isOwn: false }
+        ]
+      })
+      $module = document.querySelector('[data-module="app-project-filter"]')
+      component = new ProjectFilter($module)
+
+      component.filterProjects('my-projects')
+
+      const table = document.querySelector('#ex-projects-table')
+      const emptyMessage = document.querySelector('.app-empty-message')
+      expect(table.classList.contains('govuk-!-display-none')).toBe(true)
+      expect(emptyMessage.classList.contains('govuk-!-display-none')).toBe(
+        false
+      )
+    })
+
+    it('should show table when switching from no visible rows to visible rows', () => {
+      document.body.innerHTML = createFilterHtml({
+        rows: [
+          { name: 'Other Project 1', isOwn: false },
+          { name: 'Other Project 2', isOwn: false }
+        ]
+      })
+      $module = document.querySelector('[data-module="app-project-filter"]')
+      component = new ProjectFilter($module)
+
+      component.filterProjects('my-projects')
+      const table = document.querySelector('#ex-projects-table')
+      const emptyMessage = document.querySelector('.app-empty-message')
+      expect(table.classList.contains('govuk-!-display-none')).toBe(true)
+      expect(emptyMessage.classList.contains('govuk-!-display-none')).toBe(
+        false
+      )
+
+      component.filterProjects('all-projects')
+      expect(table.classList.contains('govuk-!-display-none')).toBe(false)
+      expect(emptyMessage.classList.contains('govuk-!-display-none')).toBe(true)
+    })
+
+    it('should handle empty rows showing empty message', () => {
+      document.body.innerHTML = createFilterHtml({ rows: [] })
+      $module = document.querySelector('[data-module="app-project-filter"]')
+      component = new ProjectFilter($module)
+
+      component.filterProjects('my-projects')
+
+      const table = document.querySelector('#ex-projects-table')
+      const emptyMessage = document.querySelector('.app-empty-message')
+      expect(table.classList.contains('govuk-!-display-none')).toBe(true)
+      expect(emptyMessage.classList.contains('govuk-!-display-none')).toBe(
+        false
+      )
     })
   })
 })

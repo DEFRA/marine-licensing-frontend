@@ -5,6 +5,8 @@ export class ProjectFilter {
     this.submitButton = this.form?.querySelector('.app-filter-submit')
     this.radios = element.querySelectorAll('input[type="radio"]')
     this.rows = document.querySelectorAll('.app-project-row')
+    this.table = document.querySelector('#ex-projects-table')
+    this.emptyMessage = document.querySelector('.app-empty-message')
 
     this.init()
   }
@@ -22,10 +24,19 @@ export class ProjectFilter {
   }
 
   filterProjects(filterValue) {
+    let visibleCount = 0
+
     for (const row of this.rows) {
       const isOwnProject = row.dataset.isOwnProject === 'true'
       const shouldHide = filterValue === 'my-projects' && !isOwnProject
       row.classList.toggle('govuk-!-display-none', shouldHide)
+      if (!shouldHide) {
+        visibleCount++
+      }
     }
+
+    const hasVisibleRows = visibleCount > 0
+    this.table?.classList.toggle('govuk-!-display-none', !hasVisibleRows)
+    this.emptyMessage?.classList.toggle('govuk-!-display-none', hasVisibleRows)
   }
 }

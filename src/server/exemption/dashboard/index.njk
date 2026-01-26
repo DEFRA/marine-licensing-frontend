@@ -55,8 +55,17 @@
         </form>
       {% endif %}
 
+      {% set hasOwnProjects = false %}
+      {% for project in projects %}
+        {% if project.attributes['data-is-own-project'] == 'true' %}
+          {% set hasOwnProjects = true %}
+        {% endif %}
+      {% endfor %}
+
+      {% set showTable = projects and projects.length > 0 and (not isEmployee or filterValue == filterAllProjects or hasOwnProjects) %}
+
       {% if projects and projects.length > 0 %}
-        <table class="govuk-table" data-module="moj-sortable-table">
+        <table class="govuk-table{% if not showTable %} govuk-!-display-none{% endif %}" data-module="moj-sortable-table" id="ex-projects-table">
           <caption class="govuk-table__caption govuk-visually-hidden">{{ heading }}</caption>
           <thead class="govuk-table__head">
             <tr class="govuk-table__row">
@@ -89,11 +98,11 @@
             {% endfor %}
           </tbody>
         </table>
-      {% else %}
-        <p class="govuk-body">
-         There are no projects to display.
-        </p>
       {% endif %}
+
+      <p class="govuk-body app-empty-message{% if showTable %} govuk-!-display-none{% endif %}">
+        There are no projects to display.
+      </p>
     </div>
   </div>
 {% endblock %}

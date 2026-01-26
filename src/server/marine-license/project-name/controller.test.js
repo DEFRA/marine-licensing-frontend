@@ -15,10 +15,17 @@ import {
   makePostRequest
 } from '#src/server/test-helpers/server-requests.js'
 import { config } from '#src/config/config.js'
+import { setMarineLicenseCache } from '#src/server/common/helpers/marine-license/session-cache/utils.js'
+import {
+  getMcmsContextFromCache,
+  clearMcmsContextCache
+} from '#src/server/common/helpers/mcms-context/cache-mcms-context.js'
 
 vi.mock('#src/server/common/helpers/session-cache/utils.js')
 vi.mock('#src/server/common/plugins/auth/utils.js')
 vi.mock('#src/server/common/helpers/authenticated-requests.js')
+vi.mock('#src/server/common/helpers/marine-license/session-cache/utils.js')
+vi.mock('#src/server/common/helpers/mcms-context/cache-mcms-context.js')
 
 describe('#marineLicense/projectName', () => {
   const getServer = setupTestServer()
@@ -41,20 +48,21 @@ describe('#marineLicense/projectName', () => {
 
   beforeEach(() => {
     vi.clearAllMocks()
+    vi.mocked(setMarineLicenseCache).mockResolvedValue({})
+    vi.mocked(getMcmsContextFromCache).mockReturnValue(null)
+    vi.mocked(clearMcmsContextCache).mockReturnValue()
   })
 
   describe('#projectNameController', () => {
     test('Should correctly throw an error if feature is disabled', async () => {
       config.set('marineLicense.enabled', false)
 
-      const { statusCode, headers } = await makeGetRequest({
+      const { statusCode } = await makeGetRequest({
         url: marineLicenseRoutes.MARINE_LICENSE_PROJECT_NAME,
         server: getServer()
       })
 
       expect(statusCode).toBe(403)
-
-      expect(headers.location).toBe(marineLicenseRoutes.TASK_LIST)
 
       config.set('marineLicense.enabled', true)
     })
@@ -71,10 +79,6 @@ describe('#marineLicense/projectName', () => {
 
       expect(requestWithError.statusCode).toBe(403)
 
-      expect(requestWithError.headers.location).toBe(
-        marineLicenseRoutes.TASK_LIST
-      )
-
       const requestWithoutError = await makePostRequest({
         url: marineLicenseRoutes.MARINE_LICENSE_PROJECT_NAME,
         server: getServer(),
@@ -83,17 +87,18 @@ describe('#marineLicense/projectName', () => {
 
       expect(requestWithoutError.statusCode).toBe(403)
 
-      expect(requestWithoutError.headers.location).toBe(
-        marineLicenseRoutes.TASK_LIST
-      )
-
       config.set('marineLicense.enabled', true)
     })
 
-    test('Should correctly create new project and stay on same page', async () => {
+    test('Should correctly create new project and redirect to task list', async () => {
       apiPostMock.mockResolvedValueOnce({
         res: { statusCode: 200 },
-        payload: { projectName: 'test' }
+        payload: {
+          value: {
+            id: 'test-id',
+            projectName: 'Project name'
+          }
+        }
       })
 
       const { statusCode, headers } = await makePostRequest({
@@ -113,9 +118,11 @@ describe('#marineLicense/projectName', () => {
         })
       )
 
-      expect(statusCode).toBe(200)
+      expect(statusCode).toBe(302)
 
-      expect(headers.location).toBe(marineLicenseRoutes.TASK_LIST)
+      expect(headers.location).toBe(
+        marineLicenseRoutes.MARINE_LICENSE_TASK_LIST
+      )
     })
 
     test('Should handle API validation errors in catch block', async () => {
@@ -166,7 +173,6 @@ describe('#marineLicense/projectName', () => {
       projectNameSubmitController.options.validate.failAction(request, h, err)
 
       expect(h.view).toHaveBeenCalledWith(PROJECT_NAME_VIEW_ROUTE, {
-        backLink: marineLicenseRoutes.TASK_LIST,
         heading: 'Project Name',
         pageTitle: 'Project name',
         payload: { projectName: '' }
@@ -187,7 +193,6 @@ describe('#marineLicense/projectName', () => {
       projectNameSubmitController.options.validate.failAction(request, h, {})
 
       expect(h.view).toHaveBeenCalledWith(PROJECT_NAME_VIEW_ROUTE, {
-        backLink: marineLicenseRoutes.TASK_LIST,
         heading: 'Project Name',
         pageTitle: 'Project name',
         payload: { projectName: '' }
@@ -207,7 +212,7 @@ describe('#marineLicense/projectName', () => {
     })
 
     test('Should correctly retrieve cached MCMS context when creating a new marine license', async () => {
-      const h = { view: vi.fn() }
+      const h = { redirect: vi.fn() }
       const mockMcmsContext = {
         activityType: 'CON',
         activitySubtype: 'maintenance',
@@ -218,7 +223,18 @@ describe('#marineLicense/projectName', () => {
         payload: { projectName: 'Project name' },
         yar: {
           get: vi.fn().mockReturnValue(mockMcmsContext),
-          clear: vi.fn()
+          clear: vi.fn(),
+          set: vi.fn(),
+          commit: vi.fn().mockResolvedValue()
+        }
+      })
+
+      apiPostMock.mockResolvedValueOnce({
+        payload: {
+          value: {
+            id: 'test-id',
+            projectName: 'Project name'
+          }
         }
       })
 
@@ -258,7 +274,12 @@ describe('#marineLicense/projectName', () => {
     test('Should handle missing organisation data when creating a new marine license', async () => {
       apiPostMock.mockResolvedValueOnce({
         res: { statusCode: 200 },
-        payload: { data: 'test' }
+        payload: {
+          value: {
+            id: 'test-id',
+            projectName: 'Project name'
+          }
+        }
       })
 
       const { statusCode } = await makePostRequest({
@@ -276,7 +297,7 @@ describe('#marineLicense/projectName', () => {
         })
       )
 
-      expect(statusCode).toBe(200)
+      expect(statusCode).toBe(302)
     })
 
     test('Should include organisation data when user is an Agent', async () => {
@@ -288,7 +309,7 @@ describe('#marineLicense/projectName', () => {
 
       apiPostMock.mockResolvedValueOnce({
         res: { statusCode: 200 },
-        payload: { data: 'test' }
+        payload: { id: 'test-id' }
       })
 
       await makePostRequest({
@@ -323,7 +344,7 @@ describe('#marineLicense/projectName', () => {
 
       apiPostMock.mockResolvedValueOnce({
         res: { statusCode: 200 },
-        payload: { data: 'test' }
+        payload: { id: 'test-id' }
       })
 
       await makePostRequest({

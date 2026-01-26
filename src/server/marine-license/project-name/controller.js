@@ -12,6 +12,8 @@ import {
   getMcmsContextFromCache
 } from '#src/server/common/helpers/mcms-context/cache-mcms-context.js'
 import { getUserSession } from '#src/server/common/plugins/auth/utils.js'
+import { setMarineLicenseCache } from '#src/server/common/helpers/marine-license/session-cache/utils.js'
+import { marineLicenseRoutes } from '#src/server/common/constants/routes.js'
 
 const errorMessages = {
   PROJECT_NAME_REQUIRED: 'Enter the project name',
@@ -96,18 +98,27 @@ export const projectNameSubmitController = {
 
       const mcmsContext = getMcmsContextFromCache(request)
 
-      await authenticatedPostRequest(request, '/marine-license/project-name', {
-        ...payload,
-        mcmsContext,
-        ...(organisationId ? { organisationId, organisationName } : {}),
-        userRelationshipType
+      const { payload: responsePayload } = await authenticatedPostRequest(
+        request,
+        '/marine-license/project-name',
+        {
+          ...payload,
+          mcmsContext,
+          ...(organisationId ? { organisationId, organisationName } : {}),
+          userRelationshipType
+        }
+      )
+
+      const { id, projectName } = responsePayload.value
+
+      await setMarineLicenseCache(request, h, {
+        id,
+        projectName
       })
 
       clearMcmsContextCache(request)
 
-      return h.view(PROJECT_NAME_VIEW_ROUTE, {
-        ...projectNameViewSettings
-      })
+      return h.redirect(marineLicenseRoutes.MARINE_LICENSE_TASK_LIST)
     } catch (e) {
       const { details } = e.data?.payload?.validation ?? {}
       if (!details) {

@@ -7,7 +7,10 @@ import {
   projectNameSubmitController,
   PROJECT_NAME_VIEW_ROUTE
 } from '#src/server/marine-license/project-name/controller.js'
-import { authenticatedPostRequest } from '#src/server/common/helpers/authenticated-requests.js'
+import {
+  authenticatedGetRequest,
+  authenticatedPostRequest
+} from '#src/server/common/helpers/authenticated-requests.js'
 import { getUserSession } from '#src/server/common/plugins/auth/utils.js'
 import { setupTestServer } from '#tests/integration/shared/test-setup-helpers.js'
 import {
@@ -15,7 +18,10 @@ import {
   makePostRequest
 } from '#src/server/test-helpers/server-requests.js'
 import { config } from '#src/config/config.js'
-import { setMarineLicenseCache } from '#src/server/common/helpers/marine-license/session-cache/utils.js'
+import {
+  getMarineLicenseCache,
+  setMarineLicenseCache
+} from '#src/server/common/helpers/marine-license/session-cache/utils.js'
 import {
   getMcmsContextFromCache,
   clearMcmsContextCache
@@ -25,7 +31,6 @@ vi.mock('#src/server/common/helpers/session-cache/utils.js')
 vi.mock('#src/server/common/plugins/auth/utils.js')
 vi.mock('#src/server/common/helpers/authenticated-requests.js')
 vi.mock('#src/server/common/helpers/marine-license/session-cache/utils.js')
-vi.mock('#src/server/common/helpers/mcms-context/cache-mcms-context.js')
 
 describe('#marineLicense/projectName', () => {
   const getServer = setupTestServer()
@@ -47,10 +52,19 @@ describe('#marineLicense/projectName', () => {
   })
 
   beforeEach(() => {
-    vi.clearAllMocks()
+    vi.mocked(getMarineLicenseCache).mockReturnValue({})
     vi.mocked(setMarineLicenseCache).mockResolvedValue({})
-    vi.mocked(getMcmsContextFromCache).mockReturnValue(null)
     vi.mocked(clearMcmsContextCache).mockReturnValue()
+    vi.mocked(authenticatedGetRequest).mockResolvedValue({
+      payload: {
+        message: 'success',
+        value: { id: 'test-id', projectName: 'Test Project', taskList: {} }
+      }
+    })
+    getUserSessionMock.mockResolvedValue({
+      organisationId: 'test-org-id',
+      organisationName: 'Test Organisation Ltd'
+    })
   })
 
   describe('#projectNameController', () => {
@@ -107,12 +121,11 @@ describe('#marineLicense/projectName', () => {
         formData: { projectName: 'Project name' }
       })
 
-      expect(authenticatedPostRequest).toHaveBeenCalledWith(
+      expect(apiPostMock).toHaveBeenCalledWith(
         expect.any(Object),
         `/marine-license/project-name`,
         expect.objectContaining({
           projectName: 'Project name',
-          mcmsContext: null,
           organisationId: 'test-org-id',
           organisationName: 'Test Organisation Ltd'
         })
@@ -219,13 +232,13 @@ describe('#marineLicense/projectName', () => {
         article: '17',
         pdfDownloadUrl: 'https://example.com/test.pdf'
       }
+
+      getMcmsContextFromCache.mockReturnValueOnce(mockMcmsContext)
       const mockRequest = createMockRequest({
         payload: { projectName: 'Project name' },
         yar: {
           get: vi.fn().mockReturnValue(mockMcmsContext),
-          clear: vi.fn(),
-          set: vi.fn(),
-          commit: vi.fn().mockResolvedValue()
+          clear: vi.fn()
         }
       })
 
@@ -249,7 +262,8 @@ describe('#marineLicense/projectName', () => {
         },
         projectName: 'Project name',
         organisationId: 'test-org-id',
-        organisationName: 'Test Organisation Ltd'
+        organisationName: 'Test Organisation Ltd',
+        userRelationshipType: undefined
       })
     })
 
@@ -292,8 +306,7 @@ describe('#marineLicense/projectName', () => {
         expect.any(Object),
         `/marine-license/project-name`,
         expect.objectContaining({
-          projectName: 'Project name',
-          mcmsContext: null
+          projectName: 'Project name'
         })
       )
 
@@ -323,7 +336,6 @@ describe('#marineLicense/projectName', () => {
         `/marine-license/project-name`,
         expect.objectContaining({
           projectName: 'Project name',
-          mcmsContext: null,
           organisationId: 'beneficiary-org-id',
           organisationName: 'Beneficiary Organisation Ltd',
           userRelationshipType: 'Agent'
@@ -358,7 +370,6 @@ describe('#marineLicense/projectName', () => {
         `/marine-license/project-name`,
         expect.objectContaining({
           projectName: 'Project name',
-          mcmsContext: null,
           organisationId: 'applicant-org-id',
           organisationName: 'Applicant Organisation Ltd',
           userRelationshipType: 'Employee'

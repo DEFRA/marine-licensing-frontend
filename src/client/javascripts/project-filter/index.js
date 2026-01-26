@@ -1,3 +1,6 @@
+// CSS class to hide elements
+const govukDisplayNone = 'govuk-!-display-none'
+
 export class ProjectFilter {
   constructor(element) {
     this.element = element
@@ -13,7 +16,7 @@ export class ProjectFilter {
 
   init() {
     if (this.submitButton) {
-      this.submitButton.classList.add('govuk-!-display-none')
+      this.submitButton.classList.add(govukDisplayNone)
     }
 
     for (const radio of this.radios) {
@@ -29,14 +32,14 @@ export class ProjectFilter {
     for (const row of this.rows) {
       const isOwnProject = row.dataset.isOwnProject === 'true'
       const shouldHide = filterValue === 'my-projects' && !isOwnProject
-      row.classList.toggle('govuk-!-display-none', shouldHide)
+      row.classList.toggle(govukDisplayNone, shouldHide)
       if (!shouldHide) {
         visibleCount++
       }
     }
 
     const hasVisibleRows = visibleCount > 0
-    this.table?.classList.toggle('govuk-!-display-none', !hasVisibleRows)
-    this.emptyMessage?.classList.toggle('govuk-!-display-none', hasVisibleRows)
+    this.table?.classList.toggle(govukDisplayNone, !hasVisibleRows)
+    this.emptyMessage?.classList.toggle(govukDisplayNone, hasVisibleRows)
   }
 }

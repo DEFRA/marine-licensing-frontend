@@ -6,14 +6,21 @@ import {
   errorDescriptionByFieldName,
   mapErrorsForDisplay
 } from '#src/server/common/helpers/errors.js'
-import { authenticatedPostRequest } from '#src/server/common/helpers/authenticated-requests.js'
+import {
+  authenticatedPatchRequest,
+  authenticatedPostRequest
+} from '#src/server/common/helpers/authenticated-requests.js'
 import {
   clearMcmsContextCache,
   getMcmsContextFromCache
 } from '#src/server/common/helpers/mcms-context/cache-mcms-context.js'
 import { getUserSession } from '#src/server/common/plugins/auth/utils.js'
-import { setMarineLicenseCache } from '#src/server/common/helpers/marine-license/session-cache/utils.js'
+import {
+  getMarineLicenseCache,
+  setMarineLicenseCache
+} from '#src/server/common/helpers/marine-license/session-cache/utils.js'
 import { marineLicenseRoutes } from '#src/server/common/constants/routes.js'
+import { getBackLink } from './utils.js'
 
 const errorMessages = {
   PROJECT_NAME_REQUIRED: 'Enter the project name',
@@ -29,15 +36,23 @@ const projectNameViewSettings = {
 const marineLicenseDisabledError = 'Marine License journey is not enabled'
 
 export const projectNameController = {
-  handler(_request, h) {
+  handler(request, h) {
     const marineLicenseConfig = config.get('marineLicense')
 
     if (!marineLicenseConfig.enabled) {
       throw Boom.forbidden(marineLicenseDisabledError)
     }
 
+    const marineLicense = getMarineLicenseCache(request)
+
+    const isUpdate = !!marineLicense.id
+
     return h.view(PROJECT_NAME_VIEW_ROUTE, {
-      ...projectNameViewSettings
+      ...projectNameViewSettings,
+      backLink: getBackLink(isUpdate),
+      payload: {
+        projectName: marineLicense.projectName
+      }
     })
   }
 }
@@ -59,10 +74,14 @@ export const projectNameSubmitController = {
 
         const { payload } = request
 
+        const marineLicense = getMarineLicenseCache(request)
+        const isUpdate = !!marineLicense.id
+
         if (!err.details) {
           return h
             .view(PROJECT_NAME_VIEW_ROUTE, {
               ...projectNameViewSettings,
+              backLink: getBackLink(isUpdate),
               payload
             })
             .takeover()
@@ -75,6 +94,7 @@ export const projectNameSubmitController = {
         return h
           .view(PROJECT_NAME_VIEW_ROUTE, {
             ...projectNameViewSettings,
+            backLink: getBackLink(isUpdate),
             payload,
             errors,
             errorSummary
@@ -93,27 +113,40 @@ export const projectNameSubmitController = {
         throw Boom.forbidden(marineLicenseDisabledError)
       }
 
+      const marineLicense = getMarineLicenseCache(request)
+
       const { organisationId, organisationName, userRelationshipType } =
         await getUserSession(request, request.state?.userSession)
 
+      const isUpdate = !!marineLicense.id
+
       const mcmsContext = getMcmsContextFromCache(request)
 
-      const { payload: responsePayload } = await authenticatedPostRequest(
-        request,
-        '/marine-license/project-name',
-        {
-          ...payload,
-          mcmsContext,
-          ...(organisationId ? { organisationId, organisationName } : {}),
-          userRelationshipType
-        }
-      )
+      const { payload: responsePayload } = isUpdate
+        ? await authenticatedPatchRequest(
+            request,
+            '/marine-license/project-name',
+            {
+              ...payload,
+              id: marineLicense.id
+            }
+          )
+        : await authenticatedPostRequest(
+            request,
+            '/marine-license/project-name',
+            {
+              ...payload,
+              mcmsContext,
+              ...(organisationId ? { organisationId, organisationName } : {}),
+              userRelationshipType
+            }
+          )
 
-      const { id, projectName } = responsePayload.value
+      const { id } = isUpdate ? marineLicense : responsePayload.value
 
       await setMarineLicenseCache(request, h, {
         id,
-        projectName
+        ...(!isUpdate && responsePayload.value)
       })
 
       clearMcmsContextCache(request)
@@ -125,12 +158,16 @@ export const projectNameSubmitController = {
         throw e
       }
 
+      const marineLicense = getMarineLicenseCache(request)
+      const isUpdate = !!marineLicense.id
+
       const errorSummary = mapErrorsForDisplay(details, errorMessages)
 
       const errors = errorDescriptionByFieldName(errorSummary)
 
       return h.view(PROJECT_NAME_VIEW_ROUTE, {
         ...projectNameViewSettings,
+        backLink: getBackLink(isUpdate),
         payload,
         errors,
         errorSummary

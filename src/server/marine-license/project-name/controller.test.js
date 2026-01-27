@@ -9,10 +9,11 @@ import {
 } from '#src/server/marine-license/project-name/controller.js'
 import {
   authenticatedGetRequest,
+  authenticatedPatchRequest,
   authenticatedPostRequest
 } from '#src/server/common/helpers/authenticated-requests.js'
 import { getUserSession } from '#src/server/common/plugins/auth/utils.js'
-import { setupTestServer } from '#tests/integration/shared/test-setup-helpers.js'
+import { setupTestServer } from '#src/server/test-helpers/server.js'
 import {
   makeGetRequest,
   makePostRequest
@@ -27,20 +28,23 @@ import {
   clearMcmsContextCache
 } from '#src/server/common/helpers/mcms-context/cache-mcms-context.js'
 
-vi.mock('#src/server/common/helpers/session-cache/utils.js')
 vi.mock('#src/server/common/plugins/auth/utils.js')
 vi.mock('#src/server/common/helpers/authenticated-requests.js')
 vi.mock('#src/server/common/helpers/marine-license/session-cache/utils.js')
+vi.mock('#src/server/common/helpers/mcms-context/cache-mcms-context.js')
 
 describe('#marineLicense/projectName', () => {
   const getServer = setupTestServer()
 
   let apiPostMock
+  let apiPatchMock
   let getUserSessionMock
+  let getMarineLicenseCacheMock
 
   beforeAll(() => {
     config.set('marineLicense.enabled', true)
     apiPostMock = vi.mocked(authenticatedPostRequest)
+    apiPatchMock = vi.mocked(authenticatedPatchRequest)
     getUserSessionMock = vi.mocked(getUserSession).mockResolvedValue({
       organisationId: 'test-org-id',
       organisationName: 'Test Organisation Ltd'
@@ -52,7 +56,9 @@ describe('#marineLicense/projectName', () => {
   })
 
   beforeEach(() => {
-    vi.mocked(getMarineLicenseCache).mockReturnValue({})
+    getMarineLicenseCacheMock = vi
+      .mocked(getMarineLicenseCache)
+      .mockReturnValue({})
     vi.mocked(setMarineLicenseCache).mockResolvedValue({})
     vi.mocked(clearMcmsContextCache).mockReturnValue()
     vi.mocked(authenticatedGetRequest).mockResolvedValue({
@@ -79,6 +85,15 @@ describe('#marineLicense/projectName', () => {
       expect(statusCode).toBe(403)
 
       config.set('marineLicense.enabled', true)
+    })
+
+    test('Should correctly continue in controller if not disabled', async () => {
+      const { statusCode } = await makeGetRequest({
+        url: marineLicenseRoutes.MARINE_LICENSE_PROJECT_NAME,
+        server: getServer()
+      })
+
+      expect(statusCode).toBe(200)
     })
   })
 
@@ -128,6 +143,40 @@ describe('#marineLicense/projectName', () => {
           projectName: 'Project name',
           organisationId: 'test-org-id',
           organisationName: 'Test Organisation Ltd'
+        })
+      )
+
+      expect(statusCode).toBe(302)
+
+      expect(headers.location).toBe(
+        marineLicenseRoutes.MARINE_LICENSE_TASK_LIST
+      )
+    })
+
+    test('Should correctly update new project and redirect to task list', async () => {
+      apiPatchMock.mockResolvedValueOnce({
+        res: { statusCode: 200 },
+        payload: {
+          value: {
+            message: 'success'
+          }
+        }
+      })
+
+      getMarineLicenseCacheMock.mockReturnValue({ id: 'test-id' })
+
+      const { statusCode, headers } = await makePostRequest({
+        url: marineLicenseRoutes.MARINE_LICENSE_PROJECT_NAME,
+        server: getServer(),
+        formData: { projectName: 'Project name' }
+      })
+
+      expect(apiPatchMock).toHaveBeenCalledWith(
+        expect.any(Object),
+        `/marine-license/project-name`,
+        expect.objectContaining({
+          id: 'test-id',
+          projectName: 'Project name'
         })
       )
 
@@ -188,6 +237,7 @@ describe('#marineLicense/projectName', () => {
       expect(h.view).toHaveBeenCalledWith(PROJECT_NAME_VIEW_ROUTE, {
         heading: 'Project Name',
         pageTitle: 'Project name',
+        backLink: null,
         payload: { projectName: '' }
       })
     })
@@ -208,6 +258,7 @@ describe('#marineLicense/projectName', () => {
       expect(h.view).toHaveBeenCalledWith(PROJECT_NAME_VIEW_ROUTE, {
         heading: 'Project Name',
         pageTitle: 'Project name',
+        backLink: null,
         payload: { projectName: '' }
       })
 
@@ -234,6 +285,7 @@ describe('#marineLicense/projectName', () => {
       }
 
       getMcmsContextFromCache.mockReturnValueOnce(mockMcmsContext)
+
       const mockRequest = createMockRequest({
         payload: { projectName: 'Project name' },
         yar: {

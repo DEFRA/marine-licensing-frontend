@@ -150,7 +150,8 @@ describe('Page accessibility checks (Axe)', () => {
     },
     {
       url: marineLicenseRoutes.MARINE_LICENSE_PROJECT_NAME,
-      title: 'Project name'
+      title: 'Project name',
+      isMarineLicense: true
     },
     {
       url: marineLicenseRoutes.MARINE_LICENSE_TASK_LIST,

@@ -1,4 +1,4 @@
-export const routes = {
+export const exemptionRoutes = {
   COORDINATES_TYPE_CHOICE:
     '/exemption/how-do-you-want-to-provide-the-coordinates',
   COORDINATES_ENTRY_CHOICE:
@@ -12,12 +12,6 @@ export const routes = {
   PROJECT_NAME: '/exemption/project-name',
   PUBLIC_REGISTER: '/exemption/sharing-your-project-information-publicly',
   TASK_LIST: '/exemption/task-list',
-  AUTH_DEFRA_ID_CALLBACK: '/signin-oidc',
-  AUTH_ENTRA_ID_CALLBACK: '/auth',
-  SIGNIN: '/signin',
-  SIGNIN_ENTRA: '/signin-entra',
-  SIGN_OUT: '/sign-out',
-  CHANGE_ORGANISATION: '/change-organisation',
   WIDTH_OF_SITE: '/exemption/width-of-site',
   CHOOSE_FILE_UPLOAD_TYPE: '/exemption/choose-file-type-to-upload',
   FILE_UPLOAD: '/exemption/upload-file',
@@ -33,14 +27,30 @@ export const routes = {
   SITE_NAME: '/exemption/site-name',
   SAME_ACTIVITY_DATES: '/exemption/same-activity-dates',
   SAME_ACTIVITY_DESCRIPTION: '/exemption/same-activity-description',
-  DASHBOARD: '/projects',
-  SERVICE_HOME: '/home',
   DELETE_EXEMPTION: '/exemption/delete',
   DELETE_SITE: '/exemption/delete-site',
   DELETE_ALL_SITES: '/exemption/delete-all-sites',
   COOKIES: '/help/cookies',
   PRIVACY: '/help/privacy',
   ADMIN_EXEMPTIONS: '/admin/exemptions'
+}
+
+export const marineLicenseRoutes = {
+  MARINE_LICENSE_PROJECT_NAME: '/marine-license/project-name'
+}
+
+export const routes = {
+  ...exemptionRoutes,
+  AUTH_DEFRA_ID_CALLBACK: '/signin-oidc',
+  AUTH_ENTRA_ID_CALLBACK: '/auth',
+  SIGNIN: '/signin',
+  SIGNIN_ENTRA: '/signin-entra',
+  SIGN_OUT: '/sign-out',
+  CHANGE_ORGANISATION: '/change-organisation',
+  DASHBOARD: '/projects',
+  SERVICE_HOME: '/home',
+  COOKIES: '/help/cookies',
+  PRIVACY: '/help/privacy'
 }
 
 export const entraIdRoutes = [

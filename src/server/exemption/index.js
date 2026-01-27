@@ -1,6 +1,5 @@
 import { projectNameRoutes } from '#src/server/exemption/project-name/index.js'
 import { publicRegisterRoutes } from '#src/server/exemption/public-register/index.js'
-import { serviceHomeRoutes } from '#src/server/exemption/service-home/index.js'
 import { taskListRoutes } from '#src/server/exemption/task-list/index.js'
 import { siteDetailsRoutes } from '#src/server/exemption/site-details/index.js'
 import { activityDatesRoutes } from './activity-dates/index.js'
@@ -35,7 +34,6 @@ export const exemption = {
       })
 
       server.route([
-        ...serviceHomeRoutes,
         ...projectNameRoutes,
         ...publicRegisterRoutes,
         ...taskListRoutes,

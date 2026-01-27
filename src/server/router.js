@@ -5,6 +5,8 @@ import { home } from '#src/server/home/index.js'
 import { serveStaticFiles } from '#src/server/common/helpers/serve-static-files.js'
 import { about } from '#src/server/about/index.js'
 import { exemption } from '#src/server/exemption/index.js'
+import { marineLicense } from '#src/server/marine-license/index.js'
+import { serviceHome } from '#src/server/service-home/index.js'
 import { auth } from '#src/server/auth/index.js'
 import { help } from '#src/server/help/index.js'
 import { browserLogs } from '#src/server/browser-logs/index.js'
@@ -28,7 +30,9 @@ export const router = {
         home,
         auth,
         help,
-        internalUserAdmin
+        internalUserAdmin,
+        marineLicense,
+        serviceHome
       ])
 
       // Static assets

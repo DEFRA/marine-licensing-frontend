@@ -3,6 +3,7 @@ import { routes } from '~/src/server/common/constants/routes.js'
 import { setupTestServer } from '~/tests/integration/shared/test-setup-helpers.js'
 import { loadPage } from '~/tests/integration/shared/app-server.js'
 import { config } from '~/src/config/config.js'
+import { marineLicenseRoutes } from '#src/server/common/constants/routes.js'
 
 describe('Service Home', () => {
   const getServer = setupTestServer()
@@ -100,7 +101,10 @@ describe('Service Home', () => {
       const applyForLicenseLink = getByRole(doc, 'link', {
         name: /Apply for a Marine License/i
       })
-      expect(applyForLicenseLink).toHaveAttribute('href', routes.SERVICE_HOME)
+      expect(applyForLicenseLink).toHaveAttribute(
+        'href',
+        marineLicenseRoutes.MARINE_LICENSE_PROJECT_NAME
+      )
       expect(applyForLicenseLink.parentElement).toHaveClass(
         'govuk-grid-column-one-half-from-desktop'
       )

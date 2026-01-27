@@ -3,7 +3,10 @@ import { readFileSync } from 'node:fs'
 
 import { config } from '#src/config/config.js'
 import { buildNavigation } from '#src/config/nunjucks/context/build-navigation.js'
-import { routes } from '#src/server/common/constants/routes.js'
+import {
+  marineLicenseRoutes,
+  routes
+} from '#src/server/common/constants/routes.js'
 import { areAnalyticsCookiesAccepted } from '#src/server/common/helpers/cookie-preferences.js'
 import { getExemptionCache } from '#src/server/common/helpers/exemptions/session-cache/utils.js'
 
@@ -13,6 +16,12 @@ const manifestPath = path.join(
   '.public/assets-manifest.json'
 )
 let webpackManifest
+
+const hideNavigationRoutes = new Set([
+  routes.PROJECT_NAME,
+  marineLicenseRoutes.MARINE_LICENSE_PROJECT_NAME
+])
+
 export function context(request) {
   if (!webpackManifest) {
     try {
@@ -23,11 +32,14 @@ export function context(request) {
   }
 
   const exemption = getExemptionCache(request)
-  const isProjectNameLandingPage =
-    request.path === routes.PROJECT_NAME && !exemption?.id
 
-  const navigation =
-    request.path === routes.PROJECT_NAME ? [] : buildNavigation(request)
+  const isProjectNameLandingPage =
+    hideNavigationRoutes.has(request.path) && !exemption?.id
+
+  const navigation = hideNavigationRoutes.has(request.path)
+    ? []
+    : buildNavigation(request)
+
   const serviceUrl = isProjectNameLandingPage ? '' : '/'
   const analyticsEnabled = areAnalyticsCookiesAccepted(request)
   const isAuthenticated = request?.auth?.isAuthenticated ?? false

@@ -25,15 +25,15 @@ const hideNavigationRoutesMarineLicense = new Set([
 ])
 
 const isRouteNavigationHidden = (request) => {
-  const { path } = request
+  const { path: pagePath } = request
 
-  if (path.includes('/exemption')) {
+  if (pagePath.includes('/exemption')) {
     const exemption = getExemptionCache(request)
-    return hideNavigationRoutesExemptions.has(path) && !exemption?.id
+    return hideNavigationRoutesExemptions.has(pagePath) && !exemption?.id
   }
 
   const marineLicense = getMarineLicenseCache(request)
-  return hideNavigationRoutesMarineLicense.has(path) && !marineLicense?.id
+  return hideNavigationRoutesMarineLicense.has(pagePath) && !marineLicense?.id
 }
 
 export function context(request) {

@@ -1,0 +1,56 @@
+{% extends 'layouts/page.njk' %}
+{% from "govuk/components/back-link/macro.njk" import govukBackLink %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/warning-text/macro.njk" import govukWarningText %}
+{% from "govuk/components/input/macro.njk" import govukInput %}
+{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+{% from "cancel-button/macro.njk" import appCancelButton %}
+
+{% block content %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+
+        {% if errors %}
+            {{ govukErrorSummary({
+                titleText: "There is a problem",
+                errorList: errorSummary
+            }) }}
+        {% endif %}
+
+        <form method="POST">
+
+          <input type="hidden" name="csrfToken" value="{{csrfToken}}" />
+
+          {{ govukInput({
+            label: {
+              text: "Project name",
+              classes: "govuk-label--l",
+              isPageHeading: true
+            },
+            hint: {
+              text: "Enter a project name that includes the project location and activity"
+            },
+            errorMessage: errors['projectName'],
+            id: "projectName",
+            name: "projectName",
+            value: payload.projectName
+          }) }}
+
+          <div class="govuk-button-group">
+          {{ govukButton({
+            text: "Save and continue",
+            classes: "govuk-button--primary"
+          }) }}
+            {% if payload.projectName %}
+          {{ appCancelButton({
+            cancelLink: backLink
+          }) }}
+            {% endif %}
+          </div>
+
+        </form>
+
+    </div>
+  </div>
+
+{% endblock %}

@@ -1,6 +1,9 @@
 // @vitest-environment jsdom
 import { vi } from 'vitest'
-import { routes } from '~/src/server/common/constants/routes.js'
+import {
+  marineLicenseRoutes,
+  routes
+} from '~/src/server/common/constants/routes.js'
 import { statusCodes } from '~/src/server/common/constants/status-codes.js'
 import { toHaveNoViolations } from 'vitest-axe/matchers'
 import { runAxeChecks } from '~/.vite/axe-helper.js'
@@ -15,11 +18,13 @@ import {
 import { mockExemption, setupTestServer } from '../shared/test-setup-helpers.js'
 import { makeGetRequest } from '~/src/server/test-helpers/server-requests.js'
 import { JSDOM } from 'jsdom'
+import { config } from '~/src/config/config.js'
 
 vi.mock('~/src/server/common/helpers/authenticated-requests.js')
 
 describe('Page accessibility checks (Axe)', () => {
   beforeAll(() => {
+    config.set('marineLicense.enabled', true)
     expect.extend(toHaveNoViolations)
   })
   const getServer = setupTestServer()
@@ -137,6 +142,10 @@ describe('Page accessibility checks (Axe)', () => {
     {
       url: routes.SERVICE_HOME,
       title: 'Home'
+    },
+    {
+      url: marineLicenseRoutes.MARINE_LICENSE_PROJECT_NAME,
+      title: 'Project name'
     }
   ]
 

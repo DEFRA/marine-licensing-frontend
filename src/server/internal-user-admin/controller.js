@@ -46,7 +46,9 @@ export const adminExemptionsController = {
 export const adminExemptionsSendController = {
   handler: async (request, h) => {
     if (request.auth?.credentials?.isTeamAdmin !== true) {
-      throw Boom.forbidden('Unauthorized')
+      throw Boom.forbidden(
+        'InternalUserAdmin: Access denied: Team admin role required'
+      )
     }
     try {
       await authenticatedPostRequest(request, '/exemption/send-to-emp', {

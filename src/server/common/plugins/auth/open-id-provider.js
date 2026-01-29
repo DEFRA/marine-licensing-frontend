@@ -36,9 +36,11 @@ export const openIdProvider = async (name, authConfig) => {
       let isTeamAdmin = false
       if (credentials.provider === 'entraId') {
         const { teamAdminEmails } = authConfig
-        isTeamAdmin = teamAdminEmails.some(
-          (email) => email.toLowerCase() === payload.upn.toLowerCase()
-        )
+        isTeamAdmin =
+          payload.upn &&
+          teamAdminEmails.some(
+            (email) => email.toLowerCase() === payload.upn.toLowerCase()
+          )
       }
 
       credentials.profile = {

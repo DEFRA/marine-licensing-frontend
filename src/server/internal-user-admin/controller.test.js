@@ -125,7 +125,7 @@ describe('Admin dashboard to send exemptions to EMP', () => {
       })
     })
 
-    test('should throw unauthorized error if user is not staff admin', async () => {
+    test('should throw unauthorized error if user is not team admin', async () => {
       const { h, request } = createRequest()
       request.auth.credentials.isTeamAdmin = false
       await expect(() =>
@@ -192,12 +192,14 @@ describe('Admin dashboard to send exemptions to EMP', () => {
       expect(h.redirect).toHaveBeenCalledWith(routes.ADMIN_EXEMPTIONS)
     })
 
-    test('should throw unauthorized error if user is not staff admin', async () => {
+    test('should throw unauthorized error if user is not team admin', async () => {
       const { h, request } = createRequest()
       request.auth.credentials.isTeamAdmin = false
       await expect(() =>
         adminExemptionsSendController.handler(request, h)
-      ).rejects.toThrow('Unauthorized')
+      ).rejects.toThrow(
+        'InternalUserAdmin: Access denied: Team admin role required'
+      )
     })
   })
 })

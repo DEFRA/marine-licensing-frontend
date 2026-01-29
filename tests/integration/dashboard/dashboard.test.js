@@ -122,7 +122,7 @@ describe('Dashboard', () => {
       })
       const statusHeader = getByRole(table, 'columnheader', { name: 'Status' })
       const dateHeader = getByRole(table, 'columnheader', {
-        name: 'Date submitted'
+        name: /Submitted\s+on/
       })
 
       expect(nameHeader).toHaveAttribute('aria-sort', 'none')

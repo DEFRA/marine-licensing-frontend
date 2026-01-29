@@ -40,7 +40,7 @@ export const marineLicenseRoutes = {
 }
 
 export const preLoginRoutes = {
-  CHECK_SETUP_EMPLOYEE: '/prelogin/check-setup-employee'
+  CHECK_SETUP_EMPLOYEE: '/account-setup/check-setup-employee'
 }
 
 export const routes = {

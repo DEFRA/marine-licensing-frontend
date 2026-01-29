@@ -54,7 +54,7 @@ export const preLoginCheckSetupEmployeeSubmitController = {
       }
     }
   },
-  async handler(request, h) {
+  async handler(_request, h) {
     return h.redirect(routes.preLogin.CHECK_SETUP_EMPLOYEE)
   }
 }

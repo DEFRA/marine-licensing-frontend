@@ -8,7 +8,7 @@ export const getMarineLicenseCache = (request) => {
 
 export const setMarineLicenseCache = async (request, h, value) => {
   const cacheValue = value || {}
-  request.yar.set(MARINE_LICENSE_CACHE_KEY, value || {})
+  request.yar.set(MARINE_LICENSE_CACHE_KEY, cacheValue)
 
   await request.yar.commit(h)
 

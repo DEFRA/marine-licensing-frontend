@@ -39,7 +39,7 @@ export const openIdProvider = async (name, authConfig) => {
         isTeamAdmin =
           payload.upn &&
           teamAdminEmails.some(
-            (email) => email.toLowerCase() === payload.upn.toLowerCase()
+            (email) => email.toLowerCase().trim() === payload.upn.toLowerCase()
           )
       }
 

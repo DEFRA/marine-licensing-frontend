@@ -11,7 +11,7 @@ To get access to the page you need a entra ID login eg -
 - test env - `firstname.lastname@defradev.onmicrosoft.com`
 - production - `firstname.lastname@defra.onmicrosoft.com`
 
-and that email must be in the whitelist of emails in CDP app config (the env var name is `ENTRA_ID_TEAM_ADMIN_EMAILS`).
+and that email must be in the whitelist of emails in CDP app config (the env var name is `ENTRA_ID_TEAM_ADMIN_EMAILS`). The whitelist is a comma-separated list of email addresses (if there are spaces between the emails in the list they'll be trimmed off automatically)
 * [cdp-app-config file for test env](https://github.com/DEFRA/cdp-app-config/blob/main/services/marine-licensing-frontend/test/marine-licensing-frontend.env#L14)
 
 ## Sending an exemption to EMP

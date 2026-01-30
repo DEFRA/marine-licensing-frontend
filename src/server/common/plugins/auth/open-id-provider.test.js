@@ -264,7 +264,7 @@ describe('#openIdProvider', () => {
   test('add isTeamAdmin to to credentials profile if provider is entra ID and users email is in admin list', async () => {
     provider = await openIdProvider('entraId', {
       ...entraIdAuthConfig,
-      teamAdminEmails: ['dev@team.com', 'user@email.com']
+      teamAdminEmails: ['dev@team.com', ' user@email.com']
     })
     const token = jwt.token.generate(
       {

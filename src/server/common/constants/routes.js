@@ -39,7 +39,12 @@ export const marineLicenseRoutes = {
   MARINE_LICENSE_PROJECT_NAME: '/marine-license/project-name'
 }
 
+export const preLoginRoutes = {
+  CHECK_SETUP_EMPLOYEE: '/prelogin/check-setup-employee'
+}
+
 export const routes = {
+  preLogin: preLoginRoutes,
   ...exemptionRoutes,
   AUTH_DEFRA_ID_CALLBACK: '/signin-oidc',
   AUTH_ENTRA_ID_CALLBACK: '/auth',

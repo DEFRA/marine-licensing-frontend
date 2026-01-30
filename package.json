@@ -87,7 +87,7 @@
     "@vitest/runner": "^4.0.14",
     "@vitest/ui": "^4.0.14",
     "allure-commandline": "^2.36.0",
-    "allure-vitest": "^3.4.2",
+    "allure-vitest": "^3.4.5",
     "autoprefixer": "^10.4.23",
     "babel-loader": "^10.0.0",
     "cheerio": "^1.2.0",

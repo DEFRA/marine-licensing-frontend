@@ -1,0 +1,8 @@
+{% from "govuk/components/back-link/macro.njk" import govukBackLink %}
+
+<nav>
+  {{ govukBackLink({
+    text: "Back",
+    href: params.backLink
+  }) }}
+</nav>

@@ -146,6 +146,10 @@ describe('Page accessibility checks (Axe)', () => {
     {
       url: marineLicenseRoutes.MARINE_LICENSE_PROJECT_NAME,
       title: 'Project name'
+    },
+    {
+      url: routes.preLogin.CHECK_SETUP_EMPLOYEE,
+      title: 'Check you are set up to apply for your organisation'
     }
   ]
 

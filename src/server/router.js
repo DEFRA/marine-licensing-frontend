@@ -11,6 +11,7 @@ import { auth } from '#src/server/auth/index.js'
 import { help } from '#src/server/help/index.js'
 import { browserLogs } from '#src/server/browser-logs/index.js'
 import { internalUserAdmin } from '#src/server/internal-user-admin/index.js'
+import { preLogin } from '#src/server/defraid-pre-login/index.js'
 export const router = {
   plugin: {
     name: 'router',
@@ -30,6 +31,7 @@ export const router = {
         home,
         auth,
         help,
+        preLogin,
         internalUserAdmin,
         marineLicense,
         serviceHome

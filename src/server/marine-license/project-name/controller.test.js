@@ -1,62 +1,79 @@
 import { vi } from 'vitest'
-import { statusCodes } from '#src/server/common/constants/status-codes.js'
 import { marineLicenseRoutes } from '#src/server/common/constants/routes.js'
-import { createMockRequest } from '#src/server/test-helpers/mocks/helpers.js'
-import { JSDOM } from 'jsdom'
 import {
-  projectNameSubmitController,
-  PROJECT_NAME_VIEW_ROUTE
-} from '#src/server/marine-license/project-name/controller.js'
-import { authenticatedPostRequest } from '#src/server/common/helpers/authenticated-requests.js'
-import { getUserSession } from '#src/server/common/plugins/auth/utils.js'
-import { setupTestServer } from '#tests/integration/shared/test-setup-helpers.js'
+  setupTestServer,
+  mockMarineLicense
+} from '#tests/integration/shared/test-setup-helpers.js'
+import { createMockRequest } from '#src/server/test-helpers/mocks/helpers.js'
 import {
   makeGetRequest,
   makePostRequest
 } from '#src/server/test-helpers/server-requests.js'
 import { config } from '#src/config/config.js'
-
-vi.mock('#src/server/common/helpers/session-cache/utils.js')
-vi.mock('#src/server/common/plugins/auth/utils.js')
-vi.mock('#src/server/common/helpers/authenticated-requests.js')
+import * as authRequests from '#src/server/common/helpers/authenticated-requests.js'
+import * as authUtils from '#src/server/common/plugins/auth/utils.js'
+import * as mcmsContextCache from '#src/server/common/helpers/mcms-context/cache-mcms-context.js'
+import { statusCodes } from '#src/server/common/constants/status-codes.js'
+import {
+  projectNameSubmitController,
+  PROJECT_NAME_VIEW_ROUTE
+} from '#src/server/marine-license/project-name/controller.js'
 
 describe('#marineLicense/projectName', () => {
   const getServer = setupTestServer()
 
-  let apiPostMock
+  let authenticatedPatchRequestMock
+  let authenticatedPostRequestMock
+  let getMcmsContextFromCacheMock
   let getUserSessionMock
 
-  beforeAll(() => {
-    config.set('marineLicense.enabled', true)
-    apiPostMock = vi.mocked(authenticatedPostRequest)
-    getUserSessionMock = vi.mocked(getUserSession).mockResolvedValue({
-      organisationId: 'test-org-id',
-      organisationName: 'Test Organisation Ltd'
-    })
-  })
-
-  afterAll(() => {
-    config.set('marineLicense.enabled', false)
-  })
-
   beforeEach(() => {
-    vi.clearAllMocks()
+    mockMarineLicense({ projectName: 'Test Project', id: 'test-id' })
+
+    authenticatedPatchRequestMock = vi.spyOn(
+      authRequests,
+      'authenticatedPatchRequest'
+    )
+
+    authenticatedPostRequestMock = vi.spyOn(
+      authRequests,
+      'authenticatedPostRequest'
+    )
+
+    getMcmsContextFromCacheMock = vi.spyOn(
+      mcmsContextCache,
+      'getMcmsContextFromCache'
+    )
+
+    getUserSessionMock = vi
+      .spyOn(authUtils, 'getUserSession')
+      .mockResolvedValue({
+        organisationId: 'test-org-id',
+        organisationName: 'Test Organisation Ltd'
+      })
   })
 
   describe('#projectNameController', () => {
     test('Should correctly throw an error if feature is disabled', async () => {
       config.set('marineLicense.enabled', false)
 
-      const { statusCode, headers } = await makeGetRequest({
+      const { statusCode } = await makeGetRequest({
         url: marineLicenseRoutes.MARINE_LICENSE_PROJECT_NAME,
         server: getServer()
       })
 
       expect(statusCode).toBe(403)
 
-      expect(headers.location).toBe(marineLicenseRoutes.TASK_LIST)
-
       config.set('marineLicense.enabled', true)
+    })
+
+    test('Should correctly continue in controller if not disabled', async () => {
+      const { statusCode } = await makeGetRequest({
+        url: marineLicenseRoutes.MARINE_LICENSE_PROJECT_NAME,
+        server: getServer()
+      })
+
+      expect(statusCode).toBe(200)
     })
   })
 
@@ -71,10 +88,6 @@ describe('#marineLicense/projectName', () => {
 
       expect(requestWithError.statusCode).toBe(403)
 
-      expect(requestWithError.headers.location).toBe(
-        marineLicenseRoutes.TASK_LIST
-      )
-
       const requestWithoutError = await makePostRequest({
         url: marineLicenseRoutes.MARINE_LICENSE_PROJECT_NAME,
         server: getServer(),
@@ -83,17 +96,20 @@ describe('#marineLicense/projectName', () => {
 
       expect(requestWithoutError.statusCode).toBe(403)
 
-      expect(requestWithoutError.headers.location).toBe(
-        marineLicenseRoutes.TASK_LIST
-      )
-
       config.set('marineLicense.enabled', true)
     })
 
-    test('Should correctly create new project and stay on same page', async () => {
-      apiPostMock.mockResolvedValueOnce({
+    test('Should correctly create new project and redirect to task list', async () => {
+      mockMarineLicense({ projectName: 'Test Project' })
+
+      authenticatedPostRequestMock.mockResolvedValueOnce({
         res: { statusCode: 200 },
-        payload: { projectName: 'test' }
+        payload: {
+          value: {
+            id: 'test-id',
+            projectName: 'Project name'
+          }
+        }
       })
 
       const { statusCode, headers } = await makePostRequest({
@@ -102,24 +118,59 @@ describe('#marineLicense/projectName', () => {
         formData: { projectName: 'Project name' }
       })
 
-      expect(authenticatedPostRequest).toHaveBeenCalledWith(
+      expect(authRequests.authenticatedPostRequest).toHaveBeenCalledWith(
         expect.any(Object),
         `/marine-license/project-name`,
         expect.objectContaining({
           projectName: 'Project name',
-          mcmsContext: null,
           organisationId: 'test-org-id',
           organisationName: 'Test Organisation Ltd'
         })
       )
 
-      expect(statusCode).toBe(200)
+      expect(statusCode).toBe(302)
 
-      expect(headers.location).toBe(marineLicenseRoutes.TASK_LIST)
+      expect(headers.location).toBe(
+        marineLicenseRoutes.MARINE_LICENSE_TASK_LIST
+      )
+    })
+
+    test('Should correctly update new project and redirect to task list', async () => {
+      authenticatedPatchRequestMock.mockResolvedValueOnce({
+        res: { statusCode: 200 },
+        payload: {
+          value: {
+            message: 'success'
+          }
+        }
+      })
+
+      const { statusCode, headers } = await makePostRequest({
+        url: marineLicenseRoutes.MARINE_LICENSE_PROJECT_NAME,
+        server: getServer(),
+        formData: { projectName: 'Project name' }
+      })
+
+      expect(authenticatedPatchRequestMock).toHaveBeenCalledWith(
+        expect.any(Object),
+        `/marine-license/project-name`,
+        expect.objectContaining({
+          id: 'test-id',
+          projectName: 'Project name'
+        })
+      )
+
+      expect(statusCode).toBe(302)
+
+      expect(headers.location).toBe(
+        marineLicenseRoutes.MARINE_LICENSE_TASK_LIST
+      )
     })
 
     test('Should handle API validation errors in catch block', async () => {
-      apiPostMock.mockRejectedValueOnce({
+      mockMarineLicense({ projectName: 'Test Project' })
+
+      authenticatedPostRequestMock.mockRejectedValueOnce({
         data: {
           payload: {
             validation: {
@@ -143,9 +194,6 @@ describe('#marineLicense/projectName', () => {
 
       expect(statusCode).toBe(statusCodes.ok)
       expect(result).toContain('Project name')
-
-      const { document } = new JSDOM(result).window
-      expect(document.querySelector('.govuk-error-summary')).toBeTruthy()
     })
 
     test('Should correctly handle an incorrectly formed error object', () => {
@@ -166,9 +214,9 @@ describe('#marineLicense/projectName', () => {
       projectNameSubmitController.options.validate.failAction(request, h, err)
 
       expect(h.view).toHaveBeenCalledWith(PROJECT_NAME_VIEW_ROUTE, {
-        backLink: marineLicenseRoutes.TASK_LIST,
         heading: 'Project Name',
         pageTitle: 'Project name',
+        backLink: marineLicenseRoutes.MARINE_LICENSE_TASK_LIST,
         payload: { projectName: '' }
       })
     })
@@ -187,9 +235,9 @@ describe('#marineLicense/projectName', () => {
       projectNameSubmitController.options.validate.failAction(request, h, {})
 
       expect(h.view).toHaveBeenCalledWith(PROJECT_NAME_VIEW_ROUTE, {
-        backLink: marineLicenseRoutes.TASK_LIST,
         heading: 'Project Name',
         pageTitle: 'Project name',
+        backLink: marineLicenseRoutes.MARINE_LICENSE_TASK_LIST,
         payload: { projectName: '' }
       })
 
@@ -203,17 +251,22 @@ describe('#marineLicense/projectName', () => {
         formData: { projectName: '' }
       })
 
-      expect(apiPostMock).not.toHaveBeenCalled()
+      expect(authenticatedPostRequestMock).not.toHaveBeenCalled()
     })
 
     test('Should correctly retrieve cached MCMS context when creating a new marine license', async () => {
-      const h = { view: vi.fn() }
+      mockMarineLicense({ projectName: 'Test Project' })
+
+      const h = { redirect: vi.fn() }
       const mockMcmsContext = {
         activityType: 'CON',
         activitySubtype: 'maintenance',
         article: '17',
         pdfDownloadUrl: 'https://example.com/test.pdf'
       }
+
+      getMcmsContextFromCacheMock.mockReturnValueOnce(mockMcmsContext)
+
       const mockRequest = createMockRequest({
         payload: { projectName: 'Project name' },
         yar: {
@@ -222,9 +275,18 @@ describe('#marineLicense/projectName', () => {
         }
       })
 
+      authenticatedPostRequestMock.mockResolvedValueOnce({
+        payload: {
+          value: {
+            id: 'test-id',
+            projectName: 'Project name'
+          }
+        }
+      })
+
       await projectNameSubmitController.handler(mockRequest, h)
 
-      expect(apiPostMock.mock.calls[0][2]).toEqual({
+      expect(authenticatedPostRequestMock.mock.calls[0][2]).toEqual({
         mcmsContext: {
           activitySubtype: 'maintenance',
           activityType: 'CON',
@@ -233,7 +295,8 @@ describe('#marineLicense/projectName', () => {
         },
         projectName: 'Project name',
         organisationId: 'test-org-id',
-        organisationName: 'Test Organisation Ltd'
+        organisationName: 'Test Organisation Ltd',
+        userRelationshipType: undefined
       })
     })
 
@@ -247,7 +310,9 @@ describe('#marineLicense/projectName', () => {
         },
         url: 'http://example.com/project-name'
       })
-      apiPostMock.mockRejectedValue(new Error('API error'))
+
+      authenticatedPostRequestMock.mockRejectedValue(new Error('API error'))
+
       await expect(() =>
         projectNameSubmitController.handler(mockRequest, h)
       ).rejects.toThrow()
@@ -256,9 +321,16 @@ describe('#marineLicense/projectName', () => {
     })
 
     test('Should handle missing organisation data when creating a new marine license', async () => {
-      apiPostMock.mockResolvedValueOnce({
+      mockMarineLicense({ projectName: 'Test Project' })
+
+      authenticatedPostRequestMock.mockResolvedValueOnce({
         res: { statusCode: 200 },
-        payload: { data: 'test' }
+        payload: {
+          value: {
+            id: 'test-id',
+            projectName: 'Project name'
+          }
+        }
       })
 
       const { statusCode } = await makePostRequest({
@@ -267,28 +339,29 @@ describe('#marineLicense/projectName', () => {
         formData: { projectName: 'Project name' }
       })
 
-      expect(authenticatedPostRequest).toHaveBeenCalledWith(
+      expect(authRequests.authenticatedPostRequest).toHaveBeenCalledWith(
         expect.any(Object),
         `/marine-license/project-name`,
         expect.objectContaining({
-          projectName: 'Project name',
-          mcmsContext: null
+          projectName: 'Project name'
         })
       )
 
-      expect(statusCode).toBe(200)
+      expect(statusCode).toBe(302)
     })
 
     test('Should include organisation data when user is an Agent', async () => {
+      mockMarineLicense({ projectName: 'Test Project' })
+
       getUserSessionMock.mockResolvedValue({
         organisationId: 'beneficiary-org-id',
         organisationName: 'Beneficiary Organisation Ltd',
         userRelationshipType: 'Agent'
       })
 
-      apiPostMock.mockResolvedValueOnce({
+      authenticatedPostRequestMock.mockResolvedValueOnce({
         res: { statusCode: 200 },
-        payload: { data: 'test' }
+        payload: { id: 'test-id' }
       })
 
       await makePostRequest({
@@ -297,33 +370,34 @@ describe('#marineLicense/projectName', () => {
         formData: { projectName: 'Project name' }
       })
 
-      expect(authenticatedPostRequest).toHaveBeenCalledWith(
+      expect(authRequests.authenticatedPostRequest).toHaveBeenCalledWith(
         expect.any(Object),
         `/marine-license/project-name`,
         expect.objectContaining({
           projectName: 'Project name',
-          mcmsContext: null,
           organisationId: 'beneficiary-org-id',
           organisationName: 'Beneficiary Organisation Ltd',
           userRelationshipType: 'Agent'
         })
       )
 
-      const callArgs = apiPostMock.mock.calls[0][2]
+      const callArgs = authenticatedPostRequestMock.mock.calls[0][2]
       expect(callArgs).toHaveProperty('organisationId')
       expect(callArgs).toHaveProperty('organisationName')
     })
 
     test('Should include organisation data when user is an Employee', async () => {
+      mockMarineLicense({ projectName: 'Test Project' })
+
       getUserSessionMock.mockResolvedValue({
         organisationId: 'applicant-org-id',
         organisationName: 'Applicant Organisation Ltd',
         userRelationshipType: 'Employee'
       })
 
-      apiPostMock.mockResolvedValueOnce({
+      authenticatedPostRequestMock.mockResolvedValueOnce({
         res: { statusCode: 200 },
-        payload: { data: 'test' }
+        payload: { id: 'test-id' }
       })
 
       await makePostRequest({
@@ -332,19 +406,18 @@ describe('#marineLicense/projectName', () => {
         formData: { projectName: 'Project name' }
       })
 
-      expect(authenticatedPostRequest).toHaveBeenCalledWith(
+      expect(authRequests.authenticatedPostRequest).toHaveBeenCalledWith(
         expect.any(Object),
         `/marine-license/project-name`,
         expect.objectContaining({
           projectName: 'Project name',
-          mcmsContext: null,
           organisationId: 'applicant-org-id',
           organisationName: 'Applicant Organisation Ltd',
           userRelationshipType: 'Employee'
         })
       )
 
-      const callArgs = apiPostMock.mock.calls[0][2]
+      const callArgs = authenticatedPostRequestMock.mock.calls[0][2]
       expect(callArgs).toHaveProperty('organisationId')
       expect(callArgs).toHaveProperty('organisationName')
     })

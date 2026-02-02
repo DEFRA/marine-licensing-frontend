@@ -6,6 +6,18 @@
 {% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
 {% from "cancel-button/macro.njk" import appCancelButton %}
 
+{% block beforeContent %}
+  {{ super() }}
+  {% if backLink %}
+  <nav>
+    {{ govukBackLink({
+      text: "Back",
+      href: backLink
+    }) }}
+  </nav>
+  {% endif %}
+{% endblock %}
+
 {% block content %}
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">

@@ -3,7 +3,10 @@ import { getByRole, queryByRole } from '@testing-library/dom'
 import { config } from '~/src/config/config.js'
 import { marineLicenseRoutes } from '~/src/server/common/constants/routes.js'
 import { statusCodes } from '~/src/server/common/constants/status-codes.js'
-import { setupTestServer } from '~/tests/integration/shared/test-setup-helpers.js'
+import {
+  mockMarineLicense,
+  setupTestServer
+} from '~/tests/integration/shared/test-setup-helpers.js'
 import { makeGetRequest } from '~/src/server/test-helpers/server-requests.js'
 import { loadPage, submitForm } from '~/tests/integration/shared/app-server.js'
 import {
@@ -47,6 +50,8 @@ describe('Marine License - Project name', () => {
     })
 
     test('should render project name page when feature is enabled and no project name set', async () => {
+      mockMarineLicense({})
+
       const document = await loadPage({
         requestUrl: marineLicenseRoutes.MARINE_LICENSE_PROJECT_NAME,
         server: getServer()
@@ -85,7 +90,52 @@ describe('Marine License - Project name', () => {
       expect(serviceName).not.toBeInTheDocument()
     })
 
+    test('should render project name page when feature is enabled and editing project name', async () => {
+      const testProjectName = 'Test Project Name'
+
+      mockMarineLicense({ id: 'test-id', projectName: testProjectName })
+
+      const document = await loadPage({
+        requestUrl: marineLicenseRoutes.MARINE_LICENSE_PROJECT_NAME,
+        server: getServer()
+      })
+
+      expect(getByRole(document, 'heading', { level: 1 })).toHaveTextContent(
+        'Project name'
+      )
+
+      getByRole(document, 'button', {
+        name: 'Save and continue'
+      })
+
+      expectInputValue({
+        document,
+        inputLabel: 'Project name',
+        value: testProjectName
+      })
+
+      expect(
+        queryByRole(document, 'link', {
+          name: 'Back'
+        })
+      ).toBeInTheDocument()
+
+      expect(
+        queryByRole(document, 'link', {
+          name: 'Cancel'
+        })
+      ).toBeInTheDocument()
+
+      const serviceName = document.querySelector(
+        '.govuk-service-navigation__link'
+      )
+
+      expect(serviceName).toBeInTheDocument()
+    })
+
     test('should show a validation error when submitted without a project name', async () => {
+      mockMarineLicense({})
+
       const submitProjectNameForm = async (formData) => {
         const { document } = await submitForm({
           requestUrl: marineLicenseRoutes.MARINE_LICENSE_PROJECT_NAME,

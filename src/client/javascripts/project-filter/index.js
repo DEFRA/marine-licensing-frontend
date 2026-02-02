@@ -19,6 +19,11 @@ export class ProjectFilter {
       this.submitButton.classList.add(govukDisplayNone)
     }
 
+    const formGroup = this.element.closest('.govuk-form-group')
+    if (formGroup) {
+      formGroup.classList.remove('govuk-!-margin-bottom-3')
+    }
+
     for (const radio of this.radios) {
       radio.addEventListener('change', () => {
         this.filterProjects(radio.value)

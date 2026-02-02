@@ -115,7 +115,9 @@ describe('Dashboard', () => {
       const doc = await loadDashboardPage()
       const table = getByRole(doc, 'table', { name: 'Projects' })
 
-      const nameHeader = getByRole(table, 'columnheader', { name: 'Name' })
+      const nameHeader = getByRole(table, 'columnheader', {
+        name: 'Project name'
+      })
       const typeHeader = getByRole(table, 'columnheader', { name: 'Type' })
       const referenceHeader = getByRole(table, 'columnheader', {
         name: 'Reference'

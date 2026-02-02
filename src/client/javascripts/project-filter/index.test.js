@@ -15,22 +15,24 @@ describe('ProjectFilter', () => {
     ]
   } = {}) {
     const radiosHtml = `
-      <div class="govuk-radios govuk-radios--inline" data-module="app-project-filter">
-        <div class="govuk-radios__item">
-          <input class="govuk-radios__input" id="filter-my" name="filter"
-                 type="radio" value="my-projects"
-                 ${selectedFilter === 'my-projects' ? 'checked' : ''}>
-          <label class="govuk-label govuk-radios__label" for="filter-my">
-            My projects
-          </label>
-        </div>
-        <div class="govuk-radios__item">
-          <input class="govuk-radios__input" id="filter-all" name="filter"
-                 type="radio" value="all-projects"
-                 ${selectedFilter === 'all-projects' ? 'checked' : ''}>
-          <label class="govuk-label govuk-radios__label" for="filter-all">
-            All Test Org projects
-          </label>
+      <div class="govuk-form-group govuk-!-margin-bottom-3">
+        <div class="govuk-radios govuk-radios--inline" data-module="app-project-filter">
+          <div class="govuk-radios__item">
+            <input class="govuk-radios__input" id="filter-my" name="filter"
+                   type="radio" value="my-projects"
+                   ${selectedFilter === 'my-projects' ? 'checked' : ''}>
+            <label class="govuk-label govuk-radios__label" for="filter-my">
+              My projects
+            </label>
+          </div>
+          <div class="govuk-radios__item">
+            <input class="govuk-radios__input" id="filter-all" name="filter"
+                   type="radio" value="all-projects"
+                   ${selectedFilter === 'all-projects' ? 'checked' : ''}>
+            <label class="govuk-label govuk-radios__label" for="filter-all">
+              All Test Org projects
+            </label>
+          </div>
         </div>
       </div>
     `
@@ -164,6 +166,21 @@ describe('ProjectFilter', () => {
 
     it('should not throw if submit button is missing', () => {
       document.body.innerHTML = createFilterHtml({ hasSubmitButton: false })
+      $module = document.querySelector('[data-module="app-project-filter"]')
+
+      expect(() => new ProjectFilter($module)).not.toThrow()
+    })
+
+    it('should remove govuk-!-margin-bottom-3 from form group', () => {
+      component = new ProjectFilter($module)
+      const formGroup = document.querySelector('.govuk-form-group')
+      expect(formGroup.classList.contains('govuk-!-margin-bottom-3')).toBe(
+        false
+      )
+    })
+
+    it('should not throw if form group is missing', () => {
+      document.body.innerHTML = createFilterHtml({ hasForm: false })
       $module = document.querySelector('[data-module="app-project-filter"]')
 
       expect(() => new ProjectFilter($module)).not.toThrow()

@@ -4,6 +4,7 @@ import {
   mapErrorsForDisplay
 } from '#src/server/common/helpers/errors.js'
 import { routes } from '#src/server/common/constants/routes.js'
+import { preloginUserSession } from '#src/server/common/helpers/defraid-pre-login/session-cache.js'
 
 const backLink = '#'
 const title = 'Check you are set up to apply for your organisation'
@@ -19,8 +20,12 @@ export const errorMessages = {
 }
 
 export const preLoginCheckSetupEmployeeController = {
-  handler(_request, h) {
-    return h.view(pathToPageTemplate, viewData)
+  async handler(request, h) {
+    const checkSetupEmployee = await preloginUserSession.get({
+      request,
+      key: 'checkSetupEmployee'
+    })
+    return h.view(pathToPageTemplate, { ...viewData, checkSetupEmployee })
   }
 }
 
@@ -55,8 +60,17 @@ export const preLoginCheckSetupEmployeeSubmitController = {
     }
   },
   async handler(request, h) {
-    if (request.payload.checkSetupEmployee === 'yes') {
+    const selection = request.payload.checkSetupEmployee
+    await preloginUserSession.set({
+      request,
+      key: 'checkSetupEmployee',
+      value: selection
+    })
+    if (selection === 'yes') {
       return h.redirect(routes.SIGNIN)
+    }
+    if (selection === 'need-to-be-added') {
+      return h.redirect(routes.preLogin.ADD_TO_ORG_ACCOUNT)
     }
     return h.redirect(routes.preLogin.CHECK_SETUP_EMPLOYEE)
   }

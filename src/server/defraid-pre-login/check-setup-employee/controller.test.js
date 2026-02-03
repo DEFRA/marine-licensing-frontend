@@ -29,7 +29,7 @@ describe('#preLoginCheckSetupEmployeeSubmitController', () => {
     expect(headers.location).toBe(routes.preLogin.CHECK_SETUP_EMPLOYEE)
   })
 
-  test('should stay on the same page if user needs to be added to an existing organisation', async () => {
+  test('should redirect if user needs to be added to an existing organisation', async () => {
     const { statusCode, headers } = await makePostRequest({
       url: routes.preLogin.CHECK_SETUP_EMPLOYEE,
       server: getServer(),
@@ -38,6 +38,6 @@ describe('#preLoginCheckSetupEmployeeSubmitController', () => {
 
     expect(statusCode).toBe(302)
 
-    expect(headers.location).toBe(routes.preLogin.CHECK_SETUP_EMPLOYEE)
+    expect(headers.location).toBe(routes.preLogin.ADD_TO_ORG_ACCOUNT)
   })
 })

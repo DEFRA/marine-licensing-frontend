@@ -165,6 +165,10 @@ describe('Page accessibility checks (Axe)', () => {
     {
       url: routes.preLogin.CHECK_SETUP_EMPLOYEE,
       title: 'Check you are set up to apply for your organisation'
+    },
+    {
+      url: routes.preLogin.ADD_TO_ORG_ACCOUNT,
+      title: 'You need to be added to your organisation’s Defra account'
     }
   ]
 

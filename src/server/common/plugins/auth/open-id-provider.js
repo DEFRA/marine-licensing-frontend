@@ -1,12 +1,9 @@
 import Jwt from '@hapi/jwt'
-import { config } from '#src/config/config.js'
 import { getOidcConfig } from '#src/server/common/plugins/auth/get-oidc-config.js'
 
 import { getOrganisationFromToken } from '#src/server/common/plugins/auth/get-organisation-from-auth-token.js'
 
-export const openIdProvider = async (name) => {
-  const authConfig = config.get(name)
-
+export const openIdProvider = async (name, authConfig) => {
   const oidcConf = await getOidcConfig(authConfig.oidcConfigurationUrl)
   return {
     name,
@@ -36,6 +33,15 @@ export const openIdProvider = async (name) => {
         hasMultipleOrgPickerEntries,
         shouldShowOrgOrUserName
       } = getOrganisationFromToken(payload)
+      let isTeamAdmin = false
+      if (credentials.provider === 'entraId') {
+        const { teamAdminEmails } = authConfig
+        isTeamAdmin =
+          payload.upn &&
+          teamAdminEmails.some(
+            (email) => email.toLowerCase().trim() === payload.upn.toLowerCase()
+          )
+      }
 
       credentials.profile = {
         id: payload.sub,
@@ -62,7 +68,8 @@ export const openIdProvider = async (name) => {
         roles: payload.roles,
         idToken: params.id_token,
         tokenUrl: oidcConf.token_endpoint,
-        logoutUrl: oidcConf.end_session_endpoint
+        logoutUrl: oidcConf.end_session_endpoint,
+        isTeamAdmin
       }
     }
   }

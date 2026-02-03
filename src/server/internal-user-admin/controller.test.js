@@ -16,7 +16,11 @@ vi.mock('~/src/server/exemption/task-list/controller.js')
 
 const createRequest = () => ({
   h: { view: vi.fn(), redirect: vi.fn() },
-  request: { logger: { error: vi.fn() }, plugins: { crumb: '123' } }
+  request: {
+    logger: { error: vi.fn() },
+    plugins: { crumb: '123' },
+    auth: { credentials: { isTeamAdmin: true } }
+  }
 })
 
 describe('Admin dashboard to send exemptions to EMP', () => {
@@ -120,6 +124,14 @@ describe('Admin dashboard to send exemptions to EMP', () => {
         failedPendingRetries: []
       })
     })
+
+    test('should throw unauthorized error if user is not team admin', async () => {
+      const { h, request } = createRequest()
+      request.auth.credentials.isTeamAdmin = false
+      await expect(() =>
+        adminExemptionsController.handler(request, h)
+      ).rejects.toThrow('Unauthorized')
+    })
   })
 
   describe('#adminExemptionsSendController', () => {
@@ -178,6 +190,16 @@ describe('Admin dashboard to send exemptions to EMP', () => {
       )
 
       expect(h.redirect).toHaveBeenCalledWith(routes.ADMIN_EXEMPTIONS)
+    })
+
+    test('should throw unauthorized error if user is not team admin', async () => {
+      const { h, request } = createRequest()
+      request.auth.credentials.isTeamAdmin = false
+      await expect(() =>
+        adminExemptionsSendController.handler(request, h)
+      ).rejects.toThrow(
+        'InternalUserAdmin: Access denied: Team admin role required'
+      )
     })
   })
 })

@@ -7,13 +7,15 @@ const contentSecurityPolicy = {
     const uploaderServiceHost = config.get(
       'cdpUploader.cdpUploadServiceBaseUrl'
     )
+    const defraIdOrigin = new URL(config.get('defraId.oidcConfigurationUrl'))
+      .origin
     const clarityProjectId = config.get('clarityProjectId')
     const cspDirectives = {
       'base-uri': "'self'",
       'connect-src': "'self' https://*.clarity.ms/collect",
       'default-src': "'self'",
       'font-src': "'self'",
-      'form-action': `'self' ${uploaderServiceHost}`,
+      'form-action': `'self' ${uploaderServiceHost} ${defraIdOrigin}`,
       'frame-src': "'self'",
       'frame-ancestors': "'none'",
       'img-src': "'self' https://tile.openstreetmap.org",

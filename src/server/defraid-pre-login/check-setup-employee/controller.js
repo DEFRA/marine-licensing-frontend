@@ -5,7 +5,7 @@ import {
 } from '#src/server/common/helpers/errors.js'
 import { routes } from '#src/server/common/constants/routes.js'
 
-const backLink = '#'
+const backLink = routes.preLogin.WHO_IS_EXEMPTION_FOR
 const title = 'Check you are set up to apply for your organisation'
 const viewData = {
   pageTitle: title,

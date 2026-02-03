@@ -383,6 +383,12 @@ export const config = convict({
       format: String,
       default: localhost,
       env: 'APP_BASE_URL'
+    },
+    teamAdminEmails: {
+      doc: 'Team admin emails',
+      format: Array,
+      default: [],
+      env: 'ENTRA_ID_TEAM_ADMIN_EMAILS'
     }
   },
   cdpUploader: {

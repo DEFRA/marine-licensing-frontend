@@ -7,7 +7,7 @@ export const createEntraIdStrategy = async (server) => {
   const entraIdConfig = config.get('entraId')
   const cookieConfig = config.get('session.cookie')
 
-  const provider = await openIdProvider('entraId')
+  const provider = await openIdProvider('entraId', entraIdConfig)
   server.auth.strategy(AUTH_STRATEGIES.ENTRA_ID, 'bell', {
     location: () =>
       `${entraIdConfig.redirectUrl}${routes.AUTH_ENTRA_ID_CALLBACK}`,

@@ -9,6 +9,7 @@ import {
   clearExemptionCache
 } from '#src/server/common/helpers/exemptions/session-cache/utils.js'
 import Boom from '@hapi/boom'
+import { EXEMPTION_TYPE } from '#src/server/common/constants/exemptions.js'
 
 export const DELETE_EXEMPTION_VIEW_ROUTE = 'exemption/delete/index'
 const DELETE_EXEMPTION_PAGE_TITLE =
@@ -37,6 +38,7 @@ export const deleteExemptionController = {
         pageTitle: DELETE_EXEMPTION_PAGE_TITLE,
         heading: DELETE_EXEMPTION_PAGE_TITLE,
         projectName: project.projectName,
+        exemptionType: EXEMPTION_TYPE,
         exemptionId,
         backLink: routes.DASHBOARD,
         routes

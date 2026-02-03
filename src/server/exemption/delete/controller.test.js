@@ -10,6 +10,7 @@ import {
   clearExemptionCache
 } from '#src/server/common/helpers/exemptions/session-cache/utils.js'
 import { routes } from '#src/server/common/constants/routes.js'
+import { EXEMPTION_TYPE } from '#src/server/common/constants/exemptions.js'
 
 import {
   deleteExemptionController,
@@ -69,6 +70,7 @@ describe('#delete', () => {
         pageTitle: 'Are you sure you want to delete this project?',
         heading: 'Are you sure you want to delete this project?',
         projectName: 'Test Project',
+        exemptionType: EXEMPTION_TYPE,
         exemptionId: 'test-project-id',
         backLink: '/projects',
         routes

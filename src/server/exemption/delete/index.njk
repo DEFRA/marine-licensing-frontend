@@ -21,7 +21,7 @@
       <h1 class="govuk-heading-l">Are you sure you want to delete this project?</h1>
 
       {{ govukInsetText({
-        text: projectName
+        text: exemptionType + ": " + projectName
       }) }}
 
       <form method="POST">

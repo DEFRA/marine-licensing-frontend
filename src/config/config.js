@@ -337,6 +337,12 @@ export const config = convict({
       default: localhost,
       env: 'APP_BASE_URL'
     },
+    cspRedirectHosts: {
+      doc: 'The Defra ID hosts that are redirected to before signin, for CSP form-action',
+      format: Array,
+      default: [],
+      env: 'DEFRA_ID_REDIRECT_HOSTS'
+    },
     refreshTokens: {
       doc: 'True if Defra Identity refresh tokens are enabled.',
       format: Boolean,

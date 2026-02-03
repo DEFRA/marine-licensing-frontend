@@ -1,0 +1,57 @@
+{% extends 'layouts/page.njk' %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/inset-text/macro.njk" import govukInsetText %}
+{% from "govuk/components/back-link/macro.njk" import govukBackLink %}
+{% from "cancel-button/macro.njk" import appCancelButton %}
+
+{% block beforeContent %}
+  {{ super() }}
+  <nav>
+    {{ govukBackLink({
+      text: "Back",
+      href: backLink
+    }) }}
+  </nav>
+{% endblock %}
+
+{% block content %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+
+      <h1 class="govuk-heading-l">Are you sure you want to withdraw this project?</h1>
+
+      {{ govukInsetText({
+        text: exemptionType + ": " + projectName
+      }) }}
+
+      <p class="govuk-body">
+        If you withdraw this exempt activity notification it will not be valid. You'll need to create a new one for any future activity.
+      </p>
+
+      <p class="govuk-body govuk-!-margin-bottom-6">
+        Do not withdraw this project if the activity has already been carried out.
+      </p>
+
+      <form method="POST">
+        <input type="hidden" name="csrfToken" value="{{csrfToken}}">
+        <input type="hidden" name="exemptionId" value="{{ exemptionId }}">
+
+        <div class="govuk-button-group">
+          {{ govukButton({
+            text: "Yes, withdraw project",
+            classes: "govuk-button--warning",
+            type: "submit",
+            attributes: {
+              "data-module": "govuk-button"
+            }
+          }) }}
+
+          {{ appCancelButton({
+            cancelLink: "/projects"
+          }) }}
+        </div>
+      </form>
+
+    </div>
+  </div>
+{% endblock %}

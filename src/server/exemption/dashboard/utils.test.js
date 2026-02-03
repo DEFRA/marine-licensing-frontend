@@ -193,7 +193,7 @@ describe('#formatProjectsForDisplay', () => {
         attributes: { 'data-sort-value': '2024-06-25' }
       },
       {
-        html: '<a href="/exemption/view-details/def456" class="govuk-link govuk-link--no-visited-state" aria-label="View details of Project 2">View details</a>'
+        html: '<a href="/exemption/view-details/def456" class="govuk-link govuk-!-margin-right-4 govuk-link--no-visited-state" aria-label="View details of Project 2">View details</a><a href="/exemption/withdraw/def456" class="govuk-link govuk-link--no-visited-state" aria-label="Withdraw Project 2">Withdraw</a>'
       }
     ])
   })
@@ -250,15 +250,15 @@ describe('getActionButtons', () => {
     )
   })
 
-  it('returns View details link when status is Closed', () => {
-    const submitted = {
+  it('returns View details and Withdraw links when status is Active', () => {
+    const active = {
       id: 'abc123',
       projectName: 'Test Project',
       status: 'Active'
     }
-    const result = getActionButtons(submitted)
+    const result = getActionButtons(active)
     expect(result).toBe(
-      '<a href="/exemption/view-details/abc123" class="govuk-link govuk-link--no-visited-state" aria-label="View details of Test Project">View details</a>'
+      `<a href="${routes.VIEW_DETAILS}/abc123" class="govuk-link govuk-!-margin-right-4 govuk-link--no-visited-state" aria-label="View details of Test Project">View details</a><a href="${routes.WITHDRAW_EXEMPTION}/abc123" class="govuk-link govuk-link--no-visited-state" aria-label="Withdraw Test Project">Withdraw</a>`
     )
   })
 

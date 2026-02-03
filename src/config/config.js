@@ -337,6 +337,12 @@ export const config = convict({
       default: localhost,
       env: 'APP_BASE_URL'
     },
+    cspRedirectHosts: {
+      doc: 'The Defra ID hosts that are redirected to before signin, for CSP form-action',
+      format: Array,
+      default: [],
+      env: 'DEFRA_ID_REDIRECT_HOSTS'
+    },
     refreshTokens: {
       doc: 'True if Defra Identity refresh tokens are enabled.',
       format: Boolean,
@@ -377,6 +383,12 @@ export const config = convict({
       format: String,
       default: localhost,
       env: 'APP_BASE_URL'
+    },
+    teamAdminEmails: {
+      doc: 'Team admin emails',
+      format: Array,
+      default: [],
+      env: 'ENTRA_ID_TEAM_ADMIN_EMAILS'
     }
   },
   cdpUploader: {

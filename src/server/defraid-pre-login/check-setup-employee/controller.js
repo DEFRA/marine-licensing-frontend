@@ -54,7 +54,10 @@ export const preLoginCheckSetupEmployeeSubmitController = {
       }
     }
   },
-  async handler(_request, h) {
+  async handler(request, h) {
+    if (request.payload.checkSetupEmployee === 'yes') {
+      return h.redirect(routes.SIGNIN)
+    }
     return h.redirect(routes.preLogin.CHECK_SETUP_EMPLOYEE)
   }
 }

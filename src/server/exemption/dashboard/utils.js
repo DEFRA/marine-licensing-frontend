@@ -23,17 +23,29 @@ export const getActionButtons = (project) => {
   return buttons
 }
 
+const getTagStyle = (status) => {
+  switch (status) {
+    case 'Draft':
+      return 'govuk-tag--light-blue'
+
+    case 'Withdrawn':
+      return 'govuk-tag--grey'
+
+    default:
+      return 'govuk-tag--green'
+  }
+}
+
 export const formatProjectsForDisplay = (projects) =>
   projects.map((project) => {
-    const tagClass =
-      project.status === 'Draft' ? 'govuk-tag--light-blue' : 'govuk-tag--green'
+    const { status } = project
 
     return [
       { text: project.projectName },
       { text: EXEMPTION_TYPE },
       { text: project.applicationReference || '-' },
       {
-        html: `<strong class="govuk-tag ${tagClass}">${project.status}</strong>`
+        html: `<strong class="govuk-tag ${getTagStyle(status)}">${status}</strong>`
       },
       {
         text: project.submittedAt

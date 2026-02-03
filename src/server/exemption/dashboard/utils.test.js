@@ -208,16 +208,20 @@ describe('#formatProjectsForDisplay', () => {
     const projects = [
       {
         projectName: 'Test Project',
-
         applicationReference: 'ML-2024-001',
         status: 'Draft',
         submittedAt: '2024-01-15'
       },
       {
         projectName: 'Test Project',
-
         applicationReference: 'ML-2024-001',
         status: 'Active',
+        submittedAt: '2024-01-15'
+      },
+      {
+        projectName: 'Test Withdrawn Project',
+        applicationReference: 'ML-2024-001',
+        status: 'Withdrawn',
         submittedAt: '2024-01-15'
       }
     ]
@@ -228,6 +232,8 @@ describe('#formatProjectsForDisplay', () => {
     expect(result[0][3].html).toContain('Draft')
     expect(result[1][3].html).toContain('govuk-tag--green')
     expect(result[1][3].html).toContain('Active')
+    expect(result[2][3].html).toContain('govuk-tag--grey')
+    expect(result[2][3].html).toContain('Withdrawn')
   })
 })
 

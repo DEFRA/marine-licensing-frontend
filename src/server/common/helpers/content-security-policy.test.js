@@ -3,9 +3,18 @@ import { contentSecurityPolicy } from './content-security-policy.js'
 
 vi.mock('~/src/config/config.js', () => ({
   config: {
-    get: vi.fn((key) =>
-      key === 'cdpUploader.cdpUploadServiceBaseUrl' ? 'http://uploader' : '123'
-    ) // clarityProjectId
+    get: vi.fn((key) => {
+      if (key === 'cdpUploader.cdpUploadServiceBaseUrl') {
+        return 'http://uploader'
+      }
+      if (key === 'defraId.cspRedirectHosts') {
+        return [
+          'https://dcidmtest.b2clogin.com',
+          'https://your-account.cpdev.cui.defra.gov.uk'
+        ]
+      }
+      return '123' // clarityProjectId
+    })
   }
 }))
 
@@ -102,7 +111,9 @@ describe('contentSecurityPolicy', () => {
 
       expect(mockResponse.header).toHaveBeenCalledWith(
         'Content-Security-Policy',
-        expect.stringContaining("form-action 'self' http://uploader")
+        expect.stringContaining(
+          "form-action 'self' http://uploader https://dcidmtest.b2clogin.com https://your-account.cpdev.cui.defra.gov.uk"
+        )
       )
     })
 

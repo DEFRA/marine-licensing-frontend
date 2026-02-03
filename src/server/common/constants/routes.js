@@ -41,7 +41,8 @@ export const marineLicenseRoutes = {
 }
 
 export const preLoginRoutes = {
-  CHECK_SETUP_EMPLOYEE: '/prelogin/check-setup-employee'
+  CHECK_SETUP_EMPLOYEE: '/prelogin/check-setup-employee',
+  ADD_TO_ORG_ACCOUNT: '/prelogin/add-to-org-account'
 }
 
 export const routes = {

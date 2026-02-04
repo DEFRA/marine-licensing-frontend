@@ -1,8 +1,14 @@
-import { getByRole, queryByRole, getByText } from '@testing-library/dom'
+import {
+  getByRole,
+  queryByRole,
+  getByText,
+  getAllByRole
+} from '@testing-library/dom'
 import { routes } from '~/src/server/common/constants/routes.js'
 import {
   setupTestServer,
-  mockExemptions
+  mockExemptions,
+  mockEmployeeExemptions
 } from '~/tests/integration/shared/test-setup-helpers.js'
 import { loadPage } from '~/tests/integration/shared/app-server.js'
 import { getExemptionsTableRow } from '~/tests/integration/shared/dom-helpers.js'
@@ -49,7 +55,7 @@ describe('Dashboard', () => {
       name: 'Draft Project'
     })
     const actionsCell = cells.pop()
-    const cellContents = cells.map((cell) => cell.textContent)
+    const cellContents = cells.map((cell) => cell.textContent.trim())
     expect(cellContents).toEqual([
       'Draft Project',
       'Exempt activity notification',
@@ -73,7 +79,7 @@ describe('Dashboard', () => {
       name: 'Active Project'
     })
     const actionsCell = cells.pop()
-    const cellContents = cells.map((cell) => cell.textContent)
+    const cellContents = cells.map((cell) => cell.textContent.trim())
     expect(cellContents).toEqual([
       'Active Project',
       'Exempt activity notification',
@@ -92,7 +98,7 @@ describe('Dashboard', () => {
     const table = queryByRole(doc, 'table', { name: 'Projects' })
     expect(table).not.toBeInTheDocument()
     expect(
-      getByText(doc, 'You currently have no projects.')
+      getByText(doc, 'There are no projects to display.')
     ).toBeInTheDocument()
   })
 
@@ -109,20 +115,22 @@ describe('Dashboard', () => {
       const doc = await loadDashboardPage()
       const table = getByRole(doc, 'table', { name: 'Projects' })
 
-      const nameHeader = getByRole(table, 'columnheader', { name: 'Name' })
+      const nameHeader = getByRole(table, 'columnheader', {
+        name: 'Project name'
+      })
       const typeHeader = getByRole(table, 'columnheader', { name: 'Type' })
       const referenceHeader = getByRole(table, 'columnheader', {
         name: 'Reference'
       })
       const statusHeader = getByRole(table, 'columnheader', { name: 'Status' })
       const dateHeader = getByRole(table, 'columnheader', {
-        name: 'Date submitted'
+        name: /Submitted\s+on/
       })
 
       expect(nameHeader).toHaveAttribute('aria-sort', 'none')
       expect(typeHeader).toHaveAttribute('aria-sort', 'none')
       expect(referenceHeader).toHaveAttribute('aria-sort', 'none')
-      expect(statusHeader).toHaveAttribute('aria-sort', 'none')
+      expect(statusHeader).toHaveAttribute('aria-sort', 'descending')
       expect(dateHeader).toHaveAttribute('aria-sort', 'none')
     })
 
@@ -183,6 +191,216 @@ describe('Dashboard', () => {
 
       expect(rows[0]).toHaveTextContent('Draft Project')
       expect(rows[1]).toHaveTextContent('Active Project')
+    })
+  })
+
+  describe('Employee user dashboard (ML-928)', () => {
+    const employeeExemptions = [
+      {
+        id: '123',
+        projectName: 'My Draft Project',
+        status: 'Draft',
+        submittedAt: null,
+        isOwnProject: true,
+        ownerName: 'John Smith'
+      },
+      {
+        id: '456',
+        projectName: 'My Active Project',
+        status: 'Active',
+        submittedAt: '2025-10-23T12:00:00.000Z',
+        isOwnProject: true,
+        ownerName: 'John Smith'
+      },
+      {
+        id: '789',
+        projectName: 'Colleague Draft',
+        status: 'Draft',
+        submittedAt: null,
+        isOwnProject: false,
+        ownerName: 'Jane Doe'
+      },
+      {
+        id: '101',
+        projectName: 'Colleague Active',
+        status: 'Active',
+        submittedAt: '2025-10-20T12:00:00.000Z',
+        isOwnProject: false,
+        ownerName: 'Jane Doe'
+      }
+    ]
+
+    it('should render filter radios for employee users', async () => {
+      mockEmployeeExemptions(employeeExemptions)
+      const doc = await loadDashboardPage()
+
+      const myProjectsRadio = doc.querySelector(
+        'input[name="filter"][value="my-projects"]'
+      )
+      const allProjectsRadio = doc.querySelector(
+        'input[name="filter"][value="all-projects"]'
+      )
+
+      expect(myProjectsRadio).toBeInTheDocument()
+      expect(allProjectsRadio).toBeInTheDocument()
+    })
+
+    it('should not render filter radios for non-employee users', async () => {
+      mockExemptions(exemptions)
+      const doc = await loadDashboardPage()
+
+      const myProjectsRadio = doc.querySelector(
+        'input[name="filter"][value="my-projects"]'
+      )
+      const allProjectsRadio = doc.querySelector(
+        'input[name="filter"][value="all-projects"]'
+      )
+
+      expect(myProjectsRadio).not.toBeInTheDocument()
+      expect(allProjectsRadio).not.toBeInTheDocument()
+    })
+
+    it('should render "My projects" as the default selected filter', async () => {
+      mockEmployeeExemptions(employeeExemptions)
+      const doc = await loadDashboardPage()
+
+      const myProjectsRadio = doc.querySelector(
+        'input[name="filter"][value="my-projects"]'
+      )
+      expect(myProjectsRadio).toBeChecked()
+    })
+
+    it('should render Owner column header for employee users', async () => {
+      mockEmployeeExemptions(employeeExemptions)
+      const doc = await loadDashboardPage()
+      const table = getByRole(doc, 'table', { name: 'Projects' })
+
+      const ownerHeader = getByRole(table, 'columnheader', { name: 'Owner' })
+      expect(ownerHeader).toBeInTheDocument()
+    })
+
+    it('should not render Owner column header for non-employee users', async () => {
+      mockExemptions(exemptions)
+      const doc = await loadDashboardPage()
+      const table = getByRole(doc, 'table', { name: 'Projects' })
+
+      const headers = getAllByRole(table, 'columnheader')
+      const headerTexts = headers.map((h) => h.textContent.trim())
+      expect(headerTexts).not.toContain('Owner')
+    })
+
+    it('should render owner name in Owner column for employee view', async () => {
+      mockEmployeeExemptions(employeeExemptions)
+      const doc = await loadDashboardPage()
+
+      const cells = getExemptionsTableRow({
+        document: doc,
+        name: 'My Draft Project'
+      })
+      const cellContents = cells.map((cell) => cell.textContent.trim())
+      expect(cellContents).toContain('John Smith')
+    })
+
+    it('should set data-is-own-project attribute on table rows', async () => {
+      mockEmployeeExemptions(employeeExemptions)
+      const doc = await loadDashboardPage()
+      const table = getByRole(doc, 'table', { name: 'Projects' })
+      const rows = table.querySelectorAll('tbody tr')
+
+      const ownProjectRow = Array.from(rows).find((row) =>
+        row.textContent.includes('My Draft Project')
+      )
+      const otherProjectRow = Array.from(rows).find((row) =>
+        row.textContent.includes('Colleague Draft')
+      )
+
+      expect(ownProjectRow).toHaveAttribute('data-is-own-project', 'true')
+      expect(otherProjectRow).toHaveAttribute('data-is-own-project', 'false')
+    })
+
+    it('should show Continue and Delete actions for own draft projects', async () => {
+      mockEmployeeExemptions(employeeExemptions)
+      const doc = await loadDashboardPage()
+
+      const cells = getExemptionsTableRow({
+        document: doc,
+        name: 'My Draft Project'
+      })
+      const actionsCell = cells.pop()
+
+      expect(
+        getByRole(actionsCell, 'link', { name: 'Continue to task list' })
+      ).toHaveAttribute('href', '/exemption/task-list/123')
+      expect(
+        getByRole(actionsCell, 'link', { name: 'Delete My Draft Project' })
+      ).toHaveAttribute('href', '/exemption/delete/123')
+    })
+
+    it('should show View details action for own active projects', async () => {
+      mockEmployeeExemptions(employeeExemptions)
+      const doc = await loadDashboardPage()
+
+      const cells = getExemptionsTableRow({
+        document: doc,
+        name: 'My Active Project'
+      })
+      const actionsCell = cells.pop()
+
+      expect(
+        getByRole(actionsCell, 'link', {
+          name: 'View details of My Active Project'
+        })
+      ).toHaveAttribute('href', '/exemption/view-details/456')
+    })
+
+    it('should show no actions for other users draft projects', async () => {
+      mockEmployeeExemptions(employeeExemptions)
+      const doc = await loadDashboardPage()
+
+      const cells = getExemptionsTableRow({
+        document: doc,
+        name: 'Colleague Draft'
+      })
+      const actionsCell = cells.pop()
+
+      const links = actionsCell.querySelectorAll('a')
+      expect(links).toHaveLength(0)
+    })
+
+    it('should show View details action for other users active projects', async () => {
+      mockEmployeeExemptions(employeeExemptions)
+      const doc = await loadDashboardPage()
+
+      const cells = getExemptionsTableRow({
+        document: doc,
+        name: 'Colleague Active'
+      })
+      const actionsCell = cells.pop()
+
+      expect(
+        getByRole(actionsCell, 'link', {
+          name: 'View details of Colleague Active'
+        })
+      ).toHaveAttribute('href', '/exemption/view-details/101')
+    })
+
+    it('should render Update results button for non-JS fallback', async () => {
+      mockEmployeeExemptions(employeeExemptions)
+      const doc = await loadDashboardPage()
+
+      const updateButton = doc.querySelector('.app-filter-submit')
+      expect(updateButton).toBeInTheDocument()
+      expect(updateButton.textContent.trim()).toBe('Update results')
+    })
+
+    it('should have app-project-filter data-module on radios container', async () => {
+      mockEmployeeExemptions(employeeExemptions)
+      const doc = await loadDashboardPage()
+
+      const filterModule = doc.querySelector(
+        '[data-module*="app-project-filter"]'
+      )
+      expect(filterModule).toBeInTheDocument()
     })
   })
 })

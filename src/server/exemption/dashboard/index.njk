@@ -1,5 +1,7 @@
 {%- from "govuk/components/table/macro.njk" import govukTable -%}
 {%- from "govuk/components/tag/macro.njk" import govukTag -%}
+{%- from "govuk/components/radios/macro.njk" import govukRadios -%}
+{%- from "govuk/components/button/macro.njk" import govukButton -%}
 {% from "moj/components/page-header-actions/macro.njk" import mojPageHeaderActions %}
 {% extends "layouts/page.njk" %}
 
@@ -10,62 +12,97 @@
     <div class="govuk-grid-column-full">
       {{ mojPageHeaderActions({
         heading: {
-          text: heading,
+          html: '<span class="govuk-caption-l">' + (organisationName | e) + '</span>' + (heading | e),
           classes: 'govuk-heading-l'
         }
       }) }}
 
-      {% if projects and projects.length > 0 %}
-
-        {{ govukTable({
-          caption: heading,
-          captionClasses: "govuk-visually-hidden",
-          attributes: {
-            "data-module": "moj-sortable-table"
-          },
-          head: [
-            {
-              text: "Name",
-              attributes: {
-              "aria-sort": "none"
-            }
+      {% if isEmployee %}
+        <form method="post" class="app-filter-form" novalidate>
+          <input type="hidden" name="csrfToken" value="{{csrfToken}}" />
+          {{ govukRadios({
+            name: "filter",
+            classes: "govuk-radios--inline govuk-radios--small",
+            attributes: {
+              "data-module": "app-project-filter govuk-radio"
             },
-            {
-              text: "Type",
-              attributes: {
-              "aria-sort": "none"
-            }
+            formGroup: {
+              classes: "govuk-!-margin-bottom-3"
             },
-            {
-              text: "Reference",
-              attributes: {
-              "aria-sort": "none"
-            }
+            fieldset: {
+              legend: {
+                text: "Show",
+                classes: "govuk-fieldset__legend--s"
+              }
             },
-            {
-              text: "Status",
-              attributes: {
-              "aria-sort": "none"
-            }
-            },
-            {
-              text: "Date submitted",
-              attributes: {
-              "aria-sort": "none"
-            }
-            },
-            {
-              text: "Actions"
-            }
-          ],
-          rows: projects
-        }) }}
-
-      {% else %}
-        <p class="govuk-body">
-          You currently have no projects.
-        </p>
+            items: [
+              {
+                value: filterMyProjects,
+                text: "My projects",
+                checked: filterValue == filterMyProjects
+              },
+              {
+                value: filterAllProjects,
+                text: "All " + organisationName + " projects",
+                checked: filterValue == filterAllProjects
+              }
+            ]
+          }) }}
+          {{ govukButton({
+            text: "Update results",
+            classes: "govuk-button--secondary app-filter-submit"
+          }) }}
+        </form>
       {% endif %}
+
+      {% set hasOwnProjects = false %}
+      {% for project in projects %}
+        {% if project.attributes['data-is-own-project'] == 'true' %}
+          {% set hasOwnProjects = true %}
+        {% endif %}
+      {% endfor %}
+
+      {% set showTable = projects and projects.length > 0 and (not isEmployee or filterValue == filterAllProjects or hasOwnProjects) %}
+
+      {% if projects and projects.length > 0 %}
+        <table class="govuk-table{% if not showTable %} govuk-!-display-none{% endif %}" data-module="moj-sortable-table" id="ex-projects-table">
+          <caption class="govuk-table__caption govuk-visually-hidden">{{ heading }}</caption>
+          <thead class="govuk-table__head">
+            <tr class="govuk-table__row">
+              <th scope="col" class="govuk-table__header" aria-sort="none">Project name</th>
+              <th scope="col" class="govuk-table__header" aria-sort="none">Type</th>
+              <th scope="col" class="govuk-table__header" aria-sort="none">Reference</th>
+              <th scope="col" class="govuk-table__header" aria-sort="descending">Status</th>
+              <th scope="col" class="govuk-table__header" aria-sort="none">Submitted&nbsp;on</th>
+              {% if isEmployee %}
+                <th scope="col" class="govuk-table__header" aria-sort="none">Owner</th>
+              {% endif %}
+              <th scope="col" class="govuk-table__header">Actions</th>
+            </tr>
+          </thead>
+          <tbody class="govuk-table__body">
+            {% for project in projects %}
+              {% set isHidden = isEmployee and filterValue == filterMyProjects and project.attributes['data-is-own-project'] == 'false' %}
+              <tr class="govuk-table__row app-project-row{% if isHidden %} govuk-!-display-none{% endif %}"
+                  data-is-own-project="{{ project.attributes['data-is-own-project'] }}">
+                {% for cell in project.cells %}
+                  <td class="govuk-table__cell"{% if cell.attributes and cell.attributes['data-sort-value'] is defined %} data-sort-value="{{ cell.attributes['data-sort-value'] }}"{% endif %}>
+                    {% if cell.html %}
+                      {{ cell.html | safe }}
+                    {% else %}
+                      {{ cell.text }}
+                    {% endif %}
+                  </td>
+                {% endfor %}
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      {% endif %}
+
+      <p class="govuk-body app-empty-message{% if showTable %} govuk-!-display-none{% endif %}">
+        There are no projects to display.
+      </p>
     </div>
   </div>
 {% endblock %}

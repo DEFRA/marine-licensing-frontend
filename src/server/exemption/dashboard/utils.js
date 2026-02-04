@@ -13,49 +13,27 @@ export const sortProjectsByStatus = (projects) => {
 
 export const getActionButtons = (project) => {
   const isOwnProject = project.isOwnProject ?? true
-  const escapedProjectName = escapeHtml(project.projectName)
 
-  const canWithdraw = project.status === 'Active' && !!isOwnProject
+  const { status, id, projectName } = project
+
+  const escapedProjectName = escapeHtml(projectName)
+
+  const canWithdraw = status === 'Active' && !!isOwnProject
 
   if (isOwnProject) {
-    if (project.status === 'Draft') {
-      return `<a href="${routes.TASK_LIST}/${project.id}" class="govuk-link govuk-!-margin-right-4 govuk-link--no-visited-state" aria-label="Continue to task list">Continue</a><a href="${routes.DELETE_EXEMPTION}/${project.id}" class="govuk-link govuk-link--no-visited-state" aria-label="Delete ${escapedProjectName}">Delete</a>`
+    if (status === 'Draft') {
+      return `<a href="${routes.TASK_LIST}/${id}" class="govuk-link govuk-!-margin-right-4 govuk-link--no-visited-state" aria-label="Continue to task list">Continue</a><a href="${routes.DELETE_EXEMPTION}/${id}" class="govuk-link govuk-link--no-visited-state" aria-label="Delete ${escapedProjectName}">Delete</a>`
     }
     const marginClass = canWithdraw
       ? 'govuk-link govuk-!-margin-right-4 '
       : 'govuk-link '
 
-    let buttons = `<a href="${routes.VIEW_DETAILS}/${project.id}" class="${marginClass}govuk-link--no-visited-state" aria-label="View details of ${escapedProjectName}">View details</a>`
+    let buttons = `<a href="${routes.VIEW_DETAILS}/${id}" class="${marginClass}govuk-link--no-visited-state" aria-label="View details of ${escapedProjectName}">View details</a>`
 
     if (canWithdraw) {
-      buttons += `<a href="${routes.WITHDRAW_EXEMPTION}/${project.id}" class="govuk-link govuk-link--no-visited-state" aria-label="Withdraw ${escapedProjectName}">Withdraw</a>`
+      buttons += `<a href="${routes.WITHDRAW_EXEMPTION}/${id}" class="govuk-link govuk-link--no-visited-state" aria-label="Withdraw ${escapedProjectName}">Withdraw</a>`
     }
     return buttons
-  }
-
-  if (project.status === 'Draft') {
-    return ''
-  }
-  return `<a href="${routes.VIEW_DETAILS}/${project.id}" class="govuk-link govuk-link--no-visited-state" aria-label="View details of ${escapedProjectName}">View details</a>`
-}
-
-export const getActionButtons1 = (project) => {
-  const { projectName, status, isOwnProject, id } = project
-
-  const canWithdraw = status === 'Active' && !!isOwnProject
-
-  if (status === 'Draft') {
-    buttons = `<a href="${routes.TASK_LIST}/${id}" class="govuk-link govuk-!-margin-right-4 govuk-link--no-visited-state" aria-label="Continue to task list">Continue</a>`
-    buttons += `<a href="${routes.DELETE_EXEMPTION}/${id}" class="govuk-link govuk-link--no-visited-state" aria-label="Delete ${projectName}">Delete</a>`
-  } else if (status === 'Active') {
-    const marginClass = canWithdraw ? 'govuk-!-margin-right-4' : ''
-    buttons = `<a href="${routes.VIEW_DETAILS}/${id}" class="govuk-link ${marginClass} govuk-link--no-visited-state" aria-label="View details of ${projectName}">View details</a>`
-  } else {
-    buttons = `<a href="${routes.VIEW_DETAILS}/${id}" class="govuk-link govuk-link--no-visited-state" aria-label="View details of ${projectName}">View details</a>`
-  }
-
-  if (canWithdraw) {
-    buttons += `<a href="${routes.WITHDRAW_EXEMPTION}/${id}" class="govuk-link govuk-link--no-visited-state" aria-label="Withdraw ${projectName}">Withdraw</a>`
   }
 
   if (project.status === 'Draft') {

@@ -1,0 +1,70 @@
+{% extends 'layouts/page.njk' %}
+{% from "govuk/components/warning-text/macro.njk" import govukWarningText %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/radios/macro.njk" import govukRadios %}
+{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+{% from "radio-page/macro.njk" import appRadioPage %}
+
+{% block beforeContent %}
+  {{ super() }}
+  {{  appBackLink({backLink: backLink}) }}
+{% endblock %}
+
+{% block content %}
+
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+      <h1 class="govuk-heading-l">
+        {{ heading }}
+      </h1>
+      <div class="govuk-body" data-testid="app-page-body">
+
+        <p class="govuk-body">
+          You cannot submit an exemption until your organisation has set you up.
+        </p>
+
+        <h2 class="govuk-heading-m">
+          What needs to happen
+        </h2>
+
+        <p class="govuk-body">
+          You must ask an administrator of your organisation’s Defra account to:
+        </p>
+
+        <ol class="govuk-list govuk-list--number">
+          <li>Go to 'Manage account users'.</li>
+          <li>Invite you as a team member.</li>
+          <li>Give you access to the 'Get permission for marine work' service.</li>
+        </ol>
+
+        <p class="govuk-body">
+          Once you have received the invitation email and accepted it, you can return to this service.
+        </p>
+
+        <ul class="govuk-list">
+          <li>
+            <a href="#" class="govuk-link">How to add users to a Defra account</a>
+          </li>
+        </ul>
+
+        <p class="govuk-body">
+          If you do not know who your organisation’s administrator is, contact Defra account support:
+        </p>
+
+        <ul class="govuk-list">
+          <li>
+            <a href="mailto:Customer.Identity-Support@defra.gov.uk" class="govuk-link" rel="noopener noreferrer">Customer.Identity-Support@defra.gov.uk</a>
+          </li>
+          <li>
+            03459 33 55 77 (Monday to Friday, 9am to 5pm)
+          </li>
+        </ul>
+
+        <p class="govuk-body">
+          <a class="govuk-link" href="https://www.gov.uk/call-charges">Find out about call charges</a>
+        </p>
+      </div>
+    </div>
+  </div>
+
+{% endblock %}

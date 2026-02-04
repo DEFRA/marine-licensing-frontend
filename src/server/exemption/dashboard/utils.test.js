@@ -156,7 +156,7 @@ describe('#formatProjectsForDisplay', () => {
       {
         id: 'def456',
         projectName: 'Project 2',
-
+        isOwnProject: true,
         applicationReference: 'ML-2024-002',
         status: 'Active',
         submittedAt: '2024-06-25'
@@ -254,11 +254,25 @@ describe('getActionButtons', () => {
     const active = {
       id: 'abc123',
       projectName: 'Test Project',
-      status: 'Active'
+      status: 'Active',
+      isOwnProject: true
     }
     const result = getActionButtons(active)
     expect(result).toBe(
       `<a href="${routes.VIEW_DETAILS}/abc123" class="govuk-link govuk-!-margin-right-4 govuk-link--no-visited-state" aria-label="View details of Test Project">View details</a><a href="${routes.WITHDRAW_EXEMPTION}/abc123" class="govuk-link govuk-link--no-visited-state" aria-label="Withdraw Test Project">Withdraw</a>`
+    )
+  })
+
+  it('does not output withdraw when user does not own project', () => {
+    const active = {
+      id: 'abc123',
+      projectName: 'Test Project',
+      status: 'Active',
+      isOwnProject: false
+    }
+    const result = getActionButtons(active)
+    expect(result).toBe(
+      `<a href="${routes.VIEW_DETAILS}/abc123" class="govuk-link  govuk-link--no-visited-state" aria-label="View details of Test Project">View details</a>`
     )
   })
 

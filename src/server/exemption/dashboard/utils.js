@@ -13,14 +13,22 @@ export const sortProjectsByStatus = (projects) => {
 export const getActionButtons = (project) => {
   let buttons = ''
 
-  if (project.status === 'Draft') {
-    buttons = `<a href="${routes.TASK_LIST}/${project.id}" class="govuk-link govuk-!-margin-right-4 govuk-link--no-visited-state" aria-label="Continue to task list">Continue</a>`
-    buttons += `<a href="${routes.DELETE_EXEMPTION}/${project.id}" class="govuk-link govuk-link--no-visited-state" aria-label="Delete ${project.projectName}">Delete</a>`
-  } else if (project.status === 'Active') {
-    buttons = `<a href="${routes.VIEW_DETAILS}/${project.id}" class="govuk-link govuk-!-margin-right-4 govuk-link--no-visited-state" aria-label="View details of ${project.projectName}">View details</a>`
-    buttons += `<a href="${routes.WITHDRAW_EXEMPTION}/${project.id}" class="govuk-link govuk-link--no-visited-state" aria-label="Withdraw ${project.projectName}">Withdraw</a>`
+  const { projectName, status, isOwnProject, id } = project
+
+  const canWithdraw = status === 'Active' && !!isOwnProject
+
+  if (status === 'Draft') {
+    buttons = `<a href="${routes.TASK_LIST}/${id}" class="govuk-link govuk-!-margin-right-4 govuk-link--no-visited-state" aria-label="Continue to task list">Continue</a>`
+    buttons += `<a href="${routes.DELETE_EXEMPTION}/${id}" class="govuk-link govuk-link--no-visited-state" aria-label="Delete ${projectName}">Delete</a>`
+  } else if (status === 'Active') {
+    const marginClass = canWithdraw ? 'govuk-!-margin-right-4' : ''
+    buttons = `<a href="${routes.VIEW_DETAILS}/${id}" class="govuk-link ${marginClass} govuk-link--no-visited-state" aria-label="View details of ${projectName}">View details</a>`
   } else {
-    buttons = `<a href="${routes.VIEW_DETAILS}/${project.id}" class="govuk-link govuk-link--no-visited-state" aria-label="View details of ${project.projectName}">View details</a>`
+    buttons = `<a href="${routes.VIEW_DETAILS}/${id}" class="govuk-link govuk-link--no-visited-state" aria-label="View details of ${projectName}">View details</a>`
+  }
+
+  if (canWithdraw) {
+    buttons += `<a href="${routes.WITHDRAW_EXEMPTION}/${id}" class="govuk-link govuk-link--no-visited-state" aria-label="Withdraw ${projectName}">Withdraw</a>`
   }
 
   return buttons

@@ -4,12 +4,16 @@ import {
 } from '#src/server/common/helpers/authenticated-requests.js'
 import { formatProjectsForDisplay } from '#src/server/internal-user-admin/utils.js'
 import { routes } from '#src/server/common/constants/routes.js'
+import Boom from '@hapi/boom'
 
 export const DASHBOARD_VIEW_ROUTE = 'internal-user-admin/index.njk'
 const DASHBOARD_PAGE_TITLE = 'Exemptions not sent to EMP'
 
 export const adminExemptionsController = {
   handler: async (request, h) => {
+    if (request.auth?.credentials?.isTeamAdmin !== true) {
+      throw Boom.forbidden('Unauthorized')
+    }
     try {
       const { payload } = await authenticatedGetRequest(
         request,
@@ -41,6 +45,11 @@ export const adminExemptionsController = {
 
 export const adminExemptionsSendController = {
   handler: async (request, h) => {
+    if (request.auth?.credentials?.isTeamAdmin !== true) {
+      throw Boom.forbidden(
+        'InternalUserAdmin: Access denied: Team admin role required'
+      )
+    }
     try {
       await authenticatedPostRequest(request, '/exemption/send-to-emp', {
         id: request.payload.exemptionId

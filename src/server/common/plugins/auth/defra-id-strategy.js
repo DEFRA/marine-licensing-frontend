@@ -33,7 +33,7 @@ export const getDefraIdConfig = async (provider) => {
 }
 
 export const createDefraIdStrategy = async (server) => {
-  const provider = await openIdProvider('defraId')
+  const provider = await openIdProvider('defraId', config.get('defraId'))
   const authConfig = await getDefraIdConfig(provider)
   server.auth.strategy(AUTH_STRATEGIES.DEFRA_ID, 'bell', authConfig)
 }

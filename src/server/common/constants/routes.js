@@ -36,11 +36,13 @@ export const exemptionRoutes = {
 }
 
 export const marineLicenseRoutes = {
-  MARINE_LICENSE_PROJECT_NAME: '/marine-license/project-name'
+  MARINE_LICENSE_PROJECT_NAME: '/marine-license/project-name',
+  MARINE_LICENSE_TASK_LIST: '/marine-license/task-list'
 }
 
 export const preLoginRoutes = {
-  CHECK_SETUP_EMPLOYEE: '/prelogin/check-setup-employee'
+  CHECK_SETUP_EMPLOYEE: '/prelogin/check-setup-employee',
+  ADD_TO_ORG_ACCOUNT: '/prelogin/add-to-org-account'
 }
 
 export const routes = {

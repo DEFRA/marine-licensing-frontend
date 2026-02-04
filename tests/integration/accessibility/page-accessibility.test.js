@@ -15,7 +15,12 @@ import {
   mockExemptionWithShapefile,
   mockProjectList
 } from '~/src/server/test-helpers/mocks/exemption.js'
-import { mockExemption, setupTestServer } from '../shared/test-setup-helpers.js'
+import { mockMarineLicenseApplication } from '~/src/server/test-helpers/mocks/marine-license-mocks.js'
+import {
+  mockExemption,
+  mockMarineLicense,
+  setupTestServer
+} from '../shared/test-setup-helpers.js'
 import { makeGetRequest } from '~/src/server/test-helpers/server-requests.js'
 import { JSDOM } from 'jsdom'
 import { config } from '~/src/config/config.js'
@@ -145,26 +150,45 @@ describe('Page accessibility checks (Axe)', () => {
     },
     {
       url: marineLicenseRoutes.MARINE_LICENSE_PROJECT_NAME,
-      title: 'Project name'
+      title: 'Project name',
+      isMarineLicense: true
+    },
+    {
+      url: marineLicenseRoutes.MARINE_LICENSE_TASK_LIST,
+      title: 'Marine licence start page',
+      isMarineLicense: true
     },
     {
       url: routes.preLogin.CHECK_SETUP_EMPLOYEE,
       title: 'Check you are set up to apply for your organisation'
+    },
+    {
+      url: routes.preLogin.ADD_TO_ORG_ACCOUNT,
+      title: 'You need to be added to your organisation’s Defra account'
     }
   ]
 
   test.each(pages)(
     '"$title" page',
-    async ({ title, url, exemption = mockExemptionData }) => {
-      mockExemption(exemption)
-      vi.mocked(authenticatedGetRequest).mockImplementation(
-        (_request, endpoint) => ({
-          payload: {
-            message: 'success',
-            value: endpoint === '/exemptions' ? mockProjectList : exemption
-          }
-        })
-      )
+    async ({
+      title,
+      url,
+      exemption = mockExemptionData,
+      isMarineLicense = false
+    }) => {
+      if (isMarineLicense) {
+        mockMarineLicense(mockMarineLicenseApplication)
+      } else {
+        mockExemption(exemption)
+        vi.mocked(authenticatedGetRequest).mockImplementation(
+          (_request, endpoint) => ({
+            payload: {
+              message: 'success',
+              value: endpoint === '/exemptions' ? mockProjectList : exemption
+            }
+          })
+        )
+      }
       const response = await makeGetRequest({
         url,
         server: getServer()

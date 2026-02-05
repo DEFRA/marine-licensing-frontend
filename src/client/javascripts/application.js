@@ -13,6 +13,7 @@ import {
 import { SortableTable } from '@ministryofjustice/frontend'
 
 import { AddAnotherPoint } from './add-another-point/index.js'
+import { ProjectFilter } from './project-filter/index.js'
 import { SiteDetailsMap } from './site-details-map/index.js'
 
 createAll(Button)
@@ -60,5 +61,14 @@ document.addEventListener('DOMContentLoaded', () => {
   )
   for (const element of mapElements) {
     new SiteDetailsMap(element) // eslint-disable-line no-new
+  }
+
+  const projectFilterElements = document.querySelectorAll(
+    '[data-module~="app-project-filter"]'
+  )
+
+  for (const element of projectFilterElements) {
+    // eslint-disable-next-line no-new
+    new ProjectFilter(element) // nosonar
   }
 })

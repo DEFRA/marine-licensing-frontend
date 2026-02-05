@@ -1,0 +1,12 @@
+{
+  "userId": "f0c19ba9-df1f-4cb8-bbe7-8078f13eabea",
+  "contactId": "16d5ffcc-3ef3-ee11-a1fe-000d3a86c43e",
+  "email": "sally.self@example.com",
+  "firstName": "Sally",
+  "lastName": "Self",
+  "loa": "1",
+  "aal": "1",
+  "enrolmentCount": 1,
+  "enrolmentRequestCount": 1,
+  "relationships": []
+}

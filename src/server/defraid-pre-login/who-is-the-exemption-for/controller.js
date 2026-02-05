@@ -15,7 +15,8 @@ const viewData = {
 export const pathToPageTemplate =
   'defraid-pre-login/who-is-the-exemption-for/index'
 export const errorMessages = {
-  WHO_IS_EXEMPTION_FOR_REQUIRED: 'Please select who the exemption is for'
+  WHO_IS_EXEMPTION_FOR_REQUIRED:
+    'Select who the exempt activity notification is for'
 }
 
 export const preLoginWhoIsExemptionForController = {

@@ -70,19 +70,19 @@ describe('Who is the exemption for page', () => {
       const { document } = new JSDOM(result).window
 
       const individualRadio = getByRole(document, 'radio', {
-        name: "Myself as an individual - it's a personal project"
+        name: "Myself as an individual - it’s a personal project"
       })
       expect(individualRadio).toBeInTheDocument()
       expect(individualRadio).toHaveAttribute('value', 'individual')
 
       const organisationRadio = getByRole(document, 'radio', {
-        name: 'The organisation I work for'
+        name: 'The organisation I’m an employee of'
       })
       expect(organisationRadio).toBeInTheDocument()
       expect(organisationRadio).toHaveAttribute('value', 'organisation')
 
       const clientRadio = getByRole(document, 'radio', {
-        name: "A client - you're an agent or intermediary notifying us on behalf of another organisation"
+        name: "A client - you’re an agent or intermediary notifying us on behalf of another organisation"
       })
       expect(clientRadio).toBeInTheDocument()
       expect(clientRadio).toHaveAttribute('value', 'client')
@@ -217,7 +217,7 @@ describe('Who is the exemption for page', () => {
       })
 
       const errorLink = within(errorSummary).getByRole('link', {
-        name: 'Please select who the exemption is for'
+        name: 'Select who the exempt activity notification is for'
       })
       expect(errorLink).toBeInTheDocument()
       expect(errorLink).toHaveAttribute('href', '#whoIsExemptionFor')
@@ -237,7 +237,7 @@ describe('Who is the exemption for page', () => {
       const errorMessage = document.querySelector('#whoIsExemptionFor-error')
       expect(errorMessage).toBeInTheDocument()
       expect(errorMessage.textContent).toContain(
-        'Please select who the exemption is for'
+        'Select who the exempt activity notification is for'
       )
     })
 
@@ -256,7 +256,7 @@ describe('Who is the exemption for page', () => {
       expect(errorSummary).toBeInTheDocument()
 
       const errorLink = within(errorSummary).getByRole('link', {
-        name: 'Please select who the exemption is for'
+        name: 'Select who the exempt activity notification is for'
       })
       expect(errorLink).toBeInTheDocument()
     })
@@ -310,13 +310,13 @@ describe('Who is the exemption for page', () => {
       const { document } = new JSDOM(result).window
 
       const individualRadio = getByRole(document, 'radio', {
-        name: "Myself as an individual - it's a personal project"
+        name: 'Myself as an individual - it’s a personal project'
       })
       const organisationRadio = getByRole(document, 'radio', {
-        name: 'The organisation I work for'
+        name: 'The organisation I’m an employee of'
       })
       const clientRadio = getByRole(document, 'radio', {
-        name: "A client - you're an agent or intermediary notifying us on behalf of another organisation"
+        name: 'A client - you’re an agent or intermediary notifying us on behalf of another organisation'
       })
 
       expect(individualRadio).not.toBeChecked()

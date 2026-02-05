@@ -206,7 +206,7 @@ describe('preLoginWhoIsExemptionForSubmitController', () => {
 describe('errorMessages', () => {
   test('contains WHO_IS_EXEMPTION_FOR_REQUIRED message', () => {
     expect(errorMessages.WHO_IS_EXEMPTION_FOR_REQUIRED).toBe(
-      'Please select who the exemption is for'
+      'Select who the exempt activity notification is for'
     )
   })
 })

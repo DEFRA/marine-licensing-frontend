@@ -5,3 +5,9 @@
     @include govuk-width-container(1200px);
   }
 }
+
+.app-filter-form {
+  .govuk-radios__label {
+    white-space: nowrap;
+  }
+}

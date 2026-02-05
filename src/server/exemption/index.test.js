@@ -220,6 +220,10 @@ describe('exemption route', () => {
         path: '/projects'
       }),
       expect.objectContaining({
+        method: 'POST',
+        path: '/projects'
+      }),
+      expect.objectContaining({
         method: 'GET',
         path: '/exemption/delete'
       }),

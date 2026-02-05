@@ -3,6 +3,7 @@ import {
   preLoginCheckSetupEmployeeController,
   preLoginCheckSetupEmployeeSubmitController
 } from '#src/server/defraid-pre-login/check-setup-employee/controller.js'
+import { preLoginRegisterNewOrgController } from '#src/server/defraid-pre-login/register-new-org/controller.js'
 import { preLoginAddToOrgAccountController } from '#src/server/defraid-pre-login/add-to-org-account/controller.js'
 
 export const preLogin = {
@@ -22,6 +23,14 @@ export const preLogin = {
           method: 'POST',
           path: routes.preLogin.CHECK_SETUP_EMPLOYEE,
           ...preLoginCheckSetupEmployeeSubmitController
+        },
+        {
+          method: 'GET',
+          path: routes.preLogin.REGISTER_NEW_ORG,
+          options: {
+            auth: false
+          },
+          ...preLoginRegisterNewOrgController
         },
         {
           method: 'GET',

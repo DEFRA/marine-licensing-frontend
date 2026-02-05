@@ -70,7 +70,7 @@ describe('Who is the exemption for page', () => {
       const { document } = new JSDOM(result).window
 
       const individualRadio = getByRole(document, 'radio', {
-        name: "Myself as an individual - it’s a personal project"
+        name: 'Myself as an individual - it’s a personal project'
       })
       expect(individualRadio).toBeInTheDocument()
       expect(individualRadio).toHaveAttribute('value', 'individual')
@@ -82,7 +82,7 @@ describe('Who is the exemption for page', () => {
       expect(organisationRadio).toHaveAttribute('value', 'organisation')
 
       const clientRadio = getByRole(document, 'radio', {
-        name: "A client - you’re an agent or intermediary notifying us on behalf of another organisation"
+        name: 'A client - you’re an agent or intermediary notifying us on behalf of another organisation'
       })
       expect(clientRadio).toBeInTheDocument()
       expect(clientRadio).toHaveAttribute('value', 'client')

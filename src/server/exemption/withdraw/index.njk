@@ -6,12 +6,7 @@
 
 {% block beforeContent %}
   {{ super() }}
-  <nav>
-    {{ govukBackLink({
-      text: "Back",
-      href: backLink
-    }) }}
-  </nav>
+  {{  appBackLink({backLink: backLink}) }}
 {% endblock %}
 
 {% block content %}
@@ -41,6 +36,7 @@
             text: "Yes, withdraw project",
             classes: "govuk-button--warning",
             type: "submit",
+            preventDoubleClick: true,
             attributes: {
               "data-module": "govuk-button"
             }

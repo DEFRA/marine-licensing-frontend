@@ -7,7 +7,7 @@ import { routes } from '~/src/server/common/constants/routes.js'
 import { loadPage } from '~/tests/integration/shared/app-server.js'
 import { within } from '@testing-library/dom'
 
-describe('Delete site', () => {
+describe('withdraw exemption', () => {
   const getServer = setupTestServer()
 
   beforeEach(() => mockExemption(mockExemptionData))

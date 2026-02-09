@@ -162,7 +162,7 @@ describe('#formatProjectsForDisplay', () => {
       {
         id: 'def456',
         projectName: 'Project 2',
-
+        isOwnProject: true,
         applicationReference: 'ML-2024-002',
         status: 'Active',
         submittedAt: '2024-06-25'
@@ -204,7 +204,7 @@ describe('#formatProjectsForDisplay', () => {
           attributes: { 'data-sort-value': '2024-06-25' }
         },
         {
-          html: '<a href="/exemption/view-details/def456" class="govuk-link govuk-link--no-visited-state" aria-label="View details of Project 2">View details</a>'
+          html: '<a href="/exemption/view-details/def456" class="govuk-link govuk-!-margin-right-4 govuk-link--no-visited-state" aria-label="View details of Project 2">View details</a><a href="/exemption/withdraw/def456" class="govuk-link govuk-link--no-visited-state" aria-label="Withdraw Project 2">Withdraw</a>'
         }
       ]
     })
@@ -220,16 +220,20 @@ describe('#formatProjectsForDisplay', () => {
     const projects = [
       {
         projectName: 'Test Project',
-
         applicationReference: 'ML-2024-001',
         status: 'Draft',
         submittedAt: '2024-01-15'
       },
       {
         projectName: 'Test Project',
-
         applicationReference: 'ML-2024-001',
         status: 'Active',
+        submittedAt: '2024-01-15'
+      },
+      {
+        projectName: 'Test Withdrawn Project',
+        applicationReference: 'ML-2024-001',
+        status: 'Withdrawn',
         submittedAt: '2024-01-15'
       }
     ]
@@ -240,6 +244,8 @@ describe('#formatProjectsForDisplay', () => {
     expect(result[0].cells[3].html).toContain('Draft')
     expect(result[1].cells[3].html).toContain('govuk-tag--green')
     expect(result[1].cells[3].html).toContain('Active')
+    expect(result[2].cells[3].html).toContain('govuk-tag--grey')
+    expect(result[2].cells[3].html).toContain('Withdrawn')
   })
 })
 
@@ -256,15 +262,29 @@ describe('getActionButtons', () => {
     )
   })
 
-  it('returns View details link when status is Closed', () => {
-    const submitted = {
+  it('returns View details and Withdraw links when status is Active', () => {
+    const active = {
       id: 'abc123',
       projectName: 'Test Project',
-      status: 'Active'
+      status: 'Active',
+      isOwnProject: true
     }
-    const result = getActionButtons(submitted)
+    const result = getActionButtons(active)
     expect(result).toBe(
-      '<a href="/exemption/view-details/abc123" class="govuk-link govuk-link--no-visited-state" aria-label="View details of Test Project">View details</a>'
+      `<a href="${routes.VIEW_DETAILS}/abc123" class="govuk-link govuk-!-margin-right-4 govuk-link--no-visited-state" aria-label="View details of Test Project">View details</a><a href="${routes.WITHDRAW_EXEMPTION}/abc123" class="govuk-link govuk-link--no-visited-state" aria-label="Withdraw Test Project">Withdraw</a>`
+    )
+  })
+
+  it('does not output withdraw when user does not own project', () => {
+    const active = {
+      id: 'abc123',
+      projectName: 'Test Project',
+      status: 'Active',
+      isOwnProject: false
+    }
+    const result = getActionButtons(active)
+    expect(result).toBe(
+      `<a href="${routes.VIEW_DETAILS}/abc123" class="govuk-link govuk-link--no-visited-state" aria-label="View details of Test Project">View details</a>`
     )
   })
 

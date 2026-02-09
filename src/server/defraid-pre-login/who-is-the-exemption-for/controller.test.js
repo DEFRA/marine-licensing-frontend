@@ -38,7 +38,7 @@ describe('preLoginWhoIsExemptionForController', () => {
   })
 
   describe('GET handler', () => {
-    test('redirects to project name when user has session cookie', async () => {
+    test('redirects to exemption landing when user has session cookie', async () => {
       const request = createMockRequest({
         state: { userSession: { sessionId: 'test-session' } }
       })
@@ -46,7 +46,7 @@ describe('preLoginWhoIsExemptionForController', () => {
 
       await preLoginWhoIsExemptionForController.handler(request, h)
 
-      expect(h.redirect).toHaveBeenCalledWith(routes.PROJECT_NAME)
+      expect(h.redirect).toHaveBeenCalledWith(routes.EXEMPTION)
       expect(h.view).not.toHaveBeenCalled()
     })
 

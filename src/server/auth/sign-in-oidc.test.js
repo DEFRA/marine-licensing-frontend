@@ -16,14 +16,14 @@ vi.mock('~/src/server/auth/utils.js', () => ({
 describe('#signInOidcController', () => {
   const getServer = setupTestServer()
 
-  test('should render the project name page', async () => {
+  test('should redirect to exemption route', async () => {
     const { statusCode, headers } = await makeGetRequest({
       url: routes.SIGNIN,
       server: getServer()
     })
 
     expect(statusCode).toBe(statusCodes.redirect)
-    expect(headers.location).toBe(routes.PROJECT_NAME)
+    expect(headers.location).toBe(routes.EXEMPTION)
   })
 
   test('should call setUserSession when auth is enabled and user is authenticated', async () => {
@@ -74,7 +74,7 @@ describe('#signInOidcController', () => {
     expect(mockH.redirect).toHaveBeenCalledWith(customRedirectRoute)
   })
 
-  test('should fall back to PROJECT_NAME route when no referrer in flash', async () => {
+  test('should fall back to EXEMPTION route when no referrer in flash', async () => {
     const mockRequest = {
       auth: { isAuthenticated: false },
       yar: { flash: vi.fn().mockReturnValue(null) }
@@ -85,6 +85,6 @@ describe('#signInOidcController', () => {
     await signInOidcController.handler(mockRequest, mockH)
 
     expect(mockRequest.yar.flash).toHaveBeenCalledWith(redirectPathCacheKey)
-    expect(mockH.redirect).toHaveBeenCalledWith(routes.PROJECT_NAME)
+    expect(mockH.redirect).toHaveBeenCalledWith(routes.EXEMPTION)
   })
 })

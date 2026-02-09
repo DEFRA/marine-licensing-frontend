@@ -95,6 +95,46 @@ describe('exemption-site-details helper', () => {
       expect(mockLogger.error).not.toHaveBeenCalled()
     })
 
+    test('should not error when getFileUploadSummaryData returns no file metadata', () => {
+      const exemption = {
+        siteDetails: [
+          {
+            coordinatesType: 'file',
+            fileUploadType: 'kml',
+            uploadedFile: {
+              filename: 'test-site.kml'
+            },
+            geoJSON: {
+              type: 'FeatureCollection',
+              features: []
+            }
+          }
+        ]
+      }
+
+      // This matches the real implementation shape (coordinates + geoJSON only).
+      getFileUploadSummaryData.mockReturnValue({
+        coordinates: [],
+        geoJSON: { type: 'FeatureCollection', features: [] }
+      })
+
+      const result = processFileUploadSiteDetails(
+        exemption,
+        mockExemptionId,
+        mockRequest,
+        0
+      )
+
+      expect(result).toEqual({
+        ...exemption.siteDetails[0],
+        isFileUpload: true,
+        method: 'Upload a file with the coordinates of the site',
+        fileType: 'KML',
+        filename: 'test-site.kml'
+      })
+      expect(mockLogger.error).not.toHaveBeenCalled()
+    })
+
     test('should process file upload site details successfully with Shapefile', () => {
       const shapefileExemption = {
         siteDetails: [

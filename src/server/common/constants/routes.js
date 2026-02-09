@@ -41,6 +41,7 @@ export const marineLicenseRoutes = {
 }
 
 export const preLoginRoutes = {
+  WHO_IS_EXEMPTION_FOR: '/prelogin/who-is-the-exemption-for',
   CHECK_SETUP_EMPLOYEE: '/prelogin/check-setup-employee',
   ADD_TO_ORG_ACCOUNT: '/prelogin/add-to-org-account'
 }

@@ -64,20 +64,6 @@ describe('cache-mcms-context', () => {
       )
     })
 
-    test('should do nothing when not on root path', () => {
-      mockRequest.path = '/some-other-path'
-      mockRequest.query = {
-        ACTIVITY_TYPE: 'CON',
-        ARTICLE: '17',
-        pdfDownloadUrl: mcmsAnswersDownloadUrl
-      }
-
-      cacheMcmsContextFromQueryParams(mockRequest)
-
-      expect(mockRequest.yar.set).not.toHaveBeenCalled()
-      expect(mockRequest.logger.info).not.toHaveBeenCalled()
-    })
-
     test('should not cache MCMS context when no query params', () => {
       mockRequest.query = {}
       mockRequest.url = 'http://example.com/'

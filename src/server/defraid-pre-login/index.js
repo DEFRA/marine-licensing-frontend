@@ -3,6 +3,10 @@ import {
   preLoginCheckSetupEmployeeController,
   preLoginCheckSetupEmployeeSubmitController
 } from '#src/server/defraid-pre-login/check-setup-employee/controller.js'
+import {
+  preLoginWhoIsExemptionForController,
+  preLoginWhoIsExemptionForSubmitController
+} from '#src/server/defraid-pre-login/who-is-the-exemption-for/controller.js'
 import { preLoginAddToOrgAccountController } from '#src/server/defraid-pre-login/add-to-org-account/controller.js'
 
 export const preLogin = {
@@ -10,6 +14,17 @@ export const preLogin = {
     name: 'preLogin',
     register(server) {
       server.route([
+        {
+          method: 'GET',
+          path: routes.preLogin.WHO_IS_EXEMPTION_FOR,
+          options: { auth: false },
+          ...preLoginWhoIsExemptionForController
+        },
+        {
+          method: 'POST',
+          path: routes.preLogin.WHO_IS_EXEMPTION_FOR,
+          ...preLoginWhoIsExemptionForSubmitController
+        },
         {
           method: 'GET',
           path: routes.preLogin.CHECK_SETUP_EMPLOYEE,

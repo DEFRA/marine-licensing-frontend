@@ -145,6 +145,10 @@ describe('Page accessibility checks (Axe)', () => {
       title: 'Are you sure you want to delete all site details?'
     },
     {
+      url: routes.WITHDRAW_EXEMPTION,
+      title: 'Are you sure you want to withdraw this project?'
+    },
+    {
       url: routes.SERVICE_HOME,
       title: 'Home'
     },
@@ -193,6 +197,7 @@ describe('Page accessibility checks (Axe)', () => {
         url,
         server: getServer()
       })
+
       expect(response.statusCode).toBe(statusCodes.ok)
       const { document } = new JSDOM(response.result).window
       expect(document.querySelector('title')).toHaveTextContent(

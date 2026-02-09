@@ -13,13 +13,27 @@ export const sortProjectsByStatus = (projects) => {
 
 export const getActionButtons = (project) => {
   const isOwnProject = project.isOwnProject ?? true
-  const escapedProjectName = escapeHtml(project.projectName)
+
+  const { status, id, projectName } = project
+
+  const escapedProjectName = escapeHtml(projectName)
+
+  const canWithdraw = status === 'Active' && !!isOwnProject
 
   if (isOwnProject) {
-    if (project.status === 'Draft') {
-      return `<a href="${routes.TASK_LIST}/${project.id}" class="govuk-link govuk-!-margin-right-4 govuk-link--no-visited-state" aria-label="Continue to task list">Continue</a><a href="${routes.DELETE_EXEMPTION}/${project.id}" class="govuk-link govuk-link--no-visited-state" aria-label="Delete ${escapedProjectName}">Delete</a>`
+    if (status === 'Draft') {
+      return `<a href="${routes.TASK_LIST}/${id}" class="govuk-link govuk-!-margin-right-4 govuk-link--no-visited-state" aria-label="Continue to task list">Continue</a><a href="${routes.DELETE_EXEMPTION}/${id}" class="govuk-link govuk-link--no-visited-state" aria-label="Delete ${escapedProjectName}">Delete</a>`
     }
-    return `<a href="${routes.VIEW_DETAILS}/${project.id}" class="govuk-link govuk-link--no-visited-state" aria-label="View details of ${escapedProjectName}">View details</a>`
+    const marginClass = canWithdraw
+      ? 'govuk-link govuk-!-margin-right-4 '
+      : 'govuk-link '
+
+    let buttons = `<a href="${routes.VIEW_DETAILS}/${id}" class="${marginClass}govuk-link--no-visited-state" aria-label="View details of ${escapedProjectName}">View details</a>`
+
+    if (canWithdraw) {
+      buttons += `<a href="${routes.WITHDRAW_EXEMPTION}/${id}" class="govuk-link govuk-link--no-visited-state" aria-label="Withdraw ${escapedProjectName}">Withdraw</a>`
+    }
+    return buttons
   }
 
   if (project.status === 'Draft') {
@@ -28,10 +42,22 @@ export const getActionButtons = (project) => {
   return `<a href="${routes.VIEW_DETAILS}/${project.id}" class="govuk-link govuk-link--no-visited-state" aria-label="View details of ${escapedProjectName}">View details</a>`
 }
 
+const getTagStyle = (status) => {
+  switch (status) {
+    case 'Draft':
+      return 'govuk-tag--light-blue'
+
+    case 'Withdrawn':
+      return 'govuk-tag--grey'
+
+    default:
+      return 'govuk-tag--green'
+  }
+}
+
 export const formatProjectsForDisplay = (projects, isEmployee = false) =>
   projects.map((project) => {
-    const tagClass =
-      project.status === 'Draft' ? 'govuk-tag--light-blue' : 'govuk-tag--green'
+    const { status } = project
 
     const isOwnProject = project.isOwnProject ?? true
 
@@ -40,7 +66,7 @@ export const formatProjectsForDisplay = (projects, isEmployee = false) =>
       { text: EXEMPTION_TYPE },
       { text: project.applicationReference || '-' },
       {
-        html: `<strong class="govuk-tag ${tagClass}">${escapeHtml(project.status)}</strong>`
+        html: `<strong class="govuk-tag ${getTagStyle(status)}">${escapeHtml(project.status)}</strong>`
       },
       {
         text: project.submittedAt

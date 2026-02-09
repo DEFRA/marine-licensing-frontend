@@ -10,6 +10,7 @@ import { routes as confirmationRoutes } from '#src/server/exemption/confirmation
 import { routes } from '#src/server/common/constants/routes.js'
 import { dashboardRoutes } from './dashboard/index.js'
 import { deleteExemptionRoutes } from './delete/index.js'
+import { withdrawExemptionRoutes } from './withdraw/index.js'
 import { viewExemptionInternalUserRoutes } from '#src/server/exemption/view-exemption-internal-user/index.js'
 import { getPageViewCommonData } from '#src/server/common/helpers/page-view-common-data.js'
 import { viewExemptionPublicUserRoutes } from '#src/server/exemption/view-exemption-public/index.js'
@@ -47,6 +48,7 @@ export const exemption = {
         ...confirmationRoutes,
         ...dashboardRoutes,
         ...deleteExemptionRoutes,
+        ...withdrawExemptionRoutes,
         {
           method: 'GET',
           path: '/exemption',

@@ -6,7 +6,7 @@ import {
 import { routes } from '#src/server/common/constants/routes.js'
 import { preloginUserSession } from '#src/server/common/helpers/defraid-pre-login/session-cache.js'
 
-const backLink = '#'
+const backLink = routes.preLogin.WHO_IS_EXEMPTION_FOR
 const title = 'Check you are set up to apply for your organisation'
 const viewData = {
   pageTitle: title,

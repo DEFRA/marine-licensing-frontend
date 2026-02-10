@@ -1,10 +1,13 @@
 import { setupTestServer } from '~/tests/integration/shared/test-setup-helpers.js'
 import { routes } from '~/src/server/common/constants/routes.js'
 import { loadPage } from '~/tests/integration/shared/app-server.js'
-import { getByRole, within } from '@testing-library/dom'
+import { getByRole, getByText, within } from '@testing-library/dom'
 import { beforeAll } from 'vitest'
 import { citizenUserSession } from '~/tests/integration/shared/session-fixtures.js'
 import { getUserSession } from '~/src/server/common/plugins/auth/utils.js'
+import { makePostRequest } from '~/src/server/test-helpers/server-requests.js'
+import { JSDOM } from 'jsdom'
+import { validateErrors } from '~/tests/integration/shared/expect-utils.js'
 
 vi.mock('~/src/server/common/plugins/auth/utils.js')
 
@@ -15,7 +18,7 @@ describe('Post-login - Confirm Individual', () => {
     vi.mocked(getUserSession).mockResolvedValue(citizenUserSession)
   })
 
-  it('should display page for Confirming Individual users', async () => {
+  test('should display page for Confirming Individual users', async () => {
     const document = await loadPage({
       requestUrl: routes.postLogin.CONFIRM_INDIVIDUAL,
       server: getServer()
@@ -41,5 +44,36 @@ describe('Post-login - Confirm Individual', () => {
 
     expect(yesRadio).not.toBeChecked()
     expect(noRadio).not.toBeChecked()
+  })
+
+  test('should stay on same page when continue is clicked without selection', async () => {
+    const { result } = await makePostRequest({
+      url: routes.postLogin.CONFIRM_INDIVIDUAL,
+      server: getServer(),
+      formData: {}
+    })
+
+    const { document } = new JSDOM(result).window
+
+    const pageHeading = within(document).getByRole('heading', {
+      level: 1,
+      name: `Confirm you're notifying us as ${citizenUserSession.displayName} for a personal project`
+    })
+    expect(pageHeading).toBeInTheDocument()
+
+    const expectedErrors = [
+      {
+        field: 'confirmIndividual',
+        message: 'Select whether you are notifying us for yourself'
+      }
+    ]
+
+    validateErrors(expectedErrors, document)
+
+    expect(
+      getByText(document, 'Select whether you are notifying us for yourself', {
+        selector: '.govuk-error-message'
+      })
+    ).toBeInTheDocument()
   })
 })

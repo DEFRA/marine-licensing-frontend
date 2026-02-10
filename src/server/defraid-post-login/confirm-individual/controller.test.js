@@ -68,13 +68,27 @@ describe('#postLoginConfirmIndividual', () => {
       const request = createMockRequest()
       const h = createMockH()
 
-      await confirmIndividualController.handler(request, h)
+      await confirmIndividualSubmitController.handler(request, h)
 
       expect(h.view).toHaveBeenCalledWith(CONFIRM_INDIVIDUAL_VIEW_ROUTE, {
         displayName: `${citizenUserSession.displayName}`,
         heading: `Confirm you're notifying us as ${citizenUserSession.displayName} for a personal project`,
         pageTitle: "Confirm you're notifying us as an individual"
       })
+    })
+
+    test('should validate payload correctly', () => {
+      const validationSchema =
+        confirmIndividualSubmitController.options.validate.payload
+
+      expect(
+        validationSchema.validate({ confirmIndividual: 'Yes' }).error
+      ).toBeUndefined()
+      expect(
+        validationSchema.validate({ confirmIndividual: 'No' }).error
+      ).toBeUndefined()
+
+      expect(validationSchema.validate({}).error).toBeDefined()
     })
   })
 })

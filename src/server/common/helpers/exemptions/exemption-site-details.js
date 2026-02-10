@@ -25,8 +25,12 @@ export const processFileUploadSiteDetails = (
   request,
   siteIndex = 0
 ) => {
+  const siteDetails = getSiteDetailsBySite(exemption, siteIndex)
+  const fallbackFileType =
+    siteDetails.fileUploadType === 'kml' ? 'KML' : 'Shapefile'
+  const fallbackFilename = siteDetails.uploadedFile?.filename || 'Unknown file'
+
   try {
-    const siteDetails = getSiteDetailsBySite(exemption, siteIndex)
     const fileUploadData = getFileUploadSummaryData({
       ...exemption,
       siteDetails
@@ -36,8 +40,8 @@ export const processFileUploadSiteDetails = (
       ...siteDetails,
       isFileUpload: true,
       method: 'Upload a file with the coordinates of the site',
-      fileType: fileUploadData.fileUploadType,
-      filename: fileUploadData.uploadedFile.filename
+      fileType: fileUploadData?.fileUploadType || fallbackFileType,
+      filename: fileUploadData?.uploadedFile?.filename || fallbackFilename
     }
   } catch (error) {
     request.logger.error(
@@ -47,15 +51,12 @@ export const processFileUploadSiteDetails = (
       },
       errorMessages.FILE_UPLOAD_DATA_ERROR
     )
-    // Fallback to basic site details if file upload data unavailable
-    const siteDetails = getSiteDetailsBySite(exemption, siteIndex)
-
     return {
       ...siteDetails,
       isFileUpload: true,
       method: 'Upload a file with the coordinates of the site',
-      fileType: siteDetails.fileUploadType === 'kml' ? 'KML' : 'Shapefile',
-      filename: siteDetails.uploadedFile?.filename || 'Unknown file'
+      fileType: fallbackFileType,
+      filename: fallbackFilename
     }
   }
 }

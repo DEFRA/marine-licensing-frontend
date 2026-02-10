@@ -28,6 +28,7 @@ export const exemptionRoutes = {
   SAME_ACTIVITY_DATES: '/exemption/same-activity-dates',
   SAME_ACTIVITY_DESCRIPTION: '/exemption/same-activity-description',
   DELETE_EXEMPTION: '/exemption/delete',
+  WITHDRAW_EXEMPTION: '/exemption/withdraw',
   DELETE_SITE: '/exemption/delete-site',
   DELETE_ALL_SITES: '/exemption/delete-all-sites',
   COOKIES: '/help/cookies',
@@ -41,6 +42,7 @@ export const marineLicenseRoutes = {
 }
 
 export const preLoginRoutes = {
+  WHO_IS_EXEMPTION_FOR: '/prelogin/who-is-the-exemption-for',
   CHECK_SETUP_EMPLOYEE: '/prelogin/check-setup-employee',
   ADD_TO_ORG_ACCOUNT: '/prelogin/add-to-org-account'
 }

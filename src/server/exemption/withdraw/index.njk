@@ -6,23 +6,26 @@
 
 {% block beforeContent %}
   {{ super() }}
-  <nav>
-    {{ govukBackLink({
-      text: "Back",
-      href: backLink
-    }) }}
-  </nav>
+  {{  appBackLink({backLink: backLink}) }}
 {% endblock %}
 
 {% block content %}
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
 
-      <h1 class="govuk-heading-l">Are you sure you want to delete this project?</h1>
+      <h1 class="govuk-heading-l">Are you sure you want to withdraw this project?</h1>
 
       {{ govukInsetText({
         text: exemptionType + ": " + projectName
       }) }}
+
+      <p class="govuk-body">
+        If you withdraw this exempt activity notification it will not be valid. You'll need to create a new one for any future activity.
+      </p>
+
+      <p class="govuk-body govuk-!-margin-bottom-6">
+        Do not withdraw this project if the activity has already been carried out.
+      </p>
 
       <form method="POST">
         <input type="hidden" name="csrfToken" value="{{csrfToken}}">
@@ -30,20 +33,21 @@
 
         <div class="govuk-button-group">
           {{ govukButton({
-            text: "Yes, delete project",
+            text: "Yes, withdraw project",
             classes: "govuk-button--warning",
             type: "submit",
+            preventDoubleClick: true,
             attributes: {
               "data-module": "govuk-button"
             }
           }) }}
 
           {{ appCancelButton({
-            cancelLink: "/home"
+            cancelLink: backLink
           }) }}
         </div>
       </form>
 
     </div>
   </div>
-{% endblock %} 
+{% endblock %}

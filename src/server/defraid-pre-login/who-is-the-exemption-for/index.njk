@@ -3,12 +3,6 @@
 {% from "govuk/components/button/macro.njk" import govukButton %}
 {% from "govuk/components/radios/macro.njk" import govukRadios %}
 {% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
-{% from "radio-page/macro.njk" import appRadioPage %}
-
-{% block beforeContent %}
-  {{ super() }}
-  {{  appBackLink({backLink: backLink}) }}
-{% endblock %}
 
 {% block content %}
 
@@ -26,37 +20,34 @@
       </h1>
       <div class="govuk-body" data-testid="app-page-body">
         {{ govukWarningText({
-          text: "If you do not set up your Defra account correctly your exempt activity notification will not be valid. This is because it will not be registered to the organisation the exemption is for.",
+          text: "If you do not set up your Defra account correctly your exempt activity notification will not be valid. This is because it will not be registered to the person or organisation the exemption is for.",
           iconFallbackText: "Warning"
         }) }}
-        <p class="govuk-body">
-          To notify us of an exemption for an organisation, you must have a Defra account linked to that organisation. You cannot use a personal individual account.
-        </p>
         <form method="POST">
           <input type="hidden" name="csrfToken" value="{{csrfToken}}" />
           {{ govukRadios({
-            idPrefix: 'checkSetupEmployee',
-            name: 'checkSetupEmployee',
-            value: checkSetupEmployee,
+            idPrefix: 'whoIsExemptionFor',
+            name: 'whoIsExemptionFor',
+            value: payload.whoIsExemptionFor,
             fieldset: {
               legend: {
-                html: 'Do you have a Defra account for your organisation?',
-                classes: "govuk-fieldset__legend govuk-fieldset__legend--m"
+                html: 'Who is this exempt activity notification for?',
+                classes: "govuk-visually-hidden"
               }
             },
             errorMessage: errorMessage,
             items: [
               {
-                value: "yes",
-                text: "Yes, I can sign in to my organisation's account"
+                value: "individual",
+                text: "Myself as an individual - it’s a personal project"
               },
               {
-                value: "register-new",
-                text: "No, I need to create a new account for my organisation"
+                value: "organisation",
+                text: "The organisation I’m an employee of"
               },
               {
-                value: "need-to-be-added",
-                text: "No, I need to be added to my organisation's existing account"
+                value: "client",
+                text: "A client - you’re an agent or intermediary notifying us on behalf of another organisation"
               }
             ]
           }) }}

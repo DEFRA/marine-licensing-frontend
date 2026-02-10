@@ -20,10 +20,8 @@
     <span class="govuk-caption-l">{{ projectName }}</span>
   {% endif %}
 
-  <h1 class="govuk-label-wrapper">
-    <label class="govuk-label govuk-label--l" for="file-id" id="file-upload-1-label">
-      {{ heading }}
-    </label>
+  <h1 class="govuk-heading-l">
+    {{ heading }}
   </h1>
 
   {% if fileUploadType == 'shapefile' %}
@@ -60,6 +58,7 @@
                 "accept": acceptAttribute
               }
           }) }}
+
 
           <div class="govuk-button-group">
             {{ govukButton({

@@ -40,8 +40,8 @@ export const processFileUploadSiteDetails = (
       ...siteDetails,
       isFileUpload: true,
       method: 'Upload a file with the coordinates of the site',
-      fileType: fileUploadData?.fileUploadType ?? fallbackFileType,
-      filename: fileUploadData?.uploadedFile?.filename ?? fallbackFilename
+      fileType: fileUploadData?.fileUploadType || fallbackFileType,
+      filename: fileUploadData?.uploadedFile?.filename || fallbackFilename
     }
   } catch (error) {
     request.logger.error(

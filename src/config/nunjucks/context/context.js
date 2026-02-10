@@ -27,13 +27,17 @@ const hideNavigationRoutesMarineLicense = new Set([
 const isRouteNavigationHidden = (request) => {
   const { path: pagePath } = request
 
-  if (pagePath.includes('/exemption')) {
-    const exemption = getExemptionCache(request)
-    return hideNavigationRoutesExemptions.has(pagePath) && !exemption?.id
-  }
+  try {
+    if (pagePath.includes('/exemption')) {
+      const exemption = getExemptionCache(request)
+      return hideNavigationRoutesExemptions.has(pagePath) && !exemption?.id
+    }
 
-  const marineLicense = getMarineLicenseCache(request)
-  return hideNavigationRoutesMarineLicense.has(pagePath) && !marineLicense?.id
+    const marineLicense = getMarineLicenseCache(request)
+    return hideNavigationRoutesMarineLicense.has(pagePath) && !marineLicense?.id
+  } catch {
+    return false
+  }
 }
 
 export function context(request) {

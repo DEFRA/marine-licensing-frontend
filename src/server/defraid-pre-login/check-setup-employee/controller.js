@@ -72,6 +72,6 @@ export const preLoginCheckSetupEmployeeSubmitController = {
     if (selection === 'need-to-be-added') {
       return h.redirect(routes.preLogin.ADD_TO_ORG_ACCOUNT)
     }
-    return h.redirect(routes.preLogin.CHECK_SETUP_EMPLOYEE)
+    return h.redirect(routes.preLogin.REGISTER_NEW_ORG)
   }
 }

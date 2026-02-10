@@ -55,7 +55,7 @@ describe('Who is the exemption for page', () => {
       const warningText = document.querySelector('.govuk-warning-text__text')
       expect(warningText).toBeInTheDocument()
       expect(warningText.textContent).toContain(
-        'If you do not set up your Defra account correctly your exempt activity notification will not be valid'
+        'If you do not set up your Defra account correctly, your exempt activity notification will not be valid'
       )
     })
 

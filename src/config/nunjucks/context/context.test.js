@@ -146,4 +146,13 @@ describe('#context', () => {
       })
     )
   })
+
+  it('When session cache throws, should show navigation', () => {
+    vi.mocked(getMarineLicenseCache).mockImplementation(() => {
+      throw new TypeError('Cannot read properties of null')
+    })
+    const mockRequest = { path: '/', logger: { error: vi.fn() } }
+    const contextResult = context(mockRequest)
+    expect(contextResult.navigation).not.toEqual([])
+  })
 })

@@ -91,6 +91,21 @@ describe('#postLoginConfirmIndividual', () => {
       expect(validationSchema.validate({}).error).toBeDefined()
     })
 
+    test('redirects to signin when no session details exist after submit', async () => {
+      vi.mocked(getUserSession).mockResolvedValue({})
+
+      const request = createMockRequest()
+      const h = createMockH()
+
+      await confirmIndividualSubmitController.options.validate.failAction(
+        request,
+        h
+      )
+
+      expect(h.redirect).toHaveBeenCalledWith(routes.SIGNIN)
+      expect(h.view).not.toHaveBeenCalled()
+    })
+
     test('should redirect if user confirms they are individual user', async () => {
       const request = createMockRequest({
         payload: { confirmIndividual: 'yes' }

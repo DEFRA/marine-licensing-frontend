@@ -90,10 +90,6 @@ export const confirmIndividualSubmitController = {
       request.state?.userSession
     )
 
-    if (!userSession?.displayName) {
-      return h.redirect(routes.SIGNIN)
-    }
-
     const { confirmIndividual } = payload
 
     await postloginUserSession.set({

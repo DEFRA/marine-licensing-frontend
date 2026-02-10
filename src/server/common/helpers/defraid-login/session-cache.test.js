@@ -51,5 +51,26 @@ describe('Session cache for Defra ID login', () => {
       })
       expect(value).toEqual('existingValue')
     })
+
+    it('returns null when there is no value for key', async () => {
+      request.yar.get.mockResolvedValue({
+        checkSetupEmployee: null,
+        otherKey: 'otherValue'
+      })
+      const value = await preloginUserSession.get({
+        request,
+        key: 'checkSetupEmployee'
+      })
+      expect(value).toEqual(null)
+    })
+
+    it('returns null when there is no cache key', async () => {
+      request.yar.get.mockResolvedValue(null)
+      const value = await preloginUserSession.get({
+        request,
+        key: 'checkSetupEmployee'
+      })
+      expect(value).toEqual(null)
+    })
   })
 })

@@ -7,6 +7,7 @@ import {
   preLoginWhoIsExemptionForController,
   preLoginWhoIsExemptionForSubmitController
 } from '#src/server/defraid-pre-login/who-is-the-exemption-for/controller.js'
+import { preLoginRegisterNewOrgController } from '#src/server/defraid-pre-login/register-new-org/controller.js'
 import { preLoginAddToOrgAccountController } from '#src/server/defraid-pre-login/add-to-org-account/controller.js'
 
 export const preLogin = {
@@ -40,10 +41,14 @@ export const preLogin = {
         },
         {
           method: 'GET',
+          path: routes.preLogin.REGISTER_NEW_ORG,
+          options: { auth: false },
+          ...preLoginRegisterNewOrgController
+        },
+        {
+          method: 'GET',
           path: routes.preLogin.ADD_TO_ORG_ACCOUNT,
-          options: {
-            auth: false
-          },
+          options: { auth: false },
           ...preLoginAddToOrgAccountController
         }
       ])

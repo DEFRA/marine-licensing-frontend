@@ -1,0 +1,56 @@
+{% extends 'layouts/page.njk' %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+
+{% block beforeContent %}
+  {{ super() }}
+  {{  appBackLink({backLink: backLink}) }}
+{% endblock %}
+
+{% block content %}
+
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+      <h1 class="govuk-heading-l">
+        {{ heading }}
+      </h1>
+      <div class="govuk-body" data-testid="app-page-body">
+
+        <p class="govuk-body">
+          You are about to sign in or create a new account. You must create an account specifically for the organisation.
+        </p>
+
+        <h2 class="govuk-heading-m">
+          What you will need
+        </h2>
+
+        <p class="govuk-body">
+          To create an account for an organisation, you will need:
+        </p>
+
+        <ul class="govuk-list govuk-list--bullet">
+          <li>the Companies House number (if the business is a limited company)</li>
+          <li>the email and phone number for the business</li>
+          <li>a Government Gateway user ID or GOV.UK One Login</li>
+        </ul>
+
+        <p class="govuk-body">
+          If you do not have a Government Gateway ID or One Login, you can create one in the next step.
+        </p>
+
+        <ul class="govuk-list">
+          <li>
+            <a href="#" class="govuk-link" target="_blank" rel="noopener noreferrer">How to create a Defra account (opens in new tab)</a>
+          </li>
+        </ul>
+
+        {{ govukButton({
+          text: "Continue",
+          href: signinUrl,
+          classes: "govuk-button--primary govuk-!-margin-top-3",
+          isStartButton: false
+        }) }}
+      </div>
+    </div>
+  </div>
+
+{% endblock %}

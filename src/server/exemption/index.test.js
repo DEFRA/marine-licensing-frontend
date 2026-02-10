@@ -272,7 +272,7 @@ describe('exemption route', () => {
       (route) => route.method === 'GET' && route.path === '/exemption'
     )
 
-    const mockRequest = { state: { userSession: {} } }
+    const mockRequest = { query: {}, state: { userSession: {} } }
     const mockToolkit = { redirect: vi.fn() }
 
     await exemptionRoute.handler(mockRequest, mockToolkit)
@@ -298,7 +298,7 @@ describe('exemption route', () => {
       (route) => route.method === 'GET' && route.path === '/exemption'
     )
 
-    const mockRequest = { state: { userSession: {} } }
+    const mockRequest = { query: {}, state: { userSession: {} } }
     const mockToolkit = { redirect: vi.fn() }
 
     await exemptionRoute.handler(mockRequest, mockToolkit)
@@ -321,7 +321,7 @@ describe('exemption route', () => {
       (route) => route.method === 'GET' && route.path === '/exemption'
     )
 
-    const mockRequest = { state: { userSession: {} } }
+    const mockRequest = { query: {}, state: { userSession: {} } }
     const mockToolkit = { redirect: vi.fn() }
 
     await exemptionRoute.handler(mockRequest, mockToolkit)
@@ -344,7 +344,7 @@ describe('exemption route', () => {
       (route) => route.method === 'GET' && route.path === '/exemption'
     )
 
-    const mockRequest = { state: {} }
+    const mockRequest = { query: {}, state: {} }
     const mockToolkit = { redirect: vi.fn() }
 
     await exemptionRoute.handler(mockRequest, mockToolkit)
@@ -368,7 +368,11 @@ describe('exemption route', () => {
       (call) => call[0] === 'onPreHandler'
     )[1]
 
-    const mockRequest = { app: {}, state: { userSession: 'mockSession' } }
+    const mockRequest = {
+      app: {},
+      query: {},
+      state: { userSession: 'mockSession' }
+    }
     const mockH = { continue: 'continue' }
 
     const result = await onPreHandlerCallback(mockRequest, mockH)
@@ -394,7 +398,7 @@ describe('exemption route', () => {
       (call) => call[0] === 'onPreHandler'
     )[1]
 
-    const mockRequest = { app: {}, state: {} }
+    const mockRequest = { app: {}, query: {}, state: {} }
     const mockH = { continue: 'continue' }
 
     const result = await onPreHandlerCallback(mockRequest, mockH)

@@ -8,8 +8,10 @@ import {
   employeeSession
 } from '~/tests/integration/shared/session-fixtures.js'
 import { getUserSession } from '~/src/server/common/plugins/auth/utils.js'
+import { cacheMcmsContextFromQueryParams } from '~/src/server/common/helpers/mcms-context/cache-mcms-context.js'
 
 vi.mock('~/src/server/common/plugins/auth/utils.js')
+vi.mock('~/src/server/common/helpers/mcms-context/cache-mcms-context.js')
 
 describe('#exemptionLanding', () => {
   const getServer = setupTestServer()
@@ -39,6 +41,26 @@ describe('#exemptionLanding', () => {
 
       expect(statusCode).toBe(statusCodes.redirect)
       expect(headers.location).toBe(routes.PROJECT_NAME)
+    })
+
+    test('Should cache MCMS context when ACTIVITY_TYPE query param is present', async () => {
+      await makeGetRequest({
+        url: `${routes.EXEMPTION}?ACTIVITY_TYPE=CON&ARTICLE=17`,
+        server: getServer()
+      })
+
+      expect(cacheMcmsContextFromQueryParams).toHaveBeenCalledTimes(1)
+    })
+
+    test('Should not call cacheMcmsContextFromQueryParams when ACTIVITY_TYPE is absent', async () => {
+      vi.mocked(cacheMcmsContextFromQueryParams).mockClear()
+
+      await makeGetRequest({
+        url: routes.EXEMPTION,
+        server: getServer()
+      })
+
+      expect(cacheMcmsContextFromQueryParams).not.toHaveBeenCalled()
     })
   })
 })

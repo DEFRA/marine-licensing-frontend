@@ -108,6 +108,7 @@ export const confirmIndividualSubmitController = {
 
     return h.view(CONFIRM_INDIVIDUAL_VIEW_ROUTE, {
       ...viewContent,
+      payload,
       heading: generateHeadingText(userSession)
     })
   }

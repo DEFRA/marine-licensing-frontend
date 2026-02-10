@@ -5,6 +5,8 @@ import {
   mapErrorsForDisplay
 } from '#src/server/common/helpers/errors.js'
 import joi from 'joi'
+import { generateHeadingText } from '#src/server/defraid-post-login/confirm-individual/utils.js'
+import { postloginUserSession } from '#src/server/common/helpers/defraid-login/session-cache.js'
 
 export const CONFIRM_INDIVIDUAL_VIEW_ROUTE =
   'defraid-post-login/confirm-individual/index'
@@ -29,18 +31,15 @@ export const confirmIndividualController = {
       return h.redirect(routes.SIGNIN)
     }
 
-    const { displayName, userRelationshipType } = userSession
+    const { userRelationshipType } = userSession
 
     if (userRelationshipType !== 'Citizen') {
       return h.redirect(routes.EXEMPTION)
     }
 
-    const heading = `Confirm you're notifying us as ${displayName} for a personal project`
-
     return h.view(CONFIRM_INDIVIDUAL_VIEW_ROUTE, {
       ...viewContent,
-      heading,
-      displayName
+      heading: generateHeadingText(userSession)
     })
   }
 }
@@ -49,7 +48,7 @@ export const confirmIndividualSubmitController = {
   options: {
     validate: {
       payload: joi.object({
-        confirmIndividual: joi.string().valid('Yes', 'No').required().messages({
+        confirmIndividual: joi.string().valid('yes', 'no').required().messages({
           'any.only': 'POST_LOGIN_CONFIRM_INDIVIDUAL_CHOICE_REQUIRED',
           'string.empty': 'POST_LOGIN_CONFIRM_INDIVIDUAL_CHOICE_REQUIRED',
           'any.required': 'POST_LOGIN_CONFIRM_INDIVIDUAL_CHOICE_REQUIRED'
@@ -57,6 +56,7 @@ export const confirmIndividualSubmitController = {
       }),
       failAction: async (request, h, err) => {
         const { payload } = request
+
         const userSession = await getUserSession(
           request,
           request.state?.userSession
@@ -65,9 +65,6 @@ export const confirmIndividualSubmitController = {
         if (!userSession?.displayName) {
           return h.redirect(routes.SIGNIN)
         }
-        const { displayName } = userSession
-
-        const heading = `Confirm you're notifying us as ${displayName} for a personal project`
 
         const errorSummary = mapErrorsForDisplay(err.details, errorMessages)
 
@@ -76,8 +73,7 @@ export const confirmIndividualSubmitController = {
         return h
           .view(CONFIRM_INDIVIDUAL_VIEW_ROUTE, {
             ...viewContent,
-            heading,
-            displayName,
+            heading: generateHeadingText(userSession),
             payload,
             errors,
             errorSummary
@@ -87,6 +83,8 @@ export const confirmIndividualSubmitController = {
     }
   },
   async handler(request, h) {
+    const { payload } = request
+
     const userSession = await getUserSession(
       request,
       request.state?.userSession
@@ -95,18 +93,22 @@ export const confirmIndividualSubmitController = {
     if (!userSession?.displayName) {
       return h.redirect(routes.SIGNIN)
     }
-    const { displayName, userRelationshipType } = userSession
 
-    if (userRelationshipType !== 'Citizen') {
+    const { confirmIndividual } = payload
+
+    await postloginUserSession.set({
+      request,
+      key: 'confirmIndividual',
+      value: confirmIndividual
+    })
+
+    if (confirmIndividual === 'yes') {
       return h.redirect(routes.PROJECT_NAME)
     }
 
-    const heading = `Confirm you're notifying us as ${displayName} for a personal project`
-
     return h.view(CONFIRM_INDIVIDUAL_VIEW_ROUTE, {
       ...viewContent,
-      heading,
-      displayName
+      heading: generateHeadingText(userSession)
     })
   }
 }

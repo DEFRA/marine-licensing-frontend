@@ -56,7 +56,6 @@ describe('#postLoginConfirmIndividual', () => {
       await confirmIndividualSubmitController.handler(request, h)
 
       expect(h.view).toHaveBeenCalledWith(CONFIRM_INDIVIDUAL_VIEW_ROUTE, {
-        displayName: `${citizenUserSession.displayName}`,
         heading: `Confirm you're notifying us as ${citizenUserSession.displayName} for a personal project`,
         pageTitle: "Confirm you're notifying us as an individual"
       })
@@ -71,7 +70,6 @@ describe('#postLoginConfirmIndividual', () => {
       await confirmIndividualSubmitController.handler(request, h)
 
       expect(h.view).toHaveBeenCalledWith(CONFIRM_INDIVIDUAL_VIEW_ROUTE, {
-        displayName: `${citizenUserSession.displayName}`,
         heading: `Confirm you're notifying us as ${citizenUserSession.displayName} for a personal project`,
         pageTitle: "Confirm you're notifying us as an individual"
       })
@@ -82,13 +80,24 @@ describe('#postLoginConfirmIndividual', () => {
         confirmIndividualSubmitController.options.validate.payload
 
       expect(
-        validationSchema.validate({ confirmIndividual: 'Yes' }).error
+        validationSchema.validate({ confirmIndividual: 'yes' }).error
       ).toBeUndefined()
       expect(
-        validationSchema.validate({ confirmIndividual: 'No' }).error
+        validationSchema.validate({ confirmIndividual: 'no' }).error
       ).toBeUndefined()
 
       expect(validationSchema.validate({}).error).toBeDefined()
+    })
+
+    test('should redirect if user confirms they are individual user', async () => {
+      const request = createMockRequest({
+        payload: { confirmIndividual: 'yes' }
+      })
+      const h = createMockH()
+      await confirmIndividualSubmitController.handler(request, h)
+
+      expect(h.redirect).toHaveBeenCalledWith(routes.PROJECT_NAME)
+      expect(h.view).not.toHaveBeenCalled()
     })
   })
 })

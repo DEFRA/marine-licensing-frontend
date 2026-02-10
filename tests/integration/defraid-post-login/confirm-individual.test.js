@@ -8,6 +8,7 @@ import { getUserSession } from '~/src/server/common/plugins/auth/utils.js'
 import { makePostRequest } from '~/src/server/test-helpers/server-requests.js'
 import { JSDOM } from 'jsdom'
 import { validateErrors } from '~/tests/integration/shared/expect-utils.js'
+import { statusCodes } from '#src/server/common/constants/status-codes.js'
 
 vi.mock('~/src/server/common/plugins/auth/utils.js')
 
@@ -75,5 +76,32 @@ describe('Post-login - Confirm Individual', () => {
         selector: '.govuk-error-message'
       })
     ).toBeInTheDocument()
+  })
+
+  test('should redirect correctly when user confirms they are individual user', async () => {
+    const { headers, statusCode } = await makePostRequest({
+      url: routes.postLogin.CONFIRM_INDIVIDUAL,
+      server: getServer(),
+      formData: { confirmIndividual: 'yes' }
+    })
+
+    expect(statusCode).toBe(statusCodes.redirect)
+    expect(headers.location).toBe(routes.PROJECT_NAME)
+  })
+
+  test('should redirect correctly when user confirms they are not individual user', async () => {
+    const { result } = await makePostRequest({
+      url: routes.postLogin.CONFIRM_INDIVIDUAL,
+      server: getServer(),
+      formData: { confirmIndividual: 'no' }
+    })
+
+    const { document } = new JSDOM(result).window
+
+    const pageHeading = within(document).getByRole('heading', {
+      level: 1,
+      name: `Confirm you're notifying us as ${citizenUserSession.displayName} for a personal project`
+    })
+    expect(pageHeading).toBeInTheDocument()
   })
 })

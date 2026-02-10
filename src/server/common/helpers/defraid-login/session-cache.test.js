@@ -1,6 +1,6 @@
-import { preloginUserSession } from '#src/server/common/helpers/defraid-pre-login/session-cache.js'
+import { preloginUserSession } from '#src/server/common/helpers/defraid-login/session-cache.js'
 
-describe('Session cache for Defra ID pre-login', () => {
+describe('Session cache for Defra ID login', () => {
   let request
 
   beforeEach(() => {

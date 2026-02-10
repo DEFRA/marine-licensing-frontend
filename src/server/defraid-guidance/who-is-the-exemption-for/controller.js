@@ -13,13 +13,13 @@ const viewData = {
   heading: title
 }
 export const pathToPageTemplate =
-  'defraid-pre-login/who-is-the-exemption-for/index'
+  'defraid-guidance/who-is-the-exemption-for/index'
 export const errorMessages = {
   WHO_IS_EXEMPTION_FOR_REQUIRED:
     'Select who the exempt activity notification is for'
 }
 
-export const preLoginWhoIsExemptionForController = {
+export const defraIdGuidanceWhoIsExemptionForController = {
   async handler(request, h) {
     if (request.state?.userSession) {
       return h.redirect(routes.PROJECT_NAME)
@@ -34,7 +34,7 @@ export const preLoginWhoIsExemptionForController = {
   }
 }
 
-export const preLoginWhoIsExemptionForSubmitController = {
+export const defraIdGuidanceWhoIsExemptionForSubmitController = {
   options: {
     auth: false,
     validate: {
@@ -72,9 +72,9 @@ export const preLoginWhoIsExemptionForSubmitController = {
     }
 
     if (whoIsExemptionFor === 'organisation') {
-      return h.redirect(routes.preLogin.CHECK_SETUP_EMPLOYEE)
+      return h.redirect(routes.defraIdGuidance.CHECK_SETUP_EMPLOYEE)
     }
 
-    return h.redirect(routes.preLogin.WHO_IS_EXEMPTION_FOR)
+    return h.redirect(routes.defraIdGuidance.WHO_IS_EXEMPTION_FOR)
   }
 }

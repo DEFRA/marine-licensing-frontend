@@ -4,21 +4,21 @@ import { loadPage, submitForm } from '~/tests/integration/shared/app-server.js'
 import { expectFieldsetError } from '~/tests/integration/shared/expect-utils.js'
 import { getByLabelText, within } from '@testing-library/dom'
 
-vi.mock('#src/server/common/helpers/defraid-pre-login/session-cache.js', () => {
+vi.mock('#src/server/common/helpers/defraid-guidance/session-cache.js', () => {
   const cache = {}
   return {
-    preloginUserSession: {
+    defraIdGuidanceUserSession: {
       set: async ({ request, key, value }) => (cache[key] = value),
       get: async ({ request, key }) => cache[key]
     }
   }
 })
 
-describe('Pre-login - Check set-up (employee)', () => {
+describe('Guidance - Check set-up (employee)', () => {
   const getServer = setupTestServer()
   const submitPageForm = async (formData) => {
     const { document } = await submitForm({
-      requestUrl: routes.preLogin.CHECK_SETUP_EMPLOYEE,
+      requestUrl: routes.defraIdGuidance.CHECK_SETUP_EMPLOYEE,
       server: getServer(),
       formData
     })
@@ -27,7 +27,7 @@ describe('Pre-login - Check set-up (employee)', () => {
 
   it('should display page "Check you are set up to apply for your organisation"', async () => {
     const document = await loadPage({
-      requestUrl: routes.preLogin.CHECK_SETUP_EMPLOYEE,
+      requestUrl: routes.defraIdGuidance.CHECK_SETUP_EMPLOYEE,
       server: getServer()
     })
     const pageHeading = within(document).getByRole('heading', {
@@ -52,7 +52,7 @@ describe('Pre-login - Check set-up (employee)', () => {
     })
     // reload the same page
     const document = await loadPage({
-      requestUrl: routes.preLogin.CHECK_SETUP_EMPLOYEE,
+      requestUrl: routes.defraIdGuidance.CHECK_SETUP_EMPLOYEE,
       server: getServer()
     })
     const radioButton = getByLabelText(

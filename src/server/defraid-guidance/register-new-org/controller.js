@@ -1,6 +1,6 @@
 import { routes } from '#src/server/common/constants/routes.js'
 
-const backLink = routes.preLogin.CHECK_SETUP_EMPLOYEE
+const backLink = routes.defraIdGuidance.CHECK_SETUP_EMPLOYEE
 const title = 'Create a new Defra account for your organisation'
 const viewData = {
   pageTitle: title,
@@ -8,9 +8,9 @@ const viewData = {
   backLink,
   signinUrl: routes.SIGNIN
 }
-export const pathToPageTemplate = 'defraid-pre-login/register-new-org/index'
+export const pathToPageTemplate = 'defraid-guidance/register-new-org/index'
 
-export const preLoginRegisterNewOrgController = {
+export const defraIdGuidanceRegisterNewOrgController = {
   handler(_request, h) {
     return h.view(pathToPageTemplate, viewData)
   }

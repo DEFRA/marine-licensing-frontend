@@ -4,24 +4,24 @@ import {
   mapErrorsForDisplay
 } from '#src/server/common/helpers/errors.js'
 import { routes } from '#src/server/common/constants/routes.js'
-import { preloginUserSession } from '#src/server/common/helpers/defraid-pre-login/session-cache.js'
+import { defraIdGuidanceUserSession } from '#src/server/common/helpers/defraid-guidance/session-cache.js'
 
-const backLink = routes.preLogin.WHO_IS_EXEMPTION_FOR
+const backLink = routes.defraIdGuidance.WHO_IS_EXEMPTION_FOR
 const title = 'Check you are set up to apply for your organisation'
 const viewData = {
   pageTitle: title,
   heading: title,
   backLink
 }
-export const pathToPageTemplate = 'defraid-pre-login/check-setup-employee/index'
+export const pathToPageTemplate = 'defraid-guidance/check-setup-employee/index'
 export const errorMessages = {
   CHECK_SETUP_EMPLOYEE_REQUIRED:
     'Select if you have a Defra account for your organisation'
 }
 
-export const preLoginCheckSetupEmployeeController = {
+export const defraIdGuidanceCheckSetupEmployeeController = {
   async handler(request, h) {
-    const checkSetupEmployee = await preloginUserSession.get({
+    const checkSetupEmployee = await defraIdGuidanceUserSession.get({
       request,
       key: 'checkSetupEmployee'
     })
@@ -29,7 +29,7 @@ export const preLoginCheckSetupEmployeeController = {
   }
 }
 
-export const preLoginCheckSetupEmployeeSubmitController = {
+export const defraIdGuidanceCheckSetupEmployeeSubmitController = {
   options: {
     auth: false,
     validate: {
@@ -61,7 +61,7 @@ export const preLoginCheckSetupEmployeeSubmitController = {
   },
   async handler(request, h) {
     const selection = request.payload.checkSetupEmployee
-    await preloginUserSession.set({
+    await defraIdGuidanceUserSession.set({
       request,
       key: 'checkSetupEmployee',
       value: selection
@@ -70,8 +70,8 @@ export const preLoginCheckSetupEmployeeSubmitController = {
       return h.redirect(routes.SIGNIN)
     }
     if (selection === 'need-to-be-added') {
-      return h.redirect(routes.preLogin.ADD_TO_ORG_ACCOUNT)
+      return h.redirect(routes.defraIdGuidance.ADD_TO_ORG_ACCOUNT)
     }
-    return h.redirect(routes.preLogin.REGISTER_NEW_ORG)
+    return h.redirect(routes.defraIdGuidance.REGISTER_NEW_ORG)
   }
 }

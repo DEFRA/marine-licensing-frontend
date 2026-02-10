@@ -3,12 +3,12 @@ import { routes } from '~/src/server/common/constants/routes.js'
 import { loadPage } from '~/tests/integration/shared/app-server.js'
 import { within } from '@testing-library/dom'
 
-describe('Pre-login - Employee needs to be added to org account', () => {
+describe('Guidance - Employee needs to be added to org account', () => {
   const getServer = setupTestServer()
 
   it('should display page "You need to be added to your organisation’s Defra account"', async () => {
     const document = await loadPage({
-      requestUrl: routes.preLogin.ADD_TO_ORG_ACCOUNT,
+      requestUrl: routes.defraIdGuidance.ADD_TO_ORG_ACCOUNT,
       server: getServer()
     })
     const pageHeading = within(document).getByRole('heading', {
@@ -18,6 +18,6 @@ describe('Pre-login - Employee needs to be added to org account', () => {
     expect(pageHeading).toBeInTheDocument()
     expect(
       within(document).getByRole('link', { name: 'Back' })
-    ).toHaveAttribute('href', '/prelogin/check-setup-employee')
+    ).toHaveAttribute('href', '/guidance/check-setup-employee')
   })
 })

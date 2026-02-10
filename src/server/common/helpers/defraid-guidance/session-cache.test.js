@@ -1,6 +1,6 @@
-import { preloginUserSession } from '#src/server/common/helpers/defraid-pre-login/session-cache.js'
+import { defraIdGuidanceUserSession } from '#src/server/common/helpers/defraid-guidance/session-cache.js'
 
-describe('Session cache for Defra ID pre-login', () => {
+describe('Session cache for Defra ID guidance', () => {
   let request
 
   beforeEach(() => {
@@ -15,24 +15,24 @@ describe('Session cache for Defra ID pre-login', () => {
 
   describe('set', () => {
     it('saves the provided value', async () => {
-      await preloginUserSession.set({
+      await defraIdGuidanceUserSession.set({
         request,
         key: 'checkSetupEmployee',
         value: 'register-new'
       })
-      expect(request.yar.set).toHaveBeenCalledWith('defraIdPreLogin', {
+      expect(request.yar.set).toHaveBeenCalledWith('defraIdGuidance', {
         checkSetupEmployee: 'register-new'
       })
     })
 
     it('merges the new property with any existing object in the cache', async () => {
       request.yar.get.mockResolvedValue({ existingKey: 'existingValue' })
-      await preloginUserSession.set({
+      await defraIdGuidanceUserSession.set({
         request,
         key: 'checkSetupEmployee',
         value: 'register-new'
       })
-      expect(request.yar.set).toHaveBeenCalledWith('defraIdPreLogin', {
+      expect(request.yar.set).toHaveBeenCalledWith('defraIdGuidance', {
         existingKey: 'existingValue',
         checkSetupEmployee: 'register-new'
       })
@@ -45,7 +45,7 @@ describe('Session cache for Defra ID pre-login', () => {
         checkSetupEmployee: 'existingValue',
         otherKey: 'otherValue'
       })
-      const value = await preloginUserSession.get({
+      const value = await defraIdGuidanceUserSession.get({
         request,
         key: 'checkSetupEmployee'
       })

@@ -3,8 +3,8 @@ import { routes } from '#src/server/common/constants/routes.js'
 import { cacheMcmsContextFromQueryParams } from '#src/server/common/helpers/mcms-context/cache-mcms-context.js'
 import { clearExemptionCache } from '#src/server/common/helpers/exemptions/session-cache/utils.js'
 import {
-  preLoginWhoIsExemptionForController,
-  preLoginWhoIsExemptionForSubmitController,
+  defraIdGuidanceWhoIsExemptionForController,
+  defraIdGuidanceWhoIsExemptionForSubmitController,
   pathToPageTemplate,
   errorMessages
 } from './controller.js'
@@ -32,7 +32,7 @@ const createMockH = () => ({
   view: vi.fn().mockReturnThis()
 })
 
-describe('preLoginWhoIsExemptionForController', () => {
+describe('defraIdGuidanceWhoIsExemptionForController', () => {
   beforeEach(() => {
     vi.clearAllMocks()
   })
@@ -44,7 +44,7 @@ describe('preLoginWhoIsExemptionForController', () => {
       })
       const h = createMockH()
 
-      await preLoginWhoIsExemptionForController.handler(request, h)
+      await defraIdGuidanceWhoIsExemptionForController.handler(request, h)
 
       expect(h.redirect).toHaveBeenCalledWith(routes.PROJECT_NAME)
       expect(h.view).not.toHaveBeenCalled()
@@ -54,7 +54,7 @@ describe('preLoginWhoIsExemptionForController', () => {
       const request = createMockRequest({ state: {} })
       const h = createMockH()
 
-      await preLoginWhoIsExemptionForController.handler(request, h)
+      await defraIdGuidanceWhoIsExemptionForController.handler(request, h)
 
       expect(h.view).toHaveBeenCalledWith(pathToPageTemplate, {
         pageTitle: 'Who is this exempt activity notification for?',
@@ -67,7 +67,7 @@ describe('preLoginWhoIsExemptionForController', () => {
       const request = createMockRequest({ state: undefined })
       const h = createMockH()
 
-      await preLoginWhoIsExemptionForController.handler(request, h)
+      await defraIdGuidanceWhoIsExemptionForController.handler(request, h)
 
       expect(h.view).toHaveBeenCalled()
       expect(h.redirect).not.toHaveBeenCalled()
@@ -79,7 +79,7 @@ describe('preLoginWhoIsExemptionForController', () => {
       })
       const h = createMockH()
 
-      await preLoginWhoIsExemptionForController.handler(request, h)
+      await defraIdGuidanceWhoIsExemptionForController.handler(request, h)
 
       expect(cacheMcmsContextFromQueryParams).toHaveBeenCalledWith(request)
     })
@@ -88,7 +88,7 @@ describe('preLoginWhoIsExemptionForController', () => {
       const request = createMockRequest({ query: {} })
       const h = createMockH()
 
-      await preLoginWhoIsExemptionForController.handler(request, h)
+      await defraIdGuidanceWhoIsExemptionForController.handler(request, h)
 
       expect(cacheMcmsContextFromQueryParams).not.toHaveBeenCalled()
     })
@@ -97,20 +97,22 @@ describe('preLoginWhoIsExemptionForController', () => {
       const request = createMockRequest()
       const h = createMockH()
 
-      await preLoginWhoIsExemptionForController.handler(request, h)
+      await defraIdGuidanceWhoIsExemptionForController.handler(request, h)
 
       expect(clearExemptionCache).toHaveBeenCalledWith(request, h)
     })
   })
 })
 
-describe('preLoginWhoIsExemptionForSubmitController', () => {
+describe('defraIdGuidanceWhoIsExemptionForSubmitController', () => {
   beforeEach(() => {
     vi.clearAllMocks()
   })
 
   test('has auth: false option', () => {
-    expect(preLoginWhoIsExemptionForSubmitController.options.auth).toBe(false)
+    expect(defraIdGuidanceWhoIsExemptionForSubmitController.options.auth).toBe(
+      false
+    )
   })
 
   describe('POST handler', () => {
@@ -120,7 +122,7 @@ describe('preLoginWhoIsExemptionForSubmitController', () => {
       })
       const h = createMockH()
 
-      await preLoginWhoIsExemptionForSubmitController.handler(request, h)
+      await defraIdGuidanceWhoIsExemptionForSubmitController.handler(request, h)
 
       expect(h.redirect).toHaveBeenCalledWith(routes.SIGNIN)
     })
@@ -131,10 +133,10 @@ describe('preLoginWhoIsExemptionForSubmitController', () => {
       })
       const h = createMockH()
 
-      await preLoginWhoIsExemptionForSubmitController.handler(request, h)
+      await defraIdGuidanceWhoIsExemptionForSubmitController.handler(request, h)
 
       expect(h.redirect).toHaveBeenCalledWith(
-        routes.preLogin.CHECK_SETUP_EMPLOYEE
+        routes.defraIdGuidance.CHECK_SETUP_EMPLOYEE
       )
     })
 
@@ -144,10 +146,10 @@ describe('preLoginWhoIsExemptionForSubmitController', () => {
       })
       const h = createMockH()
 
-      await preLoginWhoIsExemptionForSubmitController.handler(request, h)
+      await defraIdGuidanceWhoIsExemptionForSubmitController.handler(request, h)
 
       expect(h.redirect).toHaveBeenCalledWith(
-        routes.preLogin.WHO_IS_EXEMPTION_FOR
+        routes.defraIdGuidance.WHO_IS_EXEMPTION_FOR
       )
     })
   })
@@ -155,7 +157,8 @@ describe('preLoginWhoIsExemptionForSubmitController', () => {
   describe('validation', () => {
     test('validates whoIsExemptionFor is required', () => {
       const schema =
-        preLoginWhoIsExemptionForSubmitController.options.validate.payload
+        defraIdGuidanceWhoIsExemptionForSubmitController.options.validate
+          .payload
       const result = schema.validate({})
 
       expect(result.error).toBeDefined()
@@ -163,7 +166,8 @@ describe('preLoginWhoIsExemptionForSubmitController', () => {
 
     test('validates whoIsExemptionFor accepts individual', () => {
       const schema =
-        preLoginWhoIsExemptionForSubmitController.options.validate.payload
+        defraIdGuidanceWhoIsExemptionForSubmitController.options.validate
+          .payload
       const result = schema.validate({ whoIsExemptionFor: 'individual' })
 
       expect(result.error).toBeUndefined()
@@ -171,7 +175,8 @@ describe('preLoginWhoIsExemptionForSubmitController', () => {
 
     test('validates whoIsExemptionFor accepts organisation', () => {
       const schema =
-        preLoginWhoIsExemptionForSubmitController.options.validate.payload
+        defraIdGuidanceWhoIsExemptionForSubmitController.options.validate
+          .payload
       const result = schema.validate({ whoIsExemptionFor: 'organisation' })
 
       expect(result.error).toBeUndefined()
@@ -179,7 +184,8 @@ describe('preLoginWhoIsExemptionForSubmitController', () => {
 
     test('validates whoIsExemptionFor accepts client', () => {
       const schema =
-        preLoginWhoIsExemptionForSubmitController.options.validate.payload
+        defraIdGuidanceWhoIsExemptionForSubmitController.options.validate
+          .payload
       const result = schema.validate({ whoIsExemptionFor: 'client' })
 
       expect(result.error).toBeUndefined()
@@ -187,7 +193,8 @@ describe('preLoginWhoIsExemptionForSubmitController', () => {
 
     test('validates whoIsExemptionFor rejects invalid value', () => {
       const schema =
-        preLoginWhoIsExemptionForSubmitController.options.validate.payload
+        defraIdGuidanceWhoIsExemptionForSubmitController.options.validate
+          .payload
       const result = schema.validate({ whoIsExemptionFor: 'invalid' })
 
       expect(result.error).toBeDefined()
@@ -195,7 +202,8 @@ describe('preLoginWhoIsExemptionForSubmitController', () => {
 
     test('validates whoIsExemptionFor rejects empty string', () => {
       const schema =
-        preLoginWhoIsExemptionForSubmitController.options.validate.payload
+        defraIdGuidanceWhoIsExemptionForSubmitController.options.validate
+          .payload
       const result = schema.validate({ whoIsExemptionFor: '' })
 
       expect(result.error).toBeDefined()
@@ -214,7 +222,7 @@ describe('errorMessages', () => {
 describe('pathToPageTemplate', () => {
   test('returns correct template path', () => {
     expect(pathToPageTemplate).toBe(
-      'defraid-pre-login/who-is-the-exemption-for/index'
+      'defraid-guidance/who-is-the-exemption-for/index'
     )
   })
 })

@@ -163,8 +163,20 @@ describe('Page accessibility checks (Axe)', () => {
       isMarineLicense: true
     },
     {
+      url: routes.defraIdGuidance.WHO_IS_EXEMPTION_FOR,
+      title: 'Who is this exempt activity notification for?'
+    },
+    {
       url: routes.defraIdGuidance.CHECK_SETUP_EMPLOYEE,
       title: 'Check you are set up to apply for your organisation'
+    },
+    {
+      url: routes.defraIdGuidance.CHECK_SETUP_CLIENT,
+      title: 'Check you are set up to apply for your client'
+    },
+    {
+      url: routes.defraIdGuidance.REGISTER_NEW_ORG,
+      title: 'Create a new Defra account for your organisation'
     },
     {
       url: routes.defraIdGuidance.ADD_TO_ORG_ACCOUNT,

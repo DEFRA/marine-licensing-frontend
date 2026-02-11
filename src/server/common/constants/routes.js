@@ -50,7 +50,7 @@ export const preLoginRoutes = {
 }
 
 export const postLoginRoutes = {
-  CONFIRM_INDIVIDUAL: '/exemption/confirm-individual'
+  CONFIRM_INDIVIDUAL: '/confirm-individual'
 }
 
 export const routes = {

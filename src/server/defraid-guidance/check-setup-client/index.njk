@@ -3,6 +3,12 @@
 {% from "govuk/components/button/macro.njk" import govukButton %}
 {% from "govuk/components/radios/macro.njk" import govukRadios %}
 {% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+{% from "radio-page/macro.njk" import appRadioPage %}
+
+{% block beforeContent %}
+  {{ super() }}
+  {{  appBackLink({backLink: backLink}) }}
+{% endblock %}
 
 {% block content %}
 
@@ -20,34 +26,39 @@
       </h1>
       <div class="govuk-body" data-testid="app-page-body">
         {{ govukWarningText({
-          text: "If you do not set up your Defra account correctly, your exempt activity notification will not be valid. This is because it will not be registered to the person or organisation the exemption is for.",
+          text: "If you do not set up your Defra account correctly, your exempt activity notification will not be valid. This is because it will not be registered to the organisation the exemption is for.",
           iconFallbackText: "Warning"
         }) }}
+        <p class="govuk-body">
+          To notify us of an exemption for a client, they must invite you to their account as an intermediary and give you access to the 'Get permission for marine work' service. You cannot use a personal individual account.
+        </p>
         <form method="POST">
           <input type="hidden" name="csrfToken" value="{{csrfToken}}" />
           {{ govukRadios({
-            idPrefix: 'whoIsExemptionFor',
-            name: 'whoIsExemptionFor',
-            value: whoIsExemptionFor,
+            idPrefix: 'checkSetupClient',
+            name: 'checkSetupClient',
+            value: checkSetupClient,
             fieldset: {
               legend: {
-                html: 'Who is this exempt activity notification for?',
-                classes: "govuk-visually-hidden"
+                html: 'Has your client fully linked you to their Defra account?',
+                classes: "govuk-fieldset__legend govuk-fieldset__legend--m"
               }
             },
             errorMessage: errorMessage,
             items: [
               {
-                value: "individual",
-                text: "Myself as an individual - it’s a personal project"
+                value: "yes",
+                text: "Yes",
+                hint: {
+                  text: "I have accepted their email invitation and they have given me access to the 'Get permission for marine work' service"
+                }
               },
               {
-                value: "organisation",
-                text: "The organisation I’m an employee of"
-              },
-              {
-                value: "client",
-                text: "A client - you’re an agent or intermediary notifying us on behalf of another organisation"
+                value: "no",
+                text: "No",
+                hint: {
+                  text: "I have not received an invitation or I do not have access to the service yet"
+                }
               }
             ]
           }) }}

@@ -4,6 +4,10 @@ import {
   defraIdGuidanceCheckSetupEmployeeSubmitController
 } from '#src/server/defraid-guidance/check-setup-employee/controller.js'
 import {
+  defraIdGuidanceCheckSetupClientController,
+  defraIdGuidanceCheckSetupClientSubmitController
+} from '#src/server/defraid-guidance/check-setup-client/controller.js'
+import {
   defraIdGuidanceWhoIsExemptionForController,
   defraIdGuidanceWhoIsExemptionForSubmitController
 } from '#src/server/defraid-guidance/who-is-the-exemption-for/controller.js'
@@ -38,6 +42,17 @@ export const defraIdGuidance = {
           method: 'POST',
           path: routes.defraIdGuidance.CHECK_SETUP_EMPLOYEE,
           ...defraIdGuidanceCheckSetupEmployeeSubmitController
+        },
+        {
+          method: 'GET',
+          path: routes.defraIdGuidance.CHECK_SETUP_CLIENT,
+          options: { auth: false },
+          ...defraIdGuidanceCheckSetupClientController
+        },
+        {
+          method: 'POST',
+          path: routes.defraIdGuidance.CHECK_SETUP_CLIENT,
+          ...defraIdGuidanceCheckSetupClientSubmitController
         },
         {
           method: 'GET',

@@ -55,8 +55,7 @@ describe('Guidance - Check set-up (client)', () => {
     const document = await submitPageForm({})
     expectFieldsetError({
       document,
-      fieldsetLabel:
-        'Has your client fully linked you to their Defra account?',
+      fieldsetLabel: 'Has your client fully linked you to their Defra account?',
       errorMessage:
         'Select whether your client has fully linked you to their Defra account'
     })

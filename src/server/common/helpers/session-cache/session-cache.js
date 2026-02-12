@@ -7,7 +7,7 @@ const sessionConfig = config.get('session')
 export const sessionCache = {
   plugin: yar,
   options: {
-    name: 'marine-licensing-session',
+    name: 'marineLicensingSession',
     maxCookieSize: 0, // this enforces the use of server-side caching
     cache: {
       cache: sessionConfig.cache.name,

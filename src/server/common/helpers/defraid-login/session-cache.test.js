@@ -1,4 +1,4 @@
-import { defraIdGuidanceUserSession } from '#src/server/common/helpers/defraid-guidance/session-cache.js'
+import { defraIdGuidanceUserSession } from '#src/server/common/helpers/defraid-login/session-cache.js'
 
 describe('Session cache for Defra ID guidance', () => {
   let request

@@ -1,4 +1,4 @@
-const PRE_LOGIN_CACHE_PARENT_KEY = 'defraIdPreLogin'
+const GUIDANCE_CACHE_PARENT_KEY = 'defraIdGuidance'
 const POST_LOGIN_CACHE_PARENT_KEY = 'defraIdPostLogin'
 
 const loginCache = (CACHE_PARENT_KEY) => ({
@@ -12,5 +12,5 @@ const loginCache = (CACHE_PARENT_KEY) => ({
   }
 })
 
-export const preloginUserSession = loginCache(PRE_LOGIN_CACHE_PARENT_KEY)
+export const defraIdGuidanceUserSession = loginCache(GUIDANCE_CACHE_PARENT_KEY)
 export const postloginUserSession = loginCache(POST_LOGIN_CACHE_PARENT_KEY)

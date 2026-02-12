@@ -4,6 +4,7 @@ import {
   errorDescriptionByFieldName,
   mapErrorsForDisplay
 } from '#src/server/common/helpers/errors.js'
+import { validateIndividualUserSession } from '#src/server/common/helpers/user-session-validators.js'
 import joi from 'joi'
 import { generateHeadingText } from '#src/server/defraid-post-login/confirm-individual/utils.js'
 import { postloginUserSession } from '#src/server/common/helpers/defraid-login/session-cache.js'
@@ -21,21 +22,14 @@ export const errorMessages = {
 }
 
 export const confirmIndividualController = {
+  options: {
+    pre: [validateIndividualUserSession]
+  },
   async handler(request, h) {
     const userSession = await getUserSession(
       request,
       request.state?.userSession
     )
-
-    if (!userSession?.displayName) {
-      return h.redirect(routes.SIGNIN)
-    }
-
-    const { userRelationshipType } = userSession
-
-    if (userRelationshipType !== 'Citizen') {
-      return h.redirect(routes.EXEMPTION)
-    }
 
     return h.view(CONFIRM_INDIVIDUAL_VIEW_ROUTE, {
       ...viewContent,
@@ -46,6 +40,7 @@ export const confirmIndividualController = {
 
 export const confirmIndividualSubmitController = {
   options: {
+    pre: [validateIndividualUserSession],
     validate: {
       payload: joi.object({
         confirmIndividual: joi.string().valid('yes', 'no').required().messages({
@@ -56,16 +51,10 @@ export const confirmIndividualSubmitController = {
       }),
       failAction: async (request, h, err) => {
         const { payload } = request
-
         const userSession = await getUserSession(
           request,
           request.state?.userSession
         )
-
-        if (!userSession?.displayName) {
-          return h.redirect(routes.SIGNIN)
-        }
-
         const errorSummary = mapErrorsForDisplay(err.details, errorMessages)
 
         const errors = errorDescriptionByFieldName(errorSummary)

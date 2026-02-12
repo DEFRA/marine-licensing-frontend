@@ -1,5 +1,6 @@
 import { getUserSession } from '#src/server/common/plugins/auth/utils.js'
 import { routes } from '#src/server/common/constants/routes.js'
+import { USER_TYPES } from '#src/server/common/constants/user-types'
 
 const validateSessionExists = (userSession, h) => {
   if (!userSession?.displayName) {
@@ -20,7 +21,7 @@ export const validateIndividualUserSession = {
 
     const { userRelationshipType } = userSession
 
-    if (userRelationshipType !== 'Citizen') {
+    if (userRelationshipType !== USER_TYPES.CITIZEN) {
       return h.redirect(routes.EXEMPTION).takeover()
     }
 

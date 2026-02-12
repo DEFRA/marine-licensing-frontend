@@ -3,6 +3,7 @@ import { exemption } from '#src/server/exemption/index.js'
 import { getPageViewCommonData } from '#src/server/common/helpers/page-view-common-data.js'
 import { getUserSession } from '#src/server/common/plugins/auth/utils.js'
 import { routes } from '#src/server/common/constants/routes.js'
+import { USER_TYPES } from '#src/server/common/constants/user-types'
 
 vi.mock('~/src/server/common/helpers/page-view-common-data.js')
 vi.mock('~/src/server/common/plugins/auth/utils.js')
@@ -258,7 +259,9 @@ describe('exemption route', () => {
   })
 
   test('GET /exemption handler should redirect Citizen to confirm-individual', async () => {
-    getUserSession.mockResolvedValue({ userRelationshipType: 'Citizen' })
+    getUserSession.mockResolvedValue({
+      userRelationshipType: USER_TYPES.CITIZEN
+    })
 
     const server = {
       route: vi.fn(),

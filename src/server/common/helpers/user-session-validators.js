@@ -1,6 +1,6 @@
 import { getUserSession } from '#src/server/common/plugins/auth/utils.js'
 import { routes } from '#src/server/common/constants/routes.js'
-import { USER_TYPES } from '#src/server/common/constants/user-types'
+import { USER_TYPES } from '#src/server/common/constants/user-types.js'
 
 const validateSessionExists = (userSession, h) => {
   if (!userSession?.displayName) {

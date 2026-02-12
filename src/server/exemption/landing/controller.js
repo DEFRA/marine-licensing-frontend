@@ -1,7 +1,7 @@
 import { getUserSession } from '#src/server/common/plugins/auth/utils.js'
 import { routes } from '#src/server/common/constants/routes.js'
 import { cacheMcmsContextFromQueryParams } from '#src/server/common/helpers/mcms-context/cache-mcms-context.js'
-import { USER_TYPES } from '#src/server/common/constants/user-types'
+import { USER_TYPES } from '#src/server/common/constants/user-types.js'
 
 export const exemptionLandingController = {
   async handler(request, h) {

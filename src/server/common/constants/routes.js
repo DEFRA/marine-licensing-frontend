@@ -42,11 +42,11 @@ export const marineLicenseRoutes = {
   MARINE_LICENSE_TASK_LIST: '/marine-license/task-list'
 }
 
-export const preLoginRoutes = {
-  WHO_IS_EXEMPTION_FOR: '/prelogin/who-is-the-exemption-for',
-  CHECK_SETUP_EMPLOYEE: '/prelogin/check-setup-employee',
-  REGISTER_NEW_ORG: '/prelogin/register-new-organisation',
-  ADD_TO_ORG_ACCOUNT: '/prelogin/add-to-org-account'
+export const defraIdGuidanceRoutes = {
+  WHO_IS_EXEMPTION_FOR: '/guidance/who-is-the-exemption-for',
+  CHECK_SETUP_EMPLOYEE: '/guidance/check-setup-employee',
+  REGISTER_NEW_ORG: '/guidance/register-new-organisation',
+  ADD_TO_ORG_ACCOUNT: '/guidance/add-to-org-account'
 }
 
 export const postLoginRoutes = {
@@ -54,8 +54,8 @@ export const postLoginRoutes = {
 }
 
 export const routes = {
-  preLogin: preLoginRoutes,
   postLogin: postLoginRoutes,
+  defraIdGuidance: defraIdGuidanceRoutes,
   ...exemptionRoutes,
   AUTH_DEFRA_ID_CALLBACK: '/signin-oidc',
   AUTH_ENTRA_ID_CALLBACK: '/auth',

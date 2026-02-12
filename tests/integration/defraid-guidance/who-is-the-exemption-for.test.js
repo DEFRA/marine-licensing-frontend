@@ -16,14 +16,14 @@ vi.mock('~/src/server/common/helpers/exemptions/session-cache/utils.js')
 
 describe('Who is the exemption for page', () => {
   const getServer = setupTestServer()
-  const url = routes.preLogin.WHO_IS_EXEMPTION_FOR
+  const url = routes.defraIdGuidance.WHO_IS_EXEMPTION_FOR
 
   beforeEach(() => {
     vi.mocked(cacheMcmsContextFromQueryParams).mockReturnValue(undefined)
     vi.mocked(clearExemptionCache).mockResolvedValue(undefined)
   })
 
-  describe('GET /prelogin/who-is-the-exemption-for', () => {
+  describe('GET /guidance/who-is-the-exemption-for', () => {
     test('renders page with correct heading', async () => {
       const { result, statusCode } = await makeGetRequest({
         server: getServer(),
@@ -163,7 +163,7 @@ describe('Who is the exemption for page', () => {
     })
   })
 
-  describe('POST /prelogin/who-is-the-exemption-for', () => {
+  describe('POST /guidance/who-is-the-exemption-for', () => {
     test('redirects to sign-in when individual selected', async () => {
       const { statusCode, headers } = await makePostRequest({
         server: getServer(),
@@ -183,7 +183,7 @@ describe('Who is the exemption for page', () => {
       })
 
       expect(statusCode).toBe(statusCodes.redirect)
-      expect(headers.location).toBe(routes.preLogin.CHECK_SETUP_EMPLOYEE)
+      expect(headers.location).toBe(routes.defraIdGuidance.CHECK_SETUP_EMPLOYEE)
     })
 
     test('redirects to self when client selected (placeholder)', async () => {
@@ -194,7 +194,7 @@ describe('Who is the exemption for page', () => {
       })
 
       expect(statusCode).toBe(statusCodes.redirect)
-      expect(headers.location).toBe(routes.preLogin.WHO_IS_EXEMPTION_FOR)
+      expect(headers.location).toBe(routes.defraIdGuidance.WHO_IS_EXEMPTION_FOR)
     })
 
     test('shows validation error when no radio selected', async () => {

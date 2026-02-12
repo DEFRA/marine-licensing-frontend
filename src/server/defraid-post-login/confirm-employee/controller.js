@@ -30,12 +30,13 @@ export const confirmEmployeeController = {
     )
 
     const heading = generateHeadingText(userSession)
-    const { organisationName } = userSession
+    const { organisationName, hasMultipleOrgPickerEntries } = userSession
 
     return h.view(CONFIRM_EMPLOYEE_VIEW_ROUTE, {
       heading,
       pageTitle: heading,
-      organisationName
+      organisationName,
+      hasMultipleOrgPickerEntries
     })
   }
 }
@@ -69,7 +70,7 @@ export const confirmEmployeeSubmitController = {
         const errors = errorDescriptionByFieldName(errorSummary)
 
         const heading = generateHeadingText(userSession)
-        const { organisationName } = userSession
+        const { organisationName, hasMultipleOrgPickerEntries } = userSession
 
         return h
           .view(CONFIRM_EMPLOYEE_VIEW_ROUTE, {
@@ -77,6 +78,7 @@ export const confirmEmployeeSubmitController = {
             pageTitle: heading,
             payload,
             organisationName,
+            hasMultipleOrgPickerEntries,
             errors,
             errorSummary
           })
@@ -105,13 +107,14 @@ export const confirmEmployeeSubmitController = {
     }
 
     const heading = generateHeadingText(userSession)
-    const { organisationName } = userSession
+    const { organisationName, hasMultipleOrgPickerEntries } = userSession
 
     return h.view(CONFIRM_EMPLOYEE_VIEW_ROUTE, {
       payload,
       heading,
       pageTitle: heading,
-      organisationName
+      organisationName,
+      hasMultipleOrgPickerEntries
     })
   }
 }

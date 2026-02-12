@@ -1,9 +1,12 @@
 import { setupTestServer } from '~/tests/integration/shared/test-setup-helpers.js'
 import { routes } from '~/src/server/common/constants/routes.js'
 import { loadPage } from '~/tests/integration/shared/app-server.js'
-import { getByRole, getByText, within } from '@testing-library/dom'
-import { beforeAll } from 'vitest'
-import { employeeSession } from '~/tests/integration/shared/session-fixtures.js'
+import { getByRole, getByText, queryByRole, within } from '@testing-library/dom'
+import { beforeAll, beforeEach } from 'vitest'
+import {
+  employeeSession,
+  employeeSessionWithMultipleOrgs
+} from '~/tests/integration/shared/session-fixtures.js'
 import { getUserSession } from '~/src/server/common/plugins/auth/utils.js'
 import { makePostRequest } from '~/src/server/test-helpers/server-requests.js'
 import { JSDOM } from 'jsdom'
@@ -16,6 +19,10 @@ describe('Post-login - Confirm Employee', () => {
   const getServer = setupTestServer()
 
   beforeAll(() => {
+    vi.mocked(getUserSession).mockResolvedValue(employeeSession)
+  })
+
+  beforeEach(() => {
     vi.mocked(getUserSession).mockResolvedValue(employeeSession)
   })
 
@@ -45,6 +52,29 @@ describe('Post-login - Confirm Employee', () => {
     expect(yesRadio).not.toBeChecked()
     expect(noFirstRadio).not.toBeChecked()
     expect(noSecondRadio).not.toBeChecked()
+  })
+
+  test('should not show back link when user does not come from org picker', async () => {
+    const document = await loadPage({
+      requestUrl: routes.postLogin.CONFIRM_EMPLOYEE,
+      server: getServer()
+    })
+
+    const backLink = queryByRole(document, 'link', { name: 'Back' })
+    expect(backLink).not.toBeInTheDocument()
+  })
+
+  test('should show back link when user comes from org picker', async () => {
+    vi.mocked(getUserSession).mockResolvedValue(employeeSessionWithMultipleOrgs)
+
+    const document = await loadPage({
+      requestUrl: routes.postLogin.CONFIRM_EMPLOYEE,
+      server: getServer()
+    })
+
+    const backLink = document.querySelector('.govuk-back-link')
+    expect(backLink).toBeInTheDocument()
+    expect(backLink.textContent.trim()).toBe('Back')
   })
 
   test('should stay on same page when continue is clicked without selection', async () => {

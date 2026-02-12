@@ -16,7 +16,7 @@ vi.mock('~/src/server/common/plugins/auth/utils.js')
 describe('#validateEmployeeUserSession', () => {
   const createMockH = () => ({
     redirect: vi.fn().mockReturnValue({
-      takeover: vi.fn()
+      takeover: vi.fn().mockReturnValue({})
     }),
     continue: vi.fn()
   })
@@ -63,7 +63,7 @@ describe('#validateEmployeeUserSession', () => {
 describe('#validateIndividualUserSession', () => {
   const createMockH = () => ({
     redirect: vi.fn().mockReturnValue({
-      takeover: vi.fn()
+      takeover: vi.fn().mockReturnValue({})
     }),
     continue: vi.fn()
   })

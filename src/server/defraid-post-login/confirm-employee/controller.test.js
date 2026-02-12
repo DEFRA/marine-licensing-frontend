@@ -32,7 +32,8 @@ describe('#postLoginConfirmEmployee', () => {
       expect(h.view).toHaveBeenCalledWith(CONFIRM_EMPLOYEE_VIEW_ROUTE, {
         heading: `Are you notifying us as an employee of ${employeeSession.organisationName}?`,
         organisationName: 'Test Org',
-        pageTitle: `Are you notifying us as an employee of ${employeeSession.organisationName}?`
+        pageTitle: `Are you notifying us as an employee of ${employeeSession.organisationName}?`,
+        hasMultipleOrgPickerEntries: false
       })
     })
   })
@@ -48,7 +49,8 @@ describe('#postLoginConfirmEmployee', () => {
         heading: `Are you notifying us as an employee of ${employeeSession.organisationName}?`,
         organisationName: 'Test Org',
         pageTitle: `Are you notifying us as an employee of ${employeeSession.organisationName}?`,
-        payload: {}
+        payload: {},
+        hasMultipleOrgPickerEntries: false
       })
     })
 

@@ -21,6 +21,11 @@ export const employeeSession = {
   shouldShowOrgOrUserName: true
 }
 
+export const employeeSessionWithMultipleOrgs = {
+  ...employeeSession,
+  hasMultipleOrgPickerEntries: true
+}
+
 export const agentSession = {
   ...baseSession,
   userRelationshipType: 'Agent',

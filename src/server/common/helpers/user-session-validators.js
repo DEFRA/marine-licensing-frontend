@@ -2,10 +2,11 @@ import { getUserSession } from '#src/server/common/plugins/auth/utils.js'
 import { routes } from '#src/server/common/constants/routes.js'
 import { USER_TYPES } from '#src/server/common/constants/user-types.js'
 
-const validateSessionExists = (userSession, h) => {
+export const validateSessionExists = (userSession, h) => {
   if (!userSession?.displayName) {
     return h.redirect(routes.SIGNIN).takeover()
   }
+  return null
 }
 
 export const validateIndividualUserSession = {
@@ -15,8 +16,9 @@ export const validateIndividualUserSession = {
       request.state?.userSession
     )
 
-    if (!userSession?.displayName) {
-      return validateSessionExists(userSession, h)
+    const sessionCheck = validateSessionExists(userSession, h)
+    if (sessionCheck) {
+      return sessionCheck
     }
 
     const { userRelationshipType } = userSession

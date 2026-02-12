@@ -39,6 +39,10 @@ describe('Guidance - Register new organisation', () => {
     const guidanceLink = within(document).getByRole('link', {
       name: /How to create a Defra account/
     })
+    expect(guidanceLink).toHaveAttribute(
+      'href',
+      'https://www.gov.uk/guidance/creating-a-defra-account'
+    )
     expect(guidanceLink).toHaveAttribute('target', '_blank')
     expect(guidanceLink).toHaveAttribute('rel', 'noopener noreferrer')
   })

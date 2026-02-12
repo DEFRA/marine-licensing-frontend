@@ -22,12 +22,12 @@ export const errorMessages = {
 
 export const defraIdGuidanceWhoIsExemptionForController = {
   async handler(request, h) {
-    if (request.state?.userSession) {
-      return h.redirect(routes.PROJECT_NAME)
-    }
-
     if (request.query.ACTIVITY_TYPE) {
       cacheMcmsContextFromQueryParams(request)
+    }
+
+    if (request.state?.userSession) {
+      return h.redirect(routes.PROJECT_NAME)
     }
     await clearExemptionCache(request, h)
 

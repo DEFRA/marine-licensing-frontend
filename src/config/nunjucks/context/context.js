@@ -18,7 +18,10 @@ const manifestPath = path.join(
 )
 let webpackManifest
 
-const hideNavigationRoutesExemptions = new Set([routes.PROJECT_NAME])
+const hideNavigationRoutesExemptions = new Set([
+  routes.PROJECT_NAME,
+  routes.postLogin.CONFIRM_INDIVIDUAL
+])
 
 const hideNavigationRoutesMarineLicense = new Set([
   marineLicenseRoutes.MARINE_LICENSE_PROJECT_NAME

@@ -22,7 +22,7 @@ export const errorMessages = {
 export const preLoginWhoIsExemptionForController = {
   async handler(request, h) {
     if (request.state?.userSession) {
-      return h.redirect(routes.PROJECT_NAME)
+      return h.redirect(routes.EXEMPTION)
     }
 
     if (request.query.ACTIVITY_TYPE) {

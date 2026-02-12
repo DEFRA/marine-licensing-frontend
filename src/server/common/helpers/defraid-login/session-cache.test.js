@@ -1,6 +1,6 @@
-import { preloginUserSession } from '#src/server/common/helpers/defraid-pre-login/session-cache.js'
+import { preloginUserSession } from '#src/server/common/helpers/defraid-login/session-cache.js'
 
-describe('Session cache for Defra ID pre-login', () => {
+describe('Session cache for Defra ID login', () => {
   let request
 
   beforeEach(() => {
@@ -50,6 +50,27 @@ describe('Session cache for Defra ID pre-login', () => {
         key: 'checkSetupEmployee'
       })
       expect(value).toEqual('existingValue')
+    })
+
+    it('returns null when there is no value for key', async () => {
+      request.yar.get.mockResolvedValue({
+        checkSetupEmployee: null,
+        otherKey: 'otherValue'
+      })
+      const value = await preloginUserSession.get({
+        request,
+        key: 'checkSetupEmployee'
+      })
+      expect(value).toEqual(null)
+    })
+
+    it('returns null when there is no cache key', async () => {
+      request.yar.get.mockResolvedValue(null)
+      const value = await preloginUserSession.get({
+        request,
+        key: 'checkSetupEmployee'
+      })
+      expect(value).toEqual(null)
     })
   })
 })

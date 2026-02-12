@@ -13,6 +13,6 @@ describe('#loginController', () => {
     })
 
     expect(statusCode).toBe(statusCodes.redirect)
-    expect(headers.location).toBe(routes.PROJECT_NAME)
+    expect(headers.location).toBe(routes.EXEMPTION)
   })
 })

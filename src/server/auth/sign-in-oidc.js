@@ -18,7 +18,7 @@ export const signInOidcController = {
     }
     const redirects = request.yar.flash(redirectPathCacheKey)
     const redirectPath = Array.isArray(redirects) ? redirects[0] : redirects
-    const redirect = redirectPath ?? routes.PROJECT_NAME
+    const redirect = redirectPath ?? routes.EXEMPTION
 
     return h.redirect(redirect)
   }

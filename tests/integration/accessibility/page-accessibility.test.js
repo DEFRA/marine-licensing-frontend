@@ -21,11 +21,16 @@ import {
   mockMarineLicense,
   setupTestServer
 } from '../shared/test-setup-helpers.js'
+import { citizenUserSession } from '../shared/session-fixtures.js'
 import { makeGetRequest } from '~/src/server/test-helpers/server-requests.js'
 import { JSDOM } from 'jsdom'
 import { config } from '~/src/config/config.js'
+import { getUserSession } from '~/src/server/common/plugins/auth/utils.js'
 
 vi.mock('~/src/server/common/helpers/authenticated-requests.js')
+vi.mock('~/src/server/common/plugins/auth/utils.js', () => ({
+  getUserSession: vi.fn()
+}))
 
 describe('Page accessibility checks (Axe)', () => {
   beforeAll(() => {
@@ -169,6 +174,11 @@ describe('Page accessibility checks (Axe)', () => {
     {
       url: routes.preLogin.ADD_TO_ORG_ACCOUNT,
       title: 'You need to be added to your organisation’s Defra account'
+    },
+    {
+      url: routes.postLogin.CONFIRM_INDIVIDUAL,
+      title: "Confirm you're notifying us as an individual",
+      session: citizenUserSession
     }
   ]
 
@@ -178,8 +188,13 @@ describe('Page accessibility checks (Axe)', () => {
       title,
       url,
       exemption = mockExemptionData,
-      isMarineLicense = false
+      isMarineLicense = false,
+      session
     }) => {
+      if (session) {
+        vi.mocked(getUserSession).mockResolvedValue(session)
+      }
+
       if (isMarineLicense) {
         mockMarineLicense(mockMarineLicenseApplication)
       } else {

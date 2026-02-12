@@ -33,7 +33,8 @@ export const exemptionRoutes = {
   DELETE_ALL_SITES: '/exemption/delete-all-sites',
   COOKIES: '/help/cookies',
   PRIVACY: '/help/privacy',
-  ADMIN_EXEMPTIONS: '/admin/exemptions'
+  ADMIN_EXEMPTIONS: '/admin/exemptions',
+  EXEMPTION: '/exemption'
 }
 
 export const marineLicenseRoutes = {
@@ -48,8 +49,13 @@ export const preLoginRoutes = {
   ADD_TO_ORG_ACCOUNT: '/prelogin/add-to-org-account'
 }
 
+export const postLoginRoutes = {
+  CONFIRM_INDIVIDUAL: '/confirm-individual'
+}
+
 export const routes = {
   preLogin: preLoginRoutes,
+  postLogin: postLoginRoutes,
   ...exemptionRoutes,
   AUTH_DEFRA_ID_CALLBACK: '/signin-oidc',
   AUTH_ENTRA_ID_CALLBACK: '/auth',

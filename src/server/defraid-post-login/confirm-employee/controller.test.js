@@ -33,7 +33,10 @@ describe('#postLoginConfirmEmployee', () => {
         heading: `Are you notifying us as an employee of ${employeeSession.organisationName}?`,
         organisationName: 'Test Org',
         pageTitle: `Are you notifying us as an employee of ${employeeSession.organisationName}?`,
-        hasMultipleOrgPickerEntries: false
+        hasMultipleOrgPickerEntries: false,
+        payload: {
+          confirmEmployee: null
+        }
       })
     })
   })

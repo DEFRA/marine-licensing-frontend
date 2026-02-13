@@ -32,11 +32,17 @@ export const confirmEmployeeController = {
     const heading = generateHeadingText(userSession)
     const { organisationName, hasMultipleOrgPickerEntries } = userSession
 
+    const confirmEmployee = await postloginUserSession.get({
+      request,
+      key: 'confirmEmployee'
+    })
+
     return h.view(CONFIRM_EMPLOYEE_VIEW_ROUTE, {
       heading,
       pageTitle: heading,
       organisationName,
-      hasMultipleOrgPickerEntries
+      hasMultipleOrgPickerEntries,
+      payload: { confirmEmployee }
     })
   }
 }

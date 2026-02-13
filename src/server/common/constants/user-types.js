@@ -1,3 +1,4 @@
 export const USER_TYPES = {
-  CITIZEN: 'Citizen'
+  CITIZEN: 'Citizen',
+  EMPLOYEE: 'Employee'
 }

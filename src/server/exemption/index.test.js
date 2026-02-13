@@ -286,7 +286,7 @@ describe('exemption route', () => {
     )
   })
 
-  test('GET /exemption handler should redirect Employee to project-name', async () => {
+  test('GET /exemption handler should redirect Employee to correct page', async () => {
     getUserSession.mockResolvedValue({ userRelationshipType: 'Employee' })
 
     const server = {
@@ -306,7 +306,9 @@ describe('exemption route', () => {
 
     await exemptionRoute.handler(mockRequest, mockToolkit)
 
-    expect(mockToolkit.redirect).toHaveBeenCalledWith(routes.PROJECT_NAME)
+    expect(mockToolkit.redirect).toHaveBeenCalledWith(
+      routes.postLogin.CONFIRM_EMPLOYEE
+    )
   })
 
   test('GET /exemption handler should redirect Agent to project-name', async () => {

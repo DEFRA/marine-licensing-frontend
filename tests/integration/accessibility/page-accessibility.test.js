@@ -21,7 +21,10 @@ import {
   mockMarineLicense,
   setupTestServer
 } from '../shared/test-setup-helpers.js'
-import { citizenUserSession } from '../shared/session-fixtures.js'
+import {
+  citizenUserSession,
+  employeeSession
+} from '../shared/session-fixtures.js'
 import { makeGetRequest } from '~/src/server/test-helpers/server-requests.js'
 import { JSDOM } from 'jsdom'
 import { config } from '~/src/config/config.js'
@@ -179,6 +182,11 @@ describe('Page accessibility checks (Axe)', () => {
       url: routes.postLogin.CONFIRM_INDIVIDUAL,
       title: "Confirm you're notifying us as an individual",
       session: citizenUserSession
+    },
+    {
+      url: routes.postLogin.CONFIRM_EMPLOYEE,
+      title: 'Are you notifying us as an employee of Test Org?',
+      session: { ...employeeSession, shouldShowOrgOrUserName: false }
     }
   ]
 

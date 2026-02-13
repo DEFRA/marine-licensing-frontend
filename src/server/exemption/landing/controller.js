@@ -13,13 +13,21 @@ export const exemptionLandingController = {
       request,
       request.state?.userSession
     )
+
     if (!userSession) {
       return h.redirect(routes.SIGNIN)
     }
+
     const { userRelationshipType } = userSession
+
     if (userRelationshipType === USER_TYPES.CITIZEN) {
       return h.redirect(routes.postLogin.CONFIRM_INDIVIDUAL)
     }
+
+    if (userRelationshipType === USER_TYPES.EMPLOYEE) {
+      return h.redirect(routes.postLogin.CONFIRM_EMPLOYEE)
+    }
+
     return h.redirect(routes.PROJECT_NAME)
   }
 }

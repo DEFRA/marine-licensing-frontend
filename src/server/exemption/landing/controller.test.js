@@ -33,7 +33,24 @@ describe('#exemptionLanding', () => {
       expect(headers.location).toBe(routes.postLogin.CONFIRM_INDIVIDUAL)
     })
 
+    test('Should go to correct page for Employee users', async () => {
+      vi.mocked(getUserSession).mockResolvedValue(employeeSession)
+
+      const { headers, statusCode } = await makeGetRequest({
+        url: routes.EXEMPTION,
+        server: getServer()
+      })
+
+      expect(statusCode).toBe(statusCodes.redirect)
+      expect(headers.location).toBe(routes.postLogin.CONFIRM_EMPLOYEE)
+    })
+
     test('Should go to correct page for other users', async () => {
+      vi.mocked(getUserSession).mockResolvedValue({
+        ...employeeSession,
+        userRelationshipType: 'newUserType'
+      })
+
       const { headers, statusCode } = await makeGetRequest({
         url: routes.EXEMPTION,
         server: getServer()

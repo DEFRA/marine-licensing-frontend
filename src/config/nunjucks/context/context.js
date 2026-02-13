@@ -20,7 +20,8 @@ let webpackManifest
 
 const hideNavigationRoutesExemptions = new Set([
   routes.PROJECT_NAME,
-  routes.postLogin.CONFIRM_INDIVIDUAL
+  routes.postLogin.CONFIRM_INDIVIDUAL,
+  routes.postLogin.CONFIRM_EMPLOYEE
 ])
 
 const hideNavigationRoutesMarineLicense = new Set([

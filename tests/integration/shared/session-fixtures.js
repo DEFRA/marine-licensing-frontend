@@ -32,3 +32,8 @@ export const agentSession = {
   organisationName: 'Client Org',
   shouldShowOrgOrUserName: true
 }
+
+export const agentSessionWithMultipleOrgs = {
+  ...agentSession,
+  hasMultipleOrgPickerEntries: true
+}

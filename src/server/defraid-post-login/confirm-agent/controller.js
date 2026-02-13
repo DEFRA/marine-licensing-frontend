@@ -12,8 +12,7 @@ import {
 } from '#src/server/defraid-post-login/confirm-agent/utils.js'
 import { postloginUserSession } from '#src/server/common/helpers/defraid-login/session-cache.js'
 
-export const CONFIRM_AGENT_VIEW_ROUTE =
-  'defraid-post-login/confirm-agent/index'
+export const CONFIRM_AGENT_VIEW_ROUTE = 'defraid-post-login/confirm-agent/index'
 
 export const errorMessages = (userSession) => ({
   POST_LOGIN_CONFIRM_AGENT_CHOICE_REQUIRED: generateErrorText(userSession)

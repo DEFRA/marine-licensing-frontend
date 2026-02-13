@@ -31,9 +31,15 @@ export const confirmIndividualController = {
       request.state?.userSession
     )
 
+    const confirmIndividual = await postloginUserSession.get({
+      request,
+      key: 'confirmIndividual'
+    })
+
     return h.view(CONFIRM_INDIVIDUAL_VIEW_ROUTE, {
       ...viewContent,
-      heading: generateHeadingText(userSession)
+      heading: generateHeadingText(userSession),
+      payload: { confirmIndividual }
     })
   }
 }

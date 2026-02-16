@@ -4,7 +4,7 @@ import {
 } from '#src/server/common/constants/routes.js'
 import { setUserSession } from './utils.js'
 import { AUTH_STRATEGIES } from '#src/server/common/constants/auth.js'
-import { defraIdGuidanceUserSession } from '#src/server/common/helpers/defraid-guidance/session-cache.js'
+import { defraIdGuidanceUserSession } from '#src/server/common/helpers/defraid-login/session-cache.js'
 
 export const signInOidcController = {
   method: ['GET', 'POST'],

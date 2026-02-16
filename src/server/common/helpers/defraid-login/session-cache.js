@@ -9,6 +9,9 @@ const loginCache = (CACHE_PARENT_KEY) => ({
   get: async ({ request, key }) => {
     const login = await request.yar.get(CACHE_PARENT_KEY)
     return login ? login[key] || null : null
+  },
+  clear: (request) => {
+    request.yar.clear(CACHE_PARENT_KEY)
   }
 })
 

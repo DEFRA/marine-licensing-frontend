@@ -2,7 +2,7 @@ import { vi, describe, test, expect, beforeEach } from 'vitest'
 import { routes } from '#src/server/common/constants/routes.js'
 import { cacheMcmsContextFromQueryParams } from '#src/server/common/helpers/mcms-context/cache-mcms-context.js'
 import { clearExemptionCache } from '#src/server/common/helpers/exemptions/session-cache/utils.js'
-import { defraIdGuidanceUserSession } from '#src/server/common/helpers/defraid-guidance/session-cache.js'
+import { defraIdGuidanceUserSession } from '#src/server/common/helpers/defraid-login/session-cache.js'
 import {
   defraIdGuidanceWhoIsExemptionForController,
   defraIdGuidanceWhoIsExemptionForSubmitController,
@@ -21,7 +21,7 @@ vi.mock('#src/server/common/helpers/exemptions/session-cache/utils.js', () => ({
   clearExemptionCache: vi.fn().mockResolvedValue(undefined)
 }))
 
-vi.mock('#src/server/common/helpers/defraid-guidance/session-cache.js', () => ({
+vi.mock('#src/server/common/helpers/defraid-login/session-cache.js', () => ({
   defraIdGuidanceUserSession: {
     get: vi.fn().mockResolvedValue(null),
     set: vi.fn().mockResolvedValue(undefined)

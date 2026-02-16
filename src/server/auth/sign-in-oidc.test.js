@@ -5,7 +5,7 @@ import {
   routes
 } from '#src/server/common/constants/routes.js'
 import { setUserSession } from '#src/server/auth/utils.js'
-import { defraIdGuidanceUserSession } from '#src/server/common/helpers/defraid-guidance/session-cache.js'
+import { defraIdGuidanceUserSession } from '#src/server/common/helpers/defraid-login/session-cache.js'
 import { signInOidcController } from '#src/server/auth/sign-in-oidc.js'
 import { setupTestServer } from '#tests/integration/shared/test-setup-helpers.js'
 import { makeGetRequest } from '#src/server/test-helpers/server-requests.js'
@@ -14,14 +14,11 @@ vi.mock('~/src/server/auth/utils.js', () => ({
   setUserSession: vi.fn()
 }))
 
-vi.mock(
-  '~/src/server/common/helpers/defraid-guidance/session-cache.js',
-  () => ({
-    defraIdGuidanceUserSession: {
-      clear: vi.fn()
-    }
-  })
-)
+vi.mock('~/src/server/common/helpers/defraid-login/session-cache.js', () => ({
+  defraIdGuidanceUserSession: {
+    clear: vi.fn()
+  }
+}))
 
 describe('#signInOidcController', () => {
   const getServer = setupTestServer()

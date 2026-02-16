@@ -1,14 +1,11 @@
 import { config } from '#src/config/config.js'
 import { routes } from '#src/server/common/constants/routes.js'
-import { USER_TYPES } from '#src/server/common/constants/user-types.js'
 import { postloginUserSession } from '#src/server/common/helpers/defraid-login/session-cache.js'
 
 export const GUIDANCE_INDIVIDUAL_VIEW_ROUTE =
   'defraid-post-login/guidance-individual/index'
 
-const viewContent = {
-  pageTitle: 'Exempt activity notification for an individual'
-}
+const PAGE_HEADING = 'Exempt activity notification for an individual'
 
 export const guidanceIndividualController = {
   async handler(request, h) {
@@ -18,19 +15,24 @@ export const guidanceIndividualController = {
       request,
       key: 'confirmEmployee'
     })
+    const confirmAgent = await postloginUserSession.get({
+      request,
+      key: 'confirmAgent'
+    })
 
-    const isUserEmployeeOrAgent = confirmEmployee
-      ? USER_TYPES.EMPLOYEE
-      : USER_TYPES.AGENT
+    if (!confirmEmployee && !confirmAgent) {
+      return h.redirect(routes.EXEMPTION)
+    }
+
+    const backLink = confirmEmployee
+      ? routes.postLogin.CONFIRM_EMPLOYEE
+      : routes.postLogin.CONFIRM_AGENT
 
     return h.view(GUIDANCE_INDIVIDUAL_VIEW_ROUTE, {
-      ...viewContent,
+      pageTitle: PAGE_HEADING,
+      heading: PAGE_HEADING,
       accountManagementUrl,
-      heading: 'Exempt activity notification for an individual',
-      backLink:
-        isUserEmployeeOrAgent === USER_TYPES.EMPLOYEE
-          ? routes.postLogin.CONFIRM_EMPLOYEE
-          : routes.postLogin.CONFIRM_AGENT
+      backLink
     })
   }
 }

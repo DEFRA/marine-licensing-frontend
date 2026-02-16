@@ -7,13 +7,7 @@ import { createMockRequest } from '#src/server/test-helpers/mocks/helpers.js'
 import { routes } from '#src/server/common/constants/routes.js'
 import { postloginUserSession } from '#src/server/common/helpers/defraid-login/session-cache.js'
 
-vi.mock('#src/server/common/helpers/defraid-login/session-cache.js', () => ({
-  defraIdGuidanceUserSession: { get: vi.fn(), set: vi.fn() },
-  postloginUserSession: {
-    get: vi.fn().mockResolvedValue(null),
-    set: vi.fn()
-  }
-}))
+vi.mock('#src/server/common/helpers/defraid-login/session-cache.js')
 
 describe('#guidanceIndividualController', () => {
   const createMockH = () => ({
@@ -23,11 +17,15 @@ describe('#guidanceIndividualController', () => {
   })
 
   beforeEach(() => {
-    vi.mocked(postloginUserSession).get.mockResolvedValue('yes')
+    vi.mocked(postloginUserSession.get).mockImplementation(({ key }) =>
+      key === 'confirmEmployee' ? 'personal' : null
+    )
   })
 
   test('correctly renders page for agent user', async () => {
-    vi.mocked(postloginUserSession).get.mockResolvedValue(null)
+    vi.mocked(postloginUserSession.get).mockImplementation(({ key }) =>
+      key === 'confirmAgent' ? 'personal' : null
+    )
 
     const request = createMockRequest()
     const h = createMockH()
@@ -54,5 +52,17 @@ describe('#guidanceIndividualController', () => {
       pageTitle: 'Exempt activity notification for an individual',
       backLink: routes.postLogin.CONFIRM_EMPLOYEE
     })
+  })
+
+  test('redirects to EXEMPTION when neither confirmEmployee nor confirmAgent is set', async () => {
+    vi.mocked(postloginUserSession.get).mockResolvedValue(null)
+
+    const request = createMockRequest()
+    const h = createMockH()
+
+    await guidanceIndividualController.handler(request, h)
+
+    expect(h.redirect).toHaveBeenCalledWith(routes.EXEMPTION)
+    expect(h.view).not.toHaveBeenCalled()
   })
 })

@@ -186,7 +186,7 @@ describe('Who is the exemption for page', () => {
       expect(headers.location).toBe(routes.defraIdGuidance.CHECK_SETUP_EMPLOYEE)
     })
 
-    test('redirects to self when client selected (placeholder)', async () => {
+    test('redirects to check-setup-client when client selected', async () => {
       const { statusCode, headers } = await makePostRequest({
         server: getServer(),
         url,
@@ -194,7 +194,7 @@ describe('Who is the exemption for page', () => {
       })
 
       expect(statusCode).toBe(statusCodes.redirect)
-      expect(headers.location).toBe(routes.defraIdGuidance.WHO_IS_EXEMPTION_FOR)
+      expect(headers.location).toBe(routes.defraIdGuidance.CHECK_SETUP_CLIENT)
     })
 
     test('shows validation error when no radio selected', async () => {

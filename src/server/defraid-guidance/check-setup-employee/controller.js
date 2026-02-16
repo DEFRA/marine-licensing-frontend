@@ -45,13 +45,12 @@ export const defraIdGuidanceCheckSetupEmployeeSubmitController = {
           })
       }),
       failAction: (request, h, err) => {
-        const { payload } = request
         const errorSummary = mapErrorsForDisplay(err.details, errorMessages)
         const errors = errorDescriptionByFieldName(errorSummary)
         return h
           .view(pathToPageTemplate, {
             ...viewData,
-            payload,
+            checkSetupEmployee: request.payload?.checkSetupEmployee,
             errorMessage: errors.checkSetupEmployee,
             errorSummary
           })

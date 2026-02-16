@@ -97,7 +97,7 @@ describe('Cookies page', () => {
       const tables = document.querySelectorAll('.govuk-table')
       expect(tables.length).toBeGreaterThanOrEqual(2)
 
-      expect(getByText(document, 'session')).toBeInTheDocument()
+      expect(getByText(document, 'marineLicensingSession')).toBeInTheDocument()
       expect(getByText(document, 'userSession')).toBeInTheDocument()
       expect(getByText(document, 'csrfToken')).toBeInTheDocument()
       expect(getByText(document, 'cookies_preferences_set')).toBeInTheDocument()

@@ -4,6 +4,7 @@ import {
 } from '#src/server/common/constants/routes.js'
 import { setUserSession } from './utils.js'
 import { AUTH_STRATEGIES } from '#src/server/common/constants/auth.js'
+import { defraIdGuidanceUserSession } from '#src/server/common/helpers/defraid-guidance/session-cache.js'
 
 export const signInOidcController = {
   method: ['GET', 'POST'],
@@ -14,6 +15,7 @@ export const signInOidcController = {
   handler: async (request, h) => {
     if (request.auth?.isAuthenticated) {
       await setUserSession(request)
+      defraIdGuidanceUserSession.clear(request)
       request.logger.info('User has been successfully authenticated')
     }
     const redirects = request.yar.flash(redirectPathCacheKey)

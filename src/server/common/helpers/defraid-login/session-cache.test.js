@@ -8,7 +8,8 @@ describe('Session cache for Defra ID guidance', () => {
       yar: {
         set: vi.fn(),
         commit: vi.fn(),
-        get: vi.fn()
+        get: vi.fn(),
+        clear: vi.fn()
       }
     }
   })
@@ -36,6 +37,13 @@ describe('Session cache for Defra ID guidance', () => {
         existingKey: 'existingValue',
         checkSetupEmployee: 'register-new'
       })
+    })
+  })
+
+  describe('clear', () => {
+    it('clears the defraIdGuidance cache key', () => {
+      defraIdGuidanceUserSession.clear(request)
+      expect(request.yar.clear).toHaveBeenCalledWith('defraIdGuidance')
     })
   })
 

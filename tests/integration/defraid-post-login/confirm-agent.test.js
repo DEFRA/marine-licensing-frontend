@@ -15,7 +15,7 @@ import { statusCodes } from '#src/server/common/constants/status-codes.js'
 
 vi.mock('~/src/server/common/plugins/auth/utils.js')
 
-describe('Post-login - Confirm Employee', () => {
+describe('Post-login - Confirm Agent', () => {
   const getServer = setupTestServer()
 
   beforeAll(() => {
@@ -112,7 +112,7 @@ describe('Post-login - Confirm Employee', () => {
     ).toBeInTheDocument()
   })
 
-  test('should redirect correctly when user confirms they are employee user', async () => {
+  test('should redirect correctly when user confirms they are agent user', async () => {
     const { headers, statusCode } = await makePostRequest({
       url: routes.postLogin.CONFIRM_AGENT,
       server: getServer(),
@@ -123,7 +123,7 @@ describe('Post-login - Confirm Employee', () => {
     expect(headers.location).toBe(routes.PROJECT_NAME)
   })
 
-  test('should redirect correctly when user confirms they are not employee of this company', async () => {
+  test('should redirect correctly when user confirms they are not agent of this company', async () => {
     const { result } = await makePostRequest({
       url: routes.postLogin.CONFIRM_AGENT,
       server: getServer(),
@@ -139,7 +139,7 @@ describe('Post-login - Confirm Employee', () => {
     expect(pageHeading).toBeInTheDocument()
   })
 
-  test('should redirect correctly when user confirms they are not employee user', async () => {
+  test('should redirect correctly when user confirms they are not agent user', async () => {
     const { result } = await makePostRequest({
       url: routes.postLogin.CONFIRM_AGENT,
       server: getServer(),

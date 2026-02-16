@@ -20,9 +20,9 @@ export const guidanceIndividualController = {
       key: 'confirmAgent'
     })
 
-    // if (!confirmEmployee && !confirmAgent) {
-    //   return h.redirect(routes.EXEMPTION)
-    // }
+    if (!confirmEmployee && !confirmAgent) {
+      return h.redirect(routes.EXEMPTION)
+    }
 
     const backLink = confirmEmployee
       ? routes.postLogin.CONFIRM_EMPLOYEE

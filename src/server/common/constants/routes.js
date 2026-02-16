@@ -49,6 +49,16 @@ export const defraIdGuidanceRoutes = {
   ADD_TO_ORG_ACCOUNT: '/guidance/add-to-org-account'
 }
 
+<<<<<<< Updated upstream
+=======
+export const postLoginRoutes = {
+  CONFIRM_AGENT: '/confirm-agent',
+  CONFIRM_EMPLOYEE: '/confirm-employee',
+  CONFIRM_INDIVIDUAL: '/confirm-individual',
+  GUIDANCE_INDIVIDUAL: '/need-to-create-defra-account-as-individual'
+}
+
+>>>>>>> Stashed changes
 export const routes = {
   defraIdGuidance: defraIdGuidanceRoutes,
   ...exemptionRoutes,

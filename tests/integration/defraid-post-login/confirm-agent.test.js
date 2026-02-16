@@ -140,18 +140,13 @@ describe('Post-login - Confirm Agent', () => {
   })
 
   test('should redirect correctly when user confirms they are not agent user', async () => {
-    const { result } = await makePostRequest({
+    const { headers, statusCode } = await makePostRequest({
       url: routes.postLogin.CONFIRM_AGENT,
       server: getServer(),
       formData: { confirmAgent: 'personal' }
     })
 
-    const { document } = new JSDOM(result).window
-
-    const pageHeading = within(document).getByRole('heading', {
-      level: 1,
-      name: `Are you notifying us as an agent or intermediary for ${agentSession.organisationName}?`
-    })
-    expect(pageHeading).toBeInTheDocument()
+    expect(statusCode).toBe(statusCodes.redirect)
+    expect(headers.location).toBe(routes.postLogin.GUIDANCE_INDIVIDUAL)
   })
 })

@@ -53,7 +53,8 @@ export const defraIdGuidanceRoutes = {
 export const postLoginRoutes = {
   CONFIRM_AGENT: '/confirm-agent',
   CONFIRM_EMPLOYEE: '/confirm-employee',
-  CONFIRM_INDIVIDUAL: '/confirm-individual'
+  CONFIRM_INDIVIDUAL: '/confirm-individual',
+  GUIDANCE_INDIVIDUAL: '/need-to-create-defra-account-as-individual'
 }
 
 export const routes = {

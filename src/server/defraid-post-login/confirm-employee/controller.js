@@ -1,9 +1,6 @@
 import { getUserSession } from '#src/server/common/plugins/auth/utils.js'
 import { routes } from '#src/server/common/constants/routes.js'
-import {
-  errorDescriptionByFieldName,
-  mapErrorsForDisplay
-} from '#src/server/common/helpers/errors.js'
+import { createConfirmFailAction } from '#src/server/defraid-post-login/shared/createConfirmFailAction.js'
 import { validateEmployeeUserSession } from '#src/server/common/helpers/user-session-validators.js'
 import joi from 'joi'
 import {
@@ -62,34 +59,11 @@ export const confirmEmployeeSubmitController = {
             'any.required': 'POST_LOGIN_CONFIRM_EMPLOYEE_CHOICE_REQUIRED'
           })
       }),
-      failAction: async (request, h, err) => {
-        const { payload } = request
-        const userSession = await getUserSession(
-          request,
-          request.state?.userSession
-        )
-        const errorSummary = mapErrorsForDisplay(
-          err.details,
-          errorMessages(userSession)
-        )
-
-        const errors = errorDescriptionByFieldName(errorSummary)
-
-        const heading = generateHeadingText(userSession)
-        const { organisationName, hasMultipleOrgPickerEntries } = userSession
-
-        return h
-          .view(CONFIRM_EMPLOYEE_VIEW_ROUTE, {
-            heading,
-            pageTitle: heading,
-            payload,
-            organisationName,
-            hasMultipleOrgPickerEntries,
-            errors,
-            errorSummary
-          })
-          .takeover()
-      }
+      failAction: createConfirmFailAction({
+        viewRoute: CONFIRM_EMPLOYEE_VIEW_ROUTE,
+        errorMessages,
+        generateHeadingText
+      })
     }
   },
   async handler(request, h) {
@@ -110,6 +84,10 @@ export const confirmEmployeeSubmitController = {
 
     if (confirmEmployee === 'yes') {
       return h.redirect(routes.PROJECT_NAME)
+    }
+
+    if (confirmEmployee === 'personal') {
+      return h.redirect(routes.postLogin.GUIDANCE_INDIVIDUAL)
     }
 
     const heading = generateHeadingText(userSession)

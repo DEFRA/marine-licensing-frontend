@@ -64,6 +64,6 @@ export const defraIdGuidanceCheckSetupClientSubmitController = {
     if (selection === 'yes') {
       return h.redirect(routes.SIGNIN)
     }
-    return h.redirect(routes.defraIdGuidance.CHECK_SETUP_CLIENT)
+    return h.redirect(routes.defraIdGuidance.ADD_TO_CLIENT_ACCOUNT)
   }
 }

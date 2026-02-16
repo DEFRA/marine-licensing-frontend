@@ -212,6 +212,11 @@ describe('Page accessibility checks (Axe)', () => {
       url: routes.postLogin.GUIDANCE_INDIVIDUAL,
       title: 'Exempt activity notification for an individual',
       session: { ...employeeSession, shouldShowOrgOrUserName: false }
+    },
+    {
+      url: routes.postLogin.GUIDANCE_ORG,
+      title: 'Exempt activity notification for an organisation',
+      session: { ...employeeSession, shouldShowOrgOrUserName: false }
     }
   ]
 
@@ -225,7 +230,7 @@ describe('Page accessibility checks (Axe)', () => {
       session
     }) => {
       if (session) {
-        vi.mocked(postloginUserSession.get).mockResolvedValue(true)
+        vi.mocked(postloginUserSession.get).mockResolvedValue('organisation')
         vi.mocked(getUserSession).mockResolvedValue(session)
       }
 

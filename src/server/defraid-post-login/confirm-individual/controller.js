@@ -80,11 +80,6 @@ export const confirmIndividualSubmitController = {
   async handler(request, h) {
     const { payload } = request
 
-    const userSession = await getUserSession(
-      request,
-      request.state?.userSession
-    )
-
     const { confirmIndividual } = payload
 
     await postloginUserSession.set({
@@ -97,10 +92,6 @@ export const confirmIndividualSubmitController = {
       return h.redirect(routes.PROJECT_NAME)
     }
 
-    return h.view(CONFIRM_INDIVIDUAL_VIEW_ROUTE, {
-      ...viewContent,
-      payload,
-      heading: generateHeadingText(userSession)
-    })
+    return h.redirect(routes.postLogin.GUIDANCE_ORG)
   }
 }

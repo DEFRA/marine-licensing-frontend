@@ -42,19 +42,30 @@ describe('#postLoginConfirmAgent', () => {
   })
 
   describe('#confirmAgentSubmitController', () => {
-    test('correctly renders page', async () => {
-      const request = createMockRequest()
+    test('correctly redirects when personal user is selected', async () => {
+      const request = createMockRequest({
+        payload: { confirmAgent: 'personal' }
+      })
       const h = createMockH()
 
       await confirmAgentSubmitController.handler(request, h)
 
-      expect(h.view).toHaveBeenCalledWith(CONFIRM_AGENT_VIEW_ROUTE, {
-        heading: `Are you notifying us as an agent or intermediary for ${agentSession.organisationName}?`,
-        organisationName: 'Client Org',
-        pageTitle: `Are you notifying us as an agent or intermediary for ${agentSession.organisationName}?`,
-        payload: {},
-        hasMultipleOrgPickerEntries: false
+      expect(h.redirect).toHaveBeenCalledWith(
+        routes.postLogin.GUIDANCE_INDIVIDUAL
+      )
+      expect(h.view).not.toHaveBeenCalled()
+    })
+
+    test('correctly redirects when personal user is part of different organisation', async () => {
+      const request = createMockRequest({
+        payload: { confirmAgent: 'organisation' }
       })
+      const h = createMockH()
+
+      await confirmAgentSubmitController.handler(request, h)
+
+      expect(h.redirect).toHaveBeenCalledWith(routes.postLogin.GUIDANCE_ORG)
+      expect(h.view).not.toHaveBeenCalled()
     })
 
     test('should validate payload correctly', () => {

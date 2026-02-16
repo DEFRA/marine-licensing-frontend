@@ -42,19 +42,30 @@ describe('#postLoginConfirmEmployee', () => {
   })
 
   describe('#confirmEmployeeSubmitController', () => {
-    test('correctly renders page', async () => {
-      const request = createMockRequest()
+    test('correctly redirects when user answers that they are an individual', async () => {
+      const request = createMockRequest({
+        payload: { confirmEmployee: 'personal' }
+      })
       const h = createMockH()
 
       await confirmEmployeeSubmitController.handler(request, h)
 
-      expect(h.view).toHaveBeenCalledWith(CONFIRM_EMPLOYEE_VIEW_ROUTE, {
-        heading: `Are you notifying us as an employee of ${employeeSession.organisationName}?`,
-        organisationName: 'Test Org',
-        pageTitle: `Are you notifying us as an employee of ${employeeSession.organisationName}?`,
-        payload: {},
-        hasMultipleOrgPickerEntries: false
+      expect(h.redirect).toHaveBeenCalledWith(
+        routes.postLogin.GUIDANCE_INDIVIDUAL
+      )
+      expect(h.view).not.toHaveBeenCalled()
+    })
+
+    test('correctly redirects when user answers that they are part of a different organisation', async () => {
+      const request = createMockRequest({
+        payload: { confirmEmployee: 'organisation' }
       })
+      const h = createMockH()
+
+      await confirmEmployeeSubmitController.handler(request, h)
+
+      expect(h.redirect).toHaveBeenCalledWith(routes.postLogin.GUIDANCE_ORG)
+      expect(h.view).not.toHaveBeenCalled()
     })
 
     test('should validate payload correctly', () => {

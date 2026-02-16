@@ -69,11 +69,6 @@ export const confirmEmployeeSubmitController = {
   async handler(request, h) {
     const { payload } = request
 
-    const userSession = await getUserSession(
-      request,
-      request.state?.userSession
-    )
-
     const { confirmEmployee } = payload
 
     await postloginUserSession.set({
@@ -90,15 +85,8 @@ export const confirmEmployeeSubmitController = {
       return h.redirect(routes.postLogin.GUIDANCE_INDIVIDUAL)
     }
 
-    const heading = generateHeadingText(userSession)
-    const { organisationName, hasMultipleOrgPickerEntries } = userSession
-
-    return h.view(CONFIRM_EMPLOYEE_VIEW_ROUTE, {
-      payload,
-      heading,
-      pageTitle: heading,
-      organisationName,
-      hasMultipleOrgPickerEntries
-    })
+    if (confirmEmployee === 'organisation') {
+      return h.redirect(routes.postLogin.GUIDANCE_ORG)
+    }
   }
 }

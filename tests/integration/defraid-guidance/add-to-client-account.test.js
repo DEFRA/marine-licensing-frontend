@@ -31,7 +31,7 @@ describe('Guidance - Intermediary needs to be added to client account', () => {
     )
   })
 
-  it('should have a link to create a Defra account', async () => {
+  it('should have a link to Sign in', async () => {
     const document = await loadPage({
       requestUrl: routes.defraIdGuidance.ADD_TO_CLIENT_ACCOUNT,
       server: getServer()
@@ -39,10 +39,7 @@ describe('Guidance - Intermediary needs to be added to client account', () => {
     const link = within(document).getByRole('link', {
       name: /Sign in to or create a Defra account/
     })
-    expect(link).toHaveAttribute(
-      'href',
-      'https://www.gov.uk/guidance/creating-a-defra-account'
-    )
+    expect(link).toHaveAttribute('href', '/')
   })
 
   it('should have a guidance link to creating a Defra account', async () => {

@@ -22,6 +22,7 @@ import {
   setupTestServer
 } from '../shared/test-setup-helpers.js'
 import {
+  agentSession,
   citizenUserSession,
   employeeSession
 } from '../shared/session-fixtures.js'
@@ -187,6 +188,11 @@ describe('Page accessibility checks (Axe)', () => {
       url: routes.postLogin.CONFIRM_EMPLOYEE,
       title: 'Are you notifying us as an employee of Test Org?',
       session: { ...employeeSession, shouldShowOrgOrUserName: false }
+    },
+    {
+      url: routes.postLogin.CONFIRM_AGENT,
+      title: 'Are you notifying us as an agent or intermediary for Client Org?',
+      session: { ...agentSession, shouldShowOrgOrUserName: false }
     }
   ]
 

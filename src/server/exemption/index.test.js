@@ -331,6 +331,31 @@ describe('exemption route', () => {
 
     await exemptionRoute.handler(mockRequest, mockToolkit)
 
+    expect(mockToolkit.redirect).toHaveBeenCalledWith(
+      routes.postLogin.CONFIRM_AGENT
+    )
+  })
+
+  test('GET /exemption handler should redirect unknown user types to skip guidance', async () => {
+    getUserSession.mockResolvedValue({ userRelationshipType: 'New Type' })
+
+    const server = {
+      route: vi.fn(),
+      ext: vi.fn()
+    }
+
+    exemption.plugin.register(server)
+
+    const registeredRoutes = server.route.mock.calls[0][0]
+    const exemptionRoute = registeredRoutes.find(
+      (route) => route.method === 'GET' && route.path === '/exemption'
+    )
+
+    const mockRequest = { query: {}, state: { userSession: {} } }
+    const mockToolkit = { redirect: vi.fn() }
+
+    await exemptionRoute.handler(mockRequest, mockToolkit)
+
     expect(mockToolkit.redirect).toHaveBeenCalledWith(routes.PROJECT_NAME)
   })
 

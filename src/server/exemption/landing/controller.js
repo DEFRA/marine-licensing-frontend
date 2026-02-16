@@ -28,6 +28,10 @@ export const exemptionLandingController = {
       return h.redirect(routes.postLogin.CONFIRM_EMPLOYEE)
     }
 
+    if (userRelationshipType === USER_TYPES.AGENT) {
+      return h.redirect(routes.postLogin.CONFIRM_AGENT)
+    }
+
     return h.redirect(routes.PROJECT_NAME)
   }
 }

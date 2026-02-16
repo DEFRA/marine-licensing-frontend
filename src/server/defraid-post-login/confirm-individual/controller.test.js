@@ -31,7 +31,8 @@ describe('#postLoginConfirmIndividual', () => {
 
       expect(h.view).toHaveBeenCalledWith(CONFIRM_INDIVIDUAL_VIEW_ROUTE, {
         heading: `Confirm you're notifying us as ${citizenUserSession.displayName} for a personal project`,
-        pageTitle: "Confirm you're notifying us as an individual"
+        pageTitle: "Confirm you're notifying us as an individual",
+        payload: { confirmIndividual: null }
       })
     })
   })

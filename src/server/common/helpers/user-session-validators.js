@@ -52,3 +52,25 @@ export const validateEmployeeUserSession = {
     return h.continue
   }
 }
+
+export const validateAgentUserSession = {
+  method: async (request, h) => {
+    const userSession = await getUserSession(
+      request,
+      request.state?.userSession
+    )
+
+    const sessionCheck = validateSessionExists(userSession, h)
+    if (sessionCheck) {
+      return sessionCheck
+    }
+
+    const { userRelationshipType } = userSession
+
+    if (userRelationshipType !== USER_TYPES.AGENT) {
+      return h.redirect(routes.EXEMPTION).takeover()
+    }
+
+    return h.continue
+  }
+}

@@ -50,8 +50,9 @@ export const defraIdGuidanceRoutes = {
 }
 
 export const postLoginRoutes = {
-  CONFIRM_INDIVIDUAL: '/confirm-individual',
-  CONFIRM_EMPLOYEE: '/confirm-employee'
+  CONFIRM_AGENT: '/confirm-agent',
+  CONFIRM_EMPLOYEE: '/confirm-employee',
+  CONFIRM_INDIVIDUAL: '/confirm-individual'
 }
 
 export const routes = {

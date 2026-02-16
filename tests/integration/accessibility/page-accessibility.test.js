@@ -205,6 +205,11 @@ describe('Page accessibility checks (Axe)', () => {
       url: routes.postLogin.CONFIRM_AGENT,
       title: 'Are you notifying us as an agent or intermediary for Client Org?',
       session: { ...agentSession, shouldShowOrgOrUserName: false }
+    },
+    {
+      url: routes.postLogin.GUIDANCE_INDIVIDUAL,
+      title: 'Exempt activity notification for an individual',
+      session: { ...employeeSession, shouldShowOrgOrUserName: false }
     }
   ]
 

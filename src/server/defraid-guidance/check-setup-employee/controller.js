@@ -4,7 +4,7 @@ import {
   mapErrorsForDisplay
 } from '#src/server/common/helpers/errors.js'
 import { routes } from '#src/server/common/constants/routes.js'
-import { defraIdGuidanceUserSession } from '#src/server/common/helpers/defraid-guidance/session-cache.js'
+import { defraIdGuidanceUserSession } from '#src/server/common/helpers/defraid-login/session-cache.js'
 
 const backLink = routes.defraIdGuidance.WHO_IS_EXEMPTION_FOR
 const title = 'Check you are set up to apply for your organisation'

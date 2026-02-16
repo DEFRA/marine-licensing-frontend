@@ -11,6 +11,6 @@ export const loginController = {
     }
   },
   handler: (_request, h) => {
-    return h.redirect(routes.PROJECT_NAME)
+    return h.redirect(routes.EXEMPTION)
   }
 }

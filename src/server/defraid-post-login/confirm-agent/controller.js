@@ -68,11 +68,6 @@ export const confirmAgentSubmitController = {
   async handler(request, h) {
     const { payload } = request
 
-    const userSession = await getUserSession(
-      request,
-      request.state?.userSession
-    )
-
     const { confirmAgent } = payload
 
     await postloginUserSession.set({
@@ -81,23 +76,14 @@ export const confirmAgentSubmitController = {
       value: confirmAgent
     })
 
-    if (confirmAgent === 'yes') {
-      return h.redirect(routes.PROJECT_NAME)
-    }
-
     if (confirmAgent === 'personal') {
       return h.redirect(routes.postLogin.GUIDANCE_INDIVIDUAL)
     }
 
-    const heading = generateHeadingText(userSession)
-    const { organisationName, hasMultipleOrgPickerEntries } = userSession
+    if (confirmAgent === 'organisation') {
+      return h.redirect(routes.postLogin.GUIDANCE_ORG)
+    }
 
-    return h.view(CONFIRM_AGENT_VIEW_ROUTE, {
-      payload,
-      heading,
-      pageTitle: heading,
-      organisationName,
-      hasMultipleOrgPickerEntries
-    })
+    return h.redirect(routes.PROJECT_NAME)
   }
 }

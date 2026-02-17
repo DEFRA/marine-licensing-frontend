@@ -120,19 +120,14 @@ describe('Post-login - Confirm Employee', () => {
   })
 
   test('should redirect correctly when user confirms they are not employee of this company', async () => {
-    const { result } = await makePostRequest({
+    const { headers, statusCode } = await makePostRequest({
       url: routes.postLogin.CONFIRM_EMPLOYEE,
       server: getServer(),
       formData: { confirmEmployee: 'organisation' }
     })
 
-    const { document } = new JSDOM(result).window
-
-    const pageHeading = within(document).getByRole('heading', {
-      level: 1,
-      name: `Are you notifying us as an employee of ${employeeSession.organisationName}?`
-    })
-    expect(pageHeading).toBeInTheDocument()
+    expect(statusCode).toBe(statusCodes.redirect)
+    expect(headers.location).toBe(routes.postLogin.GUIDANCE_ORG)
   })
 
   test('should redirect correctly when user confirms they are not employee user', async () => {

@@ -194,6 +194,10 @@ describe('Page accessibility checks (Axe)', () => {
       title: 'You need to be added to your organisation\u2019s Defra account'
     },
     {
+      url: routes.defraIdGuidance.ADD_TO_CLIENT_ACCOUNT,
+      title: 'You need to be added to your client\u2019s Defra account'
+    },
+    {
       url: routes.postLogin.CONFIRM_INDIVIDUAL,
       title: "Confirm you're notifying us as an individual",
       session: citizenUserSession
@@ -214,8 +218,9 @@ describe('Page accessibility checks (Axe)', () => {
       session: { ...employeeSession, shouldShowOrgOrUserName: false }
     },
     {
-      url: routes.defraIdGuidance.ADD_TO_CLIENT_ACCOUNT,
-      title: 'You need to be added to your client\u2019s Defra account'
+      url: routes.postLogin.GUIDANCE_ORG,
+      title: 'Exempt activity notification for an organisation',
+      session: { ...employeeSession, shouldShowOrgOrUserName: false }
     }
   ]
 
@@ -229,7 +234,7 @@ describe('Page accessibility checks (Axe)', () => {
       session
     }) => {
       if (session) {
-        vi.mocked(postloginUserSession.get).mockResolvedValue(true)
+        vi.mocked(postloginUserSession.get).mockResolvedValue('organisation')
         vi.mocked(getUserSession).mockResolvedValue(session)
       }
 

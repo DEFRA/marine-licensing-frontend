@@ -38,17 +38,16 @@ describe('#postLoginConfirmIndividual', () => {
   })
 
   describe('#confirmIndividualSubmitController', () => {
-    test('correctly renders page', async () => {
-      const request = createMockRequest()
+    test('correctly redirects to guidance page if user answers no', async () => {
+      const request = createMockRequest({
+        payload: { confirmIndividual: 'no' }
+      })
       const h = createMockH()
 
       await confirmIndividualSubmitController.handler(request, h)
 
-      expect(h.view).toHaveBeenCalledWith(CONFIRM_INDIVIDUAL_VIEW_ROUTE, {
-        heading: `Confirm you're notifying us as ${citizenUserSession.displayName} for a personal project`,
-        pageTitle: "Confirm you're notifying us as an individual",
-        payload: {}
-      })
+      expect(h.redirect).toHaveBeenCalledWith(routes.postLogin.GUIDANCE_ORG)
+      expect(h.view).not.toHaveBeenCalled()
     })
 
     test('should validate payload correctly', () => {

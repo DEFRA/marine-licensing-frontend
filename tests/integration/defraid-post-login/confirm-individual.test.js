@@ -90,18 +90,13 @@ describe('Post-login - Confirm Individual', () => {
   })
 
   test('should redirect correctly when user confirms they are not individual user', async () => {
-    const { result } = await makePostRequest({
+    const { headers, statusCode } = await makePostRequest({
       url: routes.postLogin.CONFIRM_INDIVIDUAL,
       server: getServer(),
       formData: { confirmIndividual: 'no' }
     })
 
-    const { document } = new JSDOM(result).window
-
-    const pageHeading = within(document).getByRole('heading', {
-      level: 1,
-      name: `Confirm you're notifying us as ${citizenUserSession.displayName} for a personal project`
-    })
-    expect(pageHeading).toBeInTheDocument()
+    expect(statusCode).toBe(statusCodes.redirect)
+    expect(headers.location).toBe(routes.postLogin.GUIDANCE_ORG)
   })
 })

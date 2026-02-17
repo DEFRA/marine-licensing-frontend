@@ -180,7 +180,11 @@ describe('Page accessibility checks (Axe)', () => {
     },
     {
       url: routes.defraIdGuidance.ADD_TO_ORG_ACCOUNT,
-      title: 'You need to be added to your organisation’s Defra account'
+      title: 'You need to be added to your organisation\u2019s Defra account'
+    },
+    {
+      url: routes.defraIdGuidance.ADD_TO_CLIENT_ACCOUNT,
+      title: 'You need to be added to your client\u2019s Defra account'
     }
   ]
 

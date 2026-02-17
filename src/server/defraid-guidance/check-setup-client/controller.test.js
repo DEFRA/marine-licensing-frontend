@@ -17,7 +17,7 @@ describe('#defraIdGuidanceCheckSetupClientSubmitController', () => {
     expect(headers.location).toBe(routes.SIGNIN)
   })
 
-  test('should redirect back to the same page if the client has not linked the user', async () => {
+  test('should redirect to add-to-client-account if the client has not linked the user', async () => {
     const { statusCode, headers } = await makePostRequest({
       url: routes.defraIdGuidance.CHECK_SETUP_CLIENT,
       server: getServer(),
@@ -26,6 +26,6 @@ describe('#defraIdGuidanceCheckSetupClientSubmitController', () => {
 
     expect(statusCode).toBe(302)
 
-    expect(headers.location).toBe(routes.defraIdGuidance.CHECK_SETUP_CLIENT)
+    expect(headers.location).toBe(routes.defraIdGuidance.ADD_TO_CLIENT_ACCOUNT)
   })
 })

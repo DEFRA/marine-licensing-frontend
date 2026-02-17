@@ -191,7 +191,7 @@ describe('Page accessibility checks (Axe)', () => {
     },
     {
       url: routes.defraIdGuidance.ADD_TO_ORG_ACCOUNT,
-      title: 'You need to be added to your organisation’s Defra account'
+      title: 'You need to be added to your organisation\u2019s Defra account'
     },
     {
       url: routes.postLogin.CONFIRM_INDIVIDUAL,
@@ -212,6 +212,10 @@ describe('Page accessibility checks (Axe)', () => {
       url: routes.postLogin.GUIDANCE_INDIVIDUAL,
       title: 'Exempt activity notification for an individual',
       session: { ...employeeSession, shouldShowOrgOrUserName: false }
+    },
+    {
+      url: routes.defraIdGuidance.ADD_TO_CLIENT_ACCOUNT,
+      title: 'You need to be added to your client\u2019s Defra account'
     }
   ]
 

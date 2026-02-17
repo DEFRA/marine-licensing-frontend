@@ -13,6 +13,7 @@ import {
 } from '#src/server/defraid-guidance/who-is-the-exemption-for/controller.js'
 import { defraIdGuidanceRegisterNewOrgController } from '#src/server/defraid-guidance/register-new-org/controller.js'
 import { defraIdGuidanceAddToOrgAccountController } from '#src/server/defraid-guidance/add-to-org-account/controller.js'
+import { defraIdGuidanceAddToClientAccountController } from '#src/server/defraid-guidance/add-to-client-account/controller.js'
 
 export const defraIdGuidance = {
   plugin: {
@@ -65,6 +66,12 @@ export const defraIdGuidance = {
           path: routes.defraIdGuidance.ADD_TO_ORG_ACCOUNT,
           options: { auth: false },
           ...defraIdGuidanceAddToOrgAccountController
+        },
+        {
+          method: 'GET',
+          path: routes.defraIdGuidance.ADD_TO_CLIENT_ACCOUNT,
+          options: { auth: false },
+          ...defraIdGuidanceAddToClientAccountController
         }
       ])
     }

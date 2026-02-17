@@ -1,4 +1,5 @@
 {% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
+{% from "govuk/components/tag/macro.njk" import govukTag %}
 
 {{ govukSummaryList({
   card: {
@@ -18,6 +19,17 @@
       text: 'Exempt activity notification'
     }
     },
+    {
+      key: {
+        text: "Status"
+      },
+        value: {
+        html: govukTag({
+          text: params.status,
+          classes: params.statusTagClass
+        })
+      }
+    } if params.status else undefined,
     {
       key: {
         text: "Reference number"
@@ -41,6 +53,14 @@
         value: {
         html: params.dateSubmitted | formatDate('d MMMM yyyy')
       }
-    }
+    },
+    {
+      key: {
+        text: "Date withdrawn"
+      },
+        value: {
+        html: params.withdrawnAt | formatDate('d MMMM yyyy')
+      }
+    } if params.withdrawnAt else undefined
   ]
 }) }}

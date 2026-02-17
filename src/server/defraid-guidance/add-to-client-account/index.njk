@@ -1,0 +1,70 @@
+{% extends 'layouts/page.njk' %}
+
+{% block beforeContent %}
+  {{ super() }}
+  {{  appBackLink({backLink: backLink}) }}
+{% endblock %}
+
+{% block content %}
+
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+      <h1 class="govuk-heading-l">
+        {{ heading }}
+      </h1>
+      <div class="govuk-body" data-testid="app-page-body">
+
+        <p class="govuk-body">
+          You cannot notify us of an exemption until your client has set you up.
+        </p>
+
+        <h2 class="govuk-heading-m">
+          If your client already has a Defra account
+        </h2>
+
+        <p class="govuk-body">
+          You need to ask your client to invite you to their Defra account as an intermediary.
+        </p>
+
+        <h2 class="govuk-heading-m">
+          If your client does not have a Defra account
+        </h2>
+
+        <p class="govuk-body">
+          Ask your client to create a Defra account and invite you to it as an intermediary.
+        </p>
+
+        <p class="govuk-body">
+          To create an account, your client needs to take the following steps:
+        </p>
+
+        <ul class="govuk-list govuk-list--bullet">
+          <li>
+            <a href="/" class="govuk-link">Sign in to or create a Defra account</a> for their <strong>business or organisation</strong>.
+          </li>
+          <li>They'll create a Defra account using GOV UK Login or Government Gateway.</li>
+          <li>Invite you as an intermediary under <strong>Manage account users</strong>.</li>
+          <li>Give you access to the <strong>Get permission for marine work</strong> service.</li>
+        </ul>
+
+        <p class="govuk-body">
+          Once you've received the invitation email and accepted it, you can return to this service.
+        </p>
+
+        <h2 class="govuk-heading-m">
+          Guidance
+        </h2>
+
+        <ul class="govuk-list">
+          <li>
+            <a href="https://www.gov.uk/guidance/creating-a-defra-account" class="govuk-link">How to create a Defra account</a>
+          </li>
+          <li>
+            <a href="https://www.gov.uk/guidance/adding-users-to-a-defra-account-as-an-admin" class="govuk-link">How to add users to a Defra account</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+{% endblock %}

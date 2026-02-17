@@ -71,7 +71,7 @@ describe('Guidance - Check set-up (client)', () => {
     expect(response.headers.location).toBe(routes.SIGNIN)
   })
 
-  test('should redirect back to same page when no is selected (placeholder)', async () => {
+  test('should redirect to add-to-client-account when no is selected', async () => {
     const { response } = await submitForm({
       requestUrl: routes.defraIdGuidance.CHECK_SETUP_CLIENT,
       server: getServer(),
@@ -79,7 +79,7 @@ describe('Guidance - Check set-up (client)', () => {
     })
     expect(response.statusCode).toBe(statusCodes.redirect)
     expect(response.headers.location).toBe(
-      routes.defraIdGuidance.CHECK_SETUP_CLIENT
+      routes.defraIdGuidance.ADD_TO_CLIENT_ACCOUNT
     )
   })
 

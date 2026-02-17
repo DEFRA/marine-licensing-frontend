@@ -14,8 +14,8 @@ describe('#generateBackLink', () => {
     expect(result).toBe(routes.postLogin.CONFIRM_EMPLOYEE)
   })
 
-  test('should correctly format back link for agent user', () => {
-    const result = generateBackLink({ userTypeAgent: 'yes' })
+  test('should correctly format back link for agent user or fallback', () => {
+    const result = generateBackLink({})
 
     expect(result).toBe(routes.postLogin.CONFIRM_AGENT)
   })

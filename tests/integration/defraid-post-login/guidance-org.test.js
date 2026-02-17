@@ -34,7 +34,7 @@ describe('Post-login - Organisation Guidance Advice', () => {
     const warningText = document.querySelector('.govuk-warning-text__text')
     expect(warningText).toBeInTheDocument()
     expect(warningText.textContent).toContain(
-      'If you do not set up your Defra account correctly your exempt activity notification will not be valid. This is because it will not be registered to the person the exemption is for.'
+      'If you do not set up your Defra account correctly your exempt activity notification will not be valid. This is because it will not be registered to the organisation the exemption is for.'
     )
 
     const firstSubheading = within(document).getByRole('heading', {
@@ -131,17 +131,6 @@ describe('Post-login - Organisation Guidance Advice', () => {
     })
     expect(signOutButton).toBeInTheDocument()
     expect(signOutButton).toHaveAttribute('href', routes.SIGN_OUT)
-  })
-
-  test('should show back link when user came from employee flow', async () => {
-    vi.mocked(postloginUserSession.get).mockImplementation(({ key }) =>
-      key === 'confirmEmployee' ? 'organisation' : null
-    )
-
-    const document = await loadPage({
-      requestUrl: routes.postLogin.GUIDANCE_ORG,
-      server: getServer()
-    })
 
     const backLink = getByRole(document, 'link', { name: 'Back' })
     expect(backLink).toBeInTheDocument()

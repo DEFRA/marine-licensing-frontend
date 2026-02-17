@@ -28,7 +28,10 @@ export const guidanceOrgController = {
     const userTypeEmployee = confirmEmployee === 'organisation'
     const userTypeAgent = confirmAgent === 'organisation'
 
-    if (!userTypeIndividual && !userTypeEmployee && !userTypeAgent) {
+    const userShouldNotSeePage =
+      !userTypeIndividual && !userTypeEmployee && !userTypeAgent
+
+    if (userShouldNotSeePage) {
       return h.redirect(routes.EXEMPTION)
     }
 

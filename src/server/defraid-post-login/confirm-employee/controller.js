@@ -77,10 +77,6 @@ export const confirmEmployeeSubmitController = {
       value: confirmEmployee
     })
 
-    if (confirmEmployee === 'yes') {
-      return h.redirect(routes.PROJECT_NAME)
-    }
-
     if (confirmEmployee === 'personal') {
       return h.redirect(routes.postLogin.GUIDANCE_INDIVIDUAL)
     }
@@ -88,5 +84,7 @@ export const confirmEmployeeSubmitController = {
     if (confirmEmployee === 'organisation') {
       return h.redirect(routes.postLogin.GUIDANCE_ORG)
     }
+
+    return h.redirect(routes.PROJECT_NAME)
   }
 }

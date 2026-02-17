@@ -76,10 +76,6 @@ export const confirmAgentSubmitController = {
       value: confirmAgent
     })
 
-    if (confirmAgent === 'yes') {
-      return h.redirect(routes.PROJECT_NAME)
-    }
-
     if (confirmAgent === 'personal') {
       return h.redirect(routes.postLogin.GUIDANCE_INDIVIDUAL)
     }
@@ -87,5 +83,7 @@ export const confirmAgentSubmitController = {
     if (confirmAgent === 'organisation') {
       return h.redirect(routes.postLogin.GUIDANCE_ORG)
     }
+
+    return h.redirect(routes.PROJECT_NAME)
   }
 }

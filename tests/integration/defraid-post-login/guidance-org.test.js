@@ -104,8 +104,27 @@ describe('Post-login - Organisation Guidance Advice', () => {
 
     expect(fourthSubheading).toBeInTheDocument()
 
-    const creteAccountListLinks = lists[1].querySelectorAll('li')
-    expect(creteAccountListLinks).toHaveLength(4)
+    const guidanceLinksList = linksList[1]
+    const guidanceLinks = guidanceLinksList.querySelectorAll('li')
+    expect(guidanceLinks).toHaveLength(2)
+
+    const createAccountLink = within(document).getByRole('link', {
+      name: 'How to create a Defra account'
+    })
+    expect(createAccountLink).toBeInTheDocument()
+    expect(createAccountLink).toHaveAttribute(
+      'href',
+      'https://www.gov.uk/guidance/creating-a-defra-account'
+    )
+
+    const addUserLink = within(document).getByRole('link', {
+      name: 'How to add users to a Defra account'
+    })
+    expect(addUserLink).toBeInTheDocument()
+    expect(addUserLink).toHaveAttribute(
+      'href',
+      'https://www.gov.uk/guidance/adding-users-to-a-defra-account-as-an-admin'
+    )
 
     const signOutButton = getByRole(document, 'button', {
       name: 'Sign out'
@@ -124,7 +143,7 @@ describe('Post-login - Organisation Guidance Advice', () => {
       server: getServer()
     })
 
-    const backLink = document.querySelector('.govuk-back-link')
+    const backLink = getByRole(document, 'link', { name: 'Back' })
     expect(backLink).toBeInTheDocument()
     expect(backLink).toHaveAttribute('href', routes.postLogin.CONFIRM_EMPLOYEE)
   })
@@ -139,7 +158,7 @@ describe('Post-login - Organisation Guidance Advice', () => {
       server: getServer()
     })
 
-    const backLink = document.querySelector('.govuk-back-link')
+    const backLink = getByRole(document, 'link', { name: 'Back' })
     expect(backLink).toBeInTheDocument()
     expect(backLink).toHaveAttribute('href', routes.postLogin.CONFIRM_AGENT)
   })
@@ -154,7 +173,7 @@ describe('Post-login - Organisation Guidance Advice', () => {
       server: getServer()
     })
 
-    const backLink = document.querySelector('.govuk-back-link')
+    const backLink = getByRole(document, 'link', { name: 'Back' })
     expect(backLink).toBeInTheDocument()
     expect(backLink).toHaveAttribute(
       'href',

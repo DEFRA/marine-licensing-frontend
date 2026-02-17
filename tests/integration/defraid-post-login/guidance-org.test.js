@@ -45,7 +45,7 @@ describe('Post-login - Organisation Guidance Advice', () => {
     expect(firstSubheading).toBeInTheDocument()
 
     const lists = document.querySelectorAll('ol.govuk-list--number')
-    expect(lists).toHaveLength(1)
+    expect(lists).toHaveLength(2)
 
     const list = lists[0]
 
@@ -67,7 +67,7 @@ describe('Post-login - Organisation Guidance Advice', () => {
     expect(secondSubheading).toBeInTheDocument()
 
     const linksList = document.querySelectorAll('ul.govuk-list')
-    expect(linksList).toHaveLength(3)
+    expect(linksList).toHaveLength(2)
 
     const listOfLinks = linksList[0]
 
@@ -83,7 +83,29 @@ describe('Post-login - Organisation Guidance Advice', () => {
     })
     expect(callCharges).toBeInTheDocument()
 
-    // TODO - NEXT SECTION
+    const secondPageHeading = within(document).getByRole('heading', {
+      level: 2,
+      name: "You're the agent or intermediary for a client organisation"
+    })
+
+    expect(secondPageHeading).toBeInTheDocument()
+
+    const thirdSubheading = within(document).getByRole('heading', {
+      level: 3,
+      name: 'If your client already has a Defra account'
+    })
+
+    expect(thirdSubheading).toBeInTheDocument()
+
+    const fourthSubheading = within(document).getByRole('heading', {
+      level: 3,
+      name: 'If your client does not have a Defra account'
+    })
+
+    expect(fourthSubheading).toBeInTheDocument()
+
+    const creteAccountListLinks = lists[1].querySelectorAll('li')
+    expect(creteAccountListLinks).toHaveLength(4)
 
     const signOutButton = getByRole(document, 'button', {
       name: 'Sign out'

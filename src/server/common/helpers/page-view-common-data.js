@@ -1,6 +1,11 @@
 import { getUserSession } from '#src/server/common/plugins/auth/utils.js'
 import { routes } from '#src/server/common/constants/routes.js'
 
+export const changeOrganisationLinkRoutes = [
+  routes.DASHBOARD,
+  routes.SERVICE_HOME
+]
+
 export const getPageViewCommonData = async (request) => {
   const userSession = await getUserSession(request, request.state?.userSession)
   if (!userSession) {
@@ -13,7 +18,8 @@ export const getPageViewCommonData = async (request) => {
     displayName
   } = userSession
   const showChangeOrganisationLink =
-    hasMultipleOrgPickerEntries && request.path === routes.DASHBOARD
+    hasMultipleOrgPickerEntries &&
+    changeOrganisationLinkRoutes.includes(request.path)
   const orgOrUserName = shouldShowOrgOrUserName
     ? organisationName || displayName
     : null

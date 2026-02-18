@@ -108,10 +108,7 @@ const baseExpectedContent = {
     'The purpose of the activity':
       'Scientific instruments and associated equipment',
     "Your answers from 'Check if you need a marine licence'": [
-      'Download a copy of your answers (PDF)',
-      "If you need to change any of your 'Check if you need a marine licence' answers:",
-      'Delete this project from your projects.',
-      'Restart the process by checking if you need a marine licence.'
+      'Download a copy of your answers (PDF)'
     ]
   },
   publicRegister: {

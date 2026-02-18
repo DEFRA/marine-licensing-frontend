@@ -66,12 +66,9 @@ describe('Post-login - Organisation Guidance Advice', () => {
 
     expect(secondSubheading).toBeInTheDocument()
 
-    const linksList = document.querySelectorAll('ul.govuk-list')
-    expect(linksList).toHaveLength(2)
-
-    const listOfLinks = linksList[0]
-
-    const emailLink = within(listOfLinks).getByRole('link')
+    const emailLink = within(document).getByRole('link', {
+      name: /Customer.Identity-Support@defra.gov.uk/
+    })
     expect(emailLink).toBeInTheDocument()
     expect(emailLink).toHaveAttribute(
       'href',
@@ -104,7 +101,10 @@ describe('Post-login - Organisation Guidance Advice', () => {
 
     expect(fourthSubheading).toBeInTheDocument()
 
-    const guidanceLinksList = linksList[1]
+    const linksList = document.querySelectorAll('ul.govuk-list')
+    expect(linksList).toHaveLength(1)
+
+    const guidanceLinksList = linksList[0]
     const guidanceLinks = guidanceLinksList.querySelectorAll('li')
     expect(guidanceLinks).toHaveLength(2)
 

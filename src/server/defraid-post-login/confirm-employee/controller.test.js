@@ -30,6 +30,7 @@ describe('#postLoginConfirmEmployee', () => {
       await confirmEmployeeController.handler(request, h)
 
       expect(h.view).toHaveBeenCalledWith(CONFIRM_EMPLOYEE_VIEW_ROUTE, {
+        backLink: routes.CHANGE_ORGANISATION,
         heading: `Are you notifying us as an employee of ${employeeSession.organisationName}?`,
         organisationName: 'Test Org',
         pageTitle: `Are you notifying us as an employee of ${employeeSession.organisationName}?`,

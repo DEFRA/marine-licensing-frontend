@@ -3,6 +3,7 @@ import {
   errorDescriptionByFieldName,
   mapErrorsForDisplay
 } from '#src/server/common/helpers/errors.js'
+import { routes } from '#src/server/common/constants/routes.js'
 
 export const createConfirmFailAction = ({
   viewRoute,
@@ -25,6 +26,7 @@ export const createConfirmFailAction = ({
 
     return h
       .view(viewRoute, {
+        backLink: routes.CHANGE_ORGANISATION,
         heading,
         pageTitle: heading,
         payload,

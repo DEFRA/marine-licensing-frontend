@@ -8,5 +8,8 @@ export const defraIdGuidanceUserSession = {
   get: async ({ request, key }) => {
     const guidance = await request.yar.get(CACHE_PARENT_KEY)
     return guidance ? guidance[key] || null : null
+  },
+  clear: (request) => {
+    request.yar.clear(CACHE_PARENT_KEY)
   }
 }

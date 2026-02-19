@@ -2,6 +2,7 @@ import { vi, describe, test, expect, beforeEach } from 'vitest'
 import { routes } from '#src/server/common/constants/routes.js'
 import { cacheMcmsContextFromQueryParams } from '#src/server/common/helpers/mcms-context/cache-mcms-context.js'
 import { clearExemptionCache } from '#src/server/common/helpers/exemptions/session-cache/utils.js'
+import { defraIdGuidanceUserSession } from '#src/server/common/helpers/defraid-guidance/session-cache.js'
 import {
   defraIdGuidanceWhoIsExemptionForController,
   defraIdGuidanceWhoIsExemptionForSubmitController,
@@ -18,6 +19,13 @@ vi.mock(
 
 vi.mock('#src/server/common/helpers/exemptions/session-cache/utils.js', () => ({
   clearExemptionCache: vi.fn().mockResolvedValue(undefined)
+}))
+
+vi.mock('#src/server/common/helpers/defraid-guidance/session-cache.js', () => ({
+  defraIdGuidanceUserSession: {
+    get: vi.fn().mockResolvedValue(null),
+    set: vi.fn().mockResolvedValue(undefined)
+  }
 }))
 
 const createMockRequest = (overrides = {}) => ({
@@ -58,9 +66,24 @@ describe('defraIdGuidanceWhoIsExemptionForController', () => {
 
       expect(h.view).toHaveBeenCalledWith(pathToPageTemplate, {
         pageTitle: 'Who is this exempt activity notification for?',
-        heading: 'Who is this exempt activity notification for?'
+        heading: 'Who is this exempt activity notification for?',
+        whoIsExemptionFor: null
       })
       expect(h.redirect).not.toHaveBeenCalled()
+    })
+
+    test('pre-populates radio from session cache on back navigation', async () => {
+      defraIdGuidanceUserSession.get.mockResolvedValueOnce('client')
+      const request = createMockRequest({ state: {} })
+      const h = createMockH()
+
+      await defraIdGuidanceWhoIsExemptionForController.handler(request, h)
+
+      expect(h.view).toHaveBeenCalledWith(pathToPageTemplate, {
+        pageTitle: 'Who is this exempt activity notification for?',
+        heading: 'Who is this exempt activity notification for?',
+        whoIsExemptionFor: 'client'
+      })
     })
 
     test('renders view when state is undefined', async () => {
@@ -140,7 +163,7 @@ describe('defraIdGuidanceWhoIsExemptionForSubmitController', () => {
       )
     })
 
-    test('redirects to self when client selected', async () => {
+    test('redirects to check-setup-client when client selected', async () => {
       const request = createMockRequest({
         payload: { whoIsExemptionFor: 'client' }
       })
@@ -149,8 +172,23 @@ describe('defraIdGuidanceWhoIsExemptionForSubmitController', () => {
       await defraIdGuidanceWhoIsExemptionForSubmitController.handler(request, h)
 
       expect(h.redirect).toHaveBeenCalledWith(
-        routes.defraIdGuidance.WHO_IS_EXEMPTION_FOR
+        routes.defraIdGuidance.CHECK_SETUP_CLIENT
       )
+    })
+
+    test('saves selection to session before redirecting', async () => {
+      const request = createMockRequest({
+        payload: { whoIsExemptionFor: 'organisation' }
+      })
+      const h = createMockH()
+
+      await defraIdGuidanceWhoIsExemptionForSubmitController.handler(request, h)
+
+      expect(defraIdGuidanceUserSession.set).toHaveBeenCalledWith({
+        request,
+        key: 'whoIsExemptionFor',
+        value: 'organisation'
+      })
     })
   })
 

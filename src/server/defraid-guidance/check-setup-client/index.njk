@@ -3,6 +3,7 @@
 {% from "govuk/components/button/macro.njk" import govukButton %}
 {% from "govuk/components/radios/macro.njk" import govukRadios %}
 {% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+{% from "radio-page/macro.njk" import appRadioPage %}
 
 {% block beforeContent %}
   {{ super() }}
@@ -29,17 +30,17 @@
           iconFallbackText: "Warning"
         }) }}
         <p class="govuk-body">
-          To notify us of an exemption for an organisation, you must have a Defra account linked to that organisation. You cannot use a personal individual account.
+          To notify us of an exemption for a client, they must invite you to their account as an intermediary and give you access to the 'Get permission for marine work' service. You cannot use a personal individual account.
         </p>
         <form method="POST">
           <input type="hidden" name="csrfToken" value="{{csrfToken}}" />
           {{ govukRadios({
-            idPrefix: 'checkSetupEmployee',
-            name: 'checkSetupEmployee',
-            value: checkSetupEmployee,
+            idPrefix: 'checkSetupClient',
+            name: 'checkSetupClient',
+            value: checkSetupClient,
             fieldset: {
               legend: {
-                html: 'Do you have a Defra account for your organisation?',
+                html: 'Has your client fully linked you to their Defra account?',
                 classes: "govuk-fieldset__legend govuk-fieldset__legend--m"
               }
             },
@@ -47,15 +48,17 @@
             items: [
               {
                 value: "yes",
-                text: "Yes, I can sign in to my organisation's account"
+                text: "Yes",
+                hint: {
+                  text: "I have accepted their email invitation and they have given me access to the 'Get permission for marine work' service"
+                }
               },
               {
-                value: "register-new",
-                text: "No, I need to create a new account for my organisation"
-              },
-              {
-                value: "need-to-be-added",
-                text: "No, I need to be added to my organisation's existing account"
+                value: "no",
+                text: "No",
+                hint: {
+                  text: "I have not received an invitation or I do not have access to the service yet"
+                }
               }
             ]
           }) }}

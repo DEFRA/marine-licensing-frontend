@@ -4,11 +4,16 @@ import {
   defraIdGuidanceCheckSetupEmployeeSubmitController
 } from '#src/server/defraid-guidance/check-setup-employee/controller.js'
 import {
+  defraIdGuidanceCheckSetupClientController,
+  defraIdGuidanceCheckSetupClientSubmitController
+} from '#src/server/defraid-guidance/check-setup-client/controller.js'
+import {
   defraIdGuidanceWhoIsExemptionForController,
   defraIdGuidanceWhoIsExemptionForSubmitController
 } from '#src/server/defraid-guidance/who-is-the-exemption-for/controller.js'
 import { defraIdGuidanceRegisterNewOrgController } from '#src/server/defraid-guidance/register-new-org/controller.js'
 import { defraIdGuidanceAddToOrgAccountController } from '#src/server/defraid-guidance/add-to-org-account/controller.js'
+import { defraIdGuidanceAddToClientAccountController } from '#src/server/defraid-guidance/add-to-client-account/controller.js'
 
 export const defraIdGuidance = {
   plugin: {
@@ -41,6 +46,17 @@ export const defraIdGuidance = {
         },
         {
           method: 'GET',
+          path: routes.defraIdGuidance.CHECK_SETUP_CLIENT,
+          options: { auth: false },
+          ...defraIdGuidanceCheckSetupClientController
+        },
+        {
+          method: 'POST',
+          path: routes.defraIdGuidance.CHECK_SETUP_CLIENT,
+          ...defraIdGuidanceCheckSetupClientSubmitController
+        },
+        {
+          method: 'GET',
           path: routes.defraIdGuidance.REGISTER_NEW_ORG,
           options: { auth: false },
           ...defraIdGuidanceRegisterNewOrgController
@@ -50,6 +66,12 @@ export const defraIdGuidance = {
           path: routes.defraIdGuidance.ADD_TO_ORG_ACCOUNT,
           options: { auth: false },
           ...defraIdGuidanceAddToOrgAccountController
+        },
+        {
+          method: 'GET',
+          path: routes.defraIdGuidance.ADD_TO_CLIENT_ACCOUNT,
+          options: { auth: false },
+          ...defraIdGuidanceAddToClientAccountController
         }
       ])
     }

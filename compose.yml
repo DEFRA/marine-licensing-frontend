@@ -17,6 +17,7 @@ services:
       REDIS_PORT: 6380
       USE_SINGLE_INSTANCE_CACHE: true
       NODE_ENV: development
+      SESSION_CACHE_NAME: defraIdStubSession
     depends_on:
       redis-frontend:
         condition: service_started

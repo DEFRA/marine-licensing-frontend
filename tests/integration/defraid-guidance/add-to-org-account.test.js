@@ -20,4 +20,18 @@ describe('Guidance - Employee needs to be added to org account', () => {
       within(document).getByRole('link', { name: 'Back' })
     ).toHaveAttribute('href', '/guidance/check-setup-employee')
   })
+
+  it('should have a guidance link to adding users to a Defra account', async () => {
+    const document = await loadPage({
+      requestUrl: routes.defraIdGuidance.ADD_TO_ORG_ACCOUNT,
+      server: getServer()
+    })
+    const guidanceLink = within(document).getByRole('link', {
+      name: /How to add users to a Defra account/
+    })
+    expect(guidanceLink).toHaveAttribute(
+      'href',
+      'https://www.gov.uk/guidance/adding-users-to-a-defra-account-as-an-admin'
+    )
+  })
 })

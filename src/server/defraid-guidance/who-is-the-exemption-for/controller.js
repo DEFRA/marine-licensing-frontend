@@ -6,6 +6,7 @@ import {
 import { routes } from '#src/server/common/constants/routes.js'
 import { cacheMcmsContextFromQueryParams } from '#src/server/common/helpers/mcms-context/cache-mcms-context.js'
 import { clearExemptionCache } from '#src/server/common/helpers/exemptions/session-cache/utils.js'
+import { defraIdGuidanceUserSession } from '#src/server/common/helpers/defraid-guidance/session-cache.js'
 
 const title = 'Who is this exempt activity notification for?'
 const viewData = {
@@ -21,16 +22,20 @@ export const errorMessages = {
 
 export const defraIdGuidanceWhoIsExemptionForController = {
   async handler(request, h) {
-    if (request.state?.userSession) {
-      return h.redirect(routes.PROJECT_NAME)
-    }
-
     if (request.query.ACTIVITY_TYPE) {
       cacheMcmsContextFromQueryParams(request)
     }
+
+    if (request.state?.userSession) {
+      return h.redirect(routes.PROJECT_NAME)
+    }
     await clearExemptionCache(request, h)
 
-    return h.view(pathToPageTemplate, viewData)
+    const whoIsExemptionFor = await defraIdGuidanceUserSession.get({
+      request,
+      key: 'whoIsExemptionFor'
+    })
+    return h.view(pathToPageTemplate, { ...viewData, whoIsExemptionFor })
   }
 }
 
@@ -50,13 +55,12 @@ export const defraIdGuidanceWhoIsExemptionForSubmitController = {
           })
       }),
       failAction: (request, h, err) => {
-        const { payload } = request
         const errorSummary = mapErrorsForDisplay(err.details, errorMessages)
         const errors = errorDescriptionByFieldName(errorSummary)
         return h
           .view(pathToPageTemplate, {
             ...viewData,
-            payload,
+            whoIsExemptionFor: request.payload?.whoIsExemptionFor,
             errorMessage: errors.whoIsExemptionFor,
             errorSummary
           })
@@ -66,6 +70,11 @@ export const defraIdGuidanceWhoIsExemptionForSubmitController = {
   },
   async handler(request, h) {
     const { whoIsExemptionFor } = request.payload
+    await defraIdGuidanceUserSession.set({
+      request,
+      key: 'whoIsExemptionFor',
+      value: whoIsExemptionFor
+    })
 
     if (whoIsExemptionFor === 'individual') {
       return h.redirect(routes.SIGNIN)
@@ -75,6 +84,6 @@ export const defraIdGuidanceWhoIsExemptionForSubmitController = {
       return h.redirect(routes.defraIdGuidance.CHECK_SETUP_EMPLOYEE)
     }
 
-    return h.redirect(routes.defraIdGuidance.WHO_IS_EXEMPTION_FOR)
+    return h.redirect(routes.defraIdGuidance.CHECK_SETUP_CLIENT)
   }
 }

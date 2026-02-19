@@ -3,10 +3,11 @@ import yar from '@hapi/yar'
 import { config } from '#src/config/config.js'
 
 const sessionConfig = config.get('session')
+
 export const sessionCache = {
   plugin: yar,
   options: {
-    name: sessionConfig.cache.name,
+    name: 'marineLicensingSession',
     maxCookieSize: 0, // this enforces the use of server-side caching
     cache: {
       cache: sessionConfig.cache.name,
@@ -18,6 +19,7 @@ export const sessionCache = {
       password: sessionConfig.cookie.password,
       ttl: sessionConfig.cookie.ttl,
       isSecure: config.get('session.cookie.secure'),
+      isSameSite: 'Lax',
       clearInvalid: true
     }
   }

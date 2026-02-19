@@ -44,8 +44,10 @@ export const marineLicenseRoutes = {
 export const defraIdGuidanceRoutes = {
   WHO_IS_EXEMPTION_FOR: '/guidance/who-is-the-exemption-for',
   CHECK_SETUP_EMPLOYEE: '/guidance/check-setup-employee',
+  CHECK_SETUP_CLIENT: '/guidance/check-setup-client',
   REGISTER_NEW_ORG: '/guidance/register-new-organisation',
-  ADD_TO_ORG_ACCOUNT: '/guidance/add-to-org-account'
+  ADD_TO_ORG_ACCOUNT: '/guidance/add-to-org-account',
+  ADD_TO_CLIENT_ACCOUNT: '/guidance/add-to-client-account'
 }
 
 export const routes = {

@@ -59,7 +59,7 @@
 
     {% set sentences = ['<p><a href="' + params.mcmsContext.pdfDownloadUrl + '" class="govuk-link">Download a copy of ' +  ('your' if params.isApplicantView else 'their') + ' answers (PDF)</a></p>'] %}
 
-    {% if params.isApplicantView %}
+    {% if params.isApplicantView and params.showGuidance %}
       {% set sentences = (sentences.push('<hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible"><p class="govuk-body">If you need to change any of your \'Check if you need a marine licence\' answers:</p><ol class="govuk-list govuk-list--number"><li>Delete this project from your projects.</li><li>Restart the process by checking if you need a marine licence.</li></ol>'), sentences) %}
     {% endif %}
 

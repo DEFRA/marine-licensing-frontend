@@ -47,11 +47,13 @@ describe('Project Details Card Component', () => {
       )
     })
 
-    test('Should show full instructions for changing marine licence answers', () => {
+    test('Should not show guidance text when showGuidance is not set', () => {
       const htmlContent = $component.html()
-      expect(htmlContent).toContain('If you need to change any of your')
-      expect(htmlContent).toContain('Delete this project from your projects')
-      expect(htmlContent).toContain('Restart the process by checking')
+      expect(htmlContent).not.toContain('If you need to change any of your')
+      expect(htmlContent).not.toContain(
+        'Delete this project from your projects'
+      )
+      expect(htmlContent).not.toContain('Restart the process by checking')
     })
 
     test('Should display all activity detail rows', () => {
@@ -69,13 +71,6 @@ describe('Project Details Card Component', () => {
         "Your answers from 'Check if you need a marine licence'"
       )
       expect(htmlContent).toContain('Download a copy of your answers (PDF)')
-      expect(htmlContent).toContain(
-        "If you need to change any of your 'Check if you need a marine licence' answers:"
-      )
-      expect(htmlContent).toContain('Delete this project from your projects.')
-      expect(htmlContent).toContain(
-        'Restart the process by checking if you need a marine licence.'
-      )
     })
   })
 
@@ -120,7 +115,7 @@ describe('Project Details Card Component', () => {
     })
 
     describe('Applicant view', () => {
-      test('Should display MCMS context', () => {
+      test('Should display MCMS context without guidance text', () => {
         const document = renderComponentJSDOM('project-details-card', {
           projectName: 'Test Marine Project',
           mcmsContext: {
@@ -141,6 +136,35 @@ describe('Project Details Card Component', () => {
             name: 'Project summary'
           })
         ).toBeInTheDocument()
+        validateProjectDetails(document, {
+          projectDetails: {
+            'Type of activity': 'Deposit of a substance or object',
+            'The purpose of the activity': 'Scientific research purposes',
+            'Why this activity is exempt':
+              "Based on your answers from 'Check if you need a marine licence', your activity is exempt under Article 17 of the Marine Licensing (Exempted Activities) Order 2011 (opens in new tab)",
+            "Your answers from 'Check if you need a marine licence'": [
+              'Download a copy of your answers (PDF)'
+            ]
+          }
+        })
+      })
+
+      test('Should display guidance text when showGuidance is true', () => {
+        const document = renderComponentJSDOM('project-details-card', {
+          projectName: 'Test Marine Project',
+          mcmsContext: {
+            activity: {
+              label: 'Deposit of a substance or object',
+              purpose: 'Scientific research purposes'
+            },
+            articleCode: '17',
+            pdfDownloadUrl:
+              'https://marinelicensingtest.marinemanagement.org.uk/mmofox5uat/journey…'
+          },
+          isReadOnly: true,
+          isApplicantView: true,
+          showGuidance: true
+        })
         validateProjectDetails(document, {
           projectDetails: {
             'Type of activity': 'Deposit of a substance or object',

@@ -34,7 +34,7 @@ export const confirmAgentController = {
     })
 
     return h.view(CONFIRM_AGENT_VIEW_ROUTE, {
-      backLink: routes.CHANGE_ORGANISATION,
+      backLink: `${routes.CHANGE_ORGANISATION}?skipRedirect=true`,
       heading,
       pageTitle: heading,
       organisationName,

@@ -26,7 +26,7 @@ export const createConfirmFailAction = ({
 
     return h
       .view(viewRoute, {
-        backLink: routes.CHANGE_ORGANISATION,
+        backLink: `${routes.CHANGE_ORGANISATION}?skipRedirect=true`,
         heading,
         pageTitle: heading,
         payload,

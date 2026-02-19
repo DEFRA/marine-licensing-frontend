@@ -116,6 +116,7 @@
   },
   "overrides": {
     "lodash-es": "4.17.23",
-    "@isaacs/brace-expansion": "^5.0.1"
+    "@isaacs/brace-expansion": "^5.0.1",
+    "minimatch": "10.2.1"
   }
 }

@@ -1,7 +1,4 @@
-import {
-  changeOrganisationLinkRoutes,
-  getPageViewCommonData
-} from './page-view-common-data.js'
+import { getPageViewCommonData } from './page-view-common-data.js'
 import { getUserSession } from '#src/server/common/plugins/auth/utils.js'
 import { routes } from '#src/server/common/constants/routes.js'
 

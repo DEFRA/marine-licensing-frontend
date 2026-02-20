@@ -21,21 +21,32 @@ describe('getPageViewCommonData', () => {
     expect(result).toEqual({})
   })
 
-  test('should return showChangeOrganisationLink false when not on dashboard page', async () => {
+  test('should return showChangeOrganisationLink false for correct pages', async () => {
     const mockUserSession = {
       organisationName: 'Test Organisation Ltd',
       hasMultipleOrgPickerEntries: false
     }
     mockGetUserSession.mockResolvedValue(mockUserSession)
 
-    const mockRequest = {
+    const mockRequestDashboardPage = {
       state: { userSession: 'mock-session' },
       path: routes.TASK_LIST
     }
 
-    const result = await getPageViewCommonData(mockRequest)
+    const resultDashboard = await getPageViewCommonData(
+      mockRequestDashboardPage
+    )
 
-    expect(result.showChangeOrganisationLink).toEqual(false)
+    expect(resultDashboard.showChangeOrganisationLink).toEqual(false)
+
+    const mockRequestHomePage = {
+      state: { userSession: 'mock-session' },
+      path: routes.SERVICE_HOME
+    }
+
+    const resultHomePage = await getPageViewCommonData(mockRequestHomePage)
+
+    expect(resultHomePage.showChangeOrganisationLink).toEqual(false)
   })
 
   test('should return showChangeOrganisationLink false when user has single organisation on dashboard', async () => {

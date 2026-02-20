@@ -26,5 +26,8 @@ export const OSGB36_CONSTANTS = {
 export const EXEMPTION_TYPE = 'Exempt activity notification'
 
 export const EXEMPTION_STATUS = {
-  DRAFT: 'Draft'
+  DRAFT: 'Draft',
+  ACTIVE: 'Active',
+  SUBMITTED: 'Submitted',
+  WITHDRAWN: 'Withdrawn'
 }

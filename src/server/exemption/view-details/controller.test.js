@@ -286,6 +286,68 @@ describe('view details controller', () => {
         )
       })
 
+      test('should pass statusTagClass for active exemption', async () => {
+        const activeExemption = createSubmittedExemption({
+          status: 'Active'
+        })
+        const mockExemptionServiceInstance = {
+          getExemptionById: vi.fn().mockResolvedValue(activeExemption)
+        }
+
+        vi.mocked(getExemptionService).mockReturnValue(
+          mockExemptionServiceInstance
+        )
+        vi.mocked(getAuthProvider).mockReturnValue('entra-id')
+
+        const mockRequest = {
+          path: '/view-details/:exemptionId',
+          params: { exemptionId: validExemptionId },
+          logger: { error: vi.fn() }
+        }
+        const mockH = { view: vi.fn() }
+
+        await viewDetailsController.handler(mockRequest, mockH)
+
+        expect(mockH.view).toHaveBeenCalledWith(
+          VIEW_DETAILS_VIEW_ROUTE,
+          expect.objectContaining({
+            statusTagClass: 'govuk-tag--green'
+          })
+        )
+      })
+
+      test('should pass statusTagClass for withdrawn exemption', async () => {
+        const withdrawnExemption = createSubmittedExemption({
+          status: 'Withdrawn',
+          withdrawnAt: '2026-02-16T14:24:04.169Z'
+        })
+        const mockExemptionServiceInstance = {
+          getExemptionById: vi.fn().mockResolvedValue(withdrawnExemption)
+        }
+
+        vi.mocked(getExemptionService).mockReturnValue(
+          mockExemptionServiceInstance
+        )
+        vi.mocked(getAuthProvider).mockReturnValue('entra-id')
+
+        const mockRequest = {
+          path: '/view-details/:exemptionId',
+          params: { exemptionId: validExemptionId },
+          logger: { error: vi.fn() }
+        }
+        const mockH = { view: vi.fn() }
+
+        await viewDetailsController.handler(mockRequest, mockH)
+
+        expect(mockH.view).toHaveBeenCalledWith(
+          VIEW_DETAILS_VIEW_ROUTE,
+          expect.objectContaining({
+            statusTagClass: 'govuk-tag--grey',
+            withdrawnAt: '2026-02-16T14:24:04.169Z'
+          })
+        )
+      })
+
       test('should call view with correct data structure for internal user', async () => {
         const submittedExemption = createSubmittedExemption({
           whoExemptionIsFor: 'Dave Barnett'

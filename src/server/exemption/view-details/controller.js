@@ -7,6 +7,7 @@ import { buildSiteLocationData } from '#src/server/common/helpers/site-location-
 import { getExemptionService } from '#src/services/exemption-service/index.js'
 import { getAuthProvider } from '#src/server/common/helpers/authenticated-requests.js'
 import { AUTH_STRATEGIES } from '#src/server/common/constants/auth.js'
+import { getTagStyle } from '#src/server/common/helpers/exemptions/get-tag-style.js'
 
 export const VIEW_DETAILS_VIEW_ROUTE = 'exemption/view-details/index'
 export const viewDetailsController = {
@@ -50,6 +51,7 @@ export const viewDetailsController = {
 
       // Format the page caption with application reference
       const pageCaption = `${exemption.applicationReference}${isApplicantView ? ' - Exempt activity notification' : ''}`
+      const statusTagClass = getTagStyle(exemption.status)
 
       return h.view(VIEW_DETAILS_VIEW_ROUTE, {
         pageTitle: exemption.projectName,
@@ -58,6 +60,7 @@ export const viewDetailsController = {
         isReadOnly: true,
         isApplicantView,
         ...exemption,
+        statusTagClass,
         siteDetails,
         multipleSiteDetails,
         siteLocationData

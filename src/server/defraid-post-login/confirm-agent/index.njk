@@ -4,7 +4,7 @@
 {% block beforeContent %}
   {{ super() }}
   {% if hasMultipleOrgPickerEntries %}
-    {{ appBackLinkHistory() }}
+    {{ appBackLink({backLink: backLink}) }}
   {% endif %}
 {% endblock %}
 

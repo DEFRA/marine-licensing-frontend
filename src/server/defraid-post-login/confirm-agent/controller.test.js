@@ -30,6 +30,7 @@ describe('#postLoginConfirmAgent', () => {
       await confirmAgentController.handler(request, h)
 
       expect(h.view).toHaveBeenCalledWith(CONFIRM_AGENT_VIEW_ROUTE, {
+        backLink: `${routes.CHANGE_ORGANISATION}?skipRedirect=true`,
         heading: `Are you notifying us as an agent or intermediary for ${agentSession.organisationName}?`,
         organisationName: 'Client Org',
         pageTitle: `Are you notifying us as an agent or intermediary for ${agentSession.organisationName}?`,

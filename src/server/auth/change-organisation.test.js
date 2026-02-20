@@ -21,4 +21,17 @@ describe('#changeOrganisationController', () => {
       `${routes.SIGNIN}?${changeOrganisationQueryParam}=true`
     )
   })
+
+  test('should correctly redirect when not saving the redirect', async () => {
+    const server = getServer()
+    const { statusCode, headers } = await makeGetRequest({
+      url: `${routes.CHANGE_ORGANISATION}?skipRedirect=true`,
+      server
+    })
+
+    expect(statusCode).toBe(statusCodes.redirect)
+    expect(headers.location).toBe(
+      `${routes.SIGNIN}?${changeOrganisationQueryParam}=true`
+    )
+  })
 })

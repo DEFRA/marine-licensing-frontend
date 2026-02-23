@@ -1,6 +1,10 @@
 import { formatDate } from '#src/config/nunjucks/filters/format-date.js'
 import { routes } from '#src/server/common/constants/routes.js'
-import { EXEMPTION_TYPE } from '#src/server/common/constants/exemptions.js'
+import {
+  EXEMPTION_TYPE,
+  EXEMPTION_STATUS
+} from '#src/server/common/constants/exemptions.js'
+import { getTagStyle } from '#src/server/common/helpers/exemptions/get-tag-style.js'
 import escapeHtml from 'lodash/escape.js'
 
 export const sortProjectsByStatus = (projects) => {
@@ -18,10 +22,10 @@ export const getActionButtons = (project) => {
 
   const escapedProjectName = escapeHtml(projectName)
 
-  const canWithdraw = status === 'Active' && !!isOwnProject
+  const canWithdraw = status === EXEMPTION_STATUS.ACTIVE && !!isOwnProject
 
   if (isOwnProject) {
-    if (status === 'Draft') {
+    if (status === EXEMPTION_STATUS.DRAFT) {
       return `<a href="${routes.TASK_LIST}/${id}" class="govuk-link govuk-!-margin-right-4 govuk-link--no-visited-state" aria-label="Continue to task list">Continue</a><a href="${routes.DELETE_EXEMPTION}/${id}" class="govuk-link govuk-link--no-visited-state" aria-label="Delete ${escapedProjectName}">Delete</a>`
     }
     const marginClass = canWithdraw
@@ -36,23 +40,10 @@ export const getActionButtons = (project) => {
     return buttons
   }
 
-  if (project.status === 'Draft') {
+  if (project.status === EXEMPTION_STATUS.DRAFT) {
     return ''
   }
   return `<a href="${routes.VIEW_DETAILS}/${project.id}" class="govuk-link govuk-link--no-visited-state" aria-label="View details of ${escapedProjectName}">View details</a>`
-}
-
-const getTagStyle = (status) => {
-  switch (status) {
-    case 'Draft':
-      return 'govuk-tag--light-blue'
-
-    case 'Withdrawn':
-      return 'govuk-tag--grey'
-
-    default:
-      return 'govuk-tag--green'
-  }
 }
 
 export const formatProjectsForDisplay = (projects, isEmployee = false) =>

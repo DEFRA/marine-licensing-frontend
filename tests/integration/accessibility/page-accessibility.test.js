@@ -185,6 +185,10 @@ describe('Page accessibility checks (Axe)', () => {
     {
       url: routes.defraIdGuidance.ADD_TO_CLIENT_ACCOUNT,
       title: 'You need to be added to your client\u2019s Defra account'
+    },
+    {
+      url: marineLicenseRoutes.MARINE_LICENSE_DELETE,
+      title: 'Are you sure you want to delete this project?'
     }
   ]
 

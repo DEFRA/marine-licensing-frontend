@@ -1,6 +1,6 @@
 import Boom from '@hapi/boom'
 import { errorMessages } from '#src/server/common/constants/error-messages.js'
-import { EXEMPTION_STATUS } from '#src/server/common/constants/exemptions.js'
+import { PROJECT_STATUS } from '#src/server/common/constants/projects.js'
 import { routes } from '#src/server/common/constants/routes.js'
 import { processSiteDetails } from '#src/server/common/helpers/exemptions/exemption-site-details.js'
 import { buildSiteLocationData } from '#src/server/common/helpers/site-location-data.js'
@@ -27,7 +27,7 @@ export const viewDetailsController = {
       const exemption = await exemptionService[serviceMethod](exemptionId)
 
       if (
-        exemption.status === EXEMPTION_STATUS.DRAFT ||
+        exemption.status === PROJECT_STATUS.DRAFT ||
         !exemption.applicationReference
       ) {
         request.logger.error(

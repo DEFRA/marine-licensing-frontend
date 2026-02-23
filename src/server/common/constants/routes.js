@@ -38,7 +38,8 @@ export const exemptionRoutes = {
 
 export const marineLicenseRoutes = {
   MARINE_LICENSE_PROJECT_NAME: '/marine-license/project-name',
-  MARINE_LICENSE_TASK_LIST: '/marine-license/task-list'
+  MARINE_LICENSE_TASK_LIST: '/marine-license/task-list',
+  MARINE_LICENSE_DELETE: '/marine-license/delete'
 }
 
 export const defraIdGuidanceRoutes = {

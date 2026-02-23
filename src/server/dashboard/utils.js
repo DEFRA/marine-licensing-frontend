@@ -1,11 +1,28 @@
 import { formatDate } from '#src/config/nunjucks/filters/format-date.js'
-import { routes } from '#src/server/common/constants/routes.js'
 import {
-  EXEMPTION_TYPE,
-  EXEMPTION_STATUS
-} from '#src/server/common/constants/exemptions.js'
+  routes,
+  marineLicenseRoutes
+} from '#src/server/common/constants/routes.js'
+import { EXEMPTION_TYPE } from '#src/server/common/constants/exemptions.js'
+import { PROJECT_STATUS } from '#src/server/common/constants/projects.js'
 import { getTagStyle } from '#src/server/common/helpers/exemptions/get-tag-style.js'
 import escapeHtml from 'lodash/escape.js'
+import {
+  MARINE_LICENSE_TYPE,
+  MARINE_LICENCE_KEY
+} from '#src/server/common/constants/marine-licence.js'
+
+const getDraftActions = (id, escapedProjectName, projectType) => {
+  const taskListRoute =
+    projectType === MARINE_LICENCE_KEY
+      ? marineLicenseRoutes.MARINE_LICENSE_TASK_LIST
+      : routes.TASK_LIST
+  const deleteRoute =
+    projectType === MARINE_LICENCE_KEY
+      ? marineLicenseRoutes.MARINE_LICENSE_DELETE
+      : routes.DELETE_EXEMPTION
+  return `<a href="${taskListRoute}/${id}" class="govuk-link govuk-!-margin-right-4 govuk-link--no-visited-state" aria-label="Continue to task list">Continue</a><a href="${deleteRoute}/${id}" class="govuk-link govuk-link--no-visited-state" aria-label="Delete ${escapedProjectName}">Delete</a>`
+}
 
 export const sortProjectsByStatus = (projects) => {
   return [...projects].sort((a, b) => {
@@ -18,16 +35,24 @@ export const sortProjectsByStatus = (projects) => {
 export const getActionButtons = (project) => {
   const isOwnProject = project.isOwnProject ?? true
 
-  const { status, id, projectName } = project
+  const { status, id, projectName, projectType } = project
 
   const escapedProjectName = escapeHtml(projectName)
 
-  const canWithdraw = status === EXEMPTION_STATUS.ACTIVE && !!isOwnProject
+  if (projectType === MARINE_LICENCE_KEY) {
+    if (status === PROJECT_STATUS.DRAFT && isOwnProject) {
+      return getDraftActions(id, escapedProjectName, projectType)
+    }
+    return ''
+  }
+
+  const canWithdraw = status === PROJECT_STATUS.ACTIVE && !!isOwnProject
 
   if (isOwnProject) {
-    if (status === EXEMPTION_STATUS.DRAFT) {
-      return `<a href="${routes.TASK_LIST}/${id}" class="govuk-link govuk-!-margin-right-4 govuk-link--no-visited-state" aria-label="Continue to task list">Continue</a><a href="${routes.DELETE_EXEMPTION}/${id}" class="govuk-link govuk-link--no-visited-state" aria-label="Delete ${escapedProjectName}">Delete</a>`
+    if (status === PROJECT_STATUS.DRAFT) {
+      return getDraftActions(id, escapedProjectName, projectType)
     }
+
     const marginClass = canWithdraw
       ? 'govuk-link govuk-!-margin-right-4 '
       : 'govuk-link '
@@ -40,7 +65,7 @@ export const getActionButtons = (project) => {
     return buttons
   }
 
-  if (project.status === EXEMPTION_STATUS.DRAFT) {
+  if (project.status === PROJECT_STATUS.DRAFT) {
     return ''
   }
   return `<a href="${routes.VIEW_DETAILS}/${project.id}" class="govuk-link govuk-link--no-visited-state" aria-label="View details of ${escapedProjectName}">View details</a>`
@@ -48,13 +73,18 @@ export const getActionButtons = (project) => {
 
 export const formatProjectsForDisplay = (projects, isEmployee = false) =>
   projects.map((project) => {
-    const { status } = project
+    const { status, projectType } = project
 
     const isOwnProject = project.isOwnProject ?? true
 
     const baseRow = [
       { text: project.projectName },
-      { text: EXEMPTION_TYPE },
+      {
+        text:
+          projectType === MARINE_LICENCE_KEY
+            ? MARINE_LICENSE_TYPE
+            : EXEMPTION_TYPE
+      },
       { text: project.applicationReference || '-' },
       {
         html: `<strong class="govuk-tag ${getTagStyle(status)}">${escapeHtml(project.status)}</strong>`

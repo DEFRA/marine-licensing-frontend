@@ -4,7 +4,10 @@ import {
   formatProjectsForDisplay,
   getActionButtons
 } from './utils.js'
-import { routes } from '#src/server/common/constants/routes.js'
+import {
+  routes,
+  marineLicenseRoutes
+} from '#src/server/common/constants/routes.js'
 
 vi.mock('~/src/config/nunjucks/filters/format-date.js', () => ({
   formatDate: vi.fn((date) => {
@@ -214,6 +217,31 @@ describe('#formatProjectsForDisplay', () => {
     const result = formatProjectsForDisplay([])
 
     expect(result).toEqual([])
+  })
+
+  test('Should format MARINE_LICENCE project with Continue and Delete actions', () => {
+    const projects = [
+      {
+        id: 'ml123',
+        projectName: 'Marine Licence Project',
+        projectType: 'MARINE_LICENCE',
+        applicationReference: 'ML-2024-003',
+        status: 'Draft',
+        submittedAt: '2024-01-15'
+      }
+    ]
+
+    const result = formatProjectsForDisplay(projects)
+
+    expect(result[0].cells[1].text).toBe('Marine licence application')
+    expect(result[0].cells[5].html).toContain(
+      marineLicenseRoutes.MARINE_LICENSE_TASK_LIST
+    )
+    expect(result[0].cells[5].html).toContain(
+      marineLicenseRoutes.MARINE_LICENSE_DELETE
+    )
+    expect(result[0].cells[5].html).toContain('Continue')
+    expect(result[0].cells[5].html).toContain('Delete')
   })
 
   test('Should use correct tag for status', () => {

@@ -339,4 +339,16 @@ describe('getActionButtons', () => {
       '<a href="/exemption/view-details/ghi789" class="govuk-link govuk-link--no-visited-state" aria-label="View details of Unknown Status Project">View details</a>'
     )
   })
+
+  it('returns empty string for marine licence project when not draft or not own project', () => {
+    const marineLicenseActive = {
+      id: 'ml123',
+      projectName: 'Marine Licence Project',
+      projectType: 'MARINE_LICENCE',
+      status: 'Active',
+      isOwnProject: true
+    }
+    const result = getActionButtons(marineLicenseActive)
+    expect(result).toBe('')
+  })
 })

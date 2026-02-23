@@ -1,5 +1,6 @@
 import { vi } from 'vitest'
 import {
+  clearMarineLicenseCache,
   getMarineLicenseCache,
   setMarineLicenseCache
 } from '#src/server/common/helpers/marine-license/session-cache/utils.js'
@@ -7,6 +8,7 @@ import { authenticatedGetRequest } from '#src/server/common/helpers/authenticate
 import { transformTaskList } from '#src/server/marine-license/task-list/utils.js'
 import {
   taskListController,
+  taskListSelectMarineLicenceController,
   TASK_LIST_VIEW_ROUTE
 } from '#src/server/marine-license/task-list/controller.js'
 import { marineLicenseRoutes } from '#src/server/common/constants/routes.js'
@@ -21,11 +23,14 @@ describe('#taskListController', () => {
   let mockH
 
   const getMarineLicenseCacheMock = vi.mocked(getMarineLicenseCache)
+  const setMarineLicenseCacheMock = vi.mocked(setMarineLicenseCache)
+  const clearMarineLicenseCacheMock = vi.mocked(clearMarineLicenseCache)
   const authenticatedGetRequestMock = vi.mocked(authenticatedGetRequest)
 
   beforeEach(() => {
     mockH = {
-      view: vi.fn()
+      view: vi.fn(),
+      redirect: vi.fn()
     }
     mockRequest = {
       yar: {}
@@ -110,5 +115,27 @@ describe('#taskListController', () => {
 
     expect(getMarineLicenseCacheMock).toHaveBeenCalledWith(mockRequest)
     expect(authenticatedGetRequestMock).not.toHaveBeenCalled()
+  })
+
+  test('taskListSelectMarineLicenceController should clear cache and return to task list', async () => {
+    const mockRequestWithParams = { ...mockRequest, params: { id: '123' } }
+    await taskListSelectMarineLicenceController.handler(
+      mockRequestWithParams,
+      mockH
+    )
+
+    expect(clearMarineLicenseCacheMock).toHaveBeenCalled()
+
+    expect(setMarineLicenseCacheMock).toHaveBeenCalledWith(
+      expect.any(Object),
+      expect.any(Object),
+      {
+        id: '123'
+      }
+    )
+
+    expect(mockH.redirect).toHaveBeenCalledWith(
+      marineLicenseRoutes.MARINE_LICENSE_TASK_LIST
+    )
   })
 })

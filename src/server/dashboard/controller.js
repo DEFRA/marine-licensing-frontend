@@ -11,7 +11,7 @@ const FILTER_ALL_PROJECTS = 'all-projects'
 export const dashboardController = {
   handler: async (request, h) => {
     try {
-      const { payload } = await authenticatedGetRequest(request, '/exemptions')
+      const { payload } = await authenticatedGetRequest(request, '/projects')
 
       const projects = payload.value ?? []
       const sortedProjects = sortProjectsByStatus(projects)

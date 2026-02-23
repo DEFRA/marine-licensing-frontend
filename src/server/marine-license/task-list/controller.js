@@ -1,9 +1,11 @@
 import {
+  clearMarineLicenseCache,
   getMarineLicenseCache,
   setMarineLicenseCache
 } from '#src/server/common/helpers/marine-license/session-cache/utils.js'
 import { transformTaskList } from '#src/server/marine-license/task-list/utils.js'
 import { authenticatedGetRequest } from '#src/server/common/helpers/authenticated-requests.js'
+import { marineLicenseRoutes } from '#src/server/common/constants/routes.js'
 
 import Boom from '@hapi/boom'
 
@@ -44,5 +46,14 @@ export const taskListController = {
       projectName: payload.value.projectName,
       taskList: taskListTransformed
     })
+  }
+}
+
+export const taskListSelectMarineLicenceController = {
+  async handler(request, h) {
+    const { id } = request.params
+    await clearMarineLicenseCache(request, h)
+    await setMarineLicenseCache(request, h, { id })
+    return h.redirect(marineLicenseRoutes.MARINE_LICENSE_TASK_LIST)
   }
 }

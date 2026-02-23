@@ -61,7 +61,7 @@ describe('setPageCacheControlHeaders', () => {
     const pageRoutePaths = [
       '/',
       '/about',
-      '/exemption/dashboard',
+      '/dashboard',
       '/health',
       '/exemption/project-name'
     ]

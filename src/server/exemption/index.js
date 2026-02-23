@@ -8,7 +8,7 @@ import { checkYourAnswersRoutes } from '#src/server/exemption/check-your-answers
 import { viewDetailsRoutes } from '#src/server/exemption/view-details/index.js'
 import { routes as confirmationRoutes } from '#src/server/exemption/confirmation/index.js'
 import { routes } from '#src/server/common/constants/routes.js'
-import { dashboardRoutes } from './dashboard/index.js'
+import { dashboardRoutes } from '#src/server/dashboard/index.js'
 import { deleteExemptionRoutes } from './delete/index.js'
 import { withdrawExemptionRoutes } from './withdraw/index.js'
 import { viewExemptionInternalUserRoutes } from '#src/server/exemption/view-exemption-internal-user/index.js'

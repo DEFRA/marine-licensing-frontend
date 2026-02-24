@@ -13,7 +13,7 @@ import {
   routes,
   marineLicenseRoutes
 } from '#src/server/common/constants/routes.js'
-import { MARINE_LICENSE_TYPE } from '#src/server/common/constants/marine-licence.js'
+import { MARINE_LICENCE_TYPE } from '#src/server/common/constants/marine-licence.js'
 
 import {
   deleteMarineLicenseController,
@@ -76,7 +76,7 @@ describe('#delete', () => {
         pageTitle: 'Are you sure you want to delete this project?',
         heading: 'Are you sure you want to delete this project?',
         projectName: 'Test Project',
-        marineLicenseType: MARINE_LICENSE_TYPE,
+        marineLicenseType: MARINE_LICENCE_TYPE,
         marineLicenseId: 'test-project-id',
         cancelLink: '/projects',
         backLink: '/projects',

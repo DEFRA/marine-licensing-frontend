@@ -8,7 +8,7 @@ import { PROJECT_STATUS } from '#src/server/common/constants/projects.js'
 import { getTagStyle } from '#src/server/common/helpers/exemptions/get-tag-style.js'
 import escapeHtml from 'lodash/escape.js'
 import {
-  MARINE_LICENSE_TYPE,
+  MARINE_LICENCE_TYPE,
   MARINE_LICENCE_KEY
 } from '#src/server/common/constants/marine-licence.js'
 
@@ -84,7 +84,7 @@ export const formatProjectsForDisplay = (projects, isEmployee = false) =>
       {
         text:
           projectType === MARINE_LICENCE_KEY
-            ? MARINE_LICENSE_TYPE
+            ? MARINE_LICENCE_TYPE
             : EXEMPTION_TYPE
       },
       { text: project.applicationReference || '-' },

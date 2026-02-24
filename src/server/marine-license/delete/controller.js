@@ -12,7 +12,7 @@ import {
   clearMarineLicenseCache
 } from '#src/server/common/helpers/marine-license/session-cache/utils.js'
 import Boom from '@hapi/boom'
-import { MARINE_LICENSE_TYPE } from '#src/server/common/constants/marine-licence.js'
+import { MARINE_LICENCE_TYPE } from '#src/server/common/constants/marine-licence.js'
 
 export const DELETE_MARINE_LICENSE_VIEW_ROUTE = 'marine-license/delete/index'
 
@@ -43,7 +43,7 @@ export const deleteMarineLicenseController = {
         pageTitle: DELETE_MARINE_LICENSE_PAGE_TITLE,
         heading: DELETE_MARINE_LICENSE_PAGE_TITLE,
         projectName: project.projectName,
-        marineLicenseType: MARINE_LICENSE_TYPE,
+        marineLicenseType: MARINE_LICENCE_TYPE,
         marineLicenseId,
         backLink: routes.DASHBOARD,
         cancelLink: routes.DASHBOARD,

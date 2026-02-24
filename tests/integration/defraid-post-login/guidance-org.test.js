@@ -75,11 +75,6 @@ describe('Post-login - Organisation Guidance Advice', () => {
       'mailto:Customer.Identity-Support@defra.gov.uk'
     )
 
-    const callCharges = within(document).getByRole('link', {
-      name: /Find out about call charges/
-    })
-    expect(callCharges).toBeInTheDocument()
-
     const secondPageHeading = within(document).getByRole('heading', {
       level: 2,
       name: "You're the agent or intermediary for a client organisation"

@@ -1,0 +1,34 @@
+{% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
+
+{% set rows = [] %}
+
+{% set rows = (rows.push({
+  key: {
+    text: "Project name"
+  },
+  value: {
+    text: params.projectName
+  },
+  actions: {
+    items: [
+      {
+        href: "/marine-license/project-name?from=check-your-answers",
+        text: "Change",
+        visuallyHiddenText: "project name",
+        classes: "govuk-link--no-visited-state"
+      }
+    ]
+  }
+}), rows) %}
+
+{{ govukSummaryList({
+  card: {
+    title: {
+      text: "Project summary"
+    },
+    attributes: {
+      id: "project-details-card"
+    }
+  },
+  rows: rows
+}) }}

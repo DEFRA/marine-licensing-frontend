@@ -14,6 +14,7 @@ import {
   marineLicenseRoutes
 } from '#src/server/common/constants/routes.js'
 import { MARINE_LICENCE_TYPE } from '#src/server/common/constants/marine-licence.js'
+import * as authUtils from '#src/server/common/plugins/auth/utils.js'
 
 import {
   deleteMarineLicenseController,
@@ -35,18 +36,25 @@ describe('#delete', () => {
   const mockedSetMarineLicenseCache = vi.mocked(setMarineLicenseCache)
   const mockedClearMarineLicenseCache = vi.mocked(clearMarineLicenseCache)
 
+  const mockUserSession = {
+    contactId: 'id-123'
+  }
+
   beforeEach(() => {
     mockRequest = {
       logger: {
         error: vi.fn(),
         info: vi.fn()
-      }
+      },
+      state: {}
     }
 
     mockH = {
       view: vi.fn().mockReturnValue('view-response'),
       redirect: vi.fn().mockReturnValue('redirect-response')
     }
+
+    vi.spyOn(authUtils, 'getUserSession').mockResolvedValue({ mockUserSession })
   })
 
   describe('deleteMarineLicenseController', () => {

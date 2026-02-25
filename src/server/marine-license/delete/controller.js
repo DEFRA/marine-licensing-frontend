@@ -13,6 +13,7 @@ import {
 } from '#src/server/common/helpers/marine-license/session-cache/utils.js'
 import Boom from '@hapi/boom'
 import { MARINE_LICENCE_TYPE } from '#src/server/common/constants/marine-licence.js'
+import { getUserSession } from '#src/server/common/plugins/auth/utils.js'
 
 export const DELETE_MARINE_LICENSE_VIEW_ROUTE = 'marine-license/delete/index'
 
@@ -88,9 +89,14 @@ export const deleteMarineLicenseSubmitController = {
         `/marine-license/${marineLicenseId}`
       )
 
+      const authedUser = await getUserSession(
+        request,
+        request.state.userSession
+      )
+
       request.logger.info(
         { marineLicenseId },
-        `Deleted marine license ${marineLicenseId}`
+        `Deleted marine license ${marineLicenseId} by user ${authedUser.contactId}`
       )
 
       await clearMarineLicenseCache(request, h)

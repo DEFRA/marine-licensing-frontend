@@ -5,7 +5,7 @@ import {
 } from '#src/server/common/constants/routes.js'
 import { EXEMPTION_TYPE } from '#src/server/common/constants/exemptions.js'
 import { PROJECT_STATUS } from '#src/server/common/constants/projects.js'
-import { getTagStyle } from '#src/server/common/helpers/exemptions/get-tag-style.js'
+import { getTagStyle } from '#src/server/common/helpers/ui/get-tag-style.js'
 import escapeHtml from 'lodash/escape.js'
 import {
   MARINE_LICENCE_TYPE,

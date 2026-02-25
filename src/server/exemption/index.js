@@ -7,7 +7,7 @@ import { activityDescriptionRoutes } from '#src/server/exemption/activity-descri
 import { checkYourAnswersRoutes } from '#src/server/exemption/check-your-answers/index.js'
 import { viewDetailsRoutes } from '#src/server/exemption/view-details/index.js'
 import { routes as confirmationRoutes } from '#src/server/exemption/confirmation/index.js'
-import { routes } from '#src/server/common/constants/routes.js'
+import { landingRoutes } from '#src/server/exemption/landing/index.js'
 import { dashboardRoutes } from './dashboard/index.js'
 import { deleteExemptionRoutes } from './delete/index.js'
 import { withdrawExemptionRoutes } from './withdraw/index.js'
@@ -35,6 +35,7 @@ export const exemption = {
       })
 
       server.route([
+        ...landingRoutes,
         ...projectNameRoutes,
         ...publicRegisterRoutes,
         ...taskListRoutes,
@@ -48,14 +49,7 @@ export const exemption = {
         ...confirmationRoutes,
         ...dashboardRoutes,
         ...deleteExemptionRoutes,
-        ...withdrawExemptionRoutes,
-        {
-          method: 'GET',
-          path: '/exemption',
-          handler: (_request, h) => {
-            return h.redirect(routes.PROJECT_NAME)
-          }
-        }
+        ...withdrawExemptionRoutes
       ])
     }
   }

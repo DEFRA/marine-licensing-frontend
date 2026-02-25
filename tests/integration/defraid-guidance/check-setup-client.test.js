@@ -5,7 +5,7 @@ import { expectFieldsetError } from '~/tests/integration/shared/expect-utils.js'
 import { getByLabelText, within } from '@testing-library/dom'
 import { statusCodes } from '~/src/server/common/constants/status-codes.js'
 
-vi.mock('#src/server/common/helpers/defraid-guidance/session-cache.js', () => {
+vi.mock('#src/server/common/helpers/defraid-login/session-cache.js', () => {
   const cache = {}
   return {
     defraIdGuidanceUserSession: {

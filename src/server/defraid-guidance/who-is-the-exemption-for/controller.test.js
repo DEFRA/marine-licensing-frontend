@@ -2,7 +2,7 @@ import { vi, describe, test, expect, beforeEach } from 'vitest'
 import { routes } from '#src/server/common/constants/routes.js'
 import { cacheMcmsContextFromQueryParams } from '#src/server/common/helpers/mcms-context/cache-mcms-context.js'
 import { clearExemptionCache } from '#src/server/common/helpers/exemptions/session-cache/utils.js'
-import { defraIdGuidanceUserSession } from '#src/server/common/helpers/defraid-guidance/session-cache.js'
+import { defraIdGuidanceUserSession } from '#src/server/common/helpers/defraid-login/session-cache.js'
 import {
   defraIdGuidanceWhoIsExemptionForController,
   defraIdGuidanceWhoIsExemptionForSubmitController,
@@ -21,7 +21,7 @@ vi.mock('#src/server/common/helpers/exemptions/session-cache/utils.js', () => ({
   clearExemptionCache: vi.fn().mockResolvedValue(undefined)
 }))
 
-vi.mock('#src/server/common/helpers/defraid-guidance/session-cache.js', () => ({
+vi.mock('#src/server/common/helpers/defraid-login/session-cache.js', () => ({
   defraIdGuidanceUserSession: {
     get: vi.fn().mockResolvedValue(null),
     set: vi.fn().mockResolvedValue(undefined)
@@ -46,7 +46,7 @@ describe('defraIdGuidanceWhoIsExemptionForController', () => {
   })
 
   describe('GET handler', () => {
-    test('redirects to project name when user has session cookie', async () => {
+    test('redirects to exemption landing when user has session cookie', async () => {
       const request = createMockRequest({
         state: { userSession: { sessionId: 'test-session' } }
       })
@@ -54,7 +54,7 @@ describe('defraIdGuidanceWhoIsExemptionForController', () => {
 
       await defraIdGuidanceWhoIsExemptionForController.handler(request, h)
 
-      expect(h.redirect).toHaveBeenCalledWith(routes.PROJECT_NAME)
+      expect(h.redirect).toHaveBeenCalledWith(routes.EXEMPTION)
       expect(h.view).not.toHaveBeenCalled()
     })
 

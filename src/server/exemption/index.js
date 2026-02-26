@@ -5,6 +5,7 @@ import { siteDetailsRoutes } from '#src/server/exemption/site-details/index.js'
 import { activityDatesRoutes } from './activity-dates/index.js'
 import { activityDescriptionRoutes } from '#src/server/exemption/activity-description/index.js'
 import { checkYourAnswersRoutes } from '#src/server/exemption/check-your-answers/index.js'
+import { declarationRoutes } from '#src/server/exemption/declaration/index.js'
 import { viewDetailsRoutes } from '#src/server/exemption/view-details/index.js'
 import { routes as confirmationRoutes } from '#src/server/exemption/confirmation/index.js'
 import { dashboardRoutes } from '#src/server/dashboard/index.js'
@@ -43,6 +44,7 @@ export const exemption = {
         ...activityDatesRoutes,
         ...activityDescriptionRoutes,
         ...checkYourAnswersRoutes,
+        ...declarationRoutes,
         ...viewDetailsRoutes,
         ...viewExemptionInternalUserRoutes,
         ...viewExemptionPublicUserRoutes,

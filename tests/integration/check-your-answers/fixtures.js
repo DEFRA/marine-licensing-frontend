@@ -96,7 +96,7 @@ export const testScenarios = [
       publicRegister: {
         'Consent to publish your project information': 'No'
       },
-      submitButton: 'Confirm and send'
+      submitButton: 'Continue'
     }
   },
   {
@@ -132,7 +132,7 @@ export const testScenarios = [
       publicRegister: {
         'Consent to publish your project information': 'No'
       },
-      submitButton: 'Confirm and send'
+      submitButton: 'Continue'
     }
   },
   {
@@ -168,7 +168,7 @@ export const testScenarios = [
       publicRegister: {
         'Consent to publish your project information': 'No'
       },
-      submitButton: 'Confirm and send'
+      submitButton: 'Continue'
     }
   },
   {
@@ -219,7 +219,7 @@ export const testScenarios = [
       publicRegister: {
         'Consent to publish your project information': 'No'
       },
-      submitButton: 'Confirm and send'
+      submitButton: 'Continue'
     }
   },
   {
@@ -270,7 +270,7 @@ export const testScenarios = [
       publicRegister: {
         'Consent to publish your project information': 'No'
       },
-      submitButton: 'Confirm and send'
+      submitButton: 'Continue'
     }
   },
   {
@@ -323,7 +323,7 @@ export const testScenarios = [
       publicRegister: {
         'Consent to publish your project information': 'No'
       },
-      submitButton: 'Confirm and send'
+      submitButton: 'Continue'
     }
   },
   {
@@ -376,7 +376,7 @@ export const testScenarios = [
       publicRegister: {
         'Consent to publish your project information': 'No'
       },
-      submitButton: 'Confirm and send'
+      submitButton: 'Continue'
     }
   },
   {
@@ -474,7 +474,7 @@ export const testScenarios = [
       publicRegister: {
         'Consent to publish your project information': 'No'
       },
-      submitButton: 'Confirm and send'
+      submitButton: 'Continue'
     }
   },
   {
@@ -577,7 +577,7 @@ export const testScenarios = [
       publicRegister: {
         'Consent to publish your project information': 'No'
       },
-      submitButton: 'Confirm and send'
+      submitButton: 'Continue'
     }
   }
 ]

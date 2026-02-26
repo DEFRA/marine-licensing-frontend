@@ -19,6 +19,7 @@ export const exemptionRoutes = {
   ACTIVITY_DATES: '/exemption/activity-dates',
   ACTIVITY_DESCRIPTION: '/exemption/activity-description',
   CHECK_YOUR_ANSWERS: '/exemption/check-your-answers',
+  DECLARATION: '/exemption/declaration',
   VIEW_DETAILS: '/exemption/view-details',
   VIEW_DETAILS_INTERNAL_USER: '/view-details',
   VIEW_DETAILS_PUBLIC: '/exemption/view-public-details',

@@ -25,7 +25,7 @@ export const validateReadOnlyBehavior = (document) => {
  * @param {string} expected.submitButton - Expected submit button text
  */
 export const validateSubmissionSection = (document, expected) => {
-  const confirmButton = document.querySelector('#confirm-and-send')
+  const confirmButton = document.querySelector('#continue')
   expect(confirmButton.textContent.trim()).toBe(expected.submitButton)
 }
 

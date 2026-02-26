@@ -16,7 +16,6 @@ export const getPageViewCommonData = async (request) => {
   const logger = createLogger()
   logger.info(`russ: ${JSON.stringify(userSession, null, 2)}`)
 
-
   const {
     organisationName,
     hasMultipleOrgPickerEntries,
@@ -29,7 +28,9 @@ export const getPageViewCommonData = async (request) => {
     changeOrganisationLinkRoutes.includes(request.path)
   const orgOrUserName = shouldShowOrgOrUserName
     ? organisationName || displayName
-    : shouldShowCitizenName ? displayName : null
-    
+    : shouldShowCitizenName
+      ? displayName
+      : null
+
   return { orgOrUserName, showChangeOrganisationLink }
 }

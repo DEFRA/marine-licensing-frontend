@@ -120,7 +120,7 @@ export const mockExemptionMcmsContext = (
   }
 }
 
-export const mockMarineLicense = (m) => {
+export const mockMarineLicence = (m) => {
   vi.mocked(getMarineLicenceCache).mockImplementation(() => {
     if (m?.constructor === Error) {
       throw m

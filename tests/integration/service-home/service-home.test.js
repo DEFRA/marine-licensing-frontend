@@ -14,7 +14,7 @@ describe('Service Home', () => {
       server: getServer()
     })
 
-  describe('when marine license is disabled', () => {
+  describe('when marine licence is disabled', () => {
     test('should render cards without Apply for Marine Licence tile and correct layout', async () => {
       const doc = await loadServiceHomePage()
 
@@ -76,14 +76,14 @@ describe('Service Home', () => {
         'View or manage projects not available in this account.'
       )
 
-      const applyForLicenseLink = queryByRole(doc, 'link', {
+      const applyForLicenceLink = queryByRole(doc, 'link', {
         name: /Apply for a Marine Licence/i
       })
-      expect(applyForLicenseLink).toBeNull()
+      expect(applyForLicenceLink).toBeNull()
     })
   })
 
-  describe('when marine license is enabled', () => {
+  describe('when marine licence is enabled', () => {
     beforeAll(() => {
       config.set('marineLicence.enabled', true)
     })
@@ -98,14 +98,14 @@ describe('Service Home', () => {
       const cards = doc.querySelectorAll('.card')
       expect(cards).toHaveLength(4)
 
-      const applyForLicenseLink = getByRole(doc, 'link', {
+      const applyForLicenceLink = getByRole(doc, 'link', {
         name: /Apply for a Marine Licence/i
       })
-      expect(applyForLicenseLink).toHaveAttribute(
+      expect(applyForLicenceLink).toHaveAttribute(
         'href',
         marineLicenceRoutes.MARINE_LICENCE_PROJECT_NAME
       )
-      expect(applyForLicenseLink.parentElement).toHaveClass(
+      expect(applyForLicenceLink.parentElement).toHaveClass(
         'govuk-grid-column-one-half-from-desktop'
       )
 

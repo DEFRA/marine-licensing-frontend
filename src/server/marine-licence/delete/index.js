@@ -1,7 +1,7 @@
 import {
-  deleteMarineLicenseController,
-  deleteMarineLicenseSelectController,
-  deleteMarineLicenseSubmitController
+  deleteMarineLicenceController,
+  deleteMarineLicenceSelectController,
+  deleteMarineLicenceSubmitController
 } from '#src/server/marine-licence/delete/controller.js'
 import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
 
@@ -9,16 +9,16 @@ export const deletemarineLicenceRoutes = [
   {
     method: 'GET',
     path: marineLicenceRoutes.MARINE_LICENCE_DELETE,
-    ...deleteMarineLicenseController
+    ...deleteMarineLicenceController
   },
   {
     method: 'GET',
     path: `${marineLicenceRoutes.MARINE_LICENCE_DELETE}/{marineLicenceId}`,
-    ...deleteMarineLicenseSelectController
+    ...deleteMarineLicenceSelectController
   },
   {
     method: 'POST',
     path: marineLicenceRoutes.MARINE_LICENCE_DELETE,
-    ...deleteMarineLicenseSubmitController
+    ...deleteMarineLicenceSubmitController
   }
 ]

@@ -4,7 +4,7 @@ import { config } from '~/src/config/config.js'
 import { marineLicenceRoutes } from '~/src/server/common/constants/routes.js'
 import { statusCodes } from '~/src/server/common/constants/status-codes.js'
 import {
-  mockMarineLicense,
+  mockMarineLicence,
   setupTestServer
 } from '~/tests/integration/shared/test-setup-helpers.js'
 import { makeGetRequest } from '~/src/server/test-helpers/server-requests.js'
@@ -17,7 +17,7 @@ import {
 describe('Marine Licence - Project name', () => {
   const getServer = setupTestServer()
 
-  describe('when marine license is disabled', () => {
+  describe('when marine licence is disabled', () => {
     beforeAll(() => {
       config.set('marineLicence.enabled', false)
     })
@@ -40,7 +40,7 @@ describe('Marine Licence - Project name', () => {
     })
   })
 
-  describe('when marine license is enabled', () => {
+  describe('when marine licence is enabled', () => {
     beforeAll(() => {
       config.set('marineLicence.enabled', true)
     })
@@ -50,7 +50,7 @@ describe('Marine Licence - Project name', () => {
     })
 
     test('should render project name page when feature is enabled and no project name set', async () => {
-      mockMarineLicense({})
+      mockMarineLicence({})
 
       const document = await loadPage({
         requestUrl: marineLicenceRoutes.MARINE_LICENCE_PROJECT_NAME,
@@ -93,7 +93,7 @@ describe('Marine Licence - Project name', () => {
     test('should render project name page when feature is enabled and editing project name', async () => {
       const testProjectName = 'Test Project Name'
 
-      mockMarineLicense({ id: 'test-id', projectName: testProjectName })
+      mockMarineLicence({ id: 'test-id', projectName: testProjectName })
 
       const document = await loadPage({
         requestUrl: marineLicenceRoutes.MARINE_LICENCE_PROJECT_NAME,
@@ -134,7 +134,7 @@ describe('Marine Licence - Project name', () => {
     })
 
     test('should show a validation error when submitted without a project name', async () => {
-      mockMarineLicense({})
+      mockMarineLicence({})
 
       const submitProjectNameForm = async (formData) => {
         const { document } = await submitForm({

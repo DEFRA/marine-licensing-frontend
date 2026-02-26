@@ -1,13 +1,13 @@
 import { faker } from '@faker-js/faker'
 import { mockExemptionMcmsContext } from './exemption'
 
-export const mockMarineLicenseTaskList = {
+export const mockMarineLicenceTaskList = {
   projectName: 'COMPLETED'
 }
 
-export const mockMarineLicenseApplication = {
+export const mockMarineLicenceApplication = {
   id: faker.database.mongodbObjectId(),
   projectName: 'Test Project',
-  taskList: mockMarineLicenseTaskList,
+  taskList: mockMarineLicenceTaskList,
   mcmsContext: mockExemptionMcmsContext
 }

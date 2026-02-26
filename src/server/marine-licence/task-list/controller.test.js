@@ -38,7 +38,7 @@ describe('#taskListController', () => {
   })
 
   test('taskListController handler should render with correct context', async () => {
-    const mockMarineLicense = {
+    const mockMarineLicence = {
       id: '123',
       projectName: 'Test Project'
     }
@@ -62,12 +62,12 @@ describe('#taskListController', () => {
       }
     ]
 
-    getMarineLicenceCacheMock.mockReturnValue(mockMarineLicense)
+    getMarineLicenceCacheMock.mockReturnValue(mockMarineLicence)
     authenticatedGetRequestMock.mockResolvedValue({
       payload: mockPayload
     })
     vi.mocked(transformTaskList).mockReturnValue(mockTransformedTaskList)
-    vi.mocked(setMarineLicenceCache).mockResolvedValue(mockMarineLicense)
+    vi.mocked(setMarineLicenceCache).mockResolvedValue(mockMarineLicence)
 
     await taskListController.handler(mockRequest, mockH)
 
@@ -101,7 +101,7 @@ describe('#taskListController', () => {
 
     await expect(
       taskListController.handler(mockRequest, mockH)
-    ).rejects.toThrow(Boom.notFound('Marine license not found'))
+    ).rejects.toThrow(Boom.notFound('Marine licence not found'))
 
     expect(getMarineLicenceCacheMock).toHaveBeenCalledWith(mockRequest)
     expect(authenticatedGetRequestMock).not.toHaveBeenCalled()
@@ -112,7 +112,7 @@ describe('#taskListController', () => {
 
     await expect(
       taskListController.handler(mockRequest, mockH)
-    ).rejects.toThrow(Boom.notFound('Marine license not found'))
+    ).rejects.toThrow(Boom.notFound('Marine licence not found'))
 
     expect(getMarineLicenceCacheMock).toHaveBeenCalledWith(mockRequest)
     expect(authenticatedGetRequestMock).not.toHaveBeenCalled()

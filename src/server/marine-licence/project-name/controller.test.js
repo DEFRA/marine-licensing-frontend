@@ -2,7 +2,7 @@ import { vi } from 'vitest'
 import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
 import {
   setupTestServer,
-  mockMarineLicense
+  mockMarineLicence
 } from '#tests/integration/shared/test-setup-helpers.js'
 import { createMockRequest } from '#src/server/test-helpers/mocks/helpers.js'
 import {
@@ -28,7 +28,7 @@ describe('#marineLicence/projectName', () => {
   let getUserSessionMock
 
   beforeEach(() => {
-    mockMarineLicense({ projectName: 'Test Project', id: 'test-id' })
+    mockMarineLicence({ projectName: 'Test Project', id: 'test-id' })
 
     authenticatedPatchRequestMock = vi.spyOn(
       authRequests,
@@ -100,7 +100,7 @@ describe('#marineLicence/projectName', () => {
     })
 
     test('Should correctly create new project and redirect to task list', async () => {
-      mockMarineLicense({ projectName: 'Test Project' })
+      mockMarineLicence({ projectName: 'Test Project' })
 
       authenticatedPostRequestMock.mockResolvedValueOnce({
         res: { statusCode: 200 },
@@ -191,7 +191,7 @@ describe('#marineLicence/projectName', () => {
     })
 
     test('Should handle API validation errors in catch block', async () => {
-      mockMarineLicense({ projectName: 'Test Project' })
+      mockMarineLicence({ projectName: 'Test Project' })
 
       authenticatedPostRequestMock.mockRejectedValueOnce({
         data: {
@@ -277,8 +277,8 @@ describe('#marineLicence/projectName', () => {
       expect(authenticatedPostRequestMock).not.toHaveBeenCalled()
     })
 
-    test('Should correctly retrieve cached MCMS context when creating a new marine license', async () => {
-      mockMarineLicense({ projectName: 'Test Project' })
+    test('Should correctly retrieve cached MCMS context when creating a new marine licence', async () => {
+      mockMarineLicence({ projectName: 'Test Project' })
 
       const h = { redirect: vi.fn() }
       const mockMcmsContext = {
@@ -323,7 +323,7 @@ describe('#marineLicence/projectName', () => {
       })
     })
 
-    test('Should not clear MCMS context if an error occurs when creating a new marine license', async () => {
+    test('Should not clear MCMS context if an error occurs when creating a new marine licence', async () => {
       const h = { redirect: vi.fn() }
       const mockRequest = createMockRequest({
         payload: { projectName: 'Project name' },
@@ -343,8 +343,8 @@ describe('#marineLicence/projectName', () => {
       expect(mockRequest.yar.clear).not.toHaveBeenCalled()
     })
 
-    test('Should handle missing organisation data when creating a new marine license', async () => {
-      mockMarineLicense({ projectName: 'Test Project' })
+    test('Should handle missing organisation data when creating a new marine licence', async () => {
+      mockMarineLicence({ projectName: 'Test Project' })
 
       authenticatedPostRequestMock.mockResolvedValueOnce({
         res: { statusCode: 200 },
@@ -374,7 +374,7 @@ describe('#marineLicence/projectName', () => {
     })
 
     test('Should include organisation data when user is an Agent', async () => {
-      mockMarineLicense({ projectName: 'Test Project' })
+      mockMarineLicence({ projectName: 'Test Project' })
 
       getUserSessionMock.mockResolvedValue({
         organisationId: 'beneficiary-org-id',
@@ -410,7 +410,7 @@ describe('#marineLicence/projectName', () => {
     })
 
     test('Should include organisation data when user is an Employee', async () => {
-      mockMarineLicense({ projectName: 'Test Project' })
+      mockMarineLicence({ projectName: 'Test Project' })
 
       getUserSessionMock.mockResolvedValue({
         organisationId: 'applicant-org-id',

@@ -22,7 +22,7 @@ const hideNavigationRoutes = new Set(Object.values(routes.postLogin))
 
 const hideNavigationRoutesExemptions = new Set([routes.PROJECT_NAME])
 
-const hideNavigationRoutesMarineLicense = new Set([
+const hideNavigationRoutesMarineLicence = new Set([
   marineLicenceRoutes.MARINE_LICENCE_PROJECT_NAME
 ])
 
@@ -38,7 +38,7 @@ const isRouteNavigationHidden = (request) => {
     if (pagePath.includes('/marine-licence')) {
       const marineLicence = getMarineLicenceCache(request)
       return (
-        hideNavigationRoutesMarineLicense.has(pagePath) && !marineLicence?.id
+        hideNavigationRoutesMarineLicence.has(pagePath) && !marineLicence?.id
       )
     }
 

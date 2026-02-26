@@ -23,7 +23,7 @@ export const taskListController = {
     const marineLicence = getMarineLicenceCache(request)
 
     if (!marineLicence?.id) {
-      throw Boom.notFound('Marine license not found')
+      throw Boom.notFound('Marine licence not found')
     }
     const { id } = marineLicence
 

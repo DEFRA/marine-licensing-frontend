@@ -11,10 +11,10 @@ export const CHECK_YOUR_ANSWERS_VIEW_ROUTE =
 
 export const checkYourAnswersController = {
   async handler(request, h) {
-    const cachedMarineLicense = getMarineLicenceCache(request)
+    const cachedMarineLicence = getMarineLicenceCache(request)
     return h.view(CHECK_YOUR_ANSWERS_VIEW_ROUTE, {
       ...checkYourAnswersViewContent,
-      ...cachedMarineLicense
+      ...cachedMarineLicence
     })
   }
 }

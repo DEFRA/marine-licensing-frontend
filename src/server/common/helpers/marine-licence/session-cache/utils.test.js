@@ -26,7 +26,7 @@ describe('#utils', () => {
       }
     })
 
-    test('should clear marine license cache', async () => {
+    test('should clear marine licence cache', async () => {
       await clearMarineLicenceCache(mockRequest, mockH)
       expect(mockRequest.yar.clear).toHaveBeenCalledWith(
         MARINE_LICENCE_CACHE_KEY

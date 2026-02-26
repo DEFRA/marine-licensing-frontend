@@ -1,18 +1,18 @@
 import { getByRole, getByText } from '@testing-library/dom'
 import { marineLicenceRoutes } from '~/src/server/common/constants/routes.js'
 import {
-  mockMarineLicense,
+  mockMarineLicence,
   setupTestServer
 } from '~/tests/integration/shared/test-setup-helpers.js'
 import { loadPage } from '~/tests/integration/shared/app-server.js'
-import { mockMarineLicenseApplication } from '~/src/server/test-helpers/mocks/marine-licence-mocks.js'
+import { mockMarineLicenceApplication } from '~/src/server/test-helpers/mocks/marine-licence-mocks.js'
 
 describe('Task List', () => {
   const getServer = setupTestServer()
   let document
 
   beforeEach(async () => {
-    mockMarineLicense(mockMarineLicenseApplication)
+    mockMarineLicence(mockMarineLicenceApplication)
     document = await loadPage({
       requestUrl: marineLicenceRoutes.MARINE_LICENCE_TASK_LIST,
       server: getServer()
@@ -33,8 +33,8 @@ describe('Task List', () => {
   })
 
   test('should render review button when all tasks are completed', async () => {
-    mockMarineLicense({
-      ...mockMarineLicenseApplication,
+    mockMarineLicence({
+      ...mockMarineLicenceApplication,
       taskList: [{ status: { text: 'Completed' } }]
     })
 

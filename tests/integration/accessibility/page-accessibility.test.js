@@ -15,10 +15,10 @@ import {
   mockExemptionWithShapefile,
   mockProjectList
 } from '~/src/server/test-helpers/mocks/exemption.js'
-import { mockMarineLicenseApplication } from '~/src/server/test-helpers/mocks/marine-licence-mocks.js'
+import { mockMarineLicenceApplication } from '~/src/server/test-helpers/mocks/marine-licence-mocks.js'
 import {
   mockExemption,
-  mockMarineLicense,
+  mockMarineLicence,
   setupTestServer
 } from '../shared/test-setup-helpers.js'
 import {
@@ -166,17 +166,17 @@ describe('Page accessibility checks (Axe)', () => {
     {
       url: marineLicenceRoutes.MARINE_LICENCE_PROJECT_NAME,
       title: 'Project name',
-      isMarineLicense: true
+      isMarineLicence: true
     },
     {
       url: marineLicenceRoutes.MARINE_LICENCE_TASK_LIST,
       title: 'Marine licence start page',
-      isMarineLicense: true
+      isMarineLicence: true
     },
     {
       url: marineLicenceRoutes.MARINE_LICENCE_CHECK_YOUR_ANSWERS,
       title: 'Check your answers before sending your information',
-      isMarineLicense: true
+      isMarineLicence: true
     },
     {
       url: routes.defraIdGuidance.WHO_IS_EXEMPTION_FOR,
@@ -240,7 +240,7 @@ describe('Page accessibility checks (Axe)', () => {
       title,
       url,
       exemption = mockExemptionData,
-      isMarineLicense = false,
+      isMarineLicence = false,
       session
     }) => {
       if (session) {
@@ -248,8 +248,8 @@ describe('Page accessibility checks (Axe)', () => {
         vi.mocked(getUserSession).mockResolvedValue(session)
       }
 
-      if (isMarineLicense) {
-        mockMarineLicense(mockMarineLicenseApplication)
+      if (isMarineLicence) {
+        mockMarineLicence(mockMarineLicenceApplication)
       } else {
         mockExemption(exemption)
         vi.mocked(authenticatedGetRequest).mockImplementation(

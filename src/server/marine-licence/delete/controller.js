@@ -20,13 +20,13 @@ export const DELETE_MARINE_LICENCE_VIEW_ROUTE = 'marine-licence/delete/index'
 const DELETE_MARINE_LICENCE_PAGE_TITLE =
   'Are you sure you want to delete this project?'
 
-export const deleteMarineLicenseController = {
+export const deleteMarineLicenceController = {
   handler: async (request, h) => {
     const marineLicence = getMarineLicenceCache(request)
     const { id: marineLicenceId } = marineLicence
 
     if (!marineLicenceId) {
-      throw Boom.notFound('Marine license not found')
+      throw Boom.notFound('Marine licence not found')
     }
 
     try {
@@ -57,7 +57,7 @@ export const deleteMarineLicenseController = {
     }
   }
 }
-export const deleteMarineLicenseSelectController = {
+export const deleteMarineLicenceSelectController = {
   async handler(request, h) {
     const { marineLicenceId } = request.params
     await clearMarineLicenceCache(request, h)
@@ -65,20 +65,20 @@ export const deleteMarineLicenseSelectController = {
     return h.redirect(marineLicenceRoutes.MARINE_LICENCE_DELETE)
   }
 }
-export const deleteMarineLicenseSubmitController = {
+export const deleteMarineLicenceSubmitController = {
   handler: async (request, h) => {
     try {
       const { marineLicenceId } = request.payload
       const marineLicence = getMarineLicenceCache(request)
-      const { id: cachedMarineLicenseId } = marineLicence
+      const { id: cachedMarineLicenceId } = marineLicence
 
-      if (!marineLicenceId || marineLicenceId !== cachedMarineLicenseId) {
+      if (!marineLicenceId || marineLicenceId !== cachedMarineLicenceId) {
         request.logger.error(
           {
-            formMarineLicenseId: marineLicenceId,
-            cachedMarineLicenseId
+            formMarineLicenceId: marineLicenceId,
+            cachedMarineLicenceId
           },
-          'Marine license ID mismatch or missing'
+          'Marine licence ID mismatch or missing'
         )
         return h.redirect(routes.DASHBOARD)
       }
@@ -96,14 +96,14 @@ export const deleteMarineLicenseSubmitController = {
 
       request.logger.info(
         { marineLicenceId },
-        `Deleted marine license ${marineLicenceId} by user ${authedUser.contactId}`
+        `Deleted marine licence ${marineLicenceId} by user ${authedUser.contactId}`
       )
 
       await clearMarineLicenceCache(request, h)
 
       return h.redirect(routes.DASHBOARD)
     } catch (error) {
-      request.logger.error({ err: error }, 'Error deleting marine license')
+      request.logger.error({ err: error }, 'Error deleting marine licence')
       return h.redirect(routes.DASHBOARD)
     }
   }

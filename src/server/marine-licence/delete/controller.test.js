@@ -17,9 +17,9 @@ import { MARINE_LICENCE_TYPE } from '#src/server/common/constants/marine-licence
 import * as authUtils from '#src/server/common/plugins/auth/utils.js'
 
 import {
-  deleteMarineLicenseController,
-  deleteMarineLicenseSelectController,
-  deleteMarineLicenseSubmitController
+  deleteMarineLicenceController,
+  deleteMarineLicenceSelectController,
+  deleteMarineLicenceSubmitController
 } from './controller.js'
 
 vi.mock('~/src/server/common/helpers/authenticated-requests.js')
@@ -57,20 +57,20 @@ describe('#delete', () => {
     vi.spyOn(authUtils, 'getUserSession').mockResolvedValue({ mockUserSession })
   })
 
-  describe('deleteMarineLicenseController', () => {
+  describe('deleteMarineLicenceController', () => {
     it('should render the delete confirmation page with project details', async () => {
-      const mockMarineLicense = { id: 'test-project-id' }
+      const mockMarineLicence = { id: 'test-project-id' }
       const mockProject = {
         projectName: 'Test Project',
         id: 'test-project-id'
       }
 
-      mockedGetMarineLicenceCache.mockReturnValue(mockMarineLicense)
+      mockedGetMarineLicenceCache.mockReturnValue(mockMarineLicence)
       mockedAuthenticatedGetRequest.mockResolvedValue({
         payload: { value: mockProject }
       })
 
-      const result = await deleteMarineLicenseController.handler(
+      const result = await deleteMarineLicenceController.handler(
         mockRequest,
         mockH
       )
@@ -93,22 +93,22 @@ describe('#delete', () => {
       expect(result).toBe('view-response')
     })
 
-    it('should throw 404 if marine license is not found in cache', async () => {
+    it('should throw 404 if marine licence is not found in cache', async () => {
       mockedGetMarineLicenceCache.mockReturnValue({ id: undefined })
 
       await expect(
-        deleteMarineLicenseController.handler(mockRequest, mockH)
-      ).rejects.toThrow('Marine license not found')
+        deleteMarineLicenceController.handler(mockRequest, mockH)
+      ).rejects.toThrow('Marine licence not found')
     })
 
     it('should redirect to dashboard if project is not found', async () => {
-      const mockMarineLicense = { id: 'test-project-id' }
-      mockedGetMarineLicenceCache.mockReturnValue(mockMarineLicense)
+      const mockMarineLicence = { id: 'test-project-id' }
+      mockedGetMarineLicenceCache.mockReturnValue(mockMarineLicence)
       mockedAuthenticatedGetRequest.mockResolvedValue({
         payload: { value: null }
       })
 
-      const result = await deleteMarineLicenseController.handler(
+      const result = await deleteMarineLicenceController.handler(
         mockRequest,
         mockH
       )
@@ -118,12 +118,12 @@ describe('#delete', () => {
     })
 
     it('should redirect to dashboard if API call fails', async () => {
-      const mockMarineLicense = { id: 'test-project-id' }
+      const mockMarineLicence = { id: 'test-project-id' }
       const mockError = new Error('API Error')
-      mockedGetMarineLicenceCache.mockReturnValue(mockMarineLicense)
+      mockedGetMarineLicenceCache.mockReturnValue(mockMarineLicence)
       mockedAuthenticatedGetRequest.mockRejectedValue(mockError)
 
-      const result = await deleteMarineLicenseController.handler(
+      const result = await deleteMarineLicenceController.handler(
         mockRequest,
         mockH
       )
@@ -133,13 +133,13 @@ describe('#delete', () => {
     })
 
     it('should redirect to dashboard if project payload is undefined', async () => {
-      const mockMarineLicense = { id: 'test-project-id' }
-      mockedGetMarineLicenceCache.mockReturnValue(mockMarineLicense)
+      const mockMarineLicence = { id: 'test-project-id' }
+      mockedGetMarineLicenceCache.mockReturnValue(mockMarineLicence)
       mockedAuthenticatedGetRequest.mockResolvedValue({
         payload: { value: undefined }
       })
 
-      const result = await deleteMarineLicenseController.handler(
+      const result = await deleteMarineLicenceController.handler(
         mockRequest,
         mockH
       )
@@ -149,11 +149,11 @@ describe('#delete', () => {
     })
   })
 
-  describe('deleteMarineLicenseSelectController', () => {
-    it('should clear cache, set marine license ID in cache, and redirect to delete page', async () => {
+  describe('deleteMarineLicenceSelectController', () => {
+    it('should clear cache, set marine licence ID in cache, and redirect to delete page', async () => {
       mockRequest.params = { marineLicenceId: 'test-project-id' }
 
-      const result = await deleteMarineLicenseSelectController.handler(
+      const result = await deleteMarineLicenceSelectController.handler(
         mockRequest,
         mockH
       )
@@ -174,13 +174,13 @@ describe('#delete', () => {
     })
   })
 
-  describe('deleteMarineLicenseSubmitController', () => {
-    it('should delete marine license and redirect to dashboard when IDs match', async () => {
+  describe('deleteMarineLicenceSubmitController', () => {
+    it('should delete marine licence and redirect to dashboard when IDs match', async () => {
       mockRequest.payload = { marineLicenceId: 'test-project-id' }
-      const mockMarineLicense = { id: 'test-project-id' }
-      mockedGetMarineLicenceCache.mockReturnValue(mockMarineLicense)
+      const mockMarineLicence = { id: 'test-project-id' }
+      mockedGetMarineLicenceCache.mockReturnValue(mockMarineLicence)
 
-      const result = await deleteMarineLicenseSubmitController.handler(
+      const result = await deleteMarineLicenceSubmitController.handler(
         mockRequest,
         mockH
       )
@@ -199,12 +199,12 @@ describe('#delete', () => {
       expect(result).toBe('redirect-response')
     })
 
-    it('should redirect to dashboard when marine license ID is missing', async () => {
+    it('should redirect to dashboard when marine licence ID is missing', async () => {
       mockRequest.payload = {}
-      const mockMarineLicense = { id: 'test-project-id' }
-      mockedGetMarineLicenceCache.mockReturnValue(mockMarineLicense)
+      const mockMarineLicence = { id: 'test-project-id' }
+      mockedGetMarineLicenceCache.mockReturnValue(mockMarineLicence)
 
-      const result = await deleteMarineLicenseSubmitController.handler(
+      const result = await deleteMarineLicenceSubmitController.handler(
         mockRequest,
         mockH
       )
@@ -213,12 +213,12 @@ describe('#delete', () => {
       expect(result).toBe('redirect-response')
     })
 
-    it('should redirect to dashboard when marine license IDs do not match', async () => {
+    it('should redirect to dashboard when marine licence IDs do not match', async () => {
       mockRequest.payload = { marineLicenceId: 'different-id' }
-      const mockMarineLicense = { id: 'test-project-id' }
-      mockedGetMarineLicenceCache.mockReturnValue(mockMarineLicense)
+      const mockMarineLicence = { id: 'test-project-id' }
+      mockedGetMarineLicenceCache.mockReturnValue(mockMarineLicence)
 
-      const result = await deleteMarineLicenseSubmitController.handler(
+      const result = await deleteMarineLicenceSubmitController.handler(
         mockRequest,
         mockH
       )
@@ -229,11 +229,11 @@ describe('#delete', () => {
 
     it('should redirect to dashboard when exception occurs', async () => {
       mockRequest.payload = { marineLicenceId: 'test-project-id' }
-      const mockMarineLicense = { id: 'test-project-id' }
-      mockedGetMarineLicenceCache.mockReturnValue(mockMarineLicense)
+      const mockMarineLicence = { id: 'test-project-id' }
+      mockedGetMarineLicenceCache.mockReturnValue(mockMarineLicence)
       mockedAuthenticatedRequest.mockRejectedValue(new Error('Test error'))
 
-      const result = await deleteMarineLicenseSubmitController.handler(
+      const result = await deleteMarineLicenceSubmitController.handler(
         mockRequest,
         mockH
       )

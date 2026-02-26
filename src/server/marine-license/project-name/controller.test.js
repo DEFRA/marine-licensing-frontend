@@ -167,6 +167,29 @@ describe('#marineLicense/projectName', () => {
       )
     })
 
+    test('Should correctly redirect to check your answers', async () => {
+      authenticatedPatchRequestMock.mockResolvedValueOnce({
+        res: { statusCode: 200 },
+        payload: {
+          value: {
+            message: 'success'
+          }
+        }
+      })
+
+      const { headers } = await makePostRequest({
+        url:
+          marineLicenseRoutes.MARINE_LICENSE_PROJECT_NAME +
+          '?from=check-your-answers',
+        server: getServer(),
+        formData: { projectName: 'Project name' }
+      })
+
+      expect(headers.location).toBe(
+        marineLicenseRoutes.MARINE_LICENSE_CHECK_YOUR_ANSWERS
+      )
+    })
+
     test('Should handle API validation errors in catch block', async () => {
       mockMarineLicense({ projectName: 'Test Project' })
 

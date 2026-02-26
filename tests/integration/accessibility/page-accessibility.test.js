@@ -174,6 +174,11 @@ describe('Page accessibility checks (Axe)', () => {
       isMarineLicense: true
     },
     {
+      url: marineLicenseRoutes.MARINE_LICENSE_CHECK_YOUR_ANSWERS,
+      title: 'Check your answers before sending your information',
+      isMarineLicense: true
+    },
+    {
       url: routes.defraIdGuidance.WHO_IS_EXEMPTION_FOR,
       title: 'Who is this exempt activity notification for?'
     },

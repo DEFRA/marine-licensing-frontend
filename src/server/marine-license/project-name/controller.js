@@ -151,7 +151,13 @@ export const projectNameSubmitController = {
 
       clearMcmsContextCache(request)
 
-      return h.redirect(marineLicenseRoutes.MARINE_LICENSE_TASK_LIST)
+      const fromCheckYourAnswers = request.query?.from === 'check-your-answers'
+
+      return h.redirect(
+        fromCheckYourAnswers
+          ? marineLicenseRoutes.MARINE_LICENSE_CHECK_YOUR_ANSWERS
+          : marineLicenseRoutes.MARINE_LICENSE_TASK_LIST
+      )
     } catch (e) {
       const { details } = e.data?.payload?.validation ?? {}
       if (!details) {

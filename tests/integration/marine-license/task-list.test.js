@@ -1,5 +1,5 @@
 import { getByRole, getByText } from '@testing-library/dom'
-import { marineLicenseRoutes } from '~/src/server/common/constants/routes.js'
+import { marineLicenceRoutes } from '~/src/server/common/constants/routes.js'
 import {
   mockMarineLicense,
   setupTestServer
@@ -14,7 +14,7 @@ describe('Task List', () => {
   beforeEach(async () => {
     mockMarineLicense(mockMarineLicenseApplication)
     document = await loadPage({
-      requestUrl: marineLicenseRoutes.MARINE_LICENSE_TASK_LIST,
+      requestUrl: marineLicenceRoutes.MARINE_LICENCE_TASK_LIST,
       server: getServer()
     })
   })

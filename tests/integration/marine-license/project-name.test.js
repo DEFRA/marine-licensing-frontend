@@ -1,7 +1,7 @@
 import { JSDOM } from 'jsdom'
 import { getByRole, queryByRole } from '@testing-library/dom'
 import { config } from '~/src/config/config.js'
-import { marineLicenseRoutes } from '~/src/server/common/constants/routes.js'
+import { marineLicenceRoutes } from '~/src/server/common/constants/routes.js'
 import { statusCodes } from '~/src/server/common/constants/status-codes.js'
 import {
   mockMarineLicense,
@@ -25,7 +25,7 @@ describe('Marine License - Project name', () => {
     test('should render 403 error page when feature is disabled', async () => {
       const { result, statusCode } = await makeGetRequest({
         server: getServer(),
-        url: marineLicenseRoutes.MARINE_LICENSE_PROJECT_NAME
+        url: marineLicenceRoutes.MARINE_LICENCE_PROJECT_NAME
       })
 
       expect(statusCode).toBe(statusCodes.forbidden)
@@ -53,7 +53,7 @@ describe('Marine License - Project name', () => {
       mockMarineLicense({})
 
       const document = await loadPage({
-        requestUrl: marineLicenseRoutes.MARINE_LICENSE_PROJECT_NAME,
+        requestUrl: marineLicenceRoutes.MARINE_LICENCE_PROJECT_NAME,
         server: getServer()
       })
 
@@ -96,7 +96,7 @@ describe('Marine License - Project name', () => {
       mockMarineLicense({ id: 'test-id', projectName: testProjectName })
 
       const document = await loadPage({
-        requestUrl: marineLicenseRoutes.MARINE_LICENSE_PROJECT_NAME,
+        requestUrl: marineLicenceRoutes.MARINE_LICENCE_PROJECT_NAME,
         server: getServer()
       })
 
@@ -138,7 +138,7 @@ describe('Marine License - Project name', () => {
 
       const submitProjectNameForm = async (formData) => {
         const { document } = await submitForm({
-          requestUrl: marineLicenseRoutes.MARINE_LICENSE_PROJECT_NAME,
+          requestUrl: marineLicenceRoutes.MARINE_LICENCE_PROJECT_NAME,
           server: getServer(),
           formData
         })

@@ -11,7 +11,7 @@ import {
   taskListSelectMarineLicenceController,
   TASK_LIST_VIEW_ROUTE
 } from '#src/server/marine-licence/task-list/controller.js'
-import { marineLicenseRoutes } from '#src/server/common/constants/routes.js'
+import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
 import Boom from '@hapi/boom'
 
 vi.mock('#src/server/common/helpers/marine-license/session-cache/utils.js')
@@ -53,7 +53,7 @@ describe('#taskListController', () => {
     }
     const mockTransformedTaskList = [
       {
-        href: marineLicenseRoutes.MARINE_LICENSE_PROJECT_NAME,
+        href: marineLicenceRoutes.MARINE_LICENCE_PROJECT_NAME,
         status: { text: 'Completed' },
         title: {
           classes: 'govuk-link--no-visited-state',
@@ -136,7 +136,7 @@ describe('#taskListController', () => {
     )
 
     expect(mockH.redirect).toHaveBeenCalledWith(
-      marineLicenseRoutes.MARINE_LICENSE_TASK_LIST
+      marineLicenceRoutes.MARINE_LICENCE_TASK_LIST
     )
   })
 })

@@ -1,4 +1,4 @@
-import { marineLicenseRoutes } from '#src/server/common/constants/routes.js'
+import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
 
 const setStatus = (task) => {
   if (!task || task === 'INCOMPLETE') {
@@ -32,7 +32,7 @@ export const transformTaskList = (taskList) => {
         text: 'Project name',
         classes
       },
-      href: marineLicenseRoutes.MARINE_LICENSE_PROJECT_NAME,
+      href: marineLicenceRoutes.MARINE_LICENCE_PROJECT_NAME,
       status: setStatus(taskList.projectName)
     }
   ]

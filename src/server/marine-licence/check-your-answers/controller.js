@@ -1,9 +1,9 @@
 import { getMarineLicenseCache } from '#src/server/common/helpers/marine-license/session-cache/utils.js'
-import { marineLicenseRoutes } from '#src/server/common/constants/routes.js'
+import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
 
 const checkYourAnswersViewContent = {
   pageTitle: 'Check your answers before sending your information',
-  backLink: marineLicenseRoutes.MARINE_LICENSE_TASK_LIST
+  backLink: marineLicenceRoutes.MARINE_LICENCE_TASK_LIST
 }
 
 export const CHECK_YOUR_ANSWERS_VIEW_ROUTE =

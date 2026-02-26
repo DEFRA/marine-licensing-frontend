@@ -1,10 +1,10 @@
-import { marineLicenseRoutes } from '#src/server/common/constants/routes.js'
+import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
 import { getBackLink } from './utils'
 
 describe('projectName utils', () => {
   test('correct backLink for update route', () => {
     expect(getBackLink(true)).toEqual(
-      marineLicenseRoutes.MARINE_LICENSE_TASK_LIST
+      marineLicenceRoutes.MARINE_LICENCE_TASK_LIST
     )
   })
 

@@ -4,7 +4,7 @@ import {
   checkYourAnswersController,
   CHECK_YOUR_ANSWERS_VIEW_ROUTE
 } from '#src/server/marine-licence/check-your-answers/controller.js'
-import { marineLicenseRoutes } from '#src/server/common/constants/routes.js'
+import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
 
 vi.mock('#src/server/common/helpers/marine-license/session-cache/utils.js')
 
@@ -36,7 +36,7 @@ describe('#checkYourAnswersController', () => {
     expect(getMarineLicenseCacheMock).toHaveBeenCalledWith(mockRequest)
     expect(mockH.view).toHaveBeenCalledWith(CHECK_YOUR_ANSWERS_VIEW_ROUTE, {
       pageTitle: 'Check your answers before sending your information',
-      backLink: marineLicenseRoutes.MARINE_LICENSE_TASK_LIST,
+      backLink: marineLicenceRoutes.MARINE_LICENCE_TASK_LIST,
       ...mockCachedData
     })
   })

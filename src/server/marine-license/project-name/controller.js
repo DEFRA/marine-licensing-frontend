@@ -19,7 +19,7 @@ import {
   getMarineLicenseCache,
   setMarineLicenseCache
 } from '#src/server/common/helpers/marine-license/session-cache/utils.js'
-import { marineLicenseRoutes } from '#src/server/common/constants/routes.js'
+import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
 import { getBackLink } from './utils.js'
 
 const errorMessages = {
@@ -155,8 +155,8 @@ export const projectNameSubmitController = {
 
       return h.redirect(
         fromCheckYourAnswers
-          ? marineLicenseRoutes.MARINE_LICENSE_CHECK_YOUR_ANSWERS
-          : marineLicenseRoutes.MARINE_LICENSE_TASK_LIST
+          ? marineLicenceRoutes.MARINE_LICENCE_CHECK_YOUR_ANSWERS
+          : marineLicenceRoutes.MARINE_LICENCE_TASK_LIST
       )
     } catch (e) {
       const { details } = e.data?.payload?.validation ?? {}

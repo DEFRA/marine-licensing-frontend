@@ -5,7 +5,7 @@ import {
 } from '#src/server/common/helpers/marine-license/session-cache/utils.js'
 import { transformTaskList } from '#src/server/marine-licence/task-list/utils.js'
 import { authenticatedGetRequest } from '#src/server/common/helpers/authenticated-requests.js'
-import { marineLicenseRoutes } from '#src/server/common/constants/routes.js'
+import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
 
 import Boom from '@hapi/boom'
 
@@ -59,6 +59,6 @@ export const taskListSelectMarineLicenceController = {
     const { id } = request.params
     await clearMarineLicenseCache(request, h)
     await setMarineLicenseCache(request, h, { id })
-    return h.redirect(marineLicenseRoutes.MARINE_LICENSE_TASK_LIST)
+    return h.redirect(marineLicenceRoutes.MARINE_LICENCE_TASK_LIST)
   }
 }

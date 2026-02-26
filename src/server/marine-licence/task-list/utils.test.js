@@ -1,5 +1,5 @@
 import { transformTaskList } from '#src/server/marine-licence/task-list/utils.js'
-import { marineLicenseRoutes } from '#src/server/common/constants/routes.js'
+import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
 
 describe('taskList utils', () => {
   test('transformTaskList correctly returns task list with Completed status', () => {
@@ -9,7 +9,7 @@ describe('taskList utils', () => {
       })
     ).toEqual([
       {
-        href: marineLicenseRoutes.MARINE_LICENSE_PROJECT_NAME,
+        href: marineLicenceRoutes.MARINE_LICENCE_PROJECT_NAME,
         status: { text: 'Completed' },
         title: {
           classes: 'govuk-link--no-visited-state',
@@ -26,7 +26,7 @@ describe('taskList utils', () => {
       })
     ).toEqual([
       {
-        href: marineLicenseRoutes.MARINE_LICENSE_PROJECT_NAME,
+        href: marineLicenceRoutes.MARINE_LICENCE_PROJECT_NAME,
         status: {
           tag: { text: 'In Progress', classes: 'govuk-tag--light-blue' }
         },
@@ -42,7 +42,7 @@ describe('taskList utils', () => {
       })
     ).toEqual([
       {
-        href: marineLicenseRoutes.MARINE_LICENSE_PROJECT_NAME,
+        href: marineLicenceRoutes.MARINE_LICENCE_PROJECT_NAME,
         status: {
           tag: { text: 'Not yet started', classes: 'govuk-tag--blue' }
         },
@@ -58,7 +58,7 @@ describe('taskList utils', () => {
       })
     ).toEqual([
       {
-        href: marineLicenseRoutes.MARINE_LICENSE_PROJECT_NAME,
+        href: marineLicenceRoutes.MARINE_LICENCE_PROJECT_NAME,
         status: {
           tag: { text: 'Not yet started', classes: 'govuk-tag--blue' }
         },
@@ -74,7 +74,7 @@ describe('taskList utils', () => {
       })
     ).toEqual([
       {
-        href: marineLicenseRoutes.MARINE_LICENSE_PROJECT_NAME,
+        href: marineLicenceRoutes.MARINE_LICENCE_PROJECT_NAME,
         status: {
           tag: { text: 'Not yet started', classes: 'govuk-tag--blue' }
         },

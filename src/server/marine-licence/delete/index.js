@@ -3,22 +3,22 @@ import {
   deleteMarineLicenseSelectController,
   deleteMarineLicenseSubmitController
 } from '#src/server/marine-licence/delete/controller.js'
-import { marineLicenseRoutes } from '#src/server/common/constants/routes.js'
+import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
 
-export const deleteMarineLicenseRoutes = [
+export const deletemarineLicenceRoutes = [
   {
     method: 'GET',
-    path: marineLicenseRoutes.MARINE_LICENSE_DELETE,
+    path: marineLicenceRoutes.MARINE_LICENCE_DELETE,
     ...deleteMarineLicenseController
   },
   {
     method: 'GET',
-    path: `${marineLicenseRoutes.MARINE_LICENSE_DELETE}/{marineLicenseId}`,
+    path: `${marineLicenceRoutes.MARINE_LICENCE_DELETE}/{marineLicenseId}`,
     ...deleteMarineLicenseSelectController
   },
   {
     method: 'POST',
-    path: marineLicenseRoutes.MARINE_LICENSE_DELETE,
+    path: marineLicenceRoutes.MARINE_LICENCE_DELETE,
     ...deleteMarineLicenseSubmitController
   }
 ]

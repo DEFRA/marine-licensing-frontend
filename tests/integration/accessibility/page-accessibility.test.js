@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 import { vi } from 'vitest'
 import {
-  marineLicenseRoutes,
+  marineLicenceRoutes,
   routes
 } from '~/src/server/common/constants/routes.js'
 import { statusCodes } from '~/src/server/common/constants/status-codes.js'
@@ -164,17 +164,17 @@ describe('Page accessibility checks (Axe)', () => {
       title: 'Home'
     },
     {
-      url: marineLicenseRoutes.MARINE_LICENSE_PROJECT_NAME,
+      url: marineLicenceRoutes.MARINE_LICENCE_PROJECT_NAME,
       title: 'Project name',
       isMarineLicense: true
     },
     {
-      url: marineLicenseRoutes.MARINE_LICENSE_TASK_LIST,
+      url: marineLicenceRoutes.MARINE_LICENCE_TASK_LIST,
       title: 'Marine licence start page',
       isMarineLicense: true
     },
     {
-      url: marineLicenseRoutes.MARINE_LICENSE_CHECK_YOUR_ANSWERS,
+      url: marineLicenceRoutes.MARINE_LICENCE_CHECK_YOUR_ANSWERS,
       title: 'Check your answers before sending your information',
       isMarineLicense: true
     },
@@ -203,7 +203,7 @@ describe('Page accessibility checks (Axe)', () => {
       title: 'You need to be added to your client\u2019s Defra account'
     },
     {
-      url: marineLicenseRoutes.MARINE_LICENSE_DELETE,
+      url: marineLicenceRoutes.MARINE_LICENCE_DELETE,
       title: 'Are you sure you want to delete this project?',
       marineLicence: true
     },

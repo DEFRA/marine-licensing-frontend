@@ -11,7 +11,7 @@ import {
 } from '#src/server/common/helpers/marine-license/session-cache/utils.js'
 import {
   routes,
-  marineLicenseRoutes
+  marineLicenceRoutes
 } from '#src/server/common/constants/routes.js'
 import { MARINE_LICENCE_TYPE } from '#src/server/common/constants/marine-licence.js'
 import * as authUtils from '#src/server/common/plugins/auth/utils.js'
@@ -168,7 +168,7 @@ describe('#delete', () => {
         { id: 'test-project-id' }
       )
       expect(mockH.redirect).toHaveBeenCalledWith(
-        marineLicenseRoutes.MARINE_LICENSE_DELETE
+        marineLicenceRoutes.MARINE_LICENCE_DELETE
       )
       expect(result).toBe('redirect-response')
     })

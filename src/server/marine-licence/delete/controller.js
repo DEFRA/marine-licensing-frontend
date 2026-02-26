@@ -4,7 +4,7 @@ import {
 } from '#src/server/common/helpers/authenticated-requests.js'
 import {
   routes,
-  marineLicenseRoutes
+  marineLicenceRoutes
 } from '#src/server/common/constants/routes.js'
 import {
   getMarineLicenseCache,
@@ -62,7 +62,7 @@ export const deleteMarineLicenseSelectController = {
     const { marineLicenseId } = request.params
     await clearMarineLicenseCache(request, h)
     await setMarineLicenseCache(request, h, { id: marineLicenseId })
-    return h.redirect(marineLicenseRoutes.MARINE_LICENSE_DELETE)
+    return h.redirect(marineLicenceRoutes.MARINE_LICENCE_DELETE)
   }
 }
 export const deleteMarineLicenseSubmitController = {

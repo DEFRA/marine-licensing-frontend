@@ -1,5 +1,5 @@
 import {
-  marineLicenseRoutes,
+  marineLicenceRoutes,
   routes
 } from '#src/server/common/constants/routes.js'
 import { config } from '#src/config/config.js'
@@ -33,7 +33,7 @@ const cards = [
 const filteredCards = [
   {
     title: 'Apply for a Marine License',
-    link: marineLicenseRoutes.MARINE_LICENSE_PROJECT_NAME
+    link: marineLicenceRoutes.MARINE_LICENCE_PROJECT_NAME
   }
 ]
 

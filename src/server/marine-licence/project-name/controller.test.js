@@ -1,5 +1,5 @@
 import { vi } from 'vitest'
-import { marineLicenseRoutes } from '#src/server/common/constants/routes.js'
+import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
 import {
   setupTestServer,
   mockMarineLicense
@@ -58,7 +58,7 @@ describe('#marineLicense/projectName', () => {
       config.set('marineLicense.enabled', false)
 
       const { statusCode } = await makeGetRequest({
-        url: marineLicenseRoutes.MARINE_LICENSE_PROJECT_NAME,
+        url: marineLicenceRoutes.MARINE_LICENCE_PROJECT_NAME,
         server: getServer()
       })
 
@@ -69,7 +69,7 @@ describe('#marineLicense/projectName', () => {
 
     test('Should correctly continue in controller if not disabled', async () => {
       const { statusCode } = await makeGetRequest({
-        url: marineLicenseRoutes.MARINE_LICENSE_PROJECT_NAME,
+        url: marineLicenceRoutes.MARINE_LICENCE_PROJECT_NAME,
         server: getServer()
       })
 
@@ -82,14 +82,14 @@ describe('#marineLicense/projectName', () => {
       config.set('marineLicense.enabled', false)
 
       const requestWithError = await makePostRequest({
-        url: marineLicenseRoutes.MARINE_LICENSE_PROJECT_NAME,
+        url: marineLicenceRoutes.MARINE_LICENCE_PROJECT_NAME,
         server: getServer()
       })
 
       expect(requestWithError.statusCode).toBe(403)
 
       const requestWithoutError = await makePostRequest({
-        url: marineLicenseRoutes.MARINE_LICENSE_PROJECT_NAME,
+        url: marineLicenceRoutes.MARINE_LICENCE_PROJECT_NAME,
         server: getServer(),
         formData: { projectName: 'Project name' }
       })
@@ -113,7 +113,7 @@ describe('#marineLicense/projectName', () => {
       })
 
       const { statusCode, headers } = await makePostRequest({
-        url: marineLicenseRoutes.MARINE_LICENSE_PROJECT_NAME,
+        url: marineLicenceRoutes.MARINE_LICENCE_PROJECT_NAME,
         server: getServer(),
         formData: { projectName: 'Project name' }
       })
@@ -131,7 +131,7 @@ describe('#marineLicense/projectName', () => {
       expect(statusCode).toBe(302)
 
       expect(headers.location).toBe(
-        marineLicenseRoutes.MARINE_LICENSE_TASK_LIST
+        marineLicenceRoutes.MARINE_LICENCE_TASK_LIST
       )
     })
 
@@ -146,7 +146,7 @@ describe('#marineLicense/projectName', () => {
       })
 
       const { statusCode, headers } = await makePostRequest({
-        url: marineLicenseRoutes.MARINE_LICENSE_PROJECT_NAME,
+        url: marineLicenceRoutes.MARINE_LICENCE_PROJECT_NAME,
         server: getServer(),
         formData: { projectName: 'Project name' }
       })
@@ -163,7 +163,7 @@ describe('#marineLicense/projectName', () => {
       expect(statusCode).toBe(302)
 
       expect(headers.location).toBe(
-        marineLicenseRoutes.MARINE_LICENSE_TASK_LIST
+        marineLicenceRoutes.MARINE_LICENCE_TASK_LIST
       )
     })
 
@@ -179,14 +179,14 @@ describe('#marineLicense/projectName', () => {
 
       const { headers } = await makePostRequest({
         url:
-          marineLicenseRoutes.MARINE_LICENSE_PROJECT_NAME +
+          marineLicenceRoutes.MARINE_LICENCE_PROJECT_NAME +
           '?from=check-your-answers',
         server: getServer(),
         formData: { projectName: 'Project name' }
       })
 
       expect(headers.location).toBe(
-        marineLicenseRoutes.MARINE_LICENSE_CHECK_YOUR_ANSWERS
+        marineLicenceRoutes.MARINE_LICENCE_CHECK_YOUR_ANSWERS
       )
     })
 
@@ -210,7 +210,7 @@ describe('#marineLicense/projectName', () => {
       })
 
       const { result, statusCode } = await makePostRequest({
-        url: marineLicenseRoutes.MARINE_LICENSE_PROJECT_NAME,
+        url: marineLicenceRoutes.MARINE_LICENCE_PROJECT_NAME,
         server: getServer(),
         formData: { projectName: 'test' }
       })
@@ -239,7 +239,7 @@ describe('#marineLicense/projectName', () => {
       expect(h.view).toHaveBeenCalledWith(PROJECT_NAME_VIEW_ROUTE, {
         heading: 'Project Name',
         pageTitle: 'Project name',
-        backLink: marineLicenseRoutes.MARINE_LICENSE_TASK_LIST,
+        backLink: marineLicenceRoutes.MARINE_LICENCE_TASK_LIST,
         payload: { projectName: '' }
       })
     })
@@ -260,7 +260,7 @@ describe('#marineLicense/projectName', () => {
       expect(h.view).toHaveBeenCalledWith(PROJECT_NAME_VIEW_ROUTE, {
         heading: 'Project Name',
         pageTitle: 'Project name',
-        backLink: marineLicenseRoutes.MARINE_LICENSE_TASK_LIST,
+        backLink: marineLicenceRoutes.MARINE_LICENCE_TASK_LIST,
         payload: { projectName: '' }
       })
 
@@ -269,7 +269,7 @@ describe('#marineLicense/projectName', () => {
 
     test('Should not call the back end when payload data is empty', async () => {
       await makePostRequest({
-        url: marineLicenseRoutes.MARINE_LICENSE_PROJECT_NAME,
+        url: marineLicenceRoutes.MARINE_LICENCE_PROJECT_NAME,
         server: getServer(),
         formData: { projectName: '' }
       })
@@ -357,7 +357,7 @@ describe('#marineLicense/projectName', () => {
       })
 
       const { statusCode } = await makePostRequest({
-        url: marineLicenseRoutes.MARINE_LICENSE_PROJECT_NAME,
+        url: marineLicenceRoutes.MARINE_LICENCE_PROJECT_NAME,
         server: getServer(),
         formData: { projectName: 'Project name' }
       })
@@ -388,7 +388,7 @@ describe('#marineLicense/projectName', () => {
       })
 
       await makePostRequest({
-        url: marineLicenseRoutes.MARINE_LICENSE_PROJECT_NAME,
+        url: marineLicenceRoutes.MARINE_LICENCE_PROJECT_NAME,
         server: getServer(),
         formData: { projectName: 'Project name' }
       })
@@ -424,7 +424,7 @@ describe('#marineLicense/projectName', () => {
       })
 
       await makePostRequest({
-        url: marineLicenseRoutes.MARINE_LICENSE_PROJECT_NAME,
+        url: marineLicenceRoutes.MARINE_LICENCE_PROJECT_NAME,
         server: getServer(),
         formData: { projectName: 'Project name' }
       })

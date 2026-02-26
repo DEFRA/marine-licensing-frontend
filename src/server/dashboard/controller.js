@@ -2,7 +2,7 @@ import { authenticatedGetRequest } from '#src/server/common/helpers/authenticate
 import { getUserSession } from '#src/server/common/plugins/auth/utils.js'
 import { sortProjectsByStatus, formatProjectsForDisplay } from './utils.js'
 
-export const DASHBOARD_VIEW_ROUTE = 'exemption/dashboard/index.njk'
+export const DASHBOARD_VIEW_ROUTE = 'dashboard/index.njk'
 const DASHBOARD_PAGE_TITLE = 'Projects'
 
 const FILTER_MY_PROJECTS = 'my-projects'
@@ -11,7 +11,7 @@ const FILTER_ALL_PROJECTS = 'all-projects'
 export const dashboardController = {
   handler: async (request, h) => {
     try {
-      const { payload } = await authenticatedGetRequest(request, '/exemptions')
+      const { payload } = await authenticatedGetRequest(request, '/projects')
 
       const projects = payload.value ?? []
       const sortedProjects = sortProjectsByStatus(projects)

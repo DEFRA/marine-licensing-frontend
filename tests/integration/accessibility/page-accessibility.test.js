@@ -203,6 +203,11 @@ describe('Page accessibility checks (Axe)', () => {
       title: 'You need to be added to your client\u2019s Defra account'
     },
     {
+      url: marineLicenseRoutes.MARINE_LICENSE_DELETE,
+      title: 'Are you sure you want to delete this project?',
+      marineLicence: true
+    },
+    {
       url: routes.postLogin.CONFIRM_INDIVIDUAL,
       title: "Confirm you're notifying us as an individual",
       session: citizenUserSession

@@ -2,6 +2,7 @@ import { vi } from 'vitest'
 import { clone } from '@hapi/hoek'
 import {
   MARINE_LICENSE_CACHE_KEY,
+  clearMarineLicenseCache,
   getMarineLicenseCache,
   setMarineLicenseCache
 } from '#src/server/common/helpers/marine-license/session-cache/utils.js'
@@ -11,6 +12,28 @@ vi.mock('@hapi/hoek', () => ({
 }))
 
 describe('#utils', () => {
+  describe('clearMarineLicenseCache', () => {
+    let mockRequest
+    let mockH
+
+    beforeEach(() => {
+      mockH = {}
+      mockRequest = {
+        yar: {
+          clear: vi.fn(),
+          commit: vi.fn().mockResolvedValue()
+        }
+      }
+    })
+
+    test('should clear marine license cache', async () => {
+      await clearMarineLicenseCache(mockRequest, mockH)
+      expect(mockRequest.yar.clear).toHaveBeenCalledWith(
+        MARINE_LICENSE_CACHE_KEY
+      )
+      expect(mockRequest.yar.commit).toHaveBeenCalledWith(mockH)
+    })
+  })
   describe('getMarineLicenseCache', () => {
     let mockRequest
 

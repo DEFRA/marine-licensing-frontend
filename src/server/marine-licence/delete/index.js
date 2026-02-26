@@ -13,7 +13,7 @@ export const deletemarineLicenceRoutes = [
   },
   {
     method: 'GET',
-    path: `${marineLicenceRoutes.MARINE_LICENCE_DELETE}/{marineLicenseId}`,
+    path: `${marineLicenceRoutes.MARINE_LICENCE_DELETE}/{marineLicenceId}`,
     ...deleteMarineLicenseSelectController
   },
   {

@@ -15,7 +15,7 @@ import {
   mockExemptionWithShapefile,
   mockProjectList
 } from '~/src/server/test-helpers/mocks/exemption.js'
-import { mockMarineLicenseApplication } from '~/src/server/test-helpers/mocks/marine-license-mocks.js'
+import { mockMarineLicenseApplication } from '~/src/server/test-helpers/mocks/marine-licence-mocks.js'
 import {
   mockExemption,
   mockMarineLicense,
@@ -40,7 +40,7 @@ vi.mock('~/src/server/common/plugins/auth/utils.js', () => ({
 
 describe('Page accessibility checks (Axe)', () => {
   beforeAll(() => {
-    config.set('marineLicense.enabled', true)
+    config.set('marineLicence.enabled', true)
     expect.extend(toHaveNoViolations)
   })
   const getServer = setupTestServer()

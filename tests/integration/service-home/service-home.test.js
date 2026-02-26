@@ -15,7 +15,7 @@ describe('Service Home', () => {
     })
 
   describe('when marine license is disabled', () => {
-    test('should render cards without Apply for Marine License tile and correct layout', async () => {
+    test('should render cards without Apply for Marine Licence tile and correct layout', async () => {
       const doc = await loadServiceHomePage()
 
       expect(getByRole(doc, 'heading', { level: 1 })).toHaveTextContent('Home')
@@ -77,7 +77,7 @@ describe('Service Home', () => {
       )
 
       const applyForLicenseLink = queryByRole(doc, 'link', {
-        name: /Apply for a Marine License/i
+        name: /Apply for a Marine Licence/i
       })
       expect(applyForLicenseLink).toBeNull()
     })
@@ -85,21 +85,21 @@ describe('Service Home', () => {
 
   describe('when marine license is enabled', () => {
     beforeAll(() => {
-      config.set('marineLicense.enabled', true)
+      config.set('marineLicence.enabled', true)
     })
 
     afterAll(() => {
-      config.set('marineLicense.enabled', false)
+      config.set('marineLicence.enabled', false)
     })
 
-    test('should include Apply for Marine License card and use correct card layout', async () => {
+    test('should include Apply for Marine Licence card and use correct card layout', async () => {
       const doc = await loadServiceHomePage()
 
       const cards = doc.querySelectorAll('.card')
       expect(cards).toHaveLength(4)
 
       const applyForLicenseLink = getByRole(doc, 'link', {
-        name: /Apply for a Marine License/i
+        name: /Apply for a Marine Licence/i
       })
       expect(applyForLicenseLink).toHaveAttribute(
         'href',

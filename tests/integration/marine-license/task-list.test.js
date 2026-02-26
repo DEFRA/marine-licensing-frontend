@@ -5,7 +5,7 @@ import {
   setupTestServer
 } from '~/tests/integration/shared/test-setup-helpers.js'
 import { loadPage } from '~/tests/integration/shared/app-server.js'
-import { mockMarineLicenseApplication } from '~/src/server/test-helpers/mocks/marine-license-mocks.js'
+import { mockMarineLicenseApplication } from '~/src/server/test-helpers/mocks/marine-licence-mocks.js'
 
 describe('Task List', () => {
   const getServer = setupTestServer()

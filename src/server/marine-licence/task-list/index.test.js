@@ -5,7 +5,7 @@ describe('taskList routes', () => {
     expect(taskListRoutes[0]).toEqual(
       expect.objectContaining({
         method: 'GET',
-        path: '/marine-license/task-list'
+        path: '/marine-licence/task-list'
       })
     )
   })

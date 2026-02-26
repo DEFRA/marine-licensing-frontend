@@ -1,5 +1,5 @@
 import { vi } from 'vitest'
-import { getMarineLicenseCache } from '#src/server/common/helpers/marine-licence/session-cache/utils.js'
+import { getMarineLicenceCache } from '#src/server/common/helpers/marine-licence/session-cache/utils.js'
 import {
   checkYourAnswersController,
   CHECK_YOUR_ANSWERS_VIEW_ROUTE
@@ -12,7 +12,7 @@ describe('#checkYourAnswersController', () => {
   let mockRequest
   let mockH
 
-  const getMarineLicenseCacheMock = vi.mocked(getMarineLicenseCache)
+  const getMarineLicenceCacheMock = vi.mocked(getMarineLicenceCache)
 
   beforeEach(() => {
     mockH = {
@@ -29,11 +29,11 @@ describe('#checkYourAnswersController', () => {
       projectName: 'Test Project'
     }
 
-    getMarineLicenseCacheMock.mockReturnValue(mockCachedData)
+    getMarineLicenceCacheMock.mockReturnValue(mockCachedData)
 
     await checkYourAnswersController.handler(mockRequest, mockH)
 
-    expect(getMarineLicenseCacheMock).toHaveBeenCalledWith(mockRequest)
+    expect(getMarineLicenceCacheMock).toHaveBeenCalledWith(mockRequest)
     expect(mockH.view).toHaveBeenCalledWith(CHECK_YOUR_ANSWERS_VIEW_ROUTE, {
       pageTitle: 'Check your answers before sending your information',
       backLink: marineLicenceRoutes.MARINE_LICENCE_TASK_LIST,

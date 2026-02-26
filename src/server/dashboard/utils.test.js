@@ -341,14 +341,14 @@ describe('getActionButtons', () => {
   })
 
   it('returns empty string for marine licence project when not draft or not own project', () => {
-    const marineLicenseActive = {
+    const marineLicenceActive = {
       id: 'ml123',
       projectName: 'Marine Licence Project',
       projectType: 'MARINE_LICENCE',
       status: 'Active',
       isOwnProject: true
     }
-    const result = getActionButtons(marineLicenseActive)
+    const result = getActionButtons(marineLicenceActive)
     expect(result).toBe('')
   })
 })

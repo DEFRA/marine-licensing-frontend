@@ -19,7 +19,7 @@ import {
   PROJECT_NAME_VIEW_ROUTE
 } from '#src/server/marine-licence/project-name/controller.js'
 
-describe('#marineLicense/projectName', () => {
+describe('#marineLicence/projectName', () => {
   const getServer = setupTestServer()
 
   let authenticatedPatchRequestMock
@@ -55,7 +55,7 @@ describe('#marineLicense/projectName', () => {
 
   describe('#projectNameController', () => {
     test('Should correctly throw an error if feature is disabled', async () => {
-      config.set('marineLicense.enabled', false)
+      config.set('marineLicence.enabled', false)
 
       const { statusCode } = await makeGetRequest({
         url: marineLicenceRoutes.MARINE_LICENCE_PROJECT_NAME,
@@ -64,7 +64,7 @@ describe('#marineLicense/projectName', () => {
 
       expect(statusCode).toBe(403)
 
-      config.set('marineLicense.enabled', true)
+      config.set('marineLicence.enabled', true)
     })
 
     test('Should correctly continue in controller if not disabled', async () => {
@@ -79,7 +79,7 @@ describe('#marineLicense/projectName', () => {
 
   describe('#projectNameSubmitController', () => {
     test('Should correctly throw an error if feature is disabled', async () => {
-      config.set('marineLicense.enabled', false)
+      config.set('marineLicence.enabled', false)
 
       const requestWithError = await makePostRequest({
         url: marineLicenceRoutes.MARINE_LICENCE_PROJECT_NAME,
@@ -96,7 +96,7 @@ describe('#marineLicense/projectName', () => {
 
       expect(requestWithoutError.statusCode).toBe(403)
 
-      config.set('marineLicense.enabled', true)
+      config.set('marineLicence.enabled', true)
     })
 
     test('Should correctly create new project and redirect to task list', async () => {

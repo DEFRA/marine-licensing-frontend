@@ -14,12 +14,12 @@ import {
   expectInputValue
 } from '~/tests/integration/shared/expect-utils.js'
 
-describe('Marine License - Project name', () => {
+describe('Marine Licence - Project name', () => {
   const getServer = setupTestServer()
 
   describe('when marine license is disabled', () => {
     beforeAll(() => {
-      config.set('marineLicense.enabled', false)
+      config.set('marineLicence.enabled', false)
     })
 
     test('should render 403 error page when feature is disabled', async () => {
@@ -42,11 +42,11 @@ describe('Marine License - Project name', () => {
 
   describe('when marine license is enabled', () => {
     beforeAll(() => {
-      config.set('marineLicense.enabled', true)
+      config.set('marineLicence.enabled', true)
     })
 
     afterAll(() => {
-      config.set('marineLicense.enabled', false)
+      config.set('marineLicence.enabled', false)
     })
 
     test('should render project name page when feature is enabled and no project name set', async () => {

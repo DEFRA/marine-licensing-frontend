@@ -1,4 +1,4 @@
-import { getMarineLicenseCache } from '#src/server/common/helpers/marine-licence/session-cache/utils.js'
+import { getMarineLicenceCache } from '#src/server/common/helpers/marine-licence/session-cache/utils.js'
 import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
 
 const checkYourAnswersViewContent = {
@@ -11,7 +11,7 @@ export const CHECK_YOUR_ANSWERS_VIEW_ROUTE =
 
 export const checkYourAnswersController = {
   async handler(request, h) {
-    const cachedMarineLicense = getMarineLicenseCache(request)
+    const cachedMarineLicense = getMarineLicenceCache(request)
     return h.view(CHECK_YOUR_ANSWERS_VIEW_ROUTE, {
       ...checkYourAnswersViewContent,
       ...cachedMarineLicense

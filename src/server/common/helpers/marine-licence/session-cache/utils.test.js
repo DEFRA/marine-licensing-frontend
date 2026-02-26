@@ -1,10 +1,10 @@
 import { vi } from 'vitest'
 import { clone } from '@hapi/hoek'
 import {
-  MARINE_LICENSE_CACHE_KEY,
-  clearMarineLicenseCache,
-  getMarineLicenseCache,
-  setMarineLicenseCache
+  MARINE_LICENCE_CACHE_KEY,
+  clearMarineLicenceCache,
+  getMarineLicenceCache,
+  setMarineLicenceCache
 } from '#src/server/common/helpers/marine-licence/session-cache/utils.js'
 
 vi.mock('@hapi/hoek', () => ({
@@ -12,7 +12,7 @@ vi.mock('@hapi/hoek', () => ({
 }))
 
 describe('#utils', () => {
-  describe('clearMarineLicenseCache', () => {
+  describe('clearMarineLicenceCache', () => {
     let mockRequest
     let mockH
 
@@ -27,14 +27,14 @@ describe('#utils', () => {
     })
 
     test('should clear marine license cache', async () => {
-      await clearMarineLicenseCache(mockRequest, mockH)
+      await clearMarineLicenceCache(mockRequest, mockH)
       expect(mockRequest.yar.clear).toHaveBeenCalledWith(
-        MARINE_LICENSE_CACHE_KEY
+        MARINE_LICENCE_CACHE_KEY
       )
       expect(mockRequest.yar.commit).toHaveBeenCalledWith(mockH)
     })
   })
-  describe('getMarineLicenseCache', () => {
+  describe('getMarineLicenceCache', () => {
     let mockRequest
 
     beforeEach(() => {
@@ -49,9 +49,9 @@ describe('#utils', () => {
     test('should return an empty object when no cache is set', () => {
       mockRequest.yar.get.mockReturnValue(undefined)
 
-      const result = getMarineLicenseCache(mockRequest)
+      const result = getMarineLicenceCache(mockRequest)
 
-      expect(mockRequest.yar.get).toHaveBeenCalledWith(MARINE_LICENSE_CACHE_KEY)
+      expect(mockRequest.yar.get).toHaveBeenCalledWith(MARINE_LICENCE_CACHE_KEY)
       expect(clone).toHaveBeenCalledWith({})
       expect(result).toEqual({})
     })
@@ -60,9 +60,9 @@ describe('#utils', () => {
       const cachedData = { projectName: 'Test project', id: '123' }
       mockRequest.yar.get.mockReturnValue(cachedData)
 
-      const result = getMarineLicenseCache(mockRequest)
+      const result = getMarineLicenceCache(mockRequest)
 
-      expect(mockRequest.yar.get).toHaveBeenCalledWith(MARINE_LICENSE_CACHE_KEY)
+      expect(mockRequest.yar.get).toHaveBeenCalledWith(MARINE_LICENCE_CACHE_KEY)
       expect(clone).toHaveBeenCalledWith(cachedData)
       expect(result).not.toBe(cachedData)
       expect(result).toEqual(cachedData)
@@ -71,15 +71,15 @@ describe('#utils', () => {
     test('should handle null values in cache', () => {
       mockRequest.yar.get.mockReturnValue(null)
 
-      const result = getMarineLicenseCache(mockRequest)
+      const result = getMarineLicenceCache(mockRequest)
 
-      expect(mockRequest.yar.get).toHaveBeenCalledWith(MARINE_LICENSE_CACHE_KEY)
+      expect(mockRequest.yar.get).toHaveBeenCalledWith(MARINE_LICENCE_CACHE_KEY)
       expect(clone).toHaveBeenCalledWith({})
       expect(result).toEqual({})
     })
   })
 
-  describe('setMarineLicenseCache', () => {
+  describe('setMarineLicenceCache', () => {
     let mockRequest
     let mockH
 
@@ -97,10 +97,10 @@ describe('#utils', () => {
     test('should store the value in cache', async () => {
       const value = { projectName: 'Test project', id: '123' }
 
-      const result = await setMarineLicenseCache(mockRequest, mockH, value)
+      const result = await setMarineLicenceCache(mockRequest, mockH, value)
 
       expect(mockRequest.yar.set).toHaveBeenCalledWith(
-        MARINE_LICENSE_CACHE_KEY,
+        MARINE_LICENCE_CACHE_KEY,
         value
       )
       expect(mockRequest.yar.commit).toHaveBeenCalledWith(mockH)
@@ -110,10 +110,10 @@ describe('#utils', () => {
     test('should handle empty objects', async () => {
       const value = {}
 
-      const cache = await setMarineLicenseCache(mockRequest, mockH, value)
+      const cache = await setMarineLicenceCache(mockRequest, mockH, value)
 
       expect(mockRequest.yar.set).toHaveBeenCalledWith(
-        MARINE_LICENSE_CACHE_KEY,
+        MARINE_LICENCE_CACHE_KEY,
         value
       )
       expect(mockRequest.yar.commit).toHaveBeenCalledWith(mockH)
@@ -123,10 +123,10 @@ describe('#utils', () => {
     test('should handle undefined values and default to an empty object', async () => {
       const value = undefined
 
-      const cache = await setMarineLicenseCache(mockRequest, mockH, value)
+      const cache = await setMarineLicenceCache(mockRequest, mockH, value)
 
       expect(mockRequest.yar.set).toHaveBeenCalledWith(
-        MARINE_LICENSE_CACHE_KEY,
+        MARINE_LICENCE_CACHE_KEY,
         {}
       )
       expect(mockRequest.yar.commit).toHaveBeenCalledWith(mockH)

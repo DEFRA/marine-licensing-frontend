@@ -1,7 +1,7 @@
 import {
-  clearMarineLicenseCache,
-  getMarineLicenseCache,
-  setMarineLicenseCache
+  clearMarineLicenceCache,
+  getMarineLicenceCache,
+  setMarineLicenceCache
 } from '#src/server/common/helpers/marine-licence/session-cache/utils.js'
 import { transformTaskList } from '#src/server/marine-licence/task-list/utils.js'
 import { authenticatedGetRequest } from '#src/server/common/helpers/authenticated-requests.js'
@@ -20,24 +20,24 @@ const taskListViewSettings = {
 
 export const taskListController = {
   async handler(request, h) {
-    const marineLicense = getMarineLicenseCache(request)
+    const marineLicence = getMarineLicenceCache(request)
 
-    if (!marineLicense?.id) {
+    if (!marineLicence?.id) {
       throw Boom.notFound('Marine license not found')
     }
-    const { id } = marineLicense
+    const { id } = marineLicence
 
     const { payload } = await authenticatedGetRequest(
       request,
       `/marine-licence/${id}`
     )
 
-    const { id: marineLicenseId, taskList, projectName } = payload.value
+    const { id: marineLicenceId, taskList, projectName } = payload.value
 
     const taskListTransformed = transformTaskList(taskList)
 
-    await setMarineLicenseCache(request, h, {
-      id: marineLicenseId,
+    await setMarineLicenceCache(request, h, {
+      id: marineLicenceId,
       projectName
     })
 
@@ -57,8 +57,8 @@ export const taskListController = {
 export const taskListSelectMarineLicenceController = {
   async handler(request, h) {
     const { id } = request.params
-    await clearMarineLicenseCache(request, h)
-    await setMarineLicenseCache(request, h, { id })
+    await clearMarineLicenceCache(request, h)
+    await setMarineLicenceCache(request, h, { id })
     return h.redirect(marineLicenceRoutes.MARINE_LICENCE_TASK_LIST)
   }
 }

@@ -16,8 +16,8 @@ import {
 } from '#src/server/common/helpers/mcms-context/cache-mcms-context.js'
 import { getUserSession } from '#src/server/common/plugins/auth/utils.js'
 import {
-  getMarineLicenseCache,
-  setMarineLicenseCache
+  getMarineLicenceCache,
+  setMarineLicenceCache
 } from '#src/server/common/helpers/marine-licence/session-cache/utils.js'
 import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
 import { getBackLink } from './utils.js'
@@ -33,25 +33,25 @@ const projectNameViewSettings = {
   heading: 'Project Name'
 }
 
-const marineLicenseDisabledError = 'Marine License journey is not enabled'
+const marineLicenceDisabledError = 'Marine Licence journey is not enabled'
 
 export const projectNameController = {
   handler(request, h) {
-    const marineLicenseConfig = config.get('marineLicense')
+    const marineLicenceConfig = config.get('marineLicence')
 
-    if (!marineLicenseConfig.enabled) {
-      throw Boom.forbidden(marineLicenseDisabledError)
+    if (!marineLicenceConfig.enabled) {
+      throw Boom.forbidden(marineLicenceDisabledError)
     }
 
-    const marineLicense = getMarineLicenseCache(request)
+    const marineLicence = getMarineLicenceCache(request)
 
-    const isUpdate = !!marineLicense.id
+    const isUpdate = !!marineLicence.id
 
     return h.view(PROJECT_NAME_VIEW_ROUTE, {
       ...projectNameViewSettings,
       backLink: getBackLink(isUpdate),
       payload: {
-        projectName: marineLicense.projectName
+        projectName: marineLicence.projectName
       }
     })
   }
@@ -66,16 +66,16 @@ export const projectNameSubmitController = {
         })
       }),
       failAction: (request, h, err) => {
-        const marineLicenseConfig = config.get('marineLicense')
+        const marineLicenceConfig = config.get('marineLicence')
 
-        if (!marineLicenseConfig.enabled) {
-          throw Boom.forbidden(marineLicenseDisabledError)
+        if (!marineLicenceConfig.enabled) {
+          throw Boom.forbidden(marineLicenceDisabledError)
         }
 
         const { payload } = request
 
-        const marineLicense = getMarineLicenseCache(request)
-        const isUpdate = !!marineLicense.id
+        const marineLicence = getMarineLicenceCache(request)
+        const isUpdate = !!marineLicence.id
 
         if (!err.details) {
           return h
@@ -107,18 +107,18 @@ export const projectNameSubmitController = {
     const { payload } = request
 
     try {
-      const marineLicenseConfig = config.get('marineLicense')
+      const marineLicenceConfig = config.get('marineLicence')
 
-      if (!marineLicenseConfig.enabled) {
-        throw Boom.forbidden(marineLicenseDisabledError)
+      if (!marineLicenceConfig.enabled) {
+        throw Boom.forbidden(marineLicenceDisabledError)
       }
 
-      const marineLicense = getMarineLicenseCache(request)
+      const marineLicence = getMarineLicenceCache(request)
 
       const { organisationId, organisationName, userRelationshipType } =
         await getUserSession(request, request.state?.userSession)
 
-      const isUpdate = !!marineLicense.id
+      const isUpdate = !!marineLicence.id
 
       const mcmsContext = getMcmsContextFromCache(request)
 
@@ -128,7 +128,7 @@ export const projectNameSubmitController = {
             '/marine-licence/project-name',
             {
               ...payload,
-              id: marineLicense.id
+              id: marineLicence.id
             }
           )
         : await authenticatedPostRequest(
@@ -142,9 +142,9 @@ export const projectNameSubmitController = {
             }
           )
 
-      const { id } = isUpdate ? marineLicense : responsePayload.value
+      const { id } = isUpdate ? marineLicence : responsePayload.value
 
-      await setMarineLicenseCache(request, h, {
+      await setMarineLicenceCache(request, h, {
         id,
         ...(!isUpdate && responsePayload.value)
       })
@@ -164,8 +164,8 @@ export const projectNameSubmitController = {
         throw e
       }
 
-      const marineLicense = getMarineLicenseCache(request)
-      const isUpdate = !!marineLicense.id
+      const marineLicence = getMarineLicenceCache(request)
+      const isUpdate = !!marineLicence.id
 
       const errorSummary = mapErrorsForDisplay(details, errorMessages)
 

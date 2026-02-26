@@ -18,8 +18,8 @@ import {
   clearMcmsContextCache
 } from '~/src/server/common/helpers/mcms-context/cache-mcms-context.js'
 import {
-  getMarineLicenseCache,
-  setMarineLicenseCache
+  getMarineLicenceCache,
+  setMarineLicenceCache
 } from '~/src/server/common/helpers/marine-licence/session-cache/utils.js'
 import { mockExemptionMcmsContext as mockExemptionMcmsContextMock } from '~/tests/integration/shared/test-setup-helpers.js'
 
@@ -121,18 +121,18 @@ export const mockExemptionMcmsContext = (
 }
 
 export const mockMarineLicense = (m) => {
-  vi.mocked(getMarineLicenseCache).mockImplementation(() => {
+  vi.mocked(getMarineLicenceCache).mockImplementation(() => {
     if (m?.constructor === Error) {
       throw m
     }
     return m
   })
-  vi.mocked(setMarineLicenseCache).mockResolvedValue(undefined)
+  vi.mocked(setMarineLicenceCache).mockResolvedValue(undefined)
   const existingMock = vi
     .mocked(authenticatedGetRequest)
     .getMockImplementation()
   vi.mocked(authenticatedGetRequest).mockImplementation((request, endpoint) => {
-    if (endpoint?.startsWith('/marine-license/')) {
+    if (endpoint?.startsWith('/marine-licence/')) {
       return Promise.resolve({
         payload: {
           message: 'success',
@@ -151,8 +151,8 @@ export const mockMarineLicense = (m) => {
     })
   })
   return {
-    getMarineLicenseCache,
-    setMarineLicenseCache,
+    getMarineLicenceCache,
+    setMarineLicenceCache,
     authenticatedGetRequest
   }
 }

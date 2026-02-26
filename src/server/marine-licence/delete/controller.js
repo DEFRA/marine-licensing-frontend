@@ -7,32 +7,32 @@ import {
   marineLicenceRoutes
 } from '#src/server/common/constants/routes.js'
 import {
-  getMarineLicenseCache,
-  setMarineLicenseCache,
-  clearMarineLicenseCache
+  getMarineLicenceCache,
+  setMarineLicenceCache,
+  clearMarineLicenceCache
 } from '#src/server/common/helpers/marine-licence/session-cache/utils.js'
 import Boom from '@hapi/boom'
 import { MARINE_LICENCE_TYPE } from '#src/server/common/constants/marine-licence.js'
 import { getUserSession } from '#src/server/common/plugins/auth/utils.js'
 
-export const DELETE_MARINE_LICENSE_VIEW_ROUTE = 'marine-licence/delete/index'
+export const DELETE_MARINE_LICENCE_VIEW_ROUTE = 'marine-licence/delete/index'
 
-const DELETE_MARINE_LICENSE_PAGE_TITLE =
+const DELETE_MARINE_LICENCE_PAGE_TITLE =
   'Are you sure you want to delete this project?'
 
 export const deleteMarineLicenseController = {
   handler: async (request, h) => {
-    const marineLicense = getMarineLicenseCache(request)
-    const { id: marineLicenseId } = marineLicense
+    const marineLicence = getMarineLicenceCache(request)
+    const { id: marineLicenceId } = marineLicence
 
-    if (!marineLicenseId) {
+    if (!marineLicenceId) {
       throw Boom.notFound('Marine license not found')
     }
 
     try {
       const { payload } = await authenticatedGetRequest(
         request,
-        `/marine-licence/${marineLicenseId}`
+        `/marine-licence/${marineLicenceId}`
       )
       const project = payload.value
 
@@ -40,12 +40,12 @@ export const deleteMarineLicenseController = {
         return h.redirect(routes.DASHBOARD)
       }
 
-      return h.view(DELETE_MARINE_LICENSE_VIEW_ROUTE, {
-        pageTitle: DELETE_MARINE_LICENSE_PAGE_TITLE,
-        heading: DELETE_MARINE_LICENSE_PAGE_TITLE,
+      return h.view(DELETE_MARINE_LICENCE_VIEW_ROUTE, {
+        pageTitle: DELETE_MARINE_LICENCE_PAGE_TITLE,
+        heading: DELETE_MARINE_LICENCE_PAGE_TITLE,
         projectName: project.projectName,
-        marineLicenseType: MARINE_LICENCE_TYPE,
-        marineLicenseId,
+        marineLicenceType: MARINE_LICENCE_TYPE,
+        marineLicenceId,
         backLink: routes.DASHBOARD,
         cancelLink: routes.DASHBOARD,
         routes
@@ -59,23 +59,23 @@ export const deleteMarineLicenseController = {
 }
 export const deleteMarineLicenseSelectController = {
   async handler(request, h) {
-    const { marineLicenseId } = request.params
-    await clearMarineLicenseCache(request, h)
-    await setMarineLicenseCache(request, h, { id: marineLicenseId })
+    const { marineLicenceId } = request.params
+    await clearMarineLicenceCache(request, h)
+    await setMarineLicenceCache(request, h, { id: marineLicenceId })
     return h.redirect(marineLicenceRoutes.MARINE_LICENCE_DELETE)
   }
 }
 export const deleteMarineLicenseSubmitController = {
   handler: async (request, h) => {
     try {
-      const { marineLicenseId } = request.payload
-      const marineLicense = getMarineLicenseCache(request)
-      const { id: cachedMarineLicenseId } = marineLicense
+      const { marineLicenceId } = request.payload
+      const marineLicence = getMarineLicenceCache(request)
+      const { id: cachedMarineLicenseId } = marineLicence
 
-      if (!marineLicenseId || marineLicenseId !== cachedMarineLicenseId) {
+      if (!marineLicenceId || marineLicenceId !== cachedMarineLicenseId) {
         request.logger.error(
           {
-            formMarineLicenseId: marineLicenseId,
+            formMarineLicenseId: marineLicenceId,
             cachedMarineLicenseId
           },
           'Marine license ID mismatch or missing'
@@ -86,7 +86,7 @@ export const deleteMarineLicenseSubmitController = {
       await authenticatedRequest(
         request,
         'DELETE',
-        `/marine-licence/${marineLicenseId}`
+        `/marine-licence/${marineLicenceId}`
       )
 
       const authedUser = await getUserSession(
@@ -95,11 +95,11 @@ export const deleteMarineLicenseSubmitController = {
       )
 
       request.logger.info(
-        { marineLicenseId },
-        `Deleted marine license ${marineLicenseId} by user ${authedUser.contactId}`
+        { marineLicenceId },
+        `Deleted marine license ${marineLicenceId} by user ${authedUser.contactId}`
       )
 
-      await clearMarineLicenseCache(request, h)
+      await clearMarineLicenceCache(request, h)
 
       return h.redirect(routes.DASHBOARD)
     } catch (error) {

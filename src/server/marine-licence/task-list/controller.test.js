@@ -1,8 +1,8 @@
 import { vi } from 'vitest'
 import {
-  clearMarineLicenseCache,
-  getMarineLicenseCache,
-  setMarineLicenseCache
+  clearMarineLicenceCache,
+  getMarineLicenceCache,
+  setMarineLicenceCache
 } from '#src/server/common/helpers/marine-licence/session-cache/utils.js'
 import { authenticatedGetRequest } from '#src/server/common/helpers/authenticated-requests.js'
 import { transformTaskList } from '#src/server/marine-licence/task-list/utils.js'
@@ -22,9 +22,9 @@ describe('#taskListController', () => {
   let mockRequest
   let mockH
 
-  const getMarineLicenseCacheMock = vi.mocked(getMarineLicenseCache)
-  const setMarineLicenseCacheMock = vi.mocked(setMarineLicenseCache)
-  const clearMarineLicenseCacheMock = vi.mocked(clearMarineLicenseCache)
+  const getMarineLicenceCacheMock = vi.mocked(getMarineLicenceCache)
+  const setMarineLicenceCacheMock = vi.mocked(setMarineLicenceCache)
+  const clearMarineLicenceCacheMock = vi.mocked(clearMarineLicenceCache)
   const authenticatedGetRequestMock = vi.mocked(authenticatedGetRequest)
 
   beforeEach(() => {
@@ -62,16 +62,16 @@ describe('#taskListController', () => {
       }
     ]
 
-    getMarineLicenseCacheMock.mockReturnValue(mockMarineLicense)
+    getMarineLicenceCacheMock.mockReturnValue(mockMarineLicense)
     authenticatedGetRequestMock.mockResolvedValue({
       payload: mockPayload
     })
     vi.mocked(transformTaskList).mockReturnValue(mockTransformedTaskList)
-    vi.mocked(setMarineLicenseCache).mockResolvedValue(mockMarineLicense)
+    vi.mocked(setMarineLicenceCache).mockResolvedValue(mockMarineLicense)
 
     await taskListController.handler(mockRequest, mockH)
 
-    expect(getMarineLicenseCacheMock).toHaveBeenCalledWith(mockRequest)
+    expect(getMarineLicenceCacheMock).toHaveBeenCalledWith(mockRequest)
     expect(authenticatedGetRequestMock).toHaveBeenCalledWith(
       mockRequest,
       '/marine-licence/123'
@@ -79,7 +79,7 @@ describe('#taskListController', () => {
     expect(vi.mocked(transformTaskList)).toHaveBeenCalledWith(
       mockPayload.value.taskList
     )
-    expect(vi.mocked(setMarineLicenseCache)).toHaveBeenCalledWith(
+    expect(vi.mocked(setMarineLicenceCache)).toHaveBeenCalledWith(
       mockRequest,
       mockH,
       {
@@ -97,24 +97,24 @@ describe('#taskListController', () => {
   })
 
   test('taskListController handler should throw not found when id is missing', async () => {
-    getMarineLicenseCacheMock.mockReturnValue({})
+    getMarineLicenceCacheMock.mockReturnValue({})
 
     await expect(
       taskListController.handler(mockRequest, mockH)
     ).rejects.toThrow(Boom.notFound('Marine license not found'))
 
-    expect(getMarineLicenseCacheMock).toHaveBeenCalledWith(mockRequest)
+    expect(getMarineLicenceCacheMock).toHaveBeenCalledWith(mockRequest)
     expect(authenticatedGetRequestMock).not.toHaveBeenCalled()
   })
 
   test('taskListController handler should throw not found when cache is empty', async () => {
-    getMarineLicenseCacheMock.mockReturnValue({})
+    getMarineLicenceCacheMock.mockReturnValue({})
 
     await expect(
       taskListController.handler(mockRequest, mockH)
     ).rejects.toThrow(Boom.notFound('Marine license not found'))
 
-    expect(getMarineLicenseCacheMock).toHaveBeenCalledWith(mockRequest)
+    expect(getMarineLicenceCacheMock).toHaveBeenCalledWith(mockRequest)
     expect(authenticatedGetRequestMock).not.toHaveBeenCalled()
   })
 
@@ -125,9 +125,9 @@ describe('#taskListController', () => {
       mockH
     )
 
-    expect(clearMarineLicenseCacheMock).toHaveBeenCalled()
+    expect(clearMarineLicenceCacheMock).toHaveBeenCalled()
 
-    expect(setMarineLicenseCacheMock).toHaveBeenCalledWith(
+    expect(setMarineLicenceCacheMock).toHaveBeenCalledWith(
       expect.any(Object),
       expect.any(Object),
       {

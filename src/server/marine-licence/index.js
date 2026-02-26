@@ -3,9 +3,9 @@ import { projectNameRoutes } from '#src/server/marine-licence/project-name/index
 import { taskListRoutes } from '#src/server/marine-licence/task-list/index.js'
 import { deletemarineLicenceRoutes } from '#src/server/marine-licence/delete/index.js'
 
-export const marineLicense = {
+export const marineLicence = {
   plugin: {
-    name: 'marine-license',
+    name: 'marine-licence',
     register(server) {
       server.route([
         ...checkYourAnswersRoutes,

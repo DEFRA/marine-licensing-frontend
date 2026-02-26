@@ -1,19 +1,19 @@
 import { clone } from '@hapi/hoek'
 
-export const MARINE_LICENSE_CACHE_KEY = 'marineLicense'
+export const MARINE_LICENCE_CACHE_KEY = 'marineLicence'
 
-export const clearMarineLicenseCache = async (request, h) => {
-  request.yar.clear(MARINE_LICENSE_CACHE_KEY)
+export const clearMarineLicenceCache = async (request, h) => {
+  request.yar.clear(MARINE_LICENCE_CACHE_KEY)
   await request.yar.commit(h)
 }
 
-export const getMarineLicenseCache = (request) => {
-  return clone(request.yar.get(MARINE_LICENSE_CACHE_KEY) || {})
+export const getMarineLicenceCache = (request) => {
+  return clone(request.yar.get(MARINE_LICENCE_CACHE_KEY) || {})
 }
 
-export const setMarineLicenseCache = async (request, h, value) => {
+export const setMarineLicenceCache = async (request, h, value) => {
   const cacheValue = value || {}
-  request.yar.set(MARINE_LICENSE_CACHE_KEY, cacheValue)
+  request.yar.set(MARINE_LICENCE_CACHE_KEY, cacheValue)
 
   await request.yar.commit(h)
 

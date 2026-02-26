@@ -33,7 +33,8 @@ export const exemptionRoutes = {
   DELETE_ALL_SITES: '/exemption/delete-all-sites',
   COOKIES: '/help/cookies',
   PRIVACY: '/help/privacy',
-  ADMIN_EXEMPTIONS: '/admin/exemptions'
+  ADMIN_EXEMPTIONS: '/admin/exemptions',
+  EXEMPTION: '/exemption'
 }
 
 export const marineLicenseRoutes = {
@@ -50,7 +51,16 @@ export const defraIdGuidanceRoutes = {
   ADD_TO_CLIENT_ACCOUNT: '/guidance/add-to-client-account'
 }
 
+export const postLoginRoutes = {
+  CONFIRM_AGENT: '/confirm-agent',
+  CONFIRM_EMPLOYEE: '/confirm-employee',
+  CONFIRM_INDIVIDUAL: '/confirm-individual',
+  GUIDANCE_INDIVIDUAL: '/need-to-create-defra-account-as-individual',
+  GUIDANCE_ORG: '/need-to-create-defra-account-as-employee'
+}
+
 export const routes = {
+  postLogin: postLoginRoutes,
   defraIdGuidance: defraIdGuidanceRoutes,
   ...exemptionRoutes,
   AUTH_DEFRA_ID_CALLBACK: '/signin-oidc',

@@ -11,7 +11,9 @@ export const changeOrganisationController = {
     auth: false
   },
   handler: (request, h) => {
-    request.yar.flash(redirectPathCacheKey, routes.DASHBOARD, true)
+    if (!request.query.skipRedirect) {
+      request.yar.flash(redirectPathCacheKey, routes.DASHBOARD, true)
+    }
     return h.redirect(`${routes.SIGNIN}?${changeOrganisationQueryParam}=true`)
   }
 }

@@ -32,6 +32,23 @@ describe('Task List', () => {
     ).toBeInTheDocument()
   })
 
+  test('should render review button when all tasks are completed', async () => {
+    mockMarineLicense({
+      ...mockMarineLicenseApplication,
+      taskList: [{ status: { text: 'Completed' } }]
+    })
+
+    expect(getByRole(document, 'heading', { level: 1 })).toHaveTextContent(
+      'Marine licence start page'
+    )
+
+    expect(
+      getByRole(document, 'button', {
+        name: 'Review and send your information'
+      })
+    ).toBeInTheDocument()
+  })
+
   test('should display phase banner with feedback link that goes to current URL', () => {
     const phaseBanner = document.querySelector('.govuk-phase-banner')
     expect(phaseBanner).toBeInTheDocument()

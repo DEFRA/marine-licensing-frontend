@@ -41,10 +41,15 @@ export const taskListController = {
       projectName
     })
 
+    const hasCompletedAllTasks = taskListTransformed?.every(
+      (task) => task.status.text === 'Completed'
+    )
+
     return h.view(TASK_LIST_VIEW_ROUTE, {
       ...taskListViewSettings,
       projectName: payload.value.projectName,
-      taskList: taskListTransformed
+      taskList: taskListTransformed,
+      hasCompletedAllTasks
     })
   }
 }

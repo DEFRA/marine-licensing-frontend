@@ -88,6 +88,7 @@ describe('#taskListController', () => {
       }
     )
     expect(mockH.view).toHaveBeenCalledWith(TASK_LIST_VIEW_ROUTE, {
+      hasCompletedAllTasks: true,
       pageTitle: 'Marine licence start page',
       heading: 'Marine licence start page',
       projectName: 'Test Project',

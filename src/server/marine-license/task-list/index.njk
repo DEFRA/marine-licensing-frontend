@@ -1,4 +1,5 @@
 {% extends 'layouts/page.njk' %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
 {% from "govuk/components/task-list/macro.njk" import govukTaskList %}
 {% block content %}
   <div class="govuk-grid-row">
@@ -13,6 +14,17 @@
           idPrefix: "task-list",
           items: taskList
         }) }}
+
+        {% if hasCompletedAllTasks %}
+          {{ govukButton({
+            text: "Review and send your information",
+            href: "/marine-license/check-your-answers",
+            attributes: {
+                id: "review-and-send"
+            }
+          }) 
+        }}
+      {% endif %}
     </div>
   </div>
 {% endblock %}

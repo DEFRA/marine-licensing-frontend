@@ -31,7 +31,8 @@ export const openIdProvider = async (name, authConfig) => {
         organisationName,
         userRelationshipType,
         hasMultipleOrgPickerEntries,
-        shouldShowOrgOrUserName
+        shouldShowOrgOrUserName,
+        shouldShowCitizenName
       } = getOrganisationFromToken(payload)
       let isTeamAdmin = false
       if (credentials.provider === 'entraId') {
@@ -65,6 +66,7 @@ export const openIdProvider = async (name, authConfig) => {
         userRelationshipType,
         hasMultipleOrgPickerEntries,
         shouldShowOrgOrUserName,
+        shouldShowCitizenName,
         roles: payload.roles,
         idToken: params.id_token,
         tokenUrl: oidcConf.token_endpoint,

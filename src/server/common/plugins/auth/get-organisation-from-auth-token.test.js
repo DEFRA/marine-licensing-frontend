@@ -154,6 +154,7 @@ describe('#getOrganisationFromToken', () => {
 
       expect(result).toEqual({
         hasMultipleOrgPickerEntries: false,
+        shouldShowCitizenName: true,
         userRelationshipType: 'Citizen'
       })
     })
@@ -171,6 +172,7 @@ describe('#getOrganisationFromToken', () => {
 
       expect(result).toEqual({
         hasMultipleOrgPickerEntries: false,
+        shouldShowCitizenName: true,
         userRelationshipType: 'Citizen'
       })
     })
@@ -187,6 +189,7 @@ describe('#getOrganisationFromToken', () => {
 
       expect(result).toEqual({
         hasMultipleOrgPickerEntries: false,
+        shouldShowCitizenName: true,
         userRelationshipType: 'Citizen'
       })
     })
@@ -205,6 +208,7 @@ describe('#getOrganisationFromToken', () => {
 
       expect(result).toEqual({
         hasMultipleOrgPickerEntries: false,
+        shouldShowCitizenName: true,
         userRelationshipType: 'Citizen'
       })
     })
@@ -242,6 +246,7 @@ describe('#getOrganisationFromToken', () => {
 
       expect(result).toEqual({
         hasMultipleOrgPickerEntries: false,
+        shouldShowCitizenName: true,
         userRelationshipType: 'Citizen'
       })
     })

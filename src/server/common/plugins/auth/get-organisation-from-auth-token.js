@@ -16,7 +16,8 @@ export const getOrganisationFromToken = (decodedToken) => {
   ) {
     return {
       hasMultipleOrgPickerEntries: false,
-      userRelationshipType: defaultUserRelationshipType
+      userRelationshipType: defaultUserRelationshipType,
+      shouldShowCitizenName: true
     }
   }
   const relationship = relationships.find((r) =>

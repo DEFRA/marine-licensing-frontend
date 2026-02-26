@@ -282,4 +282,44 @@ describe('getPageViewCommonData', () => {
 
     expect(result.orgOrUserName).toEqual(null)
   })
+
+  test('should return orgOrUserName with displayName when shouldShowOrgOrUserName is false and shouldShowCitizenName is true', async () => {
+    const mockUserSession = {
+      organisationName: '',
+      displayName: 'Jane Smith',
+      hasMultipleOrgPickerEntries: false,
+      shouldShowOrgOrUserName: false,
+      shouldShowCitizenName: true
+    }
+    mockGetUserSession.mockResolvedValue(mockUserSession)
+
+    const mockRequest = {
+      state: { userSession: 'mock-session' },
+      path: '/some-page'
+    }
+
+    const result = await getPageViewCommonData(mockRequest)
+
+    expect(result.orgOrUserName).toEqual('Jane Smith')
+  })
+
+  test('should return orgOrUserName as null when shouldShowOrgOrUserName is false and shouldShowCitizenName is false', async () => {
+    const mockUserSession = {
+      organisationName: '',
+      displayName: '',
+      hasMultipleOrgPickerEntries: false,
+      shouldShowOrgOrUserName: false,
+      shouldShowCitizenName: false
+    }
+    mockGetUserSession.mockResolvedValue(mockUserSession)
+
+    const mockRequest = {
+      state: { userSession: 'mock-session' },
+      path: routes.DASHBOARD
+    }
+
+    const result = await getPageViewCommonData(mockRequest)
+
+    expect(result.orgOrUserName).toEqual(null)
+  })
 })

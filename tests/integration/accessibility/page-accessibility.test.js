@@ -226,6 +226,11 @@ describe('Page accessibility checks (Axe)', () => {
       url: routes.postLogin.GUIDANCE_ORG,
       title: 'Exempt activity notification for an organisation',
       session: { ...employeeSession, shouldShowOrgOrUserName: false }
+    },
+    {
+      url: routes.DECLARATION,
+      title: 'Declaration',
+      session: { ...employeeSession, shouldShowOrgOrUserName: false }
     }
   ]
 

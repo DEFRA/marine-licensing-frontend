@@ -3,7 +3,7 @@ import {
   clearMarineLicenseCache,
   getMarineLicenseCache,
   setMarineLicenseCache
-} from '#src/server/common/helpers/marine-license/session-cache/utils.js'
+} from '#src/server/common/helpers/marine-licence/session-cache/utils.js'
 import { authenticatedGetRequest } from '#src/server/common/helpers/authenticated-requests.js'
 import { transformTaskList } from '#src/server/marine-licence/task-list/utils.js'
 import {
@@ -14,7 +14,7 @@ import {
 import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
 import Boom from '@hapi/boom'
 
-vi.mock('#src/server/common/helpers/marine-license/session-cache/utils.js')
+vi.mock('#src/server/common/helpers/marine-licence/session-cache/utils.js')
 vi.mock('#src/server/common/helpers/authenticated-requests.js')
 vi.mock('#src/server/marine-licence/task-list/utils.js')
 

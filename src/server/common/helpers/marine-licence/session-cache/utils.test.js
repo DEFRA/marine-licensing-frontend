@@ -5,7 +5,7 @@ import {
   clearMarineLicenseCache,
   getMarineLicenseCache,
   setMarineLicenseCache
-} from '#src/server/common/helpers/marine-license/session-cache/utils.js'
+} from '#src/server/common/helpers/marine-licence/session-cache/utils.js'
 
 vi.mock('@hapi/hoek', () => ({
   clone: vi.fn((data) => ({ ...data }))

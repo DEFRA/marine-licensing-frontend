@@ -10,7 +10,7 @@ import {
   getMarineLicenseCache,
   setMarineLicenseCache,
   clearMarineLicenseCache
-} from '#src/server/common/helpers/marine-license/session-cache/utils.js'
+} from '#src/server/common/helpers/marine-licence/session-cache/utils.js'
 import Boom from '@hapi/boom'
 import { MARINE_LICENCE_TYPE } from '#src/server/common/constants/marine-licence.js'
 import { getUserSession } from '#src/server/common/plugins/auth/utils.js'

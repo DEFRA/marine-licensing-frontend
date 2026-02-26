@@ -8,7 +8,7 @@ import {
   getMarineLicenseCache,
   setMarineLicenseCache,
   clearMarineLicenseCache
-} from '#src/server/common/helpers/marine-license/session-cache/utils.js'
+} from '#src/server/common/helpers/marine-licence/session-cache/utils.js'
 import {
   routes,
   marineLicenceRoutes
@@ -23,7 +23,7 @@ import {
 } from './controller.js'
 
 vi.mock('~/src/server/common/helpers/authenticated-requests.js')
-vi.mock('~/src/server/common/helpers/marine-license/session-cache/utils.js')
+vi.mock('~/src/server/common/helpers/marine-licence/session-cache/utils.js')
 
 describe('#delete', () => {
   let mockRequest

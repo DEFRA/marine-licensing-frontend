@@ -1,4 +1,4 @@
-import { getMarineLicenseCache } from '#src/server/common/helpers/marine-license/session-cache/utils.js'
+import { getMarineLicenseCache } from '#src/server/common/helpers/marine-licence/session-cache/utils.js'
 import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
 
 const checkYourAnswersViewContent = {

@@ -9,7 +9,7 @@ import {
 } from '#src/server/common/constants/routes.js'
 import { areAnalyticsCookiesAccepted } from '#src/server/common/helpers/cookie-preferences.js'
 import { getExemptionCache } from '#src/server/common/helpers/exemptions/session-cache/utils.js'
-import { getMarineLicenseCache } from '#src/server/common/helpers/marine-license/session-cache/utils.js'
+import { getMarineLicenseCache } from '#src/server/common/helpers/marine-licence/session-cache/utils.js'
 
 const assetPath = config.get('assetPath')
 const manifestPath = path.join(

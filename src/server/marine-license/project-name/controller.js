@@ -18,7 +18,7 @@ import { getUserSession } from '#src/server/common/plugins/auth/utils.js'
 import {
   getMarineLicenseCache,
   setMarineLicenseCache
-} from '#src/server/common/helpers/marine-license/session-cache/utils.js'
+} from '#src/server/common/helpers/marine-licence/session-cache/utils.js'
 import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
 import { getBackLink } from './utils.js'
 

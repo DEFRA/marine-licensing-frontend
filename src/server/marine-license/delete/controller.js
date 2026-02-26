@@ -32,7 +32,7 @@ export const deleteMarineLicenseController = {
     try {
       const { payload } = await authenticatedGetRequest(
         request,
-        `/marine-license/${marineLicenseId}`
+        `/marine-licence/${marineLicenseId}`
       )
       const project = payload.value
 
@@ -86,7 +86,7 @@ export const deleteMarineLicenseSubmitController = {
       await authenticatedRequest(
         request,
         'DELETE',
-        `/marine-license/${marineLicenseId}`
+        `/marine-licence/${marineLicenseId}`
       )
 
       const authedUser = await getUserSession(

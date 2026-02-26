@@ -120,7 +120,7 @@ describe('#marineLicense/projectName', () => {
 
       expect(authRequests.authenticatedPostRequest).toHaveBeenCalledWith(
         expect.any(Object),
-        `/marine-license/project-name`,
+        `/marine-licence/project-name`,
         expect.objectContaining({
           projectName: 'Project name',
           organisationId: 'test-org-id',
@@ -153,7 +153,7 @@ describe('#marineLicense/projectName', () => {
 
       expect(authenticatedPatchRequestMock).toHaveBeenCalledWith(
         expect.any(Object),
-        `/marine-license/project-name`,
+        `/marine-licence/project-name`,
         expect.objectContaining({
           id: 'test-id',
           projectName: 'Project name'
@@ -364,7 +364,7 @@ describe('#marineLicense/projectName', () => {
 
       expect(authRequests.authenticatedPostRequest).toHaveBeenCalledWith(
         expect.any(Object),
-        `/marine-license/project-name`,
+        `/marine-licence/project-name`,
         expect.objectContaining({
           projectName: 'Project name'
         })
@@ -395,7 +395,7 @@ describe('#marineLicense/projectName', () => {
 
       expect(authRequests.authenticatedPostRequest).toHaveBeenCalledWith(
         expect.any(Object),
-        `/marine-license/project-name`,
+        `/marine-licence/project-name`,
         expect.objectContaining({
           projectName: 'Project name',
           organisationId: 'beneficiary-org-id',
@@ -431,7 +431,7 @@ describe('#marineLicense/projectName', () => {
 
       expect(authRequests.authenticatedPostRequest).toHaveBeenCalledWith(
         expect.any(Object),
-        `/marine-license/project-name`,
+        `/marine-licence/project-name`,
         expect.objectContaining({
           projectName: 'Project name',
           organisationId: 'applicant-org-id',

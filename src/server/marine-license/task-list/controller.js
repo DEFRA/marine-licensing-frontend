@@ -29,7 +29,7 @@ export const taskListController = {
 
     const { payload } = await authenticatedGetRequest(
       request,
-      `/marine-license/${id}`
+      `/marine-licence/${id}`
     )
 
     const { id: marineLicenseId, taskList, projectName } = payload.value

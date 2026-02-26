@@ -125,7 +125,7 @@ export const projectNameSubmitController = {
       const { payload: responsePayload } = isUpdate
         ? await authenticatedPatchRequest(
             request,
-            '/marine-license/project-name',
+            '/marine-licence/project-name',
             {
               ...payload,
               id: marineLicense.id
@@ -133,7 +133,7 @@ export const projectNameSubmitController = {
           )
         : await authenticatedPostRequest(
             request,
-            '/marine-license/project-name',
+            '/marine-licence/project-name',
             {
               ...payload,
               mcmsContext,

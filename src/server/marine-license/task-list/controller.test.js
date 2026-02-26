@@ -74,7 +74,7 @@ describe('#taskListController', () => {
     expect(getMarineLicenseCacheMock).toHaveBeenCalledWith(mockRequest)
     expect(authenticatedGetRequestMock).toHaveBeenCalledWith(
       mockRequest,
-      '/marine-license/123'
+      '/marine-licence/123'
     )
     expect(vi.mocked(transformTaskList)).toHaveBeenCalledWith(
       mockPayload.value.taskList

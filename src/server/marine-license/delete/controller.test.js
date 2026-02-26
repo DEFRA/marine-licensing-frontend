@@ -78,7 +78,7 @@ describe('#delete', () => {
       expect(mockedGetMarineLicenseCache).toHaveBeenCalledWith(mockRequest)
       expect(mockedAuthenticatedGetRequest).toHaveBeenCalledWith(
         mockRequest,
-        '/marine-license/test-project-id'
+        '/marine-licence/test-project-id'
       )
       expect(mockH.view).toHaveBeenCalledWith('marine-license/delete/index', {
         pageTitle: 'Are you sure you want to delete this project?',
@@ -189,7 +189,7 @@ describe('#delete', () => {
       expect(mockedAuthenticatedRequest).toHaveBeenCalledWith(
         mockRequest,
         'DELETE',
-        '/marine-license/test-project-id'
+        '/marine-licence/test-project-id'
       )
       expect(mockedClearMarineLicenseCache).toHaveBeenCalledWith(
         mockRequest,

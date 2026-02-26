@@ -13,9 +13,6 @@ export const getPageViewCommonData = async (request) => {
     return {}
   }
 
-  const logger = createLogger()
-  logger.info(`russ: ${JSON.stringify(userSession, null, 2)}`)
-
   const {
     organisationName,
     hasMultipleOrgPickerEntries,

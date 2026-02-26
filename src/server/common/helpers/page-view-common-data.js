@@ -1,6 +1,5 @@
 import { getUserSession } from '#src/server/common/plugins/auth/utils.js'
 import { routes } from '#src/server/common/constants/routes.js'
-import { createLogger } from '#src/server/common/helpers/logging/logger.js'
 
 export const changeOrganisationLinkRoutes = [
   routes.DASHBOARD,

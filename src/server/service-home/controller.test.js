@@ -72,7 +72,7 @@ describe('#serviceHome', () => {
       const viewContext = h.view.mock.calls[0][1]
       expect(viewContext.marineLicenceEnabled).toBe(true)
       expect(viewContext.cards).toHaveLength(4)
-      expect(viewContext.cards[2].title).toBe('Apply for a Marine Licence')
+      expect(viewContext.cards[2].title).toBe('Apply for a marine licence')
     })
   })
 })

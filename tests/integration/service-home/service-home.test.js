@@ -77,7 +77,7 @@ describe('Service Home', () => {
       )
 
       const applyForLicenceLink = queryByRole(doc, 'link', {
-        name: /Apply for a Marine Licence/i
+        name: /Apply for a marine licence/i
       })
       expect(applyForLicenceLink).toBeNull()
     })
@@ -99,7 +99,7 @@ describe('Service Home', () => {
       expect(cards).toHaveLength(4)
 
       const applyForLicenceLink = getByRole(doc, 'link', {
-        name: /Apply for a Marine Licence/i
+        name: /Apply for a marine licence/i
       })
       expect(applyForLicenceLink).toHaveAttribute(
         'href',

@@ -26,11 +26,12 @@ export const getPageViewCommonData = async (request) => {
   const showChangeOrganisationLink =
     hasMultipleOrgPickerEntries &&
     changeOrganisationLinkRoutes.includes(request.path)
+
+  const citzenName = shouldShowCitizenName ? displayName : null
+
   const orgOrUserName = shouldShowOrgOrUserName
     ? organisationName || displayName
-    : shouldShowCitizenName
-      ? displayName
-      : null
+    : citzenName
 
   return { orgOrUserName, showChangeOrganisationLink }
 }

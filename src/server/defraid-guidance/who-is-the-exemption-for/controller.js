@@ -6,7 +6,7 @@ import {
 import { routes } from '#src/server/common/constants/routes.js'
 import { cacheMcmsContextFromQueryParams } from '#src/server/common/helpers/mcms-context/cache-mcms-context.js'
 import { clearExemptionCache } from '#src/server/common/helpers/exemptions/session-cache/utils.js'
-import { defraIdGuidanceUserSession } from '#src/server/common/helpers/defraid-guidance/session-cache.js'
+import { defraIdGuidanceUserSession } from '#src/server/common/helpers/defraid-login/session-cache.js'
 
 const title = 'Who is this exempt activity notification for?'
 const viewData = {
@@ -27,7 +27,7 @@ export const defraIdGuidanceWhoIsExemptionForController = {
     }
 
     if (request.state?.userSession) {
-      return h.redirect(routes.PROJECT_NAME)
+      return h.redirect(routes.EXEMPTION)
     }
     await clearExemptionCache(request, h)
 

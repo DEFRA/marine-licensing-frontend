@@ -18,6 +18,8 @@ const manifestPath = path.join(
 )
 let webpackManifest
 
+const hideNavigationRoutes = new Set(Object.values(routes.postLogin))
+
 const hideNavigationRoutesExemptions = new Set([routes.PROJECT_NAME])
 
 const hideNavigationRoutesMarineLicense = new Set([
@@ -33,8 +35,14 @@ const isRouteNavigationHidden = (request) => {
       return hideNavigationRoutesExemptions.has(pagePath) && !exemption?.id
     }
 
-    const marineLicense = getMarineLicenseCache(request)
-    return hideNavigationRoutesMarineLicense.has(pagePath) && !marineLicense?.id
+    if (pagePath.includes('/marine-license')) {
+      const marineLicense = getMarineLicenseCache(request)
+      return (
+        hideNavigationRoutesMarineLicense.has(pagePath) && !marineLicense?.id
+      )
+    }
+
+    return hideNavigationRoutes.has(pagePath)
   } catch {
     return false
   }

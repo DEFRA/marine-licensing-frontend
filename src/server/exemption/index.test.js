@@ -1,8 +1,12 @@
 import { vi } from 'vitest'
 import { exemption } from '#src/server/exemption/index.js'
 import { getPageViewCommonData } from '#src/server/common/helpers/page-view-common-data.js'
+import { getUserSession } from '#src/server/common/plugins/auth/utils.js'
+import { routes } from '#src/server/common/constants/routes.js'
+import { USER_TYPES } from '#src/server/common/constants/user-types.js'
 
 vi.mock('~/src/server/common/helpers/page-view-common-data.js')
+vi.mock('~/src/server/common/plugins/auth/utils.js')
 
 describe('exemption route', () => {
   test('route is registered correctly', () => {
@@ -24,6 +28,10 @@ describe('exemption route', () => {
     )
     expect(server.route).toHaveBeenCalledTimes(1)
     expect(server.route).toHaveBeenCalledWith([
+      expect.objectContaining({
+        method: 'GET',
+        path: '/exemption'
+      }),
       expect.objectContaining({
         method: 'GET',
         path: '/exemption/project-name'
@@ -246,16 +254,14 @@ describe('exemption route', () => {
       expect.objectContaining({
         method: 'POST',
         path: '/exemption/withdraw'
-      }),
-      expect.objectContaining({
-        method: 'GET',
-        path: '/exemption'
       })
     ])
   })
 
-  test('handler should redirect to /exemption/project-name', () => {
-    expect.assertions(1)
+  test('GET /exemption handler should redirect Citizen to confirm-individual', async () => {
+    getUserSession.mockResolvedValue({
+      userRelationshipType: USER_TYPES.CITIZEN
+    })
 
     const server = {
       route: vi.fn(),
@@ -264,20 +270,116 @@ describe('exemption route', () => {
 
     exemption.plugin.register(server)
 
-    // Get the actual handler from the registered routes
     const registeredRoutes = server.route.mock.calls[0][0]
     const exemptionRoute = registeredRoutes.find(
       (route) => route.method === 'GET' && route.path === '/exemption'
     )
 
-    const mockRequest = {}
-    const mockToolkit = {
-      redirect: vi.fn()
+    const mockRequest = { query: {}, state: { userSession: {} } }
+    const mockToolkit = { redirect: vi.fn() }
+
+    await exemptionRoute.handler(mockRequest, mockToolkit)
+
+    expect(getUserSession).toHaveBeenCalledWith(mockRequest, {})
+    expect(mockToolkit.redirect).toHaveBeenCalledWith(
+      routes.postLogin.CONFIRM_INDIVIDUAL
+    )
+  })
+
+  test('GET /exemption handler should redirect Employee to correct page', async () => {
+    getUserSession.mockResolvedValue({ userRelationshipType: 'Employee' })
+
+    const server = {
+      route: vi.fn(),
+      ext: vi.fn()
     }
 
-    exemptionRoute.handler(mockRequest, mockToolkit)
+    exemption.plugin.register(server)
 
-    expect(mockToolkit.redirect).toHaveBeenCalledWith('/exemption/project-name')
+    const registeredRoutes = server.route.mock.calls[0][0]
+    const exemptionRoute = registeredRoutes.find(
+      (route) => route.method === 'GET' && route.path === '/exemption'
+    )
+
+    const mockRequest = { query: {}, state: { userSession: {} } }
+    const mockToolkit = { redirect: vi.fn() }
+
+    await exemptionRoute.handler(mockRequest, mockToolkit)
+
+    expect(mockToolkit.redirect).toHaveBeenCalledWith(
+      routes.postLogin.CONFIRM_EMPLOYEE
+    )
+  })
+
+  test('GET /exemption handler should redirect Agent to project-name', async () => {
+    getUserSession.mockResolvedValue({ userRelationshipType: 'Agent' })
+
+    const server = {
+      route: vi.fn(),
+      ext: vi.fn()
+    }
+
+    exemption.plugin.register(server)
+
+    const registeredRoutes = server.route.mock.calls[0][0]
+    const exemptionRoute = registeredRoutes.find(
+      (route) => route.method === 'GET' && route.path === '/exemption'
+    )
+
+    const mockRequest = { query: {}, state: { userSession: {} } }
+    const mockToolkit = { redirect: vi.fn() }
+
+    await exemptionRoute.handler(mockRequest, mockToolkit)
+
+    expect(mockToolkit.redirect).toHaveBeenCalledWith(
+      routes.postLogin.CONFIRM_AGENT
+    )
+  })
+
+  test('GET /exemption handler should redirect unknown user types to skip guidance', async () => {
+    getUserSession.mockResolvedValue({ userRelationshipType: 'New Type' })
+
+    const server = {
+      route: vi.fn(),
+      ext: vi.fn()
+    }
+
+    exemption.plugin.register(server)
+
+    const registeredRoutes = server.route.mock.calls[0][0]
+    const exemptionRoute = registeredRoutes.find(
+      (route) => route.method === 'GET' && route.path === '/exemption'
+    )
+
+    const mockRequest = { query: {}, state: { userSession: {} } }
+    const mockToolkit = { redirect: vi.fn() }
+
+    await exemptionRoute.handler(mockRequest, mockToolkit)
+
+    expect(mockToolkit.redirect).toHaveBeenCalledWith(routes.PROJECT_NAME)
+  })
+
+  test('GET /exemption handler should redirect to sign-in when no session', async () => {
+    getUserSession.mockResolvedValue(null)
+
+    const server = {
+      route: vi.fn(),
+      ext: vi.fn()
+    }
+
+    exemption.plugin.register(server)
+
+    const registeredRoutes = server.route.mock.calls[0][0]
+    const exemptionRoute = registeredRoutes.find(
+      (route) => route.method === 'GET' && route.path === '/exemption'
+    )
+
+    const mockRequest = { query: {}, state: {} }
+    const mockToolkit = { redirect: vi.fn() }
+
+    await exemptionRoute.handler(mockRequest, mockToolkit)
+
+    expect(mockToolkit.redirect).toHaveBeenCalledWith(routes.SIGNIN)
   })
 
   test('onPreHandler extension should set commonPageViewData', async () => {
@@ -296,7 +398,11 @@ describe('exemption route', () => {
       (call) => call[0] === 'onPreHandler'
     )[1]
 
-    const mockRequest = { app: {}, state: { userSession: 'mockSession' } }
+    const mockRequest = {
+      app: {},
+      query: {},
+      state: { userSession: 'mockSession' }
+    }
     const mockH = { continue: 'continue' }
 
     const result = await onPreHandlerCallback(mockRequest, mockH)
@@ -322,7 +428,7 @@ describe('exemption route', () => {
       (call) => call[0] === 'onPreHandler'
     )[1]
 
-    const mockRequest = { app: {}, state: {} }
+    const mockRequest = { app: {}, query: {}, state: {} }
     const mockH = { continue: 'continue' }
 
     const result = await onPreHandlerCallback(mockRequest, mockH)

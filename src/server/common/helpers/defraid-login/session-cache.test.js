@@ -1,4 +1,4 @@
-import { defraIdGuidanceUserSession } from '#src/server/common/helpers/defraid-guidance/session-cache.js'
+import { defraIdGuidanceUserSession } from '#src/server/common/helpers/defraid-login/session-cache.js'
 
 describe('Session cache for Defra ID guidance', () => {
   let request
@@ -58,6 +58,27 @@ describe('Session cache for Defra ID guidance', () => {
         key: 'checkSetupEmployee'
       })
       expect(value).toEqual('existingValue')
+    })
+
+    it('returns null when there is no value for key', async () => {
+      request.yar.get.mockResolvedValue({
+        checkSetupEmployee: null,
+        otherKey: 'otherValue'
+      })
+      const value = await defraIdGuidanceUserSession.get({
+        request,
+        key: 'checkSetupEmployee'
+      })
+      expect(value).toEqual(null)
+    })
+
+    it('returns null when there is no cache key', async () => {
+      request.yar.get.mockResolvedValue(null)
+      const value = await defraIdGuidanceUserSession.get({
+        request,
+        key: 'checkSetupEmployee'
+      })
+      expect(value).toEqual(null)
     })
   })
 })

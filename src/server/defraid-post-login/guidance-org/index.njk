@@ -1,0 +1,114 @@
+{% extends 'layouts/page.njk' %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/warning-text/macro.njk" import govukWarningText %}
+
+{% block beforeContent %}
+  {{ super() }}
+  {{ appBackLink({backLink: backLink}) }}
+{% endblock %}
+
+{% block content %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+
+      <h1 class="govuk-heading-l">
+        {{ heading }}
+      </h1>
+
+      {{ govukWarningText({
+        text: "If you do not set up your Defra account correctly your exempt activity notification will not be valid. This is because it will not be registered to the organisation the exemption is for.",
+        iconFallbackText: "Warning"
+      }) }}
+
+      <p class="govuk-body">If you're already registered with the organisation the exemption is for, go back and select the correct organisation.</p>
+
+      <h2 class="govuk-heading-m">
+        You're an employee of the organisation
+      </h2>
+
+      <h3 class="govuk-heading-s">
+        If the organisation does not have a Defra account
+      </h3>
+
+      <p class="govuk-body">
+        To create a new Defra account for your organisation, you need to:
+      </p>
+
+      <ol class="govuk-list govuk-list--number">
+        <li>Go to <a href="{{accountManagementUrl}}" class="govuk-link">Your Defra account</a>.</li>
+        <li>Select <strong>Register a new account</strong> in the <strong>Your accounts</strong> section.</li>
+        <li>Select <strong>business or organisation account.</strong></li>
+        <li>Continue the Defra account creation process.</li>
+      </ol>
+      
+      <h3 class="govuk-heading-s">
+        Get invited to an existing Defra account
+      </h3>
+
+      <p class="govuk-body">
+        Ask your organisation's Defra account administrator to invite you to your organisation's Defra account.
+      </p>
+
+      <p class="govuk-body">
+        If you do not know who your organisation's administrator is, contact Defra account support:
+      </p>
+
+      <p class="govuk-body">
+        <a href="mailto:Customer.Identity-Support@defra.gov.uk" class="govuk-link" rel="noopener noreferrer">Customer.Identity-Support@defra.gov.uk</a>
+      </p>
+
+      <h2 class="govuk-heading-m">
+        You're the agent or intermediary for a client organisation
+      </h2>
+
+      <h3 class="govuk-heading-s">
+        If your client already has a Defra account
+      </h3>
+
+      <p class="govuk-body">
+        You need to ask your client to invite you to their Defra account as an intermediary.
+      </p>
+
+      <h3 class="govuk-heading-s">
+        If your client does not have a Defra account
+      </h3>
+
+      <p class="govuk-body">
+        Ask your client to create a Defra account and invite you to it as an intermediary.
+      </p>
+
+      <p class="govuk-body">
+        To create an account, your client needs to:
+      </p>
+
+      <ol class="govuk-list govuk-list--number">
+        <li>Sign in to, or create a GOV.UK One Login or Government Gateway account.</li>
+        <li>Select <strong>Get permission for marine work</strong>.</li>
+        <li>Create a Defra account.</li>
+        <li>Invite you to their account as an intermediary.</li>
+      </ol>
+
+      <h2 class="govuk-heading-m">
+        Guidance
+      </h2>
+
+      <ul class="govuk-list govuk-!-margin-bottom-6">
+        <li>
+          <a href="https://www.gov.uk/guidance/creating-a-defra-account" class="govuk-link">How to create a Defra account</a>
+        </li>
+        <li>
+          <a href="https://www.gov.uk/guidance/adding-users-to-a-defra-account-as-an-admin" class="govuk-link">How to add users to a Defra account</a>
+        </li>
+      </ul>
+
+      <div class="govuk-button-group">
+          {{ govukButton({
+              text: "Sign out",
+              href: signOutUrl,
+              classes: "govuk-button--primary"
+          }) }}
+      </div>
+
+    </div>
+  </div>
+{% endblock %}

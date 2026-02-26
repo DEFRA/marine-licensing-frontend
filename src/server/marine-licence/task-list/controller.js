@@ -3,13 +3,13 @@ import {
   getMarineLicenseCache,
   setMarineLicenseCache
 } from '#src/server/common/helpers/marine-license/session-cache/utils.js'
-import { transformTaskList } from '#src/server/marine-license/task-list/utils.js'
+import { transformTaskList } from '#src/server/marine-licence/task-list/utils.js'
 import { authenticatedGetRequest } from '#src/server/common/helpers/authenticated-requests.js'
 import { marineLicenseRoutes } from '#src/server/common/constants/routes.js'
 
 import Boom from '@hapi/boom'
 
-export const TASK_LIST_VIEW_ROUTE = 'marine-license/task-list/index'
+export const TASK_LIST_VIEW_ROUTE = 'marine-licence/task-list/index'
 
 const headingText = 'Marine licence start page'
 

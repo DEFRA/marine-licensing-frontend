@@ -1,7 +1,7 @@
 import {
   taskListController,
   taskListSelectMarineLicenceController
-} from '#src/server/marine-license/task-list/controller.js'
+} from '#src/server/marine-licence/task-list/controller.js'
 import { marineLicenseRoutes } from '#src/server/common/constants/routes.js'
 
 export const taskListRoutes = [

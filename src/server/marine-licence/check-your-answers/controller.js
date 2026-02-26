@@ -7,7 +7,7 @@ const checkYourAnswersViewContent = {
 }
 
 export const CHECK_YOUR_ANSWERS_VIEW_ROUTE =
-  'marine-license/check-your-answers/index'
+  'marine-licence/check-your-answers/index'
 
 export const checkYourAnswersController = {
   async handler(request, h) {

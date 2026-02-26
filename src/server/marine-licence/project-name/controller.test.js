@@ -17,7 +17,7 @@ import { statusCodes } from '#src/server/common/constants/status-codes.js'
 import {
   projectNameSubmitController,
   PROJECT_NAME_VIEW_ROUTE
-} from '#src/server/marine-license/project-name/controller.js'
+} from '#src/server/marine-licence/project-name/controller.js'
 
 describe('#marineLicense/projectName', () => {
   const getServer = setupTestServer()

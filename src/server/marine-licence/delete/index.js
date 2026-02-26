@@ -2,7 +2,7 @@ import {
   deleteMarineLicenseController,
   deleteMarineLicenseSelectController,
   deleteMarineLicenseSubmitController
-} from '#src/server/marine-license/delete/controller.js'
+} from '#src/server/marine-licence/delete/controller.js'
 import { marineLicenseRoutes } from '#src/server/common/constants/routes.js'
 
 export const deleteMarineLicenseRoutes = [

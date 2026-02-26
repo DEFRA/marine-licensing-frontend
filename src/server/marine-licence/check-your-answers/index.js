@@ -1,5 +1,5 @@
 import { marineLicenseRoutes } from '#src/server/common/constants/routes.js'
-import { checkYourAnswersController } from '#src/server/marine-license/check-your-answers/controller.js'
+import { checkYourAnswersController } from '#src/server/marine-licence/check-your-answers/controller.js'
 
 export const checkYourAnswersRoutes = [
   {

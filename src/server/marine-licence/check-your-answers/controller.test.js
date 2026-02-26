@@ -3,7 +3,7 @@ import { getMarineLicenseCache } from '#src/server/common/helpers/marine-license
 import {
   checkYourAnswersController,
   CHECK_YOUR_ANSWERS_VIEW_ROUTE
-} from '#src/server/marine-license/check-your-answers/controller.js'
+} from '#src/server/marine-licence/check-your-answers/controller.js'
 import { marineLicenseRoutes } from '#src/server/common/constants/routes.js'
 
 vi.mock('#src/server/common/helpers/marine-license/session-cache/utils.js')

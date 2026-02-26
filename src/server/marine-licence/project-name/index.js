@@ -1,7 +1,7 @@
 import {
   projectNameController,
   projectNameSubmitController
-} from '#src/server/marine-license/project-name/controller.js'
+} from '#src/server/marine-licence/project-name/controller.js'
 import { marineLicenseRoutes } from '#src/server/common/constants/routes.js'
 
 export const projectNameRoutes = [

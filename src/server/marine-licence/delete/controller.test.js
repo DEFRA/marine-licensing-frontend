@@ -80,7 +80,7 @@ describe('#delete', () => {
         mockRequest,
         '/marine-licence/test-project-id'
       )
-      expect(mockH.view).toHaveBeenCalledWith('marine-license/delete/index', {
+      expect(mockH.view).toHaveBeenCalledWith('marine-licence/delete/index', {
         pageTitle: 'Are you sure you want to delete this project?',
         heading: 'Are you sure you want to delete this project?',
         projectName: 'Test Project',

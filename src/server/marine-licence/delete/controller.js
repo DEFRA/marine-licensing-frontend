@@ -15,7 +15,7 @@ import Boom from '@hapi/boom'
 import { MARINE_LICENCE_TYPE } from '#src/server/common/constants/marine-licence.js'
 import { getUserSession } from '#src/server/common/plugins/auth/utils.js'
 
-export const DELETE_MARINE_LICENSE_VIEW_ROUTE = 'marine-license/delete/index'
+export const DELETE_MARINE_LICENSE_VIEW_ROUTE = 'marine-licence/delete/index'
 
 const DELETE_MARINE_LICENSE_PAGE_TITLE =
   'Are you sure you want to delete this project?'

@@ -1,4 +1,4 @@
-import { transformTaskList } from '#src/server/marine-license/task-list/utils.js'
+import { transformTaskList } from '#src/server/marine-licence/task-list/utils.js'
 import { marineLicenseRoutes } from '#src/server/common/constants/routes.js'
 
 describe('taskList utils', () => {

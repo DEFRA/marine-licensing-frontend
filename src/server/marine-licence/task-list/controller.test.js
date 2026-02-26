@@ -5,18 +5,18 @@ import {
   setMarineLicenseCache
 } from '#src/server/common/helpers/marine-license/session-cache/utils.js'
 import { authenticatedGetRequest } from '#src/server/common/helpers/authenticated-requests.js'
-import { transformTaskList } from '#src/server/marine-license/task-list/utils.js'
+import { transformTaskList } from '#src/server/marine-licence/task-list/utils.js'
 import {
   taskListController,
   taskListSelectMarineLicenceController,
   TASK_LIST_VIEW_ROUTE
-} from '#src/server/marine-license/task-list/controller.js'
+} from '#src/server/marine-licence/task-list/controller.js'
 import { marineLicenseRoutes } from '#src/server/common/constants/routes.js'
 import Boom from '@hapi/boom'
 
 vi.mock('#src/server/common/helpers/marine-license/session-cache/utils.js')
 vi.mock('#src/server/common/helpers/authenticated-requests.js')
-vi.mock('#src/server/marine-license/task-list/utils.js')
+vi.mock('#src/server/marine-licence/task-list/utils.js')
 
 describe('#taskListController', () => {
   let mockRequest

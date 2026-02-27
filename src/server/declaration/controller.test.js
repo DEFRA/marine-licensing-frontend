@@ -13,6 +13,7 @@ import {
   DECLARATION_VIEW_ROUTE
 } from '#src/server/declaration/controller.js'
 import { mockMarineLicenceApplication } from '~/src/server/test-helpers/mocks/marine-licence-mocks.js'
+import { errorMessages } from '#src/server/common/constants/error-messages.js'
 
 vi.mock('#src/server/common/helpers/marine-licence/session-cache/utils.js')
 vi.mock('#src/server/common/helpers/session-cache/utils.js')
@@ -85,8 +86,11 @@ describe('#declarationSubmitController', () => {
   })
 
   describe('#declarationSubmitController/marine-licence', () => {
-    test('stays on the same page for marine-license', async () => {
+    beforeEach(() => {
       vi.mocked(getProjectType).mockReturnValue(PROJECT_TYPE.MARINE_LICENCE)
+    })
+
+    test('stays on the same page for marine-license', async () => {
       vi.mocked(getMarineLicenceCache).mockReturnValue(
         mockMarineLicenceApplication
       )
@@ -97,6 +101,17 @@ describe('#declarationSubmitController', () => {
         pageTitle: 'Declaration',
         backLink: marineLicenceRoutes.MARINE_LICENCE_CHECK_YOUR_ANSWERS
       })
+    })
+
+    test('correct session error handling for marine-license', async () => {
+      vi.spyOn(authUtils, 'getUserSession').mockResolvedValueOnce({})
+      vi.mocked(getMarineLicenceCache).mockReturnValue(
+        mockMarineLicenceApplication
+      )
+
+      await expect(
+        declarationSubmitController.handler(mockRequest, mockH)
+      ).rejects.toThrow(errorMessages.SUBMISSION_FAILED)
     })
   })
 })

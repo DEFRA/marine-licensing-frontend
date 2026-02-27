@@ -20,7 +20,7 @@ export const declarationController = {
   }
 }
 
-async function submitMarineLicence(request, h) {
+const submitMarineLicence = async (request, h) => {
   const marineLicence = getMarineLicenceCache(request)
   const { id } = marineLicence
   try {

@@ -23,7 +23,7 @@ export const checkYourAnswersController = {
 }
 
 export const checkYourAnswersContinueController = {
-  async handler(request, h) {
+  async handler(_request, h) {
     return h.redirect(routes.DECLARATION)
   }
 }

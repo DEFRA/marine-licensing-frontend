@@ -51,6 +51,7 @@ export const getOrganisationFromToken = (decodedToken) => {
     organisationName,
     userRelationshipType,
     hasMultipleOrgPickerEntries,
-    shouldShowOrgOrUserName
+    shouldShowOrgOrUserName,
+    shouldShowCitizenName: false
   }
 }

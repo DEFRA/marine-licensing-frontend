@@ -90,6 +90,14 @@ describe('#declarationSubmitController', () => {
       vi.mocked(getProjectType).mockReturnValue(PROJECT_TYPE.MARINE_LICENCE)
     })
 
+    test('throws error when marine licence has no id', async () => {
+      vi.mocked(getMarineLicenceCache).mockReturnValue({})
+
+      await expect(
+        declarationSubmitController.handler(mockRequest, mockH)
+      ).rejects.toThrow('Marine licence not found')
+    })
+
     test('stays on the same page for marine-license', async () => {
       vi.mocked(getMarineLicenceCache).mockReturnValue(
         mockMarineLicenceApplication

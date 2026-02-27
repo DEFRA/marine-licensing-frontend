@@ -22,6 +22,11 @@ export const declarationController = {
 
 const submitMarineLicence = async (request, h) => {
   const marineLicence = getMarineLicenceCache(request)
+
+  if (!marineLicence?.id) {
+    throw Boom.notFound('Marine licence not found')
+  }
+
   const { id } = marineLicence
   try {
     const { displayName, email } = await getUserSession(

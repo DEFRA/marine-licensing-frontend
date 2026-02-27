@@ -12,6 +12,7 @@ import {
   declarationSubmitController,
   DECLARATION_VIEW_ROUTE
 } from '#src/server/declaration/controller.js'
+import { mockMarineLicenceApplication } from '~/src/server/test-helpers/mocks/marine-licence-mocks.js'
 
 vi.mock('#src/server/common/helpers/marine-licence/session-cache/utils.js')
 vi.mock('#src/server/common/helpers/session-cache/utils.js')
@@ -57,7 +58,7 @@ describe('#declarationSubmitController', () => {
 
   const mockUserSession = {
     displayName: 'Test User',
-    email: ''
+    email: 'john.doe@example.com'
   }
 
   beforeEach(() => {
@@ -86,7 +87,9 @@ describe('#declarationSubmitController', () => {
   describe('#declarationSubmitController/marine-licence', () => {
     test('stays on the same page for marine-license', async () => {
       vi.mocked(getProjectType).mockReturnValue(PROJECT_TYPE.MARINE_LICENCE)
-      vi.mocked(getMarineLicenceCache).mockReturnValue({ id: 'ml-123' })
+      vi.mocked(getMarineLicenceCache).mockReturnValue(
+        mockMarineLicenceApplication
+      )
 
       await declarationSubmitController.handler(mockRequest, mockH)
 

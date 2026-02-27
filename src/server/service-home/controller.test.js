@@ -39,7 +39,7 @@ describe('#serviceHome', () => {
       expect(h.view).toHaveBeenCalledWith(SERVICE_HOME_VIEW_ROUTE, {
         pageTitle: 'Home',
         heading: 'Home',
-        marineLicenseEnabled: false,
+        marineLicenceEnabled: false,
         cards: [
           {
             description: 'View all of the existing projects in this account.',
@@ -62,7 +62,7 @@ describe('#serviceHome', () => {
       })
     })
 
-    test('Should include Apply for Marine License card when feature enabled', () => {
+    test('Should include Apply for Marine Licence card when feature enabled', () => {
       vi.spyOn(config, 'get').mockReturnValue({ enabled: true })
       const h = { view: vi.fn() }
       const request = {}
@@ -70,9 +70,9 @@ describe('#serviceHome', () => {
       serviceHomeController.handler(request, h)
 
       const viewContext = h.view.mock.calls[0][1]
-      expect(viewContext.marineLicenseEnabled).toBe(true)
+      expect(viewContext.marineLicenceEnabled).toBe(true)
       expect(viewContext.cards).toHaveLength(4)
-      expect(viewContext.cards[2].title).toBe('Apply for a Marine License')
+      expect(viewContext.cards[2].title).toBe('Apply for a marine licence')
     })
   })
 })

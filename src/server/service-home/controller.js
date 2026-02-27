@@ -1,5 +1,5 @@
 import {
-  marineLicenseRoutes,
+  marineLicenceRoutes,
   routes
 } from '#src/server/common/constants/routes.js'
 import { config } from '#src/config/config.js'
@@ -32,23 +32,23 @@ const cards = [
 
 const filteredCards = [
   {
-    title: 'Apply for a Marine License',
-    link: marineLicenseRoutes.MARINE_LICENSE_PROJECT_NAME
+    title: 'Apply for a marine licence',
+    link: marineLicenceRoutes.MARINE_LICENCE_PROJECT_NAME
   }
 ]
 
 export const serviceHomeController = {
   handler(_request, h) {
-    const marineLicense = config.get('marineLicense')
+    const marineLicence = config.get('marineLicence')
 
-    const displayCards = marineLicense.enabled
+    const displayCards = marineLicence.enabled
       ? [...cards.slice(0, 2), ...filteredCards, ...cards.slice(2)]
       : cards
 
     return h.view(SERVICE_HOME_VIEW_ROUTE, {
       ...serviceHomeViewSettings,
       cards: displayCards,
-      marineLicenseEnabled: marineLicense.enabled
+      marineLicenceEnabled: marineLicence.enabled
     })
   }
 }

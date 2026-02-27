@@ -283,12 +283,12 @@ export const config = convict({
       env: 'MARINE_LICENSING_BACKEND_API_URL'
     }
   },
-  marineLicense: {
+  marineLicence: {
     enabled: {
-      doc: 'Enable the Marine License journey',
+      doc: 'Enable the Marine Licence journey',
       format: Boolean,
       default: false,
-      env: 'ENABLE_MARINE_LICENSE'
+      env: 'ENABLE_MARINE_LICENCE'
     }
   },
   defraId: {

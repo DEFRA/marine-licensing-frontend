@@ -1,6 +1,6 @@
 import { renderComponent } from '#src/server/test-helpers/component-helpers.js'
 
-describe('Marine License Project Details Card Component', () => {
+describe('Marine Licence Project Details Card Component', () => {
   let $component
 
   beforeEach(() => {

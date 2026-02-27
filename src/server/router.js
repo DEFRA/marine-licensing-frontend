@@ -5,7 +5,7 @@ import { home } from '#src/server/home/index.js'
 import { serveStaticFiles } from '#src/server/common/helpers/serve-static-files.js'
 import { about } from '#src/server/about/index.js'
 import { exemption } from '#src/server/exemption/index.js'
-import { marineLicense } from '#src/server/marine-license/index.js'
+import { marineLicence } from '#src/server/marine-licence/index.js'
 import { serviceHome } from '#src/server/service-home/index.js'
 import { auth } from '#src/server/auth/index.js'
 import { help } from '#src/server/help/index.js'
@@ -35,7 +35,7 @@ export const router = {
         postLogin,
         defraIdGuidance,
         internalUserAdmin,
-        marineLicense,
+        marineLicence,
         serviceHome
       ])
 

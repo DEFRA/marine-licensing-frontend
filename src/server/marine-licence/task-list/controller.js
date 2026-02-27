@@ -3,10 +3,11 @@ import {
   getMarineLicenceCache,
   setMarineLicenceCache
 } from '#src/server/common/helpers/marine-licence/session-cache/utils.js'
+import { setProjectType } from '#src/server/common/helpers/session-cache/utils.js'
 import { transformTaskList } from '#src/server/marine-licence/task-list/utils.js'
 import { authenticatedGetRequest } from '#src/server/common/helpers/authenticated-requests.js'
 import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
-
+import { PROJECT_TYPE } from '#src/server/common/constants/projects.js'
 import Boom from '@hapi/boom'
 
 export const TASK_LIST_VIEW_ROUTE = 'marine-licence/task-list/index'
@@ -40,6 +41,8 @@ export const taskListController = {
       id: marineLicenceId,
       projectName
     })
+
+    await setProjectType(request, h, PROJECT_TYPE.MARINE_LICENCE)
 
     const hasCompletedAllTasks = taskListTransformed?.every(
       (task) => task.status.text === 'Completed'

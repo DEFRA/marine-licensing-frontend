@@ -1,0 +1,41 @@
+{% extends 'layouts/page.njk' %}
+{% from "govuk/components/back-link/macro.njk" import govukBackLink %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+
+{% block beforeContent %}
+  {{ super() }}
+  <nav>
+    {{ govukBackLink({
+        text: "Back",
+        href: backLink
+    }) }}
+  </nav>
+{% endblock %}
+
+{% block content %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+
+      <h1 class="govuk-heading-l">Declaration</h1>
+
+      <p class="govuk-body">I confirm that I:</p>
+
+      <ul class="govuk-list govuk-list--bullet">
+        <li>am authorised to make this agreement</li>
+        <li>to the best of my knowledge, the information provided is correct</li>
+        <li>could be prosecuted if I give information I know, or suspect is false</li>
+        <li>understand I may be sued if I give incorrect information, knowingly or recklessly</li>
+      </ul>
+
+      <form method="post">
+        <input type="hidden" name="csrfToken" value="{{ csrfToken }}"/>
+        {{ govukButton({
+          text: "Confirm and send information",
+          attributes: {
+            id: "confirm-and-send-information"
+          }
+        }) }}
+      </form>
+    </div>
+  </div>
+{% endblock %}

@@ -6,7 +6,7 @@ import {
 } from './utils.js'
 import {
   routes,
-  marineLicenseRoutes
+  marineLicenceRoutes
 } from '#src/server/common/constants/routes.js'
 
 vi.mock('~/src/config/nunjucks/filters/format-date.js', () => ({
@@ -235,10 +235,10 @@ describe('#formatProjectsForDisplay', () => {
 
     expect(result[0].cells[1].text).toBe('Marine licence application')
     expect(result[0].cells[5].html).toContain(
-      marineLicenseRoutes.MARINE_LICENSE_TASK_LIST
+      marineLicenceRoutes.MARINE_LICENCE_TASK_LIST
     )
     expect(result[0].cells[5].html).toContain(
-      marineLicenseRoutes.MARINE_LICENSE_DELETE
+      marineLicenceRoutes.MARINE_LICENCE_DELETE
     )
     expect(result[0].cells[5].html).toContain('Continue')
     expect(result[0].cells[5].html).toContain('Delete')
@@ -341,14 +341,14 @@ describe('getActionButtons', () => {
   })
 
   it('returns empty string for marine licence project when not draft or not own project', () => {
-    const marineLicenseActive = {
+    const marineLicenceActive = {
       id: 'ml123',
       projectName: 'Marine Licence Project',
       projectType: 'MARINE_LICENCE',
       status: 'Active',
       isOwnProject: true
     }
-    const result = getActionButtons(marineLicenseActive)
+    const result = getActionButtons(marineLicenceActive)
     expect(result).toBe('')
   })
 })

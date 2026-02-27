@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 import { vi } from 'vitest'
 import {
-  marineLicenseRoutes,
+  marineLicenceRoutes,
   routes
 } from '~/src/server/common/constants/routes.js'
 import { statusCodes } from '~/src/server/common/constants/status-codes.js'
@@ -15,10 +15,10 @@ import {
   mockExemptionWithShapefile,
   mockProjectList
 } from '~/src/server/test-helpers/mocks/exemption.js'
-import { mockMarineLicenseApplication } from '~/src/server/test-helpers/mocks/marine-license-mocks.js'
+import { mockMarineLicenceApplication } from '~/src/server/test-helpers/mocks/marine-licence-mocks.js'
 import {
   mockExemption,
-  mockMarineLicense,
+  mockMarineLicence,
   setupTestServer
 } from '../shared/test-setup-helpers.js'
 import {
@@ -40,7 +40,7 @@ vi.mock('~/src/server/common/plugins/auth/utils.js', () => ({
 
 describe('Page accessibility checks (Axe)', () => {
   beforeAll(() => {
-    config.set('marineLicense.enabled', true)
+    config.set('marineLicence.enabled', true)
     expect.extend(toHaveNoViolations)
   })
   const getServer = setupTestServer()
@@ -164,19 +164,19 @@ describe('Page accessibility checks (Axe)', () => {
       title: 'Home'
     },
     {
-      url: marineLicenseRoutes.MARINE_LICENSE_PROJECT_NAME,
+      url: marineLicenceRoutes.MARINE_LICENCE_PROJECT_NAME,
       title: 'Project name',
-      isMarineLicense: true
+      isMarineLicence: true
     },
     {
-      url: marineLicenseRoutes.MARINE_LICENSE_TASK_LIST,
+      url: marineLicenceRoutes.MARINE_LICENCE_TASK_LIST,
       title: 'Marine licence start page',
-      isMarineLicense: true
+      isMarineLicence: true
     },
     {
-      url: marineLicenseRoutes.MARINE_LICENSE_CHECK_YOUR_ANSWERS,
+      url: marineLicenceRoutes.MARINE_LICENCE_CHECK_YOUR_ANSWERS,
       title: 'Check your answers before sending your information',
-      isMarineLicense: true
+      isMarineLicence: true
     },
     {
       url: routes.defraIdGuidance.WHO_IS_EXEMPTION_FOR,
@@ -203,7 +203,7 @@ describe('Page accessibility checks (Axe)', () => {
       title: 'You need to be added to your client\u2019s Defra account'
     },
     {
-      url: marineLicenseRoutes.MARINE_LICENSE_DELETE,
+      url: marineLicenceRoutes.MARINE_LICENCE_DELETE,
       title: 'Are you sure you want to delete this project?',
       marineLicence: true
     },
@@ -240,7 +240,7 @@ describe('Page accessibility checks (Axe)', () => {
       title,
       url,
       exemption = mockExemptionData,
-      isMarineLicense = false,
+      isMarineLicence = false,
       session
     }) => {
       if (session) {
@@ -248,8 +248,8 @@ describe('Page accessibility checks (Axe)', () => {
         vi.mocked(getUserSession).mockResolvedValue(session)
       }
 
-      if (isMarineLicense) {
-        mockMarineLicense(mockMarineLicenseApplication)
+      if (isMarineLicence) {
+        mockMarineLicence(mockMarineLicenceApplication)
       } else {
         mockExemption(exemption)
         vi.mocked(authenticatedGetRequest).mockImplementation(

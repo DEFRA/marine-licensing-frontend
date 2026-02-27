@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, test, vi, it } from 'vitest'
 import { readFileSync } from 'node:fs'
 import { getExemptionCache } from '#src/server/common/helpers/exemptions/session-cache/utils.js'
-import { getMarineLicenseCache } from '#src/server/common/helpers/marine-license/session-cache/utils.js'
+import { getMarineLicenceCache } from '#src/server/common/helpers/marine-licence/session-cache/utils.js'
 
 vi.mock(
   '~/src/server/common/helpers/authenticated-requests.js',
@@ -15,7 +15,7 @@ vi.mock(
 )
 vi.mock('node:fs')
 vi.mock('~/src/server/common/helpers/exemptions/session-cache/utils.js')
-vi.mock('~/src/server/common/helpers/marine-license/session-cache/utils.js')
+vi.mock('~/src/server/common/helpers/marine-licence/session-cache/utils.js')
 
 describe('#context', () => {
   const mockRequest = { path: '/', logger: { error: vi.fn() } }
@@ -27,7 +27,7 @@ describe('#context', () => {
     readFileSync.mockClear()
     mockRequest.logger.error.mockClear()
     vi.mocked(getExemptionCache).mockReturnValue({})
-    vi.mocked(getMarineLicenseCache).mockReturnValue({})
+    vi.mocked(getMarineLicenceCache).mockReturnValue({})
     const contextModule =
       await import('~/src/config/nunjucks/context/context.js')
     context = contextModule.context
@@ -148,7 +148,7 @@ describe('#context', () => {
   })
 
   it('When session cache throws, should show navigation', () => {
-    vi.mocked(getMarineLicenseCache).mockImplementation(() => {
+    vi.mocked(getMarineLicenceCache).mockImplementation(() => {
       throw new TypeError('Cannot read properties of null')
     })
     const mockRequest = { path: '/', logger: { error: vi.fn() } }

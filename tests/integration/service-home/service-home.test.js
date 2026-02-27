@@ -3,7 +3,7 @@ import { routes } from '~/src/server/common/constants/routes.js'
 import { setupTestServer } from '~/tests/integration/shared/test-setup-helpers.js'
 import { loadPage } from '~/tests/integration/shared/app-server.js'
 import { config } from '~/src/config/config.js'
-import { marineLicenseRoutes } from '#src/server/common/constants/routes.js'
+import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
 
 describe('Service Home', () => {
   const getServer = setupTestServer()
@@ -14,8 +14,8 @@ describe('Service Home', () => {
       server: getServer()
     })
 
-  describe('when marine license is disabled', () => {
-    test('should render cards without Apply for Marine License tile and correct layout', async () => {
+  describe('when marine licence is disabled', () => {
+    test('should render cards without Apply for Marine Licence tile and correct layout', async () => {
       const doc = await loadServiceHomePage()
 
       expect(getByRole(doc, 'heading', { level: 1 })).toHaveTextContent('Home')
@@ -76,36 +76,36 @@ describe('Service Home', () => {
         'View or manage projects not available in this account.'
       )
 
-      const applyForLicenseLink = queryByRole(doc, 'link', {
-        name: /Apply for a Marine License/i
+      const applyForLicenceLink = queryByRole(doc, 'link', {
+        name: /Apply for a marine licence/i
       })
-      expect(applyForLicenseLink).toBeNull()
+      expect(applyForLicenceLink).toBeNull()
     })
   })
 
-  describe('when marine license is enabled', () => {
+  describe('when marine licence is enabled', () => {
     beforeAll(() => {
-      config.set('marineLicense.enabled', true)
+      config.set('marineLicence.enabled', true)
     })
 
     afterAll(() => {
-      config.set('marineLicense.enabled', false)
+      config.set('marineLicence.enabled', false)
     })
 
-    test('should include Apply for Marine License card and use correct card layout', async () => {
+    test('should include Apply for Marine Licence card and use correct card layout', async () => {
       const doc = await loadServiceHomePage()
 
       const cards = doc.querySelectorAll('.card')
       expect(cards).toHaveLength(4)
 
-      const applyForLicenseLink = getByRole(doc, 'link', {
-        name: /Apply for a Marine License/i
+      const applyForLicenceLink = getByRole(doc, 'link', {
+        name: /Apply for a marine licence/i
       })
-      expect(applyForLicenseLink).toHaveAttribute(
+      expect(applyForLicenceLink).toHaveAttribute(
         'href',
-        marineLicenseRoutes.MARINE_LICENSE_PROJECT_NAME
+        marineLicenceRoutes.MARINE_LICENCE_PROJECT_NAME
       )
-      expect(applyForLicenseLink.parentElement).toHaveClass(
+      expect(applyForLicenceLink.parentElement).toHaveClass(
         'govuk-grid-column-one-half-from-desktop'
       )
 

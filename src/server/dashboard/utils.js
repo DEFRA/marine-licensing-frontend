@@ -1,7 +1,7 @@
 import { formatDate } from '#src/config/nunjucks/filters/format-date.js'
 import {
   routes,
-  marineLicenseRoutes
+  marineLicenceRoutes
 } from '#src/server/common/constants/routes.js'
 import { EXEMPTION_TYPE } from '#src/server/common/constants/exemptions.js'
 import { PROJECT_STATUS } from '#src/server/common/constants/projects.js'
@@ -15,12 +15,12 @@ import {
 const getDraftActions = (id, escapedProjectName, projectType) => {
   const taskListRoute =
     projectType === MARINE_LICENCE_KEY
-      ? marineLicenseRoutes.MARINE_LICENSE_TASK_LIST
+      ? marineLicenceRoutes.MARINE_LICENCE_TASK_LIST
       : routes.TASK_LIST
 
   const deleteRoute =
     projectType === MARINE_LICENCE_KEY
-      ? marineLicenseRoutes.MARINE_LICENSE_DELETE
+      ? marineLicenceRoutes.MARINE_LICENCE_DELETE
       : routes.DELETE_EXEMPTION
 
   return `<a href="${taskListRoute}/${id}" class="govuk-link govuk-!-margin-right-4 govuk-link--no-visited-state" aria-label="Continue to task list">Continue</a><a href="${deleteRoute}/${id}" class="govuk-link govuk-link--no-visited-state" aria-label="Delete ${escapedProjectName}">Delete</a>`

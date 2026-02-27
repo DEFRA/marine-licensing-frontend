@@ -44,7 +44,7 @@ services:
       NODE_ENV: development
       USE_SINGLE_INSTANCE_CACHE: true
       MARINE_LICENSING_BACKEND_API_URL: http://marine-licensing-backend:3001
-      ENABLE_MARINE_LICENSE: true
+      ENABLE_MARINE_LICENCE: true
     volumes:
       - ./compose/users:/users
     command: 'sh -c "for f in /users/*.json; do curl -sS -X POST -H \"Content-Type: application/json\" -d @\"$$f\" \"http://defra-id-stub:3200/cdp-defra-id-stub/API/register\"; done & node ."'

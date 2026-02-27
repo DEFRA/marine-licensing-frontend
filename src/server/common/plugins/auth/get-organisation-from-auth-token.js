@@ -46,12 +46,15 @@ export const getOrganisationFromToken = (decodedToken) => {
   const shouldShowOrgOrUserName =
     hasMultipleOrgPickerEntries || userRelationshipType === 'Employee'
 
+  const shouldShowCitizenName =
+    shouldShowOrgOrUserName && userRelationshipType === 'Citizen'
+
   return {
     organisationId,
     organisationName,
     userRelationshipType,
     hasMultipleOrgPickerEntries,
     shouldShowOrgOrUserName,
-    shouldShowCitizenName: false
+    shouldShowCitizenName
   }
 }

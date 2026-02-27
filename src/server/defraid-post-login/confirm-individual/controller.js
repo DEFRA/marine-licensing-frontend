@@ -38,6 +38,8 @@ export const confirmIndividualController = {
 
     return h.view(CONFIRM_INDIVIDUAL_VIEW_ROUTE, {
       ...viewContent,
+      hasMultipleOrgPickerEntries: userSession.hasMultipleOrgPickerEntries,
+      backLink: `${routes.CHANGE_ORGANISATION}?skipRedirect=true`,
       heading: generateHeadingText(userSession),
       payload: { confirmIndividual }
     })
@@ -68,6 +70,9 @@ export const confirmIndividualSubmitController = {
         return h
           .view(CONFIRM_INDIVIDUAL_VIEW_ROUTE, {
             ...viewContent,
+            hasMultipleOrgPickerEntries:
+              userSession.hasMultipleOrgPickerEntries,
+            backLink: `${routes.CHANGE_ORGANISATION}?skipRedirect=true`,
             heading: generateHeadingText(userSession),
             payload,
             errors,

@@ -1,9 +1,12 @@
 import { setupTestServer } from '~/tests/integration/shared/test-setup-helpers.js'
 import { routes } from '~/src/server/common/constants/routes.js'
 import { loadPage } from '~/tests/integration/shared/app-server.js'
-import { getByRole, getByText, within } from '@testing-library/dom'
+import { getByRole, getByText, queryByRole, within } from '@testing-library/dom'
 import { beforeAll } from 'vitest'
-import { citizenUserSession } from '~/tests/integration/shared/session-fixtures.js'
+import {
+  citizenUserSession,
+  citizenUserSessionWithMultipleRelationships
+} from '~/tests/integration/shared/session-fixtures.js'
 import { getUserSession } from '~/src/server/common/plugins/auth/utils.js'
 import { makePostRequest } from '~/src/server/test-helpers/server-requests.js'
 import { JSDOM } from 'jsdom'
@@ -98,5 +101,30 @@ describe('Post-login - Confirm Individual', () => {
 
     expect(statusCode).toBe(statusCodes.redirect)
     expect(headers.location).toBe(routes.postLogin.GUIDANCE_ORG)
+  })
+
+  test('should not show back link when user does not come from org picker', async () => {
+    const document = await loadPage({
+      requestUrl: routes.postLogin.CONFIRM_INDIVIDUAL,
+      server: getServer()
+    })
+
+    const backLink = queryByRole(document, 'link', { name: 'Back' })
+    expect(backLink).not.toBeInTheDocument()
+  })
+
+  test('should show back link when user comes from org picker', async () => {
+    vi.mocked(getUserSession).mockResolvedValue(
+      citizenUserSessionWithMultipleRelationships
+    )
+
+    const document = await loadPage({
+      requestUrl: routes.postLogin.CONFIRM_INDIVIDUAL,
+      server: getServer()
+    })
+
+    const backLink = document.querySelector('.govuk-back-link')
+    expect(backLink).toBeInTheDocument()
+    expect(backLink.textContent.trim()).toBe('Back')
   })
 })

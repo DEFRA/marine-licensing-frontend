@@ -47,7 +47,7 @@ export const getOrganisationFromToken = (decodedToken) => {
     hasMultipleOrgPickerEntries || userRelationshipType === 'Employee'
 
   const shouldShowCitizenName =
-    shouldShowOrgOrUserName && userRelationshipType === 'Citizen'
+    !shouldShowOrgOrUserName && userRelationshipType === 'Citizen'
 
   return {
     organisationId,

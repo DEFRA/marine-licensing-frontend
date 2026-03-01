@@ -141,7 +141,7 @@ describe('#getOrganisationFromToken', () => {
         userRelationshipType: 'Citizen',
         hasMultipleOrgPickerEntries: false,
         shouldShowOrgOrUserName: false,
-        shouldShowCitizenName: false
+        shouldShowCitizenName: true
       })
     })
   })
@@ -237,7 +237,7 @@ describe('#getOrganisationFromToken', () => {
         userRelationshipType: 'Citizen',
         hasMultipleOrgPickerEntries: false,
         shouldShowOrgOrUserName: false,
-        shouldShowCitizenName: false
+        shouldShowCitizenName: true
       })
     })
 
@@ -274,7 +274,7 @@ describe('#getOrganisationFromToken', () => {
         userRelationshipType: 'Citizen',
         hasMultipleOrgPickerEntries: false,
         shouldShowOrgOrUserName: false,
-        shouldShowCitizenName: false
+        shouldShowCitizenName: true
       })
     })
 
@@ -296,7 +296,7 @@ describe('#getOrganisationFromToken', () => {
         userRelationshipType: 'Citizen',
         hasMultipleOrgPickerEntries: false,
         shouldShowOrgOrUserName: false,
-        shouldShowCitizenName: false
+        shouldShowCitizenName: true
       })
       expect(errorLogger).toHaveBeenCalledWith(
         'Invalid relationship type: InvalidRole'

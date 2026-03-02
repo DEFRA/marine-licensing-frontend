@@ -29,6 +29,13 @@ describe('#declarationController', () => {
   })
 
   describe('GET handler', () => {
+    beforeEach(() => {
+      vi.spyOn(authUtils, 'getUserSession').mockResolvedValue({
+        displayName: 'Test User',
+        email: 'test@example.com'
+      })
+    })
+
     test('renders declaration page for exemption', async () => {
       vi.mocked(getProjectType).mockReturnValue(PROJECT_TYPE.EXEMPTION)
 
@@ -49,6 +56,16 @@ describe('#declarationController', () => {
         pageTitle: 'Declaration',
         backLink: marineLicenceRoutes.MARINE_LICENCE_CHECK_YOUR_ANSWERS
       })
+    })
+
+    test('redirects to dashboard when user session has no displayName', async () => {
+      vi.spyOn(authUtils, 'getUserSession').mockResolvedValueOnce({})
+      mockH.redirect = vi.fn()
+
+      await declarationController.handler(mockRequest, mockH)
+
+      expect(mockH.redirect).toHaveBeenCalledWith(routes.DASHBOARD)
+      expect(mockH.view).not.toHaveBeenCalled()
     })
   })
 })

@@ -65,7 +65,7 @@
     "govuk-frontend": "^5.14.0",
     "hapi-pino": "^13.0.0",
     "hapi-pulse": "^3.0.1",
-    "ioredis": "^5.9.3",
+    "ioredis": "^5.10.0",
     "joi": "^18.0.2",
     "lodash": "^4.17.23",
     "node-fetch": "^3.3.2",
@@ -86,7 +86,7 @@
     "@vitest/coverage-v8": "^4.0.18",
     "@vitest/runner": "^4.0.14",
     "@vitest/ui": "^4.0.14",
-    "allure-commandline": "^2.36.0",
+    "allure-commandline": "^2.37.0",
     "allure-vitest": "^3.4.5",
     "autoprefixer": "^10.4.23",
     "babel-loader": "^10.0.0",
@@ -121,6 +121,7 @@
     "rollup": "^4.59.0",
     "eslint": {
       "ajv": "^6.14.0"
-    }
+    },
+    "serialize-javascript": "7.0.3"
   }
 }

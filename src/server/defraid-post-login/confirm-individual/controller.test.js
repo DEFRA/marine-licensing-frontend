@@ -30,6 +30,8 @@ describe('#postLoginConfirmIndividual', () => {
       await confirmIndividualController.handler(request, h)
 
       expect(h.view).toHaveBeenCalledWith(CONFIRM_INDIVIDUAL_VIEW_ROUTE, {
+        hasMultipleOrgPickerEntries: false,
+        backLink: `${routes.CHANGE_ORGANISATION}?skipRedirect=true`,
         heading: `Confirm you're notifying us as ${citizenUserSession.displayName} for a personal project`,
         pageTitle: "Confirm you're notifying us as an individual",
         payload: { confirmIndividual: null }

@@ -12,6 +12,7 @@ import { cacheMcmsContextFromQueryParams } from '~/src/server/common/helpers/mcm
 
 vi.mock('~/src/server/common/plugins/auth/utils.js')
 vi.mock('~/src/server/common/helpers/mcms-context/cache-mcms-context.js')
+vi.mock('~/src/server/common/helpers/defraid-login/session-cache.js')
 
 describe('#exemptionLanding', () => {
   const getServer = setupTestServer()

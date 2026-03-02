@@ -14,6 +14,11 @@ export const citizenUserSession = {
   userRelationshipType: USER_TYPES.CITIZEN
 }
 
+export const citizenUserSessionWithMultipleRelationships = {
+  ...citizenUserSession,
+  hasMultipleOrgPickerEntries: true
+}
+
 export const employeeSession = {
   ...baseSession,
   userRelationshipType: 'Employee',

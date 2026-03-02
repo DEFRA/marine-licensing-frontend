@@ -7,6 +7,7 @@ import { USER_TYPES } from '#src/server/common/constants/user-types.js'
 
 vi.mock('~/src/server/common/helpers/page-view-common-data.js')
 vi.mock('~/src/server/common/plugins/auth/utils.js')
+vi.mock('~/src/server/common/helpers/defraid-login/session-cache.js')
 
 describe('exemption route', () => {
   test('route is registered correctly', () => {

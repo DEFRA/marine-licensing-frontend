@@ -39,6 +39,7 @@ export const exemptionRoutes = {
 
 export const marineLicenceRoutes = {
   MARINE_LICENCE_CHECK_YOUR_ANSWERS: '/marine-licence/check-your-answers',
+  MARINE_LICENCE_CONFIRMATION: '/marine-licence/confirmation',
   MARINE_LICENCE_PROJECT_NAME: '/marine-licence/project-name',
   MARINE_LICENCE_TASK_LIST: '/marine-licence/task-list',
   MARINE_LICENCE_DELETE: '/marine-licence/delete'

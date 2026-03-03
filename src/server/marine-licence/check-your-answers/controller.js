@@ -1,5 +1,8 @@
 import { getMarineLicenceCache } from '#src/server/common/helpers/marine-licence/session-cache/utils.js'
-import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
+import {
+  marineLicenceRoutes,
+  routes
+} from '#src/server/common/constants/routes.js'
 
 const checkYourAnswersViewContent = {
   pageTitle: 'Check your answers before sending your information',
@@ -16,5 +19,11 @@ export const checkYourAnswersController = {
       ...checkYourAnswersViewContent,
       ...cachedMarineLicence
     })
+  }
+}
+
+export const checkYourAnswersContinueController = {
+  async handler(_request, h) {
+    return h.redirect(routes.DECLARATION)
   }
 }

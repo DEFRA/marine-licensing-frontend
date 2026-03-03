@@ -4,11 +4,12 @@ import {
   resetExemptionSiteDetails,
   setExemptionCache
 } from '#src/server/common/helpers/exemptions/session-cache/utils.js'
+import { setProjectType } from '#src/server/common/helpers/session-cache/utils.js'
 import { transformTaskList } from '#src/server/exemption/task-list/utils.js'
 import { routes } from '#src/server/common/constants/routes.js'
 import { authenticatedGetRequest } from '#src/server/common/helpers/authenticated-requests.js'
 import { EXEMPTION_TYPE } from '#src/server/common/constants/exemptions.js'
-
+import { PROJECT_TYPE } from '#src/server/common/constants/projects.js'
 import Boom from '@hapi/boom'
 import { RETURN_TO_CACHE_KEY } from '#src/server/common/constants/cache.js'
 
@@ -64,6 +65,7 @@ export const taskListController = {
       multipleSiteDetails,
       siteDetails
     })
+    await setProjectType(request, h, PROJECT_TYPE.EXEMPTION)
 
     request.yar.flash(RETURN_TO_CACHE_KEY)
 

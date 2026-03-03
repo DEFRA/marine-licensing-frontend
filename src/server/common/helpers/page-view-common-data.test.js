@@ -24,7 +24,8 @@ describe('getPageViewCommonData', () => {
   test('should return showChangeOrganisationLink false for correct pages', async () => {
     const mockUserSession = {
       organisationName: 'Test Organisation Ltd',
-      hasMultipleOrgPickerEntries: false
+      hasMultipleOrgPickerEntries: false,
+      shouldShowCitizenName: false
     }
     mockGetUserSession.mockResolvedValue(mockUserSession)
 
@@ -52,7 +53,8 @@ describe('getPageViewCommonData', () => {
   test('should return showChangeOrganisationLink false when user has single organisation on dashboard', async () => {
     const mockUserSession = {
       organisationName: 'Test Organisation Ltd',
-      hasMultipleOrgPickerEntries: false
+      hasMultipleOrgPickerEntries: false,
+      shouldShowCitizenName: false
     }
     mockGetUserSession.mockResolvedValue(mockUserSession)
 
@@ -69,7 +71,8 @@ describe('getPageViewCommonData', () => {
   test('should return showChangeOrganisationLink true when user has multiple organisations on dashboard', async () => {
     const mockUserSession = {
       organisationName: 'Test Organisation Ltd',
-      hasMultipleOrgPickerEntries: true
+      hasMultipleOrgPickerEntries: true,
+      shouldShowCitizenName: false
     }
     mockGetUserSession.mockResolvedValue(mockUserSession)
 
@@ -87,7 +90,8 @@ describe('getPageViewCommonData', () => {
     const mockUserSession = {
       organisationName: 'Test Organisation Ltd',
       hasMultipleOrgPickerEntries: true,
-      shouldShowOrgOrUserName: true
+      shouldShowOrgOrUserName: true,
+      shouldShowCitizenName: false
     }
     mockGetUserSession.mockResolvedValue(mockUserSession)
 
@@ -131,7 +135,8 @@ describe('getPageViewCommonData', () => {
       organisationName: 'Test Organisation Ltd',
       displayName: 'John Doe',
       hasMultipleOrgPickerEntries: true,
-      shouldShowOrgOrUserName: true
+      shouldShowOrgOrUserName: true,
+      shouldShowCitizenName: false
     }
     mockGetUserSession.mockResolvedValue(mockUserSession)
 
@@ -150,7 +155,8 @@ describe('getPageViewCommonData', () => {
       organisationName: null,
       displayName: 'John Doe',
       hasMultipleOrgPickerEntries: true,
-      shouldShowOrgOrUserName: true
+      shouldShowOrgOrUserName: true,
+      shouldShowCitizenName: false
     }
     mockGetUserSession.mockResolvedValue(mockUserSession)
 
@@ -168,7 +174,8 @@ describe('getPageViewCommonData', () => {
     const mockUserSession = {
       organisationName: 'Test Organisation Ltd',
       displayName: 'John Doe',
-      hasMultipleOrgPickerEntries: false
+      hasMultipleOrgPickerEntries: false,
+      shouldShowCitizenName: false
     }
     mockGetUserSession.mockResolvedValue(mockUserSession)
 
@@ -187,7 +194,8 @@ describe('getPageViewCommonData', () => {
       organisationName: 'Test Organisation Ltd',
       displayName: 'John Doe',
       hasMultipleOrgPickerEntries: false,
-      shouldShowOrgOrUserName: false
+      shouldShowOrgOrUserName: false,
+      shouldShowCitizenName: false
     }
     mockGetUserSession.mockResolvedValue(mockUserSession)
 
@@ -206,7 +214,8 @@ describe('getPageViewCommonData', () => {
       organisationName: 'Test Organisation Ltd',
       displayName: 'John Doe',
       hasMultipleOrgPickerEntries: true,
-      shouldShowOrgOrUserName: false
+      shouldShowOrgOrUserName: false,
+      shouldShowCitizenName: false
     }
     mockGetUserSession.mockResolvedValue(mockUserSession)
 
@@ -250,7 +259,8 @@ describe('getPageViewCommonData', () => {
       organisationName: '',
       displayName: 'Jane Smith',
       hasMultipleOrgPickerEntries: false,
-      shouldShowOrgOrUserName: true
+      shouldShowOrgOrUserName: true,
+      shouldShowCitizenName: false
     }
     mockGetUserSession.mockResolvedValue(mockUserSession)
 
@@ -269,7 +279,48 @@ describe('getPageViewCommonData', () => {
       organisationName: '',
       displayName: '',
       hasMultipleOrgPickerEntries: false,
-      shouldShowOrgOrUserName: false
+      shouldShowOrgOrUserName: false,
+      shouldShowCitizenName: false
+    }
+    mockGetUserSession.mockResolvedValue(mockUserSession)
+
+    const mockRequest = {
+      state: { userSession: 'mock-session' },
+      path: routes.DASHBOARD
+    }
+
+    const result = await getPageViewCommonData(mockRequest)
+
+    expect(result.orgOrUserName).toEqual(null)
+  })
+
+  test('should return orgOrUserName with displayName when shouldShowOrgOrUserName is false and shouldShowCitizenName is true', async () => {
+    const mockUserSession = {
+      organisationName: '',
+      displayName: 'Jane Smith',
+      hasMultipleOrgPickerEntries: false,
+      shouldShowOrgOrUserName: false,
+      shouldShowCitizenName: true
+    }
+    mockGetUserSession.mockResolvedValue(mockUserSession)
+
+    const mockRequest = {
+      state: { userSession: 'mock-session' },
+      path: '/some-page'
+    }
+
+    const result = await getPageViewCommonData(mockRequest)
+
+    expect(result.orgOrUserName).toEqual('Jane Smith')
+  })
+
+  test('should return orgOrUserName as null when shouldShowOrgOrUserName is false and shouldShowCitizenName is false', async () => {
+    const mockUserSession = {
+      organisationName: '',
+      displayName: '',
+      hasMultipleOrgPickerEntries: false,
+      shouldShowOrgOrUserName: false,
+      shouldShowCitizenName: false
     }
     mockGetUserSession.mockResolvedValue(mockUserSession)
 

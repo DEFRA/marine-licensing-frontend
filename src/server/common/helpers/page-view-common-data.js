@@ -11,17 +11,23 @@ export const getPageViewCommonData = async (request) => {
   if (!userSession) {
     return {}
   }
+
   const {
     organisationName,
     hasMultipleOrgPickerEntries,
     shouldShowOrgOrUserName,
-    displayName
+    displayName,
+    shouldShowCitizenName
   } = userSession
   const showChangeOrganisationLink =
     hasMultipleOrgPickerEntries &&
     changeOrganisationLinkRoutes.includes(request.path)
+
+  const citizenName = shouldShowCitizenName ? displayName : null
+
   const orgOrUserName = shouldShowOrgOrUserName
     ? organisationName || displayName
-    : null
+    : citizenName
+
   return { orgOrUserName, showChangeOrganisationLink }
 }

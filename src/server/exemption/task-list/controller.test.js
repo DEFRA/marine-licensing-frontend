@@ -13,7 +13,11 @@ import { mockExemption as mockExemptionData } from '#src/server/test-helpers/moc
 import { makeGetRequest } from '#src/server/test-helpers/server-requests.js'
 import { routes } from '#src/server/common/constants/routes.js'
 import { RETURN_TO_CACHE_KEY } from '#src/server/common/constants/cache.js'
+import { setProjectType } from '#src/server/common/helpers/session-cache/utils.js'
+import { PROJECT_TYPE } from '#src/server/common/constants/projects.js'
+
 vi.mock('#src/server/common/helpers/exemptions/session-cache/utils.js')
+vi.mock('#src/server/common/helpers/session-cache/utils.js')
 
 describe('#taskListController', () => {
   const getServer = setupTestServer()
@@ -79,6 +83,12 @@ describe('#taskListController', () => {
     )
 
     expect(mockRequest.yar.flash).toHaveBeenCalledWith(RETURN_TO_CACHE_KEY)
+
+    expect(vi.mocked(setProjectType)).toHaveBeenCalledWith(
+      expect.any(Object),
+      expect.any(Object),
+      PROJECT_TYPE.EXEMPTION
+    )
 
     expect(h.view).toHaveBeenCalledWith(TASK_LIST_VIEW_ROUTE, {
       pageTitle: 'Task list',

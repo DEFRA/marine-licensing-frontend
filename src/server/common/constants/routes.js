@@ -75,7 +75,8 @@ export const routes = {
   DASHBOARD: '/projects',
   SERVICE_HOME: '/home',
   COOKIES: '/help/cookies',
-  PRIVACY: '/help/privacy'
+  PRIVACY: '/help/privacy',
+  DECLARATION: '/declaration'
 }
 
 export const entraIdRoutes = [
@@ -93,3 +94,8 @@ export const isEntraIdRoute = (route) => {
 export const redirectPathCacheKey = 'redirectPath'
 
 export const changeOrganisationQueryParam = 'change-organisation'
+
+export const apiRoutes = {
+  SUBMIT_EXEMPTION: '/exemption/submit',
+  SUBMIT_MARINE_LICENCE: '/marine-licence/submit'
+}

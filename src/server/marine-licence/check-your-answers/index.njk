@@ -1,5 +1,6 @@
 {% extends 'layouts/page.njk' %}
 {% from "govuk/components/back-link/macro.njk" import govukBackLink %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
 {% from "marine-licence/project-details-card/macro.njk" import appMarineLicenceProjectDetailsCard %}
 
 {% block head %}
@@ -27,6 +28,15 @@
         projectName: projectName
       }) }}
 
+      <form method="post">
+        <input type="hidden" name="csrfToken" value="{{ csrfToken }}"/>
+        {{ govukButton({
+          text: "Continue",
+          attributes: {
+            id: "continue"
+          }
+        }) }}
+      </form>
     </div>
   </div>
 {% endblock %}

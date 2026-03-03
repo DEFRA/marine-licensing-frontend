@@ -4,6 +4,7 @@ import {
   getMarineLicenceCache,
   setMarineLicenceCache
 } from '#src/server/common/helpers/marine-licence/session-cache/utils.js'
+import { setProjectType } from '#src/server/common/helpers/session-cache/utils.js'
 import { authenticatedGetRequest } from '#src/server/common/helpers/authenticated-requests.js'
 import { transformTaskList } from '#src/server/marine-licence/task-list/utils.js'
 import {
@@ -12,9 +13,11 @@ import {
   TASK_LIST_VIEW_ROUTE
 } from '#src/server/marine-licence/task-list/controller.js'
 import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
+import { PROJECT_TYPE } from '#src/server/common/constants/projects.js'
 import Boom from '@hapi/boom'
 
 vi.mock('#src/server/common/helpers/marine-licence/session-cache/utils.js')
+vi.mock('#src/server/common/helpers/session-cache/utils.js')
 vi.mock('#src/server/common/helpers/authenticated-requests.js')
 vi.mock('#src/server/marine-licence/task-list/utils.js')
 
@@ -86,6 +89,11 @@ describe('#taskListController', () => {
         id: '123',
         projectName: 'Test Project'
       }
+    )
+    expect(vi.mocked(setProjectType)).toHaveBeenCalledWith(
+      mockRequest,
+      mockH,
+      PROJECT_TYPE.MARINE_LICENCE
     )
     expect(mockH.view).toHaveBeenCalledWith(TASK_LIST_VIEW_ROUTE, {
       hasCompletedAllTasks: true,

@@ -146,7 +146,8 @@ export const projectNameSubmitController = {
 
       await setMarineLicenceCache(request, h, {
         id,
-        ...(!isUpdate && responsePayload.value)
+        ...(!isUpdate && responsePayload.value),
+        projectName: payload.projectName
       })
 
       clearMcmsContextCache(request)

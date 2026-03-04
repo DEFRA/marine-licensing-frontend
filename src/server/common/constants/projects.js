@@ -4,3 +4,8 @@ export const PROJECT_STATUS = {
   SUBMITTED: 'Submitted',
   WITHDRAWN: 'Withdrawn'
 }
+
+export const PROJECT_TYPE = {
+  EXEMPTION: 'exemption',
+  MARINE_LICENCE: 'marine-licence'
+}

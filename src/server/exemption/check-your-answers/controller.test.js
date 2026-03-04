@@ -37,7 +37,7 @@ describe('check your answers controller', () => {
       })
 
       expect(statusCode).toBe(302)
-      expect(headers.location).toBe('/exemption/declaration')
+      expect(headers.location).toBe('/declaration')
     })
 
     test('Should redirect to declaration page with empty exemption data', async () => {
@@ -48,7 +48,7 @@ describe('check your answers controller', () => {
       })
 
       expect(statusCode).toBe(302)
-      expect(headers.location).toBe('/exemption/declaration')
+      expect(headers.location).toBe('/declaration')
     })
   })
 

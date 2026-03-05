@@ -24,7 +24,8 @@ describe('#getOrganisationFromToken', () => {
         organisationName: 'CDP Child Org 1',
         userRelationshipType: 'Employee',
         hasMultipleOrgPickerEntries: false,
-        shouldShowOrgOrUserName: true
+        shouldShowOrgOrUserName: true,
+        shouldShowCitizenName: false
       })
     })
 
@@ -45,7 +46,8 @@ describe('#getOrganisationFromToken', () => {
         organisationName: 'CDP Child Org 1',
         userRelationshipType: 'Employee',
         hasMultipleOrgPickerEntries: true,
-        shouldShowOrgOrUserName: true
+        shouldShowOrgOrUserName: true,
+        shouldShowCitizenName: false
       })
     })
 
@@ -67,7 +69,8 @@ describe('#getOrganisationFromToken', () => {
         organisationName: 'CDP Child Org 1',
         userRelationshipType: 'Employee',
         hasMultipleOrgPickerEntries: true,
-        shouldShowOrgOrUserName: true
+        shouldShowOrgOrUserName: true,
+        shouldShowCitizenName: false
       })
     })
   })
@@ -90,7 +93,8 @@ describe('#getOrganisationFromToken', () => {
         organisationName: 'CDP Beneficiary Org',
         userRelationshipType: 'Agent',
         hasMultipleOrgPickerEntries: false,
-        shouldShowOrgOrUserName: false
+        shouldShowOrgOrUserName: false,
+        shouldShowCitizenName: false
       })
     })
 
@@ -112,7 +116,8 @@ describe('#getOrganisationFromToken', () => {
         organisationName: 'CDP Beneficiary Org',
         userRelationshipType: 'Agent',
         hasMultipleOrgPickerEntries: true,
-        shouldShowOrgOrUserName: true
+        shouldShowOrgOrUserName: true,
+        shouldShowCitizenName: false
       })
     })
   })
@@ -135,7 +140,8 @@ describe('#getOrganisationFromToken', () => {
         organisationName: 'CDP Org',
         userRelationshipType: 'Citizen',
         hasMultipleOrgPickerEntries: false,
-        shouldShowOrgOrUserName: false
+        shouldShowOrgOrUserName: false,
+        shouldShowCitizenName: true
       })
     })
   })
@@ -154,6 +160,7 @@ describe('#getOrganisationFromToken', () => {
 
       expect(result).toEqual({
         hasMultipleOrgPickerEntries: false,
+        shouldShowCitizenName: true,
         userRelationshipType: 'Citizen'
       })
     })
@@ -171,6 +178,7 @@ describe('#getOrganisationFromToken', () => {
 
       expect(result).toEqual({
         hasMultipleOrgPickerEntries: false,
+        shouldShowCitizenName: true,
         userRelationshipType: 'Citizen'
       })
     })
@@ -187,6 +195,7 @@ describe('#getOrganisationFromToken', () => {
 
       expect(result).toEqual({
         hasMultipleOrgPickerEntries: false,
+        shouldShowCitizenName: true,
         userRelationshipType: 'Citizen'
       })
     })
@@ -205,6 +214,7 @@ describe('#getOrganisationFromToken', () => {
 
       expect(result).toEqual({
         hasMultipleOrgPickerEntries: false,
+        shouldShowCitizenName: true,
         userRelationshipType: 'Citizen'
       })
     })
@@ -226,7 +236,8 @@ describe('#getOrganisationFromToken', () => {
         organisationName: undefined,
         userRelationshipType: 'Citizen',
         hasMultipleOrgPickerEntries: false,
-        shouldShowOrgOrUserName: false
+        shouldShowOrgOrUserName: false,
+        shouldShowCitizenName: true
       })
     })
 
@@ -242,6 +253,7 @@ describe('#getOrganisationFromToken', () => {
 
       expect(result).toEqual({
         hasMultipleOrgPickerEntries: false,
+        shouldShowCitizenName: true,
         userRelationshipType: 'Citizen'
       })
     })
@@ -261,7 +273,8 @@ describe('#getOrganisationFromToken', () => {
         organisationName: undefined,
         userRelationshipType: 'Citizen',
         hasMultipleOrgPickerEntries: false,
-        shouldShowOrgOrUserName: false
+        shouldShowOrgOrUserName: false,
+        shouldShowCitizenName: true
       })
     })
 
@@ -282,7 +295,8 @@ describe('#getOrganisationFromToken', () => {
         organisationName: 'CDP Child Org 1',
         userRelationshipType: 'Citizen',
         hasMultipleOrgPickerEntries: false,
-        shouldShowOrgOrUserName: false
+        shouldShowOrgOrUserName: false,
+        shouldShowCitizenName: true
       })
       expect(errorLogger).toHaveBeenCalledWith(
         'Invalid relationship type: InvalidRole'

@@ -128,7 +128,7 @@ describe('#declarationSubmitController', () => {
       )
       expect(clearExemptionCache).toHaveBeenCalledWith(mockRequest, mockH)
       expect(mockH.redirect).toHaveBeenCalledWith(
-        `${routes.CONFIRMATION}?applicationReference=${mockApplicationReference}`
+        `${routes.CONFIRMATION}?applicationReference=${encodeURIComponent(mockApplicationReference)}`
       )
     })
 

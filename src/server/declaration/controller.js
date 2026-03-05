@@ -99,7 +99,7 @@ const submitExemption = async (request, h) => {
       await clearExemptionCache(request, h)
       const { applicationReference } = response.value
       return h.redirect(
-        `${routes.CONFIRMATION}?applicationReference=${applicationReference}`
+        `${routes.CONFIRMATION}?applicationReference=${encodeURIComponent(applicationReference)}`
       )
     }
 

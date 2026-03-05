@@ -25,3 +25,4 @@ allure-report/
 .claude/settings.local.json
 .env*
 !.env.template
+jsconfig.json

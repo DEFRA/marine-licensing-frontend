@@ -125,6 +125,7 @@ export const declarationSubmitController = {
       return submitExemption(request, h)
     }
 
+    request.logger.error({ projectType: type }, 'Unknown project type')
     return h.view(DECLARATION_VIEW_ROUTE, getViewContext(type))
   }
 }

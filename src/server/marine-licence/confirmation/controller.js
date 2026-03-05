@@ -4,8 +4,7 @@ import { getMarineLicenceCache } from '#src/server/common/helpers/marine-licence
 const CONFIRMATION_VIEW_ROUTE = 'marine-licence/confirmation/index'
 
 const confirmationViewContent = {
-  pageTitle:
-    'The information relating to your marine licence application has been sent'
+  pageTitle: 'Application sent'
 }
 
 export const confirmationController = {

@@ -23,8 +23,7 @@ describe('confirmationController', () => {
       expect(mockH.view).toHaveBeenCalledWith(
         'marine-licence/confirmation/index',
         {
-          pageTitle:
-            'The information relating to your marine licence application has been sent',
+          pageTitle: 'Application sent',
           applicationReference: 'ML-REF-001'
         }
       )

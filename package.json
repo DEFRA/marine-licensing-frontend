@@ -91,7 +91,7 @@
     "autoprefixer": "^10.4.23",
     "babel-loader": "^10.0.0",
     "cheerio": "^1.2.0",
-    "copy-webpack-plugin": "^13.0.1",
+    "copy-webpack-plugin": "^14.0.0",
     "eslint": "^9.36.0",
     "jsdom": "^28.1.0",
     "knip": "^5.85.0",
@@ -106,7 +106,7 @@
     "source-map-loader": "^5.0.0",
     "stylelint": "^16.26.0",
     "stylelint-config-gds": "^2.0.0",
-    "terser-webpack-plugin": "^5.3.16",
+    "terser-webpack-plugin": "^5.3.17",
     "vitest": "^4.0.14",
     "vitest-axe": "^0.1.0",
     "vitest-fetch-mock": "^0.4.5",
@@ -120,8 +120,7 @@
     "eslint": {
       "ajv": "^6.14.0"
     },
-    "serialize-javascript": "7.0.3",
     "immutable": "5.1.5",
-    "svgo": "4.0.1"
+    "svgo": "^4.0.1"
   }
 }

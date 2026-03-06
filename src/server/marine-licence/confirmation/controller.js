@@ -1,5 +1,4 @@
 import Boom from '@hapi/boom'
-import { getMarineLicenceCache } from '#src/server/common/helpers/marine-licence/session-cache/utils.js'
 
 const CONFIRMATION_VIEW_ROUTE = 'marine-licence/confirmation/index'
 
@@ -9,7 +8,6 @@ const confirmationViewContent = {
 
 export const confirmationController = {
   handler(request, h) {
-    getMarineLicenceCache(request)
     const { applicationReference } = request.query
 
     if (!applicationReference) {

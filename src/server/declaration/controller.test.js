@@ -153,7 +153,7 @@ describe('#declarationSubmitController', () => {
 
       await expect(
         declarationSubmitController.handler(mockRequest, mockH)
-      ).rejects.toThrow(errorMessages.SUBMISSION_FAILED)
+      ).rejects.toThrow(errorMessages.MARINE_LICENCE_SUBMISSION_FAILED)
     })
 
     test('throws when API returns success but no value', async () => {
@@ -163,7 +163,7 @@ describe('#declarationSubmitController', () => {
 
       await expect(
         declarationSubmitController.handler(mockRequest, mockH)
-      ).rejects.toThrow(errorMessages.SUBMISSION_FAILED)
+      ).rejects.toThrow(errorMessages.MARINE_LICENCE_SUBMISSION_FAILED)
     })
   })
 })

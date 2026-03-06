@@ -76,9 +76,9 @@ const submitMarineLicence = async (request, h) => {
   } catch (error) {
     request.logger.error(
       { err: error, marineLicenceId: id },
-      errorMessages.SUBMISSION_FAILED
+      errorMessages.MARINE_LICENCE_SUBMISSION_FAILED
     )
-    throw Boom.badRequest(errorMessages.SUBMISSION_FAILED, error)
+    throw Boom.badRequest(errorMessages.MARINE_LICENCE_SUBMISSION_FAILED, error)
   }
 }
 

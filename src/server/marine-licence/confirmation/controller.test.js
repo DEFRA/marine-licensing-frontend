@@ -1,18 +1,8 @@
 import { vi } from 'vitest'
 import { confirmationController } from './controller.js'
-import { getMarineLicenceCache } from '#src/server/common/helpers/marine-licence/session-cache/utils.js'
-
-vi.mock('~/src/server/common/helpers/marine-licence/session-cache/utils.js')
 
 describe('confirmationController', () => {
   const mockH = { view: vi.fn() }
-
-  beforeEach(() => {
-    vi.mocked(getMarineLicenceCache).mockReturnValue({
-      id: 'test-id',
-      projectName: 'Test Project'
-    })
-  })
 
   describe('handler', () => {
     test('renders confirmation page with applicationReference', () => {

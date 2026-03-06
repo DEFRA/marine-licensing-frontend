@@ -5,7 +5,7 @@
     <div class="govuk-grid-column-two-thirds">
       {{ govukPanel({
         titleText: "The information relating to your marine licence application has been sent",
-        html: "Your reference number<br><strong>" + applicationReference + "</strong>"
+        html: "Your reference number<br><strong>" + (applicationReference | escape) + "</strong>"
       }) }}
       <p class="govuk-body">We'll review your information and contact you within 5 working days.</p>
     </div>

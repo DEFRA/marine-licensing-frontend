@@ -68,7 +68,7 @@ const submitMarineLicence = async (request, h) => {
       await clearMarineLicenceCache(request, h)
       const { applicationReference } = response.value
       return h.redirect(
-        `${marineLicenceRoutes.MARINE_LICENCE_CONFIRMATION}?applicationReference=${applicationReference}`
+        `${marineLicenceRoutes.MARINE_LICENCE_CONFIRMATION}?applicationReference=${encodeURIComponent(applicationReference)}`
       )
     }
 

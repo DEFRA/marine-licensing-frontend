@@ -287,7 +287,7 @@ export const config = convict({
     enabled: {
       doc: 'Enable the Marine Licence journey',
       format: Boolean,
-      default: false,
+      default: true,
       env: 'ENABLE_MARINE_LICENCE'
     }
   },

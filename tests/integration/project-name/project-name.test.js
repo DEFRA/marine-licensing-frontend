@@ -49,6 +49,11 @@ describe('Project name', () => {
       '.govuk-service-navigation__link'
     )
     expect(serviceName).not.toBeInTheDocument()
+
+    // Check if the caption is set to 'Exempt activity notification' when project name is not set
+    const caption = document.querySelector('.govuk-caption-l')
+    expect(caption).not.toBeNull()
+    expect(caption.textContent).toBe('Exempt activity notification')
   })
 
   test('project name from Check Your Answers', async () => {
@@ -111,6 +116,10 @@ describe('Project name', () => {
     )
     expect(serviceName).toBeInTheDocument()
     expect(serviceName).toHaveAttribute('href', '/')
+
+    const caption = document.querySelector('.govuk-caption-l')
+    expect(caption).not.toBeNull()
+    expect(caption.textContent).toBe('Test Project')
   })
 
   test('should show a validation error when submitted without a project name', async () => {

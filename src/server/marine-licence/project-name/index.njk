@@ -32,7 +32,11 @@
         <form method="POST">
 
           <input type="hidden" name="csrfToken" value="{{csrfToken}}" />
-
+          {% if payload.projectName %}
+            <span class="govuk-caption-l">{{ payload.projectName }}</span>
+          {% else %}
+            <span class="govuk-caption-l">Marine licence</span>
+          {% endif %}
           {{ govukInput({
             label: {
               text: "Project name",

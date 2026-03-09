@@ -34,6 +34,8 @@
           <input type="hidden" name="csrfToken" value="{{csrfToken}}" />
           {% if payload.projectName %}
             <span class="govuk-caption-l">{{ payload.projectName }}</span>
+           {% else %}
+            <span class="govuk-caption-l">Exempt activity notification</span>
           {% endif %}
           {{ govukInput({
             label: {

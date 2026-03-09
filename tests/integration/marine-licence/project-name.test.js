@@ -88,6 +88,10 @@ describe('Marine Licence - Project name', () => {
       )
 
       expect(serviceName).not.toBeInTheDocument()
+
+      const caption = document.querySelector('.govuk-caption-l')
+      expect(caption).not.toBeNull()
+      expect(caption.textContent).toBe('Marine licence')
     })
 
     test('should render project name page when feature is enabled and editing project name', async () => {
@@ -131,6 +135,10 @@ describe('Marine Licence - Project name', () => {
       )
 
       expect(serviceName).toBeInTheDocument()
+
+      const caption = document.querySelector('.govuk-caption-l')
+      expect(caption).not.toBeNull()
+      expect(caption.textContent).toBe(testProjectName)
     })
 
     test('should show a validation error when submitted without a project name', async () => {

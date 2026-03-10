@@ -2,6 +2,7 @@ import { checkYourAnswersRoutes } from '#src/server/marine-licence/check-your-an
 import { projectNameRoutes } from '#src/server/marine-licence/project-name/index.js'
 import { taskListRoutes } from '#src/server/marine-licence/task-list/index.js'
 import { deleteMarineLicenceRoutes } from '#src/server/marine-licence/delete/index.js'
+import { viewDetailsRoutes } from '#src/server/marine-licence/view-details/index.js'
 
 export const marineLicence = {
   plugin: {
@@ -11,7 +12,8 @@ export const marineLicence = {
         ...checkYourAnswersRoutes,
         ...projectNameRoutes,
         ...taskListRoutes,
-        ...deleteMarineLicenceRoutes
+        ...deleteMarineLicenceRoutes,
+        ...viewDetailsRoutes
       ])
     }
   }

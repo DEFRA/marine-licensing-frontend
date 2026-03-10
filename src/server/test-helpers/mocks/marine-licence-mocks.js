@@ -11,3 +11,9 @@ export const mockMarineLicenceApplication = {
   taskList: mockMarineLicenceTaskList,
   projectType: MARINE_LICENCE_KEY
 }
+
+export const mockSubmittedMarineLicenceApplication = {
+  ...mockMarineLicenceApplication,
+  status: 'Submitted',
+  applicationReference: 'MLA/2026/10264'
+}

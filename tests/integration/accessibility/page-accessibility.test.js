@@ -236,6 +236,10 @@ describe('Page accessibility checks (Axe)', () => {
       url: routes.DECLARATION,
       title: 'Declaration',
       session: citizenUserSession
+    },
+    {
+      url: `${marineLicenceRoutes.MARINE_LICENCE_CONFIRMATION}?applicationReference=123`,
+      title: 'Application sent'
     }
   ]
 

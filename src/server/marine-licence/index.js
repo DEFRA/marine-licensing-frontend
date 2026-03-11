@@ -17,7 +17,7 @@ export const marineLicence = {
         ...projectNameRoutes,
         ...taskListRoutes,
         ...deleteMarineLicenceRoutes,
-        ...specialLegalPowersRoutes
+        ...specialLegalPowersRoutes,
         ...viewDetailsRoutes,
         ...viewMarineLicencePublicUserRoutes
       ])

@@ -43,7 +43,7 @@ export const marineLicenceRoutes = {
   MARINE_LICENCE_PROJECT_NAME: '/marine-licence/project-name',
   MARINE_LICENCE_TASK_LIST: '/marine-licence/task-list',
   MARINE_LICENCE_DELETE: '/marine-licence/delete',
-  MARINE_LICENCE_SPECIAL_LEGAL_POWERS: '/marine-licence/special-legal-powers'
+  MARINE_LICENCE_SPECIAL_LEGAL_POWERS: '/marine-licence/special-legal-powers',
   MARINE_LICENCE_VIEW_DETAILS: '/marine-licence/view-details',
   MARINE_LICENCE_VIEW_DETAILS_PUBLIC: '/marine-licence/view-public-details'
 }

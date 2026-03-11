@@ -22,24 +22,24 @@
   
   {% set noHtml %}
             {{ govukTextarea({
-              id: "reason",
-              name: "reason",
+              id: "details",
+              name: "details",
               label: {
                 text: "Provide details of the legal powers including the relevant legislation"
               },
-              errorMessage: errors['reason'],
-              value: payload.reason
+              errorMessage: errors['details'],
+              value: payload.details
             }) }}
   {% endset -%}
 
   {{ appRadioPage({
-            name: "fileUploadType",
+            name: "agree",
             errorSummary: errorSummary,
             errors: errors,
             heading: "Does your organisation have special legal powers to do any of this project?",
             isPageHeading: true,
-            value: payload.fileUploadType,
-            errorMessage: errors['fileUploadType'],
+            value: payload.agree,
+            errorMessage: errors['agree'],
             projectName: projectName,
             hint: { text: "You can either give permission to others to do the work, or do the work yourself without needing permission from other organisations, for example, if you're a harbour, lighthouse or coastal protection authority" },
             items: [

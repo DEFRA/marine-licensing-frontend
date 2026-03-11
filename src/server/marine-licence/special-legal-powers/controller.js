@@ -18,7 +18,7 @@ export const errorMessages = {
   SPECIAL_LEGAL_POWERS_DETAILS_REQUIRED: 'Provide details of the legal powers',
   SPECIAL_LEGAL_POWERS_DETAILS_MAX_LENGTH:
     'Details of the legal powers must be 1000 characters or fewer',
-  SPECIAL_LEGAL_POWERS_DETAILS_REQUIRED:
+  SPECIAL_LEGAL_POWERS_DETAILS_AGREE:
     'Select whether your organisation has special legal powers'
 }
 
@@ -52,14 +52,14 @@ export const specialLegalPowersSubmitController = {
   options: {
     validate: {
       payload: joi.object({
-        consent: joi.string().valid('yes', 'no').required().messages({
-          'any.only': 'SPECIAL_LEGAL_POWERS_DETAILS_REQUIRED',
-          'string.empty': 'SPECIAL_LEGAL_POWERS_DETAILS_REQUIRED',
-          'any.required': 'SPECIAL_LEGAL_POWERS_DETAILS_REQUIRED'
+        agree: joi.string().valid('yes', 'no').required().messages({
+          'any.only': 'SPECIAL_LEGAL_POWERS_DETAILS_AGREE',
+          'string.empty': 'SPECIAL_LEGAL_POWERS_DETAILS_AGREE',
+          'any.required': 'SPECIAL_LEGAL_POWERS_DETAILS_AGREE'
         }),
-        reason: joi.when('consent', {
-          // Reason required when consent: 'no'
-          is: 'no',
+        details: joi.when('agree', {
+          // Details required when agree: 'yes'
+          is: 'yes',
           then: joi.string().required().messages({
             'string.empty': 'SPECIAL_LEGAL_POWERS_DETAILS_REQUIRED',
             'any.required': 'SPECIAL_LEGAL_POWERS_DETAILS_REQUIRED'
@@ -106,15 +106,14 @@ export const specialLegalPowersSubmitController = {
     const marineLicence = getMarineLicenceCache(request)
 
     try {
-      // consent: 'yes' = user consents to publish, consent: 'no' = user declines consent
-      const userDeclinesConsent = payload.consent === 'no'
+      const userAgrees = payload.agree === 'yes'
 
       await authenticatedPatchRequest(
         request,
         '/marine-licence/special-legal-powers',
         {
-          consent: payload.consent,
-          ...(userDeclinesConsent && { reason: payload.reason }),
+          agree: payload.agree,
+          ...(userAgrees && { reason: payload.reason }),
           id: marineLicence.id
         }
       )
@@ -122,8 +121,8 @@ export const specialLegalPowersSubmitController = {
       await setMarineLicenceCache(request, h, {
         ...marineLicence,
         specialLegalPowers: {
-          consent: payload.consent,
-          ...(userDeclinesConsent && { reason: payload.reason })
+          agree: payload.agree,
+          ...(userAgrees && { reason: payload.reason })
         }
       })
 

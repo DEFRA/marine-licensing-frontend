@@ -5,7 +5,10 @@ import { getMarineLicenceService } from '#src/services/marine-licence-service/in
 import { viewDetailsController, VIEW_DETAILS_VIEW_ROUTE } from './controller.js'
 import { makeGetRequest } from '#src/server/test-helpers/server-requests.js'
 import { errorMessages } from '#src/server/common/constants/error-messages.js'
-import { routes } from '#src/server/common/constants/routes.js'
+import {
+  routes,
+  marineLicenceRoutes
+} from '#src/server/common/constants/routes.js'
 import { mockMarineLicenceApplication } from '#src/server/test-helpers/mocks/marine-licence-mocks.js'
 
 vi.mock('~/src/services/marine-licence-service/index.js')
@@ -24,6 +27,9 @@ describe('marine-licence view details controller', () => {
   beforeEach(() => {
     mockMarineLicenceService = {
       getMarineLicenceById: vi
+        .fn()
+        .mockResolvedValue(createSubmittedMarineLicence()),
+      getPublicMarineLicenceById: vi
         .fn()
         .mockResolvedValue(createSubmittedMarineLicence())
     }
@@ -128,6 +134,7 @@ describe('marine-licence view details controller', () => {
         vi.mocked(getMarineLicenceService).mockReturnValue(mockServiceInstance)
 
         const mockRequest = {
+          path: `${marineLicenceRoutes.MARINE_LICENCE_VIEW_DETAILS}/${mockMarineLicenceApplication.id}`,
           params: { marineLicenceId: mockMarineLicenceApplication.id },
           logger: { error: vi.fn() }
         }
@@ -156,6 +163,7 @@ describe('marine-licence view details controller', () => {
         vi.mocked(getMarineLicenceService).mockReturnValue(mockServiceInstance)
 
         const mockRequest = {
+          path: `${marineLicenceRoutes.MARINE_LICENCE_VIEW_DETAILS}/${mockMarineLicenceApplication.id}`,
           params: { marineLicenceId: mockMarineLicenceApplication.id },
           logger: { error: vi.fn() }
         }
@@ -184,6 +192,7 @@ describe('marine-licence view details controller', () => {
         vi.mocked(getMarineLicenceService).mockReturnValue(mockServiceInstance)
 
         const mockRequest = {
+          path: `${marineLicenceRoutes.MARINE_LICENCE_VIEW_DETAILS}/${mockMarineLicenceApplication.id}`,
           params: { marineLicenceId: mockMarineLicenceApplication.id },
           logger: { error: vi.fn() }
         }
@@ -197,6 +206,78 @@ describe('marine-licence view details controller', () => {
           expect.any(Error),
           'Error displaying marine licence details'
         )
+      })
+    })
+  })
+
+  describe(`GET /marine-licence/view-public-details/{marineLicenceId}`, () => {
+    describe('successful scenarios', () => {
+      test('should return 200 for a valid submitted marine licence', async () => {
+        const { statusCode } = await makeGetRequest({
+          url: `/marine-licence/view-public-details/${mockMarineLicenceApplication.id}`,
+          server: getServer()
+        })
+
+        expect(statusCode).toBe(200)
+      })
+
+      test('should call getPublicMarineLicenceById not getMarineLicenceById', async () => {
+        await makeGetRequest({
+          url: `/marine-licence/view-public-details/${mockMarineLicenceApplication.id}`,
+          server: getServer()
+        })
+
+        expect(mockMarineLicenceService.getPublicMarineLicenceById).toHaveBeenCalledWith(
+          mockMarineLicenceApplication.id
+        )
+        expect(mockMarineLicenceService.getMarineLicenceById).not.toHaveBeenCalled()
+      })
+    })
+
+    describe('controller unit tests', () => {
+      test('should call view with backLink null and short pageCaption for public view', async () => {
+        const marineLicence = createSubmittedMarineLicence()
+        const mockServiceInstance = {
+          getPublicMarineLicenceById: vi.fn().mockResolvedValue(marineLicence)
+        }
+
+        vi.mocked(getMarineLicenceService).mockReturnValue(mockServiceInstance)
+
+        const mockRequest = {
+          path: `${marineLicenceRoutes.MARINE_LICENCE_VIEW_DETAILS_PUBLIC}/${mockMarineLicenceApplication.id}`,
+          params: { marineLicenceId: mockMarineLicenceApplication.id },
+          logger: { error: vi.fn() }
+        }
+        const mockH = { view: vi.fn() }
+
+        await viewDetailsController.handler(mockRequest, mockH)
+
+        expect(mockServiceInstance.getPublicMarineLicenceById).toHaveBeenCalledWith(
+          mockMarineLicenceApplication.id
+        )
+        expect(mockH.view).toHaveBeenCalledWith(
+          VIEW_DETAILS_VIEW_ROUTE,
+          expect.objectContaining({
+            pageTitle: marineLicence.projectName,
+            pageCaption: marineLicence.applicationReference,
+            backLink: null
+          })
+        )
+      })
+    })
+
+    describe('error scenarios', () => {
+      test('should propagate 403 when public endpoint returns forbidden', async () => {
+        mockMarineLicenceService.getPublicMarineLicenceById.mockRejectedValue(
+          Boom.forbidden('Forbidden')
+        )
+
+        const { statusCode } = await makeGetRequest({
+          url: `/marine-licence/view-public-details/${mockMarineLicenceApplication.id}`,
+          server: getServer()
+        })
+
+        expect(statusCode).toBe(403)
       })
     })
   })

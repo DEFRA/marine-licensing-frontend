@@ -3,7 +3,8 @@ import { createLogger } from '#src/server/common/helpers/logging/logger.js'
 import { authenticatedGetRequest } from '#src/server/common/helpers/authenticated-requests.js'
 
 const apiPaths = {
-  getMarineLicence: (id) => `/marine-licence/${id}`
+  getMarineLicence: (id) => `/marine-licence/${id}`,
+  getPublicMarineLicence: (id) => `/public/marine-licence/${id}`
 }
 
 export class MarineLicenceService {
@@ -13,15 +14,23 @@ export class MarineLicenceService {
   }
 
   async getMarineLicenceById(id) {
+    return this.getMarineLicenceData({ id })
+  }
+
+  async getPublicMarineLicenceById(id) {
+    return this.getMarineLicenceData({ id, isPublic: true })
+  }
+
+  async getMarineLicenceData({ id, isPublic = false }) {
     if (!id) {
       this.logger.error({ id }, errorMessages.MARINE_LICENCE_NOT_FOUND)
       throw new Error(errorMessages.MARINE_LICENCE_NOT_FOUND)
     }
 
-    const { payload } = await authenticatedGetRequest(
-      this.request,
-      apiPaths.getMarineLicence(id)
-    )
+    const endpoint = isPublic
+      ? apiPaths.getPublicMarineLicence(id)
+      : apiPaths.getMarineLicence(id)
+    const { payload } = await authenticatedGetRequest(this.request, endpoint)
 
     if (payload?.message !== 'success' || !payload.value) {
       this.logger.error({ id }, errorMessages.MARINE_LICENCE_DATA_NOT_FOUND)

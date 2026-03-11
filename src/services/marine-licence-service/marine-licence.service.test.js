@@ -172,4 +172,105 @@ describe('MarineLicenceService', () => {
       })
     })
   })
+
+  describe('getPublicMarineLicenceById', () => {
+    const validId = '507f1f77bcf86cd799439011'
+
+    beforeEach(() => {
+      service = new MarineLicenceService(mockRequest, mockLogger)
+    })
+
+    describe('successful scenarios', () => {
+      test('should return marine licence data for valid ID using public endpoint', async () => {
+        const expectedMarineLicence = {
+          id: validId,
+          projectName: 'Test Project',
+          applicationReference: 'ML/2024/12345'
+        }
+
+        vi.mocked(authenticatedGetRequest).mockResolvedValue({
+          payload: {
+            message: 'success',
+            value: expectedMarineLicence
+          }
+        })
+
+        const result = await service.getPublicMarineLicenceById(validId)
+
+        expect(authenticatedGetRequest).toHaveBeenCalledWith(
+          mockRequest,
+          `/public/marine-licence/${validId}`
+        )
+        expect(result).toEqual(expectedMarineLicence)
+        expect(mockLogger.error).not.toHaveBeenCalled()
+      })
+    })
+
+    describe('invalid ID validation', () => {
+      test.each([
+        ['null', null],
+        ['undefined', undefined],
+        ['empty string', '']
+      ])('should throw when ID is %s', async (_label, invalidId) => {
+        await expect(
+          service.getPublicMarineLicenceById(invalidId)
+        ).rejects.toThrow(errorMessages.MARINE_LICENCE_NOT_FOUND)
+
+        expect(mockLogger.error).toHaveBeenCalledWith(
+          { id: invalidId },
+          errorMessages.MARINE_LICENCE_NOT_FOUND
+        )
+        expect(authenticatedGetRequest).not.toHaveBeenCalled()
+      })
+    })
+
+    describe('API response errors', () => {
+      test('should throw error when API response message is not success', async () => {
+        vi.mocked(authenticatedGetRequest).mockResolvedValue({
+          payload: {
+            message: 'error',
+            value: null
+          }
+        })
+
+        await expect(
+          service.getPublicMarineLicenceById(validId)
+        ).rejects.toThrow(errorMessages.MARINE_LICENCE_DATA_NOT_FOUND)
+
+        expect(mockLogger.error).toHaveBeenCalledWith(
+          { id: validId },
+          errorMessages.MARINE_LICENCE_DATA_NOT_FOUND
+        )
+      })
+
+      test('should throw error when API response value is null', async () => {
+        vi.mocked(authenticatedGetRequest).mockResolvedValue({
+          payload: {
+            message: 'success',
+            value: null
+          }
+        })
+
+        await expect(
+          service.getPublicMarineLicenceById(validId)
+        ).rejects.toThrow(errorMessages.MARINE_LICENCE_DATA_NOT_FOUND)
+      })
+    })
+
+    describe('network errors', () => {
+      test('should propagate network errors from authenticatedGetRequest', async () => {
+        const networkError = new Error('Network timeout')
+        vi.mocked(authenticatedGetRequest).mockRejectedValue(networkError)
+
+        await expect(
+          service.getPublicMarineLicenceById(validId)
+        ).rejects.toThrow('Network timeout')
+
+        expect(authenticatedGetRequest).toHaveBeenCalledWith(
+          mockRequest,
+          `/public/marine-licence/${validId}`
+        )
+      })
+    })
+  })
 })

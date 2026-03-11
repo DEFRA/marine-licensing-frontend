@@ -10,14 +10,15 @@ import {
   resetExemptionSiteDetails
 } from '~/src/server/common/helpers/exemptions/session-cache/utils.js'
 import {
-  authenticatedPatchRequest,
-  authenticatedGetRequest
+  authenticatedGetRequest,
+  authenticatedPatchRequest
 } from '~/src/server/common/helpers/authenticated-requests.js'
 import {
   getMcmsContextFromCache,
   clearMcmsContextCache
 } from '~/src/server/common/helpers/mcms-context/cache-mcms-context.js'
 import {
+  clearMarineLicenceCache,
   getMarineLicenceCache,
   setMarineLicenceCache
 } from '~/src/server/common/helpers/marine-licence/session-cache/utils.js'
@@ -128,6 +129,7 @@ export const mockMarineLicence = (m) => {
     return m
   })
   vi.mocked(setMarineLicenceCache).mockResolvedValue(undefined)
+  vi.mocked(clearMarineLicenceCache).mockResolvedValue(undefined)
   const existingMock = vi
     .mocked(authenticatedGetRequest)
     .getMockImplementation()
@@ -151,6 +153,7 @@ export const mockMarineLicence = (m) => {
     })
   })
   return {
+    clearMarineLicenceCache,
     getMarineLicenceCache,
     setMarineLicenceCache,
     authenticatedGetRequest

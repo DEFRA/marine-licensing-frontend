@@ -94,9 +94,9 @@ export const checkYourAnswersSubmitController = {
           err: error,
           exemptionId: id
         },
-        errorMessages.SUBMISSION_FAILED
+        errorMessages.EXEMPTION_SUBMISSION_FAILED
       )
-      throw Boom.badRequest(errorMessages.SUBMISSION_FAILED, error)
+      throw Boom.badRequest(errorMessages.EXEMPTION_SUBMISSION_FAILED, error)
     }
   }
 }

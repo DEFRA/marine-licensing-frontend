@@ -6,8 +6,10 @@ import {
 } from '~/tests/integration/shared/test-setup-helpers.js'
 import { mockMarineLicenceApplication } from '~/src/server/test-helpers/mocks/marine-licence-mocks.js'
 import { loadPage } from '~/tests/integration/shared/app-server.js'
+import { makePostRequest } from '~/src/server/test-helpers/server-requests.js'
 
 import * as authUtils from '~/src/server/common/plugins/auth/utils.js'
+import * as authRequests from '~/src/server/common/helpers/authenticated-requests.js'
 import * as sessionCacheUtils from '~/src/server/common/helpers/session-cache/utils.js'
 import {
   routes,
@@ -68,5 +70,51 @@ describe('Declaration page', () => {
     expect(items[3].textContent).toBe(
       'understand I may be sued if I give incorrect information, knowingly or recklessly'
     )
+  })
+
+  describe('Submit marine licence', () => {
+    const mockApplicationReference = 'ML-REF-INT-001'
+
+    beforeEach(() => {
+      vi.mocked(sessionCacheUtils.getProjectType).mockReturnValue(
+        PROJECT_TYPE.MARINE_LICENCE
+      )
+      mockMarineLicence({
+        ...mockMarineLicenceApplication,
+        projectName: 'My ML Project'
+      })
+      vi.spyOn(authRequests, 'authenticatedPostRequest').mockResolvedValue({
+        payload: {
+          message: 'success',
+          value: { applicationReference: mockApplicationReference }
+        }
+      })
+    })
+
+    test('submits marine licence and redirects to confirmation page', async () => {
+      const { clearMarineLicenceCache } = mockMarineLicence({
+        ...mockMarineLicenceApplication,
+        projectName: 'My ML Project'
+      })
+
+      const { statusCode, headers } = await makePostRequest({
+        url: routes.DECLARATION,
+        server: getServer()
+      })
+
+      expect(statusCode).toBe(302)
+      expect(headers.location).toBe(
+        `${marineLicenceRoutes.MARINE_LICENCE_CONFIRMATION}?applicationReference=${mockApplicationReference}`
+      )
+      expect(authRequests.authenticatedPostRequest).toHaveBeenCalledWith(
+        expect.any(Object),
+        '/marine-licence/submit',
+        { id: mockMarineLicenceApplication.id }
+      )
+      expect(clearMarineLicenceCache).toHaveBeenCalledWith(
+        expect.any(Object),
+        expect.any(Object)
+      )
+    })
   })
 })

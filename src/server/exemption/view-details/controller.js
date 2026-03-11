@@ -1,6 +1,5 @@
 import Boom from '@hapi/boom'
 import { errorMessages } from '#src/server/common/constants/error-messages.js'
-import { PROJECT_STATUS } from '#src/server/common/constants/projects.js'
 import { routes } from '#src/server/common/constants/routes.js'
 import { processSiteDetails } from '#src/server/common/helpers/exemptions/exemption-site-details.js'
 import { buildSiteLocationData } from '#src/server/common/helpers/site-location-data.js'
@@ -8,6 +7,7 @@ import { getExemptionService } from '#src/services/exemption-service/index.js'
 import { getAuthProvider } from '#src/server/common/helpers/authenticated-requests.js'
 import { AUTH_STRATEGIES } from '#src/server/common/constants/auth.js'
 import { getTagStyle } from '#src/server/common/helpers/ui/get-tag-style.js'
+import { isProjectViewable } from '#src/server/common/helpers/view-details/utils.js'
 
 export const VIEW_DETAILS_VIEW_ROUTE = 'exemption/view-details/index'
 export const viewDetailsController = {
@@ -26,10 +26,7 @@ export const viewDetailsController = {
       const exemptionService = getExemptionService(request)
       const exemption = await exemptionService[serviceMethod](exemptionId)
 
-      if (
-        exemption.status === PROJECT_STATUS.DRAFT ||
-        !exemption.applicationReference
-      ) {
+      if (!isProjectViewable(exemption)) {
         request.logger.error(
           {
             id: exemptionId,

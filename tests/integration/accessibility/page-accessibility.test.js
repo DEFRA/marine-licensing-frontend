@@ -15,7 +15,10 @@ import {
   mockExemptionWithShapefile,
   mockProjectList
 } from '~/src/server/test-helpers/mocks/exemption.js'
-import { mockMarineLicenceApplication } from '~/src/server/test-helpers/mocks/marine-licence-mocks.js'
+import {
+  mockMarineLicenceApplication,
+  mockSubmittedMarineLicenceApplication
+} from '~/src/server/test-helpers/mocks/marine-licence-mocks.js'
 import {
   mockExemption,
   mockMarineLicence,
@@ -205,7 +208,13 @@ describe('Page accessibility checks (Axe)', () => {
     {
       url: marineLicenceRoutes.MARINE_LICENCE_DELETE,
       title: 'Are you sure you want to delete this project?',
-      marineLicence: true
+      isMarineLicence: true
+    },
+    {
+      url: `${marineLicenceRoutes.MARINE_LICENCE_VIEW_DETAILS}/${mockSubmittedMarineLicenceApplication.id}`,
+      title: mockSubmittedMarineLicenceApplication.projectName,
+      marineLicence: mockSubmittedMarineLicenceApplication,
+      isMarineLicence: true
     },
     {
       url: routes.postLogin.CONFIRM_INDIVIDUAL,
@@ -249,6 +258,7 @@ describe('Page accessibility checks (Axe)', () => {
       title,
       url,
       exemption = mockExemptionData,
+      marineLicence = mockMarineLicenceApplication,
       isMarineLicence = false,
       session
     }) => {
@@ -258,7 +268,7 @@ describe('Page accessibility checks (Axe)', () => {
       }
 
       if (isMarineLicence) {
-        mockMarineLicence(mockMarineLicenceApplication)
+        mockMarineLicence(marineLicence)
       } else {
         mockExemption(exemption)
         vi.mocked(authenticatedGetRequest).mockImplementation(

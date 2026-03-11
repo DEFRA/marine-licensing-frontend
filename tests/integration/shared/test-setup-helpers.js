@@ -134,7 +134,10 @@ export const mockMarineLicence = (m) => {
     .mocked(authenticatedGetRequest)
     .getMockImplementation()
   vi.mocked(authenticatedGetRequest).mockImplementation((request, endpoint) => {
-    if (endpoint?.startsWith('/marine-licence/')) {
+    if (
+      endpoint?.startsWith('/marine-licence/') ||
+      endpoint?.startsWith('/projects')
+    ) {
       return Promise.resolve({
         payload: {
           message: 'success',

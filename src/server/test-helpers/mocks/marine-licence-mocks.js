@@ -1,5 +1,5 @@
+import { MARINE_LICENCE_KEY } from '#src/server/common/constants/marine-licence.js'
 import { faker } from '@faker-js/faker'
-import { mockExemptionMcmsContext } from './exemption'
 
 export const mockMarineLicenceTaskList = {
   projectName: 'COMPLETED'
@@ -9,5 +9,11 @@ export const mockMarineLicenceApplication = {
   id: faker.database.mongodbObjectId(),
   projectName: 'Test Project',
   taskList: mockMarineLicenceTaskList,
-  mcmsContext: mockExemptionMcmsContext
+  projectType: MARINE_LICENCE_KEY
+}
+
+export const mockSubmittedMarineLicenceApplication = {
+  ...mockMarineLicenceApplication,
+  status: 'Submitted',
+  applicationReference: 'MLA/2026/10264'
 }

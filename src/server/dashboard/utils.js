@@ -26,12 +26,17 @@ const getDraftActions = (id, escapedProjectName, projectType) => {
   return `<a href="${taskListRoute}/${id}" class="govuk-link govuk-!-margin-right-4 govuk-link--no-visited-state" aria-label="Continue to task list">Continue</a><a href="${deleteRoute}/${id}" class="govuk-link govuk-link--no-visited-state" aria-label="Delete ${escapedProjectName}">Delete</a>`
 }
 
-const getActiveActions = (id, escapedProjectName, canWithdraw) => {
+const getActiveActions = (id, escapedProjectName, projectType, canWithdraw) => {
   const marginClass = canWithdraw
     ? 'govuk-link govuk-!-margin-right-4 '
     : 'govuk-link '
 
-  let buttons = `<a href="${routes.VIEW_DETAILS}/${id}" class="${marginClass}govuk-link--no-visited-state" aria-label="View details of ${escapedProjectName}">View details</a>`
+  const viewRoute =
+    projectType === MARINE_LICENCE_KEY
+      ? marineLicenceRoutes.MARINE_LICENCE_VIEW_DETAILS
+      : routes.VIEW_DETAILS
+
+  let buttons = `<a href="${viewRoute}/${id}" class="${marginClass}govuk-link--no-visited-state" aria-label="View details of ${escapedProjectName}">View details</a>`
 
   if (canWithdraw) {
     buttons += `<a href="${routes.WITHDRAW_EXEMPTION}/${id}" class="govuk-link govuk-link--no-visited-state" aria-label="Withdraw ${escapedProjectName}">Withdraw</a>`
@@ -57,7 +62,7 @@ export const getActionButtons = (project) => {
   if (projectType === MARINE_LICENCE_KEY) {
     return status === PROJECT_STATUS.DRAFT && isOwnProject
       ? getDraftActions(id, escapedProjectName, projectType)
-      : ''
+      : getActiveActions(id, escapedProjectName, projectType)
   }
 
   const canWithdraw = status === PROJECT_STATUS.ACTIVE && !!isOwnProject
@@ -65,7 +70,7 @@ export const getActionButtons = (project) => {
   if (isOwnProject) {
     return status === PROJECT_STATUS.DRAFT
       ? getDraftActions(id, escapedProjectName, projectType)
-      : getActiveActions(id, escapedProjectName, canWithdraw)
+      : getActiveActions(id, escapedProjectName, projectType, canWithdraw)
   }
 
   return project.status === PROJECT_STATUS.DRAFT

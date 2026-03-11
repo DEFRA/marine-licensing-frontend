@@ -227,10 +227,12 @@ describe('marine-licence view details controller', () => {
           server: getServer()
         })
 
-        expect(mockMarineLicenceService.getPublicMarineLicenceById).toHaveBeenCalledWith(
-          mockMarineLicenceApplication.id
-        )
-        expect(mockMarineLicenceService.getMarineLicenceById).not.toHaveBeenCalled()
+        expect(
+          mockMarineLicenceService.getPublicMarineLicenceById
+        ).toHaveBeenCalledWith(mockMarineLicenceApplication.id)
+        expect(
+          mockMarineLicenceService.getMarineLicenceById
+        ).not.toHaveBeenCalled()
       })
     })
 
@@ -252,9 +254,9 @@ describe('marine-licence view details controller', () => {
 
         await viewDetailsController.handler(mockRequest, mockH)
 
-        expect(mockServiceInstance.getPublicMarineLicenceById).toHaveBeenCalledWith(
-          mockMarineLicenceApplication.id
-        )
+        expect(
+          mockServiceInstance.getPublicMarineLicenceById
+        ).toHaveBeenCalledWith(mockMarineLicenceApplication.id)
         expect(mockH.view).toHaveBeenCalledWith(
           VIEW_DETAILS_VIEW_ROUTE,
           expect.objectContaining({

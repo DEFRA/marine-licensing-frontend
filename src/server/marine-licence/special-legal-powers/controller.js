@@ -11,11 +11,11 @@ import { authenticatedPatchRequest } from '#src/server/common/helpers/authentica
 
 import joi from 'joi'
 
-export const SPECIAL_LEGAL_POWERS_VIEW_ROUTE = 'marine-licence/special-legal-powers/index'
+export const SPECIAL_LEGAL_POWERS_VIEW_ROUTE =
+  'marine-licence/special-legal-powers/index'
 
 export const errorMessages = {
-  SPECIAL_LEGAL_POWERS_DETAILS_REQUIRED:
-    'Provide details of the legal powers',
+  SPECIAL_LEGAL_POWERS_DETAILS_REQUIRED: 'Provide details of the legal powers',
   SPECIAL_LEGAL_POWERS_DETAILS_MAX_LENGTH:
     'Details of the legal powers must be 1000 characters or fewer',
   SPECIAL_LEGAL_POWERS_DETAILS_REQUIRED:
@@ -23,13 +23,17 @@ export const errorMessages = {
 }
 
 const specialLegalPowersSettings = {
-  pageTitle: 'Does your organisation have special legal powers to do any of this project?',
-  heading: 'Does your organisation have special legal powers to do any of this project?'
+  pageTitle:
+    'Does your organisation have special legal powers to do any of this project?',
+  heading:
+    'Does your organisation have special legal powers to do any of this project?'
 }
 
 const getBackLink = (request) => {
   const fromCheckYourAnswers = request.query?.from === 'check-your-answers'
-  return fromCheckYourAnswers ? marineLicenceRoutes.MARINE_LICENCE_CHECK_YOUR_ANSWERS : marineLicenceRoutes.MARINE_LICENCE_TASK_LIST
+  return fromCheckYourAnswers
+    ? marineLicenceRoutes.MARINE_LICENCE_CHECK_YOUR_ANSWERS
+    : marineLicenceRoutes.MARINE_LICENCE_TASK_LIST
 }
 
 export const specialLegalPowersController = {
@@ -105,11 +109,15 @@ export const specialLegalPowersSubmitController = {
       // consent: 'yes' = user consents to publish, consent: 'no' = user declines consent
       const userDeclinesConsent = payload.consent === 'no'
 
-      await authenticatedPatchRequest(request, '/marine-licence/special-legal-powers', {
-        consent: payload.consent,
-        ...(userDeclinesConsent && { reason: payload.reason }),
-        id: marineLicence.id
-      })
+      await authenticatedPatchRequest(
+        request,
+        '/marine-licence/special-legal-powers',
+        {
+          consent: payload.consent,
+          ...(userDeclinesConsent && { reason: payload.reason }),
+          id: marineLicence.id
+        }
+      )
 
       await setMarineLicenceCache(request, h, {
         ...marineLicence,

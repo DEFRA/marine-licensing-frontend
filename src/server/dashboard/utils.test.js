@@ -349,6 +349,8 @@ describe('getActionButtons', () => {
       isOwnProject: true
     }
     const result = getActionButtons(marineLicenceActive)
-    expect(result).toBe('')
+    expect(result).toBe(
+      '<a href="/marine-licence/view-details/ml123" class="govuk-link govuk-link--no-visited-state" aria-label="View details of Marine Licence Project">View details</a>'
+    )
   })
 })

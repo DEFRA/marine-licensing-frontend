@@ -1,5 +1,8 @@
 import Boom from '@hapi/boom'
-import { getMarineLicenceCache } from '#src/server/common/helpers/marine-licence/session-cache/utils.js'
+import {
+  clearMarineLicenceCache,
+  getMarineLicenceCache
+} from '#src/server/common/helpers/marine-licence/session-cache/utils.js'
 import {
   getExemptionCache,
   clearExemptionCache
@@ -10,7 +13,11 @@ import { authenticatedPostRequest } from '#src/server/common/helpers/authenticat
 import { errorMessages } from '#src/server/common/constants/error-messages.js'
 import { PROJECT_TYPE } from '#src/server/common/constants/projects.js'
 import { getBackLink } from '#src/server/declaration/utils.js'
-import { routes, apiRoutes } from '#src/server/common/constants/routes.js'
+import {
+  apiRoutes,
+  marineLicenceRoutes,
+  routes
+} from '#src/server/common/constants/routes.js'
 
 export const DECLARATION_VIEW_ROUTE = 'declaration/index'
 
@@ -53,17 +60,29 @@ const submitMarineLicence = async (request, h) => {
       throw new Error(errorMessages.USER_SESSION_NOT_FOUND)
     }
 
-    // Request to follow in ML-1054
-    return h.view(
-      DECLARATION_VIEW_ROUTE,
-      getViewContext(PROJECT_TYPE.MARINE_LICENCE)
+    const { payload: response } = await authenticatedPostRequest(
+      request,
+      apiRoutes.SUBMIT_MARINE_LICENCE,
+      {
+        id
+      }
     )
+
+    if (response?.message === 'success' && response?.value) {
+      await clearMarineLicenceCache(request, h)
+      const { applicationReference } = response.value
+      return h.redirect(
+        `${marineLicenceRoutes.MARINE_LICENCE_CONFIRMATION}?applicationReference=${encodeURIComponent(applicationReference)}`
+      )
+    }
+
+    throw new Error(errorMessages.UNEXPECTED_API_RESPONSE)
   } catch (error) {
     request.logger.error(
       { err: error, marineLicenceId: id },
-      errorMessages.SUBMISSION_FAILED
+      errorMessages.MARINE_LICENCE_SUBMISSION_FAILED
     )
-    throw Boom.badRequest(errorMessages.SUBMISSION_FAILED, error)
+    throw Boom.badRequest(errorMessages.MARINE_LICENCE_SUBMISSION_FAILED, error)
   }
 }
 

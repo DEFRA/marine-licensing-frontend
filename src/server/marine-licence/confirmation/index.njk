@@ -1,0 +1,20 @@
+{% extends 'layouts/page.njk' %}
+{% from "govuk/components/panel/macro.njk" import govukPanel %}
+{% block content %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+      {{ govukPanel({
+        titleText: "The information relating to your marine licence application has been sent",
+        html: "Your reference number<br><strong>" + (applicationReference | escape) + "</strong>"
+      }) }}
+      <p class="govuk-body">We've sent you a confirmation email with your reference number.</p>
+      <h2 class="govuk-heading-m">What happens next</h2>
+      <p class="govuk-body">We'll review your information and contact you within 5 working days.</p>
+      <p class="govuk-body">
+        If you need to contact us, you can email
+        <a href="mailto:marine.consents@marinemanagement.org.uk" class="govuk-link">marine.consents@marinemanagement.org.uk</a>,
+        quoting your reference number.
+      </p>
+    </div>
+  </div>
+{% endblock %}

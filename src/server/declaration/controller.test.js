@@ -1,5 +1,8 @@
 import { vi } from 'vitest'
-import { getMarineLicenceCache } from '#src/server/common/helpers/marine-licence/session-cache/utils.js'
+import {
+  clearMarineLicenceCache,
+  getMarineLicenceCache
+} from '#src/server/common/helpers/marine-licence/session-cache/utils.js'
 import {
   getExemptionCache,
   clearExemptionCache
@@ -7,6 +10,7 @@ import {
 import { authenticatedPostRequest } from '#src/server/common/helpers/authenticated-requests.js'
 import { getProjectType } from '#src/server/common/helpers/session-cache/utils.js'
 import * as authUtils from '#src/server/common/plugins/auth/utils.js'
+import * as authRequests from '#src/server/common/helpers/authenticated-requests.js'
 import {
   routes,
   apiRoutes,
@@ -27,6 +31,7 @@ vi.mock('#src/server/common/helpers/exemptions/session-cache/utils.js')
 vi.mock('#src/server/common/helpers/authenticated-requests.js')
 vi.mock('#src/server/common/helpers/session-cache/utils.js')
 vi.mock('#src/server/common/plugins/auth/utils.js')
+vi.mock('#src/server/common/helpers/authenticated-requests.js')
 
 describe('#declarationController', () => {
   let mockRequest
@@ -172,6 +177,15 @@ describe('#declarationSubmitController', () => {
   describe('#declarationSubmitController/marine-licence', () => {
     beforeEach(() => {
       vi.mocked(getProjectType).mockReturnValue(PROJECT_TYPE.MARINE_LICENCE)
+      vi.mocked(getMarineLicenceCache).mockReturnValue(
+        mockMarineLicenceApplication
+      )
+      vi.spyOn(authRequests, 'authenticatedPostRequest').mockResolvedValue({
+        payload: {
+          message: 'success',
+          value: { applicationReference: 'ML-REF-001' }
+        }
+      })
     })
 
     test('throws error when marine licence has no id', async () => {
@@ -182,28 +196,41 @@ describe('#declarationSubmitController', () => {
       ).rejects.toThrow('Marine licence not found')
     })
 
-    test('stays on the same page for marine-license', async () => {
-      vi.mocked(getMarineLicenceCache).mockReturnValue(
-        mockMarineLicenceApplication
-      )
+    test('correctly submits marine-licence with correct arguments', async () => {
+      mockH.redirect = vi.fn()
 
       await declarationSubmitController.handler(mockRequest, mockH)
 
-      expect(mockH.view).toHaveBeenCalledWith(DECLARATION_VIEW_ROUTE, {
-        pageTitle: 'Declaration',
-        backLink: marineLicenceRoutes.MARINE_LICENCE_CHECK_YOUR_ANSWERS
-      })
+      expect(authRequests.authenticatedPostRequest).toHaveBeenCalledWith(
+        mockRequest,
+        '/marine-licence/submit',
+        { id: mockMarineLicenceApplication.id }
+      )
+
+      expect(clearMarineLicenceCache).toHaveBeenCalledWith(mockRequest, mockH)
+      expect(mockH.redirect).toHaveBeenCalledWith(
+        `${marineLicenceRoutes.MARINE_LICENCE_CONFIRMATION}?applicationReference=ML-REF-001`
+      )
     })
 
-    test('correct session error handling for marine-license', async () => {
-      vi.spyOn(authUtils, 'getUserSession').mockResolvedValueOnce({})
-      vi.mocked(getMarineLicenceCache).mockReturnValue(
-        mockMarineLicenceApplication
-      )
+    test('throws when API returns unexpected response', async () => {
+      vi.spyOn(authRequests, 'authenticatedPostRequest').mockResolvedValue({
+        payload: { message: 'error' }
+      })
 
       await expect(
         declarationSubmitController.handler(mockRequest, mockH)
-      ).rejects.toThrow(errorMessages.SUBMISSION_FAILED)
+      ).rejects.toThrow(errorMessages.MARINE_LICENCE_SUBMISSION_FAILED)
+    })
+
+    test('throws when API returns success but no value', async () => {
+      vi.spyOn(authRequests, 'authenticatedPostRequest').mockResolvedValue({
+        payload: { message: 'success', value: null }
+      })
+
+      await expect(
+        declarationSubmitController.handler(mockRequest, mockH)
+      ).rejects.toThrow(errorMessages.MARINE_LICENCE_SUBMISSION_FAILED)
     })
   })
 })

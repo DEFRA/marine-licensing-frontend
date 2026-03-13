@@ -8,10 +8,12 @@ import { routes } from '~/src/server/common/constants/routes.js'
 import {
   setupTestServer,
   mockExemptions,
+  mockMarineLicence,
   mockEmployeeExemptions
 } from '~/tests/integration/shared/test-setup-helpers.js'
 import { loadPage } from '~/tests/integration/shared/app-server.js'
-import { getExemptionsTableRow } from '~/tests/integration/shared/dom-helpers.js'
+import { getProjectsTableRow } from '~/tests/integration/shared/dom-helpers.js'
+import { mockMarineLicenceApplication } from '~/src/server/test-helpers/mocks/marine-licence-mocks.js'
 
 describe('Dashboard', () => {
   const getServer = setupTestServer()
@@ -39,6 +41,14 @@ describe('Dashboard', () => {
     }
   ]
 
+  const marineLicences = [
+    {
+      ...mockMarineLicenceApplication,
+      status: 'Submitted',
+      submittedAt: '2025-10-23T12:00:00.000Z'
+    }
+  ]
+
   it('should render the dashboard page title, heading and Create button', async () => {
     mockExemptions(exemptions)
     const doc = await loadDashboardPage()
@@ -50,7 +60,7 @@ describe('Dashboard', () => {
   it('should render a draft exemption', async () => {
     mockExemptions(exemptions)
     const doc = await loadDashboardPage()
-    const cells = getExemptionsTableRow({
+    const cells = getProjectsTableRow({
       document: doc,
       name: 'Draft Project'
     })
@@ -74,7 +84,7 @@ describe('Dashboard', () => {
   it('should render an active exemption', async () => {
     mockExemptions(exemptions)
     const doc = await loadDashboardPage()
-    const cells = getExemptionsTableRow({
+    const cells = getProjectsTableRow({
       document: doc,
       name: 'Active Project'
     })
@@ -92,7 +102,33 @@ describe('Dashboard', () => {
     ).toHaveAttribute('href', '/exemption/view-details/456')
   })
 
-  it('should render a message if there are no exemptions', async () => {
+  it('should render a submitted marine licence', async () => {
+    mockMarineLicence(marineLicences)
+    const doc = await loadDashboardPage()
+
+    const cells = getProjectsTableRow({
+      document: doc,
+      name: mockMarineLicenceApplication.projectName
+    })
+
+    const actionsCell = cells.pop()
+    const cellContents = cells.map((cell) => cell.textContent.trim())
+    expect(cellContents).toEqual([
+      'Test Project',
+      'Marine licence application',
+      '-',
+      'Submitted',
+      '23 Oct 2025'
+    ])
+    expect(
+      getByRole(actionsCell, 'link', { name: 'View details of Test Project' })
+    ).toHaveAttribute(
+      'href',
+      `/marine-licence/view-details/${mockMarineLicenceApplication.id}`
+    )
+  })
+
+  it('should render a message if there are no projects', async () => {
     mockExemptions([])
     const doc = await loadDashboardPage()
     const table = queryByRole(doc, 'table', { name: 'Projects' })
@@ -149,14 +185,14 @@ describe('Dashboard', () => {
       mockExemptions(exemptions)
       const doc = await loadDashboardPage()
 
-      const draftRow = getExemptionsTableRow({
+      const draftRow = getProjectsTableRow({
         document: doc,
         name: 'Draft Project'
       })
       const draftDateCell = draftRow[4]
       expect(draftDateCell).toHaveAttribute('data-sort-value', '0')
 
-      const activeRow = getExemptionsTableRow({
+      const activeRow = getProjectsTableRow({
         document: doc,
         name: 'Active Project'
       })
@@ -293,7 +329,7 @@ describe('Dashboard', () => {
       mockEmployeeExemptions(employeeExemptions)
       const doc = await loadDashboardPage()
 
-      const cells = getExemptionsTableRow({
+      const cells = getProjectsTableRow({
         document: doc,
         name: 'My Draft Project'
       })
@@ -322,7 +358,7 @@ describe('Dashboard', () => {
       mockEmployeeExemptions(employeeExemptions)
       const doc = await loadDashboardPage()
 
-      const cells = getExemptionsTableRow({
+      const cells = getProjectsTableRow({
         document: doc,
         name: 'My Draft Project'
       })
@@ -340,7 +376,7 @@ describe('Dashboard', () => {
       mockEmployeeExemptions(employeeExemptions)
       const doc = await loadDashboardPage()
 
-      const cells = getExemptionsTableRow({
+      const cells = getProjectsTableRow({
         document: doc,
         name: 'My Active Project'
       })
@@ -357,7 +393,7 @@ describe('Dashboard', () => {
       mockEmployeeExemptions(employeeExemptions)
       const doc = await loadDashboardPage()
 
-      const cells = getExemptionsTableRow({
+      const cells = getProjectsTableRow({
         document: doc,
         name: 'Colleague Draft'
       })
@@ -371,7 +407,7 @@ describe('Dashboard', () => {
       mockEmployeeExemptions(employeeExemptions)
       const doc = await loadDashboardPage()
 
-      const cells = getExemptionsTableRow({
+      const cells = getProjectsTableRow({
         document: doc,
         name: 'Colleague Active'
       })

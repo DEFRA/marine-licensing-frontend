@@ -1,0 +1,7 @@
+@use 'govuk-frontend' as *;
+
+// TODO: Tag colour pending approval from Tom - may change
+.app-tag--light-blue {
+  color: govuk-colour('blue', $variant: 'shade-50');
+  background-color: govuk-colour('blue', $variant: 'tint-50');
+}

@@ -47,7 +47,7 @@ describe('taskList utils', () => {
       {
         href: routes.REVIEW_SITE_DETAILS,
         status: {
-          tag: { text: 'In Progress', classes: 'govuk-tag--light-blue' }
+          tag: { text: 'In Progress', classes: 'app-tag--light-blue' }
         },
         title: { classes: 'govuk-link--no-visited-state', text: 'Site details' }
       },
@@ -80,7 +80,7 @@ describe('taskList utils', () => {
 
       {
         href: routes.SITE_DETAILS,
-        status: { tag: { text: 'Incomplete', classes: 'govuk-tag--blue' } },
+        status: { tag: { text: 'Incomplete', classes: '' } },
         title: {
           classes: 'govuk-link--no-visited-state',
           text: 'Site details'
@@ -101,7 +101,7 @@ describe('taskList utils', () => {
     expect(transformTaskList({})).toEqual([
       {
         href: routes.PROJECT_NAME,
-        status: { tag: { text: 'Incomplete', classes: 'govuk-tag--blue' } },
+        status: { tag: { text: 'Incomplete', classes: '' } },
         title: {
           classes: 'govuk-link--no-visited-state',
           text: 'Project name'
@@ -109,7 +109,7 @@ describe('taskList utils', () => {
       },
       {
         href: routes.SITE_DETAILS,
-        status: { tag: { text: 'Incomplete', classes: 'govuk-tag--blue' } },
+        status: { tag: { text: 'Incomplete', classes: '' } },
         title: {
           classes: 'govuk-link--no-visited-state',
           text: 'Site details'
@@ -117,7 +117,7 @@ describe('taskList utils', () => {
       },
       {
         href: routes.PUBLIC_REGISTER,
-        status: { tag: { text: 'Incomplete', classes: 'govuk-tag--blue' } },
+        status: { tag: { text: 'Incomplete', classes: '' } },
         title: {
           text: 'Sharing your project information publicly',
           classes: 'govuk-link--no-visited-state'

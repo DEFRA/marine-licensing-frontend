@@ -1,8 +1,8 @@
 @use 'govuk-frontend' as *;
 
 .app-loading-spinner {
-  border: 15px solid $govuk-border-colour;
-  border-top: 15px solid $govuk-brand-colour;
+  border: 15px solid govuk-functional-colour(border);
+  border-top: 15px solid govuk-functional-colour(brand);
   border-radius: 50%;
   width: 80px;
   height: 80px;

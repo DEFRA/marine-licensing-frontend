@@ -28,7 +28,7 @@ describe('taskList utils', () => {
       {
         href: marineLicenceRoutes.MARINE_LICENCE_PROJECT_NAME,
         status: {
-          tag: { text: 'In Progress', classes: 'govuk-tag--light-blue' }
+          tag: { text: 'In Progress', classes: 'app-tag--light-blue' }
         },
         title: { classes: 'govuk-link--no-visited-state', text: 'Project name' }
       }
@@ -44,7 +44,7 @@ describe('taskList utils', () => {
       {
         href: marineLicenceRoutes.MARINE_LICENCE_PROJECT_NAME,
         status: {
-          tag: { text: 'Not yet started', classes: 'govuk-tag--blue' }
+          tag: { text: 'Not yet started', classes: '' }
         },
         title: { classes: 'govuk-link--no-visited-state', text: 'Project name' }
       }
@@ -60,7 +60,7 @@ describe('taskList utils', () => {
       {
         href: marineLicenceRoutes.MARINE_LICENCE_PROJECT_NAME,
         status: {
-          tag: { text: 'Not yet started', classes: 'govuk-tag--blue' }
+          tag: { text: 'Not yet started', classes: '' }
         },
         title: { classes: 'govuk-link--no-visited-state', text: 'Project name' }
       }
@@ -76,7 +76,7 @@ describe('taskList utils', () => {
       {
         href: marineLicenceRoutes.MARINE_LICENCE_PROJECT_NAME,
         status: {
-          tag: { text: 'Not yet started', classes: 'govuk-tag--blue' }
+          tag: { text: 'Not yet started', classes: '' }
         },
         title: { classes: 'govuk-link--no-visited-state', text: 'Project name' }
       }

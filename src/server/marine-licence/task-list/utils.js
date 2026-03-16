@@ -5,7 +5,7 @@ const setStatus = (task) => {
     return {
       tag: {
         text: 'Not yet started',
-        classes: 'govuk-tag--blue'
+        classes: ''
       }
     }
   }
@@ -14,7 +14,7 @@ const setStatus = (task) => {
     return {
       tag: {
         text: 'In Progress',
-        classes: 'govuk-tag--light-blue'
+        classes: 'app-tag--light-blue'
       }
     }
   }

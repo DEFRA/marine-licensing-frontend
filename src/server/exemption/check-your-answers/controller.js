@@ -1,20 +1,9 @@
-import Boom from '@hapi/boom'
-import {
-  clearExemptionCache,
-  getExemptionCache
-} from '#src/server/common/helpers/exemptions/session-cache/utils.js'
-import { authenticatedPostRequest } from '#src/server/common/helpers/authenticated-requests.js'
+import { getExemptionCache } from '#src/server/common/helpers/exemptions/session-cache/utils.js'
 import { routes } from '#src/server/common/constants/routes.js'
-import { getUserSession } from '#src/server/common/plugins/auth/utils.js'
 import { processSiteDetails } from '#src/server/common/helpers/exemptions/exemption-site-details.js'
-import { errorMessages } from '#src/server/common/constants/error-messages.js'
 import { getExemptionService } from '#src/services/exemption-service/index.js'
 import { buildSiteLocationData } from '#src/server/common/helpers/site-location-data.js'
 import { RETURN_TO_CACHE_KEY } from '#src/server/common/constants/cache.js'
-
-const apiPaths = {
-  submitExemption: '/exemption/submit'
-}
 
 const checkYourAnswersViewContent = {
   pageTitle: 'Check your answers before sending your information',
@@ -58,45 +47,7 @@ export const checkYourAnswersController = {
   }
 }
 export const checkYourAnswersSubmitController = {
-  async handler(request, h) {
-    const exemption = getExemptionCache(request)
-    const { id } = exemption
-    try {
-      const { displayName, email } = await getUserSession(
-        request,
-        request.state?.userSession
-      )
-      if (!displayName || !email) {
-        throw new Error(errorMessages.USER_SESSION_NOT_FOUND)
-      }
-      const { payload: response } = await authenticatedPostRequest(
-        request,
-        apiPaths.submitExemption,
-        {
-          id,
-          userName: displayName,
-          userEmail: email
-        }
-      )
-
-      if (response?.message === 'success' && response?.value) {
-        await clearExemptionCache(request, h)
-        const { applicationReference } = response.value
-        return h.redirect(
-          `/exemption/confirmation?applicationReference=${applicationReference}`
-        )
-      }
-
-      throw new Error(errorMessages.UNEXPECTED_API_RESPONSE)
-    } catch (error) {
-      request.logger.error(
-        {
-          err: error,
-          exemptionId: id
-        },
-        errorMessages.EXEMPTION_SUBMISSION_FAILED
-      )
-      throw Boom.badRequest(errorMessages.EXEMPTION_SUBMISSION_FAILED, error)
-    }
+  handler(_request, h) {
+    return h.redirect(routes.DECLARATION)
   }
 }

@@ -64,13 +64,10 @@
     }) }}
     <form method="post">
       <input type="hidden" name="csrfToken" value="{{ csrfToken }}"/>
-      <h2 class="govuk-heading-m">Now send your information</h2>
-      <p class="govuk-body">By submitting this information you are confirming that, to the best of your knowledge, the details
-        you are providing are correct.</p>
       {{ govukButton({
-            text: "Confirm and send",
+            text: "Continue",
             attributes: {
-              id: "confirm-and-send"
+              id: "continue"
             }
           }) }}
       </form>

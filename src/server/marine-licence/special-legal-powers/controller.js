@@ -8,6 +8,7 @@ import {
 } from '#src/server/common/helpers/errors.js'
 import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
 import { authenticatedPatchRequest } from '#src/server/common/helpers/authenticated-requests.js'
+import { getMarineLicenceService } from '#src/services/marine-licence-service/index.js'
 
 import joi from 'joi'
 
@@ -37,8 +38,18 @@ const getBackLink = (request) => {
 }
 
 export const specialLegalPowersController = {
-  handler(request, h) {
-    const marineLicence = getMarineLicenceCache(request)
+  async handler(request, h) {
+    let marineLicence = getMarineLicenceCache(request)
+
+    if (!marineLicence.specialLegalPowers && marineLicence.id) {
+      const service = getMarineLicenceService(request)
+      const dbLicence = await service.getMarineLicenceById(marineLicence.id)
+      marineLicence = {
+        ...marineLicence,
+        specialLegalPowers: dbLicence.specialLegalPowers
+      }
+      await setMarineLicenceCache(request, h, marineLicence)
+    }
 
     return h.view(SPECIAL_LEGAL_POWERS_VIEW_ROUTE, {
       ...specialLegalPowersSettings,

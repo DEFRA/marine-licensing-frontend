@@ -26,7 +26,7 @@ describe('#specialLegalPowers', () => {
   const mockLicence = {
     projectName: 'Test Project',
     id: 'test-id',
-    specialLegalPowers: { agree: 'no', details: 'Test reason' }
+    specialLegalPowers: { agree: 'yes', details: 'Test reason' }
   }
 
   beforeEach(() => {
@@ -79,15 +79,14 @@ describe('#specialLegalPowers', () => {
       const { statusCode, headers } = await makePostRequest({
         url: marineLicenceRoutes.MARINE_LICENCE_SPECIAL_LEGAL_POWERS,
         server: getServer(),
-        formData: { agree: 'no', details: 'Test reason' }
+        formData: { agree: 'no'}
       })
       expect(authRequests.authenticatedPatchRequest).toHaveBeenCalledWith(
         expect.any(Object),
         '/marine-licence/special-legal-powers',
         {
           id: mockLicence.id,
-          agree: 'no',
-          details: 'Test reason'
+          agree: 'no'
         }
       )
       expect(statusCode).toBe(302)
@@ -102,7 +101,7 @@ describe('#specialLegalPowers', () => {
       const { result } = await makePostRequest({
         url: marineLicenceRoutes.MARINE_LICENCE_SPECIAL_LEGAL_POWERS,
         server: getServer(),
-        formData: { agree: 'no', details: 'Test reason' }
+        formData: { agree: 'yes', details: 'Test reason' }
       })
       expect(result).toContain('Try again later.')
       const { document } = new JSDOM(result).window
@@ -131,7 +130,7 @@ describe('#specialLegalPowers', () => {
       const { result, statusCode } = await makePostRequest({
         url: marineLicenceRoutes.MARINE_LICENCE_SPECIAL_LEGAL_POWERS,
         server: getServer(),
-        formData: { agree: 'no', details: 'Test reason' }
+        formData: { agree: 'yes', details: 'Test reason' }
       })
       expect(statusCode).toBe(statusCodes.ok)
       expect(result).toContain(
@@ -163,7 +162,7 @@ describe('#specialLegalPowers', () => {
           marineLicenceRoutes.MARINE_LICENCE_SPECIAL_LEGAL_POWERS +
           '?from=check-your-answers',
         server: getServer(),
-        formData: { agree: 'no', details: 'Test reason' }
+        formData: { agree: 'yes', details: 'Test reason' }
       })
       expect(statusCode).toBe(statusCodes.ok)
       expect(result).toContain(
@@ -282,14 +281,14 @@ describe('#specialLegalPowers', () => {
           marineLicenceRoutes.MARINE_LICENCE_SPECIAL_LEGAL_POWERS +
           '?from=check-your-answers',
         server: getServer(),
-        formData: { agree: 'no', details: 'Test reason' }
+        formData: { agree: 'yes', details: 'Test reason' }
       })
       expect(authRequests.authenticatedPatchRequest).toHaveBeenCalledWith(
         expect.any(Object),
         '/marine-licence/special-legal-powers',
         {
           id: mockLicence.id,
-          agree: 'no',
+          agree: 'yes',
           details: 'Test reason'
         }
       )
@@ -322,7 +321,7 @@ describe('#specialLegalPowers', () => {
         redirect: vi.fn().mockReturnValue({ takeover: vi.fn() }),
         view: vi.fn()
       }
-      const mockRequest = { payload: { agree: 'no', details: 'Test reason' } }
+      const mockRequest = { payload: { agree: 'yes', details: 'Test reason' } }
       await specialLegalPowersSubmitController.handler(mockRequest, h)
       expect(setCacheMock).toHaveBeenCalledWith(
         mockRequest,

@@ -8,7 +8,6 @@ import {
   makeGetRequest,
   makePostRequest
 } from '#src/server/test-helpers/server-requests.js'
-import * as authRequests from '#src/server/common/helpers/authenticated-requests.js'
 import * as authUtils from '#src/server/common/plugins/auth/utils.js'
 import * as exemptionSiteDetailsHelpers from '#src/server/common/helpers/exemptions/exemption-site-details.js'
 import * as exemptionServiceModule from '#src/services/exemption-service/index.js'
@@ -31,200 +30,25 @@ describe('check your answers controller', () => {
   })
 
   describe('POST /exemption/check-your-answers', () => {
-    beforeEach(() => {
-      vi.spyOn(authRequests, 'authenticatedPostRequest').mockResolvedValue({
-        payload: {
-          message: 'success',
-          value: {
-            applicationReference: 'APP-123456',
-            submittedAt: '2025-01-01T10:00:00.000Z'
-          }
-        }
-      })
-    })
-
-    test('Should submit exemption and redirect to confirmation page after clearing exemption cache', async () => {
-      const { clearExemptionCache } = mockExemption(mockExemptionData)
+    test('Should redirect to declaration page', async () => {
       const { statusCode, headers } = await makePostRequest({
         url: '/exemption/check-your-answers',
         server: getServer()
       })
 
       expect(statusCode).toBe(302)
-      expect(headers.location).toBe(
-        '/exemption/confirmation?applicationReference=APP-123456'
-      )
-      expect(authRequests.authenticatedPostRequest).toHaveBeenCalledWith(
-        expect.any(Object),
-        '/exemption/submit',
-        {
-          id: mockExemptionData.id,
-          userName: mockUserSession.displayName,
-          userEmail: mockUserSession.email
-        }
-      )
-      expect(clearExemptionCache).toHaveBeenCalledWith(
-        expect.any(Object),
-        expect.any(Object)
-      )
+      expect(headers.location).toBe('/declaration')
     })
 
-    test('Should handle missing exemption data on POST', async () => {
+    test('Should redirect to declaration page with empty exemption data', async () => {
       mockExemption({ id: 'test-id' })
-      const { statusCode } = await makePostRequest({
-        url: '/exemption/check-your-answers',
-        server: getServer()
-      })
-      expect(statusCode).toBe(302)
-    })
-
-    test('Should handle API errors gracefully', async () => {
-      const { clearExemptionCache } = mockExemption(mockExemptionData)
-      vi.spyOn(authRequests, 'authenticatedPostRequest').mockRejectedValue(
-        new Error('API Error')
-      )
-
-      const { statusCode } = await makePostRequest({
-        url: '/exemption/check-your-answers',
-        server: getServer()
-      })
-
-      expect(statusCode).toBe(400)
-      expect(clearExemptionCache).not.toHaveBeenCalled()
-    })
-
-    test('Should handle unexpected API response format', async () => {
-      const { clearExemptionCache } = mockExemption(mockExemptionData)
-      vi.spyOn(authRequests, 'authenticatedPostRequest').mockResolvedValue({
-        payload: { message: 'error', error: 'Something went wrong' }
-      })
-
-      const { statusCode } = await makePostRequest({
-        url: '/exemption/check-your-answers',
-        server: getServer()
-      })
-
-      expect(statusCode).toBe(400)
-      expect(clearExemptionCache).not.toHaveBeenCalled()
-    })
-
-    test('Should handle API response with missing value', async () => {
-      const { clearExemptionCache } = mockExemption(mockExemptionData)
-      vi.spyOn(authRequests, 'authenticatedPostRequest').mockResolvedValue({
-        payload: { message: 'success', value: null }
-      })
-
-      const { statusCode } = await makePostRequest({
-        url: '/exemption/check-your-answers',
-        server: getServer()
-      })
-
-      expect(statusCode).toBe(400)
-      expect(clearExemptionCache).not.toHaveBeenCalled()
-    })
-
-    test('Should redirect even with missing applicationReference when value exists', async () => {
-      const { clearExemptionCache } = mockExemption(mockExemptionData)
-      vi.spyOn(authRequests, 'authenticatedPostRequest').mockResolvedValue({
-        payload: { message: 'success', value: {} }
-      })
-
       const { statusCode, headers } = await makePostRequest({
         url: '/exemption/check-your-answers',
         server: getServer()
       })
 
       expect(statusCode).toBe(302)
-      expect(headers.location).toBe(
-        '/exemption/confirmation?applicationReference=undefined'
-      )
-      expect(clearExemptionCache).toHaveBeenCalledWith(
-        expect.any(Object),
-        expect.any(Object)
-      )
-    })
-
-    test('Should handle API response with wrong message type', async () => {
-      vi.spyOn(authRequests, 'authenticatedPostRequest').mockResolvedValue({
-        payload: {
-          message: 'pending',
-          value: { applicationReference: 'APP-123' }
-        }
-      })
-
-      const { statusCode } = await makePostRequest({
-        url: '/exemption/check-your-answers',
-        server: getServer()
-      })
-
-      expect(statusCode).toBe(400)
-    })
-
-    test('Should error if user session is missing', async () => {
-      vi.spyOn(authUtils, 'getUserSession').mockResolvedValue(null)
-
-      const { statusCode } = await makePostRequest({
-        url: '/exemption/check-your-answers',
-        server: getServer()
-      })
-
-      expect(statusCode).toBe(400)
-    })
-
-    test('Should error if user session has missing displayName', async () => {
-      vi.spyOn(authUtils, 'getUserSession').mockResolvedValue({
-        displayName: null,
-        email: 'test@example.com'
-      })
-
-      const { statusCode } = await makePostRequest({
-        url: '/exemption/check-your-answers',
-        server: getServer()
-      })
-
-      expect(statusCode).toBe(400)
-    })
-
-    test('Should error if user session has missing email', async () => {
-      vi.spyOn(authUtils, 'getUserSession').mockResolvedValue({
-        displayName: 'Test User',
-        email: null
-      })
-
-      const { statusCode } = await makePostRequest({
-        url: '/exemption/check-your-answers',
-        server: getServer()
-      })
-
-      expect(statusCode).toBe(400)
-    })
-
-    test('Should error if user session has empty displayName', async () => {
-      vi.spyOn(authUtils, 'getUserSession').mockResolvedValue({
-        displayName: '',
-        email: 'test@example.com'
-      })
-
-      const { statusCode } = await makePostRequest({
-        url: '/exemption/check-your-answers',
-        server: getServer()
-      })
-
-      expect(statusCode).toBe(400)
-    })
-
-    test('Should error if user session has empty email', async () => {
-      vi.spyOn(authUtils, 'getUserSession').mockResolvedValue({
-        displayName: 'Test User',
-        email: ''
-      })
-
-      const { statusCode } = await makePostRequest({
-        url: '/exemption/check-your-answers',
-        server: getServer()
-      })
-
-      expect(statusCode).toBe(400)
+      expect(headers.location).toBe('/declaration')
     })
   })
 
@@ -293,17 +117,6 @@ describe('check your answers controller', () => {
   })
 
   describe('Controller error handling edge cases', () => {
-    test('Should handle POST request with missing exemption cache', async () => {
-      mockExemption(null)
-
-      const { statusCode } = await makePostRequest({
-        url: '/exemption/check-your-answers',
-        server: getServer()
-      })
-
-      expect(statusCode).toBe(500)
-    })
-
     test('Should handle GET request with missing exemption cache', async () => {
       mockExemption(null)
 
@@ -313,19 +126,6 @@ describe('check your answers controller', () => {
       })
 
       expect(statusCode).toBe(500)
-    })
-
-    test('Should handle getUserSession throwing an error', async () => {
-      vi.spyOn(authUtils, 'getUserSession')
-        .mockResolvedValueOnce(mockUserSession) // used by server prehandler
-        .mockRejectedValueOnce(new Error('Session retrieval failed')) // used by controller
-
-      const { statusCode } = await makePostRequest({
-        url: '/exemption/check-your-answers',
-        server: getServer()
-      })
-
-      expect(statusCode).toBe(400)
     })
 
     test('Should handle session cache errors gracefully', async () => {

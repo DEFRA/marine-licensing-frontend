@@ -52,7 +52,9 @@ describe('#specialLegalPowers', () => {
         server: getServer()
       })
       expect(result).toEqual(
-        expect.stringContaining('Does your organisation have special legal powers to do any of this project?')
+        expect.stringContaining(
+          'Does your organisation have special legal powers to do any of this project?'
+        )
       )
       expect(statusCode).toBe(statusCodes.ok)
     })
@@ -62,8 +64,10 @@ describe('#specialLegalPowers', () => {
       specialLegalPowersController.handler({}, h)
       expect(h.view).toHaveBeenCalledWith(SPECIAL_LEGAL_POWERS_VIEW_ROUTE, {
         backLink: marineLicenceRoutes.MARINE_LICENCE_TASK_LIST,
-        pageTitle: 'Does your organisation have special legal powers to do any of this project?',
-        heading: 'Does your organisation have special legal powers to do any of this project?',
+        pageTitle:
+          'Does your organisation have special legal powers to do any of this project?',
+        heading:
+          'Does your organisation have special legal powers to do any of this project?',
         projectName: mockLicence.projectName,
         payload: mockLicence.specialLegalPowers
       })
@@ -87,7 +91,9 @@ describe('#specialLegalPowers', () => {
         }
       )
       expect(statusCode).toBe(302)
-      expect(headers.location).toBe(marineLicenceRoutes.MARINE_LICENCE_TASK_LIST)
+      expect(headers.location).toBe(
+        marineLicenceRoutes.MARINE_LICENCE_TASK_LIST
+      )
     })
 
     test('Should pass error to global catchAll behaviour if it contains no validation data', async () => {
@@ -100,7 +106,9 @@ describe('#specialLegalPowers', () => {
       })
       expect(result).toContain('Try again later.')
       const { document } = new JSDOM(result).window
-      expect(document.querySelector('h1').textContent.trim()).toBe('There is a problem with the service')
+      expect(document.querySelector('h1').textContent.trim()).toBe(
+        'There is a problem with the service'
+      )
     })
 
     test('Should handle API validation errors in catch block', async () => {
@@ -126,7 +134,9 @@ describe('#specialLegalPowers', () => {
         formData: { agree: 'no', details: 'Test reason' }
       })
       expect(statusCode).toBe(statusCodes.ok)
-      expect(result).toContain('Does your organisation have special legal powers to do any of this project?')
+      expect(result).toContain(
+        'Does your organisation have special legal powers to do any of this project?'
+      )
       const { document } = new JSDOM(result).window
       expect(document.querySelector('.govuk-error-summary')).toBeTruthy()
     })
@@ -149,13 +159,19 @@ describe('#specialLegalPowers', () => {
         }
       })
       const { result, statusCode } = await makePostRequest({
-        url: marineLicenceRoutes.MARINE_LICENCE_SPECIAL_LEGAL_POWERS + '?from=check-your-answers',
+        url:
+          marineLicenceRoutes.MARINE_LICENCE_SPECIAL_LEGAL_POWERS +
+          '?from=check-your-answers',
         server: getServer(),
         formData: { agree: 'no', details: 'Test reason' }
       })
       expect(statusCode).toBe(statusCodes.ok)
-      expect(result).toContain('Does your organisation have special legal powers to do any of this project?')
-      expect(result).toContain(marineLicenceRoutes.MARINE_LICENCE_CHECK_YOUR_ANSWERS)
+      expect(result).toContain(
+        'Does your organisation have special legal powers to do any of this project?'
+      )
+      expect(result).toContain(
+        marineLicenceRoutes.MARINE_LICENCE_CHECK_YOUR_ANSWERS
+      )
       const { document } = new JSDOM(result).window
       expect(document.querySelector('.govuk-error-summary')).toBeTruthy()
     })
@@ -164,20 +180,22 @@ describe('#specialLegalPowers', () => {
       const request = { payload: { agree: '' } }
       const h = { view: vi.fn().mockReturnValue({ takeover: vi.fn() }) }
       const err = {
-        details: [
-          { path: ['agree'], message: 'TEST', type: 'string.empty' }
-        ]
+        details: [{ path: ['agree'], message: 'TEST', type: 'string.empty' }]
       }
-      specialLegalPowersSubmitController.options.validate.failAction(request, h, err)
+      specialLegalPowersSubmitController.options.validate.failAction(
+        request,
+        h,
+        err
+      )
       expect(h.view).toHaveBeenCalledWith(SPECIAL_LEGAL_POWERS_VIEW_ROUTE, {
         backLink: marineLicenceRoutes.MARINE_LICENCE_TASK_LIST,
-        pageTitle: 'Does your organisation have special legal powers to do any of this project?',
-        heading: 'Does your organisation have special legal powers to do any of this project?',
+        pageTitle:
+          'Does your organisation have special legal powers to do any of this project?',
+        heading:
+          'Does your organisation have special legal powers to do any of this project?',
         projectName: mockLicence.projectName,
         payload: { agree: '' },
-        errorSummary: [
-          { href: '#agree', text: 'TEST', field: ['agree'] }
-        ],
+        errorSummary: [{ href: '#agree', text: 'TEST', field: ['agree'] }],
         errors: {
           agree: { field: ['agree'], href: '#agree', text: 'TEST' }
         }
@@ -189,11 +207,17 @@ describe('#specialLegalPowers', () => {
       const request = { payload: { agree: '' } }
       const h = { view: vi.fn().mockReturnValue({ takeover: vi.fn() }) }
       const err = { details: null }
-      specialLegalPowersSubmitController.options.validate.failAction(request, h, err)
+      specialLegalPowersSubmitController.options.validate.failAction(
+        request,
+        h,
+        err
+      )
       expect(h.view).toHaveBeenCalledWith(SPECIAL_LEGAL_POWERS_VIEW_ROUTE, {
         backLink: marineLicenceRoutes.MARINE_LICENCE_TASK_LIST,
-        heading: 'Does your organisation have special legal powers to do any of this project?',
-        pageTitle: 'Does your organisation have special legal powers to do any of this project?',
+        heading:
+          'Does your organisation have special legal powers to do any of this project?',
+        pageTitle:
+          'Does your organisation have special legal powers to do any of this project?',
         projectName: mockLicence.projectName,
         payload: { agree: '' }
       })
@@ -203,11 +227,17 @@ describe('#specialLegalPowers', () => {
     test('Should correctly validate on empty data and handle a scenario where error details are missing', () => {
       const request = { payload: { agree: '' } }
       const h = { view: vi.fn().mockReturnValue({ takeover: vi.fn() }) }
-      specialLegalPowersSubmitController.options.validate.failAction(request, h, {})
+      specialLegalPowersSubmitController.options.validate.failAction(
+        request,
+        h,
+        {}
+      )
       expect(h.view).toHaveBeenCalledWith(SPECIAL_LEGAL_POWERS_VIEW_ROUTE, {
         backLink: marineLicenceRoutes.MARINE_LICENCE_TASK_LIST,
-        heading: 'Does your organisation have special legal powers to do any of this project?',
-        pageTitle: 'Does your organisation have special legal powers to do any of this project?',
+        heading:
+          'Does your organisation have special legal powers to do any of this project?',
+        pageTitle:
+          'Does your organisation have special legal powers to do any of this project?',
         projectName: mockLicence.projectName,
         payload: { agree: '' }
       })
@@ -217,11 +247,17 @@ describe('#specialLegalPowers', () => {
     test('Should correctly validate on invalid data', () => {
       const request = { payload: { agree: 'invalid' } }
       const h = { view: vi.fn().mockReturnValue({ takeover: vi.fn() }) }
-      specialLegalPowersSubmitController.options.validate.failAction(request, h, {})
+      specialLegalPowersSubmitController.options.validate.failAction(
+        request,
+        h,
+        {}
+      )
       expect(h.view).toHaveBeenCalledWith(SPECIAL_LEGAL_POWERS_VIEW_ROUTE, {
         backLink: marineLicenceRoutes.MARINE_LICENCE_TASK_LIST,
-        heading: 'Does your organisation have special legal powers to do any of this project?',
-        pageTitle: 'Does your organisation have special legal powers to do any of this project?',
+        heading:
+          'Does your organisation have special legal powers to do any of this project?',
+        pageTitle:
+          'Does your organisation have special legal powers to do any of this project?',
         projectName: mockLicence.projectName,
         payload: { agree: 'invalid' }
       })
@@ -242,7 +278,9 @@ describe('#specialLegalPowers', () => {
 
     test('Should correctly redirect to check your answers when parameter is present', async () => {
       const { statusCode, headers } = await makePostRequest({
-        url: marineLicenceRoutes.MARINE_LICENCE_SPECIAL_LEGAL_POWERS + '?from=check-your-answers',
+        url:
+          marineLicenceRoutes.MARINE_LICENCE_SPECIAL_LEGAL_POWERS +
+          '?from=check-your-answers',
         server: getServer(),
         formData: { agree: 'no', details: 'Test reason' }
       })
@@ -256,7 +294,9 @@ describe('#specialLegalPowers', () => {
         }
       )
       expect(statusCode).toBe(302)
-      expect(headers.location).toBe(marineLicenceRoutes.MARINE_LICENCE_CHECK_YOUR_ANSWERS)
+      expect(headers.location).toBe(
+        marineLicenceRoutes.MARINE_LICENCE_CHECK_YOUR_ANSWERS
+      )
     })
 
     test('Should show error for details being empty when agree is set to yes', async () => {
@@ -269,7 +309,9 @@ describe('#specialLegalPowers', () => {
       expect(patchMock).not.toHaveBeenCalled()
       const { document } = new JSDOM(result).window
       expect(result).toEqual(
-        expect.stringContaining(errorMessages.SPECIAL_LEGAL_POWERS_DETAILS_REQUIRED)
+        expect.stringContaining(
+          errorMessages.SPECIAL_LEGAL_POWERS_DETAILS_REQUIRED
+        )
       )
       expect(document.querySelector('.govuk-error-summary')).toBeTruthy()
     })

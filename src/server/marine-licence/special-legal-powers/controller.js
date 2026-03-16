@@ -113,7 +113,7 @@ export const specialLegalPowersSubmitController = {
         '/marine-licence/special-legal-powers',
         {
           agree: payload.agree,
-          ...(userAgrees && { reason: payload.reason }),
+          ...(userAgrees && { details: payload.details }),
           id: marineLicence.id
         }
       )
@@ -122,7 +122,7 @@ export const specialLegalPowersSubmitController = {
         ...marineLicence,
         specialLegalPowers: {
           agree: payload.agree,
-          ...(userAgrees && { reason: payload.reason })
+          ...(userAgrees && { details: payload.details })
         }
       })
 

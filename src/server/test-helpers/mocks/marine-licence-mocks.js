@@ -8,6 +8,7 @@ export const mockMarineLicenceTaskList = {
 export const mockMarineLicenceApplication = {
   id: faker.database.mongodbObjectId(),
   projectName: 'Test Project',
+  specialLegalPowers: { agree: 'yes', details: 'Test reason' },
   taskList: mockMarineLicenceTaskList,
   projectType: MARINE_LICENCE_KEY
 }

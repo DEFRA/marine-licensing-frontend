@@ -79,7 +79,7 @@ describe('#specialLegalPowers', () => {
       const { statusCode, headers } = await makePostRequest({
         url: marineLicenceRoutes.MARINE_LICENCE_SPECIAL_LEGAL_POWERS,
         server: getServer(),
-        formData: { agree: 'no'}
+        formData: { agree: 'no' }
       })
       expect(authRequests.authenticatedPatchRequest).toHaveBeenCalledWith(
         expect.any(Object),

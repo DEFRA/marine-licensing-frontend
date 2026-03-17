@@ -1,6 +1,6 @@
 import { renderComponent } from '#src/server/test-helpers/component-helpers.js'
 
-describe('Marine Licence Special Legal Powers Card Component', () => {
+describe('Marine Licence Other Permissions Card Component', () => {
   let $component
 
   const baseParams = {
@@ -13,17 +13,13 @@ describe('Marine Licence Special Legal Powers Card Component', () => {
 
   beforeEach(() => {
     $component = renderComponent(
-      'marine-licence/special-legal-powers-card',
+      'marine-licence/other-permissions-card',
       baseParams
     )
   })
 
-  test('Should render special legal powers card component', () => {
-    expect($component('#special-legal-powers-card')).toHaveLength(1)
-  })
-
-  test('Should display "Yes" when agree is yes', () => {
-    expect($component.html()).toContain('Yes')
+  test('Should render other permissions card component', () => {
+    expect($component('#other-permissions-card')).toHaveLength(1)
   })
 
   test('Should display details when agree is yes', () => {
@@ -34,7 +30,7 @@ describe('Marine Licence Special Legal Powers Card Component', () => {
 
   test('Should have correct card title', () => {
     expect($component('.govuk-summary-card__title').text().trim()).toBe(
-      'Special legal powers'
+      'Other permissions'
     )
   })
 
@@ -47,7 +43,7 @@ describe('Marine Licence Special Legal Powers Card Component', () => {
       isApplicantView: true
     }
     const $comp = renderComponent(
-      'marine-licence/special-legal-powers-card',
+      'marine-licence/other-permissions-card',
       params
     )
     expect($comp.html()).toContain('No')

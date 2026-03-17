@@ -5,7 +5,8 @@ describe('taskList utils', () => {
   test('transformTaskList correctly returns task list with Completed status', () => {
     expect(
       transformTaskList({
-        projectName: 'COMPLETED'
+        projectName: 'COMPLETED',
+        specialLegalPowers: 'COMPLETED'
       })
     ).toEqual([
       {
@@ -15,6 +16,14 @@ describe('taskList utils', () => {
           classes: 'govuk-link--no-visited-state',
           text: 'Project name'
         }
+      },
+      {
+        href: marineLicenceRoutes.MARINE_LICENCE_SPECIAL_LEGAL_POWERS,
+        status: { text: 'Completed' },
+        title: {
+          classes: 'govuk-link--no-visited-state',
+          text: 'Special Legal Powers'
+        }
       }
     ])
   })
@@ -22,7 +31,8 @@ describe('taskList utils', () => {
   test('transformTaskList correctly returns In Progress', () => {
     expect(
       transformTaskList({
-        projectName: 'IN_PROGRESS'
+        projectName: 'IN_PROGRESS',
+        specialLegalPowers: 'IN_PROGRESS'
       })
     ).toEqual([
       {
@@ -31,6 +41,13 @@ describe('taskList utils', () => {
           tag: { text: 'In Progress', classes: 'govuk-tag--light-blue' }
         },
         title: { classes: 'govuk-link--no-visited-state', text: 'Project name' }
+      },
+      {
+        href: marineLicenceRoutes.MARINE_LICENCE_SPECIAL_LEGAL_POWERS,
+        status: {
+          tag: { text: 'In Progress', classes: 'govuk-tag--light-blue' }
+        },
+        title: { classes: 'govuk-link--no-visited-state', text: 'Special Legal Powers' }
       }
     ])
   })
@@ -47,6 +64,13 @@ describe('taskList utils', () => {
           tag: { text: 'Not yet started', classes: 'govuk-tag--blue' }
         },
         title: { classes: 'govuk-link--no-visited-state', text: 'Project name' }
+      },
+      {
+        href: marineLicenceRoutes.MARINE_LICENCE_SPECIAL_LEGAL_POWERS,
+        status: {
+          tag: { text: 'Not yet started', classes: 'govuk-tag--blue' }
+        },
+        title: { classes: 'govuk-link--no-visited-state', text: 'Special Legal Powers' }
       }
     ])
   })
@@ -63,6 +87,13 @@ describe('taskList utils', () => {
           tag: { text: 'Not yet started', classes: 'govuk-tag--blue' }
         },
         title: { classes: 'govuk-link--no-visited-state', text: 'Project name' }
+      },
+      {
+        href: marineLicenceRoutes.MARINE_LICENCE_SPECIAL_LEGAL_POWERS,
+        status: {
+          tag: { text: 'Not yet started', classes: 'govuk-tag--blue' }
+        },
+        title: { classes: 'govuk-link--no-visited-state', text: 'Special Legal Powers' }
       }
     ])
   })
@@ -79,6 +110,13 @@ describe('taskList utils', () => {
           tag: { text: 'Not yet started', classes: 'govuk-tag--blue' }
         },
         title: { classes: 'govuk-link--no-visited-state', text: 'Project name' }
+      },
+      {
+        href: marineLicenceRoutes.MARINE_LICENCE_SPECIAL_LEGAL_POWERS,
+        status: {
+          tag: { text: 'Not yet started', classes: 'govuk-tag--blue' }
+        },
+        title: { classes: 'govuk-link--no-visited-state', text: 'Special Legal Powers' }
       }
     ])
   })

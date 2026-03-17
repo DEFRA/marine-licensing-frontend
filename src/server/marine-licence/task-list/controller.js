@@ -33,7 +33,12 @@ export const taskListController = {
       `/marine-licence/${id}`
     )
 
-    const { id: marineLicenceId, taskList, projectName, specialLegalPowers } = payload.value
+    const {
+      id: marineLicenceId,
+      taskList,
+      projectName,
+      specialLegalPowers
+    } = payload.value
 
     const taskListTransformed = transformTaskList(taskList)
 

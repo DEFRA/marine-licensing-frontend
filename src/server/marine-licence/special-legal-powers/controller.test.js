@@ -18,6 +18,7 @@ import {
 } from '#src/server/marine-licence/special-legal-powers/controller.js'
 import * as cacheUtils from '#src/server/common/helpers/marine-licence/session-cache/utils.js'
 import * as authRequests from '#src/server/common/helpers/authenticated-requests.js'
+import * as marineLicenceServiceModule from '#src/services/marine-licence-service/index.js'
 
 vi.mock('~/src/server/common/helpers/marine-licence/session-cache/utils.js')
 
@@ -71,6 +72,54 @@ describe('#specialLegalPowers', () => {
         projectName: mockLicence.projectName,
         payload: mockLicence.specialLegalPowers
       })
+    })
+
+    test('should fetch from service and update cache when specialLegalPowers is missing but id exists', async () => {
+      const h = { view: vi.fn() }
+
+      const cachedWithoutSpecialLegalPowers = {
+        id: 'test-id',
+        projectName: 'Test Project'
+      }
+
+      vi.mocked(cacheUtils.getMarineLicenceCache).mockReturnValue(
+        cachedWithoutSpecialLegalPowers
+      )
+
+      const dbResponse = {
+        specialLegalPowers: {
+          agree: 'yes',
+          details: 'From DB'
+        }
+      }
+
+      const mockService = {
+        getMarineLicenceById: vi.fn().mockResolvedValue(dbResponse)
+      }
+
+      vi.spyOn(
+        marineLicenceServiceModule,
+        'getMarineLicenceService'
+      ).mockReturnValue(mockService)
+
+      const setCacheMock = vi.spyOn(cacheUtils, 'setMarineLicenceCache')
+
+      await specialLegalPowersController.handler({}, h)
+
+      expect(cacheUtils.getMarineLicenceCache()).toEqual(
+        cachedWithoutSpecialLegalPowers
+      )
+
+      expect(mockService.getMarineLicenceById).toHaveBeenCalledWith('test-id')
+
+      expect(setCacheMock).toHaveBeenCalled()
+
+      expect(h.view).toHaveBeenCalledWith(
+        SPECIAL_LEGAL_POWERS_VIEW_ROUTE,
+        expect.objectContaining({
+          payload: dbResponse.specialLegalPowers
+        })
+      )
     })
   })
 

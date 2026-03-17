@@ -2,7 +2,8 @@ import { MARINE_LICENCE_KEY } from '#src/server/common/constants/marine-licence.
 import { faker } from '@faker-js/faker'
 
 export const mockMarineLicenceTaskList = {
-  projectName: 'COMPLETED'
+  projectName: 'COMPLETED',
+  specialLegalPowers: 'COMPLETED'
 }
 
 export const mockMarineLicenceApplication = {

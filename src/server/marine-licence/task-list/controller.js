@@ -33,13 +33,14 @@ export const taskListController = {
       `/marine-licence/${id}`
     )
 
-    const { id: marineLicenceId, taskList, projectName } = payload.value
+    const { id: marineLicenceId, taskList, projectName, specialLegalPowers } = payload.value
 
     const taskListTransformed = transformTaskList(taskList)
 
     await setMarineLicenceCache(request, h, {
       id: marineLicenceId,
-      projectName
+      projectName,
+      specialLegalPowers
     })
 
     await setProjectType(request, h, PROJECT_TYPE.MARINE_LICENCE)

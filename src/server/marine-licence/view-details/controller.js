@@ -41,6 +41,8 @@ export const viewDetailsController = {
 
       return h.view(VIEW_DETAILS_VIEW_ROUTE, {
         pageTitle: marineLicence.projectName,
+        specialLegalPowers: marineLicence.specialLegalPowers,
+        isReadOnly: true,
         pageCaption,
         backLink: isPublicView ? null : routes.DASHBOARD
       })

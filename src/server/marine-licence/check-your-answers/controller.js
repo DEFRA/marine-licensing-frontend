@@ -1,4 +1,4 @@
-import { 
+import {
   getMarineLicenceCache,
   setMarineLicenceCache
 } from '#src/server/common/helpers/marine-licence/session-cache/utils.js'
@@ -22,7 +22,9 @@ export const checkYourAnswersController = {
 
     if (!cachedMarineLicence.specialLegalPowers && cachedMarineLicence.id) {
       const service = getMarineLicenceService(request)
-      const dbLicence = await service.getMarineLicenceById(cachedMarineLicence.id)
+      const dbLicence = await service.getMarineLicenceById(
+        cachedMarineLicence.id
+      )
       cachedMarineLicence = {
         ...cachedMarineLicence,
         specialLegalPowers: dbLicence.specialLegalPowers

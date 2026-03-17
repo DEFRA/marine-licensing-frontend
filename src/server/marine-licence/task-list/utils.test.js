@@ -47,7 +47,10 @@ describe('taskList utils', () => {
         status: {
           tag: { text: 'In Progress', classes: 'govuk-tag--light-blue' }
         },
-        title: { classes: 'govuk-link--no-visited-state', text: 'Special Legal Powers' }
+        title: {
+          classes: 'govuk-link--no-visited-state',
+          text: 'Special Legal Powers'
+        }
       }
     ])
   })
@@ -70,7 +73,10 @@ describe('taskList utils', () => {
         status: {
           tag: { text: 'Not yet started', classes: 'govuk-tag--blue' }
         },
-        title: { classes: 'govuk-link--no-visited-state', text: 'Special Legal Powers' }
+        title: {
+          classes: 'govuk-link--no-visited-state',
+          text: 'Special Legal Powers'
+        }
       }
     ])
   })
@@ -93,7 +99,10 @@ describe('taskList utils', () => {
         status: {
           tag: { text: 'Not yet started', classes: 'govuk-tag--blue' }
         },
-        title: { classes: 'govuk-link--no-visited-state', text: 'Special Legal Powers' }
+        title: {
+          classes: 'govuk-link--no-visited-state',
+          text: 'Special Legal Powers'
+        }
       }
     ])
   })
@@ -116,7 +125,10 @@ describe('taskList utils', () => {
         status: {
           tag: { text: 'Not yet started', classes: 'govuk-tag--blue' }
         },
-        title: { classes: 'govuk-link--no-visited-state', text: 'Special Legal Powers' }
+        title: {
+          classes: 'govuk-link--no-visited-state',
+          text: 'Special Legal Powers'
+        }
       }
     ])
   })

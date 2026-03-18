@@ -4,7 +4,7 @@ import {
 } from '#src/server/common/helpers/authenticated-requests.js'
 import { formatProjectsForDisplay } from '#src/server/internal-user-admin/exemptions/backfill-areas/utils.js'
 import { routes } from '#src/server/common/constants/routes.js'
-import Boom from '@hapi/boom'
+import { validateTeamAdminSession } from '#src/server/common/helpers/user-session-validators.js'
 
 export const DASHBOARD_VIEW_ROUTE =
   'internal-user-admin/exemptions/backfill-areas/index.njk'
@@ -12,10 +12,10 @@ const DASHBOARD_PAGE_TITLE =
   'Marine licence submitted without Marine Plan or Coastal Operations Areas'
 
 export const adminBackfillController = {
+  options: {
+    pre: [validateTeamAdminSession]
+  },
   handler: async (request, h) => {
-    if (request.auth?.credentials?.isTeamAdmin !== true) {
-      throw Boom.forbidden('Unauthorized')
-    }
     try {
       const { payload } = await authenticatedGetRequest(
         request,
@@ -43,12 +43,10 @@ export const adminBackfillController = {
 }
 
 export const adminBackfillSendController = {
+  options: {
+    pre: [validateTeamAdminSession]
+  },
   handler: async (request, h) => {
-    if (request.auth?.credentials?.isTeamAdmin !== true) {
-      throw Boom.forbidden(
-        'InternalUserAdmin: Access denied: Team admin role required'
-      )
-    }
     try {
       await authenticatedPostRequest(request, '/exemption/backfill-areas', {
         id: request.payload.exemptionId

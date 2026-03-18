@@ -8,11 +8,11 @@ export const internalBackfillUserAdminRoutes = [
   {
     method: 'GET',
     path: routes.ADMIN_BACKFILL,
-    handler: adminBackfillController.handler
+    ...adminBackfillController
   },
   {
     method: 'POST',
     path: routes.ADMIN_BACKFILL,
-    handler: adminBackfillSendController.handler
+    ...adminBackfillSendController
   }
 ]

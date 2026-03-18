@@ -5,11 +5,11 @@ export const internalEmpUserAdminRoutes = [
   {
     method: 'GET',
     path: routes.ADMIN_EXEMPTIONS,
-    handler: adminEmpController.handler
+    ...adminEmpController
   },
   {
     method: 'POST',
     path: routes.ADMIN_EXEMPTIONS,
-    handler: adminEmpSendController.handler
+    ...adminEmpSendController
   }
 ]

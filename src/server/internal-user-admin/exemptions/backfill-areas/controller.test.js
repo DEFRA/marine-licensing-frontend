@@ -129,13 +129,6 @@ describe('Admin dashboard to backfill Marine Plan Areas and Coastal Operations a
       })
     })
 
-    test('should throw unauthorized error if user is not team admin', async () => {
-      const { h, request } = createRequest()
-      request.auth.credentials.isTeamAdmin = false
-      await expect(() =>
-        adminBackfillController.handler(request, h)
-      ).rejects.toThrow('Unauthorized')
-    })
   })
 
   describe('#adminBackfillSendController', () => {
@@ -196,14 +189,5 @@ describe('Admin dashboard to backfill Marine Plan Areas and Coastal Operations a
       expect(h.redirect).toHaveBeenCalledWith(routes.ADMIN_EXEMPTIONS)
     })
 
-    test('should throw unauthorized error if user is not team admin', async () => {
-      const { h, request } = createRequest()
-      request.auth.credentials.isTeamAdmin = false
-      await expect(() =>
-        adminBackfillSendController.handler(request, h)
-      ).rejects.toThrow(
-        'InternalUserAdmin: Access denied: Team admin role required'
-      )
-    })
   })
 })

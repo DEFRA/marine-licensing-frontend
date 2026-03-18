@@ -9,7 +9,8 @@ import { getUserSession } from '~/src/server/common/plugins/auth/utils.js'
 import {
   validateAgentUserSession,
   validateEmployeeUserSession,
-  validateIndividualUserSession
+  validateIndividualUserSession,
+  validateTeamAdminSession
 } from '#src/server/common/helpers/user-session-validators.js'
 import { createMockRequest } from '#src/server/test-helpers/mocks/helpers.js'
 
@@ -106,6 +107,48 @@ describe('#validateEmployeeUserSession', () => {
 
     expect(h.redirect).not.toHaveBeenCalled()
     expect(result).toBe(h.continue)
+  })
+})
+
+describe('#validateTeamAdminSession', () => {
+  test('throws Boom forbidden when isTeamAdmin is false', () => {
+    const request = createMockRequest({
+      auth: { credentials: { isTeamAdmin: false } }
+    })
+
+    let error
+    try {
+      validateTeamAdminSession.method(request)
+    } catch (e) {
+      error = e
+    }
+
+    expect(error.isBoom).toBe(true)
+    expect(error.output.statusCode).toBe(403)
+  })
+
+  test('throws Boom forbidden when auth credentials are missing', () => {
+    const request = createMockRequest()
+
+    let error
+    try {
+      validateTeamAdminSession.method(request)
+    } catch (e) {
+      error = e
+    }
+
+    expect(error.isBoom).toBe(true)
+    expect(error.output.statusCode).toBe(403)
+  })
+
+  test('returns null when isTeamAdmin is true', () => {
+    const request = createMockRequest({
+      auth: { credentials: { isTeamAdmin: true } }
+    })
+
+    const result = validateTeamAdminSession.method(request)
+
+    expect(result).toBeNull()
   })
 })
 

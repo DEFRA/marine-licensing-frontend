@@ -39,17 +39,7 @@ const getBackLink = (request) => {
 
 export const specialLegalPowersController = {
   async handler(request, h) {
-    let marineLicence = getMarineLicenceCache(request)
-
-    if (!marineLicence.specialLegalPowers && marineLicence.id) {
-      const service = getMarineLicenceService(request)
-      const dbLicence = await service.getMarineLicenceById(marineLicence.id)
-      marineLicence = {
-        ...marineLicence,
-        specialLegalPowers: dbLicence.specialLegalPowers
-      }
-      await setMarineLicenceCache(request, h, marineLicence)
-    }
+    const marineLicence = getMarineLicenceCache(request)
 
     return h.view(SPECIAL_LEGAL_POWERS_VIEW_ROUTE, {
       ...specialLegalPowersSettings,

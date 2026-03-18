@@ -9,7 +9,6 @@ import { authenticatedGetRequest } from '#src/server/common/helpers/authenticate
 import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
 import { PROJECT_TYPE } from '#src/server/common/constants/projects.js'
 import Boom from '@hapi/boom'
-import { getPageViewCommonData } from '#src/server/common/helpers/page-view-common-data.js'
 
 export const TASK_LIST_VIEW_ROUTE = 'marine-licence/task-list/index'
 
@@ -23,8 +22,6 @@ const taskListViewSettings = {
 export const taskListController = {
   async handler(request, h) {
     const marineLicence = getMarineLicenceCache(request)
-
-    const isOrganisation = await getPageViewCommonData(request).isOrganisation
 
     if (!marineLicence?.id) {
       throw Boom.notFound('Marine licence not found')
@@ -43,13 +40,7 @@ export const taskListController = {
       specialLegalPowers
     } = payload.value
 
-    let taskListTransformed = transformTaskList(taskList)
-
-    if (!isOrganisation) {
-      taskListTransformed = taskListTransformed.filter(
-        (task) => !task.organisationOnly
-      )
-    }
+    const taskListTransformed = transformTaskList(taskList)
 
     await setMarineLicenceCache(request, h, {
       id: marineLicenceId,

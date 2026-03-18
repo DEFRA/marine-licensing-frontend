@@ -25,9 +25,11 @@ export const getPageViewCommonData = async (request) => {
 
   const citizenName = shouldShowCitizenName ? displayName : null
 
+  const isOrganisation = shouldShowOrgOrUserName && !shouldShowCitizenName
+
   const orgOrUserName = shouldShowOrgOrUserName
     ? organisationName || displayName
     : citizenName
 
-  return { orgOrUserName, showChangeOrganisationLink }
+  return { orgOrUserName, showChangeOrganisationLink, isOrganisation }
 }

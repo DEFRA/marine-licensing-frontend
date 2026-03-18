@@ -33,7 +33,8 @@ export const transformTaskList = (taskList) => {
         classes
       },
       href: marineLicenceRoutes.MARINE_LICENCE_PROJECT_NAME,
-      status: setStatus(taskList.projectName)
+      status: setStatus(taskList.projectName),
+      organisationOnly: false
     },
     {
       title: {
@@ -41,7 +42,8 @@ export const transformTaskList = (taskList) => {
         classes
       },
       href: marineLicenceRoutes.MARINE_LICENCE_SPECIAL_LEGAL_POWERS,
-      status: setStatus(taskList.specialLegalPowers)
+      status: setStatus(taskList.specialLegalPowers),
+      organisationOnly: true
     }
   ]
 }

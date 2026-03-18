@@ -72,7 +72,7 @@ describe('#specialLegalPowers', () => {
         projectName: mockLicence.projectName,
         payload: mockLicence.specialLegalPowers
       })
-    })    
+    })
   })
 
   describe('#specialLegalPowersSubmitController', () => {

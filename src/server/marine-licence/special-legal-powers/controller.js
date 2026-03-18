@@ -8,7 +8,6 @@ import {
 } from '#src/server/common/helpers/errors.js'
 import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
 import { authenticatedPatchRequest } from '#src/server/common/helpers/authenticated-requests.js'
-import { getMarineLicenceService } from '#src/services/marine-licence-service/index.js'
 
 import joi from 'joi'
 

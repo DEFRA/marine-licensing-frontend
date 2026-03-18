@@ -44,7 +44,8 @@ export const marineLicenceRoutes = {
   MARINE_LICENCE_TASK_LIST: '/marine-licence/task-list',
   MARINE_LICENCE_DELETE: '/marine-licence/delete',
   MARINE_LICENCE_VIEW_DETAILS: '/marine-licence/view-details',
-  MARINE_LICENCE_VIEW_DETAILS_PUBLIC: '/marine-licence/view-public-details'
+  MARINE_LICENCE_VIEW_DETAILS_PUBLIC: '/marine-licence/view-public-details',
+  MARINE_LICENCE_VIEW_DETAILS_INTERNAL_USER: '/view-marine-licence-details'
 }
 
 export const defraIdGuidanceRoutes = {
@@ -83,6 +84,7 @@ export const routes = {
 
 export const entraIdRoutes = [
   routes.VIEW_DETAILS_INTERNAL_USER,
+  marineLicenceRoutes.MARINE_LICENCE_VIEW_DETAILS_INTERNAL_USER,
   routes.ADMIN_EXEMPTIONS
 ]
 

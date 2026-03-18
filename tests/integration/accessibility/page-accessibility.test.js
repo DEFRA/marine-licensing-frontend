@@ -217,6 +217,12 @@ describe('Page accessibility checks (Axe)', () => {
       isMarineLicence: true
     },
     {
+      url: `${marineLicenceRoutes.MARINE_LICENCE_VIEW_DETAILS_INTERNAL_USER}/${mockSubmittedMarineLicenceApplication.id}`,
+      title: mockSubmittedMarineLicenceApplication.projectName,
+      marineLicence: mockSubmittedMarineLicenceApplication,
+      isMarineLicence: true
+    },
+    {
       url: routes.postLogin.CONFIRM_INDIVIDUAL,
       title: "Confirm you're notifying us as an individual",
       session: citizenUserSession

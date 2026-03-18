@@ -5,16 +5,28 @@ import {
   marineLicenceRoutes
 } from '#src/server/common/constants/routes.js'
 import { getMarineLicenceService } from '#src/services/marine-licence-service/index.js'
-import { isProjectViewable } from '#src/server/common/helpers/view-details/utils.js'
+import {
+  isInternalUserView as getIsInternalUserView,
+  isProjectViewable
+} from '#src/server/common/helpers/view-details/utils.js'
+import { MARINE_LICENCE_KEY } from '#src/server/common/constants/marine-licence.js'
 
 export const VIEW_DETAILS_VIEW_ROUTE = 'marine-licence/view-details/index'
 
 export const viewDetailsController = {
   async handler(request, h) {
     const { marineLicenceId } = request.params
+
+    const isInternalUserView = getIsInternalUserView(
+      request,
+      MARINE_LICENCE_KEY
+    )
+
     const isPublicView = request.path.startsWith(
       marineLicenceRoutes.MARINE_LICENCE_VIEW_DETAILS_PUBLIC
     )
+
+    const isApplicantView = !isInternalUserView && !isPublicView
 
     try {
       const service = getMarineLicenceService(request)
@@ -35,14 +47,14 @@ export const viewDetailsController = {
         throw Boom.forbidden(errorMessages.MARINE_LICENCE_NOT_SUBMITTED)
       }
 
-      const pageCaption = isPublicView
-        ? marineLicence.applicationReference
-        : `${marineLicence.applicationReference} - Marine licence`
+      const pageCaption = isApplicantView
+        ? `${marineLicence.applicationReference} - Marine licence`
+        : marineLicence.applicationReference
 
       return h.view(VIEW_DETAILS_VIEW_ROUTE, {
         pageTitle: marineLicence.projectName,
         pageCaption,
-        backLink: isPublicView ? null : routes.DASHBOARD
+        backLink: isApplicantView ? routes.DASHBOARD : null
       })
     } catch (error) {
       if (error.isBoom) {

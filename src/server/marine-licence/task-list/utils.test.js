@@ -42,7 +42,10 @@ describe('taskList utils', () => {
         status: {
           tag: { text: 'In Progress', classes: 'govuk-tag--light-blue' }
         },
-        title: { classes: 'govuk-link--no-visited-state', text: 'Project name' },
+        title: {
+          classes: 'govuk-link--no-visited-state',
+          text: 'Project name'
+        },
         organisationOnly: false
       },
       {
@@ -70,7 +73,10 @@ describe('taskList utils', () => {
         status: {
           tag: { text: 'Not yet started', classes: 'govuk-tag--blue' }
         },
-        title: { classes: 'govuk-link--no-visited-state', text: 'Project name' },
+        title: {
+          classes: 'govuk-link--no-visited-state',
+          text: 'Project name'
+        },
         organisationOnly: false
       },
       {
@@ -98,7 +104,10 @@ describe('taskList utils', () => {
         status: {
           tag: { text: 'Not yet started', classes: 'govuk-tag--blue' }
         },
-        title: { classes: 'govuk-link--no-visited-state', text: 'Project name' },
+        title: {
+          classes: 'govuk-link--no-visited-state',
+          text: 'Project name'
+        },
         organisationOnly: false
       },
       {
@@ -126,7 +135,10 @@ describe('taskList utils', () => {
         status: {
           tag: { text: 'Not yet started', classes: 'govuk-tag--blue' }
         },
-        title: { classes: 'govuk-link--no-visited-state', text: 'Project name' },
+        title: {
+          classes: 'govuk-link--no-visited-state',
+          text: 'Project name'
+        },
         organisationOnly: false
       },
       {

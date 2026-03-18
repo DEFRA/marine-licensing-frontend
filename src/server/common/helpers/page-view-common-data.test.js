@@ -103,6 +103,7 @@ describe('getPageViewCommonData', () => {
     const result = await getPageViewCommonData(mockRequest)
 
     expect(result).toEqual({
+      isOrganisation: true,
       orgOrUserName: 'Test Organisation Ltd',
       showChangeOrganisationLink: false
     })
@@ -227,6 +228,7 @@ describe('getPageViewCommonData', () => {
     const result = await getPageViewCommonData(mockRequest)
 
     expect(result).toEqual({
+      isOrganisation: false,
       orgOrUserName: null,
       showChangeOrganisationLink: true
     })
@@ -249,6 +251,7 @@ describe('getPageViewCommonData', () => {
     const result = await getPageViewCommonData(mockRequest)
 
     expect(result).toEqual({
+      isOrganisation: true,
       orgOrUserName: 'Test Organisation Ltd',
       showChangeOrganisationLink: false
     })

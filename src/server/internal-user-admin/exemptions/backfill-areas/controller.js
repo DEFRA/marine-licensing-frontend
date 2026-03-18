@@ -1,0 +1,66 @@
+import {
+  authenticatedGetRequest,
+  authenticatedPostRequest
+} from '#src/server/common/helpers/authenticated-requests.js'
+import { formatProjectsForDisplay } from '#src/server/internal-user-admin/exemptions/backfill-areas/utils.js'
+import { routes } from '#src/server/common/constants/routes.js'
+import Boom from '@hapi/boom'
+
+export const DASHBOARD_VIEW_ROUTE =
+  'internal-user-admin/exemptions/backfill-areas/index.njk'
+const DASHBOARD_PAGE_TITLE =
+  'Marine licence submitted without Marine Plan or Coastal Operations Areas'
+
+export const adminBackfillController = {
+  handler: async (request, h) => {
+    if (request.auth?.credentials?.isTeamAdmin !== true) {
+      throw Boom.forbidden('Unauthorized')
+    }
+    try {
+      const { payload } = await authenticatedGetRequest(
+        request,
+        '/exemptions/backfill-areas'
+      )
+      const projects = payload?.value?.backfillAreas || []
+      return h.view(DASHBOARD_VIEW_ROUTE, {
+        pageTitle: DASHBOARD_PAGE_TITLE,
+        heading: DASHBOARD_PAGE_TITLE,
+        projects: formatProjectsForDisplay(projects, request.plugins.crumb)
+      })
+    } catch (error) {
+      request.logger.error(
+        { err: error },
+        'Error rendering internal admin page'
+      )
+
+      return h.view(DASHBOARD_VIEW_ROUTE, {
+        pageTitle: DASHBOARD_PAGE_TITLE,
+        heading: DASHBOARD_PAGE_TITLE,
+        projects: []
+      })
+    }
+  }
+}
+
+export const adminBackfillSendController = {
+  handler: async (request, h) => {
+    if (request.auth?.credentials?.isTeamAdmin !== true) {
+      throw Boom.forbidden(
+        'InternalUserAdmin: Access denied: Team admin role required'
+      )
+    }
+    try {
+      await authenticatedPostRequest(request, '/exemption/backfill-areas', {
+        id: request.payload.exemptionId
+      })
+      return h.redirect(routes.ADMIN_EXEMPTIONS)
+    } catch (error) {
+      request.logger.error(
+        { err: error },
+        'Error when attempting backfill of Areas'
+      )
+
+      return h.redirect(routes.ADMIN_EXEMPTIONS)
+    }
+  }
+}

@@ -1,10 +1,10 @@
-import { internalUserAdminRoutes } from './exemptions/index.js'
+import { internalExemptionsUserAdminRoutes } from './exemptions/index.js'
 
 export const internalUserAdmin = {
   plugin: {
     name: 'internalUserAdmin',
     register(server) {
-      server.route([...internalUserAdminRoutes])
+      server.route([...internalExemptionsUserAdminRoutes])
     }
   }
 }

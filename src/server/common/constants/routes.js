@@ -34,6 +34,7 @@ export const exemptionRoutes = {
   COOKIES: '/help/cookies',
   PRIVACY: '/help/privacy',
   ADMIN_EXEMPTIONS: '/admin/exemptions',
+  ADMIN_BACKFILL: '/admin/backfill-areas',
   EXEMPTION: '/exemption'
 }
 
@@ -83,7 +84,8 @@ export const routes = {
 
 export const entraIdRoutes = [
   routes.VIEW_DETAILS_INTERNAL_USER,
-  routes.ADMIN_EXEMPTIONS
+  routes.ADMIN_EXEMPTIONS,
+  routes.ADMIN_BACKFILL
 ]
 
 export const isEntraIdRoute = (route) => {

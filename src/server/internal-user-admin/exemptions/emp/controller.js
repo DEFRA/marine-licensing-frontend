@@ -2,14 +2,15 @@ import {
   authenticatedGetRequest,
   authenticatedPostRequest
 } from '#src/server/common/helpers/authenticated-requests.js'
-import { formatProjectsForDisplay } from '#src/server/internal-user-admin/exemptions/utils.js'
+import { formatProjectsForDisplay } from '#src/server/internal-user-admin/exemptions/emp/utils.js'
 import { routes } from '#src/server/common/constants/routes.js'
 import Boom from '@hapi/boom'
 
-export const DASHBOARD_VIEW_ROUTE = 'internal-user-admin/index.njk'
+export const DASHBOARD_VIEW_ROUTE =
+  'internal-user-admin/exemptions/emp/index.njk'
 const DASHBOARD_PAGE_TITLE = 'Exemptions not sent to EMP'
 
-export const adminExemptionsController = {
+export const adminEmpController = {
   handler: async (request, h) => {
     if (request.auth?.credentials?.isTeamAdmin !== true) {
       throw Boom.forbidden('Unauthorized')
@@ -43,7 +44,7 @@ export const adminExemptionsController = {
   }
 }
 
-export const adminExemptionsSendController = {
+export const adminEmpSendController = {
   handler: async (request, h) => {
     if (request.auth?.credentials?.isTeamAdmin !== true) {
       throw Boom.forbidden(

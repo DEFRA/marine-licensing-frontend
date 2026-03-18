@@ -2,9 +2,11 @@
 
 {% set rows = [] %}
 
+{% set specialLegalPowers = params.specialLegalPowers or {} %}
+
 {% set _ = rows.push({
      key: { text:  "Special legal powers to do any of this project" },
-     value: { html: params.specialLegalPowers.details if params.specialLegalPowers.agree === 'yes' else "No" }
+     value: { text: (specialLegalPowers.details | default("Not provided")) if specialLegalPowers.agree === 'yes' else "No" }
    })
 %}
 

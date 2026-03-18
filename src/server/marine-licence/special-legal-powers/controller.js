@@ -71,9 +71,10 @@ export const specialLegalPowersSubmitController = {
         details: joi.when('agree', {
           // Details required when agree: 'yes'
           is: 'yes',
-          then: joi.string().required().messages({
+          then: joi.string().max(1000).required().messages({
             'string.empty': 'SPECIAL_LEGAL_POWERS_DETAILS_REQUIRED',
-            'any.required': 'SPECIAL_LEGAL_POWERS_DETAILS_REQUIRED'
+            'any.required': 'SPECIAL_LEGAL_POWERS_DETAILS_REQUIRED',
+            'string.max': 'SPECIAL_LEGAL_POWERS_DETAILS_MAX_LENGTH'
           })
         })
       }),

@@ -24,7 +24,7 @@ export const taskListController = {
   async handler(request, h) {
     const marineLicence = getMarineLicenceCache(request)
 
-    const isOrganisation = getPageViewCommonData(request).isOrganisation
+    const isOrganisation = await getPageViewCommonData(request).isOrganisation
 
     if (!marineLicence?.id) {
       throw Boom.notFound('Marine licence not found')

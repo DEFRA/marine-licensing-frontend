@@ -2,7 +2,7 @@ import {
   authenticatedGetRequest,
   authenticatedPostRequest
 } from '#src/server/common/helpers/authenticated-requests.js'
-import { formatProjectsForDisplay } from '#src/server/internal-user-admin/utils.js'
+import { formatProjectsForDisplay } from '#src/server/internal-user-admin/exemptions/utils.js'
 import { routes } from '#src/server/common/constants/routes.js'
 import Boom from '@hapi/boom'
 

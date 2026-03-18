@@ -64,7 +64,9 @@ const submitMarineLicence = async (request, h) => {
       request,
       apiRoutes.SUBMIT_MARINE_LICENCE,
       {
-        id
+        id,
+        userName: displayName,
+        userEmail: email
       }
     )
 

@@ -109,7 +109,11 @@ describe('Declaration page', () => {
       expect(authRequests.authenticatedPostRequest).toHaveBeenCalledWith(
         expect.any(Object),
         '/marine-licence/submit',
-        { id: mockMarineLicenceApplication.id }
+        {
+          id: mockMarineLicenceApplication.id,
+          userEmail: mockUserSession.email,
+          userName: mockUserSession.displayName
+        }
       )
       expect(clearMarineLicenceCache).toHaveBeenCalledWith(
         expect.any(Object),

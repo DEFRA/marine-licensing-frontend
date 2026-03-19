@@ -51,14 +51,14 @@ export const adminBackfillSendController = {
       await authenticatedPostRequest(request, '/exemption/backfill-areas', {
         id: request.payload.exemptionId
       })
-      return h.redirect(routes.ADMIN_EXEMPTIONS)
+      return h.redirect(routes.ADMIN_BACKFILL)
     } catch (error) {
       request.logger.error(
         { err: error },
         'Error when attempting backfill of Areas'
       )
 
-      return h.redirect(routes.ADMIN_EXEMPTIONS)
+      return h.redirect(routes.ADMIN_BACKFILL)
     }
   }
 }

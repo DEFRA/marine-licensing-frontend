@@ -141,7 +141,7 @@ describe('Admin dashboard to backfill Marine Plan Areas and Coastal Operations a
         }
       )
 
-      expect(h.redirect).toHaveBeenCalledWith(routes.ADMIN_EXEMPTIONS)
+      expect(h.redirect).toHaveBeenCalledWith(routes.ADMIN_BACKFILL)
     })
 
     test('Should handle errors and redirect to admin exemptions', async () => {
@@ -158,7 +158,7 @@ describe('Admin dashboard to backfill Marine Plan Areas and Coastal Operations a
         'Error when attempting backfill of Areas'
       )
 
-      expect(h.redirect).toHaveBeenCalledWith(routes.ADMIN_EXEMPTIONS)
+      expect(h.redirect).toHaveBeenCalledWith(routes.ADMIN_BACKFILL)
     })
 
     test('Should handle missing exemptionId', async () => {
@@ -177,7 +177,7 @@ describe('Admin dashboard to backfill Marine Plan Areas and Coastal Operations a
         }
       )
 
-      expect(h.redirect).toHaveBeenCalledWith(routes.ADMIN_EXEMPTIONS)
+      expect(h.redirect).toHaveBeenCalledWith(routes.ADMIN_BACKFILL)
     })
   })
 })

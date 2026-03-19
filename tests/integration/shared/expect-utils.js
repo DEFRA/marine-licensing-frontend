@@ -8,7 +8,8 @@ import {
 } from '@testing-library/dom'
 import {
   getFieldsetByLabel,
-  getInputInFieldset
+  getInputInFieldset,
+  getFieldsetByHeading
 } from '~/tests/integration/shared/dom-helpers.js'
 
 vi.mock('~/src/server/common/helpers/exemptions/session-cache/utils.js')
@@ -81,7 +82,8 @@ export const expectInputError = ({ document, inputLabel, errorMessage }) => {
 export const expectFieldsetError = ({
   document,
   fieldsetLabel,
-  errorMessage
+  errorMessage,
+  findByHeading = false
 }) => {
   const errorSummary = within(document).getByRole('alert')
   within(errorSummary).getByRole('heading', {
@@ -92,10 +94,9 @@ export const expectFieldsetError = ({
     name: errorMessage
   })
 
-  const fieldset = getFieldsetByLabel({
-    document,
-    fieldsetLabel
-  })
+  const fieldset = findByHeading
+    ? getFieldsetByHeading({ document, fieldsetLabel })
+    : getFieldsetByLabel({ document, fieldsetLabel })
   within(fieldset).getByText(errorMessage)
 
   // confirm that the error summary link correctly references an input within the fieldset

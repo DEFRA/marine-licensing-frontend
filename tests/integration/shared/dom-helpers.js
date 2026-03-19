@@ -29,10 +29,24 @@ export const validateSubmissionSection = (document, expected) => {
   expect(confirmButton.textContent.trim()).toBe(expected.submitButton)
 }
 
-export const getInputInFieldset = ({ document, fieldsetLabel, inputLabel }) => {
-  const fieldset = getFieldsetByLabel({ document, fieldsetLabel })
+export const getInputInFieldset = ({
+  document,
+  fieldsetLabel,
+  inputLabel,
+  findByHeading = false
+}) => {
+  const fieldset = findByHeading
+    ? getFieldsetByHeading({ document, fieldsetLabel })
+    : getFieldsetByLabel({ document, fieldsetLabel })
   return within(fieldset).getByLabelText(inputLabel)
 }
+
+export const getFieldsetByHeading = ({ document, fieldsetLabel }) =>
+  within(document)
+    .getByText(fieldsetLabel, {
+      selector: 'h1'
+    })
+    .closest('fieldset')
 
 export const getFieldsetByLabel = ({ document, fieldsetLabel }) =>
   within(document)

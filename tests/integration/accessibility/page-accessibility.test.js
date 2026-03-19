@@ -34,6 +34,7 @@ import { JSDOM } from 'jsdom'
 import { config } from '~/src/config/config.js'
 import { getUserSession } from '~/src/server/common/plugins/auth/utils.js'
 import { postloginUserSession } from '~/src/server/common/helpers/defraid-login/session-cache.js'
+import { entraIdRoutes } from '#src/server/common/constants/routes.js'
 
 vi.mock('~/src/server/common/helpers/authenticated-requests.js')
 vi.mock('~/src/server/common/helpers/defraid-login/session-cache.js')
@@ -249,6 +250,21 @@ describe('Page accessibility checks (Axe)', () => {
     {
       url: `${marineLicenceRoutes.MARINE_LICENCE_CONFIRMATION}?applicationReference=123`,
       title: 'Application sent'
+    },
+    {
+      url: `${routes.ADMIN_EXEMPTIONS}`,
+      title: 'Exemptions Admin',
+      auth: { credentials: { isTeamAdmin: true } }
+    },
+    {
+      url: `${routes.ADMIN_EMP}`,
+      title: 'Exemptions not sent to EMP',
+      auth: { credentials: { isTeamAdmin: true } }
+    },
+    {
+      url: `${routes.ADMIN_BACKFILL}`,
+      title: 'Exemptions without Marine Plan or Coastal Operations Areas',
+      auth: { credentials: { isTeamAdmin: true } }
     }
   ]
 
@@ -260,7 +276,8 @@ describe('Page accessibility checks (Axe)', () => {
       exemption = mockExemptionData,
       marineLicence = mockMarineLicenceApplication,
       isMarineLicence = false,
-      session
+      session,
+      auth
     }) => {
       if (session) {
         vi.mocked(postloginUserSession.get).mockResolvedValue('organisation')
@@ -282,7 +299,8 @@ describe('Page accessibility checks (Axe)', () => {
       }
       const response = await makeGetRequest({
         url,
-        server: getServer()
+        server: getServer(),
+        auth
       })
 
       expect(response.statusCode).toBe(statusCodes.ok)

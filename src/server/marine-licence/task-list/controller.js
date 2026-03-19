@@ -48,18 +48,17 @@ export const taskListController = {
     } = payload.value
 
     let taskListTransformed = []
-    
+
     const { userRelationshipType } = userSession
 
     if (userRelationshipType === USER_TYPES.CITIZEN) {
       taskListTransformed = transformTaskList(taskList).filter(
         (item) => item.organisationOnly === false
       )
-    }
-    else{
+    } else {
       taskListTransformed = transformTaskList(taskList)
     }
-    
+
     await setMarineLicenceCache(request, h, {
       id: marineLicenceId,
       projectName,

@@ -172,9 +172,16 @@ describe('Page accessibility checks (Axe)', () => {
       isMarineLicence: true
     },
     {
+      url: marineLicenceRoutes.MARINE_LICENCE_SPECIAL_LEGAL_POWERS,
+      title:
+        'Does your organisation have special legal powers to do any of this project?',
+      isMarineLicence: true
+    },
+    {
       url: marineLicenceRoutes.MARINE_LICENCE_TASK_LIST,
       title: 'Marine licence start page',
-      isMarineLicence: true
+      isMarineLicence: true,
+      session: { ...agentSession, shouldShowOrgOrUserName: false }
     },
     {
       url: marineLicenceRoutes.MARINE_LICENCE_CHECK_YOUR_ANSWERS,

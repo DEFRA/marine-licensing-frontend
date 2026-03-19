@@ -1,4 +1,4 @@
-import {  getMarineLicenceCache } from '#src/server/common/helpers/marine-licence/session-cache/utils.js'
+import { getMarineLicenceCache } from '#src/server/common/helpers/marine-licence/session-cache/utils.js'
 import {
   marineLicenceRoutes,
   routes

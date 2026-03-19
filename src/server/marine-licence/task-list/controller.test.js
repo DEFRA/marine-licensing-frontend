@@ -74,7 +74,9 @@ describe('#taskListController', () => {
     vi.mocked(transformTaskList).mockReturnValue(mockTransformedTaskList)
     vi.mocked(setMarineLicenceCache).mockResolvedValue(mockMarineLicence)
 
-    authUtils.getUserSession.mockResolvedValue({ userRelationshipType: 'CITIZEN' })
+    authUtils.getUserSession.mockResolvedValue({
+      userRelationshipType: 'CITIZEN'
+    })
 
     await taskListController.handler(mockRequest, mockH)
 

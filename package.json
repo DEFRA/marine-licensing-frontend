@@ -85,7 +85,7 @@
     "@testing-library/jest-dom": "^6.9.1",
     "@vitest/coverage-v8": "^4.0.18",
     "@vitest/runner": "^4.0.14",
-    "@vitest/ui": "^4.0.14",
+    "@vitest/ui": "^4.1.0",
     "allure-commandline": "^2.38.0",
     "allure-vitest": "^3.6.0",
     "autoprefixer": "^10.4.27",

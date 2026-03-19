@@ -1,14 +1,10 @@
 import { vi } from 'vitest'
-import {
-  getMarineLicenceCache,
-  setMarineLicenceCache
-} from '#src/server/common/helpers/marine-licence/session-cache/utils.js'
+import { getMarineLicenceCache } from '#src/server/common/helpers/marine-licence/session-cache/utils.js'
 import {
   checkYourAnswersController,
   CHECK_YOUR_ANSWERS_VIEW_ROUTE
 } from '#src/server/marine-licence/check-your-answers/controller.js'
 import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
-import * as marineLicenceServiceModule from '#src/services/marine-licence-service/index.js'
 
 vi.mock('#src/server/common/helpers/marine-licence/session-cache/utils.js')
 

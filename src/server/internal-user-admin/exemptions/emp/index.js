@@ -4,12 +4,12 @@ import { adminEmpController, adminEmpSendController } from './controller.js'
 export const internalEmpUserAdminRoutes = [
   {
     method: 'GET',
-    path: routes.ADMIN_EXEMPTIONS,
+    path: routes.ADMIN_EMP,
     ...adminEmpController
   },
   {
     method: 'POST',
-    path: routes.ADMIN_EXEMPTIONS,
+    path: routes.ADMIN_EMP,
     ...adminEmpSendController
   }
 ]

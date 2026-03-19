@@ -37,10 +37,8 @@ describe('Admin dashboard to backfill Marine Plan Areas and Coastal Operations a
       await adminBackfillController.handler(request, h)
 
       expect(h.view).toHaveBeenCalledWith(DASHBOARD_VIEW_ROUTE, {
-        pageTitle:
-          'Marine licence submitted without Marine Plan or Coastal Operations Areas',
-        heading:
-          'Marine licence submitted without Marine Plan or Coastal Operations Areas',
+        pageTitle: 'Exemptions without Marine Plan or Coastal Operations Areas',
+        heading: 'Exemptions without Marine Plan or Coastal Operations Areas',
         projects: []
       })
     })
@@ -82,10 +80,8 @@ describe('Admin dashboard to backfill Marine Plan Areas and Coastal Operations a
       await adminBackfillController.handler(request, h)
 
       expect(h.view).toHaveBeenCalledWith(DASHBOARD_VIEW_ROUTE, {
-        pageTitle:
-          'Marine licence submitted without Marine Plan or Coastal Operations Areas',
-        heading:
-          'Marine licence submitted without Marine Plan or Coastal Operations Areas',
+        pageTitle: 'Exemptions without Marine Plan or Coastal Operations Areas',
+        heading: 'Exemptions without Marine Plan or Coastal Operations Areas',
         projects: expectedFormattedProjects
       })
     })
@@ -103,10 +99,8 @@ describe('Admin dashboard to backfill Marine Plan Areas and Coastal Operations a
       )
 
       expect(h.view).toHaveBeenCalledWith(DASHBOARD_VIEW_ROUTE, {
-        pageTitle:
-          'Marine licence submitted without Marine Plan or Coastal Operations Areas',
-        heading:
-          'Marine licence submitted without Marine Plan or Coastal Operations Areas',
+        pageTitle: 'Exemptions without Marine Plan or Coastal Operations Areas',
+        heading: 'Exemptions without Marine Plan or Coastal Operations Areas',
         projects: []
       })
     })
@@ -121,14 +115,11 @@ describe('Admin dashboard to backfill Marine Plan Areas and Coastal Operations a
       await adminBackfillController.handler(request, h)
 
       expect(h.view).toHaveBeenCalledWith(DASHBOARD_VIEW_ROUTE, {
-        pageTitle:
-          'Marine licence submitted without Marine Plan or Coastal Operations Areas',
-        heading:
-          'Marine licence submitted without Marine Plan or Coastal Operations Areas',
+        pageTitle: 'Exemptions without Marine Plan or Coastal Operations Areas',
+        heading: 'Exemptions without Marine Plan or Coastal Operations Areas',
         projects: []
       })
     })
-
   })
 
   describe('#adminBackfillSendController', () => {
@@ -188,6 +179,5 @@ describe('Admin dashboard to backfill Marine Plan Areas and Coastal Operations a
 
       expect(h.redirect).toHaveBeenCalledWith(routes.ADMIN_EXEMPTIONS)
     })
-
   })
 })

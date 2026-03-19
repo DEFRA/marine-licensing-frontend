@@ -9,7 +9,7 @@ import { validateTeamAdminSession } from '#src/server/common/helpers/user-sessio
 export const DASHBOARD_VIEW_ROUTE =
   'internal-user-admin/exemptions/backfill-areas/index.njk'
 const DASHBOARD_PAGE_TITLE =
-  'Marine licence submitted without Marine Plan or Coastal Operations Areas'
+  'Exemptions without Marine Plan or Coastal Operations Areas'
 
 export const adminBackfillController = {
   options: {

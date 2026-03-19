@@ -15,9 +15,9 @@
         }
       }) }}
 
-      <p class="govuk-body">Backfill Marine Plan and Coastal Enforment Areas, then submit to Dynamics.</p>
-
       {% if projects and projects.length > 0 %}
+
+        <p class="govuk-body">Backfill Marine Plan and Coastal Enforment Areas, then submit to Dynamics.</p>
 
         {{ govukTable({
           caption: heading,
@@ -41,7 +41,7 @@
 
       {% else %}
         <p class="govuk-body">
-          You currently have no projects.
+          You currently have no projects that require backfill.
         </p>
       {% endif %}
       {% if failedPendingRetries.length %}

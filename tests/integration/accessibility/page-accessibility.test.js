@@ -34,7 +34,6 @@ import { JSDOM } from 'jsdom'
 import { config } from '~/src/config/config.js'
 import { getUserSession } from '~/src/server/common/plugins/auth/utils.js'
 import { postloginUserSession } from '~/src/server/common/helpers/defraid-login/session-cache.js'
-import { entraIdRoutes } from '#src/server/common/constants/routes.js'
 
 vi.mock('~/src/server/common/helpers/authenticated-requests.js')
 vi.mock('~/src/server/common/helpers/defraid-login/session-cache.js')

@@ -8,6 +8,8 @@ import { transformTaskList } from '#src/server/marine-licence/task-list/utils.js
 import { authenticatedGetRequest } from '#src/server/common/helpers/authenticated-requests.js'
 import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
 import { PROJECT_TYPE } from '#src/server/common/constants/projects.js'
+import { getUserSession } from '#src/server/common/plugins/auth/utils.js'
+import { USER_TYPES } from '#src/server/common/constants/user-types.js'
 import Boom from '@hapi/boom'
 
 export const TASK_LIST_VIEW_ROUTE = 'marine-licence/task-list/index'
@@ -21,6 +23,11 @@ const taskListViewSettings = {
 
 export const taskListController = {
   async handler(request, h) {
+    const userSession = await getUserSession(
+      request,
+      request.state?.userSession
+    )
+
     const marineLicence = getMarineLicenceCache(request)
 
     if (!marineLicence?.id) {
@@ -40,8 +47,19 @@ export const taskListController = {
       specialLegalPowers
     } = payload.value
 
-    const taskListTransformed = transformTaskList(taskList)
+    let taskListTransformed = []
+    
+    const { userRelationshipType } = userSession
 
+    if (userRelationshipType === USER_TYPES.CITIZEN) {
+      taskListTransformed = transformTaskList(taskList).filter(
+        (item) => item.organisationOnly === false
+      )
+    }
+    else{
+      taskListTransformed = transformTaskList(taskList)
+    }
+    
     await setMarineLicenceCache(request, h, {
       id: marineLicenceId,
       projectName,

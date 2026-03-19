@@ -18,7 +18,6 @@ import {
 } from '#src/server/marine-licence/special-legal-powers/controller.js'
 import * as cacheUtils from '#src/server/common/helpers/marine-licence/session-cache/utils.js'
 import * as authRequests from '#src/server/common/helpers/authenticated-requests.js'
-import * as marineLicenceServiceModule from '#src/services/marine-licence-service/index.js'
 
 vi.mock('~/src/server/common/helpers/marine-licence/session-cache/utils.js')
 

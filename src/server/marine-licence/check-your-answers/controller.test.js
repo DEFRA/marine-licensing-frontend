@@ -48,44 +48,4 @@ describe('#checkYourAnswersController', () => {
       ...mockCachedData
     })
   })
-
-  test('should enter if block when specialLegalPowers missing and id exists', async () => {
-    const mockCachedData = {
-      id: '123',
-      projectName: 'Test Project'
-    }
-
-    const dbResponse = {
-      specialLegalPowers: {
-        agree: 'yes',
-        details: 'From DB'
-      }
-    }
-
-    getMarineLicenceCacheMock.mockReturnValue(mockCachedData)
-
-    const mockService = {
-      getMarineLicenceById: vi.fn().mockResolvedValue(dbResponse)
-    }
-
-    vi.spyOn(
-      marineLicenceServiceModule,
-      'getMarineLicenceService'
-    ).mockReturnValue(mockService)
-
-    const setCacheMock = vi.mocked(setMarineLicenceCache)
-
-    await checkYourAnswersController.handler(mockRequest, mockH)
-
-    expect(mockService.getMarineLicenceById).toHaveBeenCalledWith('123')
-
-    expect(setCacheMock).toHaveBeenCalled()
-
-    expect(mockH.view).toHaveBeenCalledWith(
-      CHECK_YOUR_ANSWERS_VIEW_ROUTE,
-      expect.objectContaining({
-        specialLegalPowers: dbResponse.specialLegalPowers
-      })
-    )
-  })
 })

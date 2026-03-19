@@ -14,12 +14,14 @@ import {
 } from '#src/server/marine-licence/task-list/controller.js'
 import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
 import { PROJECT_TYPE } from '#src/server/common/constants/projects.js'
+import * as authUtils from '#src/server/common/plugins/auth/utils.js'
 import Boom from '@hapi/boom'
 
 vi.mock('#src/server/common/helpers/marine-licence/session-cache/utils.js')
 vi.mock('#src/server/common/helpers/session-cache/utils.js')
 vi.mock('#src/server/common/helpers/authenticated-requests.js')
 vi.mock('#src/server/marine-licence/task-list/utils.js')
+vi.mock('#src/server/common/plugins/auth/utils.js')
 
 describe('#taskListController', () => {
   let mockRequest
@@ -71,6 +73,8 @@ describe('#taskListController', () => {
     })
     vi.mocked(transformTaskList).mockReturnValue(mockTransformedTaskList)
     vi.mocked(setMarineLicenceCache).mockResolvedValue(mockMarineLicence)
+
+    authUtils.getUserSession.mockResolvedValue({ userRelationshipType: 'CITIZEN' })
 
     await taskListController.handler(mockRequest, mockH)
 

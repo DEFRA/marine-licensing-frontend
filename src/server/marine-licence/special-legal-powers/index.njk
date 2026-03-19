@@ -15,7 +15,7 @@
 
 {% block content %}
   
-  {% set noHtml %}
+  {% set specialLegalPowersDetails %}
             {{ govukTextarea({
               id: "details",
               name: "details",
@@ -42,7 +42,7 @@
                 value: "yes",
                 text: "Yes",
                 conditional: {
-                  html: noHtml
+                  html: specialLegalPowersDetails
                 }
                 },
                 {

@@ -124,7 +124,6 @@ describe('Admin dashboard to send exemptions to EMP', () => {
         failedPendingRetries: []
       })
     })
-
   })
 
   describe('#adminEmpSendController', () => {
@@ -184,6 +183,5 @@ describe('Admin dashboard to send exemptions to EMP', () => {
 
       expect(h.redirect).toHaveBeenCalledWith(routes.ADMIN_EXEMPTIONS)
     })
-
   })
 })

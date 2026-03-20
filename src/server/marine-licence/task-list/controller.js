@@ -59,6 +59,14 @@ export const taskListController = {
       taskListTransformed = transformTaskList(taskList)
     }
 
+    const projectDetailsTaskList = taskListTransformed.filter(
+      (item) => item.section === 'projectDetails'
+    )
+
+    const otherPermissionsTaskList = taskListTransformed.filter(
+      (item) => item.section === 'otherPermissions'
+    )
+
     await setMarineLicenceCache(request, h, {
       id: marineLicenceId,
       projectName,
@@ -74,7 +82,8 @@ export const taskListController = {
     return h.view(TASK_LIST_VIEW_ROUTE, {
       ...taskListViewSettings,
       projectName: payload.value.projectName,
-      taskList: taskListTransformed,
+      projectDetailsTaskList,
+      otherPermissionsTaskList,
       hasCompletedAllTasks
     })
   }

@@ -16,7 +16,8 @@ describe('taskList utils', () => {
           classes: 'govuk-link--no-visited-state',
           text: 'Project name'
         },
-        organisationOnly: false
+        organisationOnly: false,
+        section: 'projectDetails'
       },
       {
         href: marineLicenceRoutes.MARINE_LICENCE_SPECIAL_LEGAL_POWERS,
@@ -25,7 +26,8 @@ describe('taskList utils', () => {
           classes: 'govuk-link--no-visited-state',
           text: 'Special Legal Powers'
         },
-        organisationOnly: true
+        organisationOnly: true,
+        section: 'otherPermissions'
       }
     ])
   })
@@ -46,7 +48,8 @@ describe('taskList utils', () => {
           classes: 'govuk-link--no-visited-state',
           text: 'Project name'
         },
-        organisationOnly: false
+        organisationOnly: false,
+        section: 'projectDetails'
       },
       {
         href: marineLicenceRoutes.MARINE_LICENCE_SPECIAL_LEGAL_POWERS,
@@ -57,7 +60,8 @@ describe('taskList utils', () => {
           classes: 'govuk-link--no-visited-state',
           text: 'Special Legal Powers'
         },
-        organisationOnly: true
+        organisationOnly: true,
+        section: 'otherPermissions'
       }
     ])
   })
@@ -77,7 +81,8 @@ describe('taskList utils', () => {
           classes: 'govuk-link--no-visited-state',
           text: 'Project name'
         },
-        organisationOnly: false
+        organisationOnly: false,
+        section: 'projectDetails'
       },
       {
         href: marineLicenceRoutes.MARINE_LICENCE_SPECIAL_LEGAL_POWERS,
@@ -88,7 +93,8 @@ describe('taskList utils', () => {
           classes: 'govuk-link--no-visited-state',
           text: 'Special Legal Powers'
         },
-        organisationOnly: true
+        organisationOnly: true,
+        section: 'otherPermissions'
       }
     ])
   })
@@ -108,7 +114,8 @@ describe('taskList utils', () => {
           classes: 'govuk-link--no-visited-state',
           text: 'Project name'
         },
-        organisationOnly: false
+        organisationOnly: false,
+        section: 'projectDetails'
       },
       {
         href: marineLicenceRoutes.MARINE_LICENCE_SPECIAL_LEGAL_POWERS,
@@ -119,7 +126,8 @@ describe('taskList utils', () => {
           classes: 'govuk-link--no-visited-state',
           text: 'Special Legal Powers'
         },
-        organisationOnly: true
+        organisationOnly: true,
+        section: 'otherPermissions'
       }
     ])
   })
@@ -139,7 +147,8 @@ describe('taskList utils', () => {
           classes: 'govuk-link--no-visited-state',
           text: 'Project name'
         },
-        organisationOnly: false
+        organisationOnly: false,
+        section: 'projectDetails'
       },
       {
         href: marineLicenceRoutes.MARINE_LICENCE_SPECIAL_LEGAL_POWERS,
@@ -150,7 +159,8 @@ describe('taskList utils', () => {
           classes: 'govuk-link--no-visited-state',
           text: 'Special Legal Powers'
         },
-        organisationOnly: true
+        organisationOnly: true,
+        section: 'otherPermissions'
       }
     ])
   })

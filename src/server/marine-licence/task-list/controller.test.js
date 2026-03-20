@@ -52,7 +52,8 @@ describe('#taskListController', () => {
         id: '123',
         projectName: 'Test Project',
         taskList: {
-          projectName: 'COMPLETED'
+          projectName: 'COMPLETED',
+          specialLegalPowers: 'COMPLETED'
         }
       }
     }
@@ -63,7 +64,45 @@ describe('#taskListController', () => {
         title: {
           classes: 'govuk-link--no-visited-state',
           text: 'Project name'
-        }
+        },
+        organisationOnly: true,
+        section: 'projectDetails'
+      },
+      {
+        title: {
+          text: 'Special Legal Powers',
+          classes: 'govuk-link--no-visited-state'
+        },
+        href: marineLicenceRoutes.MARINE_LICENCE_SPECIAL_LEGAL_POWERS,
+        status: { text: 'Completed' },
+        organisationOnly: true,
+        section: 'otherPermissions'
+      }
+    ]
+
+    const expectedOtherPermissionsTaskList = [
+      {
+        title: {
+          text: 'Special Legal Powers',
+          classes: 'govuk-link--no-visited-state'
+        },
+        href: marineLicenceRoutes.MARINE_LICENCE_SPECIAL_LEGAL_POWERS,
+        status: { text: 'Completed' },
+        organisationOnly: true,
+        section: 'otherPermissions'
+      }
+    ]
+
+    const expectedProjectDetailsTaskList = [
+      {
+        href: marineLicenceRoutes.MARINE_LICENCE_PROJECT_NAME,
+        status: { text: 'Completed' },
+        title: {
+          classes: 'govuk-link--no-visited-state',
+          text: 'Project name'
+        },
+        organisationOnly: true,
+        section: 'projectDetails'
       }
     ]
 
@@ -106,7 +145,8 @@ describe('#taskListController', () => {
       pageTitle: 'Marine licence start page',
       heading: 'Marine licence start page',
       projectName: 'Test Project',
-      taskList: mockTransformedTaskList
+      otherPermissionsTaskList: expectedOtherPermissionsTaskList,
+      projectDetailsTaskList: expectedProjectDetailsTaskList
     })
   })
 

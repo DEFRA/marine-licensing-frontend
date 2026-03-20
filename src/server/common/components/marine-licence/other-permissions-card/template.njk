@@ -10,7 +10,17 @@
 
 {% set _ = rows.push({
   key: { text: "Special legal powers to do any of this project" },
-  value: value
+  value: value,
+  actions: {
+      items: [
+        {
+          href: "/marine-licence/special-legal-powers?from=check-your-answers",
+          text: "Change",
+          visuallyHiddenText: "special legal powers",
+          classes: "govuk-link--no-visited-state"
+        }
+      ]
+    } if not params.isReadOnly
 }) %}
 
 {% if rows | length %}
@@ -20,16 +30,7 @@
       title: {
         text: "Other permissions"
     },
-      actions: {
-        items: [
-          {
-            href: "/marine-licence/special-legal-powers?from=check-your-answers",
-            text: "Change",
-            visuallyHiddenText: "special legal powers",
-            classes: "govuk-link--no-visited-state"
-          }
-        ]
-      } if not params.isReadOnly,
+      
       attributes: {
         id: "other-permissions-card"
       }

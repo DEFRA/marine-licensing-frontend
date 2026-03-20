@@ -8,7 +8,7 @@ export const adminExemptionsController = {
   options: {
     pre: [validateTeamAdminSession]
   },
-  handler: async (request, h) => {
+  handler: async (_request, h) => {
     return h.view(DASHBOARD_VIEW_ROUTE, {
       pageTitle: DASHBOARD_PAGE_TITLE,
       heading: DASHBOARD_PAGE_TITLE

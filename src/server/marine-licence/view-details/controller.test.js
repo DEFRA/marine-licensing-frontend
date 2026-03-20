@@ -9,14 +9,19 @@ import {
   routes,
   marineLicenceRoutes
 } from '#src/server/common/constants/routes.js'
-import { mockMarineLicenceApplication } from '#src/server/test-helpers/mocks/marine-licence-mocks.js'
+import {
+  mockMarineLicenceApplication,
+  mockSubmittedMarineLicenceApplication
+} from '#src/server/test-helpers/mocks/marine-licence-mocks.js'
+import { getAuthProvider } from '#src/server/common/helpers/authenticated-requests.js'
 
 vi.mock('~/src/services/marine-licence-service/index.js')
+vi.mock('~/src/server/common/helpers/authenticated-requests.js', () => ({
+  getAuthProvider: vi.fn().mockReturnValue('defra-id')
+}))
 
 const createSubmittedMarineLicence = (overrides = {}) => ({
-  ...mockMarineLicenceApplication,
-  applicationReference: 'ML/2024/12345',
-  status: 'Submitted',
+  ...mockSubmittedMarineLicenceApplication,
   ...overrides
 })
 
@@ -28,10 +33,10 @@ describe('marine-licence view details controller', () => {
     mockMarineLicenceService = {
       getMarineLicenceById: vi
         .fn()
-        .mockResolvedValue(createSubmittedMarineLicence()),
+        .mockResolvedValue(mockSubmittedMarineLicenceApplication),
       getPublicMarineLicenceById: vi
         .fn()
-        .mockResolvedValue(createSubmittedMarineLicence())
+        .mockResolvedValue(mockSubmittedMarineLicenceApplication)
     }
 
     vi.mocked(getMarineLicenceService).mockReturnValue(mockMarineLicenceService)
@@ -281,6 +286,35 @@ describe('marine-licence view details controller', () => {
 
         expect(statusCode).toBe(403)
       })
+    })
+  })
+
+  describe(`GET /view-marine-licence-details/{marineLicenceId}`, () => {
+    test('should return correct view valid marine licence using dynamics link', async () => {
+      vi.mocked(getAuthProvider).mockReturnValue('entra-id')
+
+      const mockH = { view: vi.fn() }
+      const mockRequest = {
+        path: `/view-marine-licence-details/${mockMarineLicenceApplication.id}`,
+        params: { marineLicenceId: mockMarineLicenceApplication.id },
+        logger: { error: vi.fn() }
+      }
+
+      await viewDetailsController.handler(mockRequest, mockH)
+
+      expect(getMarineLicenceService).toHaveBeenCalledWith(expect.any(Object))
+      expect(
+        mockMarineLicenceService.getMarineLicenceById
+      ).toHaveBeenCalledWith(mockSubmittedMarineLicenceApplication.id)
+
+      expect(mockH.view).toHaveBeenCalledWith(
+        VIEW_DETAILS_VIEW_ROUTE,
+        expect.objectContaining({
+          pageTitle: mockSubmittedMarineLicenceApplication.projectName,
+          pageCaption: `${mockSubmittedMarineLicenceApplication.applicationReference}`,
+          backLink: null
+        })
+      )
     })
   })
 })

@@ -13,15 +13,17 @@
 
       <h2 class="govuk-heading-m">Project details</h2>
       {{ govukTaskList({
-          idPrefix: "task-list",
+          idPrefix: "project-details-task-list",
           items: projectDetailsTaskList
         }) }}
 
+        {% if otherPermissionsTaskList | length %}
         <h2 class="govuk-heading-m">Other permissions</h2>
          {{ govukTaskList({
-          idPrefix: "task-list",
+          idPrefix: "other-permissions-task-list",
           items: otherPermissionsTaskList
         }) }}
+        {% endif %}
 
         {% if hasCompletedAllTasks %}
           {{ govukButton({

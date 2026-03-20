@@ -204,7 +204,11 @@ describe('#declarationSubmitController', () => {
       expect(authRequests.authenticatedPostRequest).toHaveBeenCalledWith(
         mockRequest,
         '/marine-licence/submit',
-        { id: mockMarineLicenceApplication.id }
+        {
+          id: mockMarineLicenceApplication.id,
+          userEmail: 'john.doe@example.com',
+          userName: 'Test User'
+        }
       )
 
       expect(clearMarineLicenceCache).toHaveBeenCalledWith(mockRequest, mockH)

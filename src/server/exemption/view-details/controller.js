@@ -4,19 +4,22 @@ import { routes } from '#src/server/common/constants/routes.js'
 import { processSiteDetails } from '#src/server/common/helpers/exemptions/exemption-site-details.js'
 import { buildSiteLocationData } from '#src/server/common/helpers/site-location-data.js'
 import { getExemptionService } from '#src/services/exemption-service/index.js'
-import { getAuthProvider } from '#src/server/common/helpers/authenticated-requests.js'
-import { AUTH_STRATEGIES } from '#src/server/common/constants/auth.js'
 import { getTagStyle } from '#src/server/common/helpers/ui/get-tag-style.js'
-import { isProjectViewable } from '#src/server/common/helpers/view-details/utils.js'
+import {
+  isInternalUserView as getIsInternalUserView,
+  isProjectViewable
+} from '#src/server/common/helpers/view-details/utils.js'
+import { EXEMPTIONS_KEY } from '#src/server/common/constants/exemptions.js'
 
 export const VIEW_DETAILS_VIEW_ROUTE = 'exemption/view-details/index'
 export const viewDetailsController = {
   async handler(request, h) {
     const { exemptionId } = request.params
-    const isInternalUserView =
-      request.path.startsWith(routes.VIEW_DETAILS_INTERNAL_USER) &&
-      getAuthProvider(request) === AUTH_STRATEGIES.ENTRA_ID
+
+    const isInternalUserView = getIsInternalUserView(request, EXEMPTIONS_KEY)
+
     const isPublicView = request.path.startsWith(routes.VIEW_DETAILS_PUBLIC)
+
     const isApplicantView = !isInternalUserView && !isPublicView
 
     try {

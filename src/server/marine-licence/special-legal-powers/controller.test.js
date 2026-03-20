@@ -18,8 +18,10 @@ import {
 } from '#src/server/marine-licence/special-legal-powers/controller.js'
 import * as cacheUtils from '#src/server/common/helpers/marine-licence/session-cache/utils.js'
 import * as authRequests from '#src/server/common/helpers/authenticated-requests.js'
+import * as authUtils from '#src/server/common/plugins/auth/utils.js'
 
 vi.mock('~/src/server/common/helpers/marine-licence/session-cache/utils.js')
+vi.mock('~/src/server/common/plugins/auth/utils.js')
 
 describe('#specialLegalPowers', () => {
   const getServer = setupTestServer()
@@ -47,6 +49,10 @@ describe('#specialLegalPowers', () => {
 
   describe('#specialLegalPowersController', () => {
     test('Should provide expected response', async () => {
+      authUtils.getUserSession.mockResolvedValue({
+        userRelationshipType: 'EMPLOYEE'
+      })
+
       const { result, statusCode } = await makeGetRequest({
         url: marineLicenceRoutes.MARINE_LICENCE_SPECIAL_LEGAL_POWERS,
         server: getServer()
@@ -59,9 +65,14 @@ describe('#specialLegalPowers', () => {
       expect(statusCode).toBe(statusCodes.ok)
     })
 
-    test('specialLegalPowersController handler should render with correct context', () => {
+    test('specialLegalPowersController handler should render with correct context', async () => {
+      authUtils.getUserSession.mockResolvedValue({
+        userRelationshipType: 'EMPLOYEE'
+      })
+
       const h = { view: vi.fn() }
-      specialLegalPowersController.handler({}, h)
+
+      await specialLegalPowersController.handler({}, h)
       expect(h.view).toHaveBeenCalledWith(SPECIAL_LEGAL_POWERS_VIEW_ROUTE, {
         backLink: marineLicenceRoutes.MARINE_LICENCE_TASK_LIST,
         pageTitle:

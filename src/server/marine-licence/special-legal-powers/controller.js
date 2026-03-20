@@ -8,6 +8,8 @@ import {
 } from '#src/server/common/helpers/errors.js'
 import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
 import { authenticatedPatchRequest } from '#src/server/common/helpers/authenticated-requests.js'
+import { USER_TYPES } from '#src/server/common/constants/user-types.js'
+import { getUserSession } from '#src/server/common/plugins/auth/utils.js'
 
 import joi from 'joi'
 
@@ -39,6 +41,17 @@ const getBackLink = (request) => {
 export const specialLegalPowersController = {
   async handler(request, h) {
     const marineLicence = getMarineLicenceCache(request)
+
+    const userSession = await getUserSession(
+      request,
+      request.state?.userSession
+    )
+
+    const { userRelationshipType } = userSession
+
+    if (userRelationshipType === USER_TYPES.CITIZEN) {
+      return h.redirect(marineLicenceRoutes.MARINE_LICENCE_TASK_LIST)
+    }
 
     return h.view(SPECIAL_LEGAL_POWERS_VIEW_ROUTE, {
       ...specialLegalPowersSettings,

@@ -295,7 +295,7 @@ describe('marine-licence view details controller', () => {
 
       const mockH = { view: vi.fn() }
       const mockRequest = {
-        path: `/view-marine-licence-details/:${mockMarineLicenceApplication.id}`,
+        path: `/view-marine-licence-details/${mockMarineLicenceApplication.id}`,
         params: { marineLicenceId: mockMarineLicenceApplication.id },
         logger: { error: vi.fn() }
       }

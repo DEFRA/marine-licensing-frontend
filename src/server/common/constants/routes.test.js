@@ -21,6 +21,14 @@ describe('isEntraIdRoute', () => {
     expect(isEntraIdRoute('/view-details/abc123')).toBe(true)
   })
 
+  test('should return true for exact match on /view-marine-licence-details', () => {
+    expect(isEntraIdRoute('/view-marine-licence-details')).toBe(true)
+  })
+
+  test('should return true for route starting with /view-marine-licence-details', () => {
+    expect(isEntraIdRoute('/view-marine-licence-details/abc123')).toBe(true)
+  })
+
   test('should return true for exact match on /admin/exemptions', () => {
     expect(isEntraIdRoute('/admin/exemptions')).toBe(true)
   })

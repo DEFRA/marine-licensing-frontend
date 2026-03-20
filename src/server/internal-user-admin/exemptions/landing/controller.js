@@ -9,21 +9,9 @@ export const adminExemptionsController = {
     pre: [validateTeamAdminSession]
   },
   handler: async (request, h) => {
-    try {
-      return h.view(DASHBOARD_VIEW_ROUTE, {
-        pageTitle: DASHBOARD_PAGE_TITLE,
-        heading: DASHBOARD_PAGE_TITLE
-      })
-    } catch (error) {
-      request.logger.error(
-        { err: error },
-        'Error rendering internal admin page'
-      )
-
-      return h.view(DASHBOARD_VIEW_ROUTE, {
-        pageTitle: DASHBOARD_PAGE_TITLE,
-        heading: DASHBOARD_PAGE_TITLE
-      })
-    }
+    return h.view(DASHBOARD_VIEW_ROUTE, {
+      pageTitle: DASHBOARD_PAGE_TITLE,
+      heading: DASHBOARD_PAGE_TITLE
+    })
   }
 }

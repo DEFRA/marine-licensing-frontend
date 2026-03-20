@@ -7,8 +7,7 @@ describe('Marine Licence Other Permissions Card Component', () => {
     specialLegalPowers: {
       agree: 'yes',
       details: 'We have statutory powers under the Marine Act.'
-    },
-    isApplicantView: true
+    }
   }
 
   beforeEach(() => {

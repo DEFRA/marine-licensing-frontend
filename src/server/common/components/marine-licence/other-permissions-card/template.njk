@@ -2,15 +2,16 @@
 
 {% set rows = [] %}
 
-{% if params.specialLegalPowers  %}
+{% if params.specialLegalPowers.agree === 'yes' %}
+  {% set value = { html: params.specialLegalPowers.details } %}
+{% else %}
+  {% set value = { text: "No" } %}
+{% endif %}
 
 {% set _ = rows.push({
-     key: { text:  "Special legal powers to do any of this project" },
-     value: { text: (specialLegalPowers.details | default("Not provided")) if specialLegalPowers.agree === 'yes' else "No" }
-   })
-%}
-
-{% endif %}
+  key: { text: "Special legal powers to do any of this project" },
+  value: value
+}) %}
 
 {% if rows | length %}
 

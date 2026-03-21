@@ -10,6 +10,9 @@ import {
   expectInputValue
 } from '~/tests/integration/shared/expect-utils.js'
 import { getInputInFieldset } from '~/tests/integration/shared/dom-helpers.js'
+import { employeeSession } from '~/tests/integration/shared/session-fixtures.js'
+import { getUserSession } from '~/src/server/common/plugins/auth/utils.js'
+vi.mock('~/src/server/common/plugins/auth/utils.js')
 
 describe('Special legal powers', () => {
   const getServer = setupTestServer()
@@ -18,6 +21,10 @@ describe('Special legal powers', () => {
     projectName: 'Test Marine Project',
     specialLegalPowers: { agree: undefined, details: '' }
   }
+
+  beforeAll(() => {
+    vi.mocked(getUserSession).mockResolvedValue(employeeSession)
+  })
 
   test('page elements', async () => {
     mockMarineLicence(marineLicence)

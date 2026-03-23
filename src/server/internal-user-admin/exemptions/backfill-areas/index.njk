@@ -13,30 +13,31 @@
           classes: 'govuk-heading-l'
         }
       }) }}
+      </div>
 
-      {% if projects and projects.length > 0 %}
+      <div class="govuk-grid-column-full">
+        {% if projects and projects.length > 0 %}
 
-        <p class="govuk-body">Backfill Marine Plan and Coastal Enforcement Areas, then submit to Dynamics.</p>
-
-        {{ govukTable({
-          caption: heading,
-          captionClasses: "govuk-visually-hidden",
-          head: [
-            {
-              text: "Name"
-            },
-            {
-              text: "Reference"
-            },
-            {
-              text: "Submitted"
-            },
-            {
-              text: "Actions"
-            }
-          ],
-          rows: projects
-        }) }}
+          {{ govukTable({
+            caption: heading,
+            captionClasses: "govuk-visually-hidden",
+            head: [
+              {
+                text: "Name"
+              },
+              {
+                text: "Reference"
+              },
+              {
+                text: "Submitted"
+              },
+              {
+                text: "Actions",
+                classes:"govuk-!-width-one-quarter"
+              }
+            ],
+            rows: projects
+          }) }}
 
       {% else %}
         <p class="govuk-body">
@@ -44,5 +45,6 @@
         </p>
       {% endif %}
     </div>
+
   </div>
 {% endblock %}

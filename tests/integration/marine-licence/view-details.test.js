@@ -22,4 +22,17 @@ describe('Marine Licence View Details', () => {
       mockSubmittedMarineLicenceApplication.projectName
     )
   })
+
+  test('should render the page in Dynamics view', async () => {
+    mockMarineLicence(mockSubmittedMarineLicenceApplication)
+
+    const document = await loadPage({
+      requestUrl: `${marineLicenceRoutes.MARINE_LICENCE_VIEW_DETAILS_INTERNAL_USER}/${mockSubmittedMarineLicenceApplication.id}`,
+      server: getServer()
+    })
+
+    expect(getByRole(document, 'heading', { level: 1 })).toHaveTextContent(
+      mockSubmittedMarineLicenceApplication.projectName
+    )
+  })
 })

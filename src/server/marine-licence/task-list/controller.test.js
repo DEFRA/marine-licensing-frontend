@@ -8,7 +8,7 @@ import { setProjectType } from '#src/server/common/helpers/session-cache/utils.j
 import { authenticatedGetRequest } from '#src/server/common/helpers/authenticated-requests.js'
 import {
   transformProjectDetailsTaskList,
-  transformOtherPermissionsTaskList
+  transformSiteDetailsTaskList
 } from '#src/server/marine-licence/task-list/utils.js'
 import {
   taskListController,
@@ -67,7 +67,7 @@ describe('#taskListController', () => {
         }
       }
     ]
-    const mockOtherPermissionsTaskList = [
+    const mockSiteDetailsTaskList = [
       {
         href: '/',
         status: { text: 'Completed' },
@@ -79,9 +79,11 @@ describe('#taskListController', () => {
     authenticatedGetRequestMock.mockResolvedValue({
       payload: mockPayload
     })
-    vi.mocked(transformProjectDetailsTaskList).mockReturnValue(mockTransformedTaskList)
-    vi.mocked(transformOtherPermissionsTaskList).mockReturnValue(
-      mockOtherPermissionsTaskList
+    vi.mocked(transformProjectDetailsTaskList).mockReturnValue(
+      mockTransformedTaskList
+    )
+    vi.mocked(transformSiteDetailsTaskList).mockReturnValue(
+      mockSiteDetailsTaskList
     )
     vi.mocked(setMarineLicenceCache).mockResolvedValue(mockMarineLicence)
 
@@ -95,7 +97,7 @@ describe('#taskListController', () => {
     expect(vi.mocked(transformProjectDetailsTaskList)).toHaveBeenCalledWith(
       mockPayload.value.taskList
     )
-    expect(vi.mocked(transformOtherPermissionsTaskList)).toHaveBeenCalledWith(
+    expect(vi.mocked(transformSiteDetailsTaskList)).toHaveBeenCalledWith(
       mockPayload.value.taskList
     )
     expect(vi.mocked(setMarineLicenceCache)).toHaveBeenCalledWith(
@@ -117,7 +119,7 @@ describe('#taskListController', () => {
       heading: 'Marine licence start page',
       projectName: 'Test Project',
       taskList: mockTransformedTaskList,
-      otherPermissionsTaskList: mockOtherPermissionsTaskList
+      siteDetailsTaskList: mockSiteDetailsTaskList
     })
   })
 

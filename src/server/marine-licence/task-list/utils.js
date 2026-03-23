@@ -34,7 +34,7 @@ export const transformProjectDetailsTaskList = (taskList) => [
   }
 ]
 
-export const transformOtherPermissionsTaskList = (taskList) => [
+export const transformSiteDetailsTaskList = (taskList) => [
   {
     title: { text: 'Site details', classes: taskClasses },
     href: '/',

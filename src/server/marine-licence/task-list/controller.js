@@ -6,7 +6,7 @@ import {
 import { setProjectType } from '#src/server/common/helpers/session-cache/utils.js'
 import {
   transformProjectDetailsTaskList,
-  transformOtherPermissionsTaskList
+  transformSiteDetailsTaskList
 } from '#src/server/marine-licence/task-list/utils.js'
 import { authenticatedGetRequest } from '#src/server/common/helpers/authenticated-requests.js'
 import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
@@ -40,8 +40,8 @@ export const taskListController = {
 
     const projectDetailsTaskListTransformed =
       transformProjectDetailsTaskList(taskList)
-    const otherPermissionsTaskListTransformed =
-      transformOtherPermissionsTaskList(taskList)
+    const siteDetailsTaskListTransformed =
+      transformSiteDetailsTaskList(taskList)
 
     await setMarineLicenceCache(request, h, {
       id: marineLicenceId,
@@ -52,14 +52,14 @@ export const taskListController = {
 
     const hasCompletedAllTasks = [
       ...projectDetailsTaskListTransformed,
-      ...otherPermissionsTaskListTransformed
+      ...siteDetailsTaskListTransformed
     ].every((task) => task.status.text === 'Completed')
 
     return h.view(TASK_LIST_VIEW_ROUTE, {
       ...taskListViewSettings,
       projectName: payload.value.projectName,
       taskList: projectDetailsTaskListTransformed,
-      otherPermissionsTaskList: otherPermissionsTaskListTransformed,
+      siteDetailsTaskList: siteDetailsTaskListTransformed,
       hasCompletedAllTasks
     })
   }

@@ -1,6 +1,6 @@
 import {
   transformProjectDetailsTaskList,
-  transformOtherPermissionsTaskList
+  transformSiteDetailsTaskList
 } from '#src/server/marine-licence/task-list/utils.js'
 import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
 
@@ -47,10 +47,10 @@ describe('taskList utils', () => {
     )
   })
 
-  describe('transformOtherPermissionsTaskList', () => {
+  describe('transformSiteDetailsTaskList', () => {
     test('correctly returns Completed status', () => {
       expect(
-        transformOtherPermissionsTaskList({ siteDetails: 'COMPLETED' })
+        transformSiteDetailsTaskList({ siteDetails: 'COMPLETED' })
       ).toEqual([
         {
           href: '/',
@@ -62,7 +62,7 @@ describe('taskList utils', () => {
 
     test('correctly returns In Progress', () => {
       expect(
-        transformOtherPermissionsTaskList({ siteDetails: 'IN_PROGRESS' })
+        transformSiteDetailsTaskList({ siteDetails: 'IN_PROGRESS' })
       ).toEqual([
         {
           href: '/',
@@ -78,7 +78,7 @@ describe('taskList utils', () => {
       'correctly returns Not yet started for %s',
       (value) => {
         expect(
-          transformOtherPermissionsTaskList({ siteDetails: value })
+          transformSiteDetailsTaskList({ siteDetails: value })
         ).toEqual([
           {
             href: '/',

@@ -36,11 +36,11 @@ describe('Task List', () => {
     ).toBeInTheDocument()
 
     expect(
-      getByRole(document, 'heading', { level: 2, name: 'Other permissions' })
+      getByRole(document, 'heading', { level: 2, name: 'Site details' })
     ).toBeInTheDocument()
   })
 
-  test('should render site details link in Other permissions task list', () => {
+  test('should render site details link in Site Details task list', () => {
     expect(
       getByRole(document, 'link', { name: 'Site details' })
     ).toBeInTheDocument()

@@ -1,5 +1,7 @@
 import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
 
+const taskClasses = 'govuk-link--no-visited-state'
+
 const setStatus = (task) => {
   if (!task || task === 'INCOMPLETE') {
     return {
@@ -24,16 +26,18 @@ const setStatus = (task) => {
   }
 }
 
-export const transformTaskList = (taskList) => {
-  const classes = 'govuk-link--no-visited-state'
-  return [
-    {
-      title: {
-        text: 'Project name',
-        classes
-      },
-      href: marineLicenceRoutes.MARINE_LICENCE_PROJECT_NAME,
-      status: setStatus(taskList.projectName)
-    }
-  ]
-}
+export const transformProjectDetailsTaskList = (taskList) => [
+  {
+    title: { text: 'Project name', classes: taskClasses },
+    href: marineLicenceRoutes.MARINE_LICENCE_PROJECT_NAME,
+    status: setStatus(taskList.projectName)
+  }
+]
+
+export const transformOtherPermissionsTaskList = (taskList) => [
+  {
+    title: { text: 'Site details', classes: taskClasses },
+    href: '/',
+    status: setStatus(taskList.siteDetails)
+  }
+]

@@ -30,6 +30,20 @@ describe('Task List', () => {
         "When you provide your information you'll need to complete all sections before you can send your application."
       )
     ).toBeInTheDocument()
+
+    expect(
+      getByRole(document, 'heading', { level: 2, name: 'Project details' })
+    ).toBeInTheDocument()
+
+    expect(
+      getByRole(document, 'heading', { level: 2, name: 'Other permissions' })
+    ).toBeInTheDocument()
+  })
+
+  test('should render site details link in Other permissions task list', () => {
+    expect(
+      getByRole(document, 'link', { name: 'Site details' })
+    ).toBeInTheDocument()
   })
 
   test('should render review button when all tasks are completed', async () => {

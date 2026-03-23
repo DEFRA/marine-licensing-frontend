@@ -4,7 +4,10 @@ import {
   setMarineLicenceCache
 } from '#src/server/common/helpers/marine-licence/session-cache/utils.js'
 import { setProjectType } from '#src/server/common/helpers/session-cache/utils.js'
-import { transformTaskList } from '#src/server/marine-licence/task-list/utils.js'
+import {
+  transformProjectDetailsTaskList,
+  transformOtherPermissionsTaskList
+} from '#src/server/marine-licence/task-list/utils.js'
 import { authenticatedGetRequest } from '#src/server/common/helpers/authenticated-requests.js'
 import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
 import { PROJECT_TYPE } from '#src/server/common/constants/projects.js'
@@ -35,7 +38,10 @@ export const taskListController = {
 
     const { id: marineLicenceId, taskList, projectName } = payload.value
 
-    const taskListTransformed = transformTaskList(taskList)
+    const projectDetailsTaskListTransformed =
+      transformProjectDetailsTaskList(taskList)
+    const otherPermissionsTaskListTransformed =
+      transformOtherPermissionsTaskList(taskList)
 
     await setMarineLicenceCache(request, h, {
       id: marineLicenceId,
@@ -44,14 +50,16 @@ export const taskListController = {
 
     await setProjectType(request, h, PROJECT_TYPE.MARINE_LICENCE)
 
-    const hasCompletedAllTasks = taskListTransformed?.every(
-      (task) => task.status.text === 'Completed'
-    )
+    const hasCompletedAllTasks = [
+      ...projectDetailsTaskListTransformed,
+      ...otherPermissionsTaskListTransformed
+    ].every((task) => task.status.text === 'Completed')
 
     return h.view(TASK_LIST_VIEW_ROUTE, {
       ...taskListViewSettings,
       projectName: payload.value.projectName,
-      taskList: taskListTransformed,
+      taskList: projectDetailsTaskListTransformed,
+      otherPermissionsTaskList: otherPermissionsTaskListTransformed,
       hasCompletedAllTasks
     })
   }

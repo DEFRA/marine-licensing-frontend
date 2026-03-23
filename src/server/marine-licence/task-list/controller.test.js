@@ -6,7 +6,10 @@ import {
 } from '#src/server/common/helpers/marine-licence/session-cache/utils.js'
 import { setProjectType } from '#src/server/common/helpers/session-cache/utils.js'
 import { authenticatedGetRequest } from '#src/server/common/helpers/authenticated-requests.js'
-import { transformTaskList } from '#src/server/marine-licence/task-list/utils.js'
+import {
+  transformProjectDetailsTaskList,
+  transformOtherPermissionsTaskList
+} from '#src/server/marine-licence/task-list/utils.js'
 import {
   taskListController,
   taskListSelectMarineLicenceController,
@@ -64,12 +67,22 @@ describe('#taskListController', () => {
         }
       }
     ]
+    const mockOtherPermissionsTaskList = [
+      {
+        href: '/',
+        status: { text: 'Completed' },
+        title: { classes: 'govuk-link--no-visited-state', text: 'Site details' }
+      }
+    ]
 
     getMarineLicenceCacheMock.mockReturnValue(mockMarineLicence)
     authenticatedGetRequestMock.mockResolvedValue({
       payload: mockPayload
     })
-    vi.mocked(transformTaskList).mockReturnValue(mockTransformedTaskList)
+    vi.mocked(transformProjectDetailsTaskList).mockReturnValue(mockTransformedTaskList)
+    vi.mocked(transformOtherPermissionsTaskList).mockReturnValue(
+      mockOtherPermissionsTaskList
+    )
     vi.mocked(setMarineLicenceCache).mockResolvedValue(mockMarineLicence)
 
     await taskListController.handler(mockRequest, mockH)
@@ -79,7 +92,10 @@ describe('#taskListController', () => {
       mockRequest,
       '/marine-licence/123'
     )
-    expect(vi.mocked(transformTaskList)).toHaveBeenCalledWith(
+    expect(vi.mocked(transformProjectDetailsTaskList)).toHaveBeenCalledWith(
+      mockPayload.value.taskList
+    )
+    expect(vi.mocked(transformOtherPermissionsTaskList)).toHaveBeenCalledWith(
       mockPayload.value.taskList
     )
     expect(vi.mocked(setMarineLicenceCache)).toHaveBeenCalledWith(
@@ -100,7 +116,8 @@ describe('#taskListController', () => {
       pageTitle: 'Marine licence start page',
       heading: 'Marine licence start page',
       projectName: 'Test Project',
-      taskList: mockTransformedTaskList
+      taskList: mockTransformedTaskList,
+      otherPermissionsTaskList: mockOtherPermissionsTaskList
     })
   })
 

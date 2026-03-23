@@ -1,6 +1,7 @@
 import { getUserSession } from '#src/server/common/plugins/auth/utils.js'
 import { routes } from '#src/server/common/constants/routes.js'
 import { USER_TYPES } from '#src/server/common/constants/user-types.js'
+import Boom from '@hapi/boom'
 
 export const validateSessionExists = (userSession, h) => {
   if (!userSession?.displayName) {
@@ -72,5 +73,14 @@ export const validateAgentUserSession = {
     }
 
     return h.continue
+  }
+}
+
+export const validateTeamAdminSession = {
+  method: (request) => {
+    if (request.auth?.credentials?.isTeamAdmin !== true) {
+      throw Boom.forbidden('Unauthorized')
+    }
+    return null
   }
 }

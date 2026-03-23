@@ -1,7 +1,7 @@
 import { vi } from 'vitest'
 import {
-  adminExemptionsController,
-  adminExemptionsSendController,
+  adminBackfillController,
+  adminBackfillSendController,
   DASHBOARD_VIEW_ROUTE
 } from './controller.js'
 import {
@@ -23,24 +23,23 @@ const createRequest = () => ({
   }
 })
 
-describe('Admin dashboard to send exemptions to EMP', () => {
+describe('Admin dashboard to backfill Marine Plan Areas and Coastal Operations areas', () => {
   const authenticatedGetRequestMock = vi.mocked(authenticatedGetRequest)
 
-  describe('#adminExemptionsController', () => {
+  describe('#adminBackfillController', () => {
     test('Should render dashboard template with correct context', async () => {
       authenticatedGetRequestMock.mockResolvedValueOnce({
-        payload: { value: { unsentExemptions: [], failedPendingRetries: 0 } }
+        payload: { value: { backfillAreas: [] } }
       })
 
       const { h, request } = createRequest()
 
-      await adminExemptionsController.handler(request, h)
+      await adminBackfillController.handler(request, h)
 
       expect(h.view).toHaveBeenCalledWith(DASHBOARD_VIEW_ROUTE, {
-        pageTitle: 'Exemptions not sent to EMP',
-        heading: 'Exemptions not sent to EMP',
-        projects: [],
-        failedPendingRetries: []
+        pageTitle: 'Exemptions without Marine Plan or Coastal Operations Areas',
+        heading: 'Exemptions without Marine Plan or Coastal Operations Areas',
+        projects: []
       })
     })
 
@@ -74,17 +73,16 @@ describe('Admin dashboard to send exemptions to EMP', () => {
 
       authenticatedGetRequestMock.mockResolvedValueOnce({
         payload: {
-          value: { unsentExemptions: projects, failedPendingRetries: 0 }
+          value: { backfillAreas: projects }
         }
       })
 
-      await adminExemptionsController.handler(request, h)
+      await adminBackfillController.handler(request, h)
 
       expect(h.view).toHaveBeenCalledWith(DASHBOARD_VIEW_ROUTE, {
-        pageTitle: 'Exemptions not sent to EMP',
-        heading: 'Exemptions not sent to EMP',
-        projects: expectedFormattedProjects,
-        failedPendingRetries: []
+        pageTitle: 'Exemptions without Marine Plan or Coastal Operations Areas',
+        heading: 'Exemptions without Marine Plan or Coastal Operations Areas',
+        projects: expectedFormattedProjects
       })
     })
 
@@ -93,7 +91,7 @@ describe('Admin dashboard to send exemptions to EMP', () => {
 
       authenticatedGetRequestMock.mockRejectedValueOnce(new Error('API Error'))
 
-      await adminExemptionsController.handler(request, h)
+      await adminBackfillController.handler(request, h)
 
       expect(request.logger.error).toHaveBeenCalledWith(
         { err: expect.any(Error) },
@@ -101,10 +99,9 @@ describe('Admin dashboard to send exemptions to EMP', () => {
       )
 
       expect(h.view).toHaveBeenCalledWith(DASHBOARD_VIEW_ROUTE, {
-        pageTitle: 'Exemptions not sent to EMP',
-        heading: 'Exemptions not sent to EMP',
-        projects: [],
-        failedPendingRetries: []
+        pageTitle: 'Exemptions without Marine Plan or Coastal Operations Areas',
+        heading: 'Exemptions without Marine Plan or Coastal Operations Areas',
+        projects: []
       })
     })
 
@@ -115,62 +112,53 @@ describe('Admin dashboard to send exemptions to EMP', () => {
         payload: {}
       })
 
-      await adminExemptionsController.handler(request, h)
+      await adminBackfillController.handler(request, h)
 
       expect(h.view).toHaveBeenCalledWith(DASHBOARD_VIEW_ROUTE, {
-        pageTitle: 'Exemptions not sent to EMP',
-        heading: 'Exemptions not sent to EMP',
-        projects: [],
-        failedPendingRetries: []
+        pageTitle: 'Exemptions without Marine Plan or Coastal Operations Areas',
+        heading: 'Exemptions without Marine Plan or Coastal Operations Areas',
+        projects: []
       })
-    })
-
-    test('should throw unauthorized error if user is not team admin', async () => {
-      const { h, request } = createRequest()
-      request.auth.credentials.isTeamAdmin = false
-      await expect(() =>
-        adminExemptionsController.handler(request, h)
-      ).rejects.toThrow('Unauthorized')
     })
   })
 
-  describe('#adminExemptionsSendController', () => {
+  describe('#adminBackfillSendController', () => {
     const authenticatedPostRequestMock = vi.mocked(authenticatedPostRequest)
 
-    test('Should send exemption to EMP and redirect to admin exemptions', async () => {
+    test('Should send exemption to back end and redirect to admin exemptions', async () => {
       const { h, request } = createRequest()
       request.payload = { exemptionId: 'test-exemption-123' }
 
       authenticatedPostRequestMock.mockResolvedValueOnce({})
 
-      await adminExemptionsSendController.handler(request, h)
+      await adminBackfillSendController.handler(request, h)
 
       expect(authenticatedPostRequestMock).toHaveBeenCalledWith(
         request,
-        '/exemption/send-to-emp',
+        '/exemption/backfill-areas',
         {
           id: 'test-exemption-123'
         }
       )
 
-      expect(h.redirect).toHaveBeenCalledWith(routes.ADMIN_EXEMPTIONS)
+      expect(h.redirect).toHaveBeenCalledWith(routes.ADMIN_BACKFILL)
     })
 
     test('Should handle errors and redirect to admin exemptions', async () => {
       const { h, request } = createRequest()
       request.payload = { exemptionId: 'test-exemption-456' }
 
-      const error = new Error('Failed to send to EMP')
+      const error = new Error('Failed to send')
       authenticatedPostRequestMock.mockRejectedValueOnce(error)
 
-      await adminExemptionsSendController.handler(request, h)
+      await adminBackfillSendController.handler(request, h)
 
       expect(request.logger.error).toHaveBeenCalledWith(
         { err: error },
-        'Error sending exemption to EMP'
+        'Error when attempting backfill of Areas'
       )
 
-      expect(h.redirect).toHaveBeenCalledWith(routes.ADMIN_EXEMPTIONS)
+      expect(h.redirect).toHaveBeenCalledWith(routes.ADMIN_BACKFILL)
     })
 
     test('Should handle missing exemptionId', async () => {
@@ -179,27 +167,17 @@ describe('Admin dashboard to send exemptions to EMP', () => {
 
       authenticatedPostRequestMock.mockResolvedValueOnce({})
 
-      await adminExemptionsSendController.handler(request, h)
+      await adminBackfillSendController.handler(request, h)
 
       expect(authenticatedPostRequestMock).toHaveBeenCalledWith(
         request,
-        '/exemption/send-to-emp',
+        '/exemption/backfill-areas',
         {
           id: undefined
         }
       )
 
-      expect(h.redirect).toHaveBeenCalledWith(routes.ADMIN_EXEMPTIONS)
-    })
-
-    test('should throw unauthorized error if user is not team admin', async () => {
-      const { h, request } = createRequest()
-      request.auth.credentials.isTeamAdmin = false
-      await expect(() =>
-        adminExemptionsSendController.handler(request, h)
-      ).rejects.toThrow(
-        'InternalUserAdmin: Access denied: Team admin role required'
-      )
+      expect(h.redirect).toHaveBeenCalledWith(routes.ADMIN_BACKFILL)
     })
   })
 })

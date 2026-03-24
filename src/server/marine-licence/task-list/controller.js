@@ -31,12 +31,21 @@ export const taskListController = {
     }
     const { id } = marineLicence
 
+    const { query } = request
+
+    const hasCancel = query?.cancel === 'site-details'
+
     const { payload } = await authenticatedGetRequest(
       request,
       `/marine-licence/${id}`
     )
 
-    const { id: marineLicenceId, taskList, projectName } = payload.value
+    const {
+      id: marineLicenceId,
+      taskList,
+      projectName,
+      siteDetails
+    } = payload.value
 
     const projectDetailsTaskListTransformed =
       transformProjectDetailsTaskList(taskList)
@@ -45,7 +54,8 @@ export const taskListController = {
 
     await setMarineLicenceCache(request, h, {
       id: marineLicenceId,
-      projectName
+      projectName,
+      siteDetails: hasCancel ? [] : siteDetails
     })
 
     await setProjectType(request, h, PROJECT_TYPE.MARINE_LICENCE)

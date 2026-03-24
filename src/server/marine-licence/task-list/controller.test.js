@@ -33,6 +33,12 @@ describe('#taskListController', () => {
   const clearMarineLicenceCacheMock = vi.mocked(clearMarineLicenceCache)
   const authenticatedGetRequestMock = vi.mocked(authenticatedGetRequest)
 
+  const mockMarineLicence = {
+    id: '123',
+    projectName: 'Test Project',
+    siteDetails: [{ siteName: 'some-site' }]
+  }
+
   beforeEach(() => {
     mockH = {
       view: vi.fn(),
@@ -44,17 +50,14 @@ describe('#taskListController', () => {
   })
 
   test('taskListController handler should render with correct context', async () => {
-    const mockMarineLicence = {
-      id: '123',
-      projectName: 'Test Project'
-    }
     const mockPayload = {
       value: {
         id: '123',
         projectName: 'Test Project',
         taskList: {
           projectName: 'COMPLETED'
-        }
+        },
+        siteDetails: mockMarineLicence.siteDetails
       }
     }
     const mockTransformedTaskList = [
@@ -103,10 +106,7 @@ describe('#taskListController', () => {
     expect(vi.mocked(setMarineLicenceCache)).toHaveBeenCalledWith(
       mockRequest,
       mockH,
-      {
-        id: '123',
-        projectName: 'Test Project'
-      }
+      mockMarineLicence
     )
     expect(vi.mocked(setProjectType)).toHaveBeenCalledWith(
       mockRequest,
@@ -143,6 +143,26 @@ describe('#taskListController', () => {
 
     expect(getMarineLicenceCacheMock).toHaveBeenCalledWith(mockRequest)
     expect(authenticatedGetRequestMock).not.toHaveBeenCalled()
+  })
+
+  test('taskListController handler should correctly handle request to clear cache', async () => {
+    getMarineLicenceCacheMock.mockReturnValue(mockMarineLicence)
+
+    const mockRequestWithParams = {
+      ...mockRequest,
+      query: { cancel: 'site-details' }
+    }
+
+    await taskListController.handler(mockRequestWithParams, mockH)
+
+    expect(setMarineLicenceCacheMock).toHaveBeenCalledWith(
+      expect.any(Object),
+      expect.any(Object),
+      {
+        ...mockMarineLicence,
+        siteDetails: []
+      }
+    )
   })
 
   test('taskListSelectMarineLicenceController should clear cache and return to task list', async () => {

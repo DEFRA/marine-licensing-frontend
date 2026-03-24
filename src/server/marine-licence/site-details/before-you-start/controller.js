@@ -10,7 +10,7 @@ export const BEFORE_YOU_START_SITE_DETAILS_VIEW_ROUTE =
 const beforeYouStartSettings = {
   backLink: marineLicenceRoutes.MARINE_LICENCE_TASK_LIST,
   cancelLink: `${marineLicenceRoutes.MARINE_LICENCE_TASK_LIST}?cancel=site-details`,
-  continueLink: marineLicenceRoutes.MARINE_LICENCE_SITE_DETAILS,
+  continueLink: marineLicenceRoutes.MARINE_LICENCE_COORDINATES_TYPE_CHOICE,
   pageTitle: 'Site details',
   heading: 'Site details',
   isMarineLicence: true

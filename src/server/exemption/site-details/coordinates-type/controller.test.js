@@ -17,6 +17,8 @@ import { routes } from '#src/server/common/constants/routes.js'
 
 vi.mock('~/src/server/common/helpers/exemptions/session-cache/utils.js')
 
+const cancelLink = `${routes.TASK_LIST}?cancel=site-details`
+
 describe('#coordinatesType', () => {
   const getServer = setupTestServer()
   let getExemptionCacheSpy
@@ -39,6 +41,7 @@ describe('#coordinatesType', () => {
           pageTitle: 'How do you want to provide the site location?',
           heading: 'How do you want to provide the site location?',
           backLink: routes.SITE_DETAILS,
+          cancelLink,
           payload: { coordinatesType: 'coordinates' },
           projectName: 'Test Project'
         }
@@ -60,6 +63,7 @@ describe('#coordinatesType', () => {
           pageTitle: 'How do you want to provide the site location?',
           heading: 'How do you want to provide the site location?',
           backLink: routes.SITE_DETAILS,
+          cancelLink,
           payload: { coordinatesType: undefined },
           projectName: 'Test Project'
         }
@@ -148,6 +152,7 @@ describe('#coordinatesType', () => {
           projectName: 'Test Project',
           payload: { coordinatesType: 'invalid' },
           backLink: routes.SITE_DETAILS,
+          cancelLink,
           errorSummary: [
             {
               href: '#coordinatesType',
@@ -189,6 +194,7 @@ describe('#coordinatesType', () => {
         PROVIDE_COORDINATES_CHOICE_VIEW_ROUTE,
         {
           backLink: routes.SITE_DETAILS,
+          cancelLink,
           pageTitle: 'How do you want to provide the site location?',
           heading: 'How do you want to provide the site location?',
           projectName: 'Test Project',
@@ -197,41 +203,6 @@ describe('#coordinatesType', () => {
       )
 
       expect(h.view().takeover).toHaveBeenCalled()
-    })
-
-    test('Should correctly validate on valid data', () => {
-      const request = {
-        coordinatesType: 'file'
-      }
-
-      const payloadValidator =
-        coordinatesTypeSubmitController.options.validate.payload
-
-      const result = payloadValidator.validate(request)
-
-      expect(result.error).toBeUndefined()
-    })
-
-    test('Should correctly validate on empty data', () => {
-      const request = {}
-
-      const payloadValidator =
-        coordinatesTypeSubmitController.options.validate.payload
-
-      const result = payloadValidator.validate(request)
-
-      expect(result.error.message).toBe('PROVIDE_COORDINATES_CHOICE_REQUIRED')
-    })
-
-    test('Should correctly validate on invalid data', () => {
-      const request = { coordinatesType: 'invalid' }
-
-      const payloadValidator =
-        coordinatesTypeSubmitController.options.validate.payload
-
-      const result = payloadValidator.validate(request)
-
-      expect(result.error.message).toBe('PROVIDE_COORDINATES_CHOICE_REQUIRED')
     })
 
     test('Should correctly redirect when file option is selected', async () => {

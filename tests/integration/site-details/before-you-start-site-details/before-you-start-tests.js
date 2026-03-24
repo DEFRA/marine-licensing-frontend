@@ -1,28 +1,14 @@
 import { getByRole, getByText } from '@testing-library/dom'
 import { JSDOM } from 'jsdom'
-import { routes } from '~/src/server/common/constants/routes.js'
 import { statusCodes } from '~/src/server/common/constants/status-codes.js'
 
-import { mockExemption, setupTestServer } from '../shared/test-setup-helpers.js'
-import { makeGetRequest } from '~/src/server/test-helpers/server-requests.js'
-
-describe('Before you start site details page', () => {
-  const mockExemptionData = {
-    id: 'test-exemption-123',
-    projectName: 'Test Project'
-  }
-
-  const getServer = setupTestServer()
-
-  beforeEach(() => {
-    mockExemption(mockExemptionData)
-  })
-
+export function sharedBeforeYouStartSiteDetailsTests(
+  makeRequest,
+  projectName,
+  navLinks
+) {
   test('should display the before you start page with correct content', async () => {
-    const { result, statusCode } = await makeGetRequest({
-      server: getServer(),
-      url: routes.SITE_DETAILS
-    })
+    const { result, statusCode } = await makeRequest()
 
     expect(statusCode).toBe(statusCodes.ok)
 
@@ -31,9 +17,7 @@ describe('Before you start site details page', () => {
     expect(
       getByRole(document, 'heading', { name: 'Site details' })
     ).toBeInTheDocument()
-    expect(
-      getByText(document, mockExemptionData.projectName)
-    ).toBeInTheDocument()
+    expect(getByText(document, projectName)).toBeInTheDocument()
 
     expect(
       getByRole(document, 'heading', { name: 'Before you start' })
@@ -55,28 +39,19 @@ describe('Before you start site details page', () => {
   })
 
   test('should have correct navigation links', async () => {
-    const { result } = await makeGetRequest({
-      server: getServer(),
-      url: routes.SITE_DETAILS
-    })
+    const { result } = await makeRequest()
 
     const { document } = new JSDOM(result).window
 
     const continueButton = getByRole(document, 'button', { name: 'Continue' })
-    expect(continueButton).toHaveAttribute(
-      'href',
-      '/exemption/how-do-you-want-to-provide-the-coordinates'
-    )
+    expect(continueButton).toHaveAttribute('href', navLinks.continueHref)
 
     const backLink = getByRole(document, 'link', { name: 'Back' })
-    expect(backLink).toHaveAttribute('href', '/exemption/task-list')
+    expect(backLink).toHaveAttribute('href', navLinks.backHref)
   })
 
   test('should display all required content sections', async () => {
-    const { result } = await makeGetRequest({
-      server: getServer(),
-      url: routes.SITE_DETAILS
-    })
+    const { result } = await makeRequest()
 
     const { document } = new JSDOM(result).window
 
@@ -110,10 +85,7 @@ describe('Before you start site details page', () => {
   })
 
   test('should have properly structured lists for accessibility', async () => {
-    const { result } = await makeGetRequest({
-      server: getServer(),
-      url: routes.SITE_DETAILS
-    })
+    const { result } = await makeRequest()
 
     const { document } = new JSDOM(result).window
 
@@ -140,4 +112,4 @@ describe('Before you start site details page', () => {
       getByText(document, 'enter the coordinates manually')
     )
   })
-})
+}

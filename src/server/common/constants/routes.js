@@ -34,6 +34,8 @@ export const exemptionRoutes = {
   COOKIES: '/help/cookies',
   PRIVACY: '/help/privacy',
   ADMIN_EXEMPTIONS: '/admin/exemptions',
+  ADMIN_EMP: '/admin/emp',
+  ADMIN_BACKFILL: '/admin/backfill-areas',
   EXEMPTION: '/exemption'
 }
 
@@ -85,6 +87,8 @@ export const routes = {
 
 export const entraIdRoutes = [
   routes.VIEW_DETAILS_INTERNAL_USER,
+  routes.ADMIN_BACKFILL,
+  routes.ADMIN_EMP,
   marineLicenceRoutes.MARINE_LICENCE_VIEW_DETAILS_INTERNAL_USER,
   routes.ADMIN_EXEMPTIONS
 ]

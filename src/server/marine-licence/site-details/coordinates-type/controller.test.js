@@ -136,7 +136,10 @@ describe('#coordinatesType (marine licence)', () => {
         })
       }
 
-      await coordinatesTypeSubmitController.handler({}, h)
+      await coordinatesTypeSubmitController.handler(
+        { payload: { coordinatesType: 'file' } },
+        h
+      )
 
       expect(h.view).not.toHaveBeenCalled()
       expect(h.redirect).toHaveBeenCalledWith(

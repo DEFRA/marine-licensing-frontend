@@ -1,4 +1,7 @@
-import { getMarineLicenceCache } from '#src/server/common/helpers/marine-licence/session-cache/utils.js'
+import {
+  getMarineLicenceCache,
+  setMarineLicenceCache
+} from '#src/server/common/helpers/marine-licence/session-cache/utils.js'
 import {
   errorDescriptionByFieldName,
   mapErrorsForDisplay
@@ -19,12 +22,16 @@ export const coordinatesTypeController = {
   handler(request, h) {
     const marineLicence = getMarineLicenceCache(request)
 
+    const siteDetails = marineLicence.siteDetails ?? {}
+
     return h.view(MARINE_LICENCE_COORDINATES_CHOICE_VIEW_ROUTE, {
       ...coordinatesTypeSettings,
       backLink: marineLicenceRoutes.MARINE_LICENCE_SITE_DETAILS,
       cancelLink,
       projectName: marineLicence.projectName,
-      payload: {}
+      payload: {
+        coordinatesType: siteDetails.coordinatesType
+      }
     })
   }
 }
@@ -71,6 +78,17 @@ export const coordinatesTypeSubmitController = {
     }
   },
   async handler(request, h) {
+    const { payload } = request
+    const marineLicence = getMarineLicenceCache(request)
+
+    await setMarineLicenceCache(request, h, {
+      ...marineLicence,
+      siteDetails: {
+        ...marineLicence.siteDetails,
+        coordinatesType: payload.coordinatesType
+      }
+    })
+
     return h
       .redirect(marineLicenceRoutes.MARINE_LICENCE_COORDINATES_TYPE_CHOICE)
       .takeover()

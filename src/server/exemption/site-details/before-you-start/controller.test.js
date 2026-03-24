@@ -12,7 +12,6 @@ import { mockExemption } from '#src/server/test-helpers/mocks/exemption.js'
 import { makeGetRequest } from '#src/server/test-helpers/server-requests.js'
 import { statusCodes } from '#src/server/common/constants/status-codes.js'
 import { routes } from '#src/server/common/constants/routes.js'
-import { EXEMPTIONS_KEY } from '#src/server/common/constants/exemptions.js'
 
 vi.mock('~/src/server/common/helpers/exemptions/session-cache/utils.js')
 

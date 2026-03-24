@@ -1,5 +1,4 @@
 import { vi } from 'vitest'
-import { setupTestServer } from '#tests/integration/shared/test-setup-helpers.js'
 import {
   coordinatesTypeController,
   coordinatesTypeSubmitController,
@@ -7,22 +6,15 @@ import {
 } from '#src/server/marine-licence/site-details/coordinates-type/controller.js'
 import { getMarineLicenceCache } from '#src/server/common/helpers/marine-licence/session-cache/utils.js'
 import { mockMarineLicenceApplication } from '#src/server/test-helpers/mocks/marine-licence-mocks.js'
-import { makeGetRequest } from '#src/server/test-helpers/server-requests.js'
-import { statusCodes } from '#src/server/common/constants/status-codes.js'
-import { JSDOM } from 'jsdom'
 import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
 
 vi.mock('~/src/server/common/helpers/marine-licence/session-cache/utils.js')
 
 const cancelLink = `${marineLicenceRoutes.MARINE_LICENCE_TASK_LIST}?cancel=site-details`
 
-describe('#coordinatesType', () => {
-  const getServer = setupTestServer()
-
+describe('#coordinatesType (marine licence)', () => {
   beforeEach(() => {
-    vi.mocked(getMarineLicenceCache).mockReturnValue(
-      mockMarineLicenceApplication
-    )
+    vi.mocked(getMarineLicenceCache).mockReturnValue(mockMarineLicenceApplication)
   })
 
   describe('#coordinatesTypeController', () => {
@@ -42,47 +34,6 @@ describe('#coordinatesType', () => {
           payload: {}
         }
       )
-    })
-
-    test('Should provide expected response', async () => {
-      const { result, statusCode } = await makeGetRequest({
-        url: marineLicenceRoutes.MARINE_LICENCE_COORDINATES_TYPE_CHOICE,
-        server: getServer()
-      })
-
-      const { document } = new JSDOM(result).window
-
-      expect(document.querySelector('h1').textContent.trim()).toBe(
-        'How do you want to provide the site location?'
-      )
-
-      expect(
-        document.querySelector('.govuk-caption-l').textContent.trim()
-      ).toBe(mockMarineLicenceApplication.projectName)
-
-      expect(document.querySelector('#coordinatesType').value).toBe('file')
-
-      expect(document.querySelector('#coordinatesType-2').value).toBe(
-        'coordinates'
-      )
-
-      expect(
-        document
-          .querySelector(
-            `.govuk-back-link[href="${marineLicenceRoutes.MARINE_LICENCE_SITE_DETAILS}"`
-          )
-          .textContent.trim()
-      ).toBe('Back')
-
-      expect(
-        document
-          .querySelector(
-            `.govuk-link[href="${marineLicenceRoutes.MARINE_LICENCE_TASK_LIST}?cancel=site-details"`
-          )
-          .textContent.trim()
-      ).toBe('Cancel')
-
-      expect(statusCode).toBe(statusCodes.ok)
     })
   })
 

@@ -19,16 +19,17 @@ describe('Before you start site details page (marine licence)', () => {
     mockMarineLicence(mockMarineLicenceData)
   })
 
-  sharedBeforeYouStartSiteDetailsTests(
-    () =>
+  sharedBeforeYouStartSiteDetailsTests({
+    projectType: 'marineLicence',
+    request: () =>
       makeGetRequest({
         server: getServer(),
         url: marineLicenceRoutes.MARINE_LICENCE_SITE_DETAILS
       }),
-    mockMarineLicenceData.projectName,
-    {
+    projectName: mockMarineLicenceData.projectName,
+    navLinks: {
       continueHref: marineLicenceRoutes.MARINE_LICENCE_SITE_DETAILS,
       backHref: marineLicenceRoutes.MARINE_LICENCE_TASK_LIST
     }
-  )
+  })
 })

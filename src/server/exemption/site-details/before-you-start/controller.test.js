@@ -39,7 +39,7 @@ describe('#beforeYouStart', () => {
           pageTitle: 'Site details',
           heading: 'Site details',
           projectName: 'Test Project',
-          projectType: EXEMPTIONS_KEY
+          isExemption: true
         }
       )
     })

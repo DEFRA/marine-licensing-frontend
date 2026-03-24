@@ -19,12 +19,14 @@ describe('Before you start site details page (exemption)', () => {
     mockExemption(mockExemptionData)
   })
 
-  sharedBeforeYouStartSiteDetailsTests(
-    () => makeGetRequest({ server: getServer(), url: routes.SITE_DETAILS }),
-    mockExemptionData.projectName,
-    {
+  sharedBeforeYouStartSiteDetailsTests({
+    projectType: 'exemptions',
+    request: () =>
+      makeGetRequest({ server: getServer(), url: routes.SITE_DETAILS }),
+    projectName: mockExemptionData.projectName,
+    navLinks: {
       continueHref: '/exemption/how-do-you-want-to-provide-the-coordinates',
       backHref: '/exemption/task-list'
     }
-  )
+  })
 })

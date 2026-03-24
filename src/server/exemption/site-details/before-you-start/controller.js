@@ -1,4 +1,3 @@
-import { EXEMPTIONS_KEY } from '#src/server/common/constants/exemptions.js'
 import {
   clearSavedSiteDetails,
   getExemptionCache
@@ -14,7 +13,7 @@ const beforeYouStartSettings = {
   continueLink: routes.COORDINATES_TYPE_CHOICE,
   pageTitle: 'Site details',
   heading: 'Site details',
-  projectType: EXEMPTIONS_KEY
+  isExemption: true
 }
 export const beforeYouStartController = {
   async handler(request, h) {

@@ -27,7 +27,7 @@ describe('Task List', () => {
     expect(
       getByText(
         document,
-        "When you provide your information you'll need to complete all sections before you can send your application."
+        'You need to complete all sections before sending your application. Your progress will be saved as you go if you need to come back later.'
       )
     ).toBeInTheDocument()
 

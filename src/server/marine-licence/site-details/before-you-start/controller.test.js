@@ -12,7 +12,6 @@ import { mockMarineLicenceApplication } from '#src/server/test-helpers/mocks/mar
 import { makeGetRequest } from '#src/server/test-helpers/server-requests.js'
 import { statusCodes } from '#src/server/common/constants/status-codes.js'
 import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
-import { MARINE_LICENCE_KEY } from '#src/server/common/constants/marine-licence.js'
 
 vi.mock('~/src/server/common/helpers/marine-licence/session-cache/utils.js')
 
@@ -41,7 +40,7 @@ describe('#beforeYouStart', () => {
           pageTitle: 'Site details',
           heading: 'Site details',
           projectName: 'Test Project',
-          projectType: MARINE_LICENCE_KEY
+          isMarineLicence: true
         }
       )
     })

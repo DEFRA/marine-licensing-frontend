@@ -1,4 +1,3 @@
-import { MARINE_LICENCE_KEY } from '#src/server/common/constants/marine-licence.js'
 import {
   clearSavedMarineLicenceSiteDetails,
   getMarineLicenceCache
@@ -14,7 +13,7 @@ const beforeYouStartSettings = {
   continueLink: marineLicenceRoutes.MARINE_LICENCE_SITE_DETAILS,
   pageTitle: 'Site details',
   heading: 'Site details',
-  projectType: MARINE_LICENCE_KEY
+  isMarineLicence: true
 }
 export const beforeYouStartController = {
   async handler(request, h) {

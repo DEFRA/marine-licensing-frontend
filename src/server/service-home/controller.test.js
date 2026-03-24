@@ -30,11 +30,11 @@ describe('#serviceHome', () => {
       expect(result).toContain('Home')
     })
 
-    test('Should render service home template with correct context', () => {
+    test('Should render service home template with correct context', async () => {
       const h = { view: vi.fn() }
       const request = {}
 
-      serviceHomeController.handler(request, h)
+      await serviceHomeController.handler(request, h)
 
       expect(h.view).toHaveBeenCalledWith(SERVICE_HOME_VIEW_ROUTE, {
         pageTitle: 'Home',
@@ -62,12 +62,14 @@ describe('#serviceHome', () => {
       })
     })
 
-    test('Should include Apply for Marine Licence card when feature enabled', () => {
+    test('Should include Apply for Marine Licence card when feature enabled', async () => {
       vi.spyOn(config, 'get').mockReturnValue({ enabled: true })
       const h = { view: vi.fn() }
-      const request = {}
+      const request = {
+        yar: { clear: vi.fn(), commit: vi.fn() }
+      }
 
-      serviceHomeController.handler(request, h)
+      await serviceHomeController.handler(request, h)
 
       const viewContext = h.view.mock.calls[0][1]
       expect(viewContext.marineLicenceEnabled).toBe(true)

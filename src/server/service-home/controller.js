@@ -3,6 +3,7 @@ import {
   routes
 } from '#src/server/common/constants/routes.js'
 import { config } from '#src/config/config.js'
+import { clearMarineLicenceCache } from '#src/server/common/helpers/marine-licence/session-cache/utils.js'
 
 export const SERVICE_HOME_VIEW_ROUTE = 'service-home/index'
 
@@ -38,12 +39,16 @@ const filteredCards = [
 ]
 
 export const serviceHomeController = {
-  handler(_request, h) {
+  async handler(request, h) {
     const marineLicence = config.get('marineLicence')
 
     const displayCards = marineLicence.enabled
       ? [...cards.slice(0, 2), ...filteredCards, ...cards.slice(2)]
       : cards
+
+    if (marineLicence.enabled) {
+      await clearMarineLicenceCache(request, h)
+    }
 
     return h.view(SERVICE_HOME_VIEW_ROUTE, {
       ...serviceHomeViewSettings,

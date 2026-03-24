@@ -16,7 +16,8 @@ import {
   coordinatesTypeSchema
 } from '#src/server/common/validation/coordinates-type/constants.js'
 
-export const PROVIDE_COORDINATES_CHOICE_VIEW_ROUTE = 'templates/coordinates-type'
+export const PROVIDE_COORDINATES_CHOICE_VIEW_ROUTE =
+  'templates/coordinates-type'
 
 const cancelLink = `${routes.TASK_LIST}?cancel=site-details`
 

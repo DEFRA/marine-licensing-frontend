@@ -4,7 +4,10 @@ import {
   setMarineLicenceCache
 } from '#src/server/common/helpers/marine-licence/session-cache/utils.js'
 import { setProjectType } from '#src/server/common/helpers/session-cache/utils.js'
-import { transformTaskList } from '#src/server/marine-licence/task-list/utils.js'
+import {
+  transformProjectDetailsTaskList,
+  transformSiteDetailsTaskList
+} from '#src/server/marine-licence/task-list/utils.js'
 import { authenticatedGetRequest } from '#src/server/common/helpers/authenticated-requests.js'
 import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
 import { PROJECT_TYPE } from '#src/server/common/constants/projects.js'
@@ -35,6 +38,10 @@ export const taskListController = {
     }
     const { id } = marineLicence
 
+    const { query } = request
+
+    const hasCancel = query?.cancel === 'site-details'
+
     const { payload } = await authenticatedGetRequest(
       request,
       `/marine-licence/${id}`
@@ -44,7 +51,8 @@ export const taskListController = {
       id: marineLicenceId,
       taskList,
       projectName,
-      specialLegalPowers
+      specialLegalPowers,
+      siteDetails
     } = payload.value
 
     let taskListTransformed = []
@@ -66,24 +74,36 @@ export const taskListController = {
     const otherPermissionsTaskList = taskListTransformed.filter(
       (item) => item.section === 'otherPermissions'
     )
+    
+    const projectDetailsTaskListTransformed =
+      transformProjectDetailsTaskList(taskList)
+    const siteDetailsTaskListTransformed =
+      transformSiteDetailsTaskList(taskList)
 
     await setMarineLicenceCache(request, h, {
       id: marineLicenceId,
       projectName,
       specialLegalPowers
+      siteDetails: hasCancel ? [] : siteDetails
     })
 
     await setProjectType(request, h, PROJECT_TYPE.MARINE_LICENCE)
 
-    const hasCompletedAllTasks = taskListTransformed?.every(
-      (task) => task.status.text === 'Completed'
-    )
+    const hasCompletedAllTasks = [
+      ...projectDetailsTaskListTransformed,
+      ...siteDetailsTaskListTransformed
+    ]
+      // Filter is temporary until we get to saving to the back end for 'Site Details'
+      .filter((task) => task.title.text !== 'Site details')
+      .every((task) => task.status.text === 'Completed')
 
     return h.view(TASK_LIST_VIEW_ROUTE, {
       ...taskListViewSettings,
       projectName: payload.value.projectName,
       projectDetailsTaskList,
       otherPermissionsTaskList,
+      taskList: projectDetailsTaskListTransformed,
+      siteDetailsTaskList: siteDetailsTaskListTransformed,
       hasCompletedAllTasks
     })
   }

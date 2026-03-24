@@ -8,8 +8,8 @@
         <span class="govuk-caption-l">{{projectName}}</span>
       {% endif %}
         <h1 class="govuk-heading-l">Marine licence start page</h1>
-      <p class="govuk-body">When you provide your information you'll need to complete all sections before you can send your application.</p>
-      <p class="govuk-body">Your progress will be saved as you go if you need to come back later.</p>
+      <p class="govuk-body">You need to complete all sections before sending your application. Your progress will be saved as you go if you need to come back later.</p>
+      <p class="govuk-body">You can start the Marine plan policy section once you have completed the site details section.</p>
 
       <h2 class="govuk-heading-m">Project details</h2>
       {{ govukTaskList({
@@ -24,6 +24,12 @@
           items: otherPermissionsTaskList
         }) }}
         {% endif %}
+        
+      <h2 class="govuk-heading-m">Site details</h2>
+      {{ govukTaskList({
+          idPrefix: "site-details-task-list",
+          items: siteDetailsTaskList
+        }) }}
 
         {% if hasCompletedAllTasks %}
           {{ govukButton({

@@ -1,28 +1,15 @@
 import { getByRole, getByText } from '@testing-library/dom'
 import { JSDOM } from 'jsdom'
-import { routes } from '~/src/server/common/constants/routes.js'
 import { statusCodes } from '~/src/server/common/constants/status-codes.js'
 
-import { mockExemption, setupTestServer } from '../shared/test-setup-helpers.js'
-import { makeGetRequest } from '~/src/server/test-helpers/server-requests.js'
-
-describe('Before you start site details page', () => {
-  const mockExemptionData = {
-    id: 'test-exemption-123',
-    projectName: 'Test Project'
-  }
-
-  const getServer = setupTestServer()
-
-  beforeEach(() => {
-    mockExemption(mockExemptionData)
-  })
-
+export function sharedBeforeYouStartSiteDetailsTests({
+  request,
+  projectName,
+  navLinks,
+  projectType
+}) {
   test('should display the before you start page with correct content', async () => {
-    const { result, statusCode } = await makeGetRequest({
-      server: getServer(),
-      url: routes.SITE_DETAILS
-    })
+    const { result, statusCode } = await request()
 
     expect(statusCode).toBe(statusCodes.ok)
 
@@ -31,9 +18,7 @@ describe('Before you start site details page', () => {
     expect(
       getByRole(document, 'heading', { name: 'Site details' })
     ).toBeInTheDocument()
-    expect(
-      getByText(document, mockExemptionData.projectName)
-    ).toBeInTheDocument()
+    expect(getByText(document, projectName)).toBeInTheDocument()
 
     expect(
       getByRole(document, 'heading', { name: 'Before you start' })
@@ -55,28 +40,19 @@ describe('Before you start site details page', () => {
   })
 
   test('should have correct navigation links', async () => {
-    const { result } = await makeGetRequest({
-      server: getServer(),
-      url: routes.SITE_DETAILS
-    })
+    const { result } = await request()
 
     const { document } = new JSDOM(result).window
 
     const continueButton = getByRole(document, 'button', { name: 'Continue' })
-    expect(continueButton).toHaveAttribute(
-      'href',
-      '/exemption/how-do-you-want-to-provide-the-coordinates'
-    )
+    expect(continueButton).toHaveAttribute('href', navLinks.continueHref)
 
     const backLink = getByRole(document, 'link', { name: 'Back' })
-    expect(backLink).toHaveAttribute('href', '/exemption/task-list')
+    expect(backLink).toHaveAttribute('href', navLinks.backHref)
   })
 
-  test('should display all required content sections', async () => {
-    const { result } = await makeGetRequest({
-      server: getServer(),
-      url: routes.SITE_DETAILS
-    })
+  test('should display all required content sections in structured lists', async () => {
+    const { result } = await request()
 
     const { document } = new JSDOM(result).window
 
@@ -91,18 +67,60 @@ describe('Before you start site details page', () => {
     ).toBeInTheDocument()
 
     expect(getByText(document, 'a site name')).toBeInTheDocument()
-    expect(
-      getByText(document, 'the exact location of the site')
-    ).toBeInTheDocument()
-    expect(
-      getByText(document, 'the dates the activity will take place')
-    ).toBeInTheDocument()
-    expect(
-      getByText(document, 'a description of the activity')
-    ).toBeInTheDocument()
+
+    if (projectType === 'exemptions') {
+      expect(
+        getByText(document, 'the exact location of the site')
+      ).toBeInTheDocument()
+      expect(
+        getByText(document, 'the dates the activity will take place')
+      ).toBeInTheDocument()
+      expect(
+        getByText(document, 'a description of the activity')
+      ).toBeInTheDocument()
+
+      expect(
+        getByText(
+          document,
+          'upload a shapefile or KML file with the coordinates'
+        )
+      ).toBeInTheDocument()
+      expect(
+        getByText(document, 'enter the coordinates manually')
+      ).toBeInTheDocument()
+    }
+
+    if (projectType === 'marineLicence') {
+      expect(
+        getByText(document, 'type of activity, for example construction')
+      ).toBeInTheDocument()
+
+      expect(
+        getByText(
+          document,
+          'category of activity, for example maintenance construction'
+        )
+      ).toBeInTheDocument()
+
+      expect(getByText(document, 'activity description')).toBeInTheDocument()
+
+      expect(
+        getByText(document, 'maximum duration of the activity')
+      ).toBeInTheDocument()
+
+      expect(
+        getByText(document, 'schedule of when the activity will take place')
+      ).toBeInTheDocument()
+      expect(
+        getByText(
+          document,
+          'possible impacts of the activity and ways to reduce them'
+        )
+      ).toBeInTheDocument()
+    }
 
     expect(
-      getByText(document, 'upload a file with the coordinates')
+      getByText(document, 'upload a shapefile or KML file with the coordinates')
     ).toBeInTheDocument()
     expect(
       getByText(document, 'enter the coordinates manually')
@@ -110,10 +128,7 @@ describe('Before you start site details page', () => {
   })
 
   test('should have properly structured lists for accessibility', async () => {
-    const { result } = await makeGetRequest({
-      server: getServer(),
-      url: routes.SITE_DETAILS
-    })
+    const { result } = await request()
 
     const { document } = new JSDOM(result).window
 
@@ -122,22 +137,10 @@ describe('Before you start site details page', () => {
 
     const firstList = lists[0]
     expect(firstList).toContainElement(getByText(document, 'a site name'))
-    expect(firstList).toContainElement(
-      getByText(document, 'the exact location of the site')
-    )
-    expect(firstList).toContainElement(
-      getByText(document, 'the dates the activity will take place')
-    )
-    expect(firstList).toContainElement(
-      getByText(document, 'a description of the activity')
-    )
 
     const secondList = lists[1]
     expect(secondList).toContainElement(
-      getByText(document, 'upload a file with the coordinates')
-    )
-    expect(secondList).toContainElement(
-      getByText(document, 'enter the coordinates manually')
+      getByText(document, 'upload a shapefile or KML file with the coordinates')
     )
   })
-})
+}

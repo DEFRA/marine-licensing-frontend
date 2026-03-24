@@ -2,7 +2,9 @@ import { vi } from 'vitest'
 import { clone } from '@hapi/hoek'
 import {
   MARINE_LICENCE_CACHE_KEY,
+  SAVED_SITE_DETAILS_CACHE_KEY,
   clearMarineLicenceCache,
+  clearSavedMarineLicenceSiteDetails,
   getMarineLicenceCache,
   setMarineLicenceCache
 } from '#src/server/common/helpers/marine-licence/session-cache/utils.js'
@@ -132,6 +134,25 @@ describe('#utils', () => {
       expect(mockRequest.yar.commit).toHaveBeenCalledWith(mockH)
 
       expect(cache).toEqual({})
+    })
+  })
+
+  describe('clearSavedMarineLicenceSiteDetails', () => {
+    test('should clear the value in cache', async () => {
+      const mockH = {}
+      const mockRequest = {
+        yar: {
+          clear: vi.fn(),
+          commit: vi.fn().mockResolvedValue()
+        }
+      }
+
+      await clearSavedMarineLicenceSiteDetails(mockRequest, mockH)
+
+      expect(mockRequest.yar.clear).toHaveBeenCalledWith(
+        SAVED_SITE_DETAILS_CACHE_KEY
+      )
+      expect(mockRequest.yar.commit).toHaveBeenCalledWith(mockH)
     })
   })
 })

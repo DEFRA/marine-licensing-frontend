@@ -3,24 +3,26 @@ import { setupTestServer } from '#tests/integration/shared/test-setup-helpers.js
 import {
   beforeYouStartController,
   BEFORE_YOU_START_SITE_DETAILS_VIEW_ROUTE
-} from '#src/server/exemption/site-details/before-you-start/controller.js'
+} from '#src/server/marine-licence/site-details/before-you-start/controller.js'
 import {
-  clearSavedSiteDetails,
-  getExemptionCache
-} from '#src/server/common/helpers/exemptions/session-cache/utils.js'
-import { mockExemption } from '#src/server/test-helpers/mocks/exemption.js'
+  clearSavedMarineLicenceSiteDetails,
+  getMarineLicenceCache
+} from '#src/server/common/helpers/marine-licence/session-cache/utils.js'
+import { mockMarineLicenceApplication } from '#src/server/test-helpers/mocks/marine-licence-mocks.js'
 import { makeGetRequest } from '#src/server/test-helpers/server-requests.js'
 import { statusCodes } from '#src/server/common/constants/status-codes.js'
-import { routes } from '#src/server/common/constants/routes.js'
+import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
 
-vi.mock('~/src/server/common/helpers/exemptions/session-cache/utils.js')
+vi.mock('~/src/server/common/helpers/marine-licence/session-cache/utils.js')
 
 describe('#beforeYouStart', () => {
   const getServer = setupTestServer()
 
   beforeEach(() => {
-    vi.mocked(getExemptionCache).mockReturnValue(mockExemption)
-    vi.mocked(clearSavedSiteDetails)
+    vi.mocked(getMarineLicenceCache).mockReturnValue(
+      mockMarineLicenceApplication
+    )
+    vi.mocked(clearSavedMarineLicenceSiteDetails)
   })
 
   describe('#beforeYouStartController', () => {
@@ -32,20 +34,20 @@ describe('#beforeYouStart', () => {
       expect(h.view).toHaveBeenCalledWith(
         BEFORE_YOU_START_SITE_DETAILS_VIEW_ROUTE,
         {
-          backLink: routes.TASK_LIST,
-          cancelLink: `${routes.TASK_LIST}?cancel=site-details`,
-          continueLink: routes.COORDINATES_TYPE_CHOICE,
+          backLink: marineLicenceRoutes.MARINE_LICENCE_TASK_LIST,
+          cancelLink: `${marineLicenceRoutes.MARINE_LICENCE_TASK_LIST}?cancel=site-details`,
+          continueLink: marineLicenceRoutes.MARINE_LICENCE_SITE_DETAILS,
           pageTitle: 'Site details',
           heading: 'Site details',
           projectName: 'Test Project',
-          isExemption: true
+          isMarineLicence: true
         }
       )
     })
 
     test('Should provide expected response', async () => {
       const { statusCode } = await makeGetRequest({
-        url: routes.SITE_DETAILS,
+        url: marineLicenceRoutes.MARINE_LICENCE_SITE_DETAILS,
         server: getServer()
       })
 

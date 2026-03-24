@@ -8,7 +8,7 @@
 <nav>
   {{ govukBackLink({
     text: "Back",
-    href: '/exemption/task-list'
+    href: backLink
   }) }}
 </nav>
 {% endblock %}
@@ -23,15 +23,28 @@
       <p>In the next step, you'll need to provide the following for every site:</p>
       <ul class="govuk-list govuk-list--bullet">
         <li>a site name</li>
-        <li>the exact location of the site</li>
-        <li>the dates the activity will take place</li>
-        <li>a description of the activity</li>
+
+        {% if isExemption %}
+          <li>the exact location of the site</li>
+          <li>the dates the activity will take place</li>
+          <li>a description of the activity</li>
+        {% endif %}
+
+        {% if isMarineLicence %}
+          <li>type of activity, for example construction</li>
+          <li>category of activity, for example maintenance construction</li>
+          <li>activity description</li>
+          <li>maximum duration of the activity</li>
+          <li>schedule of when the activity will take place</li>
+          <li>possible impacts of the activity and ways to reduce them</li>
+        {% endif %}
+
       </ul>
 
       <h2 class="govuk-heading-m">Providing site locations</h2>
       <p>You can provide site locations in 2 ways:</p>
       <ul class="govuk-list govuk-list--bullet">
-        <li>upload a file with the coordinates</li>
+        <li>upload a shapefile or KML file with the coordinates</li>
         <li>enter the coordinates manually</li>
       </ul>
 
@@ -41,16 +54,19 @@
 
       <h2 class="govuk-heading-m">Defining the site boundary</h2>
       <p>The coordinates must mark the full boundary of every site, including space for any movement or small changes in the activity location.</p>
-      <p>If the activity happens outside the marked boundary, it will not be covered by the exemption.</p>
+      
+      {% if isExemption %}
+        <p class="govuk-body">If the activity happens outside the marked boundary, it will not be covered by the exemption.</p>
+      {% endif %}
       
       <div class="govuk-button-group">
         {{ govukButton({
           text: "Continue",
-          href: "/exemption/how-do-you-want-to-provide-the-coordinates"
+          href: continueLink
         }) }}
         
         {{ appCancelButton({
-          cancelLink: "/exemption/task-list?cancel=site-details"
+          cancelLink: cancelLink
         }) }}
       </div>
     </div>

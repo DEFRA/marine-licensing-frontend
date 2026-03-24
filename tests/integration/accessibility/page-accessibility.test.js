@@ -185,6 +185,10 @@ describe('Page accessibility checks (Axe)', () => {
       session: { ...agentSession, shouldShowOrgOrUserName: false }
     },
     {
+      url: marineLicenceRoutes.MARINE_LICENCE_SITE_DETAILS,
+      title: 'Site details'
+    },
+    {
       url: marineLicenceRoutes.MARINE_LICENCE_CHECK_YOUR_ANSWERS,
       title: 'Check your answers before sending your information',
       isMarineLicence: true

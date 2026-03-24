@@ -3,13 +3,18 @@ import {
   clearSavedSiteDetails,
   getExemptionCache
 } from '#src/server/common/helpers/exemptions/session-cache/utils.js'
+import { routes } from '#src/server/common/constants/routes.js'
 
 export const BEFORE_YOU_START_SITE_DETAILS_VIEW_ROUTE =
   'templates/before-you-start'
 
 const beforeYouStartSettings = {
+  backLink: routes.TASK_LIST,
+  cancelLink: `${routes.TASK_LIST}?cancel=site-details`,
+  continueLink: routes.COORDINATES_TYPE_CHOICE,
   pageTitle: 'Site details',
-  heading: 'Site details'
+  heading: 'Site details',
+  projectType: EXEMPTIONS_KEY
 }
 export const beforeYouStartController = {
   async handler(request, h) {
@@ -19,8 +24,7 @@ export const beforeYouStartController = {
 
     return h.view(BEFORE_YOU_START_SITE_DETAILS_VIEW_ROUTE, {
       ...beforeYouStartSettings,
-      projectName: exemption.projectName,
-      projectType: EXEMPTIONS_KEY
+      projectName: exemption.projectName
     })
   }
 }

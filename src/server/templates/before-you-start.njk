@@ -8,7 +8,7 @@
 <nav>
   {{ govukBackLink({
     text: "Back",
-    href: '/exemption/task-list'
+    href: backLink
   }) }}
 </nav>
 {% endblock %}
@@ -46,11 +46,11 @@
       <div class="govuk-button-group">
         {{ govukButton({
           text: "Continue",
-          href: "/exemption/how-do-you-want-to-provide-the-coordinates"
+          href: continueLink
         }) }}
         
         {{ appCancelButton({
-          cancelLink: "/exemption/task-list?cancel=site-details"
+          cancelLink: cancelLink
         }) }}
       </div>
     </div>

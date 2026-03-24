@@ -33,6 +33,9 @@ describe('#beforeYouStart', () => {
       expect(h.view).toHaveBeenCalledWith(
         BEFORE_YOU_START_SITE_DETAILS_VIEW_ROUTE,
         {
+          backLink: routes.TASK_LIST,
+          cancelLink: `${routes.TASK_LIST}?cancel=site-details`,
+          continueLink: routes.COORDINATES_TYPE_CHOICE,
           pageTitle: 'Site details',
           heading: 'Site details',
           projectName: 'Test Project',

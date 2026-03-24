@@ -27,8 +27,8 @@ describe('Before you start site details page (marine licence)', () => {
       }),
     mockMarineLicenceData.projectName,
     {
-      continueHref: '/exemption/how-do-you-want-to-provide-the-coordinates',
-      backHref: '/exemption/task-list'
+      continueHref: marineLicenceRoutes.MARINE_LICENCE_SITE_DETAILS,
+      backHref: marineLicenceRoutes.MARINE_LICENCE_TASK_LIST
     }
   )
 })

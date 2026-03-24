@@ -5,7 +5,7 @@ import {
   BEFORE_YOU_START_SITE_DETAILS_VIEW_ROUTE
 } from '#src/server/marine-licence/site-details/before-you-start/controller.js'
 import {
-  clearMarineLicenceCache,
+  clearSavedMarineLicenceSiteDetails,
   getMarineLicenceCache
 } from '#src/server/common/helpers/marine-licence/session-cache/utils.js'
 import { mockMarineLicenceApplication } from '#src/server/test-helpers/mocks/marine-licence-mocks.js'
@@ -23,7 +23,7 @@ describe('#beforeYouStart', () => {
     vi.mocked(getMarineLicenceCache).mockReturnValue(
       mockMarineLicenceApplication
     )
-    vi.mocked(clearMarineLicenceCache)
+    vi.mocked(clearSavedMarineLicenceSiteDetails)
   })
 
   describe('#beforeYouStartController', () => {
@@ -35,6 +35,9 @@ describe('#beforeYouStart', () => {
       expect(h.view).toHaveBeenCalledWith(
         BEFORE_YOU_START_SITE_DETAILS_VIEW_ROUTE,
         {
+          backLink: marineLicenceRoutes.MARINE_LICENCE_TASK_LIST,
+          cancelLink: `${marineLicenceRoutes.MARINE_LICENCE_TASK_LIST}?cancel=site-details`,
+          continueLink: marineLicenceRoutes.MARINE_LICENCE_SITE_DETAILS,
           pageTitle: 'Site details',
           heading: 'Site details',
           projectName: 'Test Project',

@@ -26,31 +26,14 @@ const setStatus = (task) => {
   }
 }
 
-export const transformTaskList = (taskList) => {
-  const classes = 'govuk-link--no-visited-state'
-  return [
-    {
-      title: {
-        text: 'Project name',
-        classes
-      },
-      href: marineLicenceRoutes.MARINE_LICENCE_PROJECT_NAME,
-      status: setStatus(taskList.projectName),
-      organisationOnly: false,
-      section: 'projectDetails'
-    },
-    {
-      title: {
-        text: 'Special Legal Powers',
-        classes
-      },
-      href: marineLicenceRoutes.MARINE_LICENCE_SPECIAL_LEGAL_POWERS,
-      status: setStatus(taskList.specialLegalPowers),
-      organisationOnly: true,
-      section: 'otherPermissions'
-    }
-  ]
-}
+export const transformOtherPermissionsTaskList = (taskList) => [
+  {
+    title: { text: 'Special legal powers', classes: taskClasses },
+    href: marineLicenceRoutes.MARINE_LICENCE_SPECIAL_LEGAL_POWERS,
+    status: setStatus(taskList.specialLegalPowers)
+  }
+]
+
 export const transformProjectDetailsTaskList = (taskList) => [
   {
     title: { text: 'Project name', classes: taskClasses },

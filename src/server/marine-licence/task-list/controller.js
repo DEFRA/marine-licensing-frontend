@@ -6,7 +6,8 @@ import {
 import { setProjectType } from '#src/server/common/helpers/session-cache/utils.js'
 import {
   transformProjectDetailsTaskList,
-  transformSiteDetailsTaskList
+  transformSiteDetailsTaskList,
+  transformOtherPermissionsTaskList
 } from '#src/server/marine-licence/task-list/utils.js'
 import { authenticatedGetRequest } from '#src/server/common/helpers/authenticated-requests.js'
 import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
@@ -55,26 +56,15 @@ export const taskListController = {
       siteDetails
     } = payload.value
 
-    let taskListTransformed = []
-
     const { userRelationshipType } = userSession
 
-    if (userRelationshipType === USER_TYPES.CITIZEN) {
-      taskListTransformed = transformTaskList(taskList).filter(
-        (item) => item.organisationOnly === false
-      )
-    } else {
-      taskListTransformed = transformTaskList(taskList)
+    let otherPermissionsTaskListTransformed
+
+    if (userRelationshipType !== USER_TYPES.CITIZEN) {
+      otherPermissionsTaskListTransformed =
+        transformOtherPermissionsTaskList(taskList)
     }
 
-    const projectDetailsTaskList = taskListTransformed.filter(
-      (item) => item.section === 'projectDetails'
-    )
-
-    const otherPermissionsTaskList = taskListTransformed.filter(
-      (item) => item.section === 'otherPermissions'
-    )
-    
     const projectDetailsTaskListTransformed =
       transformProjectDetailsTaskList(taskList)
     const siteDetailsTaskListTransformed =
@@ -83,13 +73,14 @@ export const taskListController = {
     await setMarineLicenceCache(request, h, {
       id: marineLicenceId,
       projectName,
-      specialLegalPowers
+      specialLegalPowers,
       siteDetails: hasCancel ? [] : siteDetails
     })
 
     await setProjectType(request, h, PROJECT_TYPE.MARINE_LICENCE)
 
     const hasCompletedAllTasks = [
+      ...otherPermissionsTaskListTransformed,
       ...projectDetailsTaskListTransformed,
       ...siteDetailsTaskListTransformed
     ]
@@ -100,9 +91,8 @@ export const taskListController = {
     return h.view(TASK_LIST_VIEW_ROUTE, {
       ...taskListViewSettings,
       projectName: payload.value.projectName,
-      projectDetailsTaskList,
-      otherPermissionsTaskList,
-      taskList: projectDetailsTaskListTransformed,
+      otherPermissionsTaskList: otherPermissionsTaskListTransformed,
+      projectDetailsTaskList: projectDetailsTaskListTransformed,
       siteDetailsTaskList: siteDetailsTaskListTransformed,
       hasCompletedAllTasks
     })

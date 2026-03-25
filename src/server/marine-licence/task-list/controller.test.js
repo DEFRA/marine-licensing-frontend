@@ -8,7 +8,8 @@ import { setProjectType } from '#src/server/common/helpers/session-cache/utils.j
 import { authenticatedGetRequest } from '#src/server/common/helpers/authenticated-requests.js'
 import {
   transformProjectDetailsTaskList,
-  transformSiteDetailsTaskList
+  transformSiteDetailsTaskList,
+  transformOtherPermissionsTaskList
 } from '#src/server/marine-licence/task-list/utils.js'
 import {
   taskListController,
@@ -63,54 +64,26 @@ describe('#taskListController', () => {
         siteDetails: mockMarineLicence.siteDetails
       }
     }
-    const mockTransformedTaskList = [
+
+    const mockProjectDetailsTaskList = [
       {
-        href: marineLicenceRoutes.MARINE_LICENCE_PROJECT_NAME,
+        href: '/',
         status: { text: 'Completed' },
-        title: {
-          classes: 'govuk-link--no-visited-state',
-          text: 'Project name'
-        },
-        organisationOnly: true,
-        section: 'projectDetails'
-      },
-      {
-        title: {
-          text: 'Special Legal Powers',
-          classes: 'govuk-link--no-visited-state'
-        },
-        href: marineLicenceRoutes.MARINE_LICENCE_SPECIAL_LEGAL_POWERS,
-        status: { text: 'Completed' },
-        organisationOnly: true,
-        section: 'otherPermissions'
+        title: { classes: 'govuk-link--no-visited-state', text: 'Project name' }
       }
     ]
 
-    const expectedOtherPermissionsTaskList = [
+    const mockOtherPermissionsTaskList = [
       {
-        title: {
-          text: 'Special Legal Powers',
-          classes: 'govuk-link--no-visited-state'
-        },
-        href: marineLicenceRoutes.MARINE_LICENCE_SPECIAL_LEGAL_POWERS,
-        status: { text: 'Completed' },
-        organisationOnly: true,
-        section: 'otherPermissions'
-      }
-    ]
-
-    const expectedProjectDetailsTaskList = [
-      {
-        href: marineLicenceRoutes.MARINE_LICENCE_PROJECT_NAME,
+        href: '/',
         status: { text: 'Completed' },
         title: {
           classes: 'govuk-link--no-visited-state',
-          text: 'Project name'
-        },
-        organisationOnly: true,
-        section: 'projectDetails'
+          text: 'Special Legal Powers'
+        }
       }
     ]
+
     const mockSiteDetailsTaskList = [
       {
         href: '/',
@@ -124,10 +97,13 @@ describe('#taskListController', () => {
       payload: mockPayload
     })
     vi.mocked(transformProjectDetailsTaskList).mockReturnValue(
-      mockTransformedTaskList
+      mockProjectDetailsTaskList
     )
     vi.mocked(transformSiteDetailsTaskList).mockReturnValue(
       mockSiteDetailsTaskList
+    )
+    vi.mocked(transformOtherPermissionsTaskList).mockReturnValue(
+      mockOtherPermissionsTaskList
     )
     vi.mocked(setMarineLicenceCache).mockResolvedValue(mockMarineLicence)
 
@@ -163,9 +139,8 @@ describe('#taskListController', () => {
       pageTitle: 'Marine licence start page',
       heading: 'Marine licence start page',
       projectName: 'Test Project',
-      otherPermissionsTaskList: expectedOtherPermissionsTaskList,
-      projectDetailsTaskList: expectedProjectDetailsTaskList
-      taskList: mockTransformedTaskList,
+      otherPermissionsTaskList: mockOtherPermissionsTaskList,
+      projectDetailsTaskList: mockProjectDetailsTaskList,
       siteDetailsTaskList: mockSiteDetailsTaskList
     })
   })

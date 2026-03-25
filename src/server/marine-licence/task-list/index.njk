@@ -17,7 +17,13 @@
           items: projectDetailsTaskList
         }) }}
 
-        {% if otherPermissionsTaskList | length %}
+      <h2 class="govuk-heading-m">Site details</h2>
+      {{ govukTaskList({
+          idPrefix: "site-details-task-list",
+          items: siteDetailsTaskList
+        }) }}
+
+          {% if otherPermissionsTaskList | length %}
         <h2 class="govuk-heading-m">Other permissions</h2>
          {{ govukTaskList({
           idPrefix: "other-permissions-task-list",
@@ -25,12 +31,6 @@
         }) }}
         {% endif %}
         
-      <h2 class="govuk-heading-m">Site details</h2>
-      {{ govukTaskList({
-          idPrefix: "site-details-task-list",
-          items: siteDetailsTaskList
-        }) }}
-
         {% if hasCompletedAllTasks %}
           {{ govukButton({
             text: "Review and send your information",

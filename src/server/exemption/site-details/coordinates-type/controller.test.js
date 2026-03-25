@@ -1,5 +1,4 @@
 import { vi } from 'vitest'
-import { setupTestServer } from '#tests/integration/shared/test-setup-helpers.js'
 import {
   coordinatesTypeController,
   coordinatesTypeSubmitController,
@@ -10,15 +9,13 @@ import {
   mockExemption,
   mockSite
 } from '#src/server/test-helpers/mocks/exemption.js'
-import { makeGetRequest } from '#src/server/test-helpers/server-requests.js'
-import { statusCodes } from '#src/server/common/constants/status-codes.js'
-import { JSDOM } from 'jsdom'
 import { routes } from '#src/server/common/constants/routes.js'
 
 vi.mock('~/src/server/common/helpers/exemptions/session-cache/utils.js')
 
+const cancelLink = `${routes.TASK_LIST}?cancel=site-details`
+
 describe('#coordinatesType', () => {
-  const getServer = setupTestServer()
   let getExemptionCacheSpy
 
   beforeEach(() => {
@@ -39,6 +36,7 @@ describe('#coordinatesType', () => {
           pageTitle: 'How do you want to provide the site location?',
           heading: 'How do you want to provide the site location?',
           backLink: routes.SITE_DETAILS,
+          cancelLink,
           payload: { coordinatesType: 'coordinates' },
           projectName: 'Test Project'
         }
@@ -60,55 +58,11 @@ describe('#coordinatesType', () => {
           pageTitle: 'How do you want to provide the site location?',
           heading: 'How do you want to provide the site location?',
           backLink: routes.SITE_DETAILS,
+          cancelLink,
           payload: { coordinatesType: undefined },
           projectName: 'Test Project'
         }
       )
-    })
-
-    test('Should provide expected response and correctly pre populate data', async () => {
-      const { result, statusCode } = await makeGetRequest({
-        url: routes.COORDINATES_TYPE_CHOICE,
-        server: getServer()
-      })
-
-      const { document } = new JSDOM(result).window
-
-      expect(document.querySelector('h1').textContent.trim()).toBe(
-        'How do you want to provide the site location?'
-      )
-
-      expect(
-        document.querySelector('.govuk-caption-l').textContent.trim()
-      ).toBe('Test Project')
-
-      expect(
-        document.querySelector('.govuk-caption-l').textContent.trim()
-      ).toBe(mockExemption.projectName)
-
-      expect(document.querySelector('#coordinatesType').value).toBe('file')
-
-      expect(document.querySelector('#coordinatesType-2').value).toBe(
-        'coordinates'
-      )
-
-      expect(document.querySelector('#coordinatesType-2').checked).toBe(true)
-
-      expect(
-        document
-          .querySelector('.govuk-back-link[href="/exemption/site-details"')
-          .textContent.trim()
-      ).toBe('Back')
-
-      expect(
-        document
-          .querySelector(
-            '.govuk-link[href="/exemption/task-list?cancel=site-details"'
-          )
-          .textContent.trim()
-      ).toBe('Cancel')
-
-      expect(statusCode).toBe(statusCodes.ok)
     })
   })
 
@@ -148,6 +102,7 @@ describe('#coordinatesType', () => {
           projectName: 'Test Project',
           payload: { coordinatesType: 'invalid' },
           backLink: routes.SITE_DETAILS,
+          cancelLink,
           errorSummary: [
             {
               href: '#coordinatesType',
@@ -189,6 +144,7 @@ describe('#coordinatesType', () => {
         PROVIDE_COORDINATES_CHOICE_VIEW_ROUTE,
         {
           backLink: routes.SITE_DETAILS,
+          cancelLink,
           pageTitle: 'How do you want to provide the site location?',
           heading: 'How do you want to provide the site location?',
           projectName: 'Test Project',
@@ -197,41 +153,6 @@ describe('#coordinatesType', () => {
       )
 
       expect(h.view().takeover).toHaveBeenCalled()
-    })
-
-    test('Should correctly validate on valid data', () => {
-      const request = {
-        coordinatesType: 'file'
-      }
-
-      const payloadValidator =
-        coordinatesTypeSubmitController.options.validate.payload
-
-      const result = payloadValidator.validate(request)
-
-      expect(result.error).toBeUndefined()
-    })
-
-    test('Should correctly validate on empty data', () => {
-      const request = {}
-
-      const payloadValidator =
-        coordinatesTypeSubmitController.options.validate.payload
-
-      const result = payloadValidator.validate(request)
-
-      expect(result.error.message).toBe('PROVIDE_COORDINATES_CHOICE_REQUIRED')
-    })
-
-    test('Should correctly validate on invalid data', () => {
-      const request = { coordinatesType: 'invalid' }
-
-      const payloadValidator =
-        coordinatesTypeSubmitController.options.validate.payload
-
-      const result = payloadValidator.validate(request)
-
-      expect(result.error.message).toBe('PROVIDE_COORDINATES_CHOICE_REQUIRED')
     })
 
     test('Should correctly redirect when file option is selected', async () => {

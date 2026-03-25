@@ -28,7 +28,7 @@ describe('Before you start site details page (marine licence)', () => {
       }),
     projectName: mockMarineLicenceData.projectName,
     navLinks: {
-      continueHref: marineLicenceRoutes.MARINE_LICENCE_SITE_DETAILS,
+      continueHref: marineLicenceRoutes.MARINE_LICENCE_COORDINATES_TYPE_CHOICE,
       backHref: marineLicenceRoutes.MARINE_LICENCE_TASK_LIST
     }
   })

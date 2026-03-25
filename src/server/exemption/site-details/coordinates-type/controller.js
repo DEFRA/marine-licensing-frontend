@@ -10,21 +10,17 @@ import {
   mapErrorsForDisplay
 } from '#src/server/common/helpers/errors.js'
 import { routes } from '#src/server/common/constants/routes.js'
-
-import joi from 'joi'
+import {
+  coordinatesTypeSettings,
+  coordinatesTypeErrorMessages,
+  coordinatesTypeSchema
+} from '#src/server/common/validation/coordinates-type/constants.js'
 
 export const PROVIDE_COORDINATES_CHOICE_VIEW_ROUTE =
-  'exemption/site-details/coordinates-type/index'
+  'templates/coordinates-type'
 
-const provideCoordinatesSettings = {
-  pageTitle: 'How do you want to provide the site location?',
-  heading: 'How do you want to provide the site location?'
-}
+const cancelLink = `${routes.TASK_LIST}?cancel=site-details`
 
-export const errorMessages = {
-  PROVIDE_COORDINATES_CHOICE_REQUIRED:
-    'Select how you want to provide the site location'
-}
 export const coordinatesTypeController = {
   options: {
     pre: [setSiteDataPreHandler]
@@ -36,8 +32,9 @@ export const coordinatesTypeController = {
     const siteDetails = getSiteDetailsBySite(exemption, siteIndex)
 
     return h.view(PROVIDE_COORDINATES_CHOICE_VIEW_ROUTE, {
-      ...provideCoordinatesSettings,
+      ...coordinatesTypeSettings,
       backLink: routes.SITE_DETAILS,
+      cancelLink,
       projectName: exemption.projectName,
       payload: {
         coordinatesType: siteDetails.coordinatesType
@@ -45,21 +42,12 @@ export const coordinatesTypeController = {
     })
   }
 }
+
 export const coordinatesTypeSubmitController = {
   options: {
     pre: [setSiteDataPreHandler],
     validate: {
-      payload: joi.object({
-        coordinatesType: joi
-          .string()
-          .valid('file', 'coordinates')
-          .required()
-          .messages({
-            'any.only': 'PROVIDE_COORDINATES_CHOICE_REQUIRED',
-            'string.empty': 'PROVIDE_COORDINATES_CHOICE_REQUIRED',
-            'any.required': 'PROVIDE_COORDINATES_CHOICE_REQUIRED'
-          })
-      }),
+      payload: coordinatesTypeSchema,
       failAction: (request, h, err) => {
         const { payload } = request
         const { projectName } = getExemptionCache(request)
@@ -67,22 +55,27 @@ export const coordinatesTypeSubmitController = {
         if (!err.details) {
           return h
             .view(PROVIDE_COORDINATES_CHOICE_VIEW_ROUTE, {
-              ...provideCoordinatesSettings,
+              ...coordinatesTypeSettings,
               backLink: routes.SITE_DETAILS,
+              cancelLink,
               payload,
               projectName
             })
             .takeover()
         }
 
-        const errorSummary = mapErrorsForDisplay(err.details, errorMessages)
+        const errorSummary = mapErrorsForDisplay(
+          err.details,
+          coordinatesTypeErrorMessages
+        )
 
         const errors = errorDescriptionByFieldName(errorSummary)
 
         return h
           .view(PROVIDE_COORDINATES_CHOICE_VIEW_ROUTE, {
-            ...provideCoordinatesSettings,
+            ...coordinatesTypeSettings,
             backLink: routes.SITE_DETAILS,
+            cancelLink,
             payload,
             projectName,
             errors,

@@ -189,6 +189,10 @@ describe('Page accessibility checks (Axe)', () => {
       title: 'Site details'
     },
     {
+      url: marineLicenceRoutes.MARINE_LICENCE_COORDINATES_TYPE_CHOICE,
+      title: 'How do you want to provide the site location?'
+    },
+    {
       url: marineLicenceRoutes.MARINE_LICENCE_CHECK_YOUR_ANSWERS,
       title: 'Check your answers before sending your information',
       isMarineLicence: true

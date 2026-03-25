@@ -1,3 +1,4 @@
+import { statusCodes } from '~/src/server/common/constants/status-codes.js'
 import { marineLicenceRoutes } from '~/src/server/common/constants/routes.js'
 import {
   mockMarineLicence,
@@ -36,5 +37,31 @@ describe('Coordinates type page (marine licence)', () => {
     projectName: mockMarineLicenceData.projectName,
     backHref: marineLicenceRoutes.MARINE_LICENCE_SITE_DETAILS,
     cancelHref: `${marineLicenceRoutes.MARINE_LICENCE_TASK_LIST}?cancel=site-details`
+  })
+
+  test('should redirect to choose file type when file option is selected', async () => {
+    const response = await makePostRequest({
+      server: getServer(),
+      url: marineLicenceRoutes.MARINE_LICENCE_COORDINATES_TYPE_CHOICE,
+      formData: { coordinatesType: 'file' }
+    })
+
+    expect(response.statusCode).toBe(statusCodes.redirect)
+    expect(response.headers.location).toBe(
+      marineLicenceRoutes.MARINE_LICENCE_CHOOSE_FILE_UPLOAD_TYPE
+    )
+  })
+
+  test('should redirect to same page when coordinates option is selected', async () => {
+    const response = await makePostRequest({
+      server: getServer(),
+      url: marineLicenceRoutes.MARINE_LICENCE_COORDINATES_TYPE_CHOICE,
+      formData: { coordinatesType: 'coordinates' }
+    })
+
+    expect(response.statusCode).toBe(statusCodes.redirect)
+    expect(response.headers.location).toBe(
+      marineLicenceRoutes.MARINE_LICENCE_COORDINATES_TYPE_CHOICE
+    )
   })
 })

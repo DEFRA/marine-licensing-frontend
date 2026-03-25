@@ -1,3 +1,4 @@
+import { statusCodes } from '~/src/server/common/constants/status-codes.js'
 import { routes } from '~/src/server/common/constants/routes.js'
 import {
   mockExemption,
@@ -32,5 +33,27 @@ describe('Choose file type page (exemption)', () => {
     projectName: mockExemptionData.projectName,
     backHref: routes.COORDINATES_TYPE_CHOICE,
     cancelHref: '/exemption/task-list?cancel=site-details'
+  })
+
+  test('should redirect to file upload page when shapefile is selected', async () => {
+    const response = await makePostRequest({
+      server: getServer(),
+      url: routes.CHOOSE_FILE_UPLOAD_TYPE,
+      formData: { fileUploadType: 'shapefile' }
+    })
+
+    expect(response.statusCode).toBe(statusCodes.redirect)
+    expect(response.headers.location).toBe(routes.FILE_UPLOAD)
+  })
+
+  test('should redirect to file upload page when kml is selected', async () => {
+    const response = await makePostRequest({
+      server: getServer(),
+      url: routes.CHOOSE_FILE_UPLOAD_TYPE,
+      formData: { fileUploadType: 'kml' }
+    })
+
+    expect(response.statusCode).toBe(statusCodes.redirect)
+    expect(response.headers.location).toBe(routes.FILE_UPLOAD)
   })
 })

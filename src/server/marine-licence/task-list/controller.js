@@ -53,6 +53,7 @@ export const taskListController = {
       taskList,
       projectName,
       specialLegalPowers,
+      otherAuthorities,
       siteDetails
     } = payload.value
 
@@ -74,6 +75,7 @@ export const taskListController = {
       id: marineLicenceId,
       projectName,
       specialLegalPowers,
+      otherAuthorities,
       siteDetails: hasCancel ? [] : siteDetails
     })
 

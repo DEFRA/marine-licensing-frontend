@@ -31,6 +31,11 @@ export const transformOtherPermissionsTaskList = (taskList) => [
     title: { text: 'Special legal powers', classes: taskClasses },
     href: marineLicenceRoutes.MARINE_LICENCE_SPECIAL_LEGAL_POWERS,
     status: setStatus(taskList.specialLegalPowers)
+  },
+  {
+    title: { text: 'Other authorities', classes: taskClasses },
+    href: marineLicenceRoutes.MARINE_LICENCE_OTHER_AUTHORITIES,
+    status: setStatus(taskList.otherAuthorities)
   }
 ]
 

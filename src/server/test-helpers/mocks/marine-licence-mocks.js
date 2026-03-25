@@ -4,6 +4,7 @@ import { faker } from '@faker-js/faker'
 export const mockMarineLicenceTaskList = {
   projectName: 'COMPLETED',
   specialLegalPowers: 'COMPLETED',
+  otherAuthorities: 'COMPLETED',
   siteDetails: 'COMPLETED'
 }
 

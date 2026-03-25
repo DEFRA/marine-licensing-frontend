@@ -179,6 +179,12 @@ describe('Page accessibility checks (Axe)', () => {
       session: { ...agentSession, shouldShowOrgOrUserName: false }
     },
     {
+      url: marineLicenceRoutes.MARINE_LICENCE_OTHER_AUTHORITIES,
+      title:
+        'Have you applied to, or got permission from, any other authorities in relation to this project?',
+      isMarineLicence: true
+    },
+    {
       url: marineLicenceRoutes.MARINE_LICENCE_TASK_LIST,
       title: 'Marine licence start page',
       isMarineLicence: true,

@@ -1,4 +1,4 @@
-import { coordinatesTypeSchema } from '#src/server/common/validation/coordinates-type/constants.js'
+import { coordinatesTypeSchema } from '#src/server/common/validation/coordinates-type/schema.js'
 
 describe('#coordinatesTypeSchema', () => {
   test('should validate valid file option', () => {

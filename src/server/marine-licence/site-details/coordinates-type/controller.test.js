@@ -143,7 +143,7 @@ describe('#coordinatesType (marine licence)', () => {
 
       expect(h.view).not.toHaveBeenCalled()
       expect(h.redirect).toHaveBeenCalledWith(
-        marineLicenceRoutes.MARINE_LICENCE_COORDINATES_TYPE_CHOICE
+        marineLicenceRoutes.MARINE_LICENCE_CHOOSE_FILE_UPLOAD_TYPE
       )
       expect(h.redirect().takeover).toHaveBeenCalled()
     })

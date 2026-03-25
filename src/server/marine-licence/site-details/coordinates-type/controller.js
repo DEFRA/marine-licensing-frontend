@@ -89,6 +89,12 @@ export const coordinatesTypeSubmitController = {
       }
     })
 
+    if (payload.coordinatesType === 'file') {
+      return h
+        .redirect(marineLicenceRoutes.MARINE_LICENCE_CHOOSE_FILE_UPLOAD_TYPE)
+        .takeover()
+    }
+
     return h
       .redirect(marineLicenceRoutes.MARINE_LICENCE_COORDINATES_TYPE_CHOICE)
       .takeover()

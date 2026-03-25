@@ -28,9 +28,7 @@ export function sharedChooseFileTypeTests({
       getByRole(document, 'radio', { name: 'Shapefile' })
     ).toBeInTheDocument()
 
-    expect(
-      getByRole(document, 'radio', { name: 'KML' })
-    ).toBeInTheDocument()
+    expect(getByRole(document, 'radio', { name: 'KML' })).toBeInTheDocument()
 
     expect(getByRole(document, 'link', { name: 'Back' })).toHaveAttribute(
       'href',

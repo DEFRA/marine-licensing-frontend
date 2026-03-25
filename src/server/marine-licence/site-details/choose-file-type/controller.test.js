@@ -26,7 +26,9 @@ describe('#chooseFileType (marine licence)', () => {
   const getServer = setupTestServer()
 
   beforeEach(() => {
-    vi.mocked(getMarineLicenceCache).mockReturnValue(mockMarineLicenceApplication)
+    vi.mocked(getMarineLicenceCache).mockReturnValue(
+      mockMarineLicenceApplication
+    )
   })
 
   describe('#chooseFileTypeController', () => {
@@ -153,11 +155,9 @@ describe('#chooseFileType (marine licence)', () => {
         view: vi.fn().mockReturnValue({ takeover: vi.fn() })
       }
 
-      chooseFileTypeSubmitController.options.validate.failAction(
-        request,
-        h,
-        { details: null }
-      )
+      chooseFileTypeSubmitController.options.validate.failAction(request, h, {
+        details: null
+      })
 
       expect(h.view).toHaveBeenCalledWith(
         MARINE_LICENCE_CHOOSE_FILE_TYPE_VIEW_ROUTE,

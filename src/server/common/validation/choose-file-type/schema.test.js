@@ -2,7 +2,9 @@ import { chooseFileTypeSchema } from '#src/server/common/validation/choose-file-
 
 describe('#chooseFileTypeSchema', () => {
   test('should validate valid shapefile option', () => {
-    const { error } = chooseFileTypeSchema.validate({ fileUploadType: 'shapefile' })
+    const { error } = chooseFileTypeSchema.validate({
+      fileUploadType: 'shapefile'
+    })
 
     expect(error).toBeUndefined()
   })

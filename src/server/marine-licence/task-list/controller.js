@@ -58,7 +58,7 @@ export const taskListController = {
 
     const { userRelationshipType } = userSession
 
-    let otherPermissionsTaskListTransformed
+    let otherPermissionsTaskListTransformed = []
 
     if (userRelationshipType !== USER_TYPES.CITIZEN) {
       otherPermissionsTaskListTransformed =

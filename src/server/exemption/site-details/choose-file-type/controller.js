@@ -18,8 +18,6 @@ export const CHOOSE_FILE_UPLOAD_TYPE_VIEW_ROUTE = 'templates/choose-file-type'
 
 const cancelLink = '/exemption/task-list?cancel=site-details'
 
-export { chooseFileTypeErrorMessages as errorMessages }
-
 export const chooseFileTypeController = {
   handler(request, h) {
     const exemption = getExemptionCache(request)

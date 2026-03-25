@@ -128,7 +128,7 @@ describe('#coordinatesType (marine licence)', () => {
       expect(h.view().takeover).toHaveBeenCalled()
     })
 
-    test('Should redirect to same page on successful submission', async () => {
+    test('Should redirect to correct page for file uploads', async () => {
       const h = {
         view: vi.fn(),
         redirect: vi.fn().mockReturnValue({
@@ -144,6 +144,26 @@ describe('#coordinatesType (marine licence)', () => {
       expect(h.view).not.toHaveBeenCalled()
       expect(h.redirect).toHaveBeenCalledWith(
         marineLicenceRoutes.MARINE_LICENCE_CHOOSE_FILE_UPLOAD_TYPE
+      )
+      expect(h.redirect().takeover).toHaveBeenCalled()
+    })
+
+    test('Should redirect to same page on successful submission of manual coordinates type', async () => {
+      const h = {
+        view: vi.fn(),
+        redirect: vi.fn().mockReturnValue({
+          takeover: vi.fn()
+        })
+      }
+
+      await coordinatesTypeSubmitController.handler(
+        { payload: { coordinatesType: 'manual' } },
+        h
+      )
+
+      expect(h.view).not.toHaveBeenCalled()
+      expect(h.redirect).toHaveBeenCalledWith(
+        marineLicenceRoutes.MARINE_LICENCE_COORDINATES_TYPE_CHOICE
       )
       expect(h.redirect().takeover).toHaveBeenCalled()
     })

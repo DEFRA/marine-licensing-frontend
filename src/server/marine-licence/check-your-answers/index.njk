@@ -2,6 +2,7 @@
 {% from "govuk/components/back-link/macro.njk" import govukBackLink %}
 {% from "govuk/components/button/macro.njk" import govukButton %}
 {% from "marine-licence/project-details-card/macro.njk" import appMarineLicenceProjectDetailsCard %}
+{% from "marine-licence/other-permissions-card/macro.njk" import appMarineLicenceOtherPermissionsCard %}
 
 {% block head %}
   {{ super() }}
@@ -26,6 +27,11 @@
 
       {{ appMarineLicenceProjectDetailsCard({
         projectName: projectName
+      }) }}
+
+       {{ appMarineLicenceOtherPermissionsCard({
+        specialLegalPowers: specialLegalPowers,
+        isReadOnly: isReadOnly
       }) }}
 
       <form method="post">

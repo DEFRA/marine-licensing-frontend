@@ -26,7 +26,11 @@ describe('#checkYourAnswersController', () => {
   test('handler should render with correct context', async () => {
     const mockCachedData = {
       id: '123',
-      projectName: 'Test Project'
+      projectName: 'Test Project',
+      specialLegalPowers: {
+        agree: 'yes',
+        details: 'We have statutory powers under the Marine Act.'
+      }
     }
 
     getMarineLicenceCacheMock.mockReturnValue(mockCachedData)

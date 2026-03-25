@@ -1,0 +1,59 @@
+{% extends 'layouts/page.njk' %}
+{% from "govuk/components/textarea/macro.njk" import govukTextarea %}
+{% from "govuk/components/back-link/macro.njk" import govukBackLink %}
+{% from "radio-page/macro.njk" import appRadioPage %}
+
+{% block beforeContent %}
+{{ super() }}
+<nav>
+  {{ govukBackLink({
+    text: "Back",
+    href: backLink
+  }) }}
+</nav>
+{% endblock %}
+
+{% block content %}
+  
+  {% set specialLegalPowersDetails %}
+            {{ govukTextarea({
+              id: "details",
+              name: "details",
+              label: {
+                text: "Provide details of the legal powers including the relevant legislation"
+              },
+              errorMessage: errors['details'],
+              value: payload.details
+            }) }}
+  {% endset -%}
+
+  {{ appRadioPage({
+            name: "agree",
+            errorSummary: errorSummary,
+            errors: errors,
+            heading: "Does your organisation have special legal powers to do any of this project?",
+            isPageHeading: true,
+            value: payload.agree,
+            errorMessage: errors['agree'],
+            projectName: projectName,
+            hint: { text: "You can either give permission to others to do the work, or do the work yourself without needing permission from other organisations, for example, if you're a harbour, lighthouse or coastal protection authority" },
+            items: [
+                {
+                value: "yes",
+                text: "Yes",
+                conditional: {
+                  html: specialLegalPowersDetails
+                }
+                },
+                {
+                value: "no",
+                text: "No"
+                }
+            ],
+            csrfToken: csrfToken,
+            buttonText: "Save and continue",
+            cancelLink: backLink
+            })
+        }}
+
+{% endblock %}

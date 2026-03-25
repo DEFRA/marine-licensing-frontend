@@ -6,10 +6,17 @@ import {
 } from '~/tests/integration/shared/test-setup-helpers.js'
 import { loadPage } from '~/tests/integration/shared/app-server.js'
 import { mockMarineLicenceApplication } from '~/src/server/test-helpers/mocks/marine-licence-mocks.js'
+import { employeeSession } from '~/tests/integration/shared/session-fixtures.js'
+import { getUserSession } from '~/src/server/common/plugins/auth/utils.js'
+vi.mock('~/src/server/common/plugins/auth/utils.js')
 
 describe('Task List', () => {
   const getServer = setupTestServer()
   let document
+
+  beforeAll(() => {
+    vi.mocked(getUserSession).mockResolvedValue(employeeSession)
+  })
 
   beforeEach(async () => {
     mockMarineLicence(mockMarineLicenceApplication)

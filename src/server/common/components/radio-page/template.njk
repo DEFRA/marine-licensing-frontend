@@ -3,6 +3,12 @@
 {% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
 {% from "cancel-button/macro.njk" import appCancelButton %}
 
+{% if params.buttonText is defined %}
+    {% set buttonText = params.buttonText %}
+{% else %}
+    {% set buttonText = "Continue" %}
+{% endif %}
+
 {% set headingWithCaption %}
     {% if params.projectName %}
         <span class="govuk-caption-l">{{ params.projectName }}</span>
@@ -52,7 +58,7 @@
 
             <div class="govuk-button-group">
                 {{ govukButton({
-                    text: "Continue",
+                    text: buttonText,
                     classes: "govuk-button--primary"
                 }) }}
 

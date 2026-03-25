@@ -26,6 +26,14 @@ const setStatus = (task) => {
   }
 }
 
+export const transformOtherPermissionsTaskList = (taskList) => [
+  {
+    title: { text: 'Special legal powers', classes: taskClasses },
+    href: marineLicenceRoutes.MARINE_LICENCE_SPECIAL_LEGAL_POWERS,
+    status: setStatus(taskList.specialLegalPowers)
+  }
+]
+
 export const transformProjectDetailsTaskList = (taskList) => [
   {
     title: { text: 'Project name', classes: taskClasses },

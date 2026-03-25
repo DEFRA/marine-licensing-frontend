@@ -1,0 +1,43 @@
+{% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
+
+{% set rows = [] %}
+
+{% if params.specialLegalPowers %}
+  {% if params.specialLegalPowers.agree === 'yes' %}
+    {% set value = { text: params.specialLegalPowers.details } %}
+  {% else %}
+    {% set value = { text: "No" } %}
+  {% endif %}
+
+  {% set _ = rows.push({
+    key: { text: "Special legal powers to do any of this project" },
+    value: value,
+    actions: {
+        items: [
+          {
+            href: "/marine-licence/special-legal-powers?from=check-your-answers",
+            text: "Change",
+            visuallyHiddenText: "special legal powers",
+            classes: "govuk-link--no-visited-state"
+          }
+        ]
+      } if not params.isReadOnly
+  }) %}
+{% endif %}
+
+{% if rows | length %}
+
+{{ govukSummaryList({
+    card: {
+      title: {
+        text: "Other permissions"
+    },
+      
+      attributes: {
+        id: "other-permissions-card"
+      }
+    },
+    rows: rows
+  }) }}
+  
+{% endif %}

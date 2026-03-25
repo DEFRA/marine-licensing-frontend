@@ -1,6 +1,7 @@
 import {
   transformProjectDetailsTaskList,
-  transformSiteDetailsTaskList
+  transformSiteDetailsTaskList,
+  transformOtherPermissionsTaskList
 } from '#src/server/marine-licence/task-list/utils.js'
 import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
 
@@ -104,6 +105,60 @@ describe('taskList utils', () => {
             title: {
               classes: 'govuk-link--no-visited-state',
               text: 'Site details'
+            }
+          }
+        ])
+      }
+    )
+  })
+
+  describe('transformOtherPermissionsTaskList', () => {
+    test('correctly returns Completed status', () => {
+      expect(
+        transformOtherPermissionsTaskList({ specialLegalPowers: 'COMPLETED' })
+      ).toEqual([
+        {
+          href: marineLicenceRoutes.MARINE_LICENCE_SPECIAL_LEGAL_POWERS,
+          status: { text: 'Completed' },
+          title: {
+            classes: 'govuk-link--no-visited-state',
+            text: 'Special legal powers'
+          }
+        }
+      ])
+    })
+
+    test('correctly returns In Progress', () => {
+      expect(
+        transformOtherPermissionsTaskList({ specialLegalPowers: 'IN_PROGRESS' })
+      ).toEqual([
+        {
+          href: marineLicenceRoutes.MARINE_LICENCE_SPECIAL_LEGAL_POWERS,
+          status: {
+            tag: { text: 'In Progress', classes: 'govuk-tag--light-blue' }
+          },
+          title: {
+            classes: 'govuk-link--no-visited-state',
+            text: 'Special legal powers'
+          }
+        }
+      ])
+    })
+
+    test.each([null, 'INCOMPLETE', undefined])(
+      'correctly returns Not yet started for %s',
+      (value) => {
+        expect(
+          transformOtherPermissionsTaskList({ specialLegalPowers: value })
+        ).toEqual([
+          {
+            href: marineLicenceRoutes.MARINE_LICENCE_SPECIAL_LEGAL_POWERS,
+            status: {
+              tag: { text: 'Not yet started', classes: 'govuk-tag--blue' }
+            },
+            title: {
+              classes: 'govuk-link--no-visited-state',
+              text: 'Special legal powers'
             }
           }
         ])

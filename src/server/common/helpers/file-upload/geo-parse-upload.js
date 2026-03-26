@@ -60,12 +60,7 @@ export const extractCoordinatesFromFile = async (
   }
 }
 
-export const extractCoordinates = async ({
-  status,
-  uploadConfig,
-  request,
-  h
-}) => {
+export const extractCoordinates = async ({ status, uploadConfig, request }) => {
   const cdpUploadConfig = config.get('cdpUploader')
   const s3Bucket = cdpUploadConfig.s3Bucket
   const s3Key = status.s3Location.s3Key

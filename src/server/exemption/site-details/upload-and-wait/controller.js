@@ -20,8 +20,7 @@ import {
   DEFAULT_GEO_PARSER_ERROR_MESSAGE
 } from './error-messages.js'
 
-export const UPLOAD_AND_WAIT_VIEW_ROUTE =
-  'exemption/site-details/upload-and-wait/index'
+export const UPLOAD_AND_WAIT_VIEW_ROUTE = 'templates/upload-and-wait'
 
 const pageSettings = {
   pageTitle: 'Checking your file...',
@@ -220,12 +219,13 @@ async function storeSuccessfulUpload(
 }
 
 function handleProcessingStatus(status, exemption, h) {
-  // Show waiting page with meta refresh
   return h.view(UPLOAD_AND_WAIT_VIEW_ROUTE, {
     ...pageSettings,
     projectName: exemption.projectName,
     isProcessing: true,
-    filename: status.filename
+    filename: status.filename,
+    tryAgainLink: routes.FILE_UPLOAD,
+    cancelLink: routes.TASK_LIST
   })
 }
 

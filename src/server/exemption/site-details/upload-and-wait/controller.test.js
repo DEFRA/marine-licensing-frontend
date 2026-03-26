@@ -358,7 +358,9 @@ describe('#uploadAndWait', () => {
           projectName: 'Test Project',
           isProcessing: true,
           pageRefreshTimeInSeconds: 2,
-          filename: 'test.kml'
+          filename: 'test.kml',
+          tryAgainLink: routes.FILE_UPLOAD,
+          cancelLink: routes.TASK_LIST
         })
       })
 
@@ -380,7 +382,9 @@ describe('#uploadAndWait', () => {
           projectName: 'Test Project',
           isProcessing: true,
           pageRefreshTimeInSeconds: 2,
-          filename: 'test.kml'
+          filename: 'test.kml',
+          tryAgainLink: routes.FILE_UPLOAD,
+          cancelLink: routes.TASK_LIST
         })
       })
 
@@ -1308,7 +1312,9 @@ describe('#uploadAndWait', () => {
           projectName: 'Test Project',
           isProcessing: true,
           pageRefreshTimeInSeconds: 2,
-          filename: ''
+          filename: '',
+          tryAgainLink: routes.FILE_UPLOAD,
+          cancelLink: routes.TASK_LIST
         })
       })
     })

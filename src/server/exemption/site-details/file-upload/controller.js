@@ -10,7 +10,8 @@ import {
   mapErrorsForDisplay
 } from '#src/server/common/helpers/errors.js'
 import { getSiteDetailsBySite } from '#src/server/common/helpers/exemptions/session-cache/site-details-utils.js'
-export const FILE_UPLOAD_VIEW_ROUTE = 'exemption/site-details/file-upload/index'
+
+export const FILE_UPLOAD_VIEW_ROUTE = 'templates/file-upload'
 
 const UPLOAD_A_FILE = 'Upload a file'
 const pageSettings = {

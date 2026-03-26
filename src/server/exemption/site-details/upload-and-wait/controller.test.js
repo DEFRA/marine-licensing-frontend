@@ -588,7 +588,6 @@ describe('#uploadAndWait', () => {
           'The selected file must be a KML file'
         )
       })
-
     })
 
     describe('when upload is rejected', () => {
@@ -642,7 +641,6 @@ describe('#uploadAndWait', () => {
         // And user is redirected to file upload
         expect(h.redirect).toHaveBeenCalledWith(routes.FILE_UPLOAD)
       })
-
     })
 
     describe('when geo-parser API fails', () => {
@@ -786,7 +784,6 @@ describe('#uploadAndWait', () => {
 
         expect(h.redirect).toHaveBeenCalledWith(routes.FILE_UPLOAD)
       })
-
     })
 
     describe('when service errors occur', () => {

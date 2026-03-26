@@ -16,7 +16,11 @@ describe('#logExtractionSuccess', () => {
   test('should log feature count and coordinate count', () => {
     const request = createMockRequest()
     const geoJSON = { features: [{}, {}] }
-    const extractedCoordinates = [[1, 2], [3, 4], [5, 6]]
+    const extractedCoordinates = [
+      [1, 2],
+      [3, 4],
+      [5, 6]
+    ]
 
     logExtractionSuccess(request, geoJSON, extractedCoordinates)
 

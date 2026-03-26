@@ -17,9 +17,12 @@ describe('#getAllowedExtensions', () => {
     ['shapefile', ['zip']],
     ['unknown', []],
     [undefined, []]
-  ])('should return correct extensions for file type %s', (fileType, expected) => {
-    expect(getAllowedExtensions(fileType)).toEqual(expected)
-  })
+  ])(
+    'should return correct extensions for file type %s',
+    (fileType, expected) => {
+      expect(getAllowedExtensions(fileType)).toEqual(expected)
+    }
+  )
 })
 
 describe('#getCdpErrorMessageFromCode', () => {
@@ -73,7 +76,10 @@ describe('#getGeoParserErrorMessage', () => {
     ],
     [null, DEFAULT_GEO_PARSER_ERROR_MESSAGE],
     ['UNKNOWN_CODE', DEFAULT_GEO_PARSER_ERROR_MESSAGE]
-  ])('should return correct message for error code %s', (errorCode, expected) => {
-    expect(getGeoParserErrorMessage(errorCode)).toBe(expected)
-  })
+  ])(
+    'should return correct message for error code %s',
+    (errorCode, expected) => {
+      expect(getGeoParserErrorMessage(errorCode)).toBe(expected)
+    }
+  )
 })

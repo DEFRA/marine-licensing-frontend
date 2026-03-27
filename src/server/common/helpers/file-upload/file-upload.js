@@ -20,7 +20,7 @@ export const getFileTypeContent = (fileUploadType) => {
     }
   } else if (fileUploadType === 'shapefile') {
     return {
-      heading: 'Upload a Shapefile',
+      heading: 'Upload a shapefile',
       acceptAttribute: '.zip'
     }
   } else {

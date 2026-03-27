@@ -127,7 +127,7 @@ describe('#fileUpload', () => {
         },
         {
           fileType: 'shapefile',
-          expectedHeading: 'Upload a Shapefile',
+          expectedHeading: 'Upload a shapefile',
           expectedAccept: '.zip'
         }
       ])(
@@ -492,7 +492,7 @@ describe('#fileUpload', () => {
       },
       {
         type: 'shapefile',
-        expectedHeading: 'Upload a Shapefile',
+        expectedHeading: 'Upload a shapefile',
         expectedAccept: '.zip'
       }
     ])(

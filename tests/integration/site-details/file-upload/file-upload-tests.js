@@ -8,7 +8,7 @@ export function sharedFileUploadTests({ loadPageWithFileType }) {
     const document = await loadPageWithFileType('shapefile')
 
     const h1 = getByRole(document, 'heading', { level: 1 })
-    expect(h1).toHaveTextContent('Upload a Shapefile')
+    expect(h1).toHaveTextContent('Upload a shapefile')
 
     const zipFileText = getByText(
       document,

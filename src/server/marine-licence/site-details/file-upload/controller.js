@@ -14,7 +14,7 @@ import {
   updateMarineLicenceSiteDetails
 } from '#src/server/common/helpers/marine-licence/session-cache/utils.js'
 
-const s3PathForExemptions = 'exemptions'
+const s3PathForMarineLicence = 'marine-licence'
 
 export const fileUploadController = {
   async handler(request, h) {
@@ -59,7 +59,7 @@ export const fileUploadController = {
       const redirectUrl = marineLicenceRoutes.MARINE_LICENCE_UPLOAD_AND_WAIT
       const uploadConfig = await cdpService.initiate({
         redirectUrl,
-        s3Path: s3PathForExemptions,
+        s3Path: s3PathForMarineLicence,
         s3Bucket
       })
 

@@ -15,8 +15,9 @@ import {
 } from '#src/server/common/helpers/file-upload/file-upload.js'
 import {
   extractCoordinates,
-  validateUploadedFile
+  extractGeoParserErrorCode
 } from '#src/server/common/helpers/file-upload/geo-parse-upload.js'
+import { handleReadyStatus } from '#src/server/common/helpers/file-upload/upload-status-handler.js'
 import { logSuccessfulProcessing } from '#src/server/common/helpers/file-upload/upload-logging.js'
 import { DEFAULT_ERROR_MESSAGE } from '#src/server/common/helpers/file-upload/error-messages.js'
 import {
@@ -24,21 +25,8 @@ import {
   uploadAndWaitPageSettings
 } from '#src/server/common/helpers/file-upload/constants.js'
 
-async function handleValidationError(request, h, validation, fileType) {
-  const errorDetails = {
-    message: validation.errorMessage,
-    fieldName: 'file'
-  }
-  await storeUploadError(request, h, errorDetails, fileType)
-  return { redirect: routes.FILE_UPLOAD }
-}
-
 async function handleGeoParserError(request, h, error, filename, fileType) {
-  let errorCode = null
-
-  if (error.data?.payload?.message) {
-    errorCode = error.data.payload.message
-  }
+  const errorCode = extractGeoParserErrorCode(error)
   const message = getGeoParserErrorMessage(errorCode)
 
   const errorDetails = {
@@ -110,25 +98,6 @@ function handleProcessingStatus(status, exemption, h) {
     tryAgainLink: routes.FILE_UPLOAD,
     cancelLink: routes.TASK_LIST
   })
-}
-
-async function handleReadyStatus(status, uploadConfig, request, h) {
-  const validationResult = await validateUploadedFile(
-    status,
-    uploadConfig,
-    request
-  )
-  if (!validationResult.isValid) {
-    await handleValidationError(
-      request,
-      h,
-      validationResult,
-      uploadConfig.fileType
-    )
-    return h.redirect(routes.FILE_UPLOAD)
-  }
-
-  return processValidatedFile(status, uploadConfig, request, h)
 }
 
 const processValidatedFile = async (status, uploadConfig, request, h) => {
@@ -219,7 +188,12 @@ async function processUploadStatus(status, context) {
   }
 
   if (status.status === 'ready') {
-    return handleReadyStatus(status, uploadConfig, request, h)
+    const redirect = await handleReadyStatus(status, uploadConfig, request, h, {
+      storeUploadError,
+      fileUploadRoute: routes.FILE_UPLOAD
+    })
+    if (redirect) return redirect
+    return processValidatedFile(status, uploadConfig, request, h)
   }
 
   if (status.status === 'rejected' || status.status === 'error') {

@@ -1,7 +1,8 @@
 import { vi } from 'vitest'
 import {
   validateAndExtractGeoJSON,
-  validateUploadedFile
+  validateUploadedFile,
+  extractGeoParserErrorCode
 } from '#src/server/common/helpers/file-upload/geo-parse-upload.js'
 import * as fileValidationModule from '#src/services/file-validation/index.js'
 import * as fileUploadModule from '#src/server/common/helpers/file-upload/file-upload.js'
@@ -73,6 +74,28 @@ describe('#validateAndExtractGeoJSON', () => {
     expect(() => validateAndExtractGeoJSON(response)).toThrow(
       'Invalid GeoJSON structure'
     )
+  })
+})
+
+describe('#extractGeoParserErrorCode', () => {
+  test.each([
+    {
+      description: 'error with data.payload.message',
+      error: { data: { payload: { message: 'SHAPEFILE_MISSING_CORE_FILES' } } },
+      expected: 'SHAPEFILE_MISSING_CORE_FILES'
+    },
+    {
+      description: 'generic error with no data property',
+      error: new Error('generic error'),
+      expected: null
+    },
+    {
+      description: 'error with null data',
+      error: { data: null },
+      expected: null
+    }
+  ])('should return $expected for $description', ({ error, expected }) => {
+    expect(extractGeoParserErrorCode(error)).toBe(expected)
   })
 })
 

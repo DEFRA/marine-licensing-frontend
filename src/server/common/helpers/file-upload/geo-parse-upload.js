@@ -77,6 +77,9 @@ export const extractCoordinates = async ({ status, uploadConfig, request }) => {
   return coordinateData
 }
 
+export const extractGeoParserErrorCode = (error) =>
+  error.data?.payload?.message ?? null
+
 export const validateUploadedFile = async (status, uploadConfig, request) => {
   const fileValidationService = getFileValidationService(request.logger)
   const allowedExtensions = getAllowedExtensions(uploadConfig.fileType)

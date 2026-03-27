@@ -192,7 +192,9 @@ async function processUploadStatus(status, context) {
       storeUploadError,
       fileUploadRoute: routes.FILE_UPLOAD
     })
-    if (redirect) return redirect
+    if (redirect) {
+      return redirect
+    }
     return processValidatedFile(status, uploadConfig, request, h)
   }
 

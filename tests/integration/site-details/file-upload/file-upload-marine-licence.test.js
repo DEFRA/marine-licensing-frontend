@@ -32,7 +32,7 @@ describe('File upload page (marine licence)', () => {
   const loadPageWithFileType = (fileUploadType) => {
     mockMarineLicence({
       ...mockMarineLicenceApplication,
-      siteDetails: { fileUploadType }
+      siteDetails: [{ fileUploadType }]
     })
 
     return loadPage({

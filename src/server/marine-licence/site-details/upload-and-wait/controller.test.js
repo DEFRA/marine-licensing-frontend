@@ -68,7 +68,7 @@ const createMockStatusResponse = (status, overrides = {}) => ({
 
 const createMockMarineLicence = (overrides = {}) => ({
   projectName: 'Test Project',
-  siteDetails: { uploadConfig: createMockUploadConfig() },
+  siteDetails: [{ uploadConfig: createMockUploadConfig() }],
   ...overrides
 })
 
@@ -166,7 +166,7 @@ const expectRejectedStatusHandling = async (
 ) => {
   getMarineLicenceCacheSpy.mockReturnValue(
     createMockMarineLicence({
-      siteDetails: { uploadConfig: createMockUploadConfig({ fileType }) }
+      siteDetails: [{ uploadConfig: createMockUploadConfig({ fileType }) }]
     })
   )
   mockCdpService.getStatus.mockResolvedValue({
@@ -214,7 +214,7 @@ const expectFileValidationFailure = async (
 ) => {
   getMarineLicenceCacheSpy.mockReturnValue(
     createMockMarineLicence({
-      siteDetails: { uploadConfig: createMockUploadConfig({ fileType }) }
+      siteDetails: [{ uploadConfig: createMockUploadConfig({ fileType }) }]
     })
   )
 
@@ -408,9 +408,13 @@ describe('#uploadAndWait', () => {
         test('should process shapefile and redirect to site details', async () => {
           getMarineLicenceCacheSpy.mockReturnValue(
             createMockMarineLicence({
-              siteDetails: {
-                uploadConfig: createMockUploadConfig({ fileType: 'shapefile' })
-              }
+              siteDetails: [
+                {
+                  uploadConfig: createMockUploadConfig({
+                    fileType: 'shapefile'
+                  })
+                }
+              ]
             })
           )
 
@@ -581,9 +585,11 @@ describe('#uploadAndWait', () => {
       test('should handle SHAPEFILE_MISSING_CORE_FILES error from geo-parser', async () => {
         getMarineLicenceCacheSpy.mockReturnValue(
           createMockMarineLicence({
-            siteDetails: {
-              uploadConfig: createMockUploadConfig({ fileType: 'shapefile' })
-            }
+            siteDetails: [
+              {
+                uploadConfig: createMockUploadConfig({ fileType: 'shapefile' })
+              }
+            ]
           })
         )
         const statusResponse = createMockStatusResponse('ready', {

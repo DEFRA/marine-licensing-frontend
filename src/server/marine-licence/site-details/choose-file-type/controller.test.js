@@ -53,7 +53,7 @@ describe('#chooseFileType (marine licence)', () => {
     test('handler should pre-populate fileUploadType from cache', () => {
       vi.mocked(getMarineLicenceCache).mockReturnValueOnce({
         ...mockMarineLicenceApplication,
-        siteDetails: { fileUploadType: 'kml' }
+        siteDetails: [{ fileUploadType: 'kml' }]
       })
 
       const h = { view: vi.fn() }

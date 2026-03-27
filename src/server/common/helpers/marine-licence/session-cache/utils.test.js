@@ -168,7 +168,7 @@ describe('#utils', () => {
       expect(mockRequest.yar.set).toHaveBeenCalledWith(
         MARINE_LICENCE_CACHE_KEY,
         {
-          siteDetails: { coordinatesType: 'file' }
+          siteDetails: [{ coordinatesType: 'file' }]
         }
       )
       expect(mockRequest.yar.commit).toHaveBeenCalledWith(mockH)
@@ -189,7 +189,7 @@ describe('#utils', () => {
       expect(mockRequest.yar.set).toHaveBeenCalledWith(
         MARINE_LICENCE_CACHE_KEY,
         {
-          siteDetails: { coordinatesType: null }
+          siteDetails: [{}]
         }
       )
       expect(mockRequest.yar.commit).toHaveBeenCalledWith(mockH)
@@ -210,7 +210,7 @@ describe('#utils', () => {
       expect(mockRequest.yar.set).toHaveBeenCalledWith(
         MARINE_LICENCE_CACHE_KEY,
         {
-          siteDetails: { coordinatesType: null }
+          siteDetails: [{}]
         }
       )
       expect(mockRequest.yar.commit).toHaveBeenCalledWith(mockH)
@@ -232,7 +232,7 @@ describe('#utils', () => {
       expect(mockRequest.yar.set).toHaveBeenCalledWith(
         MARINE_LICENCE_CACHE_KEY,
         {
-          siteDetails: { coordinatesType: null }
+          siteDetails: [{}]
         }
       )
       expect(mockRequest.yar.commit).toHaveBeenCalledWith(mockH)

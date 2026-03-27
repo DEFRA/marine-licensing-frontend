@@ -29,7 +29,7 @@ const createMockH = () => ({
 
 const createMockMarineLicence = (siteDetails = {}) => ({
   ...mockMarineLicenceApplication,
-  siteDetails
+  siteDetails: [siteDetails]
 })
 
 const createStandardUploadConfig = () => ({

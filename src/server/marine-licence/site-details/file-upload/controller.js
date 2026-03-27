@@ -13,15 +13,16 @@ import {
   getMarineLicenceCache,
   updateMarineLicenceSiteDetails
 } from '#src/server/common/helpers/marine-licence/session-cache/utils.js'
+import { getSiteDetailsBySite } from '#src/server/common/helpers/exemptions/session-cache/site-details-utils.js'
 
 const s3PathForMarineLicence = 'marine-licence'
 
 export const fileUploadController = {
   async handler(request, h) {
     const marineLicence = getMarineLicenceCache(request)
-    const { siteDetails } = marineLicence
+    const site = getSiteDetailsBySite(marineLicence)
 
-    const { fileUploadType, uploadedFile, uploadError } = siteDetails
+    const { fileUploadType, uploadedFile, uploadError } = site
 
     request.logger.debug(
       `fileUploadController: fileUploadType [${fileUploadType}]`

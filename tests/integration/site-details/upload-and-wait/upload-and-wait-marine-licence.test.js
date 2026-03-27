@@ -29,13 +29,15 @@ describe('Upload and wait page (marine licence)', () => {
   const loadPageWithStatus = (status) => {
     mockMarineLicence({
       ...mockMarineLicenceApplication,
-      siteDetails: {
-        uploadConfig: {
-          uploadId: 'test-upload-id',
-          statusUrl: 'test-status-url',
-          fileType: 'kml'
+      siteDetails: [
+        {
+          uploadConfig: {
+            uploadId: 'test-upload-id',
+            statusUrl: 'test-status-url',
+            fileType: 'kml'
+          }
         }
-      }
+      ]
     })
     mockCdpService.getStatus.mockResolvedValue({
       status,
@@ -51,7 +53,7 @@ describe('Upload and wait page (marine licence)', () => {
   const getRedirectResponse = () => {
     mockMarineLicence({
       ...mockMarineLicenceApplication,
-      siteDetails: {}
+      siteDetails: [{}]
     })
 
     return makeGetRequest({

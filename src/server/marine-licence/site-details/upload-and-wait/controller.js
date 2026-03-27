@@ -19,6 +19,7 @@ import {
   UPLOAD_AND_WAIT_VIEW_ROUTE,
   uploadAndWaitPageSettings
 } from '#src/server/common/helpers/file-upload/constants.js'
+import { getSiteDetailsBySite } from '#src/server/common/helpers/exemptions/session-cache/site-details-utils.js'
 
 async function handleGeoParserError(request, h, error, filename, fileType) {
   const errorCode = extractGeoParserErrorCode(error)
@@ -173,8 +174,9 @@ async function processUploadStatus(status, context) {
 export const uploadAndWaitController = {
   async handler(request, h) {
     const marineLicence = getMarineLicenceCache(request)
+    const site = getSiteDetailsBySite(marineLicence)
 
-    const { uploadConfig } = marineLicence.siteDetails ?? {}
+    const { uploadConfig } = site
 
     if (!uploadConfig) {
       return h.redirect(

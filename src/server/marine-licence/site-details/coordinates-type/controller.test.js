@@ -127,25 +127,5 @@ describe('#coordinatesType (marine licence)', () => {
 
       expect(h.view().takeover).toHaveBeenCalled()
     })
-
-    test('Should redirect to same page on successful submission', async () => {
-      const h = {
-        view: vi.fn(),
-        redirect: vi.fn().mockReturnValue({
-          takeover: vi.fn()
-        })
-      }
-
-      await coordinatesTypeSubmitController.handler(
-        { payload: { coordinatesType: 'file' } },
-        h
-      )
-
-      expect(h.view).not.toHaveBeenCalled()
-      expect(h.redirect).toHaveBeenCalledWith(
-        marineLicenceRoutes.MARINE_LICENCE_COORDINATES_TYPE_CHOICE
-      )
-      expect(h.redirect().takeover).toHaveBeenCalled()
-    })
   })
 })

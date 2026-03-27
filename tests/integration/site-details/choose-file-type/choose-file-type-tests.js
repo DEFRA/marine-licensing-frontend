@@ -3,7 +3,7 @@ import { JSDOM } from 'jsdom'
 import { statusCodes } from '~/src/server/common/constants/status-codes.js'
 import { validateErrors } from '~/tests/integration/shared/expect-utils.js'
 
-export function sharedCoordinatesTypeTests({
+export function sharedChooseFileTypeTests({
   getRequest,
   postRequest,
   projectName,
@@ -19,23 +19,17 @@ export function sharedCoordinatesTypeTests({
 
     expect(
       getByRole(document, 'heading', {
-        name: 'How do you want to provide the site location?'
+        name: 'Which type of file do you want to upload?'
       })
     ).toBeInTheDocument()
 
     expect(getByText(document, projectName)).toBeInTheDocument()
 
     expect(
-      getByRole(document, 'radio', {
-        name: 'Upload a file with the coordinates of the site'
-      })
+      getByRole(document, 'radio', { name: 'Shapefile' })
     ).toBeInTheDocument()
 
-    expect(
-      getByRole(document, 'radio', {
-        name: 'Enter the coordinates of the site manually'
-      })
-    ).toBeInTheDocument()
+    expect(getByRole(document, 'radio', { name: 'KML' })).toBeInTheDocument()
 
     expect(getByRole(document, 'link', { name: 'Back' })).toHaveAttribute(
       'href',
@@ -58,8 +52,8 @@ export function sharedCoordinatesTypeTests({
     validateErrors(
       [
         {
-          field: 'coordinatesType',
-          message: 'Select how you want to provide the site location'
+          field: 'fileUploadType',
+          message: 'Select which type of file you want to upload'
         }
       ],
       document

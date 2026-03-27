@@ -193,6 +193,10 @@ describe('Page accessibility checks (Axe)', () => {
       title: 'How do you want to provide the site location?'
     },
     {
+      url: marineLicenceRoutes.MARINE_LICENCE_CHOOSE_FILE_UPLOAD_TYPE,
+      title: 'Choose file type'
+    },
+    {
       url: marineLicenceRoutes.MARINE_LICENCE_CHECK_YOUR_ANSWERS,
       title: 'Check your answers before sending your information',
       isMarineLicence: true

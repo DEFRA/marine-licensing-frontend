@@ -8,42 +8,38 @@ import {
   makeGetRequest,
   makePostRequest
 } from '~/src/server/test-helpers/server-requests.js'
-import { sharedCoordinatesTypeTests } from './coordinates-type-tests.js'
+import { sharedChooseFileTypeTests } from './choose-file-type-tests.js'
+import { mockMarineLicenceApplication } from '#src/server/test-helpers/mocks/marine-licence-mocks.js'
 
-describe('Coordinates type page (marine licence)', () => {
-  const mockMarineLicenceData = {
-    id: 'test-marine-licence-123',
-    projectName: 'Test Marine Project'
-  }
-
+describe('Choose file type page (marine licence)', () => {
   const getServer = setupTestServer()
 
   beforeEach(() => {
-    mockMarineLicence(mockMarineLicenceData)
+    mockMarineLicence(mockMarineLicenceApplication)
   })
 
-  sharedCoordinatesTypeTests({
+  sharedChooseFileTypeTests({
     getRequest: () =>
       makeGetRequest({
         server: getServer(),
-        url: marineLicenceRoutes.MARINE_LICENCE_COORDINATES_TYPE_CHOICE
+        url: marineLicenceRoutes.MARINE_LICENCE_CHOOSE_FILE_UPLOAD_TYPE
       }),
     postRequest: ({ formData }) =>
       makePostRequest({
         server: getServer(),
-        url: marineLicenceRoutes.MARINE_LICENCE_COORDINATES_TYPE_CHOICE,
+        url: marineLicenceRoutes.MARINE_LICENCE_CHOOSE_FILE_UPLOAD_TYPE,
         formData
       }),
-    projectName: mockMarineLicenceData.projectName,
-    backHref: marineLicenceRoutes.MARINE_LICENCE_SITE_DETAILS,
+    projectName: mockMarineLicenceApplication.projectName,
+    backHref: marineLicenceRoutes.MARINE_LICENCE_COORDINATES_TYPE_CHOICE,
     cancelHref: `${marineLicenceRoutes.MARINE_LICENCE_TASK_LIST}?cancel=site-details`
   })
 
-  test('should redirect to choose file type when file option is selected', async () => {
+  test('should redirect to same page when shapefile is selected', async () => {
     const response = await makePostRequest({
       server: getServer(),
-      url: marineLicenceRoutes.MARINE_LICENCE_COORDINATES_TYPE_CHOICE,
-      formData: { coordinatesType: 'file' }
+      url: marineLicenceRoutes.MARINE_LICENCE_CHOOSE_FILE_UPLOAD_TYPE,
+      formData: { fileUploadType: 'shapefile' }
     })
 
     expect(response.statusCode).toBe(statusCodes.redirect)
@@ -52,16 +48,16 @@ describe('Coordinates type page (marine licence)', () => {
     )
   })
 
-  test('should redirect to same page when coordinates option is selected', async () => {
+  test('should redirect to same page when kml is selected', async () => {
     const response = await makePostRequest({
       server: getServer(),
-      url: marineLicenceRoutes.MARINE_LICENCE_COORDINATES_TYPE_CHOICE,
-      formData: { coordinatesType: 'coordinates' }
+      url: marineLicenceRoutes.MARINE_LICENCE_CHOOSE_FILE_UPLOAD_TYPE,
+      formData: { fileUploadType: 'kml' }
     })
 
     expect(response.statusCode).toBe(statusCodes.redirect)
     expect(response.headers.location).toBe(
-      marineLicenceRoutes.MARINE_LICENCE_COORDINATES_TYPE_CHOICE
+      marineLicenceRoutes.MARINE_LICENCE_CHOOSE_FILE_UPLOAD_TYPE
     )
   })
 })

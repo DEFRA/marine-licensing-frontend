@@ -1,5 +1,3 @@
-import joi from 'joi'
-
 import {
   getExemptionCache,
   updateExemptionSiteDetails
@@ -10,44 +8,35 @@ import {
   mapErrorsForDisplay
 } from '#src/server/common/helpers/errors.js'
 import { getSiteDetailsBySite } from '#src/server/common/helpers/exemptions/session-cache/site-details-utils.js'
-const pageSettings = {
-  pageTitle: 'Choose file type',
-  heading: 'Which type of file do you want to upload?'
-}
+import {
+  chooseFileTypeSettings,
+  chooseFileTypeErrorMessages
+} from '#src/server/common/validation/choose-file-type/constants.js'
+import { chooseFileTypeSchema } from '#src/server/common/validation/choose-file-type/schema.js'
 
-export const CHOOSE_FILE_UPLOAD_TYPE_VIEW_ROUTE =
-  'exemption/site-details/choose-file-type/index'
+export const CHOOSE_FILE_UPLOAD_TYPE_VIEW_ROUTE = 'templates/choose-file-type'
 
-export const errorMessages = {
-  FILE_TYPE_ENTRY_REQUIRED: 'Select which type of file you want to upload'
-}
+const cancelLink = '/exemption/task-list?cancel=site-details'
+
 export const chooseFileTypeController = {
   handler(request, h) {
     const exemption = getExemptionCache(request)
     const site = getSiteDetailsBySite(exemption)
 
     return h.view(CHOOSE_FILE_UPLOAD_TYPE_VIEW_ROUTE, {
-      ...pageSettings,
+      ...chooseFileTypeSettings,
       payload: { fileUploadType: site.fileUploadType || '' },
       projectName: exemption.projectName,
-      backLink: routes.COORDINATES_TYPE_CHOICE
+      backLink: routes.COORDINATES_TYPE_CHOICE,
+      cancelLink
     })
   }
 }
+
 export const chooseFileTypeSubmitController = {
   options: {
     validate: {
-      payload: joi.object({
-        fileUploadType: joi
-          .string()
-          .valid('shapefile', 'kml')
-          .required()
-          .messages({
-            'any.only': 'FILE_TYPE_ENTRY_REQUIRED',
-            'string.empty': 'FILE_TYPE_ENTRY_REQUIRED',
-            'any.required': 'FILE_TYPE_ENTRY_REQUIRED'
-          })
-      }),
+      payload: chooseFileTypeSchema,
       failAction: (request, h, err) => {
         const { payload } = request
         const { projectName } = getExemptionCache(request)
@@ -55,23 +44,28 @@ export const chooseFileTypeSubmitController = {
         if (!err.details) {
           return h
             .view(CHOOSE_FILE_UPLOAD_TYPE_VIEW_ROUTE, {
-              ...pageSettings,
+              ...chooseFileTypeSettings,
               payload,
               projectName,
-              backLink: routes.COORDINATES_TYPE_CHOICE
+              backLink: routes.COORDINATES_TYPE_CHOICE,
+              cancelLink
             })
             .takeover()
         }
 
-        const errorSummary = mapErrorsForDisplay(err.details, errorMessages)
+        const errorSummary = mapErrorsForDisplay(
+          err.details,
+          chooseFileTypeErrorMessages
+        )
         const errors = errorDescriptionByFieldName(errorSummary)
 
         return h
           .view(CHOOSE_FILE_UPLOAD_TYPE_VIEW_ROUTE, {
-            ...pageSettings,
+            ...chooseFileTypeSettings,
             payload,
             projectName,
             backLink: routes.COORDINATES_TYPE_CHOICE,
+            cancelLink,
             errors,
             errorSummary
           })

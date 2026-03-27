@@ -6,9 +6,9 @@ import { JSDOM } from 'jsdom'
 import {
   chooseFileTypeController,
   chooseFileTypeSubmitController,
-  CHOOSE_FILE_UPLOAD_TYPE_VIEW_ROUTE,
-  errorMessages
+  CHOOSE_FILE_UPLOAD_TYPE_VIEW_ROUTE
 } from '#src/server/exemption/site-details/choose-file-type/controller.js'
+import { chooseFileTypeErrorMessages } from '#src/server/common/validation/choose-file-type/constants.js'
 
 import {
   makeGetRequest,
@@ -17,6 +17,8 @@ import {
 import * as cacheUtils from '#src/server/common/helpers/exemptions/session-cache/utils.js'
 
 vi.mock('~/src/server/common/helpers/exemptions/session-cache/utils.js')
+
+const cancelLink = '/exemption/task-list?cancel=site-details'
 
 describe('#chooseFileType', () => {
   const getServer = setupTestServer()
@@ -65,7 +67,7 @@ describe('#chooseFileType', () => {
       expect(statusCode).toBe(statusCodes.ok)
     })
 
-    test('chooseFileTypeController handler should render view with correct page title, heading, and pre-populated data from cache', () => {
+    test('handler should render view with correct page title, heading, and pre-populated data from cache', () => {
       const h = { view: vi.fn() }
 
       chooseFileTypeController.handler({}, h)
@@ -77,10 +79,11 @@ describe('#chooseFileType', () => {
           fileUploadType: mockExemptionState.siteDetails[0].fileUploadType
         },
         projectName: mockExemptionState.projectName,
-        backLink: routes.COORDINATES_TYPE_CHOICE
+        backLink: routes.COORDINATES_TYPE_CHOICE,
+        cancelLink
       })
 
-      getExemptionCacheSpy.mockReturnValueOnce({}) // exmpty excemption cache object
+      getExemptionCacheSpy.mockReturnValueOnce({})
 
       chooseFileTypeController.handler({}, h)
 
@@ -91,8 +94,9 @@ describe('#chooseFileType', () => {
           pageTitle: 'Choose file type',
           heading: 'Which type of file do you want to upload?',
           payload: { fileUploadType: '' },
-          projectName: undefined, // nothing in the cache
-          backLink: routes.COORDINATES_TYPE_CHOICE
+          projectName: undefined,
+          backLink: routes.COORDINATES_TYPE_CHOICE,
+          cancelLink
         }
       )
     })
@@ -149,7 +153,7 @@ describe('#chooseFileType', () => {
       expect(document.querySelector('.govuk-error-summary')).toBeTruthy()
       expect(
         document.querySelector('.govuk-error-summary__list').textContent
-      ).toContain(errorMessages.FILE_TYPE_ENTRY_REQUIRED)
+      ).toContain(chooseFileTypeErrorMessages.FILE_TYPE_ENTRY_REQUIRED)
 
       expect(statusCode).toBe(statusCodes.ok)
     })
@@ -187,10 +191,11 @@ describe('#chooseFileType', () => {
         projectName: mockExemptionState.projectName,
         payload: { fileUploadType: '' },
         backLink: routes.COORDINATES_TYPE_CHOICE,
+        cancelLink,
         errorSummary: [
           {
             href: '#fileUploadType',
-            text: errorMessages.FILE_TYPE_ENTRY_REQUIRED,
+            text: chooseFileTypeErrorMessages.FILE_TYPE_ENTRY_REQUIRED,
             field: ['fileUploadType']
           }
         ],
@@ -198,7 +203,7 @@ describe('#chooseFileType', () => {
           fileUploadType: {
             field: ['fileUploadType'],
             href: '#fileUploadType',
-            text: errorMessages.FILE_TYPE_ENTRY_REQUIRED
+            text: chooseFileTypeErrorMessages.FILE_TYPE_ENTRY_REQUIRED
           }
         }
       })
@@ -232,7 +237,8 @@ describe('#chooseFileType', () => {
         heading: 'Which type of file do you want to upload?',
         projectName: mockExemptionState.projectName,
         payload: { fileUploadType: '' },
-        backLink: routes.COORDINATES_TYPE_CHOICE
+        backLink: routes.COORDINATES_TYPE_CHOICE,
+        cancelLink
       })
 
       expect(h.view().takeover).toHaveBeenCalled()

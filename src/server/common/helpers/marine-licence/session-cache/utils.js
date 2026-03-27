@@ -16,7 +16,7 @@ export const clearSavedMarineLicenceSiteDetails = async (request, h) => {
 export const updateMarineLicenceSiteDetails = async (
   request,
   h,
-  siteIndex = 0,
+  siteIndex,
   key,
   value
 ) => {

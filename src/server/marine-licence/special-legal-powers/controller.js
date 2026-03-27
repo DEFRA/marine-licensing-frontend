@@ -66,17 +66,17 @@ export const specialLegalPowersSubmitController = {
     validate: {
       payload: joi.object({
         agree: joi.string().valid('yes', 'no').required().messages({
-          'any.only': 'SPECIAL_LEGAL_POWERS_DETAILS_AGREE',
-          'string.empty': 'SPECIAL_LEGAL_POWERS_DETAILS_AGREE',
-          'any.required': 'SPECIAL_LEGAL_POWERS_DETAILS_AGREE'
+          'any.only': errorMessages.SPECIAL_LEGAL_POWERS_DETAILS_AGREE,
+          'string.empty': errorMessages.SPECIAL_LEGAL_POWERS_DETAILS_AGREE,
+          'any.required': errorMessages.SPECIAL_LEGAL_POWERS_DETAILS_AGREE
         }),
         details: joi.when('agree', {
           // Details required when agree: 'yes'
           is: 'yes',
           then: joi.string().max(1000).required().messages({
-            'string.empty': 'SPECIAL_LEGAL_POWERS_DETAILS_REQUIRED',
-            'any.required': 'SPECIAL_LEGAL_POWERS_DETAILS_REQUIRED',
-            'string.max': 'SPECIAL_LEGAL_POWERS_DETAILS_MAX_LENGTH'
+            'string.empty': errorMessages.SPECIAL_LEGAL_POWERS_DETAILS_REQUIRED,
+            'any.required': errorMessages.SPECIAL_LEGAL_POWERS_DETAILS_REQUIRED,
+            'string.max': errorMessages.SPECIAL_LEGAL_POWERS_DETAILS_MAX_LENGTH
           })
         })
       }),

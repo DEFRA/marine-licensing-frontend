@@ -59,12 +59,8 @@ export const taskListController = {
 
     const { userRelationshipType } = userSession
 
-    let otherPermissionsTaskListTransformed = []
-
-    if (userRelationshipType !== USER_TYPES.CITIZEN) {
-      otherPermissionsTaskListTransformed =
-        transformOtherPermissionsTaskList(taskList)
-    }
+    const otherPermissionsTaskListTransformed =
+        transformOtherPermissionsTaskList(taskList, userRelationshipType === USER_TYPES.CITIZEN)
 
     const projectDetailsTaskListTransformed =
       transformProjectDetailsTaskList(taskList)

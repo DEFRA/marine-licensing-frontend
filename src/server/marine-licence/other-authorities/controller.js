@@ -55,16 +55,16 @@ export const otherAuthoritiesSubmitController = {
     validate: {
       payload: joi.object({
         agree: joi.string().valid('yes', 'no').required().messages({
-          'any.only': 'OTHER_AUTHORITIES_AGREE',
-          'string.empty': 'OTHER_AUTHORITIES_AGREE',
-          'any.required': 'OTHER_AUTHORITIES_AGREE'
+          'any.only': errorMessages.OTHER_AUTHORITIES_AGREE,
+          'string.empty': errorMessages.OTHER_AUTHORITIES_AGREE,
+          'any.required': errorMessages.OTHER_AUTHORITIES_AGREE
         }),
         details: joi.when('agree', {
           is: 'yes',
           then: joi.string().max(1000).required().messages({
-            'string.empty': 'OTHER_AUTHORITIES_DETAILS_REQUIRED',
-            'any.required': 'OTHER_AUTHORITIES_DETAILS_REQUIRED',
-            'string.max': 'OTHER_AUTHORITIES_DETAILS_MAX_LENGTH'
+            'string.empty': errorMessages.OTHER_AUTHORITIES_DETAILS_REQUIRED,
+            'any.required': errorMessages.OTHER_AUTHORITIES_DETAILS_REQUIRED,
+            'string.max': errorMessages.OTHER_AUTHORITIES_DETAILS_MAX_LENGTH
           })
         })
       }),

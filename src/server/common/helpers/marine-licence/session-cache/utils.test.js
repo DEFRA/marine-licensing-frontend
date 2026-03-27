@@ -6,7 +6,8 @@ import {
   clearMarineLicenceCache,
   clearSavedMarineLicenceSiteDetails,
   getMarineLicenceCache,
-  setMarineLicenceCache
+  setMarineLicenceCache,
+  updateMarineLicenceSiteDetails
 } from '#src/server/common/helpers/marine-licence/session-cache/utils.js'
 
 vi.mock('@hapi/hoek', () => ({
@@ -134,6 +135,109 @@ describe('#utils', () => {
       expect(mockRequest.yar.commit).toHaveBeenCalledWith(mockH)
 
       expect(cache).toEqual({})
+    })
+  })
+
+  describe('updateMarineLicenceSiteDetails', () => {
+    let mockRequest
+    let mockH
+
+    beforeEach(() => {
+      mockH = {}
+      mockRequest = {
+        yar: {
+          clear: vi.fn(),
+          get: vi.fn(),
+          set: vi.fn(),
+          commit: vi.fn().mockResolvedValue()
+        }
+      }
+    })
+
+    test('should store the value in cache', async () => {
+      const value = { coordinatesType: 'file' }
+
+      const result = await updateMarineLicenceSiteDetails(
+        mockRequest,
+        mockH,
+        0,
+        'coordinatesType',
+        value.coordinatesType
+      )
+
+      expect(mockRequest.yar.set).toHaveBeenCalledWith(
+        MARINE_LICENCE_CACHE_KEY,
+        {
+          siteDetails: [{ coordinatesType: 'file' }]
+        }
+      )
+      expect(mockRequest.yar.commit).toHaveBeenCalledWith(mockH)
+      expect(result).toEqual({ coordinatesType: 'file' })
+    })
+
+    test('should handle empty objects', async () => {
+      const value = {}
+
+      const result = await updateMarineLicenceSiteDetails(
+        mockRequest,
+        mockH,
+        0,
+        'coordinatesType',
+        value.coordinatesType
+      )
+
+      expect(mockRequest.yar.set).toHaveBeenCalledWith(
+        MARINE_LICENCE_CACHE_KEY,
+        {
+          siteDetails: [{}]
+        }
+      )
+      expect(mockRequest.yar.commit).toHaveBeenCalledWith(mockH)
+      expect(result).toEqual({ coordinatesType: null })
+    })
+
+    test('should handle undefined values and convert to null', async () => {
+      const value = undefined
+
+      const result = await updateMarineLicenceSiteDetails(
+        mockRequest,
+        mockH,
+        0,
+        'coordinatesType',
+        value
+      )
+
+      expect(mockRequest.yar.set).toHaveBeenCalledWith(
+        MARINE_LICENCE_CACHE_KEY,
+        {
+          siteDetails: [{}]
+        }
+      )
+      expect(mockRequest.yar.commit).toHaveBeenCalledWith(mockH)
+
+      expect(result).toEqual({ coordinatesType: null })
+    })
+
+    test('should handle null values correctly', async () => {
+      const value = null
+
+      const result = await updateMarineLicenceSiteDetails(
+        mockRequest,
+        mockH,
+        0,
+        'coordinatesType',
+        value
+      )
+
+      expect(mockRequest.yar.set).toHaveBeenCalledWith(
+        MARINE_LICENCE_CACHE_KEY,
+        {
+          siteDetails: [{}]
+        }
+      )
+      expect(mockRequest.yar.commit).toHaveBeenCalledWith(mockH)
+
+      expect(result).toEqual({ coordinatesType: null })
     })
   })
 

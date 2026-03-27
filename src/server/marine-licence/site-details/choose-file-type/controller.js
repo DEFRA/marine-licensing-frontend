@@ -1,6 +1,6 @@
 import {
   getMarineLicenceCache,
-  setMarineLicenceCache
+  updateMarineLicenceSiteDetails
 } from '#src/server/common/helpers/marine-licence/session-cache/utils.js'
 import {
   errorDescriptionByFieldName,
@@ -12,6 +12,7 @@ import {
   chooseFileTypeErrorMessages
 } from '#src/server/common/validation/choose-file-type/constants.js'
 import { chooseFileTypeSchema } from '#src/server/common/validation/choose-file-type/schema.js'
+import { getSiteDetailsBySite } from '#src/server/common/helpers/exemptions/session-cache/site-details-utils.js'
 
 export const MARINE_LICENCE_CHOOSE_FILE_TYPE_VIEW_ROUTE =
   'templates/choose-file-type'
@@ -22,14 +23,14 @@ const cancelLink = `${marineLicenceRoutes.MARINE_LICENCE_TASK_LIST}?cancel=site-
 export const chooseFileTypeController = {
   handler(request, h) {
     const marineLicence = getMarineLicenceCache(request)
-    const siteDetails = marineLicence.siteDetails ?? {}
+    const site = getSiteDetailsBySite(marineLicence)
 
     return h.view(MARINE_LICENCE_CHOOSE_FILE_TYPE_VIEW_ROUTE, {
       ...chooseFileTypeSettings,
       backLink,
       cancelLink,
       projectName: marineLicence.projectName,
-      payload: { fileUploadType: siteDetails.fileUploadType ?? '' }
+      payload: { fileUploadType: site.fileUploadType ?? '' }
     })
   }
 }
@@ -76,15 +77,14 @@ export const chooseFileTypeSubmitController = {
   },
   async handler(request, h) {
     const { payload } = request
-    const marineLicence = getMarineLicenceCache(request)
 
-    await setMarineLicenceCache(request, h, {
-      ...marineLicence,
-      siteDetails: {
-        ...marineLicence.siteDetails,
-        fileUploadType: payload.fileUploadType
-      }
-    })
+    await updateMarineLicenceSiteDetails(
+      request,
+      h,
+      0,
+      'fileUploadType',
+      payload.fileUploadType
+    )
 
     return h
       .redirect(marineLicenceRoutes.MARINE_LICENCE_CHOOSE_FILE_UPLOAD_TYPE)

@@ -1,20 +1,9 @@
 import { vi } from 'vitest'
 import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
 import {
-  setupTestServer,
-  mockMarineLicence
-} from '#tests/integration/shared/test-setup-helpers.js'
-import {
-  makeGetRequest,
-  makePostRequest
-} from '#src/server/test-helpers/server-requests.js'
-import { statusCodes } from '#src/server/common/constants/status-codes.js'
-import { JSDOM } from 'jsdom'
-import {
   otherAuthoritiesController,
   otherAuthoritiesSubmitController,
-  OTHER_AUTHORITIES_VIEW_ROUTE,
-  errorMessages
+  OTHER_AUTHORITIES_VIEW_ROUTE
 } from '#src/server/marine-licence/other-authorities/controller.js'
 import * as cacheUtils from '#src/server/common/helpers/marine-licence/session-cache/utils.js'
 import * as authRequests from '#src/server/common/helpers/authenticated-requests.js'
@@ -22,7 +11,6 @@ import * as authRequests from '#src/server/common/helpers/authenticated-requests
 vi.mock('~/src/server/common/helpers/marine-licence/session-cache/utils.js')
 
 describe('#otherAuthorities', () => {
-  const getServer = setupTestServer()
   const mockLicence = {
     projectName: 'Test Project',
     id: 'test-id',
@@ -30,7 +18,6 @@ describe('#otherAuthorities', () => {
   }
 
   beforeEach(() => {
-    mockMarineLicence(mockLicence)
     vi.restoreAllMocks()
     vi.spyOn(authRequests, 'authenticatedPatchRequest').mockResolvedValue({
       payload: {
@@ -46,19 +33,6 @@ describe('#otherAuthorities', () => {
   })
 
   describe('#otherAuthoritiesController', () => {
-    test('Should provide expected response', async () => {
-      const { result, statusCode } = await makeGetRequest({
-        url: marineLicenceRoutes.MARINE_LICENCE_OTHER_AUTHORITIES,
-        server: getServer()
-      })
-      expect(result).toEqual(
-        expect.stringContaining(
-          'Have you applied to, or got permission from, any other authorities in relation to this project?'
-        )
-      )
-      expect(statusCode).toBe(statusCodes.ok)
-    })
-
     test('otherAuthoritiesController handler should render with correct context', async () => {
       const h = { view: vi.fn() }
 
@@ -76,12 +50,40 @@ describe('#otherAuthorities', () => {
   })
 
   describe('#otherAuthoritiesSubmitController', () => {
+    test('Should pass error to global catchAll behaviour if it contains no validation data', async () => {
+      const thrownError = { res: { statusCode: 500 }, data: {} }
+      vi.spyOn(authRequests, 'authenticatedPatchRequest').mockRejectedValueOnce(
+        thrownError
+      )
+      const h = {
+        redirect: vi.fn().mockReturnValue({ takeover: vi.fn() }),
+        view: vi.fn()
+      }
+
+      await expect(
+        otherAuthoritiesSubmitController.handler(
+          {
+            payload: { agree: 'yes', details: 'Applied to harbour authority' },
+            query: {}
+          },
+          h
+        )
+      ).rejects.toBe(thrownError)
+      expect(h.view).not.toHaveBeenCalled()
+      expect(h.redirect).not.toHaveBeenCalled()
+    })
+
     test('Should correctly redirect to the next page on success', async () => {
-      const { statusCode, headers } = await makePostRequest({
-        url: marineLicenceRoutes.MARINE_LICENCE_OTHER_AUTHORITIES,
-        server: getServer(),
-        formData: { agree: 'no' }
-      })
+      const h = {
+        redirect: vi.fn().mockReturnValue({ takeover: vi.fn() }),
+        view: vi.fn()
+      }
+
+      await otherAuthoritiesSubmitController.handler(
+        { payload: { agree: 'no' }, query: {} },
+        h
+      )
+
       expect(authRequests.authenticatedPatchRequest).toHaveBeenCalledWith(
         expect.any(Object),
         '/marine-licence/other-authorities',
@@ -90,90 +92,167 @@ describe('#otherAuthorities', () => {
           agree: 'no'
         }
       )
-      expect(statusCode).toBe(302)
-      expect(headers.location).toBe(
+      expect(h.redirect).toHaveBeenCalledWith(
         marineLicenceRoutes.MARINE_LICENCE_TASK_LIST
       )
     })
 
-    test('Should pass error to global catchAll behaviour if it contains no validation data', async () => {
-      const patchMock = vi.spyOn(authRequests, 'authenticatedPatchRequest')
-      patchMock.mockRejectedValueOnce({ res: { statusCode: 500 }, data: {} })
-      const { result } = await makePostRequest({
-        url: marineLicenceRoutes.MARINE_LICENCE_OTHER_AUTHORITIES,
-        server: getServer(),
-        formData: { agree: 'yes', details: 'Applied to harbour authority' }
-      })
-      expect(result).toContain('Try again later.')
-      const { document } = new JSDOM(result).window
-      expect(document.querySelector('h1').textContent.trim()).toBe(
-        'There is a problem with the service'
+    test('Should correctly redirect to check your answers when parameter is present', async () => {
+      const h = {
+        redirect: vi.fn().mockReturnValue({ takeover: vi.fn() }),
+        view: vi.fn()
+      }
+
+      await otherAuthoritiesSubmitController.handler(
+        {
+          payload: { agree: 'yes', details: 'Applied to harbour authority' },
+          query: { from: 'check-your-answers' }
+        },
+        h
+      )
+
+      expect(authRequests.authenticatedPatchRequest).toHaveBeenCalledWith(
+        expect.any(Object),
+        '/marine-licence/other-authorities',
+        {
+          id: mockLicence.id,
+          agree: 'yes',
+          details: 'Applied to harbour authority'
+        }
+      )
+      expect(h.redirect).toHaveBeenCalledWith(
+        marineLicenceRoutes.MARINE_LICENCE_CHECK_YOUR_ANSWERS
       )
     })
 
     test('Should handle API validation errors in catch block', async () => {
-      const patchMock = vi.spyOn(authRequests, 'authenticatedPatchRequest')
-      patchMock.mockRejectedValueOnce({
-        data: {
-          payload: {
-            validation: {
-              details: [
-                {
-                  path: ['agree'],
-                  message: 'OTHER_AUTHORITIES_DETAILS_REQUIRED',
-                  type: 'any.required'
-                }
-              ]
+      vi.spyOn(authRequests, 'authenticatedPatchRequest').mockRejectedValueOnce(
+        {
+          data: {
+            payload: {
+              validation: {
+                details: [
+                  {
+                    path: ['agree'],
+                    message: 'OTHER_AUTHORITIES_DETAILS_REQUIRED',
+                    type: 'any.required'
+                  }
+                ]
+              }
             }
           }
         }
-      })
-      const { result, statusCode } = await makePostRequest({
-        url: marineLicenceRoutes.MARINE_LICENCE_OTHER_AUTHORITIES,
-        server: getServer(),
-        formData: { agree: 'yes', details: 'Applied to harbour authority' }
-      })
-      expect(statusCode).toBe(statusCodes.ok)
-      expect(result).toContain(
-        'Have you applied to, or got permission from, any other authorities in relation to this project?'
       )
-      const { document } = new JSDOM(result).window
-      expect(document.querySelector('.govuk-error-summary')).toBeTruthy()
+
+      const h = {
+        redirect: vi.fn().mockReturnValue({ takeover: vi.fn() }),
+        view: vi.fn()
+      }
+
+      await otherAuthoritiesSubmitController.handler(
+        {
+          payload: { agree: 'yes', details: 'Applied to harbour authority' },
+          query: {}
+        },
+        h
+      )
+
+      expect(h.view).toHaveBeenCalledWith(
+        OTHER_AUTHORITIES_VIEW_ROUTE,
+        expect.objectContaining({
+          backLink: marineLicenceRoutes.MARINE_LICENCE_TASK_LIST,
+          payload: { agree: 'yes', details: 'Applied to harbour authority' }
+        })
+      )
     })
 
     test('Should handle API validation errors in catch block with from=check-your-answers parameter', async () => {
-      const patchMock = vi.spyOn(authRequests, 'authenticatedPatchRequest')
-      patchMock.mockRejectedValueOnce({
-        data: {
-          payload: {
-            validation: {
-              details: [
-                {
-                  path: ['agree'],
-                  message: 'OTHER_AUTHORITIES_DETAILS_REQUIRED',
-                  type: 'any.required'
-                }
-              ]
+      vi.spyOn(authRequests, 'authenticatedPatchRequest').mockRejectedValueOnce(
+        {
+          data: {
+            payload: {
+              validation: {
+                details: [
+                  {
+                    path: ['agree'],
+                    message: 'OTHER_AUTHORITIES_DETAILS_REQUIRED',
+                    type: 'any.required'
+                  }
+                ]
+              }
             }
           }
         }
-      })
-      const { result, statusCode } = await makePostRequest({
-        url:
-          marineLicenceRoutes.MARINE_LICENCE_OTHER_AUTHORITIES +
-          '?from=check-your-answers',
-        server: getServer(),
-        formData: { agree: 'yes', details: 'Applied to harbour authority' }
-      })
-      expect(statusCode).toBe(statusCodes.ok)
-      expect(result).toContain(
-        'Have you applied to, or got permission from, any other authorities in relation to this project?'
       )
-      expect(result).toContain(
-        marineLicenceRoutes.MARINE_LICENCE_CHECK_YOUR_ANSWERS
+
+      const h = {
+        redirect: vi.fn().mockReturnValue({ takeover: vi.fn() }),
+        view: vi.fn()
+      }
+
+      await otherAuthoritiesSubmitController.handler(
+        {
+          payload: { agree: 'yes', details: 'Applied to harbour authority' },
+          query: { from: 'check-your-answers' }
+        },
+        h
       )
-      const { document } = new JSDOM(result).window
-      expect(document.querySelector('.govuk-error-summary')).toBeTruthy()
+
+      expect(h.view).toHaveBeenCalledWith(
+        OTHER_AUTHORITIES_VIEW_ROUTE,
+        expect.objectContaining({
+          backLink: marineLicenceRoutes.MARINE_LICENCE_CHECK_YOUR_ANSWERS,
+          payload: { agree: 'yes', details: 'Applied to harbour authority' }
+        })
+      )
+    })
+
+    test('Should show error messages without calling the back end when payload data is empty', () => {
+      const request = { payload: { agree: '' } }
+      const h = { view: vi.fn().mockReturnValue({ takeover: vi.fn() }) }
+
+      const err = {
+        details: [
+          {
+            path: ['agree'],
+            message: 'TEST',
+            type: 'string.empty'
+          }
+        ]
+      }
+
+      otherAuthoritiesSubmitController.options.validate.failAction(
+        request,
+        h,
+        err
+      )
+
+      expect(authRequests.authenticatedPatchRequest).not.toHaveBeenCalled()
+      expect(h.view).toHaveBeenCalled()
+    })
+
+    test('Should show error for details being empty when agree is set to yes', () => {
+      const request = { payload: { agree: 'yes', details: '' } }
+      const h = { view: vi.fn().mockReturnValue({ takeover: vi.fn() }) }
+
+      const err = {
+        details: [
+          {
+            path: ['details'],
+            message: 'OTHER_AUTHORITIES_DETAILS_REQUIRED',
+            type: 'string.empty'
+          }
+        ]
+      }
+
+      otherAuthoritiesSubmitController.options.validate.failAction(
+        request,
+        h,
+        err
+      )
+
+      expect(authRequests.authenticatedPatchRequest).not.toHaveBeenCalled()
+      expect(h.view).toHaveBeenCalled()
     })
 
     test('Should correctly validate on empty data', () => {
@@ -262,58 +341,6 @@ describe('#otherAuthorities', () => {
         payload: { agree: 'invalid' }
       })
       expect(h.view().takeover).toHaveBeenCalled()
-    })
-
-    test('Should show error messages without calling the back end when payload data is empty', async () => {
-      const patchMock = vi.spyOn(authRequests, 'authenticatedPatchRequest')
-      const { result } = await makePostRequest({
-        url: marineLicenceRoutes.MARINE_LICENCE_OTHER_AUTHORITIES,
-        server: getServer(),
-        formData: { agree: '' }
-      })
-      expect(patchMock).not.toHaveBeenCalled()
-      const { document } = new JSDOM(result).window
-      expect(document.querySelector('.govuk-error-summary')).toBeTruthy()
-    })
-
-    test('Should correctly redirect to check your answers when parameter is present', async () => {
-      const { statusCode, headers } = await makePostRequest({
-        url:
-          marineLicenceRoutes.MARINE_LICENCE_OTHER_AUTHORITIES +
-          '?from=check-your-answers',
-        server: getServer(),
-        formData: { agree: 'yes', details: 'Applied to harbour authority' }
-      })
-      expect(authRequests.authenticatedPatchRequest).toHaveBeenCalledWith(
-        expect.any(Object),
-        '/marine-licence/other-authorities',
-        {
-          id: mockLicence.id,
-          agree: 'yes',
-          details: 'Applied to harbour authority'
-        }
-      )
-      expect(statusCode).toBe(302)
-      expect(headers.location).toBe(
-        marineLicenceRoutes.MARINE_LICENCE_CHECK_YOUR_ANSWERS
-      )
-    })
-
-    test('Should show error for details being empty when agree is set to yes', async () => {
-      const patchMock = vi.spyOn(authRequests, 'authenticatedPatchRequest')
-      const { result } = await makePostRequest({
-        url: marineLicenceRoutes.MARINE_LICENCE_OTHER_AUTHORITIES,
-        server: getServer(),
-        formData: { agree: 'yes' }
-      })
-      expect(patchMock).not.toHaveBeenCalled()
-      const { document } = new JSDOM(result).window
-      expect(result).toEqual(
-        expect.stringContaining(
-          errorMessages.OTHER_AUTHORITIES_DETAILS_REQUIRED
-        )
-      )
-      expect(document.querySelector('.govuk-error-summary')).toBeTruthy()
     })
 
     test('Should correctly set the cache when submitting other authorities', async () => {

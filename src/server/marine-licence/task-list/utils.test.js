@@ -201,5 +201,65 @@ describe('taskList utils', () => {
         ])
       }
     )
+
+    describe('when isCitizen is true', () => {
+      test('correctly returns Completed status', () => {
+        expect(
+          transformOtherPermissionsTaskList(
+            { otherAuthorities: 'COMPLETED' },
+            true
+          )
+        ).toEqual([
+          {
+            href: marineLicenceRoutes.MARINE_LICENCE_OTHER_AUTHORITIES,
+            status: { text: 'Completed' },
+            title: {
+              classes: 'govuk-link--no-visited-state',
+              text: 'Other authorities'
+            }
+          }
+        ])
+      })
+
+      test('correctly returns In Progress', () => {
+        expect(
+          transformOtherPermissionsTaskList(
+            { otherAuthorities: 'IN_PROGRESS' },
+            true
+          )
+        ).toEqual([
+          {
+            href: marineLicenceRoutes.MARINE_LICENCE_OTHER_AUTHORITIES,
+            status: {
+              tag: { text: 'In Progress', classes: 'govuk-tag--light-blue' }
+            },
+            title: {
+              classes: 'govuk-link--no-visited-state',
+              text: 'Other authorities'
+            }
+          }
+        ])
+      })
+
+      test.each([null, 'INCOMPLETE', undefined])(
+        'correctly returns Not yet started for %s',
+        (value) => {
+          expect(
+            transformOtherPermissionsTaskList({ otherAuthorities: value }, true)
+          ).toEqual([
+            {
+              href: marineLicenceRoutes.MARINE_LICENCE_OTHER_AUTHORITIES,
+              status: {
+                tag: { text: 'Not yet started', classes: 'govuk-tag--blue' }
+              },
+              title: {
+                classes: 'govuk-link--no-visited-state',
+                text: 'Other authorities'
+              }
+            }
+          ])
+        }
+      )
+    })
   })
 })

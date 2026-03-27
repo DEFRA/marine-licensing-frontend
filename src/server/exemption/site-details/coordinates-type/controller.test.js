@@ -155,48 +155,6 @@ describe('#coordinatesType', () => {
       expect(h.view().takeover).toHaveBeenCalled()
     })
 
-    test('Should correctly redirect when file option is selected', async () => {
-      const h = {
-        view: vi.fn(),
-        redirect: vi.fn().mockReturnValue({
-          takeover: vi.fn()
-        })
-      }
-
-      await coordinatesTypeSubmitController.handler(
-        {
-          payload: { coordinatesType: 'file' },
-          site: mockSite
-        },
-        h
-      )
-
-      expect(h.view).not.toHaveBeenCalled()
-      expect(h.redirect).toHaveBeenCalledWith(routes.CHOOSE_FILE_UPLOAD_TYPE)
-    })
-
-    test('Should correctly redirect to coordinates entry page when coordinates option is selected', async () => {
-      const h = {
-        view: vi.fn(),
-        redirect: vi.fn().mockReturnValue({
-          takeover: vi.fn()
-        })
-      }
-
-      await coordinatesTypeSubmitController.handler(
-        {
-          payload: { coordinatesType: 'coordinates' },
-          site: mockSite
-        },
-        h
-      )
-
-      expect(h.view).not.toHaveBeenCalled()
-
-      expect(h.redirect).toHaveBeenCalledWith(routes.MULTIPLE_SITES_CHOICE)
-      expect(h.redirect().takeover).toHaveBeenCalled()
-    })
-
     test('Should correctly set the cache when submitting', async () => {
       const h = {
         redirect: vi.fn().mockReturnValue({

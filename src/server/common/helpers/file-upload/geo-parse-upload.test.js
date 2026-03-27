@@ -1,4 +1,13 @@
-import { validateAndExtractGeoJSON } from '#src/server/common/helpers/file-upload/geo-parse-upload.js'
+import { vi } from 'vitest'
+import {
+  validateAndExtractGeoJSON,
+  validateUploadedFile
+} from '#src/server/common/helpers/file-upload/geo-parse-upload.js'
+import * as fileValidationModule from '#src/services/file-validation/index.js'
+import * as fileUploadModule from '#src/server/common/helpers/file-upload/file-upload.js'
+
+vi.mock('~/src/services/file-validation/index.js')
+vi.mock('~/src/server/common/helpers/file-upload/file-upload.js')
 
 describe('#validateAndExtractGeoJSON', () => {
   const buildGeoJSON = (featureCount = 1) => ({
@@ -64,5 +73,75 @@ describe('#validateAndExtractGeoJSON', () => {
     expect(() => validateAndExtractGeoJSON(response)).toThrow(
       'Invalid GeoJSON structure'
     )
+  })
+})
+
+describe('#validateUploadedFile', () => {
+  const mockLogger = { info: vi.fn(), error: vi.fn(), warn: vi.fn() }
+  const mockRequest = { logger: mockLogger }
+  let mockValidateFileExtension
+
+  beforeEach(() => {
+    mockValidateFileExtension = vi.fn()
+    vi.mocked(fileValidationModule.getFileValidationService).mockReturnValue({
+      validateFileExtension: mockValidateFileExtension
+    })
+    vi.mocked(fileUploadModule.getAllowedExtensions).mockReturnValue(['kml'])
+  })
+
+  test('should call getFileValidationService with the request logger', async () => {
+    mockValidateFileExtension.mockReturnValue({
+      isValid: true,
+      extension: 'kml',
+      errorMessage: null
+    })
+
+    const validResult = { isValid: true, extension: 'kml', errorMessage: null }
+
+    const result = await validateUploadedFile(
+      { filename: 'test.kml' },
+      { fileType: 'kml' },
+      mockRequest
+    )
+    expect(mockValidateFileExtension).toHaveBeenCalledWith('test.kml', ['kml'])
+
+    expect(fileValidationModule.getFileValidationService).toHaveBeenCalledWith(
+      mockLogger
+    )
+    expect(result).toEqual(validResult)
+  })
+
+  test('should call getAllowedExtensions with the fileType', async () => {
+    mockValidateFileExtension.mockReturnValue({
+      isValid: true,
+      extension: 'kml',
+      errorMessage: null
+    })
+
+    await validateUploadedFile(
+      { filename: 'test.kml' },
+      { fileType: 'kml' },
+      mockRequest
+    )
+
+    expect(fileUploadModule.getAllowedExtensions).toHaveBeenCalledWith('kml')
+  })
+
+  test('should return invalid result when file extension is not allowed', async () => {
+    vi.mocked(fileUploadModule.getAllowedExtensions).mockReturnValue(['kml'])
+    const invalidResult = {
+      isValid: false,
+      extension: 'pdf',
+      errorMessage: 'The selected file must be a KML file'
+    }
+    mockValidateFileExtension.mockReturnValue(invalidResult)
+
+    const result = await validateUploadedFile(
+      { filename: 'document.pdf' },
+      { fileType: 'kml' },
+      mockRequest
+    )
+
+    expect(result).toEqual(invalidResult)
   })
 })

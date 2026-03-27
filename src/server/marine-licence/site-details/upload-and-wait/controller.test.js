@@ -3,15 +3,23 @@ import { uploadAndWaitController } from '#src/server/marine-licence/site-details
 import { UPLOAD_AND_WAIT_VIEW_ROUTE } from '#src/server/common/helpers/file-upload/constants.js'
 import * as mlCacheUtils from '#src/server/common/helpers/marine-licence/session-cache/utils.js'
 import * as cdpUploadService from '#src/services/cdp-upload-service/index.js'
-import * as fileValidationService from '#src/services/file-validation/index.js'
+import * as geoParseUpload from '#src/server/common/helpers/file-upload/geo-parse-upload.js'
 import * as authenticatedRequests from '#src/server/common/helpers/authenticated-requests.js'
 import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
 import { config } from '#src/config/config.js'
 
 vi.mock('~/src/server/common/helpers/marine-licence/session-cache/utils.js')
 vi.mock('~/src/services/cdp-upload-service/index.js')
-vi.mock('~/src/services/file-validation/index.js')
 vi.mock('~/src/server/common/helpers/authenticated-requests.js')
+vi.mock(
+  '~/src/server/common/helpers/file-upload/geo-parse-upload.js',
+  async () => {
+    const actual = await vi.importActual(
+      '~/src/server/common/helpers/file-upload/geo-parse-upload.js'
+    )
+    return { ...actual, validateUploadedFile: vi.fn() }
+  }
+)
 vi.mock('~/src/config/config.js')
 
 vi.mock('~/src/server/common/helpers/logging/logger-options.js', () => ({
@@ -112,18 +120,16 @@ const setupMockServices = () => {
     getStatus: vi.fn()
   }
 
-  const mockFileValidationService = {
-    validateFileExtension: vi.fn()
-  }
-
   vi.spyOn(cdpUploadService, 'getCdpUploadService').mockReturnValue(
     mockCdpService
   )
-  vi.spyOn(fileValidationService, 'getFileValidationService').mockReturnValue(
-    mockFileValidationService
+
+  const mockValidateUploadedFile = vi.spyOn(
+    geoParseUpload,
+    'validateUploadedFile'
   )
 
-  return { mockCdpService, mockFileValidationService }
+  return { mockCdpService, mockValidateUploadedFile }
 }
 
 const setupCacheSpies = () => {
@@ -200,11 +206,10 @@ const expectFileValidationFailure = async (
   mockRequest,
   getMarineLicenceCacheSpy,
   mockCdpService,
-  mockFileValidationService,
+  mockValidateUploadedFile,
   updateMarineLicenceSiteDetailsSpy,
   filename,
   fileType,
-  allowedExtensions,
   errorMessage
 ) => {
   getMarineLicenceCacheSpy.mockReturnValue(
@@ -216,7 +221,7 @@ const expectFileValidationFailure = async (
   const statusResponse = createMockStatusResponse('ready', { filename })
   mockCdpService.getStatus.mockResolvedValue(statusResponse)
 
-  mockFileValidationService.validateFileExtension.mockReturnValue({
+  mockValidateUploadedFile.mockResolvedValue({
     isValid: false,
     extension: filename.split('.').pop(),
     errorMessage
@@ -225,11 +230,6 @@ const expectFileValidationFailure = async (
   const h = createMockResponseHandler()
 
   await uploadAndWaitController.handler(mockRequest, h)
-
-  expect(mockFileValidationService.validateFileExtension).toHaveBeenCalledWith(
-    filename,
-    allowedExtensions
-  )
 
   expect(updateMarineLicenceSiteDetailsSpy).toHaveBeenCalledWith(
     mockRequest,
@@ -264,7 +264,7 @@ describe('#uploadAndWait', () => {
   let getMarineLicenceCacheSpy
   let updateMarineLicenceSiteDetailsSpy
   let mockCdpService
-  let mockFileValidationService
+  let mockValidateUploadedFile
   let authenticatedPostRequestSpy
 
   beforeEach(() => {
@@ -277,7 +277,7 @@ describe('#uploadAndWait', () => {
 
     const services = setupMockServices()
     mockCdpService = services.mockCdpService
-    mockFileValidationService = services.mockFileValidationService
+    mockValidateUploadedFile = services.mockValidateUploadedFile
 
     authenticatedPostRequestSpy = setupAuthenticatedRequestSpy()
   })
@@ -378,7 +378,7 @@ describe('#uploadAndWait', () => {
           const statusResponse = createMockStatusResponse('ready')
           mockCdpService.getStatus.mockResolvedValue(statusResponse)
 
-          mockFileValidationService.validateFileExtension.mockReturnValue({
+          mockValidateUploadedFile.mockResolvedValue({
             isValid: true,
             extension: 'kml',
             errorMessage: null
@@ -387,10 +387,6 @@ describe('#uploadAndWait', () => {
           const h = createMockResponseHandler()
 
           await uploadAndWaitController.handler(mockRequest, h)
-
-          expect(
-            mockFileValidationService.validateFileExtension
-          ).toHaveBeenCalledWith('test.kml', ['kml'])
 
           expect(authenticatedPostRequestSpy).toHaveBeenCalledWith(
             mockRequest,
@@ -423,7 +419,7 @@ describe('#uploadAndWait', () => {
           })
           mockCdpService.getStatus.mockResolvedValue(statusResponse)
 
-          mockFileValidationService.validateFileExtension.mockReturnValue({
+          mockValidateUploadedFile.mockResolvedValue({
             isValid: true,
             extension: 'zip',
             errorMessage: null
@@ -432,10 +428,6 @@ describe('#uploadAndWait', () => {
           const h = createMockResponseHandler()
 
           await uploadAndWaitController.handler(mockRequest, h)
-
-          expect(
-            mockFileValidationService.validateFileExtension
-          ).toHaveBeenCalledWith('coordinates.zip', ['zip'])
 
           expect(authenticatedPostRequestSpy).toHaveBeenCalledWith(
             mockRequest,
@@ -460,11 +452,10 @@ describe('#uploadAndWait', () => {
           mockRequest,
           getMarineLicenceCacheSpy,
           mockCdpService,
-          mockFileValidationService,
+          mockValidateUploadedFile,
           updateMarineLicenceSiteDetailsSpy,
           'document.pdf',
           'kml',
-          ['kml'],
           'The selected file must be a KML file'
         )
       })
@@ -526,7 +517,7 @@ describe('#uploadAndWait', () => {
         const statusResponse = createMockStatusResponse('ready')
         mockCdpService.getStatus.mockResolvedValue(statusResponse)
 
-        mockFileValidationService.validateFileExtension.mockReturnValue({
+        mockValidateUploadedFile.mockResolvedValue({
           isValid: true,
           extension: 'kml',
           errorMessage: null
@@ -600,7 +591,7 @@ describe('#uploadAndWait', () => {
         })
         mockCdpService.getStatus.mockResolvedValue(statusResponse)
 
-        mockFileValidationService.validateFileExtension.mockReturnValue({
+        mockValidateUploadedFile.mockResolvedValue({
           isValid: true,
           extension: 'zip',
           errorMessage: null
@@ -696,7 +687,7 @@ describe('#uploadAndWait', () => {
         delete statusResponse.s3Location
         mockCdpService.getStatus.mockResolvedValue(statusResponse)
 
-        mockFileValidationService.validateFileExtension.mockReturnValue({
+        mockValidateUploadedFile.mockResolvedValue({
           isValid: true,
           extension: 'kml',
           errorMessage: null

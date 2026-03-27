@@ -5,6 +5,8 @@ import {
   logExtractionSuccess,
   logExtractionError
 } from '#src/server/common/helpers/file-upload/upload-logging.js'
+import { getFileValidationService } from '#src/services/file-validation/index.js'
+import { getAllowedExtensions } from '#src/server/common/helpers/file-upload/file-upload.js'
 
 const buildCoordinateResult = (geoJSON, extractedCoordinates) => ({
   geoJSON,
@@ -73,4 +75,15 @@ export const extractCoordinates = async ({ status, uploadConfig, request }) => {
   )
 
   return coordinateData
+}
+
+export const validateUploadedFile = async (status, uploadConfig, request) => {
+  const fileValidationService = getFileValidationService(request.logger)
+  const allowedExtensions = getAllowedExtensions(uploadConfig.fileType)
+  const validation = fileValidationService.validateFileExtension(
+    status.filename,
+    allowedExtensions
+  )
+
+  return validation
 }

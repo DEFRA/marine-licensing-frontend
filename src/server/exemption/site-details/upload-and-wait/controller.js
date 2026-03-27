@@ -8,14 +8,15 @@ import {
   updateExemptionSiteDetailsBatch
 } from '#src/server/common/helpers/exemptions/session-cache/utils.js'
 import { getCdpUploadService } from '#src/services/cdp-upload-service/index.js'
-import { getFileValidationService } from '#src/services/file-validation/index.js'
 import {
-  getAllowedExtensions,
   isMultipleSitesFile,
   getCdpErrorMessageFromCode,
   getGeoParserErrorMessage
 } from '#src/server/common/helpers/file-upload/file-upload.js'
-import { extractCoordinates } from '#src/server/common/helpers/file-upload/geo-parse-upload.js'
+import {
+  extractCoordinates,
+  validateUploadedFile
+} from '#src/server/common/helpers/file-upload/geo-parse-upload.js'
 import { logSuccessfulProcessing } from '#src/server/common/helpers/file-upload/upload-logging.js'
 import { DEFAULT_ERROR_MESSAGE } from '#src/server/common/helpers/file-upload/error-messages.js'
 import {
@@ -115,29 +116,19 @@ async function handleReadyStatus(status, uploadConfig, request, h) {
   const validationResult = await validateUploadedFile(
     status,
     uploadConfig,
-    request,
-    h
+    request
   )
   if (!validationResult.isValid) {
+    await handleValidationError(
+      request,
+      h,
+      validationResult,
+      uploadConfig.fileType
+    )
     return h.redirect(routes.FILE_UPLOAD)
   }
 
   return processValidatedFile(status, uploadConfig, request, h)
-}
-
-const validateUploadedFile = async (status, uploadConfig, request, h) => {
-  const fileValidationService = getFileValidationService(request.logger)
-  const allowedExtensions = getAllowedExtensions(uploadConfig.fileType)
-  const validation = fileValidationService.validateFileExtension(
-    status.filename,
-    allowedExtensions
-  )
-
-  if (!validation.isValid) {
-    await handleValidationError(request, h, validation, uploadConfig.fileType)
-  }
-
-  return validation
 }
 
 const processValidatedFile = async (status, uploadConfig, request, h) => {

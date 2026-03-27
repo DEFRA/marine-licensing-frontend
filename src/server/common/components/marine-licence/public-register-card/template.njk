@@ -1,0 +1,49 @@
+{% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
+
+{% set rows = [] %}
+
+{% if params.publicRegister %}
+  {% if params.publicRegister.consent === 'yes' %}
+    {% set consentValue = { text: "Yes" } %}
+  {% else %}
+    {% set consentValue = { text: "No" } %}
+  {% endif %}
+
+  {% set _ = rows.push({
+    key: { text: "Do you consent to the MMO publishing your project information publicly?" },
+    value: consentValue,
+    actions: {
+        items: [
+          {
+            href: "/marine-licence/sharing-your-project-information-publicly?from=check-your-answers",
+            text: "Change",
+            visuallyHiddenText: "sharing your project information publicly",
+            classes: "govuk-link--no-visited-state"
+          }
+        ]
+      } if not params.isReadOnly
+  }) %}
+
+  {% if params.publicRegister.consent === 'yes' %}
+    {% set _ = rows.push({
+      key: { text: "Details" },
+      value: { text: params.publicRegister.details }
+    }) %}
+  {% endif %}
+{% endif %}
+
+{% if rows | length %}
+
+{{ govukSummaryList({
+    card: {
+      title: {
+        text: "Sharing your project information publicly"
+    },
+      attributes: {
+        id: "public-register-card"
+      }
+    },
+    rows: rows
+  }) }}
+
+{% endif %}

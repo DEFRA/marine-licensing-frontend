@@ -1,0 +1,76 @@
+{% extends 'layouts/page.njk' %}
+{% from "govuk/components/textarea/macro.njk" import govukTextarea %}
+{% from "govuk/components/back-link/macro.njk" import govukBackLink %}
+{% from "radio-page/macro.njk" import appRadioPage %}
+
+{% block beforeContent %}
+{{ super() }}
+<nav>
+  {{ govukBackLink({
+    text: "Back",
+    href: backLink
+  }) }}
+</nav>
+{% endblock %}
+
+{% block content %}
+
+  {% set hintText %}
+       <p class="govuk-body">The MMO must keep a register of information relating to applications and licences it's responsible for. This register must be made available to the public.</p>
+
+		<p class="govuk-body">We will not publish your email address, phone number or the cost of your marine works.</p>
+
+		<h2 class="govuk-heading-m">Information that cannot be publicly shared</h2>
+
+		<p class="govuk-body">Information on your application will not be published on the MMO's public register if the:</p>
+
+		<ul class="govuk-list govuk-list--bullet">
+			<li>Secretary of State decides publishing it contains sensitive information that would be a threat to national security</li>
+			<li>MMO decides the information is commercially sensitive</li>
+		</ul>
+
+    <h2 class="govuk-heading-m">Is there any reason your information cannot be shared publicly?</h2>
+  {% endset -%}
+
+  {% set publicRegisterDetails %}
+            {{ govukTextarea({
+              id: "details",
+              name: "details",
+              label: {
+                text: "Provide details of why you do not consent to your project information being published"
+              },
+              errorMessage: errors['details'],
+              value: payload.details
+            }) }}
+  {% endset -%}
+
+  {{ appRadioPage({
+            name: "consent",
+            errorSummary: errorSummary,
+            errors: errors,
+            heading: "Sharing your project information publicly",
+            isPageHeading: true,
+            value: payload.consent,
+            errorMessage: errors['consent'],
+            projectName: projectName,
+            hint: { html: hintText },
+            items: [
+                {
+                value: "yes",
+                text: "Yes",
+                conditional: {
+                  html: publicRegisterDetails
+                }
+                },
+                {
+                value: "no",
+                text: "No"
+                }
+            ],
+            csrfToken: csrfToken,
+            buttonText: "Save and continue",
+            cancelLink: backLink
+            })
+        }}
+
+{% endblock %}

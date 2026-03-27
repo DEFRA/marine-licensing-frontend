@@ -26,6 +26,14 @@ const setStatus = (task) => {
   }
 }
 
+export const transformSharingTaskList = (taskList) => [
+  {
+    title: { text: 'Sharing your project information publicly', classes: taskClasses },
+    href: marineLicenceRoutes.MARINE_LICENCE_PUBLIC_REGISTER,
+    status: setStatus(taskList.publicRegister)
+  }
+]
+
 export const transformOtherPermissionsTaskList = (taskList) => [
   {
     title: { text: 'Special legal powers', classes: taskClasses },

@@ -21,7 +21,7 @@
           idPrefix: "site-details-task-list",
           items: siteDetailsTaskList
         }) }}
-
+     
           {% if otherPermissionsTaskList | length %}
         <h2 class="govuk-heading-m">Other permissions</h2>
          {{ govukTaskList({
@@ -29,6 +29,12 @@
           items: otherPermissionsTaskList
         }) }}
         {% endif %}
+
+         <h2 class="govuk-heading-m">Sharing your project information publicly</h2>
+      {{ govukTaskList({
+          idPrefix: "sharing-task-list",
+          items: sharingTaskList
+        }) }}
         
         {% if hasCompletedAllTasks %}
           {{ govukButton({

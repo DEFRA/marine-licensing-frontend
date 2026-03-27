@@ -3,6 +3,7 @@
 {% from "govuk/components/button/macro.njk" import govukButton %}
 {% from "marine-licence/project-details-card/macro.njk" import appMarineLicenceProjectDetailsCard %}
 {% from "marine-licence/other-permissions-card/macro.njk" import appMarineLicenceOtherPermissionsCard %}
+{% from "marine-licence/public-register-card/macro.njk" import appMarineLicencePublicRegisterCard %}
 
 {% block head %}
   {{ super() }}
@@ -31,6 +32,11 @@
 
        {{ appMarineLicenceOtherPermissionsCard({
         specialLegalPowers: specialLegalPowers,
+        isReadOnly: isReadOnly
+      }) }}
+
+      {{ appMarineLicencePublicRegisterCard({
+        publicRegister: publicRegister,
         isReadOnly: isReadOnly
       }) }}
 

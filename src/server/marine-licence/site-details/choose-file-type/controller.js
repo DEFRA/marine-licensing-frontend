@@ -8,47 +8,45 @@ import {
 } from '#src/server/common/helpers/errors.js'
 import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
 import {
-  coordinatesTypeSettings,
-  coordinatesTypeErrorMessages
-} from '#src/server/common/validation/coordinates-type/constants.js'
-import { coordinatesTypeSchema } from '#src/server/common/validation/coordinates-type/schema.js'
+  chooseFileTypeSettings,
+  chooseFileTypeErrorMessages
+} from '#src/server/common/validation/choose-file-type/constants.js'
+import { chooseFileTypeSchema } from '#src/server/common/validation/choose-file-type/schema.js'
 
-export const MARINE_LICENCE_COORDINATES_CHOICE_VIEW_ROUTE =
-  'templates/coordinates-type'
+export const MARINE_LICENCE_CHOOSE_FILE_TYPE_VIEW_ROUTE =
+  'templates/choose-file-type'
 
+const backLink = marineLicenceRoutes.MARINE_LICENCE_COORDINATES_TYPE_CHOICE
 const cancelLink = `${marineLicenceRoutes.MARINE_LICENCE_TASK_LIST}?cancel=site-details`
 
-export const coordinatesTypeController = {
+export const chooseFileTypeController = {
   handler(request, h) {
     const marineLicence = getMarineLicenceCache(request)
-
     const siteDetails = marineLicence.siteDetails ?? {}
 
-    return h.view(MARINE_LICENCE_COORDINATES_CHOICE_VIEW_ROUTE, {
-      ...coordinatesTypeSettings,
-      backLink: marineLicenceRoutes.MARINE_LICENCE_SITE_DETAILS,
+    return h.view(MARINE_LICENCE_CHOOSE_FILE_TYPE_VIEW_ROUTE, {
+      ...chooseFileTypeSettings,
+      backLink,
       cancelLink,
       projectName: marineLicence.projectName,
-      payload: {
-        coordinatesType: siteDetails.coordinatesType
-      }
+      payload: { fileUploadType: siteDetails.fileUploadType ?? '' }
     })
   }
 }
 
-export const coordinatesTypeSubmitController = {
+export const chooseFileTypeSubmitController = {
   options: {
     validate: {
-      payload: coordinatesTypeSchema,
+      payload: chooseFileTypeSchema,
       failAction: (request, h, err) => {
         const { payload } = request
         const { projectName } = getMarineLicenceCache(request)
 
         if (!err.details) {
           return h
-            .view(MARINE_LICENCE_COORDINATES_CHOICE_VIEW_ROUTE, {
-              ...coordinatesTypeSettings,
-              backLink: marineLicenceRoutes.MARINE_LICENCE_SITE_DETAILS,
+            .view(MARINE_LICENCE_CHOOSE_FILE_TYPE_VIEW_ROUTE, {
+              ...chooseFileTypeSettings,
+              backLink,
               cancelLink,
               payload,
               projectName
@@ -58,15 +56,14 @@ export const coordinatesTypeSubmitController = {
 
         const errorSummary = mapErrorsForDisplay(
           err.details,
-          coordinatesTypeErrorMessages
+          chooseFileTypeErrorMessages
         )
-
         const errors = errorDescriptionByFieldName(errorSummary)
 
         return h
-          .view(MARINE_LICENCE_COORDINATES_CHOICE_VIEW_ROUTE, {
-            ...coordinatesTypeSettings,
-            backLink: marineLicenceRoutes.MARINE_LICENCE_SITE_DETAILS,
+          .view(MARINE_LICENCE_CHOOSE_FILE_TYPE_VIEW_ROUTE, {
+            ...chooseFileTypeSettings,
+            backLink,
             cancelLink,
             payload,
             projectName,
@@ -85,18 +82,12 @@ export const coordinatesTypeSubmitController = {
       ...marineLicence,
       siteDetails: {
         ...marineLicence.siteDetails,
-        coordinatesType: payload.coordinatesType
+        fileUploadType: payload.fileUploadType
       }
     })
 
-    if (payload.coordinatesType === 'file') {
-      return h
-        .redirect(marineLicenceRoutes.MARINE_LICENCE_CHOOSE_FILE_UPLOAD_TYPE)
-        .takeover()
-    }
-
     return h
-      .redirect(marineLicenceRoutes.MARINE_LICENCE_COORDINATES_TYPE_CHOICE)
+      .redirect(marineLicenceRoutes.MARINE_LICENCE_CHOOSE_FILE_UPLOAD_TYPE)
       .takeover()
   }
 }

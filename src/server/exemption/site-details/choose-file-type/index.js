@@ -12,11 +12,6 @@ export const chooseFileTypeRoutes = [
   {
     method: 'POST',
     path: routes.CHOOSE_FILE_UPLOAD_TYPE,
-    options: {
-      plugins: {
-        crumb: true
-      }
-    },
     ...chooseFileTypeSubmitController
   }
 ]

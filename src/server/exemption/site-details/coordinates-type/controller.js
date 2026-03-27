@@ -12,9 +12,9 @@ import {
 import { routes } from '#src/server/common/constants/routes.js'
 import {
   coordinatesTypeSettings,
-  coordinatesTypeErrorMessages,
-  coordinatesTypeSchema
+  coordinatesTypeErrorMessages
 } from '#src/server/common/validation/coordinates-type/constants.js'
+import { coordinatesTypeSchema } from '#src/server/common/validation/coordinates-type/schema.js'
 
 export const PROVIDE_COORDINATES_CHOICE_VIEW_ROUTE =
   'templates/coordinates-type'

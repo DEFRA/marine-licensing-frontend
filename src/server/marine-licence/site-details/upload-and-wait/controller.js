@@ -1,0 +1,249 @@
+import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
+import {
+  getMarineLicenceCache,
+  updateMarineLicenceSiteDetails
+} from '#src/server/common/helpers/marine-licence/session-cache/utils.js'
+import { getCdpUploadService } from '#src/services/cdp-upload-service/index.js'
+import { getFileValidationService } from '#src/services/file-validation/index.js'
+import {
+  getAllowedExtensions,
+  getCdpErrorMessageFromCode,
+  getGeoParserErrorMessage
+} from '#src/server/common/helpers/file-upload/file-upload.js'
+import { extractCoordinates } from '#src/server/common/helpers/file-upload/geo-parse-upload.js'
+import { logSuccessfulProcessing } from '#src/server/common/helpers/file-upload/upload-logging.js'
+import { DEFAULT_ERROR_MESSAGE } from '#src/server/common/helpers/file-upload/error-messages.js'
+import {
+  UPLOAD_AND_WAIT_VIEW_ROUTE,
+  uploadAndWaitPageSettings
+} from '#src/server/common/helpers/file-upload/constants.js'
+
+async function handleValidationError(request, h, validation, fileType) {
+  const errorDetails = {
+    message: validation.errorMessage,
+    fieldName: 'file'
+  }
+  await storeUploadError(request, h, errorDetails, fileType)
+  return { redirect: marineLicenceRoutes.MARINE_LICENCE_FILE_UPLOAD }
+}
+
+async function handleGeoParserError(request, h, error, filename, fileType) {
+  let errorCode = null
+
+  if (error.data?.payload?.message) {
+    errorCode = error.data.payload.message
+  }
+  const message = getGeoParserErrorMessage(errorCode)
+
+  const errorDetails = {
+    message,
+    fieldName: 'file',
+    fileType
+  }
+
+  await storeUploadError(request, h, errorDetails, fileType)
+
+  request.logger.error(
+    {
+      err: error,
+      filename,
+      fileType,
+      errorCode,
+      mappedMessage: message
+    },
+    'FileUpload: ERROR: Failed to extract coordinates from uploaded file'
+  )
+
+  return { redirect: marineLicenceRoutes.MARINE_LICENCE_FILE_UPLOAD }
+}
+
+async function handleCdpRejectionError(request, h, status, fileType) {
+  const errorMessage = status.errorCode
+    ? getCdpErrorMessageFromCode(status.errorCode, fileType)
+    : DEFAULT_ERROR_MESSAGE
+
+  const errorDetails = {
+    message: errorMessage,
+    fieldName: 'file'
+  }
+
+  request.logger.error(
+    {
+      error: {
+        code: status.errorCode,
+        message: status.message,
+        type: fileType
+      }
+    },
+    'FileUpload: CDP rejection error'
+  )
+
+  await storeUploadError(request, h, errorDetails, fileType)
+  return { redirect: marineLicenceRoutes.MARINE_LICENCE_FILE_UPLOAD }
+}
+
+async function clearUploadSession(request, h) {
+  await updateMarineLicenceSiteDetails(request, h, 0, 'uploadConfig', null)
+}
+
+async function storeUploadError(request, h, errorDetails, fileType) {
+  await updateMarineLicenceSiteDetails(request, h, 0, 'uploadError', {
+    message: errorDetails.message,
+    fieldName: errorDetails.fieldName,
+    fileType
+  })
+  await clearUploadSession(request, h)
+}
+
+function handleProcessingStatus(status, marineLicence, h) {
+  return h.view(UPLOAD_AND_WAIT_VIEW_ROUTE, {
+    ...uploadAndWaitPageSettings,
+    projectName: marineLicence.projectName,
+    isProcessing: true,
+    filename: status.filename,
+    tryAgainLink: marineLicenceRoutes.MARINE_LICENCE_FILE_UPLOAD,
+    cancelLink: marineLicenceRoutes.MARINE_LICENCE_TASK_LIST
+  })
+}
+
+async function handleReadyStatus(status, uploadConfig, request, h) {
+  const validationResult = await validateUploadedFile(
+    status,
+    uploadConfig,
+    request,
+    h
+  )
+  if (!validationResult.isValid) {
+    return h.redirect(marineLicenceRoutes.MARINE_LICENCE_FILE_UPLOAD)
+  }
+
+  return processValidatedFile(status, uploadConfig, request, h)
+}
+
+const validateUploadedFile = async (status, uploadConfig, request, h) => {
+  const fileValidationService = getFileValidationService(request.logger)
+  const allowedExtensions = getAllowedExtensions(uploadConfig.fileType)
+  const validation = fileValidationService.validateFileExtension(
+    status.filename,
+    allowedExtensions
+  )
+
+  if (!validation.isValid) {
+    await handleValidationError(request, h, validation, uploadConfig.fileType)
+  }
+
+  return validation
+}
+
+const processValidatedFile = async (status, uploadConfig, request, h) => {
+  try {
+    const coordinateData = await extractCoordinates({
+      status,
+      uploadConfig,
+      request,
+      h
+    })
+
+    logSuccessfulProcessing(request, status, uploadConfig, coordinateData)
+
+    return h.redirect(marineLicenceRoutes.MARINE_LICENCE_SITE_DETAILS)
+  } catch (error) {
+    await handleGeoParserError(
+      request,
+      h,
+      error,
+      status.filename,
+      uploadConfig.fileType
+    )
+    return h.redirect(marineLicenceRoutes.MARINE_LICENCE_FILE_UPLOAD)
+  }
+}
+
+async function handleRejectedStatus(status, uploadConfig, request, h) {
+  await handleCdpRejectionError(request, h, status, uploadConfig.fileType)
+  return h.redirect(marineLicenceRoutes.MARINE_LICENCE_FILE_UPLOAD)
+}
+
+function handleUnknownStatus(request, uploadConfig, status, h) {
+  request.logger.warn(
+    {
+      uploadId: uploadConfig.uploadId,
+      status: status.status
+    },
+    'FileUpload: Unknown upload status'
+  )
+
+  return h.redirect(marineLicenceRoutes.MARINE_LICENCE_CHOOSE_FILE_UPLOAD_TYPE)
+}
+
+async function processUploadStatus(status, context) {
+  const { uploadConfig, request, h, marineLicence } = context
+  request.logger.debug(
+    `Upload status check:  ${JSON.stringify(
+      {
+        uploadId: uploadConfig.uploadId,
+        status: status.status,
+        filename: status.filename
+      },
+      null,
+      2
+    )}`
+  )
+
+  if (status.status === 'pending' || status.status === 'scanning') {
+    return handleProcessingStatus(status, marineLicence, h)
+  }
+
+  if (status.status === 'ready') {
+    return handleReadyStatus(status, uploadConfig, request, h)
+  }
+
+  if (status.status === 'rejected' || status.status === 'error') {
+    return handleRejectedStatus(status, uploadConfig, request, h)
+  }
+
+  return handleUnknownStatus(request, uploadConfig, status, h)
+}
+
+export const uploadAndWaitController = {
+  async handler(request, h) {
+    const marineLicence = getMarineLicenceCache(request)
+
+    const { uploadConfig } = marineLicence.siteDetails ?? {}
+
+    if (!uploadConfig) {
+      return h.redirect(
+        marineLicenceRoutes.MARINE_LICENCE_CHOOSE_FILE_UPLOAD_TYPE
+      )
+    }
+
+    try {
+      const cdpService = getCdpUploadService()
+      const status = await cdpService.getStatus(
+        uploadConfig.uploadId,
+        uploadConfig.statusUrl
+      )
+
+      return await processUploadStatus(status, {
+        uploadConfig,
+        request,
+        h,
+        marineLicence
+      })
+    } catch (error) {
+      request.logger.error(
+        {
+          err: error,
+          uploadId: uploadConfig.uploadId
+        },
+        'FileUpload: ERROR: Failed to check upload status'
+      )
+
+      await updateMarineLicenceSiteDetails(request, h, 0, 'uploadConfig', null)
+
+      return h.redirect(
+        marineLicenceRoutes.MARINE_LICENCE_CHOOSE_FILE_UPLOAD_TYPE
+      )
+    }
+  }
+}

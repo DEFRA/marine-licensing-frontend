@@ -35,7 +35,7 @@ describe('Choose file type page (marine licence)', () => {
     cancelHref: `${marineLicenceRoutes.MARINE_LICENCE_TASK_LIST}?cancel=site-details`
   })
 
-  test('should redirect to same page when shapefile is selected', async () => {
+  test('should redirect to correct page when shapefile is selected', async () => {
     const response = await makePostRequest({
       server: getServer(),
       url: marineLicenceRoutes.MARINE_LICENCE_CHOOSE_FILE_UPLOAD_TYPE,
@@ -44,11 +44,11 @@ describe('Choose file type page (marine licence)', () => {
 
     expect(response.statusCode).toBe(statusCodes.redirect)
     expect(response.headers.location).toBe(
-      marineLicenceRoutes.MARINE_LICENCE_CHOOSE_FILE_UPLOAD_TYPE
+      marineLicenceRoutes.MARINE_LICENCE_FILE_UPLOAD
     )
   })
 
-  test('should redirect to same page when kml is selected', async () => {
+  test('should redirect to correct page when kml is selected', async () => {
     const response = await makePostRequest({
       server: getServer(),
       url: marineLicenceRoutes.MARINE_LICENCE_CHOOSE_FILE_UPLOAD_TYPE,
@@ -57,7 +57,7 @@ describe('Choose file type page (marine licence)', () => {
 
     expect(response.statusCode).toBe(statusCodes.redirect)
     expect(response.headers.location).toBe(
-      marineLicenceRoutes.MARINE_LICENCE_CHOOSE_FILE_UPLOAD_TYPE
+      marineLicenceRoutes.MARINE_LICENCE_FILE_UPLOAD
     )
   })
 })

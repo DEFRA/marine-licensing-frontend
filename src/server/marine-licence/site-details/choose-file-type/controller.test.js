@@ -185,7 +185,7 @@ describe('#chooseFileType (marine licence)', () => {
       )
 
       expect(h.redirect).toHaveBeenCalledWith(
-        marineLicenceRoutes.MARINE_LICENCE_CHOOSE_FILE_UPLOAD_TYPE
+        marineLicenceRoutes.MARINE_LICENCE_FILE_UPLOAD
       )
       expect(h.redirect().takeover).toHaveBeenCalled()
     })

@@ -51,6 +51,8 @@ export const marineLicenceRoutes = {
     '/marine-licence/how-do-you-want-to-provide-the-coordinates',
   MARINE_LICENCE_CHOOSE_FILE_UPLOAD_TYPE:
     '/marine-licence/choose-file-type-to-upload',
+  MARINE_LICENCE_FILE_UPLOAD: '/marine-licence/upload-file',
+  MARINE_LICENCE_UPLOAD_AND_WAIT: '/marine-licence/upload-and-wait',
   MARINE_LICENCE_VIEW_DETAILS: '/marine-licence/view-details',
   MARINE_LICENCE_VIEW_DETAILS_PUBLIC: '/marine-licence/view-public-details',
   MARINE_LICENCE_VIEW_DETAILS_INTERNAL_USER: '/view-marine-licence-details'

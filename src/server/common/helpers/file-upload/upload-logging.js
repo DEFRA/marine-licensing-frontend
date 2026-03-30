@@ -29,11 +29,11 @@ export const logSuccessfulProcessing = (
   coordinateData
 ) => {
   request.logger.info(
-    'FileUpload: File upload and coordinate extraction completed successfully',
     {
       filename: status.filename,
       fileType: uploadConfig.fileType,
       featureCount: coordinateData.featureCount
-    }
+    },
+    'FileUpload: File upload and coordinate extraction completed successfully'
   )
 }

@@ -60,8 +60,8 @@ describe('#logSuccessfulProcessing', () => {
     logSuccessfulProcessing(request, status, uploadConfig, coordinateData)
 
     expect(request.logger.info).toHaveBeenCalledWith(
-      'FileUpload: File upload and coordinate extraction completed successfully',
-      { filename: 'test.kml', fileType: 'kml', featureCount: 2 }
+      { filename: 'test.kml', fileType: 'kml', featureCount: 2 },
+      'FileUpload: File upload and coordinate extraction completed successfully'
     )
   })
 })

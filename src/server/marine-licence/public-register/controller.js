@@ -11,16 +11,14 @@ import { authenticatedPatchRequest } from '#src/server/common/helpers/authentica
 
 import joi from 'joi'
 
-export const PUBLIC_REGISTER_VIEW_ROUTE =
-  'marine-licence/public-register/index'
+export const PUBLIC_REGISTER_VIEW_ROUTE = 'marine-licence/public-register/index'
 
 export const errorMessages = {
   PUBLIC_REGISTER_CONSENT_REQUIRED:
     'Select whether you consent to the MMO publishing your project information publicly',
   PUBLIC_REGISTER_DETAILS_REQUIRED:
     'Provide details about what you consent to share',
-  PUBLIC_REGISTER_DETAILS_MAX_LENGTH:
-    'Details must be 1000 characters or fewer'
+  PUBLIC_REGISTER_DETAILS_MAX_LENGTH: 'Details must be 1000 characters or fewer'
 }
 
 const publicRegisterSettings = {

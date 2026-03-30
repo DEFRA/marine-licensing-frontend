@@ -1,4 +1,5 @@
 import { clone } from '@hapi/hoek'
+import { getSiteDetailsBySite } from '#src/server/common/helpers/exemptions/session-cache/site-details-utils.js'
 
 export const MARINE_LICENCE_CACHE_KEY = 'marineLicence'
 export const SAVED_SITE_DETAILS_CACHE_KEY = 'savedMarineLicenceSiteDetails'
@@ -43,6 +44,78 @@ export const updateMarineLicenceSiteDetails = async (
   await request.yar.commit(h)
 
   return { [key]: cacheValue }
+}
+
+export const updateMarineLicenceSiteDetailsBatch = (
+  request,
+  status,
+  coordinateData,
+  s3Location,
+  options
+) => {
+  const { isMultipleSitesFile } = options
+  const existingCache = getMarineLicenceCache(request)
+
+  const firstSiteDetails = getSiteDetailsBySite(existingCache)
+
+  const { coordinatesType, fileUploadType } = firstSiteDetails
+
+  const uploadSiteData = {
+    coordinatesType,
+    fileUploadType,
+    uploadedFile: {
+      ...status
+    },
+    s3Location: {
+      s3Bucket: s3Location.s3Bucket,
+      s3Key: s3Location.s3Key,
+      fileId: status.s3Location.fileId,
+      s3Url: status.s3Location.s3Url,
+      checksumSha256: status.s3Location.checksumSha256
+    },
+    featureCount: 1,
+    uploadConfig: null
+  }
+
+  if (!isMultipleSitesFile) {
+    const updatedSite = {
+      ...uploadSiteData,
+      extractedCoordinates: coordinateData.extractedCoordinates,
+      geoJSON: coordinateData.geoJSON
+    }
+
+    request.yar.set(MARINE_LICENCE_CACHE_KEY, {
+      ...existingCache,
+      siteDetails: [updatedSite]
+    })
+
+    return [updatedSite]
+  }
+
+  const updatedSiteDetails = []
+
+  for (const [index] of coordinateData.geoJSON.features.entries()) {
+    const existingSiteDetails = getSiteDetailsBySite(existingCache, index)
+
+    const updatedSite = {
+      ...existingSiteDetails,
+      ...uploadSiteData,
+      extractedCoordinates: coordinateData.extractedCoordinates[index],
+      geoJSON: {
+        type: coordinateData.geoJSON.type,
+        features: [coordinateData.geoJSON.features[index]]
+      }
+    }
+
+    updatedSiteDetails.push(updatedSite)
+  }
+
+  request.yar.set(MARINE_LICENCE_CACHE_KEY, {
+    ...existingCache,
+    siteDetails: updatedSiteDetails
+  })
+
+  return updatedSiteDetails
 }
 
 export const getMarineLicenceCache = (request) => {

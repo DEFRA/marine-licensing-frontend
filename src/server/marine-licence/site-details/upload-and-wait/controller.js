@@ -1,12 +1,14 @@
 import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
 import {
   getMarineLicenceCache,
-  updateMarineLicenceSiteDetails
+  updateMarineLicenceSiteDetails,
+  updateMarineLicenceSiteDetailsBatch
 } from '#src/server/common/helpers/marine-licence/session-cache/utils.js'
 import { getCdpUploadService } from '#src/services/cdp-upload-service/index.js'
 import {
   getCdpErrorMessageFromCode,
-  getGeoParserErrorMessage
+  getGeoParserErrorMessage,
+  isMultipleSitesFile
 } from '#src/server/common/helpers/file-upload/file-upload.js'
 import {
   extractCoordinates,
@@ -20,6 +22,8 @@ import {
   uploadAndWaitPageSettings
 } from '#src/server/common/helpers/file-upload/constants.js'
 import { getSiteDetailsBySite } from '#src/server/common/helpers/exemptions/session-cache/site-details-utils.js'
+import { saveSiteDetailsToBackend } from '#src/server/common/helpers/marine-licence/save-site-details.js'
+import { config } from '#src/config/config.js'
 
 async function handleGeoParserError(request, h, error, filename, fileType) {
   const errorCode = extractGeoParserErrorCode(error)
@@ -98,6 +102,8 @@ function handleProcessingStatus(status, marineLicence, h) {
 
 const processValidatedFile = async (status, uploadConfig, request, h) => {
   try {
+    const cdpUploadConfig = config.get('cdpUploader')
+
     const coordinateData = await extractCoordinates({
       status,
       uploadConfig,
@@ -107,7 +113,22 @@ const processValidatedFile = async (status, uploadConfig, request, h) => {
 
     logSuccessfulProcessing(request, status, uploadConfig, coordinateData)
 
-    return h.redirect(marineLicenceRoutes.MARINE_LICENCE_SITE_DETAILS)
+    updateMarineLicenceSiteDetailsBatch(
+      request,
+      status,
+      coordinateData,
+      {
+        s3Bucket: cdpUploadConfig.s3Bucket,
+        s3Key: status.s3Location.s3Key
+      },
+      {
+        isMultipleSitesFile: isMultipleSitesFile(coordinateData)
+      }
+    )
+
+    await saveSiteDetailsToBackend(request, h)
+
+    return h.redirect(marineLicenceRoutes.MARINE_LICENCE_FILE_UPLOAD)
   } catch (error) {
     await handleGeoParserError(
       request,

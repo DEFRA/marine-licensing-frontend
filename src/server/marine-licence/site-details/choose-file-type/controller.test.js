@@ -26,9 +26,10 @@ describe('#chooseFileType (marine licence)', () => {
   const getServer = setupTestServer()
 
   beforeEach(() => {
-    vi.mocked(getMarineLicenceCache).mockReturnValue(
-      mockMarineLicenceApplication
-    )
+    vi.mocked(getMarineLicenceCache).mockReturnValue({
+      ...mockMarineLicenceApplication,
+      siteDetails: []
+    })
   })
 
   describe('#chooseFileTypeController', () => {

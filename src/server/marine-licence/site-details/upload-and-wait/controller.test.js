@@ -11,6 +11,8 @@ import { config } from '#src/config/config.js'
 vi.mock('~/src/server/common/helpers/marine-licence/session-cache/utils.js')
 vi.mock('~/src/services/cdp-upload-service/index.js')
 vi.mock('~/src/server/common/helpers/authenticated-requests.js')
+vi.mock('~/src/server/common/helpers/exemptions/save-site-details.js')
+
 vi.mock(
   '~/src/server/common/helpers/file-upload/geo-parse-upload.js',
   async () => {
@@ -399,7 +401,7 @@ describe('#uploadAndWait', () => {
           )
 
           expect(h.redirect).toHaveBeenCalledWith(
-            marineLicenceRoutes.MARINE_LICENCE_SITE_DETAILS
+            marineLicenceRoutes.MARINE_LICENCE_FILE_UPLOAD
           )
         })
       })
@@ -444,7 +446,7 @@ describe('#uploadAndWait', () => {
           )
 
           expect(h.redirect).toHaveBeenCalledWith(
-            marineLicenceRoutes.MARINE_LICENCE_SITE_DETAILS
+            marineLicenceRoutes.MARINE_LICENCE_FILE_UPLOAD
           )
         })
       })

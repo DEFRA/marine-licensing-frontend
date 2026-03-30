@@ -13,6 +13,38 @@ export const clearSavedMarineLicenceSiteDetails = async (request, h) => {
   await request.yar.commit(h)
 }
 
+export const updateMarineLicenceSiteDetails = async (
+  request,
+  h,
+  siteIndex,
+  key,
+  value
+) => {
+  const existingCache = getMarineLicenceCache(request)
+  const existingSiteDetails = existingCache.siteDetails || []
+  const cacheValue = value ?? null
+
+  const updatedSiteDetails = [...existingSiteDetails]
+
+  updatedSiteDetails[siteIndex] = {
+    ...updatedSiteDetails[siteIndex],
+    [key]: cacheValue
+  }
+
+  if (cacheValue === null) {
+    delete updatedSiteDetails[siteIndex][key]
+  }
+
+  request.yar.set(MARINE_LICENCE_CACHE_KEY, {
+    ...existingCache,
+    siteDetails: updatedSiteDetails
+  })
+
+  await request.yar.commit(h)
+
+  return { [key]: cacheValue }
+}
+
 export const getMarineLicenceCache = (request) => {
   return clone(request.yar.get(MARINE_LICENCE_CACHE_KEY) || {})
 }

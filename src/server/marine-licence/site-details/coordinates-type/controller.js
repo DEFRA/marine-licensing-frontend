@@ -1,6 +1,6 @@
 import {
   getMarineLicenceCache,
-  setMarineLicenceCache
+  updateMarineLicenceSiteDetails
 } from '#src/server/common/helpers/marine-licence/session-cache/utils.js'
 import {
   errorDescriptionByFieldName,
@@ -12,6 +12,7 @@ import {
   coordinatesTypeErrorMessages
 } from '#src/server/common/validation/coordinates-type/constants.js'
 import { coordinatesTypeSchema } from '#src/server/common/validation/coordinates-type/schema.js'
+import { getSiteDetailsBySite } from '#src/server/common/helpers/exemptions/session-cache/site-details-utils.js'
 
 export const MARINE_LICENCE_COORDINATES_CHOICE_VIEW_ROUTE =
   'templates/coordinates-type'
@@ -21,8 +22,7 @@ const cancelLink = `${marineLicenceRoutes.MARINE_LICENCE_TASK_LIST}?cancel=site-
 export const coordinatesTypeController = {
   handler(request, h) {
     const marineLicence = getMarineLicenceCache(request)
-
-    const siteDetails = marineLicence.siteDetails ?? {}
+    const site = getSiteDetailsBySite(marineLicence)
 
     return h.view(MARINE_LICENCE_COORDINATES_CHOICE_VIEW_ROUTE, {
       ...coordinatesTypeSettings,
@@ -30,7 +30,7 @@ export const coordinatesTypeController = {
       cancelLink,
       projectName: marineLicence.projectName,
       payload: {
-        coordinatesType: siteDetails.coordinatesType
+        coordinatesType: site.coordinatesType
       }
     })
   }
@@ -79,15 +79,14 @@ export const coordinatesTypeSubmitController = {
   },
   async handler(request, h) {
     const { payload } = request
-    const marineLicence = getMarineLicenceCache(request)
 
-    await setMarineLicenceCache(request, h, {
-      ...marineLicence,
-      siteDetails: {
-        ...marineLicence.siteDetails,
-        coordinatesType: payload.coordinatesType
-      }
-    })
+    await updateMarineLicenceSiteDetails(
+      request,
+      h,
+      0,
+      'coordinatesType',
+      payload.coordinatesType
+    )
 
     if (payload.coordinatesType === 'file') {
       return h

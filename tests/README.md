@@ -101,5 +101,5 @@ test('should show validation error for invalid date', async () => {
 - **Semantic Queries**: `getByRole('button')` instead of `querySelector('button')`
 - **User-Focused**: Tests how users actually perceive and interact with the page
 - **Accessibility Testing**: Ensures proper ARIA roles, labels, and semantic structure
-- **Better Error Messages**: Clear feedback when elements aren't found as expected 
+- **Better Error Messages**: Clear feedback when elements aren't found as expected
 - **Robustness**: Less brittle than CSS selector-based tests

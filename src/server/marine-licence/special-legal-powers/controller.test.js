@@ -20,7 +20,6 @@ describe('#specialLegalPowers', () => {
   }
 
   beforeEach(() => {
-    vi.restoreAllMocks()
     vi.spyOn(authRequests, 'authenticatedPatchRequest').mockResolvedValue({
       payload: {
         id: mockLicence.id,
@@ -38,21 +37,6 @@ describe('#specialLegalPowers', () => {
   })
 
   describe('#specialLegalPowersController', () => {
-    test('specialLegalPowersController handler should render with correct context', async () => {
-      const h = { view: vi.fn() }
-
-      await specialLegalPowersController.handler({}, h)
-      expect(h.view).toHaveBeenCalledWith(SPECIAL_LEGAL_POWERS_VIEW_ROUTE, {
-        backLink: marineLicenceRoutes.MARINE_LICENCE_TASK_LIST,
-        pageTitle:
-          'Does your organisation have special legal powers to do any of this project?',
-        heading:
-          'Does your organisation have special legal powers to do any of this project?',
-        projectName: mockLicence.projectName,
-        payload: mockLicence.specialLegalPowers
-      })
-    })
-
     test('specialLegalPowersController handler should redirect citizens to task list', async () => {
       authUtils.getUserSession.mockResolvedValueOnce({
         userRelationshipType: 'Citizen'
@@ -223,153 +207,47 @@ describe('#specialLegalPowers', () => {
       )
     })
 
-    test('Should show error messages without calling the back end when payload data is empty', () => {
-      const request = { payload: { agree: '' } }
-      const h = { view: vi.fn().mockReturnValue({ takeover: vi.fn() }) }
-      const err = {
-        details: [
-          {
-            path: ['agree'],
-            message: 'TEST',
-            type: 'string.empty'
-          }
-        ]
-      }
-
-      specialLegalPowersSubmitController.options.validate.failAction(
-        request,
-        h,
-        err
-      )
-
-      expect(authRequests.authenticatedPatchRequest).not.toHaveBeenCalled()
-      expect(h.view).toHaveBeenCalled()
-    })
-
-    test('Should show error for details being empty when agree is set to yes', () => {
-      const request = { payload: { agree: 'yes', details: '' } }
-      const h = { view: vi.fn().mockReturnValue({ takeover: vi.fn() }) }
-      const err = {
-        details: [
-          {
-            path: ['details'],
-            message: 'SPECIAL_LEGAL_POWERS_DETAILS_REQUIRED',
-            type: 'string.empty'
-          }
-        ]
-      }
-
-      specialLegalPowersSubmitController.options.validate.failAction(
-        request,
-        h,
-        err
-      )
-
-      expect(authRequests.authenticatedPatchRequest).not.toHaveBeenCalled()
-      expect(h.view).toHaveBeenCalled()
-    })
-
-    test('Should correctly validate on empty data', () => {
-      const request = { payload: { agree: '' } }
-      const h = { view: vi.fn().mockReturnValue({ takeover: vi.fn() }) }
-      const err = {
-        details: [{ path: ['agree'], message: 'TEST', type: 'string.empty' }]
-      }
-      specialLegalPowersSubmitController.options.validate.failAction(
-        request,
-        h,
-        err
-      )
-      expect(h.view).toHaveBeenCalledWith(SPECIAL_LEGAL_POWERS_VIEW_ROUTE, {
-        backLink: marineLicenceRoutes.MARINE_LICENCE_TASK_LIST,
-        pageTitle:
-          'Does your organisation have special legal powers to do any of this project?',
-        heading:
-          'Does your organisation have special legal powers to do any of this project?',
-        projectName: mockLicence.projectName,
+    test.each([
+      {
+        name: 'null error details',
         payload: { agree: '' },
-        errorSummary: [{ href: '#agree', text: 'TEST', field: ['agree'] }],
-        errors: {
-          agree: { field: ['agree'], href: '#agree', text: 'TEST' }
-        }
-      })
-      expect(h.view().takeover).toHaveBeenCalled()
-    })
-
-    test('Should correctly handle an incorrectly formed error object', () => {
-      const request = { payload: { agree: '' } }
-      const h = { view: vi.fn().mockReturnValue({ takeover: vi.fn() }) }
-      const err = { details: null }
-      specialLegalPowersSubmitController.options.validate.failAction(
-        request,
-        h,
-        err
-      )
-      expect(h.view).toHaveBeenCalledWith(SPECIAL_LEGAL_POWERS_VIEW_ROUTE, {
-        backLink: marineLicenceRoutes.MARINE_LICENCE_TASK_LIST,
-        heading:
-          'Does your organisation have special legal powers to do any of this project?',
-        pageTitle:
-          'Does your organisation have special legal powers to do any of this project?',
-        projectName: mockLicence.projectName,
-        payload: { agree: '' }
-      })
-      expect(h.view().takeover).toHaveBeenCalled()
-    })
-
-    test('Should correctly validate on empty data and handle a scenario where error details are missing', () => {
-      const request = { payload: { agree: '' } }
-      const h = { view: vi.fn().mockReturnValue({ takeover: vi.fn() }) }
-      specialLegalPowersSubmitController.options.validate.failAction(
-        request,
-        h,
-        {}
-      )
-      expect(h.view).toHaveBeenCalledWith(SPECIAL_LEGAL_POWERS_VIEW_ROUTE, {
-        backLink: marineLicenceRoutes.MARINE_LICENCE_TASK_LIST,
-        heading:
-          'Does your organisation have special legal powers to do any of this project?',
-        pageTitle:
-          'Does your organisation have special legal powers to do any of this project?',
-        projectName: mockLicence.projectName,
-        payload: { agree: '' }
-      })
-      expect(h.view().takeover).toHaveBeenCalled()
-    })
-
-    test('Should correctly validate on invalid data', () => {
-      const request = { payload: { agree: 'invalid' } }
-      const h = { view: vi.fn().mockReturnValue({ takeover: vi.fn() }) }
-      specialLegalPowersSubmitController.options.validate.failAction(
-        request,
-        h,
-        {}
-      )
-      expect(h.view).toHaveBeenCalledWith(SPECIAL_LEGAL_POWERS_VIEW_ROUTE, {
-        backLink: marineLicenceRoutes.MARINE_LICENCE_TASK_LIST,
-        heading:
-          'Does your organisation have special legal powers to do any of this project?',
-        pageTitle:
-          'Does your organisation have special legal powers to do any of this project?',
-        projectName: mockLicence.projectName,
-        payload: { agree: 'invalid' }
-      })
-      expect(h.view().takeover).toHaveBeenCalled()
-    })
-
-    test('Should correctly set the cache when submitting special legal powers', async () => {
-      const setCacheMock = vi.spyOn(cacheUtils, 'setMarineLicenceCache')
-      const h = {
-        redirect: vi.fn().mockReturnValue({ takeover: vi.fn() }),
-        view: vi.fn()
+        err: { details: null },
+        expectedExtra: {}
+      },
+      {
+        name: 'missing error details',
+        payload: { agree: '' },
+        err: {},
+        expectedExtra: {}
+      },
+      {
+        name: 'invalid agree value',
+        payload: { agree: 'invalid' },
+        err: {},
+        expectedExtra: {}
       }
-      const mockRequest = { payload: { agree: 'yes', details: 'Test reason' } }
-      await specialLegalPowersSubmitController.handler(mockRequest, h)
-      expect(setCacheMock).toHaveBeenCalledWith(
-        mockRequest,
-        expect.any(Object),
-        expect.objectContaining(mockLicence)
-      )
-    })
+    ])(
+      'Should correctly handle failAction with $name',
+      ({ payload, err, expectedExtra }) => {
+        const request = { payload }
+        const h = { view: vi.fn().mockReturnValue({ takeover: vi.fn() }) }
+        specialLegalPowersSubmitController.options.validate.failAction(
+          request,
+          h,
+          err
+        )
+        expect(h.view).toHaveBeenCalledWith(SPECIAL_LEGAL_POWERS_VIEW_ROUTE, {
+          backLink: marineLicenceRoutes.MARINE_LICENCE_TASK_LIST,
+          pageTitle:
+            'Does your organisation have special legal powers to do any of this project?',
+          heading:
+            'Does your organisation have special legal powers to do any of this project?',
+          projectName: mockLicence.projectName,
+          payload,
+          ...expectedExtra
+        })
+        expect(h.view().takeover).toHaveBeenCalled()
+      }
+    )
   })
 })

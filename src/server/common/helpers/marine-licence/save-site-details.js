@@ -91,7 +91,7 @@ export const saveSiteDetailsToBackend = async (request, h) => {
     request.logger.error(
       {
         err: error,
-        exemptionId: marineLicence.id,
+        marineLicenceId: marineLicence.id,
         coordinatesType
       },
       'Failed to save site details to backend'

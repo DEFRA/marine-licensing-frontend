@@ -8,6 +8,7 @@ import {
 } from '#src/server/common/helpers/errors.js'
 import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
 import { authenticatedPatchRequest } from '#src/server/common/helpers/authenticated-requests.js'
+import { createFailAction } from '#src/server/common/helpers/marine-licence/createFailAction.js'
 
 import joi from 'joi'
 
@@ -64,38 +65,12 @@ export const publicRegisterSubmitController = {
           })
         })
       }),
-      failAction: (request, h, err) => {
-        const { payload } = request
-
-        const { projectName } = getMarineLicenceCache(request)
-        const backLink = getBackLink(request)
-
-        if (!err.details) {
-          return h
-            .view(PUBLIC_REGISTER_VIEW_ROUTE, {
-              ...publicRegisterSettings,
-              payload,
-              projectName,
-              backLink
-            })
-            .takeover()
-        }
-
-        const errorSummary = mapErrorsForDisplay(err.details, errorMessages)
-
-        const errors = errorDescriptionByFieldName(errorSummary)
-
-        return h
-          .view(PUBLIC_REGISTER_VIEW_ROUTE, {
-            ...publicRegisterSettings,
-            payload,
-            projectName,
-            backLink,
-            errors,
-            errorSummary
-          })
-          .takeover()
-      }
+      failAction: createFailAction({
+        viewRoute: PUBLIC_REGISTER_VIEW_ROUTE,
+        settings: publicRegisterSettings,
+        errorMessages,
+        getBackLink
+      })
     }
   },
   async handler(request, h) {

@@ -27,20 +27,21 @@ const setStatus = (task) => {
 }
 
 export const transformOtherPermissionsTaskList = (taskList, isCitizen) => [
-  ...(!isCitizen
+  ...(isCitizen
     ? [
+        {
+          title: { text: 'Other authorities', classes: taskClasses },
+          href: marineLicenceRoutes.MARINE_LICENCE_OTHER_AUTHORITIES,
+          status: setStatus(taskList.otherAuthorities)
+        }
+      ]
+    : [
         {
           title: { text: 'Special legal powers', classes: taskClasses },
           href: marineLicenceRoutes.MARINE_LICENCE_SPECIAL_LEGAL_POWERS,
           status: setStatus(taskList.specialLegalPowers)
         }
-      ]
-    : []),
-  {
-    title: { text: 'Other authorities', classes: taskClasses },
-    href: marineLicenceRoutes.MARINE_LICENCE_OTHER_AUTHORITIES,
-    status: setStatus(taskList.otherAuthorities)
-  }
+      ])
 ]
 
 export const transformProjectDetailsTaskList = (taskList) => [

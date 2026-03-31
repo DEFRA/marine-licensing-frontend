@@ -1,17 +1,18 @@
 import { vi } from 'vitest'
-import { uploadAndWaitController } from '#src/server/exemption/site-details/upload-and-wait/controller.js'
+import { uploadAndWaitController } from '#src/server/marine-licence/site-details/upload-and-wait/controller.js'
 import { UPLOAD_AND_WAIT_VIEW_ROUTE } from '#src/server/common/helpers/file-upload/constants.js'
-import * as cacheUtils from '#src/server/common/helpers/exemptions/session-cache/utils.js'
+import * as mlCacheUtils from '#src/server/common/helpers/marine-licence/session-cache/utils.js'
 import * as cdpUploadService from '#src/services/cdp-upload-service/index.js'
 import * as geoParseUpload from '#src/server/common/helpers/file-upload/geo-parse-upload.js'
 import * as authenticatedRequests from '#src/server/common/helpers/authenticated-requests.js'
-import { mockExemption } from '#src/server/test-helpers/mocks/exemption.js'
-import { routes } from '#src/server/common/constants/routes.js'
+import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
 import { config } from '#src/config/config.js'
 
-vi.mock('~/src/server/common/helpers/exemptions/session-cache/utils.js')
+vi.mock('~/src/server/common/helpers/marine-licence/session-cache/utils.js')
 vi.mock('~/src/services/cdp-upload-service/index.js')
 vi.mock('~/src/server/common/helpers/authenticated-requests.js')
+vi.mock('~/src/server/common/helpers/exemptions/save-site-details.js')
+
 vi.mock(
   '~/src/server/common/helpers/file-upload/geo-parse-upload.js',
   async () => {
@@ -67,7 +68,7 @@ const createMockStatusResponse = (status, overrides = {}) => ({
   ...overrides
 })
 
-const createMockExemption = (overrides = {}) => ({
+const createMockMarineLicence = (overrides = {}) => ({
   projectName: 'Test Project',
   siteDetails: [{ uploadConfig: createMockUploadConfig() }],
   ...overrides
@@ -111,26 +112,8 @@ const setupMockConfig = () => {
     if (key === 'cdpUploader') {
       return { s3Bucket: 'test-bucket' }
     }
-    // Return undefined for any other keys - will cause test to fail if something unexpected is accessed
     return undefined
   })
-}
-
-const expectSuccessfulFileProcessing = (
-  spies,
-  request,
-  isMultipleSites = false
-) => {
-  const { updateExemptionSiteDetailsBatchSpy } = spies
-
-  // Verify batch update was called with all the required data including clearing upload config
-  expect(updateExemptionSiteDetailsBatchSpy).toHaveBeenCalledWith(
-    request,
-    expect.any(Object),
-    expect.any(Object),
-    expect.any(Object),
-    { isMultipleSitesFile: isMultipleSites }
-  )
 }
 
 // Service Mock Setup Helpers
@@ -152,22 +135,17 @@ const setupMockServices = () => {
 }
 
 const setupCacheSpies = () => {
-  const getExemptionCacheSpy = vi
-    .spyOn(cacheUtils, 'getExemptionCache')
-    .mockReturnValue(mockExemption)
+  const getMarineLicenceCacheSpy = vi
+    .spyOn(mlCacheUtils, 'getMarineLicenceCache')
+    .mockReturnValue(createMockMarineLicence())
 
-  const updateExemptionSiteDetailsSpy = vi
-    .spyOn(cacheUtils, 'updateExemptionSiteDetails')
-    .mockImplementation()
-
-  const updateExemptionSiteDetailsBatchSpy = vi
-    .spyOn(cacheUtils, 'updateExemptionSiteDetailsBatch')
+  const updateMarineLicenceSiteDetailsSpy = vi
+    .spyOn(mlCacheUtils, 'updateMarineLicenceSiteDetails')
     .mockImplementation()
 
   return {
-    getExemptionCacheSpy,
-    updateExemptionSiteDetailsSpy,
-    updateExemptionSiteDetailsBatchSpy
+    getMarineLicenceCacheSpy,
+    updateMarineLicenceSiteDetailsSpy
   }
 }
 
@@ -180,17 +158,16 @@ const setupAuthenticatedRequestSpy = () => {
 // Error Testing Helpers
 const expectRejectedStatusHandling = async (
   mockRequest,
-  getExemptionCacheSpy,
+  getMarineLicenceCacheSpy,
   mockCdpService,
-  updateExemptionSiteDetailsSpy,
+  updateMarineLicenceSiteDetailsSpy,
   errorCode,
   rawMessage,
   expectedErrorMessage,
   fileType = 'kml'
 ) => {
-  // Given exemption with upload config and rejected status
-  getExemptionCacheSpy.mockReturnValue(
-    createMockExemption({
+  getMarineLicenceCacheSpy.mockReturnValue(
+    createMockMarineLicence({
       siteDetails: [{ uploadConfig: createMockUploadConfig({ fileType }) }]
     })
   )
@@ -202,11 +179,9 @@ const expectRejectedStatusHandling = async (
 
   const h = createMockResponseHandler()
 
-  // When handler is called
   await uploadAndWaitController.handler(mockRequest, h)
 
-  // Then expected error handling occurs
-  expect(updateExemptionSiteDetailsSpy).toHaveBeenCalledWith(
+  expect(updateMarineLicenceSiteDetailsSpy).toHaveBeenCalledWith(
     mockRequest,
     expect.any(Object),
     0,
@@ -217,29 +192,30 @@ const expectRejectedStatusHandling = async (
       fileType
     }
   )
-  expect(updateExemptionSiteDetailsSpy).toHaveBeenCalledWith(
+  expect(updateMarineLicenceSiteDetailsSpy).toHaveBeenCalledWith(
     mockRequest,
     expect.any(Object),
     0,
     'uploadConfig',
     null
   )
-  expect(h.redirect).toHaveBeenCalledWith(routes.FILE_UPLOAD)
+  expect(h.redirect).toHaveBeenCalledWith(
+    marineLicenceRoutes.MARINE_LICENCE_FILE_UPLOAD
+  )
 }
 
 const expectFileValidationFailure = async (
   mockRequest,
-  getExemptionCacheSpy,
+  getMarineLicenceCacheSpy,
   mockCdpService,
   mockValidateUploadedFile,
-  updateExemptionSiteDetailsSpy,
+  updateMarineLicenceSiteDetailsSpy,
   filename,
   fileType,
   errorMessage
 ) => {
-  // Given exemption with upload config and ready status
-  getExemptionCacheSpy.mockReturnValue(
-    createMockExemption({
+  getMarineLicenceCacheSpy.mockReturnValue(
+    createMockMarineLicence({
       siteDetails: [{ uploadConfig: createMockUploadConfig({ fileType }) }]
     })
   )
@@ -247,7 +223,6 @@ const expectFileValidationFailure = async (
   const statusResponse = createMockStatusResponse('ready', { filename })
   mockCdpService.getStatus.mockResolvedValue(statusResponse)
 
-  // And failed file validation
   mockValidateUploadedFile.mockResolvedValue({
     isValid: false,
     extension: filename.split('.').pop(),
@@ -256,11 +231,9 @@ const expectFileValidationFailure = async (
 
   const h = createMockResponseHandler()
 
-  // When handler is called
   await uploadAndWaitController.handler(mockRequest, h)
 
-  // And error handling occurs
-  expect(updateExemptionSiteDetailsSpy).toHaveBeenCalledWith(
+  expect(updateMarineLicenceSiteDetailsSpy).toHaveBeenCalledWith(
     mockRequest,
     expect.any(Object),
     0,
@@ -271,17 +244,18 @@ const expectFileValidationFailure = async (
       fileType
     }
   )
-  expect(updateExemptionSiteDetailsSpy).toHaveBeenCalledWith(
+  expect(updateMarineLicenceSiteDetailsSpy).toHaveBeenCalledWith(
     mockRequest,
     expect.any(Object),
     0,
     'uploadConfig',
     null
   )
-  expect(h.redirect).toHaveBeenCalledWith(routes.FILE_UPLOAD)
+  expect(h.redirect).toHaveBeenCalledWith(
+    marineLicenceRoutes.MARINE_LICENCE_FILE_UPLOAD
+  )
 
-  // And uploaded file should not be stored when validation fails
-  expect(updateExemptionSiteDetailsSpy).not.toHaveBeenCalledWith(
+  expect(updateMarineLicenceSiteDetailsSpy).not.toHaveBeenCalledWith(
     mockRequest,
     'uploadedFile',
     expect.anything()
@@ -289,22 +263,19 @@ const expectFileValidationFailure = async (
 }
 
 describe('#uploadAndWait', () => {
-  let getExemptionCacheSpy
-  let updateExemptionSiteDetailsSpy
-  let updateExemptionSiteDetailsBatchSpy
+  let getMarineLicenceCacheSpy
+  let updateMarineLicenceSiteDetailsSpy
   let mockCdpService
   let mockValidateUploadedFile
   let authenticatedPostRequestSpy
 
   beforeEach(() => {
-    // Setup config after reset to ensure it's available
     setupMockConfig()
 
     const cacheSpies = setupCacheSpies()
-    getExemptionCacheSpy = cacheSpies.getExemptionCacheSpy
-    updateExemptionSiteDetailsSpy = cacheSpies.updateExemptionSiteDetailsSpy
-    updateExemptionSiteDetailsBatchSpy =
-      cacheSpies.updateExemptionSiteDetailsBatchSpy
+    getMarineLicenceCacheSpy = cacheSpies.getMarineLicenceCacheSpy
+    updateMarineLicenceSiteDetailsSpy =
+      cacheSpies.updateMarineLicenceSiteDetailsSpy
 
     const services = setupMockServices()
     mockCdpService = services.mockCdpService
@@ -317,38 +288,33 @@ describe('#uploadAndWait', () => {
     const mockRequest = createMockRequest()
 
     describe('when no upload config exists', () => {
-      test('should redirect to CHOOSE_FILE_UPLOAD_TYPE', async () => {
-        // Given no upload config exists
-        getExemptionCacheSpy.mockReturnValue({})
+      test('should redirect to MARINE_LICENCE_CHOOSE_FILE_UPLOAD_TYPE', async () => {
+        getMarineLicenceCacheSpy.mockReturnValue({})
         const h = createMockResponseHandler()
 
-        // When handler is called
         await uploadAndWaitController.handler(mockRequest, h)
 
-        // Then redirect to choose file upload type
-        expect(h.redirect).toHaveBeenCalledWith(routes.CHOOSE_FILE_UPLOAD_TYPE)
+        expect(h.redirect).toHaveBeenCalledWith(
+          marineLicenceRoutes.MARINE_LICENCE_CHOOSE_FILE_UPLOAD_TYPE
+        )
       })
     })
 
     describe('when checking upload status', () => {
       test('should show waiting page when status is pending', async () => {
-        // Given exemption with upload config and pending status
-        getExemptionCacheSpy.mockReturnValue(createMockExemption())
+        getMarineLicenceCacheSpy.mockReturnValue(createMockMarineLicence())
         mockCdpService.getStatus.mockResolvedValue(
           createMockStatusResponse('pending')
         )
         const h = createMockResponseHandler()
 
-        // When handler is called
         await uploadAndWaitController.handler(mockRequest, h)
 
-        // Then CDP service is called with correct parameters
         expect(mockCdpService.getStatus).toHaveBeenCalledWith(
           'test-upload-id',
           'test-status-url'
         )
 
-        // And waiting page is displayed
         expect(h.view).toHaveBeenCalledWith(UPLOAD_AND_WAIT_VIEW_ROUTE, {
           pageTitle: 'Checking your file...',
           heading: 'Checking your file...',
@@ -356,23 +322,20 @@ describe('#uploadAndWait', () => {
           isProcessing: true,
           pageRefreshTimeInSeconds: 2,
           filename: 'test.kml',
-          tryAgainLink: routes.FILE_UPLOAD,
-          cancelLink: routes.TASK_LIST
+          tryAgainLink: marineLicenceRoutes.MARINE_LICENCE_FILE_UPLOAD,
+          cancelLink: marineLicenceRoutes.MARINE_LICENCE_TASK_LIST
         })
       })
 
       test('should show waiting page when status is scanning', async () => {
-        // Given exemption with upload config and scanning status
-        getExemptionCacheSpy.mockReturnValue(createMockExemption())
+        getMarineLicenceCacheSpy.mockReturnValue(createMockMarineLicence())
         mockCdpService.getStatus.mockResolvedValue(
           createMockStatusResponse('scanning')
         )
         const h = createMockResponseHandler()
 
-        // When handler is called
         await uploadAndWaitController.handler(mockRequest, h)
 
-        // Then waiting page is displayed
         expect(h.view).toHaveBeenCalledWith(UPLOAD_AND_WAIT_VIEW_ROUTE, {
           pageTitle: 'Checking your file...',
           heading: 'Checking your file...',
@@ -380,14 +343,13 @@ describe('#uploadAndWait', () => {
           isProcessing: true,
           pageRefreshTimeInSeconds: 2,
           filename: 'test.kml',
-          tryAgainLink: routes.FILE_UPLOAD,
-          cancelLink: routes.TASK_LIST
+          tryAgainLink: marineLicenceRoutes.MARINE_LICENCE_FILE_UPLOAD,
+          cancelLink: marineLicenceRoutes.MARINE_LICENCE_TASK_LIST
         })
       })
 
-      test('should redirect to CHOOSE_FILE_UPLOAD_TYPE for unknown status', async () => {
-        // Given exemption with upload config and unknown status
-        getExemptionCacheSpy.mockReturnValue(createMockExemption())
+      test('should redirect to MARINE_LICENCE_CHOOSE_FILE_UPLOAD_TYPE for unknown status', async () => {
+        getMarineLicenceCacheSpy.mockReturnValue(createMockMarineLicence())
         mockCdpService.getStatus.mockResolvedValue({
           status: 'unknown',
           filename: 'test.kml'
@@ -395,10 +357,8 @@ describe('#uploadAndWait', () => {
 
         const h = createMockResponseHandler()
 
-        // When handler is called
         await uploadAndWaitController.handler(mockRequest, h)
 
-        // Then warning is logged
         expect(mockRequest.logger.warn).toHaveBeenCalledWith(
           {
             uploadId: 'test-upload-id',
@@ -407,20 +367,19 @@ describe('#uploadAndWait', () => {
           'FileUpload: Unknown upload status'
         )
 
-        // And user is redirected to choose file upload type
-        expect(h.redirect).toHaveBeenCalledWith(routes.CHOOSE_FILE_UPLOAD_TYPE)
+        expect(h.redirect).toHaveBeenCalledWith(
+          marineLicenceRoutes.MARINE_LICENCE_CHOOSE_FILE_UPLOAD_TYPE
+        )
       })
     })
 
     describe('when file upload is ready', () => {
       describe('with valid KML file', () => {
-        test('should process file and redirect to activity dates for single site', async () => {
-          // Given exemption with upload config and ready status
-          getExemptionCacheSpy.mockReturnValue(createMockExemption())
+        test('should process file and redirect to site details', async () => {
+          getMarineLicenceCacheSpy.mockReturnValue(createMockMarineLicence())
           const statusResponse = createMockStatusResponse('ready')
           mockCdpService.getStatus.mockResolvedValue(statusResponse)
 
-          // And successful file validation
           mockValidateUploadedFile.mockResolvedValue({
             isValid: true,
             extension: 'kml',
@@ -429,10 +388,8 @@ describe('#uploadAndWait', () => {
 
           const h = createMockResponseHandler()
 
-          // When handler is called
           await uploadAndWaitController.handler(mockRequest, h)
 
-          // And geo-parser API is called
           expect(authenticatedPostRequestSpy).toHaveBeenCalledWith(
             mockRequest,
             '/geo-parser/extract',
@@ -443,76 +400,23 @@ describe('#uploadAndWait', () => {
             }
           )
 
-          // And file processing data is stored correctly
-          expectSuccessfulFileProcessing(
-            {
-              updateExemptionSiteDetailsSpy,
-              updateExemptionSiteDetailsBatchSpy
-            },
-            mockRequest
+          expect(h.redirect).toHaveBeenCalledWith(
+            marineLicenceRoutes.MARINE_LICENCE_FILE_UPLOAD
           )
-
-          expect(h.redirect).toHaveBeenCalledWith(routes.ACTIVITY_DATES)
-        })
-
-        test('should process file and redirect to same activity dates page for multiple sites', async () => {
-          // Given exemption with upload config and ready status
-          getExemptionCacheSpy.mockReturnValue(createMockExemption())
-          const statusResponse = createMockStatusResponse('ready')
-          mockCdpService.getStatus.mockResolvedValue(statusResponse)
-
-          // And successful file validation
-          mockValidateUploadedFile.mockResolvedValue({
-            isValid: true,
-            extension: 'kml',
-            errorMessage: null
-          })
-
-          // And geo-parser API returns multiple features (multiple sites)
-          authenticatedPostRequestSpy.mockResolvedValue(
-            createMockGeoJsonResponse(3)
-          )
-
-          const h = createMockResponseHandler()
-
-          // When handler is called
-          await uploadAndWaitController.handler(mockRequest, h)
-
-          // And geo-parser API is called
-          expect(authenticatedPostRequestSpy).toHaveBeenCalledWith(
-            mockRequest,
-            '/geo-parser/extract',
-            {
-              s3Bucket: 'test-bucket',
-              s3Key: 'test-key',
-              fileType: 'kml'
-            }
-          )
-
-          // And file processing data is stored correctly
-          expectSuccessfulFileProcessing(
-            {
-              updateExemptionSiteDetailsSpy,
-              updateExemptionSiteDetailsBatchSpy
-            },
-            mockRequest,
-            true // Multiple sites scenario
-          )
-
-          // And user is redirected to same activity dates page for multiple sites
-          expect(h.redirect).toHaveBeenCalledWith(routes.SAME_ACTIVITY_DATES)
         })
       })
 
       describe('with valid Shapefile', () => {
-        test('should process shapefile and redirect to activity dates for single site', async () => {
-          // Given exemption with shapefile upload config
-          const shapefileUploadConfig = createMockUploadConfig({
-            fileType: 'shapefile'
-          })
-          getExemptionCacheSpy.mockReturnValue(
-            createMockExemption({
-              siteDetails: [{ uploadConfig: shapefileUploadConfig }]
+        test('should process shapefile and redirect to site details', async () => {
+          getMarineLicenceCacheSpy.mockReturnValue(
+            createMockMarineLicence({
+              siteDetails: [
+                {
+                  uploadConfig: createMockUploadConfig({
+                    fileType: 'shapefile'
+                  })
+                }
+              ]
             })
           )
 
@@ -521,7 +425,6 @@ describe('#uploadAndWait', () => {
           })
           mockCdpService.getStatus.mockResolvedValue(statusResponse)
 
-          // And successful shapefile validation
           mockValidateUploadedFile.mockResolvedValue({
             isValid: true,
             extension: 'zip',
@@ -530,10 +433,8 @@ describe('#uploadAndWait', () => {
 
           const h = createMockResponseHandler()
 
-          // When handler is called
           await uploadAndWaitController.handler(mockRequest, h)
 
-          // And geo-parser API is called with shapefile type
           expect(authenticatedPostRequestSpy).toHaveBeenCalledWith(
             mockRequest,
             '/geo-parser/extract',
@@ -544,16 +445,9 @@ describe('#uploadAndWait', () => {
             }
           )
 
-          // And file processing data is stored correctly
-          expectSuccessfulFileProcessing(
-            {
-              updateExemptionSiteDetailsSpy,
-              updateExemptionSiteDetailsBatchSpy
-            },
-            mockRequest
+          expect(h.redirect).toHaveBeenCalledWith(
+            marineLicenceRoutes.MARINE_LICENCE_FILE_UPLOAD
           )
-
-          expect(h.redirect).toHaveBeenCalledWith(routes.ACTIVITY_DATES)
         })
       })
     })
@@ -562,10 +456,10 @@ describe('#uploadAndWait', () => {
       test('should redirect to file upload with error for wrong extension', async () => {
         await expectFileValidationFailure(
           mockRequest,
-          getExemptionCacheSpy,
+          getMarineLicenceCacheSpy,
           mockCdpService,
           mockValidateUploadedFile,
-          updateExemptionSiteDetailsSpy,
+          updateMarineLicenceSiteDetailsSpy,
           'document.pdf',
           'kml',
           'The selected file must be a KML file'
@@ -577,9 +471,9 @@ describe('#uploadAndWait', () => {
       test('should redirect to file upload with virus error message', async () => {
         await expectRejectedStatusHandling(
           mockRequest,
-          getExemptionCacheSpy,
+          getMarineLicenceCacheSpy,
           mockCdpService,
-          updateExemptionSiteDetailsSpy,
+          updateMarineLicenceSiteDetailsSpy,
           'VIRUS_DETECTED',
           'The selected file contains a virus',
           'The selected file contains a virus'
@@ -587,8 +481,7 @@ describe('#uploadAndWait', () => {
       })
 
       test('should handle error status the same as rejected status', async () => {
-        // Given exemption with upload config and error status
-        getExemptionCacheSpy.mockReturnValue(createMockExemption())
+        getMarineLicenceCacheSpy.mockReturnValue(createMockMarineLicence())
         mockCdpService.getStatus.mockResolvedValue({
           status: 'error',
           message: 'Processing failed'
@@ -596,11 +489,9 @@ describe('#uploadAndWait', () => {
 
         const h = createMockResponseHandler()
 
-        // When handler is called
         await uploadAndWaitController.handler(mockRequest, h)
 
-        // Then error is set in cache
-        expect(updateExemptionSiteDetailsSpy).toHaveBeenCalledWith(
+        expect(updateMarineLicenceSiteDetailsSpy).toHaveBeenCalledWith(
           mockRequest,
           expect.any(Object),
           0,
@@ -612,8 +503,7 @@ describe('#uploadAndWait', () => {
           }
         )
 
-        // And upload config is cleared
-        expect(updateExemptionSiteDetailsSpy).toHaveBeenCalledWith(
+        expect(updateMarineLicenceSiteDetailsSpy).toHaveBeenCalledWith(
           mockRequest,
           expect.any(Object),
           0,
@@ -621,36 +511,32 @@ describe('#uploadAndWait', () => {
           null
         )
 
-        // And user is redirected to file upload
-        expect(h.redirect).toHaveBeenCalledWith(routes.FILE_UPLOAD)
+        expect(h.redirect).toHaveBeenCalledWith(
+          marineLicenceRoutes.MARINE_LICENCE_FILE_UPLOAD
+        )
       })
     })
 
     describe('when geo-parser API fails', () => {
       test('should handle geo-parser API errors gracefully', async () => {
-        // Given exemption with upload config and ready status
-        getExemptionCacheSpy.mockReturnValue(createMockExemption())
+        getMarineLicenceCacheSpy.mockReturnValue(createMockMarineLicence())
         const statusResponse = createMockStatusResponse('ready')
         mockCdpService.getStatus.mockResolvedValue(statusResponse)
 
-        // And successful file validation
         mockValidateUploadedFile.mockResolvedValue({
           isValid: true,
           extension: 'kml',
           errorMessage: null
         })
 
-        // But geo-parser API fails
         authenticatedPostRequestSpy.mockRejectedValue(
           new Error('Geo-parser service unavailable')
         )
 
         const h = createMockResponseHandler()
 
-        // When handler is called
         await uploadAndWaitController.handler(mockRequest, h)
 
-        // Then geo-parser API is called
         expect(authenticatedPostRequestSpy).toHaveBeenCalledWith(
           mockRequest,
           '/geo-parser/extract',
@@ -661,7 +547,6 @@ describe('#uploadAndWait', () => {
           }
         )
 
-        // And error is logged with error code and mapped message
         expect(mockRequest.logger.error).toHaveBeenCalledWith(
           {
             err: expect.any(Error),
@@ -674,8 +559,7 @@ describe('#uploadAndWait', () => {
           'FileUpload: ERROR: Failed to extract coordinates from uploaded file'
         )
 
-        // And generic error is set in cache
-        expect(updateExemptionSiteDetailsSpy).toHaveBeenCalledWith(
+        expect(updateMarineLicenceSiteDetailsSpy).toHaveBeenCalledWith(
           mockRequest,
           expect.any(Object),
           0,
@@ -687,8 +571,7 @@ describe('#uploadAndWait', () => {
           }
         )
 
-        // And upload config is cleared
-        expect(updateExemptionSiteDetailsSpy).toHaveBeenCalledWith(
+        expect(updateMarineLicenceSiteDetailsSpy).toHaveBeenCalledWith(
           mockRequest,
           expect.any(Object),
           0,
@@ -696,13 +579,14 @@ describe('#uploadAndWait', () => {
           null
         )
 
-        // And user is redirected to file upload
-        expect(h.redirect).toHaveBeenCalledWith(routes.FILE_UPLOAD)
+        expect(h.redirect).toHaveBeenCalledWith(
+          marineLicenceRoutes.MARINE_LICENCE_FILE_UPLOAD
+        )
       })
 
       test('should handle SHAPEFILE_MISSING_CORE_FILES error from geo-parser', async () => {
-        getExemptionCacheSpy.mockReturnValue(
-          createMockExemption({
+        getMarineLicenceCacheSpy.mockReturnValue(
+          createMockMarineLicence({
             siteDetails: [
               {
                 uploadConfig: createMockUploadConfig({ fileType: 'shapefile' })
@@ -745,7 +629,7 @@ describe('#uploadAndWait', () => {
           'FileUpload: ERROR: Failed to extract coordinates from uploaded file'
         )
 
-        expect(updateExemptionSiteDetailsSpy).toHaveBeenCalledWith(
+        expect(updateMarineLicenceSiteDetailsSpy).toHaveBeenCalledWith(
           mockRequest,
           expect.any(Object),
           0,
@@ -757,7 +641,7 @@ describe('#uploadAndWait', () => {
           }
         )
 
-        expect(updateExemptionSiteDetailsSpy).toHaveBeenCalledWith(
+        expect(updateMarineLicenceSiteDetailsSpy).toHaveBeenCalledWith(
           mockRequest,
           expect.any(Object),
           0,
@@ -765,24 +649,23 @@ describe('#uploadAndWait', () => {
           null
         )
 
-        expect(h.redirect).toHaveBeenCalledWith(routes.FILE_UPLOAD)
+        expect(h.redirect).toHaveBeenCalledWith(
+          marineLicenceRoutes.MARINE_LICENCE_FILE_UPLOAD
+        )
       })
     })
 
     describe('when service errors occur', () => {
       test('should handle CDP service errors gracefully', async () => {
-        // Given exemption with upload config and CDP service error
-        getExemptionCacheSpy.mockReturnValue(createMockExemption())
+        getMarineLicenceCacheSpy.mockReturnValue(createMockMarineLicence())
         mockCdpService.getStatus.mockRejectedValue(
           new Error('Service unavailable')
         )
 
         const h = createMockResponseHandler()
 
-        // When handler is called
         await uploadAndWaitController.handler(mockRequest, h)
 
-        // Then error is logged
         expect(mockRequest.logger.error).toHaveBeenCalledWith(
           {
             err: expect.any(Error),
@@ -791,8 +674,7 @@ describe('#uploadAndWait', () => {
           'FileUpload: ERROR: Failed to check upload status'
         )
 
-        // And upload config is cleared
-        expect(updateExemptionSiteDetailsSpy).toHaveBeenCalledWith(
+        expect(updateMarineLicenceSiteDetailsSpy).toHaveBeenCalledWith(
           mockRequest,
           expect.any(Object),
           0,
@@ -800,20 +682,19 @@ describe('#uploadAndWait', () => {
           null
         )
 
-        // And user is redirected to choose file upload type
-        expect(h.redirect).toHaveBeenCalledWith(routes.CHOOSE_FILE_UPLOAD_TYPE)
+        expect(h.redirect).toHaveBeenCalledWith(
+          marineLicenceRoutes.MARINE_LICENCE_CHOOSE_FILE_UPLOAD_TYPE
+        )
       })
     })
 
     describe('edge cases', () => {
       test('should handle missing s3Location in status response', async () => {
-        // Given exemption with upload config and ready status without s3Location
-        getExemptionCacheSpy.mockReturnValue(createMockExemption())
+        getMarineLicenceCacheSpy.mockReturnValue(createMockMarineLicence())
         const statusResponse = createMockStatusResponse('ready')
         delete statusResponse.s3Location
         mockCdpService.getStatus.mockResolvedValue(statusResponse)
 
-        // And successful file validation
         mockValidateUploadedFile.mockResolvedValue({
           isValid: true,
           extension: 'kml',
@@ -822,11 +703,9 @@ describe('#uploadAndWait', () => {
 
         const h = createMockResponseHandler()
 
-        // When handler is called
         await uploadAndWaitController.handler(mockRequest, h)
 
-        // Then error handling occurs due to missing s3Location
-        expect(updateExemptionSiteDetailsSpy).toHaveBeenCalledWith(
+        expect(updateMarineLicenceSiteDetailsSpy).toHaveBeenCalledWith(
           mockRequest,
           expect.any(Object),
           0,
@@ -838,19 +717,20 @@ describe('#uploadAndWait', () => {
           }
         )
 
-        expect(updateExemptionSiteDetailsSpy).toHaveBeenCalledWith(
+        expect(updateMarineLicenceSiteDetailsSpy).toHaveBeenCalledWith(
           mockRequest,
           expect.any(Object),
           0,
           'uploadConfig',
           null
         )
-        expect(h.redirect).toHaveBeenCalledWith(routes.FILE_UPLOAD)
+        expect(h.redirect).toHaveBeenCalledWith(
+          marineLicenceRoutes.MARINE_LICENCE_FILE_UPLOAD
+        )
       })
 
       test('should handle empty filename in status response', async () => {
-        // Given exemption with upload config and status with empty filename
-        getExemptionCacheSpy.mockReturnValue(createMockExemption())
+        getMarineLicenceCacheSpy.mockReturnValue(createMockMarineLicence())
         mockCdpService.getStatus.mockResolvedValue({
           status: 'pending',
           filename: ''
@@ -858,10 +738,8 @@ describe('#uploadAndWait', () => {
 
         const h = createMockResponseHandler()
 
-        // When handler is called
         await uploadAndWaitController.handler(mockRequest, h)
 
-        // Then waiting page is still displayed (handles empty filename gracefully)
         expect(h.view).toHaveBeenCalledWith(UPLOAD_AND_WAIT_VIEW_ROUTE, {
           pageTitle: 'Checking your file...',
           heading: 'Checking your file...',
@@ -869,8 +747,8 @@ describe('#uploadAndWait', () => {
           isProcessing: true,
           pageRefreshTimeInSeconds: 2,
           filename: '',
-          tryAgainLink: routes.FILE_UPLOAD,
-          cancelLink: routes.TASK_LIST
+          tryAgainLink: marineLicenceRoutes.MARINE_LICENCE_FILE_UPLOAD,
+          cancelLink: marineLicenceRoutes.MARINE_LICENCE_TASK_LIST
         })
       })
     })

@@ -14,9 +14,10 @@ const cancelLink = `${marineLicenceRoutes.MARINE_LICENCE_TASK_LIST}?cancel=site-
 
 describe('#coordinatesType (marine licence)', () => {
   beforeEach(() => {
-    vi.mocked(getMarineLicenceCache).mockReturnValue(
-      mockMarineLicenceApplication
-    )
+    vi.mocked(getMarineLicenceCache).mockReturnValue({
+      ...mockMarineLicenceApplication,
+      siteDetails: []
+    })
   })
 
   describe('#coordinatesTypeController', () => {

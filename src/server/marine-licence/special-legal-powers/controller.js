@@ -10,7 +10,7 @@ import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
 import { authenticatedPatchRequest } from '#src/server/common/helpers/authenticated-requests.js'
 import { USER_TYPES } from '#src/server/common/constants/user-types.js'
 import { getUserSession } from '#src/server/common/plugins/auth/utils.js'
-import { createFailAction } from '#src/server/common/helpers/marine-licence/createFailAction.js'
+import { createMarineLicenceFailAction } from '#src/server/common/helpers/marine-licence/createMarineLicenceFailAction.js'
 
 import joi from 'joi'
 
@@ -80,7 +80,7 @@ export const specialLegalPowersSubmitController = {
           })
         })
       }),
-      failAction: createFailAction({
+      failAction: createMarineLicenceFailAction({
         viewRoute: SPECIAL_LEGAL_POWERS_VIEW_ROUTE,
         settings: specialLegalPowersSettings,
         errorMessages,

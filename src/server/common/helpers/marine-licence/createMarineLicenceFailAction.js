@@ -4,7 +4,7 @@ import {
   mapErrorsForDisplay
 } from '#src/server/common/helpers/errors.js'
 
-export const createFailAction = ({
+export const createMarineLicenceFailAction = ({
   viewRoute,
   settings,
   errorMessages,

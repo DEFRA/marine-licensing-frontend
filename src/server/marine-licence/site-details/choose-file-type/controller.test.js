@@ -26,9 +26,10 @@ describe('#chooseFileType (marine licence)', () => {
   const getServer = setupTestServer()
 
   beforeEach(() => {
-    vi.mocked(getMarineLicenceCache).mockReturnValue(
-      mockMarineLicenceApplication
-    )
+    vi.mocked(getMarineLicenceCache).mockReturnValue({
+      ...mockMarineLicenceApplication,
+      siteDetails: []
+    })
   })
 
   describe('#chooseFileTypeController', () => {
@@ -185,7 +186,7 @@ describe('#chooseFileType (marine licence)', () => {
       )
 
       expect(h.redirect).toHaveBeenCalledWith(
-        marineLicenceRoutes.MARINE_LICENCE_CHOOSE_FILE_UPLOAD_TYPE
+        marineLicenceRoutes.MARINE_LICENCE_FILE_UPLOAD
       )
       expect(h.redirect().takeover).toHaveBeenCalled()
     })

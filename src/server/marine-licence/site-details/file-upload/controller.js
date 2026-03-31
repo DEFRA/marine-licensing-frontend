@@ -1,11 +1,6 @@
-import {
-  getExemptionCache,
-  updateExemptionSiteDetails
-} from '#src/server/common/helpers/exemptions/session-cache/utils.js'
 import { getCdpUploadService } from '#src/services/cdp-upload-service/index.js'
-import { routes } from '#src/server/common/constants/routes.js'
+import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
 import { config } from '#src/config/config.js'
-import { getSiteDetailsBySite } from '#src/server/common/helpers/exemptions/session-cache/site-details-utils.js'
 import {
   getFileTypeContent,
   createFileUploadErrorDisplay
@@ -14,12 +9,18 @@ import {
   fileUploadPageSettings,
   FILE_UPLOAD_VIEW_ROUTE
 } from '#src/server/common/helpers/file-upload/constants.js'
+import {
+  getMarineLicenceCache,
+  updateMarineLicenceSiteDetails
+} from '#src/server/common/helpers/marine-licence/session-cache/utils.js'
+import { getSiteDetailsBySite } from '#src/server/common/helpers/exemptions/session-cache/site-details-utils.js'
 
-const s3PathForExemptions = 'exemptions'
+const s3PathForMarineLicence = 'marine-licence'
+
 export const fileUploadController = {
   async handler(request, h) {
-    const exemption = getExemptionCache(request)
-    const site = getSiteDetailsBySite(exemption)
+    const marineLicence = getMarineLicenceCache(request)
+    const site = getSiteDetailsBySite(marineLicence)
 
     const { fileUploadType, uploadedFile, uploadError } = site
 
@@ -28,7 +29,9 @@ export const fileUploadController = {
     )
 
     if (!fileUploadType) {
-      return h.redirect(routes.CHOOSE_FILE_UPLOAD_TYPE)
+      return h.redirect(
+        marineLicenceRoutes.MARINE_LICENCE_CHOOSE_FILE_UPLOAD_TYPE
+      )
     }
 
     const fileTypeContent = getFileTypeContent(fileUploadType)
@@ -41,7 +44,7 @@ export const fileUploadController = {
       errors = errorDisplay.errors
 
       // Clear error from session after retrieving
-      await updateExemptionSiteDetails(request, h, 0, 'uploadError', null)
+      await updateMarineLicenceSiteDetails(request, h, 0, 'uploadError', null)
     }
 
     if (uploadedFile && !uploadError) {
@@ -54,15 +57,15 @@ export const fileUploadController = {
       const cdpService = getCdpUploadService()
       const cdpUploadConfig = config.get('cdpUploader')
       const s3Bucket = cdpUploadConfig.s3Bucket
-      const redirectUrl = routes.UPLOAD_AND_WAIT
+      const redirectUrl = marineLicenceRoutes.MARINE_LICENCE_UPLOAD_AND_WAIT
       const uploadConfig = await cdpService.initiate({
         redirectUrl,
-        s3Path: s3PathForExemptions,
+        s3Path: s3PathForMarineLicence,
         s3Bucket
       })
 
       // Store upload configuration in session
-      await updateExemptionSiteDetails(request, h, 0, 'uploadConfig', {
+      await updateMarineLicenceSiteDetails(request, h, 0, 'uploadConfig', {
         uploadId: uploadConfig.uploadId,
         statusUrl: uploadConfig.statusUrl,
         fileType: fileUploadType
@@ -72,13 +75,13 @@ export const fileUploadController = {
       return h.view(FILE_UPLOAD_VIEW_ROUTE, {
         ...fileUploadPageSettings,
         ...fileTypeContent,
-        projectName: exemption.projectName,
+        projectName: marineLicence.projectName,
         uploadUrl: uploadConfig.uploadUrl,
         maxFileSize: uploadConfig.maxFileSize,
         acceptAttribute: fileTypeContent.acceptAttribute,
         fileUploadType,
-        backLink: routes.CHOOSE_FILE_UPLOAD_TYPE,
-        cancelLink: `${routes.TASK_LIST}?cancel=site-details`,
+        backLink: marineLicenceRoutes.MARINE_LICENCE_CHOOSE_FILE_UPLOAD_TYPE,
+        cancelLink: `${marineLicenceRoutes.MARINE_LICENCE_TASK_LIST}?cancel=site-details`,
         errorSummary,
         errors
       })
@@ -86,13 +89,15 @@ export const fileUploadController = {
       request.logger.error(
         {
           err: error,
-          exemptionId: exemption.id,
+          marineLicenceId: marineLicence.id,
           fileUploadType
         },
         'Failed to initialize file upload'
       )
 
-      return h.redirect(routes.CHOOSE_FILE_UPLOAD_TYPE)
+      return h.redirect(
+        marineLicenceRoutes.MARINE_LICENCE_CHOOSE_FILE_UPLOAD_TYPE
+      )
     }
   }
 }

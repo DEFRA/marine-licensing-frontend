@@ -1,17 +1,14 @@
-import { config } from '#src/config/config.js'
-import { routes } from '#src/server/common/constants/routes.js'
-import { getSiteDetailsBySite } from '#src/server/common/helpers/exemptions/session-cache/site-details-utils.js'
+import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
 import {
-  getExemptionCache,
-  updateExemptionMultipleSiteDetails,
-  updateExemptionSiteDetails,
-  updateExemptionSiteDetailsBatch
-} from '#src/server/common/helpers/exemptions/session-cache/utils.js'
+  getMarineLicenceCache,
+  updateMarineLicenceSiteDetails,
+  updateMarineLicenceSiteDetailsBatch
+} from '#src/server/common/helpers/marine-licence/session-cache/utils.js'
 import { getCdpUploadService } from '#src/services/cdp-upload-service/index.js'
 import {
-  isMultipleSitesFile,
   getCdpErrorMessageFromCode,
-  getGeoParserErrorMessage
+  getGeoParserErrorMessage,
+  isMultipleSitesFile
 } from '#src/server/common/helpers/file-upload/file-upload.js'
 import {
   extractCoordinates,
@@ -24,6 +21,9 @@ import {
   UPLOAD_AND_WAIT_VIEW_ROUTE,
   uploadAndWaitPageSettings
 } from '#src/server/common/helpers/file-upload/constants.js'
+import { getSiteDetailsBySite } from '#src/server/common/helpers/exemptions/session-cache/site-details-utils.js'
+import { saveSiteDetailsToBackend } from '#src/server/common/helpers/marine-licence/save-site-details.js'
+import { config } from '#src/config/config.js'
 
 async function handleGeoParserError(request, h, error, filename, fileType) {
   const errorCode = extractGeoParserErrorCode(error)
@@ -48,7 +48,7 @@ async function handleGeoParserError(request, h, error, filename, fileType) {
     'FileUpload: ERROR: Failed to extract coordinates from uploaded file'
   )
 
-  return { redirect: routes.FILE_UPLOAD }
+  return { redirect: marineLicenceRoutes.MARINE_LICENCE_FILE_UPLOAD }
 }
 
 async function handleCdpRejectionError(request, h, status, fileType) {
@@ -73,15 +73,15 @@ async function handleCdpRejectionError(request, h, status, fileType) {
   )
 
   await storeUploadError(request, h, errorDetails, fileType)
-  return { redirect: routes.FILE_UPLOAD }
+  return { redirect: marineLicenceRoutes.MARINE_LICENCE_FILE_UPLOAD }
 }
 
 async function clearUploadSession(request, h) {
-  await updateExemptionSiteDetails(request, h, 0, 'uploadConfig', null)
+  await updateMarineLicenceSiteDetails(request, h, 0, 'uploadConfig', null)
 }
 
 async function storeUploadError(request, h, errorDetails, fileType) {
-  await updateExemptionSiteDetails(request, h, 0, 'uploadError', {
+  await updateMarineLicenceSiteDetails(request, h, 0, 'uploadError', {
     message: errorDetails.message,
     fieldName: errorDetails.fieldName,
     fileType
@@ -89,14 +89,14 @@ async function storeUploadError(request, h, errorDetails, fileType) {
   await clearUploadSession(request, h)
 }
 
-function handleProcessingStatus(status, exemption, h) {
+function handleProcessingStatus(status, marineLicence, h) {
   return h.view(UPLOAD_AND_WAIT_VIEW_ROUTE, {
     ...uploadAndWaitPageSettings,
-    projectName: exemption.projectName,
+    projectName: marineLicence.projectName,
     isProcessing: true,
     filename: status.filename,
-    tryAgainLink: routes.FILE_UPLOAD,
-    cancelLink: routes.TASK_LIST
+    tryAgainLink: marineLicenceRoutes.MARINE_LICENCE_FILE_UPLOAD,
+    cancelLink: marineLicenceRoutes.MARINE_LICENCE_TASK_LIST
   })
 }
 
@@ -111,14 +111,9 @@ const processValidatedFile = async (status, uploadConfig, request, h) => {
       h
     })
 
-    await updateExemptionMultipleSiteDetails(
-      request,
-      h,
-      'multipleSitesEnabled',
-      isMultipleSitesFile(coordinateData)
-    )
+    logSuccessfulProcessing(request, status, uploadConfig, coordinateData)
 
-    updateExemptionSiteDetailsBatch(
+    updateMarineLicenceSiteDetailsBatch(
       request,
       status,
       coordinateData,
@@ -131,13 +126,9 @@ const processValidatedFile = async (status, uploadConfig, request, h) => {
       }
     )
 
-    logSuccessfulProcessing(request, status, uploadConfig, coordinateData)
+    await saveSiteDetailsToBackend(request, h)
 
-    if (isMultipleSitesFile(coordinateData)) {
-      return h.redirect(routes.SAME_ACTIVITY_DATES)
-    }
-
-    return h.redirect(routes.ACTIVITY_DATES)
+    return h.redirect(marineLicenceRoutes.MARINE_LICENCE_FILE_UPLOAD)
   } catch (error) {
     await handleGeoParserError(
       request,
@@ -146,18 +137,16 @@ const processValidatedFile = async (status, uploadConfig, request, h) => {
       status.filename,
       uploadConfig.fileType
     )
-    return h.redirect(routes.FILE_UPLOAD)
+    return h.redirect(marineLicenceRoutes.MARINE_LICENCE_FILE_UPLOAD)
   }
 }
 
 async function handleRejectedStatus(status, uploadConfig, request, h) {
-  // Handle CDP rejection/error and redirect
   await handleCdpRejectionError(request, h, status, uploadConfig.fileType)
-  return h.redirect(routes.FILE_UPLOAD)
+  return h.redirect(marineLicenceRoutes.MARINE_LICENCE_FILE_UPLOAD)
 }
 
 function handleUnknownStatus(request, uploadConfig, status, h) {
-  // Unknown status - redirect to file type selection
   request.logger.warn(
     {
       uploadId: uploadConfig.uploadId,
@@ -166,11 +155,11 @@ function handleUnknownStatus(request, uploadConfig, status, h) {
     'FileUpload: Unknown upload status'
   )
 
-  return h.redirect(routes.CHOOSE_FILE_UPLOAD_TYPE)
+  return h.redirect(marineLicenceRoutes.MARINE_LICENCE_CHOOSE_FILE_UPLOAD_TYPE)
 }
 
 async function processUploadStatus(status, context) {
-  const { uploadConfig, request, h, exemption } = context
+  const { uploadConfig, request, h, marineLicence } = context
   request.logger.debug(
     `Upload status check:  ${JSON.stringify(
       {
@@ -184,13 +173,13 @@ async function processUploadStatus(status, context) {
   )
 
   if (status.status === 'pending' || status.status === 'scanning') {
-    return handleProcessingStatus(status, exemption, h)
+    return handleProcessingStatus(status, marineLicence, h)
   }
 
   if (status.status === 'ready') {
     const redirect = await handleReadyStatus(status, uploadConfig, request, h, {
       storeUploadError,
-      fileUploadRoute: routes.FILE_UPLOAD
+      fileUploadRoute: marineLicenceRoutes.MARINE_LICENCE_FILE_UPLOAD
     })
     if (redirect) {
       return redirect
@@ -202,19 +191,20 @@ async function processUploadStatus(status, context) {
     return handleRejectedStatus(status, uploadConfig, request, h)
   }
 
-  // Unknown status
   return handleUnknownStatus(request, uploadConfig, status, h)
 }
 
 export const uploadAndWaitController = {
   async handler(request, h) {
-    const exemption = getExemptionCache(request)
-    const site = getSiteDetailsBySite(exemption)
+    const marineLicence = getMarineLicenceCache(request)
+    const site = getSiteDetailsBySite(marineLicence)
 
     const { uploadConfig } = site
 
     if (!uploadConfig) {
-      return h.redirect(routes.CHOOSE_FILE_UPLOAD_TYPE)
+      return h.redirect(
+        marineLicenceRoutes.MARINE_LICENCE_CHOOSE_FILE_UPLOAD_TYPE
+      )
     }
 
     try {
@@ -228,7 +218,7 @@ export const uploadAndWaitController = {
         uploadConfig,
         request,
         h,
-        exemption
+        marineLicence
       })
     } catch (error) {
       request.logger.error(
@@ -239,9 +229,11 @@ export const uploadAndWaitController = {
         'FileUpload: ERROR: Failed to check upload status'
       )
 
-      // Clear upload config and redirect to file type selection
-      await updateExemptionSiteDetails(request, h, 0, 'uploadConfig', null)
-      return h.redirect(routes.CHOOSE_FILE_UPLOAD_TYPE)
+      await updateMarineLicenceSiteDetails(request, h, 0, 'uploadConfig', null)
+
+      return h.redirect(
+        marineLicenceRoutes.MARINE_LICENCE_CHOOSE_FILE_UPLOAD_TYPE
+      )
     }
   }
 }

@@ -7,7 +7,8 @@ import {
   clearSavedMarineLicenceSiteDetails,
   getMarineLicenceCache,
   setMarineLicenceCache,
-  updateMarineLicenceSiteDetails
+  updateMarineLicenceSiteDetails,
+  updateMarineLicenceSiteDetailsBatch
 } from '#src/server/common/helpers/marine-licence/session-cache/utils.js'
 
 vi.mock('@hapi/hoek', () => ({
@@ -238,6 +239,291 @@ describe('#utils', () => {
       expect(mockRequest.yar.commit).toHaveBeenCalledWith(mockH)
 
       expect(result).toEqual({ coordinatesType: null })
+    })
+  })
+
+  describe('updateMarineLicenceSiteDetailsBatch', () => {
+    let mockRequest
+
+    const mockStatus = {
+      filename: 'test-file',
+      status: 'ready',
+      s3Location: {
+        s3Bucket: 'test-bucket',
+        s3Key: 'test-key',
+        fileId: 'test-file-id',
+        s3Url: 'https://test-url',
+        checksumSha256: 'test-checksum'
+      }
+    }
+
+    const mockS3Location = {
+      s3Bucket: 'test-bucket',
+      s3Key: 'test-key'
+    }
+
+    beforeEach(() => {
+      mockRequest = {
+        yar: {
+          get: vi.fn(),
+          set: vi.fn()
+        }
+      }
+    })
+
+    test('should update multiple siteDetails properties in a single operation for a single site', () => {
+      const existingCache = {
+        projectName: 'Test Project',
+        siteDetails: [
+          {
+            coordinatesType: 'file',
+            fileUploadType: 'kml'
+          }
+        ]
+      }
+
+      mockRequest.yar.get.mockReturnValue(existingCache)
+
+      const mockCoordinateData = {
+        extractedCoordinates: [],
+        geoJSON: {
+          type: 'FeatureCollection',
+          features: [
+            {
+              type: 'Feature',
+              geometry: {
+                type: 'Polygon',
+                coordinates: [
+                  [
+                    [-1.2345, 50.9876],
+                    [-1.2335, 50.9876],
+                    [-1.2335, 50.9886],
+                    [-1.2345, 50.9886],
+                    [-1.2345, 50.9876]
+                  ]
+                ]
+              }
+            }
+          ]
+        }
+      }
+
+      const result = updateMarineLicenceSiteDetailsBatch(
+        mockRequest,
+        mockStatus,
+        mockCoordinateData,
+        mockS3Location,
+        { isMultipleSitesFile: false }
+      )
+
+      const expected = {
+        coordinatesType: 'file',
+        fileUploadType: 'kml',
+        uploadedFile: {
+          filename: 'test-file',
+          status: 'ready',
+          s3Location: {
+            s3Bucket: 'test-bucket',
+            s3Key: 'test-key',
+            fileId: 'test-file-id',
+            s3Url: 'https://test-url',
+            checksumSha256: 'test-checksum'
+          }
+        },
+        s3Location: {
+          s3Bucket: mockS3Location.s3Bucket,
+          s3Key: mockS3Location.s3Key,
+          fileId: mockStatus.s3Location.fileId,
+          s3Url: mockStatus.s3Location.s3Url,
+          checksumSha256: mockStatus.s3Location.checksumSha256
+        },
+        extractedCoordinates: expect.any(Array),
+        geoJSON: mockCoordinateData.geoJSON,
+        featureCount: 1,
+        uploadConfig: null
+      }
+
+      expect(mockRequest.yar.set).toHaveBeenCalledWith(
+        MARINE_LICENCE_CACHE_KEY,
+        {
+          projectName: 'Test Project',
+          siteDetails: [expected]
+        }
+      )
+
+      expect(result).toEqual([expected])
+    })
+
+    test('should update multiple siteDetails properties in a single operation for multiple sites', () => {
+      const existingCache = {
+        projectName: 'Test Project',
+        siteDetails: [
+          {
+            coordinatesType: 'file',
+            fileUploadType: 'kml'
+          }
+        ]
+      }
+
+      mockRequest.yar.get.mockReturnValue(existingCache)
+
+      const mockCoordinateData = {
+        extractedCoordinates: [[[-1.2345, 50.9876]], [[-1.2345, 50.9876]]],
+        geoJSON: {
+          type: 'FeatureCollection',
+          features: [
+            {
+              type: 'Feature',
+              geometry: {
+                type: 'Polygon',
+                coordinates: [
+                  [
+                    [-1.2345, 50.9876],
+                    [-1.2335, 50.9876],
+                    [-1.2335, 50.9886],
+                    [-1.2345, 50.9886],
+                    [-1.2345, 50.9876]
+                  ]
+                ]
+              }
+            },
+            {
+              type: 'Feature',
+              geometry: {
+                type: 'Polygon',
+                coordinates: [
+                  [
+                    [-1.1345, 51.9876],
+                    [-1.1335, 51.9876],
+                    [-1.1335, 51.9886],
+                    [-1.1345, 51.9886],
+                    [-1.1345, 51.9876]
+                  ]
+                ]
+              }
+            }
+          ]
+        }
+      }
+
+      const result = updateMarineLicenceSiteDetailsBatch(
+        mockRequest,
+        mockStatus,
+        mockCoordinateData,
+        mockS3Location,
+        { isMultipleSitesFile: true }
+      )
+
+      const expectedS3Location = {
+        s3Bucket: mockS3Location.s3Bucket,
+        s3Key: mockS3Location.s3Key,
+        fileId: mockStatus.s3Location.fileId,
+        s3Url: mockStatus.s3Location.s3Url,
+        checksumSha256: mockStatus.s3Location.checksumSha256
+      }
+
+      const expected = [
+        {
+          coordinatesType: 'file',
+          fileUploadType: 'kml',
+          uploadedFile: mockStatus,
+          s3Location: expectedS3Location,
+          extractedCoordinates: expect.any(Array),
+          geoJSON: {
+            type: 'FeatureCollection',
+            features: [mockCoordinateData.geoJSON.features[0]]
+          },
+          featureCount: 1,
+          uploadConfig: null
+        },
+        {
+          coordinatesType: 'file',
+          fileUploadType: 'kml',
+          uploadedFile: mockStatus,
+          s3Location: expectedS3Location,
+          extractedCoordinates: expect.any(Array),
+          geoJSON: {
+            type: 'FeatureCollection',
+            features: [mockCoordinateData.geoJSON.features[1]]
+          },
+          featureCount: 1,
+          uploadConfig: null
+        }
+      ]
+
+      expect(mockRequest.yar.set).toHaveBeenCalledWith(
+        MARINE_LICENCE_CACHE_KEY,
+        {
+          projectName: 'Test Project',
+          siteDetails: expected
+        }
+      )
+
+      expect(result).toEqual(expected)
+    })
+
+    test('should handle empty siteDetails', () => {
+      const existingCache = { projectName: 'Test Project' }
+      mockRequest.yar.get.mockReturnValue(existingCache)
+
+      const mockCoordinateData = {
+        extractedCoordinates: [],
+        geoJSON: {
+          type: 'FeatureCollection',
+          features: [
+            {
+              type: 'Feature',
+              geometry: {
+                type: 'Polygon',
+                coordinates: [
+                  [
+                    [-1.2345, 50.9876],
+                    [-1.2335, 50.9876],
+                    [-1.2335, 50.9886],
+                    [-1.2345, 50.9886],
+                    [-1.2345, 50.9876]
+                  ]
+                ]
+              }
+            }
+          ]
+        }
+      }
+
+      const result = updateMarineLicenceSiteDetailsBatch(
+        mockRequest,
+        mockStatus,
+        mockCoordinateData,
+        mockS3Location,
+        { isMultipleSitesFile: false }
+      )
+
+      const expected = {
+        coordinatesType: undefined,
+        fileUploadType: undefined,
+        uploadedFile: mockStatus,
+        s3Location: {
+          s3Bucket: mockS3Location.s3Bucket,
+          s3Key: mockS3Location.s3Key,
+          fileId: mockStatus.s3Location.fileId,
+          s3Url: mockStatus.s3Location.s3Url,
+          checksumSha256: mockStatus.s3Location.checksumSha256
+        },
+        extractedCoordinates: expect.any(Array),
+        geoJSON: mockCoordinateData.geoJSON,
+        featureCount: 1,
+        uploadConfig: null
+      }
+
+      expect(mockRequest.yar.set).toHaveBeenCalledWith(
+        MARINE_LICENCE_CACHE_KEY,
+        {
+          projectName: 'Test Project',
+          siteDetails: [expected]
+        }
+      )
+
+      expect(result).toEqual([expected])
     })
   })
 

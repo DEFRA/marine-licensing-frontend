@@ -10,23 +10,14 @@
   {% endif %}
 
   {% set _ = rows.push({
-    key: { text: "Do you consent to the MMO publishing your project information publicly?" },
+    key: { text: "Is there any reason your information cannot be shared publicly?" },
     value: consentValue,
-    actions: {
-        items: [
-          {
-            href: "/marine-licence/sharing-your-project-information-publicly?from=check-your-answers",
-            text: "Change",
-            visuallyHiddenText: "sharing your project information publicly",
-            classes: "govuk-link--no-visited-state"
-          }
-        ]
-      } if not params.isReadOnly
+    classes: "govuk-summary-list__row--no-border"    
   }) %}
 
   {% if params.publicRegister.consent === 'yes' %}
     {% set _ = rows.push({
-      key: { text: "Details" },
+      key: { text: "Reason your information cannot be shared publicly" },
       value: { text: params.publicRegister.details }
     }) %}
   {% endif %}
@@ -38,11 +29,21 @@
     card: {
       title: {
         text: "Sharing your project information publicly"
-    },
+      },
       attributes: {
         id: "public-register-card"
-      }
-    },
+      },
+      actions: {
+        items: [
+          {
+            href: "/marine-licence/sharing-your-project-information-publicly?from=check-your-answers",
+            text: "Change",
+            visuallyHiddenText: "sharing your project information publicly",
+            classes: "govuk-link--no-visited-state"
+          }
+        ]
+      } if not params.isReadOnly
+    },    
     rows: rows
   }) }}
 

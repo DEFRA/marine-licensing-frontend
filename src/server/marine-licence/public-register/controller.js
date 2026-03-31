@@ -51,16 +51,16 @@ export const publicRegisterSubmitController = {
     validate: {
       payload: joi.object({
         consent: joi.string().valid('yes', 'no').required().messages({
-          'any.only': 'PUBLIC_REGISTER_CONSENT_REQUIRED',
-          'string.empty': 'PUBLIC_REGISTER_CONSENT_REQUIRED',
-          'any.required': 'PUBLIC_REGISTER_CONSENT_REQUIRED'
+          'any.only': errorMessages.PUBLIC_REGISTER_CONSENT_REQUIRED,
+          'string.empty': errorMessages.PUBLIC_REGISTER_CONSENT_REQUIRED,
+          'any.required': errorMessages.PUBLIC_REGISTER_CONSENT_REQUIRED
         }),
         details: joi.when('consent', {
           is: 'yes',
           then: joi.string().max(1000).required().messages({
-            'string.empty': 'PUBLIC_REGISTER_DETAILS_REQUIRED',
-            'any.required': 'PUBLIC_REGISTER_DETAILS_REQUIRED',
-            'string.max': 'PUBLIC_REGISTER_DETAILS_MAX_LENGTH'
+            'string.empty': errorMessages.PUBLIC_REGISTER_DETAILS_REQUIRED,
+            'any.required': errorMessages.PUBLIC_REGISTER_DETAILS_REQUIRED,
+            'string.max': errorMessages.PUBLIC_REGISTER_DETAILS_MAX_LENGTH
           })
         })
       }),

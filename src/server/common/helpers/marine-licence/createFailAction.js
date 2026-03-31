@@ -4,7 +4,12 @@ import {
   mapErrorsForDisplay
 } from '#src/server/common/helpers/errors.js'
 
-export const createFailAction = ({ viewRoute, settings, errorMessages, getBackLink }) => {
+export const createFailAction = ({
+  viewRoute,
+  settings,
+  errorMessages,
+  getBackLink
+}) => {
   return (request, h, err) => {
     const { payload } = request
     const { projectName } = getMarineLicenceCache(request)

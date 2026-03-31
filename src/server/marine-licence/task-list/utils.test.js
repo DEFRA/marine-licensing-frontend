@@ -66,7 +66,7 @@ describe('taskList utils', () => {
         transformSiteDetailsTaskList({ siteDetails: 'COMPLETED' })
       ).toEqual([
         {
-          href: marineLicenceRoutes.MARINE_LICENCE_SITE_DETAILS,
+          href: marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS,
           status: { text: 'Completed' },
           title: {
             classes: 'govuk-link--no-visited-state',
@@ -81,7 +81,7 @@ describe('taskList utils', () => {
         transformSiteDetailsTaskList({ siteDetails: 'IN_PROGRESS' })
       ).toEqual([
         {
-          href: marineLicenceRoutes.MARINE_LICENCE_SITE_DETAILS,
+          href: marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS,
           status: {
             tag: { text: 'In Progress', classes: 'govuk-tag--light-blue' }
           },

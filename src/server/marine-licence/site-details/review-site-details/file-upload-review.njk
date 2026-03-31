@@ -1,0 +1,78 @@
+{% extends 'layouts/page.njk' %}
+{% from "govuk/components/back-link/macro.njk" import govukBackLink %}
+{% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "cancel-button/macro.njk" import appCancelButton %}
+{% from "site-details-map/macro.njk" import appSiteDetailsMap %}
+{% from "incomplete-field/macro.njk" import appIncompleteField %}
+{% from "govuk/components/inset-text/macro.njk" import govukInsetText %}
+{% block head %}
+  {{ super() }}
+{% endblock %}
+{% block beforeContent %}
+  {{ super() }}
+<nav>
+  {{ govukBackLink({
+  text: "Back",
+  href: backLink
+}) }}
+</nav>
+{% endblock %}
+
+  {% block content %}
+    <div class="govuk-grid-row">
+      <div class="govuk-grid-column-full">
+        <span class="govuk-caption-l">{{ projectName }}</span>
+        <h1 class="govuk-heading-l">Review site details</h1>
+
+            {% if hasIncompleteFields %}
+
+              {% set incompleteWarningText %}
+                <p class="govuk-!-margin-bottom-3">The site details you've provided are saved.</p>
+                <p class="govuk-!-margin-bottom-3">You must complete all sections marked {{appIncompleteField()}} before you can send your information.</p>
+                <p class="govuk-!-margin-bottom-0">If you cannot finish now, you can return to this page later.</p>
+              {% endset %}
+
+              {{ govukInsetText({
+                html: incompleteWarningText
+              }) }}
+
+            {% endif  %}
+
+            {% set multipleSiteRows = [
+                {
+                    key: {
+                      text: "Method of providing site location"
+                    },
+                    value: {
+                      text: 'File uploaded'
+                    }
+                }
+            ] %}
+
+            {{ govukSummaryList({
+                card: {
+                  title: {
+                    text: "Providing the site location"
+                  },
+                  attributes: {
+                    id: "site-location-card"
+                  }
+                },
+                rows: multipleSiteRows
+            }) }}
+
+        <form method="POST">
+          <input type="hidden" name="csrfToken" value="{{ csrfToken }}">
+            <div class="govuk-button-group">
+              {{ govukButton({
+            text: "Continue",
+            attributes: {
+              id: "continue"
+            }
+          }) }}
+            </div>
+          </form>
+        </div>
+      </div>
+    {% endblock %}

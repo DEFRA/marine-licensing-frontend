@@ -17,6 +17,7 @@ import { RETURN_TO_CACHE_KEY } from '#src/server/common/constants/cache.js'
 vi.mock('~/src/server/common/helpers/exemptions/session-cache/utils.js')
 vi.mock('~/src/server/common/helpers/coordinate-utils.js')
 vi.mock('~/src/services/exemption-service/index.js')
+
 function createMockHandler(type = 'view') {
   if (type === 'redirect') {
     return { redirect: vi.fn() }

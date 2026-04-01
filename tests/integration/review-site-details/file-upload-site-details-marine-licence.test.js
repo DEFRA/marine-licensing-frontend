@@ -1,8 +1,5 @@
 import { JSDOM } from 'jsdom'
-import {
-  marineLicenceRoutes,
-  routes
-} from '~/src/server/common/constants/routes.js'
+import { marineLicenceRoutes } from '~/src/server/common/constants/routes.js'
 import { statusCodes } from '~/src/server/common/constants/status-codes.js'
 import { testScenarios } from './marine-licence-fixtures/file-upload-fixtures.js'
 import {
@@ -15,7 +12,10 @@ import {
   mockMarineLicence,
   setupTestServer
 } from '~/tests/integration/shared/test-setup-helpers.js'
-import { makeGetRequest } from '~/src/server/test-helpers/server-requests.js'
+import {
+  makeGetRequest,
+  makePostRequest
+} from '~/src/server/test-helpers/server-requests.js'
 import * as marineLicenceService from '~/src/services/marine-licence-service/index.js'
 
 vi.mock('~/src/services/marine-licence-service/index.js')
@@ -73,7 +73,9 @@ describe('ML Review Site Details - File Upload Integration Tests', () => {
       })
 
       expect(response.statusCode).toBe(statusCodes.redirect)
-      expect(response.headers.location).toBe(routes.TASK_LIST)
+      expect(response.headers.location).toBe(
+        marineLicenceRoutes.MARINE_LICENCE_TASK_LIST
+      )
     })
 
     test('should redirect to task list when coordinatesType is not file', async () => {
@@ -97,7 +99,26 @@ describe('ML Review Site Details - File Upload Integration Tests', () => {
       })
 
       expect(response.statusCode).toBe(statusCodes.redirect)
-      expect(response.headers.location).toBe(routes.TASK_LIST)
+      expect(response.headers.location).toBe(
+        marineLicenceRoutes.MARINE_LICENCE_TASK_LIST
+      )
+    })
+  })
+
+  describe('Form Submission', () => {
+    test('should redirect to task list on form submission', async () => {
+      mockMarineLicence(testScenarios[0].marineLicence)
+
+      const response = await makePostRequest({
+        url: marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS,
+        server: getServer(),
+        formData: {}
+      })
+
+      expect(response.statusCode).toBe(statusCodes.redirect)
+      expect(response.headers.location).toBe(
+        marineLicenceRoutes.MARINE_LICENCE_TASK_LIST
+      )
     })
   })
 

@@ -240,72 +240,70 @@ describe('#reviewSiteDetails', () => {
     })
   })
 
-  describe('Integration Tests', () => {
-    describe('POST Handler - Read-Only Flow', () => {
-      test('should redirect to task list if no id is present', async () => {
-        cacheUtils.getExemptionCache.mockReturnValue({})
+  describe('POST Handler - Read-Only Flow', () => {
+    test('should redirect to task list if no id is present', async () => {
+      cacheUtils.getExemptionCache.mockReturnValue({})
 
-        const { headers, statusCode } = await makePostRequest({
-          url: routes.REVIEW_SITE_DETAILS,
-          server: getServer(),
-          headers: {
-            referer: `http://localhost/${routes.WIDTH_OF_SITE}`
-          }
-        })
-
-        expect(headers.location).toBe(routes.TASK_LIST)
-        expect(statusCode).toBe(statusCodes.redirect)
-      })
-
-      test('should reset exemption and redirect to task list', async () => {
-        const request = {
-          payload: {},
-          logger: {
-            info: vi.fn(),
-            error: vi.fn(),
-            debug: vi.fn()
-          },
-          yar: {
-            flash: vi.fn().mockReturnValue([])
-          }
+      const { headers, statusCode } = await makePostRequest({
+        url: routes.REVIEW_SITE_DETAILS,
+        server: getServer(),
+        headers: {
+          referer: `http://localhost/${routes.WIDTH_OF_SITE}`
         }
-        getExemptionCacheSpy.mockReturnValue(mockExemption)
-        const h = { redirect: vi.fn() }
-
-        await reviewSiteDetailsSubmitController.handler(request, h)
-
-        expect(resetExemptionSiteDetailsSpy).toHaveBeenCalledWith(request, h)
-        expect(h.redirect).toHaveBeenCalledWith(routes.TASK_LIST)
       })
 
-      test('should redirect to check your answers when returnTo flash is set', async () => {
-        const request = {
-          payload: {},
-          logger: {},
-          yar: {
-            flash: vi.fn().mockReturnValue([routes.CHECK_YOUR_ANSWERS])
-          }
+      expect(headers.location).toBe(routes.TASK_LIST)
+      expect(statusCode).toBe(statusCodes.redirect)
+    })
+
+    test('should reset exemption and redirect to task list', async () => {
+      const request = {
+        payload: {},
+        logger: {
+          info: vi.fn(),
+          error: vi.fn(),
+          debug: vi.fn()
+        },
+        yar: {
+          flash: vi.fn().mockReturnValue([])
         }
-        getExemptionCacheSpy.mockReturnValue(mockExemption)
-        const h = { redirect: vi.fn() }
+      }
+      getExemptionCacheSpy.mockReturnValue(mockExemption)
+      const h = { redirect: vi.fn() }
 
-        await reviewSiteDetailsSubmitController.handler(request, h)
+      await reviewSiteDetailsSubmitController.handler(request, h)
 
-        expect(request.yar.flash).toHaveBeenCalledWith(RETURN_TO_CACHE_KEY)
-        expect(h.redirect).toHaveBeenCalledWith(routes.CHECK_YOUR_ANSWERS)
-        expect(resetExemptionSiteDetailsSpy).not.toHaveBeenCalled()
+      expect(resetExemptionSiteDetailsSpy).toHaveBeenCalledWith(request, h)
+      expect(h.redirect).toHaveBeenCalledWith(routes.TASK_LIST)
+    })
+
+    test('should redirect to check your answers when returnTo flash is set', async () => {
+      const request = {
+        payload: {},
+        logger: {},
+        yar: {
+          flash: vi.fn().mockReturnValue([routes.CHECK_YOUR_ANSWERS])
+        }
+      }
+      getExemptionCacheSpy.mockReturnValue(mockExemption)
+      const h = { redirect: vi.fn() }
+
+      await reviewSiteDetailsSubmitController.handler(request, h)
+
+      expect(request.yar.flash).toHaveBeenCalledWith(RETURN_TO_CACHE_KEY)
+      expect(h.redirect).toHaveBeenCalledWith(routes.CHECK_YOUR_ANSWERS)
+      expect(resetExemptionSiteDetailsSpy).not.toHaveBeenCalled()
+    })
+
+    test('should add another site correctly', async () => {
+      const { headers, statusCode } = await makePostRequest({
+        url: routes.REVIEW_SITE_DETAILS,
+        server: getServer(),
+        formData: { add: true }
       })
 
-      test('should add another site correctly', async () => {
-        const { headers, statusCode } = await makePostRequest({
-          url: routes.REVIEW_SITE_DETAILS,
-          server: getServer(),
-          formData: { add: true }
-        })
-
-        expect(statusCode).toBe(statusCodes.redirect)
-        expect(headers.location).toBe(`${routes.SITE_NAME}?site=3`)
-      })
+      expect(statusCode).toBe(statusCodes.redirect)
+      expect(headers.location).toBe(`${routes.SITE_NAME}?site=3`)
     })
   })
 })

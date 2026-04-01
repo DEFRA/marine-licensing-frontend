@@ -1,7 +1,4 @@
-import {
-  marineLicenceRoutes,
-  routes
-} from '#src/server/common/constants/routes.js'
+import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
 import { renderFileUploadReview } from './utils.js'
 import { getSiteDetailsBySite } from '#src/server/common/helpers/exemptions/session-cache/site-details-utils.js'
 import {
@@ -27,7 +24,7 @@ export const reviewSiteDetailsController = {
     await clearSavedMarineLicenceSiteDetails(request, h)
 
     if (!marineLicence.id) {
-      return h.redirect(routes.TASK_LIST)
+      return h.redirect(marineLicenceRoutes.MARINE_LICENCE_TASK_LIST)
     }
 
     const marineLicenceService = getMarineLicenceService(request)
@@ -53,7 +50,7 @@ export const reviewSiteDetailsController = {
       : false
 
     if (coordinatesType !== 'file') {
-      return h.redirect(routes.TASK_LIST)
+      return h.redirect(marineLicenceRoutes.MARINE_LICENCE_TASK_LIST)
     }
 
     return renderFileUploadReview(h, {
@@ -63,5 +60,11 @@ export const reviewSiteDetailsController = {
       reviewSiteDetailsPageData,
       returnToCheckYourAnswers
     })
+  }
+}
+
+export const reviewSiteDetailsSubmitController = {
+  async handler(_request, h) {
+    return h.redirect(marineLicenceRoutes.MARINE_LICENCE_TASK_LIST)
   }
 }

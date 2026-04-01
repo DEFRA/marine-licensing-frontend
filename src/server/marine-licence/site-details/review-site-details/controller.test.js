@@ -6,10 +6,7 @@ import {
   reviewSiteDetailsController
 } from '#src/server/marine-licence/site-details/review-site-details/controller.js'
 import { mockExemption } from '#src/server/test-helpers/mocks/exemption.js'
-import {
-  marineLicenceRoutes,
-  routes
-} from '#src/server/common/constants/routes.js'
+import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
 import { mockFileUploadMarineLicence } from '#src/server/test-helpers/mocks/marine-licence-mocks.js'
 import { mockRequest } from '#src/server/test-helpers/mocks/request.js'
 
@@ -49,56 +46,55 @@ describe('#reviewSiteDetails', () => {
       .mockResolvedValue(true)
   })
 
-  describe('Unit Tests', () => {
-    describe('GET Handler', () => {
-      test('should redirect to task list when no marine licence ID exists', async () => {
-        getMarineLicenceCacheSpy.mockReturnValueOnce({})
+  describe('reviewSiteDetailsController', () => {
+    test('should redirect to task list when no marine licence ID exists', async () => {
+      getMarineLicenceCacheSpy.mockReturnValueOnce({})
 
-        const h = createMockHandler('redirect')
+      const h = createMockHandler('redirect')
 
-        await reviewSiteDetailsController.handler(mockRequest, h)
+      await reviewSiteDetailsController.handler(mockRequest, h)
 
-        expect(mockRequest.yar.flash).not.toHaveBeenCalled()
+      expect(mockRequest.yar.flash).not.toHaveBeenCalled()
 
-        expect(h.redirect).toHaveBeenCalledWith(routes.TASK_LIST)
-      })
+      expect(h.redirect).toHaveBeenCalledWith(
+        marineLicenceRoutes.MARINE_LICENCE_TASK_LIST
+      )
+    })
 
-      test('should load data from ExemptionService', async () => {
-        getMarineLicenceCacheSpy.mockReturnValueOnce({ id: 'test-id' })
+    test('should load data from ExemptionService', async () => {
+      getMarineLicenceCacheSpy.mockReturnValueOnce({ id: 'test-id' })
 
-        const mockMarineLicenceServiceInstance = {
-          getMarineLicenceById: vi
-            .fn()
-            .mockResolvedValue(mockFileUploadMarineLicence)
-        }
-        vi.spyOn(
-          marineLicenceService,
-          'getMarineLicenceService'
-        ).mockReturnValue(mockMarineLicenceServiceInstance)
+      const mockMarineLicenceServiceInstance = {
+        getMarineLicenceById: vi
+          .fn()
+          .mockResolvedValue(mockFileUploadMarineLicence)
+      }
+      vi.spyOn(marineLicenceService, 'getMarineLicenceService').mockReturnValue(
+        mockMarineLicenceServiceInstance
+      )
 
-        const h = createMockHandler()
+      const h = createMockHandler()
 
-        await reviewSiteDetailsController.handler(mockRequest, h)
+      await reviewSiteDetailsController.handler(mockRequest, h)
 
-        expect(
-          marineLicenceService.getMarineLicenceService
-        ).toHaveBeenCalledWith(mockRequest)
+      expect(marineLicenceService.getMarineLicenceService).toHaveBeenCalledWith(
+        mockRequest
+      )
 
-        expect(setMarineLicenceCacheSpy).toHaveBeenCalled()
+      expect(setMarineLicenceCacheSpy).toHaveBeenCalled()
 
-        expect(
-          mockMarineLicenceServiceInstance.getMarineLicenceById
-        ).toHaveBeenCalledWith('test-id')
-        expect(h.view).toHaveBeenCalledWith(
-          FILE_UPLOAD_REVIEW_VIEW_ROUTE,
-          expect.objectContaining({
-            heading: 'Review site details',
-            pageTitle: 'Review site details',
-            backLink: marineLicenceRoutes.MARINE_LICENCE_FILE_UPLOAD,
-            projectName: 'Test Project'
-          })
-        )
-      })
+      expect(
+        mockMarineLicenceServiceInstance.getMarineLicenceById
+      ).toHaveBeenCalledWith('test-id')
+      expect(h.view).toHaveBeenCalledWith(
+        FILE_UPLOAD_REVIEW_VIEW_ROUTE,
+        expect.objectContaining({
+          heading: 'Review site details',
+          pageTitle: 'Review site details',
+          backLink: marineLicenceRoutes.MARINE_LICENCE_FILE_UPLOAD,
+          projectName: 'Test Project'
+        })
+      )
     })
   })
 })

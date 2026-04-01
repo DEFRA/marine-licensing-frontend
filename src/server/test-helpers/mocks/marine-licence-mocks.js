@@ -5,9 +5,8 @@ export const mockMarineLicenceTaskList = {
   projectName: 'COMPLETED',
   specialLegalPowers: 'COMPLETED',
   siteDetails: 'COMPLETED',
-  publicRegister: 'COMPLETED'
-  otherAuthorities: 'COMPLETED',
-  siteDetails: 'COMPLETED'
+  publicRegister: 'COMPLETED',
+  otherAuthorities: 'COMPLETED'
 }
 
 export const mockMarineLicenceApplication = {

@@ -84,7 +84,10 @@ export const taskListController = {
       ...otherPermissionsTaskListTransformed,
       ...projectDetailsTaskListTransformed,
       ...siteDetailsTaskListTransformed
-    ].every((task) => task.status.text === 'Completed')
+    ]
+      // Filter is temporary until we get to saving to the back end for 'Site Details'
+      .filter((task) => task.title.text !== 'Site details')
+      .every((task) => task.status.text === 'Completed')
 
     return h.view(TASK_LIST_VIEW_ROUTE, {
       ...taskListViewSettings,

@@ -46,6 +46,7 @@ export const marineLicenceRoutes = {
   MARINE_LICENCE_TASK_LIST: '/marine-licence/task-list',
   MARINE_LICENCE_DELETE: '/marine-licence/delete',
   MARINE_LICENCE_SPECIAL_LEGAL_POWERS: '/marine-licence/special-legal-powers',
+  MARINE_LICENCE_OTHER_AUTHORITIES: '/marine-licence/other-authorities',
   MARINE_LICENCE_SITE_DETAILS: '/marine-licence/site-details',
   MARINE_LICENCE_COORDINATES_TYPE_CHOICE:
     '/marine-licence/how-do-you-want-to-provide-the-coordinates',

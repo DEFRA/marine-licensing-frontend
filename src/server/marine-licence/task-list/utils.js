@@ -37,13 +37,19 @@ export const transformSharingTaskList = (taskList) => [
   }
 ]
 
-export const transformOtherPermissionsTaskList = (taskList) => [
-  {
+export const transformOtherPermissionsTaskList = (taskList, isCitizen) => {
+  const otherAuthorities = {
+    title: { text: 'Other authorities', classes: taskClasses },
+    href: marineLicenceRoutes.MARINE_LICENCE_OTHER_AUTHORITIES,
+    status: setStatus(taskList.otherAuthorities)
+  }
+  const specialLegalPowers = {
     title: { text: 'Special legal powers', classes: taskClasses },
     href: marineLicenceRoutes.MARINE_LICENCE_SPECIAL_LEGAL_POWERS,
     status: setStatus(taskList.specialLegalPowers)
   }
-]
+  return isCitizen ? [otherAuthorities] : [specialLegalPowers, otherAuthorities]
+}
 
 export const transformProjectDetailsTaskList = (taskList) => [
   {

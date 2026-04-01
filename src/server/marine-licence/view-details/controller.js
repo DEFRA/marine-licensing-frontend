@@ -55,6 +55,7 @@ export const viewDetailsController = {
         pageTitle: marineLicence.projectName,
         specialLegalPowers: marineLicence.specialLegalPowers,
         publicRegister: marineLicence.publicRegister,
+        otherAuthorities: marineLicence.otherAuthorities,
         isReadOnly: true,
         pageCaption,
         backLink: isApplicantView ? routes.DASHBOARD : null

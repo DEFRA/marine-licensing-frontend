@@ -1,7 +1,5 @@
 import { config } from '#src/config/config.js'
 import { routes } from '#src/server/common/constants/routes.js'
-import { authenticatedPostRequest } from '#src/server/common/helpers/authenticated-requests.js'
-import { extractCoordinatesFromGeoJSON } from '#src/server/common/helpers/coordinate-utils.js'
 import { getSiteDetailsBySite } from '#src/server/common/helpers/exemptions/session-cache/site-details-utils.js'
 import {
   getExemptionCache,
@@ -10,134 +8,25 @@ import {
   updateExemptionSiteDetailsBatch
 } from '#src/server/common/helpers/exemptions/session-cache/utils.js'
 import { getCdpUploadService } from '#src/services/cdp-upload-service/index.js'
-import { getFileValidationService } from '#src/services/file-validation/index.js'
-import { isMultipleSitesFile } from '#src/server/exemption/site-details/upload-and-wait/utils.js'
 import {
-  GEO_PARSER_ERROR_MESSAGES,
-  CDP_ERROR_MESSAGES,
-  FILE_TYPE_ERROR_MESSAGES,
-  DEFAULT_ERROR_MESSAGE,
-  DEFAULT_GEO_PARSER_ERROR_MESSAGE
-} from './error-messages.js'
-
-export const UPLOAD_AND_WAIT_VIEW_ROUTE =
-  'exemption/site-details/upload-and-wait/index'
-
-const pageSettings = {
-  pageTitle: 'Checking your file...',
-  heading: 'Checking your file...',
-  pageRefreshTimeInSeconds: 2
-}
-
-const getGeoParserErrorMessage = (errorCode) => {
-  return (
-    GEO_PARSER_ERROR_MESSAGES[errorCode] || DEFAULT_GEO_PARSER_ERROR_MESSAGE
-  )
-}
-
-const getCdpErrorMessageFromCode = (errorCode, fileType) => {
-  if (errorCode === 'INVALID_FILE_TYPE') {
-    return FILE_TYPE_ERROR_MESSAGES[fileType] || CDP_ERROR_MESSAGES[errorCode]
-  }
-
-  return CDP_ERROR_MESSAGES[errorCode] || DEFAULT_ERROR_MESSAGE
-}
-
-function getAllowedExtensions(fileType) {
-  switch (fileType) {
-    case 'kml':
-      return ['kml']
-    case 'shapefile':
-      return ['zip']
-    default:
-      return []
-  }
-}
-
-async function extractCoordinatesFromFile(request, s3Bucket, s3Key, fileType) {
-  try {
-    request.logger.info(
-      { s3Bucket, s3Key, fileType },
-      `FileUpload: Calling geo-parser API`
-    )
-    const response = await callGeoParserAPI(request, s3Bucket, s3Key, fileType)
-
-    const geoJSON = validateAndExtractGeoJSON(response)
-    const extractedCoordinates = extractCoordinatesFromGeoJSON(geoJSON)
-
-    logExtractionSuccess(request, geoJSON, extractedCoordinates)
-
-    return buildCoordinateResult(geoJSON, extractedCoordinates)
-  } catch (error) {
-    logExtractionError(request, error, { s3Bucket, s3Key, fileType })
-    throw error
-  }
-}
-
-const callGeoParserAPI = async (request, s3Bucket, s3Key, fileType) => {
-  return authenticatedPostRequest(request, '/geo-parser/extract', {
-    s3Bucket,
-    s3Key,
-    fileType
-  })
-}
-
-const validateAndExtractGeoJSON = (response) => {
-  const { payload } = response
-
-  if (payload?.message !== 'success') {
-    throw new Error('Invalid geo-parser response')
-  }
-
-  const geoJSON = payload.value
-  if (!geoJSON?.features) {
-    throw new Error('Invalid GeoJSON structure')
-  }
-
-  return geoJSON
-}
-
-const logExtractionSuccess = (request, geoJSON, extractedCoordinates) => {
-  request.logger.info(
-    {
-      featureCount: geoJSON.features.length,
-      coordinateCount: extractedCoordinates.length
-    },
-    'FileUpload: Successfully extracted coordinates'
-  )
-}
-
-const buildCoordinateResult = (geoJSON, extractedCoordinates) => ({
-  geoJSON,
-  extractedCoordinates,
-  featureCount: geoJSON.features.length
-})
-
-const logExtractionError = (request, error, fileContext) => {
-  request.logger.error(
-    {
-      err: error,
-      ...fileContext
-    },
-    'FileUpload: ERROR: Failed to extract coordinates from file'
-  )
-}
-
-async function handleValidationError(request, h, validation, fileType) {
-  const errorDetails = {
-    message: validation.errorMessage,
-    fieldName: 'file'
-  }
-  await storeUploadError(request, h, errorDetails, fileType)
-  return { redirect: routes.FILE_UPLOAD }
-}
+  isMultipleSitesFile,
+  getCdpErrorMessageFromCode,
+  getGeoParserErrorMessage
+} from '#src/server/common/helpers/file-upload/file-upload.js'
+import {
+  extractCoordinates,
+  extractGeoParserErrorCode
+} from '#src/server/common/helpers/file-upload/geo-parse-upload.js'
+import { handleReadyStatus } from '#src/server/common/helpers/file-upload/upload-status-handler.js'
+import { logSuccessfulProcessing } from '#src/server/common/helpers/file-upload/upload-logging.js'
+import { DEFAULT_ERROR_MESSAGE } from '#src/server/common/helpers/file-upload/error-messages.js'
+import {
+  UPLOAD_AND_WAIT_VIEW_ROUTE,
+  uploadAndWaitPageSettings
+} from '#src/server/common/helpers/file-upload/constants.js'
 
 async function handleGeoParserError(request, h, error, filename, fileType) {
-  let errorCode = null
-
-  if (error.data?.payload?.message) {
-    errorCode = error.data.payload.message
-  }
+  const errorCode = extractGeoParserErrorCode(error)
   const message = getGeoParserErrorMessage(errorCode)
 
   const errorDetails = {
@@ -200,72 +89,48 @@ async function storeUploadError(request, h, errorDetails, fileType) {
   await clearUploadSession(request, h)
 }
 
-async function storeSuccessfulUpload(
-  request,
-  h,
-  status,
-  coordinateData,
-  s3Location
-) {
-  await updateExemptionMultipleSiteDetails(
-    request,
-    h,
-    'multipleSitesEnabled',
-    isMultipleSitesFile(coordinateData)
-  )
-
-  updateExemptionSiteDetailsBatch(request, status, coordinateData, s3Location, {
-    isMultipleSitesFile: isMultipleSitesFile(coordinateData)
-  })
-}
-
 function handleProcessingStatus(status, exemption, h) {
-  // Show waiting page with meta refresh
   return h.view(UPLOAD_AND_WAIT_VIEW_ROUTE, {
-    ...pageSettings,
+    ...uploadAndWaitPageSettings,
     projectName: exemption.projectName,
     isProcessing: true,
-    filename: status.filename
+    filename: status.filename,
+    tryAgainLink: routes.FILE_UPLOAD,
+    cancelLink: routes.TASK_LIST
   })
-}
-
-async function handleReadyStatus(status, uploadConfig, request, h) {
-  const validationResult = await validateUploadedFile(
-    status,
-    uploadConfig,
-    request,
-    h
-  )
-  if (!validationResult.isValid) {
-    return h.redirect(routes.FILE_UPLOAD)
-  }
-
-  return processValidatedFile(status, uploadConfig, request, h)
-}
-
-const validateUploadedFile = async (status, uploadConfig, request, h) => {
-  const fileValidationService = getFileValidationService(request.logger)
-  const allowedExtensions = getAllowedExtensions(uploadConfig.fileType)
-  const validation = fileValidationService.validateFileExtension(
-    status.filename,
-    allowedExtensions
-  )
-
-  if (!validation.isValid) {
-    await handleValidationError(request, h, validation, uploadConfig.fileType)
-  }
-
-  return validation
 }
 
 const processValidatedFile = async (status, uploadConfig, request, h) => {
   try {
-    const coordinateData = await extractAndStoreCoordinates(
+    const cdpUploadConfig = config.get('cdpUploader')
+
+    const coordinateData = await extractCoordinates({
       status,
       uploadConfig,
       request,
       h
+    })
+
+    await updateExemptionMultipleSiteDetails(
+      request,
+      h,
+      'multipleSitesEnabled',
+      isMultipleSitesFile(coordinateData)
     )
+
+    updateExemptionSiteDetailsBatch(
+      request,
+      status,
+      coordinateData,
+      {
+        s3Bucket: cdpUploadConfig.s3Bucket,
+        s3Key: status.s3Location.s3Key
+      },
+      {
+        isMultipleSitesFile: isMultipleSitesFile(coordinateData)
+      }
+    )
+
     logSuccessfulProcessing(request, status, uploadConfig, coordinateData)
 
     if (isMultipleSitesFile(coordinateData)) {
@@ -285,40 +150,6 @@ const processValidatedFile = async (status, uploadConfig, request, h) => {
   }
 }
 
-const extractAndStoreCoordinates = async (status, uploadConfig, request, h) => {
-  const cdpUploadConfig = config.get('cdpUploader')
-  const s3Bucket = cdpUploadConfig.s3Bucket
-  const s3Key = status.s3Location.s3Key
-
-  const coordinateData = await extractCoordinatesFromFile(
-    request,
-    s3Bucket,
-    s3Key,
-    uploadConfig.fileType
-  )
-  await storeSuccessfulUpload(request, h, status, coordinateData, {
-    s3Bucket,
-    s3Key
-  })
-
-  return coordinateData
-}
-
-const logSuccessfulProcessing = (
-  request,
-  status,
-  uploadConfig,
-  coordinateData
-) => {
-  request.logger.info(
-    'FileUpload: File upload and coordinate extraction completed successfully',
-    {
-      filename: status.filename,
-      fileType: uploadConfig.fileType,
-      featureCount: coordinateData.featureCount
-    }
-  )
-}
 async function handleRejectedStatus(status, uploadConfig, request, h) {
   // Handle CDP rejection/error and redirect
   await handleCdpRejectionError(request, h, status, uploadConfig.fileType)
@@ -357,7 +188,14 @@ async function processUploadStatus(status, context) {
   }
 
   if (status.status === 'ready') {
-    return handleReadyStatus(status, uploadConfig, request, h)
+    const redirect = await handleReadyStatus(status, uploadConfig, request, h, {
+      storeUploadError,
+      fileUploadRoute: routes.FILE_UPLOAD
+    })
+    if (redirect) {
+      return redirect
+    }
+    return processValidatedFile(status, uploadConfig, request, h)
   }
 
   if (status.status === 'rejected' || status.status === 'error') {

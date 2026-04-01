@@ -1,6 +1,7 @@
 import { getByRole, getByText } from '@testing-library/dom'
 import { JSDOM } from 'jsdom'
 import { statusCodes } from '~/src/server/common/constants/status-codes.js'
+import { validateErrors } from '~/tests/integration/shared/expect-utils.js'
 
 export function sharedCoordinatesTypeTests({
   getRequest,
@@ -54,12 +55,14 @@ export function sharedCoordinatesTypeTests({
 
     const { document } = new JSDOM(result).window
 
-    expect(getByRole(document, 'alert')).toBeInTheDocument()
-
-    expect(
-      getByRole(document, 'link', {
-        name: 'Select how you want to provide the site location'
-      })
-    ).toBeInTheDocument()
+    validateErrors(
+      [
+        {
+          field: 'coordinatesType',
+          message: 'Select how you want to provide the site location'
+        }
+      ],
+      document
+    )
   })
 }

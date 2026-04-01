@@ -1,11 +1,9 @@
 import { vi } from 'vitest'
-import {
-  uploadAndWaitController,
-  UPLOAD_AND_WAIT_VIEW_ROUTE
-} from '#src/server/exemption/site-details/upload-and-wait/controller.js'
+import { uploadAndWaitController } from '#src/server/exemption/site-details/upload-and-wait/controller.js'
+import { UPLOAD_AND_WAIT_VIEW_ROUTE } from '#src/server/common/helpers/file-upload/constants.js'
 import * as cacheUtils from '#src/server/common/helpers/exemptions/session-cache/utils.js'
 import * as cdpUploadService from '#src/services/cdp-upload-service/index.js'
-import * as fileValidationService from '#src/services/file-validation/index.js'
+import * as geoParseUpload from '#src/server/common/helpers/file-upload/geo-parse-upload.js'
 import * as authenticatedRequests from '#src/server/common/helpers/authenticated-requests.js'
 import { mockExemption } from '#src/server/test-helpers/mocks/exemption.js'
 import { routes } from '#src/server/common/constants/routes.js'
@@ -13,8 +11,16 @@ import { config } from '#src/config/config.js'
 
 vi.mock('~/src/server/common/helpers/exemptions/session-cache/utils.js')
 vi.mock('~/src/services/cdp-upload-service/index.js')
-vi.mock('~/src/services/file-validation/index.js')
 vi.mock('~/src/server/common/helpers/authenticated-requests.js')
+vi.mock(
+  '~/src/server/common/helpers/file-upload/geo-parse-upload.js',
+  async () => {
+    const actual = await vi.importActual(
+      '~/src/server/common/helpers/file-upload/geo-parse-upload.js'
+    )
+    return { ...actual, validateUploadedFile: vi.fn() }
+  }
+)
 vi.mock('~/src/config/config.js')
 
 vi.mock('~/src/server/common/helpers/logging/logger-options.js', () => ({
@@ -133,18 +139,16 @@ const setupMockServices = () => {
     getStatus: vi.fn()
   }
 
-  const mockFileValidationService = {
-    validateFileExtension: vi.fn()
-  }
-
   vi.spyOn(cdpUploadService, 'getCdpUploadService').mockReturnValue(
     mockCdpService
   )
-  vi.spyOn(fileValidationService, 'getFileValidationService').mockReturnValue(
-    mockFileValidationService
+
+  const mockValidateUploadedFile = vi.spyOn(
+    geoParseUpload,
+    'validateUploadedFile'
   )
 
-  return { mockCdpService, mockFileValidationService }
+  return { mockCdpService, mockValidateUploadedFile }
 }
 
 const setupCacheSpies = () => {
@@ -227,11 +231,10 @@ const expectFileValidationFailure = async (
   mockRequest,
   getExemptionCacheSpy,
   mockCdpService,
-  mockFileValidationService,
+  mockValidateUploadedFile,
   updateExemptionSiteDetailsSpy,
   filename,
   fileType,
-  allowedExtensions,
   errorMessage
 ) => {
   // Given exemption with upload config and ready status
@@ -245,7 +248,7 @@ const expectFileValidationFailure = async (
   mockCdpService.getStatus.mockResolvedValue(statusResponse)
 
   // And failed file validation
-  mockFileValidationService.validateFileExtension.mockReturnValue({
+  mockValidateUploadedFile.mockResolvedValue({
     isValid: false,
     extension: filename.split('.').pop(),
     errorMessage
@@ -255,12 +258,6 @@ const expectFileValidationFailure = async (
 
   // When handler is called
   await uploadAndWaitController.handler(mockRequest, h)
-
-  // Then file validation is performed
-  expect(mockFileValidationService.validateFileExtension).toHaveBeenCalledWith(
-    filename,
-    allowedExtensions
-  )
 
   // And error handling occurs
   expect(updateExemptionSiteDetailsSpy).toHaveBeenCalledWith(
@@ -296,7 +293,7 @@ describe('#uploadAndWait', () => {
   let updateExemptionSiteDetailsSpy
   let updateExemptionSiteDetailsBatchSpy
   let mockCdpService
-  let mockFileValidationService
+  let mockValidateUploadedFile
   let authenticatedPostRequestSpy
 
   beforeEach(() => {
@@ -311,7 +308,7 @@ describe('#uploadAndWait', () => {
 
     const services = setupMockServices()
     mockCdpService = services.mockCdpService
-    mockFileValidationService = services.mockFileValidationService
+    mockValidateUploadedFile = services.mockValidateUploadedFile
 
     authenticatedPostRequestSpy = setupAuthenticatedRequestSpy()
   })
@@ -358,7 +355,9 @@ describe('#uploadAndWait', () => {
           projectName: 'Test Project',
           isProcessing: true,
           pageRefreshTimeInSeconds: 2,
-          filename: 'test.kml'
+          filename: 'test.kml',
+          tryAgainLink: routes.FILE_UPLOAD,
+          cancelLink: routes.TASK_LIST
         })
       })
 
@@ -380,7 +379,9 @@ describe('#uploadAndWait', () => {
           projectName: 'Test Project',
           isProcessing: true,
           pageRefreshTimeInSeconds: 2,
-          filename: 'test.kml'
+          filename: 'test.kml',
+          tryAgainLink: routes.FILE_UPLOAD,
+          cancelLink: routes.TASK_LIST
         })
       })
 
@@ -420,7 +421,7 @@ describe('#uploadAndWait', () => {
           mockCdpService.getStatus.mockResolvedValue(statusResponse)
 
           // And successful file validation
-          mockFileValidationService.validateFileExtension.mockReturnValue({
+          mockValidateUploadedFile.mockResolvedValue({
             isValid: true,
             extension: 'kml',
             errorMessage: null
@@ -430,11 +431,6 @@ describe('#uploadAndWait', () => {
 
           // When handler is called
           await uploadAndWaitController.handler(mockRequest, h)
-
-          // Then file validation is performed
-          expect(
-            mockFileValidationService.validateFileExtension
-          ).toHaveBeenCalledWith('test.kml', ['kml'])
 
           // And geo-parser API is called
           expect(authenticatedPostRequestSpy).toHaveBeenCalledWith(
@@ -466,7 +462,7 @@ describe('#uploadAndWait', () => {
           mockCdpService.getStatus.mockResolvedValue(statusResponse)
 
           // And successful file validation
-          mockFileValidationService.validateFileExtension.mockReturnValue({
+          mockValidateUploadedFile.mockResolvedValue({
             isValid: true,
             extension: 'kml',
             errorMessage: null
@@ -481,11 +477,6 @@ describe('#uploadAndWait', () => {
 
           // When handler is called
           await uploadAndWaitController.handler(mockRequest, h)
-
-          // Then file validation is performed
-          expect(
-            mockFileValidationService.validateFileExtension
-          ).toHaveBeenCalledWith('test.kml', ['kml'])
 
           // And geo-parser API is called
           expect(authenticatedPostRequestSpy).toHaveBeenCalledWith(
@@ -531,7 +522,7 @@ describe('#uploadAndWait', () => {
           mockCdpService.getStatus.mockResolvedValue(statusResponse)
 
           // And successful shapefile validation
-          mockFileValidationService.validateFileExtension.mockReturnValue({
+          mockValidateUploadedFile.mockResolvedValue({
             isValid: true,
             extension: 'zip',
             errorMessage: null
@@ -541,11 +532,6 @@ describe('#uploadAndWait', () => {
 
           // When handler is called
           await uploadAndWaitController.handler(mockRequest, h)
-
-          // Then file validation is performed with zip extension
-          expect(
-            mockFileValidationService.validateFileExtension
-          ).toHaveBeenCalledWith('coordinates.zip', ['zip'])
 
           // And geo-parser API is called with shapefile type
           expect(authenticatedPostRequestSpy).toHaveBeenCalledWith(
@@ -578,26 +564,11 @@ describe('#uploadAndWait', () => {
           mockRequest,
           getExemptionCacheSpy,
           mockCdpService,
-          mockFileValidationService,
+          mockValidateUploadedFile,
           updateExemptionSiteDetailsSpy,
           'document.pdf',
           'kml',
-          ['kml'],
           'The selected file must be a KML file'
-        )
-      })
-
-      test('should handle unknown file type in getAllowedExtensions default case', async () => {
-        await expectFileValidationFailure(
-          mockRequest,
-          getExemptionCacheSpy,
-          mockCdpService,
-          mockFileValidationService,
-          updateExemptionSiteDetailsSpy,
-          'test.unknown',
-          'unknown',
-          [],
-          'The selected file could not be uploaded – try again'
         )
       })
     })
@@ -653,74 +624,6 @@ describe('#uploadAndWait', () => {
         // And user is redirected to file upload
         expect(h.redirect).toHaveBeenCalledWith(routes.FILE_UPLOAD)
       })
-
-      test('should handle different error message types correctly', async () => {
-        const testCases = [
-          {
-            errorCode: 'FILE_EMPTY',
-            message: 'file is empty',
-            expected: 'The selected file is empty'
-          },
-          {
-            errorCode: 'FILE_TOO_LARGE',
-            message: 'file must be smaller than 50MB',
-            expected: 'The selected file must be smaller than 50 MB'
-          },
-          {
-            errorCode: 'INVALID_FILE_TYPE',
-            message: 'must be a kml file',
-            expected: 'The selected file must be a KML file'
-          },
-          {
-            errorCode: 'NO_FILE_SELECTED',
-            message: 'Select a file to upload',
-            expected: 'Select a file to upload'
-          },
-          {
-            errorCode: 'UPLOAD_ERROR',
-            message: 'unknown error',
-            expected: 'The selected file could not be uploaded – try again'
-          }
-        ]
-
-        for (const testCase of testCases) {
-          await expectRejectedStatusHandling(
-            mockRequest,
-            getExemptionCacheSpy,
-            mockCdpService,
-            updateExemptionSiteDetailsSpy,
-            testCase.errorCode,
-            testCase.message,
-            testCase.expected
-          )
-        }
-      })
-
-      test('should handle unknown file type message correctly', async () => {
-        await expectRejectedStatusHandling(
-          mockRequest,
-          getExemptionCacheSpy,
-          mockCdpService,
-          updateExemptionSiteDetailsSpy,
-          null,
-          'must be a foo file',
-          'The selected file could not be uploaded – try again',
-          'foo'
-        )
-      })
-
-      test('should handle shapefile error message correctly', async () => {
-        await expectRejectedStatusHandling(
-          mockRequest,
-          getExemptionCacheSpy,
-          mockCdpService,
-          updateExemptionSiteDetailsSpy,
-          'INVALID_FILE_TYPE',
-          'must be a shapefile',
-          'The selected file must be a Shapefile',
-          'shapefile'
-        )
-      })
     })
 
     describe('when geo-parser API fails', () => {
@@ -731,7 +634,7 @@ describe('#uploadAndWait', () => {
         mockCdpService.getStatus.mockResolvedValue(statusResponse)
 
         // And successful file validation
-        mockFileValidationService.validateFileExtension.mockReturnValue({
+        mockValidateUploadedFile.mockResolvedValue({
           isValid: true,
           extension: 'kml',
           errorMessage: null
@@ -797,158 +700,6 @@ describe('#uploadAndWait', () => {
         expect(h.redirect).toHaveBeenCalledWith(routes.FILE_UPLOAD)
       })
 
-      test('should handle geo-parser API returning invalid response', async () => {
-        // Given exemption with upload config and ready status
-        getExemptionCacheSpy.mockReturnValue(createMockExemption())
-        const statusResponse = createMockStatusResponse('ready')
-        mockCdpService.getStatus.mockResolvedValue(statusResponse)
-
-        // And successful file validation
-        mockFileValidationService.validateFileExtension.mockReturnValue({
-          isValid: true,
-          extension: 'kml',
-          errorMessage: null
-        })
-
-        // But geo-parser API returns invalid response
-        authenticatedPostRequestSpy.mockResolvedValue({
-          statusCode: 400,
-          payload: {
-            error: 'Invalid file format'
-          }
-        })
-
-        const h = createMockResponseHandler()
-
-        // When handler is called
-        await uploadAndWaitController.handler(mockRequest, h)
-
-        // Then error handling occurs
-        expect(updateExemptionSiteDetailsSpy).toHaveBeenCalledWith(
-          mockRequest,
-          expect.any(Object),
-          0,
-          'uploadError',
-          {
-            message: 'The selected file could not be processed – try again',
-            fieldName: 'file',
-            fileType: 'kml'
-          }
-        )
-
-        expect(updateExemptionSiteDetailsSpy).toHaveBeenCalledWith(
-          mockRequest,
-          expect.any(Object),
-          0,
-          'uploadConfig',
-          null
-        )
-        expect(h.redirect).toHaveBeenCalledWith(routes.FILE_UPLOAD)
-      })
-
-      test('should handle geo-parser API returning unsuccessful response', async () => {
-        // Given exemption with upload config and ready status
-        getExemptionCacheSpy.mockReturnValue(createMockExemption())
-        const statusResponse = createMockStatusResponse('ready')
-        mockCdpService.getStatus.mockResolvedValue(statusResponse)
-
-        // And successful file validation
-        mockFileValidationService.validateFileExtension.mockReturnValue({
-          isValid: true,
-          extension: 'kml',
-          errorMessage: null
-        })
-
-        // But geo-parser API returns unsuccessful response
-        authenticatedPostRequestSpy.mockResolvedValue({
-          statusCode: 200,
-          payload: {
-            message: 'error',
-            error: 'Could not parse file'
-          }
-        })
-
-        const h = createMockResponseHandler()
-
-        // When handler is called
-        await uploadAndWaitController.handler(mockRequest, h)
-
-        // Then error handling occurs
-        expect(updateExemptionSiteDetailsSpy).toHaveBeenCalledWith(
-          mockRequest,
-          expect.any(Object),
-          0,
-          'uploadError',
-          {
-            message: 'The selected file could not be processed – try again',
-            fieldName: 'file',
-            fileType: 'kml'
-          }
-        )
-
-        expect(updateExemptionSiteDetailsSpy).toHaveBeenCalledWith(
-          mockRequest,
-          expect.any(Object),
-          0,
-          'uploadConfig',
-          null
-        )
-        expect(h.redirect).toHaveBeenCalledWith(routes.FILE_UPLOAD)
-      })
-
-      test('should handle geo-parser API returning invalid GeoJSON structure', async () => {
-        // Given exemption with upload config and ready status
-        getExemptionCacheSpy.mockReturnValue(createMockExemption())
-        const statusResponse = createMockStatusResponse('ready')
-        mockCdpService.getStatus.mockResolvedValue(statusResponse)
-
-        // And successful file validation
-        mockFileValidationService.validateFileExtension.mockReturnValue({
-          isValid: true,
-          extension: 'kml',
-          errorMessage: null
-        })
-
-        // But geo-parser API returns response with invalid GeoJSON
-        authenticatedPostRequestSpy.mockResolvedValue({
-          statusCode: 200,
-          payload: {
-            message: 'success',
-            value: {
-              type: 'FeatureCollection'
-              // Missing features array
-            }
-          }
-        })
-
-        const h = createMockResponseHandler()
-
-        // When handler is called
-        await uploadAndWaitController.handler(mockRequest, h)
-
-        // Then error handling occurs
-        expect(updateExemptionSiteDetailsSpy).toHaveBeenCalledWith(
-          mockRequest,
-          expect.any(Object),
-          0,
-          'uploadError',
-          {
-            message: 'The selected file could not be processed – try again',
-            fieldName: 'file',
-            fileType: 'kml'
-          }
-        )
-
-        expect(updateExemptionSiteDetailsSpy).toHaveBeenCalledWith(
-          mockRequest,
-          expect.any(Object),
-          0,
-          'uploadConfig',
-          null
-        )
-        expect(h.redirect).toHaveBeenCalledWith(routes.FILE_UPLOAD)
-      })
-
       test('should handle SHAPEFILE_MISSING_CORE_FILES error from geo-parser', async () => {
         getExemptionCacheSpy.mockReturnValue(
           createMockExemption({
@@ -964,7 +715,7 @@ describe('#uploadAndWait', () => {
         })
         mockCdpService.getStatus.mockResolvedValue(statusResponse)
 
-        mockFileValidationService.validateFileExtension.mockReturnValue({
+        mockValidateUploadedFile.mockResolvedValue({
           isValid: true,
           extension: 'zip',
           errorMessage: null
@@ -1001,141 +752,6 @@ describe('#uploadAndWait', () => {
           'uploadError',
           {
             message: 'The selected file must include .shp .shx and .dbf files',
-            fieldName: 'file',
-            fileType: 'shapefile'
-          }
-        )
-
-        expect(updateExemptionSiteDetailsSpy).toHaveBeenCalledWith(
-          mockRequest,
-          expect.any(Object),
-          0,
-          'uploadConfig',
-          null
-        )
-
-        expect(h.redirect).toHaveBeenCalledWith(routes.FILE_UPLOAD)
-      })
-
-      test('should handle SHAPEFILE_MISSING_PRJ_FILE error from geo-parser', async () => {
-        getExemptionCacheSpy.mockReturnValue(
-          createMockExemption({
-            siteDetails: [
-              {
-                uploadConfig: createMockUploadConfig({ fileType: 'shapefile' })
-              }
-            ]
-          })
-        )
-        const statusResponse = createMockStatusResponse('ready', {
-          filename: 'coordinates.zip'
-        })
-        mockCdpService.getStatus.mockResolvedValue(statusResponse)
-
-        mockFileValidationService.validateFileExtension.mockReturnValue({
-          isValid: true,
-          extension: 'zip',
-          errorMessage: null
-        })
-
-        const geoParserError = new Error('Shapefile validation failed')
-        geoParserError.data = {
-          payload: {
-            message: 'SHAPEFILE_MISSING_PRJ_FILE'
-          }
-        }
-        authenticatedPostRequestSpy.mockRejectedValue(geoParserError)
-
-        const h = createMockResponseHandler()
-
-        await uploadAndWaitController.handler(mockRequest, h)
-
-        expect(mockRequest.logger.error).toHaveBeenCalledWith(
-          {
-            err: geoParserError,
-            filename: 'coordinates.zip',
-            fileType: 'shapefile',
-            errorCode: 'SHAPEFILE_MISSING_PRJ_FILE',
-            mappedMessage: 'The selected file must include a .prj file'
-          },
-          'FileUpload: ERROR: Failed to extract coordinates from uploaded file'
-        )
-
-        expect(updateExemptionSiteDetailsSpy).toHaveBeenCalledWith(
-          mockRequest,
-          expect.any(Object),
-          0,
-          'uploadError',
-          {
-            message: 'The selected file must include a .prj file',
-            fieldName: 'file',
-            fileType: 'shapefile'
-          }
-        )
-
-        expect(updateExemptionSiteDetailsSpy).toHaveBeenCalledWith(
-          mockRequest,
-          expect.any(Object),
-          0,
-          'uploadConfig',
-          null
-        )
-
-        expect(h.redirect).toHaveBeenCalledWith(routes.FILE_UPLOAD)
-      })
-
-      test('should handle SHAPEFILE_PRJ_FILE_TOO_LARGE error from geo-parser', async () => {
-        getExemptionCacheSpy.mockReturnValue(
-          createMockExemption({
-            siteDetails: [
-              {
-                uploadConfig: createMockUploadConfig({ fileType: 'shapefile' })
-              }
-            ]
-          })
-        )
-        const statusResponse = createMockStatusResponse('ready', {
-          filename: 'coordinates.zip'
-        })
-        mockCdpService.getStatus.mockResolvedValue(statusResponse)
-
-        mockFileValidationService.validateFileExtension.mockReturnValue({
-          isValid: true,
-          extension: 'zip',
-          errorMessage: null
-        })
-
-        const geoParserError = new Error('Shapefile validation failed')
-        geoParserError.data = {
-          payload: {
-            message: 'SHAPEFILE_PRJ_FILE_TOO_LARGE'
-          }
-        }
-        authenticatedPostRequestSpy.mockRejectedValue(geoParserError)
-
-        const h = createMockResponseHandler()
-
-        await uploadAndWaitController.handler(mockRequest, h)
-
-        expect(mockRequest.logger.error).toHaveBeenCalledWith(
-          {
-            err: geoParserError,
-            filename: 'coordinates.zip',
-            fileType: 'shapefile',
-            errorCode: 'SHAPEFILE_PRJ_FILE_TOO_LARGE',
-            mappedMessage:
-              "The selected file's .prj file must be smaller than 50KB"
-          },
-          'FileUpload: ERROR: Failed to extract coordinates from uploaded file'
-        )
-
-        expect(updateExemptionSiteDetailsSpy).toHaveBeenCalledWith(
-          mockRequest,
-          expect.any(Object),
-          0,
-          'uploadError',
-          {
-            message: "The selected file's .prj file must be smaller than 50KB",
             fieldName: 'file',
             fileType: 'shapefile'
           }
@@ -1189,62 +805,6 @@ describe('#uploadAndWait', () => {
       })
     })
 
-    describe('logging behavior', () => {
-      test('should log debug information on successful status check', async () => {
-        // Given exemption with upload config and pending status
-        getExemptionCacheSpy.mockReturnValue(createMockExemption())
-        mockCdpService.getStatus.mockResolvedValue(
-          createMockStatusResponse('pending')
-        )
-
-        const h = createMockResponseHandler()
-
-        // When handler is called
-        await uploadAndWaitController.handler(mockRequest, h)
-
-        // Then debug information is logged (behavior, not exact count)
-        expect(mockRequest.logger.debug).toHaveBeenCalled()
-      })
-
-      test('should log successful coordinate extraction info', async () => {
-        // Given exemption with upload config and ready status
-        getExemptionCacheSpy.mockReturnValue(createMockExemption())
-        const statusResponse = createMockStatusResponse('ready')
-        mockCdpService.getStatus.mockResolvedValue(statusResponse)
-
-        // And successful file validation
-        mockFileValidationService.validateFileExtension.mockReturnValue({
-          isValid: true,
-          extension: 'kml',
-          errorMessage: null
-        })
-
-        const h = createMockResponseHandler()
-
-        // When handler is called
-        await uploadAndWaitController.handler(mockRequest, h)
-
-        // Then info logging occurs for successful extraction
-        expect(mockRequest.logger.info).toHaveBeenCalledWith(
-          expect.objectContaining({
-            featureCount: expect.any(Number),
-            coordinateCount: expect.any(Number)
-          }),
-          'FileUpload: Successfully extracted coordinates'
-        )
-
-        // And completion logging occurs
-        expect(mockRequest.logger.info).toHaveBeenCalledWith(
-          'FileUpload: File upload and coordinate extraction completed successfully',
-          expect.objectContaining({
-            filename: 'test.kml',
-            fileType: 'kml',
-            featureCount: expect.any(Number)
-          })
-        )
-      })
-    })
-
     describe('edge cases', () => {
       test('should handle missing s3Location in status response', async () => {
         // Given exemption with upload config and ready status without s3Location
@@ -1254,7 +814,7 @@ describe('#uploadAndWait', () => {
         mockCdpService.getStatus.mockResolvedValue(statusResponse)
 
         // And successful file validation
-        mockFileValidationService.validateFileExtension.mockReturnValue({
+        mockValidateUploadedFile.mockResolvedValue({
           isValid: true,
           extension: 'kml',
           errorMessage: null
@@ -1308,7 +868,9 @@ describe('#uploadAndWait', () => {
           projectName: 'Test Project',
           isProcessing: true,
           pageRefreshTimeInSeconds: 2,
-          filename: ''
+          filename: '',
+          tryAgainLink: routes.FILE_UPLOAD,
+          cancelLink: routes.TASK_LIST
         })
       })
     })

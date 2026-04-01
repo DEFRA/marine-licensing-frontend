@@ -66,7 +66,7 @@ export function sharedBeforeYouStartSiteDetailsTests({
       getByRole(document, 'heading', { name: 'Defining the site boundary' })
     ).toBeInTheDocument()
 
-    expect(getByText(document, 'a site name')).toBeInTheDocument()
+    expect(getByText(document, 'site name')).toBeInTheDocument()
 
     if (projectType === 'exemptions') {
       expect(
@@ -136,7 +136,7 @@ export function sharedBeforeYouStartSiteDetailsTests({
     expect(lists).toHaveLength(2)
 
     const firstList = lists[0]
-    expect(firstList).toContainElement(getByText(document, 'a site name'))
+    expect(firstList).toContainElement(getByText(document, 'site name'))
 
     const secondList = lists[1]
     expect(secondList).toContainElement(

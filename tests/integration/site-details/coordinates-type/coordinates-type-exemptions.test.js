@@ -1,3 +1,4 @@
+import { statusCodes } from '~/src/server/common/constants/status-codes.js'
 import { routes } from '~/src/server/common/constants/routes.js'
 import {
   mockExemption,
@@ -37,5 +38,27 @@ describe('Coordinates type page (exemption)', () => {
     projectName: mockExemptionData.projectName,
     backHref: routes.SITE_DETAILS,
     cancelHref: `${routes.TASK_LIST}?cancel=site-details`
+  })
+
+  test('should redirect to choose file type when file option is selected', async () => {
+    const response = await makePostRequest({
+      server: getServer(),
+      url: routes.COORDINATES_TYPE_CHOICE,
+      formData: { coordinatesType: 'file' }
+    })
+
+    expect(response.statusCode).toBe(statusCodes.redirect)
+    expect(response.headers.location).toBe(routes.CHOOSE_FILE_UPLOAD_TYPE)
+  })
+
+  test('should redirect to multiple sites choice when coordinates option is selected', async () => {
+    const response = await makePostRequest({
+      server: getServer(),
+      url: routes.COORDINATES_TYPE_CHOICE,
+      formData: { coordinatesType: 'coordinates' }
+    })
+
+    expect(response.statusCode).toBe(statusCodes.redirect)
+    expect(response.headers.location).toBe(routes.MULTIPLE_SITES_CHOICE)
   })
 })

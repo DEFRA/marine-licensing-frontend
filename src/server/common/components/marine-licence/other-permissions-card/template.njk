@@ -25,6 +25,29 @@
   }) %}
 {% endif %}
 
+{% if params.otherAuthorities %}
+  {% if params.otherAuthorities.agree === 'yes' %}
+    {% set value = { text: params.otherAuthorities.details } %}
+  {% else %}
+    {% set value = { text: "No" } %}
+  {% endif %}
+
+  {% set _ = rows.push({
+    key: { text: "Permission from any other authorities in relation to this project" },
+    value: value,
+    actions: {
+        items: [
+          {
+            href: "/marine-licence/other-authorities?from=check-your-answers",
+            text: "Change",
+            visuallyHiddenText: "other authorities",
+            classes: "govuk-link--no-visited-state"
+          }
+        ]
+      } if not params.isReadOnly
+  }) %}
+{% endif %}
+
 {% if rows | length %}
 
 {{ govukSummaryList({

@@ -48,4 +48,63 @@ describe('Marine Licence Other Permissions Card Component', () => {
     expect($comp.html()).toContain('No')
     expect($comp.html()).not.toContain('Should not be shown')
   })
+
+  describe('other authorities', () => {
+    test('Should display details when agree is yes', () => {
+      const params = {
+        otherAuthorities: {
+          agree: 'yes',
+          details: 'Applied to harbour authority'
+        }
+      }
+      const $comp = renderComponent(
+        'marine-licence/other-permissions-card',
+        params
+      )
+      expect($comp.html()).toContain('Applied to harbour authority')
+    })
+
+    test('Should display "No" and not show details when agree is no', () => {
+      const params = {
+        otherAuthorities: {
+          agree: 'no',
+          details: 'Should not be shown'
+        }
+      }
+      const $comp = renderComponent(
+        'marine-licence/other-permissions-card',
+        params
+      )
+      expect($comp.html()).toContain('No')
+      expect($comp.html()).not.toContain('Should not be shown')
+    })
+
+    test('Should show change link when not read only', () => {
+      const params = {
+        otherAuthorities: { agree: 'no' },
+        isReadOnly: false
+      }
+      const $comp = renderComponent(
+        'marine-licence/other-permissions-card',
+        params
+      )
+      expect($comp.html()).toContain(
+        '/marine-licence/other-authorities?from=check-your-answers'
+      )
+    })
+
+    test('Should not show change link when read only', () => {
+      const params = {
+        otherAuthorities: { agree: 'no' },
+        isReadOnly: true
+      }
+      const $comp = renderComponent(
+        'marine-licence/other-permissions-card',
+        params
+      )
+      expect($comp.html()).not.toContain(
+        '/marine-licence/other-authorities?from=check-your-answers'
+      )
+    })
+  })
 })

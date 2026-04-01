@@ -53,17 +53,17 @@ export const taskListController = {
       taskList,
       projectName,
       specialLegalPowers,
+      otherAuthorities,
       siteDetails
     } = payload.value
 
     const { userRelationshipType } = userSession
 
-    let otherPermissionsTaskListTransformed = []
-
-    if (userRelationshipType !== USER_TYPES.CITIZEN) {
-      otherPermissionsTaskListTransformed =
-        transformOtherPermissionsTaskList(taskList)
-    }
+    const otherPermissionsTaskListTransformed =
+      transformOtherPermissionsTaskList(
+        taskList,
+        userRelationshipType === USER_TYPES.CITIZEN
+      )
 
     const projectDetailsTaskListTransformed =
       transformProjectDetailsTaskList(taskList)
@@ -74,6 +74,7 @@ export const taskListController = {
       id: marineLicenceId,
       projectName,
       specialLegalPowers,
+      otherAuthorities,
       siteDetails: hasCancel ? [] : siteDetails
     })
 

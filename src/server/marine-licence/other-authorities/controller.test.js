@@ -1,61 +1,36 @@
 import { vi } from 'vitest'
 import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
 import {
-  specialLegalPowersController,
-  specialLegalPowersSubmitController,
-  SPECIAL_LEGAL_POWERS_VIEW_ROUTE
-} from '#src/server/marine-licence/special-legal-powers/controller.js'
+  otherAuthoritiesSubmitController,
+  OTHER_AUTHORITIES_VIEW_ROUTE
+} from '#src/server/marine-licence/other-authorities/controller.js'
 import * as cacheUtils from '#src/server/common/helpers/marine-licence/session-cache/utils.js'
 import * as authRequests from '#src/server/common/helpers/authenticated-requests.js'
-import * as authUtils from '#src/server/common/plugins/auth/utils.js'
 
 vi.mock('~/src/server/common/helpers/marine-licence/session-cache/utils.js')
-vi.mock('~/src/server/common/plugins/auth/utils.js')
 
-describe('#specialLegalPowers', () => {
+describe('#otherAuthorities', () => {
   const mockLicence = {
     projectName: 'Test Project',
     id: 'test-id',
-    specialLegalPowers: { agree: 'yes', details: 'Test reason' }
+    otherAuthorities: { agree: 'yes', details: 'Applied to harbour authority' }
   }
 
   beforeEach(() => {
     vi.spyOn(authRequests, 'authenticatedPatchRequest').mockResolvedValue({
       payload: {
         id: mockLicence.id,
-        ...mockLicence.specialLegalPowers
+        ...mockLicence.otherAuthorities
       }
     })
     vi.spyOn(cacheUtils, 'getMarineLicenceCache').mockReturnValue(mockLicence)
-    authUtils.getUserSession.mockResolvedValue({
-      userRelationshipType: 'EMPLOYEE'
-    })
   })
 
   afterEach(() => {
     vi.restoreAllMocks()
   })
 
-  describe('#specialLegalPowersController', () => {
-    test('specialLegalPowersController handler should redirect citizens to task list', async () => {
-      authUtils.getUserSession.mockResolvedValueOnce({
-        userRelationshipType: 'Citizen'
-      })
-      const h = {
-        view: vi.fn(),
-        redirect: vi.fn()
-      }
-
-      await specialLegalPowersController.handler({}, h)
-
-      expect(h.redirect).toHaveBeenCalledWith(
-        marineLicenceRoutes.MARINE_LICENCE_TASK_LIST
-      )
-      expect(h.view).not.toHaveBeenCalled()
-    })
-  })
-
-  describe('#specialLegalPowersSubmitController', () => {
+  describe('#otherAuthoritiesSubmitController', () => {
     test('Should pass error to global catchAll behaviour if it contains no validation data', async () => {
       const thrownError = { res: { statusCode: 500 }, data: {} }
       vi.spyOn(authRequests, 'authenticatedPatchRequest').mockRejectedValueOnce(
@@ -67,8 +42,11 @@ describe('#specialLegalPowers', () => {
       }
 
       await expect(
-        specialLegalPowersSubmitController.handler(
-          { payload: { agree: 'yes', details: 'Test reason' }, query: {} },
+        otherAuthoritiesSubmitController.handler(
+          {
+            payload: { agree: 'yes', details: 'Applied to harbour authority' },
+            query: {}
+          },
           h
         )
       ).rejects.toBe(thrownError)
@@ -82,14 +60,14 @@ describe('#specialLegalPowers', () => {
         view: vi.fn()
       }
 
-      await specialLegalPowersSubmitController.handler(
+      await otherAuthoritiesSubmitController.handler(
         { payload: { agree: 'no' }, query: {} },
         h
       )
 
       expect(authRequests.authenticatedPatchRequest).toHaveBeenCalledWith(
         expect.any(Object),
-        '/marine-licence/special-legal-powers',
+        '/marine-licence/other-authorities',
         {
           id: mockLicence.id,
           agree: 'no'
@@ -106,9 +84,9 @@ describe('#specialLegalPowers', () => {
         view: vi.fn()
       }
 
-      await specialLegalPowersSubmitController.handler(
+      await otherAuthoritiesSubmitController.handler(
         {
-          payload: { agree: 'yes', details: 'Test reason' },
+          payload: { agree: 'yes', details: 'Applied to harbour authority' },
           query: { from: 'check-your-answers' }
         },
         h
@@ -116,11 +94,11 @@ describe('#specialLegalPowers', () => {
 
       expect(authRequests.authenticatedPatchRequest).toHaveBeenCalledWith(
         expect.any(Object),
-        '/marine-licence/special-legal-powers',
+        '/marine-licence/other-authorities',
         {
           id: mockLicence.id,
           agree: 'yes',
-          details: 'Test reason'
+          details: 'Applied to harbour authority'
         }
       )
       expect(h.redirect).toHaveBeenCalledWith(
@@ -137,7 +115,7 @@ describe('#specialLegalPowers', () => {
                 details: [
                   {
                     path: ['agree'],
-                    message: 'SPECIAL_LEGAL_POWERS_DETAILS_REQUIRED',
+                    message: 'OTHER_AUTHORITIES_DETAILS_REQUIRED',
                     type: 'any.required'
                   }
                 ]
@@ -152,16 +130,19 @@ describe('#specialLegalPowers', () => {
         view: vi.fn()
       }
 
-      await specialLegalPowersSubmitController.handler(
-        { payload: { agree: 'yes', details: 'Test reason' }, query: {} },
+      await otherAuthoritiesSubmitController.handler(
+        {
+          payload: { agree: 'yes', details: 'Applied to harbour authority' },
+          query: {}
+        },
         h
       )
 
       expect(h.view).toHaveBeenCalledWith(
-        SPECIAL_LEGAL_POWERS_VIEW_ROUTE,
+        OTHER_AUTHORITIES_VIEW_ROUTE,
         expect.objectContaining({
           backLink: marineLicenceRoutes.MARINE_LICENCE_TASK_LIST,
-          payload: { agree: 'yes', details: 'Test reason' }
+          payload: { agree: 'yes', details: 'Applied to harbour authority' }
         })
       )
     })
@@ -175,7 +156,7 @@ describe('#specialLegalPowers', () => {
                 details: [
                   {
                     path: ['agree'],
-                    message: 'SPECIAL_LEGAL_POWERS_DETAILS_REQUIRED',
+                    message: 'OTHER_AUTHORITIES_DETAILS_REQUIRED',
                     type: 'any.required'
                   }
                 ]
@@ -190,19 +171,19 @@ describe('#specialLegalPowers', () => {
         view: vi.fn()
       }
 
-      await specialLegalPowersSubmitController.handler(
+      await otherAuthoritiesSubmitController.handler(
         {
-          payload: { agree: 'yes', details: 'Test reason' },
+          payload: { agree: 'yes', details: 'Applied to harbour authority' },
           query: { from: 'check-your-answers' }
         },
         h
       )
 
       expect(h.view).toHaveBeenCalledWith(
-        SPECIAL_LEGAL_POWERS_VIEW_ROUTE,
+        OTHER_AUTHORITIES_VIEW_ROUTE,
         expect.objectContaining({
           backLink: marineLicenceRoutes.MARINE_LICENCE_CHECK_YOUR_ANSWERS,
-          payload: { agree: 'yes', details: 'Test reason' }
+          payload: { agree: 'yes', details: 'Applied to harbour authority' }
         })
       )
     })
@@ -231,17 +212,17 @@ describe('#specialLegalPowers', () => {
       ({ payload, err, expectedExtra }) => {
         const request = { payload }
         const h = { view: vi.fn().mockReturnValue({ takeover: vi.fn() }) }
-        specialLegalPowersSubmitController.options.validate.failAction(
+        otherAuthoritiesSubmitController.options.validate.failAction(
           request,
           h,
           err
         )
-        expect(h.view).toHaveBeenCalledWith(SPECIAL_LEGAL_POWERS_VIEW_ROUTE, {
+        expect(h.view).toHaveBeenCalledWith(OTHER_AUTHORITIES_VIEW_ROUTE, {
           backLink: marineLicenceRoutes.MARINE_LICENCE_TASK_LIST,
           pageTitle:
-            'Does your organisation have special legal powers to do any of this project?',
+            'Have you applied to, or got permission from, any other authorities in relation to this project?',
           heading:
-            'Does your organisation have special legal powers to do any of this project?',
+            'Have you applied to, or got permission from, any other authorities in relation to this project?',
           projectName: mockLicence.projectName,
           payload,
           ...expectedExtra

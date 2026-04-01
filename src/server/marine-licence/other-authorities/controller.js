@@ -8,27 +8,26 @@ import {
 } from '#src/server/common/helpers/errors.js'
 import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
 import { authenticatedPatchRequest } from '#src/server/common/helpers/authenticated-requests.js'
-import { USER_TYPES } from '#src/server/common/constants/user-types.js'
-import { getUserSession } from '#src/server/common/plugins/auth/utils.js'
 
 import joi from 'joi'
 
-export const SPECIAL_LEGAL_POWERS_VIEW_ROUTE =
-  'marine-licence/special-legal-powers/index'
+export const OTHER_AUTHORITIES_VIEW_ROUTE =
+  'marine-licence/other-authorities/index'
 
 export const errorMessages = {
-  SPECIAL_LEGAL_POWERS_DETAILS_REQUIRED: 'Provide details of the legal powers',
-  SPECIAL_LEGAL_POWERS_DETAILS_MAX_LENGTH:
-    'Details of the legal powers must be 1000 characters or fewer',
-  SPECIAL_LEGAL_POWERS_DETAILS_AGREE:
-    'Select whether your organisation has special legal powers'
+  OTHER_AUTHORITIES_AGREE:
+    'Select whether you have applied to, or got permission from, any other authorities',
+  OTHER_AUTHORITIES_DETAILS_REQUIRED:
+    'Provide details of the other authorities',
+  OTHER_AUTHORITIES_DETAILS_MAX_LENGTH:
+    'Details of the other authorities must be 1000 characters or fewer'
 }
 
-const specialLegalPowersSettings = {
+const otherAuthoritiesSettings = {
   pageTitle:
-    'Does your organisation have special legal powers to do any of this project?',
+    'Have you applied to, or got permission from, any other authorities in relation to this project?',
   heading:
-    'Does your organisation have special legal powers to do any of this project?'
+    'Have you applied to, or got permission from, any other authorities in relation to this project?'
 }
 
 const getBackLink = (request) => {
@@ -38,45 +37,34 @@ const getBackLink = (request) => {
     : marineLicenceRoutes.MARINE_LICENCE_TASK_LIST
 }
 
-export const specialLegalPowersController = {
+export const otherAuthoritiesController = {
   async handler(request, h) {
     const marineLicence = getMarineLicenceCache(request)
 
-    const userSession = await getUserSession(
-      request,
-      request.state?.userSession
-    )
-
-    const { userRelationshipType } = userSession
-
-    if (userRelationshipType === USER_TYPES.CITIZEN) {
-      return h.redirect(marineLicenceRoutes.MARINE_LICENCE_TASK_LIST)
-    }
-
-    return h.view(SPECIAL_LEGAL_POWERS_VIEW_ROUTE, {
-      ...specialLegalPowersSettings,
+    return h.view(OTHER_AUTHORITIES_VIEW_ROUTE, {
+      ...otherAuthoritiesSettings,
       projectName: marineLicence.projectName,
-      payload: marineLicence.specialLegalPowers,
+      payload: marineLicence.otherAuthorities,
       backLink: getBackLink(request)
     })
   }
 }
-export const specialLegalPowersSubmitController = {
+
+export const otherAuthoritiesSubmitController = {
   options: {
     validate: {
       payload: joi.object({
         agree: joi.string().valid('yes', 'no').required().messages({
-          'any.only': errorMessages.SPECIAL_LEGAL_POWERS_DETAILS_AGREE,
-          'string.empty': errorMessages.SPECIAL_LEGAL_POWERS_DETAILS_AGREE,
-          'any.required': errorMessages.SPECIAL_LEGAL_POWERS_DETAILS_AGREE
+          'any.only': errorMessages.OTHER_AUTHORITIES_AGREE,
+          'string.empty': errorMessages.OTHER_AUTHORITIES_AGREE,
+          'any.required': errorMessages.OTHER_AUTHORITIES_AGREE
         }),
         details: joi.when('agree', {
-          // Details required when agree: 'yes'
           is: 'yes',
           then: joi.string().max(1000).required().messages({
-            'string.empty': errorMessages.SPECIAL_LEGAL_POWERS_DETAILS_REQUIRED,
-            'any.required': errorMessages.SPECIAL_LEGAL_POWERS_DETAILS_REQUIRED,
-            'string.max': errorMessages.SPECIAL_LEGAL_POWERS_DETAILS_MAX_LENGTH
+            'string.empty': errorMessages.OTHER_AUTHORITIES_DETAILS_REQUIRED,
+            'any.required': errorMessages.OTHER_AUTHORITIES_DETAILS_REQUIRED,
+            'string.max': errorMessages.OTHER_AUTHORITIES_DETAILS_MAX_LENGTH
           })
         })
       }),
@@ -88,8 +76,8 @@ export const specialLegalPowersSubmitController = {
 
         if (!err.details) {
           return h
-            .view(SPECIAL_LEGAL_POWERS_VIEW_ROUTE, {
-              ...specialLegalPowersSettings,
+            .view(OTHER_AUTHORITIES_VIEW_ROUTE, {
+              ...otherAuthoritiesSettings,
               payload,
               projectName,
               backLink
@@ -102,8 +90,8 @@ export const specialLegalPowersSubmitController = {
         const errors = errorDescriptionByFieldName(errorSummary)
 
         return h
-          .view(SPECIAL_LEGAL_POWERS_VIEW_ROUTE, {
-            ...specialLegalPowersSettings,
+          .view(OTHER_AUTHORITIES_VIEW_ROUTE, {
+            ...otherAuthoritiesSettings,
             payload,
             projectName,
             backLink,
@@ -124,7 +112,7 @@ export const specialLegalPowersSubmitController = {
 
       await authenticatedPatchRequest(
         request,
-        '/marine-licence/special-legal-powers',
+        '/marine-licence/other-authorities',
         {
           agree: payload.agree,
           ...(userAgrees && { details: payload.details }),
@@ -134,7 +122,7 @@ export const specialLegalPowersSubmitController = {
 
       await setMarineLicenceCache(request, h, {
         ...marineLicence,
-        specialLegalPowers: {
+        otherAuthorities: {
           agree: payload.agree,
           ...(userAgrees && { details: payload.details })
         }
@@ -153,8 +141,8 @@ export const specialLegalPowersSubmitController = {
 
       const errors = errorDescriptionByFieldName(errorSummary)
 
-      return h.view(SPECIAL_LEGAL_POWERS_VIEW_ROUTE, {
-        ...specialLegalPowersSettings,
+      return h.view(OTHER_AUTHORITIES_VIEW_ROUTE, {
+        ...otherAuthoritiesSettings,
         payload,
         projectName: marineLicence.projectName,
         backLink: getBackLink(request),

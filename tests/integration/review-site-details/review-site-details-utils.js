@@ -8,6 +8,7 @@ export const getSiteDetailsCard = (document, expected, siteIndex = 0) => {
   })
   return heading.closest('.govuk-summary-card')
 }
+
 export const validatePageStructure = (document, expected) => {
   const heading = document.querySelector('h1')
   expect(heading.textContent.trim()).toBe('Review site details')

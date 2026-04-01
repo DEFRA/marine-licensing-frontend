@@ -52,15 +52,53 @@
                 rows: multipleSiteRows
             }) }}
 
+        {% for site in summaryData %}
+
+            {#  This javascript variable is only for testing purposes. #}
+            <script nonce='{{ cspNonce }}'>
+              var geoJSON{{loop.index}} = {{ site.geoJSON | dump | safe }};
+            </script>
+
+          {% set summaryRowsHeading %}
+            Site {{ site.siteNumber }}
+          {% endset %}
+
+          {% set rows = [] %}
+
+          {% set _ = rows.push({
+            key: { text: "Site name"},
+            value: { html: appIncompleteField({text: site.siteName})},
+            actions: setSiteDetailsAction(site.siteName, 'review-site-details', site.siteNumber)
+          }) %}
+
+          {% set _ = rows.push({
+            key: { text: "Map view" },
+            value: { html: appSiteDetailsMap(site.siteDetailsData, loop.index0), classes: "govuk-summary-list__value--full-width" }
+          }) %}
+
+          {{ govukSummaryList({
+            card: {
+              attributes: {
+                id: "site-details-" + site.siteNumber
+              },
+              title: {
+                text: summaryRowsHeading
+              }
+            },
+            classes: 'govuk-summary-list--full-width',
+            rows: rows
+        }) }}
+        {% endfor %}
+
         <form method="POST">
           <input type="hidden" name="csrfToken" value="{{ csrfToken }}">
             <div class="govuk-button-group">
               {{ govukButton({
-            text: "Continue",
-            attributes: {
-              id: "continue"
-            }
-          }) }}
+                text: "Continue",
+                attributes: {
+                  id: "continue"
+                }
+              }) }}
             </div>
           </form>
         </div>

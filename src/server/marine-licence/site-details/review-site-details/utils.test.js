@@ -8,8 +8,21 @@ import {
   hasIncompleteFields,
   renderFileUploadReview
 } from '#src/server/marine-licence/site-details/review-site-details/utils.js'
+import { getFileUploadSummaryData } from '#src/server/common/helpers/review-site-details/file-upload.js'
+import { createSiteDetailsDataJson } from '#src/server/common/helpers/site-details.js'
 
 vi.mock('~/src/server/common/helpers/marine-licence/session-cache/utils.js')
+
+vi.mock(
+  '~/src/server/common/helpers/review-site-details/file-upload.js',
+  () => ({
+    getFileUploadSummaryData: vi.fn()
+  })
+)
+
+vi.mock('~/src/server/common/helpers/site-details.js', () => ({
+  createSiteDetailsDataJson: vi.fn()
+}))
 
 describe('siteDetails utils', () => {
   describe('getFileUploadBackLink util', () => {
@@ -50,6 +63,26 @@ describe('siteDetails utils', () => {
     }
 
     test('renderFileUploadReview renders correct view with data', () => {
+      const mockCoordinates = [
+        { type: 'Point', coordinates: [51.5074, -0.1278] }
+      ]
+      const mockGeoJSON = {
+        type: 'FeatureCollection',
+        features: [
+          {
+            type: 'Feature',
+            geometry: { type: 'Point', coordinates: [51.5074, -0.1278] }
+          }
+        ]
+      }
+      const mockSiteDetailsData = '{"coordinatesType":"file"}'
+
+      getFileUploadSummaryData.mockReturnValue({
+        coordinates: mockCoordinates,
+        geoJSON: mockGeoJSON
+      })
+      createSiteDetailsDataJson.mockReturnValue(mockSiteDetailsData)
+
       const marineLicence = {
         projectName: 'Test Project'
       }
@@ -60,18 +93,7 @@ describe('siteDetails utils', () => {
           uploadedFile: {
             filename: 'test-site.kml'
           },
-          geoJSON: {
-            type: 'FeatureCollection',
-            features: [
-              {
-                type: 'Feature',
-                geometry: {
-                  type: 'Point',
-                  coordinates: [51.5074, -0.1278]
-                }
-              }
-            ]
-          },
+          geoJSON: mockGeoJSON,
           siteName: 'File Upload Site 1'
         }
       ]
@@ -92,7 +114,16 @@ describe('siteDetails utils', () => {
         expect.objectContaining({
           pageTitle: 'Review site details',
           backLink: marineLicenceRoutes.MARINE_LICENCE_FILE_UPLOAD,
-          projectName: 'Test Project'
+          projectName: 'Test Project',
+          summaryData: [
+            {
+              coordinates: mockCoordinates,
+              geoJSON: mockGeoJSON,
+              siteName: 'File Upload Site 1',
+              siteNumber: 1,
+              siteDetailsData: mockSiteDetailsData
+            }
+          ]
         })
       )
     })

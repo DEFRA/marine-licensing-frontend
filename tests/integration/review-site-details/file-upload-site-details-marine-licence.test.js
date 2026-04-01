@@ -4,6 +4,7 @@ import { statusCodes } from '~/src/server/common/constants/status-codes.js'
 import { testScenarios } from './marine-licence-fixtures/file-upload-fixtures.js'
 import {
   getRowByKey,
+  validateActionLink,
   validateIncompleteWarning,
   validateNavigationElements,
   validatePageStructure
@@ -43,6 +44,10 @@ describe('ML Review Site Details - File Upload Integration Tests', () => {
       validateSiteLocationCard(document)
       validateIncompleteWarning(document, expectedPageContent)
       validateNavigationElements(document)
+
+      for (const site of expectedPageContent.siteDetails.keys()) {
+        validateFileUpload(document, expectedPageContent, site)
+      }
     }
   )
 
@@ -151,5 +156,38 @@ describe('ML Review Site Details - File Upload Integration Tests', () => {
     expect(getRowByKey(card, 'File type')).toBeFalsy()
     expect(getRowByKey(card, 'File uploaded')).toBeFalsy()
     expect(document.querySelector('[href*="delete"]')).toBeFalsy()
+  }
+
+  const validateFileUpload = (document, expected, siteIndex) => {
+    const cards = document.querySelectorAll('.govuk-summary-card')
+    const siteDetailsCards = Array.from(cards).filter((card) =>
+      card.textContent.match(/Site/g)
+    )
+
+    siteDetailsCards.forEach((card, i) => {
+      const siteNameRow = getRowByKey(card, 'Site name')
+
+      const siteNameExpected = expected.siteDetails[siteIndex].siteName
+
+      const hasValue =
+        siteNameExpected &&
+        siteNameExpected !== '' &&
+        siteNameExpected !== 'Incomplete'
+
+      const expectedText = hasValue ? siteNameExpected : 'Incomplete'
+
+      expect(siteNameRow.textContent).toContain(expectedText)
+
+      validateActionLink(siteNameRow, siteNameExpected, siteIndex)
+
+      const mapViewRow = getRowByKey(card, 'Map view')
+      expect(mapViewRow).toBeTruthy()
+      expect(mapViewRow.textContent.trim()).toBe('Map view')
+
+      const mapDiv = mapViewRow.querySelector(
+        '.app-site-details-map[data-module="site-details-map"]'
+      )
+      expect(mapDiv).toBeTruthy()
+    })
   }
 })

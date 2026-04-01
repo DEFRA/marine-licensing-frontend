@@ -8,7 +8,12 @@ export const testScenarios = [
     expectedPageContent: {
       projectName: 'Test Project',
       backLink: marineLicenceRoutes.MARINE_LICENCE_FILE_UPLOAD,
-      hasIncompleteWarning: false
+      hasIncompleteWarning: false,
+      siteDetails: [
+        {
+          ...mockMarineLicenceApplication.siteDetails[0]
+        }
+      ]
     }
   },
   {
@@ -22,7 +27,13 @@ export const testScenarios = [
     expectedPageContent: {
       projectName: 'Test Project',
       backLink: marineLicenceRoutes.MARINE_LICENCE_FILE_UPLOAD,
-      hasIncompleteWarning: true
+      hasIncompleteWarning: true,
+      siteDetails: [
+        {
+          ...mockMarineLicenceApplication.siteDetails[0],
+          siteName: null
+        }
+      ]
     }
   }
 ]

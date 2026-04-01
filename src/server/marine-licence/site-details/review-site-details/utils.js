@@ -54,7 +54,7 @@ const hasMissingRequiredFields = (site) => {
   return isSiteNameMissing
 }
 
-export const hasIncompleteFields = (siteDetails, multipleSiteDetails) => {
+export const hasIncompleteFields = (siteDetails) => {
   if (!siteDetails || siteDetails.length === 0) {
     return false
   }

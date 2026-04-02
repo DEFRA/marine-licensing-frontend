@@ -67,7 +67,7 @@
     "hapi-pulse": "^3.0.1",
     "ioredis": "^5.10.0",
     "joi": "^18.1.1",
-    "lodash": "^4.17.23",
+    "lodash": "^4.18.1",
     "node-fetch": "^3.3.2",
     "nunjucks": "^3.2.4",
     "ol": "^10.8.0",
@@ -115,7 +115,7 @@
     "webpack-cli": "7.0.2"
   },
   "overrides": {
-    "lodash-es": "4.17.23",
+    "lodash-es": "4.18.1",
     "minimatch": "10.2.4",
     "eslint": {
       "ajv": "^6.14.0"

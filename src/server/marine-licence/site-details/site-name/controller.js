@@ -1,14 +1,15 @@
 import {
-  getExemptionCache,
-  updateExemptionSiteDetails
-} from '#src/server/common/helpers/exemptions/session-cache/utils.js'
-import { routes } from '#src/server/common/constants/routes.js'
-import { saveSiteDetailsToBackend } from '#src/server/common/helpers/exemptions/save-site-details.js'
+  getMarineLicenceCache,
+  updateMarineLicenceSiteDetails
+} from '#src/server/common/helpers/marine-licence/session-cache/utils.js'
+import {
+  marineLicenceRoutes,
+  routes
+} from '#src/server/common/constants/routes.js'
 import {
   errorDescriptionByFieldName,
   mapErrorsForDisplay
 } from '#src/server/common/helpers/errors.js'
-import { getCancelLink } from '#src/server/exemption/site-details/utils/cancel-link.js'
 import {
   siteNameSettings,
   siteNameErrorMessages
@@ -16,25 +17,18 @@ import {
 import { siteNameSchema } from '#src/server/common/validation/site-name/schema.js'
 import {
   getSiteDataFromParam,
-  hasInvalidSiteNumber,
-  shouldAddNewSite
+  hasInvalidSiteNumber
 } from '#src/server/common/helpers/site-details/site-name.js'
-import { addNewSite } from './utils.js'
 
 export const SITE_NAME_VIEW_ROUTE = 'templates/site-name.njk'
 
-const getBackLink = (siteIndex, action, siteNumber) => {
-  if (action) {
-    return `${routes.REVIEW_SITE_DETAILS}#site-details-${siteNumber}`
-  }
-  return siteIndex === 0
-    ? routes.MULTIPLE_SITES_CHOICE
-    : routes.REVIEW_SITE_DETAILS
+const getBackLink = () => {
+  return marineLicenceRoutes.MARINE_LICENCE_COORDINATES_TYPE_CHOICE
 }
 
 const createValidationFailAction = (request, h, err) => {
   const { payload } = request
-  const exemption = getExemptionCache(request)
+  const marineLicence = getMarineLicenceCache(request)
 
   const { action, site } = request.query
 
@@ -45,9 +39,9 @@ const createValidationFailAction = (request, h, err) => {
       .view(SITE_NAME_VIEW_ROUTE, {
         ...siteNameSettings,
         backLink: getBackLink(siteIndex, action, siteNumber),
-        cancelLink: getCancelLink(action),
+        cancelLink: marineLicenceRoutes.MARINE_LICENCE_TASK_LIST,
         payload,
-        projectName: exemption.projectName,
+        projectName: marineLicence.projectName,
         siteNumber,
         action
       })
@@ -61,9 +55,9 @@ const createValidationFailAction = (request, h, err) => {
     .view(SITE_NAME_VIEW_ROUTE, {
       ...siteNameSettings,
       backLink: getBackLink(siteIndex, action, siteNumber),
-      cancelLink: getCancelLink(action),
+      cancelLink: marineLicenceRoutes.MARINE_LICENCE_TASK_LIST,
       payload,
-      projectName: exemption.projectName,
+      projectName: marineLicence.projectName,
       siteNumber,
       action,
       errors,
@@ -74,10 +68,10 @@ const createValidationFailAction = (request, h, err) => {
 
 export const siteNameController = {
   handler(request, h) {
-    const exemption = getExemptionCache(request)
+    const marineLicence = getMarineLicenceCache(request)
 
     const { action, site } = request.query
-    const { siteDetails } = exemption
+    const { siteDetails } = marineLicence
 
     const { siteIndex, siteNumber } = getSiteDataFromParam(site)
 
@@ -90,8 +84,8 @@ export const siteNameController = {
     return h.view(SITE_NAME_VIEW_ROUTE, {
       ...siteNameSettings,
       backLink: getBackLink(siteIndex, action, siteNumber),
-      cancelLink: getCancelLink(action),
-      projectName: exemption.projectName,
+      cancelLink: marineLicenceRoutes.MARINE_LICENCE_TASK_LIST,
+      projectName: marineLicence.projectName,
       siteNumber,
       action,
       payload: {
@@ -109,35 +103,21 @@ export const siteNameSubmitController = {
     }
   },
   async handler(request, h) {
-    const exemption = getExemptionCache(request)
-
     const { payload } = request
 
-    const { action, site } = request.query
+    const { site } = request.query
 
-    const { siteIndex, siteNumber } = getSiteDataFromParam(site)
+    const { siteIndex } = getSiteDataFromParam(site)
 
-    const queryParams = site ? `?site=${site}` : ''
+    const redirectRoute = marineLicenceRoutes.MARINE_LICENCE_SITE_NAME
 
-    const redirectRoute = action
-      ? `${routes.REVIEW_SITE_DETAILS}#site-details-${siteNumber}`
-      : `${routes.SAME_ACTIVITY_DATES}${queryParams}`
-
-    if (shouldAddNewSite(site, exemption)) {
-      await addNewSite(request, h, exemption, payload)
-    } else {
-      await updateExemptionSiteDetails(
-        request,
-        h,
-        siteIndex,
-        'siteName',
-        payload.siteName
-      )
-    }
-
-    if (action) {
-      await saveSiteDetailsToBackend(request, h)
-    }
+    await updateMarineLicenceSiteDetails(
+      request,
+      h,
+      siteIndex,
+      'siteName',
+      payload.siteName
+    )
 
     return h.redirect(redirectRoute)
   }

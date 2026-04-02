@@ -117,9 +117,6 @@ describe('#taskListController', () => {
     vi.mocked(transformOtherPermissionsTaskList).mockReturnValue(
       mockOtherPermissionsTaskList
     )
-    vi.mocked(transformOtherPermissionsTaskList).mockReturnValue(
-      mockOtherPermissionsTaskList
-    )
     vi.mocked(transformSharingTaskList).mockReturnValue(mockSharingTaskList)
     vi.mocked(setMarineLicenceCache).mockResolvedValue(mockMarineLicence)
 

@@ -58,7 +58,7 @@ export const publicRegisterSubmitController = {
         }),
         details: joi.when('consent', {
           is: 'yes',
-          then: joi.string().max(1000).required().messages({
+          then: joi.string().trim().max(1000).required().messages({
             'string.empty': errorMessages.PUBLIC_REGISTER_DETAILS_REQUIRED,
             'any.required': errorMessages.PUBLIC_REGISTER_DETAILS_REQUIRED,
             'string.max': errorMessages.PUBLIC_REGISTER_DETAILS_MAX_LENGTH

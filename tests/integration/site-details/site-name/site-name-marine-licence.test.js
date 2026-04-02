@@ -33,8 +33,7 @@ describe('Site name page (marine licence)', () => {
     setupMock,
     projectName: mockMarineLicenceApplication.projectName,
     cancelLinkHref: marineLicenceRoutes.MARINE_LICENCE_TASK_LIST,
-    backLinkHref:
-      marineLicenceRoutes.MARINE_LICENCE_COORDINATES_TYPE_CHOICE
+    backLinkHref: marineLicenceRoutes.MARINE_LICENCE_COORDINATES_TYPE_CHOICE
   })
 
   test('should redirect after valid site name is submitted', async () => {

@@ -61,7 +61,7 @@ describe('Coordinates type page (marine licence)', () => {
 
     expect(response.statusCode).toBe(statusCodes.redirect)
     expect(response.headers.location).toBe(
-      marineLicenceRoutes.MARINE_LICENCE_COORDINATES_TYPE_CHOICE
+      marineLicenceRoutes.MARINE_LICENCE_SITE_NAME
     )
   })
 })

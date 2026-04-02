@@ -1,12 +1,11 @@
 import { JSDOM } from 'jsdom'
-import {
-  getByLabelText,
-  getByRole,
-  getByText
-} from '@testing-library/dom'
+import { getByLabelText, getByRole, getByText } from '@testing-library/dom'
 import { statusCodes } from '~/src/server/common/constants/status-codes.js'
 import { validateErrors } from '../../shared/expect-utils.js'
-import { makeGetRequest, makePostRequest } from '~/src/server/test-helpers/server-requests.js'
+import {
+  makeGetRequest,
+  makePostRequest
+} from '~/src/server/test-helpers/server-requests.js'
 
 /**
  * @param {{
@@ -117,7 +116,10 @@ export function sharedSiteNameTests({
     ).toBeInTheDocument()
     expect(getByText(document, 'Site 1')).toBeInTheDocument()
 
-    validateErrors([{ field: 'siteName', message: 'Enter the site name' }], document)
+    validateErrors(
+      [{ field: 'siteName', message: 'Enter the site name' }],
+      document
+    )
   })
 
   test('should stay on same page when site name is too long', async () => {
@@ -144,7 +146,12 @@ export function sharedSiteNameTests({
     expect(getByText(document, 'Site 1')).toBeInTheDocument()
 
     validateErrors(
-      [{ field: 'siteName', message: 'Site name should be 250 characters or less' }],
+      [
+        {
+          field: 'siteName',
+          message: 'Site name should be 250 characters or less'
+        }
+      ],
       document
     )
   })

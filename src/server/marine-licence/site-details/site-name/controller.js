@@ -32,13 +32,13 @@ const createValidationFailAction = (request, h, err) => {
 
   const { action, site } = request.query
 
-  const { siteIndex, siteNumber } = getSiteDataFromParam(site)
+  const { siteNumber } = getSiteDataFromParam(site)
 
   if (!err.details) {
     return h
       .view(SITE_NAME_VIEW_ROUTE, {
         ...siteNameSettings,
-        backLink: getBackLink(siteIndex, action, siteNumber),
+        backLink: getBackLink(),
         cancelLink: marineLicenceRoutes.MARINE_LICENCE_TASK_LIST,
         payload,
         projectName: marineLicence.projectName,
@@ -54,7 +54,7 @@ const createValidationFailAction = (request, h, err) => {
   return h
     .view(SITE_NAME_VIEW_ROUTE, {
       ...siteNameSettings,
-      backLink: getBackLink(siteIndex, action, siteNumber),
+      backLink: getBackLink(),
       cancelLink: marineLicenceRoutes.MARINE_LICENCE_TASK_LIST,
       payload,
       projectName: marineLicence.projectName,
@@ -83,7 +83,7 @@ export const siteNameController = {
 
     return h.view(SITE_NAME_VIEW_ROUTE, {
       ...siteNameSettings,
-      backLink: getBackLink(siteIndex, action, siteNumber),
+      backLink: getBackLink(),
       cancelLink: marineLicenceRoutes.MARINE_LICENCE_TASK_LIST,
       projectName: marineLicence.projectName,
       siteNumber,

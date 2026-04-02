@@ -19,9 +19,7 @@ import {
 
 const SITE_NAME_MAX_LENGTH = 250
 
-export const SITE_NAME_VIEW_ROUTE = 'exemption/site-details/site-name/index'
-
-export const SITE_NAME_URL = '/exemption/site-name'
+export const SITE_NAME_VIEW_ROUTE = 'templates/site-name.njk'
 
 const siteNameSettings = {
   pageTitle: 'Site name',

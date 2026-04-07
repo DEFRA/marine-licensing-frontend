@@ -172,7 +172,7 @@ describe('#siteName', () => {
         SITE_NAME_VIEW_ROUTE,
         expect.objectContaining({
           action: 'add',
-          backLink: `${marineLicenceRoutes.MARINE_LICENCE_COORDINATES_TYPE_CHOICE}`,
+          backLink: marineLicenceRoutes.MARINE_LICENCE_COORDINATES_TYPE_CHOICE,
           cancelLink: marineLicenceRoutes.MARINE_LICENCE_TASK_LIST
         })
       )

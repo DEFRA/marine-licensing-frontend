@@ -62,7 +62,6 @@ export const renderFileUploadReview = (h, options) => {
     ...reviewSiteDetailsPageData,
     backLink: getFileUploadBackLink(previousPage, returnToCheckYourAnswers),
     projectName: marineLicence.projectName,
-    configEnv: config.get('env'),
     hasIncompleteFields: hasIncompleteFields(siteDetails),
     summaryData
   })

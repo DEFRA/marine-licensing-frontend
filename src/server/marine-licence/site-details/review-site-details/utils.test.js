@@ -131,10 +131,10 @@ describe('siteDetails utils', () => {
 
   describe('hasIncompleteFields util', () => {
     test('should return false for null, undefined, or empty inputs', () => {
-      expect(hasIncompleteFields(null, {})).toBe(false)
-      expect(hasIncompleteFields(undefined, {})).toBe(false)
-      expect(hasIncompleteFields([], {})).toBe(false)
-      expect(hasIncompleteFields([{ siteName: 'Test' }], null)).toBe(false)
+      expect(hasIncompleteFields(null)).toBe(false)
+      expect(hasIncompleteFields(undefined)).toBe(false)
+      expect(hasIncompleteFields([])).toBe(false)
+      expect(hasIncompleteFields([{ siteName: 'Test' }])).toBe(false)
     })
 
     test('should return false when all required fields are present', () => {

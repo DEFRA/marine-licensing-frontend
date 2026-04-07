@@ -12,6 +12,7 @@ vi.mock('~/src/server/common/helpers/marine-licence/session-cache/utils.js')
 vi.mock('~/src/services/cdp-upload-service/index.js')
 vi.mock('~/src/server/common/helpers/authenticated-requests.js')
 vi.mock('~/src/server/common/helpers/exemptions/save-site-details.js')
+vi.mock('~/src/server/common/helpers/marine-licence/save-site-details.js')
 
 vi.mock(
   '~/src/server/common/helpers/file-upload/geo-parse-upload.js',
@@ -375,7 +376,7 @@ describe('#uploadAndWait', () => {
 
     describe('when file upload is ready', () => {
       describe('with valid KML file', () => {
-        test('should process file and redirect to site details', async () => {
+        test('should process file and redirect to correct page', async () => {
           getMarineLicenceCacheSpy.mockReturnValue(createMockMarineLicence())
           const statusResponse = createMockStatusResponse('ready')
           mockCdpService.getStatus.mockResolvedValue(statusResponse)
@@ -401,7 +402,7 @@ describe('#uploadAndWait', () => {
           )
 
           expect(h.redirect).toHaveBeenCalledWith(
-            marineLicenceRoutes.MARINE_LICENCE_FILE_UPLOAD
+            marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS
           )
         })
       })
@@ -446,7 +447,7 @@ describe('#uploadAndWait', () => {
           )
 
           expect(h.redirect).toHaveBeenCalledWith(
-            marineLicenceRoutes.MARINE_LICENCE_FILE_UPLOAD
+            marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS
           )
         })
       })

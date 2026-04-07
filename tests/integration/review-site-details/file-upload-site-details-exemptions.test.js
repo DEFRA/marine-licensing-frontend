@@ -3,8 +3,13 @@ import { vi } from 'vitest'
 import { getByText, queryByText, within } from '@testing-library/dom'
 import { routes } from '~/src/server/common/constants/routes.js'
 import { statusCodes } from '~/src/server/common/constants/status-codes.js'
-import { testScenarios } from './file-upload-fixtures.js'
-import { validateActionLink } from './review-site-details-utils.js'
+import { testScenarios } from './exemptions-fixtures/file-upload-fixtures.js'
+import {
+  getSiteDetailsCard,
+  getRowByKey,
+  validateActionLink,
+  validateNavigationElements
+} from './review-site-details-utils.js'
 
 import {
   makeGetRequest,
@@ -18,15 +23,6 @@ import * as exemptionService from '#src/services/exemption-service/index.js'
 
 vi.mock('~/src/server/common/helpers/coordinate-utils.js')
 vi.mock('~/src/services/exemption-service/index.js')
-
-const getSiteDetailsCard = (document, expected, siteIndex = 0) => {
-  const cardName = expected?.siteDetails[siteIndex]?.cardName ?? 'Site details'
-  const heading = within(document).getByRole('heading', {
-    level: 2,
-    name: cardName
-  })
-  return heading.closest('.govuk-summary-card')
-}
 
 describe('Review Site Details - File Upload Integration Tests', () => {
   const getServer = setupTestServer()
@@ -328,19 +324,5 @@ describe('Review Site Details - File Upload Integration Tests', () => {
       '.app-site-details-map[data-module="site-details-map"]'
     )
     expect(mapDiv).toBeTruthy()
-  }
-
-  const validateNavigationElements = (document) => {
-    expect(
-      within(document).getByRole('button', { name: 'Continue' })
-    ).toHaveAttribute('type', 'submit')
-  }
-
-  const getRowByKey = (card, keyText) => {
-    const rows = card.querySelectorAll('.govuk-summary-list__row')
-    return Array.from(rows).find((row) => {
-      const keyElement = row.querySelector('.govuk-summary-list__key')
-      return keyElement && keyElement.textContent.trim() === keyText
-    })
   }
 })

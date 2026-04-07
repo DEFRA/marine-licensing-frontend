@@ -1,0 +1,106 @@
+{% extends 'layouts/page.njk' %}
+{% from "govuk/components/back-link/macro.njk" import govukBackLink %}
+{% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "cancel-button/macro.njk" import appCancelButton %}
+{% from "site-details-map/macro.njk" import appSiteDetailsMap %}
+{% from "incomplete-field/macro.njk" import appIncompleteField %}
+{% from "incomplete-fields-warning/macro.njk" import appIncompleteFieldsWarning %}
+{% block head %}
+  {{ super() }}
+{% endblock %}
+{% block beforeContent %}
+  {{ super() }}
+<nav>
+  {{ govukBackLink({
+  text: "Back",
+  href: backLink
+}) }}
+</nav>
+{% endblock %}
+
+  {% block content %}
+    <div class="govuk-grid-row">
+      <div class="govuk-grid-column-full">
+        <span class="govuk-caption-l">{{ projectName }}</span>
+        <h1 class="govuk-heading-l">Review site details</h1>
+
+            {% if hasIncompleteFields %}
+              {{ appIncompleteFieldsWarning() }}
+            {% endif %}
+
+            {% set multipleSiteRows = [
+                {
+                    key: {
+                      text: "Method of providing site location"
+                    },
+                    value: {
+                      text: 'File uploaded'
+                    }
+                }
+            ] %}
+
+            {{ govukSummaryList({
+                card: {
+                  title: {
+                    text: "Providing the site location"
+                  },
+                  attributes: {
+                    id: "site-location-card"
+                  }
+                },
+                rows: multipleSiteRows
+            }) }}
+
+        {% for site in summaryData %}
+
+            {#  This javascript variable is only for testing purposes. #}
+            <script nonce='{{ cspNonce }}'>
+              var geoJSON{{loop.index}} = {{ site.geoJSON | dump | safe }};
+            </script>
+
+          {% set summaryRowsHeading %}
+            Site {{ site.siteNumber }}
+          {% endset %}
+
+          {% set rows = [] %}
+
+          {% set _ = rows.push({
+            key: { text: "Site name"},
+            value: { html: appIncompleteField({text: site.siteName})},
+            actions: setSiteDetailsAction(site.siteName, 'review-site-details', site.siteNumber)
+          }) %}
+
+          {% set _ = rows.push({
+            key: { text: "Map view" },
+            value: { html: appSiteDetailsMap(site.siteDetailsData, loop.index0), classes: "govuk-summary-list__value--full-width" }
+          }) %}
+
+          {{ govukSummaryList({
+            card: {
+              attributes: {
+                id: "site-details-" + site.siteNumber
+              },
+              title: {
+                text: summaryRowsHeading
+              }
+            },
+            classes: 'govuk-summary-list--full-width',
+            rows: rows
+        }) }}
+        {% endfor %}
+
+        <form method="POST">
+          <input type="hidden" name="csrfToken" value="{{ csrfToken }}">
+            <div class="govuk-button-group">
+              {{ govukButton({
+                text: "Continue",
+                attributes: {
+                  id: "continue"
+                }
+              }) }}
+            </div>
+          </form>
+        </div>
+      </div>
+    {% endblock %}

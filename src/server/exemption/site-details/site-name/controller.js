@@ -9,29 +9,19 @@ import {
   mapErrorsForDisplay
 } from '#src/server/common/helpers/errors.js'
 import { getCancelLink } from '#src/server/exemption/site-details/utils/cancel-link.js'
-import joi from 'joi'
 import {
-  addNewSite,
+  siteNameSettings,
+  siteNameErrorMessages
+} from '#src/server/common/validation/site-name/constants.js'
+import { siteNameSchema } from '#src/server/common/validation/site-name/schema.js'
+import {
   getSiteDataFromParam,
   hasInvalidSiteNumber,
   shouldAddNewSite
-} from './utils.js'
+} from '#src/server/common/helpers/site-details/site-name.js'
+import { addNewSite } from './utils.js'
 
-const SITE_NAME_MAX_LENGTH = 250
-
-export const SITE_NAME_VIEW_ROUTE = 'exemption/site-details/site-name/index'
-
-export const SITE_NAME_URL = '/exemption/site-name'
-
-const siteNameSettings = {
-  pageTitle: 'Site name',
-  heading: 'Site name'
-}
-
-export const errorMessages = {
-  SITE_NAME_REQUIRED: 'Enter the site name',
-  SITE_NAME_MAX_LENGTH: 'Site name should be 250 characters or less'
-}
+export const SITE_NAME_VIEW_ROUTE = 'templates/site-name.njk'
 
 const getBackLink = (siteIndex, action, siteNumber) => {
   if (action) {
@@ -64,7 +54,7 @@ const createValidationFailAction = (request, h, err) => {
       .takeover()
   }
 
-  const errorSummary = mapErrorsForDisplay(err.details, errorMessages)
+  const errorSummary = mapErrorsForDisplay(err.details, siteNameErrorMessages)
   const errors = errorDescriptionByFieldName(errorSummary)
 
   return h
@@ -114,18 +104,7 @@ export const siteNameController = {
 export const siteNameSubmitController = {
   options: {
     validate: {
-      payload: joi.object({
-        siteName: joi
-          .string()
-          .min(1)
-          .max(SITE_NAME_MAX_LENGTH)
-          .required()
-          .messages({
-            'string.empty': 'SITE_NAME_REQUIRED',
-            'any.required': 'SITE_NAME_REQUIRED',
-            'string.max': 'SITE_NAME_MAX_LENGTH'
-          })
-      }),
+      payload: siteNameSchema,
       failAction: createValidationFailAction
     }
   },

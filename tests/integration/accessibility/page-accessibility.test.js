@@ -131,6 +131,12 @@ describe('Page accessibility checks (Axe)', () => {
     },
     { url: routes.SITE_NAME, title: 'Site name' },
     {
+      url: marineLicenceRoutes.MARINE_LICENCE_SITE_NAME,
+      title: 'Site name',
+      isMarineLicence: true
+    },
+
+    {
       url: routes.MULTIPLE_SITES_CHOICE,
       title: 'Do you need to tell us about more than one site?'
     },

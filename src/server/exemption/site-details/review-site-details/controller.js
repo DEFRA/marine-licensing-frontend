@@ -78,6 +78,7 @@ export const reviewSiteDetailsController = {
         })
   }
 }
+
 export const reviewSiteDetailsSubmitController = {
   async handler(request, h) {
     const { payload } = request

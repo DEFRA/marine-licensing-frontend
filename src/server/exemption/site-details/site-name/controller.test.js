@@ -2,8 +2,7 @@ import { vi } from 'vitest'
 import {
   siteNameController,
   siteNameSubmitController,
-  SITE_NAME_VIEW_ROUTE,
-  errorMessages
+  SITE_NAME_VIEW_ROUTE
 } from '#src/server/exemption/site-details/site-name/controller.js'
 import { mockExemption as mockExemptionData } from '#src/server/test-helpers/mocks/exemption.js'
 import { createMockRequest } from '#src/server/test-helpers/mocks/helpers.js'
@@ -205,30 +204,6 @@ describe('#siteName', () => {
       )
       expect(h.redirect).toHaveBeenCalledWith(
         `${routes.REVIEW_SITE_DETAILS}#site-details-2`
-      )
-    })
-
-    test('should validate payload correctly', () => {
-      const validationSchema = siteNameSubmitController.options.validate.payload
-
-      expect(
-        validationSchema.validate({ siteName: 'Valid Site Name' }).error
-      ).toBeUndefined()
-      expect(
-        validationSchema.validate({ siteName: 'A'.repeat(250) }).error
-      ).toBeUndefined()
-
-      expect(validationSchema.validate({}).error).toBeDefined()
-      expect(validationSchema.validate({ siteName: '' }).error).toBeDefined()
-      expect(
-        validationSchema.validate({ siteName: 'A'.repeat(251) }).error
-      ).toBeDefined()
-    })
-
-    test('should have correct error messages', () => {
-      expect(errorMessages.SITE_NAME_REQUIRED).toBe('Enter the site name')
-      expect(errorMessages.SITE_NAME_MAX_LENGTH).toBe(
-        'Site name should be 250 characters or less'
       )
     })
 

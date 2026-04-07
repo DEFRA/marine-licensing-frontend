@@ -7,6 +7,7 @@ import { formatDate } from '#src/server/common/helpers/dates/date-utils.js'
 import { getSiteDetailsBySite } from '#src/server/common/helpers/exemptions/session-cache/site-details-utils.js'
 import { buildSiteLocationData } from '#src/server/common/helpers/site-location-data.js'
 import { getReviewSummaryText } from '#src/server/common/helpers/exemptions/exemption-site-details.js'
+import { getFileUploadSummaryData } from '#src/server/common/helpers/review-site-details/file-upload.js'
 const isWGS84 = (coordinateSystem) =>
   coordinateSystem === COORDINATE_SYSTEMS.WGS84
 
@@ -123,42 +124,6 @@ export const getPolygonCoordinatesDisplayData = (
     transformCoordinateToDisplayFormat(coord, index, coordinateSystem)
   )
 }
-
-export const getFileUploadSummaryData = (exemption) => {
-  const siteDetails = exemption.siteDetails || {}
-  const geoJSON = siteDetails.geoJSON || {}
-
-  const coordinates = parseGeoJSONCoordinates(geoJSON)
-
-  return {
-    coordinates,
-    geoJSON
-  }
-}
-
-const parseGeoJSONCoordinates = (geoJSON) => {
-  const features = geoJSON.features
-  if (!features || !Array.isArray(features)) {
-    return []
-  }
-
-  return features.filter(hasValidGeometry).map(extractCoordinateData)
-}
-
-const hasValidGeometry = (feature) => {
-  const geometry = feature.geometry
-  return (
-    geometry?.type &&
-    geometry?.coordinates &&
-    Array.isArray(geometry.coordinates) &&
-    geometry.coordinates.length > 0
-  )
-}
-
-const extractCoordinateData = (feature) => ({
-  type: feature.geometry.type,
-  coordinates: feature.geometry.coordinates
-})
 
 export const getFileUploadBackLink = (
   previousPage,

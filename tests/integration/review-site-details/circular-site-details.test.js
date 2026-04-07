@@ -5,7 +5,7 @@ import { COORDINATE_SYSTEMS } from '~/src/server/common/constants/exemptions.js'
 import { routes } from '~/src/server/common/constants/routes.js'
 import { statusCodes } from '~/src/server/common/constants/status-codes.js'
 import * as coordinateUtils from '~/src/server/common/helpers/coordinate-utils.js'
-import { testScenarios } from './circular-site-fixtures.js'
+import { testScenarios } from './exemptions-fixtures/circular-site-fixtures.js'
 
 import { makeGetRequest } from '~/src/server/test-helpers/server-requests.js'
 import {

@@ -128,7 +128,7 @@ const processValidatedFile = async (status, uploadConfig, request, h) => {
 
     await saveSiteDetailsToBackend(request, h)
 
-    return h.redirect(marineLicenceRoutes.MARINE_LICENCE_FILE_UPLOAD)
+    return h.redirect(marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS)
   } catch (error) {
     await handleGeoParserError(
       request,

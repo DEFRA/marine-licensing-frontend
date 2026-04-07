@@ -94,8 +94,6 @@ export const coordinatesTypeSubmitController = {
         .takeover()
     }
 
-    return h
-      .redirect(marineLicenceRoutes.MARINE_LICENCE_COORDINATES_TYPE_CHOICE)
-      .takeover()
+    return h.redirect(marineLicenceRoutes.MARINE_LICENCE_SITE_NAME).takeover()
   }
 }

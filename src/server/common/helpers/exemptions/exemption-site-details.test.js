@@ -10,17 +10,23 @@ import {
 import {
   getCoordinateSystemText,
   getCoordinateDisplayText,
-  getFileUploadSummaryData,
   getPolygonCoordinatesDisplayData
 } from '#src/server/exemption/site-details/review-site-details/utils.js'
+import { getFileUploadSummaryData } from '#src/server/common/helpers/review-site-details/file-upload.js'
 
 vi.mock(
   '~/src/server/exemption/site-details/review-site-details/utils.js',
   () => ({
     getCoordinateSystemText: vi.fn(),
     getCoordinateDisplayText: vi.fn(),
-    getFileUploadSummaryData: vi.fn(),
     getPolygonCoordinatesDisplayData: vi.fn()
+  })
+)
+
+vi.mock(
+  '~/src/server/common/helpers/review-site-details/file-upload.js',
+  () => ({
+    getFileUploadSummaryData: vi.fn()
   })
 )
 

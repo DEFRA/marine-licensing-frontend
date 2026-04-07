@@ -51,7 +51,10 @@ export const transformProjectDetailsTaskList = (taskList) => [
 export const transformSiteDetailsTaskList = (taskList) => [
   {
     title: { text: 'Site details', classes: taskClasses },
-    href: marineLicenceRoutes.MARINE_LICENCE_SITE_DETAILS,
+    href:
+      !taskList.siteDetails || taskList.siteDetails === 'INCOMPLETE'
+        ? marineLicenceRoutes.MARINE_LICENCE_SITE_DETAILS
+        : marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS,
     status: setStatus(taskList.siteDetails)
   }
 ]

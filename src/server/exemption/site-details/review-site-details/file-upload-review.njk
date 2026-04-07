@@ -5,7 +5,7 @@
 {% from "cancel-button/macro.njk" import appCancelButton %}
 {% from "site-details-map/macro.njk" import appSiteDetailsMap %}
 {% from "incomplete-field/macro.njk" import appIncompleteField %}
-{% from "govuk/components/inset-text/macro.njk" import govukInsetText %}
+{% from "incomplete-fields-warning/macro.njk" import appIncompleteFieldsWarning %}
 {% block head %}
   {{ super() }}
 {% endblock %}
@@ -26,18 +26,8 @@
         <h1 class="govuk-heading-l">Review site details</h1>
 
             {% if isMultiSiteJourney and hasIncompleteFields %}
-
-              {% set incompleteWarningText %}
-                <p class="govuk-!-margin-bottom-3">The site details you've provided are saved.</p>
-                <p class="govuk-!-margin-bottom-3">You must complete all sections marked {{appIncompleteField()}} before you can send your information.</p>
-                <p class="govuk-!-margin-bottom-0">If you cannot finish now, you can return to this page later.</p>
-              {% endset %}
-
-              {{ govukInsetText({
-                html: incompleteWarningText
-              }) }}
-
-            {% endif  %}
+              {{ appIncompleteFieldsWarning() }}
+            {% endif %}
 
             {% set multipleSiteRows = [
                 {

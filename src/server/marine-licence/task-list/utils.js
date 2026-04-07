@@ -26,13 +26,19 @@ const setStatus = (task) => {
   }
 }
 
-export const transformOtherPermissionsTaskList = (taskList) => [
-  {
+export const transformOtherPermissionsTaskList = (taskList, isCitizen) => {
+  const otherAuthorities = {
+    title: { text: 'Other authorities', classes: taskClasses },
+    href: marineLicenceRoutes.MARINE_LICENCE_OTHER_AUTHORITIES,
+    status: setStatus(taskList.otherAuthorities)
+  }
+  const specialLegalPowers = {
     title: { text: 'Special legal powers', classes: taskClasses },
     href: marineLicenceRoutes.MARINE_LICENCE_SPECIAL_LEGAL_POWERS,
     status: setStatus(taskList.specialLegalPowers)
   }
-]
+  return isCitizen ? [otherAuthorities] : [specialLegalPowers, otherAuthorities]
+}
 
 export const transformProjectDetailsTaskList = (taskList) => [
   {
@@ -45,7 +51,10 @@ export const transformProjectDetailsTaskList = (taskList) => [
 export const transformSiteDetailsTaskList = (taskList) => [
   {
     title: { text: 'Site details', classes: taskClasses },
-    href: marineLicenceRoutes.MARINE_LICENCE_SITE_DETAILS,
+    href:
+      !taskList.siteDetails || taskList.siteDetails === 'INCOMPLETE'
+        ? marineLicenceRoutes.MARINE_LICENCE_SITE_DETAILS
+        : marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS,
     status: setStatus(taskList.siteDetails)
   }
 ]

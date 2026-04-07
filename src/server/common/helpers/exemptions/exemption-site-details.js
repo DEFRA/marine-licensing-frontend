@@ -1,9 +1,9 @@
 import {
   getCoordinateSystemText,
   getCoordinateDisplayText,
-  getFileUploadSummaryData,
   getPolygonCoordinatesDisplayData
 } from '#src/server/exemption/site-details/review-site-details/utils.js'
+import { getFileUploadSummaryData } from '#src/server/common/helpers/review-site-details/file-upload.js'
 import { getSiteDetailsBySite } from '#src/server/common/helpers/exemptions/session-cache/site-details-utils.js'
 import { formatDate } from '#src/server/common/helpers/dates/date-utils.js'
 import { createSiteDetailsDataJson } from '#src/server/common/helpers/site-details.js'

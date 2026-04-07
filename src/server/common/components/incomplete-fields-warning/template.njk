@@ -1,0 +1,12 @@
+{% from "incomplete-field/macro.njk" import appIncompleteField %}
+{% from "govuk/components/inset-text/macro.njk" import govukInsetText %}
+
+{% set incompleteWarningText %}
+  <p class="govuk-!-margin-bottom-3">The site details you've provided are saved.</p>
+  <p class="govuk-!-margin-bottom-3">You must complete all sections marked {{appIncompleteField()}} before you can send your information.</p>
+  <p class="govuk-!-margin-bottom-0">If you cannot finish now, you can return to this page later.</p>
+{% endset %}
+
+{{ govukInsetText({
+  html: incompleteWarningText
+}) }}

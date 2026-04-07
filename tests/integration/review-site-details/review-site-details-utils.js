@@ -1,4 +1,4 @@
-import { within } from '@testing-library/dom'
+import { getByText, queryByText, within } from '@testing-library/dom'
 
 export const getSiteDetailsCard = (document, expected, siteIndex = 0) => {
   const cardName = expected?.siteDetails[siteIndex]?.cardName ?? 'Site details'
@@ -8,6 +8,7 @@ export const getSiteDetailsCard = (document, expected, siteIndex = 0) => {
   })
   return heading.closest('.govuk-summary-card')
 }
+
 export const validatePageStructure = (document, expected) => {
   const heading = document.querySelector('h1')
   expect(heading.textContent.trim()).toBe('Review site details')
@@ -51,4 +52,25 @@ export const getRowByKey = (card, keyText) => {
     const keyElement = row.querySelector('.govuk-summary-list__key')
     return keyElement && keyElement.textContent.trim() === keyText
   })
+}
+
+export const validateIncompleteWarning = (document, expected) => {
+  if (expected.hasIncompleteWarning) {
+    expect(
+      getByText(document, "The site details you've provided are saved.")
+    ).toBeInTheDocument()
+    expect(
+      getByText(document, /You must complete all sections marked/i)
+    ).toBeInTheDocument()
+    expect(
+      getByText(
+        document,
+        'If you cannot finish now, you can return to this page later.'
+      )
+    ).toBeInTheDocument()
+  } else {
+    expect(
+      queryByText(document, "The site details you've provided are saved.")
+    ).not.toBeInTheDocument()
+  }
 }

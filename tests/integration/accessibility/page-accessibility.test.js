@@ -131,6 +131,12 @@ describe('Page accessibility checks (Axe)', () => {
     },
     { url: routes.SITE_NAME, title: 'Site name' },
     {
+      url: marineLicenceRoutes.MARINE_LICENCE_SITE_NAME,
+      title: 'Site name',
+      isMarineLicence: true
+    },
+
+    {
       url: routes.MULTIPLE_SITES_CHOICE,
       title: 'Do you need to tell us about more than one site?'
     },
@@ -177,6 +183,12 @@ describe('Page accessibility checks (Axe)', () => {
         'Does your organisation have special legal powers to do any of this project?',
       isMarineLicence: true,
       session: { ...agentSession, shouldShowOrgOrUserName: false }
+    },
+    {
+      url: marineLicenceRoutes.MARINE_LICENCE_OTHER_AUTHORITIES,
+      title:
+        'Have you applied to, or got permission from, any other authorities in relation to this project?',
+      isMarineLicence: true
     },
     {
       url: marineLicenceRoutes.MARINE_LICENCE_TASK_LIST,

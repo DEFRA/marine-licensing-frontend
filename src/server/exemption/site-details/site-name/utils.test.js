@@ -1,7 +1,7 @@
 import { setExemptionCache } from '#src/server/common/helpers/exemptions/session-cache/utils.js'
 import { mockExemption } from '#src/server/test-helpers/mocks/exemption.js'
 import { createMockRequest } from '#src/server/test-helpers/mocks/helpers.js'
-import { addNewSite, hasInvalidSiteNumber } from './utils'
+import { addNewSite } from './utils'
 
 vi.mock('#src/server/common/helpers/exemptions/session-cache/utils.js')
 
@@ -30,20 +30,6 @@ describe('#site name utils', () => {
         mockH,
         expected
       )
-    })
-  })
-  describe('#hasInvalidSiteNumber', () => {
-    test('correctly returns with invalid site number in URL params', async () => {
-      const isInvalid = hasInvalidSiteNumber(10, [{}, {}])
-      expect(isInvalid).toBeTruthy()
-    })
-    test('correctly returns with valid site number in URL params when editing', async () => {
-      const isInvalid = hasInvalidSiteNumber(1, [{}, {}])
-      expect(isInvalid).toBeFalsy()
-    })
-    test('correctly returns with valid site number in URL params when adding', async () => {
-      const isInvalid = hasInvalidSiteNumber(3, [{}, {}])
-      expect(isInvalid).toBeFalsy()
     })
   })
 })

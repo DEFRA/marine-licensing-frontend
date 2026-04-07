@@ -1,4 +1,3 @@
-import { config } from '#src/config/config.js'
 import {
   routes,
   marineLicenceRoutes

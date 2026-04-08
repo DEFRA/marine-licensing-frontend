@@ -4,7 +4,10 @@ import {
   siteNameSubmitController,
   SITE_NAME_VIEW_ROUTE
 } from '#src/server/marine-licence/site-details/site-name/controller.js'
-import { createMockRequest } from '#src/server/test-helpers/mocks/helpers.js'
+import {
+  createMockRequest,
+  createMockH
+} from '#src/server/test-helpers/mocks/helpers.js'
 import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
 import {
   getMarineLicenceCache,
@@ -18,6 +21,7 @@ vi.mock('~/src/server/common/helpers/marine-licence/save-site-details.js')
 
 describe('#siteName', () => {
   const mockSiteName = 'Test Site Name'
+  const h = createMockH()
 
   beforeAll(() => {
     vi.mocked(getMarineLicenceCache).mockReturnValue(
@@ -27,7 +31,6 @@ describe('#siteName', () => {
 
   describe('#siteNameController', () => {
     test('should render with correct context', () => {
-      const h = { view: vi.fn() }
       const request = createMockRequest()
 
       vi.mocked(getMarineLicenceCache).mockReturnValueOnce({
@@ -55,7 +58,6 @@ describe('#siteName', () => {
     })
 
     test('should include action in view context when action parameter is present', () => {
-      const h = { view: vi.fn() }
       const request = createMockRequest({ query: { action: 'add' } })
 
       siteNameController.handler(request, h)
@@ -65,6 +67,21 @@ describe('#siteName', () => {
         expect.objectContaining({
           action: true
         })
+      )
+    })
+
+    test('should redirect to task list when invalid site number', () => {
+      vi.mocked(getMarineLicenceCache).mockReturnValueOnce({
+        ...mockMarineLicenceApplication,
+        siteDetails: []
+      })
+
+      const request = createMockRequest({ query: { site: '3' } })
+
+      siteNameController.handler(request, h)
+
+      expect(h.redirect).toHaveBeenCalledWith(
+        marineLicenceRoutes.MARINE_LICENCE_TASK_LIST
       )
     })
   })
@@ -84,7 +101,7 @@ describe('#siteName', () => {
       const request = createMockRequest({
         payload: { siteName: 'Test Site Name' }
       })
-      const h = { redirect: vi.fn() }
+
       vi.mocked(saveSiteDetailsToBackend).mockResolvedValueOnce(undefined)
 
       await siteNameSubmitController.handler(request, h)
@@ -105,7 +122,6 @@ describe('#siteName', () => {
       const request = createMockRequest({
         payload: { siteName: '' }
       })
-      const h = { view: vi.fn().mockReturnValue({ takeover: vi.fn() }) }
 
       const err = {
         details: [
@@ -136,7 +152,6 @@ describe('#siteName', () => {
       const request = createMockRequest({
         payload: { siteName: 'invalid' }
       })
-      const h = { view: vi.fn().mockReturnValue({ takeover: vi.fn() }) }
 
       siteNameSubmitController.options.validate.failAction(request, h, {})
 
@@ -157,7 +172,6 @@ describe('#siteName', () => {
         payload: { siteName: '' },
         query: { action: 'add' }
       })
-      const h = { view: vi.fn().mockReturnValue({ takeover: vi.fn() }) }
 
       const err = {
         details: [

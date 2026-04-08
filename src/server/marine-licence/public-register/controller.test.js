@@ -13,7 +13,7 @@ describe('#publicRegister', () => {
   const mockLicence = {
     projectName: 'Test Project',
     id: 'test-id',
-    publicRegister: { consent: 'yes', details: 'Some details' }
+    publicRegister: { consent: 'no', details: 'Some details' }
   }
 
   beforeEach(() => {
@@ -44,7 +44,7 @@ describe('#publicRegister', () => {
       await expect(
         publicRegisterSubmitController.handler(
           {
-            payload: { consent: 'yes', details: 'Some details' },
+            payload: { consent: 'no', details: 'Some details' },
             query: {}
           },
           h
@@ -61,7 +61,7 @@ describe('#publicRegister', () => {
       }
 
       await publicRegisterSubmitController.handler(
-        { payload: { consent: 'no' }, query: {} },
+        { payload: { consent: 'yes' }, query: {} },
         h
       )
 
@@ -70,7 +70,7 @@ describe('#publicRegister', () => {
         '/marine-licence/public-register',
         {
           id: mockLicence.id,
-          consent: 'no'
+          consent: 'yes'
         }
       )
       expect(h.redirect).toHaveBeenCalledWith(
@@ -86,7 +86,7 @@ describe('#publicRegister', () => {
 
       await publicRegisterSubmitController.handler(
         {
-          payload: { consent: 'yes', details: 'Some details' },
+          payload: { consent: 'no', details: 'Some details' },
           query: { from: 'check-your-answers' }
         },
         h
@@ -97,7 +97,7 @@ describe('#publicRegister', () => {
         '/marine-licence/public-register',
         {
           id: mockLicence.id,
-          consent: 'yes',
+          consent: 'no',
           details: 'Some details'
         }
       )
@@ -132,7 +132,7 @@ describe('#publicRegister', () => {
 
       await publicRegisterSubmitController.handler(
         {
-          payload: { consent: 'yes', details: 'Some details' },
+          payload: { consent: 'no', details: 'Some details' },
           query: {}
         },
         h
@@ -142,7 +142,7 @@ describe('#publicRegister', () => {
         PUBLIC_REGISTER_VIEW_ROUTE,
         expect.objectContaining({
           backLink: marineLicenceRoutes.MARINE_LICENCE_TASK_LIST,
-          payload: { consent: 'yes', details: 'Some details' }
+          payload: { consent: 'no', details: 'Some details' }
         })
       )
     })
@@ -173,7 +173,7 @@ describe('#publicRegister', () => {
 
       await publicRegisterSubmitController.handler(
         {
-          payload: { consent: 'yes', details: 'Some details' },
+          payload: { consent: 'no', details: 'Some details' },
           query: { from: 'check-your-answers' }
         },
         h
@@ -183,7 +183,7 @@ describe('#publicRegister', () => {
         PUBLIC_REGISTER_VIEW_ROUTE,
         expect.objectContaining({
           backLink: marineLicenceRoutes.MARINE_LICENCE_CHECK_YOUR_ANSWERS,
-          payload: { consent: 'yes', details: 'Some details' }
+          payload: { consent: 'no', details: 'Some details' }
         })
       )
     })

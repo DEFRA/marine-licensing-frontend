@@ -29,7 +29,7 @@
 			<li>MMO decides the information is commercially sensitive</li>
 		</ul>
 
-    <h2 class="govuk-heading-m">Is there any reason your information cannot be shared publicly?</h2>
+    <h2 class="govuk-heading-m">Do you consent to the MMO publishing your project information publicly?</h2>
   {% endset -%}
 
   {% set publicRegisterDetails %}
@@ -57,14 +57,14 @@
             items: [
                 {
                 value: "yes",
-                text: "Yes",
-                conditional: {
-                  html: publicRegisterDetails
-                }
+                text: "Yes"
                 },
                 {
                 value: "no",
-                text: "No"
+                text: "No",
+                conditional: {
+                  html: publicRegisterDetails
+                }
                 }
             ],
             csrfToken: csrfToken,

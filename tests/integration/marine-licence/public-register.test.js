@@ -88,7 +88,7 @@ describe('Public register', () => {
     mockMarineLicence({
       ...marineLicence,
       publicRegister: {
-        consent: 'yes',
+        consent: 'no',
         details: 'Some details'
       }
     })
@@ -102,7 +102,7 @@ describe('Public register', () => {
       getInputInFieldset({
         document,
         fieldsetLabel: 'Sharing your project information publicly',
-        inputLabel: 'Yes',
+        inputLabel: 'No',
         findByHeading: true
       })
     ).toBeChecked()
@@ -132,12 +132,12 @@ describe('Public register', () => {
       document,
       fieldsetLabel: 'Sharing your project information publicly',
       errorMessage:
-        'Select whether you consent to the MMO publishing your project information publicly',
+        'Select whether there is any reason why your information cannot be shared publicly',
       findByHeading: true
     })
   })
 
-  test('should show a validation error when "yes" is selected but details are missing', async () => {
+  test('should show a validation error when "no" is selected but details are missing', async () => {
     mockMarineLicence(marineLicence)
 
     const submitPublicRegisterForm = async (formData) => {
@@ -150,14 +150,15 @@ describe('Public register', () => {
     }
 
     const document = await submitPublicRegisterForm({
-      consent: 'yes',
+      consent: 'no',
       details: ''
     })
 
     expectFieldsetError({
       document,
       fieldsetLabel: 'Sharing your project information publicly',
-      errorMessage: 'Provide details about what you consent to share',
+      errorMessage:
+        'Provide details of why you do not consent',
       findByHeading: true
     })
   })

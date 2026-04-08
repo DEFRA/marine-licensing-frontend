@@ -9,13 +9,17 @@ export function setSiteDetailsAction(
 
   const action = hasValue ? 'change' : 'add'
 
-  let queryString = siteNumber
-    ? `site=${siteNumber}${skipAction ? '' : '&'}`
-    : ''
+  const queryParams = []
+
+  if (siteNumber) {
+    queryParams.push(`site=${siteNumber}`)
+  }
 
   if (!skipAction) {
-    queryString += `action=${action}`
+    queryParams.push(`action=${action}`)
   }
+
+  const queryString = queryParams.join('&')
 
   return {
     items: [

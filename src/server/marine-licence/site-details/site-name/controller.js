@@ -113,7 +113,7 @@ export const siteNameSubmitController = {
 
     const { site } = request.query
 
-    const { siteIndex } = getSiteDataFromParam(site)
+    const { siteIndex, siteNumber } = getSiteDataFromParam(site)
 
     const marineLicence = getMarineLicenceCache(request)
 
@@ -122,7 +122,7 @@ export const siteNameSubmitController = {
     const isFileUploadCoordinates = siteDetails.coordinatesType === 'file'
 
     const redirectRoute = isFileUploadCoordinates
-      ? marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS
+      ? `${marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS}#site-details-${siteNumber}`
       : marineLicenceRoutes.MARINE_LICENCE_SITE_NAME
 
     await updateMarineLicenceSiteDetails(

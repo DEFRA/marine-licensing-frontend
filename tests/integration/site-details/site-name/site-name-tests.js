@@ -7,16 +7,6 @@ import {
   makePostRequest
 } from '~/src/server/test-helpers/server-requests.js'
 
-/**
- * @param {{
- *   getServer: () => import('@hapi/hapi').Server,
- *   url: string,
- *   setupMock: (siteDetails?: object[]) => void,
- *   projectName: string,
- *   cancelLinkHref: string,
- *   backLinkHref: string
- * }} options
- */
 export function sharedSiteNameTests({
   getServer,
   url,

@@ -68,7 +68,7 @@
           {% set _ = rows.push({
             key: { text: "Site name"},
             value: { html: appIncompleteField({text: site.siteName})},
-            actions: setSiteDetailsAction(site.siteName, 'review-site-details', site.siteNumber)
+            actions: setSiteDetailsAction(site.siteName, 'site-name', site.siteNumber,"",true)
           }) %}
 
           {% set _ = rows.push({

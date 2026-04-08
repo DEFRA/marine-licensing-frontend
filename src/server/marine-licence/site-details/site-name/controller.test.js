@@ -11,9 +11,10 @@ import {
   updateMarineLicenceSiteDetails
 } from '#src/server/common/helpers/marine-licence/session-cache/utils.js'
 import { mockMarineLicenceApplication } from '#src/server/test-helpers/mocks/marine-licence-mocks.js'
+import { saveSiteDetailsToBackend } from '#src/server/common/helpers/marine-licence/save-site-details.js'
 
 vi.mock('~/src/server/common/helpers/marine-licence/session-cache/utils.js')
-vi.mock('~/src/server/common/helpers/exemptions/save-site-details.js')
+vi.mock('~/src/server/common/helpers/marine-licence/save-site-details.js')
 
 describe('#siteName', () => {
   const mockSiteName = 'Test Site Name'
@@ -44,12 +45,12 @@ describe('#siteName', () => {
       expect(h.view).toHaveBeenCalledWith(SITE_NAME_VIEW_ROUTE, {
         pageTitle: 'Site name',
         heading: 'Site name',
-        backLink: marineLicenceRoutes.MARINE_LICENCE_COORDINATES_TYPE_CHOICE,
-        cancelLink: marineLicenceRoutes.MARINE_LICENCE_TASK_LIST,
+        backLink: marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS,
+        cancelLink: marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS,
         payload: { siteName: mockSiteName },
         projectName: 'Test Project',
         siteNumber: 1,
-        action: undefined
+        action: true
       })
     })
 
@@ -62,7 +63,7 @@ describe('#siteName', () => {
       expect(h.view).toHaveBeenCalledWith(
         SITE_NAME_VIEW_ROUTE,
         expect.objectContaining({
-          action: 'add'
+          action: true
         })
       )
     })
@@ -84,6 +85,7 @@ describe('#siteName', () => {
         payload: { siteName: 'Test Site Name' }
       })
       const h = { redirect: vi.fn() }
+      vi.mocked(saveSiteDetailsToBackend).mockResolvedValueOnce(undefined)
 
       await siteNameSubmitController.handler(request, h)
 
@@ -95,7 +97,7 @@ describe('#siteName', () => {
         'Test Site Name'
       )
       expect(h.redirect).toHaveBeenCalledWith(
-        marineLicenceRoutes.MARINE_LICENCE_SITE_NAME
+        marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS
       )
     })
 
@@ -119,12 +121,12 @@ describe('#siteName', () => {
       expect(h.view).toHaveBeenCalledWith(SITE_NAME_VIEW_ROUTE, {
         pageTitle: 'Site name',
         heading: 'Site name',
-        backLink: marineLicenceRoutes.MARINE_LICENCE_COORDINATES_TYPE_CHOICE,
-        cancelLink: marineLicenceRoutes.MARINE_LICENCE_TASK_LIST,
+        backLink: marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS,
+        cancelLink: marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS,
         payload: { siteName: '' },
         projectName: 'Test Project',
         siteNumber: 1,
-        action: undefined,
+        action: true,
         errors: expect.any(Object),
         errorSummary: expect.any(Array)
       })
@@ -141,12 +143,12 @@ describe('#siteName', () => {
       expect(h.view).toHaveBeenCalledWith(SITE_NAME_VIEW_ROUTE, {
         pageTitle: 'Site name',
         heading: 'Site name',
-        backLink: marineLicenceRoutes.MARINE_LICENCE_COORDINATES_TYPE_CHOICE,
-        cancelLink: marineLicenceRoutes.MARINE_LICENCE_TASK_LIST,
+        backLink: marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS,
+        cancelLink: marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS,
         payload: { siteName: 'invalid' },
         projectName: 'Test Project',
         siteNumber: 1,
-        action: undefined
+        action: true
       })
     })
 
@@ -171,9 +173,9 @@ describe('#siteName', () => {
       expect(h.view).toHaveBeenCalledWith(
         SITE_NAME_VIEW_ROUTE,
         expect.objectContaining({
-          action: 'add',
-          backLink: marineLicenceRoutes.MARINE_LICENCE_COORDINATES_TYPE_CHOICE,
-          cancelLink: marineLicenceRoutes.MARINE_LICENCE_TASK_LIST
+          action: true,
+          backLink: marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS,
+          cancelLink: marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS
         })
       )
     })

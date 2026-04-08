@@ -26,7 +26,8 @@ export const prepareFileUploadDataForSave = (siteDetails, request) => {
         s3Bucket: site.s3Location.s3Bucket,
         s3Key: site.s3Location.s3Key,
         checksumSha256: site.s3Location.checksumSha256
-      }
+      },
+      siteName: site.siteName
     }
 
     request.logger.info(

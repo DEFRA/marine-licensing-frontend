@@ -37,6 +37,7 @@ describe('save-site-details', () => {
         fileUploadType: 'kml',
         geoJSON: mockMarineLicenceApplication.siteDetails[0].geoJSON,
         featureCount: 0,
+        siteName: 'test site name',
         uploadedFile: { filename: 'test-upload-id' },
         s3Location: {
           s3Bucket: 'test-bucket',
@@ -123,6 +124,7 @@ describe('save-site-details', () => {
         fileUploadType: 'kml',
         geoJSON: siteDetails[0].geoJSON,
         featureCount: 1,
+        siteName: undefined,
         uploadedFile: {
           filename: 'test-site.kml'
         },
@@ -138,6 +140,7 @@ describe('save-site-details', () => {
         fileUploadType: 'kml',
         geoJSON: siteDetails[1].geoJSON,
         featureCount: 1,
+        siteName: undefined,
         uploadedFile: {
           filename: 'test-site.kml'
         },

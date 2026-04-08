@@ -10,15 +10,15 @@
   {% endif %}
 
   {% set _ = rows.push({
-    key: { text: "Is there any reason your information cannot be shared publicly?" },
+    key: { text: "Consent to publish your project information" },
     value: consentValue,
     classes: "govuk-summary-list__row--no-border"    
   }) %}
 
-  {% if params.publicRegister.consent === 'yes' %}
+  {% if params.publicRegister.consent === 'no' %}
     {% set _ = rows.push({
-      key: { text: "Reason your information cannot be shared publicly" },
-      value: { text: params.publicRegister.details }
+      key: { text: "Why do you not consent" },
+      value: { text: params.publicRegister.reason }
     }) %}
   {% endif %}
 {% endif %}

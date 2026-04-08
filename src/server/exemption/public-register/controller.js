@@ -8,18 +8,18 @@ import {
 } from '#src/server/common/helpers/errors.js'
 import { routes } from '#src/server/common/constants/routes.js'
 import { authenticatedPatchRequest } from '#src/server/common/helpers/authenticated-requests.js'
+import { createFailAction } from '#src/server/common/helpers/createFailAction.js'
 
 import joi from 'joi'
 
-export const PUBLIC_REGISTER_VIEW_ROUTE = 'exemption/public-register/index'
+export const PUBLIC_REGISTER_VIEW_ROUTE = 'templates/public-register'
 
 export const errorMessages = {
-  PUBLIC_REGISTER_REASON_REQUIRED:
-    'Provide details of why you do not consent to your project information being published',
+  PUBLIC_REGISTER_REASON_REQUIRED: 'Provide details of why you do not consent',
   PUBLIC_REGISTER_REASON_MAX_LENGTH:
-    'Details of why you do not consent must be 1000 characters or less',
+    'Details of why you do not consent must be 1000 characters or fewer',
   PUBLIC_REGISTER_CONSENT_REQUIRED:
-    'Select whether you consent to the MMO publishing your project information publicly'
+    'Select whether there is any reason why your information cannot be shared publicly'
 }
 
 const publicRegisterSettings = {
@@ -54,46 +54,21 @@ export const publicRegisterSubmitController = {
           'any.required': 'PUBLIC_REGISTER_CONSENT_REQUIRED'
         }),
         reason: joi.when('consent', {
-          // Reason required when consent: 'no'
           is: 'no',
-          then: joi.string().required().messages({
+          then: joi.string().trim().max(1000).required().messages({
             'string.empty': 'PUBLIC_REGISTER_REASON_REQUIRED',
-            'any.required': 'PUBLIC_REGISTER_REASON_REQUIRED'
+            'any.required': 'PUBLIC_REGISTER_REASON_REQUIRED',
+            'string.max': 'PUBLIC_REGISTER_REASON_MAX_LENGTH'
           })
         })
       }),
-      failAction: (request, h, err) => {
-        const { payload } = request
-
-        const { projectName } = getExemptionCache(request)
-        const backLink = getBackLink(request)
-
-        if (!err.details) {
-          return h
-            .view(PUBLIC_REGISTER_VIEW_ROUTE, {
-              ...publicRegisterSettings,
-              payload,
-              projectName,
-              backLink
-            })
-            .takeover()
-        }
-
-        const errorSummary = mapErrorsForDisplay(err.details, errorMessages)
-
-        const errors = errorDescriptionByFieldName(errorSummary)
-
-        return h
-          .view(PUBLIC_REGISTER_VIEW_ROUTE, {
-            ...publicRegisterSettings,
-            payload,
-            projectName,
-            backLink,
-            errors,
-            errorSummary
-          })
-          .takeover()
-      }
+      failAction: createFailAction({
+        getCache: getExemptionCache,
+        viewRoute: PUBLIC_REGISTER_VIEW_ROUTE,
+        settings: publicRegisterSettings,
+        errorMessages,
+        getBackLink
+      })
     }
   },
   async handler(request, h) {
@@ -102,7 +77,6 @@ export const publicRegisterSubmitController = {
     const exemption = getExemptionCache(request)
 
     try {
-      // consent: 'yes' = user consents to publish, consent: 'no' = user declines consent
       const userDeclinesConsent = payload.consent === 'no'
 
       await authenticatedPatchRequest(request, '/exemption/public-register', {

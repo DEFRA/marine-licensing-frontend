@@ -16,7 +16,7 @@ describe('Public register', () => {
   const marineLicence = {
     id: 'marine-licence-123',
     projectName: 'Test Marine Project',
-    publicRegister: { consent: undefined, details: '' }
+    publicRegister: { consent: undefined, reason: '' }
   }
 
   test('page elements', async () => {
@@ -58,7 +58,7 @@ describe('Public register', () => {
     )
   })
 
-  test('form state when no decision set', async () => {
+  test('public register form state when no decision set', async () => {
     mockMarineLicence(marineLicence)
 
     const document = await loadPage({
@@ -84,7 +84,7 @@ describe('Public register', () => {
     ).not.toBeChecked()
   })
 
-  test('form state when consent is yes', async () => {
+  test('public register form state when consent is yes', async () => {
     mockMarineLicence({
       ...marineLicence,
       publicRegister: { consent: 'yes' }
@@ -113,12 +113,12 @@ describe('Public register', () => {
     ).not.toBeChecked()
   })
 
-  test('form state when consent is no and details set', async () => {
+  test('public register form state when consent is no and reason set', async () => {
     mockMarineLicence({
       ...marineLicence,
       publicRegister: {
         consent: 'no',
-        details: 'Some details'
+        reason: 'Some reason'
       }
     })
 
@@ -139,7 +139,7 @@ describe('Public register', () => {
       document,
       inputLabel:
         'Provide details of why you do not consent to your project information being published',
-      value: 'Some details'
+      value: 'Some reason'
     })
   })
 
@@ -155,7 +155,7 @@ describe('Public register', () => {
       return document
     }
 
-    const document = await submitPublicRegisterForm({ details: '' })
+    const document = await submitPublicRegisterForm({ reason: '' })
 
     expectFieldsetError({
       document,
@@ -166,7 +166,7 @@ describe('Public register', () => {
     })
   })
 
-  test('should show a validation error when "no" is selected but details are missing', async () => {
+  test('should show a validation error when "no" is selected but reason is missing', async () => {
     mockMarineLicence(marineLicence)
 
     const submitPublicRegisterForm = async (formData) => {
@@ -180,7 +180,7 @@ describe('Public register', () => {
 
     const document = await submitPublicRegisterForm({
       consent: 'no',
-      details: ''
+      reason: ''
     })
 
     expectFieldsetError({

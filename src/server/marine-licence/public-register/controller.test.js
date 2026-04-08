@@ -13,7 +13,7 @@ describe('#publicRegister', () => {
   const mockLicence = {
     projectName: 'Test Project',
     id: 'test-id',
-    publicRegister: { consent: 'no', details: 'Some details' }
+    publicRegister: { consent: 'no', reason: 'Some reason' }
   }
 
   beforeEach(() => {
@@ -44,7 +44,7 @@ describe('#publicRegister', () => {
       await expect(
         publicRegisterSubmitController.handler(
           {
-            payload: { consent: 'no', details: 'Some details' },
+            payload: { consent: 'no', reason: 'Some reason' },
             query: {}
           },
           h
@@ -86,7 +86,7 @@ describe('#publicRegister', () => {
 
       await publicRegisterSubmitController.handler(
         {
-          payload: { consent: 'no', details: 'Some details' },
+          payload: { consent: 'no', reason: 'Some reason' },
           query: { from: 'check-your-answers' }
         },
         h
@@ -98,7 +98,7 @@ describe('#publicRegister', () => {
         {
           id: mockLicence.id,
           consent: 'no',
-          details: 'Some details'
+          reason: 'Some reason'
         }
       )
       expect(h.redirect).toHaveBeenCalledWith(
@@ -130,7 +130,7 @@ describe('#publicRegister', () => {
                 details: [
                   {
                     path: ['consent'],
-                    message: 'PUBLIC_REGISTER_DETAILS_REQUIRED',
+                    message: 'PUBLIC_REGISTER_REASON_REQUIRED',
                     type: 'any.required'
                   }
                 ]
@@ -146,7 +146,7 @@ describe('#publicRegister', () => {
 
         await publicRegisterSubmitController.handler(
           {
-            payload: { consent: 'no', details: 'Some details' },
+            payload: { consent: 'no', reason: 'Some reason' },
             query
           },
           h
@@ -156,7 +156,7 @@ describe('#publicRegister', () => {
           PUBLIC_REGISTER_VIEW_ROUTE,
           expect.objectContaining({
             backLink: expectedBackLink,
-            payload: { consent: 'no', details: 'Some details' }
+            payload: { consent: 'no', reason: 'Some reason' }
           })
         )
       }

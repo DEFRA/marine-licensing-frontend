@@ -12,13 +12,13 @@ import { createMarineLicenceFailAction } from '#src/server/common/helpers/marine
 
 import joi from 'joi'
 
-export const PUBLIC_REGISTER_VIEW_ROUTE = 'marine-licence/public-register/index'
+export const PUBLIC_REGISTER_VIEW_ROUTE = 'templates/public-register'
 
 export const errorMessages = {
   PUBLIC_REGISTER_CONSENT_REQUIRED:
     'Select whether there is any reason why your information cannot be shared publicly',
-  PUBLIC_REGISTER_DETAILS_REQUIRED: 'Provide details of why you do not consent',
-  PUBLIC_REGISTER_DETAILS_MAX_LENGTH:
+  PUBLIC_REGISTER_REASON_REQUIRED: 'Provide details of why you do not consent',
+  PUBLIC_REGISTER_REASON_MAX_LENGTH:
     'Details of why you do not consent must be 1000 characters or fewer'
 }
 
@@ -56,12 +56,12 @@ export const publicRegisterSubmitController = {
           'string.empty': errorMessages.PUBLIC_REGISTER_CONSENT_REQUIRED,
           'any.required': errorMessages.PUBLIC_REGISTER_CONSENT_REQUIRED
         }),
-        details: joi.when('consent', {
+        reason: joi.when('consent', {
           is: 'no',
           then: joi.string().trim().max(1000).required().messages({
-            'string.empty': errorMessages.PUBLIC_REGISTER_DETAILS_REQUIRED,
-            'any.required': errorMessages.PUBLIC_REGISTER_DETAILS_REQUIRED,
-            'string.max': errorMessages.PUBLIC_REGISTER_DETAILS_MAX_LENGTH
+            'string.empty': errorMessages.PUBLIC_REGISTER_REASON_REQUIRED,
+            'any.required': errorMessages.PUBLIC_REGISTER_REASON_REQUIRED,
+            'string.max': errorMessages.PUBLIC_REGISTER_REASON_MAX_LENGTH
           })
         })
       }),
@@ -86,7 +86,7 @@ export const publicRegisterSubmitController = {
         '/marine-licence/public-register',
         {
           consent: payload.consent,
-          ...(userDoesNotConsent && { details: payload.details }),
+          ...(userDoesNotConsent && { reason: payload.reason }),
           id: marineLicence.id
         }
       )
@@ -95,7 +95,7 @@ export const publicRegisterSubmitController = {
         ...marineLicence,
         publicRegister: {
           consent: payload.consent,
-          ...(userDoesNotConsent && { details: payload.details })
+          ...(userDoesNotConsent && { reason: payload.reason })
         }
       })
 

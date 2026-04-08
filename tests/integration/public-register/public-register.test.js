@@ -66,7 +66,7 @@ describe('Public register', () => {
     ).toHaveAttribute('href', routes.CHECK_YOUR_ANSWERS)
   })
 
-  test('public register decision not set', async () => {
+  test('public register form state when no decision set', async () => {
     mockExemption(exemption)
     const document = await loadPage({
       requestUrl: routes.PUBLIC_REGISTER,
@@ -75,14 +75,51 @@ describe('Public register', () => {
     expect(
       getInputInFieldset({
         document,
-        fieldsetLabel:
-          'Do you consent to the MMO publishing your project information publicly?',
-        inputLabel: 'Yes'
+        fieldsetLabel: 'Sharing your project information publicly',
+        inputLabel: 'Yes',
+        findByHeading: true
+      })
+    ).not.toBeChecked()
+    expect(
+      getInputInFieldset({
+        document,
+        fieldsetLabel: 'Sharing your project information publicly',
+        inputLabel: 'No',
+        findByHeading: true
       })
     ).not.toBeChecked()
   })
 
-  test('public register decision set', async () => {
+  test('public register form state when consent is yes', async () => {
+    mockExemption({
+      ...exemption,
+      publicRegister: { consent: 'yes' }
+    })
+
+    const document = await loadPage({
+      requestUrl: routes.PUBLIC_REGISTER,
+      server: getServer()
+    })
+
+    expect(
+      getInputInFieldset({
+        document,
+        fieldsetLabel: 'Sharing your project information publicly',
+        inputLabel: 'Yes',
+        findByHeading: true
+      })
+    ).toBeChecked()
+    expect(
+      getInputInFieldset({
+        document,
+        fieldsetLabel: 'Sharing your project information publicly',
+        inputLabel: 'No',
+        findByHeading: true
+      })
+    ).not.toBeChecked()
+  })
+
+  test('public register form state when consent is no and reason set', async () => {
     mockExemption({
       ...exemption,
       publicRegister: { consent: 'no', reason: 'Test reason' }
@@ -94,9 +131,9 @@ describe('Public register', () => {
     expect(
       getInputInFieldset({
         document,
-        fieldsetLabel:
-          'Do you consent to the MMO publishing your project information publicly?',
-        inputLabel: 'No'
+        fieldsetLabel: 'Sharing your project information publicly',
+        inputLabel: 'No',
+        findByHeading: true
       })
     ).toBeChecked()
     expectInputValue({
@@ -107,7 +144,7 @@ describe('Public register', () => {
     })
   })
 
-  test('should show a validation error when submitted without a decision', async () => {
+  test('should show a validation error when submitted without a consent decision', async () => {
     mockExemption(exemption)
     const submitProjectNameForm = async (formData) => {
       const { document } = await submitForm({
@@ -120,10 +157,35 @@ describe('Public register', () => {
     const document = await submitProjectNameForm({ reason: '' })
     expectFieldsetError({
       document,
-      fieldsetLabel:
-        'Do you consent to the MMO publishing your project information publicly?',
+      fieldsetLabel: 'Sharing your project information publicly',
       errorMessage:
-        'Select whether you consent to the MMO publishing your project information publicly'
+        'Select whether there is any reason why your information cannot be shared publicly',
+      findByHeading: true
+    })
+  })
+
+  test('should show a validation error when "no" is selected but reason is missing', async () => {
+    mockExemption(exemption)
+
+    const submitPublicRegisterForm = async (formData) => {
+      const { document } = await submitForm({
+        requestUrl: routes.PUBLIC_REGISTER,
+        server: getServer(),
+        formData
+      })
+      return document
+    }
+
+    const document = await submitPublicRegisterForm({
+      consent: 'no',
+      reason: ''
+    })
+
+    expectFieldsetError({
+      document,
+      fieldsetLabel: 'Sharing your project information publicly',
+      errorMessage: 'Provide details of why you do not consent',
+      findByHeading: true
     })
   })
 })

@@ -84,7 +84,36 @@ describe('Public register', () => {
     ).not.toBeChecked()
   })
 
-  test('form state when consent and details set', async () => {
+  test('form state when consent is yes', async () => {
+    mockMarineLicence({
+      ...marineLicence,
+      publicRegister: { consent: 'yes' }
+    })
+
+    const document = await loadPage({
+      requestUrl: marineLicenceRoutes.MARINE_LICENCE_PUBLIC_REGISTER,
+      server: getServer()
+    })
+
+    expect(
+      getInputInFieldset({
+        document,
+        fieldsetLabel: 'Sharing your project information publicly',
+        inputLabel: 'Yes',
+        findByHeading: true
+      })
+    ).toBeChecked()
+    expect(
+      getInputInFieldset({
+        document,
+        fieldsetLabel: 'Sharing your project information publicly',
+        inputLabel: 'No',
+        findByHeading: true
+      })
+    ).not.toBeChecked()
+  })
+
+  test('form state when consent is no and details set', async () => {
     mockMarineLicence({
       ...marineLicence,
       publicRegister: {
@@ -157,8 +186,7 @@ describe('Public register', () => {
     expectFieldsetError({
       document,
       fieldsetLabel: 'Sharing your project information publicly',
-      errorMessage:
-        'Provide details of why you do not consent',
+      errorMessage: 'Provide details of why you do not consent',
       findByHeading: true
     })
   })

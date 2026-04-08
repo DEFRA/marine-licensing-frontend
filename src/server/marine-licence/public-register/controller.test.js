@@ -106,9 +106,24 @@ describe('#publicRegister', () => {
       )
     })
 
-    test('Should handle API validation errors in catch block', async () => {
-      vi.spyOn(authRequests, 'authenticatedPatchRequest').mockRejectedValueOnce(
-        {
+    test.each([
+      {
+        name: 'task list backlink',
+        query: {},
+        expectedBackLink: marineLicenceRoutes.MARINE_LICENCE_TASK_LIST
+      },
+      {
+        name: 'check-your-answers backlink',
+        query: { from: 'check-your-answers' },
+        expectedBackLink: marineLicenceRoutes.MARINE_LICENCE_CHECK_YOUR_ANSWERS
+      }
+    ])(
+      'Should handle API validation errors in catch block with $name',
+      async ({ query, expectedBackLink }) => {
+        vi.spyOn(
+          authRequests,
+          'authenticatedPatchRequest'
+        ).mockRejectedValueOnce({
           data: {
             payload: {
               validation: {
@@ -122,71 +137,30 @@ describe('#publicRegister', () => {
               }
             }
           }
-        }
-      )
-
-      const h = {
-        redirect: vi.fn().mockReturnValue({ takeover: vi.fn() }),
-        view: vi.fn()
-      }
-
-      await publicRegisterSubmitController.handler(
-        {
-          payload: { consent: 'no', details: 'Some details' },
-          query: {}
-        },
-        h
-      )
-
-      expect(h.view).toHaveBeenCalledWith(
-        PUBLIC_REGISTER_VIEW_ROUTE,
-        expect.objectContaining({
-          backLink: marineLicenceRoutes.MARINE_LICENCE_TASK_LIST,
-          payload: { consent: 'no', details: 'Some details' }
         })
-      )
-    })
 
-    test('Should handle API validation errors in catch block with from=check-your-answers parameter', async () => {
-      vi.spyOn(authRequests, 'authenticatedPatchRequest').mockRejectedValueOnce(
-        {
-          data: {
-            payload: {
-              validation: {
-                details: [
-                  {
-                    path: ['consent'],
-                    message: 'PUBLIC_REGISTER_DETAILS_REQUIRED',
-                    type: 'any.required'
-                  }
-                ]
-              }
-            }
-          }
+        const h = {
+          redirect: vi.fn().mockReturnValue({ takeover: vi.fn() }),
+          view: vi.fn()
         }
-      )
 
-      const h = {
-        redirect: vi.fn().mockReturnValue({ takeover: vi.fn() }),
-        view: vi.fn()
+        await publicRegisterSubmitController.handler(
+          {
+            payload: { consent: 'no', details: 'Some details' },
+            query
+          },
+          h
+        )
+
+        expect(h.view).toHaveBeenCalledWith(
+          PUBLIC_REGISTER_VIEW_ROUTE,
+          expect.objectContaining({
+            backLink: expectedBackLink,
+            payload: { consent: 'no', details: 'Some details' }
+          })
+        )
       }
-
-      await publicRegisterSubmitController.handler(
-        {
-          payload: { consent: 'no', details: 'Some details' },
-          query: { from: 'check-your-answers' }
-        },
-        h
-      )
-
-      expect(h.view).toHaveBeenCalledWith(
-        PUBLIC_REGISTER_VIEW_ROUTE,
-        expect.objectContaining({
-          backLink: marineLicenceRoutes.MARINE_LICENCE_CHECK_YOUR_ANSWERS,
-          payload: { consent: 'no', details: 'Some details' }
-        })
-      )
-    })
+    )
 
     test.each([
       {

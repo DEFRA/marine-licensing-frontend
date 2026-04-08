@@ -17,9 +17,9 @@ export const PUBLIC_REGISTER_VIEW_ROUTE = 'marine-licence/public-register/index'
 export const errorMessages = {
   PUBLIC_REGISTER_CONSENT_REQUIRED:
     'Select whether there is any reason why your information cannot be shared publicly',
-  PUBLIC_REGISTER_DETAILS_REQUIRED:
-    'Provide details of why you do not consent',
-  PUBLIC_REGISTER_DETAILS_MAX_LENGTH: 'Details of why you do not consent must be 1000 characters or fewer'
+  PUBLIC_REGISTER_DETAILS_REQUIRED: 'Provide details of why you do not consent',
+  PUBLIC_REGISTER_DETAILS_MAX_LENGTH:
+    'Details of why you do not consent must be 1000 characters or fewer'
 }
 
 const publicRegisterSettings = {

@@ -17,7 +17,13 @@ describe('createFailAction', () => {
     getCache = vi.fn().mockReturnValue({ projectName })
     getBackLink = vi.fn().mockReturnValue(backLink)
     h = { view: vi.fn().mockReturnValue({ takeover: vi.fn() }) }
-    failAction = createFailAction({ getCache, viewRoute, settings, errorMessages, getBackLink })
+    failAction = createFailAction({
+      getCache,
+      viewRoute,
+      settings,
+      errorMessages,
+      getBackLink
+    })
   })
 
   test('renders view without errors when err.details is missing', () => {
@@ -59,7 +65,9 @@ describe('createFailAction', () => {
       payload: request.payload,
       projectName,
       backLink,
-      errorSummary: [{ href: '#field', text: 'Field is required', field: ['field'] }],
+      errorSummary: [
+        { href: '#field', text: 'Field is required', field: ['field'] }
+      ],
       errors: {
         field: { href: '#field', text: 'Field is required', field: ['field'] }
       }
@@ -70,14 +78,21 @@ describe('createFailAction', () => {
   test('uses raw message when not found in errorMessages', () => {
     const request = { payload: {} }
     const err = {
-      details: [{ path: ['field'], message: 'some.raw.message', type: 'any.required' }]
+      details: [
+        { path: ['field'], message: 'some.raw.message', type: 'any.required' }
+      ]
     }
 
     failAction(request, h, err)
 
-    expect(h.view).toHaveBeenCalledWith(viewRoute, expect.objectContaining({
-      errorSummary: [{ href: '#field', text: 'some.raw.message', field: ['field'] }]
-    }))
+    expect(h.view).toHaveBeenCalledWith(
+      viewRoute,
+      expect.objectContaining({
+        errorSummary: [
+          { href: '#field', text: 'some.raw.message', field: ['field'] }
+        ]
+      })
+    )
   })
 
   test('calls getCache and getBackLink with the request', () => {

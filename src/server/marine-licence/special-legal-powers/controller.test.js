@@ -206,6 +206,5 @@ describe('#specialLegalPowers', () => {
         })
       )
     })
-
   })
 })

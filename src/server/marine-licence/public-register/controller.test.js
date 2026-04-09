@@ -161,6 +161,5 @@ describe('#publicRegister', () => {
         )
       }
     )
-
   })
 })

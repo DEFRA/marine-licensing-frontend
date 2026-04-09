@@ -4,19 +4,24 @@ import {
   siteNameSubmitController,
   SITE_NAME_VIEW_ROUTE
 } from '#src/server/marine-licence/site-details/site-name/controller.js'
-import { createMockRequest } from '#src/server/test-helpers/mocks/helpers.js'
+import {
+  createMockRequest,
+  createMockH
+} from '#src/server/test-helpers/mocks/helpers.js'
 import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
 import {
   getMarineLicenceCache,
   updateMarineLicenceSiteDetails
 } from '#src/server/common/helpers/marine-licence/session-cache/utils.js'
 import { mockMarineLicenceApplication } from '#src/server/test-helpers/mocks/marine-licence-mocks.js'
+import { saveSiteDetailsToBackend } from '#src/server/common/helpers/marine-licence/save-site-details.js'
 
 vi.mock('~/src/server/common/helpers/marine-licence/session-cache/utils.js')
-vi.mock('~/src/server/common/helpers/exemptions/save-site-details.js')
+vi.mock('~/src/server/common/helpers/marine-licence/save-site-details.js')
 
 describe('#siteName', () => {
   const mockSiteName = 'Test Site Name'
+  const h = createMockH()
 
   beforeAll(() => {
     vi.mocked(getMarineLicenceCache).mockReturnValue(
@@ -26,7 +31,6 @@ describe('#siteName', () => {
 
   describe('#siteNameController', () => {
     test('should render with correct context', () => {
-      const h = { view: vi.fn() }
       const request = createMockRequest()
 
       vi.mocked(getMarineLicenceCache).mockReturnValueOnce({
@@ -44,17 +48,16 @@ describe('#siteName', () => {
       expect(h.view).toHaveBeenCalledWith(SITE_NAME_VIEW_ROUTE, {
         pageTitle: 'Site name',
         heading: 'Site name',
-        backLink: marineLicenceRoutes.MARINE_LICENCE_COORDINATES_TYPE_CHOICE,
-        cancelLink: marineLicenceRoutes.MARINE_LICENCE_TASK_LIST,
+        backLink: marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS,
+        cancelLink: marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS,
         payload: { siteName: mockSiteName },
         projectName: 'Test Project',
         siteNumber: 1,
-        action: undefined
+        action: true
       })
     })
 
     test('should include action in view context when action parameter is present', () => {
-      const h = { view: vi.fn() }
       const request = createMockRequest({ query: { action: 'add' } })
 
       siteNameController.handler(request, h)
@@ -62,8 +65,23 @@ describe('#siteName', () => {
       expect(h.view).toHaveBeenCalledWith(
         SITE_NAME_VIEW_ROUTE,
         expect.objectContaining({
-          action: 'add'
+          action: true
         })
+      )
+    })
+
+    test('should redirect to task list when invalid site number', () => {
+      vi.mocked(getMarineLicenceCache).mockReturnValueOnce({
+        ...mockMarineLicenceApplication,
+        siteDetails: []
+      })
+
+      const request = createMockRequest({ query: { site: '3' } })
+
+      siteNameController.handler(request, h)
+
+      expect(h.redirect).toHaveBeenCalledWith(
+        marineLicenceRoutes.MARINE_LICENCE_TASK_LIST
       )
     })
   })
@@ -83,7 +101,8 @@ describe('#siteName', () => {
       const request = createMockRequest({
         payload: { siteName: 'Test Site Name' }
       })
-      const h = { redirect: vi.fn() }
+
+      vi.mocked(saveSiteDetailsToBackend).mockResolvedValueOnce(undefined)
 
       await siteNameSubmitController.handler(request, h)
 
@@ -95,7 +114,7 @@ describe('#siteName', () => {
         'Test Site Name'
       )
       expect(h.redirect).toHaveBeenCalledWith(
-        marineLicenceRoutes.MARINE_LICENCE_SITE_NAME
+        `${marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS}#site-details-1`
       )
     })
 
@@ -103,7 +122,6 @@ describe('#siteName', () => {
       const request = createMockRequest({
         payload: { siteName: '' }
       })
-      const h = { view: vi.fn().mockReturnValue({ takeover: vi.fn() }) }
 
       const err = {
         details: [
@@ -119,12 +137,12 @@ describe('#siteName', () => {
       expect(h.view).toHaveBeenCalledWith(SITE_NAME_VIEW_ROUTE, {
         pageTitle: 'Site name',
         heading: 'Site name',
-        backLink: marineLicenceRoutes.MARINE_LICENCE_COORDINATES_TYPE_CHOICE,
-        cancelLink: marineLicenceRoutes.MARINE_LICENCE_TASK_LIST,
+        backLink: marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS,
+        cancelLink: marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS,
         payload: { siteName: '' },
         projectName: 'Test Project',
         siteNumber: 1,
-        action: undefined,
+        action: true,
         errors: expect.any(Object),
         errorSummary: expect.any(Array)
       })
@@ -134,19 +152,18 @@ describe('#siteName', () => {
       const request = createMockRequest({
         payload: { siteName: 'invalid' }
       })
-      const h = { view: vi.fn().mockReturnValue({ takeover: vi.fn() }) }
 
       siteNameSubmitController.options.validate.failAction(request, h, {})
 
       expect(h.view).toHaveBeenCalledWith(SITE_NAME_VIEW_ROUTE, {
         pageTitle: 'Site name',
         heading: 'Site name',
-        backLink: marineLicenceRoutes.MARINE_LICENCE_COORDINATES_TYPE_CHOICE,
-        cancelLink: marineLicenceRoutes.MARINE_LICENCE_TASK_LIST,
+        backLink: marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS,
+        cancelLink: marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS,
         payload: { siteName: 'invalid' },
         projectName: 'Test Project',
         siteNumber: 1,
-        action: undefined
+        action: true
       })
     })
 
@@ -155,7 +172,6 @@ describe('#siteName', () => {
         payload: { siteName: '' },
         query: { action: 'add' }
       })
-      const h = { view: vi.fn().mockReturnValue({ takeover: vi.fn() }) }
 
       const err = {
         details: [
@@ -171,9 +187,9 @@ describe('#siteName', () => {
       expect(h.view).toHaveBeenCalledWith(
         SITE_NAME_VIEW_ROUTE,
         expect.objectContaining({
-          action: 'add',
-          backLink: marineLicenceRoutes.MARINE_LICENCE_COORDINATES_TYPE_CHOICE,
-          cancelLink: marineLicenceRoutes.MARINE_LICENCE_TASK_LIST
+          action: true,
+          backLink: marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS,
+          cancelLink: marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS
         })
       )
     })

@@ -3,7 +3,10 @@ import {
   mockMarineLicence,
   setupTestServer
 } from '~/tests/integration/shared/test-setup-helpers.js'
-import { mockMarineLicenceApplication } from '#src/server/test-helpers/mocks/marine-licence-mocks.js'
+import {
+  mockFileUploadMarineLicence,
+  mockMarineLicenceApplication
+} from '#src/server/test-helpers/mocks/marine-licence-mocks.js'
 import { sharedSiteNameTests } from './site-name-tests.js'
 import {
   makeGetRequest,
@@ -36,7 +39,7 @@ describe('Site name page (marine licence)', () => {
     backLinkHref: marineLicenceRoutes.MARINE_LICENCE_COORDINATES_TYPE_CHOICE
   })
 
-  test('should redirect after valid site name is submitted', async () => {
+  test('should redirect after valid site name is submitted for a manual site', async () => {
     setupMock([{}])
 
     const response = await makePostRequest({
@@ -51,7 +54,22 @@ describe('Site name page (marine licence)', () => {
     )
   })
 
-  test('should show correct content for second site', async () => {
+  test('should redirect after valid site name is submitted for a file upload', async () => {
+    setupMock(mockFileUploadMarineLicence.siteDetails)
+
+    const response = await makePostRequest({
+      url: marineLicenceRoutes.MARINE_LICENCE_SITE_NAME,
+      server: getServer(),
+      formData: { siteName: 'Test Site Name' }
+    })
+
+    expect(response.statusCode).toBe(statusCodes.redirect)
+    expect(response.headers.location).toBe(
+      `${marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS}#site-details-1`
+    )
+  })
+
+  test('should show correct content for second site and manual coordinates', async () => {
     setupMock([{}, {}])
 
     const { result, statusCode } = await makeGetRequest({
@@ -67,6 +85,37 @@ describe('Site name page (marine licence)', () => {
     expect(backLink).toHaveAttribute(
       'href',
       marineLicenceRoutes.MARINE_LICENCE_COORDINATES_TYPE_CHOICE
+    )
+
+    const cancelLink = getByRole(document, 'link', { name: 'Cancel' })
+    expect(cancelLink).toHaveAttribute(
+      'href',
+      marineLicenceRoutes.MARINE_LICENCE_TASK_LIST
+    )
+  })
+
+  test('should show correct content for file upload page variant', async () => {
+    setupMock(mockFileUploadMarineLicence.siteDetails)
+
+    const { result, statusCode } = await makeGetRequest({
+      server: getServer(),
+      url: `${marineLicenceRoutes.MARINE_LICENCE_SITE_NAME}?site=1`
+    })
+
+    expect(statusCode).toBe(statusCodes.ok)
+
+    const { document } = new JSDOM(result).window
+
+    const backLink = getByRole(document, 'link', { name: 'Back' })
+    expect(backLink).toHaveAttribute(
+      'href',
+      marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS
+    )
+
+    const cancelLink = getByRole(document, 'link', { name: 'Cancel' })
+    expect(cancelLink).toHaveAttribute(
+      'href',
+      marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS
     )
   })
 })

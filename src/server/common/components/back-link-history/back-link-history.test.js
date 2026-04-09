@@ -12,5 +12,7 @@ describe('backLinkHistory Component', () => {
     expect($backLink('a').attr('href')).toBe('#')
     expect($backLink('a').attr('data-module')).toBe('app-back-link-history')
     expect($backLink('a').hasClass('govuk-back-link')).toBe(true)
+    expect($backLink('a').hasClass('govuk-!-margin-bottom-0')).toBe(true)
+    expect($backLink('a').attr('style')).toBeUndefined()
   })
 })

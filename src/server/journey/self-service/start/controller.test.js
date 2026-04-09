@@ -93,6 +93,7 @@ describe('#iatStartController (integration)', () => {
     expect(backLink).not.toBeNull()
     expect(backLink.getAttribute('href')).not.toMatch(/^javascript:/)
     expect(backLink.getAttribute('data-module')).toBe('app-back-link-history')
+    expect(backLink.getAttribute('style')).toBeNull()
   })
 
   test('Renders a non-functional "Start now" button', async () => {

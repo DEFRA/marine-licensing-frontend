@@ -33,9 +33,7 @@ export const validateActionLink = (row, value, siteIndex) => {
   })
 
   const siteHref =
-    typeof siteIndex !== 'undefined'
-      ? `?site=${siteIndex + 1}&action=${hasValue ? 'change' : 'add'}`
-      : `?action=${hasValue ? 'change' : 'add'}`
+    typeof siteIndex !== 'undefined' ? `?site=${siteIndex + 1}` : ''
 
   expect(actionLink).toHaveAttribute('href', expect.stringContaining(siteHref))
 }

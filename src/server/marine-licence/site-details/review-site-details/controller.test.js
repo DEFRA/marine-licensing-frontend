@@ -8,7 +8,7 @@ import {
 import { mockExemption } from '#src/server/test-helpers/mocks/exemption.js'
 import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
 import { mockFileUploadMarineLicence } from '#src/server/test-helpers/mocks/marine-licence-mocks.js'
-import { mockRequest } from '#src/server/test-helpers/mocks/request.js'
+import { createMockRequest } from '#src/server/test-helpers/mocks/helpers.js'
 
 vi.mock('~/src/server/common/helpers/marine-licence/session-cache/utils.js')
 vi.mock('~/src/services/marine-licence-service/index.js')
@@ -23,6 +23,8 @@ function createMockHandler(type = 'view') {
 describe('#reviewSiteDetails', () => {
   let getMarineLicenceCacheSpy
   let setMarineLicenceCacheSpy
+
+  const mockRequest = createMockRequest()
 
   beforeAll(() => {
     const mockMarineLicenceServiceInstance = {

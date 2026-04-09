@@ -2,15 +2,24 @@ export function setSiteDetailsAction(
   value,
   href,
   siteNumber,
-  visuallyHiddenText
+  visuallyHiddenText,
+  skipAction
 ) {
   const hasValue = value && value !== ''
 
   const action = hasValue ? 'change' : 'add'
 
-  const queryString = siteNumber
-    ? `site=${siteNumber}&action=${action}`
-    : `action=${action}`
+  const queryParams = []
+
+  if (siteNumber) {
+    queryParams.push(`site=${siteNumber}`)
+  }
+
+  if (!skipAction) {
+    queryParams.push(`action=${action}`)
+  }
+
+  const queryString = queryParams.join('&')
 
   return {
     items: [

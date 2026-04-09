@@ -12,22 +12,19 @@ describe('#iatStartController', () => {
     iatStartController.handler({}, h)
 
     expect(h.view).toHaveBeenCalledTimes(1)
-    expect(h.view).toHaveBeenCalledWith(
-      'journey/self-service/start/index',
-      {
-        pageTitle: 'Check if you need a marine licence',
-        hidePhaseBanner: true,
-        links: {
-          jurisdiction:
-            'https://www.gov.uk/guidance/marine-licensing-definitions#jurisdiction',
-          exemptions:
-            'https://www.gov.uk/guidance/do-i-need-a-marine-licence#exemptions',
-          selfService:
-            'https://www.gov.uk/guidance/do-i-need-a-marine-licence#self-service',
-          guidance: 'https://www.gov.uk/guidance/do-i-need-a-marine-licence'
-        }
+    expect(h.view).toHaveBeenCalledWith('journey/self-service/start/index', {
+      pageTitle: 'Check if you need a marine licence',
+      hidePhaseBanner: true,
+      links: {
+        jurisdiction:
+          'https://www.gov.uk/guidance/marine-licensing-definitions#jurisdiction',
+        exemptions:
+          'https://www.gov.uk/guidance/do-i-need-a-marine-licence#exemptions',
+        selfService:
+          'https://www.gov.uk/guidance/do-i-need-a-marine-licence#self-service',
+        guidance: 'https://www.gov.uk/guidance/do-i-need-a-marine-licence'
       }
-    )
+    })
   })
 })
 
@@ -59,8 +56,8 @@ describe('#iatStartController (integration)', () => {
 
   test('Renders all four external links with the expected hrefs', async () => {
     const { document } = await getPage()
-    const hrefs = Array.from(document.querySelectorAll('a[href]')).map(
-      (a) => a.getAttribute('href')
+    const hrefs = Array.from(document.querySelectorAll('a[href]')).map((a) =>
+      a.getAttribute('href')
     )
     expect(hrefs).toContain(
       'https://www.gov.uk/guidance/marine-licensing-definitions#jurisdiction'
@@ -79,7 +76,9 @@ describe('#iatStartController (integration)', () => {
   test('All four external gov.uk links open in a new tab with rel=noopener', async () => {
     const { document } = await getPage()
     const externalLinks = Array.from(
-      document.querySelectorAll('.govuk-grid-column-two-thirds a[href^="https://www.gov.uk"]')
+      document.querySelectorAll(
+        '.govuk-grid-column-two-thirds a[href^="https://www.gov.uk"]'
+      )
     )
     expect(externalLinks.length).toBeGreaterThanOrEqual(4)
     for (const link of externalLinks) {
@@ -108,8 +107,6 @@ describe('#iatStartController (integration)', () => {
 
   test('Renders no navigation links in the header', async () => {
     const { document } = await getPage()
-    expect(
-      document.querySelector('.govuk-service-navigation__list')
-    ).toBeNull()
+    expect(document.querySelector('.govuk-service-navigation__list')).toBeNull()
   })
 })

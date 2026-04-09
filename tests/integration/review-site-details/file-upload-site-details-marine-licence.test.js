@@ -13,6 +13,7 @@ import {
   mockMarineLicence,
   setupTestServer
 } from '~/tests/integration/shared/test-setup-helpers.js'
+import { expectedValueOrIncomplete } from '~/tests/integration/shared/expect-utils.js'
 import {
   makeGetRequest,
   makePostRequest
@@ -159,7 +160,7 @@ describe('ML Review Site Details - File Upload Integration Tests', () => {
   const validateFileUpload = (document, expected, siteIndex) => {
     const cards = document.querySelectorAll('.govuk-summary-card')
     const siteDetailsCards = Array.from(cards).filter((card) =>
-      card.textContent.match(/Site/g)
+      card.textContent.match(/Site \d+(?! - Activity)/)
     )
 
     siteDetailsCards.forEach((card, i) => {
@@ -167,14 +168,7 @@ describe('ML Review Site Details - File Upload Integration Tests', () => {
 
       const siteNameExpected = expected.siteDetails[siteIndex].siteName
 
-      const hasValue =
-        siteNameExpected &&
-        siteNameExpected !== '' &&
-        siteNameExpected !== 'Incomplete'
-
-      const expectedText = hasValue ? siteNameExpected : 'Incomplete'
-
-      expect(siteNameRow.textContent).toContain(expectedText)
+      expect(siteNameRow.textContent).toContain(expectedValueOrIncomplete(siteNameExpected))
 
       validateActionLink(siteNameRow, siteNameExpected, siteIndex)
 
@@ -186,6 +180,56 @@ describe('ML Review Site Details - File Upload Integration Tests', () => {
         '.app-site-details-map[data-module="site-details-map"]'
       )
       expect(mapDiv).toBeTruthy()
+    })
+
+    const activityDetailsCards = Array.from(cards).filter((card) =>
+      card.textContent.match(/Site \d+(?= - Activity)/)
+    )
+
+    activityDetailsCards.forEach((card, i) => {
+      const activityDetails = expected.siteDetails[siteIndex].activityDetails[i]
+
+      const activityTypeRow = getRowByKey(card, 'Type of activity')
+      expect(activityTypeRow).toBeTruthy()
+      expect(activityTypeRow.textContent).toContain(
+        expectedValueOrIncomplete(activityDetails.activityType)
+      )
+
+      const activityDescriptionRow = getRowByKey(card, 'Activity description')
+      expect(activityDescriptionRow).toBeTruthy()
+      expect(activityDescriptionRow.textContent).toContain(
+        expectedValueOrIncomplete(activityDetails.activityDescription)
+      )
+
+      const activityDurationRow = getRowByKey(
+        card,
+        'Maximum duration of activity'
+      )
+      expect(activityDurationRow).toBeTruthy()
+      expect(activityDurationRow.textContent).toContain(
+        expectedValueOrIncomplete(activityDetails.activityDuration)
+      )
+
+      const completionDateRow = getRowByKey(card, 'Completion date')
+      expect(completionDateRow).toBeTruthy()
+      expect(completionDateRow.textContent).toContain(
+        expectedValueOrIncomplete(activityDetails.completionDate)
+      )
+
+      const activityMonthsRow = getRowByKey(
+        card,
+        'Activity limited to specific months'
+      )
+      expect(activityMonthsRow).toBeTruthy()
+      expect(activityMonthsRow.textContent).toContain(
+        expectedValueOrIncomplete(activityDetails.activityMonths)
+      )
+
+      const workingHoursRow = getRowByKey(card, 'Proposed working hours')
+      expect(workingHoursRow).toBeTruthy()
+      expect(workingHoursRow.textContent).toContain(
+        expectedValueOrIncomplete(activityDetails.workingHours)
+      )
     })
   }
 })

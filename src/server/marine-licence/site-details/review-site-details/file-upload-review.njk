@@ -2,10 +2,10 @@
 {% from "govuk/components/back-link/macro.njk" import govukBackLink %}
 {% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
 {% from "govuk/components/button/macro.njk" import govukButton %}
-{% from "cancel-button/macro.njk" import appCancelButton %}
 {% from "site-details-map/macro.njk" import appSiteDetailsMap %}
 {% from "incomplete-field/macro.njk" import appIncompleteField %}
 {% from "incomplete-fields-warning/macro.njk" import appIncompleteFieldsWarning %}
+{% from "marine-licence/activity-details-card/macro.njk" import appMarineLicenceActivityDetailsCard %}
 {% block head %}
   {{ super() }}
 {% endblock %}
@@ -88,6 +88,17 @@
             classes: 'govuk-summary-list--full-width',
             rows: rows
         }) }}
+
+          {% for activityDetails in site.activityDetails %}
+
+            {{ appMarineLicenceActivityDetailsCard({
+              activityDetails: activityDetails,
+              siteNumber: site.siteNumber ,
+              index: loop.index
+            }) }}
+
+          {% endfor %}
+
         {% endfor %}
 
         <form method="POST">

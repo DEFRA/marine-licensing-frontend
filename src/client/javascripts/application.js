@@ -13,6 +13,7 @@ import {
 import { SortableTable } from '@ministryofjustice/frontend'
 
 import { AddAnotherPoint } from './add-another-point/index.js'
+import { BackLinkHistory } from './back-link-history/index.js'
 import { ProjectFilter } from './project-filter/index.js'
 import { SiteDetailsMap } from './site-details-map/index.js'
 
@@ -61,6 +62,13 @@ document.addEventListener('DOMContentLoaded', () => {
   )
   for (const element of mapElements) {
     new SiteDetailsMap(element) // eslint-disable-line no-new
+  }
+
+  const backLinkHistoryElements = document.querySelectorAll(
+    '[data-module="app-back-link-history"]'
+  )
+  for (const element of backLinkHistoryElements) {
+    new BackLinkHistory(element) // eslint-disable-line no-new
   }
 
   const projectFilterElements = document.querySelectorAll(

@@ -3,16 +3,20 @@ export function setSiteDetailsAction(
   href,
   siteNumber,
   visuallyHiddenText,
-  skipAction
+  options = {}
 ) {
   const hasValue = value && value !== ''
-
   const action = hasValue ? 'change' : 'add'
+  const { skipAction, activityNumber } = options
 
   const queryParams = []
 
   if (siteNumber) {
     queryParams.push(`site=${siteNumber}`)
+  }
+
+  if (activityNumber) {
+    queryParams.push(`activity=${activityNumber}`)
   }
 
   if (!skipAction) {

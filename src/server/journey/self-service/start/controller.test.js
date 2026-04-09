@@ -105,4 +105,12 @@ describe('#iatStartController (integration)', () => {
     const { document } = await getPage()
     expect(document.querySelector('.govuk-phase-banner')).toBeNull()
   })
+
+  test('Renders no navigation links in the header', async () => {
+    const { document } = await getPage()
+    const navItems = document.querySelectorAll(
+      '.govuk-service-navigation__item'
+    )
+    expect(navItems.length).toBe(0)
+  })
 })

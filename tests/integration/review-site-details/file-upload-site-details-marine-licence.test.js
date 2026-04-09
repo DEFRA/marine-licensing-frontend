@@ -168,7 +168,9 @@ describe('ML Review Site Details - File Upload Integration Tests', () => {
 
       const siteNameExpected = expected.siteDetails[siteIndex].siteName
 
-      expect(siteNameRow.textContent).toContain(expectedValueOrIncomplete(siteNameExpected))
+      expect(siteNameRow.textContent).toContain(
+        expectedValueOrIncomplete(siteNameExpected)
+      )
 
       validateActionLink(siteNameRow, siteNameExpected, siteIndex)
 

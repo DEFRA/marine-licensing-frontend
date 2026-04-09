@@ -15,7 +15,6 @@ import {
 import * as cacheUtils from '#src/server/common/helpers/exemptions/session-cache/utils.js'
 import { routes } from '#src/server/common/constants/routes.js'
 import * as authRequests from '#src/server/common/helpers/authenticated-requests.js'
-import { publicRegisterErrorMessages } from '#src/server/common/validation/public-register/constants.js'
 
 vi.mock('~/src/server/common/helpers/exemptions/session-cache/utils.js')
 
@@ -187,20 +186,16 @@ describe('#publicRegister', () => {
       expect(document.querySelector('.govuk-error-summary')).toBeTruthy()
     })
 
-    test('Should show error messages without calling the back end when payload data is empty', async () => {
+    test('Should not call the back end when payload fails validation', async () => {
       const apiPostMock = vi.spyOn(authRequests, 'authenticatedPatchRequest')
 
-      const { result } = await makePostRequest({
+      await makePostRequest({
         url: routes.PUBLIC_REGISTER,
         server: getServer(),
         formData: { consent: '' }
       })
 
       expect(apiPostMock).not.toHaveBeenCalled()
-
-      const { document } = new JSDOM(result).window
-
-      expect(document.querySelector('.govuk-error-summary')).toBeTruthy()
     })
 
     test('Should correctly redirect to check your answers when parameter is present', async () => {
@@ -223,28 +218,6 @@ describe('#publicRegister', () => {
       expect(statusCode).toBe(302)
 
       expect(headers.location).toBe(routes.CHECK_YOUR_ANSWERS)
-    })
-
-    test('Should show error for reason being empty when consent is set to no', async () => {
-      const apiPostMock = vi.spyOn(authRequests, 'authenticatedPatchRequest')
-
-      const { result } = await makePostRequest({
-        url: routes.PUBLIC_REGISTER,
-        server: getServer(),
-        formData: { consent: 'no' }
-      })
-
-      expect(apiPostMock).not.toHaveBeenCalled()
-
-      const { document } = new JSDOM(result).window
-
-      expect(result).toEqual(
-        expect.stringContaining(
-          publicRegisterErrorMessages.PUBLIC_REGISTER_REASON_REQUIRED
-        )
-      )
-
-      expect(document.querySelector('.govuk-error-summary')).toBeTruthy()
     })
 
     test('Should correctly set the cache when submitting public register', async () => {

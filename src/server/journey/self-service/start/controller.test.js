@@ -100,4 +100,9 @@ describe('#iatStartController (integration)', () => {
     expect(startButton.textContent).toContain('Start now')
     expect(startButton.getAttribute('href')).toBe('#')
   })
+
+  test('Does not render the phase banner', async () => {
+    const { document } = await getPage()
+    expect(document.querySelector('.govuk-phase-banner')).toBeNull()
+  })
 })

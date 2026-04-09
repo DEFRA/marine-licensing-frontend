@@ -198,5 +198,4 @@ describe('setSiteDetailsAction', () => {
       ]
     })
   })
-
 })

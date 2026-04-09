@@ -10,12 +10,12 @@ import { JSDOM } from 'jsdom'
 import {
   publicRegisterController,
   publicRegisterSubmitController,
-  PUBLIC_REGISTER_VIEW_ROUTE,
-  errorMessages
+  PUBLIC_REGISTER_VIEW_ROUTE
 } from '#src/server/exemption/public-register/controller.js'
 import * as cacheUtils from '#src/server/common/helpers/exemptions/session-cache/utils.js'
 import { routes } from '#src/server/common/constants/routes.js'
 import * as authRequests from '#src/server/common/helpers/authenticated-requests.js'
+import { publicRegisterErrorMessages } from '#src/server/common/constants/form-validation-error-messages.js'
 
 vi.mock('~/src/server/common/helpers/exemptions/session-cache/utils.js')
 
@@ -239,7 +239,9 @@ describe('#publicRegister', () => {
       const { document } = new JSDOM(result).window
 
       expect(result).toEqual(
-        expect.stringContaining(errorMessages.PUBLIC_REGISTER_REASON_REQUIRED)
+        expect.stringContaining(
+          publicRegisterErrorMessages.PUBLIC_REGISTER_REASON_REQUIRED
+        )
       )
 
       expect(document.querySelector('.govuk-error-summary')).toBeTruthy()

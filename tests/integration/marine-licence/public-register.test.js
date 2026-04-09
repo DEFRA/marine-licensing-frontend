@@ -161,7 +161,7 @@ describe('Public register', () => {
       document,
       fieldsetLabel: 'Sharing your project information publicly',
       errorMessage:
-        'Select whether there is any reason why your information cannot be shared publicly',
+        'Select whether you consent to the MMO publishing your project information publicly',
       findByHeading: true
     })
   })
@@ -186,8 +186,10 @@ describe('Public register', () => {
     expectFieldsetError({
       document,
       fieldsetLabel: 'Sharing your project information publicly',
-      errorMessage: 'Provide details of why you do not consent',
-      findByHeading: true
+      errorMessage:
+        'Provide details of why you do not consent to your project information being published',
+      findByHeading: true,
+      useErrorClass: true
     })
   })
 })

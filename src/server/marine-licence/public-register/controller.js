@@ -9,18 +9,11 @@ import {
 import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
 import { authenticatedPatchRequest } from '#src/server/common/helpers/authenticated-requests.js'
 import { createFailAction } from '#src/server/common/helpers/createFailAction.js'
+import { publicRegisterErrorMessages } from '#src/server/common/constants/form-validation-error-messages.js'
 
 import joi from 'joi'
 
 export const PUBLIC_REGISTER_VIEW_ROUTE = 'templates/public-register'
-
-export const errorMessages = {
-  PUBLIC_REGISTER_CONSENT_REQUIRED:
-    'Select whether there is any reason why your information cannot be shared publicly',
-  PUBLIC_REGISTER_REASON_REQUIRED: 'Provide details of why you do not consent',
-  PUBLIC_REGISTER_REASON_MAX_LENGTH:
-    'Details of why you do not consent must be 1000 characters or fewer'
-}
 
 const publicRegisterSettings = {
   pageTitle: 'Sharing your project information publicly',
@@ -52,16 +45,22 @@ export const publicRegisterSubmitController = {
     validate: {
       payload: joi.object({
         consent: joi.string().valid('yes', 'no').required().messages({
-          'any.only': errorMessages.PUBLIC_REGISTER_CONSENT_REQUIRED,
-          'string.empty': errorMessages.PUBLIC_REGISTER_CONSENT_REQUIRED,
-          'any.required': errorMessages.PUBLIC_REGISTER_CONSENT_REQUIRED
+          'any.only':
+            publicRegisterErrorMessages.PUBLIC_REGISTER_CONSENT_REQUIRED,
+          'string.empty':
+            publicRegisterErrorMessages.PUBLIC_REGISTER_CONSENT_REQUIRED,
+          'any.required':
+            publicRegisterErrorMessages.PUBLIC_REGISTER_CONSENT_REQUIRED
         }),
         reason: joi.when('consent', {
           is: 'no',
           then: joi.string().trim().max(1000).required().messages({
-            'string.empty': errorMessages.PUBLIC_REGISTER_REASON_REQUIRED,
-            'any.required': errorMessages.PUBLIC_REGISTER_REASON_REQUIRED,
-            'string.max': errorMessages.PUBLIC_REGISTER_REASON_MAX_LENGTH
+            'string.empty':
+              publicRegisterErrorMessages.PUBLIC_REGISTER_REASON_REQUIRED,
+            'any.required':
+              publicRegisterErrorMessages.PUBLIC_REGISTER_REASON_REQUIRED,
+            'string.max':
+              publicRegisterErrorMessages.PUBLIC_REGISTER_REASON_MAX_LENGTH
           })
         })
       }),
@@ -69,7 +68,7 @@ export const publicRegisterSubmitController = {
         getCache: getMarineLicenceCache,
         viewRoute: PUBLIC_REGISTER_VIEW_ROUTE,
         settings: publicRegisterSettings,
-        errorMessages,
+        publicRegisterErrorMessages,
         getBackLink
       })
     }
@@ -109,7 +108,10 @@ export const publicRegisterSubmitController = {
         throw e
       }
 
-      const errorSummary = mapErrorsForDisplay(details, errorMessages)
+      const errorSummary = mapErrorsForDisplay(
+        details,
+        publicRegisterErrorMessages
+      )
 
       const errors = errorDescriptionByFieldName(errorSummary)
 

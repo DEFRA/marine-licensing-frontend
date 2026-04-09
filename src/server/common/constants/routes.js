@@ -92,7 +92,8 @@ export const routes = {
   SERVICE_HOME: '/home',
   COOKIES: '/help/cookies',
   PRIVACY: '/help/privacy',
-  DECLARATION: '/declaration'
+  DECLARATION: '/declaration',
+  IAT_START: '/journey/self-service/start'
 }
 
 export const entraIdRoutes = [

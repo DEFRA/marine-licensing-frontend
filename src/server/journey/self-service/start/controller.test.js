@@ -108,9 +108,8 @@ describe('#iatStartController (integration)', () => {
 
   test('Renders no navigation links in the header', async () => {
     const { document } = await getPage()
-    const navItems = document.querySelectorAll(
-      '.govuk-service-navigation__item'
-    )
-    expect(navItems.length).toBe(0)
+    expect(
+      document.querySelector('.govuk-service-navigation__list')
+    ).toBeNull()
   })
 })

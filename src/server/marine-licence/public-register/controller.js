@@ -8,7 +8,7 @@ import {
 } from '#src/server/common/helpers/errors.js'
 import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
 import { authenticatedPatchRequest } from '#src/server/common/helpers/authenticated-requests.js'
-import { createMarineLicenceFailAction } from '#src/server/common/helpers/marine-licence/createMarineLicenceFailAction.js'
+import { createFailAction } from '#src/server/common/helpers/createFailAction.js'
 
 import joi from 'joi'
 
@@ -65,7 +65,8 @@ export const publicRegisterSubmitController = {
           })
         })
       }),
-      failAction: createMarineLicenceFailAction({
+      failAction: createFailAction({
+        getCache: getMarineLicenceCache,
         viewRoute: PUBLIC_REGISTER_VIEW_ROUTE,
         settings: publicRegisterSettings,
         errorMessages,

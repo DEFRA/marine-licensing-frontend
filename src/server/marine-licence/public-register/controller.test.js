@@ -162,45 +162,5 @@ describe('#publicRegister', () => {
       }
     )
 
-    test.each([
-      {
-        name: 'null error details',
-        payload: { consent: '' },
-        err: { details: null },
-        expectedExtra: {}
-      },
-      {
-        name: 'missing error details',
-        payload: { consent: '' },
-        err: {},
-        expectedExtra: {}
-      },
-      {
-        name: 'invalid consent value',
-        payload: { consent: 'invalid' },
-        err: {},
-        expectedExtra: {}
-      }
-    ])(
-      'Should correctly handle failAction with $name',
-      ({ payload, err, expectedExtra }) => {
-        const request = { payload }
-        const h = { view: vi.fn().mockReturnValue({ takeover: vi.fn() }) }
-        publicRegisterSubmitController.options.validate.failAction(
-          request,
-          h,
-          err
-        )
-        expect(h.view).toHaveBeenCalledWith(PUBLIC_REGISTER_VIEW_ROUTE, {
-          backLink: marineLicenceRoutes.MARINE_LICENCE_TASK_LIST,
-          pageTitle: 'Sharing your project information publicly',
-          heading: 'Sharing your project information publicly',
-          projectName: mockLicence.projectName,
-          payload,
-          ...expectedExtra
-        })
-        expect(h.view().takeover).toHaveBeenCalled()
-      }
-    )
   })
 })

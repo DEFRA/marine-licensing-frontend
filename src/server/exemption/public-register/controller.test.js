@@ -15,7 +15,7 @@ import {
 import * as cacheUtils from '#src/server/common/helpers/exemptions/session-cache/utils.js'
 import { routes } from '#src/server/common/constants/routes.js'
 import * as authRequests from '#src/server/common/helpers/authenticated-requests.js'
-import { publicRegisterErrorMessages } from '#src/server/common/constants/form-validation-error-messages.js'
+import { publicRegisterErrorMessages } from '#src/server/common/validation/public-register/constants.js'
 
 vi.mock('~/src/server/common/helpers/exemptions/session-cache/utils.js')
 

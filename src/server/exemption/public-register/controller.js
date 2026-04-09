@@ -9,16 +9,13 @@ import {
 import { routes } from '#src/server/common/constants/routes.js'
 import { authenticatedPatchRequest } from '#src/server/common/helpers/authenticated-requests.js'
 import { createFailAction } from '#src/server/common/helpers/createFailAction.js'
-import { publicRegisterErrorMessages } from '#src/server/common/constants/form-validation-error-messages.js'
-
-import joi from 'joi'
+import { publicRegisterSchema } from '#src/server/common/validation/public-register/schema.js'
+import {
+  publicRegisterErrorMessages,
+  publicRegisterSettings
+} from '#src/server/common/validation/public-register/constants.js'
 
 export const PUBLIC_REGISTER_VIEW_ROUTE = 'templates/public-register'
-
-const publicRegisterSettings = {
-  pageTitle: 'Sharing your project information publicly',
-  heading: 'Sharing your project information publicly'
-}
 
 const getBackLink = (request) => {
   const fromCheckYourAnswers = request.query?.from === 'check-your-answers'
@@ -40,32 +37,12 @@ export const publicRegisterController = {
 export const publicRegisterSubmitController = {
   options: {
     validate: {
-      payload: joi.object({
-        consent: joi.string().valid('yes', 'no').required().messages({
-          'any.only':
-            publicRegisterErrorMessages.PUBLIC_REGISTER_CONSENT_REQUIRED,
-          'string.empty':
-            publicRegisterErrorMessages.PUBLIC_REGISTER_CONSENT_REQUIRED,
-          'any.required':
-            publicRegisterErrorMessages.PUBLIC_REGISTER_CONSENT_REQUIRED
-        }),
-        reason: joi.when('consent', {
-          is: 'no',
-          then: joi.string().trim().max(1000).required().messages({
-            'string.empty':
-              publicRegisterErrorMessages.PUBLIC_REGISTER_REASON_REQUIRED,
-            'any.required':
-              publicRegisterErrorMessages.PUBLIC_REGISTER_REASON_REQUIRED,
-            'string.max':
-              publicRegisterErrorMessages.PUBLIC_REGISTER_REASON_MAX_LENGTH
-          })
-        })
-      }),
+      payload: publicRegisterSchema,
       failAction: createFailAction({
         getCache: getExemptionCache,
         viewRoute: PUBLIC_REGISTER_VIEW_ROUTE,
         settings: publicRegisterSettings,
-        publicRegisterErrorMessages,
+        errorMessages: publicRegisterErrorMessages,
         getBackLink
       })
     }

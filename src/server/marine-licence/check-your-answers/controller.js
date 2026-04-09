@@ -18,7 +18,8 @@ export const checkYourAnswersController = {
 
     return h.view(CHECK_YOUR_ANSWERS_VIEW_ROUTE, {
       ...checkYourAnswersViewContent,
-      ...cachedMarineLicence
+      ...cachedMarineLicence,
+      publicRegisterRoute: marineLicenceRoutes.MARINE_LICENCE_PUBLIC_REGISTER
     })
   }
 }

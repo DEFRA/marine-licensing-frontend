@@ -7,7 +7,7 @@ import {
 import * as cacheUtils from '#src/server/common/helpers/marine-licence/session-cache/utils.js'
 import * as authRequests from '#src/server/common/helpers/authenticated-requests.js'
 
-vi.mock('~/src/server/common/helpers/marine-licence/session-cache/utils.js')
+vi.mock('#/src/server/common/helpers/marine-licence/session-cache/utils.js')
 
 describe('#publicRegister', () => {
   const mockLicence = {

@@ -63,7 +63,8 @@ export const viewDetailsController = {
         statusTagClass,
         siteDetails,
         multipleSiteDetails,
-        siteLocationData
+        siteLocationData,
+        publicRegisterRoute: routes.PUBLIC_REGISTER
       })
     } catch (error) {
       if (error.isBoom) {

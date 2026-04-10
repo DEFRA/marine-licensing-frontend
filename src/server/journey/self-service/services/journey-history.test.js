@@ -21,17 +21,29 @@ describe('#journey-history', () => {
   describe('#getBackLink', () => {
     test('returns start page when history is empty', () => {
       const request = createMockRequest([])
-      expect(getBackLink(request)).toBe(IAT_START)
+      expect(getBackLink(request, '/sea')).toBe(IAT_START)
     })
 
-    test('returns the last route in history prefixed with route prefix', () => {
+    test('returns the previous route when current route is in history', () => {
       const request = createMockRequest(['/sea', '/jurisdiction'])
-      expect(getBackLink(request)).toBe(`${ROUTE_PREFIX}/jurisdiction`)
+      expect(getBackLink(request, '/jurisdiction')).toBe(`${ROUTE_PREFIX}/sea`)
+    })
+
+    test('returns start page when current route is the first in history', () => {
+      const request = createMockRequest(['/sea', '/jurisdiction'])
+      expect(getBackLink(request, '/sea')).toBe(IAT_START)
+    })
+
+    test('returns last route when current route is not in history', () => {
+      const request = createMockRequest(['/sea', '/jurisdiction'])
+      expect(getBackLink(request, '/activity-type')).toBe(
+        `${ROUTE_PREFIX}/jurisdiction`
+      )
     })
 
     test('returns start page when history is null', () => {
       const request = createMockRequest(null)
-      expect(getBackLink(request)).toBe(IAT_START)
+      expect(getBackLink(request, '/sea')).toBe(IAT_START)
     })
   })
 

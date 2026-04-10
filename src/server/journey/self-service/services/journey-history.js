@@ -3,14 +3,20 @@ import { routes } from '#src/server/common/constants/routes.js'
 const SESSION_KEY = 'selfServiceHistory'
 const ROUTE_PREFIX = '/journey/self-service'
 
-export function getBackLink(request) {
+export function getBackLink(request, currentRoute) {
   const history = request.yar.get(SESSION_KEY) ?? []
 
-  if (history.length === 0) {
-    return routes.IAT_START
+  const currentIndex = history.indexOf(currentRoute)
+
+  if (currentIndex > 0) {
+    return `${ROUTE_PREFIX}/${history[currentIndex - 1].replace(/^\//, '')}`
   }
 
-  return `${ROUTE_PREFIX}/${history[history.length - 1].replace(/^\//, '')}`
+  if (currentIndex === -1 && history.length > 0) {
+    return `${ROUTE_PREFIX}/${history[history.length - 1].replace(/^\//, '')}`
+  }
+
+  return routes.IAT_START
 }
 
 export function pushRoute(request, route) {

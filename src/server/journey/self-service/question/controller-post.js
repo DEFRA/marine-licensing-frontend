@@ -3,7 +3,10 @@ import {
   getSection
 } from '#src/server/journey/self-service/services/journey-data.js'
 import { calculateNextRoute } from '#src/server/journey/self-service/services/journey-router.js'
-import { pushRoute } from '#src/server/journey/self-service/services/journey-history.js'
+import {
+  pushRoute,
+  getBackLink
+} from '#src/server/journey/self-service/services/journey-history.js'
 import { statusCodes } from '#src/server/common/constants/status-codes.js'
 
 const VIEW_PATH = 'journey/self-service/question/index'
@@ -27,7 +30,7 @@ export const questionPostController = {
           pageTitle: question.text,
           question,
           section,
-          backLink: undefined,
+          backLink: getBackLink(request, questionRoute),
           hidePhaseBanner: true,
           errors: { answer: { text: 'Select an option' } },
           errorSummary: [{ text: 'Select an option', href: '#answer' }]

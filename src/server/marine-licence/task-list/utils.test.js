@@ -9,7 +9,10 @@ describe('taskList utils', () => {
   describe('transformProjectDetailsTaskList', () => {
     test('correctly returns Completed status', () => {
       expect(
-        transformProjectDetailsTaskList({ projectName: 'COMPLETED', projectBackground: 'COMPLETED' })
+        transformProjectDetailsTaskList({
+          projectName: 'COMPLETED',
+          projectBackground: 'COMPLETED'
+        })
       ).toEqual([
         {
           href: marineLicenceRoutes.MARINE_LICENCE_PROJECT_NAME,
@@ -32,7 +35,10 @@ describe('taskList utils', () => {
 
     test('correctly returns In Progress', () => {
       expect(
-        transformProjectDetailsTaskList({ projectName: 'IN_PROGRESS', projectBackground: 'IN_PROGRESS' })
+        transformProjectDetailsTaskList({
+          projectName: 'IN_PROGRESS',
+          projectBackground: 'IN_PROGRESS'
+        })
       ).toEqual([
         {
           href: marineLicenceRoutes.MARINE_LICENCE_PROJECT_NAME,

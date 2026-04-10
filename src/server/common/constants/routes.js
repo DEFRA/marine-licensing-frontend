@@ -96,7 +96,8 @@ export const routes = {
   COOKIES: '/help/cookies',
   PRIVACY: '/help/privacy',
   DECLARATION: '/declaration',
-  IAT_START: '/journey/self-service/start'
+  IAT_START: '/journey/self-service/start',
+  IAT_QUESTION: '/journey/self-service/{questionPath*}'
 }
 
 export const entraIdRoutes = [

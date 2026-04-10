@@ -21,9 +21,10 @@ patterns, and avoid reaching into unrelated feature directories.
 
 ### Pages
 
-| URL                           | Directory             | Ticket  |
-| ----------------------------- | --------------------- | ------- |
-| `/journey/self-service/start` | `self-service/start/` | ML-1162 |
+| URL                                     | Directory                | Ticket  |
+| --------------------------------------- | ------------------------ | ------- |
+| `/journey/self-service/start`           | `self-service/start/`    | ML-1162 |
+| `/journey/self-service/{questionPath*}` | `self-service/question/` | ML-1186 |
 
 More pages (the question journey, outcome pages) will land under
 `self-service/` as follow-up tickets complete.

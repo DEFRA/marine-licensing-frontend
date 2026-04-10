@@ -925,16 +925,11 @@
     {
       "route": "/mod-permission",
       "heading": "MOD permission not sought or granted",
-      "outcomeTypes": [
-        "WO_MOD_PERMISSION",
-        "WO_STANDARD_TRACK_MLA"
-      ]
+      "outcomeTypes": ["WO_MOD_PERMISSION", "WO_STANDARD_TRACK_MLA"]
     },
     {
       "route": "/not-licensable",
-      "outcomeTypes": [
-        "WO_NOT_LICENSABLE"
-      ]
+      "outcomeTypes": ["WO_NOT_LICENSABLE"]
     },
     {
       "route": "/scaffolding-impede-navigation",
@@ -971,25 +966,17 @@
     {
       "route": "/fast-track-mla",
       "heading": "Self-service marine licensing",
-      "outcomeTypes": [
-        "WO_FAST_TRACK_MLA"
-      ]
+      "outcomeTypes": ["WO_FAST_TRACK_MLA"]
     },
     {
       "route": "/fast-track-mla/bas-block",
       "heading": "Licence required",
-      "outcomeTypes": [
-        "WO_FAST_TRACK_MLA_BAS_BLOCK"
-      ]
+      "outcomeTypes": ["WO_FAST_TRACK_MLA_BAS_BLOCK"]
     },
     {
       "route": "/not-screened-out",
       "heading": "Project not \"screened out\" by the MMO",
-      "outcomeTypes": [
-        "WO_ENQUIRY",
-        "WO_EIA",
-        "WO_STANDARD_TRACK_MLA"
-      ]
+      "outcomeTypes": ["WO_ENQUIRY", "WO_EIA", "WO_STANDARD_TRACK_MLA"]
     },
     {
       "route": "/historic-england/not-agreed",
@@ -1002,9 +989,7 @@
     {
       "route": "/fast-track-mla/activity",
       "heading": "Licence required - Self-service activity",
-      "outcomeTypes": [
-        "WO_FAST_TRACK_MLA"
-      ]
+      "outcomeTypes": ["WO_FAST_TRACK_MLA"]
     },
     {
       "route": "/natural-england/not-agreed",
@@ -1017,614 +1002,439 @@
     {
       "route": "/standard-marine-licence-application/construction",
       "heading": "Construction",
-      "outcomeTypes": [
-        "WO_STANDARD_TRACK_MLA"
-      ]
+      "outcomeTypes": ["WO_STANDARD_TRACK_MLA"]
     },
     {
       "route": "/standard-marine-licence-application/deposit",
       "heading": "Deposit",
-      "outcomeTypes": [
-        "WO_STANDARD_TRACK_MLA"
-      ]
+      "outcomeTypes": ["WO_STANDARD_TRACK_MLA"]
     },
     {
       "route": "/standard-marine-licence-application/removal",
       "heading": "Removal",
-      "outcomeTypes": [
-        "WO_STANDARD_TRACK_MLA"
-      ]
+      "outcomeTypes": ["WO_STANDARD_TRACK_MLA"]
     },
     {
       "route": "/standard-marine-licence-application/dredging",
       "heading": "Dredging",
-      "outcomeTypes": [
-        "WO_STANDARD_TRACK_MLA"
-      ]
+      "outcomeTypes": ["WO_STANDARD_TRACK_MLA"]
     },
     {
       "route": "/standard-marine-licence-application/incineration",
       "heading": "Incineration",
-      "outcomeTypes": [
-        "WO_STANDARD_TRACK_MLA"
-      ]
+      "outcomeTypes": ["WO_STANDARD_TRACK_MLA"]
     },
     {
       "route": "/standard-marine-licence-application/scuttling",
       "heading": "Scuttling",
-      "outcomeTypes": [
-        "WO_STANDARD_TRACK_MLA"
-      ]
+      "outcomeTypes": ["WO_STANDARD_TRACK_MLA"]
     },
     {
       "route": "/standard-marine-licence-application/explosives",
       "heading": "Explosives",
-      "outcomeTypes": [
-        "WO_STANDARD_TRACK_MLA"
-      ]
+      "outcomeTypes": ["WO_STANDARD_TRACK_MLA"]
     },
     {
       "route": "/standard-marine-licence-application/other-activity",
       "heading": "Activity - other",
-      "outcomeTypes": [
-        "WO_STANDARD_TRACK_MLA_OTHER_ACTIVITY"
-      ]
+      "outcomeTypes": ["WO_STANDARD_TRACK_MLA_OTHER_ACTIVITY"]
     },
     {
       "route": "/standard-marine-licence-application/other-maintenance",
       "heading": "Maintenance of existing structures or assets - Other maintenance",
-      "outcomeTypes": [
-        "WO_STANDARD_TRACK_MLA_OTHER_MAINTENANCE"
-      ]
+      "outcomeTypes": ["WO_STANDARD_TRACK_MLA_OTHER_MAINTENANCE"]
     },
     {
       "route": "/standard-marine-licence-application/bas-duration",
       "heading": "Activity - duration over 3 months (Burial at Sea)",
-      "outcomeTypes": [
-        "WO_STANDARD_TRACK_MLA"
-      ]
+      "outcomeTypes": ["WO_STANDARD_TRACK_MLA"]
     },
     {
       "route": "/standard-marine-licence-application/bas-other-location",
       "heading": "Deposit - Burial at Sea - Other location",
-      "outcomeTypes": [
-        "WO_STANDARD_TRACK_MLA"
-      ]
+      "outcomeTypes": ["WO_STANDARD_TRACK_MLA"]
     },
     {
       "route": "/standard-marine-licence-application/other-removals",
       "heading": "Minor removals - Other removals",
-      "outcomeTypes": [
-        "WO_STANDARD_TRACK_MLA_OTHER_REMOVALS"
-      ]
+      "outcomeTypes": ["WO_STANDARD_TRACK_MLA_OTHER_REMOVALS"]
     },
     {
       "route": "/standard-marine-licence-application/other-clearance-dredging",
       "heading": "Non-navigational clearance dredging - Other clearance dredging",
-      "outcomeTypes": [
-        "WO_STANDARD_TRACK_MLA_OTHER_CLEARANCE_DREDGING"
-      ]
+      "outcomeTypes": ["WO_STANDARD_TRACK_MLA_OTHER_CLEARANCE_DREDGING"]
     },
     {
       "route": "/standard-marine-licence-application/other-beach-maintenance",
       "heading": "Beach maintenance activities - Other beach maintenance",
-      "outcomeTypes": [
-        "WO_STANDARD_TRACK_MLA_OTHER_BEACH_MAINTENANCE"
-      ]
+      "outcomeTypes": ["WO_STANDARD_TRACK_MLA_OTHER_BEACH_MAINTENANCE"]
     },
     {
       "route": "/standard-marine-licence-application/other-deposits",
       "heading": "Deposit of markers - Other deposits",
-      "outcomeTypes": [
-        "WO_STANDARD_TRACK_MLA_OTHER_DEPOSITS"
-      ]
+      "outcomeTypes": ["WO_STANDARD_TRACK_MLA_OTHER_DEPOSITS"]
     },
     {
       "route": "/standard-marine-licence-application/duration",
       "heading": "Activity - duration over 12 months",
-      "outcomeTypes": [
-        "WO_STANDARD_TRACK_MLA"
-      ]
+      "outcomeTypes": ["WO_STANDARD_TRACK_MLA"]
     },
     {
       "route": "/standard-marine-licence-application/public-register",
       "heading": "Information needs be withheld from the MMO public register",
-      "outcomeTypes": [
-        "WO_STANDARD_TRACK_MLA"
-      ]
+      "outcomeTypes": ["WO_STANDARD_TRACK_MLA"]
     },
     {
       "route": "/standard-marine-licence-application/ten-square-miles",
       "heading": "Activity locations not within 10 square miles",
-      "outcomeTypes": [
-        "WO_STANDARD_TRACK_MLA"
-      ]
+      "outcomeTypes": ["WO_STANDARD_TRACK_MLA"]
     },
     {
       "route": "/standard-marine-licence-application/intrusive-in-nature",
       "heading": "Activity intrusive in nature",
-      "outcomeTypes": [
-        "WO_STANDARD_TRACK_MLA"
-      ]
+      "outcomeTypes": ["WO_STANDARD_TRACK_MLA"]
     },
     {
       "route": "/standard-marine-licence-application/routing-measure",
       "heading": "New activity within an International Maritime Organisation routing measure",
-      "outcomeTypes": [
-        "WO_STANDARD_TRACK_MLA"
-      ]
+      "outcomeTypes": ["WO_STANDARD_TRACK_MLA"]
     },
     {
       "route": "/standard-marine-licence-application/protected-place",
       "heading": "Activity within a protected place or controlled site under the Protection of Military Remains Act (1986)",
-      "outcomeTypes": [
-        "WO_STANDARD_TRACK_MLA"
-      ]
+      "outcomeTypes": ["WO_STANDARD_TRACK_MLA"]
     },
     {
       "route": "/exemption/licence-not-required",
       "heading": "Marine licence not required",
-      "outcomeTypes": [
-        "WO_EXE_NOT_LICENSABLE"
-      ]
+      "outcomeTypes": ["WO_EXE_NOT_LICENSABLE"]
     },
     {
       "route": "/exemption/licence-not-required/deposit-method",
       "heading": "Marine licence not required",
-      "outcomeTypes": [
-        "WO_EXE_NOT_LICENSABLE_DEPOSIT_METHOD"
-      ]
+      "outcomeTypes": ["WO_EXE_NOT_LICENSABLE_DEPOSIT_METHOD"]
     },
     {
       "route": "/exemption/licence-not-required/sea",
       "heading": "Marine licence not required",
-      "outcomeTypes": [
-        "WO_EXE_NOT_LICENSABLE_SEA"
-      ]
+      "outcomeTypes": ["WO_EXE_NOT_LICENSABLE_SEA"]
     },
     {
       "route": "/exemption/licence-not-required/deposit-method",
       "heading": "Marine licence not required",
-      "outcomeTypes": [
-        "WO_EXE_NOT_LICENSABLE_DEPOSIT_METHOD"
-      ]
+      "outcomeTypes": ["WO_EXE_NOT_LICENSABLE_DEPOSIT_METHOD"]
     },
     {
       "route": "/exemption/licence-not-required/removal-seabed",
       "heading": "Marine licence not required",
-      "outcomeTypes": [
-        "WO_EXE_NOT_LICENSABLE_REMOVAL_SEABED"
-      ]
+      "outcomeTypes": ["WO_EXE_NOT_LICENSABLE_REMOVAL_SEABED"]
     },
     {
       "route": "/exemption/licence-not-required/removal-method",
       "heading": "Marine licence not required",
-      "outcomeTypes": [
-        "WO_EXE_NOT_LICENSABLE_REMOVAL_METHOD"
-      ]
+      "outcomeTypes": ["WO_EXE_NOT_LICENSABLE_REMOVAL_METHOD"]
     },
     {
       "route": "/exemption/licence-not-required/Incineration-on",
       "heading": "Marine licence not required",
-      "outcomeTypes": [
-        "WO_EXE_NOT_LICENSABLE_INCINERATION_ON"
-      ]
+      "outcomeTypes": ["WO_EXE_NOT_LICENSABLE_INCINERATION_ON"]
     },
     {
       "route": "/exemption/licence-not-required/Activity-elsewhere",
       "heading": "Marine licence not required",
-      "outcomeTypes": [
-        "WO_EXE_NOT_LICENSABLE_ELSEWHERE_ACTIVITY"
-      ]
+      "outcomeTypes": ["WO_EXE_NOT_LICENSABLE_ELSEWHERE_ACTIVITY"]
     },
     {
       "route": "/exemption/licence-not-required/deposit-method-elsewhere",
       "heading": "Marine licence not required",
-      "outcomeTypes": [
-        "WO_EXE_NOT_LICENSABLE_DEPOSIT_METHOD_ELSEWHERE"
-      ]
+      "outcomeTypes": ["WO_EXE_NOT_LICENSABLE_DEPOSIT_METHOD_ELSEWHERE"]
     },
     {
       "route": "/exemption/licence-not-required/scuttling-method-elsewhere",
       "heading": "Marine licence not required",
-      "outcomeTypes": [
-        "WO_EXE_NOT_LICENSABLE_SCUTTLING_METHOD_ELSEWHERE"
-      ]
+      "outcomeTypes": ["WO_EXE_NOT_LICENSABLE_SCUTTLING_METHOD_ELSEWHERE"]
     },
     {
       "route": "/exemption/licence-not-required/incineration-method-elsewhere",
       "heading": "Marine licence not required",
-      "outcomeTypes": [
-        "WO_EXE_NOT_LICENSABLE_INCINERATION_METHOD_ELSEWHERE"
-      ]
+      "outcomeTypes": ["WO_EXE_NOT_LICENSABLE_INCINERATION_METHOD_ELSEWHERE"]
     },
     {
       "route": "/exemption/licence-not-required/scuttling-method-elsewhere",
       "heading": "Marine licence not required",
-      "outcomeTypes": [
-        "WO_EXE_NOT_LICENSABLE_SCUTTLING_METHOD_ELSEWHERE"
-      ]
+      "outcomeTypes": ["WO_EXE_NOT_LICENSABLE_SCUTTLING_METHOD_ELSEWHERE"]
     },
     {
       "route": "/exemption/licence-not-required-cables",
       "heading": "Exempt activity",
-      "outcomeTypes": [
-        "WO_EXE_NOT_LICENSABLE_CABLES"
-      ]
+      "outcomeTypes": ["WO_EXE_NOT_LICENSABLE_CABLES"]
     },
     {
       "route": "/exemption/licence-not-required-cables/maintenance",
       "heading": "Exempt activity",
-      "outcomeTypes": [
-        "WO_EXE_NOT_LICENSABLE_CABLES_MAINTENANCE"
-      ]
+      "outcomeTypes": ["WO_EXE_NOT_LICENSABLE_CABLES_MAINTENANCE"]
     },
     {
       "route": "/exemption/licence-required-no-exemption-part-cables",
       "heading": "Marine licence is required",
-      "outcomeTypes": [
-        "WO_EXE_NOT_LICENSABLE_PART_CABLES"
-      ]
+      "outcomeTypes": ["WO_EXE_NOT_LICENSABLE_PART_CABLES"]
     },
     {
       "route": "/exemption/licence-not-required-cables/maintenance/both",
       "heading": "Exempt activity",
-      "outcomeTypes": [
-        "WO_EXE_NOT_LICENSABLE_PART_CABLES_MAINTENANCE_BOTH"
-      ]
+      "outcomeTypes": ["WO_EXE_NOT_LICENSABLE_PART_CABLES_MAINTENANCE_BOTH"]
     },
     {
       "route": "/exemption/licence-not-required-exemption-available-article-7",
       "heading": "Exempt activity",
-      "outcomeTypes": [
-        "WO_EXE_AVAILABLE_ARTICLE_7"
-      ]
+      "outcomeTypes": ["WO_EXE_AVAILABLE_ARTICLE_7"]
     },
     {
       "route": "/exemption/licence-not-required-exemption-available-article-8",
       "heading": "Exempt activity",
-      "outcomeTypes": [
-        "WO_EXE_AVAILABLE_ARTICLE_8"
-      ]
+      "outcomeTypes": ["WO_EXE_AVAILABLE_ARTICLE_8"]
     },
     {
       "route": "/exemption/licence-not-required-exemption-available-article-9",
       "heading": "Exempt activity",
-      "outcomeTypes": [
-        "WO_EXE_AVAILABLE_ARTICLE_9"
-      ]
+      "outcomeTypes": ["WO_EXE_AVAILABLE_ARTICLE_9"]
     },
     {
       "route": "/exemption/licence-not-required-exemption-available-article-10",
       "heading": "Exempt activity",
-      "outcomeTypes": [
-        "WO_EXE_AVAILABLE_ARTICLE_10"
-      ]
+      "outcomeTypes": ["WO_EXE_AVAILABLE_ARTICLE_10"]
     },
     {
       "route": "/exemption/licence-not-required-exemption-available-article-11",
       "heading": "Exempt activity",
-      "outcomeTypes": [
-        "WO_EXE_AVAILABLE_ARTICLE_11"
-      ]
+      "outcomeTypes": ["WO_EXE_AVAILABLE_ARTICLE_11"]
     },
     {
       "route": "/exemption/licence-not-required-exemption-available-article-12",
       "heading": "Exempt activity",
-      "outcomeTypes": [
-        "WO_EXE_AVAILABLE_ARTICLE_12"
-      ]
+      "outcomeTypes": ["WO_EXE_AVAILABLE_ARTICLE_12"]
     },
     {
       "route": "/exemption/licence-not-required-exemption-available-article-13",
       "heading": "You need to provide more information, but you do not need a marine licence",
-      "outcomeTypes": [
-        "WO_EXE_AVAILABLE_ARTICLE_13"
-      ]
+      "outcomeTypes": ["WO_EXE_AVAILABLE_ARTICLE_13"]
     },
     {
       "route": "/exemption/licence-not-required-exemption-available-article-14",
       "heading": "Exempt activity",
-      "outcomeTypes": [
-        "WO_EXE_AVAILABLE_ARTICLE_14"
-      ]
+      "outcomeTypes": ["WO_EXE_AVAILABLE_ARTICLE_14"]
     },
     {
       "route": "/exemption/licence-not-required-exemption-available-article-15",
       "heading": "Marine licence not required",
-      "outcomeTypes": [
-        "WO_EXE_AVAILABLE_ARTICLE_15"
-      ]
+      "outcomeTypes": ["WO_EXE_AVAILABLE_ARTICLE_15"]
     },
     {
       "route": "/exemption/licence-not-required-exemption-available-article-16",
       "heading": "Exempt activity - Approval required",
-      "outcomeTypes": [
-        "WO_EXE_AVAILABLE_ARTICLE_16"
-      ]
+      "outcomeTypes": ["WO_EXE_AVAILABLE_ARTICLE_16"]
     },
     {
       "route": "/exemption/licence-not-required-exemption-available-article-17",
       "heading": "You need to provide more information, but you do not need a marine licence",
-      "outcomeTypes": [
-        "WO_EXE_AVAILABLE_ARTICLE_17"
-      ]
+      "outcomeTypes": ["WO_EXE_AVAILABLE_ARTICLE_17"]
     },
     {
       "route": "/exemption/licence-not-required-exemption-available-article-17A",
       "heading": "You need to provide more information, but you do not need a marine licence",
-      "outcomeTypes": [
-        "WO_EXE_AVAILABLE_ARTICLE_17A"
-      ]
+      "outcomeTypes": ["WO_EXE_AVAILABLE_ARTICLE_17A"]
     },
     {
       "route": "/exemption/licence-not-required-exemption-available-article-17B",
       "heading": "You need to provide more information, but you do not need a marine licence",
-      "outcomeTypes": [
-        "WO_EXE_AVAILABLE_ARTICLE_17B"
-      ]
+      "outcomeTypes": ["WO_EXE_AVAILABLE_ARTICLE_17B"]
     },
     {
       "route": "/exemption/licence-not-required-exemption-available-article-18",
       "heading": "Licence is not required",
-      "outcomeTypes": [
-        "WO_EXE_AVAILABLE_ARTICLE_18"
-      ]
+      "outcomeTypes": ["WO_EXE_AVAILABLE_ARTICLE_18"]
     },
     {
       "route": "/exemption/licence-not-required-exemption-available-article-18A",
       "heading": "You need to provide more information, but you do not need a marine licence",
-      "outcomeTypes": [
-        "WO_EXE_AVAILABLE_ARTICLE_18A"
-      ]
+      "outcomeTypes": ["WO_EXE_AVAILABLE_ARTICLE_18A"]
     },
     {
       "route": "/exemption/licence-not-required-exemption-available-article-19",
       "heading": "Exempt activity",
-      "outcomeTypes": [
-        "WO_EXE_AVAILABLE_ARTICLE_19"
-      ]
+      "outcomeTypes": ["WO_EXE_AVAILABLE_ARTICLE_19"]
     },
     {
       "route": "/exemption/licence-not-required-exemption-available-article-20",
       "heading": "You need to provide more information, but you do not need a marine licence",
-      "outcomeTypes": [
-        "WO_EXE_AVAILABLE_ARTICLE_20"
-      ]
+      "outcomeTypes": ["WO_EXE_AVAILABLE_ARTICLE_20"]
     },
     {
       "route": "/exemption/licence-not-required-exemption-available-article-21",
       "heading": "You need to provide more information, but you do not need a marine licence",
-      "outcomeTypes": [
-        "WO_EXE_AVAILABLE_ARTICLE_21"
-      ]
+      "outcomeTypes": ["WO_EXE_AVAILABLE_ARTICLE_21"]
     },
     {
       "route": "/exemption/licence-not-required-exemption-available-article-21-no-notification",
       "heading": "Exempt activity",
-      "outcomeTypes": [
-        "WO_EXE_AVAILABLE_ARTICLE_21_NO_NOTIFICATION"
-      ]
+      "outcomeTypes": ["WO_EXE_AVAILABLE_ARTICLE_21_NO_NOTIFICATION"]
     },
     {
       "route": "/exemption/licence-not-required-exemption-available-article-21A",
       "heading": "Exempt activity",
-      "outcomeTypes": [
-        "WO_EXE_AVAILABLE_ARTICLE_21A"
-      ]
+      "outcomeTypes": ["WO_EXE_AVAILABLE_ARTICLE_21A"]
     },
     {
       "route": "/exemption/licence-not-required-exemption-available-article-22",
       "heading": "Exempt activity",
-      "outcomeTypes": [
-        "WO_EXE_AVAILABLE_ARTICLE_22"
-      ]
+      "outcomeTypes": ["WO_EXE_AVAILABLE_ARTICLE_22"]
     },
     {
       "route": "/exemption/licence-not-required-exemption-available-article-23",
       "heading": "Exempt activity",
-      "outcomeTypes": [
-        "WO_EXE_AVAILABLE_ARTICLE_23"
-      ]
+      "outcomeTypes": ["WO_EXE_AVAILABLE_ARTICLE_23"]
     },
     {
       "route": "/exemption/licence-not-required-exemption-available-article-24",
       "heading": "Exempt activity",
-      "outcomeTypes": [
-        "WO_EXE_AVAILABLE_ARTICLE_24"
-      ]
+      "outcomeTypes": ["WO_EXE_AVAILABLE_ARTICLE_24"]
     },
     {
       "route": "/exemption/licence-not-required-exemption-available-article-24A",
       "heading": "Exempt activity",
-      "outcomeTypes": [
-        "WO_EXE_AVAILABLE_ARTICLE_24A"
-      ]
+      "outcomeTypes": ["WO_EXE_AVAILABLE_ARTICLE_24A"]
     },
     {
       "route": "/exemption/licence-not-required-exemption-available-article-25",
       "heading": "Exempt activity",
-      "outcomeTypes": [
-        "WO_EXE_AVAILABLE_ARTICLE_25"
-      ]
+      "outcomeTypes": ["WO_EXE_AVAILABLE_ARTICLE_25"]
     },
     {
       "route": "/exemption/licence-not-required-exemption-available-article-25-notification",
       "heading": "You need to provide more information, but you do not need a marine licence",
-      "outcomeTypes": [
-        "WO_EXE_AVAILABLE_ARTICLE_25_NOTIFICATION"
-      ]
+      "outcomeTypes": ["WO_EXE_AVAILABLE_ARTICLE_25_NOTIFICATION"]
     },
     {
       "route": "/exemption/licence-not-required-exemption-available-article-25A",
       "heading": "You need to provide more information, but you do not need a marine licence",
-      "outcomeTypes": [
-        "WO_EXE_AVAILABLE_ARTICLE_25A"
-      ]
+      "outcomeTypes": ["WO_EXE_AVAILABLE_ARTICLE_25A"]
     },
     {
       "route": "/exemption/licence-not-required-exemption-available-article-25A-mmo-approval",
       "heading": "Exempt activity - Approval required",
-      "outcomeTypes": [
-        "WO_EXE_AVAILABLE_ARTICLE_25A_MMO_APPROVAL"
-      ]
+      "outcomeTypes": ["WO_EXE_AVAILABLE_ARTICLE_25A_MMO_APPROVAL"]
     },
     {
       "route": "/exemption/licence-not-required-exemption-available-article-26",
       "heading": "Exempt activity - Approval required",
-      "outcomeTypes": [
-        "WO_EXE_AVAILABLE_ARTICLE_26"
-      ]
+      "outcomeTypes": ["WO_EXE_AVAILABLE_ARTICLE_26"]
     },
     {
       "route": "/exemption/licence-not-required-exemption-available-article-26a",
       "heading": "You need to provide more information, but you do not need a marine licence",
-      "outcomeTypes": [
-        "WO_EXE_AVAILABLE_ARTICLE_26A"
-      ]
+      "outcomeTypes": ["WO_EXE_AVAILABLE_ARTICLE_26A"]
     },
     {
       "route": "/exemption/licence-not-required-exemption-available-article-26a-no-notification",
       "heading": "Exempt activity",
-      "outcomeTypes": [
-        "WO_EXE_AVAILABLE_ARTICLE_26A_NO_NOTIFICATION"
-      ]
+      "outcomeTypes": ["WO_EXE_AVAILABLE_ARTICLE_26A_NO_NOTIFICATION"]
     },
     {
       "route": "/exemption/licence-not-required-exemption-available-article-27",
       "heading": "Exempt activity",
-      "outcomeTypes": [
-        "WO_EXE_AVAILABLE_ARTICLE_27"
-      ]
+      "outcomeTypes": ["WO_EXE_AVAILABLE_ARTICLE_27"]
     },
     {
       "route": "/exemption/licence-not-required-exemption-available-article-27A",
       "heading": "Exempt activity",
-      "outcomeTypes": [
-        "WO_EXE_AVAILABLE_ARTICLE_27A"
-      ]
+      "outcomeTypes": ["WO_EXE_AVAILABLE_ARTICLE_27A"]
     },
     {
       "route": "/exemption/licence-not-required-exemption-available-article-28",
       "heading": "Exempt activity",
-      "outcomeTypes": [
-        "WO_EXE_AVAILABLE_ARTICLE_28"
-      ]
+      "outcomeTypes": ["WO_EXE_AVAILABLE_ARTICLE_28"]
     },
     {
       "route": "/exemption/licence-not-required-exemption-available-article-29",
       "heading": "Exempt activity",
-      "outcomeTypes": [
-        "WO_EXE_AVAILABLE_ARTICLE_29"
-      ]
+      "outcomeTypes": ["WO_EXE_AVAILABLE_ARTICLE_29"]
     },
     {
       "route": "/exemption/licence-not-required-exemption-available-article-30",
       "heading": "Exempt activity",
-      "outcomeTypes": [
-        "WO_EXE_AVAILABLE_ARTICLE_30"
-      ]
+      "outcomeTypes": ["WO_EXE_AVAILABLE_ARTICLE_30"]
     },
     {
       "route": "/exemption/licence-not-required-exemption-available-article-31",
       "heading": "Exempt activity",
-      "outcomeTypes": [
-        "WO_EXE_AVAILABLE_ARTICLE_31"
-      ]
+      "outcomeTypes": ["WO_EXE_AVAILABLE_ARTICLE_31"]
     },
     {
       "route": "/exemption/licence-not-required-exemption-available-article-32",
       "heading": "Exempt activity",
-      "outcomeTypes": [
-        "WO_EXE_AVAILABLE_ARTICLE_32"
-      ]
+      "outcomeTypes": ["WO_EXE_AVAILABLE_ARTICLE_32"]
     },
     {
       "route": "/exemption/licence-not-required-exemption-available-article-33",
       "heading": "Exempt activity",
-      "outcomeTypes": [
-        "WO_EXE_AVAILABLE_ARTICLE_33"
-      ]
+      "outcomeTypes": ["WO_EXE_AVAILABLE_ARTICLE_33"]
     },
     {
       "route": "/exemption/licence-not-required-exemption-available-article-34",
       "heading": "You need to provide more information, but you do not need a marine licence",
-      "outcomeTypes": [
-        "WO_EXE_AVAILABLE_ARTICLE_34"
-      ]
+      "outcomeTypes": ["WO_EXE_AVAILABLE_ARTICLE_34"]
     },
     {
       "route": "/exemption/licence-not-required-exemption-available-article-35",
       "heading": "You need to provide more information, but you do not need a marine licence",
-      "outcomeTypes": [
-        "WO_EXE_AVAILABLE_ARTICLE_35"
-      ]
+      "outcomeTypes": ["WO_EXE_AVAILABLE_ARTICLE_35"]
     },
     {
       "route": "/exemption/licence-not-required-exemption-available-article-36",
       "heading": "Exempt activity",
-      "outcomeTypes": [
-        "WO_EXE_AVAILABLE_ARTICLE_36"
-      ]
+      "outcomeTypes": ["WO_EXE_AVAILABLE_ARTICLE_36"]
     },
     {
       "route": "/exemption/licence-not-required-exemption-available-article-37",
       "heading": "Exempt activity",
-      "outcomeTypes": [
-        "WO_EXE_AVAILABLE_ARTICLE_37"
-      ]
+      "outcomeTypes": ["WO_EXE_AVAILABLE_ARTICLE_37"]
     },
     {
       "route": "/exemption/licence-not-required-exemption-available-Section-75",
       "heading": "Exempt activity",
-      "outcomeTypes": [
-        "WO_EXE_AVAILABLE_SECTION_75"
-      ]
+      "outcomeTypes": ["WO_EXE_AVAILABLE_SECTION_75"]
     },
     {
       "route": "/exemption/licence-not-required-exemption-available-Section-75-disposal",
       "heading": "Exempt activity - Approval required",
-      "outcomeTypes": [
-        "WO_EXE_AVAILABLE_SECTION_75_DISPOSAL"
-      ]
+      "outcomeTypes": ["WO_EXE_AVAILABLE_SECTION_75_DISPOSAL"]
     },
     {
       "route": "/exemption/licence-not-required-exemption-available-Section-77",
       "heading": "Exempt activity",
-      "outcomeTypes": [
-        "WO_EXE_AVAILABLE_SECTION_77"
-      ]
+      "outcomeTypes": ["WO_EXE_AVAILABLE_SECTION_77"]
     },
     {
       "route": "/licence-not-required-devolved",
       "heading": "Marine licence not required",
-      "outcomeTypes": [
-        "WO_EXE_LICENCE_DEVOLVED"
-      ]
+      "outcomeTypes": ["WO_EXE_LICENCE_DEVOLVED"]
     },
     {
       "route": "/exemption/licence-required-no-exemption-no-self-service",
       "heading": "Marine licence is required",
-      "outcomeTypes": [
-        "WO_EXE_LICENCE_REQUIRED_NO_SELF_SERVICE"
-      ]
+      "outcomeTypes": ["WO_EXE_LICENCE_REQUIRED_NO_SELF_SERVICE"]
     },
     {
       "route": "/exemption/licence-required-no-exemption",
       "heading": "Marine licence is required",
-      "outcomeTypes": [
-        "WO_EXE_LICENCE_REQUIRED"
-      ]
+      "outcomeTypes": ["WO_EXE_LICENCE_REQUIRED"]
     },
     {
       "route": "/exemption/construction-exe-not-available-continue",
       "heading": "Exemption not available",
       "section": "doINeedAMarineLicenceConstruction",
       "text": "<b><b>Please select the service you require.</b></b><p><p> Find out more about <a target=\"_blank\" href=\"https://www.gov.uk/guidance/do-i-need-a-marine-licence#self-service\">self-service</a>, or <a target=\"_blank\" href=\"https://www.gov.uk/guidance/do-i-need-a-marine-licence#standard-marine-licence\">standard marine licensing</a>.<p><p>Note: If you select option 1 but it is subsequently determined in the course of the check that the activity does not meet relevant qualifying criteria you will have the opportunity to continue your journey and apply for a standard marine licence once the check is concluded.",
-      "outcomeTypes": [
-        "WO_CON_NO_EXE_SELF_SERVICE",
-        "WO_NO_EXE_STANDARD_MLA"
-      ]
+      "outcomeTypes": ["WO_CON_NO_EXE_SELF_SERVICE", "WO_NO_EXE_STANDARD_MLA"]
     },
     {
       "route": "/exemption/deposit-exe-not-available-continue",

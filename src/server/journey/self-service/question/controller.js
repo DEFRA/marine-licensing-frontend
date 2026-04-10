@@ -1,4 +1,7 @@
-import { getQuestion, getSection } from '#src/server/journey/self-service/services/journey-data.js'
+import {
+  getQuestion,
+  getSection
+} from '#src/server/journey/self-service/services/journey-data.js'
 import { getBackLink } from '#src/server/journey/self-service/services/journey-history.js'
 
 const VIEW_PATH = 'journey/self-service/question/index'

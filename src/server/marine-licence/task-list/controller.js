@@ -52,6 +52,7 @@ export const taskListController = {
       id: marineLicenceId,
       taskList,
       projectName,
+      projectBackground,
       specialLegalPowers,
       otherAuthorities,
       siteDetails
@@ -73,6 +74,7 @@ export const taskListController = {
     await setMarineLicenceCache(request, h, {
       id: marineLicenceId,
       projectName,
+      projectBackground,
       specialLegalPowers,
       otherAuthorities,
       siteDetails: hasCancel ? [] : siteDetails

@@ -39,7 +39,16 @@ describe('#taskListController', () => {
   const mockMarineLicence = {
     id: '123',
     projectName: 'Test Project',
-    siteDetails: [{ siteName: 'some-site' }]
+    projectBackground: 'Test project background',
+    siteDetails: [{ siteName: 'some-site' }],
+    otherAuthorities: {
+      agree: 'yes',
+      details: 'some details'
+    },
+    specialLegalPowers: {
+      agree: 'yes',
+      details: 'some special legal powers'
+    }
   }
 
   beforeEach(() => {
@@ -57,11 +66,22 @@ describe('#taskListController', () => {
       value: {
         id: '123',
         projectName: 'Test Project',
+        projectBackground: 'Test project background',
         taskList: {
           projectName: 'COMPLETED',
-          specialLegalPowers: 'COMPLETED'
+          projectBackground: 'COMPLETED',
+          specialLegalPowers: 'COMPLETED',
+          otherAuthorities: 'COMPLETED'
         },
-        siteDetails: mockMarineLicence.siteDetails
+        siteDetails: mockMarineLicence.siteDetails,
+        otherAuthorities: {
+          agree: 'yes',
+          details: 'some details'
+        },
+        specialLegalPowers: {
+          agree: 'yes',
+          details: 'some special legal powers'
+        }
       }
     }
 
@@ -70,6 +90,14 @@ describe('#taskListController', () => {
         href: '/',
         status: { text: 'Completed' },
         title: { classes: 'govuk-link--no-visited-state', text: 'Project name' }
+      },
+      {
+        href: '/',
+        status: { text: 'Completed' },
+        title: {
+          classes: 'govuk-link--no-visited-state',
+          text: 'Project background'
+        }
       }
     ]
 
@@ -80,6 +108,14 @@ describe('#taskListController', () => {
         title: {
           classes: 'govuk-link--no-visited-state',
           text: 'Special Legal Powers'
+        }
+      },
+      {
+        href: '/',
+        status: { text: 'Completed' },
+        title: {
+          classes: 'govuk-link--no-visited-state',
+          text: 'Other authorities'
         }
       }
     ]

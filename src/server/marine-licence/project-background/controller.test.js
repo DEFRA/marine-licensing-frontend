@@ -1,6 +1,7 @@
 import { vi } from 'vitest'
 import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
 import {
+  projectBackgroundController,
   projectBackgroundSubmitController,
   PROJECT_BACKGROUND_VIEW_ROUTE
 } from '#src/server/marine-licence/project-background/controller.js'
@@ -28,6 +29,20 @@ describe('#projectBackground', () => {
 
   afterEach(() => {
     vi.restoreAllMocks()
+  })
+
+  describe('#projectBackgroundController', () => {
+    test('should render view with project data from cache', async () => {
+      const h = { view: vi.fn() }
+      await projectBackgroundController.handler({ query: {} }, h)
+      expect(h.view).toHaveBeenCalledWith(PROJECT_BACKGROUND_VIEW_ROUTE, {
+        pageTitle: 'Project background',
+        heading: 'Project background',
+        projectName: mockLicence.projectName,
+        payload: { projectBackground: mockLicence.projectBackground },
+        backLink: marineLicenceRoutes.MARINE_LICENCE_TASK_LIST
+      })
+    })
   })
 
   describe('#projectBackgroundSubmitController', () => {

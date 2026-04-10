@@ -6,6 +6,6 @@ export class BackLinkHistory {
 
   onClick(event) {
     event.preventDefault()
-    window.history.back()
+    globalThis.history.back()
   }
 }

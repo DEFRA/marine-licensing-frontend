@@ -5,12 +5,14 @@ export const mockMarineLicenceTaskList = {
   projectName: 'COMPLETED',
   specialLegalPowers: 'COMPLETED',
   otherAuthorities: 'COMPLETED',
-  siteDetails: 'COMPLETED'
+  siteDetails: 'COMPLETED',
+  projectBackground: 'COMPLETED'
 }
 
 export const mockMarineLicenceApplication = {
   id: faker.database.mongodbObjectId(),
   projectName: 'Test Project',
+  projectBackground: 'Test project background',
   specialLegalPowers: { agree: 'yes', details: 'Test reason' },
   taskList: mockMarineLicenceTaskList,
   projectType: MARINE_LICENCE_KEY,

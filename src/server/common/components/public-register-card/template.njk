@@ -4,7 +4,8 @@
 
 {% set _ = rows.push({
      key: { text:  "Consent to publish your project information" if params.isApplicantView else "Consent to publish project information" },
-     value: { html: "Yes" if params.publicRegister.consent === 'yes' else "No" }
+     value: { html: "Yes" if params.publicRegister.consent === 'yes' else "No" },
+     classes: "govuk-summary-list__row--no-border"
    })
 %}
 
@@ -12,7 +13,7 @@
 
 {% set _ = rows.push({
   key: { text: "Why you do not consent" if params.isApplicantView else "Why the applicant did not consent" },
-  value: { html: params.publicRegister.reason }
+  value: { html: params.publicRegister.reason }  
 }) %}
 
 {%  endif  %}
@@ -25,7 +26,7 @@
       actions: {
         items: [
           {
-            href: "/exemption/sharing-your-project-information-publicly?from=check-your-answers",
+            href: params.changeLink ~ "?from=check-your-answers",
             text: "Change",
             visuallyHiddenText: " sharing project information publicly",
             classes: "govuk-link--no-visited-state"

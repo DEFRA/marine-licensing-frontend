@@ -9,7 +9,8 @@ import { authenticatedGetRequest } from '#src/server/common/helpers/authenticate
 import {
   transformProjectDetailsTaskList,
   transformSiteDetailsTaskList,
-  transformOtherPermissionsTaskList
+  transformOtherPermissionsTaskList,
+  transformSharingTaskList
 } from '#src/server/marine-licence/task-list/utils.js'
 import {
   taskListController,
@@ -120,6 +121,17 @@ describe('#taskListController', () => {
       }
     ]
 
+    const mockSharingTaskList = [
+      {
+        href: '/',
+        status: { text: 'Completed' },
+        title: {
+          classes: 'govuk-link--no-visited-state',
+          text: 'Sharing your project information publicly'
+        }
+      }
+    ]
+
     const mockSiteDetailsTaskList = [
       {
         href: '/',
@@ -141,6 +153,7 @@ describe('#taskListController', () => {
     vi.mocked(transformOtherPermissionsTaskList).mockReturnValue(
       mockOtherPermissionsTaskList
     )
+    vi.mocked(transformSharingTaskList).mockReturnValue(mockSharingTaskList)
     vi.mocked(setMarineLicenceCache).mockResolvedValue(mockMarineLicence)
 
     authUtils.getUserSession.mockResolvedValue({
@@ -177,7 +190,8 @@ describe('#taskListController', () => {
       projectName: 'Test Project',
       otherPermissionsTaskList: mockOtherPermissionsTaskList,
       projectDetailsTaskList: mockProjectDetailsTaskList,
-      siteDetailsTaskList: mockSiteDetailsTaskList
+      siteDetailsTaskList: mockSiteDetailsTaskList,
+      sharingTaskList: mockSharingTaskList
     })
   })
 

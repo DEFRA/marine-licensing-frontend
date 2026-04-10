@@ -150,4 +150,17 @@ describe('setSiteDetailsAction', () => {
       'Hidden description'
     )
   })
+
+  test('should accept override to not output any action param', () => {
+    const result = setSiteDetailsAction('Value', '/page', 1, '', true)
+    expect(result).toEqual({
+      items: [
+        {
+          classes: 'govuk-link--no-visited-state',
+          href: '/page?site=1',
+          text: 'Change'
+        }
+      ]
+    })
+  })
 })

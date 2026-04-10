@@ -4,15 +4,10 @@ import { faker } from '@faker-js/faker'
 export const mockMarineLicenceTaskList = {
   projectName: 'COMPLETED',
   specialLegalPowers: 'COMPLETED',
-<<<<<<< ML-1061-LCML-display-project-background-screen
   otherAuthorities: 'COMPLETED',
   siteDetails: 'COMPLETED',
-  projectBackground: 'COMPLETED'
-=======
-  siteDetails: 'COMPLETED',
-  publicRegister: 'COMPLETED',
-  otherAuthorities: 'COMPLETED'
->>>>>>> main
+  projectBackground: 'COMPLETED',
+  publicRegister: 'COMPLETED'
 }
 
 export const mockMarineLicenceApplication = {

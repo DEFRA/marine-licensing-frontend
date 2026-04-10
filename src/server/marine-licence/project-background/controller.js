@@ -17,7 +17,7 @@ export const PROJECT_BACKGROUND_VIEW_ROUTE =
 export const errorMessages = {
   PROJECT_BACKGROUND_REQUIRED: 'Enter the project background',
   PROJECT_BACKGROUND_MAX_LENGTH:
-    'Project background must be 1000 characters or fewer'
+    'Project background must be 1000 characters or less'
 }
 
 const projectBackgroundSettings = {

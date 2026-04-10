@@ -126,7 +126,7 @@ describe('Project background', () => {
       [
         {
           field: 'projectBackground',
-          message: 'Project background must be 1000 characters or fewer'
+          message: 'Project background must be 1000 characters or less'
         }
       ],
       document

@@ -11,8 +11,16 @@ describe('Project background', () => {
   const getServer = setupTestServer()
   const marineLicence = {
     id: 'marine-licence-123',
-    projectName: 'Test Marine Project',
-    projectBackground: undefined
+    projectName: 'Test Marine Project'
+  }
+
+  const submitProjectBackgroundForm = async (formData) => {
+    const { document } = await submitForm({
+      requestUrl: marineLicenceRoutes.MARINE_LICENCE_PROJECT_BACKGROUND,
+      server: getServer(),
+      formData
+    })
+    return document
   }
 
   test('page elements', async () => {
@@ -54,7 +62,7 @@ describe('Project background', () => {
     )
   })
 
-  test('form state when no data set', async () => {
+  test('project background form state when no data set', async () => {
     mockMarineLicence(marineLicence)
 
     const document = await loadPage({
@@ -65,7 +73,7 @@ describe('Project background', () => {
     expect(getByRole(document, 'textbox')).toHaveValue('')
   })
 
-  test('form state when data is set', async () => {
+  test('project background form state when data is set', async () => {
     mockMarineLicence({
       ...marineLicence,
       projectBackground: 'Some background text'
@@ -81,15 +89,6 @@ describe('Project background', () => {
 
   test('should show a validation error when submitted without content', async () => {
     mockMarineLicence(marineLicence)
-
-    const submitProjectBackgroundForm = async (formData) => {
-      const { document } = await submitForm({
-        requestUrl: marineLicenceRoutes.MARINE_LICENCE_PROJECT_BACKGROUND,
-        server: getServer(),
-        formData
-      })
-      return document
-    }
 
     const document = await submitProjectBackgroundForm({
       projectBackground: ''
@@ -108,15 +107,6 @@ describe('Project background', () => {
 
   test('should show a validation error when content exceeds 1000 characters', async () => {
     mockMarineLicence(marineLicence)
-
-    const submitProjectBackgroundForm = async (formData) => {
-      const { document } = await submitForm({
-        requestUrl: marineLicenceRoutes.MARINE_LICENCE_PROJECT_BACKGROUND,
-        server: getServer(),
-        formData
-      })
-      return document
-    }
 
     const document = await submitProjectBackgroundForm({
       projectBackground: 'a'.repeat(1001)

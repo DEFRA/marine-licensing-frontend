@@ -14,14 +14,14 @@ describe('#projectBackground', () => {
   const mockLicence = {
     projectName: 'Test Project',
     id: 'test-id',
-    projectBackground: { projectBackground: 'Some background information' }
+    projectBackground: 'Some background information'
   }
 
   beforeEach(() => {
     vi.spyOn(authRequests, 'authenticatedPatchRequest').mockResolvedValue({
       payload: {
         id: mockLicence.id,
-        ...mockLicence.projectBackground
+        projectBackground: mockLicence.projectBackground
       }
     })
     vi.spyOn(cacheUtils, 'getMarineLicenceCache').mockReturnValue(mockLicence)

@@ -10,7 +10,6 @@ describe('#iatStartController', () => {
     expect(h.view).toHaveBeenCalledTimes(1)
     expect(h.view).toHaveBeenCalledWith('journey/self-service/start/index', {
       pageTitle: 'Check if you need a marine licence',
-      hidePhaseBanner: true,
       links: {
         jurisdiction:
           'https://www.gov.uk/guidance/marine-licensing-definitions#jurisdiction',

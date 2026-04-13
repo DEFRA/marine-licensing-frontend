@@ -1,34 +1,23 @@
 import { createRequire } from 'node:module'
-import sanitizeHtml from 'sanitize-html'
+import { sanitise, stripHtml } from './sanitise.js'
 
 const require = createRequire(import.meta.url)
 const journeyData = require('../data/self-service.json')
-
-const sanitizeOptions = {
-  allowedTags: ['a', 'b', 'br', 'li', 'ol', 'p', 'strong', 'u', 'ul'],
-  allowedAttributes: {
-    a: ['href', 'target'],
-    ol: ['type']
-  },
-  allowedSchemes: ['http', 'https']
-}
-
-function sanitize(text) {
-  return text ? sanitizeHtml(text, sanitizeOptions) : text
-}
 
 const questionsByRoute = new Map()
 const sectionsById = new Map()
 
 for (const question of journeyData.questions) {
-  question.hint = sanitize(question.hint)
+  question.text = stripHtml(question.text)
+  question.hint = sanitise(question.hint)
   for (const answer of question.answers) {
-    answer.hint = sanitize(answer.hint)
+    answer.hint = sanitise(answer.hint)
   }
   questionsByRoute.set(question.route, question)
 }
 
 for (const section of journeyData.sections) {
+  section.text = stripHtml(section.text)
   sectionsById.set(section.id, section)
 }
 

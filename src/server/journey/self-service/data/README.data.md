@@ -499,8 +499,9 @@ jq '[
 **Sanitisation:**
 
 `question.hint` and `answer.hint` fields are sanitised at load time by
-`journey-data.js` using an allowlist of safe tags and attributes. The `text`
-fields on questions, answers, outcomes, and outcomeTypes are **not currently
+`journey-data.js` (via `sanitise.js`) using an allowlist of safe tags and
+attributes. `question.text` and `section.text` are stripped of all HTML at
+load time. The `text` fields on outcomes and outcomeTypes are **not currently
 sanitised** — this is tracked as future work.
 
 ---

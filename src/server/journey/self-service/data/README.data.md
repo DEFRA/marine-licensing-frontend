@@ -410,15 +410,98 @@ These are likely reached by hardcoded routes in the application rather than thro
 
 ### 5. HTML in Content Fields
 
-The `text` and `hint` fields contain raw HTML — not Markdown, not plain text. Common patterns:
+Some `text` and `hint` fields contain raw HTML. The presence of HTML varies
+significantly by field type — it is concentrated in outcome/guidance content
+and largely absent from form labels.
 
-- `<p><p>` for paragraph breaks (note: doubled, not `<p>...</p>`)
-- `<a target="_blank" href="...">` for external links
-- `<b>` for bold text
-- `<br/>` for line breaks
-- `<ul><li>` for bullet lists
+**Where HTML occurs:**
 
-This HTML will need careful handling in any code generation — it should be rendered as-is, not escaped.
+| Field              | With HTML | Total | Prevalence |
+| ------------------ | --------- | ----- | ---------- |
+| `outcomeType.text` | 90        | 99    | 91%        |
+| `question.hint`    | 63        | 359   | 18%        |
+| `outcome.text`     | 8         | 106   | 8%         |
+| `answer.hint`      | 4         | 970   | < 1%       |
+| `question.text`    | 1         | 359   | < 1%       |
+
+**Where HTML does NOT occur:**
+
+| Field          | Total | HTML |
+| -------------- | ----- | ---- |
+| `answer.text`  | 970   | None |
+| `section.text` | 48    | None |
+
+**Tags used (across all fields):**
+
+| Tag              | Purpose                          |
+| ---------------- | -------------------------------- |
+| `<p>`            | Paragraph breaks (most common)   |
+| `<a>`            | External links (always gov.uk)   |
+| `<b>`, `<strong>`| Bold emphasis                    |
+| `<ul>`, `<li>`   | Unordered lists                  |
+| `<ol type="i">`  | Ordered list (roman numerals, 1) |
+| `<br/>`          | Line breaks                      |
+| `<u>`            | Underline (rare, 2 instances)    |
+
+**HTML quality issues in the source data:**
+
+- Doubled tags: `<p><p>` and `<b><b>` appear in several outcomeType texts
+- One `question.text` has malformed list markup (`</li><li>` without a
+  wrapping `<ul>`)
+
+**Verification with jq:**
+
+All filters below run against `self-service.json`. The `test("<")` check
+matches any field containing an HTML tag.
+
+```bash
+# Count totals per field type
+jq '.outcomeTypes | length' self-service.json                        # 99
+jq '.questions | length' self-service.json                           # 359
+jq '.outcomes | length' self-service.json                            # 106
+jq '[.questions[].answers[]] | length' self-service.json             # 970
+jq '.sections | length' self-service.json                            # 48
+
+# outcomeType.text — 90/99 contain HTML
+jq '[.outcomeTypes[] | select(.text | test("<"))] | length' self-service.json
+jq '.outcomeTypes[] | select(.text | test("<")) | {id, text}' self-service.json
+
+# question.hint — 63/359 contain HTML
+jq '[.questions[] | select(.hint? // "" | test("<"))] | length' self-service.json
+jq '.questions[] | select(.hint? // "" | test("<")) | {route, hint}' self-service.json
+
+# outcome.text — 8/106 contain HTML
+jq '[.outcomes[] | select(.text? // "" | test("<"))] | length' self-service.json
+jq '.outcomes[] | select(.text? // "" | test("<")) | {route, text}' self-service.json
+
+# answer.hint — 4/970 contain HTML
+jq '[.questions[].answers[] | select(.hint? // "" | test("<"))] | length' self-service.json
+jq '.questions[].answers[] | select(.hint? // "" | test("<")) | {id, hint}' self-service.json
+
+# question.text — 1/359 contains HTML (malformed list markup)
+jq '[.questions[] | select(.text | test("<"))] | length' self-service.json
+jq '.questions[] | select(.text | test("<")) | {route, text}' self-service.json
+
+# answer.text — confirm zero HTML
+jq '[.questions[].answers[] | select(.text | test("<"))] | length' self-service.json
+
+# section.text — confirm zero HTML
+jq '[.sections[] | select(.text | test("<"))] | length' self-service.json
+
+# List distinct HTML tags across all fields
+jq '[
+  .outcomeTypes[].text,
+  (.questions[] | .text, (.hint // ""), (.answers[] | .text, (.hint // ""))),
+  (.outcomes[] | (.text // ""))
+] | map(scan("</?[a-zA-Z][a-zA-Z0-9]*")) | flatten | unique | .[]' self-service.json
+```
+
+**Sanitisation:**
+
+`question.hint` and `answer.hint` fields are sanitised at load time by
+`journey-data.js` using an allowlist of safe tags and attributes. The `text`
+fields on questions, answers, outcomes, and outcomeTypes are **not currently
+sanitised** — this is tracked as future work.
 
 ---
 
@@ -502,5 +585,5 @@ These parameters configure what the destination module does — which form to sh
 | Terminal outcomes           | 87    | Distinct end-states                           |
 | Sections (progress bar)     | 48    | Grouped into 5 phases                         |
 | MCMS form mappings          | 22    | Answers to carry forward                      |
-| HTML content fields         | ~465  | Raw HTML, not escaped                         |
+| HTML content fields         | ~166  | Concentrated in outcomeType.text (91%) and question.hint (18%) |
 | External links in content   | ~50+  | GOV.UK guidance, ArcGIS maps, .docx downloads |

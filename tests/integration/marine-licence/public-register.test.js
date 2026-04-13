@@ -1,7 +1,7 @@
 import { getByRole, getByText } from '@testing-library/dom'
-import { routes } from '~/src/server/common/constants/routes.js'
+import { marineLicenceRoutes } from '~/src/server/common/constants/routes.js'
 import {
-  mockExemption,
+  mockMarineLicence,
   setupTestServer
 } from '~/tests/integration/shared/test-setup-helpers.js'
 import { loadPage, submitForm } from '~/tests/integration/shared/app-server.js'
@@ -13,65 +13,59 @@ import { getInputInFieldset } from '~/tests/integration/shared/dom-helpers.js'
 
 describe('Public register', () => {
   const getServer = setupTestServer()
-  const exemption = {
-    id: 'test-exemption-123',
-    projectName: 'Hammersmith pontoon maintenance'
+  const marineLicence = {
+    id: 'marine-licence-123',
+    projectName: 'Test Marine Project',
+    publicRegister: { consent: undefined, reason: '' }
   }
 
   test('page elements', async () => {
-    mockExemption(exemption)
+    mockMarineLicence(marineLicence)
+
     const document = await loadPage({
-      requestUrl: routes.PUBLIC_REGISTER,
+      requestUrl: marineLicenceRoutes.MARINE_LICENCE_PUBLIC_REGISTER,
       server: getServer()
     })
-    expect(
-      getByText(document, 'Hammersmith pontoon maintenance')
-    ).toBeInTheDocument()
-    expect(
-      getByRole(document, 'link', {
-        name: 'Back'
-      })
-    ).toHaveAttribute('href', routes.TASK_LIST)
+
+    expect(getByText(document, 'Test Marine Project')).toBeInTheDocument()
+    expect(getByRole(document, 'link', { name: 'Back' })).toHaveAttribute(
+      'href',
+      marineLicenceRoutes.MARINE_LICENCE_TASK_LIST
+    )
     expect(getByRole(document, 'heading', { level: 1 })).toHaveTextContent(
       'Sharing your project information publicly'
     )
-    expect(
-      getByRole(document, 'link', {
-        name: 'Explore Marine Plans (opens in new tab)'
-      })
-    ).toHaveAttribute(
+    getByRole(document, 'button', { name: 'Save and continue' })
+    expect(getByRole(document, 'link', { name: 'Cancel' })).toHaveAttribute(
       'href',
-      'https://www.gov.uk/guidance/explore-marine-plans'
+      marineLicenceRoutes.MARINE_LICENCE_TASK_LIST
     )
-    getByRole(document, 'button', {
-      name: 'Save and continue'
-    })
-    expect(
-      getByRole(document, 'link', {
-        name: 'Cancel'
-      })
-    ).toHaveAttribute('href', routes.TASK_LIST)
   })
 
-  test('public register from Check Your Answers', async () => {
-    mockExemption(exemption)
+  test('back link from Check Your Answers', async () => {
+    mockMarineLicence(marineLicence)
+
     const document = await loadPage({
-      requestUrl: routes.PUBLIC_REGISTER + '?from=check-your-answers',
+      requestUrl:
+        marineLicenceRoutes.MARINE_LICENCE_PUBLIC_REGISTER +
+        '?from=check-your-answers',
       server: getServer()
     })
-    expect(
-      getByRole(document, 'link', {
-        name: 'Back'
-      })
-    ).toHaveAttribute('href', routes.CHECK_YOUR_ANSWERS)
+
+    expect(getByRole(document, 'link', { name: 'Back' })).toHaveAttribute(
+      'href',
+      marineLicenceRoutes.MARINE_LICENCE_CHECK_YOUR_ANSWERS
+    )
   })
 
   test('public register form state when no decision set', async () => {
-    mockExemption(exemption)
+    mockMarineLicence(marineLicence)
+
     const document = await loadPage({
-      requestUrl: routes.PUBLIC_REGISTER,
+      requestUrl: marineLicenceRoutes.MARINE_LICENCE_PUBLIC_REGISTER,
       server: getServer()
     })
+
     expect(
       getInputInFieldset({
         document,
@@ -91,13 +85,13 @@ describe('Public register', () => {
   })
 
   test('public register form state when consent is yes', async () => {
-    mockExemption({
-      ...exemption,
+    mockMarineLicence({
+      ...marineLicence,
       publicRegister: { consent: 'yes' }
     })
 
     const document = await loadPage({
-      requestUrl: routes.PUBLIC_REGISTER,
+      requestUrl: marineLicenceRoutes.MARINE_LICENCE_PUBLIC_REGISTER,
       server: getServer()
     })
 
@@ -120,14 +114,19 @@ describe('Public register', () => {
   })
 
   test('public register form state when consent is no and reason set', async () => {
-    mockExemption({
-      ...exemption,
-      publicRegister: { consent: 'no', reason: 'Test reason' }
+    mockMarineLicence({
+      ...marineLicence,
+      publicRegister: {
+        consent: 'no',
+        reason: 'Some reason'
+      }
     })
+
     const document = await loadPage({
-      requestUrl: routes.PUBLIC_REGISTER,
+      requestUrl: marineLicenceRoutes.MARINE_LICENCE_PUBLIC_REGISTER,
       server: getServer()
     })
+
     expect(
       getInputInFieldset({
         document,
@@ -140,21 +139,24 @@ describe('Public register', () => {
       document,
       inputLabel:
         'Provide details of why you do not consent to your project information being published',
-      value: 'Test reason'
+      value: 'Some reason'
     })
   })
 
   test('should show a validation error when submitted without a consent decision', async () => {
-    mockExemption(exemption)
-    const submitProjectNameForm = async (formData) => {
+    mockMarineLicence(marineLicence)
+
+    const submitPublicRegisterForm = async (formData) => {
       const { document } = await submitForm({
-        requestUrl: routes.PUBLIC_REGISTER,
+        requestUrl: marineLicenceRoutes.MARINE_LICENCE_PUBLIC_REGISTER,
         server: getServer(),
         formData
       })
       return document
     }
-    const document = await submitProjectNameForm({ reason: '' })
+
+    const document = await submitPublicRegisterForm({ reason: '' })
+
     expectFieldsetError({
       document,
       fieldsetLabel: 'Sharing your project information publicly',
@@ -165,11 +167,11 @@ describe('Public register', () => {
   })
 
   test('should show a validation error when "no" is selected but reason is missing', async () => {
-    mockExemption(exemption)
+    mockMarineLicence(marineLicence)
 
     const submitPublicRegisterForm = async (formData) => {
       const { document } = await submitForm({
-        requestUrl: routes.PUBLIC_REGISTER,
+        requestUrl: marineLicenceRoutes.MARINE_LICENCE_PUBLIC_REGISTER,
         server: getServer(),
         formData
       })

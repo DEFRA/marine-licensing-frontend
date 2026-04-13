@@ -42,7 +42,8 @@ export const checkYourAnswersController = {
       activityDetailsChangeLink,
       reviewSiteDetailsRoute: routes.REVIEW_SITE_DETAILS,
       multipleSiteDetails,
-      isReadOnly: false
+      isReadOnly: false,
+      publicRegisterRoute: routes.PUBLIC_REGISTER
     })
   }
 }

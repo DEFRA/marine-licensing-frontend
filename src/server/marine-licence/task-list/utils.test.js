@@ -1,7 +1,8 @@
 import {
   transformProjectDetailsTaskList,
   transformSiteDetailsTaskList,
-  transformOtherPermissionsTaskList
+  transformOtherPermissionsTaskList,
+  transformSharingTaskList
 } from '#src/server/marine-licence/task-list/utils.js'
 import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
 
@@ -261,5 +262,65 @@ describe('taskList utils', () => {
         }
       )
     })
+  })
+
+  describe('transformSharingTaskList', () => {
+    test('correctly returns Completed status', () => {
+      expect(
+        transformSharingTaskList({
+          publicRegister: 'COMPLETED'
+        })
+      ).toEqual([
+        {
+          href: marineLicenceRoutes.MARINE_LICENCE_PUBLIC_REGISTER,
+          status: { text: 'Completed' },
+          title: {
+            classes: 'govuk-link--no-visited-state',
+            text: 'Sharing your project information publicly'
+          }
+        }
+      ])
+    })
+
+    test('correctly returns In Progress', () => {
+      expect(
+        transformSharingTaskList({
+          publicRegister: 'IN_PROGRESS'
+        })
+      ).toEqual([
+        {
+          href: marineLicenceRoutes.MARINE_LICENCE_PUBLIC_REGISTER,
+          status: {
+            tag: { text: 'In Progress', classes: 'govuk-tag--light-blue' }
+          },
+          title: {
+            classes: 'govuk-link--no-visited-state',
+            text: 'Sharing your project information publicly'
+          }
+        }
+      ])
+    })
+
+    test.each([null, 'INCOMPLETE', undefined])(
+      'correctly returns Not yet started for %s',
+      (value) => {
+        expect(
+          transformSharingTaskList({
+            publicRegister: value
+          })
+        ).toEqual([
+          {
+            href: marineLicenceRoutes.MARINE_LICENCE_PUBLIC_REGISTER,
+            status: {
+              tag: { text: 'Not yet started', classes: 'govuk-tag--blue' }
+            },
+            title: {
+              classes: 'govuk-link--no-visited-state',
+              text: 'Sharing your project information publicly'
+            }
+          }
+        ])
+      }
+    )
   })
 })

@@ -7,7 +7,8 @@ import { setProjectType } from '#src/server/common/helpers/session-cache/utils.j
 import {
   transformProjectDetailsTaskList,
   transformSiteDetailsTaskList,
-  transformOtherPermissionsTaskList
+  transformOtherPermissionsTaskList,
+  transformSharingTaskList
 } from '#src/server/marine-licence/task-list/utils.js'
 import { authenticatedGetRequest } from '#src/server/common/helpers/authenticated-requests.js'
 import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
@@ -53,6 +54,7 @@ export const taskListController = {
       taskList,
       projectName,
       specialLegalPowers,
+      publicRegister,
       otherAuthorities,
       siteDetails
     } = payload.value
@@ -65,6 +67,7 @@ export const taskListController = {
         userRelationshipType === USER_TYPES.CITIZEN
       )
 
+    const sharingTaskListTransformed = transformSharingTaskList(taskList)
     const projectDetailsTaskListTransformed =
       transformProjectDetailsTaskList(taskList)
     const siteDetailsTaskListTransformed =
@@ -74,6 +77,7 @@ export const taskListController = {
       id: marineLicenceId,
       projectName,
       specialLegalPowers,
+      publicRegister,
       otherAuthorities,
       siteDetails: hasCancel ? [] : siteDetails
     })
@@ -82,6 +86,7 @@ export const taskListController = {
 
     const hasCompletedAllTasks = [
       ...otherPermissionsTaskListTransformed,
+      ...sharingTaskListTransformed,
       ...projectDetailsTaskListTransformed,
       ...siteDetailsTaskListTransformed
     ]
@@ -93,6 +98,7 @@ export const taskListController = {
       ...taskListViewSettings,
       projectName: payload.value.projectName,
       otherPermissionsTaskList: otherPermissionsTaskListTransformed,
+      sharingTaskList: sharingTaskListTransformed,
       projectDetailsTaskList: projectDetailsTaskListTransformed,
       siteDetailsTaskList: siteDetailsTaskListTransformed,
       hasCompletedAllTasks

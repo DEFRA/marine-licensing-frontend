@@ -30,7 +30,9 @@ describe('#checkYourAnswersController', () => {
       specialLegalPowers: {
         agree: 'yes',
         details: 'We have statutory powers under the Marine Act.'
-      }
+      },
+      publicRegisterRoute:
+        '/marine-licence/sharing-your-project-information-publicly'
     }
 
     getMarineLicenceCacheMock.mockReturnValue(mockCachedData)

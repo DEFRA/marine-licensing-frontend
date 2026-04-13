@@ -18,7 +18,10 @@ const manifestPath = path.join(
 )
 let webpackManifest
 
-const hideNavigationRoutes = new Set(Object.values(routes.postLogin))
+const hideNavigationRoutes = new Set([
+  ...Object.values(routes.postLogin),
+  routes.IAT_START
+])
 
 const hideNavigationRoutesExemptions = new Set([routes.PROJECT_NAME])
 

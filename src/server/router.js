@@ -14,6 +14,7 @@ import { browserLogs } from '#src/server/browser-logs/index.js'
 import { internalUserAdmin } from '#src/server/internal-user-admin/index.js'
 import { postLogin } from '#src/server/defraid-post-login/index.js'
 import { defraIdGuidance } from '#src/server/defraid-guidance/index.js'
+import { journeySelfServiceStart } from '#src/server/journey/self-service/start/index.js'
 
 export const router = {
   plugin: {
@@ -39,7 +40,8 @@ export const router = {
         internalUserAdmin,
         marineLicence,
         declaration,
-        serviceHome
+        serviceHome,
+        journeySelfServiceStart
       ])
 
       // Static assets

@@ -1,0 +1,56 @@
+{% extends 'layouts/page.njk' %}
+
+{% from "govuk/components/button/macro.njk" import govukButton %}
+
+{% block beforeContent %}
+  {{ appBackLinkHistory() }}
+{% endblock %}
+
+{% block content %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+      <h1 class="govuk-heading-xl">Check if you need a marine licence</h1>
+
+      <p class="govuk-body">Use this tool to find out:</p>
+
+      <ul class="govuk-list govuk-list--bullet">
+        <li>If your activity falls within the jurisdiction of the MMO</li>
+        <li>If an exemption may apply (where appropriate)</li>
+        <li>If your activity is suitable for self-service marine licensing (where appropriate)</li>
+      </ul>
+
+      <p class="govuk-body">Where applicable, you will be directed to the appropriate service.</p>
+
+      <p class="govuk-body">
+        Find out more about the MMO's
+        <a class="govuk-link" href="{{ links.jurisdiction }}" target="_blank" rel="noopener noreferrer">jurisdiction<span class="govuk-visually-hidden"> (opens in new tab)</span></a>,
+        <a class="govuk-link" href="{{ links.exemptions }}" target="_blank" rel="noopener noreferrer">exemptions<span class="govuk-visually-hidden"> (opens in new tab)</span></a>
+        and
+        <a class="govuk-link" href="{{ links.selfService }}" target="_blank" rel="noopener noreferrer">self-service marine licensing<span class="govuk-visually-hidden"> (opens in new tab)</span></a>.
+      </p>
+
+      <h2 class="govuk-heading-m">Before you start</h2>
+
+      <p class="govuk-body">
+        Ensure you read MMO's marine
+        <a class="govuk-link" href="{{ links.guidance }}" target="_blank" rel="noopener noreferrer">guidance<span class="govuk-visually-hidden"> (opens in new tab)</span></a>.
+        You will need to know:
+      </p>
+
+      <ul class="govuk-list govuk-list--bullet">
+        <li>What your activity is</li>
+        <li>Where your activity will take place</li>
+        <li>What it will involve</li>
+      </ul>
+
+      <p class="govuk-body">The guidance will provide a basic understanding of the factors that help determine whether a marine licence is required and explain the difference between various services available.</p>
+
+      {{ govukButton({
+        text: "Start now",
+        href: "#",
+        classes: "govuk-button--start",
+        isStartButton: true
+      }) }}
+    </div>
+  </div>
+{% endblock %}

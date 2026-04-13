@@ -111,6 +111,15 @@ describe('#context', () => {
     expect(contextResult.navigation).toEqual([])
   })
 
+  it('When on the IAT start page, should not use navigation links', () => {
+    const mockRequest = {
+      path: '/journey/self-service/start',
+      logger: { error: vi.fn() }
+    }
+    const contextResult = context(mockRequest)
+    expect(contextResult.navigation).toEqual([])
+  })
+
   test('Should read file on first call', () => {
     readFileSync.mockReturnValue(`{
       "application.js": "javascripts/application.js",

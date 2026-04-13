@@ -10,6 +10,7 @@ import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
 import { authenticatedPatchRequest } from '#src/server/common/helpers/authenticated-requests.js'
 import { USER_TYPES } from '#src/server/common/constants/user-types.js'
 import { getUserSession } from '#src/server/common/plugins/auth/utils.js'
+import { createFailAction } from '#src/server/common/helpers/createFailAction.js'
 
 import joi from 'joi'
 
@@ -71,7 +72,6 @@ export const specialLegalPowersSubmitController = {
           'any.required': errorMessages.SPECIAL_LEGAL_POWERS_DETAILS_AGREE
         }),
         details: joi.when('agree', {
-          // Details required when agree: 'yes'
           is: 'yes',
           then: joi.string().max(1000).required().messages({
             'string.empty': errorMessages.SPECIAL_LEGAL_POWERS_DETAILS_REQUIRED,
@@ -80,38 +80,13 @@ export const specialLegalPowersSubmitController = {
           })
         })
       }),
-      failAction: (request, h, err) => {
-        const { payload } = request
-
-        const { projectName } = getMarineLicenceCache(request)
-        const backLink = getBackLink(request)
-
-        if (!err.details) {
-          return h
-            .view(SPECIAL_LEGAL_POWERS_VIEW_ROUTE, {
-              ...specialLegalPowersSettings,
-              payload,
-              projectName,
-              backLink
-            })
-            .takeover()
-        }
-
-        const errorSummary = mapErrorsForDisplay(err.details, errorMessages)
-
-        const errors = errorDescriptionByFieldName(errorSummary)
-
-        return h
-          .view(SPECIAL_LEGAL_POWERS_VIEW_ROUTE, {
-            ...specialLegalPowersSettings,
-            payload,
-            projectName,
-            backLink,
-            errors,
-            errorSummary
-          })
-          .takeover()
-      }
+      failAction: createFailAction({
+        getCache: getMarineLicenceCache,
+        viewRoute: SPECIAL_LEGAL_POWERS_VIEW_ROUTE,
+        settings: specialLegalPowersSettings,
+        errorMessages,
+        getBackLink
+      })
     }
   },
   async handler(request, h) {

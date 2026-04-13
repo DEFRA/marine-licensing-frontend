@@ -10,8 +10,7 @@ import { JSDOM } from 'jsdom'
 import {
   publicRegisterController,
   publicRegisterSubmitController,
-  PUBLIC_REGISTER_VIEW_ROUTE,
-  errorMessages
+  PUBLIC_REGISTER_VIEW_ROUTE
 } from '#src/server/exemption/public-register/controller.js'
 import * as cacheUtils from '#src/server/common/helpers/exemptions/session-cache/utils.js'
 import { routes } from '#src/server/common/constants/routes.js'
@@ -187,152 +186,16 @@ describe('#publicRegister', () => {
       expect(document.querySelector('.govuk-error-summary')).toBeTruthy()
     })
 
-    test('Should correctly validate on empty data', () => {
-      const request = {
-        payload: { consent: '' }
-      }
-
-      const h = {
-        view: vi.fn().mockReturnValue({
-          takeover: vi.fn()
-        })
-      }
-
-      const err = {
-        details: [
-          {
-            path: ['consent'],
-            message: 'TEST',
-            type: 'string.empty'
-          }
-        ]
-      }
-
-      publicRegisterSubmitController.options.validate.failAction(
-        request,
-        h,
-        err
-      )
-
-      expect(h.view).toHaveBeenCalledWith(PUBLIC_REGISTER_VIEW_ROUTE, {
-        backLink: routes.TASK_LIST,
-        pageTitle: 'Sharing your project information publicly',
-        heading: 'Sharing your project information publicly',
-        projectName: mockExemption.projectName,
-        payload: { consent: '' },
-        errorSummary: [
-          {
-            href: '#consent',
-            text: 'TEST',
-            field: ['consent']
-          }
-        ],
-        errors: {
-          consent: {
-            field: ['consent'],
-            href: '#consent',
-            text: 'TEST'
-          }
-        }
-      })
-
-      expect(h.view().takeover).toHaveBeenCalled()
-    })
-
-    test('Should correctly handle an incorrectly formed error object', () => {
-      const request = {
-        payload: { consent: '' }
-      }
-
-      const h = {
-        view: vi.fn().mockReturnValue({
-          takeover: vi.fn()
-        })
-      }
-
-      const err = {
-        details: null
-      }
-
-      publicRegisterSubmitController.options.validate.failAction(
-        request,
-        h,
-        err
-      )
-
-      expect(h.view).toHaveBeenCalledWith(PUBLIC_REGISTER_VIEW_ROUTE, {
-        backLink: routes.TASK_LIST,
-        heading: 'Sharing your project information publicly',
-        pageTitle: 'Sharing your project information publicly',
-        projectName: 'Test Project',
-        payload: { consent: '' }
-      })
-
-      expect(h.view().takeover).toHaveBeenCalled()
-    })
-
-    test('Should correctly validate on empty data and handle a scenario where error details are missing', () => {
-      const request = {
-        payload: { consent: '' }
-      }
-
-      const h = {
-        view: vi.fn().mockReturnValue({
-          takeover: vi.fn()
-        })
-      }
-
-      publicRegisterSubmitController.options.validate.failAction(request, h, {})
-
-      expect(h.view).toHaveBeenCalledWith(PUBLIC_REGISTER_VIEW_ROUTE, {
-        backLink: routes.TASK_LIST,
-        heading: 'Sharing your project information publicly',
-        pageTitle: 'Sharing your project information publicly',
-        projectName: 'Test Project',
-        payload: { consent: '' }
-      })
-
-      expect(h.view().takeover).toHaveBeenCalled()
-    })
-
-    test('Should correctly validate on invalid data', () => {
-      const request = {
-        payload: { consent: 'invalid' }
-      }
-
-      const h = {
-        view: vi.fn().mockReturnValue({
-          takeover: vi.fn()
-        })
-      }
-
-      publicRegisterSubmitController.options.validate.failAction(request, h, {})
-
-      expect(h.view).toHaveBeenCalledWith(PUBLIC_REGISTER_VIEW_ROUTE, {
-        backLink: routes.TASK_LIST,
-        heading: 'Sharing your project information publicly',
-        pageTitle: 'Sharing your project information publicly',
-        projectName: 'Test Project',
-        payload: { consent: 'invalid' }
-      })
-
-      expect(h.view().takeover).toHaveBeenCalled()
-    })
-
-    test('Should show error messages without calling the back end when payload data is empty', async () => {
+    test('Should not call the back end when payload fails validation', async () => {
       const apiPostMock = vi.spyOn(authRequests, 'authenticatedPatchRequest')
 
-      const { result } = await makePostRequest({
+      await makePostRequest({
         url: routes.PUBLIC_REGISTER,
         server: getServer(),
         formData: { consent: '' }
       })
 
       expect(apiPostMock).not.toHaveBeenCalled()
-
-      const { document } = new JSDOM(result).window
-
-      expect(document.querySelector('.govuk-error-summary')).toBeTruthy()
     })
 
     test('Should correctly redirect to check your answers when parameter is present', async () => {
@@ -355,26 +218,6 @@ describe('#publicRegister', () => {
       expect(statusCode).toBe(302)
 
       expect(headers.location).toBe(routes.CHECK_YOUR_ANSWERS)
-    })
-
-    test('Should show error for reason being empty when consent is set to no', async () => {
-      const apiPostMock = vi.spyOn(authRequests, 'authenticatedPatchRequest')
-
-      const { result } = await makePostRequest({
-        url: routes.PUBLIC_REGISTER,
-        server: getServer(),
-        formData: { consent: 'no' }
-      })
-
-      expect(apiPostMock).not.toHaveBeenCalled()
-
-      const { document } = new JSDOM(result).window
-
-      expect(result).toEqual(
-        expect.stringContaining(errorMessages.PUBLIC_REGISTER_REASON_REQUIRED)
-      )
-
-      expect(document.querySelector('.govuk-error-summary')).toBeTruthy()
     })
 
     test('Should correctly set the cache when submitting public register', async () => {

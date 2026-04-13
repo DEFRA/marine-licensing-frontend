@@ -206,48 +206,5 @@ describe('#specialLegalPowers', () => {
         })
       )
     })
-
-    test.each([
-      {
-        name: 'null error details',
-        payload: { agree: '' },
-        err: { details: null },
-        expectedExtra: {}
-      },
-      {
-        name: 'missing error details',
-        payload: { agree: '' },
-        err: {},
-        expectedExtra: {}
-      },
-      {
-        name: 'invalid agree value',
-        payload: { agree: 'invalid' },
-        err: {},
-        expectedExtra: {}
-      }
-    ])(
-      'Should correctly handle failAction with $name',
-      ({ payload, err, expectedExtra }) => {
-        const request = { payload }
-        const h = { view: vi.fn().mockReturnValue({ takeover: vi.fn() }) }
-        specialLegalPowersSubmitController.options.validate.failAction(
-          request,
-          h,
-          err
-        )
-        expect(h.view).toHaveBeenCalledWith(SPECIAL_LEGAL_POWERS_VIEW_ROUTE, {
-          backLink: marineLicenceRoutes.MARINE_LICENCE_TASK_LIST,
-          pageTitle:
-            'Does your organisation have special legal powers to do any of this project?',
-          heading:
-            'Does your organisation have special legal powers to do any of this project?',
-          projectName: mockLicence.projectName,
-          payload,
-          ...expectedExtra
-        })
-        expect(h.view().takeover).toHaveBeenCalled()
-      }
-    )
   })
 })

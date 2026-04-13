@@ -49,7 +49,10 @@ describe('Public Register Card Component', () => {
       })
 
       test('should show a change link when not read-only', () => {
-        const component = renderComponent({ isReadOnly: false })
+        const component = renderComponent({
+          isReadOnly: false,
+          changeLink: '/exemption/sharing-your-project-information-publicly'
+        })
         expect(
           within(component).getByRole('link', {
             name: /Change/
@@ -112,14 +115,18 @@ describe('Public Register Card Component', () => {
       })
 
       test('should show a change link when not read-only', () => {
-        const component = renderComponent({ isReadOnly: false })
+        const component = renderComponent({
+          isReadOnly: false,
+          changeLink:
+            '/marine-licence/sharing-your-project-information-publicly'
+        })
         expect(
           within(component).getByRole('link', {
             name: /Change/
           })
         ).toHaveAttribute(
           'href',
-          '/exemption/sharing-your-project-information-publicly?from=check-your-answers'
+          '/marine-licence/sharing-your-project-information-publicly?from=check-your-answers'
         )
       })
     })
@@ -171,7 +178,10 @@ describe('Public Register Card Component', () => {
       })
 
       test('should show a change link when not read-only', () => {
-        const component = renderComponent({ isReadOnly: false })
+        const component = renderComponent({
+          isReadOnly: false,
+          changeLink: '/exemption/sharing-your-project-information-publicly'
+        })
         expect(
           within(component).getByRole('link', {
             name: /Change/
@@ -224,14 +234,18 @@ describe('Public Register Card Component', () => {
       })
 
       test('should show a change link when not read-only', () => {
-        const component = renderComponent({ isReadOnly: false })
+        const component = renderComponent({
+          isReadOnly: false,
+          changeLink:
+            '/marine-licence/sharing-your-project-information-publicly'
+        })
         expect(
           within(component).getByRole('link', {
             name: /Change/
           })
         ).toHaveAttribute(
           'href',
-          '/exemption/sharing-your-project-information-publicly?from=check-your-answers'
+          '/marine-licence/sharing-your-project-information-publicly?from=check-your-answers'
         )
       })
     })

@@ -3,6 +3,7 @@
 {% from "govuk/components/button/macro.njk" import govukButton %}
 {% from "marine-licence/project-details-card/macro.njk" import appMarineLicenceProjectDetailsCard %}
 {% from "marine-licence/other-permissions-card/macro.njk" import appMarineLicenceOtherPermissionsCard %}
+{% from "public-register-card/macro.njk" import appPublicRegisterCard %}
 
 {% block head %}
   {{ super() }}
@@ -33,6 +34,12 @@
         specialLegalPowers: specialLegalPowers,
         otherAuthorities: otherAuthorities,
         isReadOnly: isReadOnly
+      }) }}
+
+      {{ appPublicRegisterCard({
+        publicRegister: publicRegister,
+        isReadOnly: isReadOnly,
+        changeLink: publicRegisterRoute
       }) }}
 
       <form method="post">

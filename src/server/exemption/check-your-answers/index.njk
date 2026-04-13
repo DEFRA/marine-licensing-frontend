@@ -60,7 +60,8 @@
     {{ appPublicRegisterCard({
       publicRegister: publicRegister,
       isReadOnly: isReadOnly,
-      isApplicantView: true
+      isApplicantView: true,
+      changeLink: publicRegisterRoute
     }) }}
     <form method="post">
       <input type="hidden" name="csrfToken" value="{{ csrfToken }}"/>

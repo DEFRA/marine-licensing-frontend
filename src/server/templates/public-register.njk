@@ -1,0 +1,74 @@
+{% extends 'layouts/page.njk' %}
+{% from "govuk/components/textarea/macro.njk" import govukTextarea %}
+{% from "govuk/components/back-link/macro.njk" import govukBackLink %}
+{% from "radio-page/macro.njk" import appRadioPage %}
+
+{% block beforeContent %}
+{{ super() }}
+<nav>
+  {{ govukBackLink({
+    text: "Back",
+    href: backLink
+  }) }}
+</nav>
+{% endblock %}
+
+{% block content %}
+
+  {% set hintText %}
+    <p class="govuk-body">The Marine Management Organisation (MMO) publishes some of the information you provide on <a class="govuk-link" href="https://www.gov.uk/guidance/explore-marine-plans" target="_blank" rel="noopener noreferrer">Explore Marine Plans (opens in new tab)</a>. In the future, we may also publish this information on the MMO's public register.</p>
+
+    <p class="govuk-body">Sharing this information helps you and other applicants:</p>
+
+    <ul class="govuk-list govuk-list--bullet">
+      <li>get a clear picture of activity in the marine environment</li>
+      <li>prepare applications more effectively by avoiding conflicts with existing marine activity</li>
+      <li>evaluate the environmental impact of projects in the context of other marine activity, leading to better applications and evidence for decision-makers</li>
+    </ul>
+
+    <p class="govuk-body">We will not publish contact details, such as your email address, phone number or postal address, or any financial information.</p>
+
+    <h2 class="govuk-heading-m">Do you consent to the MMO publishing your project information publicly?</h2>
+  {% endset -%}
+
+  {% set conditionalHtml %}
+    {{ govukTextarea({
+      id: "reason",
+      name: "reason",
+      label: {
+        text: "Provide details of why you do not consent to your project information being published"
+      },
+      errorMessage: errors['reason'],
+      value: payload.reason
+    }) }}
+  {% endset -%}
+
+  {{ appRadioPage({
+    name: "consent",
+    errorSummary: errorSummary,
+    errors: errors,
+    heading: "Sharing your project information publicly",
+    isPageHeading: true,
+    value: payload.consent,
+    errorMessage: errors['consent'],
+    projectName: projectName,
+    hint: { html: hintText },
+    items: [
+      {
+        value: "yes",
+        text: "Yes"
+      },
+      {
+        value: "no",
+        text: "No",
+        conditional: {
+          html: conditionalHtml
+        }
+      }
+    ],
+    csrfToken: csrfToken,
+    buttonText: "Save and continue",
+    cancelLink: backLink
+  }) }}
+
+{% endblock %}

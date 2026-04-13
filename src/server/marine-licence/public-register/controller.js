@@ -1,12 +1,12 @@
 import {
-  getExemptionCache,
-  setExemptionCache
-} from '#src/server/common/helpers/exemptions/session-cache/utils.js'
+  getMarineLicenceCache,
+  setMarineLicenceCache
+} from '#src/server/common/helpers/marine-licence/session-cache/utils.js'
 import {
   errorDescriptionByFieldName,
   mapErrorsForDisplay
 } from '#src/server/common/helpers/errors.js'
-import { routes } from '#src/server/common/constants/routes.js'
+import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
 import { authenticatedPatchRequest } from '#src/server/common/helpers/authenticated-requests.js'
 import { createFailAction } from '#src/server/common/helpers/createFailAction.js'
 import { publicRegisterSchema } from '#src/server/common/validation/public-register/schema.js'
@@ -19,27 +19,30 @@ export const PUBLIC_REGISTER_VIEW_ROUTE = 'templates/public-register'
 
 const getBackLink = (request) => {
   const fromCheckYourAnswers = request.query?.from === 'check-your-answers'
-  return fromCheckYourAnswers ? routes.CHECK_YOUR_ANSWERS : routes.TASK_LIST
+  return fromCheckYourAnswers
+    ? marineLicenceRoutes.MARINE_LICENCE_CHECK_YOUR_ANSWERS
+    : marineLicenceRoutes.MARINE_LICENCE_TASK_LIST
 }
 
 export const publicRegisterController = {
-  handler(request, h) {
-    const exemption = getExemptionCache(request)
+  async handler(request, h) {
+    const marineLicence = getMarineLicenceCache(request)
 
     return h.view(PUBLIC_REGISTER_VIEW_ROUTE, {
       ...publicRegisterSettings,
-      projectName: exemption.projectName,
-      payload: exemption.publicRegister,
+      projectName: marineLicence.projectName,
+      payload: marineLicence.publicRegister,
       backLink: getBackLink(request)
     })
   }
 }
+
 export const publicRegisterSubmitController = {
   options: {
     validate: {
       payload: publicRegisterSchema,
       failAction: createFailAction({
-        getCache: getExemptionCache,
+        getCache: getMarineLicenceCache,
         viewRoute: PUBLIC_REGISTER_VIEW_ROUTE,
         settings: publicRegisterSettings,
         errorMessages: publicRegisterErrorMessages,
@@ -50,22 +53,26 @@ export const publicRegisterSubmitController = {
   async handler(request, h) {
     const { payload } = request
 
-    const exemption = getExemptionCache(request)
+    const marineLicence = getMarineLicenceCache(request)
 
     try {
-      const userDeclinesConsent = payload.consent === 'no'
+      const userDoesNotConsent = payload.consent === 'no'
 
-      await authenticatedPatchRequest(request, '/exemption/public-register', {
-        consent: payload.consent,
-        ...(userDeclinesConsent && { reason: payload.reason }),
-        id: exemption.id
-      })
+      await authenticatedPatchRequest(
+        request,
+        '/marine-licence/public-register',
+        {
+          consent: payload.consent,
+          ...(userDoesNotConsent && { reason: payload.reason }),
+          id: marineLicence.id
+        }
+      )
 
-      await setExemptionCache(request, h, {
-        ...exemption,
+      await setMarineLicenceCache(request, h, {
+        ...marineLicence,
         publicRegister: {
           consent: payload.consent,
-          ...(userDeclinesConsent && { reason: payload.reason })
+          ...(userDoesNotConsent && { reason: payload.reason })
         }
       })
 
@@ -88,7 +95,7 @@ export const publicRegisterSubmitController = {
       return h.view(PUBLIC_REGISTER_VIEW_ROUTE, {
         ...publicRegisterSettings,
         payload,
-        projectName: exemption.projectName,
+        projectName: marineLicence.projectName,
         backLink: getBackLink(request),
         errors,
         errorSummary

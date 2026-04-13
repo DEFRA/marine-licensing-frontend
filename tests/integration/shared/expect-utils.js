@@ -83,7 +83,8 @@ export const expectFieldsetError = ({
   document,
   fieldsetLabel,
   errorMessage,
-  findByHeading = false
+  findByHeading = false,
+  useErrorClass = false
 }) => {
   const errorSummary = within(document).getByRole('alert')
   within(errorSummary).getByRole('heading', {
@@ -97,7 +98,13 @@ export const expectFieldsetError = ({
   const fieldset = findByHeading
     ? getFieldsetByHeading({ document, fieldsetLabel })
     : getFieldsetByLabel({ document, fieldsetLabel })
-  within(fieldset).getByText(errorMessage)
+
+  if (useErrorClass) {
+    const errorEl = fieldset.querySelector('.govuk-error-message')
+    expect(errorEl).toHaveTextContent(errorMessage)
+  } else {
+    within(fieldset).getByText(errorMessage)
+  }
 
   // confirm that the error summary link correctly references an input within the fieldset
   const fieldsetId = errorSummaryLink.getAttribute('href')

@@ -110,7 +110,7 @@
     "vitest": "^4.1.0",
     "vitest-axe": "^0.1.0",
     "vitest-fetch-mock": "^0.4.5",
-    "webpack": "^5.105.4",
+    "webpack": "^5.106.1",
     "webpack-assets-manifest": "6.5.1",
     "webpack-cli": "7.0.2"
   },

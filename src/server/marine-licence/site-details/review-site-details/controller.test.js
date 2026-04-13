@@ -1,17 +1,23 @@
 import { beforeAll, vi } from 'vitest'
 import * as cacheUtils from '#src/server/common/helpers/marine-licence/session-cache/utils.js'
 import * as marineLicenceService from '#src/services/marine-licence-service/index.js'
+import * as authenticatedRequests from '#src/server/common/helpers/authenticated-requests.js'
 import {
   FILE_UPLOAD_REVIEW_VIEW_ROUTE,
-  reviewSiteDetailsController
+  reviewSiteDetailsController,
+  reviewSiteDetailsSubmitController
 } from '#src/server/marine-licence/site-details/review-site-details/controller.js'
 import { mockExemption } from '#src/server/test-helpers/mocks/exemption.js'
-import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
+import {
+  apiRoutes,
+  marineLicenceRoutes
+} from '#src/server/common/constants/routes.js'
 import { mockFileUploadMarineLicence } from '#src/server/test-helpers/mocks/marine-licence-mocks.js'
 import { createMockRequest } from '#src/server/test-helpers/mocks/helpers.js'
 
 vi.mock('~/src/server/common/helpers/marine-licence/session-cache/utils.js')
 vi.mock('~/src/services/marine-licence-service/index.js')
+vi.mock('~/src/server/common/helpers/authenticated-requests.js')
 
 function createMockHandler(type = 'view') {
   if (type === 'redirect') {
@@ -96,6 +102,35 @@ describe('#reviewSiteDetails', () => {
           backLink: marineLicenceRoutes.MARINE_LICENCE_FILE_UPLOAD,
           projectName: 'Test Project'
         })
+      )
+    })
+  })
+
+  describe('reviewSiteDetailsSubmitController', () => {
+    test('should call the API and redirect to review page with the next activity anchor', async () => {
+      getMarineLicenceCacheSpy.mockReturnValue({
+        id: 'test-id',
+        siteDetails: [{ activityDetails: [{ activityType: 'existing' }] }]
+      })
+      vi.mocked(
+        authenticatedRequests.authenticatedPatchRequest
+      ).mockResolvedValue({})
+
+      const h = createMockHandler('redirect')
+      const request = createMockRequest({
+        payload: { addActivity: 'addActivity', siteNumber: '1' }
+      })
+
+      await reviewSiteDetailsSubmitController.handler(request, h)
+
+      expect(
+        vi.mocked(authenticatedRequests.authenticatedPatchRequest)
+      ).toHaveBeenCalledWith(request, apiRoutes.ADD_ACTIVITY_TO_SITE, {
+        siteIndex: 0,
+        id: 'test-id'
+      })
+      expect(h.redirect).toHaveBeenCalledWith(
+        `${marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS}#activity-details-site-1-activity-2`
       )
     })
   })

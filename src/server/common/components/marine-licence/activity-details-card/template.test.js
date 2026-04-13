@@ -24,7 +24,7 @@ describe('Marine Licence Activity Details Card', () => {
   })
 
   test('Should render the activity details card', () => {
-    expect($component('#activity-details-1-1')).toHaveLength(1)
+    expect($component('#activity-details-site-1-activity-1')).toHaveLength(1)
 
     expect($component('.govuk-summary-card__title').text().trim()).toBe(
       'Site 1 - Activity 1'

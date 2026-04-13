@@ -76,7 +76,7 @@ export const reviewSiteDetailsSubmitController = {
     const marineLicence = getMarineLicenceCache(request)
 
     if (addActivity) {
-      const siteIndex = parseInt(siteNumber, 10) - 1
+      const siteIndex = Number.parseInt(siteNumber, 10) - 1
 
       const currentActivityCount =
         marineLicence.siteDetails[siteIndex].activityDetails.length

@@ -104,16 +104,18 @@
           <input type="hidden" name="csrfToken" value="{{ csrfToken }}">
           <input type="hidden" name="siteNumber" value="{{ site.siteNumber }}">
 
-          {{ govukButton({
-            text: "Add another activity for site " + site.siteNumber,
-            classes: "govuk-button--secondary",
-            attributes: {
-              id: 'add-another-activity-site-' + site.siteNumber,
-              name: "addActivity",
-              value: "addActivity",
-              type: "submit"
-            }
-          }) }}
+          <div class="govuk-!-margin-bottom-6">
+            {{ govukButton({
+              text: "Add another activity for site " + site.siteNumber,
+              classes: "govuk-button--secondary",
+              attributes: {
+                id: 'add-another-activity-site-' + site.siteNumber,
+                name: "addActivity",
+                value: "addActivity",
+                type: "submit"
+              }
+            }) }}
+          </div>
 
           </form>
 

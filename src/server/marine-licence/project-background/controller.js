@@ -6,7 +6,10 @@ import {
   errorDescriptionByFieldName,
   mapErrorsForDisplay
 } from '#src/server/common/helpers/errors.js'
-import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
+import {
+  apiRoutes,
+  marineLicenceRoutes
+} from '#src/server/common/constants/routes.js'
 import { authenticatedPatchRequest } from '#src/server/common/helpers/authenticated-requests.js'
 
 import joi from 'joi'
@@ -97,7 +100,7 @@ export const projectBackgroundSubmitController = {
     try {
       await authenticatedPatchRequest(
         request,
-        '/marine-licence/project-background',
+        apiRoutes.MARINE_LICENCE_PROJECT_BACKGROUND,
         {
           projectBackground: payload.projectBackground,
           id: marineLicence.id

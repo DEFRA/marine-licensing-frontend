@@ -120,5 +120,6 @@ export const changeOrganisationQueryParam = 'change-organisation'
 
 export const apiRoutes = {
   SUBMIT_EXEMPTION: '/exemption/submit',
-  SUBMIT_MARINE_LICENCE: '/marine-licence/submit'
+  SUBMIT_MARINE_LICENCE: '/marine-licence/submit',
+  MARINE_LICENCE_PROJECT_BACKGROUND: '/marine-licence/project-background'
 }

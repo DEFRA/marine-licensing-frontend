@@ -34,7 +34,7 @@
             {% set item = {
               value: answer.id,
               text: answer.text,
-              hint: { html: answer.hint }
+              hint: { html: answer.hint } {# sanitised at load time #}
             } %}
           {% else %}
             {% set item = {
@@ -54,7 +54,7 @@
               classes: "govuk-fieldset__legend--l"
             }
           },
-          hint: { html: question.hint } if question.hint,
+          hint: { html: question.hint } if question.hint, {# sanitised at load time #}
           errorMessage: errors.answer if errors,
           items: items
         }) }}

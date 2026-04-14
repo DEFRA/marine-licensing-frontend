@@ -4,9 +4,10 @@ import {
   getBackLink,
   clearHistory
 } from '#src/server/journey/self-service/services/journey-history.js'
+import { routes } from '#src/server/common/constants/routes.js'
 
-const IAT_START = '/journey/self-service/start'
-const ROUTE_PREFIX = '/journey/self-service'
+const { IAT_START } = routes
+const ROUTE_PREFIX = IAT_START.replace(/\/start$/, '')
 
 function createMockRequest(history = []) {
   return {

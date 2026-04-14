@@ -3,7 +3,7 @@ import sanitizeHtml from 'sanitize-html'
 const sanitiseOptions = {
   allowedTags: ['a', 'b', 'br', 'li', 'ol', 'p', 'strong', 'u', 'ul'],
   allowedAttributes: {
-    a: ['href', 'target'],
+    a: ['href', 'target', 'rel'],
     ol: ['type']
   },
   allowedSchemes: ['http', 'https']

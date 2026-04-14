@@ -87,7 +87,7 @@ describe('Page accessibility checks (Axe)', () => {
     // },
     {
       url: routes.COORDINATES_ENTRY_CHOICE,
-      title: 'How do you want to enter the coordinates?'
+      title: 'How do you want to enter the site coordinates?'
     },
     {
       url: routes.COORDINATE_SYSTEM_CHOICE,

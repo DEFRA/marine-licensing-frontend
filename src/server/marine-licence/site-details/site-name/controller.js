@@ -123,7 +123,7 @@ export const siteNameSubmitController = {
 
     const redirectRoute = isFileUploadCoordinates
       ? `${marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS}#site-details-${siteNumber}`
-      : marineLicenceRoutes.MARINE_LICENCE_SITE_NAME
+      : marineLicenceRoutes.MARINE_LICENCE_COORDINATES_ENTRY_CHOICE
 
     await updateMarineLicenceSiteDetails(
       request,

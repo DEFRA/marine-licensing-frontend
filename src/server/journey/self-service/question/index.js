@@ -22,7 +22,7 @@ export const journeySelfServiceQuestion = {
             validate: {
               payload: Joi.object({
                 answer: Joi.string()
-              }).options({ allowUnknown: true })
+              })
             }
           },
           ...questionPostController

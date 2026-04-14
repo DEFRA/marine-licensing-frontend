@@ -96,3 +96,13 @@ export const mockFileUploadMarineLicence = {
     }
   ]
 }
+
+export const mockManualCoordinatesMarineLicence = {
+  ...mockMarineLicenceApplication,
+  siteDetails: [
+    {
+      coordinatesType: 'coordinates',
+      siteName: 'Test site name'
+    }
+  ]
+}

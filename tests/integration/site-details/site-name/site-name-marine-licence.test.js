@@ -13,7 +13,7 @@ import {
   makePostRequest
 } from '~/src/server/test-helpers/server-requests.js'
 import { JSDOM } from 'jsdom'
-import { getByRole } from '@testing-library/dom'
+import { getByRole, queryByRole } from '@testing-library/dom'
 import { statusCodes } from '~/src/server/common/constants/status-codes.js'
 
 describe('Site name page (marine licence)', () => {
@@ -112,10 +112,7 @@ describe('Site name page (marine licence)', () => {
       marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS
     )
 
-    const cancelLink = getByRole(document, 'link', { name: 'Cancel' })
-    expect(cancelLink).toHaveAttribute(
-      'href',
-      marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS
-    )
+    const cancelLink = queryByRole(document, 'link', { name: 'Cancel' })
+    expect(cancelLink).not.toBeInTheDocument()
   })
 })

@@ -199,10 +199,10 @@ describe('ML Review Site Details - File Upload Integration Tests', () => {
       )
       expect(mapDiv).toBeTruthy()
 
-      const addAnotherAcitivtybutton = getByRole(document, 'button', {
+      const addAnotherActivitybutton = getByRole(document, 'button', {
         name: `Add another activity for site ${siteIndex + 1}`
       })
-      expect(addAnotherAcitivtybutton).toBeInTheDocument()
+      expect(addAnotherActivitybutton).toBeInTheDocument()
     })
 
     const activityDetailsCards = Array.from(cards).filter((card) =>

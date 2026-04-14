@@ -45,10 +45,7 @@ const isRouteNavigationHidden = (request) => {
       )
     }
 
-    return (
-      hideNavigationRoutes.has(pagePath) ||
-      pagePath.startsWith('/journey/self-service/')
-    )
+    return hideNavigationRoutes.has(pagePath)
   } catch {
     return false
   }

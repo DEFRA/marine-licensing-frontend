@@ -4,14 +4,16 @@ import { faker } from '@faker-js/faker'
 export const mockMarineLicenceTaskList = {
   projectName: 'COMPLETED',
   specialLegalPowers: 'COMPLETED',
+  otherAuthorities: 'COMPLETED',
   siteDetails: 'COMPLETED',
-  publicRegister: 'COMPLETED',
-  otherAuthorities: 'COMPLETED'
+  projectBackground: 'COMPLETED',
+  publicRegister: 'COMPLETED'
 }
 
 export const mockMarineLicenceApplication = {
   id: faker.database.mongodbObjectId(),
   projectName: 'Test Project',
+  projectBackground: 'Test project background',
   specialLegalPowers: { agree: 'yes', details: 'Test reason' },
   taskList: mockMarineLicenceTaskList,
   projectType: MARINE_LICENCE_KEY,

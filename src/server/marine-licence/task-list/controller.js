@@ -53,6 +53,7 @@ export const taskListController = {
       id: marineLicenceId,
       taskList,
       projectName,
+      projectBackground,
       specialLegalPowers,
       publicRegister,
       otherAuthorities,
@@ -76,6 +77,7 @@ export const taskListController = {
     await setMarineLicenceCache(request, h, {
       id: marineLicenceId,
       projectName,
+      projectBackground,
       specialLegalPowers,
       publicRegister,
       otherAuthorities,

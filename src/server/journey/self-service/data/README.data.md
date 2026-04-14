@@ -433,15 +433,15 @@ and largely absent from form labels.
 
 **Tags used (across all fields):**
 
-| Tag              | Purpose                          |
-| ---------------- | -------------------------------- |
-| `<p>`            | Paragraph breaks (most common)   |
-| `<a>`            | External links (always gov.uk)   |
-| `<b>`, `<strong>`| Bold emphasis                    |
-| `<ul>`, `<li>`   | Unordered lists                  |
-| `<ol type="i">`  | Ordered list (roman numerals, 1) |
-| `<br/>`          | Line breaks                      |
-| `<u>`            | Underline (rare, 2 instances)    |
+| Tag               | Purpose                          |
+| ----------------- | -------------------------------- |
+| `<p>`             | Paragraph breaks (most common)   |
+| `<a>`             | External links (always gov.uk)   |
+| `<b>`, `<strong>` | Bold emphasis                    |
+| `<ul>`, `<li>`    | Unordered lists                  |
+| `<ol type="i">`   | Ordered list (roman numerals, 1) |
+| `<br/>`           | Line breaks                      |
+| `<u>`             | Underline (rare, 2 instances)    |
 
 **HTML quality issues in the source data:**
 
@@ -576,15 +576,15 @@ These parameters configure what the destination module does — which form to sh
 
 ## Summary: What the Generated Site Must Handle
 
-| Concern                     | Count | Notes                                         |
-| --------------------------- | ----- | --------------------------------------------- |
-| Radio button question pages | 354   | Standard GOV.UK radios                        |
-| Checkbox question pages     | 5     | MultiSelect with special routing              |
-| Outcome pages (terminal)    | 98    | Display result + action buttons               |
-| Outcome pages (fork)        | 8     | Display choices that re-enter question tree   |
-| Transitions to test         | 1,078 | Each is a single verifiable assertion         |
-| Terminal outcomes           | 87    | Distinct end-states                           |
-| Sections (progress bar)     | 48    | Grouped into 5 phases                         |
-| MCMS form mappings          | 22    | Answers to carry forward                      |
+| Concern                     | Count | Notes                                                          |
+| --------------------------- | ----- | -------------------------------------------------------------- |
+| Radio button question pages | 354   | Standard GOV.UK radios                                         |
+| Checkbox question pages     | 5     | MultiSelect with special routing                               |
+| Outcome pages (terminal)    | 98    | Display result + action buttons                                |
+| Outcome pages (fork)        | 8     | Display choices that re-enter question tree                    |
+| Transitions to test         | 1,078 | Each is a single verifiable assertion                          |
+| Terminal outcomes           | 87    | Distinct end-states                                            |
+| Sections (progress bar)     | 48    | Grouped into 5 phases                                          |
+| MCMS form mappings          | 22    | Answers to carry forward                                       |
 | HTML content fields         | ~166  | Concentrated in outcomeType.text (91%) and question.hint (18%) |
-| External links in content   | ~50+  | GOV.UK guidance, ArcGIS maps, .docx downloads |
+| External links in content   | ~50+  | GOV.UK guidance, ArcGIS maps, .docx downloads                  |

@@ -2,7 +2,8 @@ import { sanitise, stripHtml } from './sanitise.js'
 
 describe('#sanitise', () => {
   test('allows safe HTML tags', () => {
-    const input = '<p>Text with <a href="https://gov.uk" target="_blank">link</a></p>'
+    const input =
+      '<p>Text with <a href="https://gov.uk" target="_blank">link</a></p>'
     expect(sanitise(input)).toBe(input)
   })
 

@@ -11,7 +11,7 @@ import {
 import { mockMarineLicenceApplication } from '#src/server/test-helpers/mocks/marine-licence-mocks.js'
 import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
 
-vi.mock('~/src/server/common/helpers/marine-licence/session-cache/utils.js')
+vi.mock('#src/server/common/helpers/marine-licence/session-cache/utils.js')
 
 const cancelLink = `${marineLicenceRoutes.MARINE_LICENCE_TASK_LIST}?cancel=site-details`
 
@@ -204,7 +204,7 @@ describe('#coordinatesEntry (marine licence)', () => {
         'single'
       )
       expect(h.redirect).toHaveBeenCalledWith(
-        marineLicenceRoutes.MARINE_LICENCE_COORDINATE_SYSTEM_CHOICE
+        marineLicenceRoutes.MARINE_LICENCE_COORDINATES_ENTRY_CHOICE
       )
     })
   })

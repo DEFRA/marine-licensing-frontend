@@ -20,8 +20,8 @@ import { getCancelLink } from '#src/server/exemption/site-details/utils/cancel-l
 export const COORDINATES_ENTRY_VIEW_ROUTE = 'templates/coordinates-entry'
 
 const coordinatesEntrySettings = {
-  pageTitle: 'How do you want to enter the coordinates?',
-  heading: 'How do you want to enter the coordinates?',
+  pageTitle: 'How do you want to enter the site coordinates?',
+  heading: 'How do you want to enter the site coordinates?',
   backLink: routes.ACTIVITY_DESCRIPTION
 }
 

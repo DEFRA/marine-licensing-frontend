@@ -38,8 +38,8 @@ describe('#coordinatesEntry', () => {
       await coordinatesEntryController.handler(request, h)
 
       expect(h.view).toHaveBeenCalledWith(COORDINATES_ENTRY_VIEW_ROUTE, {
-        pageTitle: 'How do you want to enter the coordinates?',
-        heading: 'How do you want to enter the coordinates?',
+        pageTitle: 'How do you want to enter the site coordinates?',
+        heading: 'How do you want to enter the site coordinates?',
         cancelLink: routes.TASK_LIST + '?cancel=site-details',
         backLink: routes.ACTIVITY_DESCRIPTION,
         payload: {
@@ -62,8 +62,8 @@ describe('#coordinatesEntry', () => {
       await coordinatesEntryController.handler(request, h)
 
       expect(h.view).toHaveBeenCalledWith(COORDINATES_ENTRY_VIEW_ROUTE, {
-        pageTitle: 'How do you want to enter the coordinates?',
-        heading: 'How do you want to enter the coordinates?',
+        pageTitle: 'How do you want to enter the site coordinates?',
+        heading: 'How do you want to enter the site coordinates?',
         cancelLink: routes.TASK_LIST + '?cancel=site-details',
         backLink: routes.ACTIVITY_DESCRIPTION,
         payload: { coordinatesEntry: undefined },
@@ -82,7 +82,7 @@ describe('#coordinatesEntry', () => {
       const { document } = new JSDOM(result).window
 
       expect(document.querySelector('h1').textContent.trim()).toBe(
-        'How do you want to enter the coordinates?'
+        'How do you want to enter the site coordinates?'
       )
 
       expect(
@@ -134,8 +134,8 @@ describe('#coordinatesEntry', () => {
       await coordinatesEntryController.handler(request, h)
 
       expect(h.view).toHaveBeenCalledWith(COORDINATES_ENTRY_VIEW_ROUTE, {
-        pageTitle: 'How do you want to enter the coordinates?',
-        heading: 'How do you want to enter the coordinates?',
+        pageTitle: 'How do you want to enter the site coordinates?',
+        heading: 'How do you want to enter the site coordinates?',
         backLink: routes.REVIEW_SITE_DETAILS + '#site-details-1',
         cancelLink: undefined,
         payload: { coordinatesEntry: undefined },
@@ -177,8 +177,8 @@ describe('#coordinatesEntry', () => {
       )
 
       expect(h.view).toHaveBeenCalledWith(COORDINATES_ENTRY_VIEW_ROUTE, {
-        pageTitle: 'How do you want to enter the coordinates?',
-        heading: 'How do you want to enter the coordinates?',
+        pageTitle: 'How do you want to enter the site coordinates?',
+        heading: 'How do you want to enter the site coordinates?',
         cancelLink: routes.TASK_LIST + '?cancel=site-details',
         backLink: routes.ACTIVITY_DESCRIPTION,
         projectName: 'Test Project',
@@ -224,8 +224,8 @@ describe('#coordinatesEntry', () => {
       )
 
       expect(h.view).toHaveBeenCalledWith(COORDINATES_ENTRY_VIEW_ROUTE, {
-        pageTitle: 'How do you want to enter the coordinates?',
-        heading: 'How do you want to enter the coordinates?',
+        pageTitle: 'How do you want to enter the site coordinates?',
+        heading: 'How do you want to enter the site coordinates?',
         cancelLink: routes.TASK_LIST + '?cancel=site-details',
         backLink: routes.ACTIVITY_DESCRIPTION,
         projectName: 'Test Project',
@@ -262,8 +262,8 @@ describe('#coordinatesEntry', () => {
       )
 
       expect(h.view).toHaveBeenCalledWith(COORDINATES_ENTRY_VIEW_ROUTE, {
-        pageTitle: 'How do you want to enter the coordinates?',
-        heading: 'How do you want to enter the coordinates?',
+        pageTitle: 'How do you want to enter the site coordinates?',
+        heading: 'How do you want to enter the site coordinates?',
         cancelLink: routes.TASK_LIST + '?cancel=site-details',
         backLink: routes.ACTIVITY_DESCRIPTION,
         projectName: 'Test Project',

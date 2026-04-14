@@ -19,7 +19,7 @@ export function sharedCoordinatesEntryTests({
 
     expect(
       getByRole(document, 'heading', {
-        name: 'How do you want to enter the coordinates?'
+        name: 'How do you want to enter the site coordinates?'
       })
     ).toBeInTheDocument()
 

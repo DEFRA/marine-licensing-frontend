@@ -32,8 +32,8 @@ describe('#coordinatesEntry (marine licence)', () => {
       expect(h.view).toHaveBeenCalledWith(
         MARINE_LICENCE_COORDINATES_ENTRY_VIEW_ROUTE,
         {
-          pageTitle: 'How do you want to enter the coordinates?',
-          heading: 'How do you want to enter the coordinates?',
+          pageTitle: 'How do you want to enter the site coordinates?',
+          heading: 'How do you want to enter the site coordinates?',
           backLink: marineLicenceRoutes.MARINE_LICENCE_SITE_NAME,
           cancelLink,
           projectName: 'Test Project',
@@ -57,8 +57,8 @@ describe('#coordinatesEntry (marine licence)', () => {
       expect(h.view).toHaveBeenCalledWith(
         MARINE_LICENCE_COORDINATES_ENTRY_VIEW_ROUTE,
         {
-          pageTitle: 'How do you want to enter the coordinates?',
-          heading: 'How do you want to enter the coordinates?',
+          pageTitle: 'How do you want to enter the site coordinates?',
+          heading: 'How do you want to enter the site coordinates?',
           backLink: marineLicenceRoutes.MARINE_LICENCE_SITE_NAME,
           cancelLink,
           projectName: 'Test Project',
@@ -101,8 +101,8 @@ describe('#coordinatesEntry (marine licence)', () => {
       expect(h.view).toHaveBeenCalledWith(
         MARINE_LICENCE_COORDINATES_ENTRY_VIEW_ROUTE,
         {
-          pageTitle: 'How do you want to enter the coordinates?',
-          heading: 'How do you want to enter the coordinates?',
+          pageTitle: 'How do you want to enter the site coordinates?',
+          heading: 'How do you want to enter the site coordinates?',
           backLink: marineLicenceRoutes.MARINE_LICENCE_SITE_NAME,
           cancelLink,
           projectName: 'Test Project',
@@ -147,8 +147,8 @@ describe('#coordinatesEntry (marine licence)', () => {
       expect(h.view).toHaveBeenCalledWith(
         MARINE_LICENCE_COORDINATES_ENTRY_VIEW_ROUTE,
         {
-          pageTitle: 'How do you want to enter the coordinates?',
-          heading: 'How do you want to enter the coordinates?',
+          pageTitle: 'How do you want to enter the site coordinates?',
+          heading: 'How do you want to enter the site coordinates?',
           backLink: marineLicenceRoutes.MARINE_LICENCE_SITE_NAME,
           cancelLink,
           projectName: 'Test Project',

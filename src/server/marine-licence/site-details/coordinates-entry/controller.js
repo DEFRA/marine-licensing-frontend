@@ -15,8 +15,8 @@ export const MARINE_LICENCE_COORDINATES_ENTRY_VIEW_ROUTE =
   'templates/coordinates-entry'
 
 const coordinatesEntrySettings = {
-  pageTitle: 'How do you want to enter the coordinates?',
-  heading: 'How do you want to enter the coordinates?'
+  pageTitle: 'How do you want to enter the site coordinates?',
+  heading: 'How do you want to enter the site coordinates?'
 }
 
 export const errorMessages = {

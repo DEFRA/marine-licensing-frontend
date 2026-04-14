@@ -1,0 +1,90 @@
+{% extends 'layouts/page.njk' %}
+{% from "govuk/components/textarea/macro.njk" import govukTextarea %}
+{% from "govuk/components/back-link/macro.njk" import govukBackLink %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+{% from "cancel-button/macro.njk" import appCancelButton %}
+{% from "govuk/components/details/macro.njk" import govukDetails %}
+
+{% block beforeContent %}
+{{ super() }}
+<nav>
+  {{ govukBackLink({
+    text: "Back",
+    href: backLink
+  }) }}
+</nav>
+{% endblock %}
+
+{% block content %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+
+      {% if errorSummary %}
+        {{ govukErrorSummary({
+          titleText: "There is a problem",
+          errorList: errorSummary
+        }) }}
+      {% endif %}
+
+      <span class="govuk-caption-l">{{ projectName }}</span>
+
+      <h1 class="govuk-heading-l">{{ heading }}</h1>
+
+      <p class="govuk-body">The project background will be displayed on the public register and on the licence. Give a summary of:</p>
+      <ul class="govuk-list govuk-list--bullet">
+        <li>what activities you're doing and why</li>
+        <li>where the work will take place</li>
+        <li>which companies or organisations are involved (if applicable)</li>
+      </ul>
+      <p class="govuk-body">You'll be asked to go into further detail about these later in the application.</p>
+
+       {% set helperHtml %}
+        <h2 class="govuk-heading-s">Example one</h2>
+        <p>The seabed stabilisation works will support the construction of Coastal Offshore Wind Farm. 
+          The works consist of depositing material in the form of rock bags, geotextile sand containers, 
+          loose rock, and rock mattresses on the seabed to stabilise the surface for jack-up vessel operations. 
+          This will take place within the wind farm's array area in 20 distinct locations.</p>
+
+        <h2 class="govuk-heading-s">Example two</h2>
+        <p>The works involve the reconstruction and extension of the existing rock armour 
+          located at River Point (Reach W1) of the Harbour Tidal Walls, located along the River Harbour. 
+          Reach W1 extends from the fort near the mouth of the river to the harbour club.</p>
+      {% endset %}
+
+      {{ govukDetails({
+          html: helperHtml,
+          summaryText: "Project background examples"
+      }) }}
+
+      <form method="POST">
+        <input type="hidden" name="csrfToken" value="{{ csrfToken }}" />
+
+        {{ govukTextarea({
+          id: "projectBackground",
+          name: "projectBackground",
+          label: {
+            text: "Give a background summary of your project",
+            classes: "govuk-label--s"
+          },
+          hint: {
+            text: "Enter a maximum of 1,000 characters"
+          },
+          errorMessage: errors['projectBackground'],
+          value: payload.projectBackground
+        }) }}
+
+        <div class="govuk-button-group">
+          {{ govukButton({
+            text: "Save and continue",
+            classes: "govuk-button--primary"
+          }) }}
+          {{ appCancelButton({
+            cancelLink: backLink
+          }) }}
+        </div>
+      </form>
+
+    </div>
+  </div>
+{% endblock %}

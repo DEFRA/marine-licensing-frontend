@@ -10,7 +10,10 @@ describe('taskList utils', () => {
   describe('transformProjectDetailsTaskList', () => {
     test('correctly returns Completed status', () => {
       expect(
-        transformProjectDetailsTaskList({ projectName: 'COMPLETED' })
+        transformProjectDetailsTaskList({
+          projectName: 'COMPLETED',
+          projectBackground: 'COMPLETED'
+        })
       ).toEqual([
         {
           href: marineLicenceRoutes.MARINE_LICENCE_PROJECT_NAME,
@@ -19,13 +22,24 @@ describe('taskList utils', () => {
             classes: 'govuk-link--no-visited-state',
             text: 'Project name'
           }
+        },
+        {
+          href: marineLicenceRoutes.MARINE_LICENCE_PROJECT_BACKGROUND,
+          status: { text: 'Completed' },
+          title: {
+            classes: 'govuk-link--no-visited-state',
+            text: 'Project background'
+          }
         }
       ])
     })
 
     test('correctly returns In Progress', () => {
       expect(
-        transformProjectDetailsTaskList({ projectName: 'IN_PROGRESS' })
+        transformProjectDetailsTaskList({
+          projectName: 'IN_PROGRESS',
+          projectBackground: 'IN_PROGRESS'
+        })
       ).toEqual([
         {
           href: marineLicenceRoutes.MARINE_LICENCE_PROJECT_NAME,
@@ -35,6 +49,16 @@ describe('taskList utils', () => {
           title: {
             classes: 'govuk-link--no-visited-state',
             text: 'Project name'
+          }
+        },
+        {
+          href: marineLicenceRoutes.MARINE_LICENCE_PROJECT_BACKGROUND,
+          status: {
+            tag: { text: 'In Progress', classes: 'govuk-tag--light-blue' }
+          },
+          title: {
+            classes: 'govuk-link--no-visited-state',
+            text: 'Project background'
           }
         }
       ])
@@ -53,6 +77,16 @@ describe('taskList utils', () => {
               title: {
                 classes: 'govuk-link--no-visited-state',
                 text: 'Project name'
+              }
+            },
+            {
+              href: marineLicenceRoutes.MARINE_LICENCE_PROJECT_BACKGROUND,
+              status: {
+                tag: { text: 'Not yet started', classes: 'govuk-tag--blue' }
+              },
+              title: {
+                classes: 'govuk-link--no-visited-state',
+                text: 'Project background'
               }
             }
           ]

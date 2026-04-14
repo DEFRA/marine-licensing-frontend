@@ -18,6 +18,7 @@ import {
 } from '#src/server/common/helpers/site-details/site-name.js'
 import { saveSiteDetailsToBackend } from '#src/server/common/helpers/marine-licence/save-site-details.js'
 import { getSiteDetailsBySite } from '#src/server/common/helpers/marine-licence/session-cache/site-details-utils.js'
+import { getCancelLink } from '#src/server/marine-licence/site-details/utils/cancel-link.js'
 
 export const SITE_NAME_VIEW_ROUTE = 'templates/site-name.njk'
 
@@ -25,11 +26,6 @@ const getBackLink = (isSavePage) =>
   isSavePage
     ? marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS
     : marineLicenceRoutes.MARINE_LICENCE_COORDINATES_TYPE_CHOICE
-
-const getCancelLink = (isSavePage) =>
-  isSavePage
-    ? marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS
-    : marineLicenceRoutes.MARINE_LICENCE_TASK_LIST
 
 const createValidationFailAction = (request, h, err) => {
   const { payload } = request

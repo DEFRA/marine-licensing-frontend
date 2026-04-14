@@ -29,12 +29,15 @@
         {% endset %}
 
         {% set items = [] %}
+
+        {#  answer.hint and question.hint contain html but are sanitised at load time #}
+
         {% for answer in question.answers %}
           {% if answer.hint %}
             {% set item = {
               value: answer.id,
               text: answer.text,
-              hint: { html: answer.hint } {# sanitised at load time #}
+              hint: { html: answer.hint }
             } %}
           {% else %}
             {% set item = {
@@ -54,7 +57,7 @@
               classes: "govuk-fieldset__legend--l"
             }
           },
-          hint: { html: question.hint } if question.hint, {# sanitised at load time #}
+          hint: { html: question.hint } if question.hint,
           errorMessage: errors.answer if errors,
           items: items
         }) }}

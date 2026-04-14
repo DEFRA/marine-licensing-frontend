@@ -11,12 +11,12 @@ describe('journey self-service question route', () => {
       expect.objectContaining({
         method: 'GET',
         path: '/journey/self-service/{questionPath*}',
-        options: { auth: false }
+        options: expect.objectContaining({ auth: false })
       }),
       expect.objectContaining({
         method: 'POST',
         path: '/journey/self-service/{questionPath*}',
-        options: { auth: false }
+        options: expect.objectContaining({ auth: false })
       })
     ])
   })

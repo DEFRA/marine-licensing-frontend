@@ -21,7 +21,7 @@ export const journeySelfServiceQuestion = {
             auth: false,
             validate: {
               payload: Joi.object({
-                answer: Joi.string().required()
+                answer: Joi.string()
               }).options({ allowUnknown: true })
             }
           },

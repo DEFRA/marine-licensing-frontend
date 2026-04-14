@@ -13,7 +13,10 @@ import {
   getMarineLicenceCache,
   updateMarineLicenceSiteDetails
 } from '#src/server/common/helpers/marine-licence/session-cache/utils.js'
-import { mockMarineLicenceApplication } from '#src/server/test-helpers/mocks/marine-licence-mocks.js'
+import {
+  mockManualCoordinatesMarineLicence,
+  mockMarineLicenceApplication
+} from '#src/server/test-helpers/mocks/marine-licence-mocks.js'
 import { saveSiteDetailsToBackend } from '#src/server/common/helpers/marine-licence/save-site-details.js'
 
 vi.mock('~/src/server/common/helpers/marine-licence/session-cache/utils.js')
@@ -33,27 +36,23 @@ describe('#siteName', () => {
     test('should render with correct context', () => {
       const request = createMockRequest()
 
-      vi.mocked(getMarineLicenceCache).mockReturnValueOnce({
-        ...mockMarineLicenceApplication,
-        siteDetails: [
-          {
-            ...mockMarineLicenceApplication.siteDetails[0],
-            siteName: mockSiteName
-          }
-        ]
-      })
+      vi.mocked(getMarineLicenceCache).mockReturnValueOnce(
+        mockManualCoordinatesMarineLicence
+      )
 
       siteNameController.handler(request, h)
 
       expect(h.view).toHaveBeenCalledWith(SITE_NAME_VIEW_ROUTE, {
         pageTitle: 'Site name',
         heading: 'Site name',
-        backLink: marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS,
-        cancelLink: marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS,
-        payload: { siteName: mockSiteName },
+        backLink: marineLicenceRoutes.MARINE_LICENCE_COORDINATES_TYPE_CHOICE,
+        cancelLink: marineLicenceRoutes.MARINE_LICENCE_TASK_LIST,
+        payload: {
+          siteName: mockManualCoordinatesMarineLicence.siteDetails[0].siteName
+        },
         projectName: 'Test Project',
         siteNumber: 1,
-        action: true
+        action: false
       })
     })
 
@@ -138,7 +137,6 @@ describe('#siteName', () => {
         pageTitle: 'Site name',
         heading: 'Site name',
         backLink: marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS,
-        cancelLink: marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS,
         payload: { siteName: '' },
         projectName: 'Test Project',
         siteNumber: 1,
@@ -159,7 +157,6 @@ describe('#siteName', () => {
         pageTitle: 'Site name',
         heading: 'Site name',
         backLink: marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS,
-        cancelLink: marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS,
         payload: { siteName: 'invalid' },
         projectName: 'Test Project',
         siteNumber: 1,
@@ -188,8 +185,7 @@ describe('#siteName', () => {
         SITE_NAME_VIEW_ROUTE,
         expect.objectContaining({
           action: true,
-          backLink: marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS,
-          cancelLink: marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS
+          backLink: marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS
         })
       )
     })

@@ -64,7 +64,9 @@ export const marineLicenceRoutes = {
   MARINE_LICENCE_VIEW_DETAILS_PUBLIC: '/marine-licence/view-public-details',
   MARINE_LICENCE_VIEW_DETAILS_INTERNAL_USER: '/view-marine-licence-details',
   MARINE_LICENCE_COORDINATES_ENTRY_CHOICE:
-    '/marine-licence/how-do-you-want-to-enter-the-coordinates'
+    '/marine-licence/how-do-you-want-to-enter-the-coordinates',
+  MARINE_LICENCE_COORDINATE_SYSTEM_CHOICE:
+    '/marine-licence/what-coordinate-system'
 }
 
 export const defraIdGuidanceRoutes = {

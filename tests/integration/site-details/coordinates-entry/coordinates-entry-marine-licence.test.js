@@ -40,7 +40,7 @@ describe('Coordinates entry page (marine licence)', () => {
     cancelHref: `${marineLicenceRoutes.MARINE_LICENCE_TASK_LIST}?cancel=site-details`
   })
 
-  test('should redirect to self when single is selected', async () => {
+  test('should redirect to coordinate system when single is selected', async () => {
     const response = await makePostRequest({
       server: getServer(),
       url: marineLicenceRoutes.MARINE_LICENCE_COORDINATES_ENTRY_CHOICE,
@@ -49,11 +49,11 @@ describe('Coordinates entry page (marine licence)', () => {
 
     expect(response.statusCode).toBe(statusCodes.redirect)
     expect(response.headers.location).toBe(
-      marineLicenceRoutes.MARINE_LICENCE_COORDINATES_ENTRY_CHOICE
+      marineLicenceRoutes.MARINE_LICENCE_COORDINATE_SYSTEM_CHOICE
     )
   })
 
-  test('should redirect to self when multiple is selected', async () => {
+  test('should redirect to coordinate system when multiple is selected', async () => {
     const response = await makePostRequest({
       server: getServer(),
       url: marineLicenceRoutes.MARINE_LICENCE_COORDINATES_ENTRY_CHOICE,
@@ -62,7 +62,7 @@ describe('Coordinates entry page (marine licence)', () => {
 
     expect(response.statusCode).toBe(statusCodes.redirect)
     expect(response.headers.location).toBe(
-      marineLicenceRoutes.MARINE_LICENCE_COORDINATES_ENTRY_CHOICE
+      marineLicenceRoutes.MARINE_LICENCE_COORDINATE_SYSTEM_CHOICE
     )
   })
 })

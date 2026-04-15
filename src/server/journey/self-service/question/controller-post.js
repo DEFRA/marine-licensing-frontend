@@ -8,6 +8,7 @@ import {
   pushRoute,
   getBackLink
 } from '#src/server/journey/self-service/services/journey-history.js'
+import { statusCodes } from '#src/server/common/constants/status-codes.js'
 
 const VIEW_PATH = 'journey/self-service/question/index'
 const ROUTE_PREFIX = '/journey/self-service'
@@ -31,11 +32,10 @@ export const questionPostController = {
           question,
           section,
           backLink: getBackLink(request, questionRoute),
-          hidePhaseBanner: true,
           errors: { answer: { text: 'Select an option' } },
           errorSummary: [{ text: 'Select an option', href: '#answer' }]
         })
-        .code(400)
+        .code(statusCodes.badRequest)
     }
 
     pushRoute(request, questionRoute)

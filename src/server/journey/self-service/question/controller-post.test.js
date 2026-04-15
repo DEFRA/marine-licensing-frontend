@@ -1,4 +1,5 @@
 import { vi } from 'vitest'
+import { statusCodes } from '#src/server/common/constants/status-codes.js'
 
 vi.mock('#src/server/journey/self-service/services/journey-data.js')
 vi.mock('#src/server/journey/self-service/services/journey-router.js')
@@ -93,7 +94,7 @@ describe('#questionPostController', () => {
         errorSummary: [{ text: 'Select an option', href: '#answer' }]
       })
     )
-    expect(codeStub).toHaveBeenCalledWith(400)
+    expect(codeStub).toHaveBeenCalledWith(statusCodes.badRequest)
   })
 
   test('returns 400 with error when payload is null', () => {
@@ -106,7 +107,7 @@ describe('#questionPostController', () => {
 
     questionPostController.handler(request, h)
 
-    expect(codeStub).toHaveBeenCalledWith(400)
+    expect(codeStub).toHaveBeenCalledWith(statusCodes.badRequest)
   })
 
   test('throws Boom.notFound when question is not found', () => {

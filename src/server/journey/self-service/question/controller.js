@@ -22,8 +22,7 @@ export const questionController = {
       pageTitle: question.text,
       question,
       section,
-      backLink: getBackLink(request, questionRoute),
-      hidePhaseBanner: true
+      backLink: getBackLink(request, questionRoute)
     })
   }
 }

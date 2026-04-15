@@ -42,15 +42,10 @@ More pages (the question journey, outcome pages) will land under
 
 IAT pages deliberately render without the app's usual chrome:
 
-- **No phase banner.** Set `hidePhaseBanner: true` in the view model.
-  The guard lives in `src/server/common/templates/layouts/page.njk`.
-- **No header navigation links.** Add the route path to
-  `hideNavigationRoutes` in `src/config/nunjucks/context/context.js`.
-  The existing mechanism already handles blanking `serviceUrl` so the
-  service name strip is not clickable.
+- **No phase banner.**
+- **No header navigation links.**
 
-Both mechanisms are opt-in per route and leave every other page in the
-service unchanged.
+The template does not call `super()` so these are omitted as standard.
 
 ### Test file layout
 

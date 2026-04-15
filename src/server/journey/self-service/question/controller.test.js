@@ -42,8 +42,7 @@ describe('#questionController', () => {
       pageTitle: 'Where will the activity take place?',
       question: mockQuestion,
       section: mockSection,
-      backLink: '/journey/self-service/start',
-      hidePhaseBanner: true
+      backLink: '/journey/self-service/start'
     })
   })
 

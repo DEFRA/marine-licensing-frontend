@@ -16,7 +16,7 @@ describe('Type of activity (marine licence)', () => {
     mockMarineLicence(mockMarineLicenceApplication)
 
     const document = await loadPage({
-      requestUrl: `${marineLicenceRoutes.MARINE_LICENCE_TYPE_OF_ACTIVITY}?site=1`,
+      requestUrl: `${marineLicenceRoutes.MARINE_LICENCE_TYPE_OF_ACTIVITY}?site=1&activity=1`,
       server: getServer()
     })
 
@@ -24,10 +24,13 @@ describe('Type of activity (marine licence)', () => {
       getByText(document, mockMarineLicenceApplication.projectName)
     ).toBeInTheDocument()
 
+    expect(getByText(document, 'Site 1 - Activity 1')).toBeInTheDocument()
+
     expect(getByRole(document, 'link', { name: 'Back' })).toHaveAttribute(
       'href',
       marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS
     )
+
     expect(getByRole(document, 'heading', { level: 1 })).toHaveTextContent(
       'Type of activity'
     )
@@ -64,7 +67,7 @@ describe('Type of activity (marine licence)', () => {
     mockMarineLicence(mockMarineLicenceApplication)
 
     const response = await makePostRequest({
-      url: marineLicenceRoutes.MARINE_LICENCE_TYPE_OF_ACTIVITY,
+      url: `${marineLicenceRoutes.MARINE_LICENCE_TYPE_OF_ACTIVITY}?site=1&activity=1`,
       server: getServer(),
       formData: {
         activityType: 'deposit',

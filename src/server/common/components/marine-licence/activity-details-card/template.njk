@@ -10,7 +10,7 @@
 {% set _ = rows.push({
     key: { text: "Type of activity"},
     value: { html: appIncompleteField({text:params.activityDetails.activityType})},
-    actions: setSiteDetailsAction(params.activityDetails.activityType, 'review-site-details', params.siteNumber, "", { skipAction: true, activityNumber: params.index })
+    actions: setSiteDetailsAction(params.activityDetails.activityType, 'type-of-activity', params.siteNumber, "", { skipAction: true, activityNumber: params.index })
 }) %}
 
 {% set _ = rows.push({

@@ -1,14 +1,12 @@
 import {
   getMarineLicenceCache,
-  updateMarineLicenceSiteDetails
+  updateMarineLicenceSiteActivityDetails
 } from '#src/server/common/helpers/marine-licence/session-cache/utils.js'
-import {
-  errorDescriptionByFieldName,
-  mapErrorsForDisplay
-} from '#src/server/common/helpers/errors.js'
 import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
-import { getSiteDetailsBySite } from '#src/server/common/helpers/exemptions/session-cache/site-details-utils.js'
+import { getActivityDetailsByIndex } from '#src/server/common/helpers/marine-licence/session-cache/site-details-utils.js'
 import { typeOfActivitySchema } from '#src/server/marine-licence/site-details/type-of-activity/schema.js'
+import { getSiteDataFromParam } from '#src/server/common/helpers/site-details/site-name.js'
+import { createFailAction } from '#src/server/common/helpers/createFailAction.js'
 
 export const typeOfActivityErrorMessages = {
   ACTIVITY_TYPE_REQUIRED: 'Select the type of activity',
@@ -40,16 +38,33 @@ export const typeOfActivitySettings = {
 export const typeOfActivityController = {
   handler(request, h) {
     const marineLicence = getMarineLicenceCache(request)
-    const site = getSiteDetailsBySite(marineLicence)
+
+    const {
+      activityDetailsIndex,
+      activityDetailsNumber,
+      siteIndex,
+      siteNumber
+    } = getSiteDataFromParam(request.query)
+
+    const activityDetails = getActivityDetailsByIndex(
+      marineLicence,
+      siteIndex,
+      activityDetailsIndex
+    )
 
     return h.view(MARINE_LICENCE_TYPE_OF_ACTIVITY_VIEW_ROUTE, {
       ...typeOfActivitySettings,
       backLink,
       cancelLink,
       projectName: marineLicence.projectName,
+      siteNumber,
+      activityDetailsNumber,
       payload: {
-        activityType: site.activityType,
-        ...subTypePayload(site.activityType, site.activitySubType)
+        activityType: activityDetails.activityType,
+        ...subTypePayload(
+          activityDetails.activityType,
+          activityDetails.activitySubType
+        )
       }
     })
   }
@@ -60,38 +75,17 @@ export const typeOfActivitySubmitController = {
     validate: {
       payload: typeOfActivitySchema,
       failAction: (request, h, err) => {
-        const { payload } = request
-        const { projectName } = getMarineLicenceCache(request)
-
-        if (!err.details) {
-          return h
-            .view(MARINE_LICENCE_TYPE_OF_ACTIVITY_VIEW_ROUTE, {
-              ...typeOfActivitySettings,
-              backLink,
-              cancelLink,
-              payload,
-              projectName
-            })
-            .takeover()
-        }
-
-        const errorSummary = mapErrorsForDisplay(
-          err.details,
-          typeOfActivityErrorMessages
+        const { activityDetailsNumber, siteNumber } = getSiteDataFromParam(
+          request.query
         )
-        const errors = errorDescriptionByFieldName(errorSummary)
-
-        return h
-          .view(MARINE_LICENCE_TYPE_OF_ACTIVITY_VIEW_ROUTE, {
-            ...typeOfActivitySettings,
-            backLink,
-            cancelLink,
-            payload,
-            projectName,
-            errors,
-            errorSummary
-          })
-          .takeover()
+        return createFailAction({
+          getCache: getMarineLicenceCache,
+          viewRoute: MARINE_LICENCE_TYPE_OF_ACTIVITY_VIEW_ROUTE,
+          settings: typeOfActivitySettings,
+          errorMessages: typeOfActivityErrorMessages,
+          getBackLink: () => backLink,
+          params: { cancelLink, activityDetailsNumber, siteNumber }
+        })(request, h, err)
       }
     }
   },
@@ -104,17 +98,24 @@ export const typeOfActivitySubmitController = {
       removal: payload.activitySubTypeRemoval
     }
 
-    await updateMarineLicenceSiteDetails(
+    const { activityDetailsIndex, siteIndex } = getSiteDataFromParam(
+      request.query
+    )
+
+    await updateMarineLicenceSiteActivityDetails(
       request,
       h,
-      0,
+      siteIndex,
+      activityDetailsIndex,
       'activityType',
       payload.activityType
     )
-    await updateMarineLicenceSiteDetails(
+
+    await updateMarineLicenceSiteActivityDetails(
       request,
       h,
-      0,
+      siteIndex,
+      activityDetailsIndex,
       'activitySubType',
       activitySubTypeByType[payload.activityType]
     )

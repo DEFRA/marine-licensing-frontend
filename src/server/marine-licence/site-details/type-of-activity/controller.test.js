@@ -1,18 +1,24 @@
 import { vi } from 'vitest'
 import {
   typeOfActivitySubmitController,
-  MARINE_LICENCE_TYPE_OF_ACTIVITY_VIEW_ROUTE,
-  typeOfActivityErrorMessages
+  typeOfActivitySettings,
+  typeOfActivityErrorMessages,
+  MARINE_LICENCE_TYPE_OF_ACTIVITY_VIEW_ROUTE
 } from '#src/server/marine-licence/site-details/type-of-activity/controller.js'
-
 import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
 import {
   getMarineLicenceCache,
-  updateMarineLicenceSiteDetails
+  updateMarineLicenceSiteActivityDetails
 } from '#src/server/common/helpers/marine-licence/session-cache/utils.js'
+import { createFailAction } from '#src/server/common/helpers/createFailAction.js'
 import { mockMarineLicenceApplication } from '#src/server/test-helpers/mocks/marine-licence-mocks.js'
+import {
+  createMockRequest,
+  createMockH
+} from '#src/server/test-helpers/mocks/helpers.js'
 
 vi.mock('~/src/server/common/helpers/marine-licence/session-cache/utils.js')
+vi.mock('~/src/server/common/helpers/createFailAction.js')
 
 describe('#typeOfActivity', () => {
   beforeEach(() => {
@@ -22,75 +28,62 @@ describe('#typeOfActivity', () => {
   })
 
   describe('#typeOfActivitySubmitController', () => {
-    test('failAction should pass errors through to view', () => {
-      const request = {
-        payload: {
-          activityType: 'construction',
-          activitySubTypeConstruction: ''
-        }
-      }
-      const viewH = {
-        view: vi.fn().mockReturnValue({ takeover: vi.fn() })
-      }
+    test('createFailAction was called with params', () => {
+      const mockFailAction = vi.fn()
+      vi.mocked(createFailAction).mockReturnValue(mockFailAction)
 
-      const err = {
-        details: [
-          {
-            path: ['activitySubTypeConstruction'],
-            message: 'ACTIVITY_TYPE_CONSTRUCTION_REQUIRED',
-            type: 'custom'
-          }
-        ]
-      }
+      const request = createMockRequest({ query: { site: 1, activity: 1 } })
+      const h = createMockH()
+      const err = new Error('validation error')
 
       typeOfActivitySubmitController.options.validate.failAction(
         request,
-        viewH,
+        h,
         err
       )
 
-      expect(viewH.view).toHaveBeenCalledWith(
-        MARINE_LICENCE_TYPE_OF_ACTIVITY_VIEW_ROUTE,
-        expect.objectContaining({
-          errorSummary: [
-            {
-              href: '#activitySubTypeConstruction',
-              text: typeOfActivityErrorMessages.ACTIVITY_TYPE_CONSTRUCTION_REQUIRED,
-              field: ['activitySubTypeConstruction']
-            }
-          ]
-        })
-      )
-      expect(viewH.view().takeover).toHaveBeenCalled()
+      expect(createFailAction).toHaveBeenCalledWith({
+        getCache: getMarineLicenceCache,
+        viewRoute: MARINE_LICENCE_TYPE_OF_ACTIVITY_VIEW_ROUTE,
+        settings: typeOfActivitySettings,
+        errorMessages: typeOfActivityErrorMessages,
+        getBackLink: expect.any(Function),
+        params: {
+          cancelLink: marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS,
+          activityDetailsNumber: 1,
+          siteNumber: 1
+        }
+      })
     })
 
     test('handler should persist activityType and activitySubType and redirect', async () => {
-      const redirectH = {
-        redirect: vi.fn().mockReturnValue({ takeover: vi.fn() })
-      }
-      const request = {
+      const redirectH = createMockH()
+      const request = createMockRequest({
+        query: { site: 1, activity: 1 },
         payload: {
           activityType: 'removal',
           activitySubTypeConstruction: '',
           activitySubTypeDeposit: '',
           activitySubTypeRemoval: 'removal-type-2'
         }
-      }
+      })
 
       await typeOfActivitySubmitController.handler(request, redirectH)
 
-      expect(updateMarineLicenceSiteDetails).toHaveBeenNthCalledWith(
+      expect(updateMarineLicenceSiteActivityDetails).toHaveBeenNthCalledWith(
         1,
         request,
         redirectH,
         0,
+        0,
         'activityType',
         'removal'
       )
-      expect(updateMarineLicenceSiteDetails).toHaveBeenNthCalledWith(
+      expect(updateMarineLicenceSiteActivityDetails).toHaveBeenNthCalledWith(
         2,
         request,
         redirectH,
+        0,
         0,
         'activitySubType',
         'removal-type-2'

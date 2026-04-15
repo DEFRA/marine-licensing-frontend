@@ -22,6 +22,7 @@ export const mockMarineLicenceApplication = {
       coordinatesType: 'file',
       fileUploadType: 'kml',
       siteName: 'test site name',
+      featureCount: 1,
       activityDetails: [
         {
           activityType: 'Test type',

@@ -36,9 +36,9 @@ const createValidationFailAction = (request, h, err) => {
   const { payload } = request
   const exemption = getExemptionCache(request)
 
-  const { action, site } = request.query
+  const { action } = request.query
 
-  const { siteIndex, siteNumber } = getSiteDataFromParam(site)
+  const { siteIndex, siteNumber } = getSiteDataFromParam(request.query)
 
   if (!err.details) {
     return h
@@ -79,7 +79,7 @@ export const siteNameController = {
     const { action, site } = request.query
     const { siteDetails } = exemption
 
-    const { siteIndex, siteNumber } = getSiteDataFromParam(site)
+    const { siteIndex, siteNumber } = getSiteDataFromParam(request.query)
 
     if (site && hasInvalidSiteNumber(siteNumber, siteDetails)) {
       return h.redirect(routes.TASK_LIST)
@@ -115,7 +115,7 @@ export const siteNameSubmitController = {
 
     const { action, site } = request.query
 
-    const { siteIndex, siteNumber } = getSiteDataFromParam(site)
+    const { siteIndex, siteNumber } = getSiteDataFromParam(request.query)
 
     const queryParams = site ? `?site=${site}` : ''
 

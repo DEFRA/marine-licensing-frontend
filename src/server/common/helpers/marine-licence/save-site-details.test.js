@@ -36,8 +36,10 @@ describe('save-site-details', () => {
       expect(result[0]).toEqual({
         coordinatesType: 'file',
         fileUploadType: 'kml',
+        activityDetails:
+          mockMarineLicenceApplication.siteDetails[0].activityDetails,
         geoJSON: mockMarineLicenceApplication.siteDetails[0].geoJSON,
-        featureCount: 0,
+        featureCount: mockMarineLicenceApplication.siteDetails[0].featureCount,
         siteName: 'test site name',
         uploadedFile: { filename: 'test-upload-id' },
         s3Location: {
@@ -50,7 +52,7 @@ describe('save-site-details', () => {
       expect(mockRequest.logger.info).toHaveBeenCalledWith(
         {
           fileType: 'kml',
-          featureCount: 0,
+          featureCount: 1,
           filename: 'test-upload-id'
         },
         'Saving file upload site details'
@@ -182,7 +184,7 @@ describe('save-site-details', () => {
         mockRequest,
         apiRoutes.UPDATE_MARINE_LICENCE_SITE,
         {
-          siteDetails: expect.any(Array),
+          siteDetails: mockMarineLicenceApplication.siteDetails[0],
           siteIndex: 0,
           id: mockMarineLicenceApplication.id
         }

@@ -18,13 +18,30 @@
         classes: "govuk-link--no-visited-state"
       }
     ]
-  }
+  } if not params.isReadOnly
+},{
+  key: {
+    text: "Project background"
+  },
+  value: {
+    text: params.projectBackground
+  },
+  actions: {
+    items: [
+      {
+        href: "/marine-licence/project-background?from=check-your-answers",
+        text: "Change",
+        visuallyHiddenText: "project background",
+        classes: "govuk-link--no-visited-state"
+      }
+    ]
+  } if not params.isReadOnly
 }), rows) %}
 
 {{ govukSummaryList({
   card: {
     title: {
-      text: "Project summary"
+      text: "Project details"
     },
     attributes: {
       id: "project-details-card"

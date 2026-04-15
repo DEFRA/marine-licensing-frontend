@@ -178,6 +178,11 @@ describe('Page accessibility checks (Axe)', () => {
       isMarineLicence: true
     },
     {
+      url: marineLicenceRoutes.MARINE_LICENCE_PROJECT_BACKGROUND,
+      title: 'Project background',
+      isMarineLicence: true
+    },
+    {
       url: marineLicenceRoutes.MARINE_LICENCE_SPECIAL_LEGAL_POWERS,
       title:
         'Does your organisation have special legal powers to do any of this project?',
@@ -192,7 +197,8 @@ describe('Page accessibility checks (Axe)', () => {
     },
     {
       url: marineLicenceRoutes.MARINE_LICENCE_PUBLIC_REGISTER,
-      title: 'Sharing your project information publicly'
+      title: 'Sharing your project information publicly',
+      isMarineLicence: true
     },
     {
       url: marineLicenceRoutes.MARINE_LICENCE_TASK_LIST,

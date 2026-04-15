@@ -3,7 +3,11 @@ import {
   getQuestion,
   getSection
 } from '#src/server/journey/self-service/services/journey-data.js'
-import { getBackLink } from '#src/server/journey/self-service/services/journey-history.js'
+import {
+  getBackLink,
+  getAnswerForRoute
+} from '#src/server/journey/self-service/services/session-answers.js'
+import { statusCodes } from '#src/server/common/constants/status-codes.js'
 
 const VIEW_PATH = 'journey/self-service/question/index'
 
@@ -22,7 +26,8 @@ export const questionController = {
       pageTitle: question.text,
       question,
       section,
-      backLink: getBackLink(request, questionRoute)
+      backLink: getBackLink(request, questionRoute),
+      selectedAnswer: getAnswerForRoute(request, questionRoute)
     })
   }
 }

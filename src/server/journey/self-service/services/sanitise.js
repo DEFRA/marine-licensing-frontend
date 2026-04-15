@@ -4,9 +4,16 @@ const sanitiseOptions = {
   allowedTags: ['a', 'b', 'br', 'li', 'ol', 'p', 'strong', 'u', 'ul'],
   allowedAttributes: {
     a: ['href', 'target', 'rel'],
-    ol: ['type']
+    ol: ['type'],
+    p: ['class']
   },
-  allowedSchemes: ['http', 'https']
+  allowedSchemes: ['http', 'https'],
+  transformTags: {
+    p: (tagName, attribs) => ({
+      tagName,
+      attribs: { ...attribs, class: 'govuk-hint' }
+    })
+  }
 }
 
 export function sanitise(text) {

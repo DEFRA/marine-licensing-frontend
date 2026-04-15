@@ -291,6 +291,14 @@ export const config = convict({
       env: 'ENABLE_MARINE_LICENCE'
     }
   },
+  selfService: {
+    enabled: {
+      doc: 'Enable the Self Service IAT journey',
+      format: Boolean,
+      default: false,
+      env: 'ENABLE_SELF_SERVICE'
+    }
+  },
   defraId: {
     accountManagementUrl: {
       doc: 'Defra ID account management portal URL',

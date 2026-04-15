@@ -1,5 +1,6 @@
 import inert from '@hapi/inert'
 
+import { config } from '#src/config/config.js'
 import { health } from '#src/server/health/index.js'
 import { home } from '#src/server/home/index.js'
 import { serveStaticFiles } from '#src/server/common/helpers/serve-static-files.js'
@@ -30,7 +31,7 @@ export const router = {
       await server.register([browserLogs])
 
       // Application specific routes, add your own routes here
-      await server.register([
+      const plugins = [
         exemption,
         about,
         home,
@@ -41,10 +42,14 @@ export const router = {
         internalUserAdmin,
         marineLicence,
         declaration,
-        serviceHome,
-        journeySelfServiceStart,
-        journeySelfServiceQuestion
-      ])
+        serviceHome
+      ]
+
+      if (config.get('selfService.enabled')) {
+        plugins.push(journeySelfServiceStart, journeySelfServiceQuestion)
+      }
+
+      await server.register(plugins)
 
       // Static assets
       await server.register([serveStaticFiles])

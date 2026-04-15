@@ -2,8 +2,10 @@ import { JSDOM } from 'jsdom'
 import { statusCodes } from '#src/server/common/constants/status-codes.js'
 import { setupTestServer } from '#tests/integration/shared/test-setup-helpers.js'
 import { makeGetRequest } from '#src/server/test-helpers/server-requests.js'
+import { config } from '#src/config/config.js'
 
 describe('#iatStartController (integration)', () => {
+  config.set('selfService.enabled', true)
   const getServer = setupTestServer()
 
   const getPage = async () => {

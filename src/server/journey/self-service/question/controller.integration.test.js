@@ -5,8 +5,10 @@ import {
   makeGetRequest,
   makePostRequest
 } from '#src/server/test-helpers/server-requests.js'
+import { config } from '#src/config/config.js'
 
 describe('#questionController (integration)', () => {
+  config.set('selfService.enabled', true)
   const getServer = setupTestServer()
 
   const getPage = async (path = '/journey/self-service/sea', headers = {}) => {

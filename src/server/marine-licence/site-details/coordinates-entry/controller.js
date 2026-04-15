@@ -29,12 +29,15 @@ export const coordinatesEntryController = {
   handler(request, h) {
     const marineLicence = getMarineLicenceCache(request)
     const siteDetails = getSiteDetailsBySite(marineLicence)
+    const action = request.query.action
 
     return h.view(MARINE_LICENCE_COORDINATES_ENTRY_VIEW_ROUTE, {
       ...coordinatesEntrySettings,
       backLink: getBackRoute(),
       cancelLink,
       projectName: marineLicence.projectName,
+      siteNumber: null,
+      action,
       payload: {
         coordinatesEntry: siteDetails.coordinatesEntry
       }
@@ -59,6 +62,7 @@ export const coordinatesEntrySubmitController = {
       failAction: (request, h, err) => {
         const { payload } = request
         const { projectName } = getMarineLicenceCache(request)
+        const action = request.query.action
 
         if (!err.details) {
           return h
@@ -67,7 +71,9 @@ export const coordinatesEntrySubmitController = {
               backLink: getBackRoute(),
               cancelLink,
               payload,
-              projectName
+              projectName,
+              siteNumber: null,
+              action
             })
             .takeover()
         }
@@ -82,6 +88,8 @@ export const coordinatesEntrySubmitController = {
             cancelLink,
             payload,
             projectName,
+            siteNumber: null,
+            action,
             errors,
             errorSummary
           })

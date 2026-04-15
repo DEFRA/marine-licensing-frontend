@@ -9,6 +9,7 @@ import {
   updateMarineLicenceSiteDetails
 } from '#src/server/common/helpers/marine-licence/session-cache/utils.js'
 import { mockMarineLicenceApplication } from '#src/server/test-helpers/mocks/marine-licence-mocks.js'
+import { createMockRequest } from '#src/server/test-helpers/mocks/helpers.js'
 import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
 
 vi.mock('#src/server/common/helpers/marine-licence/session-cache/utils.js')
@@ -27,7 +28,7 @@ describe('#coordinatesEntry (marine licence)', () => {
     test('handler should render with correct context', () => {
       const h = { view: vi.fn() }
 
-      coordinatesEntryController.handler({}, h)
+      coordinatesEntryController.handler(createMockRequest(), h)
 
       expect(h.view).toHaveBeenCalledWith(
         MARINE_LICENCE_COORDINATES_ENTRY_VIEW_ROUTE,
@@ -37,6 +38,8 @@ describe('#coordinatesEntry (marine licence)', () => {
           backLink: marineLicenceRoutes.MARINE_LICENCE_SITE_NAME,
           cancelLink,
           projectName: 'Test Project',
+          siteNumber: null,
+          action: undefined,
           payload: {
             coordinatesEntry: 'single'
           }
@@ -52,7 +55,7 @@ describe('#coordinatesEntry (marine licence)', () => {
 
       const h = { view: vi.fn() }
 
-      coordinatesEntryController.handler({}, h)
+      coordinatesEntryController.handler(createMockRequest(), h)
 
       expect(h.view).toHaveBeenCalledWith(
         MARINE_LICENCE_COORDINATES_ENTRY_VIEW_ROUTE,
@@ -62,6 +65,8 @@ describe('#coordinatesEntry (marine licence)', () => {
           backLink: marineLicenceRoutes.MARINE_LICENCE_SITE_NAME,
           cancelLink,
           projectName: 'Test Project',
+          siteNumber: null,
+          action: undefined,
           payload: {
             coordinatesEntry: undefined
           }
@@ -72,9 +77,9 @@ describe('#coordinatesEntry (marine licence)', () => {
 
   describe('#coordinatesEntrySubmitController', () => {
     test('should correctly format error data', () => {
-      const request = {
+      const request = createMockRequest({
         payload: { coordinatesEntry: 'invalid' }
-      }
+      })
 
       const h = {
         view: vi.fn().mockReturnValue({
@@ -106,6 +111,8 @@ describe('#coordinatesEntry (marine licence)', () => {
           backLink: marineLicenceRoutes.MARINE_LICENCE_SITE_NAME,
           cancelLink,
           projectName: 'Test Project',
+          siteNumber: null,
+          action: undefined,
           payload: { coordinatesEntry: 'invalid' },
           errorSummary: [
             {
@@ -128,9 +135,9 @@ describe('#coordinatesEntry (marine licence)', () => {
     })
 
     test('should output page with no error data in object', () => {
-      const request = {
+      const request = createMockRequest({
         payload: { coordinatesEntry: 'invalid' }
-      }
+      })
 
       const h = {
         view: vi.fn().mockReturnValue({
@@ -152,6 +159,8 @@ describe('#coordinatesEntry (marine licence)', () => {
           backLink: marineLicenceRoutes.MARINE_LICENCE_SITE_NAME,
           cancelLink,
           projectName: 'Test Project',
+          siteNumber: null,
+          action: undefined,
           payload: { coordinatesEntry: 'invalid' }
         }
       )
@@ -159,40 +168,62 @@ describe('#coordinatesEntry (marine licence)', () => {
       expect(h.view().takeover).toHaveBeenCalled()
     })
 
-    test('should correctly validate on valid data', () => {
+    test('Should correctly validate on valid data', () => {
+      const request = { coordinatesEntry: 'single' }
+
       const payloadValidator =
         coordinatesEntrySubmitController.options.validate.payload
 
-      expect(
-        payloadValidator.validate({ coordinatesEntry: 'single' }).error
-      ).toBeUndefined()
-      expect(
-        payloadValidator.validate({ coordinatesEntry: 'multiple' }).error
-      ).toBeUndefined()
+      const result = payloadValidator.validate(request)
+
+      expect(result.error).toBeUndefined()
     })
 
-    test('should correctly validate on empty data', () => {
+    test('Should correctly validate on empty data', () => {
+      const request = {}
+
       const payloadValidator =
         coordinatesEntrySubmitController.options.validate.payload
 
-      const result = payloadValidator.validate({})
+      const result = payloadValidator.validate(request)
 
       expect(result.error.message).toBe('COORDINATES_ENTRY_REQUIRED')
     })
 
-    test('should correctly validate on invalid data', () => {
+    test('Should correctly validate on invalid data', () => {
+      const request = { coordinatesEntry: 'invalid' }
+
       const payloadValidator =
         coordinatesEntrySubmitController.options.validate.payload
 
-      const result = payloadValidator.validate({ coordinatesEntry: 'invalid' })
+      const result = payloadValidator.validate(request)
 
       expect(result.error.message).toBe('COORDINATES_ENTRY_REQUIRED')
     })
 
-    test('should redirect to coordinate system choice on successful POST', async () => {
+    test('Should correctly navigate to next page when POST is successful', async () => {
       const h = { redirect: vi.fn() }
 
-      const request = { payload: { coordinatesEntry: 'single' } }
+      const request = createMockRequest({
+        payload: { coordinatesEntry: 'single' }
+      })
+
+      await coordinatesEntrySubmitController.handler(request, h)
+
+      expect(h.redirect).toHaveBeenCalledWith(
+        marineLicenceRoutes.MARINE_LICENCE_COORDINATES_ENTRY_CHOICE
+      )
+    })
+
+    test('Should correctly set the cache when submitting', async () => {
+      const h = {
+        redirect: vi.fn().mockReturnValue({ takeover: vi.fn() }),
+        view: vi.fn()
+      }
+
+      const request = createMockRequest({
+        payload: { coordinatesEntry: 'single' }
+      })
 
       await coordinatesEntrySubmitController.handler(request, h)
 
@@ -202,9 +233,6 @@ describe('#coordinatesEntry (marine licence)', () => {
         0,
         'coordinatesEntry',
         'single'
-      )
-      expect(h.redirect).toHaveBeenCalledWith(
-        marineLicenceRoutes.MARINE_LICENCE_COORDINATES_ENTRY_CHOICE
       )
     })
   })

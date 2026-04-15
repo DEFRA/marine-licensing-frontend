@@ -63,6 +63,111 @@ describe('Type of activity (marine licence)', () => {
     )
   })
 
+  test('pre-selects construction activity type and sub-type', async () => {
+    mockMarineLicence({
+      ...mockMarineLicenceApplication,
+      siteDetails: [
+        {
+          ...mockMarineLicenceApplication.siteDetails[0],
+          activityDetails: [
+            {
+              ...mockMarineLicenceApplication.siteDetails[0].activityDetails[0],
+              activityType: 'construction',
+              activitySubType: 'construction-type-2'
+            }
+          ]
+        }
+      ]
+    })
+
+    const document = await loadPage({
+      requestUrl: `${marineLicenceRoutes.MARINE_LICENCE_TYPE_OF_ACTIVITY}?site=1&activity=1`,
+      server: getServer()
+    })
+
+    expect(
+      getByRole(document, 'radio', {
+        name: 'Construction, alteration or improvement of any works'
+      })
+    ).toBeChecked()
+
+    expect(
+      getByRole(document, 'radio', {
+        name: 'Maintenance of existing works'
+      })
+    ).toBeChecked()
+  })
+
+  test('pre-selects deposit activity type and sub-type', async () => {
+    mockMarineLicence({
+      ...mockMarineLicenceApplication,
+      siteDetails: [
+        {
+          ...mockMarineLicenceApplication.siteDetails[0],
+          activityDetails: [
+            {
+              ...mockMarineLicenceApplication.siteDetails[0].activityDetails[0],
+              activityType: 'deposit',
+              activitySubType: 'deposit-type-1'
+            }
+          ]
+        }
+      ]
+    })
+
+    const document = await loadPage({
+      requestUrl: `${marineLicenceRoutes.MARINE_LICENCE_TYPE_OF_ACTIVITY}?site=1&activity=1`,
+      server: getServer()
+    })
+
+    expect(
+      getByRole(document, 'radio', {
+        name: 'Deposit of any substance or object'
+      })
+    ).toBeChecked()
+
+    expect(
+      getByRole(document, 'radio', {
+        name: 'Continuation of existing deposit activity'
+      })
+    ).toBeChecked()
+  })
+
+  test('pre-selects removal activity type and sub-type', async () => {
+    mockMarineLicence({
+      ...mockMarineLicenceApplication,
+      siteDetails: [
+        {
+          ...mockMarineLicenceApplication.siteDetails[0],
+          activityDetails: [
+            {
+              ...mockMarineLicenceApplication.siteDetails[0].activityDetails[0],
+              activityType: 'removal',
+              activitySubType: 'removal-type-3'
+            }
+          ]
+        }
+      ]
+    })
+
+    const document = await loadPage({
+      requestUrl: `${marineLicenceRoutes.MARINE_LICENCE_TYPE_OF_ACTIVITY}?site=1&activity=1`,
+      server: getServer()
+    })
+
+    expect(
+      getByRole(document, 'radio', {
+        name: 'Removal of any substance or object'
+      })
+    ).toBeChecked()
+
+    expect(
+      getByRole(document, 'radio', {
+        name: 'Removal for replacement'
+      })
+    ).toBeChecked()
+  })
+
   test('redirects after valid submission', async () => {
     mockMarineLicence(mockMarineLicenceApplication)
 

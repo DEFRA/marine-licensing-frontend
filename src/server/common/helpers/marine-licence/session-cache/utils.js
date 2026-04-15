@@ -55,9 +55,8 @@ export const updateMarineLicenceSiteActivityDetails = async (
   value
 ) => {
   const existingCache = getMarineLicenceCache(request)
-  const existingSiteDetails = existingCache.siteDetails || []
   const existingActivityDetails =
-    existingSiteDetails[siteIndex]?.activityDetails || []
+    existingCache.siteDetails[siteIndex]?.activityDetails || []
 
   const updatedActivityDetails = [...existingActivityDetails]
   updatedActivityDetails[activityDetailsIndex] = {

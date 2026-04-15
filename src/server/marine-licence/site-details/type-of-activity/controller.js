@@ -23,11 +23,9 @@ const cancelLink = marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS
 
 const subTypePayload = (activityType, activitySubType) => ({
   activitySubTypeConstruction:
-    activityType === 'construction' ? (activitySubType ?? '') : '',
-  activitySubTypeDeposit:
-    activityType === 'deposit' ? (activitySubType ?? '') : '',
-  activitySubTypeRemoval:
-    activityType === 'removal' ? (activitySubType ?? '') : ''
+    activityType === 'construction' ? activitySubType : '',
+  activitySubTypeDeposit: activityType === 'deposit' ? activitySubType : '',
+  activitySubTypeRemoval: activityType === 'removal' ? activitySubType : ''
 })
 
 export const typeOfActivitySettings = {

@@ -11,7 +11,8 @@ describe('#site name utils', () => {
         activityDetailsNumber: 3
       })
     })
-    test('returns defaults when called with undefined value', () => {
+
+    test('returns defaults when called with all undefined value', () => {
       const result = getSiteDataFromParam(undefined)
       expect(result).toEqual({
         siteIndex: 0,

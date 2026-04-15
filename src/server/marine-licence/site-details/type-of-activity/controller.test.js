@@ -49,7 +49,6 @@ describe('#typeOfActivity', () => {
         errorMessages: typeOfActivityErrorMessages,
         getBackLink: expect.any(Function),
         params: {
-          cancelLink: marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS,
           activityDetailsNumber: 1,
           siteNumber: 1
         }

@@ -19,7 +19,6 @@ export const MARINE_LICENCE_TYPE_OF_ACTIVITY_VIEW_ROUTE =
   'marine-licence/site-details/type-of-activity/index'
 
 const backLink = marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS
-const cancelLink = marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS
 
 const subTypePayload = (activityType, activitySubType) => ({
   activitySubTypeConstruction:
@@ -53,7 +52,6 @@ export const typeOfActivityController = {
     return h.view(MARINE_LICENCE_TYPE_OF_ACTIVITY_VIEW_ROUTE, {
       ...typeOfActivitySettings,
       backLink,
-      cancelLink,
       projectName: marineLicence.projectName,
       siteNumber,
       activityDetailsNumber,
@@ -82,7 +80,7 @@ export const typeOfActivitySubmitController = {
           settings: typeOfActivitySettings,
           errorMessages: typeOfActivityErrorMessages,
           getBackLink: () => backLink,
-          params: { cancelLink, activityDetailsNumber, siteNumber }
+          params: { activityDetailsNumber, siteNumber }
         })(request, h, err)
       }
     }

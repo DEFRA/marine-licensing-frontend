@@ -3,7 +3,6 @@
 {% from "govuk/components/button/macro.njk" import govukButton %}
 {% from "govuk/components/radios/macro.njk" import govukRadios %}
 {% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
-{% from "cancel-button/macro.njk" import appCancelButton %}
 
 {% block beforeContent %}
 {{ super() }}
@@ -180,9 +179,6 @@
             classes: "govuk-button--primary"
           }) }}
 
-          {{ appCancelButton({
-            cancelLink: cancelLink
-          }) }}
         </div>
 
       </form>

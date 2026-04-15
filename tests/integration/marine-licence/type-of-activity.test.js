@@ -56,11 +56,6 @@ describe('Type of activity (marine licence)', () => {
     expect(
       getByRole(document, 'button', { name: 'Continue' })
     ).toBeInTheDocument()
-
-    expect(getByRole(document, 'link', { name: 'Cancel' })).toHaveAttribute(
-      'href',
-      `${marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS}`
-    )
   })
 
   test('pre-selects construction activity type and sub-type', async () => {

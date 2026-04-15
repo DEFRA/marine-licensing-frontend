@@ -1,11 +1,12 @@
-import { describe, test, expect, vi } from 'vitest'
+import { vi } from 'vitest'
 
-vi.mock('#src/server/journey/self-service/services/journey-data.js', () => ({
-  getFirstQuestionRoute: vi.fn(() => '/sea')
-}))
+vi.mock('#src/server/journey/self-service/services/session-answers.js')
 
-const { iatStartController } =
-  await import('#src/server/journey/self-service/start/controller.js')
+import {
+  iatStartController,
+  iatStartPostController
+} from '#src/server/journey/self-service/start/controller.js'
+import { clearAnswers } from '#src/server/journey/self-service/services/session-answers.js'
 
 describe('iatStartController', () => {
   test('passes firstQuestionRoute to the view', () => {
@@ -41,5 +42,17 @@ describe('iatStartController', () => {
         guidance: 'https://www.gov.uk/guidance/do-i-need-a-marine-licence'
       }
     })
+  })
+})
+
+describe('#iatStartPostController', () => {
+  test('clears answers and redirects to first question', () => {
+    const request = {}
+    const h = { redirect: vi.fn() }
+
+    iatStartPostController.handler(request, h)
+
+    expect(clearAnswers).toHaveBeenCalledWith(request)
+    expect(h.redirect).toHaveBeenCalledWith('/journey/self-service/sea')
   })
 })

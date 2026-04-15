@@ -1,3 +1,7 @@
+import { clearAnswers } from '#src/server/journey/self-service/services/session-answers.js'
+
+const FIRST_QUESTION_PATH = '/journey/self-service/sea'
+
 import { getFirstQuestionRoute } from '#src/server/journey/self-service/services/journey-data.js'
 
 export const iatStartController = {
@@ -15,5 +19,12 @@ export const iatStartController = {
         guidance: 'https://www.gov.uk/guidance/do-i-need-a-marine-licence'
       }
     })
+  }
+}
+
+export const iatStartPostController = {
+  handler(request, h) {
+    clearAnswers(request)
+    return h.redirect(FIRST_QUESTION_PATH)
   }
 }

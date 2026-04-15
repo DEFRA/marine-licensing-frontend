@@ -73,12 +73,14 @@ describe('#iatStartController (integration)', () => {
     expect(backLink.getAttribute('style')).toBeNull()
   })
 
-  test('Renders a "Start now" button linking to the first question', async () => {
+  test('Renders a "Start now" button inside a POST form', async () => {
     const { document } = await getPage()
     const startButton = document.querySelector('.govuk-button--start')
     expect(startButton).not.toBeNull()
     expect(startButton.textContent).toContain('Start now')
-    expect(startButton.getAttribute('href')).toBe('/journey/self-service/sea')
+    const form = startButton.closest('form')
+    expect(form).not.toBeNull()
+    expect(form.getAttribute('method')).toBe('POST')
   })
 
   test('Does not render the phase banner', async () => {

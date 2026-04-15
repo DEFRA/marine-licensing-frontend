@@ -11,10 +11,7 @@ import {
   getSection
 } from '#src/server/journey/self-service/services/journey-data.js'
 import { calculateNextRoute } from '#src/server/journey/self-service/services/journey-router.js'
-import {
-  pushAnswer,
-  getBackLink
-} from '#src/server/journey/self-service/services/session-answers.js'
+import { pushAnswer } from '#src/server/journey/self-service/services/session-answers.js'
 
 describe('#questionPostController', () => {
   const mockQuestion = {

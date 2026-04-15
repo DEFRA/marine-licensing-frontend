@@ -11,8 +11,6 @@ import {
 } from '#src/server/journey/self-service/services/journey-data.js'
 import { calculateNextRoute } from '#src/server/journey/self-service/services/journey-router.js'
 import { pushRoute } from '#src/server/journey/self-service/services/journey-history.js'
-import { statusCodes } from '#src/server/common/constants/status-codes.js'
-
 describe('#questionPostController', () => {
   const mockQuestion = {
     route: '/sea',
@@ -95,7 +93,7 @@ describe('#questionPostController', () => {
         errorSummary: [{ text: 'Select an option', href: '#answer' }]
       })
     )
-    expect(codeStub).toHaveBeenCalledWith(statusCodes.badRequest)
+    expect(codeStub).toHaveBeenCalledWith(400)
   })
 
   test('returns 400 with error when payload is null', () => {
@@ -108,19 +106,22 @@ describe('#questionPostController', () => {
 
     questionPostController.handler(request, h)
 
-    expect(codeStub).toHaveBeenCalledWith(statusCodes.badRequest)
+    expect(codeStub).toHaveBeenCalledWith(400)
   })
 
-  test('returns 404 when question is not found', () => {
+  test('throws Boom.notFound when question is not found', () => {
     vi.mocked(getQuestion).mockReturnValue(null)
     const request = {
       params: { questionPath: 'nonexistent' },
       payload: { answer: 'anything' }
     }
-    const h = { response: vi.fn().mockReturnValue({ code: vi.fn() }) }
+    const h = { view: vi.fn() }
 
-    questionPostController.handler(request, h)
-
-    expect(h.response).toHaveBeenCalledWith('Not found')
+    expect(() => questionPostController.handler(request, h)).toThrow(
+      expect.objectContaining({
+        isBoom: true,
+        output: expect.objectContaining({ statusCode: 404 })
+      })
+    )
   })
 })

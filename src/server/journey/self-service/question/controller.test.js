@@ -47,20 +47,17 @@ describe('#questionController', () => {
     })
   })
 
-  test('returns 404 when question is not found', () => {
+  test('throws Boom.notFound when question is not found', () => {
     vi.mocked(getQuestion).mockReturnValue(null)
     const request = { params: { questionPath: 'nonexistent' } }
-    const mockCodeFn = vi.fn().mockReturnValue('response-object')
-    const mockResponseFn = vi.fn().mockReturnValue({ code: mockCodeFn })
-    const h = {
-      view: vi.fn(),
-      response: mockResponseFn
-    }
+    const h = { view: vi.fn() }
 
-    const result = questionController.handler(request, h)
-
-    expect(mockCodeFn).toHaveBeenCalledWith(404)
-    expect(result).toBe('response-object')
+    expect(() => questionController.handler(request, h)).toThrow(
+      expect.objectContaining({
+        isBoom: true,
+        output: expect.objectContaining({ statusCode: 404 })
+      })
+    )
   })
 
   test('passes null section when question has no section', () => {

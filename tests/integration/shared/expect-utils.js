@@ -132,6 +132,9 @@ export const expectNoFieldsetError = ({
   expect(within(fieldset).queryByText(errorMessage)).not.toBeInTheDocument()
 }
 
+export const expectedValueOrIncomplete = (value) =>
+  value && value !== '' && value !== 'Incomplete' ? value : 'Incomplete'
+
 /* use expectFieldsetError instead */
 export const validateErrors = (expectedErrors, document) => {
   const errorSummary = getByRole(document, 'alert')

@@ -1,9 +1,14 @@
 import { getFileUploadSummaryData } from '#src/server/common/helpers/review-site-details/file-upload.js'
+import { mockMarineLicenceApplication } from '#src/server/test-helpers/mocks/marine-licence-mocks.js'
 
 describe('getFileUploadSummaryData util', () => {
+  const activityDetails =
+    mockMarineLicenceApplication.siteDetails[0].activityDetails
+
   test('getFileUploadSummaryData correctly parses coordinates from geoJSON for KML', () => {
     const project = {
       siteDetails: {
+        activityDetails,
         fileUploadType: 'kml',
         uploadedFile: {
           filename: 'test-site.kml'
@@ -41,6 +46,7 @@ describe('getFileUploadSummaryData util', () => {
     const result = getFileUploadSummaryData(project)
 
     expect(result).toEqual({
+      activityDetails,
       coordinates: [
         {
           type: 'Point',
@@ -92,6 +98,7 @@ describe('getFileUploadSummaryData util', () => {
   test('getFileUploadSummaryData correctly parses coordinates from geoJSON for Shapefile', () => {
     const project = {
       siteDetails: {
+        activityDetails,
         fileUploadType: 'shapefile',
         uploadedFile: {
           filename: 'test-site.shp'
@@ -118,6 +125,7 @@ describe('getFileUploadSummaryData util', () => {
     const result = getFileUploadSummaryData(project)
 
     expect(result).toEqual({
+      activityDetails,
       coordinates: [
         {
           type: 'LineString',
@@ -162,7 +170,8 @@ describe('getFileUploadSummaryData util', () => {
 
     expect(result).toEqual({
       coordinates: [],
-      geoJSON: {}
+      geoJSON: {},
+      activityDetails: []
     })
   })
 
@@ -173,7 +182,8 @@ describe('getFileUploadSummaryData util', () => {
 
     expect(result).toEqual({
       coordinates: [],
-      geoJSON: {}
+      geoJSON: {},
+      activityDetails: []
     })
   })
 
@@ -197,7 +207,8 @@ describe('getFileUploadSummaryData util', () => {
 
     expect(result).toEqual({
       coordinates: [],
-      geoJSON: {}
+      geoJSON: {},
+      activityDetails: []
     })
   })
 })

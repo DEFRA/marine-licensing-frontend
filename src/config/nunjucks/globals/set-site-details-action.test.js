@@ -152,12 +152,47 @@ describe('setSiteDetailsAction', () => {
   })
 
   test('should accept override to not output any action param', () => {
-    const result = setSiteDetailsAction('Value', '/page', 1, '', true)
+    const result = setSiteDetailsAction('Value', '/page', 1, '', {
+      skipAction: true
+    })
     expect(result).toEqual({
       items: [
         {
           classes: 'govuk-link--no-visited-state',
           href: '/page?site=1',
+          text: 'Change'
+        }
+      ]
+    })
+  })
+
+  test('should include activity query param when provided', () => {
+    const result = setSiteDetailsAction('Value', '/page', 1, '', {
+      skipAction: true,
+      activityNumber: 2
+    })
+
+    expect(result).toEqual({
+      items: [
+        {
+          classes: 'govuk-link--no-visited-state',
+          href: '/page?site=1&activity=2',
+          text: 'Change'
+        }
+      ]
+    })
+  })
+
+  test('should include activity with action when no site is provided', () => {
+    const result = setSiteDetailsAction('Value', '/page', null, '', {
+      activityNumber: 3
+    })
+
+    expect(result).toEqual({
+      items: [
+        {
+          classes: 'govuk-link--no-visited-state',
+          href: '/page?activity=3&action=change',
           text: 'Change'
         }
       ]

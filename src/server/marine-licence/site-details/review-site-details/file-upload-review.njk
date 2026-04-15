@@ -2,10 +2,10 @@
 {% from "govuk/components/back-link/macro.njk" import govukBackLink %}
 {% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
 {% from "govuk/components/button/macro.njk" import govukButton %}
-{% from "cancel-button/macro.njk" import appCancelButton %}
 {% from "site-details-map/macro.njk" import appSiteDetailsMap %}
 {% from "incomplete-field/macro.njk" import appIncompleteField %}
 {% from "incomplete-fields-warning/macro.njk" import appIncompleteFieldsWarning %}
+{% from "marine-licence/activity-details-card/macro.njk" import appMarineLicenceActivityDetailsCard %}
 {% block head %}
   {{ super() }}
 {% endblock %}
@@ -68,7 +68,7 @@
           {% set _ = rows.push({
             key: { text: "Site name"},
             value: { html: appIncompleteField({text: site.siteName})},
-            actions: setSiteDetailsAction(site.siteName, 'site-name', site.siteNumber,"",true)
+            actions: setSiteDetailsAction(site.siteName, 'site-name', site.siteNumber, "", { skipAction: true })
           }) %}
 
           {% set _ = rows.push({
@@ -88,6 +88,37 @@
             classes: 'govuk-summary-list--full-width',
             rows: rows
         }) }}
+
+          {% for activityDetails in site.activityDetails %}
+
+            {{ appMarineLicenceActivityDetailsCard({
+              activityDetails: activityDetails,
+              siteNumber: site.siteNumber ,
+              index: loop.index
+            }) }}
+
+          {% endfor %}
+
+
+        <form method="POST">
+          <input type="hidden" name="csrfToken" value="{{ csrfToken }}">
+          <input type="hidden" name="siteNumber" value="{{ site.siteNumber }}">
+
+          <div class="govuk-!-margin-bottom-6">
+            {{ govukButton({
+              text: "Add another activity for site " + site.siteNumber,
+              classes: "govuk-button--secondary",
+              attributes: {
+                id: 'add-another-activity-site-' + site.siteNumber,
+                name: "addActivity",
+                value: "addActivity",
+                type: "submit"
+              }
+            }) }}
+          </div>
+
+          </form>
+
         {% endfor %}
 
         <form method="POST">

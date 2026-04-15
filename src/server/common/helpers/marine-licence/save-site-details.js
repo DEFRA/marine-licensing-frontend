@@ -3,7 +3,7 @@ import {
   getMarineLicenceCache,
   setMarineLicenceCache
 } from '#src/server/common/helpers/marine-licence/session-cache/utils.js'
-import { routes } from '#src/server/common/constants/routes.js'
+import { routes, apiRoutes } from '#src/server/common/constants/routes.js'
 import Boom from '@hapi/boom'
 
 export const prepareFileUploadDataForSave = (siteDetails, request) => {
@@ -45,7 +45,11 @@ export const prepareFileUploadDataForSave = (siteDetails, request) => {
   return dataToSave
 }
 
-export const saveSiteDetailsToBackend = async (request, h) => {
+export const saveSiteDetailsToBackend = async (
+  request,
+  h,
+  { siteIndex } = {}
+) => {
   const marineLicence = getMarineLicenceCache(request)
   const { siteDetails } = marineLicence
   const coordinatesType = siteDetails[0]?.coordinatesType
@@ -67,24 +71,49 @@ export const saveSiteDetailsToBackend = async (request, h) => {
     throw new Error('Only file journeys can be saved for now')
   }
 
-  const dataToSave = prepareFileUploadDataForSave(siteDetails, request)
+  const isSingleSite = siteIndex !== undefined
+
+  const siteDetailsToUpdate = isSingleSite
+    ? siteDetails.filter((_, index) => index === siteIndex)
+    : siteDetails
+
+  const dataToSave = prepareFileUploadDataForSave(siteDetailsToUpdate, request)
 
   try {
-    await authenticatedPatchRequest(request, '/marine-licence/site-details', {
-      siteDetails: dataToSave,
-      id: marineLicence.id
-    })
+    if (isSingleSite) {
+      await authenticatedPatchRequest(
+        request,
+        apiRoutes.UPDATE_MARINE_LICENCE_SITE,
+        {
+          siteDetails: dataToSave,
+          siteIndex,
+          id: marineLicence.id
+        }
+      )
+    } else {
+      await authenticatedPatchRequest(
+        request,
+        apiRoutes.UPDATE_MARINE_LICENCE_SITE_DETAILS,
+        {
+          siteDetails: dataToSave,
+          id: marineLicence.id
+        }
+      )
+    }
 
     await setMarineLicenceCache(request, h, {
       ...marineLicence,
-      siteDetails: dataToSave
+      siteDetails: isSingleSite
+        ? siteDetails.with(siteIndex, dataToSave)
+        : dataToSave
     })
 
     request.logger.info(
       {
         marineLicenceId: marineLicence.id,
         siteCount: dataToSave.length,
-        coordinatesType
+        coordinatesType,
+        isSingleSite
       },
       'Successfully saved site details to backend'
     )

@@ -1,4 +1,7 @@
-import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
+import {
+  apiRoutes,
+  marineLicenceRoutes
+} from '#src/server/common/constants/routes.js'
 import { renderFileUploadReview } from './utils.js'
 import { getSiteDetailsBySite } from '#src/server/common/helpers/exemptions/session-cache/site-details-utils.js'
 import {
@@ -7,6 +10,7 @@ import {
   setMarineLicenceCache
 } from '#src/server/common/helpers/marine-licence/session-cache/utils.js'
 import { getMarineLicenceService } from '#src/services/marine-licence-service/index.js'
+import { authenticatedPatchRequest } from '#src/server/common/helpers/authenticated-requests.js'
 
 export const FILE_UPLOAD_REVIEW_VIEW_ROUTE =
   'marine-licence/site-details/review-site-details/file-upload-review'
@@ -64,7 +68,31 @@ export const reviewSiteDetailsController = {
 }
 
 export const reviewSiteDetailsSubmitController = {
-  async handler(_request, h) {
+  async handler(request, h) {
+    const { payload } = request
+
+    const { addActivity, siteNumber } = payload
+
+    const marineLicence = getMarineLicenceCache(request)
+
+    if (addActivity) {
+      const siteIndex = Number.parseInt(siteNumber, 10) - 1
+
+      const currentActivityCount =
+        marineLicence.siteDetails[siteIndex].activityDetails.length
+
+      const newActivityIndex = currentActivityCount + 1
+
+      await authenticatedPatchRequest(request, apiRoutes.ADD_ACTIVITY_TO_SITE, {
+        siteIndex,
+        id: marineLicence.id
+      })
+
+      return h.redirect(
+        `${marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS}#activity-details-site-${siteNumber}-activity-${newActivityIndex}`
+      )
+    }
+
     return h.redirect(marineLicenceRoutes.MARINE_LICENCE_TASK_LIST)
   }
 }

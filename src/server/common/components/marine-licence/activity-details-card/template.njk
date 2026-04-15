@@ -1,0 +1,58 @@
+{% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
+{% from "incomplete-field/macro.njk" import appIncompleteField %}
+
+{% set rows = [] %}
+
+{% set activityRowsHeading %}
+  Site {{ params.siteNumber }} - Activity {{ params.index }}
+{% endset %}
+
+{% set _ = rows.push({
+    key: { text: "Type of activity"},
+    value: { html: appIncompleteField({text:params.activityDetails.activityType})},
+    actions: setSiteDetailsAction(params.activityDetails.activityType, 'review-site-details', params.siteNumber, "", { skipAction: true, activityNumber: params.index })
+}) %}
+
+{% set _ = rows.push({
+    key: { text: "Activity description"},
+    value: { html: appIncompleteField({text:params.activityDetails.activityDescription})},
+    actions: setSiteDetailsAction(params.activityDetails.activityDescription, 'review-site-details', params.siteNumber, "", { skipAction: true, activityNumber: params.index })
+}) %}
+
+{% set _ = rows.push({
+    key: { text: "Maximum duration of activity"},
+    value: { html: appIncompleteField({text:params.activityDetails.activityDuration})},
+    actions: setSiteDetailsAction(params.activityDetails.activityDuration, 'review-site-details', params.siteNumber, "", { skipAction: true, activityNumber: params.index })
+}) %}
+
+{% set _ = rows.push({
+    key: { text: "Completion date"},
+    value: { html: appIncompleteField({text:params.activityDetails.completionDate})},
+    actions: setSiteDetailsAction(params.activityDetails.completionDate, 'review-site-details', params.siteNumber, "", { skipAction: true, activityNumber: params.index })
+}) %}
+
+{% set _ = rows.push({
+    key: { text: "Activity limited to specific months"},
+    value: { html: appIncompleteField({text:params.activityDetails.activityMonths})},
+    actions: setSiteDetailsAction(params.activityDetails.activityMonths, 'review-site-details', params.siteNumber, "", { skipAction: true, activityNumber: params.index })
+}) %}
+
+{% set _ = rows.push({
+    key: { text: "Proposed working hours"},
+    value: { html: appIncompleteField({text:params.activityDetails.workingHours})},
+    actions: setSiteDetailsAction(params.activityDetails.workingHours, 'review-site-details', params.siteNumber, "", { skipAction: true, activityNumber: params.index })
+}) %}
+
+
+{{ govukSummaryList({
+  card: {
+    attributes: {
+      id: "activity-details-site-" + params.siteNumber + '-activity-' + params.index
+    },
+    title: {
+      text: activityRowsHeading
+    }
+  },
+  classes: 'govuk-summary-list--full-width',
+  rows: rows
+}) }}

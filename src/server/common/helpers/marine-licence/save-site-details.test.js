@@ -11,6 +11,7 @@ import {
 import { createMockRequest } from '#src/server/test-helpers/mocks/helpers.js'
 import Boom from '@hapi/boom'
 import { mockMarineLicenceApplication } from '#src/server/test-helpers/mocks/marine-licence-mocks.js'
+import { apiRoutes } from '#src/server/common/constants/routes.js'
 
 vi.mock('../authenticated-requests.js')
 vi.mock('./session-cache/utils.js')
@@ -45,11 +46,6 @@ describe('save-site-details', () => {
           checksumSha256: 'test-checksum'
         }
       })
-    })
-
-    test('should log save information for each site', () => {
-      const siteDetails = [mockMarineLicenceApplication.siteDetails[0]]
-      prepareFileUploadDataForSave(siteDetails, mockRequest)
 
       expect(mockRequest.logger.info).toHaveBeenCalledWith(
         {
@@ -175,6 +171,43 @@ describe('save-site-details', () => {
   })
 
   describe('saveSiteDetailsToBackend', () => {
+    test('should save site details successfully with single site option', async () => {
+      vi.mocked(authenticatedPatchRequest).mockResolvedValue({
+        payload: { success: true }
+      })
+
+      await saveSiteDetailsToBackend(mockRequest, mockH, { siteIndex: 0 })
+
+      expect(authenticatedPatchRequest).toHaveBeenCalledWith(
+        mockRequest,
+        apiRoutes.UPDATE_MARINE_LICENCE_SITE,
+        {
+          siteDetails: expect.any(Array),
+          siteIndex: 0,
+          id: mockMarineLicenceApplication.id
+        }
+      )
+
+      expect(vi.mocked(setMarineLicenceCache)).toHaveBeenCalledWith(
+        mockRequest,
+        mockH,
+        expect.objectContaining({
+          ...mockMarineLicenceApplication,
+          siteDetails: expect.any(Array)
+        })
+      )
+
+      expect(mockRequest.logger.info).toHaveBeenCalledWith(
+        {
+          marineLicenceId: mockMarineLicenceApplication.id,
+          siteCount: 1,
+          coordinatesType: 'file',
+          isSingleSite: true
+        },
+        'Successfully saved site details to backend'
+      )
+    })
+
     test('should save file upload site details successfully', async () => {
       vi.mocked(authenticatedPatchRequest).mockResolvedValue({
         payload: { success: true }
@@ -184,7 +217,7 @@ describe('save-site-details', () => {
 
       expect(authenticatedPatchRequest).toHaveBeenCalledWith(
         mockRequest,
-        '/marine-licence/site-details',
+        apiRoutes.UPDATE_MARINE_LICENCE_SITE_DETAILS,
         {
           siteDetails: expect.any(Array),
           id: mockMarineLicenceApplication.id
@@ -204,7 +237,8 @@ describe('save-site-details', () => {
         {
           marineLicenceId: mockMarineLicenceApplication.id,
           siteCount: 1,
-          coordinatesType: 'file'
+          coordinatesType: 'file',
+          isSingleSite: false
         },
         'Successfully saved site details to backend'
       )

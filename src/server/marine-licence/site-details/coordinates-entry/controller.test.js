@@ -76,7 +76,7 @@ describe('#coordinatesEntry (marine licence)', () => {
   })
 
   describe('#coordinatesEntrySubmitController', () => {
-    test('should correctly format error data', () => {
+    test('Should correctly format error data', () => {
       const request = createMockRequest({
         payload: { coordinatesEntry: 'invalid' }
       })
@@ -134,7 +134,7 @@ describe('#coordinatesEntry (marine licence)', () => {
       expect(h.view().takeover).toHaveBeenCalled()
     })
 
-    test('should output page with no error data in object', () => {
+    test('Should output page with no error data in object', () => {
       const request = createMockRequest({
         payload: { coordinatesEntry: 'invalid' }
       })
@@ -166,39 +166,6 @@ describe('#coordinatesEntry (marine licence)', () => {
       )
 
       expect(h.view().takeover).toHaveBeenCalled()
-    })
-
-    test('Should correctly validate on valid data', () => {
-      const request = { coordinatesEntry: 'single' }
-
-      const payloadValidator =
-        coordinatesEntrySubmitController.options.validate.payload
-
-      const result = payloadValidator.validate(request)
-
-      expect(result.error).toBeUndefined()
-    })
-
-    test('Should correctly validate on empty data', () => {
-      const request = {}
-
-      const payloadValidator =
-        coordinatesEntrySubmitController.options.validate.payload
-
-      const result = payloadValidator.validate(request)
-
-      expect(result.error.message).toBe('COORDINATES_ENTRY_REQUIRED')
-    })
-
-    test('Should correctly validate on invalid data', () => {
-      const request = { coordinatesEntry: 'invalid' }
-
-      const payloadValidator =
-        coordinatesEntrySubmitController.options.validate.payload
-
-      const result = payloadValidator.validate(request)
-
-      expect(result.error.message).toBe('COORDINATES_ENTRY_REQUIRED')
     })
 
     test('Should correctly navigate to next page when POST is successful', async () => {

@@ -7,21 +7,16 @@ import {
   errorDescriptionByFieldName,
   mapErrorsForDisplay
 } from '#src/server/common/helpers/errors.js'
-import joi from 'joi'
 import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
+import {
+  coordinatesEntrySettings,
+  coordinatesEntryErrorMessages
+} from '#src/server/common/validation/coordinates-entry/constants.js'
+import { coordinatesEntrySchema } from '#src/server/common/validation/coordinates-entry/schema.js'
 import { getBackRoute } from './utils.js'
 
 export const MARINE_LICENCE_COORDINATES_ENTRY_VIEW_ROUTE =
   'templates/coordinates-entry'
-
-const coordinatesEntrySettings = {
-  pageTitle: 'How do you want to enter the site coordinates?',
-  heading: 'How do you want to enter the site coordinates?'
-}
-
-export const errorMessages = {
-  COORDINATES_ENTRY_REQUIRED: 'Select how you want to enter the coordinates'
-}
 
 const cancelLink = `${marineLicenceRoutes.MARINE_LICENCE_TASK_LIST}?cancel=site-details`
 
@@ -48,17 +43,7 @@ export const coordinatesEntryController = {
 export const coordinatesEntrySubmitController = {
   options: {
     validate: {
-      payload: joi.object({
-        coordinatesEntry: joi
-          .string()
-          .valid('single', 'multiple')
-          .required()
-          .messages({
-            'any.only': 'COORDINATES_ENTRY_REQUIRED',
-            'string.empty': 'COORDINATES_ENTRY_REQUIRED',
-            'any.required': 'COORDINATES_ENTRY_REQUIRED'
-          })
-      }),
+      payload: coordinatesEntrySchema,
       failAction: (request, h, err) => {
         const { payload } = request
         const { projectName } = getMarineLicenceCache(request)
@@ -78,7 +63,10 @@ export const coordinatesEntrySubmitController = {
             .takeover()
         }
 
-        const errorSummary = mapErrorsForDisplay(err.details, errorMessages)
+        const errorSummary = mapErrorsForDisplay(
+          err.details,
+          coordinatesEntryErrorMessages
+        )
         const errors = errorDescriptionByFieldName(errorSummary)
 
         return h

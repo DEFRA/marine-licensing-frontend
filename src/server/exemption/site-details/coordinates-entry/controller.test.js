@@ -275,41 +275,6 @@ describe('#coordinatesEntry', () => {
       expect(h.view().takeover).toHaveBeenCalled()
     })
 
-    test('Should correctly validate on valid data', () => {
-      const request = {
-        coordinatesEntry: 'single'
-      }
-
-      const payloadValidator =
-        coordinatesEntrySubmitController.options.validate.payload
-
-      const result = payloadValidator.validate(request)
-
-      expect(result.error).toBeUndefined()
-    })
-
-    test('Should correctly validate on empty data', () => {
-      const request = {}
-
-      const payloadValidator =
-        coordinatesEntrySubmitController.options.validate.payload
-
-      const result = payloadValidator.validate(request)
-
-      expect(result.error.message).toBe('COORDINATES_ENTRY_REQUIRED')
-    })
-
-    test('Should correctly validate on invalid data', () => {
-      const request = { coordinatesEntry: 'invalid' }
-
-      const payloadValidator =
-        coordinatesEntrySubmitController.options.validate.payload
-
-      const result = payloadValidator.validate(request)
-
-      expect(result.error.message).toBe('COORDINATES_ENTRY_REQUIRED')
-    })
-
     test('Should correctly navigate to next page when POST is successful', async () => {
       const h = {
         redirect: vi.fn()

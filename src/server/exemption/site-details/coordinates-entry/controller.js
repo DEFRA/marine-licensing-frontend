@@ -8,16 +8,13 @@ import {
   setSiteDataPreHandler,
   setSiteData
 } from '#src/server/common/helpers/exemptions/session-cache/site-utils.js'
-import {
-  errorDescriptionByFieldName,
-  mapErrorsForDisplay
-} from '#src/server/common/helpers/errors.js'
 import { routes } from '#src/server/common/constants/routes.js'
 import {
   coordinatesEntrySettings,
   coordinatesEntryErrorMessages
 } from '#src/server/common/validation/coordinates-entry/constants.js'
 import { coordinatesEntrySchema } from '#src/server/common/validation/coordinates-entry/schema.js'
+import { createFailAction } from '#src/server/common/helpers/createFailAction.js'
 import { getBackRoute } from './utils.js'
 import { getCancelLink } from '#src/server/exemption/site-details/utils/cancel-link.js'
 
@@ -63,59 +60,31 @@ export const coordinatesEntryController = {
     })
   }
 }
+
 export const coordinatesEntrySubmitController = {
   options: {
     pre: [setSiteDataPreHandler],
     validate: {
       payload: coordinatesEntrySchema,
       failAction: (request, h, err) => {
-        const { payload } = request
         const exemption = getExemptionCache(request)
-        const { projectName } = exemption
         const action = request.query.action
-
         const site = setSiteData(request)
-        const { siteNumber } = site
-
-        const siteNumberDisplay = exemption.multipleSiteDetails
-          ?.multipleSitesEnabled
-          ? siteNumber
-          : null
-
-        if (!err.details) {
-          return h
-            .view(COORDINATES_ENTRY_VIEW_ROUTE, {
-              ...coordinatesEntrySettings,
-              backLink: getBackRoute(site, exemption, action),
-              cancelLink: getCancelLink(action),
-              payload,
-              projectName,
-              siteNumber: siteNumberDisplay,
-              action
-            })
-            .takeover()
-        }
-
-        const errorSummary = mapErrorsForDisplay(
-          err.details,
-          coordinatesEntryErrorMessages
-        )
-
-        const errors = errorDescriptionByFieldName(errorSummary)
-
-        return h
-          .view(COORDINATES_ENTRY_VIEW_ROUTE, {
-            ...coordinatesEntrySettings,
-            backLink: getBackRoute(site, exemption, action),
+        return createFailAction({
+          viewRoute: COORDINATES_ENTRY_VIEW_ROUTE,
+          settings: coordinatesEntrySettings,
+          errorMessages: coordinatesEntryErrorMessages,
+          projectName: exemption.projectName,
+          backLink: getBackRoute(site, exemption, action),
+          payload: request.payload,
+          params: {
             cancelLink: getCancelLink(action),
-            payload,
-            projectName,
-            siteNumber: siteNumberDisplay,
-            action,
-            errors,
-            errorSummary
-          })
-          .takeover()
+            siteNumber: exemption.multipleSiteDetails?.multipleSitesEnabled
+              ? site.siteNumber
+              : null,
+            action
+          }
+        })(request, h, err)
       }
     }
   },

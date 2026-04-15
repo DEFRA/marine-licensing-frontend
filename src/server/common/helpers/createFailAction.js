@@ -4,24 +4,23 @@ import {
 } from '#src/server/common/helpers/errors.js'
 
 export const createFailAction = ({
-  getCache,
   viewRoute,
   settings,
   errorMessages,
-  getBackLink
+  projectName,
+  backLink,
+  payload,
+  params
 }) => {
-  return (request, h, err) => {
-    const { payload } = request
-    const { projectName } = getCache(request)
-    const backLink = getBackLink(request)
-
+  return (_request, h, err) => {
     if (!err.details) {
       return h
         .view(viewRoute, {
           ...settings,
           payload,
           projectName,
-          backLink
+          backLink,
+          ...params
         })
         .takeover()
     }
@@ -35,6 +34,7 @@ export const createFailAction = ({
         payload,
         projectName,
         backLink,
+        ...params,
         errors,
         errorSummary
       })

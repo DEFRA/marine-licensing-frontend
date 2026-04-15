@@ -3,16 +3,13 @@ import {
   updateMarineLicenceSiteDetails
 } from '#src/server/common/helpers/marine-licence/session-cache/utils.js'
 import { getSiteDetailsBySite } from '#src/server/common/helpers/marine-licence/session-cache/site-details-utils.js'
-import {
-  errorDescriptionByFieldName,
-  mapErrorsForDisplay
-} from '#src/server/common/helpers/errors.js'
 import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
 import {
   coordinatesEntrySettings,
   coordinatesEntryErrorMessages
 } from '#src/server/common/validation/coordinates-entry/constants.js'
 import { coordinatesEntrySchema } from '#src/server/common/validation/coordinates-entry/schema.js'
+import { createFailAction } from '#src/server/common/helpers/createFailAction.js'
 import { getBackRoute } from './utils.js'
 
 export const MARINE_LICENCE_COORDINATES_ENTRY_VIEW_ROUTE =
@@ -45,43 +42,21 @@ export const coordinatesEntrySubmitController = {
     validate: {
       payload: coordinatesEntrySchema,
       failAction: (request, h, err) => {
-        const { payload } = request
         const { projectName } = getMarineLicenceCache(request)
         const action = request.query.action
-
-        if (!err.details) {
-          return h
-            .view(MARINE_LICENCE_COORDINATES_ENTRY_VIEW_ROUTE, {
-              ...coordinatesEntrySettings,
-              backLink: getBackRoute(),
-              cancelLink,
-              payload,
-              projectName,
-              siteNumber: null,
-              action
-            })
-            .takeover()
-        }
-
-        const errorSummary = mapErrorsForDisplay(
-          err.details,
-          coordinatesEntryErrorMessages
-        )
-        const errors = errorDescriptionByFieldName(errorSummary)
-
-        return h
-          .view(MARINE_LICENCE_COORDINATES_ENTRY_VIEW_ROUTE, {
-            ...coordinatesEntrySettings,
-            backLink: getBackRoute(),
+        return createFailAction({
+          viewRoute: MARINE_LICENCE_COORDINATES_ENTRY_VIEW_ROUTE,
+          settings: coordinatesEntrySettings,
+          errorMessages: coordinatesEntryErrorMessages,
+          projectName,
+          backLink: getBackRoute(),
+          payload: request.payload,
+          params: {
             cancelLink,
-            payload,
-            projectName,
             siteNumber: null,
-            action,
-            errors,
-            errorSummary
-          })
-          .takeover()
+            action
+          }
+        })(request, h, err)
       }
     }
   },

@@ -11,7 +11,7 @@ describe('#typeOfActivitySchema', () => {
     ['removal', 'activitySubTypeRemoval', 'removal-type-1'],
     ['removal', 'activitySubTypeRemoval', 'removal-type-2'],
     ['removal', 'activitySubTypeRemoval', 'removal-type-3'],
-    ['removal', 'activitySubTypeRemoval', 'REM4']
+    ['removal', 'activitySubTypeRemoval', 'removal-type-4']
   ])(
     'accepts %s with subtype %s',
     (activityType, subtypeField, subtypeValue) => {

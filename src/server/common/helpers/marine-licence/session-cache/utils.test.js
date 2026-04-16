@@ -321,15 +321,9 @@ describe('#utils', () => {
         ]
       })
 
-      await updateMarineLicenceSiteActivityDetails(
-        mockRequest,
-        mockH,
-        0,
-        0,
-        {
-          activityType: 'removal'
-        }
-      )
+      await updateMarineLicenceSiteActivityDetails(mockRequest, mockH, 0, 0, {
+        activityType: 'removal'
+      })
 
       expect(mockRequest.yar.set).toHaveBeenCalledWith(
         MARINE_LICENCE_CACHE_KEY,

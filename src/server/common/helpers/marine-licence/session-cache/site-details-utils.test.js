@@ -39,7 +39,7 @@ describe('getActivityDetailsByIndex', () => {
     )
   })
 
-  test('should correctly return the specified acitvity details', () => {
+  test('should correctly return the specified activity details', () => {
     const mockMultiSiteMarineLicence = {
       ...mockMarineLicenceApplication,
       siteDetails: [

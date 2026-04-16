@@ -1,14 +1,15 @@
 import { clearAnswers } from '#src/server/journey/self-service/services/session-answers.js'
 
-const FIRST_QUESTION_PATH = '/journey/self-service/sea'
-
-import { getFirstQuestionRoute } from '#src/server/journey/self-service/services/journey-data.js'
+import {
+  getFirstQuestionRoute,
+  ROUTE_PREFIX
+} from '#src/server/journey/self-service/services/journey-data.js'
 
 export const iatStartController = {
   handler(_request, h) {
     return h.view('journey/self-service/start/index', {
       pageTitle: 'Check if you need a marine licence',
-      firstQuestionRoute: `/journey/self-service${getFirstQuestionRoute()}`,
+      firstQuestionRoute: `${ROUTE_PREFIX}${getFirstQuestionRoute()}`,
       links: {
         jurisdiction:
           'https://www.gov.uk/guidance/marine-licensing-definitions#jurisdiction',
@@ -25,6 +26,6 @@ export const iatStartController = {
 export const iatStartPostController = {
   handler(request, h) {
     clearAnswers(request)
-    return h.redirect(FIRST_QUESTION_PATH)
+    return h.redirect(`${ROUTE_PREFIX}${getFirstQuestionRoute()}`)
   }
 }

@@ -1,7 +1,7 @@
 import { routes } from '#src/server/common/constants/routes.js'
+import { ROUTE_PREFIX } from '#src/server/journey/self-service/services/journey-data.js'
 
 const SESSION_KEY = 'selfServiceAnswers'
-const ROUTE_PREFIX = '/journey/self-service'
 
 export function getAnswers(request) {
   return request.yar.get(SESSION_KEY) ?? []

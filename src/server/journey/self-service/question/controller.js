@@ -7,7 +7,6 @@ import {
   getBackLink,
   getAnswerForRoute
 } from '#src/server/journey/self-service/services/session-answers.js'
-import { statusCodes } from '#src/server/common/constants/status-codes.js'
 
 const VIEW_PATH = 'journey/self-service/question/index'
 

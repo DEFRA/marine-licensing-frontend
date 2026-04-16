@@ -100,9 +100,7 @@ describe('#session-answers', () => {
         { questionRoute: '/sea', answerId: 'inSea' },
         { questionRoute: '/jurisdiction', answerId: 'englandWales' }
       ])
-      expect(getBackLink(request, '/jurisdiction')).toBe(
-        `${ROUTE_PREFIX}/sea`
-      )
+      expect(getBackLink(request, '/jurisdiction')).toBe(`${ROUTE_PREFIX}/sea`)
     })
 
     test('returns start page when current route is the first in answers', () => {

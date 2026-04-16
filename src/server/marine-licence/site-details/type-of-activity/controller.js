@@ -1,0 +1,114 @@
+import {
+  getMarineLicenceCache,
+  updateMarineLicenceSiteActivityDetails
+} from '#src/server/common/helpers/marine-licence/session-cache/utils.js'
+import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
+import { getActivityDetailsByIndex } from '#src/server/common/helpers/marine-licence/session-cache/site-details-utils.js'
+import { typeOfActivitySchema } from '#src/server/marine-licence/site-details/type-of-activity/schema.js'
+import { getSiteDataFromParam } from '#src/server/common/helpers/site-details/site-name.js'
+import { createFailAction } from '#src/server/common/helpers/createFailAction.js'
+
+export const typeOfActivityErrorMessages = {
+  ACTIVITY_TYPE_REQUIRED: 'Select the type of activity',
+  ACTIVITY_TYPE_CONSTRUCTION_REQUIRED: 'Select the type of construction',
+  ACTIVITY_TYPE_DEPOSIT_REQUIRED: 'Select the type of deposit',
+  ACTIVITY_TYPE_REMOVAL_REQUIRED: 'Select the type of removal'
+}
+
+export const MARINE_LICENCE_TYPE_OF_ACTIVITY_VIEW_ROUTE =
+  'marine-licence/site-details/type-of-activity/index'
+
+const backLink = marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS
+
+const subTypePayload = (activityType, activitySubType) => ({
+  activitySubTypeConstruction:
+    activityType === 'construction' ? activitySubType : '',
+  activitySubTypeDeposit: activityType === 'deposit' ? activitySubType : '',
+  activitySubTypeRemoval: activityType === 'removal' ? activitySubType : ''
+})
+
+export const typeOfActivitySettings = {
+  pageTitle: 'Type of activity',
+  heading: 'Type of activity'
+}
+
+export const typeOfActivityController = {
+  handler(request, h) {
+    const marineLicence = getMarineLicenceCache(request)
+
+    const {
+      activityDetailsIndex,
+      activityDetailsNumber,
+      siteIndex,
+      siteNumber
+    } = getSiteDataFromParam(request.query)
+
+    const activityDetails = getActivityDetailsByIndex(
+      marineLicence,
+      siteIndex,
+      activityDetailsIndex
+    )
+
+    return h.view(MARINE_LICENCE_TYPE_OF_ACTIVITY_VIEW_ROUTE, {
+      ...typeOfActivitySettings,
+      backLink,
+      projectName: marineLicence.projectName,
+      siteNumber,
+      activityDetailsNumber,
+      payload: {
+        activityType: activityDetails.activityType,
+        ...subTypePayload(
+          activityDetails.activityType,
+          activityDetails.activitySubType
+        )
+      }
+    })
+  }
+}
+
+export const typeOfActivitySubmitController = {
+  options: {
+    validate: {
+      payload: typeOfActivitySchema,
+      failAction: (request, h, err) => {
+        const { activityDetailsNumber, siteNumber } = getSiteDataFromParam(
+          request.query
+        )
+        return createFailAction({
+          getCache: getMarineLicenceCache,
+          viewRoute: MARINE_LICENCE_TYPE_OF_ACTIVITY_VIEW_ROUTE,
+          settings: typeOfActivitySettings,
+          errorMessages: typeOfActivityErrorMessages,
+          getBackLink: () => backLink,
+          params: { activityDetailsNumber, siteNumber }
+        })(request, h, err)
+      }
+    }
+  },
+  async handler(request, h) {
+    const { payload } = request
+
+    const activitySubTypeByType = {
+      construction: payload.activitySubTypeConstruction,
+      deposit: payload.activitySubTypeDeposit,
+      removal: payload.activitySubTypeRemoval
+    }
+
+    const { activityDetailsIndex, siteIndex } = getSiteDataFromParam(
+      request.query
+    )
+
+    await updateMarineLicenceSiteActivityDetails(
+      request,
+      h,
+      siteIndex,
+      activityDetailsIndex,
+      {
+        activityType: payload.activityType,
+        activitySubType: activitySubTypeByType[payload.activityType]
+      }
+    )
+
+    return h.redirect(marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS)
+  }
+}

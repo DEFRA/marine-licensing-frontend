@@ -27,7 +27,8 @@ export const prepareFileUploadDataForSave = (siteDetails, request) => {
         s3Key: site.s3Location.s3Key,
         checksumSha256: site.s3Location.checksumSha256
       },
-      siteName: site.siteName
+      siteName: site.siteName,
+      activityDetails: site.activityDetails
     }
 
     request.logger.info(
@@ -85,7 +86,7 @@ export const saveSiteDetailsToBackend = async (
         request,
         apiRoutes.UPDATE_MARINE_LICENCE_SITE,
         {
-          siteDetails: dataToSave,
+          siteDetails: dataToSave[0],
           siteIndex,
           id: marineLicence.id
         }

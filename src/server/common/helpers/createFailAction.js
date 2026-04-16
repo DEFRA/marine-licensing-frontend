@@ -7,9 +7,13 @@ export const createFailAction = ({
   viewRoute,
   settings,
   errorMessages,
+<<<<<<< ML-1194-LCML-How-do-you-want-to-enter-the-site-coordinates-page
   projectName,
   backLink,
   payload,
+=======
+  getBackLink,
+>>>>>>> main
   params
 }) => {
   return (_request, h, err) => {
@@ -36,7 +40,8 @@ export const createFailAction = ({
         backLink,
         ...params,
         errors,
-        errorSummary
+        errorSummary,
+        ...params
       })
       .takeover()
   }

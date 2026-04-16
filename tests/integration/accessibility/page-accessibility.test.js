@@ -208,7 +208,13 @@ describe('Page accessibility checks (Axe)', () => {
     },
     {
       url: marineLicenceRoutes.MARINE_LICENCE_SITE_DETAILS,
+      isMarineLicence: true,
       title: 'Site details'
+    },
+    {
+      url: marineLicenceRoutes.MARINE_LICENCE_TYPE_OF_ACTIVITY,
+      isMarineLicence: true,
+      title: 'Type of activity'
     },
     {
       url: marineLicenceRoutes.MARINE_LICENCE_COORDINATES_TYPE_CHOICE,

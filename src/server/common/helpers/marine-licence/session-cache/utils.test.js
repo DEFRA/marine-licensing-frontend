@@ -7,6 +7,7 @@ import {
   clearSavedMarineLicenceSiteDetails,
   getMarineLicenceCache,
   setMarineLicenceCache,
+  updateMarineLicenceSiteActivityDetails,
   updateMarineLicenceSiteDetails,
   updateMarineLicenceSiteDetailsBatch
 } from '#src/server/common/helpers/marine-licence/session-cache/utils.js'
@@ -239,6 +240,148 @@ describe('#utils', () => {
       expect(mockRequest.yar.commit).toHaveBeenCalledWith(mockH)
 
       expect(result).toEqual({ coordinatesType: null })
+    })
+  })
+
+  describe('updateMarineLicenceSiteActivityDetails', () => {
+    let mockRequest
+    let mockH
+
+    beforeEach(() => {
+      mockH = {}
+      mockRequest = {
+        yar: {
+          clear: vi.fn(),
+          get: vi.fn(),
+          set: vi.fn(),
+          commit: vi.fn().mockResolvedValue()
+        }
+      }
+    })
+
+    test('should update the provided fields in the correct activity object', async () => {
+      mockRequest.yar.get.mockReturnValue({
+        siteDetails: [
+          {
+            activityDetails: [
+              { activityType: 'construction' },
+              { activityType: 'deposit' }
+            ]
+          }
+        ]
+      })
+
+      const result = await updateMarineLicenceSiteActivityDetails(
+        mockRequest,
+        mockH,
+        0,
+        1,
+        {
+          activityType: 'removal',
+          activitySubType: 'removal-type-2'
+        }
+      )
+
+      expect(mockRequest.yar.set).toHaveBeenCalledWith(
+        MARINE_LICENCE_CACHE_KEY,
+        {
+          siteDetails: [
+            {
+              activityDetails: [
+                { activityType: 'construction' },
+                {
+                  activityType: 'removal',
+                  activitySubType: 'removal-type-2'
+                }
+              ]
+            }
+          ]
+        }
+      )
+      expect(result).toEqual({
+        activityDetails: [
+          { activityType: 'construction' },
+          {
+            activityType: 'removal',
+            activitySubType: 'removal-type-2'
+          }
+        ]
+      })
+    })
+
+    test('should leave other activity objects in the array unchanged', async () => {
+      mockRequest.yar.get.mockReturnValue({
+        siteDetails: [
+          {
+            activityDetails: [
+              { activityType: 'construction', activityDescription: 'Building' },
+              { activityType: 'deposit', activityDescription: 'Dumping' }
+            ]
+          }
+        ]
+      })
+
+      await updateMarineLicenceSiteActivityDetails(mockRequest, mockH, 0, 0, {
+        activityType: 'removal'
+      })
+
+      expect(mockRequest.yar.set).toHaveBeenCalledWith(
+        MARINE_LICENCE_CACHE_KEY,
+        {
+          siteDetails: [
+            {
+              activityDetails: [
+                { activityType: 'removal', activityDescription: 'Building' },
+                { activityType: 'deposit', activityDescription: 'Dumping' }
+              ]
+            }
+          ]
+        }
+      )
+    })
+
+    test('should initialise activityDetails as empty array if site has none', async () => {
+      mockRequest.yar.get.mockReturnValue({
+        siteDetails: [{}]
+      })
+
+      const result = await updateMarineLicenceSiteActivityDetails(
+        mockRequest,
+        mockH,
+        0,
+        0,
+        {
+          activityType: 'construction'
+        }
+      )
+
+      expect(mockRequest.yar.set).toHaveBeenCalledWith(
+        MARINE_LICENCE_CACHE_KEY,
+        {
+          siteDetails: [{ activityDetails: [{ activityType: 'construction' }] }]
+        }
+      )
+      expect(result).toEqual({
+        activityDetails: [{ activityType: 'construction' }]
+      })
+    })
+
+    test('should return the activityDetails array', async () => {
+      mockRequest.yar.get.mockReturnValue({
+        siteDetails: [{ activityDetails: [{ activityType: 'construction' }] }]
+      })
+
+      const result = await updateMarineLicenceSiteActivityDetails(
+        mockRequest,
+        mockH,
+        0,
+        0,
+        {
+          activityType: 'deposit'
+        }
+      )
+
+      expect(result).toEqual({ activityDetails: [{ activityType: 'deposit' }] })
     })
   })
 

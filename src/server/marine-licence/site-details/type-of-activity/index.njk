@@ -1,0 +1,189 @@
+{% extends 'layouts/page.njk' %}
+{% from "govuk/components/back-link/macro.njk" import govukBackLink %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/radios/macro.njk" import govukRadios %}
+{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+
+{% block beforeContent %}
+{{ super() }}
+<nav>
+  {{ govukBackLink({
+    text: "Back",
+    href: backLink
+  }) }}
+</nav>
+{% endblock %}
+
+{% set headingWithCaption %}
+    {% if projectName %}
+        <span class="govuk-caption-l">{{ projectName }}</span>
+    {% endif %}
+    {% if siteNumber and activityDetailsNumber %}
+      <span class="govuk-caption-l">Site {{ siteNumber }} - Activity {{ activityDetailsNumber }}</span>
+    {% endif %}
+    <h1 class="govuk-fieldset__heading">{{ heading }}</h1>
+{% endset %}
+
+{% set constructionNested %}
+  {{ govukRadios({
+    idPrefix: "activitySubTypeConstruction",
+    name: "activitySubTypeConstruction",
+    value: payload.activitySubTypeConstruction,
+    fieldset: {
+      legend: {
+        text: "Select the type of construction"
+      },
+      attributes: {
+        id: "activitySubTypeConstruction-fieldset"
+      }
+    },
+    errorMessage: errors.activitySubTypeConstruction,
+    items: [
+      {
+        value: "construction-type-1",
+        text: "Construction of new works"
+      },
+      {
+        value: "construction-type-2",
+        text: "Maintenance of existing works"
+      },
+      {
+        value: "construction-type-3",
+        text: "Alteration or improvement, including extending, of existing marine works"
+      }
+    ]
+  }) }}
+{% endset %}
+
+{% set depositNested %}
+  {{ govukRadios({
+    idPrefix: "activitySubTypeDeposit",
+    name: "activitySubTypeDeposit",
+    value: payload.activitySubTypeDeposit,
+    fieldset: {
+      legend: {
+        text: "Select the type of deposit"
+      },
+      attributes: {
+        id: "activitySubTypeDeposit-fieldset"
+      }
+    },
+    errorMessage: errors.activitySubTypeDeposit,
+    items: [
+      {
+        value: "deposit-type-1",
+        text: "Continuation of existing deposit activity"
+      },
+      {
+        value: "deposit-type-2",
+        text: "Deposit of something new"
+      },
+      {
+        value: "deposit-type-3",
+        text: "Replacing existing object"
+      }
+    ]
+  }) }}
+{% endset %}
+
+{% set removalNested %}
+  {{ govukRadios({
+    idPrefix: "activitySubTypeRemoval",
+    name: "activitySubTypeRemoval",
+    value: payload.activitySubTypeRemoval,
+    fieldset: {
+      legend: {
+        text: "Select the type of removal"
+      },
+      attributes: {
+        id: "activitySubTypeRemoval-fieldset"
+      }
+    },
+    errorMessage: errors.activitySubTypeRemoval,
+    items: [
+      {
+        value: "removal-type-1",
+        text: "One off first time removal"
+      },
+      {
+        value: "removal-type-2",
+        text: "Removal as part of an ongoing or routine activity"
+      },
+      {
+        value: "removal-type-3",
+        text: "Removal for replacement"
+      },
+      {
+        value: "removal-type-4",
+        text: "Removal for relocation"
+      }
+    ]
+  }) }}
+{% endset %}
+
+{% block content %}
+
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+
+      {% if errorSummary %}
+        {{ govukErrorSummary({
+          titleText: "There is a problem",
+          errorList: errorSummary
+        }) }}
+      {% endif %}
+
+      <form method="POST">
+
+        <input type="hidden" name="csrfToken" value="{{ csrfToken }}" />
+
+        {{ govukRadios({
+          idPrefix: "activityType",
+          name: "activityType",
+          value: payload.activityType,
+          fieldset: {
+            legend: {
+              html: headingWithCaption,
+              classes: "govuk-fieldset__legend govuk-fieldset__legend--l govuk-!-margin-bottom-6"
+            }
+          },
+          errorMessage: errors.activityType,
+          items: [
+            {
+              value: "construction",
+              text: "Construction, alteration or improvement of any works",
+              conditional: {
+                html: constructionNested
+              }
+            },
+            {
+              value: "deposit",
+              text: "Deposit of any substance or object",
+              conditional: {
+                html: depositNested
+              }
+            },
+            {
+              value: "removal",
+              text: "Removal of any substance or object",
+              conditional: {
+                html: removalNested
+              }
+            }
+          ]
+        }) }}
+
+        <div class="govuk-button-group">
+          {{ govukButton({
+            text: "Continue",
+            classes: "govuk-button--primary"
+          }) }}
+
+        </div>
+
+      </form>
+
+    </div>
+  </div>
+
+{% endblock %}

@@ -31,9 +31,9 @@ const createValidationFailAction = (request, h, err) => {
   const { payload } = request
   const marineLicence = getMarineLicenceCache(request)
 
-  const { action, site } = request.query
+  const { action } = request.query
 
-  const { siteIndex, siteNumber } = getSiteDataFromParam(site)
+  const { siteIndex, siteNumber } = getSiteDataFromParam(request.query)
 
   const siteDetails = getSiteDetailsBySite(marineLicence, siteIndex)
 
@@ -71,7 +71,7 @@ export const siteNameController = {
 
     const { action, site } = request.query
 
-    const { siteIndex, siteNumber } = getSiteDataFromParam(site)
+    const { siteIndex, siteNumber } = getSiteDataFromParam(request.query)
 
     const siteDetails = getSiteDetailsBySite(marineLicence, siteIndex)
 
@@ -107,9 +107,7 @@ export const siteNameSubmitController = {
   async handler(request, h) {
     const { payload } = request
 
-    const { site } = request.query
-
-    const { siteIndex, siteNumber } = getSiteDataFromParam(site)
+    const { siteIndex, siteNumber } = getSiteDataFromParam(request.query)
 
     const marineLicence = getMarineLicenceCache(request)
 

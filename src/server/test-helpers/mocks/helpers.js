@@ -21,6 +21,6 @@ export const createMockRequest = (overrides = {}) => ({
 
 export const createMockH = (overrides = {}) => ({
   view: vi.fn().mockReturnValue({ takeover: vi.fn() }),
-  redirect: vi.fn(),
+  redirect: vi.fn().mockReturnValue({ takeover: vi.fn() }),
   ...overrides
 })

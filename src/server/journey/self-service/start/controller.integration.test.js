@@ -2,8 +2,10 @@ import { JSDOM } from 'jsdom'
 import { statusCodes } from '#src/server/common/constants/status-codes.js'
 import { setupTestServer } from '#tests/integration/shared/test-setup-helpers.js'
 import { makeGetRequest } from '#src/server/test-helpers/server-requests.js'
+import { config } from '#src/config/config.js'
 
 describe('#iatStartController (integration)', () => {
+  config.set('selfService.enabled', true)
   const getServer = setupTestServer()
 
   const getPage = async () => {
@@ -71,12 +73,12 @@ describe('#iatStartController (integration)', () => {
     expect(backLink.getAttribute('style')).toBeNull()
   })
 
-  test('Renders a non-functional "Start now" button', async () => {
+  test('Renders a "Start now" button linking to the first question', async () => {
     const { document } = await getPage()
     const startButton = document.querySelector('.govuk-button--start')
     expect(startButton).not.toBeNull()
     expect(startButton.textContent).toContain('Start now')
-    expect(startButton.getAttribute('href')).toBe('#')
+    expect(startButton.getAttribute('href')).toBe('/journey/self-service/sea')
   })
 
   test('Does not render the phase banner', async () => {

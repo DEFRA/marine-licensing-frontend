@@ -366,7 +366,7 @@ describe('#utils', () => {
       })
     })
 
-    test('should return the activityDetails array from updateMarineLicenceSiteDetails', async () => {
+    test('should return the activityDetails array', async () => {
       mockRequest.yar.get.mockReturnValue({
         siteDetails: [{ activityDetails: [{ activityType: 'construction' }] }]
       })

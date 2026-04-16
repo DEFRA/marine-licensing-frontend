@@ -109,8 +109,6 @@ export const typeOfActivitySubmitController = {
       }
     )
 
-    return h
-      .redirect(marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS)
-      .takeover()
+    return h.redirect(marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS)
   }
 }

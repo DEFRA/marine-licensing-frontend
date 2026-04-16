@@ -8,6 +8,7 @@ const sanitiseOptions = {
     p: ['class']
   },
   allowedSchemes: ['http', 'https'],
+  // Transform <p> tags to <p class='govuk-hint'> for grey styling
   transformTags: {
     p: (tagName, attribs) => ({
       tagName,

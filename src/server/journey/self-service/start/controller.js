@@ -9,7 +9,6 @@ export const iatStartController = {
   handler(_request, h) {
     return h.view('journey/self-service/start/index', {
       pageTitle: 'Check if you need a marine licence',
-      firstQuestionRoute: `${ROUTE_PREFIX}${getFirstQuestionRoute()}`,
       links: {
         jurisdiction:
           'https://www.gov.uk/guidance/marine-licensing-definitions#jurisdiction',

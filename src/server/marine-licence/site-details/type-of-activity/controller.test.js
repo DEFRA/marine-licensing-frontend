@@ -69,23 +69,15 @@ describe('#typeOfActivity', () => {
 
       await typeOfActivitySubmitController.handler(request, redirectH)
 
-      expect(updateMarineLicenceSiteActivityDetails).toHaveBeenNthCalledWith(
-        1,
+      expect(updateMarineLicenceSiteActivityDetails).toHaveBeenCalledWith(
         request,
         redirectH,
         0,
         0,
-        'activityType',
-        'removal'
-      )
-      expect(updateMarineLicenceSiteActivityDetails).toHaveBeenNthCalledWith(
-        2,
-        request,
-        redirectH,
-        0,
-        0,
-        'activitySubType',
-        'removal-type-2'
+        {
+          activityType: 'removal',
+          activitySubType: 'removal-type-2'
+        }
       )
       expect(redirectH.redirect).toHaveBeenCalledWith(
         marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS

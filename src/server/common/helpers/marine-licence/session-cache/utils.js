@@ -51,8 +51,7 @@ export const updateMarineLicenceSiteActivityDetails = async (
   h,
   siteIndex,
   activityDetailsIndex,
-  key,
-  value
+  values
 ) => {
   const existingCache = getMarineLicenceCache(request)
   const existingActivityDetails =
@@ -61,7 +60,7 @@ export const updateMarineLicenceSiteActivityDetails = async (
   const updatedActivityDetails = [...existingActivityDetails]
   updatedActivityDetails[activityDetailsIndex] = {
     ...updatedActivityDetails[activityDetailsIndex],
-    [key]: value
+    ...values
   }
 
   return updateMarineLicenceSiteDetails(

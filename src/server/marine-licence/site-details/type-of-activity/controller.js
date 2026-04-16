@@ -103,17 +103,10 @@ export const typeOfActivitySubmitController = {
       h,
       siteIndex,
       activityDetailsIndex,
-      'activityType',
-      payload.activityType
-    )
-
-    await updateMarineLicenceSiteActivityDetails(
-      request,
-      h,
-      siteIndex,
-      activityDetailsIndex,
-      'activitySubType',
-      activitySubTypeByType[payload.activityType]
+      {
+        activityType: payload.activityType,
+        activitySubType: activitySubTypeByType[payload.activityType]
+      }
     )
 
     return h

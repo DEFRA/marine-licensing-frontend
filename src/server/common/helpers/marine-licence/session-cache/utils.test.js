@@ -259,7 +259,7 @@ describe('#utils', () => {
       }
     })
 
-    test('should update the correct key in the correct activity object', async () => {
+    test('should update the provided fields in the correct activity object', async () => {
       mockRequest.yar.get.mockReturnValue({
         siteDetails: [
           {
@@ -276,8 +276,10 @@ describe('#utils', () => {
         mockH,
         0,
         1,
-        'activityType',
-        'removal'
+        {
+          activityType: 'removal',
+          activitySubType: 'removal-type-2'
+        }
       )
 
       expect(mockRequest.yar.set).toHaveBeenCalledWith(
@@ -287,7 +289,10 @@ describe('#utils', () => {
             {
               activityDetails: [
                 { activityType: 'construction' },
-                { activityType: 'removal' }
+                {
+                  activityType: 'removal',
+                  activitySubType: 'removal-type-2'
+                }
               ]
             }
           ]
@@ -296,7 +301,10 @@ describe('#utils', () => {
       expect(result).toEqual({
         activityDetails: [
           { activityType: 'construction' },
-          { activityType: 'removal' }
+          {
+            activityType: 'removal',
+            activitySubType: 'removal-type-2'
+          }
         ]
       })
     })
@@ -318,8 +326,9 @@ describe('#utils', () => {
         mockH,
         0,
         0,
-        'activityType',
-        'removal'
+        {
+          activityType: 'removal'
+        }
       )
 
       expect(mockRequest.yar.set).toHaveBeenCalledWith(
@@ -347,8 +356,9 @@ describe('#utils', () => {
         mockH,
         0,
         0,
-        'activityType',
-        'construction'
+        {
+          activityType: 'construction'
+        }
       )
 
       expect(mockRequest.yar.set).toHaveBeenCalledWith(
@@ -372,8 +382,9 @@ describe('#utils', () => {
         mockH,
         0,
         0,
-        'activityType',
-        'deposit'
+        {
+          activityType: 'deposit'
+        }
       )
 
       expect(result).toEqual({ activityDetails: [{ activityType: 'deposit' }] })

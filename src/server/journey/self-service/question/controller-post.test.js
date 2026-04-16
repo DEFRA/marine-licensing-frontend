@@ -12,6 +12,7 @@ import {
 } from '#src/server/journey/self-service/services/journey-data.js'
 import { calculateNextRoute } from '#src/server/journey/self-service/services/journey-router.js'
 import { pushRoute } from '#src/server/journey/self-service/services/journey-history.js'
+
 describe('#questionPostController', () => {
   const mockQuestion = {
     route: '/sea',

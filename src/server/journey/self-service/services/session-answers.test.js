@@ -6,10 +6,10 @@ import {
   getBackLink,
   clearAnswers
 } from '#src/server/journey/self-service/services/session-answers.js'
+import { ROUTE_PREFIX } from '#src/server/journey/self-service/services/journey-data.js'
 import { routes } from '#src/server/common/constants/routes.js'
 
 const { IAT_START } = routes
-const ROUTE_PREFIX = IAT_START.replace(/\/start$/, '')
 
 function createMockRequest(answers = []) {
   return {

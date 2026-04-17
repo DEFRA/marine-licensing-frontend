@@ -46,6 +46,32 @@ export const updateMarineLicenceSiteDetails = async (
   return { [key]: cacheValue }
 }
 
+export const updateMarineLicenceSiteActivityDetails = async (
+  request,
+  h,
+  siteIndex,
+  activityDetailsIndex,
+  values
+) => {
+  const existingCache = getMarineLicenceCache(request)
+  const existingActivityDetails =
+    existingCache.siteDetails[siteIndex]?.activityDetails || []
+
+  const updatedActivityDetails = [...existingActivityDetails]
+  updatedActivityDetails[activityDetailsIndex] = {
+    ...updatedActivityDetails[activityDetailsIndex],
+    ...values
+  }
+
+  return updateMarineLicenceSiteDetails(
+    request,
+    h,
+    siteIndex,
+    'activityDetails',
+    updatedActivityDetails
+  )
+}
+
 export const updateMarineLicenceSiteDetailsBatch = (
   request,
   status,

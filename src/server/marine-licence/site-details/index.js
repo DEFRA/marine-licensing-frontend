@@ -3,6 +3,7 @@ import { coordinatesTypeRoutes } from '#src/server/marine-licence/site-details/c
 import { chooseFileTypeRoutes } from '#src/server/marine-licence/site-details/choose-file-type/index.js'
 import { fileUploadRoutes } from '#src/server/marine-licence/site-details/file-upload/index.js'
 import { siteNameRoutes } from '#src/server/marine-licence/site-details/site-name/index.js'
+import { typeOfActivityRoutes } from '#src/server/marine-licence/site-details/type-of-activity/index.js'
 import { reviewSiteDetailsRoutes } from '#src/server/marine-licence/site-details/review-site-details/index.js'
 import { uploadAndWaitRoutes } from '#src/server/marine-licence/site-details/upload-and-wait/index.js'
 
@@ -13,5 +14,6 @@ export const siteDetailsRoutes = [
   ...fileUploadRoutes,
   ...siteNameRoutes,
   ...reviewSiteDetailsRoutes,
+  ...typeOfActivityRoutes,
   ...uploadAndWaitRoutes
 ]

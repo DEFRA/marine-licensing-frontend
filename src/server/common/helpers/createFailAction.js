@@ -8,7 +8,8 @@ export const createFailAction = ({
   viewRoute,
   settings,
   errorMessages,
-  getBackLink
+  getBackLink,
+  params
 }) => {
   return (request, h, err) => {
     const { payload } = request
@@ -21,7 +22,8 @@ export const createFailAction = ({
           ...settings,
           payload,
           projectName,
-          backLink
+          backLink,
+          ...params
         })
         .takeover()
     }
@@ -36,7 +38,8 @@ export const createFailAction = ({
         projectName,
         backLink,
         errors,
-        errorSummary
+        errorSummary,
+        ...params
       })
       .takeover()
   }

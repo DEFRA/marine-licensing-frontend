@@ -36,14 +36,13 @@
 
 {% endblock %}
 
-{% block header %}
+{% block govukHeader %}
   {% include "partials/cookie-banner.njk" %}
 
   {{ govukHeader({
     homepageUrl: "https://www.gov.uk/",
     classes: "govuk-header--full-width-border",
-    serviceUrl: serviceUrl,
-    useTudorCrown: true
+    serviceUrl: serviceUrl
   }) }}
 
   {{ govukServiceNavigation({
@@ -82,7 +81,7 @@
 
 {% block content %}{% endblock %}
 
-{% block footer %}
+{% block govukFooter %}
   {{ govukFooter({
     meta: {
       items: [

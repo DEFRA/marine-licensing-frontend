@@ -167,15 +167,8 @@ export default {
           from: path.join(govukFrontendPath, 'dist/govuk/assets'),
           to: 'assets',
           globOptions: {
-            ignore: [
-              path.join(govukFrontendPath, 'dist/govuk/assets/rebrand'),
-              path.join(govukFrontendPath, 'dist/govuk/assets/images')
-            ]
+            ignore: []
           }
-        },
-        {
-          from: path.join(govukFrontendPath, 'dist/govuk/assets/rebrand'),
-          to: 'assets'
         },
         {
           from: require.resolve('ol/ol.css'),

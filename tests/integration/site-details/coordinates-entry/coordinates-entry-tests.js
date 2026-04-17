@@ -59,7 +59,7 @@ export function sharedCoordinatesEntryTests({
       [
         {
           field: 'coordinatesEntry',
-          message: 'Select how you want to enter the coordinates'
+          message: 'Select how you want to enter the site coordinates'
         }
       ],
       document

@@ -4,5 +4,6 @@ export const coordinatesEntrySettings = {
 }
 
 export const coordinatesEntryErrorMessages = {
-  COORDINATES_ENTRY_REQUIRED: 'Select how you want to enter the coordinates'
+  COORDINATES_ENTRY_REQUIRED:
+    'Select how you want to enter the site coordinates'
 }

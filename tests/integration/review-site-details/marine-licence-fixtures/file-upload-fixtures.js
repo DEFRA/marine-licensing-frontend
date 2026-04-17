@@ -1,5 +1,6 @@
 import { mockMarineLicenceApplication } from '~/src/server/test-helpers/mocks/marine-licence-mocks.js'
 import { marineLicenceRoutes } from '~/src/server/common/constants/routes.js'
+import { mockOutputActivityDetails } from '#src/server/test-helpers/mocks/marine-licence-mocks.js'
 
 export const testScenarios = [
   {
@@ -11,7 +12,8 @@ export const testScenarios = [
       hasIncompleteWarning: false,
       siteDetails: [
         {
-          ...mockMarineLicenceApplication.siteDetails[0]
+          ...mockMarineLicenceApplication.siteDetails[0],
+          activityDetails: [mockOutputActivityDetails]
         }
       ]
     }
@@ -31,7 +33,8 @@ export const testScenarios = [
       siteDetails: [
         {
           ...mockMarineLicenceApplication.siteDetails[0],
-          siteName: null
+          siteName: null,
+          activityDetails: [mockOutputActivityDetails]
         }
       ]
     }

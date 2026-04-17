@@ -5,7 +5,6 @@ import {
   typeOfActivityErrorMessages,
   MARINE_LICENCE_TYPE_OF_ACTIVITY_VIEW_ROUTE
 } from '#src/server/marine-licence/site-details/type-of-activity/controller.js'
-import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
 import {
   getMarineLicenceCache,
   updateMarineLicenceSiteActivityDetails
@@ -80,7 +79,7 @@ describe('#typeOfActivity', () => {
         }
       )
       expect(redirectH.redirect).toHaveBeenCalledWith(
-        marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS
+        '/marine-licence/activity-details/what-are-you-removing-on-an-ongoing-basis?site=1&activity=1'
       )
       expect(redirectH.redirect).toHaveBeenCalled()
     })

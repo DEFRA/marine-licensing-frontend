@@ -1,5 +1,8 @@
 import { getFileUploadSummaryData } from '#src/server/common/helpers/review-site-details/file-upload.js'
-import { mockMarineLicenceApplication } from '#src/server/test-helpers/mocks/marine-licence-mocks.js'
+import {
+  mockMarineLicenceApplication,
+  mockOutputActivityDetails
+} from '#src/server/test-helpers/mocks/marine-licence-mocks.js'
 
 describe('getFileUploadSummaryData util', () => {
   const activityDetails =
@@ -46,7 +49,7 @@ describe('getFileUploadSummaryData util', () => {
     const result = getFileUploadSummaryData(project)
 
     expect(result).toEqual({
-      activityDetails,
+      activityDetails: [mockOutputActivityDetails],
       coordinates: [
         {
           type: 'Point',
@@ -125,7 +128,7 @@ describe('getFileUploadSummaryData util', () => {
     const result = getFileUploadSummaryData(project)
 
     expect(result).toEqual({
-      activityDetails,
+      activityDetails: [mockOutputActivityDetails],
       coordinates: [
         {
           type: 'LineString',

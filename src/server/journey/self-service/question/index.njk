@@ -37,12 +37,14 @@
             {% set item = {
               value: answer.id,
               text: answer.text,
-              hint: { html: answer.hint }
+              hint: { html: answer.hint },
+              checked: answer.id === selectedAnswer
             } %}
           {% else %}
             {% set item = {
               value: answer.id,
-              text: answer.text
+              text: answer.text,
+              checked: answer.id === selectedAnswer
             } %}
           {% endif %}
           {% set items = (items.push(item), items) %}

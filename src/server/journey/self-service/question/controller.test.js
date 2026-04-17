@@ -1,14 +1,17 @@
 import { vi } from 'vitest'
 
 vi.mock('#src/server/journey/self-service/services/journey-data.js')
-vi.mock('#src/server/journey/self-service/services/journey-history.js')
+vi.mock('#src/server/journey/self-service/services/session-answers.js')
 
 import { questionController } from '#src/server/journey/self-service/question/controller.js'
 import {
   getQuestion,
   getSection
 } from '#src/server/journey/self-service/services/journey-data.js'
-import { getBackLink } from '#src/server/journey/self-service/services/journey-history.js'
+import {
+  getBackLink,
+  getAnswerForRoute
+} from '#src/server/journey/self-service/services/session-answers.js'
 
 describe('#questionController', () => {
   const mockQuestion = {
@@ -27,6 +30,7 @@ describe('#questionController', () => {
     vi.mocked(getQuestion).mockReturnValue(mockQuestion)
     vi.mocked(getSection).mockReturnValue(mockSection)
     vi.mocked(getBackLink).mockReturnValue('/journey/self-service/start')
+    vi.mocked(getAnswerForRoute).mockReturnValue(null)
   })
 
   test('calls h.view with the correct template and view model', () => {
@@ -38,11 +42,13 @@ describe('#questionController', () => {
     expect(getQuestion).toHaveBeenCalledWith('/sea')
     expect(getSection).toHaveBeenCalledWith('doINeedAMarineLicence')
     expect(getBackLink).toHaveBeenCalledWith(request, '/sea')
+    expect(getAnswerForRoute).toHaveBeenCalledWith(request, '/sea')
     expect(h.view).toHaveBeenCalledWith('journey/self-service/question/index', {
       pageTitle: 'Where will the activity take place?',
       question: mockQuestion,
       section: mockSection,
-      backLink: '/journey/self-service/start'
+      backLink: '/journey/self-service/start',
+      selectedAnswer: null
     })
   })
 
@@ -73,6 +79,19 @@ describe('#questionController', () => {
     expect(h.view).toHaveBeenCalledWith(
       'journey/self-service/question/index',
       expect.objectContaining({ section: null })
+    )
+  })
+
+  test('passes selectedAnswer when a previous answer exists', () => {
+    vi.mocked(getAnswerForRoute).mockReturnValue('inSea')
+    const request = { params: { questionPath: 'sea' } }
+    const h = { view: vi.fn() }
+
+    questionController.handler(request, h)
+
+    expect(h.view).toHaveBeenCalledWith(
+      'journey/self-service/question/index',
+      expect.objectContaining({ selectedAnswer: 'inSea' })
     )
   })
 })

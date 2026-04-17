@@ -102,7 +102,7 @@ describe('#formatProjectsForDisplay', () => {
           { text: 'Exempt activity notification' },
           { text: 'ML-2024-001' },
           {
-            html: '<strong class="govuk-tag govuk-tag--light-blue">Draft</strong>'
+            html: '<strong class="govuk-tag govuk-tag--app-light-blue">Draft</strong>'
           },
           {
             text: '15 Jan 2024',
@@ -138,7 +138,7 @@ describe('#formatProjectsForDisplay', () => {
           { text: 'Exempt activity notification' },
           { text: '-' },
           {
-            html: '<strong class="govuk-tag govuk-tag--light-blue">Draft</strong>'
+            html: '<strong class="govuk-tag govuk-tag--app-light-blue">Draft</strong>'
           },
           {
             text: '-',
@@ -182,7 +182,7 @@ describe('#formatProjectsForDisplay', () => {
         { text: 'Exempt activity notification' },
         { text: 'ML-2024-001' },
         {
-          html: '<strong class="govuk-tag govuk-tag--light-blue">Draft</strong>'
+          html: '<strong class="govuk-tag govuk-tag--app-light-blue">Draft</strong>'
         },
         {
           text: '15 Jan 2024',
@@ -268,7 +268,7 @@ describe('#formatProjectsForDisplay', () => {
 
     const result = formatProjectsForDisplay(projects)
 
-    expect(result[0].cells[3].html).toContain('govuk-tag--light-blue')
+    expect(result[0].cells[3].html).toContain('govuk-tag--app-light-blue')
     expect(result[0].cells[3].html).toContain('Draft')
     expect(result[1].cells[3].html).toContain('govuk-tag--green')
     expect(result[1].cells[3].html).toContain('Active')

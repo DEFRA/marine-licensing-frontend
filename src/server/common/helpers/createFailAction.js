@@ -34,9 +34,9 @@ export const createFailAction = ({
         payload,
         projectName,
         backLink,
-        ...params,
         errors,
-        errorSummary
+        errorSummary,
+        ...params
       })
       .takeover()
   }

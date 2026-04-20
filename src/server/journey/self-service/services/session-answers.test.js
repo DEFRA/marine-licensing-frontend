@@ -3,6 +3,8 @@ import {
   getAnswers,
   getAnswerForRoute,
   pushAnswer,
+  pushOutcomeSelection,
+  getOutcomeSelection,
   getBackLink,
   clearAnswers
 } from '#src/server/journey/self-service/services/session-answers.js'
@@ -23,7 +25,9 @@ function createMockRequest(answers = []) {
 describe('#session-answers', () => {
   describe('#getAnswers', () => {
     test('returns the answers array', () => {
-      const answers = [{ questionRoute: '/sea', answerId: 'inSea' }]
+      const answers = [
+        { type: 'question', questionRoute: '/sea', answerId: 'inSea' }
+      ]
       const request = createMockRequest(answers)
       expect(getAnswers(request)).toEqual(answers)
     })
@@ -37,14 +41,14 @@ describe('#session-answers', () => {
   describe('#getAnswerForRoute', () => {
     test('returns the answerId for a known question route', () => {
       const request = createMockRequest([
-        { questionRoute: '/sea', answerId: 'inSea' }
+        { type: 'question', questionRoute: '/sea', answerId: 'inSea' }
       ])
       expect(getAnswerForRoute(request, '/sea')).toBe('inSea')
     })
 
-    test('returns null when question route is not in answers', () => {
+    test('returns null when route is not in answers', () => {
       const request = createMockRequest([
-        { questionRoute: '/sea', answerId: 'inSea' }
+        { type: 'question', questionRoute: '/sea', answerId: 'inSea' }
       ])
       expect(getAnswerForRoute(request, '/jurisdiction')).toBeNull()
     })
@@ -53,84 +57,271 @@ describe('#session-answers', () => {
       const request = createMockRequest(null)
       expect(getAnswerForRoute(request, '/sea')).toBeNull()
     })
+
+    test('treats a legacy entry (no type) as a question entry', () => {
+      const request = createMockRequest([
+        { questionRoute: '/sea', answerId: 'inSea' }
+      ])
+      expect(getAnswerForRoute(request, '/sea')).toBe('inSea')
+    })
+
+    test('does not match outcome entries by their outcomeRoute', () => {
+      const request = createMockRequest([
+        {
+          type: 'outcome',
+          outcomeRoute: '/construction/journey-select',
+          outcomeTypeId: 'WO_CON_SELF_SERVICE_JOURNEY'
+        }
+      ])
+      expect(
+        getAnswerForRoute(request, '/construction/journey-select')
+      ).toBeNull()
+    })
   })
 
   describe('#pushAnswer', () => {
-    test('appends answer to existing answers', () => {
+    test('appends a question entry with type field', () => {
       const request = createMockRequest([
-        { questionRoute: '/sea', answerId: 'inSea' }
+        { type: 'question', questionRoute: '/sea', answerId: 'inSea' }
       ])
       pushAnswer(request, '/jurisdiction', 'englandWales')
       expect(request.yar.set).toHaveBeenCalledWith('selfServiceAnswers', [
-        { questionRoute: '/sea', answerId: 'inSea' },
-        { questionRoute: '/jurisdiction', answerId: 'englandWales' }
+        { type: 'question', questionRoute: '/sea', answerId: 'inSea' },
+        {
+          type: 'question',
+          questionRoute: '/jurisdiction',
+          answerId: 'englandWales'
+        }
       ])
     })
 
-    test('creates new answers array when none exists', () => {
+    test('creates a new answers array when none exists', () => {
       const request = createMockRequest(null)
       pushAnswer(request, '/sea', 'inSea')
       expect(request.yar.set).toHaveBeenCalledWith('selfServiceAnswers', [
-        { questionRoute: '/sea', answerId: 'inSea' }
+        { type: 'question', questionRoute: '/sea', answerId: 'inSea' }
       ])
     })
 
-    test('truncates future answers when re-answering an earlier question', () => {
+    test('truncates future entries when re-answering an earlier question', () => {
+      const request = createMockRequest([
+        { type: 'question', questionRoute: '/sea', answerId: 'inSea' },
+        {
+          type: 'question',
+          questionRoute: '/jurisdiction',
+          answerId: 'englandWales'
+        },
+        {
+          type: 'question',
+          questionRoute: '/activity-type',
+          answerId: 'construction'
+        }
+      ])
+      pushAnswer(request, '/jurisdiction', 'scotland')
+      expect(request.yar.set).toHaveBeenCalledWith('selfServiceAnswers', [
+        { type: 'question', questionRoute: '/sea', answerId: 'inSea' },
+        {
+          type: 'question',
+          questionRoute: '/jurisdiction',
+          answerId: 'scotland'
+        }
+      ])
+    })
+
+    test('matches a legacy entry (no type) on truncation', () => {
       const request = createMockRequest([
         { questionRoute: '/sea', answerId: 'inSea' },
-        { questionRoute: '/jurisdiction', answerId: 'englandWales' },
-        { questionRoute: '/activity-type', answerId: 'construction' }
+        { questionRoute: '/jurisdiction', answerId: 'englandWales' }
       ])
       pushAnswer(request, '/jurisdiction', 'scotland')
       expect(request.yar.set).toHaveBeenCalledWith('selfServiceAnswers', [
         { questionRoute: '/sea', answerId: 'inSea' },
-        { questionRoute: '/jurisdiction', answerId: 'scotland' }
+        {
+          type: 'question',
+          questionRoute: '/jurisdiction',
+          answerId: 'scotland'
+        }
       ])
+    })
+  })
+
+  describe('#pushOutcomeSelection', () => {
+    test('appends an outcome entry', () => {
+      const request = createMockRequest([
+        { type: 'question', questionRoute: '/sea', answerId: 'inSea' }
+      ])
+      pushOutcomeSelection(
+        request,
+        '/construction/journey-select',
+        'WO_CON_SELF_SERVICE_JOURNEY'
+      )
+      expect(request.yar.set).toHaveBeenCalledWith('selfServiceAnswers', [
+        { type: 'question', questionRoute: '/sea', answerId: 'inSea' },
+        {
+          type: 'outcome',
+          outcomeRoute: '/construction/journey-select',
+          outcomeTypeId: 'WO_CON_SELF_SERVICE_JOURNEY'
+        }
+      ])
+    })
+
+    test('truncates future entries when re-selecting an earlier outcome', () => {
+      const request = createMockRequest([
+        { type: 'question', questionRoute: '/sea', answerId: 'inSea' },
+        {
+          type: 'outcome',
+          outcomeRoute: '/construction/journey-select',
+          outcomeTypeId: 'WO_CON_EXEMPTION_JOURNEY'
+        },
+        {
+          type: 'question',
+          questionRoute: '/exemption/construction',
+          answerId: 'noExemption'
+        }
+      ])
+      pushOutcomeSelection(
+        request,
+        '/construction/journey-select',
+        'WO_CON_SELF_SERVICE_JOURNEY'
+      )
+      expect(request.yar.set).toHaveBeenCalledWith('selfServiceAnswers', [
+        { type: 'question', questionRoute: '/sea', answerId: 'inSea' },
+        {
+          type: 'outcome',
+          outcomeRoute: '/construction/journey-select',
+          outcomeTypeId: 'WO_CON_SELF_SERVICE_JOURNEY'
+        }
+      ])
+    })
+  })
+
+  describe('#getOutcomeSelection', () => {
+    test('returns the outcomeTypeId for a known outcome route', () => {
+      const request = createMockRequest([
+        {
+          type: 'outcome',
+          outcomeRoute: '/construction/journey-select',
+          outcomeTypeId: 'WO_CON_SELF_SERVICE_JOURNEY'
+        }
+      ])
+      expect(getOutcomeSelection(request, '/construction/journey-select')).toBe(
+        'WO_CON_SELF_SERVICE_JOURNEY'
+      )
+    })
+
+    test('returns null when the outcome is not stored', () => {
+      const request = createMockRequest([
+        { type: 'question', questionRoute: '/sea', answerId: 'inSea' }
+      ])
+      expect(
+        getOutcomeSelection(request, '/construction/journey-select')
+      ).toBeNull()
     })
   })
 
   describe('#getBackLink', () => {
     test('returns start page when answers are empty', () => {
       const request = createMockRequest([])
-      expect(getBackLink(request, '/sea')).toBe(IAT_START)
+      expect(getBackLink(request, '/sea', 'question')).toBe(IAT_START)
     })
 
-    test('returns the previous answer route when current route is in answers', () => {
+    test('returns previous question URL when current is a later question', () => {
       const request = createMockRequest([
-        { questionRoute: '/sea', answerId: 'inSea' },
-        { questionRoute: '/jurisdiction', answerId: 'englandWales' }
+        { type: 'question', questionRoute: '/sea', answerId: 'inSea' },
+        {
+          type: 'question',
+          questionRoute: '/jurisdiction',
+          answerId: 'englandWales'
+        }
       ])
-      expect(getBackLink(request, '/jurisdiction')).toBe(`${ROUTE_PREFIX}/sea`)
+      expect(getBackLink(request, '/jurisdiction', 'question')).toBe(
+        `${ROUTE_PREFIX}/sea`
+      )
     })
 
-    test('returns start page when current route is the first in answers', () => {
+    test('returns /outcome/ prefixed URL when previous entry is an outcome', () => {
       const request = createMockRequest([
-        { questionRoute: '/sea', answerId: 'inSea' },
-        { questionRoute: '/jurisdiction', answerId: 'englandWales' }
+        { type: 'question', questionRoute: '/sea', answerId: 'inSea' },
+        {
+          type: 'outcome',
+          outcomeRoute: '/construction/journey-select',
+          outcomeTypeId: 'WO_CON_SELF_SERVICE_JOURNEY'
+        },
+        {
+          type: 'question',
+          questionRoute: '/construction/activity',
+          answerId: 'someAnswer'
+        }
       ])
-      expect(getBackLink(request, '/sea')).toBe(IAT_START)
+      expect(getBackLink(request, '/construction/activity', 'question')).toBe(
+        `${ROUTE_PREFIX}/outcome/construction/journey-select`
+      )
     })
 
-    test('returns last answer route when current route is not in answers', () => {
+    test('returns previous entry URL when current is an outcome with a question before it', () => {
       const request = createMockRequest([
-        { questionRoute: '/sea', answerId: 'inSea' },
-        { questionRoute: '/jurisdiction', answerId: 'englandWales' }
+        {
+          type: 'question',
+          questionRoute: '/activity-type',
+          answerId: 'construction'
+        },
+        {
+          type: 'outcome',
+          outcomeRoute: '/construction/journey-select',
+          outcomeTypeId: 'WO_CON_SELF_SERVICE_JOURNEY'
+        }
       ])
-      expect(getBackLink(request, '/activity-type')).toBe(
+      expect(
+        getBackLink(request, '/construction/journey-select', 'outcome')
+      ).toBe(`${ROUTE_PREFIX}/activity-type`)
+    })
+
+    test('returns start page when current is the first entry', () => {
+      const request = createMockRequest([
+        { type: 'question', questionRoute: '/sea', answerId: 'inSea' },
+        {
+          type: 'question',
+          questionRoute: '/jurisdiction',
+          answerId: 'englandWales'
+        }
+      ])
+      expect(getBackLink(request, '/sea', 'question')).toBe(IAT_START)
+    })
+
+    test('returns last entry URL when current is not in the array', () => {
+      const request = createMockRequest([
+        { type: 'question', questionRoute: '/sea', answerId: 'inSea' },
+        {
+          type: 'question',
+          questionRoute: '/jurisdiction',
+          answerId: 'englandWales'
+        }
+      ])
+      expect(getBackLink(request, '/activity-type', 'question')).toBe(
         `${ROUTE_PREFIX}/jurisdiction`
       )
     })
 
     test('returns start page when answers are null', () => {
       const request = createMockRequest(null)
-      expect(getBackLink(request, '/sea')).toBe(IAT_START)
+      expect(getBackLink(request, '/sea', 'question')).toBe(IAT_START)
+    })
+
+    test('treats legacy entry (no type) as a question entry when matching current', () => {
+      const request = createMockRequest([
+        { questionRoute: '/sea', answerId: 'inSea' },
+        { questionRoute: '/jurisdiction', answerId: 'englandWales' }
+      ])
+      expect(getBackLink(request, '/jurisdiction', 'question')).toBe(
+        `${ROUTE_PREFIX}/sea`
+      )
     })
   })
 
   describe('#clearAnswers', () => {
     test('sets answers to empty array', () => {
       const request = createMockRequest([
-        { questionRoute: '/sea', answerId: 'inSea' }
+        { type: 'question', questionRoute: '/sea', answerId: 'inSea' }
       ])
       clearAnswers(request)
       expect(request.yar.set).toHaveBeenCalledWith('selfServiceAnswers', [])

@@ -3,43 +3,85 @@ import { ROUTE_PREFIX } from '#src/server/journey/self-service/services/journey-
 
 const SESSION_KEY = 'selfServiceAnswers'
 
+function entryType(entry) {
+  return entry.type ?? 'question'
+}
+
+function isQuestionEntry(entry) {
+  return entryType(entry) === 'question'
+}
+
+function isOutcomeEntry(entry) {
+  return entryType(entry) === 'outcome'
+}
+
+function urlForEntry(entry) {
+  if (isOutcomeEntry(entry)) {
+    return `${ROUTE_PREFIX}/outcome/${entry.outcomeRoute.replace(/^\//, '')}`
+  }
+  return `${ROUTE_PREFIX}/${entry.questionRoute.replace(/^\//, '')}`
+}
+
 export function getAnswers(request) {
   return request.yar.get(SESSION_KEY) ?? []
 }
 
 export function getAnswerForRoute(request, questionRoute) {
   const answers = getAnswers(request)
-  const entry = answers.find((a) => a.questionRoute === questionRoute)
+  const entry = answers.find(
+    (e) => isQuestionEntry(e) && e.questionRoute === questionRoute
+  )
   return entry?.answerId ?? null
 }
 
 export function pushAnswer(request, questionRoute, answerId) {
   const answers = getAnswers(request)
-
   const existingIndex = answers.findIndex(
-    (a) => a.questionRoute === questionRoute
+    (e) => isQuestionEntry(e) && e.questionRoute === questionRoute
   )
   if (existingIndex !== -1) {
     answers.splice(existingIndex)
   }
-
-  answers.push({ questionRoute, answerId })
+  answers.push({ type: 'question', questionRoute, answerId })
   request.yar.set(SESSION_KEY, answers)
 }
 
-export function getBackLink(request, currentRoute) {
+export function pushOutcomeSelection(request, outcomeRoute, outcomeTypeId) {
+  const answers = getAnswers(request)
+  const existingIndex = answers.findIndex(
+    (e) => isOutcomeEntry(e) && e.outcomeRoute === outcomeRoute
+  )
+  if (existingIndex !== -1) {
+    answers.splice(existingIndex)
+  }
+  answers.push({ type: 'outcome', outcomeRoute, outcomeTypeId })
+  request.yar.set(SESSION_KEY, answers)
+}
+
+export function getOutcomeSelection(request, outcomeRoute) {
+  const answers = getAnswers(request)
+  const entry = answers.find(
+    (e) => isOutcomeEntry(e) && e.outcomeRoute === outcomeRoute
+  )
+  return entry?.outcomeTypeId ?? null
+}
+
+export function getBackLink(request, currentRoute, currentType) {
   const answers = getAnswers(request)
 
-  const currentIndex = answers.findIndex(
-    (a) => a.questionRoute === currentRoute
-  )
+  const currentIndex = answers.findIndex((e) => {
+    if (entryType(e) !== currentType) return false
+    return currentType === 'outcome'
+      ? e.outcomeRoute === currentRoute
+      : e.questionRoute === currentRoute
+  })
 
   if (currentIndex > 0) {
-    return `${ROUTE_PREFIX}/${answers[currentIndex - 1].questionRoute.replace(/^\//, '')}`
+    return urlForEntry(answers[currentIndex - 1])
   }
 
   if (currentIndex === -1 && answers.length > 0) {
-    return `${ROUTE_PREFIX}/${answers[answers.length - 1].questionRoute.replace(/^\//, '')}`
+    return urlForEntry(answers[answers.length - 1])
   }
 
   return routes.IAT_START

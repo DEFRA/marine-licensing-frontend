@@ -136,6 +136,14 @@ describe('#questionController (integration)', () => {
     })
   })
 
+  const getSessionCookie = (response) => {
+    const setCookieHeader = response.headers['set-cookie']
+    const sessionCookie = Array.isArray(setCookieHeader)
+      ? setCookieHeader[0]
+      : setCookieHeader || ''
+    return sessionCookie ? { cookie: sessionCookie } : {}
+  }
+
   describe('navigation flow', () => {
     test('second question page has back link to previous question', async () => {
       const { response: postResponse } = await postPage(
@@ -143,17 +151,55 @@ describe('#questionController (integration)', () => {
         { answer: 'inSea' }
       )
 
-      const setCookieHeader = postResponse.headers['set-cookie']
-      const sessionCookie = Array.isArray(setCookieHeader)
-        ? setCookieHeader[0]
-        : setCookieHeader || ''
+      const headers = getSessionCookie(postResponse)
 
       const { document } = await getPage(
         '/journey/self-service/jurisdiction',
-        sessionCookie ? { cookie: sessionCookie } : {}
+        headers
       )
       const backLink = document.querySelector('.govuk-back-link')
       expect(backLink.getAttribute('href')).toBe('/journey/self-service/sea')
+    })
+
+    test('previous answer is pre-selected when navigating back', async () => {
+      const { response: postResponse } = await postPage(
+        '/journey/self-service/sea',
+        { answer: 'inSea' }
+      )
+
+      const headers = getSessionCookie(postResponse)
+
+      const { document } = await getPage('/journey/self-service/sea', headers)
+      const checkedRadio = document.querySelector(
+        'input[type="radio"][checked]'
+      )
+      expect(checkedRadio).not.toBeNull()
+      expect(checkedRadio.getAttribute('value')).toBe('inSea')
+    })
+
+    test('starting a new session clears previous answers', async () => {
+      const { response: postResponse } = await postPage(
+        '/journey/self-service/sea',
+        { answer: 'inSea' }
+      )
+
+      const headers = getSessionCookie(postResponse)
+
+      const { response: startResponse } = await postPage(
+        '/journey/self-service/start',
+        {},
+        headers
+      )
+      const startHeaders = getSessionCookie(startResponse)
+
+      const { document } = await getPage(
+        '/journey/self-service/sea',
+        startHeaders
+      )
+      const checkedRadio = document.querySelector(
+        'input[type="radio"][checked]'
+      )
+      expect(checkedRadio).toBeNull()
     })
   })
 })

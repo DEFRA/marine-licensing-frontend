@@ -3,7 +3,7 @@ import { statusCodes } from '#src/server/common/constants/status-codes.js'
 
 vi.mock('#src/server/journey/self-service/services/journey-data.js')
 vi.mock('#src/server/journey/self-service/services/journey-router.js')
-vi.mock('#src/server/journey/self-service/services/journey-history.js')
+vi.mock('#src/server/journey/self-service/services/session-answers.js')
 
 import { questionPostController } from '#src/server/journey/self-service/question/controller-post.js'
 import {
@@ -11,7 +11,7 @@ import {
   getSection
 } from '#src/server/journey/self-service/services/journey-data.js'
 import { calculateNextRoute } from '#src/server/journey/self-service/services/journey-router.js'
-import { pushRoute } from '#src/server/journey/self-service/services/journey-history.js'
+import { pushAnswer } from '#src/server/journey/self-service/services/session-answers.js'
 
 describe('#questionPostController', () => {
   const mockQuestion = {
@@ -36,7 +36,7 @@ describe('#questionPostController', () => {
   beforeEach(() => {
     vi.mocked(getQuestion).mockReturnValue(mockQuestion)
     vi.mocked(getSection).mockReturnValue(mockSection)
-    vi.mocked(pushRoute).mockReturnValue(undefined)
+    vi.mocked(pushAnswer).mockReturnValue(undefined)
   })
 
   test('redirects to the next question on valid answer', () => {
@@ -53,7 +53,7 @@ describe('#questionPostController', () => {
 
     questionPostController.handler(request, h)
 
-    expect(pushRoute).toHaveBeenCalledWith(request, '/sea')
+    expect(pushAnswer).toHaveBeenCalledWith(request, '/sea', 'inSea')
     expect(h.redirect).toHaveBeenCalledWith(
       '/journey/self-service/jurisdiction'
     )

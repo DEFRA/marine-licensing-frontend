@@ -1,7 +1,10 @@
 import { JSDOM } from 'jsdom'
 import { statusCodes } from '#src/server/common/constants/status-codes.js'
 import { setupTestServer } from '#tests/integration/shared/test-setup-helpers.js'
-import { makeGetRequest } from '#src/server/test-helpers/server-requests.js'
+import {
+  makeGetRequest,
+  makePostRequest
+} from '#src/server/test-helpers/server-requests.js'
 import { config } from '#src/config/config.js'
 
 describe('#iatStartController (integration)', () => {
@@ -73,12 +76,14 @@ describe('#iatStartController (integration)', () => {
     expect(backLink.getAttribute('style')).toBeNull()
   })
 
-  test('Renders a "Start now" button linking to the first question', async () => {
+  test('Renders a "Start now" button inside a POST form', async () => {
     const { document } = await getPage()
     const startButton = document.querySelector('.govuk-button--start')
     expect(startButton).not.toBeNull()
     expect(startButton.textContent).toContain('Start now')
-    expect(startButton.getAttribute('href')).toBe('/journey/self-service/sea')
+    const form = startButton.closest('form')
+    expect(form).not.toBeNull()
+    expect(form.getAttribute('method')).toBe('POST')
   })
 
   test('Does not render the phase banner', async () => {
@@ -89,5 +94,15 @@ describe('#iatStartController (integration)', () => {
   test('Renders no navigation links in the header', async () => {
     const { document } = await getPage()
     expect(document.querySelector('.govuk-service-navigation__list')).toBeNull()
+  })
+
+  test('POST redirects to first question', async () => {
+    const response = await makePostRequest({
+      url: '/journey/self-service/start',
+      server: getServer(),
+      formData: {}
+    })
+    expect(response.statusCode).toBe(statusCodes.redirect)
+    expect(response.headers.location).toBe('/journey/self-service/sea')
   })
 })

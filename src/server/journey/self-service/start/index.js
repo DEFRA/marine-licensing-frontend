@@ -1,4 +1,7 @@
-import { iatStartController } from '#src/server/journey/self-service/start/controller.js'
+import {
+  iatStartController,
+  iatStartPostController
+} from '#src/server/journey/self-service/start/controller.js'
 import { routes } from '#src/server/common/constants/routes.js'
 
 export const journeySelfServiceStart = {
@@ -13,6 +16,14 @@ export const journeySelfServiceStart = {
             auth: false
           },
           ...iatStartController
+        },
+        {
+          method: 'POST',
+          path: routes.IAT_START,
+          options: {
+            auth: false
+          },
+          ...iatStartPostController
         }
       ])
     }

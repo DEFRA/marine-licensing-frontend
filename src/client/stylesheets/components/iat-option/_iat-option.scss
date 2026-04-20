@@ -1,0 +1,6 @@
+@use 'govuk-frontend' as *;
+
+.app-iat-option {
+  border: 1px solid $govuk-border-colour;
+  padding: govuk-spacing(4);
+}

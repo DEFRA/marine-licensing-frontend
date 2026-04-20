@@ -1,0 +1,57 @@
+{% extends "layouts/page.njk" %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+
+{% block beforeContent %}
+  {{ appBackLink({ backLink: backLink }) }}
+{% endblock %}
+
+{% block content %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+
+      {% if section %}
+        <span class="govuk-caption-l">{{ section.text }}</span>
+      {% endif %}
+
+      <h1 class="govuk-heading-xl">{{ outcome.heading }}</h1>
+
+      {% if outcome.text %}
+        <div class="govuk-body">{{ outcome.text | safe }}</div>
+      {% endif %}
+
+      {% for option in options %}
+        <div class="app-iat-option govuk-!-margin-bottom-6">
+          <h2 class="govuk-heading-m">Option {{ loop.index }} - {{ option.heading }}</h2>
+
+          {% if option.text %}
+            <div class="govuk-body">{{ option.text | safe }}</div>
+          {% endif %}
+
+          <div class="govuk-button-group">
+            {% if option.isTerminal %}
+              {# Terminal outcomeType on intermediate page — see ML-1268 #}
+              {{ govukButton({
+                text: "Continue",
+                href: "#"
+              }) }}
+            {% else %}
+              <form method="POST">
+                <input type="hidden" name="csrfToken" value="{{ csrfToken }}"/>
+                <input type="hidden" name="outcomeType" value="{{ option.id }}"/>
+                {{ govukButton({ text: "Continue" }) }}
+              </form>
+            {% endif %}
+
+            {# PDF download deferred to ML-1165 #}
+            {{ govukButton({
+              text: "Download a PDF record of my answers",
+              href: "#",
+              classes: "govuk-button--secondary"
+            }) }}
+          </div>
+        </div>
+      {% endfor %}
+
+    </div>
+  </div>
+{% endblock %}

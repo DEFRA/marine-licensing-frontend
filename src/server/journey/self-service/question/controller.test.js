@@ -41,7 +41,7 @@ describe('#questionController', () => {
 
     expect(getQuestion).toHaveBeenCalledWith('/sea')
     expect(getSection).toHaveBeenCalledWith('doINeedAMarineLicence')
-    expect(getBackLink).toHaveBeenCalledWith(request, '/sea')
+    expect(getBackLink).toHaveBeenCalledWith(request, '/sea', 'question')
     expect(getAnswerForRoute).toHaveBeenCalledWith(request, '/sea')
     expect(h.view).toHaveBeenCalledWith('journey/self-service/question/index', {
       pageTitle: 'Where will the activity take place?',

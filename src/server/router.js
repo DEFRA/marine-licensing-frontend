@@ -17,6 +17,7 @@ import { postLogin } from '#src/server/defraid-post-login/index.js'
 import { defraIdGuidance } from '#src/server/defraid-guidance/index.js'
 import { journeySelfServiceStart } from '#src/server/journey/self-service/start/index.js'
 import { journeySelfServiceQuestion } from '#src/server/journey/self-service/question/index.js'
+import { journeySelfServiceOutcome } from '#src/server/journey/self-service/outcome/index.js'
 
 export const router = {
   plugin: {
@@ -46,7 +47,11 @@ export const router = {
       ]
 
       if (config.get('selfService.enabled')) {
-        plugins.push(journeySelfServiceStart, journeySelfServiceQuestion)
+        plugins.push(
+          journeySelfServiceStart,
+          journeySelfServiceQuestion,
+          journeySelfServiceOutcome
+        )
       }
 
       await server.register(plugins)

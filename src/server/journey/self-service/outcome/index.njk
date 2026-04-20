@@ -28,18 +28,22 @@
             <div class="govuk-body">{{ option.text | safe }}</div>
           {% endif %}
 
-          <div class="govuk-button-group">
+          <div class="app-iat-option__actions">
             {% if option.isTerminal %}
               {# Terminal outcomeType on intermediate page — see ML-1268 #}
               {{ govukButton({
                 text: "Continue",
-                href: "#"
+                href: "#",
+                classes: "govuk-!-margin-bottom-0"
               }) }}
             {% else %}
               <form method="POST">
                 <input type="hidden" name="csrfToken" value="{{ csrfToken }}"/>
                 <input type="hidden" name="outcomeType" value="{{ option.id }}"/>
-                {{ govukButton({ text: "Continue" }) }}
+                {{ govukButton({
+                  text: "Continue",
+                  classes: "govuk-!-margin-bottom-0"
+                }) }}
               </form>
             {% endif %}
 
@@ -47,7 +51,7 @@
             {{ govukButton({
               text: "Download a PDF record of my answers",
               href: "#",
-              classes: "govuk-button--secondary"
+              classes: "govuk-button--secondary govuk-!-margin-bottom-0"
             }) }}
           </div>
         </div>

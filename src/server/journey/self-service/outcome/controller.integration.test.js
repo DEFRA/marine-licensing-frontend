@@ -130,9 +130,8 @@ describe('#outcomeController (integration)', () => {
 
     test('renders the lead bold and anchor links preserved by sanitiseRichText', async () => {
       const { document } = await getPage()
-      const lead = document.querySelector(
-        '.govuk-grid-column-two-thirds > .govuk-body'
-      )
+      const lead = document.querySelector('.govuk-inset-text')
+      expect(lead).not.toBeNull()
       expect(lead.querySelector('b')).not.toBeNull()
       const anchors = lead.querySelectorAll('a')
       expect(anchors.length).toBeGreaterThanOrEqual(1)

@@ -7,12 +7,9 @@ import {
   setSiteData,
   setSiteDataPreHandler
 } from '#src/server/common/helpers/exemptions/session-cache/site-utils.js'
-import {
-  errorDescriptionByFieldName,
-  mapErrorsForDisplay
-} from '#src/server/common/helpers/errors.js'
 import { routes } from '#src/server/common/constants/routes.js'
 import { getCancelLink } from '#src/server/exemption/site-details/utils/cancel-link.js'
+import { createFailAction } from '#src/server/common/helpers/createFailAction.js'
 import {
   coordinateSystemSettings,
   coordinateSystemErrorMessages
@@ -70,53 +67,25 @@ export const coordinateSystemSubmitController = {
     validate: {
       payload: coordinateSystemSchema,
       failAction: (request, h, err) => {
-        const { payload } = request
         const exemption = getExemptionCache(request)
-        const { projectName } = exemption
         const action = request.query.action
-
         const site = setSiteData(request)
         const { queryParams, siteNumber } = site
-
-        const siteNumberDisplay = exemption.multipleSiteDetails
-          ?.multipleSitesEnabled
-          ? siteNumber
-          : null
-
-        if (!err.details) {
-          return h
-            .view(COORDINATE_SYSTEM_VIEW_ROUTE, {
-              ...coordinateSystemSettings,
-              backLink: getBackLink(action, siteNumber, queryParams, request),
-              cancelLink: getCancelLink(action),
-              payload,
-              projectName,
-              siteNumber: siteNumberDisplay,
-              action
-            })
-            .takeover()
-        }
-
-        const errorSummary = mapErrorsForDisplay(
-          err.details,
-          coordinateSystemErrorMessages
-        )
-
-        const errors = errorDescriptionByFieldName(errorSummary)
-
-        return h
-          .view(COORDINATE_SYSTEM_VIEW_ROUTE, {
-            ...coordinateSystemSettings,
-            backLink: getBackLink(action, siteNumber, queryParams, request),
+        return createFailAction({
+          viewRoute: COORDINATE_SYSTEM_VIEW_ROUTE,
+          settings: coordinateSystemSettings,
+          errorMessages: coordinateSystemErrorMessages,
+          projectName: exemption.projectName,
+          backLink: getBackLink(action, siteNumber, queryParams, request),
+          payload: request.payload,
+          params: {
             cancelLink: getCancelLink(action),
-            payload,
-            projectName,
-            siteNumber: siteNumberDisplay,
-            action,
-            errors,
-            errorSummary
-          })
-          .takeover()
+            siteNumber: exemption.multipleSiteDetails?.multipleSitesEnabled
+              ? siteNumber
+              : null,
+            action
+          }
+        })(request, h, err)
       }
     }
   },

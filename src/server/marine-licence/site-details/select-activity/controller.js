@@ -2,6 +2,7 @@ import { getMarineLicenceCache } from '#src/server/common/helpers/marine-licence
 import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
 import { getSiteDataFromParam } from '#src/server/common/helpers/site-details/site-name.js'
 import { selectActivityVariants } from '#src/server/common/constants/activity-variants.js'
+import { saveSiteDetailsToBackend } from '#src/server/common/helpers/marine-licence/save-site-details.js'
 
 export const SELECT_ACTIVITY_VIEW_ROUTE =
   'marine-licence/site-details/select-activity/index'
@@ -30,7 +31,11 @@ export const selectActivityController = {
 }
 
 export const selectActivitySubmitController = {
-  handler(request, h) {
+  async handler(request, h) {
+    const { siteIndex } = getSiteDataFromParam(request.query)
+
+    await saveSiteDetailsToBackend(request, h, { siteIndex })
+
     return h.redirect(marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS)
   }
 }

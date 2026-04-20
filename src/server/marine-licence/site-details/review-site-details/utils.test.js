@@ -117,6 +117,7 @@ describe('siteDetails utils', () => {
           projectName: 'Test Project',
           summaryData: [
             {
+              activityDetails: [],
               coordinates: mockCoordinates,
               geoJSON: mockGeoJSON,
               siteName: 'File Upload Site 1',

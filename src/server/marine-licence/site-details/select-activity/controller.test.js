@@ -85,9 +85,9 @@ describe('#selectActivity', () => {
       const mockFailAction = vi.fn()
       vi.mocked(createFailAction).mockReturnValue(mockFailAction)
 
-      const mockMarineLicenceApplicationDepositActivity = {
-        ...mockMarineLicenceApplication
-      }
+      const mockMarineLicenceApplicationDepositActivity = structuredClone(
+        mockMarineLicenceApplication
+      )
 
       mockMarineLicenceApplicationDepositActivity.siteDetails[0].activityDetails[0].activityType =
         'deposit'
@@ -118,7 +118,7 @@ describe('#selectActivity', () => {
           ACTIVITIES_REQUIRED:
             'Select at least one type of substance or object',
           ACTIVITIES_OTHER_REASON_REQUIRED:
-            'Enter details of the other structures'
+            'Enter details of the other deposits'
         },
         settings: {
           ...commonTestExpectedReturn.settings,
@@ -133,9 +133,9 @@ describe('#selectActivity', () => {
       const mockFailAction = vi.fn()
       vi.mocked(createFailAction).mockReturnValue(mockFailAction)
 
-      const mockMarineLicenceApplicationDepositActivity = {
-        ...mockMarineLicenceApplication
-      }
+      const mockMarineLicenceApplicationDepositActivity = structuredClone(
+        mockMarineLicenceApplication
+      )
 
       mockMarineLicenceApplicationDepositActivity.siteDetails[0].activityDetails[0].activityType =
         'removal'

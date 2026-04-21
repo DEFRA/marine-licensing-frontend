@@ -1,6 +1,11 @@
 import { selectActivityVariants } from '#src/server/common/constants/activity-variants.js'
 
+const subTypeToVariant = Object.fromEntries(
+  Object.entries(selectActivityVariants).map(([key, { activitySubType }]) => [
+    activitySubType,
+    key
+  ])
+)
+
 export const getActivityVariantFromSubType = (activitySubType) =>
-  Object.entries(selectActivityVariants).find(
-    ([, variant]) => variant.activitySubType === activitySubType
-  )?.[0]
+  subTypeToVariant[activitySubType]

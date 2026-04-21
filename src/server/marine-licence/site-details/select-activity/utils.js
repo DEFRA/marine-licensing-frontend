@@ -1,4 +1,4 @@
-import { ACTIVITY_LABELS } from '../../../common/constants/activities.js'
+import { ACTIVITY_LABELS } from '#src/server/common/constants/activities.js'
 
 export const getConstructionActivities = () => [
   { divider: 'Aquaculture' },

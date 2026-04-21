@@ -7,7 +7,7 @@ export const selectActivityErrorMessages = (activityType) => {
   } else if (activityType === 'deposit') {
     return {
       ACTIVITIES_REQUIRED: 'Select at least one type of substance or object',
-      ACTIVITIES_OTHER_REASON_REQUIRED: 'Enter details of the other structures'
+      ACTIVITIES_OTHER_REASON_REQUIRED: 'Enter details of the other deposits'
     }
   } else if (activityType === 'removal') {
     return {

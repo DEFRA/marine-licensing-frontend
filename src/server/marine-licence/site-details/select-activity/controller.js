@@ -20,19 +20,17 @@ const getBackLink = (action, siteNumber, activityDetailsNumber) =>
     ? `${marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS}#activity-details-site-${siteNumber}-activity-${activityDetailsNumber}`
     : marineLicenceRoutes.MARINE_LICENCE_TYPE_OF_ACTIVITY
 
-const getSelectActivityPageParams = (request, marineLicence) => {
+const getSelectActivityPageParams = (
+  request,
+  marineLicence,
+  activityDetails
+) => {
   const { activityVariant } = request.params
   const action = request.query.action
   const { heading } = selectActivityVariants[activityVariant]
 
-  const { activityDetailsIndex, activityDetailsNumber, siteNumber, siteIndex } =
-    getSiteDataFromParam(request.query)
-
-  const activityDetails = getActivityDetailsByIndex(
-    marineLicence,
-    siteIndex,
-    activityDetailsIndex,
-    activityDetailsNumber
+  const { activityDetailsNumber, siteNumber } = getSiteDataFromParam(
+    request.query
   )
 
   const activityOptions = getActivityOptions(activityDetails.activityType)
@@ -63,10 +61,10 @@ export const selectActivityController = {
     )
 
     return h.view(SELECT_ACTIVITY_VIEW_ROUTE, {
-      ...getSelectActivityPageParams(request, marineLicence),
+      ...getSelectActivityPageParams(request, marineLicence, activityDetails),
       payload: {
-        activities: activityDetails.activities.selections,
-        otherActivity: activityDetails.activities.otherActivity
+        activities: activityDetails.activities?.selections ?? [],
+        otherActivity: activityDetails.activities?.otherActivity
       }
     })
   }
@@ -96,7 +94,11 @@ export const selectActivitySubmitController = {
         return createFailAction({
           getCache: getMarineLicenceCache,
           viewRoute: SELECT_ACTIVITY_VIEW_ROUTE,
-          settings: getSelectActivityPageParams(request, marineLicence),
+          settings: getSelectActivityPageParams(
+            request,
+            marineLicence,
+            activityDetails
+          ),
           errorMessages: selectActivityErrorMessages(
             activityDetails.activityType
           ),
@@ -115,7 +117,7 @@ export const selectActivitySubmitController = {
       activityDetailsNumber
     } = getSiteDataFromParam(request.query)
 
-    const userHasSelectedOther = !!payload.otherActivity
+    const userHasSelectedOther = [payload.activities].flat().includes('other')
 
     await updateMarineLicenceSiteActivityDetails(
       request,

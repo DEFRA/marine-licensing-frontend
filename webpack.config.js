@@ -173,6 +173,10 @@ export default {
         {
           from: require.resolve('ol/ol.css'),
           to: 'stylesheets/ol.css'
+        },
+        {
+          from: path.join(dirname, 'src/client/images'),
+          to: 'assets/images'
         }
       ]
     })

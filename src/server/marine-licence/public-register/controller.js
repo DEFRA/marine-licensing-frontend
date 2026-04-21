@@ -41,13 +41,18 @@ export const publicRegisterSubmitController = {
   options: {
     validate: {
       payload: publicRegisterSchema,
-      failAction: createFailAction({
-        getCache: getMarineLicenceCache,
-        viewRoute: PUBLIC_REGISTER_VIEW_ROUTE,
-        settings: publicRegisterSettings,
-        errorMessages: publicRegisterErrorMessages,
-        getBackLink
-      })
+      failAction: (request, h, err) => {
+        const { projectName } = getMarineLicenceCache(request)
+        const backLink = getBackLink(request)
+        return createFailAction({
+          viewRoute: PUBLIC_REGISTER_VIEW_ROUTE,
+          settings: publicRegisterSettings,
+          errorMessages: publicRegisterErrorMessages,
+          projectName,
+          backLink,
+          payload: request.payload
+        })(request, h, err)
+      }
     }
   },
   async handler(request, h) {

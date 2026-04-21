@@ -8,27 +8,17 @@ import {
   setSiteDataPreHandler,
   setSiteData
 } from '#src/server/common/helpers/exemptions/session-cache/site-utils.js'
-import {
-  errorDescriptionByFieldName,
-  mapErrorsForDisplay
-} from '#src/server/common/helpers/errors.js'
-import joi from 'joi'
 import { routes } from '#src/server/common/constants/routes.js'
+import {
+  coordinatesEntrySettings,
+  coordinatesEntryErrorMessages
+} from '#src/server/common/validation/coordinates-entry/constants.js'
+import { coordinatesEntrySchema } from '#src/server/common/validation/coordinates-entry/schema.js'
+import { createFailAction } from '#src/server/common/helpers/createFailAction.js'
 import { getBackRoute } from './utils.js'
 import { getCancelLink } from '#src/server/exemption/site-details/utils/cancel-link.js'
 
-export const COORDINATES_ENTRY_VIEW_ROUTE =
-  'exemption/site-details/coordinates-entry/index'
-
-const coordinatesEntrySettings = {
-  pageTitle: 'How do you want to enter the coordinates?',
-  heading: 'How do you want to enter the coordinates?',
-  backLink: routes.ACTIVITY_DESCRIPTION
-}
-
-export const errorMessages = {
-  COORDINATES_ENTRY_REQUIRED: 'Select how you want to enter the coordinates'
-}
+export const COORDINATES_ENTRY_VIEW_ROUTE = 'templates/coordinates-entry'
 
 export const coordinatesEntryController = {
   options: {
@@ -70,66 +60,31 @@ export const coordinatesEntryController = {
     })
   }
 }
+
 export const coordinatesEntrySubmitController = {
   options: {
     pre: [setSiteDataPreHandler],
     validate: {
-      payload: joi.object({
-        coordinatesEntry: joi
-          .string()
-          .valid('single', 'multiple')
-          .required()
-          .messages({
-            'any.only': 'COORDINATES_ENTRY_REQUIRED',
-            'string.empty': 'COORDINATES_ENTRY_REQUIRED',
-            'any.required': 'COORDINATES_ENTRY_REQUIRED'
-          })
-      }),
+      payload: coordinatesEntrySchema,
       failAction: (request, h, err) => {
-        const { payload } = request
         const exemption = getExemptionCache(request)
-        const { projectName } = exemption
         const action = request.query.action
-
         const site = setSiteData(request)
-        const { siteNumber } = site
-
-        const siteNumberDisplay = exemption.multipleSiteDetails
-          ?.multipleSitesEnabled
-          ? siteNumber
-          : null
-
-        if (!err.details) {
-          return h
-            .view(COORDINATES_ENTRY_VIEW_ROUTE, {
-              ...coordinatesEntrySettings,
-              backLink: getBackRoute(site, exemption, action),
-              cancelLink: getCancelLink(action),
-              payload,
-              projectName,
-              siteNumber: siteNumberDisplay,
-              action
-            })
-            .takeover()
-        }
-
-        const errorSummary = mapErrorsForDisplay(err.details, errorMessages)
-
-        const errors = errorDescriptionByFieldName(errorSummary)
-
-        return h
-          .view(COORDINATES_ENTRY_VIEW_ROUTE, {
-            ...coordinatesEntrySettings,
-            backLink: getBackRoute(site, exemption, action),
+        return createFailAction({
+          viewRoute: COORDINATES_ENTRY_VIEW_ROUTE,
+          settings: coordinatesEntrySettings,
+          errorMessages: coordinatesEntryErrorMessages,
+          projectName: exemption.projectName,
+          backLink: getBackRoute(site, exemption, action),
+          payload: request.payload,
+          params: {
             cancelLink: getCancelLink(action),
-            payload,
-            projectName,
-            siteNumber: siteNumberDisplay,
-            action,
-            errors,
-            errorSummary
-          })
-          .takeover()
+            siteNumber: exemption.multipleSiteDetails?.multipleSitesEnabled
+              ? site.siteNumber
+              : null,
+            action
+          }
+        })(request, h, err)
       }
     }
   },

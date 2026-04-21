@@ -1,27 +1,14 @@
-import { describe, test, expect, vi } from 'vitest'
+import { vi } from 'vitest'
 
-vi.mock('#src/server/journey/self-service/services/journey-data.js', () => ({
-  getFirstQuestionRoute: vi.fn(() => '/sea')
-}))
+vi.mock('#src/server/journey/self-service/services/session-answers.js')
 
-const { iatStartController } =
-  await import('#src/server/journey/self-service/start/controller.js')
+import {
+  iatStartController,
+  iatStartPostController
+} from '#src/server/journey/self-service/start/controller.js'
+import { clearAnswers } from '#src/server/journey/self-service/services/session-answers.js'
 
 describe('iatStartController', () => {
-  test('passes firstQuestionRoute to the view', () => {
-    const viewData = {}
-    const h = {
-      view: (_template, data) => {
-        Object.assign(viewData, data)
-        return 'rendered'
-      }
-    }
-
-    iatStartController.handler({}, h)
-
-    expect(viewData.firstQuestionRoute).toBe('/journey/self-service/sea')
-  })
-
   test('Should call h.view with expected template path and view model', () => {
     const h = { view: vi.fn() }
 
@@ -30,7 +17,6 @@ describe('iatStartController', () => {
     expect(h.view).toHaveBeenCalledTimes(1)
     expect(h.view).toHaveBeenCalledWith('journey/self-service/start/index', {
       pageTitle: 'Check if you need a marine licence',
-      firstQuestionRoute: '/journey/self-service/sea',
       links: {
         jurisdiction:
           'https://www.gov.uk/guidance/marine-licensing-definitions#jurisdiction',
@@ -41,5 +27,17 @@ describe('iatStartController', () => {
         guidance: 'https://www.gov.uk/guidance/do-i-need-a-marine-licence'
       }
     })
+  })
+})
+
+describe('#iatStartPostController', () => {
+  test('clears answers and redirects to first question', () => {
+    const request = {}
+    const h = { redirect: vi.fn() }
+
+    iatStartPostController.handler(request, h)
+
+    expect(clearAnswers).toHaveBeenCalledWith(request)
+    expect(h.redirect).toHaveBeenCalledWith('/journey/self-service/sea')
   })
 })

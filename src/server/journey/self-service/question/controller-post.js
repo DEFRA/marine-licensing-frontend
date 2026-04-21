@@ -1,17 +1,17 @@
 import Boom from '@hapi/boom'
 import {
   getQuestion,
-  getSection
+  getSection,
+  ROUTE_PREFIX
 } from '#src/server/journey/self-service/services/journey-data.js'
 import { calculateNextRoute } from '#src/server/journey/self-service/services/journey-router.js'
 import {
-  pushRoute,
+  pushAnswer,
   getBackLink
-} from '#src/server/journey/self-service/services/journey-history.js'
+} from '#src/server/journey/self-service/services/session-answers.js'
 import { statusCodes } from '#src/server/common/constants/status-codes.js'
 
 const VIEW_PATH = 'journey/self-service/question/index'
-const ROUTE_PREFIX = '/journey/self-service'
 
 export const questionPostController = {
   handler(request, h) {
@@ -38,7 +38,7 @@ export const questionPostController = {
         .code(statusCodes.badRequest)
     }
 
-    pushRoute(request, questionRoute)
+    pushAnswer(request, questionRoute, selectedAnswerId)
 
     const next = calculateNextRoute(question, selectedAnswerId)
 

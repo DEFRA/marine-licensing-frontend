@@ -117,6 +117,28 @@ describe('#siteName', () => {
       )
     })
 
+    test('should redirect to coordinates entry when coordinatesType is not file', async () => {
+      vi.mocked(getMarineLicenceCache).mockReturnValueOnce({
+        ...mockMarineLicenceApplication,
+        siteDetails: [
+          {
+            ...mockMarineLicenceApplication.siteDetails[0],
+            coordinatesType: 'coordinates'
+          }
+        ]
+      })
+
+      const request = createMockRequest({
+        payload: { siteName: 'Test Site Name' }
+      })
+
+      await siteNameSubmitController.handler(request, h)
+
+      expect(h.redirect).toHaveBeenCalledWith(
+        marineLicenceRoutes.MARINE_LICENCE_COORDINATES_ENTRY_CHOICE
+      )
+    })
+
     test('should handle validation failure with error details', () => {
       const request = createMockRequest({
         payload: { siteName: '' }

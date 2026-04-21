@@ -21,6 +21,8 @@ for (const section of journeyData.sections) {
   sectionsById.set(section.id, section)
 }
 
+export const ROUTE_PREFIX = '/journey/self-service'
+
 export function getFirstQuestionRoute() {
   return journeyData.firstQuestionRoute
 }

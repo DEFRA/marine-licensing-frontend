@@ -50,7 +50,7 @@ describe('Site name page (marine licence)', () => {
 
     expect(response.statusCode).toBe(statusCodes.redirect)
     expect(response.headers.location).toBe(
-      marineLicenceRoutes.MARINE_LICENCE_SITE_NAME
+      marineLicenceRoutes.MARINE_LICENCE_COORDINATES_ENTRY_CHOICE
     )
   })
 

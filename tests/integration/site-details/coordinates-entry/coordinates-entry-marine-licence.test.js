@@ -8,12 +8,13 @@ import {
   makeGetRequest,
   makePostRequest
 } from '~/src/server/test-helpers/server-requests.js'
-import { sharedCoordinatesTypeTests } from './coordinates-type-tests.js'
+import { sharedCoordinatesEntryTests } from './coordinates-entry-tests.js'
 
-describe('Coordinates type page (marine licence)', () => {
+describe('Coordinates entry page (marine licence)', () => {
   const mockMarineLicenceData = {
     id: 'test-marine-licence-123',
-    projectName: 'Test Marine Project'
+    projectName: 'Test Marine Project',
+    siteDetails: [{ coordinatesEntry: 'single' }]
   }
 
   const getServer = setupTestServer()
@@ -22,46 +23,46 @@ describe('Coordinates type page (marine licence)', () => {
     mockMarineLicence(mockMarineLicenceData)
   })
 
-  sharedCoordinatesTypeTests({
+  sharedCoordinatesEntryTests({
     getRequest: () =>
       makeGetRequest({
         server: getServer(),
-        url: marineLicenceRoutes.MARINE_LICENCE_COORDINATES_TYPE_CHOICE
+        url: marineLicenceRoutes.MARINE_LICENCE_COORDINATES_ENTRY_CHOICE
       }),
     postRequest: ({ formData }) =>
       makePostRequest({
         server: getServer(),
-        url: marineLicenceRoutes.MARINE_LICENCE_COORDINATES_TYPE_CHOICE,
+        url: marineLicenceRoutes.MARINE_LICENCE_COORDINATES_ENTRY_CHOICE,
         formData
       }),
     projectName: mockMarineLicenceData.projectName,
-    backHref: marineLicenceRoutes.MARINE_LICENCE_SITE_DETAILS,
+    backHref: marineLicenceRoutes.MARINE_LICENCE_SITE_NAME,
     cancelHref: `${marineLicenceRoutes.MARINE_LICENCE_TASK_LIST}?cancel=site-details`
   })
 
-  test('should redirect to choose file type when file option is selected', async () => {
+  test('should redirect to self when single is selected', async () => {
     const response = await makePostRequest({
       server: getServer(),
-      url: marineLicenceRoutes.MARINE_LICENCE_COORDINATES_TYPE_CHOICE,
-      formData: { coordinatesType: 'file' }
+      url: marineLicenceRoutes.MARINE_LICENCE_COORDINATES_ENTRY_CHOICE,
+      formData: { coordinatesEntry: 'single' }
     })
 
     expect(response.statusCode).toBe(statusCodes.redirect)
     expect(response.headers.location).toBe(
-      marineLicenceRoutes.MARINE_LICENCE_CHOOSE_FILE_UPLOAD_TYPE
+      marineLicenceRoutes.MARINE_LICENCE_COORDINATES_ENTRY_CHOICE
     )
   })
 
-  test('should redirect to site name when coordinates option is selected', async () => {
+  test('should redirect to self when multiple is selected', async () => {
     const response = await makePostRequest({
       server: getServer(),
-      url: marineLicenceRoutes.MARINE_LICENCE_COORDINATES_TYPE_CHOICE,
-      formData: { coordinatesType: 'coordinates' }
+      url: marineLicenceRoutes.MARINE_LICENCE_COORDINATES_ENTRY_CHOICE,
+      formData: { coordinatesEntry: 'multiple' }
     })
 
     expect(response.statusCode).toBe(statusCodes.redirect)
     expect(response.headers.location).toBe(
-      marineLicenceRoutes.MARINE_LICENCE_SITE_NAME
+      marineLicenceRoutes.MARINE_LICENCE_COORDINATES_ENTRY_CHOICE
     )
   })
 })

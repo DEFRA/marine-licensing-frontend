@@ -1,8 +1,8 @@
 import { getTagStyle } from './get-tag-style.js'
 
 describe('getTagStyle', () => {
-  it('should return app-light-blue for Draft', () => {
-    expect(getTagStyle('Draft')).toBe('govuk-tag--app-light-blue')
+  it('should return blue for Draft', () => {
+    expect(getTagStyle('Draft')).toBe('govuk-tag--blue')
   })
 
   it('should return grey for Withdrawn', () => {

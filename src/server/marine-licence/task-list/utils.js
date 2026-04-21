@@ -16,7 +16,7 @@ const setStatus = (task) => {
     return {
       tag: {
         text: 'In Progress',
-        classes: 'govuk-tag--app-light-blue'
+        classes: 'govuk-tag--teal'
       }
     }
   }

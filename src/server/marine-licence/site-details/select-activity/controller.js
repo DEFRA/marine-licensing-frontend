@@ -8,7 +8,7 @@ import { selectActivityVariants } from '#src/server/common/constants/activity-va
 import { saveSiteDetailsToBackend } from '#src/server/common/helpers/marine-licence/save-site-details.js'
 import { getActivityOptions } from '#src/server/marine-licence/site-details/select-activity/utils.js'
 import { getActivityDetailsByIndex } from '#src/server/common/helpers/marine-licence/session-cache/site-details-utils.js'
-import { selectActivitySchema } from '#src/server/common/validation/select-activity/schema.js'
+import { selectActivitySchema } from '#src/server/marine-licence/site-details/select-activity/schema.js'
 import { createFailAction } from '#src/server/common/helpers/createFailAction.js'
 import { selectActivityErrorMessages } from '#src/server/common/validation/select-activity/constants.js'
 

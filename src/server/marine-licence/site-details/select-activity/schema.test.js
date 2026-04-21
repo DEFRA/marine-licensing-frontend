@@ -1,4 +1,4 @@
-import { selectActivitySchema } from '#src/server/common/validation/select-activity/schema.js'
+import { selectActivitySchema } from '#src/server/marine-licence/site-details/select-activity/schema.js'
 
 describe('#selectActivitySchema', () => {
   test('should validate when a single activity is selected', () => {

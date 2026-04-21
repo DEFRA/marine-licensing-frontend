@@ -13,11 +13,7 @@ import {
   createMockRequest,
   createMockH
 } from '#src/server/test-helpers/mocks/helpers.js'
-import {
-  getConstructionActivities,
-  getDepositActivities,
-  getRemovalActivities
-} from '#src/server/marine-licence/site-details/select-activity/utils.js'
+import { getActivityOptions } from '#src/server/marine-licence/site-details/select-activity/utils.js'
 
 vi.mock('~/src/server/common/helpers/marine-licence/session-cache/utils.js')
 vi.mock('~/src/server/common/helpers/marine-licence/save-site-details.js')
@@ -63,7 +59,7 @@ describe('#selectActivity', () => {
         err
       )
 
-      const expectedActivityOptions = getConstructionActivities()
+      const expectedActivityOptions = getActivityOptions('construction')
 
       expect(createFailAction).toHaveBeenCalledWith({
         ...commonTestExpectedReturn,
@@ -110,7 +106,7 @@ describe('#selectActivity', () => {
         err
       )
 
-      const expectedActivityOptions = getDepositActivities()
+      const expectedActivityOptions = getActivityOptions('deposit')
 
       expect(createFailAction).toHaveBeenCalledWith({
         ...commonTestExpectedReturn,
@@ -158,7 +154,7 @@ describe('#selectActivity', () => {
         err
       )
 
-      const expectedActivityOptions = getRemovalActivities()
+      const expectedActivityOptions = getActivityOptions('removal')
 
       expect(createFailAction).toHaveBeenCalledWith({
         ...commonTestExpectedReturn,

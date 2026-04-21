@@ -94,7 +94,10 @@ export const formatProjectsForDisplay = (projects, isEmployee = false) =>
       },
       { text: project.applicationReference || '-' },
       {
-        html: `<strong class="govuk-tag ${getTagStyle(status)}">${escapeHtml(project.status)}</strong>`
+        html: `<strong class="govuk-tag ${getTagStyle(status)}">${escapeHtml(project.status)}</strong>`,
+        attributes: {
+          'data-sort-value': project.status
+        }
       },
       {
         text: project.submittedAt

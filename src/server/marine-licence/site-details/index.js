@@ -1,5 +1,6 @@
 import { beforeYouStartRoutes } from '#src/server/marine-licence/site-details/before-you-start/index.js'
 import { coordinatesTypeRoutes } from '#src/server/marine-licence/site-details/coordinates-type/index.js'
+import { coordinatesEntryRoutes } from '#src/server/marine-licence/site-details/coordinates-entry/index.js'
 import { chooseFileTypeRoutes } from '#src/server/marine-licence/site-details/choose-file-type/index.js'
 import { fileUploadRoutes } from '#src/server/marine-licence/site-details/file-upload/index.js'
 import { siteNameRoutes } from '#src/server/marine-licence/site-details/site-name/index.js'
@@ -10,6 +11,7 @@ import { uploadAndWaitRoutes } from '#src/server/marine-licence/site-details/upl
 export const siteDetailsRoutes = [
   ...beforeYouStartRoutes,
   ...coordinatesTypeRoutes,
+  ...coordinatesEntryRoutes,
   ...chooseFileTypeRoutes,
   ...fileUploadRoutes,
   ...siteNameRoutes,

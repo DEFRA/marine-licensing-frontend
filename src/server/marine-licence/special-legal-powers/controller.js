@@ -80,13 +80,18 @@ export const specialLegalPowersSubmitController = {
           })
         })
       }),
-      failAction: createFailAction({
-        getCache: getMarineLicenceCache,
-        viewRoute: SPECIAL_LEGAL_POWERS_VIEW_ROUTE,
-        settings: specialLegalPowersSettings,
-        errorMessages,
-        getBackLink
-      })
+      failAction: (request, h, err) => {
+        const { projectName } = getMarineLicenceCache(request)
+        const backLink = getBackLink(request)
+        return createFailAction({
+          viewRoute: SPECIAL_LEGAL_POWERS_VIEW_ROUTE,
+          settings: specialLegalPowersSettings,
+          errorMessages,
+          projectName,
+          backLink,
+          payload: request.payload
+        })(request, h, err)
+      }
     }
   },
   async handler(request, h) {

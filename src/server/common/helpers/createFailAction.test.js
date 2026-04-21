@@ -7,32 +7,29 @@ describe('createFailAction', () => {
   const errorMessages = { REQUIRED: 'Field is required' }
   const projectName = 'My Project'
   const backLink = '/back'
+  const payload = { field: 'value' }
 
-  let getCache
-  let getBackLink
   let h
   let failAction
 
   beforeEach(() => {
-    getCache = vi.fn().mockReturnValue({ projectName })
-    getBackLink = vi.fn().mockReturnValue(backLink)
     h = { view: vi.fn().mockReturnValue({ takeover: vi.fn() }) }
     failAction = createFailAction({
-      getCache,
       viewRoute,
       settings,
       errorMessages,
-      getBackLink
+      projectName,
+      backLink,
+      payload
     })
   })
 
   test('renders view without errors when err.details is missing', () => {
-    const request = { payload: { field: 'value' } }
-    failAction(request, h, {})
+    failAction({}, h, {})
 
     expect(h.view).toHaveBeenCalledWith(viewRoute, {
       ...settings,
-      payload: request.payload,
+      payload,
       projectName,
       backLink
     })
@@ -40,12 +37,11 @@ describe('createFailAction', () => {
   })
 
   test('renders view without errors when err.details is null', () => {
-    const request = { payload: { field: '' } }
-    failAction(request, h, { details: null })
+    failAction({}, h, { details: null })
 
     expect(h.view).toHaveBeenCalledWith(viewRoute, {
       ...settings,
-      payload: request.payload,
+      payload,
       projectName,
       backLink
     })
@@ -53,16 +49,15 @@ describe('createFailAction', () => {
   })
 
   test('renders view with mapped errors when err.details is present', () => {
-    const request = { payload: { field: '' } }
     const err = {
       details: [{ path: ['field'], message: 'REQUIRED', type: 'string.empty' }]
     }
 
-    failAction(request, h, err)
+    failAction({}, h, err)
 
     expect(h.view).toHaveBeenCalledWith(viewRoute, {
       ...settings,
-      payload: request.payload,
+      payload,
       projectName,
       backLink,
       errorSummary: [
@@ -76,14 +71,13 @@ describe('createFailAction', () => {
   })
 
   test('uses raw message when not found in errorMessages', () => {
-    const request = { payload: {} }
     const err = {
       details: [
         { path: ['field'], message: 'some.raw.message', type: 'any.required' }
       ]
     }
 
-    failAction(request, h, err)
+    failAction({}, h, err)
 
     expect(h.view).toHaveBeenCalledWith(
       viewRoute,
@@ -95,11 +89,55 @@ describe('createFailAction', () => {
     )
   })
 
-  test('calls getCache and getBackLink with the request', () => {
-    const request = { payload: {} }
-    failAction(request, h, {})
+  test('spreads params into the view context', () => {
+    const cancelLink = '/cancel'
+    const action = 'change'
 
-    expect(getCache).toHaveBeenCalledWith(request)
-    expect(getBackLink).toHaveBeenCalledWith(request)
+    failAction = createFailAction({
+      viewRoute,
+      settings,
+      errorMessages,
+      projectName,
+      backLink,
+      payload,
+      params: { cancelLink, siteNumber: 2, action }
+    })
+
+    failAction({}, h, {})
+
+    expect(h.view).toHaveBeenCalledWith(viewRoute, {
+      ...settings,
+      payload,
+      projectName,
+      backLink,
+      cancelLink,
+      siteNumber: 2,
+      action
+    })
+  })
+
+  test('spreads params into the view context when errors are present', () => {
+    const cancelLink = '/cancel'
+
+    failAction = createFailAction({
+      viewRoute,
+      settings,
+      errorMessages,
+      projectName,
+      backLink,
+      payload,
+      params: { cancelLink }
+    })
+
+    const err = {
+      details: [{ path: ['field'], message: 'REQUIRED', type: 'string.empty' }]
+    }
+
+    failAction({}, h, err)
+
+    expect(h.view).toHaveBeenCalledWith(
+      viewRoute,
+      expect.objectContaining({ cancelLink })
+    )
   })
 })

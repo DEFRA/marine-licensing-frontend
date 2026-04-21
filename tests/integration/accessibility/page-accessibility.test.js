@@ -87,7 +87,7 @@ describe('Page accessibility checks (Axe)', () => {
     // },
     {
       url: routes.COORDINATES_ENTRY_CHOICE,
-      title: 'How do you want to enter the coordinates?'
+      title: 'How do you want to enter the site coordinates?'
     },
     {
       url: routes.COORDINATE_SYSTEM_CHOICE,
@@ -223,6 +223,10 @@ describe('Page accessibility checks (Axe)', () => {
     {
       url: marineLicenceRoutes.MARINE_LICENCE_CHOOSE_FILE_UPLOAD_TYPE,
       title: 'Choose file type'
+    },
+    {
+      url: marineLicenceRoutes.MARINE_LICENCE_COORDINATES_ENTRY_CHOICE,
+      title: 'How do you want to enter the site coordinates?'
     },
     {
       url: marineLicenceRoutes.MARINE_LICENCE_CHECK_YOUR_ANSWERS,

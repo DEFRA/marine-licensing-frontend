@@ -1,6 +1,6 @@
 import { ACTIVITY_LABELS } from '../../../common/constants/activities.js'
 
-const getConstructionActivities = () => [
+export const getConstructionActivities = () => [
   { divider: 'Aquaculture' },
   { text: ACTIVITY_LABELS.CON1, value: 'CON1' },
   { text: ACTIVITY_LABELS.CON2, value: 'CON2' },
@@ -37,7 +37,7 @@ const getConstructionActivities = () => [
   { text: ACTIVITY_LABELS.CON_OTHER, value: 'other' }
 ]
 
-const getDepositActivities = () => [
+export const getDepositActivities = () => [
   { divider: 'Dredged material and waste' },
   { text: ACTIVITY_LABELS.DEP1, value: 'DEP1' },
   { text: ACTIVITY_LABELS.DEP2, value: 'DEP2' },
@@ -67,7 +67,7 @@ const getDepositActivities = () => [
   { text: ACTIVITY_LABELS.DEP_OTHER, value: 'other' }
 ]
 
-const getRemovalActivities = () => [
+export const getRemovalActivities = () => [
   { divider: 'Debris, waste or abandoned items' },
   { text: ACTIVITY_LABELS.REM1, value: 'REM1' },
   { text: ACTIVITY_LABELS.REM2, value: 'REM2' },

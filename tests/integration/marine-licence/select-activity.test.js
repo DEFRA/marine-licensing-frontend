@@ -8,7 +8,10 @@ import { loadPage, submitForm } from '~/tests/integration/shared/app-server.js'
 import { statusCodes } from '~/src/server/common/constants/status-codes.js'
 import { mockMarineLicenceApplication } from '#src/server/test-helpers/mocks/marine-licence-mocks.js'
 import { makePostRequest } from '~/src/server/test-helpers/server-requests.js'
-import { expectFieldsetError } from '~/tests/integration/shared/expect-utils.js'
+import {
+  expectFieldsetError,
+  expectInputValue
+} from '~/tests/integration/shared/expect-utils.js'
 
 describe('Type of activity (marine licence)', () => {
   const getServer = setupTestServer()
@@ -49,6 +52,17 @@ describe('Type of activity (marine licence)', () => {
     ).toBeInTheDocument()
   })
 
+  test('correct back link from Review Site Details', async () => {
+    const document = await loadPage({
+      requestUrl: `/marine-licence/activity-details/${variantUsedForTesting}?action=change&site=1&activity=1`,
+      server: getServer()
+    })
+    expect(getByRole(document, 'link', { name: 'Back' })).toHaveAttribute(
+      'href',
+      `${marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS}#activity-details-site-1-activity-1`
+    )
+  })
+
   test('pre-selects correct checkboxes', async () => {
     mockMarineLicence({
       ...mockMarineLicenceApplication,
@@ -58,7 +72,10 @@ describe('Type of activity (marine licence)', () => {
           activityDetails: [
             {
               ...mockMarineLicenceApplication.siteDetails[0].activityDetails[0],
-              activities: ['CON2']
+              activities: {
+                selections: ['CON2', 'other'],
+                otherActivity: 'test activity'
+              }
             }
           ]
         }
@@ -81,6 +98,18 @@ describe('Type of activity (marine licence)', () => {
         name: 'Piled or fixed aquaculture structures'
       })
     ).toBeChecked()
+
+    expect(
+      getByRole(document, 'checkbox', {
+        name: 'Other structures not listed above'
+      })
+    ).toBeChecked()
+
+    expectInputValue({
+      document,
+      inputLabel: 'Provide details',
+      value: 'test activity'
+    })
   })
 
   test('redirects after valid submission', async () => {
@@ -90,13 +119,14 @@ describe('Type of activity (marine licence)', () => {
       url: `/marine-licence/activity-details/${variantUsedForTesting}?site=1&activity=1`,
       server: getServer(),
       formData: {
-        activities: ['CON1']
+        activities: ['CON1'],
+        otherActivity: 'Test activity'
       }
     })
 
     expect(response.statusCode).toBe(statusCodes.redirect)
     expect(response.headers.location).toBe(
-      marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS
+      `${marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS}#activity-details-site-1-activity-1`
     )
   })
 

@@ -4,7 +4,7 @@ export const selectActivityErrorMessages = (activityType) => {
       ACTIVITIES_REQUIRED: 'Select at least one type of structure',
       ACTIVITIES_OTHER_REASON_REQUIRED: 'Enter details of the other structures'
     }
-  } else if (activityType === 'deposite') {
+  } else if (activityType === 'deposit') {
     return {
       ACTIVITIES_REQUIRED: 'Select at least one type of substance or object',
       ACTIVITIES_OTHER_REASON_REQUIRED: 'Enter details of the other structures'

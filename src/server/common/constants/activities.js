@@ -25,7 +25,6 @@ export const ACTIVITY_LABELS = {
   CON24: 'Foundations for offshore platforms or similar structures',
   CON25: 'Piles or piled structures',
   CON_OTHER: 'Other structures not listed above',
-
   DEP1: 'Alternative use of dredged material – beach management',
   DEP2: 'Alternative use of dredged material – habitat creation',
   DEP3: 'Alternative use of dredged material – land reclamation or construction fill',
@@ -49,7 +48,6 @@ export const ACTIVITY_LABELS = {
   DEP20: 'Fireworks',
   DEP21: 'Use of tracers or dyes',
   DEP_OTHER: 'Other substances or objects not listed above',
-
   REM1: 'Abandoned fishing equipment',
   REM2: 'Marine litter and debris',
   REM3: 'Rocks, boulders or obstructions',

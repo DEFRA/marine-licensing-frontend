@@ -13,7 +13,7 @@ export const mockMarineLicenceTaskList = {
 const mockActivityDetails = {
   activityType: 'construction',
   activitySubType: 'construction-type-1',
-  activities: ['CON1'],
+  activities: { selections: ['CON1'] },
   activityDescription: 'Test description',
   activityDuration: 'Test duration',
   completionDate: 'Test completion',
@@ -23,7 +23,7 @@ const mockActivityDetails = {
 
 export const mockOutputActivityDetails = {
   ...mockActivityDetails,
-  activityType: "What you're constructing"
+  activityType: 'Construction of new works'
 }
 
 export const mockMarineLicenceApplication = {

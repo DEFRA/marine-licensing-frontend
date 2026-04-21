@@ -15,20 +15,46 @@ import { selectActivityErrorMessages } from '#src/server/common/validation/selec
 export const SELECT_ACTIVITY_VIEW_ROUTE =
   'marine-licence/site-details/select-activity/index'
 
-const backLink = marineLicenceRoutes.MARINE_LICENCE_TYPE_OF_ACTIVITY
+const getBackLink = (action, siteNumber, activityDetailsNumber) =>
+  action
+    ? `${marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS}#activity-details-site-${siteNumber}-activity-${activityDetailsNumber}`
+    : marineLicenceRoutes.MARINE_LICENCE_TYPE_OF_ACTIVITY
+
+const getSelectActivityPageParams = (request, marineLicence) => {
+  const { activityVariant } = request.params
+  const action = request.query.action
+  const { heading } = selectActivityVariants[activityVariant]
+
+  const { activityDetailsIndex, activityDetailsNumber, siteNumber, siteIndex } =
+    getSiteDataFromParam(request.query)
+
+  const activityDetails = getActivityDetailsByIndex(
+    marineLicence,
+    siteIndex,
+    activityDetailsIndex,
+    activityDetailsNumber
+  )
+
+  const activityOptions = getActivityOptions(activityDetails.activityType)
+
+  return {
+    heading,
+    pageTitle: heading,
+    backLink: getBackLink(action, siteNumber, activityDetailsNumber),
+    projectName: marineLicence.projectName,
+    siteNumber,
+    activityDetailsNumber,
+    activityOptions
+  }
+}
 
 export const selectActivityController = {
   handler(request, h) {
     const marineLicence = getMarineLicenceCache(request)
-    const { activityVariant } = request.params
-    const { heading } = selectActivityVariants[activityVariant]
 
-    const {
-      activityDetailsIndex,
-      activityDetailsNumber,
-      siteNumber,
-      siteIndex
-    } = getSiteDataFromParam(request.query)
+    const { activityDetailsIndex, siteIndex } = getSiteDataFromParam(
+      request.query
+    )
 
     const activityDetails = getActivityDetailsByIndex(
       marineLicence,
@@ -36,17 +62,12 @@ export const selectActivityController = {
       activityDetailsIndex
     )
 
-    const activityOptions = getActivityOptions(activityDetails.activityType)
-
     return h.view(SELECT_ACTIVITY_VIEW_ROUTE, {
-      heading,
-      pageTitle: heading,
-      backLink,
-      projectName: marineLicence.projectName,
-      siteNumber,
-      activityDetailsNumber,
-      activityOptions,
-      payload: { activities: activityDetails.activities }
+      ...getSelectActivityPageParams(request, marineLicence),
+      payload: {
+        activities: activityDetails.activities.selections,
+        otherActivity: activityDetails.activities.otherActivity
+      }
     })
   }
 }
@@ -55,7 +76,6 @@ export const selectActivitySubmitController = {
   options: {
     validate: {
       payload: selectActivitySchema,
-
       failAction: (request, h, err) => {
         const marineLicence = getMarineLicenceCache(request)
 
@@ -63,15 +83,9 @@ export const selectActivitySubmitController = {
           err.details[0].hrefOverride = 'activities-2'
         }
 
-        const { activityVariant } = request.params
-        const { heading } = selectActivityVariants[activityVariant]
-
-        const {
-          activityDetailsIndex,
-          activityDetailsNumber,
-          siteNumber,
-          siteIndex
-        } = getSiteDataFromParam(request.query)
+        const { activityDetailsIndex, siteIndex } = getSiteDataFromParam(
+          request.query
+        )
 
         const activityDetails = getActivityDetailsByIndex(
           marineLicence,
@@ -79,22 +93,14 @@ export const selectActivitySubmitController = {
           activityDetailsIndex
         )
 
-        const activityOptions = getActivityOptions(activityDetails.activityType)
-
         return createFailAction({
           getCache: getMarineLicenceCache,
           viewRoute: SELECT_ACTIVITY_VIEW_ROUTE,
-          params: {
-            heading,
-            pageTitle: heading,
-            siteNumber,
-            activityDetailsNumber,
-            activityOptions
-          },
+          settings: getSelectActivityPageParams(request, marineLicence),
           errorMessages: selectActivityErrorMessages(
             activityDetails.activityType
           ),
-          getBackLink: () => backLink
+          getBackLink
         })(request, h, err)
       }
     }
@@ -102,9 +108,12 @@ export const selectActivitySubmitController = {
   async handler(request, h) {
     const { payload } = request
 
-    const { activityDetailsIndex, siteIndex } = getSiteDataFromParam(
-      request.query
-    )
+    const {
+      activityDetailsIndex,
+      siteIndex,
+      siteNumber,
+      activityDetailsNumber
+    } = getSiteDataFromParam(request.query)
 
     const userHasSelectedOther = !!payload.otherActivity
 
@@ -114,13 +123,17 @@ export const selectActivitySubmitController = {
       siteIndex,
       activityDetailsIndex,
       {
-        activities: payload.activities,
-        ...(userHasSelectedOther && { otherReason: payload.otherActivity })
+        activities: {
+          selections: payload.activities,
+          ...(userHasSelectedOther && { otherActivity: payload.otherActivity })
+        }
       }
     )
 
     await saveSiteDetailsToBackend(request, h, { siteIndex })
 
-    return h.redirect(marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS)
+    return h.redirect(
+      `${marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS}#activity-details-site-${siteNumber}-activity-${activityDetailsNumber}`
+    )
   }
 }

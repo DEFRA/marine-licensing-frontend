@@ -11,13 +11,19 @@ import { getSiteDetailsBySite } from '#src/server/common/helpers/exemptions/sess
 import { routes } from '#src/server/common/constants/routes.js'
 import { saveSiteDetailsToBackend } from '#src/server/common/helpers/exemptions/save-site-details.js'
 import { getCancelLink } from '#src/server/exemption/site-details/utils/cancel-link.js'
+import joi from 'joi'
 import { getBackLink, getNextRoute } from './utils.js'
 import { copySameActivityDescriptionToAllSites } from '#src/server/common/helpers/exemptions/copy-same-activity-data.js'
-import { activityDescriptionSchema } from '#src/server/common/validation/activity-description/schema.js'
-import { activityDescriptionErrorMessages as errorMessages } from '#src/server/common/validation/activity-description/constants.js'
 
 export const ACTIVITY_DESCRIPTION_VIEW_ROUTE =
   'exemption/activity-description/index'
+
+const ACTIVITY_DESCRIPTION_FIELD_MAX_LENGTH = 4000
+
+export const errorMessages = {
+  ACTIVITY_DESCRIPTION_REQUIRED: 'Enter the activity description',
+  ACTIVITY_DESCRIPTION_MAX_LENGTH: `Activity description must be ${ACTIVITY_DESCRIPTION_FIELD_MAX_LENGTH} characters or less`
+}
 
 const templateValues = {
   pageTitle: 'Activity description',
@@ -87,7 +93,18 @@ export const activityDescriptionSubmitController = {
   options: {
     pre: [setSiteDataPreHandler],
     validate: {
-      payload: activityDescriptionSchema,
+      payload: joi.object({
+        activityDescription: joi
+          .string()
+          .min(1)
+          .max(ACTIVITY_DESCRIPTION_FIELD_MAX_LENGTH)
+          .required()
+          .messages({
+            'string.empty': 'ACTIVITY_DESCRIPTION_REQUIRED',
+            'any.required': 'ACTIVITY_DESCRIPTION_REQUIRED',
+            'string.max': 'ACTIVITY_DESCRIPTION_MAX_LENGTH'
+          })
+      }),
       failAction: (request, h, err) => {
         const { payload } = request
 

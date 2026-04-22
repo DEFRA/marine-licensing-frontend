@@ -12,6 +12,7 @@ import {
   activityDescriptionErrorMessages
 } from '#src/server/common/validation/activity-description/constants.js'
 import { saveSiteDetailsToBackend } from '#src/server/common/helpers/marine-licence/save-site-details.js'
+import { validateSiteAndActivityParams } from '#src/server/common/helpers/marine-licence/session-cache/site-utils.js'
 
 export const MARINE_LICENCE_ACTIVITY_DESCRIPTION_VIEW_ROUTE =
   'marine-licence/site-details/activity-description/index'
@@ -20,6 +21,9 @@ const getBackLink = (siteNumber, activityDetailsNumber) =>
   `${marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS}#activity-details-site-${siteNumber}-activity-${activityDetailsNumber}`
 
 export const activityDescriptionController = {
+  options: {
+    pre: [validateSiteAndActivityParams]
+  },
   handler(request, h) {
     const marineLicence = getMarineLicenceCache(request)
     const {
@@ -50,6 +54,7 @@ export const activityDescriptionController = {
 
 export const activityDescriptionSubmitController = {
   options: {
+    pre: [validateSiteAndActivityParams],
     validate: {
       payload: activityDescriptionSchema,
       failAction: (request, h, err) => {

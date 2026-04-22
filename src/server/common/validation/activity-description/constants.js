@@ -3,7 +3,7 @@ export const activityDescriptionSettings = {
   heading: 'Activity description'
 }
 
-export const ACTIVITY_DESCRIPTION_MAX_LENGTH = 4000
+export const ACTIVITY_DESCRIPTION_MAX_LENGTH = 1000
 
 export const activityDescriptionErrorMessages = {
   ACTIVITY_DESCRIPTION_REQUIRED: 'Enter the activity description',

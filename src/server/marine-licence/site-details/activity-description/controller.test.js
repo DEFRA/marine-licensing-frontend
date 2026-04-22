@@ -49,7 +49,7 @@ describe('#activityDescriptionSubmitController', () => {
     )
   })
 
-  test.skip('failAction renders view with errors', () => {
+  test('failAction renders view with errors', () => {
     const request = createMockRequest({
       query: { site: '1', activity: '1' },
       payload: { activityDescription: '' }

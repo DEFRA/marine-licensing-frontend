@@ -19,7 +19,8 @@ export const typeOfActivityErrorMessages = {
 export const MARINE_LICENCE_TYPE_OF_ACTIVITY_VIEW_ROUTE =
   'marine-licence/site-details/type-of-activity/index'
 
-const backLink = marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS
+const getBackLink = (siteNumber, activityDetailsNumber) =>
+  `${marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS}#activity-details-site-${siteNumber}-activity-${activityDetailsNumber}`
 
 const subTypePayload = (activityType, activitySubType) => ({
   activitySubTypeConstruction:
@@ -52,7 +53,7 @@ export const typeOfActivityController = {
 
     return h.view(MARINE_LICENCE_TYPE_OF_ACTIVITY_VIEW_ROUTE, {
       ...typeOfActivitySettings,
-      backLink,
+      backLink: getBackLink(siteNumber, activityDetailsNumber),
       projectName: marineLicence.projectName,
       siteNumber,
       activityDetailsNumber,
@@ -72,16 +73,19 @@ export const typeOfActivitySubmitController = {
     validate: {
       payload: typeOfActivitySchema,
       failAction: (request, h, err) => {
+        const marineLicence = getMarineLicenceCache(request)
+
         const { activityDetailsNumber, siteNumber } = getSiteDataFromParam(
           request.query
         )
         return createFailAction({
-          getCache: getMarineLicenceCache,
+          projectName: marineLicence.projectName,
           viewRoute: MARINE_LICENCE_TYPE_OF_ACTIVITY_VIEW_ROUTE,
           settings: typeOfActivitySettings,
           errorMessages: typeOfActivityErrorMessages,
-          getBackLink: () => backLink,
-          params: { activityDetailsNumber, siteNumber }
+          backLink: getBackLink(siteNumber, activityDetailsNumber),
+          params: { activityDetailsNumber, siteNumber },
+          payload: request.payload
         })(request, h, err)
       }
     }

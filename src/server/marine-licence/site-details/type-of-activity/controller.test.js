@@ -42,15 +42,17 @@ describe('#typeOfActivity', () => {
       )
 
       expect(createFailAction).toHaveBeenCalledWith({
-        getCache: getMarineLicenceCache,
+        projectName: 'Test Project',
         viewRoute: MARINE_LICENCE_TYPE_OF_ACTIVITY_VIEW_ROUTE,
         settings: typeOfActivitySettings,
         errorMessages: typeOfActivityErrorMessages,
-        getBackLink: expect.any(Function),
+        backLink:
+          '/marine-licence/review-site-details#activity-details-site-1-activity-1',
         params: {
           activityDetailsNumber: 1,
           siteNumber: 1
-        }
+        },
+        payload: {}
       })
     })
 

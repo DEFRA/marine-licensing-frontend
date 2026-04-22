@@ -10,10 +10,9 @@ export const selectActivitySchema = joi.object({
     .messages({
       'any.required': 'ACTIVITIES_REQUIRED',
       'array.min': 'ACTIVITIES_REQUIRED'
-    })
-    .default([]),
+    }),
   otherActivity: joi.when('activities', {
-    is: joi.array().has('other'),
+    is: joi.array().required().has('other'),
     then: joi.string().trim().max(1000).required().messages({
       'string.empty': 'ACTIVITIES_OTHER_REASON_REQUIRED',
       'any.required': 'ACTIVITIES_OTHER_REASON_REQUIRED',

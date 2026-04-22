@@ -92,7 +92,6 @@ export const selectActivitySubmitController = {
         )
 
         return createFailAction({
-          getCache: getMarineLicenceCache,
           viewRoute: SELECT_ACTIVITY_VIEW_ROUTE,
           settings: getSelectActivityPageParams(
             request,
@@ -102,7 +101,7 @@ export const selectActivitySubmitController = {
           errorMessages: selectActivityErrorMessages(
             activityDetails.activityType
           ),
-          getBackLink
+          payload: request.payload
         })(request, h, err)
       }
     }

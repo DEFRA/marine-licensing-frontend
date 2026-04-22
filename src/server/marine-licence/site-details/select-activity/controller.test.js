@@ -28,9 +28,8 @@ describe('#selectActivity', () => {
 
   describe('#selectActivitySubmitController', () => {
     const commonTestExpectedReturn = {
-      getCache: getMarineLicenceCache,
       viewRoute: SELECT_ACTIVITY_VIEW_ROUTE,
-      getBackLink: expect.any(Function),
+      payload: {},
       settings: {
         backLink: '/marine-licence/type-of-activity',
         activityDetailsNumber: 1,

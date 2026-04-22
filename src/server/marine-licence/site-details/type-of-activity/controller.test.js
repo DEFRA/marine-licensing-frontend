@@ -82,7 +82,6 @@ describe('#typeOfActivity', () => {
       expect(redirectH.redirect).toHaveBeenCalledWith(
         marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS
       )
-      expect(redirectH.redirect).toHaveBeenCalled()
     })
   })
 })

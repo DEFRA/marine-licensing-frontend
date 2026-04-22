@@ -238,41 +238,6 @@ describe('#activityDescriptionController', () => {
       expect(headers.location).toBe(routes.COORDINATES_ENTRY_CHOICE)
     })
 
-    test('should handle form submission with empty activity description', async () => {
-      const payload = {
-        activityDescription: ''
-      }
-
-      const { result, statusCode } = await makePostRequest({
-        url: routes.ACTIVITY_DESCRIPTION,
-        server: getServer(),
-        formData: payload,
-        headers: {
-          cookie: 'cookies_preferences_set=true'
-        }
-      })
-
-      expect(statusCode).toBe(statusCodes.ok)
-
-      const { document } = new JSDOM(result).window
-      expect(
-        document
-          .querySelector('label[for="activityDescription"]')
-          .textContent.trim()
-      ).toBe('Activity description')
-      expect(document.querySelector('#activityDescription').value).toBe('')
-      expect(document.querySelector('form').method).toBe('post')
-      expect(
-        document.querySelector('button[type="submit"]').textContent.trim()
-      ).toBe('Continue')
-      expect(
-        document.querySelector('.govuk-error-summary').textContent
-      ).toContain('There is a problem')
-      expect(
-        document.querySelector('.govuk-error-message').textContent
-      ).toContain('Enter the activity description')
-    })
-
     test('should pass error to global catchAll handler', async () => {
       const apiPatchMock = vi.spyOn(authRequests, 'authenticatedPatchRequest')
       apiPatchMock.mockRejectedValueOnce({

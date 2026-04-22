@@ -53,11 +53,11 @@ export const adminEmpSendController = {
       await authenticatedPostRequest(request, '/exemption/send-to-emp', {
         id: request.payload.exemptionId
       })
-      return h.redirect(routes.ADMIN_EXEMPTIONS)
+      return h.redirect(routes.ADMIN_EMP)
     } catch (error) {
       request.logger.error({ err: error }, 'Error sending exemption to EMP')
 
-      return h.redirect(routes.ADMIN_EXEMPTIONS)
+      return h.redirect(routes.ADMIN_EMP)
     }
   }
 }

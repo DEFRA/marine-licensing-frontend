@@ -22,6 +22,16 @@ function urlForEntry(entry) {
   return `${ROUTE_PREFIX}/${entry.questionRoute.replace(/^\//, '')}`
 }
 
+// The IAT is a decision tree. When a user re-answers a question (or
+// re-picks an outcome) the entries that followed were driven by the old
+// choice and no longer belong to the current path, so they are discarded.
+function deleteFutureAnswers(answers, matchesCurrentEntry) {
+  const index = answers.findIndex(matchesCurrentEntry)
+  if (index !== -1) {
+    answers.length = index
+  }
+}
+
 export function getAnswers(request) {
   return request.yar.get(SESSION_KEY) ?? []
 }
@@ -36,24 +46,18 @@ export function getAnswerForRoute(request, questionRoute) {
 
 export function pushAnswer(request, questionRoute, answerId) {
   const answers = getAnswers(request)
-  const existingIndex = answers.findIndex(
-    (e) => isQuestionEntry(e) && e.questionRoute === questionRoute
-  )
-  if (existingIndex !== -1) {
-    answers.splice(existingIndex)
-  }
+  const isEntryForThisQuestion = (e) =>
+    isQuestionEntry(e) && e.questionRoute === questionRoute
+  deleteFutureAnswers(answers, isEntryForThisQuestion)
   answers.push({ type: 'question', questionRoute, answerId })
   request.yar.set(SESSION_KEY, answers)
 }
 
 export function pushOutcomeSelection(request, outcomeRoute, outcomeTypeId) {
   const answers = getAnswers(request)
-  const existingIndex = answers.findIndex(
-    (e) => isOutcomeEntry(e) && e.outcomeRoute === outcomeRoute
-  )
-  if (existingIndex !== -1) {
-    answers.splice(existingIndex)
-  }
+  const isEntryForThisOutcome = (e) =>
+    isOutcomeEntry(e) && e.outcomeRoute === outcomeRoute
+  deleteFutureAnswers(answers, isEntryForThisOutcome)
   answers.push({ type: 'outcome', outcomeRoute, outcomeTypeId })
   request.yar.set(SESSION_KEY, answers)
 }
@@ -70,7 +74,9 @@ export function getBackLink(request, currentRoute, currentType) {
   const answers = getAnswers(request)
 
   const currentIndex = answers.findIndex((e) => {
-    if (entryType(e) !== currentType) return false
+    if (entryType(e) !== currentType) {
+      return false
+    }
     return currentType === 'outcome'
       ? e.outcomeRoute === currentRoute
       : e.questionRoute === currentRoute

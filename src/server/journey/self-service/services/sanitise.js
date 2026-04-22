@@ -22,7 +22,7 @@ const hintSanitiseOptions = {
 const richTextSanitiseOptions = {
   allowedTags: ALLOWED_TAGS,
   allowedAttributes: {
-    a: ['href', 'target', 'rel', 'lang'],
+    a: ['href', 'target', 'rel'],
     ol: ['type']
   },
   allowedSchemes: ALLOWED_SCHEMES

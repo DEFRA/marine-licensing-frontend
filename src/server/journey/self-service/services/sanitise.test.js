@@ -110,22 +110,13 @@ describe('#sanitiseRichText', () => {
     expect(result).toContain('Line two')
   })
 
-  test('preserves anchors with href, target, rel and lang', () => {
+  test('preserves anchors with href, target and rel', () => {
     const input =
-      '<a href="https://www.gov.uk/" target="_blank" rel="noopener" lang="en">gov.uk</a>'
+      '<a href="https://www.gov.uk/" target="_blank" rel="noopener">gov.uk</a>'
     const result = sanitiseRichText(input)
     expect(result).toContain('href="https://www.gov.uk/"')
     expect(result).toContain('target="_blank"')
     expect(result).toContain('rel="noopener"')
-    expect(result).toContain('lang="en"')
-  })
-
-  test('preserves cy-language anchors (Welsh variant)', () => {
-    const input =
-      '<a href="https://naturalresources.wales/?lang=cy" lang="cy">Adnoddau Naturiol Cymru</a>'
-    const result = sanitiseRichText(input)
-    expect(result).toContain('lang="cy"')
-    expect(result).toContain('href="https://naturalresources.wales/?lang=cy"')
   })
 
   test('preserves http and https schemes', () => {

@@ -1,5 +1,5 @@
 import { vi } from 'vitest'
-import { COORDINATE_SYSTEMS } from '#src/server/common/constants/exemptions.js'
+import { COORDINATE_SYSTEMS } from '#src/server/common/constants/coordinate-systems.js'
 import { statusCodes } from '#src/server/common/constants/status-codes.js'
 import * as cacheUtils from '#src/server/common/helpers/exemptions/session-cache/utils.js'
 import * as exemptionService from '#src/services/exemption-service/index.js'

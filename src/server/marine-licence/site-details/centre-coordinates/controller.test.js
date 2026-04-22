@@ -5,7 +5,7 @@ import {
   centreCoordinatesSubmitFailHandler,
   COORDINATE_SYSTEM_VIEW_ROUTES
 } from '#src/server/marine-licence/site-details/centre-coordinates/controller.js'
-import { COORDINATE_SYSTEMS } from '#src/server/common/constants/exemptions.js'
+import { COORDINATE_SYSTEMS } from '#src/server/common/constants/coordinate-systems.js'
 import {
   getMarineLicenceCache,
   updateMarineLicenceSiteDetails

@@ -7,27 +7,16 @@ import {
   setSiteData,
   setSiteDataPreHandler
 } from '#src/server/common/helpers/exemptions/session-cache/site-utils.js'
-import {
-  errorDescriptionByFieldName,
-  mapErrorsForDisplay
-} from '#src/server/common/helpers/errors.js'
 import { routes } from '#src/server/common/constants/routes.js'
 import { getCancelLink } from '#src/server/exemption/site-details/utils/cancel-link.js'
+import { createFailAction } from '#src/server/common/helpers/createFailAction.js'
+import {
+  coordinateSystemSettings,
+  coordinateSystemErrorMessages
+} from '#src/server/common/validation/coordinate-system/constants.js'
+import { coordinateSystemSchema } from '#src/server/common/validation/coordinate-system/schema.js'
 
-import joi from 'joi'
-
-export const COORDINATE_SYSTEM_VIEW_ROUTE =
-  'exemption/site-details/coordinate-system/index'
-
-const coordinateSystemSettings = {
-  pageTitle: 'Which coordinate system do you want to use?',
-  heading: 'Which coordinate system do you want to use?',
-  backLink: routes.COORDINATES_ENTRY_CHOICE
-}
-
-export const errorMessages = {
-  COORDINATE_SYSTEM_REQUIRED: 'Select which coordinate system you want to use'
-}
+export const COORDINATE_SYSTEM_VIEW_ROUTE = 'templates/coordinate-system'
 
 const getBackLink = (action, siteNumber, queryParams, request) => {
   if (action) {
@@ -37,7 +26,7 @@ const getBackLink = (action, siteNumber, queryParams, request) => {
     }
     return `${routes.REVIEW_SITE_DETAILS}#site-details-${siteNumber}`
   }
-  return coordinateSystemSettings.backLink + queryParams
+  return routes.COORDINATES_ENTRY_CHOICE + queryParams
 }
 
 export const coordinateSystemController = {
@@ -76,62 +65,27 @@ export const coordinateSystemSubmitController = {
   options: {
     pre: [setSiteDataPreHandler],
     validate: {
-      payload: joi.object({
-        coordinateSystem: joi
-          .string()
-          .valid('wgs84', 'osgb36')
-          .required()
-          .messages({
-            'any.only': 'COORDINATE_SYSTEM_REQUIRED',
-            'string.empty': 'COORDINATE_SYSTEM_REQUIRED',
-            'any.required': 'COORDINATE_SYSTEM_REQUIRED'
-          })
-      }),
+      payload: coordinateSystemSchema,
       failAction: (request, h, err) => {
-        const { payload } = request
         const exemption = getExemptionCache(request)
-        const { projectName } = exemption
         const action = request.query.action
-
         const site = setSiteData(request)
         const { queryParams, siteNumber } = site
-
-        const siteNumberDisplay = exemption.multipleSiteDetails
-          ?.multipleSitesEnabled
-          ? siteNumber
-          : null
-
-        if (!err.details) {
-          return h
-            .view(COORDINATE_SYSTEM_VIEW_ROUTE, {
-              ...coordinateSystemSettings,
-              backLink: getBackLink(action, siteNumber, queryParams, request),
-              cancelLink: getCancelLink(action),
-              payload,
-              projectName,
-              siteNumber: siteNumberDisplay,
-              action
-            })
-            .takeover()
-        }
-
-        const errorSummary = mapErrorsForDisplay(err.details, errorMessages)
-
-        const errors = errorDescriptionByFieldName(errorSummary)
-
-        return h
-          .view(COORDINATE_SYSTEM_VIEW_ROUTE, {
-            ...coordinateSystemSettings,
-            backLink: getBackLink(action, siteNumber, queryParams, request),
+        return createFailAction({
+          viewRoute: COORDINATE_SYSTEM_VIEW_ROUTE,
+          settings: coordinateSystemSettings,
+          errorMessages: coordinateSystemErrorMessages,
+          projectName: exemption.projectName,
+          backLink: getBackLink(action, siteNumber, queryParams, request),
+          payload: request.payload,
+          params: {
             cancelLink: getCancelLink(action),
-            payload,
-            projectName,
-            siteNumber: siteNumberDisplay,
-            action,
-            errors,
-            errorSummary
-          })
-          .takeover()
+            siteNumber: exemption.multipleSiteDetails?.multipleSitesEnabled
+              ? siteNumber
+              : null,
+            action
+          }
+        })(request, h, err)
       }
     }
   },
@@ -203,7 +157,7 @@ export const coordinateSystemSubmitController = {
 
     return h.view(COORDINATE_SYSTEM_VIEW_ROUTE, {
       ...coordinateSystemSettings,
-      backLink: coordinateSystemSettings.backLink + queryParams,
+      backLink: routes.COORDINATES_ENTRY_CHOICE + queryParams,
       projectName: exemption.projectName,
       payload: {
         coordinateSystem: payload.coordinateSystem

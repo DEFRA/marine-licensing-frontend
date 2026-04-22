@@ -16,22 +16,20 @@
 {% set helperHtml %}
   <h2 class="govuk-heading-s">WGS84 (World Geodetic System 1984)</h2>
   <p>
-    WGS84 is a global system that pinpoints locations using latitude and
-    longitude. Latitude shows how far north or south a place is, and longitude
-    shows how far east or west it is. WGS84 is widely used in GPS and mapping
-    tools like Google Maps.
+    WGS84 is a global system widely used in GPS and mapping tools like Google Maps. 
+    It uses latitude and longitude to pinpoint locations. For example, latitude 55.019889, longitude -1.399500.
   </p>
   <h2 class="govuk-heading-s">British National Grid (OSGB36)</h2>
   <p>
-    The British National Grid maps Great Britain using numerical east and north positions, called eastings and
-    northings. It’s based on the OSGB36 reference system used by Ordnance Survey. For example, easting 438493,
-    northing 569648.
+    The British National Grid maps Great Britain using numerical east and north positions, 
+    called eastings and northings. It's based on the OSGB36 reference system used by Ordnance Survey. 
+    For example, easting 438493, northing 569648.
   </p>
 {% endset %}
 
 {% set helperText %}
   {{ govukDetails({
-      html:helperHtml,
+      html: helperHtml,
       summaryText: "Help with the coordinate systems"
   }) }}
 {% endset %}

@@ -129,7 +129,7 @@ describe('Admin dashboard to send exemptions to EMP', () => {
   describe('#adminEmpSendController', () => {
     const authenticatedPostRequestMock = vi.mocked(authenticatedPostRequest)
 
-    test('Should send exemption to EMP and redirect to admin exemptions', async () => {
+    test('Should send exemption to EMP and redirect to admin emp page', async () => {
       const { h, request } = createRequest()
       request.payload = { exemptionId: 'test-exemption-123' }
 
@@ -145,10 +145,10 @@ describe('Admin dashboard to send exemptions to EMP', () => {
         }
       )
 
-      expect(h.redirect).toHaveBeenCalledWith(routes.ADMIN_EXEMPTIONS)
+      expect(h.redirect).toHaveBeenCalledWith(routes.ADMIN_EMP)
     })
 
-    test('Should handle errors and redirect to admin exemptions', async () => {
+    test('Should handle errors and redirect back to admin emp page', async () => {
       const { h, request } = createRequest()
       request.payload = { exemptionId: 'test-exemption-456' }
 
@@ -162,7 +162,7 @@ describe('Admin dashboard to send exemptions to EMP', () => {
         'Error sending exemption to EMP'
       )
 
-      expect(h.redirect).toHaveBeenCalledWith(routes.ADMIN_EXEMPTIONS)
+      expect(h.redirect).toHaveBeenCalledWith(routes.ADMIN_EMP)
     })
 
     test('Should handle missing exemptionId', async () => {
@@ -181,7 +181,7 @@ describe('Admin dashboard to send exemptions to EMP', () => {
         }
       )
 
-      expect(h.redirect).toHaveBeenCalledWith(routes.ADMIN_EXEMPTIONS)
+      expect(h.redirect).toHaveBeenCalledWith(routes.ADMIN_EMP)
     })
   })
 })

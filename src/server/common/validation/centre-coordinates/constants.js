@@ -19,15 +19,15 @@ export const centreCoordinatesErrorMessages = {
       'Longitude must include 6 decimal places, like -1.399500'
   },
   [COORDINATE_SYSTEMS.OSGB36]: {
-    EASTINGS_REQUIRED: 'Enter the eastings',
-    EASTINGS_NON_NUMERIC: 'Eastings must be a number',
-    EASTINGS_LENGTH: 'Eastings must be 6 digits',
+    EASTINGS_REQUIRED: 'Enter the easting',
+    EASTINGS_NON_NUMERIC: 'Easting must be a number',
+    EASTINGS_LENGTH: 'Easting must be 6 digits',
     EASTINGS_POSITIVE_NUMBER:
-      'Eastings must be a positive 6-digit number, like 123456',
-    NORTHINGS_REQUIRED: 'Enter the northings',
-    NORTHINGS_NON_NUMERIC: 'Northings must be a number',
-    NORTHINGS_LENGTH: 'Northings must be 6 or 7 digits',
+      'Easting must be a positive 6-digit number, like 123456',
+    NORTHINGS_REQUIRED: 'Enter the northing',
+    NORTHINGS_NON_NUMERIC: 'Northing must be a number',
+    NORTHINGS_LENGTH: 'Northing must be 6 or 7 digits',
     NORTHINGS_POSITIVE_NUMBER:
-      'Northings must be a positive 6 or 7-digit number, like 123456'
+      'Northing must be a positive 6 or 7-digit number, like 123456'
   }
 }

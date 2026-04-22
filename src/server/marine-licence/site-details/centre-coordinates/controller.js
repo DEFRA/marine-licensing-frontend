@@ -124,7 +124,6 @@ export const centreCoordinatesSubmitController = {
     const { payload } = request
     const marineLicence = getMarineLicenceCache(request)
     const coordinateSystem = getCoordinateSystem(marineLicence)
-    const action = request.query.action
 
     const { error, value } = validateCentreCoordinates(
       payload,
@@ -137,10 +136,6 @@ export const centreCoordinatesSubmitController = {
 
     await updateMarineLicenceSiteDetails(request, h, 0, 'coordinates', value)
 
-    if (action) {
-      return h.redirect(marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS)
-    }
-
-    return h.redirect(marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS)
+    return h.redirect(marineLicenceRoutes.MARINE_LICENCE_CIRCLE_CENTRE_POINT)
   }
 }

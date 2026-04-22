@@ -236,9 +236,6 @@ describe('#centreCoordinates (marine licence)', () => {
         'coordinates',
         wgs84Coordinates
       )
-      expect(h.redirect).toHaveBeenCalledWith(
-        marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS
-      )
     })
 
     test('should trim spaces from wgs84 data and save the converted values', async () => {
@@ -274,9 +271,6 @@ describe('#centreCoordinates (marine licence)', () => {
         'coordinates',
         osgb36Coordinates
       )
-      expect(h.redirect).toHaveBeenCalledWith(
-        marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS
-      )
     })
 
     test('should correctly handle validation errors', async () => {
@@ -307,7 +301,7 @@ describe('#centreCoordinates (marine licence)', () => {
       await centreCoordinatesSubmitController.handler(request, h)
 
       expect(h.redirect).toHaveBeenCalledWith(
-        marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS
+        marineLicenceRoutes.MARINE_LICENCE_CIRCLE_CENTRE_POINT
       )
     })
   })

@@ -229,6 +229,10 @@ describe('Page accessibility checks (Axe)', () => {
       title: 'How do you want to enter the site coordinates?'
     },
     {
+      url: marineLicenceRoutes.MARINE_LICENCE_COORDINATE_SYSTEM_CHOICE,
+      title: 'Which coordinate system do you want to use?'
+    },
+    {
       url: marineLicenceRoutes.MARINE_LICENCE_CHECK_YOUR_ANSWERS,
       title: 'Check your answers before sending your information',
       isMarineLicence: true

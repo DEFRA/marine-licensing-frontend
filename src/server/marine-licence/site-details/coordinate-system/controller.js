@@ -4,52 +4,51 @@ import {
 } from '#src/server/common/helpers/marine-licence/session-cache/utils.js'
 import { getSiteDetailsBySite } from '#src/server/common/helpers/marine-licence/session-cache/site-details-utils.js'
 import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
-import {
-  coordinatesEntrySettings,
-  coordinatesEntryErrorMessages
-} from '#src/server/common/validation/coordinates-entry/constants.js'
-import { coordinatesEntrySchema } from '#src/server/common/validation/coordinates-entry/schema.js'
 import { createFailAction } from '#src/server/common/helpers/createFailAction.js'
-import { getBackRoute } from './utils.js'
+import {
+  coordinateSystemSettings,
+  coordinateSystemErrorMessages
+} from '#src/server/common/validation/coordinate-system/constants.js'
+import { coordinateSystemSchema } from '#src/server/common/validation/coordinate-system/schema.js'
 
-export const MARINE_LICENCE_COORDINATES_ENTRY_VIEW_ROUTE =
-  'templates/coordinates-entry'
+export const MARINE_LICENCE_COORDINATE_SYSTEM_VIEW_ROUTE =
+  'templates/coordinate-system'
 
 const cancelLink = `${marineLicenceRoutes.MARINE_LICENCE_TASK_LIST}?cancel=site-details`
 
-export const coordinatesEntryController = {
+export const coordinateSystemController = {
   handler(request, h) {
     const marineLicence = getMarineLicenceCache(request)
     const siteDetails = getSiteDetailsBySite(marineLicence)
     const action = request.query.action
 
-    return h.view(MARINE_LICENCE_COORDINATES_ENTRY_VIEW_ROUTE, {
-      ...coordinatesEntrySettings,
-      backLink: getBackRoute(),
+    return h.view(MARINE_LICENCE_COORDINATE_SYSTEM_VIEW_ROUTE, {
+      ...coordinateSystemSettings,
+      backLink: marineLicenceRoutes.MARINE_LICENCE_COORDINATES_ENTRY_CHOICE,
       cancelLink,
       projectName: marineLicence.projectName,
       siteNumber: null,
       action,
       payload: {
-        coordinatesEntry: siteDetails.coordinatesEntry
+        coordinateSystem: siteDetails.coordinateSystem
       }
     })
   }
 }
 
-export const coordinatesEntrySubmitController = {
+export const coordinateSystemSubmitController = {
   options: {
     validate: {
-      payload: coordinatesEntrySchema,
+      payload: coordinateSystemSchema,
       failAction: (request, h, err) => {
         const { projectName } = getMarineLicenceCache(request)
         const action = request.query.action
         return createFailAction({
-          viewRoute: MARINE_LICENCE_COORDINATES_ENTRY_VIEW_ROUTE,
-          settings: coordinatesEntrySettings,
-          errorMessages: coordinatesEntryErrorMessages,
+          viewRoute: MARINE_LICENCE_COORDINATE_SYSTEM_VIEW_ROUTE,
+          settings: coordinateSystemSettings,
+          errorMessages: coordinateSystemErrorMessages,
           projectName,
-          backLink: getBackRoute(),
+          backLink: marineLicenceRoutes.MARINE_LICENCE_COORDINATES_ENTRY_CHOICE,
           payload: request.payload,
           params: {
             cancelLink,
@@ -67,8 +66,8 @@ export const coordinatesEntrySubmitController = {
       request,
       h,
       0,
-      'coordinatesEntry',
-      payload.coordinatesEntry
+      'coordinateSystem',
+      payload.coordinateSystem
     )
 
     return h.redirect(

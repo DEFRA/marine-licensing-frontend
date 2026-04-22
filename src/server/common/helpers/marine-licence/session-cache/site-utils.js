@@ -15,7 +15,7 @@ export const validateSiteAndActivityParams = {
     const marineLicence = getMarineLicenceCache(request)
     const siteDetails = marineLicence.siteDetails?.[siteIndex]
 
-    if (!siteDetails || !siteDetails.activityDetails?.[activityIndex]) {
+    if (!siteDetails?.activityDetails?.[activityIndex]) {
       return h.redirect(marineLicenceRoutes.MARINE_LICENCE_TASK_LIST).takeover()
     }
 

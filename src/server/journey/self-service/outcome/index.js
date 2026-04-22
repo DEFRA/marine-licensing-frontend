@@ -5,7 +5,6 @@ import {
 } from '#src/server/journey/self-service/outcome/controller.js'
 import { routes } from '#src/server/common/constants/routes.js'
 
-
 const outcomeTypeMaxCharLength = 400
 
 export const journeySelfServiceOutcome = {

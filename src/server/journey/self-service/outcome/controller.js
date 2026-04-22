@@ -11,7 +11,6 @@ import {
   getBackLink,
   pushOutcomeSelection
 } from '#src/server/journey/self-service/services/session-answers.js'
-import { statusCodes } from '#src/server/common/constants/status-codes.js'
 
 const VIEW_PATH = 'journey/self-service/outcome/index'
 
@@ -61,9 +60,7 @@ export const outcomePostController = {
       outcomeType.nextQuestionRoute
 
     if (!validChoice) {
-      return h
-        .response('Invalid outcome selection')
-        .code(statusCodes.badRequest)
+      throw Boom.badRequest('Invalid outcome selection')
     }
 
     pushOutcomeSelection(request, outcomeRoute, outcomeTypeId)

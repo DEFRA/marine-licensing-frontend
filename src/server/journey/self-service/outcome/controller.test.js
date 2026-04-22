@@ -1,5 +1,4 @@
 import { vi } from 'vitest'
-import { statusCodes } from '#src/server/common/constants/status-codes.js'
 
 vi.mock('#src/server/journey/self-service/services/journey-data.js')
 vi.mock('#src/server/journey/self-service/services/session-answers.js')
@@ -225,7 +224,7 @@ describe('#outcomePostController', () => {
     )
   })
 
-  test('returns 400 when outcomeType is not in this outcome list', () => {
+  test('throws Boom.badRequest when outcomeType is not in this outcome list', () => {
     const request = {
       params: { outcomePath: 'construction/journey-select' },
       payload: { outcomeType: 'WO_UNRELATED_OUTCOME_TYPE' }
@@ -234,51 +233,59 @@ describe('#outcomePostController', () => {
       id: 'WO_UNRELATED_OUTCOME_TYPE',
       nextQuestionRoute: '/other-question'
     })
-    const codeStub = vi.fn()
-    const h = { response: vi.fn().mockReturnValue({ code: codeStub }) }
+    const h = {}
 
-    outcomePostController.handler(request, h)
-
-    expect(codeStub).toHaveBeenCalledWith(statusCodes.badRequest)
+    expect(() => outcomePostController.handler(request, h)).toThrow(
+      expect.objectContaining({
+        isBoom: true,
+        output: expect.objectContaining({ statusCode: 400 })
+      })
+    )
   })
 
-  test('returns 400 when outcomeType is terminal (no nextQuestionRoute)', () => {
+  test('throws Boom.badRequest when outcomeType is terminal (no nextQuestionRoute)', () => {
     const request = {
       params: { outcomePath: 'construction/journey-select' },
       payload: { outcomeType: 'WO_STANDARD_MLA' }
     }
-    const codeStub = vi.fn()
-    const h = { response: vi.fn().mockReturnValue({ code: codeStub }) }
+    const h = {}
 
-    outcomePostController.handler(request, h)
-
-    expect(codeStub).toHaveBeenCalledWith(statusCodes.badRequest)
+    expect(() => outcomePostController.handler(request, h)).toThrow(
+      expect.objectContaining({
+        isBoom: true,
+        output: expect.objectContaining({ statusCode: 400 })
+      })
+    )
   })
 
-  test('returns 400 when outcomeType payload is missing', () => {
+  test('throws Boom.badRequest when outcomeType payload is missing', () => {
     const request = {
       params: { outcomePath: 'construction/journey-select' },
       payload: {}
     }
-    const codeStub = vi.fn()
-    const h = { response: vi.fn().mockReturnValue({ code: codeStub }) }
+    const h = {}
 
-    outcomePostController.handler(request, h)
-
-    expect(codeStub).toHaveBeenCalledWith(statusCodes.badRequest)
+    expect(() => outcomePostController.handler(request, h)).toThrow(
+      expect.objectContaining({
+        isBoom: true,
+        output: expect.objectContaining({ statusCode: 400 })
+      })
+    )
   })
 
-  test('returns 400 when outcomeType is unknown', () => {
+  test('throws Boom.badRequest when outcomeType is unknown', () => {
     vi.mocked(getOutcomeType).mockReturnValue(null)
     const request = {
       params: { outcomePath: 'construction/journey-select' },
       payload: { outcomeType: 'NOT_A_REAL_ID' }
     }
-    const codeStub = vi.fn()
-    const h = { response: vi.fn().mockReturnValue({ code: codeStub }) }
+    const h = {}
 
-    outcomePostController.handler(request, h)
-
-    expect(codeStub).toHaveBeenCalledWith(statusCodes.badRequest)
+    expect(() => outcomePostController.handler(request, h)).toThrow(
+      expect.objectContaining({
+        isBoom: true,
+        output: expect.objectContaining({ statusCode: 400 })
+      })
+    )
   })
 })

@@ -101,7 +101,6 @@ export const activityDescriptionSubmitController = {
           .required()
           .messages({
             'string.empty': 'ACTIVITY_DESCRIPTION_REQUIRED',
-            'any.required': 'ACTIVITY_DESCRIPTION_REQUIRED',
             'string.max': 'ACTIVITY_DESCRIPTION_MAX_LENGTH'
           })
       }),

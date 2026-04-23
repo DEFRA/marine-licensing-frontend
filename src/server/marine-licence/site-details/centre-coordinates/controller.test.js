@@ -157,7 +157,9 @@ describe('#centreCoordinates (marine licence)', () => {
     })
 
     test('should correctly format error data for osgb36', () => {
-      vi.mocked(getMarineLicenceCache).mockReturnValueOnce(mockOsgb36Application)
+      vi.mocked(getMarineLicenceCache).mockReturnValueOnce(
+        mockOsgb36Application
+      )
       const request = createMockRequest({
         query: {},
         payload: { eastings: 'invalid' }

@@ -18,8 +18,6 @@ import {
   COORDINATE_SYSTEM_VIEW_ROUTES
 } from '#src/server/common/validation/centre-coordinates/constants.js'
 
-export { COORDINATE_SYSTEM_VIEW_ROUTES }
-
 const centreCoordinatesPageData = {
   ...centreCoordinatesSettings,
   backLink: marineLicenceRoutes.MARINE_LICENCE_COORDINATE_SYSTEM_CHOICE

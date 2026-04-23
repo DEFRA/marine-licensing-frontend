@@ -34,7 +34,6 @@ export const createFailAction = ({
         payload,
         projectName,
         backLink,
-        ...params,
         errors,
         errorSummary,
         ...params

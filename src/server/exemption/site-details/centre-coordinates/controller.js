@@ -13,7 +13,6 @@ import {
   mapErrorsForDisplay
 } from '#src/server/common/helpers/errors.js'
 import { routes } from '#src/server/common/constants/routes.js'
-import { COORDINATE_SYSTEMS } from '#src/server/common/constants/coordinate-systems.js'
 import { getPayload } from '#src/server/common/helpers/site-details/centre-coordinates.js'
 import { validateCentreCoordinates } from '#src/server/common/validation/centre-coordinates/validate.js'
 import {

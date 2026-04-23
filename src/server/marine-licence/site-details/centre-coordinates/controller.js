@@ -34,11 +34,11 @@ const getCoordinateSystem = (marineLicence) => {
     : COORDINATE_SYSTEMS.WGS84
 }
 
-const getBackLinkForAction = (action, request) => {
+const getBackLinkForAction = () => {
   return centreCoordinatesPageData.backLink
 }
 
-const getButtonText = (action, request) => {
+const getButtonText = () => {
   return 'Continue'
 }
 

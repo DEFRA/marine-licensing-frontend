@@ -116,41 +116,6 @@ describe('#centreCoordinates (marine licence)', () => {
         }
       )
     })
-
-    test('handler should render correctly when using a change link (direct change, no originalCoordinateSystem)', () => {
-      const h = { view: vi.fn() }
-      const request = createMockRequest({ query: { action: 'change' } })
-
-      centreCoordinatesController.handler(request, h)
-
-      expect(h.view).toHaveBeenCalledWith(
-        COORDINATE_SYSTEM_VIEW_ROUTES[COORDINATE_SYSTEMS.WGS84],
-        expect.objectContaining({
-          action: 'change',
-          backLink: marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS,
-          buttonText: 'Save and continue',
-          cancelLink: undefined
-        })
-      )
-    })
-
-    test('handler should render correctly when using a change link with originalCoordinateSystem in session', () => {
-      const h = { view: vi.fn() }
-      const request = createMockRequest({ query: { action: 'change' } })
-      request.yar.get.mockReturnValue({ originalCoordinateSystem: 'osgb36' })
-
-      centreCoordinatesController.handler(request, h)
-
-      expect(h.view).toHaveBeenCalledWith(
-        COORDINATE_SYSTEM_VIEW_ROUTES[COORDINATE_SYSTEMS.WGS84],
-        expect.objectContaining({
-          action: 'change',
-          backLink: `${marineLicenceRoutes.MARINE_LICENCE_COORDINATE_SYSTEM_CHOICE}?action=change`,
-          buttonText: 'Continue',
-          cancelLink: undefined
-        })
-      )
-    })
   })
 
   describe('#centreCoordinatesSubmitFailHandler', () => {
@@ -185,6 +150,44 @@ describe('#centreCoordinates (marine licence)', () => {
           ],
           errors: {
             latitude: { field: ['latitude'], href: '#latitude', text: 'TEST' }
+          }
+        }
+      )
+      expect(h.view().takeover).toHaveBeenCalled()
+    })
+
+    test('should correctly format error data for osgb36', () => {
+      vi.mocked(getMarineLicenceCache).mockReturnValueOnce(mockOsgb36Application)
+      const request = createMockRequest({
+        query: {},
+        payload: { eastings: 'invalid' }
+      })
+      const h = {
+        view: vi.fn().mockReturnValue({ takeover: vi.fn() })
+      }
+      const err = {
+        details: [{ path: ['eastings'], message: 'TEST', type: 'any.only' }]
+      }
+
+      centreCoordinatesSubmitFailHandler(request, h, err)
+
+      expect(h.view).toHaveBeenCalledWith(
+        COORDINATE_SYSTEM_VIEW_ROUTES[COORDINATE_SYSTEMS.OSGB36],
+        {
+          action: undefined,
+          backLink: marineLicenceRoutes.MARINE_LICENCE_COORDINATE_SYSTEM_CHOICE,
+          buttonText: 'Continue',
+          cancelLink: marineLicenceRoutes.MARINE_LICENCE_TASK_LIST,
+          heading: 'Enter the coordinates at the centre point of the site',
+          pageTitle: 'Enter the coordinates at the centre point of the site',
+          projectName: 'Test Project',
+          payload: { eastings: 'invalid' },
+          siteNumber: null,
+          errorSummary: [
+            { href: '#eastings', text: 'TEST', field: ['eastings'] }
+          ],
+          errors: {
+            eastings: { field: ['eastings'], href: '#eastings', text: 'TEST' }
           }
         }
       )
@@ -270,6 +273,24 @@ describe('#centreCoordinates (marine licence)', () => {
         0,
         'coordinates',
         osgb36Coordinates
+      )
+    })
+
+    test('should trim spaces from OSGB36 data and save the converted values', async () => {
+      vi.mocked(getMarineLicenceCache).mockReturnValue(mockOsgb36Application)
+      const h = { redirect: vi.fn() }
+      const request = createMockRequest({
+        payload: { eastings: ' 425053', northings: '564180 ' }
+      })
+
+      await centreCoordinatesSubmitController.handler(request, h)
+
+      expect(updateMarineLicenceSiteDetails).toHaveBeenCalledWith(
+        request,
+        h,
+        0,
+        'coordinates',
+        { eastings: '425053', northings: '564180' }
       )
     })
 

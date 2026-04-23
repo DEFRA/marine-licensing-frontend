@@ -15,8 +15,8 @@ const setStatus = (task) => {
   if (task === 'IN_PROGRESS') {
     return {
       tag: {
-        text: 'In Progress',
-        classes: 'govuk-tag--light-blue'
+        text: 'In progress',
+        classes: 'govuk-tag--teal'
       }
     }
   }

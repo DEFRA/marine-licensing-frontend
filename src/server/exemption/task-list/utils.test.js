@@ -32,7 +32,7 @@ describe('taskList utils', () => {
     ])
   })
 
-  test('transformTaskList correctly returns In Progress', () => {
+  test('transformTaskList correctly returns In progress', () => {
     expect(
       transformTaskList({
         ...mockExemptionTaskList,
@@ -47,7 +47,7 @@ describe('taskList utils', () => {
       {
         href: routes.REVIEW_SITE_DETAILS,
         status: {
-          tag: { text: 'In Progress', classes: 'govuk-tag--light-blue' }
+          tag: { text: 'In progress', classes: 'govuk-tag--teal' }
         },
         title: { classes: 'govuk-link--no-visited-state', text: 'Site details' }
       },

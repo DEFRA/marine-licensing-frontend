@@ -17,6 +17,17 @@ vi.mock('~/src/server/common/helpers/coordinate-utils.js')
 vi.mock('~/src/server/common/helpers/exemptions/session-cache/utils.js')
 vi.mock('~/src/server/common/helpers/exemptions/save-site-details.js')
 
+const mockOsgb36ExemptionData = {
+  ...mockExemptionData,
+  siteDetails: [
+    {
+      coordinatesType: 'coordinates',
+      coordinateSystem: COORDINATE_SYSTEMS.OSGB36,
+      coordinates: { eastings: '532000', northings: '182000' }
+    }
+  ]
+}
+
 describe('Centre coordinates page (exemptions)', () => {
   const getServer = setupTestServer()
 
@@ -41,6 +52,14 @@ describe('Centre coordinates page (exemptions)', () => {
     cancelHref: `${routes.TASK_LIST}?cancel=site-details`,
     latitude: mockExemptionData.siteDetails[0].coordinates.latitude,
     longitude: mockExemptionData.siteDetails[0].coordinates.longitude,
-    redirectHref: routes.WIDTH_OF_SITE
+    redirectHref: routes.WIDTH_OF_SITE,
+    setupOsgb36: () => {
+      mockExemption(mockOsgb36ExemptionData)
+      vi.spyOn(coordinateUtils, 'getCoordinateSystem').mockReturnValueOnce({
+        coordinateSystem: COORDINATE_SYSTEMS.OSGB36
+      })
+    },
+    eastings: '532000',
+    northings: '182000'
   })
 })

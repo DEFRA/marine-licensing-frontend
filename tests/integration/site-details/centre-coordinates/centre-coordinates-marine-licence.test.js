@@ -1,9 +1,6 @@
 import { vi } from 'vitest'
-import { JSDOM } from 'jsdom'
-import { getByRole, getByText } from '@testing-library/dom'
 import { COORDINATE_SYSTEMS } from '~/src/server/common/constants/coordinate-systems.js'
 import { marineLicenceRoutes } from '~/src/server/common/constants/routes.js'
-import { statusCodes } from '~/src/server/common/constants/status-codes.js'
 import * as coordinateUtils from '~/src/server/common/helpers/coordinate-utils.js'
 import {
   makeGetRequest,
@@ -68,44 +65,14 @@ describe('Centre coordinates page (marine licence)', () => {
     cancelHref: marineLicenceRoutes.MARINE_LICENCE_TASK_LIST,
     latitude: mockWgs84Data.siteDetails[0].coordinates.latitude,
     longitude: mockWgs84Data.siteDetails[0].coordinates.longitude,
-    redirectHref: marineLicenceRoutes.MARINE_LICENCE_CIRCLE_CENTRE_POINT
-  })
-
-  test('should render the OSGB36 page with eastings and northings pre-populated', async () => {
-    mockMarineLicence(mockOsgb36Data)
-    vi.spyOn(coordinateUtils, 'getCoordinateSystem').mockReturnValueOnce({
-      coordinateSystem: COORDINATE_SYSTEMS.OSGB36
-    })
-
-    const { result, statusCode } = await makeGetRequest({
-      url: marineLicenceRoutes.MARINE_LICENCE_CIRCLE_CENTRE_POINT,
-      server: getServer()
-    })
-
-    expect(statusCode).toBe(statusCodes.ok)
-
-    const { document } = new JSDOM(result).window
-
-    expect(
-      getByRole(document, 'heading', {
-        name: /Enter the coordinates at the centre point of the site/
+    redirectHref: marineLicenceRoutes.MARINE_LICENCE_CIRCLE_CENTRE_POINT,
+    setupOsgb36: () => {
+      mockMarineLicence(mockOsgb36Data)
+      vi.spyOn(coordinateUtils, 'getCoordinateSystem').mockReturnValueOnce({
+        coordinateSystem: COORDINATE_SYSTEMS.OSGB36
       })
-    ).toBeInTheDocument()
-
-    expect(document.querySelector('#eastings').value).toBe(
-      mockOsgb36Data.siteDetails[0].coordinates.eastings
-    )
-    expect(document.querySelector('#northings').value).toBe(
-      mockOsgb36Data.siteDetails[0].coordinates.northings
-    )
-
-    expect(
-      getByText(document, 'Help with eastings and northings formats')
-    ).toBeInTheDocument()
-
-    expect(getByRole(document, 'link', { name: 'Back' })).toHaveAttribute(
-      'href',
-      marineLicenceRoutes.MARINE_LICENCE_COORDINATE_SYSTEM_CHOICE
-    )
+    },
+    eastings: mockOsgb36Data.siteDetails[0].coordinates.eastings,
+    northings: mockOsgb36Data.siteDetails[0].coordinates.northings
   })
 })

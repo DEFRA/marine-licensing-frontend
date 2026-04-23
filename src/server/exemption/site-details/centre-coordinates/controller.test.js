@@ -290,12 +290,7 @@ describe('#centreCoordinates', () => {
         ]
       }
 
-      centreCoordinatesSubmitFailHandler(
-        request,
-        h,
-        err,
-        COORDINATE_SYSTEMS.WGS84
-      )
+      centreCoordinatesSubmitFailHandler(request, h, err)
 
       expect(h.view).toHaveBeenCalledWith(
         COORDINATE_SYSTEM_VIEW_ROUTES[COORDINATE_SYSTEMS.WGS84],
@@ -346,12 +341,7 @@ describe('#centreCoordinates', () => {
 
       const err = {}
 
-      centreCoordinatesSubmitFailHandler(
-        request,
-        h,
-        err,
-        COORDINATE_SYSTEMS.WGS84
-      )
+      centreCoordinatesSubmitFailHandler(request, h, err)
 
       expect(h.view).toHaveBeenCalledWith(
         COORDINATE_SYSTEM_VIEW_ROUTES[COORDINATE_SYSTEMS.WGS84],
@@ -530,12 +520,7 @@ describe('#centreCoordinates', () => {
         })
       }
 
-      centreCoordinatesSubmitFailHandler(
-        request,
-        h,
-        {},
-        COORDINATE_SYSTEMS.WGS84
-      )
+      centreCoordinatesSubmitFailHandler(request, h, {})
 
       expect(h.view).toHaveBeenCalledWith(
         COORDINATE_SYSTEM_VIEW_ROUTES[COORDINATE_SYSTEMS.WGS84],

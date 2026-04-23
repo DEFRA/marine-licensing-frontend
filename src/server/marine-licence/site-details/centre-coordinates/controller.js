@@ -14,13 +14,11 @@ import { getPayload } from '#src/server/common/helpers/site-details/centre-coord
 import { validateCentreCoordinates } from '#src/server/common/validation/centre-coordinates/validate.js'
 import {
   centreCoordinatesSettings,
-  centreCoordinatesErrorMessages
+  centreCoordinatesErrorMessages,
+  COORDINATE_SYSTEM_VIEW_ROUTES
 } from '#src/server/common/validation/centre-coordinates/constants.js'
 
-export const COORDINATE_SYSTEM_VIEW_ROUTES = {
-  [COORDINATE_SYSTEMS.WGS84]: 'templates/centre-coordinates/wgs84',
-  [COORDINATE_SYSTEMS.OSGB36]: 'templates/centre-coordinates/osgb36'
-}
+export { COORDINATE_SYSTEM_VIEW_ROUTES }
 
 const centreCoordinatesPageData = {
   ...centreCoordinatesSettings,
@@ -34,14 +32,6 @@ const getCoordinateSystem = (marineLicence) => {
     : COORDINATE_SYSTEMS.WGS84
 }
 
-const getBackLinkForAction = () => {
-  return centreCoordinatesPageData.backLink
-}
-
-const getButtonText = () => {
-  return 'Continue'
-}
-
 export const centreCoordinatesController = {
   handler(request, h) {
     const marineLicence = getMarineLicenceCache(request)
@@ -51,12 +41,11 @@ export const centreCoordinatesController = {
 
     return h.view(COORDINATE_SYSTEM_VIEW_ROUTES[coordinateSystem], {
       ...centreCoordinatesPageData,
-      backLink: getBackLinkForAction(),
       cancelLink: getCancelLink(action),
       projectName: marineLicence.projectName,
       siteNumber: null,
       action,
-      buttonText: getButtonText(),
+      buttonText: 'Continue',
       payload: getPayload(siteDetails, coordinateSystem)
     })
   }
@@ -73,12 +62,11 @@ export const centreCoordinatesSubmitFailHandler = (request, h, error) => {
     return h
       .view(COORDINATE_SYSTEM_VIEW_ROUTES[coordinateSystem], {
         ...centreCoordinatesPageData,
-        backLink: getBackLinkForAction(),
         cancelLink: getCancelLink(action),
         projectName,
         siteNumber: null,
         action,
-        buttonText: getButtonText(),
+        buttonText: 'Continue',
         payload
       })
       .takeover()
@@ -93,12 +81,11 @@ export const centreCoordinatesSubmitFailHandler = (request, h, error) => {
   return h
     .view(COORDINATE_SYSTEM_VIEW_ROUTES[coordinateSystem], {
       ...centreCoordinatesPageData,
-      backLink: getBackLinkForAction(),
       cancelLink: getCancelLink(action),
       projectName,
       siteNumber: null,
       action,
-      buttonText: getButtonText(),
+      buttonText: 'Continue',
       payload,
       errors,
       errorSummary

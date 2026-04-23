@@ -1,5 +1,10 @@
 import { COORDINATE_SYSTEMS } from '#src/server/common/constants/coordinate-systems.js'
 
+export const COORDINATE_SYSTEM_VIEW_ROUTES = {
+  [COORDINATE_SYSTEMS.WGS84]: 'templates/centre-coordinates/wgs84',
+  [COORDINATE_SYSTEMS.OSGB36]: 'templates/centre-coordinates/osgb36'
+}
+
 export const centreCoordinatesSettings = {
   pageTitle: 'Enter the coordinates at the centre point of the site',
   heading: 'Enter the coordinates at the centre point of the site'

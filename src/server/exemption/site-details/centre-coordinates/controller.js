@@ -18,15 +18,13 @@ import { getPayload } from '#src/server/common/helpers/site-details/centre-coord
 import { validateCentreCoordinates } from '#src/server/common/validation/centre-coordinates/validate.js'
 import {
   centreCoordinatesSettings,
-  centreCoordinatesErrorMessages
+  centreCoordinatesErrorMessages,
+  COORDINATE_SYSTEM_VIEW_ROUTES
 } from '#src/server/common/validation/centre-coordinates/constants.js'
 import { saveSiteDetailsToBackend } from '#src/server/common/helpers/exemptions/save-site-details.js'
 import { getCancelLink } from '#src/server/exemption/site-details/utils/cancel-link.js'
 
-export const COORDINATE_SYSTEM_VIEW_ROUTES = {
-  [COORDINATE_SYSTEMS.WGS84]: 'templates/centre-coordinates/wgs84',
-  [COORDINATE_SYSTEMS.OSGB36]: 'templates/centre-coordinates/osgb36'
-}
+export { COORDINATE_SYSTEM_VIEW_ROUTES }
 
 const centreCoordinatesPageData = {
   ...centreCoordinatesSettings,

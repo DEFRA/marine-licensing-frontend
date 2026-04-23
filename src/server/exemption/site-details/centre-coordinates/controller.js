@@ -23,8 +23,6 @@ import {
 import { saveSiteDetailsToBackend } from '#src/server/common/helpers/exemptions/save-site-details.js'
 import { getCancelLink } from '#src/server/exemption/site-details/utils/cancel-link.js'
 
-export { COORDINATE_SYSTEM_VIEW_ROUTES }
-
 const centreCoordinatesPageData = {
   ...centreCoordinatesSettings,
   backLink: routes.COORDINATE_SYSTEM_CHOICE

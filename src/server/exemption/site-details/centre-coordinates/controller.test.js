@@ -2,9 +2,9 @@ import { vi } from 'vitest'
 import {
   centreCoordinatesController,
   centreCoordinatesSubmitController,
-  COORDINATE_SYSTEM_VIEW_ROUTES,
   centreCoordinatesSubmitFailHandler
 } from '#src/server/exemption/site-details/centre-coordinates/controller.js'
+import { COORDINATE_SYSTEM_VIEW_ROUTES } from '#src/server/common/validation/centre-coordinates/constants.js'
 import { COORDINATE_SYSTEMS } from '#src/server/common/constants/coordinate-systems.js'
 import * as cacheUtils from '#src/server/common/helpers/exemptions/session-cache/utils.js'
 import * as coordinateUtils from '#src/server/common/helpers/coordinate-utils.js'

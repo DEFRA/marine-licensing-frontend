@@ -35,24 +35,11 @@ const getCoordinateSystem = (marineLicence) => {
 }
 
 const getBackLinkForAction = (action, request) => {
-  if (action) {
-    const savedSiteDetails = request.yar.get('savedSiteDetails') || {}
-    if (savedSiteDetails.originalCoordinateSystem) {
-      return `${marineLicenceRoutes.MARINE_LICENCE_COORDINATE_SYSTEM_CHOICE}?action=${action}`
-    }
-    return marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS
-  }
   return centreCoordinatesPageData.backLink
 }
 
 const getButtonText = (action, request) => {
-  if (!action) {
-    return 'Continue'
-  }
-  const savedSiteDetails = request.yar.get('savedSiteDetails') || {}
-  return savedSiteDetails.originalCoordinateSystem
-    ? 'Continue'
-    : 'Save and continue'
+  return 'Continue'
 }
 
 export const centreCoordinatesController = {

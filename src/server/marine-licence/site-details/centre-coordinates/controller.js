@@ -51,12 +51,12 @@ export const centreCoordinatesController = {
 
     return h.view(COORDINATE_SYSTEM_VIEW_ROUTES[coordinateSystem], {
       ...centreCoordinatesPageData,
-      backLink: getBackLinkForAction(action, request),
+      backLink: getBackLinkForAction(),
       cancelLink: getCancelLink(action),
       projectName: marineLicence.projectName,
       siteNumber: null,
       action,
-      buttonText: getButtonText(action, request),
+      buttonText: getButtonText(),
       payload: getPayload(siteDetails, coordinateSystem)
     })
   }
@@ -73,12 +73,12 @@ export const centreCoordinatesSubmitFailHandler = (request, h, error) => {
     return h
       .view(COORDINATE_SYSTEM_VIEW_ROUTES[coordinateSystem], {
         ...centreCoordinatesPageData,
-        backLink: getBackLinkForAction(action, request),
+        backLink: getBackLinkForAction(),
         cancelLink: getCancelLink(action),
         projectName,
         siteNumber: null,
         action,
-        buttonText: getButtonText(action, request),
+        buttonText: getButtonText(),
         payload
       })
       .takeover()
@@ -93,12 +93,12 @@ export const centreCoordinatesSubmitFailHandler = (request, h, error) => {
   return h
     .view(COORDINATE_SYSTEM_VIEW_ROUTES[coordinateSystem], {
       ...centreCoordinatesPageData,
-      backLink: getBackLinkForAction(action, request),
+      backLink: getBackLinkForAction(),
       cancelLink: getCancelLink(action),
       projectName,
       siteNumber: null,
       action,
-      buttonText: getButtonText(action, request),
+      buttonText: getButtonText(),
       payload,
       errors,
       errorSummary

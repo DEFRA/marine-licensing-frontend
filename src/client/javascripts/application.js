@@ -6,8 +6,8 @@ import {
   createAll,
   ErrorSummary,
   FileUpload,
-  Header,
   Radios,
+  ServiceNavigation,
   SkipLink
 } from 'govuk-frontend'
 import { SortableTable } from '@ministryofjustice/frontend'
@@ -20,7 +20,7 @@ import { SiteDetailsMap } from './site-details-map/index.js'
 createAll(Button)
 createAll(Checkboxes)
 createAll(ErrorSummary)
-createAll(Header)
+createAll(ServiceNavigation)
 createAll(Radios)
 createAll(SkipLink)
 createAll(FileUpload)

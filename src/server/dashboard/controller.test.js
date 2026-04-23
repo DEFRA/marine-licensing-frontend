@@ -67,7 +67,8 @@ describe('#dashboard', () => {
             { text: 'Exempt activity notification' },
             { text: '-' },
             {
-              html: '<strong class="govuk-tag govuk-tag--light-blue">Draft</strong>'
+              html: '<strong class="govuk-tag govuk-tag--blue">Draft</strong>',
+              attributes: { 'data-sort-value': 'Draft' }
             },
             {
               text: '-',

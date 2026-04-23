@@ -1,2 +1,7 @@
 // Example custom CSS variables
 $app-light-grey: #f8f8f8;
+
+// Pre-v6 govuk-colour('dark-blue') value, preserved for the active-state
+// navigation link colour. v6 has no semantic equivalent — link/link-hover
+// would lose the active-state distinction.
+$app-nav-active-blue: #003078;

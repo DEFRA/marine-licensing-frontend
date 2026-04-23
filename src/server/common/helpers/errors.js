@@ -55,6 +55,7 @@ export const mapErrorsForDisplay = (errors = [], messages = {}) => {
   return errors
     .filter((error) => {
       const field = error.field || error.path
+
       if (errorFields.has(field[0])) {
         return false
       }
@@ -64,8 +65,11 @@ export const mapErrorsForDisplay = (errors = [], messages = {}) => {
     })
     .map((error) => {
       const field = error.field || error.path
+
+      const href = error.hrefOverride ? error.hrefOverride : field
+
       return {
-        href: `#${field}`,
+        href: `#${href}`,
         text: messages[error.message] ?? error.message,
         field
       }

@@ -221,6 +221,31 @@ describe('mapErrorsForDisplay', () => {
     ])
   })
 
+  test('allows a manual override for href target', () => {
+    const messages = {
+      PROJECT_NAME_REQUIRED: 'Enter the project name'
+    }
+
+    const result = mapErrorsForDisplay(
+      [
+        {
+          message: 'PROJECT_NAME_REQUIRED',
+          path: 'projectName',
+          hrefOverride: 'otherTarget'
+        }
+      ],
+      messages
+    )
+
+    expect(result).toStrictEqual([
+      {
+        href: '#otherTarget',
+        text: 'Enter the project name',
+        field: 'projectName'
+      }
+    ])
+  })
+
   test('show only one error per field', () => {
     const messages = {
       PROJECT_NAME_REQUIRED: 'Enter the project name',

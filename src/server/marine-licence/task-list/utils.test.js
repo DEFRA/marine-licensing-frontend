@@ -34,7 +34,7 @@ describe('taskList utils', () => {
       ])
     })
 
-    test('correctly returns In Progress', () => {
+    test('correctly returns In progress', () => {
       expect(
         transformProjectDetailsTaskList({
           projectName: 'IN_PROGRESS',
@@ -44,7 +44,7 @@ describe('taskList utils', () => {
         {
           href: marineLicenceRoutes.MARINE_LICENCE_PROJECT_NAME,
           status: {
-            tag: { text: 'In Progress', classes: 'govuk-tag--light-blue' }
+            tag: { text: 'In progress', classes: 'govuk-tag--teal' }
           },
           title: {
             classes: 'govuk-link--no-visited-state',
@@ -54,7 +54,7 @@ describe('taskList utils', () => {
         {
           href: marineLicenceRoutes.MARINE_LICENCE_PROJECT_BACKGROUND,
           status: {
-            tag: { text: 'In Progress', classes: 'govuk-tag--light-blue' }
+            tag: { text: 'In progress', classes: 'govuk-tag--teal' }
           },
           title: {
             classes: 'govuk-link--no-visited-state',
@@ -111,14 +111,14 @@ describe('taskList utils', () => {
       ])
     })
 
-    test('correctly returns In Progress', () => {
+    test('correctly returns In progress', () => {
       expect(
         transformSiteDetailsTaskList({ siteDetails: 'IN_PROGRESS' })
       ).toEqual([
         {
           href: marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS,
           status: {
-            tag: { text: 'In Progress', classes: 'govuk-tag--light-blue' }
+            tag: { text: 'In progress', classes: 'govuk-tag--teal' }
           },
           title: {
             classes: 'govuk-link--no-visited-state',
@@ -174,7 +174,7 @@ describe('taskList utils', () => {
       ])
     })
 
-    test('correctly returns In Progress', () => {
+    test('correctly returns In progress', () => {
       expect(
         transformOtherPermissionsTaskList({
           specialLegalPowers: 'IN_PROGRESS',
@@ -184,7 +184,7 @@ describe('taskList utils', () => {
         {
           href: marineLicenceRoutes.MARINE_LICENCE_SPECIAL_LEGAL_POWERS,
           status: {
-            tag: { text: 'In Progress', classes: 'govuk-tag--light-blue' }
+            tag: { text: 'In progress', classes: 'govuk-tag--teal' }
           },
           title: {
             classes: 'govuk-link--no-visited-state',
@@ -194,7 +194,7 @@ describe('taskList utils', () => {
         {
           href: marineLicenceRoutes.MARINE_LICENCE_OTHER_AUTHORITIES,
           status: {
-            tag: { text: 'In Progress', classes: 'govuk-tag--light-blue' }
+            tag: { text: 'In progress', classes: 'govuk-tag--teal' }
           },
           title: {
             classes: 'govuk-link--no-visited-state',
@@ -256,7 +256,7 @@ describe('taskList utils', () => {
         ])
       })
 
-      test('correctly returns In Progress', () => {
+      test('correctly returns In progress', () => {
         expect(
           transformOtherPermissionsTaskList(
             { otherAuthorities: 'IN_PROGRESS' },
@@ -266,7 +266,7 @@ describe('taskList utils', () => {
           {
             href: marineLicenceRoutes.MARINE_LICENCE_OTHER_AUTHORITIES,
             status: {
-              tag: { text: 'In Progress', classes: 'govuk-tag--light-blue' }
+              tag: { text: 'In progress', classes: 'govuk-tag--teal' }
             },
             title: {
               classes: 'govuk-link--no-visited-state',
@@ -316,7 +316,7 @@ describe('taskList utils', () => {
       ])
     })
 
-    test('correctly returns In Progress', () => {
+    test('correctly returns In progress', () => {
       expect(
         transformSharingTaskList({
           publicRegister: 'IN_PROGRESS'
@@ -325,7 +325,7 @@ describe('taskList utils', () => {
         {
           href: marineLicenceRoutes.MARINE_LICENCE_PUBLIC_REGISTER,
           status: {
-            tag: { text: 'In Progress', classes: 'govuk-tag--light-blue' }
+            tag: { text: 'In progress', classes: 'govuk-tag--teal' }
           },
           title: {
             classes: 'govuk-link--no-visited-state',

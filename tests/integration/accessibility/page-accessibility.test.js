@@ -218,6 +218,11 @@ describe('Page accessibility checks (Axe)', () => {
       title: 'Type of activity'
     },
     {
+      url: `${marineLicenceRoutes.MARINE_LICENCE_ACTIVITY_DESCRIPTION}?site=1&activity=1`,
+      isMarineLicence: true,
+      title: 'Activity description'
+    },
+    {
       url: marineLicenceRoutes.MARINE_LICENCE_COORDINATES_TYPE_CHOICE,
       title: 'How do you want to provide the site location?'
     },

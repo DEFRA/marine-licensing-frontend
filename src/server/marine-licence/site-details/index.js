@@ -10,9 +10,11 @@ import { typeOfActivityRoutes } from '#src/server/marine-licence/site-details/ty
 import { selectActivityRoutes } from '#src/server/marine-licence/site-details/select-activity/index.js'
 import { reviewSiteDetailsRoutes } from '#src/server/marine-licence/site-details/review-site-details/index.js'
 import { uploadAndWaitRoutes } from '#src/server/marine-licence/site-details/upload-and-wait/index.js'
+import { widthOfSiteRoutes } from '#src/server/marine-licence/site-details/width-of-site/index.js'
 
 export const siteDetailsRoutes = [
   ...centreCoordinatesRoutes,
+  ...widthOfSiteRoutes,
   ...beforeYouStartRoutes,
   ...coordinateSystemRoutes,
   ...coordinatesTypeRoutes,

@@ -108,6 +108,6 @@ export const centreCoordinatesSubmitController = {
 
     await updateMarineLicenceSiteDetails(request, h, 0, 'coordinates', value)
 
-    return h.redirect(marineLicenceRoutes.MARINE_LICENCE_CIRCLE_CENTRE_POINT)
+    return h.redirect(marineLicenceRoutes.MARINE_LICENCE_WIDTH_OF_SITE)
   }
 }

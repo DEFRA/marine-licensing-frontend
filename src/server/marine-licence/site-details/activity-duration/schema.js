@@ -18,12 +18,17 @@ export const activityDurationSchema = joi.object({
     is: joi.string().min(1).required(),
     then: joi.when('activity-duration-years', {
       is: joi.valid('0'),
-      then: joi.string().invalid('0').required().custom(validateMonthRange).messages({
-        'any.invalid': 'DURATION_BOTH_ZERO',
-        'string.empty': 'DURATION_REQUIRED',
-        'any.required': 'DURATION_REQUIRED',
-        'any.custom': 'MONTHS_NOT_VALID'
-      }),
+      then: joi
+        .string()
+        .invalid('0')
+        .required()
+        .custom(validateMonthRange)
+        .messages({
+          'any.invalid': 'DURATION_BOTH_ZERO',
+          'string.empty': 'DURATION_REQUIRED',
+          'any.required': 'DURATION_REQUIRED',
+          'any.custom': 'MONTHS_NOT_VALID'
+        }),
       otherwise: joi.string().required().custom(validateMonthRange).messages({
         'string.empty': 'DURATION_REQUIRED',
         'any.required': 'DURATION_REQUIRED',

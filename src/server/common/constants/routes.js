@@ -59,6 +59,8 @@ export const marineLicenceRoutes = {
   MARINE_LICENCE_SITE_NAME: '/marine-licence/site-name',
   MARINE_LICENCE_REVIEW_SITE_DETAILS: '/marine-licence/review-site-details',
   MARINE_LICENCE_TYPE_OF_ACTIVITY: '/marine-licence/type-of-activity',
+  MARINE_LICENCE_SELECT_ACTIVITY:
+    '/marine-licence/activity-details/{activityVariant}',
   MARINE_LICENCE_UPLOAD_AND_WAIT: '/marine-licence/upload-and-wait',
   MARINE_LICENCE_VIEW_DETAILS: '/marine-licence/view-details',
   MARINE_LICENCE_VIEW_DETAILS_PUBLIC: '/marine-licence/view-public-details',

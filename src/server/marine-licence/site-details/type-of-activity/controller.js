@@ -7,6 +7,7 @@ import { getActivityDetailsByIndex } from '#src/server/common/helpers/marine-lic
 import { typeOfActivitySchema } from '#src/server/marine-licence/site-details/type-of-activity/schema.js'
 import { getSiteDataFromParam } from '#src/server/common/helpers/site-details/site-name.js'
 import { createFailAction } from '#src/server/common/helpers/createFailAction.js'
+import { getActivityVariantFromSubType } from '#src/server/common/helpers/activity-details/activity-variants.js'
 
 export const typeOfActivityErrorMessages = {
   ACTIVITY_TYPE_REQUIRED: 'Select the type of activity',
@@ -18,7 +19,8 @@ export const typeOfActivityErrorMessages = {
 export const MARINE_LICENCE_TYPE_OF_ACTIVITY_VIEW_ROUTE =
   'marine-licence/site-details/type-of-activity/index'
 
-const backLink = marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS
+const getBackLink = (siteNumber, activityDetailsNumber) =>
+  `${marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS}#activity-details-site-${siteNumber}-activity-${activityDetailsNumber}`
 
 const subTypePayload = (activityType, activitySubType) => ({
   activitySubTypeConstruction:
@@ -51,7 +53,7 @@ export const typeOfActivityController = {
 
     return h.view(MARINE_LICENCE_TYPE_OF_ACTIVITY_VIEW_ROUTE, {
       ...typeOfActivitySettings,
-      backLink,
+      backLink: getBackLink(siteNumber, activityDetailsNumber),
       projectName: marineLicence.projectName,
       siteNumber,
       activityDetailsNumber,
@@ -71,16 +73,19 @@ export const typeOfActivitySubmitController = {
     validate: {
       payload: typeOfActivitySchema,
       failAction: (request, h, err) => {
+        const marineLicence = getMarineLicenceCache(request)
+
         const { activityDetailsNumber, siteNumber } = getSiteDataFromParam(
           request.query
         )
         return createFailAction({
-          getCache: getMarineLicenceCache,
+          projectName: marineLicence.projectName,
           viewRoute: MARINE_LICENCE_TYPE_OF_ACTIVITY_VIEW_ROUTE,
           settings: typeOfActivitySettings,
           errorMessages: typeOfActivityErrorMessages,
-          getBackLink: () => backLink,
-          params: { activityDetailsNumber, siteNumber }
+          backLink: getBackLink(siteNumber, activityDetailsNumber),
+          params: { activityDetailsNumber, siteNumber },
+          payload: request.payload
         })(request, h, err)
       }
     }
@@ -94,9 +99,14 @@ export const typeOfActivitySubmitController = {
       removal: payload.activitySubTypeRemoval
     }
 
-    const { activityDetailsIndex, siteIndex } = getSiteDataFromParam(
-      request.query
-    )
+    const {
+      activityDetailsNumber,
+      activityDetailsIndex,
+      siteIndex,
+      siteNumber
+    } = getSiteDataFromParam(request.query)
+
+    const activitySubType = activitySubTypeByType[payload.activityType]
 
     await updateMarineLicenceSiteActivityDetails(
       request,
@@ -109,6 +119,10 @@ export const typeOfActivitySubmitController = {
       }
     )
 
-    return h.redirect(marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS)
+    const getPageToNavigateTo = getActivityVariantFromSubType(activitySubType)
+
+    return h.redirect(
+      `/marine-licence/activity-details/${getPageToNavigateTo}?site=${siteNumber}&activity=${activityDetailsNumber}`
+    )
   }
 }

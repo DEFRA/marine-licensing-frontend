@@ -3,6 +3,7 @@
 {% from "govuk/components/button/macro.njk" import govukButton %}
 {% from "govuk/components/date-input/macro.njk" import govukDateInput %}
 {% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+{% from "site-activity-heading/macro.njk" import appSiteActivityHeading %}
 
 {% block beforeContent %}
 {{ super() }}
@@ -15,13 +16,12 @@
 {% endblock %}
 
 {% set headingWithCaption %}
-    {% if projectName %}
-        <span class="govuk-caption-l">{{ projectName }}</span>
-    {% endif %}
-    {% if siteNumber and activityDetailsNumber %}
-      <span class="govuk-caption-l">Site {{ siteNumber }} - Activity {{ activityDetailsNumber }}</span>
-    {% endif %}
-    <h1 class="govuk-fieldset__heading">{{ heading }}</h1>
+  {{ appSiteActivityHeading({
+    projectName: projectName,
+    siteNumber: siteNumber,
+    activityDetailsNumber: activityDetailsNumber,
+    heading: heading
+  }) }}
 {% endset %}
 
 {% block content %}

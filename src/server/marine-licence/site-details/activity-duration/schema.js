@@ -1,6 +1,6 @@
 import joi from 'joi'
 
-export const durationSchema = joi.object({
+export const activityDurationSchema = joi.object({
   'duration-years': joi.string().required().messages({
     'string.empty': 'DURATION_REQUIRED',
     'any.required': 'DURATION_REQUIRED'

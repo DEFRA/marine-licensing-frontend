@@ -1,8 +1,7 @@
 import { vi } from 'vitest'
 import {
   activityDurationSubmitController,
-  durationSettings,
-  durationErrorMessages,
+  activityDurationSettings,
   MARINE_LICENCE_DURATION_VIEW_ROUTE
 } from '#src/server/marine-licence/site-details/activity-duration/controller.js'
 import {
@@ -19,7 +18,7 @@ import {
 vi.mock('~/src/server/common/helpers/marine-licence/session-cache/utils.js')
 vi.mock('~/src/server/common/helpers/createFailAction.js')
 
-describe('#duration', () => {
+describe('#activityDuration', () => {
   beforeEach(() => {
     vi.mocked(getMarineLicenceCache).mockReturnValue(
       mockMarineLicenceApplication
@@ -44,7 +43,7 @@ describe('#duration', () => {
       expect(createFailAction).toHaveBeenCalledWith({
         projectName: 'Test Project',
         viewRoute: MARINE_LICENCE_DURATION_VIEW_ROUTE,
-        settings: durationSettings,
+        settings: activityDurationSettings,
         errorMessages: {
           DURATION_REQUIRED: 'Enter the maximum duration of the activity'
         },

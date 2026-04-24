@@ -1,8 +1,8 @@
-import { durationSchema } from '#src/server/marine-licence/site-details/activity-duration/schema.js'
+import { activityDurationSchema } from '#src/server/marine-licence/site-details/activity-duration/schema.js'
 
-describe('#durationSchema', () => {
+describe('#activityDurationSchema', () => {
   test('accepts valid years and months', () => {
-    const { error } = durationSchema.validate({
+    const { error } = activityDurationSchema.validate({
       'duration-years': '2',
       'duration-months': '6'
     })
@@ -10,7 +10,7 @@ describe('#durationSchema', () => {
   })
 
   test('accepts zero values', () => {
-    const { error } = durationSchema.validate({
+    const { error } = activityDurationSchema.validate({
       'duration-years': '0',
       'duration-months': '0'
     })
@@ -18,7 +18,7 @@ describe('#durationSchema', () => {
   })
 
   test('fails on years when years is missing', () => {
-    const { error } = durationSchema.validate({
+    const { error } = activityDurationSchema.validate({
       'duration-months': '6'
     })
     expect(error?.message).toBe('DURATION_REQUIRED')
@@ -26,7 +26,7 @@ describe('#durationSchema', () => {
   })
 
   test('fails on months when years is filled but months is missing', () => {
-    const { error } = durationSchema.validate({
+    const { error } = activityDurationSchema.validate({
       'duration-years': '2'
     })
     expect(error?.message).toBe('DURATION_REQUIRED')
@@ -34,7 +34,7 @@ describe('#durationSchema', () => {
   })
 
   test('fails on years when years is empty', () => {
-    const { error } = durationSchema.validate({
+    const { error } = activityDurationSchema.validate({
       'duration-years': '',
       'duration-months': '6'
     })
@@ -43,7 +43,7 @@ describe('#durationSchema', () => {
   })
 
   test('fails on months when years is filled but months is empty', () => {
-    const { error } = durationSchema.validate({
+    const { error } = activityDurationSchema.validate({
       'duration-years': '2',
       'duration-months': ''
     })
@@ -52,7 +52,7 @@ describe('#durationSchema', () => {
   })
 
   test('produces only one error when both fields are empty', () => {
-    const { error } = durationSchema.validate(
+    const { error } = activityDurationSchema.validate(
       { 'duration-years': '', 'duration-months': '' },
       { abortEarly: false }
     )

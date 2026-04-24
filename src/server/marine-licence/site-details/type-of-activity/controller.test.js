@@ -83,7 +83,6 @@ describe('#typeOfActivity', () => {
       expect(redirectH.redirect).toHaveBeenCalledWith(
         '/marine-licence/activity-details/what-are-you-removing-on-an-ongoing-basis?site=1&activity=1'
       )
-      expect(redirectH.redirect).toHaveBeenCalled()
     })
   })
 })

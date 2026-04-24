@@ -100,8 +100,8 @@ export const activityDescriptionSubmitController = {
           .max(ACTIVITY_DESCRIPTION_FIELD_MAX_LENGTH)
           .required()
           .messages({
-            'string.empty': errorMessages.ACTIVITY_DESCRIPTION_REQUIRED,
-            'string.max': errorMessages.ACTIVITY_DESCRIPTION_MAX_LENGTH
+            'string.empty': 'ACTIVITY_DESCRIPTION_REQUIRED',
+            'string.max': 'ACTIVITY_DESCRIPTION_MAX_LENGTH'
           })
       }),
       failAction: (request, h, err) => {

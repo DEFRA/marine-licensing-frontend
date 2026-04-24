@@ -5,6 +5,7 @@ import {
 import { FILE_UPLOAD_REVIEW_VIEW_ROUTE } from './controller.js'
 import { getFileUploadSummaryData } from '#src/server/common/helpers/review-site-details/file-upload.js'
 import { createSiteDetailsDataJson } from '#src/server/common/helpers/site-details.js'
+import { parseActivityDetails } from '#src/server/common/helpers/review-site-details/activity-details.js'
 
 export const getFileUploadBackLink = (
   previousPage,
@@ -47,13 +48,16 @@ export const renderFileUploadReview = (h, options) => {
       siteDetails: site
     })
 
+    const activityDetails = parseActivityDetails(site)
+
     const siteDetailsData = createSiteDetailsDataJson(site)
 
     return {
       ...fileUploadSummaryData,
       siteName: site.siteName,
       siteNumber: index + 1,
-      siteDetailsData
+      siteDetailsData,
+      activityDetails
     }
   })
 

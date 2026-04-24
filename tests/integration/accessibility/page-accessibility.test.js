@@ -34,6 +34,7 @@ import { JSDOM } from 'jsdom'
 import { config } from '~/src/config/config.js'
 import { getUserSession } from '~/src/server/common/plugins/auth/utils.js'
 import { postloginUserSession } from '~/src/server/common/helpers/defraid-login/session-cache.js'
+import { selectActivityVariants } from '~/src/server/common/constants/activity-variants.js'
 
 vi.mock('~/src/server/common/helpers/authenticated-requests.js')
 vi.mock('~/src/server/common/helpers/defraid-login/session-cache.js')
@@ -329,7 +330,15 @@ describe('Page accessibility checks (Axe)', () => {
     }
   ]
 
-  test.each(pages)(
+  const dynamicPages = Object.entries(selectActivityVariants).map(
+    ([key, page]) => ({
+      isMarineLicence: true,
+      url: `/marine-licence/activity-details/${key}`,
+      title: page.heading
+    })
+  )
+
+  test.each(pages.concat(dynamicPages))(
     '"$title" page',
     async ({
       title,

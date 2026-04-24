@@ -28,7 +28,7 @@ describe('Type of activity (marine licence)', () => {
 
     expect(getByRole(document, 'link', { name: 'Back' })).toHaveAttribute(
       'href',
-      marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS
+      `${marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS}#activity-details-site-1-activity-1`
     )
 
     expect(getByRole(document, 'heading', { level: 1 })).toHaveTextContent(
@@ -177,7 +177,7 @@ describe('Type of activity (marine licence)', () => {
 
     expect(response.statusCode).toBe(statusCodes.redirect)
     expect(response.headers.location).toBe(
-      marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS
+      '/marine-licence/activity-details/what-new-deposit-activity-are-you-doing?site=1&activity=1'
     )
   })
 })

@@ -9,9 +9,26 @@
 
 {% set _ = rows.push({
     key: { text: "Type of activity"},
-    value: { html: appIncompleteField({text:params.activityDetails.activityType})},
-    actions: setSiteDetailsAction(params.activityDetails.activityType, 'type-of-activity', params.siteNumber, "", { skipAction: true, activityNumber: params.index })
+    value: { html: appIncompleteField({text:params.activityDetails.activitySubType})},
+    actions: setSiteDetailsAction(params.activityDetails.activitySubType, 'type-of-activity', params.siteNumber, "", { skipAction: true, activityNumber: params.index })
 }) %}
+
+{% if params.activityDetails.activityHeading %}
+
+  {% set activityList %}
+    <ul class="govuk-list govuk-list--bullet">
+      {% for activity in params.activityDetails.activities %}
+        <li>{{activity}}</li>
+      {% endfor %}
+    </ul>
+  {% endset %}
+
+  {% set _ = rows.push({
+      key: { text: params.activityDetails.activityHeading},
+      value: { html: activityList },
+      actions: setSiteDetailsAction(true,  params.activityDetails.activityLink, params.siteNumber, "", { activityNumber: params.index })
+  }) %}
+{% endif %}
 
 {% set _ = rows.push({
     key: { text: "Activity description"},

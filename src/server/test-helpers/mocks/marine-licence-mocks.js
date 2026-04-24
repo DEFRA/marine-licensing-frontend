@@ -10,6 +10,22 @@ export const mockMarineLicenceTaskList = {
   publicRegister: 'COMPLETED'
 }
 
+const mockActivityDetails = {
+  activityType: 'construction',
+  activitySubType: 'construction-type-1',
+  activities: { selections: ['CON1'] },
+  activityDescription: 'Test description',
+  activityDuration: 'Test duration',
+  completionDate: 'Test completion',
+  activityMonths: 'Test months',
+  workingHours: 'Test hours'
+}
+
+export const mockOutputActivityDetails = {
+  ...mockActivityDetails,
+  activityType: 'Construction of new works'
+}
+
 export const mockMarineLicenceApplication = {
   id: faker.database.mongodbObjectId(),
   projectName: 'Test Project',
@@ -19,20 +35,11 @@ export const mockMarineLicenceApplication = {
   projectType: MARINE_LICENCE_KEY,
   siteDetails: [
     {
+      activityDetails: [mockActivityDetails],
       coordinatesType: 'file',
       fileUploadType: 'kml',
       siteName: 'test site name',
       featureCount: 1,
-      activityDetails: [
-        {
-          activityType: 'Test type',
-          activityDescription: 'Test description',
-          activityDuration: 'Test duration',
-          completionDate: 'Test completion',
-          activityMonths: 'Test months',
-          workingHours: 'Test hours'
-        }
-      ],
       uploadedFile: {
         filename: 'test-upload-id'
       },
@@ -75,6 +82,7 @@ export const mockFileUploadMarineLicence = {
   ...mockMarineLicenceApplication,
   siteDetails: [
     {
+      activityDetails: [mockActivityDetails],
       coordinatesType: 'file',
       fileUploadType: 'kml',
       siteName: 'test site name',

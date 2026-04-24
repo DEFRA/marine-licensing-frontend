@@ -1,0 +1,15 @@
+@use 'govuk-frontend' as *;
+
+.govuk-checkboxes--heading-divider .govuk-checkboxes__divider {
+  @extend %govuk-heading-s;
+
+  margin-top: govuk-spacing(7);
+  margin-bottom: govuk-spacing(3);
+  display: block;
+  width: auto;
+  text-align: left;
+
+  &:first-of-type {
+    margin-top: 0;
+  }
+}

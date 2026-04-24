@@ -7,7 +7,8 @@ describe('Marine Licence Activity Details Card', () => {
     siteNumber: 1,
     index: 1,
     activityDetails: {
-      activityType: 'Test type',
+      activityType: 'construction',
+      activitySubType: "What you're constructing",
       activityDescription: 'Test description',
       activityDuration: 'Test duration',
       completionDate: 'Test completion',
@@ -33,7 +34,7 @@ describe('Marine Licence Activity Details Card', () => {
 
   test('Should display all activity detail values', () => {
     const html = $component.html()
-    expect(html).toContain('Test type')
+    expect(html).toContain("What you're constructing")
     expect(html).toContain('Test description')
     expect(html).toContain('Test duration')
     expect(html).toContain('Test completion')

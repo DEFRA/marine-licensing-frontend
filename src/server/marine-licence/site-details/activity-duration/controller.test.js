@@ -46,7 +46,11 @@ describe('#activityDuration', () => {
         viewRoute: MARINE_LICENCE_DURATION_VIEW_ROUTE,
         settings: activityDurationSettings,
         errorMessages: {
-          DURATION_REQUIRED: 'Enter the maximum duration of the activity'
+          DURATION_BOTH_ZERO: 'Years and months cannot both be 0',
+          DURATION_REQUIRED: 'Enter the maximum duration of the activity',
+          MONTHS_NOT_VALID:
+            'Number of months must be an integer between 0 and 11',
+          YEARS_NOT_INTEGER: 'Number of years must be an integer'
         },
         backLink:
           '/marine-licence/review-site-details#activity-details-site-1-activity-1',

@@ -1,0 +1,7 @@
+{% if params.projectName %}
+    <span class="govuk-caption-l">{{ params.projectName }}</span>
+{% endif %}
+{% if params.siteNumber and params.activityDetailsNumber %}
+    <span class="govuk-caption-l">Site {{ params.siteNumber }} - Activity {{ params.activityDetailsNumber }}</span>
+{% endif %}
+<h1 class="{{ params.headingClass if params.headingClass else 'govuk-heading-l' }} govuk-!-margin-bottom-0">{{ params.heading }}</h1>

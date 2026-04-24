@@ -33,7 +33,7 @@
 {% set _ = rows.push({
     key: { text: "Activity description"},
     value: { html: appIncompleteField({text:params.activityDetails.activityDescription})},
-    actions: setSiteDetailsAction(params.activityDetails.activityDescription, 'review-site-details', params.siteNumber, "", { skipAction: true, activityNumber: params.index })
+    actions: setSiteDetailsAction(params.activityDetails.activityDescription, 'activity-description', params.siteNumber, "", { skipAction: true, activityNumber: params.index })
 }) %}
 
 {% set _ = rows.push({

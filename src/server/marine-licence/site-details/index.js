@@ -9,7 +9,7 @@ import { typeOfActivityRoutes } from '#src/server/marine-licence/site-details/ty
 import { selectActivityRoutes } from '#src/server/marine-licence/site-details/select-activity/index.js'
 import { reviewSiteDetailsRoutes } from '#src/server/marine-licence/site-details/review-site-details/index.js'
 import { uploadAndWaitRoutes } from '#src/server/marine-licence/site-details/upload-and-wait/index.js'
-import { durationRoutes } from '#src/server/marine-licence/site-details/maximum-duration/index.js'
+import { durationRoutes } from '#src/server/marine-licence/site-details/activity-duration/index.js'
 
 export const siteDetailsRoutes = [
   ...beforeYouStartRoutes,

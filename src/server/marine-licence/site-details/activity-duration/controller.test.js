@@ -1,10 +1,10 @@
 import { vi } from 'vitest'
 import {
-  durationSubmitController,
+  activityDurationSubmitController,
   durationSettings,
   durationErrorMessages,
   MARINE_LICENCE_DURATION_VIEW_ROUTE
-} from '#src/server/marine-licence/site-details/maximum-duration/controller.js'
+} from '#src/server/marine-licence/site-details/activity-duration/controller.js'
 import {
   getMarineLicenceCache,
   updateMarineLicenceSiteActivityDetails
@@ -26,7 +26,7 @@ describe('#duration', () => {
     )
   })
 
-  describe('#durationSubmitController', () => {
+  describe('#activityDurationSubmitController', () => {
     test('createFailAction was called with params', () => {
       const mockFailAction = vi.fn()
       vi.mocked(createFailAction).mockReturnValue(mockFailAction)
@@ -35,13 +35,19 @@ describe('#duration', () => {
       const h = createMockH()
       const err = new Error('validation error')
 
-      durationSubmitController.options.validate.failAction(request, h, err)
+      activityDurationSubmitController.options.validate.failAction(
+        request,
+        h,
+        err
+      )
 
       expect(createFailAction).toHaveBeenCalledWith({
         projectName: 'Test Project',
         viewRoute: MARINE_LICENCE_DURATION_VIEW_ROUTE,
         settings: durationSettings,
-        errorMessages: { DURATION_REQUIRED: 'Enter the maximum duration of the activity' },
+        errorMessages: {
+          DURATION_REQUIRED: 'Enter the maximum duration of the activity'
+        },
         backLink:
           '/marine-licence/review-site-details#activity-details-site-1-activity-1',
         params: {
@@ -62,7 +68,7 @@ describe('#duration', () => {
         }
       })
 
-      await durationSubmitController.handler(request, redirectH)
+      await activityDurationSubmitController.handler(request, redirectH)
 
       expect(updateMarineLicenceSiteActivityDetails).toHaveBeenCalledWith(
         request,

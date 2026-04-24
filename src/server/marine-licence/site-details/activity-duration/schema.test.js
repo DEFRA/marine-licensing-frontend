@@ -1,4 +1,4 @@
-import { durationSchema } from '#src/server/marine-licence/site-details/maximum-duration/schema.js'
+import { durationSchema } from '#src/server/marine-licence/site-details/activity-duration/schema.js'
 
 describe('#durationSchema', () => {
   test('accepts valid years and months', () => {

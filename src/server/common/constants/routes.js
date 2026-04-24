@@ -69,7 +69,7 @@ export const marineLicenceRoutes = {
     '/marine-licence/how-do-you-want-to-enter-the-coordinates',
   MARINE_LICENCE_COORDINATE_SYSTEM_CHOICE:
     '/marine-licence/what-coordinate-system',
-  MARINE_LICENCE_DURATION: '/marine-licence/maximum-duration'
+  MARINE_LICENCE_DURATION: '/marine-licence/activity-duration'
 }
 
 export const defraIdGuidanceRoutes = {

@@ -9,12 +9,21 @@ describe('#activityDurationSchema', () => {
     expect(error).toBeUndefined()
   })
 
-  test('accepts zero values', () => {
+  test('accepts zero years with non-zero months', () => {
+    const { error } = activityDurationSchema.validate({
+      'activity-duration-years': '0',
+      'activity-duration-months': '6'
+    })
+    expect(error).toBeUndefined()
+  })
+
+  test('fails when both years and months are 0', () => {
     const { error } = activityDurationSchema.validate({
       'activity-duration-years': '0',
       'activity-duration-months': '0'
     })
-    expect(error).toBeUndefined()
+    expect(error?.message).toBe('DURATION_BOTH_ZERO')
+    expect(error?.details[0].path).toEqual(['activity-duration-months'])
   })
 
   test('fails on years when years is missing', () => {
@@ -57,5 +66,32 @@ describe('#activityDurationSchema', () => {
       { abortEarly: false }
     )
     expect(error?.details).toHaveLength(1)
+  })
+
+  test('fails on years when years is not an integer', () => {
+    const { error } = activityDurationSchema.validate({
+      'activity-duration-years': '1.5',
+      'activity-duration-months': '6'
+    })
+    expect(error?.message).toBe('YEARS_NOT_INTEGER')
+    expect(error?.details[0].path).toEqual(['activity-duration-years'])
+  })
+
+  test('fails on months when months is not an integer', () => {
+    const { error } = activityDurationSchema.validate({
+      'activity-duration-years': '2',
+      'activity-duration-months': 'abc'
+    })
+    expect(error?.message).toBe('MONTHS_NOT_VALID')
+    expect(error?.details[0].path).toEqual(['activity-duration-months'])
+  })
+
+  test('fails on months when months is greater than 11', () => {
+    const { error } = activityDurationSchema.validate({
+      'activity-duration-years': '2',
+      'activity-duration-months': '12'
+    })
+    expect(error?.message).toBe('MONTHS_NOT_VALID')
+    expect(error?.details[0].path).toEqual(['activity-duration-months'])
   })
 })

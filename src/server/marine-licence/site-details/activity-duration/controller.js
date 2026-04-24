@@ -10,7 +10,10 @@ import { createFailAction } from '#src/server/common/helpers/createFailAction.js
 import { saveSiteDetailsToBackend } from '#src/server/common/helpers/marine-licence/save-site-details.js'
 
 export const activityDurationErrorMessages = {
-  DURATION_REQUIRED: 'Enter the maximum duration of the activity'
+  DURATION_REQUIRED: 'Enter the maximum duration of the activity',
+  DURATION_BOTH_ZERO: 'Years and months cannot both be 0',
+  YEARS_NOT_INTEGER: 'Number of years must be an integer',
+  MONTHS_NOT_VALID: 'Number of months must be an integer between 0 and 11'
 }
 
 export const MARINE_LICENCE_DURATION_VIEW_ROUTE =

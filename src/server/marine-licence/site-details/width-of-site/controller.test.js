@@ -1,8 +1,7 @@
 import { vi } from 'vitest'
 import {
   widthOfSiteController,
-  widthOfSiteSubmitController,
-  widthOfSiteSubmitFailHandler
+  widthOfSiteSubmitController
 } from '#src/server/marine-licence/site-details/width-of-site/controller.js'
 import { WIDTH_OF_SITE_VIEW_ROUTE } from '#src/server/common/validation/width-of-site/constants.js'
 import {
@@ -67,61 +66,6 @@ describe('#widthOfSite (marine licence)', () => {
         action: undefined,
         payload: { width: undefined }
       })
-    })
-  })
-
-  describe('#widthOfSiteSubmitFailHandler', () => {
-    test('should correctly format error data', () => {
-      const request = createMockRequest({
-        payload: { width: 'invalid' }
-      })
-      const h = {
-        view: vi.fn().mockReturnValue({ takeover: vi.fn() })
-      }
-      const err = {
-        details: [{ path: ['width'], message: 'TEST', type: 'any.only' }]
-      }
-
-      widthOfSiteSubmitFailHandler(request, h, err)
-
-      expect(h.view).toHaveBeenCalledWith(WIDTH_OF_SITE_VIEW_ROUTE, {
-        pageTitle: 'Enter the width of the circular site in metres',
-        heading: 'Enter the width of the circular site in metres',
-        backLink: marineLicenceRoutes.MARINE_LICENCE_CIRCLE_CENTRE_POINT,
-        cancelLink: marineLicenceRoutes.MARINE_LICENCE_TASK_LIST,
-        projectName: 'Test Project',
-        payload: { width: 'invalid' },
-        siteNumber: null,
-        action: undefined,
-        errorSummary: [{ href: '#width', text: 'TEST', field: ['width'] }],
-        errors: {
-          width: { field: ['width'], href: '#width', text: 'TEST' }
-        }
-      })
-      expect(h.view().takeover).toHaveBeenCalled()
-    })
-
-    test('should still render page if no error details are provided', () => {
-      const request = createMockRequest({
-        payload: { width: 'invalid' }
-      })
-      const h = {
-        view: vi.fn().mockReturnValue({ takeover: vi.fn() })
-      }
-
-      widthOfSiteSubmitFailHandler(request, h, {})
-
-      expect(h.view).toHaveBeenCalledWith(WIDTH_OF_SITE_VIEW_ROUTE, {
-        pageTitle: 'Enter the width of the circular site in metres',
-        heading: 'Enter the width of the circular site in metres',
-        backLink: marineLicenceRoutes.MARINE_LICENCE_CIRCLE_CENTRE_POINT,
-        cancelLink: marineLicenceRoutes.MARINE_LICENCE_TASK_LIST,
-        projectName: 'Test Project',
-        payload: { width: 'invalid' },
-        siteNumber: null,
-        action: undefined
-      })
-      expect(h.view().takeover).toHaveBeenCalled()
     })
   })
 

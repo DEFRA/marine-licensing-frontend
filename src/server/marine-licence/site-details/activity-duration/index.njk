@@ -41,8 +41,8 @@
         <input type="hidden" name="csrfToken" value="{{ csrfToken }}" />
 
         {{ govukDateInput({
-          id: "duration",
-          namePrefix: "duration",
+          id: "activity-duration",
+          namePrefix: "activity-duration",
           fieldset: {
             legend: {
               html: headingWithCaption,
@@ -52,21 +52,21 @@
           hint: {
             text: "Enter 0 in any box that does not apply. For example, 2 years 0 months, or 0 years 6 months"
           },
-          errorMessage: errors['duration-years'] or errors['duration-months'],
+          errorMessage: errors['activity-duration-years'] or errors['activity-duration-months'],
           items: [
             {
-              id: "duration-years",
+              id: "activity-duration-years",
               name: "years",
               label:  "Years" ,
-              classes: "govuk-input--width-2" + (" govuk-input--error" if errors['duration-years']),
-              value: payload['duration-years']
+              classes: "govuk-input--width-2" + (" govuk-input--error" if errors['activity-duration-years']),
+              value: payload['activity-duration-years']
             },
             {
-              id: "duration-months",
+              id: "activity-duration-months",
               name: "months",
               label: "Months" ,
-              classes: "govuk-input--width-2" + (" govuk-input--error" if errors['duration-months']),
-              value: payload['duration-months']
+              classes: "govuk-input--width-2" + (" govuk-input--error" if errors['activity-duration-months']),
+              value: payload['activity-duration-months']
             }
           ]
         }) }}

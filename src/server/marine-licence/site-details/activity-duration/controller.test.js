@@ -17,6 +17,7 @@ import {
 
 vi.mock('~/src/server/common/helpers/marine-licence/session-cache/utils.js')
 vi.mock('~/src/server/common/helpers/createFailAction.js')
+vi.mock('~/src/server/common/helpers/marine-licence/save-site-details.js')
 
 describe('#activityDuration', () => {
   beforeEach(() => {
@@ -62,8 +63,8 @@ describe('#activityDuration', () => {
       const request = createMockRequest({
         query: { site: 1, activity: 1 },
         payload: {
-          'duration-years': '2',
-          'duration-months': '6'
+          'activity-duration-years': '2',
+          'activity-duration-months': '6'
         }
       })
 
@@ -75,8 +76,10 @@ describe('#activityDuration', () => {
         0,
         0,
         {
-          durationYears: '2',
-          durationMonths: '6'
+          activityDuration: {
+            months: '6',
+            years: '2'
+          }
         }
       )
       expect(redirectH.redirect).toHaveBeenCalledWith(

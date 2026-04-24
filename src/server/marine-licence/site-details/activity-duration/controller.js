@@ -7,6 +7,7 @@ import { getActivityDetailsByIndex } from '#src/server/common/helpers/marine-lic
 import { activityDurationSchema } from '#src/server/marine-licence/site-details/activity-duration/schema.js'
 import { getSiteDataFromParam } from '#src/server/common/helpers/site-details/site-name.js'
 import { createFailAction } from '#src/server/common/helpers/createFailAction.js'
+import { saveSiteDetailsToBackend } from '#src/server/common/helpers/marine-licence/save-site-details.js'
 
 export const activityDurationErrorMessages = {
   DURATION_REQUIRED: 'Enter the maximum duration of the activity'
@@ -47,8 +48,8 @@ export const activityDurationController = {
       siteNumber,
       activityDetailsNumber,
       payload: {
-        'duration-years': activityDetails.durationYears,
-        'duration-months': activityDetails.durationMonths
+        'activity-duration-years': activityDetails.durationYears,
+        'activity-duration-months': activityDetails.durationMonths
       }
     })
   }
@@ -92,10 +93,14 @@ export const activityDurationSubmitController = {
       siteIndex,
       activityDetailsIndex,
       {
-        durationYears: payload['duration-years'],
-        durationMonths: payload['duration-months']
+        activityDuration: {
+          years: payload['activity-duration-years'],
+          months: payload['activity-duration-months']
+        }
       }
     )
+
+    await saveSiteDetailsToBackend(request, h, { siteIndex })
 
     return h.redirect(
       `${marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS}?site=${siteNumber}&activity=${activityDetailsNumber}`

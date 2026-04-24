@@ -87,8 +87,8 @@ describe('Duration (marine licence)', () => {
       url: `${marineLicenceRoutes.MARINE_LICENCE_DURATION}?site=1&activity=1`,
       server: getServer(),
       formData: {
-        'duration-years': '2',
-        'duration-months': '6'
+        'activity-duration-years': '2',
+        'activity-duration-months': '6'
       }
     })
 

@@ -1,0 +1,67 @@
+{% extends 'layouts/page.njk' %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/back-link/macro.njk" import govukBackLink %}
+{% from "govuk/components/textarea/macro.njk" import govukTextarea %}
+{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+{% from "site-activity-heading/macro.njk" import appSiteActivityHeading %}
+
+{% block beforeContent %}
+{{ super() }}
+<nav>
+  {{ govukBackLink({
+    text: "Back",
+    href: backLink
+  }) }}
+</nav>
+{% endblock %}
+
+{% set headingWithCaption %}
+  {{ appSiteActivityHeading({
+    projectName: projectName,
+    siteNumber: siteNumber,
+    activityDetailsNumber: activityDetailsNumber,
+    heading: heading
+  }) }}
+{% endset %}
+
+{% set hintText %}
+  <p class="govuk-body">This is a summary of what you're going to do and in what order. Include the equipment you'll use, how you'll transport materials and the maximum dimensions of the marine works and materials.</p>
+  <p class="govuk-body">For example, if you're constructing a sheet piled wall you need to tell us the maximum dimension of the wall, maximum dimension of the piles and the maximum number of piles.</p>
+  <p class="govuk-hint">Enter a maximum of 1,000 characters</p>
+{% endset %}
+
+{% block content %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+      {% if errors %}
+        {{ govukErrorSummary({
+          titleText: "There is a problem",
+          errorList: errorSummary
+        }) }}
+      {% endif %}
+      <form method="POST">
+        <input type="hidden" name="csrfToken" value="{{ csrfToken }}"/>
+        {{ govukTextarea({
+          id: "activityDescription",
+          name: "activityDescription",
+          value: payload.activityDescription,
+          rows: 8,
+          label: {
+            html: headingWithCaption,
+            classes: "govuk-label--l"
+          },
+          hint: {
+            html: hintText
+          },
+          errorMessage: errors['activityDescription']
+        }) }}
+        <div class="govuk-button-group">
+          {{ govukButton({
+            text: "Save and continue",
+            classes: "govuk-button--primary"
+          }) }}
+        </div>
+      </form>
+    </div>
+  </div>
+{% endblock %}

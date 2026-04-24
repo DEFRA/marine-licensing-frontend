@@ -1,3 +1,4 @@
+import { activityDescriptionRoutes } from '#src/server/marine-licence/site-details/activity-description/index.js'
 import { beforeYouStartRoutes } from '#src/server/marine-licence/site-details/before-you-start/index.js'
 import { coordinateSystemRoutes } from '#src/server/marine-licence/site-details/coordinate-system/index.js'
 import { coordinatesTypeRoutes } from '#src/server/marine-licence/site-details/coordinates-type/index.js'
@@ -11,6 +12,7 @@ import { reviewSiteDetailsRoutes } from '#src/server/marine-licence/site-details
 import { uploadAndWaitRoutes } from '#src/server/marine-licence/site-details/upload-and-wait/index.js'
 
 export const siteDetailsRoutes = [
+  ...activityDescriptionRoutes,
   ...beforeYouStartRoutes,
   ...coordinateSystemRoutes,
   ...coordinatesTypeRoutes,

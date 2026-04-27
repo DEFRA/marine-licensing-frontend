@@ -62,7 +62,7 @@ describe('#questionPostController', () => {
 
     questionPostController.handler(request, h)
 
-    expect(pushAnswer).toHaveBeenCalledWith(request, '/sea', 'inSea')
+    expect(pushAnswer).toHaveBeenCalledWith(request, '/sea', ['inSea'])
     expect(h.redirect).toHaveBeenCalledWith(
       '/journey/self-service/jurisdiction'
     )

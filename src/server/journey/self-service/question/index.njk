@@ -38,13 +38,13 @@
               value: answer.id,
               text: answer.text,
               hint: { html: answer.hint },
-              checked: answer.id === selectedAnswer
+              checked: answer.id in selectedAnswers
             } %}
           {% else %}
             {% set item = {
               value: answer.id,
               text: answer.text,
-              checked: answer.id === selectedAnswer
+              checked: answer.id in selectedAnswers
             } %}
           {% endif %}
           {% set items = (items.push(item), items) %}

@@ -32,15 +32,17 @@ export const questionPostController = {
           question,
           section,
           backLink: getBackLink(request, questionRoute, 'question'),
+          selectedAnswers: [],
           errors: { answer: { text: 'Select an option' } },
           errorSummary: [{ text: 'Select an option', href: '#answer' }]
         })
         .code(statusCodes.badRequest)
     }
 
-    pushAnswer(request, questionRoute, selectedAnswerId)
+    const ids = [selectedAnswerId]
+    pushAnswer(request, questionRoute, ids)
 
-    const next = calculateNextRoute(question, selectedAnswerId)
+    const next = calculateNextRoute(question, ids)
     const target = next.route.replace(/^\//, '')
     const prefix = next.type === 'outcome' ? 'outcome/' : ''
 

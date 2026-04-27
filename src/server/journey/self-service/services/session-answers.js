@@ -22,9 +22,15 @@ function urlForEntry(entry) {
   return `${ROUTE_PREFIX}/${entry.questionRoute.replace(/^\//, '')}`
 }
 
-// The IAT is a decision tree. When a user re-answers a question (or
-// re-picks an outcome) the entries that followed were driven by the old
-// choice and no longer belong to the current path, so they are discarded.
+// One-release backward-compat: in-flight sessions may carry the legacy
+// { answerId: string } shape. Convert to the unified { answerIds: string[] }
+// shape on read. Remove this fallback once any in-flight sessions have expired.
+function readAnswerIds(entry) {
+  if (Array.isArray(entry?.answerIds)) return entry.answerIds
+  if (typeof entry?.answerId === 'string') return [entry.answerId]
+  return []
+}
+
 function deleteFutureAnswers(answers, matchesCurrentEntry) {
   const index = answers.findIndex(matchesCurrentEntry)
   if (index !== -1) {
@@ -41,15 +47,15 @@ export function getAnswerForRoute(request, questionRoute) {
   const entry = answers.find(
     (e) => isQuestionEntry(e) && e.questionRoute === questionRoute
   )
-  return entry?.answerId ?? null
+  return readAnswerIds(entry)
 }
 
-export function pushAnswer(request, questionRoute, answerId) {
+export function pushAnswer(request, questionRoute, answerIds) {
   const answers = getAnswers(request)
   const isEntryForThisQuestion = (e) =>
     isQuestionEntry(e) && e.questionRoute === questionRoute
   deleteFutureAnswers(answers, isEntryForThisQuestion)
-  answers.push({ type: 'question', questionRoute, answerId })
+  answers.push({ type: 'question', questionRoute, answerIds })
   request.yar.set(SESSION_KEY, answers)
 }
 

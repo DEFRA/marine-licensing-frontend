@@ -8,6 +8,7 @@ import { typeOfActivitySchema } from '#src/server/marine-licence/site-details/ty
 import { getSiteDataFromParam } from '#src/server/common/helpers/site-details/site-name.js'
 import { createFailAction } from '#src/server/common/helpers/createFailAction.js'
 import { getActivityVariantFromSubType } from '#src/server/common/helpers/activity-details/activity-variants.js'
+import { validateSiteAndActivityParams } from '#src/server/common/helpers/marine-licence/session-cache/site-utils.js'
 
 export const typeOfActivityErrorMessages = {
   ACTIVITY_TYPE_REQUIRED: 'Select the type of activity',
@@ -35,6 +36,9 @@ export const typeOfActivitySettings = {
 }
 
 export const typeOfActivityController = {
+  options: {
+    pre: [validateSiteAndActivityParams]
+  },
   handler(request, h) {
     const marineLicence = getMarineLicenceCache(request)
 
@@ -108,6 +112,15 @@ export const typeOfActivitySubmitController = {
 
     const activitySubType = activitySubTypeByType[payload.activityType]
 
+    const marineLicence = getMarineLicenceCache(request)
+    const existingActivityDetails = getActivityDetailsByIndex(
+      marineLicence,
+      siteIndex,
+      activityDetailsIndex
+    )
+    const activityTypeChanged =
+      existingActivityDetails.activityType !== payload.activityType
+
     await updateMarineLicenceSiteActivityDetails(
       request,
       h,
@@ -115,7 +128,8 @@ export const typeOfActivitySubmitController = {
       activityDetailsIndex,
       {
         activityType: payload.activityType,
-        activitySubType: activitySubTypeByType[payload.activityType]
+        activitySubType: activitySubTypeByType[payload.activityType],
+        ...(activityTypeChanged && { activities: null })
       }
     )
 

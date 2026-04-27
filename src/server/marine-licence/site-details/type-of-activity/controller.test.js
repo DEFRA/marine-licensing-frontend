@@ -76,6 +76,7 @@ describe('#typeOfActivity', () => {
         0,
         0,
         {
+          activities: null,
           activityType: 'removal',
           activitySubType: 'removal-type-2'
         }

@@ -28,6 +28,7 @@ const getBackLinkForAction = (action, siteNumber, queryParams) => {
   }
   return routes.CIRCLE_CENTRE_POINT + queryParams
 }
+
 export const widthOfSiteController = {
   options: {
     pre: [setSiteDataPreHandler]

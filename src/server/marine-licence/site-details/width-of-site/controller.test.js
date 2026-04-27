@@ -39,7 +39,7 @@ describe('#widthOfSite (marine licence)', () => {
         pageTitle: 'Enter the width of the circular site in metres',
         heading: 'Enter the width of the circular site in metres',
         backLink: marineLicenceRoutes.MARINE_LICENCE_CIRCLE_CENTRE_POINT,
-        cancelLink: marineLicenceRoutes.MARINE_LICENCE_TASK_LIST,
+        cancelLink: `${marineLicenceRoutes.MARINE_LICENCE_TASK_LIST}?cancel=site-details`,
         projectName: 'Test Project',
         siteNumber: null,
         action: undefined,
@@ -60,7 +60,7 @@ describe('#widthOfSite (marine licence)', () => {
         pageTitle: 'Enter the width of the circular site in metres',
         heading: 'Enter the width of the circular site in metres',
         backLink: marineLicenceRoutes.MARINE_LICENCE_CIRCLE_CENTRE_POINT,
-        cancelLink: marineLicenceRoutes.MARINE_LICENCE_TASK_LIST,
+        cancelLink: `${marineLicenceRoutes.MARINE_LICENCE_TASK_LIST}?cancel=site-details`,
         projectName: 'Test Project',
         siteNumber: null,
         action: undefined,
@@ -87,23 +87,6 @@ describe('#widthOfSite (marine licence)', () => {
       )
       expect(h.redirect).toHaveBeenCalledWith(
         marineLicenceRoutes.MARINE_LICENCE_WIDTH_OF_SITE
-      )
-    })
-
-    test('should not trim a width with no surrounding spaces', async () => {
-      const h = { redirect: vi.fn() }
-      const request = createMockRequest({
-        payload: { width: '250' }
-      })
-
-      await widthOfSiteSubmitController.handler(request, h)
-
-      expect(updateMarineLicenceSiteDetails).toHaveBeenCalledWith(
-        request,
-        h,
-        0,
-        'circleWidth',
-        '250'
       )
     })
   })

@@ -73,7 +73,7 @@ describe('Width of site page (marine licence)', () => {
 
     expect(getByRole(document, 'link', { name: 'Cancel' })).toHaveAttribute(
       'href',
-      marineLicenceRoutes.MARINE_LICENCE_TASK_LIST
+      `${marineLicenceRoutes.MARINE_LICENCE_TASK_LIST}?cancel=site-details`
     )
   })
 

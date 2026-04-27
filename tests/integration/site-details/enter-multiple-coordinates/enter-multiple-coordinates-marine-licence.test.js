@@ -3,7 +3,6 @@ import { JSDOM } from 'jsdom'
 import { getByRole } from '@testing-library/dom'
 import { COORDINATE_SYSTEMS } from '~/src/server/common/constants/coordinate-systems.js'
 import { marineLicenceRoutes } from '~/src/server/common/constants/routes.js'
-import * as coordinateUtils from '~/src/server/common/helpers/coordinate-utils.js'
 import { statusCodes } from '~/src/server/common/constants/status-codes.js'
 import {
   makeGetRequest,
@@ -16,7 +15,6 @@ import {
 import { mockMarineLicenceApplication } from '~/src/server/test-helpers/mocks/marine-licence-mocks.js'
 import { updateMarineLicenceSiteDetails } from '~/src/server/common/helpers/marine-licence/session-cache/utils.js'
 
-vi.mock('~/src/server/common/helpers/coordinate-utils.js')
 vi.mock('~/src/server/common/helpers/marine-licence/session-cache/utils.js')
 
 const wgs84Coordinates = [
@@ -26,9 +24,9 @@ const wgs84Coordinates = [
 ]
 
 const osgb36Coordinates = [
-  { eastings: '530000', northings: '181000' },
-  { eastings: '530100', northings: '181100' },
-  { eastings: '530200', northings: '181200' }
+  { easting: '530000', northing: '181000' },
+  { easting: '530100', northing: '181100' },
+  { easting: '530200', northing: '181200' }
 ]
 
 const mockWgs84Application = {
@@ -58,9 +56,6 @@ describe('Enter multiple coordinates page (marine licence)', () => {
 
   beforeEach(() => {
     mockMarineLicence(mockWgs84Application)
-    vi.spyOn(coordinateUtils, 'getCoordinateSystem').mockReturnValue({
-      coordinateSystem: COORDINATE_SYSTEMS.WGS84
-    })
     vi.mocked(updateMarineLicenceSiteDetails).mockResolvedValue(undefined)
   })
 
@@ -122,11 +117,11 @@ describe('Enter multiple coordinates page (marine licence)', () => {
     const { document } = new JSDOM(result).window
 
     expect(
-      document.querySelector('[name="coordinates[0][eastings]"]').value
-    ).toBe(osgb36Coordinates[0].eastings)
+      document.querySelector('[name="coordinates[0][easting]"]').value
+    ).toBe(osgb36Coordinates[0].easting)
     expect(
-      document.querySelector('[name="coordinates[0][northings]"]').value
-    ).toBe(osgb36Coordinates[0].northings)
+      document.querySelector('[name="coordinates[0][northing]"]').value
+    ).toBe(osgb36Coordinates[0].northing)
   })
 
   test('should render WGS84 page with empty inputs when cache has no coordinates', async () => {
@@ -163,7 +158,7 @@ describe('Enter multiple coordinates page (marine licence)', () => {
 
     expect(response.statusCode).toBe(statusCodes.redirect)
     expect(response.headers.location).toBe(
-      marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS
+      marineLicenceRoutes.MARINE_LICENCE_ENTER_MULTIPLE_COORDINATES
     )
   })
 

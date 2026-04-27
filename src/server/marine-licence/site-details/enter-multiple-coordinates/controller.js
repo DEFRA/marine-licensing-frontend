@@ -8,7 +8,6 @@ import {
   updateMarineLicenceSiteDetails
 } from '#src/server/common/helpers/marine-licence/session-cache/utils.js'
 import { getSiteDetailsBySite } from '#src/server/common/helpers/marine-licence/session-cache/site-details-utils.js'
-import { getCoordinateSystem } from '#src/server/common/helpers/coordinate-utils.js'
 import {
   MULTIPLE_COORDINATES_VIEW_ROUTES,
   normaliseCoordinatesForDisplay,
@@ -46,7 +45,7 @@ export const multipleCoordinatesController = {
     const paddedCoordinates = [...coordinates]
     const emptyCoordinate =
       coordinateSystem === COORDINATE_SYSTEMS.OSGB36
-        ? { eastings: '', northings: '' }
+        ? { easting: '', northing: '' }
         : { latitude: '', longitude: '' }
 
     while (paddedCoordinates.length < POLYGON_MIN_COORDINATE_POINTS) {
@@ -78,7 +77,7 @@ function renderMultipleCoordinatesView(
   const paddedCoordinates = [...coordinatesForDisplay]
   const emptyCoordinate =
     coordinateSystem === COORDINATE_SYSTEMS.OSGB36
-      ? { eastings: '', northings: '' }
+      ? { easting: '', northing: '' }
       : { latitude: '', longitude: '' }
   while (paddedCoordinates.length < POLYGON_MIN_COORDINATE_POINTS) {
     paddedCoordinates.push({ ...emptyCoordinate })
@@ -94,7 +93,11 @@ export const multipleCoordinatesSubmitController = {
   async handler(request, h) {
     const { payload } = request
     const marineLicence = getMarineLicenceCache(request)
-    const { coordinateSystem } = getCoordinateSystem(request)
+    const siteDetails = getSiteDetailsBySite(marineLicence)
+    const coordinateSystem =
+      siteDetails.coordinateSystem === COORDINATE_SYSTEMS.OSGB36
+        ? COORDINATE_SYSTEMS.OSGB36
+        : COORDINATE_SYSTEMS.WGS84
 
     let coordinates = convertPayloadToCoordinatesArray(
       payload,
@@ -138,7 +141,7 @@ export const multipleCoordinatesSubmitController = {
     if (payload.add) {
       const emptyCoordinate =
         coordinateSystem === COORDINATE_SYSTEMS.OSGB36
-          ? { eastings: '', northings: '' }
+          ? { easting: '', northing: '' }
           : { latitude: '', longitude: '' }
 
       validatedCoordinates = [...validatedCoordinates, emptyCoordinate]
@@ -160,6 +163,6 @@ export const multipleCoordinatesSubmitController = {
       )
     }
 
-    return h.redirect(marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS)
+    return h.redirect(marineLicenceRoutes.MARINE_LICENCE_ENTER_MULTIPLE_COORDINATES)
   }
 }

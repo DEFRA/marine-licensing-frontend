@@ -27,7 +27,7 @@ vi.mock('~/src/server/common/schemas/osgb36.js')
 vi.mock('~/src/server/common/schemas/wgs84.js')
 
 const EMPTY_WGS84_COORDINATE = { latitude: '', longitude: '' }
-const EMPTY_OSGB36_COORDINATE = { eastings: '', northings: '' }
+const EMPTY_OSGB36_COORDINATE = { easting: '', northing: '' }
 
 const SAMPLE_WGS84_COORDINATES = [
   { latitude: '51.5074', longitude: '-0.1278' },
@@ -36,9 +36,9 @@ const SAMPLE_WGS84_COORDINATES = [
 ]
 
 const SAMPLE_OSGB36_COORDINATES = [
-  { eastings: '529090', northings: '181680' },
-  { eastings: '406250', northings: '286550' },
-  { eastings: '383500', northings: '398000' }
+  { easting: '529090', northing: '181680' },
+  { easting: '406250', northing: '286550' },
+  { easting: '383500', northing: '398000' }
 ]
 
 const COORDINATE_SYSTEMS_TEST_DATA = [
@@ -52,7 +52,7 @@ const COORDINATE_SYSTEMS_TEST_DATA = [
     system: COORDINATE_SYSTEMS.OSGB36,
     emptyCoordinate: EMPTY_OSGB36_COORDINATE,
     sampleCoordinates: SAMPLE_OSGB36_COORDINATES,
-    fields: { primary: 'eastings', secondary: 'northings' }
+    fields: { primary: 'easting', secondary: 'northing' }
   }
 ]
 
@@ -78,9 +78,9 @@ describe('enter-multiple-coordinates utils', () => {
       expect(
         normaliseCoordinatesForDisplay(COORDINATE_SYSTEMS.OSGB36, [])
       ).toEqual([
-        { eastings: '', northings: '' },
-        { eastings: '', northings: '' },
-        { eastings: '', northings: '' }
+        { easting: '', northing: '' },
+        { easting: '', northing: '' },
+        { easting: '', northing: '' }
       ])
     })
 
@@ -89,14 +89,14 @@ describe('enter-multiple-coordinates utils', () => {
       expect(
         normaliseCoordinatesForDisplay(COORDINATE_SYSTEMS.OSGB36, coords)
       ).toEqual([
-        { eastings: '', northings: '' },
-        { eastings: '', northings: '' },
-        { eastings: '', northings: '' }
+        { easting: '', northing: '' },
+        { easting: '', northing: '' },
+        { easting: '', northing: '' }
       ])
     })
 
     it('should return 3 empty coordinates if first coordinate is OSGB36 but system is WGS84', () => {
-      const coords = [{ eastings: '123456', northings: '654321' }]
+      const coords = [{ easting: '123456', northing: '654321' }]
       expect(
         normaliseCoordinatesForDisplay(COORDINATE_SYSTEMS.WGS84, coords)
       ).toEqual([
@@ -165,16 +165,16 @@ describe('enter-multiple-coordinates utils', () => {
         {
           latitude: '51.5',
           longitude: '-0.1',
-          eastings: '123456',
-          northings: '654321'
+          easting: '123456',
+          northing: '654321'
         }
       ]
       expect(
         normaliseCoordinatesForDisplay(COORDINATE_SYSTEMS.OSGB36, coords)
       ).toEqual([
-        { eastings: '123456', northings: '654321' },
-        { eastings: '', northings: '' },
-        { eastings: '', northings: '' }
+        { easting: '123456', northing: '654321' },
+        { easting: '', northing: '' },
+        { easting: '', northing: '' }
       ])
     })
 
@@ -203,9 +203,9 @@ describe('enter-multiple-coordinates utils', () => {
       expect(
         normaliseCoordinatesForDisplay(invalidCoordinateSystem, coords)
       ).toEqual([
-        { eastings: '', northings: '' },
-        { eastings: '', northings: '' },
-        { eastings: '', northings: '' }
+        { easting: '', northing: '' },
+        { easting: '', northing: '' },
+        { easting: '', northing: '' }
       ])
     })
   })
@@ -240,8 +240,8 @@ describe('enter-multiple-coordinates utils', () => {
         secondary: 'longitude'
       })
       expect(COORDINATE_FIELDS.OSGB36).toEqual({
-        primary: 'eastings',
-        secondary: 'northings'
+        primary: 'easting',
+        secondary: 'northing'
       })
     })
   })

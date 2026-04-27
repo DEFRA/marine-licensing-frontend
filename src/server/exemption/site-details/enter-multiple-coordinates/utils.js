@@ -35,8 +35,8 @@ export const COORDINATE_FIELDS = {
     secondary: 'longitude'
   },
   OSGB36: {
-    primary: 'eastings',
-    secondary: 'northings'
+    primary: 'easting',
+    secondary: 'northing'
   }
 }
 
@@ -69,7 +69,7 @@ const areCoordinatesEmptyOrInvalid = (coordinates) => {
 }
 const doesCoordinateSystemMatchData = (coordinate, coordinateSystem) => {
   const hasWgs84Fields = coordinate?.latitude !== undefined
-  const hasOsgb36Fields = coordinate?.eastings !== undefined
+  const hasOsgb36Fields = coordinate?.easting !== undefined
 
   if (coordinateSystem === COORDINATE_SYSTEMS.WGS84) {
     return hasWgs84Fields

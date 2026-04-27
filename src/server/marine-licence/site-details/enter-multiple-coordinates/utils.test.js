@@ -20,7 +20,7 @@ vi.mock('~/src/server/common/helpers/marine-licence/session-cache/utils.js')
 vi.mock('~/src/server/common/helpers/site-details.js')
 
 const EMPTY_WGS84 = { latitude: '', longitude: '' }
-const EMPTY_OSGB36 = { eastings: '', northings: '' }
+const EMPTY_OSGB36 = { easting: '', northing: '' }
 
 const SAMPLE_WGS84 = [
   { latitude: '51.5074', longitude: '-0.1278' },
@@ -29,9 +29,9 @@ const SAMPLE_WGS84 = [
 ]
 
 const SAMPLE_OSGB36 = [
-  { eastings: '529090', northings: '181680' },
-  { eastings: '406250', northings: '286550' },
-  { eastings: '383500', northings: '398000' }
+  { easting: '529090', northing: '181680' },
+  { easting: '406250', northing: '286550' },
+  { easting: '383500', northing: '398000' }
 ]
 
 describe('enter-multiple-coordinates utils (marine licence)', () => {
@@ -119,14 +119,14 @@ describe('enter-multiple-coordinates utils (marine licence)', () => {
 
     test('converts OSGB36 payload to coordinates array', () => {
       const payload = {
-        'coordinates[0][eastings]': '529090',
-        'coordinates[0][northings]': '181680'
+        'coordinates[0][easting]': '529090',
+        'coordinates[0][northing]': '181680'
       }
       const result = convertPayloadToCoordinatesArray(
         payload,
         COORDINATE_SYSTEMS.OSGB36
       )
-      expect(result).toEqual([{ eastings: '529090', northings: '181680' }])
+      expect(result).toEqual([{ easting: '529090', northing: '181680' }])
     })
   })
 

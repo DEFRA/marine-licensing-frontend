@@ -62,7 +62,7 @@ export const multipleCoordinatesController = {
     const paddedCoordinates = [...coordinates]
     const emptyCoordinate =
       coordinateSystem === COORDINATE_SYSTEMS.OSGB36
-        ? { eastings: '', northings: '' }
+        ? { easting: '', northing: '' }
         : { latitude: '', longitude: '' }
 
     while (paddedCoordinates.length < POLYGON_MIN_COORDINATE_POINTS) {
@@ -98,7 +98,7 @@ function renderMultipleCoordinatesView(
   const paddedCoordinates = [...coordinatesForDisplay]
   const emptyCoordinate =
     coordinateSystem === COORDINATE_SYSTEMS.OSGB36
-      ? { eastings: '', northings: '' }
+      ? { easting: '', northing: '' }
       : { latitude: '', longitude: '' }
   while (paddedCoordinates.length < minCoords) {
     paddedCoordinates.push({ ...emptyCoordinate })
@@ -162,7 +162,7 @@ export const multipleCoordinatesSubmitController = {
     if (payload.add) {
       const emptyCoordinate =
         coordinateSystem === COORDINATE_SYSTEMS.OSGB36
-          ? { eastings: '', northings: '' }
+          ? { easting: '', northing: '' }
           : { latitude: '', longitude: '' }
 
       validatedCoordinates = [...validatedCoordinates, emptyCoordinate]

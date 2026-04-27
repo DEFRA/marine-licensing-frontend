@@ -5,7 +5,6 @@ import {
 } from '#src/server/marine-licence/site-details/enter-multiple-coordinates/controller.js'
 import { COORDINATE_SYSTEMS } from '#src/server/common/constants/coordinate-systems.js'
 import * as cacheUtils from '#src/server/common/helpers/marine-licence/session-cache/utils.js'
-import * as coordinateUtils from '#src/server/common/helpers/coordinate-utils.js'
 import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
 import { updateMarineLicenceSiteDetails } from '#src/server/common/helpers/marine-licence/session-cache/utils.js'
 import {
@@ -18,7 +17,6 @@ vi.mock('~/src/server/common/helpers/marine-licence/session-cache/utils.js')
 
 describe('#multipleCoordinates (marine licence)', () => {
   let getMarineLicenceCacheSpy
-  let getCoordinateSystemSpy
 
   const mockCoordinates = {
     wgs84: [
@@ -26,14 +24,14 @@ describe('#multipleCoordinates (marine licence)', () => {
       { latitude: '51.517500', longitude: '-0.137600' }
     ],
     osgb36: [
-      { eastings: '530000', northings: '181000' },
-      { eastings: '530100', northings: '181100' }
+      { easting: '530000', northing: '181000' },
+      { easting: '530100', northing: '181100' }
     ]
   }
 
   const paddedCoordinates = {
     wgs84: { latitude: '', longitude: '' },
-    osgb36: { eastings: '', northings: '' }
+    osgb36: { easting: '', northing: '' }
   }
 
   const mockMarineLicence = {
@@ -54,10 +52,6 @@ describe('#multipleCoordinates (marine licence)', () => {
       .mockReturnValue(mockMarineLicence)
 
     vi.mocked(updateMarineLicenceSiteDetails).mockResolvedValue(undefined)
-
-    getCoordinateSystemSpy = vi
-      .spyOn(coordinateUtils, 'getCoordinateSystem')
-      .mockReturnValue({ coordinateSystem: COORDINATE_SYSTEMS.WGS84 })
   })
 
   describe('#multipleCoordinatesController', () => {
@@ -198,7 +192,7 @@ describe('#multipleCoordinates (marine licence)', () => {
         expect.any(Array)
       )
       expect(mockH.redirect).toHaveBeenCalledWith(
-        marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS
+        marineLicenceRoutes.MARINE_LICENCE_ENTER_MULTIPLE_COORDINATES
       )
     })
 
@@ -222,16 +216,17 @@ describe('#multipleCoordinates (marine licence)', () => {
     })
 
     test('should handle OSGB36 coordinates correctly', async () => {
-      getCoordinateSystemSpy.mockReturnValueOnce({
-        coordinateSystem: COORDINATE_SYSTEMS.OSGB36
+      getMarineLicenceCacheSpy.mockReturnValueOnce({
+        ...mockMarineLicence,
+        siteDetails: [{ coordinateSystem: COORDINATE_SYSTEMS.OSGB36 }]
       })
       const payload = {
-        'coordinates[0][eastings]': '530000',
-        'coordinates[0][northings]': '181000',
-        'coordinates[1][eastings]': '530100',
-        'coordinates[1][northings]': '181100',
-        'coordinates[2][eastings]': '530200',
-        'coordinates[2][northings]': '181200'
+        'coordinates[0][easting]': '530000',
+        'coordinates[0][northing]': '181000',
+        'coordinates[1][easting]': '530100',
+        'coordinates[1][northing]': '181100',
+        'coordinates[2][easting]': '530200',
+        'coordinates[2][northing]': '181200'
       }
       const request = createMockRequest({ payload })
 
@@ -245,7 +240,7 @@ describe('#multipleCoordinates (marine licence)', () => {
         expect.any(Array)
       )
       expect(mockH.redirect).toHaveBeenCalledWith(
-        marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS
+        marineLicenceRoutes.MARINE_LICENCE_ENTER_MULTIPLE_COORDINATES
       )
     })
 
@@ -273,16 +268,17 @@ describe('#multipleCoordinates (marine licence)', () => {
     })
 
     test('should re-render with added OSGB36 point when add button clicked', async () => {
-      getCoordinateSystemSpy.mockReturnValueOnce({
-        coordinateSystem: COORDINATE_SYSTEMS.OSGB36
+      getMarineLicenceCacheSpy.mockReturnValue({
+        ...mockMarineLicence,
+        siteDetails: [{ coordinateSystem: COORDINATE_SYSTEMS.OSGB36 }]
       })
       const payload = {
-        'coordinates[0][eastings]': '530000',
-        'coordinates[0][northings]': '181000',
-        'coordinates[1][eastings]': '530100',
-        'coordinates[1][northings]': '181100',
-        'coordinates[2][eastings]': '530200',
-        'coordinates[2][northings]': '181200',
+        'coordinates[0][easting]': '530000',
+        'coordinates[0][northing]': '181000',
+        'coordinates[1][easting]': '530100',
+        'coordinates[1][northing]': '181100',
+        'coordinates[2][easting]': '530200',
+        'coordinates[2][northing]': '181200',
         add: 'add'
       }
       const request = createMockRequest({ payload })
@@ -299,16 +295,17 @@ describe('#multipleCoordinates (marine licence)', () => {
     })
 
     test('should re-render with removed point when remove button clicked', async () => {
-      getCoordinateSystemSpy.mockReturnValueOnce({
-        coordinateSystem: COORDINATE_SYSTEMS.OSGB36
+      getMarineLicenceCacheSpy.mockReturnValue({
+        ...mockMarineLicence,
+        siteDetails: [{ coordinateSystem: COORDINATE_SYSTEMS.OSGB36 }]
       })
       const payload = {
-        'coordinates[0][eastings]': '530000',
-        'coordinates[0][northings]': '181000',
-        'coordinates[1][eastings]': '530100',
-        'coordinates[1][northings]': '181100',
-        'coordinates[2][eastings]': '530200',
-        'coordinates[2][northings]': '181200',
+        'coordinates[0][easting]': '530000',
+        'coordinates[0][northing]': '181000',
+        'coordinates[1][easting]': '530100',
+        'coordinates[1][northing]': '181100',
+        'coordinates[2][easting]': '530200',
+        'coordinates[2][northing]': '181200',
         remove: '3'
       }
       const request = createMockRequest({ payload })
@@ -341,7 +338,7 @@ describe('#multipleCoordinates (marine licence)', () => {
       await multipleCoordinatesSubmitController.handler(request, mockH)
 
       expect(mockH.redirect).toHaveBeenCalledWith(
-        marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS
+        marineLicenceRoutes.MARINE_LICENCE_ENTER_MULTIPLE_COORDINATES
       )
     })
   })

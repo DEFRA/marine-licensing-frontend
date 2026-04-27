@@ -65,6 +65,8 @@ describe('#selectActivity', () => {
         errorMessages: {
           ACTIVITIES_OTHER_REASON_REQUIRED:
             'Enter details of the other structures',
+          ACTIVITIES_OTHER_REASON_MAX_LENGTH:
+            'Details of other structures must be 1000 characters or less',
           ACTIVITIES_REQUIRED: 'Select at least one type of structure'
         },
         params: {
@@ -113,7 +115,9 @@ describe('#selectActivity', () => {
           ACTIVITIES_REQUIRED:
             'Select at least one type of substance or object',
           ACTIVITIES_OTHER_REASON_REQUIRED:
-            'Enter details of the other deposits'
+            'Enter details of the other deposits',
+          ACTIVITIES_OTHER_REASON_MAX_LENGTH:
+            'Details of other deposits must be 1000 characters or less'
         },
         params: {
           ...commonTestExpectedReturn.params,
@@ -160,7 +164,9 @@ describe('#selectActivity', () => {
         errorMessages: {
           ACTIVITIES_REQUIRED: 'Select at least one substance or object',
           ACTIVITIES_OTHER_REASON_REQUIRED:
-            'Enter details of the other substances or objects'
+            'Enter details of the other substances or objects',
+          ACTIVITIES_OTHER_REASON_MAX_LENGTH:
+            'Details of the other substances or objects must be 1000 characters or less'
         },
         params: {
           ...commonTestExpectedReturn.params,

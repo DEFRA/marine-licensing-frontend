@@ -67,6 +67,18 @@ intentional for the IAT because the tree will grow many pages sharing
 the same testing patterns, and the per-file split keeps each concern
 easy to find and extend.
 
+### Accessibility (Axe) coverage
+
+IAT a11y checks live in `self-service/accessibility.test.js` — an
+IAT-scoped Axe sweep kept separate from the frontend-wide sweep at
+`tests/integration/accessibility/page-accessibility.test.js` so that
+a11y coverage travels with the module when it is extracted.
+
+When a new IAT page or a new markup variant is added, add a
+representative URL to that file's `pages` list. Pages with identical
+markup (e.g. an outcome page with a different number of option cards)
+do not need separate entries.
+
 Repo-wide convention still applies: import only `vi` from `vitest`;
 use `describe` / `test` / `expect` as globals.
 

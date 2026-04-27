@@ -1,14 +1,16 @@
 import sanitizeHtml from 'sanitize-html'
 
-const sanitiseOptions = {
-  allowedTags: ['a', 'b', 'br', 'li', 'ol', 'p', 'strong', 'u', 'ul'],
+const ALLOWED_TAGS = ['a', 'b', 'br', 'li', 'ol', 'p', 'strong', 'u', 'ul']
+const ALLOWED_SCHEMES = ['http', 'https']
+
+const hintSanitiseOptions = {
+  allowedTags: ALLOWED_TAGS,
   allowedAttributes: {
     a: ['href', 'target', 'rel'],
     ol: ['type'],
     p: ['class']
   },
-  allowedSchemes: ['http', 'https'],
-  // Transform <p> tags to <p class='govuk-hint'> for grey styling
+  allowedSchemes: ALLOWED_SCHEMES,
   transformTags: {
     p: (tagName, attribs) => ({
       tagName,
@@ -17,8 +19,21 @@ const sanitiseOptions = {
   }
 }
 
+const richTextSanitiseOptions = {
+  allowedTags: ALLOWED_TAGS,
+  allowedAttributes: {
+    a: ['href', 'target', 'rel'],
+    ol: ['type']
+  },
+  allowedSchemes: ALLOWED_SCHEMES
+}
+
 export function sanitise(text) {
-  return text ? sanitizeHtml(text, sanitiseOptions) : text
+  return text ? sanitizeHtml(text, hintSanitiseOptions) : text
+}
+
+export function sanitiseRichText(text) {
+  return text ? sanitizeHtml(text, richTextSanitiseOptions) : text
 }
 
 export function stripHtml(text) {

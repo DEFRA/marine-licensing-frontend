@@ -1,4 +1,4 @@
-import { sanitise, stripHtml } from './sanitise.js'
+import { sanitise, sanitiseRichText, stripHtml } from './sanitise.js'
 
 describe('#sanitise', () => {
   test('adds govuk-hint class to p tags', () => {
@@ -76,5 +76,86 @@ describe('#stripHtml', () => {
     expect(stripHtml(null)).toBeNull()
     expect(stripHtml(undefined)).toBeUndefined()
     expect(stripHtml('')).toBe('')
+  })
+})
+
+describe('#sanitiseRichText', () => {
+  test('preserves allowed inline tags', () => {
+    const input =
+      '<p><b>Bold</b> with <strong>strong</strong> and <u>underline</u>.</p>'
+    const result = sanitiseRichText(input)
+    expect(result).toContain('<b>Bold</b>')
+    expect(result).toContain('<strong>strong</strong>')
+    expect(result).toContain('<u>underline</u>')
+    expect(result).toContain('<p>')
+  })
+
+  test('does not rewrite <p> to govuk-hint class', () => {
+    const result = sanitiseRichText('<p>Body paragraph</p>')
+    expect(result).toBe('<p>Body paragraph</p>')
+    expect(result).not.toContain('govuk-hint')
+  })
+
+  test('preserves lists', () => {
+    const result = sanitiseRichText('<ul><li>One</li><li>Two</li></ul>')
+    expect(result).toContain('<ul>')
+    expect(result).toContain('<li>One</li>')
+    expect(result).toContain('<li>Two</li>')
+  })
+
+  test('preserves <br/> tags', () => {
+    const result = sanitiseRichText('Line one<br/>Line two')
+    expect(result).toContain('<br')
+    expect(result).toContain('Line one')
+    expect(result).toContain('Line two')
+  })
+
+  test('preserves anchors with href, target and rel', () => {
+    const input =
+      '<a href="https://www.gov.uk/" target="_blank" rel="noopener">gov.uk</a>'
+    const result = sanitiseRichText(input)
+    expect(result).toContain('href="https://www.gov.uk/"')
+    expect(result).toContain('target="_blank"')
+    expect(result).toContain('rel="noopener"')
+  })
+
+  test('preserves http and https schemes', () => {
+    expect(
+      sanitiseRichText('<a href="http://legislation.gov.uk/">law</a>')
+    ).toContain('href="http://legislation.gov.uk/"')
+    expect(sanitiseRichText('<a href="https://gov.uk/">gov</a>')).toContain(
+      'href="https://gov.uk/"'
+    )
+  })
+
+  test('strips javascript: hrefs', () => {
+    const result = sanitiseRichText('<a href="javascript:alert(1)">x</a>')
+    expect(result).not.toContain('javascript:')
+  })
+
+  test('strips <script> and on* handlers', () => {
+    expect(sanitiseRichText('<script>alert("xss")</script>')).toBe('')
+    const result = sanitiseRichText(
+      '<a href="https://x/" onclick="alert(1)">link</a>'
+    )
+    expect(result).not.toContain('onclick')
+  })
+
+  test('auto-balances malformed nested tags in source data', () => {
+    const result = sanitiseRichText('<b><b>Please select.</b></b>')
+    expect(result).toContain('Please select.')
+    expect((result.match(/<b>/g) || []).length).toBeGreaterThan(0)
+  })
+
+  test('returns falsy values unchanged', () => {
+    expect(sanitiseRichText(null)).toBeNull()
+    expect(sanitiseRichText(undefined)).toBeUndefined()
+    expect(sanitiseRichText('')).toBe('')
+  })
+})
+
+describe('#sanitise (regression)', () => {
+  test('still rewrites <p> to govuk-hint class', () => {
+    expect(sanitise('<p>hint</p>')).toBe('<p class="govuk-hint">hint</p>')
   })
 })

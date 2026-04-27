@@ -31,7 +31,7 @@ export const questionPostController = {
           pageTitle: question.text,
           question,
           section,
-          backLink: getBackLink(request, questionRoute),
+          backLink: getBackLink(request, questionRoute, 'question'),
           errors: { answer: { text: 'Select an option' } },
           errorSummary: [{ text: 'Select an option', href: '#answer' }]
         })
@@ -41,7 +41,9 @@ export const questionPostController = {
     pushAnswer(request, questionRoute, selectedAnswerId)
 
     const next = calculateNextRoute(question, selectedAnswerId)
+    const target = next.route.replace(/^\//, '')
+    const prefix = next.type === 'outcome' ? 'outcome/' : ''
 
-    return h.redirect(`${ROUTE_PREFIX}/${next.route.replace(/^\//, '')}`)
+    return h.redirect(`${ROUTE_PREFIX}/${prefix}${target}`)
   }
 }

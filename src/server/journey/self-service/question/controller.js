@@ -25,7 +25,7 @@ export const questionController = {
       pageTitle: question.text,
       question,
       section,
-      backLink: getBackLink(request, questionRoute),
+      backLink: getBackLink(request, questionRoute, 'question'),
       selectedAnswer: getAnswerForRoute(request, questionRoute)
     })
   }

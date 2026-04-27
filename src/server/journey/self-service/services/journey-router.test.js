@@ -43,9 +43,9 @@ describe('#calculateNextRoute (single-select)', () => {
   })
 
   test('throws when given multiple ids on a single-select question', () => {
-    expect(() =>
-      calculateNextRoute(radioQuestion, ['inSea', 'other'])
-    ).toThrow("Single-select question '/sea' received 2 answers")
+    expect(() => calculateNextRoute(radioQuestion, ['inSea', 'other'])).toThrow(
+      "Single-select question '/sea' received 2 answers"
+    )
   })
 })
 

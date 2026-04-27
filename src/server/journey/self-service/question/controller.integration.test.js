@@ -139,8 +139,7 @@ describe('#questionController (integration)', () => {
   })
 
   describe('GET /journey/self-service/construction/maintenance-existing-works (multi-select)', () => {
-    const url =
-      '/journey/self-service/construction/maintenance-existing-works'
+    const url = '/journey/self-service/construction/maintenance-existing-works'
 
     test('returns 200', async () => {
       const { response } = await getPage(url)
@@ -150,7 +149,9 @@ describe('#questionController (integration)', () => {
     test('renders the section caption', async () => {
       const { document } = await getPage(url)
       const caption = document.querySelector('.govuk-caption-l')
-      expect(caption.textContent).toContain('Self-service check - Sub-activities')
+      expect(caption.textContent).toContain(
+        'Self-service check - Sub-activities'
+      )
     })
 
     test('renders the question heading', async () => {
@@ -259,8 +260,7 @@ describe('#questionController (integration)', () => {
   })
 
   describe('POST /journey/self-service/construction/maintenance-existing-works (multi-select)', () => {
-    const url =
-      '/journey/self-service/construction/maintenance-existing-works'
+    const url = '/journey/self-service/construction/maintenance-existing-works'
 
     test('returns 400 with error summary when no checkbox is selected', async () => {
       const { response, document } = await postPage(url, {})
@@ -316,8 +316,7 @@ describe('#questionController (integration)', () => {
   })
 
   describe('navigation flow (multi-select)', () => {
-    const url =
-      '/journey/self-service/construction/maintenance-existing-works'
+    const url = '/journey/self-service/construction/maintenance-existing-works'
 
     test('next page back link points to the multi-select page after submission', async () => {
       const { response: postResponse } = await postPage(url, {

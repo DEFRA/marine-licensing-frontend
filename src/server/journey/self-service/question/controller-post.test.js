@@ -156,7 +156,10 @@ describe('#questionPostController', () => {
 
     beforeEach(() => {
       vi.mocked(getQuestion).mockReturnValue(multiSelectQuestion)
-      vi.mocked(getSection).mockReturnValue({ id: 'subactivityType', text: 'Sub-activities' })
+      vi.mocked(getSection).mockReturnValue({
+        id: 'subactivityType',
+        text: 'Sub-activities'
+      })
     })
 
     test('returns 400 with multi-select error message when answers is empty', () => {
@@ -173,7 +176,9 @@ describe('#questionPostController', () => {
         'journey/self-service/question/index',
         expect.objectContaining({
           errors: { answers: { text: 'Select at least one option' } },
-          errorSummary: [{ text: 'Select at least one option', href: '#answers' }]
+          errorSummary: [
+            { text: 'Select at least one option', href: '#answers' }
+          ]
         })
       )
       expect(codeStub).toHaveBeenCalledWith(statusCodes.badRequest)

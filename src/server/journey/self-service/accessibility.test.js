@@ -34,7 +34,8 @@ describe('IAT page accessibility (Axe)', () => {
     },
     {
       url: '/journey/self-service/construction/maintenance-existing-works',
-      title: 'Please select sub-activites that match with activities proposed to be carried out.'
+      title:
+        'Please select sub-activites that match with activities proposed to be carried out.'
     }
   ]
 

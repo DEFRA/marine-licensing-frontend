@@ -34,7 +34,7 @@ describe('Type of activity (marine licence)', () => {
 
     expect(getByRole(document, 'link', { name: 'Back' })).toHaveAttribute(
       'href',
-      marineLicenceRoutes.MARINE_LICENCE_TYPE_OF_ACTIVITY
+      `${marineLicenceRoutes.MARINE_LICENCE_TYPE_OF_ACTIVITY}?site=1&activity=1`
     )
 
     expect(getByRole(document, 'heading', { level: 1 })).toHaveTextContent(

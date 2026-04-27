@@ -1,0 +1,15 @@
+@use 'govuk-frontend' as *;
+
+.app-iat-option {
+  border: $govuk-border-width solid $govuk-border-colour;
+  padding: govuk-spacing(4) govuk-spacing(4) govuk-spacing(7);
+}
+
+.app-iat-option__actions {
+  margin-top: govuk-spacing(3);
+
+  form {
+    display: inline-block;
+    margin-right: govuk-spacing(2);
+  }
+}

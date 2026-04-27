@@ -108,7 +108,8 @@ export const routes = {
   PRIVACY: '/help/privacy',
   DECLARATION: '/declaration',
   IAT_START: '/journey/self-service/start',
-  IAT_QUESTION: '/journey/self-service/{questionPath*}'
+  IAT_QUESTION: '/journey/self-service/{questionPath*}',
+  IAT_OUTCOME: '/journey/self-service/outcome/{outcomePath*}'
 }
 
 export const entraIdRoutes = [

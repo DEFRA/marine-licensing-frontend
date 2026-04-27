@@ -11,7 +11,10 @@ import {
   getSection
 } from '#src/server/journey/self-service/services/journey-data.js'
 import { calculateNextRoute } from '#src/server/journey/self-service/services/journey-router.js'
-import { pushAnswer } from '#src/server/journey/self-service/services/session-answers.js'
+import {
+  pushAnswer,
+  getBackLink
+} from '#src/server/journey/self-service/services/session-answers.js'
 
 describe('#questionPostController', () => {
   const mockQuestion = {
@@ -23,6 +26,11 @@ describe('#questionPostController', () => {
         id: 'inSea',
         text: 'In or over the sea',
         nextQuestionRoute: '/jurisdiction'
+      },
+      {
+        id: 'construction',
+        text: 'Construction',
+        outcomeRoute: '/construction/journey-select'
       },
       { id: 'other', text: 'Somewhere else', outcomeRoute: '/not-licensable' }
     ]
@@ -37,6 +45,7 @@ describe('#questionPostController', () => {
     vi.mocked(getQuestion).mockReturnValue(mockQuestion)
     vi.mocked(getSection).mockReturnValue(mockSection)
     vi.mocked(pushAnswer).mockReturnValue(undefined)
+    vi.mocked(getBackLink).mockReturnValue('/journey/self-service/start')
   })
 
   test('redirects to the next question on valid answer', () => {
@@ -59,22 +68,22 @@ describe('#questionPostController', () => {
     )
   })
 
-  test('redirects to the outcome route when answer leads to outcome', () => {
+  test('redirects with /outcome/ prefix when answer leads to an outcome', () => {
     vi.mocked(calculateNextRoute).mockReturnValue({
       type: 'outcome',
-      route: '/not-licensable'
+      route: '/construction/journey-select'
     })
 
     const request = {
       params: { questionPath: 'sea' },
-      payload: { answer: 'other' }
+      payload: { answer: 'construction' }
     }
     const h = { redirect: vi.fn() }
 
     questionPostController.handler(request, h)
 
     expect(h.redirect).toHaveBeenCalledWith(
-      '/journey/self-service/not-licensable'
+      '/journey/self-service/outcome/construction/journey-select'
     )
   })
 
@@ -95,6 +104,7 @@ describe('#questionPostController', () => {
         errorSummary: [{ text: 'Select an option', href: '#answer' }]
       })
     )
+    expect(getBackLink).toHaveBeenCalledWith(request, '/sea', 'question')
     expect(codeStub).toHaveBeenCalledWith(statusCodes.badRequest)
   })
 

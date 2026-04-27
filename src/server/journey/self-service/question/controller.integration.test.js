@@ -127,12 +127,14 @@ describe('#questionController (integration)', () => {
       )
     })
 
-    test('redirects to outcome route when answer leads to outcome', async () => {
+    test('redirects to /outcome/ URL when answer leads to an outcome', async () => {
       const { response } = await postPage('/journey/self-service/sea', {
         answer: 'other'
       })
       expect(response.statusCode).toBe(statusCodes.redirect)
-      expect(response.headers.location).toContain('licence-not-required')
+      expect(response.headers.location).toMatch(
+        /^\/journey\/self-service\/outcome\//
+      )
     })
   })
 

@@ -72,7 +72,9 @@ export const marineLicenceRoutes = {
     '/marine-licence/what-coordinate-system',
   MARINE_LICENCE_CIRCLE_CENTRE_POINT:
     '/marine-licence/enter-the-coordinates-at-the-centre-point',
-  MARINE_LICENCE_WIDTH_OF_SITE: '/marine-licence/width-of-site'
+  MARINE_LICENCE_WIDTH_OF_SITE: '/marine-licence/width-of-site',
+  MARINE_LICENCE_ENTER_MULTIPLE_COORDINATES:
+    '/marine-licence/enter-multiple-coordinates'
 }
 
 export const defraIdGuidanceRoutes = {

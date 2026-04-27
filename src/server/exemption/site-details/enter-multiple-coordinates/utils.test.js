@@ -60,10 +60,8 @@ describe('enter-multiple-coordinates utils', () => {
   describe('MULTIPLE_COORDINATES_VIEW_ROUTES', () => {
     it('should provide correct route mappings for coordinate systems', () => {
       expect(MULTIPLE_COORDINATES_VIEW_ROUTES).toEqual({
-        [COORDINATE_SYSTEMS.WGS84]:
-          'exemption/site-details/enter-multiple-coordinates/wgs84',
-        [COORDINATE_SYSTEMS.OSGB36]:
-          'exemption/site-details/enter-multiple-coordinates/osgb36'
+        [COORDINATE_SYSTEMS.WGS84]: 'templates/multiple-coordinates-wgs84',
+        [COORDINATE_SYSTEMS.OSGB36]: 'templates/multiple-coordinates-osgb36'
       })
     })
   })

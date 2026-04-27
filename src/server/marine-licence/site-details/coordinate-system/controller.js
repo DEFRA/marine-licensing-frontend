@@ -3,6 +3,7 @@ import {
   updateMarineLicenceSiteDetails
 } from '#src/server/common/helpers/marine-licence/session-cache/utils.js'
 import { getSiteDetailsBySite } from '#src/server/common/helpers/marine-licence/session-cache/site-details-utils.js'
+import { setSiteDataPreHandler } from '#src/server/common/helpers/marine-licence/session-cache/site-utils.js'
 import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
 import { createFailAction } from '#src/server/common/helpers/createFailAction.js'
 import {
@@ -38,6 +39,7 @@ export const coordinateSystemController = {
 
 export const coordinateSystemSubmitController = {
   options: {
+    pre: [setSiteDataPreHandler],
     validate: {
       payload: coordinateSystemSchema,
       failAction: (request, h, err) => {
@@ -60,8 +62,9 @@ export const coordinateSystemSubmitController = {
     }
   },
   async handler(request, h) {
-    const { payload } = request
-
+    const { payload, site } = request
+    const { siteDetails } = site
+    
     await updateMarineLicenceSiteDetails(
       request,
       h,
@@ -69,6 +72,18 @@ export const coordinateSystemSubmitController = {
       'coordinateSystem',
       payload.coordinateSystem
     )
+
+    const coordinatesEntry = siteDetails.coordinatesEntry
+
+    if (coordinatesEntry === 'single') {      
+
+      return h.redirect(marineLicenceRoutes.MARINE_LICENCE_CIRCLE_CENTRE_POINT)
+    }
+
+    if (coordinatesEntry === 'multiple') {      
+
+      return h.redirect(marineLicenceRoutes.MARINE_LICENCE_ENTER_MULTIPLE_COORDINATES)
+    }
 
     return h.redirect(marineLicenceRoutes.MARINE_LICENCE_CIRCLE_CENTRE_POINT)
   }

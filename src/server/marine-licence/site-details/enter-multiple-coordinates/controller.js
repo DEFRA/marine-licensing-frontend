@@ -2,13 +2,12 @@ import {
   COORDINATE_SYSTEMS,
   POLYGON_MIN_COORDINATE_POINTS
 } from '#src/server/common/constants/coordinate-systems.js'
-import { routes } from '#src/server/common/constants/routes.js'
+import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
 import {
-  getExemptionCache,
-  updateExemptionSiteDetails
-} from '#src/server/common/helpers/exemptions/session-cache/utils.js'
-import { setSiteDataPreHandler } from '#src/server/common/helpers/exemptions/session-cache/site-utils.js'
-import { getSiteDetailsBySite } from '#src/server/common/helpers/exemptions/session-cache/site-details-utils.js'
+  getMarineLicenceCache,
+  updateMarineLicenceSiteDetails
+} from '#src/server/common/helpers/marine-licence/session-cache/utils.js'
+import { getSiteDetailsBySite } from '#src/server/common/helpers/marine-licence/session-cache/site-details-utils.js'
 import { getCoordinateSystem } from '#src/server/common/helpers/coordinate-utils.js'
 import {
   MULTIPLE_COORDINATES_VIEW_ROUTES,
@@ -20,34 +19,19 @@ import {
   removeCoordinateAtIndex
 } from './utils.js'
 import { validateCoordinates } from '#src/server/common/validation/multiple-coordinates/validate.js'
-import { saveSiteDetailsToBackend } from '#src/server/common/helpers/exemptions/save-site-details.js'
-import { getCancelLink } from '#src/server/exemption/site-details/utils/cancel-link.js'
+import { getCancelLink } from '#src/server/marine-licence/site-details/utils/cancel-link.js'
 
-const getBackLinkForAction = (action, siteNumber, queryParams, request) => {
-  if (action) {
-    const savedSiteDetails = request.yar.get('savedSiteDetails') || {}
-
-    if (savedSiteDetails.originalCoordinateSystem !== undefined) {
-      return `${routes.COORDINATE_SYSTEM_CHOICE}?site=${siteNumber}&action=${action}`
-    }
-
-    return `${routes.REVIEW_SITE_DETAILS}#site-details-${siteNumber}`
-  }
-
-  return routes.COORDINATE_SYSTEM_CHOICE + queryParams
-}
+const getBackLinkForAction = (action) =>
+  action
+    ? marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS
+    : marineLicenceRoutes.MARINE_LICENCE_COORDINATE_SYSTEM_CHOICE
 
 export const multipleCoordinatesController = {
-  options: {
-    pre: [setSiteDataPreHandler]
-  },
   handler(request, h) {
-    const exemption = getExemptionCache(request) || {}
-    const { projectName } = exemption
-    const { site } = request
-    const { siteIndex, queryParams, siteNumber } = site
+    const marineLicence = getMarineLicenceCache(request) || {}
+    const { projectName } = marineLicence
     const action = request.query.action
-    const siteDetails = getSiteDetailsBySite(exemption, siteIndex)
+    const siteDetails = getSiteDetailsBySite(marineLicence)
 
     const coordinateSystem =
       siteDetails.coordinateSystem === COORDINATE_SYSTEMS.OSGB36
@@ -71,13 +55,11 @@ export const multipleCoordinatesController = {
 
     return h.view(MULTIPLE_COORDINATES_VIEW_ROUTES[coordinateSystem], {
       ...multipleCoordinatesPageData,
-      backLink: getBackLinkForAction(action, siteNumber, queryParams, request),
+      backLink: getBackLinkForAction(action),
       cancelLink: getCancelLink(action),
       coordinates: paddedCoordinates,
       projectName,
-      siteNumber: exemption.multipleSiteDetails?.multipleSitesEnabled
-        ? siteNumber
-        : null,
+      siteNumber: null,
       action
     })
   }
@@ -93,14 +75,12 @@ function renderMultipleCoordinatesView(
     coordinateSystem,
     coordinates
   )
-  // Pad coordinates to at least 3 items
-  const minCoords = 3
   const paddedCoordinates = [...coordinatesForDisplay]
   const emptyCoordinate =
     coordinateSystem === COORDINATE_SYSTEMS.OSGB36
       ? { eastings: '', northings: '' }
       : { latitude: '', longitude: '' }
-  while (paddedCoordinates.length < minCoords) {
+  while (paddedCoordinates.length < POLYGON_MIN_COORDINATE_POINTS) {
     paddedCoordinates.push({ ...emptyCoordinate })
   }
   return h.view(MULTIPLE_COORDINATES_VIEW_ROUTES[coordinateSystem], {
@@ -111,14 +91,9 @@ function renderMultipleCoordinatesView(
 }
 
 export const multipleCoordinatesSubmitController = {
-  options: {
-    pre: [setSiteDataPreHandler]
-  },
   async handler(request, h) {
     const { payload } = request
-    const exemption = getExemptionCache(request)
-    const { siteIndex, queryParams, siteNumber } = request.site
-    const action = request.query.action
+    const marineLicence = getMarineLicenceCache(request)
     const { coordinateSystem } = getCoordinateSystem(request)
 
     let coordinates = convertPayloadToCoordinatesArray(
@@ -135,7 +110,7 @@ export const multipleCoordinatesSubmitController = {
 
     const validationResult = validateCoordinates(
       coordinates,
-      exemption.id,
+      marineLicence.id,
       coordinateSystem
     )
 
@@ -152,13 +127,14 @@ export const multipleCoordinatesSubmitController = {
     }
 
     let validatedCoordinates = validationResult.value.coordinates
-    await updateExemptionSiteDetails(
+    await updateMarineLicenceSiteDetails(
       request,
       h,
-      siteIndex,
+      0,
       'coordinates',
       validatedCoordinates
     )
+
     if (payload.add) {
       const emptyCoordinate =
         coordinateSystem === COORDINATE_SYSTEMS.OSGB36
@@ -171,7 +147,7 @@ export const multipleCoordinatesSubmitController = {
         h,
         validatedCoordinates,
         coordinateSystem,
-        exemption?.projectName
+        marineLicence?.projectName
       )
     }
 
@@ -180,16 +156,10 @@ export const multipleCoordinatesSubmitController = {
         h,
         validatedCoordinates,
         coordinateSystem,
-        exemption?.projectName
+        marineLicence?.projectName
       )
     }
 
-    const nextRoute = action
-      ? `${routes.REVIEW_SITE_DETAILS}#site-details-${siteNumber}`
-      : routes.REVIEW_SITE_DETAILS + queryParams
-
-    await saveSiteDetailsToBackend(request, h)
-
-    return h.redirect(nextRoute)
+    return h.redirect(marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS)
   }
 }

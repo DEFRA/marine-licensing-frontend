@@ -2,14 +2,10 @@ import {
   COORDINATE_SYSTEMS,
   POLYGON_MIN_COORDINATE_POINTS
 } from '#src/server/common/constants/coordinate-systems.js'
-import { routes } from '#src/server/common/constants/routes.js'
-import { getExemptionCache } from '#src/server/common/helpers/exemptions/session-cache/utils.js'
+import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
+import { getMarineLicenceCache } from '#src/server/common/helpers/marine-licence/session-cache/utils.js'
 import { generatePointSpecificErrorMessage } from '#src/server/common/helpers/site-details.js'
-import { getCancelLink } from '#src/server/exemption/site-details/utils/cancel-link.js'
-
-// ============================================================================
-// CONSTANTS AND CONFIGURATION
-// ============================================================================
+import { getCancelLink } from '#src/server/marine-licence/site-details/utils/cancel-link.js'
 
 export const PATTERNS = {
   FIELD_BRACKETS: /[[\]]/g
@@ -25,7 +21,7 @@ export const multipleCoordinatesPageData = {
     'Enter multiple sets of coordinates to mark the boundary of the site',
   pageTitle:
     'Enter multiple sets of coordinates to mark the boundary of the site',
-  backLink: routes.COORDINATE_SYSTEM_CHOICE,
+  backLink: marineLicenceRoutes.MARINE_LICENCE_COORDINATE_SYSTEM_CHOICE,
   cancelLink: getCancelLink()
 }
 
@@ -40,10 +36,6 @@ export const COORDINATE_FIELDS = {
   }
 }
 
-// ============================================================================
-// COORDINATE SYSTEM UTILITIES
-// ============================================================================
-
 export const isWGS84 = (coordinateSystem) =>
   coordinateSystem === COORDINATE_SYSTEMS.WGS84
 
@@ -55,18 +47,14 @@ const createEmptyCoordinate = (coordinateSystem) => {
   return { [fields.primary]: '', [fields.secondary]: '' }
 }
 
-const createDefaultCoordinates = (coordinateSystem) => {
-  return Array.from({ length: POLYGON_MIN_COORDINATE_POINTS }, () =>
+const createDefaultCoordinates = (coordinateSystem) =>
+  Array.from({ length: POLYGON_MIN_COORDINATE_POINTS }, () =>
     createEmptyCoordinate(coordinateSystem)
   )
-}
 
-// ============================================================================
-// DATA TRANSFORMATION FUNCTIONS
-// ============================================================================
-const areCoordinatesEmptyOrInvalid = (coordinates) => {
-  return coordinates.length === 0 || !coordinates[0]
-}
+const areCoordinatesEmptyOrInvalid = (coordinates) =>
+  coordinates.length === 0 || !coordinates[0]
+
 const doesCoordinateSystemMatchData = (coordinate, coordinateSystem) => {
   const hasWgs84Fields = coordinate?.latitude !== undefined
   const hasOsgb36Fields = coordinate?.eastings !== undefined
@@ -81,6 +69,7 @@ const doesCoordinateSystemMatchData = (coordinate, coordinateSystem) => {
 
   return false
 }
+
 const extractRelevantCoordinateFields = (coordinate, coordinateSystem) => {
   const fields = getCoordinateFields(coordinateSystem)
   return {
@@ -88,6 +77,7 @@ const extractRelevantCoordinateFields = (coordinate, coordinateSystem) => {
     [fields.secondary]: coordinate[fields.secondary] || ''
   }
 }
+
 export const normaliseCoordinatesForDisplay = (
   coordinateSystem,
   coordinates = []
@@ -149,10 +139,6 @@ export const convertPayloadToCoordinatesArray = (payload, coordinateSystem) => {
   return coordinates
 }
 
-// ============================================================================
-// ERROR HANDLING FUNCTIONS
-// ============================================================================
-
 export const convertArrayErrorsToFlattenedErrors = (error) => {
   if (!error.details) {
     return error
@@ -186,15 +172,14 @@ export const processErrorDetail = (detail) => {
   return { fieldName, fieldId, coordinateIndex, enhancedMessage }
 }
 
-export const createErrorSummary = (validationError) => {
-  return validationError.details.map((detail) => {
+export const createErrorSummary = (validationError) =>
+  validationError.details.map((detail) => {
     const { fieldId, enhancedMessage } = processErrorDetail(detail)
     return {
       href: `#${fieldId}`,
       text: enhancedMessage
     }
   })
-}
 
 export const createFieldErrors = (validationError) => {
   const errors = {}
@@ -214,7 +199,7 @@ export const handleValidationFailure = (
   coordinateSystem
 ) => {
   const { payload } = request
-  const exemption = getExemptionCache(request)
+  const marineLicence = getMarineLicenceCache(request)
   const coordinates = convertPayloadToCoordinatesArray(
     payload,
     coordinateSystem
@@ -225,7 +210,7 @@ export const handleValidationFailure = (
       .view(MULTIPLE_COORDINATES_VIEW_ROUTES[coordinateSystem], {
         ...multipleCoordinatesPageData,
         coordinates,
-        projectName: exemption?.projectName
+        projectName: marineLicence?.projectName
       })
       .takeover()
   }
@@ -238,15 +223,12 @@ export const handleValidationFailure = (
       ...multipleCoordinatesPageData,
       coordinates,
       errors,
-      projectName: exemption?.projectName,
+      projectName: marineLicence?.projectName,
       errorSummary
     })
     .takeover()
 }
 
-// ============================================================================
-// ARRAY MANIPULATION UTILITIES
-// ============================================================================
 export const removeCoordinateAtIndex = (coordinates, index) => {
   if (
     index >= POLYGON_MIN_COORDINATE_POINTS &&

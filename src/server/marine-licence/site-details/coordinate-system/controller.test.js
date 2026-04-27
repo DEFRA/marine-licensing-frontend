@@ -168,11 +168,42 @@ describe('#coordinateSystem (marine licence)', () => {
       expect(h.view().takeover).toHaveBeenCalled()
     })
 
-    test('Should correctly navigate to self when POST is successful', async () => {
+    test('Should correctly navigate to single coordinates when coordinatesEntry is single', async () => {
       const h = { redirect: vi.fn() }
 
       const request = createMockRequest({
-        payload: { coordinateSystem: 'wgs84' }
+        payload: { coordinateSystem: 'wgs84' },
+        site: { siteIndex: 0, siteDetails: { coordinatesEntry: 'single' } }
+      })
+
+      await coordinateSystemSubmitController.handler(request, h)
+
+      expect(h.redirect).toHaveBeenCalledWith(
+        marineLicenceRoutes.MARINE_LICENCE_CIRCLE_CENTRE_POINT
+      )
+    })
+
+    test('Should correctly navigate to multiple coordinates when coordinatesEntry is multiple', async () => {
+      const h = { redirect: vi.fn() }
+
+      const request = createMockRequest({
+        payload: { coordinateSystem: 'wgs84' },
+        site: { siteIndex: 0, siteDetails: { coordinatesEntry: 'multiple' } }
+      })
+
+      await coordinateSystemSubmitController.handler(request, h)
+
+      expect(h.redirect).toHaveBeenCalledWith(
+        marineLicenceRoutes.MARINE_LICENCE_ENTER_MULTIPLE_COORDINATES
+      )
+    })
+
+    test('Should fall back to circle centre point when coordinatesEntry is not set', async () => {
+      const h = { redirect: vi.fn() }
+
+      const request = createMockRequest({
+        payload: { coordinateSystem: 'wgs84' },
+        site: { siteIndex: 0, siteDetails: {} }
       })
 
       await coordinateSystemSubmitController.handler(request, h)
@@ -189,7 +220,8 @@ describe('#coordinateSystem (marine licence)', () => {
       }
 
       const request = createMockRequest({
-        payload: { coordinateSystem: 'wgs84' }
+        payload: { coordinateSystem: 'wgs84' },
+        site: { siteIndex: 0, siteDetails: { coordinatesEntry: 'single' } }
       })
 
       await coordinateSystemSubmitController.handler(request, h)

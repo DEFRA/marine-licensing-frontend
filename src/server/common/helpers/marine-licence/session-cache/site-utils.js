@@ -1,4 +1,5 @@
 import { getMarineLicenceCache } from '#src/server/common/helpers/marine-licence/session-cache/utils.js'
+import { getSiteDetailsBySite } from '#src/server/common/helpers/marine-licence/session-cache/site-details-utils.js'
 import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
 
 export const validateSiteAndActivityParams = {
@@ -19,6 +20,21 @@ export const validateSiteAndActivityParams = {
       return h.redirect(marineLicenceRoutes.MARINE_LICENCE_TASK_LIST).takeover()
     }
 
+    return h.continue
+  }
+}
+
+export const setSiteData = (request) => {
+  const marineLicence = getMarineLicenceCache(request)
+  return {
+    siteIndex: 0,
+    siteDetails: getSiteDetailsBySite(marineLicence)
+  }
+}
+
+export const setSiteDataPreHandler = {
+  method: (request, h) => {
+    request.site = setSiteData(request)
     return h.continue
   }
 }

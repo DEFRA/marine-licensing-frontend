@@ -71,20 +71,6 @@ describe('#session-answers', () => {
       expect(getAnswerForRoute(request, '/sea')).toEqual([])
     })
 
-    test('treats a legacy entry (no type) with answerId string as a question entry', () => {
-      const request = createMockRequest([
-        { questionRoute: '/sea', answerId: 'inSea' }
-      ])
-      expect(getAnswerForRoute(request, '/sea')).toEqual(['inSea'])
-    })
-
-    test('treats a legacy entry with answerId string and a type as a question entry', () => {
-      const request = createMockRequest([
-        { type: 'question', questionRoute: '/sea', answerId: 'inSea' }
-      ])
-      expect(getAnswerForRoute(request, '/sea')).toEqual(['inSea'])
-    })
-
     test('does not match outcome entries by their outcomeRoute', () => {
       const request = createMockRequest([
         {

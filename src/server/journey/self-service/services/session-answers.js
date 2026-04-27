@@ -31,6 +31,9 @@ function readAnswerIds(entry) {
   return []
 }
 
+// The IAT is a decision tree. When a user re-answers a question (or
+// re-picks an outcome) the entries that followed were driven by the old
+// choice and no longer belong to the current path, so they are discarded.
 function deleteFutureAnswers(answers, matchesCurrentEntry) {
   const index = answers.findIndex(matchesCurrentEntry)
   if (index !== -1) {

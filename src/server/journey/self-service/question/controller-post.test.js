@@ -101,7 +101,8 @@ describe('#questionPostController', () => {
       'journey/self-service/question/index',
       expect.objectContaining({
         errors: { answer: { text: 'Select an option' } },
-        errorSummary: [{ text: 'Select an option', href: '#answer' }]
+        errorSummary: [{ text: 'Select an option', href: '#answer' }],
+        selectedAnswers: []
       })
     )
     expect(getBackLink).toHaveBeenCalledWith(request, '/sea', 'question')

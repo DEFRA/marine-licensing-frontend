@@ -94,4 +94,32 @@ describe('#questionController', () => {
       expect.objectContaining({ selectedAnswers: ['inSea'] })
     )
   })
+
+  test('passes empty selectedAnswers for a multi-select question even when a prior selection exists', () => {
+    const multiSelectQuestion = {
+      route: '/construction/maintenance-existing-works',
+      text: 'Sub-activities',
+      section: 'subactivityType',
+      multiSelect: {
+        questionRoute: '/x',
+        outcomeRoute: '/y',
+        outcomeAnswerId: 'OTHER_MAINTENANCE'
+      },
+      answers: [{ id: 'SCAFFOLDING_ACCESS_TOWERS' }]
+    }
+    vi.mocked(getQuestion).mockReturnValue(multiSelectQuestion)
+    vi.mocked(getAnswerForRoute).mockReturnValue(['SCAFFOLDING_ACCESS_TOWERS'])
+
+    const request = {
+      params: { questionPath: 'construction/maintenance-existing-works' }
+    }
+    const h = { view: vi.fn() }
+
+    questionController.handler(request, h)
+
+    expect(h.view).toHaveBeenCalledWith(
+      'journey/self-service/question/index',
+      expect.objectContaining({ selectedAnswers: [] })
+    )
+  })
 })

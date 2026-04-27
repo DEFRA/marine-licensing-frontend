@@ -50,7 +50,9 @@ describe('#activityDuration', () => {
           DURATION_REQUIRED: 'Enter the maximum duration of the activity',
           MONTHS_NOT_VALID:
             'Number of months must be an integer between 0 and 11',
-          YEARS_NOT_INTEGER: 'Number of years must be an integer'
+          MONTHS_REQUIRED: 'Enter the number of months',
+          YEARS_NOT_INTEGER: 'Number of years must be an integer',
+          YEARS_REQUIRED: 'Enter the number of years'
         },
         backLink:
           '/marine-licence/review-site-details#activity-details-site-1-activity-1',

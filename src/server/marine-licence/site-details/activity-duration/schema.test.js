@@ -30,7 +30,7 @@ describe('#activityDurationSchema', () => {
     const { error } = activityDurationSchema.validate({
       'activity-duration-months': '6'
     })
-    expect(error?.message).toBe('DURATION_REQUIRED')
+    expect(error?.message).toBe('YEARS_REQUIRED')
     expect(error?.details[0].path).toEqual(['activity-duration-years'])
   })
 
@@ -38,7 +38,7 @@ describe('#activityDurationSchema', () => {
     const { error } = activityDurationSchema.validate({
       'activity-duration-years': '2'
     })
-    expect(error?.message).toBe('DURATION_REQUIRED')
+    expect(error?.message).toBe('MONTHS_REQUIRED')
     expect(error?.details[0].path).toEqual(['activity-duration-months'])
   })
 
@@ -47,7 +47,7 @@ describe('#activityDurationSchema', () => {
       'activity-duration-years': '',
       'activity-duration-months': '6'
     })
-    expect(error?.message).toBe('DURATION_REQUIRED')
+    expect(error?.message).toBe('YEARS_REQUIRED')
     expect(error?.details[0].path).toEqual(['activity-duration-years'])
   })
 
@@ -56,16 +56,16 @@ describe('#activityDurationSchema', () => {
       'activity-duration-years': '2',
       'activity-duration-months': ''
     })
-    expect(error?.message).toBe('DURATION_REQUIRED')
+    expect(error?.message).toBe('MONTHS_REQUIRED')
     expect(error?.details[0].path).toEqual(['activity-duration-months'])
   })
 
-  test('produces only one error when both fields are empty', () => {
+  test('produces both required errors when both fields are empty', () => {
     const { error } = activityDurationSchema.validate(
       { 'activity-duration-years': '', 'activity-duration-months': '' },
       { abortEarly: false }
     )
-    expect(error?.details).toHaveLength(1)
+    expect(error?.details).toHaveLength(2)
   })
 
   test('fails on years when years is not an integer', () => {

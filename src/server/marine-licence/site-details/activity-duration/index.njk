@@ -24,6 +24,16 @@
   }) }}
 {% endset %}
 
+{% set yearsError = errors['activity-duration-years'] %}
+{% set monthsError = errors['activity-duration-months'] %}
+{% set inlineDurationError = yearsError or monthsError %}
+{% if yearsError and monthsError %}
+  {% set inlineDurationError = {
+    html: yearsError.text + '<br>' + monthsError.text
+  } %}
+{% endif %}
+{% set highlightMultipleFields = inlineDurationError and inlineDurationError.highlightMultipleFields %}
+
 {% block content %}
 
   <div class="govuk-grid-row">
@@ -52,20 +62,20 @@
           hint: {
             text: "Enter 0 in any box that does not apply. For example, 2 years 0 months, or 0 years 6 months"
           },
-          errorMessage: errors['activity-duration-years'] or errors['activity-duration-months'],
+          errorMessage: inlineDurationError,
           items: [
             {
               id: "activity-duration-years",
               name: "years",
               label:  "Years" ,
-              classes: "govuk-input--width-2" + (" govuk-input--error" if errors['activity-duration-years']),
+              classes: "govuk-input--width-2" + (" govuk-input--error" if yearsError or highlightMultipleFields),
               value: payload['activity-duration-years']
             },
             {
               id: "activity-duration-months",
               name: "months",
               label: "Months" ,
-              classes: "govuk-input--width-2" + (" govuk-input--error" if errors['activity-duration-months']),
+              classes: "govuk-input--width-2" + (" govuk-input--error" if monthsError or highlightMultipleFields),
               value: payload['activity-duration-months']
             }
           ]

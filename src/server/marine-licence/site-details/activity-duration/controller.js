@@ -5,6 +5,7 @@ import {
 import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
 import { getActivityDetailsByIndex } from '#src/server/common/helpers/marine-licence/session-cache/site-details-utils.js'
 import { activityDurationSchema } from '#src/server/marine-licence/site-details/activity-duration/schema.js'
+import { mapDurationErrors } from '#src/server/marine-licence/site-details/activity-duration/utils.js'
 import { getSiteDataFromParam } from '#src/server/common/helpers/site-details/site-name.js'
 import { createFailAction } from '#src/server/common/helpers/createFailAction.js'
 import { saveSiteDetailsToBackend } from '#src/server/common/helpers/marine-licence/save-site-details.js'
@@ -12,6 +13,8 @@ import { validateSiteAndActivityParams } from '#src/server/common/helpers/marine
 
 export const activityDurationErrorMessages = {
   DURATION_REQUIRED: 'Enter the maximum duration of the activity',
+  YEARS_REQUIRED: 'Enter the number of years',
+  MONTHS_REQUIRED: 'Enter the number of months',
   DURATION_BOTH_ZERO: 'Years and months cannot both be 0',
   YEARS_NOT_INTEGER: 'Number of years must be an integer',
   MONTHS_NOT_VALID: 'Number of months must be an integer between 0 and 11'
@@ -67,6 +70,10 @@ export const activityDurationSubmitController = {
     validate: {
       payload: activityDurationSchema,
       failAction: (request, h, err) => {
+        if (err?.details?.length) {
+          err.details = mapDurationErrors(err.details)
+        }
+
         const marineLicence = getMarineLicenceCache(request)
 
         const { activityDetailsNumber, siteNumber } = getSiteDataFromParam(

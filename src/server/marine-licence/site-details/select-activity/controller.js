@@ -11,6 +11,7 @@ import { getActivityDetailsByIndex } from '#src/server/common/helpers/marine-lic
 import { selectActivitySchema } from '#src/server/marine-licence/site-details/select-activity/schema.js'
 import { createFailAction } from '#src/server/common/helpers/createFailAction.js'
 import { selectActivityErrorMessages } from '#src/server/common/validation/select-activity/constants.js'
+import { validateSiteAndActivityParams } from '#src/server/common/helpers/marine-licence/session-cache/site-utils.js'
 
 export const SELECT_ACTIVITY_VIEW_ROUTE =
   'marine-licence/site-details/select-activity/index'
@@ -47,6 +48,9 @@ const getSelectActivityPageParams = (
 }
 
 export const selectActivityController = {
+  options: {
+    pre: [validateSiteAndActivityParams]
+  },
   handler(request, h) {
     const marineLicence = getMarineLicenceCache(request)
 

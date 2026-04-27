@@ -108,6 +108,15 @@ export const typeOfActivitySubmitController = {
 
     const activitySubType = activitySubTypeByType[payload.activityType]
 
+    const marineLicence = getMarineLicenceCache(request)
+    const existingActivityDetails = getActivityDetailsByIndex(
+      marineLicence,
+      siteIndex,
+      activityDetailsIndex
+    )
+    const activityTypeChanged =
+      existingActivityDetails.activityType !== payload.activityType
+
     await updateMarineLicenceSiteActivityDetails(
       request,
       h,
@@ -115,7 +124,8 @@ export const typeOfActivitySubmitController = {
       activityDetailsIndex,
       {
         activityType: payload.activityType,
-        activitySubType: activitySubTypeByType[payload.activityType]
+        activitySubType: activitySubTypeByType[payload.activityType],
+        ...(activityTypeChanged && { activities: null })
       }
     )
 

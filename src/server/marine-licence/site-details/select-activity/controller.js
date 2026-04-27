@@ -18,7 +18,7 @@ export const SELECT_ACTIVITY_VIEW_ROUTE =
 const getBackLink = (action, siteNumber, activityDetailsNumber) =>
   action
     ? `${marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS}#activity-details-site-${siteNumber}-activity-${activityDetailsNumber}`
-    : marineLicenceRoutes.MARINE_LICENCE_TYPE_OF_ACTIVITY
+    : `${marineLicenceRoutes.MARINE_LICENCE_TYPE_OF_ACTIVITY}?site=${siteNumber}&activity=${activityDetailsNumber}`
 
 const getSelectActivityPageParams = (
   request,

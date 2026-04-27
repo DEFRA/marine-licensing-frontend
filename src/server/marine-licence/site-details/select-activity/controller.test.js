@@ -31,7 +31,7 @@ describe('#selectActivity', () => {
       viewRoute: SELECT_ACTIVITY_VIEW_ROUTE,
       payload: {},
       settings: {
-        backLink: '/marine-licence/type-of-activity',
+        backLink: '/marine-licence/type-of-activity?site=1&activity=1',
         activityDetailsNumber: 1,
         siteNumber: 1,
         projectName: 'Test Project'

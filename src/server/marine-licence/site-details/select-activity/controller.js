@@ -93,7 +93,7 @@ export const selectActivitySubmitController = {
 
         return createFailAction({
           viewRoute: SELECT_ACTIVITY_VIEW_ROUTE,
-          settings: getSelectActivityPageParams(
+          params: getSelectActivityPageParams(
             request,
             marineLicence,
             activityDetails

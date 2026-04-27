@@ -70,11 +70,26 @@ export const mapActivitySelections = (activities, activityType) =>
       : ACTIVITY_LABELS[selection]
   )
 
+export const formatActivityDuration = (activityDuration = {}) => {
+  if (!activityDuration.years || !activityDuration.months) {
+    return null
+  }
+
+  const pluralYears =
+    Number.parseInt(activityDuration.years) > 1 ? 'years' : 'year'
+
+  const pluralMonths =
+    Number.parseInt(activityDuration.months) > 1 ? 'months' : 'month'
+
+  return `${activityDuration.years} ${pluralYears}, ${activityDuration.months} ${pluralMonths}`
+}
+
 export const parseActivityDetails = (siteDetails) => {
   const activityDetails = siteDetails.activityDetails ?? []
 
   return activityDetails.map((activity) => ({
     ...activity,
+    activityDuration: formatActivityDuration(activity.activityDuration),
     activitySubType: formatActivitySubTypeLabel(activity.activitySubType),
     activityHeading: formatActivitySubTypeHeading(activity.activitySubType),
     activityLink: `/marine-licence/activity-details/${getActivityVariantFromSubType(activity.activitySubType)}`,

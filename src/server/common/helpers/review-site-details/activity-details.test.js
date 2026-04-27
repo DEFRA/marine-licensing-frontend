@@ -1,4 +1,5 @@
 import {
+  formatActivityDuration,
   formatActivitySubTypeHeading,
   formatActivitySubTypeLabel,
   getOtherActivityLabel,
@@ -150,6 +151,7 @@ describe('parseActivityDetails', () => {
     const siteDetails = {
       activityDetails: [
         {
+          activityDuration: { years: 1, months: 10 },
           activitySubType: 'construction-type-1',
           activityType: 'construction',
           activities: { selections: ['CON1'] },
@@ -160,6 +162,7 @@ describe('parseActivityDetails', () => {
 
     expect(parseActivityDetails(siteDetails)).toEqual([
       {
+        activityDuration: '1 year, 10 months',
         activityHeading: "What you're constructing",
         activityLink:
           '/marine-licence/activity-details/what-are-you-constructing',
@@ -189,5 +192,31 @@ describe('parseActivityDetails', () => {
 
   test('returns empty array when activityDetails is missing', () => {
     expect(parseActivityDetails({})).toEqual([])
+  })
+})
+
+describe('formatActivityDuration', () => {
+  test('returns formatted activity details from site', () => {
+    const activityDuration = { years: 1, months: 10 }
+
+    expect(formatActivityDuration(activityDuration)).toEqual(
+      '1 year, 10 months'
+    )
+  })
+
+  test('correctly validate plurals', () => {
+    expect(formatActivityDuration({ years: 1, months: 1 })).toEqual(
+      '1 year, 1 month'
+    )
+
+    expect(formatActivityDuration({ years: 2, months: 2 })).toEqual(
+      '2 years, 2 months'
+    )
+  })
+
+  test('return null if any data is missing', () => {
+    expect(formatActivityDuration({ months: 1 })).toEqual(null)
+
+    expect(formatActivityDuration({ years: 2 })).toEqual(null)
   })
 })

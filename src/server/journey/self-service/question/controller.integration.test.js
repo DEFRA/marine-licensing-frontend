@@ -138,6 +138,59 @@ describe('#questionController (integration)', () => {
     })
   })
 
+  describe('GET /journey/self-service/construction/maintenance-existing-works (multi-select)', () => {
+    const url =
+      '/journey/self-service/construction/maintenance-existing-works'
+
+    test('returns 200', async () => {
+      const { response } = await getPage(url)
+      expect(response.statusCode).toBe(statusCodes.ok)
+    })
+
+    test('renders the section caption', async () => {
+      const { document } = await getPage(url)
+      const caption = document.querySelector('.govuk-caption-l')
+      expect(caption.textContent).toContain('Self-service check - Sub-activities')
+    })
+
+    test('renders the question heading', async () => {
+      const { document } = await getPage(url)
+      const legend = document.querySelector('.govuk-fieldset__legend')
+      expect(legend.textContent).toContain(
+        'Please select sub-activites that match with activities proposed to be carried out.'
+      )
+    })
+
+    test('renders checkboxes (not radios) for each answer', async () => {
+      const { document } = await getPage(url)
+      const checkboxes = document.querySelectorAll('input[type="checkbox"]')
+      expect(checkboxes.length).toBe(10)
+      expect(document.querySelectorAll('input[type="radio"]').length).toBe(0)
+    })
+
+    test('renders a Continue button', async () => {
+      const { document } = await getPage(url)
+      const buttons = Array.from(document.querySelectorAll('.govuk-button'))
+      const continueButton = buttons.find((b) =>
+        b.textContent.includes('Continue')
+      )
+      expect(continueButton).not.toBeNull()
+    })
+
+    test('renders a back link', async () => {
+      const { document } = await getPage(url)
+      const backLink = document.querySelector('.govuk-back-link')
+      expect(backLink).not.toBeNull()
+    })
+
+    test('does not render navigation links in the header', async () => {
+      const { document } = await getPage(url)
+      expect(
+        document.querySelector('.govuk-service-navigation__list')
+      ).toBeNull()
+    })
+  })
+
   const getSessionCookie = (response) => {
     const setCookieHeader = response.headers['set-cookie']
     const sessionCookie = Array.isArray(setCookieHeader)

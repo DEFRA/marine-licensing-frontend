@@ -257,4 +257,95 @@ describe('#questionController (integration)', () => {
       expect(checkedRadio).toBeNull()
     })
   })
+
+  describe('POST /journey/self-service/construction/maintenance-existing-works (multi-select)', () => {
+    const url =
+      '/journey/self-service/construction/maintenance-existing-works'
+
+    test('returns 400 with error summary when no checkbox is selected', async () => {
+      const { response, document } = await postPage(url, {})
+      expect(response.statusCode).toBe(statusCodes.badRequest)
+
+      const errorSummary = document.querySelector('.govuk-error-summary')
+      expect(errorSummary).not.toBeNull()
+      expect(errorSummary.textContent).toContain('Select at least one option')
+
+      const errorLink = errorSummary.querySelector('a')
+      expect(errorLink.getAttribute('href')).toBe('#answers')
+    })
+
+    test('redirects to the multiSelect.questionRoute when one non-other answer is selected', async () => {
+      const { response } = await postPage(url, {
+        answers: 'SCAFFOLDING_ACCESS_TOWERS'
+      })
+      expect(response.statusCode).toBe(statusCodes.redirect)
+      expect(response.headers.location).toBe(
+        '/journey/self-service/construction/maintenance-existing-works/scaffolding'
+      )
+    })
+
+    test('redirects to the multiSelect.questionRoute when several non-other answers are selected', async () => {
+      const { response } = await postPage(url, {
+        answers: ['SCAFFOLDING_ACCESS_TOWERS', 'REPAINTING_STRUCTURES']
+      })
+      expect(response.statusCode).toBe(statusCodes.redirect)
+      expect(response.headers.location).toBe(
+        '/journey/self-service/construction/maintenance-existing-works/scaffolding'
+      )
+    })
+
+    test('redirects to the multiSelect.outcomeRoute when only the other answer is selected', async () => {
+      const { response } = await postPage(url, {
+        answers: 'OTHER_MAINTENANCE'
+      })
+      expect(response.statusCode).toBe(statusCodes.redirect)
+      expect(response.headers.location).toBe(
+        '/journey/self-service/outcome/standard-marine-licence-application/other-maintenance'
+      )
+    })
+
+    test('redirects to the multiSelect.outcomeRoute when other and non-other are mixed (OTHER_ANY rule)', async () => {
+      const { response } = await postPage(url, {
+        answers: ['SCAFFOLDING_ACCESS_TOWERS', 'OTHER_MAINTENANCE']
+      })
+      expect(response.statusCode).toBe(statusCodes.redirect)
+      expect(response.headers.location).toBe(
+        '/journey/self-service/outcome/standard-marine-licence-application/other-maintenance'
+      )
+    })
+  })
+
+  describe('navigation flow (multi-select)', () => {
+    const url =
+      '/journey/self-service/construction/maintenance-existing-works'
+
+    test('next page back link points to the multi-select page after submission', async () => {
+      const { response: postResponse } = await postPage(url, {
+        answers: 'SCAFFOLDING_ACCESS_TOWERS'
+      })
+
+      const headers = getSessionCookie(postResponse)
+
+      const { document } = await getPage(
+        '/journey/self-service/construction/maintenance-existing-works/scaffolding',
+        headers
+      )
+      const backLink = document.querySelector('.govuk-back-link')
+      expect(backLink.getAttribute('href')).toBe(url)
+    })
+
+    test('returning to the multi-select page renders no checked checkboxes (AC5)', async () => {
+      const { response: postResponse } = await postPage(url, {
+        answers: ['SCAFFOLDING_ACCESS_TOWERS', 'REPAINTING_STRUCTURES']
+      })
+
+      const headers = getSessionCookie(postResponse)
+
+      const { document } = await getPage(url, headers)
+      const checkedBoxes = document.querySelectorAll(
+        'input[type="checkbox"][checked]'
+      )
+      expect(checkedBoxes.length).toBe(0)
+    })
+  })
 })

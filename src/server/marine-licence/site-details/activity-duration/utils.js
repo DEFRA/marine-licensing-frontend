@@ -22,6 +22,10 @@ const highlightBothErrorsWhenZeroValues = (detail) => ({
 })
 
 export const mapDurationErrors = (details) => {
+  if (!Array.isArray(details) || details.length === 0) {
+    return []
+  }
+
   const hasYearsRequired = details.some(
     (detail) => detail.message === 'YEARS_REQUIRED'
   )

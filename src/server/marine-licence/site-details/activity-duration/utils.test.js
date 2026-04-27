@@ -1,6 +1,14 @@
 import { mapDurationErrors } from '#src/server/marine-licence/site-details/activity-duration/utils.js'
 
 describe('#mapDurationErrors', () => {
+  test('returns empty array for undefined input', () => {
+    expect(mapDurationErrors(undefined)).toEqual([])
+  })
+
+  test('returns empty array for empty input', () => {
+    expect(mapDurationErrors([])).toEqual([])
+  })
+
   test('collapses YEARS_REQUIRED and MONTHS_REQUIRED into DURATION_REQUIRED', () => {
     const result = mapDurationErrors([
       { message: 'YEARS_REQUIRED', path: ['activity-duration-years'] },

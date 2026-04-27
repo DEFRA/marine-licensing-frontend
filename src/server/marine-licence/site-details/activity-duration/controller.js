@@ -70,9 +70,7 @@ export const activityDurationSubmitController = {
     validate: {
       payload: activityDurationSchema,
       failAction: (request, h, err) => {
-        if (err?.details?.length) {
-          err.details = mapDurationErrors(err.details)
-        }
+        err.details = mapDurationErrors(err?.details)
 
         const marineLicence = getMarineLicenceCache(request)
 

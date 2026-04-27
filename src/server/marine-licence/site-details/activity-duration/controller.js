@@ -58,8 +58,8 @@ export const activityDurationController = {
       siteNumber,
       activityDetailsNumber,
       payload: {
-        'activity-duration-years': activityDetails.durationYears,
-        'activity-duration-months': activityDetails.durationMonths
+        'activity-duration-years': activityDetails.activityDuration?.years,
+        'activity-duration-months': activityDetails.activityDuration?.months
       }
     })
   }

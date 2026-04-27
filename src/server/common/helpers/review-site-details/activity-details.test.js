@@ -197,14 +197,12 @@ describe('parseActivityDetails', () => {
 
 describe('formatActivityDuration', () => {
   test('returns formatted activity details from site', () => {
-    const activityDuration = { years: 1, months: 10 }
-
-    expect(formatActivityDuration(activityDuration)).toEqual(
+    expect(formatActivityDuration({ years: 1, months: 10 })).toEqual(
       '1 year, 10 months'
     )
   })
 
-  test('correctly validate plurals', () => {
+  test('correctly handles plurals', () => {
     expect(formatActivityDuration({ years: 1, months: 1 })).toEqual(
       '1 year, 1 month'
     )
@@ -214,9 +212,19 @@ describe('formatActivityDuration', () => {
     )
   })
 
-  test('return null if any data is missing', () => {
-    expect(formatActivityDuration({ months: 1 })).toEqual(null)
+  test('omits years when years is 0', () => {
+    expect(formatActivityDuration({ years: 0, months: 6 })).toEqual('6 months')
 
+    expect(formatActivityDuration({ years: 0, months: 1 })).toEqual('1 month')
+  })
+
+  test('returns null when months is missing or 0', () => {
     expect(formatActivityDuration({ years: 2 })).toEqual(null)
+
+    expect(formatActivityDuration({ years: 2, months: 0 })).toEqual(null)
+  })
+
+  test('returns null when years is missing', () => {
+    expect(formatActivityDuration({ months: 6 })).toEqual(null)
   })
 })

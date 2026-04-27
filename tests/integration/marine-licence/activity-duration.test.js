@@ -63,8 +63,7 @@ describe('Duration (marine licence)', () => {
           activityDetails: [
             {
               ...mockMarineLicenceApplication.siteDetails[0].activityDetails[0],
-              durationYears: '2',
-              durationMonths: '6'
+              activityDuration: { years: 2, months: 6 }
             }
           ]
         }

@@ -71,17 +71,21 @@ export const mapActivitySelections = (activities, activityType) =>
   )
 
 export const formatActivityDuration = (activityDuration = {}) => {
-  if (!activityDuration.years || !activityDuration.months) {
+  const { years, months } = activityDuration
+
+  if (years == null || months == null || months === 0) {
     return null
   }
 
-  const pluralYears =
-    Number.parseInt(activityDuration.years) > 1 ? 'years' : 'year'
+  const pluralMonths = months > 1 ? 'months' : 'month'
 
-  const pluralMonths =
-    Number.parseInt(activityDuration.months) > 1 ? 'months' : 'month'
+  if (years === 0) {
+    return `${months} ${pluralMonths}`
+  }
 
-  return `${activityDuration.years} ${pluralYears}, ${activityDuration.months} ${pluralMonths}`
+  const pluralYears = years > 1 ? 'years' : 'year'
+
+  return `${years} ${pluralYears}, ${months} ${pluralMonths}`
 }
 
 export const parseActivityDetails = (siteDetails) => {

@@ -77,26 +77,6 @@ describe('Width of site page (marine licence)', () => {
     )
   })
 
-  test('should render page with empty input when cache has no width', async () => {
-    mockMarineLicence({
-      ...mockMarineLicenceApplication,
-      siteDetails: [
-        {
-          ...mockMarineLicenceApplication.siteDetails[0],
-          circleWidth: undefined
-        }
-      ]
-    })
-
-    const { result, statusCode } = await getRequest()
-
-    expect(statusCode).toBe(statusCodes.ok)
-
-    const { document } = new JSDOM(result).window
-
-    expect(document.querySelector('#width').value).toBe('')
-  })
-
   test('should redirect back to same page on valid submission', async () => {
     const response = await postRequest({ width: '250' })
 

@@ -34,13 +34,13 @@ export const mockActivityDetails = {
 export const mockOutputActivityDetails = {
   ...mockActivityDetails,
   activityType: 'Construction of new works',
+  activityDuration: '1 year, 4 months',
   completionDate: mockActivityDetails.completionDate.reason
 }
 
 export const mockOutputEmptyActivityDetails = {
   ...mockEmptyActivityDetails,
-  completionDate: null,
-  activityDuration: '1 year, 4 months'
+  completionDate: null
 }
 
 export const mockMarineLicenceApplication = {

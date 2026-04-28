@@ -1,4 +1,4 @@
-import { COORDINATE_SYSTEMS } from '~/src/server/common/constants/exemptions.js'
+import { COORDINATE_SYSTEMS } from '~/src/server/common/constants/coordinate-systems.js'
 
 export const baseSubmittedExemption = {
   id: '507f1f77bcf86cd799439011',

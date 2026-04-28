@@ -1,4 +1,4 @@
-import { COORDINATE_SYSTEMS } from '#src/server/common/constants/exemptions.js'
+import { COORDINATE_SYSTEMS } from '#src/server/common/constants/coordinate-systems.js'
 export const COORDINATE_ERROR_MESSAGES = {
   [COORDINATE_SYSTEMS.WGS84]: {
     LATITUDE_REQUIRED: 'Enter the latitude',

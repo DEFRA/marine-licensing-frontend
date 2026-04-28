@@ -1,7 +1,7 @@
 import { vi } from 'vitest'
 import { JSDOM } from 'jsdom'
 import { getByText, within } from '@testing-library/dom'
-import { COORDINATE_SYSTEMS } from '~/src/server/common/constants/exemptions.js'
+import { COORDINATE_SYSTEMS } from '~/src/server/common/constants/coordinate-systems.js'
 import { routes } from '~/src/server/common/constants/routes.js'
 import { statusCodes } from '~/src/server/common/constants/status-codes.js'
 import * as coordinateUtils from '~/src/server/common/helpers/coordinate-utils.js'

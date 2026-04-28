@@ -70,8 +70,6 @@ export const coordinateSystemSubmitController = {
       payload.coordinateSystem
     )
 
-    return h.redirect(
-      marineLicenceRoutes.MARINE_LICENCE_COORDINATE_SYSTEM_CHOICE
-    )
+    return h.redirect(marineLicenceRoutes.MARINE_LICENCE_CIRCLE_CENTRE_POINT)
   }
 }

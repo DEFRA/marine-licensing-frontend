@@ -1,5 +1,5 @@
 import { vi } from 'vitest'
-import { COORDINATE_SYSTEMS } from '#src/server/common/constants/exemptions.js'
+import { COORDINATE_SYSTEMS } from '#src/server/common/constants/coordinate-systems.js'
 import { routes } from '#src/server/common/constants/routes.js'
 import { getExemptionCache } from '#src/server/common/helpers/exemptions/session-cache/utils.js'
 import { generatePointSpecificErrorMessage } from '#src/server/common/helpers/site-details.js'

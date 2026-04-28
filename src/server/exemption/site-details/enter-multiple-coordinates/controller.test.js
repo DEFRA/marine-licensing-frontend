@@ -3,7 +3,7 @@ import {
   multipleCoordinatesController,
   multipleCoordinatesSubmitController
 } from '#src/server/exemption/site-details/enter-multiple-coordinates/controller.js'
-import { COORDINATE_SYSTEMS } from '#src/server/common/constants/exemptions.js'
+import { COORDINATE_SYSTEMS } from '#src/server/common/constants/coordinate-systems.js'
 import * as cacheUtils from '#src/server/common/helpers/exemptions/session-cache/utils.js'
 import * as coordinateUtils from '#src/server/common/helpers/coordinate-utils.js'
 import { routes } from '#src/server/common/constants/routes.js'

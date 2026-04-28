@@ -11,6 +11,7 @@ import { getActivityDetailsByIndex } from '#src/server/common/helpers/marine-lic
 import { selectActivitySchema } from '#src/server/marine-licence/site-details/select-activity/schema.js'
 import { createFailAction } from '#src/server/common/helpers/createFailAction.js'
 import { selectActivityErrorMessages } from '#src/server/common/validation/select-activity/constants.js'
+import { validateSiteAndActivityParams } from '#src/server/common/helpers/marine-licence/session-cache/site-utils.js'
 
 export const SELECT_ACTIVITY_VIEW_ROUTE =
   'marine-licence/site-details/select-activity/index'
@@ -18,7 +19,7 @@ export const SELECT_ACTIVITY_VIEW_ROUTE =
 const getBackLink = (action, siteNumber, activityDetailsNumber) =>
   action
     ? `${marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS}#activity-details-site-${siteNumber}-activity-${activityDetailsNumber}`
-    : marineLicenceRoutes.MARINE_LICENCE_TYPE_OF_ACTIVITY
+    : `${marineLicenceRoutes.MARINE_LICENCE_TYPE_OF_ACTIVITY}?site=${siteNumber}&activity=${activityDetailsNumber}`
 
 const getSelectActivityPageParams = (
   request,
@@ -47,6 +48,9 @@ const getSelectActivityPageParams = (
 }
 
 export const selectActivityController = {
+  options: {
+    pre: [validateSiteAndActivityParams]
+  },
   handler(request, h) {
     const marineLicence = getMarineLicenceCache(request)
 
@@ -93,7 +97,7 @@ export const selectActivitySubmitController = {
 
         return createFailAction({
           viewRoute: SELECT_ACTIVITY_VIEW_ROUTE,
-          settings: getSelectActivityPageParams(
+          params: getSelectActivityPageParams(
             request,
             marineLicence,
             activityDetails

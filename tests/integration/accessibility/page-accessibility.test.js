@@ -213,7 +213,7 @@ describe('Page accessibility checks (Axe)', () => {
       title: 'Site details'
     },
     {
-      url: marineLicenceRoutes.MARINE_LICENCE_TYPE_OF_ACTIVITY,
+      url: `${marineLicenceRoutes.MARINE_LICENCE_TYPE_OF_ACTIVITY}?site=1&activity=1`,
       isMarineLicence: true,
       title: 'Type of activity'
     },
@@ -338,7 +338,7 @@ describe('Page accessibility checks (Axe)', () => {
   const dynamicPages = Object.entries(selectActivityVariants).map(
     ([key, page]) => ({
       isMarineLicence: true,
-      url: `/marine-licence/activity-details/${key}`,
+      url: `/marine-licence/activity-details/${key}?site=1&activity=1`,
       title: page.heading
     })
   )

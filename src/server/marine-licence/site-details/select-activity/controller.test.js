@@ -30,8 +30,8 @@ describe('#selectActivity', () => {
     const commonTestExpectedReturn = {
       viewRoute: SELECT_ACTIVITY_VIEW_ROUTE,
       payload: {},
-      settings: {
-        backLink: '/marine-licence/type-of-activity',
+      params: {
+        backLink: '/marine-licence/type-of-activity?site=1&activity=1',
         activityDetailsNumber: 1,
         siteNumber: 1,
         projectName: 'Test Project'
@@ -65,10 +65,12 @@ describe('#selectActivity', () => {
         errorMessages: {
           ACTIVITIES_OTHER_REASON_REQUIRED:
             'Enter details of the other structures',
+          ACTIVITIES_OTHER_REASON_MAX_LENGTH:
+            'Details of other structures must be 1000 characters or less',
           ACTIVITIES_REQUIRED: 'Select at least one type of structure'
         },
-        settings: {
-          ...commonTestExpectedReturn.settings,
+        params: {
+          ...commonTestExpectedReturn.params,
           activityOptions: expectedActivityOptions,
           heading: 'What are you constructing?',
           pageTitle: 'What are you constructing?'
@@ -113,10 +115,12 @@ describe('#selectActivity', () => {
           ACTIVITIES_REQUIRED:
             'Select at least one type of substance or object',
           ACTIVITIES_OTHER_REASON_REQUIRED:
-            'Enter details of the other deposits'
+            'Enter details of the other deposits',
+          ACTIVITIES_OTHER_REASON_MAX_LENGTH:
+            'Details of other deposits must be 1000 characters or less'
         },
-        settings: {
-          ...commonTestExpectedReturn.settings,
+        params: {
+          ...commonTestExpectedReturn.params,
           activityOptions: expectedActivityOptions,
           heading: 'What deposit activity are you continuing?',
           pageTitle: 'What deposit activity are you continuing?'
@@ -160,10 +164,12 @@ describe('#selectActivity', () => {
         errorMessages: {
           ACTIVITIES_REQUIRED: 'Select at least one substance or object',
           ACTIVITIES_OTHER_REASON_REQUIRED:
-            'Enter details of the other substances or objects'
+            'Enter details of the other substances or objects',
+          ACTIVITIES_OTHER_REASON_MAX_LENGTH:
+            'Details of the other substances or objects must be 1000 characters or less'
         },
-        settings: {
-          ...commonTestExpectedReturn.settings,
+        params: {
+          ...commonTestExpectedReturn.params,
           activityOptions: expectedActivityOptions,
           heading:
             'What are you removing for the first time on a one off basis?',

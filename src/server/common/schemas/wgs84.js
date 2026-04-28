@@ -2,7 +2,7 @@ import joi from 'joi'
 import {
   POLYGON_MIN_COORDINATE_POINTS,
   WGS84_CONSTANTS
-} from '#src/server/common/constants/exemptions.js'
+} from '#src/server/common/constants/coordinate-systems.js'
 import { JOI_ERRORS } from '#src/server/common/constants/joi.js'
 
 const {

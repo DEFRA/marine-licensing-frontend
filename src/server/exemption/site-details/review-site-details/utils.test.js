@@ -1,6 +1,6 @@
 import { beforeEach, vi } from 'vitest'
 import Boom from '@hapi/boom'
-import { COORDINATE_SYSTEMS } from '#src/server/common/constants/exemptions.js'
+import { COORDINATE_SYSTEMS } from '#src/server/common/constants/coordinate-systems.js'
 import { routes } from '#src/server/common/constants/routes.js'
 import {
   buildManualCoordinateSummaryData,

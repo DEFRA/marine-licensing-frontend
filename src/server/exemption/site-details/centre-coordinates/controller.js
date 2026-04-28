@@ -13,49 +13,19 @@ import {
   mapErrorsForDisplay
 } from '#src/server/common/helpers/errors.js'
 import { routes } from '#src/server/common/constants/routes.js'
-import { COORDINATE_SYSTEMS } from '#src/server/common/constants/exemptions.js'
-import { getPayload } from '#src/server/exemption/site-details/centre-coordinates/utils.js'
-import { validateCentreCoordinates } from '#src/server/exemption/site-details/centre-coordinates/validate.js'
+import { getPayload } from '#src/server/common/helpers/site-details/centre-coordinates.js'
+import { validateCentreCoordinates } from '#src/server/common/validation/centre-coordinates/validate.js'
+import {
+  centreCoordinatesSettings,
+  centreCoordinatesErrorMessages,
+  COORDINATE_SYSTEM_VIEW_ROUTES
+} from '#src/server/common/validation/centre-coordinates/constants.js'
 import { saveSiteDetailsToBackend } from '#src/server/common/helpers/exemptions/save-site-details.js'
 import { getCancelLink } from '#src/server/exemption/site-details/utils/cancel-link.js'
 
-export const COORDINATE_SYSTEM_VIEW_ROUTES = {
-  [COORDINATE_SYSTEMS.WGS84]: 'exemption/site-details/centre-coordinates/wgs84',
-  [COORDINATE_SYSTEMS.OSGB36]:
-    'exemption/site-details/centre-coordinates/osgb36'
-}
-
 const centreCoordinatesPageData = {
-  pageTitle: 'Enter the coordinates at the centre point of the site',
-  heading: 'Enter the coordinates at the centre point of the site',
+  ...centreCoordinatesSettings,
   backLink: routes.COORDINATE_SYSTEM_CHOICE
-}
-
-export const errorMessages = {
-  [COORDINATE_SYSTEMS.WGS84]: {
-    LATITUDE_REQUIRED: 'Enter the latitude',
-    LATITUDE_LENGTH: 'Latitude must be between -90 and 90',
-    LATITUDE_NON_NUMERIC: 'Latitude must be a number',
-    LATITUDE_DECIMAL_PLACES:
-      'Latitude must include 6 decimal places, like 55.019889',
-    LONGITUDE_REQUIRED: 'Enter the longitude',
-    LONGITUDE_LENGTH: 'Longitude must be between -180 and 180',
-    LONGITUDE_NON_NUMERIC: 'Longitude must be a number',
-    LONGITUDE_DECIMAL_PLACES:
-      'Longitude must include 6 decimal places, like -1.399500'
-  },
-  [COORDINATE_SYSTEMS.OSGB36]: {
-    EASTINGS_REQUIRED: 'Enter the eastings',
-    EASTINGS_NON_NUMERIC: 'Eastings must be a number',
-    EASTINGS_LENGTH: 'Eastings must be 6 digits',
-    EASTINGS_POSITIVE_NUMBER:
-      'Eastings must be a positive 6-digit number, like 123456',
-    NORTHINGS_REQUIRED: 'Enter the northings',
-    NORTHINGS_NON_NUMERIC: 'Northings must be a number',
-    NORTHINGS_LENGTH: 'Northings must be 6 or 7 digits',
-    NORTHINGS_POSITIVE_NUMBER:
-      'Northings must be a positive 6 or 7-digit number, like 123456'
-  }
 }
 
 const getBackLinkForAction = (action, siteNumber, queryParams, request) => {
@@ -141,7 +111,7 @@ export const centreCoordinatesSubmitFailHandler = (request, h, error) => {
   }
   const errorSummary = mapErrorsForDisplay(
     error.details,
-    errorMessages[coordinateSystem]
+    centreCoordinatesErrorMessages[coordinateSystem]
   )
 
   const errors = errorDescriptionByFieldName(errorSummary)

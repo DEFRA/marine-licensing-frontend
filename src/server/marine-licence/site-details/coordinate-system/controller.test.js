@@ -178,7 +178,7 @@ describe('#coordinateSystem (marine licence)', () => {
       await coordinateSystemSubmitController.handler(request, h)
 
       expect(h.redirect).toHaveBeenCalledWith(
-        marineLicenceRoutes.MARINE_LICENCE_COORDINATE_SYSTEM_CHOICE
+        marineLicenceRoutes.MARINE_LICENCE_CIRCLE_CENTRE_POINT
       )
     })
 

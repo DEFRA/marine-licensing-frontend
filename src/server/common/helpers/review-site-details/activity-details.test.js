@@ -1,4 +1,5 @@
 import {
+  formatActivityDuration,
   formatActivitySubTypeHeading,
   formatActivitySubTypeLabel,
   getOtherActivityLabel,
@@ -187,5 +188,41 @@ describe('parseActivityDetails', () => {
 
   test('returns empty array when activityDetails is missing', () => {
     expect(parseActivityDetails({})).toEqual([])
+  })
+})
+
+describe('formatActivityDuration', () => {
+  test('returns formatted activity details from site', () => {
+    expect(formatActivityDuration({ years: 1, months: 10 })).toEqual(
+      '1 year, 10 months'
+    )
+  })
+
+  test('correctly handles plurals', () => {
+    expect(formatActivityDuration({ years: 1, months: 1 })).toEqual(
+      '1 year, 1 month'
+    )
+
+    expect(formatActivityDuration({ years: 2, months: 2 })).toEqual(
+      '2 years, 2 months'
+    )
+  })
+
+  test('omits years when years is 0', () => {
+    expect(formatActivityDuration({ years: 0, months: 6 })).toEqual('6 months')
+
+    expect(formatActivityDuration({ years: 0, months: 1 })).toEqual('1 month')
+  })
+
+  test('omits months when months is 0', () => {
+    expect(formatActivityDuration({ years: 2, months: 0 })).toEqual('2 years')
+
+    expect(formatActivityDuration({ years: 1, months: 0 })).toEqual('1 year')
+  })
+
+  test('returns null when years or months is missing', () => {
+    expect(formatActivityDuration({ years: 2 })).toEqual(null)
+
+    expect(formatActivityDuration({ months: 6 })).toEqual(null)
   })
 })

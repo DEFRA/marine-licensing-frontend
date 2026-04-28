@@ -25,8 +25,8 @@ export const mockActivityDetails = {
   activitySubType: 'construction-type-1',
   activities: { selections: ['CON1'] },
   activityDescription: 'Test description',
-  activityDuration: 'Test duration',
   completionDate: { date: 'yes', reason: 'Test completion' },
+  activityDuration: { years: 1, months: 4 },
   activityMonths: 'Test months',
   workingHours: 'Test hours'
 }
@@ -39,7 +39,8 @@ export const mockOutputActivityDetails = {
 
 export const mockOutputEmptyActivityDetails = {
   ...mockEmptyActivityDetails,
-  completionDate: null
+  completionDate: null,
+  activityDuration: '1 year, 4 months'
 }
 
 export const mockMarineLicenceApplication = {

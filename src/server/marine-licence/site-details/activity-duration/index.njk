@@ -1,0 +1,96 @@
+{% extends 'layouts/page.njk' %}
+{% from "govuk/components/back-link/macro.njk" import govukBackLink %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/date-input/macro.njk" import govukDateInput %}
+{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+{% from "site-activity-heading/macro.njk" import appSiteActivityHeading %}
+
+{% block beforeContent %}
+{{ super() }}
+<nav>
+  {{ govukBackLink({
+    text: "Back",
+    href: backLink
+  }) }}
+</nav>
+{% endblock %}
+
+{% set headingWithCaption %}
+  {{ appSiteActivityHeading({
+    projectName: projectName,
+    siteNumber: siteNumber,
+    activityDetailsNumber: activityDetailsNumber,
+    heading: heading
+  }) }}
+{% endset %}
+
+{% set yearsError = errors['activity-duration-years'] %}
+{% set monthsError = errors['activity-duration-months'] %}
+{% set inlineDurationError = yearsError or monthsError %}
+{% if yearsError and monthsError %}
+  {% set inlineDurationError = {
+    html: yearsError.text + '<br>' + monthsError.text
+  } %}
+{% endif %}
+{% set highlightMultipleFields = inlineDurationError and inlineDurationError.highlightMultipleFields %}
+
+{% block content %}
+
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+
+      {% if errorSummary %}
+        {{ govukErrorSummary({
+          titleText: "There is a problem",
+          errorList: errorSummary
+        }) }}
+      {% endif %}
+
+      <form method="POST">
+
+        <input type="hidden" name="csrfToken" value="{{ csrfToken }}" />
+
+        {{ govukDateInput({
+          id: "activity-duration",
+          namePrefix: "activity-duration",
+          fieldset: {
+            legend: {
+              html: headingWithCaption,
+              classes: "govuk-fieldset__legend govuk-fieldset__legend--l govuk-!-margin-bottom-6"
+            }
+          },
+          hint: {
+            text: "Enter 0 in any box that does not apply. For example, 2 years 0 months, or 0 years 6 months"
+          },
+          errorMessage: inlineDurationError,
+          items: [
+            {
+              id: "activity-duration-years",
+              name: "years",
+              label:  "Years" ,
+              classes: "govuk-input--width-2" + (" govuk-input--error" if yearsError or highlightMultipleFields),
+              value: payload['activity-duration-years']
+            },
+            {
+              id: "activity-duration-months",
+              name: "months",
+              label: "Months" ,
+              classes: "govuk-input--width-2" + (" govuk-input--error" if monthsError or highlightMultipleFields),
+              value: payload['activity-duration-months']
+            }
+          ]
+        }) }}
+
+        <div class="govuk-button-group">
+          {{ govukButton({
+            text: "Save and continue",
+            classes: "govuk-button--primary"
+          }) }}
+        </div>
+
+      </form>
+
+    </div>
+  </div>
+
+{% endblock %}

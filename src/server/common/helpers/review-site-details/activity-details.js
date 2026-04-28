@@ -70,11 +70,34 @@ export const mapActivitySelections = (activities, activityType) =>
       : ACTIVITY_LABELS[selection]
   )
 
+export const formatActivityDuration = (activityDuration = {}) => {
+  const { years, months } = activityDuration
+
+  if (years == null || months == null) {
+    return null
+  }
+
+  const yearLabel = years > 1 ? 'years' : 'year'
+
+  if (months === 0) {
+    return `${years} ${yearLabel}`
+  }
+
+  const monthLabel = months > 1 ? 'months' : 'month'
+
+  if (years === 0) {
+    return `${months} ${monthLabel}`
+  }
+
+  return `${years} ${yearLabel}, ${months} ${monthLabel}`
+}
+
 export const parseActivityDetails = (siteDetails) => {
   const activityDetails = siteDetails.activityDetails ?? []
 
   return activityDetails.map((activity) => ({
     ...activity,
+    activityDuration: formatActivityDuration(activity.activityDuration),
     activitySubType: formatActivitySubTypeLabel(activity.activitySubType),
     activityHeading: formatActivitySubTypeHeading(activity.activitySubType),
     activityLink: `/marine-licence/activity-details/${getActivityVariantFromSubType(activity.activitySubType)}`,

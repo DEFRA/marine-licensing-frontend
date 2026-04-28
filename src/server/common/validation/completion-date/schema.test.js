@@ -20,7 +20,9 @@ describe('#completionDateSchema', () => {
   })
 
   test('should fail on invalid completionDate value', () => {
-    const { error } = completionDateSchema.validate({ completionDate: 'invalid' })
+    const { error } = completionDateSchema.validate({
+      completionDate: 'invalid'
+    })
     expect(error.message).toBe('COMPLETION_DATE_REQUIRED')
   })
 

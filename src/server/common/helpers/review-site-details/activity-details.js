@@ -73,8 +73,14 @@ export const mapActivitySelections = (activities, activityType) =>
 export const formatActivityDuration = (activityDuration = {}) => {
   const { years, months } = activityDuration
 
-  if (years == null || months == null || months === 0) {
+  if (years == null || months == null) {
     return null
+  }
+
+  const yearLabel = years > 1 ? 'years' : 'year'
+
+  if (months === 0) {
+    return `${years} ${yearLabel}`
   }
 
   const monthLabel = months > 1 ? 'months' : 'month'
@@ -82,8 +88,6 @@ export const formatActivityDuration = (activityDuration = {}) => {
   if (years === 0) {
     return `${months} ${monthLabel}`
   }
-
-  const yearLabel = years > 1 ? 'years' : 'year'
 
   return `${years} ${yearLabel}, ${months} ${monthLabel}`
 }

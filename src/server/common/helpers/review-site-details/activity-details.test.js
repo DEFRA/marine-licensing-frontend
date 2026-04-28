@@ -218,13 +218,15 @@ describe('formatActivityDuration', () => {
     expect(formatActivityDuration({ years: 0, months: 1 })).toEqual('1 month')
   })
 
-  test('returns null when months is missing or 0', () => {
-    expect(formatActivityDuration({ years: 2 })).toEqual(null)
+  test('omits months when months is 0', () => {
+    expect(formatActivityDuration({ years: 2, months: 0 })).toEqual('2 years')
 
-    expect(formatActivityDuration({ years: 2, months: 0 })).toEqual(null)
+    expect(formatActivityDuration({ years: 1, months: 0 })).toEqual('1 year')
   })
 
-  test('returns null when years is missing', () => {
+  test('returns null when years or months is missing', () => {
+    expect(formatActivityDuration({ years: 2 })).toEqual(null)
+
     expect(formatActivityDuration({ months: 6 })).toEqual(null)
   })
 })

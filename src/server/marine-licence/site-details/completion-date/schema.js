@@ -1,5 +1,5 @@
 import joi from 'joi'
-import { COMPLETION_DATE_REASON_MAX_LENGTH } from '#src/server/common/validation/completion-date/constants.js'
+import { COMPLETION_DATE_REASON_MAX_LENGTH } from '#src/server/marine-licence/site-details/completion-date/constants.js'
 
 export const completionDateSchema = joi.object({
   completionDate: joi.string().valid('yes', 'no').required().messages({

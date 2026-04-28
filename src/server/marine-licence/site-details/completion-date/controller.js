@@ -6,11 +6,11 @@ import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
 import { getActivityDetailsByIndex } from '#src/server/common/helpers/marine-licence/session-cache/site-details-utils.js'
 import { getSiteDataFromParam } from '#src/server/common/helpers/site-details/site-name.js'
 import { createFailAction } from '#src/server/common/helpers/createFailAction.js'
-import { completionDateSchema } from '#src/server/common/validation/completion-date/schema.js'
+import { completionDateSchema } from '#src/server/marine-licence/site-details/completion-date/schema.js'
 import {
   completionDateSettings,
   completionDateErrorMessages
-} from '#src/server/common/validation/completion-date/constants.js'
+} from '#src/server/marine-licence/site-details/completion-date/constants.js'
 import { saveSiteDetailsToBackend } from '#src/server/common/helpers/marine-licence/save-site-details.js'
 import { validateSiteAndActivityParams } from '#src/server/common/helpers/marine-licence/session-cache/site-utils.js'
 

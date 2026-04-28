@@ -1,4 +1,4 @@
-import { completionDateSchema } from '#src/server/common/validation/completion-date/schema.js'
+import { completionDateSchema } from '#src/server/marine-licence/site-details/completion-date/schema.js'
 
 describe('#completionDateSchema', () => {
   test('should validate when completionDate is no', () => {

@@ -2,6 +2,7 @@ import { vi } from 'vitest'
 
 vi.mock('#src/server/journey/self-service/services/journey-data.js')
 vi.mock('#src/server/journey/self-service/services/session-answers.js')
+vi.mock('#src/server/journey/self-service/services/data-quality.js')
 
 import { questionController } from '#src/server/journey/self-service/question/controller.js'
 import {
@@ -12,6 +13,7 @@ import {
   getBackLink,
   getAnswerForRoute
 } from '#src/server/journey/self-service/services/session-answers.js'
+import { reportRuntimeIssue } from '#src/server/journey/self-service/services/data-quality.js'
 
 describe('#questionController', () => {
   const mockQuestion = {
@@ -34,7 +36,10 @@ describe('#questionController', () => {
   })
 
   test('calls h.view with the correct template and view model', () => {
-    const request = { params: { questionPath: 'sea' } }
+    const request = {
+      params: { questionPath: 'sea' },
+      logger: { warn: vi.fn() }
+    }
     const h = { view: vi.fn() }
 
     questionController.handler(request, h)
@@ -54,7 +59,10 @@ describe('#questionController', () => {
 
   test('throws Boom.notFound when question is not found', () => {
     vi.mocked(getQuestion).mockReturnValue(null)
-    const request = { params: { questionPath: 'nonexistent' } }
+    const request = {
+      params: { questionPath: 'nonexistent' },
+      logger: { warn: vi.fn() }
+    }
     const h = { view: vi.fn() }
 
     expect(() => questionController.handler(request, h)).toThrow(
@@ -71,7 +79,10 @@ describe('#questionController', () => {
       section: undefined
     })
     vi.mocked(getSection).mockReturnValue(null)
-    const request = { params: { questionPath: 'sea' } }
+    const request = {
+      params: { questionPath: 'sea' },
+      logger: { warn: vi.fn() }
+    }
     const h = { view: vi.fn() }
 
     questionController.handler(request, h)
@@ -84,7 +95,10 @@ describe('#questionController', () => {
 
   test('passes selectedAnswer when a previous answer exists', () => {
     vi.mocked(getAnswerForRoute).mockReturnValue('inSea')
-    const request = { params: { questionPath: 'sea' } }
+    const request = {
+      params: { questionPath: 'sea' },
+      logger: { warn: vi.fn() }
+    }
     const h = { view: vi.fn() }
 
     questionController.handler(request, h)
@@ -92,6 +106,25 @@ describe('#questionController', () => {
     expect(h.view).toHaveBeenCalledWith(
       'journey/self-service/question/index',
       expect.objectContaining({ selectedAnswer: 'inSea' })
+    )
+  })
+
+  test('logs unknown-question-route on 404', () => {
+    vi.mocked(getQuestion).mockReturnValue(null)
+    const request = {
+      params: { questionPath: 'nope/route' },
+      logger: { warn: vi.fn() }
+    }
+    const h = { view: vi.fn() }
+
+    expect(() => questionController.handler(request, h)).toThrow()
+
+    expect(reportRuntimeIssue).toHaveBeenCalledWith(
+      request,
+      'unknown-question-route',
+      '/nope/route',
+      expect.any(String),
+      expect.any(String)
     )
   })
 })

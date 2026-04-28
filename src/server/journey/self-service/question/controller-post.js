@@ -10,6 +10,7 @@ import {
   getBackLink
 } from '#src/server/journey/self-service/services/session-answers.js'
 import { statusCodes } from '#src/server/common/constants/status-codes.js'
+import { reportRuntimeIssue } from '#src/server/journey/self-service/services/data-quality.js'
 
 const VIEW_PATH = 'journey/self-service/question/index'
 
@@ -19,6 +20,13 @@ export const questionPostController = {
     const question = getQuestion(questionRoute)
 
     if (!question) {
+      reportRuntimeIssue(
+        request,
+        'unknown-question-route',
+        questionRoute,
+        `POST ${questionRoute} hit but no question with that route exists in self-service.json`,
+        `unknown question route ${questionRoute}`
+      )
       throw Boom.notFound('Question not found')
     }
 
@@ -40,7 +48,19 @@ export const questionPostController = {
 
     pushAnswer(request, questionRoute, selectedAnswerId)
 
-    const next = calculateNextRoute(question, selectedAnswerId)
+    let next
+    try {
+      next = calculateNextRoute(question, selectedAnswerId)
+    } catch (err) {
+      reportRuntimeIssue(
+        request,
+        'answer-no-route',
+        `${questionRoute}#${selectedAnswerId}`,
+        `Add nextQuestionRoute or outcomeRoute to answer '${selectedAnswerId}' on question ${questionRoute} in self-service.json`,
+        err.message
+      )
+      throw err
+    }
     const target = next.route.replace(/^\//, '')
     const prefix = next.type === 'outcome' ? 'outcome/' : ''
 

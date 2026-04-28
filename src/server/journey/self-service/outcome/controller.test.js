@@ -2,6 +2,7 @@ import { vi } from 'vitest'
 
 vi.mock('#src/server/journey/self-service/services/journey-data.js')
 vi.mock('#src/server/journey/self-service/services/session-answers.js')
+vi.mock('#src/server/journey/self-service/services/data-quality.js')
 
 import {
   outcomeController,
@@ -18,6 +19,7 @@ import {
   getBackLink,
   pushOutcomeSelection
 } from '#src/server/journey/self-service/services/session-answers.js'
+import { reportRuntimeIssue } from '#src/server/journey/self-service/services/data-quality.js'
 
 const mockOutcome = {
   route: '/construction/journey-select',
@@ -73,7 +75,10 @@ describe('#outcomeController', () => {
   })
 
   test('renders the intermediate outcome view model', () => {
-    const request = { params: { outcomePath: 'construction/journey-select' } }
+    const request = {
+      params: { outcomePath: 'construction/journey-select' },
+      logger: { warn: vi.fn() }
+    }
     const h = { view: vi.fn() }
 
     outcomeController.handler(request, h)
@@ -118,7 +123,10 @@ describe('#outcomeController', () => {
 
   test('throws Boom.notFound for an unknown outcome route', () => {
     vi.mocked(getOutcome).mockReturnValue(null)
-    const request = { params: { outcomePath: 'nope' } }
+    const request = {
+      params: { outcomePath: 'nope' },
+      logger: { warn: vi.fn() }
+    }
     const h = { view: vi.fn() }
 
     expect(() => outcomeController.handler(request, h)).toThrow(
@@ -131,7 +139,10 @@ describe('#outcomeController', () => {
 
   test('throws Boom.notFound for a terminal outcome', () => {
     vi.mocked(isIntermediateOutcome).mockReturnValue(false)
-    const request = { params: { outcomePath: 'licence-not-required' } }
+    const request = {
+      params: { outcomePath: 'licence-not-required' },
+      logger: { warn: vi.fn() }
+    }
     const h = { view: vi.fn() }
 
     expect(() => outcomeController.handler(request, h)).toThrow(
@@ -148,7 +159,10 @@ describe('#outcomeController', () => {
       section: undefined
     })
     vi.mocked(getSection).mockReturnValue(null)
-    const request = { params: { outcomePath: 'construction/journey-select' } }
+    const request = {
+      params: { outcomePath: 'construction/journey-select' },
+      logger: { warn: vi.fn() }
+    }
     const h = { view: vi.fn() }
 
     outcomeController.handler(request, h)
@@ -156,6 +170,25 @@ describe('#outcomeController', () => {
     expect(h.view).toHaveBeenCalledWith(
       'journey/self-service/outcome/index',
       expect.objectContaining({ section: null })
+    )
+  })
+
+  test('logs unknown-outcome-route on 404', () => {
+    vi.mocked(getOutcome).mockReturnValue(null)
+    const request = {
+      params: { outcomePath: 'nope' },
+      logger: { warn: vi.fn() }
+    }
+    const h = { view: vi.fn() }
+
+    expect(() => outcomeController.handler(request, h)).toThrow()
+
+    expect(reportRuntimeIssue).toHaveBeenCalledWith(
+      request,
+      'unknown-outcome-route',
+      '/nope',
+      expect.any(String),
+      expect.any(String)
     )
   })
 })
@@ -176,7 +209,8 @@ describe('#outcomePostController', () => {
   test('redirects to next question and records the outcome selection', () => {
     const request = {
       params: { outcomePath: 'construction/journey-select' },
-      payload: { outcomeType: 'WO_CON_SELF_SERVICE_JOURNEY' }
+      payload: { outcomeType: 'WO_CON_SELF_SERVICE_JOURNEY' },
+      logger: { warn: vi.fn() }
     }
     const h = { redirect: vi.fn() }
 
@@ -196,7 +230,8 @@ describe('#outcomePostController', () => {
     vi.mocked(getOutcome).mockReturnValue(null)
     const request = {
       params: { outcomePath: 'nope' },
-      payload: { outcomeType: 'WO_CON_SELF_SERVICE_JOURNEY' }
+      payload: { outcomeType: 'WO_CON_SELF_SERVICE_JOURNEY' },
+      logger: { warn: vi.fn() }
     }
     const h = { redirect: vi.fn() }
 
@@ -212,7 +247,8 @@ describe('#outcomePostController', () => {
     vi.mocked(isIntermediateOutcome).mockReturnValue(false)
     const request = {
       params: { outcomePath: 'licence-not-required' },
-      payload: { outcomeType: 'WO_STANDARD_MLA' }
+      payload: { outcomeType: 'WO_STANDARD_MLA' },
+      logger: { warn: vi.fn() }
     }
     const h = { redirect: vi.fn() }
 
@@ -227,7 +263,8 @@ describe('#outcomePostController', () => {
   test('throws Boom.badRequest when outcomeType is not in this outcome list', () => {
     const request = {
       params: { outcomePath: 'construction/journey-select' },
-      payload: { outcomeType: 'WO_UNRELATED_OUTCOME_TYPE' }
+      payload: { outcomeType: 'WO_UNRELATED_OUTCOME_TYPE' },
+      logger: { warn: vi.fn() }
     }
     vi.mocked(getOutcomeType).mockReturnValue({
       id: 'WO_UNRELATED_OUTCOME_TYPE',
@@ -246,7 +283,8 @@ describe('#outcomePostController', () => {
   test('throws Boom.badRequest when outcomeType is terminal (no nextQuestionRoute)', () => {
     const request = {
       params: { outcomePath: 'construction/journey-select' },
-      payload: { outcomeType: 'WO_STANDARD_MLA' }
+      payload: { outcomeType: 'WO_STANDARD_MLA' },
+      logger: { warn: vi.fn() }
     }
     const h = {}
 
@@ -261,7 +299,8 @@ describe('#outcomePostController', () => {
   test('throws Boom.badRequest when outcomeType payload is missing', () => {
     const request = {
       params: { outcomePath: 'construction/journey-select' },
-      payload: {}
+      payload: {},
+      logger: { warn: vi.fn() }
     }
     const h = {}
 
@@ -277,7 +316,8 @@ describe('#outcomePostController', () => {
     vi.mocked(getOutcomeType).mockReturnValue(null)
     const request = {
       params: { outcomePath: 'construction/journey-select' },
-      payload: { outcomeType: 'NOT_A_REAL_ID' }
+      payload: { outcomeType: 'NOT_A_REAL_ID' },
+      logger: { warn: vi.fn() }
     }
     const h = {}
 
@@ -286,6 +326,25 @@ describe('#outcomePostController', () => {
         isBoom: true,
         output: expect.objectContaining({ statusCode: 400 })
       })
+    )
+  })
+
+  test('logs invalid-outcome-selection when outcomeType is rejected', () => {
+    const request = {
+      params: { outcomePath: 'construction/journey-select' },
+      payload: { outcomeType: 'WO_STANDARD_MLA' },
+      logger: { warn: vi.fn() }
+    }
+    const h = {}
+
+    expect(() => outcomePostController.handler(request, h)).toThrow()
+
+    expect(reportRuntimeIssue).toHaveBeenCalledWith(
+      request,
+      'invalid-outcome-selection',
+      '/construction/journey-select',
+      expect.any(String),
+      expect.any(String)
     )
   })
 })

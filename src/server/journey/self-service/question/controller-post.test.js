@@ -4,6 +4,7 @@ import { statusCodes } from '#src/server/common/constants/status-codes.js'
 vi.mock('#src/server/journey/self-service/services/journey-data.js')
 vi.mock('#src/server/journey/self-service/services/journey-router.js')
 vi.mock('#src/server/journey/self-service/services/session-answers.js')
+vi.mock('#src/server/journey/self-service/services/data-quality.js')
 
 import { questionPostController } from '#src/server/journey/self-service/question/controller-post.js'
 import {
@@ -15,6 +16,7 @@ import {
   pushAnswer,
   getBackLink
 } from '#src/server/journey/self-service/services/session-answers.js'
+import { reportRuntimeIssue } from '#src/server/journey/self-service/services/data-quality.js'
 
 describe('#questionPostController', () => {
   const mockQuestion = {
@@ -56,7 +58,8 @@ describe('#questionPostController', () => {
 
     const request = {
       params: { questionPath: 'sea' },
-      payload: { answer: 'inSea' }
+      payload: { answer: 'inSea' },
+      logger: { warn: vi.fn() }
     }
     const h = { redirect: vi.fn() }
 
@@ -76,7 +79,8 @@ describe('#questionPostController', () => {
 
     const request = {
       params: { questionPath: 'sea' },
-      payload: { answer: 'construction' }
+      payload: { answer: 'construction' },
+      logger: { warn: vi.fn() }
     }
     const h = { redirect: vi.fn() }
 
@@ -90,7 +94,8 @@ describe('#questionPostController', () => {
   test('returns 400 with error when no answer is selected', () => {
     const request = {
       params: { questionPath: 'sea' },
-      payload: {}
+      payload: {},
+      logger: { warn: vi.fn() }
     }
     const codeStub = vi.fn()
     const h = { view: vi.fn().mockReturnValue({ code: codeStub }) }
@@ -111,7 +116,8 @@ describe('#questionPostController', () => {
   test('returns 400 with error when payload is null', () => {
     const request = {
       params: { questionPath: 'sea' },
-      payload: null
+      payload: null,
+      logger: { warn: vi.fn() }
     }
     const codeStub = vi.fn()
     const h = { view: vi.fn().mockReturnValue({ code: codeStub }) }
@@ -125,7 +131,8 @@ describe('#questionPostController', () => {
     vi.mocked(getQuestion).mockReturnValue(null)
     const request = {
       params: { questionPath: 'nonexistent' },
-      payload: { answer: 'anything' }
+      payload: { answer: 'anything' },
+      logger: { warn: vi.fn() }
     }
     const h = { view: vi.fn() }
 
@@ -134,6 +141,30 @@ describe('#questionPostController', () => {
         isBoom: true,
         output: expect.objectContaining({ statusCode: 404 })
       })
+    )
+  })
+
+  test('logs answer-no-route when calculateNextRoute throws "no route"', () => {
+    vi.mocked(calculateNextRoute).mockImplementation(() => {
+      throw new Error(
+        "Answer 'broken' on question '/sea' has no nextQuestionRoute or outcomeRoute"
+      )
+    })
+    const request = {
+      params: { questionPath: 'sea' },
+      payload: { answer: 'broken' },
+      logger: { warn: vi.fn() }
+    }
+    const h = { redirect: vi.fn(), view: vi.fn() }
+
+    expect(() => questionPostController.handler(request, h)).toThrow()
+
+    expect(reportRuntimeIssue).toHaveBeenCalledWith(
+      request,
+      'answer-no-route',
+      '/sea#broken',
+      expect.any(String),
+      expect.any(String)
     )
   })
 })

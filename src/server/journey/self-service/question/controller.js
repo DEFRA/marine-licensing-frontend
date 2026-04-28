@@ -7,6 +7,7 @@ import {
   getBackLink,
   getAnswerForRoute
 } from '#src/server/journey/self-service/services/session-answers.js'
+import { reportRuntimeIssue } from '#src/server/journey/self-service/services/data-quality.js'
 
 const VIEW_PATH = 'journey/self-service/question/index'
 
@@ -16,6 +17,13 @@ export const questionController = {
     const question = getQuestion(questionRoute)
 
     if (!question) {
+      reportRuntimeIssue(
+        request,
+        'unknown-question-route',
+        questionRoute,
+        `GET ${questionRoute} hit but no question with that route exists in self-service.json`,
+        `unknown question route ${questionRoute}`
+      )
       throw Boom.notFound('Question not found')
     }
 

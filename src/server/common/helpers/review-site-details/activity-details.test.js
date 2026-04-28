@@ -156,7 +156,7 @@ describe('parseActivityDetails', () => {
     expect(parseActivityDetails(siteDetails)).toEqual([
       {
         activityDescription: 'Test description',
-        activityDuration: 'Test duration',
+        activityDuration: '1 year, 4 months',
         activityHeading: "What you're constructing",
         activityLink:
           '/marine-licence/activity-details/what-are-you-constructing',

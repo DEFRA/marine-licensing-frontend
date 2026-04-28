@@ -2,6 +2,7 @@ import {
   formatActivityDuration,
   formatActivitySubTypeHeading,
   formatActivitySubTypeLabel,
+  formatCompletionDate,
   getOtherActivityLabel,
   mapActivitySelections,
   parseActivityDetails
@@ -224,5 +225,23 @@ describe('formatActivityDuration', () => {
     expect(formatActivityDuration({ years: 2 })).toEqual(null)
 
     expect(formatActivityDuration({ months: 6 })).toEqual(null)
+  })
+})
+
+describe('formatCompletionDate', () => {
+  test('returns correct format of text for "no" option', () => {
+    expect(formatCompletionDate({ date: 'no' })).toEqual(
+      'Not needed to be completed by a certain date'
+    )
+  })
+
+  test('returns correct format of text for "yes" option', () => {
+    expect(
+      formatCompletionDate({ date: 'yes', reason: 'Test reason' })
+    ).toEqual('Test reason')
+  })
+
+  test('returns null for missing data', () => {
+    expect(formatCompletionDate({})).toEqual(null)
   })
 })

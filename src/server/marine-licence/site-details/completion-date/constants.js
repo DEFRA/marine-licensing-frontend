@@ -1,8 +1,9 @@
+const completionDateHeading =
+  'Does any part of the activity need to be completed by a certain date?'
+
 export const completionDateSettings = {
-  pageTitle:
-    'Does any part of the activity need to be completed by a certain date?',
-  heading:
-    'Does any part of the activity need to be completed by a certain date?'
+  pageTitle: completionDateHeading,
+  heading: completionDateHeading
 }
 
 export const COMPLETION_DATE_REASON_MAX_LENGTH = 1000

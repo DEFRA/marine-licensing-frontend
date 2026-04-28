@@ -1,14 +1,14 @@
 import { completionDateSchema } from '#src/server/marine-licence/site-details/completion-date/schema.js'
 
 describe('#completionDateSchema', () => {
-  test('should validate when completionDate is no', () => {
-    const { error } = completionDateSchema.validate({ completionDate: 'no' })
+  test('should validate when date is no', () => {
+    const { error } = completionDateSchema.validate({ date: 'no' })
     expect(error).toBeUndefined()
   })
 
-  test('should validate when completionDate is yes with a reason', () => {
+  test('should validate when date is yes with a reason', () => {
     const { error } = completionDateSchema.validate({
-      completionDate: 'yes',
+      date: 'yes',
       reason: 'Some reason'
     })
     expect(error).toBeUndefined()
@@ -19,16 +19,16 @@ describe('#completionDateSchema', () => {
     expect(error.message).toBe('COMPLETION_DATE_REQUIRED')
   })
 
-  test('should fail on invalid completionDate value', () => {
+  test('should fail on invalid date value', () => {
     const { error } = completionDateSchema.validate({
-      completionDate: 'invalid'
+      date: 'invalid'
     })
     expect(error.message).toBe('COMPLETION_DATE_REQUIRED')
   })
 
-  test('should fail when completionDate is yes but reason is empty', () => {
+  test('should fail when date is yes but reason is empty', () => {
     const { error } = completionDateSchema.validate({
-      completionDate: 'yes',
+      date: 'yes',
       reason: ''
     })
     expect(error.message).toBe('COMPLETION_DATE_REASON_REQUIRED')
@@ -36,7 +36,7 @@ describe('#completionDateSchema', () => {
 
   test('should fail when reason exceeds 1000 characters', () => {
     const { error } = completionDateSchema.validate({
-      completionDate: 'yes',
+      date: 'yes',
       reason: 'x'.repeat(1001)
     })
     expect(error.message).toBe('COMPLETION_DATE_REASON_MAX_LENGTH')

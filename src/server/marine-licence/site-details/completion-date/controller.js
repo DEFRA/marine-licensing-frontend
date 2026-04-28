@@ -82,7 +82,7 @@ export const completionDateSubmitController = {
       siteNumber
     } = getSiteDataFromParam(request.query)
 
-    const hasCompletionDate = payload.completionDate === 'yes'
+    const hasCompletionDate = payload.date === 'yes'
 
     await updateMarineLicenceSiteActivityDetails(
       request,
@@ -91,7 +91,7 @@ export const completionDateSubmitController = {
       activityDetailsIndex,
       {
         completionDate: {
-          completionDate: payload.completionDate,
+          date: payload.date,
           ...(hasCompletionDate && { reason: payload.reason })
         }
       }

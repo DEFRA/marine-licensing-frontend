@@ -89,7 +89,7 @@ describe('Completion date (marine licence)', () => {
   test('completion date form state when yes with reason pre-populated', async () => {
     mockMarineLicence(
       marineLicenceWithCompletionDate({
-        completionDate: 'yes',
+        date: 'yes',
         reason: 'Test reason'
       })
     )
@@ -138,7 +138,7 @@ describe('Completion date (marine licence)', () => {
     const { document } = await submitForm({
       requestUrl: pageUrl,
       server: getServer(),
-      formData: { completionDate: 'yes', reason: '' }
+      formData: { date: 'yes', reason: '' }
     })
 
     expectFieldsetError({
@@ -156,7 +156,7 @@ describe('Completion date (marine licence)', () => {
     const response = await makePostRequest({
       url: pageUrl,
       server: getServer(),
-      formData: { completionDate: 'no' }
+      formData: { date: 'no' }
     })
 
     expect(response.statusCode).toBe(statusCodes.redirect)

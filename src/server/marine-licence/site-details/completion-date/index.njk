@@ -52,16 +52,16 @@
       <form method="POST">
         <input type="hidden" name="csrfToken" value="{{ csrfToken }}"/>
         {{ govukRadios({
-          idPrefix: "completionDate",
-          name: "completionDate",
-          value: payload.completionDate,
+          idPrefix: "date",
+          name: "date",
+          value: payload.date,
           fieldset: {
             legend: {
               html: headingWithCaption,
               classes: "govuk-fieldset__legend govuk-fieldset__legend--l govuk-!-margin-bottom-6"
             }
           },
-          errorMessage: errors['completionDate'],
+          errorMessage: errors['date'],
           items: [
             {
               value: "yes",

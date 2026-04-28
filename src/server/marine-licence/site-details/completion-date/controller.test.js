@@ -31,7 +31,7 @@ describe('#completionDateSubmitController', () => {
     const h = createMockH()
     const request = createMockRequest({
       query: { site: '1', activity: '1' },
-      payload: { completionDate: 'no' }
+      payload: { date: 'no' }
     })
 
     await completionDateSubmitController.handler(request, h)
@@ -41,7 +41,7 @@ describe('#completionDateSubmitController', () => {
       h,
       0,
       0,
-      { completionDate: { completionDate: 'no' } }
+      { completionDate: { date: 'no' } }
     )
 
     expect(h.redirect).toHaveBeenCalledWith(
@@ -53,7 +53,7 @@ describe('#completionDateSubmitController', () => {
     const h = createMockH()
     const request = createMockRequest({
       query: { site: '1', activity: '1' },
-      payload: { completionDate: 'yes', reason: 'Test reason' }
+      payload: { date: 'yes', reason: 'Test reason' }
     })
 
     await completionDateSubmitController.handler(request, h)
@@ -63,20 +63,20 @@ describe('#completionDateSubmitController', () => {
       h,
       0,
       0,
-      { completionDate: { completionDate: 'yes', reason: 'Test reason' } }
+      { completionDate: { date: 'yes', reason: 'Test reason' } }
     )
   })
 
   test('failAction renders view with errors', () => {
     const request = createMockRequest({
       query: { site: '1', activity: '1' },
-      payload: { completionDate: '' }
+      payload: { date: '' }
     })
     const h = { view: vi.fn().mockReturnThis(), takeover: vi.fn() }
     const err = {
       details: [
         {
-          path: ['completionDate'],
+          path: ['date'],
           message:
             'Select whether any part of the project needs to be completed by a certain date',
           type: 'any.required'
@@ -90,7 +90,7 @@ describe('#completionDateSubmitController', () => {
       MARINE_LICENCE_COMPLETION_DATE_VIEW_ROUTE,
       expect.objectContaining({
         errors: expect.objectContaining({
-          completionDate: expect.objectContaining({
+          date: expect.objectContaining({
             text: 'Select whether any part of the project needs to be completed by a certain date'
           })
         })

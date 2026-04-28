@@ -10,20 +10,36 @@ export const mockMarineLicenceTaskList = {
   publicRegister: 'COMPLETED'
 }
 
-const mockActivityDetails = {
+export const mockEmptyActivityDetails = {
+  activityType: '',
+  activitySubType: '',
+  activities: {},
+  activityDescription: '',
+  activityDuration: '',
+  completionDate: {},
+  activityMonths: '',
+  workingHours: ''
+}
+export const mockActivityDetails = {
   activityType: 'construction',
   activitySubType: 'construction-type-1',
   activities: { selections: ['CON1'] },
   activityDescription: 'Test description',
   activityDuration: 'Test duration',
-  completionDate: 'Test completion',
+  completionDate: { date: 'yes', reason: 'Test completion' },
   activityMonths: 'Test months',
   workingHours: 'Test hours'
 }
 
 export const mockOutputActivityDetails = {
   ...mockActivityDetails,
-  activityType: 'Construction of new works'
+  activityType: 'Construction of new works',
+  completionDate: mockActivityDetails.completionDate.reason
+}
+
+export const mockOutputEmptyActivityDetails = {
+  ...mockEmptyActivityDetails,
+  completionDate: null
 }
 
 export const mockMarineLicenceApplication = {

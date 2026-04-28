@@ -5,6 +5,7 @@ import {
   mapActivitySelections,
   parseActivityDetails
 } from '#src/server/common/helpers/review-site-details/activity-details.js'
+import { mockActivityDetails } from '#src/server/test-helpers/mocks/marine-licence-mocks.js'
 
 describe('formatActivitySubTypeLabel', () => {
   test('returns label for construction-type-1', () => {
@@ -148,25 +149,22 @@ describe('mapActivitySelections', () => {
 describe('parseActivityDetails', () => {
   test('returns formatted activity details from site', () => {
     const siteDetails = {
-      activityDetails: [
-        {
-          activitySubType: 'construction-type-1',
-          activityType: 'construction',
-          activities: { selections: ['CON1'] },
-          someField: 'value'
-        }
-      ]
+      activityDetails: [mockActivityDetails]
     }
 
     expect(parseActivityDetails(siteDetails)).toEqual([
       {
+        activityDescription: 'Test description',
+        activityDuration: 'Test duration',
         activityHeading: "What you're constructing",
         activityLink:
           '/marine-licence/activity-details/what-are-you-constructing',
         activitySubType: 'Construction of new works',
         activityType: 'construction',
         activities: ['Aquaculture trestles or fixed walkways'],
-        someField: 'value'
+        activityMonths: 'Test months',
+        completionDate: 'Test completion',
+        workingHours: 'Test hours'
       }
     ])
   })

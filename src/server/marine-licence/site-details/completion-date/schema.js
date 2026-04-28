@@ -2,12 +2,12 @@ import joi from 'joi'
 import { COMPLETION_DATE_REASON_MAX_LENGTH } from '#src/server/marine-licence/site-details/completion-date/constants.js'
 
 export const completionDateSchema = joi.object({
-  completionDate: joi.string().valid('yes', 'no').required().messages({
+  date: joi.string().valid('yes', 'no').required().messages({
     'any.only': 'COMPLETION_DATE_REQUIRED',
     'string.empty': 'COMPLETION_DATE_REQUIRED',
     'any.required': 'COMPLETION_DATE_REQUIRED'
   }),
-  reason: joi.when('completionDate', {
+  reason: joi.when('date', {
     is: 'yes',
     then: joi
       .string()

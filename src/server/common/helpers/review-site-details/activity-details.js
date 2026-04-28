@@ -77,15 +77,15 @@ export const formatActivityDuration = (activityDuration = {}) => {
     return null
   }
 
-  const pluralMonths = months > 1 ? 'months' : 'month'
+  const monthLabel = months > 1 ? 'months' : 'month'
 
   if (years === 0) {
-    return `${months} ${pluralMonths}`
+    return `${months} ${monthLabel}`
   }
 
-  const pluralYears = years > 1 ? 'years' : 'year'
+  const yearLabel = years > 1 ? 'years' : 'year'
 
-  return `${years} ${pluralYears}, ${months} ${pluralMonths}`
+  return `${years} ${yearLabel}, ${months} ${monthLabel}`
 }
 
 export const parseActivityDetails = (siteDetails) => {

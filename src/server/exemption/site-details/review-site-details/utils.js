@@ -1,6 +1,6 @@
 import Boom from '@hapi/boom'
 import { config } from '#src/config/config.js'
-import { COORDINATE_SYSTEMS } from '#src/server/common/constants/exemptions.js'
+import { COORDINATE_SYSTEMS } from '#src/server/common/constants/coordinate-systems.js'
 import { routes } from '#src/server/common/constants/routes.js'
 import { createSiteDetailsDataJson } from '#src/server/common/helpers/site-details.js'
 import { formatDate } from '#src/server/common/helpers/dates/date-utils.js'

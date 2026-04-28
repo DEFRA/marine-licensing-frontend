@@ -22,7 +22,10 @@ export const journeySelfServiceQuestion = {
             validate: {
               payload: Joi.object({
                 answer: Joi.string(),
-                answers: Joi.array().items(Joi.string().min(1)).single()
+                answers: Joi.array()
+                  .items(Joi.string().min(1).max(100))
+                  .max(20)
+                  .single()
               }).oxor('answer', 'answers')
             }
           },

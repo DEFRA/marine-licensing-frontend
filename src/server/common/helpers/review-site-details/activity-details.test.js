@@ -1,5 +1,6 @@
 import {
   formatActivityDuration,
+  formatActivityMonths,
   formatActivitySubTypeHeading,
   formatActivitySubTypeLabel,
   getOtherActivityLabel,
@@ -228,5 +229,39 @@ describe('formatActivityDuration', () => {
     expect(formatActivityDuration({ years: 2 })).toEqual(null)
 
     expect(formatActivityDuration({ months: 6 })).toEqual(null)
+  })
+})
+
+describe('formatActivityMonths', () => {
+  test('returns "No" for "no" option', () => {
+    expect(formatActivityMonths({ months: 'no' })).toEqual('No')
+  })
+
+  test('returns details text for "yes" option', () => {
+    expect(
+      formatActivityMonths({ months: 'yes', details: 'January to March' })
+    ).toEqual('January to March')
+  })
+
+  test('returns null for missing data', () => {
+    expect(formatActivityMonths({})).toEqual(null)
+  })
+})
+
+describe('formatCompletionDate', () => {
+  test('returns correct format of text for "no" option', () => {
+    expect(formatCompletionDate({ date: 'no' })).toEqual(
+      'Not needed to be completed by a certain date'
+    )
+  })
+
+  test('returns correct format of text for "yes" option', () => {
+    expect(
+      formatCompletionDate({ date: 'yes', reason: 'Test reason' })
+    ).toEqual('Test reason')
+  })
+
+  test('returns null for missing data', () => {
+    expect(formatCompletionDate({})).toEqual(null)
   })
 })

@@ -17,6 +17,7 @@ describe('Type of activity (marine licence)', () => {
   const getServer = setupTestServer()
 
   const variantUsedForTesting = 'what-are-you-constructing'
+  const maxLengthOtherActivity = 'a'.repeat(1001)
 
   test('page elements', async () => {
     mockMarineLicence(mockMarineLicenceApplication)
@@ -161,6 +162,71 @@ describe('Type of activity (marine licence)', () => {
       document,
       fieldsetLabel: 'What are you constructing?',
       errorMessage: 'Enter details of the other structures',
+      findByHeading: true,
+      useErrorClass: true
+    })
+  })
+
+  test('show error when other structures exceeds 1000 characters', async () => {
+    mockMarineLicence(mockMarineLicenceApplication)
+
+    const { document } = await submitForm({
+      requestUrl: `/marine-licence/activity-details/${variantUsedForTesting}?site=1&activity=1`,
+      server: getServer(),
+      formData: { activities: 'other', otherActivity: maxLengthOtherActivity }
+    })
+
+    expectFieldsetError({
+      document,
+      fieldsetLabel: 'What are you constructing?',
+      errorMessage:
+        'Details of other structures must be 1000 characters or less',
+      findByHeading: true,
+      useErrorClass: true
+    })
+  })
+
+  test('show error when other deposits exceeds 1000 characters', async () => {
+    const depositApplication = structuredClone(mockMarineLicenceApplication)
+    depositApplication.siteDetails[0].activityDetails[0].activityType =
+      'deposit'
+    mockMarineLicence(depositApplication)
+
+    const { document } = await submitForm({
+      requestUrl:
+        '/marine-licence/activity-details/what-deposit-activity-are-you-continuing?site=1&activity=1',
+      server: getServer(),
+      formData: { activities: 'other', otherActivity: maxLengthOtherActivity }
+    })
+
+    expectFieldsetError({
+      document,
+      fieldsetLabel: 'What deposit activity are you continuing?',
+      errorMessage: 'Details of other deposits must be 1000 characters or less',
+      findByHeading: true,
+      useErrorClass: true
+    })
+  })
+
+  test('show error when other substances or objects exceeds 1000 characters', async () => {
+    const removalApplication = structuredClone(mockMarineLicenceApplication)
+    removalApplication.siteDetails[0].activityDetails[0].activityType =
+      'removal'
+    mockMarineLicence(removalApplication)
+
+    const { document } = await submitForm({
+      requestUrl:
+        '/marine-licence/activity-details/what-are-you-removing-for-the-first-time?site=1&activity=1',
+      server: getServer(),
+      formData: { activities: 'other', otherActivity: maxLengthOtherActivity }
+    })
+
+    expectFieldsetError({
+      document,
+      fieldsetLabel:
+        'What are you removing for the first time on a one off basis?',
+      errorMessage:
+        'Details of the other substances or objects must be 1000 characters or less',
       findByHeading: true,
       useErrorClass: true
     })

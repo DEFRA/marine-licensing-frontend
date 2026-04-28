@@ -109,7 +109,7 @@ describe('Completion date (marine licence)', () => {
     ).toBeChecked()
     expectInputValue({
       document,
-      inputLabel: 'Enter the dates and the reasons why',
+      inputLabel: 'Provide reasons for the completion date',
       value: 'Test reason'
     })
   })
@@ -144,7 +144,7 @@ describe('Completion date (marine licence)', () => {
     expectFieldsetError({
       document,
       fieldsetLabel,
-      errorMessage: 'Enter the dates and the reasons why',
+      errorMessage: 'Provide reasons for the completion date',
       findByHeading: true,
       useErrorClass: true
     })

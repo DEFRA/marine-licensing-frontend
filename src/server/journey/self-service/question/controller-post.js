@@ -14,8 +14,8 @@ import { statusCodes } from '#src/server/common/constants/status-codes.js'
 const VIEW_PATH = 'journey/self-service/question/index'
 
 function toArray(value) {
-  if (Array.isArray(value)) return value
-  if (typeof value === 'string' && value.length > 0) return [value]
+  if (Array.isArray(value)) { return value }
+  if (typeof value === 'string' && value.length > 0) { return [value] }
   return []
 }
 

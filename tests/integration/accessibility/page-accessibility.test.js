@@ -228,6 +228,12 @@ describe('Page accessibility checks (Axe)', () => {
       title: 'What is the maximum duration of the activity?'
     },
     {
+      url: `${marineLicenceRoutes.MARINE_LICENCE_COMPLETION_DATE}?site=1&activity=1`,
+      isMarineLicence: true,
+      title:
+        'Does any part of the activity need to be completed by a certain date?'
+    },
+    {
       url: marineLicenceRoutes.MARINE_LICENCE_COORDINATES_TYPE_CHOICE,
       title: 'How do you want to provide the site location?'
     },

@@ -1,0 +1,23 @@
+import joi from 'joi'
+import { COMPLETION_DATE_REASON_MAX_LENGTH } from '#src/server/common/validation/completion-date/constants.js'
+
+export const completionDateSchema = joi.object({
+  completionDate: joi.string().valid('yes', 'no').required().messages({
+    'any.only': 'COMPLETION_DATE_REQUIRED',
+    'string.empty': 'COMPLETION_DATE_REQUIRED',
+    'any.required': 'COMPLETION_DATE_REQUIRED'
+  }),
+  reason: joi.when('completionDate', {
+    is: 'yes',
+    then: joi
+      .string()
+      .trim()
+      .max(COMPLETION_DATE_REASON_MAX_LENGTH)
+      .required()
+      .messages({
+        'string.empty': 'COMPLETION_DATE_REASON_REQUIRED',
+        'any.required': 'COMPLETION_DATE_REASON_REQUIRED',
+        'string.max': 'COMPLETION_DATE_REASON_MAX_LENGTH'
+      })
+  })
+})

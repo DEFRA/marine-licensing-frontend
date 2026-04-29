@@ -163,6 +163,8 @@ export const multipleCoordinatesSubmitController = {
       )
     }
 
-    return h.redirect(marineLicenceRoutes.MARINE_LICENCE_ENTER_MULTIPLE_COORDINATES)
+    return h.redirect(
+      marineLicenceRoutes.MARINE_LICENCE_ENTER_MULTIPLE_COORDINATES
+    )
   }
 }

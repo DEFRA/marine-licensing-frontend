@@ -1,21 +1,33 @@
-export function calculateNextRoute(question, selectedAnswerId) {
-  const answer = question.answers.find((a) => a.id === selectedAnswerId)
+export function calculateNextRoute(question, selectedAnswerIds) {
+  if (question.multiSelect) {
+    return calculateMultiSelectRoute(question, selectedAnswerIds)
+  }
+  return calculateSingleSelectRoute(question, selectedAnswerIds)
+}
 
-  if (!answer) {
+function calculateMultiSelectRoute(question, ids) {
+  const { questionRoute, outcomeRoute, outcomeAnswerId } = question.multiSelect
+  const otherSelected = ids.includes(outcomeAnswerId)
+  return otherSelected
+    ? { type: 'outcome', route: outcomeRoute }
+    : { type: 'question', route: questionRoute }
+}
+
+function calculateSingleSelectRoute(question, ids) {
+  if (ids.length !== 1) {
     throw new Error(
-      `No answer found for id '${selectedAnswerId}' on question '${question.route}'`
+      `Single-select question '${question.route}' received ${ids.length} answers`
     )
   }
-
+  const answer = question.answers.find((a) => a.id === ids[0])
+  if (!answer) {
+    throw new Error(`No answer '${ids[0]}' on '${question.route}'`)
+  }
   if (answer.nextQuestionRoute) {
     return { type: 'question', route: answer.nextQuestionRoute }
   }
-
   if (answer.outcomeRoute) {
     return { type: 'outcome', route: answer.outcomeRoute }
   }
-
-  throw new Error(
-    `Answer '${answer.id}' on question '${question.route}' has no nextQuestionRoute or outcomeRoute`
-  )
+  throw new Error(`Answer '${answer.id}' on '${question.route}' has no route`)
 }

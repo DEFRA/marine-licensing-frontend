@@ -262,13 +262,13 @@ Five pages use checkboxes instead of radio buttons. These are the sub-activity s
 ```mermaid
 flowchart TD
     MS["/construction/maintenance-existing-works<br/>☑ Scaffolding<br/>☑ Repainting<br/>☐ Other maintenance"]
-    MS -->|"User selects any NON-other items<br/>(multiSelect.questionRoute)"| NEXT["/construction/maintenance-existing-works/scaffolding"]
-    MS -->|"User selects OTHER_MAINTENANCE<br/>(multiSelect.outcomeAnswerId)"| OUT["/standard-marine-licence-application/other-maintenance"]
+    MS -->|"OTHER_MAINTENANCE NOT ticked<br/>(any combination of non-other answers)"| NEXT["/construction/maintenance-existing-works/scaffolding"]
+    MS -->|"OTHER_MAINTENANCE ticked<br/>(alone or alongside other answers)"| OUT["/standard-marine-licence-application/other-maintenance"]
 ```
 
-- Individual answers on multiSelect pages have **no routes** — routing is on the `multiSelect` object
-- If the user selects the `outcomeAnswerId` answer, they go to `outcomeRoute` (standard licence — their activity doesn't fit self-service categories)
-- Otherwise, they continue via `questionRoute` to more detailed questions
+- Individual answers on multiSelect pages have **no routes** — routing is on the `multiSelect` object.
+- The rule (matches the legacy Fivium behaviour, `JourneyService.getMultiSelectNextRoute`): if the `outcomeAnswerId` answer is ticked **at all** (alone or alongside non-other answers), the user goes to `outcomeRoute` (their activity doesn't fit any of the self-service sub-activity categories). Only when `outcomeAnswerId` is unticked do they continue via `questionRoute`.
+- The runtime implementation lives in `services/journey-router.js` (`calculateNextRoute` → `calculateMultiSelectRoute`).
 
 **The five multiSelect pages:**
 

@@ -21,8 +21,12 @@ export const journeySelfServiceQuestion = {
             auth: false,
             validate: {
               payload: Joi.object({
-                answer: Joi.string()
-              })
+                answer: Joi.string().max(100),
+                answers: Joi.array()
+                  .items(Joi.string().min(1).max(100))
+                  .max(100)
+                  .single()
+              }).oxor('answer', 'answers')
             }
           },
           ...questionPostController

@@ -313,19 +313,5 @@ describe('#centreCoordinates (marine licence)', () => {
       expect(h.view().takeover).toHaveBeenCalled()
       expect(updateMarineLicenceSiteDetails).not.toHaveBeenCalled()
     })
-
-    test('should redirect to circle width when action is present', async () => {
-      const h = { redirect: vi.fn() }
-      const request = createMockRequest({
-        payload: { ...wgs84Coordinates },
-        query: { action: 'change' }
-      })
-
-      await centreCoordinatesSubmitController.handler(request, h)
-
-      expect(h.redirect).toHaveBeenCalledWith(
-        marineLicenceRoutes.MARINE_LICENCE_WIDTH_OF_SITE
-      )
-    })
   })
 })

@@ -89,20 +89,10 @@ function renderMultipleCoordinatesView(
   coordinateSystem,
   projectName
 ) {
-  const coordinatesForDisplay = normaliseCoordinatesForDisplay(
+  const paddedCoordinates = normaliseCoordinatesForDisplay(
     coordinateSystem,
     coordinates
   )
-  // Pad coordinates to at least 3 items
-  const minCoords = 3
-  const paddedCoordinates = [...coordinatesForDisplay]
-  const emptyCoordinate =
-    coordinateSystem === COORDINATE_SYSTEMS.OSGB36
-      ? { easting: '', northing: '' }
-      : { latitude: '', longitude: '' }
-  while (paddedCoordinates.length < minCoords) {
-    paddedCoordinates.push({ ...emptyCoordinate })
-  }
   return h.view(MULTIPLE_COORDINATES_VIEW_ROUTES[coordinateSystem], {
     ...multipleCoordinatesPageData,
     coordinates: paddedCoordinates,

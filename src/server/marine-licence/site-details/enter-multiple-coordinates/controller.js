@@ -70,18 +70,10 @@ function renderMultipleCoordinatesView(
   coordinateSystem,
   projectName
 ) {
-  const coordinatesForDisplay = normaliseCoordinatesForDisplay(
+  const paddedCoordinates = normaliseCoordinatesForDisplay(
     coordinateSystem,
     coordinates
   )
-  const paddedCoordinates = [...coordinatesForDisplay]
-  const emptyCoordinate =
-    coordinateSystem === COORDINATE_SYSTEMS.OSGB36
-      ? { easting: '', northing: '' }
-      : { latitude: '', longitude: '' }
-  while (paddedCoordinates.length < POLYGON_MIN_COORDINATE_POINTS) {
-    paddedCoordinates.push({ ...emptyCoordinate })
-  }
   return h.view(MULTIPLE_COORDINATES_VIEW_ROUTES[coordinateSystem], {
     ...multipleCoordinatesPageData,
     coordinates: paddedCoordinates,

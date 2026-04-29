@@ -153,6 +153,7 @@ describe('parseActivityDetails', () => {
     const siteDetails = {
       activityDetails: [
         {
+          activityMonths: { months: 1, details: 'test reason' },
           activityDuration: { years: 1, months: 10 },
           activitySubType: 'construction-type-1',
           activityType: 'construction',
@@ -171,6 +172,8 @@ describe('parseActivityDetails', () => {
         activitySubType: 'Construction of new works',
         activityType: 'construction',
         activities: ['Aquaculture trestles or fixed walkways'],
+        activityMonths: 'test reason',
+        completionDate: null,
         someField: 'value'
       }
     ])

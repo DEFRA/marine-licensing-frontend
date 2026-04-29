@@ -37,20 +37,10 @@ export const multipleCoordinatesController = {
         ? COORDINATE_SYSTEMS.OSGB36
         : COORDINATE_SYSTEMS.WGS84
 
-    const coordinates = normaliseCoordinatesForDisplay(
+    const paddedCoordinates = normaliseCoordinatesForDisplay(
       coordinateSystem,
       siteDetails.coordinates
     )
-
-    const paddedCoordinates = [...coordinates]
-    const emptyCoordinate =
-      coordinateSystem === COORDINATE_SYSTEMS.OSGB36
-        ? { easting: '', northing: '' }
-        : { latitude: '', longitude: '' }
-
-    while (paddedCoordinates.length < POLYGON_MIN_COORDINATE_POINTS) {
-      paddedCoordinates.push({ ...emptyCoordinate })
-    }
 
     return h.view(MULTIPLE_COORDINATES_VIEW_ROUTES[coordinateSystem], {
       ...multipleCoordinatesPageData,

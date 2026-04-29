@@ -84,7 +84,6 @@ describe('#outcomeController', () => {
     outcomeController.handler(request, h)
 
     expect(getOutcome).toHaveBeenCalledWith('/construction/journey-select')
-    expect(isIntermediateOutcome).toHaveBeenCalledWith(mockOutcome)
     expect(getBackLink).toHaveBeenCalledWith(
       request,
       '/construction/journey-select',
@@ -93,6 +92,8 @@ describe('#outcomeController', () => {
     expect(h.view).toHaveBeenCalledWith(
       'journey/self-service/outcome/index',
       expect.objectContaining({
+        classification: 'intermediate',
+        heading: 'Marine licence may be required',
         pageTitle: 'Marine licence may be required',
         outcome: mockOutcome,
         section: mockSection,
@@ -101,19 +102,22 @@ describe('#outcomeController', () => {
             id: 'WO_CON_EXEMPTION_JOURNEY',
             heading: 'Check to see if an exemption applies',
             text: '<p>body</p>',
-            isTerminal: false
+            isTerminal: false,
+            ctaLabel: 'Continue'
           },
           {
             id: 'WO_CON_SELF_SERVICE_JOURNEY',
             heading: 'Check self-service',
             text: '<p>body</p>',
-            isTerminal: false
+            isTerminal: false,
+            ctaLabel: 'Continue'
           },
           {
             id: 'WO_STANDARD_MLA',
             heading: 'Apply for a standard marine licence',
             text: '<p>body</p>',
-            isTerminal: true
+            isTerminal: true,
+            ctaLabel: 'Continue'
           }
         ],
         backLink: '/journey/self-service/activity-type'
@@ -125,22 +129,6 @@ describe('#outcomeController', () => {
     vi.mocked(getOutcome).mockReturnValue(null)
     const request = {
       params: { outcomePath: 'nope' },
-      logger: { warn: vi.fn() }
-    }
-    const h = { view: vi.fn() }
-
-    expect(() => outcomeController.handler(request, h)).toThrow(
-      expect.objectContaining({
-        isBoom: true,
-        output: expect.objectContaining({ statusCode: 404 })
-      })
-    )
-  })
-
-  test('throws Boom.notFound for a terminal outcome', () => {
-    vi.mocked(isIntermediateOutcome).mockReturnValue(false)
-    const request = {
-      params: { outcomePath: 'licence-not-required' },
       logger: { warn: vi.fn() }
     }
     const h = { view: vi.fn() }
@@ -343,6 +331,220 @@ describe('#outcomePostController', () => {
       request,
       'invalid-outcome-selection',
       '/construction/journey-select',
+      expect.any(String),
+      expect.any(String)
+    )
+  })
+})
+
+import {
+  classifyOutcome,
+  ctaLabelFor
+} from '#src/server/journey/self-service/outcome/controller.js'
+
+describe('#classifyOutcome', () => {
+  test('returns "intermediate" when at least one outcomeType has nextQuestionRoute', () => {
+    vi.mocked(getOutcomeTypesForOutcome).mockReturnValue([
+      { id: 'A', nextQuestionRoute: '/q' },
+      { id: 'B', module: 'X' }
+    ])
+    expect(classifyOutcome({})).toBe('intermediate')
+  })
+
+  test('returns "terminal-multi" when all outcomeTypes are terminal and there are 2+', () => {
+    vi.mocked(getOutcomeTypesForOutcome).mockReturnValue([
+      { id: 'A', module: 'X' },
+      { id: 'B', link: 'https://x' }
+    ])
+    expect(classifyOutcome({})).toBe('terminal-multi')
+  })
+
+  test('returns "terminal-single" when there is exactly one terminal outcomeType', () => {
+    vi.mocked(getOutcomeTypesForOutcome).mockReturnValue([
+      { id: 'A', module: 'X' }
+    ])
+    expect(classifyOutcome({})).toBe('terminal-single')
+  })
+})
+
+describe('#ctaLabelFor', () => {
+  test('returns overrideCtaButtonText when present', () => {
+    expect(
+      ctaLabelFor({
+        overrideCtaButtonText: 'Apply now',
+        link: 'x',
+        module: 'y'
+      })
+    ).toBe('Apply now')
+  })
+
+  test('returns "Download" when only link: is set', () => {
+    expect(ctaLabelFor({ link: 'https://x.docx' })).toBe('Download')
+  })
+
+  test('returns "Continue" when neither override nor link is set', () => {
+    expect(ctaLabelFor({ module: 'MMO_APP2_CONTROL' })).toBe('Continue')
+  })
+
+  test('returns "Continue" for an info-only outcomeType (no module/link/override)', () => {
+    expect(ctaLabelFor({ id: 'X' })).toBe('Continue')
+  })
+})
+
+describe('#outcomeController — terminal-multi', () => {
+  const multiOutcome = {
+    route: '/scaffolding-impede-navigation',
+    heading: 'Scaffolding or access towers - impede safe or normal navigation',
+    text: null,
+    outcomeTypes: [
+      'WO_DOWNLOAD_HA_AGREED_METHOD_TEMPLATE',
+      'WO_STANDARD_TRACK_MLA'
+    ]
+  }
+  const otDownload = {
+    id: 'WO_DOWNLOAD_HA_AGREED_METHOD_TEMPLATE',
+    heading: 'Download HA self-service marine licensing agreed method template',
+    text: '<p>download body</p>',
+    link: 'https://x.docx'
+  }
+  const otStandardMla = {
+    id: 'WO_STANDARD_TRACK_MLA',
+    heading: 'Apply for a standard marine licence',
+    text: '<p>standard MLA body</p>',
+    module: 'MMO_APP2_CONTROL'
+  }
+
+  beforeEach(() => {
+    vi.mocked(getOutcome).mockReturnValue(multiOutcome)
+    vi.mocked(getSection).mockReturnValue(null)
+    vi.mocked(getOutcomeTypesForOutcome).mockReturnValue([
+      otDownload,
+      otStandardMla
+    ])
+    vi.mocked(isIntermediateOutcome).mockReturnValue(false)
+    vi.mocked(getBackLink).mockReturnValue('/journey/self-service/back-here')
+  })
+
+  test('renders terminal-multi view model with per-card ctaLabel', () => {
+    const request = {
+      params: { outcomePath: 'scaffolding-impede-navigation' },
+      logger: { warn: vi.fn() }
+    }
+    const h = { view: vi.fn() }
+
+    outcomeController.handler(request, h)
+
+    expect(h.view).toHaveBeenCalledWith(
+      'journey/self-service/outcome/index',
+      expect.objectContaining({
+        classification: 'terminal-multi',
+        heading: multiOutcome.heading,
+        pageTitle: multiOutcome.heading,
+        outcome: multiOutcome,
+        options: [
+          {
+            id: 'WO_DOWNLOAD_HA_AGREED_METHOD_TEMPLATE',
+            heading: otDownload.heading,
+            text: '<p>download body</p>',
+            ctaLabel: 'Download'
+          },
+          {
+            id: 'WO_STANDARD_TRACK_MLA',
+            heading: otStandardMla.heading,
+            text: '<p>standard MLA body</p>',
+            ctaLabel: 'Continue'
+          }
+        ],
+        backLink: '/journey/self-service/back-here'
+      })
+    )
+  })
+})
+
+describe('#outcomeController — terminal-single', () => {
+  const terminalOutcome = {
+    route: '/exemption/article-25A',
+    heading: 'You need to provide more information',
+    text: null,
+    outcomeTypes: ['WO_EXE_AVAILABLE_ARTICLE_25A']
+  }
+  const terminalOutcomeType = {
+    id: 'WO_EXE_AVAILABLE_ARTICLE_25A',
+    heading: 'Fill out an exemption notification',
+    text: '<p>Article 25A body…</p>',
+    overrideCtaButtonText: 'Continue'
+  }
+
+  beforeEach(() => {
+    vi.mocked(getOutcome).mockReturnValue(terminalOutcome)
+    vi.mocked(getSection).mockReturnValue(null)
+    vi.mocked(getOutcomeTypesForOutcome).mockReturnValue([terminalOutcomeType])
+    vi.mocked(isIntermediateOutcome).mockReturnValue(false)
+    vi.mocked(getBackLink).mockReturnValue('/journey/self-service/something')
+  })
+
+  test('renders the terminal-single view model', () => {
+    const request = {
+      params: { outcomePath: 'exemption/article-25A' },
+      logger: { warn: vi.fn() }
+    }
+    const h = { view: vi.fn() }
+
+    outcomeController.handler(request, h)
+
+    expect(h.view).toHaveBeenCalledWith(
+      'journey/self-service/outcome/index',
+      expect.objectContaining({
+        classification: 'terminal-single',
+        heading: 'You need to provide more information',
+        pageTitle: 'You need to provide more information',
+        outcome: terminalOutcome,
+        body: '<p>Article 25A body…</p>',
+        ctaLabel: 'Continue',
+        backLink: '/journey/self-service/something'
+      })
+    )
+  })
+
+  test('logs outcome-type-empty-text when terminal body is empty', () => {
+    vi.mocked(getOutcomeTypesForOutcome).mockReturnValue([
+      { ...terminalOutcomeType, text: '' }
+    ])
+    const request = {
+      params: { outcomePath: 'exemption/article-25A' },
+      logger: { warn: vi.fn() }
+    }
+    const h = { view: vi.fn() }
+
+    outcomeController.handler(request, h)
+
+    expect(reportRuntimeIssue).toHaveBeenCalledWith(
+      request,
+      'outcome-type-empty-text',
+      'WO_EXE_AVAILABLE_ARTICLE_25A',
+      expect.any(String),
+      expect.any(String)
+    )
+  })
+
+  test('logs outcome-missing-heading and uses "Result" fallback', () => {
+    vi.mocked(getOutcome).mockReturnValue({ ...terminalOutcome, heading: null })
+    const request = {
+      params: { outcomePath: 'exemption/article-25A' },
+      logger: { warn: vi.fn() }
+    }
+    const h = { view: vi.fn() }
+
+    outcomeController.handler(request, h)
+
+    expect(h.view).toHaveBeenCalledWith(
+      'journey/self-service/outcome/index',
+      expect.objectContaining({ heading: 'Result', pageTitle: 'Result' })
+    )
+    expect(reportRuntimeIssue).toHaveBeenCalledWith(
+      request,
+      'outcome-missing-heading',
+      '/exemption/article-25A',
       expect.any(String),
       expect.any(String)
     )

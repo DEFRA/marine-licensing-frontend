@@ -15,12 +15,25 @@ import { reportRuntimeIssue } from '#src/server/journey/self-service/services/da
 
 const VIEW_PATH = 'journey/self-service/outcome/index'
 
+export function classifyOutcome(outcome) {
+  const types = getOutcomeTypesForOutcome(outcome)
+  if (types.some((ot) => ot.nextQuestionRoute)) return 'intermediate'
+  return types.length > 1 ? 'terminal-multi' : 'terminal-single'
+}
+
+export function ctaLabelFor(outcomeType) {
+  if (outcomeType.overrideCtaButtonText) {
+    return outcomeType.overrideCtaButtonText
+  }
+  if (outcomeType.link) return 'Download'
+  return 'Continue'
+}
+
 function loadIntermediateOutcome(request) {
   const outcomeRoute = '/' + request.params.outcomePath
   const outcome = getOutcome(outcomeRoute)
 
   if (!outcome || !isIntermediateOutcome(outcome)) {
-    // only log for a truly unknown route — terminal-outcome 404s are defence-in-depth against forged POSTs, not data errors
     if (!outcome) {
       reportRuntimeIssue(
         request,
@@ -36,25 +49,105 @@ function loadIntermediateOutcome(request) {
   return { outcomeRoute, outcome }
 }
 
+function loadOutcomeForGet(request) {
+  const outcomeRoute = '/' + request.params.outcomePath
+  const outcome = getOutcome(outcomeRoute)
+
+  if (!outcome) {
+    reportRuntimeIssue(
+      request,
+      'unknown-outcome-route',
+      outcomeRoute,
+      `Add ${outcomeRoute} as an outcome or fix the referring answer in self-service.json`,
+      `unknown outcome route ${outcomeRoute}`
+    )
+    throw Boom.notFound('Outcome not found')
+  }
+
+  const types = getOutcomeTypesForOutcome(outcome)
+  if (types.length === 0) {
+    reportRuntimeIssue(
+      request,
+      'outcome-empty-outcome-types',
+      outcomeRoute,
+      `Add at least one resolvable outcomeType to ${outcomeRoute} in self-service.json`,
+      `outcome ${outcomeRoute} resolved to zero outcomeTypes`
+    )
+    throw Boom.notFound('Outcome has no resolvable outcomeTypes')
+  }
+
+  return { outcomeRoute, outcome, types }
+}
+
+function logEmptyTextIfNeeded(request, outcomeType) {
+  if (outcomeType.text) return
+  reportRuntimeIssue(
+    request,
+    'outcome-type-empty-text',
+    outcomeType.id,
+    `Set 'text' on outcomeType ${outcomeType.id} in self-service.json`,
+    `outcomeType ${outcomeType.id} has empty text; rendering with no body`
+  )
+}
+
+function logMissingHeadingIfNeeded(request, outcomeRoute, outcome) {
+  if (outcome.heading) return
+  reportRuntimeIssue(
+    request,
+    'outcome-missing-heading',
+    outcomeRoute,
+    `Set 'heading' on the ${outcomeRoute} outcome in self-service.json`,
+    `outcome ${outcomeRoute} has no heading; rendering fallback 'Result'`
+  )
+}
+
 export const outcomeController = {
   handler(request, h) {
-    const { outcomeRoute, outcome } = loadIntermediateOutcome(request)
-    const section = outcome.section ? getSection(outcome.section) : null
+    const { outcomeRoute, outcome, types } = loadOutcomeForGet(request)
+    const classification = classifyOutcome(outcome)
+    logMissingHeadingIfNeeded(request, outcomeRoute, outcome)
+    const heading = outcome.heading ?? 'Result'
 
-    const options = getOutcomeTypesForOutcome(outcome).map((ot) => ({
-      id: ot.id,
-      heading: ot.heading,
-      text: ot.text,
-      isTerminal: !ot.nextQuestionRoute
-    }))
-
-    return h.view(VIEW_PATH, {
-      pageTitle: outcome.heading,
+    const baseModel = {
+      classification,
+      heading,
+      pageTitle: heading,
       outcome,
-      section,
-      options,
       backLink: getBackLink(request, outcomeRoute, 'outcome')
+    }
+
+    if (classification === 'intermediate') {
+      const section = outcome.section ? getSection(outcome.section) : null
+      const options = types.map((ot) => ({
+        id: ot.id,
+        heading: ot.heading,
+        text: ot.text,
+        isTerminal: !ot.nextQuestionRoute,
+        ctaLabel: ctaLabelFor(ot)
+      }))
+      return h.view(VIEW_PATH, { ...baseModel, section, options })
+    }
+
+    if (classification === 'terminal-single') {
+      const [ot] = types
+      logEmptyTextIfNeeded(request, ot)
+      return h.view(VIEW_PATH, {
+        ...baseModel,
+        body: ot.text,
+        ctaLabel: ctaLabelFor(ot)
+      })
+    }
+
+    const options = types.map((ot) => {
+      logEmptyTextIfNeeded(request, ot)
+      return {
+        id: ot.id,
+        heading: ot.heading,
+        text: ot.text,
+        ctaLabel: ctaLabelFor(ot)
+      }
     })
+    return h.view(VIEW_PATH, { ...baseModel, options })
   }
 }
 

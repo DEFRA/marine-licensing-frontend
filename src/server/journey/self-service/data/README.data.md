@@ -501,8 +501,9 @@ jq '[
 `question.hint` and `answer.hint` fields are sanitised at load time by
 `journey-data.js` (via `sanitise.js`) using an allowlist of safe tags and
 attributes. `question.text` and `section.text` are stripped of all HTML at
-load time. The `text` fields on outcomes and outcomeTypes are **not currently
-sanitised** — this is tracked as future work.
+load time. The `text` fields on outcomes and outcomeTypes are also sanitised
+at load time via `sanitiseRichText` (same allowlist as `sanitise`, minus the
+`govuk-hint` class transform).
 
 ---
 

@@ -31,6 +31,15 @@ describe('IAT page accessibility (Axe)', () => {
     {
       url: '/journey/self-service/outcome/construction/journey-select',
       title: 'Marine licence may be required'
+    },
+    {
+      url: '/journey/self-service/outcome/exemption/licence-not-required-exemption-available-article-25A',
+      title:
+        'You need to provide more information, but you do not need a marine licence'
+    },
+    {
+      url: '/journey/self-service/outcome/scaffolding-impede-navigation',
+      title: 'Scaffolding or access towers - impede safe or normal navigation'
     }
   ]
 

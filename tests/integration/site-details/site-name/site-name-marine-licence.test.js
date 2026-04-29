@@ -35,7 +35,7 @@ describe('Site name page (marine licence)', () => {
     url: marineLicenceRoutes.MARINE_LICENCE_SITE_NAME,
     setupMock,
     projectName: mockMarineLicenceApplication.projectName,
-    cancelLinkHref: marineLicenceRoutes.MARINE_LICENCE_TASK_LIST,
+    cancelLinkHref: `${marineLicenceRoutes.MARINE_LICENCE_TASK_LIST}?cancel=site-details`,
     backLinkHref: marineLicenceRoutes.MARINE_LICENCE_COORDINATES_TYPE_CHOICE
   })
 
@@ -90,7 +90,7 @@ describe('Site name page (marine licence)', () => {
     const cancelLink = getByRole(document, 'link', { name: 'Cancel' })
     expect(cancelLink).toHaveAttribute(
       'href',
-      marineLicenceRoutes.MARINE_LICENCE_TASK_LIST
+      `${marineLicenceRoutes.MARINE_LICENCE_TASK_LIST}?cancel=site-details`
     )
   })
 

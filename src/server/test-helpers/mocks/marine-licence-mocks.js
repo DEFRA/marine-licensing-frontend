@@ -28,7 +28,6 @@ export const mockActivityDetails = {
   activityDescription: 'Test description',
   completionDate: { date: 'yes', reason: 'Test completion' },
   activityDuration: { years: 1, months: 4 },
-  completionDate: 'Test completion',
   activityMonths: { months: 'yes', details: 'Test months' },
   workingHours: 'Test hours'
 }

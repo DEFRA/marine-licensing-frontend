@@ -8,7 +8,6 @@ import {
   mapActivitySelections,
   parseActivityDetails
 } from '#src/server/common/helpers/review-site-details/activity-details.js'
-import { mockActivityDetails } from '#src/server/test-helpers/mocks/marine-licence-mocks.js'
 
 describe('formatActivitySubTypeLabel', () => {
   test('returns label for construction-type-1', () => {
@@ -175,7 +174,6 @@ describe('parseActivityDetails', () => {
         activityType: 'construction',
         activities: ['Aquaculture trestles or fixed walkways'],
         activityMonths: 'test reason',
-        completionDate: null,
         someField: 'value',
         completionDate: 'Test completion',
         workingHours: 'Test hours'

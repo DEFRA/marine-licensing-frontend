@@ -246,6 +246,34 @@ describe('mapErrorsForDisplay', () => {
     ])
   })
 
+  test('maps direct overrides and highlight flags', () => {
+    const messages = {
+      DURATION_REQUIRED: 'Enter the maximum duration of the activity'
+    }
+
+    const result = mapErrorsForDisplay(
+      [
+        {
+          message: 'DURATION_REQUIRED',
+          path: [],
+          field: ['activity-duration-years'],
+          hrefOverride: 'activity-duration-years',
+          highlightMultipleFields: true
+        }
+      ],
+      messages
+    )
+
+    expect(result).toStrictEqual([
+      {
+        href: '#activity-duration-years',
+        text: 'Enter the maximum duration of the activity',
+        field: ['activity-duration-years'],
+        highlightMultipleFields: true
+      }
+    ])
+  })
+
   test('show only one error per field', () => {
     const messages = {
       PROJECT_NAME_REQUIRED: 'Enter the project name',

@@ -65,13 +65,15 @@ export const mapErrorsForDisplay = (errors = [], messages = {}) => {
     })
     .map((error) => {
       const field = error.field || error.path
-
-      const href = error.hrefOverride ? error.hrefOverride : field
+      const href = error.hrefOverride || field
 
       return {
         href: `#${href}`,
         text: messages[error.message] ?? error.message,
-        field
+        field,
+        ...(error.highlightMultipleFields
+          ? { highlightMultipleFields: true }
+          : {})
       }
     })
 }

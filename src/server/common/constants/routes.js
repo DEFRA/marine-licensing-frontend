@@ -73,7 +73,8 @@ export const marineLicenceRoutes = {
     '/marine-licence/what-coordinate-system',
   MARINE_LICENCE_CIRCLE_CENTRE_POINT:
     '/marine-licence/enter-the-coordinates-at-the-centre-point',
-  MARINE_LICENCE_DURATION: '/marine-licence/activity-duration'
+  MARINE_LICENCE_DURATION: '/marine-licence/activity-duration',
+  MARINE_LICENCE_WORKING_HOURS: '/marine-licence/working-hours'
 }
 
 export const defraIdGuidanceRoutes = {

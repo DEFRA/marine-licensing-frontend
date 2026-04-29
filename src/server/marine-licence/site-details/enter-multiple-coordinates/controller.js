@@ -122,10 +122,12 @@ export const multipleCoordinatesSubmitController = {
         validationResult.error
       )
       return handleValidationFailure(
-        request,
         h,
         convertedError,
-        coordinateSystem
+        coordinateSystem,
+        coordinates,
+        marineLicence?.projectName,
+        multipleCoordinatesPageData
       )
     }
 

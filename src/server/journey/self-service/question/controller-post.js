@@ -14,6 +14,16 @@ import { reportRuntimeIssue } from '#src/server/journey/self-service/services/da
 
 const VIEW_PATH = 'journey/self-service/question/index'
 
+function toArray(value) {
+  if (Array.isArray(value)) {
+    return value
+  }
+  if (typeof value === 'string' && value.length > 0) {
+    return [value]
+  }
+  return []
+}
+
 export const questionPostController = {
   handler(request, h) {
     const questionRoute = '/' + request.params.questionPath
@@ -30,9 +40,16 @@ export const questionPostController = {
       throw Boom.notFound('Question not found')
     }
 
-    const selectedAnswerId = request.payload?.answer
+    const isMulti = !!question.multiSelect
+    const submittedIds = isMulti
+      ? toArray(request.payload?.answers)
+      : toArray(request.payload?.answer)
 
-    if (!selectedAnswerId) {
+    if (submittedIds.length === 0) {
+      const errorText = isMulti
+        ? 'Select at least one option'
+        : 'Select an option'
+      const errorField = isMulti ? 'answers' : 'answer'
       const section = question.section ? getSection(question.section) : null
       return h
         .view(VIEW_PATH, {
@@ -40,17 +57,18 @@ export const questionPostController = {
           question,
           section,
           backLink: getBackLink(request, questionRoute, 'question'),
-          errors: { answer: { text: 'Select an option' } },
-          errorSummary: [{ text: 'Select an option', href: '#answer' }]
+          errors: { [errorField]: { text: errorText } },
+          errorSummary: [{ text: errorText, href: `#${errorField}` }],
+          selectedAnswers: []
         })
         .code(statusCodes.badRequest)
     }
 
-    pushAnswer(request, questionRoute, selectedAnswerId)
+    pushAnswer(request, questionRoute, submittedIds)
 
     let next
     try {
-      next = calculateNextRoute(question, selectedAnswerId)
+      next = calculateNextRoute(question, submittedIds)
     } catch (err) {
       reportRuntimeIssue(
         request,

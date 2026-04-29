@@ -1,4 +1,4 @@
-import { COORDINATE_SYSTEMS } from '~/src/server/common/constants/exemptions.js'
+import { COORDINATE_SYSTEMS } from '~/src/server/common/constants/coordinate-systems.js'
 import { mockFileUploadExemption } from '~/src/server/test-helpers/mocks/exemption.js'
 
 const baseFileUploadExemption = {

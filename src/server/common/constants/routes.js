@@ -41,6 +41,7 @@ export const exemptionRoutes = {
 
 export const marineLicenceRoutes = {
   MARINE_LICENCE_ACTIVITY_DESCRIPTION: '/marine-licence/activity-description',
+  MARINE_LICENCE_COMPLETION_DATE: '/marine-licence/completion-date',
   MARINE_LICENCE_CHECK_YOUR_ANSWERS: '/marine-licence/check-your-answers',
   MARINE_LICENCE_CONFIRMATION: '/marine-licence/confirmation',
   MARINE_LICENCE_PROJECT_NAME: '/marine-licence/project-name',
@@ -70,6 +71,8 @@ export const marineLicenceRoutes = {
     '/marine-licence/how-do-you-want-to-enter-the-coordinates',
   MARINE_LICENCE_COORDINATE_SYSTEM_CHOICE:
     '/marine-licence/what-coordinate-system',
+  MARINE_LICENCE_CIRCLE_CENTRE_POINT:
+    '/marine-licence/enter-the-coordinates-at-the-centre-point',
   MARINE_LICENCE_DURATION: '/marine-licence/activity-duration'
 }
 

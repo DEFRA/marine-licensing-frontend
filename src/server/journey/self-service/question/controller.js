@@ -34,7 +34,9 @@ export const questionController = {
       question,
       section,
       backLink: getBackLink(request, questionRoute, 'question'),
-      selectedAnswer: getAnswerForRoute(request, questionRoute)
+      selectedAnswers: question.multiSelect
+        ? []
+        : getAnswerForRoute(request, questionRoute)
     })
   }
 }

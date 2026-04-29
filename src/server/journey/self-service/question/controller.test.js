@@ -32,7 +32,7 @@ describe('#questionController', () => {
     vi.mocked(getQuestion).mockReturnValue(mockQuestion)
     vi.mocked(getSection).mockReturnValue(mockSection)
     vi.mocked(getBackLink).mockReturnValue('/journey/self-service/start')
-    vi.mocked(getAnswerForRoute).mockReturnValue(null)
+    vi.mocked(getAnswerForRoute).mockReturnValue([])
   })
 
   test('calls h.view with the correct template and view model', () => {
@@ -53,7 +53,7 @@ describe('#questionController', () => {
       question: mockQuestion,
       section: mockSection,
       backLink: '/journey/self-service/start',
-      selectedAnswer: null
+      selectedAnswers: []
     })
   })
 
@@ -93,9 +93,9 @@ describe('#questionController', () => {
     )
   })
 
-  test('passes selectedAnswer when a previous answer exists', () => {
-    vi.mocked(getAnswerForRoute).mockReturnValue('inSea')
-    const request = {
+  test('passes selectedAnswers when a previous answer exists', () => {
+    vi.mocked(getAnswerForRoute).mockReturnValue(['inSea'])
+     const request = {
       params: { questionPath: 'sea' },
       logger: { warn: vi.fn() }
     }
@@ -105,7 +105,35 @@ describe('#questionController', () => {
 
     expect(h.view).toHaveBeenCalledWith(
       'journey/self-service/question/index',
-      expect.objectContaining({ selectedAnswer: 'inSea' })
+      expect.objectContaining({ selectedAnswers: ['inSea'] })
+    )
+  })
+
+  test('passes empty selectedAnswers for a multi-select question even when a prior selection exists', () => {
+    const multiSelectQuestion = {
+      route: '/construction/maintenance-existing-works',
+      text: 'Sub-activities',
+      section: 'subactivityType',
+      multiSelect: {
+        questionRoute: '/x',
+        outcomeRoute: '/y',
+        outcomeAnswerId: 'OTHER_MAINTENANCE'
+      },
+      answers: [{ id: 'SCAFFOLDING_ACCESS_TOWERS' }]
+    }
+    vi.mocked(getQuestion).mockReturnValue(multiSelectQuestion)
+    vi.mocked(getAnswerForRoute).mockReturnValue(['SCAFFOLDING_ACCESS_TOWERS'])
+
+    const request = {
+      params: { questionPath: 'construction/maintenance-existing-works' }
+    }
+    const h = { view: vi.fn() }
+
+    questionController.handler(request, h)
+
+    expect(h.view).toHaveBeenCalledWith(
+      'journey/self-service/question/index',
+      expect.objectContaining({ selectedAnswers: [] })
     )
   })
 

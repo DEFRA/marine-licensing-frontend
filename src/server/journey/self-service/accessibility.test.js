@@ -33,6 +33,11 @@ describe('IAT page accessibility (Axe)', () => {
       title: 'Marine licence may be required'
     },
     {
+      url: '/journey/self-service/construction/maintenance-existing-works',
+      title:
+        'Please select sub-activites that match with activities proposed to be carried out.'
+    },
+    {
       url: '/journey/self-service/outcome/exemption/licence-not-required-exemption-available-article-25A',
       title:
         'You need to provide more information, but you do not need a marine licence'

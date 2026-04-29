@@ -1,5 +1,5 @@
 import { faker } from '@faker-js/faker'
-import { COORDINATE_SYSTEMS } from '#src/server/common/constants/exemptions.js'
+import { COORDINATE_SYSTEMS } from '#src/server/common/constants/coordinate-systems.js'
 import { mcmsAnswersDownloadUrl } from './mcms.js'
 
 export const mockExemptionTaskList = {

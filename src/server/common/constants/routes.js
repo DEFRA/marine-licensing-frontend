@@ -71,7 +71,9 @@ export const marineLicenceRoutes = {
   MARINE_LICENCE_COORDINATE_SYSTEM_CHOICE:
     '/marine-licence/what-coordinate-system',
   MARINE_LICENCE_DURATION: '/marine-licence/activity-duration',
-  MARINE_LICENCE_MONTHS_OF_ACTIVITY: '/marine-licence/months-of-activity'
+  MARINE_LICENCE_MONTHS_OF_ACTIVITY: '/marine-licence/months-of-activity',
+  MARINE_LICENCE_CIRCLE_CENTRE_POINT:
+    '/marine-licence/enter-the-coordinates-at-the-centre-point'
 }
 
 export const defraIdGuidanceRoutes = {

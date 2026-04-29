@@ -4,7 +4,7 @@ import {
   getCoordinateSystem
 } from '#src/server/common/helpers/coordinate-utils.js'
 import { getExemptionCache } from './exemptions/session-cache/utils.js'
-import { COORDINATE_SYSTEMS } from '#src/server/common/constants/exemptions.js'
+import { COORDINATE_SYSTEMS } from '#src/server/common/constants/coordinate-systems.js'
 
 // Mock the session cache utils
 vi.mock('./exemptions/session-cache/utils.js')

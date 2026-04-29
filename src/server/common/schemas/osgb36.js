@@ -3,7 +3,7 @@ import { JOI_ERRORS } from '#src/server/common/constants/joi.js'
 import {
   POLYGON_MIN_COORDINATE_POINTS,
   OSGB36_CONSTANTS
-} from '#src/server/common/constants/exemptions.js'
+} from '#src/server/common/constants/coordinate-systems.js'
 
 // Eastings minimum is 000000 and maximum 700000. Unpadded 0 also allowed as a value.
 // Northings minimum is 000000 and maximum 1200000. Unpadded 0 also allowed as a value.

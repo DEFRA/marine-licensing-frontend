@@ -1,7 +1,7 @@
 import {
   COORDINATE_SYSTEMS,
   POLYGON_MIN_COORDINATE_POINTS
-} from '#src/server/common/constants/exemptions.js'
+} from '#src/server/common/constants/coordinate-systems.js'
 import { routes } from '#src/server/common/constants/routes.js'
 import {
   getExemptionCache,

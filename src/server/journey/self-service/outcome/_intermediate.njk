@@ -25,7 +25,7 @@
         {{ govukButton({
           text: option.ctaLabel,
           href: "#",
-          classes: "govuk-!-margin-bottom-0"
+          classes: "govuk-!-margin-right-3"
         }) }}
       {% else %}
         <form method="POST">
@@ -33,7 +33,7 @@
           <input type="hidden" name="outcomeType" value="{{ option.id }}"/>
           {{ govukButton({
             text: option.ctaLabel,
-            classes: "govuk-!-margin-bottom-0"
+            classes: "govuk-!-margin-right-3"
           }) }}
         </form>
       {% endif %}
@@ -42,7 +42,7 @@
       {{ govukButton({
         text: "Download a PDF record of my answers",
         href: "#",
-        classes: "govuk-button--secondary govuk-!-margin-bottom-0"
+        classes: "govuk-button--secondary"
       }) }}
     </div>
   </div>

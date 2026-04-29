@@ -7,7 +7,11 @@
 {% endif %}
 
 <div class="app-iat-actions">
-  {{ govukButton({ text: ctaLabel, href: "#" }) }}
+  {{ govukButton({
+    text: ctaLabel,
+    href: "#",
+    classes: "govuk-!-margin-right-3"
+  }) }}
   {{ govukButton({
     text: "Download a PDF record of my answers",
     href: "#",

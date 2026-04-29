@@ -49,7 +49,7 @@ describe('Coordinate system page (marine licence)', () => {
 
     expect(response.statusCode).toBe(statusCodes.redirect)
     expect(response.headers.location).toBe(
-      marineLicenceRoutes.MARINE_LICENCE_COORDINATE_SYSTEM_CHOICE
+      marineLicenceRoutes.MARINE_LICENCE_CIRCLE_CENTRE_POINT
     )
   })
 
@@ -62,7 +62,7 @@ describe('Coordinate system page (marine licence)', () => {
 
     expect(response.statusCode).toBe(statusCodes.redirect)
     expect(response.headers.location).toBe(
-      marineLicenceRoutes.MARINE_LICENCE_COORDINATE_SYSTEM_CHOICE
+      marineLicenceRoutes.MARINE_LICENCE_CIRCLE_CENTRE_POINT
     )
   })
 })

@@ -1,4 +1,4 @@
-import { COORDINATE_SYSTEMS } from '#src/server/common/constants/exemptions.js'
+import { COORDINATE_SYSTEMS } from '#src/server/common/constants/coordinate-systems.js'
 import { getSiteDetailsBySite } from '#src/server/common/helpers/exemptions/session-cache/site-details-utils.js'
 import { getExemptionCache } from '#src/server/common/helpers/exemptions/session-cache/utils.js'
 

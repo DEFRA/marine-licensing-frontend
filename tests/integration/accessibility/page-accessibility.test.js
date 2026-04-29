@@ -244,6 +244,11 @@ describe('Page accessibility checks (Axe)', () => {
       title: 'Which coordinate system do you want to use?'
     },
     {
+      url: marineLicenceRoutes.MARINE_LICENCE_CIRCLE_CENTRE_POINT,
+      title: 'Enter the coordinates at the centre point of the site',
+      isMarineLicence: true
+    },
+    {
       url: marineLicenceRoutes.MARINE_LICENCE_CHECK_YOUR_ANSWERS,
       title: 'Check your answers before sending your information',
       isMarineLicence: true

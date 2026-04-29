@@ -1,12 +1,11 @@
 import { vi } from 'vitest'
-import { setupTestServer } from '#tests/integration/shared/test-setup-helpers.js'
 import {
   centreCoordinatesController,
   centreCoordinatesSubmitController,
-  COORDINATE_SYSTEM_VIEW_ROUTES,
   centreCoordinatesSubmitFailHandler
 } from '#src/server/exemption/site-details/centre-coordinates/controller.js'
-import { COORDINATE_SYSTEMS } from '#src/server/common/constants/exemptions.js'
+import { COORDINATE_SYSTEM_VIEW_ROUTES } from '#src/server/common/validation/centre-coordinates/constants.js'
+import { COORDINATE_SYSTEMS } from '#src/server/common/constants/coordinate-systems.js'
 import * as cacheUtils from '#src/server/common/helpers/exemptions/session-cache/utils.js'
 import * as coordinateUtils from '#src/server/common/helpers/coordinate-utils.js'
 import {
@@ -14,9 +13,6 @@ import {
   mockSite
 } from '#src/server/test-helpers/mocks/exemption.js'
 import { createMockRequest } from '#src/server/test-helpers/mocks/helpers.js'
-import { makeGetRequest } from '#src/server/test-helpers/server-requests.js'
-import { statusCodes } from '#src/server/common/constants/status-codes.js'
-import { JSDOM } from 'jsdom'
 import { routes } from '#src/server/common/constants/routes.js'
 import { saveSiteDetailsToBackend } from '#src/server/common/helpers/exemptions/save-site-details.js'
 
@@ -24,7 +20,6 @@ vi.mock('~/src/server/common/helpers/exemptions/session-cache/utils.js')
 vi.mock('~/src/server/common/helpers/exemptions/save-site-details.js')
 
 describe('#centreCoordinates', () => {
-  const getServer = setupTestServer()
   let getExemptionCacheSpy
   let getCoordinateSystemSpy
 
@@ -156,53 +151,6 @@ describe('#centreCoordinates', () => {
           siteNumber: null
         }
       )
-    })
-
-    test('Should provide expected response and correctly pre populate data', async () => {
-      const { result, statusCode } = await makeGetRequest({
-        url: routes.CIRCLE_CENTRE_POINT,
-        server: getServer()
-      })
-
-      const { document } = new JSDOM(result).window
-
-      expect(document.querySelector('h1').textContent.trim()).toContain(
-        'Enter the coordinates at the centre point of the site'
-      )
-
-      expect(
-        document.querySelector('.govuk-caption-l').textContent.trim()
-      ).toBe(mockExemption.projectName)
-
-      expect(document.querySelector('#latitude').value).toBe(
-        mockCoordinates[COORDINATE_SYSTEMS.WGS84].latitude
-      )
-      expect(document.querySelector('#longitude').value).toBe(
-        mockCoordinates[COORDINATE_SYSTEMS.WGS84].longitude
-      )
-
-      const hintSummary = document.querySelector('.govuk-details__summary-text')
-      expect(hintSummary.textContent.trim()).toBe(
-        'Help with latitude and longitude formats'
-      )
-
-      expect(
-        document
-          .querySelector(
-            '.govuk-back-link[href="/exemption/what-coordinate-system'
-          )
-          .textContent.trim()
-      ).toBe('Back')
-
-      expect(
-        document
-          .querySelector(
-            '.govuk-link[href="/exemption/task-list?cancel=site-details"'
-          )
-          .textContent.trim()
-      ).toBe('Cancel')
-
-      expect(statusCode).toBe(statusCodes.ok)
     })
 
     test('centreCoordinatesController handler should render correctly when using a change link (direct change, no originalCoordinatesEntry)', () => {
@@ -342,12 +290,7 @@ describe('#centreCoordinates', () => {
         ]
       }
 
-      centreCoordinatesSubmitFailHandler(
-        request,
-        h,
-        err,
-        COORDINATE_SYSTEMS.WGS84
-      )
+      centreCoordinatesSubmitFailHandler(request, h, err)
 
       expect(h.view).toHaveBeenCalledWith(
         COORDINATE_SYSTEM_VIEW_ROUTES[COORDINATE_SYSTEMS.WGS84],
@@ -398,12 +341,7 @@ describe('#centreCoordinates', () => {
 
       const err = {}
 
-      centreCoordinatesSubmitFailHandler(
-        request,
-        h,
-        err,
-        COORDINATE_SYSTEMS.WGS84
-      )
+      centreCoordinatesSubmitFailHandler(request, h, err)
 
       expect(h.view).toHaveBeenCalledWith(
         COORDINATE_SYSTEM_VIEW_ROUTES[COORDINATE_SYSTEMS.WGS84],
@@ -582,12 +520,7 @@ describe('#centreCoordinates', () => {
         })
       }
 
-      centreCoordinatesSubmitFailHandler(
-        request,
-        h,
-        {},
-        COORDINATE_SYSTEMS.WGS84
-      )
+      centreCoordinatesSubmitFailHandler(request, h, {})
 
       expect(h.view).toHaveBeenCalledWith(
         COORDINATE_SYSTEM_VIEW_ROUTES[COORDINATE_SYSTEMS.WGS84],

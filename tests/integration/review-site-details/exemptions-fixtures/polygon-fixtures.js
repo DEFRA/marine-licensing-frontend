@@ -1,5 +1,5 @@
 import { routes } from '#src/server/common/constants/routes.js'
-import { COORDINATE_SYSTEMS } from '~/src/server/common/constants/exemptions.js'
+import { COORDINATE_SYSTEMS } from '~/src/server/common/constants/coordinate-systems.js'
 import { mockExemption } from '~/src/server/test-helpers/mocks/exemption.js'
 
 const basePolygonExemption = {

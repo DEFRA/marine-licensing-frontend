@@ -13,6 +13,7 @@ import { reviewSiteDetailsRoutes } from '#src/server/marine-licence/site-details
 import { uploadAndWaitRoutes } from '#src/server/marine-licence/site-details/upload-and-wait/index.js'
 import { widthOfSiteRoutes } from '#src/server/marine-licence/site-details/width-of-site/index.js'
 import { enterMultipleCoordinatesRoutes } from '#src/server/marine-licence/site-details/enter-multiple-coordinates/index.js'
+import { durationRoutes } from '#src/server/marine-licence/site-details/activity-duration/index.js'
 
 export const siteDetailsRoutes = [
   ...centreCoordinatesRoutes,
@@ -29,5 +30,6 @@ export const siteDetailsRoutes = [
   ...reviewSiteDetailsRoutes,
   ...typeOfActivityRoutes,
   ...selectActivityRoutes,
-  ...uploadAndWaitRoutes
+  ...uploadAndWaitRoutes,
+  ...durationRoutes
 ]

@@ -1,6 +1,10 @@
 import { mockMarineLicenceApplication } from '~/src/server/test-helpers/mocks/marine-licence-mocks.js'
 import { marineLicenceRoutes } from '~/src/server/common/constants/routes.js'
-import { mockOutputActivityDetails } from '#src/server/test-helpers/mocks/marine-licence-mocks.js'
+import {
+  mockEmptyActivityDetails,
+  mockOutputActivityDetails,
+  mockOutputEmptyActivityDetails
+} from '#src/server/test-helpers/mocks/marine-licence-mocks.js'
 
 export const testScenarios = [
   {
@@ -23,7 +27,11 @@ export const testScenarios = [
     marineLicence: {
       ...mockMarineLicenceApplication,
       siteDetails: [
-        { ...mockMarineLicenceApplication.siteDetails[0], siteName: '' }
+        {
+          ...mockMarineLicenceApplication.siteDetails[0],
+          siteName: '',
+          activityDetails: [mockEmptyActivityDetails]
+        }
       ]
     },
     expectedPageContent: {
@@ -34,7 +42,7 @@ export const testScenarios = [
         {
           ...mockMarineLicenceApplication.siteDetails[0],
           siteName: null,
-          activityDetails: [mockOutputActivityDetails]
+          activityDetails: [mockOutputEmptyActivityDetails]
         }
       ]
     }

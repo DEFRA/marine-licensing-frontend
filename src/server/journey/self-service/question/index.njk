@@ -1,5 +1,6 @@
 {% extends "layouts/page.njk" %}
 {% from "govuk/components/radios/macro.njk" import govukRadios %}
+{% from "govuk/components/checkboxes/macro.njk" import govukCheckboxes %}
 {% from "govuk/components/button/macro.njk" import govukButton %}
 {% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
 
@@ -38,31 +39,47 @@
               value: answer.id,
               text: answer.text,
               hint: { html: answer.hint },
-              checked: answer.id === selectedAnswer
+              checked: answer.id in selectedAnswers
             } %}
           {% else %}
             {% set item = {
               value: answer.id,
               text: answer.text,
-              checked: answer.id === selectedAnswer
+              checked: answer.id in selectedAnswers
             } %}
           {% endif %}
           {% set items = (items.push(item), items) %}
         {% endfor %}
 
-        {{ govukRadios({
-          name: "answer",
-          fieldset: {
-            legend: {
-              html: legendHtml,
-              isPageHeading: true,
-              classes: "govuk-fieldset__legend--l"
-            }
-          },
-          hint: { html: question.hint } if question.hint,
-          errorMessage: errors.answer if errors,
-          items: items
-        }) }}
+        {% if question.multiSelect %}
+          {{ govukCheckboxes({
+            name: "answers",
+            fieldset: {
+              legend: {
+                html: legendHtml,
+                isPageHeading: true,
+                classes: "govuk-fieldset__legend--l"
+              }
+            },
+            hint: { html: question.hint } if question.hint,
+            errorMessage: errors.answers if errors,
+            items: items
+          }) }}
+        {% else %}
+          {{ govukRadios({
+            name: "answer",
+            fieldset: {
+              legend: {
+                html: legendHtml,
+                isPageHeading: true,
+                classes: "govuk-fieldset__legend--l"
+              }
+            },
+            hint: { html: question.hint } if question.hint,
+            errorMessage: errors.answer if errors,
+            items: items
+          }) }}
+        {% endif %}
 
         {{ govukButton({ text: "Continue" }) }}
       </form>

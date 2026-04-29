@@ -3,6 +3,7 @@ import {
   formatActivityMonths,
   formatActivitySubTypeHeading,
   formatActivitySubTypeLabel,
+  formatCompletionDate,
   getOtherActivityLabel,
   mapActivitySelections,
   parseActivityDetails

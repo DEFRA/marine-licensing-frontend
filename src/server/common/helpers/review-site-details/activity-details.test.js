@@ -153,12 +153,15 @@ describe('parseActivityDetails', () => {
     const siteDetails = {
       activityDetails: [
         {
+          activityDescription: 'Test description',
           activityMonths: { months: 1, details: 'test reason' },
           activityDuration: { years: 1, months: 10 },
           activitySubType: 'construction-type-1',
           activityType: 'construction',
           activities: { selections: ['CON1'] },
-          someField: 'value'
+          completionDate: { date: 'yes', reason: 'Test completion' },
+          someField: 'value',
+          workingHours: 'Test hours'
         }
       ]
     }
@@ -166,7 +169,7 @@ describe('parseActivityDetails', () => {
     expect(parseActivityDetails(siteDetails)).toEqual([
       {
         activityDescription: 'Test description',
-        activityDuration: '1 year, 4 months',
+        activityDuration: '1 year, 10 months',
         activityHeading: "What you're constructing",
         activityLink:
           '/marine-licence/activity-details/what-are-you-constructing',

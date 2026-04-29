@@ -70,11 +70,12 @@ export const questionPostController = {
     try {
       next = calculateNextRoute(question, submittedIds)
     } catch (err) {
+      const answerId = submittedIds[0]
       reportRuntimeIssue(
         request,
         'answer-no-route',
-        `${questionRoute}#${selectedAnswerId}`,
-        `Add nextQuestionRoute or outcomeRoute to answer '${selectedAnswerId}' on question ${questionRoute} in self-service.json`,
+        `${questionRoute}#${answerId}`,
+        `Add nextQuestionRoute or outcomeRoute to answer '${answerId}' on question ${questionRoute} in self-service.json`,
         err.message
       )
       throw err

@@ -62,6 +62,14 @@ export const getOtherActivityLabel = (activityType, otherText) => {
   const prefix = OTHER_ACTIVITY_PREFIXES[activityType]
   return prefix ? `${prefix}: ${otherText}` : otherText
 }
+export const formatCompletionDate = (completionDate) => {
+  if (!completionDate?.date) {
+    return null
+  }
+  return completionDate.date === 'no'
+    ? 'Not needed to be completed by a certain date'
+    : completionDate.reason
+}
 
 export const mapActivitySelections = (activities, activityType) =>
   (activities?.selections ?? []).map((selection) =>
@@ -104,6 +112,7 @@ export const parseActivityDetails = (siteDetails) => {
     activities: mapActivitySelections(
       activity.activities,
       activity.activityType
-    )
+    ),
+    completionDate: formatCompletionDate(activity.completionDate)
   }))
 }

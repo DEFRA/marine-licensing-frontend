@@ -62,7 +62,7 @@ describe('#questionPostController', () => {
 
     questionPostController.handler(request, h)
 
-    expect(pushAnswer).toHaveBeenCalledWith(request, '/sea', 'inSea')
+    expect(pushAnswer).toHaveBeenCalledWith(request, '/sea', ['inSea'])
     expect(h.redirect).toHaveBeenCalledWith(
       '/journey/self-service/jurisdiction'
     )
@@ -101,7 +101,8 @@ describe('#questionPostController', () => {
       'journey/self-service/question/index',
       expect.objectContaining({
         errors: { answer: { text: 'Select an option' } },
-        errorSummary: [{ text: 'Select an option', href: '#answer' }]
+        errorSummary: [{ text: 'Select an option', href: '#answer' }],
+        selectedAnswers: []
       })
     )
     expect(getBackLink).toHaveBeenCalledWith(request, '/sea', 'question')
@@ -135,5 +136,93 @@ describe('#questionPostController', () => {
         output: expect.objectContaining({ statusCode: 404 })
       })
     )
+  })
+
+  describe('multi-select POST', () => {
+    const multiSelectQuestion = {
+      route: '/construction/maintenance-existing-works',
+      text: 'Sub-activities',
+      section: 'subactivityType',
+      multiSelect: {
+        questionRoute: '/construction/maintenance-existing-works/scaffolding',
+        outcomeRoute: '/standard-marine-licence-application/other-maintenance',
+        outcomeAnswerId: 'OTHER_MAINTENANCE'
+      },
+      answers: [
+        { id: 'SCAFFOLDING_ACCESS_TOWERS' },
+        { id: 'OTHER_MAINTENANCE' }
+      ]
+    }
+
+    beforeEach(() => {
+      vi.mocked(getQuestion).mockReturnValue(multiSelectQuestion)
+      vi.mocked(getSection).mockReturnValue({
+        id: 'subactivityType',
+        text: 'Sub-activities'
+      })
+    })
+
+    test('returns 400 with multi-select error message when answers is empty', () => {
+      const request = {
+        params: { questionPath: 'construction/maintenance-existing-works' },
+        payload: {}
+      }
+      const codeStub = vi.fn()
+      const h = { view: vi.fn().mockReturnValue({ code: codeStub }) }
+
+      questionPostController.handler(request, h)
+
+      expect(h.view).toHaveBeenCalledWith(
+        'journey/self-service/question/index',
+        expect.objectContaining({
+          errors: { answers: { text: 'Select at least one option' } },
+          errorSummary: [
+            { text: 'Select at least one option', href: '#answers' }
+          ]
+        })
+      )
+      expect(codeStub).toHaveBeenCalledWith(statusCodes.badRequest)
+    })
+
+    test('coerces a single answers string into a one-element array and pushes it', () => {
+      vi.mocked(calculateNextRoute).mockReturnValue({
+        type: 'question',
+        route: '/construction/maintenance-existing-works/scaffolding'
+      })
+      const request = {
+        params: { questionPath: 'construction/maintenance-existing-works' },
+        payload: { answers: 'SCAFFOLDING_ACCESS_TOWERS' }
+      }
+      const h = { redirect: vi.fn() }
+
+      questionPostController.handler(request, h)
+
+      expect(pushAnswer).toHaveBeenCalledWith(
+        request,
+        '/construction/maintenance-existing-works',
+        ['SCAFFOLDING_ACCESS_TOWERS']
+      )
+    })
+
+    test('passes the full answers array to calculateNextRoute', () => {
+      vi.mocked(calculateNextRoute).mockReturnValue({
+        type: 'outcome',
+        route: '/standard-marine-licence-application/other-maintenance'
+      })
+      const request = {
+        params: { questionPath: 'construction/maintenance-existing-works' },
+        payload: {
+          answers: ['SCAFFOLDING_ACCESS_TOWERS', 'OTHER_MAINTENANCE']
+        }
+      }
+      const h = { redirect: vi.fn() }
+
+      questionPostController.handler(request, h)
+
+      expect(calculateNextRoute).toHaveBeenCalledWith(multiSelectQuestion, [
+        'SCAFFOLDING_ACCESS_TOWERS',
+        'OTHER_MAINTENANCE'
+      ])
+    })
   })
 })

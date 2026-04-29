@@ -2,10 +2,12 @@ import {
   formatActivityDuration,
   formatActivitySubTypeHeading,
   formatActivitySubTypeLabel,
+  formatCompletionDate,
   getOtherActivityLabel,
   mapActivitySelections,
   parseActivityDetails
 } from '#src/server/common/helpers/review-site-details/activity-details.js'
+import { mockActivityDetails } from '#src/server/test-helpers/mocks/marine-licence-mocks.js'
 
 describe('formatActivitySubTypeLabel', () => {
   test('returns label for construction-type-1', () => {
@@ -149,27 +151,22 @@ describe('mapActivitySelections', () => {
 describe('parseActivityDetails', () => {
   test('returns formatted activity details from site', () => {
     const siteDetails = {
-      activityDetails: [
-        {
-          activityDuration: { years: 1, months: 10 },
-          activitySubType: 'construction-type-1',
-          activityType: 'construction',
-          activities: { selections: ['CON1'] },
-          someField: 'value'
-        }
-      ]
+      activityDetails: [mockActivityDetails]
     }
 
     expect(parseActivityDetails(siteDetails)).toEqual([
       {
-        activityDuration: '1 year, 10 months',
+        activityDescription: 'Test description',
+        activityDuration: '1 year, 4 months',
         activityHeading: "What you're constructing",
         activityLink:
           '/marine-licence/activity-details/what-are-you-constructing',
         activitySubType: 'Construction of new works',
         activityType: 'construction',
         activities: ['Aquaculture trestles or fixed walkways'],
-        someField: 'value'
+        activityMonths: 'Test months',
+        completionDate: 'Test completion',
+        workingHours: 'Test hours'
       }
     ])
   })
@@ -228,5 +225,23 @@ describe('formatActivityDuration', () => {
     expect(formatActivityDuration({ years: 2 })).toEqual(null)
 
     expect(formatActivityDuration({ months: 6 })).toEqual(null)
+  })
+})
+
+describe('formatCompletionDate', () => {
+  test('returns correct format of text for "no" option', () => {
+    expect(formatCompletionDate({ date: 'no' })).toEqual(
+      'Not needed to be completed by a certain date'
+    )
+  })
+
+  test('returns correct format of text for "yes" option', () => {
+    expect(
+      formatCompletionDate({ date: 'yes', reason: 'Test reason' })
+    ).toEqual('Test reason')
+  })
+
+  test('returns null for missing data', () => {
+    expect(formatCompletionDate({})).toEqual(null)
   })
 })

@@ -1,7 +1,4 @@
-import {
-  COORDINATE_SYSTEMS,
-  POLYGON_MIN_COORDINATE_POINTS
-} from '#src/server/common/constants/coordinate-systems.js'
+import { COORDINATE_SYSTEMS } from '#src/server/common/constants/coordinate-systems.js'
 import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
 import {
   getMarineLicenceCache,

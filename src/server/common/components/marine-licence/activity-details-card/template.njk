@@ -45,7 +45,7 @@
 {% set _ = rows.push({
     key: { text: "Completion date"},
     value: { html: appIncompleteField({text:params.activityDetails.completionDate})},
-    actions: setSiteDetailsAction(params.activityDetails.completionDate, 'review-site-details', params.siteNumber, "", { skipAction: true, activityNumber: params.index })
+    actions: setSiteDetailsAction(params.activityDetails.completionDate, 'completion-date', params.siteNumber, "", { skipAction: true, activityNumber: params.index })
 }) %}
 
 {% set _ = rows.push({

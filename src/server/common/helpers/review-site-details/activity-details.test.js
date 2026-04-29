@@ -8,6 +8,7 @@ import {
   mapActivitySelections,
   parseActivityDetails
 } from '#src/server/common/helpers/review-site-details/activity-details.js'
+import { mockActivityDetails } from '#src/server/test-helpers/mocks/marine-licence-mocks.js'
 
 describe('formatActivitySubTypeLabel', () => {
   test('returns label for construction-type-1', () => {
@@ -165,7 +166,8 @@ describe('parseActivityDetails', () => {
 
     expect(parseActivityDetails(siteDetails)).toEqual([
       {
-        activityDuration: '1 year, 10 months',
+        activityDescription: 'Test description',
+        activityDuration: '1 year, 4 months',
         activityHeading: "What you're constructing",
         activityLink:
           '/marine-licence/activity-details/what-are-you-constructing',
@@ -174,7 +176,9 @@ describe('parseActivityDetails', () => {
         activities: ['Aquaculture trestles or fixed walkways'],
         activityMonths: 'test reason',
         completionDate: null,
-        someField: 'value'
+        someField: 'value',
+        completionDate: 'Test completion',
+        workingHours: 'Test hours'
       }
     ])
   })

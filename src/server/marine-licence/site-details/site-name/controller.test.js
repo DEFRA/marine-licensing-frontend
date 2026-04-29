@@ -46,7 +46,7 @@ describe('#siteName', () => {
         pageTitle: 'Site name',
         heading: 'Site name',
         backLink: marineLicenceRoutes.MARINE_LICENCE_COORDINATES_TYPE_CHOICE,
-        cancelLink: marineLicenceRoutes.MARINE_LICENCE_TASK_LIST,
+        cancelLink: `${marineLicenceRoutes.MARINE_LICENCE_TASK_LIST}?cancel=site-details`,
         payload: {
           siteName: mockManualCoordinatesMarineLicence.siteDetails[0].siteName
         },

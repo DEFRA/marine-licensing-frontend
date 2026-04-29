@@ -62,7 +62,7 @@ describe('#centreCoordinates (marine licence)', () => {
           action: undefined,
           backLink: marineLicenceRoutes.MARINE_LICENCE_COORDINATE_SYSTEM_CHOICE,
           buttonText: 'Continue',
-          cancelLink: marineLicenceRoutes.MARINE_LICENCE_TASK_LIST,
+          cancelLink: `${marineLicenceRoutes.MARINE_LICENCE_TASK_LIST}?cancel=site-details`,
           heading: 'Enter the coordinates at the centre point of the site',
           pageTitle: 'Enter the coordinates at the centre point of the site',
           payload: { latitude: undefined, longitude: undefined },
@@ -83,7 +83,7 @@ describe('#centreCoordinates (marine licence)', () => {
           action: undefined,
           backLink: marineLicenceRoutes.MARINE_LICENCE_COORDINATE_SYSTEM_CHOICE,
           buttonText: 'Continue',
-          cancelLink: marineLicenceRoutes.MARINE_LICENCE_TASK_LIST,
+          cancelLink: `${marineLicenceRoutes.MARINE_LICENCE_TASK_LIST}?cancel=site-details`,
           heading: 'Enter the coordinates at the centre point of the site',
           pageTitle: 'Enter the coordinates at the centre point of the site',
           payload: { ...wgs84Coordinates },
@@ -107,7 +107,7 @@ describe('#centreCoordinates (marine licence)', () => {
           action: undefined,
           backLink: marineLicenceRoutes.MARINE_LICENCE_COORDINATE_SYSTEM_CHOICE,
           buttonText: 'Continue',
-          cancelLink: marineLicenceRoutes.MARINE_LICENCE_TASK_LIST,
+          cancelLink: `${marineLicenceRoutes.MARINE_LICENCE_TASK_LIST}?cancel=site-details`,
           heading: 'Enter the coordinates at the centre point of the site',
           pageTitle: 'Enter the coordinates at the centre point of the site',
           payload: { ...osgb36Coordinates },
@@ -139,7 +139,7 @@ describe('#centreCoordinates (marine licence)', () => {
           action: undefined,
           backLink: marineLicenceRoutes.MARINE_LICENCE_COORDINATE_SYSTEM_CHOICE,
           buttonText: 'Continue',
-          cancelLink: marineLicenceRoutes.MARINE_LICENCE_TASK_LIST,
+          cancelLink: `${marineLicenceRoutes.MARINE_LICENCE_TASK_LIST}?cancel=site-details`,
           heading: 'Enter the coordinates at the centre point of the site',
           pageTitle: 'Enter the coordinates at the centre point of the site',
           projectName: 'Test Project',
@@ -179,7 +179,7 @@ describe('#centreCoordinates (marine licence)', () => {
           action: undefined,
           backLink: marineLicenceRoutes.MARINE_LICENCE_COORDINATE_SYSTEM_CHOICE,
           buttonText: 'Continue',
-          cancelLink: marineLicenceRoutes.MARINE_LICENCE_TASK_LIST,
+          cancelLink: `${marineLicenceRoutes.MARINE_LICENCE_TASK_LIST}?cancel=site-details`,
           heading: 'Enter the coordinates at the centre point of the site',
           pageTitle: 'Enter the coordinates at the centre point of the site',
           projectName: 'Test Project',
@@ -213,7 +213,7 @@ describe('#centreCoordinates (marine licence)', () => {
           action: undefined,
           backLink: marineLicenceRoutes.MARINE_LICENCE_COORDINATE_SYSTEM_CHOICE,
           buttonText: 'Continue',
-          cancelLink: marineLicenceRoutes.MARINE_LICENCE_TASK_LIST,
+          cancelLink: `${marineLicenceRoutes.MARINE_LICENCE_TASK_LIST}?cancel=site-details`,
           heading: 'Enter the coordinates at the centre point of the site',
           pageTitle: 'Enter the coordinates at the centre point of the site',
           projectName: 'Test Project',
@@ -314,7 +314,7 @@ describe('#centreCoordinates (marine licence)', () => {
       expect(updateMarineLicenceSiteDetails).not.toHaveBeenCalled()
     })
 
-    test('should redirect to review site details when action is present', async () => {
+    test('should redirect to circle width when action is present', async () => {
       const h = { redirect: vi.fn() }
       const request = createMockRequest({
         payload: { ...wgs84Coordinates },
@@ -324,7 +324,7 @@ describe('#centreCoordinates (marine licence)', () => {
       await centreCoordinatesSubmitController.handler(request, h)
 
       expect(h.redirect).toHaveBeenCalledWith(
-        marineLicenceRoutes.MARINE_LICENCE_CIRCLE_CENTRE_POINT
+        marineLicenceRoutes.MARINE_LICENCE_WIDTH_OF_SITE
       )
     })
   })

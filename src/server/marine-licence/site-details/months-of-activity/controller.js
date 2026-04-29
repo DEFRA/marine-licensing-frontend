@@ -25,32 +25,28 @@ export const monthsOfActivityController = {
     pre: [validateSiteAndActivityParams]
   },
   handler(request, h) {
-    try {
-      const marineLicence = getMarineLicenceCache(request)
-      const {
-        activityDetailsIndex,
-        activityDetailsNumber,
-        siteIndex,
-        siteNumber
-      } = getSiteDataFromParam(request.query)
+    const marineLicence = getMarineLicenceCache(request)
+    const {
+      activityDetailsIndex,
+      activityDetailsNumber,
+      siteIndex,
+      siteNumber
+    } = getSiteDataFromParam(request.query)
 
-      const activityDetails = getActivityDetailsByIndex(
-        marineLicence,
-        siteIndex,
-        activityDetailsIndex
-      )
+    const activityDetails = getActivityDetailsByIndex(
+      marineLicence,
+      siteIndex,
+      activityDetailsIndex
+    )
 
-      return h.view(MARINE_LICENCE_MONTHS_OF_ACTIVITY_VIEW_ROUTE, {
-        ...monthsOfActivitySettings,
-        backLink: getBackLink(siteNumber, activityDetailsNumber),
-        projectName: marineLicence.projectName,
-        siteNumber,
-        activityDetailsNumber,
-        payload: activityDetails.activityMonths
-      })
-    } catch (e) {
-      console.log(e)
-    }
+    return h.view(MARINE_LICENCE_MONTHS_OF_ACTIVITY_VIEW_ROUTE, {
+      ...monthsOfActivitySettings,
+      backLink: getBackLink(siteNumber, activityDetailsNumber),
+      projectName: marineLicence.projectName,
+      siteNumber,
+      activityDetailsNumber,
+      payload: activityDetails.activityMonths
+    })
   }
 }
 

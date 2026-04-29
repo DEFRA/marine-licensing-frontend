@@ -95,7 +95,7 @@ describe('#questionController', () => {
 
   test('passes selectedAnswers when a previous answer exists', () => {
     vi.mocked(getAnswerForRoute).mockReturnValue(['inSea'])
-     const request = {
+    const request = {
       params: { questionPath: 'sea' },
       logger: { warn: vi.fn() }
     }

@@ -2,9 +2,9 @@ import { vi } from 'vitest'
 import { setupTestServer } from '#tests/integration/shared/test-setup-helpers.js'
 import {
   widthOfSiteController,
-  widthOfSiteSubmitController,
-  WIDTH_OF_SITE_VIEW_ROUTE
+  widthOfSiteSubmitController
 } from '#src/server/exemption/site-details/width-of-site/controller.js'
+import { WIDTH_OF_SITE_VIEW_ROUTE } from '#src/server/common/validation/width-of-site/constants.js'
 import * as cacheUtils from '#src/server/common/helpers/exemptions/session-cache/utils.js'
 import {
   mockExemption,

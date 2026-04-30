@@ -5,17 +5,23 @@ import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
 describe('getCancelLink', () => {
   it('should return cancel link when action is undefined', () => {
     const result = getCancelLink(undefined)
-    expect(result).toBe(marineLicenceRoutes.MARINE_LICENCE_TASK_LIST)
+    expect(result).toBe(
+      `${marineLicenceRoutes.MARINE_LICENCE_TASK_LIST}?cancel=site-details`
+    )
   })
 
   it('should return cancel link when action is falsy', () => {
     const result = getCancelLink(null)
-    expect(result).toBe(marineLicenceRoutes.MARINE_LICENCE_TASK_LIST)
+    expect(result).toBe(
+      `${marineLicenceRoutes.MARINE_LICENCE_TASK_LIST}?cancel=site-details`
+    )
   })
 
   it('should return cancel link when action is empty string', () => {
     const result = getCancelLink('')
-    expect(result).toBe(marineLicenceRoutes.MARINE_LICENCE_TASK_LIST)
+    expect(result).toBe(
+      `${marineLicenceRoutes.MARINE_LICENCE_TASK_LIST}?cancel=site-details`
+    )
   })
 
   it('should return undefined when action has a value', () => {

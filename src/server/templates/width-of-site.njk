@@ -36,10 +36,10 @@
           }) }}
         {% endif %}
 
-      <form method="POST" action="{{ routes.WIDTH_OF_SITE }}">
+      <form method="POST">
 
         <input type="hidden" name="csrfToken" value="{{ csrfToken }}">
-        
+
         {{ govukInput({
           label: {
             html: headingWithCaption,
@@ -66,8 +66,8 @@
             cancelLink: cancelLink
           }) }}
         </div>
-        
+
       </form>
     </div>
   </div>
-{% endblock %} 
+{% endblock %}

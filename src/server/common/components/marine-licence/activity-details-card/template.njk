@@ -51,7 +51,7 @@
 {% set _ = rows.push({
     key: { text: "Activity limited to specific months"},
     value: { html: appIncompleteField({text:params.activityDetails.activityMonths})},
-    actions: setSiteDetailsAction(params.activityDetails.activityMonths, 'review-site-details', params.siteNumber, "", { skipAction: true, activityNumber: params.index })
+    actions: setSiteDetailsAction(params.activityDetails.activityMonths, 'months-of-activity', params.siteNumber, "", { skipAction: true, activityNumber: params.index })
 }) %}
 
 {% set _ = rows.push({

@@ -12,11 +12,14 @@ import { typeOfActivityRoutes } from '#src/server/marine-licence/site-details/ty
 import { selectActivityRoutes } from '#src/server/marine-licence/site-details/select-activity/index.js'
 import { reviewSiteDetailsRoutes } from '#src/server/marine-licence/site-details/review-site-details/index.js'
 import { uploadAndWaitRoutes } from '#src/server/marine-licence/site-details/upload-and-wait/index.js'
+import { widthOfSiteRoutes } from '#src/server/marine-licence/site-details/width-of-site/index.js'
 import { durationRoutes } from '#src/server/marine-licence/site-details/activity-duration/index.js'
 import { workingHoursRoutes } from '#src/server/marine-licence/site-details/working-hours/index.js'
+import { monthsOfActivityRoutes } from '#src/server/marine-licence/site-details/months-of-activity/index.js'
 
 export const siteDetailsRoutes = [
   ...centreCoordinatesRoutes,
+  ...widthOfSiteRoutes,
   ...activityDescriptionRoutes,
   ...completionDateRoutes,
   ...beforeYouStartRoutes,
@@ -31,5 +34,6 @@ export const siteDetailsRoutes = [
   ...selectActivityRoutes,
   ...uploadAndWaitRoutes,
   ...durationRoutes,
-  ...workingHoursRoutes
+  ...workingHoursRoutes,
+  ...monthsOfActivityRoutes
 ]

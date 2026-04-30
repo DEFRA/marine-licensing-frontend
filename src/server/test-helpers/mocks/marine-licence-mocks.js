@@ -17,9 +17,10 @@ export const mockEmptyActivityDetails = {
   activityDescription: '',
   activityDuration: '',
   completionDate: {},
-  activityMonths: '',
+  activityMonths: {},
   workingHours: ''
 }
+
 export const mockActivityDetails = {
   activityType: 'construction',
   activitySubType: 'construction-type-1',
@@ -27,7 +28,7 @@ export const mockActivityDetails = {
   activityDescription: 'Test description',
   completionDate: { date: 'yes', reason: 'Test completion' },
   activityDuration: { years: 1, months: 4 },
-  activityMonths: 'Test months',
+  activityMonths: { months: 'yes', details: 'Test months' },
   workingHours: 'Test hours'
 }
 
@@ -35,12 +36,14 @@ export const mockOutputActivityDetails = {
   ...mockActivityDetails,
   activityType: 'Construction of new works',
   activityDuration: '1 year, 4 months',
-  completionDate: mockActivityDetails.completionDate.reason
+  completionDate: mockActivityDetails.completionDate.reason,
+  activityMonths: mockActivityDetails.activityMonths.details
 }
 
 export const mockOutputEmptyActivityDetails = {
   ...mockEmptyActivityDetails,
-  completionDate: null
+  completionDate: null,
+  activityMonths: null
 }
 
 export const mockMarineLicenceApplication = {

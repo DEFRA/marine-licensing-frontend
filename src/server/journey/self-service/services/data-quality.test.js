@@ -146,7 +146,8 @@ describe('#runLoadTimeScan', () => {
             { id: 'a', text: 'a', outcomeRoute: '/o-good' },
             { id: 'b', text: 'b', outcomeRoute: '/o-missing-heading' },
             { id: 'c', text: 'c', outcomeRoute: '/o-empty-types' },
-            { id: 'd', text: 'd', outcomeRoute: '/o-bad-ref' }
+            { id: 'd', text: 'd', outcomeRoute: '/o-bad-ref' },
+            { id: 'e', text: 'e', outcomeRoute: '/o-multi-headingless' }
           ]
         },
         {
@@ -186,11 +187,24 @@ describe('#runLoadTimeScan', () => {
           heading: 'Orphan',
           text: null,
           outcomeTypes: ['T_GOOD']
+        },
+        {
+          route: '/o-multi-headingless',
+          heading: 'Multi-terminal with a headingless option',
+          text: null,
+          outcomeTypes: ['T_NO_HEADING', 'T_HEADING_OK']
         }
       ],
       outcomeTypes: [
         { id: 'T_GOOD', heading: 'Good', text: '<p>body</p>' },
-        { id: 'T_EMPTY_TEXT', heading: 'Empty text', text: '' }
+        { id: 'T_EMPTY_TEXT', heading: 'Empty text', text: '' },
+        { id: 'T_NO_HEADING', text: '<p>no heading</p>', module: 'X' },
+        {
+          id: 'T_HEADING_OK',
+          heading: 'Heading is here',
+          text: '<p>ok</p>',
+          module: 'Y'
+        }
       ],
       sections: []
     }
@@ -211,10 +225,112 @@ describe('#runLoadTimeScan', () => {
         'outcome-missing-heading',
         'outcome-orphan',
         'outcome-unknown-outcome-type-ref',
+        'outcometype-missing-heading',
         'question-no-answers',
         'question-orphan'
       ].sort()
     )
+  })
+
+  test('flags only headingless outcomeTypes used on a multi-terminal outcome', () => {
+    const warn = vi.fn()
+    runLoadTimeScan({ warn }, makeJourney())
+
+    const refs = warn.mock.calls
+      .filter(([obj]) => obj.event.action === 'outcometype-missing-heading')
+      .map(([obj]) => obj.event.reference)
+      .sort()
+
+    expect(refs).toEqual(['T_NO_HEADING'])
+  })
+
+  test('does NOT flag headingless outcomeType on a single-terminal outcome', () => {
+    const warn = vi.fn()
+    runLoadTimeScan(
+      { warn },
+      {
+        firstQuestionRoute: '/q1',
+        questions: [
+          {
+            route: '/q1',
+            text: 'q1',
+            answers: [{ id: 'a', text: 'a', outcomeRoute: '/single' }]
+          }
+        ],
+        outcomes: [
+          {
+            route: '/single',
+            heading: 'Single',
+            text: null,
+            outcomeTypes: ['T_NO_HEADING']
+          }
+        ],
+        outcomeTypes: [{ id: 'T_NO_HEADING', text: '<p>x</p>', module: 'X' }],
+        sections: []
+      }
+    )
+
+    const refs = warn.mock.calls
+      .filter(([obj]) => obj.event.action === 'outcometype-missing-heading')
+      .map(([obj]) => obj.event.reference)
+
+    expect(refs).toEqual([])
+  })
+
+  test('does NOT flag headingless outcomeType on an intermediate (fork) outcome', () => {
+    const warn = vi.fn()
+    runLoadTimeScan(
+      { warn },
+      {
+        firstQuestionRoute: '/q1',
+        questions: [
+          {
+            route: '/q1',
+            text: 'q1',
+            answers: [{ id: 'a', text: 'a', outcomeRoute: '/fork' }]
+          },
+          {
+            route: '/onwards',
+            text: 'onwards',
+            answers: [{ id: 'a', text: 'a', outcomeRoute: '/single' }]
+          }
+        ],
+        outcomes: [
+          {
+            route: '/fork',
+            heading: 'Fork',
+            text: null,
+            outcomeTypes: ['T_NO_HEADING_INTERMEDIATE', 'T_HEADING_TERMINAL']
+          },
+          {
+            route: '/single',
+            heading: 'Single',
+            text: null,
+            outcomeTypes: ['T_HEADING_TERMINAL']
+          }
+        ],
+        outcomeTypes: [
+          {
+            id: 'T_NO_HEADING_INTERMEDIATE',
+            text: '<p>x</p>',
+            nextQuestionRoute: '/onwards'
+          },
+          {
+            id: 'T_HEADING_TERMINAL',
+            heading: 'OK',
+            text: '<p>y</p>',
+            module: 'X'
+          }
+        ],
+        sections: []
+      }
+    )
+
+    const refs = warn.mock.calls
+      .filter(([obj]) => obj.event.action === 'outcometype-missing-heading')
+      .map(([obj]) => obj.event.reference)
+
+    expect(refs).toEqual([])
   })
 
   test('emits a separate warn per orphan question (one per route)', () => {

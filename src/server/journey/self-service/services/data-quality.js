@@ -30,7 +30,10 @@ export function reportRuntimeIssue(request, action, reference, fix, summary) {
 }
 
 export function runLoadTimeScan(logger, journeyData) {
-  const outcomeTypeIds = new Set(journeyData.outcomeTypes.map((ot) => ot.id))
+  const outcomeTypesById = new Map(
+    journeyData.outcomeTypes.map((ot) => [ot.id, ot])
+  )
+  const outcomeTypeIds = new Set(outcomeTypesById.keys())
   const reachableQuestions = new Set()
   const reachableOutcomes = new Set()
 
@@ -110,6 +113,20 @@ export function runLoadTimeScan(logger, journeyData) {
           )
         }
       }
+      if (isMultiTerminal(outcome, outcomeTypesById)) {
+        for (const id of outcome.outcomeTypes) {
+          const ot = outcomeTypesById.get(id)
+          if (ot && !ot.heading) {
+            reportLoadTimeIssue(
+              logger,
+              'outcometype-missing-heading',
+              id,
+              `Set 'heading' on outcomeType ${id} in self-service.json — it renders as an option card on multi-terminal outcome ${outcome.route}`,
+              `outcomeType ${id} has no heading; renders as a stranded "Option N" card on ${outcome.route}`
+            )
+          }
+        }
+      }
     }
     if (!reachableOutcomes.has(outcome.route)) {
       reportLoadTimeIssue(
@@ -121,6 +138,14 @@ export function runLoadTimeScan(logger, journeyData) {
       )
     }
   }
+}
+
+function isMultiTerminal(outcome, outcomeTypesById) {
+  const types = (outcome.outcomeTypes ?? [])
+    .map((id) => outcomeTypesById.get(id))
+    .filter(Boolean)
+  if (types.length < 2) return false
+  return types.every((ot) => !ot.nextQuestionRoute)
 }
 
 function walkReachable(journeyData, reachableQuestions, reachableOutcomes) {

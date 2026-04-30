@@ -71,6 +71,7 @@ export const typeOfActivityController = {
 
 export const typeOfActivitySubmitController = {
   options: {
+    pre: [validateSiteAndActivityParams],
     validate: {
       payload: typeOfActivitySchema,
       failAction: (request, h, err) => {

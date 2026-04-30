@@ -18,17 +18,29 @@ const cancelLink = `${marineLicenceRoutes.MARINE_LICENCE_TASK_LIST}?cancel=site-
 
 describe('#coordinateSystem (marine licence)', () => {
   beforeEach(() => {
-    vi.mocked(getMarineLicenceCache).mockReturnValue({
-      ...mockMarineLicenceApplication,
-      siteDetails: [{ coordinateSystem: 'wgs84' }]
-    })
+    vi.mocked(getMarineLicenceCache).mockReturnValue(
+      mockMarineLicenceApplication
+    )
   })
 
   describe('#coordinateSystemController', () => {
     test('handler should render with correct context', () => {
       const h = { view: vi.fn() }
 
-      coordinateSystemController.handler(createMockRequest(), h)
+      coordinateSystemController.handler(
+        createMockRequest({
+          site: {
+            siteIndex: 0,
+            siteNumber: 1,
+            queryParams: '',
+            siteDetails: {
+              coordinateSystem: 'wgs84',
+              coordinatesEntry: 'single'
+            }
+          }
+        }),
+        h
+      )
 
       expect(h.view).toHaveBeenCalledWith(
         MARINE_LICENCE_COORDINATE_SYSTEM_VIEW_ROUTE,
@@ -38,7 +50,7 @@ describe('#coordinateSystem (marine licence)', () => {
           backLink: marineLicenceRoutes.MARINE_LICENCE_COORDINATES_ENTRY_CHOICE,
           cancelLink,
           projectName: 'Test Project',
-          siteNumber: null,
+          siteNumber: 1,
           action: undefined,
           payload: {
             coordinateSystem: 'wgs84'
@@ -49,13 +61,22 @@ describe('#coordinateSystem (marine licence)', () => {
 
     test('handler should render with correct context when no existing cache data', () => {
       vi.mocked(getMarineLicenceCache).mockReturnValueOnce({
-        projectName: mockMarineLicenceApplication.projectName,
-        siteDetails: []
+        projectName: mockMarineLicenceApplication.projectName
       })
 
       const h = { view: vi.fn() }
 
-      coordinateSystemController.handler(createMockRequest(), h)
+      coordinateSystemController.handler(
+        createMockRequest({
+          site: {
+            siteIndex: 0,
+            siteNumber: 1,
+            queryParams: '',
+            siteDetails: {}
+          }
+        }),
+        h
+      )
 
       expect(h.view).toHaveBeenCalledWith(
         MARINE_LICENCE_COORDINATE_SYSTEM_VIEW_ROUTE,
@@ -65,7 +86,7 @@ describe('#coordinateSystem (marine licence)', () => {
           backLink: marineLicenceRoutes.MARINE_LICENCE_COORDINATES_ENTRY_CHOICE,
           cancelLink,
           projectName: 'Test Project',
-          siteNumber: null,
+          siteNumber: 1,
           action: undefined,
           payload: {
             coordinateSystem: undefined
@@ -111,7 +132,7 @@ describe('#coordinateSystem (marine licence)', () => {
           backLink: marineLicenceRoutes.MARINE_LICENCE_COORDINATES_ENTRY_CHOICE,
           cancelLink,
           projectName: 'Test Project',
-          siteNumber: null,
+          siteNumber: 1,
           action: undefined,
           payload: { coordinateSystem: 'invalid' },
           errorSummary: [
@@ -159,7 +180,7 @@ describe('#coordinateSystem (marine licence)', () => {
           backLink: marineLicenceRoutes.MARINE_LICENCE_COORDINATES_ENTRY_CHOICE,
           cancelLink,
           projectName: 'Test Project',
-          siteNumber: null,
+          siteNumber: 1,
           action: undefined,
           payload: { coordinateSystem: 'invalid' }
         }
@@ -173,7 +194,12 @@ describe('#coordinateSystem (marine licence)', () => {
 
       const request = createMockRequest({
         payload: { coordinateSystem: 'wgs84' },
-        site: { siteIndex: 0, siteDetails: { coordinatesEntry: 'single' } }
+        site: {
+          siteIndex: 0,
+          siteNumber: 1,
+          queryParams: '',
+          siteDetails: { coordinatesEntry: 'single', coordinateSystem: 'wgs84' }
+        }
       })
 
       await coordinateSystemSubmitController.handler(request, h)
@@ -188,7 +214,15 @@ describe('#coordinateSystem (marine licence)', () => {
 
       const request = createMockRequest({
         payload: { coordinateSystem: 'wgs84' },
-        site: { siteIndex: 0, siteDetails: { coordinatesEntry: 'multiple' } }
+        site: {
+          siteIndex: 0,
+          siteNumber: 1,
+          queryParams: '',
+          siteDetails: {
+            coordinatesEntry: 'multiple',
+            coordinateSystem: 'wgs84'
+          }
+        }
       })
 
       await coordinateSystemSubmitController.handler(request, h)
@@ -203,7 +237,12 @@ describe('#coordinateSystem (marine licence)', () => {
 
       const request = createMockRequest({
         payload: { coordinateSystem: 'wgs84' },
-        site: { siteIndex: 0, siteDetails: {} }
+        site: {
+          siteIndex: 0,
+          siteNumber: 1,
+          queryParams: '',
+          siteDetails: { coordinateSystem: 'wgs84' }
+        }
       })
 
       await coordinateSystemSubmitController.handler(request, h)
@@ -221,7 +260,12 @@ describe('#coordinateSystem (marine licence)', () => {
 
       const request = createMockRequest({
         payload: { coordinateSystem: 'wgs84' },
-        site: { siteIndex: 0, siteDetails: { coordinatesEntry: 'single' } }
+        site: {
+          siteIndex: 0,
+          siteNumber: 1,
+          queryParams: '',
+          siteDetails: { coordinatesEntry: 'single', coordinateSystem: 'wgs84' }
+        }
       })
 
       await coordinateSystemSubmitController.handler(request, h)

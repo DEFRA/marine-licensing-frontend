@@ -62,7 +62,17 @@ describe('#multipleCoordinates (marine licence)', () => {
     })
 
     test('should render WGS84 template with correct context', () => {
-      const request = createMockRequest()
+      const request = createMockRequest({
+        site: {
+          siteIndex: 0,
+          siteNumber: 1,
+          queryParams: '',
+          siteDetails: {
+            coordinateSystem: COORDINATE_SYSTEMS.WGS84,
+            coordinates: mockCoordinates.wgs84
+          }
+        }
+      })
       multipleCoordinatesController.handler(request, mockH)
 
       expect(mockH.view).toHaveBeenCalledWith(
@@ -76,23 +86,28 @@ describe('#multipleCoordinates (marine licence)', () => {
             '?cancel=site-details',
           coordinates: [...mockCoordinates.wgs84, paddedCoordinates.wgs84],
           projectName: 'Test Project',
-          siteNumber: null
+          siteNumber: 1
         }
       )
     })
 
     test('should render OSGB36 template with correct context', () => {
       getMarineLicenceCacheSpy.mockReturnValueOnce({
-        ...mockMarineLicence,
-        siteDetails: [
-          {
+        id: 'test-ml-id',
+        projectName: 'Test Project'
+      })
+
+      const request = createMockRequest({
+        site: {
+          siteIndex: 0,
+          siteNumber: 1,
+          queryParams: '',
+          siteDetails: {
             coordinateSystem: COORDINATE_SYSTEMS.OSGB36,
             coordinates: mockCoordinates.osgb36
           }
-        ]
+        }
       })
-
-      const request = createMockRequest()
       multipleCoordinatesController.handler(request, mockH)
 
       expect(mockH.view).toHaveBeenCalledWith(
@@ -106,7 +121,7 @@ describe('#multipleCoordinates (marine licence)', () => {
             '?cancel=site-details',
           coordinates: [...mockCoordinates.osgb36, paddedCoordinates.osgb36],
           projectName: 'Test Project',
-          siteNumber: null
+          siteNumber: 1
         }
       )
     })
@@ -114,7 +129,14 @@ describe('#multipleCoordinates (marine licence)', () => {
     test('should handle empty cache gracefully', () => {
       getMarineLicenceCacheSpy.mockReturnValueOnce(undefined)
 
-      const request = createMockRequest()
+      const request = createMockRequest({
+        site: {
+          siteIndex: 0,
+          siteNumber: 1,
+          queryParams: '',
+          siteDetails: {}
+        }
+      })
       multipleCoordinatesController.handler(request, mockH)
 
       expect(mockH.view).toHaveBeenCalledWith(
@@ -132,13 +154,24 @@ describe('#multipleCoordinates (marine licence)', () => {
             paddedCoordinates.wgs84
           ],
           projectName: undefined,
-          siteNumber: null
+          siteNumber: 1
         }
       )
     })
 
     test('should render with change action back link pointing to review page', () => {
-      const request = createMockRequest({ query: { action: 'change' } })
+      const request = createMockRequest({
+        query: { action: 'change' },
+        site: {
+          siteIndex: 0,
+          siteNumber: 1,
+          queryParams: '',
+          siteDetails: {
+            coordinateSystem: COORDINATE_SYSTEMS.WGS84,
+            coordinates: mockCoordinates.wgs84
+          }
+        }
+      })
       multipleCoordinatesController.handler(request, mockH)
 
       expect(mockH.view).toHaveBeenCalledWith(
@@ -150,7 +183,7 @@ describe('#multipleCoordinates (marine licence)', () => {
           cancelLink: undefined,
           coordinates: [...mockCoordinates.wgs84, paddedCoordinates.wgs84],
           projectName: 'Test Project',
-          siteNumber: null
+          siteNumber: 1
         }
       )
     })
@@ -180,7 +213,15 @@ describe('#multipleCoordinates (marine licence)', () => {
         'coordinates[2][latitude]': '51.527600',
         'coordinates[2][longitude]': '-0.147700'
       }
-      const request = createMockRequest({ payload })
+      const request = createMockRequest({
+        payload,
+        site: {
+          siteIndex: 0,
+          siteNumber: 1,
+          queryParams: '',
+          siteDetails: { coordinateSystem: COORDINATE_SYSTEMS.WGS84 }
+        }
+      })
 
       await multipleCoordinatesSubmitController.handler(request, mockH)
 
@@ -200,7 +241,15 @@ describe('#multipleCoordinates (marine licence)', () => {
       const payload = {
         'coordinates[0][latitude]': 'invalid'
       }
-      const request = createMockRequest({ payload })
+      const request = createMockRequest({
+        payload,
+        site: {
+          siteIndex: 0,
+          siteNumber: 1,
+          queryParams: '',
+          siteDetails: { coordinateSystem: COORDINATE_SYSTEMS.WGS84 }
+        }
+      })
 
       multipleCoordinatesSubmitController.handler(request, mockH)
 
@@ -217,8 +266,8 @@ describe('#multipleCoordinates (marine licence)', () => {
 
     test('should handle OSGB36 coordinates correctly', async () => {
       getMarineLicenceCacheSpy.mockReturnValueOnce({
-        ...mockMarineLicence,
-        siteDetails: [{ coordinateSystem: COORDINATE_SYSTEMS.OSGB36 }]
+        id: 'test-ml-id',
+        projectName: 'Test Project'
       })
       const payload = {
         'coordinates[0][easting]': '530000',
@@ -228,7 +277,15 @@ describe('#multipleCoordinates (marine licence)', () => {
         'coordinates[2][easting]': '530200',
         'coordinates[2][northing]': '181200'
       }
-      const request = createMockRequest({ payload })
+      const request = createMockRequest({
+        payload,
+        site: {
+          siteIndex: 0,
+          siteNumber: 1,
+          queryParams: '',
+          siteDetails: { coordinateSystem: COORDINATE_SYSTEMS.OSGB36 }
+        }
+      })
 
       await multipleCoordinatesSubmitController.handler(request, mockH)
 
@@ -254,7 +311,15 @@ describe('#multipleCoordinates (marine licence)', () => {
         'coordinates[2][longitude]': '-0.147700',
         add: 'add'
       }
-      const request = createMockRequest({ payload })
+      const request = createMockRequest({
+        payload,
+        site: {
+          siteIndex: 0,
+          siteNumber: 1,
+          queryParams: '',
+          siteDetails: { coordinateSystem: COORDINATE_SYSTEMS.WGS84 }
+        }
+      })
 
       await multipleCoordinatesSubmitController.handler(request, mockH)
 
@@ -269,8 +334,8 @@ describe('#multipleCoordinates (marine licence)', () => {
 
     test('should re-render with added OSGB36 point when add button clicked', async () => {
       getMarineLicenceCacheSpy.mockReturnValue({
-        ...mockMarineLicence,
-        siteDetails: [{ coordinateSystem: COORDINATE_SYSTEMS.OSGB36 }]
+        id: 'test-ml-id',
+        projectName: 'Test Project'
       })
       const payload = {
         'coordinates[0][easting]': '530000',
@@ -281,7 +346,15 @@ describe('#multipleCoordinates (marine licence)', () => {
         'coordinates[2][northing]': '181200',
         add: 'add'
       }
-      const request = createMockRequest({ payload })
+      const request = createMockRequest({
+        payload,
+        site: {
+          siteIndex: 0,
+          siteNumber: 1,
+          queryParams: '',
+          siteDetails: { coordinateSystem: COORDINATE_SYSTEMS.OSGB36 }
+        }
+      })
 
       await multipleCoordinatesSubmitController.handler(request, mockH)
 
@@ -296,8 +369,8 @@ describe('#multipleCoordinates (marine licence)', () => {
 
     test('should re-render with removed point when remove button clicked', async () => {
       getMarineLicenceCacheSpy.mockReturnValue({
-        ...mockMarineLicence,
-        siteDetails: [{ coordinateSystem: COORDINATE_SYSTEMS.OSGB36 }]
+        id: 'test-ml-id',
+        projectName: 'Test Project'
       })
       const payload = {
         'coordinates[0][easting]': '530000',
@@ -308,7 +381,15 @@ describe('#multipleCoordinates (marine licence)', () => {
         'coordinates[2][northing]': '181200',
         remove: '3'
       }
-      const request = createMockRequest({ payload })
+      const request = createMockRequest({
+        payload,
+        site: {
+          siteIndex: 0,
+          siteNumber: 1,
+          queryParams: '',
+          siteDetails: { coordinateSystem: COORDINATE_SYSTEMS.OSGB36 }
+        }
+      })
 
       await multipleCoordinatesSubmitController.handler(request, mockH)
 
@@ -332,7 +413,13 @@ describe('#multipleCoordinates (marine licence)', () => {
       }
       const request = createMockRequest({
         payload,
-        query: { action: 'change' }
+        query: { action: 'change' },
+        site: {
+          siteIndex: 0,
+          siteNumber: 1,
+          queryParams: '',
+          siteDetails: { coordinateSystem: COORDINATE_SYSTEMS.WGS84 }
+        }
       })
 
       await multipleCoordinatesSubmitController.handler(request, mockH)

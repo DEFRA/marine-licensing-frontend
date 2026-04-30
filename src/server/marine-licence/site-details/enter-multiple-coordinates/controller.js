@@ -4,7 +4,6 @@ import {
   getMarineLicenceCache,
   updateMarineLicenceSiteDetails
 } from '#src/server/common/helpers/marine-licence/session-cache/utils.js'
-import { getSiteDetailsBySite } from '#src/server/common/helpers/marine-licence/session-cache/site-details-utils.js'
 import {
   MULTIPLE_COORDINATES_VIEW_ROUTES,
   normaliseCoordinatesForDisplay,
@@ -16,6 +15,7 @@ import {
 } from './utils.js'
 import { validateCoordinates } from '#src/server/common/validation/multiple-coordinates/validate.js'
 import { getCancelLink } from '#src/server/marine-licence/site-details/utils/cancel-link.js'
+import { setSiteDataPreHandler } from '#src/server/common/helpers/marine-licence/session-cache/site-utils.js'
 
 const getBackLinkForAction = (action) =>
   action
@@ -23,11 +23,14 @@ const getBackLinkForAction = (action) =>
     : marineLicenceRoutes.MARINE_LICENCE_COORDINATE_SYSTEM_CHOICE
 
 export const multipleCoordinatesController = {
+  options: {
+    pre: [setSiteDataPreHandler]
+  },
   handler(request, h) {
     const marineLicence = getMarineLicenceCache(request) || {}
     const { projectName } = marineLicence
+    const { siteNumber, siteDetails } = request.site
     const action = request.query.action
-    const siteDetails = getSiteDetailsBySite(marineLicence)
 
     const coordinateSystem =
       siteDetails.coordinateSystem === COORDINATE_SYSTEMS.OSGB36
@@ -45,7 +48,7 @@ export const multipleCoordinatesController = {
       cancelLink: getCancelLink(action),
       coordinates: paddedCoordinates,
       projectName,
-      siteNumber: null,
+      siteNumber,
       action
     })
   }
@@ -55,7 +58,8 @@ function renderMultipleCoordinatesView(
   h,
   coordinates,
   coordinateSystem,
-  projectName
+  projectName,
+  siteNumber
 ) {
   const paddedCoordinates = normaliseCoordinatesForDisplay(
     coordinateSystem,
@@ -64,15 +68,19 @@ function renderMultipleCoordinatesView(
   return h.view(MULTIPLE_COORDINATES_VIEW_ROUTES[coordinateSystem], {
     ...multipleCoordinatesPageData,
     coordinates: paddedCoordinates,
-    projectName
+    projectName,
+    siteNumber
   })
 }
 
 export const multipleCoordinatesSubmitController = {
+  options: {
+    pre: [setSiteDataPreHandler]
+  },
   async handler(request, h) {
     const { payload } = request
     const marineLicence = getMarineLicenceCache(request)
-    const siteDetails = getSiteDetailsBySite(marineLicence)
+    const { siteIndex, siteNumber, siteDetails } = request.site
     const coordinateSystem =
       siteDetails.coordinateSystem === COORDINATE_SYSTEMS.OSGB36
         ? COORDINATE_SYSTEMS.OSGB36
@@ -114,7 +122,7 @@ export const multipleCoordinatesSubmitController = {
     await updateMarineLicenceSiteDetails(
       request,
       h,
-      0,
+      siteIndex,
       'coordinates',
       validatedCoordinates
     )
@@ -131,7 +139,8 @@ export const multipleCoordinatesSubmitController = {
         h,
         validatedCoordinates,
         coordinateSystem,
-        marineLicence?.projectName
+        marineLicence?.projectName,
+        siteNumber
       )
     }
 
@@ -140,7 +149,8 @@ export const multipleCoordinatesSubmitController = {
         h,
         validatedCoordinates,
         coordinateSystem,
-        marineLicence?.projectName
+        marineLicence?.projectName,
+        siteNumber
       )
     }
 

@@ -13,12 +13,10 @@ import {
 } from '#src/server/marine-licence/site-details/completion-date/constants.js'
 import { saveSiteDetailsToBackend } from '#src/server/common/helpers/marine-licence/save-site-details.js'
 import { validateSiteAndActivityParams } from '#src/server/common/helpers/marine-licence/session-cache/site-utils.js'
+import { getActivityDetailsBackLink } from '#src/server/marine-licence/site-details/utils/back-link.js'
 
 export const MARINE_LICENCE_COMPLETION_DATE_VIEW_ROUTE =
   'marine-licence/site-details/completion-date/index'
-
-const getBackLink = (siteNumber, activityDetailsNumber) =>
-  `${marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS}#activity-details-site-${siteNumber}-activity-${activityDetailsNumber}`
 
 export const completionDateController = {
   options: {
@@ -41,7 +39,7 @@ export const completionDateController = {
 
     return h.view(MARINE_LICENCE_COMPLETION_DATE_VIEW_ROUTE, {
       ...completionDateSettings,
-      backLink: getBackLink(siteNumber, activityDetailsNumber),
+      backLink: getActivityDetailsBackLink(siteNumber, activityDetailsNumber),
       projectName: marineLicence.projectName,
       siteNumber,
       activityDetailsNumber,
@@ -65,7 +63,10 @@ export const completionDateSubmitController = {
           settings: completionDateSettings,
           errorMessages: completionDateErrorMessages,
           projectName: marineLicence.projectName,
-          backLink: getBackLink(siteNumber, activityDetailsNumber),
+          backLink: getActivityDetailsBackLink(
+            siteNumber,
+            activityDetailsNumber
+          ),
           payload: request.payload,
           params: { activityDetailsNumber, siteNumber }
         })(request, h, err)

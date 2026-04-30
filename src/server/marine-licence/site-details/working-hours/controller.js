@@ -13,12 +13,10 @@ import {
 } from '#src/server/common/validation/working-hours/constants.js'
 import { saveSiteDetailsToBackend } from '#src/server/common/helpers/marine-licence/save-site-details.js'
 import { validateSiteAndActivityParams } from '#src/server/common/helpers/marine-licence/session-cache/site-utils.js'
+import { getActivityDetailsBackLink } from '#src/server/marine-licence/site-details/utils/back-link.js'
 
 export const MARINE_LICENCE_WORKING_HOURS_VIEW_ROUTE =
   'marine-licence/site-details/working-hours/index'
-
-const getBackLink = (siteNumber, activityDetailsNumber) =>
-  `${marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS}#activity-details-site-${siteNumber}-activity-${activityDetailsNumber}`
 
 export const workingHoursController = {
   options: {
@@ -41,7 +39,7 @@ export const workingHoursController = {
 
     return h.view(MARINE_LICENCE_WORKING_HOURS_VIEW_ROUTE, {
       ...workingHoursSettings,
-      backLink: getBackLink(siteNumber, activityDetailsNumber),
+      backLink: getActivityDetailsBackLink(siteNumber, activityDetailsNumber),
       projectName: marineLicence.projectName,
       siteNumber,
       activityDetailsNumber,
@@ -67,7 +65,10 @@ export const workingHoursSubmitController = {
           settings: workingHoursSettings,
           errorMessages: workingHoursErrorMessages,
           projectName: marineLicence.projectName,
-          backLink: getBackLink(siteNumber, activityDetailsNumber),
+          backLink: getActivityDetailsBackLink(
+            siteNumber,
+            activityDetailsNumber
+          ),
           payload: request.payload,
           params: { activityDetailsNumber, siteNumber }
         })(request, h, err)

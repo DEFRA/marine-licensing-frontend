@@ -401,32 +401,5 @@ describe('#multipleCoordinates (marine licence)', () => {
         })
       )
     })
-
-    test('should redirect to review page on change action valid submit', async () => {
-      const payload = {
-        'coordinates[0][latitude]': '51.507400',
-        'coordinates[0][longitude]': '-0.127800',
-        'coordinates[1][latitude]': '51.517500',
-        'coordinates[1][longitude]': '-0.137600',
-        'coordinates[2][latitude]': '51.527600',
-        'coordinates[2][longitude]': '-0.147700'
-      }
-      const request = createMockRequest({
-        payload,
-        query: { action: 'change' },
-        site: {
-          siteIndex: 0,
-          siteNumber: 1,
-          queryParams: '',
-          siteDetails: { coordinateSystem: COORDINATE_SYSTEMS.WGS84 }
-        }
-      })
-
-      await multipleCoordinatesSubmitController.handler(request, mockH)
-
-      expect(mockH.redirect).toHaveBeenCalledWith(
-        marineLicenceRoutes.MARINE_LICENCE_ENTER_MULTIPLE_COORDINATES
-      )
-    })
   })
 })

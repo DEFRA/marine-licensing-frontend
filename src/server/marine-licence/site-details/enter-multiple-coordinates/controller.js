@@ -16,6 +16,12 @@ import {
 import { validateCoordinates } from '#src/server/common/validation/multiple-coordinates/validate.js'
 import { getCancelLink } from '#src/server/marine-licence/site-details/utils/cancel-link.js'
 import { setSiteDataPreHandler } from '#src/server/common/helpers/marine-licence/session-cache/site-utils.js'
+import { saveSiteDetailsToBackend } from '#src/server/common/helpers/marine-licence/save-site-details.js'
+
+const getCoordinateSystemForSite = (siteDetails) =>
+  siteDetails.coordinateSystem === COORDINATE_SYSTEMS.OSGB36
+    ? COORDINATE_SYSTEMS.OSGB36
+    : COORDINATE_SYSTEMS.WGS84
 
 const getBackLinkForAction = (action) =>
   action
@@ -32,10 +38,7 @@ export const multipleCoordinatesController = {
     const { siteNumber, siteDetails } = request.site
     const action = request.query.action
 
-    const coordinateSystem =
-      siteDetails.coordinateSystem === COORDINATE_SYSTEMS.OSGB36
-        ? COORDINATE_SYSTEMS.OSGB36
-        : COORDINATE_SYSTEMS.WGS84
+    const coordinateSystem = getCoordinateSystemForSite(siteDetails)
 
     const paddedCoordinates = normaliseCoordinatesForDisplay(
       coordinateSystem,
@@ -81,10 +84,7 @@ export const multipleCoordinatesSubmitController = {
     const { payload } = request
     const marineLicence = getMarineLicenceCache(request)
     const { siteIndex, siteNumber, siteDetails } = request.site
-    const coordinateSystem =
-      siteDetails.coordinateSystem === COORDINATE_SYSTEMS.OSGB36
-        ? COORDINATE_SYSTEMS.OSGB36
-        : COORDINATE_SYSTEMS.WGS84
+    const coordinateSystem = getCoordinateSystemForSite(siteDetails)
 
     let coordinates = convertPayloadToCoordinatesArray(
       payload,
@@ -153,6 +153,8 @@ export const multipleCoordinatesSubmitController = {
         siteNumber
       )
     }
+
+    await saveSiteDetailsToBackend(request, h, { siteIndex })
 
     return h.redirect(
       marineLicenceRoutes.MARINE_LICENCE_ENTER_MULTIPLE_COORDINATES

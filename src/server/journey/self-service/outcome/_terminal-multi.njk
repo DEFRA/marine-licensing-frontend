@@ -4,7 +4,7 @@
 
 {% for option in options %}
   <div class="app-iat-option govuk-!-margin-bottom-6">
-    <h2 class="govuk-heading-m">Option {{ loop.index }} - {{ option.heading }}</h2>
+    <h2 class="govuk-heading-m">Option {{ loop.index }}{% if option.heading %} - {{ option.heading }}{% endif %}</h2>
     {% if option.text %}
       <div class="govuk-body">{{ option.text | safe }}</div>
     {% endif %}

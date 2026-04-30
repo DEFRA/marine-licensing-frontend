@@ -384,6 +384,15 @@ describe('GET terminal-multi', () => {
     const { document } = await getPage(MULTI)
     expect(document.querySelector('.govuk-back-link')).not.toBeNull()
   })
+
+  test('omits the trailing dash on a card whose outcomeType has no heading', async () => {
+    const MOD = '/journey/self-service/outcome/mod-permission'
+    const { document } = await getPage(MOD)
+    const cards = Array.from(document.querySelectorAll('.app-iat-option h2'))
+    const headings = cards.map((h) => h.textContent.trim())
+    expect(headings[0]).toBe('Option 1')
+    expect(headings[1]).toBe('Option 2 - Apply for a standard marine licence')
+  })
 })
 
 describe('POST to a terminal outcome route', () => {

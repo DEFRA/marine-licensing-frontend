@@ -85,5 +85,87 @@ describe('#typeOfActivity', () => {
         '/marine-licence/activity-details/what-are-you-removing-on-an-ongoing-basis?site=1&activity=1'
       )
     })
+
+    describe('activityTypeChanged', () => {
+      test('clears activities when activityType changes', async () => {
+        const redirectH = createMockH()
+        const request = createMockRequest({
+          query: { site: 1, activity: 1 },
+          payload: {
+            activityType: 'deposit',
+            activitySubTypeConstruction: '',
+            activitySubTypeDeposit: 'deposit-type-1',
+            activitySubTypeRemoval: ''
+          }
+        })
+
+        await typeOfActivitySubmitController.handler(request, redirectH)
+
+        expect(updateMarineLicenceSiteActivityDetails).toHaveBeenCalledWith(
+          request,
+          redirectH,
+          0,
+          0,
+          {
+            activities: null,
+            activityType: 'deposit',
+            activitySubType: 'deposit-type-1'
+          }
+        )
+      })
+
+      test('clears activities when activitySubType changes', async () => {
+        const redirectH = createMockH()
+        const request = createMockRequest({
+          query: { site: 1, activity: 1 },
+          payload: {
+            activityType: 'construction',
+            activitySubTypeConstruction: 'construction-type-2',
+            activitySubTypeDeposit: '',
+            activitySubTypeRemoval: ''
+          }
+        })
+
+        await typeOfActivitySubmitController.handler(request, redirectH)
+
+        expect(updateMarineLicenceSiteActivityDetails).toHaveBeenCalledWith(
+          request,
+          redirectH,
+          0,
+          0,
+          {
+            activities: null,
+            activityType: 'construction',
+            activitySubType: 'construction-type-2'
+          }
+        )
+      })
+
+      test('does not clear activities when activityType and activitySubType are unchanged', async () => {
+        const redirectH = createMockH()
+        const request = createMockRequest({
+          query: { site: 1, activity: 1 },
+          payload: {
+            activityType: 'construction',
+            activitySubTypeConstruction: 'construction-type-1',
+            activitySubTypeDeposit: '',
+            activitySubTypeRemoval: ''
+          }
+        })
+
+        await typeOfActivitySubmitController.handler(request, redirectH)
+
+        expect(updateMarineLicenceSiteActivityDetails).toHaveBeenCalledWith(
+          request,
+          redirectH,
+          0,
+          0,
+          {
+            activityType: 'construction',
+            activitySubType: 'construction-type-1'
+          }
+        )
+      })
+    })
   })
 })

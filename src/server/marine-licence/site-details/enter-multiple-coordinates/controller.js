@@ -154,8 +154,6 @@ export const multipleCoordinatesSubmitController = {
       )
     }
 
-    await saveSiteDetailsToBackend(request, h, { siteIndex })
-
     return h.redirect(
       marineLicenceRoutes.MARINE_LICENCE_ENTER_MULTIPLE_COORDINATES
     )

@@ -281,6 +281,45 @@ describe('save-site-details', () => {
       )
     })
 
+    test('should save manual coordinate site details successfully', async () => {
+      vi.mocked(getMarineLicenceCache).mockReturnValue(
+        mockManualCoordinatesMarineLicence
+      )
+      vi.mocked(authenticatedPatchRequest).mockResolvedValue({
+        payload: { success: true }
+      })
+
+      await saveSiteDetailsToBackend(mockRequest, mockH)
+
+      expect(authenticatedPatchRequest).toHaveBeenCalledWith(
+        mockRequest,
+        apiRoutes.UPDATE_MARINE_LICENCE_SITE_DETAILS,
+        {
+          siteDetails: mockManualCoordinatesMarineLicence.siteDetails,
+          id: mockManualCoordinatesMarineLicence.id
+        }
+      )
+
+      expect(vi.mocked(setMarineLicenceCache)).toHaveBeenCalledWith(
+        mockRequest,
+        mockH,
+        expect.objectContaining({
+          ...mockManualCoordinatesMarineLicence,
+          siteDetails: mockManualCoordinatesMarineLicence.siteDetails
+        })
+      )
+
+      expect(mockRequest.logger.info).toHaveBeenCalledWith(
+        {
+          marineLicenceId: mockManualCoordinatesMarineLicence.id,
+          siteCount: 1,
+          coordinatesType: 'coordinates',
+          isSingleSite: false
+        },
+        'Successfully saved site details to backend'
+      )
+    })
+
     test('should throw error when Marine Licence ID is missing', async () => {
       vi.mocked(getMarineLicenceCache).mockReturnValue({
         ...mockMarineLicenceApplication,

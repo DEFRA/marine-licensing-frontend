@@ -62,10 +62,10 @@ describe('Centre coordinates page (marine licence)', () => {
       }),
     projectName: mockWgs84Data.projectName,
     backHref: marineLicenceRoutes.MARINE_LICENCE_COORDINATE_SYSTEM_CHOICE,
-    cancelHref: marineLicenceRoutes.MARINE_LICENCE_TASK_LIST,
+    cancelHref: `${marineLicenceRoutes.MARINE_LICENCE_TASK_LIST}?cancel=site-details`,
     latitude: mockWgs84Data.siteDetails[0].coordinates.latitude,
     longitude: mockWgs84Data.siteDetails[0].coordinates.longitude,
-    redirectHref: marineLicenceRoutes.MARINE_LICENCE_CIRCLE_CENTRE_POINT,
+    redirectHref: marineLicenceRoutes.MARINE_LICENCE_WIDTH_OF_SITE,
     setupOsgb36: () => {
       mockMarineLicence(mockOsgb36Data)
       vi.spyOn(coordinateUtils, 'getCoordinateSystem').mockReturnValueOnce({

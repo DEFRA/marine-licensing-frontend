@@ -228,6 +228,11 @@ describe('Page accessibility checks (Axe)', () => {
       title: 'What is the maximum duration of the activity?'
     },
     {
+      url: `${marineLicenceRoutes.MARINE_LICENCE_MONTHS_OF_ACTIVITY}?site=1&activity=1`,
+      isMarineLicence: true,
+      title: 'Will the activity be limited to specific months of the year?'
+    },
+    {
       url: `${marineLicenceRoutes.MARINE_LICENCE_COMPLETION_DATE}?site=1&activity=1`,
       isMarineLicence: true,
       title:
@@ -252,6 +257,11 @@ describe('Page accessibility checks (Axe)', () => {
     {
       url: marineLicenceRoutes.MARINE_LICENCE_CIRCLE_CENTRE_POINT,
       title: 'Enter the coordinates at the centre point of the site',
+      isMarineLicence: true
+    },
+    {
+      url: marineLicenceRoutes.MARINE_LICENCE_WIDTH_OF_SITE,
+      title: 'Enter the width of the circular site in metres',
       isMarineLicence: true
     },
     {

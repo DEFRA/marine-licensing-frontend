@@ -12,7 +12,7 @@ import { validateSiteAndActivityParams } from '#src/server/common/helpers/marine
 
 export const typeOfActivityErrorMessages = {
   ACTIVITY_TYPE_REQUIRED: 'Select the type of activity',
-  ACTIVITY_TYPE_CONSTRUCTION_REQUIRED: 'Select the type of construction',
+  ACTIVITY_TYPE_CONSTRUCTION_REQUIRED: 'Select the type of works',
   ACTIVITY_TYPE_DEPOSIT_REQUIRED: 'Select the type of deposit',
   ACTIVITY_TYPE_REMOVAL_REQUIRED: 'Select the type of removal'
 }
@@ -119,7 +119,8 @@ export const typeOfActivitySubmitController = {
       activityDetailsIndex
     )
     const activityTypeChanged =
-      existingActivityDetails.activityType !== payload.activityType
+      existingActivityDetails.activityType !== payload.activityType ||
+      existingActivityDetails.activitySubType !== activitySubType
 
     await updateMarineLicenceSiteActivityDetails(
       request,

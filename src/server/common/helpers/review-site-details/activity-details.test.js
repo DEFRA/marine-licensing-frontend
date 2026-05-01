@@ -1,5 +1,6 @@
 import {
   formatActivityDuration,
+  formatActivityMonths,
   formatActivitySubTypeHeading,
   formatActivitySubTypeLabel,
   formatCompletionDate,
@@ -7,7 +8,6 @@ import {
   mapActivitySelections,
   parseActivityDetails
 } from '#src/server/common/helpers/review-site-details/activity-details.js'
-import { mockActivityDetails } from '#src/server/test-helpers/mocks/marine-licence-mocks.js'
 
 describe('formatActivitySubTypeLabel', () => {
   test('returns label for construction-type-1', () => {
@@ -151,20 +151,33 @@ describe('mapActivitySelections', () => {
 describe('parseActivityDetails', () => {
   test('returns formatted activity details from site', () => {
     const siteDetails = {
-      activityDetails: [mockActivityDetails]
+      activityDetails: [
+        {
+          activityDescription: 'Test description',
+          activityMonths: { months: 1, details: 'test reason' },
+          activityDuration: { years: 1, months: 10 },
+          activitySubType: 'construction-type-1',
+          activityType: 'construction',
+          activities: { selections: ['CON1'] },
+          completionDate: { date: 'yes', reason: 'Test completion' },
+          someField: 'value',
+          workingHours: 'Test hours'
+        }
+      ]
     }
 
     expect(parseActivityDetails(siteDetails)).toEqual([
       {
         activityDescription: 'Test description',
-        activityDuration: '1 year, 4 months',
+        activityDuration: '1 year, 10 months',
         activityHeading: "What you're constructing",
         activityLink:
           '/marine-licence/activity-details/what-are-you-constructing',
         activitySubType: 'Construction of new works',
         activityType: 'construction',
         activities: ['Aquaculture trestles or fixed walkways'],
-        activityMonths: 'Test months',
+        activityMonths: 'test reason',
+        someField: 'value',
         completionDate: 'Test completion',
         workingHours: 'Test hours'
       }
@@ -225,6 +238,22 @@ describe('formatActivityDuration', () => {
     expect(formatActivityDuration({ years: 2 })).toEqual(null)
 
     expect(formatActivityDuration({ months: 6 })).toEqual(null)
+  })
+})
+
+describe('formatActivityMonths', () => {
+  test('returns "No" for "no" option', () => {
+    expect(formatActivityMonths({ months: 'no' })).toEqual('No')
+  })
+
+  test('returns details text for "yes" option', () => {
+    expect(
+      formatActivityMonths({ months: 'yes', details: 'January to March' })
+    ).toEqual('January to March')
+  })
+
+  test('returns null for missing data', () => {
+    expect(formatActivityMonths({})).toEqual(null)
   })
 })
 

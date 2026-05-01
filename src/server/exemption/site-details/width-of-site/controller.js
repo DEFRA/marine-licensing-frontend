@@ -16,11 +16,11 @@ import { circleWidthValidationSchema } from '#src/server/common/schemas/circle-w
 import { routes } from '#src/server/common/constants/routes.js'
 import { saveSiteDetailsToBackend } from '#src/server/common/helpers/exemptions/save-site-details.js'
 import { getCancelLink } from '#src/server/exemption/site-details/utils/cancel-link.js'
-
-export const WIDTH_OF_SITE_VIEW_ROUTE =
-  'exemption/site-details/width-of-site/index'
-
-const ENTER_WIDTH = 'Enter the width of the circular site in metres'
+import {
+  WIDTH_OF_SITE_VIEW_ROUTE,
+  widthOfSiteSettings,
+  widthOfSiteErrorMessages
+} from '#src/server/common/validation/width-of-site/constants.js'
 
 const getBackLinkForAction = (action, siteNumber, queryParams) => {
   if (action) {
@@ -29,18 +29,6 @@ const getBackLinkForAction = (action, siteNumber, queryParams) => {
   return routes.CIRCLE_CENTRE_POINT + queryParams
 }
 
-const widthOfSiteSettings = {
-  pageTitle: ENTER_WIDTH,
-  heading: ENTER_WIDTH
-}
-
-export const errorMessages = {
-  WIDTH_REQUIRED: ENTER_WIDTH,
-  WIDTH_INVALID: 'The width of the circular site must be a number',
-  WIDTH_MIN: 'The width of the circular site must be 1 metre or more',
-  WIDTH_NON_INTEGER:
-    'The width of the circular site must be a whole number, like 10'
-}
 export const widthOfSiteController = {
   options: {
     pre: [setSiteDataPreHandler]
@@ -100,7 +88,10 @@ export const widthOfSiteSubmitController = {
             .takeover()
         }
 
-        const errorSummary = mapErrorsForDisplay(err.details, errorMessages)
+        const errorSummary = mapErrorsForDisplay(
+          err.details,
+          widthOfSiteErrorMessages
+        )
         const errors = errorDescriptionByFieldName(errorSummary)
 
         return h

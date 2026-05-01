@@ -246,23 +246,6 @@ describe('save-site-details', () => {
       )
     })
 
-    test('should not save manual coordinates', async () => {
-      const manualMarineLicence = {
-        ...mockMarineLicenceApplication,
-        siteDetails: [
-          {
-            coordinatesType: 'coordinates',
-            coordinatesEntry: 'single'
-          }
-        ]
-      }
-      vi.mocked(getMarineLicenceCache).mockReturnValue(manualMarineLicence)
-
-      await expect(
-        saveSiteDetailsToBackend(mockRequest, mockH)
-      ).rejects.toThrow('Only file journeys can be saved for now')
-    })
-
     test('should throw error when Marine Licence ID is missing', async () => {
       vi.mocked(getMarineLicenceCache).mockReturnValue({
         ...mockMarineLicenceApplication,

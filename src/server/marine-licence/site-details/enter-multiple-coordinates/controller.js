@@ -16,7 +16,6 @@ import {
 import { validateCoordinates } from '#src/server/common/validation/multiple-coordinates/validate.js'
 import { getCancelLink } from '#src/server/marine-licence/site-details/utils/cancel-link.js'
 import { setSiteDataPreHandler } from '#src/server/common/helpers/marine-licence/session-cache/site-utils.js'
-import { saveSiteDetailsToBackend } from '#src/server/common/helpers/marine-licence/save-site-details.js'
 
 const getCoordinateSystemForSite = (siteDetails) =>
   siteDetails.coordinateSystem === COORDINATE_SYSTEMS.OSGB36

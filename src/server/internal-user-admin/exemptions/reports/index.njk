@@ -1,0 +1,39 @@
+{%- from "govuk/components/summary-list/macro.njk" import govukSummaryList -%}
+{% extends "layouts/page.njk" %}
+
+{% block content %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+      <h1 class="govuk-heading-l">{{ heading }}</h1>
+
+      {{ govukSummaryList({
+        rows: [
+          {
+            key: {
+              text: "Submitted exemptions"
+            },
+            value: {
+              text: summary.submittedExemptions
+            }
+          },
+          {
+            key: {
+              text: "Unsubmitted exemptions"
+            },
+            value: {
+              text: summary.unsubmittedExemptions
+            }
+          },
+          {
+            key: {
+              text: "Withdrawn exemptions"
+            },
+            value: {
+              text: summary.withdrawnExemptions
+            }
+          }
+        ]
+      }) }}
+    </div>
+  </div>
+{% endblock %}

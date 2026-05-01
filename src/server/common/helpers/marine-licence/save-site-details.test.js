@@ -1,7 +1,8 @@
 import { describe, test, expect, vi, beforeEach } from 'vitest'
 import {
   saveSiteDetailsToBackend,
-  prepareFileUploadDataForSave
+  prepareFileUploadDataForSave,
+  prepareManualCoordinateDataForSave
 } from './save-site-details.js'
 import { authenticatedPatchRequest } from '../authenticated-requests.js'
 import {
@@ -10,7 +11,10 @@ import {
 } from './session-cache/utils.js'
 import { createMockRequest } from '#src/server/test-helpers/mocks/helpers.js'
 import Boom from '@hapi/boom'
-import { mockMarineLicenceApplication } from '#src/server/test-helpers/mocks/marine-licence-mocks.js'
+import {
+  mockMarineLicenceApplication,
+  mockManualCoordinatesMarineLicence
+} from '#src/server/test-helpers/mocks/marine-licence-mocks.js'
 import { apiRoutes } from '#src/server/common/constants/routes.js'
 
 vi.mock('../authenticated-requests.js')
@@ -169,6 +173,37 @@ describe('save-site-details', () => {
       const result = prepareFileUploadDataForSave(siteDetails, mockRequest)[0]
 
       expect(result.featureCount).toBe(0)
+    })
+  })
+
+  describe('prepareManualCoordinateDataForSave', () => {
+    test('should return site details as-is for manual coordinate entry', () => {
+      const result = prepareManualCoordinateDataForSave(
+        mockManualCoordinatesMarineLicence.siteDetails,
+        mockRequest
+      )
+
+      expect(result).toEqual(mockManualCoordinatesMarineLicence.siteDetails)
+    })
+
+    test('should log save information for each site', () => {
+      const siteDetails = [
+        {
+          coordinatesType: 'coordinates',
+          coordinatesEntry: 'single',
+          siteName: 'Test site'
+        }
+      ]
+
+      prepareManualCoordinateDataForSave(siteDetails, mockRequest)
+
+      expect(mockRequest.logger.info).toHaveBeenCalledWith(
+        {
+          coordinatesType: 'coordinates',
+          coordinatesEntry: 'single'
+        },
+        'Saving manual coordinate site details'
+      )
     })
   })
 

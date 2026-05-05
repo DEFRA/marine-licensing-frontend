@@ -113,6 +113,25 @@ describe('#reportRuntimeIssue', () => {
 
     expect(warn).toHaveBeenCalledTimes(3)
   })
+
+  test('caps the dedupe Set at 100 entries with FIFO eviction', () => {
+    const warn = vi.fn()
+    const request = { logger: { warn } }
+
+    for (let i = 0; i < 100; i++) {
+      reportRuntimeIssue(request, 'action', `ref-${i}`, 'fix', 'summary')
+    }
+    expect(warn).toHaveBeenCalledTimes(100)
+
+    reportRuntimeIssue(request, 'action', 'ref-100', 'fix', 'summary')
+    expect(warn).toHaveBeenCalledTimes(101)
+
+    reportRuntimeIssue(request, 'action', 'ref-0', 'fix', 'summary')
+    expect(warn).toHaveBeenCalledTimes(102)
+
+    reportRuntimeIssue(request, 'action', 'ref-50', 'fix', 'summary')
+    expect(warn).toHaveBeenCalledTimes(102)
+  })
 })
 
 describe('#runLoadTimeScan', () => {

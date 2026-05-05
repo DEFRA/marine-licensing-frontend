@@ -1,5 +1,6 @@
 const CATEGORY = 'iat-data-quality'
 
+const MAX_SEEN_RUNTIME_ISSUES = 100
 const seenRuntimeIssues = new Set()
 
 function buildEvent(action, reference, fix) {
@@ -22,6 +23,10 @@ export function reportRuntimeIssue(request, action, reference, fix, summary) {
   const key = `${action}:${reference}`
   if (seenRuntimeIssues.has(key)) {
     return
+  }
+  if (seenRuntimeIssues.size >= MAX_SEEN_RUNTIME_ISSUES) {
+    const oldest = seenRuntimeIssues.values().next().value
+    seenRuntimeIssues.delete(oldest)
   }
   seenRuntimeIssues.add(key)
   request.logger.warn(

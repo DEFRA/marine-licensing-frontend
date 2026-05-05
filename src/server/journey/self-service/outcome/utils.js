@@ -3,6 +3,10 @@ import {
   getSection
 } from '#src/server/journey/self-service/services/journey-data.js'
 
+export function outcomeRouteFromRequest(request) {
+  return '/' + request.params.outcomePath
+}
+
 export function classifyOutcome(outcome) {
   const types = getOutcomeTypesForOutcome(outcome)
   if (types.some((ot) => ot.nextQuestionRoute)) {

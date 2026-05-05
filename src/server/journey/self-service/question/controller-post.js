@@ -11,6 +11,7 @@ import {
 } from '#src/server/journey/self-service/services/session-answers.js'
 import { statusCodes } from '#src/server/common/constants/status-codes.js'
 import { reportRuntimeIssue } from '#src/server/journey/self-service/services/data-quality.js'
+import { questionRouteFromRequest } from '#src/server/journey/self-service/question/utils.js'
 
 const VIEW_PATH = 'journey/self-service/question/index'
 
@@ -26,7 +27,7 @@ function toArray(value) {
 
 export const questionPostController = {
   handler(request, h) {
-    const questionRoute = '/' + request.params.questionPath
+    const questionRoute = questionRouteFromRequest(request)
     const question = getQuestion(questionRoute)
 
     if (!question) {

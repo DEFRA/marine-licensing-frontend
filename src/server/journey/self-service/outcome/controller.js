@@ -15,13 +15,14 @@ import {
   buildIntermediateView,
   buildTerminalMultiView,
   buildTerminalSingleView,
-  classifyOutcome
+  classifyOutcome,
+  outcomeRouteFromRequest
 } from '#src/server/journey/self-service/outcome/utils.js'
 
 const VIEW_PATH = 'journey/self-service/outcome/index'
 
 function loadOutcome(request) {
-  const outcomeRoute = '/' + request.params.outcomePath
+  const outcomeRoute = outcomeRouteFromRequest(request)
   const outcome = getOutcome(outcomeRoute)
 
   if (!outcome) {

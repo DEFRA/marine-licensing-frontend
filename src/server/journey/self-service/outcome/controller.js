@@ -33,27 +33,7 @@ export function ctaLabelFor(outcomeType) {
   return 'Continue'
 }
 
-function loadIntermediateOutcome(request) {
-  const outcomeRoute = '/' + request.params.outcomePath
-  const outcome = getOutcome(outcomeRoute)
-
-  if (!outcome || !isIntermediateOutcome(outcome)) {
-    if (!outcome) {
-      reportRuntimeIssue(
-        request,
-        'unknown-outcome-route',
-        outcomeRoute,
-        `Add ${outcomeRoute} as an outcome or fix the referring answer in self-service.json`,
-        `unknown outcome route ${outcomeRoute}`
-      )
-    }
-    throw Boom.notFound('Outcome not found')
-  }
-
-  return { outcomeRoute, outcome }
-}
-
-function loadOutcomeForGet(request) {
+function loadOutcome(request) {
   const outcomeRoute = '/' + request.params.outcomePath
   const outcome = getOutcome(outcomeRoute)
 
@@ -67,6 +47,20 @@ function loadOutcomeForGet(request) {
     )
     throw Boom.notFound('Outcome not found')
   }
+
+  return { outcomeRoute, outcome }
+}
+
+function loadIntermediateOutcome(request) {
+  const { outcomeRoute, outcome } = loadOutcome(request)
+  if (!isIntermediateOutcome(outcome)) {
+    throw Boom.notFound('Outcome not found')
+  }
+  return { outcomeRoute, outcome }
+}
+
+function loadOutcomeForGet(request) {
+  const { outcomeRoute, outcome } = loadOutcome(request)
 
   const types = getOutcomeTypesForOutcome(outcome)
   if (types.length === 0) {

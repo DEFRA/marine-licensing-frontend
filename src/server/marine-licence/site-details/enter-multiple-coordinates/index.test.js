@@ -33,7 +33,9 @@ describe('Enter Multiple Coordinates Routes (marine licence)', () => {
 
   test('all routes should use the correct path', () => {
     enterMultipleCoordinatesRoutes.forEach((route) => {
-      expect(route.path).toBe('/marine-licence/enter-multiple-coordinates')
+      expect(route.path).toBe(
+        marineLicenceRoutes.MARINE_LICENCE_ENTER_MULTIPLE_COORDINATES
+      )
     })
   })
 })

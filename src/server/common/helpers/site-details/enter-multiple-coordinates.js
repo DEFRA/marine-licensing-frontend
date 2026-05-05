@@ -212,6 +212,26 @@ export const handleValidationFailure = (
     .takeover()
 }
 
+export const renderMultipleCoordinatesView = (
+  h,
+  coordinates,
+  coordinateSystem,
+  pageData,
+  projectName,
+  siteNumber
+) => {
+  const paddedCoordinates = normaliseCoordinatesForDisplay(
+    coordinateSystem,
+    coordinates
+  )
+  return h.view(MULTIPLE_COORDINATES_VIEW_ROUTES[coordinateSystem], {
+    ...pageData,
+    coordinates: paddedCoordinates,
+    projectName,
+    siteNumber
+  })
+}
+
 export const removeCoordinateAtIndex = (coordinates, index) => {
   if (
     index >= POLYGON_MIN_COORDINATE_POINTS &&

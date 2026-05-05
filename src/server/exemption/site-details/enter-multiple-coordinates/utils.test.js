@@ -59,6 +59,12 @@ describe('enter-multiple-coordinates utils (exemptions)', () => {
         MULTIPLE_COORDINATES_VIEW_ROUTES[COORDINATE_SYSTEMS.WGS84],
         expect.objectContaining({
           coordinates: mockCoordinates,
+          errorSummary: [
+            {
+              href: '#coordinates-0-latitude',
+              text: 'Point 1: Field is required'
+            }
+          ],
           errors: {
             coordinates0latitude: { text: 'Point 1: Field is required' }
           },

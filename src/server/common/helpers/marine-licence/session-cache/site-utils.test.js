@@ -155,12 +155,16 @@ describe('#setSiteDataPreHandler', () => {
 
   test('redirects to task list for an invalid site number', () => {
     const request = createMockRequest({ query: { site: '99' } })
-    const h = createMockH()
+    const mockTakeover = vi.fn()
+    const h = createMockH({
+      redirect: vi.fn().mockReturnValue({ takeover: mockTakeover })
+    })
 
     setSiteDataPreHandler.method(request, h)
 
     expect(h.redirect).toHaveBeenCalledWith(
       marineLicenceRoutes.MARINE_LICENCE_TASK_LIST
     )
+    expect(mockTakeover).toHaveBeenCalled()
   })
 })

@@ -14,7 +14,8 @@ import {
   convertPayloadToCoordinatesArray,
   convertArrayErrorsToFlattenedErrors,
   handleValidationFailure,
-  removeCoordinateAtIndex
+  removeCoordinateAtIndex,
+  renderMultipleCoordinatesView
 } from './utils.js'
 import { validateCoordinates } from '#src/server/common/validation/multiple-coordinates/validate.js'
 import { saveSiteDetailsToBackend } from '#src/server/common/helpers/exemptions/save-site-details.js'
@@ -68,23 +69,6 @@ export const multipleCoordinatesController = {
       action
     })
   }
-}
-
-function renderMultipleCoordinatesView(
-  h,
-  coordinates,
-  coordinateSystem,
-  projectName
-) {
-  const paddedCoordinates = normaliseCoordinatesForDisplay(
-    coordinateSystem,
-    coordinates
-  )
-  return h.view(MULTIPLE_COORDINATES_VIEW_ROUTES[coordinateSystem], {
-    ...multipleCoordinatesPageData,
-    coordinates: paddedCoordinates,
-    projectName
-  })
 }
 
 export const multipleCoordinatesSubmitController = {
@@ -150,6 +134,7 @@ export const multipleCoordinatesSubmitController = {
         h,
         validatedCoordinates,
         coordinateSystem,
+        multipleCoordinatesPageData,
         exemption?.projectName
       )
     }
@@ -159,6 +144,7 @@ export const multipleCoordinatesSubmitController = {
         h,
         validatedCoordinates,
         coordinateSystem,
+        multipleCoordinatesPageData,
         exemption?.projectName
       )
     }

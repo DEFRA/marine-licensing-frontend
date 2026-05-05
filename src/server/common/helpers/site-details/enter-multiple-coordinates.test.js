@@ -172,13 +172,13 @@ describe('enter-multiple-coordinates common utils', () => {
       ])
     })
 
-    it('should pick wsg84 if first coordinate has both field types when system is WSG84', () => {
+    it('should pick wgs84 if first coordinate has both field types when system is WGS84', () => {
       const coords = [
         {
           latitude: '51.5',
           longitude: '-0.1',
-          eastings: '123456',
-          northings: '654321'
+          easting: '123456',
+          northing: '654321'
         }
       ]
       expect(

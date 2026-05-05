@@ -11,7 +11,8 @@ import {
   convertPayloadToCoordinatesArray,
   convertArrayErrorsToFlattenedErrors,
   handleValidationFailure,
-  removeCoordinateAtIndex
+  removeCoordinateAtIndex,
+  renderMultipleCoordinatesView
 } from './utils.js'
 import { validateCoordinates } from '#src/server/common/validation/multiple-coordinates/validate.js'
 import { getCancelLink } from '#src/server/marine-licence/site-details/utils/cancel-link.js'
@@ -55,25 +56,6 @@ export const multipleCoordinatesController = {
       action
     })
   }
-}
-
-function renderMultipleCoordinatesView(
-  h,
-  coordinates,
-  coordinateSystem,
-  projectName,
-  siteNumber
-) {
-  const paddedCoordinates = normaliseCoordinatesForDisplay(
-    coordinateSystem,
-    coordinates
-  )
-  return h.view(MULTIPLE_COORDINATES_VIEW_ROUTES[coordinateSystem], {
-    ...multipleCoordinatesPageData,
-    coordinates: paddedCoordinates,
-    projectName,
-    siteNumber
-  })
 }
 
 export const multipleCoordinatesSubmitController = {
@@ -139,6 +121,7 @@ export const multipleCoordinatesSubmitController = {
         h,
         validatedCoordinates,
         coordinateSystem,
+        multipleCoordinatesPageData,
         marineLicence?.projectName,
         siteNumber
       )
@@ -149,6 +132,7 @@ export const multipleCoordinatesSubmitController = {
         h,
         validatedCoordinates,
         coordinateSystem,
+        multipleCoordinatesPageData,
         marineLicence?.projectName,
         siteNumber
       )

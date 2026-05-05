@@ -13,7 +13,8 @@ export {
   createErrorSummary,
   createFieldErrors,
   handleValidationFailure,
-  removeCoordinateAtIndex
+  removeCoordinateAtIndex,
+  renderMultipleCoordinatesView
 } from '#src/server/common/helpers/site-details/enter-multiple-coordinates.js'
 
 import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'

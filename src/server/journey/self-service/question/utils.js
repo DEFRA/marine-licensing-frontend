@@ -8,6 +8,16 @@ export function questionRouteFromRequest(request) {
   return '/' + request.params.questionPath
 }
 
+export function toArray(value) {
+  if (Array.isArray(value)) {
+    return value
+  }
+  if (typeof value === 'string' && value.length > 0) {
+    return [value]
+  }
+  return []
+}
+
 export function loadQuestion(request) {
   const questionRoute = questionRouteFromRequest(request)
   const question = getQuestion(questionRoute)

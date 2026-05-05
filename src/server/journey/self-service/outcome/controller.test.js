@@ -248,6 +248,26 @@ describe('#outcomePostController', () => {
     )
   })
 
+  test('logs post-on-non-intermediate-outcome when POSTed to a terminal outcome', () => {
+    vi.mocked(isIntermediateOutcome).mockReturnValue(false)
+    const request = {
+      params: { outcomePath: 'licence-not-required' },
+      payload: { outcomeType: 'WO_STANDARD_MLA' },
+      logger: { warn: vi.fn() }
+    }
+    const h = { redirect: vi.fn() }
+
+    expect(() => outcomePostController.handler(request, h)).toThrow()
+
+    expect(reportRuntimeIssue).toHaveBeenCalledWith(
+      request,
+      'post-on-non-intermediate-outcome',
+      '/licence-not-required',
+      expect.any(String),
+      expect.any(String)
+    )
+  })
+
   test('throws Boom.badRequest when outcomeType is not in this outcome list', () => {
     const request = {
       params: { outcomePath: 'construction/journey-select' },

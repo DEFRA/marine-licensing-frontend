@@ -54,6 +54,13 @@ function loadOutcome(request) {
 function loadIntermediateOutcome(request) {
   const { outcomeRoute, outcome } = loadOutcome(request)
   if (!isIntermediateOutcome(outcome)) {
+    reportRuntimeIssue(
+      request,
+      'post-on-non-intermediate-outcome',
+      outcomeRoute,
+      `If users should be able to choose an option on ${outcomeRoute}, add an outcomeType with nextQuestionRoute to it in self-service.json; otherwise investigate where the POST originated`,
+      `POST ${outcomeRoute} hit but the outcome has no outcomeTypes with nextQuestionRoute`
+    )
     throw Boom.notFound('Outcome not found')
   }
   return { outcomeRoute, outcome }

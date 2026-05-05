@@ -391,4 +391,135 @@ describe('#runLoadTimeScan', () => {
     runLoadTimeScan({ warn }, clean)
     expect(warn).not.toHaveBeenCalled()
   })
+
+  test('a multiSelect question reaches its multiSelect.questionRoute and outcomeRoute and skips the per-answer route check', () => {
+    const warn = vi.fn()
+    runLoadTimeScan(
+      { warn },
+      {
+        firstQuestionRoute: '/q1',
+        questions: [
+          {
+            route: '/q1',
+            text: 'q1',
+            answers: [
+              { id: 'a', text: 'a' },
+              { id: 'b', text: 'b' }
+            ],
+            multiSelect: { questionRoute: '/q2', outcomeRoute: '/o' }
+          },
+          {
+            route: '/q2',
+            text: 'q2',
+            answers: [{ id: 'c', text: 'c', outcomeRoute: '/o' }]
+          }
+        ],
+        outcomes: [
+          { route: '/o', heading: 'O', text: null, outcomeTypes: ['T'] }
+        ],
+        outcomeTypes: [{ id: 'T', heading: 'T', text: '<p>x</p>' }],
+        sections: []
+      }
+    )
+
+    const actions = warn.mock.calls.map(([obj]) => obj.event.action)
+    expect(actions).not.toContain('question-orphan')
+    expect(actions).not.toContain('outcome-orphan')
+    expect(actions).not.toContain('answer-no-route')
+  })
+
+  test('tolerates an answer pointing to a non-existent question route without crashing', () => {
+    const warn = vi.fn()
+    runLoadTimeScan(
+      { warn },
+      {
+        firstQuestionRoute: '/q1',
+        questions: [
+          {
+            route: '/q1',
+            text: 'q1',
+            answers: [
+              { id: 'a', text: 'a', nextQuestionRoute: '/does-not-exist' },
+              { id: 'b', text: 'b', outcomeRoute: '/o' }
+            ]
+          }
+        ],
+        outcomes: [
+          { route: '/o', heading: 'O', text: null, outcomeTypes: ['T'] }
+        ],
+        outcomeTypes: [{ id: 'T', heading: 'T', text: '<p>x</p>' }],
+        sections: []
+      }
+    )
+
+    const orphanOutcomes = warn.mock.calls
+      .filter(([obj]) => obj.event.action === 'outcome-orphan')
+      .map(([obj]) => obj.event.reference)
+    expect(orphanOutcomes).toEqual([])
+  })
+
+  test(
+    'terminates on a cyclic journey (BFS dedup prevents infinite loop)',
+    { timeout: 1000 },
+    () => {
+      const warn = vi.fn()
+      runLoadTimeScan(
+        { warn },
+        {
+          firstQuestionRoute: '/q1',
+          questions: [
+            {
+              route: '/q1',
+              text: 'q1',
+              answers: [{ id: 'a', text: 'a', nextQuestionRoute: '/q2' }]
+            },
+            {
+              route: '/q2',
+              text: 'q2',
+              answers: [{ id: 'a', text: 'a', nextQuestionRoute: '/q1' }]
+            }
+          ],
+          outcomes: [],
+          outcomeTypes: [],
+          sections: []
+        }
+      )
+
+      const orphans = warn.mock.calls
+        .filter(([obj]) => obj.event.action === 'question-orphan')
+        .map(([obj]) => obj.event.reference)
+      expect(orphans).toEqual([])
+    }
+  )
+
+  test('tolerates a reachable question with no answers field', () => {
+    const warn = vi.fn()
+    runLoadTimeScan(
+      { warn },
+      {
+        firstQuestionRoute: '/q1',
+        questions: [
+          {
+            route: '/q1',
+            text: 'q1',
+            answers: [{ id: 'a', text: 'a', nextQuestionRoute: '/q2' }]
+          },
+          { route: '/q2', text: 'q2' }
+        ],
+        outcomes: [],
+        outcomeTypes: [],
+        sections: []
+      }
+    )
+
+    const noAnswersRefs = warn.mock.calls
+      .filter(([obj]) => obj.event.action === 'question-no-answers')
+      .map(([obj]) => obj.event.reference)
+    const orphanRefs = warn.mock.calls
+      .filter(([obj]) => obj.event.action === 'question-orphan')
+      .map(([obj]) => obj.event.reference)
+
+    expect(noAnswersRefs).toContain('/q2')
+    expect(orphanRefs).not.toContain('/q2')
+  })
 })

@@ -3,7 +3,6 @@ import {
   getOutcome,
   getOutcomeType,
   getOutcomeTypesForOutcome,
-  getSection,
   isIntermediateOutcome,
   ROUTE_PREFIX
 } from '#src/server/journey/self-service/services/journey-data.js'
@@ -12,26 +11,14 @@ import {
   pushOutcomeSelection
 } from '#src/server/journey/self-service/services/session-answers.js'
 import { reportRuntimeIssue } from '#src/server/journey/self-service/services/data-quality.js'
+import {
+  buildIntermediateView,
+  buildTerminalMultiView,
+  buildTerminalSingleView,
+  classifyOutcome
+} from '#src/server/journey/self-service/outcome/utils.js'
 
 const VIEW_PATH = 'journey/self-service/outcome/index'
-
-export function classifyOutcome(outcome) {
-  const types = getOutcomeTypesForOutcome(outcome)
-  if (types.some((ot) => ot.nextQuestionRoute)) {
-    return 'intermediate'
-  }
-  return types.length > 1 ? 'terminal-multi' : 'terminal-single'
-}
-
-export function ctaLabelFor(outcomeType) {
-  if (outcomeType.overrideCtaButtonText) {
-    return outcomeType.overrideCtaButtonText
-  }
-  if (outcomeType.link) {
-    return 'Download'
-  }
-  return 'Continue'
-}
 
 function loadOutcome(request) {
   const outcomeRoute = '/' + request.params.outcomePath
@@ -126,40 +113,19 @@ export const outcomeController = {
     }
 
     if (classification === 'intermediate') {
-      const section = outcome.section ? getSection(outcome.section) : null
-      return h.view(VIEW_PATH, {
-        ...baseModel,
-        section,
-        options: types.map((ot) => ({
-          id: ot.id,
-          heading: ot.heading,
-          text: ot.text,
-          isTerminal: !ot.nextQuestionRoute,
-          ctaLabel: ctaLabelFor(ot)
-        }))
-      })
+      return h.view(VIEW_PATH, buildIntermediateView(baseModel, outcome, types))
     }
 
     if (classification === 'terminal-single') {
       const [ot] = types
       logEmptyTextIfNeeded(request, ot)
-      return h.view(VIEW_PATH, {
-        ...baseModel,
-        body: ot.text,
-        ctaLabel: ctaLabelFor(ot)
-      })
+      return h.view(VIEW_PATH, buildTerminalSingleView(baseModel, ot))
     }
 
-    const options = types.map((ot) => {
+    for (const ot of types) {
       logEmptyTextIfNeeded(request, ot)
-      return {
-        id: ot.id,
-        heading: ot.heading,
-        text: ot.text,
-        ctaLabel: ctaLabelFor(ot)
-      }
-    })
-    return h.view(VIEW_PATH, { ...baseModel, options })
+    }
+    return h.view(VIEW_PATH, buildTerminalMultiView(baseModel, types))
   }
 }
 

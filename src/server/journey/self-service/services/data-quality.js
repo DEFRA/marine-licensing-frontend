@@ -148,6 +148,9 @@ function isMultiTerminal(outcome, outcomeTypesById) {
 }
 
 function walkReachable(journeyData, reachableQuestions, reachableOutcomes) {
+  // Build indexes from the passed-in journeyData rather than reusing the ones
+  // in journey-data.js — the scan must be runnable against synthetic fixtures
+  // in tests, not just the singleton self-service.json.
   const questionsByRoute = new Map(
     journeyData.questions.map((q) => [q.route, q])
   )

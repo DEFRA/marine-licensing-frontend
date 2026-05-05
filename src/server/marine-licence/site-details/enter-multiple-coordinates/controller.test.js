@@ -12,8 +12,10 @@ import {
   multipleCoordinatesPageData
 } from '#src/server/marine-licence/site-details/enter-multiple-coordinates/utils.js'
 import { createMockRequest } from '#src/server/test-helpers/mocks/helpers.js'
+import { saveSiteDetailsToBackend } from '#src/server/common/helpers/marine-licence/save-site-details.js'
 
 vi.mock('~/src/server/common/helpers/marine-licence/session-cache/utils.js')
+vi.mock('~/src/server/common/helpers/marine-licence/save-site-details.js')
 
 describe('#multipleCoordinates (marine licence)', () => {
   let getMarineLicenceCacheSpy
@@ -202,9 +204,10 @@ describe('#multipleCoordinates (marine licence)', () => {
       mockH.redirect.mockClear()
       mockTakeover.mockClear()
       mockH.view.mockReturnValue(mockViewResult)
+      vi.mocked(saveSiteDetailsToBackend).mockResolvedValue()
     })
 
-    test('should save valid coordinates and redirect to review page', async () => {
+    test('should save valid coordinates and redirect to same page', async () => {
       const payload = {
         'coordinates[0][latitude]': '51.507400',
         'coordinates[0][longitude]': '-0.127800',
@@ -235,6 +238,30 @@ describe('#multipleCoordinates (marine licence)', () => {
       expect(mockH.redirect).toHaveBeenCalledWith(
         marineLicenceRoutes.MARINE_LICENCE_ENTER_MULTIPLE_COORDINATES
       )
+    })
+
+    test('should call saveSiteDetailsToBackend on valid submission', async () => {
+      const payload = {
+        'coordinates[0][latitude]': '51.507400',
+        'coordinates[0][longitude]': '-0.127800',
+        'coordinates[1][latitude]': '51.517500',
+        'coordinates[1][longitude]': '-0.137600',
+        'coordinates[2][latitude]': '51.527600',
+        'coordinates[2][longitude]': '-0.147700'
+      }
+      const request = createMockRequest({
+        payload,
+        site: {
+          siteIndex: 0,
+          siteNumber: 1,
+          queryParams: '',
+          siteDetails: { coordinateSystem: COORDINATE_SYSTEMS.WGS84 }
+        }
+      })
+
+      await multipleCoordinatesSubmitController.handler(request, mockH)
+
+      expect(saveSiteDetailsToBackend).toHaveBeenCalledWith(request, mockH)
     })
 
     test('should handle validation errors by re-rendering with errors', () => {

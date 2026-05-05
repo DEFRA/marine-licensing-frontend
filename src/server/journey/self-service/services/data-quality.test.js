@@ -26,7 +26,6 @@ describe('#reportLoadTimeIssue', () => {
     expect(warn).toHaveBeenCalledWith(
       {
         event: {
-          category: 'iat-data-quality',
           action: 'outcome-missing-heading',
           reference: '/foo',
           reason: "Set 'heading' on the /foo outcome in self-service.json",
@@ -64,7 +63,6 @@ describe('#reportRuntimeIssue', () => {
     expect(warn).toHaveBeenCalledWith(
       {
         event: {
-          category: 'iat-data-quality',
           action: 'unknown-outcome-route',
           reference: '/nope',
           reason:

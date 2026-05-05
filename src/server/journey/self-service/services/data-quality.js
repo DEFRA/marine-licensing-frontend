@@ -4,7 +4,6 @@ const seenRuntimeIssues = new Set()
 
 function buildEvent(action, reference, fix) {
   return {
-    category: CATEGORY,
     action,
     reference,
     reason: fix,

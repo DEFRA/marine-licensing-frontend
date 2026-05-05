@@ -3,9 +3,10 @@ import {
   getBackLink,
   getAnswerForRoute
 } from '#src/server/journey/self-service/services/session-answers.js'
-import { loadQuestion } from '#src/server/journey/self-service/question/utils.js'
-
-const VIEW_PATH = 'journey/self-service/question/index'
+import {
+  loadQuestion,
+  VIEW_PATH
+} from '#src/server/journey/self-service/question/utils.js'
 
 export const questionController = {
   handler(request, h) {

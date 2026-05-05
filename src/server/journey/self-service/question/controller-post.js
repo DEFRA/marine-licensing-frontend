@@ -9,9 +9,10 @@ import {
 } from '#src/server/journey/self-service/services/session-answers.js'
 import { statusCodes } from '#src/server/common/constants/status-codes.js'
 import { reportRuntimeIssue } from '#src/server/journey/self-service/services/data-quality.js'
-import { loadQuestion } from '#src/server/journey/self-service/question/utils.js'
-
-const VIEW_PATH = 'journey/self-service/question/index'
+import {
+  loadQuestion,
+  VIEW_PATH
+} from '#src/server/journey/self-service/question/utils.js'
 
 function toArray(value) {
   if (Array.isArray(value)) {

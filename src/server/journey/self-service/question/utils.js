@@ -2,6 +2,8 @@ import Boom from '@hapi/boom'
 import { getQuestion } from '#src/server/journey/self-service/services/journey-data.js'
 import { reportRuntimeIssue } from '#src/server/journey/self-service/services/data-quality.js'
 
+export const VIEW_PATH = 'journey/self-service/question/index'
+
 export function questionRouteFromRequest(request) {
   return '/' + request.params.questionPath
 }

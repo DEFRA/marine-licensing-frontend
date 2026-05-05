@@ -92,7 +92,7 @@ export const taskListController = {
       ...projectDetailsTaskListTransformed,
       ...siteDetailsTaskListTransformed
     ]
-      // Filter is temporary until we get to saving to the back end for 'Site Details'
+      // Filter is temporary until we get to saving to the back end for manual 'Site Details'
       .filter((task) => task.title.text !== 'Site details')
       .every((task) => task.status.text === 'Completed')
 

@@ -58,7 +58,9 @@ function buildScanContext(journeyData) {
 }
 
 function checkQuestion(logger, question, ctx) {
-  if (!Array.isArray(question.answers) || question.answers.length === 0) {
+  const hasAnswers =
+    Array.isArray(question.answers) && question.answers.length > 0
+  if (!hasAnswers) {
     reportLoadTimeIssue(
       logger,
       'question-no-answers',
@@ -66,7 +68,8 @@ function checkQuestion(logger, question, ctx) {
       `Add at least one answer to question ${question.route} in self-service.json`,
       `question ${question.route} has no answers`
     )
-  } else if (!question.multiSelect) {
+  }
+  if (hasAnswers && !question.multiSelect) {
     checkAnswerRoutes(logger, question)
   }
   checkQuestionReachability(logger, question, ctx)

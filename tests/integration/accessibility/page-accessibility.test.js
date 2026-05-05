@@ -239,6 +239,11 @@ describe('Page accessibility checks (Axe)', () => {
         'Does any part of the activity need to be completed by a certain date?'
     },
     {
+      url: `${marineLicenceRoutes.MARINE_LICENCE_WORKING_HOURS}?site=1&activity=1`,
+      isMarineLicence: true,
+      title: 'What are the proposed working hours?'
+    },
+    {
       url: marineLicenceRoutes.MARINE_LICENCE_COORDINATES_TYPE_CHOICE,
       title: 'How do you want to provide the site location?'
     },

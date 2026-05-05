@@ -89,7 +89,7 @@ describe('#activityDuration', () => {
         }
       )
       expect(redirectH.redirect).toHaveBeenCalledWith(
-        '/marine-licence/review-site-details?site=1&activity=1'
+        '/marine-licence/review-site-details#activity-details-site-1-activity-1'
       )
     })
   })

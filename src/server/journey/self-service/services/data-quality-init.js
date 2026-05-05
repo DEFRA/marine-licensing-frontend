@@ -7,7 +7,9 @@ export const journeySelfServiceDataQualityInit = {
     name: 'journeySelfServiceDataQualityInit',
     register(server) {
       server.events.on('start', () => {
-        if (!config.get('selfService.dataQualityEnabled')) return
+        if (!config.get('selfService.dataQualityEnabled')) {
+          return
+        }
         runLoadTimeScan(server.logger, getJourneyData())
       })
     }

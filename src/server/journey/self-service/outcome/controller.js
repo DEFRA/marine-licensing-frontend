@@ -17,7 +17,9 @@ const VIEW_PATH = 'journey/self-service/outcome/index'
 
 export function classifyOutcome(outcome) {
   const types = getOutcomeTypesForOutcome(outcome)
-  if (types.some((ot) => ot.nextQuestionRoute)) return 'intermediate'
+  if (types.some((ot) => ot.nextQuestionRoute)) {
+    return 'intermediate'
+  }
   return types.length > 1 ? 'terminal-multi' : 'terminal-single'
 }
 
@@ -25,7 +27,9 @@ export function ctaLabelFor(outcomeType) {
   if (outcomeType.overrideCtaButtonText) {
     return outcomeType.overrideCtaButtonText
   }
-  if (outcomeType.link) return 'Download'
+  if (outcomeType.link) {
+    return 'Download'
+  }
   return 'Continue'
 }
 
@@ -80,7 +84,9 @@ function loadOutcomeForGet(request) {
 }
 
 function logEmptyTextIfNeeded(request, outcomeType) {
-  if (outcomeType.text) return
+  if (outcomeType.text) {
+    return
+  }
   reportRuntimeIssue(
     request,
     'outcome-type-empty-text',
@@ -91,7 +97,9 @@ function logEmptyTextIfNeeded(request, outcomeType) {
 }
 
 function logMissingHeadingIfNeeded(request, outcomeRoute, outcome) {
-  if (outcome.heading) return
+  if (outcome.heading) {
+    return
+  }
   reportRuntimeIssue(
     request,
     'outcome-missing-heading',
@@ -118,14 +126,17 @@ export const outcomeController = {
 
     if (classification === 'intermediate') {
       const section = outcome.section ? getSection(outcome.section) : null
-      const options = types.map((ot) => ({
-        id: ot.id,
-        heading: ot.heading,
-        text: ot.text,
-        isTerminal: !ot.nextQuestionRoute,
-        ctaLabel: ctaLabelFor(ot)
-      }))
-      return h.view(VIEW_PATH, { ...baseModel, section, options })
+      return h.view(VIEW_PATH, {
+        ...baseModel,
+        section,
+        options: types.map((ot) => ({
+          id: ot.id,
+          heading: ot.heading,
+          text: ot.text,
+          isTerminal: !ot.nextQuestionRoute,
+          ctaLabel: ctaLabelFor(ot)
+        }))
+      })
     }
 
     if (classification === 'terminal-single') {

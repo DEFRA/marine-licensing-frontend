@@ -6,19 +6,19 @@ import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
 import { getActivityDetailsByIndex } from '#src/server/common/helpers/marine-licence/session-cache/site-details-utils.js'
 import { getSiteDataFromParam } from '#src/server/common/helpers/site-details/site-name.js'
 import { createFailAction } from '#src/server/common/helpers/createFailAction.js'
-import { completionDateSchema } from '#src/server/marine-licence/site-details/completion-date/schema.js'
+import { workingHoursSchema } from '#src/server/common/validation/working-hours/schema.js'
 import {
-  completionDateSettings,
-  completionDateErrorMessages
-} from '#src/server/marine-licence/site-details/completion-date/constants.js'
+  workingHoursSettings,
+  workingHoursErrorMessages
+} from '#src/server/common/validation/working-hours/constants.js'
 import { saveSiteDetailsToBackend } from '#src/server/common/helpers/marine-licence/save-site-details.js'
 import { validateSiteAndActivityParams } from '#src/server/common/helpers/marine-licence/session-cache/site-utils.js'
 import { getActivityDetailsBackLink } from '#src/server/marine-licence/site-details/utils/back-link.js'
 
-export const MARINE_LICENCE_COMPLETION_DATE_VIEW_ROUTE =
-  'marine-licence/site-details/completion-date/index'
+export const MARINE_LICENCE_WORKING_HOURS_VIEW_ROUTE =
+  'marine-licence/site-details/working-hours/index'
 
-export const completionDateController = {
+export const workingHoursController = {
   options: {
     pre: [validateSiteAndActivityParams]
   },
@@ -37,31 +37,33 @@ export const completionDateController = {
       activityDetailsIndex
     )
 
-    return h.view(MARINE_LICENCE_COMPLETION_DATE_VIEW_ROUTE, {
-      ...completionDateSettings,
+    return h.view(MARINE_LICENCE_WORKING_HOURS_VIEW_ROUTE, {
+      ...workingHoursSettings,
       backLink: getActivityDetailsBackLink(siteNumber, activityDetailsNumber),
       projectName: marineLicence.projectName,
       siteNumber,
       activityDetailsNumber,
-      payload: activityDetails.completionDate
+      payload: {
+        workingHours: activityDetails.workingHours
+      }
     })
   }
 }
 
-export const completionDateSubmitController = {
+export const workingHoursSubmitController = {
   options: {
     pre: [validateSiteAndActivityParams],
     validate: {
-      payload: completionDateSchema,
+      payload: workingHoursSchema,
       failAction: (request, h, err) => {
         const { activityDetailsNumber, siteNumber } = getSiteDataFromParam(
           request.query
         )
         const marineLicence = getMarineLicenceCache(request)
         return createFailAction({
-          viewRoute: MARINE_LICENCE_COMPLETION_DATE_VIEW_ROUTE,
-          settings: completionDateSettings,
-          errorMessages: completionDateErrorMessages,
+          viewRoute: MARINE_LICENCE_WORKING_HOURS_VIEW_ROUTE,
+          settings: workingHoursSettings,
+          errorMessages: workingHoursErrorMessages,
           projectName: marineLicence.projectName,
           backLink: getActivityDetailsBackLink(
             siteNumber,
@@ -83,18 +85,13 @@ export const completionDateSubmitController = {
       siteNumber
     } = getSiteDataFromParam(request.query)
 
-    const hasCompletionDate = payload.date === 'yes'
-
     await updateMarineLicenceSiteActivityDetails(
       request,
       h,
       siteIndex,
       activityDetailsIndex,
       {
-        completionDate: {
-          date: payload.date,
-          ...(hasCompletionDate && { reason: payload.reason })
-        }
+        workingHours: payload.workingHours
       }
     )
 

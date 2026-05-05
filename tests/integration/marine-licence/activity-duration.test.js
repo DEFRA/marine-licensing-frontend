@@ -93,7 +93,7 @@ describe('Duration (marine licence)', () => {
 
     expect(response.statusCode).toBe(statusCodes.redirect)
     expect(response.headers.location).toBe(
-      '/marine-licence/review-site-details?site=1&activity=1'
+      '/marine-licence/review-site-details#activity-details-site-1-activity-1'
     )
   })
 })

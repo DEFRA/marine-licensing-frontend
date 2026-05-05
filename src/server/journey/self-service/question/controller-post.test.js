@@ -145,6 +145,26 @@ describe('#questionPostController', () => {
     )
   })
 
+  test('logs unknown-question-route on 404', () => {
+    vi.mocked(getQuestion).mockReturnValue(null)
+    const request = {
+      params: { questionPath: 'nope/route' },
+      payload: { answer: 'anything' },
+      logger: { warn: vi.fn() }
+    }
+    const h = { view: vi.fn() }
+
+    expect(() => questionPostController.handler(request, h)).toThrow()
+
+    expect(reportRuntimeIssue).toHaveBeenCalledWith(
+      request,
+      'unknown-question-route',
+      '/nope/route',
+      expect.any(String),
+      expect.any(String)
+    )
+  })
+
   test('logs answer-no-route when calculateNextRoute throws "no route"', () => {
     vi.mocked(calculateNextRoute).mockImplementation(() => {
       throw new Error(

@@ -1,6 +1,4 @@
-import Boom from '@hapi/boom'
 import {
-  getQuestion,
   getSection,
   ROUTE_PREFIX
 } from '#src/server/journey/self-service/services/journey-data.js'
@@ -11,7 +9,7 @@ import {
 } from '#src/server/journey/self-service/services/session-answers.js'
 import { statusCodes } from '#src/server/common/constants/status-codes.js'
 import { reportRuntimeIssue } from '#src/server/journey/self-service/services/data-quality.js'
-import { questionRouteFromRequest } from '#src/server/journey/self-service/question/utils.js'
+import { loadQuestion } from '#src/server/journey/self-service/question/utils.js'
 
 const VIEW_PATH = 'journey/self-service/question/index'
 
@@ -27,19 +25,7 @@ function toArray(value) {
 
 export const questionPostController = {
   handler(request, h) {
-    const questionRoute = questionRouteFromRequest(request)
-    const question = getQuestion(questionRoute)
-
-    if (!question) {
-      reportRuntimeIssue(
-        request,
-        'unknown-question-route',
-        questionRoute,
-        `POST ${questionRoute} hit but no question with that route exists in self-service.json`,
-        `unknown question route ${questionRoute}`
-      )
-      throw Boom.notFound('Question not found')
-    }
+    const { questionRoute, question } = loadQuestion(request)
 
     const isMulti = !!question.multiSelect
     const submittedIds = isMulti

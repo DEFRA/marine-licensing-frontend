@@ -24,7 +24,8 @@ export const adminReportsController = {
       return h.view(DASHBOARD_VIEW_ROUTE, {
         pageTitle: DASHBOARD_PAGE_TITLE,
         heading: DASHBOARD_PAGE_TITLE,
-        summary: mapSummaryReport(payload?.value)
+        summary: mapSummaryReport(payload?.value),
+        hasApiError: false
       })
     } catch (error) {
       request.logger.error(
@@ -35,7 +36,8 @@ export const adminReportsController = {
       return h.view(DASHBOARD_VIEW_ROUTE, {
         pageTitle: DASHBOARD_PAGE_TITLE,
         heading: DASHBOARD_PAGE_TITLE,
-        summary: mapSummaryReport()
+        summary: mapSummaryReport(),
+        hasApiError: true
       })
     }
   }

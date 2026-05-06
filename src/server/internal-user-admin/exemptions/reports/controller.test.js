@@ -4,6 +4,8 @@ import { adminReportsController, DASHBOARD_VIEW_ROUTE } from './controller.js'
 
 vi.mock('~/src/server/common/helpers/authenticated-requests.js')
 
+const DASHBOARD_PAGE_TITLE = 'Exemptions summary report'
+
 const createRequest = () => ({
   h: { view: vi.fn() },
   request: {
@@ -12,7 +14,14 @@ const createRequest = () => ({
   }
 })
 
-describe('Admin exemptions summary report', () => {
+const createExpectedViewModel = (summary, hasApiError = false) => ({
+  pageTitle: DASHBOARD_PAGE_TITLE,
+  heading: DASHBOARD_PAGE_TITLE,
+  summary,
+  hasApiError
+})
+
+describe('Admin exemptions summary report success handling', () => {
   const authenticatedGetRequestMock = vi.mocked(authenticatedGetRequest)
 
   test('Should render summary report with API response values', async () => {
@@ -33,15 +42,14 @@ describe('Admin exemptions summary report', () => {
       request,
       '/exemptions/summary'
     )
-    expect(h.view).toHaveBeenCalledWith(DASHBOARD_VIEW_ROUTE, {
-      pageTitle: 'Exemptions summary report',
-      heading: 'Exemptions summary report',
-      summary: {
+    expect(h.view).toHaveBeenCalledWith(
+      DASHBOARD_VIEW_ROUTE,
+      createExpectedViewModel({
         submittedExemptions: 12,
         unsubmittedExemptions: 7,
         withdrawnExemptions: 2
-      }
-    })
+      })
+    )
   })
 
   test('Should fallback to zero values when payload is missing', async () => {
@@ -50,16 +58,41 @@ describe('Admin exemptions summary report', () => {
     const { h, request } = createRequest()
     await adminReportsController.handler(request, h)
 
-    expect(h.view).toHaveBeenCalledWith(DASHBOARD_VIEW_ROUTE, {
-      pageTitle: 'Exemptions summary report',
-      heading: 'Exemptions summary report',
-      summary: {
+    expect(h.view).toHaveBeenCalledWith(
+      DASHBOARD_VIEW_ROUTE,
+      createExpectedViewModel({
         submittedExemptions: 0,
         unsubmittedExemptions: 0,
         withdrawnExemptions: 0
+      })
+    )
+  })
+
+  test('Should default missing values to zero for partial payloads', async () => {
+    authenticatedGetRequestMock.mockResolvedValueOnce({
+      payload: {
+        value: {
+          submittedExemptions: 5
+        }
       }
     })
+
+    const { h, request } = createRequest()
+    await adminReportsController.handler(request, h)
+
+    expect(h.view).toHaveBeenCalledWith(
+      DASHBOARD_VIEW_ROUTE,
+      createExpectedViewModel({
+        submittedExemptions: 5,
+        unsubmittedExemptions: 0,
+        withdrawnExemptions: 0
+      })
+    )
   })
+})
+
+describe('Admin exemptions summary report error handling', () => {
+  const authenticatedGetRequestMock = vi.mocked(authenticatedGetRequest)
 
   test('Should handle API errors gracefully', async () => {
     authenticatedGetRequestMock.mockRejectedValueOnce(new Error('API Error'))
@@ -71,14 +104,16 @@ describe('Admin exemptions summary report', () => {
       { err: expect.any(Error) },
       'Error rendering internal admin summary report page'
     )
-    expect(h.view).toHaveBeenCalledWith(DASHBOARD_VIEW_ROUTE, {
-      pageTitle: 'Exemptions summary report',
-      heading: 'Exemptions summary report',
-      summary: {
+    expect(h.view).toHaveBeenCalledWith(
+      DASHBOARD_VIEW_ROUTE,
+      createExpectedViewModel(
+        {
         submittedExemptions: 0,
         unsubmittedExemptions: 0,
         withdrawnExemptions: 0
-      }
-    })
+        },
+        true
+      )
+    )
   })
 })

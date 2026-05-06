@@ -25,6 +25,15 @@ export function ctaLabelFor(outcomeType) {
   return 'Continue'
 }
 
+export function hasContinueFor(outcomeType) {
+  return Boolean(
+    outcomeType.module ||
+    outcomeType.nextQuestionRoute ||
+    outcomeType.link ||
+    outcomeType.overrideCtaButtonText
+  )
+}
+
 export function buildIntermediateView(baseModel, outcome, types) {
   const section = outcome.section ? getSection(outcome.section) : null
   return {
@@ -44,7 +53,8 @@ export function buildTerminalSingleView(baseModel, terminalType) {
   return {
     ...baseModel,
     body: terminalType.text,
-    ctaLabel: ctaLabelFor(terminalType)
+    ctaLabel: ctaLabelFor(terminalType),
+    hasContinue: hasContinueFor(terminalType)
   }
 }
 
@@ -55,7 +65,8 @@ export function buildTerminalMultiView(baseModel, types) {
       id: ot.id,
       heading: ot.heading,
       text: ot.text,
-      ctaLabel: ctaLabelFor(ot)
+      ctaLabel: ctaLabelFor(ot),
+      hasContinue: hasContinueFor(ot)
     }))
   }
 }

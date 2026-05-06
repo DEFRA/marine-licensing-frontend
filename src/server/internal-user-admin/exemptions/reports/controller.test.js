@@ -108,9 +108,9 @@ describe('Admin exemptions summary report error handling', () => {
       DASHBOARD_VIEW_ROUTE,
       createExpectedViewModel(
         {
-        submittedExemptions: 0,
-        unsubmittedExemptions: 0,
-        withdrawnExemptions: 0
+          submittedExemptions: 0,
+          unsubmittedExemptions: 0,
+          withdrawnExemptions: 0
         },
         true
       )

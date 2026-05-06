@@ -320,6 +320,48 @@ describe('save-site-details', () => {
       )
     })
 
+    test('should transform OSGB36 eastings/northings to easting/northing in API payload while retaining plural names in cache', async () => {
+      const osgb36MarineLicence = {
+        ...mockManualCoordinatesMarineLicence,
+        siteDetails: [
+          {
+            coordinatesType: 'coordinates',
+            coordinatesEntry: 'single',
+            coordinates: { eastings: '532000', northings: '182000' },
+            circleWidth: '50'
+          }
+        ]
+      }
+      vi.mocked(getMarineLicenceCache).mockReturnValue(osgb36MarineLicence)
+      vi.mocked(authenticatedPatchRequest).mockResolvedValue({
+        payload: { success: true }
+      })
+
+      await saveSiteDetailsToBackend(mockRequest, mockH, { siteIndex: 0 })
+
+      expect(authenticatedPatchRequest).toHaveBeenCalledWith(
+        mockRequest,
+        apiRoutes.UPDATE_MARINE_LICENCE_SITE,
+        expect.objectContaining({
+          siteDetails: expect.objectContaining({
+            coordinates: { easting: '532000', northing: '182000' }
+          })
+        })
+      )
+
+      expect(vi.mocked(setMarineLicenceCache)).toHaveBeenCalledWith(
+        mockRequest,
+        mockH,
+        expect.objectContaining({
+          siteDetails: expect.arrayContaining([
+            expect.objectContaining({
+              coordinates: { eastings: '532000', northings: '182000' }
+            })
+          ])
+        })
+      )
+    })
+
     test('should throw error when Marine Licence ID is missing', async () => {
       vi.mocked(getMarineLicenceCache).mockReturnValue({
         ...mockMarineLicenceApplication,

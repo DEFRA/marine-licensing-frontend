@@ -57,7 +57,7 @@
 {% set _ = rows.push({
     key: { text: "Proposed working hours"},
     value: { html: appIncompleteField({text:params.activityDetails.workingHours})},
-    actions: setSiteDetailsAction(params.activityDetails.workingHours, 'review-site-details', params.siteNumber, "", { skipAction: true, activityNumber: params.index })
+    actions: setSiteDetailsAction(params.activityDetails.workingHours, 'working-hours', params.siteNumber, "", { skipAction: true, activityNumber: params.index })
 }) %}
 
 

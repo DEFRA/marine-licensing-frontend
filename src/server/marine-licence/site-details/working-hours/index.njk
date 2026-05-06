@@ -1,0 +1,66 @@
+{% extends 'layouts/page.njk' %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/back-link/macro.njk" import govukBackLink %}
+{% from "govuk/components/textarea/macro.njk" import govukTextarea %}
+{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+{% from "site-activity-heading/macro.njk" import appSiteActivityHeading %}
+
+{% block beforeContent %}
+{{ super() }}
+<nav>
+  {{ govukBackLink({
+    text: "Back",
+    href: backLink
+  }) }}
+</nav>
+{% endblock %}
+
+{% set headingWithCaption %}
+  {{ appSiteActivityHeading({
+    projectName: projectName,
+    siteNumber: siteNumber,
+    activityDetailsNumber: activityDetailsNumber,
+    heading: heading
+  }) }}
+{% endset %}
+
+{% set hintText %}
+  <p class="govuk-hint">Tell us the days of the week and start and finish times (for example, Monday to Friday, 9am to 5pm). Include whether the works will happen at high or low tide.</p>
+  <p class="govuk-hint">Enter a maximum of 1,000 characters</p>
+{% endset %}
+
+{% block content %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+      {% if errors %}
+        {{ govukErrorSummary({
+          titleText: "There is a problem",
+          errorList: errorSummary
+        }) }}
+      {% endif %}
+      <form method="POST">
+        <input type="hidden" name="csrfToken" value="{{ csrfToken }}"/>
+        {{ govukTextarea({
+          id: "workingHours",
+          name: "workingHours",
+          value: payload.workingHours,
+          rows: 8,
+          label: {
+            html: headingWithCaption,
+            classes: "govuk-label--l"
+          },
+          hint: {
+            html: hintText
+          },
+          errorMessage: errors['workingHours']
+        }) }}
+        <div class="govuk-button-group">
+          {{ govukButton({
+            text: "Save and continue",
+            classes: "govuk-button--primary"
+          }) }}
+        </div>
+      </form>
+    </div>
+  </div>
+{% endblock %}

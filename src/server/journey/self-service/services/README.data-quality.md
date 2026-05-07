@@ -19,12 +19,12 @@ caught at boot or in production traffic.
 
 ## Module surface
 
-| Export                | Caller                                                  | Logger              |
-| --------------------- | ------------------------------------------------------- | ------------------- |
-| `runLoadTimeScan`     | `data-quality-init.js` (Hapi `start` event)             | `server.logger`     |
-| `reportLoadTimeIssue` | Internal to `runLoadTimeScan`'s checks                  | passed-in `logger`  |
-| `reportRuntimeIssue`  | `outcome/controller.js`, `question/utils.js`            | `request.logger`    |
-| `reportRuntimeError`  | `question/controller.js`                                | `request.logger`    |
+| Export                | Caller                                       | Logger             |
+| --------------------- | -------------------------------------------- | ------------------ |
+| `runLoadTimeScan`     | `data-quality-init.js` (Hapi `start` event)  | `server.logger`    |
+| `reportLoadTimeIssue` | Internal to `runLoadTimeScan`'s checks       | passed-in `logger` |
+| `reportRuntimeIssue`  | `outcome/controller.js`, `question/utils.js` | `request.logger`   |
+| `reportRuntimeError`  | `question/controller.js`                     | `request.logger`   |
 
 The runtime callers are reached on routes registered with `auth: false`, so the
 `seenRuntimeIssues` Set is bounded (`MAX_SEEN_RUNTIME_ISSUES = 100`, FIFO
@@ -107,16 +107,16 @@ The two filled sets are then consumed by `checkQuestionReachability` and
 
 ### Defects emitted by the load-time scan
 
-| `event.action`                       | Trigger                                                              |
-| ------------------------------------ | -------------------------------------------------------------------- |
-| `question-no-answers`                | Question with empty/missing `answers`                                |
-| `answer-no-route`                    | Single-select answer with neither `nextQuestionRoute` nor `outcomeRoute` |
-| `question-orphan`                    | Question unreachable from `firstQuestionRoute`                       |
-| `outcome-missing-heading`            | Outcome with no `heading`                                            |
-| `outcome-empty-outcome-types`        | Outcome with empty/missing `outcomeTypes`                            |
-| `outcome-unknown-outcome-type-ref`   | Outcome references an undefined outcomeType id                       |
-| `outcometype-missing-heading`        | OutcomeType rendered as a card on a multi-terminal outcome but has no `heading` |
-| `outcome-orphan`                     | Outcome unreachable from any answer or outcomeType                   |
+| `event.action`                     | Trigger                                                                         |
+| ---------------------------------- | ------------------------------------------------------------------------------- |
+| `question-no-answers`              | Question with empty/missing `answers`                                           |
+| `answer-no-route`                  | Single-select answer with neither `nextQuestionRoute` nor `outcomeRoute`        |
+| `question-orphan`                  | Question unreachable from `firstQuestionRoute`                                  |
+| `outcome-missing-heading`          | Outcome with no `heading`                                                       |
+| `outcome-empty-outcome-types`      | Outcome with empty/missing `outcomeTypes`                                       |
+| `outcome-unknown-outcome-type-ref` | Outcome references an undefined outcomeType id                                  |
+| `outcometype-missing-heading`      | OutcomeType rendered as a card on a multi-terminal outcome but has no `heading` |
+| `outcome-orphan`                   | Outcome unreachable from any answer or outcomeType                              |
 
 ## Flow 2 — runtime reporting
 

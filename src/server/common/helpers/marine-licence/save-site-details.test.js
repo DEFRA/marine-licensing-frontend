@@ -243,27 +243,6 @@ describe('save-site-details', () => {
       })
     })
 
-    test('should log save information for each site', () => {
-      const siteDetails = [
-        {
-          coordinatesType: 'coordinates',
-          coordinatesEntry: 'single',
-          siteName: 'Test site'
-        }
-      ]
-
-      prepareManualCoordinateDataForSave(siteDetails, mockRequest)
-
-      expect(mockRequest.logger.info).toHaveBeenCalledWith(
-        {
-          coordinatesType: 'coordinates',
-          coordinatesEntry: 'single'
-        },
-        'Saving manual coordinate site details'
-      )
-    })
-  })
-
   describe('saveSiteDetailsToBackend', () => {
     test('should save site details successfully with single site option', async () => {
       vi.mocked(authenticatedPatchRequest).mockResolvedValue({

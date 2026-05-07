@@ -1,7 +1,8 @@
 import { describe, test, expect, vi, beforeEach } from 'vitest'
 import {
   saveSiteDetailsToBackend,
-  prepareFileUploadDataForSave
+  prepareFileUploadDataForSave,
+  prepareManualCoordinateDataForSave
 } from './save-site-details.js'
 import { authenticatedPatchRequest } from '../authenticated-requests.js'
 import {
@@ -10,7 +11,10 @@ import {
 } from './session-cache/utils.js'
 import { createMockRequest } from '#src/server/test-helpers/mocks/helpers.js'
 import Boom from '@hapi/boom'
-import { mockMarineLicenceApplication } from '#src/server/test-helpers/mocks/marine-licence-mocks.js'
+import {
+  mockMarineLicenceApplication,
+  mockManualCoordinatesMarineLicence
+} from '#src/server/test-helpers/mocks/marine-licence-mocks.js'
 import { apiRoutes } from '#src/server/common/constants/routes.js'
 
 vi.mock('../authenticated-requests.js')
@@ -172,6 +176,68 @@ describe('save-site-details', () => {
     })
   })
 
+  describe('prepareManualCoordinateDataForSave', () => {
+    test('should return a structured object for single coordinate entry including circleWidth', () => {
+      const siteDetails = [
+        {
+          coordinatesType: 'coordinates',
+          coordinatesEntry: 'single',
+          coordinateSystem: 'wgs84',
+          coordinates: { latitude: '51.489676', longitude: '-0.231530' },
+          circleWidth: '100',
+          siteName: 'Test site',
+          activityDetails: { description: 'Test activity' },
+          someUiOnlyField: 'should not appear'
+        }
+      ]
+
+      const result = prepareManualCoordinateDataForSave(siteDetails)
+
+      expect(result).toHaveLength(1)
+      expect(result[0]).toEqual({
+        coordinatesType: 'coordinates',
+        coordinatesEntry: 'single',
+        coordinateSystem: 'wgs84',
+        coordinates: { latitude: '51.489676', longitude: '-0.231530' },
+        circleWidth: '100',
+        siteName: 'Test site',
+        activityDetails: { description: 'Test activity' }
+      })
+      expect(result[0]).not.toHaveProperty('someUiOnlyField')
+    })
+
+    test('should return a structured object for multiple coordinate entry without circleWidth', () => {
+      const siteDetails = [
+        {
+          coordinatesType: 'coordinates',
+          coordinatesEntry: 'multiple',
+          coordinateSystem: 'wgs84',
+          coordinates: [
+            { latitude: '51.489676', longitude: '-0.231530' },
+            { latitude: '51.490000', longitude: '-0.230000' },
+            { latitude: '51.488000', longitude: '-0.232000' }
+          ],
+          circleWidth: '100',
+          siteName: 'Test polygon site',
+          activityDetails: null
+        }
+      ]
+
+      const result = prepareManualCoordinateDataForSave(siteDetails)
+
+      expect(result).toHaveLength(1)
+      expect(result[0]).not.toHaveProperty('circleWidth')
+      expect(result[0]).toEqual({
+        coordinatesType: 'coordinates',
+        coordinatesEntry: 'multiple',
+        coordinateSystem: 'wgs84',
+        coordinates: siteDetails[0].coordinates,
+        siteName: 'Test polygon site',
+        activityDetails: null
+      })
+    })
+  })
+
   describe('saveSiteDetailsToBackend', () => {
     test('should save site details successfully with single site option', async () => {
       vi.mocked(authenticatedPatchRequest).mockResolvedValue({
@@ -246,21 +312,43 @@ describe('save-site-details', () => {
       )
     })
 
-    test('should not save manual coordinates', async () => {
-      const manualMarineLicence = {
-        ...mockMarineLicenceApplication,
-        siteDetails: [
-          {
-            coordinatesType: 'coordinates',
-            coordinatesEntry: 'single'
-          }
-        ]
-      }
-      vi.mocked(getMarineLicenceCache).mockReturnValue(manualMarineLicence)
+    test('should save manual coordinate site details successfully', async () => {
+      vi.mocked(getMarineLicenceCache).mockReturnValue(
+        mockManualCoordinatesMarineLicence
+      )
+      vi.mocked(authenticatedPatchRequest).mockResolvedValue({
+        payload: { success: true }
+      })
 
-      await expect(
-        saveSiteDetailsToBackend(mockRequest, mockH)
-      ).rejects.toThrow('Only file journeys can be saved for now')
+      await saveSiteDetailsToBackend(mockRequest, mockH)
+
+      expect(authenticatedPatchRequest).toHaveBeenCalledWith(
+        mockRequest,
+        apiRoutes.UPDATE_MARINE_LICENCE_SITE_DETAILS,
+        {
+          siteDetails: expect.any(Array),
+          id: mockManualCoordinatesMarineLicence.id
+        }
+      )
+
+      expect(vi.mocked(setMarineLicenceCache)).toHaveBeenCalledWith(
+        mockRequest,
+        mockH,
+        expect.objectContaining({
+          ...mockManualCoordinatesMarineLicence,
+          siteDetails: expect.any(Array)
+        })
+      )
+
+      expect(mockRequest.logger.info).toHaveBeenCalledWith(
+        {
+          marineLicenceId: mockManualCoordinatesMarineLicence.id,
+          siteCount: 1,
+          coordinatesType: 'coordinates',
+          isSingleSite: false
+        },
+        'Successfully saved site details to backend'
+      )
     })
 
     test('should throw error when Marine Licence ID is missing', async () => {

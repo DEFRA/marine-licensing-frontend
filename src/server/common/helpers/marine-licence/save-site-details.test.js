@@ -242,6 +242,7 @@ describe('save-site-details', () => {
         activityDetails: null
       })
     })
+  })
 
   describe('saveSiteDetailsToBackend', () => {
     test('should save site details successfully with single site option', async () => {

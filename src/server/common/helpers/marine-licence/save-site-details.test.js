@@ -177,13 +177,70 @@ describe('save-site-details', () => {
   })
 
   describe('prepareManualCoordinateDataForSave', () => {
-    test('should return site details as-is for manual coordinate entry', () => {
+    test('should return a structured object for single coordinate entry including circleWidth', () => {
+      const siteDetails = [
+        {
+          coordinatesType: 'coordinates',
+          coordinatesEntry: 'single',
+          coordinateSystem: 'wgs84',
+          coordinates: { latitude: '51.489676', longitude: '-0.231530' },
+          circleWidth: '100',
+          siteName: 'Test site',
+          activityDetails: { description: 'Test activity' },
+          someUiOnlyField: 'should not appear'
+        }
+      ]
+
       const result = prepareManualCoordinateDataForSave(
-        mockManualCoordinatesMarineLicence.siteDetails,
+        siteDetails,
         mockRequest
       )
 
-      expect(result).toEqual(mockManualCoordinatesMarineLicence.siteDetails)
+      expect(result).toHaveLength(1)
+      expect(result[0]).toEqual({
+        coordinatesType: 'coordinates',
+        coordinatesEntry: 'single',
+        coordinateSystem: 'wgs84',
+        coordinates: { latitude: '51.489676', longitude: '-0.231530' },
+        circleWidth: '100',
+        siteName: 'Test site',
+        activityDetails: { description: 'Test activity' }
+      })
+      expect(result[0]).not.toHaveProperty('someUiOnlyField')
+    })
+
+    test('should return a structured object for multiple coordinate entry without circleWidth', () => {
+      const siteDetails = [
+        {
+          coordinatesType: 'coordinates',
+          coordinatesEntry: 'multiple',
+          coordinateSystem: 'wgs84',
+          coordinates: [
+            { latitude: '51.489676', longitude: '-0.231530' },
+            { latitude: '51.490000', longitude: '-0.230000' },
+            { latitude: '51.488000', longitude: '-0.232000' }
+          ],
+          circleWidth: '100',
+          siteName: 'Test polygon site',
+          activityDetails: null
+        }
+      ]
+
+      const result = prepareManualCoordinateDataForSave(
+        siteDetails,
+        mockRequest
+      )
+
+      expect(result).toHaveLength(1)
+      expect(result[0]).not.toHaveProperty('circleWidth')
+      expect(result[0]).toEqual({
+        coordinatesType: 'coordinates',
+        coordinatesEntry: 'multiple',
+        coordinateSystem: 'wgs84',
+        coordinates: siteDetails[0].coordinates,
+        siteName: 'Test polygon site',
+        activityDetails: null
+      })
     })
 
     test('should log save information for each site', () => {
@@ -295,7 +352,7 @@ describe('save-site-details', () => {
         mockRequest,
         apiRoutes.UPDATE_MARINE_LICENCE_SITE_DETAILS,
         {
-          siteDetails: mockManualCoordinatesMarineLicence.siteDetails,
+          siteDetails: expect.any(Array),
           id: mockManualCoordinatesMarineLicence.id
         }
       )
@@ -305,7 +362,7 @@ describe('save-site-details', () => {
         mockH,
         expect.objectContaining({
           ...mockManualCoordinatesMarineLicence,
-          siteDetails: mockManualCoordinatesMarineLicence.siteDetails
+          siteDetails: expect.any(Array)
         })
       )
 

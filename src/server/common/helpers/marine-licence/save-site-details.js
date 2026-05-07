@@ -47,16 +47,26 @@ export const prepareFileUploadDataForSave = (siteDetails, request) => {
 }
 
 export const prepareManualCoordinateDataForSave = (siteDetails, request) => {
+  const dataToSave = []
+
   for (const site of siteDetails) {
-    request.logger.info(
-      {
-        coordinatesType: site.coordinatesType,
-        coordinatesEntry: site.coordinatesEntry
-      },
-      'Saving manual coordinate site details'
-    )
+    const siteToSave = {
+      coordinatesType: site.coordinatesType,
+      coordinatesEntry: site.coordinatesEntry,
+      coordinateSystem: site.coordinateSystem,
+      coordinates: site.coordinates,
+      siteName: site.siteName,
+      activityDetails: site.activityDetails
+    }
+
+    if (site.coordinatesEntry === 'single') {
+      siteToSave.circleWidth = site.circleWidth
+    }
+
+    dataToSave.push(siteToSave)
   }
-  return siteDetails
+
+  return dataToSave
 }
 
 export const saveSiteDetailsToBackend = async (

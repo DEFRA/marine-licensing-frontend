@@ -48,6 +48,22 @@ IAT pages deliberately render without the app's usual chrome:
 
 The template does not call `super()` so these are omitted as standard.
 
+### Handler file layout
+
+Each feature directory has one `controller.js` exporting both the GET
+and POST handlers (e.g. `outcomeController` and
+`outcomePostController`), matching the rest of
+`marine-licensing-frontend`. Do not split handlers into a separate
+`controller-post.js`.
+
+When `controller.js` starts to feel unwieldy, extract pure helpers,
+loaders, and view-model builders into a sibling `utils.js` (the
+convention used elsewhere in the repo) rather than splitting
+handlers across files. The JS cursor rule enforces function-level
+size limits — cyclomatic ≤ 10, cognitive ≤ 15, length ≤ 75 lines —
+not file-level ones, so a controller of any reasonable length is
+fine as long as each handler stays within those bounds.
+
 ### Test file layout
 
 For IAT pages we split the two test styles into separate files:

@@ -226,10 +226,7 @@ describe('save-site-details', () => {
         }
       ]
 
-      const result = prepareManualCoordinateDataForSave(
-        siteDetails,
-        mockRequest
-      )
+      const result = prepareManualCoordinateDataForSave(siteDetails)
 
       expect(result).toHaveLength(1)
       expect(result[0]).not.toHaveProperty('circleWidth')

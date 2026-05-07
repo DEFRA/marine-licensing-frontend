@@ -46,7 +46,7 @@ export const prepareFileUploadDataForSave = (siteDetails, request) => {
   return dataToSave
 }
 
-export const prepareManualCoordinateDataForSave = (siteDetails, request) => {
+export const prepareManualCoordinateDataForSave = (siteDetails) => {
   const dataToSave = []
 
   for (const site of siteDetails) {
@@ -100,7 +100,7 @@ export const saveSiteDetailsToBackend = async (
   const dataToSave =
     coordinatesType === 'file'
       ? prepareFileUploadDataForSave(siteDetailsToUpdate, request)
-      : prepareManualCoordinateDataForSave(siteDetailsToUpdate, request)
+      : prepareManualCoordinateDataForSave(siteDetailsToUpdate)
 
   try {
     if (isSingleSite) {

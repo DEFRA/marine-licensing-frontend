@@ -70,6 +70,30 @@ export const prepareManualCoordinateDataForSave = (siteDetails) => {
   return dataToSave
 }
 
+export const prepareSiteData = (
+  siteDetails,
+  coordinatesType,
+  isSingleSite,
+  siteIndex,
+  request
+) => {
+  const siteDetailsToUpdate = isSingleSite
+    ? siteDetails.filter((_, index) => index === siteIndex)
+    : siteDetails
+
+  const cacheData =
+    coordinatesType === 'file'
+      ? prepareFileUploadDataForSave(siteDetailsToUpdate, request)
+      : prepareManualCoordinateDataForSave(siteDetailsToUpdate)
+
+  const apiData =
+    coordinatesType === 'file'
+      ? cacheData
+      : transformCoordinatesForApi(cacheData)
+
+  return { cacheData, apiData }
+}
+
 export const saveSiteDetailsToBackend = async (
   request,
   h,
@@ -93,20 +117,13 @@ export const saveSiteDetailsToBackend = async (
   }
 
   const isSingleSite = siteIndex !== undefined
-
-  const siteDetailsToUpdate = isSingleSite
-    ? siteDetails.filter((_, index) => index === siteIndex)
-    : siteDetails
-
-  const cacheData =
-    coordinatesType === 'file'
-      ? prepareFileUploadDataForSave(siteDetailsToUpdate, request)
-      : prepareManualCoordinateDataForSave(siteDetailsToUpdate)
-
-  const apiData =
-    coordinatesType === 'file'
-      ? cacheData
-      : transformCoordinatesForApi(cacheData)
+  const { cacheData, apiData } = prepareSiteData(
+    siteDetails,
+    coordinatesType,
+    isSingleSite,
+    siteIndex,
+    request
+  )
 
   try {
     if (isSingleSite) {

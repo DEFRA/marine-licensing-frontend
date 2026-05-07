@@ -207,6 +207,21 @@ function isMultiTerminal(outcome, outcomeTypesById) {
   return types.every((ot) => !ot.nextQuestionRoute)
 }
 
+/**
+ * walkReachable() has 4 steps:--
+ *   1. Building per-call lookup indexes (questionsByRoute, outcomesByRoute, outcomeTypesById) from the supplied
+ *      journeyData rather than the module singleton — so the load-time scan can run against synthetic test fixtures
+ *   2. Seeding a queue with the first question, then popping nodes one at a time and dispatching to visitQuestion or
+ *      visitOutcome based on node.kind
+ *   3. For each unvisited question, marking it reachable and enqueuing its successors — either the multi-select
+ *      branches (questionRoute / outcomeRoute) or each answer's nextQuestionRoute / outcomeRoute
+ *   4. For each unvisited outcome, marking it reachable and enqueuing any nextQuestionRoute exposed by its referenced
+ *      outcomeTypes — that's how a terminal-typed outcome can loop back into another question
+ *
+ *   The two output sets it fills are then consumed by checkQuestionReachability and checkOutcomeReachability
+ *   flag any question or outcome defined in self-service.json that no path from the entry point can reach — the
+ *   "orphan" diagnostics.
+ */
 function walkReachable(journeyData, reachableQuestions, reachableOutcomes) {
   // Build indexes from the passed-in journeyData rather than reusing the ones
   // in journey-data.js — the scan must be runnable against synthetic fixtures

@@ -20,7 +20,15 @@ export function reportLoadTimeIssue(logger, action, reference, fix, summary) {
 }
 
 export function reportRuntimeIssue(request, action, reference, fix, summary) {
-  const key = `${action}:${reference}`
+  emitRuntime(request, 'warn', action, reference, fix, summary)
+}
+
+export function reportRuntimeError(request, action, reference, fix, summary) {
+  emitRuntime(request, 'error', action, reference, fix, summary)
+}
+
+function emitRuntime(request, level, action, reference, fix, summary) {
+  const key = `${level}:${action}:${reference}`
   if (seenRuntimeIssues.has(key)) {
     return
   }
@@ -29,7 +37,7 @@ export function reportRuntimeIssue(request, action, reference, fix, summary) {
     seenRuntimeIssues.delete(oldest)
   }
   seenRuntimeIssues.add(key)
-  request.logger.warn(
+  request.logger[level](
     { event: buildEvent(action, reference, fix) },
     `${CATEGORY}: ${summary}`
   )

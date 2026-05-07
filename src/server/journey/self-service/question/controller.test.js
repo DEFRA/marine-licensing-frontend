@@ -20,7 +20,10 @@ import {
   getAnswerForRoute,
   pushAnswer
 } from '#src/server/journey/self-service/services/session-answers.js'
-import { reportRuntimeIssue } from '#src/server/journey/self-service/services/data-quality.js'
+import {
+  reportRuntimeIssue,
+  reportRuntimeError
+} from '#src/server/journey/self-service/services/data-quality.js'
 
 describe('#questionController', () => {
   const mockQuestion = {
@@ -311,7 +314,7 @@ describe('#questionPostController', () => {
     )
   })
 
-  test('logs answer-no-route when calculateNextRoute throws "no route"', () => {
+  test('logs answer-no-route at error level when calculateNextRoute throws "no route"', () => {
     vi.mocked(calculateNextRoute).mockImplementation(() => {
       throw new Error(
         "Answer 'broken' on question '/sea' has no nextQuestionRoute or outcomeRoute"
@@ -320,18 +323,25 @@ describe('#questionPostController', () => {
     const request = {
       params: { questionPath: 'sea' },
       payload: { answer: 'broken' },
-      logger: { warn: vi.fn() }
+      logger: { warn: vi.fn(), error: vi.fn() }
     }
     const h = { redirect: vi.fn(), view: vi.fn() }
 
     expect(() => questionPostController.handler(request, h)).toThrow()
 
-    expect(reportRuntimeIssue).toHaveBeenCalledWith(
+    expect(reportRuntimeError).toHaveBeenCalledWith(
       request,
       'answer-no-route',
       '/sea#broken',
       expect.any(String),
       expect.any(String)
+    )
+    expect(reportRuntimeIssue).not.toHaveBeenCalledWith(
+      request,
+      'answer-no-route',
+      expect.anything(),
+      expect.anything(),
+      expect.anything()
     )
   })
 

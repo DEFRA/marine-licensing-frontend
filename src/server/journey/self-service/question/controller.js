@@ -9,7 +9,7 @@ import {
   pushAnswer
 } from '#src/server/journey/self-service/services/session-answers.js'
 import { statusCodes } from '#src/server/common/constants/status-codes.js'
-import { reportRuntimeIssue } from '#src/server/journey/self-service/services/data-quality.js'
+import { reportRuntimeError } from '#src/server/journey/self-service/services/data-quality.js'
 import {
   loadQuestion,
   toArray,
@@ -69,7 +69,7 @@ export const questionPostController = {
       next = calculateNextRoute(question, submittedIds)
     } catch (err) {
       const answerId = submittedIds[0]
-      reportRuntimeIssue(
+      reportRuntimeError(
         request,
         'answer-no-route',
         `${questionRoute}#${answerId}`,

@@ -134,6 +134,71 @@ describe('#reportRuntimeIssue', () => {
   })
 })
 
+describe('#reportRuntimeError', () => {
+  let reportRuntimeError
+
+  beforeEach(async () => {
+    vi.resetModules()
+    const mod =
+      await import('#src/server/journey/self-service/services/data-quality.js')
+    reportRuntimeError = mod.reportRuntimeError
+  })
+
+  test('emits ECS-shaped error line via request.logger.error (not warn)', () => {
+    const error = vi.fn()
+    const warn = vi.fn()
+    const request = { logger: { error, warn } }
+
+    reportRuntimeError(
+      request,
+      'answer-no-route',
+      '/sea#broken',
+      "Add nextQuestionRoute or outcomeRoute to answer 'broken' on /sea",
+      "Answer 'broken' on /sea has no route"
+    )
+
+    expect(warn).not.toHaveBeenCalled()
+    expect(error).toHaveBeenCalledTimes(1)
+    expect(error).toHaveBeenCalledWith(
+      {
+        event: {
+          action: 'answer-no-route',
+          reference: '/sea#broken',
+          reason:
+            "Add nextQuestionRoute or outcomeRoute to answer 'broken' on /sea",
+          outcome: 'failure'
+        }
+      },
+      "iat-data-quality: Answer 'broken' on /sea has no route"
+    )
+  })
+
+  test('per-process dedupe: same (action, reference) only logs once at error level', () => {
+    const error = vi.fn()
+    const request = { logger: { error, warn: vi.fn() } }
+
+    reportRuntimeError(request, 'answer-no-route', '/sea#broken', 'fix', 's')
+    reportRuntimeError(request, 'answer-no-route', '/sea#broken', 'fix', 's')
+    reportRuntimeError(request, 'answer-no-route', '/sea#broken', 'fix', 's')
+
+    expect(error).toHaveBeenCalledTimes(1)
+  })
+
+  test('warn-level and error-level dedupe keys do not collide', async () => {
+    const mod =
+      await import('#src/server/journey/self-service/services/data-quality.js')
+    const error = vi.fn()
+    const warn = vi.fn()
+    const request = { logger: { error, warn } }
+
+    mod.reportRuntimeIssue(request, 'answer-no-route', '/sea#broken', 'f', 's')
+    mod.reportRuntimeError(request, 'answer-no-route', '/sea#broken', 'f', 's')
+
+    expect(warn).toHaveBeenCalledTimes(1)
+    expect(error).toHaveBeenCalledTimes(1)
+  })
+})
+
 describe('#runLoadTimeScan', () => {
   let runLoadTimeScan
 

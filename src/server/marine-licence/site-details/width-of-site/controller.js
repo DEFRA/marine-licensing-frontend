@@ -82,6 +82,6 @@ export const widthOfSiteSubmitController = {
 
     await saveSiteDetailsToBackend(request, h)
 
-    return h.redirect(marineLicenceRoutes.MARINE_LICENCE_WIDTH_OF_SITE)
+    return h.redirect(marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS)
   }
 }

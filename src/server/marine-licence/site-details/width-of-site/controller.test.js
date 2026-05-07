@@ -83,7 +83,7 @@ describe('#widthOfSite (marine licence)', () => {
   })
 
   describe('#widthOfSiteSubmitController', () => {
-    test('should call updateMarineLicenceSiteDetails with trimmed width and redirect to same page', async () => {
+    test('should call updateMarineLicenceSiteDetails with trimmed width and redirect to review-site-details', async () => {
       const h = { redirect: vi.fn() }
       const request = createMockRequest({
         payload: { width: ' 500 ' },
@@ -101,7 +101,7 @@ describe('#widthOfSite (marine licence)', () => {
       )
       expect(saveSiteDetailsToBackend).toHaveBeenCalledWith(request, h)
       expect(h.redirect).toHaveBeenCalledWith(
-        marineLicenceRoutes.MARINE_LICENCE_WIDTH_OF_SITE
+        marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS
       )
     })
   })

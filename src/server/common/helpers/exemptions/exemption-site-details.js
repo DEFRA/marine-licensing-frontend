@@ -2,7 +2,7 @@ import {
   getCoordinateSystemText,
   getCoordinateDisplayText,
   getPolygonCoordinatesDisplayData
-} from '#src/server/exemption/site-details/review-site-details/utils.js'
+} from '#src/server/common/helpers/review-site-details/manual-entry.js'
 import { getFileUploadSummaryData } from '#src/server/common/helpers/review-site-details/file-upload.js'
 import { getSiteDetailsBySite } from '#src/server/common/helpers/exemptions/session-cache/site-details-utils.js'
 import { formatDate } from '#src/server/common/helpers/dates/date-utils.js'

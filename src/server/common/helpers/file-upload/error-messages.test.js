@@ -68,10 +68,10 @@ describe('error-messages', () => {
       )
     })
 
-    test("should have message for FEATURES_CONTAIN_POINT_OR_LINE", () => {
-      expect(
-        GEO_PARSER_ERROR_MESSAGES.FEATURES_CONTAIN_POINT_OR_LINE
-      ).toBe("The selected file must not contain any 'point' or 'line' sites")
+    test('should have message for FEATURES_CONTAIN_POINT_OR_LINE', () => {
+      expect(GEO_PARSER_ERROR_MESSAGES.FEATURES_CONTAIN_POINT_OR_LINE).toBe(
+        "The selected file must not contain any 'point' or 'line' sites"
+      )
     })
   })
 

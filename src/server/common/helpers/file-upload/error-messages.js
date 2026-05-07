@@ -13,7 +13,9 @@ export const GEO_PARSER_ERROR_MESSAGES = {
     'The selected file contains invalid coordinates',
   COORDINATES_INVALID_LATITUDE:
     'The selected file contains invalid coordinates',
-  UNSUPPORTED_FILE_TYPE: 'The selected file type is not supported'
+  UNSUPPORTED_FILE_TYPE: 'The selected file type is not supported',
+  FEATURES_CONTAIN_POINT_OR_LINE:
+    "The selected file must not contain any 'point' or 'line' sites"
 }
 
 /**

@@ -8,11 +8,13 @@ import {
   getMarineLicenceCache,
   updateMarineLicenceSiteDetails
 } from '#src/server/common/helpers/marine-licence/session-cache/utils.js'
+import { saveSiteDetailsToBackend } from '#src/server/common/helpers/marine-licence/save-site-details.js'
 import { mockMarineLicenceApplication } from '#src/server/test-helpers/mocks/marine-licence-mocks.js'
 import { createMockRequest } from '#src/server/test-helpers/mocks/helpers.js'
 import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
 
 vi.mock('#src/server/common/helpers/marine-licence/session-cache/utils.js')
+vi.mock('#src/server/common/helpers/marine-licence/save-site-details.js')
 
 const mockApplicationWithWidth = {
   ...mockMarineLicenceApplication,
@@ -85,6 +87,7 @@ describe('#widthOfSite (marine licence)', () => {
         'circleWidth',
         '500'
       )
+      expect(saveSiteDetailsToBackend).toHaveBeenCalledWith(request, h)
       expect(h.redirect).toHaveBeenCalledWith(
         marineLicenceRoutes.MARINE_LICENCE_WIDTH_OF_SITE
       )

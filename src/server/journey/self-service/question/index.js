@@ -1,5 +1,7 @@
-import { questionController } from '#src/server/journey/self-service/question/controller.js'
-import { questionPostController } from '#src/server/journey/self-service/question/controller-post.js'
+import {
+  questionController,
+  questionPostController
+} from '#src/server/journey/self-service/question/controller.js'
 import { routes } from '#src/server/common/constants/routes.js'
 import Joi from 'joi'
 

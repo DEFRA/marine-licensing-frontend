@@ -12,6 +12,7 @@ import {
   widthOfSiteSettings,
   widthOfSiteErrorMessages
 } from '#src/server/common/validation/width-of-site/constants.js'
+import { saveSiteDetailsToBackend } from '#src/server/common/helpers/marine-licence/save-site-details.js'
 
 const widthOfSitePageData = {
   ...widthOfSiteSettings,
@@ -71,6 +72,8 @@ export const widthOfSiteSubmitController = {
       'circleWidth',
       payload.width.trim()
     )
+
+    await saveSiteDetailsToBackend(request, h)
 
     return h.redirect(marineLicenceRoutes.MARINE_LICENCE_WIDTH_OF_SITE)
   }

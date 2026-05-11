@@ -35,6 +35,10 @@ for (const outcomeType of journeyData.outcomeTypes) {
   outcomeTypesById.set(outcomeType.id, outcomeType)
 }
 
+export function getJourneyData() {
+  return journeyData
+}
+
 export const ROUTE_PREFIX = '/journey/self-service'
 
 export function getFirstQuestionRoute() {

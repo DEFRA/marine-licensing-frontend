@@ -36,6 +36,7 @@ export const exemptionRoutes = {
   ADMIN_EXEMPTIONS: '/admin/exemptions',
   ADMIN_EMP: '/admin/emp',
   ADMIN_BACKFILL: '/admin/backfill-areas',
+  ADMIN_REPORTS: '/admin/reports',
   EXEMPTION: '/exemption'
 }
 
@@ -120,6 +121,7 @@ export const entraIdRoutes = [
   routes.VIEW_DETAILS_INTERNAL_USER,
   routes.ADMIN_BACKFILL,
   routes.ADMIN_EMP,
+  routes.ADMIN_REPORTS,
   marineLicenceRoutes.MARINE_LICENCE_VIEW_DETAILS_INTERNAL_USER,
   routes.ADMIN_EXEMPTIONS
 ]

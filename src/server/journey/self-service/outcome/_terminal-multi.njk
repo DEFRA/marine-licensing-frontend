@@ -1,0 +1,23 @@
+{% from "govuk/components/button/macro.njk" import govukButton %}
+
+<h1 class="govuk-heading-xl">{{ heading }}</h1>
+
+{% for option in options %}
+  <div class="app-iat-option govuk-!-margin-bottom-6">
+    <h2 class="govuk-heading-m">Option {{ loop.index }}{% if option.heading %} - {{ option.heading }}{% endif %}</h2>
+    {% if option.text %}
+      <div class="govuk-body">{{ option.text | safe }}</div>
+    {% endif %}
+    {{ govukButton({
+      text: option.ctaLabel,
+      href: "#",
+      classes: "govuk-!-margin-bottom-0"
+    }) }}
+  </div>
+{% endfor %}
+
+{{ govukButton({
+  text: "Download a PDF record of my answers",
+  href: "#",
+  classes: "govuk-button--secondary"
+}) }}

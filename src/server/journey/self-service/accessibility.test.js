@@ -36,6 +36,15 @@ describe('IAT page accessibility (Axe)', () => {
       url: '/journey/self-service/construction/maintenance-existing-works',
       title:
         'Please select sub-activites that match with activities proposed to be carried out.'
+    },
+    {
+      url: '/journey/self-service/outcome/exemption/licence-not-required-exemption-available-article-25A',
+      title:
+        'You need to provide more information, but you do not need a marine licence'
+    },
+    {
+      url: '/journey/self-service/outcome/scaffolding-impede-navigation',
+      title: 'Scaffolding or access towers - impede safe or normal navigation'
     }
   ]
 

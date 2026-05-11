@@ -207,7 +207,7 @@ describe('siteDetails utils', () => {
               activityDates: '1 January 2025 to 1 January 2025',
               activityDescription: 'Test activity description',
               method:
-                'Enter one set of coordinates and a width to create a circular site',
+                'Manually enter one set of coordinates and a width to create a circular site',
               showActivityDates: true,
               showActivityDescription: true,
               siteName: 'Manual Coordinate Site 1'

@@ -74,7 +74,7 @@ export const getCoordinateSystemText = (coordinateSystem) => {
 
   return isWGS84(coordinateSystem)
     ? 'WGS84 (World Geodetic System 1984)\nLatitude and longitude'
-    : 'British National Grid (OSGB36)\nEastings and Northings'
+    : 'OSGB36 (National Grid)\nEastings and Northings'
 }
 
 export const getCoordinateDisplayText = (siteDetails, coordinateSystem) => {
@@ -112,7 +112,7 @@ export const getReviewSummaryText = (siteDetails) => {
   const { coordinatesEntry, coordinatesType } = siteDetails
 
   if (coordinatesEntry === 'single' && coordinatesType === 'coordinates') {
-    return 'Enter one set of coordinates and a width to create a circular site'
+    return 'Manually enter one set of coordinates and a width to create a circular site'
   }
 
   if (coordinatesEntry === 'multiple' && coordinatesType === 'coordinates') {

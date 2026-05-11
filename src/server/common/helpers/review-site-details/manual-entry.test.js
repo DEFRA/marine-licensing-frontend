@@ -11,7 +11,7 @@ describe('manual-entry helpers', () => {
   describe('getCoordinateSystemText', () => {
     test('returns text for OSGB36', () => {
       expect(getCoordinateSystemText(COORDINATE_SYSTEMS.OSGB36)).toBe(
-        'British National Grid (OSGB36)\nEastings and Northings'
+        'OSGB36 (National Grid)\nEastings and Northings'
       )
     })
 
@@ -196,7 +196,7 @@ describe('manual-entry helpers', () => {
           coordinatesType: 'coordinates'
         })
       ).toBe(
-        'Enter one set of coordinates and a width to create a circular site'
+        'Manually enter one set of coordinates and a width to create a circular site'
       )
     })
 
@@ -244,7 +244,7 @@ describe('manual-entry helpers', () => {
           activityDates: '1 January 2025 to 1 January 2025',
           activityDescription: 'Test activity description',
           method:
-            'Enter one set of coordinates and a width to create a circular site',
+            'Manually enter one set of coordinates and a width to create a circular site',
           showActivityDates: true,
           showActivityDescription: true,
           siteName: 'Test Site 1',
@@ -336,8 +336,7 @@ describe('manual-entry helpers', () => {
       const result = buildManualCoordinateSummaryData(siteDetails, {})
 
       expect(result[0]).toMatchObject({
-        coordinateSystem:
-          'British National Grid (OSGB36)\nEastings and Northings',
+        coordinateSystem: 'OSGB36 (National Grid)\nEastings and Northings',
         coordinates: '425053, 564180',
         width: '200 metres'
       })

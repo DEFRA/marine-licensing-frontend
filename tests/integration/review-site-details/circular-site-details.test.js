@@ -101,7 +101,7 @@ describe('Review Site Details - Circular Coordinates Integration Tests', () => {
       )
       expect(methodRow).toBeTruthy()
       expect(methodRow.textContent).toContain(
-        'Enter one set of coordinates and a width to create a circular site'
+        'Manually enter one set of coordinates and a width to create a circular site'
       )
     })
   })

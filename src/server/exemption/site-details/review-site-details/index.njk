@@ -24,6 +24,10 @@
             <span class="govuk-caption-l">{{ projectName }}</span>
             <h1 class="govuk-heading-l">{{ heading }}</h1>
 
+            <div class="govuk-inset-text">
+              The site details you've provided are saved.<br>You must complete all sections marked <span class='govuk-tag govuk-tag--red govuk-!-margin-bottom-2 govuk-!-margin-top-2'>Incomplete</span> before you can send your information.<br>If you cannot finish now, you can return to this page later.
+            </div>
+
             {% set multipleSiteRows = [
                 {
                     key: {

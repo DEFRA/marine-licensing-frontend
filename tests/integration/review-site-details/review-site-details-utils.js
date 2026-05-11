@@ -72,3 +72,66 @@ export const validateIncompleteWarning = (document, expected) => {
     ).not.toBeInTheDocument()
   }
 }
+
+export const validateSiteLocationCard = (document) => {
+  const card = document.querySelector('#site-location-card')
+  expect(card).toBeTruthy()
+
+  const cardTitle = card.querySelector('.govuk-summary-card__title')
+  expect(cardTitle.textContent.trim()).toBe('Providing the site location')
+
+  const methodRow = getRowByKey(card, 'Method of providing site location')
+  expect(methodRow).toBeTruthy()
+  expect(methodRow.textContent).toContain(
+    'Enter the coordinates of the site manually'
+  )
+}
+
+export const validateMultipleSites = (document, expected) => {
+  const heading = document.querySelector('h1')
+  expect(heading.textContent.trim()).toBe('Review site details')
+
+  const caption = document.querySelector('.govuk-caption-l')
+  expect(caption.textContent.trim()).toBe(expected.projectName)
+
+  const cards = document.querySelectorAll('.govuk-summary-card')
+  const siteDetailsCards = Array.from(cards).filter((card) => {
+    const title = card.querySelector('.govuk-summary-card__title')
+    return title && /^Site \d+$/.test(title.textContent.trim())
+  })
+  expect(siteDetailsCards).toHaveLength(expected.siteDetails.length)
+
+  expect(
+    within(document).getByRole('button', { name: 'Continue' })
+  ).toHaveAttribute('type', 'submit')
+}
+
+export const validateSiteDetailsCard = (document, expected, siteIndex) => {
+  const siteCard = getSiteDetailsCard(document, expected, siteIndex)
+
+  const cardTitle = siteCard.querySelector('.govuk-summary-card__title')
+  expect(cardTitle.textContent.trim()).toBe(
+    expected.siteDetails[siteIndex].cardName
+  )
+
+  const siteNameRow = getRowByKey(siteCard, 'Site name')
+  expect(siteNameRow).toBeTruthy()
+  expect(siteNameRow.textContent).toContain(
+    expected.siteDetails[siteIndex].siteName
+  )
+
+  const methodRow = getRowByKey(
+    siteCard,
+    'Single or multiple sets of coordinates'
+  )
+  expect(methodRow).toBeTruthy()
+  expect(methodRow.textContent).toContain(
+    expected.siteDetails[siteIndex].method
+  )
+
+  const coordinateSystemRow = getRowByKey(siteCard, 'Coordinate system')
+  expect(coordinateSystemRow).toBeTruthy()
+  expect(coordinateSystemRow.textContent).toContain(
+    expected.siteDetails[siteIndex].coordinateSystem
+  )
+}

@@ -186,7 +186,7 @@ describe('siteDetails utils', () => {
         {
           coordinatesType: 'coordinates',
           coordinatesEntry: 'single',
-          coordinateSystem: 'WGS84',
+          coordinateSystem: 'wgs84',
           coordinates: { latitude: '51.5074', longitude: '-0.1278' },
           circleWidth: '100',
           siteName: 'Manual Site'
@@ -208,7 +208,11 @@ describe('siteDetails utils', () => {
           backLink: marineLicenceRoutes.MARINE_LICENCE_WIDTH_OF_SITE,
           projectName: 'Test Project',
           summaryData: expect.arrayContaining([
-            expect.objectContaining({ siteName: 'Manual Site', siteNumber: 1 })
+            expect.objectContaining({
+              siteName: 'Manual Site',
+              siteNumber: 1,
+              coordinates: '51.5074, -0.1278'
+            })
           ])
         })
       )

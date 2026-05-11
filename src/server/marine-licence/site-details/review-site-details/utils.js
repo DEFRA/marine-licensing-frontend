@@ -116,7 +116,10 @@ export const renderManualEntryReview = (h, options) => {
     returnToCheckYourAnswers = false
   } = options
 
-  const summaryData = buildManualCoordinateSummaryData(siteDetails, {})
+  const summaryData = buildManualCoordinateSummaryData(
+    siteDetails,
+    marineLicence.multipleSiteDetails ?? {}
+  )
 
   return h.view(MANUAL_ENTRY_REVIEW_VIEW_ROUTE, {
     ...reviewSiteDetailsPageData,

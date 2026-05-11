@@ -3,8 +3,7 @@ import {
   processFileUploadSiteDetails,
   processManualSiteDetails,
   processSiteDetails,
-  errorMessages,
-  getReviewSummaryText
+  errorMessages
 } from './exemption-site-details.js'
 
 import {
@@ -16,11 +15,15 @@ import { getFileUploadSummaryData } from '#src/server/common/helpers/review-site
 
 vi.mock(
   '~/src/server/common/helpers/review-site-details/manual-entry.js',
-  () => ({
-    getCoordinateSystemText: vi.fn(),
-    getCoordinateDisplayText: vi.fn(),
-    getPolygonCoordinatesDisplayData: vi.fn()
-  })
+  async (importOriginal) => {
+    const actual = await importOriginal()
+    return {
+      getCoordinateSystemText: vi.fn(),
+      getCoordinateDisplayText: vi.fn(),
+      getPolygonCoordinatesDisplayData: vi.fn(),
+      getReviewSummaryText: actual.getReviewSummaryText
+    }
+  }
 )
 
 vi.mock(
@@ -326,7 +329,7 @@ describe('exemption-site-details helper', () => {
         isFileUpload: false,
         coordinateSystemText: 'WGS84 (latitude and longitude)',
         reviewSummaryText:
-          'Enter one set of coordinates and a width to create a circular site',
+          'Manually enter one set of coordinates and a width to create a circular site',
         coordinatesType: 'coordinates',
         coordinateSystem: 'wgs84',
         coordinatesEntry: 'single',
@@ -366,7 +369,7 @@ describe('exemption-site-details helper', () => {
         isFileUpload: false,
         coordinateSystemText: 'OSGB36 (eastings and northings)',
         reviewSummaryText:
-          'Enter one set of coordinates and a width to create a circular site',
+          'Manually enter one set of coordinates and a width to create a circular site',
         coordinatesType: 'coordinates',
         coordinateSystem: 'osgb36',
         coordinatesEntry: 'single',
@@ -676,23 +679,6 @@ describe('exemption-site-details helper', () => {
       expect(result[0].showActivityDates).toBe(false)
       expect(result[0].activityDescription).toBe('Test activity description')
       expect(result[0].showActivityDescription).toBe(false)
-    })
-  })
-
-  describe('getReviewSummaryText utils', () => {
-    test('getReviewSummaryText correctly returns text for site details circle width text', () => {
-      expect(
-        getReviewSummaryText({
-          coordinatesEntry: 'single',
-          coordinatesType: 'coordinates'
-        })
-      ).toBe(
-        'Enter one set of coordinates and a width to create a circular site'
-      )
-    })
-
-    test('getReviewSummaryText correctly returns blank otherwise', () => {
-      expect(getReviewSummaryText({})).toBe('')
     })
   })
 })

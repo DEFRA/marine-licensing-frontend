@@ -8,11 +8,13 @@
     {% if option.text %}
       <div class="govuk-body">{{ option.text | safe }}</div>
     {% endif %}
-    {{ govukButton({
-      text: option.ctaLabel,
-      href: "#",
-      classes: "govuk-!-margin-bottom-0"
-    }) }}
+    {% if option.hasContinue %}
+      {{ govukButton({
+        text: option.ctaLabel,
+        href: "#",
+        classes: "govuk-!-margin-bottom-0"
+      }) }}
+    {% endif %}
   </div>
 {% endfor %}
 

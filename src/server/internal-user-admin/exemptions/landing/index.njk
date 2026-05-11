@@ -12,7 +12,7 @@
       <ul class="card-group">
 
         <li class="govuk-grid-column-one-half-from-desktop card-group__item">
-          <a href="/admin/emp" class="card card--clickable">
+          <a href="{{ routes.ADMIN_EMP }}" class="card card--clickable">
             <h2 class="govuk-heading-m card__heading">
               Exemptions not sent to EMP
             </h2>
@@ -21,9 +21,17 @@
 
 
         <li class="govuk-grid-column-one-half-from-desktop card-group__item">
-          <a href="/admin/backfill-areas" class="card card--clickable">
+          <a href="{{ routes.ADMIN_BACKFILL }}" class="card card--clickable">
             <h2 class="govuk-heading-m card__heading">
               Exemptions without Marine Plan or Coastal Operations Areas
+            </h2>
+          </a>
+        </li>
+
+        <li class="govuk-grid-column-one-half-from-desktop card-group__item">
+          <a href="{{ routes.ADMIN_REPORTS }}" class="card card--clickable">
+            <h2 class="govuk-heading-m card__heading">
+              Summary report
             </h2>
           </a>
         </li>

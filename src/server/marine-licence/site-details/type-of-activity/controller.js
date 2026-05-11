@@ -2,13 +2,13 @@ import {
   getMarineLicenceCache,
   updateMarineLicenceSiteActivityDetails
 } from '#src/server/common/helpers/marine-licence/session-cache/utils.js'
-import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
 import { getActivityDetailsByIndex } from '#src/server/common/helpers/marine-licence/session-cache/site-details-utils.js'
 import { typeOfActivitySchema } from '#src/server/marine-licence/site-details/type-of-activity/schema.js'
 import { getSiteDataFromParam } from '#src/server/common/helpers/site-details/site-name.js'
 import { createFailAction } from '#src/server/common/helpers/createFailAction.js'
 import { getActivityVariantFromSubType } from '#src/server/common/helpers/activity-details/activity-variants.js'
 import { validateSiteAndActivityParams } from '#src/server/common/helpers/marine-licence/session-cache/site-utils.js'
+import { getActivityDetailsBackLink } from '#src/server/marine-licence/site-details/utils/back-link.js'
 
 export const typeOfActivityErrorMessages = {
   ACTIVITY_TYPE_REQUIRED: 'Select the type of activity',
@@ -19,9 +19,6 @@ export const typeOfActivityErrorMessages = {
 
 export const MARINE_LICENCE_TYPE_OF_ACTIVITY_VIEW_ROUTE =
   'marine-licence/site-details/type-of-activity/index'
-
-const getBackLink = (siteNumber, activityDetailsNumber) =>
-  `${marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS}#activity-details-site-${siteNumber}-activity-${activityDetailsNumber}`
 
 const subTypePayload = (activityType, activitySubType) => ({
   activitySubTypeConstruction:
@@ -57,7 +54,7 @@ export const typeOfActivityController = {
 
     return h.view(MARINE_LICENCE_TYPE_OF_ACTIVITY_VIEW_ROUTE, {
       ...typeOfActivitySettings,
-      backLink: getBackLink(siteNumber, activityDetailsNumber),
+      backLink: getActivityDetailsBackLink(siteNumber, activityDetailsNumber),
       projectName: marineLicence.projectName,
       siteNumber,
       activityDetailsNumber,
@@ -74,6 +71,7 @@ export const typeOfActivityController = {
 
 export const typeOfActivitySubmitController = {
   options: {
+    pre: [validateSiteAndActivityParams],
     validate: {
       payload: typeOfActivitySchema,
       failAction: (request, h, err) => {
@@ -87,7 +85,10 @@ export const typeOfActivitySubmitController = {
           viewRoute: MARINE_LICENCE_TYPE_OF_ACTIVITY_VIEW_ROUTE,
           settings: typeOfActivitySettings,
           errorMessages: typeOfActivityErrorMessages,
-          backLink: getBackLink(siteNumber, activityDetailsNumber),
+          backLink: getActivityDetailsBackLink(
+            siteNumber,
+            activityDetailsNumber
+          ),
           params: { activityDetailsNumber, siteNumber },
           payload: request.payload
         })(request, h, err)

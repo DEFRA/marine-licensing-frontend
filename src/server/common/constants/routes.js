@@ -36,6 +36,7 @@ export const exemptionRoutes = {
   ADMIN_EXEMPTIONS: '/admin/exemptions',
   ADMIN_EMP: '/admin/emp',
   ADMIN_BACKFILL: '/admin/backfill-areas',
+  ADMIN_REPORTS: '/admin/reports',
   EXEMPTION: '/exemption'
 }
 
@@ -75,6 +76,7 @@ export const marineLicenceRoutes = {
   MARINE_LICENCE_MONTHS_OF_ACTIVITY: '/marine-licence/months-of-activity',
   MARINE_LICENCE_CIRCLE_CENTRE_POINT:
     '/marine-licence/enter-the-coordinates-at-the-centre-point',
+  MARINE_LICENCE_WORKING_HOURS: '/marine-licence/working-hours',
   MARINE_LICENCE_WIDTH_OF_SITE: '/marine-licence/width-of-site'
 }
 
@@ -119,6 +121,7 @@ export const entraIdRoutes = [
   routes.VIEW_DETAILS_INTERNAL_USER,
   routes.ADMIN_BACKFILL,
   routes.ADMIN_EMP,
+  routes.ADMIN_REPORTS,
   marineLicenceRoutes.MARINE_LICENCE_VIEW_DETAILS_INTERNAL_USER,
   routes.ADMIN_EXEMPTIONS
 ]

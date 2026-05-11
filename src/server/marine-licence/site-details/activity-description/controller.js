@@ -13,12 +13,10 @@ import {
 } from '#src/server/common/validation/activity-description/constants.js'
 import { saveSiteDetailsToBackend } from '#src/server/common/helpers/marine-licence/save-site-details.js'
 import { validateSiteAndActivityParams } from '#src/server/common/helpers/marine-licence/session-cache/site-utils.js'
+import { getActivityDetailsBackLink } from '#src/server/marine-licence/site-details/utils/back-link.js'
 
 export const MARINE_LICENCE_ACTIVITY_DESCRIPTION_VIEW_ROUTE =
   'marine-licence/site-details/activity-description/index'
-
-const getBackLink = (siteNumber, activityDetailsNumber) =>
-  `${marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS}#activity-details-site-${siteNumber}-activity-${activityDetailsNumber}`
 
 export const activityDescriptionController = {
   options: {
@@ -41,7 +39,7 @@ export const activityDescriptionController = {
 
     return h.view(MARINE_LICENCE_ACTIVITY_DESCRIPTION_VIEW_ROUTE, {
       ...activityDescriptionSettings,
-      backLink: getBackLink(siteNumber, activityDetailsNumber),
+      backLink: getActivityDetailsBackLink(siteNumber, activityDetailsNumber),
       projectName: marineLicence.projectName,
       siteNumber,
       activityDetailsNumber,
@@ -67,7 +65,10 @@ export const activityDescriptionSubmitController = {
           settings: activityDescriptionSettings,
           errorMessages: activityDescriptionErrorMessages,
           projectName: marineLicence.projectName,
-          backLink: getBackLink(siteNumber, activityDetailsNumber),
+          backLink: getActivityDetailsBackLink(
+            siteNumber,
+            activityDetailsNumber
+          ),
           payload: request.payload,
           params: { activityDetailsNumber, siteNumber }
         })(request, h, err)

@@ -46,6 +46,29 @@ export const prepareFileUploadDataForSave = (siteDetails, request) => {
   return dataToSave
 }
 
+export const prepareManualCoordinateDataForSave = (siteDetails) => {
+  const dataToSave = []
+
+  for (const site of siteDetails) {
+    const siteToSave = {
+      coordinatesType: site.coordinatesType,
+      coordinatesEntry: site.coordinatesEntry,
+      coordinateSystem: site.coordinateSystem,
+      coordinates: site.coordinates,
+      siteName: site.siteName,
+      activityDetails: site.activityDetails
+    }
+
+    if (site.coordinatesEntry === 'single') {
+      siteToSave.circleWidth = site.circleWidth
+    }
+
+    dataToSave.push(siteToSave)
+  }
+
+  return dataToSave
+}
+
 export const saveSiteDetailsToBackend = async (
   request,
   h,
@@ -68,17 +91,16 @@ export const saveSiteDetailsToBackend = async (
     throw new Error('Site details are required to save')
   }
 
-  if (coordinatesType !== 'file') {
-    throw new Error('Only file journeys can be saved for now')
-  }
-
   const isSingleSite = siteIndex !== undefined
 
   const siteDetailsToUpdate = isSingleSite
     ? siteDetails.filter((_, index) => index === siteIndex)
     : siteDetails
 
-  const dataToSave = prepareFileUploadDataForSave(siteDetailsToUpdate, request)
+  const dataToSave =
+    coordinatesType === 'file'
+      ? prepareFileUploadDataForSave(siteDetailsToUpdate, request)
+      : prepareManualCoordinateDataForSave(siteDetailsToUpdate)
 
   try {
     if (isSingleSite) {

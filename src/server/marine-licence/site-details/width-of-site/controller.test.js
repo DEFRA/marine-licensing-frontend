@@ -101,7 +101,7 @@ describe('#widthOfSite (marine licence)', () => {
       )
       expect(saveSiteDetailsToBackend).toHaveBeenCalledWith(request, h)
       expect(h.redirect).toHaveBeenCalledWith(
-        marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS
+        `${marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS}#site-details-1`
       )
     })
   })

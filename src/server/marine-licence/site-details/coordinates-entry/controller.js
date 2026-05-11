@@ -68,7 +68,8 @@ export const coordinatesEntrySubmitController = {
   },
   async handler(request, h) {
     const { payload } = request
-    const { siteIndex } = request.site
+    const { siteIndex, siteNumber } = request.site
+    const action = request.query.action
 
     await updateMarineLicenceSiteDetails(
       request,
@@ -77,6 +78,12 @@ export const coordinatesEntrySubmitController = {
       'coordinatesEntry',
       payload.coordinatesEntry
     )
+
+    if (action) {
+      return h.redirect(
+        `${marineLicenceRoutes.MARINE_LICENCE_COORDINATE_SYSTEM_CHOICE}?site=${siteNumber}&action=${action}`
+      )
+    }
 
     return h.redirect(
       marineLicenceRoutes.MARINE_LICENCE_COORDINATE_SYSTEM_CHOICE

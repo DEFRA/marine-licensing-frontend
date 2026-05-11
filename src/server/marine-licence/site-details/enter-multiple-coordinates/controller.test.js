@@ -236,7 +236,7 @@ describe('#multipleCoordinates (marine licence)', () => {
         expect.any(Array)
       )
       expect(mockH.redirect).toHaveBeenCalledWith(
-        marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS
+        `${marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS}#site-details-1`
       )
     })
 
@@ -324,7 +324,7 @@ describe('#multipleCoordinates (marine licence)', () => {
         expect.any(Array)
       )
       expect(mockH.redirect).toHaveBeenCalledWith(
-        marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS
+        `${marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS}#site-details-1`
       )
     })
 

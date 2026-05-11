@@ -10,6 +10,7 @@ import {
 } from '#src/server/common/helpers/errors.js'
 import { getCancelLink } from '#src/server/marine-licence/site-details/utils/cancel-link.js'
 import { setSiteDataPreHandler } from '#src/server/common/helpers/marine-licence/session-cache/site-utils.js'
+import { saveSiteDetailsToBackend } from '#src/server/common/helpers/marine-licence/save-site-details.js'
 import { getPayload } from '#src/server/common/helpers/site-details/centre-coordinates.js'
 import { validateCentreCoordinates } from '#src/server/common/validation/centre-coordinates/validate.js'
 import {
@@ -99,8 +100,9 @@ export const centreCoordinatesSubmitController = {
   },
   async handler(request, h) {
     const { payload } = request
-    const { siteIndex, siteDetails } = request.site
+    const { siteIndex, siteNumber, siteDetails } = request.site
     const coordinateSystem = getCoordinateSystem(siteDetails)
+    const action = request.query.action
 
     const { error, value } = validateCentreCoordinates(
       payload,
@@ -118,6 +120,19 @@ export const centreCoordinatesSubmitController = {
       'coordinates',
       value
     )
+
+    if (action && siteDetails.circleWidth) {
+      await saveSiteDetailsToBackend(request, h)
+      return h.redirect(
+        `${marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS}#site-details-${siteNumber}`
+      )
+    }
+
+    if (action) {
+      return h.redirect(
+        `${marineLicenceRoutes.MARINE_LICENCE_WIDTH_OF_SITE}?site=${siteNumber}&action=${action}`
+      )
+    }
 
     return h.redirect(marineLicenceRoutes.MARINE_LICENCE_WIDTH_OF_SITE)
   }

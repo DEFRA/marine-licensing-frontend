@@ -70,7 +70,7 @@ export const widthOfSiteSubmitController = {
   },
   async handler(request, h) {
     const { payload } = request
-    const { siteIndex } = request.site
+    const { siteIndex, siteNumber } = request.site
 
     await updateMarineLicenceSiteDetails(
       request,
@@ -82,6 +82,8 @@ export const widthOfSiteSubmitController = {
 
     await saveSiteDetailsToBackend(request, h)
 
-    return h.redirect(marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS)
+    return h.redirect(
+      `${marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS}#site-details-${siteNumber}`
+    )
   }
 }

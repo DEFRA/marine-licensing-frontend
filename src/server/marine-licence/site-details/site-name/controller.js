@@ -106,6 +106,7 @@ export const siteNameSubmitController = {
   },
   async handler(request, h) {
     const { payload } = request
+    const { action } = request.query
 
     const { siteIndex, siteNumber } = getSiteDataFromParam(request.query)
 
@@ -114,8 +115,9 @@ export const siteNameSubmitController = {
     const siteDetails = getSiteDetailsBySite(marineLicence, siteIndex)
 
     const isFileUploadCoordinates = siteDetails.coordinatesType === 'file'
+    const shouldReturnToReview = isFileUploadCoordinates || !!action
 
-    const redirectRoute = isFileUploadCoordinates
+    const redirectRoute = shouldReturnToReview
       ? `${marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS}#site-details-${siteNumber}`
       : marineLicenceRoutes.MARINE_LICENCE_COORDINATES_ENTRY_CHOICE
 
@@ -127,7 +129,7 @@ export const siteNameSubmitController = {
       payload.siteName
     )
 
-    if (isFileUploadCoordinates) {
+    if (shouldReturnToReview) {
       await saveSiteDetailsToBackend(request, h)
     }
 

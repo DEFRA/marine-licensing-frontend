@@ -67,7 +67,8 @@ export const coordinateSystemSubmitController = {
   },
   async handler(request, h) {
     const { payload } = request
-    const { siteIndex, siteDetails } = request.site
+    const { siteIndex, siteNumber, siteDetails } = request.site
+    const action = request.query.action
 
     await updateMarineLicenceSiteDetails(
       request,
@@ -78,17 +79,15 @@ export const coordinateSystemSubmitController = {
     )
 
     const { coordinatesEntry } = siteDetails
+    const nextPage =
+      coordinatesEntry === 'multiple'
+        ? marineLicenceRoutes.MARINE_LICENCE_ENTER_MULTIPLE_COORDINATES
+        : marineLicenceRoutes.MARINE_LICENCE_CIRCLE_CENTRE_POINT
 
-    if (coordinatesEntry === 'single') {
-      return h.redirect(marineLicenceRoutes.MARINE_LICENCE_CIRCLE_CENTRE_POINT)
+    if (action) {
+      return h.redirect(`${nextPage}?site=${siteNumber}&action=${action}`)
     }
 
-    if (coordinatesEntry === 'multiple') {
-      return h.redirect(
-        marineLicenceRoutes.MARINE_LICENCE_ENTER_MULTIPLE_COORDINATES
-      )
-    }
-
-    return h.redirect(marineLicenceRoutes.MARINE_LICENCE_CIRCLE_CENTRE_POINT)
+    return h.redirect(nextPage)
   }
 }

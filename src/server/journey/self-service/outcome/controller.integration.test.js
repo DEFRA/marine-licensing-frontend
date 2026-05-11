@@ -395,6 +395,65 @@ describe('GET terminal-multi', () => {
   })
 })
 
+describe('GET licence-not-required (terminal-single, info-only)', () => {
+  config.set('selfService.enabled', true)
+  const getServer = setupTestServer()
+
+  const ROUTE = '/journey/self-service/outcome/licence-not-required-devolved'
+
+  const getPage = async (path = ROUTE) => {
+    const response = await makeGetRequest({ url: path, server: getServer() })
+    return {
+      response,
+      document: new JSDOM(response.result).window.document
+    }
+  }
+
+  test('returns 200', async () => {
+    const { response } = await getPage()
+    expect(response.statusCode).toBe(statusCodes.ok)
+  })
+
+  test('renders the H1 from outcome.heading', async () => {
+    const { document } = await getPage()
+    expect(document.querySelector('h1').textContent).toContain(
+      'Marine licence not required'
+    )
+  })
+
+  test('renders the body from the outcomeType text', async () => {
+    const { document } = await getPage()
+    const body = document.querySelector('.govuk-grid-column-full .govuk-body')
+    expect(body).not.toBeNull()
+    expect(body.textContent).toContain('relevant devolved administration')
+  })
+
+  test('renders the Download PDF button', async () => {
+    const { document } = await getPage()
+    const pdf = Array.from(
+      document.querySelectorAll('a.govuk-button--secondary')
+    ).filter((a) =>
+      a.textContent.includes('Download a PDF record of my answers')
+    )
+    expect(pdf).toHaveLength(1)
+    expect(pdf[0].getAttribute('href')).toBe('#')
+  })
+
+  test('does NOT render a primary Continue button', async () => {
+    const { document } = await getPage()
+    const buttons = Array.from(document.querySelectorAll('a.govuk-button'))
+    const primaryCount = buttons.filter(
+      (a) => !a.classList.contains('govuk-button--secondary')
+    ).length
+    expect(primaryCount).toBe(0)
+  })
+
+  test('renders a back link', async () => {
+    const { document } = await getPage()
+    expect(document.querySelector('.govuk-back-link')).not.toBeNull()
+  })
+})
+
 describe('POST to a terminal outcome route', () => {
   config.set('selfService.enabled', true)
   const getServer = setupTestServer()

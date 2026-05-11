@@ -56,7 +56,7 @@
     "@ministryofjustice/frontend": "^9.0.0",
     "aws-embedded-metrics": "^4.2.1",
     "convict": "^6.2.5",
-    "cssnano": "^7.1.7",
+    "cssnano": "^8.0.0",
     "cssnano-preset-default": "^7.0.10",
     "date-fns": "^4.1.0",
     "dayjs": "^1.11.20",
@@ -119,6 +119,8 @@
     "minimatch": "10.2.4",
     "flatted": "^3.4.2",
     "picomatch": "^4.0.4",
-    "vite": "^8.0.5"
+    "vite": "^8.0.5",
+    "@babel/plugin-transform-modules-systemjs": "^7.29.4",
+    "fast-uri": "^3.1.2"
   }
 }

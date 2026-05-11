@@ -23,7 +23,7 @@ const isValidCoordinateForSystem = (coord, coordinateSystem) => {
     return coord.latitude && coord.longitude
   }
 
-  return coord.eastings && coord.northings
+  return coord.easting && coord.northing
 }
 
 const generateCoordinateLabel = (index) => {
@@ -86,7 +86,7 @@ export const getCoordinateDisplayText = (siteDetails, coordinateSystem) => {
 
   return isWGS84(coordinateSystem)
     ? `${coordinates.latitude}, ${coordinates.longitude}`
-    : `${coordinates.eastings}, ${coordinates.northings}`
+    : `${coordinates.easting}, ${coordinates.northing}`
 }
 
 export const getPolygonCoordinatesDisplayData = (

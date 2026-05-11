@@ -6,49 +6,7 @@ import { formatDate } from '#src/server/common/helpers/dates/date-utils.js'
 import { getSiteDetailsBySite } from '#src/server/common/helpers/exemptions/session-cache/site-details-utils.js'
 import { buildSiteLocationData } from '#src/server/common/helpers/site-location-data.js'
 import { getFileUploadSummaryData } from '#src/server/common/helpers/review-site-details/file-upload.js'
-import {
-  buildManualCoordinateSummaryData,
-  getCoordinateDisplayText,
-  getCoordinateSystemText,
-  getPolygonCoordinatesDisplayData
-} from '#src/server/common/helpers/review-site-details/manual-entry.js'
-
-const isValidPolygonInput = (siteDetails, coordinateSystem) => {
-  if (!siteDetails || !coordinateSystem) {
-    return false
-  }
-
-  const { coordinates } = siteDetails
-  return coordinates && Array.isArray(coordinates)
-}
-
-const isValidCoordinateForSystem = (coord, coordinateSystem) => {
-  if (!coord) {
-    return false
-  }
-
-  if (isWGS84(coordinateSystem)) {
-    return coord.latitude && coord.longitude
-  }
-
-  return coord.easting && coord.northing
-}
-
-const generateCoordinateLabel = (index) => {
-  return index === 0 ? 'Start and end points' : `Point ${index + 1}`
-}
-
-const transformCoordinateToDisplayFormat = (coord, index, coordinateSystem) => {
-  const displayText = getCoordinateDisplayText(
-    { coordinates: coord },
-    coordinateSystem
-  )
-
-  return {
-    label: generateCoordinateLabel(index),
-    value: displayText
-  }
-}
+import { buildManualCoordinateSummaryData } from '#src/server/common/helpers/review-site-details/manual-entry.js'
 
 const REVIEW_SITE_DETAILS_VIEW_ROUTE =
   'exemption/site-details/review-site-details/index'
@@ -83,47 +41,6 @@ export const getSiteDetailsBackLink = (
   }
 
   return routes.WIDTH_OF_SITE
-}
-
-export const getCoordinateSystemText = (coordinateSystem) => {
-  if (!coordinateSystem) {
-    return ''
-  }
-
-  return isWGS84(coordinateSystem)
-    ? 'WGS84 (World Geodetic System 1984)\nLatitude and longitude'
-    : 'British National Grid (OSGB36)\nEastings and Northings'
-}
-
-export const getCoordinateDisplayText = (siteDetails, coordinateSystem) => {
-  const { coordinates } = siteDetails
-
-  if (!coordinates || !coordinateSystem) {
-    return ''
-  }
-
-  return isWGS84(coordinateSystem)
-    ? `${coordinates.latitude}, ${coordinates.longitude}`
-    : `${coordinates.easting}, ${coordinates.northing}`
-}
-
-export const getPolygonCoordinatesDisplayData = (
-  siteDetails,
-  coordinateSystem
-) => {
-  if (!isValidPolygonInput(siteDetails, coordinateSystem)) {
-    return []
-  }
-
-  const { coordinates } = siteDetails
-
-  const validCoordinates = coordinates.filter((coord) =>
-    isValidCoordinateForSystem(coord, coordinateSystem)
-  )
-
-  return validCoordinates.map((coord, index) =>
-    transformCoordinateToDisplayFormat(coord, index, coordinateSystem)
-  )
 }
 
 export const getFileUploadBackLink = (

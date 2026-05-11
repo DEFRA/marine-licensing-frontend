@@ -98,9 +98,9 @@ export const testScenarios = [
           coordinatesEntry: 'multiple',
           coordinateSystem: 'osgb36',
           coordinates: [
-            { eastings: '425053', northings: '564180' },
-            { eastings: '426000', northings: '565000' },
-            { eastings: '427000', northings: '566000' }
+            { easting: '425053', northing: '564180' },
+            { easting: '426000', northing: '565000' },
+            { easting: '427000', northing: '566000' }
           ]
         }
       ]
@@ -222,12 +222,12 @@ export const testScenarios = [
           coordinatesEntry: 'multiple',
           coordinateSystem: 'osgb36',
           coordinates: [
-            { eastings: '425053', northings: '564180' },
-            { eastings: '426000', northings: '565000' },
-            { eastings: '427000', northings: '566000' },
-            { eastings: '428000', northings: '567000' },
-            { eastings: '429000', northings: '568000' },
-            { eastings: '430000', northings: '569000' }
+            { easting: '425053', northing: '564180' },
+            { easting: '426000', northing: '565000' },
+            { easting: '427000', northing: '566000' },
+            { easting: '428000', northing: '567000' },
+            { easting: '429000', northing: '568000' },
+            { easting: '430000', northing: '569000' }
           ]
         }
       ]
@@ -408,9 +408,9 @@ export const testScenarios = [
           coordinatesEntry: 'multiple',
           coordinateSystem: 'osgb36',
           coordinates: [
-            { eastings: '425053', northings: '564180' },
-            { eastings: '426000', northings: '565000' },
-            { eastings: '427000', northings: '566000' }
+            { easting: '425053', northing: '564180' },
+            { easting: '426000', northing: '565000' },
+            { easting: '427000', northing: '566000' }
           ]
         }
       ]

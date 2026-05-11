@@ -297,6 +297,12 @@ export const config = convict({
       format: Boolean,
       default: false,
       env: 'ENABLE_SELF_SERVICE'
+    },
+    dataQualityEnabled: {
+      doc: 'Enable IAT data-quality scan and warning logs at server startup',
+      format: Boolean,
+      default: false,
+      env: 'ENABLE_IAT_DATA_QUALITY'
     }
   },
   defraId: {

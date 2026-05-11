@@ -47,17 +47,51 @@ export const prepareFileUploadDataForSave = (siteDetails, request) => {
   return dataToSave
 }
 
-export const prepareManualCoordinateDataForSave = (siteDetails, request) => {
+export const prepareManualCoordinateDataForSave = (siteDetails) => {
+  const dataToSave = []
+
   for (const site of siteDetails) {
-    request.logger.info(
-      {
-        coordinatesType: site.coordinatesType,
-        coordinatesEntry: site.coordinatesEntry
-      },
-      'Saving manual coordinate site details'
-    )
+    const siteToSave = {
+      coordinatesType: site.coordinatesType,
+      coordinatesEntry: site.coordinatesEntry,
+      coordinateSystem: site.coordinateSystem,
+      coordinates: site.coordinates,
+      siteName: site.siteName,
+      activityDetails: site.activityDetails
+    }
+
+    if (site.coordinatesEntry === 'single') {
+      siteToSave.circleWidth = site.circleWidth
+    }
+
+    dataToSave.push(siteToSave)
   }
-  return siteDetails
+
+  return dataToSave
+}
+
+export const prepareSiteData = (
+  siteDetails,
+  coordinatesType,
+  isSingleSite,
+  siteIndex,
+  request
+) => {
+  const siteDetailsToUpdate = isSingleSite
+    ? siteDetails.filter((_, index) => index === siteIndex)
+    : siteDetails
+
+  const cacheData =
+    coordinatesType === 'file'
+      ? prepareFileUploadDataForSave(siteDetailsToUpdate, request)
+      : prepareManualCoordinateDataForSave(siteDetailsToUpdate)
+
+  const apiData =
+    coordinatesType === 'file'
+      ? cacheData
+      : transformCoordinatesForApi(cacheData)
+
+  return { cacheData, apiData }
 }
 
 export const saveSiteDetailsToBackend = async (
@@ -83,20 +117,13 @@ export const saveSiteDetailsToBackend = async (
   }
 
   const isSingleSite = siteIndex !== undefined
-
-  const siteDetailsToUpdate = isSingleSite
-    ? siteDetails.filter((_, index) => index === siteIndex)
-    : siteDetails
-
-  const cacheData =
-    coordinatesType === 'file'
-      ? prepareFileUploadDataForSave(siteDetailsToUpdate, request)
-      : prepareManualCoordinateDataForSave(siteDetailsToUpdate, request)
-
-  const apiData =
-    coordinatesType === 'file'
-      ? cacheData
-      : transformCoordinatesForApi(cacheData)
+  const { cacheData, apiData } = prepareSiteData(
+    siteDetails,
+    coordinatesType,
+    isSingleSite,
+    siteIndex,
+    request
+  )
 
   try {
     if (isSingleSite) {

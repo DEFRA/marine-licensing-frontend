@@ -1,0 +1,20 @@
+{% from "govuk/components/button/macro.njk" import govukButton %}
+
+<h1 class="govuk-heading-xl">{{ heading }}</h1>
+
+{% if body %}
+  <div class="govuk-body">{{ body | safe }}</div>
+{% endif %}
+
+<div class="app-iat-actions">
+  {{ govukButton({
+    text: ctaLabel,
+    href: "#",
+    classes: "govuk-!-margin-right-3"
+  }) }}
+  {{ govukButton({
+    text: "Download a PDF record of my answers",
+    href: "#",
+    classes: "govuk-button--secondary"
+  }) }}
+</div>

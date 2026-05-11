@@ -80,9 +80,9 @@ export const mockPolygonCoordinatesWGS84 = [
 ]
 
 export const mockPolygonCoordinatesOSGB36 = [
-  { eastings: '123456', northings: '654321' },
-  { eastings: '123556', northings: '654421' },
-  { eastings: '123656', northings: '654521' }
+  { easting: '123456', northing: '654321' },
+  { easting: '123556', northing: '654421' },
+  { easting: '123656', northing: '654521' }
 ]
 
 const baseExpectedContent = {
@@ -145,7 +145,7 @@ export const testScenarios = [
       coordinatesType: 'coordinates',
       coordinatesEntry: 'single',
       coordinateSystem: COORDINATE_SYSTEMS.OSGB36,
-      coordinates: { eastings: '123456', northings: '654321' },
+      coordinates: { easting: '123456', northing: '654321' },
       circleWidth: '250'
     }),
     expectedPageContent: {

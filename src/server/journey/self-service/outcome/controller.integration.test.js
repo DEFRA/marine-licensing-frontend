@@ -146,13 +146,6 @@ describe('#outcomeController (integration)', () => {
       )
       expect(response.statusCode).toBe(statusCodes.notFound)
     })
-
-    test('returns 404 for a terminal outcome page', async () => {
-      const { response } = await getPage(
-        '/journey/self-service/outcome/licence-not-required-devolved'
-      )
-      expect(response.statusCode).toBe(statusCodes.notFound)
-    })
   })
 
   describe(`POST ${JOURNEY_SELECT}`, () => {
@@ -227,5 +220,191 @@ describe('#outcomeController (integration)', () => {
       const backLink = document.querySelector('.govuk-back-link')
       expect(backLink.getAttribute('href')).toBe('/journey/self-service/start')
     })
+  })
+})
+
+describe('GET terminal-single', () => {
+  config.set('selfService.enabled', true)
+  const getServer = setupTestServer()
+
+  const SINGLE =
+    '/journey/self-service/outcome/exemption/licence-not-required-exemption-available-article-25A'
+
+  const getPage = async (path = SINGLE, headers = {}) => {
+    const response = await makeGetRequest({
+      url: path,
+      server: getServer(),
+      headers
+    })
+    return {
+      response,
+      document: new JSDOM(response.result).window.document
+    }
+  }
+
+  test('returns 200', async () => {
+    const { response } = await getPage(SINGLE)
+    expect(response.statusCode).toBe(statusCodes.ok)
+  })
+
+  test('renders the H1 from outcome.heading', async () => {
+    const { document } = await getPage(SINGLE)
+    expect(document.querySelector('h1').textContent).toContain(
+      'You need to provide more information'
+    )
+  })
+
+  test('renders the body with sanitised anchor links', async () => {
+    const { document } = await getPage(SINGLE)
+    const body = document.querySelector('.govuk-grid-column-full .govuk-body')
+    expect(body).not.toBeNull()
+    const anchors = body.querySelectorAll('a')
+    expect(anchors.length).toBeGreaterThanOrEqual(1)
+    for (const a of anchors) {
+      expect(a.getAttribute('href')).toMatch(/^https?:\/\//)
+    }
+  })
+
+  test('does NOT render the outcomeType.heading', async () => {
+    const { document } = await getPage(SINGLE)
+    expect(document.body.textContent).not.toContain(
+      'Fill out an exemption notification'
+    )
+  })
+
+  test('renders one Continue button (page-level, href="#")', async () => {
+    const { document } = await getPage(SINGLE)
+    const continueButtons = Array.from(
+      document.querySelectorAll('a.govuk-button:not(.govuk-button--secondary)')
+    ).filter((a) => a.textContent.trim() === 'Continue')
+    expect(continueButtons).toHaveLength(1)
+    expect(continueButtons[0].getAttribute('href')).toBe('#')
+  })
+
+  test('renders one PDF button (page-level, href="#")', async () => {
+    const { document } = await getPage(SINGLE)
+    const pdfButtons = Array.from(
+      document.querySelectorAll('a.govuk-button--secondary')
+    ).filter((a) =>
+      a.textContent.includes('Download a PDF record of my answers')
+    )
+    expect(pdfButtons).toHaveLength(1)
+    expect(pdfButtons[0].getAttribute('href')).toBe('#')
+  })
+
+  test('does not render any option cards', async () => {
+    const { document } = await getPage(SINGLE)
+    expect(document.querySelectorAll('.app-iat-option')).toHaveLength(0)
+  })
+
+  test('renders a back link', async () => {
+    const { document } = await getPage(SINGLE)
+    expect(document.querySelector('.govuk-back-link')).not.toBeNull()
+  })
+
+  test('does not render the phase banner', async () => {
+    const { document } = await getPage(SINGLE)
+    expect(document.querySelector('.govuk-phase-banner')).toBeNull()
+  })
+
+  test('does not render navigation links in the header', async () => {
+    const { document } = await getPage(SINGLE)
+    expect(document.querySelector('.govuk-service-navigation__list')).toBeNull()
+  })
+})
+
+describe('GET terminal-multi', () => {
+  config.set('selfService.enabled', true)
+  const getServer = setupTestServer()
+
+  const MULTI = '/journey/self-service/outcome/scaffolding-impede-navigation'
+
+  const getPage = async (path = MULTI, headers = {}) => {
+    const response = await makeGetRequest({
+      url: path,
+      server: getServer(),
+      headers
+    })
+    return {
+      response,
+      document: new JSDOM(response.result).window.document
+    }
+  }
+
+  test('returns 200', async () => {
+    const { response } = await getPage(MULTI)
+    expect(response.statusCode).toBe(statusCodes.ok)
+  })
+
+  test('renders the H1 from outcome.heading', async () => {
+    const { document } = await getPage(MULTI)
+    expect(document.querySelector('h1').textContent).toContain(
+      'Scaffolding or access towers'
+    )
+  })
+
+  test('renders one option card per outcomeType', async () => {
+    const { document } = await getPage(MULTI)
+    expect(document.querySelectorAll('.app-iat-option')).toHaveLength(2)
+  })
+
+  test('option-C label resolution: link: → "Download", module: → "Continue"', async () => {
+    const { document } = await getPage(MULTI)
+    const cards = Array.from(document.querySelectorAll('.app-iat-option'))
+    const labels = cards.map((c) =>
+      c.querySelector('a.govuk-button')?.textContent.trim()
+    )
+    expect(labels).toEqual(['Download', 'Continue'])
+  })
+
+  test('every per-card CTA has href="#"', async () => {
+    const { document } = await getPage(MULTI)
+    const cards = document.querySelectorAll('.app-iat-option')
+    for (const card of cards) {
+      const cta = card.querySelector(
+        'a.govuk-button:not(.govuk-button--secondary)'
+      )
+      expect(cta).not.toBeNull()
+      expect(cta.getAttribute('href')).toBe('#')
+    }
+  })
+
+  test('renders exactly one page-level PDF button', async () => {
+    const { document } = await getPage(MULTI)
+    const pdf = Array.from(
+      document.querySelectorAll('a.govuk-button--secondary')
+    ).filter((a) =>
+      a.textContent.includes('Download a PDF record of my answers')
+    )
+    expect(pdf).toHaveLength(1)
+    expect(pdf[0].getAttribute('href')).toBe('#')
+  })
+
+  test('renders a back link', async () => {
+    const { document } = await getPage(MULTI)
+    expect(document.querySelector('.govuk-back-link')).not.toBeNull()
+  })
+
+  test('omits the trailing dash on a card whose outcomeType has no heading', async () => {
+    const MOD = '/journey/self-service/outcome/mod-permission'
+    const { document } = await getPage(MOD)
+    const cards = Array.from(document.querySelectorAll('.app-iat-option h2'))
+    const headings = cards.map((h) => h.textContent.trim())
+    expect(headings[0]).toBe('Option 1')
+    expect(headings[1]).toBe('Option 2 - Apply for a standard marine licence')
+  })
+})
+
+describe('POST to a terminal outcome route', () => {
+  config.set('selfService.enabled', true)
+  const getServer = setupTestServer()
+
+  test('returns 404 (terminal pages have no POST handler behaviour)', async () => {
+    const response = await makePostRequest({
+      url: '/journey/self-service/outcome/scaffolding-impede-navigation',
+      server: getServer(),
+      formData: { outcomeType: 'WO_STANDARD_TRACK_MLA' }
+    })
+    expect(response.statusCode).toBe(statusCodes.notFound)
   })
 })

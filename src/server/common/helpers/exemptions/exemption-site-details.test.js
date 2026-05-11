@@ -11,11 +11,11 @@ import {
   getCoordinateSystemText,
   getCoordinateDisplayText,
   getPolygonCoordinatesDisplayData
-} from '#src/server/exemption/site-details/review-site-details/utils.js'
+} from '#src/server/common/helpers/review-site-details/manual-entry.js'
 import { getFileUploadSummaryData } from '#src/server/common/helpers/review-site-details/file-upload.js'
 
 vi.mock(
-  '~/src/server/exemption/site-details/review-site-details/utils.js',
+  '~/src/server/common/helpers/review-site-details/manual-entry.js',
   () => ({
     getCoordinateSystemText: vi.fn(),
     getCoordinateDisplayText: vi.fn(),
@@ -441,9 +441,9 @@ describe('exemption-site-details helper', () => {
             coordinateSystem: 'osgb36',
             coordinatesEntry: 'multiple',
             coordinates: [
-              { eastings: '425053', northings: '564180' },
-              { eastings: '426000', northings: '565000' },
-              { eastings: '427000', northings: '566000' }
+              { easting: '425053', northing: '564180' },
+              { easting: '426000', northing: '565000' },
+              { easting: '427000', northing: '566000' }
             ],
             circleWidth: null
           }

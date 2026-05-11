@@ -1,0 +1,208 @@
+import { JSDOM } from 'jsdom'
+import { within } from '@testing-library/dom'
+import { marineLicenceRoutes } from '~/src/server/common/constants/routes.js'
+import { statusCodes } from '~/src/server/common/constants/status-codes.js'
+import { testScenarios } from './marine-licence-fixtures/polygon-fixtures.js'
+import {
+  makeGetRequest,
+  makePostRequest
+} from '~/src/server/test-helpers/server-requests.js'
+import {
+  mockMarineLicence,
+  setupTestServer
+} from '~/tests/integration/shared/test-setup-helpers.js'
+import * as marineLicenceService from '~/src/services/marine-licence-service/index.js'
+import {
+  getRowByKey,
+  getSiteDetailsCard,
+  validateNavigationElements,
+  validatePageStructure
+} from './review-site-details-utils.js'
+
+vi.mock('~/src/services/marine-licence-service/index.js')
+
+describe('ML Review Site Details - Polygon Coordinates Integration Tests', () => {
+  const getServer = setupTestServer()
+
+  beforeEach(() => {
+    mockMarineLicence(testScenarios[0].marineLicence)
+    vi.mocked(marineLicenceService.getMarineLicenceService).mockReturnValue({
+      getMarineLicenceById: vi
+        .fn()
+        .mockResolvedValue(testScenarios[0].marineLicence)
+    })
+  })
+
+  test.each(testScenarios)(
+    '$name - validates polygon coordinate display',
+    async ({ marineLicence, expectedPageContent }) => {
+      const document = await getPageDocument(marineLicence)
+
+      const isMultipleSites =
+        marineLicence.multipleSiteDetails?.multipleSitesEnabled
+
+      validatePageStructure(document, expectedPageContent)
+      validateSiteLocationCard(document)
+      validateNavigationElements(document)
+
+      if (isMultipleSites) {
+        validateMultipleSites(document, expectedPageContent)
+
+        for (const site of expectedPageContent.siteDetails.keys()) {
+          validatePolygonCoordinates(document, expectedPageContent, site)
+          validateSiteDetailsCard(document, expectedPageContent, site)
+        }
+      } else {
+        validatePolygonCoordinates(document, expectedPageContent, 0)
+        validateSiteDetailsCard(document, expectedPageContent, 0)
+      }
+    }
+  )
+
+  describe('back link', () => {
+    test('should point to check your answers when from=check-your-answers', async () => {
+      const response = await makeGetRequest({
+        server: getServer(),
+        url: `${marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS}?from=check-your-answers`
+      })
+
+      expect(response.statusCode).toBe(statusCodes.ok)
+      const document = new JSDOM(response.result).window.document
+
+      const backLink = document.querySelector('.govuk-back-link')
+      expect(backLink.getAttribute('href')).toBe(
+        marineLicenceRoutes.MARINE_LICENCE_CHECK_YOUR_ANSWERS
+      )
+    })
+  })
+
+  test('should redirect to task list when no marine licence id in cache', async () => {
+    mockMarineLicence({})
+
+    const response = await makeGetRequest({
+      server: getServer(),
+      url: marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS
+    })
+
+    expect(response.statusCode).toBe(statusCodes.redirect)
+    expect(response.headers.location).toBe(
+      marineLicenceRoutes.MARINE_LICENCE_TASK_LIST
+    )
+  })
+
+  describe('Form Submission', () => {
+    test('should redirect to task list on form submission', async () => {
+      const response = await makePostRequest({
+        url: marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS,
+        server: getServer(),
+        formData: {}
+      })
+
+      expect(response.statusCode).toBe(statusCodes.redirect)
+      expect(response.headers.location).toBe(
+        marineLicenceRoutes.MARINE_LICENCE_TASK_LIST
+      )
+    })
+  })
+
+  const getPageDocument = async (marineLicence) => {
+    mockMarineLicence(marineLicence)
+    vi.mocked(marineLicenceService.getMarineLicenceService).mockReturnValue({
+      getMarineLicenceById: vi.fn().mockResolvedValue(marineLicence)
+    })
+
+    const response = await makeGetRequest({
+      server: getServer(),
+      url: marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS,
+      headers: {
+        referer: `http://localhost${marineLicenceRoutes.MARINE_LICENCE_ENTER_MULTIPLE_COORDINATES}`
+      }
+    })
+
+    expect(response.statusCode).toBe(statusCodes.ok)
+    return new JSDOM(response.result).window.document
+  }
+
+  const validateSiteLocationCard = (document) => {
+    const card = document.querySelector('#site-location-card')
+    expect(card).toBeTruthy()
+
+    const cardTitle = card.querySelector('.govuk-summary-card__title')
+    expect(cardTitle.textContent.trim()).toBe('Providing the site location')
+
+    const methodRow = getRowByKey(card, 'Method of providing site location')
+    expect(methodRow).toBeTruthy()
+    expect(methodRow.textContent).toContain(
+      'Enter the coordinates of the site manually'
+    )
+  }
+
+  const validateMultipleSites = (document, expected) => {
+    const heading = document.querySelector('h1')
+    expect(heading.textContent.trim()).toBe('Review site details')
+
+    const caption = document.querySelector('.govuk-caption-l')
+    expect(caption.textContent.trim()).toBe(expected.projectName)
+
+    const cards = document.querySelectorAll('.govuk-summary-card')
+    const siteDetailsCards = Array.from(cards).filter((card) => {
+      const title = card.querySelector('.govuk-summary-card__title')
+      return title && /^Site \d+$/.test(title.textContent.trim())
+    })
+    expect(siteDetailsCards).toHaveLength(expected.siteDetails.length)
+
+    expect(
+      within(document).getByRole('button', { name: 'Continue' })
+    ).toHaveAttribute('type', 'submit')
+  }
+
+  const validateSiteDetailsCard = (document, expected, siteIndex) => {
+    const siteCard = getSiteDetailsCard(document, expected, siteIndex)
+
+    const cardTitle = siteCard.querySelector('.govuk-summary-card__title')
+    expect(cardTitle.textContent.trim()).toBe(
+      expected.siteDetails[siteIndex].cardName
+    )
+
+    const siteNameRow = getRowByKey(siteCard, 'Site name')
+    expect(siteNameRow).toBeTruthy()
+    expect(siteNameRow.textContent).toContain(
+      expected.siteDetails[siteIndex].siteName
+    )
+
+    const methodRow = getRowByKey(
+      siteCard,
+      'Single or multiple sets of coordinates'
+    )
+    expect(methodRow).toBeTruthy()
+    expect(methodRow.textContent).toContain(
+      expected.siteDetails[siteIndex].method
+    )
+
+    const coordinateSystemRow = getRowByKey(siteCard, 'Coordinate system')
+    expect(coordinateSystemRow).toBeTruthy()
+    expect(coordinateSystemRow.textContent).toContain(
+      expected.siteDetails[siteIndex].coordinateSystem
+    )
+  }
+
+  const validatePolygonCoordinates = (document, expected, siteIndex) => {
+    const siteCard = getSiteDetailsCard(document, expected, siteIndex)
+
+    for (const { label, value } of expected.siteDetails[siteIndex]
+      .polygonCoordinates) {
+      const row = getRowByKey(siteCard, label)
+      expect(row).toBeTruthy()
+      expect(row.textContent).toContain(value)
+    }
+
+    const mapViewRow = getRowByKey(siteCard, 'Map view')
+    expect(mapViewRow).toBeTruthy()
+    expect(mapViewRow.textContent.trim()).toBe('Map view')
+
+    const mapDiv = mapViewRow.querySelector(
+      '.app-site-details-map[data-module="site-details-map"]'
+    )
+    expect(mapDiv).toBeTruthy()
+  }
+})

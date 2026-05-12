@@ -22,13 +22,17 @@ export const iatAnswersService = {
   },
 
   async get(request, id) {
-    const { payload, res } = await authenticatedGetRequest(
-      request,
-      `${PATH}/${id}`
-    )
-    if (res?.statusCode === 404) {
-      return null
+    try {
+      const { payload } = await authenticatedGetRequest(
+        request,
+        `${PATH}/${id}`
+      )
+      return payload?.value ?? null
+    } catch (error) {
+      if (error?.output?.statusCode === 404) {
+        return null
+      }
+      throw error
     }
-    return payload?.value ?? null
   }
 }

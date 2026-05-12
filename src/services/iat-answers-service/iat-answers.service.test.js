@@ -73,12 +73,23 @@ describe('iatAnswersService', () => {
     expect(doc).toEqual({ id: 'abc', outcome: {} })
   })
 
-  it('get returns null on 404', async () => {
-    authenticatedGetRequest.mockResolvedValue({
-      payload: null,
-      res: { statusCode: 404 }
-    })
+  it('get returns null on Boom 404', async () => {
+    authenticatedGetRequest.mockRejectedValue(
+      Object.assign(new Error('Response Error: 404 Not Found'), {
+        output: { statusCode: 404 },
+        isBoom: true
+      })
+    )
     const doc = await iatAnswersService.get(request, 'abc')
     expect(doc).toBeNull()
+  })
+
+  it('get rethrows non-404 errors', async () => {
+    const boom500 = Object.assign(
+      new Error('Response Error: 500 Internal Server Error'),
+      { output: { statusCode: 500 }, isBoom: true }
+    )
+    authenticatedGetRequest.mockRejectedValue(boom500)
+    await expect(iatAnswersService.get(request, 'abc')).rejects.toBe(boom500)
   })
 })

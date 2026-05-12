@@ -17,7 +17,7 @@ export const testScenarios = [
       siteDetails: [
         {
           ...mockMarineLicenceApplication.siteDetails[0],
-          activityDetails: [mockOutputActivityDetails]
+          activityDetails: [mockOutputActivityDetails, mockOutputActivityDetails]
         }
       ]
     }

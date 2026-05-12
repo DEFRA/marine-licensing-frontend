@@ -137,7 +137,7 @@ describe('ML Review Site Details - File Upload Integration Tests', () => {
 
       expect(response.statusCode).toBe(statusCodes.redirect)
       expect(response.headers.location).toBe(
-        `${marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS}#activity-details-site-1-activity-2`
+        `${marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS}#activity-details-site-1-activity-3`
       )
     })
   })
@@ -212,16 +212,21 @@ describe('ML Review Site Details - File Upload Integration Tests', () => {
       const activityDetails = expected.siteDetails[siteIndex].activityDetails[i]
 
       const actionList = card.querySelector('.govuk-summary-card__actions')
-      expect(actionList).toBeTruthy()
 
-      const deleteLink = within(actionList).getByRole('link', {
-        name: /Delete activity/
-      })
+      if (i === 0) {
+        expect(actionList).toBeNull()
+      } else {
+        expect(actionList).toBeTruthy()
 
-      expect(deleteLink).toHaveAttribute(
-        'href',
-        expect.stringContaining(`delete-activity?site=1&activity=${i + 1}`)
-      )
+        const deleteLink = within(actionList).getByRole('link', {
+          name: /Delete activity/
+        })
+
+        expect(deleteLink).toHaveAttribute(
+          'href',
+          expect.stringContaining(`delete-activity?site=1&activity=${i + 1}`)
+        )
+      }
 
       const activityTypeRow = getRowByKey(card, 'Type of activity')
       expect(activityTypeRow).toBeTruthy()

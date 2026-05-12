@@ -27,6 +27,10 @@ export const deleteActivityController = {
       activityDetailsNumber
     } = getSiteDataFromParam(request.query)
 
+    if (activityDetailsNumber === 1) {
+      return h.redirect(marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS)
+    }
+
     return h.view(DELETE_ACTIVITY_VIEW_ROUTE, {
       pageTitle: DELETE_ACTIVITY_PAGE_TITLE,
       heading: DELETE_ACTIVITY_PAGE_TITLE,

@@ -61,6 +61,12 @@
 }) %}
 
 
+{% set deleteItems = ([{
+  href: params.deleteLink,
+  text: 'Delete activity',
+  classes: 'govuk-link--no-visited-state'
+}] if params.deleteLink else []) %}
+
 {{ govukSummaryList({
   card: {
     attributes: {
@@ -70,13 +76,7 @@
       text: activityRowsHeading
     },
     actions: {
-      items: [
-        {
-          href: params.deleteLink,
-          text: 'Delete activity',
-          classes: 'govuk-link--no-visited-state'
-        }
-      ]
+      items: deleteItems
     }
   },
   classes: 'govuk-summary-list--full-width',

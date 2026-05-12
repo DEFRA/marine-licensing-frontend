@@ -51,7 +51,9 @@ export const renderFileUploadReview = (h, options) => {
     const activityDetails = parseActivityDetails(site).map(
       (activity, actIndex) => ({
         ...activity,
-        deleteLink: `${marineLicenceRoutes.MARINE_LICENCE_DELETE_ACTIVITY}?site=${index + 1}&activity=${actIndex + 1}`
+        ...(actIndex > 0 && {
+          deleteLink: `${marineLicenceRoutes.MARINE_LICENCE_DELETE_ACTIVITY}?site=${index + 1}&activity=${actIndex + 1}`
+        })
       })
     )
 

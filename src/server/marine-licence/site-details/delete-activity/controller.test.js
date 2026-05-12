@@ -27,9 +27,23 @@ describe('deleteActivityController', () => {
   })
 
   describe('GET handler', () => {
-    it('should render the confirmation view with correct data', () => {
+    it('should redirect to review site details when attempting to delete the first activity', () => {
       const request = createMockRequest({
         query: { site: '1', activity: '1' }
+      })
+      const h = createMockH()
+
+      deleteActivityController.handler(request, h)
+
+      expect(h.redirect).toHaveBeenCalledWith(
+        marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS
+      )
+      expect(h.view).not.toHaveBeenCalled()
+    })
+
+    it('should render the confirmation view with correct data for activities', () => {
+      const request = createMockRequest({
+        query: { site: '1', activity: '2' }
       })
       const h = createMockH()
 
@@ -40,8 +54,8 @@ describe('deleteActivityController', () => {
         heading: 'Are you sure you want to delete this activity?',
         siteNumber: 1,
         siteIndex: 0,
-        activityIndex: 0,
-        activityDetailsNumber: 1,
+        activityIndex: 1,
+        activityDetailsNumber: 2,
         projectName: mockMarineLicenceApplication.projectName,
         backLink: marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS,
         marineLicenceRoutes

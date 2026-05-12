@@ -3,6 +3,19 @@ import { vi } from 'vitest'
 vi.mock('#src/server/journey/self-service/services/journey-data.js')
 vi.mock('#src/server/journey/self-service/services/session-answers.js')
 vi.mock('#src/server/journey/self-service/services/data-quality.js')
+vi.mock('#src/services/iat-answers-service/iat-answers.service.js', () => ({
+  iatAnswersService: {
+    create: vi.fn(),
+    update: vi.fn(),
+    delete: vi.fn()
+  }
+}))
+vi.mock(
+  '#src/server/journey/self-service/services/iat-answers-payload.js',
+  () => ({
+    buildIatAnswersPayload: vi.fn()
+  })
+)
 
 import {
   outcomeController,
@@ -16,10 +29,15 @@ import {
   isIntermediateOutcome
 } from '#src/server/journey/self-service/services/journey-data.js'
 import {
+  getAnswerDocStash,
   getBackLink,
-  pushOutcomeSelection
+  getOutcomeSelection,
+  pushOutcomeSelection,
+  setAnswerDocStash
 } from '#src/server/journey/self-service/services/session-answers.js'
 import { reportRuntimeIssue } from '#src/server/journey/self-service/services/data-quality.js'
+import { iatAnswersService } from '#src/services/iat-answers-service/iat-answers.service.js'
+import { buildIatAnswersPayload } from '#src/server/journey/self-service/services/iat-answers-payload.js'
 
 const mockOutcome = {
   route: '/construction/journey-select',
@@ -72,16 +90,17 @@ describe('#outcomeController', () => {
     vi.mocked(getBackLink).mockReturnValue(
       '/journey/self-service/activity-type'
     )
+    vi.mocked(buildIatAnswersPayload).mockReturnValue(null)
   })
 
-  test('renders the intermediate outcome view model', () => {
+  test('renders the intermediate outcome view model', async () => {
     const request = {
       params: { outcomePath: 'construction/journey-select' },
       logger: { warn: vi.fn() }
     }
     const h = { view: vi.fn() }
 
-    outcomeController.handler(request, h)
+    await outcomeController.handler(request, h)
 
     expect(getOutcome).toHaveBeenCalledWith('/construction/journey-select')
     expect(getBackLink).toHaveBeenCalledWith(
@@ -125,7 +144,7 @@ describe('#outcomeController', () => {
     )
   })
 
-  test('throws Boom.notFound for an unknown outcome route', () => {
+  test('throws Boom.notFound for an unknown outcome route', async () => {
     vi.mocked(getOutcome).mockReturnValue(null)
     const request = {
       params: { outcomePath: 'nope' },
@@ -133,7 +152,7 @@ describe('#outcomeController', () => {
     }
     const h = { view: vi.fn() }
 
-    expect(() => outcomeController.handler(request, h)).toThrow(
+    await expect(outcomeController.handler(request, h)).rejects.toThrow(
       expect.objectContaining({
         isBoom: true,
         output: expect.objectContaining({ statusCode: 404 })
@@ -141,7 +160,7 @@ describe('#outcomeController', () => {
     )
   })
 
-  test('passes null section when outcome has no section', () => {
+  test('passes null section when outcome has no section', async () => {
     vi.mocked(getOutcome).mockReturnValue({
       ...mockOutcome,
       section: undefined
@@ -153,7 +172,7 @@ describe('#outcomeController', () => {
     }
     const h = { view: vi.fn() }
 
-    outcomeController.handler(request, h)
+    await outcomeController.handler(request, h)
 
     expect(h.view).toHaveBeenCalledWith(
       'journey/self-service/outcome/index',
@@ -161,7 +180,7 @@ describe('#outcomeController', () => {
     )
   })
 
-  test('logs unknown-outcome-route on 404', () => {
+  test('logs unknown-outcome-route on 404', async () => {
     vi.mocked(getOutcome).mockReturnValue(null)
     const request = {
       params: { outcomePath: 'nope' },
@@ -169,7 +188,7 @@ describe('#outcomeController', () => {
     }
     const h = { view: vi.fn() }
 
-    expect(() => outcomeController.handler(request, h)).toThrow()
+    await expect(outcomeController.handler(request, h)).rejects.toThrow()
 
     expect(reportRuntimeIssue).toHaveBeenCalledWith(
       request,
@@ -389,16 +408,17 @@ describe('#outcomeController — terminal-multi', () => {
     ])
     vi.mocked(isIntermediateOutcome).mockReturnValue(false)
     vi.mocked(getBackLink).mockReturnValue('/journey/self-service/back-here')
+    vi.mocked(buildIatAnswersPayload).mockReturnValue(null)
   })
 
-  test('renders terminal-multi view model with per-card ctaLabel', () => {
+  test('renders terminal-multi view model with per-card ctaLabel', async () => {
     const request = {
       params: { outcomePath: 'scaffolding-impede-navigation' },
       logger: { warn: vi.fn() }
     }
     const h = { view: vi.fn() }
 
-    outcomeController.handler(request, h)
+    await outcomeController.handler(request, h)
 
     expect(h.view).toHaveBeenCalledWith(
       'journey/self-service/outcome/index',
@@ -449,16 +469,17 @@ describe('#outcomeController — terminal-single', () => {
     vi.mocked(getOutcomeTypesForOutcome).mockReturnValue([terminalOutcomeType])
     vi.mocked(isIntermediateOutcome).mockReturnValue(false)
     vi.mocked(getBackLink).mockReturnValue('/journey/self-service/something')
+    vi.mocked(buildIatAnswersPayload).mockReturnValue(null)
   })
 
-  test('renders the terminal-single view model', () => {
+  test('renders the terminal-single view model', async () => {
     const request = {
       params: { outcomePath: 'exemption/article-25A' },
       logger: { warn: vi.fn() }
     }
     const h = { view: vi.fn() }
 
-    outcomeController.handler(request, h)
+    await outcomeController.handler(request, h)
 
     expect(h.view).toHaveBeenCalledWith(
       'journey/self-service/outcome/index',
@@ -474,7 +495,7 @@ describe('#outcomeController — terminal-single', () => {
     )
   })
 
-  test('logs outcome-type-empty-text when terminal body is empty', () => {
+  test('logs outcome-type-empty-text when terminal body is empty', async () => {
     vi.mocked(getOutcomeTypesForOutcome).mockReturnValue([
       { ...terminalOutcomeType, text: '' }
     ])
@@ -484,7 +505,7 @@ describe('#outcomeController — terminal-single', () => {
     }
     const h = { view: vi.fn() }
 
-    outcomeController.handler(request, h)
+    await outcomeController.handler(request, h)
 
     expect(reportRuntimeIssue).toHaveBeenCalledWith(
       request,
@@ -495,7 +516,7 @@ describe('#outcomeController — terminal-single', () => {
     )
   })
 
-  test('logs outcome-missing-heading and uses "Result" fallback', () => {
+  test('logs outcome-missing-heading and uses "Result" fallback', async () => {
     vi.mocked(getOutcome).mockReturnValue({ ...terminalOutcome, heading: null })
     const request = {
       params: { outcomePath: 'exemption/article-25A' },
@@ -503,7 +524,7 @@ describe('#outcomeController — terminal-single', () => {
     }
     const h = { view: vi.fn() }
 
-    outcomeController.handler(request, h)
+    await outcomeController.handler(request, h)
 
     expect(h.view).toHaveBeenCalledWith(
       'journey/self-service/outcome/index',
@@ -515,6 +536,195 @@ describe('#outcomeController — terminal-single', () => {
       '/exemption/article-25A',
       expect.any(String),
       expect.any(String)
+    )
+  })
+})
+
+describe('outcomeController save flow', () => {
+  const savePayload = {
+    outcome: {
+      route: '/construction/journey-select',
+      typeId: '',
+      summaryText: ''
+    },
+    answers: [
+      {
+        questionRoute: '/q1',
+        questionText: 'Q1?',
+        answers: [{ id: 'A1', text: 'Yes' }]
+      }
+    ]
+  }
+
+  function buildSaveRequest() {
+    return {
+      params: { outcomePath: 'construction/journey-select' },
+      logger: { warn: vi.fn() }
+    }
+  }
+
+  beforeEach(() => {
+    vi.mocked(getOutcome).mockReturnValue(mockOutcome)
+    vi.mocked(getSection).mockReturnValue(mockSection)
+    vi.mocked(getOutcomeTypesForOutcome).mockReturnValue([
+      otExemption,
+      otSelfService,
+      otStandard
+    ])
+    vi.mocked(isIntermediateOutcome).mockReturnValue(true)
+    vi.mocked(getBackLink).mockReturnValue(
+      '/journey/self-service/activity-type'
+    )
+    vi.mocked(getOutcomeSelection).mockReturnValue(null)
+    vi.mocked(buildIatAnswersPayload).mockReturnValue(savePayload)
+  })
+
+  test('POSTs a new doc when no stash and stashes the returned id', async () => {
+    vi.mocked(getAnswerDocStash).mockReturnValue({
+      id: null,
+      outcomeRoute: null
+    })
+    vi.mocked(iatAnswersService.create).mockResolvedValue('new-id')
+
+    const request = buildSaveRequest()
+    const h = { view: vi.fn() }
+
+    await outcomeController.handler(request, h)
+
+    expect(iatAnswersService.create).toHaveBeenCalledTimes(1)
+    expect(iatAnswersService.create).toHaveBeenCalledWith(request, savePayload)
+    expect(iatAnswersService.update).not.toHaveBeenCalled()
+    expect(iatAnswersService.delete).not.toHaveBeenCalled()
+    expect(setAnswerDocStash).toHaveBeenCalledWith(
+      request,
+      'new-id',
+      '/construction/journey-select'
+    )
+    expect(h.view).toHaveBeenCalledWith(
+      'journey/self-service/outcome/index',
+      expect.objectContaining({
+        answerPageUrl: '/journey/self-service/answer/new-id'
+      })
+    )
+  })
+
+  test('PUTs to the same id when the stash matches the outcome route', async () => {
+    vi.mocked(getAnswerDocStash).mockReturnValue({
+      id: 'old-id',
+      outcomeRoute: '/construction/journey-select'
+    })
+    vi.mocked(iatAnswersService.update).mockResolvedValue(undefined)
+
+    const request = buildSaveRequest()
+    const h = { view: vi.fn() }
+
+    await outcomeController.handler(request, h)
+
+    expect(iatAnswersService.update).toHaveBeenCalledTimes(1)
+    expect(iatAnswersService.update).toHaveBeenCalledWith(
+      request,
+      'old-id',
+      savePayload
+    )
+    expect(iatAnswersService.create).not.toHaveBeenCalled()
+    expect(iatAnswersService.delete).not.toHaveBeenCalled()
+    expect(setAnswerDocStash).toHaveBeenCalledWith(
+      request,
+      'old-id',
+      '/construction/journey-select'
+    )
+    expect(h.view).toHaveBeenCalledWith(
+      'journey/self-service/outcome/index',
+      expect.objectContaining({
+        answerPageUrl: '/journey/self-service/answer/old-id'
+      })
+    )
+  })
+
+  test('DELETEs old id then POSTs new when stash is for a different outcome', async () => {
+    vi.mocked(getAnswerDocStash).mockReturnValue({
+      id: 'old-id',
+      outcomeRoute: '/other'
+    })
+    vi.mocked(iatAnswersService.delete).mockResolvedValue(undefined)
+    vi.mocked(iatAnswersService.create).mockResolvedValue('new-id')
+
+    const request = buildSaveRequest()
+    const h = { view: vi.fn() }
+
+    await outcomeController.handler(request, h)
+
+    expect(iatAnswersService.delete).toHaveBeenCalledWith(request, 'old-id')
+    expect(iatAnswersService.create).toHaveBeenCalledWith(request, savePayload)
+    expect(iatAnswersService.update).not.toHaveBeenCalled()
+    const deleteOrder = vi.mocked(iatAnswersService.delete).mock
+      .invocationCallOrder[0]
+    const createOrder = vi.mocked(iatAnswersService.create).mock
+      .invocationCallOrder[0]
+    expect(deleteOrder).toBeLessThan(createOrder)
+    expect(setAnswerDocStash).toHaveBeenCalledWith(
+      request,
+      'new-id',
+      '/construction/journey-select'
+    )
+    expect(h.view).toHaveBeenCalledWith(
+      'journey/self-service/outcome/index',
+      expect.objectContaining({
+        answerPageUrl: '/journey/self-service/answer/new-id'
+      })
+    )
+  })
+
+  test('renders the page without answerPageUrl when create fails', async () => {
+    vi.mocked(getAnswerDocStash).mockReturnValue({
+      id: null,
+      outcomeRoute: null
+    })
+    vi.mocked(iatAnswersService.create).mockRejectedValue(
+      new Error('backend down')
+    )
+
+    const request = buildSaveRequest()
+    const h = { view: vi.fn() }
+
+    await outcomeController.handler(request, h)
+
+    expect(request.logger.warn).toHaveBeenCalledWith(
+      expect.objectContaining({
+        event: expect.objectContaining({
+          action: 'iat-answers:save-failed',
+          reference: '/construction/journey-select',
+          reason: 'backend down'
+        })
+      }),
+      expect.any(String)
+    )
+    expect(setAnswerDocStash).not.toHaveBeenCalled()
+    expect(h.view).toHaveBeenCalledWith(
+      'journey/self-service/outcome/index',
+      expect.objectContaining({ answerPageUrl: null })
+    )
+  })
+
+  test('renders the page without answerPageUrl when payload builder returns null', async () => {
+    vi.mocked(buildIatAnswersPayload).mockReturnValue(null)
+    vi.mocked(getAnswerDocStash).mockReturnValue({
+      id: null,
+      outcomeRoute: null
+    })
+
+    const request = buildSaveRequest()
+    const h = { view: vi.fn() }
+
+    await outcomeController.handler(request, h)
+
+    expect(iatAnswersService.create).not.toHaveBeenCalled()
+    expect(iatAnswersService.update).not.toHaveBeenCalled()
+    expect(iatAnswersService.delete).not.toHaveBeenCalled()
+    expect(setAnswerDocStash).not.toHaveBeenCalled()
+    expect(h.view).toHaveBeenCalledWith(
+      'journey/self-service/outcome/index',
+      expect.objectContaining({ answerPageUrl: null })
     )
   })
 })

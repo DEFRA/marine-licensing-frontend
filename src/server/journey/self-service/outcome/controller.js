@@ -7,8 +7,11 @@ import {
   ROUTE_PREFIX
 } from '#src/server/journey/self-service/services/journey-data.js'
 import {
+  getAnswerDocStash,
   getBackLink,
-  pushOutcomeSelection
+  getOutcomeSelection,
+  pushOutcomeSelection,
+  setAnswerDocStash
 } from '#src/server/journey/self-service/services/session-answers.js'
 import { reportRuntimeIssue } from '#src/server/journey/self-service/services/data-quality.js'
 import {
@@ -18,6 +21,8 @@ import {
   classifyOutcome,
   outcomeRouteFromRequest
 } from '#src/server/journey/self-service/outcome/utils.js'
+import { iatAnswersService } from '#src/services/iat-answers-service/iat-answers.service.js'
+import { buildIatAnswersPayload } from '#src/server/journey/self-service/services/iat-answers-payload.js'
 
 const VIEW_PATH = 'journey/self-service/outcome/index'
 
@@ -98,19 +103,61 @@ function logMissingHeadingIfNeeded(request, outcomeRoute, outcome) {
   )
 }
 
+async function persistAndGetAnswerUrl(request, outcomeRoute) {
+  const outcomeTypeId = getOutcomeSelection(request, outcomeRoute)
+  const payload = buildIatAnswersPayload(request, outcomeRoute, outcomeTypeId)
+  if (!payload) {
+    return null
+  }
+
+  const stash = getAnswerDocStash(request)
+  try {
+    let id
+    if (!stash.id) {
+      id = await iatAnswersService.create(request, payload)
+    } else if (stash.outcomeRoute === outcomeRoute) {
+      await iatAnswersService.update(request, stash.id, payload)
+      id = stash.id
+    } else {
+      await iatAnswersService.delete(request, stash.id)
+      id = await iatAnswersService.create(request, payload)
+    }
+    if (!id) {
+      return null
+    }
+    setAnswerDocStash(request, id, outcomeRoute)
+    return `/journey/self-service/answer/${id}`
+  } catch (error) {
+    request.logger.warn(
+      {
+        event: {
+          action: 'iat-answers:save-failed',
+          reference: outcomeRoute,
+          reason: error.message
+        }
+      },
+      `IAT answers save failed for ${outcomeRoute}; rendering outcome without view-answers link`
+    )
+    return null
+  }
+}
+
 export const outcomeController = {
-  handler(request, h) {
+  async handler(request, h) {
     const { outcomeRoute, outcome, types } = loadOutcomeForGet(request)
     const classification = classifyOutcome(outcome)
     logMissingHeadingIfNeeded(request, outcomeRoute, outcome)
     const heading = outcome.heading ?? 'Result'
+
+    const answerPageUrl = await persistAndGetAnswerUrl(request, outcomeRoute)
 
     const baseModel = {
       classification,
       heading,
       pageTitle: heading,
       outcome,
-      backLink: getBackLink(request, outcomeRoute, 'outcome')
+      backLink: getBackLink(request, outcomeRoute, 'outcome'),
+      answerPageUrl
     }
 
     if (classification === 'intermediate') {

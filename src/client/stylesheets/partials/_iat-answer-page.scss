@@ -9,10 +9,12 @@
 }
 
 @media print {
-  .govuk-footer,
-  .govuk-phase-banner,
-  .govuk-back-link,
-  .print-link {
-    display: none;
+  .app-iat-answers-page-body {
+    .govuk-footer,
+    .govuk-phase-banner,
+    .govuk-back-link,
+    .print-link {
+      display: none;
+    }
   }
 }

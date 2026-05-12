@@ -4,9 +4,8 @@ vi.mock('#src/services/iat-answers-service/iat-answers.service.js', () => ({
   iatAnswersService: { get: vi.fn() }
 }))
 
-const { iatAnswersService } = await import(
-  '#src/services/iat-answers-service/iat-answers.service.js'
-)
+const { iatAnswersService } =
+  await import('#src/services/iat-answers-service/iat-answers.service.js')
 const { answerController } = await import('./controller.js')
 
 function buildH() {

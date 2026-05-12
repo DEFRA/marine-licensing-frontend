@@ -37,7 +37,9 @@ describe('iatAnswersService', () => {
   })
 
   it('create returns null when value is missing', async () => {
-    authenticatedPostRequest.mockResolvedValue({ payload: { message: 'success' } })
+    authenticatedPostRequest.mockResolvedValue({
+      payload: { message: 'success' }
+    })
     const id = await iatAnswersService.create(request, body)
     expect(id).toBeNull()
   })

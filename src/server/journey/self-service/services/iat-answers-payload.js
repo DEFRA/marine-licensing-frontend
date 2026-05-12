@@ -1,6 +1,7 @@
 import {
   getOutcome,
   getOutcomeType,
+  getOutcomeTypesForOutcome,
   getQuestion
 } from '#src/server/journey/self-service/services/journey-data.js'
 import { getAnswers } from '#src/server/journey/self-service/services/session-answers.js'
@@ -30,20 +31,42 @@ function buildAnswerEntry(entry) {
   }
 }
 
+function chooseTypeId(outcomeTypeId, types, outcomeRoute) {
+  if (outcomeTypeId) {
+    return outcomeTypeId
+  }
+  if (types.length === 1) {
+    return types[0].id
+  }
+  return outcomeRoute
+}
+
+function chooseSummaryText(outcomeTypeId, types, outcome) {
+  if (outcomeTypeId) {
+    const ot = getOutcomeType(outcomeTypeId)
+    if (ot?.text) {
+      return ot.text
+    }
+  }
+  if (types.length === 1 && types[0].text) {
+    return types[0].text
+  }
+  if (outcome.text) {
+    return outcome.text
+  }
+  return outcome.heading ?? ''
+}
+
 function buildOutcomeBlock(outcomeRoute, outcomeTypeId) {
   const outcome = getOutcome(outcomeRoute)
   if (!outcome) {
     return null
   }
-  let summaryText = outcome.text ?? ''
-  if (outcomeTypeId) {
-    const ot = getOutcomeType(outcomeTypeId)
-    summaryText = ot?.text ?? summaryText
-  }
+  const types = getOutcomeTypesForOutcome(outcome)
   return {
     route: outcomeRoute,
-    typeId: outcomeTypeId ?? '',
-    summaryText
+    typeId: chooseTypeId(outcomeTypeId, types, outcomeRoute),
+    summaryText: chooseSummaryText(outcomeTypeId, types, outcome)
   }
 }
 

@@ -3,14 +3,19 @@ import { describe, expect, test, vi } from 'vitest'
 vi.mock('#src/server/journey/self-service/services/journey-data.js', () => ({
   getQuestion: vi.fn(),
   getOutcome: vi.fn(),
-  getOutcomeType: vi.fn()
+  getOutcomeType: vi.fn(),
+  getOutcomeTypesForOutcome: vi.fn()
 }))
 vi.mock('#src/server/journey/self-service/services/session-answers.js', () => ({
   getAnswers: vi.fn()
 }))
 
-const { getQuestion, getOutcome, getOutcomeType } =
-  await import('#src/server/journey/self-service/services/journey-data.js')
+const {
+  getQuestion,
+  getOutcome,
+  getOutcomeType,
+  getOutcomeTypesForOutcome
+} = await import('#src/server/journey/self-service/services/journey-data.js')
 const { getAnswers } =
   await import('#src/server/journey/self-service/services/session-answers.js')
 const { buildIatAnswersPayload } = await import('./iat-answers-payload.js')
@@ -46,6 +51,9 @@ describe('buildIatAnswersPayload', () => {
           }
     )
     getOutcome.mockReturnValue({ text: 'Outcome summary' })
+    getOutcomeTypesForOutcome.mockReturnValue([
+      { id: 'lnr-x', text: 'Outcome type text' }
+    ])
     getOutcomeType.mockReturnValue({ text: 'Outcome type text' })
 
     const result = buildIatAnswersPayload({}, '/outcome/x', 'lnr-x')
@@ -78,16 +86,18 @@ describe('buildIatAnswersPayload', () => {
     ])
     getQuestion.mockReturnValue(null)
     getOutcome.mockReturnValue({ text: 'x' })
+    getOutcomeTypesForOutcome.mockReturnValue([])
     expect(buildIatAnswersPayload({}, '/o')).toBeNull()
   })
 
   test('returns null when there are no question entries', () => {
     getAnswers.mockReturnValue([])
     getOutcome.mockReturnValue({ text: 'x' })
+    getOutcomeTypesForOutcome.mockReturnValue([])
     expect(buildIatAnswersPayload({}, '/o')).toBeNull()
   })
 
-  test('falls back to outcome.text when no outcomeTypeId', () => {
+  test('with no outcomeTypeId and a single outcomeType, uses that outcomeType id and text', () => {
     getAnswers.mockReturnValue([
       { type: 'question', questionRoute: '/q', answerIds: ['a'] }
     ])
@@ -97,9 +107,79 @@ describe('buildIatAnswersPayload', () => {
       answers: [{ id: 'a', text: 'A' }]
     })
     getOutcome.mockReturnValue({ text: 'Just outcome' })
+    getOutcomeTypesForOutcome.mockReturnValue([
+      { id: 'terminal-single-id', text: 'Single outcomeType text' }
+    ])
+
     const result = buildIatAnswersPayload({}, '/o')
-    expect(result.outcome.summaryText).toBe('Just outcome')
-    expect(result.outcome.typeId).toBe('')
+
+    expect(result.outcome.typeId).toBe('terminal-single-id')
+    expect(result.outcome.summaryText).toBe('Single outcomeType text')
+  })
+
+  test('terminal-multi: with no outcomeTypeId and multiple outcomeTypes, falls back to outcomeRoute and outcome.heading', () => {
+    getAnswers.mockReturnValue([
+      { type: 'question', questionRoute: '/q', answerIds: ['a'] }
+    ])
+    getQuestion.mockReturnValue({
+      route: '/q',
+      text: 'Q?',
+      answers: [{ id: 'a', text: 'A' }]
+    })
+    getOutcome.mockReturnValue({ heading: 'Outcome heading' })
+    getOutcomeTypesForOutcome.mockReturnValue([
+      { id: 't1', text: 'one' },
+      { id: 't2', text: 'two' }
+    ])
+
+    const result = buildIatAnswersPayload({}, '/outcome/multi')
+
+    expect(result.outcome.typeId).toBe('/outcome/multi')
+    expect(result.outcome.summaryText).toBe('Outcome heading')
+  })
+
+  test('with stashed outcomeTypeId, resolved outcomeType.text wins over outcome.text', () => {
+    getAnswers.mockReturnValue([
+      { type: 'question', questionRoute: '/q', answerIds: ['a'] }
+    ])
+    getQuestion.mockReturnValue({
+      route: '/q',
+      text: 'Q?',
+      answers: [{ id: 'a', text: 'A' }]
+    })
+    getOutcome.mockReturnValue({ text: 'Outcome-level text' })
+    getOutcomeTypesForOutcome.mockReturnValue([
+      { id: 'ot-1', text: 'ot-1 text' },
+      { id: 'ot-2', text: 'ot-2 text' }
+    ])
+    getOutcomeType.mockReturnValue({ text: 'ot-2 text' })
+
+    const result = buildIatAnswersPayload({}, '/o', 'ot-2')
+
+    expect(result.outcome.typeId).toBe('ot-2')
+    expect(result.outcome.summaryText).toBe('ot-2 text')
+  })
+
+  test('regression: terminal-single outcome with no stashed outcomeTypeId produces non-empty typeId and summaryText', () => {
+    getAnswers.mockReturnValue([
+      { type: 'question', questionRoute: '/q', answerIds: ['a'] }
+    ])
+    getQuestion.mockReturnValue({
+      route: '/q',
+      text: 'Q?',
+      answers: [{ id: 'a', text: 'A' }]
+    })
+    getOutcome.mockReturnValue({ heading: 'Heading only', text: '' })
+    getOutcomeTypesForOutcome.mockReturnValue([
+      { id: 'terminal-type-id', text: 'Terminal outcome type text' }
+    ])
+
+    const result = buildIatAnswersPayload({}, '/outcome/terminal')
+
+    expect(result.outcome.typeId).not.toBe('')
+    expect(result.outcome.summaryText).not.toBe('')
+    expect(result.outcome.typeId).toBe('terminal-type-id')
+    expect(result.outcome.summaryText).toBe('Terminal outcome type text')
   })
 
   test('returns null when the outcome route is not in the JSON', () => {
@@ -112,6 +192,7 @@ describe('buildIatAnswersPayload', () => {
       answers: [{ id: 'a', text: 'A' }]
     })
     getOutcome.mockReturnValue(null)
+    getOutcomeTypesForOutcome.mockReturnValue([])
     expect(buildIatAnswersPayload({}, '/missing-outcome')).toBeNull()
   })
 
@@ -125,6 +206,7 @@ describe('buildIatAnswersPayload', () => {
       answers: [{ id: 'real', text: 'Real answer' }]
     })
     getOutcome.mockReturnValue({ text: 'Outcome' })
+    getOutcomeTypesForOutcome.mockReturnValue([])
     expect(buildIatAnswersPayload({}, '/outcome/x')).toBeNull()
   })
 })

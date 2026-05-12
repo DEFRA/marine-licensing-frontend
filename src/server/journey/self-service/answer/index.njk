@@ -12,7 +12,7 @@
       <h1 class="govuk-heading-xl">{{ heading }}</h1>
 
       <h2 class="govuk-heading-m">Date of check</h2>
-      <p class="govuk-body">{{ dateOfCheck.toString().slice(0, 24) if dateOfCheck else '' }}</p>
+      <p class="govuk-body">{{ dateOfCheck | formatDate }}</p>
 
       <h2 class="govuk-heading-m">Summary</h2>
       <p class="govuk-body">{{ summaryText }}</p>

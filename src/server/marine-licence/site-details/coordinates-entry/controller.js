@@ -10,7 +10,7 @@ import {
 import { coordinatesEntrySchema } from '#src/server/common/validation/coordinates-entry/schema.js'
 import { createFailAction } from '#src/server/common/helpers/createFailAction.js'
 import { getSiteDataFromParam } from '#src/server/common/helpers/site-details/site-name.js'
-import { setSiteDataPreHandler } from '#src/server/common/helpers/marine-licence/session-cache/site-utils.js'
+import { validateSiteAndActivityParams } from '#src/server/common/helpers/marine-licence/session-cache/site-utils.js'
 import { getBackRoute } from './utils.js'
 
 export const MARINE_LICENCE_COORDINATES_ENTRY_VIEW_ROUTE =
@@ -20,7 +20,7 @@ const cancelLink = `${marineLicenceRoutes.MARINE_LICENCE_TASK_LIST}?cancel=site-
 
 export const coordinatesEntryController = {
   options: {
-    pre: [setSiteDataPreHandler]
+    pre: [validateSiteAndActivityParams]
   },
   handler(request, h) {
     const marineLicence = getMarineLicenceCache(request)
@@ -43,7 +43,7 @@ export const coordinatesEntryController = {
 
 export const coordinatesEntrySubmitController = {
   options: {
-    pre: [setSiteDataPreHandler],
+    pre: [validateSiteAndActivityParams],
     validate: {
       payload: coordinatesEntrySchema,
       failAction: (request, h, err) => {

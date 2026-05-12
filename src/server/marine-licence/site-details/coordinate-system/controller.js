@@ -4,7 +4,7 @@ import {
 } from '#src/server/common/helpers/marine-licence/session-cache/utils.js'
 import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
 import { getSiteDataFromParam } from '#src/server/common/helpers/site-details/site-name.js'
-import { setSiteDataPreHandler } from '#src/server/common/helpers/marine-licence/session-cache/site-utils.js'
+import { validateSiteAndActivityParams } from '#src/server/common/helpers/marine-licence/session-cache/site-utils.js'
 import { createFailAction } from '#src/server/common/helpers/createFailAction.js'
 import {
   coordinateSystemSettings,
@@ -19,7 +19,7 @@ const cancelLink = `${marineLicenceRoutes.MARINE_LICENCE_TASK_LIST}?cancel=site-
 
 export const coordinateSystemController = {
   options: {
-    pre: [setSiteDataPreHandler]
+    pre: [validateSiteAndActivityParams]
   },
   handler(request, h) {
     const marineLicence = getMarineLicenceCache(request)
@@ -42,7 +42,7 @@ export const coordinateSystemController = {
 
 export const coordinateSystemSubmitController = {
   options: {
-    pre: [setSiteDataPreHandler],
+    pre: [validateSiteAndActivityParams],
     validate: {
       payload: coordinateSystemSchema,
       failAction: (request, h, err) => {

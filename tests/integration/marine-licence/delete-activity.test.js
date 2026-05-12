@@ -17,7 +17,6 @@ describe('Delete activity', () => {
   const getServer = setupTestServer()
 
   describe('when the application has multiple activities', () => {
-
     test('should display the delete activity page for non-first activities', async () => {
       const document = await loadPage({
         requestUrl: `${marineLicenceRoutes.MARINE_LICENCE_DELETE_ACTIVITY}?site=1&activity=2`,

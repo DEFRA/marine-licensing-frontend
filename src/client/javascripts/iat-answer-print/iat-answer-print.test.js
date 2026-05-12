@@ -26,7 +26,7 @@ describe('IatAnswerPrint', () => {
   })
 
   test('does not throw or bind when given null', () => {
-    expect(() => new IatAnswerPrint(null)).not.toThrow() // eslint-disable-line no-new
+    expect(() => new IatAnswerPrint(null)).not.toThrow()
     expect(window.print).not.toHaveBeenCalled()
   })
 })

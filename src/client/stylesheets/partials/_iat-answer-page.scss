@@ -1,0 +1,18 @@
+.app-iat-answers-page {
+  .govuk-summary-list__key {
+    width: 50%;
+  }
+
+  .govuk-summary-list__value {
+    width: 50%;
+  }
+}
+
+@media print {
+  .govuk-footer,
+  .govuk-phase-banner,
+  .govuk-back-link,
+  .print-link {
+    display: none;
+  }
+}

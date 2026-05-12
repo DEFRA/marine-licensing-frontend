@@ -6,7 +6,10 @@ import {
   pushOutcomeSelection,
   getOutcomeSelection,
   getBackLink,
-  clearAnswers
+  clearAnswers,
+  clearAnswerDocStash,
+  getAnswerDocStash,
+  setAnswerDocStash
 } from '#src/server/journey/self-service/services/session-answers.js'
 import { ROUTE_PREFIX } from '#src/server/journey/self-service/services/journey-data.js'
 import { routes } from '#src/server/common/constants/routes.js'
@@ -346,6 +349,47 @@ describe('#session-answers', () => {
       ])
       clearAnswers(request)
       expect(request.yar.set).toHaveBeenCalledWith('selfServiceAnswers', [])
+    })
+  })
+
+  describe('#answerDocStash', () => {
+    function buildStashRequest(initial = {}) {
+      const store = new Map(Object.entries(initial))
+      return {
+        yar: {
+          get: (k) => store.get(k),
+          set: (k, v) => store.set(k, v),
+          clear: (k) => store.delete(k)
+        }
+      }
+    }
+
+    test('get returns nulls when empty', () => {
+      expect(getAnswerDocStash(buildStashRequest())).toEqual({
+        id: null,
+        outcomeRoute: null
+      })
+    })
+
+    test('set then get round-trips', () => {
+      const request = buildStashRequest()
+      setAnswerDocStash(request, 'abc', '/o')
+      expect(getAnswerDocStash(request)).toEqual({
+        id: 'abc',
+        outcomeRoute: '/o'
+      })
+    })
+
+    test('clear removes both', () => {
+      const request = buildStashRequest({
+        selfServiceAnswerDocId: 'abc',
+        selfServiceAnswerOutcomeRoute: '/o'
+      })
+      clearAnswerDocStash(request)
+      expect(getAnswerDocStash(request)).toEqual({
+        id: null,
+        outcomeRoute: null
+      })
     })
   })
 })

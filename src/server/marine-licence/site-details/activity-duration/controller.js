@@ -117,7 +117,7 @@ export const activityDurationSubmitController = {
     await saveSiteDetailsToBackend(request, h, { siteIndex })
 
     return h.redirect(
-      `${marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS}?site=${siteNumber}&activity=${activityDetailsNumber}`
+      `${marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS}#activity-details-site-${siteNumber}-activity-${activityDetailsNumber}`
     )
   }
 }

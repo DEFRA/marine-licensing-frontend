@@ -44,6 +44,10 @@ describe('#workingHoursSubmitController', () => {
       { workingHours: 'Monday to Friday, 9am to 5pm' }
     )
 
+    expect(saveSiteDetailsToBackend).toHaveBeenCalledWith(request, h, {
+      siteIndex: 0
+    })
+
     expect(h.redirect).toHaveBeenCalledWith(
       `${marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS}#activity-details-site-1-activity-1`
     )

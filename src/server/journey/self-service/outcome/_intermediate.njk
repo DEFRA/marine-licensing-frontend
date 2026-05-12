@@ -1,0 +1,49 @@
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/inset-text/macro.njk" import govukInsetText %}
+
+{% if section %}
+  <span class="govuk-caption-l">{{ section.text }}</span>
+{% endif %}
+
+<h1 class="govuk-heading-xl">{{ heading }}</h1>
+
+{% if outcome.text %}
+  {{ govukInsetText({ html: outcome.text }) }}
+{% endif %}
+
+{% for option in options %}
+  <div class="app-iat-option govuk-!-margin-bottom-6">
+    <h2 class="govuk-heading-m">Option {{ loop.index }}{% if option.heading %} - {{ option.heading }}{% endif %}</h2>
+
+    {% if option.text %}
+      <div class="govuk-body">{{ option.text | safe }}</div>
+    {% endif %}
+
+    <div class="app-iat-option__actions">
+      {% if option.isTerminal %}
+        {# Terminal outcomeType on intermediate page — see ML-1268 #}
+        {{ govukButton({
+          text: option.ctaLabel,
+          href: "#",
+          classes: "govuk-!-margin-right-3"
+        }) }}
+      {% else %}
+        <form method="POST">
+          <input type="hidden" name="csrfToken" value="{{ csrfToken }}"/>
+          <input type="hidden" name="outcomeType" value="{{ option.id }}"/>
+          {{ govukButton({
+            text: option.ctaLabel,
+            classes: "govuk-!-margin-right-3"
+          }) }}
+        </form>
+      {% endif %}
+
+      {# PDF download deferred to ML-1165 #}
+      {{ govukButton({
+        text: "Download a PDF record of my answers",
+        href: "#",
+        classes: "govuk-button--secondary"
+      }) }}
+    </div>
+  </div>
+{% endfor %}

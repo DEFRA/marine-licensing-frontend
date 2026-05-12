@@ -1,4 +1,5 @@
 import { getByText, queryByText, within } from '@testing-library/dom'
+import { expectedValueOrIncomplete } from '~/tests/integration/shared/expect-utils.js'
 
 export const getSiteDetailsCard = (document, expected, siteIndex = 0) => {
   const cardName = expected?.siteDetails[siteIndex]?.cardName ?? 'Site details'
@@ -104,6 +105,56 @@ export const validateMultipleSites = (document, expected) => {
   expect(
     within(document).getByRole('button', { name: 'Continue' })
   ).toHaveAttribute('type', 'submit')
+}
+
+export const validateActivityDetailsCards = (document, expected, siteIndex) => {
+  const cards = document.querySelectorAll('.govuk-summary-card')
+  const activityDetailsCards = Array.from(cards).filter((card) =>
+    card.textContent.match(/Site \d+(?= - Activity)/)
+  )
+
+  activityDetailsCards.forEach((card, i) => {
+    const activityDetails = expected.siteDetails[siteIndex].activityDetails[i]
+
+    const activityTypeRow = getRowByKey(card, 'Type of activity')
+    expect(activityTypeRow).toBeTruthy()
+    expect(activityTypeRow.textContent).toContain(
+      expectedValueOrIncomplete(activityDetails.activityType)
+    )
+
+    const activityDescriptionRow = getRowByKey(card, 'Activity description')
+    expect(activityDescriptionRow).toBeTruthy()
+    expect(activityDescriptionRow.textContent).toContain(
+      expectedValueOrIncomplete(activityDetails.activityDescription)
+    )
+
+    const activityDurationRow = getRowByKey(card, 'Maximum duration of activity')
+    expect(activityDurationRow).toBeTruthy()
+    expect(activityDurationRow.textContent).toContain(
+      expectedValueOrIncomplete(activityDetails.activityDuration)
+    )
+
+    const completionDateRow = getRowByKey(card, 'Completion date')
+    expect(completionDateRow).toBeTruthy()
+    expect(completionDateRow.textContent).toContain(
+      expectedValueOrIncomplete(activityDetails.completionDate)
+    )
+
+    const activityMonthsRow = getRowByKey(
+      card,
+      'Activity limited to specific months'
+    )
+    expect(activityMonthsRow).toBeTruthy()
+    expect(activityMonthsRow.textContent).toContain(
+      expectedValueOrIncomplete(activityDetails.activityMonths)
+    )
+
+    const workingHoursRow = getRowByKey(card, 'Proposed working hours')
+    expect(workingHoursRow).toBeTruthy()
+    expect(workingHoursRow.textContent).toContain(
+      expectedValueOrIncomplete(activityDetails.workingHours)
+    )
+  })
 }
 
 export const validateSiteDetailsCard = (document, expected, siteIndex) => {

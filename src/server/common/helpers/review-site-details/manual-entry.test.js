@@ -6,6 +6,7 @@ import {
   getPolygonCoordinatesDisplayData,
   getReviewSummaryText
 } from '#src/server/common/helpers/review-site-details/manual-entry.js'
+import { mockActivityDetails } from '#src/server/test-helpers/mocks/marine-licence-mocks.js'
 
 describe('manual-entry helpers', () => {
   describe('getCoordinateSystemText', () => {
@@ -255,7 +256,8 @@ describe('manual-entry helpers', () => {
           siteNumber: 1,
           siteDetailsData: expect.stringContaining(
             '"coordinatesType":"coordinates"'
-          )
+          ),
+          activityDetails: []
         }
       ])
     })
@@ -367,6 +369,30 @@ describe('manual-entry helpers', () => {
       expect(buildManualCoordinateSummaryData(null, {})).toEqual([])
       expect(buildManualCoordinateSummaryData(undefined, {})).toEqual([])
       expect(buildManualCoordinateSummaryData('not-array', {})).toEqual([])
+    })
+
+    test('includes parsed activityDetails when site has activities', () => {
+      const siteDetails = [
+        {
+          coordinateSystem: COORDINATE_SYSTEMS.WGS84,
+          coordinatesEntry: 'single',
+          coordinatesType: 'coordinates',
+          coordinates: { latitude: '51.5074', longitude: '-0.1278' },
+          circleWidth: '100',
+          siteName: 'Test Site',
+          activityDetails: [mockActivityDetails]
+        }
+      ]
+
+      const result = buildManualCoordinateSummaryData(siteDetails, {})
+
+      expect(result[0].activityDetails).toHaveLength(1)
+      expect(result[0].activityDetails[0]).toMatchObject({
+        activitySubType: 'Construction of new works',
+        activityDuration: '1 year, 4 months',
+        completionDate: 'Test completion',
+        activityMonths: 'Test months'
+      })
     })
   })
 })

@@ -18,7 +18,7 @@ describe('#validateSiteAndActivityParams', () => {
     )
   })
 
-  test('redirects when site does not exist in cache.', () => {
+  test('redirects when site does not exist in cache', () => {
     const request = createMockRequest({ query: { site: '99' } })
     const h = createMockH()
 

@@ -128,7 +128,10 @@ export const validateActivityDetailsCards = (document, expected, siteIndex) => {
       expectedValueOrIncomplete(activityDetails.activityDescription)
     )
 
-    const activityDurationRow = getRowByKey(card, 'Maximum duration of activity')
+    const activityDurationRow = getRowByKey(
+      card,
+      'Maximum duration of activity'
+    )
     expect(activityDurationRow).toBeTruthy()
     expect(activityDurationRow.textContent).toContain(
       expectedValueOrIncomplete(activityDetails.activityDuration)

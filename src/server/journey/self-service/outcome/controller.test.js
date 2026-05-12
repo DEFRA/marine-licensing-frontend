@@ -29,6 +29,7 @@ import {
   isIntermediateOutcome
 } from '#src/server/journey/self-service/services/journey-data.js'
 import {
+  clearAnswerDocStash,
   getAnswerDocStash,
   getBackLink,
   getOutcomeSelection,
@@ -722,6 +723,58 @@ describe('outcomeController save flow', () => {
     expect(iatAnswersService.update).not.toHaveBeenCalled()
     expect(iatAnswersService.delete).not.toHaveBeenCalled()
     expect(setAnswerDocStash).not.toHaveBeenCalled()
+    expect(h.view).toHaveBeenCalledWith(
+      'journey/self-service/outcome/index',
+      expect.objectContaining({ answerPageUrl: null })
+    )
+  })
+
+  test('clears the stash when create returns null', async () => {
+    vi.mocked(getAnswerDocStash).mockReturnValue({
+      id: null,
+      outcomeRoute: null
+    })
+    vi.mocked(iatAnswersService.create).mockResolvedValue(null)
+
+    const request = buildSaveRequest()
+    const h = { view: vi.fn() }
+
+    await outcomeController.handler(request, h)
+
+    expect(clearAnswerDocStash).toHaveBeenCalledTimes(1)
+    expect(clearAnswerDocStash).toHaveBeenCalledWith(request)
+    expect(setAnswerDocStash).not.toHaveBeenCalled()
+    expect(h.view).toHaveBeenCalledWith(
+      'journey/self-service/outcome/index',
+      expect.objectContaining({ answerPageUrl: null })
+    )
+  })
+
+  test('clears the stash when the save throws', async () => {
+    vi.mocked(getAnswerDocStash).mockReturnValue({
+      id: 'old-id',
+      outcomeRoute: '/construction/journey-select'
+    })
+    vi.mocked(iatAnswersService.update).mockRejectedValue(
+      new Error('backend down')
+    )
+
+    const request = buildSaveRequest()
+    const h = { view: vi.fn() }
+
+    await outcomeController.handler(request, h)
+
+    expect(clearAnswerDocStash).toHaveBeenCalledTimes(1)
+    expect(clearAnswerDocStash).toHaveBeenCalledWith(request)
+    expect(setAnswerDocStash).not.toHaveBeenCalled()
+    expect(request.logger.warn).toHaveBeenCalledWith(
+      expect.objectContaining({
+        event: expect.objectContaining({
+          action: 'iat-answers:save-failed'
+        })
+      }),
+      expect.any(String)
+    )
     expect(h.view).toHaveBeenCalledWith(
       'journey/self-service/outcome/index',
       expect.objectContaining({ answerPageUrl: null })

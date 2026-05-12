@@ -7,6 +7,7 @@ import {
   ROUTE_PREFIX
 } from '#src/server/journey/self-service/services/journey-data.js'
 import {
+  clearAnswerDocStash,
   getAnswerDocStash,
   getBackLink,
   getOutcomeSelection,
@@ -123,11 +124,13 @@ async function persistAndGetAnswerUrl(request, outcomeRoute) {
       id = await iatAnswersService.create(request, payload)
     }
     if (!id) {
+      clearAnswerDocStash(request)
       return null
     }
     setAnswerDocStash(request, id, outcomeRoute)
     return `/journey/self-service/answer/${id}`
   } catch (error) {
+    clearAnswerDocStash(request)
     request.logger.warn(
       {
         event: {

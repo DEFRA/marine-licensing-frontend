@@ -9,8 +9,8 @@ import {
   mapErrorsForDisplay
 } from '#src/server/common/helpers/errors.js'
 import { getCancelLink } from '#src/server/marine-licence/site-details/utils/cancel-link.js'
-import { setSiteDataPreHandler } from '#src/server/common/helpers/marine-licence/session-cache/site-utils.js'
 import { saveSiteDetailsToBackend } from '#src/server/common/helpers/marine-licence/save-site-details.js'
+import { validateSiteAndActivityParams } from '#src/server/common/helpers/marine-licence/session-cache/site-utils.js'
 import { getPayload } from '#src/server/common/helpers/site-details/centre-coordinates.js'
 import { validateCentreCoordinates } from '#src/server/common/validation/centre-coordinates/validate.js'
 import {
@@ -31,7 +31,7 @@ const getCoordinateSystem = (siteDetails) =>
 
 export const centreCoordinatesController = {
   options: {
-    pre: [setSiteDataPreHandler]
+    pre: [validateSiteAndActivityParams]
   },
   handler(request, h) {
     const marineLicence = getMarineLicenceCache(request)
@@ -96,7 +96,7 @@ export const centreCoordinatesSubmitFailHandler = (request, h, error) => {
 
 export const centreCoordinatesSubmitController = {
   options: {
-    pre: [setSiteDataPreHandler]
+    pre: [validateSiteAndActivityParams]
   },
   async handler(request, h) {
     const { payload } = request

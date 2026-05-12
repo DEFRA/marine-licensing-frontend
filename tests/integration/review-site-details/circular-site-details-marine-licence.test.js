@@ -14,6 +14,7 @@ import * as marineLicenceService from '~/src/services/marine-licence-service/ind
 import {
   getRowByKey,
   getSiteDetailsCard,
+  validateActivityDetailsCards,
   validateMultipleSites,
   validateNavigationElements,
   validatePageStructure,
@@ -53,10 +54,16 @@ describe('ML Review Site Details - Circular Coordinates Integration Tests', () =
         for (const site of expectedPageContent.siteDetails.keys()) {
           validateCircularCoordinates(document, expectedPageContent, site)
           validateSiteDetailsCard(document, expectedPageContent, site)
+          if (expectedPageContent.siteDetails[site].activityDetails?.length) {
+            validateActivityDetailsCards(document, expectedPageContent, site)
+          }
         }
       } else {
         validateCircularCoordinates(document, expectedPageContent, 0)
         validateSiteDetailsCard(document, expectedPageContent, 0)
+        if (expectedPageContent.siteDetails[0].activityDetails?.length) {
+          validateActivityDetailsCards(document, expectedPageContent, 0)
+        }
       }
     }
   )
@@ -139,6 +146,24 @@ describe('ML Review Site Details - Circular Coordinates Integration Tests', () =
       expect(response.statusCode).toBe(statusCodes.redirect)
       expect(response.headers.location).toBe(
         marineLicenceRoutes.MARINE_LICENCE_TASK_LIST
+      )
+    })
+
+    test('should redirect back to review page with anchor when addActivity is submitted', async () => {
+      const scenarioWithActivities = testScenarios.find(
+        (s) => s.marineLicence.siteDetails[0].activityDetails?.length
+      )
+      mockMarineLicence(scenarioWithActivities.marineLicence)
+
+      const response = await makePostRequest({
+        url: marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS,
+        server: getServer(),
+        formData: { addActivity: 'addActivity', siteNumber: '1' }
+      })
+
+      expect(response.statusCode).toBe(statusCodes.redirect)
+      expect(response.headers.location).toBe(
+        `${marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS}#activity-details-site-1-activity-2`
       )
     })
   })

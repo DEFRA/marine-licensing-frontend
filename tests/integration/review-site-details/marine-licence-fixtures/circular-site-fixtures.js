@@ -1,4 +1,8 @@
 import { marineLicenceRoutes } from '~/src/server/common/constants/routes.js'
+import {
+  mockActivityDetails,
+  mockOutputActivityDetails
+} from '~/src/server/test-helpers/mocks/marine-licence-mocks.js'
 
 const baseMlCircularMarineLicence = {
   id: 'test-ml-circular-123',
@@ -128,6 +132,40 @@ export const testScenarios = [
             'WGS84 (World Geodetic System 1984)Latitude and longitude',
           centreCoordinates: '51.489676, -0.231530',
           circleWidth: '200 metres'
+        }
+      ]
+    }
+  },
+  {
+    name: 'WGS84 circular coordinates - with activity details',
+    marineLicence: {
+      ...baseMlCircularMarineLicence,
+      siteDetails: [
+        {
+          coordinatesType: 'coordinates',
+          coordinatesEntry: 'single',
+          coordinateSystem: 'wgs84',
+          coordinates: { latitude: '55.123456', longitude: '55.123456' },
+          circleWidth: '100',
+          siteName: 'Test Site 1',
+          activityDetails: [mockActivityDetails]
+        }
+      ]
+    },
+    expectedPageContent: {
+      backLink: marineLicenceRoutes.MARINE_LICENCE_WIDTH_OF_SITE,
+      projectName: 'Hammersmith pontoon construction',
+      siteDetails: [
+        {
+          cardName: 'Site 1',
+          siteName: 'Test Site 1',
+          method:
+            'Manually enter one set of coordinates and a width to create a circular site',
+          coordinateSystem:
+            'WGS84 (World Geodetic System 1984)Latitude and longitude',
+          centreCoordinates: '55.123456, 55.123456',
+          circleWidth: '100 metres',
+          activityDetails: [mockOutputActivityDetails]
         }
       ]
     }

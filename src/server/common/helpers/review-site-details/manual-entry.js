@@ -1,6 +1,7 @@
 import { COORDINATE_SYSTEMS } from '#src/server/common/constants/coordinate-systems.js'
 import { createSiteDetailsDataJson } from '#src/server/common/helpers/site-details.js'
 import { formatDate } from '#src/server/common/helpers/dates/date-utils.js'
+import { parseActivityDetails } from '#src/server/common/helpers/review-site-details/activity-details.js'
 
 const isWGS84 = (coordinateSystem) =>
   coordinateSystem === COORDINATE_SYSTEMS.WGS84
@@ -172,7 +173,8 @@ export const buildManualCoordinateSummaryData = (
           coordinateSystem
         ),
         siteNumber: index + 1,
-        siteDetailsData
+        siteDetailsData,
+        activityDetails: parseActivityDetails(site)
       })
     } else {
       summaryData.push({
@@ -192,7 +194,8 @@ export const buildManualCoordinateSummaryData = (
         coordinates: getCoordinateDisplayText(site, coordinateSystem),
         width: circleWidth ? metresLabel(circleWidth) : '',
         siteNumber: index + 1,
-        siteDetailsData
+        siteDetailsData,
+        activityDetails: parseActivityDetails(site)
       })
     }
   }

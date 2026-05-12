@@ -1,3 +1,19 @@
+import { vi } from 'vitest'
+
+vi.mock('#src/services/iat-answers-service/iat-answers.service.js', () => ({
+  iatAnswersService: {
+    create: vi.fn(),
+    update: vi.fn(),
+    delete: vi.fn()
+  }
+}))
+vi.mock(
+  '#src/server/journey/self-service/services/iat-answers-payload.js',
+  () => ({
+    buildIatAnswersPayload: vi.fn()
+  })
+)
+
 import { JSDOM } from 'jsdom'
 import { statusCodes } from '#src/server/common/constants/status-codes.js'
 import { setupTestServer } from '#tests/integration/shared/test-setup-helpers.js'
@@ -6,6 +22,27 @@ import {
   makePostRequest
 } from '#src/server/test-helpers/server-requests.js'
 import { config } from '#src/config/config.js'
+import { iatAnswersService } from '#src/services/iat-answers-service/iat-answers.service.js'
+import { buildIatAnswersPayload } from '#src/server/journey/self-service/services/iat-answers-payload.js'
+
+const STUB_ANSWER_ID = 'iat-stub-id-123'
+const EXPECTED_ANSWER_PAGE_URL = `/journey/self-service/answer/${STUB_ANSWER_ID}`
+
+beforeEach(() => {
+  vi.mocked(buildIatAnswersPayload).mockReturnValue({
+    outcome: { route: '/stub', typeId: '', summaryText: '' },
+    answers: [
+      {
+        questionRoute: '/stub-question',
+        questionText: 'stub',
+        answers: [{ id: 'a', text: 'stub' }]
+      }
+    ]
+  })
+  vi.mocked(iatAnswersService.create).mockResolvedValue(STUB_ANSWER_ID)
+  vi.mocked(iatAnswersService.update).mockResolvedValue(undefined)
+  vi.mocked(iatAnswersService.delete).mockResolvedValue(undefined)
+})
 
 describe('#outcomeController (integration)', () => {
   config.set('selfService.enabled', true)
@@ -97,18 +134,32 @@ describe('#outcomeController (integration)', () => {
       expect(continueButton.getAttribute('href')).toBe('#')
     })
 
-    test('every option card has a "Download a PDF record of my answers" link with href="#"', async () => {
+    test('does not render the old "Download a PDF" button anywhere', async () => {
       const { document } = await getPage()
-      const cards = document.querySelectorAll('.app-iat-option')
-      for (const card of cards) {
-        const downloadButton = Array.from(
-          card.querySelectorAll('a.govuk-button--secondary')
-        ).find((a) =>
-          a.textContent.includes('Download a PDF record of my answers')
-        )
-        expect(downloadButton).not.toBeNull()
-        expect(downloadButton.getAttribute('href')).toBe('#')
-      }
+      expect(document.body.textContent).not.toContain(
+        'Download a PDF record of my answers'
+      )
+    })
+
+    test('renders one page-level "View answers" link with target=_blank and rel=noopener', async () => {
+      const { document } = await getPage()
+      const links = Array.from(
+        document.querySelectorAll('a.govuk-link')
+      ).filter((a) => a.textContent.includes('View answers'))
+      expect(links).toHaveLength(1)
+      const link = links[0]
+      expect(link.getAttribute('href')).toBe(EXPECTED_ANSWER_PAGE_URL)
+      expect(link.getAttribute('target')).toBe('_blank')
+      expect(link.getAttribute('rel')).toBe('noopener noreferrer')
+      expect(
+        link.querySelector('.govuk-visually-hidden').textContent
+      ).toContain('(opens in a new tab)')
+    })
+
+    test('does not render the "View answers" link when the IAT save returns null', async () => {
+      vi.mocked(iatAnswersService.create).mockResolvedValueOnce(null)
+      const { document } = await getPage()
+      expect(document.body.textContent).not.toContain('View answers')
     })
 
     test('renders a back link', async () => {
@@ -281,15 +332,32 @@ describe('GET terminal-single', () => {
     expect(continueButtons[0].getAttribute('href')).toBe('#')
   })
 
-  test('renders one PDF button (page-level, href="#")', async () => {
+  test('does not render the old "Download a PDF" button', async () => {
     const { document } = await getPage(SINGLE)
-    const pdfButtons = Array.from(
-      document.querySelectorAll('a.govuk-button--secondary')
-    ).filter((a) =>
-      a.textContent.includes('Download a PDF record of my answers')
+    expect(document.body.textContent).not.toContain(
+      'Download a PDF record of my answers'
     )
-    expect(pdfButtons).toHaveLength(1)
-    expect(pdfButtons[0].getAttribute('href')).toBe('#')
+  })
+
+  test('renders one page-level "View answers" link with target=_blank and rel=noopener', async () => {
+    const { document } = await getPage(SINGLE)
+    const links = Array.from(document.querySelectorAll('a.govuk-link')).filter(
+      (a) => a.textContent.includes('View answers')
+    )
+    expect(links).toHaveLength(1)
+    const link = links[0]
+    expect(link.getAttribute('href')).toBe(EXPECTED_ANSWER_PAGE_URL)
+    expect(link.getAttribute('target')).toBe('_blank')
+    expect(link.getAttribute('rel')).toBe('noopener noreferrer')
+    expect(link.querySelector('.govuk-visually-hidden').textContent).toContain(
+      '(opens in a new tab)'
+    )
+  })
+
+  test('does not render the "View answers" link when the IAT save returns null', async () => {
+    vi.mocked(iatAnswersService.create).mockResolvedValueOnce(null)
+    const { document } = await getPage(SINGLE)
+    expect(document.body.textContent).not.toContain('View answers')
   })
 
   test('does not render any option cards', async () => {
@@ -369,15 +437,32 @@ describe('GET terminal-multi', () => {
     }
   })
 
-  test('renders exactly one page-level PDF button', async () => {
+  test('does not render the old "Download a PDF" button', async () => {
     const { document } = await getPage(MULTI)
-    const pdf = Array.from(
-      document.querySelectorAll('a.govuk-button--secondary')
-    ).filter((a) =>
-      a.textContent.includes('Download a PDF record of my answers')
+    expect(document.body.textContent).not.toContain(
+      'Download a PDF record of my answers'
     )
-    expect(pdf).toHaveLength(1)
-    expect(pdf[0].getAttribute('href')).toBe('#')
+  })
+
+  test('renders one page-level "View answers" link with target=_blank and rel=noopener', async () => {
+    const { document } = await getPage(MULTI)
+    const links = Array.from(document.querySelectorAll('a.govuk-link')).filter(
+      (a) => a.textContent.includes('View answers')
+    )
+    expect(links).toHaveLength(1)
+    const link = links[0]
+    expect(link.getAttribute('href')).toBe(EXPECTED_ANSWER_PAGE_URL)
+    expect(link.getAttribute('target')).toBe('_blank')
+    expect(link.getAttribute('rel')).toBe('noopener noreferrer')
+    expect(link.querySelector('.govuk-visually-hidden').textContent).toContain(
+      '(opens in a new tab)'
+    )
+  })
+
+  test('does not render the "View answers" link when the IAT save returns null', async () => {
+    vi.mocked(iatAnswersService.create).mockResolvedValueOnce(null)
+    const { document } = await getPage(MULTI)
+    expect(document.body.textContent).not.toContain('View answers')
   })
 
   test('renders a back link', async () => {
@@ -428,15 +513,23 @@ describe('GET licence-not-required (terminal-single, info-only)', () => {
     expect(body.textContent).toContain('relevant devolved administration')
   })
 
-  test('renders the Download PDF button', async () => {
+  test('does not render the old "Download a PDF" button', async () => {
     const { document } = await getPage()
-    const pdf = Array.from(
-      document.querySelectorAll('a.govuk-button--secondary')
-    ).filter((a) =>
-      a.textContent.includes('Download a PDF record of my answers')
+    expect(document.body.textContent).not.toContain(
+      'Download a PDF record of my answers'
     )
-    expect(pdf).toHaveLength(1)
-    expect(pdf[0].getAttribute('href')).toBe('#')
+  })
+
+  test('renders the "View answers" link with target=_blank and rel=noopener', async () => {
+    const { document } = await getPage()
+    const links = Array.from(document.querySelectorAll('a.govuk-link')).filter(
+      (a) => a.textContent.includes('View answers')
+    )
+    expect(links).toHaveLength(1)
+    const link = links[0]
+    expect(link.getAttribute('href')).toBe(EXPECTED_ANSWER_PAGE_URL)
+    expect(link.getAttribute('target')).toBe('_blank')
+    expect(link.getAttribute('rel')).toBe('noopener noreferrer')
   })
 
   test('does NOT render a primary Continue button', async () => {

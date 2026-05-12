@@ -14,9 +14,15 @@
       classes: "govuk-!-margin-right-3"
     }) }}
   {% endif %}
-  {{ govukButton({
-    text: "Download a PDF record of my answers",
-    href: "#",
-    classes: "govuk-button--secondary"
-  }) }}
 </div>
+
+{% if answerPageUrl %}
+  <p class="govuk-body">
+    <a class="govuk-link"
+       href="{{ answerPageUrl }}"
+       target="_blank"
+       rel="noopener noreferrer">
+      View answers<span class="govuk-visually-hidden"> (opens in a new tab)</span>
+    </a>
+  </p>
+{% endif %}

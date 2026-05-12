@@ -114,4 +114,17 @@ describe('buildIatAnswersPayload', () => {
     getOutcome.mockReturnValue(null)
     expect(buildIatAnswersPayload({}, '/missing-outcome')).toBeNull()
   })
+
+  test('returns null when every answerId is missing from question.answers[]', () => {
+    getAnswers.mockReturnValue([
+      { type: 'question', questionRoute: '/q', answerIds: ['ghost'] }
+    ])
+    getQuestion.mockReturnValue({
+      route: '/q',
+      text: 'Q?',
+      answers: [{ id: 'real', text: 'Real answer' }]
+    })
+    getOutcome.mockReturnValue({ text: 'Outcome' })
+    expect(buildIatAnswersPayload({}, '/outcome/x')).toBeNull()
+  })
 })

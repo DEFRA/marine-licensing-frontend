@@ -6,6 +6,7 @@ describe('Marine Licence Activity Details Card', () => {
   const baseParams = {
     siteNumber: 1,
     index: 1,
+    deleteLink: '/marine-licence/delete-activity?site=1&activity=1',
     activityDetails: {
       activityType: 'construction',
       activitySubType: "What you're constructing",

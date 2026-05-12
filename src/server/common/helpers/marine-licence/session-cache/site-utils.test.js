@@ -1,8 +1,7 @@
 import { vi } from 'vitest'
 import {
   validateSiteAndActivityParams,
-  setSiteData,
-  setSiteDataPreHandler
+  setSiteData
 } from '#src/server/common/helpers/marine-licence/session-cache/site-utils.js'
 import {
   createMockH,
@@ -19,30 +18,8 @@ describe('#validateSiteAndActivityParams', () => {
     )
   })
 
-  test('redirects when site param is missing', () => {
-    const request = createMockRequest({ query: { activity: '1' } })
-    const h = createMockH()
-
-    validateSiteAndActivityParams.method(request, h)
-
-    expect(h.redirect).toHaveBeenCalledWith(
-      marineLicenceRoutes.MARINE_LICENCE_TASK_LIST
-    )
-  })
-
-  test('redirects when activity param is missing', () => {
-    const request = createMockRequest({ query: { site: '1' } })
-    const h = createMockH()
-
-    validateSiteAndActivityParams.method(request, h)
-
-    expect(h.redirect).toHaveBeenCalledWith(
-      marineLicenceRoutes.MARINE_LICENCE_TASK_LIST
-    )
-  })
-
   test('redirects when site does not exist in cache', () => {
-    const request = createMockRequest({ query: { site: '99', activity: '1' } })
+    const request = createMockRequest({ query: { site: '99' } })
     const h = createMockH()
 
     validateSiteAndActivityParams.method(request, h)
@@ -50,6 +27,21 @@ describe('#validateSiteAndActivityParams', () => {
     expect(h.redirect).toHaveBeenCalledWith(
       marineLicenceRoutes.MARINE_LICENCE_TASK_LIST
     )
+  })
+
+  test('sets request.site and continues when activity param is absent', () => {
+    const request = createMockRequest()
+    const h = createMockH()
+
+    const result = validateSiteAndActivityParams.method(request, h)
+
+    expect(request.site).toEqual({
+      siteIndex: 0,
+      siteNumber: 1,
+      queryParams: '',
+      siteDetails: mockMarineLicenceApplication.siteDetails[0]
+    })
+    expect(result).toBe(h.continue)
   })
 
   test('redirects when activity does not exist for site', () => {
@@ -63,12 +55,18 @@ describe('#validateSiteAndActivityParams', () => {
     )
   })
 
-  test('continues when site and activity are valid', () => {
+  test('sets request.site and continues when site and activity are valid', () => {
     const request = createMockRequest({ query: { site: '1', activity: '1' } })
     const h = createMockH()
 
     const result = validateSiteAndActivityParams.method(request, h)
 
+    expect(request.site).toEqual({
+      siteIndex: 0,
+      siteNumber: 1,
+      queryParams: '',
+      siteDetails: mockMarineLicenceApplication.siteDetails[0]
+    })
     expect(result).toBe(h.continue)
   })
 })
@@ -128,43 +126,5 @@ describe('#setSiteData', () => {
       queryParams: '?site=2',
       siteDetails: {}
     })
-  })
-})
-
-describe('#setSiteDataPreHandler', () => {
-  beforeEach(() => {
-    vi.spyOn(utils, 'getMarineLicenceCache').mockReturnValue(
-      mockMarineLicenceApplication
-    )
-  })
-
-  test('sets request.site and returns h.continue for valid site', () => {
-    const request = createMockRequest()
-    const h = createMockH()
-
-    const result = setSiteDataPreHandler.method(request, h)
-
-    expect(request.site).toEqual({
-      siteIndex: 0,
-      siteNumber: 1,
-      queryParams: '',
-      siteDetails: mockMarineLicenceApplication.siteDetails[0]
-    })
-    expect(result).toBe(h.continue)
-  })
-
-  test('redirects to task list for an invalid site number', () => {
-    const request = createMockRequest({ query: { site: '99' } })
-    const mockTakeover = vi.fn()
-    const h = createMockH({
-      redirect: vi.fn().mockReturnValue({ takeover: mockTakeover })
-    })
-
-    setSiteDataPreHandler.method(request, h)
-
-    expect(h.redirect).toHaveBeenCalledWith(
-      marineLicenceRoutes.MARINE_LICENCE_TASK_LIST
-    )
-    expect(mockTakeover).toHaveBeenCalled()
   })
 })

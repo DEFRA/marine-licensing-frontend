@@ -6,28 +6,6 @@ import {
   hasInvalidSiteNumber
 } from '#src/server/common/helpers/site-details/site-name.js'
 
-export const validateSiteAndActivityParams = {
-  method: (request, h) => {
-    const { site, activity } = request.query
-
-    if (!site || !activity) {
-      return h.redirect(marineLicenceRoutes.MARINE_LICENCE_TASK_LIST).takeover()
-    }
-
-    const siteIndex = Number.parseInt(site, 10) - 1
-    const activityIndex = Number.parseInt(activity, 10) - 1
-
-    const marineLicence = getMarineLicenceCache(request)
-    const siteDetails = marineLicence.siteDetails?.[siteIndex]
-
-    if (!siteDetails?.activityDetails?.[activityIndex]) {
-      return h.redirect(marineLicenceRoutes.MARINE_LICENCE_TASK_LIST).takeover()
-    }
-
-    return h.continue
-  }
-}
-
 export const setSiteData = (request) => {
   const marineLicence = getMarineLicenceCache(request)
   const { siteIndex, siteNumber } = getSiteDataFromParam(request.query)
@@ -44,12 +22,26 @@ export const setSiteData = (request) => {
   }
 }
 
-export const setSiteDataPreHandler = {
+export const validateSiteAndActivityParams = {
   method: (request, h) => {
-    request.site = setSiteData(request)
+    const siteData = setSiteData(request)
 
-    if (!request.site?.siteNumber) {
+    if (!siteData) {
       return h.redirect(marineLicenceRoutes.MARINE_LICENCE_TASK_LIST).takeover()
+    }
+
+    request.site = siteData
+
+    const { activity } = request.query
+
+    if (activity !== undefined) {
+      const activityIndex = Number.parseInt(activity, 10) - 1
+
+      if (!siteData.siteDetails?.activityDetails?.[activityIndex]) {
+        return h
+          .redirect(marineLicenceRoutes.MARINE_LICENCE_TASK_LIST)
+          .takeover()
+      }
     }
 
     return h.continue

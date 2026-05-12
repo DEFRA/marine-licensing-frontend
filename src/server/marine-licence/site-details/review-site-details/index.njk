@@ -81,9 +81,13 @@
           {% set hasCoordinates = false %}
           {% for coordinate in site.polygonCoordinates %}
             {% set hasCoordinates = true %}
+            {% set rowClasses = "" if loop.last else "govuk-summary-list__row--no-border" %}
             {% set _ = summaryRows.push({
+              classes: rowClasses,
               key: { text: coordinate.label },
-              value: { text: coordinate.value }
+              value: { 
+                text: coordinate.value                
+              }
             }) %}
           {% endfor %}
           {% if not hasCoordinates %}

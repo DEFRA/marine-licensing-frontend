@@ -16,26 +16,28 @@ import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
 vi.mock('#src/server/common/helpers/marine-licence/session-cache/utils.js')
 vi.mock('#src/server/common/helpers/marine-licence/save-site-details.js')
 
-const mockApplicationWithWidth = {
-  ...mockMarineLicenceApplication,
-  siteDetails: [
-    {
-      ...mockMarineLicenceApplication.siteDetails[0],
-      circleWidth: '500'
-    }
-  ]
-}
-
 describe('#widthOfSite (marine licence)', () => {
   beforeEach(() => {
-    vi.mocked(getMarineLicenceCache).mockReturnValue(mockApplicationWithWidth)
+    vi.mocked(getMarineLicenceCache).mockReturnValue(
+      mockMarineLicenceApplication
+    )
   })
 
   describe('#widthOfSiteController', () => {
     test('handler should render with correct context with pre-populated width', () => {
       const h = { view: vi.fn() }
 
-      widthOfSiteController.handler(createMockRequest(), h)
+      widthOfSiteController.handler(
+        createMockRequest({
+          site: {
+            siteIndex: 0,
+            siteNumber: 1,
+            queryParams: '',
+            siteDetails: { circleWidth: '500' }
+          }
+        }),
+        h
+      )
 
       expect(h.view).toHaveBeenCalledWith(WIDTH_OF_SITE_VIEW_ROUTE, {
         pageTitle: 'Enter the width of the circular site in metres',
@@ -43,7 +45,7 @@ describe('#widthOfSite (marine licence)', () => {
         backLink: marineLicenceRoutes.MARINE_LICENCE_CIRCLE_CENTRE_POINT,
         cancelLink: `${marineLicenceRoutes.MARINE_LICENCE_TASK_LIST}?cancel=site-details`,
         projectName: 'Test Project',
-        siteNumber: null,
+        siteNumber: 1,
         action: undefined,
         payload: { width: '500' }
       })
@@ -51,12 +53,21 @@ describe('#widthOfSite (marine licence)', () => {
 
     test('handler should render with payload.width undefined when no circleWidth in cache', () => {
       vi.mocked(getMarineLicenceCache).mockReturnValueOnce({
-        projectName: mockMarineLicenceApplication.projectName,
-        siteDetails: []
+        projectName: mockMarineLicenceApplication.projectName
       })
       const h = { view: vi.fn() }
 
-      widthOfSiteController.handler(createMockRequest(), h)
+      widthOfSiteController.handler(
+        createMockRequest({
+          site: {
+            siteIndex: 0,
+            siteNumber: 1,
+            queryParams: '',
+            siteDetails: {}
+          }
+        }),
+        h
+      )
 
       expect(h.view).toHaveBeenCalledWith(WIDTH_OF_SITE_VIEW_ROUTE, {
         pageTitle: 'Enter the width of the circular site in metres',
@@ -64,7 +75,7 @@ describe('#widthOfSite (marine licence)', () => {
         backLink: marineLicenceRoutes.MARINE_LICENCE_CIRCLE_CENTRE_POINT,
         cancelLink: `${marineLicenceRoutes.MARINE_LICENCE_TASK_LIST}?cancel=site-details`,
         projectName: 'Test Project',
-        siteNumber: null,
+        siteNumber: 1,
         action: undefined,
         payload: { width: undefined }
       })
@@ -75,7 +86,8 @@ describe('#widthOfSite (marine licence)', () => {
     test('should call updateMarineLicenceSiteDetails with trimmed width and redirect to same page', async () => {
       const h = { redirect: vi.fn() }
       const request = createMockRequest({
-        payload: { width: ' 500 ' }
+        payload: { width: ' 500 ' },
+        site: { siteIndex: 0, siteNumber: 1, queryParams: '', siteDetails: {} }
       })
 
       await widthOfSiteSubmitController.handler(request, h)

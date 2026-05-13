@@ -1,35 +1,30 @@
-import { validateCoordinates } from '#src/server/exemption/site-details/enter-multiple-coordinates/validation/validation.js'
+import { validateCoordinates } from '#src/server/common/validation/multiple-coordinates/validate.js'
 import { COORDINATE_SYSTEMS } from '#src/server/common/constants/coordinate-systems.js'
-import wgs84TestCases from './validation-error-cases-wgs84.json'
-import osgb36TestCases from './validation-error-cases-osgb36.json'
-import successTestCases from './validation-success-cases-wgs84.json'
-import osgb36SuccessTestCases from './validation-success-cases-osgb36.json'
+import wgs84ErrorCases from './validation-error-cases-wgs84.json'
+import osgb36ErrorCases from './validation-error-cases-osgb36.json'
+import wgs84SuccessCases from './validation-success-cases-wgs84.json'
+import osgb36SuccessCases from './validation-success-cases-osgb36.json'
 
 describe('Validate multiple coordinates', () => {
   describe('WGS84 coordinate system', () => {
-    test.each(successTestCases)('$description', ({ coordinates }) => {
-      const exemptionId = 'test-id'
-
+    test.each(wgs84SuccessCases)('$description', ({ coordinates }) => {
       const result = validateCoordinates(
         coordinates,
-        exemptionId,
+        'test-id',
         COORDINATE_SYSTEMS.WGS84
       )
       expect(result.error).toBeUndefined()
     })
 
     describe('error cases', () => {
-      test.each(wgs84TestCases)(
+      test.each(wgs84ErrorCases)(
         '$expectedError',
         ({ coordinates, expectedError }) => {
-          const exemptionId = 'test-id'
-
           const result = validateCoordinates(
             coordinates,
-            exemptionId,
+            'test-id',
             COORDINATE_SYSTEMS.WGS84
           )
-
           expect(result.error).toBeDefined()
           expect(result.error.message).toContain(expectedError)
         }
@@ -38,29 +33,24 @@ describe('Validate multiple coordinates', () => {
   })
 
   describe('OSGB36 coordinate system', () => {
-    test.each(osgb36SuccessTestCases)('$description', ({ coordinates }) => {
-      const exemptionId = 'test-id'
-
+    test.each(osgb36SuccessCases)('$description', ({ coordinates }) => {
       const result = validateCoordinates(
         coordinates,
-        exemptionId,
+        'test-id',
         COORDINATE_SYSTEMS.OSGB36
       )
       expect(result.error).toBeUndefined()
     })
 
     describe('error cases', () => {
-      test.each(osgb36TestCases)(
+      test.each(osgb36ErrorCases)(
         '$expectedError',
         ({ coordinates, expectedError }) => {
-          const exemptionId = 'test-id'
-
           const result = validateCoordinates(
             coordinates,
-            exemptionId,
+            'test-id',
             COORDINATE_SYSTEMS.OSGB36
           )
-
           expect(result.error).toBeDefined()
           expect(result.error.message).toContain(expectedError)
         }

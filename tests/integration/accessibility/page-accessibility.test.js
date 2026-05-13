@@ -270,6 +270,12 @@ describe('Page accessibility checks (Axe)', () => {
       isMarineLicence: true
     },
     {
+      url: marineLicenceRoutes.MARINE_LICENCE_ENTER_MULTIPLE_COORDINATES,
+      title:
+        'Enter multiple sets of coordinates to mark the boundary of the site',
+      isMarineLicence: true
+    },
+    {
       url: marineLicenceRoutes.MARINE_LICENCE_CHECK_YOUR_ANSWERS,
       title: 'Check your answers before sending your information',
       isMarineLicence: true

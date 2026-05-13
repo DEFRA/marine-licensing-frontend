@@ -2,7 +2,8 @@ import { describe, test, expect, vi, beforeEach } from 'vitest'
 import {
   saveSiteDetailsToBackend,
   prepareFileUploadDataForSave,
-  prepareManualCoordinateDataForSave
+  prepareManualCoordinateDataForSave,
+  prepareSiteData
 } from './save-site-details.js'
 import { authenticatedPatchRequest } from '../authenticated-requests.js'
 import {
@@ -238,6 +239,85 @@ describe('save-site-details', () => {
     })
   })
 
+  describe('prepareSiteData', () => {
+    test('should return all file-upload sites with apiData equal to cacheData', () => {
+      const { siteDetails } = mockMarineLicenceApplication
+      const { cacheData, apiData } = prepareSiteData(
+        siteDetails,
+        'file',
+        false,
+        undefined,
+        mockRequest
+      )
+
+      expect(cacheData).toHaveLength(1)
+      expect(cacheData[0].coordinatesType).toBe('file')
+      expect(apiData).toBe(cacheData)
+    })
+
+    test('should filter to the specified siteIndex for file-upload type', () => {
+      const site = mockMarineLicenceApplication.siteDetails[0]
+      const siteDetails = [site, { ...site, siteName: 'second site' }]
+
+      const { cacheData } = prepareSiteData(
+        siteDetails,
+        'file',
+        true,
+        1,
+        mockRequest
+      )
+
+      expect(cacheData).toHaveLength(1)
+      expect(cacheData[0].siteName).toBe('second site')
+    })
+
+    test('should return manual coordinate sites with apiData run through transformCoordinatesForApi', () => {
+      const { siteDetails } = mockManualCoordinatesMarineLicence
+      const { cacheData, apiData } = prepareSiteData(
+        siteDetails,
+        'coordinates',
+        false,
+        undefined,
+        mockRequest
+      )
+
+      expect(cacheData).toHaveLength(1)
+      expect(cacheData[0].coordinatesType).toBe('coordinates')
+      expect(apiData).toHaveLength(1)
+    })
+
+    test('should transform OSGB36 eastings/northings in apiData but preserve them in cacheData', () => {
+      const siteDetails = [
+        {
+          coordinatesType: 'coordinates',
+          coordinatesEntry: 'single',
+          coordinateSystem: 'osgb36',
+          coordinates: { eastings: '532000', northings: '182000' },
+          circleWidth: '50',
+          siteName: 'OSGB36 site',
+          activityDetails: null
+        }
+      ]
+
+      const { cacheData, apiData } = prepareSiteData(
+        siteDetails,
+        'coordinates',
+        false,
+        undefined,
+        mockRequest
+      )
+
+      expect(cacheData[0].coordinates).toEqual({
+        eastings: '532000',
+        northings: '182000'
+      })
+      expect(apiData[0].coordinates).toEqual({
+        easting: '532000',
+        northing: '182000'
+      })
+    })
+  })
+
   describe('saveSiteDetailsToBackend', () => {
     test('should save site details successfully with single site option', async () => {
       vi.mocked(authenticatedPatchRequest).mockResolvedValue({
@@ -348,6 +428,48 @@ describe('save-site-details', () => {
           isSingleSite: false
         },
         'Successfully saved site details to backend'
+      )
+    })
+
+    test('should transform OSGB36 eastings/northings to easting/northing in API payload while retaining plural names in cache', async () => {
+      const osgb36MarineLicence = {
+        ...mockManualCoordinatesMarineLicence,
+        siteDetails: [
+          {
+            coordinatesType: 'coordinates',
+            coordinatesEntry: 'single',
+            coordinates: { eastings: '532000', northings: '182000' },
+            circleWidth: '50'
+          }
+        ]
+      }
+      vi.mocked(getMarineLicenceCache).mockReturnValue(osgb36MarineLicence)
+      vi.mocked(authenticatedPatchRequest).mockResolvedValue({
+        payload: { success: true }
+      })
+
+      await saveSiteDetailsToBackend(mockRequest, mockH, { siteIndex: 0 })
+
+      expect(authenticatedPatchRequest).toHaveBeenCalledWith(
+        mockRequest,
+        apiRoutes.UPDATE_MARINE_LICENCE_SITE,
+        expect.objectContaining({
+          siteDetails: expect.objectContaining({
+            coordinates: { easting: '532000', northing: '182000' }
+          })
+        })
+      )
+
+      expect(vi.mocked(setMarineLicenceCache)).toHaveBeenCalledWith(
+        mockRequest,
+        mockH,
+        expect.objectContaining({
+          siteDetails: expect.arrayContaining([
+            expect.objectContaining({
+              coordinates: { eastings: '532000', northings: '182000' }
+            })
+          ])
+        })
       )
     })
 

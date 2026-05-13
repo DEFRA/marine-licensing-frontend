@@ -199,9 +199,9 @@ describe('#createOsgb36MultipleCoordinatesSchema', () => {
     const schema = createOsgb36MultipleCoordinatesSchema()
     const request = {
       coordinates: [
-        { eastings: '425053', northings: '564180' },
-        { eastings: '425054', northings: '564181' },
-        { eastings: '425055', northings: '564182' }
+        { easting: '425053', northing: '564180' },
+        { easting: '425054', northing: '564181' },
+        { easting: '425055', northing: '564182' }
       ]
     }
 
@@ -227,8 +227,8 @@ describe('#createOsgb36MultipleCoordinatesSchema', () => {
     const schema = createOsgb36MultipleCoordinatesSchema()
     const request = {
       coordinates: [
-        { eastings: '425053', northings: '564180' },
-        { eastings: '425054', northings: '564181' }
+        { easting: '425053', northing: '564180' },
+        { easting: '425054', northing: '564181' }
       ]
     }
 
@@ -252,25 +252,25 @@ describe('#createOsgb36MultipleCoordinatesSchema', () => {
     const schema = createOsgb36MultipleCoordinatesSchema()
     const request = {
       coordinates: [
-        { eastings: '10000', northings: '10000' },
-        { eastings: '425054', northings: '564181' },
-        { eastings: '425055', northings: '564182' }
+        { easting: '10000', northing: '10000' },
+        { easting: '425054', northing: '564181' },
+        { easting: '425055', northing: '564182' }
       ]
     }
 
     const result = schema.validate(request, { abortEarly: false })
 
-    expect(result.error.message).toContain('Eastings must be 6 digits')
-    expect(result.error.message).toContain('Northings must be 6 or 7 digits')
+    expect(result.error.message).toContain('Easting must be 6 digits')
+    expect(result.error.message).toContain('Northing must be 6 or 7 digits')
   })
 
   test('Should correctly validate with additional unknown fields', () => {
     const schema = createOsgb36MultipleCoordinatesSchema()
     const request = {
       coordinates: [
-        { eastings: '425053', northings: '564180' },
-        { eastings: '425054', northings: '564181' },
-        { eastings: '425055', northings: '564182' }
+        { easting: '425053', northing: '564180' },
+        { easting: '425054', northing: '564181' },
+        { easting: '425055', northing: '564182' }
       ],
       additionalField: 'should be ignored'
     }
@@ -283,65 +283,65 @@ describe('#createOsgb36MultipleCoordinatesSchema', () => {
 
 describe('#createOsgb36CoordinateSchema', () => {
   test('Should default to simple messageType when not specified', () => {
-    const schema = createOsgb36CoordinateSchema('eastings')
+    const schema = createOsgb36CoordinateSchema('easting')
     const result = schema.validate('')
 
     expect(result.error).toBeDefined()
-    expect(result.error.message).toContain('Enter the eastings')
+    expect(result.error.message).toContain('Enter the easting')
   })
 
   describe('Error message specification verification', () => {
     test('Should show correct error for blank eastings field with withPoint messageType', () => {
       const schema = createOsgb36CoordinateSchema(
-        'eastings',
+        'easting',
         'withPoint',
         'point 2'
       )
       const result = schema.validate('')
 
       expect(result.error).toBeDefined()
-      expect(result.error.message).toBe('Enter the eastings of point 2')
+      expect(result.error.message).toBe('Enter the easting of point 2')
     })
 
     test('Should show correct error for blank northings field with withPoint messageType', () => {
       const schema = createOsgb36CoordinateSchema(
-        'northings',
+        'northing',
         'withPoint',
         'point 3'
       )
       const result = schema.validate('')
 
       expect(result.error).toBeDefined()
-      expect(result.error.message).toBe('Enter the northings of point 3')
+      expect(result.error.message).toBe('Enter the northing of point 3')
     })
 
     test('Should show correct error for non-numeric eastings with withPoint messageType', () => {
       const schema = createOsgb36CoordinateSchema(
-        'eastings',
+        'easting',
         'withPoint',
         'point 2'
       )
       const result = schema.validate('abc123')
 
       expect(result.error).toBeDefined()
-      expect(result.error.message).toBe('Eastings of point 2 must be a number')
+      expect(result.error.message).toBe('Easting of point 2 must be a number')
     })
 
     test('Should show correct error for non-numeric northings with withPoint messageType', () => {
       const schema = createOsgb36CoordinateSchema(
-        'northings',
+        'northing',
         'withPoint',
         'point 3'
       )
       const result = schema.validate('xyz789')
 
       expect(result.error).toBeDefined()
-      expect(result.error.message).toBe('Northings of point 3 must be a number')
+      expect(result.error.message).toBe('Northing of point 3 must be a number')
     })
 
     test('Should show correct error for negative eastings with withPoint messageType', () => {
       const schema = createOsgb36CoordinateSchema(
-        'eastings',
+        'easting',
         'withPoint',
         'point 2'
       )
@@ -349,13 +349,13 @@ describe('#createOsgb36CoordinateSchema', () => {
 
       expect(result.error).toBeDefined()
       expect(result.error.message).toBe(
-        'Eastings of point 2 must be a positive 6-digit number, like 123456'
+        'Easting of point 2 must be a positive 6-digit number, like 123456'
       )
     })
 
     test('Should show correct error for negative northings with withPoint messageType', () => {
       const schema = createOsgb36CoordinateSchema(
-        'northings',
+        'northing',
         'withPoint',
         'point 3'
       )
@@ -363,25 +363,25 @@ describe('#createOsgb36CoordinateSchema', () => {
 
       expect(result.error).toBeDefined()
       expect(result.error.message).toBe(
-        'Northings of point 3 must be a positive 6 or 7-digit number, like 123456'
+        'Northing of point 3 must be a positive 6 or 7-digit number, like 123456'
       )
     })
 
     test('Should show correct error for eastings not exactly 6 digits with withPoint messageType', () => {
       const schema = createOsgb36CoordinateSchema(
-        'eastings',
+        'easting',
         'withPoint',
         'point 2'
       )
       const result = schema.validate('12345') // 5 digits
 
       expect(result.error).toBeDefined()
-      expect(result.error.message).toBe('Eastings of point 2 must be 6 digits')
+      expect(result.error.message).toBe('Easting of point 2 must be 6 digits')
     })
 
     test('Should show correct error for northings not 6 or 7 digits with withPoint messageType', () => {
       const schema = createOsgb36CoordinateSchema(
-        'northings',
+        'northing',
         'withPoint',
         'point 3'
       )
@@ -389,25 +389,25 @@ describe('#createOsgb36CoordinateSchema', () => {
 
       expect(result.error).toBeDefined()
       expect(result.error.message).toBe(
-        'Northings of point 3 must be 6 or 7 digits'
+        'Northing of point 3 must be 6 or 7 digits'
       )
     })
 
     test('Should show correct error for eastings with too many digits', () => {
       const schema = createOsgb36CoordinateSchema(
-        'eastings',
+        'easting',
         'withPoint',
         'point 2'
       )
       const result = schema.validate('1234567') // 7 digits
 
       expect(result.error).toBeDefined()
-      expect(result.error.message).toBe('Eastings of point 2 must be 6 digits')
+      expect(result.error.message).toBe('Easting of point 2 must be 6 digits')
     })
 
     test('Should show correct error for northings with too many digits', () => {
       const schema = createOsgb36CoordinateSchema(
-        'northings',
+        'northing',
         'withPoint',
         'point 3'
       )
@@ -415,7 +415,7 @@ describe('#createOsgb36CoordinateSchema', () => {
 
       expect(result.error).toBeDefined()
       expect(result.error.message).toBe(
-        'Northings of point 3 must be 6 or 7 digits'
+        'Northing of point 3 must be 6 or 7 digits'
       )
     })
   })

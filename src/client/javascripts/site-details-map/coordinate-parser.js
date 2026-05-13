@@ -20,8 +20,8 @@ class CoordinateParser {
 
     if (isOSGB36 && this.hasOSGB36Coordinates(coordinates)) {
       return this.convertOSGB36ToWebMercator(
-        Number.parseFloat(coordinates.eastings),
-        Number.parseFloat(coordinates.northings),
+        Number.parseFloat(coordinates.easting),
+        Number.parseFloat(coordinates.northing),
         fromLonLatFunction
       )
     }
@@ -67,7 +67,7 @@ class CoordinateParser {
     return coordinates.latitude && coordinates.longitude
   }
   hasOSGB36Coordinates(coordinates) {
-    return coordinates.eastings && coordinates.northings
+    return coordinates.easting && coordinates.northing
   }
   convertFromLonLat(coordinates, fromLonLatFunction) {
     return fromLonLatFunction([

@@ -21,10 +21,10 @@ describe('site-details helper', () => {
       expect(COORDINATE_ERROR_MESSAGES[COORDINATE_SYSTEMS.OSGB36]).toBeDefined()
       expect(
         COORDINATE_ERROR_MESSAGES[COORDINATE_SYSTEMS.OSGB36].EASTINGS_REQUIRED
-      ).toBe('Enter the eastings')
+      ).toBe('Enter the easting')
       expect(
         COORDINATE_ERROR_MESSAGES[COORDINATE_SYSTEMS.OSGB36].NORTHINGS_REQUIRED
-      ).toBe('Enter the northings')
+      ).toBe('Enter the northing')
     })
   })
 
@@ -41,10 +41,10 @@ describe('site-details helper', () => {
 
     test('should generate correct message for point 3 (index 2)', () => {
       const result = generatePointSpecificErrorMessage(
-        'Eastings must be 6 digits',
+        'Easting must be 6 digits',
         2
       )
-      expect(result).toBe('Eastings of point 3 must be 6 digits')
+      expect(result).toBe('Easting of point 3 must be 6 digits')
     })
 
     test('should return original message if no mapping found', () => {

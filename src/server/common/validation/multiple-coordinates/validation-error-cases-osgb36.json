@@ -1,0 +1,66 @@
+[
+  {
+    "expectedError": "Easting must be a number",
+    "coordinates": [
+      { "easting": "abc123", "northing": "654321" },
+      { "easting": "234567", "northing": "765432" },
+      { "easting": "345678", "northing": "876543" }
+    ]
+  },
+  {
+    "expectedError": "Northing must be a number",
+    "coordinates": [
+      { "easting": "123456", "northing": "654321" },
+      { "easting": "234567", "northing": "765432" },
+      { "easting": "345678", "northing": "def789" }
+    ]
+  },
+  {
+    "expectedError": "Easting must be a positive 6-digit number, like 123456",
+    "coordinates": [
+      { "easting": "123456", "northing": "654321" },
+      { "easting": "-654321", "northing": "765432" },
+      { "easting": "345678", "northing": "876543" }
+    ]
+  },
+  {
+    "expectedError": "Northing must be a positive 6 or 7-digit number, like 123456",
+    "coordinates": [
+      { "easting": "123456", "northing": "654321" },
+      { "easting": "234567", "northing": "765432" },
+      { "easting": "345678", "northing": "-1234567" }
+    ]
+  },
+  {
+    "expectedError": "Easting must be 6 digits",
+    "coordinates": [
+      { "easting": "12345", "northing": "654321" },
+      { "easting": "234567", "northing": "765432" },
+      { "easting": "345678", "northing": "876543" }
+    ]
+  },
+  {
+    "expectedError": "Northing must be 6 or 7 digits",
+    "coordinates": [
+      { "easting": "123456", "northing": "654321" },
+      { "easting": "234567", "northing": "123" },
+      { "easting": "345678", "northing": "876543" }
+    ]
+  },
+  {
+    "expectedError": "Easting must be 6 digits",
+    "coordinates": [
+      { "easting": "123456", "northing": "654321" },
+      { "easting": "12345678", "northing": "765432" },
+      { "easting": "345678", "northing": "876543" }
+    ]
+  },
+  {
+    "expectedError": "Northing must be 6 or 7 digits",
+    "coordinates": [
+      { "easting": "123456", "northing": "12345678" },
+      { "easting": "234567", "northing": "765432" },
+      { "easting": "345678", "northing": "876543" }
+    ]
+  }
+]

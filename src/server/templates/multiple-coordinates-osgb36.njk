@@ -1,0 +1,15 @@
+{% extends "layouts/multiple-coordinates-template.njk" %}
+
+{% set fieldNames = "easting,northing" %}
+{% set firstCoordinate = "easting" %}
+{% set secondCoordinate = "northing" %}
+
+{% set detailsSummary = "Help with eastings and northings formats" %}
+
+{% set detailsHTML %}
+  {% include "partials/coordinate-entry/osgb36-hint-details.njk" %}
+{% endset %}
+
+{% set introText %}
+  {% include "partials/coordinate-entry/osgb36-intro.njk" %}
+{% endset %}

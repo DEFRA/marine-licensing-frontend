@@ -412,13 +412,15 @@ describe('#outcomeController — terminal-multi', () => {
             id: 'WO_DOWNLOAD_HA_AGREED_METHOD_TEMPLATE',
             heading: otDownload.heading,
             text: '<p>download body</p>',
-            ctaLabel: 'Download'
+            ctaLabel: 'Download',
+            hasContinue: true
           },
           {
             id: 'WO_STANDARD_TRACK_MLA',
             heading: otStandardMla.heading,
             text: '<p>standard MLA body</p>',
-            ctaLabel: 'Continue'
+            ctaLabel: 'Continue',
+            hasContinue: true
           }
         ],
         backLink: '/journey/self-service/back-here'

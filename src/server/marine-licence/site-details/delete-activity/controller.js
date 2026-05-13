@@ -59,7 +59,7 @@ export const deleteActivitySubmitController = {
     try {
       await authenticatedPatchRequest(
         request,
-        apiRoutes.REMOVE_ACTIVITY_FROM_SITE,
+        apiRoutes.DELETE_ACTIVITY_FROM_SITE,
         {
           id: marineLicence.id,
           siteIndex: parsedSiteIndex,

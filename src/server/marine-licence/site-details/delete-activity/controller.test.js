@@ -78,7 +78,7 @@ describe('deleteActivityController', () => {
 
       expect(
         vi.mocked(authenticatedRequests.authenticatedPatchRequest)
-      ).toHaveBeenCalledWith(request, apiRoutes.REMOVE_ACTIVITY_FROM_SITE, {
+      ).toHaveBeenCalledWith(request, apiRoutes.DELETE_ACTIVITY_FROM_SITE, {
         id: mockMarineLicenceApplication.id,
         siteIndex: 0,
         activityIndex: 0

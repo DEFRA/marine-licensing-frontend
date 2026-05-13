@@ -145,5 +145,5 @@ export const apiRoutes = {
   UPDATE_MARINE_LICENCE_SITE: '/marine-licence/site',
   UPDATE_MARINE_LICENCE_SITE_DETAILS: '/marine-licence/site-details',
   MARINE_LICENCE_PROJECT_BACKGROUND: '/marine-licence/project-background',
-  REMOVE_ACTIVITY_FROM_SITE: '/marine-licence/remove-activity-details'
+  DELETE_ACTIVITY_FROM_SITE: '/marine-licence/delete-activity-details'
 }

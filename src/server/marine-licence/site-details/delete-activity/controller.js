@@ -72,9 +72,11 @@ export const deleteActivitySubmitController = {
       request.logger.error(
         {
           err: error,
-          siteIndex: parsedSiteIndex,
-          activityIndex: parsedActivityIndex,
-          marineLicenceId: marineLicence.id
+          event: {
+            action: 'marine-licence:delete-activity-failed',
+            reference: marineLicence.id,
+            reason: `siteIndex=${parsedSiteIndex} activityIndex=${parsedActivityIndex}`
+          }
         },
         'Error deleting activity'
       )

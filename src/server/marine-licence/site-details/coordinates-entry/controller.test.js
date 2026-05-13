@@ -18,17 +18,26 @@ const cancelLink = `${marineLicenceRoutes.MARINE_LICENCE_TASK_LIST}?cancel=site-
 
 describe('#coordinatesEntry (marine licence)', () => {
   beforeEach(() => {
-    vi.mocked(getMarineLicenceCache).mockReturnValue({
-      ...mockMarineLicenceApplication,
-      siteDetails: [{ coordinatesEntry: 'single' }]
-    })
+    vi.mocked(getMarineLicenceCache).mockReturnValue(
+      mockMarineLicenceApplication
+    )
   })
 
   describe('#coordinatesEntryController', () => {
     test('handler should render with correct context', () => {
       const h = { view: vi.fn() }
 
-      coordinatesEntryController.handler(createMockRequest(), h)
+      coordinatesEntryController.handler(
+        createMockRequest({
+          site: {
+            siteIndex: 0,
+            siteNumber: 1,
+            queryParams: '',
+            siteDetails: { coordinatesEntry: 'single' }
+          }
+        }),
+        h
+      )
 
       expect(h.view).toHaveBeenCalledWith(
         MARINE_LICENCE_COORDINATES_ENTRY_VIEW_ROUTE,
@@ -38,7 +47,7 @@ describe('#coordinatesEntry (marine licence)', () => {
           backLink: marineLicenceRoutes.MARINE_LICENCE_SITE_NAME,
           cancelLink,
           projectName: 'Test Project',
-          siteNumber: null,
+          siteNumber: 1,
           action: undefined,
           payload: {
             coordinatesEntry: 'single'
@@ -49,13 +58,22 @@ describe('#coordinatesEntry (marine licence)', () => {
 
     test('handler should render with correct context when no existing cache data', () => {
       vi.mocked(getMarineLicenceCache).mockReturnValueOnce({
-        projectName: mockMarineLicenceApplication.projectName,
-        siteDetails: []
+        projectName: mockMarineLicenceApplication.projectName
       })
 
       const h = { view: vi.fn() }
 
-      coordinatesEntryController.handler(createMockRequest(), h)
+      coordinatesEntryController.handler(
+        createMockRequest({
+          site: {
+            siteIndex: 0,
+            siteNumber: 1,
+            queryParams: '',
+            siteDetails: {}
+          }
+        }),
+        h
+      )
 
       expect(h.view).toHaveBeenCalledWith(
         MARINE_LICENCE_COORDINATES_ENTRY_VIEW_ROUTE,
@@ -65,7 +83,7 @@ describe('#coordinatesEntry (marine licence)', () => {
           backLink: marineLicenceRoutes.MARINE_LICENCE_SITE_NAME,
           cancelLink,
           projectName: 'Test Project',
-          siteNumber: null,
+          siteNumber: 1,
           action: undefined,
           payload: {
             coordinatesEntry: undefined
@@ -111,7 +129,7 @@ describe('#coordinatesEntry (marine licence)', () => {
           backLink: marineLicenceRoutes.MARINE_LICENCE_SITE_NAME,
           cancelLink,
           projectName: 'Test Project',
-          siteNumber: null,
+          siteNumber: 1,
           action: undefined,
           payload: { coordinatesEntry: 'invalid' },
           errorSummary: [
@@ -159,7 +177,7 @@ describe('#coordinatesEntry (marine licence)', () => {
           backLink: marineLicenceRoutes.MARINE_LICENCE_SITE_NAME,
           cancelLink,
           projectName: 'Test Project',
-          siteNumber: null,
+          siteNumber: 1,
           action: undefined,
           payload: { coordinatesEntry: 'invalid' }
         }
@@ -172,7 +190,8 @@ describe('#coordinatesEntry (marine licence)', () => {
       const h = { redirect: vi.fn() }
 
       const request = createMockRequest({
-        payload: { coordinatesEntry: 'single' }
+        payload: { coordinatesEntry: 'single' },
+        site: { siteIndex: 0, siteNumber: 1, queryParams: '', siteDetails: {} }
       })
 
       await coordinatesEntrySubmitController.handler(request, h)
@@ -189,7 +208,8 @@ describe('#coordinatesEntry (marine licence)', () => {
       }
 
       const request = createMockRequest({
-        payload: { coordinatesEntry: 'single' }
+        payload: { coordinatesEntry: 'single' },
+        site: { siteIndex: 0, siteNumber: 1, queryParams: '', siteDetails: {} }
       })
 
       await coordinatesEntrySubmitController.handler(request, h)

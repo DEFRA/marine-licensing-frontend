@@ -87,7 +87,7 @@ describe('siteDetails utils', () => {
     test('getCoordinateDisplayText correctly returns text for OSGB36', () => {
       expect(
         getCoordinateDisplayText(
-          { coordinates: { eastings: '425053', northings: '564180' } },
+          { coordinates: { easting: '425053', northing: '564180' } },
           COORDINATE_SYSTEMS.OSGB36
         )
       ).toBe(`425053, 564180`)
@@ -128,8 +128,8 @@ describe('siteDetails utils', () => {
     test('getPolygonCoordinatesDisplayData correctly formats valid OSGB36 coordinates', () => {
       const siteDetails = {
         coordinates: [
-          { eastings: '425053', northings: '564180' },
-          { eastings: '425063', northings: '564190' }
+          { easting: '425053', northing: '564180' },
+          { easting: '425063', northing: '564190' }
         ]
       }
       const coordinateSystem = COORDINATE_SYSTEMS.OSGB36
@@ -195,10 +195,10 @@ describe('siteDetails utils', () => {
     test('getPolygonCoordinatesDisplayData filters out incomplete coordinates for OSGB36', () => {
       const siteDetails = {
         coordinates: [
-          { eastings: '425053', northings: '564180' },
-          { eastings: '425063' }, // Missing northings
-          { northings: '564190' }, // Missing eastings
-          { eastings: '425073', northings: '564200' }
+          { easting: '425053', northing: '564180' },
+          { easting: '425063' }, // Missing northing
+          { northing: '564190' }, // Missing easting
+          { easting: '425073', northing: '564200' }
         ]
       }
       const coordinateSystem = COORDINATE_SYSTEMS.OSGB36
@@ -378,8 +378,8 @@ describe('siteDetails utils', () => {
           coordinatesEntry: 'single',
           coordinatesType: 'coordinates',
           coordinates: {
-            eastings: '425053',
-            northings: '564180'
+            easting: '425053',
+            northing: '564180'
           },
           circleWidth: '200',
           activityDates: {

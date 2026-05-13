@@ -78,7 +78,9 @@ export const marineLicenceRoutes = {
     '/marine-licence/enter-the-coordinates-at-the-centre-point',
   MARINE_LICENCE_WORKING_HOURS: '/marine-licence/working-hours',
   MARINE_LICENCE_WIDTH_OF_SITE: '/marine-licence/width-of-site',
-  MARINE_LICENCE_DELETE_ACTIVITY: '/marine-licence/delete-activity'
+  MARINE_LICENCE_DELETE_ACTIVITY: '/marine-licence/delete-activity',
+  MARINE_LICENCE_ENTER_MULTIPLE_COORDINATES:
+    '/marine-licence/enter-multiple-coordinates'
 }
 
 export const defraIdGuidanceRoutes = {

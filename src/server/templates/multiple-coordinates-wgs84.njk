@@ -1,0 +1,16 @@
+{% extends "layouts/multiple-coordinates-template.njk" %}
+
+{% set fieldNames = "latitude,longitude" %}
+{% set firstCoordinate = "latitude" %}
+{% set secondCoordinate = "longitude" %}
+
+
+{% set detailsSummary = "Help with latitude and longitude formats" %}
+
+{% set detailsHTML %}
+  {% include "partials/coordinate-entry/wgs84-hint-details.njk" %}
+{% endset %}
+
+{% set introText %}
+  {% include "partials/coordinate-entry/wgs84-intro.njk" %}
+{% endset %}

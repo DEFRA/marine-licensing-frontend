@@ -17,14 +17,14 @@ export {
   renderMultipleCoordinatesView
 } from '#src/server/common/helpers/site-details/enter-multiple-coordinates.js'
 
-import { routes } from '#src/server/common/constants/routes.js'
-import { getCancelLink } from '#src/server/exemption/site-details/utils/cancel-link.js'
+import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
+import { getCancelLink } from '#src/server/marine-licence/site-details/utils/cancel-link.js'
 
 export const multipleCoordinatesPageData = {
   heading:
     'Enter multiple sets of coordinates to mark the boundary of the site',
   pageTitle:
     'Enter multiple sets of coordinates to mark the boundary of the site',
-  backLink: routes.COORDINATE_SYSTEM_CHOICE,
+  backLink: marineLicenceRoutes.MARINE_LICENCE_COORDINATE_SYSTEM_CHOICE,
   cancelLink: getCancelLink()
 }

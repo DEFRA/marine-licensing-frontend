@@ -338,6 +338,50 @@ describe('save-site-details', () => {
       )
     })
 
+    test('should transform OSGB36 eastings/northings to easting/northing in API payload while retaining plural names in cache', async () => {
+      const osgb36Exemption = {
+        ...mockExemption,
+        siteDetails: [
+          {
+            coordinatesType: 'coordinates',
+            coordinatesEntry: 'single',
+            coordinates: { eastings: '532000', northings: '182000' },
+            circleWidth: '50'
+          }
+        ]
+      }
+      vi.mocked(getExemptionCache).mockReturnValue(osgb36Exemption)
+      vi.mocked(authenticatedPatchRequest).mockResolvedValue({
+        payload: { success: true }
+      })
+
+      await saveSiteDetailsToBackend(mockRequest, mockH)
+
+      expect(authenticatedPatchRequest).toHaveBeenCalledWith(
+        mockRequest,
+        '/exemption/site-details',
+        expect.objectContaining({
+          siteDetails: [
+            expect.objectContaining({
+              coordinates: { easting: '532000', northing: '182000' }
+            })
+          ]
+        })
+      )
+
+      expect(vi.mocked(setExemptionCache)).toHaveBeenCalledWith(
+        mockRequest,
+        mockH,
+        expect.objectContaining({
+          siteDetails: [
+            expect.objectContaining({
+              coordinates: { eastings: '532000', northings: '182000' }
+            })
+          ]
+        })
+      )
+    })
+
     test('should throw error when exemption ID is missing', async () => {
       vi.mocked(getExemptionCache).mockReturnValue({
         ...mockExemption,

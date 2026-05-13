@@ -73,6 +73,12 @@ describe('error-messages', () => {
         'The selected file must only contain sites drawn as polygons (shapes), not points or lines'
       )
     })
+
+    test('should have message for GEOMETRY_NESTING_TOO_DEEP', () => {
+      expect(GEO_PARSER_ERROR_MESSAGES.GEOMETRY_NESTING_TOO_DEEP).toBe(
+        'We couldn’t process this map file because its geometry is too complex. Please simplify the shape and upload again.'
+      )
+    })
   })
 
   describe('CDP_ERROR_MESSAGES', () => {

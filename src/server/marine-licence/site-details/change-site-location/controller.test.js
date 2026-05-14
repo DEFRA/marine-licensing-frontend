@@ -35,6 +35,7 @@ describe('changeSiteLocationController', () => {
         heading: 'Change site location',
         siteNumber: 1,
         siteIndex: 0,
+        siteName: 'test site name',
         projectName: mockMarineLicenceApplication.projectName,
         backLink: marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS,
         cancelLink: marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS

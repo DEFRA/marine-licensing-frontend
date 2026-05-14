@@ -277,6 +277,17 @@ describe('Page accessibility checks (Axe)', () => {
       isMarineLicence: true
     },
     {
+      url: marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS,
+      title: 'Review site details',
+      isMarineLicence: true
+    },
+    {
+      url: marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS,
+      title: 'Review site details',
+      isMarineLicence: true,
+      marineLicence: mockManualCoordinatesMarineLicence
+    },
+    {
       url: marineLicenceRoutes.MARINE_LICENCE_CHECK_YOUR_ANSWERS,
       title: 'Check your answers before sending your information',
       isMarineLicence: true

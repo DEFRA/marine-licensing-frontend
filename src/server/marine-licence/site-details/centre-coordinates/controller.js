@@ -2,6 +2,7 @@ import {
   getMarineLicenceCache,
   updateMarineLicenceSiteDetails
 } from '#src/server/common/helpers/marine-licence/session-cache/utils.js'
+import { getSiteDetailsBySite } from '#src/server/common/helpers/marine-licence/session-cache/site-details-utils.js'
 import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
 import { COORDINATE_SYSTEMS } from '#src/server/common/constants/coordinate-systems.js'
 import {
@@ -9,7 +10,8 @@ import {
   mapErrorsForDisplay
 } from '#src/server/common/helpers/errors.js'
 import { getCancelLink } from '#src/server/marine-licence/site-details/utils/cancel-link.js'
-import { setSiteDataPreHandler } from '#src/server/common/helpers/marine-licence/session-cache/site-utils.js'
+import { validateSiteParam } from '#src/server/common/helpers/marine-licence/session-cache/site-utils.js'
+import { getSiteDataFromParam } from '#src/server/common/helpers/site-details/site-name.js'
 import { getPayload } from '#src/server/common/helpers/site-details/centre-coordinates.js'
 import { validateCentreCoordinates } from '#src/server/common/validation/centre-coordinates/validate.js'
 import {
@@ -30,11 +32,12 @@ const getCoordinateSystem = (siteDetails) =>
 
 export const centreCoordinatesController = {
   options: {
-    pre: [setSiteDataPreHandler]
+    pre: [validateSiteParam]
   },
   handler(request, h) {
     const marineLicence = getMarineLicenceCache(request)
-    const { siteNumber, siteDetails } = request.site
+    const { siteIndex, siteNumber } = getSiteDataFromParam(request.query)
+    const siteDetails = getSiteDetailsBySite(marineLicence, siteIndex)
     const coordinateSystem = getCoordinateSystem(siteDetails)
     const action = request.query.action
 
@@ -53,7 +56,8 @@ export const centreCoordinatesController = {
 export const centreCoordinatesSubmitFailHandler = (request, h, error) => {
   const { payload } = request
   const marineLicence = getMarineLicenceCache(request)
-  const { siteNumber, siteDetails } = request.site
+  const { siteIndex, siteNumber } = getSiteDataFromParam(request.query)
+  const siteDetails = getSiteDetailsBySite(marineLicence, siteIndex)
   const coordinateSystem = getCoordinateSystem(siteDetails)
   const { projectName } = marineLicence
   const action = request.query.action
@@ -95,11 +99,13 @@ export const centreCoordinatesSubmitFailHandler = (request, h, error) => {
 
 export const centreCoordinatesSubmitController = {
   options: {
-    pre: [setSiteDataPreHandler]
+    pre: [validateSiteParam]
   },
   async handler(request, h) {
     const { payload } = request
-    const { siteIndex, siteDetails } = request.site
+    const marineLicence = getMarineLicenceCache(request)
+    const { siteIndex } = getSiteDataFromParam(request.query)
+    const siteDetails = getSiteDetailsBySite(marineLicence, siteIndex)
     const coordinateSystem = getCoordinateSystem(siteDetails)
 
     const { error, value } = validateCentreCoordinates(

@@ -61,15 +61,17 @@ export const reviewSiteDetailsController = {
         reviewSiteDetailsPageData,
         returnToCheckYourAnswers
       })
+    } else if (coordinatesType === 'coordinates') {
+      return renderManualEntryReview(h, {
+        marineLicence: completeMarineLicence,
+        siteDetails,
+        previousPage,
+        reviewSiteDetailsPageData,
+        returnToCheckYourAnswers
+      })
+    } else {
+      return h.redirect(marineLicenceRoutes.MARINE_LICENCE_TASK_LIST)
     }
-
-    return renderManualEntryReview(h, {
-      marineLicence: completeMarineLicence,
-      siteDetails,
-      previousPage,
-      reviewSiteDetailsPageData,
-      returnToCheckYourAnswers
-    })
   }
 }
 

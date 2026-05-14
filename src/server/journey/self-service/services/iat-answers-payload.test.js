@@ -10,12 +10,8 @@ vi.mock('#src/server/journey/self-service/services/session-answers.js', () => ({
   getAnswers: vi.fn()
 }))
 
-const {
-  getQuestion,
-  getOutcome,
-  getOutcomeType,
-  getOutcomeTypesForOutcome
-} = await import('#src/server/journey/self-service/services/journey-data.js')
+const { getQuestion, getOutcome, getOutcomeType, getOutcomeTypesForOutcome } =
+  await import('#src/server/journey/self-service/services/journey-data.js')
 const { getAnswers } =
   await import('#src/server/journey/self-service/services/session-answers.js')
 const { buildIatAnswersPayload } = await import('./iat-answers-payload.js')

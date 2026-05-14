@@ -55,7 +55,7 @@ export const mockMarineLicenceApplication = {
   projectType: MARINE_LICENCE_KEY,
   siteDetails: [
     {
-      activityDetails: [mockActivityDetails],
+      activityDetails: [mockActivityDetails, mockActivityDetails],
       coordinatesType: 'file',
       fileUploadType: 'kml',
       siteName: 'test site name',

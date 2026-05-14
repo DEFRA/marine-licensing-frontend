@@ -93,8 +93,9 @@
 
             {{ appMarineLicenceActivityDetailsCard({
               activityDetails: activityDetails,
-              siteNumber: site.siteNumber ,
-              index: loop.index
+              siteNumber: site.siteNumber,
+              index: loop.index,
+              deleteLink: activityDetails.deleteLink
             }) }}
 
           {% endfor %}

@@ -17,6 +17,7 @@ import { enterMultipleCoordinatesRoutes } from '#src/server/marine-licence/site-
 import { durationRoutes } from '#src/server/marine-licence/site-details/activity-duration/index.js'
 import { workingHoursRoutes } from '#src/server/marine-licence/site-details/working-hours/index.js'
 import { monthsOfActivityRoutes } from '#src/server/marine-licence/site-details/months-of-activity/index.js'
+import { deleteActivityRoutes } from '#src/server/marine-licence/site-details/delete-activity/index.js'
 
 export const siteDetailsRoutes = [
   ...centreCoordinatesRoutes,
@@ -37,5 +38,6 @@ export const siteDetailsRoutes = [
   ...uploadAndWaitRoutes,
   ...durationRoutes,
   ...workingHoursRoutes,
-  ...monthsOfActivityRoutes
+  ...monthsOfActivityRoutes,
+  ...deleteActivityRoutes
 ]

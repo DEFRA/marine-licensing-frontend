@@ -28,6 +28,26 @@ export const validateSiteAndActivityParams = {
   }
 }
 
+export const validateSiteParams = {
+  method: (request, h) => {
+    const { site } = request.query
+
+    if (!site) {
+      return h.redirect(marineLicenceRoutes.MARINE_LICENCE_TASK_LIST).takeover()
+    }
+
+    const siteIndex = Number.parseInt(site, 10) - 1
+
+    const marineLicence = getMarineLicenceCache(request)
+
+    if (!marineLicence.siteDetails?.[siteIndex]) {
+      return h.redirect(marineLicenceRoutes.MARINE_LICENCE_TASK_LIST).takeover()
+    }
+
+    return h.continue
+  }
+}
+
 export const setSiteData = (request) => {
   const marineLicence = getMarineLicenceCache(request)
   const { siteIndex, siteNumber } = getSiteDataFromParam(request.query)

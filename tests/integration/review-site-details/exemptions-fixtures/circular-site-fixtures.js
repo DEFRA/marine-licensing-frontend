@@ -82,7 +82,7 @@ export const testScenarios = [
           coordinatesType: 'coordinates',
           coordinatesEntry: 'single',
           coordinateSystem: 'osgb36',
-          coordinates: { eastings: '425053', northings: '564180' },
+          coordinates: { easting: '425053', northing: '564180' },
           circleWidth: '250'
         }
       ]
@@ -205,7 +205,7 @@ export const testScenarios = [
           coordinatesType: 'coordinates',
           coordinatesEntry: 'single',
           coordinateSystem: 'osgb36',
-          coordinates: { eastings: '425053', northings: '564180' },
+          coordinates: { easting: '425053', northing: '564180' },
           circleWidth: '300'
         }
       ]

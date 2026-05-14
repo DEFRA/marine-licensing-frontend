@@ -3,6 +3,7 @@ import {
   getMarineLicenceCache,
   setMarineLicenceCache
 } from '#src/server/common/helpers/marine-licence/session-cache/utils.js'
+import { transformCoordinatesForApi } from '#src/server/common/helpers/site-details/coordinate-transform.js'
 import { routes, apiRoutes } from '#src/server/common/constants/routes.js'
 import Boom from '@hapi/boom'
 
@@ -69,6 +70,30 @@ export const prepareManualCoordinateDataForSave = (siteDetails) => {
   return dataToSave
 }
 
+export const prepareSiteData = (
+  siteDetails,
+  coordinatesType,
+  isSingleSite,
+  siteIndex,
+  request
+) => {
+  const siteDetailsToUpdate = isSingleSite
+    ? siteDetails.filter((_, index) => index === siteIndex)
+    : siteDetails
+
+  const cacheData =
+    coordinatesType === 'file'
+      ? prepareFileUploadDataForSave(siteDetailsToUpdate, request)
+      : prepareManualCoordinateDataForSave(siteDetailsToUpdate)
+
+  const apiData =
+    coordinatesType === 'file'
+      ? cacheData
+      : transformCoordinatesForApi(cacheData)
+
+  return { cacheData, apiData }
+}
+
 export const saveSiteDetailsToBackend = async (
   request,
   h,
@@ -92,15 +117,13 @@ export const saveSiteDetailsToBackend = async (
   }
 
   const isSingleSite = siteIndex !== undefined
-
-  const siteDetailsToUpdate = isSingleSite
-    ? siteDetails.filter((_, index) => index === siteIndex)
-    : siteDetails
-
-  const dataToSave =
-    coordinatesType === 'file'
-      ? prepareFileUploadDataForSave(siteDetailsToUpdate, request)
-      : prepareManualCoordinateDataForSave(siteDetailsToUpdate)
+  const { cacheData, apiData } = prepareSiteData(
+    siteDetails,
+    coordinatesType,
+    isSingleSite,
+    siteIndex,
+    request
+  )
 
   try {
     if (isSingleSite) {
@@ -108,7 +131,7 @@ export const saveSiteDetailsToBackend = async (
         request,
         apiRoutes.UPDATE_MARINE_LICENCE_SITE,
         {
-          siteDetails: dataToSave[0],
+          siteDetails: apiData[0],
           siteIndex,
           id: marineLicence.id
         }
@@ -118,7 +141,7 @@ export const saveSiteDetailsToBackend = async (
         request,
         apiRoutes.UPDATE_MARINE_LICENCE_SITE_DETAILS,
         {
-          siteDetails: dataToSave,
+          siteDetails: apiData,
           id: marineLicence.id
         }
       )
@@ -127,14 +150,14 @@ export const saveSiteDetailsToBackend = async (
     await setMarineLicenceCache(request, h, {
       ...marineLicence,
       siteDetails: isSingleSite
-        ? siteDetails.with(siteIndex, dataToSave)
-        : dataToSave
+        ? siteDetails.with(siteIndex, cacheData[0])
+        : cacheData
     })
 
     request.logger.info(
       {
         marineLicenceId: marineLicence.id,
-        siteCount: dataToSave.length,
+        siteCount: cacheData.length,
         coordinatesType,
         isSingleSite
       },

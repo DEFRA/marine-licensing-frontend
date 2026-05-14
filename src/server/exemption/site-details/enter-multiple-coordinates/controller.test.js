@@ -29,14 +29,14 @@ describe('#multipleCoordinates', () => {
       { latitude: '51.517500', longitude: '-0.137600' }
     ],
     osgb36: [
-      { eastings: '530000', northings: '181000' },
-      { eastings: '530100', northings: '181100' }
+      { easting: '530000', northing: '181000' },
+      { easting: '530100', northing: '181100' }
     ]
   }
 
   const paddedCoordinates = {
     wgs84: { latitude: '', longitude: '' },
-    osgb36: { eastings: '', northings: '' }
+    osgb36: { easting: '', northing: '' }
   }
 
   const mockExemption = {
@@ -279,12 +279,12 @@ describe('#multipleCoordinates', () => {
         coordinateSystem: COORDINATE_SYSTEMS.OSGB36
       })
       const payload = {
-        'coordinates[0][eastings]': '530000',
-        'coordinates[0][northings]': '181000',
-        'coordinates[1][eastings]': '530100',
-        'coordinates[1][northings]': '181100',
-        'coordinates[2][eastings]': '530200',
-        'coordinates[2][northings]': '181200'
+        'coordinates[0][easting]': '530000',
+        'coordinates[0][northing]': '181000',
+        'coordinates[1][easting]': '530100',
+        'coordinates[1][northing]': '181100',
+        'coordinates[2][easting]': '530200',
+        'coordinates[2][northing]': '181200'
       }
       const request = createMockRequest({ payload, site: mockSite })
 
@@ -306,12 +306,12 @@ describe('#multipleCoordinates', () => {
         coordinateSystem: COORDINATE_SYSTEMS.OSGB36
       })
       const payload = {
-        'coordinates[0][eastings]': ' 530000',
-        'coordinates[0][northings]': '181000 ',
-        'coordinates[1][eastings]': '530100',
-        'coordinates[1][northings]': '181100',
-        'coordinates[2][eastings]': '530200',
-        'coordinates[2][northings]': '181200'
+        'coordinates[0][easting]': ' 530000',
+        'coordinates[0][northing]': '181000 ',
+        'coordinates[1][easting]': '530100',
+        'coordinates[1][northing]': '181100',
+        'coordinates[2][easting]': '530200',
+        'coordinates[2][northing]': '181200'
       }
       const request = createMockRequest({ payload, site: mockSite })
 
@@ -374,12 +374,12 @@ describe('#multipleCoordinates', () => {
 
     test('should re-render the page with an added osgb36 point when the add point button is clicked', async () => {
       const payload = {
-        'coordinates[0][eastings]': '530000',
-        'coordinates[0][northings]': '181000',
-        'coordinates[1][eastings]': '530100',
-        'coordinates[1][northings]': '181100',
-        'coordinates[2][eastings]': '530200',
-        'coordinates[2][northings]': '181200',
+        'coordinates[0][easting]': '530000',
+        'coordinates[0][northing]': '181000',
+        'coordinates[1][easting]': '530100',
+        'coordinates[1][northing]': '181100',
+        'coordinates[2][easting]': '530200',
+        'coordinates[2][northing]': '181200',
         add: 'add'
       }
       const request = createMockRequest({ payload, site: mockSite })
@@ -402,12 +402,12 @@ describe('#multipleCoordinates', () => {
 
     test('should re-render the page with a removed point when the remove button is clicked', async () => {
       const payload = {
-        'coordinates[0][eastings]': '530000',
-        'coordinates[0][northings]': '181000',
-        'coordinates[1][eastings]': '530100',
-        'coordinates[1][northings]': '181100',
-        'coordinates[2][eastings]': '530200',
-        'coordinates[2][northings]': '181200',
+        'coordinates[0][easting]': '530000',
+        'coordinates[0][northing]': '181000',
+        'coordinates[1][easting]': '530100',
+        'coordinates[1][northing]': '181100',
+        'coordinates[2][easting]': '530200',
+        'coordinates[2][northing]': '181200',
         remove: '3'
       }
       const request = createMockRequest({ payload, site: mockSite })

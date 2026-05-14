@@ -13,7 +13,11 @@ export const GEO_PARSER_ERROR_MESSAGES = {
     'The selected file contains invalid coordinates',
   COORDINATES_INVALID_LATITUDE:
     'The selected file contains invalid coordinates',
-  UNSUPPORTED_FILE_TYPE: 'The selected file type is not supported'
+  UNSUPPORTED_FILE_TYPE: 'The selected file type is not supported',
+  FEATURES_CONTAIN_POINT_OR_LINE:
+    'The selected file must only contain sites drawn as polygons (shapes), not points or lines',
+  GEOMETRY_NESTING_TOO_DEEP:
+    'We couldn’t process this map file because its geometry is too complex. Please simplify the shape and upload again.'
 }
 
 /**

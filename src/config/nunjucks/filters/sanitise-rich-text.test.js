@@ -18,16 +18,12 @@ describe('sanitiseRichTextFilter', () => {
   })
 
   test('SafeString toString equals sanitised output', () => {
-    const result = sanitiseRichTextFilter(
-      '<p>ok</p><script>alert(1)</script>'
-    )
+    const result = sanitiseRichTextFilter('<p>ok</p><script>alert(1)</script>')
     expect(result.toString()).toBe('<p>ok</p>')
   })
 
   test('strips javascript: scheme from anchor href', () => {
-    const result = sanitiseRichTextFilter(
-      '<a href="javascript:alert(1)">x</a>'
-    )
+    const result = sanitiseRichTextFilter('<a href="javascript:alert(1)">x</a>')
     expect(result.toString()).toBe('<a>x</a>')
   })
 })

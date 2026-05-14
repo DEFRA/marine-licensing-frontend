@@ -41,7 +41,8 @@ describe('#answerController (integration)', () => {
       ]
     })
 
-    const { document } = await getPage()
+    const { response, document } = await getPage()
+    expect(response.statusCode).toBe(200)
     const summaryDiv = document.querySelector(
       '.app-iat-answers-page div.govuk-body'
     )
@@ -73,6 +74,7 @@ describe('#answerController (integration)', () => {
     })
 
     const { response, document } = await getPage()
+    expect(response.statusCode).toBe(200)
     // The page contains the safe parts.
     expect(document.body.textContent).toContain('ok')
     // No injected <script> survives. The page has a legitimate

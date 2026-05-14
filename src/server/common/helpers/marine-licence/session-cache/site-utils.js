@@ -8,24 +8,20 @@ import {
 
 export const validateSiteAndActivityParams = {
   method: (request, h) => {
-    const siteData = setSiteData(request)
+    const { site, activity } = request.query
 
-    if (!siteData) {
+    if (!site || !activity) {
       return h.redirect(marineLicenceRoutes.MARINE_LICENCE_TASK_LIST).takeover()
     }
 
-    request.site = siteData
+    const siteIndex = Number.parseInt(site, 10) - 1
+    const activityIndex = Number.parseInt(activity, 10) - 1
 
-    const { activity } = request.query
+    const marineLicence = getMarineLicenceCache(request)
+    const siteDetails = marineLicence.siteDetails?.[siteIndex]
 
-    if (activity !== undefined) {
-      const activityIndex = Number.parseInt(activity, 10) - 1
-
-      if (!siteData.siteDetails?.activityDetails?.[activityIndex]) {
-        return h
-          .redirect(marineLicenceRoutes.MARINE_LICENCE_TASK_LIST)
-          .takeover()
-      }
+    if (!siteDetails?.activityDetails?.[activityIndex]) {
+      return h.redirect(marineLicenceRoutes.MARINE_LICENCE_TASK_LIST).takeover()
     }
 
     return h.continue

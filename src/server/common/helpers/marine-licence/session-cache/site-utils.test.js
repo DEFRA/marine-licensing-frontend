@@ -19,8 +19,8 @@ describe('#validateSiteAndActivityParams', () => {
     )
   })
 
-  test('redirects when site does not exist in cache.', () => {
-    const request = createMockRequest({ query: { site: '99' } })
+  test('redirects when site param is missing', () => {
+    const request = createMockRequest({ query: { activity: '1' } })
     const h = createMockH()
 
     validateSiteAndActivityParams.method(request, h)
@@ -30,19 +30,26 @@ describe('#validateSiteAndActivityParams', () => {
     )
   })
 
-  test('sets request.site and continues when activity param is absent', () => {
-    const request = createMockRequest()
+  test('redirects when activity param is missing', () => {
+    const request = createMockRequest({ query: { site: '1' } })
     const h = createMockH()
 
-    const result = validateSiteAndActivityParams.method(request, h)
+    validateSiteAndActivityParams.method(request, h)
 
-    expect(request.site).toEqual({
-      siteIndex: 0,
-      siteNumber: 1,
-      queryParams: '',
-      siteDetails: mockMarineLicenceApplication.siteDetails[0]
-    })
-    expect(result).toBe(h.continue)
+    expect(h.redirect).toHaveBeenCalledWith(
+      marineLicenceRoutes.MARINE_LICENCE_TASK_LIST
+    )
+  })
+
+  test('redirects when site does not exist in cache', () => {
+    const request = createMockRequest({ query: { site: '99', activity: '1' } })
+    const h = createMockH()
+
+    validateSiteAndActivityParams.method(request, h)
+
+    expect(h.redirect).toHaveBeenCalledWith(
+      marineLicenceRoutes.MARINE_LICENCE_TASK_LIST
+    )
   })
 
   test('redirects when activity does not exist for site', () => {
@@ -56,18 +63,12 @@ describe('#validateSiteAndActivityParams', () => {
     )
   })
 
-  test('sets request.site and continues when site and activity are valid', () => {
+  test('continues when site and activity are valid', () => {
     const request = createMockRequest({ query: { site: '1', activity: '1' } })
     const h = createMockH()
 
     const result = validateSiteAndActivityParams.method(request, h)
 
-    expect(request.site).toEqual({
-      siteIndex: 0,
-      siteNumber: 1,
-      queryParams: '',
-      siteDetails: mockMarineLicenceApplication.siteDetails[0]
-    })
     expect(result).toBe(h.continue)
   })
 })

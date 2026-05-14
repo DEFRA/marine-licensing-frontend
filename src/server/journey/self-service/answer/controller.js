@@ -11,8 +11,8 @@ export const answerController = {
     }
 
     return h.view(VIEW_PATH, {
-      pageTitle: 'IAT answers',
-      heading: 'IAT answers',
+      pageTitle: 'Marine licence requirement check',
+      heading: 'Marine licence requirement check',
       dateOfCheck: doc.createdAt,
       summaryText: doc.outcome?.summaryText ?? '',
       answers: doc.answers ?? []

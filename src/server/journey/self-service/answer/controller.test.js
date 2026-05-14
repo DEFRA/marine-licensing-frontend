@@ -34,7 +34,7 @@ describe('answerController', () => {
     expect(h.view).toHaveBeenCalledWith(
       'journey/self-service/answer/index',
       expect.objectContaining({
-        heading: 'IAT answers',
+        heading: 'Marine licence requirement check',
         summaryText: 'Summary text',
         dateOfCheck: doc.createdAt,
         answers: doc.answers

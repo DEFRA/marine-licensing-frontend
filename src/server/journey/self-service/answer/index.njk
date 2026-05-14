@@ -13,13 +13,22 @@
     <div class="govuk-grid-column-full app-iat-answers-page">
       <h1 class="govuk-heading-xl">{{ heading }}</h1>
 
+      <p class="govuk-body">
+        <a class="govuk-link print-link"
+           href="#"
+           data-module="iat-answer-print">
+          Print this page
+        </a>
+      </p>
+      <p class="govuk-body print-instructions">To save as a PDF, select 'Print this page' and choose 'Save as PDF' as your printer.</p>
+
       <h2 class="govuk-heading-m">Date of check</h2>
-      <p class="govuk-body">{{ dateOfCheck | formatDate }}</p>
+      <p class="govuk-body">{{ dateOfCheck | formatDate('d MMMM yyyy') }}</p>
 
       <h2 class="govuk-heading-m">Summary</h2>
       <p class="govuk-body">{{ summaryText }}</p>
 
-      <h2 class="govuk-heading-m">Your answers</h2>
+      <h2 class="govuk-heading-m">Answers</h2>
       {% set rows = [] %}
       {% for entry in answers %}
         {% set valueHtml %}
@@ -37,14 +46,6 @@
       {% endfor %}
 
       {{ govukSummaryList({ rows: rows }) }}
-
-      <p class="govuk-body">
-        <a class="govuk-link print-link"
-           href="#"
-           data-module="iat-answer-print">
-          Print this page
-        </a>
-      </p>
     </div>
   </div>
 {% endblock %}

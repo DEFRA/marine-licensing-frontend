@@ -151,9 +151,9 @@ describe('#outcomeController (integration)', () => {
       expect(link.getAttribute('href')).toBe(EXPECTED_ANSWER_PAGE_URL)
       expect(link.getAttribute('target')).toBe('_blank')
       expect(link.getAttribute('rel')).toBe('noopener noreferrer')
-      expect(
-        link.querySelector('.govuk-visually-hidden').textContent
-      ).toContain('(opens in a new tab)')
+      expect(link.textContent.replace(/\s+/g, ' ').trim()).toBe(
+        'View answers (opens in a new tab)'
+      )
     })
 
     test('does not render the "View answers" link when the IAT save returns null', async () => {
@@ -349,8 +349,8 @@ describe('GET terminal-single', () => {
     expect(link.getAttribute('href')).toBe(EXPECTED_ANSWER_PAGE_URL)
     expect(link.getAttribute('target')).toBe('_blank')
     expect(link.getAttribute('rel')).toBe('noopener noreferrer')
-    expect(link.querySelector('.govuk-visually-hidden').textContent).toContain(
-      '(opens in a new tab)'
+    expect(link.textContent.replace(/\s+/g, ' ').trim()).toBe(
+      'View answers (opens in a new tab)'
     )
   })
 
@@ -454,8 +454,8 @@ describe('GET terminal-multi', () => {
     expect(link.getAttribute('href')).toBe(EXPECTED_ANSWER_PAGE_URL)
     expect(link.getAttribute('target')).toBe('_blank')
     expect(link.getAttribute('rel')).toBe('noopener noreferrer')
-    expect(link.querySelector('.govuk-visually-hidden').textContent).toContain(
-      '(opens in a new tab)'
+    expect(link.textContent.replace(/\s+/g, ' ').trim()).toBe(
+      'View answers (opens in a new tab)'
     )
   })
 

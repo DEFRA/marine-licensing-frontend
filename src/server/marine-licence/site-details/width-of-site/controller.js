@@ -7,7 +7,7 @@ import { circleWidthValidationSchema } from '#src/server/common/schemas/circle-w
 import { createFailAction } from '#src/server/common/helpers/createFailAction.js'
 import { getCancelLink } from '#src/server/marine-licence/site-details/utils/cancel-link.js'
 import { getSiteDataFromParam } from '#src/server/common/helpers/site-details/site-name.js'
-import { validateSiteAndActivityParams } from '#src/server/common/helpers/marine-licence/session-cache/site-utils.js'
+import { setSiteDataPreHandler } from '#src/server/common/helpers/marine-licence/session-cache/site-utils.js'
 import {
   WIDTH_OF_SITE_VIEW_ROUTE,
   widthOfSiteSettings,
@@ -22,7 +22,7 @@ const widthOfSitePageData = {
 
 export const widthOfSiteController = {
   options: {
-    pre: [validateSiteAndActivityParams]
+    pre: [setSiteDataPreHandler]
   },
   handler(request, h) {
     const marineLicence = getMarineLicenceCache(request)
@@ -44,7 +44,7 @@ export const widthOfSiteController = {
 
 export const widthOfSiteSubmitController = {
   options: {
-    pre: [validateSiteAndActivityParams],
+    pre: [setSiteDataPreHandler],
     validate: {
       payload: circleWidthValidationSchema,
       failAction: (request, h, err) => {

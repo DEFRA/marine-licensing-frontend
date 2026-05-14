@@ -26,7 +26,7 @@ export function sharedFileUploadTests({ loadPageWithFileType }) {
     ).toBeTruthy()
   })
 
-  test('should show KML heading and not show shapefile guidance text', async () => {
+  test('should show KML heading and polygon guidance text only', async () => {
     const document = await loadPageWithFileType('kml')
 
     const h1 = getByRole(document, 'heading', { level: 1 })
@@ -40,6 +40,6 @@ export function sharedFileUploadTests({ loadPageWithFileType }) {
 
     expect(
       document.body.textContent.includes('You can include more than one site')
-    ).toBe(false)
+    ).toBe(true)
   })
 }

@@ -48,6 +48,10 @@ describe('#sanitise', () => {
     expect(sanitise('<script>alert("xss")</script>')).toBe('')
   })
 
+  test('strips protocol-relative href to prevent stored open-redirect', () => {
+    expect(sanitise('<a href="//attacker.com">click</a>')).toBe('<a>click</a>')
+  })
+
   test('returns falsy values unchanged', () => {
     expect(sanitise(null)).toBeNull()
     expect(sanitise(undefined)).toBeUndefined()
@@ -131,6 +135,12 @@ describe('#sanitiseRichText', () => {
   test('strips javascript: hrefs', () => {
     const result = sanitiseRichText('<a href="javascript:alert(1)">x</a>')
     expect(result).not.toContain('javascript:')
+  })
+
+  test('strips protocol-relative href to prevent stored open-redirect', () => {
+    expect(sanitiseRichText('<a href="//attacker.com">click</a>')).toBe(
+      '<a>click</a>'
+    )
   })
 
   test('strips <script> and on* handlers', () => {

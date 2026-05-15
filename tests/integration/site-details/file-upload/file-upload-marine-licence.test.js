@@ -44,6 +44,6 @@ describe('File upload page (marine licence)', () => {
     })
   }
 
-  sharedFileUploadTests({ loadPageWithFileType })
-  singleSiteModeTests({ loadPageWithFileType })
+  sharedFileUploadTests({ loadPageWithFileType, projectType: 'marine-licence' })
+  singleSiteModeTests({ loadPageWithFileType, projectType: 'marine-licence' })
 })

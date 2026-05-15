@@ -7,12 +7,9 @@ import {
   ROUTE_PREFIX
 } from '#src/server/journey/self-service/services/journey-data.js'
 import {
-  clearAnswerDocStash,
-  getAnswerDocStash,
   getBackLink,
   getOutcomeSelection,
-  pushOutcomeSelection,
-  setAnswerDocStash
+  pushOutcomeSelection
 } from '#src/server/journey/self-service/services/session-answers.js'
 import { reportRuntimeIssue } from '#src/server/journey/self-service/services/data-quality.js'
 import {
@@ -111,26 +108,13 @@ async function persistAndGetAnswerUrl(request, outcomeRoute) {
     return null
   }
 
-  const stash = getAnswerDocStash(request)
   try {
-    let id
-    if (!stash.id) {
-      id = await iatAnswersService.create(request, payload)
-    } else if (stash.outcomeRoute === outcomeRoute) {
-      await iatAnswersService.update(request, stash.id, payload)
-      id = stash.id
-    } else {
-      await iatAnswersService.delete(request, stash.id)
-      id = await iatAnswersService.create(request, payload)
-    }
-    if (!id) {
-      clearAnswerDocStash(request)
+    const slug = await iatAnswersService.create(request, payload)
+    if (!slug) {
       return null
     }
-    setAnswerDocStash(request, id, outcomeRoute)
-    return `/journey/self-service/answer/${id}`
+    return `/journey/self-service/answer/${slug}`
   } catch (error) {
-    clearAnswerDocStash(request)
     request.logger.warn(
       {
         event: {

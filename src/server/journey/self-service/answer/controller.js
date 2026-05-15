@@ -5,7 +5,7 @@ const VIEW_PATH = 'journey/self-service/answer/index'
 
 export const answerController = {
   handler: async (request, h) => {
-    const doc = await iatAnswersService.get(request, request.params.id)
+    const doc = await iatAnswersService.get(request, request.params.slug)
     if (!doc) {
       throw Boom.notFound('IAT answers not found')
     }

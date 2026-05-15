@@ -8,12 +8,15 @@ export const journeySelfServiceAnswer = {
       server.route([
         {
           method: 'GET',
-          path: '/journey/self-service/answer/{id}',
+          path: '/journey/self-service/answer/{slug}',
           options: {
             auth: false,
             validate: {
               params: Joi.object({
-                id: Joi.string().length(24).hex().required()
+                slug: Joi.string()
+                  .length(22)
+                  .pattern(/^[A-Za-z0-9_-]{22}$/)
+                  .required()
               })
             }
           },

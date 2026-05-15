@@ -100,23 +100,3 @@ export function getBackLink(request, currentRoute, currentType) {
 export function clearAnswers(request) {
   request.yar.set(SESSION_KEY, [])
 }
-
-const DOC_ID_KEY = 'selfServiceAnswerDocId'
-const DOC_ROUTE_KEY = 'selfServiceAnswerOutcomeRoute'
-
-export function getAnswerDocStash(request) {
-  return {
-    id: request.yar.get(DOC_ID_KEY) ?? null,
-    outcomeRoute: request.yar.get(DOC_ROUTE_KEY) ?? null
-  }
-}
-
-export function setAnswerDocStash(request, id, outcomeRoute) {
-  request.yar.set(DOC_ID_KEY, id)
-  request.yar.set(DOC_ROUTE_KEY, outcomeRoute)
-}
-
-export function clearAnswerDocStash(request) {
-  request.yar.clear(DOC_ID_KEY)
-  request.yar.clear(DOC_ROUTE_KEY)
-}

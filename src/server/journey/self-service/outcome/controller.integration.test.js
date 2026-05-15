@@ -2,9 +2,7 @@ import { vi } from 'vitest'
 
 vi.mock('#src/services/iat-answers-service/iat-answers.service.js', () => ({
   iatAnswersService: {
-    create: vi.fn(),
-    update: vi.fn(),
-    delete: vi.fn()
+    create: vi.fn()
   }
 }))
 vi.mock(
@@ -40,8 +38,6 @@ beforeEach(() => {
     ]
   })
   vi.mocked(iatAnswersService.create).mockResolvedValue(STUB_ANSWER_ID)
-  vi.mocked(iatAnswersService.update).mockResolvedValue(undefined)
-  vi.mocked(iatAnswersService.delete).mockResolvedValue(undefined)
 })
 
 describe('#outcomeController (integration)', () => {
@@ -160,6 +156,41 @@ describe('#outcomeController (integration)', () => {
       vi.mocked(iatAnswersService.create).mockResolvedValueOnce(null)
       const { document } = await getPage()
       expect(document.body.textContent).not.toContain('View answers')
+    })
+
+    test('does not render the "View answers" link and logs save-failed when create throws', async () => {
+      vi.mocked(iatAnswersService.create).mockRejectedValueOnce(
+        new Error('backend unavailable')
+      )
+      const { document } = await getPage()
+      expect(document.body.textContent).not.toContain('View answers')
+    })
+
+    test('two consecutive outcome GETs produce different answer URLs', async () => {
+      vi.mocked(iatAnswersService.create)
+        .mockResolvedValueOnce('AZ4rr6bLclCVUsE2Pl_zKw')
+        .mockResolvedValueOnce('BZ4rr6bLclCVUsE2Pl_zKx')
+
+      const { document: doc1 } = await getPage()
+      const { document: doc2 } = await getPage()
+
+      const getAnswerHref = (document) => {
+        const link = Array.from(document.querySelectorAll('a.govuk-link')).find(
+          (a) => a.textContent.includes('View answers')
+        )
+        return link ? link.getAttribute('href') : null
+      }
+
+      const url1 = getAnswerHref(doc1)
+      const url2 = getAnswerHref(doc2)
+
+      expect(url1).toMatch(
+        /^\/journey\/self-service\/answer\/[A-Za-z0-9_-]{22}$/
+      )
+      expect(url2).toMatch(
+        /^\/journey\/self-service\/answer\/[A-Za-z0-9_-]{22}$/
+      )
+      expect(url1).not.toBe(url2)
     })
 
     test('renders a back link', async () => {

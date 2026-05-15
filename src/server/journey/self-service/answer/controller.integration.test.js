@@ -17,7 +17,7 @@ describe('#answerController (integration)', () => {
 
   const getPage = async () => {
     const response = await makeGetRequest({
-      url: '/journey/self-service/answer/507f1f77bcf86cd799439011',
+      url: '/journey/self-service/answer/AZ4rr6bLclCVUsE2Pl_zKw',
       server: getServer()
     })
     return {
@@ -97,5 +97,13 @@ describe('#answerController (integration)', () => {
     // Defence in depth — the raw response body must not contain the literal
     // "javascript:" string in any href attribute that would execute.
     expect(response.result).not.toMatch(/href="javascript:/)
+  })
+
+  test('malformed slug returns 400 from Joi validation', async () => {
+    const response = await makeGetRequest({
+      url: '/journey/self-service/answer/not-valid',
+      server: getServer()
+    })
+    expect(response.statusCode).toBe(400)
   })
 })

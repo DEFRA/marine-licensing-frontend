@@ -27,7 +27,7 @@ describe('answerController', () => {
 
     const h = buildH()
     await answerController.handler(
-      { params: { id: '507f1f77bcf86cd799439011' } },
+      { params: { slug: 'AZ4rr6bLclCVUsE2Pl_zKw' } },
       h
     )
 
@@ -46,7 +46,7 @@ describe('answerController', () => {
     iatAnswersService.get.mockResolvedValue(null)
     await expect(
       answerController.handler(
-        { params: { id: '507f1f77bcf86cd799439011' } },
+        { params: { slug: 'AZ4rr6bLclCVUsE2Pl_zKw' } },
         buildH()
       )
     ).rejects.toMatchObject({ output: { statusCode: 404 } })
@@ -62,7 +62,7 @@ describe('answerController', () => {
 
     const h = buildH()
     await answerController.handler(
-      { params: { id: '507f1f77bcf86cd799439011' } },
+      { params: { slug: 'AZ4rr6bLclCVUsE2Pl_zKw' } },
       h
     )
 

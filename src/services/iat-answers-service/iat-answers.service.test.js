@@ -2,17 +2,11 @@ import { describe, expect, it, vi, beforeEach } from 'vitest'
 
 vi.mock('#src/server/common/helpers/authenticated-requests.js', () => ({
   authenticatedGetRequest: vi.fn(),
-  authenticatedPostRequest: vi.fn(),
-  authenticatedPutRequest: vi.fn(),
-  authenticatedRequest: vi.fn()
+  authenticatedPostRequest: vi.fn()
 }))
 
-const {
-  authenticatedGetRequest,
-  authenticatedPostRequest,
-  authenticatedPutRequest,
-  authenticatedRequest
-} = await import('#src/server/common/helpers/authenticated-requests.js')
+const { authenticatedGetRequest, authenticatedPostRequest } =
+  await import('#src/server/common/helpers/authenticated-requests.js')
 const { iatAnswersService } = await import('./iat-answers.service.js')
 
 const request = {}
@@ -23,12 +17,12 @@ describe('iatAnswersService', () => {
     vi.resetAllMocks()
   })
 
-  it('create returns the id from the success response', async () => {
+  it('create returns the slug from the success response', async () => {
     authenticatedPostRequest.mockResolvedValue({
-      payload: { message: 'success', value: { id: 'abc' } }
+      payload: { message: 'success', value: { slug: 'AZ4rr6bLclCVUsE2Pl_zKw' } }
     })
-    const id = await iatAnswersService.create(request, body)
-    expect(id).toBe('abc')
+    const slug = await iatAnswersService.create(request, body)
+    expect(slug).toBe('AZ4rr6bLclCVUsE2Pl_zKw')
     expect(authenticatedPostRequest).toHaveBeenCalledWith(
       request,
       '/iat-answers',
@@ -40,37 +34,24 @@ describe('iatAnswersService', () => {
     authenticatedPostRequest.mockResolvedValue({
       payload: { message: 'success' }
     })
-    const id = await iatAnswersService.create(request, body)
-    expect(id).toBeNull()
-  })
-
-  it('update PUTs to /iat-answers/{id}', async () => {
-    authenticatedPutRequest.mockResolvedValue({ payload: {} })
-    await iatAnswersService.update(request, 'abc', body)
-    expect(authenticatedPutRequest).toHaveBeenCalledWith(
-      request,
-      '/iat-answers/abc',
-      body
-    )
-  })
-
-  it('delete sends DELETE via the generic helper', async () => {
-    authenticatedRequest.mockResolvedValue({ payload: {} })
-    await iatAnswersService.delete(request, 'abc')
-    expect(authenticatedRequest).toHaveBeenCalledWith(
-      request,
-      'DELETE',
-      '/iat-answers/abc'
-    )
+    const slug = await iatAnswersService.create(request, body)
+    expect(slug).toBeNull()
   })
 
   it('get returns the value on success', async () => {
     authenticatedGetRequest.mockResolvedValue({
-      payload: { message: 'success', value: { id: 'abc', outcome: {} } },
+      payload: {
+        message: 'success',
+        value: { slug: 'AZ4rr6bLclCVUsE2Pl_zKw', outcome: {} }
+      },
       res: { statusCode: 200 }
     })
-    const doc = await iatAnswersService.get(request, 'abc')
-    expect(doc).toEqual({ id: 'abc', outcome: {} })
+    const doc = await iatAnswersService.get(request, 'AZ4rr6bLclCVUsE2Pl_zKw')
+    expect(doc).toEqual({ slug: 'AZ4rr6bLclCVUsE2Pl_zKw', outcome: {} })
+    expect(authenticatedGetRequest).toHaveBeenCalledWith(
+      request,
+      '/iat-answers/AZ4rr6bLclCVUsE2Pl_zKw'
+    )
   })
 
   it('get returns null on Boom 404', async () => {
@@ -80,7 +61,7 @@ describe('iatAnswersService', () => {
         isBoom: true
       })
     )
-    const doc = await iatAnswersService.get(request, 'abc')
+    const doc = await iatAnswersService.get(request, 'AZ4rr6bLclCVUsE2Pl_zKw')
     expect(doc).toBeNull()
   })
 
@@ -90,6 +71,8 @@ describe('iatAnswersService', () => {
       { output: { statusCode: 500 }, isBoom: true }
     )
     authenticatedGetRequest.mockRejectedValue(boom500)
-    await expect(iatAnswersService.get(request, 'abc')).rejects.toBe(boom500)
+    await expect(
+      iatAnswersService.get(request, 'AZ4rr6bLclCVUsE2Pl_zKw')
+    ).rejects.toBe(boom500)
   })
 })

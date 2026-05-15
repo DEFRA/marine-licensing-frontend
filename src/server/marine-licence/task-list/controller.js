@@ -1,5 +1,6 @@
 import {
   clearMarineLicenceCache,
+  clearSingleSiteMode,
   getMarineLicenceCache,
   setMarineLicenceCache
 } from '#src/server/common/helpers/marine-licence/session-cache/utils.js'
@@ -85,6 +86,7 @@ export const taskListController = {
     })
 
     await setProjectType(request, h, PROJECT_TYPE.MARINE_LICENCE)
+    await clearSingleSiteMode(request, h)
 
     const hasCompletedAllTasks = [
       ...otherPermissionsTaskListTransformed,

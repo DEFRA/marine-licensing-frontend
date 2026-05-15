@@ -1,5 +1,8 @@
 import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
-import { getMarineLicenceCache } from '#src/server/common/helpers/marine-licence/session-cache/utils.js'
+import {
+  getMarineLicenceCache,
+  setSingleSiteMode
+} from '#src/server/common/helpers/marine-licence/session-cache/utils.js'
 import { getSiteDataFromParam } from '#src/server/common/helpers/site-details/site-name.js'
 import { validateSiteParams } from '#src/server/common/helpers/marine-licence/session-cache/site-utils.js'
 import { getSiteDetailsBySite } from '#src/server/common/helpers/marine-licence/session-cache/site-details-utils.js'
@@ -33,9 +36,8 @@ export const changeSiteLocationController = {
 }
 
 export const changeSiteLocationSubmitController = {
-  handler(request, h) {
-    return h.redirect(
-      marineLicenceRoutes.MARINE_LICENCE_CHOOSE_FILE_UPLOAD_TYPE
-    )
+  async handler(request, h) {
+    await setSingleSiteMode(request, h)
+    return h.redirect(marineLicenceRoutes.MARINE_LICENCE_CHOOSE_FILE_UPLOAD_TYPE)
   }
 }

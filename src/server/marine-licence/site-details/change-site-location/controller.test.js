@@ -44,12 +44,15 @@ describe('changeSiteLocationController', () => {
   })
 
   describe('POST handler', () => {
-    it('should redirect to choose file upload type', () => {
+    it('should set singleSiteMode and redirect to choose file upload type', async () => {
+      vi.mocked(cacheUtils.setSingleSiteMode).mockResolvedValue()
+
       const request = createMockRequest({})
       const h = createMockH()
 
-      changeSiteLocationSubmitController.handler(request, h)
+      await changeSiteLocationSubmitController.handler(request, h)
 
+      expect(cacheUtils.setSingleSiteMode).toHaveBeenCalledWith(request, h)
       expect(h.redirect).toHaveBeenCalledWith(
         marineLicenceRoutes.MARINE_LICENCE_CHOOSE_FILE_UPLOAD_TYPE
       )

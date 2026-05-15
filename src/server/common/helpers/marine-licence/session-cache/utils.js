@@ -1,5 +1,6 @@
 import { clone } from '@hapi/hoek'
 import { getSiteDetailsBySite } from '#src/server/common/helpers/exemptions/session-cache/site-details-utils.js'
+import { SINGLE_SITE_MODE_KEY } from '#src/server/common/constants/cache.js'
 
 export const MARINE_LICENCE_CACHE_KEY = 'marineLicence'
 export const SAVED_SITE_DETAILS_CACHE_KEY = 'savedMarineLicenceSiteDetails'
@@ -146,6 +147,19 @@ export const updateMarineLicenceSiteDetailsBatch = (
 
 export const getMarineLicenceCache = (request) => {
   return clone(request.yar.get(MARINE_LICENCE_CACHE_KEY) || {})
+}
+
+export const setSingleSiteMode = async (request, h) => {
+  request.yar.set(SINGLE_SITE_MODE_KEY, true)
+  await request.yar.commit(h)
+}
+
+export const getSingleSiteMode = (request) =>
+  request.yar.get(SINGLE_SITE_MODE_KEY) === true
+
+export const clearSingleSiteMode = async (request, h) => {
+  request.yar.clear(SINGLE_SITE_MODE_KEY)
+  await request.yar.commit(h)
 }
 
 export const setMarineLicenceCache = async (request, h, value) => {

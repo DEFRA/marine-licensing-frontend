@@ -28,7 +28,15 @@
     <p class="govuk-body">Upload a ZIP file containing all the files for your shapefile. Your shapefile must include
       .shp, .shx, .dbf and .prj files.</p>
   {% endif %}
-  <p class="govuk-body">You can include more than one site. Your file must only contain sites drawn as polygons (shapes), not points or lines.</p>
+
+  {% if not singleSiteMode %}
+    <p class="govuk-body">You can include more than one site. Your file must only contain sites drawn as polygons (shapes), not points or lines.</p>
+  {% endif %}
+
+  {% if singleSiteMode %}
+    <p class="govuk-body">The file you upload must be for a single site. Your file must only contain a site drawn as a polygon (shape), not a point or a line.</p>
+  {% endif %}
+
 {% endset %}
 
 {% block content %}

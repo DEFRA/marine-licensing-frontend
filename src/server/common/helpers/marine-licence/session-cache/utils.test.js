@@ -5,12 +5,16 @@ import {
   SAVED_SITE_DETAILS_CACHE_KEY,
   clearMarineLicenceCache,
   clearSavedMarineLicenceSiteDetails,
+  clearSingleSiteMode,
   getMarineLicenceCache,
+  getSingleSiteMode,
   setMarineLicenceCache,
+  setSingleSiteMode,
   updateMarineLicenceSiteActivityDetails,
   updateMarineLicenceSiteDetails,
   updateMarineLicenceSiteDetailsBatch
 } from '#src/server/common/helpers/marine-licence/session-cache/utils.js'
+import { SINGLE_SITE_MODE_KEY } from '#src/server/common/constants/cache.js'
 
 vi.mock('@hapi/hoek', () => ({
   clone: vi.fn((data) => ({ ...data }))
@@ -685,6 +689,55 @@ describe('#utils', () => {
       expect(mockRequest.yar.clear).toHaveBeenCalledWith(
         SAVED_SITE_DETAILS_CACHE_KEY
       )
+      expect(mockRequest.yar.commit).toHaveBeenCalledWith(mockH)
+    })
+  })
+
+  describe('setSingleSiteMode', () => {
+    test('should set the single site mode key and commit', async () => {
+      const mockH = {}
+      const mockRequest = {
+        yar: {
+          set: vi.fn(),
+          commit: vi.fn().mockResolvedValue()
+        }
+      }
+
+      await setSingleSiteMode(mockRequest, mockH)
+
+      expect(mockRequest.yar.set).toHaveBeenCalledWith(SINGLE_SITE_MODE_KEY, true)
+      expect(mockRequest.yar.commit).toHaveBeenCalledWith(mockH)
+    })
+  })
+
+  describe('getSingleSiteMode', () => {
+    test('should return true when single site mode key is set', () => {
+      const mockRequest = { yar: { get: vi.fn().mockReturnValue(true) } }
+
+      expect(getSingleSiteMode(mockRequest)).toBe(true)
+      expect(mockRequest.yar.get).toHaveBeenCalledWith(SINGLE_SITE_MODE_KEY)
+    })
+
+    test('should return false when single site mode key is not set', () => {
+      const mockRequest = { yar: { get: vi.fn().mockReturnValue(undefined) } }
+
+      expect(getSingleSiteMode(mockRequest)).toBe(false)
+    })
+  })
+
+  describe('clearSingleSiteMode', () => {
+    test('should clear the single site mode key and commit', async () => {
+      const mockH = {}
+      const mockRequest = {
+        yar: {
+          clear: vi.fn(),
+          commit: vi.fn().mockResolvedValue()
+        }
+      }
+
+      await clearSingleSiteMode(mockRequest, mockH)
+
+      expect(mockRequest.yar.clear).toHaveBeenCalledWith(SINGLE_SITE_MODE_KEY)
       expect(mockRequest.yar.commit).toHaveBeenCalledWith(mockH)
     })
   })

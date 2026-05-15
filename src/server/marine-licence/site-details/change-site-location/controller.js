@@ -38,6 +38,8 @@ export const changeSiteLocationController = {
 export const changeSiteLocationSubmitController = {
   async handler(request, h) {
     await setSingleSiteMode(request, h)
-    return h.redirect(marineLicenceRoutes.MARINE_LICENCE_CHOOSE_FILE_UPLOAD_TYPE)
+    return h.redirect(
+      marineLicenceRoutes.MARINE_LICENCE_CHOOSE_FILE_UPLOAD_TYPE
+    )
   }
 }

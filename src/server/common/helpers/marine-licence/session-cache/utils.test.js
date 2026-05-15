@@ -705,7 +705,10 @@ describe('#utils', () => {
 
       await setSingleSiteMode(mockRequest, mockH)
 
-      expect(mockRequest.yar.set).toHaveBeenCalledWith(SINGLE_SITE_MODE_KEY, true)
+      expect(mockRequest.yar.set).toHaveBeenCalledWith(
+        SINGLE_SITE_MODE_KEY,
+        true
+      )
       expect(mockRequest.yar.commit).toHaveBeenCalledWith(mockH)
     })
   })

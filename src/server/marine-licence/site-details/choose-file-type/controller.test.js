@@ -20,16 +20,22 @@ import {
   makePostRequest
 } from '#src/server/test-helpers/server-requests.js'
 
-vi.mock('~/src/server/common/helpers/marine-licence/session-cache/utils.js', () => ({
-  getMarineLicenceCache: vi.fn(),
-  getSingleSiteMode: vi.fn().mockReturnValue(false),
-  updateMarineLicenceSiteDetails: vi.fn().mockResolvedValue({})
-}))
+vi.mock(
+  '~/src/server/common/helpers/marine-licence/session-cache/utils.js',
+  () => ({
+    getMarineLicenceCache: vi.fn(),
+    getSingleSiteMode: vi.fn().mockReturnValue(false),
+    updateMarineLicenceSiteDetails: vi.fn().mockResolvedValue({})
+  })
+)
 
-const defaultBackLink = marineLicenceRoutes.MARINE_LICENCE_COORDINATES_TYPE_CHOICE
+const defaultBackLink =
+  marineLicenceRoutes.MARINE_LICENCE_COORDINATES_TYPE_CHOICE
 const defaultCancelLink = `${marineLicenceRoutes.MARINE_LICENCE_TASK_LIST}?cancel=site-details`
-const singleSiteBackLink = marineLicenceRoutes.MARINE_LICENCE_CHANGE_SITE_LOCATION
-const singleSiteCancelLink = marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS
+const singleSiteBackLink =
+  marineLicenceRoutes.MARINE_LICENCE_CHANGE_SITE_LOCATION
+const singleSiteCancelLink =
+  marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS
 
 describe('#chooseFileType (marine licence)', () => {
   const getServer = setupTestServer()

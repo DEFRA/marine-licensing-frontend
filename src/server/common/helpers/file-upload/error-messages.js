@@ -43,3 +43,6 @@ export const DEFAULT_ERROR_MESSAGE =
 
 export const DEFAULT_GEO_PARSER_ERROR_MESSAGE =
   'The selected file could not be processed – try again'
+
+export const SINGLE_SITE_ERROR_MESSAGE =
+  'Upload a file that contains a single site'

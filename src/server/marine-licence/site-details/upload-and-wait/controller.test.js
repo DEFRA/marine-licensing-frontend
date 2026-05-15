@@ -1,6 +1,7 @@
 import { vi } from 'vitest'
 import { uploadAndWaitController } from '#src/server/marine-licence/site-details/upload-and-wait/controller.js'
 import { UPLOAD_AND_WAIT_VIEW_ROUTE } from '#src/server/common/helpers/file-upload/constants.js'
+import { SINGLE_SITE_ERROR_MESSAGE } from '#src/server/common/helpers/file-upload/error-messages.js'
 import * as mlCacheUtils from '#src/server/common/helpers/marine-licence/session-cache/utils.js'
 import * as cdpUploadService from '#src/services/cdp-upload-service/index.js'
 import * as geoParseUpload from '#src/server/common/helpers/file-upload/geo-parse-upload.js'
@@ -144,9 +145,14 @@ const setupCacheSpies = () => {
     .spyOn(mlCacheUtils, 'updateMarineLicenceSiteDetails')
     .mockImplementation()
 
+  const getSingleSiteModeSpy = vi
+    .spyOn(mlCacheUtils, 'getSingleSiteMode')
+    .mockReturnValue(false)
+
   return {
     getMarineLicenceCacheSpy,
-    updateMarineLicenceSiteDetailsSpy
+    updateMarineLicenceSiteDetailsSpy,
+    getSingleSiteModeSpy
   }
 }
 
@@ -266,6 +272,7 @@ const expectFileValidationFailure = async (
 describe('#uploadAndWait', () => {
   let getMarineLicenceCacheSpy
   let updateMarineLicenceSiteDetailsSpy
+  let getSingleSiteModeSpy
   let mockCdpService
   let mockValidateUploadedFile
   let authenticatedPostRequestSpy
@@ -277,6 +284,7 @@ describe('#uploadAndWait', () => {
     getMarineLicenceCacheSpy = cacheSpies.getMarineLicenceCacheSpy
     updateMarineLicenceSiteDetailsSpy =
       cacheSpies.updateMarineLicenceSiteDetailsSpy
+    getSingleSiteModeSpy = cacheSpies.getSingleSiteModeSpy
 
     const services = setupMockServices()
     mockCdpService = services.mockCdpService
@@ -685,6 +693,84 @@ describe('#uploadAndWait', () => {
 
         expect(h.redirect).toHaveBeenCalledWith(
           marineLicenceRoutes.MARINE_LICENCE_CHOOSE_FILE_UPLOAD_TYPE
+        )
+      })
+    })
+
+    describe('when single site mode is active', () => {
+      const setupReadyStatusWithValidFile = () => {
+        const statusResponse = createMockStatusResponse('ready')
+        mockCdpService.getStatus.mockResolvedValue(statusResponse)
+        mockValidateUploadedFile.mockResolvedValue({
+          isValid: true,
+          extension: 'kml',
+          errorMessage: null
+        })
+      }
+
+      test('should store error and redirect to file upload when file contains multiple sites', async () => {
+        getSingleSiteModeSpy.mockReturnValue(true)
+        authenticatedPostRequestSpy.mockResolvedValue(
+          createMockGeoJsonResponse(3)
+        )
+        setupReadyStatusWithValidFile()
+
+        const h = createMockResponseHandler()
+
+        await uploadAndWaitController.handler(mockRequest, h)
+
+        expect(updateMarineLicenceSiteDetailsSpy).toHaveBeenCalledWith(
+          mockRequest,
+          expect.any(Object),
+          0,
+          'uploadError',
+          {
+            message: SINGLE_SITE_ERROR_MESSAGE,
+            fieldName: 'file',
+            fileType: 'kml'
+          }
+        )
+        expect(updateMarineLicenceSiteDetailsSpy).toHaveBeenCalledWith(
+          mockRequest,
+          expect.any(Object),
+          0,
+          'uploadConfig',
+          null
+        )
+        expect(h.redirect).toHaveBeenCalledWith(
+          marineLicenceRoutes.MARINE_LICENCE_FILE_UPLOAD
+        )
+      })
+
+      test('should not block upload when file contains a single site', async () => {
+        getSingleSiteModeSpy.mockReturnValue(true)
+        authenticatedPostRequestSpy.mockResolvedValue(
+          createMockGeoJsonResponse(1)
+        )
+        setupReadyStatusWithValidFile()
+
+        const h = createMockResponseHandler()
+
+        await uploadAndWaitController.handler(mockRequest, h)
+
+        expect(h.redirect).toHaveBeenCalledWith(
+          marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS
+        )
+      })
+
+      test('should not block upload when singleSiteMode is false and file contains multiple sites', async () => {
+        getSingleSiteModeSpy.mockReturnValue(false)
+        authenticatedPostRequestSpy.mockResolvedValue(
+          createMockGeoJsonResponse(3)
+        )
+        setupReadyStatusWithValidFile()
+
+        const h = createMockResponseHandler()
+
+        await uploadAndWaitController.handler(mockRequest, h)
+
+        expect(h.redirect).toHaveBeenCalledWith(
+          marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS
         )
       })
     })

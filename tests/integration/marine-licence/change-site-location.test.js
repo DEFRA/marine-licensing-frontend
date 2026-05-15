@@ -5,10 +5,7 @@ import {
 } from '~/tests/integration/shared/test-setup-helpers.js'
 import { loadPage } from '~/tests/integration/shared/app-server.js'
 import { within } from '@testing-library/dom'
-import {
-  mockFileUploadMarineLicence,
-  mockMarineLicenceApplication
-} from '#src/server/test-helpers/mocks/marine-licence-mocks.js'
+import { mockMarineLicenceApplication } from '#src/server/test-helpers/mocks/marine-licence-mocks.js'
 import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
 
 vi.mock('~/src/server/common/helpers/authenticated-requests.js')

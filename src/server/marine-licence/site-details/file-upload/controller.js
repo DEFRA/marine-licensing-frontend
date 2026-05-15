@@ -73,6 +73,9 @@ export const fileUploadController = {
       })
 
       const singleSiteMode = getSingleSiteMode(request)
+      const cancelLink = singleSiteMode
+        ? marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS
+        : `${marineLicenceRoutes.MARINE_LICENCE_TASK_LIST}?cancel=site-details`
 
       // Show the upload form
       return h.view(FILE_UPLOAD_VIEW_ROUTE, {
@@ -84,7 +87,7 @@ export const fileUploadController = {
         acceptAttribute: fileTypeContent.acceptAttribute,
         fileUploadType,
         backLink: marineLicenceRoutes.MARINE_LICENCE_CHOOSE_FILE_UPLOAD_TYPE,
-        cancelLink: `${marineLicenceRoutes.MARINE_LICENCE_TASK_LIST}?cancel=site-details`,
+        cancelLink,
         errorSummary,
         errors,
         singleSiteMode

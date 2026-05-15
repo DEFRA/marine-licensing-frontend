@@ -1,5 +1,6 @@
 import { getByRole, getByText } from '@testing-library/dom'
 import { getSingleSiteMode } from '~/src/server/common/helpers/marine-licence/session-cache/utils.js'
+import { marineLicenceRoutes } from '~/src/server/common/constants/routes.js'
 
 export function sharedFileUploadTests({ loadPageWithFileType }) {
   test('should show shapefile heading and guidance text', async () => {
@@ -39,6 +40,11 @@ export function sharedFileUploadTests({ loadPageWithFileType }) {
     expect(
       document.body.textContent.includes('You can include more than one site')
     ).toBe(true)
+
+    expect(getByRole(document, 'link', { name: 'Cancel' })).toHaveAttribute(
+      'href',
+      `${marineLicenceRoutes.MARINE_LICENCE_TASK_LIST}?cancel=site-details`
+    )
   })
 }
 
@@ -88,5 +94,10 @@ export function singleSiteModeTests({ loadPageWithFileType }) {
         'The file you upload must be for a single site.'
       )
     ).toBe(true)
+
+    expect(getByRole(document, 'link', { name: 'Cancel' })).toHaveAttribute(
+      'href',
+      marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS
+    )
   })
 }

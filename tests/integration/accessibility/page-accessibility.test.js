@@ -244,6 +244,11 @@ describe('Page accessibility checks (Axe)', () => {
       title: 'What are the proposed working hours?'
     },
     {
+      url: `${marineLicenceRoutes.MARINE_LICENCE_DELETE_ACTIVITY}?site=1&activity=2`,
+      isMarineLicence: true,
+      title: 'Are you sure you want to delete this activity?'
+    },
+    {
       url: marineLicenceRoutes.MARINE_LICENCE_COORDINATES_TYPE_CHOICE,
       title: 'How do you want to provide the site location?'
     },
@@ -267,6 +272,12 @@ describe('Page accessibility checks (Axe)', () => {
     {
       url: marineLicenceRoutes.MARINE_LICENCE_WIDTH_OF_SITE,
       title: 'Enter the width of the circular site in metres',
+      isMarineLicence: true
+    },
+    {
+      url: marineLicenceRoutes.MARINE_LICENCE_ENTER_MULTIPLE_COORDINATES,
+      title:
+        'Enter multiple sets of coordinates to mark the boundary of the site',
       isMarineLicence: true
     },
     {

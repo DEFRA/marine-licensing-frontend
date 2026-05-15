@@ -6,6 +6,7 @@ describe('Marine Licence Activity Details Card', () => {
   const baseParams = {
     siteNumber: 1,
     index: 1,
+    deleteLink: '/marine-licence/delete-activity?site=1&activity=1',
     activityDetails: {
       activityType: 'construction',
       activitySubType: "What you're constructing",
@@ -30,6 +31,20 @@ describe('Marine Licence Activity Details Card', () => {
     expect($component('.govuk-summary-card__title').text().trim()).toBe(
       'Site 1 - Activity 1'
     )
+  })
+
+  test('Should show delete link when deleteLink is provided', () => {
+    expect(
+      $component('.govuk-summary-card__actions a').first().text().trim()
+    ).toContain('Delete activity')
+  })
+
+  test('Should not show delete link when deleteLink is not provided', () => {
+    const $noDeleteComponent = renderComponent(
+      'marine-licence/activity-details-card',
+      { ...baseParams, deleteLink: undefined }
+    )
+    expect($noDeleteComponent('.govuk-summary-card__actions')).toHaveLength(0)
   })
 
   test('Should display all activity detail values', () => {

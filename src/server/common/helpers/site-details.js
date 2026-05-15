@@ -13,18 +13,18 @@ export const COORDINATE_ERROR_MESSAGES = {
       'Longitude must include 6 decimal places, like -1.399500'
   },
   [COORDINATE_SYSTEMS.OSGB36]: {
-    EASTINGS_REQUIRED: 'Enter the eastings',
-    EASTINGS_NON_NUMERIC: 'Eastings must be a number',
-    EASTINGS_LENGTH: 'Eastings must be 6 digits',
+    EASTINGS_REQUIRED: 'Enter the easting',
+    EASTINGS_NON_NUMERIC: 'Easting must be a number',
+    EASTINGS_LENGTH: 'Easting must be 6 digits',
     EASTINGS_POSITIVE_NUMBER:
-      'Eastings must be a positive 6-digit number, like 123456',
-    EASTINGS_WHOLE_NUMBER: 'Eastings must be a whole number',
-    NORTHINGS_REQUIRED: 'Enter the northings',
-    NORTHINGS_NON_NUMERIC: 'Northings must be a number',
-    NORTHINGS_LENGTH: 'Northings must be 6 or 7 digits',
+      'Easting must be a positive 6-digit number, like 123456',
+    EASTINGS_WHOLE_NUMBER: 'Easting must be a whole number',
+    NORTHINGS_REQUIRED: 'Enter the northing',
+    NORTHINGS_NON_NUMERIC: 'Northing must be a number',
+    NORTHINGS_LENGTH: 'Northing must be 6 or 7 digits',
     NORTHINGS_POSITIVE_NUMBER:
-      'Northings must be a positive 6 or 7-digit number, like 123456',
-    NORTHINGS_WHOLE_NUMBER: 'Northings must be a whole number'
+      'Northing must be a positive 6 or 7-digit number, like 123456',
+    NORTHINGS_WHOLE_NUMBER: 'Northing must be a whole number'
   }
 }
 export const generatePointSpecificErrorMessage = (baseMessage, index) => {
@@ -34,22 +34,22 @@ export const generatePointSpecificErrorMessage = (baseMessage, index) => {
   const messageMap = {
     'Enter the latitude': `Enter the latitude of ${pointName}`,
     'Enter the longitude': `Enter the longitude of ${pointName}`,
-    'Enter the eastings': `Enter the eastings of ${pointName}`,
-    'Enter the northings': `Enter the northings of ${pointName}`,
+    'Enter the easting': `Enter the easting of ${pointName}`,
+    'Enter the northing': `Enter the northing of ${pointName}`,
     'Latitude must be a number': `Latitude of ${pointName} must be a number`,
     'Longitude must be a number': `Longitude of ${pointName} must be a number`,
-    'Eastings must be a number': `Eastings of ${pointName} must be a number`,
-    'Northings must be a number': `Northings of ${pointName} must be a number`,
+    'Easting must be a number': `Easting of ${pointName} must be a number`,
+    'Northing must be a number': `Northing of ${pointName} must be a number`,
     'Latitude must be between -90 and 90': `Latitude of ${pointName} must be between -90 and 90`,
     'Longitude must be between -180 and 180': `Longitude of ${pointName} must be between -180 and 180`,
-    'Eastings must be 6 digits': `Eastings of ${pointName} must be 6 digits`,
-    'Northings must be 6 or 7 digits': `Northings of ${pointName} must be 6 or 7 digits`,
+    'Easting must be 6 digits': `Easting of ${pointName} must be 6 digits`,
+    'Northing must be 6 or 7 digits': `Northing of ${pointName} must be 6 or 7 digits`,
     'Latitude must include 6 decimal places, like 55.019889': `Latitude of ${pointName} must include 6 decimal places, like 55.019889`,
     'Longitude must include 6 decimal places, like -1.399500': `Longitude of ${pointName} must include 6 decimal places, like -1.399500`,
-    'Eastings must be a whole number': `Eastings of ${pointName} must be a whole number`,
-    'Northings must be a whole number': `Northings of ${pointName} must be a whole number`,
-    'Eastings must be a positive 6-digit number, like 123456': `Eastings of ${pointName} must be a positive 6-digit number, like 123456`,
-    'Northings must be a positive 6 or 7-digit number, like 123456': `Northings of ${pointName} must be a positive 6 or 7-digit number, like 123456`
+    'Easting must be a whole number': `Easting of ${pointName} must be a whole number`,
+    'Northing must be a whole number': `Northing of ${pointName} must be a whole number`,
+    'Easting must be a positive 6-digit number, like 123456': `Easting of ${pointName} must be a positive 6-digit number, like 123456`,
+    'Northing must be a positive 6 or 7-digit number, like 123456': `Northing of ${pointName} must be a positive 6 or 7-digit number, like 123456`
   }
 
   return messageMap[baseMessage] || baseMessage

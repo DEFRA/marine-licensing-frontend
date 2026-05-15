@@ -23,7 +23,7 @@ import { config } from '#src/config/config.js'
 import { iatAnswersService } from '#src/services/iat-answers-service/iat-answers.service.js'
 import { buildIatAnswersPayload } from '#src/server/journey/self-service/services/iat-answers-payload.js'
 
-const STUB_ANSWER_ID = 'iat-stub-id-123'
+const STUB_ANSWER_ID = 'AZ4rr6bLclCVUsE2Pl_zKw'
 const EXPECTED_ANSWER_PAGE_URL = `/journey/self-service/answer/${STUB_ANSWER_ID}`
 
 beforeEach(() => {

@@ -244,6 +244,11 @@ describe('Page accessibility checks (Axe)', () => {
       title: 'What are the proposed working hours?'
     },
     {
+      url: `${marineLicenceRoutes.MARINE_LICENCE_DELETE_ACTIVITY}?site=1&activity=2`,
+      isMarineLicence: true,
+      title: 'Are you sure you want to delete this activity?'
+    },
+    {
       url: marineLicenceRoutes.MARINE_LICENCE_COORDINATES_TYPE_CHOICE,
       title: 'How do you want to provide the site location?'
     },

@@ -48,7 +48,14 @@ export const renderFileUploadReview = (h, options) => {
       siteDetails: site
     })
 
-    const activityDetails = parseActivityDetails(site)
+    const activityDetails = parseActivityDetails(site).map(
+      (activity, actIndex) => ({
+        ...activity,
+        ...(actIndex > 0 && {
+          deleteLink: `${marineLicenceRoutes.MARINE_LICENCE_DELETE_ACTIVITY}?site=${index + 1}&activity=${actIndex + 1}`
+        })
+      })
+    )
 
     const siteDetailsData = createSiteDetailsDataJson(site)
 

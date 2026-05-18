@@ -19,7 +19,7 @@ import {
   makePostRequest
 } from '~/src/server/test-helpers/server-requests.js'
 import * as marineLicenceService from '~/src/services/marine-licence-service/index.js'
-import { getByRole } from '@testing-library/dom'
+import { getByRole, within } from '@testing-library/dom'
 
 vi.mock('~/src/services/marine-licence-service/index.js')
 
@@ -137,7 +137,7 @@ describe('ML Review Site Details - File Upload Integration Tests', () => {
 
       expect(response.statusCode).toBe(statusCodes.redirect)
       expect(response.headers.location).toBe(
-        `${marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS}#activity-details-site-1-activity-2`
+        `${marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS}#activity-details-site-1-activity-3`
       )
     })
   })
@@ -170,7 +170,6 @@ describe('ML Review Site Details - File Upload Integration Tests', () => {
 
     expect(getRowByKey(card, 'File type')).toBeFalsy()
     expect(getRowByKey(card, 'File uploaded')).toBeFalsy()
-    expect(document.querySelector('[href*="delete"]')).toBeFalsy()
   }
 
   const validateFileUpload = (document, expected, siteIndex) => {
@@ -211,6 +210,23 @@ describe('ML Review Site Details - File Upload Integration Tests', () => {
 
     activityDetailsCards.forEach((card, i) => {
       const activityDetails = expected.siteDetails[siteIndex].activityDetails[i]
+
+      const actionList = card.querySelector('.govuk-summary-card__actions')
+
+      if (i === 0) {
+        expect(actionList).toBeNull()
+      } else {
+        expect(actionList).toBeTruthy()
+
+        const deleteLink = within(actionList).getByRole('link', {
+          name: /Delete activity/
+        })
+
+        expect(deleteLink).toHaveAttribute(
+          'href',
+          expect.stringContaining(`delete-activity?site=1&activity=${i + 1}`)
+        )
+      }
 
       const activityTypeRow = getRowByKey(card, 'Type of activity')
       expect(activityTypeRow).toBeTruthy()

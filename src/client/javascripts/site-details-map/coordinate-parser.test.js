@@ -19,7 +19,7 @@ describe('CoordinateParser', () => {
   })
 
   const setupOSGB36Test = (webMercatorResult = [56000, 6708000]) => {
-    const coordinates = { eastings: '577000', northings: '178000' }
+    const coordinates = { easting: '577000', northing: '178000' }
     GeographicCoordinateConverter.osgb36ToWgs84.mockReturnValue([0.7, 51.55])
     mockFromLonLat.mockReturnValue(webMercatorResult)
     return coordinates
@@ -59,8 +59,8 @@ describe('CoordinateParser', () => {
       },
       {
         method: 'hasOSGB36Coordinates',
-        valid: { eastings: '530000', northings: '180000' },
-        invalid: [{ eastings: '530000' }, { northings: '180000' }, {}]
+        valid: { easting: '530000', northing: '180000' },
+        invalid: [{ easting: '530000' }, { northing: '180000' }, {}]
       }
     ])('$method should validate coordinates', ({ method, valid, invalid }) => {
       expect(coordinateParser[method](valid)).toBeTruthy()
@@ -289,9 +289,9 @@ describe('CoordinateParser', () => {
 
     test('should work with OSGB36 coordinates', () => {
       const coordinatesArray = [
-        { eastings: '530000', northings: '180000' },
-        { eastings: '531000', northings: '181000' },
-        { eastings: '532000', northings: '182000' }
+        { easting: '530000', northing: '180000' },
+        { easting: '531000', northing: '181000' },
+        { easting: '532000', northing: '182000' }
       ]
 
       GeographicCoordinateConverter.osgb36ToWgs84

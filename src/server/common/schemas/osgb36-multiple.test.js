@@ -5,9 +5,9 @@ describe('#multipleCoordinates OSGB36 schema', () => {
     test('Should correctly validate valid OSGB36 coordinates array', () => {
       const payload = {
         coordinates: [
-          { eastings: '123456', northings: '654321' },
-          { eastings: '234567', northings: '765432' },
-          { eastings: '345678', northings: '876543' }
+          { easting: '123456', northing: '654321' },
+          { easting: '234567', northing: '765432' },
+          { easting: '345678', northing: '876543' }
         ]
       }
 
@@ -20,11 +20,11 @@ describe('#multipleCoordinates OSGB36 schema', () => {
     test('Should correctly validate with more than 3 coordinates', () => {
       const payload = {
         coordinates: [
-          { eastings: '123456', northings: '654321' },
-          { eastings: '234567', northings: '765432' },
-          { eastings: '345678', northings: '876543' },
-          { eastings: '456789', northings: '987654' },
-          { eastings: '567890', northings: '1098765' }
+          { easting: '123456', northing: '654321' },
+          { easting: '234567', northing: '765432' },
+          { easting: '345678', northing: '876543' },
+          { easting: '456789', northing: '987654' },
+          { easting: '567890', northing: '1098765' }
         ]
       }
 
@@ -37,8 +37,8 @@ describe('#multipleCoordinates OSGB36 schema', () => {
     test('Should require at least 3 coordinates', () => {
       const payload = {
         coordinates: [
-          { eastings: '123456', northings: '654321' },
-          { eastings: '234567', northings: '765432' }
+          { easting: '123456', northing: '654321' },
+          { easting: '234567', northing: '765432' }
         ]
       }
 
@@ -52,9 +52,9 @@ describe('#multipleCoordinates OSGB36 schema', () => {
     test('Should validate individual coordinate fields', () => {
       const payload = {
         coordinates: [
-          { eastings: 'invalid', northings: '654321' },
-          { eastings: '234567', northings: '765432' },
-          { eastings: '345678', northings: '876543' }
+          { easting: 'invalid', northing: '654321' },
+          { easting: '234567', northing: '765432' },
+          { easting: '345678', northing: '876543' }
         ]
       }
 
@@ -62,7 +62,7 @@ describe('#multipleCoordinates OSGB36 schema', () => {
       const result = schema.validate(payload)
 
       expect(result.error).toBeDefined()
-      expect(result.error.message).toContain('Eastings must be a number')
+      expect(result.error.message).toContain('Easting must be a number')
     })
 
     test('Should require coordinates array', () => {
@@ -78,9 +78,9 @@ describe('#multipleCoordinates OSGB36 schema', () => {
     test('Should validate coordinate ranges', () => {
       const payload = {
         coordinates: [
-          { eastings: '12345', northings: '65432' }, // Too short
-          { eastings: '234567', northings: '765432' },
-          { eastings: '345678', northings: '876543' }
+          { easting: '12345', northing: '65432' }, // Too short
+          { easting: '234567', northing: '765432' },
+          { easting: '345678', northing: '876543' }
         ]
       }
 
@@ -88,15 +88,15 @@ describe('#multipleCoordinates OSGB36 schema', () => {
       const result = schema.validate(payload)
 
       expect(result.error).toBeDefined()
-      expect(result.error.message).toContain('Eastings must be 6 digits')
+      expect(result.error.message).toContain('Easting must be 6 digits')
     })
 
     test('Should allow unknown fields in payload', () => {
       const payload = {
         coordinates: [
-          { eastings: '123456', northings: '654321' },
-          { eastings: '234567', northings: '765432' },
-          { eastings: '345678', northings: '876543' }
+          { easting: '123456', northing: '654321' },
+          { easting: '234567', northing: '765432' },
+          { easting: '345678', northing: '876543' }
         ],
         id: 'exemption-123',
         csrfToken: 'token-value'
@@ -111,9 +111,9 @@ describe('#multipleCoordinates OSGB36 schema', () => {
     test('Should generate single error message for non-numeric input like "abc123"', () => {
       const payload = {
         coordinates: [
-          { eastings: 'abc123', northings: '654321' },
-          { eastings: '234567', northings: '765432' },
-          { eastings: '345678', northings: '876543' }
+          { easting: 'abc123', northing: '654321' },
+          { easting: '234567', northing: '765432' },
+          { easting: '345678', northing: '876543' }
         ]
       }
 
@@ -121,16 +121,16 @@ describe('#multipleCoordinates OSGB36 schema', () => {
       const result = schema.validate(payload, { abortEarly: false })
 
       expect(result.error).toBeDefined()
-      expect(result.error.message).toContain('Eastings must be a number')
+      expect(result.error.message).toContain('Easting must be a number')
 
-      // Verify only one error for the first coordinate's eastings (no duplicate)
-      const eastingsErrors = result.error.details.filter(
+      // Verify only one error for the first coordinate's easting (no duplicate)
+      const eastingErrors = result.error.details.filter(
         (detail) =>
           detail.path.includes('coordinates') &&
           detail.path.includes(0) &&
-          detail.path.includes('eastings')
+          detail.path.includes('easting')
       )
-      expect(eastingsErrors).toHaveLength(1)
+      expect(eastingErrors).toHaveLength(1)
     })
   })
 })

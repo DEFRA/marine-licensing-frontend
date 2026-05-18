@@ -1,39 +1,84 @@
-import { routes } from '~/src/server/common/constants/routes.js'
+import { JSDOM } from 'jsdom'
+import { getByRole } from '@testing-library/dom'
+import { statusCodes } from '~/src/server/common/constants/status-codes.js'
 import {
   expectFieldsetError,
   expectFieldsetInputValue,
   expectNoFieldsetError
 } from '~/tests/integration/shared/expect-utils.js'
 import { requestBody } from './helpers.js'
-import {
-  mockExemption,
-  setupTestServer
-} from '~/tests/integration/shared/test-setup-helpers.js'
-import { submitForm } from '~/tests/integration/shared/app-server.js'
-import { statusCodes } from '~/src/server/common/constants/status-codes.js'
-import {
-  exemptionOsgb36Coordinates,
-  exemptionWgs84Coordinates
-} from '~/tests/integration/enter-multiple-coordinates/fixtures.js'
 
-describe('Multiple co-ordinates - form validation', () => {
-  const getServer = setupTestServer()
-
-  const submitCoordinatesForm = async (formData) => {
-    const { document } = await submitForm({
-      requestUrl: routes.ENTER_MULTIPLE_COORDINATES,
-      server: getServer(),
-      formData
-    })
-    return document
+export function sharedEnterMultipleCoordinatesTests({
+  getRequest,
+  postRequest,
+  projectName,
+  backHref,
+  cancelHref,
+  wgs84FirstCoord,
+  osgb36FirstCoord,
+  setupWgs84,
+  setupOsgb36,
+  setupEmptyWgs84,
+  redirectHref
+}) {
+  const parseDocument = async (formData) => {
+    const response = await postRequest(formData)
+    return new JSDOM(response.result).window.document
   }
 
   describe('WGS84 co-ordinate system', () => {
-    beforeEach(() => mockExemption(exemptionWgs84Coordinates))
+    beforeEach(() => setupWgs84())
+
+    test('should render page correctly with pre-populated WGS84 coordinates', async () => {
+      const { result, statusCode } = await getRequest()
+
+      expect(statusCode).toBe(statusCodes.ok)
+
+      const { document } = new JSDOM(result).window
+
+      expect(
+        getByRole(document, 'heading', {
+          name: /Enter multiple sets of coordinates to mark the boundary of the site/
+        })
+      ).toBeInTheDocument()
+
+      expect(
+        document.querySelector('.govuk-caption-l').textContent.trim()
+      ).toBe(projectName)
+
+      expect(getByRole(document, 'link', { name: 'Back' })).toHaveAttribute(
+        'href',
+        backHref
+      )
+
+      expect(getByRole(document, 'link', { name: 'Cancel' })).toHaveAttribute(
+        'href',
+        cancelHref
+      )
+
+      expect(
+        document.querySelector('[name="coordinates[0][latitude]"]').value
+      ).toBe(wgs84FirstCoord.latitude)
+      expect(
+        document.querySelector('[name="coordinates[0][longitude]"]').value
+      ).toBe(wgs84FirstCoord.longitude)
+    })
+
+    test('should render page with empty inputs when cache has no coordinates', async () => {
+      setupEmptyWgs84()
+      const { result, statusCode } = await getRequest()
+
+      expect(statusCode).toBe(statusCodes.ok)
+
+      const { document } = new JSDOM(result).window
+      expect(
+        document.querySelector('[name="coordinates[0][latitude]"]').value
+      ).toBe('')
+    })
 
     describe('Co-ordinates missing', () => {
       test('all missing', async () => {
-        const document = await submitCoordinatesForm(
+        const document = await parseDocument(
           requestBody({
             coordinates: [
               ['', ''],
@@ -63,7 +108,7 @@ describe('Multiple co-ordinates - form validation', () => {
       })
 
       test('latitude missing', async () => {
-        const document = await submitCoordinatesForm(
+        const document = await parseDocument(
           requestBody({
             coordinates: [['', '0.000000']],
             system: 'WGS84'
@@ -88,7 +133,7 @@ describe('Multiple co-ordinates - form validation', () => {
       })
 
       test('longitude missing', async () => {
-        const document = await submitCoordinatesForm(
+        const document = await parseDocument(
           requestBody({
             coordinates: [['0.000000', '']],
             system: 'WGS84'
@@ -114,8 +159,8 @@ describe('Multiple co-ordinates - form validation', () => {
     })
 
     describe('Invalid co-ordinates', () => {
-      test('latitude has < 6 decimal places', async () => {
-        const document = await submitCoordinatesForm(
+      test('latitude has fewer than 6 decimal places', async () => {
+        const document = await parseDocument(
           requestBody({
             coordinates: [
               ['51', '-0.231530'],
@@ -144,8 +189,8 @@ describe('Multiple co-ordinates - form validation', () => {
         })
       })
 
-      test('longitude has < 6 decimal places', async () => {
-        const document = await submitCoordinatesForm(
+      test('longitude has fewer than 6 decimal places', async () => {
+        const document = await parseDocument(
           requestBody({
             coordinates: [
               ['51.495842', '-0.245672'],
@@ -175,11 +220,9 @@ describe('Multiple co-ordinates - form validation', () => {
       })
     })
 
-    test('redirects if all form data is valid', async () => {
-      const { response } = await submitForm({
-        requestUrl: routes.ENTER_MULTIPLE_COORDINATES,
-        server: getServer(),
-        formData: requestBody({
+    test('should redirect on valid WGS84 submission', async () => {
+      const response = await postRequest(
+        requestBody({
           coordinates: [
             ['51.489676', '-0.231530'],
             ['51.495842', '-0.245672'],
@@ -187,18 +230,70 @@ describe('Multiple co-ordinates - form validation', () => {
           ],
           system: 'WGS84'
         })
-      })
-      // page redirected, so no error
+      )
       expect(response.statusCode).toBe(statusCodes.redirect)
+      expect(response.headers.location).toBe(redirectHref)
+    })
+
+    test('should re-render with an added point when add button is submitted', async () => {
+      const response = await postRequest({
+        ...requestBody({
+          coordinates: [
+            ['51.489676', '-0.231530'],
+            ['51.495842', '-0.245672'],
+            ['51.483219', '-0.228943']
+          ],
+          system: 'WGS84'
+        }),
+        add: 'add'
+      })
+
+      expect(response.statusCode).toBe(statusCodes.ok)
+
+      const { document } = new JSDOM(response.result).window
+      expect(
+        document.querySelector('[name="coordinates[3][latitude]"]')
+      ).toBeTruthy()
+    })
+
+    test('should render validation error when fewer than 3 coordinate points provided', async () => {
+      const response = await postRequest(
+        requestBody({
+          coordinates: [['51.507400', '-0.127800']],
+          system: 'WGS84'
+        })
+      )
+
+      expect(response.statusCode).toBe(statusCodes.ok)
+
+      const { document } = new JSDOM(response.result).window
+      expect(document.querySelector('.govuk-error-summary')).toBeTruthy()
+      expect(document.body.textContent).toContain(
+        'You must provide at least 3 coordinate points'
+      )
     })
   })
 
   describe('OSGB36 co-ordinate system', () => {
-    beforeEach(() => mockExemption(exemptionOsgb36Coordinates))
+    beforeEach(() => setupOsgb36())
+
+    test('should render OSGB36 page with pre-populated coordinates', async () => {
+      const { result, statusCode } = await getRequest()
+
+      expect(statusCode).toBe(statusCodes.ok)
+
+      const { document } = new JSDOM(result).window
+      expect(
+        document.querySelector('[name="coordinates[0][easting]"]').value
+      ).toBe(osgb36FirstCoord.easting)
+      expect(
+        document.querySelector('[name="coordinates[0][northing]"]').value
+      ).toBe(osgb36FirstCoord.northing)
+    })
 
     describe('Co-ordinates missing', () => {
       test('all missing', async () => {
-        const document = await submitCoordinatesForm(
+        const document = await parseDocument(
           requestBody({
             coordinates: [
               ['', ''],
@@ -211,76 +306,76 @@ describe('Multiple co-ordinates - form validation', () => {
         expectFieldsetError({
           document,
           fieldsetLabel: 'Start and end point',
-          errorMessage: 'Enter the eastings of start and end point'
+          errorMessage: 'Enter the easting of start and end point'
         })
         ;['2', '3'].forEach((pointNumber) => {
           expectFieldsetError({
             document,
             fieldsetLabel: `Point ${pointNumber}`,
-            errorMessage: `Enter the eastings of point ${pointNumber}`
+            errorMessage: `Enter the easting of point ${pointNumber}`
           })
           expectFieldsetError({
             document,
             fieldsetLabel: `Point ${pointNumber}`,
-            errorMessage: `Enter the northings of point ${pointNumber}`
+            errorMessage: `Enter the northing of point ${pointNumber}`
           })
         })
       })
 
-      test('eastings missing', async () => {
-        const document = await submitCoordinatesForm(
+      test('easting missing', async () => {
+        const document = await parseDocument(
           requestBody({
-            coordinates: [['', '0.000000']],
+            coordinates: [['', '654321']],
             system: 'OSGB36'
           })
         )
         expectFieldsetError({
           document,
           fieldsetLabel: 'Start and end point',
-          errorMessage: 'Enter the eastings of start and end point'
+          errorMessage: 'Enter the easting of start and end point'
         })
         expectNoFieldsetError({
           document,
           fieldsetLabel: 'Start and end point',
-          errorMessage: 'Enter the northings of start and end point'
+          errorMessage: 'Enter the northing of start and end point'
         })
         expectFieldsetInputValue({
           document,
           fieldsetLabel: 'Start and end point',
-          inputLabel: 'Northings of start and end point',
-          value: '0.000000'
+          inputLabel: 'Northing of start and end point',
+          value: '654321'
         })
       })
 
-      test('northings missing', async () => {
-        const document = await submitCoordinatesForm(
+      test('northing missing', async () => {
+        const document = await parseDocument(
           requestBody({
-            coordinates: [['0.000000', '']],
+            coordinates: [['123456', '']],
             system: 'OSGB36'
           })
         )
         expectFieldsetError({
           document,
           fieldsetLabel: 'Start and end point',
-          errorMessage: 'Enter the northings of start and end point'
+          errorMessage: 'Enter the northing of start and end point'
         })
         expectNoFieldsetError({
           document,
           fieldsetLabel: 'Start and end point',
-          errorMessage: 'Enter the eastings of start and end point'
+          errorMessage: 'Enter the easting of start and end point'
         })
         expectFieldsetInputValue({
           document,
           fieldsetLabel: 'Start and end point',
-          inputLabel: 'Eastings of start and end point',
-          value: '0.000000'
+          inputLabel: 'Easting of start and end point',
+          value: '123456'
         })
       })
     })
 
     describe('Invalid co-ordinates', () => {
-      test('eastings is < 6 digits', async () => {
-        const document = await submitCoordinatesForm(
+      test('easting has fewer than 6 digits', async () => {
+        const document = await parseDocument(
           requestBody({
             coordinates: [
               ['12345', '654321'],
@@ -293,23 +388,23 @@ describe('Multiple co-ordinates - form validation', () => {
         expectFieldsetError({
           document,
           fieldsetLabel: 'Start and end point',
-          errorMessage: 'Eastings of start and end point must be 6 digits'
+          errorMessage: 'Easting of start and end point must be 6 digits'
         })
         expectNoFieldsetError({
           document,
           fieldsetLabel: 'Start and end point',
-          errorMessage: 'Enter the northings of start and end point'
+          errorMessage: 'Enter the northing of start and end point'
         })
         expectFieldsetInputValue({
           document,
           fieldsetLabel: 'Start and end point',
-          inputLabel: 'Northings of start and end point',
+          inputLabel: 'Northing of start and end point',
           value: '654321'
         })
       })
 
-      test('northings is < 6 digits', async () => {
-        const document = await submitCoordinatesForm(
+      test('northing has fewer than 6 digits', async () => {
+        const document = await parseDocument(
           requestBody({
             coordinates: [
               ['123456', '654321'],
@@ -322,27 +417,25 @@ describe('Multiple co-ordinates - form validation', () => {
         expectFieldsetError({
           document,
           fieldsetLabel: 'Point 3',
-          errorMessage: 'Northings of point 3 must be 6 or 7 digits'
+          errorMessage: 'Northing of point 3 must be 6 or 7 digits'
         })
         expectNoFieldsetError({
           document,
           fieldsetLabel: 'Point 3',
-          errorMessage: 'Enter the eastings of point 3'
+          errorMessage: 'Enter the easting of point 3'
         })
         expectFieldsetInputValue({
           document,
           fieldsetLabel: 'Point 3',
-          inputLabel: 'Eastings of point 3',
+          inputLabel: 'Easting of point 3',
           value: '123458'
         })
       })
     })
 
-    test('redirects if all form data is valid', async () => {
-      const { response } = await submitForm({
-        requestUrl: routes.ENTER_MULTIPLE_COORDINATES,
-        server: getServer(),
-        formData: requestBody({
+    test('should redirect on valid OSGB36 submission', async () => {
+      const response = await postRequest(
+        requestBody({
           coordinates: [
             ['123456', '654321'],
             ['123457', '654322'],
@@ -350,9 +443,9 @@ describe('Multiple co-ordinates - form validation', () => {
           ],
           system: 'OSGB36'
         })
-      })
-      // page redirected, so no error
+      )
       expect(response.statusCode).toBe(statusCodes.redirect)
+      expect(response.headers.location).toBe(redirectHref)
     })
   })
-})
+}

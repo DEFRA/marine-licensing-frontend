@@ -3,6 +3,7 @@ import {
   getExemptionCache,
   setExemptionCache
 } from '#src/server/common/helpers/exemptions/session-cache/utils.js'
+import { transformCoordinatesForApi } from '#src/server/common/helpers/site-details/coordinate-transform.js'
 import { routes } from '#src/server/common/constants/routes.js'
 import Boom from '@hapi/boom'
 
@@ -98,27 +99,32 @@ export const saveSiteDetailsToBackend = async (request, h) => {
     throw new Error('Site details are required to save')
   }
 
-  const dataToSave =
+  const cacheData =
     coordinatesType === 'file'
       ? prepareFileUploadDataForSave(siteDetails, request)
       : prepareManualCoordinateDataForSave(exemption, request)
 
+  const apiData =
+    coordinatesType === 'file'
+      ? cacheData
+      : transformCoordinatesForApi(cacheData)
+
   try {
     await authenticatedPatchRequest(request, '/exemption/site-details', {
       multipleSiteDetails: exemption.multipleSiteDetails,
-      siteDetails: dataToSave,
+      siteDetails: apiData,
       id: exemption.id
     })
 
     await setExemptionCache(request, h, {
       ...exemption,
-      siteDetails: dataToSave
+      siteDetails: cacheData
     })
 
     request.logger.info(
       {
         exemptionId: exemption.id,
-        siteCount: dataToSave.length,
+        siteCount: cacheData.length,
         coordinatesType
       },
       'Successfully saved site details to backend'

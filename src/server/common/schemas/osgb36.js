@@ -50,11 +50,11 @@ const validateCoordinates = (value, helpers, type) => {
     return helpers.error(JOI_ERRORS.NUMBER_POSITIVE)
   }
 
-  if (type === 'eastings' && !isEastingsInRange(value, coordinate)) {
+  if (type === 'easting' && !isEastingsInRange(value, coordinate)) {
     return helpers.error(JOI_ERRORS.NUMBER_RANGE)
   }
 
-  if (type === 'northings' && !isNorthingsInRange(value, coordinate)) {
+  if (type === 'northing' && !isNorthingsInRange(value, coordinate)) {
     return helpers.error(JOI_ERRORS.NUMBER_RANGE)
   }
 
@@ -74,13 +74,13 @@ const capitaliseCoordinateType = (type) =>
   type.charAt(0).toUpperCase() + type.slice(1)
 
 const COORDINATE_CONFIG = {
-  eastings: {
+  easting: {
     constantPrefix: 'EASTINGS',
     lengthDescription: '6 digits',
     positiveDescription: '6-digit number',
     example: '123456'
   },
-  northings: {
+  northing: {
     constantPrefix: 'NORTHINGS',
     lengthDescription: '6 or 7 digits',
     positiveDescription: '6 or 7-digit number',
@@ -139,13 +139,13 @@ export const createOsgb36CoordinateSchema = (
 }
 
 export const osgb36ValidationSchema = joi.object({
-  eastings: createOsgb36CoordinateSchema('eastings', 'constants'),
-  northings: createOsgb36CoordinateSchema('northings', 'constants')
+  eastings: createOsgb36CoordinateSchema('easting', 'constants'),
+  northings: createOsgb36CoordinateSchema('northing', 'constants')
 })
 
 export const osgb36MultipleCoordinateItemSchema = joi.object({
-  eastings: createOsgb36CoordinateSchema('eastings', 'simple'),
-  northings: createOsgb36CoordinateSchema('northings', 'simple')
+  easting: createOsgb36CoordinateSchema('easting', 'simple'),
+  northing: createOsgb36CoordinateSchema('northing', 'simple')
 })
 
 export const createOsgb36MultipleCoordinatesSchema = () => {

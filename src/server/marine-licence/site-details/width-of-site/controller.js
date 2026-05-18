@@ -2,11 +2,12 @@ import {
   getMarineLicenceCache,
   updateMarineLicenceSiteDetails
 } from '#src/server/common/helpers/marine-licence/session-cache/utils.js'
-import { getSiteDetailsBySite } from '#src/server/common/helpers/marine-licence/session-cache/site-details-utils.js'
 import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
 import { circleWidthValidationSchema } from '#src/server/common/schemas/circle-width.js'
 import { createFailAction } from '#src/server/common/helpers/createFailAction.js'
 import { getCancelLink } from '#src/server/marine-licence/site-details/utils/cancel-link.js'
+import { getSiteDataFromParam } from '#src/server/common/helpers/site-details/site-name.js'
+import { setSiteDataPreHandler } from '#src/server/common/helpers/marine-licence/session-cache/site-utils.js'
 import {
   WIDTH_OF_SITE_VIEW_ROUTE,
   widthOfSiteSettings,
@@ -20,16 +21,19 @@ const widthOfSitePageData = {
 }
 
 export const widthOfSiteController = {
+  options: {
+    pre: [setSiteDataPreHandler]
+  },
   handler(request, h) {
     const marineLicence = getMarineLicenceCache(request)
-    const siteDetails = getSiteDetailsBySite(marineLicence)
+    const { siteNumber, siteDetails } = request.site
     const action = request.query.action
 
     return h.view(WIDTH_OF_SITE_VIEW_ROUTE, {
       ...widthOfSitePageData,
       cancelLink: getCancelLink(action),
       projectName: marineLicence.projectName,
-      siteNumber: null,
+      siteNumber,
       action,
       payload: {
         width: siteDetails?.circleWidth
@@ -40,11 +44,13 @@ export const widthOfSiteController = {
 
 export const widthOfSiteSubmitController = {
   options: {
+    pre: [setSiteDataPreHandler],
     validate: {
       payload: circleWidthValidationSchema,
       failAction: (request, h, err) => {
         const marineLicence = getMarineLicenceCache(request)
         const { projectName } = marineLicence
+        const { siteNumber } = getSiteDataFromParam(request.query)
         const action = request.query.action
         return createFailAction({
           viewRoute: WIDTH_OF_SITE_VIEW_ROUTE,
@@ -55,7 +61,7 @@ export const widthOfSiteSubmitController = {
           payload: request.payload,
           params: {
             cancelLink: getCancelLink(action),
-            siteNumber: null,
+            siteNumber,
             action
           }
         })(request, h, err)
@@ -64,11 +70,12 @@ export const widthOfSiteSubmitController = {
   },
   async handler(request, h) {
     const { payload } = request
+    const { siteIndex } = request.site
 
     await updateMarineLicenceSiteDetails(
       request,
       h,
-      0,
+      siteIndex,
       'circleWidth',
       payload.width.trim()
     )

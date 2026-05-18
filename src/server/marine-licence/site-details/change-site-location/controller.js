@@ -4,7 +4,7 @@ import {
   setSingleSiteMode
 } from '#src/server/common/helpers/marine-licence/session-cache/utils.js'
 import { getSiteDataFromParam } from '#src/server/common/helpers/site-details/site-name.js'
-import { validateSiteParam } from '#src/server/common/helpers/marine-licence/session-cache/site-utils.js'
+import { validateSiteRequiredParam } from '#src/server/common/helpers/marine-licence/session-cache/site-utils.js'
 import { getSiteDetailsBySite } from '#src/server/common/helpers/marine-licence/session-cache/site-details-utils.js'
 
 export const CHANGE_SITE_LOCATION_VIEW_ROUTE =
@@ -14,7 +14,7 @@ const CHANGE_SITE_LOCATION_PAGE_TITLE = 'Change site location'
 
 export const changeSiteLocationController = {
   options: {
-    pre: [validateSiteParam]
+    pre: [validateSiteRequiredParam]
   },
   handler(request, h) {
     const marineLicence = getMarineLicenceCache(request)

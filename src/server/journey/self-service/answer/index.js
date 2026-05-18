@@ -1,6 +1,8 @@
 import Joi from 'joi'
 import { answerController } from '#src/server/journey/self-service/answer/controller.js'
 
+const SLUG_LENGTH = 22
+
 export const journeySelfServiceAnswer = {
   plugin: {
     name: 'journeySelfServiceAnswer',
@@ -14,7 +16,7 @@ export const journeySelfServiceAnswer = {
             validate: {
               params: Joi.object({
                 slug: Joi.string()
-                  .length(22)
+                  .length(SLUG_LENGTH)
                   .pattern(/^[A-Za-z0-9_-]{22}$/)
                   .required()
               })

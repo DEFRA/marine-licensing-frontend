@@ -5,7 +5,7 @@ export class IatAnswerPrint {
     }
     $module.addEventListener('click', (event) => {
       event.preventDefault()
-      window.print()
+      globalThis.print()
     })
   }
 }

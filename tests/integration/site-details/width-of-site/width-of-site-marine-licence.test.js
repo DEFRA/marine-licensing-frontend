@@ -77,12 +77,12 @@ describe('Width of site page (marine licence)', () => {
     )
   })
 
-  test('should redirect back to same page on valid submission', async () => {
+  test('should redirect to review site details on valid submission', async () => {
     const response = await postRequest({ width: '250' })
 
     expect(response.statusCode).toBe(statusCodes.redirect)
     expect(response.headers.location).toBe(
-      marineLicenceRoutes.MARINE_LICENCE_WIDTH_OF_SITE
+      marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS
     )
   })
 

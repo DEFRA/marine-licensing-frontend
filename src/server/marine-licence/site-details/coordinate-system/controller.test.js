@@ -25,22 +25,13 @@ describe('#coordinateSystem (marine licence)', () => {
 
   describe('#coordinateSystemController', () => {
     test('handler should render with correct context', () => {
+      vi.mocked(getMarineLicenceCache).mockReturnValue({
+        ...mockMarineLicenceApplication,
+        siteDetails: [{ coordinateSystem: 'wgs84', coordinatesEntry: 'single' }]
+      })
       const h = { view: vi.fn() }
 
-      coordinateSystemController.handler(
-        createMockRequest({
-          site: {
-            siteIndex: 0,
-            siteNumber: 1,
-            queryParams: '',
-            siteDetails: {
-              coordinateSystem: 'wgs84',
-              coordinatesEntry: 'single'
-            }
-          }
-        }),
-        h
-      )
+      coordinateSystemController.handler(createMockRequest(), h)
 
       expect(h.view).toHaveBeenCalledWith(
         MARINE_LICENCE_COORDINATE_SYSTEM_VIEW_ROUTE,
@@ -60,23 +51,13 @@ describe('#coordinateSystem (marine licence)', () => {
     })
 
     test('handler should render with correct context when no existing cache data', () => {
-      vi.mocked(getMarineLicenceCache).mockReturnValueOnce({
-        projectName: mockMarineLicenceApplication.projectName
+      vi.mocked(getMarineLicenceCache).mockReturnValue({
+        projectName: mockMarineLicenceApplication.projectName,
+        siteDetails: [{}]
       })
-
       const h = { view: vi.fn() }
 
-      coordinateSystemController.handler(
-        createMockRequest({
-          site: {
-            siteIndex: 0,
-            siteNumber: 1,
-            queryParams: '',
-            siteDetails: {}
-          }
-        }),
-        h
-      )
+      coordinateSystemController.handler(createMockRequest(), h)
 
       expect(h.view).toHaveBeenCalledWith(
         MARINE_LICENCE_COORDINATE_SYSTEM_VIEW_ROUTE,
@@ -190,19 +171,16 @@ describe('#coordinateSystem (marine licence)', () => {
     })
 
     test('Should correctly navigate to single coordinates when coordinatesEntry is single', async () => {
+      vi.mocked(getMarineLicenceCache).mockReturnValue({
+        ...mockMarineLicenceApplication,
+        siteDetails: [{ coordinatesEntry: 'single', coordinateSystem: 'wgs84' }]
+      })
       const h = { redirect: vi.fn() }
 
-      const request = createMockRequest({
-        payload: { coordinateSystem: 'wgs84' },
-        site: {
-          siteIndex: 0,
-          siteNumber: 1,
-          queryParams: '',
-          siteDetails: { coordinatesEntry: 'single', coordinateSystem: 'wgs84' }
-        }
-      })
-
-      await coordinateSystemSubmitController.handler(request, h)
+      await coordinateSystemSubmitController.handler(
+        createMockRequest({ payload: { coordinateSystem: 'wgs84' } }),
+        h
+      )
 
       expect(h.redirect).toHaveBeenCalledWith(
         marineLicenceRoutes.MARINE_LICENCE_CIRCLE_CENTRE_POINT
@@ -210,22 +188,18 @@ describe('#coordinateSystem (marine licence)', () => {
     })
 
     test('Should correctly navigate to multiple coordinates when coordinatesEntry is multiple', async () => {
+      vi.mocked(getMarineLicenceCache).mockReturnValue({
+        ...mockMarineLicenceApplication,
+        siteDetails: [
+          { coordinatesEntry: 'multiple', coordinateSystem: 'wgs84' }
+        ]
+      })
       const h = { redirect: vi.fn() }
 
-      const request = createMockRequest({
-        payload: { coordinateSystem: 'wgs84' },
-        site: {
-          siteIndex: 0,
-          siteNumber: 1,
-          queryParams: '',
-          siteDetails: {
-            coordinatesEntry: 'multiple',
-            coordinateSystem: 'wgs84'
-          }
-        }
-      })
-
-      await coordinateSystemSubmitController.handler(request, h)
+      await coordinateSystemSubmitController.handler(
+        createMockRequest({ payload: { coordinateSystem: 'wgs84' } }),
+        h
+      )
 
       expect(h.redirect).toHaveBeenCalledWith(
         marineLicenceRoutes.MARINE_LICENCE_ENTER_MULTIPLE_COORDINATES
@@ -233,19 +207,16 @@ describe('#coordinateSystem (marine licence)', () => {
     })
 
     test('Should fall back to circle centre point when coordinatesEntry is not set', async () => {
+      vi.mocked(getMarineLicenceCache).mockReturnValue({
+        ...mockMarineLicenceApplication,
+        siteDetails: [{ coordinateSystem: 'wgs84' }]
+      })
       const h = { redirect: vi.fn() }
 
-      const request = createMockRequest({
-        payload: { coordinateSystem: 'wgs84' },
-        site: {
-          siteIndex: 0,
-          siteNumber: 1,
-          queryParams: '',
-          siteDetails: { coordinateSystem: 'wgs84' }
-        }
-      })
-
-      await coordinateSystemSubmitController.handler(request, h)
+      await coordinateSystemSubmitController.handler(
+        createMockRequest({ payload: { coordinateSystem: 'wgs84' } }),
+        h
+      )
 
       expect(h.redirect).toHaveBeenCalledWith(
         marineLicenceRoutes.MARINE_LICENCE_CIRCLE_CENTRE_POINT
@@ -253,19 +224,16 @@ describe('#coordinateSystem (marine licence)', () => {
     })
 
     test('Should correctly set the cache when submitting', async () => {
+      vi.mocked(getMarineLicenceCache).mockReturnValue({
+        ...mockMarineLicenceApplication,
+        siteDetails: [{ coordinatesEntry: 'single', coordinateSystem: 'wgs84' }]
+      })
       const h = {
         redirect: vi.fn().mockReturnValue({ takeover: vi.fn() }),
         view: vi.fn()
       }
-
       const request = createMockRequest({
-        payload: { coordinateSystem: 'wgs84' },
-        site: {
-          siteIndex: 0,
-          siteNumber: 1,
-          queryParams: '',
-          siteDetails: { coordinatesEntry: 'single', coordinateSystem: 'wgs84' }
-        }
+        payload: { coordinateSystem: 'wgs84' }
       })
 
       await coordinateSystemSubmitController.handler(request, h)

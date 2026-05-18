@@ -2,12 +2,13 @@ import {
   getMarineLicenceCache,
   updateMarineLicenceSiteDetails
 } from '#src/server/common/helpers/marine-licence/session-cache/utils.js'
+import { getSiteDetailsBySite } from '#src/server/common/helpers/marine-licence/session-cache/site-details-utils.js'
 import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
 import { circleWidthValidationSchema } from '#src/server/common/schemas/circle-width.js'
 import { createFailAction } from '#src/server/common/helpers/createFailAction.js'
 import { getCancelLink } from '#src/server/marine-licence/site-details/utils/cancel-link.js'
 import { getSiteDataFromParam } from '#src/server/common/helpers/site-details/site-name.js'
-import { setSiteDataPreHandler } from '#src/server/common/helpers/marine-licence/session-cache/site-utils.js'
+import { validateSiteParam } from '#src/server/common/helpers/marine-licence/session-cache/site-utils.js'
 import {
   WIDTH_OF_SITE_VIEW_ROUTE,
   widthOfSiteSettings,
@@ -22,11 +23,12 @@ const widthOfSitePageData = {
 
 export const widthOfSiteController = {
   options: {
-    pre: [setSiteDataPreHandler]
+    pre: [validateSiteParam]
   },
   handler(request, h) {
     const marineLicence = getMarineLicenceCache(request)
-    const { siteNumber, siteDetails } = request.site
+    const { siteIndex, siteNumber } = getSiteDataFromParam(request.query)
+    const siteDetails = getSiteDetailsBySite(marineLicence, siteIndex)
     const action = request.query.action
 
     return h.view(WIDTH_OF_SITE_VIEW_ROUTE, {
@@ -44,7 +46,7 @@ export const widthOfSiteController = {
 
 export const widthOfSiteSubmitController = {
   options: {
-    pre: [setSiteDataPreHandler],
+    pre: [validateSiteParam],
     validate: {
       payload: circleWidthValidationSchema,
       failAction: (request, h, err) => {
@@ -70,7 +72,7 @@ export const widthOfSiteSubmitController = {
   },
   async handler(request, h) {
     const { payload } = request
-    const { siteIndex } = request.site
+    const { siteIndex } = getSiteDataFromParam(request.query)
 
     await updateMarineLicenceSiteDetails(
       request,
@@ -82,6 +84,6 @@ export const widthOfSiteSubmitController = {
 
     await saveSiteDetailsToBackend(request, h)
 
-    return h.redirect(marineLicenceRoutes.MARINE_LICENCE_WIDTH_OF_SITE)
+    return h.redirect(marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS)
   }
 }

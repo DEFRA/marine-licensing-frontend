@@ -2,6 +2,7 @@ import {
   getMarineLicenceCache,
   updateMarineLicenceSiteDetails
 } from '#src/server/common/helpers/marine-licence/session-cache/utils.js'
+import { getSiteDetailsBySite } from '#src/server/common/helpers/marine-licence/session-cache/site-details-utils.js'
 import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
 import {
   coordinatesEntrySettings,
@@ -10,7 +11,7 @@ import {
 import { coordinatesEntrySchema } from '#src/server/common/validation/coordinates-entry/schema.js'
 import { createFailAction } from '#src/server/common/helpers/createFailAction.js'
 import { getSiteDataFromParam } from '#src/server/common/helpers/site-details/site-name.js'
-import { setSiteDataPreHandler } from '#src/server/common/helpers/marine-licence/session-cache/site-utils.js'
+import { validateSiteParam } from '#src/server/common/helpers/marine-licence/session-cache/site-utils.js'
 import { getBackRoute } from './utils.js'
 
 export const MARINE_LICENCE_COORDINATES_ENTRY_VIEW_ROUTE =
@@ -20,11 +21,12 @@ const cancelLink = `${marineLicenceRoutes.MARINE_LICENCE_TASK_LIST}?cancel=site-
 
 export const coordinatesEntryController = {
   options: {
-    pre: [setSiteDataPreHandler]
+    pre: [validateSiteParam]
   },
   handler(request, h) {
     const marineLicence = getMarineLicenceCache(request)
-    const { siteNumber, siteDetails } = request.site
+    const { siteIndex, siteNumber } = getSiteDataFromParam(request.query)
+    const siteDetails = getSiteDetailsBySite(marineLicence, siteIndex)
     const action = request.query.action
 
     return h.view(MARINE_LICENCE_COORDINATES_ENTRY_VIEW_ROUTE, {
@@ -43,7 +45,7 @@ export const coordinatesEntryController = {
 
 export const coordinatesEntrySubmitController = {
   options: {
-    pre: [setSiteDataPreHandler],
+    pre: [validateSiteParam],
     validate: {
       payload: coordinatesEntrySchema,
       failAction: (request, h, err) => {
@@ -68,7 +70,7 @@ export const coordinatesEntrySubmitController = {
   },
   async handler(request, h) {
     const { payload } = request
-    const { siteIndex } = request.site
+    const { siteIndex } = getSiteDataFromParam(request.query)
 
     await updateMarineLicenceSiteDetails(
       request,

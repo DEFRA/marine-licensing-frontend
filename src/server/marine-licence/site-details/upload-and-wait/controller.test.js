@@ -1,7 +1,6 @@
 import { vi } from 'vitest'
 import { uploadAndWaitController } from '#src/server/marine-licence/site-details/upload-and-wait/controller.js'
 import { UPLOAD_AND_WAIT_VIEW_ROUTE } from '#src/server/common/helpers/file-upload/constants.js'
-import { SINGLE_SITE_ERROR_MESSAGE } from '#src/server/common/helpers/file-upload/error-messages.js'
 import * as mlCacheUtils from '#src/server/common/helpers/marine-licence/session-cache/utils.js'
 import * as cdpUploadService from '#src/services/cdp-upload-service/index.js'
 import * as geoParseUpload from '#src/server/common/helpers/file-upload/geo-parse-upload.js'
@@ -715,10 +714,10 @@ describe('#uploadAndWait', () => {
         })
       }
 
-      test('should store error and redirect to file upload when file contains multiple sites', async () => {
+      test('should pass singleSiteOnly property to geo-parser when in single site mode', async () => {
         getSingleSiteModeSpy.mockReturnValue({ siteIndex: 0 })
         authenticatedPostRequestSpy.mockResolvedValue(
-          createMockGeoJsonResponse(3)
+          createMockGeoJsonResponse(1)
         )
         setupReadyStatusWithValidFile()
 
@@ -726,26 +725,15 @@ describe('#uploadAndWait', () => {
 
         await uploadAndWaitController.handler(mockRequest, h)
 
-        expect(updateMarineLicenceSiteDetailsSpy).toHaveBeenCalledWith(
+        expect(authenticatedPostRequestSpy).toHaveBeenCalledWith(
           mockRequest,
-          expect.any(Object),
-          0,
-          'uploadError',
+          '/geo-parser/extract',
           {
-            message: SINGLE_SITE_ERROR_MESSAGE,
-            fieldName: 'file',
-            fileType: 'kml'
+            s3Bucket: 'test-bucket',
+            s3Key: 'test-key',
+            fileType: 'kml',
+            singleSiteOnly: true
           }
-        )
-        expect(updateMarineLicenceSiteDetailsSpy).toHaveBeenCalledWith(
-          mockRequest,
-          expect.any(Object),
-          0,
-          'uploadConfig',
-          null
-        )
-        expect(h.redirect).toHaveBeenCalledWith(
-          marineLicenceRoutes.MARINE_LICENCE_FILE_UPLOAD
         )
       })
 

@@ -18,10 +18,7 @@ import {
 } from '#src/server/common/helpers/file-upload/geo-parse-upload.js'
 import { handleReadyStatus } from '#src/server/common/helpers/file-upload/upload-status-handler.js'
 import { logSuccessfulProcessing } from '#src/server/common/helpers/file-upload/upload-logging.js'
-import {
-  DEFAULT_ERROR_MESSAGE,
-  SINGLE_SITE_ERROR_MESSAGE
-} from '#src/server/common/helpers/file-upload/error-messages.js'
+import { DEFAULT_ERROR_MESSAGE } from '#src/server/common/helpers/file-upload/error-messages.js'
 import {
   UPLOAD_AND_WAIT_VIEW_ROUTE,
   uploadAndWaitPageSettings
@@ -110,28 +107,14 @@ const processValidatedFile = async (status, uploadConfig, request, h) => {
   try {
     const cdpUploadConfig = config.get('cdpUploader')
 
+    const singleSiteMode = getSingleSiteMode(request)
+
     const coordinateData = await extractCoordinates({
       status,
       uploadConfig,
       request,
-      h
+      singleSiteOnly: !!singleSiteMode
     })
-
-    const singleSiteMode = getSingleSiteMode(request)
-
-    if (singleSiteMode && isMultipleSitesFile(coordinateData)) {
-      await storeUploadError(
-        request,
-        h,
-        {
-          message: SINGLE_SITE_ERROR_MESSAGE,
-          fieldName: 'file',
-          fileType: uploadConfig.fileType
-        },
-        uploadConfig.fileType
-      )
-      return h.redirect(marineLicenceRoutes.MARINE_LICENCE_FILE_UPLOAD)
-    }
 
     logSuccessfulProcessing(request, status, uploadConfig, coordinateData)
 

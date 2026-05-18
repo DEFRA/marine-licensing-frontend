@@ -105,7 +105,7 @@ export const centreCoordinatesSubmitController = {
   async handler(request, h) {
     const { payload } = request
     const marineLicence = getMarineLicenceCache(request)
-    const { siteIndex } = getSiteDataFromParam(request.query)
+    const { siteIndex, siteNumber } = getSiteDataFromParam(request.query)
     const siteDetails = getSiteDetailsBySite(marineLicence, siteIndex)
     const coordinateSystem = getCoordinateSystem(siteDetails)
     const action = request.query.action

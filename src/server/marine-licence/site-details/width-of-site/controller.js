@@ -72,7 +72,7 @@ export const widthOfSiteSubmitController = {
   },
   async handler(request, h) {
     const { payload } = request
-    const { siteIndex } = getSiteDataFromParam(request.query)
+    const { siteIndex, siteNumber } = getSiteDataFromParam(request.query)
 
     await updateMarineLicenceSiteDetails(
       request,

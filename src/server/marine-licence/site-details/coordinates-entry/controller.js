@@ -70,7 +70,8 @@ export const coordinatesEntrySubmitController = {
   },
   async handler(request, h) {
     const { payload } = request
-    const { siteIndex } = getSiteDataFromParam(request.query)
+    const { siteIndex, siteNumber } = getSiteDataFromParam(request.query)
+    const action = request.query.action
 
     await updateMarineLicenceSiteDetails(
       request,

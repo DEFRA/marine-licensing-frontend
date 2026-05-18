@@ -109,6 +109,36 @@ describe('#reviewSiteDetails', () => {
       )
     })
 
+    test('should redirect to task list for unknown coordinatesType', async () => {
+      getMarineLicenceCacheSpy.mockReturnValueOnce({ id: 'test-id' })
+
+      const unknownTypeMarineLicence = {
+        ...mockFileUploadMarineLicence,
+        siteDetails: [
+          {
+            ...mockFileUploadMarineLicence.siteDetails[0],
+            coordinatesType: 'unknown'
+          }
+        ]
+      }
+      const mockMarineLicenceServiceInstance = {
+        getMarineLicenceById: vi
+          .fn()
+          .mockResolvedValue(unknownTypeMarineLicence)
+      }
+      vi.spyOn(marineLicenceService, 'getMarineLicenceService').mockReturnValue(
+        mockMarineLicenceServiceInstance
+      )
+
+      const h = createMockHandler('redirect')
+
+      await reviewSiteDetailsController.handler(mockRequest, h)
+
+      expect(h.redirect).toHaveBeenCalledWith(
+        marineLicenceRoutes.MARINE_LICENCE_TASK_LIST
+      )
+    })
+
     test('should render manual-entry-review for coordinates coordinatesType', async () => {
       getMarineLicenceCacheSpy.mockReturnValueOnce({ id: 'test-id' })
 
@@ -137,6 +167,17 @@ describe('#reviewSiteDetails', () => {
   })
 
   describe('reviewSiteDetailsSubmitController', () => {
+    test('should redirect to task list when no addActivity in payload', async () => {
+      const h = createMockHandler('redirect')
+      const request = createMockRequest({ payload: {} })
+
+      await reviewSiteDetailsSubmitController.handler(request, h)
+
+      expect(h.redirect).toHaveBeenCalledWith(
+        marineLicenceRoutes.MARINE_LICENCE_TASK_LIST
+      )
+    })
+
     test('should call the API and redirect to review page with the next activity anchor', async () => {
       getMarineLicenceCacheSpy.mockReturnValue({
         id: 'test-id',

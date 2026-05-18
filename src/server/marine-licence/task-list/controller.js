@@ -91,10 +91,7 @@ export const taskListController = {
       ...sharingTaskListTransformed,
       ...projectDetailsTaskListTransformed,
       ...siteDetailsTaskListTransformed
-    ]
-      // Filter is temporary until we get to saving to the back end for manual 'Site Details'
-      .filter((task) => task.title.text !== 'Site details')
-      .every((task) => task.status.text === 'Completed')
+    ].every((task) => task.status.text === 'Completed')
 
     return h.view(TASK_LIST_VIEW_ROUTE, {
       ...taskListViewSettings,

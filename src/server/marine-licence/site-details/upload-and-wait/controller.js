@@ -28,6 +28,7 @@ import {
 } from '#src/server/common/helpers/file-upload/constants.js'
 import { getSiteDetailsBySite } from '#src/server/common/helpers/exemptions/session-cache/site-details-utils.js'
 import { saveSiteDetailsToBackend } from '#src/server/common/helpers/marine-licence/save-site-details.js'
+import { getSiteDetailsAnchor } from '#src/server/common/helpers/site-details/anchor-utils.js'
 import { config } from '#src/config/config.js'
 
 async function handleGeoParserError(request, h, error, filename, fileType) {
@@ -161,7 +162,11 @@ const processValidatedFile = async (status, uploadConfig, request, h) => {
 
     await saveSiteDetailsToBackend(request, h)
 
-    return h.redirect(marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS)
+    const reviewRoute = singleSiteMode
+      ? `${marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS}${getSiteDetailsAnchor(singleSiteMode.siteIndex + 1)}`
+      : marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS
+
+    return h.redirect(reviewRoute)
   } catch (error) {
     await handleGeoParserError(
       request,

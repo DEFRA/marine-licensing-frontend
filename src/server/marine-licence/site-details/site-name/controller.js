@@ -19,6 +19,7 @@ import {
 import { saveSiteDetailsToBackend } from '#src/server/common/helpers/marine-licence/save-site-details.js'
 import { getSiteDetailsBySite } from '#src/server/common/helpers/marine-licence/session-cache/site-details-utils.js'
 import { getCancelLink } from '#src/server/marine-licence/site-details/utils/cancel-link.js'
+import { getSiteDetailsAnchor } from '#src/server/common/helpers/site-details/anchor-utils.js'
 
 export const SITE_NAME_VIEW_ROUTE = 'templates/site-name.njk'
 
@@ -116,7 +117,7 @@ export const siteNameSubmitController = {
     const isFileUploadCoordinates = siteDetails.coordinatesType === 'file'
 
     const redirectRoute = isFileUploadCoordinates
-      ? `${marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS}#site-details-${siteNumber}`
+      ? `${marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS}${getSiteDetailsAnchor(siteNumber)}`
       : marineLicenceRoutes.MARINE_LICENCE_COORDINATES_ENTRY_CHOICE
 
     await updateMarineLicenceSiteDetails(

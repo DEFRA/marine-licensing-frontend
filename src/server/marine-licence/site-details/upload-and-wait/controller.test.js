@@ -768,11 +768,11 @@ describe('#uploadAndWait', () => {
           1
         )
         expect(h.redirect).toHaveBeenCalledWith(
-          marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS
+          `${marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS}#site-details-2`
         )
       })
 
-      test('should not block upload when file contains a single site', async () => {
+      test('should redirect to anchored site card on successful single site upload', async () => {
         getSingleSiteModeSpy.mockReturnValue({ siteIndex: 0 })
         authenticatedPostRequestSpy.mockResolvedValue(
           createMockGeoJsonResponse(1)
@@ -784,7 +784,7 @@ describe('#uploadAndWait', () => {
         await uploadAndWaitController.handler(mockRequest, h)
 
         expect(h.redirect).toHaveBeenCalledWith(
-          marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS
+          `${marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS}#site-details-1`
         )
       })
 

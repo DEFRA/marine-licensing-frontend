@@ -1,0 +1,24 @@
+---
+description: Project-specific shared helpers and utilities
+globs: src/server/marine-licence/**/*.js
+alwaysApply: true
+---
+
+# Project Helpers
+
+## Site Details Anchor
+
+When building a URL that links to a specific site card on the review-site-details page, use `getSiteDetailsAnchor` rather than constructing the anchor string manually.
+
+```javascript
+import { getSiteDetailsAnchor } from '#src/server/common/helpers/site-details/anchor-utils.js'
+
+// siteNumber is 1-based (the display number)
+const url = `${marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS}${getSiteDetailsAnchor(siteNumber)}`
+
+// If you only have siteIndex (0-based), convert first
+const url = `${marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS}${getSiteDetailsAnchor(siteIndex + 1)}`
+```
+
+- Location: `src/server/common/helpers/site-details/anchor-utils.js`
+- The anchor matches the `id: "site-details-" + site.siteNumber` set on site cards in the review-site-details Nunjucks templates.

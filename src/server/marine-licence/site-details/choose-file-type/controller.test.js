@@ -89,7 +89,7 @@ describe('#chooseFileType (marine licence)', () => {
         ...mockMarineLicenceApplication,
         siteDetails: [{ fileUploadType: 'kml' }]
       })
-      vi.mocked(getSingleSiteMode).mockReturnValueOnce(true)
+      vi.mocked(getSingleSiteMode).mockReturnValueOnce({ siteIndex: 0 })
 
       const h = { view: vi.fn() }
 

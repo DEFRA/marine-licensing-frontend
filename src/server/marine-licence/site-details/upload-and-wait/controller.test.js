@@ -147,12 +147,17 @@ const setupCacheSpies = () => {
 
   const getSingleSiteModeSpy = vi
     .spyOn(mlCacheUtils, 'getSingleSiteMode')
-    .mockReturnValue(false)
+    .mockReturnValue(null)
+
+  const updateSingleSiteLocationSpy = vi
+    .spyOn(mlCacheUtils, 'updateSingleSiteLocation')
+    .mockImplementation()
 
   return {
     getMarineLicenceCacheSpy,
     updateMarineLicenceSiteDetailsSpy,
-    getSingleSiteModeSpy
+    getSingleSiteModeSpy,
+    updateSingleSiteLocationSpy
   }
 }
 
@@ -273,6 +278,7 @@ describe('#uploadAndWait', () => {
   let getMarineLicenceCacheSpy
   let updateMarineLicenceSiteDetailsSpy
   let getSingleSiteModeSpy
+  let updateSingleSiteLocationSpy
   let mockCdpService
   let mockValidateUploadedFile
   let authenticatedPostRequestSpy
@@ -285,6 +291,7 @@ describe('#uploadAndWait', () => {
     updateMarineLicenceSiteDetailsSpy =
       cacheSpies.updateMarineLicenceSiteDetailsSpy
     getSingleSiteModeSpy = cacheSpies.getSingleSiteModeSpy
+    updateSingleSiteLocationSpy = cacheSpies.updateSingleSiteLocationSpy
 
     const services = setupMockServices()
     mockCdpService = services.mockCdpService
@@ -709,7 +716,7 @@ describe('#uploadAndWait', () => {
       }
 
       test('should store error and redirect to file upload when file contains multiple sites', async () => {
-        getSingleSiteModeSpy.mockReturnValue(true)
+        getSingleSiteModeSpy.mockReturnValue({ siteIndex: 0 })
         authenticatedPostRequestSpy.mockResolvedValue(
           createMockGeoJsonResponse(3)
         )
@@ -742,8 +749,31 @@ describe('#uploadAndWait', () => {
         )
       })
 
+      test('should call updateSingleSiteLocation with siteIndex when file is valid', async () => {
+        getSingleSiteModeSpy.mockReturnValue({ siteIndex: 1 })
+        authenticatedPostRequestSpy.mockResolvedValue(
+          createMockGeoJsonResponse(1)
+        )
+        setupReadyStatusWithValidFile()
+
+        const h = createMockResponseHandler()
+
+        await uploadAndWaitController.handler(mockRequest, h)
+
+        expect(updateSingleSiteLocationSpy).toHaveBeenCalledWith(
+          mockRequest,
+          expect.any(Object),
+          expect.any(Object),
+          expect.objectContaining({ s3Bucket: 'test-bucket' }),
+          1
+        )
+        expect(h.redirect).toHaveBeenCalledWith(
+          marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS
+        )
+      })
+
       test('should not block upload when file contains a single site', async () => {
-        getSingleSiteModeSpy.mockReturnValue(true)
+        getSingleSiteModeSpy.mockReturnValue({ siteIndex: 0 })
         authenticatedPostRequestSpy.mockResolvedValue(
           createMockGeoJsonResponse(1)
         )
@@ -758,8 +788,8 @@ describe('#uploadAndWait', () => {
         )
       })
 
-      test('should not block upload when singleSiteMode is false and file contains multiple sites', async () => {
-        getSingleSiteModeSpy.mockReturnValue(false)
+      test('should not block upload when singleSiteMode is null and file contains multiple sites', async () => {
+        getSingleSiteModeSpy.mockReturnValue(null)
         authenticatedPostRequestSpy.mockResolvedValue(
           createMockGeoJsonResponse(3)
         )

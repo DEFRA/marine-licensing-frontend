@@ -3,7 +3,8 @@ import {
   getMarineLicenceCache,
   getSingleSiteMode,
   updateMarineLicenceSiteDetails,
-  updateMarineLicenceSiteDetailsBatch
+  updateMarineLicenceSiteDetailsBatch,
+  updateSingleSiteLocation
 } from '#src/server/common/helpers/marine-licence/session-cache/utils.js'
 import { getCdpUploadService } from '#src/services/cdp-upload-service/index.js'
 import {
@@ -115,7 +116,9 @@ const processValidatedFile = async (status, uploadConfig, request, h) => {
       h
     })
 
-    if (getSingleSiteMode(request) && isMultipleSitesFile(coordinateData)) {
+    const singleSiteMode = getSingleSiteMode(request)
+
+    if (singleSiteMode && isMultipleSitesFile(coordinateData)) {
       await storeUploadError(
         request,
         h,
@@ -131,18 +134,30 @@ const processValidatedFile = async (status, uploadConfig, request, h) => {
 
     logSuccessfulProcessing(request, status, uploadConfig, coordinateData)
 
-    updateMarineLicenceSiteDetailsBatch(
-      request,
-      status,
-      coordinateData,
-      {
-        s3Bucket: cdpUploadConfig.s3Bucket,
-        s3Key: status.s3Location.s3Key
-      },
-      {
-        isMultipleSitesFile: isMultipleSitesFile(coordinateData)
-      }
-    )
+    const s3Location = {
+      s3Bucket: cdpUploadConfig.s3Bucket,
+      s3Key: status.s3Location.s3Key
+    }
+
+    if (singleSiteMode) {
+      updateSingleSiteLocation(
+        request,
+        status,
+        coordinateData,
+        s3Location,
+        singleSiteMode.siteIndex
+      )
+    } else {
+      updateMarineLicenceSiteDetailsBatch(
+        request,
+        status,
+        coordinateData,
+        s3Location,
+        {
+          isMultipleSitesFile: isMultipleSitesFile(coordinateData)
+        }
+      )
+    }
 
     await saveSiteDetailsToBackend(request, h)
 

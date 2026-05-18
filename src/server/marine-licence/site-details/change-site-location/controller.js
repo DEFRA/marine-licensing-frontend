@@ -37,7 +37,8 @@ export const changeSiteLocationController = {
 
 export const changeSiteLocationSubmitController = {
   async handler(request, h) {
-    await setSingleSiteMode(request, h)
+    const siteIndex = Number.parseInt(request.payload.siteIndex, 10)
+    await setSingleSiteMode(request, h, siteIndex)
     return h.redirect(
       marineLicenceRoutes.MARINE_LICENCE_CHOOSE_FILE_UPLOAD_TYPE
     )

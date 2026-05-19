@@ -1,0 +1,174 @@
+{% extends 'layouts/page.njk' %}
+{% from "govuk/components/back-link/macro.njk" import govukBackLink %}
+{% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "site-details-map/macro.njk" import appSiteDetailsMap %}
+{% from "marine-licence/activity-details-card/macro.njk" import appMarineLicenceActivityDetailsCard %}
+{% block head %}
+  {{ super() }}
+{% endblock %}
+{% block beforeContent %}
+  {{ super() }}
+  <nav>
+    {{ govukBackLink({
+      text: "Back",
+      href: backLink
+    }) }}
+  </nav>
+{% endblock %}
+
+{% block content %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-full">
+      <span class="govuk-caption-l">{{ projectName }}</span>
+      <h1 class="govuk-heading-l">Review site details</h1>
+
+      <div class="govuk-inset-text">
+        The site details you've provided are saved.<br>You must complete all sections marked <span class='govuk-tag govuk-tag--red govuk-!-margin-bottom-2 govuk-!-margin-top-2'>Incomplete</span> before you can send your information.<br>If you cannot finish now, you can return to this page later.
+      </div>
+
+      {% set multipleSiteRows = [
+        {
+          key: {
+            text: "Method of providing site location"
+          },
+          value: {
+            text: "Enter the coordinates of the site manually"
+          }
+        }
+      ] %}
+
+      {{ govukSummaryList({
+        card: {
+          title: {
+            text: "Providing the site location"
+          },
+          attributes: {
+            id: "site-location-card"
+          }
+        },
+        rows: multipleSiteRows
+      }) }}
+
+      {% for site in summaryData %}
+
+        <script nonce='{{ cspNonce }}'>
+          var geoJSON{{loop.index}} = {{ site.siteDetailsData | safe }};
+        </script>
+
+        {% set summaryRows = [] %}
+
+        {% set summaryRowsHeading %}
+          Site {{ site.siteNumber }}
+        {% endset %}
+
+        {% set _ = summaryRows.push({
+          key: { text: "Site name" },
+          value: { text: site.siteName }
+        }) %}
+
+        {% set _ = summaryRows.push({
+          key: { text: "Single or multiple sets of coordinates" },
+          value: { text: site.method }
+        }) %}
+
+        {% set _ = summaryRows.push({
+          key: { text: "Coordinate system" },
+          value: { text: site.coordinateSystem | replace('\n', '<br>') | safe }
+        }) %}
+
+        {% if site.polygonCoordinates %}
+          {% set hasCoordinates = false %}
+          {% for coordinate in site.polygonCoordinates %}
+            {% set hasCoordinates = true %}
+            {% set rowClasses = "" if loop.last else "govuk-summary-list__row--no-border" %}
+            {% set _ = summaryRows.push({
+              classes: rowClasses,
+              key: { text: coordinate.label },
+              value: { 
+                text: coordinate.value                
+              }
+            }) %}
+          {% endfor %}
+          {% if not hasCoordinates %}
+            {% set _ = summaryRows.push({
+              key: { text: "Start and end points" },
+              value: { text: "" }
+            }) %}
+          {% endif %}
+        {% else %}
+          {% set _ = summaryRows.push({
+            key: { text: "Coordinates at centre of site" },
+            value: { text: site.coordinates }
+          }) %}
+
+          {% set _ = summaryRows.push({
+            key: { text: "Width of circular site" },
+            value: { text: site.width }
+          }) %}
+        {% endif %}
+
+        {% set _ = summaryRows.push({
+          key: { text: "Map view" },
+          value: {
+            html: appSiteDetailsMap(site.siteDetailsData, loop.index0),
+            classes: "govuk-summary-list__value--full-width"
+          }
+        }) %}
+
+        {{ govukSummaryList({
+          card: {
+            attributes: {
+              id: "site-details-" + site.siteNumber
+            },
+            title: {
+              text: summaryRowsHeading
+            }
+          },
+          classes: "govuk-summary-list--full-width",
+          rows: summaryRows
+        }) }}
+
+        {% for activityDetails in site.activityDetails %}
+          {{ appMarineLicenceActivityDetailsCard({
+            activityDetails: activityDetails,
+            siteNumber: site.siteNumber,
+            index: loop.index
+          }) }}
+        {% endfor %}
+
+        <form method="POST">
+          <input type="hidden" name="csrfToken" value="{{ csrfToken }}">
+          <input type="hidden" name="siteNumber" value="{{ site.siteNumber }}">
+
+          <div class="govuk-!-margin-bottom-6">
+            {{ govukButton({
+              text: "Add another activity for site " + site.siteNumber,
+              classes: "govuk-button--secondary",
+              attributes: {
+                id: 'add-another-activity-site-' + site.siteNumber,
+                name: "addActivity",
+                value: "addActivity",
+                type: "submit"
+              }
+            }) }}
+          </div>
+
+          </form>
+
+      {% endfor %}
+
+      <form method="POST">
+        <input type="hidden" name="csrfToken" value="{{ csrfToken }}">
+        <div class="govuk-button-group">
+          {{ govukButton({
+            text: "Continue",
+            attributes: {
+              id: "continue"
+            }
+          }) }}
+        </div>
+      </form>
+    </div>
+  </div>
+{% endblock %}

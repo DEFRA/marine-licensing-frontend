@@ -24,6 +24,10 @@
             <span class="govuk-caption-l">{{ projectName }}</span>
             <h1 class="govuk-heading-l">{{ heading }}</h1>
 
+            <div class="govuk-inset-text">
+              The site details you've provided are saved.<br>You must complete all sections marked <span class='govuk-tag govuk-tag--red govuk-!-margin-bottom-2 govuk-!-margin-top-2'>Incomplete</span> before you can send your information.<br>If you cannot finish now, you can return to this page later.
+            </div>
+
             {% set multipleSiteRows = [
                 {
                     key: {
@@ -190,13 +194,15 @@
 
             {% if site.polygonCoordinates %}
                 {# Polygon site - multiple coordinates #}
-                {% set hasCoordinates = false %}
+                {% set hasCoordinates = false %}                
                 {% for coordinate in site.polygonCoordinates %}
                     {% set hasCoordinates = true %}
                     {% set coordinateKey = { text: coordinate.label } %}
+                    {% set rowClasses = "" if loop.last else "govuk-summary-list__row--no-border" %}
                     {% if loop.first %}
                         {% set coordinateValue = { html: appIncompleteField({ text: coordinate.value }) } %}
                         {% set coordinateRow = {
+                            classes: rowClasses,
                             key: coordinateKey,
                             value: coordinateValue,
                             actions: setSiteDetailsAction(site.polygonCoordinates, 'enter-multiple-coordinates', site.siteNumber)
@@ -204,6 +210,7 @@
                     {% else %}
                         {% set coordinateValue = { text: coordinate.value } %}
                         {% set coordinateRow = {
+                            classes: rowClasses,
                             key: coordinateKey,
                             value: coordinateValue
                         } %}

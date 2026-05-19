@@ -87,6 +87,6 @@ describe('Enter multiple coordinates page (marine licence)', () => {
     setupWgs84: () => mockMarineLicence(mockWgs84Application),
     setupOsgb36: () => mockMarineLicence(mockOsgb36Application),
     setupEmptyWgs84: () => mockMarineLicence(mockEmptyWgs84Application),
-    redirectHref: marineLicenceRoutes.MARINE_LICENCE_ENTER_MULTIPLE_COORDINATES
+    redirectHref: marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS
   })
 })

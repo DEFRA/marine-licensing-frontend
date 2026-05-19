@@ -2,9 +2,10 @@ import {
   getMarineLicenceCache,
   updateMarineLicenceSiteDetails
 } from '#src/server/common/helpers/marine-licence/session-cache/utils.js'
+import { getSiteDetailsBySite } from '#src/server/common/helpers/marine-licence/session-cache/site-details-utils.js'
 import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
 import { getSiteDataFromParam } from '#src/server/common/helpers/site-details/site-name.js'
-import { setSiteDataPreHandler } from '#src/server/common/helpers/marine-licence/session-cache/site-utils.js'
+import { validateSiteParam } from '#src/server/common/helpers/marine-licence/session-cache/site-utils.js'
 import { createFailAction } from '#src/server/common/helpers/createFailAction.js'
 import {
   coordinateSystemSettings,
@@ -19,11 +20,12 @@ const cancelLink = `${marineLicenceRoutes.MARINE_LICENCE_TASK_LIST}?cancel=site-
 
 export const coordinateSystemController = {
   options: {
-    pre: [setSiteDataPreHandler]
+    pre: [validateSiteParam]
   },
   handler(request, h) {
     const marineLicence = getMarineLicenceCache(request)
-    const { siteNumber, siteDetails } = request.site
+    const { siteIndex, siteNumber } = getSiteDataFromParam(request.query)
+    const siteDetails = getSiteDetailsBySite(marineLicence, siteIndex)
     const action = request.query.action
 
     return h.view(MARINE_LICENCE_COORDINATE_SYSTEM_VIEW_ROUTE, {
@@ -42,7 +44,7 @@ export const coordinateSystemController = {
 
 export const coordinateSystemSubmitController = {
   options: {
-    pre: [setSiteDataPreHandler],
+    pre: [validateSiteParam],
     validate: {
       payload: coordinateSystemSchema,
       failAction: (request, h, err) => {
@@ -67,7 +69,9 @@ export const coordinateSystemSubmitController = {
   },
   async handler(request, h) {
     const { payload } = request
-    const { siteIndex, siteDetails } = request.site
+    const marineLicence = getMarineLicenceCache(request)
+    const { siteIndex } = getSiteDataFromParam(request.query)
+    const siteDetails = getSiteDetailsBySite(marineLicence, siteIndex)
 
     await updateMarineLicenceSiteDetails(
       request,

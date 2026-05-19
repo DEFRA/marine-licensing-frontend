@@ -2,7 +2,7 @@ import {
   apiRoutes,
   marineLicenceRoutes
 } from '#src/server/common/constants/routes.js'
-import { renderFileUploadReview } from './utils.js'
+import { renderFileUploadReview, renderManualEntryReview } from './utils.js'
 import { getSiteDetailsBySite } from '#src/server/common/helpers/exemptions/session-cache/site-details-utils.js'
 import {
   clearSavedMarineLicenceSiteDetails,
@@ -53,17 +53,25 @@ export const reviewSiteDetailsController = {
       ? marineLicenceRoutes.MARINE_LICENCE_CHECK_YOUR_ANSWERS
       : false
 
-    if (coordinatesType !== 'file') {
+    if (coordinatesType === 'file') {
+      return renderFileUploadReview(h, {
+        marineLicence: completeMarineLicence,
+        siteDetails,
+        previousPage,
+        reviewSiteDetailsPageData,
+        returnToCheckYourAnswers
+      })
+    } else if (coordinatesType === 'coordinates') {
+      return renderManualEntryReview(h, {
+        marineLicence: completeMarineLicence,
+        siteDetails,
+        previousPage,
+        reviewSiteDetailsPageData,
+        returnToCheckYourAnswers
+      })
+    } else {
       return h.redirect(marineLicenceRoutes.MARINE_LICENCE_TASK_LIST)
     }
-
-    return renderFileUploadReview(h, {
-      marineLicence: completeMarineLicence,
-      siteDetails,
-      previousPage,
-      reviewSiteDetailsPageData,
-      returnToCheckYourAnswers
-    })
   }
 }
 

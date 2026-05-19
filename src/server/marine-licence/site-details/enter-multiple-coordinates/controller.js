@@ -16,7 +16,9 @@ import {
 } from './utils.js'
 import { validateCoordinates } from '#src/server/common/validation/multiple-coordinates/validate.js'
 import { getCancelLink } from '#src/server/marine-licence/site-details/utils/cancel-link.js'
-import { setSiteDataPreHandler } from '#src/server/common/helpers/marine-licence/session-cache/site-utils.js'
+import { validateSiteParam } from '#src/server/common/helpers/marine-licence/session-cache/site-utils.js'
+import { getSiteDataFromParam } from '#src/server/common/helpers/site-details/site-name.js'
+import { getSiteDetailsBySite } from '#src/server/common/helpers/marine-licence/session-cache/site-details-utils.js'
 import { saveSiteDetailsToBackend } from '#src/server/common/helpers/marine-licence/save-site-details.js'
 
 const getCoordinateSystemForSite = (siteDetails) =>
@@ -31,12 +33,13 @@ const getBackLinkForAction = (action) =>
 
 export const multipleCoordinatesController = {
   options: {
-    pre: [setSiteDataPreHandler]
+    pre: [validateSiteParam]
   },
   handler(request, h) {
     const marineLicence = getMarineLicenceCache(request) || {}
     const { projectName } = marineLicence
-    const { siteNumber, siteDetails } = request.site
+    const { siteIndex, siteNumber } = getSiteDataFromParam(request.query)
+    const siteDetails = getSiteDetailsBySite(marineLicence, siteIndex)
     const action = request.query.action
 
     const coordinateSystem = getCoordinateSystemForSite(siteDetails)
@@ -60,12 +63,13 @@ export const multipleCoordinatesController = {
 
 export const multipleCoordinatesSubmitController = {
   options: {
-    pre: [setSiteDataPreHandler]
+    pre: [validateSiteParam]
   },
   async handler(request, h) {
     const { payload } = request
     const marineLicence = getMarineLicenceCache(request)
-    const { siteIndex, siteNumber, siteDetails } = request.site
+    const { siteIndex, siteNumber } = getSiteDataFromParam(request.query)
+    const siteDetails = getSiteDetailsBySite(marineLicence, siteIndex)
     const coordinateSystem = getCoordinateSystemForSite(siteDetails)
 
     let coordinates = convertPayloadToCoordinatesArray(
@@ -140,8 +144,6 @@ export const multipleCoordinatesSubmitController = {
 
     await saveSiteDetailsToBackend(request, h)
 
-    return h.redirect(
-      marineLicenceRoutes.MARINE_LICENCE_ENTER_MULTIPLE_COORDINATES
-    )
+    return h.redirect(marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS)
   }
 }

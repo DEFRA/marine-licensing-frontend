@@ -25,19 +25,13 @@ describe('#widthOfSite (marine licence)', () => {
 
   describe('#widthOfSiteController', () => {
     test('handler should render with correct context with pre-populated width', () => {
+      vi.mocked(getMarineLicenceCache).mockReturnValue({
+        ...mockMarineLicenceApplication,
+        siteDetails: [{ circleWidth: '500' }]
+      })
       const h = { view: vi.fn() }
 
-      widthOfSiteController.handler(
-        createMockRequest({
-          site: {
-            siteIndex: 0,
-            siteNumber: 1,
-            queryParams: '',
-            siteDetails: { circleWidth: '500' }
-          }
-        }),
-        h
-      )
+      widthOfSiteController.handler(createMockRequest(), h)
 
       expect(h.view).toHaveBeenCalledWith(WIDTH_OF_SITE_VIEW_ROUTE, {
         pageTitle: 'Enter the width of the circular site in metres',
@@ -52,22 +46,13 @@ describe('#widthOfSite (marine licence)', () => {
     })
 
     test('handler should render with payload.width undefined when no circleWidth in cache', () => {
-      vi.mocked(getMarineLicenceCache).mockReturnValueOnce({
-        projectName: mockMarineLicenceApplication.projectName
+      vi.mocked(getMarineLicenceCache).mockReturnValue({
+        projectName: mockMarineLicenceApplication.projectName,
+        siteDetails: [{}]
       })
       const h = { view: vi.fn() }
 
-      widthOfSiteController.handler(
-        createMockRequest({
-          site: {
-            siteIndex: 0,
-            siteNumber: 1,
-            queryParams: '',
-            siteDetails: {}
-          }
-        }),
-        h
-      )
+      widthOfSiteController.handler(createMockRequest(), h)
 
       expect(h.view).toHaveBeenCalledWith(WIDTH_OF_SITE_VIEW_ROUTE, {
         pageTitle: 'Enter the width of the circular site in metres',
@@ -83,12 +68,9 @@ describe('#widthOfSite (marine licence)', () => {
   })
 
   describe('#widthOfSiteSubmitController', () => {
-    test('should call updateMarineLicenceSiteDetails with trimmed width and redirect to same page', async () => {
+    test('should call updateMarineLicenceSiteDetails with trimmed width and redirect to review-site-details', async () => {
       const h = { redirect: vi.fn() }
-      const request = createMockRequest({
-        payload: { width: ' 500 ' },
-        site: { siteIndex: 0, siteNumber: 1, queryParams: '', siteDetails: {} }
-      })
+      const request = createMockRequest({ payload: { width: ' 500 ' } })
 
       await widthOfSiteSubmitController.handler(request, h)
 
@@ -101,7 +83,7 @@ describe('#widthOfSite (marine licence)', () => {
       )
       expect(saveSiteDetailsToBackend).toHaveBeenCalledWith(request, h)
       expect(h.redirect).toHaveBeenCalledWith(
-        marineLicenceRoutes.MARINE_LICENCE_WIDTH_OF_SITE
+        marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS
       )
     })
   })

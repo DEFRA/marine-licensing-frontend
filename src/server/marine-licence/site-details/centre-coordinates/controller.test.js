@@ -28,22 +28,13 @@ describe('#centreCoordinates (marine licence)', () => {
 
   describe('#centreCoordinatesController', () => {
     test('handler should render with correct context with no existing data', () => {
-      vi.mocked(getMarineLicenceCache).mockReturnValueOnce({
-        projectName: mockMarineLicenceApplication.projectName
+      vi.mocked(getMarineLicenceCache).mockReturnValue({
+        projectName: mockMarineLicenceApplication.projectName,
+        siteDetails: [{}]
       })
       const h = { view: vi.fn() }
 
-      centreCoordinatesController.handler(
-        createMockRequest({
-          site: {
-            siteIndex: 0,
-            siteNumber: 1,
-            queryParams: '',
-            siteDetails: {}
-          }
-        }),
-        h
-      )
+      centreCoordinatesController.handler(createMockRequest(), h)
 
       expect(h.view).toHaveBeenCalledWith(
         COORDINATE_SYSTEM_VIEW_ROUTES[COORDINATE_SYSTEMS.WGS84],
@@ -62,23 +53,19 @@ describe('#centreCoordinates (marine licence)', () => {
     })
 
     test('handler should render with correct context for wgs84', () => {
+      vi.mocked(getMarineLicenceCache).mockReturnValue({
+        ...mockMarineLicenceApplication,
+        siteDetails: [
+          {
+            coordinatesType: 'coordinates',
+            coordinateSystem: COORDINATE_SYSTEMS.WGS84,
+            coordinates: wgs84Coordinates
+          }
+        ]
+      })
       const h = { view: vi.fn() }
 
-      centreCoordinatesController.handler(
-        createMockRequest({
-          site: {
-            siteIndex: 0,
-            siteNumber: 1,
-            queryParams: '',
-            siteDetails: {
-              coordinatesType: 'coordinates',
-              coordinateSystem: COORDINATE_SYSTEMS.WGS84,
-              coordinates: wgs84Coordinates
-            }
-          }
-        }),
-        h
-      )
+      centreCoordinatesController.handler(createMockRequest(), h)
 
       expect(h.view).toHaveBeenCalledWith(
         COORDINATE_SYSTEM_VIEW_ROUTES[COORDINATE_SYSTEMS.WGS84],
@@ -97,26 +84,19 @@ describe('#centreCoordinates (marine licence)', () => {
     })
 
     test('handler should render with correct context for osgb36', () => {
-      vi.mocked(getMarineLicenceCache).mockReturnValueOnce({
-        projectName: mockMarineLicenceApplication.projectName
+      vi.mocked(getMarineLicenceCache).mockReturnValue({
+        projectName: mockMarineLicenceApplication.projectName,
+        siteDetails: [
+          {
+            coordinatesType: 'coordinates',
+            coordinateSystem: COORDINATE_SYSTEMS.OSGB36,
+            coordinates: osgb36Coordinates
+          }
+        ]
       })
       const h = { view: vi.fn() }
 
-      centreCoordinatesController.handler(
-        createMockRequest({
-          site: {
-            siteIndex: 0,
-            siteNumber: 1,
-            queryParams: '',
-            siteDetails: {
-              coordinatesType: 'coordinates',
-              coordinateSystem: COORDINATE_SYSTEMS.OSGB36,
-              coordinates: osgb36Coordinates
-            }
-          }
-        }),
-        h
-      )
+      centreCoordinatesController.handler(createMockRequest(), h)
 
       expect(h.view).toHaveBeenCalledWith(
         COORDINATE_SYSTEM_VIEW_ROUTES[COORDINATE_SYSTEMS.OSGB36],
@@ -137,16 +117,11 @@ describe('#centreCoordinates (marine licence)', () => {
 
   describe('#centreCoordinatesSubmitFailHandler', () => {
     test('should correctly format error data', () => {
-      const request = createMockRequest({
-        query: {},
-        payload: { latitude: 'invalid' },
-        site: {
-          siteIndex: 0,
-          siteNumber: 1,
-          queryParams: '',
-          siteDetails: { coordinateSystem: COORDINATE_SYSTEMS.WGS84 }
-        }
+      vi.mocked(getMarineLicenceCache).mockReturnValue({
+        ...mockMarineLicenceApplication,
+        siteDetails: [{ coordinateSystem: COORDINATE_SYSTEMS.WGS84 }]
       })
+      const request = createMockRequest({ payload: { latitude: 'invalid' } })
       const h = {
         view: vi.fn().mockReturnValue({ takeover: vi.fn() })
       }
@@ -180,19 +155,11 @@ describe('#centreCoordinates (marine licence)', () => {
     })
 
     test('should correctly format error data for osgb36', () => {
-      vi.mocked(getMarineLicenceCache).mockReturnValueOnce({
-        projectName: mockMarineLicenceApplication.projectName
+      vi.mocked(getMarineLicenceCache).mockReturnValue({
+        projectName: mockMarineLicenceApplication.projectName,
+        siteDetails: [{ coordinateSystem: COORDINATE_SYSTEMS.OSGB36 }]
       })
-      const request = createMockRequest({
-        query: {},
-        payload: { eastings: 'invalid' },
-        site: {
-          siteIndex: 0,
-          siteNumber: 1,
-          queryParams: '',
-          siteDetails: { coordinateSystem: COORDINATE_SYSTEMS.OSGB36 }
-        }
-      })
+      const request = createMockRequest({ payload: { eastings: 'invalid' } })
       const h = {
         view: vi.fn().mockReturnValue({ takeover: vi.fn() })
       }
@@ -226,16 +193,11 @@ describe('#centreCoordinates (marine licence)', () => {
     })
 
     test('should still render page if no error details are provided', () => {
-      const request = createMockRequest({
-        query: {},
-        payload: { latitude: 'invalid' },
-        site: {
-          siteIndex: 0,
-          siteNumber: 1,
-          queryParams: '',
-          siteDetails: { coordinateSystem: COORDINATE_SYSTEMS.WGS84 }
-        }
+      vi.mocked(getMarineLicenceCache).mockReturnValue({
+        ...mockMarineLicenceApplication,
+        siteDetails: [{ coordinateSystem: COORDINATE_SYSTEMS.WGS84 }]
       })
+      const request = createMockRequest({ payload: { latitude: 'invalid' } })
       const h = {
         view: vi.fn().mockReturnValue({ takeover: vi.fn() })
       }
@@ -262,16 +224,12 @@ describe('#centreCoordinates (marine licence)', () => {
 
   describe('#centreCoordinatesSubmitController', () => {
     test('should correctly set the cache when submitting wgs84 data', async () => {
-      const h = { redirect: vi.fn() }
-      const request = createMockRequest({
-        payload: { ...wgs84Coordinates },
-        site: {
-          siteIndex: 0,
-          siteNumber: 1,
-          queryParams: '',
-          siteDetails: { coordinateSystem: COORDINATE_SYSTEMS.WGS84 }
-        }
+      vi.mocked(getMarineLicenceCache).mockReturnValue({
+        ...mockMarineLicenceApplication,
+        siteDetails: [{ coordinateSystem: COORDINATE_SYSTEMS.WGS84 }]
       })
+      const h = { redirect: vi.fn() }
+      const request = createMockRequest({ payload: { ...wgs84Coordinates } })
 
       await centreCoordinatesSubmitController.handler(request, h)
 
@@ -285,15 +243,13 @@ describe('#centreCoordinates (marine licence)', () => {
     })
 
     test('should trim spaces from wgs84 data and save the converted values', async () => {
+      vi.mocked(getMarineLicenceCache).mockReturnValue({
+        ...mockMarineLicenceApplication,
+        siteDetails: [{ coordinateSystem: COORDINATE_SYSTEMS.WGS84 }]
+      })
       const h = { redirect: vi.fn() }
       const request = createMockRequest({
-        payload: { latitude: ' 55.019889', longitude: '-1.399500 ' },
-        site: {
-          siteIndex: 0,
-          siteNumber: 1,
-          queryParams: '',
-          siteDetails: { coordinateSystem: COORDINATE_SYSTEMS.WGS84 }
-        }
+        payload: { latitude: ' 55.019889', longitude: '-1.399500 ' }
       })
 
       await centreCoordinatesSubmitController.handler(request, h)
@@ -308,16 +264,12 @@ describe('#centreCoordinates (marine licence)', () => {
     })
 
     test('should correctly set the cache when submitting OSGB36 data', async () => {
-      const h = { redirect: vi.fn() }
-      const request = createMockRequest({
-        payload: { ...osgb36Coordinates },
-        site: {
-          siteIndex: 0,
-          siteNumber: 1,
-          queryParams: '',
-          siteDetails: { coordinateSystem: COORDINATE_SYSTEMS.OSGB36 }
-        }
+      vi.mocked(getMarineLicenceCache).mockReturnValue({
+        ...mockMarineLicenceApplication,
+        siteDetails: [{ coordinateSystem: COORDINATE_SYSTEMS.OSGB36 }]
       })
+      const h = { redirect: vi.fn() }
+      const request = createMockRequest({ payload: { ...osgb36Coordinates } })
 
       await centreCoordinatesSubmitController.handler(request, h)
 
@@ -331,15 +283,13 @@ describe('#centreCoordinates (marine licence)', () => {
     })
 
     test('should trim spaces from OSGB36 data and save the converted values', async () => {
+      vi.mocked(getMarineLicenceCache).mockReturnValue({
+        ...mockMarineLicenceApplication,
+        siteDetails: [{ coordinateSystem: COORDINATE_SYSTEMS.OSGB36 }]
+      })
       const h = { redirect: vi.fn() }
       const request = createMockRequest({
-        payload: { eastings: ' 425053', northings: '564180 ' },
-        site: {
-          siteIndex: 0,
-          siteNumber: 1,
-          queryParams: '',
-          siteDetails: { coordinateSystem: COORDINATE_SYSTEMS.OSGB36 }
-        }
+        payload: { eastings: ' 425053', northings: '564180 ' }
       })
 
       await centreCoordinatesSubmitController.handler(request, h)
@@ -354,18 +304,14 @@ describe('#centreCoordinates (marine licence)', () => {
     })
 
     test('should correctly handle validation errors', async () => {
+      vi.mocked(getMarineLicenceCache).mockReturnValue({
+        ...mockMarineLicenceApplication,
+        siteDetails: [{ coordinateSystem: COORDINATE_SYSTEMS.WGS84 }]
+      })
       const h = {
         view: vi.fn().mockReturnValue({ takeover: vi.fn() })
       }
-      const request = createMockRequest({
-        payload: { latitude: 'invalid' },
-        site: {
-          siteIndex: 0,
-          siteNumber: 1,
-          queryParams: '',
-          siteDetails: { coordinateSystem: COORDINATE_SYSTEMS.WGS84 }
-        }
-      })
+      const request = createMockRequest({ payload: { latitude: 'invalid' } })
 
       await centreCoordinatesSubmitController.handler(request, h)
 

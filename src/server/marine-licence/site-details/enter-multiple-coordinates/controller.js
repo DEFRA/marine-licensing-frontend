@@ -2,7 +2,8 @@ import { COORDINATE_SYSTEMS } from '#src/server/common/constants/coordinate-syst
 import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
 import {
   getMarineLicenceCache,
-  updateMarineLicenceSiteDetails
+  updateMarineLicenceSiteDetails,
+  getSavedSiteDetails
 } from '#src/server/common/helpers/marine-licence/session-cache/utils.js'
 import {
   MULTIPLE_COORDINATES_VIEW_ROUTES,
@@ -16,7 +17,6 @@ import {
 } from './utils.js'
 import { validateCoordinates } from '#src/server/common/validation/multiple-coordinates/validate.js'
 import { getCancelLink } from '#src/server/marine-licence/site-details/utils/cancel-link.js'
-import { getSavedSiteDetails } from '#src/server/common/helpers/marine-licence/session-cache/utils.js'
 import { validateSiteParam } from '#src/server/common/helpers/marine-licence/session-cache/site-utils.js'
 import { getSiteDataFromParam } from '#src/server/common/helpers/site-details/site-name.js'
 import { getSiteDetailsBySite } from '#src/server/common/helpers/marine-licence/session-cache/site-details-utils.js'

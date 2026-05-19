@@ -173,7 +173,7 @@ describe('#sanitise (regression)', () => {
 describe('#sanitiseRichText — cross-repo contract canary', () => {
   // CONTRACT: this canary is byte-identical to the one in marine-licensing-
   // backend's src/iat-answers/api/helpers/sanitise-summary-text.test.js.
-  // If you change it here, change it there in the SAME PR. Verified empirically
+  // If you change it here, change it there in the SAME TICKET. Verified empirically
   // against sanitize-html ^2.17.3.
   const CANARY_INPUT =
     '<p>Hello <a href="https://example.gov.uk/x" target="_blank" rel="noopener">link</a> ' +

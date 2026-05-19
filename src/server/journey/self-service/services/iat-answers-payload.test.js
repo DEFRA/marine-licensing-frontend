@@ -156,7 +156,7 @@ describe('buildIatAnswersPayload', () => {
     expect(result.outcome.summaryText).toBe('ot-2 text')
   })
 
-  test('regression: terminal-single outcome with no stashed outcomeTypeId produces non-empty typeId and summaryText', () => {
+  test('terminal-single outcome with no stashed outcomeTypeId produces non-empty typeId and summaryText', () => {
     getAnswers.mockReturnValue([
       { type: 'question', questionRoute: '/q', answerIds: ['a'] }
     ])

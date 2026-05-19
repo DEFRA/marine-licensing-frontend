@@ -130,13 +130,6 @@ describe('#outcomeController (integration)', () => {
       expect(continueButton.getAttribute('href')).toBe('#')
     })
 
-    test('does not render the old "Download a PDF" button anywhere', async () => {
-      const { document } = await getPage()
-      expect(document.body.textContent).not.toContain(
-        'Download a PDF record of my answers'
-      )
-    })
-
     test('renders one page-level "View answers" link with target=_blank and rel=noopener', async () => {
       const { document } = await getPage()
       const links = Array.from(

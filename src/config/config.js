@@ -46,6 +46,11 @@ convict.addFormat({
       return
     }
 
+    // cdp-defra-id-stub uses test_value; allow it in non-prod CDP envs (perf-test, test)
+    if (schema.env === 'DEFRA_ID_CLIENT_SECRET' && env !== 'prod') {
+      return
+    }
+
     const invalidValues = schema.default === undefined ? [] : [schema.default] // never allow the default
     invalidValues.push('') // dont allow empty strings
 

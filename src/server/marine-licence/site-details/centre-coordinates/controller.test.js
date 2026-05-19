@@ -117,6 +117,32 @@ describe('#centreCoordinates (marine licence)', () => {
         }
       )
     })
+
+    test('handler should pre-populate OSGB36 payload using singular field names returned by backend', () => {
+      vi.mocked(getMarineLicenceCache).mockReturnValue({
+        projectName: mockMarineLicenceApplication.projectName,
+        siteDetails: [
+          {
+            coordinatesType: 'coordinates',
+            coordinateSystem: COORDINATE_SYSTEMS.OSGB36,
+            coordinates: { easting: '425053', northing: '564180' }
+          }
+        ]
+      })
+      const h = { view: vi.fn() }
+
+      centreCoordinatesController.handler(
+        createMockRequest({ query: { action: 'change' } }),
+        h
+      )
+
+      expect(h.view).toHaveBeenCalledWith(
+        COORDINATE_SYSTEM_VIEW_ROUTES[COORDINATE_SYSTEMS.OSGB36],
+        expect.objectContaining({
+          payload: { eastings: '425053', northings: '564180' }
+        })
+      )
+    })
   })
 
   describe('#centreCoordinatesSubmitFailHandler', () => {

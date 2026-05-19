@@ -58,7 +58,7 @@
     "convict": "^6.2.5",
     "cssnano": "^8.0.1",
     "cssnano-preset-default": "^8.0.1",
-    "date-fns": "^4.1.0",
+    "date-fns": "^4.2.1",
     "dayjs": "^1.11.20",
     "dotenv": "^17.4.2",
     "global-agent": "^3.0.0",

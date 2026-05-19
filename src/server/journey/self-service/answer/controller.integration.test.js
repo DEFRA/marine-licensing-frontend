@@ -106,4 +106,28 @@ describe('#answerController (integration)', () => {
     })
     expect(response.statusCode).toBe(400)
   })
+
+  test('renders the static introduction from documentPreambleText', async () => {
+    vi.mocked(iatAnswersService.get).mockResolvedValueOnce({
+      createdAt: new Date('2026-05-01T12:00:00Z'),
+      outcome: { summaryText: '<p>ok</p>' },
+      answers: [
+        {
+          questionRoute: '/q1',
+          questionText: 'Q1?',
+          answers: [{ id: 'a1', text: 'A1' }]
+        }
+      ]
+    })
+
+    const { response, document } = await getPage()
+    expect(response.statusCode).toBe(200)
+    const headings = Array.from(document.querySelectorAll('h2')).map((h) =>
+      h.textContent.trim()
+    )
+    expect(headings).toContain('Introduction')
+    expect(document.body.textContent).toContain(
+      'The purpose of the MMO marine licence requirement checker tool'
+    )
+  })
 })

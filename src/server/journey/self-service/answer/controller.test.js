@@ -4,6 +4,10 @@ vi.mock('#src/services/iat-answers-service/iat-answers.service.js', () => ({
   iatAnswersService: { get: vi.fn() }
 }))
 
+vi.mock('#src/server/journey/self-service/services/journey-data.js', () => ({
+  getDocumentPreambleText: vi.fn(() => 'Static preamble text')
+}))
+
 const { iatAnswersService } =
   await import('#src/services/iat-answers-service/iat-answers.service.js')
 const { answerController } = await import('./controller.js')
@@ -35,6 +39,7 @@ describe('answerController', () => {
       'journey/self-service/answer/index',
       expect.objectContaining({
         heading: 'Marine licence requirement check',
+        introductionText: 'Static preamble text',
         summaryText: 'Summary text',
         dateOfCheck: doc.createdAt,
         answers: doc.answers

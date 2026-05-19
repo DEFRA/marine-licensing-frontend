@@ -1,5 +1,6 @@
 // @vitest-environment jsdom
 import { JSDOM } from 'jsdom'
+import { vi } from 'vitest'
 import { toHaveNoViolations } from 'vitest-axe/matchers'
 import { runAxeChecks } from '#.vite/axe-helper.js'
 import { statusCodes } from '#src/server/common/constants/status-codes.js'
@@ -7,10 +8,41 @@ import { setupTestServer } from '#tests/integration/shared/test-setup-helpers.js
 import { makeGetRequest } from '#src/server/test-helpers/server-requests.js'
 import { config } from '#src/config/config.js'
 
+vi.mock('#src/services/iat-answers-service/iat-answers.service.js', () => ({
+  iatAnswersService: { get: vi.fn() }
+}))
+
+const { iatAnswersService } =
+  await import('#src/services/iat-answers-service/iat-answers.service.js')
+
+const STUB_ANSWERS_DOC = {
+  createdAt: new Date('2026-05-01T12:00:00Z'),
+  outcome: {
+    summaryText:
+      '<p>Based on your answers, you do not need a marine licence.</p>'
+  },
+  answers: [
+    {
+      questionRoute: '/sea',
+      questionText: 'Where will the activity take place?',
+      answers: [{ id: 'sea', text: 'In or over the sea' }]
+    },
+    {
+      questionRoute: '/jurisdiction',
+      questionText: 'Which waters will the activity take place in?',
+      answers: [{ id: 'englishWaters', text: 'In English waters' }]
+    }
+  ]
+}
+
 describe('IAT page accessibility (Axe)', () => {
   beforeAll(() => {
     config.set('selfService.enabled', true)
     expect.extend(toHaveNoViolations)
+  })
+
+  beforeEach(() => {
+    vi.mocked(iatAnswersService.get).mockResolvedValue(STUB_ANSWERS_DOC)
   })
 
   const getServer = setupTestServer()
@@ -45,6 +77,10 @@ describe('IAT page accessibility (Axe)', () => {
     {
       url: '/journey/self-service/outcome/scaffolding-impede-navigation',
       title: 'Scaffolding or access towers - impede safe or normal navigation'
+    },
+    {
+      url: '/journey/self-service/answer/AZ4rr6bLclCVUsE2Pl_zKw',
+      title: 'Marine licence requirement check'
     }
   ]
 

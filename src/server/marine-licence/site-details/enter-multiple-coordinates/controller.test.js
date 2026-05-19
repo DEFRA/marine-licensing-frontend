@@ -6,7 +6,10 @@ import {
 import { COORDINATE_SYSTEMS } from '#src/server/common/constants/coordinate-systems.js'
 import * as cacheUtils from '#src/server/common/helpers/marine-licence/session-cache/utils.js'
 import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
-import { updateMarineLicenceSiteDetails } from '#src/server/common/helpers/marine-licence/session-cache/utils.js'
+import {
+  updateMarineLicenceSiteDetails,
+  getSavedSiteDetails
+} from '#src/server/common/helpers/marine-licence/session-cache/utils.js'
 import {
   MULTIPLE_COORDINATES_VIEW_ROUTES,
   multipleCoordinatesPageData
@@ -54,6 +57,7 @@ describe('#multipleCoordinates (marine licence)', () => {
       .mockReturnValue(mockMarineLicence)
 
     vi.mocked(updateMarineLicenceSiteDetails).mockResolvedValue(undefined)
+    vi.mocked(getSavedSiteDetails).mockReturnValue({})
   })
 
   describe('#multipleCoordinatesController', () => {
@@ -167,7 +171,7 @@ describe('#multipleCoordinates (marine licence)', () => {
         {
           ...multipleCoordinatesPageData,
           action: 'change',
-          backLink: marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS,
+          backLink: `${marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS}#site-details-1`,
           cancelLink: undefined,
           coordinates: [...mockCoordinates.wgs84, paddedCoordinates.wgs84],
           projectName: 'Test Project',

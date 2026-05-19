@@ -17,9 +17,13 @@ import {
 import { saveSiteDetailsToBackend } from '#src/server/common/helpers/marine-licence/save-site-details.js'
 
 const widthOfSitePageData = {
-  ...widthOfSiteSettings,
-  backLink: marineLicenceRoutes.MARINE_LICENCE_CIRCLE_CENTRE_POINT
+  ...widthOfSiteSettings
 }
+
+const getBackLink = (action, siteNumber) =>
+  action
+    ? `${marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS}#site-details-${siteNumber}`
+    : marineLicenceRoutes.MARINE_LICENCE_CIRCLE_CENTRE_POINT
 
 export const widthOfSiteController = {
   options: {
@@ -33,6 +37,7 @@ export const widthOfSiteController = {
 
     return h.view(WIDTH_OF_SITE_VIEW_ROUTE, {
       ...widthOfSitePageData,
+      backLink: getBackLink(action, siteNumber),
       cancelLink: getCancelLink(action),
       projectName: marineLicence.projectName,
       siteNumber,
@@ -58,7 +63,7 @@ export const widthOfSiteSubmitController = {
           viewRoute: WIDTH_OF_SITE_VIEW_ROUTE,
           settings: widthOfSiteSettings,
           errorMessages: widthOfSiteErrorMessages,
-          backLink: marineLicenceRoutes.MARINE_LICENCE_CIRCLE_CENTRE_POINT,
+          backLink: getBackLink(action, siteNumber),
           projectName,
           payload: request.payload,
           params: {

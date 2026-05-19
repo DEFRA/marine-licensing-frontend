@@ -22,9 +22,9 @@ import { getCancelLink } from '#src/server/marine-licence/site-details/utils/can
 
 export const SITE_NAME_VIEW_ROUTE = 'templates/site-name.njk'
 
-const getBackLink = (isSavePage) =>
+const getBackLink = (isSavePage, siteNumber) =>
   isSavePage
-    ? marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS
+    ? `${marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS}#site-details-${siteNumber}`
     : marineLicenceRoutes.MARINE_LICENCE_COORDINATES_TYPE_CHOICE
 
 const createValidationFailAction = (request, h, err) => {
@@ -41,7 +41,7 @@ const createValidationFailAction = (request, h, err) => {
 
   const errorViewSettings = {
     ...siteNameSettings,
-    backLink: getBackLink(isSavePage),
+    backLink: getBackLink(isSavePage, siteNumber),
     cancelLink: getCancelLink(isSavePage),
     payload,
     projectName: marineLicence.projectName,
@@ -85,7 +85,7 @@ export const siteNameController = {
 
     return h.view(SITE_NAME_VIEW_ROUTE, {
       ...siteNameSettings,
-      backLink: getBackLink(isSavePage),
+      backLink: getBackLink(isSavePage, siteNumber),
       cancelLink: getCancelLink(isSavePage),
       projectName: marineLicence.projectName,
       siteNumber,

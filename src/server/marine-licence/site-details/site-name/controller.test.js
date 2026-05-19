@@ -158,7 +158,7 @@ describe('#siteName', () => {
       expect(h.view).toHaveBeenCalledWith(SITE_NAME_VIEW_ROUTE, {
         pageTitle: 'Site name',
         heading: 'Site name',
-        backLink: marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS,
+        backLink: `${marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS}#site-details-1`,
         payload: { siteName: '' },
         projectName: 'Test Project',
         siteNumber: 1,
@@ -178,7 +178,7 @@ describe('#siteName', () => {
       expect(h.view).toHaveBeenCalledWith(SITE_NAME_VIEW_ROUTE, {
         pageTitle: 'Site name',
         heading: 'Site name',
-        backLink: marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS,
+        backLink: `${marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS}#site-details-1`,
         payload: { siteName: 'invalid' },
         projectName: 'Test Project',
         siteNumber: 1,
@@ -207,7 +207,7 @@ describe('#siteName', () => {
         SITE_NAME_VIEW_ROUTE,
         expect.objectContaining({
           action: true,
-          backLink: marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS
+          backLink: `${marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS}#site-details-1`
         })
       )
     })

@@ -1,6 +1,9 @@
 import {
   getMarineLicenceCache,
-  updateMarineLicenceSiteDetails
+  updateMarineLicenceSiteDetails,
+  updateMarineLicenceSiteDetailsMultiple,
+  getSavedSiteDetails,
+  setSavedSiteDetails
 } from '#src/server/common/helpers/marine-licence/session-cache/utils.js'
 import { getSiteDetailsBySite } from '#src/server/common/helpers/marine-licence/session-cache/site-details-utils.js'
 import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
@@ -12,12 +15,15 @@ import { coordinatesEntrySchema } from '#src/server/common/validation/coordinate
 import { createFailAction } from '#src/server/common/helpers/createFailAction.js'
 import { getSiteDataFromParam } from '#src/server/common/helpers/site-details/site-name.js'
 import { validateSiteParam } from '#src/server/common/helpers/marine-licence/session-cache/site-utils.js'
-import { getBackRoute } from './utils.js'
+import { getCancelLink } from '#src/server/marine-licence/site-details/utils/cancel-link.js'
 
 export const MARINE_LICENCE_COORDINATES_ENTRY_VIEW_ROUTE =
   'templates/coordinates-entry'
 
-const cancelLink = `${marineLicenceRoutes.MARINE_LICENCE_TASK_LIST}?cancel=site-details`
+const getBackLink = (action, siteNumber) =>
+  action
+    ? `${marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS}#site-details-${siteNumber}`
+    : marineLicenceRoutes.MARINE_LICENCE_SITE_NAME
 
 export const coordinatesEntryController = {
   options: {
@@ -31,8 +37,8 @@ export const coordinatesEntryController = {
 
     return h.view(MARINE_LICENCE_COORDINATES_ENTRY_VIEW_ROUTE, {
       ...coordinatesEntrySettings,
-      backLink: getBackRoute(),
-      cancelLink,
+      backLink: getBackLink(action, siteNumber),
+      cancelLink: getCancelLink(action),
       projectName: marineLicence.projectName,
       siteNumber,
       action,
@@ -57,10 +63,10 @@ export const coordinatesEntrySubmitController = {
           settings: coordinatesEntrySettings,
           errorMessages: coordinatesEntryErrorMessages,
           projectName,
-          backLink: getBackRoute(),
+          backLink: getBackLink(action, siteNumber),
           payload: request.payload,
           params: {
-            cancelLink,
+            cancelLink: getCancelLink(action),
             siteNumber,
             action
           }
@@ -70,7 +76,9 @@ export const coordinatesEntrySubmitController = {
   },
   async handler(request, h) {
     const { payload } = request
+    const marineLicence = getMarineLicenceCache(request)
     const { siteIndex, siteNumber } = getSiteDataFromParam(request.query)
+    const siteDetails = getSiteDetailsBySite(marineLicence, siteIndex)
     const action = request.query.action
 
     await updateMarineLicenceSiteDetails(
@@ -81,7 +89,26 @@ export const coordinatesEntrySubmitController = {
       payload.coordinatesEntry
     )
 
+    if (action && payload.coordinatesEntry === siteDetails.coordinatesEntry) {
+      return h.redirect(
+        `${marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS}#site-details-${siteNumber}`
+      )
+    }
+
     if (action) {
+      const savedSiteDetails = getSavedSiteDetails(request)
+      if (!savedSiteDetails.originalCoordinatesEntry) {
+        savedSiteDetails.originalCoordinatesEntry = siteDetails.coordinatesEntry
+      }
+      if (!savedSiteDetails.originalCoordinateSystem) {
+        savedSiteDetails.originalCoordinateSystem = siteDetails.coordinateSystem
+      }
+      await setSavedSiteDetails(request, h, savedSiteDetails)
+      await updateMarineLicenceSiteDetailsMultiple(request, h, siteIndex, {
+        coordinateSystem: null,
+        coordinates: null,
+        circleWidth: null
+      })
       return h.redirect(
         `${marineLicenceRoutes.MARINE_LICENCE_COORDINATE_SYSTEM_CHOICE}?site=${siteNumber}&action=${action}`
       )

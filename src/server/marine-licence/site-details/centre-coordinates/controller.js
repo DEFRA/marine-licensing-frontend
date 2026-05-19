@@ -1,6 +1,7 @@
 import {
   getMarineLicenceCache,
-  updateMarineLicenceSiteDetails
+  updateMarineLicenceSiteDetails,
+  getSavedSiteDetails
 } from '#src/server/common/helpers/marine-licence/session-cache/utils.js'
 import { getSiteDetailsBySite } from '#src/server/common/helpers/marine-licence/session-cache/site-details-utils.js'
 import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
@@ -22,8 +23,17 @@ import {
 } from '#src/server/common/validation/centre-coordinates/constants.js'
 
 const centreCoordinatesPageData = {
-  ...centreCoordinatesSettings,
-  backLink: marineLicenceRoutes.MARINE_LICENCE_COORDINATE_SYSTEM_CHOICE
+  ...centreCoordinatesSettings
+}
+
+const getBackLink = (action, siteNumber, savedSiteDetails) => {
+  if (action) {
+    if (savedSiteDetails.originalCoordinateSystem) {
+      return `${marineLicenceRoutes.MARINE_LICENCE_COORDINATE_SYSTEM_CHOICE}?site=${siteNumber}&action=${action}`
+    }
+    return `${marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS}#site-details-${siteNumber}`
+  }
+  return marineLicenceRoutes.MARINE_LICENCE_COORDINATE_SYSTEM_CHOICE
 }
 
 const getCoordinateSystem = (siteDetails) =>
@@ -41,9 +51,11 @@ export const centreCoordinatesController = {
     const siteDetails = getSiteDetailsBySite(marineLicence, siteIndex)
     const coordinateSystem = getCoordinateSystem(siteDetails)
     const action = request.query.action
+    const savedSiteDetails = getSavedSiteDetails(request)
 
     return h.view(COORDINATE_SYSTEM_VIEW_ROUTES[coordinateSystem], {
       ...centreCoordinatesPageData,
+      backLink: getBackLink(action, siteNumber, savedSiteDetails),
       cancelLink: getCancelLink(action),
       projectName: marineLicence.projectName,
       siteNumber,
@@ -62,11 +74,15 @@ export const centreCoordinatesSubmitFailHandler = (request, h, error) => {
   const coordinateSystem = getCoordinateSystem(siteDetails)
   const { projectName } = marineLicence
   const action = request.query.action
+  const savedSiteDetails = getSavedSiteDetails(request)
+
+  const backLink = getBackLink(action, siteNumber, savedSiteDetails)
 
   if (!error.details) {
     return h
       .view(COORDINATE_SYSTEM_VIEW_ROUTES[coordinateSystem], {
         ...centreCoordinatesPageData,
+        backLink,
         cancelLink: getCancelLink(action),
         projectName,
         siteNumber,
@@ -86,6 +102,7 @@ export const centreCoordinatesSubmitFailHandler = (request, h, error) => {
   return h
     .view(COORDINATE_SYSTEM_VIEW_ROUTES[coordinateSystem], {
       ...centreCoordinatesPageData,
+      backLink,
       cancelLink: getCancelLink(action),
       projectName,
       siteNumber,

@@ -440,7 +440,7 @@ describe('GET terminal-multi', () => {
     expect(document.querySelectorAll('.app-iat-option')).toHaveLength(2)
   })
 
-  test('option-C label resolution: link: → "Download", module: → "Continue"', async () => {
+  test('renders "Download" for link: outcomes and "Continue" for module: outcomes', async () => {
     const { document } = await getPage(MULTI)
     const cards = Array.from(document.querySelectorAll('.app-iat-option'))
     const labels = cards.map((c) =>

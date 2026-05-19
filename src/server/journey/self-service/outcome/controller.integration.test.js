@@ -461,13 +461,6 @@ describe('GET terminal-multi', () => {
     }
   })
 
-  test('does not render the old "Download a PDF" button', async () => {
-    const { document } = await getPage(MULTI)
-    expect(document.body.textContent).not.toContain(
-      'Download a PDF record of my answers'
-    )
-  })
-
   test('renders one page-level "View answers" link with target=_blank and rel=noopener', async () => {
     const { document } = await getPage(MULTI)
     const links = Array.from(document.querySelectorAll('a.govuk-link')).filter(

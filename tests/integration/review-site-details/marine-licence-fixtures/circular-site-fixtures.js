@@ -1,62 +1,45 @@
-import { routes } from '#src/server/common/constants/routes.js'
-import { COORDINATE_SYSTEMS } from '~/src/server/common/constants/coordinate-systems.js'
-import { mockExemption } from '~/src/server/test-helpers/mocks/exemption.js'
+import { marineLicenceRoutes } from '~/src/server/common/constants/routes.js'
+import {
+  mockActivityDetails,
+  mockOutputActivityDetails
+} from '~/src/server/test-helpers/mocks/marine-licence-mocks.js'
 
-const baseCircularExemption = {
-  multipleSiteDetails: {
-    multipleSiteDetails: false,
-    sameActivityDates: 'no',
-    sameActivityDescrption: 'no'
-  },
-  id: 'test-circular-exemption-123',
+const baseMlCircularMarineLicence = {
+  id: 'test-ml-circular-123',
   projectName: 'Hammersmith pontoon construction',
+  multipleSiteDetails: {},
   publicRegister: {
     withholdFromPublicRegister: false
   },
   taskList: {
     projectName: { status: 'completed' },
-    activityDates: { status: 'completed' },
-    activityDescription: { status: 'completed' },
-    siteDetails: {
-      status: 'completed'
-    },
-    publicRegister: { status: 'completed' }
+    siteDetails: { status: 'completed' }
   }
 }
 
 export const testScenarios = [
   {
     name: 'WGS84 circular coordinates - basic scenario',
-    coordinateSystem: COORDINATE_SYSTEMS.WGS84,
-    exemption: {
-      ...baseCircularExemption,
+    marineLicence: {
+      ...baseMlCircularMarineLicence,
       siteDetails: [
         {
-          activityDates: {
-            start: '2025-01-01T00:00:00.000Z',
-            end: '2025-01-01T00:00:00.000Z'
-          },
-          activityDescription: 'Test activity description',
           coordinatesType: 'coordinates',
           coordinatesEntry: 'single',
           coordinateSystem: 'wgs84',
           coordinates: { latitude: '55.123456', longitude: '55.123456' },
-          circleWidth: '100'
+          circleWidth: '100',
+          siteName: 'Test Site 1'
         }
       ]
     },
     expectedPageContent: {
-      backLink: routes.WIDTH_OF_SITE,
+      backLink: marineLicenceRoutes.MARINE_LICENCE_WIDTH_OF_SITE,
       projectName: 'Hammersmith pontoon construction',
-      multipleSiteDetails: {
-        method: 'Enter the coordinates of the site manually',
-        multipleSiteDetails: 'No'
-      },
       siteDetails: [
         {
-          activityDates: '1 January 2025 to 1 January 2025',
-          activityDescription: 'Test activity description',
-          cardName: 'Site details',
+          cardName: 'Site 1',
+          siteName: 'Test Site 1',
           method:
             'Manually enter one set of coordinates and a width to create a circular site',
           coordinateSystem:
@@ -69,36 +52,26 @@ export const testScenarios = [
   },
   {
     name: 'OSGB36 circular coordinates - basic scenario',
-    coordinateSystem: COORDINATE_SYSTEMS.OSGB36,
-    exemption: {
-      ...baseCircularExemption,
+    marineLicence: {
+      ...baseMlCircularMarineLicence,
       siteDetails: [
         {
-          activityDates: {
-            start: '2025-01-01T00:00:00.000Z',
-            end: '2025-01-01T00:00:00.000Z'
-          },
-          activityDescription: 'Test activity description',
           coordinatesType: 'coordinates',
           coordinatesEntry: 'single',
           coordinateSystem: 'osgb36',
           coordinates: { easting: '425053', northing: '564180' },
-          circleWidth: '250'
+          circleWidth: '250',
+          siteName: 'Test Site 1'
         }
       ]
     },
     expectedPageContent: {
-      backLink: routes.WIDTH_OF_SITE,
+      backLink: marineLicenceRoutes.MARINE_LICENCE_WIDTH_OF_SITE,
       projectName: 'Hammersmith pontoon construction',
-      multipleSiteDetails: {
-        method: 'Enter the coordinates of the site manually',
-        multipleSiteDetails: 'No'
-      },
       siteDetails: [
         {
-          activityDates: '1 January 2025 to 1 January 2025',
-          activityDescription: 'Test activity description',
-          cardName: 'Site details',
+          cardName: 'Site 1',
+          siteName: 'Test Site 1',
           method:
             'Manually enter one set of coordinates and a width to create a circular site',
           coordinateSystem: 'OSGB36 (National Grid)Eastings and Northings',
@@ -109,10 +82,9 @@ export const testScenarios = [
     }
   },
   {
-    name: 'Multiple sites scenario with circular sites - same dates and description',
-    coordinateSystem: COORDINATE_SYSTEMS.WGS84,
-    exemption: {
-      ...baseCircularExemption,
+    name: 'Multiple sites scenario - WGS84 circular sites',
+    marineLicence: {
+      ...baseMlCircularMarineLicence,
       multipleSiteDetails: {
         multipleSitesEnabled: true,
         sameActivityDates: 'yes',
@@ -120,42 +92,30 @@ export const testScenarios = [
       },
       siteDetails: [
         {
-          activityDates: mockExemption.siteDetails[0].activityDates,
-          activityDescription: mockExemption.siteDetails[0].activityDescription,
-          siteName: 'Site 1',
           coordinatesType: 'coordinates',
           coordinatesEntry: 'single',
           coordinateSystem: 'wgs84',
           coordinates: { latitude: '55.123456', longitude: '55.123456' },
-          circleWidth: '100'
+          circleWidth: '100',
+          siteName: 'Site 1'
         },
         {
-          activityDates: mockExemption.siteDetails[1].activityDates,
-          activityDescription: mockExemption.siteDetails[1].activityDescription,
-          siteName: 'Site 2',
           coordinatesType: 'coordinates',
           coordinatesEntry: 'single',
           coordinateSystem: 'wgs84',
           coordinates: { latitude: '51.489676', longitude: '-0.231530' },
-          circleWidth: '200'
+          circleWidth: '200',
+          siteName: 'Site 2'
         }
       ]
     },
     expectedPageContent: {
-      backLink: routes.WIDTH_OF_SITE,
+      backLink: marineLicenceRoutes.MARINE_LICENCE_WIDTH_OF_SITE,
       projectName: 'Hammersmith pontoon construction',
-      multipleSiteDetails: {
-        method: 'Enter the coordinates of the site manually',
-        multipleSiteDetails: 'Yes',
-        sameActivityDates: 'Yes',
-        sameActivityDescription: 'Yes',
-        activityDates: '1 January 2025 to 1 January 2025',
-        activityDescription: 'Test activity description'
-      },
       siteDetails: [
         {
+          cardName: 'Site 1',
           siteName: 'Site 1',
-          cardName: 'Site 1 details',
           method:
             'Manually enter one set of coordinates and a width to create a circular site',
           coordinateSystem:
@@ -164,8 +124,8 @@ export const testScenarios = [
           circleWidth: '100 metres'
         },
         {
+          cardName: 'Site 2',
           siteName: 'Site 2',
-          cardName: 'Site 2 details',
           method:
             'Manually enter one set of coordinates and a width to create a circular site',
           coordinateSystem:
@@ -177,10 +137,43 @@ export const testScenarios = [
     }
   },
   {
-    name: 'Multiple sites scenario with circular sites - variable dates and description',
-    coordinateSystem: COORDINATE_SYSTEMS.WGS84,
-    exemption: {
-      ...baseCircularExemption,
+    name: 'WGS84 circular coordinates - with activity details',
+    marineLicence: {
+      ...baseMlCircularMarineLicence,
+      siteDetails: [
+        {
+          coordinatesType: 'coordinates',
+          coordinatesEntry: 'single',
+          coordinateSystem: 'wgs84',
+          coordinates: { latitude: '55.123456', longitude: '55.123456' },
+          circleWidth: '100',
+          siteName: 'Test Site 1',
+          activityDetails: [mockActivityDetails]
+        }
+      ]
+    },
+    expectedPageContent: {
+      backLink: marineLicenceRoutes.MARINE_LICENCE_WIDTH_OF_SITE,
+      projectName: 'Hammersmith pontoon construction',
+      siteDetails: [
+        {
+          cardName: 'Site 1',
+          siteName: 'Test Site 1',
+          method:
+            'Manually enter one set of coordinates and a width to create a circular site',
+          coordinateSystem:
+            'WGS84 (World Geodetic System 1984)Latitude and longitude',
+          centreCoordinates: '55.123456, 55.123456',
+          circleWidth: '100 metres',
+          activityDetails: [mockOutputActivityDetails]
+        }
+      ]
+    }
+  },
+  {
+    name: 'Multiple sites scenario - mixed coordinate systems',
+    marineLicence: {
+      ...baseMlCircularMarineLicence,
       multipleSiteDetails: {
         multipleSitesEnabled: true,
         sameActivityDates: 'no',
@@ -188,42 +181,30 @@ export const testScenarios = [
       },
       siteDetails: [
         {
-          activityDates: mockExemption.siteDetails[0].activityDates,
-          activityDescription: mockExemption.siteDetails[0].activityDescription,
-          siteName: 'Site 1',
           coordinatesType: 'coordinates',
           coordinatesEntry: 'single',
           coordinateSystem: 'wgs84',
           coordinates: { latitude: '55.123456', longitude: '55.123456' },
-          circleWidth: '100'
+          circleWidth: '100',
+          siteName: 'Site 1'
         },
         {
-          activityDates: mockExemption.siteDetails[1].activityDates,
-          activityDescription: mockExemption.siteDetails[1].activityDescription,
-          siteName: 'Site 2',
           coordinatesType: 'coordinates',
           coordinatesEntry: 'single',
           coordinateSystem: 'osgb36',
           coordinates: { easting: '425053', northing: '564180' },
-          circleWidth: '300'
+          circleWidth: '300',
+          siteName: 'Site 2'
         }
       ]
     },
     expectedPageContent: {
-      backLink: routes.WIDTH_OF_SITE,
+      backLink: marineLicenceRoutes.MARINE_LICENCE_WIDTH_OF_SITE,
       projectName: 'Hammersmith pontoon construction',
-      multipleSiteDetails: {
-        method: 'Enter the coordinates of the site manually',
-        multipleSiteDetails: 'Yes',
-        sameActivityDates: 'No',
-        sameActivityDescription: 'No'
-      },
       siteDetails: [
         {
+          cardName: 'Site 1',
           siteName: 'Site 1',
-          cardName: 'Site 1 details',
-          activityDates: '1 January 2025 to 1 January 2025',
-          activityDescription: 'Test activity description',
           method:
             'Manually enter one set of coordinates and a width to create a circular site',
           coordinateSystem:
@@ -232,10 +213,8 @@ export const testScenarios = [
           circleWidth: '100 metres'
         },
         {
+          cardName: 'Site 2',
           siteName: 'Site 2',
-          cardName: 'Site 2 details',
-          activityDates: '1 February 2025 to 1 February 2025',
-          activityDescription: 'Test activity description',
           method:
             'Manually enter one set of coordinates and a width to create a circular site',
           coordinateSystem: 'OSGB36 (National Grid)Eastings and Northings',

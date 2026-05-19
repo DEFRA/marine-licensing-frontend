@@ -16,6 +16,7 @@ import {
   mockProjectList
 } from '~/src/server/test-helpers/mocks/exemption.js'
 import {
+  mockManualCoordinatesMarineLicence,
   mockMarineLicenceApplication,
   mockSubmittedMarineLicenceApplication
 } from '~/src/server/test-helpers/mocks/marine-licence-mocks.js'
@@ -279,6 +280,17 @@ describe('Page accessibility checks (Axe)', () => {
       title:
         'Enter multiple sets of coordinates to mark the boundary of the site',
       isMarineLicence: true
+    },
+    {
+      url: marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS,
+      title: 'Review site details',
+      isMarineLicence: true
+    },
+    {
+      url: marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS,
+      title: 'Review site details',
+      isMarineLicence: true,
+      marineLicence: mockManualCoordinatesMarineLicence
     },
     {
       url: marineLicenceRoutes.MARINE_LICENCE_CHECK_YOUR_ANSWERS,

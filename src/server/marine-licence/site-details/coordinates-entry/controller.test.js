@@ -25,19 +25,13 @@ describe('#coordinatesEntry (marine licence)', () => {
 
   describe('#coordinatesEntryController', () => {
     test('handler should render with correct context', () => {
+      vi.mocked(getMarineLicenceCache).mockReturnValue({
+        ...mockMarineLicenceApplication,
+        siteDetails: [{ coordinatesEntry: 'single' }]
+      })
       const h = { view: vi.fn() }
 
-      coordinatesEntryController.handler(
-        createMockRequest({
-          site: {
-            siteIndex: 0,
-            siteNumber: 1,
-            queryParams: '',
-            siteDetails: { coordinatesEntry: 'single' }
-          }
-        }),
-        h
-      )
+      coordinatesEntryController.handler(createMockRequest(), h)
 
       expect(h.view).toHaveBeenCalledWith(
         MARINE_LICENCE_COORDINATES_ENTRY_VIEW_ROUTE,
@@ -57,23 +51,13 @@ describe('#coordinatesEntry (marine licence)', () => {
     })
 
     test('handler should render with correct context when no existing cache data', () => {
-      vi.mocked(getMarineLicenceCache).mockReturnValueOnce({
-        projectName: mockMarineLicenceApplication.projectName
+      vi.mocked(getMarineLicenceCache).mockReturnValue({
+        projectName: mockMarineLicenceApplication.projectName,
+        siteDetails: [{}]
       })
-
       const h = { view: vi.fn() }
 
-      coordinatesEntryController.handler(
-        createMockRequest({
-          site: {
-            siteIndex: 0,
-            siteNumber: 1,
-            queryParams: '',
-            siteDetails: {}
-          }
-        }),
-        h
-      )
+      coordinatesEntryController.handler(createMockRequest(), h)
 
       expect(h.view).toHaveBeenCalledWith(
         MARINE_LICENCE_COORDINATES_ENTRY_VIEW_ROUTE,
@@ -188,10 +172,8 @@ describe('#coordinatesEntry (marine licence)', () => {
 
     test('Should correctly navigate to next page when POST is successful', async () => {
       const h = { redirect: vi.fn() }
-
       const request = createMockRequest({
-        payload: { coordinatesEntry: 'single' },
-        site: { siteIndex: 0, siteNumber: 1, queryParams: '', siteDetails: {} }
+        payload: { coordinatesEntry: 'single' }
       })
 
       await coordinatesEntrySubmitController.handler(request, h)
@@ -206,10 +188,8 @@ describe('#coordinatesEntry (marine licence)', () => {
         redirect: vi.fn().mockReturnValue({ takeover: vi.fn() }),
         view: vi.fn()
       }
-
       const request = createMockRequest({
-        payload: { coordinatesEntry: 'single' },
-        site: { siteIndex: 0, siteNumber: 1, queryParams: '', siteDetails: {} }
+        payload: { coordinatesEntry: 'single' }
       })
 
       await coordinatesEntrySubmitController.handler(request, h)

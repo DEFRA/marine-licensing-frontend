@@ -84,32 +84,6 @@ describe('ML Review Site Details - File Upload Integration Tests', () => {
     )
   })
 
-  test('should redirect to task list when coordinatesType is not file', async () => {
-    const nonFileLicence = {
-      ...testScenarios[0].marineLicence,
-      siteDetails: [
-        {
-          ...testScenarios[0].marineLicence.siteDetails[0],
-          coordinatesType: 'manual'
-        }
-      ]
-    }
-    mockMarineLicence(nonFileLicence)
-    vi.mocked(marineLicenceService.getMarineLicenceService).mockReturnValue({
-      getMarineLicenceById: vi.fn().mockResolvedValue(nonFileLicence)
-    })
-
-    const response = await makeGetRequest({
-      server: getServer(),
-      url: marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS
-    })
-
-    expect(response.statusCode).toBe(statusCodes.redirect)
-    expect(response.headers.location).toBe(
-      marineLicenceRoutes.MARINE_LICENCE_TASK_LIST
-    )
-  })
-
   describe('Form Submission', () => {
     test('should redirect to task list on form submission', async () => {
       mockMarineLicence(testScenarios[0].marineLicence)

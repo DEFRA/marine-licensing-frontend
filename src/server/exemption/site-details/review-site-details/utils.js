@@ -1,52 +1,12 @@
 import Boom from '@hapi/boom'
 import { config } from '#src/config/config.js'
-import { COORDINATE_SYSTEMS } from '#src/server/common/constants/coordinate-systems.js'
 import { routes } from '#src/server/common/constants/routes.js'
 import { createSiteDetailsDataJson } from '#src/server/common/helpers/site-details.js'
 import { formatDate } from '#src/server/common/helpers/dates/date-utils.js'
 import { getSiteDetailsBySite } from '#src/server/common/helpers/exemptions/session-cache/site-details-utils.js'
 import { buildSiteLocationData } from '#src/server/common/helpers/site-location-data.js'
-import { getReviewSummaryText } from '#src/server/common/helpers/exemptions/exemption-site-details.js'
 import { getFileUploadSummaryData } from '#src/server/common/helpers/review-site-details/file-upload.js'
-const isWGS84 = (coordinateSystem) =>
-  coordinateSystem === COORDINATE_SYSTEMS.WGS84
-
-const isValidPolygonInput = (siteDetails, coordinateSystem) => {
-  if (!siteDetails || !coordinateSystem) {
-    return false
-  }
-
-  const { coordinates } = siteDetails
-  return coordinates && Array.isArray(coordinates)
-}
-
-const isValidCoordinateForSystem = (coord, coordinateSystem) => {
-  if (!coord) {
-    return false
-  }
-
-  if (isWGS84(coordinateSystem)) {
-    return coord.latitude && coord.longitude
-  }
-
-  return coord.easting && coord.northing
-}
-
-const generateCoordinateLabel = (index) => {
-  return index === 0 ? 'Start and end points' : `Point ${index + 1}`
-}
-
-const transformCoordinateToDisplayFormat = (coord, index, coordinateSystem) => {
-  const displayText = getCoordinateDisplayText(
-    { coordinates: coord },
-    coordinateSystem
-  )
-
-  return {
-    label: generateCoordinateLabel(index),
-    value: displayText
-  }
-}
+import { buildManualCoordinateSummaryData } from '#src/server/common/helpers/review-site-details/manual-entry.js'
 
 const REVIEW_SITE_DETAILS_VIEW_ROUTE =
   'exemption/site-details/review-site-details/index'
@@ -80,49 +40,7 @@ export const getSiteDetailsBackLink = (
     return routes.ENTER_MULTIPLE_COORDINATES
   }
 
-  // For circular sites (single coordinate), go back to width page
   return routes.WIDTH_OF_SITE
-}
-
-export const getCoordinateSystemText = (coordinateSystem) => {
-  if (!coordinateSystem) {
-    return ''
-  }
-
-  return isWGS84(coordinateSystem)
-    ? 'WGS84 (World Geodetic System 1984)\nLatitude and longitude'
-    : 'British National Grid (OSGB36)\nEastings and Northings'
-}
-
-export const getCoordinateDisplayText = (siteDetails, coordinateSystem) => {
-  const { coordinates } = siteDetails
-
-  if (!coordinates || !coordinateSystem) {
-    return ''
-  }
-
-  return isWGS84(coordinateSystem)
-    ? `${coordinates.latitude}, ${coordinates.longitude}`
-    : `${coordinates.easting}, ${coordinates.northing}`
-}
-
-export const getPolygonCoordinatesDisplayData = (
-  siteDetails,
-  coordinateSystem
-) => {
-  if (!isValidPolygonInput(siteDetails, coordinateSystem)) {
-    return []
-  }
-
-  const { coordinates } = siteDetails
-
-  const validCoordinates = coordinates.filter((coord) =>
-    isValidCoordinateForSystem(coord, coordinateSystem)
-  )
-
-  return validCoordinates.map((coord, index) =>
-    transformCoordinateToDisplayFormat(coord, index, coordinateSystem)
-  )
 }
 
 export const getFileUploadBackLink = (
@@ -142,17 +60,12 @@ export const getFileUploadBackLink = (
   const url = new URL(previousPage)
   const previousPath = url.pathname
 
-  // If coming from task list, return to task list
   if (previousPath === routes.TASK_LIST) {
     return routes.TASK_LIST
   }
 
-  // Otherwise, return to correct page for file upload upload journey
   return previousPath
 }
-
-const metresLabel = (metres) =>
-  metres === '1' ? `${metres} metre` : `${metres} metres`
 
 const getActivityDatesSummaryText = (activityDates, showActivityDates) => {
   if (!showActivityDates) {
@@ -174,85 +87,6 @@ const getActivityDescriptionSummaryText = (
   }
 
   return activityDescription ?? ''
-}
-export const buildManualCoordinateSummaryData = (
-  siteDetails,
-  multipleSiteDetails = {}
-) => {
-  const summaryData = []
-
-  if (!siteDetails || !Array.isArray(siteDetails)) {
-    return []
-  }
-
-  for (const [index, site] of siteDetails.entries()) {
-    const {
-      circleWidth,
-      coordinatesEntry,
-      coordinateSystem,
-      activityDates,
-      activityDescription,
-      siteName
-    } = site
-    const { multipleSitesEnabled, sameActivityDates, sameActivityDescription } =
-      multipleSiteDetails
-
-    const showActivityDates =
-      !multipleSitesEnabled || sameActivityDates === 'no'
-
-    const showActivityDescription =
-      !multipleSitesEnabled || sameActivityDescription === 'no'
-
-    // Generate individual site details data for the map
-    const siteDetailsData = createSiteDetailsDataJson(site, coordinateSystem)
-
-    if (coordinatesEntry === 'multiple') {
-      summaryData.push({
-        activityDates: getActivityDatesSummaryText(
-          activityDates,
-          showActivityDates
-        ),
-        activityDescription: getActivityDescriptionSummaryText(
-          activityDescription,
-          showActivityDescription
-        ),
-        showActivityDates,
-        showActivityDescription,
-        siteName: siteName ?? '',
-        method: getReviewSummaryText(site),
-        coordinateSystem: getCoordinateSystemText(coordinateSystem),
-        polygonCoordinates: getPolygonCoordinatesDisplayData(
-          site,
-          coordinateSystem
-        ),
-        siteNumber: index + 1,
-        siteDetailsData
-      })
-    } else {
-      // Default to circular site display
-      summaryData.push({
-        activityDates: getActivityDatesSummaryText(
-          activityDates,
-          showActivityDates
-        ),
-        activityDescription: getActivityDescriptionSummaryText(
-          activityDescription,
-          showActivityDescription
-        ),
-        showActivityDates,
-        showActivityDescription,
-        siteName: siteName ?? '',
-        method: getReviewSummaryText(site),
-        coordinateSystem: getCoordinateSystemText(coordinateSystem),
-        coordinates: getCoordinateDisplayText(site, coordinateSystem),
-        width: circleWidth ? metresLabel(circleWidth) : '',
-        siteNumber: index + 1,
-        siteDetailsData
-      })
-    }
-  }
-
-  return summaryData
 }
 
 export const renderFileUploadReview = (h, options) => {
@@ -318,6 +152,7 @@ export const renderFileUploadReview = (h, options) => {
       hasIncompleteFields(siteDetails, multipleSiteDetails)
   })
 }
+
 export const renderManualCoordinateReview = (h, options) => {
   const {
     exemption,

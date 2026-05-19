@@ -98,6 +98,35 @@ describe('config validation', () => {
       }).rejects.toThrow(/must be set for perf-test environment/)
     })
 
+    test('should allow test_value for defraId client secret in perf-test', async () => {
+      process.env.ENVIRONMENT = 'perf-test'
+      process.env.NODE_ENV = 'test'
+      process.env.SESSION_COOKIE_PASSWORD =
+        'production-password-at-least-32-chars'
+      process.env.REDIS_HOST = 'prod-redis.example.com'
+      process.env.REDIS_USERNAME = 'prod-user'
+      process.env.REDIS_PASSWORD = 'prod-password'
+      process.env.MARINE_LICENSING_BACKEND_API_URL = 'https://api.example.com'
+      process.env.DEFRA_ID_OIDC_CONFIGURATION_URL =
+        'https://cdp-defra-id-stub.perf-test.cdp-int.defra.cloud/cdp-defra-id-stub/.well-known/openid-configuration'
+      process.env.DEFRA_ID_CLIENT_ID = 'perf-client-id'
+      process.env.DEFRA_ID_CLIENT_SECRET = 'test_value'
+      process.env.DEFRA_ID_SERVICE_ID = 'perf-service-id'
+      process.env.DEFRA_ID_ACCOUNT_MANAGEMENT_URL =
+        'https://cdp-defra-id-stub.perf-test.cdp-int.defra.cloud/management'
+      process.env.ENTRA_ID_OIDC_CONFIGURATION_URL = 'https://entra.example.com'
+      process.env.ENTRA_ID_CLIENT_ID = 'entra-client-id'
+      process.env.ENTRA_ID_CLIENT_SECRET = 'entra-secret'
+      process.env.CDP_UPLOADER_BASE_URL = 'https://uploader.example.com'
+      process.env.CDP_UPLOAD_BUCKET = 'perf-bucket'
+      process.env.APP_BASE_URL =
+        'https://marine-licensing-frontend.perf-test.cdp-int.defra.cloud'
+
+      const { config } = await import('./config.js')
+
+      expect(config.get('defraId.clientSecret')).toBe('test_value')
+    })
+
     test('should reject empty string values in prod environment', async () => {
       process.env.ENVIRONMENT = 'prod'
       process.env.NODE_ENV = 'production'

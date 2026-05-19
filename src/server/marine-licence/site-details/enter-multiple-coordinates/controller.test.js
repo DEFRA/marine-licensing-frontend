@@ -268,6 +268,27 @@ describe('#multipleCoordinates (marine licence)', () => {
       )
     })
 
+    test('should use review page back link on validation error when action is set', () => {
+      getMarineLicenceCacheSpy.mockReturnValue({
+        ...mockMarineLicence,
+        siteDetails: [{ coordinateSystem: COORDINATE_SYSTEMS.WGS84 }]
+      })
+      vi.mocked(getSavedSiteDetails).mockReturnValue({})
+      const request = createMockRequest({
+        payload: { 'coordinates[0][latitude]': 'invalid' },
+        query: { action: 'change' }
+      })
+
+      multipleCoordinatesSubmitController.handler(request, mockH)
+
+      expect(mockH.view).toHaveBeenCalledWith(
+        MULTIPLE_COORDINATES_VIEW_ROUTES[COORDINATE_SYSTEMS.WGS84],
+        expect.objectContaining({
+          backLink: `${marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS}#site-details-1`
+        })
+      )
+    })
+
     test('should handle OSGB36 coordinates correctly', async () => {
       getMarineLicenceCacheSpy.mockReturnValue({
         ...mockMarineLicence,

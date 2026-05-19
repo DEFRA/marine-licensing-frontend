@@ -86,5 +86,69 @@ describe('#widthOfSite (marine licence)', () => {
         `${marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS}#site-details-1`
       )
     })
+
+    test('failAction should render with standard back link and cancel link when no action', () => {
+      const request = createMockRequest({ payload: { width: 'invalid' } })
+      const h = { view: vi.fn().mockReturnValue({ takeover: vi.fn() }) }
+      const err = {
+        details: [{ path: ['width'], message: 'TEST', type: 'any.only' }]
+      }
+
+      widthOfSiteSubmitController.options.validate.failAction(request, h, err)
+
+      expect(h.view).toHaveBeenCalledWith(
+        WIDTH_OF_SITE_VIEW_ROUTE,
+        expect.objectContaining({
+          backLink: marineLicenceRoutes.MARINE_LICENCE_CIRCLE_CENTRE_POINT,
+          cancelLink: `${marineLicenceRoutes.MARINE_LICENCE_TASK_LIST}?cancel=site-details`
+        })
+      )
+      expect(h.view().takeover).toHaveBeenCalled()
+    })
+
+    test('failAction should render with review page back link and no cancel link when action is set', () => {
+      const request = createMockRequest({
+        payload: { width: 'invalid' },
+        query: { action: 'change' }
+      })
+      const h = { view: vi.fn().mockReturnValue({ takeover: vi.fn() }) }
+      const err = {
+        details: [{ path: ['width'], message: 'TEST', type: 'any.only' }]
+      }
+
+      widthOfSiteSubmitController.options.validate.failAction(request, h, err)
+
+      expect(h.view).toHaveBeenCalledWith(
+        WIDTH_OF_SITE_VIEW_ROUTE,
+        expect.objectContaining({
+          backLink: `${marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS}#site-details-1`,
+          cancelLink: undefined
+        })
+      )
+    })
+  })
+
+  describe('#widthOfSiteController action mode', () => {
+    test('should use review page back link and no cancel link when action is set', () => {
+      vi.mocked(getMarineLicenceCache).mockReturnValue({
+        ...mockMarineLicenceApplication,
+        siteDetails: [{ circleWidth: '500' }]
+      })
+      const h = { view: vi.fn() }
+
+      widthOfSiteController.handler(
+        createMockRequest({ query: { action: 'change' } }),
+        h
+      )
+
+      expect(h.view).toHaveBeenCalledWith(
+        WIDTH_OF_SITE_VIEW_ROUTE,
+        expect.objectContaining({
+          backLink: `${marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS}#site-details-1`,
+          cancelLink: undefined,
+          action: 'change'
+        })
+      )
+    })
   })
 })

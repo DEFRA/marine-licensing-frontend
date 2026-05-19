@@ -37,6 +37,39 @@ const getBackLinkForAction = (action, siteNumber, savedSiteDetails) => {
   return marineLicenceRoutes.MARINE_LICENCE_COORDINATE_SYSTEM_CHOICE
 }
 
+const buildPageData = (action, siteNumber, savedSiteDetails) => ({
+  ...multipleCoordinatesPageData,
+  backLink: getBackLinkForAction(action, siteNumber, savedSiteDetails),
+  cancelLink: getCancelLink(action),
+  action
+})
+
+const parseCoordinatesFromPayload = (payload, coordinateSystem) => {
+  let coordinates = convertPayloadToCoordinatesArray(payload, coordinateSystem)
+  if (payload.remove) {
+    coordinates = removeCoordinateAtIndex(
+      coordinates,
+      Number.parseInt(payload.remove)
+    )
+  }
+  return coordinates
+}
+
+const appendEmptyCoordinateIfAdding = (
+  payload,
+  coordinates,
+  coordinateSystem
+) => {
+  if (!payload.add) {
+    return coordinates
+  }
+  const emptyCoordinate =
+    coordinateSystem === COORDINATE_SYSTEMS.OSGB36
+      ? { easting: '', northing: '' }
+      : { latitude: '', longitude: '' }
+  return [...coordinates, emptyCoordinate]
+}
+
 export const multipleCoordinatesController = {
   options: {
     pre: [validateSiteParam]
@@ -48,22 +81,17 @@ export const multipleCoordinatesController = {
     const siteDetails = getSiteDetailsBySite(marineLicence, siteIndex)
     const action = request.query.action
     const savedSiteDetails = getSavedSiteDetails(request)
-
     const coordinateSystem = getCoordinateSystemForSite(siteDetails)
-
     const paddedCoordinates = normaliseCoordinatesForDisplay(
       coordinateSystem,
       siteDetails.coordinates
     )
 
     return h.view(MULTIPLE_COORDINATES_VIEW_ROUTES[coordinateSystem], {
-      ...multipleCoordinatesPageData,
-      backLink: getBackLinkForAction(action, siteNumber, savedSiteDetails),
-      cancelLink: getCancelLink(action),
+      ...buildPageData(action, siteNumber, savedSiteDetails),
       coordinates: paddedCoordinates,
       projectName,
-      siteNumber,
-      action
+      siteNumber
     })
   }
 }
@@ -80,24 +108,9 @@ export const multipleCoordinatesSubmitController = {
     const coordinateSystem = getCoordinateSystemForSite(siteDetails)
     const action = request.query.action
     const savedSiteDetails = getSavedSiteDetails(request)
-    const pageData = {
-      ...multipleCoordinatesPageData,
-      backLink: getBackLinkForAction(action, siteNumber, savedSiteDetails),
-      cancelLink: getCancelLink(action),
-      action
-    }
+    const pageData = buildPageData(action, siteNumber, savedSiteDetails)
 
-    let coordinates = convertPayloadToCoordinatesArray(
-      payload,
-      coordinateSystem
-    )
-
-    if (payload.remove) {
-      coordinates = removeCoordinateAtIndex(
-        coordinates,
-        Number.parseInt(payload.remove)
-      )
-    }
+    const coordinates = parseCoordinatesFromPayload(payload, coordinateSystem)
 
     const validationResult = validateCoordinates(
       coordinates,
@@ -115,11 +128,11 @@ export const multipleCoordinatesSubmitController = {
         coordinateSystem,
         coordinates,
         marineLicence?.projectName,
-        multipleCoordinatesPageData
+        pageData
       )
     }
 
-    let validatedCoordinates = validationResult.value.coordinates
+    const validatedCoordinates = validationResult.value.coordinates
     await updateMarineLicenceSiteDetails(
       request,
       h,
@@ -128,28 +141,15 @@ export const multipleCoordinatesSubmitController = {
       validatedCoordinates
     )
 
-    if (payload.add) {
-      const emptyCoordinate =
-        coordinateSystem === COORDINATE_SYSTEMS.OSGB36
-          ? { easting: '', northing: '' }
-          : { latitude: '', longitude: '' }
-
-      validatedCoordinates = [...validatedCoordinates, emptyCoordinate]
-
-      return renderMultipleCoordinatesView(
-        h,
+    if (payload.add || payload.remove) {
+      const displayCoordinates = appendEmptyCoordinateIfAdding(
+        payload,
         validatedCoordinates,
-        coordinateSystem,
-        pageData,
-        marineLicence?.projectName,
-        siteNumber
+        coordinateSystem
       )
-    }
-
-    if (payload.remove) {
       return renderMultipleCoordinatesView(
         h,
-        validatedCoordinates,
+        displayCoordinates,
         coordinateSystem,
         pageData,
         marineLicence?.projectName,

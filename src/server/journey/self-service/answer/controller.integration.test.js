@@ -107,6 +107,39 @@ describe('#answerController (integration)', () => {
     expect(response.statusCode).toBe(400)
   })
 
+  test('renders the GOV.UK header, service name and Beta phase banner; hides service nav links, back link and organisation banner', async () => {
+    vi.mocked(iatAnswersService.get).mockResolvedValueOnce({
+      createdAt: new Date('2026-05-01T12:00:00Z'),
+      outcome: { summaryText: '<p>ok</p>' },
+      answers: [
+        {
+          questionRoute: '/q1',
+          questionText: 'Q1?',
+          answers: [{ id: 'a1', text: 'A1' }]
+        }
+      ]
+    })
+
+    const { response, document } = await getPage()
+    expect(response.statusCode).toBe(200)
+
+    expect(document.querySelector('.govuk-header')).not.toBeNull()
+
+    const serviceNav = document.querySelector('.govuk-service-navigation')
+    expect(serviceNav).not.toBeNull()
+    expect(serviceNav.textContent).toContain('Get permission for marine work')
+
+    const phaseBanner = document.querySelector('.govuk-phase-banner')
+    expect(phaseBanner).not.toBeNull()
+    expect(phaseBanner.textContent.toLowerCase()).toContain('beta')
+
+    expect(document.querySelector('.govuk-service-navigation__list')).toBeNull()
+
+    expect(document.querySelector('.govuk-back-link')).toBeNull()
+
+    expect(document.querySelector('.app-border-bottom')).toBeNull()
+  })
+
   test('renders the static introduction from documentPreambleText', async () => {
     vi.mocked(iatAnswersService.get).mockResolvedValueOnce({
       createdAt: new Date('2026-05-01T12:00:00Z'),

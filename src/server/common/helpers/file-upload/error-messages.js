@@ -17,7 +17,8 @@ export const GEO_PARSER_ERROR_MESSAGES = {
   FEATURES_CONTAIN_POINT_OR_LINE:
     'The selected file must only contain sites drawn as polygons (shapes), not points or lines',
   GEOMETRY_NESTING_TOO_DEEP:
-    'We couldn’t process this map file because its geometry is too complex. Please simplify the shape and upload again.'
+    'We couldn’t process this map file because its geometry is too complex. Please simplify the shape and upload again.',
+  SINGLE_SITE_ONLY: 'Upload a file that contains a single site'
 }
 
 /**

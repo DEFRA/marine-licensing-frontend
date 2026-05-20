@@ -6,7 +6,10 @@ import {
 } from '~/tests/integration/shared/test-setup-helpers.js'
 import { loadPage } from '~/tests/integration/shared/app-server.js'
 import * as cdpUploadService from '~/src/services/cdp-upload-service/index.js'
-import { sharedFileUploadTests } from './file-upload-tests.js'
+import {
+  sharedFileUploadTests,
+  singleSiteModeTests
+} from './file-upload-tests.js'
 import { mockMarineLicenceApplication } from '#src/server/test-helpers/mocks/marine-licence-mocks.js'
 
 vi.mock('~/src/services/cdp-upload-service/index.js')
@@ -41,5 +44,6 @@ describe('File upload page (marine licence)', () => {
     })
   }
 
-  sharedFileUploadTests({ loadPageWithFileType })
+  sharedFileUploadTests({ loadPageWithFileType, projectType: 'marine-licence' })
+  singleSiteModeTests({ loadPageWithFileType, projectType: 'marine-licence' })
 })

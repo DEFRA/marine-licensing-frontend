@@ -1,0 +1,55 @@
+{% extends 'layouts/page.njk' %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/inset-text/macro.njk" import govukInsetText %}
+{% from "govuk/components/back-link/macro.njk" import govukBackLink %}
+{% from "cancel-button/macro.njk" import appCancelButton %}
+
+{% block beforeContent %}
+  {{ super() }}
+  <nav>
+    {{ govukBackLink({
+      text: "Back",
+      href: backLink
+    }) }}
+  </nav>
+{% endblock %}
+
+{% block content %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+
+    {% if projectName %}
+        <span class="govuk-caption-l">{{ projectName }}</span>
+    {% endif %}
+    <h1 class="govuk-heading-l">{{ heading }}</h1>
+
+      {% set siteLabel = 'Site ' + siteNumber + (': ' + siteName if siteName else '') %}
+
+      {{ govukInsetText({
+        text: siteLabel
+      }) }}
+
+      <p class="govuk-body">You can change your site location by uploading a single site file. Any activity details you've already entered will be saved.</p>
+      <p class="govuk-body">If you've started the Marine plan policies, changing your site location may change which policies are presented.</p>
+
+      <form method="POST">
+        <input type="hidden" name="csrfToken" value="{{ csrfToken }}">
+        <input type="hidden" name="siteIndex" value="{{ siteIndex }}">
+
+        <div class="govuk-button-group">
+          {{ govukButton({
+            text: "Yes, change site location",
+            preventDoubleClick: true,
+            classes: "govuk-button--warning",
+            type: "submit"
+          }) }}
+
+          {{ appCancelButton({
+            cancelLink: cancelLink
+          }) }}
+        </div>
+      </form>
+
+    </div>
+  </div>
+{% endblock %}

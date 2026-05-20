@@ -24,6 +24,14 @@
 - **At most one `break`/`continue` per loop.** Refactor multiple `continue`s
   into early `return`s in extracted helpers. (S2208 family)
 
+## Shared Project Helpers
+
+### Site Details Anchor
+
+- Use `getSiteDetailsAnchor(siteNumber)` from `#src/server/common/helpers/site-details/anchor-utils.js` when building links to a specific site card on the review-site-details page.
+- `siteNumber` is **1-based** (the display number, not the array index). If you only have `siteIndex`, pass `siteIndex + 1`.
+- Example: `` `${marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS}${getSiteDetailsAnchor(siteNumber)}` ``
+
 ## Logging
 
 - Don't write `event.category` from log calls. ECS defines it as a `keyword`

@@ -14,7 +14,7 @@ import {
   updateMarineLicenceSiteDetails,
   updateMarineLicenceSiteDetailsBatch,
   updateMarineLicenceSiteDetailsMultiple,
-  getSingleSiteMode, 
+  getSingleSiteMode,
   setSingleSiteMode,
   updateSingleSiteLocation
 } from '#src/server/common/helpers/marine-licence/session-cache/utils.js'

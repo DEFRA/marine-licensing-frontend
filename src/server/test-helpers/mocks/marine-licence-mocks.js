@@ -52,6 +52,10 @@ export const mockMarineLicenceApplication = {
   projectName: 'Test Project',
   projectBackground: 'Test project background',
   specialLegalPowers: { agree: 'yes', details: 'Test reason' },
+  publicConsultation: {
+    consulted: 'yes',
+    details: 'Consulted with local fishing group'
+  },
   taskList: mockMarineLicenceTaskList,
   projectType: MARINE_LICENCE_KEY,
   siteDetails: [

@@ -198,4 +198,24 @@ describe('setSiteDetailsAction', () => {
       ]
     })
   })
+
+  test('should render visually hidden html when hideLinkText option is true', () => {
+    const result = setSiteDetailsAction(
+      '51.5074, -0.1278',
+      'enter-multiple-coordinates',
+      1,
+      'Point 2',
+      { hideLinkText: true }
+    )
+
+    expect(result).toEqual({
+      items: [
+        {
+          href: 'enter-multiple-coordinates?site=1&action=change',
+          html: '<span class="govuk-visually-hidden">Change Point 2</span>',
+          classes: 'govuk-link--no-visited-state'
+        }
+      ]
+    })
+  })
 })

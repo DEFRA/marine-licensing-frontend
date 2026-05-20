@@ -7,7 +7,7 @@ export function setSiteDetailsAction(
 ) {
   const hasValue = value && value !== ''
   const action = hasValue ? 'change' : 'add'
-  const { skipAction, activityNumber } = options
+  const { skipAction, activityNumber, hideLinkText } = options
 
   const queryParams = []
 
@@ -24,15 +24,21 @@ export function setSiteDetailsAction(
   }
 
   const queryString = queryParams.join('&')
+  const linkText = hasValue ? 'Change' : 'Add'
+  const fullText = visuallyHiddenText
+    ? `${linkText} ${visuallyHiddenText}`
+    : linkText
 
   return {
     items: [
       {
-        ...(href && {
-          href: `${href}?${queryString}`
-        }),
-        text: hasValue ? 'Change' : 'Add',
-        ...(visuallyHiddenText && { visuallyHiddenText }),
+        ...(href && { href: `${href}?${queryString}` }),
+        ...(hideLinkText
+          ? { html: `<span class="govuk-visually-hidden">${fullText}</span>` }
+          : {
+              text: linkText,
+              ...(visuallyHiddenText && { visuallyHiddenText })
+            }),
         classes: 'govuk-link--no-visited-state'
       }
     ]

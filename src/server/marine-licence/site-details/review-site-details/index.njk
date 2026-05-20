@@ -85,12 +85,21 @@
           {% for coordinate in site.polygonCoordinates %}
             {% set hasCoordinates = true %}
             {% set rowClasses = "" if loop.last else "govuk-summary-list__row--no-border" %}
-            {% set _ = summaryRows.push({
-              classes: rowClasses,
-              key: { text: coordinate.label },
-              value: { text: coordinate.value },
-              actions: setSiteDetailsAction(coordinate.value, 'enter-multiple-coordinates', site.siteNumber)
-            }) %}
+            {% if loop.first %}
+              {% set _ = summaryRows.push({
+                classes: rowClasses,
+                key: { text: coordinate.label },
+                value: { text: coordinate.value },
+                actions: setSiteDetailsAction(coordinate.value, 'enter-multiple-coordinates', site.siteNumber)
+              }) %}
+            {% else %}
+              {% set _ = summaryRows.push({
+                classes: rowClasses,
+                key: { text: coordinate.label },
+                value: { text: coordinate.value },
+                actions: setSiteDetailsAction(coordinate.value, 'enter-multiple-coordinates', site.siteNumber, coordinate.label, { hideLinkText: true })
+              }) %}
+            {% endif %}
           {% endfor %}
           {% if not hasCoordinates %}
             {% set _ = summaryRows.push({

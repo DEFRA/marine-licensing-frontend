@@ -163,6 +163,15 @@ describe('ML Review Site Details - File Upload Integration Tests', () => {
 
       validateActionLink(siteNameRow, siteNameExpected, siteIndex)
 
+      const changeLink = within(card).getByRole('link', {
+        name: /Change site location/
+      })
+
+      expect(changeLink).toHaveAttribute(
+        'href',
+        expect.stringContaining(`change-site-location?site=${i + 1}`)
+      )
+
       const mapViewRow = getRowByKey(card, 'Map view')
       expect(mapViewRow).toBeTruthy()
       expect(mapViewRow.textContent.trim()).toBe('Map view')

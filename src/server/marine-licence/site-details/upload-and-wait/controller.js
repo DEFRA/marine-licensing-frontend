@@ -1,8 +1,10 @@
 import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
 import {
   getMarineLicenceCache,
+  getSingleSiteMode,
   updateMarineLicenceSiteDetails,
-  updateMarineLicenceSiteDetailsBatch
+  updateMarineLicenceSiteDetailsBatch,
+  updateSingleSiteLocation
 } from '#src/server/common/helpers/marine-licence/session-cache/utils.js'
 import { getCdpUploadService } from '#src/services/cdp-upload-service/index.js'
 import {
@@ -23,6 +25,7 @@ import {
 } from '#src/server/common/helpers/file-upload/constants.js'
 import { getSiteDetailsBySite } from '#src/server/common/helpers/exemptions/session-cache/site-details-utils.js'
 import { saveSiteDetailsToBackend } from '#src/server/common/helpers/marine-licence/save-site-details.js'
+import { getSiteDetailsAnchor } from '#src/server/common/helpers/site-details/anchor-utils.js'
 import { config } from '#src/config/config.js'
 
 async function handleGeoParserError(request, h, error, filename, fileType) {
@@ -104,31 +107,49 @@ const processValidatedFile = async (status, uploadConfig, request, h) => {
   try {
     const cdpUploadConfig = config.get('cdpUploader')
 
+    const singleSiteMode = getSingleSiteMode(request)
+
     const coordinateData = await extractCoordinates({
       status,
       uploadConfig,
       request,
-      h
+      singleSiteOnly: !!singleSiteMode
     })
 
     logSuccessfulProcessing(request, status, uploadConfig, coordinateData)
 
-    updateMarineLicenceSiteDetailsBatch(
-      request,
-      status,
-      coordinateData,
-      {
-        s3Bucket: cdpUploadConfig.s3Bucket,
-        s3Key: status.s3Location.s3Key
-      },
-      {
-        isMultipleSitesFile: isMultipleSitesFile(coordinateData)
-      }
-    )
+    const s3Location = {
+      s3Bucket: cdpUploadConfig.s3Bucket,
+      s3Key: status.s3Location.s3Key
+    }
+
+    if (singleSiteMode) {
+      updateSingleSiteLocation(
+        request,
+        status,
+        coordinateData,
+        s3Location,
+        singleSiteMode.siteIndex
+      )
+    } else {
+      updateMarineLicenceSiteDetailsBatch(
+        request,
+        status,
+        coordinateData,
+        s3Location,
+        {
+          isMultipleSitesFile: isMultipleSitesFile(coordinateData)
+        }
+      )
+    }
 
     await saveSiteDetailsToBackend(request, h)
 
-    return h.redirect(marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS)
+    const reviewRoute = singleSiteMode
+      ? `${marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS}${getSiteDetailsAnchor(singleSiteMode.siteIndex + 1)}`
+      : marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS
+
+    return h.redirect(reviewRoute)
   } catch (error) {
     await handleGeoParserError(
       request,

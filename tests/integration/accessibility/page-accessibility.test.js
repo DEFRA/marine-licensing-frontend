@@ -250,6 +250,11 @@ describe('Page accessibility checks (Axe)', () => {
       title: 'Are you sure you want to delete this activity?'
     },
     {
+      url: `${marineLicenceRoutes.MARINE_LICENCE_CHANGE_SITE_LOCATION}?site=1`,
+      isMarineLicence: true,
+      title: 'Change site location'
+    },
+    {
       url: marineLicenceRoutes.MARINE_LICENCE_COORDINATES_TYPE_CHOICE,
       title: 'How do you want to provide the site location?'
     },

@@ -5,12 +5,17 @@ import {
   SAVED_SITE_DETAILS_CACHE_KEY,
   clearMarineLicenceCache,
   clearSavedMarineLicenceSiteDetails,
+  clearSingleSiteMode,
   getMarineLicenceCache,
+  getSingleSiteMode,
   setMarineLicenceCache,
+  setSingleSiteMode,
   updateMarineLicenceSiteActivityDetails,
   updateMarineLicenceSiteDetails,
-  updateMarineLicenceSiteDetailsBatch
+  updateMarineLicenceSiteDetailsBatch,
+  updateSingleSiteLocation
 } from '#src/server/common/helpers/marine-licence/session-cache/utils.js'
+import { SINGLE_SITE_MODE_KEY } from '#src/server/common/constants/cache.js'
 
 vi.mock('@hapi/hoek', () => ({
   clone: vi.fn((data) => ({ ...data }))
@@ -686,6 +691,161 @@ describe('#utils', () => {
         SAVED_SITE_DETAILS_CACHE_KEY
       )
       expect(mockRequest.yar.commit).toHaveBeenCalledWith(mockH)
+    })
+  })
+
+  describe('setSingleSiteMode', () => {
+    test('should set the single site mode key with siteIndex object and commit', async () => {
+      const mockH = {}
+      const mockRequest = {
+        yar: {
+          set: vi.fn(),
+          commit: vi.fn().mockResolvedValue()
+        }
+      }
+
+      await setSingleSiteMode(mockRequest, mockH, 2)
+
+      expect(mockRequest.yar.set).toHaveBeenCalledWith(SINGLE_SITE_MODE_KEY, {
+        siteIndex: 2
+      })
+      expect(mockRequest.yar.commit).toHaveBeenCalledWith(mockH)
+    })
+  })
+
+  describe('getSingleSiteMode', () => {
+    test('should return the stored object when single site mode key is set', () => {
+      const stored = { siteIndex: 1 }
+      const mockRequest = { yar: { get: vi.fn().mockReturnValue(stored) } }
+
+      expect(getSingleSiteMode(mockRequest)).toBe(stored)
+      expect(mockRequest.yar.get).toHaveBeenCalledWith(SINGLE_SITE_MODE_KEY)
+    })
+
+    test('should return null when single site mode key is not set', () => {
+      const mockRequest = { yar: { get: vi.fn().mockReturnValue(null) } }
+
+      expect(getSingleSiteMode(mockRequest)).toBeNull()
+    })
+  })
+
+  describe('clearSingleSiteMode', () => {
+    test('should clear the single site mode key and commit', async () => {
+      const mockH = {}
+      const mockRequest = {
+        yar: {
+          clear: vi.fn(),
+          commit: vi.fn().mockResolvedValue()
+        }
+      }
+
+      await clearSingleSiteMode(mockRequest, mockH)
+
+      expect(mockRequest.yar.clear).toHaveBeenCalledWith(SINGLE_SITE_MODE_KEY)
+      expect(mockRequest.yar.commit).toHaveBeenCalledWith(mockH)
+    })
+  })
+
+  describe('updateSingleSiteLocation', () => {
+    const mockStatus = {
+      filename: 'test-file.kml',
+      status: 'ready',
+      s3Location: {
+        s3Bucket: 'test-bucket',
+        s3Key: 'test-key',
+        fileId: 'test-file-id',
+        s3Url: 'https://test-url',
+        checksumSha256: 'test-checksum'
+      }
+    }
+
+    const mockS3Location = { s3Bucket: 'test-bucket', s3Key: 'test-key' }
+
+    const mockCoordinateData = {
+      extractedCoordinates: [[[-1.23, 50.99]]],
+      geoJSON: {
+        type: 'FeatureCollection',
+        features: [
+          {
+            type: 'Feature',
+            geometry: { type: 'Point', coordinates: [-1.23, 50.99] }
+          }
+        ]
+      }
+    }
+
+    test('should update only the target site, preserving other sites and site-level data', () => {
+      const existingCache = {
+        projectName: 'Test Project',
+        siteDetails: [
+          {
+            siteName: 'Site A',
+            activityDetails: [{ activityType: 'construction' }],
+            coordinatesType: 'file',
+            fileUploadType: 'kml'
+          },
+          {
+            siteName: 'Site B',
+            activityDetails: [{ activityType: 'deposit' }],
+            coordinatesType: 'file',
+            fileUploadType: 'kml'
+          }
+        ]
+      }
+
+      const mockRequest = {
+        yar: { get: vi.fn().mockReturnValue(existingCache), set: vi.fn() }
+      }
+
+      updateSingleSiteLocation(
+        mockRequest,
+        mockStatus,
+        mockCoordinateData,
+        mockS3Location,
+        1
+      )
+
+      const [, setCall] = mockRequest.yar.set.mock.calls[0]
+
+      expect(setCall.siteDetails[0]).toEqual(existingCache.siteDetails[0])
+
+      expect(setCall.siteDetails[1]).toMatchObject({
+        siteName: 'Site B',
+        activityDetails: [{ activityType: 'deposit' }],
+        extractedCoordinates: mockCoordinateData.extractedCoordinates,
+        geoJSON: mockCoordinateData.geoJSON,
+        featureCount: 1,
+        uploadConfig: null
+      })
+    })
+
+    test('should write updated siteDetails to the cache', () => {
+      const existingCache = {
+        projectName: 'Test Project',
+        siteDetails: [
+          { siteName: 'Site A', coordinatesType: 'file', fileUploadType: 'kml' }
+        ]
+      }
+
+      const mockRequest = {
+        yar: { get: vi.fn().mockReturnValue(existingCache), set: vi.fn() }
+      }
+
+      updateSingleSiteLocation(
+        mockRequest,
+        mockStatus,
+        mockCoordinateData,
+        mockS3Location,
+        0
+      )
+
+      expect(mockRequest.yar.set).toHaveBeenCalledWith(
+        MARINE_LICENCE_CACHE_KEY,
+        expect.objectContaining({
+          projectName: 'Test Project',
+          siteDetails: expect.any(Array)
+        })
+      )
     })
   })
 })

@@ -29,26 +29,39 @@ export const validateAndExtractGeoJSON = (response) => {
   return geoJSON
 }
 
-const callGeoParserAPI = async (request, s3Bucket, s3Key, fileType) => {
-  return authenticatedPostRequest(request, '/geo-parser/extract', {
-    s3Bucket,
-    s3Key,
-    fileType
-  })
+const callGeoParserAPI = async (
+  request,
+  s3Bucket,
+  s3Key,
+  fileType,
+  singleSiteOnly = false
+) => {
+  const body = { s3Bucket, s3Key, fileType }
+  if (singleSiteOnly) {
+    body.singleSiteOnly = true
+  }
+  return authenticatedPostRequest(request, '/geo-parser/extract', body)
 }
 
 export const extractCoordinatesFromFile = async (
   request,
   s3Bucket,
   s3Key,
-  fileType
+  fileType,
+  singleSiteOnly = false
 ) => {
   try {
     request.logger.info(
       { s3Bucket, s3Key, fileType },
       `FileUpload: Calling geo-parser API`
     )
-    const response = await callGeoParserAPI(request, s3Bucket, s3Key, fileType)
+    const response = await callGeoParserAPI(
+      request,
+      s3Bucket,
+      s3Key,
+      fileType,
+      singleSiteOnly
+    )
 
     const geoJSON = validateAndExtractGeoJSON(response)
     const extractedCoordinates = extractCoordinatesFromGeoJSON(geoJSON)
@@ -62,7 +75,12 @@ export const extractCoordinatesFromFile = async (
   }
 }
 
-export const extractCoordinates = async ({ status, uploadConfig, request }) => {
+export const extractCoordinates = async ({
+  status,
+  uploadConfig,
+  request,
+  singleSiteOnly = false
+}) => {
   const cdpUploadConfig = config.get('cdpUploader')
   const s3Bucket = cdpUploadConfig.s3Bucket
   const s3Key = status.s3Location.s3Key
@@ -71,7 +89,8 @@ export const extractCoordinates = async ({ status, uploadConfig, request }) => {
     request,
     s3Bucket,
     s3Key,
-    uploadConfig.fileType
+    uploadConfig.fileType,
+    singleSiteOnly
   )
 
   return coordinateData

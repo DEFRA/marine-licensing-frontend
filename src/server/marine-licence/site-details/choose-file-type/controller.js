@@ -1,5 +1,6 @@
 import {
   getMarineLicenceCache,
+  getSingleSiteMode,
   updateMarineLicenceSiteDetails
 } from '#src/server/common/helpers/marine-licence/session-cache/utils.js'
 import {
@@ -13,24 +14,31 @@ import {
 } from '#src/server/common/validation/choose-file-type/constants.js'
 import { chooseFileTypeSchema } from '#src/server/common/validation/choose-file-type/schema.js'
 import { getSiteDetailsBySite } from '#src/server/common/helpers/exemptions/session-cache/site-details-utils.js'
+import {
+  getChooseFileTypeBackLink,
+  getChooseFileTypeCancelLink
+} from '#src/server/marine-licence/site-details/choose-file-type/utils.js'
 
 export const MARINE_LICENCE_CHOOSE_FILE_TYPE_VIEW_ROUTE =
   'templates/choose-file-type'
-
-const backLink = marineLicenceRoutes.MARINE_LICENCE_COORDINATES_TYPE_CHOICE
-const cancelLink = `${marineLicenceRoutes.MARINE_LICENCE_TASK_LIST}?cancel=site-details`
 
 export const chooseFileTypeController = {
   handler(request, h) {
     const marineLicence = getMarineLicenceCache(request)
     const site = getSiteDetailsBySite(marineLicence)
+    const isSingleSiteMode = getSingleSiteMode(request)
+
+    const payload = {
+      fileUploadType:
+        isSingleSiteMode || !site.fileUploadType ? '' : site.fileUploadType
+    }
 
     return h.view(MARINE_LICENCE_CHOOSE_FILE_TYPE_VIEW_ROUTE, {
       ...chooseFileTypeSettings,
-      backLink,
-      cancelLink,
+      backLink: getChooseFileTypeBackLink(isSingleSiteMode),
+      cancelLink: getChooseFileTypeCancelLink(isSingleSiteMode),
       projectName: marineLicence.projectName,
-      payload: { fileUploadType: site.fileUploadType ?? '' }
+      payload
     })
   }
 }
@@ -41,7 +49,11 @@ export const chooseFileTypeSubmitController = {
       payload: chooseFileTypeSchema,
       failAction: (request, h, err) => {
         const { payload } = request
-        const { projectName } = getMarineLicenceCache(request)
+        const marineLicence = getMarineLicenceCache(request)
+        const { projectName } = marineLicence
+        const isSingleSiteMode = getSingleSiteMode(request)
+        const backLink = getChooseFileTypeBackLink(isSingleSiteMode)
+        const cancelLink = getChooseFileTypeCancelLink(isSingleSiteMode)
 
         if (!err.details) {
           return h

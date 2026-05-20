@@ -144,9 +144,19 @@ const setupCacheSpies = () => {
     .spyOn(mlCacheUtils, 'updateMarineLicenceSiteDetails')
     .mockImplementation()
 
+  const getSingleSiteModeSpy = vi
+    .spyOn(mlCacheUtils, 'getSingleSiteMode')
+    .mockReturnValue(null)
+
+  const updateSingleSiteLocationSpy = vi
+    .spyOn(mlCacheUtils, 'updateSingleSiteLocation')
+    .mockImplementation()
+
   return {
     getMarineLicenceCacheSpy,
-    updateMarineLicenceSiteDetailsSpy
+    updateMarineLicenceSiteDetailsSpy,
+    getSingleSiteModeSpy,
+    updateSingleSiteLocationSpy
   }
 }
 
@@ -266,6 +276,8 @@ const expectFileValidationFailure = async (
 describe('#uploadAndWait', () => {
   let getMarineLicenceCacheSpy
   let updateMarineLicenceSiteDetailsSpy
+  let getSingleSiteModeSpy
+  let updateSingleSiteLocationSpy
   let mockCdpService
   let mockValidateUploadedFile
   let authenticatedPostRequestSpy
@@ -277,6 +289,8 @@ describe('#uploadAndWait', () => {
     getMarineLicenceCacheSpy = cacheSpies.getMarineLicenceCacheSpy
     updateMarineLicenceSiteDetailsSpy =
       cacheSpies.updateMarineLicenceSiteDetailsSpy
+    getSingleSiteModeSpy = cacheSpies.getSingleSiteModeSpy
+    updateSingleSiteLocationSpy = cacheSpies.updateSingleSiteLocationSpy
 
     const services = setupMockServices()
     mockCdpService = services.mockCdpService
@@ -685,6 +699,96 @@ describe('#uploadAndWait', () => {
 
         expect(h.redirect).toHaveBeenCalledWith(
           marineLicenceRoutes.MARINE_LICENCE_CHOOSE_FILE_UPLOAD_TYPE
+        )
+      })
+    })
+
+    describe('when single site mode is active', () => {
+      const setupReadyStatusWithValidFile = () => {
+        const statusResponse = createMockStatusResponse('ready')
+        mockCdpService.getStatus.mockResolvedValue(statusResponse)
+        mockValidateUploadedFile.mockResolvedValue({
+          isValid: true,
+          extension: 'kml',
+          errorMessage: null
+        })
+      }
+
+      test('should pass singleSiteOnly property to geo-parser when in single site mode', async () => {
+        getSingleSiteModeSpy.mockReturnValue({ siteIndex: 0 })
+        authenticatedPostRequestSpy.mockResolvedValue(
+          createMockGeoJsonResponse(1)
+        )
+        setupReadyStatusWithValidFile()
+
+        const h = createMockResponseHandler()
+
+        await uploadAndWaitController.handler(mockRequest, h)
+
+        expect(authenticatedPostRequestSpy).toHaveBeenCalledWith(
+          mockRequest,
+          '/geo-parser/extract',
+          {
+            s3Bucket: 'test-bucket',
+            s3Key: 'test-key',
+            fileType: 'kml',
+            singleSiteOnly: true
+          }
+        )
+      })
+
+      test('should call updateSingleSiteLocation with siteIndex when file is valid', async () => {
+        getSingleSiteModeSpy.mockReturnValue({ siteIndex: 1 })
+        authenticatedPostRequestSpy.mockResolvedValue(
+          createMockGeoJsonResponse(1)
+        )
+        setupReadyStatusWithValidFile()
+
+        const h = createMockResponseHandler()
+
+        await uploadAndWaitController.handler(mockRequest, h)
+
+        expect(updateSingleSiteLocationSpy).toHaveBeenCalledWith(
+          mockRequest,
+          expect.any(Object),
+          expect.any(Object),
+          expect.objectContaining({ s3Bucket: 'test-bucket' }),
+          1
+        )
+        expect(h.redirect).toHaveBeenCalledWith(
+          `${marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS}#site-details-2`
+        )
+      })
+
+      test('should redirect to anchored site card on successful single site upload', async () => {
+        getSingleSiteModeSpy.mockReturnValue({ siteIndex: 0 })
+        authenticatedPostRequestSpy.mockResolvedValue(
+          createMockGeoJsonResponse(1)
+        )
+        setupReadyStatusWithValidFile()
+
+        const h = createMockResponseHandler()
+
+        await uploadAndWaitController.handler(mockRequest, h)
+
+        expect(h.redirect).toHaveBeenCalledWith(
+          `${marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS}#site-details-1`
+        )
+      })
+
+      test('should not block upload when singleSiteMode is null and file contains multiple sites', async () => {
+        getSingleSiteModeSpy.mockReturnValue(null)
+        authenticatedPostRequestSpy.mockResolvedValue(
+          createMockGeoJsonResponse(3)
+        )
+        setupReadyStatusWithValidFile()
+
+        const h = createMockResponseHandler()
+
+        await uploadAndWaitController.handler(mockRequest, h)
+
+        expect(h.redirect).toHaveBeenCalledWith(
+          marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS
         )
       })
     })

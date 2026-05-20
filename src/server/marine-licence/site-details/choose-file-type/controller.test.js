@@ -9,7 +9,10 @@ import {
   MARINE_LICENCE_CHOOSE_FILE_TYPE_VIEW_ROUTE
 } from '#src/server/marine-licence/site-details/choose-file-type/controller.js'
 import { chooseFileTypeErrorMessages } from '#src/server/common/validation/choose-file-type/constants.js'
-import { getMarineLicenceCache } from '#src/server/common/helpers/marine-licence/session-cache/utils.js'
+import {
+  getMarineLicenceCache,
+  getSingleSiteMode
+} from '#src/server/common/helpers/marine-licence/session-cache/utils.js'
 import { mockMarineLicenceApplication } from '#src/server/test-helpers/mocks/marine-licence-mocks.js'
 
 import {
@@ -17,10 +20,22 @@ import {
   makePostRequest
 } from '#src/server/test-helpers/server-requests.js'
 
-vi.mock('~/src/server/common/helpers/marine-licence/session-cache/utils.js')
+vi.mock(
+  '~/src/server/common/helpers/marine-licence/session-cache/utils.js',
+  () => ({
+    getMarineLicenceCache: vi.fn(),
+    getSingleSiteMode: vi.fn().mockReturnValue(false),
+    updateMarineLicenceSiteDetails: vi.fn().mockResolvedValue({})
+  })
+)
 
-const backLink = marineLicenceRoutes.MARINE_LICENCE_COORDINATES_TYPE_CHOICE
-const cancelLink = `${marineLicenceRoutes.MARINE_LICENCE_TASK_LIST}?cancel=site-details`
+const defaultBackLink =
+  marineLicenceRoutes.MARINE_LICENCE_COORDINATES_TYPE_CHOICE
+const defaultCancelLink = `${marineLicenceRoutes.MARINE_LICENCE_TASK_LIST}?cancel=site-details`
+const singleSiteBackLink =
+  marineLicenceRoutes.MARINE_LICENCE_CHANGE_SITE_LOCATION
+const singleSiteCancelLink =
+  marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS
 
 describe('#chooseFileType (marine licence)', () => {
   const getServer = setupTestServer()
@@ -43,8 +58,8 @@ describe('#chooseFileType (marine licence)', () => {
         {
           pageTitle: 'Choose file type',
           heading: 'Which type of file do you want to upload?',
-          backLink,
-          cancelLink,
+          backLink: defaultBackLink,
+          cancelLink: defaultCancelLink,
           projectName: mockMarineLicenceApplication.projectName,
           payload: { fileUploadType: '' }
         }
@@ -65,6 +80,27 @@ describe('#chooseFileType (marine licence)', () => {
         MARINE_LICENCE_CHOOSE_FILE_TYPE_VIEW_ROUTE,
         expect.objectContaining({
           payload: { fileUploadType: 'kml' }
+        })
+      )
+    })
+
+    test('handler should not pre-populate fileUploadType when singleSiteMode is set', () => {
+      vi.mocked(getMarineLicenceCache).mockReturnValueOnce({
+        ...mockMarineLicenceApplication,
+        siteDetails: [{ fileUploadType: 'kml' }]
+      })
+      vi.mocked(getSingleSiteMode).mockReturnValueOnce({ siteIndex: 0 })
+
+      const h = { view: vi.fn() }
+
+      chooseFileTypeController.handler({}, h)
+
+      expect(h.view).toHaveBeenCalledWith(
+        MARINE_LICENCE_CHOOSE_FILE_TYPE_VIEW_ROUTE,
+        expect.objectContaining({
+          payload: { fileUploadType: '' },
+          backLink: singleSiteBackLink,
+          cancelLink: singleSiteCancelLink
         })
       )
     })
@@ -127,8 +163,8 @@ describe('#chooseFileType (marine licence)', () => {
           heading: 'Which type of file do you want to upload?',
           projectName: mockMarineLicenceApplication.projectName,
           payload: { fileUploadType: '' },
-          backLink,
-          cancelLink,
+          backLink: defaultBackLink,
+          cancelLink: defaultCancelLink,
           errorSummary: [
             {
               href: '#fileUploadType',
@@ -167,8 +203,8 @@ describe('#chooseFileType (marine licence)', () => {
           heading: 'Which type of file do you want to upload?',
           projectName: mockMarineLicenceApplication.projectName,
           payload: { fileUploadType: '' },
-          backLink,
-          cancelLink
+          backLink: defaultBackLink,
+          cancelLink: defaultCancelLink
         }
       )
 

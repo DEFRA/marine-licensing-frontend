@@ -11,6 +11,7 @@ import {
 } from '#src/server/common/helpers/file-upload/constants.js'
 import {
   getMarineLicenceCache,
+  getSingleSiteMode,
   updateMarineLicenceSiteDetails
 } from '#src/server/common/helpers/marine-licence/session-cache/utils.js'
 import { getSiteDetailsBySite } from '#src/server/common/helpers/exemptions/session-cache/site-details-utils.js'
@@ -71,6 +72,11 @@ export const fileUploadController = {
         fileType: fileUploadType
       })
 
+      const singleSiteMode = getSingleSiteMode(request)
+      const cancelLink = singleSiteMode
+        ? marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS
+        : `${marineLicenceRoutes.MARINE_LICENCE_TASK_LIST}?cancel=site-details`
+
       // Show the upload form
       return h.view(FILE_UPLOAD_VIEW_ROUTE, {
         ...fileUploadPageSettings,
@@ -81,9 +87,10 @@ export const fileUploadController = {
         acceptAttribute: fileTypeContent.acceptAttribute,
         fileUploadType,
         backLink: marineLicenceRoutes.MARINE_LICENCE_CHOOSE_FILE_UPLOAD_TYPE,
-        cancelLink: `${marineLicenceRoutes.MARINE_LICENCE_TASK_LIST}?cancel=site-details`,
+        cancelLink,
         errorSummary,
-        errors
+        errors,
+        singleSiteMode
       })
     } catch (error) {
       request.logger.error(

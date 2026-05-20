@@ -170,7 +170,10 @@ describe('Consultation and advertising', () => {
     const response = await makePostRequest({
       url: marineLicenceRoutes.MARINE_LICENCE_PUBLIC_CONSULTATION,
       server: getServer(),
-      formData: { consulted: 'yes', details: 'Spoke to local fishing association' }
+      formData: {
+        consulted: 'yes',
+        details: 'Spoke to local fishing association'
+      }
     })
 
     expect(response.statusCode).toBe(statusCodes.redirect)

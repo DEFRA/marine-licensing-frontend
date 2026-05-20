@@ -27,6 +27,18 @@ export const validateSiteAndActivityParams = {
   }
 }
 
+export const validateSiteRequiredParam = {
+  method: (request, h) => {
+    const { site } = request.query
+
+    if (!site) {
+      return h.redirect(marineLicenceRoutes.MARINE_LICENCE_TASK_LIST).takeover()
+    }
+
+    return validateSiteParam.method(request, h)
+  }
+}
+
 export const validateSiteParam = {
   method: (request, h) => {
     const marineLicence = getMarineLicenceCache(request)

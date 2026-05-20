@@ -6,6 +6,7 @@ import { renderFileUploadReview, renderManualEntryReview } from './utils.js'
 import { getSiteDetailsBySite } from '#src/server/common/helpers/exemptions/session-cache/site-details-utils.js'
 import {
   clearSavedMarineLicenceSiteDetails,
+  clearSingleSiteMode,
   getMarineLicenceCache,
   setMarineLicenceCache
 } from '#src/server/common/helpers/marine-licence/session-cache/utils.js'
@@ -26,6 +27,7 @@ export const reviewSiteDetailsController = {
     const fromCheckYourAnswers = request.query?.from === 'check-your-answers'
 
     await clearSavedMarineLicenceSiteDetails(request, h)
+    await clearSingleSiteMode(request, h)
 
     if (!marineLicence.id) {
       return h.redirect(marineLicenceRoutes.MARINE_LICENCE_TASK_LIST)

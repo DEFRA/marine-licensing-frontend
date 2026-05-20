@@ -1,7 +1,8 @@
 import { vi } from 'vitest'
 import {
   validateSiteAndActivityParams,
-  validateSiteParam
+  validateSiteParam,
+  validateSiteRequiredParam
 } from '#src/server/common/helpers/marine-licence/session-cache/site-utils.js'
 import {
   createMockH,
@@ -95,11 +96,52 @@ describe('#validateSiteParam', () => {
   })
 
   test('continues when site is valid', () => {
-    const request = createMockRequest()
+    const request = createMockRequest({ query: { site: '1' } })
     const h = createMockH()
 
     const result = validateSiteParam.method(request, h)
 
     expect(result).toBe(h.continue)
+    expect(h.redirect).not.toHaveBeenCalled()
+  })
+})
+
+describe('#validateSiteRequiredParam', () => {
+  beforeEach(() => {
+    vi.spyOn(utils, 'getMarineLicenceCache').mockReturnValue(
+      mockMarineLicenceApplication
+    )
+  })
+
+  test('redirects when site param is missing', () => {
+    const request = createMockRequest({ query: {} })
+    const h = createMockH()
+
+    validateSiteRequiredParam.method(request, h)
+
+    expect(h.redirect).toHaveBeenCalledWith(
+      marineLicenceRoutes.MARINE_LICENCE_TASK_LIST
+    )
+  })
+
+  test('redirects when site does not exist in cache', () => {
+    const request = createMockRequest({ query: { site: '99' } })
+    const h = createMockH()
+
+    validateSiteRequiredParam.method(request, h)
+
+    expect(h.redirect).toHaveBeenCalledWith(
+      marineLicenceRoutes.MARINE_LICENCE_TASK_LIST
+    )
+  })
+
+  test('continues when site is valid', () => {
+    const request = createMockRequest({ query: { site: '1' } })
+    const h = createMockH()
+
+    const result = validateSiteRequiredParam.method(request, h)
+
+    expect(result).toBe(h.continue)
+    expect(h.redirect).not.toHaveBeenCalled()
   })
 })

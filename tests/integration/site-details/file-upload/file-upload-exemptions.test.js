@@ -38,5 +38,5 @@ describe('File upload page (exemption)', () => {
     return loadPage({ requestUrl: routes.FILE_UPLOAD, server: getServer() })
   }
 
-  sharedFileUploadTests({ loadPageWithFileType })
+  sharedFileUploadTests({ loadPageWithFileType, projectType: 'exemption' })
 })

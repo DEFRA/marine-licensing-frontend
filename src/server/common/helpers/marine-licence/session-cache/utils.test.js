@@ -745,6 +745,10 @@ describe('#utils', () => {
         SAVED_SITE_DETAILS_CACHE_KEY,
         values
       )
+      expect(mockRequest.yar.commit).toHaveBeenCalledWith(mockH)
+    })
+  })
+
   describe('setSingleSiteMode', () => {
     test('should set the single site mode key with siteIndex object and commit', async () => {
       const mockH = {}
@@ -897,6 +901,10 @@ describe('#utils', () => {
           projectName: 'Test Project',
           siteDetails: [{ coordinatesEntry: 'single', siteName: 'My Site' }]
         }
+      )
+    })
+  })
+
   describe('updateSingleSiteLocation', () => {
     const mockStatus = {
       filename: 'test-file.kml',

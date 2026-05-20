@@ -273,7 +273,6 @@ describe('#multipleCoordinates (marine licence)', () => {
         ...mockMarineLicence,
         siteDetails: [{ coordinateSystem: COORDINATE_SYSTEMS.WGS84 }]
       })
-      vi.mocked(getSavedSiteDetails).mockReturnValue({})
       const request = createMockRequest({
         payload: { 'coordinates[0][latitude]': 'invalid' },
         query: { action: 'change' }

@@ -17,6 +17,7 @@ import {
 } from './utils.js'
 import { validateCoordinates } from '#src/server/common/validation/multiple-coordinates/validate.js'
 import { getCancelLink } from '#src/server/marine-licence/site-details/utils/cancel-link.js'
+import { getCoordinateSystemBackLink } from '#src/server/marine-licence/site-details/utils/back-link.js'
 import { validateSiteParam } from '#src/server/common/helpers/marine-licence/session-cache/site-utils.js'
 import { getSiteDataFromParam } from '#src/server/common/helpers/site-details/site-name.js'
 import { getSiteDetailsBySite } from '#src/server/common/helpers/marine-licence/session-cache/site-details-utils.js'
@@ -27,19 +28,9 @@ const getCoordinateSystemForSite = (siteDetails) =>
     ? COORDINATE_SYSTEMS.OSGB36
     : COORDINATE_SYSTEMS.WGS84
 
-const getBackLinkForAction = (action, siteNumber, savedSiteDetails) => {
-  if (action) {
-    if (savedSiteDetails.originalCoordinateSystem) {
-      return `${marineLicenceRoutes.MARINE_LICENCE_COORDINATE_SYSTEM_CHOICE}?site=${siteNumber}&action=${action}`
-    }
-    return `${marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS}#site-details-${siteNumber}`
-  }
-  return marineLicenceRoutes.MARINE_LICENCE_COORDINATE_SYSTEM_CHOICE
-}
-
 const buildPageData = (action, siteNumber, savedSiteDetails) => ({
   ...multipleCoordinatesPageData,
-  backLink: getBackLinkForAction(action, siteNumber, savedSiteDetails),
+  backLink: getCoordinateSystemBackLink(action, siteNumber, savedSiteDetails),
   cancelLink: getCancelLink(action),
   action
 })

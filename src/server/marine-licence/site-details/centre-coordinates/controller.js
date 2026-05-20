@@ -11,6 +11,7 @@ import {
   mapErrorsForDisplay
 } from '#src/server/common/helpers/errors.js'
 import { getCancelLink } from '#src/server/marine-licence/site-details/utils/cancel-link.js'
+import { getCoordinateSystemBackLink } from '#src/server/marine-licence/site-details/utils/back-link.js'
 import { saveSiteDetailsToBackend } from '#src/server/common/helpers/marine-licence/save-site-details.js'
 import { validateSiteParam } from '#src/server/common/helpers/marine-licence/session-cache/site-utils.js'
 import { getSiteDataFromParam } from '#src/server/common/helpers/site-details/site-name.js'
@@ -24,16 +25,6 @@ import {
 
 const centreCoordinatesPageData = {
   ...centreCoordinatesSettings
-}
-
-const getBackLink = (action, siteNumber, savedSiteDetails) => {
-  if (action) {
-    if (savedSiteDetails.originalCoordinateSystem) {
-      return `${marineLicenceRoutes.MARINE_LICENCE_COORDINATE_SYSTEM_CHOICE}?site=${siteNumber}&action=${action}`
-    }
-    return `${marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS}#site-details-${siteNumber}`
-  }
-  return marineLicenceRoutes.MARINE_LICENCE_COORDINATE_SYSTEM_CHOICE
 }
 
 const getCoordinateSystem = (siteDetails) =>
@@ -55,7 +46,11 @@ export const centreCoordinatesController = {
 
     return h.view(COORDINATE_SYSTEM_VIEW_ROUTES[coordinateSystem], {
       ...centreCoordinatesPageData,
-      backLink: getBackLink(action, siteNumber, savedSiteDetails),
+      backLink: getCoordinateSystemBackLink(
+        action,
+        siteNumber,
+        savedSiteDetails
+      ),
       cancelLink: getCancelLink(action),
       projectName: marineLicence.projectName,
       siteNumber,
@@ -76,7 +71,11 @@ export const centreCoordinatesSubmitFailHandler = (request, h, error) => {
   const action = request.query.action
   const savedSiteDetails = getSavedSiteDetails(request)
 
-  const backLink = getBackLink(action, siteNumber, savedSiteDetails)
+  const backLink = getCoordinateSystemBackLink(
+    action,
+    siteNumber,
+    savedSiteDetails
+  )
 
   if (!error.details) {
     return h

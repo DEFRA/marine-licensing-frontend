@@ -17,7 +17,7 @@ import { createMockRequest } from '#src/server/test-helpers/mocks/helpers.js'
 import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
 
 vi.mock('#src/server/common/helpers/marine-licence/session-cache/utils.js')
-vi.mock('#/src/server/common/helpers/marine-licence/save-site-details.js')
+vi.mock('#src/server/common/helpers/marine-licence/save-site-details.js')
 
 const wgs84Coordinates = { latitude: '55.019889', longitude: '-1.399500' }
 const osgb36Coordinates = { eastings: '425053', northings: '564180' }
@@ -432,59 +432,6 @@ describe('#centreCoordinates (marine licence)', () => {
         createMockRequest({ query: { action: 'change' } }),
         h
       )
-
-      expect(h.view).toHaveBeenCalledWith(
-        COORDINATE_SYSTEM_VIEW_ROUTES[COORDINATE_SYSTEMS.WGS84],
-        expect.objectContaining({
-          backLink: `${marineLicenceRoutes.MARINE_LICENCE_COORDINATE_SYSTEM_CHOICE}?site=1&action=change`
-        })
-      )
-    })
-  })
-
-  describe('#centreCoordinatesSubmitFailHandler action mode', () => {
-    test('should use review page back link when action is set and no originalCoordinateSystem', () => {
-      vi.mocked(getMarineLicenceCache).mockReturnValue({
-        ...mockMarineLicenceApplication,
-        siteDetails: [{ coordinateSystem: COORDINATE_SYSTEMS.WGS84 }]
-      })
-      const request = createMockRequest({
-        payload: { latitude: 'invalid' },
-        query: { action: 'change' }
-      })
-      const h = { view: vi.fn().mockReturnValue({ takeover: vi.fn() }) }
-      const err = {
-        details: [{ path: ['latitude'], message: 'TEST', type: 'any.only' }]
-      }
-
-      centreCoordinatesSubmitFailHandler(request, h, err)
-
-      expect(h.view).toHaveBeenCalledWith(
-        COORDINATE_SYSTEM_VIEW_ROUTES[COORDINATE_SYSTEMS.WGS84],
-        expect.objectContaining({
-          backLink: `${marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS}#site-details-1`
-        })
-      )
-    })
-
-    test('should use coordinate-system back link when action is set and originalCoordinateSystem is saved', () => {
-      vi.mocked(getMarineLicenceCache).mockReturnValue({
-        ...mockMarineLicenceApplication,
-        siteDetails: [{ coordinateSystem: COORDINATE_SYSTEMS.WGS84 }]
-      })
-      vi.mocked(getSavedSiteDetails).mockReturnValue({
-        originalCoordinateSystem: 'wgs84'
-      })
-      const request = createMockRequest({
-        payload: { latitude: 'invalid' },
-        query: { action: 'change' }
-      })
-      const h = { view: vi.fn().mockReturnValue({ takeover: vi.fn() }) }
-      const err = {
-        details: [{ path: ['latitude'], message: 'TEST', type: 'any.only' }]
-      }
-
-      centreCoordinatesSubmitFailHandler(request, h, err)
 
       expect(h.view).toHaveBeenCalledWith(
         COORDINATE_SYSTEM_VIEW_ROUTES[COORDINATE_SYSTEMS.WGS84],

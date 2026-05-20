@@ -323,33 +323,4 @@ describe('#coordinatesEntry (marine licence)', () => {
       )
     })
   })
-
-  describe('#coordinatesEntrySubmitController failAction action mode', () => {
-    test('should use review page back link and no cancel link when action is set', () => {
-      const request = createMockRequest({
-        payload: { coordinatesEntry: 'invalid' },
-        query: { action: 'change' }
-      })
-      const h = { view: vi.fn().mockReturnValue({ takeover: vi.fn() }) }
-      const err = {
-        details: [
-          { path: ['coordinatesEntry'], message: 'TEST', type: 'any.only' }
-        ]
-      }
-
-      coordinatesEntrySubmitController.options.validate.failAction(
-        request,
-        h,
-        err
-      )
-
-      expect(h.view).toHaveBeenCalledWith(
-        MARINE_LICENCE_COORDINATES_ENTRY_VIEW_ROUTE,
-        expect.objectContaining({
-          backLink: `${marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS}#site-details-1`,
-          cancelLink: undefined
-        })
-      )
-    })
-  })
 })

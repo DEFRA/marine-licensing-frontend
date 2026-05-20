@@ -88,6 +88,12 @@ export const coordinateSystemSubmitController = {
     const siteDetails = getSiteDetailsBySite(marineLicence, siteIndex)
     const action = request.query.action
 
+    if (action && payload.coordinateSystem === siteDetails.coordinateSystem) {
+      return h.redirect(
+        `${marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS}#site-details-${siteNumber}`
+      )
+    }
+
     await updateMarineLicenceSiteDetails(
       request,
       h,
@@ -95,12 +101,6 @@ export const coordinateSystemSubmitController = {
       'coordinateSystem',
       payload.coordinateSystem
     )
-
-    if (action && payload.coordinateSystem === siteDetails.coordinateSystem) {
-      return h.redirect(
-        `${marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS}#site-details-${siteNumber}`
-      )
-    }
 
     const { coordinatesEntry } = siteDetails
     const nextPage =
@@ -111,8 +111,10 @@ export const coordinateSystemSubmitController = {
     if (action) {
       const savedSiteDetails = getSavedSiteDetails(request)
       if (!savedSiteDetails.originalCoordinateSystem) {
-        savedSiteDetails.originalCoordinateSystem = siteDetails.coordinateSystem
-        await setSavedSiteDetails(request, h, savedSiteDetails)
+        await setSavedSiteDetails(request, h, {
+          ...savedSiteDetails,
+          originalCoordinateSystem: siteDetails.coordinateSystem
+        })
       }
       await updateMarineLicenceSiteDetailsMultiple(request, h, siteIndex, {
         coordinates: null

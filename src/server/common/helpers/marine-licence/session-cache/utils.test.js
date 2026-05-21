@@ -7,12 +7,15 @@ import {
   clearSavedMarineLicenceSiteDetails,
   clearSingleSiteMode,
   getMarineLicenceCache,
-  getSingleSiteMode,
+  getSavedSiteDetails,
   setMarineLicenceCache,
-  setSingleSiteMode,
+  setSavedSiteDetails,
   updateMarineLicenceSiteActivityDetails,
   updateMarineLicenceSiteDetails,
   updateMarineLicenceSiteDetailsBatch,
+  updateMarineLicenceSiteDetailsMultiple,
+  getSingleSiteMode,
+  setSingleSiteMode,
   updateSingleSiteLocation
 } from '#src/server/common/helpers/marine-licence/session-cache/utils.js'
 import { SINGLE_SITE_MODE_KEY } from '#src/server/common/constants/cache.js'
@@ -694,6 +697,58 @@ describe('#utils', () => {
     })
   })
 
+  describe('getSavedSiteDetails', () => {
+    let mockRequest
+
+    beforeEach(() => {
+      mockRequest = { yar: { get: vi.fn() } }
+    })
+
+    test('should return the stored value when it exists', () => {
+      const savedDetails = { originalCoordinatesEntry: 'single' }
+      mockRequest.yar.get.mockReturnValue(savedDetails)
+
+      const result = getSavedSiteDetails(mockRequest)
+
+      expect(mockRequest.yar.get).toHaveBeenCalledWith(
+        SAVED_SITE_DETAILS_CACHE_KEY
+      )
+      expect(result).toBe(savedDetails)
+    })
+
+    test('should return {} when the cache is empty', () => {
+      mockRequest.yar.get.mockReturnValue(null)
+
+      const result = getSavedSiteDetails(mockRequest)
+
+      expect(result).toEqual({})
+    })
+  })
+
+  describe('setSavedSiteDetails', () => {
+    test('should set the value and commit the session', async () => {
+      const mockH = {}
+      const mockRequest = {
+        yar: {
+          set: vi.fn(),
+          commit: vi.fn().mockResolvedValue()
+        }
+      }
+      const values = {
+        originalCoordinatesEntry: 'single',
+        originalCoordinateSystem: 'wgs84'
+      }
+
+      await setSavedSiteDetails(mockRequest, mockH, values)
+
+      expect(mockRequest.yar.set).toHaveBeenCalledWith(
+        SAVED_SITE_DETAILS_CACHE_KEY,
+        values
+      )
+      expect(mockRequest.yar.commit).toHaveBeenCalledWith(mockH)
+    })
+  })
+
   describe('setSingleSiteMode', () => {
     test('should set the single site mode key with siteIndex object and commit', async () => {
       const mockH = {}
@@ -743,6 +798,110 @@ describe('#utils', () => {
 
       expect(mockRequest.yar.clear).toHaveBeenCalledWith(SINGLE_SITE_MODE_KEY)
       expect(mockRequest.yar.commit).toHaveBeenCalledWith(mockH)
+    })
+  })
+
+  describe('updateMarineLicenceSiteDetailsMultiple', () => {
+    let mockRequest
+    let mockH
+
+    beforeEach(() => {
+      mockH = {}
+      mockRequest = {
+        yar: {
+          get: vi.fn(),
+          set: vi.fn(),
+          commit: vi.fn().mockResolvedValue()
+        }
+      }
+    })
+
+    test('should set non-null values on the site', async () => {
+      mockRequest.yar.get.mockReturnValue({
+        siteDetails: [{ coordinatesEntry: 'single', coordinateSystem: 'wgs84' }]
+      })
+
+      await updateMarineLicenceSiteDetailsMultiple(mockRequest, mockH, 0, {
+        coordinateSystem: 'osgb36'
+      })
+
+      expect(mockRequest.yar.set).toHaveBeenCalledWith(
+        MARINE_LICENCE_CACHE_KEY,
+        {
+          siteDetails: [
+            { coordinatesEntry: 'single', coordinateSystem: 'osgb36' }
+          ]
+        }
+      )
+      expect(mockRequest.yar.commit).toHaveBeenCalledWith(mockH)
+    })
+
+    test('should delete keys whose value is null', async () => {
+      mockRequest.yar.get.mockReturnValue({
+        siteDetails: [
+          {
+            coordinatesEntry: 'single',
+            coordinateSystem: 'wgs84',
+            coordinates: {},
+            circleWidth: '500'
+          }
+        ]
+      })
+
+      await updateMarineLicenceSiteDetailsMultiple(mockRequest, mockH, 0, {
+        coordinateSystem: null,
+        coordinates: null,
+        circleWidth: null
+      })
+
+      expect(mockRequest.yar.set).toHaveBeenCalledWith(
+        MARINE_LICENCE_CACHE_KEY,
+        {
+          siteDetails: [{ coordinatesEntry: 'single' }]
+        }
+      )
+    })
+
+    test('should delete keys whose value is undefined', async () => {
+      mockRequest.yar.get.mockReturnValue({
+        siteDetails: [{ coordinateSystem: 'wgs84' }]
+      })
+
+      await updateMarineLicenceSiteDetailsMultiple(mockRequest, mockH, 0, {
+        coordinateSystem: undefined
+      })
+
+      expect(mockRequest.yar.set).toHaveBeenCalledWith(
+        MARINE_LICENCE_CACHE_KEY,
+        {
+          siteDetails: [{}]
+        }
+      )
+    })
+
+    test('should leave unrelated fields untouched', async () => {
+      mockRequest.yar.get.mockReturnValue({
+        projectName: 'Test Project',
+        siteDetails: [
+          {
+            coordinatesEntry: 'single',
+            coordinateSystem: 'wgs84',
+            siteName: 'My Site'
+          }
+        ]
+      })
+
+      await updateMarineLicenceSiteDetailsMultiple(mockRequest, mockH, 0, {
+        coordinateSystem: null
+      })
+
+      expect(mockRequest.yar.set).toHaveBeenCalledWith(
+        MARINE_LICENCE_CACHE_KEY,
+        {
+          projectName: 'Test Project',
+          siteDetails: [{ coordinatesEntry: 'single', siteName: 'My Site' }]
+        }
+      )
     })
   })
 

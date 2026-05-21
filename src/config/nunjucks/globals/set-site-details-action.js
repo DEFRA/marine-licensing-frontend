@@ -23,7 +23,12 @@ export function setSiteDetailsAction(
   const action = hasValue ? 'change' : 'add'
   const { skipAction, activityNumber, hideLinkText } = options
 
-  const queryString = buildQueryString(siteNumber, activityNumber, skipAction, action)
+  const queryString = buildQueryString(
+    siteNumber,
+    activityNumber,
+    skipAction,
+    action
+  )
   const linkText = hasValue ? 'Change' : 'Add'
   const fullText = visuallyHiddenText
     ? `${linkText} ${visuallyHiddenText}`

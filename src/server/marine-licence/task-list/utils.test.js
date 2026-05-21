@@ -30,6 +30,14 @@ describe('taskList utils', () => {
             classes: 'govuk-link--no-visited-state',
             text: 'Project background'
           }
+        },
+        {
+          href: marineLicenceRoutes.MARINE_LICENCE_PREFERRED_DATES,
+          status: { text: 'Completed' },
+          title: {
+            classes: 'govuk-link--no-visited-state',
+            text: 'What are your preferred start and end dates for the licence?'
+          }
         }
       ])
     })
@@ -60,6 +68,16 @@ describe('taskList utils', () => {
             classes: 'govuk-link--no-visited-state',
             text: 'Project background'
           }
+        },
+        {
+          href: marineLicenceRoutes.MARINE_LICENCE_PREFERRED_DATES,
+          status: {
+            tag: { text: 'In progress', classes: 'govuk-tag--teal' }
+          },
+          title: {
+            classes: 'govuk-link--no-visited-state',
+            text: 'What are your preferred start and end dates for the licence?'
+          }
         }
       ])
     })
@@ -87,6 +105,16 @@ describe('taskList utils', () => {
               title: {
                 classes: 'govuk-link--no-visited-state',
                 text: 'Project background'
+              }
+            },
+            {
+              href: marineLicenceRoutes.MARINE_LICENCE_PREFERRED_DATES,
+              status: {
+                tag: { text: 'Not yet started', classes: 'govuk-tag--blue' }
+              },
+              title: {
+                classes: 'govuk-link--no-visited-state',
+                text: 'What are your preferred start and end dates for the licence?'
               }
             }
           ]

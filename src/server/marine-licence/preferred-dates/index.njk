@@ -1,0 +1,110 @@
+{% extends 'layouts/page.njk' %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/date-input/macro.njk" import govukDateInput %}
+{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+{% from "cancel-button/macro.njk" import appCancelButton %}
+
+{% block beforeContent %}
+{{ super() }}
+  {{ appBackLink({
+    backLink: backLink
+  }) }}
+{% endblock %}
+
+{% block content %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+      {% if errorSummary %}
+        {{ govukErrorSummary({
+          titleText: "There is a problem",
+          errorList: errorSummary
+        }) }}
+      {% endif %}
+
+      {% if projectName %}
+        <span class="govuk-caption-l">{{ projectName }}</span>
+      {% endif %}
+
+      <h1 class="govuk-heading-l">{{ heading }}</h1>
+
+      <p class="govuk-body">Give your preferred start and end dates. We'll confirm the final dates if we issue your licence.</p>
+      <p class="govuk-body">It takes at least 13 weeks to make a decision on a marine licence for most applications. Consider this when stating the start and end dates.</p>
+
+      <form method="POST">
+        <input type="hidden" name="csrfToken" value="{{ csrfToken }}" />
+
+        {{ govukDateInput({
+          id: "start-date",
+          namePrefix: "start-date",
+          fieldset: {
+            legend: {
+              text: "Start date",
+              classes: "govuk-fieldset__legend--s"
+            }
+          },
+          hint: {
+            text: "For example, 7 " + currentYear
+          },
+          errorMessage: errors['start-date'] if errors,
+          items: [
+            {
+              id: "start-date-month",
+              name: "month",
+              label: "Month",
+              classes: "govuk-input--width-2" + (" govuk-input--error" if errors and errors['start-date-month']),
+              value: payload['start-date-month'] if payload
+            },
+            {
+              id: "start-date-year",
+              name: "year",
+              label: "Year",
+              classes: "govuk-input--width-4" + (" govuk-input--error" if errors and errors['start-date-year']),
+              value: payload['start-date-year'] if payload
+            }
+          ]
+        }) }}
+
+        {{ govukDateInput({
+          id: "end-date",
+          namePrefix: "end-date",
+          fieldset: {
+            legend: {
+              text: "End date",
+              classes: "govuk-fieldset__legend--s"
+            }
+          },
+          hint: {
+            text: "For example, 8 " + nextYear
+          },
+          errorMessage: errors['end-date'] if errors,
+          items: [
+            {
+              id: "end-date-month",
+              name: "month",
+              label: "Month",
+              classes: "govuk-input--width-2" + (" govuk-input--error" if errors and errors['end-date-month']),
+              value: payload['end-date-month'] if payload
+            },
+            {
+              id: "end-date-year",
+              name: "year",
+              label: "Year",
+              classes: "govuk-input--width-4" + (" govuk-input--error" if errors and errors['end-date-year']),
+              value: payload['end-date-year'] if payload
+            }
+          ]
+        }) }}
+
+        <div class="govuk-button-group">
+          {{ govukButton({
+            text: "Save and continue",
+            classes: "govuk-button--primary"
+          }) }}
+          {{ appCancelButton({
+            cancelLink: backLink
+          }) }}
+        </div>
+      </form>
+    </div>
+  </div>
+{% endblock %}

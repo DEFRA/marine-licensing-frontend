@@ -203,6 +203,11 @@ describe('Page accessibility checks (Axe)', () => {
       isMarineLicence: true
     },
     {
+      url: marineLicenceRoutes.MARINE_LICENCE_PREFERRED_DATES,
+      title: 'What are your preferred start and end dates for the licence?',
+      isMarineLicence: true
+    },
+    {
       url: marineLicenceRoutes.MARINE_LICENCE_TASK_LIST,
       title: 'Marine licence start page',
       isMarineLicence: true,

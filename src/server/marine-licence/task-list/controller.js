@@ -56,6 +56,7 @@ export const taskListController = {
       projectName,
       projectBackground,
       specialLegalPowers,
+      preferredDates,
       publicRegister,
       otherAuthorities,
       siteDetails
@@ -80,6 +81,7 @@ export const taskListController = {
       projectName,
       projectBackground,
       specialLegalPowers,
+      preferredDates,
       publicRegister,
       otherAuthorities,
       siteDetails: hasCancel ? [] : siteDetails

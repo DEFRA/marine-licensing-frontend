@@ -6,6 +6,7 @@ export const mockMarineLicenceTaskList = {
   specialLegalPowers: 'COMPLETED',
   otherAuthorities: 'COMPLETED',
   siteDetails: 'COMPLETED',
+  preferredDates: 'COMPLETED',
   projectBackground: 'COMPLETED',
   publicRegister: 'COMPLETED'
 }
@@ -52,6 +53,10 @@ export const mockMarineLicenceApplication = {
   projectBackground: 'Test project background',
   specialLegalPowers: { agree: 'yes', details: 'Test reason' },
   taskList: mockMarineLicenceTaskList,
+  preferredDates: {
+    start: { month: '07', year: '2026' },
+    end: { month: '08', year: '2027' }
+  },
   projectType: MARINE_LICENCE_KEY,
   siteDetails: [
     {

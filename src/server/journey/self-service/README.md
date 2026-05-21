@@ -36,16 +36,16 @@ true. They all run with `auth: false`.
 
 ## Routes
 
-| Method | Path                                                                       | Purpose                                                                                                                                 | Source      |
-| ------ | -------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------- | ----------- |
-| GET    | `/journey/self-service/start`                                              | Pre-walkthrough landing page                                                                                                            | `start/`    |
-| POST   | `/journey/self-service/start`                                              | Initialise session, redirect to first question                                                                                          | `start/`    |
-| GET    | `/journey/self-service/{questionPath*}`                                    | Render a question page (radio or multiSelect)                                                                                           | `question/` |
-| POST   | `/journey/self-service/{questionPath*}`                                    | Record answer(s) in session, redirect to the next node                                                                                  | `question/` |
-| GET    | `/journey/self-service/outcome/{outcomePath*}`                             | Render an outcome (intermediate fork, terminal-single, or terminal-multi) with per-option "View answers" trigger links                  | `outcome/`  |
-| POST   | `/journey/self-service/outcome/{outcomePath*}`                             | Branch an intermediate outcome via the selected `outcomeType`, redirect to its `nextQuestionRoute` (rejected for non-intermediate)      | `outcome/`  |
-| GET    | `/journey/self-service/view-answers/{outcomeTypeId}/{outcomePath*}`        | Mint an `iat-answers` doc keyed on the chosen outcomeType's text, 302 to `/journey/self-service/answer/{slug}` (per-option trigger URL) | `outcome/`  |
-| GET    | `/journey/self-service/answer/{slug}`                                      | Render the public, printable answer page for a previously completed walkthrough                                                         | `answer/`   |
+| Method | Path                                                                | Purpose                                                                                                                                 | Source      |
+| ------ | ------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------- | ----------- |
+| GET    | `/journey/self-service/start`                                       | Pre-walkthrough landing page                                                                                                            | `start/`    |
+| POST   | `/journey/self-service/start`                                       | Initialise session, redirect to first question                                                                                          | `start/`    |
+| GET    | `/journey/self-service/{questionPath*}`                             | Render a question page (radio or multiSelect)                                                                                           | `question/` |
+| POST   | `/journey/self-service/{questionPath*}`                             | Record answer(s) in session, redirect to the next node                                                                                  | `question/` |
+| GET    | `/journey/self-service/outcome/{outcomePath*}`                      | Render an outcome (intermediate fork, terminal-single, or terminal-multi) with per-option "View answers" trigger links                  | `outcome/`  |
+| POST   | `/journey/self-service/outcome/{outcomePath*}`                      | Branch an intermediate outcome via the selected `outcomeType`, redirect to its `nextQuestionRoute` (rejected for non-intermediate)      | `outcome/`  |
+| GET    | `/journey/self-service/view-answers/{outcomeTypeId}/{outcomePath*}` | Mint an `iat-answers` doc keyed on the chosen outcomeType's text, 302 to `/journey/self-service/answer/{slug}` (per-option trigger URL) | `outcome/`  |
+| GET    | `/journey/self-service/answer/{slug}`                               | Render the public, printable answer page for a previously completed walkthrough                                                         | `answer/`   |
 
 The catch-all paths on question and outcome resolve through
 `services/journey-data.js` and `services/journey-router.js`; see
@@ -68,7 +68,7 @@ A typical walkthrough is three logical phases:
    `services/iat-answers-payload.js` (the chosen outcomeType's text
    becomes `summaryText`), POSTs it to the backend
    (`iatAnswersService.create` → `marine-licensing-backend POST
-   /iat-answers`), then 302s to `/journey/self-service/answer/<slug>`.
+/iat-answers`), then 302s to `/journey/self-service/answer/<slug>`.
    This mirrors the Fivium app's per-option document model — each
    outcomeType the user clicks yields its own slug, so a user comparing
    options on a terminal-multi page can get distinct durable URLs per

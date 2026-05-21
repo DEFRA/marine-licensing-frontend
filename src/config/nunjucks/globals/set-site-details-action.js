@@ -1,3 +1,17 @@
+const buildQueryString = (siteNumber, activityNumber, skipAction, action) => {
+  const queryParams = []
+  if (siteNumber) {
+    queryParams.push(`site=${siteNumber}`)
+  }
+  if (activityNumber) {
+    queryParams.push(`activity=${activityNumber}`)
+  }
+  if (!skipAction) {
+    queryParams.push(`action=${action}`)
+  }
+  return queryParams.join('&')
+}
+
 export function setSiteDetailsAction(
   value,
   href,
@@ -9,21 +23,7 @@ export function setSiteDetailsAction(
   const action = hasValue ? 'change' : 'add'
   const { skipAction, activityNumber, hideLinkText } = options
 
-  const queryParams = []
-
-  if (siteNumber) {
-    queryParams.push(`site=${siteNumber}`)
-  }
-
-  if (activityNumber) {
-    queryParams.push(`activity=${activityNumber}`)
-  }
-
-  if (!skipAction) {
-    queryParams.push(`action=${action}`)
-  }
-
-  const queryString = queryParams.join('&')
+  const queryString = buildQueryString(siteNumber, activityNumber, skipAction, action)
   const linkText = hasValue ? 'Change' : 'Add'
   const fullText = visuallyHiddenText
     ? `${linkText} ${visuallyHiddenText}`

@@ -118,7 +118,7 @@ export const siteNameSubmitController = {
     const isFileUploadCoordinates = siteDetails.coordinatesType === 'file'
     const shouldReturnToReview = isFileUploadCoordinates || !!action
 
-    const redirectRoute = isFileUploadCoordinates
+    const redirectRoute = shouldReturnToReview
       ? `${marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS}${getSiteDetailsAnchor(siteNumber)}`
       : marineLicenceRoutes.MARINE_LICENCE_COORDINATES_ENTRY_CHOICE
 

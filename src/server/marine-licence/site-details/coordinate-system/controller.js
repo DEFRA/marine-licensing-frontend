@@ -8,6 +8,7 @@ import {
 import { getSiteDetailsBySite } from '#src/server/common/helpers/marine-licence/session-cache/site-details-utils.js'
 import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
 import { getSiteDataFromParam } from '#src/server/common/helpers/site-details/site-name.js'
+import { getSiteDetailsAnchor } from '#src/server/common/helpers/site-details/anchor-utils.js'
 import { validateSiteParam } from '#src/server/common/helpers/marine-licence/session-cache/site-utils.js'
 import { createFailAction } from '#src/server/common/helpers/createFailAction.js'
 import {
@@ -25,7 +26,7 @@ const getBackLink = (action, siteNumber, savedSiteDetails) => {
     if (savedSiteDetails.originalCoordinatesEntry) {
       return `${marineLicenceRoutes.MARINE_LICENCE_COORDINATES_ENTRY_CHOICE}?site=${siteNumber}&action=${action}`
     }
-    return `${marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS}#site-details-${siteNumber}`
+    return `${marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS}${getSiteDetailsAnchor(siteNumber)}`
   }
   return marineLicenceRoutes.MARINE_LICENCE_COORDINATES_ENTRY_CHOICE
 }
@@ -90,7 +91,7 @@ export const coordinateSystemSubmitController = {
 
     if (action && payload.coordinateSystem === siteDetails.coordinateSystem) {
       return h.redirect(
-        `${marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS}#site-details-${siteNumber}`
+        `${marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS}${getSiteDetailsAnchor(siteNumber)}`
       )
     }
 

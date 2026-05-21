@@ -13,6 +13,7 @@ import {
 import { getCancelLink } from '#src/server/marine-licence/site-details/utils/cancel-link.js'
 import { getCoordinateSystemBackLink } from '#src/server/marine-licence/site-details/utils/back-link.js'
 import { saveSiteDetailsToBackend } from '#src/server/common/helpers/marine-licence/save-site-details.js'
+import { getSiteDetailsAnchor } from '#src/server/common/helpers/site-details/anchor-utils.js'
 import { validateSiteParam } from '#src/server/common/helpers/marine-licence/session-cache/site-utils.js'
 import { getSiteDataFromParam } from '#src/server/common/helpers/site-details/site-name.js'
 import { getPayload } from '#src/server/common/helpers/site-details/centre-coordinates.js'
@@ -146,7 +147,7 @@ export const centreCoordinatesSubmitController = {
     if (action && siteDetails.circleWidth) {
       await saveSiteDetailsToBackend(request, h)
       return h.redirect(
-        `${marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS}#site-details-${siteNumber}`
+        `${marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS}${getSiteDetailsAnchor(siteNumber)}`
       )
     }
 

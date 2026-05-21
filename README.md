@@ -29,16 +29,15 @@ ability to create licence exemption notifications.
 
 ## Prerequisites
 
-For latest minimum versions of Node.js and NPM, see the [package.json](./package.json) 'engines'
-property.
+This project targets **Node.js 24** to align with the [CDP Node.js frontend template](https://github.com/DEFRA/cdp-node-frontend-template). The required version is pinned in [.nvmrc](./.nvmrc) (`v24.14.1`); minimum versions are also listed in [package.json](./package.json) `engines`.
 
-- [Node.js](http://nodejs.org/)
-- [npm](https://nodejs.org/)
+- [Node.js](http://nodejs.org/) 24.x
+- [npm](https://nodejs.org/) (bundled with Node.js)
 - [Docker](https://www.docker.com/)
 
 You may find it easier to manage Node.js versions using a version manager such
-as [nvm](https://github.com/creationix/nvm) or [n](https://www.npmjs.com/package/n). From within the
-project folder you can then either run `nvm use` or `n auto` to install the required version.
+as [nvm](https://github.com/nvm-sh/nvm) or [fnm](https://github.com/Schniz/fnm). From within the
+project folder run `nvm use` or `fnm use` to select the version in `.nvmrc`.
 
 ## Local development
 

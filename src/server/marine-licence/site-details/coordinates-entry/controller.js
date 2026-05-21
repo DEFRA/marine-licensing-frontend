@@ -16,13 +16,14 @@ import { createFailAction } from '#src/server/common/helpers/createFailAction.js
 import { getSiteDataFromParam } from '#src/server/common/helpers/site-details/site-name.js'
 import { validateSiteParam } from '#src/server/common/helpers/marine-licence/session-cache/site-utils.js'
 import { getCancelLink } from '#src/server/marine-licence/site-details/utils/cancel-link.js'
+import { getSiteDetailsAnchor } from '#src/server/common/helpers/site-details/anchor-utils.js'
 
 export const MARINE_LICENCE_COORDINATES_ENTRY_VIEW_ROUTE =
   'templates/coordinates-entry'
 
 const getBackLink = (action, siteNumber) =>
   action
-    ? `${marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS}#site-details-${siteNumber}`
+    ? `${marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS}${getSiteDetailsAnchor(siteNumber)}`
     : marineLicenceRoutes.MARINE_LICENCE_SITE_NAME
 
 export const coordinatesEntryController = {
@@ -83,7 +84,7 @@ export const coordinatesEntrySubmitController = {
 
     if (action && payload.coordinatesEntry === siteDetails.coordinatesEntry) {
       return h.redirect(
-        `${marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS}#site-details-${siteNumber}`
+        `${marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS}${getSiteDetailsAnchor(siteNumber)}`
       )
     }
 

@@ -106,7 +106,7 @@ describe('#widthOfSite (marine licence)', () => {
       expect(h.view().takeover).toHaveBeenCalled()
     })
 
-    test('failAction should render with review page back link and no cancel link when action is set', () => {
+    test('failAction should render with centre-point back link and no cancel link when action is set', () => {
       const request = createMockRequest({
         payload: { width: 'invalid' },
         query: { action: 'change' }
@@ -121,7 +121,7 @@ describe('#widthOfSite (marine licence)', () => {
       expect(h.view).toHaveBeenCalledWith(
         WIDTH_OF_SITE_VIEW_ROUTE,
         expect.objectContaining({
-          backLink: `${marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS}#site-details-1`,
+          backLink: `${marineLicenceRoutes.MARINE_LICENCE_CIRCLE_CENTRE_POINT}?site=1&action=change`,
           cancelLink: undefined
         })
       )
@@ -129,7 +129,7 @@ describe('#widthOfSite (marine licence)', () => {
   })
 
   describe('#widthOfSiteController action mode', () => {
-    test('should use review page back link and no cancel link when action is set', () => {
+    test('should use centre-point back link and no cancel link when action is set', () => {
       vi.mocked(getMarineLicenceCache).mockReturnValue({
         ...mockMarineLicenceApplication,
         siteDetails: [{ circleWidth: '500' }]
@@ -144,7 +144,7 @@ describe('#widthOfSite (marine licence)', () => {
       expect(h.view).toHaveBeenCalledWith(
         WIDTH_OF_SITE_VIEW_ROUTE,
         expect.objectContaining({
-          backLink: `${marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS}#site-details-1`,
+          backLink: `${marineLicenceRoutes.MARINE_LICENCE_CIRCLE_CENTRE_POINT}?site=1&action=change`,
           cancelLink: undefined,
           action: 'change'
         })

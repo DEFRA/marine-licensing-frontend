@@ -22,7 +22,7 @@ const widthOfSitePageData = {
 
 const getBackLink = (action, siteNumber) =>
   action
-    ? `${marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS}#site-details-${siteNumber}`
+    ? `${marineLicenceRoutes.MARINE_LICENCE_CIRCLE_CENTRE_POINT}?site=${siteNumber}&action=${action}`
     : marineLicenceRoutes.MARINE_LICENCE_CIRCLE_CENTRE_POINT
 
 export const widthOfSiteController = {

@@ -20,10 +20,11 @@ deeper-dive areas, see:
 
 ```
 src/server/journey/self-service/
-├── start/        # GET/POST /journey/self-service/start              (ML-1162)
-├── question/     # GET/POST /journey/self-service/{questionPath*}    (ML-1186)
-├── outcome/      # GET/POST /journey/self-service/outcome/{...*}     (ML-1164)
-├── answer/       # GET    /journey/self-service/answer/{slug}        (ML-1165)
+├── start/        # GET/POST /journey/self-service/start                   (ML-1162)
+├── question/     # GET/POST /journey/self-service/{questionPath*}         (ML-1186)
+├── outcome/      # GET/POST /journey/self-service/outcome/{...*}          (ML-1164)
+│                 # GET      /journey/self-service/view-answers/{...}      (ML-1165)
+├── answer/       # GET      /journey/self-service/answer/{slug}           (ML-1165)
 ├── data/         # self-service.json + load-time parser/sanitiser
 └── services/     # journey-data, journey-router, data-quality,
                   # sanitise, session-answers, iat-answers-payload
@@ -35,15 +36,16 @@ true. They all run with `auth: false`.
 
 ## Routes
 
-| Method | Path                                           | Purpose                                                                                         | Source      |
-| ------ | ---------------------------------------------- | ----------------------------------------------------------------------------------------------- | ----------- |
-| GET    | `/journey/self-service/start`                  | Pre-walkthrough landing page                                                                    | `start/`    |
-| POST   | `/journey/self-service/start`                  | Initialise session, redirect to first question                                                  | `start/`    |
-| GET    | `/journey/self-service/{questionPath*}`        | Render a question page (radio or multiSelect)                                                   | `question/` |
-| POST   | `/journey/self-service/{questionPath*}`        | Record answer(s) in session, redirect to the next node                                          | `question/` |
-| GET    | `/journey/self-service/outcome/{outcomePath*}` | Render an outcome (intermediate fork, terminal-single, or terminal-multi)                       | `outcome/`  |
-| POST   | `/journey/self-service/outcome/{outcomePath*}` | Branch via an `outcomeType`, persist `iat-answers` doc on terminal outcomes, render or redirect | `outcome/`  |
-| GET    | `/journey/self-service/answer/{slug}`          | Render the public, printable answer page for a previously completed walkthrough                 | `answer/`   |
+| Method | Path                                                                       | Purpose                                                                                                                                 | Source      |
+| ------ | -------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------- | ----------- |
+| GET    | `/journey/self-service/start`                                              | Pre-walkthrough landing page                                                                                                            | `start/`    |
+| POST   | `/journey/self-service/start`                                              | Initialise session, redirect to first question                                                                                          | `start/`    |
+| GET    | `/journey/self-service/{questionPath*}`                                    | Render a question page (radio or multiSelect)                                                                                           | `question/` |
+| POST   | `/journey/self-service/{questionPath*}`                                    | Record answer(s) in session, redirect to the next node                                                                                  | `question/` |
+| GET    | `/journey/self-service/outcome/{outcomePath*}`                             | Render an outcome (intermediate fork, terminal-single, or terminal-multi) with per-option "View answers" trigger links                  | `outcome/`  |
+| POST   | `/journey/self-service/outcome/{outcomePath*}`                             | Branch an intermediate outcome via the selected `outcomeType`, redirect to its `nextQuestionRoute` (rejected for non-intermediate)      | `outcome/`  |
+| GET    | `/journey/self-service/view-answers/{outcomeTypeId}/{outcomePath*}`        | Mint an `iat-answers` doc keyed on the chosen outcomeType's text, 302 to `/journey/self-service/answer/{slug}` (per-option trigger URL) | `outcome/`  |
+| GET    | `/journey/self-service/answer/{slug}`                                      | Render the public, printable answer page for a previously completed walkthrough                                                         | `answer/`   |
 
 The catch-all paths on question and outcome resolve through
 `services/journey-data.js` and `services/journey-router.js`; see
@@ -55,18 +57,31 @@ A typical walkthrough is three logical phases:
 
 1. **Walk.** Browser GETs/POSTs through `start → question(s) → outcome(s)`.
    Answers accumulate in the Hapi session (`@hapi/yar`,
-   `services/session-answers.js`).
-2. **Persist on terminal outcome.** On a terminal outcome POST,
-   `outcome/controller.js` builds an `iat-answers` payload via
-   `services/iat-answers-payload.js` and POSTs it to the backend
-   (`iatAnswersService.create` →
-   `marine-licensing-backend POST /iat-answers`). The backend returns a
-   slug; the frontend renders the outcome page with a `View answers` link
-   to `/journey/self-service/answer/<slug>`.
+   `services/session-answers.js`). Each outcome page renders a per-option
+   `View answers` link pointing at a trigger URL of the form
+   `/journey/self-service/view-answers/<outcomeTypeId>/<outcomePath>` —
+   one link per `outcomeType`, with no `iat-answers` doc persisted yet.
+2. **Mint on click.** When the user clicks a `View answers` link the
+   trigger GET runs `outcomeViewAnswersController` in
+   `outcome/controller.js`: it validates the `outcomeTypeId` is one of
+   the outcome's types, builds the `iat-answers` payload via
+   `services/iat-answers-payload.js` (the chosen outcomeType's text
+   becomes `summaryText`), POSTs it to the backend
+   (`iatAnswersService.create` → `marine-licensing-backend POST
+   /iat-answers`), then 302s to `/journey/self-service/answer/<slug>`.
+   This mirrors the Fivium app's per-option document model — each
+   outcomeType the user clicks yields its own slug, so a user comparing
+   options on a terminal-multi page can get distinct durable URLs per
+   choice.
 3. **View answers.** Anyone (the original walker or anyone they share the
    link with — including the public ArcGIS map layer that links to these
    URLs) can GET `/journey/self-service/answer/<slug>` to see the
    immutable record of the questions, answers, and outcome summary.
+
+No `iat-answers` doc is persisted on a plain outcome-page GET. The
+controller only writes when the user explicitly clicks `View answers`,
+which keeps unused-doc accumulation proportional to actual reader intent
+rather than to page-view volume.
 
 ## Append-only `iat-answers` contract
 
@@ -116,7 +131,7 @@ defend against, so a reader doesn't infer protection that isn't there.
 | 4   | Write-only API surface (no PUT/PATCH/DELETE on `/iat-answers/{slug}`)        | [`marine-licensing-backend/src/iat-answers/api/index.js`](../../../../../marine-licensing-backend/src/iat-answers/api/index.js)                                                                                       | Tampering with, or deletion of, public-record answer content by anyone who learns a slug. A re-walk creates a _new_ slug; the old URL is immutable. Unused docs will accumulate, which is accepted as we never will know which end up getting used. |
 | 5   | Backend sanitisation of `outcome.summaryText` on insert                      | [`marine-licensing-backend/src/iat-answers/api/helpers/sanitise-summary-text.js`](../../../../../marine-licensing-backend/src/iat-answers/api/helpers/sanitise-summary-text.js)                                       | Stored XSS via the only HTML-bearing field the frontend POSTs. Uses `sanitize-html` with a tag/scheme allowlist that is **byte-identical** to the frontend's `richTextSanitiseOptions` (see the contract comment in `sanitise-summary-text.js`)     |
 | 6   | Frontend sanitisation of `self-service.json` content at load time            | [`services/sanitise.js`](./services/sanitise.js), applied by `services/journey-data.js` to `question.hint`, `answer.hint`, `outcome.text`, `outcomeType.text`, with `stripHtml` on `question.text` and `section.text` | Reflected XSS from configuration content rendered into the IAT pages. Same allowlist as backend `sanitiseSummaryText` plus the `govuk-hint` class transform for hint paragraphs                                                                     |
-| 7   | Frontend re-sanitisation of `summaryText` on the answer page                 | [`answer/index.njk:29`](./answer/index.njk) (`\| sanitiseRichText`)                                                                                                                                                   | Stored XSS in the (very unlikely) case that a malicious actor wrote a document directly into Mongo, bypassing layer 8. Defence in depth — the same allowlist is applied at both write and render.                                                   |
+| 7   | Frontend re-sanitisation of `summaryText` on the answer page                 | [`answer/index.njk:28`](./answer/index.njk) (`\| sanitiseRichText`)                                                                                                                                                   | Stored XSS in the (very unlikely) case that a malicious actor wrote a document directly into Mongo, bypassing layer 5. Defence in depth — the same allowlist is applied at both write and render.                                                   |
 | 8   | No PII in the `iat-answers` document body                                    | [`services/iat-answers-payload.js`](./services/iat-answers-payload.js) — payload is `{ outcome: { route, typeId, summaryText }, answers: [{ questionRoute, questionText, answers: [{ id, text }] }] }` only           | Accidental publication of personal data when the answer URL is shared or indexed. The doc carries only the user's question/answer trail and the rendered outcome text — no name, email, phone, IP, or session ID                                    |
 | 9   | Bounded `seenRuntimeIssues` Set (FIFO, 100 entries)                          | [`services/data-quality.js`](./services/data-quality.js), see [`services/README.data-quality.md`](./services/README.data-quality.md)                                                                                  | Process-level memory growth from anonymous traffic that hits a malformed-config branch. Required because the runtime callers are reachable on `auth: false` routes.                                                                                 |
 

@@ -33,6 +33,8 @@
   {% endset %}
 
   {% set helperText %}
+    <p class="govuk-body">This could include relevant local groups in the community or organisations, for example, resident committees, local environmental and conservation groups, Companies House or Natural England.</p>
+
     {{ govukDetails({
       summaryText: "Help with pre-application and public consultation",
       html: helperHtml
@@ -53,7 +55,7 @@
       errorMessage: errors['details'],
       value: payload.details
     }) }}
-  {% endset -%}
+  {% endset %}
 
   {{ appRadioPage({
     name: "consulted",
@@ -64,6 +66,7 @@
     value: payload.consulted,
     errorMessage: errors['consulted'],
     projectName: projectName,
+    bodyHtml: bodyHtml,
     hint: { html: helperText },
     items: [
       {

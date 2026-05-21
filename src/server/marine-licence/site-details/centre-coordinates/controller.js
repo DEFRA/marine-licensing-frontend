@@ -1,6 +1,7 @@
 import {
   getMarineLicenceCache,
-  updateMarineLicenceSiteDetails
+  updateMarineLicenceSiteDetails,
+  getSavedSiteDetails
 } from '#src/server/common/helpers/marine-licence/session-cache/utils.js'
 import { getSiteDetailsBySite } from '#src/server/common/helpers/marine-licence/session-cache/site-details-utils.js'
 import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
@@ -10,6 +11,9 @@ import {
   mapErrorsForDisplay
 } from '#src/server/common/helpers/errors.js'
 import { getCancelLink } from '#src/server/marine-licence/site-details/utils/cancel-link.js'
+import { getCoordinateSystemBackLink } from '#src/server/marine-licence/site-details/utils/back-link.js'
+import { saveSiteDetailsToBackend } from '#src/server/common/helpers/marine-licence/save-site-details.js'
+import { getSiteDetailsAnchor } from '#src/server/common/helpers/site-details/anchor-utils.js'
 import { validateSiteParam } from '#src/server/common/helpers/marine-licence/session-cache/site-utils.js'
 import { getSiteDataFromParam } from '#src/server/common/helpers/site-details/site-name.js'
 import { getPayload } from '#src/server/common/helpers/site-details/centre-coordinates.js'
@@ -21,8 +25,7 @@ import {
 } from '#src/server/common/validation/centre-coordinates/constants.js'
 
 const centreCoordinatesPageData = {
-  ...centreCoordinatesSettings,
-  backLink: marineLicenceRoutes.MARINE_LICENCE_COORDINATE_SYSTEM_CHOICE
+  ...centreCoordinatesSettings
 }
 
 const getCoordinateSystem = (siteDetails) =>
@@ -40,9 +43,15 @@ export const centreCoordinatesController = {
     const siteDetails = getSiteDetailsBySite(marineLicence, siteIndex)
     const coordinateSystem = getCoordinateSystem(siteDetails)
     const action = request.query.action
+    const savedSiteDetails = getSavedSiteDetails(request)
 
     return h.view(COORDINATE_SYSTEM_VIEW_ROUTES[coordinateSystem], {
       ...centreCoordinatesPageData,
+      backLink: getCoordinateSystemBackLink(
+        action,
+        siteNumber,
+        savedSiteDetails
+      ),
       cancelLink: getCancelLink(action),
       projectName: marineLicence.projectName,
       siteNumber,
@@ -61,11 +70,19 @@ export const centreCoordinatesSubmitFailHandler = (request, h, error) => {
   const coordinateSystem = getCoordinateSystem(siteDetails)
   const { projectName } = marineLicence
   const action = request.query.action
+  const savedSiteDetails = getSavedSiteDetails(request)
+
+  const backLink = getCoordinateSystemBackLink(
+    action,
+    siteNumber,
+    savedSiteDetails
+  )
 
   if (!error.details) {
     return h
       .view(COORDINATE_SYSTEM_VIEW_ROUTES[coordinateSystem], {
         ...centreCoordinatesPageData,
+        backLink,
         cancelLink: getCancelLink(action),
         projectName,
         siteNumber,
@@ -85,6 +102,7 @@ export const centreCoordinatesSubmitFailHandler = (request, h, error) => {
   return h
     .view(COORDINATE_SYSTEM_VIEW_ROUTES[coordinateSystem], {
       ...centreCoordinatesPageData,
+      backLink,
       cancelLink: getCancelLink(action),
       projectName,
       siteNumber,
@@ -104,9 +122,10 @@ export const centreCoordinatesSubmitController = {
   async handler(request, h) {
     const { payload } = request
     const marineLicence = getMarineLicenceCache(request)
-    const { siteIndex } = getSiteDataFromParam(request.query)
+    const { siteIndex, siteNumber } = getSiteDataFromParam(request.query)
     const siteDetails = getSiteDetailsBySite(marineLicence, siteIndex)
     const coordinateSystem = getCoordinateSystem(siteDetails)
+    const action = request.query.action
 
     const { error, value } = validateCentreCoordinates(
       payload,
@@ -124,6 +143,19 @@ export const centreCoordinatesSubmitController = {
       'coordinates',
       value
     )
+
+    if (action && siteDetails.circleWidth) {
+      await saveSiteDetailsToBackend(request, h)
+      return h.redirect(
+        `${marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS}${getSiteDetailsAnchor(siteNumber)}`
+      )
+    }
+
+    if (action) {
+      return h.redirect(
+        `${marineLicenceRoutes.MARINE_LICENCE_WIDTH_OF_SITE}?site=${siteNumber}&action=${action}`
+      )
+    }
 
     return h.redirect(marineLicenceRoutes.MARINE_LICENCE_WIDTH_OF_SITE)
   }

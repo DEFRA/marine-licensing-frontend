@@ -8,7 +8,6 @@ import {
 } from '#src/server/journey/self-service/services/journey-data.js'
 import {
   getBackLink,
-  getOutcomeSelection,
   pushOutcomeSelection
 } from '#src/server/journey/self-service/services/session-answers.js'
 import { reportRuntimeIssue } from '#src/server/journey/self-service/services/data-quality.js'
@@ -101,34 +100,6 @@ function logMissingHeadingIfNeeded(request, outcomeRoute, outcome) {
   )
 }
 
-async function persistAndGetAnswerUrl(request, outcomeRoute) {
-  const outcomeTypeId = getOutcomeSelection(request, outcomeRoute)
-  const payload = buildIatAnswersPayload(request, outcomeRoute, outcomeTypeId)
-  if (!payload) {
-    return null
-  }
-
-  try {
-    const slug = await iatAnswersService.create(request, payload)
-    if (!slug) {
-      return null
-    }
-    return `/journey/self-service/answer/${slug}`
-  } catch (error) {
-    request.logger.warn(
-      {
-        event: {
-          action: 'iat-answers:save-failed',
-          reference: outcomeRoute,
-          reason: error.message
-        }
-      },
-      `IAT answers save failed for ${outcomeRoute}; rendering outcome without view-answers link`
-    )
-    return null
-  }
-}
-
 export const outcomeController = {
   async handler(request, h) {
     const { outcomeRoute, outcome, types } = loadOutcomeForGet(request)
@@ -136,15 +107,13 @@ export const outcomeController = {
     logMissingHeadingIfNeeded(request, outcomeRoute, outcome)
     const heading = outcome.heading ?? 'Result'
 
-    const answerPageUrl = await persistAndGetAnswerUrl(request, outcomeRoute)
-
     const baseModel = {
       classification,
       heading,
       pageTitle: heading,
       outcome,
-      backLink: getBackLink(request, outcomeRoute, 'outcome'),
-      answerPageUrl
+      outcomeRoute,
+      backLink: getBackLink(request, outcomeRoute, 'outcome')
     }
 
     if (classification === 'intermediate') {
@@ -161,6 +130,59 @@ export const outcomeController = {
       logEmptyTextIfNeeded(request, ot)
     }
     return h.view(VIEW_PATH, buildTerminalMultiView(baseModel, types))
+  }
+}
+
+async function createAnswerDocOrThrow(request, outcomeRoute, outcomeTypeId) {
+  const payload = buildIatAnswersPayload(request, outcomeRoute, outcomeTypeId)
+  if (!payload) {
+    throw Boom.notFound('IAT answers payload could not be built')
+  }
+  let slug
+  try {
+    slug = await iatAnswersService.create(request, payload)
+  } catch (error) {
+    request.logger.warn(
+      {
+        event: {
+          action: 'iat-answers:save-failed',
+          reference: outcomeRoute,
+          reason: error.message
+        }
+      },
+      `IAT answers save failed for ${outcomeRoute}`
+    )
+    throw Boom.badImplementation('IAT answers save failed')
+  }
+  if (!slug) {
+    throw Boom.badImplementation('IAT answers create returned no slug')
+  }
+  return slug
+}
+
+export const outcomeViewAnswersController = {
+  async handler(request, h) {
+    const { outcomeRoute, outcome } = loadOutcome(request)
+
+    const outcomeTypeId = request.params.outcomeTypeId
+    const outcomeType = outcomeTypeId ? getOutcomeType(outcomeTypeId) : null
+    if (!outcomeType || !outcome.outcomeTypes.includes(outcomeTypeId)) {
+      reportRuntimeIssue(
+        request,
+        'invalid-outcome-selection',
+        outcomeRoute,
+        `If outcomeType '${outcomeTypeId}' should be selectable on ${outcomeRoute}, add it to outcomeTypes in self-service.json or fix the trigger link`,
+        `GET view-answers ${outcomeRoute} rejected outcomeType '${outcomeTypeId}'`
+      )
+      throw Boom.badRequest('Invalid outcome selection')
+    }
+
+    const slug = await createAnswerDocOrThrow(
+      request,
+      outcomeRoute,
+      outcomeTypeId
+    )
+    return h.redirect(`/journey/self-service/answer/${slug}`)
   }
 }
 

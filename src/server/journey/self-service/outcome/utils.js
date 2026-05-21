@@ -34,6 +34,11 @@ export function hasContinueFor(outcomeType) {
   )
 }
 
+function viewAnswersUrlFor(outcomeRoute, outcomeTypeId) {
+  const tail = outcomeRoute.replace(/^\//, '')
+  return `/journey/self-service/view-answers/${outcomeTypeId}/${tail}`
+}
+
 export function buildIntermediateView(baseModel, outcome, types) {
   const section = outcome.section ? getSection(outcome.section) : null
   return {
@@ -44,7 +49,8 @@ export function buildIntermediateView(baseModel, outcome, types) {
       heading: ot.heading,
       text: ot.text,
       isTerminal: !ot.nextQuestionRoute,
-      ctaLabel: ctaLabelFor(ot)
+      ctaLabel: ctaLabelFor(ot),
+      viewAnswersUrl: viewAnswersUrlFor(baseModel.outcomeRoute, ot.id)
     }))
   }
 }
@@ -54,7 +60,8 @@ export function buildTerminalSingleView(baseModel, terminalType) {
     ...baseModel,
     body: terminalType.text,
     ctaLabel: ctaLabelFor(terminalType),
-    hasContinue: hasContinueFor(terminalType)
+    hasContinue: hasContinueFor(terminalType),
+    viewAnswersUrl: viewAnswersUrlFor(baseModel.outcomeRoute, terminalType.id)
   }
 }
 
@@ -66,7 +73,8 @@ export function buildTerminalMultiView(baseModel, types) {
       heading: ot.heading,
       text: ot.text,
       ctaLabel: ctaLabelFor(ot),
-      hasContinue: hasContinueFor(ot)
+      hasContinue: hasContinueFor(ot),
+      viewAnswersUrl: viewAnswersUrlFor(baseModel.outcomeRoute, ot.id)
     }))
   }
 }

@@ -1,7 +1,8 @@
 import Joi from 'joi'
 import {
   outcomeController,
-  outcomePostController
+  outcomePostController,
+  outcomeViewAnswersController
 } from '#src/server/journey/self-service/outcome/controller.js'
 import { routes } from '#src/server/common/constants/routes.js'
 
@@ -32,6 +33,22 @@ export const journeySelfServiceOutcome = {
             }
           },
           ...outcomePostController
+        },
+        {
+          method: 'GET',
+          path: routes.IAT_OUTCOME_VIEW_ANSWERS,
+          options: {
+            auth: false,
+            validate: {
+              params: Joi.object({
+                outcomeTypeId: Joi.string()
+                  .max(outcomeTypeMaxCharLength)
+                  .required(),
+                outcomePath: Joi.string().required()
+              })
+            }
+          },
+          ...outcomeViewAnswersController
         }
       ])
     }

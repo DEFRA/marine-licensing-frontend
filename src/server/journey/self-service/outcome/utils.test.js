@@ -60,7 +60,7 @@ describe('#ctaLabelFor', () => {
 })
 
 describe('#buildTerminalSingleView — hasContinue', () => {
-  const baseModel = { heading: 'h' }
+  const baseModel = { heading: 'h', outcomeRoute: '/x' }
 
   test('hasContinue=true when outcomeType has module', () => {
     const view = buildTerminalSingleView(baseModel, {
@@ -95,9 +95,21 @@ describe('#buildTerminalSingleView — hasContinue', () => {
   })
 })
 
+describe('#buildTerminalSingleView — viewAnswersUrl', () => {
+  test('builds /view-answers/<typeId>/<outcomeRoute-without-leading-slash>', () => {
+    const view = buildTerminalSingleView(
+      { heading: 'h', outcomeRoute: '/markers/ha-not-agreed' },
+      { id: 'WO_FOO' }
+    )
+    expect(view.viewAnswersUrl).toBe(
+      '/journey/self-service/view-answers/WO_FOO/markers/ha-not-agreed'
+    )
+  })
+})
+
 describe('#buildTerminalMultiView — hasContinue per option', () => {
   test('sets hasContinue per option from module / link / override', () => {
-    const view = buildTerminalMultiView({ heading: 'h' }, [
+    const view = buildTerminalMultiView({ heading: 'h', outcomeRoute: '/x' }, [
       { id: 'A', text: 'a', module: 'M' },
       { id: 'B', text: 'b' },
       { id: 'C', text: 'c', link: 'https://example.gov.uk/x.docx' }

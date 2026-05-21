@@ -130,60 +130,27 @@ describe('#outcomeController (integration)', () => {
       expect(continueButton.getAttribute('href')).toBe('#')
     })
 
-    test('renders one page-level "View answers" link with target=_blank and rel=noopener', async () => {
+    test('renders a per-option "View answers" link inside each option card', async () => {
       const { document } = await getPage()
-      const links = Array.from(
-        document.querySelectorAll('a.govuk-link')
-      ).filter((a) => a.textContent.includes('View answers'))
-      expect(links).toHaveLength(1)
-      const link = links[0]
-      expect(link.getAttribute('href')).toBe(EXPECTED_ANSWER_PAGE_URL)
-      expect(link.getAttribute('target')).toBe('_blank')
-      expect(link.getAttribute('rel')).toBe('noopener noreferrer')
-      expect(link.textContent.replace(/\s+/g, ' ').trim()).toBe(
-        'View answers (opens in a new tab)'
-      )
-    })
-
-    test('does not render the "View answers" link when the IAT save returns null', async () => {
-      vi.mocked(iatAnswersService.create).mockResolvedValueOnce(null)
-      const { document } = await getPage()
-      expect(document.body.textContent).not.toContain('View answers')
-    })
-
-    test('does not render the "View answers" link and logs save-failed when create throws', async () => {
-      vi.mocked(iatAnswersService.create).mockRejectedValueOnce(
-        new Error('backend unavailable')
-      )
-      const { document } = await getPage()
-      expect(document.body.textContent).not.toContain('View answers')
-    })
-
-    test('two consecutive outcome GETs produce different answer URLs', async () => {
-      vi.mocked(iatAnswersService.create)
-        .mockResolvedValueOnce('AZ4rr6bLclCVUsE2Pl_zKw')
-        .mockResolvedValueOnce('BZ4rr6bLclCVUsE2Pl_zKx')
-
-      const { document: doc1 } = await getPage()
-      const { document: doc2 } = await getPage()
-
-      const getAnswerHref = (document) => {
-        const link = Array.from(document.querySelectorAll('a.govuk-link')).find(
+      const cards = document.querySelectorAll('.app-iat-option')
+      expect(cards).toHaveLength(3)
+      const expectedHrefs = [
+        '/journey/self-service/view-answers/WO_CON_EXEMPTION_JOURNEY/construction/journey-select',
+        '/journey/self-service/view-answers/WO_CON_SELF_SERVICE_JOURNEY/construction/journey-select',
+        '/journey/self-service/view-answers/WO_STANDARD_MLA/construction/journey-select'
+      ]
+      cards.forEach((card, i) => {
+        const link = Array.from(card.querySelectorAll('a.govuk-link')).find(
           (a) => a.textContent.includes('View answers')
         )
-        return link ? link.getAttribute('href') : null
-      }
-
-      const url1 = getAnswerHref(doc1)
-      const url2 = getAnswerHref(doc2)
-
-      expect(url1).toMatch(
-        /^\/journey\/self-service\/answer\/[A-Za-z0-9_-]{22}$/
-      )
-      expect(url2).toMatch(
-        /^\/journey\/self-service\/answer\/[A-Za-z0-9_-]{22}$/
-      )
-      expect(url1).not.toBe(url2)
+        expect(link).not.toBeNull()
+        expect(link.getAttribute('href')).toBe(expectedHrefs[i])
+        expect(link.getAttribute('target')).toBe('_blank')
+        expect(link.getAttribute('rel')).toBe('noopener noreferrer')
+        expect(link.textContent.replace(/\s+/g, ' ').trim()).toBe(
+          'View answers (opens in a new tab)'
+        )
+      })
     })
 
     test('renders a back link', async () => {
@@ -356,32 +323,21 @@ describe('GET terminal-single', () => {
     expect(continueButtons[0].getAttribute('href')).toBe('#')
   })
 
-  test('does not render the old "Download a PDF" button', async () => {
-    const { document } = await getPage(SINGLE)
-    expect(document.body.textContent).not.toContain(
-      'Download a PDF record of my answers'
-    )
-  })
-
-  test('renders one page-level "View answers" link with target=_blank and rel=noopener', async () => {
+  test('renders a single "View answers" link with the per-option trigger URL', async () => {
     const { document } = await getPage(SINGLE)
     const links = Array.from(document.querySelectorAll('a.govuk-link')).filter(
       (a) => a.textContent.includes('View answers')
     )
     expect(links).toHaveLength(1)
     const link = links[0]
-    expect(link.getAttribute('href')).toBe(EXPECTED_ANSWER_PAGE_URL)
+    expect(link.getAttribute('href')).toBe(
+      '/journey/self-service/view-answers/WO_EXE_AVAILABLE_ARTICLE_25A/exemption/licence-not-required-exemption-available-article-25A'
+    )
     expect(link.getAttribute('target')).toBe('_blank')
     expect(link.getAttribute('rel')).toBe('noopener noreferrer')
     expect(link.textContent.replace(/\s+/g, ' ').trim()).toBe(
       'View answers (opens in a new tab)'
     )
-  })
-
-  test('does not render the "View answers" link when the IAT save returns null', async () => {
-    vi.mocked(iatAnswersService.create).mockResolvedValueOnce(null)
-    const { document } = await getPage(SINGLE)
-    expect(document.body.textContent).not.toContain('View answers')
   })
 
   test('does not render any option cards', async () => {
@@ -461,25 +417,23 @@ describe('GET terminal-multi', () => {
     }
   })
 
-  test('renders one page-level "View answers" link with target=_blank and rel=noopener', async () => {
+  test('renders a per-option "View answers" link inside each option card', async () => {
     const { document } = await getPage(MULTI)
-    const links = Array.from(document.querySelectorAll('a.govuk-link')).filter(
-      (a) => a.textContent.includes('View answers')
-    )
-    expect(links).toHaveLength(1)
-    const link = links[0]
-    expect(link.getAttribute('href')).toBe(EXPECTED_ANSWER_PAGE_URL)
-    expect(link.getAttribute('target')).toBe('_blank')
-    expect(link.getAttribute('rel')).toBe('noopener noreferrer')
-    expect(link.textContent.replace(/\s+/g, ' ').trim()).toBe(
-      'View answers (opens in a new tab)'
-    )
-  })
-
-  test('does not render the "View answers" link when the IAT save returns null', async () => {
-    vi.mocked(iatAnswersService.create).mockResolvedValueOnce(null)
-    const { document } = await getPage(MULTI)
-    expect(document.body.textContent).not.toContain('View answers')
+    const cards = document.querySelectorAll('.app-iat-option')
+    expect(cards).toHaveLength(2)
+    const expectedHrefs = [
+      '/journey/self-service/view-answers/WO_DOWNLOAD_HA_AGREED_METHOD_TEMPLATE/scaffolding-impede-navigation',
+      '/journey/self-service/view-answers/WO_STANDARD_TRACK_MLA/scaffolding-impede-navigation'
+    ]
+    cards.forEach((card, i) => {
+      const link = Array.from(card.querySelectorAll('a.govuk-link')).find((a) =>
+        a.textContent.includes('View answers')
+      )
+      expect(link).not.toBeNull()
+      expect(link.getAttribute('href')).toBe(expectedHrefs[i])
+      expect(link.getAttribute('target')).toBe('_blank')
+      expect(link.getAttribute('rel')).toBe('noopener noreferrer')
+    })
   })
 
   test('renders a back link', async () => {
@@ -530,21 +484,16 @@ describe('GET licence-not-required (terminal-single, info-only)', () => {
     expect(body.textContent).toContain('relevant devolved administration')
   })
 
-  test('does not render the old "Download a PDF" button', async () => {
-    const { document } = await getPage()
-    expect(document.body.textContent).not.toContain(
-      'Download a PDF record of my answers'
-    )
-  })
-
-  test('renders the "View answers" link with target=_blank and rel=noopener', async () => {
+  test('renders the "View answers" link with the per-option trigger URL', async () => {
     const { document } = await getPage()
     const links = Array.from(document.querySelectorAll('a.govuk-link')).filter(
       (a) => a.textContent.includes('View answers')
     )
     expect(links).toHaveLength(1)
     const link = links[0]
-    expect(link.getAttribute('href')).toBe(EXPECTED_ANSWER_PAGE_URL)
+    expect(link.getAttribute('href')).toBe(
+      '/journey/self-service/view-answers/WO_EXE_LICENCE_DEVOLVED/licence-not-required-devolved'
+    )
     expect(link.getAttribute('target')).toBe('_blank')
     expect(link.getAttribute('rel')).toBe('noopener noreferrer')
   })
@@ -575,5 +524,46 @@ describe('POST to a terminal outcome route', () => {
       formData: { outcomeType: 'WO_STANDARD_TRACK_MLA' }
     })
     expect(response.statusCode).toBe(statusCodes.notFound)
+  })
+})
+
+describe('GET /journey/self-service/view-answers/:outcomeTypeId/:outcomePath', () => {
+  config.set('selfService.enabled', true)
+  const getServer = setupTestServer()
+
+  const TRIGGER_URL =
+    '/journey/self-service/view-answers/WO_DOWNLOAD_HA_MARKERS_AGREED_METHOD_TEMPLATE/markers/ha-not-agreed'
+
+  test('redirects to the slugged answer page returned by iatAnswersService.create', async () => {
+    const response = await makeGetRequest({
+      url: TRIGGER_URL,
+      server: getServer()
+    })
+    expect(response.statusCode).toBe(statusCodes.redirect)
+    expect(response.headers.location).toBe(EXPECTED_ANSWER_PAGE_URL)
+    expect(buildIatAnswersPayload).toHaveBeenCalledWith(
+      expect.anything(),
+      '/markers/ha-not-agreed',
+      'WO_DOWNLOAD_HA_MARKERS_AGREED_METHOD_TEMPLATE'
+    )
+    expect(iatAnswersService.create).toHaveBeenCalledTimes(1)
+  })
+
+  test('returns 400 when the outcomeTypeId is not in the outcome', async () => {
+    const response = await makeGetRequest({
+      url: '/journey/self-service/view-answers/WO_UNRELATED_TYPE/markers/ha-not-agreed',
+      server: getServer()
+    })
+    expect(response.statusCode).toBe(statusCodes.badRequest)
+    expect(iatAnswersService.create).not.toHaveBeenCalled()
+  })
+
+  test('returns 404 when the outcome route is unknown', async () => {
+    const response = await makeGetRequest({
+      url: '/journey/self-service/view-answers/WO_DOWNLOAD_HA_MARKERS_AGREED_METHOD_TEMPLATE/nonexistent-outcome',
+      server: getServer()
+    })
+    expect(response.statusCode).toBe(statusCodes.notFound)
+    expect(iatAnswersService.create).not.toHaveBeenCalled()
   })
 })

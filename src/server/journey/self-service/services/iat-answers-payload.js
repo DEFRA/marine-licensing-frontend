@@ -48,6 +48,13 @@ function chooseSummaryText(outcomeTypeId, types, outcome) {
       return ot.text
     }
   }
+  const isIntermediate = types.some((t) => t?.nextQuestionRoute)
+  if (isIntermediate) {
+    const firstTypeWithText = types.find((t) => t?.text)
+    if (firstTypeWithText) {
+      return firstTypeWithText.text
+    }
+  }
   if (types.length === 1 && types[0].text) {
     return types[0].text
   }

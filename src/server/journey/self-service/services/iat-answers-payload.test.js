@@ -134,6 +134,41 @@ describe('buildIatAnswersPayload', () => {
     expect(result.outcome.summaryText).toBe('Outcome heading')
   })
 
+  test('intermediate outcome: with no outcomeTypeId and multiple outcomeTypes, prefers first outcomeType text over outcome.text UI prompt', () => {
+    getAnswers.mockReturnValue([
+      { type: 'question', questionRoute: '/q', answerIds: ['a'] }
+    ])
+    getQuestion.mockReturnValue({
+      route: '/q',
+      text: 'Q?',
+      answers: [{ id: 'a', text: 'A' }]
+    })
+    getOutcome.mockReturnValue({
+      heading: 'Exemption not available',
+      text: 'Please select the service you require.'
+    })
+    getOutcomeTypesForOutcome.mockReturnValue([
+      {
+        id: 'WO_CON_NO_EXE_SELF_SERVICE',
+        text: 'Based on the information provided an exemption is not available and a marine licence is required.',
+        nextQuestionRoute: '/construction/activity'
+      },
+      {
+        id: 'WO_NO_EXE_STANDARD_MLA',
+        text: 'Based on the information provided an exemption is not available and a marine licence is required.'
+      }
+    ])
+
+    const result = buildIatAnswersPayload(
+      {},
+      '/exemption/construction-exe-not-available-continue'
+    )
+
+    expect(result.outcome.summaryText).toBe(
+      'Based on the information provided an exemption is not available and a marine licence is required.'
+    )
+  })
+
   test('with stashed outcomeTypeId, resolved outcomeType.text wins over outcome.text', () => {
     getAnswers.mockReturnValue([
       { type: 'question', questionRoute: '/q', answerIds: ['a'] }

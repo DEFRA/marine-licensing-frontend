@@ -45,7 +45,10 @@ describe('Marine Licence View Details', () => {
     })
 
     expect(
-      getByText(document, 'Public groups or organisations consultation')
+      getByText(
+        document,
+        'Pre-application public groups or organisations consultation'
+      )
     ).toBeInTheDocument()
     expect(
       getByText(
@@ -68,7 +71,7 @@ describe('Marine Licence View Details', () => {
 
     const keyEl = getByText(
       document,
-      'Public groups or organisations consultation'
+      'Pre-application public groups or organisations consultation'
     )
     expect(keyEl).toBeInTheDocument()
     const row = keyEl.closest('.govuk-summary-list__row')

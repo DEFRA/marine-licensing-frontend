@@ -177,7 +177,7 @@ describe('taskList utils', () => {
           status: { text: 'Completed' },
           title: {
             classes: 'govuk-link--no-visited-state',
-            text: 'Public consultation'
+            text: 'Pre-application consultation'
           }
         }
       ])
@@ -218,7 +218,7 @@ describe('taskList utils', () => {
           },
           title: {
             classes: 'govuk-link--no-visited-state',
-            text: 'Public consultation'
+            text: 'Pre-application consultation'
           }
         }
       ])
@@ -261,7 +261,7 @@ describe('taskList utils', () => {
             },
             title: {
               classes: 'govuk-link--no-visited-state',
-              text: 'Public consultation'
+              text: 'Pre-application consultation'
             }
           }
         ])
@@ -289,7 +289,7 @@ describe('taskList utils', () => {
             status: { text: 'Completed' },
             title: {
               classes: 'govuk-link--no-visited-state',
-              text: 'Public consultation'
+              text: 'Pre-application consultation'
             }
           }
         ])
@@ -322,7 +322,7 @@ describe('taskList utils', () => {
             },
             title: {
               classes: 'govuk-link--no-visited-state',
-              text: 'Public consultation'
+              text: 'Pre-application consultation'
             }
           }
         ])
@@ -354,7 +354,7 @@ describe('taskList utils', () => {
               },
               title: {
                 classes: 'govuk-link--no-visited-state',
-                text: 'Public consultation'
+                text: 'Pre-application consultation'
               }
             }
           ])

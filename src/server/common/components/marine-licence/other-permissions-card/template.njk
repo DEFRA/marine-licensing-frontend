@@ -51,15 +51,15 @@
 
 
 {% set _ = rows.push({
-     key: { text:  "Public groups or organisations consultation" },
-     value: { html: params.publicConsultation.details if params.publicConsultation.consulted === 'yes' else "No" },
+     key: { text:  "Pre-application public groups or organisations consultation" },
+     value: { text: params.publicConsultation.details if params.publicConsultation.consulted === 'yes' else "No" },
      classes: "govuk-summary-list__row--no-border",
        actions: {
       items: [
         {
           href: "/marine-licence/public-consultation?from=check-your-answers",
           text: "Change",
-          visuallyHiddenText: "public groups or organisations consultation",
+          visuallyHiddenText: "Pre-application public groups or organisations consultation",
           classes: "govuk-link--no-visited-state"
         }
       ]

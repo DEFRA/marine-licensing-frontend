@@ -49,7 +49,7 @@ export const transformOtherPermissionsTaskList = (taskList, isCitizen) => {
     status: setStatus(taskList.specialLegalPowers)
   }
   const publicConsultation = {
-    title: { text: 'Public consultation', classes: taskClasses },
+    title: { text: 'Pre-application consultation', classes: taskClasses },
     href: marineLicenceRoutes.MARINE_LICENCE_PUBLIC_CONSULTATION,
     status: setStatus(taskList.publicConsultation)
   }

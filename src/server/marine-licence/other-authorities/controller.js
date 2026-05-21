@@ -6,8 +6,8 @@ import {
   errorDescriptionByFieldName,
   mapErrorsForDisplay
 } from '#src/server/common/helpers/errors.js'
-import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
 import { authenticatedPatchRequest } from '#src/server/common/helpers/authenticated-requests.js'
+import { getCommonRedirectLink } from '#src/server/common/helpers/marine-licence/redirect-link.js'
 
 import joi from 'joi'
 
@@ -30,13 +30,6 @@ const otherAuthoritiesSettings = {
     'Have you applied to, or got permission from, any other authorities in relation to this project?'
 }
 
-const getBackLink = (request) => {
-  const fromCheckYourAnswers = request.query?.from === 'check-your-answers'
-  return fromCheckYourAnswers
-    ? marineLicenceRoutes.MARINE_LICENCE_CHECK_YOUR_ANSWERS
-    : marineLicenceRoutes.MARINE_LICENCE_TASK_LIST
-}
-
 export const otherAuthoritiesController = {
   async handler(request, h) {
     const marineLicence = getMarineLicenceCache(request)
@@ -45,7 +38,7 @@ export const otherAuthoritiesController = {
       ...otherAuthoritiesSettings,
       projectName: marineLicence.projectName,
       payload: marineLicence.otherAuthorities,
-      backLink: getBackLink(request)
+      backLink: getCommonRedirectLink(request)
     })
   }
 }
@@ -72,7 +65,7 @@ export const otherAuthoritiesSubmitController = {
         const { payload } = request
 
         const { projectName } = getMarineLicenceCache(request)
-        const backLink = getBackLink(request)
+        const backLink = getCommonRedirectLink(request)
 
         if (!err.details) {
           return h
@@ -128,7 +121,7 @@ export const otherAuthoritiesSubmitController = {
         }
       })
 
-      return h.redirect(getBackLink(request))
+      return h.redirect(getCommonRedirectLink(request))
     } catch (e) {
       const validation = e.data?.payload?.validation
       const details = validation?.details
@@ -145,7 +138,7 @@ export const otherAuthoritiesSubmitController = {
         ...otherAuthoritiesSettings,
         payload,
         projectName: marineLicence.projectName,
-        backLink: getBackLink(request),
+        backLink: getCommonRedirectLink(request),
         errors,
         errorSummary
       })

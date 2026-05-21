@@ -6,11 +6,9 @@ import {
   errorDescriptionByFieldName,
   mapErrorsForDisplay
 } from '#src/server/common/helpers/errors.js'
-import {
-  apiRoutes,
-  marineLicenceRoutes
-} from '#src/server/common/constants/routes.js'
+import { apiRoutes } from '#src/server/common/constants/routes.js'
 import { authenticatedPatchRequest } from '#src/server/common/helpers/authenticated-requests.js'
+import { getCommonRedirectLink } from '#src/server/common/helpers/marine-licence/redirect-link.js'
 
 import joi from 'joi'
 
@@ -28,13 +26,6 @@ const projectBackgroundSettings = {
   heading: 'Project background'
 }
 
-const getBackLink = (request) => {
-  const fromCheckYourAnswers = request.query?.from === 'check-your-answers'
-  return fromCheckYourAnswers
-    ? marineLicenceRoutes.MARINE_LICENCE_CHECK_YOUR_ANSWERS
-    : marineLicenceRoutes.MARINE_LICENCE_TASK_LIST
-}
-
 export const projectBackgroundController = {
   async handler(request, h) {
     const marineLicence = getMarineLicenceCache(request)
@@ -43,7 +34,7 @@ export const projectBackgroundController = {
       ...projectBackgroundSettings,
       projectName: marineLicence.projectName,
       payload: { projectBackground: marineLicence.projectBackground },
-      backLink: getBackLink(request)
+      backLink: getCommonRedirectLink(request)
     })
   }
 }
@@ -62,7 +53,7 @@ export const projectBackgroundSubmitController = {
         const { payload } = request
 
         const { projectName } = getMarineLicenceCache(request)
-        const backLink = getBackLink(request)
+        const backLink = getCommonRedirectLink(request)
 
         if (!err.details) {
           return h
@@ -112,7 +103,7 @@ export const projectBackgroundSubmitController = {
         projectBackground: payload.projectBackground
       })
 
-      return h.redirect(getBackLink(request))
+      return h.redirect(getCommonRedirectLink(request))
     } catch (e) {
       const validation = e.data?.payload?.validation
       const details = validation?.details
@@ -129,7 +120,7 @@ export const projectBackgroundSubmitController = {
         ...projectBackgroundSettings,
         payload,
         projectName: marineLicence.projectName,
-        backLink: getBackLink(request),
+        backLink: getCommonRedirectLink(request),
         errors,
         errorSummary
       })

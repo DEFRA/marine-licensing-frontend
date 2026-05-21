@@ -10,6 +10,7 @@ import {
   isProjectViewable
 } from '#src/server/common/helpers/view-details/utils.js'
 import { MARINE_LICENCE_KEY } from '#src/server/common/constants/marine-licence.js'
+import { buildSummaryData } from '#src/server/common/helpers/marine-licence/summary-data.js'
 
 export const VIEW_DETAILS_VIEW_ROUTE = 'marine-licence/view-details/index'
 
@@ -47,17 +48,20 @@ export const viewDetailsController = {
         throw Boom.forbidden(errorMessages.MARINE_LICENCE_NOT_SUBMITTED)
       }
 
+      const formattedMarineLicence = buildSummaryData(marineLicence)
+
       const pageCaption = isApplicantView
         ? `${marineLicence.applicationReference} - Marine licence`
         : marineLicence.applicationReference
 
       return h.view(VIEW_DETAILS_VIEW_ROUTE, {
-        pageTitle: marineLicence.projectName,
-        specialLegalPowers: marineLicence.specialLegalPowers,
-        publicRegister: marineLicence.publicRegister,
-        otherAuthorities: marineLicence.otherAuthorities,
-        projectName: marineLicence.projectName,
-        projectBackground: marineLicence.projectBackground,
+        pageTitle: formattedMarineLicence.projectName,
+        specialLegalPowers: formattedMarineLicence.specialLegalPowers,
+        publicRegister: formattedMarineLicence.publicRegister,
+        otherAuthorities: formattedMarineLicence.otherAuthorities,
+        preferredDates: formattedMarineLicence.preferredDates,
+        projectName: formattedMarineLicence.projectName,
+        projectBackground: formattedMarineLicence.projectBackground,
         isReadOnly: true,
         pageCaption,
         backLink: isApplicantView ? routes.DASHBOARD : null

@@ -64,11 +64,11 @@ export const transformProjectDetailsTaskList = (taskList) => [
   },
   {
     title: {
-      text: 'What are your preferred start and end dates for the licence?',
+      text: 'Preferred start and end dates of the licence',
       classes: taskClasses
     },
     href: marineLicenceRoutes.MARINE_LICENCE_PREFERRED_DATES,
-    status: setStatus(taskList.projectBackground)
+    status: setStatus(taskList.preferredDates)
   }
 ]
 

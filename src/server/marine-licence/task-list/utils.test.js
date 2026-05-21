@@ -12,7 +12,8 @@ describe('taskList utils', () => {
       expect(
         transformProjectDetailsTaskList({
           projectName: 'COMPLETED',
-          projectBackground: 'COMPLETED'
+          projectBackground: 'COMPLETED',
+          preferredDates: 'COMPLETED'
         })
       ).toEqual([
         {
@@ -36,7 +37,7 @@ describe('taskList utils', () => {
           status: { text: 'Completed' },
           title: {
             classes: 'govuk-link--no-visited-state',
-            text: 'What are your preferred start and end dates for the licence?'
+            text: 'Preferred start and end dates of the licence'
           }
         }
       ])
@@ -46,7 +47,8 @@ describe('taskList utils', () => {
       expect(
         transformProjectDetailsTaskList({
           projectName: 'IN_PROGRESS',
-          projectBackground: 'IN_PROGRESS'
+          projectBackground: 'IN_PROGRESS',
+          preferredDates: 'IN_PROGRESS'
         })
       ).toEqual([
         {
@@ -76,7 +78,7 @@ describe('taskList utils', () => {
           },
           title: {
             classes: 'govuk-link--no-visited-state',
-            text: 'What are your preferred start and end dates for the licence?'
+            text: 'Preferred start and end dates of the licence'
           }
         }
       ])
@@ -114,7 +116,7 @@ describe('taskList utils', () => {
               },
               title: {
                 classes: 'govuk-link--no-visited-state',
-                text: 'What are your preferred start and end dates for the licence?'
+                text: 'Preferred start and end dates of the licence'
               }
             }
           ]

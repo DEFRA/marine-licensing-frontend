@@ -6,11 +6,9 @@ import {
   errorDescriptionByFieldName,
   mapErrorsForDisplay
 } from '#src/server/common/helpers/errors.js'
-import {
-  apiRoutes,
-  marineLicenceRoutes
-} from '#src/server/common/constants/routes.js'
+import { apiRoutes } from '#src/server/common/constants/routes.js'
 import { authenticatedPatchRequest } from '#src/server/common/helpers/authenticated-requests.js'
+import { getCommonRedirectLink } from '#src/server/common/helpers/marine-licence/redirect-link.js'
 
 export const PREFERRED_DATES_VIEW_ROUTE = 'marine-licence/preferred-dates/index'
 
@@ -45,7 +43,7 @@ export const preferredDatesController = {
         ...parseDateToPayload(cached.start, 'start-date'),
         ...parseDateToPayload(cached.end, 'end-date')
       },
-      backLink: marineLicenceRoutes.MARINE_LICENCE_TASK_LIST,
+      backLink: getCommonRedirectLink(request),
       currentYear,
       nextYear: currentYear + 1
     })
@@ -82,7 +80,7 @@ export const preferredDatesSubmitController = {
         preferredDates: { start, end }
       })
 
-      return h.redirect(marineLicenceRoutes.MARINE_LICENCE_TASK_LIST)
+      return h.redirect(getCommonRedirectLink(request))
     } catch (e) {
       const validation = e.data?.payload?.validation
       const details = validation?.details
@@ -98,7 +96,7 @@ export const preferredDatesSubmitController = {
         ...settings,
         payload,
         projectName: marineLicence.projectName,
-        backLink: marineLicenceRoutes.MARINE_LICENCE_TASK_LIST,
+        backLink: getCommonRedirectLink(request),
         errors,
         errorSummary
       })

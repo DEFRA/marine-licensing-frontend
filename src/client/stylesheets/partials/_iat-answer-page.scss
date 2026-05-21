@@ -17,5 +17,9 @@
     .print-instructions {
       display: none;
     }
+
+    .govuk-service-navigation__service-name .govuk-service-navigation__link::after {
+      content: none;
+    }
   }
 }

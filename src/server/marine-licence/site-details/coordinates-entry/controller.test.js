@@ -187,6 +187,27 @@ describe('#coordinatesEntry (marine licence)', () => {
       )
     })
 
+    test('should include site param in redirect when site is 2', async () => {
+      vi.mocked(getMarineLicenceCache).mockReturnValue({
+        ...mockMarineLicenceApplication,
+        siteDetails: [
+          { coordinatesEntry: 'single' },
+          { coordinatesType: 'coordinates' }
+        ]
+      })
+      const h = { redirect: vi.fn() }
+      const request = createMockRequest({
+        payload: { coordinatesEntry: 'single' },
+        query: { site: '2' }
+      })
+
+      await coordinatesEntrySubmitController.handler(request, h)
+
+      expect(h.redirect).toHaveBeenCalledWith(
+        `${marineLicenceRoutes.MARINE_LICENCE_COORDINATE_SYSTEM_CHOICE}?site=2`
+      )
+    })
+
     test('Should correctly set the cache when submitting', async () => {
       const h = {
         redirect: vi.fn().mockReturnValue({ takeover: vi.fn() }),

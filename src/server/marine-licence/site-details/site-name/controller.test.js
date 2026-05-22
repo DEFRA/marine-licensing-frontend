@@ -164,6 +164,27 @@ describe('#siteName', () => {
       )
     })
 
+    test('should redirect to coordinates entry with site param when adding a second site', async () => {
+      vi.mocked(getMarineLicenceCache).mockReturnValueOnce({
+        ...mockMarineLicenceApplication,
+        siteDetails: [
+          { coordinatesType: 'coordinates', siteName: 'Site 1' },
+          { coordinatesType: 'coordinates' }
+        ]
+      })
+
+      const request = createMockRequest({
+        payload: { siteName: 'Site 2' },
+        query: { site: '2' }
+      })
+
+      await siteNameSubmitController.handler(request, h)
+
+      expect(h.redirect).toHaveBeenCalledWith(
+        `${marineLicenceRoutes.MARINE_LICENCE_COORDINATES_ENTRY_CHOICE}?site=2`
+      )
+    })
+
     test('should handle validation failure with error details', () => {
       const request = createMockRequest({
         payload: { siteName: '' }

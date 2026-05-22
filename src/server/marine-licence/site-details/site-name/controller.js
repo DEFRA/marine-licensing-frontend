@@ -23,9 +23,9 @@ import { getSiteDetailsAnchor } from '#src/server/common/helpers/site-details/an
 
 export const SITE_NAME_VIEW_ROUTE = 'templates/site-name.njk'
 
-const getBackLink = (isSavePage) =>
+const getBackLink = (isSavePage, siteNumber) =>
   isSavePage
-    ? marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS
+    ? `${marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS}${getSiteDetailsAnchor(siteNumber)}`
     : marineLicenceRoutes.MARINE_LICENCE_COORDINATES_TYPE_CHOICE
 
 const createValidationFailAction = (request, h, err) => {
@@ -42,7 +42,7 @@ const createValidationFailAction = (request, h, err) => {
 
   const errorViewSettings = {
     ...siteNameSettings,
-    backLink: getBackLink(isSavePage),
+    backLink: getBackLink(isSavePage, siteNumber),
     cancelLink: getCancelLink(isSavePage),
     payload,
     projectName: marineLicence.projectName,
@@ -86,7 +86,7 @@ export const siteNameController = {
 
     return h.view(SITE_NAME_VIEW_ROUTE, {
       ...siteNameSettings,
-      backLink: getBackLink(isSavePage),
+      backLink: getBackLink(isSavePage, siteNumber),
       cancelLink: getCancelLink(isSavePage),
       projectName: marineLicence.projectName,
       siteNumber,
@@ -107,6 +107,7 @@ export const siteNameSubmitController = {
   },
   async handler(request, h) {
     const { payload } = request
+    const { action } = request.query
 
     const { siteIndex, siteNumber } = getSiteDataFromParam(request.query)
 
@@ -115,8 +116,9 @@ export const siteNameSubmitController = {
     const siteDetails = getSiteDetailsBySite(marineLicence, siteIndex)
 
     const isFileUploadCoordinates = siteDetails.coordinatesType === 'file'
+    const shouldReturnToReview = isFileUploadCoordinates || !!action
 
-    const redirectRoute = isFileUploadCoordinates
+    const redirectRoute = shouldReturnToReview
       ? `${marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS}${getSiteDetailsAnchor(siteNumber)}`
       : marineLicenceRoutes.MARINE_LICENCE_COORDINATES_ENTRY_CHOICE
 
@@ -128,7 +130,7 @@ export const siteNameSubmitController = {
       payload.siteName
     )
 
-    if (isFileUploadCoordinates) {
+    if (shouldReturnToReview) {
       await saveSiteDetailsToBackend(request, h)
     }
 

@@ -8,13 +8,16 @@ import { COORDINATE_SYSTEM_VIEW_ROUTES } from '#src/server/common/validation/cen
 import { COORDINATE_SYSTEMS } from '#src/server/common/constants/coordinate-systems.js'
 import {
   getMarineLicenceCache,
+  getSavedSiteDetails,
   updateMarineLicenceSiteDetails
 } from '#src/server/common/helpers/marine-licence/session-cache/utils.js'
+import { saveSiteDetailsToBackend } from '#src/server/common/helpers/marine-licence/save-site-details.js'
 import { mockMarineLicenceApplication } from '#src/server/test-helpers/mocks/marine-licence-mocks.js'
 import { createMockRequest } from '#src/server/test-helpers/mocks/helpers.js'
 import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
 
 vi.mock('#src/server/common/helpers/marine-licence/session-cache/utils.js')
+vi.mock('#src/server/common/helpers/marine-licence/save-site-details.js')
 
 const wgs84Coordinates = { latitude: '55.019889', longitude: '-1.399500' }
 const osgb36Coordinates = { eastings: '425053', northings: '564180' }
@@ -24,6 +27,7 @@ describe('#centreCoordinates (marine licence)', () => {
     vi.mocked(getMarineLicenceCache).mockReturnValue(
       mockMarineLicenceApplication
     )
+    vi.mocked(getSavedSiteDetails).mockReturnValue({})
   })
 
   describe('#centreCoordinatesController', () => {
@@ -111,6 +115,32 @@ describe('#centreCoordinates (marine licence)', () => {
           projectName: 'Test Project',
           siteNumber: 1
         }
+      )
+    })
+
+    test('handler should pre-populate OSGB36 payload using singular field names returned by backend', () => {
+      vi.mocked(getMarineLicenceCache).mockReturnValue({
+        projectName: mockMarineLicenceApplication.projectName,
+        siteDetails: [
+          {
+            coordinatesType: 'coordinates',
+            coordinateSystem: COORDINATE_SYSTEMS.OSGB36,
+            coordinates: { easting: '425053', northing: '564180' }
+          }
+        ]
+      })
+      const h = { view: vi.fn() }
+
+      centreCoordinatesController.handler(
+        createMockRequest({ query: { action: 'change' } }),
+        h
+      )
+
+      expect(h.view).toHaveBeenCalledWith(
+        COORDINATE_SYSTEM_VIEW_ROUTES[COORDINATE_SYSTEMS.OSGB36],
+        expect.objectContaining({
+          payload: { eastings: '425053', northings: '564180' }
+        })
       )
     })
   })
@@ -321,6 +351,94 @@ describe('#centreCoordinates (marine licence)', () => {
       )
       expect(h.view().takeover).toHaveBeenCalled()
       expect(updateMarineLicenceSiteDetails).not.toHaveBeenCalled()
+    })
+
+    test('should save and redirect to review page when action is set and circleWidth exists', async () => {
+      vi.mocked(getMarineLicenceCache).mockReturnValue({
+        ...mockMarineLicenceApplication,
+        siteDetails: [
+          { coordinateSystem: COORDINATE_SYSTEMS.WGS84, circleWidth: '500' }
+        ]
+      })
+      vi.mocked(saveSiteDetailsToBackend).mockResolvedValue(undefined)
+      const h = { redirect: vi.fn() }
+      const request = createMockRequest({
+        payload: { ...wgs84Coordinates },
+        query: { action: 'change' }
+      })
+
+      await centreCoordinatesSubmitController.handler(request, h)
+
+      expect(saveSiteDetailsToBackend).toHaveBeenCalledWith(request, h)
+      expect(h.redirect).toHaveBeenCalledWith(
+        `${marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS}#site-details-1`
+      )
+    })
+
+    test('should redirect to width-of-site when action is set and no circleWidth', async () => {
+      vi.mocked(getMarineLicenceCache).mockReturnValue({
+        ...mockMarineLicenceApplication,
+        siteDetails: [{ coordinateSystem: COORDINATE_SYSTEMS.WGS84 }]
+      })
+      const h = { redirect: vi.fn() }
+      const request = createMockRequest({
+        payload: { ...wgs84Coordinates },
+        query: { action: 'change' }
+      })
+
+      await centreCoordinatesSubmitController.handler(request, h)
+
+      expect(saveSiteDetailsToBackend).not.toHaveBeenCalled()
+      expect(h.redirect).toHaveBeenCalledWith(
+        `${marineLicenceRoutes.MARINE_LICENCE_WIDTH_OF_SITE}?site=1&action=change`
+      )
+    })
+  })
+
+  describe('#centreCoordinatesController action mode', () => {
+    test('should use review page back link when action is set and no originalCoordinateSystem', () => {
+      vi.mocked(getMarineLicenceCache).mockReturnValue({
+        ...mockMarineLicenceApplication,
+        siteDetails: [{ coordinateSystem: COORDINATE_SYSTEMS.WGS84 }]
+      })
+      const h = { view: vi.fn() }
+
+      centreCoordinatesController.handler(
+        createMockRequest({ query: { action: 'change' } }),
+        h
+      )
+
+      expect(h.view).toHaveBeenCalledWith(
+        COORDINATE_SYSTEM_VIEW_ROUTES[COORDINATE_SYSTEMS.WGS84],
+        expect.objectContaining({
+          backLink: `${marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS}#site-details-1`,
+          cancelLink: undefined,
+          action: 'change'
+        })
+      )
+    })
+
+    test('should use coordinate-system back link when action is set and originalCoordinateSystem is saved', () => {
+      vi.mocked(getMarineLicenceCache).mockReturnValue({
+        ...mockMarineLicenceApplication,
+        siteDetails: [{ coordinateSystem: COORDINATE_SYSTEMS.WGS84 }]
+      })
+      vi.mocked(getSavedSiteDetails).mockReturnValue({
+        originalCoordinateSystem: 'wgs84'
+      })
+      const h = { view: vi.fn() }
+
+      centreCoordinatesController.handler(
+        createMockRequest({ query: { action: 'change' } }),
+        h
+      )
+
+      expect(h.view).toHaveBeenCalledWith(
+        COORDINATE_SYSTEM_VIEW_ROUTES[COORDINATE_SYSTEMS.WGS84],
+        expect.objectContaining({
+          backLink: `${marineLicenceRoutes.MARINE_LICENCE_COORDINATE_SYSTEM_CHOICE}?site=1&action=change`
+        })
+      )
     })
   })
 })

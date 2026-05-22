@@ -64,17 +64,20 @@
 
         {% set _ = summaryRows.push({
           key: { text: "Site name" },
-          value: { text: site.siteName }
+          value: { text: site.siteName },
+          actions: setSiteDetailsAction(site.siteName, 'site-name', site.siteNumber)
         }) %}
 
         {% set _ = summaryRows.push({
           key: { text: "Single or multiple sets of coordinates" },
-          value: { text: site.method }
+          value: { text: site.method },
+          actions: setSiteDetailsAction(site.method, 'how-do-you-want-to-enter-the-coordinates', site.siteNumber)
         }) %}
 
         {% set _ = summaryRows.push({
           key: { text: "Coordinate system" },
-          value: { text: site.coordinateSystem | replace('\n', '<br>') | safe }
+          value: { text: site.coordinateSystem | replace('\n', '<br>') | safe },
+          actions: setSiteDetailsAction(site.coordinateSystem, 'what-coordinate-system', site.siteNumber)
         }) %}
 
         {% if site.polygonCoordinates %}
@@ -82,29 +85,40 @@
           {% for coordinate in site.polygonCoordinates %}
             {% set hasCoordinates = true %}
             {% set rowClasses = "" if loop.last else "govuk-summary-list__row--no-border" %}
-            {% set _ = summaryRows.push({
-              classes: rowClasses,
-              key: { text: coordinate.label },
-              value: { 
-                text: coordinate.value                
-              }
-            }) %}
+            {% if loop.first %}
+              {% set _ = summaryRows.push({
+                classes: rowClasses,
+                key: { text: coordinate.label },
+                value: { text: coordinate.value },
+                actions: setSiteDetailsAction(coordinate.value, 'enter-multiple-coordinates', site.siteNumber)
+              }) %}
+            {% else %}
+              {% set _ = summaryRows.push({
+                classes: rowClasses,
+                key: { text: coordinate.label },
+                value: { text: coordinate.value },
+                actions: setSiteDetailsAction(coordinate.value, 'enter-multiple-coordinates', site.siteNumber, coordinate.label, { hideLinkText: true })
+              }) %}
+            {% endif %}
           {% endfor %}
           {% if not hasCoordinates %}
             {% set _ = summaryRows.push({
               key: { text: "Start and end points" },
-              value: { text: "" }
+              value: { text: "" },
+              actions: setSiteDetailsAction('', 'enter-multiple-coordinates', site.siteNumber)
             }) %}
           {% endif %}
         {% else %}
           {% set _ = summaryRows.push({
             key: { text: "Coordinates at centre of site" },
-            value: { text: site.coordinates }
+            value: { text: site.coordinates },
+            actions: setSiteDetailsAction(site.coordinates, 'enter-the-coordinates-at-the-centre-point', site.siteNumber)
           }) %}
 
           {% set _ = summaryRows.push({
             key: { text: "Width of circular site" },
-            value: { text: site.width }
+            value: { text: site.width },
+            actions: setSiteDetailsAction(site.width, 'width-of-site', site.siteNumber)
           }) %}
         {% endif %}
 

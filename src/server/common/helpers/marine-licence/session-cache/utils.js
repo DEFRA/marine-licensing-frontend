@@ -16,6 +16,14 @@ export const clearSavedMarineLicenceSiteDetails = async (request, h) => {
   await request.yar.commit(h)
 }
 
+export const getSavedSiteDetails = (request) =>
+  request.yar.get(SAVED_SITE_DETAILS_CACHE_KEY) || {}
+
+export const setSavedSiteDetails = async (request, h, values) => {
+  request.yar.set(SAVED_SITE_DETAILS_CACHE_KEY, values)
+  await request.yar.commit(h)
+}
+
 export const updateMarineLicenceSiteDetails = async (
   request,
   h,
@@ -74,6 +82,34 @@ export const updateMarineLicenceSiteActivityDetails = async (
   )
 }
 
+export const updateMarineLicenceSiteDetailsMultiple = async (
+  request,
+  h,
+  siteIndex,
+  values
+) => {
+  const existingCache = getMarineLicenceCache(request)
+  const existingSiteDetails = existingCache.siteDetails || []
+  const updatedSiteDetails = [...existingSiteDetails]
+  const updatedSite = { ...updatedSiteDetails[siteIndex] }
+
+  for (const [key, value] of Object.entries(values)) {
+    if (value === null || value === undefined) {
+      delete updatedSite[key]
+    } else {
+      updatedSite[key] = value
+    }
+  }
+
+  updatedSiteDetails[siteIndex] = updatedSite
+
+  request.yar.set(MARINE_LICENCE_CACHE_KEY, {
+    ...existingCache,
+    siteDetails: updatedSiteDetails
+  })
+
+  await request.yar.commit(h)
+}
 const buildUploadSiteData = ({ status, s3Location, siteDetails }) => ({
   coordinatesType: siteDetails.coordinatesType,
   fileUploadType: siteDetails.fileUploadType,

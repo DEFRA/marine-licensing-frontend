@@ -67,12 +67,12 @@ describe('Post-login - Organisation Guidance Advice', () => {
     expect(secondSubheading).toBeInTheDocument()
 
     const emailLink = within(document).getByRole('link', {
-      name: /Customer.Identity-Support@defra.gov.uk/
+      name: /marine\.consents@marinemanagement\.org\.uk/
     })
     expect(emailLink).toBeInTheDocument()
     expect(emailLink).toHaveAttribute(
       'href',
-      'mailto:Customer.Identity-Support@defra.gov.uk'
+      'mailto:marine.consents@marinemanagement.org.uk'
     )
 
     const secondPageHeading = within(document).getByRole('heading', {

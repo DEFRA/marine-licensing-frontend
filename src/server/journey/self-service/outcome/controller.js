@@ -20,6 +20,7 @@ import {
 } from '#src/server/journey/self-service/outcome/utils.js'
 import { iatAnswersService } from '#src/services/iat-answers-service/iat-answers.service.js'
 import { buildIatAnswersPayload } from '#src/server/journey/self-service/services/iat-answers-payload.js'
+import { routes } from '#src/server/common/constants/routes.js'
 
 const VIEW_PATH = 'journey/self-service/outcome/index'
 
@@ -182,7 +183,7 @@ export const outcomeViewAnswersController = {
       outcomeRoute,
       outcomeTypeId
     )
-    return h.redirect(`/journey/self-service/answer/${slug}`)
+    return h.redirect(`${routes.IAT_ANSWER}/${slug}`)
   }
 }
 

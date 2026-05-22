@@ -1,5 +1,6 @@
 import Joi from 'joi'
 import { answerController } from '#src/server/journey/self-service/answer/controller.js'
+import { routes } from '#src/server/common/constants/routes.js'
 
 const SLUG_LENGTH = 22
 
@@ -10,7 +11,7 @@ export const journeySelfServiceAnswer = {
       server.route([
         {
           method: 'GET',
-          path: '/journey/self-service/answer/{slug}',
+          path: `${routes.IAT_ANSWER}/{slug}`,
           options: {
             auth: false,
             validate: {

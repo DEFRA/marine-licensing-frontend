@@ -57,14 +57,14 @@ export const validateDateRanges = (payload, now = new Date()) => {
 
   if (isMonthInPast(startYear, startMonth, now)) {
     details.push({
-      message: 'START_DATE_TODAY_OR_FUTURE',
+      message: 'PREFERRED_START_DATE_TODAY_OR_FUTURE',
       path: ['start-date-month']
     })
   }
 
   if (isMonthInPast(endYear, endMonth, now)) {
     details.push({
-      message: 'END_DATE_TODAY_OR_FUTURE',
+      message: 'PREFERRED_END_DATE_TODAY_OR_FUTURE',
       path: ['end-date-month']
     })
   }

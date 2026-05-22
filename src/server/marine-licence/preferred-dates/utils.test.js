@@ -145,43 +145,43 @@ describe('#validateDateRanges', () => {
     expect(result).toEqual([])
   })
 
-  test('should return START_DATE_TODAY_OR_FUTURE when start month is in the past', () => {
+  test('should return PREFERRED_START_DATE_TODAY_OR_FUTURE when start month is in the past', () => {
     const result = validateDateRanges(
       payload('4', '2026', '12', '2027'),
       MAY_2026
     )
     expect(result).toEqual([
-      { message: 'START_DATE_TODAY_OR_FUTURE', path: ['start-date-month'] }
+      { message: 'PREFERRED_START_DATE_TODAY_OR_FUTURE', path: ['start-date-month'] }
     ])
   })
 
-  test('should return START_DATE_TODAY_OR_FUTURE when start year is in the past', () => {
+  test('should return PREFERRED_START_DATE_TODAY_OR_FUTURE when start year is in the past', () => {
     const result = validateDateRanges(
       payload('12', '2025', '12', '2027'),
       MAY_2026
     )
     expect(result).toEqual([
-      { message: 'START_DATE_TODAY_OR_FUTURE', path: ['start-date-month'] }
+      { message: 'PREFERRED_START_DATE_TODAY_OR_FUTURE', path: ['start-date-month'] }
     ])
   })
 
-  test('should return END_DATE_TODAY_OR_FUTURE when end month is in the past', () => {
+  test('should return PREFERRED_END_DATE_TODAY_OR_FUTURE when end month is in the past', () => {
     const result = validateDateRanges(
       payload('6', '2026', '4', '2026'),
       MAY_2026
     )
     expect(result).toEqual([
-      { message: 'END_DATE_TODAY_OR_FUTURE', path: ['end-date-month'] }
+      { message: 'PREFERRED_END_DATE_TODAY_OR_FUTURE', path: ['end-date-month'] }
     ])
   })
 
-  test('should return END_DATE_TODAY_OR_FUTURE when end year is in the past', () => {
+  test('should return PREFERRED_END_DATE_TODAY_OR_FUTURE when end year is in the past', () => {
     const result = validateDateRanges(
       payload('6', '2026', '12', '2025'),
       MAY_2026
     )
     expect(result).toEqual([
-      { message: 'END_DATE_TODAY_OR_FUTURE', path: ['end-date-month'] }
+      { message: 'PREFERRED_END_DATE_TODAY_OR_FUTURE', path: ['end-date-month'] }
     ])
   })
 
@@ -191,8 +191,8 @@ describe('#validateDateRanges', () => {
       MAY_2026
     )
     expect(result).toEqual([
-      { message: 'START_DATE_TODAY_OR_FUTURE', path: ['start-date-month'] },
-      { message: 'END_DATE_TODAY_OR_FUTURE', path: ['end-date-month'] }
+      { message: 'PREFERRED_START_DATE_TODAY_OR_FUTURE', path: ['start-date-month'] },
+      { message: 'PREFERRED_END_DATE_TODAY_OR_FUTURE', path: ['end-date-month'] }
     ])
   })
 

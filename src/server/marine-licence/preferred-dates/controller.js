@@ -129,7 +129,10 @@ export const preferredDatesSubmitController = {
         throw e
       }
 
-      const errorSummary = mapErrorsForDisplay(details, {})
+      const errorSummary = mapErrorsForDisplay(
+        details,
+        preferredDatesErrorMessages
+      )
       const errors = errorDescriptionByFieldName(errorSummary)
 
       return h.view(PREFERRED_DATES_VIEW_ROUTE, {

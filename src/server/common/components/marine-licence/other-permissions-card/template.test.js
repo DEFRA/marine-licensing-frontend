@@ -107,4 +107,63 @@ describe('Marine Licence Other Permissions Card Component', () => {
       )
     })
   })
+
+  describe('public consultation', () => {
+    test('Should display details when consulted is yes', () => {
+      const params = {
+        publicConsultation: {
+          consulted: 'yes',
+          details: 'Spoke to local fishing association'
+        }
+      }
+      const $comp = renderComponent(
+        'marine-licence/other-permissions-card',
+        params
+      )
+      expect($comp.html()).toContain('Spoke to local fishing association')
+    })
+
+    test('Should display "No" and not show details when consulted is no', () => {
+      const params = {
+        publicConsultation: {
+          consulted: 'no',
+          details: 'Should not be shown'
+        }
+      }
+      const $comp = renderComponent(
+        'marine-licence/other-permissions-card',
+        params
+      )
+      expect($comp.html()).toContain('No')
+      expect($comp.html()).not.toContain('Should not be shown')
+    })
+
+    test('Should show change link when not read only', () => {
+      const params = {
+        publicConsultation: { consulted: 'no' },
+        isReadOnly: false
+      }
+      const $comp = renderComponent(
+        'marine-licence/other-permissions-card',
+        params
+      )
+      expect($comp.html()).toContain(
+        '/marine-licence/public-consultation?from=check-your-answers'
+      )
+    })
+
+    test('Should not show change link when read only', () => {
+      const params = {
+        publicConsultation: { consulted: 'no' },
+        isReadOnly: true
+      }
+      const $comp = renderComponent(
+        'marine-licence/other-permissions-card',
+        params
+      )
+      expect($comp.html()).not.toContain(
+        '/marine-licence/public-consultation?from=check-your-answers'
+      )
+    })
+  })
 })

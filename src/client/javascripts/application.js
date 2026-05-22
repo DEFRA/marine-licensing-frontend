@@ -14,6 +14,7 @@ import { SortableTable } from '@ministryofjustice/frontend'
 
 import { AddAnotherPoint } from './add-another-point/index.js'
 import { BackLinkHistory } from './back-link-history/index.js'
+import { IatAnswerPrint } from './iat-answer-print/index.js'
 import { ProjectFilter } from './project-filter/index.js'
 import { SiteDetailsMap } from './site-details-map/index.js'
 
@@ -78,5 +79,12 @@ document.addEventListener('DOMContentLoaded', () => {
   for (const element of projectFilterElements) {
     // eslint-disable-next-line no-new
     new ProjectFilter(element) // nosonar
+  }
+
+  const printElements = document.querySelectorAll(
+    '[data-module="iat-answer-print"]'
+  )
+  for (const element of printElements) {
+    new IatAnswerPrint(element) // eslint-disable-line no-new
   }
 })

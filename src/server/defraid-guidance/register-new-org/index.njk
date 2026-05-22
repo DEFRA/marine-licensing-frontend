@@ -1,5 +1,7 @@
 {% extends 'layouts/page.njk' %}
 {% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/inset-text/macro.njk" import govukInsetText %}
+
 
 {% block beforeContent %}
   {{ super() }}
@@ -18,6 +20,10 @@
         <p class="govuk-body">
           You are about to sign in or create a new account. You must create an account specifically for the organisation.
         </p>
+
+        {{ govukInsetText({
+        html: "If your organisation is a local authority or other government department, you must contact <a href='mailto:marine.consents@marinemanagement.org.uk' class='govuk-link'>marine.consents@marinemanagement.org.uk</a> to create a new Defra account."
+      }) }}
 
         <h2 class="govuk-heading-m">
           What you will need

@@ -203,6 +203,12 @@ describe('Page accessibility checks (Axe)', () => {
       isMarineLicence: true
     },
     {
+      url: marineLicenceRoutes.MARINE_LICENCE_PUBLIC_CONSULTATION,
+      title:
+        'Have you consulted with any public groups or organisations before making this application?',
+      isMarineLicence: true
+    },
+    {
       url: marineLicenceRoutes.MARINE_LICENCE_TASK_LIST,
       title: 'Marine licence start page',
       isMarineLicence: true,

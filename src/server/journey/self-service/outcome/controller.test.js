@@ -3,10 +3,22 @@ import { vi } from 'vitest'
 vi.mock('#src/server/journey/self-service/services/journey-data.js')
 vi.mock('#src/server/journey/self-service/services/session-answers.js')
 vi.mock('#src/server/journey/self-service/services/data-quality.js')
+vi.mock('#src/services/iat-answers-service/iat-answers.service.js', () => ({
+  iatAnswersService: {
+    create: vi.fn()
+  }
+}))
+vi.mock(
+  '#src/server/journey/self-service/services/iat-answers-payload.js',
+  () => ({
+    buildIatAnswersPayload: vi.fn()
+  })
+)
 
 import {
   outcomeController,
-  outcomePostController
+  outcomePostController,
+  outcomeViewAnswersController
 } from '#src/server/journey/self-service/outcome/controller.js'
 import {
   getOutcome,
@@ -20,6 +32,8 @@ import {
   pushOutcomeSelection
 } from '#src/server/journey/self-service/services/session-answers.js'
 import { reportRuntimeIssue } from '#src/server/journey/self-service/services/data-quality.js'
+import { iatAnswersService } from '#src/services/iat-answers-service/iat-answers.service.js'
+import { buildIatAnswersPayload } from '#src/server/journey/self-service/services/iat-answers-payload.js'
 
 const mockOutcome = {
   route: '/construction/journey-select',
@@ -72,16 +86,17 @@ describe('#outcomeController', () => {
     vi.mocked(getBackLink).mockReturnValue(
       '/journey/self-service/activity-type'
     )
+    vi.mocked(buildIatAnswersPayload).mockReturnValue(null)
   })
 
-  test('renders the intermediate outcome view model', () => {
+  test('renders the intermediate outcome view model', async () => {
     const request = {
       params: { outcomePath: 'construction/journey-select' },
       logger: { warn: vi.fn() }
     }
     const h = { view: vi.fn() }
 
-    outcomeController.handler(request, h)
+    await outcomeController.handler(request, h)
 
     expect(getOutcome).toHaveBeenCalledWith('/construction/journey-select')
     expect(getBackLink).toHaveBeenCalledWith(
@@ -103,21 +118,27 @@ describe('#outcomeController', () => {
             heading: 'Check to see if an exemption applies',
             text: '<p>body</p>',
             isTerminal: false,
-            ctaLabel: 'Continue'
+            ctaLabel: 'Continue',
+            viewAnswersUrl:
+              '/journey/self-service/view-answers/WO_CON_EXEMPTION_JOURNEY/construction/journey-select'
           },
           {
             id: 'WO_CON_SELF_SERVICE_JOURNEY',
             heading: 'Check self-service',
             text: '<p>body</p>',
             isTerminal: false,
-            ctaLabel: 'Continue'
+            ctaLabel: 'Continue',
+            viewAnswersUrl:
+              '/journey/self-service/view-answers/WO_CON_SELF_SERVICE_JOURNEY/construction/journey-select'
           },
           {
             id: 'WO_STANDARD_MLA',
             heading: 'Apply for a standard marine licence',
             text: '<p>body</p>',
             isTerminal: true,
-            ctaLabel: 'Continue'
+            ctaLabel: 'Continue',
+            viewAnswersUrl:
+              '/journey/self-service/view-answers/WO_STANDARD_MLA/construction/journey-select'
           }
         ],
         backLink: '/journey/self-service/activity-type'
@@ -125,7 +146,7 @@ describe('#outcomeController', () => {
     )
   })
 
-  test('throws Boom.notFound for an unknown outcome route', () => {
+  test('throws Boom.notFound for an unknown outcome route', async () => {
     vi.mocked(getOutcome).mockReturnValue(null)
     const request = {
       params: { outcomePath: 'nope' },
@@ -133,7 +154,7 @@ describe('#outcomeController', () => {
     }
     const h = { view: vi.fn() }
 
-    expect(() => outcomeController.handler(request, h)).toThrow(
+    await expect(outcomeController.handler(request, h)).rejects.toThrow(
       expect.objectContaining({
         isBoom: true,
         output: expect.objectContaining({ statusCode: 404 })
@@ -141,7 +162,7 @@ describe('#outcomeController', () => {
     )
   })
 
-  test('passes null section when outcome has no section', () => {
+  test('passes null section when outcome has no section', async () => {
     vi.mocked(getOutcome).mockReturnValue({
       ...mockOutcome,
       section: undefined
@@ -153,7 +174,7 @@ describe('#outcomeController', () => {
     }
     const h = { view: vi.fn() }
 
-    outcomeController.handler(request, h)
+    await outcomeController.handler(request, h)
 
     expect(h.view).toHaveBeenCalledWith(
       'journey/self-service/outcome/index',
@@ -161,7 +182,7 @@ describe('#outcomeController', () => {
     )
   })
 
-  test('logs unknown-outcome-route on 404', () => {
+  test('logs unknown-outcome-route on 404', async () => {
     vi.mocked(getOutcome).mockReturnValue(null)
     const request = {
       params: { outcomePath: 'nope' },
@@ -169,7 +190,7 @@ describe('#outcomeController', () => {
     }
     const h = { view: vi.fn() }
 
-    expect(() => outcomeController.handler(request, h)).toThrow()
+    await expect(outcomeController.handler(request, h)).rejects.toThrow()
 
     expect(reportRuntimeIssue).toHaveBeenCalledWith(
       request,
@@ -357,6 +378,177 @@ describe('#outcomePostController', () => {
   })
 })
 
+describe('#outcomeViewAnswersController', () => {
+  const SLUG = 'AZ4rr6bLclCVUsE2Pl_zKw'
+  const ANSWER_URL = `/journey/self-service/answer/${SLUG}`
+
+  const samplePayload = {
+    outcome: {
+      route: '/construction/journey-select',
+      typeId: 'WO_CON_SELF_SERVICE_JOURNEY',
+      summaryText: 'summary'
+    },
+    answers: [
+      {
+        questionRoute: '/q1',
+        questionText: 'Q1?',
+        answers: [{ id: 'A1', text: 'Yes' }]
+      }
+    ]
+  }
+
+  beforeEach(() => {
+    vi.mocked(getOutcome).mockReturnValue(mockOutcome)
+    vi.mocked(getOutcomeType).mockImplementation((id) => {
+      if (id === 'WO_CON_EXEMPTION_JOURNEY') return otExemption
+      if (id === 'WO_CON_SELF_SERVICE_JOURNEY') return otSelfService
+      if (id === 'WO_STANDARD_MLA') return otStandard
+      return null
+    })
+    vi.mocked(buildIatAnswersPayload).mockReturnValue(samplePayload)
+    vi.mocked(iatAnswersService.create).mockResolvedValue(SLUG)
+  })
+
+  function buildRequest(overrides = {}) {
+    return {
+      params: {
+        outcomePath: 'construction/journey-select',
+        outcomeTypeId: 'WO_CON_SELF_SERVICE_JOURNEY',
+        ...(overrides.params ?? {})
+      },
+      logger: { warn: vi.fn() },
+      ...overrides
+    }
+  }
+
+  test('redirects to the answer page URL minted from the chosen outcomeType', async () => {
+    const request = buildRequest()
+    const h = { redirect: vi.fn() }
+
+    await outcomeViewAnswersController.handler(request, h)
+
+    expect(buildIatAnswersPayload).toHaveBeenCalledWith(
+      request,
+      '/construction/journey-select',
+      'WO_CON_SELF_SERVICE_JOURNEY'
+    )
+    expect(iatAnswersService.create).toHaveBeenCalledWith(
+      request,
+      samplePayload
+    )
+    expect(h.redirect).toHaveBeenCalledWith(ANSWER_URL)
+  })
+
+  test('throws Boom.notFound for an unknown outcome route', async () => {
+    vi.mocked(getOutcome).mockReturnValue(null)
+    const request = buildRequest({ params: { outcomePath: 'nope' } })
+    const h = { redirect: vi.fn() }
+
+    await expect(
+      outcomeViewAnswersController.handler(request, h)
+    ).rejects.toThrow(
+      expect.objectContaining({
+        isBoom: true,
+        output: expect.objectContaining({ statusCode: 404 })
+      })
+    )
+  })
+
+  test('throws Boom.badRequest when outcomeTypeId is not in the outcome list', async () => {
+    const request = buildRequest({
+      params: { outcomeTypeId: 'WO_UNRELATED_OUTCOME_TYPE' }
+    })
+    vi.mocked(getOutcomeType).mockReturnValue({
+      id: 'WO_UNRELATED_OUTCOME_TYPE'
+    })
+    const h = { redirect: vi.fn() }
+
+    await expect(
+      outcomeViewAnswersController.handler(request, h)
+    ).rejects.toThrow(
+      expect.objectContaining({
+        isBoom: true,
+        output: expect.objectContaining({ statusCode: 400 })
+      })
+    )
+    expect(iatAnswersService.create).not.toHaveBeenCalled()
+  })
+
+  test('throws Boom.badRequest when outcomeTypeId is unknown', async () => {
+    vi.mocked(getOutcomeType).mockReturnValue(null)
+    const request = buildRequest({
+      params: { outcomeTypeId: 'NOT_A_REAL_ID' }
+    })
+    const h = { redirect: vi.fn() }
+
+    await expect(
+      outcomeViewAnswersController.handler(request, h)
+    ).rejects.toThrow(
+      expect.objectContaining({
+        isBoom: true,
+        output: expect.objectContaining({ statusCode: 400 })
+      })
+    )
+  })
+
+  test('throws Boom.notFound when buildIatAnswersPayload returns null (no session answers)', async () => {
+    vi.mocked(buildIatAnswersPayload).mockReturnValue(null)
+    const request = buildRequest()
+    const h = { redirect: vi.fn() }
+
+    await expect(
+      outcomeViewAnswersController.handler(request, h)
+    ).rejects.toThrow(
+      expect.objectContaining({
+        isBoom: true,
+        output: expect.objectContaining({ statusCode: 404 })
+      })
+    )
+    expect(iatAnswersService.create).not.toHaveBeenCalled()
+  })
+
+  test('throws Boom.badImplementation when iatAnswersService.create resolves null', async () => {
+    vi.mocked(iatAnswersService.create).mockResolvedValue(null)
+    const request = buildRequest()
+    const h = { redirect: vi.fn() }
+
+    await expect(
+      outcomeViewAnswersController.handler(request, h)
+    ).rejects.toThrow(
+      expect.objectContaining({
+        isBoom: true,
+        output: expect.objectContaining({ statusCode: 500 })
+      })
+    )
+  })
+
+  test('throws Boom.badImplementation and logs save-failed when create throws', async () => {
+    vi.mocked(iatAnswersService.create).mockRejectedValue(
+      new Error('backend down')
+    )
+    const request = buildRequest()
+    const h = { redirect: vi.fn() }
+
+    await expect(
+      outcomeViewAnswersController.handler(request, h)
+    ).rejects.toThrow(
+      expect.objectContaining({
+        isBoom: true,
+        output: expect.objectContaining({ statusCode: 500 })
+      })
+    )
+    expect(request.logger.warn).toHaveBeenCalledWith(
+      expect.objectContaining({
+        event: expect.objectContaining({
+          action: 'iat-answers:save-failed',
+          reference: '/construction/journey-select'
+        })
+      }),
+      expect.stringContaining('IAT answers save failed')
+    )
+  })
+})
+
 describe('#outcomeController — terminal-multi', () => {
   const multiOutcome = {
     route: '/scaffolding-impede-navigation',
@@ -389,16 +581,17 @@ describe('#outcomeController — terminal-multi', () => {
     ])
     vi.mocked(isIntermediateOutcome).mockReturnValue(false)
     vi.mocked(getBackLink).mockReturnValue('/journey/self-service/back-here')
+    vi.mocked(buildIatAnswersPayload).mockReturnValue(null)
   })
 
-  test('renders terminal-multi view model with per-card ctaLabel', () => {
+  test('renders terminal-multi view model with per-card ctaLabel', async () => {
     const request = {
       params: { outcomePath: 'scaffolding-impede-navigation' },
       logger: { warn: vi.fn() }
     }
     const h = { view: vi.fn() }
 
-    outcomeController.handler(request, h)
+    await outcomeController.handler(request, h)
 
     expect(h.view).toHaveBeenCalledWith(
       'journey/self-service/outcome/index',
@@ -413,14 +606,18 @@ describe('#outcomeController — terminal-multi', () => {
             heading: otDownload.heading,
             text: '<p>download body</p>',
             ctaLabel: 'Download',
-            hasContinue: true
+            hasContinue: true,
+            viewAnswersUrl:
+              '/journey/self-service/view-answers/WO_DOWNLOAD_HA_AGREED_METHOD_TEMPLATE/scaffolding-impede-navigation'
           },
           {
             id: 'WO_STANDARD_TRACK_MLA',
             heading: otStandardMla.heading,
             text: '<p>standard MLA body</p>',
             ctaLabel: 'Continue',
-            hasContinue: true
+            hasContinue: true,
+            viewAnswersUrl:
+              '/journey/self-service/view-answers/WO_STANDARD_TRACK_MLA/scaffolding-impede-navigation'
           }
         ],
         backLink: '/journey/self-service/back-here'
@@ -449,16 +646,17 @@ describe('#outcomeController — terminal-single', () => {
     vi.mocked(getOutcomeTypesForOutcome).mockReturnValue([terminalOutcomeType])
     vi.mocked(isIntermediateOutcome).mockReturnValue(false)
     vi.mocked(getBackLink).mockReturnValue('/journey/self-service/something')
+    vi.mocked(buildIatAnswersPayload).mockReturnValue(null)
   })
 
-  test('renders the terminal-single view model', () => {
+  test('renders the terminal-single view model', async () => {
     const request = {
       params: { outcomePath: 'exemption/article-25A' },
       logger: { warn: vi.fn() }
     }
     const h = { view: vi.fn() }
 
-    outcomeController.handler(request, h)
+    await outcomeController.handler(request, h)
 
     expect(h.view).toHaveBeenCalledWith(
       'journey/self-service/outcome/index',
@@ -474,7 +672,7 @@ describe('#outcomeController — terminal-single', () => {
     )
   })
 
-  test('logs outcome-type-empty-text when terminal body is empty', () => {
+  test('logs outcome-type-empty-text when terminal body is empty', async () => {
     vi.mocked(getOutcomeTypesForOutcome).mockReturnValue([
       { ...terminalOutcomeType, text: '' }
     ])
@@ -484,7 +682,7 @@ describe('#outcomeController — terminal-single', () => {
     }
     const h = { view: vi.fn() }
 
-    outcomeController.handler(request, h)
+    await outcomeController.handler(request, h)
 
     expect(reportRuntimeIssue).toHaveBeenCalledWith(
       request,
@@ -495,7 +693,7 @@ describe('#outcomeController — terminal-single', () => {
     )
   })
 
-  test('logs outcome-missing-heading and uses "Result" fallback', () => {
+  test('logs outcome-missing-heading and uses "Result" fallback', async () => {
     vi.mocked(getOutcome).mockReturnValue({ ...terminalOutcome, heading: null })
     const request = {
       params: { outcomePath: 'exemption/article-25A' },
@@ -503,7 +701,7 @@ describe('#outcomeController — terminal-single', () => {
     }
     const h = { view: vi.fn() }
 
-    outcomeController.handler(request, h)
+    await outcomeController.handler(request, h)
 
     expect(h.view).toHaveBeenCalledWith(
       'journey/self-service/outcome/index',

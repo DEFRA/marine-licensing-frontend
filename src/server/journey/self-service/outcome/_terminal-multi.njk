@@ -12,14 +12,18 @@
       {{ govukButton({
         text: option.ctaLabel,
         href: "#",
-        classes: "govuk-!-margin-bottom-0"
+        classes: "govuk-!-margin-bottom-2"
       }) }}
+    {% endif %}
+    {% if option.viewAnswersUrl %}
+      <p class="govuk-body">
+        <a class="govuk-link"
+           href="{{ option.viewAnswersUrl }}"
+           target="_blank"
+           rel="noopener noreferrer">
+          View answers (opens in a new tab)
+        </a>
+      </p>
     {% endif %}
   </div>
 {% endfor %}
-
-{{ govukButton({
-  text: "Download a PDF record of my answers",
-  href: "#",
-  classes: "govuk-button--secondary"
-}) }}

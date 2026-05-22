@@ -48,6 +48,10 @@ describe('#sanitise', () => {
     expect(sanitise('<script>alert("xss")</script>')).toBe('')
   })
 
+  test('strips protocol-relative href to prevent stored open-redirect', () => {
+    expect(sanitise('<a href="//attacker.com">click</a>')).toBe('<a>click</a>')
+  })
+
   test('returns falsy values unchanged', () => {
     expect(sanitise(null)).toBeNull()
     expect(sanitise(undefined)).toBeUndefined()
@@ -133,6 +137,12 @@ describe('#sanitiseRichText', () => {
     expect(result).not.toContain('javascript:')
   })
 
+  test('strips protocol-relative href to prevent stored open-redirect', () => {
+    expect(sanitiseRichText('<a href="//attacker.com">click</a>')).toBe(
+      '<a>click</a>'
+    )
+  })
+
   test('strips <script> and on* handlers', () => {
     expect(sanitiseRichText('<script>alert("xss")</script>')).toBe('')
     const result = sanitiseRichText(
@@ -157,5 +167,30 @@ describe('#sanitiseRichText', () => {
 describe('#sanitise (regression)', () => {
   test('still rewrites <p> to govuk-hint class', () => {
     expect(sanitise('<p>hint</p>')).toBe('<p class="govuk-hint">hint</p>')
+  })
+})
+
+describe('#sanitiseRichText — cross-repo contract canary', () => {
+  // CONTRACT: this canary is byte-identical to the one in marine-licensing-
+  // backend's src/iat-answers/api/helpers/sanitise-summary-text.test.js.
+  // If you change it here, change it there in the SAME TICKET. Verified empirically
+  // against sanitize-html ^2.17.3.
+  const CANARY_INPUT =
+    '<p>Hello <a href="https://example.gov.uk/x" target="_blank" rel="noopener">link</a> ' +
+    '<b>bold</b> <u>under</u> <strong>strong</strong><br><ul><li>one</li></ul>' +
+    '<ol type="a"><li>alpha</li></ol>' +
+    '<script>alert(1)</script><img src="x" onerror="alert(1)">' +
+    '<a href="javascript:alert(1)">bad</a>' +
+    '<style>body{}</style><iframe src="https://evil"></iframe>'
+
+  const CANARY_OUTPUT =
+    '<p>Hello <a href="https://example.gov.uk/x" target="_blank" rel="noopener">link</a> ' +
+    '<b>bold</b> <u>under</u> <strong>strong</strong><br /></p>' +
+    '<ul><li>one</li></ul>' +
+    '<ol type="a"><li>alpha</li></ol>' +
+    '<a>bad</a>'
+
+  test('canary round-trips to expected output', () => {
+    expect(sanitiseRichText(CANARY_INPUT)).toBe(CANARY_OUTPUT)
   })
 })

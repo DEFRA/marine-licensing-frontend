@@ -48,6 +48,25 @@
   }) %}
 {% endif %}
 
+
+
+{% set _ = rows.push({
+     key: { text:  "Pre-application public groups or organisations consultation" },
+     value: { text: params.publicConsultation.details if params.publicConsultation.consulted === 'yes' else "No" },
+     classes: "govuk-summary-list__row--no-border",
+       actions: {
+      items: [
+        {
+          href: "/marine-licence/public-consultation?from=check-your-answers",
+          text: "Change",
+          visuallyHiddenText: "Pre-application public groups or organisations consultation",
+          classes: "govuk-link--no-visited-state"
+        }
+      ]
+    } if not params.isReadOnly
+   })
+%}
+
 {% if rows | length %}
 
 {{ govukSummaryList({

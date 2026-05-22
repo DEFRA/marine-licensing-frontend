@@ -7,7 +7,8 @@ export const mockMarineLicenceTaskList = {
   otherAuthorities: 'COMPLETED',
   siteDetails: 'COMPLETED',
   projectBackground: 'COMPLETED',
-  publicRegister: 'COMPLETED'
+  publicRegister: 'COMPLETED',
+  publicConsultation: 'COMPLETED'
 }
 
 export const mockEmptyActivityDetails = {
@@ -51,6 +52,10 @@ export const mockMarineLicenceApplication = {
   projectName: 'Test Project',
   projectBackground: 'Test project background',
   specialLegalPowers: { agree: 'yes', details: 'Test reason' },
+  publicConsultation: {
+    consulted: 'yes',
+    details: 'Consulted with local fishing group'
+  },
   taskList: mockMarineLicenceTaskList,
   projectType: MARINE_LICENCE_KEY,
   siteDetails: [

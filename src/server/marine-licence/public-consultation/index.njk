@@ -1,0 +1,89 @@
+{% extends 'layouts/page.njk' %}
+{% from "govuk/components/textarea/macro.njk" import govukTextarea %}
+{% from "govuk/components/back-link/macro.njk" import govukBackLink %}
+{% from "govuk/components/details/macro.njk" import govukDetails %}
+{% from "radio-page/macro.njk" import appRadioPage %}
+
+{% block beforeContent %}
+{{ super() }}
+<nav>
+  {{ govukBackLink({
+    text: "Back",
+    href: backLink
+  }) }}
+</nav>
+{% endblock %}
+
+{% block content %}
+
+  {% set helperHtml %}
+    <p class="govuk-body"><strong>Pre-application consultation</strong></p>
+    <p class="govuk-body">Pre-application consultation is informal. It means speaking to public groups or organisations before submitting your application.</p>
+    <p class="govuk-body">We ask because it helps us understand the context of your application and prepare for the formal public consultation.</p>
+    <p class="govuk-body">For example, it tells us if there might be a high level of public interest and helps avoid duplication or competing advice.</p>
+    <p class="govuk-body"><strong>Public consultation</strong></p>
+    <p class="govuk-body">After we assess your application, we will open a formal public consultation. This is a legal requirement.</p>
+    <p class="govuk-body">The formal consultation:</p>
+    <ul class="govuk-list govuk-list--bullet">
+      <li>lasts at least 28 days (6 weeks if your activity needs an Environmental Impact Assessment)</li>
+      <li>allows the public to comment on your application</li>
+      <li>means you must advertise your activity (you pay for advertising costs)</li>
+    </ul>
+    <p class="govuk-body">Your case officer will tell you what you need to advertise and where, when your application reaches this stage. Budget for advertising as part of your application costs.</p>
+  {% endset %}
+
+  {% set helperText %}
+    <p class="govuk-body">This could include relevant local groups in the community or organisations, for example, resident committees, local environmental and conservation groups, Companies House or Natural England.</p>
+
+    {{ govukDetails({
+      summaryText: "Help with pre-application and public consultation",
+      html: helperHtml
+    }) }}
+  {% endset %}
+
+  {% set conditionalHtml %}
+    {{ govukTextarea({
+      id: "details",
+      name: "details",
+      label: {
+        text: "Tell us who you consulted and what advice they gave"
+      },
+      hint: {
+        text: "Enter a maximum of 1,000 characters"
+      },
+      maxlength: 1000,
+      errorMessage: errors['details'],
+      value: payload.details
+    }) }}
+  {% endset %}
+
+  {{ appRadioPage({
+    name: "consulted",
+    errorSummary: errorSummary,
+    errors: errors,
+    heading: "Have you consulted with any public groups or organisations before making this application?",
+    isPageHeading: true,
+    value: payload.consulted,
+    errorMessage: errors['consulted'],
+    projectName: projectName,
+    bodyHtml: bodyHtml,
+    hint: { html: helperText },
+    items: [
+      {
+        value: "yes",
+        text: "Yes",
+        conditional: {
+          html: conditionalHtml
+        }
+      },
+      {
+        value: "no",
+        text: "No"
+      }
+    ],
+    csrfToken: csrfToken,
+    buttonText: "Save and continue",
+    cancelLink: backLink
+  }) }}
+
+{% endblock %}

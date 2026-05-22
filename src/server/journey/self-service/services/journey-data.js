@@ -45,6 +45,10 @@ export function getFirstQuestionRoute() {
   return journeyData.firstQuestionRoute
 }
 
+export function getDocumentPreambleText() {
+  return journeyData.documentPreambleText
+}
+
 export function getQuestion(route) {
   return questionsByRoute.get(route) ?? null
 }

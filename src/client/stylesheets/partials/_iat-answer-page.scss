@@ -1,0 +1,25 @@
+.app-iat-answers-page {
+  .govuk-summary-list__key {
+    width: 50%;
+  }
+
+  .govuk-summary-list__value {
+    width: 50%;
+  }
+}
+
+@media print {
+  .app-iat-answers-page-body {
+    .govuk-footer,
+    .govuk-phase-banner,
+    .govuk-back-link,
+    .print-link,
+    .print-instructions {
+      display: none;
+    }
+
+    .govuk-service-navigation__service-name .govuk-service-navigation__link::after {
+      content: none;
+    }
+  }
+}

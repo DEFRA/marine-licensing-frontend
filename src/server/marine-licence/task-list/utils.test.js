@@ -182,7 +182,8 @@ describe('taskList utils', () => {
       expect(
         transformOtherPermissionsTaskList({
           specialLegalPowers: 'COMPLETED',
-          otherAuthorities: 'COMPLETED'
+          otherAuthorities: 'COMPLETED',
+          publicConsultation: 'COMPLETED'
         })
       ).toEqual([
         {
@@ -199,6 +200,14 @@ describe('taskList utils', () => {
           title: {
             classes: 'govuk-link--no-visited-state',
             text: 'Other authorities'
+          }
+        },
+        {
+          href: marineLicenceRoutes.MARINE_LICENCE_PUBLIC_CONSULTATION,
+          status: { text: 'Completed' },
+          title: {
+            classes: 'govuk-link--no-visited-state',
+            text: 'Pre-application consultation'
           }
         }
       ])
@@ -208,7 +217,8 @@ describe('taskList utils', () => {
       expect(
         transformOtherPermissionsTaskList({
           specialLegalPowers: 'IN_PROGRESS',
-          otherAuthorities: 'IN_PROGRESS'
+          otherAuthorities: 'IN_PROGRESS',
+          publicConsultation: 'IN_PROGRESS'
         })
       ).toEqual([
         {
@@ -229,6 +239,16 @@ describe('taskList utils', () => {
           title: {
             classes: 'govuk-link--no-visited-state',
             text: 'Other authorities'
+          }
+        },
+        {
+          href: marineLicenceRoutes.MARINE_LICENCE_PUBLIC_CONSULTATION,
+          status: {
+            tag: { text: 'In progress', classes: 'govuk-tag--teal' }
+          },
+          title: {
+            classes: 'govuk-link--no-visited-state',
+            text: 'Pre-application consultation'
           }
         }
       ])
@@ -240,7 +260,8 @@ describe('taskList utils', () => {
         expect(
           transformOtherPermissionsTaskList({
             specialLegalPowers: value,
-            otherAuthorities: value
+            otherAuthorities: value,
+            publicConsultation: value
           })
         ).toEqual([
           {
@@ -262,6 +283,16 @@ describe('taskList utils', () => {
               classes: 'govuk-link--no-visited-state',
               text: 'Other authorities'
             }
+          },
+          {
+            href: marineLicenceRoutes.MARINE_LICENCE_PUBLIC_CONSULTATION,
+            status: {
+              tag: { text: 'Not yet started', classes: 'govuk-tag--blue' }
+            },
+            title: {
+              classes: 'govuk-link--no-visited-state',
+              text: 'Pre-application consultation'
+            }
           }
         ])
       }
@@ -271,7 +302,7 @@ describe('taskList utils', () => {
       test('correctly returns Completed status', () => {
         expect(
           transformOtherPermissionsTaskList(
-            { otherAuthorities: 'COMPLETED' },
+            { otherAuthorities: 'COMPLETED', publicConsultation: 'COMPLETED' },
             true
           )
         ).toEqual([
@@ -282,6 +313,14 @@ describe('taskList utils', () => {
               classes: 'govuk-link--no-visited-state',
               text: 'Other authorities'
             }
+          },
+          {
+            href: marineLicenceRoutes.MARINE_LICENCE_PUBLIC_CONSULTATION,
+            status: { text: 'Completed' },
+            title: {
+              classes: 'govuk-link--no-visited-state',
+              text: 'Pre-application consultation'
+            }
           }
         ])
       })
@@ -289,7 +328,10 @@ describe('taskList utils', () => {
       test('correctly returns In progress', () => {
         expect(
           transformOtherPermissionsTaskList(
-            { otherAuthorities: 'IN_PROGRESS' },
+            {
+              otherAuthorities: 'IN_PROGRESS',
+              publicConsultation: 'IN_PROGRESS'
+            },
             true
           )
         ).toEqual([
@@ -302,6 +344,16 @@ describe('taskList utils', () => {
               classes: 'govuk-link--no-visited-state',
               text: 'Other authorities'
             }
+          },
+          {
+            href: marineLicenceRoutes.MARINE_LICENCE_PUBLIC_CONSULTATION,
+            status: {
+              tag: { text: 'In progress', classes: 'govuk-tag--teal' }
+            },
+            title: {
+              classes: 'govuk-link--no-visited-state',
+              text: 'Pre-application consultation'
+            }
           }
         ])
       })
@@ -310,7 +362,10 @@ describe('taskList utils', () => {
         'correctly returns Not yet started for %s',
         (value) => {
           expect(
-            transformOtherPermissionsTaskList({ otherAuthorities: value }, true)
+            transformOtherPermissionsTaskList(
+              { otherAuthorities: value, publicConsultation: value },
+              true
+            )
           ).toEqual([
             {
               href: marineLicenceRoutes.MARINE_LICENCE_OTHER_AUTHORITIES,
@@ -320,6 +375,16 @@ describe('taskList utils', () => {
               title: {
                 classes: 'govuk-link--no-visited-state',
                 text: 'Other authorities'
+              }
+            },
+            {
+              href: marineLicenceRoutes.MARINE_LICENCE_PUBLIC_CONSULTATION,
+              status: {
+                tag: { text: 'Not yet started', classes: 'govuk-tag--blue' }
+              },
+              title: {
+                classes: 'govuk-link--no-visited-state',
+                text: 'Pre-application consultation'
               }
             }
           ])

@@ -62,6 +62,7 @@ export const viewDetailsController = {
         preferredDates: formattedMarineLicence.preferredDates,
         projectName: formattedMarineLicence.projectName,
         projectBackground: formattedMarineLicence.projectBackground,
+        publicConsultation: marineLicence.publicConsultation,
         isReadOnly: true,
         pageCaption,
         backLink: isApplicantView ? routes.DASHBOARD : null

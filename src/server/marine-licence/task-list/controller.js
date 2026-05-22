@@ -58,6 +58,7 @@ export const taskListController = {
       specialLegalPowers,
       preferredDates,
       publicRegister,
+      publicConsultation,
       otherAuthorities,
       siteDetails
     } = payload.value
@@ -83,6 +84,7 @@ export const taskListController = {
       specialLegalPowers,
       preferredDates,
       publicRegister,
+      publicConsultation,
       otherAuthorities,
       siteDetails: hasCancel ? [] : siteDetails
     })

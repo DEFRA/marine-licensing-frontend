@@ -58,6 +58,7 @@ export const marineLicenceRoutes = {
     '/marine-licence/choose-file-type-to-upload',
   MARINE_LICENCE_PUBLIC_REGISTER:
     '/marine-licence/sharing-your-project-information-publicly',
+  MARINE_LICENCE_PUBLIC_CONSULTATION: '/marine-licence/public-consultation',
   MARINE_LICENCE_FILE_UPLOAD: '/marine-licence/upload-file',
   MARINE_LICENCE_SITE_NAME: '/marine-licence/site-name',
   MARINE_LICENCE_REVIEW_SITE_DETAILS: '/marine-licence/review-site-details',
@@ -119,7 +120,10 @@ export const routes = {
   DECLARATION: '/declaration',
   IAT_START: '/journey/self-service/start',
   IAT_QUESTION: '/journey/self-service/{questionPath*}',
-  IAT_OUTCOME: '/journey/self-service/outcome/{outcomePath*}'
+  IAT_OUTCOME: '/journey/self-service/outcome/{outcomePath*}',
+  IAT_OUTCOME_VIEW_ANSWERS:
+    '/journey/self-service/view-answers/{outcomeTypeId}/{outcomePath*}',
+  IAT_ANSWER: '/journey/self-service/answer'
 }
 
 export const entraIdRoutes = [

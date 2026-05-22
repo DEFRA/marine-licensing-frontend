@@ -8,7 +8,8 @@ export const mockMarineLicenceTaskList = {
   siteDetails: 'COMPLETED',
   preferredDates: 'COMPLETED',
   projectBackground: 'COMPLETED',
-  publicRegister: 'COMPLETED'
+  publicRegister: 'COMPLETED',
+  publicConsultation: 'COMPLETED'
 }
 
 export const mockEmptyActivityDetails = {
@@ -52,6 +53,10 @@ export const mockMarineLicenceApplication = {
   projectName: 'Test Project',
   projectBackground: 'Test project background',
   specialLegalPowers: { agree: 'yes', details: 'Test reason' },
+  publicConsultation: {
+    consulted: 'yes',
+    details: 'Consulted with local fishing group'
+  },
   taskList: mockMarineLicenceTaskList,
   preferredDates: {
     start: { month: '07', year: '2026' },

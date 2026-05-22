@@ -1,5 +1,6 @@
 {% extends 'layouts/page.njk' %}
 {% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/inset-text/macro.njk" import govukInsetText %}
 {% from "govuk/components/warning-text/macro.njk" import govukWarningText %}
 
 {% block beforeContent %}
@@ -30,6 +31,10 @@
         If the organisation does not have a Defra account
       </h3>
 
+      {{ govukInsetText({
+        html: "If your organisation is a local authority or other government department, you must contact <a href='mailto:marine.consents@marinemanagement.org.uk' class='govuk-link'>marine.consents@marinemanagement.org.uk</a> to create a new Defra account."
+      }) }}
+
       <p class="govuk-body">
         To create a new Defra account for your organisation, you need to:
       </p>
@@ -47,14 +52,6 @@
 
       <p class="govuk-body">
         Ask your organisation's Defra account administrator to invite you to your organisation's Defra account.
-      </p>
-
-      <p class="govuk-body">
-        If you do not know who your organisation's administrator is, contact Defra account support:
-      </p>
-
-      <p class="govuk-body">
-        <a href="mailto:Customer.Identity-Support@defra.gov.uk" class="govuk-link" rel="noopener noreferrer">Customer.Identity-Support@defra.gov.uk</a>
       </p>
 
       <h2 class="govuk-heading-m">

@@ -21,7 +21,6 @@
 
     <div class="app-iat-option__actions">
       {% if option.isTerminal %}
-        {# Terminal outcomeType on intermediate page — see ML-1268 #}
         {{ govukButton({
           text: option.ctaLabel,
           href: "#",
@@ -37,13 +36,17 @@
           }) }}
         </form>
       {% endif %}
-
-      {# PDF download deferred to ML-1165 #}
-      {{ govukButton({
-        text: "Download a PDF record of my answers",
-        href: "#",
-        classes: "govuk-button--secondary"
-      }) }}
     </div>
+
+    {% if option.viewAnswersUrl %}
+      <p class="govuk-body">
+        <a class="govuk-link"
+           href="{{ option.viewAnswersUrl }}"
+           target="_blank"
+           rel="noopener noreferrer">
+          View answers (opens in a new tab)
+        </a>
+      </p>
+    {% endif %}
   </div>
 {% endfor %}

@@ -1,3 +1,17 @@
+import { vi } from 'vitest'
+
+vi.mock('#src/services/iat-answers-service/iat-answers.service.js', () => ({
+  iatAnswersService: {
+    create: vi.fn()
+  }
+}))
+vi.mock(
+  '#src/server/journey/self-service/services/iat-answers-payload.js',
+  () => ({
+    buildIatAnswersPayload: vi.fn()
+  })
+)
+
 import { JSDOM } from 'jsdom'
 import { statusCodes } from '#src/server/common/constants/status-codes.js'
 import { setupTestServer } from '#tests/integration/shared/test-setup-helpers.js'
@@ -6,6 +20,25 @@ import {
   makePostRequest
 } from '#src/server/test-helpers/server-requests.js'
 import { config } from '#src/config/config.js'
+import { iatAnswersService } from '#src/services/iat-answers-service/iat-answers.service.js'
+import { buildIatAnswersPayload } from '#src/server/journey/self-service/services/iat-answers-payload.js'
+
+const STUB_ANSWER_ID = 'AZ4rr6bLclCVUsE2Pl_zKw'
+const EXPECTED_ANSWER_PAGE_URL = `/journey/self-service/answer/${STUB_ANSWER_ID}`
+
+beforeEach(() => {
+  vi.mocked(buildIatAnswersPayload).mockReturnValue({
+    outcome: { route: '/stub', typeId: '', summaryText: '' },
+    answers: [
+      {
+        questionRoute: '/stub-question',
+        questionText: 'stub',
+        answers: [{ id: 'a', text: 'stub' }]
+      }
+    ]
+  })
+  vi.mocked(iatAnswersService.create).mockResolvedValue(STUB_ANSWER_ID)
+})
 
 describe('#outcomeController (integration)', () => {
   config.set('selfService.enabled', true)
@@ -97,18 +130,27 @@ describe('#outcomeController (integration)', () => {
       expect(continueButton.getAttribute('href')).toBe('#')
     })
 
-    test('every option card has a "Download a PDF record of my answers" link with href="#"', async () => {
+    test('renders a per-option "View answers" link inside each option card', async () => {
       const { document } = await getPage()
       const cards = document.querySelectorAll('.app-iat-option')
-      for (const card of cards) {
-        const downloadButton = Array.from(
-          card.querySelectorAll('a.govuk-button--secondary')
-        ).find((a) =>
-          a.textContent.includes('Download a PDF record of my answers')
+      expect(cards).toHaveLength(3)
+      const expectedHrefs = [
+        '/journey/self-service/view-answers/WO_CON_EXEMPTION_JOURNEY/construction/journey-select',
+        '/journey/self-service/view-answers/WO_CON_SELF_SERVICE_JOURNEY/construction/journey-select',
+        '/journey/self-service/view-answers/WO_STANDARD_MLA/construction/journey-select'
+      ]
+      cards.forEach((card, i) => {
+        const link = Array.from(card.querySelectorAll('a.govuk-link')).find(
+          (a) => a.textContent.includes('View answers')
         )
-        expect(downloadButton).not.toBeNull()
-        expect(downloadButton.getAttribute('href')).toBe('#')
-      }
+        expect(link).not.toBeNull()
+        expect(link.getAttribute('href')).toBe(expectedHrefs[i])
+        expect(link.getAttribute('target')).toBe('_blank')
+        expect(link.getAttribute('rel')).toBe('noopener noreferrer')
+        expect(link.textContent.replace(/\s+/g, ' ').trim()).toBe(
+          'View answers (opens in a new tab)'
+        )
+      })
     })
 
     test('renders a back link', async () => {
@@ -281,15 +323,21 @@ describe('GET terminal-single', () => {
     expect(continueButtons[0].getAttribute('href')).toBe('#')
   })
 
-  test('renders one PDF button (page-level, href="#")', async () => {
+  test('renders a single "View answers" link with the per-option trigger URL', async () => {
     const { document } = await getPage(SINGLE)
-    const pdfButtons = Array.from(
-      document.querySelectorAll('a.govuk-button--secondary')
-    ).filter((a) =>
-      a.textContent.includes('Download a PDF record of my answers')
+    const links = Array.from(document.querySelectorAll('a.govuk-link')).filter(
+      (a) => a.textContent.includes('View answers')
     )
-    expect(pdfButtons).toHaveLength(1)
-    expect(pdfButtons[0].getAttribute('href')).toBe('#')
+    expect(links).toHaveLength(1)
+    const link = links[0]
+    expect(link.getAttribute('href')).toBe(
+      '/journey/self-service/view-answers/WO_EXE_AVAILABLE_ARTICLE_25A/exemption/licence-not-required-exemption-available-article-25A'
+    )
+    expect(link.getAttribute('target')).toBe('_blank')
+    expect(link.getAttribute('rel')).toBe('noopener noreferrer')
+    expect(link.textContent.replace(/\s+/g, ' ').trim()).toBe(
+      'View answers (opens in a new tab)'
+    )
   })
 
   test('does not render any option cards', async () => {
@@ -348,7 +396,7 @@ describe('GET terminal-multi', () => {
     expect(document.querySelectorAll('.app-iat-option')).toHaveLength(2)
   })
 
-  test('option-C label resolution: link: → "Download", module: → "Continue"', async () => {
+  test('renders "Download" for link: outcomes and "Continue" for module: outcomes', async () => {
     const { document } = await getPage(MULTI)
     const cards = Array.from(document.querySelectorAll('.app-iat-option'))
     const labels = cards.map((c) =>
@@ -369,15 +417,23 @@ describe('GET terminal-multi', () => {
     }
   })
 
-  test('renders exactly one page-level PDF button', async () => {
+  test('renders a per-option "View answers" link inside each option card', async () => {
     const { document } = await getPage(MULTI)
-    const pdf = Array.from(
-      document.querySelectorAll('a.govuk-button--secondary')
-    ).filter((a) =>
-      a.textContent.includes('Download a PDF record of my answers')
-    )
-    expect(pdf).toHaveLength(1)
-    expect(pdf[0].getAttribute('href')).toBe('#')
+    const cards = document.querySelectorAll('.app-iat-option')
+    expect(cards).toHaveLength(2)
+    const expectedHrefs = [
+      '/journey/self-service/view-answers/WO_DOWNLOAD_HA_AGREED_METHOD_TEMPLATE/scaffolding-impede-navigation',
+      '/journey/self-service/view-answers/WO_STANDARD_TRACK_MLA/scaffolding-impede-navigation'
+    ]
+    cards.forEach((card, i) => {
+      const link = Array.from(card.querySelectorAll('a.govuk-link')).find((a) =>
+        a.textContent.includes('View answers')
+      )
+      expect(link).not.toBeNull()
+      expect(link.getAttribute('href')).toBe(expectedHrefs[i])
+      expect(link.getAttribute('target')).toBe('_blank')
+      expect(link.getAttribute('rel')).toBe('noopener noreferrer')
+    })
   })
 
   test('renders a back link', async () => {
@@ -428,15 +484,18 @@ describe('GET licence-not-required (terminal-single, info-only)', () => {
     expect(body.textContent).toContain('relevant devolved administration')
   })
 
-  test('renders the Download PDF button', async () => {
+  test('renders the "View answers" link with the per-option trigger URL', async () => {
     const { document } = await getPage()
-    const pdf = Array.from(
-      document.querySelectorAll('a.govuk-button--secondary')
-    ).filter((a) =>
-      a.textContent.includes('Download a PDF record of my answers')
+    const links = Array.from(document.querySelectorAll('a.govuk-link')).filter(
+      (a) => a.textContent.includes('View answers')
     )
-    expect(pdf).toHaveLength(1)
-    expect(pdf[0].getAttribute('href')).toBe('#')
+    expect(links).toHaveLength(1)
+    const link = links[0]
+    expect(link.getAttribute('href')).toBe(
+      '/journey/self-service/view-answers/WO_EXE_LICENCE_DEVOLVED/licence-not-required-devolved'
+    )
+    expect(link.getAttribute('target')).toBe('_blank')
+    expect(link.getAttribute('rel')).toBe('noopener noreferrer')
   })
 
   test('does NOT render a primary Continue button', async () => {
@@ -465,5 +524,46 @@ describe('POST to a terminal outcome route', () => {
       formData: { outcomeType: 'WO_STANDARD_TRACK_MLA' }
     })
     expect(response.statusCode).toBe(statusCodes.notFound)
+  })
+})
+
+describe('GET /journey/self-service/view-answers/:outcomeTypeId/:outcomePath', () => {
+  config.set('selfService.enabled', true)
+  const getServer = setupTestServer()
+
+  const TRIGGER_URL =
+    '/journey/self-service/view-answers/WO_DOWNLOAD_HA_MARKERS_AGREED_METHOD_TEMPLATE/markers/ha-not-agreed'
+
+  test('redirects to the slugged answer page returned by iatAnswersService.create', async () => {
+    const response = await makeGetRequest({
+      url: TRIGGER_URL,
+      server: getServer()
+    })
+    expect(response.statusCode).toBe(statusCodes.redirect)
+    expect(response.headers.location).toBe(EXPECTED_ANSWER_PAGE_URL)
+    expect(buildIatAnswersPayload).toHaveBeenCalledWith(
+      expect.anything(),
+      '/markers/ha-not-agreed',
+      'WO_DOWNLOAD_HA_MARKERS_AGREED_METHOD_TEMPLATE'
+    )
+    expect(iatAnswersService.create).toHaveBeenCalledTimes(1)
+  })
+
+  test('returns 400 when the outcomeTypeId is not in the outcome', async () => {
+    const response = await makeGetRequest({
+      url: '/journey/self-service/view-answers/WO_UNRELATED_TYPE/markers/ha-not-agreed',
+      server: getServer()
+    })
+    expect(response.statusCode).toBe(statusCodes.badRequest)
+    expect(iatAnswersService.create).not.toHaveBeenCalled()
+  })
+
+  test('returns 404 when the outcome route is unknown', async () => {
+    const response = await makeGetRequest({
+      url: '/journey/self-service/view-answers/WO_DOWNLOAD_HA_MARKERS_AGREED_METHOD_TEMPLATE/nonexistent-outcome',
+      server: getServer()
+    })
+    expect(response.statusCode).toBe(statusCodes.notFound)
+    expect(iatAnswersService.create).not.toHaveBeenCalled()
   })
 })

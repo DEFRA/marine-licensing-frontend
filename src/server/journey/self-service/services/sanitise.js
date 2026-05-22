@@ -11,6 +11,7 @@ const hintSanitiseOptions = {
     p: ['class']
   },
   allowedSchemes: ALLOWED_SCHEMES,
+  allowProtocolRelative: false,
   transformTags: {
     p: (tagName, attribs) => ({
       tagName,
@@ -25,7 +26,8 @@ const richTextSanitiseOptions = {
     a: ['href', 'target', 'rel'],
     ol: ['type']
   },
-  allowedSchemes: ALLOWED_SCHEMES
+  allowedSchemes: ALLOWED_SCHEMES,
+  allowProtocolRelative: false
 }
 
 export function sanitise(text) {

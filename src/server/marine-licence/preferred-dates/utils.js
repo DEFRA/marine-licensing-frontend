@@ -10,6 +10,35 @@ const END_YEAR = 'PREFERRED_END_YEAR_REQUIRED'
 
 const startEndCodes = [START_MONTH, START_YEAR, END_MONTH, END_YEAR]
 
+const mapStartError = (hasMonth, hasYear) => {
+  if (hasMonth && hasYear) {
+    return {
+      message: 'PREFERRED_START_DATE_REQUIRED',
+      path: ['start-date-month']
+    }
+  }
+  if (hasMonth) {
+    return { message: START_MONTH, path: ['start-date-month'] }
+  }
+  if (hasYear) {
+    return { message: START_YEAR, path: ['start-date-year'] }
+  }
+  return null
+}
+
+const mapEndError = (hasMonth, hasYear) => {
+  if (hasMonth && hasYear) {
+    return { message: 'PREFERRED_END_DATE_REQUIRED', path: ['end-date-month'] }
+  }
+  if (hasMonth) {
+    return { message: END_MONTH, path: ['end-date-month'] }
+  }
+  if (hasYear) {
+    return { message: END_YEAR, path: ['end-date-year'] }
+  }
+  return null
+}
+
 export const mapPreferredDatesErrors = (details) => {
   if (!Array.isArray(details) || details.length === 0) {
     return []
@@ -21,29 +50,10 @@ export const mapPreferredDatesErrors = (details) => {
   const hasEndYear = details.some((d) => d.message === END_YEAR)
 
   const otherDetails = details.filter((d) => !startEndCodes.includes(d.message))
-  const mappedDetails = []
-
-  if (hasStartMonth && hasStartYear) {
-    mappedDetails.push({
-      message: 'PREFERRED_START_DATE_REQUIRED',
-      path: ['start-date-month']
-    })
-  } else if (hasStartMonth) {
-    mappedDetails.push({ message: START_MONTH, path: ['start-date-month'] })
-  } else if (hasStartYear) {
-    mappedDetails.push({ message: START_YEAR, path: ['start-date-year'] })
-  }
-
-  if (hasEndMonth && hasEndYear) {
-    mappedDetails.push({
-      message: 'PREFERRED_END_DATE_REQUIRED',
-      path: ['end-date-month']
-    })
-  } else if (hasEndMonth) {
-    mappedDetails.push({ message: END_MONTH, path: ['end-date-month'] })
-  } else if (hasEndYear) {
-    mappedDetails.push({ message: END_YEAR, path: ['end-date-year'] })
-  }
+  const mappedDetails = [
+    mapStartError(hasStartMonth, hasStartYear),
+    mapEndError(hasEndMonth, hasEndYear)
+  ].filter(Boolean)
 
   return [...mappedDetails, ...otherDetails]
 }

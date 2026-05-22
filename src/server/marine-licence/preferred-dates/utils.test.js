@@ -151,7 +151,10 @@ describe('#validateDateRanges', () => {
       MAY_2026
     )
     expect(result).toEqual([
-      { message: 'PREFERRED_START_DATE_TODAY_OR_FUTURE', path: ['start-date-month'] }
+      {
+        message: 'PREFERRED_START_DATE_TODAY_OR_FUTURE',
+        path: ['start-date-month']
+      }
     ])
   })
 
@@ -161,7 +164,10 @@ describe('#validateDateRanges', () => {
       MAY_2026
     )
     expect(result).toEqual([
-      { message: 'PREFERRED_START_DATE_TODAY_OR_FUTURE', path: ['start-date-month'] }
+      {
+        message: 'PREFERRED_START_DATE_TODAY_OR_FUTURE',
+        path: ['start-date-month']
+      }
     ])
   })
 
@@ -171,7 +177,10 @@ describe('#validateDateRanges', () => {
       MAY_2026
     )
     expect(result).toEqual([
-      { message: 'PREFERRED_END_DATE_TODAY_OR_FUTURE', path: ['end-date-month'] }
+      {
+        message: 'PREFERRED_END_DATE_TODAY_OR_FUTURE',
+        path: ['end-date-month']
+      }
     ])
   })
 
@@ -181,7 +190,10 @@ describe('#validateDateRanges', () => {
       MAY_2026
     )
     expect(result).toEqual([
-      { message: 'PREFERRED_END_DATE_TODAY_OR_FUTURE', path: ['end-date-month'] }
+      {
+        message: 'PREFERRED_END_DATE_TODAY_OR_FUTURE',
+        path: ['end-date-month']
+      }
     ])
   })
 
@@ -191,8 +203,14 @@ describe('#validateDateRanges', () => {
       MAY_2026
     )
     expect(result).toEqual([
-      { message: 'PREFERRED_START_DATE_TODAY_OR_FUTURE', path: ['start-date-month'] },
-      { message: 'PREFERRED_END_DATE_TODAY_OR_FUTURE', path: ['end-date-month'] }
+      {
+        message: 'PREFERRED_START_DATE_TODAY_OR_FUTURE',
+        path: ['start-date-month']
+      },
+      {
+        message: 'PREFERRED_END_DATE_TODAY_OR_FUTURE',
+        path: ['end-date-month']
+      }
     ])
   })
 

@@ -80,10 +80,10 @@ export const preferredDatesSubmitController = {
   async handler(request, h) {
     const { payload } = request
     const marineLicence = getMarineLicenceCache(request)
+    const currentYear = new Date().getFullYear()
 
     const dateRangeDetails = validateDateRanges(payload)
     if (dateRangeDetails.length > 0) {
-      const currentYear = new Date().getFullYear()
       return createFailAction({
         viewRoute: PREFERRED_DATES_VIEW_ROUTE,
         settings,

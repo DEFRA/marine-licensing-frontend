@@ -29,7 +29,7 @@ const getBackLink = (action, siteNumber, savedSiteDetails) => {
     }
     return `${marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS}${getSiteDetailsAnchor(siteNumber)}`
   }
-  return marineLicenceRoutes.MARINE_LICENCE_COORDINATES_ENTRY_CHOICE
+  return `${marineLicenceRoutes.MARINE_LICENCE_COORDINATES_ENTRY_CHOICE}${getSiteParam(siteNumber)}`
 }
 
 export const coordinateSystemController = {

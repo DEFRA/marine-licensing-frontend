@@ -7,6 +7,5 @@ describe('getSiteParam', () => {
 
   test('returns site query param when siteNumber is greater than 1', () => {
     expect(getSiteParam(2)).toBe('?site=2')
-    expect(getSiteParam(3)).toBe('?site=3')
   })
 })

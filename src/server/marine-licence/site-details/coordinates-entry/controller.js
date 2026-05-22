@@ -25,7 +25,7 @@ export const MARINE_LICENCE_COORDINATES_ENTRY_VIEW_ROUTE =
 const getBackLink = (action, siteNumber) =>
   action
     ? `${marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS}${getSiteDetailsAnchor(siteNumber)}`
-    : marineLicenceRoutes.MARINE_LICENCE_SITE_NAME
+    : `${marineLicenceRoutes.MARINE_LICENCE_SITE_NAME}${getSiteParam(siteNumber)}`
 
 export const coordinatesEntryController = {
   options: {

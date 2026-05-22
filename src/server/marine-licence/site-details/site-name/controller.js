@@ -25,7 +25,7 @@ import { getSiteParam } from '#src/server/common/helpers/site-details/site-numbe
 export const SITE_NAME_VIEW_ROUTE = 'templates/site-name.njk'
 
 const getBackLink = (isSavePage, siteNumber) =>
-  isSavePage
+  isSavePage || siteNumber > 1
     ? `${marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS}${getSiteDetailsAnchor(siteNumber)}`
     : marineLicenceRoutes.MARINE_LICENCE_COORDINATES_TYPE_CHOICE
 

@@ -119,7 +119,10 @@ export const routes = {
   DECLARATION: '/declaration',
   IAT_START: '/journey/self-service/start',
   IAT_QUESTION: '/journey/self-service/{questionPath*}',
-  IAT_OUTCOME: '/journey/self-service/outcome/{outcomePath*}'
+  IAT_OUTCOME: '/journey/self-service/outcome/{outcomePath*}',
+  IAT_OUTCOME_VIEW_ANSWERS:
+    '/journey/self-service/view-answers/{outcomeTypeId}/{outcomePath*}',
+  IAT_ANSWER: '/journey/self-service/answer'
 }
 
 export const entraIdRoutes = [

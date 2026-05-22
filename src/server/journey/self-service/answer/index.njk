@@ -1,0 +1,50 @@
+{% extends "layouts/page.njk" %}
+
+{% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
+
+{% set bodyClasses = "app-iat-answers-page-body" %}
+
+{% block content %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-full app-iat-answers-page">
+      <h1 class="govuk-heading-xl">{{ heading }}</h1>
+
+      <p class="govuk-body">
+        <a class="govuk-link print-link"
+           href="#"
+           data-module="iat-answer-print">
+          Print this page
+        </a>
+      </p>
+      <p class="govuk-body print-instructions">To save as a PDF, select 'Print this page' and choose 'Save as PDF' as your printer.</p>
+
+      <h2 class="govuk-heading-m">Introduction</h2>
+      <p class="govuk-body">{{ introductionText }}</p>
+
+      <h2 class="govuk-heading-m">Date of check</h2>
+      <p class="govuk-body">{{ dateOfCheck | formatDate('d MMMM yyyy') }}</p>
+
+      <h2 class="govuk-heading-m">Summary</h2>
+      <div class="govuk-body">{{ summaryText | sanitiseRichText }}</div>
+
+      <h2 class="govuk-heading-m">Answers</h2>
+      {% set rows = [] %}
+      {% for entry in answers %}
+        {% set valueHtml %}
+          {% if entry.answers | length > 1 %}
+            <ul class="govuk-list govuk-list--bullet">
+              {% for a in entry.answers %}
+                <li>{{ a.text }}</li>
+              {% endfor %}
+            </ul>
+          {% else %}
+            {{ entry.answers[0].text }}
+          {% endif %}
+        {% endset %}
+        {% set rows = (rows.push({ key: { text: entry.questionText }, value: { html: valueHtml } }), rows) %}
+      {% endfor %}
+
+      {{ govukSummaryList({ rows: rows }) }}
+    </div>
+  </div>
+{% endblock %}

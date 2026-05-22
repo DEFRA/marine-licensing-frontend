@@ -8,33 +8,38 @@ const START_YEAR = 'PREFERRED_START_YEAR_REQUIRED'
 const END_MONTH = 'PREFERRED_END_MONTH_REQUIRED'
 const END_YEAR = 'PREFERRED_END_YEAR_REQUIRED'
 
-const startEndCodes = [START_MONTH, START_YEAR, END_MONTH, END_YEAR]
+const FIELD_START_MONTH = 'start-date-month'
+const FIELD_START_YEAR = 'start-date-year'
+const FIELD_END_MONTH = 'end-date-month'
+const FIELD_END_YEAR = 'end-date-year'
+
+const startEndCodes = new Set([START_MONTH, START_YEAR, END_MONTH, END_YEAR])
 
 const mapStartError = (hasMonth, hasYear) => {
   if (hasMonth && hasYear) {
     return {
       message: 'PREFERRED_START_DATE_REQUIRED',
-      path: ['start-date-month']
+      path: [FIELD_START_MONTH]
     }
   }
   if (hasMonth) {
-    return { message: START_MONTH, path: ['start-date-month'] }
+    return { message: START_MONTH, path: [FIELD_START_MONTH] }
   }
   if (hasYear) {
-    return { message: START_YEAR, path: ['start-date-year'] }
+    return { message: START_YEAR, path: [FIELD_START_YEAR] }
   }
   return null
 }
 
 const mapEndError = (hasMonth, hasYear) => {
   if (hasMonth && hasYear) {
-    return { message: 'PREFERRED_END_DATE_REQUIRED', path: ['end-date-month'] }
+    return { message: 'PREFERRED_END_DATE_REQUIRED', path: [FIELD_END_MONTH] }
   }
   if (hasMonth) {
-    return { message: END_MONTH, path: ['end-date-month'] }
+    return { message: END_MONTH, path: [FIELD_END_MONTH] }
   }
   if (hasYear) {
-    return { message: END_YEAR, path: ['end-date-year'] }
+    return { message: END_YEAR, path: [FIELD_END_YEAR] }
   }
   return null
 }
@@ -49,7 +54,7 @@ export const mapPreferredDatesErrors = (details) => {
   const hasEndMonth = details.some((d) => d.message === END_MONTH)
   const hasEndYear = details.some((d) => d.message === END_YEAR)
 
-  const otherDetails = details.filter((d) => !startEndCodes.includes(d.message))
+  const otherDetails = details.filter((d) => !startEndCodes.has(d.message))
   const mappedDetails = [
     mapStartError(hasStartMonth, hasStartYear),
     mapEndError(hasEndMonth, hasEndYear)
@@ -59,23 +64,23 @@ export const mapPreferredDatesErrors = (details) => {
 }
 
 export const validateDateRanges = (payload, now = new Date()) => {
-  const startMonth = parseInt(payload['start-date-month'], 10)
-  const startYear = parseInt(payload['start-date-year'], 10)
-  const endMonth = parseInt(payload['end-date-month'], 10)
-  const endYear = parseInt(payload['end-date-year'], 10)
+  const startMonth = Number.parseInt(payload[FIELD_START_MONTH], 10)
+  const startYear = Number.parseInt(payload[FIELD_START_YEAR], 10)
+  const endMonth = Number.parseInt(payload[FIELD_END_MONTH], 10)
+  const endYear = Number.parseInt(payload[FIELD_END_YEAR], 10)
   const details = []
 
   if (isMonthInPast(startYear, startMonth, now)) {
     details.push({
       message: 'PREFERRED_START_DATE_TODAY_OR_FUTURE',
-      path: ['start-date-month']
+      path: [FIELD_START_MONTH]
     })
   }
 
   if (isMonthInPast(endYear, endMonth, now)) {
     details.push({
       message: 'PREFERRED_END_DATE_TODAY_OR_FUTURE',
-      path: ['end-date-month']
+      path: [FIELD_END_MONTH]
     })
   }
 
@@ -86,7 +91,7 @@ export const validateDateRanges = (payload, now = new Date()) => {
     if (isEndDateBeforeStartDate(startDateStr, endDateStr)) {
       details.push({
         message: 'PREFERRED_END_DATE_BEFORE_START_DATE',
-        path: ['end-date-month']
+        path: [FIELD_END_MONTH]
       })
     }
   }

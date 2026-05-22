@@ -117,6 +117,31 @@ describe('#siteName', () => {
       )
     })
 
+    test('should redirect to review site details when action param is set and coordinatesType is not file', async () => {
+      vi.mocked(getMarineLicenceCache).mockReturnValueOnce({
+        ...mockMarineLicenceApplication,
+        siteDetails: [
+          {
+            ...mockMarineLicenceApplication.siteDetails[0],
+            coordinatesType: 'coordinates'
+          }
+        ]
+      })
+
+      const request = createMockRequest({
+        payload: { siteName: 'Test Site Name' },
+        query: { action: 'change' }
+      })
+
+      vi.mocked(saveSiteDetailsToBackend).mockResolvedValueOnce(undefined)
+
+      await siteNameSubmitController.handler(request, h)
+
+      expect(h.redirect).toHaveBeenCalledWith(
+        `${marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS}#site-details-1`
+      )
+    })
+
     test('should redirect to coordinates entry when coordinatesType is not file', async () => {
       vi.mocked(getMarineLicenceCache).mockReturnValueOnce({
         ...mockMarineLicenceApplication,
@@ -158,7 +183,7 @@ describe('#siteName', () => {
       expect(h.view).toHaveBeenCalledWith(SITE_NAME_VIEW_ROUTE, {
         pageTitle: 'Site name',
         heading: 'Site name',
-        backLink: marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS,
+        backLink: `${marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS}#site-details-1`,
         payload: { siteName: '' },
         projectName: 'Test Project',
         siteNumber: 1,
@@ -178,7 +203,7 @@ describe('#siteName', () => {
       expect(h.view).toHaveBeenCalledWith(SITE_NAME_VIEW_ROUTE, {
         pageTitle: 'Site name',
         heading: 'Site name',
-        backLink: marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS,
+        backLink: `${marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS}#site-details-1`,
         payload: { siteName: 'invalid' },
         projectName: 'Test Project',
         siteNumber: 1,
@@ -207,7 +232,7 @@ describe('#siteName', () => {
         SITE_NAME_VIEW_ROUTE,
         expect.objectContaining({
           action: true,
-          backLink: marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS
+          backLink: `${marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS}#site-details-1`
         })
       )
     })

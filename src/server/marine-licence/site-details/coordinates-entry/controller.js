@@ -1,6 +1,9 @@
 import {
   getMarineLicenceCache,
-  updateMarineLicenceSiteDetails
+  updateMarineLicenceSiteDetails,
+  updateMarineLicenceSiteDetailsMultiple,
+  getSavedSiteDetails,
+  setSavedSiteDetails
 } from '#src/server/common/helpers/marine-licence/session-cache/utils.js'
 import { getSiteDetailsBySite } from '#src/server/common/helpers/marine-licence/session-cache/site-details-utils.js'
 import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
@@ -12,12 +15,16 @@ import { coordinatesEntrySchema } from '#src/server/common/validation/coordinate
 import { createFailAction } from '#src/server/common/helpers/createFailAction.js'
 import { getSiteDataFromParam } from '#src/server/common/helpers/site-details/site-name.js'
 import { validateSiteParam } from '#src/server/common/helpers/marine-licence/session-cache/site-utils.js'
-import { getBackRoute } from './utils.js'
+import { getCancelLink } from '#src/server/marine-licence/site-details/utils/cancel-link.js'
+import { getSiteDetailsAnchor } from '#src/server/common/helpers/site-details/anchor-utils.js'
 
 export const MARINE_LICENCE_COORDINATES_ENTRY_VIEW_ROUTE =
   'templates/coordinates-entry'
 
-const cancelLink = `${marineLicenceRoutes.MARINE_LICENCE_TASK_LIST}?cancel=site-details`
+const getBackLink = (action, siteNumber) =>
+  action
+    ? `${marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS}${getSiteDetailsAnchor(siteNumber)}`
+    : marineLicenceRoutes.MARINE_LICENCE_SITE_NAME
 
 export const coordinatesEntryController = {
   options: {
@@ -31,8 +38,8 @@ export const coordinatesEntryController = {
 
     return h.view(MARINE_LICENCE_COORDINATES_ENTRY_VIEW_ROUTE, {
       ...coordinatesEntrySettings,
-      backLink: getBackRoute(),
-      cancelLink,
+      backLink: getBackLink(action, siteNumber),
+      cancelLink: getCancelLink(action),
       projectName: marineLicence.projectName,
       siteNumber,
       action,
@@ -57,10 +64,10 @@ export const coordinatesEntrySubmitController = {
           settings: coordinatesEntrySettings,
           errorMessages: coordinatesEntryErrorMessages,
           projectName,
-          backLink: getBackRoute(),
+          backLink: getBackLink(action, siteNumber),
           payload: request.payload,
           params: {
-            cancelLink,
+            cancelLink: getCancelLink(action),
             siteNumber,
             action
           }
@@ -70,7 +77,16 @@ export const coordinatesEntrySubmitController = {
   },
   async handler(request, h) {
     const { payload } = request
-    const { siteIndex } = getSiteDataFromParam(request.query)
+    const marineLicence = getMarineLicenceCache(request)
+    const { siteIndex, siteNumber } = getSiteDataFromParam(request.query)
+    const siteDetails = getSiteDetailsBySite(marineLicence, siteIndex)
+    const action = request.query.action
+
+    if (action && payload.coordinatesEntry === siteDetails.coordinatesEntry) {
+      return h.redirect(
+        `${marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS}${getSiteDetailsAnchor(siteNumber)}`
+      )
+    }
 
     await updateMarineLicenceSiteDetails(
       request,
@@ -79,6 +95,27 @@ export const coordinatesEntrySubmitController = {
       'coordinatesEntry',
       payload.coordinatesEntry
     )
+
+    if (action) {
+      const savedSiteDetails = getSavedSiteDetails(request)
+      await setSavedSiteDetails(request, h, {
+        ...savedSiteDetails,
+        ...(!savedSiteDetails.originalCoordinatesEntry && {
+          originalCoordinatesEntry: siteDetails.coordinatesEntry
+        }),
+        ...(!savedSiteDetails.originalCoordinateSystem && {
+          originalCoordinateSystem: siteDetails.coordinateSystem
+        })
+      })
+      await updateMarineLicenceSiteDetailsMultiple(request, h, siteIndex, {
+        coordinateSystem: null,
+        coordinates: null,
+        circleWidth: null
+      })
+      return h.redirect(
+        `${marineLicenceRoutes.MARINE_LICENCE_COORDINATE_SYSTEM_CHOICE}?site=${siteNumber}&action=${action}`
+      )
+    }
 
     return h.redirect(
       marineLicenceRoutes.MARINE_LICENCE_COORDINATE_SYSTEM_CHOICE

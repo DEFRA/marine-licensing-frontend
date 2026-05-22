@@ -7,6 +7,7 @@ import {
 } from '#src/server/marine-licence/preferred-dates/controller.js'
 import * as cacheUtils from '#src/server/common/helpers/marine-licence/session-cache/utils.js'
 import * as authRequests from '#src/server/common/helpers/authenticated-requests.js'
+import { createMockH } from '#src/server/test-helpers/mocks/helpers.js'
 
 vi.mock('#/src/server/common/helpers/marine-licence/session-cache/utils.js')
 
@@ -38,7 +39,7 @@ describe('#preferredDates', () => {
 
   describe('#preferredDatesController', () => {
     test('handler should render with correct context when cached dates exist', () => {
-      const h = { view: vi.fn() }
+      const h = createMockH()
 
       preferredDatesController.handler({}, h)
 
@@ -63,7 +64,7 @@ describe('#preferredDates', () => {
       vi.spyOn(cacheUtils, 'getMarineLicenceCache').mockReturnValueOnce({
         projectName: 'Test'
       })
-      const h = { view: vi.fn() }
+      const h = createMockH()
 
       preferredDatesController.handler({}, h)
 
@@ -86,10 +87,7 @@ describe('#preferredDates', () => {
       vi.spyOn(authRequests, 'authenticatedPatchRequest').mockRejectedValueOnce(
         thrownError
       )
-      const h = {
-        redirect: vi.fn().mockReturnValue({ takeover: vi.fn() }),
-        view: vi.fn()
-      }
+      const h = createMockH()
 
       await expect(
         preferredDatesSubmitController.handler(
@@ -109,10 +107,7 @@ describe('#preferredDates', () => {
     })
 
     test('Should correctly redirect to the task list on success', async () => {
-      const h = {
-        redirect: vi.fn().mockReturnValue({ takeover: vi.fn() }),
-        view: vi.fn()
-      }
+      const h = createMockH()
 
       await preferredDatesSubmitController.handler(
         {
@@ -159,10 +154,7 @@ describe('#preferredDates', () => {
         }
       )
 
-      const h = {
-        redirect: vi.fn().mockReturnValue({ takeover: vi.fn() }),
-        view: vi.fn()
-      }
+      const h = createMockH()
 
       await preferredDatesSubmitController.handler(
         {

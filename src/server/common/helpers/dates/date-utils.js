@@ -71,6 +71,12 @@ export function compareDates(date1, date2) {
   return 0
 }
 
+export function isMonthInPast(year, month, now = new Date()) {
+  const inputDate = dayjs.utc(`${year}-${String(month).padStart(2, '0')}-01`)
+  const currentMonth = dayjs.utc(now).startOf('month')
+  return inputDate.isBefore(currentMonth, 'month')
+}
+
 export function isEndDateBeforeStartDate(startDate, endDate) {
   const start = dayjs.utc(startDate)
   const end = dayjs.utc(endDate)

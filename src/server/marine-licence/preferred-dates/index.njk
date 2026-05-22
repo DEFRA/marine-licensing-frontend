@@ -45,7 +45,7 @@
           hint: {
             text: "For example, 7 " + currentYear
           },
-          errorMessage: errors['start-date'] if errors,
+          errorMessage: (errors['start-date-month'] or errors['start-date-year']) if errors,
           items: [
             {
               id: "start-date-month",
@@ -76,7 +76,7 @@
           hint: {
             text: "For example, 8 " + nextYear
           },
-          errorMessage: errors['end-date'] if errors,
+          errorMessage: (errors['end-date-month'] or errors['end-date-year']) if errors,
           items: [
             {
               id: "end-date-month",

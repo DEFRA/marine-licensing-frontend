@@ -5,6 +5,7 @@ import {
   formatDate,
   isValidDateComponents,
   isTodayOrFuture,
+  isMonthInPast,
   compareDates,
   isEndDateBeforeStartDate,
   createDayjsDate
@@ -183,6 +184,35 @@ describe('date-utils', () => {
     test('handles ISO string input', () => {
       const result = isTodayOrFuture('2025-06-16T00:00:00.000Z')
       expect(result).toBe(true)
+    })
+  })
+
+  describe('isMonthInPast', () => {
+    const MAY_2026 = new Date(2026, 4, 1)
+
+    test('returns true when month is in a past year', () => {
+      expect(isMonthInPast(2025, 12, MAY_2026)).toBe(true)
+    })
+
+    test('returns true when month is earlier in the same year', () => {
+      expect(isMonthInPast(2026, 4, MAY_2026)).toBe(true)
+    })
+
+    test('returns false when month is the current month (1st of month as now)', () => {
+      expect(isMonthInPast(2026, 5, MAY_2026)).toBe(false)
+    })
+
+    test('returns false when now is mid-month and input is the current month', () => {
+      const MAY_22_2026 = new Date(2026, 4, 22)
+      expect(isMonthInPast(2026, 5, MAY_22_2026)).toBe(false)
+    })
+
+    test('returns false when month is in the future', () => {
+      expect(isMonthInPast(2026, 6, MAY_2026)).toBe(false)
+    })
+
+    test('returns false when year is in the future', () => {
+      expect(isMonthInPast(2027, 1, MAY_2026)).toBe(false)
     })
   })
 

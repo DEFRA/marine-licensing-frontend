@@ -9,6 +9,13 @@ import {
 import { apiRoutes } from '#src/server/common/constants/routes.js'
 import { authenticatedPatchRequest } from '#src/server/common/helpers/authenticated-requests.js'
 import { getCommonRedirectLink } from '#src/server/common/helpers/marine-licence/redirect-link.js'
+import { createFailAction } from '#src/server/common/helpers/createFailAction.js'
+import { preferredDatesSchema } from '#src/server/marine-licence/preferred-dates/schema.js'
+import {
+  mapPreferredDatesErrors,
+  validateDateRanges
+} from '#src/server/marine-licence/preferred-dates/utils.js'
+import { preferredDatesErrorMessages } from '#src/server/marine-licence/preferred-dates/constants.js'
 
 export const PREFERRED_DATES_VIEW_ROUTE = 'marine-licence/preferred-dates/index'
 
@@ -51,9 +58,42 @@ export const preferredDatesController = {
 }
 
 export const preferredDatesSubmitController = {
+  options: {
+    validate: {
+      payload: preferredDatesSchema,
+      failAction: (request, h, err) => {
+        err.details = mapPreferredDatesErrors(err?.details)
+        const marineLicence = getMarineLicenceCache(request)
+        const currentYear = new Date().getFullYear()
+        return createFailAction({
+          viewRoute: PREFERRED_DATES_VIEW_ROUTE,
+          settings,
+          errorMessages: preferredDatesErrorMessages,
+          projectName: marineLicence.projectName,
+          backLink: getCommonRedirectLink(request),
+          payload: request.payload,
+          params: { currentYear, nextYear: currentYear + 1 }
+        })(request, h, err)
+      }
+    }
+  },
   async handler(request, h) {
     const { payload } = request
     const marineLicence = getMarineLicenceCache(request)
+
+    const dateRangeDetails = validateDateRanges(payload)
+    if (dateRangeDetails.length > 0) {
+      const currentYear = new Date().getFullYear()
+      return createFailAction({
+        viewRoute: PREFERRED_DATES_VIEW_ROUTE,
+        settings,
+        errorMessages: preferredDatesErrorMessages,
+        projectName: marineLicence.projectName,
+        backLink: getCommonRedirectLink(request),
+        payload,
+        params: { currentYear, nextYear: currentYear + 1 }
+      })(request, h, { details: dateRangeDetails })
+    }
 
     try {
       const start = {

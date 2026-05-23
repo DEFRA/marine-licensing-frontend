@@ -2,15 +2,11 @@ import { vi } from 'vitest'
 
 vi.mock('#src/services/iat-answers-service/iat-answers.service.js', () => ({
   iatAnswersService: {
-    create: vi.fn()
+    create: vi.fn(),
+    patch: vi.fn(),
+    publish: vi.fn()
   }
 }))
-vi.mock(
-  '#src/server/journey/self-service/services/iat-answers-payload.js',
-  () => ({
-    buildIatAnswersPayload: vi.fn()
-  })
-)
 
 import { JSDOM } from 'jsdom'
 import { statusCodes } from '#src/server/common/constants/status-codes.js'
@@ -21,23 +17,14 @@ import {
 } from '#src/server/test-helpers/server-requests.js'
 import { config } from '#src/config/config.js'
 import { iatAnswersService } from '#src/services/iat-answers-service/iat-answers.service.js'
-import { buildIatAnswersPayload } from '#src/server/journey/self-service/services/iat-answers-payload.js'
 
 const STUB_ANSWER_ID = 'AZ4rr6bLclCVUsE2Pl_zKw'
-const EXPECTED_ANSWER_PAGE_URL = `/journey/self-service/answer/${STUB_ANSWER_ID}`
+const EXPECTED_ANSWER_PAGE_URL = `/iat-answer/${STUB_ANSWER_ID}`
 
 beforeEach(() => {
-  vi.mocked(buildIatAnswersPayload).mockReturnValue({
-    outcome: { route: '/stub', typeId: '', summaryText: '' },
-    answers: [
-      {
-        questionRoute: '/stub-question',
-        questionText: 'stub',
-        answers: [{ id: 'a', text: 'stub' }]
-      }
-    ]
-  })
   vi.mocked(iatAnswersService.create).mockResolvedValue(STUB_ANSWER_ID)
+  vi.mocked(iatAnswersService.patch).mockResolvedValue(undefined)
+  vi.mocked(iatAnswersService.publish).mockResolvedValue(undefined)
 })
 
 describe('#outcomeController (integration)', () => {
@@ -541,12 +528,8 @@ describe('GET /journey/self-service/view-answers/:outcomeTypeId/:outcomePath', (
     })
     expect(response.statusCode).toBe(statusCodes.redirect)
     expect(response.headers.location).toBe(EXPECTED_ANSWER_PAGE_URL)
-    expect(buildIatAnswersPayload).toHaveBeenCalledWith(
-      expect.anything(),
-      '/markers/ha-not-agreed',
-      'WO_DOWNLOAD_HA_MARKERS_AGREED_METHOD_TEMPLATE'
-    )
-    expect(iatAnswersService.create).toHaveBeenCalledTimes(1)
+    expect(iatAnswersService.patch).toHaveBeenCalledTimes(1)
+    expect(iatAnswersService.publish).toHaveBeenCalledTimes(1)
   })
 
   test('returns 400 when the outcomeTypeId is not in the outcome', async () => {

@@ -1,15 +1,24 @@
 import {
   authenticatedGetRequest,
-  authenticatedPostRequest
+  authenticatedPostRequest,
+  authenticatedPatchRequest
 } from '#src/server/common/helpers/authenticated-requests.js'
 import { statusCodes } from '#src/server/common/constants/status-codes.js'
 
 const PATH = '/iat-answers'
 
 export const iatAnswersService = {
-  async create(request, body) {
-    const { payload } = await authenticatedPostRequest(request, PATH, body)
+  async create(request) {
+    const { payload } = await authenticatedPostRequest(request, PATH)
     return payload?.value?.slug ?? null
+  },
+
+  async patch(request, slug, body) {
+    await authenticatedPatchRequest(request, `${PATH}/${slug}`, body)
+  },
+
+  async publish(request, slug) {
+    await authenticatedPostRequest(request, `${PATH}/${slug}/publish`)
   },
 
   async get(request, slug) {

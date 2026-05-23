@@ -10,12 +10,12 @@ describe('journey self-service question route', () => {
     expect(server.route).toHaveBeenCalledWith([
       expect.objectContaining({
         method: 'GET',
-        path: '/journey/self-service/{questionPath*}',
+        path: '/journey/self-service/c/{slug}/{questionPath*}',
         options: expect.objectContaining({ auth: false })
       }),
       expect.objectContaining({
         method: 'POST',
-        path: '/journey/self-service/{questionPath*}',
+        path: '/journey/self-service/c/{slug}/{questionPath*}',
         options: expect.objectContaining({ auth: false })
       })
     ])

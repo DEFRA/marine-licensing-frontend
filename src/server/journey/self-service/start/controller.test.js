@@ -34,7 +34,9 @@ describe('iatStartPostController', () => {
 
     expect(iatAnswersService.create).toHaveBeenCalledWith(request)
     expect(redirect).toHaveBeenCalledWith(
-      expect.stringMatching(/^\/journey\/self-service\/c\/abcdefghijklmnopqrstuv\//)
+      expect.stringMatching(
+        /^\/journey\/self-service\/c\/abcdefghijklmnopqrstuv\//
+      )
     )
   })
 

@@ -55,7 +55,9 @@ export const questionController = {
       question,
       section,
       backLink: getBackLink(answers, slug, questionRoute, 'question'),
-      selectedAnswers: question.multiSelect ? [] : getAnswerForRoute(answers, questionRoute)
+      selectedAnswers: question.multiSelect
+        ? []
+        : getAnswerForRoute(answers, questionRoute)
     })
   }
 }
@@ -73,7 +75,10 @@ export const questionPostController = {
 
     if (submittedIds.length === 0) {
       return h
-        .view(VIEW_PATH, buildErrorView(question, slug, answers, questionRoute, isMulti))
+        .view(
+          VIEW_PATH,
+          buildErrorView(question, slug, answers, questionRoute, isMulti)
+        )
         .code(statusCodes.badRequest)
     }
 

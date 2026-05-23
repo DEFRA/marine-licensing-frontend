@@ -62,9 +62,9 @@ describe('iatAnswersService', () => {
         { output: { statusCode: 400 }, isBoom: true }
       )
       authenticatedPatchRequest.mockRejectedValue(boom400)
-      await expect(
-        iatAnswersService.patch(request, slug, {})
-      ).rejects.toBe(boom400)
+      await expect(iatAnswersService.patch(request, slug, {})).rejects.toBe(
+        boom400
+      )
     })
   })
 
@@ -84,9 +84,9 @@ describe('iatAnswersService', () => {
         { output: { statusCode: 500 }, isBoom: true }
       )
       authenticatedPostRequest.mockRejectedValue(boom500)
-      await expect(
-        iatAnswersService.publish(request, slug)
-      ).rejects.toBe(boom500)
+      await expect(iatAnswersService.publish(request, slug)).rejects.toBe(
+        boom500
+      )
     })
   })
 

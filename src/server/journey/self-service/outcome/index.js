@@ -34,7 +34,11 @@ export const journeySelfServiceOutcome = {
         {
           method: 'GET',
           path: routes.IAT_OUTCOME,
-          options: { auth: false, pre: [loadIatContext], validate: { params: outcomeParamsSchema } },
+          options: {
+            auth: false,
+            pre: [loadIatContext],
+            validate: { params: outcomeParamsSchema }
+          },
           ...outcomeController
         },
         {
@@ -55,7 +59,11 @@ export const journeySelfServiceOutcome = {
         {
           method: 'GET',
           path: routes.IAT_OUTCOME_VIEW_ANSWERS,
-          options: { auth: false, pre: [loadIatContext], validate: { params: viewAnswersParamsSchema } },
+          options: {
+            auth: false,
+            pre: [loadIatContext],
+            validate: { params: viewAnswersParamsSchema }
+          },
           ...outcomeViewAnswersController
         }
       ])

@@ -12,10 +12,16 @@ vi.mock('#src/server/journey/self-service/services/journey-data.js', () => ({
       return { mcmsAppFormMapping: 'ACTIVITY_TYPE', answers: [{ id: 'CON' }] }
     }
     if (route === '/exemption/construction') {
-      return { mcmsAppFormMapping: 'EXE_ACTIVITY_SUBTYPE_CONSTRUCTION', answers: [{ id: 'new' }] }
+      return {
+        mcmsAppFormMapping: 'EXE_ACTIVITY_SUBTYPE_CONSTRUCTION',
+        answers: [{ id: 'new' }]
+      }
     }
     if (route === '/construction/activity') {
-      return { mcmsAppFormMapping: 'ACTIVITY_SUBTYPE_CONSTRUCTION', answers: [{ id: 'CON_MNTN_FT' }] }
+      return {
+        mcmsAppFormMapping: 'ACTIVITY_SUBTYPE_CONSTRUCTION',
+        answers: [{ id: 'CON_MNTN_FT' }]
+      }
     }
     if (route === '/no-mapping') {
       return { mcmsAppFormMapping: null, answers: [{ id: 'X' }] }
@@ -24,7 +30,13 @@ vi.mock('#src/server/journey/self-service/services/journey-data.js', () => ({
   }),
   getOutcomeType: vi.fn((id) => {
     if (id === 'WO_EXE_AVAILABLE_ARTICLE_13') {
-      return { id, params: [{ name: 'ADV_TYPE', value: 'EXE' }, { name: 'ARTICLE', value: '13' }] }
+      return {
+        id,
+        params: [
+          { name: 'ADV_TYPE', value: 'EXE' },
+          { name: 'ARTICLE', value: '13' }
+        ]
+      }
     }
     if (id === 'WO_ENQUIRY') {
       return { id, params: [{ name: 'ADV_TYPE', value: 'ENQ' }] }
@@ -40,9 +52,17 @@ describe('getMappedAnswers', () => {
   it('emits {mapping: answerId} only for questions whose mcmsAppFormMapping is non-null', () => {
     const out = getMappedAnswers([
       { type: 'question', questionRoute: '/activity-type', answerIds: ['CON'] },
-      { type: 'question', questionRoute: '/exemption/construction', answerIds: ['new'] },
+      {
+        type: 'question',
+        questionRoute: '/exemption/construction',
+        answerIds: ['new']
+      },
       { type: 'question', questionRoute: '/no-mapping', answerIds: ['X'] },
-      { type: 'outcome', outcomeRoute: '/o', outcomeTypeId: 'WO_EXE_AVAILABLE_ARTICLE_13' }
+      {
+        type: 'outcome',
+        outcomeRoute: '/o',
+        outcomeTypeId: 'WO_EXE_AVAILABLE_ARTICLE_13'
+      }
     ])
     expect(out).toEqual({
       ACTIVITY_TYPE: 'CON',
@@ -52,7 +72,11 @@ describe('getMappedAnswers', () => {
 
   it('treats EXE and non-EXE subtype mappings identically (no special-casing)', () => {
     const out = getMappedAnswers([
-      { type: 'question', questionRoute: '/construction/activity', answerIds: ['CON_MNTN_FT'] }
+      {
+        type: 'question',
+        questionRoute: '/construction/activity',
+        answerIds: ['CON_MNTN_FT']
+      }
     ])
     expect(out).toEqual({ ACTIVITY_SUBTYPE_CONSTRUCTION: 'CON_MNTN_FT' })
   })
@@ -97,25 +121,31 @@ describe('getOutcomeContext', () => {
 
 describe('getChosenOutcomeTypeId', () => {
   it('returns the most recent outcome entry id', () => {
-    expect(getChosenOutcomeTypeId([
-      { type: 'outcome', outcomeRoute: '/a', outcomeTypeId: 'X' },
-      { type: 'question', questionRoute: '/q', answerIds: ['A'] },
-      { type: 'outcome', outcomeRoute: '/b', outcomeTypeId: 'Y' }
-    ])).toBe('Y')
+    expect(
+      getChosenOutcomeTypeId([
+        { type: 'outcome', outcomeRoute: '/a', outcomeTypeId: 'X' },
+        { type: 'question', questionRoute: '/q', answerIds: ['A'] },
+        { type: 'outcome', outcomeRoute: '/b', outcomeTypeId: 'Y' }
+      ])
+    ).toBe('Y')
   })
 
   it('returns null when no outcome has been picked', () => {
-    expect(getChosenOutcomeTypeId([
-      { type: 'question', questionRoute: '/q', answerIds: ['A'] }
-    ])).toBeNull()
+    expect(
+      getChosenOutcomeTypeId([
+        { type: 'question', questionRoute: '/q', answerIds: ['A'] }
+      ])
+    ).toBeNull()
   })
 })
 
 describe('buildHandoff', () => {
   it('returns null when no outcome is chosen', () => {
-    expect(buildHandoff({
-      answers: [{ type: 'question', questionRoute: '/q', answerIds: ['A'] }]
-    })).toBeNull()
+    expect(
+      buildHandoff({
+        answers: [{ type: 'question', questionRoute: '/q', answerIds: ['A'] }]
+      })
+    ).toBeNull()
   })
 
   it('returns null when doc is missing or has no answers', () => {
@@ -126,8 +156,16 @@ describe('buildHandoff', () => {
   it('combines outcome context, mapped answers, and a null answersUrl (AC5 deferred)', () => {
     const result = buildHandoff({
       answers: [
-        { type: 'question', questionRoute: '/activity-type', answerIds: ['CON'] },
-        { type: 'outcome', outcomeRoute: '/exemption/construction', outcomeTypeId: 'WO_EXE_AVAILABLE_ARTICLE_13' }
+        {
+          type: 'question',
+          questionRoute: '/activity-type',
+          answerIds: ['CON']
+        },
+        {
+          type: 'outcome',
+          outcomeRoute: '/exemption/construction',
+          outcomeTypeId: 'WO_EXE_AVAILABLE_ARTICLE_13'
+        }
       ]
     })
     expect(result).toEqual({

@@ -26,9 +26,18 @@ const TERMINAL_MULTI_TYPE_ID = 'WO_MOD_PERMISSION'
 
 const SLUG = 'abcdefghijklmnopqrstuv'
 
-function makeRequest({ outcomeRoute, answers = [], payload = {}, params = {} } = {}) {
+function makeRequest({
+  outcomeRoute,
+  answers = [],
+  payload = {},
+  params = {}
+} = {}) {
   return {
-    params: { slug: SLUG, outcomePath: outcomeRoute.replace(/^\//, ''), ...params },
+    params: {
+      slug: SLUG,
+      outcomePath: outcomeRoute.replace(/^\//, ''),
+      ...params
+    },
     app: { iatDoc: { slug: SLUG, answers, published: false } },
     payload,
     logger: { warn: vi.fn() }
@@ -98,7 +107,9 @@ describe('outcomePostController (intermediate)', () => {
       outcomeRoute: INTERMEDIATE_ROUTE,
       payload: { outcomeType: 'NOT_A_REAL_TYPE' }
     })
-    await expect(outcomePostController.handler(request, h)).rejects.toThrow(/Invalid outcome selection/)
+    await expect(outcomePostController.handler(request, h)).rejects.toThrow(
+      /Invalid outcome selection/
+    )
   })
 })
 
@@ -128,7 +139,9 @@ describe('outcomeViewAnswersController', () => {
       outcomeRoute: TERMINAL_SINGLE_ROUTE,
       params: { outcomeTypeId: 'NOT_A_REAL_TYPE' }
     })
-    await expect(outcomeViewAnswersController.handler(request, h)).rejects.toThrow(/Invalid outcome selection/)
+    await expect(
+      outcomeViewAnswersController.handler(request, h)
+    ).rejects.toThrow(/Invalid outcome selection/)
     expect(iatAnswersService.publish).not.toHaveBeenCalled()
   })
 })

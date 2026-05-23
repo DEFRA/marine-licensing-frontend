@@ -87,7 +87,10 @@ export const answerController = {
       introductionText: getDocumentPreambleText(),
       dateOfCheck: doc.createdAt,
       summaryText: summaryTextFor(chosen),
-      answers: answersLog.filter(isQuestion).map(buildAnswerDisplay).filter(Boolean)
+      answers: answersLog
+        .filter(isQuestion)
+        .map(buildAnswerDisplay)
+        .filter(Boolean)
     })
   }
 }

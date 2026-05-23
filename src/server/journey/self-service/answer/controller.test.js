@@ -12,9 +12,8 @@ vi.mock('#src/server/journey/self-service/services/journey-data.js', () => ({
   getOutcomeTypesForOutcome: vi.fn()
 }))
 
-const { iatAnswersService } = await import(
-  '#src/services/iat-answers-service/iat-answers.service.js'
-)
+const { iatAnswersService } =
+  await import('#src/services/iat-answers-service/iat-answers.service.js')
 const {
   getDocumentPreambleText,
   getQuestion,
@@ -63,7 +62,10 @@ describe('answerController', () => {
     iatAnswersService.get.mockResolvedValue(doc)
 
     const h = buildH()
-    await answerController.handler({ params: { slug: 'AZ4rr6bLclCVUsE2Pl_zKw' } }, h)
+    await answerController.handler(
+      { params: { slug: 'AZ4rr6bLclCVUsE2Pl_zKw' } },
+      h
+    )
 
     expect(h.view).toHaveBeenCalledWith(
       'journey/self-service/answer/index',
@@ -86,14 +88,19 @@ describe('answerController', () => {
   it('throws 404 when the doc is missing', async () => {
     iatAnswersService.get.mockResolvedValue(null)
     await expect(
-      answerController.handler({ params: { slug: 'AZ4rr6bLclCVUsE2Pl_zKw' } }, buildH())
+      answerController.handler(
+        { params: { slug: 'AZ4rr6bLclCVUsE2Pl_zKw' } },
+        buildH()
+      )
     ).rejects.toMatchObject({ output: { statusCode: 404 } })
   })
 
   it('returns empty summaryText when there is no outcome entry in the log', async () => {
     const doc = {
       createdAt: new Date('2026-05-23T10:00:00Z'),
-      answers: [{ type: 'question', questionRoute: '/sea', answerIds: ['inSea'] }]
+      answers: [
+        { type: 'question', questionRoute: '/sea', answerIds: ['inSea'] }
+      ]
     }
     iatAnswersService.get.mockResolvedValue(doc)
     getQuestion.mockReturnValue({
@@ -103,7 +110,10 @@ describe('answerController', () => {
     })
 
     const h = buildH()
-    await answerController.handler({ params: { slug: 'AZ4rr6bLclCVUsE2Pl_zKw' } }, h)
+    await answerController.handler(
+      { params: { slug: 'AZ4rr6bLclCVUsE2Pl_zKw' } },
+      h
+    )
 
     expect(h.view).toHaveBeenCalledWith(
       'journey/self-service/answer/index',
@@ -113,7 +123,10 @@ describe('answerController', () => {
 
   it('falls back to outcome.text when outcomeType has no text', async () => {
     getOutcomeType.mockReturnValue(null)
-    getOutcome.mockReturnValue({ text: 'Fallback outcome text', outcomeTypes: [] })
+    getOutcome.mockReturnValue({
+      text: 'Fallback outcome text',
+      outcomeTypes: []
+    })
     getOutcomeTypesForOutcome.mockReturnValue([])
 
     const doc = {
@@ -129,11 +142,17 @@ describe('answerController', () => {
     iatAnswersService.get.mockResolvedValue(doc)
 
     const h = buildH()
-    await answerController.handler({ params: { slug: 'AZ4rr6bLclCVUsE2Pl_zKw' } }, h)
+    await answerController.handler(
+      { params: { slug: 'AZ4rr6bLclCVUsE2Pl_zKw' } },
+      h
+    )
 
     expect(h.view).toHaveBeenCalledWith(
       'journey/self-service/answer/index',
-      expect.objectContaining({ summaryText: 'Fallback outcome text', answers: [] })
+      expect.objectContaining({
+        summaryText: 'Fallback outcome text',
+        answers: []
+      })
     )
   })
 
@@ -153,13 +172,20 @@ describe('answerController', () => {
       createdAt: new Date('2026-05-23T10:00:00Z'),
       answers: [
         { type: 'question', questionRoute: '/sea', answerIds: ['inSea'] },
-        { type: 'outcome', outcomeRoute: '/mod-permission', outcomeTypeId: 'WO_STANDARD_TRACK_MLA' }
+        {
+          type: 'outcome',
+          outcomeRoute: '/mod-permission',
+          outcomeTypeId: 'WO_STANDARD_TRACK_MLA'
+        }
       ]
     }
     iatAnswersService.get.mockResolvedValue(doc)
 
     const h = buildH()
-    await answerController.handler({ params: { slug: 'AZ4rr6bLclCVUsE2Pl_zKw' } }, h)
+    await answerController.handler(
+      { params: { slug: 'AZ4rr6bLclCVUsE2Pl_zKw' } },
+      h
+    )
 
     const [, viewModel] = h.view.mock.calls[0]
     expect(viewModel.answers).toHaveLength(1)

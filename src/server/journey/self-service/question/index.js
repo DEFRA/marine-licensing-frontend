@@ -41,7 +41,10 @@ export const journeySelfServiceQuestion = {
               params: paramsSchema,
               payload: Joi.object({
                 answer: Joi.string().max(100),
-                answers: Joi.array().items(Joi.string().min(1).max(100)).max(100).single()
+                answers: Joi.array()
+                  .items(Joi.string().min(1).max(100))
+                  .max(100)
+                  .single()
               }).oxor('answer', 'answers')
             }
           },

@@ -30,7 +30,10 @@ describe('loadIatContext', () => {
     iatAnswersService.get.mockResolvedValueOnce(doc)
 
     const result = await loadIatContext.method(request, h)
-    expect(iatAnswersService.get).toHaveBeenCalledWith(request, request.params.slug)
+    expect(iatAnswersService.get).toHaveBeenCalledWith(
+      request,
+      request.params.slug
+    )
     expect(request.app.iatDoc).toBe(doc)
     expect(result).toBe(h.continue)
   })
@@ -43,7 +46,11 @@ describe('loadIatContext', () => {
   })
 
   it('redirects to IAT_INVALID if the doc is published', async () => {
-    iatAnswersService.get.mockResolvedValueOnce({ slug: request.params.slug, published: true, answers: [] })
+    iatAnswersService.get.mockResolvedValueOnce({
+      slug: request.params.slug,
+      published: true,
+      answers: []
+    })
     await loadIatContext.method(request, h)
     expect(h.redirect).toHaveBeenCalledWith(routes.IAT_INVALID)
     expect(takeover).toHaveBeenCalled()

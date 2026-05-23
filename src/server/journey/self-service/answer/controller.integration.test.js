@@ -60,7 +60,8 @@ describe('#answerController (integration)', () => {
         { type: 'question', questionRoute: '/sea', answerIds: ['inSea'] },
         {
           type: 'outcome',
-          outcomeRoute: '/exemption/licence-not-required-exemption-available-article-7',
+          outcomeRoute:
+            '/exemption/licence-not-required-exemption-available-article-7',
           outcomeTypeId: 'WO_EXE_AVAILABLE_ARTICLE_7'
         }
       ]

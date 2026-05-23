@@ -114,7 +114,11 @@ async function renderTerminalSingle(request, h, baseModel, types, slug) {
   const [ot] = types
   logEmptyTextIfNeeded(request, ot)
   const answers = answersFromRequest(request)
-  const newAnswers = pushOutcomeSelection(answers, baseModel.outcomeRoute, ot.id)
+  const newAnswers = pushOutcomeSelection(
+    answers,
+    baseModel.outcomeRoute,
+    ot.id
+  )
   await iatAnswersService.patch(request, slug, { answers: newAnswers })
   return h.view(VIEW_PATH, buildTerminalSingleView(baseModel, ot))
 }
@@ -156,7 +160,13 @@ export const outcomeController = {
   }
 }
 
-function validateIntermediateChoice(outcomeTypeId, outcomeType, outcome, outcomeRoute, request) {
+function validateIntermediateChoice(
+  outcomeTypeId,
+  outcomeType,
+  outcome,
+  outcomeRoute,
+  request
+) {
   const validChoice =
     outcomeType &&
     outcome.outcomeTypes.includes(outcomeTypeId) &&
@@ -183,9 +193,19 @@ export const outcomePostController = {
     const outcomeTypeId = request.payload?.outcomeType
     const outcomeType = outcomeTypeId ? getOutcomeType(outcomeTypeId) : null
 
-    validateIntermediateChoice(outcomeTypeId, outcomeType, outcome, outcomeRoute, request)
+    validateIntermediateChoice(
+      outcomeTypeId,
+      outcomeType,
+      outcome,
+      outcomeRoute,
+      request
+    )
 
-    const newAnswers = pushOutcomeSelection(answers, outcomeRoute, outcomeTypeId)
+    const newAnswers = pushOutcomeSelection(
+      answers,
+      outcomeRoute,
+      outcomeTypeId
+    )
     await iatAnswersService.patch(request, slug, { answers: newAnswers })
 
     const target = outcomeType.nextQuestionRoute.replace(/^\//, '')
@@ -193,7 +213,13 @@ export const outcomePostController = {
   }
 }
 
-function validateOutcomeTypeId(outcomeTypeId, outcomeType, outcome, outcomeRoute, request) {
+function validateOutcomeTypeId(
+  outcomeTypeId,
+  outcomeType,
+  outcome,
+  outcomeRoute,
+  request
+) {
   if (!outcomeType || !outcome.outcomeTypes.includes(outcomeTypeId)) {
     reportRuntimeIssue(
       request,
@@ -213,10 +239,20 @@ export const outcomeViewAnswersController = {
     const outcomeTypeId = request.params.outcomeTypeId
     const outcomeType = outcomeTypeId ? getOutcomeType(outcomeTypeId) : null
 
-    validateOutcomeTypeId(outcomeTypeId, outcomeType, outcome, outcomeRoute, request)
+    validateOutcomeTypeId(
+      outcomeTypeId,
+      outcomeType,
+      outcome,
+      outcomeRoute,
+      request
+    )
 
     const answers = answersFromRequest(request)
-    const newAnswers = pushOutcomeSelection(answers, outcomeRoute, outcomeTypeId)
+    const newAnswers = pushOutcomeSelection(
+      answers,
+      outcomeRoute,
+      outcomeTypeId
+    )
     await iatAnswersService.patch(request, slug, { answers: newAnswers })
 
     await iatAnswersService.publish(request, slug)

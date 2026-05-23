@@ -12,7 +12,9 @@ describe('journey-answer-log', () => {
   describe('pushAnswer', () => {
     it('appends a new question entry', () => {
       const out = pushAnswer([], '/x', ['A'])
-      expect(out).toEqual([{ type: 'question', questionRoute: '/x', answerIds: ['A'] }])
+      expect(out).toEqual([
+        { type: 'question', questionRoute: '/x', answerIds: ['A'] }
+      ])
     })
 
     it('overwrites the existing answer for the same question, dropping later entries', () => {
@@ -22,7 +24,9 @@ describe('journey-answer-log', () => {
         { type: 'outcome', outcomeRoute: '/o', outcomeTypeId: 'WO' }
       ]
       const out = pushAnswer(log, '/x', ['C'])
-      expect(out).toEqual([{ type: 'question', questionRoute: '/x', answerIds: ['C'] }])
+      expect(out).toEqual([
+        { type: 'question', questionRoute: '/x', answerIds: ['C'] }
+      ])
     })
 
     it('returns a new array (does not mutate input)', () => {
@@ -36,7 +40,9 @@ describe('journey-answer-log', () => {
   describe('pushOutcomeSelection', () => {
     it('appends a new outcome entry', () => {
       const out = pushOutcomeSelection([], '/o', 'WO_TYPE')
-      expect(out).toEqual([{ type: 'outcome', outcomeRoute: '/o', outcomeTypeId: 'WO_TYPE' }])
+      expect(out).toEqual([
+        { type: 'outcome', outcomeRoute: '/o', outcomeTypeId: 'WO_TYPE' }
+      ])
     })
 
     it('overwrites the existing selection for the same outcome route', () => {
@@ -45,13 +51,17 @@ describe('journey-answer-log', () => {
         { type: 'question', questionRoute: '/x', answerIds: ['Z'] }
       ]
       const out = pushOutcomeSelection(log, '/o', 'B')
-      expect(out).toEqual([{ type: 'outcome', outcomeRoute: '/o', outcomeTypeId: 'B' }])
+      expect(out).toEqual([
+        { type: 'outcome', outcomeRoute: '/o', outcomeTypeId: 'B' }
+      ])
     })
   })
 
   describe('getAnswerForRoute', () => {
     it('returns the answerIds for the matching question, or [] if absent', () => {
-      const log = [{ type: 'question', questionRoute: '/x', answerIds: ['A', 'B'] }]
+      const log = [
+        { type: 'question', questionRoute: '/x', answerIds: ['A', 'B'] }
+      ]
       expect(getAnswerForRoute(log, '/x')).toEqual(['A', 'B'])
       expect(getAnswerForRoute(log, '/y')).toEqual([])
     })

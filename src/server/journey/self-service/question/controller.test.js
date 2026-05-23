@@ -9,7 +9,11 @@ vi.mock('#src/services/iat-answers-service/iat-answers.service.js', () => ({
 
 const SLUG = 'abcdefghijklmnopqrstuv'
 
-function makeRequest({ answers = [], payload = {}, questionRoute = '/activity-type' } = {}) {
+function makeRequest({
+  answers = [],
+  payload = {},
+  questionRoute = '/activity-type'
+} = {}) {
   return {
     params: { slug: SLUG, questionPath: questionRoute.replace(/^\//, '') },
     app: { iatDoc: { slug: SLUG, answers, published: false } },
@@ -29,7 +33,13 @@ describe('questionController GET', () => {
 
   it('reads request.app.iatDoc.answers (not yar) and renders the question with the matching selectedAnswers', () => {
     const request = makeRequest({
-      answers: [{ type: 'question', questionRoute: '/activity-type', answerIds: ['CON'] }]
+      answers: [
+        {
+          type: 'question',
+          questionRoute: '/activity-type',
+          answerIds: ['CON']
+        }
+      ]
     })
     questionController.handler(request, h)
     expect(view).toHaveBeenCalledWith(
@@ -41,13 +51,21 @@ describe('questionController GET', () => {
   it('builds backLink under the slug-prefixed URL', () => {
     // answers log has /activity-type as the previous step; current question is /sea
     const request = makeRequest({
-      answers: [{ type: 'question', questionRoute: '/activity-type', answerIds: ['CON'] }],
+      answers: [
+        {
+          type: 'question',
+          questionRoute: '/activity-type',
+          answerIds: ['CON']
+        }
+      ],
       questionRoute: '/sea'
     })
     questionController.handler(request, h)
     expect(view).toHaveBeenCalledWith(
       expect.any(String),
-      expect.objectContaining({ backLink: `/journey/self-service/c/${SLUG}/activity-type` })
+      expect.objectContaining({
+        backLink: `/journey/self-service/c/${SLUG}/activity-type`
+      })
     )
   })
 })
@@ -68,7 +86,10 @@ describe('questionPostController', () => {
     await questionPostController.handler(request, h)
     expect(view).toHaveBeenCalledWith(
       expect.any(String),
-      expect.objectContaining({ errors: expect.any(Object), selectedAnswers: [] })
+      expect.objectContaining({
+        errors: expect.any(Object),
+        selectedAnswers: []
+      })
     )
     expect(code).toHaveBeenCalledWith(statusCodes.badRequest)
     expect(iatAnswersService.patch).not.toHaveBeenCalled()
@@ -80,11 +101,15 @@ describe('questionPostController', () => {
       payload: { answer: 'CON' }
     })
     await questionPostController.handler(request, h)
-    expect(iatAnswersService.patch).toHaveBeenCalledWith(
-      request,
-      SLUG,
-      { answers: [{ type: 'question', questionRoute: '/activity-type', answerIds: ['CON'] }] }
-    )
+    expect(iatAnswersService.patch).toHaveBeenCalledWith(request, SLUG, {
+      answers: [
+        {
+          type: 'question',
+          questionRoute: '/activity-type',
+          answerIds: ['CON']
+        }
+      ]
+    })
     // CON on /activity-type has nextQuestionRoute: /exemption/construction (a question route).
     expect(redirect).toHaveBeenCalledWith(
       `/journey/self-service/c/${SLUG}/exemption/construction`
@@ -94,15 +119,28 @@ describe('questionPostController', () => {
   it('trims future answers when the user re-answers an earlier question', async () => {
     const request = makeRequest({
       answers: [
-        { type: 'question', questionRoute: '/activity-type', answerIds: ['DEPOSIT'] },
-        { type: 'question', questionRoute: '/deposit/method', answerIds: ['something'] }
+        {
+          type: 'question',
+          questionRoute: '/activity-type',
+          answerIds: ['DEPOSIT']
+        },
+        {
+          type: 'question',
+          questionRoute: '/deposit/method',
+          answerIds: ['something']
+        }
       ],
       payload: { answer: 'CON' }
     })
     await questionPostController.handler(request, h)
-    expect(iatAnswersService.patch).toHaveBeenCalledWith(
-      request, SLUG,
-      { answers: [{ type: 'question', questionRoute: '/activity-type', answerIds: ['CON'] }] }
-    )
+    expect(iatAnswersService.patch).toHaveBeenCalledWith(request, SLUG, {
+      answers: [
+        {
+          type: 'question',
+          questionRoute: '/activity-type',
+          answerIds: ['CON']
+        }
+      ]
+    })
   })
 })

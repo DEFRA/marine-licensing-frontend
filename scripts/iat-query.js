@@ -1,3 +1,26 @@
+/**
+ * IAT query CLI — read-only inspection of self-service.json.
+ *
+ * Usage:
+ *   npm run iat                              # prints usage
+ *   npm run iat -- <subcommand> [args] [--json]
+ *
+ * Subcommands:
+ *   question <route>                                  one question + answers + targets
+ *   outcome <route>                                   one outcome + inline outcomeTypes
+ *   outcome-type <id>                                 one outcomeType (params, link, module, nextQuestionRoute)
+ *   outcomes [--classify X] [--has-param N[=V]]       list outcomes filtered by classification/param
+ *   outcome-types [--has-param N[=V]] [--has-next-question]
+ *   questions [--mapping N] [--has-mapping]           list questions by mcmsAppFormMapping
+ *   mappings                                          distinct mappings + carrier question routes
+ *
+ * Every subcommand accepts --json for machine-readable output.
+ * Exit codes: 0 success, 1 not-found, 2 invalid args.
+ *
+ * Reuses journey-data.js's parsed/sanitised view so the CLI sees what the running app sees.
+ * Spec: reqs/ml-1306/2026-05-23-iat-query-cli-spec.md.
+ */
+
 import { parseArgs } from 'node:util'
 import {
   getJourneyData,

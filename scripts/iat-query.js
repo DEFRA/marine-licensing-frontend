@@ -9,12 +9,14 @@ import {
 import { classifyOutcome } from '../src/server/journey/self-service/outcome/utils.js'
 
 const EXCERPT_LEN = 60
+const MAX_TEXT_FOR_STRIP = 10000
 
 function excerpt(text) {
   if (!text) {
     return '-'
   }
-  const stripped = text.replace(/<[^>]+>/g, '').trim()
+  const bounded = text.length > MAX_TEXT_FOR_STRIP ? text.slice(0, MAX_TEXT_FOR_STRIP) : text
+  const stripped = bounded.replaceAll(/<[^>]+>/g, '').trim()
   if (stripped.length <= EXCERPT_LEN) {
     return stripped
   }
@@ -167,7 +169,7 @@ function outcomeTypeMatchesHasParam(ot, paramName, paramValue) {
     if (p.name !== paramName) {
       return false
     }
-    return paramValue === undefined || p.value === paramValue
+    return paramValue === null || p.value === paramValue
   })
 }
 
@@ -203,11 +205,11 @@ function runOutcomes(flags, json) {
 
 function parseHasParam(hasParam) {
   if (!hasParam) {
-    return { name: null, value: undefined }
+    return { name: null, value: null }
   }
   const eqIdx = hasParam.indexOf('=')
   if (eqIdx === -1) {
-    return { name: hasParam, value: undefined }
+    return { name: hasParam, value: null }
   }
   return { name: hasParam.slice(0, eqIdx), value: hasParam.slice(eqIdx + 1) }
 }
@@ -269,7 +271,7 @@ function runMappings(json) {
       mappingMap.set(q.mcmsAppFormMapping, [q.route])
     }
   }
-  const sortedKeys = [...mappingMap.keys()].sort()
+  const sortedKeys = [...mappingMap.keys()].sort((a, b) => a.localeCompare(b))
   if (json) {
     const doc = {}
     for (const key of sortedKeys) {
@@ -281,7 +283,7 @@ function runMappings(json) {
   return { stdout: lines.join('\n'), code: 0 }
 }
 
-function parseSingleArg(rest, name, usage) {
+function parseSingleArg(rest, usage) {
   const { values, positionals } = parseArgs({
     args: rest,
     options: { json: { type: 'boolean', default: false } },
@@ -295,7 +297,7 @@ function parseSingleArg(rest, name, usage) {
 }
 
 function dispatchQuestion(rest) {
-  const parsed = parseSingleArg(rest, 'route', 'Usage: iat-query question <route> [--json]')
+  const parsed = parseSingleArg(rest, 'Usage: iat-query question <route> [--json]')
   if (parsed.error) {
     return parsed.error
   }
@@ -303,7 +305,7 @@ function dispatchQuestion(rest) {
 }
 
 function dispatchOutcome(rest) {
-  const parsed = parseSingleArg(rest, 'route', 'Usage: iat-query outcome <route> [--json]')
+  const parsed = parseSingleArg(rest, 'Usage: iat-query outcome <route> [--json]')
   if (parsed.error) {
     return parsed.error
   }
@@ -311,7 +313,7 @@ function dispatchOutcome(rest) {
 }
 
 function dispatchOutcomeType(rest) {
-  const parsed = parseSingleArg(rest, 'id', 'Usage: iat-query outcome-type <id> [--json]')
+  const parsed = parseSingleArg(rest, 'Usage: iat-query outcome-type <id> [--json]')
   if (parsed.error) {
     return parsed.error
   }

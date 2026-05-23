@@ -11,7 +11,7 @@ export const journeySelfServiceAnswer = {
       server.route([
         {
           method: 'GET',
-          path: `${routes.IAT_ANSWER}/{slug}`,
+          path: routes.IAT_ANSWER,
           options: {
             auth: false,
             validate: {

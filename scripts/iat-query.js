@@ -281,105 +281,120 @@ function runMappings(json) {
   return { stdout: lines.join('\n'), code: 0 }
 }
 
+function parseSingleArg(rest, name, usage) {
+  const { values, positionals } = parseArgs({
+    args: rest,
+    options: { json: { type: 'boolean', default: false } },
+    allowPositionals: true
+  })
+  const arg = positionals[0]
+  if (!arg) {
+    return { error: { stdout: usage, code: 2 } }
+  }
+  return { arg, json: values.json }
+}
+
+function dispatchQuestion(rest) {
+  const parsed = parseSingleArg(rest, 'route', 'Usage: iat-query question <route> [--json]')
+  if (parsed.error) {
+    return parsed.error
+  }
+  return runQuestion(parsed.arg, parsed.json)
+}
+
+function dispatchOutcome(rest) {
+  const parsed = parseSingleArg(rest, 'route', 'Usage: iat-query outcome <route> [--json]')
+  if (parsed.error) {
+    return parsed.error
+  }
+  return runOutcome(parsed.arg, parsed.json)
+}
+
+function dispatchOutcomeType(rest) {
+  const parsed = parseSingleArg(rest, 'id', 'Usage: iat-query outcome-type <id> [--json]')
+  if (parsed.error) {
+    return parsed.error
+  }
+  return runOutcomeType(parsed.arg, parsed.json)
+}
+
+function dispatchOutcomes(rest) {
+  const { values } = parseArgs({
+    args: rest,
+    options: {
+      json: { type: 'boolean', default: false },
+      classify: { type: 'string' },
+      'has-param': { type: 'string' }
+    },
+    allowPositionals: false
+  })
+  return runOutcomes(
+    { classify: values.classify, hasParam: values['has-param'] },
+    values.json
+  )
+}
+
+function dispatchOutcomeTypes(rest) {
+  const { values } = parseArgs({
+    args: rest,
+    options: {
+      json: { type: 'boolean', default: false },
+      'has-param': { type: 'string' },
+      'has-next-question': { type: 'boolean', default: false }
+    },
+    allowPositionals: false
+  })
+  return runOutcomeTypes(
+    { hasParam: values['has-param'], hasNextQuestion: values['has-next-question'] },
+    values.json
+  )
+}
+
+function dispatchQuestions(rest) {
+  const { values } = parseArgs({
+    args: rest,
+    options: {
+      json: { type: 'boolean', default: false },
+      mapping: { type: 'string' },
+      'has-mapping': { type: 'boolean', default: false }
+    },
+    allowPositionals: false
+  })
+  return runQuestions(
+    { mapping: values.mapping, hasMapping: values['has-mapping'] },
+    values.json
+  )
+}
+
+function dispatchMappings(rest) {
+  const { values } = parseArgs({
+    args: rest,
+    options: { json: { type: 'boolean', default: false } },
+    allowPositionals: false
+  })
+  return runMappings(values.json)
+}
+
+const DISPATCH = {
+  question: dispatchQuestion,
+  outcome: dispatchOutcome,
+  'outcome-type': dispatchOutcomeType,
+  outcomes: dispatchOutcomes,
+  'outcome-types': dispatchOutcomeTypes,
+  questions: dispatchQuestions,
+  mappings: dispatchMappings
+}
+
 export function runCommand(argv) {
   const [subcommand, ...rest] = argv
   if (!subcommand) {
     return { stdout: 'Usage: iat-query <subcommand> [args] [--json]', code: 2 }
   }
-  switch (subcommand) {
-    case 'question': {
-      const { values, positionals } = parseArgs({
-        args: rest,
-        options: { json: { type: 'boolean', default: false } },
-        allowPositionals: true
-      })
-      const route = positionals[0]
-      if (!route) {
-        return { stdout: 'Usage: iat-query question <route> [--json]', code: 2 }
-      }
-      return runQuestion(route, values.json)
-    }
-    case 'outcome': {
-      const { values, positionals } = parseArgs({
-        args: rest,
-        options: { json: { type: 'boolean', default: false } },
-        allowPositionals: true
-      })
-      const route = positionals[0]
-      if (!route) {
-        return { stdout: 'Usage: iat-query outcome <route> [--json]', code: 2 }
-      }
-      return runOutcome(route, values.json)
-    }
-    case 'outcome-type': {
-      const { values, positionals } = parseArgs({
-        args: rest,
-        options: { json: { type: 'boolean', default: false } },
-        allowPositionals: true
-      })
-      const id = positionals[0]
-      if (!id) {
-        return { stdout: 'Usage: iat-query outcome-type <id> [--json]', code: 2 }
-      }
-      return runOutcomeType(id, values.json)
-    }
-    case 'outcomes': {
-      const { values } = parseArgs({
-        args: rest,
-        options: {
-          json: { type: 'boolean', default: false },
-          classify: { type: 'string' },
-          'has-param': { type: 'string' }
-        },
-        allowPositionals: false
-      })
-      return runOutcomes(
-        { classify: values.classify, hasParam: values['has-param'] },
-        values.json
-      )
-    }
-    case 'outcome-types': {
-      const { values } = parseArgs({
-        args: rest,
-        options: {
-          json: { type: 'boolean', default: false },
-          'has-param': { type: 'string' },
-          'has-next-question': { type: 'boolean', default: false }
-        },
-        allowPositionals: false
-      })
-      return runOutcomeTypes(
-        { hasParam: values['has-param'], hasNextQuestion: values['has-next-question'] },
-        values.json
-      )
-    }
-    case 'questions': {
-      const { values } = parseArgs({
-        args: rest,
-        options: {
-          json: { type: 'boolean', default: false },
-          mapping: { type: 'string' },
-          'has-mapping': { type: 'boolean', default: false }
-        },
-        allowPositionals: false
-      })
-      return runQuestions(
-        { mapping: values.mapping, hasMapping: values['has-mapping'] },
-        values.json
-      )
-    }
-    case 'mappings': {
-      const { values } = parseArgs({
-        args: rest,
-        options: { json: { type: 'boolean', default: false } },
-        allowPositionals: false
-      })
-      return runMappings(values.json)
-    }
-    default: {
-      return { stdout: `Unknown subcommand: ${subcommand}`, code: 2 }
-    }
+  const handler = DISPATCH[subcommand]
+  if (!handler) {
+    return { stdout: `Unknown subcommand: ${subcommand}`, code: 2 }
   }
+  return handler(rest)
 }
 
 const isMain =

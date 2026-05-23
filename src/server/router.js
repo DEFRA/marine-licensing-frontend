@@ -19,6 +19,7 @@ import { journeySelfServiceStart } from '#src/server/journey/self-service/start/
 import { journeySelfServiceQuestion } from '#src/server/journey/self-service/question/index.js'
 import { journeySelfServiceOutcome } from '#src/server/journey/self-service/outcome/index.js'
 import { journeySelfServiceAnswer } from '#src/server/journey/self-service/answer/index.js'
+import { journeySelfServiceInvalid } from '#src/server/journey/self-service/invalid/index.js'
 import { journeySelfServiceDataQualityInit } from '#src/server/journey/self-service/services/data-quality-init.js'
 
 export const router = {
@@ -54,6 +55,7 @@ export const router = {
           journeySelfServiceQuestion,
           journeySelfServiceOutcome,
           journeySelfServiceAnswer,
+          journeySelfServiceInvalid,
           journeySelfServiceDataQualityInit
         )
       }

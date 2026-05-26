@@ -1,9 +1,9 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { iatStartController, iatStartPostController } from './controller.js'
-import { iatAnswersService } from '#src/services/iat-answers-service/iat-answers.service.js'
+import { iatContextService } from '#src/services/iat-service/iat-context.service.js'
 
-vi.mock('#src/services/iat-answers-service/iat-answers.service.js', () => ({
-  iatAnswersService: { create: vi.fn() }
+vi.mock('#src/services/iat-service/iat-context.service.js', () => ({
+  iatContextService: { create: vi.fn() }
 }))
 
 describe('iatStartController GET', () => {
@@ -27,12 +27,12 @@ describe('iatStartPostController', () => {
     request = {}
   })
 
-  it('creates an iat-answers doc and redirects to the slug-prefixed first question', async () => {
-    iatAnswersService.create.mockResolvedValueOnce('abcdefghijklmnopqrstuv')
+  it('creates an iat-context and redirects to the slug-prefixed first question', async () => {
+    iatContextService.create.mockResolvedValueOnce('abcdefghijklmnopqrstuv')
 
     await iatStartPostController.handler(request, h)
 
-    expect(iatAnswersService.create).toHaveBeenCalledWith(request)
+    expect(iatContextService.create).toHaveBeenCalledWith(request)
     expect(redirect).toHaveBeenCalledWith(
       expect.stringMatching(
         /^\/journey\/self-service\/c\/abcdefghijklmnopqrstuv\//
@@ -41,7 +41,7 @@ describe('iatStartPostController', () => {
   })
 
   it('throws Boom.badImplementation if create returns no slug', async () => {
-    iatAnswersService.create.mockResolvedValueOnce(null)
+    iatContextService.create.mockResolvedValueOnce(null)
     await expect(iatStartPostController.handler(request, h)).rejects.toThrow()
   })
 })

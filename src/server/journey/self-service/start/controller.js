@@ -1,6 +1,6 @@
 import Boom from '@hapi/boom'
 import { getFirstQuestionRoute } from '#src/server/journey/self-service/services/journey-data.js'
-import { iatAnswersService } from '#src/services/iat-answers-service/iat-answers.service.js'
+import { iatContextService } from '#src/services/iat-service/iat-context.service.js'
 
 export const iatStartController = {
   handler(_request, h) {
@@ -21,9 +21,9 @@ export const iatStartController = {
 
 export const iatStartPostController = {
   async handler(request, h) {
-    const slug = await iatAnswersService.create(request)
+    const slug = await iatContextService.create(request)
     if (!slug) {
-      throw Boom.badImplementation('IAT answers create returned no slug')
+      throw Boom.badImplementation('IAT context create returned no slug')
     }
     const firstQuestion = getFirstQuestionRoute().replace(/^\//, '')
     return h.redirect(`/journey/self-service/c/${slug}/${firstQuestion}`)

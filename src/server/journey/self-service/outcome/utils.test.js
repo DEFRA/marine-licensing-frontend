@@ -96,13 +96,13 @@ describe('#buildTerminalSingleView — hasContinue', () => {
 })
 
 describe('#buildTerminalSingleView — viewAnswersUrl', () => {
-  test('builds /view-answers/<typeId>/<outcomeRoute-without-leading-slash>', () => {
+  test('builds /c/<slug>/view-answers/<typeId>/<outcomeRoute-without-leading-slash>', () => {
     const view = buildTerminalSingleView(
-      { heading: 'h', outcomeRoute: '/markers/ha-not-agreed' },
+      { heading: 'h', outcomeRoute: '/markers/ha-not-agreed', slug: 'abcdefghijklmnopqrstuv' },
       { id: 'WO_FOO' }
     )
     expect(view.viewAnswersUrl).toBe(
-      '/journey/self-service/view-answers/WO_FOO/markers/ha-not-agreed'
+      '/journey/self-service/c/abcdefghijklmnopqrstuv/view-answers/WO_FOO/markers/ha-not-agreed'
     )
   })
 })

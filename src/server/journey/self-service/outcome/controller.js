@@ -145,6 +145,7 @@ export const outcomeController = {
       pageTitle: heading,
       outcome,
       outcomeRoute,
+      slug,
       backLink: getBackLink(answers, slug, outcomeRoute, 'outcome')
     }
 

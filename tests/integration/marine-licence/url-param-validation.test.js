@@ -27,7 +27,8 @@ describe('Param validation', () => {
   ]
 
   const pagesWithSiteParamOnly = [
-    { url: marineLicenceRoutes.MARINE_LICENCE_CHANGE_SITE_LOCATION }
+    { url: marineLicenceRoutes.MARINE_LICENCE_CHANGE_SITE_LOCATION },
+    { url: marineLicenceRoutes.MARINE_LICENCE_DELETE_SITE }
   ]
 
   const expectsTaskListRedirect = async (requestUrl) => {

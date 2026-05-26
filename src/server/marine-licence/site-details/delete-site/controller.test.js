@@ -16,8 +16,8 @@ import {
 } from '#src/server/test-helpers/mocks/helpers.js'
 import { mockManualCoordinatesMarineLicence } from '#src/server/test-helpers/mocks/marine-licence-mocks.js'
 
-vi.mock('~/src/server/common/helpers/marine-licence/session-cache/utils.js')
-vi.mock('~/src/server/common/helpers/authenticated-requests.js')
+vi.mock('#src/server/common/helpers/marine-licence/session-cache/utils.js')
+vi.mock('#src/server/common/helpers/authenticated-requests.js')
 
 const mockWithTwoSites = {
   ...mockManualCoordinatesMarineLicence,

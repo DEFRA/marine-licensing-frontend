@@ -99,6 +99,19 @@ describe('ML Review Site Details - Polygon Coordinates Integration Tests', () =>
         `${marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS}#activity-details-site-1-activity-2`
       )
     })
+
+    test('should redirect to site name for new site when add is submitted', async () => {
+      const response = await makePostRequest({
+        url: marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS,
+        server: getServer(),
+        formData: { add: 'add' }
+      })
+
+      expect(response.statusCode).toBe(statusCodes.redirect)
+      expect(response.headers.location).toBe(
+        `${marineLicenceRoutes.MARINE_LICENCE_SITE_NAME}?site=2`
+      )
+    })
   })
 
   const getPageDocument = async (marineLicence) => {

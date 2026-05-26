@@ -102,9 +102,11 @@ function logMissingHeadingIfNeeded(request, outcomeRoute, outcome) {
 }
 
 function buildOutcomeAnswerPayload(outcomeRoute, outcome, outcomeType) {
+  const questionText =
+    outcomeType.text || outcome.heading || outcome.text || outcomeRoute
   return {
     questionRoute: outcomeRoute,
-    questionText: outcome.heading ?? '',
+    questionText,
     answers: [
       { id: outcomeType.id, text: outcomeType.heading ?? outcomeType.id }
     ],

@@ -109,6 +109,21 @@ describe('outcomePostController (intermediate)', () => {
     )
   })
 
+  it('records the chosen outcomeType.text as questionText and outcomeType.heading as the answer (matches MCMS)', async () => {
+    const request = makeRequest({
+      outcomeRoute: INTERMEDIATE_ROUTE,
+      payload: { outcomeType: INTERMEDIATE_TYPE_ID }
+    })
+    await outcomePostController.handler(request, h)
+    const payload = iatContextService.patch.mock.calls[0][2]
+    expect(payload.questionText).toMatch(
+      /Based on the information provided the selected activity is a licensable activity/
+    )
+    expect(payload.answers[0].text).toBe(
+      'Check to see if an exemption applies or notify the MMO about an exempt activity'
+    )
+  })
+
   it('throws Boom.badRequest if outcomeType is not a valid choice on this outcome', async () => {
     const request = makeRequest({
       outcomeRoute: INTERMEDIATE_ROUTE,

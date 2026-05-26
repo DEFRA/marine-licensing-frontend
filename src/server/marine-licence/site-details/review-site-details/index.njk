@@ -173,16 +173,18 @@
       {% endfor %}
 
       <form method="POST">
-        <input type="hidden" name="csrfToken" value="{{ csrfToken }}">
-        {{ govukButton({
-          text: "Add another site",
-          classes: "govuk-button--secondary",
-          attributes: {
-            name: "add",
-            value: "add",
-            type: "submit"
-          }
-        }) }}
+        <div class="govuk-!-margin-bottom-6">
+          <input type="hidden" name="csrfToken" value="{{ csrfToken }}">
+          {{ govukButton({
+            text: "Add another site",
+            classes: "govuk-button--secondary",
+            attributes: {
+              name: "add",
+              value: "add",
+              type: "submit"
+            }
+          }) }}
+        </div>
         <div class="govuk-button-group">
           {{ govukButton({
             text: "Continue",

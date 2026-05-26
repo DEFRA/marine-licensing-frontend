@@ -1,17 +1,17 @@
 import Joi from 'joi'
-import { answerController } from '#src/server/journey/self-service/answer/controller.js'
+import { outcomeDocumentController } from '#src/server/journey/self-service/outcome-document/controller.js'
 import { routes } from '#src/server/common/constants/routes.js'
 
 const SLUG_LENGTH = 22
 
-export const journeySelfServiceAnswer = {
+export const journeySelfServiceOutcomeDocument = {
   plugin: {
-    name: 'journeySelfServiceAnswer',
+    name: 'journeySelfServiceOutcomeDocument',
     register(server) {
       server.route([
         {
           method: 'GET',
-          path: routes.IAT_ANSWER,
+          path: routes.OUTCOME_DOCUMENT,
           options: {
             auth: false,
             validate: {
@@ -23,7 +23,7 @@ export const journeySelfServiceAnswer = {
               })
             }
           },
-          ...answerController
+          ...outcomeDocumentController
         }
       ])
     }

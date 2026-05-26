@@ -1,4 +1,5 @@
 import {
+  getDocumentPreambleText,
   getOutcomeTypesForOutcome,
   getSection
 } from '#src/server/journey/self-service/services/journey-data.js'
@@ -81,6 +82,7 @@ export function buildSnapshotPayload(outcome, outcomeRoute, outcomeTypeId) {
   }
 
   return {
+    preamble: getDocumentPreambleText() ?? '',
     outcomeRoute,
     outcomeKind: classifyOutcome(outcome),
     outcomeHeading: outcome.heading ?? '',

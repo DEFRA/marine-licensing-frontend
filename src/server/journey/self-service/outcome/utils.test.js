@@ -3,12 +3,16 @@ import { vi } from 'vitest'
 vi.mock('#src/server/journey/self-service/services/journey-data.js')
 
 import {
+  buildSnapshotPayload,
   buildTerminalMultiView,
   buildTerminalSingleView,
   classifyOutcome,
   ctaLabelFor
 } from '#src/server/journey/self-service/outcome/utils.js'
-import { getOutcomeTypesForOutcome } from '#src/server/journey/self-service/services/journey-data.js'
+import {
+  getDocumentPreambleText,
+  getOutcomeTypesForOutcome
+} from '#src/server/journey/self-service/services/journey-data.js'
 
 describe('#classifyOutcome', () => {
   test('returns "intermediate" when at least one outcomeType has nextQuestionRoute', () => {
@@ -119,5 +123,29 @@ describe('#buildTerminalMultiView — hasContinue per option', () => {
       { id: 'C', text: 'c', link: 'https://example.gov.uk/x.docx' }
     ])
     expect(view.options.map((o) => o.hasContinue)).toEqual([true, false, true])
+  })
+})
+
+describe('#buildSnapshotPayload — preamble', () => {
+  test('reads preamble from JSON via getDocumentPreambleText and freezes it into the payload', () => {
+    vi.mocked(getDocumentPreambleText).mockReturnValue('PREAMBLE-FROZEN')
+    vi.mocked(getOutcomeTypesForOutcome).mockReturnValue([
+      { id: 'X', module: 'M' }
+    ])
+    const payload = buildSnapshotPayload(
+      { heading: 'h', text: 't' },
+      '/some-outcome',
+      'X'
+    )
+    expect(payload.preamble).toBe('PREAMBLE-FROZEN')
+  })
+
+  test('falls back to empty string when JSON has no preamble', () => {
+    vi.mocked(getDocumentPreambleText).mockReturnValue(undefined)
+    vi.mocked(getOutcomeTypesForOutcome).mockReturnValue([
+      { id: 'X', module: 'M' }
+    ])
+    const payload = buildSnapshotPayload({}, '/some-outcome', 'X')
+    expect(payload.preamble).toBe('')
   })
 })

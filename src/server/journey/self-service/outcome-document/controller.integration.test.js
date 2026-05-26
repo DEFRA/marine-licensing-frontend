@@ -13,16 +13,21 @@ const { iatOutcomeDocumentService } =
 
 const ANSWER_SLUG = 'AZ4rr6bLclCVUsE2Pl_zKw'
 
+const PREAMBLE =
+  'The purpose of the MMO marine licence requirement checker tool is to assist prospective applicants to determine whether a marine licence is be required in order to carry out an activity.'
+
 const buildSnapshot = ({
   outcomeRoute,
   outcomeKind = 'terminal-single',
   outcomeHeading = '',
   outcomeText = '',
-  focusedOption
+  focusedOption,
+  preamble = PREAMBLE
 }) => ({
   slug: ANSWER_SLUG,
   contextSlug: 'a'.repeat(22),
   capturedAt: new Date('2026-05-01T12:00:00Z').toISOString(),
+  preamble,
   questionLog: [
     {
       questionRoute: '/sea',
@@ -179,7 +184,7 @@ describe('#outcomeDocumentController (integration)', () => {
     expect(document.querySelector('.app-border-bottom')).toBeNull()
   })
 
-  test('renders the static introduction text', async () => {
+  test('renders the introduction text from the frozen snapshot preamble', async () => {
     vi.mocked(iatOutcomeDocumentService.get).mockResolvedValueOnce(
       buildSnapshot({
         outcomeRoute: '/mod-permission',
@@ -202,7 +207,7 @@ describe('#outcomeDocumentController (integration)', () => {
     )
     expect(headings).toContain('Introduction')
     expect(document.body.textContent).toContain(
-      'This is a record of the questions you answered'
+      'The purpose of the MMO marine licence requirement checker tool'
     )
   })
 })

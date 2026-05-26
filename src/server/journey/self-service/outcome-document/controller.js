@@ -30,8 +30,7 @@ export const outcomeDocumentController = {
     return h.view(VIEW_PATH, {
       pageTitle: 'Marine licence requirement check',
       heading: 'Marine licence requirement check',
-      introductionText:
-        'This is a record of the questions you answered when checking whether you need a marine licence, and the recommendation you were given.',
+      introductionText: doc.preamble ?? '',
       dateOfCheck: doc.capturedAt,
       summaryText: doc.focusedOption?.text ?? '',
       answers: questionLog.map(buildAnswerDisplay).filter(Boolean)

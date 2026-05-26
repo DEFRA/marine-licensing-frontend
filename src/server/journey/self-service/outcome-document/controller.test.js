@@ -21,6 +21,8 @@ vi.mock('#src/server/journey/self-service/services/journey-data.js', () => ({
 const frozenDoc = {
   slug: 'b'.repeat(22),
   capturedAt: new Date('2026-05-26T10:00:00Z').toISOString(),
+  preamble:
+    'The purpose of the MMO marine licence requirement checker tool is to assist prospective applicants…',
   questionLog: [
     {
       questionRoute: '/activity-type',
@@ -109,6 +111,21 @@ describe('outcomeDocumentController', () => {
     await outcomeDocumentController.handler(request, h)
     const [, model] = h.view.mock.calls[0]
     expect(model.dateOfCheck).toBe(frozenDoc.capturedAt)
+  })
+
+  test('introductionText is read from the frozen snapshot preamble, not hardcoded or JSON-resolved', async () => {
+    iatOutcomeDocumentService.get.mockResolvedValue(frozenDoc)
+    await outcomeDocumentController.handler(request, h)
+    const [, model] = h.view.mock.calls[0]
+    expect(model.introductionText).toBe(frozenDoc.preamble)
+  })
+
+  test('introductionText falls back to empty string when preamble is missing', async () => {
+    const docNoPreamble = { ...frozenDoc, preamble: undefined }
+    iatOutcomeDocumentService.get.mockResolvedValue(docNoPreamble)
+    await outcomeDocumentController.handler(request, h)
+    const [, model] = h.view.mock.calls[0]
+    expect(model.introductionText).toBe('')
   })
 
   test('multi-select question renders all selected answers', async () => {

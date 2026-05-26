@@ -10,10 +10,15 @@ import * as authRequests from '#src/server/common/helpers/authenticated-requests
 import { createMockH } from '#src/server/test-helpers/mocks/helpers.js'
 
 vi.mock('#/src/server/common/helpers/marine-licence/session-cache/utils.js')
+vi.mock('#src/server/common/schemas/date-schema-utils.js', () => ({
+  threeMonthsFromNow: vi.fn().mockReturnValue('8 2026'),
+  fifteenMonthsFromNow: vi.fn().mockReturnValue('8 2027')
+}))
+
+const START_DATE_HINT = '8 2026'
+const END_DATE_HINT = '8 2027'
 
 describe('#preferredDates', () => {
-  let currentYear, nextYear
-
   const mockLicence = {
     projectName: 'Test Project',
     id: 'test-id',
@@ -24,9 +29,6 @@ describe('#preferredDates', () => {
   }
 
   beforeEach(() => {
-    currentYear = new Date().getFullYear()
-    nextYear = currentYear + 1
-
     vi.spyOn(authRequests, 'authenticatedPatchRequest').mockResolvedValue({
       payload: { id: mockLicence.id }
     })
@@ -47,9 +49,9 @@ describe('#preferredDates', () => {
         backLink: marineLicenceRoutes.MARINE_LICENCE_TASK_LIST,
         pageTitle:
           'What are your preferred start and end dates for the licence?',
-        currentYear,
+        startDateHint: START_DATE_HINT,
         heading: 'What are your preferred start and end dates for the licence?',
-        nextYear,
+        endDateHint: END_DATE_HINT,
         projectName: mockLicence.projectName,
         payload: {
           'start-date-month': '07',
@@ -72,9 +74,9 @@ describe('#preferredDates', () => {
         backLink: marineLicenceRoutes.MARINE_LICENCE_TASK_LIST,
         pageTitle:
           'What are your preferred start and end dates for the licence?',
-        currentYear,
+        startDateHint: START_DATE_HINT,
         heading: 'What are your preferred start and end dates for the licence?',
-        nextYear,
+        endDateHint: END_DATE_HINT,
         projectName: 'Test',
         payload: {}
       })

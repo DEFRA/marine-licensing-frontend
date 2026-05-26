@@ -16,6 +16,10 @@ import {
   validateDateRanges
 } from '#src/server/marine-licence/preferred-dates/utils.js'
 import { preferredDatesErrorMessages } from '#src/server/marine-licence/preferred-dates/constants.js'
+import {
+  fifteenMonthsFromNow,
+  threeMonthsFromNow
+} from '#src/server/common/schemas/date-schema-utils.js'
 
 export const PREFERRED_DATES_VIEW_ROUTE = 'marine-licence/preferred-dates/index'
 
@@ -41,7 +45,9 @@ export const preferredDatesController = {
   async handler(request, h) {
     const marineLicence = getMarineLicenceCache(request)
     const cached = marineLicence.preferredDates || {}
-    const currentYear = new Date().getFullYear()
+
+    const startDateHint = threeMonthsFromNow()
+    const endDateHint = fifteenMonthsFromNow()
 
     return h.view(PREFERRED_DATES_VIEW_ROUTE, {
       ...settings,
@@ -51,10 +57,25 @@ export const preferredDatesController = {
         ...parseDateToPayload(cached.end, 'end-date')
       },
       backLink: getCommonRedirectLink(request),
-      currentYear,
-      nextYear: currentYear + 1
+      startDateHint,
+      endDateHint
     })
   }
+}
+
+export const showErrorView = (request, h, err, marineLicence) => {
+  const startDateHint = threeMonthsFromNow()
+  const endDateHint = fifteenMonthsFromNow()
+
+  return createFailAction({
+    viewRoute: PREFERRED_DATES_VIEW_ROUTE,
+    settings,
+    errorMessages: preferredDatesErrorMessages,
+    projectName: marineLicence.projectName,
+    backLink: getCommonRedirectLink(request),
+    payload: request.payload,
+    params: { startDateHint, endDateHint }
+  })(request, h, err)
 }
 
 export const preferredDatesSubmitController = {
@@ -64,35 +85,23 @@ export const preferredDatesSubmitController = {
       failAction: (request, h, err) => {
         err.details = mapPreferredDatesErrors(err?.details)
         const marineLicence = getMarineLicenceCache(request)
-        const currentYear = new Date().getFullYear()
-        return createFailAction({
-          viewRoute: PREFERRED_DATES_VIEW_ROUTE,
-          settings,
-          errorMessages: preferredDatesErrorMessages,
-          projectName: marineLicence.projectName,
-          backLink: getCommonRedirectLink(request),
-          payload: request.payload,
-          params: { currentYear, nextYear: currentYear + 1 }
-        })(request, h, err)
+        return showErrorView(request, h, err, marineLicence)
       }
     }
   },
   async handler(request, h) {
     const { payload } = request
     const marineLicence = getMarineLicenceCache(request)
-    const currentYear = new Date().getFullYear()
 
     const dateRangeDetails = validateDateRanges(payload)
+
     if (dateRangeDetails.length > 0) {
-      return createFailAction({
-        viewRoute: PREFERRED_DATES_VIEW_ROUTE,
-        settings,
-        errorMessages: preferredDatesErrorMessages,
-        projectName: marineLicence.projectName,
-        backLink: getCommonRedirectLink(request),
-        payload,
-        params: { currentYear, nextYear: currentYear + 1 }
-      })(request, h, { details: dateRangeDetails })
+      return showErrorView(
+        request,
+        h,
+        { details: dateRangeDetails },
+        marineLicence
+      )
     }
 
     try {
@@ -135,13 +144,18 @@ export const preferredDatesSubmitController = {
       )
       const errors = errorDescriptionByFieldName(errorSummary)
 
+      const startDateHint = threeMonthsFromNow()
+      const endDateHint = fifteenMonthsFromNow()
+
       return h.view(PREFERRED_DATES_VIEW_ROUTE, {
         ...settings,
         payload,
         projectName: marineLicence.projectName,
         backLink: getCommonRedirectLink(request),
         errors,
-        errorSummary
+        errorSummary,
+        endDateHint,
+        startDateHint
       })
     }
   }

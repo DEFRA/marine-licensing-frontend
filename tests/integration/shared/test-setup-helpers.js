@@ -124,45 +124,56 @@ export const mockExemptionMcmsContext = (
 const DEFAULT_TEST_SLUG = 'abcdefghijklmnopqrstuv'
 
 /**
- * Configure the iat-answers-service mocks for IAT integration tests.
- * Pass in the mocked iatAnswersService (each test file does its own
+ * Configure the iat-context-service mocks for IAT integration tests.
+ * Pass in the mocked iatContextService (each test file does its own
  * vi.mock for hoisting) and an optional config object.
  *
- * Returns: { slug, doc, journeyUrl(path), answerUrl }
- * - slug: the stable slug used in URLs and returned from create()
- * - journeyUrl('/sea') → '/journey/self-service/c/{slug}/sea'
- * - answerUrl → '/iat-answer/{slug}'
+ * Returns: { slug, state, journeyUrl(path) }
  */
-export const mockIatAnswers = (
-  iatAnswersService,
-  {
-    slug = DEFAULT_TEST_SLUG,
-    answers = [],
-    published = false,
-    createdAt = new Date('2026-05-01T12:00:00Z')
-  } = {}
+export const mockIatContext = (
+  iatContextService,
+  { slug = DEFAULT_TEST_SLUG, questionLog = [] } = {}
 ) => {
-  const doc = { slug, published, answers: [...answers], createdAt }
-  vi.mocked(iatAnswersService.create).mockResolvedValue(slug)
-  vi.mocked(iatAnswersService.get).mockImplementation(() =>
-    Promise.resolve({ ...doc, answers: [...doc.answers] })
+  const state = { slug, questionLog: [...questionLog] }
+  vi.mocked(iatContextService.create).mockResolvedValue(slug)
+  vi.mocked(iatContextService.get).mockImplementation(() =>
+    Promise.resolve({ slug: state.slug, questionLog: [...state.questionLog] })
   )
-  vi.mocked(iatAnswersService.patch).mockImplementation(
-    (_request, _slug, body) => {
-      if (body && Array.isArray(body.answers)) {
-        doc.answers = body.answers
+  vi.mocked(iatContextService.patch).mockImplementation(
+    (_req, _slug, answer) => {
+      const idx = state.questionLog.findIndex(
+        (e) => e.questionRoute === answer.questionRoute
+      )
+      const entry = { ...answer, answeredAt: new Date() }
+      if (idx === -1) {
+        state.questionLog = [...state.questionLog, entry]
+      } else {
+        state.questionLog = [...state.questionLog.slice(0, idx), entry]
       }
-      return Promise.resolve(undefined)
+      return Promise.resolve({ questionLogLength: state.questionLog.length })
     }
   )
-  vi.mocked(iatAnswersService.publish).mockResolvedValue(undefined)
   return {
     slug,
-    doc,
+    state,
     journeyUrl: (path) =>
-      `/journey/self-service/c/${slug}${path.startsWith('/') ? path : `/${path}`}`,
-    answerUrl: `/iat-answer/${slug}`
+      `/journey/self-service/c/${slug}${path.startsWith('/') ? path : `/${path}`}`
   }
+}
+
+/**
+ * Configure the iat-outcome-document-service mocks for IAT integration tests.
+ * Pass in the mocked iatOutcomeDocumentService and a snapshot doc.
+ */
+export const mockOutcomeDocument = (iatOutcomeDocumentService, doc) => {
+  vi.mocked(iatOutcomeDocumentService.mint).mockResolvedValue({
+    slug: doc.slug,
+    viewUrl: `/outcome-documents/${doc.slug}`,
+    snapshot: doc
+  })
+  vi.mocked(iatOutcomeDocumentService.get).mockImplementation((_req, s) =>
+    Promise.resolve(s === doc.slug ? doc : null)
+  )
 }
 
 export const mockMarineLicence = (m) => {

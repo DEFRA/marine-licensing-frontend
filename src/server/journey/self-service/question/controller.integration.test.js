@@ -1,22 +1,21 @@
 import { vi } from 'vitest'
 
-vi.mock('#src/services/iat-answers-service/iat-answers.service.js', () => ({
-  iatAnswersService: {
+vi.mock('#src/services/iat-service/iat-context.service.js', () => ({
+  iatContextService: {
     create: vi.fn(),
     get: vi.fn(),
-    patch: vi.fn(),
-    publish: vi.fn()
+    patch: vi.fn()
   }
 }))
 
-const { iatAnswersService } =
-  await import('#src/services/iat-answers-service/iat-answers.service.js')
+const { iatContextService } =
+  await import('#src/services/iat-service/iat-context.service.js')
 
 import { JSDOM } from 'jsdom'
 import { statusCodes } from '#src/server/common/constants/status-codes.js'
 import {
   setupTestServer,
-  mockIatAnswers
+  mockIatContext
 } from '#tests/integration/shared/test-setup-helpers.js'
 import {
   makeGetRequest,
@@ -31,7 +30,7 @@ describe('#questionController (integration)', () => {
   let journey
 
   beforeEach(() => {
-    journey = mockIatAnswers(iatAnswersService)
+    journey = mockIatContext(iatContextService)
   })
 
   const getPage = async (path, headers = {}) => {
@@ -271,7 +270,7 @@ describe('#questionController (integration)', () => {
         formData: {},
         headers
       })
-      const newJourney = mockIatAnswers(iatAnswersService)
+      const newJourney = mockIatContext(iatContextService)
       const startHeaders = getSessionCookie(startResponse)
 
       const { document } = await getPage(

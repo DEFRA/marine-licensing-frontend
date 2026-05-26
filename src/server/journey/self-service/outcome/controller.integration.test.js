@@ -1,28 +1,38 @@
 import { vi } from 'vitest'
 
-vi.mock('#src/services/iat-answers-service/iat-answers.service.js', () => ({
-  iatAnswersService: {
+vi.mock('#src/services/iat-service/iat-context.service.js', () => ({
+  iatContextService: {
     create: vi.fn(),
     get: vi.fn(),
-    patch: vi.fn(),
-    publish: vi.fn()
+    patch: vi.fn()
+  }
+}))
+vi.mock('#src/services/iat-service/iat-outcome-document.service.js', () => ({
+  iatOutcomeDocumentService: {
+    mint: vi.fn(),
+    get: vi.fn()
   }
 }))
 
-const { iatAnswersService } =
-  await import('#src/services/iat-answers-service/iat-answers.service.js')
+const { iatContextService } =
+  await import('#src/services/iat-service/iat-context.service.js')
+const { iatOutcomeDocumentService } =
+  await import('#src/services/iat-service/iat-outcome-document.service.js')
 
 import { JSDOM } from 'jsdom'
 import { statusCodes } from '#src/server/common/constants/status-codes.js'
 import {
   setupTestServer,
-  mockIatAnswers
+  mockIatContext,
+  mockOutcomeDocument
 } from '#tests/integration/shared/test-setup-helpers.js'
 import {
   makeGetRequest,
   makePostRequest
 } from '#src/server/test-helpers/server-requests.js'
 import { config } from '#src/config/config.js'
+
+const NEW_SLUG = 'B'.repeat(22)
 
 describe('#outcomeController (integration)', () => {
   config.set('selfService.enabled', true)
@@ -31,7 +41,26 @@ describe('#outcomeController (integration)', () => {
   let journey
 
   beforeEach(() => {
-    journey = mockIatAnswers(iatAnswersService)
+    journey = mockIatContext(iatContextService)
+    mockOutcomeDocument(iatOutcomeDocumentService, {
+      slug: NEW_SLUG,
+      contextSlug: journey.slug,
+      capturedAt: new Date('2026-05-26T10:00:00Z').toISOString(),
+      questionLog: [],
+      outcomeRoute: '/placeholder',
+      outcomeKind: 'terminal-single',
+      outcomeHeading: '',
+      outcomeText: '',
+      focusedOption: {
+        id: 'PLACEHOLDER',
+        heading: '',
+        text: '',
+        module: null,
+        link: null,
+        overrideCtaButtonUrl: null,
+        params: null
+      }
+    })
   })
 
   const OUTCOME_JOURNEY_SELECT = '/construction/journey-select'
@@ -274,7 +303,7 @@ describe('#outcomeController (integration)', () => {
         formData: {},
         headers: postHeaders
       })
-      const newJourney = mockIatAnswers(iatAnswersService)
+      const newJourney = mockIatContext(iatContextService)
       const startHeaders = getSessionCookie(startPost)
 
       const { document } = await getPage(
@@ -282,7 +311,12 @@ describe('#outcomeController (integration)', () => {
         startHeaders
       )
       const backLink = document.querySelector('.govuk-back-link')
-      expect(backLink.getAttribute('href')).toBe('/journey/self-service/start')
+      // A fresh context has an empty questionLog, so the back link falls back
+      // to the slug-root URL (the "start of this slug's journey") rather than
+      // pointing into a stale prior selection.
+      expect(backLink.getAttribute('href')).toBe(
+        `/journey/self-service/c/${newJourney.slug}/`
+      )
     })
   })
 })
@@ -294,7 +328,26 @@ describe('GET terminal-single', () => {
   let journey
 
   beforeEach(() => {
-    journey = mockIatAnswers(iatAnswersService)
+    journey = mockIatContext(iatContextService)
+    mockOutcomeDocument(iatOutcomeDocumentService, {
+      slug: NEW_SLUG,
+      contextSlug: journey.slug,
+      capturedAt: new Date('2026-05-26T10:00:00Z').toISOString(),
+      questionLog: [],
+      outcomeRoute: '/placeholder',
+      outcomeKind: 'terminal-single',
+      outcomeHeading: '',
+      outcomeText: '',
+      focusedOption: {
+        id: 'PLACEHOLDER',
+        heading: '',
+        text: '',
+        module: null,
+        link: null,
+        overrideCtaButtonUrl: null,
+        params: null
+      }
+    })
   })
 
   const SINGLE_PATH =
@@ -370,7 +423,7 @@ describe('GET terminal-single', () => {
     )
   })
 
-  test('the rendered "View answers" link actually resolves end-to-end (publishes + redirects)', async () => {
+  test('the rendered "View answers" link actually resolves end-to-end (mints + redirects)', async () => {
     const { document } = await getPage(journey.journeyUrl(SINGLE_PATH))
     const href = Array.from(document.querySelectorAll('a.govuk-link'))
       .find((a) => a.textContent.includes('View answers'))
@@ -379,8 +432,8 @@ describe('GET terminal-single', () => {
     const response = await makeGetRequest({ url: href, server: getServer() })
 
     expect(response.statusCode).toBe(statusCodes.redirect)
-    expect(response.headers.location).toBe(journey.answerUrl)
-    expect(iatAnswersService.publish).toHaveBeenCalledTimes(1)
+    expect(response.headers.location).toBe(`/outcome-documents/${NEW_SLUG}`)
+    expect(iatOutcomeDocumentService.mint).toHaveBeenCalledTimes(1)
   })
 
   test('does not render any option cards', async () => {
@@ -411,7 +464,26 @@ describe('GET terminal-multi', () => {
   let journey
 
   beforeEach(() => {
-    journey = mockIatAnswers(iatAnswersService)
+    journey = mockIatContext(iatContextService)
+    mockOutcomeDocument(iatOutcomeDocumentService, {
+      slug: NEW_SLUG,
+      contextSlug: journey.slug,
+      capturedAt: new Date('2026-05-26T10:00:00Z').toISOString(),
+      questionLog: [],
+      outcomeRoute: '/placeholder',
+      outcomeKind: 'terminal-single',
+      outcomeHeading: '',
+      outcomeText: '',
+      focusedOption: {
+        id: 'PLACEHOLDER',
+        heading: '',
+        text: '',
+        module: null,
+        link: null,
+        overrideCtaButtonUrl: null,
+        params: null
+      }
+    })
   })
 
   const MULTI_PATH = '/outcome/scaffolding-impede-navigation'
@@ -512,7 +584,26 @@ describe('GET licence-not-required (terminal-single, info-only)', () => {
   let journey
 
   beforeEach(() => {
-    journey = mockIatAnswers(iatAnswersService)
+    journey = mockIatContext(iatContextService)
+    mockOutcomeDocument(iatOutcomeDocumentService, {
+      slug: NEW_SLUG,
+      contextSlug: journey.slug,
+      capturedAt: new Date('2026-05-26T10:00:00Z').toISOString(),
+      questionLog: [],
+      outcomeRoute: '/placeholder',
+      outcomeKind: 'terminal-single',
+      outcomeHeading: '',
+      outcomeText: '',
+      focusedOption: {
+        id: 'PLACEHOLDER',
+        heading: '',
+        text: '',
+        module: null,
+        link: null,
+        overrideCtaButtonUrl: null,
+        params: null
+      }
+    })
   })
 
   const ROUTE_PATH = '/outcome/licence-not-required-devolved'
@@ -582,7 +673,26 @@ describe('POST to a terminal outcome route', () => {
   let journey
 
   beforeEach(() => {
-    journey = mockIatAnswers(iatAnswersService)
+    journey = mockIatContext(iatContextService)
+    mockOutcomeDocument(iatOutcomeDocumentService, {
+      slug: NEW_SLUG,
+      contextSlug: journey.slug,
+      capturedAt: new Date('2026-05-26T10:00:00Z').toISOString(),
+      questionLog: [],
+      outcomeRoute: '/placeholder',
+      outcomeKind: 'terminal-single',
+      outcomeHeading: '',
+      outcomeText: '',
+      focusedOption: {
+        id: 'PLACEHOLDER',
+        heading: '',
+        text: '',
+        module: null,
+        link: null,
+        overrideCtaButtonUrl: null,
+        params: null
+      }
+    })
   })
 
   test('returns 404 (terminal pages have no POST handler behaviour)', async () => {
@@ -602,21 +712,39 @@ describe('GET /view-answers/:outcomeTypeId/:outcomePath', () => {
   let journey
 
   beforeEach(() => {
-    journey = mockIatAnswers(iatAnswersService)
+    journey = mockIatContext(iatContextService)
+    mockOutcomeDocument(iatOutcomeDocumentService, {
+      slug: NEW_SLUG,
+      contextSlug: journey.slug,
+      capturedAt: new Date('2026-05-26T10:00:00Z').toISOString(),
+      questionLog: [],
+      outcomeRoute: '/placeholder',
+      outcomeKind: 'terminal-single',
+      outcomeHeading: '',
+      outcomeText: '',
+      focusedOption: {
+        id: 'PLACEHOLDER',
+        heading: '',
+        text: '',
+        module: null,
+        link: null,
+        overrideCtaButtonUrl: null,
+        params: null
+      }
+    })
   })
 
   const VIEW_ANSWERS_PATH =
     '/view-answers/WO_DOWNLOAD_HA_MARKERS_AGREED_METHOD_TEMPLATE/markers/ha-not-agreed'
 
-  test('redirects to the slugged answer page returned by iatAnswersService.create', async () => {
+  test('redirects to the minted outcome-document page', async () => {
     const response = await makeGetRequest({
       url: journey.journeyUrl(VIEW_ANSWERS_PATH),
       server: getServer()
     })
     expect(response.statusCode).toBe(statusCodes.redirect)
-    expect(response.headers.location).toBe(journey.answerUrl)
-    expect(iatAnswersService.patch).toHaveBeenCalledTimes(1)
-    expect(iatAnswersService.publish).toHaveBeenCalledTimes(1)
+    expect(response.headers.location).toBe(`/outcome-documents/${NEW_SLUG}`)
+    expect(iatOutcomeDocumentService.mint).toHaveBeenCalledTimes(1)
   })
 
   test('returns 400 when the outcomeTypeId is not in the outcome', async () => {
@@ -627,7 +755,7 @@ describe('GET /view-answers/:outcomeTypeId/:outcomePath', () => {
       server: getServer()
     })
     expect(response.statusCode).toBe(statusCodes.badRequest)
-    expect(iatAnswersService.create).not.toHaveBeenCalled()
+    expect(iatOutcomeDocumentService.mint).not.toHaveBeenCalled()
   })
 
   test('returns 404 when the outcome route is unknown', async () => {
@@ -638,6 +766,6 @@ describe('GET /view-answers/:outcomeTypeId/:outcomePath', () => {
       server: getServer()
     })
     expect(response.statusCode).toBe(statusCodes.notFound)
-    expect(iatAnswersService.create).not.toHaveBeenCalled()
+    expect(iatOutcomeDocumentService.mint).not.toHaveBeenCalled()
   })
 })

@@ -4,10 +4,14 @@ import {
   outcomePostController,
   outcomeViewAnswersController
 } from './controller.js'
-import { iatAnswersService } from '#src/services/iat-answers-service/iat-answers.service.js'
+import { iatContextService } from '#src/services/iat-service/iat-context.service.js'
+import { iatOutcomeDocumentService } from '#src/services/iat-service/iat-outcome-document.service.js'
 
-vi.mock('#src/services/iat-answers-service/iat-answers.service.js', () => ({
-  iatAnswersService: { patch: vi.fn(), publish: vi.fn() }
+vi.mock('#src/services/iat-service/iat-context.service.js', () => ({
+  iatContextService: { patch: vi.fn() }
+}))
+vi.mock('#src/services/iat-service/iat-outcome-document.service.js', () => ({
+  iatOutcomeDocumentService: { mint: vi.fn() }
 }))
 
 // Real intermediate outcome: /construction/journey-select
@@ -18,6 +22,7 @@ const INTERMEDIATE_TYPE_ID = 'WO_CON_EXEMPTION_JOURNEY'
 // Real terminal-single outcome: /exemption/licence-required-no-exemption
 // outcomeType: WO_EXE_LICENCE_REQUIRED (no nextQuestionRoute)
 const TERMINAL_SINGLE_ROUTE = '/exemption/licence-required-no-exemption'
+const TERMINAL_SINGLE_TYPE_ID = 'WO_EXE_LICENCE_REQUIRED'
 
 // Real terminal-multi outcome: /mod-permission
 // outcomeTypes: WO_MOD_PERMISSION, WO_STANDARD_TRACK_MLA
@@ -28,7 +33,7 @@ const SLUG = 'abcdefghijklmnopqrstuv'
 
 function makeRequest({
   outcomeRoute,
-  answers = [],
+  questionLog = [],
   payload = {},
   params = {}
 } = {}) {
@@ -38,7 +43,7 @@ function makeRequest({
       outcomePath: outcomeRoute.replace(/^\//, ''),
       ...params
     },
-    app: { iatDoc: { slug: SLUG, answers, published: false } },
+    app: { iatDoc: { slug: SLUG, questionLog } },
     payload,
     logger: { warn: vi.fn() }
   }
@@ -48,7 +53,7 @@ describe('outcomeController GET', () => {
   let view, redirect, h
 
   beforeEach(() => {
-    iatAnswersService.patch.mockReset().mockResolvedValue(undefined)
+    iatContextService.patch.mockReset().mockResolvedValue(undefined)
     view = vi.fn()
     redirect = vi.fn()
     h = { view, redirect }
@@ -58,23 +63,18 @@ describe('outcomeController GET', () => {
     const request = makeRequest({ outcomeRoute: INTERMEDIATE_ROUTE })
     await outcomeController.handler(request, h)
     expect(view).toHaveBeenCalled()
-    expect(iatAnswersService.patch).not.toHaveBeenCalled()
+    expect(iatContextService.patch).not.toHaveBeenCalled()
   })
 
-  it('pushes the chosen outcomeTypeId and patches the doc on terminal-single', async () => {
+  it('patches the doc with the chosen outcomeType as an answer on terminal-single', async () => {
     const request = makeRequest({ outcomeRoute: TERMINAL_SINGLE_ROUTE })
     await outcomeController.handler(request, h)
-    expect(iatAnswersService.patch).toHaveBeenCalledWith(
+    expect(iatContextService.patch).toHaveBeenCalledWith(
       request,
       SLUG,
       expect.objectContaining({
-        answers: expect.arrayContaining([
-          expect.objectContaining({
-            type: 'outcome',
-            outcomeRoute: TERMINAL_SINGLE_ROUTE,
-            outcomeTypeId: expect.any(String)
-          })
-        ])
+        questionRoute: TERMINAL_SINGLE_ROUTE,
+        answers: [expect.objectContaining({ id: TERMINAL_SINGLE_TYPE_ID })]
       })
     )
     expect(view).toHaveBeenCalled()
@@ -85,18 +85,25 @@ describe('outcomePostController (intermediate)', () => {
   let redirect, h
 
   beforeEach(() => {
-    iatAnswersService.patch.mockReset().mockResolvedValue(undefined)
+    iatContextService.patch.mockReset().mockResolvedValue(undefined)
     redirect = vi.fn()
     h = { redirect }
   })
 
-  it('patches with the selected outcomeTypeId and redirects to slug-prefixed next route', async () => {
+  it('patches with the selected outcomeType as an answer and redirects to slug-prefixed next route', async () => {
     const request = makeRequest({
       outcomeRoute: INTERMEDIATE_ROUTE,
       payload: { outcomeType: INTERMEDIATE_TYPE_ID }
     })
     await outcomePostController.handler(request, h)
-    expect(iatAnswersService.patch).toHaveBeenCalled()
+    expect(iatContextService.patch).toHaveBeenCalledWith(
+      request,
+      SLUG,
+      expect.objectContaining({
+        questionRoute: INTERMEDIATE_ROUTE,
+        answers: [expect.objectContaining({ id: INTERMEDIATE_TYPE_ID })]
+      })
+    )
     expect(redirect).toHaveBeenCalledWith(
       expect.stringMatching(new RegExp(`^/journey/self-service/c/${SLUG}/`))
     )
@@ -117,21 +124,34 @@ describe('outcomeViewAnswersController', () => {
   let redirect, h
 
   beforeEach(() => {
-    iatAnswersService.patch.mockReset().mockResolvedValue(undefined)
-    iatAnswersService.publish.mockReset().mockResolvedValue(undefined)
+    iatContextService.patch.mockReset().mockResolvedValue(undefined)
+    iatOutcomeDocumentService.mint.mockReset()
     redirect = vi.fn()
     h = { redirect }
   })
 
-  it('patches the chosen outcomeTypeId, publishes, then redirects to /iat-answer/{slug}', async () => {
+  it('mints an outcome document and redirects to /outcome-documents/{newSlug}', async () => {
+    const newSlug = 'B'.repeat(22)
+    iatOutcomeDocumentService.mint.mockResolvedValue({
+      slug: newSlug,
+      viewUrl: `/outcome-documents/${newSlug}`,
+      snapshot: {}
+    })
+
     const request = makeRequest({
       outcomeRoute: TERMINAL_MULTI_ROUTE,
       params: { outcomeTypeId: TERMINAL_MULTI_TYPE_ID }
     })
     await outcomeViewAnswersController.handler(request, h)
-    expect(iatAnswersService.patch).toHaveBeenCalled()
-    expect(iatAnswersService.publish).toHaveBeenCalledWith(request, SLUG)
-    expect(redirect).toHaveBeenCalledWith(`/iat-answer/${SLUG}`)
+    expect(iatOutcomeDocumentService.mint).toHaveBeenCalledWith(
+      request,
+      SLUG,
+      expect.objectContaining({
+        outcomeRoute: TERMINAL_MULTI_ROUTE,
+        focusedOption: expect.objectContaining({ id: TERMINAL_MULTI_TYPE_ID })
+      })
+    )
+    expect(redirect).toHaveBeenCalledWith(`/outcome-documents/${newSlug}`)
   })
 
   it('throws Boom.badRequest if outcomeTypeId is not a valid type on this outcome', async () => {
@@ -142,6 +162,6 @@ describe('outcomeViewAnswersController', () => {
     await expect(
       outcomeViewAnswersController.handler(request, h)
     ).rejects.toThrow(/Invalid outcome selection/)
-    expect(iatAnswersService.publish).not.toHaveBeenCalled()
+    expect(iatOutcomeDocumentService.mint).not.toHaveBeenCalled()
   })
 })

@@ -6,24 +6,33 @@ import { runAxeChecks } from '#.vite/axe-helper.js'
 import { statusCodes } from '#src/server/common/constants/status-codes.js'
 import {
   setupTestServer,
-  mockIatAnswers
+  mockIatContext,
+  mockOutcomeDocument
 } from '#tests/integration/shared/test-setup-helpers.js'
 import { makeGetRequest } from '#src/server/test-helpers/server-requests.js'
 import { config } from '#src/config/config.js'
 
-vi.mock('#src/services/iat-answers-service/iat-answers.service.js', () => ({
-  iatAnswersService: {
+vi.mock('#src/services/iat-service/iat-context.service.js', () => ({
+  iatContextService: {
     create: vi.fn(),
     get: vi.fn(),
-    patch: vi.fn(),
-    publish: vi.fn()
+    patch: vi.fn()
+  }
+}))
+vi.mock('#src/services/iat-service/iat-outcome-document.service.js', () => ({
+  iatOutcomeDocumentService: {
+    mint: vi.fn(),
+    get: vi.fn()
   }
 }))
 
-const { iatAnswersService } =
-  await import('#src/services/iat-answers-service/iat-answers.service.js')
+const { iatContextService } =
+  await import('#src/services/iat-service/iat-context.service.js')
+const { iatOutcomeDocumentService } =
+  await import('#src/services/iat-service/iat-outcome-document.service.js')
 
 const TEST_SLUG = 'abcdefghijklmnopqrstuv'
+const OUTCOME_DOC_SLUG = 'AZ4rr6bLclCVUsE2Pl_zKw'
 
 const slugUrl = (path) =>
   `/journey/self-service/c/${TEST_SLUG}${path.startsWith('/') ? path : `/${path}`}`
@@ -62,7 +71,7 @@ const pages = [
     title: 'Scaffolding or access towers - impede safe or normal navigation'
   },
   {
-    url: `/iat-answer/${TEST_SLUG}`,
+    url: `/outcome-documents/${OUTCOME_DOC_SLUG}`,
     title: 'Marine licence requirement check'
   }
 ]
@@ -74,16 +83,48 @@ describe('IAT page accessibility (Axe)', () => {
   })
 
   beforeEach(() => {
-    mockIatAnswers(iatAnswersService, {
+    mockIatContext(iatContextService, {
       slug: TEST_SLUG,
-      answers: [
-        { type: 'question', questionRoute: '/sea', answerIds: ['inSea'] },
+      questionLog: [
         {
-          type: 'question',
+          questionRoute: '/sea',
+          questionText: 'Where will the activity take place?',
+          answers: [{ id: 'inSea', text: 'In the sea' }],
+          mcmsAppFormMapping: null
+        },
+        {
           questionRoute: '/jurisdiction',
-          answerIds: ['englishWaters']
+          questionText: 'Which waters will the activity take place in?',
+          answers: [{ id: 'englishWaters', text: 'English waters' }],
+          mcmsAppFormMapping: null
         }
       ]
+    })
+    mockOutcomeDocument(iatOutcomeDocumentService, {
+      slug: OUTCOME_DOC_SLUG,
+      contextSlug: TEST_SLUG,
+      capturedAt: new Date('2026-05-01T12:00:00Z').toISOString(),
+      questionLog: [
+        {
+          questionRoute: '/sea',
+          questionText: 'Where will the activity take place?',
+          answers: [{ id: 'inSea', text: 'In the sea' }],
+          mcmsAppFormMapping: null
+        }
+      ],
+      outcomeRoute: '/mod-permission',
+      outcomeKind: 'terminal-multi',
+      outcomeHeading: 'MOD permission',
+      outcomeText: '',
+      focusedOption: {
+        id: 'WO_STANDARD_TRACK_MLA',
+        heading: 'Apply for a standard marine licence',
+        text: '<p>You should apply for a standard track marine licence.</p>',
+        module: null,
+        link: null,
+        overrideCtaButtonUrl: null,
+        params: null
+      }
     })
   })
 

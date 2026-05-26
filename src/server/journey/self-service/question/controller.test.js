@@ -1,22 +1,22 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { questionController, questionPostController } from './controller.js'
-import { iatAnswersService } from '#src/services/iat-answers-service/iat-answers.service.js'
+import { iatContextService } from '#src/services/iat-service/iat-context.service.js'
 import { statusCodes } from '#src/server/common/constants/status-codes.js'
 
-vi.mock('#src/services/iat-answers-service/iat-answers.service.js', () => ({
-  iatAnswersService: { patch: vi.fn() }
+vi.mock('#src/services/iat-service/iat-context.service.js', () => ({
+  iatContextService: { patch: vi.fn() }
 }))
 
 const SLUG = 'abcdefghijklmnopqrstuv'
 
 function makeRequest({
-  answers = [],
+  questionLog = [],
   payload = {},
   questionRoute = '/activity-type'
 } = {}) {
   return {
     params: { slug: SLUG, questionPath: questionRoute.replace(/^\//, '') },
-    app: { iatDoc: { slug: SLUG, answers, published: false } },
+    app: { iatDoc: { slug: SLUG, questionLog } },
     payload,
     logger: { warn: vi.fn() }
   }
@@ -31,13 +31,13 @@ describe('questionController GET', () => {
     h = { view }
   })
 
-  it('reads request.app.iatDoc.answers (not yar) and renders the question with the matching selectedAnswers', () => {
+  it('reads request.app.iatDoc.questionLog (not yar) and renders the question with the matching selectedAnswers', () => {
     const request = makeRequest({
-      answers: [
+      questionLog: [
         {
-          type: 'question',
           questionRoute: '/activity-type',
-          answerIds: ['CON']
+          questionText: 'What kind?',
+          answers: [{ id: 'CON', text: 'Construction' }]
         }
       ]
     })
@@ -49,13 +49,13 @@ describe('questionController GET', () => {
   })
 
   it('builds backLink under the slug-prefixed URL', () => {
-    // answers log has /activity-type as the previous step; current question is /sea
+    // questionLog has /activity-type as the previous step; current question is /sea
     const request = makeRequest({
-      answers: [
+      questionLog: [
         {
-          type: 'question',
           questionRoute: '/activity-type',
-          answerIds: ['CON']
+          questionText: 'What kind?',
+          answers: [{ id: 'CON', text: 'Construction' }]
         }
       ],
       questionRoute: '/sea'
@@ -74,7 +74,7 @@ describe('questionPostController', () => {
   let view, code, redirect, h
 
   beforeEach(() => {
-    iatAnswersService.patch.mockReset().mockResolvedValue(undefined)
+    iatContextService.patch.mockReset().mockResolvedValue(undefined)
     code = vi.fn()
     view = vi.fn(() => ({ code }))
     redirect = vi.fn()
@@ -92,55 +92,49 @@ describe('questionPostController', () => {
       })
     )
     expect(code).toHaveBeenCalledWith(statusCodes.badRequest)
-    expect(iatAnswersService.patch).not.toHaveBeenCalled()
+    expect(iatContextService.patch).not.toHaveBeenCalled()
   })
 
-  it('patches the doc with the new answers log and redirects to the slug-prefixed next route', async () => {
+  it('patches the doc with the new answer and redirects to the slug-prefixed next route', async () => {
     const request = makeRequest({
-      answers: [],
+      questionLog: [],
       payload: { answer: 'CON' }
     })
     await questionPostController.handler(request, h)
-    expect(iatAnswersService.patch).toHaveBeenCalledWith(request, SLUG, {
-      answers: [
-        {
-          type: 'question',
-          questionRoute: '/activity-type',
-          answerIds: ['CON']
-        }
-      ]
-    })
+    expect(iatContextService.patch).toHaveBeenCalledWith(
+      request,
+      SLUG,
+      expect.objectContaining({
+        questionRoute: '/activity-type',
+        answers: [{ id: 'CON', text: 'Construction' }]
+      })
+    )
     // CON on /activity-type has nextQuestionRoute: /exemption/construction (a question route).
     expect(redirect).toHaveBeenCalledWith(
       `/journey/self-service/c/${SLUG}/exemption/construction`
     )
   })
 
-  it('trims future answers when the user re-answers an earlier question', async () => {
+  it('passes a single answer per PATCH call (backend handles append/truncate)', async () => {
     const request = makeRequest({
-      answers: [
+      questionLog: [
         {
-          type: 'question',
           questionRoute: '/activity-type',
-          answerIds: ['DEPOSIT']
+          questionText: 'What kind?',
+          answers: [{ id: 'DEPOSIT', text: 'Deposit' }]
         },
         {
-          type: 'question',
           questionRoute: '/deposit/method',
-          answerIds: ['something']
+          questionText: 'Method?',
+          answers: [{ id: 'something', text: 'Something' }]
         }
       ],
       payload: { answer: 'CON' }
     })
     await questionPostController.handler(request, h)
-    expect(iatAnswersService.patch).toHaveBeenCalledWith(request, SLUG, {
-      answers: [
-        {
-          type: 'question',
-          questionRoute: '/activity-type',
-          answerIds: ['CON']
-        }
-      ]
-    })
+    expect(iatContextService.patch).toHaveBeenCalledTimes(1)
+    const callArg = iatContextService.patch.mock.calls[0][2]
+    expect(callArg.questionRoute).toBe('/activity-type')
+    expect(callArg.answers).toEqual([{ id: 'CON', text: 'Construction' }])
   })
 })

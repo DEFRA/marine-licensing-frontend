@@ -126,3 +126,11 @@ export function createDateFieldsFromValue(dateValue) {
     year: components.year
   }
 }
+
+export function threeMonthsFromNow() {
+  return dayjs().add(3, 'month').format('M YYYY')
+}
+
+export function fifteenMonthsFromNow() {
+  return dayjs().add(15, 'month').format('M YYYY')
+}

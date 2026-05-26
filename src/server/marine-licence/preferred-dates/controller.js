@@ -19,7 +19,7 @@ import { preferredDatesErrorMessages } from '#src/server/marine-licence/preferre
 import {
   fifteenMonthsFromNow,
   threeMonthsFromNow
-} from '#src/server/common/schemas/date-schema-utils.js'
+} from '#src/server/common/helpers/dates/date-utils.js'
 
 export const PREFERRED_DATES_VIEW_ROUTE = 'marine-licence/preferred-dates/index'
 

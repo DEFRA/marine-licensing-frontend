@@ -1,7 +1,5 @@
 import { describe, expect, vi } from 'vitest'
 import {
-  fifteenMonthsFromNow,
-  threeMonthsFromNow,
   validateDatesNotInPast,
   validateDateTooFarApart,
   validateDateTooFarInFuture,
@@ -258,37 +256,4 @@ describe('#dateSchemaUtils', () => {
     })
   })
 
-  describe('threeMonthsFromNow', () => {
-    const HINT_MOCK_DATE = new Date('2026-05-26T10:00:00.000Z')
-
-    beforeAll(() => {
-      vi.useFakeTimers()
-      vi.setSystemTime(HINT_MOCK_DATE)
-    })
-
-    afterAll(() => {
-      vi.useRealTimers()
-    })
-
-    test('should return a date formatted as "M YYYY" three months from now', () => {
-      expect(threeMonthsFromNow()).toBe('8 2026')
-    })
-  })
-
-  describe('fifteenMonthsFromNow', () => {
-    const HINT_MOCK_DATE = new Date('2026-05-26T10:00:00.000Z')
-
-    beforeAll(() => {
-      vi.useFakeTimers()
-      vi.setSystemTime(HINT_MOCK_DATE)
-    })
-
-    afterAll(() => {
-      vi.useRealTimers()
-    })
-
-    test('should return a date formatted as "M YYYY" fifteen months from now', () => {
-      expect(fifteenMonthsFromNow()).toBe('8 2027')
-    })
-  })
 })

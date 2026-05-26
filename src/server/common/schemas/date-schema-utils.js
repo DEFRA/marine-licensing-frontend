@@ -95,11 +95,3 @@ export const validateDatesNotInPast = (startDate, endDate, today, helpers) => {
 
   return null
 }
-
-export const threeMonthsFromNow = () => {
-  return dayjs().add(3, 'month').format('M YYYY')
-}
-
-export const fifteenMonthsFromNow = () => {
-  return dayjs().add(15, 'month').format('M YYYY')
-}

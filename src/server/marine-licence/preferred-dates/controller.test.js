@@ -10,7 +10,8 @@ import * as authRequests from '#src/server/common/helpers/authenticated-requests
 import { createMockH } from '#src/server/test-helpers/mocks/helpers.js'
 
 vi.mock('#/src/server/common/helpers/marine-licence/session-cache/utils.js')
-vi.mock('#src/server/common/schemas/date-schema-utils.js', () => ({
+vi.mock('#src/server/common/helpers/dates/date-utils.js', async () => ({
+  ...(await vi.importActual('#src/server/common/helpers/dates/date-utils.js')),
   threeMonthsFromNow: vi.fn().mockReturnValue('8 2026'),
   fifteenMonthsFromNow: vi.fn().mockReturnValue('8 2027')
 }))

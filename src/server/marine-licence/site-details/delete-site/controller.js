@@ -20,11 +20,7 @@ export const deleteSiteController = {
   handler(request, h) {
     const marineLicence = getMarineLicenceCache(request)
     const { siteNumber, siteIndex } = getSiteDataFromParam(request.query)
-    const siteDetails = marineLicence.siteDetails?.[siteIndex]
-
-    if (!siteDetails) {
-      return h.redirect(marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS)
-    }
+    const siteDetails = marineLicence.siteDetails[siteIndex]
 
     return h.view(DELETE_SITE_VIEW_ROUTE, {
       pageTitle: DELETE_SITE_PAGE_TITLE,

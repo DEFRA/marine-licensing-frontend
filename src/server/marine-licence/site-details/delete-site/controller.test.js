@@ -52,22 +52,6 @@ describe('deleteSiteController', () => {
         marineLicenceRoutes
       })
     })
-
-    it('should redirect to review site details when site is not found', () => {
-      vi.mocked(cacheUtils.getMarineLicenceCache).mockReturnValue({
-        ...mockManualCoordinatesMarineLicence,
-        siteDetails: []
-      })
-      const request = createMockRequest({ query: { site: '1' } })
-      const h = createMockH()
-
-      deleteSiteController.handler(request, h)
-
-      expect(h.redirect).toHaveBeenCalledWith(
-        marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS
-      )
-      expect(h.view).not.toHaveBeenCalled()
-    })
   })
 
   describe('POST handler', () => {

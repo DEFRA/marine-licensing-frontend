@@ -46,7 +46,7 @@ describe('Delete site', () => {
     )
   })
 
-  test('should redirect to tast list when site is not found', async () => {
+  test('should redirect to task list when site param is out of range', async () => {
     const response = await makeGetRequest({
       url: `${marineLicenceRoutes.MARINE_LICENCE_DELETE_SITE}?site=99`,
       server: getServer()

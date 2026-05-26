@@ -132,7 +132,8 @@ export const renderManualEntryReview = (h, options) => {
     ...reviewSiteDetailsPageData,
     backLink: getManualEntryBackLink(previousPage, returnToCheckYourAnswers),
     projectName: marineLicence.projectName,
-    summaryData
+    summaryData,
+    marineLicenceRoutes
   })
 }
 

@@ -5,32 +5,23 @@ import {
   getOutcomeTypesForOutcome,
   isIntermediateOutcome
 } from '#src/server/journey/self-service/services/journey-data.js'
-import {
-  getBackLink,
-  pushOutcomeSelection
-} from '#src/server/journey/self-service/services/journey-answer-log.js'
+import { getBackLink } from '#src/server/journey/self-service/services/journey-answer-log.js'
 import { reportRuntimeIssue } from '#src/server/journey/self-service/services/data-quality.js'
 import {
   buildIntermediateView,
+  buildSnapshotPayload,
   buildTerminalMultiView,
   buildTerminalSingleView,
   classifyOutcome,
   outcomeRouteFromRequest
 } from '#src/server/journey/self-service/outcome/utils.js'
-import { iatAnswersService } from '#src/services/iat-answers-service/iat-answers.service.js'
+import { iatContextService } from '#src/services/iat-service/iat-context.service.js'
+import { iatOutcomeDocumentService } from '#src/services/iat-service/iat-outcome-document.service.js'
 
 const VIEW_PATH = 'journey/self-service/outcome/index'
 
 function slugFromRequest(request) {
   return request.params.slug
-}
-
-function answersFromRequest(request) {
-  return request.app.iatDoc?.answers ?? []
-}
-
-function answerUrlFor(slug) {
-  return `/iat-answer/${slug}`
 }
 
 function loadOutcome(request) {
@@ -110,16 +101,25 @@ function logMissingHeadingIfNeeded(request, outcomeRoute, outcome) {
   )
 }
 
+function buildOutcomeAnswerPayload(outcomeRoute, outcome, outcomeType) {
+  return {
+    questionRoute: outcomeRoute,
+    questionText: outcome.heading ?? '',
+    answers: [
+      { id: outcomeType.id, text: outcomeType.heading ?? outcomeType.id }
+    ],
+    mcmsAppFormMapping: null
+  }
+}
+
 async function renderTerminalSingle(request, h, baseModel, types, slug) {
   const [ot] = types
   logEmptyTextIfNeeded(request, ot)
-  const answers = answersFromRequest(request)
-  const newAnswers = pushOutcomeSelection(
-    answers,
-    baseModel.outcomeRoute,
-    ot.id
+  await iatContextService.patch(
+    request,
+    slug,
+    buildOutcomeAnswerPayload(baseModel.outcomeRoute, baseModel.outcome, ot)
   )
-  await iatAnswersService.patch(request, slug, { answers: newAnswers })
   return h.view(VIEW_PATH, buildTerminalSingleView(baseModel, ot))
 }
 
@@ -134,7 +134,6 @@ export const outcomeController = {
   async handler(request, h) {
     const { outcomeRoute, outcome, types } = loadOutcomeForGet(request)
     const slug = slugFromRequest(request)
-    const answers = answersFromRequest(request)
     const classification = classifyOutcome(outcome)
     logMissingHeadingIfNeeded(request, outcomeRoute, outcome)
     const heading = outcome.heading ?? 'Result'
@@ -146,7 +145,7 @@ export const outcomeController = {
       outcome,
       outcomeRoute,
       slug,
-      backLink: getBackLink(answers, slug, outcomeRoute, 'outcome')
+      backLink: getBackLink(request, slug, outcomeRoute)
     }
 
     if (classification === 'intermediate') {
@@ -189,7 +188,6 @@ export const outcomePostController = {
   async handler(request, h) {
     const { outcomeRoute, outcome } = loadIntermediateOutcome(request)
     const slug = slugFromRequest(request)
-    const answers = answersFromRequest(request)
 
     const outcomeTypeId = request.payload?.outcomeType
     const outcomeType = outcomeTypeId ? getOutcomeType(outcomeTypeId) : null
@@ -202,12 +200,11 @@ export const outcomePostController = {
       request
     )
 
-    const newAnswers = pushOutcomeSelection(
-      answers,
-      outcomeRoute,
-      outcomeTypeId
+    await iatContextService.patch(
+      request,
+      slug,
+      buildOutcomeAnswerPayload(outcomeRoute, outcome, outcomeType)
     )
-    await iatAnswersService.patch(request, slug, { answers: newAnswers })
 
     const target = outcomeType.nextQuestionRoute.replace(/^\//, '')
     return h.redirect(`/journey/self-service/c/${slug}/${target}`)
@@ -248,15 +245,11 @@ export const outcomeViewAnswersController = {
       request
     )
 
-    const answers = answersFromRequest(request)
-    const newAnswers = pushOutcomeSelection(
-      answers,
-      outcomeRoute,
-      outcomeTypeId
-    )
-    await iatAnswersService.patch(request, slug, { answers: newAnswers })
-
-    await iatAnswersService.publish(request, slug)
-    return h.redirect(answerUrlFor(slug))
+    const payload = buildSnapshotPayload(outcome, outcomeRoute, outcomeTypeId)
+    const minted = await iatOutcomeDocumentService.mint(request, slug, payload)
+    if (!minted?.slug) {
+      throw Boom.badImplementation('outcome-document mint returned no slug')
+    }
+    return h.redirect(`/outcome-documents/${minted.slug}`)
   }
 }

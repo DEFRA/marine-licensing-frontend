@@ -73,6 +73,30 @@ export function buildTerminalSingleView(baseModel, terminalType) {
   }
 }
 
+export function buildSnapshotPayload(outcome, outcomeRoute, outcomeTypeId) {
+  const all = getOutcomeTypesForOutcome(outcome)
+  const focused = all.find((ot) => ot.id === outcomeTypeId)
+  if (!focused) {
+    throw new Error(`Unknown outcomeTypeId: ${outcomeTypeId}`)
+  }
+
+  return {
+    outcomeRoute,
+    outcomeKind: classifyOutcome(outcome),
+    outcomeHeading: outcome.heading ?? '',
+    outcomeText: outcome.text ?? '',
+    focusedOption: {
+      id: focused.id,
+      heading: focused.heading ?? '',
+      text: focused.text ?? '',
+      module: focused.module ?? null,
+      link: focused.link ?? null,
+      overrideCtaButtonUrl: focused.overrideCtaButtonUrl ?? null,
+      params: focused.params ?? null
+    }
+  }
+}
+
 export function buildTerminalMultiView(baseModel, types) {
   return {
     ...baseModel,

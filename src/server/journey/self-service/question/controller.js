@@ -1,8 +1,7 @@
 import { getSection } from '#src/server/journey/self-service/services/journey-data.js'
 import { calculateNextRoute } from '#src/server/journey/self-service/services/journey-router.js'
 import {
-  getAnswerForRoute,
-  pushAnswer,
+  getSelectedAnswerIdsForRoute,
   getBackLink
 } from '#src/server/journey/self-service/services/journey-answer-log.js'
 import { statusCodes } from '#src/server/common/constants/status-codes.js'
@@ -12,14 +11,10 @@ import {
   toArray,
   VIEW_PATH
 } from '#src/server/journey/self-service/question/utils.js'
-import { iatAnswersService } from '#src/services/iat-answers-service/iat-answers.service.js'
+import { iatContextService } from '#src/services/iat-service/iat-context.service.js'
 
 function slugFromRequest(request) {
   return request.params.slug
-}
-
-function answersFromRequest(request) {
-  return request.app.iatDoc?.answers ?? []
 }
 
 function redirectTargetFor(slug, next) {
@@ -28,7 +23,7 @@ function redirectTargetFor(slug, next) {
   return `/journey/self-service/c/${slug}/${prefix}${target}`
 }
 
-function buildErrorView(question, slug, answers, questionRoute, isMulti) {
+function buildErrorView(question, slug, request, questionRoute, isMulti) {
   const errorText = isMulti ? 'Select at least one option' : 'Select an option'
   const errorField = isMulti ? 'answers' : 'answer'
   const section = question.section ? getSection(question.section) : null
@@ -36,10 +31,24 @@ function buildErrorView(question, slug, answers, questionRoute, isMulti) {
     pageTitle: question.text,
     question,
     section,
-    backLink: getBackLink(answers, slug, questionRoute, 'question'),
+    backLink: getBackLink(request, slug, questionRoute),
     errors: { [errorField]: { text: errorText } },
     errorSummary: [{ text: errorText, href: `#${errorField}` }],
     selectedAnswers: []
+  }
+}
+
+function buildAnswerPayload(question, questionRoute, submittedIds) {
+  const selected = submittedIds
+    .map((id) => question.answers?.find((a) => a.id === id))
+    .filter(Boolean)
+    .map((a) => ({ id: a.id, text: a.text }))
+
+  return {
+    questionRoute,
+    questionText: question.text,
+    answers: selected,
+    mcmsAppFormMapping: question.mcmsAppFormMapping ?? null
   }
 }
 
@@ -47,17 +56,16 @@ export const questionController = {
   handler(request, h) {
     const { questionRoute, question } = loadQuestion(request)
     const slug = slugFromRequest(request)
-    const answers = answersFromRequest(request)
     const section = question.section ? getSection(question.section) : null
 
     return h.view(VIEW_PATH, {
       pageTitle: question.text,
       question,
       section,
-      backLink: getBackLink(answers, slug, questionRoute, 'question'),
+      backLink: getBackLink(request, slug, questionRoute),
       selectedAnswers: question.multiSelect
         ? []
-        : getAnswerForRoute(answers, questionRoute)
+        : getSelectedAnswerIdsForRoute(request, questionRoute)
     })
   }
 }
@@ -66,7 +74,6 @@ export const questionPostController = {
   async handler(request, h) {
     const { questionRoute, question } = loadQuestion(request)
     const slug = slugFromRequest(request)
-    const answers = answersFromRequest(request)
 
     const isMulti = !!question.multiSelect
     const submittedIds = isMulti
@@ -77,13 +84,13 @@ export const questionPostController = {
       return h
         .view(
           VIEW_PATH,
-          buildErrorView(question, slug, answers, questionRoute, isMulti)
+          buildErrorView(question, slug, request, questionRoute, isMulti)
         )
         .code(statusCodes.badRequest)
     }
 
-    const newAnswers = pushAnswer(answers, questionRoute, submittedIds)
-    await iatAnswersService.patch(request, slug, { answers: newAnswers })
+    const answer = buildAnswerPayload(question, questionRoute, submittedIds)
+    await iatContextService.patch(request, slug, answer)
 
     let next
     try {

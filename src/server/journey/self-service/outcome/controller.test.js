@@ -22,7 +22,6 @@ const INTERMEDIATE_TYPE_ID = 'WO_CON_EXEMPTION_JOURNEY'
 // Real terminal-single outcome: /exemption/licence-required-no-exemption
 // outcomeType: WO_EXE_LICENCE_REQUIRED (no nextQuestionRoute)
 const TERMINAL_SINGLE_ROUTE = '/exemption/licence-required-no-exemption'
-const TERMINAL_SINGLE_TYPE_ID = 'WO_EXE_LICENCE_REQUIRED'
 
 // Real terminal-multi outcome: /mod-permission
 // outcomeTypes: WO_MOD_PERMISSION, WO_STANDARD_TRACK_MLA
@@ -66,18 +65,11 @@ describe('outcomeController GET', () => {
     expect(iatContextService.patch).not.toHaveBeenCalled()
   })
 
-  it('patches the doc with the chosen outcomeType as an answer on terminal-single', async () => {
+  it('renders terminal-single WITHOUT recording the outcome in the answer log (matches MCMS)', async () => {
     const request = makeRequest({ outcomeRoute: TERMINAL_SINGLE_ROUTE })
     await outcomeController.handler(request, h)
-    expect(iatContextService.patch).toHaveBeenCalledWith(
-      request,
-      SLUG,
-      expect.objectContaining({
-        questionRoute: TERMINAL_SINGLE_ROUTE,
-        answers: [expect.objectContaining({ id: TERMINAL_SINGLE_TYPE_ID })]
-      })
-    )
     expect(view).toHaveBeenCalled()
+    expect(iatContextService.patch).not.toHaveBeenCalled()
   })
 })
 

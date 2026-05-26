@@ -114,14 +114,9 @@ function buildOutcomeAnswerPayload(outcomeRoute, outcome, outcomeType) {
   }
 }
 
-async function renderTerminalSingle(request, h, baseModel, types, slug) {
+function renderTerminalSingle(request, h, baseModel, types) {
   const [ot] = types
   logEmptyTextIfNeeded(request, ot)
-  await iatContextService.patch(
-    request,
-    slug,
-    buildOutcomeAnswerPayload(baseModel.outcomeRoute, baseModel.outcome, ot)
-  )
   return h.view(VIEW_PATH, buildTerminalSingleView(baseModel, ot))
 }
 
@@ -155,7 +150,7 @@ export const outcomeController = {
     }
 
     if (classification === 'terminal-single') {
-      return renderTerminalSingle(request, h, baseModel, types, slug)
+      return renderTerminalSingle(request, h, baseModel, types)
     }
 
     return renderTerminalMulti(request, h, baseModel, types)

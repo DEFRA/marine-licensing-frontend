@@ -173,15 +173,15 @@ The JSON is large (~5000 lines) and relational. Use the in-repo CLI rather than 
 npm run iat -- <subcommand> [args] [--json]
 ```
 
-| Subcommand                                                              | Purpose                                                                                       |
-| ----------------------------------------------------------------------- | --------------------------------------------------------------------------------------------- |
-| `question <route>`                                                      | Show one question with its answers and where each leads                                       |
-| `outcome <route>`                                                       | Show one outcome with its outcomeTypes inline                                                 |
-| `outcome-type <id>`                                                     | Show one outcomeType (params, link, module, nextQuestionRoute)                                |
-| `outcomes [--classify X] [--has-param N[=V]]`                           | List outcomes filtered by `intermediate`/`terminal-single`/`terminal-multi` and/or by param   |
-| `outcome-types [--has-param N[=V]] [--has-next-question]`               | List outcomeTypes; useful for finding ones that route forward vs. terminal                    |
-| `questions [--mapping N] [--has-mapping]`                               | List questions; filter by `mcmsAppFormMapping`                                                |
-| `mappings`                                                              | Distinct `mcmsAppFormMapping` values + the question route(s) that carry each                  |
+| Subcommand                                                | Purpose                                                                                     |
+| --------------------------------------------------------- | ------------------------------------------------------------------------------------------- |
+| `question <route>`                                        | Show one question with its answers and where each leads                                     |
+| `outcome <route>`                                         | Show one outcome with its outcomeTypes inline                                               |
+| `outcome-type <id>`                                       | Show one outcomeType (params, link, module, nextQuestionRoute)                              |
+| `outcomes [--classify X] [--has-param N[=V]]`             | List outcomes filtered by `intermediate`/`terminal-single`/`terminal-multi` and/or by param |
+| `outcome-types [--has-param N[=V]] [--has-next-question]` | List outcomeTypes; useful for finding ones that route forward vs. terminal                  |
+| `questions [--mapping N] [--has-mapping]`                 | List questions; filter by `mcmsAppFormMapping`                                              |
+| `mappings`                                                | Distinct `mcmsAppFormMapping` values + the question route(s) that carry each                |
 
 Every subcommand accepts `--json` for machine-readable output. Exit codes: `0` success, `1` not-found, `2` invalid args.
 

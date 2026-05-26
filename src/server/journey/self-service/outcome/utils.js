@@ -50,7 +50,11 @@ export function buildIntermediateView(baseModel, outcome, types) {
       text: ot.text,
       isTerminal: !ot.nextQuestionRoute,
       ctaLabel: ctaLabelFor(ot),
-      viewAnswersUrl: viewAnswersUrlFor(baseModel.slug, baseModel.outcomeRoute, ot.id)
+      viewAnswersUrl: viewAnswersUrlFor(
+        baseModel.slug,
+        baseModel.outcomeRoute,
+        ot.id
+      )
     }))
   }
 }
@@ -61,7 +65,11 @@ export function buildTerminalSingleView(baseModel, terminalType) {
     body: terminalType.text,
     ctaLabel: ctaLabelFor(terminalType),
     hasContinue: hasContinueFor(terminalType),
-    viewAnswersUrl: viewAnswersUrlFor(baseModel.slug, baseModel.outcomeRoute, terminalType.id)
+    viewAnswersUrl: viewAnswersUrlFor(
+      baseModel.slug,
+      baseModel.outcomeRoute,
+      terminalType.id
+    )
   }
 }
 
@@ -74,7 +82,11 @@ export function buildTerminalMultiView(baseModel, types) {
       text: ot.text,
       ctaLabel: ctaLabelFor(ot),
       hasContinue: hasContinueFor(ot),
-      viewAnswersUrl: viewAnswersUrlFor(baseModel.slug, baseModel.outcomeRoute, ot.id)
+      viewAnswersUrl: viewAnswersUrlFor(
+        baseModel.slug,
+        baseModel.outcomeRoute,
+        ot.id
+      )
     }))
   }
 }

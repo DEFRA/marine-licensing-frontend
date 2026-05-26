@@ -98,7 +98,11 @@ describe('#buildTerminalSingleView — hasContinue', () => {
 describe('#buildTerminalSingleView — viewAnswersUrl', () => {
   test('builds /c/<slug>/view-answers/<typeId>/<outcomeRoute-without-leading-slash>', () => {
     const view = buildTerminalSingleView(
-      { heading: 'h', outcomeRoute: '/markers/ha-not-agreed', slug: 'abcdefghijklmnopqrstuv' },
+      {
+        heading: 'h',
+        outcomeRoute: '/markers/ha-not-agreed',
+        slug: 'abcdefghijklmnopqrstuv'
+      },
       { id: 'WO_FOO' }
     )
     expect(view.viewAnswersUrl).toBe(

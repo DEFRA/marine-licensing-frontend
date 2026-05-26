@@ -56,6 +56,28 @@ describe('#siteName', () => {
       })
     })
 
+    test('should link back to review page without anchor when adding a second site', () => {
+      vi.mocked(getMarineLicenceCache).mockReturnValueOnce({
+        ...mockMarineLicenceApplication,
+        siteDetails: [
+          { coordinatesType: 'coordinates', siteName: 'Site 1' },
+          { coordinatesType: 'coordinates' }
+        ]
+      })
+
+      const request = createMockRequest({ query: { site: '2' } })
+
+      siteNameController.handler(request, h)
+
+      expect(h.view).toHaveBeenCalledWith(
+        SITE_NAME_VIEW_ROUTE,
+        expect.objectContaining({
+          backLink: marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS,
+          action: false
+        })
+      )
+    })
+
     test('should include action in view context when action parameter is present', () => {
       const request = createMockRequest({ query: { action: 'add' } })
 

@@ -84,7 +84,7 @@ describe('Site name page (marine licence)', () => {
     const backLink = getByRole(document, 'link', { name: 'Back' })
     expect(backLink).toHaveAttribute(
       'href',
-      `${marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS}#site-details-2`
+      `${marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS}`
     )
 
     const cancelLink = getByRole(document, 'link', { name: 'Cancel' })

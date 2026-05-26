@@ -93,10 +93,11 @@ describe('#questionController (integration)', () => {
       expect(continueButton).not.toBeNull()
     })
 
-    test('renders a back link', async () => {
+    test('renders a back link pointing to the IAT start page (matches MCMS — no contextId in URL)', async () => {
       const { document } = await getPage(journey.journeyUrl('/sea'))
       const backLink = document.querySelector('.govuk-back-link')
       expect(backLink).not.toBeNull()
+      expect(backLink.getAttribute('href')).toBe('/journey/self-service/start')
     })
 
     test('does not render the phase banner', async () => {

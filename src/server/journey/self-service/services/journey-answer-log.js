@@ -1,4 +1,5 @@
 import { getOutcome } from '#src/server/journey/self-service/services/journey-data.js'
+import { routes } from '#src/server/common/constants/routes.js'
 
 function questionLogOf(request) {
   return request.app.iatDoc?.questionLog ?? []
@@ -26,7 +27,7 @@ export function getBackLink(request, slug, currentRoute) {
   const idx = log.findIndex((e) => e.questionRoute === currentRoute)
   const previous = idx === -1 ? log[log.length - 1] : log[idx - 1]
   if (!previous) {
-    return `/journey/self-service/c/${slug}/`
+    return routes.IAT_START
   }
   return urlForEntry(slug, previous)
 }

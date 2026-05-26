@@ -312,11 +312,9 @@ describe('#outcomeController (integration)', () => {
       )
       const backLink = document.querySelector('.govuk-back-link')
       // A fresh context has an empty questionLog, so the back link falls back
-      // to the slug-root URL (the "start of this slug's journey") rather than
-      // pointing into a stale prior selection.
-      expect(backLink.getAttribute('href')).toBe(
-        `/journey/self-service/c/${newJourney.slug}/`
-      )
+      // to the IAT start page (no contextId) — matching MCMS and giving the
+      // user a working route rather than a 404 against the slug-only URL.
+      expect(backLink.getAttribute('href')).toBe('/journey/self-service/start')
     })
   })
 })

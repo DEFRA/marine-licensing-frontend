@@ -140,6 +140,53 @@ describe('#outcomeDocumentController (integration)', () => {
     expect(response.result).not.toMatch(/href="javascript:/)
   })
 
+  test('renders HTML inside questionText (e.g. <p> tags from outcomeType.text) as real elements, not escaped text', async () => {
+    const docWithHtmlQuestion = {
+      ...buildSnapshot({
+        outcomeRoute: '/mod-permission',
+        focusedOption: {
+          id: 'WO_STANDARD_TRACK_MLA',
+          heading: 'Apply for a standard marine licence',
+          text: '<p>You should apply for a standard track marine licence.</p>',
+          module: null,
+          link: null,
+          overrideCtaButtonUrl: null,
+          params: null
+        }
+      }),
+      questionLog: [
+        {
+          questionRoute: '/construction/journey-select',
+          questionText:
+            'Based on the information provided an exemption is not available and a marine licence is required.<p></p><p>You are advised to select an appropriate option and continue.</p>',
+          answers: [
+            {
+              id: 'WO_CON_NO_EXE_SELF_SERVICE',
+              text: 'Check to see if the activity is suitable for self-service marine licensing'
+            }
+          ],
+          mcmsAppFormMapping: null
+        }
+      ]
+    }
+    vi.mocked(iatOutcomeDocumentService.get).mockResolvedValueOnce(
+      docWithHtmlQuestion
+    )
+
+    const { response, document } = await getPage()
+    expect(response.statusCode).toBe(200)
+
+    const dtElements = Array.from(document.querySelectorAll('dt.govuk-summary-list__key'))
+    const intermediateDt = dtElements.find((dt) =>
+      dt.textContent.includes('You are advised')
+    )
+    expect(intermediateDt).not.toBeUndefined()
+    expect(intermediateDt.querySelector('p')).not.toBeNull()
+    expect(response.result).not.toContain(
+      '&lt;p&gt;You are advised'
+    )
+  })
+
   test('malformed slug returns 400 from Joi validation', async () => {
     const response = await makeGetRequest({
       url: '/outcome-documents/not-valid',

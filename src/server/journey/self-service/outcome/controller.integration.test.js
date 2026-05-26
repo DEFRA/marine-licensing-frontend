@@ -370,6 +370,19 @@ describe('GET terminal-single', () => {
     )
   })
 
+  test('the rendered "View answers" link actually resolves end-to-end (publishes + redirects)', async () => {
+    const { document } = await getPage(journey.journeyUrl(SINGLE_PATH))
+    const href = Array.from(document.querySelectorAll('a.govuk-link'))
+      .find((a) => a.textContent.includes('View answers'))
+      .getAttribute('href')
+
+    const response = await makeGetRequest({ url: href, server: getServer() })
+
+    expect(response.statusCode).toBe(statusCodes.redirect)
+    expect(response.headers.location).toBe(journey.answerUrl)
+    expect(iatAnswersService.publish).toHaveBeenCalledTimes(1)
+  })
+
   test('does not render any option cards', async () => {
     const { document } = await getPage(journey.journeyUrl(SINGLE_PATH))
     expect(document.querySelectorAll('.app-iat-option')).toHaveLength(0)

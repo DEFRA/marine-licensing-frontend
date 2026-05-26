@@ -19,6 +19,7 @@ import { workingHoursRoutes } from '#src/server/marine-licence/site-details/work
 import { monthsOfActivityRoutes } from '#src/server/marine-licence/site-details/months-of-activity/index.js'
 import { deleteActivityRoutes } from '#src/server/marine-licence/site-details/delete-activity/index.js'
 import { deleteSiteRoutes } from '#src/server/marine-licence/site-details/delete-site/index.js'
+import { deleteAllSitesRoutes } from '#src/server/marine-licence/site-details/delete-all-sites/index.js'
 import { changeSiteLocationRoutes } from '#src/server/marine-licence/site-details/change-site-location/index.js'
 
 export const siteDetailsRoutes = [
@@ -43,5 +44,6 @@ export const siteDetailsRoutes = [
   ...monthsOfActivityRoutes,
   ...deleteActivityRoutes,
   ...deleteSiteRoutes,
+  ...deleteAllSitesRoutes,
   ...changeSiteLocationRoutes
 ]

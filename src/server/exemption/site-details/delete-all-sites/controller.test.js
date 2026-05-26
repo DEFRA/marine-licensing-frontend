@@ -31,15 +31,12 @@ describe('deleteAllSitesController', () => {
     it('should render delete all sites view with correct data', async () => {
       await deleteAllSitesController.handler(mockRequest, mockH)
 
-      expect(mockH.view).toHaveBeenCalledWith(
-        'exemption/site-details/delete-all-sites/index',
-        {
-          pageTitle: 'Are you sure you want to delete all site details?',
-          heading: 'Are you sure you want to delete all site details?',
-          backLink: routes.REVIEW_SITE_DETAILS,
-          routes
-        }
-      )
+      expect(mockH.view).toHaveBeenCalledWith('templates/delete-all-sites', {
+        pageTitle: 'Are you sure you want to delete all site details?',
+        heading: 'Are you sure you want to delete all site details?',
+        backLink: routes.REVIEW_SITE_DETAILS,
+        projectName: mockExemption.projectName
+      })
     })
 
     it('should redirect to correct page when no sites exist', async () => {

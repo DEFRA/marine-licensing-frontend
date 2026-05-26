@@ -83,7 +83,8 @@ export const marineLicenceRoutes = {
   MARINE_LICENCE_DELETE_SITE: '/marine-licence/delete-site',
   MARINE_LICENCE_CHANGE_SITE_LOCATION: '/marine-licence/change-site-location',
   MARINE_LICENCE_ENTER_MULTIPLE_COORDINATES:
-    '/marine-licence/enter-multiple-coordinates'
+    '/marine-licence/enter-multiple-coordinates',
+  MARINE_LICENCE_DELETE_ALL_SITES: '/marine-licence/delete-all-sites'
 }
 
 export const defraIdGuidanceRoutes = {

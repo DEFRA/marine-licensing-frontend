@@ -121,6 +121,50 @@ export const mockExemptionMcmsContext = (
   }
 }
 
+const DEFAULT_TEST_SLUG = 'abcdefghijklmnopqrstuv'
+
+/**
+ * Configure the iat-answers-service mocks for IAT integration tests.
+ * Pass in the mocked iatAnswersService (each test file does its own
+ * vi.mock for hoisting) and an optional config object.
+ *
+ * Returns: { slug, doc, journeyUrl(path), answerUrl }
+ * - slug: the stable slug used in URLs and returned from create()
+ * - journeyUrl('/sea') → '/journey/self-service/c/{slug}/sea'
+ * - answerUrl → '/iat-answer/{slug}'
+ */
+export const mockIatAnswers = (
+  iatAnswersService,
+  {
+    slug = DEFAULT_TEST_SLUG,
+    answers = [],
+    published = false,
+    createdAt = new Date('2026-05-01T12:00:00Z')
+  } = {}
+) => {
+  const doc = { slug, published, answers: [...answers], createdAt }
+  vi.mocked(iatAnswersService.create).mockResolvedValue(slug)
+  vi.mocked(iatAnswersService.get).mockImplementation(() =>
+    Promise.resolve({ ...doc, answers: [...doc.answers] })
+  )
+  vi.mocked(iatAnswersService.patch).mockImplementation(
+    (_request, _slug, body) => {
+      if (body && Array.isArray(body.answers)) {
+        doc.answers = body.answers
+      }
+      return Promise.resolve(undefined)
+    }
+  )
+  vi.mocked(iatAnswersService.publish).mockResolvedValue(undefined)
+  return {
+    slug,
+    doc,
+    journeyUrl: (path) =>
+      `/journey/self-service/c/${slug}${path.startsWith('/') ? path : `/${path}`}`,
+    answerUrl: `/iat-answer/${slug}`
+  }
+}
+
 export const mockMarineLicence = (m) => {
   vi.mocked(getMarineLicenceCache).mockImplementation(() => {
     if (m?.constructor === Error) {

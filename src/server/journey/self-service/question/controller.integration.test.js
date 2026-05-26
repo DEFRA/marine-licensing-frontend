@@ -1,6 +1,23 @@
+import { vi } from 'vitest'
+
+vi.mock('#src/services/iat-answers-service/iat-answers.service.js', () => ({
+  iatAnswersService: {
+    create: vi.fn(),
+    get: vi.fn(),
+    patch: vi.fn(),
+    publish: vi.fn()
+  }
+}))
+
+const { iatAnswersService } =
+  await import('#src/services/iat-answers-service/iat-answers.service.js')
+
 import { JSDOM } from 'jsdom'
 import { statusCodes } from '#src/server/common/constants/status-codes.js'
-import { setupTestServer } from '#tests/integration/shared/test-setup-helpers.js'
+import {
+  setupTestServer,
+  mockIatAnswers
+} from '#tests/integration/shared/test-setup-helpers.js'
 import {
   makeGetRequest,
   makePostRequest
@@ -11,7 +28,13 @@ describe('#questionController (integration)', () => {
   config.set('selfService.enabled', true)
   const getServer = setupTestServer()
 
-  const getPage = async (path = '/journey/self-service/sea', headers = {}) => {
+  let journey
+
+  beforeEach(() => {
+    journey = mockIatAnswers(iatAnswersService)
+  })
+
+  const getPage = async (path, headers = {}) => {
     const response = await makeGetRequest({
       url: path,
       server: getServer(),
@@ -36,14 +59,14 @@ describe('#questionController (integration)', () => {
     }
   }
 
-  describe('GET /journey/self-service/sea', () => {
+  describe('GET /sea', () => {
     test('returns 200', async () => {
-      const { response } = await getPage()
+      const { response } = await getPage(journey.journeyUrl('/sea'))
       expect(response.statusCode).toBe(statusCodes.ok)
     })
 
     test('renders the question heading', async () => {
-      const { document } = await getPage()
+      const { document } = await getPage(journey.journeyUrl('/sea'))
       const legend = document.querySelector('.govuk-fieldset__legend')
       expect(legend.textContent).toContain(
         'Where will the activity take place?'
@@ -51,19 +74,19 @@ describe('#questionController (integration)', () => {
     })
 
     test('renders section caption', async () => {
-      const { document } = await getPage()
+      const { document } = await getPage(journey.journeyUrl('/sea'))
       const caption = document.querySelector('.govuk-caption-l')
       expect(caption.textContent).toContain('Jurisdiction check')
     })
 
     test('renders radio buttons for each answer', async () => {
-      const { document } = await getPage()
+      const { document } = await getPage(journey.journeyUrl('/sea'))
       const radios = document.querySelectorAll('input[type="radio"]')
       expect(radios.length).toBe(5)
     })
 
     test('renders a Continue button', async () => {
-      const { document } = await getPage()
+      const { document } = await getPage(journey.journeyUrl('/sea'))
       const buttons = Array.from(document.querySelectorAll('.govuk-button'))
       const continueButton = buttons.find((b) =>
         b.textContent.includes('Continue')
@@ -72,42 +95,42 @@ describe('#questionController (integration)', () => {
     })
 
     test('renders a back link', async () => {
-      const { document } = await getPage()
+      const { document } = await getPage(journey.journeyUrl('/sea'))
       const backLink = document.querySelector('.govuk-back-link')
       expect(backLink).not.toBeNull()
     })
 
     test('does not render the phase banner', async () => {
-      const { document } = await getPage()
+      const { document } = await getPage(journey.journeyUrl('/sea'))
       expect(document.querySelector('.govuk-phase-banner')).toBeNull()
     })
 
     test('does not render navigation links in the header', async () => {
-      const { document } = await getPage()
+      const { document } = await getPage(journey.journeyUrl('/sea'))
       expect(
         document.querySelector('.govuk-service-navigation__list')
       ).toBeNull()
     })
 
     test('renders hint text with guidance link that opens in new tab', async () => {
-      const { document } = await getPage()
+      const { document } = await getPage(journey.journeyUrl('/sea'))
       const hintLink = document.querySelector('.govuk-hint a[target="_blank"]')
       expect(hintLink).not.toBeNull()
       expect(hintLink.getAttribute('href')).toContain('gov.uk')
     })
   })
 
-  describe('GET /journey/self-service/nonexistent', () => {
+  describe('GET /nonexistent (unknown question route)', () => {
     test('returns 404 for an unknown question route', async () => {
-      const { response } = await getPage('/journey/self-service/nonexistent')
+      const { response } = await getPage(journey.journeyUrl('/nonexistent'))
       expect(response.statusCode).toBe(statusCodes.notFound)
     })
   })
 
-  describe('POST /journey/self-service/sea', () => {
+  describe('POST /sea', () => {
     test('returns 400 with error summary when no answer is selected', async () => {
       const { response, document } = await postPage(
-        '/journey/self-service/sea',
+        journey.journeyUrl('/sea'),
         {}
       )
       expect(response.statusCode).toBe(statusCodes.badRequest)
@@ -118,36 +141,37 @@ describe('#questionController (integration)', () => {
     })
 
     test('redirects to the next question when a valid answer is selected', async () => {
-      const { response } = await postPage('/journey/self-service/sea', {
+      const { response } = await postPage(journey.journeyUrl('/sea'), {
         answer: 'inSea'
       })
       expect(response.statusCode).toBe(statusCodes.redirect)
       expect(response.headers.location).toBe(
-        '/journey/self-service/jurisdiction'
+        journey.journeyUrl('/jurisdiction')
       )
     })
 
     test('redirects to /outcome/ URL when answer leads to an outcome', async () => {
-      const { response } = await postPage('/journey/self-service/sea', {
+      const { response } = await postPage(journey.journeyUrl('/sea'), {
         answer: 'other'
       })
       expect(response.statusCode).toBe(statusCodes.redirect)
       expect(response.headers.location).toMatch(
-        /^\/journey\/self-service\/outcome\//
+        new RegExp(`^/journey/self-service/c/${journey.slug}/outcome/`)
       )
     })
   })
 
-  describe('GET /journey/self-service/construction/maintenance-existing-works (multi-select)', () => {
-    const url = '/journey/self-service/construction/maintenance-existing-works'
+  describe('GET /construction/maintenance-existing-works (multi-select)', () => {
+    const getUrl = () =>
+      journey.journeyUrl('/construction/maintenance-existing-works')
 
     test('returns 200', async () => {
-      const { response } = await getPage(url)
+      const { response } = await getPage(getUrl())
       expect(response.statusCode).toBe(statusCodes.ok)
     })
 
     test('renders the section caption', async () => {
-      const { document } = await getPage(url)
+      const { document } = await getPage(getUrl())
       const caption = document.querySelector('.govuk-caption-l')
       expect(caption.textContent).toContain(
         'Self-service check - Sub-activities'
@@ -155,7 +179,7 @@ describe('#questionController (integration)', () => {
     })
 
     test('renders the question heading', async () => {
-      const { document } = await getPage(url)
+      const { document } = await getPage(getUrl())
       const legend = document.querySelector('.govuk-fieldset__legend')
       expect(legend.textContent).toContain(
         'Please select sub-activites that match with activities proposed to be carried out.'
@@ -163,14 +187,14 @@ describe('#questionController (integration)', () => {
     })
 
     test('renders checkboxes (not radios) for each answer', async () => {
-      const { document } = await getPage(url)
+      const { document } = await getPage(getUrl())
       const checkboxes = document.querySelectorAll('input[type="checkbox"]')
       expect(checkboxes.length).toBe(10)
       expect(document.querySelectorAll('input[type="radio"]').length).toBe(0)
     })
 
     test('renders a Continue button', async () => {
-      const { document } = await getPage(url)
+      const { document } = await getPage(getUrl())
       const buttons = Array.from(document.querySelectorAll('.govuk-button'))
       const continueButton = buttons.find((b) =>
         b.textContent.includes('Continue')
@@ -179,13 +203,13 @@ describe('#questionController (integration)', () => {
     })
 
     test('renders a back link', async () => {
-      const { document } = await getPage(url)
+      const { document } = await getPage(getUrl())
       const backLink = document.querySelector('.govuk-back-link')
       expect(backLink).not.toBeNull()
     })
 
     test('does not render navigation links in the header', async () => {
-      const { document } = await getPage(url)
+      const { document } = await getPage(getUrl())
       expect(
         document.querySelector('.govuk-service-navigation__list')
       ).toBeNull()
@@ -203,29 +227,29 @@ describe('#questionController (integration)', () => {
   describe('navigation flow', () => {
     test('second question page has back link to previous question', async () => {
       const { response: postResponse } = await postPage(
-        '/journey/self-service/sea',
+        journey.journeyUrl('/sea'),
         { answer: 'inSea' }
       )
 
       const headers = getSessionCookie(postResponse)
 
       const { document } = await getPage(
-        '/journey/self-service/jurisdiction',
+        journey.journeyUrl('/jurisdiction'),
         headers
       )
       const backLink = document.querySelector('.govuk-back-link')
-      expect(backLink.getAttribute('href')).toBe('/journey/self-service/sea')
+      expect(backLink.getAttribute('href')).toBe(journey.journeyUrl('/sea'))
     })
 
     test('previous answer is pre-selected when navigating back', async () => {
       const { response: postResponse } = await postPage(
-        '/journey/self-service/sea',
+        journey.journeyUrl('/sea'),
         { answer: 'inSea' }
       )
 
       const headers = getSessionCookie(postResponse)
 
-      const { document } = await getPage('/journey/self-service/sea', headers)
+      const { document } = await getPage(journey.journeyUrl('/sea'), headers)
       const checkedRadio = document.querySelector(
         'input[type="radio"][checked]'
       )
@@ -235,21 +259,23 @@ describe('#questionController (integration)', () => {
 
     test('starting a new session clears previous answers', async () => {
       const { response: postResponse } = await postPage(
-        '/journey/self-service/sea',
+        journey.journeyUrl('/sea'),
         { answer: 'inSea' }
       )
 
       const headers = getSessionCookie(postResponse)
 
-      const { response: startResponse } = await postPage(
-        '/journey/self-service/start',
-        {},
+      const startResponse = await makePostRequest({
+        url: '/journey/self-service/start',
+        server: getServer(),
+        formData: {},
         headers
-      )
+      })
+      const newJourney = mockIatAnswers(iatAnswersService)
       const startHeaders = getSessionCookie(startResponse)
 
       const { document } = await getPage(
-        '/journey/self-service/sea',
+        newJourney.journeyUrl('/sea'),
         startHeaders
       )
       const checkedRadio = document.querySelector(
@@ -259,11 +285,12 @@ describe('#questionController (integration)', () => {
     })
   })
 
-  describe('POST /journey/self-service/construction/maintenance-existing-works (multi-select)', () => {
-    const url = '/journey/self-service/construction/maintenance-existing-works'
+  describe('POST /construction/maintenance-existing-works (multi-select)', () => {
+    const getUrl = () =>
+      journey.journeyUrl('/construction/maintenance-existing-works')
 
     test('returns 400 with error summary when no checkbox is selected', async () => {
-      const { response, document } = await postPage(url, {})
+      const { response, document } = await postPage(getUrl(), {})
       expect(response.statusCode).toBe(statusCodes.badRequest)
 
       const errorSummary = document.querySelector('.govuk-error-summary')
@@ -275,72 +302,83 @@ describe('#questionController (integration)', () => {
     })
 
     test('redirects to the multiSelect.questionRoute when one non-other answer is selected', async () => {
-      const { response } = await postPage(url, {
+      const { response } = await postPage(getUrl(), {
         answers: 'SCAFFOLDING_ACCESS_TOWERS'
       })
       expect(response.statusCode).toBe(statusCodes.redirect)
       expect(response.headers.location).toBe(
-        '/journey/self-service/construction/maintenance-existing-works/scaffolding'
+        journey.journeyUrl(
+          '/construction/maintenance-existing-works/scaffolding'
+        )
       )
     })
 
     test('redirects to the multiSelect.questionRoute when several non-other answers are selected', async () => {
-      const { response } = await postPage(url, {
+      const { response } = await postPage(getUrl(), {
         answers: ['SCAFFOLDING_ACCESS_TOWERS', 'REPAINTING_STRUCTURES']
       })
       expect(response.statusCode).toBe(statusCodes.redirect)
       expect(response.headers.location).toBe(
-        '/journey/self-service/construction/maintenance-existing-works/scaffolding'
+        journey.journeyUrl(
+          '/construction/maintenance-existing-works/scaffolding'
+        )
       )
     })
 
     test('redirects to the multiSelect.outcomeRoute when only the other answer is selected', async () => {
-      const { response } = await postPage(url, {
+      const { response } = await postPage(getUrl(), {
         answers: 'OTHER_MAINTENANCE'
       })
       expect(response.statusCode).toBe(statusCodes.redirect)
       expect(response.headers.location).toBe(
-        '/journey/self-service/outcome/standard-marine-licence-application/other-maintenance'
+        journey.journeyUrl(
+          '/outcome/standard-marine-licence-application/other-maintenance'
+        )
       )
     })
 
     test('redirects to the multiSelect.outcomeRoute when other and non-other are mixed (OTHER_ANY rule)', async () => {
-      const { response } = await postPage(url, {
+      const { response } = await postPage(getUrl(), {
         answers: ['SCAFFOLDING_ACCESS_TOWERS', 'OTHER_MAINTENANCE']
       })
       expect(response.statusCode).toBe(statusCodes.redirect)
       expect(response.headers.location).toBe(
-        '/journey/self-service/outcome/standard-marine-licence-application/other-maintenance'
+        journey.journeyUrl(
+          '/outcome/standard-marine-licence-application/other-maintenance'
+        )
       )
     })
   })
 
   describe('navigation flow (multi-select)', () => {
-    const url = '/journey/self-service/construction/maintenance-existing-works'
+    const getUrl = () =>
+      journey.journeyUrl('/construction/maintenance-existing-works')
 
     test('next page back link points to the multi-select page after submission', async () => {
-      const { response: postResponse } = await postPage(url, {
+      const { response: postResponse } = await postPage(getUrl(), {
         answers: 'SCAFFOLDING_ACCESS_TOWERS'
       })
 
       const headers = getSessionCookie(postResponse)
 
       const { document } = await getPage(
-        '/journey/self-service/construction/maintenance-existing-works/scaffolding',
+        journey.journeyUrl(
+          '/construction/maintenance-existing-works/scaffolding'
+        ),
         headers
       )
       const backLink = document.querySelector('.govuk-back-link')
-      expect(backLink.getAttribute('href')).toBe(url)
+      expect(backLink.getAttribute('href')).toBe(getUrl())
     })
 
     test('returning to the multi-select page renders no checked checkboxes (AC5)', async () => {
-      const { response: postResponse } = await postPage(url, {
+      const { response: postResponse } = await postPage(getUrl(), {
         answers: ['SCAFFOLDING_ACCESS_TOWERS', 'REPAINTING_STRUCTURES']
       })
 
       const headers = getSessionCookie(postResponse)
 
-      const { document } = await getPage(url, headers)
+      const { document } = await getPage(getUrl(), headers)
       const checkedBoxes = document.querySelectorAll(
         'input[type="checkbox"][checked]'
       )

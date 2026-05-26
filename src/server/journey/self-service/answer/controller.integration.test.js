@@ -15,9 +15,11 @@ describe('#answerController (integration)', () => {
   config.set('selfService.enabled', true)
   const getServer = setupTestServer()
 
+  const ANSWER_SLUG = 'AZ4rr6bLclCVUsE2Pl_zKw'
+
   const getPage = async () => {
     const response = await makeGetRequest({
-      url: '/journey/self-service/answer/AZ4rr6bLclCVUsE2Pl_zKw',
+      url: `/iat-answer/${ANSWER_SLUG}`,
       server: getServer()
     })
     return {
@@ -110,7 +112,7 @@ describe('#answerController (integration)', () => {
 
   test('malformed slug returns 400 from Joi validation', async () => {
     const response = await makeGetRequest({
-      url: '/journey/self-service/answer/not-valid',
+      url: '/iat-answer/not-valid',
       server: getServer()
     })
     expect(response.statusCode).toBe(400)

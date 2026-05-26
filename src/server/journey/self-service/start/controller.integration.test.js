@@ -1,6 +1,23 @@
+import { vi } from 'vitest'
+
+vi.mock('#src/services/iat-answers-service/iat-answers.service.js', () => ({
+  iatAnswersService: {
+    create: vi.fn(),
+    get: vi.fn(),
+    patch: vi.fn(),
+    publish: vi.fn()
+  }
+}))
+
+const { iatAnswersService } =
+  await import('#src/services/iat-answers-service/iat-answers.service.js')
+
 import { JSDOM } from 'jsdom'
 import { statusCodes } from '#src/server/common/constants/status-codes.js'
-import { setupTestServer } from '#tests/integration/shared/test-setup-helpers.js'
+import {
+  setupTestServer,
+  mockIatAnswers
+} from '#tests/integration/shared/test-setup-helpers.js'
 import {
   makeGetRequest,
   makePostRequest
@@ -10,6 +27,12 @@ import { config } from '#src/config/config.js'
 describe('#iatStartController (integration)', () => {
   config.set('selfService.enabled', true)
   const getServer = setupTestServer()
+
+  let journey
+
+  beforeEach(() => {
+    journey = mockIatAnswers(iatAnswersService)
+  })
 
   const getPage = async () => {
     const response = await makeGetRequest({
@@ -103,6 +126,6 @@ describe('#iatStartController (integration)', () => {
       formData: {}
     })
     expect(response.statusCode).toBe(statusCodes.redirect)
-    expect(response.headers.location).toBe('/journey/self-service/sea')
+    expect(response.headers.location).toBe(journey.journeyUrl('/sea'))
   })
 })

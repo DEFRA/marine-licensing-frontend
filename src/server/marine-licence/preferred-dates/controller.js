@@ -2,10 +2,6 @@ import {
   getMarineLicenceCache,
   setMarineLicenceCache
 } from '#src/server/common/helpers/marine-licence/session-cache/utils.js'
-import {
-  errorDescriptionByFieldName,
-  mapErrorsForDisplay
-} from '#src/server/common/helpers/errors.js'
 import { apiRoutes } from '#src/server/common/constants/routes.js'
 import { authenticatedPatchRequest } from '#src/server/common/helpers/authenticated-requests.js'
 import { getCommonRedirectLink } from '#src/server/common/helpers/marine-licence/redirect-link.js'
@@ -138,25 +134,7 @@ export const preferredDatesSubmitController = {
         throw e
       }
 
-      const errorSummary = mapErrorsForDisplay(
-        details,
-        preferredDatesErrorMessages
-      )
-      const errors = errorDescriptionByFieldName(errorSummary)
-
-      const startDateHint = threeMonthsFromNow()
-      const endDateHint = fifteenMonthsFromNow()
-
-      return h.view(PREFERRED_DATES_VIEW_ROUTE, {
-        ...settings,
-        payload,
-        projectName: marineLicence.projectName,
-        backLink: getCommonRedirectLink(request),
-        errors,
-        errorSummary,
-        endDateHint,
-        startDateHint
-      })
+      return showErrorView(request, h, details, marineLicence)
     }
   }
 }

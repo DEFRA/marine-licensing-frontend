@@ -12,6 +12,9 @@ dayjs.extend(isSameOrBefore)
 const DATE_FORMAT_ISO = 'YYYY-MM-DD'
 const DATE_FORMAT_FLEXIBLE = 'YYYY-M-D'
 
+const THREE = 3
+const FIFTEEN = 15
+
 function hasNullValues(year, month, day) {
   return year == null || month == null || day == null
 }
@@ -128,9 +131,9 @@ export function createDateFieldsFromValue(dateValue) {
 }
 
 export function threeMonthsFromNow() {
-  return dayjs().add(3, 'month').format('M YYYY')
+  return dayjs().add(THREE, 'month').format('M YYYY')
 }
 
 export function fifteenMonthsFromNow() {
-  return dayjs().add(15, 'month').format('M YYYY')
+  return dayjs().add(FIFTEEN, 'month').format('M YYYY')
 }

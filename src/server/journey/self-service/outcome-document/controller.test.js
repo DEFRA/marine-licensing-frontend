@@ -6,7 +6,7 @@ vi.mock('#src/services/iat-service/iat-outcome-document.service.js', () => ({
 }))
 import { iatOutcomeDocumentService } from '#src/services/iat-service/iat-outcome-document.service.js'
 
-// CRITICAL (AC #6): mock journey-data.js so any sneaked-in lookup returns nothing.
+// CRITICAL: mock journey-data.js so any sneaked-in lookup returns nothing.
 // The controller MUST NOT call journey-data at render time — the snapshot is
 // self-contained. If a future refactor sneaks in a lookup, the JSON-replacement
 // test below catches it.
@@ -84,7 +84,7 @@ describe('outcomeDocumentController', () => {
     expect(model.summaryText).toBe('<p>You qualify under Article 13.</p>')
   })
 
-  test('JSON-REPLACEMENT GUARANTEE (AC #6): renders correctly even when journey-data.js returns nothing', async () => {
+  test('JSON-REPLACEMENT GUARANTEE: renders correctly even when journey-data.js returns nothing', async () => {
     iatOutcomeDocumentService.get.mockResolvedValue(frozenDoc)
     await outcomeDocumentController.handler(request, h)
     const journeyData =

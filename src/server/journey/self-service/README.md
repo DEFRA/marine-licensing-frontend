@@ -27,11 +27,11 @@ src/server/journey/self-service/
 │                 # GET      /journey/self-service/c/{slug}/view-answers/{...}           (ML-1165, ML-1304/1306)
 ├── answer/       # GET      /iat-answer/{slug}                                          (ML-1165, ML-1306)
 ├── data/         # self-service.json + load-time parser/sanitiser
-└── services/     # journey-data, journey-router, journey-answer-log, application-handoff,
+└── services/     # journey-data, journey-router, journey-answer-log,
                   # load-iat-context, data-quality, sanitise
 ```
 
-Note: `session-answers.js` and `iat-answers-payload.js` are GONE. The new modules are `journey-answer-log`, `application-handoff`, and `load-iat-context`.
+Note: `session-answers.js` and `iat-answers-payload.js` are GONE. The new modules are `journey-answer-log` and `load-iat-context`. MCMS handoff will be rebuilt against the new snapshot shape when wiring becomes a requirement.
 
 All route plugins are registered conditionally in
 [`src/server/router.js`](../../router.js) when `selfService.enabled` is
@@ -263,7 +263,6 @@ Things this list deliberately does _not_ claim:
 - Key service unit tests:
   - `services/journey-answer-log.test.js`
   - `services/load-iat-context.test.js`
-  - `services/application-handoff.test.js`
   - `invalid/controller.test.js`
 - Contract: the `sanitise-summary-text` allowlist contract between
   frontend and backend is checked by canary tests in both repos. The

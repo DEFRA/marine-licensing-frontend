@@ -3,6 +3,7 @@ import { vi } from 'vitest'
 vi.mock('#src/server/journey/self-service/services/journey-data.js')
 
 import {
+  buildIntermediateView,
   buildSnapshotPayload,
   buildTerminalMultiView,
   buildTerminalSingleView,
@@ -147,5 +148,26 @@ describe('#buildSnapshotPayload — preamble', () => {
     ])
     const payload = buildSnapshotPayload({}, '/some-outcome', 'X')
     expect(payload.preamble).toBe('')
+  })
+
+  test("throws when the focused outcomeTypeId is not one of the outcome's outcomeTypes", () => {
+    vi.mocked(getOutcomeTypesForOutcome).mockReturnValue([
+      { id: 'A', module: 'M' },
+      { id: 'B', module: 'M' }
+    ])
+    expect(() =>
+      buildSnapshotPayload({}, '/some-outcome', 'NOT_IN_LIST')
+    ).toThrow(/Unknown outcomeTypeId: NOT_IN_LIST/)
+  })
+})
+
+describe('#buildIntermediateView — section ternary fallback', () => {
+  test('returns section: null when the outcome has no section field', () => {
+    const view = buildIntermediateView(
+      { heading: 'h', outcomeRoute: '/x', slug: 'abcdefghijklmnopqrstuv' },
+      { outcomeTypes: ['X'] }, // no `section`
+      [{ id: 'X', heading: 'opt' }]
+    )
+    expect(view.section).toBeNull()
   })
 })

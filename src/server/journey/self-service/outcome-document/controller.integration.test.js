@@ -176,15 +176,15 @@ describe('#outcomeDocumentController (integration)', () => {
     const { response, document } = await getPage()
     expect(response.statusCode).toBe(200)
 
-    const dtElements = Array.from(document.querySelectorAll('dt.govuk-summary-list__key'))
+    const dtElements = Array.from(
+      document.querySelectorAll('dt.govuk-summary-list__key')
+    )
     const intermediateDt = dtElements.find((dt) =>
       dt.textContent.includes('You are advised')
     )
     expect(intermediateDt).not.toBeUndefined()
     expect(intermediateDt.querySelector('p')).not.toBeNull()
-    expect(response.result).not.toContain(
-      '&lt;p&gt;You are advised'
-    )
+    expect(response.result).not.toContain('&lt;p&gt;You are advised')
   })
 
   test('malformed slug returns 400 from Joi validation', async () => {

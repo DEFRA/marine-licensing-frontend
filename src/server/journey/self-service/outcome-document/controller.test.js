@@ -128,6 +128,41 @@ describe('outcomeDocumentController', () => {
     expect(model.introductionText).toBe('')
   })
 
+  test('filters out questionLog entries that have no answers (defensive against malformed snapshot)', async () => {
+    const docWithEmptyEntry = {
+      ...frozenDoc,
+      questionLog: [
+        {
+          questionRoute: '/q-empty',
+          questionText: 'No answer captured'
+        },
+        ...frozenDoc.questionLog
+      ]
+    }
+    iatOutcomeDocumentService.get.mockResolvedValue(docWithEmptyEntry)
+    await outcomeDocumentController.handler(request, h)
+    const [, model] = h.view.mock.calls[0]
+    const routes = model.answers.map((a) => a.questionRoute)
+    expect(routes).not.toContain('/q-empty')
+    expect(routes).toEqual(['/activity-type', '/exemption/construction'])
+  })
+
+  test('falls back to empty answers list when doc has no questionLog field', async () => {
+    const docNoQuestionLog = { ...frozenDoc, questionLog: undefined }
+    iatOutcomeDocumentService.get.mockResolvedValue(docNoQuestionLog)
+    await outcomeDocumentController.handler(request, h)
+    const [, model] = h.view.mock.calls[0]
+    expect(model.answers).toEqual([])
+  })
+
+  test('falls back to empty summaryText when doc has no focusedOption', async () => {
+    const docNoFocused = { ...frozenDoc, focusedOption: undefined }
+    iatOutcomeDocumentService.get.mockResolvedValue(docNoFocused)
+    await outcomeDocumentController.handler(request, h)
+    const [, model] = h.view.mock.calls[0]
+    expect(model.summaryText).toBe('')
+  })
+
   test('multi-select question renders all selected answers', async () => {
     const multiDoc = {
       ...frozenDoc,

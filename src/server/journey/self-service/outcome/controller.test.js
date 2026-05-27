@@ -171,4 +171,16 @@ describe('outcomeViewAnswersController', () => {
     ).rejects.toThrow(/Invalid outcome selection/)
     expect(iatOutcomeDocumentService.mint).not.toHaveBeenCalled()
   })
+
+  it('throws Boom.badImplementation when the mint service returns no slug', async () => {
+    iatOutcomeDocumentService.mint.mockResolvedValue({ slug: undefined })
+    const request = makeRequest({
+      outcomeRoute: TERMINAL_MULTI_ROUTE,
+      params: { outcomeTypeId: TERMINAL_MULTI_TYPE_ID }
+    })
+    await expect(
+      outcomeViewAnswersController.handler(request, h)
+    ).rejects.toThrow(/mint returned no slug/)
+    expect(redirect).not.toHaveBeenCalled()
+  })
 })

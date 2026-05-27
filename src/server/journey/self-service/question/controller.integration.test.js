@@ -127,6 +127,14 @@ describe('#questionController (integration)', () => {
     })
   })
 
+  describe('GET with over-length questionPath param (Joi cap)', () => {
+    test('returns 400 when questionPath exceeds the 200-char cap (defence in depth on auth: false route)', async () => {
+      const overLongPath = '/' + 'a'.repeat(201)
+      const { response } = await getPage(journey.journeyUrl(overLongPath))
+      expect(response.statusCode).toBe(statusCodes.badRequest)
+    })
+  })
+
   describe('POST /sea', () => {
     test('returns 400 with error summary when no answer is selected', async () => {
       const { response, document } = await postPage(

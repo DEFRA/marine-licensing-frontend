@@ -11,9 +11,11 @@ const slugSchema = Joi.string()
   .pattern(/^[A-Za-z0-9_-]{22}$/)
   .required()
 
+const QUESTION_PATH_MAX = 200
+
 const paramsSchema = Joi.object({
   slug: slugSchema,
-  questionPath: Joi.string().required()
+  questionPath: Joi.string().max(QUESTION_PATH_MAX).required()
 })
 
 export const journeySelfServiceQuestion = {

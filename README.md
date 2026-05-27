@@ -191,6 +191,10 @@ Dependabot automatically creates pull requests to update dependencies.
 
 ## Releases
 
+### [7.0.0](https://eaflood.atlassian.net/projects/ML/versions/36894/tab/release-report-all-issues)
+
+Details available on the release version ticket
+
 ### [6.0.0](https://eaflood.atlassian.net/projects/ML/versions/33941/tab/release-report-all-issues)
 
 Details are available on the release version ticket

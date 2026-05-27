@@ -115,17 +115,21 @@ describe('#outcomeDocumentController (integration)', () => {
     expect(summaryDiv.querySelector('p')).not.toBeNull()
   })
 
-  test('malicious HTML in summaryText renders inert', async () => {
-    // sanitiseRichText is enforced by the template filter; this test confirms
-    // the page renders safely with the new snapshot shape and does not reflect
-    // any injected script content.
+  test('malicious HTML in summaryText is stripped while benign markup survives', async () => {
+    // summaryText is rendered via the sanitiseRichText filter, which returns a
+    // nunjucks SafeString (unescaped) — so stripping the markup is the only
+    // defence. Feed a real payload: the <script> and javascript: href must go,
+    // the benign <p> must remain.
     vi.mocked(iatOutcomeDocumentService.get).mockResolvedValueOnce(
       buildSnapshot({
         outcomeRoute: '/mod-permission',
         focusedOption: {
           id: 'WO_STANDARD_TRACK_MLA',
           heading: 'Apply for a standard marine licence',
-          text: '<p>You should apply for a standard track marine licence.</p>',
+          text:
+            '<p>You should apply for a standard track marine licence.</p>' +
+            '<script>window.__pwned = true</script>' +
+            '<a href="javascript:alert(1)">click</a>',
           module: null,
           link: null,
           overrideCtaButtonUrl: null,
@@ -134,9 +138,25 @@ describe('#outcomeDocumentController (integration)', () => {
       })
     )
 
-    const { response } = await getPage()
+    const { response, document } = await getPage()
     expect(response.statusCode).toBe(200)
-    expect(response.result).not.toContain('<script>window.__pwned')
+
+    const summaryDiv = document.querySelector(
+      '.app-iat-answers-page div.govuk-body'
+    )
+
+    // positive control: benign markup survives sanitisation
+    expect(summaryDiv.querySelector('p')).not.toBeNull()
+    expect(summaryDiv.textContent).toContain('standard track marine licence')
+
+    // the <script> element and its payload are removed entirely
+    expect(summaryDiv.querySelector('script')).toBeNull()
+    expect(response.result).not.toContain('window.__pwned')
+
+    // the javascript: scheme is stripped from the anchor, link text retained
+    const injectedLink = summaryDiv.querySelector('a')
+    expect(injectedLink).not.toBeNull()
+    expect(injectedLink.getAttribute('href')).toBeNull()
     expect(response.result).not.toMatch(/href="javascript:/)
   })
 

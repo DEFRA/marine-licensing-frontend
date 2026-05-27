@@ -16,6 +16,7 @@ import {
 } from '#src/server/common/validation/width-of-site/constants.js'
 import { saveSiteDetailsToBackend } from '#src/server/common/helpers/marine-licence/save-site-details.js'
 import { getSiteDetailsAnchor } from '#src/server/common/helpers/site-details/anchor-utils.js'
+import { getSiteParam } from '#src/server/common/helpers/site-details/site-number-utils.js'
 
 const widthOfSitePageData = {
   ...widthOfSiteSettings
@@ -24,7 +25,7 @@ const widthOfSitePageData = {
 const getBackLink = (action, siteNumber) =>
   action
     ? `${marineLicenceRoutes.MARINE_LICENCE_CIRCLE_CENTRE_POINT}?site=${siteNumber}&action=${action}`
-    : marineLicenceRoutes.MARINE_LICENCE_CIRCLE_CENTRE_POINT
+    : `${marineLicenceRoutes.MARINE_LICENCE_CIRCLE_CENTRE_POINT}${getSiteParam(siteNumber)}`
 
 export const widthOfSiteController = {
   options: {

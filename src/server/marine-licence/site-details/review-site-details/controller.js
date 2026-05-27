@@ -8,7 +8,8 @@ import {
   clearSavedMarineLicenceSiteDetails,
   clearSingleSiteMode,
   getMarineLicenceCache,
-  setMarineLicenceCache
+  setMarineLicenceCache,
+  updateMarineLicenceSiteDetails
 } from '#src/server/common/helpers/marine-licence/session-cache/utils.js'
 import { getMarineLicenceService } from '#src/services/marine-licence-service/index.js'
 import { authenticatedPatchRequest } from '#src/server/common/helpers/authenticated-requests.js'
@@ -81,9 +82,23 @@ export const reviewSiteDetailsSubmitController = {
   async handler(request, h) {
     const { payload } = request
 
-    const { addActivity, siteNumber } = payload
+    const { add, addActivity, siteNumber } = payload
 
     const marineLicence = getMarineLicenceCache(request)
+
+    if (add) {
+      const newSiteNumber = marineLicence.siteDetails.length + 1
+      await updateMarineLicenceSiteDetails(
+        request,
+        h,
+        newSiteNumber - 1,
+        'coordinatesType',
+        'coordinates'
+      )
+      return h.redirect(
+        `${marineLicenceRoutes.MARINE_LICENCE_SITE_NAME}?site=${newSiteNumber}`
+      )
+    }
 
     if (addActivity) {
       const siteIndex = Number.parseInt(siteNumber, 10) - 1

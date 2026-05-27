@@ -17,6 +17,7 @@ import { getSiteDataFromParam } from '#src/server/common/helpers/site-details/si
 import { validateSiteParam } from '#src/server/common/helpers/marine-licence/session-cache/site-utils.js'
 import { getCancelLink } from '#src/server/marine-licence/site-details/utils/cancel-link.js'
 import { getSiteDetailsAnchor } from '#src/server/common/helpers/site-details/anchor-utils.js'
+import { getSiteParam } from '#src/server/common/helpers/site-details/site-number-utils.js'
 
 export const MARINE_LICENCE_COORDINATES_ENTRY_VIEW_ROUTE =
   'templates/coordinates-entry'
@@ -24,7 +25,7 @@ export const MARINE_LICENCE_COORDINATES_ENTRY_VIEW_ROUTE =
 const getBackLink = (action, siteNumber) =>
   action
     ? `${marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS}${getSiteDetailsAnchor(siteNumber)}`
-    : marineLicenceRoutes.MARINE_LICENCE_SITE_NAME
+    : `${marineLicenceRoutes.MARINE_LICENCE_SITE_NAME}${getSiteParam(siteNumber)}`
 
 export const coordinatesEntryController = {
   options: {
@@ -118,7 +119,7 @@ export const coordinatesEntrySubmitController = {
     }
 
     return h.redirect(
-      marineLicenceRoutes.MARINE_LICENCE_COORDINATE_SYSTEM_CHOICE
+      `${marineLicenceRoutes.MARINE_LICENCE_COORDINATE_SYSTEM_CHOICE}${getSiteParam(siteNumber)}`
     )
   }
 }

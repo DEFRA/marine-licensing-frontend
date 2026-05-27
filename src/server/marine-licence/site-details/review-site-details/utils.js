@@ -126,7 +126,10 @@ export const renderManualEntryReview = (h, options) => {
   const summaryData = buildManualCoordinateSummaryData(
     siteDetails,
     marineLicence.multipleSiteDetails ?? {}
-  )
+  ).map((site, index) => ({
+    ...site,
+    deleteSiteLink: `${marineLicenceRoutes.MARINE_LICENCE_DELETE_SITE}?site=${index + 1}`
+  }))
 
   return h.view(MANUAL_ENTRY_REVIEW_VIEW_ROUTE, {
     ...reviewSiteDetailsPageData,

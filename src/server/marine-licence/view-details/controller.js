@@ -61,7 +61,9 @@ export const viewDetailsController = {
         publicConsultation: marineLicence.publicConsultation,
         isReadOnly: true,
         pageCaption,
-        backLink: isApplicantView ? routes.DASHBOARD : null
+        backLink: isApplicantView ? routes.DASHBOARD : null,
+        isInternalUserView,
+        marineLicenceId
       })
     } catch (error) {
       if (error.isBoom) {

@@ -6,6 +6,9 @@ import {
 } from '~/tests/integration/shared/test-setup-helpers.js'
 import { loadPage } from '~/tests/integration/shared/app-server.js'
 import { mockSubmittedMarineLicenceApplication } from '~/src/server/test-helpers/mocks/marine-licence-mocks.js'
+import { getAuthProvider } from '~/src/server/common/helpers/authenticated-requests.js'
+import { AUTH_STRATEGIES } from '~/src/server/common/constants/auth.js'
+import { mockMarineLicenceApplication } from '#src/server/test-helpers/mocks/marine-licence-mocks.js'
 
 describe('Marine Licence View Details', () => {
   const getServer = setupTestServer()
@@ -25,6 +28,7 @@ describe('Marine Licence View Details', () => {
 
   test('should render the page in Dynamics view', async () => {
     mockMarineLicence(mockSubmittedMarineLicenceApplication)
+    vi.mocked(getAuthProvider).mockReturnValue(AUTH_STRATEGIES.ENTRA_ID)
 
     const document = await loadPage({
       requestUrl: `${marineLicenceRoutes.MARINE_LICENCE_VIEW_DETAILS_INTERNAL_USER}/${mockSubmittedMarineLicenceApplication.id}`,
@@ -33,6 +37,13 @@ describe('Marine Licence View Details', () => {
 
     expect(getByRole(document, 'heading', { level: 1 })).toHaveTextContent(
       mockSubmittedMarineLicenceApplication.projectName
+    )
+
+    expect(
+      getByRole(document, 'link', { name: 'Download Location CSV' })
+    ).toHaveAttribute(
+      'href',
+      `/marine-licence/location-csv-download/${mockSubmittedMarineLicenceApplication.id}`
     )
   })
 

@@ -66,6 +66,7 @@ export const marineLicenceRoutes = {
   MARINE_LICENCE_SELECT_ACTIVITY:
     '/marine-licence/activity-details/{activityVariant}',
   MARINE_LICENCE_UPLOAD_AND_WAIT: '/marine-licence/upload-and-wait',
+  MARINE_LICENCE_CSV_DOWNLOAD: '/marine-licence/location-csv-download',
   MARINE_LICENCE_VIEW_DETAILS: '/marine-licence/view-details',
   MARINE_LICENCE_VIEW_DETAILS_PUBLIC: '/marine-licence/view-public-details',
   MARINE_LICENCE_VIEW_DETAILS_INTERNAL_USER: '/view-marine-licence-details',
@@ -153,5 +154,7 @@ export const apiRoutes = {
   UPDATE_MARINE_LICENCE_SITE: '/marine-licence/site',
   UPDATE_MARINE_LICENCE_SITE_DETAILS: '/marine-licence/site-details',
   MARINE_LICENCE_PROJECT_BACKGROUND: '/marine-licence/project-background',
-  DELETE_ACTIVITY_FROM_SITE: '/marine-licence/delete-activity-details'
+  DELETE_ACTIVITY_FROM_SITE: '/marine-licence/delete-activity-details',
+  GENERATE_COORDINATES_CSV:
+    '/marine-licence/{marineLicenceId}/generate-coordinates-csv'
 }

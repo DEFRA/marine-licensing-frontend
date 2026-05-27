@@ -1,0 +1,43 @@
+import Boom from '@hapi/boom'
+import { apiRoutes } from '#src/server/common/constants/routes.js'
+import { authenticatedGetRequest } from '#src/server/common/helpers/authenticated-requests.js'
+
+export const locationCsvDownloadController = {
+  async handler(request, h) {
+    const { marineLicenceId } = request.params
+    const endpoint = apiRoutes.GENERATE_COORDINATES_CSV.replace(
+      '{marineLicenceId}',
+      marineLicenceId
+    )
+
+    try {
+      const { res, payload } = await authenticatedGetRequest(
+        request,
+        endpoint,
+        { json: false }
+      )
+
+      if (res.statusCode !== 200) {
+        request.logger.error(
+          { marineLicenceId, statusCode: res.statusCode },
+          'Unexpected status code from CSV download endpoint'
+        )
+        throw Boom.internal('Failed to download CSV')
+      }
+
+      const contentDisposition = res.headers['content-disposition']
+
+      return h
+        .response(payload)
+        .type('text/csv')
+        .header('Content-Disposition', contentDisposition)
+    } catch (error) {
+      if (error.isBoom) {
+        throw error
+      }
+
+      request.logger.error(error, 'Error downloading coordinates CSV')
+      throw Boom.internal('Error downloading coordinates CSV')
+    }
+  }
+}

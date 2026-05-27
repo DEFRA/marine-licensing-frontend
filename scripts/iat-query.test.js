@@ -17,7 +17,11 @@ describe('iat-query', () => {
     })
 
     it('--json emits valid parseable JSON with question fields', () => {
-      const { stdout, code } = runCommand(['question', '/activity-type', '--json'])
+      const { stdout, code } = runCommand([
+        'question',
+        '/activity-type',
+        '--json'
+      ])
       expect(code).toBe(0)
       const parsed = JSON.parse(stdout)
       expect(parsed.mcmsAppFormMapping).toBe('ACTIVITY_TYPE')
@@ -41,7 +45,11 @@ describe('iat-query', () => {
     })
 
     it('--json includes classification and outcomeTypes', () => {
-      const { stdout, code } = runCommand(['outcome', '/mod-permission', '--json'])
+      const { stdout, code } = runCommand([
+        'outcome',
+        '/mod-permission',
+        '--json'
+      ])
       expect(code).toBe(0)
       const parsed = JSON.parse(stdout)
       expect(parsed).toHaveProperty('classification')
@@ -64,7 +72,11 @@ describe('iat-query', () => {
     })
 
     it('--json includes params and all fields', () => {
-      const { stdout, code } = runCommand(['outcome-type', 'WO_FAST_TRACK_MLA', '--json'])
+      const { stdout, code } = runCommand([
+        'outcome-type',
+        'WO_FAST_TRACK_MLA',
+        '--json'
+      ])
       expect(code).toBe(0)
       const parsed = JSON.parse(stdout)
       expect(parsed.id).toBe('WO_FAST_TRACK_MLA')
@@ -83,7 +95,11 @@ describe('iat-query', () => {
     })
 
     it('--classify filters to only the requested classification', () => {
-      const { stdout, code } = runCommand(['outcomes', '--classify', 'terminal-single'])
+      const { stdout, code } = runCommand([
+        'outcomes',
+        '--classify',
+        'terminal-single'
+      ])
       expect(code).toBe(0)
       const lines = stdout.split('\n').filter(Boolean)
       expect(lines.length).toBeGreaterThan(0)
@@ -93,14 +109,23 @@ describe('iat-query', () => {
     })
 
     it('--has-param filters outcomes whose types have the param', () => {
-      const { stdout, code } = runCommand(['outcomes', '--has-param', 'FAST_TRACK'])
+      const { stdout, code } = runCommand([
+        'outcomes',
+        '--has-param',
+        'FAST_TRACK'
+      ])
       expect(code).toBe(0)
       const lines = stdout.split('\n').filter(Boolean)
       expect(lines.length).toBeGreaterThan(0)
     })
 
     it('--json emits an array with route and classification', () => {
-      const { stdout, code } = runCommand(['outcomes', '--classify', 'intermediate', '--json'])
+      const { stdout, code } = runCommand([
+        'outcomes',
+        '--classify',
+        'intermediate',
+        '--json'
+      ])
       expect(code).toBe(0)
       const parsed = JSON.parse(stdout)
       expect(Array.isArray(parsed)).toBe(true)
@@ -119,7 +144,10 @@ describe('iat-query', () => {
     })
 
     it('--has-next-question filters to types with nextQuestionRoute', () => {
-      const { stdout, code } = runCommand(['outcome-types', '--has-next-question'])
+      const { stdout, code } = runCommand([
+        'outcome-types',
+        '--has-next-question'
+      ])
       expect(code).toBe(0)
       const lines = stdout.split('\n').filter(Boolean)
       expect(lines.length).toBeGreaterThan(0)
@@ -130,7 +158,11 @@ describe('iat-query', () => {
     })
 
     it('--has-param NAME=VALUE matches exact value', () => {
-      const { stdout, code } = runCommand(['outcome-types', '--has-param', 'FAST_TRACK=true'])
+      const { stdout, code } = runCommand([
+        'outcome-types',
+        '--has-param',
+        'FAST_TRACK=true'
+      ])
       expect(code).toBe(0)
       const lines = stdout.split('\n').filter(Boolean)
       expect(lines.length).toBeGreaterThan(0)
@@ -138,7 +170,12 @@ describe('iat-query', () => {
     })
 
     it('--json emits an array of outcomeType objects', () => {
-      const { stdout, code } = runCommand(['outcome-types', '--has-param', 'FAST_TRACK', '--json'])
+      const { stdout, code } = runCommand([
+        'outcome-types',
+        '--has-param',
+        'FAST_TRACK',
+        '--json'
+      ])
       expect(code).toBe(0)
       const parsed = JSON.parse(stdout)
       expect(Array.isArray(parsed)).toBe(true)
@@ -166,7 +203,11 @@ describe('iat-query', () => {
     })
 
     it('--mapping NAME filters to exact mapping', () => {
-      const { stdout, code } = runCommand(['questions', '--mapping', 'ACTIVITY_TYPE'])
+      const { stdout, code } = runCommand([
+        'questions',
+        '--mapping',
+        'ACTIVITY_TYPE'
+      ])
       expect(code).toBe(0)
       const lines = stdout.split('\n').filter(Boolean)
       expect(lines.length).toBeGreaterThan(0)
@@ -174,7 +215,12 @@ describe('iat-query', () => {
     })
 
     it('--json returns an array with route field', () => {
-      const { stdout, code } = runCommand(['questions', '--mapping', 'ACTIVITY_TYPE', '--json'])
+      const { stdout, code } = runCommand([
+        'questions',
+        '--mapping',
+        'ACTIVITY_TYPE',
+        '--json'
+      ])
       expect(code).toBe(0)
       const parsed = JSON.parse(stdout)
       expect(Array.isArray(parsed)).toBe(true)

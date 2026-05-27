@@ -38,7 +38,8 @@ function excerpt(text) {
   if (!text) {
     return '-'
   }
-  const bounded = text.length > MAX_TEXT_FOR_STRIP ? text.slice(0, MAX_TEXT_FOR_STRIP) : text
+  const bounded =
+    text.length > MAX_TEXT_FOR_STRIP ? text.slice(0, MAX_TEXT_FOR_STRIP) : text
   const stripped = bounded.replaceAll(/<[^>]+>/g, '').trim()
   if (stripped.length <= EXCERPT_LEN) {
     return stripped
@@ -181,7 +182,9 @@ function runOutcomeType(id, json) {
 
 function outcomeMatchesHasParam(outcome, paramName, paramValue) {
   const types = getOutcomeTypesForOutcome(outcome)
-  return types.some((ot) => outcomeTypeMatchesHasParam(ot, paramName, paramValue))
+  return types.some((ot) =>
+    outcomeTypeMatchesHasParam(ot, paramName, paramValue)
+  )
 }
 
 function outcomeTypeMatchesHasParam(ot, paramName, paramValue) {
@@ -302,7 +305,9 @@ function runMappings(json) {
     }
     return { stdout: JSON.stringify(doc, null, 2), code: 0 }
   }
-  const lines = sortedKeys.map((key) => `${key}\t${mappingMap.get(key).join(',')}`)
+  const lines = sortedKeys.map(
+    (key) => `${key}\t${mappingMap.get(key).join(',')}`
+  )
   return { stdout: lines.join('\n'), code: 0 }
 }
 
@@ -320,7 +325,10 @@ function parseSingleArg(rest, usage) {
 }
 
 function dispatchQuestion(rest) {
-  const parsed = parseSingleArg(rest, 'Usage: iat-query question <route> [--json]')
+  const parsed = parseSingleArg(
+    rest,
+    'Usage: iat-query question <route> [--json]'
+  )
   if (parsed.error) {
     return parsed.error
   }
@@ -328,7 +336,10 @@ function dispatchQuestion(rest) {
 }
 
 function dispatchOutcome(rest) {
-  const parsed = parseSingleArg(rest, 'Usage: iat-query outcome <route> [--json]')
+  const parsed = parseSingleArg(
+    rest,
+    'Usage: iat-query outcome <route> [--json]'
+  )
   if (parsed.error) {
     return parsed.error
   }
@@ -336,7 +347,10 @@ function dispatchOutcome(rest) {
 }
 
 function dispatchOutcomeType(rest) {
-  const parsed = parseSingleArg(rest, 'Usage: iat-query outcome-type <id> [--json]')
+  const parsed = parseSingleArg(
+    rest,
+    'Usage: iat-query outcome-type <id> [--json]'
+  )
   if (parsed.error) {
     return parsed.error
   }
@@ -370,7 +384,10 @@ function dispatchOutcomeTypes(rest) {
     allowPositionals: false
   })
   return runOutcomeTypes(
-    { hasParam: values['has-param'], hasNextQuestion: values['has-next-question'] },
+    {
+      hasParam: values['has-param'],
+      hasNextQuestion: values['has-next-question']
+    },
     values.json
   )
 }
@@ -422,8 +439,7 @@ export function runCommand(argv) {
   return handler(rest)
 }
 
-const isMain =
-  import.meta.url === `file://${process.argv[1]}`
+const isMain = import.meta.url === `file://${process.argv[1]}`
 
 if (isMain) {
   const { stdout, code } = runCommand(process.argv.slice(2))

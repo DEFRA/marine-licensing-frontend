@@ -161,19 +161,6 @@ sequenceDiagram
     end
 ```
 
-The same lifecycle as a state machine:
-
-```mermaid
-stateDiagram-v2
-    [*] --> ContextInFlight: POST /iat-contexts<br/>(expiresAt = now + 24h)
-    ContextInFlight --> ContextInFlight: PATCH /iat-contexts/{slug}<br/>(append / truncate-and-replace)
-    ContextInFlight --> [*]: 24h TTL deletion
-
-    ContextInFlight --> SnapshotMinted: POST /iat-contexts/{slug}/outcome-documents<br/>(creates a NEW snapshot doc)
-    SnapshotMinted --> ContextInFlight: user navigates back; context still mutable
-    SnapshotMinted --> [*]: snapshot URL served forever<br/>(no TTL on iat-outcome-documents)
-```
-
 The pre-handler [`services/load-iat-context.js`](./services/load-iat-context.js)
 runs on every `c/{slug}/…` route — it fetches the context doc via the
 backend, redirects to `/journey/self-service/invalid` on missing-or-expired,

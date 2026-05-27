@@ -32,7 +32,6 @@
     "server:debug": "nodemon --inspect-brk=0.0.0.0 --ext js,json --legacy-watch ./src",
     "prestart": "npm run build",
     "start": "NODE_ENV=production node --use-strict .",
-    "iat": "node scripts/iat-query.js",
     "knip": "knip"
   },
   "author": "Defra DDTS",

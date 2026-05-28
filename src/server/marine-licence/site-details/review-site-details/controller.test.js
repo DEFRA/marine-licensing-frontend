@@ -167,6 +167,30 @@ describe('#reviewSiteDetails', () => {
   })
 
   describe('reviewSiteDetailsSubmitController', () => {
+    test('should set coordinatesType and redirect to site name for new site when add is in payload', async () => {
+      getMarineLicenceCacheSpy.mockReturnValue({
+        id: 'test-id',
+        siteDetails: [{ coordinatesType: 'coordinates', siteName: 'Site 1' }]
+      })
+      vi.mocked(cacheUtils.updateMarineLicenceSiteDetails).mockResolvedValue({})
+
+      const h = createMockHandler('redirect')
+      const request = createMockRequest({ payload: { add: 'add' } })
+
+      await reviewSiteDetailsSubmitController.handler(request, h)
+
+      expect(cacheUtils.updateMarineLicenceSiteDetails).toHaveBeenCalledWith(
+        request,
+        h,
+        1,
+        'coordinatesType',
+        'coordinates'
+      )
+      expect(h.redirect).toHaveBeenCalledWith(
+        `${marineLicenceRoutes.MARINE_LICENCE_SITE_NAME}?site=2`
+      )
+    })
+
     test('should redirect to task list when no addActivity in payload', async () => {
       const h = createMockHandler('redirect')
       const request = createMockRequest({ payload: {} })

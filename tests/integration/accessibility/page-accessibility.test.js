@@ -256,6 +256,11 @@ describe('Page accessibility checks (Axe)', () => {
       title: 'What are the proposed working hours?'
     },
     {
+      url: `${marineLicenceRoutes.MARINE_LICENCE_DELETE_SITE}?site=1`,
+      isMarineLicence: true,
+      title: 'Are you sure you want to delete this site?'
+    },
+    {
       url: `${marineLicenceRoutes.MARINE_LICENCE_DELETE_ACTIVITY}?site=1&activity=2`,
       isMarineLicence: true,
       title: 'Are you sure you want to delete this activity?'

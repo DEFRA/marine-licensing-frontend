@@ -35,7 +35,10 @@ export const buildCYASiteData = async (marineLicence, request) => {
   if (coordinatesType === 'file') {
     return {
       coordinatesType,
-      summaryData: buildFileUploadSummaryData(completeMarineLicence, siteDetails)
+      summaryData: buildFileUploadSummaryData(
+        completeMarineLicence,
+        siteDetails
+      )
     }
   }
 

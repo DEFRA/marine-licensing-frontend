@@ -52,7 +52,10 @@ describe('#checkYourAnswersController', () => {
     await checkYourAnswersController.handler(mockRequest, mockH)
 
     expect(getMarineLicenceCacheMock).toHaveBeenCalledWith(mockRequest)
-    expect(buildCYASiteDataMock).toHaveBeenCalledWith(mockCachedData, mockRequest)
+    expect(buildCYASiteDataMock).toHaveBeenCalledWith(
+      mockCachedData,
+      mockRequest
+    )
     expect(mockH.view).toHaveBeenCalledWith(CHECK_YOUR_ANSWERS_VIEW_ROUTE, {
       pageTitle: 'Check your answers before sending your information',
       backLink: marineLicenceRoutes.MARINE_LICENCE_TASK_LIST,
@@ -61,8 +64,7 @@ describe('#checkYourAnswersController', () => {
       summaryData: mockSummaryData,
       reviewSiteDetailsRoute:
         marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS,
-      publicRegisterRoute:
-        marineLicenceRoutes.MARINE_LICENCE_PUBLIC_REGISTER
+      publicRegisterRoute: marineLicenceRoutes.MARINE_LICENCE_PUBLIC_REGISTER
     })
   })
 
@@ -88,8 +90,7 @@ describe('#checkYourAnswersController', () => {
       summaryData: [],
       reviewSiteDetailsRoute:
         marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS,
-      publicRegisterRoute:
-        marineLicenceRoutes.MARINE_LICENCE_PUBLIC_REGISTER,
+      publicRegisterRoute: marineLicenceRoutes.MARINE_LICENCE_PUBLIC_REGISTER,
       preferredDates: 'July 2026 to August 2027'
     })
   })

@@ -1,6 +1,6 @@
 import { vi } from 'vitest'
 import { getMarineLicenceCache } from '#src/server/common/helpers/marine-licence/session-cache/utils.js'
-import { buildCYASiteData } from '#src/server/common/helpers/marine-licence/check-your-answers/site-data.js'
+import { buildCheckYourAnswersSiteData } from '#src/server/common/helpers/marine-licence/check-your-answers-site-data.js'
 import { buildSummaryData } from '#src/server/common/helpers/marine-licence/summary-data.js'
 import {
   checkYourAnswersController,
@@ -15,7 +15,7 @@ import { mockMarineLicenceApplication } from '~/src/server/test-helpers/mocks/ma
 
 vi.mock('#src/server/common/helpers/marine-licence/session-cache/utils.js')
 vi.mock(
-  '#src/server/common/helpers/marine-licence/check-your-answers/site-data.js'
+  '#src/server/common/helpers/marine-licence/check-your-answers-site-data.js'
 )
 vi.mock('#src/server/common/helpers/marine-licence/summary-data.js')
 
@@ -24,7 +24,9 @@ describe('#checkYourAnswersController', () => {
   let mockH
 
   const getMarineLicenceCacheMock = vi.mocked(getMarineLicenceCache)
-  const buildCYASiteDataMock = vi.mocked(buildCYASiteData)
+  const buildCheckYourAnswersSiteDataMock = vi.mocked(
+    buildCheckYourAnswersSiteData
+  )
   const buildSummaryDataMock = vi.mocked(buildSummaryData)
 
   beforeEach(() => {
@@ -51,7 +53,7 @@ describe('#checkYourAnswersController', () => {
     const mockSummaryData = [{ siteNumber: 1, siteName: 'Test Site' }]
 
     getMarineLicenceCacheMock.mockReturnValue(mockCachedData)
-    buildCYASiteDataMock.mockResolvedValue({
+    buildCheckYourAnswersSiteDataMock.mockResolvedValue({
       coordinatesType: 'coordinates',
       summaryData: mockSummaryData
     })
@@ -63,7 +65,7 @@ describe('#checkYourAnswersController', () => {
     await checkYourAnswersController.handler(mockRequest, mockH)
 
     expect(getMarineLicenceCacheMock).toHaveBeenCalledWith(mockRequest)
-    expect(buildCYASiteDataMock).toHaveBeenCalledWith(
+    expect(buildCheckYourAnswersSiteDataMock).toHaveBeenCalledWith(
       mockCachedData,
       mockRequest
     )
@@ -88,7 +90,7 @@ describe('#checkYourAnswersController', () => {
     }
 
     getMarineLicenceCacheMock.mockReturnValue(mockCachedData)
-    buildCYASiteDataMock.mockResolvedValue({
+    buildCheckYourAnswersSiteDataMock.mockResolvedValue({
       coordinatesType: null,
       summaryData: []
     })

@@ -14,7 +14,7 @@ const buildFileUploadSummaryData = (marineLicence, siteDetails) =>
     activityDetails: parseActivityDetails(site)
   }))
 
-export const buildCYASiteData = async (marineLicence, request) => {
+export const buildCheckYourAnswersSiteData = async (marineLicence, request) => {
   if (!marineLicence.id) {
     return { coordinatesType: null, summaryData: [] }
   }

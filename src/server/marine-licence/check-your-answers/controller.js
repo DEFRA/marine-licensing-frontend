@@ -3,7 +3,7 @@ import {
   marineLicenceRoutes,
   routes
 } from '#src/server/common/constants/routes.js'
-import { buildCYASiteData } from '#src/server/common/helpers/marine-licence/check-your-answers/site-data.js'
+import { buildCheckYourAnswersSiteData } from '#src/server/common/helpers/marine-licence/check-your-answers-site-data.js'
 import { buildSummaryData } from '#src/server/common/helpers/marine-licence/summary-data.js'
 
 const checkYourAnswersViewContent = {
@@ -17,10 +17,8 @@ export const CHECK_YOUR_ANSWERS_VIEW_ROUTE =
 export const checkYourAnswersController = {
   async handler(request, h) {
     const cachedMarineLicence = getMarineLicenceCache(request)
-    const { coordinatesType, summaryData } = await buildCYASiteData(
-      cachedMarineLicence,
-      request
-    )
+    const { coordinatesType, summaryData } =
+      await buildCheckYourAnswersSiteData(cachedMarineLicence, request)
 
     const formattedMarineLicence = buildSummaryData(cachedMarineLicence)
 

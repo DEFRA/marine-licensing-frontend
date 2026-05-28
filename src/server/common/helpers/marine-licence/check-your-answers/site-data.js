@@ -1,5 +1,5 @@
 import { getMarineLicenceService } from '#src/services/marine-licence-service/index.js'
-import { getSiteDetailsBySite } from '#src/server/common/helpers/exemptions/session-cache/site-details-utils.js'
+import { getSiteDetailsBySite } from '#src/server/common/helpers/marine-licence/session-cache/site-details-utils.js'
 import { buildManualCoordinateSummaryData } from '#src/server/common/helpers/review-site-details/manual-entry.js'
 import { getFileUploadSummaryData } from '#src/server/common/helpers/review-site-details/file-upload.js'
 import { createSiteDetailsDataJson } from '#src/server/common/helpers/site-details.js'

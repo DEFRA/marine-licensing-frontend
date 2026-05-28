@@ -1,17 +1,23 @@
 import { vi } from 'vitest'
 import { getMarineLicenceCache } from '#src/server/common/helpers/marine-licence/session-cache/utils.js'
 import { buildCYASiteData } from '#src/server/common/helpers/marine-licence/check-your-answers/site-data.js'
+import { buildSummaryData } from '#src/server/common/helpers/marine-licence/summary-data.js'
 import {
   checkYourAnswersController,
+  checkYourAnswersContinueController,
   CHECK_YOUR_ANSWERS_VIEW_ROUTE
 } from '#src/server/marine-licence/check-your-answers/controller.js'
-import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
+import {
+  marineLicenceRoutes,
+  routes
+} from '#src/server/common/constants/routes.js'
 import { mockMarineLicenceApplication } from '~/src/server/test-helpers/mocks/marine-licence-mocks.js'
 
 vi.mock('#src/server/common/helpers/marine-licence/session-cache/utils.js')
 vi.mock(
   '#src/server/common/helpers/marine-licence/check-your-answers/site-data.js'
 )
+vi.mock('#src/server/common/helpers/marine-licence/summary-data.js')
 
 describe('#checkYourAnswersController', () => {
   let mockRequest
@@ -19,6 +25,7 @@ describe('#checkYourAnswersController', () => {
 
   const getMarineLicenceCacheMock = vi.mocked(getMarineLicenceCache)
   const buildCYASiteDataMock = vi.mocked(buildCYASiteData)
+  const buildSummaryDataMock = vi.mocked(buildSummaryData)
 
   beforeEach(() => {
     mockH = {
@@ -48,6 +55,10 @@ describe('#checkYourAnswersController', () => {
       coordinatesType: 'coordinates',
       summaryData: mockSummaryData
     })
+    buildSummaryDataMock.mockReturnValue({
+      ...mockCachedData,
+      preferredDates: 'July 2026 to August 2027'
+    })
 
     await checkYourAnswersController.handler(mockRequest, mockH)
 
@@ -56,10 +67,12 @@ describe('#checkYourAnswersController', () => {
       mockCachedData,
       mockRequest
     )
+    expect(buildSummaryDataMock).toHaveBeenCalledWith(mockCachedData)
     expect(mockH.view).toHaveBeenCalledWith(CHECK_YOUR_ANSWERS_VIEW_ROUTE, {
       pageTitle: 'Check your answers before sending your information',
       backLink: marineLicenceRoutes.MARINE_LICENCE_TASK_LIST,
       ...mockCachedData,
+      preferredDates: 'July 2026 to August 2027',
       coordinatesType: 'coordinates',
       summaryData: mockSummaryData,
       reviewSiteDetailsRoute:
@@ -79,19 +92,32 @@ describe('#checkYourAnswersController', () => {
       coordinatesType: null,
       summaryData: []
     })
+    buildSummaryDataMock.mockReturnValue({
+      ...mockCachedData,
+      preferredDates: null
+    })
 
     await checkYourAnswersController.handler(mockRequest, mockH)
 
+    expect(buildSummaryDataMock).toHaveBeenCalledWith(mockCachedData)
     expect(mockH.view).toHaveBeenCalledWith(CHECK_YOUR_ANSWERS_VIEW_ROUTE, {
       pageTitle: 'Check your answers before sending your information',
       backLink: marineLicenceRoutes.MARINE_LICENCE_TASK_LIST,
       ...mockCachedData,
+      preferredDates: null,
       coordinatesType: null,
       summaryData: [],
       reviewSiteDetailsRoute:
         marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS,
-      publicRegisterRoute: marineLicenceRoutes.MARINE_LICENCE_PUBLIC_REGISTER,
-      preferredDates: 'July 2026 to August 2027'
+      publicRegisterRoute: marineLicenceRoutes.MARINE_LICENCE_PUBLIC_REGISTER
     })
+  })
+})
+
+describe('#checkYourAnswersContinueController', () => {
+  test('handler should redirect to declaration', async () => {
+    const mockH = { redirect: vi.fn() }
+    await checkYourAnswersContinueController.handler({}, mockH)
+    expect(mockH.redirect).toHaveBeenCalledWith(routes.DECLARATION)
   })
 })

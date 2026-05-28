@@ -58,7 +58,7 @@ describe('#taskListController', () => {
       redirect: vi.fn()
     }
     mockRequest = {
-      yar: {}
+      yar: { flash: vi.fn() }
     }
   })
 

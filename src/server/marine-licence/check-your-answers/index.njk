@@ -71,7 +71,8 @@
             {{ appMarineLicenceActivityDetailsCard({
               activityDetails: activityDetails,
               siteNumber: site.siteNumber,
-              index: loop.index
+              index: loop.index,
+              changeLink: reviewSiteDetailsRoute + "?from=check-your-answers#activity-details-site-" + site.siteNumber + "-activity-" + loop.index
             }) }}
           {% endfor %}
         {% endfor %}

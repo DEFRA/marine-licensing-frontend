@@ -202,6 +202,20 @@ describe('#reviewSiteDetails', () => {
       )
     })
 
+    test('should redirect to check-your-answers when flash returnTo is set', async () => {
+      const h = createMockHandler('redirect')
+      const request = createMockRequest({ payload: {} })
+      request.yar.flash.mockReturnValue([
+        marineLicenceRoutes.MARINE_LICENCE_CHECK_YOUR_ANSWERS
+      ])
+
+      await reviewSiteDetailsSubmitController.handler(request, h)
+
+      expect(h.redirect).toHaveBeenCalledWith(
+        marineLicenceRoutes.MARINE_LICENCE_CHECK_YOUR_ANSWERS
+      )
+    })
+
     test('should call the API and redirect to review page with the next activity anchor', async () => {
       getMarineLicenceCacheSpy.mockReturnValue({
         id: 'test-id',

@@ -5,6 +5,7 @@ import {
 } from '#src/server/common/constants/routes.js'
 import { buildCheckYourAnswersSiteData } from '#src/server/common/helpers/marine-licence/check-your-answers-site-data.js'
 import { buildSummaryData } from '#src/server/common/helpers/marine-licence/summary-data.js'
+import { RETURN_TO_CACHE_KEY } from '#src/server/common/constants/cache.js'
 
 const checkYourAnswersViewContent = {
   pageTitle: 'Check your answers before sending your information',
@@ -17,6 +18,11 @@ export const CHECK_YOUR_ANSWERS_VIEW_ROUTE =
 export const checkYourAnswersController = {
   async handler(request, h) {
     const cachedMarineLicence = getMarineLicenceCache(request)
+    request.yar.flash(
+      RETURN_TO_CACHE_KEY,
+      marineLicenceRoutes.MARINE_LICENCE_CHECK_YOUR_ANSWERS,
+      true
+    )
     const { coordinatesType, summaryData } =
       await buildCheckYourAnswersSiteData(cachedMarineLicence, request)
 

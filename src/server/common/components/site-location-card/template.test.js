@@ -37,18 +37,6 @@ describe('Site Location Card Component', () => {
         )
       })
 
-      test('Should display file type', () => {
-        const htmlContent = $component.html()
-        expect(htmlContent).toContain('File type')
-        expect(htmlContent).toContain('KML')
-      })
-
-      test('Should display file uploaded', () => {
-        const htmlContent = $component.html()
-        expect(htmlContent).toContain('File uploaded')
-        expect(htmlContent).toContain('test-site.kml')
-      })
-
       test('Should show Change link when not read-only', () => {
         expect(
           $component('.govuk-summary-card__actions a').text().trim()
@@ -75,13 +63,12 @@ describe('Site Location Card Component', () => {
         expect($component('#site-location-card')).toHaveLength(1)
       })
 
-      test('Should display all file upload fields', () => {
+      test('Should display method of providing site location', () => {
         const htmlContent = $component.html()
         expect(htmlContent).toContain('Method of providing site location')
-        expect(htmlContent).toContain('File type')
-        expect(htmlContent).toContain('Shapefile')
-        expect(htmlContent).toContain('File uploaded')
-        expect(htmlContent).toContain('site-boundary.shp')
+        expect(htmlContent).toContain(
+          'Upload a file with the coordinates of the site'
+        )
       })
 
       test('Should not show Change link when read-only', () => {

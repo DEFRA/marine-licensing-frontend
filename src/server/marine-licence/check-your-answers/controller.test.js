@@ -34,7 +34,7 @@ describe('#checkYourAnswersController', () => {
       view: vi.fn()
     }
     mockRequest = {
-      yar: {}
+      yar: { flash: vi.fn() }
     }
   })
 
@@ -65,6 +65,11 @@ describe('#checkYourAnswersController', () => {
     await checkYourAnswersController.handler(mockRequest, mockH)
 
     expect(getMarineLicenceCacheMock).toHaveBeenCalledWith(mockRequest)
+    expect(mockRequest.yar.flash).toHaveBeenCalledWith(
+      'returnTo',
+      marineLicenceRoutes.MARINE_LICENCE_CHECK_YOUR_ANSWERS,
+      true
+    )
     expect(buildCheckYourAnswersSiteDataMock).toHaveBeenCalledWith(
       mockCachedData,
       mockRequest

@@ -69,7 +69,7 @@ export const testScenarios = [
       summaryCards: [
         'Project summary',
         'Providing the site location',
-        'Site details',
+        'Site 1',
         'Sharing your project information publicly'
       ],
       projectDetails: {
@@ -118,7 +118,7 @@ export const testScenarios = [
       summaryCards: [
         'Project summary',
         'Providing the site location',
-        'Site details',
+        'Site 1',
         'Sharing your project information publicly'
       ],
       projectDetails: {
@@ -154,7 +154,7 @@ export const testScenarios = [
       summaryCards: [
         'Project summary',
         'Providing the site location',
-        'Site details',
+        'Site 1',
         'Sharing your project information publicly'
       ],
       projectDetails: {
@@ -199,7 +199,7 @@ export const testScenarios = [
       summaryCards: [
         'Project summary',
         'Providing the site location',
-        'Site details',
+        'Site 1',
         'Sharing your project information publicly'
       ],
       projectDetails: {
@@ -250,7 +250,7 @@ export const testScenarios = [
       summaryCards: [
         'Project summary',
         'Providing the site location',
-        'Site details',
+        'Site 1',
         'Sharing your project information publicly'
       ],
       projectDetails: {
@@ -302,7 +302,7 @@ export const testScenarios = [
       summaryCards: [
         'Project summary',
         'Providing the site location',
-        'Site details',
+        'Site 1',
         'Sharing your project information publicly'
       ],
       projectDetails: {
@@ -355,7 +355,7 @@ export const testScenarios = [
       summaryCards: [
         'Project summary',
         'Providing the site location',
-        'Site details',
+        'Site 1',
         'Sharing your project information publicly'
       ],
       projectDetails: {
@@ -430,8 +430,8 @@ export const testScenarios = [
         'Project summary',
         'Providing the site location',
         'Activity details',
-        'Site 1 details',
-        'Site 2 details',
+        'Site 1',
+        'Site 2',
         'Sharing your project information publicly'
       ],
       projectDetails: {
@@ -544,8 +544,8 @@ export const testScenarios = [
         'Project summary',
         'Providing the site location',
         'Activity details',
-        'Site 1 details',
-        'Site 2 details',
+        'Site 1',
+        'Site 2',
         'Sharing your project information publicly'
       ],
       projectDetails: {
@@ -553,9 +553,7 @@ export const testScenarios = [
       },
       siteLocation: {
         'Method of providing site location':
-          'Upload a file with the coordinates of the site',
-        'File type': 'KML',
-        'File uploaded': 'site1.kml'
+          'Upload a file with the coordinates of the site'
       },
       activityDetails: {
         'Are the activity dates the same for every site?': 'Yes',

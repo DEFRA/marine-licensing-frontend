@@ -17,6 +17,7 @@ import { PROJECT_TYPE } from '#src/server/common/constants/projects.js'
 import { getUserSession } from '#src/server/common/plugins/auth/utils.js'
 import { USER_TYPES } from '#src/server/common/constants/user-types.js'
 import Boom from '@hapi/boom'
+import { RETURN_TO_CACHE_KEY } from '#src/server/common/constants/cache.js'
 
 export const TASK_LIST_VIEW_ROUTE = 'marine-licence/task-list/index'
 
@@ -29,6 +30,8 @@ const taskListViewSettings = {
 
 export const taskListController = {
   async handler(request, h) {
+    request.yar.flash(RETURN_TO_CACHE_KEY)
+
     const userSession = await getUserSession(
       request,
       request.state?.userSession

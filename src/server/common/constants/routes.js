@@ -84,7 +84,8 @@ export const marineLicenceRoutes = {
   MARINE_LICENCE_CHANGE_SITE_LOCATION: '/marine-licence/change-site-location',
   MARINE_LICENCE_ENTER_MULTIPLE_COORDINATES:
     '/marine-licence/enter-multiple-coordinates',
-  MARINE_LICENCE_DELETE_ALL_SITES: '/marine-licence/delete-all-sites'
+  MARINE_LICENCE_DELETE_ALL_SITES: '/marine-licence/delete-all-sites',
+  MARINE_LICENCE_PREFERRED_DATES: '/marine-licence/start-and-end-dates'
 }
 
 export const defraIdGuidanceRoutes = {
@@ -154,5 +155,6 @@ export const apiRoutes = {
   UPDATE_MARINE_LICENCE_SITE: '/marine-licence/site',
   UPDATE_MARINE_LICENCE_SITE_DETAILS: '/marine-licence/site-details',
   MARINE_LICENCE_PROJECT_BACKGROUND: '/marine-licence/project-background',
-  DELETE_ACTIVITY_FROM_SITE: '/marine-licence/delete-activity-details'
+  DELETE_ACTIVITY_FROM_SITE: '/marine-licence/delete-activity-details',
+  UPDATE_PREFERRED_DATES: '/marine-licence/preferred-dates'
 }

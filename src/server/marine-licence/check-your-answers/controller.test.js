@@ -6,6 +6,7 @@ import {
   CHECK_YOUR_ANSWERS_VIEW_ROUTE
 } from '#src/server/marine-licence/check-your-answers/controller.js'
 import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
+import { mockMarineLicenceApplication } from '~/src/server/test-helpers/mocks/marine-licence-mocks.js'
 
 vi.mock('#src/server/common/helpers/marine-licence/session-cache/utils.js')
 vi.mock(
@@ -35,7 +36,10 @@ describe('#checkYourAnswersController', () => {
       specialLegalPowers: {
         agree: 'yes',
         details: 'We have statutory powers under the Marine Act.'
-      }
+      },
+      ...mockMarineLicenceApplication,
+      publicRegisterRoute:
+        '/marine-licence/sharing-your-project-information-publicly'
     }
     const mockSummaryData = [{ siteNumber: 1, siteName: 'Test Site' }]
 
@@ -85,7 +89,8 @@ describe('#checkYourAnswersController', () => {
       reviewSiteDetailsRoute:
         marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS,
       publicRegisterRoute:
-        marineLicenceRoutes.MARINE_LICENCE_PUBLIC_REGISTER
+        marineLicenceRoutes.MARINE_LICENCE_PUBLIC_REGISTER,
+      preferredDates: 'July 2026 to August 2027'
     })
   })
 })

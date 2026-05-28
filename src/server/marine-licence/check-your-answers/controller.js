@@ -4,6 +4,7 @@ import {
   routes
 } from '#src/server/common/constants/routes.js'
 import { buildCYASiteData } from '#src/server/common/helpers/marine-licence/check-your-answers/site-data.js'
+import { buildSummaryData } from '#src/server/common/helpers/marine-licence/summary-data.js'
 
 const checkYourAnswersViewContent = {
   pageTitle: 'Check your answers before sending your information',
@@ -21,6 +22,8 @@ export const checkYourAnswersController = {
       request
     )
 
+    const formattedMarineLicence = buildSummaryData(cachedMarineLicence)
+
     return h.view(CHECK_YOUR_ANSWERS_VIEW_ROUTE, {
       ...checkYourAnswersViewContent,
       ...cachedMarineLicence,
@@ -28,6 +31,7 @@ export const checkYourAnswersController = {
       summaryData,
       reviewSiteDetailsRoute:
         marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS,
+      ...formattedMarineLicence,
       publicRegisterRoute: marineLicenceRoutes.MARINE_LICENCE_PUBLIC_REGISTER
     })
   }

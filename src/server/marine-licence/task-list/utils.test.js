@@ -12,7 +12,8 @@ describe('taskList utils', () => {
       expect(
         transformProjectDetailsTaskList({
           projectName: 'COMPLETED',
-          projectBackground: 'COMPLETED'
+          projectBackground: 'COMPLETED',
+          preferredDates: 'COMPLETED'
         })
       ).toEqual([
         {
@@ -29,6 +30,14 @@ describe('taskList utils', () => {
           title: {
             classes: 'govuk-link--no-visited-state',
             text: 'Project background'
+          }
+        },
+        {
+          href: marineLicenceRoutes.MARINE_LICENCE_PREFERRED_DATES,
+          status: { text: 'Completed' },
+          title: {
+            classes: 'govuk-link--no-visited-state',
+            text: 'Preferred start and end dates of the licence'
           }
         }
       ])
@@ -38,7 +47,8 @@ describe('taskList utils', () => {
       expect(
         transformProjectDetailsTaskList({
           projectName: 'IN_PROGRESS',
-          projectBackground: 'IN_PROGRESS'
+          projectBackground: 'IN_PROGRESS',
+          preferredDates: 'IN_PROGRESS'
         })
       ).toEqual([
         {
@@ -59,6 +69,16 @@ describe('taskList utils', () => {
           title: {
             classes: 'govuk-link--no-visited-state',
             text: 'Project background'
+          }
+        },
+        {
+          href: marineLicenceRoutes.MARINE_LICENCE_PREFERRED_DATES,
+          status: {
+            tag: { text: 'In progress', classes: 'govuk-tag--teal' }
+          },
+          title: {
+            classes: 'govuk-link--no-visited-state',
+            text: 'Preferred start and end dates of the licence'
           }
         }
       ])
@@ -87,6 +107,16 @@ describe('taskList utils', () => {
               title: {
                 classes: 'govuk-link--no-visited-state',
                 text: 'Project background'
+              }
+            },
+            {
+              href: marineLicenceRoutes.MARINE_LICENCE_PREFERRED_DATES,
+              status: {
+                tag: { text: 'Not yet started', classes: 'govuk-tag--blue' }
+              },
+              title: {
+                classes: 'govuk-link--no-visited-state',
+                text: 'Preferred start and end dates of the licence'
               }
             }
           ]

@@ -69,6 +69,14 @@ export const transformProjectDetailsTaskList = (taskList) => [
     title: { text: 'Project background', classes: taskClasses },
     href: marineLicenceRoutes.MARINE_LICENCE_PROJECT_BACKGROUND,
     status: setStatus(taskList.projectBackground)
+  },
+  {
+    title: {
+      text: 'Preferred start and end dates of the licence',
+      classes: taskClasses
+    },
+    href: marineLicenceRoutes.MARINE_LICENCE_PREFERRED_DATES,
+    status: setStatus(taskList.preferredDates)
   }
 ]
 

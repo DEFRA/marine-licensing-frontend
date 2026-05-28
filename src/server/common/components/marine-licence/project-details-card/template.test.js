@@ -36,6 +36,9 @@ describe('Marine Licence Project Details Card Component', () => {
       expect($comp.html()).toContain(
         '/marine-licence/project-background?from=check-your-answers'
       )
+      expect($comp.html()).toContain(
+        '/marine-licence/start-and-end-dates?from=check-your-answers'
+      )
     })
 
     test('Should not show change links when read only', () => {

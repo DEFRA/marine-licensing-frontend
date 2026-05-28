@@ -3,6 +3,7 @@ import {
   marineLicenceRoutes,
   routes
 } from '#src/server/common/constants/routes.js'
+import { buildCYASiteData } from '#src/server/common/helpers/marine-licence/check-your-answers/site-data.js'
 
 const checkYourAnswersViewContent = {
   pageTitle: 'Check your answers before sending your information',
@@ -15,10 +16,18 @@ export const CHECK_YOUR_ANSWERS_VIEW_ROUTE =
 export const checkYourAnswersController = {
   async handler(request, h) {
     const cachedMarineLicence = getMarineLicenceCache(request)
+    const { coordinatesType, summaryData } = await buildCYASiteData(
+      cachedMarineLicence,
+      request
+    )
 
     return h.view(CHECK_YOUR_ANSWERS_VIEW_ROUTE, {
       ...checkYourAnswersViewContent,
       ...cachedMarineLicence,
+      coordinatesType,
+      summaryData,
+      reviewSiteDetailsRoute:
+        marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS,
       publicRegisterRoute: marineLicenceRoutes.MARINE_LICENCE_PUBLIC_REGISTER
     })
   }

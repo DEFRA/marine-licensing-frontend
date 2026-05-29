@@ -1,3 +1,4 @@
+import { routes } from '#src/server/common/constants/routes.js'
 import { validateTeamAdminSession } from '#src/server/common/helpers/user-session-validators.js'
 
 export const DASHBOARD_VIEW_ROUTE =
@@ -11,7 +12,8 @@ export const adminExemptionsController = {
   handler: async (_request, h) => {
     return h.view(DASHBOARD_VIEW_ROUTE, {
       pageTitle: DASHBOARD_PAGE_TITLE,
-      heading: DASHBOARD_PAGE_TITLE
+      heading: DASHBOARD_PAGE_TITLE,
+      routes
     })
   }
 }

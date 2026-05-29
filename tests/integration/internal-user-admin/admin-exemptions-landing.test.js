@@ -9,7 +9,10 @@ const teamAdminAuth = {
   credentials: { isTeamAdmin: true }
 }
 
-const loadAdminExemptionsLandingPage = async ({ server, auth = teamAdminAuth }) => {
+const loadAdminExemptionsLandingPage = async ({
+  server,
+  auth = teamAdminAuth
+}) => {
   const response = await makeGetRequest({
     url: routes.ADMIN_EXEMPTIONS,
     server,
@@ -56,7 +59,10 @@ describe('Admin exemptions landing page', () => {
         server: getServer()
       })
 
-      expect(getByRole(document, 'link', { name })).toHaveAttribute('href', href)
+      expect(getByRole(document, 'link', { name })).toHaveAttribute(
+        'href',
+        href
+      )
     }
   )
 

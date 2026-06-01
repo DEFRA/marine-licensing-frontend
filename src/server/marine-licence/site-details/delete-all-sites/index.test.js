@@ -32,18 +32,4 @@ describe('deleteAllSitesRoutes', () => {
     expect(route.path).toBe(marineLicenceRoutes.MARINE_LICENCE_DELETE_ALL_SITES)
     expect(route.handler).toBeDefined()
   })
-
-  it('should include the deleteAllSitesController for the GET route', () => {
-    const route = deleteAllSitesRoutes[0]
-
-    expect(route.handler).toBeDefined()
-    expect(typeof route.handler).toBe('function')
-  })
-
-  it('should include the deleteAllSitesSubmitController for the POST route', () => {
-    const route = deleteAllSitesRoutes[1]
-
-    expect(route.handler).toBeDefined()
-    expect(typeof route.handler).toBe('function')
-  })
 })

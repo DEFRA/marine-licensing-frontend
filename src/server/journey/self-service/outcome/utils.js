@@ -74,6 +74,18 @@ export function buildTerminalSingleView(baseModel, terminalType) {
   }
 }
 
+function buildFocusedOption(focused) {
+  return {
+    id: focused.id,
+    heading: focused.heading ?? '',
+    text: focused.text ?? '',
+    module: focused.module ?? null,
+    link: focused.link ?? null,
+    overrideCtaButtonUrl: focused.overrideCtaButtonUrl ?? null,
+    params: focused.params ?? null
+  }
+}
+
 export function buildSnapshotPayload(outcome, outcomeRoute, outcomeTypeId) {
   const all = getOutcomeTypesForOutcome(outcome)
   const focused = all.find((ot) => ot.id === outcomeTypeId)
@@ -87,15 +99,7 @@ export function buildSnapshotPayload(outcome, outcomeRoute, outcomeTypeId) {
     outcomeKind: classifyOutcome(outcome),
     outcomeHeading: outcome.heading ?? '',
     outcomeText: outcome.text ?? '',
-    focusedOption: {
-      id: focused.id,
-      heading: focused.heading ?? '',
-      text: focused.text ?? '',
-      module: focused.module ?? null,
-      link: focused.link ?? null,
-      overrideCtaButtonUrl: focused.overrideCtaButtonUrl ?? null,
-      params: focused.params ?? null
-    }
+    focusedOption: buildFocusedOption(focused)
   }
 }
 

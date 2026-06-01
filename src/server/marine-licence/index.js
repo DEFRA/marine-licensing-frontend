@@ -13,6 +13,7 @@ import { viewDetailsRoutes } from '#src/server/marine-licence/view-details/index
 import { locationCsvDownloadRoutes } from '#src/server/marine-licence/location-csv-download/index.js'
 import { viewMarineLicencePublicUserRoutes } from '#src/server/marine-licence/view-marine-licence-public/index.js'
 import { viewMarineLicenceInternalUserRoutes } from '#src/server/marine-licence/view-marine-licence-internal-user/index.js'
+import { preferredDatesRoutes } from '#src/server/marine-licence/preferred-dates/index.js'
 
 export const marineLicence = {
   plugin: {
@@ -28,6 +29,7 @@ export const marineLicence = {
         ...publicRegisterRoutes,
         ...publicConsultationRoutes,
         ...otherAuthoritiesRoutes,
+        ...preferredDatesRoutes,
         ...projectBackgroundRoutes,
         ...siteDetailsRoutes,
         ...viewDetailsRoutes,

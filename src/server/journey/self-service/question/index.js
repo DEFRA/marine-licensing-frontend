@@ -7,7 +7,6 @@ import { routes } from '#src/server/common/constants/routes.js'
 import Joi from 'joi'
 
 const slugSchema = Joi.string()
-  .length(22)
   .pattern(/^[A-Za-z0-9_-]{22}$/)
   .required()
 

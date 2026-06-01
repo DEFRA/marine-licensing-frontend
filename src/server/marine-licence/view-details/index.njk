@@ -25,17 +25,12 @@
       {% endif %}
       <h1 class="govuk-heading-l" id="view-details-heading">{{ pageTitle }}</h1>
 
-
-      {% if isInternalUserView %}
-        <p class="govuk-body">
-          <a class="govuk-link govuk-link--no-visited-state" rel="noreferrer noopener" target="_blank" href="/marine-licence/location-csv-download/{{marineLicenceId}}">Download Location CSV</a>
-        </p>
-      {% endif %}
-
       {{ appMarineLicenceProjectDetailsCard({
         projectName: projectName,
         projectBackground: projectBackground,
-        isReadOnly: isReadOnly
+        isReadOnly: isReadOnly,
+        isInternalUserView: isInternalUserView,
+        marineLicenceId: marineLicenceId
       }) }}
 
       {{ appMarineLicenceOtherPermissionsCard({

@@ -39,7 +39,9 @@ describe('Marine Licence View Details', () => {
     )
 
     expect(
-      getByRole(document, 'link', { name: 'Download Location CSV' })
+      getByRole(document, 'link', {
+        name: 'Download coordinates as a csv file'
+      })
     ).toHaveAttribute(
       'href',
       `/marine-licence/location-csv-download/${mockSubmittedMarineLicenceApplication.id}`

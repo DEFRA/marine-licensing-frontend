@@ -24,6 +24,18 @@ describe('Marine Licence Project Details Card Component', () => {
     )
   })
 
+  test('Should show csv link if the user is internal user', () => {
+    $component = renderComponent('marine-licence/project-details-card', {
+      projectName: 'Test Marine Project',
+      isInternalUserView: true,
+      marineLicenceId: '123'
+    })
+
+    const htmlContent = $component.html()
+    expect(htmlContent).toContain('Location coordinates')
+    expect(htmlContent).toContain('/marine-licence/location-csv-download/123')
+  })
+
   describe('change links', () => {
     test('Should show change links when not read only', () => {
       const $comp = renderComponent('marine-licence/project-details-card', {

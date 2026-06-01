@@ -1,3 +1,4 @@
+import Boom from '@hapi/boom'
 import { vi } from 'vitest'
 import { setupTestServer } from '#tests/integration/shared/test-setup-helpers.js'
 import { authenticatedGetRequest } from '#src/server/common/helpers/authenticated-requests.js'
@@ -74,6 +75,39 @@ describe('locationCSVDownload controller', () => {
         })
 
         expect(statusCode).toBe(404)
+      })
+
+      test('should wrap non-Boom errors from authenticatedGetRequest in Boom.internal and log them', async () => {
+        const networkError = new Error('Network failure')
+        vi.mocked(authenticatedGetRequest).mockRejectedValue(networkError)
+
+        const request = createMockRequest({
+          params: { marineLicenceId: TEST_ID }
+        })
+        const h = createCsvMockH()
+
+        await expect(
+          locationCsvDownloadController.handler(request, h)
+        ).rejects.toMatchObject({ isBoom: true, output: { statusCode: 500 } })
+
+        expect(request.logger.error).toHaveBeenCalledWith(
+          networkError,
+          'Error downloading coordinates CSV'
+        )
+      })
+
+      test('should re-throw Boom errors from authenticatedGetRequest without wrapping', async () => {
+        const boomError = Boom.forbidden('Not allowed')
+        vi.mocked(authenticatedGetRequest).mockRejectedValue(boomError)
+
+        const request = createMockRequest({
+          params: { marineLicenceId: TEST_ID }
+        })
+        const h = createCsvMockH()
+
+        await expect(
+          locationCsvDownloadController.handler(request, h)
+        ).rejects.toBe(boomError)
       })
 
       test('should throw Boom.internal when backend returns a non-200 status', async () => {

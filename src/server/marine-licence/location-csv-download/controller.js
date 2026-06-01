@@ -1,6 +1,7 @@
 import Boom from '@hapi/boom'
 import { apiRoutes } from '#src/server/common/constants/routes.js'
 import { authenticatedGetRequest } from '#src/server/common/helpers/authenticated-requests.js'
+import { statusCodes } from '#src/server/common/constants/status-codes.js'
 
 export const locationCsvDownloadController = {
   async handler(request, h) {
@@ -17,7 +18,7 @@ export const locationCsvDownloadController = {
         { json: false }
       )
 
-      if (res.statusCode !== 200) {
+      if (res.statusCode !== statusCodes.ok) {
         request.logger.error(
           { marineLicenceId, statusCode: res.statusCode },
           'Unexpected status code from CSV download endpoint'

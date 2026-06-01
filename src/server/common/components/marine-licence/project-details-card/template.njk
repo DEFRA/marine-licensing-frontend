@@ -36,6 +36,23 @@
       }
     ]
   } if not params.isReadOnly
+},{
+  key: {
+    text: "Preferred start and end dates of the licence"
+  },
+  value: {
+    text: params.preferredDates
+  },
+  actions: {
+    items: [
+      {
+        href: "/marine-licence/start-and-end-dates?from=check-your-answers",
+        text: "Change",
+        visuallyHiddenText: "preferred dates",
+        classes: "govuk-link--no-visited-state"
+      }
+    ]
+  } if not params.isReadOnly
 }), rows) %}
 
 {{ govukSummaryList({

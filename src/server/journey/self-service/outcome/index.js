@@ -11,7 +11,6 @@ const OUTCOME_TYPE_MAX = 400
 const OUTCOME_PATH_MAX = 200
 
 const slugSchema = Joi.string()
-  .length(22)
   .pattern(/^[A-Za-z0-9_-]{22}$/)
   .required()
 

@@ -20,9 +20,17 @@ export const locationCsvDownloadController = {
 
       if (res.statusCode !== statusCodes.ok) {
         request.logger.error(
-          { marineLicenceId, statusCode: res.statusCode },
+          {
+            event: {
+              action: 'marine-licence:location-csv-download-failed',
+              reference: marineLicenceId,
+              reason: `unexpected statusCode=${res.statusCode}`,
+              outcome: 'failure'
+            }
+          },
           'Unexpected status code from CSV download endpoint'
         )
+
         throw Boom.internal('Failed to download CSV')
       }
 

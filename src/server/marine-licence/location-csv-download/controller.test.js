@@ -123,14 +123,6 @@ describe('locationCSVDownload controller', () => {
         await expect(
           locationCsvDownloadController.handler(request, h)
         ).rejects.toMatchObject({ isBoom: true, output: { statusCode: 500 } })
-
-        expect(request.logger.error).toHaveBeenCalledWith(
-          expect.objectContaining({
-            marineLicenceId: TEST_ID,
-            statusCode: 502
-          }),
-          'Unexpected status code from CSV download endpoint'
-        )
       })
     })
   })

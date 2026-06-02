@@ -5,8 +5,7 @@ import {
 } from '#src/server/common/helpers/exemptions/session-cache/utils.js'
 import { authenticatedPatchRequest } from '#src/server/common/helpers/authenticated-requests.js'
 
-export const DELETE_ALL_SITES_VIEW_ROUTE =
-  'exemption/site-details/delete-all-sites/index'
+export const DELETE_ALL_SITES_VIEW_ROUTE = 'templates/delete-all-sites'
 const DELETE_ALL_SITES_PAGE_TITLE =
   'Are you sure you want to delete all site details?'
 
@@ -23,7 +22,7 @@ export const deleteAllSitesController = {
       pageTitle: DELETE_ALL_SITES_PAGE_TITLE,
       heading: DELETE_ALL_SITES_PAGE_TITLE,
       backLink: routes.REVIEW_SITE_DETAILS,
-      routes
+      projectName: exemption.projectName
     })
   }
 }

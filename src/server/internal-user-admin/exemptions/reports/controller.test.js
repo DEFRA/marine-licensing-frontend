@@ -6,6 +6,22 @@ vi.mock('~/src/server/common/helpers/authenticated-requests.js')
 
 const DASHBOARD_PAGE_TITLE = 'Exemptions summary report'
 
+const emptyStats = {
+  coordinatesInputMethod: {
+    shapefile: 0,
+    kml: 0,
+    manualCoordinates: 0
+  },
+  coordinateSystemVolume: {
+    wgs84: { count: 0, percentage: '0%' },
+    bng: { count: 0, percentage: '0%' },
+    total: 0
+  },
+  byArticleRows: [],
+  byMarinePlanAreaRows: [],
+  byCoastalOperationsAreaRows: []
+}
+
 const createRequest = () => ({
   h: { view: vi.fn() },
   request: {
@@ -14,25 +30,55 @@ const createRequest = () => ({
   }
 })
 
-const createExpectedViewModel = (summary, hasApiError = false) => ({
+const createExpectedViewModel = (summary, stats = emptyStats, hasApiError = false) => ({
   pageTitle: DASHBOARD_PAGE_TITLE,
   heading: DASHBOARD_PAGE_TITLE,
   summary,
+  stats,
   hasApiError
 })
+
+const fullApiValue = {
+  submittedExemptions: 12,
+  unsubmittedExemptions: 7,
+  withdrawnExemptions: 2,
+  coordinatesInputMethod: {
+    shapefile: 1,
+    kml: 2,
+    manualCoordinates: 3
+  },
+  coordinateSystemVolume: {
+    wgs84: { count: 3, percentage: 75 },
+    bng: { count: 1, percentage: 25 },
+    total: 4
+  },
+  byArticle: { 25: 2 },
+  byMarinePlanArea: { 'East inshore': 2 },
+  byCoastalOperationsArea: { South: 1 }
+}
+
+const fullStats = {
+  coordinatesInputMethod: {
+    shapefile: 1,
+    kml: 2,
+    manualCoordinates: 3
+  },
+  coordinateSystemVolume: {
+    wgs84: { count: 3, percentage: '75%' },
+    bng: { count: 1, percentage: '25%' },
+    total: 4
+  },
+  byArticleRows: [[{ text: '25' }, { text: '2' }]],
+  byMarinePlanAreaRows: [[{ text: 'East inshore' }, { text: '2' }]],
+  byCoastalOperationsAreaRows: [[{ text: 'South' }, { text: '1' }]]
+}
 
 describe('Admin exemptions summary report success handling', () => {
   const authenticatedGetRequestMock = vi.mocked(authenticatedGetRequest)
 
   test('Should render summary report with API response values', async () => {
     authenticatedGetRequestMock.mockResolvedValueOnce({
-      payload: {
-        value: {
-          submittedExemptions: 12,
-          unsubmittedExemptions: 7,
-          withdrawnExemptions: 2
-        }
-      }
+      payload: { value: fullApiValue }
     })
 
     const { h, request } = createRequest()
@@ -44,11 +90,14 @@ describe('Admin exemptions summary report success handling', () => {
     )
     expect(h.view).toHaveBeenCalledWith(
       DASHBOARD_VIEW_ROUTE,
-      createExpectedViewModel({
-        submittedExemptions: 12,
-        unsubmittedExemptions: 7,
-        withdrawnExemptions: 2
-      })
+      createExpectedViewModel(
+        {
+          submittedExemptions: 12,
+          unsubmittedExemptions: 7,
+          withdrawnExemptions: 2
+        },
+        fullStats
+      )
     )
   })
 
@@ -112,6 +161,7 @@ describe('Admin exemptions summary report error handling', () => {
           unsubmittedExemptions: 0,
           withdrawnExemptions: 0
         },
+        emptyStats,
         true
       )
     )

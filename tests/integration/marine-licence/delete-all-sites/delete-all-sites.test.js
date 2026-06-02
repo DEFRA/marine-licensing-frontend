@@ -1,34 +1,36 @@
 import { vi } from 'vitest'
 import {
-  mockExemption,
+  mockMarineLicence,
   setupTestServer
 } from '~/tests/integration/shared/test-setup-helpers.js'
-import { routes } from '~/src/server/common/constants/routes.js'
+import { marineLicenceRoutes } from '~/src/server/common/constants/routes.js'
 import { loadPage } from '~/tests/integration/shared/app-server.js'
 import { within } from '@testing-library/dom'
 
 vi.mock('~/src/server/common/helpers/authenticated-requests.js')
 
-describe('Delete site', () => {
+describe('Marine licence - Delete all sites', () => {
   const getServer = setupTestServer()
 
   beforeEach(() =>
-    mockExemption({
+    mockMarineLicence({
+      id: 'test-marine-licence-123',
+      projectName: 'Test Project',
       siteDetails: [
         {
-          id: 'test-exemption-123',
-          projectName: 'Test Project',
-          siteName: 'test site'
+          coordinatesType: 'coordinates',
+          siteName: 'Test site'
         }
       ]
     })
   )
 
-  test('should display the delete site page', async () => {
+  test('should display the delete all sites page', async () => {
     const document = await loadPage({
-      requestUrl: routes.DELETE_ALL_SITES,
+      requestUrl: marineLicenceRoutes.MARINE_LICENCE_DELETE_ALL_SITES,
       server: getServer()
     })
+
     const pageHeading = within(document).getByRole('heading', {
       level: 1,
       name: 'Are you sure you want to delete all site details?'
@@ -41,15 +43,19 @@ describe('Delete site', () => {
     )
 
     const backLink = within(document).getByRole('link', { name: 'Back' })
-    expect(backLink).toHaveAttribute('href', routes.REVIEW_SITE_DETAILS)
+    expect(backLink).toHaveAttribute(
+      'href',
+      marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS
+    )
 
     within(document).getByRole('button', {
       name: 'Yes, delete all site details'
     })
 
-    const cancelLink = within(document).getByRole('link', {
-      name: 'Cancel'
-    })
-    expect(cancelLink).toHaveAttribute('href', routes.REVIEW_SITE_DETAILS)
+    const cancelLink = within(document).getByRole('link', { name: 'Cancel' })
+    expect(cancelLink).toHaveAttribute(
+      'href',
+      marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS
+    )
   })
 })

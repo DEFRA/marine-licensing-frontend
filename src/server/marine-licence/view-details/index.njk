@@ -2,6 +2,7 @@
 {% from "govuk/components/back-link/macro.njk" import govukBackLink %}
 {% from "marine-licence/other-permissions-card/macro.njk" import appMarineLicenceOtherPermissionsCard %}
 {% from "marine-licence/project-details-card/macro.njk" import appMarineLicenceProjectDetailsCard %}
+{% from "marine-licence/site-details-card/macro.njk" import appMarineLicenceSiteDetailsCard %}
 {% from "public-register-card/macro.njk" import appPublicRegisterCard %}
 
 {% block beforeContent %}
@@ -29,10 +30,15 @@
         projectName: projectName,
         projectBackground: projectBackground,
         isReadOnly: isReadOnly,
-        isInternalUserView: isInternalUserView,
-        marineLicenceId: marineLicenceId,
         preferredDates: preferredDates
       }) }}
+
+      {% if isInternalUserView %}
+        {{ appMarineLicenceSiteDetailsCard({
+          isInternalUserView: isInternalUserView,
+          marineLicenceId: marineLicenceId
+        }) }}
+      {% endif %}
 
       {{ appMarineLicenceOtherPermissionsCard({
         specialLegalPowers: specialLegalPowers,

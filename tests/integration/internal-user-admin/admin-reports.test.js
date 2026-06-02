@@ -101,7 +101,9 @@ describe('Admin exemptions summary report', () => {
   })
 
   test('shows error message when summary API fails', async () => {
-    vi.mocked(authenticatedGetRequest).mockRejectedValueOnce(new Error('API Error'))
+    vi.mocked(authenticatedGetRequest).mockRejectedValueOnce(
+      new Error('API Error')
+    )
 
     const response = await makeGetRequest({
       server: getServer(),

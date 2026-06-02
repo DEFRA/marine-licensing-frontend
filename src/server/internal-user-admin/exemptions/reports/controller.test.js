@@ -30,7 +30,11 @@ const createRequest = () => ({
   }
 })
 
-const createExpectedViewModel = (summary, stats = emptyStats, hasApiError = false) => ({
+const createExpectedViewModel = (
+  summary,
+  stats = emptyStats,
+  hasApiError = false
+) => ({
   pageTitle: DASHBOARD_PAGE_TITLE,
   heading: DASHBOARD_PAGE_TITLE,
   summary,

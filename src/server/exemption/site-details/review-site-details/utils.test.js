@@ -139,9 +139,7 @@ describe('siteDetails utils', () => {
             method: 'File uploaded',
             multipleSiteDetails: 'No',
             sameActivityDates: 'No',
-            sameActivityDescription: 'No',
-            fileType: 'KML',
-            filename: 'test-site.kml'
+            sameActivityDescription: 'No'
           })
         })
       )

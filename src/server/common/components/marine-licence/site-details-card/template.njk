@@ -67,4 +67,34 @@
   },
   classes: "govuk-summary-list--full-width",
   rows: summaryRows
+
+
+{% if params.isInternalUserView %}
+  {% set csvAnchor %}
+    <a class="govuk-link govuk-link--no-visited-state" rel="noreferrer noopener" target="_blank" href="/marine-licence/location-csv-download/{{ params.marineLicenceId }}" >Download coordinates as a csv file</a>
+  {% endset %}
+{% endif %}
+
+{% set rows = [] %}
+
+{% set rows = (rows.push({
+  key: {
+    text: "Location coordinates"
+  },
+  value: {
+    html: csvAnchor
+  }
+} if params.isInternalUserView), rows) %}
+
+
+{{ govukSummaryList({
+  card: {
+    title: {
+      text: "Providing the site location"
+    },
+    attributes: {
+      id: "site-details-card"
+    }
+  },
+  rows: rows
 }) }}

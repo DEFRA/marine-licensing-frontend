@@ -18,7 +18,6 @@
  * Exit codes: 0 success, 1 not-found, 2 invalid args.
  *
  * Reuses journey-data.js's parsed/sanitised view so the CLI sees what the running app sees.
- * Spec: reqs/ml-1306/2026-05-23-iat-query-cli-spec.md.
  */
 
 import { parseArgs } from 'node:util'

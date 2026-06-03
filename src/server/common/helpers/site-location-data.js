@@ -1,9 +1,5 @@
 import { formatDate } from '#src/server/common/helpers/dates/date-utils.js'
 
-const getFileTypeText = (fileUploadType) => {
-  return fileUploadType === 'kml' ? 'KML' : 'Shapefile'
-}
-
 export const buildSiteLocationData = (multipleSiteDetails, siteDetails) => {
   if (!siteDetails?.[0]) {
     return null
@@ -34,11 +30,6 @@ export const buildSiteLocationData = (multipleSiteDetails, siteDetails) => {
 
   if (sameActivityDescription === 'yes') {
     siteLocationData.activityDescription = firstSite.activityDescription
-  }
-
-  if (firstSite.coordinatesType === 'file') {
-    siteLocationData.fileType = getFileTypeText(firstSite.fileUploadType)
-    siteLocationData.filename = firstSite.uploadedFile.filename
   }
 
   return siteLocationData

@@ -30,9 +30,13 @@ describe('Site Location Card Component', () => {
       })
 
       test('Should display method of providing site location', () => {
-        const htmlContent = $component.html()
-        expect(htmlContent).toContain('Method of providing site location')
-        expect(htmlContent).toContain('File uploaded')
+        const methodRow = $component('.govuk-summary-list__row')
+        expect(methodRow.find('.govuk-summary-list__key').text().trim()).toBe(
+          'Method of providing site location'
+        )
+        expect(methodRow.find('.govuk-summary-list__value').text().trim()).toBe(
+          'File uploaded'
+        )
       })
 
       test('Should show Change link when not read-only', () => {
@@ -62,9 +66,13 @@ describe('Site Location Card Component', () => {
       })
 
       test('Should display method of providing site location', () => {
-        const htmlContent = $component.html()
-        expect(htmlContent).toContain('Method of providing site location')
-        expect(htmlContent).toContain('File uploaded')
+        const methodRow = $component('.govuk-summary-list__row')
+        expect(methodRow.find('.govuk-summary-list__key').text().trim()).toBe(
+          'Method of providing site location'
+        )
+        expect(methodRow.find('.govuk-summary-list__value').text().trim()).toBe(
+          'File uploaded'
+        )
       })
 
       test('Should not show Change link when read-only', () => {

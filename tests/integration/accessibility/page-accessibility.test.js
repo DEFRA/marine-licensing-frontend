@@ -203,6 +203,11 @@ describe('Page accessibility checks (Axe)', () => {
       isMarineLicence: true
     },
     {
+      url: marineLicenceRoutes.MARINE_LICENCE_PREFERRED_DATES,
+      title: 'What are your preferred start and end dates for the licence?',
+      isMarineLicence: true
+    },
+    {
       url: marineLicenceRoutes.MARINE_LICENCE_PUBLIC_CONSULTATION,
       title:
         'Have you consulted with any public groups or organisations before making this application?',
@@ -249,6 +254,11 @@ describe('Page accessibility checks (Axe)', () => {
       url: `${marineLicenceRoutes.MARINE_LICENCE_WORKING_HOURS}?site=1&activity=1`,
       isMarineLicence: true,
       title: 'What are the proposed working hours?'
+    },
+    {
+      url: `${marineLicenceRoutes.MARINE_LICENCE_DELETE_SITE}?site=1`,
+      isMarineLicence: true,
+      title: 'Are you sure you want to delete this site?'
     },
     {
       url: `${marineLicenceRoutes.MARINE_LICENCE_DELETE_ACTIVITY}?site=1&activity=2`,

@@ -11,6 +11,7 @@ import { authenticatedPatchRequest } from '#src/server/common/helpers/authentica
 import { USER_TYPES } from '#src/server/common/constants/user-types.js'
 import { getUserSession } from '#src/server/common/plugins/auth/utils.js'
 import { createFailAction } from '#src/server/common/helpers/createFailAction.js'
+import { getCommonRedirectLink } from '#src/server/common/helpers/marine-licence/redirect-link.js'
 
 import joi from 'joi'
 
@@ -32,13 +33,6 @@ const specialLegalPowersSettings = {
     'Does your organisation have special legal powers to do any of this project?'
 }
 
-const getBackLink = (request) => {
-  const fromCheckYourAnswers = request.query?.from === 'check-your-answers'
-  return fromCheckYourAnswers
-    ? marineLicenceRoutes.MARINE_LICENCE_CHECK_YOUR_ANSWERS
-    : marineLicenceRoutes.MARINE_LICENCE_TASK_LIST
-}
-
 export const specialLegalPowersController = {
   async handler(request, h) {
     const marineLicence = getMarineLicenceCache(request)
@@ -58,7 +52,7 @@ export const specialLegalPowersController = {
       ...specialLegalPowersSettings,
       projectName: marineLicence.projectName,
       payload: marineLicence.specialLegalPowers,
-      backLink: getBackLink(request)
+      backLink: getCommonRedirectLink(request)
     })
   }
 }
@@ -82,7 +76,7 @@ export const specialLegalPowersSubmitController = {
       }),
       failAction: (request, h, err) => {
         const { projectName } = getMarineLicenceCache(request)
-        const backLink = getBackLink(request)
+        const backLink = getCommonRedirectLink(request)
         return createFailAction({
           viewRoute: SPECIAL_LEGAL_POWERS_VIEW_ROUTE,
           settings: specialLegalPowersSettings,
@@ -120,7 +114,7 @@ export const specialLegalPowersSubmitController = {
         }
       })
 
-      return h.redirect(getBackLink(request))
+      return h.redirect(getCommonRedirectLink(request))
     } catch (e) {
       const validation = e.data?.payload?.validation
       const details = validation?.details
@@ -137,7 +131,7 @@ export const specialLegalPowersSubmitController = {
         ...specialLegalPowersSettings,
         payload,
         projectName: marineLicence.projectName,
-        backLink: getBackLink(request),
+        backLink: getCommonRedirectLink(request),
         errors,
         errorSummary
       })

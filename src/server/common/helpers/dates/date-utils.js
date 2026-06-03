@@ -12,6 +12,9 @@ dayjs.extend(isSameOrBefore)
 const DATE_FORMAT_ISO = 'YYYY-MM-DD'
 const DATE_FORMAT_FLEXIBLE = 'YYYY-M-D'
 
+const THREE = 3
+const FIFTEEN = 15
+
 function hasNullValues(year, month, day) {
   return year == null || month == null || day == null
 }
@@ -71,6 +74,12 @@ export function compareDates(date1, date2) {
   return 0
 }
 
+export function isMonthInPast(year, month, now = new Date()) {
+  const inputDate = dayjs.utc(`${year}-${String(month).padStart(2, '0')}-01`)
+  const currentMonth = dayjs.utc(now).startOf('month')
+  return inputDate.isBefore(currentMonth, 'month')
+}
+
 export function isEndDateBeforeStartDate(startDate, endDate) {
   const start = dayjs.utc(startDate)
   const end = dayjs.utc(endDate)
@@ -119,4 +128,12 @@ export function createDateFieldsFromValue(dateValue) {
     month: components.month,
     year: components.year
   }
+}
+
+export function threeMonthsFromNow() {
+  return dayjs().add(THREE, 'month').format('M YYYY')
+}
+
+export function fifteenMonthsFromNow() {
+  return dayjs().add(FIFTEEN, 'month').format('M YYYY')
 }

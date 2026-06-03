@@ -20,13 +20,19 @@ import { saveSiteDetailsToBackend } from '#src/server/common/helpers/marine-lice
 import { getSiteDetailsBySite } from '#src/server/common/helpers/marine-licence/session-cache/site-details-utils.js'
 import { getCancelLink } from '#src/server/marine-licence/site-details/utils/cancel-link.js'
 import { getSiteDetailsAnchor } from '#src/server/common/helpers/site-details/anchor-utils.js'
+import { getSiteParam } from '#src/server/common/helpers/site-details/site-number-utils.js'
 
 export const SITE_NAME_VIEW_ROUTE = 'templates/site-name.njk'
 
-const getBackLink = (isSavePage, siteNumber) =>
-  isSavePage
-    ? `${marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS}${getSiteDetailsAnchor(siteNumber)}`
-    : marineLicenceRoutes.MARINE_LICENCE_COORDINATES_TYPE_CHOICE
+const getBackLink = (shouldReturnToReview, siteNumber) => {
+  if (shouldReturnToReview) {
+    return `${marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS}${getSiteDetailsAnchor(siteNumber)}`
+  }
+  if (siteNumber > 1) {
+    return marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS
+  }
+  return marineLicenceRoutes.MARINE_LICENCE_COORDINATES_TYPE_CHOICE
+}
 
 const createValidationFailAction = (request, h, err) => {
   const { payload } = request
@@ -38,16 +44,16 @@ const createValidationFailAction = (request, h, err) => {
 
   const siteDetails = getSiteDetailsBySite(marineLicence, siteIndex)
 
-  const isSavePage = action || siteDetails.coordinatesType === 'file'
+  const shouldReturnToReview = action || siteDetails.coordinatesType === 'file'
 
   const errorViewSettings = {
     ...siteNameSettings,
-    backLink: getBackLink(isSavePage, siteNumber),
-    cancelLink: getCancelLink(isSavePage),
+    backLink: getBackLink(shouldReturnToReview, siteNumber),
+    cancelLink: getCancelLink(shouldReturnToReview),
     payload,
     projectName: marineLicence.projectName,
     siteNumber,
-    action: !!isSavePage
+    action: !!shouldReturnToReview
   }
 
   if (!err.details) {
@@ -80,17 +86,18 @@ export const siteNameController = {
       return h.redirect(marineLicenceRoutes.MARINE_LICENCE_TASK_LIST)
     }
 
-    const isSavePage = action || siteDetails.coordinatesType === 'file'
+    const shouldReturnToReview =
+      action || siteDetails.coordinatesType === 'file'
 
     const siteName = siteDetails.siteName ?? ''
 
     return h.view(SITE_NAME_VIEW_ROUTE, {
       ...siteNameSettings,
-      backLink: getBackLink(isSavePage, siteNumber),
-      cancelLink: getCancelLink(isSavePage),
+      backLink: getBackLink(shouldReturnToReview, siteNumber),
+      cancelLink: getCancelLink(shouldReturnToReview),
       projectName: marineLicence.projectName,
       siteNumber,
-      action: !!isSavePage,
+      action: !!shouldReturnToReview,
       payload: {
         siteName
       }
@@ -120,7 +127,7 @@ export const siteNameSubmitController = {
 
     const redirectRoute = shouldReturnToReview
       ? `${marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS}${getSiteDetailsAnchor(siteNumber)}`
-      : marineLicenceRoutes.MARINE_LICENCE_COORDINATES_ENTRY_CHOICE
+      : `${marineLicenceRoutes.MARINE_LICENCE_COORDINATES_ENTRY_CHOICE}${getSiteParam(siteNumber)}`
 
     await updateMarineLicenceSiteDetails(
       request,

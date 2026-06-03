@@ -6,7 +6,6 @@ import {
   errorDescriptionByFieldName,
   mapErrorsForDisplay
 } from '#src/server/common/helpers/errors.js'
-import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
 import { authenticatedPatchRequest } from '#src/server/common/helpers/authenticated-requests.js'
 import { createFailAction } from '#src/server/common/helpers/createFailAction.js'
 import { publicRegisterSchema } from '#src/server/common/validation/public-register/schema.js'
@@ -14,15 +13,9 @@ import {
   publicRegisterErrorMessages,
   publicRegisterSettings
 } from '#src/server/common/validation/public-register/constants.js'
+import { getCommonRedirectLink } from '#src/server/common/helpers/marine-licence/redirect-link.js'
 
 export const PUBLIC_REGISTER_VIEW_ROUTE = 'templates/public-register'
-
-const getBackLink = (request) => {
-  const fromCheckYourAnswers = request.query?.from === 'check-your-answers'
-  return fromCheckYourAnswers
-    ? marineLicenceRoutes.MARINE_LICENCE_CHECK_YOUR_ANSWERS
-    : marineLicenceRoutes.MARINE_LICENCE_TASK_LIST
-}
 
 export const publicRegisterController = {
   async handler(request, h) {
@@ -32,7 +25,7 @@ export const publicRegisterController = {
       ...publicRegisterSettings,
       projectName: marineLicence.projectName,
       payload: marineLicence.publicRegister,
-      backLink: getBackLink(request)
+      backLink: getCommonRedirectLink(request)
     })
   }
 }
@@ -43,7 +36,7 @@ export const publicRegisterSubmitController = {
       payload: publicRegisterSchema,
       failAction: (request, h, err) => {
         const { projectName } = getMarineLicenceCache(request)
-        const backLink = getBackLink(request)
+        const backLink = getCommonRedirectLink(request)
         return createFailAction({
           viewRoute: PUBLIC_REGISTER_VIEW_ROUTE,
           settings: publicRegisterSettings,
@@ -81,7 +74,7 @@ export const publicRegisterSubmitController = {
         }
       })
 
-      return h.redirect(getBackLink(request))
+      return h.redirect(getCommonRedirectLink(request))
     } catch (e) {
       const validation = e.data?.payload?.validation
       const details = validation?.details
@@ -101,7 +94,7 @@ export const publicRegisterSubmitController = {
         ...publicRegisterSettings,
         payload,
         projectName: marineLicence.projectName,
-        backLink: getBackLink(request),
+        backLink: getCommonRedirectLink(request),
         errors,
         errorSummary
       })

@@ -37,7 +37,7 @@ describe('Delete site', () => {
 
     const inset = document.querySelector('.govuk-inset-text')
     expect(inset).toHaveTextContent(
-      "You'll lose all the site details you've already entered. This cannot be undone."
+      "You'll lose all the site details you've already entered."
     )
 
     const backLink = within(document).getByRole('link', { name: 'Back' })

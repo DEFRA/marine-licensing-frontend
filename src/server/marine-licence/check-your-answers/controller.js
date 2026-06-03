@@ -3,6 +3,7 @@ import {
   marineLicenceRoutes,
   routes
 } from '#src/server/common/constants/routes.js'
+import { buildSummaryData } from '#src/server/common/helpers/marine-licence/summary-data.js'
 
 const checkYourAnswersViewContent = {
   pageTitle: 'Check your answers before sending your information',
@@ -16,9 +17,11 @@ export const checkYourAnswersController = {
   async handler(request, h) {
     const cachedMarineLicence = getMarineLicenceCache(request)
 
+    const formattedMarineLicence = buildSummaryData(cachedMarineLicence)
+
     return h.view(CHECK_YOUR_ANSWERS_VIEW_ROUTE, {
       ...checkYourAnswersViewContent,
-      ...cachedMarineLicence,
+      ...formattedMarineLicence,
       publicRegisterRoute: marineLicenceRoutes.MARINE_LICENCE_PUBLIC_REGISTER
     })
   }

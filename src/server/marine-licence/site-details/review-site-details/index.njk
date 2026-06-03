@@ -43,6 +43,13 @@
           title: {
             text: "Providing the site location"
           },
+          actions: {
+            items: [{
+              href: "delete-all-sites",
+              text: "Delete all site details",
+              classes: "govuk-link--no-visited-state"
+            }]
+          },
           attributes: {
             id: "site-location-card"
           }
@@ -137,6 +144,14 @@
             },
             title: {
               text: summaryRowsHeading
+            },
+            actions: {
+              items: [{
+                href: site.deleteSiteLink,
+                text: "Delete site",
+                classes: "govuk-link--no-visited-state",
+                visuallyHiddenText: "for site " + site.siteNumber
+              }]
             }
           },
           classes: "govuk-summary-list--full-width",
@@ -173,7 +188,18 @@
       {% endfor %}
 
       <form method="POST">
-        <input type="hidden" name="csrfToken" value="{{ csrfToken }}">
+        <div class="govuk-!-margin-bottom-6">
+          <input type="hidden" name="csrfToken" value="{{ csrfToken }}">
+          {{ govukButton({
+            text: "Add another site",
+            classes: "govuk-button--secondary",
+            attributes: {
+              name: "add",
+              value: "add",
+              type: "submit"
+            }
+          }) }}
+        </div>
         <div class="govuk-button-group">
           {{ govukButton({
             text: "Continue",

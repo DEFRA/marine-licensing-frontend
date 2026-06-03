@@ -393,6 +393,27 @@ describe('#centreCoordinates (marine licence)', () => {
         `${marineLicenceRoutes.MARINE_LICENCE_WIDTH_OF_SITE}?site=1&action=change`
       )
     })
+
+    test('should include site param in redirect to width-of-site when site is 2', async () => {
+      vi.mocked(getMarineLicenceCache).mockReturnValue({
+        ...mockMarineLicenceApplication,
+        siteDetails: [
+          { coordinateSystem: COORDINATE_SYSTEMS.WGS84, siteName: 'Site 1' },
+          { coordinateSystem: COORDINATE_SYSTEMS.WGS84 }
+        ]
+      })
+      const h = { redirect: vi.fn() }
+      const request = createMockRequest({
+        payload: { ...wgs84Coordinates },
+        query: { site: '2' }
+      })
+
+      await centreCoordinatesSubmitController.handler(request, h)
+
+      expect(h.redirect).toHaveBeenCalledWith(
+        `${marineLicenceRoutes.MARINE_LICENCE_WIDTH_OF_SITE}?site=2`
+      )
+    })
   })
 
   describe('#centreCoordinatesController action mode', () => {

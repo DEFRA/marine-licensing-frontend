@@ -227,6 +227,29 @@ describe('#coordinateSystem (marine licence)', () => {
       )
     })
 
+    test('should include site param in redirect when site is 2', async () => {
+      vi.mocked(getMarineLicenceCache).mockReturnValue({
+        ...mockMarineLicenceApplication,
+        siteDetails: [
+          { coordinatesEntry: 'single', coordinateSystem: 'wgs84' },
+          { coordinatesType: 'coordinates' }
+        ]
+      })
+      const h = { redirect: vi.fn() }
+
+      await coordinateSystemSubmitController.handler(
+        createMockRequest({
+          payload: { coordinateSystem: 'wgs84' },
+          query: { site: '2' }
+        }),
+        h
+      )
+
+      expect(h.redirect).toHaveBeenCalledWith(
+        `${marineLicenceRoutes.MARINE_LICENCE_CIRCLE_CENTRE_POINT}?site=2`
+      )
+    })
+
     test('Should correctly set the cache when submitting', async () => {
       vi.mocked(getMarineLicenceCache).mockReturnValue({
         ...mockMarineLicenceApplication,

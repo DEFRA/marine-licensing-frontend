@@ -2,12 +2,15 @@ import { vi } from 'vitest'
 import {
   createDateISO,
   extractDateComponents,
+  fifteenMonthsFromNow,
   formatDate,
   isValidDateComponents,
   isTodayOrFuture,
+  isMonthInPast,
   compareDates,
   isEndDateBeforeStartDate,
-  createDayjsDate
+  createDayjsDate,
+  threeMonthsFromNow
 } from './date-utils.js'
 
 describe('date-utils', () => {
@@ -186,6 +189,35 @@ describe('date-utils', () => {
     })
   })
 
+  describe('isMonthInPast', () => {
+    const MAY_2026 = new Date(2026, 4, 1)
+
+    test('returns true when month is in a past year', () => {
+      expect(isMonthInPast(2025, 12, MAY_2026)).toBe(true)
+    })
+
+    test('returns true when month is earlier in the same year', () => {
+      expect(isMonthInPast(2026, 4, MAY_2026)).toBe(true)
+    })
+
+    test('returns false when month is the current month (1st of month as now)', () => {
+      expect(isMonthInPast(2026, 5, MAY_2026)).toBe(false)
+    })
+
+    test('returns false when now is mid-month and input is the current month', () => {
+      const MAY_22_2026 = new Date(2026, 4, 22)
+      expect(isMonthInPast(2026, 5, MAY_22_2026)).toBe(false)
+    })
+
+    test('returns false when month is in the future', () => {
+      expect(isMonthInPast(2026, 6, MAY_2026)).toBe(false)
+    })
+
+    test('returns false when year is in the future', () => {
+      expect(isMonthInPast(2027, 1, MAY_2026)).toBe(false)
+    })
+  })
+
   describe('compareDates', () => {
     test('returns -1 when first date is earlier', () => {
       const date1 = new Date('2025-06-14T00:00:00.000Z')
@@ -270,6 +302,40 @@ describe('date-utils', () => {
       const result = createDayjsDate(2024, 2, 29)
       expect(result).not.toBeNull()
       expect(result.isValid()).toBe(true)
+    })
+  })
+
+  describe('threeMonthsFromNow', () => {
+    const HINT_MOCK_DATE = new Date('2026-05-26T10:00:00.000Z')
+
+    beforeAll(() => {
+      vi.useFakeTimers()
+      vi.setSystemTime(HINT_MOCK_DATE)
+    })
+
+    afterAll(() => {
+      vi.useRealTimers()
+    })
+
+    test('should return a date formatted as "M YYYY" three months from now', () => {
+      expect(threeMonthsFromNow()).toBe('8 2026')
+    })
+  })
+
+  describe('fifteenMonthsFromNow', () => {
+    const HINT_MOCK_DATE = new Date('2026-05-26T10:00:00.000Z')
+
+    beforeAll(() => {
+      vi.useFakeTimers()
+      vi.setSystemTime(HINT_MOCK_DATE)
+    })
+
+    afterAll(() => {
+      vi.useRealTimers()
+    })
+
+    test('should return a date formatted as "M YYYY" fifteen months from now', () => {
+      expect(fifteenMonthsFromNow()).toBe('8 2027')
     })
   })
 })

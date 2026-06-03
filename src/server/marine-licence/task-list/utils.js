@@ -90,3 +90,14 @@ export const transformSiteDetailsTaskList = (taskList) => [
     status: setStatus(taskList.siteDetails)
   }
 ]
+
+export const transformWaterFrameworkTaskList = (taskList) => [
+  {
+    title: {
+      text: 'Water Framework Directive assessment',
+      classes: taskClasses
+    },
+    href: marineLicenceRoutes.MARINE_LICENCE_WATER_FRAMEWORK_DIRECTIVE_BEFORE_YOU_START,
+    status: setStatus(taskList.waterFrameworkDirective)
+  }
+]

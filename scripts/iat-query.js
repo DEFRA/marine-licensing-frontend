@@ -9,8 +9,8 @@
  *   question <route>                                  one question + answers + targets
  *   outcome <route>                                   one outcome + inline outcomeTypes
  *   outcome-type <id>                                 one outcomeType (params, link, module, nextQuestionRoute)
- *   outcomes [--classify X] [--has-param N[=V]]       list outcomes filtered by classification/param
- *   outcome-types [--has-param N[=V]] [--has-next-question]
+ *   outcomes [--classify X] [--has-param N[=V]] [--has-link]   list outcomes filtered by classification/param/link
+ *   outcome-types [--has-param N[=V]] [--has-next-question] [--has-link]
  *   questions [--mapping N] [--has-mapping]           list questions by mcmsAppFormMapping
  *   mappings                                          distinct mappings + carrier question routes
  *
@@ -187,6 +187,10 @@ function outcomeMatchesHasParam(outcome, paramName, paramValue) {
   )
 }
 
+function outcomeHasLink(outcome) {
+  return getOutcomeTypesForOutcome(outcome).some((ot) => Boolean(ot.link))
+}
+
 function outcomeTypeMatchesHasParam(ot, paramName, paramValue) {
   if (!ot.params || ot.params.length === 0) {
     return false
@@ -200,7 +204,7 @@ function outcomeTypeMatchesHasParam(ot, paramName, paramValue) {
 }
 
 function runOutcomes(flags, json) {
-  const { classify, hasParam } = flags
+  const { classify, hasParam, hasLink } = flags
   const { name: paramName, value: paramValue } = parseHasParam(hasParam)
   const data = getJourneyData()
   const filtered = data.outcomes.filter((o) => {
@@ -209,6 +213,9 @@ function runOutcomes(flags, json) {
       return false
     }
     if (paramName && !outcomeMatchesHasParam(o, paramName, paramValue)) {
+      return false
+    }
+    if (hasLink && !outcomeHasLink(o)) {
       return false
     }
     return true
@@ -241,7 +248,7 @@ function parseHasParam(hasParam) {
 }
 
 function runOutcomeTypes(flags, json) {
-  const { hasParam, hasNextQuestion } = flags
+  const { hasParam, hasNextQuestion, hasLink } = flags
   const { name: paramName, value: paramValue } = parseHasParam(hasParam)
   const data = getJourneyData()
   const filtered = data.outcomeTypes.filter((ot) => {
@@ -249,6 +256,9 @@ function runOutcomeTypes(flags, json) {
       return false
     }
     if (hasNextQuestion && !ot.nextQuestionRoute) {
+      return false
+    }
+    if (hasLink && !ot.link) {
       return false
     }
     return true
@@ -363,12 +373,17 @@ function dispatchOutcomes(rest) {
     options: {
       json: { type: 'boolean', default: false },
       classify: { type: 'string' },
-      'has-param': { type: 'string' }
+      'has-param': { type: 'string' },
+      'has-link': { type: 'boolean', default: false }
     },
     allowPositionals: false
   })
   return runOutcomes(
-    { classify: values.classify, hasParam: values['has-param'] },
+    {
+      classify: values.classify,
+      hasParam: values['has-param'],
+      hasLink: values['has-link']
+    },
     values.json
   )
 }
@@ -379,14 +394,16 @@ function dispatchOutcomeTypes(rest) {
     options: {
       json: { type: 'boolean', default: false },
       'has-param': { type: 'string' },
-      'has-next-question': { type: 'boolean', default: false }
+      'has-next-question': { type: 'boolean', default: false },
+      'has-link': { type: 'boolean', default: false }
     },
     allowPositionals: false
   })
   return runOutcomeTypes(
     {
       hasParam: values['has-param'],
-      hasNextQuestion: values['has-next-question']
+      hasNextQuestion: values['has-next-question'],
+      hasLink: values['has-link']
     },
     values.json
   )

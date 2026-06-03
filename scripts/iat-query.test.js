@@ -119,6 +119,16 @@ describe('iat-query', () => {
       expect(lines.length).toBeGreaterThan(0)
     })
 
+    it('--has-link filters to outcomes whose types carry a link', () => {
+      const { stdout, code } = runCommand(['outcomes', '--has-link'])
+      expect(code).toBe(0)
+      const lines = stdout.split('\n').filter(Boolean)
+      expect(lines.length).toBeGreaterThan(0)
+      const all = runCommand(['outcomes']).stdout.split('\n').filter(Boolean)
+      expect(lines.length).toBeLessThan(all.length)
+      expect(stdout).toContain('/scaffolding-impede-navigation')
+    })
+
     it('--json emits an array with route and classification', () => {
       const { stdout, code } = runCommand([
         'outcomes',
@@ -167,6 +177,30 @@ describe('iat-query', () => {
       const lines = stdout.split('\n').filter(Boolean)
       expect(lines.length).toBeGreaterThan(0)
       expect(lines[0]).toContain('FAST_TRACK=true')
+    })
+
+    it('--has-link filters to types with a non-empty link', () => {
+      const { stdout, code } = runCommand(['outcome-types', '--has-link'])
+      expect(code).toBe(0)
+      const lines = stdout.split('\n').filter(Boolean)
+      expect(lines.length).toBeGreaterThan(0)
+      expect(stdout).toContain('WO_DOWNLOAD_HA_AGREED_METHOD_TEMPLATE')
+      expect(stdout).not.toContain('WO_FAST_TRACK_MLA')
+    })
+
+    it('--has-link --json emits objects that all carry a link', () => {
+      const { stdout, code } = runCommand([
+        'outcome-types',
+        '--has-link',
+        '--json'
+      ])
+      expect(code).toBe(0)
+      const parsed = JSON.parse(stdout)
+      expect(Array.isArray(parsed)).toBe(true)
+      expect(parsed.length).toBeGreaterThan(0)
+      for (const ot of parsed) {
+        expect(ot.link).toBeTruthy()
+      }
     })
 
     it('--json emits an array of outcomeType objects', () => {

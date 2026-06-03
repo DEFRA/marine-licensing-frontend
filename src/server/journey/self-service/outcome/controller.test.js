@@ -131,7 +131,6 @@ describe('outcomeViewAnswersController', () => {
   let redirect, h
 
   beforeEach(() => {
-    iatContextService.patch.mockReset().mockResolvedValue(undefined)
     iatOutcomeDocumentService.mint.mockReset()
     redirect = vi.fn()
     h = { redirect }

@@ -17,3 +17,13 @@ export const expectedProjectDetailsCard = {
     }
   ]
 }
+
+export const expectedSiteDetailsCard = {
+  cardTitle: 'Providing the site location',
+  rows: [
+    {
+      key: 'Location coordinates',
+      value: 'Download coordinates as a csv file'
+    }
+  ]
+}

@@ -1,0 +1,32 @@
+import { renderComponent } from '#src/server/test-helpers/component-helpers.js'
+
+describe('Marine Licence Site Details Card Component', () => {
+  let $component
+
+  beforeEach(() => {
+    $component = renderComponent('marine-licence/site-details-card', {
+      projectName: 'Test Marine Project'
+    })
+  })
+
+  test('Should render site details card component', () => {
+    expect($component('#site-details-card')).toHaveLength(1)
+  })
+
+  test('Should have correct card title', () => {
+    expect($component('.govuk-summary-card__title').text().trim()).toBe(
+      'Providing the site location'
+    )
+  })
+
+  test('Should show csv link if the user is internal user', () => {
+    $component = renderComponent('marine-licence/site-details-card', {
+      isInternalUserView: true,
+      marineLicenceId: '123'
+    })
+
+    const htmlContent = $component.html()
+    expect(htmlContent).toContain('Location coordinates')
+    expect(htmlContent).toContain('/marine-licence/location-csv-download/123')
+  })
+})

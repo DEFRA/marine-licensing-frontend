@@ -127,11 +127,6 @@
 
         {% for site in summaryData %}
 
-            {#  This javascript variable is only for testing purposes. #}
-            <script nonce='{{ cspNonce }}'>
-              var geoJSON{{loop.index}} = {{ site.geoJSON | dump | safe }};
-            </script>
-
           {% set summaryRowsHeading %}
             {% if isMultiSiteJourney %}
               Site {{ site.siteNumber }} details

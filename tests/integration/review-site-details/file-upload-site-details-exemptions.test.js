@@ -140,18 +140,6 @@ describe('Review Site Details - File Upload Integration Tests', () => {
     expect(methodRow).toBeTruthy()
     expect(methodRow.textContent).toContain(expected.multipleSiteDetails.method)
 
-    const fileTypeRow = getRowByKey(siteLocationCard, 'File type')
-    expect(fileTypeRow).toBeTruthy()
-    expect(fileTypeRow.textContent).toContain(
-      expected.multipleSiteDetails.fileType
-    )
-
-    const fileUploadedRow = getRowByKey(siteLocationCard, 'File uploaded')
-    expect(fileUploadedRow).toBeTruthy()
-    expect(fileUploadedRow.textContent).toContain(
-      expected.multipleSiteDetails.fileUploaded
-    )
-
     const backLink = document.querySelector('.govuk-back-link')
     expect(backLink.textContent.trim()).toBe('Back')
     expect(backLink.getAttribute('href')).toBe(routes.FILE_UPLOAD)

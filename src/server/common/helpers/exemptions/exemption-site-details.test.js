@@ -70,7 +70,7 @@ describe('exemption-site-details helper', () => {
 
     test('should process file upload site details successfully with KML file', () => {
       const mockFileUploadData = {
-        method: 'Upload a file with the coordinates of the site',
+        method: 'File uploaded',
         fileUploadType: 'KML',
         uploadedFile: { filename: 'test-site.kml' },
         coordinates: [
@@ -97,7 +97,7 @@ describe('exemption-site-details helper', () => {
       expect(result).toEqual({
         ...baseFileUploadExemption.siteDetails[0],
         isFileUpload: true,
-        method: 'Upload a file with the coordinates of the site',
+        method: 'File uploaded',
         fileType: 'KML',
         filename: 'test-site.kml'
       })
@@ -137,7 +137,7 @@ describe('exemption-site-details helper', () => {
       expect(result).toEqual({
         ...exemption.siteDetails[0],
         isFileUpload: true,
-        method: 'Upload a file with the coordinates of the site',
+        method: 'File uploaded',
         fileType: 'KML',
         filename: 'test-site.kml'
       })
@@ -158,7 +158,7 @@ describe('exemption-site-details helper', () => {
       }
 
       const mockFileUploadData = {
-        method: 'Upload a file with the coordinates of the site',
+        method: 'File uploaded',
         fileUploadType: 'Shapefile',
         uploadedFile: { filename: 'test-site.shp' },
         coordinates: [
@@ -188,7 +188,7 @@ describe('exemption-site-details helper', () => {
       expect(result).toEqual({
         ...shapefileExemption.siteDetails[0],
         isFileUpload: true,
-        method: 'Upload a file with the coordinates of the site',
+        method: 'File uploaded',
         fileType: 'Shapefile',
         filename: 'test-site.shp'
       })
@@ -230,7 +230,7 @@ describe('exemption-site-details helper', () => {
       expect(result).toEqual({
         ...exemptionWithKml.siteDetails[0],
         isFileUpload: true,
-        method: 'Upload a file with the coordinates of the site',
+        method: 'File uploaded',
         fileType: 'KML',
         filename: 'test-site.kml'
       })
@@ -263,7 +263,7 @@ describe('exemption-site-details helper', () => {
       expect(result).toEqual({
         ...exemptionWithShapefile.siteDetails[0],
         isFileUpload: true,
-        method: 'Upload a file with the coordinates of the site',
+        method: 'File uploaded',
         fileType: 'Shapefile',
         filename: 'test-site.zip'
       })
@@ -507,7 +507,7 @@ describe('exemption-site-details helper', () => {
       }
 
       const mockFileUploadData = {
-        method: 'Upload a file with the coordinates of the site',
+        method: 'File uploaded',
         fileUploadType: 'KML',
         uploadedFile: { filename: 'test.kml' }
       }

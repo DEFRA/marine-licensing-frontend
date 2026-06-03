@@ -230,7 +230,7 @@ describe('#reviewSiteDetails', () => {
               })
             ]),
             multipleSiteDetailsData: expect.objectContaining({
-              method: 'Upload a file with the coordinates of the site',
+              method: 'File uploaded',
               fileType: 'KML',
               filename: 'test-site.kml'
             })

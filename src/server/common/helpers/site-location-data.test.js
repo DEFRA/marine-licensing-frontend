@@ -94,7 +94,7 @@ describe('buildSiteLocationData', () => {
       sameActivityDates: 'No',
       sameActivityDescription: 'No',
       multipleSitesEnabled: false,
-      method: 'Upload a file with the coordinates of the site',
+      method: 'File uploaded',
       isFileUpload: true,
       fileType: 'KML',
       filename: 'test-site.kml'
@@ -129,7 +129,7 @@ describe('buildSiteLocationData', () => {
       sameActivityDates: 'Yes',
       sameActivityDescription: 'No',
       multipleSitesEnabled: true,
-      method: 'Upload a file with the coordinates of the site',
+      method: 'File uploaded',
       isFileUpload: true,
       fileType: 'Shapefile',
       filename: 'site-boundary.zip',

@@ -9,7 +9,7 @@ describe('Site Location Card Component', () => {
         $component = renderComponent('site-location-card', {
           siteLocationData: {
             isFileUpload: true,
-            method: 'Upload a file with the coordinates of the site',
+            method: 'File uploaded',
             fileType: 'KML',
             filename: 'test-site.kml',
             multipleSiteDetails: 'No',
@@ -32,9 +32,7 @@ describe('Site Location Card Component', () => {
       test('Should display method of providing site location', () => {
         const htmlContent = $component.html()
         expect(htmlContent).toContain('Method of providing site location')
-        expect(htmlContent).toContain(
-          'Upload a file with the coordinates of the site'
-        )
+        expect(htmlContent).toContain('File uploaded')
       })
 
       test('Should show Change link when not read-only', () => {
@@ -49,7 +47,7 @@ describe('Site Location Card Component', () => {
         $component = renderComponent('site-location-card', {
           siteLocationData: {
             isFileUpload: true,
-            method: 'Upload a file with the coordinates of the site',
+            method: 'File uploaded',
             fileType: 'Shapefile',
             filename: 'site-boundary.shp',
             multipleSiteDetails: 'Yes',
@@ -66,9 +64,7 @@ describe('Site Location Card Component', () => {
       test('Should display method of providing site location', () => {
         const htmlContent = $component.html()
         expect(htmlContent).toContain('Method of providing site location')
-        expect(htmlContent).toContain(
-          'Upload a file with the coordinates of the site'
-        )
+        expect(htmlContent).toContain('File uploaded')
       })
 
       test('Should not show Change link when read-only', () => {

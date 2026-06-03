@@ -39,7 +39,7 @@ export const testScenarios = [
       projectName: 'Hammersmith pontoon construction',
       multipleSiteDetails: {
         multipleSiteDetails: 'No',
-        method: 'Upload a file with the coordinates of the site',
+        method: 'File uploaded',
         fileType: 'KML',
         fileUploaded: 'test-upload-id'
       },
@@ -77,7 +77,7 @@ export const testScenarios = [
       projectName: 'Hammersmith pontoon construction',
       multipleSiteDetails: {
         multipleSiteDetails: 'Yes',
-        method: 'Upload a file with the coordinates of the site',
+        method: 'File uploaded',
         fileType: 'KML',
         fileUploaded: 'test-upload-id',
         sameActivityDates: 'Yes',
@@ -117,7 +117,7 @@ export const testScenarios = [
       projectName: 'Hammersmith pontoon construction',
       multipleSiteDetails: {
         multipleSiteDetails: 'Yes',
-        method: 'Upload a file with the coordinates of the site',
+        method: 'File uploaded',
         fileType: 'KML',
         fileUploaded: 'test-upload-id',
         sameActivityDates: 'No',

@@ -165,12 +165,10 @@ export const testScenarios = [
     expectedPageContent: {
       ...baseExpectedContent,
       siteLocation: {
-        'Method of providing site location':
-          'Upload a file with the coordinates of the site'
+        'Method of providing site location': 'File uploaded'
       },
       siteDetails: {
-        'Method of providing site location':
-          'Upload a file with the coordinates of the site'
+        'Method of providing site location': 'File uploaded'
       }
     }
   },
@@ -180,12 +178,10 @@ export const testScenarios = [
     expectedPageContent: {
       ...baseExpectedContent,
       siteLocation: {
-        'Method of providing site location':
-          'Upload a file with the coordinates of the site'
+        'Method of providing site location': 'File uploaded'
       },
       siteDetails: {
-        'Method of providing site location':
-          'Upload a file with the coordinates of the site'
+        'Method of providing site location': 'File uploaded'
       }
     }
   },

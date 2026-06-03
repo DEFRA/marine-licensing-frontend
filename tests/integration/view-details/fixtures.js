@@ -167,9 +167,12 @@ export const testScenarios = [
       siteLocation: {
         'Method of providing site location': 'File uploaded'
       },
-      siteDetails: {
-        'Method of providing site location': 'File uploaded'
-      }
+      siteDetails: [
+        {
+          'Activity dates': '',
+          'Activity description': 'Test activity description'
+        }
+      ]
     }
   },
   {
@@ -180,9 +183,12 @@ export const testScenarios = [
       siteLocation: {
         'Method of providing site location': 'File uploaded'
       },
-      siteDetails: {
-        'Method of providing site location': 'File uploaded'
-      }
+      siteDetails: [
+        {
+          'Activity dates': '',
+          'Activity description': 'Test activity description'
+        }
+      ]
     }
   },
   {

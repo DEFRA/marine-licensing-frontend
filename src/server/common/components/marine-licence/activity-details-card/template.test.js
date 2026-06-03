@@ -64,9 +64,9 @@ describe('Marine Licence Activity Details Card', () => {
         '/marine-licence/review-site-details?from=check-your-answers#activity-details-site-1-activity-1'
     })
     expect($c('.govuk-summary-list__actions')).toHaveLength(0)
-    expect($c('.govuk-summary-card__actions a').text().trim()).toContain(
-      'Change'
-    )
+    const cardActionsText = $c('.govuk-summary-card__actions a').text().trim()
+    expect(cardActionsText).toContain('Change')
+    expect(cardActionsText).toContain('Delete activity')
   })
 
   test('Should display correct row labels', () => {

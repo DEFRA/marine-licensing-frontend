@@ -37,8 +37,11 @@ describe('#buildCheckYourAnswersSiteData', () => {
     expect(result).toEqual({ coordinatesType: null, summaryData: [] })
   })
 
-  test('returns empty data when completeMarineLicence has no siteDetails', async () => {
-    mockGetMarineLicenceById.mockResolvedValue({ id: '123' })
+  test.each([
+    ['no siteDetails key', { id: '123' }],
+    ['empty siteDetails array', { id: '123', siteDetails: [] }]
+  ])('returns empty data when API response has %s', async (_, apiResponse) => {
+    mockGetMarineLicenceById.mockResolvedValue(apiResponse)
 
     const result = await buildCheckYourAnswersSiteData(
       { id: '123' },
@@ -46,17 +49,6 @@ describe('#buildCheckYourAnswersSiteData', () => {
     )
 
     expect(mockGetMarineLicenceById).toHaveBeenCalledWith('123')
-    expect(result).toEqual({ coordinatesType: null, summaryData: [] })
-  })
-
-  test('returns empty data when siteDetails is an empty array', async () => {
-    mockGetMarineLicenceById.mockResolvedValue({ id: '123', siteDetails: [] })
-
-    const result = await buildCheckYourAnswersSiteData(
-      { id: '123' },
-      mockRequest
-    )
-
     expect(result).toEqual({ coordinatesType: null, summaryData: [] })
   })
 

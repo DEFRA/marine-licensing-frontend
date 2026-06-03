@@ -1,57 +1,32 @@
 import { renderComponent } from '#src/server/test-helpers/component-helpers.js'
 
-describe('Marine Licence Project Details Card Component', () => {
+describe('Marine Licence Site Details Card Component', () => {
   let $component
 
   beforeEach(() => {
-    $component = renderComponent('marine-licence/project-details-card', {
+    $component = renderComponent('marine-licence/site-details-card', {
       projectName: 'Test Marine Project'
     })
   })
 
-  test('Should render project details card component', () => {
-    expect($component('#project-details-card')).toHaveLength(1)
-  })
-
-  test('Should display project name', () => {
-    const htmlContent = $component.html()
-    expect(htmlContent).toContain('Test Marine Project')
+  test('Should render site details card component', () => {
+    expect($component('#site-details-card')).toHaveLength(1)
   })
 
   test('Should have correct card title', () => {
     expect($component('.govuk-summary-card__title').text().trim()).toBe(
-      'Project details'
+      'Providing the site location'
     )
   })
 
-  describe('change links', () => {
-    test('Should show change links when not read only', () => {
-      const $comp = renderComponent('marine-licence/project-details-card', {
-        projectName: 'Test Marine Project',
-        isReadOnly: false
-      })
-      expect($comp.html()).toContain(
-        '/marine-licence/project-name?from=check-your-answers'
-      )
-      expect($comp.html()).toContain(
-        '/marine-licence/project-background?from=check-your-answers'
-      )
-      expect($comp.html()).toContain(
-        '/marine-licence/start-and-end-dates?from=check-your-answers'
-      )
+  test('Should show csv link if the user is internal user', () => {
+    $component = renderComponent('marine-licence/site-details-card', {
+      isInternalUserView: true,
+      marineLicenceId: '123'
     })
 
-    test('Should not show change links when read only', () => {
-      const $comp = renderComponent('marine-licence/project-details-card', {
-        projectName: 'Test Marine Project',
-        isReadOnly: true
-      })
-      expect($comp.html()).not.toContain(
-        '/marine-licence/project-name?from=check-your-answers'
-      )
-      expect($comp.html()).not.toContain(
-        '/marine-licence/project-background?from=check-your-answers'
-      )
-    })
+    const htmlContent = $component.html()
+    expect(htmlContent).toContain('Location coordinates')
+    expect(htmlContent).toContain('/marine-licence/location-csv-download/123')
   })
 })

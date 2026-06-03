@@ -75,26 +75,27 @@
   {% endset %}
 {% endif %}
 
-{% set rows = [] %}
+{% if params.isInternalUserView %}
+  {% set rows = [] %}
 
-{% set rows = (rows.push({
-  key: {
-    text: "Location coordinates"
-  },
-  value: {
-    html: csvAnchor
-  }
-} if params.isInternalUserView), rows) %}
-
-
-{{ govukSummaryList({
-  card: {
-    title: {
-      text: "Providing the site location"
+  {% set rows = (rows.push({
+    key: {
+      text: "Location coordinates"
     },
-    attributes: {
-      id: "site-details-card"
+    value: {
+      html: csvAnchor
     }
-  },
-  rows: rows
-}) }}
+  }), rows) %}
+
+  {{ govukSummaryList({
+    card: {
+      title: {
+        text: "Providing the site location"
+      },
+      attributes: {
+        id: "site-details-card"
+      }
+    },
+    rows: rows
+  }) }}
+{% endif %}

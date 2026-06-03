@@ -9,14 +9,24 @@ describe('Marine Licence Site Details Card Component', () => {
     })
   })
 
-  test('Should render site details card component', () => {
-    expect($component('#site-details-card')).toHaveLength(1)
+  test('Should not render providing the site location card for non-internal users', () => {
+    expect($component('#site-details-card')).toHaveLength(0)
   })
 
-  test('Should have correct card title', () => {
-    expect($component('.govuk-summary-card__title').text().trim()).toBe(
+  test('Should render providing the site location card with correct title for internal users', () => {
+    $component = renderComponent('marine-licence/site-details-card', {
+      isInternalUserView: true
+    })
+
+    expect($component('.govuk-summary-card__title').text()).toContain(
       'Providing the site location'
     )
+  })
+
+  test('Should not show csv link for non-internal users', () => {
+    const htmlContent = $component.html()
+    expect(htmlContent).not.toContain('Location coordinates')
+    expect(htmlContent).not.toContain('/marine-licence/location-csv-download/')
   })
 
   test('Should show csv link if the user is internal user', () => {

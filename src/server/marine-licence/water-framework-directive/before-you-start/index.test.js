@@ -1,4 +1,4 @@
-import { waterFrameworkDirectiveBeforeYouStartRoutes } from '#src/server/marine-licence/water-directive-framework/before-you-start/index.js'
+import { waterFrameworkDirectiveBeforeYouStartRoutes } from '#src/server/marine-licence/water-framework-directive/before-you-start/index.js'
 import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
 
 describe('#waterFrameworkDirectiveBeforeYouStartRoutes', () => {

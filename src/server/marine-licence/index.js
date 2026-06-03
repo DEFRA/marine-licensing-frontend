@@ -14,7 +14,7 @@ import { locationCsvDownloadRoutes } from '#src/server/marine-licence/location-c
 import { viewMarineLicencePublicUserRoutes } from '#src/server/marine-licence/view-marine-licence-public/index.js'
 import { viewMarineLicenceInternalUserRoutes } from '#src/server/marine-licence/view-marine-licence-internal-user/index.js'
 import { preferredDatesRoutes } from '#src/server/marine-licence/preferred-dates/index.js'
-import { waterDirectiveRoutes } from '#src/server/marine-licence/water-directive-framework/index.js'
+import { waterDirectiveRoutes } from '#src/server/marine-licence/water-framework-directive/index.js'
 
 export const marineLicence = {
   plugin: {

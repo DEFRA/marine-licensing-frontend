@@ -3,7 +3,7 @@ import { setupTestServer } from '#tests/integration/shared/test-setup-helpers.js
 import {
   waterFrameworkDirectiveBeforeYouStartController,
   WATER_FRAMEWORK_DIRECTIVE_BEFORE_YOU_START_VIEW_ROUTE
-} from '#src/server/marine-licence/water-directive-framework/before-you-start/controller.js'
+} from '#src/server/marine-licence/water-framework-directive/before-you-start/controller.js'
 import { getMarineLicenceCache } from '#src/server/common/helpers/marine-licence/session-cache/utils.js'
 import { mockMarineLicenceApplication } from '#src/server/test-helpers/mocks/marine-licence-mocks.js'
 import { makeGetRequest } from '#src/server/test-helpers/server-requests.js'

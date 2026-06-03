@@ -14,6 +14,18 @@
  *   questions [--mapping N] [--has-mapping]           list questions by mcmsAppFormMapping
  *   mappings                                          distinct mappings + carrier question routes
  *
+ * Examples:
+ *   npm run iat -- question /activity-type
+ *       inspect one question, its answers, and where each answer branches to
+ *   npm run iat -- outcome /scaffolding-impede-navigation
+ *       inspect an outcome's heading, classification, and inline outcomeTypes
+ *   npm run iat -- outcomes --has-link
+ *       list every outcome route that surfaces a downloadable asset (e.g. .docx templates)
+ *   npm run iat -- outcome-types --has-link --json
+ *       resolve the link-bearing outcomeTypes to their actual asset URLs
+ *   npm run iat -- mappings
+ *       list the distinct MCMS form mappings and the question routes carrying each
+ *
  * Every subcommand accepts --json for machine-readable output.
  * Exit codes: 0 success, 1 not-found, 2 invalid args.
  *

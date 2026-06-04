@@ -33,11 +33,29 @@ describe('Water Framework Directive Nautical mile', () => {
     expect(getByRole(document, 'heading', { level: 1 })).toHaveTextContent(
       'Is your project located within one nautical mile (1.85km) of the coast?'
     )
-    getByRole(document, 'button', { name: 'Continue' })
+
+    expect(
+      getByText(
+        document,
+        'This example shows a project site located within one nautical mile of the coast.'
+      )
+    ).toBeInTheDocument()
+
+    expect(
+      getByRole(document, 'img', {
+        name: 'Diagram showing a site location in the water less than 1 nautical mile from the coast'
+      })
+    ).toBeInTheDocument()
+
+    expect(
+      getByRole(document, 'button', { name: 'Continue' })
+    ).toBeInTheDocument()
+
     expect(getByRole(document, 'link', { name: 'Cancel' })).toHaveAttribute(
       'href',
       marineLicenceRoutes.MARINE_LICENCE_TASK_LIST
     )
+
     expect(
       getByText(
         document,

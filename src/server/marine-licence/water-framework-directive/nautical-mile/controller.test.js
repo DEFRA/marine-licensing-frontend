@@ -2,14 +2,17 @@ import { vi } from 'vitest'
 import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
 import {
   nauticalMileSubmitController,
-  NAUTICAL_MILE_VIEW_ROUTE
+  NAUTICAL_MILE_VIEW_ROUTE,
+  nauticalMileController
 } from '#src/server/marine-licence/water-framework-directive/nautical-mile/controller.js'
 import * as cacheUtils from '#src/server/common/helpers/marine-licence/session-cache/utils.js'
 import * as wfdCache from '#src/server/common/helpers/marine-licence/session-cache/water-framework-directive.js'
+import { createMockH } from '#src/server/test-helpers/mocks/helpers.js'
 
 vi.mock('~/src/server/common/helpers/marine-licence/session-cache/utils.js')
 
 describe('#nauticalMile', () => {
+  const h = createMockH()
   const mockLicence = {
     projectName: 'Test Project',
     id: 'test-id',
@@ -27,13 +30,32 @@ describe('#nauticalMile', () => {
     vi.restoreAllMocks()
   })
 
+  describe('#nauticalMilController', () => {
+    test('Should correctly load page even without previous WFD data stored', async () => {
+      const mockWithouWfd = { ...mockLicence }
+      delete mockWithouWfd.waterFrameworkDirective
+      vi.spyOn(cacheUtils, 'getMarineLicenceCache').mockReturnValueOnce(
+        mockWithouWfd
+      )
+
+      await nauticalMileController.handler({ query: {} }, h)
+
+      expect(h.view).toHaveBeenCalledWith(NAUTICAL_MILE_VIEW_ROUTE, {
+        backLink:
+          marineLicenceRoutes.MARINE_LICENCE_WATER_FRAMEWORK_DIRECTIVE_BEFORE_YOU_START,
+        cancelLink: marineLicenceRoutes.MARINE_LICENCE_TASK_LIST,
+        pageTitle:
+          'Is your project located within one nautical mile (1.85km) of the coast?',
+        heading:
+          'Is your project located within one nautical mile (1.85km) of the coast?',
+        projectName: mockLicence.projectName,
+        payload: { nauticalMile: undefined }
+      })
+    })
+  })
+
   describe('#nauticalMileSubmitController', () => {
     test('Should correctly redirect to nautical mile page on success', async () => {
-      const h = {
-        redirect: vi.fn().mockReturnValue({ takeover: vi.fn() }),
-        view: vi.fn()
-      }
-
       await nauticalMileSubmitController.handler(
         { payload: { nauticalMile: 'yes' }, query: {} },
         h
@@ -51,11 +73,6 @@ describe('#nauticalMile', () => {
     })
 
     test('Should correctly redirect when answer is no', async () => {
-      const h = {
-        redirect: vi.fn().mockReturnValue({ takeover: vi.fn() }),
-        view: vi.fn()
-      }
-
       await nauticalMileSubmitController.handler(
         { payload: { nauticalMile: 'no' }, query: {} },
         h
@@ -95,7 +112,6 @@ describe('#nauticalMile', () => {
       'Should correctly handle failAction with $name',
       ({ payload, err, expectedExtra }) => {
         const request = { payload }
-        const h = { view: vi.fn().mockReturnValue({ takeover: vi.fn() }) }
         nauticalMileSubmitController.options.validate.failAction(
           request,
           h,

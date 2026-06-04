@@ -25,12 +25,12 @@ const nauticalMileSettings = {
 export const nauticalMileController = {
   async handler(request, h) {
     const marineLicence = getMarineLicenceCache(request)
-    const wfd = marineLicence.waterFrameworkDirective || {}
+    const { waterFrameworkDirective } = marineLicence
 
     return h.view(NAUTICAL_MILE_VIEW_ROUTE, {
       ...nauticalMileSettings,
       projectName: marineLicence.projectName,
-      payload: { nauticalMile: wfd.nauticalMile }
+      payload: { nauticalMile: waterFrameworkDirective?.nauticalMile }
     })
   }
 }

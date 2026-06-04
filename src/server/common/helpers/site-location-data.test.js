@@ -94,7 +94,7 @@ describe('buildSiteLocationData', () => {
       sameActivityDates: 'No',
       sameActivityDescription: 'No',
       multipleSitesEnabled: false,
-      method: 'File uploaded',
+      method: 'File upload',
       isFileUpload: true
     })
   })
@@ -127,7 +127,7 @@ describe('buildSiteLocationData', () => {
       sameActivityDates: 'Yes',
       sameActivityDescription: 'No',
       multipleSitesEnabled: true,
-      method: 'File uploaded',
+      method: 'File upload',
       isFileUpload: true,
       activityDates: '1 February 2025 to 28 February 2025'
     })

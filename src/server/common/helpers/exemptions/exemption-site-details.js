@@ -40,7 +40,7 @@ export const processFileUploadSiteDetails = (
     return {
       ...siteDetails,
       isFileUpload: true,
-      method: 'File uploaded',
+      method: 'File upload',
       fileType: fileUploadData?.fileUploadType || fallbackFileType,
       filename: fileUploadData?.uploadedFile?.filename || fallbackFilename
     }
@@ -55,7 +55,7 @@ export const processFileUploadSiteDetails = (
     return {
       ...siteDetails,
       isFileUpload: true,
-      method: 'File uploaded',
+      method: 'File upload',
       fileType: fallbackFileType,
       filename: fallbackFilename
     }

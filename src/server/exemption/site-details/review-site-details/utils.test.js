@@ -136,7 +136,7 @@ describe('siteDetails utils', () => {
             })
           ]),
           multipleSiteDetailsData: expect.objectContaining({
-            method: 'File uploaded',
+            method: 'File upload',
             multipleSiteDetails: 'No',
             sameActivityDates: 'No',
             sameActivityDescription: 'No'

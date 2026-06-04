@@ -230,7 +230,7 @@ describe('#reviewSiteDetails', () => {
               })
             ]),
             multipleSiteDetailsData: expect.objectContaining({
-              method: 'File uploaded'
+              method: 'File upload'
             })
           })
         )

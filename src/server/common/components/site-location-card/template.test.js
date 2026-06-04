@@ -9,7 +9,7 @@ describe('Site Location Card Component', () => {
         $component = renderComponent('site-location-card', {
           siteLocationData: {
             isFileUpload: true,
-            method: 'File uploaded',
+            method: 'File upload',
             fileType: 'KML',
             filename: 'test-site.kml',
             multipleSiteDetails: 'No',
@@ -35,7 +35,7 @@ describe('Site Location Card Component', () => {
           'Method of providing site location'
         )
         expect(methodRow.find('.govuk-summary-list__value').text().trim()).toBe(
-          'File uploaded'
+          'File upload'
         )
       })
 
@@ -51,7 +51,7 @@ describe('Site Location Card Component', () => {
         $component = renderComponent('site-location-card', {
           siteLocationData: {
             isFileUpload: true,
-            method: 'File uploaded',
+            method: 'File upload',
             fileType: 'Shapefile',
             filename: 'site-boundary.shp',
             multipleSiteDetails: 'Yes',
@@ -71,7 +71,7 @@ describe('Site Location Card Component', () => {
           'Method of providing site location'
         )
         expect(methodRow.find('.govuk-summary-list__value').text().trim()).toBe(
-          'File uploaded'
+          'File upload'
         )
       })
 

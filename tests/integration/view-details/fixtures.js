@@ -165,7 +165,7 @@ export const testScenarios = [
     expectedPageContent: {
       ...baseExpectedContent,
       siteLocation: {
-        'Method of providing site location': 'File uploaded'
+        'Method of providing site location': 'File upload'
       },
       siteDetails: [
         {
@@ -181,7 +181,7 @@ export const testScenarios = [
     expectedPageContent: {
       ...baseExpectedContent,
       siteLocation: {
-        'Method of providing site location': 'File uploaded'
+        'Method of providing site location': 'File upload'
       },
       siteDetails: [
         {

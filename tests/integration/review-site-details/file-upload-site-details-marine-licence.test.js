@@ -140,10 +140,10 @@ describe('ML Review Site Details - File Upload Integration Tests', () => {
 
     const methodRow = getRowByKey(card, 'Method of providing site location')
     expect(methodRow).toBeTruthy()
-    expect(methodRow.textContent).toContain('File uploaded')
+    expect(methodRow.textContent).toContain('File upload')
 
     expect(getRowByKey(card, 'File type')).toBeFalsy()
-    expect(getRowByKey(card, 'File uploaded')).toBeFalsy()
+    expect(getRowByKey(card, 'File upload')).toBeFalsy()
   }
 
   const validateFileUpload = (document, expected, siteIndex) => {

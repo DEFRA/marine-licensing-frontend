@@ -20,7 +20,7 @@ export const buildSiteLocationData = (multipleSiteDetails, siteDetails) => {
   siteLocationData.method =
     firstSite.coordinatesType === 'coordinates'
       ? 'Enter the coordinates of the site manually'
-      : 'File uploaded'
+      : 'File upload'
 
   siteLocationData.isFileUpload = firstSite.coordinatesType === 'file'
 

@@ -43,7 +43,7 @@ describe('Marine Licence Check Your Answers - site and activity cards', () => {
       ).toBeInTheDocument()
     })
 
-    test('renders "Providing the site location" card with File uploaded method', () => {
+    test('renders "Providing the site location" card with File upload method', () => {
       expect(
         getByRole(document, 'heading', {
           level: 2,
@@ -54,7 +54,7 @@ describe('Marine Licence Check Your Answers - site and activity cards', () => {
       const card = document.querySelector('#site-location-card')
       expect(card).toBeTruthy()
       expect(card.textContent).toContain('Method of providing site location')
-      expect(card.textContent).toContain('File uploaded')
+      expect(card.textContent).toContain('File upload')
     })
 
     test('renders a Site 1 card with a Change link', () => {

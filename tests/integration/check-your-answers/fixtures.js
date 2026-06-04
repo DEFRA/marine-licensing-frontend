@@ -552,7 +552,7 @@ export const testScenarios = [
         'Project name': 'Hammersmith pontoon construction'
       },
       siteLocation: {
-        'Method of providing site location': 'File uploaded'
+        'Method of providing site location': 'File upload'
       },
       activityDetails: {
         'Are the activity dates the same for every site?': 'Yes',

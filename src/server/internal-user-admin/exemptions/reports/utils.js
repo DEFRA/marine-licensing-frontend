@@ -1,16 +1,45 @@
-const formatPercentage = (percentage) => `${percentage}%`
+/**
+ * @param {number | string} percentage
+ * @returns {string}
+ */
+export const formatPercentage = (percentage) => {
+  const normalized = String(percentage).replace(/%$/, '').trim()
+  const value = Number(normalized)
+  const rounded = Number.isFinite(value) ? Math.round(value) : 0
+  return `${rounded}%`
+}
+
+/**
+ * @param {string} firstLabel
+ * @param {string} secondLabel
+ * @param {boolean} numericLabels
+ */
+const compareLabels = (firstLabel, secondLabel, numericLabels) =>
+  numericLabels
+    ? Number(firstLabel) - Number(secondLabel)
+    : firstLabel.localeCompare(secondLabel)
+
+/**
+ * @param {Record<string, number>} record
+ */
+const usesNumericLabelSort = (record) =>
+  Object.keys(record).every((label) => /^\d+$/.test(String(label)))
 
 /**
  * @param {Record<string, number>} [record]
  * @returns {{ label: string, count: number }[]}
  */
-export const mapCountRecordToSortedEntries = (record = {}) =>
-  Object.entries(record)
+export const mapCountRecordToSortedEntries = (record = {}) => {
+  const numericLabels = usesNumericLabelSort(record)
+
+  return Object.entries(record)
     .map(([label, count]) => ({ label: String(label), count }))
     .sort(
       (first, second) =>
-        second.count - first.count || first.label.localeCompare(second.label)
+        second.count - first.count ||
+        compareLabels(first.label, second.label, numericLabels)
     )
+}
 
 /**
  * @param {Record<string, number>} [record]

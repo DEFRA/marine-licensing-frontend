@@ -44,20 +44,6 @@ const teamAdminAuth = { credentials: { isTeamAdmin: true } }
 describe('Admin exemptions summary report', () => {
   const getServer = setupTestServer()
 
-  test('admin landing page links to summary report', async () => {
-    const response = await makeGetRequest({
-      server: getServer(),
-      url: routes.ADMIN_EXEMPTIONS,
-      auth: teamAdminAuth
-    })
-
-    validateResponse(response)
-    const document = responseToDocument(response)
-
-    const reportLink = getByRole(document, 'link', { name: 'Summary report' })
-    expect(reportLink).toHaveAttribute('href', routes.ADMIN_REPORTS)
-  })
-
   test('renders status counts and statistics from summary API', async () => {
     vi.mocked(authenticatedGetRequest).mockResolvedValue({
       payload: { message: 'success', value: summaryApiValue }

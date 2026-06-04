@@ -82,6 +82,8 @@
       <h2 class="govuk-heading-m">Exemptions by article</h2>
       {% if stats.byArticleRows.length > 0 %}
         {{ govukTable({
+          caption: "Exemptions by article",
+          captionClasses: "govuk-visually-hidden",
           classes: "govuk-!-margin-bottom-8",
           head: [
             { text: "Article" },
@@ -96,6 +98,8 @@
       <h2 class="govuk-heading-m">Exemptions by Marine Plan Area</h2>
       {% if stats.byMarinePlanAreaRows.length > 0 %}
         {{ govukTable({
+          caption: "Exemptions by Marine Plan Area",
+          captionClasses: "govuk-visually-hidden",
           classes: "govuk-!-margin-bottom-8",
           head: [
             { text: "Marine Plan Area" },
@@ -110,6 +114,8 @@
       <h2 class="govuk-heading-m">Exemptions by Coastal Operations Area</h2>
       {% if stats.byCoastalOperationsAreaRows.length > 0 %}
         {{ govukTable({
+          caption: "Exemptions by Coastal Operations Area",
+          captionClasses: "govuk-visually-hidden",
           head: [
             { text: "Coastal Operations Area" },
             { text: "Number of exemptions", classes: "govuk-!-width-one-quarter" }

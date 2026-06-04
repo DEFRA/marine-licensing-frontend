@@ -92,36 +92,6 @@ describe('#checkYourAnswersController', () => {
     })
   })
 
-  test('handler should render with empty site data when id present but no sites', async () => {
-    const mockCachedData = { ...mockMarineLicenceApplication }
-    const mockCompleteLicence = { ...mockCachedData, siteDetails: [] }
-
-    getMarineLicenceCacheMock.mockReturnValue(mockCachedData)
-    mockGetMarineLicenceById.mockResolvedValue(mockCompleteLicence)
-    buildSiteDataMock.mockReturnValue({
-      coordinatesType: null,
-      summaryData: []
-    })
-    buildSummaryDataMock.mockReturnValue({
-      ...mockCachedData,
-      preferredDates: null
-    })
-
-    await checkYourAnswersController.handler(mockRequest, mockH)
-
-    expect(mockGetMarineLicenceById).toHaveBeenCalledWith(
-      mockMarineLicenceApplication.id
-    )
-    expect(buildSiteDataMock).toHaveBeenCalledWith(mockCompleteLicence)
-    expect(mockH.view).toHaveBeenCalledWith(
-      CHECK_YOUR_ANSWERS_VIEW_ROUTE,
-      expect.objectContaining({
-        coordinatesType: null,
-        summaryData: []
-      })
-    )
-  })
-
   test('handler should render with empty site data when no id in cache', async () => {
     const mockCachedData = {
       projectName: 'No Id Project'

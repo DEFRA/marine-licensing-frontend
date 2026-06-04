@@ -50,7 +50,7 @@ describe('Marine Licence Site Details Card - Change link', () => {
       coordinateSystem: 'WGS84',
       coordinates: '50.9876, -1.2345',
       width: '100m',
-      siteDetailsData: '{}'
+      siteDetailsData: {}
     },
     coordinatesType: 'coordinates'
   }

@@ -22,8 +22,8 @@ vi.mock('#src/server/common/helpers/marine-licence/site-data.js', () => ({
     .mockReturnValue({ coordinatesType: null, summaryData: [] })
 }))
 
-vi.mock('~/src/services/marine-licence-service/index.js')
-vi.mock('~/src/server/common/helpers/authenticated-requests.js', () => ({
+vi.mock('#src/services/marine-licence-service/index.js')
+vi.mock('#src/server/common/helpers/authenticated-requests.js', () => ({
   getAuthProvider: vi.fn().mockReturnValue('defra-id')
 }))
 
@@ -137,6 +137,13 @@ describe('marine-licence view details controller', () => {
     })
 
     describe('controller unit tests', () => {
+      beforeEach(() => {
+        vi.mocked(buildSiteData).mockReturnValue({
+          coordinatesType: null,
+          summaryData: []
+        })
+      })
+
       test('should call view with correct data structure', async () => {
         const marineLicence = createSubmittedMarineLicence()
         const mockServiceInstance = {

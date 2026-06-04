@@ -12,7 +12,7 @@ export const NAUTICAL_MILE_VIEW_ROUTE =
   'marine-licence/water-framework-directive/nautical-mile/index'
 
 export const errorMessages = {
-  NAUTICAL_MILE_AGREE:
+  NAUTICAL_MILE_REQUIRED:
     'Select whether your project is located within one nautical mile (1.85km) of the coast'
 }
 
@@ -44,9 +44,9 @@ export const nauticalMileSubmitController = {
     validate: {
       payload: joi.object({
         nauticalMile: joi.string().valid('yes', 'no').required().messages({
-          'any.only': errorMessages.NAUTICAL_MILE_AGREE,
-          'string.empty': errorMessages.NAUTICAL_MILE_AGREE,
-          'any.required': errorMessages.NAUTICAL_MILE_AGREE
+          'any.only': errorMessages.NAUTICAL_MILE_REQUIRED,
+          'string.empty': errorMessages.NAUTICAL_MILE_REQUIRED,
+          'any.required': errorMessages.NAUTICAL_MILE_REQUIRED
         })
       }),
       failAction: (request, h, err) => {

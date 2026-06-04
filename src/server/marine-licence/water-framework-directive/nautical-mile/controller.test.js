@@ -1,5 +1,8 @@
 import { vi } from 'vitest'
-import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
+import {
+  apiRoutes,
+  marineLicenceRoutes
+} from '#src/server/common/constants/routes.js'
 import {
   nauticalMileSubmitController,
   NAUTICAL_MILE_VIEW_ROUTE,
@@ -8,8 +11,10 @@ import {
 import * as cacheUtils from '#src/server/common/helpers/marine-licence/session-cache/utils.js'
 import * as wfdCache from '#src/server/common/helpers/marine-licence/session-cache/water-framework-directive.js'
 import { createMockH } from '#src/server/test-helpers/mocks/helpers.js'
+import { authenticatedPatchRequest } from '#src/server/common/helpers/authenticated-requests.js'
 
 vi.mock('~/src/server/common/helpers/marine-licence/session-cache/utils.js')
+vi.mock('~/src/server/common/helpers/authenticated-requests.js')
 
 describe('#nauticalMile', () => {
   const h = createMockH()
@@ -30,7 +35,7 @@ describe('#nauticalMile', () => {
     vi.restoreAllMocks()
   })
 
-  describe('#nauticalMilController', () => {
+  describe('#nauticalMileController', () => {
     test('Should correctly load page even without previous WFD data stored', async () => {
       const mockWithouWfd = { ...mockLicence }
       delete mockWithouWfd.waterFrameworkDirective
@@ -78,14 +83,13 @@ describe('#nauticalMile', () => {
         h
       )
 
-      expect(wfdCache.updateWaterFrameworkDirective).toHaveBeenCalledWith(
+      expect(authenticatedPatchRequest).toHaveBeenCalledWith(
         expect.any(Object),
-        h,
-        'nauticalMile',
-        'no'
+        apiRoutes.UPDATE_WATER_FRAMEWORK_DIRECTIVE,
+        { nauticalMile: 'no', id: mockLicence.id }
       )
       expect(h.redirect).toHaveBeenCalledWith(
-        marineLicenceRoutes.MARINE_LICENCE_WATER_FRAMEWORK_DIRECTIVE_NAUTICAL_MILE
+        marineLicenceRoutes.MARINE_LICENCE_TASK_LIST
       )
     })
 

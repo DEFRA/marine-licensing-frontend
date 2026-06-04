@@ -11,6 +11,7 @@ import {
 } from '#src/server/common/helpers/view-details/utils.js'
 import { MARINE_LICENCE_KEY } from '#src/server/common/constants/marine-licence.js'
 import { buildSummaryData } from '#src/server/common/helpers/marine-licence/summary-data.js'
+import { buildSiteData } from '#src/server/common/helpers/marine-licence/site-data.js'
 
 export const VIEW_DETAILS_VIEW_ROUTE = 'marine-licence/view-details/index'
 
@@ -49,6 +50,7 @@ export const viewDetailsController = {
       }
 
       const formattedMarineLicence = buildSummaryData(marineLicence)
+      const { coordinatesType, summaryData } = buildSiteData(marineLicence)
 
       const pageCaption = isApplicantView
         ? `${marineLicence.applicationReference} - Marine licence`
@@ -63,6 +65,8 @@ export const viewDetailsController = {
         projectName: formattedMarineLicence.projectName,
         projectBackground: formattedMarineLicence.projectBackground,
         publicConsultation: formattedMarineLicence.publicConsultation,
+        coordinatesType,
+        summaryData,
         isReadOnly: true,
         pageCaption,
         backLink: isApplicantView ? routes.DASHBOARD : null,

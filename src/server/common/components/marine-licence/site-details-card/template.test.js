@@ -40,3 +40,38 @@ describe('Marine Licence Site Details Card Component', () => {
     expect(htmlContent).toContain('/marine-licence/location-csv-download/123')
   })
 })
+
+describe('Marine Licence Site Details Card - Change link', () => {
+  const siteParams = {
+    site: {
+      siteNumber: 1,
+      siteName: 'Test site',
+      method: 'Single set of coordinates',
+      coordinateSystem: 'WGS84',
+      coordinates: '50.9876, -1.2345',
+      width: '100m',
+      siteDetailsData: '{}'
+    },
+    coordinatesType: 'coordinates'
+  }
+
+  test('Should not render Change link when changeLink is not provided', () => {
+    const $component = renderComponent(
+      'marine-licence/site-details-card',
+      siteParams
+    )
+    expect($component('.govuk-summary-card__actions a').text()).not.toContain(
+      'Change'
+    )
+  })
+
+  test('Should render Change link when changeLink is provided', () => {
+    const $component = renderComponent('marine-licence/site-details-card', {
+      ...siteParams,
+      changeLink: '/review-site-details?from=check-your-answers#site-details-1'
+    })
+    expect($component('.govuk-summary-card__actions a').text()).toContain(
+      'Change'
+    )
+  })
+})

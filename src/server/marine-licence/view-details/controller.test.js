@@ -14,6 +14,13 @@ import {
   mockSubmittedMarineLicenceApplication
 } from '#src/server/test-helpers/mocks/marine-licence-mocks.js'
 import { getAuthProvider } from '#src/server/common/helpers/authenticated-requests.js'
+import { buildSiteData } from '#src/server/common/helpers/marine-licence/site-data.js'
+
+vi.mock('#src/server/common/helpers/marine-licence/site-data.js', () => ({
+  buildSiteData: vi
+    .fn()
+    .mockReturnValue({ coordinatesType: null, summaryData: [] })
+}))
 
 vi.mock('~/src/services/marine-licence-service/index.js')
 vi.mock('~/src/server/common/helpers/authenticated-requests.js', () => ({
@@ -152,7 +159,39 @@ describe('marine-licence view details controller', () => {
           expect.objectContaining({
             pageTitle: marineLicence.projectName,
             pageCaption: `${marineLicence.applicationReference} - Marine licence`,
-            backLink: routes.DASHBOARD
+            backLink: routes.DASHBOARD,
+            coordinatesType: null,
+            summaryData: []
+          })
+        )
+      })
+
+      test('should pass coordinatesType and summaryData from buildSiteData', async () => {
+        const marineLicence = createSubmittedMarineLicence()
+        const mockServiceInstance = {
+          getMarineLicenceById: vi.fn().mockResolvedValue(marineLicence)
+        }
+        vi.mocked(getMarineLicenceService).mockReturnValue(mockServiceInstance)
+        vi.mocked(buildSiteData).mockReturnValue({
+          coordinatesType: 'coordinates',
+          summaryData: [{ siteNumber: 1, siteName: 'Test Site' }]
+        })
+
+        const mockRequest = {
+          path: `${marineLicenceRoutes.MARINE_LICENCE_VIEW_DETAILS}/${mockMarineLicenceApplication.id}`,
+          params: { marineLicenceId: mockMarineLicenceApplication.id },
+          logger: { error: vi.fn() }
+        }
+        const mockH = { view: vi.fn() }
+
+        await viewDetailsController.handler(mockRequest, mockH)
+
+        expect(buildSiteData).toHaveBeenCalledWith(marineLicence)
+        expect(mockH.view).toHaveBeenCalledWith(
+          VIEW_DETAILS_VIEW_ROUTE,
+          expect.objectContaining({
+            coordinatesType: 'coordinates',
+            summaryData: [{ siteNumber: 1, siteName: 'Test Site' }]
           })
         )
       })

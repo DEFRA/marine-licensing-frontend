@@ -1,6 +1,7 @@
 import { vi } from 'vitest'
 import { getMarineLicenceCache } from '#src/server/common/helpers/marine-licence/session-cache/utils.js'
-import { buildCheckYourAnswersSiteData } from '#src/server/common/helpers/marine-licence/check-your-answers-site-data.js'
+import { getMarineLicenceService } from '#src/services/marine-licence-service/index.js'
+import { buildSiteData } from '#src/server/common/helpers/marine-licence/site-data.js'
 import { buildSummaryData } from '#src/server/common/helpers/marine-licence/summary-data.js'
 import {
   checkYourAnswersController,
@@ -14,22 +15,24 @@ import {
 import { mockMarineLicenceApplication } from '~/src/server/test-helpers/mocks/marine-licence-mocks.js'
 
 vi.mock('#src/server/common/helpers/marine-licence/session-cache/utils.js')
-vi.mock(
-  '#src/server/common/helpers/marine-licence/check-your-answers-site-data.js'
-)
+vi.mock('#src/services/marine-licence-service/index.js')
+vi.mock('#src/server/common/helpers/marine-licence/site-data.js')
 vi.mock('#src/server/common/helpers/marine-licence/summary-data.js')
 
 describe('#checkYourAnswersController', () => {
   let mockRequest
   let mockH
+  let mockGetMarineLicenceById
 
   const getMarineLicenceCacheMock = vi.mocked(getMarineLicenceCache)
-  const buildCheckYourAnswersSiteDataMock = vi.mocked(
-    buildCheckYourAnswersSiteData
-  )
+  const buildSiteDataMock = vi.mocked(buildSiteData)
   const buildSummaryDataMock = vi.mocked(buildSummaryData)
 
   beforeEach(() => {
+    mockGetMarineLicenceById = vi.fn()
+    vi.mocked(getMarineLicenceService).mockReturnValue({
+      getMarineLicenceById: mockGetMarineLicenceById
+    })
     mockH = {
       view: vi.fn()
     }
@@ -40,7 +43,6 @@ describe('#checkYourAnswersController', () => {
 
   test('handler should render with correct context including site data', async () => {
     const mockCachedData = {
-      id: '123',
       projectName: 'Test Project',
       specialLegalPowers: {
         agree: 'yes',
@@ -50,10 +52,12 @@ describe('#checkYourAnswersController', () => {
       publicRegisterRoute:
         '/marine-licence/sharing-your-project-information-publicly'
     }
+    const mockCompleteLicence = { ...mockCachedData, siteDetails: [] }
     const mockSummaryData = [{ siteNumber: 1, siteName: 'Test Site' }]
 
     getMarineLicenceCacheMock.mockReturnValue(mockCachedData)
-    buildCheckYourAnswersSiteDataMock.mockResolvedValue({
+    mockGetMarineLicenceById.mockResolvedValue(mockCompleteLicence)
+    buildSiteDataMock.mockReturnValue({
       coordinatesType: 'coordinates',
       summaryData: mockSummaryData
     })
@@ -70,10 +74,10 @@ describe('#checkYourAnswersController', () => {
       marineLicenceRoutes.MARINE_LICENCE_CHECK_YOUR_ANSWERS,
       true
     )
-    expect(buildCheckYourAnswersSiteDataMock).toHaveBeenCalledWith(
-      mockCachedData,
-      mockRequest
+    expect(mockGetMarineLicenceById).toHaveBeenCalledWith(
+      mockMarineLicenceApplication.id
     )
+    expect(buildSiteDataMock).toHaveBeenCalledWith(mockCompleteLicence)
     expect(buildSummaryDataMock).toHaveBeenCalledWith(mockCachedData)
     expect(mockH.view).toHaveBeenCalledWith(CHECK_YOUR_ANSWERS_VIEW_ROUTE, {
       pageTitle: 'Check your answers before sending your information',
@@ -88,17 +92,12 @@ describe('#checkYourAnswersController', () => {
     })
   })
 
-  test('handler should render with empty site data when no sites exist', async () => {
+  test('handler should render with empty site data when no id in cache', async () => {
     const mockCachedData = {
-      id: '456',
-      projectName: 'No Sites Project'
+      projectName: 'No Id Project'
     }
 
     getMarineLicenceCacheMock.mockReturnValue(mockCachedData)
-    buildCheckYourAnswersSiteDataMock.mockResolvedValue({
-      coordinatesType: null,
-      summaryData: []
-    })
     buildSummaryDataMock.mockReturnValue({
       ...mockCachedData,
       preferredDates: null
@@ -106,7 +105,8 @@ describe('#checkYourAnswersController', () => {
 
     await checkYourAnswersController.handler(mockRequest, mockH)
 
-    expect(buildSummaryDataMock).toHaveBeenCalledWith(mockCachedData)
+    expect(mockGetMarineLicenceById).not.toHaveBeenCalled()
+    expect(buildSiteDataMock).not.toHaveBeenCalled()
     expect(mockH.view).toHaveBeenCalledWith(CHECK_YOUR_ANSWERS_VIEW_ROUTE, {
       pageTitle: 'Check your answers before sending your information',
       backLink: marineLicenceRoutes.MARINE_LICENCE_TASK_LIST,

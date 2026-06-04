@@ -1,4 +1,3 @@
-import { getMarineLicenceService } from '#src/services/marine-licence-service/index.js'
 import { getSiteDetailsBySite } from '#src/server/common/helpers/marine-licence/session-cache/site-details-utils.js'
 import { buildManualCoordinateSummaryData } from '#src/server/common/helpers/review-site-details/manual-entry.js'
 import { getFileUploadSummaryData } from '#src/server/common/helpers/review-site-details/file-upload.js'
@@ -14,16 +13,7 @@ const buildFileUploadSummaryData = (marineLicence, siteDetails) =>
     activityDetails: parseActivityDetails(site)
   }))
 
-export const buildCheckYourAnswersSiteData = async (marineLicence, request) => {
-  if (!marineLicence.id) {
-    return { coordinatesType: null, summaryData: [] }
-  }
-
-  const marineLicenceService = getMarineLicenceService(request)
-  const completeMarineLicence = await marineLicenceService.getMarineLicenceById(
-    marineLicence.id
-  )
-
+export const buildSiteData = (completeMarineLicence) => {
   const { siteDetails, multipleSiteDetails } = completeMarineLicence
 
   if (!siteDetails || siteDetails.length === 0) {

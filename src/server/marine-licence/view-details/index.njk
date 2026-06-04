@@ -1,8 +1,10 @@
 {% extends 'layouts/page.njk' %}
 {% from "govuk/components/back-link/macro.njk" import govukBackLink %}
+{% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
 {% from "marine-licence/other-permissions-card/macro.njk" import appMarineLicenceOtherPermissionsCard %}
 {% from "marine-licence/project-details-card/macro.njk" import appMarineLicenceProjectDetailsCard %}
 {% from "marine-licence/site-details-card/macro.njk" import appMarineLicenceSiteDetailsCard %}
+{% from "marine-licence/activity-details-card/macro.njk" import appMarineLicenceActivityDetailsCard %}
 {% from "public-register-card/macro.njk" import appPublicRegisterCard %}
 
 {% block beforeContent %}
@@ -32,6 +34,37 @@
         isReadOnly: isReadOnly,
         preferredDates: preferredDates
       }) }}
+
+      {% if summaryData and summaryData.length %}
+        {{ govukSummaryList({
+          card: {
+            title: { text: "Providing the site location" },
+            attributes: { id: "site-location-card" }
+          },
+          rows: [{
+            key: { text: "Method of providing site location" },
+            value: { text: "File upload" if coordinatesType === "file" else "Enter the coordinates of the site manually" }
+          }]
+        }) }}
+
+        {% for site in summaryData %}
+          {{ appMarineLicenceSiteDetailsCard({
+            site: site,
+            loopIndex0: loop.index0,
+            coordinatesType: coordinatesType,
+            cspNonce: cspNonce
+          }) }}
+
+          {% for activityDetails in site.activityDetails %}
+            {{ appMarineLicenceActivityDetailsCard({
+              activityDetails: activityDetails,
+              siteNumber: site.siteNumber,
+              index: loop.index,
+              isReadOnly: true
+            }) }}
+          {% endfor %}
+        {% endfor %}
+      {% endif %}
 
       {% if isInternalUserView %}
         {{ appMarineLicenceSiteDetailsCard({

@@ -1,23 +1,31 @@
 import { getByRole, getByText } from '@testing-library/dom'
-import { JSDOM } from 'jsdom'
-import { statusCodes } from '~/src/server/common/constants/status-codes.js'
+import { marineLicenceRoutes } from '~/src/server/common/constants/routes.js'
+import {
+  mockMarineLicence,
+  setupTestServer
+} from '~/tests/integration/shared/test-setup-helpers.js'
+import { loadPage } from '~/tests/integration/shared/app-server.js'
 
-export function sharedWaterDirectiveBeforeYouStartTests({
-  request,
-  projectName,
-  navLinks
-}) {
+describe('Water Framework Directive before you start page (marine licence)', () => {
+  const getServer = setupTestServer()
+  const marineLicence = {
+    id: 'test-marine-licence-123',
+    projectName: 'Test Marine Project'
+  }
+
   test('should display the correct content', async () => {
-    const { result, statusCode } = await request()
+    mockMarineLicence(marineLicence)
 
-    expect(statusCode).toBe(statusCodes.ok)
-
-    const { document } = new JSDOM(result).window
+    const document = await loadPage({
+      requestUrl:
+        marineLicenceRoutes.MARINE_LICENCE_WATER_FRAMEWORK_DIRECTIVE_BEFORE_YOU_START,
+      server: getServer()
+    })
 
     expect(
       getByRole(document, 'heading', { name: 'Water Framework Directive' })
     ).toBeInTheDocument()
-    expect(getByText(document, projectName)).toBeInTheDocument()
+    expect(getByText(document, marineLicence.projectName)).toBeInTheDocument()
     expect(
       getByRole(document, 'heading', { name: 'Before you start' })
     ).toBeInTheDocument()
@@ -30,32 +38,27 @@ export function sharedWaterDirectiveBeforeYouStartTests({
     expect(
       getByRole(document, 'heading', { name: 'Uploading your assessment' })
     ).toBeInTheDocument()
-
     expect(
       getByText(
         document,
         "The Water Framework Directive (WFD) protects the quality of estuarine and coastal waters. Its aim is to make sure all water bodies reach or maintain 'good' status."
       )
     ).toBeInTheDocument()
-
     expect(
       getByText(
         document,
         'if your project is within one nautical mile (1.85km) of the coast'
       )
     ).toBeInTheDocument()
-
     expect(
       getByText(document, 'Help with excluded activities')
     ).toBeInTheDocument()
-
     expect(
       getByText(
         document,
         'You may not need to complete a new WFD assessment if you carried out the same activity at the same location, between 2015 and 2022 and already have an assessment.'
       )
     ).toBeInTheDocument()
-
     expect(
       getByText(
         document,
@@ -65,14 +68,21 @@ export function sharedWaterDirectiveBeforeYouStartTests({
   })
 
   test('should have correct navigation links', async () => {
-    const { result } = await request()
+    mockMarineLicence(marineLicence)
 
-    const { document } = new JSDOM(result).window
+    const document = await loadPage({
+      requestUrl:
+        marineLicenceRoutes.MARINE_LICENCE_WATER_FRAMEWORK_DIRECTIVE_BEFORE_YOU_START,
+      server: getServer()
+    })
 
-    const continueButton = getByRole(document, 'button', { name: 'Continue' })
-    expect(continueButton).toHaveAttribute('href', navLinks.continueHref)
-
-    const backLink = getByRole(document, 'link', { name: 'Back' })
-    expect(backLink).toHaveAttribute('href', navLinks.backHref)
+    expect(getByRole(document, 'button', { name: 'Continue' })).toHaveAttribute(
+      'href',
+      marineLicenceRoutes.MARINE_LICENCE_WATER_FRAMEWORK_DIRECTIVE_NAUTICAL_MILES
+    )
+    expect(getByRole(document, 'link', { name: 'Back' })).toHaveAttribute(
+      'href',
+      marineLicenceRoutes.MARINE_LICENCE_TASK_LIST
+    )
   })
-}
+})

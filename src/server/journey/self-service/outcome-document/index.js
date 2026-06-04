@@ -1,8 +1,7 @@
 import Joi from 'joi'
 import { outcomeDocumentController } from '#src/server/journey/self-service/outcome-document/controller.js'
+import { slugSchema } from '#src/server/journey/self-service/schemas/slug.js'
 import { routes } from '#src/server/common/constants/routes.js'
-
-const SLUG_LENGTH = 22
 
 export const journeySelfServiceOutcomeDocument = {
   plugin: {
@@ -16,10 +15,7 @@ export const journeySelfServiceOutcomeDocument = {
             auth: false,
             validate: {
               params: Joi.object({
-                slug: Joi.string()
-                  .length(SLUG_LENGTH)
-                  .pattern(/^[A-Za-z0-9_-]{22}$/)
-                  .required()
+                slug: slugSchema
               })
             }
           },

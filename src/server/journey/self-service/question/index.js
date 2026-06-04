@@ -3,12 +3,9 @@ import {
   questionPostController
 } from '#src/server/journey/self-service/question/controller.js'
 import { loadIatContext } from '#src/server/journey/self-service/services/load-iat-context.js'
+import { slugSchema } from '#src/server/journey/self-service/schemas/slug.js'
 import { routes } from '#src/server/common/constants/routes.js'
 import Joi from 'joi'
-
-const slugSchema = Joi.string()
-  .pattern(/^[A-Za-z0-9_-]{22}$/)
-  .required()
 
 const QUESTION_PATH_MAX = 200
 

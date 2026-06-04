@@ -5,14 +5,11 @@ import {
   outcomeViewAnswersController
 } from '#src/server/journey/self-service/outcome/controller.js'
 import { loadIatContext } from '#src/server/journey/self-service/services/load-iat-context.js'
+import { slugSchema } from '#src/server/journey/self-service/schemas/slug.js'
 import { routes } from '#src/server/common/constants/routes.js'
 
 const OUTCOME_TYPE_MAX = 400
 const OUTCOME_PATH_MAX = 200
-
-const slugSchema = Joi.string()
-  .pattern(/^[A-Za-z0-9_-]{22}$/)
-  .required()
 
 const outcomeParamsSchema = Joi.object({
   slug: slugSchema,

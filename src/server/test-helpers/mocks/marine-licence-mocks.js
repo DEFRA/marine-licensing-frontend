@@ -9,7 +9,8 @@ export const mockMarineLicenceTaskList = {
   preferredDates: 'COMPLETED',
   projectBackground: 'COMPLETED',
   publicRegister: 'COMPLETED',
-  publicConsultation: 'COMPLETED'
+  publicConsultation: 'COMPLETED',
+  waterFrameworkDirective: 'COMPLETED'
 }
 
 export const mockEmptyActivityDetails = {

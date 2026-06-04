@@ -86,7 +86,7 @@ describe('#nauticalMile', () => {
       expect(authenticatedPatchRequest).toHaveBeenCalledWith(
         expect.any(Object),
         apiRoutes.UPDATE_WATER_FRAMEWORK_DIRECTIVE,
-        { nauticalMile: 'no', id: mockLicence.id }
+        { waterFrameworkDirective: { nauticalMile: 'no' }, id: mockLicence.id }
       )
       expect(h.redirect).toHaveBeenCalledWith(
         marineLicenceRoutes.MARINE_LICENCE_TASK_LIST

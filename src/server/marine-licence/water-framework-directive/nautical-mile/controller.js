@@ -74,7 +74,7 @@ export const nauticalMileSubmitController = {
         request,
         apiRoutes.UPDATE_WATER_FRAMEWORK_DIRECTIVE,
         {
-          nauticalMile,
+          waterFrameworkDirective: { nauticalMile },
           id: marineLicence.id
         }
       )

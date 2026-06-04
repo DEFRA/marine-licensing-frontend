@@ -91,7 +91,7 @@ export const transformSiteDetailsTaskList = (taskList) => [
   }
 ]
 
-export const transformWaterFrameworkTaskList = (taskList) => [
+export const transformwaterFrameworkDirectiveTaskList = (taskList) => [
   {
     title: {
       text: 'Water Framework Directive assessment',

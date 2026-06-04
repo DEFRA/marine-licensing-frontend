@@ -10,7 +10,7 @@ import {
   transformSiteDetailsTaskList,
   transformOtherPermissionsTaskList,
   transformSharingTaskList,
-  transformWaterFrameworkTaskList
+  transformwaterFrameworkDirectiveTaskList
 } from '#src/server/marine-licence/task-list/utils.js'
 import { authenticatedGetRequest } from '#src/server/common/helpers/authenticated-requests.js'
 import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
@@ -61,7 +61,8 @@ export const taskListController = {
       publicRegister,
       publicConsultation,
       otherAuthorities,
-      siteDetails
+      siteDetails,
+      waterFrameworkDirective
     } = payload.value
 
     const { userRelationshipType } = userSession
@@ -78,8 +79,8 @@ export const taskListController = {
     const siteDetailsTaskListTransformed =
       transformSiteDetailsTaskList(taskList)
 
-    const waterFrameworkTaskListTransformed =
-      transformWaterFrameworkTaskList(taskList)
+    const waterFrameworkDirectiveTaskListTransformed =
+      transformwaterFrameworkDirectiveTaskList(taskList)
 
     await setMarineLicenceCache(request, h, {
       id: marineLicenceId,
@@ -90,7 +91,8 @@ export const taskListController = {
       publicRegister,
       publicConsultation,
       otherAuthorities,
-      siteDetails: hasCancel ? [] : siteDetails
+      siteDetails: hasCancel ? [] : siteDetails,
+      waterFrameworkDirective
     })
 
     await setProjectType(request, h, PROJECT_TYPE.MARINE_LICENCE)
@@ -100,7 +102,8 @@ export const taskListController = {
       ...otherPermissionsTaskListTransformed,
       ...sharingTaskListTransformed,
       ...projectDetailsTaskListTransformed,
-      ...siteDetailsTaskListTransformed
+      ...siteDetailsTaskListTransformed,
+      ...waterFrameworkDirectiveTaskListTransformed
     ].every((task) => task.status.text === 'Completed')
 
     return h.view(TASK_LIST_VIEW_ROUTE, {
@@ -110,7 +113,8 @@ export const taskListController = {
       sharingTaskList: sharingTaskListTransformed,
       projectDetailsTaskList: projectDetailsTaskListTransformed,
       siteDetailsTaskList: siteDetailsTaskListTransformed,
-      waterFrameworkTaskList: waterFrameworkTaskListTransformed,
+      waterFrameworkDirectiveTaskList:
+        waterFrameworkDirectiveTaskListTransformed,
       hasCompletedAllTasks
     })
   }

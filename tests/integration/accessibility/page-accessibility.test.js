@@ -230,6 +230,12 @@ describe('Page accessibility checks (Axe)', () => {
       title: 'Water Framework Directive'
     },
     {
+      url: marineLicenceRoutes.MARINE_LICENCE_WATER_FRAMEWORK_DIRECTIVE_NAUTICAL_MILE,
+      isMarineLicence: true,
+      title:
+        'Is your project located within one nautical mile (1.85km) of the coast?'
+    },
+    {
       url: `${marineLicenceRoutes.MARINE_LICENCE_TYPE_OF_ACTIVITY}?site=1&activity=1`,
       isMarineLicence: true,
       title: 'Type of activity'

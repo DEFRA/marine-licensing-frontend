@@ -48,6 +48,10 @@ export const mockOutputEmptyActivityDetails = {
   activityMonths: null
 }
 
+export const waterFrameworkDirective = {
+  nauticalMiles: 'yes'
+}
+
 export const mockMarineLicenceApplication = {
   id: faker.database.mongodbObjectId(),
   projectName: 'Test Project',
@@ -99,7 +103,8 @@ export const mockMarineLicenceApplication = {
         ]
       }
     }
-  ]
+  ],
+  waterFrameworkDirective
 }
 
 export const mockSubmittedMarineLicenceApplication = {

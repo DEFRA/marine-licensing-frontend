@@ -35,7 +35,7 @@ describe('#nauticalMile', () => {
       }
 
       await nauticalMileSubmitController.handler(
-        { payload: { nauticalMiles: 'yes' }, query: {} },
+        { payload: { nauticalMile: 'yes' }, query: {} },
         h
       )
 
@@ -57,7 +57,7 @@ describe('#nauticalMile', () => {
       }
 
       await nauticalMileSubmitController.handler(
-        { payload: { nauticalMiles: 'no' }, query: {} },
+        { payload: { nauticalMile: 'no' }, query: {} },
         h
       )
 
@@ -75,19 +75,19 @@ describe('#nauticalMile', () => {
     test.each([
       {
         name: 'null error details',
-        payload: { nauticalMiles: '' },
+        payload: { nauticalMile: '' },
         err: { details: null },
         expectedExtra: {}
       },
       {
         name: 'missing error details',
-        payload: { nauticalMiles: '' },
+        payload: { nauticalMile: '' },
         err: {},
         expectedExtra: {}
       },
       {
         name: 'invalid agree value',
-        payload: { nauticalMiles: 'invalid' },
+        payload: { nauticalMile: 'invalid' },
         err: {},
         expectedExtra: {}
       }

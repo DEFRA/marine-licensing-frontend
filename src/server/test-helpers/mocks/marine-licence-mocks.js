@@ -49,7 +49,7 @@ export const mockOutputEmptyActivityDetails = {
 }
 
 export const waterFrameworkDirective = {
-  nauticalMiles: 'yes'
+  nauticalMile: 'yes'
 }
 
 export const mockMarineLicenceApplication = {

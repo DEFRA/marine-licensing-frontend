@@ -18,20 +18,20 @@ describe('updateWaterFrameworkDirective', () => {
   })
 
   test('should store the value in cache', async () => {
-    const value = { nauticalMiles: 'yes' }
+    const value = { nauticalMile: 'yes' }
 
     const result = await updateWaterFrameworkDirective(
       mockRequest,
       mockH,
-      'nauticalMiles',
-      value.nauticalMiles
+      'nauticalMile',
+      value.nauticalMile
     )
 
     expect(mockRequest.yar.set).toHaveBeenCalledWith(MARINE_LICENCE_CACHE_KEY, {
-      waterFrameworkDirective: { nauticalMiles: 'yes' }
+      waterFrameworkDirective: { nauticalMile: 'yes' }
     })
     expect(mockRequest.yar.commit).toHaveBeenCalledWith(mockH)
-    expect(result).toEqual({ nauticalMiles: 'yes' })
+    expect(result).toEqual({ nauticalMile: 'yes' })
   })
 
   test('should handle empty objects', async () => {
@@ -40,15 +40,15 @@ describe('updateWaterFrameworkDirective', () => {
     const result = await updateWaterFrameworkDirective(
       mockRequest,
       mockH,
-      'nauticalMiles',
-      value.nauticalMiles
+      'nauticalMile',
+      value.nauticalMile
     )
 
     expect(mockRequest.yar.set).toHaveBeenCalledWith(MARINE_LICENCE_CACHE_KEY, {
       waterFrameworkDirective: {}
     })
     expect(mockRequest.yar.commit).toHaveBeenCalledWith(mockH)
-    expect(result).toEqual({ nauticalMiles: null })
+    expect(result).toEqual({ nauticalMile: null })
   })
 
   test('should handle undefined values and convert to null', async () => {
@@ -57,7 +57,7 @@ describe('updateWaterFrameworkDirective', () => {
     const result = await updateWaterFrameworkDirective(
       mockRequest,
       mockH,
-      'nauticalMiles',
+      'nauticalMile',
       value
     )
 
@@ -66,7 +66,7 @@ describe('updateWaterFrameworkDirective', () => {
     })
     expect(mockRequest.yar.commit).toHaveBeenCalledWith(mockH)
 
-    expect(result).toEqual({ nauticalMiles: null })
+    expect(result).toEqual({ nauticalMile: null })
   })
 
   test('should handle null values correctly', async () => {
@@ -75,7 +75,7 @@ describe('updateWaterFrameworkDirective', () => {
     const result = await updateWaterFrameworkDirective(
       mockRequest,
       mockH,
-      'nauticalMiles',
+      'nauticalMile',
       value
     )
 
@@ -84,6 +84,6 @@ describe('updateWaterFrameworkDirective', () => {
     })
     expect(mockRequest.yar.commit).toHaveBeenCalledWith(mockH)
 
-    expect(result).toEqual({ nauticalMiles: null })
+    expect(result).toEqual({ nauticalMile: null })
   })
 })

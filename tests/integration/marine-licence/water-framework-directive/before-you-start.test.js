@@ -78,7 +78,7 @@ describe('Water Framework Directive before you start page (marine licence)', () 
 
     expect(getByRole(document, 'button', { name: 'Continue' })).toHaveAttribute(
       'href',
-      marineLicenceRoutes.MARINE_LICENCE_WATER_FRAMEWORK_DIRECTIVE_NAUTICAL_MILES
+      marineLicenceRoutes.MARINE_LICENCE_WATER_FRAMEWORK_DIRECTIVE_NAUTICAL_MILE
     )
     expect(getByRole(document, 'link', { name: 'Back' })).toHaveAttribute(
       'href',

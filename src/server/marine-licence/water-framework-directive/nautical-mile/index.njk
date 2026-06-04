@@ -44,16 +44,16 @@
         <input type="hidden" name="csrfToken" value="{{ csrfToken }}" />
 
         {{ govukRadios({
-          idPrefix: "nauticalMiles",
-          name: "nauticalMiles",
-          value: payload.nauticalMiles,
+          idPrefix: "nauticalMile",
+          name: "nauticalMile",
+          value: payload.nauticalMile,
           fieldset: {
             legend: {
               text: "Is your project located within one nautical mile (1.85km) of the coast?",
               classes: "govuk-visually-hidden"
             }
           },
-          errorMessage: errors['nauticalMiles'],
+          errorMessage: errors['nauticalMile'],
           items: [
             {
               value: "yes",

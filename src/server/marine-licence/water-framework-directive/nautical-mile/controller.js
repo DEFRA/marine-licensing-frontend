@@ -30,7 +30,7 @@ export const nauticalMileController = {
     return h.view(NAUTICAL_MILE_VIEW_ROUTE, {
       ...nauticalMileSettings,
       projectName: marineLicence.projectName,
-      payload: { nauticalMiles: wfd.nauticalMile }
+      payload: { nauticalMile: wfd.nauticalMile }
     })
   }
 }
@@ -39,7 +39,7 @@ export const nauticalMileSubmitController = {
   options: {
     validate: {
       payload: joi.object({
-        nauticalMiles: joi.string().valid('yes', 'no').required().messages({
+        nauticalMile: joi.string().valid('yes', 'no').required().messages({
           'any.only': errorMessages.NAUTICAL_MILE_AGREE,
           'string.empty': errorMessages.NAUTICAL_MILE_AGREE,
           'any.required': errorMessages.NAUTICAL_MILE_AGREE
@@ -65,7 +65,7 @@ export const nauticalMileSubmitController = {
       request,
       h,
       'nauticalMile',
-      payload.nauticalMiles
+      payload.nauticalMile
     )
 
     return h.redirect(

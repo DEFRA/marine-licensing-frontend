@@ -225,6 +225,11 @@ describe('Page accessibility checks (Axe)', () => {
       title: 'Site details'
     },
     {
+      url: marineLicenceRoutes.MARINE_LICENCE_WATER_FRAMEWORK_DIRECTIVE_BEFORE_YOU_START,
+      isMarineLicence: true,
+      title: 'Water Framework Directive'
+    },
+    {
       url: `${marineLicenceRoutes.MARINE_LICENCE_TYPE_OF_ACTIVITY}?site=1&activity=1`,
       isMarineLicence: true,
       title: 'Type of activity'

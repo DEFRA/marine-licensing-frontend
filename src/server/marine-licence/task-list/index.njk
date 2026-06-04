@@ -21,7 +21,13 @@
           idPrefix: "site-details-task-list",
           items: siteDetailsTaskList
         }) }}
-     
+
+        <h2 class="govuk-heading-m">Water Framework Directive</h2>
+        {{ govukTaskList({
+            idPrefix: "water-framework-task-list",
+            items: waterFrameworkTaskList
+        }) }}
+
           {% if otherPermissionsTaskList | length %}
         <h2 class="govuk-heading-m">Other permissions</h2>
          {{ govukTaskList({

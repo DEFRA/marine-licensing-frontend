@@ -9,7 +9,8 @@ import {
   transformProjectDetailsTaskList,
   transformSiteDetailsTaskList,
   transformOtherPermissionsTaskList,
-  transformSharingTaskList
+  transformSharingTaskList,
+  transformWaterFrameworkTaskList
 } from '#src/server/marine-licence/task-list/utils.js'
 import { authenticatedGetRequest } from '#src/server/common/helpers/authenticated-requests.js'
 import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
@@ -80,6 +81,9 @@ export const taskListController = {
     const siteDetailsTaskListTransformed =
       transformSiteDetailsTaskList(taskList)
 
+    const waterFrameworkTaskListTransformed =
+      transformWaterFrameworkTaskList(taskList)
+
     await setMarineLicenceCache(request, h, {
       id: marineLicenceId,
       projectName,
@@ -109,6 +113,7 @@ export const taskListController = {
       sharingTaskList: sharingTaskListTransformed,
       projectDetailsTaskList: projectDetailsTaskListTransformed,
       siteDetailsTaskList: siteDetailsTaskListTransformed,
+      waterFrameworkTaskList: waterFrameworkTaskListTransformed,
       hasCompletedAllTasks
     })
   }

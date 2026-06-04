@@ -98,7 +98,10 @@ describe('#checkYourAnswersController', () => {
 
     getMarineLicenceCacheMock.mockReturnValue(mockCachedData)
     mockGetMarineLicenceById.mockResolvedValue(mockCompleteLicence)
-    buildSiteDataMock.mockReturnValue({ coordinatesType: null, summaryData: [] })
+    buildSiteDataMock.mockReturnValue({
+      coordinatesType: null,
+      summaryData: []
+    })
     buildSummaryDataMock.mockReturnValue({
       ...mockCachedData,
       preferredDates: null

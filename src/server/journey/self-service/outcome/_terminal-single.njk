@@ -10,7 +10,7 @@
   {% if hasContinue %}
     {{ govukButton({
       text: ctaLabel,
-      href: "#",
+      href: continueUrl or "#",
       classes: "govuk-!-margin-right-3"
     }) }}
   {% endif %}

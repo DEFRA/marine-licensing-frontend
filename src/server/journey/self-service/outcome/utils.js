@@ -40,6 +40,14 @@ function viewAnswersUrlFor(slug, outcomeRoute, outcomeTypeId) {
   return `/journey/self-service/c/${slug}/view-answers/${outcomeTypeId}/${tail}`
 }
 
+function continueUrlFor(slug, outcomeRoute, outcomeType) {
+  if (!outcomeType.overrideCtaButtonUrl) {
+    return null
+  }
+  const tail = outcomeRoute.replace(/^\//, '')
+  return `/journey/self-service/c/${slug}/continue/${outcomeType.id}/${tail}`
+}
+
 export function buildIntermediateView(baseModel, outcome, types) {
   const section = outcome.section ? getSection(outcome.section) : null
   return {
@@ -66,6 +74,11 @@ export function buildTerminalSingleView(baseModel, terminalType) {
     body: terminalType.text,
     ctaLabel: ctaLabelFor(terminalType),
     hasContinue: hasContinueFor(terminalType),
+    continueUrl: continueUrlFor(
+      baseModel.slug,
+      baseModel.outcomeRoute,
+      terminalType
+    ),
     viewAnswersUrl: viewAnswersUrlFor(
       baseModel.slug,
       baseModel.outcomeRoute,
@@ -112,6 +125,7 @@ export function buildTerminalMultiView(baseModel, types) {
       text: ot.text,
       ctaLabel: ctaLabelFor(ot),
       hasContinue: hasContinueFor(ot),
+      continueUrl: continueUrlFor(baseModel.slug, baseModel.outcomeRoute, ot),
       viewAnswersUrl: viewAnswersUrlFor(
         baseModel.slug,
         baseModel.outcomeRoute,

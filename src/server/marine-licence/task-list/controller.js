@@ -10,7 +10,7 @@ import {
   transformSiteDetailsTaskList,
   transformOtherPermissionsTaskList,
   transformSharingTaskList,
-  transformwaterFrameworkDirectiveTaskList
+  transformWaterFrameworkDirectiveTaskList
 } from '#src/server/marine-licence/task-list/utils.js'
 import { authenticatedGetRequest } from '#src/server/common/helpers/authenticated-requests.js'
 import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
@@ -80,7 +80,7 @@ export const taskListController = {
       transformSiteDetailsTaskList(taskList)
 
     const waterFrameworkDirectiveTaskListTransformed =
-      transformwaterFrameworkDirectiveTaskList(taskList)
+      transformWaterFrameworkDirectiveTaskList(taskList)
 
     await setMarineLicenceCache(request, h, {
       id: marineLicenceId,

@@ -3,7 +3,7 @@ import {
   transformSiteDetailsTaskList,
   transformOtherPermissionsTaskList,
   transformSharingTaskList,
-  transformwaterFrameworkDirectiveTaskList
+  transformWaterFrameworkDirectiveTaskList
 } from '#src/server/marine-licence/task-list/utils.js'
 import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
 
@@ -454,10 +454,10 @@ describe('taskList utils', () => {
     )
   })
 
-  describe('transformwaterFrameworkDirectiveTaskList', () => {
+  describe('transformWaterFrameworkDirectiveTaskList', () => {
     test('correctly returns Completed status', () => {
       expect(
-        transformwaterFrameworkDirectiveTaskList({
+        transformWaterFrameworkDirectiveTaskList({
           waterFrameworkDirective: 'COMPLETED'
         })
       ).toEqual([
@@ -474,7 +474,7 @@ describe('taskList utils', () => {
 
     test('correctly returns In progress', () => {
       expect(
-        transformwaterFrameworkDirectiveTaskList({
+        transformWaterFrameworkDirectiveTaskList({
           waterFrameworkDirective: 'IN_PROGRESS'
         })
       ).toEqual([
@@ -495,7 +495,7 @@ describe('taskList utils', () => {
       'correctly returns Not yet started for %s',
       (value) => {
         expect(
-          transformwaterFrameworkDirectiveTaskList({
+          transformWaterFrameworkDirectiveTaskList({
             waterFrameworkDirective: value
           })
         ).toEqual([

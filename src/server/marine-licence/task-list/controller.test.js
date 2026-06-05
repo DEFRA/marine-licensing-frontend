@@ -11,7 +11,7 @@ import {
   transformSiteDetailsTaskList,
   transformOtherPermissionsTaskList,
   transformSharingTaskList,
-  transformwaterFrameworkDirectiveTaskList
+  transformWaterFrameworkDirectiveTaskList
 } from '#src/server/marine-licence/task-list/utils.js'
 import {
   taskListController,
@@ -167,7 +167,7 @@ describe('#taskListController', () => {
     vi.mocked(transformOtherPermissionsTaskList).mockReturnValue(
       mockOtherPermissionsTaskList
     )
-    vi.mocked(transformwaterFrameworkDirectiveTaskList).mockReturnValue(
+    vi.mocked(transformWaterFrameworkDirectiveTaskList).mockReturnValue(
       mockwaterFrameworkDirectiveTaskList
     )
     vi.mocked(transformSharingTaskList).mockReturnValue(mockSharingTaskList)
@@ -191,7 +191,7 @@ describe('#taskListController', () => {
       mockPayload.value.taskList
     )
     expect(
-      vi.mocked(transformwaterFrameworkDirectiveTaskList)
+      vi.mocked(transformWaterFrameworkDirectiveTaskList)
     ).toHaveBeenCalledWith(mockPayload.value.taskList)
 
     expect(vi.mocked(setMarineLicenceCache)).toHaveBeenCalledWith(

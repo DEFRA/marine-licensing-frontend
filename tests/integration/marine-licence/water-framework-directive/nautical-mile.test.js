@@ -79,7 +79,7 @@ describe('Water Framework Directive Nautical mile', () => {
         fieldsetLabel:
           'Is your project located within one nautical mile (1.85km) of the coast?',
         inputLabel: 'Yes',
-        findByHeading: false
+        findByHeading: true
       })
     ).not.toBeChecked()
     expect(
@@ -88,7 +88,7 @@ describe('Water Framework Directive Nautical mile', () => {
         fieldsetLabel:
           'Is your project located within one nautical mile (1.85km) of the coast?',
         inputLabel: 'No',
-        findByHeading: false
+        findByHeading: true
       })
     ).not.toBeChecked()
   })
@@ -111,7 +111,7 @@ describe('Water Framework Directive Nautical mile', () => {
         fieldsetLabel:
           'Is your project located within one nautical mile (1.85km) of the coast?',
         inputLabel: 'Yes',
-        findByHeading: false
+        findByHeading: true
       })
     ).toBeChecked()
   })
@@ -137,7 +137,7 @@ describe('Water Framework Directive Nautical mile', () => {
         'Is your project located within one nautical mile (1.85km) of the coast?',
       errorMessage:
         'Select whether your project is located within one nautical mile (1.85km) of the coast',
-      findByHeading: false
+      findByHeading: true
     })
   })
 })

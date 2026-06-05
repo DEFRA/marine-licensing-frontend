@@ -1,10 +1,7 @@
 {% extends 'layouts/page.njk' %}
 {% from "govuk/components/back-link/macro.njk" import govukBackLink %}
-{% from "govuk/components/radios/macro.njk" import govukRadios %}
-{% from "govuk/components/button/macro.njk" import govukButton %}
-{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
 {% from "govuk/components/details/macro.njk" import govukDetails %}
-{% from "cancel-button/macro.njk" import appCancelButton %}
+{% from "radio-page/macro.njk" import appRadioPage %}
 
 {% block beforeContent %}
 {{ super() }}
@@ -17,70 +14,44 @@
 {% endblock %}
 
 {% block content %}
-  <div class="govuk-grid-row">
-    <div class="govuk-grid-column-two-thirds">
 
-      {% if errorSummary %}
-        {{ govukErrorSummary({
-          titleText: "There is a problem",
-          errorList: errorSummary
-        }) }}
-      {% endif %}
+  {% set nauticalMileHelpHtml %}
+    <p class="govuk-body">This example shows a project site located within one nautical mile of the coast.</p>
+    <img src="/public/assets/images/nautical-mile-illustration.png" alt="Diagram showing a site location in the water less than 1 nautical mile from the coast" width="100%" class="govuk-!-margin-bottom-6" />
+  {% endset %}
 
-      <span class="govuk-caption-l">{{ projectName }}</span>
-      <h1 class="govuk-heading-l">Is your project located within one nautical mile (1.85km) of the coast?</h1>
+  {% set nauticalMileContentHtml %}
+    {{ govukDetails({
+      summaryText: "Help with understanding one nautical mile from the coast",
+      html: nauticalMileHelpHtml
+    }) }}
+  {% endset %}
 
-      {% set nauticalMileHelpHtml %}
-          <p class="govuk-body">This example shows a project site located within one nautical mile of the coast.</p>
-          <img src="/public/assets/images/nautical-mile-illustration.png" alt="Diagram showing a site location in the water less than 1 nautical mile from the coast" width="100%" class="govuk-!-margin-bottom-6" />
-      {% endset %}
+  {{ appRadioPage({
+    name: "nauticalMile",
+    errorSummary: errorSummary,
+    errors: errors,
+    heading: "Is your project located within one nautical mile (1.85km) of the coast?",
+    isPageHeading: true,
+    value: payload.nauticalMile,
+    errorMessage: errors['nauticalMile'],
+    projectName: projectName,
+    contentHtml: nauticalMileContentHtml,
+    items: [
+      {
+        value: "yes",
+        text: "Yes"
+      },
+      {
+        value: "no",
+        text: "No",
+        hint: {
+          text: "You do not need to complete a Water Framework Directive assessment"
+        }
+      }
+    ],
+    csrfToken: csrfToken,
+    cancelLink: cancelLink
+  }) }}
 
-      {{ govukDetails({
-        summaryText: "Help with understanding one nautical mile from the coast",
-        html: nauticalMileHelpHtml
-      }) }}
-
-      <form method="POST">
-        <input type="hidden" name="csrfToken" value="{{ csrfToken }}" />
-
-        {{ govukRadios({
-          idPrefix: "nauticalMile",
-          name: "nauticalMile",
-          value: payload.nauticalMile,
-          fieldset: {
-            legend: {
-              text: "Is your project located within one nautical mile (1.85km) of the coast?",
-              classes: "govuk-visually-hidden"
-            }
-          },
-          errorMessage: errors['nauticalMile'],
-          items: [
-            {
-              value: "yes",
-              text: "Yes"
-            },
-            {
-              value: "no",
-              text: "No",
-              hint: {
-                text: "You do not need to complete a Water Framework Directive assessment"
-              }
-            }
-          ]
-        }) }}
-
-        <div class="govuk-button-group">
-          {{ govukButton({
-            text: "Continue",
-            classes: "govuk-button--primary"
-          }) }}
-
-          {{ appCancelButton({
-            cancelLink: cancelLink
-          }) }}
-        </div>
-      </form>
-
-    </div>
-  </div>
 {% endblock %}

@@ -143,11 +143,7 @@ const processValidatedFile = async (status, uploadConfig, request, h) => {
       )
     }
 
-    await saveSiteDetailsToBackend(
-      request,
-      h,
-      singleSiteMode ? { siteIndex: singleSiteMode.siteIndex } : undefined
-    )
+    await saveSiteDetailsToBackend(request, h)
 
     const reviewRoute = singleSiteMode
       ? `${marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS}${getSiteDetailsAnchor(singleSiteMode.siteIndex + 1)}`

@@ -86,6 +86,8 @@ export const marineLicenceRoutes = {
   MARINE_LICENCE_ENTER_MULTIPLE_COORDINATES:
     '/marine-licence/enter-multiple-coordinates',
   MARINE_LICENCE_DELETE_ALL_SITES: '/marine-licence/delete-all-sites',
+  MARINE_LICENCE_WATER_FRAMEWORK_DIRECTIVE_BEFORE_YOU_START:
+    '/marine-licence/water-framework-directive-before-you-start',
   MARINE_LICENCE_PREFERRED_DATES: '/marine-licence/start-and-end-dates'
 }
 

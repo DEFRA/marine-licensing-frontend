@@ -2,7 +2,8 @@ import {
   transformProjectDetailsTaskList,
   transformSiteDetailsTaskList,
   transformOtherPermissionsTaskList,
-  transformSharingTaskList
+  transformSharingTaskList,
+  transformWaterFrameworkTaskList
 } from '#src/server/marine-licence/task-list/utils.js'
 import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
 
@@ -446,6 +447,64 @@ describe('taskList utils', () => {
             title: {
               classes: 'govuk-link--no-visited-state',
               text: 'Sharing your project information publicly'
+            }
+          }
+        ])
+      }
+    )
+  })
+
+  describe('transformWaterFrameworkTaskList', () => {
+    test('correctly returns Completed status', () => {
+      expect(
+        transformWaterFrameworkTaskList({
+          waterFrameworkDirective: 'COMPLETED'
+        })
+      ).toEqual([
+        {
+          href: marineLicenceRoutes.MARINE_LICENCE_WATER_FRAMEWORK_DIRECTIVE_BEFORE_YOU_START,
+          status: { text: 'Completed' },
+          title: {
+            classes: 'govuk-link--no-visited-state',
+            text: 'Water Framework Directive assessment'
+          }
+        }
+      ])
+    })
+
+    test('correctly returns In progress', () => {
+      expect(
+        transformWaterFrameworkTaskList({
+          waterFrameworkDirective: 'IN_PROGRESS'
+        })
+      ).toEqual([
+        {
+          href: marineLicenceRoutes.MARINE_LICENCE_WATER_FRAMEWORK_DIRECTIVE_BEFORE_YOU_START,
+          status: {
+            tag: { text: 'In progress', classes: 'govuk-tag--teal' }
+          },
+          title: {
+            classes: 'govuk-link--no-visited-state',
+            text: 'Water Framework Directive assessment'
+          }
+        }
+      ])
+    })
+
+    test.each([null, 'INCOMPLETE', undefined])(
+      'correctly returns Not yet started for %s',
+      (value) => {
+        expect(
+          transformWaterFrameworkTaskList({ waterFrameworkDirective: value })
+        ).toEqual([
+          {
+            href: marineLicenceRoutes.MARINE_LICENCE_WATER_FRAMEWORK_DIRECTIVE_BEFORE_YOU_START,
+            status: {
+              tag: { text: 'Not yet started', classes: 'govuk-tag--blue' }
+            },
+            title: {
+              classes: 'govuk-link--no-visited-state',
+              text: 'Water Framework Directive assessment'
             }
           }
         ])

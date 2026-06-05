@@ -242,6 +242,12 @@ describe('Page accessibility checks (Axe)', () => {
         'Is your project limited to one of the following excluded activities?'
     },
     {
+      url: marineLicenceRoutes.MARINE_LICENCE_WATER_FRAMEWORK_DIRECTIVE_PREVIOUS_ASSESSMENT,
+      isMarineLicence: true,
+      title:
+        'Do you have a previous Water Framework Directive assessment completed between 2015 and 2022 for this type of activity?'
+    },
+    {
       url: `${marineLicenceRoutes.MARINE_LICENCE_TYPE_OF_ACTIVITY}?site=1&activity=1`,
       isMarineLicence: true,
       title: 'Type of activity'

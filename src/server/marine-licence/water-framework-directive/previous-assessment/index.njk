@@ -1,0 +1,46 @@
+{% extends 'layouts/page.njk' %}
+{% from "govuk/components/back-link/macro.njk" import govukBackLink %}
+{% from "radio-page/macro.njk" import appRadioPage %}
+
+{% block beforeContent %}
+{{ super() }}
+<nav>
+  {{ govukBackLink({
+    text: "Back",
+    href: backLink
+  }) }}
+</nav>
+{% endblock %}
+
+{% block content %}
+
+  {{ appRadioPage({
+    name: "previousAssessment",
+    errorSummary: errorSummary,
+    errors: errors,
+    heading: "Do you have a previous Water Framework Directive assessment completed between 2015 and 2022 for this type of activity?",
+    isPageHeading: true,
+    value: payload.previousAssessment,
+    errorMessage: errors['previousAssessment'],
+    projectName: projectName,
+    items: [
+      {
+        value: "yes",
+        text: "Yes",
+        hint: {
+          text: "You have a previous Water Framework Directive assessment for the same type of activity you're proposing in this application"
+        }
+      },
+      {
+        value: "no",
+        text: "No",
+        hint: {
+          text: "You will need to upload a new Water Framework Directive assessment"
+        }
+      }
+    ],
+    csrfToken: csrfToken,
+    cancelLink: cancelLink
+  }) }}
+
+{% endblock %}

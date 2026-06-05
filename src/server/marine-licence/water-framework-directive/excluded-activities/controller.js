@@ -77,7 +77,7 @@ export const excludedActivitiesSubmitController = {
     )
 
     return h.redirect(
-      marineLicenceRoutes.MARINE_LICENCE_WATER_FRAMEWORK_DIRECTIVE_EXCLUDED_ACTIVITIES
+      marineLicenceRoutes.MARINE_LICENCE_WATER_FRAMEWORK_DIRECTIVE_PREVIOUS_ASSESSMENT
     )
   }
 }

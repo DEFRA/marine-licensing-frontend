@@ -7,6 +7,7 @@ import * as geoParseUpload from '#src/server/common/helpers/file-upload/geo-pars
 import * as authenticatedRequests from '#src/server/common/helpers/authenticated-requests.js'
 import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
 import { config } from '#src/config/config.js'
+import { saveSiteDetailsToBackend } from '#src/server/common/helpers/marine-licence/save-site-details.js'
 
 vi.mock('~/src/server/common/helpers/marine-licence/session-cache/utils.js')
 vi.mock('~/src/services/cdp-upload-service/index.js')
@@ -415,6 +416,11 @@ describe('#uploadAndWait', () => {
             }
           )
 
+          expect(saveSiteDetailsToBackend).toHaveBeenCalledWith(
+            mockRequest,
+            h,
+            undefined
+          )
           expect(h.redirect).toHaveBeenCalledWith(
             marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS
           )
@@ -460,6 +466,11 @@ describe('#uploadAndWait', () => {
             }
           )
 
+          expect(saveSiteDetailsToBackend).toHaveBeenCalledWith(
+            mockRequest,
+            h,
+            undefined
+          )
           expect(h.redirect).toHaveBeenCalledWith(
             marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS
           )
@@ -735,6 +746,9 @@ describe('#uploadAndWait', () => {
             singleSiteOnly: true
           }
         )
+        expect(saveSiteDetailsToBackend).toHaveBeenCalledWith(mockRequest, h, {
+          siteIndex: 0
+        })
       })
 
       test('should call updateSingleSiteLocation with siteIndex when file is valid', async () => {
@@ -755,6 +769,9 @@ describe('#uploadAndWait', () => {
           expect.objectContaining({ s3Bucket: 'test-bucket' }),
           1
         )
+        expect(saveSiteDetailsToBackend).toHaveBeenCalledWith(mockRequest, h, {
+          siteIndex: 1
+        })
         expect(h.redirect).toHaveBeenCalledWith(
           `${marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS}#site-details-2`
         )
@@ -771,6 +788,9 @@ describe('#uploadAndWait', () => {
 
         await uploadAndWaitController.handler(mockRequest, h)
 
+        expect(saveSiteDetailsToBackend).toHaveBeenCalledWith(mockRequest, h, {
+          siteIndex: 0
+        })
         expect(h.redirect).toHaveBeenCalledWith(
           `${marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS}#site-details-1`
         )
@@ -787,6 +807,11 @@ describe('#uploadAndWait', () => {
 
         await uploadAndWaitController.handler(mockRequest, h)
 
+        expect(saveSiteDetailsToBackend).toHaveBeenCalledWith(
+          mockRequest,
+          h,
+          undefined
+        )
         expect(h.redirect).toHaveBeenCalledWith(
           marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS
         )

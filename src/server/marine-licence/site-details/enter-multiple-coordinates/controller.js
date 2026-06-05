@@ -149,7 +149,7 @@ export const multipleCoordinatesSubmitController = {
       )
     }
 
-    await saveSiteDetailsToBackend(request, h)
+    await saveSiteDetailsToBackend(request, h, { siteIndex })
 
     return h.redirect(
       `${marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS}${getSiteDetailsAnchor(siteNumber)}`

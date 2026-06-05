@@ -1,15 +1,10 @@
 import { authenticatedGetRequest } from '#src/server/common/helpers/authenticated-requests.js'
 import { validateTeamAdminSession } from '#src/server/common/helpers/user-session-validators.js'
+import { mapExemptionStats, mapSummaryReport } from './utils.js'
 
 export const DASHBOARD_VIEW_ROUTE =
   'internal-user-admin/exemptions/reports/index.njk'
 const DASHBOARD_PAGE_TITLE = 'Exemptions summary report'
-
-const mapSummaryReport = (value) => ({
-  submittedExemptions: value?.submittedExemptions ?? 0,
-  unsubmittedExemptions: value?.unsubmittedExemptions ?? 0,
-  withdrawnExemptions: value?.withdrawnExemptions ?? 0
-})
 
 export const adminReportsController = {
   options: {
@@ -25,6 +20,7 @@ export const adminReportsController = {
         pageTitle: DASHBOARD_PAGE_TITLE,
         heading: DASHBOARD_PAGE_TITLE,
         summary: mapSummaryReport(payload?.value),
+        stats: mapExemptionStats(payload?.value),
         hasApiError: false
       })
     } catch (error) {
@@ -37,6 +33,7 @@ export const adminReportsController = {
         pageTitle: DASHBOARD_PAGE_TITLE,
         heading: DASHBOARD_PAGE_TITLE,
         summary: mapSummaryReport(),
+        stats: mapExemptionStats(),
         hasApiError: true
       })
     }

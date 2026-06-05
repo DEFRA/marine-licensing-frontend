@@ -248,7 +248,7 @@ describe('outcomeContinueController', () => {
     )
     await expect(
       outcomeContinueController.handler(request, h)
-    ).rejects.toThrow()
+    ).rejects.toMatchObject({ output: { statusCode: 404 } })
     expect(iatOutcomeDocumentService.mint).not.toHaveBeenCalled()
   })
 
@@ -256,7 +256,7 @@ describe('outcomeContinueController', () => {
     const request = continueRequest(EXEMPTION_ROUTE, 'WO_NOT_A_REAL_TYPE')
     await expect(
       outcomeContinueController.handler(request, h)
-    ).rejects.toThrow()
+    ).rejects.toMatchObject({ output: { statusCode: 400 } })
     expect(iatOutcomeDocumentService.mint).not.toHaveBeenCalled()
   })
 })

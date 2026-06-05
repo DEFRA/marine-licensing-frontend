@@ -2,7 +2,8 @@ import { describe, it, expect, beforeEach, vi } from 'vitest'
 import {
   outcomeController,
   outcomePostController,
-  outcomeViewAnswersController
+  outcomeViewAnswersController,
+  outcomeContinueController
 } from './controller.js'
 import { iatContextService } from '#src/services/iat-service/iat-context.service.js'
 import { iatOutcomeDocumentService } from '#src/services/iat-service/iat-outcome-document.service.js'
@@ -184,5 +185,78 @@ describe('outcomeViewAnswersController', () => {
       outcomeViewAnswersController.handler(request, h)
     ).rejects.toThrow(/mint returned no slug/)
     expect(redirect).not.toHaveBeenCalled()
+  })
+})
+
+describe('outcomeContinueController', () => {
+  const EXEMPTION_ROUTE =
+    '/exemption/licence-not-required-exemption-available-article-13'
+  const EXEMPTION_TYPE_ID = 'WO_EXE_AVAILABLE_ARTICLE_13'
+  const OVERRIDE_URL =
+    'https://get-permission-for-marine-work.defra.gov.uk/guidance/who-is-the-exemption-for/'
+
+  let redirect, h
+
+  beforeEach(() => {
+    iatOutcomeDocumentService.mint.mockReset()
+    redirect = vi.fn()
+    h = { redirect }
+  })
+
+  function continueRequest(outcomeRoute, outcomeTypeId, questionLog = []) {
+    return {
+      params: {
+        slug: SLUG,
+        outcomeTypeId,
+        outcomePath: outcomeRoute.replace(/^\//, '')
+      },
+      app: { iatDoc: { slug: SLUG, questionLog } },
+      logger: { warn: vi.fn() }
+    }
+  }
+
+  it('mints, builds the query string, and 302s to overrideCtaButtonUrl', async () => {
+    iatOutcomeDocumentService.mint.mockResolvedValue({
+      slug: 'B'.repeat(22),
+      answersUrl: `https://fe.example/outcome-documents/${'B'.repeat(22)}`
+    })
+    const request = continueRequest(EXEMPTION_ROUTE, EXEMPTION_TYPE_ID, [
+      {
+        questionRoute: '/activity-type',
+        answers: [{ id: 'CON', text: 'Construction' }],
+        mcmsAppFormMapping: 'ACTIVITY_TYPE'
+      }
+    ])
+
+    await outcomeContinueController.handler(request, h)
+
+    expect(iatOutcomeDocumentService.mint).toHaveBeenCalledTimes(1)
+    const location = redirect.mock.calls[0][0]
+    expect(location).toContain(`${OVERRIDE_URL}?`)
+    expect(location).toContain('ACTIVITY_TYPE=CON')
+    expect(location).toContain('ADV_TYPE=EXE')
+    expect(location).toContain('ARTICLE=13')
+    expect(location).toContain(
+      `pdfDownloadUrl=https%3A%2F%2Ffe.example%2Foutcome-documents%2F${'B'.repeat(22)}`
+    )
+  })
+
+  it('404s for a non-exemption outcomeType (no overrideCtaButtonUrl) without minting', async () => {
+    const request = continueRequest(
+      '/exemption/licence-required-no-exemption',
+      'WO_EXE_LICENCE_REQUIRED'
+    )
+    await expect(
+      outcomeContinueController.handler(request, h)
+    ).rejects.toThrow()
+    expect(iatOutcomeDocumentService.mint).not.toHaveBeenCalled()
+  })
+
+  it('400s for an outcomeTypeId that does not belong to the outcome', async () => {
+    const request = continueRequest(EXEMPTION_ROUTE, 'WO_NOT_A_REAL_TYPE')
+    await expect(
+      outcomeContinueController.handler(request, h)
+    ).rejects.toThrow()
+    expect(iatOutcomeDocumentService.mint).not.toHaveBeenCalled()
   })
 })

@@ -15,6 +15,10 @@ import {
   classifyOutcome,
   outcomeRouteFromRequest
 } from '#src/server/journey/self-service/outcome/utils.js'
+import {
+  buildHandoffQueryString,
+  HANDOFF_ALLOWLISTS
+} from '#src/server/journey/self-service/services/application-handoff.js'
 import { iatContextService } from '#src/services/iat-service/iat-context.service.js'
 import { iatOutcomeDocumentService } from '#src/services/iat-service/iat-outcome-document.service.js'
 import { routes } from '#src/server/common/constants/routes.js'
@@ -249,5 +253,65 @@ export const outcomeViewAnswersController = {
       throw Boom.badImplementation('outcome-document mint returned no slug')
     }
     return h.redirect(routes.OUTCOME_DOCUMENT.replace('{slug}', minted.slug))
+  }
+}
+
+function assertExemptionHandoff(
+  request,
+  outcomeRoute,
+  outcomeTypeId,
+  focusedOption
+) {
+  if (focusedOption.overrideCtaButtonUrl) {
+    return
+  }
+  reportRuntimeIssue(
+    request,
+    'continue-on-non-exemption-outcome',
+    outcomeTypeId,
+    `If outcomeType '${outcomeTypeId}' should hand off to the exemption journey, set overrideCtaButtonUrl on it in self-service.json`,
+    `GET continue ${outcomeRoute} rejected outcomeType '${outcomeTypeId}' (no overrideCtaButtonUrl)`
+  )
+  throw Boom.notFound('Outcome is not an exemption handoff')
+}
+
+export const outcomeContinueController = {
+  async handler(request, h) {
+    const { outcomeRoute, outcome } = loadOutcome(request)
+    const slug = slugFromRequest(request)
+    const outcomeTypeId = request.params.outcomeTypeId
+    const outcomeType = outcomeTypeId ? getOutcomeType(outcomeTypeId) : null
+
+    validateOutcomeTypeId(
+      outcomeTypeId,
+      outcomeType,
+      outcome,
+      outcomeRoute,
+      request
+    )
+
+    const payload = buildSnapshotPayload(outcome, outcomeRoute, outcomeTypeId)
+    assertExemptionHandoff(
+      request,
+      outcomeRoute,
+      outcomeTypeId,
+      payload.focusedOption
+    )
+
+    const minted = await iatOutcomeDocumentService.mint(request, slug, payload)
+    if (!minted?.slug) {
+      throw Boom.badImplementation('outcome-document mint returned no slug')
+    }
+
+    const queryString = buildHandoffQueryString({
+      questionLog: request.app.iatDoc?.questionLog ?? [],
+      focusedOption: payload.focusedOption,
+      answersUrl: minted.answersUrl,
+      allowList: HANDOFF_ALLOWLISTS.exemption
+    })
+
+    return h.redirect(
+      `${payload.focusedOption.overrideCtaButtonUrl}?${queryString}`
+    )
   }
 }

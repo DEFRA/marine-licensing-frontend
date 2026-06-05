@@ -243,9 +243,7 @@ describe('#multipleCoordinates (marine licence)', () => {
 
       await multipleCoordinatesSubmitController.handler(request, mockH)
 
-      expect(saveSiteDetailsToBackend).toHaveBeenCalledWith(request, mockH, {
-        siteIndex: 0
-      })
+      expect(saveSiteDetailsToBackend).toHaveBeenCalledWith(request, mockH)
     })
 
     test('should handle validation errors by re-rendering with errors', () => {

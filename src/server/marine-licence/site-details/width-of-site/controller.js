@@ -89,7 +89,7 @@ export const widthOfSiteSubmitController = {
       payload.width.trim()
     )
 
-    await saveSiteDetailsToBackend(request, h, { siteIndex })
+    await saveSiteDetailsToBackend(request, h)
 
     return h.redirect(
       `${marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS}${getSiteDetailsAnchor(siteNumber)}`

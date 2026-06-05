@@ -772,3 +772,34 @@ describe('GET /view-answers/:outcomeTypeId/:outcomePath', () => {
     expect(iatOutcomeDocumentService.mint).not.toHaveBeenCalled()
   })
 })
+
+describe('#outcomeContinueController (integration)', () => {
+  config.set('selfService.enabled', true)
+  const getServer = setupTestServer()
+
+  let journey
+
+  beforeEach(() => {
+    journey = mockIatContext(iatContextService)
+    iatOutcomeDocumentService.mint.mockResolvedValue({
+      slug: NEW_SLUG,
+      answersUrl: `https://fe.example/outcome-documents/${NEW_SLUG}`
+    })
+  })
+
+  it('302s an exemption Continue to overrideCtaButtonUrl with the query string', async () => {
+    const route =
+      'exemption/licence-not-required-exemption-available-article-13'
+    const url = `/journey/self-service/c/${journey.slug}/continue/WO_EXE_AVAILABLE_ARTICLE_13/${route}`
+
+    const response = await makeGetRequest({ url, server: getServer() })
+
+    expect(response.statusCode).toBe(statusCodes.redirect)
+    expect(response.headers.location).toContain(
+      'https://get-permission-for-marine-work.defra.gov.uk/guidance/who-is-the-exemption-for/?'
+    )
+    expect(response.headers.location).toContain('ADV_TYPE=EXE')
+    expect(response.headers.location).toContain('ARTICLE=13')
+    expect(response.headers.location).toContain('pdfDownloadUrl=')
+  })
+})

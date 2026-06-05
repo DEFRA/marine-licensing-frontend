@@ -226,6 +226,13 @@ describe('#coordinatesEntry (marine licence)', () => {
         'coordinatesEntry',
         'single'
       )
+      expect(updateMarineLicenceSiteDetails).toHaveBeenCalledWith(
+        request,
+        h,
+        0,
+        'coordinatesType',
+        'coordinates'
+      )
     })
 
     test('should redirect to review page when action is set and answer is unchanged', async () => {

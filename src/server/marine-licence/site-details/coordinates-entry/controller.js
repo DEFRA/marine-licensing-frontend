@@ -97,6 +97,14 @@ export const coordinatesEntrySubmitController = {
       payload.coordinatesEntry
     )
 
+    await updateMarineLicenceSiteDetails(
+      request,
+      h,
+      siteIndex,
+      'coordinatesType',
+      'coordinates'
+    )
+
     if (action) {
       const savedSiteDetails = getSavedSiteDetails(request)
       await setSavedSiteDetails(request, h, {

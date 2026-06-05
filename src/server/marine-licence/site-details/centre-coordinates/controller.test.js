@@ -369,7 +369,9 @@ describe('#centreCoordinates (marine licence)', () => {
 
       await centreCoordinatesSubmitController.handler(request, h)
 
-      expect(saveSiteDetailsToBackend).toHaveBeenCalledWith(request, h)
+      expect(saveSiteDetailsToBackend).toHaveBeenCalledWith(request, h, {
+        siteIndex: 0
+      })
       expect(h.redirect).toHaveBeenCalledWith(
         `${marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS}#site-details-1`
       )

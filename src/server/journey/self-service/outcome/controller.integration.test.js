@@ -394,13 +394,17 @@ describe('GET terminal-single', () => {
     )
   })
 
-  test('renders one Continue button (page-level, href="#")', async () => {
+  test('renders one Continue button linking to the exemption handoff continue route', async () => {
     const { document } = await getPage(journey.journeyUrl(SINGLE_PATH))
     const continueButtons = Array.from(
       document.querySelectorAll('a.govuk-button:not(.govuk-button--secondary)')
     ).filter((a) => a.textContent.trim() === 'Continue')
     expect(continueButtons).toHaveLength(1)
-    expect(continueButtons[0].getAttribute('href')).toBe('#')
+    expect(continueButtons[0].getAttribute('href')).toBe(
+      journey.journeyUrl(
+        '/continue/WO_EXE_AVAILABLE_ARTICLE_25A/exemption/licence-not-required-exemption-available-article-25A'
+      )
+    )
   })
 
   test('renders a single "View answers" link with the per-option trigger URL', async () => {

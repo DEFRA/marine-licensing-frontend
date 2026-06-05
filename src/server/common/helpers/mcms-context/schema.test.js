@@ -108,6 +108,16 @@ describe('mcms-context schema', () => {
         expect(error.details[0].path).toEqual(['pdfDownloadUrl'])
       })
 
+      it('rejects a legacy-shaped path on a new self-hosted host (new hosts only serve /outcome-documents/{slug})', () => {
+        const pdfDownloadUrl =
+          'http://localhost:3000/x/journey/self-service/outcome-document/abc123'
+        const { error } = paramsSchema.validate({
+          ...validBaseParams,
+          pdfDownloadUrl
+        })
+        expect(error).toBeDefined()
+      })
+
       const NEW_SLUG_22 = 'B'.repeat(22)
 
       it.each([

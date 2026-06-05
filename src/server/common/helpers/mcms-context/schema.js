@@ -29,10 +29,6 @@ function isNewAllowedHost(host) {
   return allowedOutcomeDocumentHosts.includes(host) || host === appHost()
 }
 
-function isAllowedPath(pathname) {
-  return NEW_DOC_PATH.test(pathname) || LEGACY_DOC_PATH.test(pathname)
-}
-
 function validatePdfDownloadUrl(value, helpers) {
   let url
   try {
@@ -53,7 +49,7 @@ function validatePdfDownloadUrl(value, helpers) {
     if (url.protocol !== 'https:' && url.protocol !== 'http:') {
       return helpers.error('any.invalid')
     }
-    if (!isAllowedPath(url.pathname)) {
+    if (!NEW_DOC_PATH.test(url.pathname)) {
       return helpers.error('any.invalid')
     }
     return value

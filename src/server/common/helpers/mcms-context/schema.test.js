@@ -107,6 +107,55 @@ describe('mcms-context schema', () => {
         expect(error).toBeDefined()
         expect(error.details[0].path).toEqual(['pdfDownloadUrl'])
       })
+
+      const NEW_SLUG_22 = 'B'.repeat(22)
+
+      it.each([
+        `https://get-permission-for-marine-work.defra.gov.uk/outcome-documents/${NEW_SLUG_22}`,
+        `https://marine-licensing-frontend.dev.cdp-int.defra.cloud/outcome-documents/${NEW_SLUG_22}`,
+        `https://marine-licensing-frontend.test.cdp-int.defra.cloud/outcome-documents/${NEW_SLUG_22}`,
+        `https://marine-licensing-frontend.perf-test.cdp-int.defra.cloud/outcome-documents/${NEW_SLUG_22}`,
+        `http://marine-licensing-frontend.local:3000/outcome-documents/${NEW_SLUG_22}`,
+        `http://localhost:3000/outcome-documents/${NEW_SLUG_22}`
+      ])(
+        'accepts new self-hosted outcome-document URL %s',
+        (pdfDownloadUrl) => {
+          const { error } = paramsSchema.validate({
+            ...validBaseParams,
+            pdfDownloadUrl
+          })
+          expect(error).toBeUndefined()
+        }
+      )
+
+      it('accepts a base64url slug containing an underscore (regression for the old [a-zA-Z0-9-] charset)', () => {
+        const pdfDownloadUrl =
+          'https://get-permission-for-marine-work.defra.gov.uk/outcome-documents/ab_cd-EF1234567890123456'
+        const { error } = paramsSchema.validate({
+          ...validBaseParams,
+          pdfDownloadUrl
+        })
+        expect(error).toBeUndefined()
+      })
+
+      it('rejects an unknown host', () => {
+        const pdfDownloadUrl = `https://evil.example.com/outcome-documents/${NEW_SLUG_22}`
+        const { error } = paramsSchema.validate({
+          ...validBaseParams,
+          pdfDownloadUrl
+        })
+        expect(error).toBeDefined()
+      })
+
+      it('rejects an allowed host with a non-outcome-document path', () => {
+        const pdfDownloadUrl =
+          'https://get-permission-for-marine-work.defra.gov.uk/not-a-document/123'
+        const { error } = paramsSchema.validate({
+          ...validBaseParams,
+          pdfDownloadUrl
+        })
+        expect(error).toBeDefined()
+      })
     })
 
     describe('transformation', () => {

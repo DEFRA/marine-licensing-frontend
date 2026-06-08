@@ -37,7 +37,7 @@ describe('#waterFrameworkDirectiveBeforeYouStart', () => {
           backLink: marineLicenceRoutes.MARINE_LICENCE_TASK_LIST,
           cancelLink: marineLicenceRoutes.MARINE_LICENCE_TASK_LIST,
           continueLink:
-            marineLicenceRoutes.MARINE_LICENCE_WATER_FRAMEWORK_DIRECTIVE_BEFORE_YOU_START,
+            marineLicenceRoutes.MARINE_LICENCE_WATER_FRAMEWORK_DIRECTIVE_NAUTICAL_MILE,
           pageTitle: 'Water Framework Directive',
           heading: 'Water Framework Directive',
           projectName: 'Test Project'

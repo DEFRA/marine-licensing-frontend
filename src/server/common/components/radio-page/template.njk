@@ -51,7 +51,7 @@
                         classes: "govuk-fieldset__legend govuk-fieldset__legend--l govuk-!-margin-bottom-6"
                     }
                 } if params.isPageHeading,
-                hint: params.hint,
+                hint: { html: params.contentHtml } if params.contentHtml else params.hint,
                 errorMessage: params.errorMessage,
                 items: params.items
             }) }}

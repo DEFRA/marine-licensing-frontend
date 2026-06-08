@@ -53,16 +53,31 @@ describe('Marine Licence View Details', () => {
     )
   })
 
-  describe('site details card', () => {
+  describe('site details', () => {
     let document
 
     beforeEach(async () => {
       document = await loadViewDetailsPage(getServer())
     })
 
-    // Card is currently only viewable for Internal Users
-    // Reseve this test once this updates to all users
-    test('renders the site details card', () => {
+    test('renders the site location card', () => {
+      expect(document.querySelector('#site-location-card')).not.toBeNull()
+    })
+
+    test('renders a site card for each site', () => {
+      const siteCount = mockSubmittedMarineLicenceApplication.siteDetails.length
+      for (let i = 1; i <= siteCount; i++) {
+        expect(document.querySelector(`#site-details-${i}`)).not.toBeNull()
+      }
+    })
+
+    test('renders the site name', () => {
+      expect(document.body.textContent).toContain(
+        mockSubmittedMarineLicenceApplication.siteDetails[0].siteName
+      )
+    })
+
+    test('does not render the internal-user-only site-details-card', () => {
       expect(document.querySelector('#site-details-card')).toBeNull()
     })
   })

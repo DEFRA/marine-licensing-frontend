@@ -111,13 +111,6 @@ describe('marine-licence view details controller', () => {
     })
 
     describe('controller unit tests', () => {
-      beforeEach(() => {
-        vi.mocked(buildSiteData).mockReturnValue({
-          coordinatesType: null,
-          summaryData: []
-        })
-      })
-
       test('should call view with correct data structure', async () => {
         const marineLicence = createSubmittedMarineLicence()
         const mockServiceInstance = {

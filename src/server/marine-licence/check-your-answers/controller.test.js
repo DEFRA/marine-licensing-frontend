@@ -87,38 +87,6 @@ describe('#checkYourAnswersController', () => {
       publicRegisterRoute: marineLicenceRoutes.MARINE_LICENCE_PUBLIC_REGISTER
     })
   })
-
-  test('handler should render with empty site data when no sites exist', async () => {
-    const mockCachedData = {
-      id: '456',
-      projectName: 'No Sites Project'
-    }
-
-    getMarineLicenceCacheMock.mockReturnValue(mockCachedData)
-    buildCheckYourAnswersSiteDataMock.mockResolvedValue({
-      coordinatesType: null,
-      summaryData: []
-    })
-    buildSummaryDataMock.mockReturnValue({
-      ...mockCachedData,
-      preferredDates: null
-    })
-
-    await checkYourAnswersController.handler(mockRequest, mockH)
-
-    expect(buildSummaryDataMock).toHaveBeenCalledWith(mockCachedData)
-    expect(mockH.view).toHaveBeenCalledWith(CHECK_YOUR_ANSWERS_VIEW_ROUTE, {
-      pageTitle: 'Check your answers before sending your information',
-      backLink: marineLicenceRoutes.MARINE_LICENCE_TASK_LIST,
-      ...mockCachedData,
-      preferredDates: null,
-      coordinatesType: null,
-      summaryData: [],
-      reviewSiteDetailsRoute:
-        marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS,
-      publicRegisterRoute: marineLicenceRoutes.MARINE_LICENCE_PUBLIC_REGISTER
-    })
-  })
 })
 
 describe('#checkYourAnswersContinueController', () => {

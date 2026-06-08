@@ -157,3 +157,34 @@ export const mockManualCoordinatesMarineLicence = {
     }
   ]
 }
+
+export const mockCircularMarineLicence = {
+  ...mockMarineLicenceApplication,
+  siteDetails: [
+    {
+      coordinatesType: 'coordinates',
+      coordinatesEntry: 'single',
+      coordinateSystem: 'wgs84',
+      coordinates: { latitude: '55.123456', longitude: '55.123456' },
+      circleWidth: '100',
+      siteName: 'Circular Test Site'
+    }
+  ]
+}
+
+export const mockPolygonMarineLicence = {
+  ...mockMarineLicenceApplication,
+  siteDetails: [
+    {
+      coordinatesType: 'coordinates',
+      coordinatesEntry: 'multiple',
+      coordinateSystem: 'wgs84',
+      coordinates: [
+        { latitude: '55.123456', longitude: '55.123456' },
+        { latitude: '33.987654', longitude: '33.987654' },
+        { latitude: '78.123456', longitude: '78.123456' }
+      ],
+      siteName: 'Polygon Test Site'
+    }
+  ]
+}

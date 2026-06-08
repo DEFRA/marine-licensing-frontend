@@ -7,7 +7,9 @@ import {
 import { loadPage } from '~/tests/integration/shared/app-server.js'
 import {
   mockFileUploadMarineLicence,
-  mockManualCoordinatesMarineLicence
+  mockManualCoordinatesMarineLicence,
+  mockCircularMarineLicence,
+  mockPolygonMarineLicence
 } from '~/src/server/test-helpers/mocks/marine-licence-mocks.js'
 import * as marineLicenceService from '~/src/services/marine-licence-service/index.js'
 
@@ -111,6 +113,48 @@ describe('Marine Licence Check Your Answers - site and activity cards', () => {
       expect(
         getByRole(document, 'heading', { level: 2, name: 'Site 1' })
       ).toBeInTheDocument()
+    })
+  })
+
+  describe('circular-coordinates licence', () => {
+    let document
+
+    beforeEach(async () => {
+      document = await loadCyaPage(mockCircularMarineLicence)
+    })
+
+    test('renders a Site 1 card with circular coordinate rows', () => {
+      expect(
+        getByRole(document, 'heading', { level: 2, name: 'Site 1' })
+      ).toBeInTheDocument()
+
+      const siteCard = document.querySelector('#site-details-1')
+      expect(siteCard).toBeTruthy()
+      expect(siteCard.textContent).toContain(
+        'Single or multiple sets of coordinates'
+      )
+      expect(siteCard.textContent).toContain('100 metres')
+    })
+  })
+
+  describe('polygon-coordinates licence', () => {
+    let document
+
+    beforeEach(async () => {
+      document = await loadCyaPage(mockPolygonMarineLicence)
+    })
+
+    test('renders a Site 1 card with polygon coordinate rows', () => {
+      expect(
+        getByRole(document, 'heading', { level: 2, name: 'Site 1' })
+      ).toBeInTheDocument()
+
+      const siteCard = document.querySelector('#site-details-1')
+      expect(siteCard).toBeTruthy()
+      expect(siteCard.textContent).toContain(
+        'Single or multiple sets of coordinates'
+      )
+      expect(siteCard.textContent).toContain('55.123456, 55.123456')
     })
   })
 

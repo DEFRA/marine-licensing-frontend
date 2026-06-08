@@ -56,6 +56,14 @@ describe('Task List', () => {
     ).toBeInTheDocument()
   })
 
+  test('should render water framework directive link in Water Framework Directive  task list', () => {
+    expect(
+      getByRole(document, 'link', {
+        name: 'Water Framework Directive assessment'
+      })
+    ).toBeInTheDocument()
+  })
+
   test('should render review button when all tasks are completed', async () => {
     mockMarineLicence({
       ...mockMarineLicenceApplication,

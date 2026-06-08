@@ -9,7 +9,8 @@ export const mockMarineLicenceTaskList = {
   preferredDates: 'COMPLETED',
   projectBackground: 'COMPLETED',
   publicRegister: 'COMPLETED',
-  publicConsultation: 'COMPLETED'
+  publicConsultation: 'COMPLETED',
+  waterFrameworkDirective: 'COMPLETED'
 }
 
 export const mockEmptyActivityDetails = {
@@ -46,6 +47,10 @@ export const mockOutputEmptyActivityDetails = {
   ...mockEmptyActivityDetails,
   completionDate: null,
   activityMonths: null
+}
+
+export const waterFrameworkDirective = {
+  nauticalMile: 'yes'
 }
 
 export const mockMarineLicenceApplication = {
@@ -99,7 +104,8 @@ export const mockMarineLicenceApplication = {
         ]
       }
     }
-  ]
+  ],
+  waterFrameworkDirective
 }
 
 export const mockSubmittedMarineLicenceApplication = {

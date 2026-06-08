@@ -1,0 +1,57 @@
+{% extends 'layouts/page.njk' %}
+{% from "govuk/components/back-link/macro.njk" import govukBackLink %}
+{% from "govuk/components/details/macro.njk" import govukDetails %}
+{% from "radio-page/macro.njk" import appRadioPage %}
+
+{% block beforeContent %}
+{{ super() }}
+<nav>
+  {{ govukBackLink({
+    text: "Back",
+    href: backLink
+  }) }}
+</nav>
+{% endblock %}
+
+{% block content %}
+
+  {% set nauticalMileHelpHtml %}
+    <p class="govuk-body">This example shows a project site located within one nautical mile of the coast.</p>
+    <img src="/public/assets/images/nautical-mile-illustration.png" alt="Diagram showing a site location in the water less than 1 nautical mile from the coast" width="100%" class="govuk-!-margin-bottom-6" />
+  {% endset %}
+
+  {% set nauticalMileContentHtml %}
+    {{ govukDetails({
+      summaryText: "Help with understanding one nautical mile from the coast",
+      html: nauticalMileHelpHtml
+    }) }}
+  {% endset %}
+
+  {{ appRadioPage({
+    name: "nauticalMile",
+    errorSummary: errorSummary,
+    errors: errors,
+    heading: "Is your project located within one nautical mile (1.85km) of the coast?",
+    isPageHeading: true,
+    value: payload.nauticalMile,
+    errorMessage: errors['nauticalMile'],
+    projectName: projectName,
+    contentHtml: nauticalMileContentHtml,
+    items: [
+      {
+        value: "yes",
+        text: "Yes"
+      },
+      {
+        value: "no",
+        text: "No",
+        hint: {
+          text: "You do not need to complete a Water Framework Directive assessment"
+        }
+      }
+    ],
+    csrfToken: csrfToken,
+    cancelLink: cancelLink
+  }) }}
+
+{% endblock %}

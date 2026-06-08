@@ -10,7 +10,8 @@ import {
   transformProjectDetailsTaskList,
   transformSiteDetailsTaskList,
   transformOtherPermissionsTaskList,
-  transformSharingTaskList
+  transformSharingTaskList,
+  transformWaterFrameworkDirectiveTaskList
 } from '#src/server/marine-licence/task-list/utils.js'
 import {
   taskListController,
@@ -49,7 +50,8 @@ describe('#taskListController', () => {
     specialLegalPowers: {
       agree: 'yes',
       details: 'some special legal powers'
-    }
+    },
+    waterFrameworkDirective: { nauticalMile: 'no' }
   }
 
   beforeEach(() => {
@@ -82,7 +84,8 @@ describe('#taskListController', () => {
         specialLegalPowers: {
           agree: 'yes',
           details: 'some special legal powers'
-        }
+        },
+        waterFrameworkDirective: { nauticalMile: 'no' }
       }
     }
 
@@ -121,6 +124,17 @@ describe('#taskListController', () => {
       }
     ]
 
+    const mockwaterFrameworkDirectiveTaskList = [
+      {
+        href: '/',
+        status: { text: 'Completed' },
+        title: {
+          classes: 'govuk-link--no-visited-state',
+          text: 'Special Legal Powers'
+        }
+      }
+    ]
+
     const mockSharingTaskList = [
       {
         href: '/',
@@ -153,6 +167,9 @@ describe('#taskListController', () => {
     vi.mocked(transformOtherPermissionsTaskList).mockReturnValue(
       mockOtherPermissionsTaskList
     )
+    vi.mocked(transformWaterFrameworkDirectiveTaskList).mockReturnValue(
+      mockwaterFrameworkDirectiveTaskList
+    )
     vi.mocked(transformSharingTaskList).mockReturnValue(mockSharingTaskList)
     vi.mocked(setMarineLicenceCache).mockResolvedValue(mockMarineLicence)
 
@@ -173,6 +190,10 @@ describe('#taskListController', () => {
     expect(vi.mocked(transformSiteDetailsTaskList)).toHaveBeenCalledWith(
       mockPayload.value.taskList
     )
+    expect(
+      vi.mocked(transformWaterFrameworkDirectiveTaskList)
+    ).toHaveBeenCalledWith(mockPayload.value.taskList)
+
     expect(vi.mocked(setMarineLicenceCache)).toHaveBeenCalledWith(
       mockRequest,
       mockH,
@@ -191,7 +212,8 @@ describe('#taskListController', () => {
       otherPermissionsTaskList: mockOtherPermissionsTaskList,
       projectDetailsTaskList: mockProjectDetailsTaskList,
       siteDetailsTaskList: mockSiteDetailsTaskList,
-      sharingTaskList: mockSharingTaskList
+      sharingTaskList: mockSharingTaskList,
+      waterFrameworkDirectiveTaskList: mockwaterFrameworkDirectiveTaskList
     })
   })
 

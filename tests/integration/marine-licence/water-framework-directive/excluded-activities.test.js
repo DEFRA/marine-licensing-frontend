@@ -56,6 +56,13 @@ describe('Water Framework Directive Excluded Activities', () => {
     ).toBeInTheDocument()
 
     expect(
+      getByText(
+        document,
+        `'over water' replacement or repairs to, for example bridge, pier and jetty surfaces - if you minimise bank or bed disturbance`
+      )
+    ).toBeInTheDocument()
+
+    expect(
       getByRole(document, 'button', { name: 'Continue' })
     ).toBeInTheDocument()
 

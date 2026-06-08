@@ -48,9 +48,7 @@ describe('siteDetails utils', () => {
 
     test('getSiteDetailsBackLink includes ?site= param when referer has one for WIDTH_OF_SITE', () => {
       expect(
-        getSiteDetailsBackLink(
-          `http://hostname${routes.WIDTH_OF_SITE}?site=2`
-        )
+        getSiteDetailsBackLink(`http://hostname${routes.WIDTH_OF_SITE}?site=2`)
       ).toBe(`${routes.WIDTH_OF_SITE}?site=2`)
     })
 

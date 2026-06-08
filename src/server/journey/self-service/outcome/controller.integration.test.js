@@ -800,7 +800,10 @@ describe('#outcomeContinueController (integration)', () => {
 
     expect(response.statusCode).toBe(statusCodes.redirect)
     expect(response.headers.location).toContain(
-      'https://get-permission-for-marine-work.defra.gov.uk/guidance/who-is-the-exemption-for/?'
+      '/guidance/who-is-the-exemption-for/?'
+    )
+    expect(response.headers.location).not.toContain(
+      'get-permission-for-marine-work.defra.gov.uk'
     )
     expect(response.headers.location).toContain('ADV_TYPE=EXE')
     expect(response.headers.location).toContain('ARTICLE=13')

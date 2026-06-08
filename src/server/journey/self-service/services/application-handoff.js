@@ -32,6 +32,16 @@ export function projectOutcomeParams(focusedOption, allowList) {
   return result
 }
 
+export function buildHandoffRedirectUrl(overrideCtaButtonUrl, queryString) {
+  const url = new URL(overrideCtaButtonUrl)
+  const path = `${url.pathname}${url.search}`
+  if (!queryString) {
+    return path
+  }
+  const separator = url.search ? '&' : '?'
+  return `${path}${separator}${queryString}`
+}
+
 export function buildHandoffQueryString({
   questionLog,
   focusedOption,

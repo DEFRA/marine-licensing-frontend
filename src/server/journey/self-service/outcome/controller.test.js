@@ -232,7 +232,8 @@ describe('outcomeContinueController', () => {
 
     expect(iatOutcomeDocumentService.mint).toHaveBeenCalledTimes(1)
     const location = redirect.mock.calls[0][0]
-    expect(location).toContain(`${OVERRIDE_URL}?`)
+    expect(location).toContain('/guidance/who-is-the-exemption-for/?')
+    expect(location).not.toContain(new URL(OVERRIDE_URL).host)
     expect(location).toContain('ACTIVITY_TYPE=CON')
     expect(location).toContain('ADV_TYPE=EXE')
     expect(location).toContain('ARTICLE=13')

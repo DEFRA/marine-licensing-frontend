@@ -3,7 +3,8 @@ import {
   HANDOFF_ALLOWLISTS,
   projectMappedAnswers,
   projectOutcomeParams,
-  buildHandoffQueryString
+  buildHandoffQueryString,
+  buildHandoffRedirectUrl
 } from './application-handoff.js'
 
 const exemption = HANDOFF_ALLOWLISTS.exemption
@@ -96,5 +97,34 @@ describe('buildHandoffQueryString', () => {
       allowList: exemption
     })
     expect(qs).toBe('ADV_TYPE=EXE')
+  })
+})
+
+describe('buildHandoffRedirectUrl', () => {
+  it('returns the override path + query as a relative URL (no host/origin)', () => {
+    const result = buildHandoffRedirectUrl(
+      'https://get-permission-for-marine-work.defra.gov.uk/guidance/who-is-the-exemption-for/',
+      'ACTIVITY_TYPE=CON&ADV_TYPE=EXE'
+    )
+    expect(result).toBe(
+      '/guidance/who-is-the-exemption-for/?ACTIVITY_TYPE=CON&ADV_TYPE=EXE'
+    )
+    expect(result.startsWith('/')).toBe(true)
+    expect(result).not.toContain('get-permission-for-marine-work.defra.gov.uk')
+  })
+
+  it('returns just the path when there is no query string', () => {
+    expect(
+      buildHandoffRedirectUrl('https://example.test/guidance/x/', '')
+    ).toBe('/guidance/x/')
+  })
+
+  it('merges with an existing query already on the override URL', () => {
+    expect(
+      buildHandoffRedirectUrl(
+        'https://example.test/guidance/x?foo=bar',
+        'ADV_TYPE=EXE'
+      )
+    ).toBe('/guidance/x?foo=bar&ADV_TYPE=EXE')
   })
 })

@@ -17,6 +17,7 @@ import {
 } from '#src/server/journey/self-service/outcome/utils.js'
 import {
   buildHandoffQueryString,
+  buildHandoffRedirectUrl,
   HANDOFF_ALLOWLISTS
 } from '#src/server/journey/self-service/services/application-handoff.js'
 import { iatContextService } from '#src/services/iat-service/iat-context.service.js'
@@ -311,7 +312,10 @@ export const outcomeContinueController = {
     })
 
     return h.redirect(
-      `${payload.focusedOption.overrideCtaButtonUrl}?${queryString}`
+      buildHandoffRedirectUrl(
+        payload.focusedOption.overrideCtaButtonUrl,
+        queryString
+      )
     )
   }
 }

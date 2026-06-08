@@ -31,6 +31,7 @@ import {
   makePostRequest
 } from '#src/server/test-helpers/server-requests.js'
 import { config } from '#src/config/config.js'
+import { routes } from '#src/server/common/constants/routes.js'
 
 const NEW_SLUG = 'B'.repeat(22)
 
@@ -430,7 +431,9 @@ describe('GET terminal-single', () => {
     const response = await makeGetRequest({ url: href, server: getServer() })
 
     expect(response.statusCode).toBe(statusCodes.redirect)
-    expect(response.headers.location).toBe(`/outcome-documents/${NEW_SLUG}`)
+    expect(response.headers.location).toBe(
+      routes.OUTCOME_DOCUMENT.replace('{slug}', NEW_SLUG)
+    )
     expect(iatOutcomeDocumentService.mint).toHaveBeenCalledTimes(1)
   })
 
@@ -741,7 +744,9 @@ describe('GET /view-answers/:outcomeTypeId/:outcomePath', () => {
       server: getServer()
     })
     expect(response.statusCode).toBe(statusCodes.redirect)
-    expect(response.headers.location).toBe(`/outcome-documents/${NEW_SLUG}`)
+    expect(response.headers.location).toBe(
+      routes.OUTCOME_DOCUMENT.replace('{slug}', NEW_SLUG)
+    )
     expect(iatOutcomeDocumentService.mint).toHaveBeenCalledTimes(1)
   })
 

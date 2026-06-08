@@ -17,6 +17,7 @@ import {
 } from '#src/server/journey/self-service/outcome/utils.js'
 import { iatContextService } from '#src/services/iat-service/iat-context.service.js'
 import { iatOutcomeDocumentService } from '#src/services/iat-service/iat-outcome-document.service.js'
+import { routes } from '#src/server/common/constants/routes.js'
 
 const VIEW_PATH = 'journey/self-service/outcome/index'
 
@@ -247,6 +248,6 @@ export const outcomeViewAnswersController = {
     if (!minted?.slug) {
       throw Boom.badImplementation('outcome-document mint returned no slug')
     }
-    return h.redirect(`/outcome-documents/${minted.slug}`)
+    return h.redirect(routes.OUTCOME_DOCUMENT.replace('{slug}', minted.slug))
   }
 }

@@ -23,7 +23,7 @@ describe('iatOutcomeDocumentService', () => {
     it('posts the snapshot payload and returns the full value (slug + viewUrl + snapshot)', async () => {
       const value = {
         slug: snapSlug,
-        viewUrl: `/outcome-documents/${snapSlug}`,
+        viewUrl: `/journey/self-service/outcome-document/${snapSlug}`,
         snapshot: { slug: snapSlug, contextSlug }
       }
       authenticatedPostRequest.mockResolvedValue({

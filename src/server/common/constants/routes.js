@@ -129,7 +129,7 @@ export const routes = {
   IAT_OUTCOME: '/journey/self-service/c/{slug}/outcome/{outcomePath*}',
   IAT_OUTCOME_VIEW_ANSWERS:
     '/journey/self-service/c/{slug}/view-answers/{outcomeTypeId}/{outcomePath*}',
-  OUTCOME_DOCUMENT: '/outcome-documents/{slug}'
+  OUTCOME_DOCUMENT: '/journey/self-service/outcome-document/{slug}'
 }
 
 export const entraIdRoutes = [

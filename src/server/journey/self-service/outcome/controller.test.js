@@ -6,6 +6,7 @@ import {
 } from './controller.js'
 import { iatContextService } from '#src/services/iat-service/iat-context.service.js'
 import { iatOutcomeDocumentService } from '#src/services/iat-service/iat-outcome-document.service.js'
+import { routes } from '#src/server/common/constants/routes.js'
 
 vi.mock('#src/services/iat-service/iat-context.service.js', () => ({
   iatContextService: { patch: vi.fn() }
@@ -136,11 +137,11 @@ describe('outcomeViewAnswersController', () => {
     h = { redirect }
   })
 
-  it('mints an outcome document and redirects to /outcome-documents/{newSlug}', async () => {
+  it('mints an outcome document and redirects to the outcome-document page', async () => {
     const newSlug = 'B'.repeat(22)
     iatOutcomeDocumentService.mint.mockResolvedValue({
       slug: newSlug,
-      viewUrl: `/outcome-documents/${newSlug}`,
+      viewUrl: routes.OUTCOME_DOCUMENT.replace('{slug}', newSlug),
       snapshot: {}
     })
 
@@ -157,7 +158,9 @@ describe('outcomeViewAnswersController', () => {
         focusedOption: expect.objectContaining({ id: TERMINAL_MULTI_TYPE_ID })
       })
     )
-    expect(redirect).toHaveBeenCalledWith(`/outcome-documents/${newSlug}`)
+    expect(redirect).toHaveBeenCalledWith(
+      routes.OUTCOME_DOCUMENT.replace('{slug}', newSlug)
+    )
   })
 
   it('throws Boom.badRequest if outcomeTypeId is not a valid type on this outcome', async () => {

@@ -3,6 +3,7 @@ import { vi } from 'vitest'
 import { setupTestServer } from '#tests/integration/shared/test-setup-helpers.js'
 import { makeGetRequest } from '#src/server/test-helpers/server-requests.js'
 import { config } from '#src/config/config.js'
+import { routes } from '#src/server/common/constants/routes.js'
 
 vi.mock('#src/services/iat-service/iat-outcome-document.service.js', () => ({
   iatOutcomeDocumentService: { get: vi.fn() }
@@ -49,7 +50,7 @@ describe('#outcomeDocumentController (integration)', () => {
 
   const getPage = async () => {
     const response = await makeGetRequest({
-      url: `/outcome-documents/${ANSWER_SLUG}`,
+      url: routes.OUTCOME_DOCUMENT.replace('{slug}', ANSWER_SLUG),
       server: getServer()
     })
     return {
@@ -209,7 +210,7 @@ describe('#outcomeDocumentController (integration)', () => {
 
   test('malformed slug returns 400 from Joi validation', async () => {
     const response = await makeGetRequest({
-      url: '/outcome-documents/not-valid',
+      url: routes.OUTCOME_DOCUMENT.replace('{slug}', 'not-valid'),
       server: getServer()
     })
     expect(response.statusCode).toBe(400)

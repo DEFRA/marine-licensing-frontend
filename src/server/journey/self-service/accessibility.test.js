@@ -11,6 +11,7 @@ import {
 } from '#tests/integration/shared/test-setup-helpers.js'
 import { makeGetRequest } from '#src/server/test-helpers/server-requests.js'
 import { config } from '#src/config/config.js'
+import { routes } from '#src/server/common/constants/routes.js'
 
 vi.mock('#src/services/iat-service/iat-context.service.js', () => ({
   iatContextService: {
@@ -71,7 +72,7 @@ const pages = [
     title: 'Scaffolding or access towers - impede safe or normal navigation'
   },
   {
-    url: `/outcome-documents/${OUTCOME_DOC_SLUG}`,
+    url: routes.OUTCOME_DOCUMENT.replace('{slug}', OUTCOME_DOC_SLUG),
     title: 'Marine licence requirement check'
   }
 ]

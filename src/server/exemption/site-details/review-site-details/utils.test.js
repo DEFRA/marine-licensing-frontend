@@ -45,6 +45,21 @@ describe('siteDetails utils', () => {
         routes.CHECK_YOUR_ANSWERS
       )
     })
+
+    test('getSiteDetailsBackLink includes ?site= param when referer has one for WIDTH_OF_SITE', () => {
+      expect(
+        getSiteDetailsBackLink(`http://hostname${routes.WIDTH_OF_SITE}?site=2`)
+      ).toBe(`${routes.WIDTH_OF_SITE}?site=2`)
+    })
+
+    test('getSiteDetailsBackLink includes ?site= param when referer has one for ENTER_MULTIPLE_COORDINATES', () => {
+      expect(
+        getSiteDetailsBackLink(
+          `http://hostname${routes.ENTER_MULTIPLE_COORDINATES}?site=2`,
+          'multiple'
+        )
+      ).toBe(`${routes.ENTER_MULTIPLE_COORDINATES}?site=2`)
+    })
   })
 
   describe('getFileUploadBackLink util', () => {

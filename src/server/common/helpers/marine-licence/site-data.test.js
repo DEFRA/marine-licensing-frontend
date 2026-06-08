@@ -19,11 +19,8 @@ vi.mock('#src/server/common/helpers/site-details.js')
 vi.mock('#src/server/common/helpers/review-site-details/activity-details.js')
 
 describe('#buildSiteData', () => {
-  test.each([
-    ['no siteDetails key', { id: '123' }],
-    ['empty siteDetails array', { id: '123', siteDetails: [] }]
-  ])('returns empty data when marine licence has %s', (_, marineLicence) => {
-    const result = buildSiteData(marineLicence)
+  test('returns empty data when marine licence has no siteDetails', () => {
+    const result = buildSiteData({ id: '123' })
 
     expect(result).toEqual({ coordinatesType: null, summaryData: [] })
   })

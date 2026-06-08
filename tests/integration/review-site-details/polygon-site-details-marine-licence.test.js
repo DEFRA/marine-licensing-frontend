@@ -68,6 +68,23 @@ describe('ML Review Site Details - Polygon Coordinates Integration Tests', () =>
     }
   )
 
+  describe('back link', () => {
+    test('should point to check your answers when from=check-your-answers', async () => {
+      const response = await makeGetRequest({
+        server: getServer(),
+        url: `${marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS}?from=check-your-answers`
+      })
+
+      expect(response.statusCode).toBe(statusCodes.ok)
+      const document = new JSDOM(response.result).window.document
+
+      const backLink = document.querySelector('.govuk-back-link')
+      expect(backLink.getAttribute('href')).toBe(
+        marineLicenceRoutes.MARINE_LICENCE_CHECK_YOUR_ANSWERS
+      )
+    })
+  })
+
   describe('Form Submission', () => {
     test('should redirect to task list on form submission', async () => {
       const response = await makePostRequest({
@@ -79,6 +96,30 @@ describe('ML Review Site Details - Polygon Coordinates Integration Tests', () =>
       expect(response.statusCode).toBe(statusCodes.redirect)
       expect(response.headers.location).toBe(
         marineLicenceRoutes.MARINE_LICENCE_TASK_LIST
+      )
+    })
+
+    test('should redirect to check-your-answers when returnTo flash is set', async () => {
+      const cyaResponse = await makeGetRequest({
+        server: getServer(),
+        url: marineLicenceRoutes.MARINE_LICENCE_CHECK_YOUR_ANSWERS
+      })
+
+      const sessionCookie = cyaResponse.headers['set-cookie']
+      const cookieHeader = Array.isArray(sessionCookie)
+        ? sessionCookie.join('; ')
+        : sessionCookie
+
+      const response = await makePostRequest({
+        url: marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS,
+        server: getServer(),
+        formData: {},
+        headers: { cookie: cookieHeader }
+      })
+
+      expect(response.statusCode).toBe(statusCodes.redirect)
+      expect(response.headers.location).toBe(
+        marineLicenceRoutes.MARINE_LICENCE_CHECK_YOUR_ANSWERS
       )
     })
 

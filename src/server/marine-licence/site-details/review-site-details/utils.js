@@ -51,16 +51,18 @@ export const getManualEntryBackLink = (
 
   const url = new URL(previousPage)
   const previousPath = url.pathname
+  const siteParam = url.searchParams.get('site')
+  const queryParams = siteParam ? `?site=${siteParam}` : ''
 
   if (
     previousPath ===
     marineLicenceRoutes.MARINE_LICENCE_ENTER_MULTIPLE_COORDINATES
   ) {
-    return marineLicenceRoutes.MARINE_LICENCE_ENTER_MULTIPLE_COORDINATES
+    return `${marineLicenceRoutes.MARINE_LICENCE_ENTER_MULTIPLE_COORDINATES}${queryParams}`
   }
 
   if (previousPath === marineLicenceRoutes.MARINE_LICENCE_WIDTH_OF_SITE) {
-    return marineLicenceRoutes.MARINE_LICENCE_WIDTH_OF_SITE
+    return `${marineLicenceRoutes.MARINE_LICENCE_WIDTH_OF_SITE}${queryParams}`
   }
 
   if (previousPath === routes.TASK_LIST) {

@@ -173,6 +173,24 @@ describe('siteDetails utils', () => {
         marineLicenceRoutes.MARINE_LICENCE_CHECK_YOUR_ANSWERS
       )
     })
+
+    test('includes ?site= param when referer has one for WIDTH_OF_SITE', () => {
+      expect(
+        getManualEntryBackLink(
+          `http://hostname${marineLicenceRoutes.MARINE_LICENCE_WIDTH_OF_SITE}?site=2`
+        )
+      ).toBe(`${marineLicenceRoutes.MARINE_LICENCE_WIDTH_OF_SITE}?site=2`)
+    })
+
+    test('includes ?site= param when referer has one for ENTER_MULTIPLE_COORDINATES', () => {
+      expect(
+        getManualEntryBackLink(
+          `http://hostname${marineLicenceRoutes.MARINE_LICENCE_ENTER_MULTIPLE_COORDINATES}?site=2`
+        )
+      ).toBe(
+        `${marineLicenceRoutes.MARINE_LICENCE_ENTER_MULTIPLE_COORDINATES}?site=2`
+      )
+    })
   })
 
   describe('renderManualEntryReview util', () => {

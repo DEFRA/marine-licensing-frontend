@@ -1,9 +1,10 @@
 {%- from "govuk/components/summary-list/macro.njk" import govukSummaryList -%}
+{%- from "govuk/components/table/macro.njk" import govukTable -%}
 {% extends "layouts/page.njk" %}
 
 {% block content %}
   <div class="govuk-grid-row">
-    <div class="govuk-grid-column-two-thirds">
+    <div class="govuk-grid-column-full">
       <h1 class="govuk-heading-l">{{ heading }}</h1>
       {% if hasApiError %}
         <p class="govuk-body govuk-!-margin-bottom-6">
@@ -11,34 +12,119 @@
         </p>
       {% endif %}
 
+      <h2 class="govuk-heading-m">Exemption status</h2>
       {{ govukSummaryList({
+        classes: "govuk-!-margin-bottom-8",
         rows: [
           {
-            key: {
-              text: "Submitted exemptions"
-            },
-            value: {
-              text: summary.submittedExemptions
-            }
+            key: { text: "Submitted exemptions" },
+            value: { text: summary.submittedExemptions }
           },
           {
-            key: {
-              text: "Unsubmitted exemptions"
-            },
-            value: {
-              text: summary.unsubmittedExemptions
-            }
+            key: { text: "Unsubmitted exemptions" },
+            value: { text: summary.unsubmittedExemptions }
           },
           {
-            key: {
-              text: "Withdrawn exemptions"
-            },
-            value: {
-              text: summary.withdrawnExemptions
-            }
+            key: { text: "Withdrawn exemptions" },
+            value: { text: summary.withdrawnExemptions }
           }
         ]
       }) }}
+
+      <h2 class="govuk-heading-m">Coordinates input method</h2>
+      <p class="govuk-body">Number of exemptions by how site coordinates were provided.</p>
+      {{ govukSummaryList({
+        classes: "govuk-!-margin-bottom-8",
+        rows: [
+          {
+            key: { text: "Shapefile" },
+            value: { text: stats.coordinatesInputMethod.shapefile }
+          },
+          {
+            key: { text: "KML" },
+            value: { text: stats.coordinatesInputMethod.kml }
+          },
+          {
+            key: { text: "Manual coordinates" },
+            value: { text: stats.coordinatesInputMethod.manualCoordinates }
+          }
+        ]
+      }) }}
+
+      <h2 class="govuk-heading-m">Coordinate system volume</h2>
+      <p class="govuk-body">Site-level volume and percentage of data submitted in WGS84 versus British National Grid (BNG). File uploads are counted as WGS84.</p>
+      {{ govukSummaryList({
+        classes: "govuk-!-margin-bottom-8",
+        rows: [
+          {
+            key: { text: "WGS84 (count)" },
+            value: { text: stats.coordinateSystemVolume.wgs84.count }
+          },
+          {
+            key: { text: "WGS84 (%)" },
+            value: { text: stats.coordinateSystemVolume.wgs84.percentage }
+          },
+          {
+            key: { text: "BNG (count)" },
+            value: { text: stats.coordinateSystemVolume.bng.count }
+          },
+          {
+            key: { text: "BNG (%)" },
+            value: { text: stats.coordinateSystemVolume.bng.percentage }
+          },
+          {
+            key: { text: "Total sites" },
+            value: { text: stats.coordinateSystemVolume.total }
+          }
+        ]
+      }) }}
+
+      <h2 class="govuk-heading-m">Exemptions by article</h2>
+      {% if stats.byArticleRows.length > 0 %}
+        {{ govukTable({
+          caption: "Exemptions by article",
+          captionClasses: "govuk-visually-hidden",
+          classes: "govuk-!-margin-bottom-8",
+          head: [
+            { text: "Article" },
+            { text: "Number of exemptions", classes: "govuk-!-width-one-quarter" }
+          ],
+          rows: stats.byArticleRows
+        }) }}
+      {% else %}
+        <p class="govuk-body govuk-!-margin-bottom-8">No article data available.</p>
+      {% endif %}
+
+      <h2 class="govuk-heading-m">Exemptions by Marine Plan Area</h2>
+      {% if stats.byMarinePlanAreaRows.length > 0 %}
+        {{ govukTable({
+          caption: "Exemptions by Marine Plan Area",
+          captionClasses: "govuk-visually-hidden",
+          classes: "govuk-!-margin-bottom-8",
+          head: [
+            { text: "Marine Plan Area" },
+            { text: "Number of exemptions", classes: "govuk-!-width-one-quarter" }
+          ],
+          rows: stats.byMarinePlanAreaRows
+        }) }}
+      {% else %}
+        <p class="govuk-body govuk-!-margin-bottom-8">No Marine Plan Area data available.</p>
+      {% endif %}
+
+      <h2 class="govuk-heading-m">Exemptions by Coastal Operations Area</h2>
+      {% if stats.byCoastalOperationsAreaRows.length > 0 %}
+        {{ govukTable({
+          caption: "Exemptions by Coastal Operations Area",
+          captionClasses: "govuk-visually-hidden",
+          head: [
+            { text: "Coastal Operations Area" },
+            { text: "Number of exemptions", classes: "govuk-!-width-one-quarter" }
+          ],
+          rows: stats.byCoastalOperationsAreaRows
+        }) }}
+      {% else %}
+        <p class="govuk-body">No Coastal Operations Area data available.</p>
+      {% endif %}
     </div>
   </div>
 {% endblock %}

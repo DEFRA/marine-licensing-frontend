@@ -430,6 +430,11 @@ describe('Page accessibility checks (Axe)', () => {
       url: `${routes.ADMIN_BACKFILL}`,
       title: 'Exemptions without Marine Plan or Coastal Operations Areas',
       auth: { credentials: { isTeamAdmin: true } }
+    },
+    {
+      url: `${routes.ADMIN_REPORTS}`,
+      title: 'Exemptions summary report',
+      auth: { credentials: { isTeamAdmin: true } }
     }
   ]
 
@@ -465,7 +470,26 @@ describe('Page accessibility checks (Axe)', () => {
           (_request, endpoint) => ({
             payload: {
               message: 'success',
-              value: endpoint === '/exemptions' ? mockProjectList : exemption
+              value:
+                endpoint === '/exemptions'
+                  ? mockProjectList
+                  : endpoint === '/exemptions/summary'
+                    ? {
+                        coordinatesInputMethod: {
+                          shapefile: 0,
+                          kml: 0,
+                          manualCoordinates: 0
+                        },
+                        coordinateSystemVolume: {
+                          wgs84: { count: 0, percentage: 0 },
+                          bng: { count: 0, percentage: 0 },
+                          total: 0
+                        },
+                        byArticle: {},
+                        byMarinePlanArea: {},
+                        byCoastalOperationsArea: {}
+                      }
+                    : exemption
             }
           })
         )

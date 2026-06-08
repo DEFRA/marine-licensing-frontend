@@ -138,7 +138,7 @@ export const siteNameSubmitController = {
     )
 
     if (shouldReturnToReview) {
-      await saveSiteDetailsToBackend(request, h)
+      await saveSiteDetailsToBackend(request, h, { siteIndex })
     }
 
     return h.redirect(redirectRoute)

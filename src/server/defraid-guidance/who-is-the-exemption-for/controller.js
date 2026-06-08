@@ -26,10 +26,11 @@ export const defraIdGuidanceWhoIsExemptionForController = {
       cacheMcmsContextFromQueryParams(request)
     }
 
+    await clearExemptionCache(request, h)
+
     if (request.state?.userSession) {
       return h.redirect(routes.EXEMPTION)
     }
-    await clearExemptionCache(request, h)
 
     const whoIsExemptionFor = await defraIdGuidanceUserSession.get({
       request,

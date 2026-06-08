@@ -254,6 +254,41 @@ the JSON-replacement test in
 | `selfService.dataQualityEnabled` | `ENABLE_IAT_DATA_QUALITY` | `false` | Runs `runLoadTimeScan` on Hapi `start` to log defects in `self-service.json`. Runtime defect logging in handlers is **not** gated by this flag. |
 | `iat.inFlightTtlMs`              | `IAT_IN_FLIGHT_TTL_MS`    | 24h     | Sets the `expiresAt` value written on context creation. Mongo's TTL monitor deletes the doc that many ms after that timestamp.                  |
 
+## Querying `self-service.json`
+
+The JSON is large (~5000 lines) and relational. Use the in-repo CLI rather than ad-hoc grep/jq — it reuses the same parsed/sanitised view the running app sees, so what you see matches what runs.
+
+```bash
+npm run iat -- <subcommand> [args] [--json]
+```
+
+| Subcommand                                                | Purpose                                                                                     |
+| --------------------------------------------------------- | ------------------------------------------------------------------------------------------- |
+| `question <route>`                                        | Show one question with its answers and where each leads                                     |
+| `outcome <route>`                                         | Show one outcome with its outcomeTypes inline                                               |
+| `outcome-type <id>`                                       | Show one outcomeType (params, link, module, nextQuestionRoute)                              |
+| `outcomes [--classify X] [--has-param N[=V]]`             | List outcomes filtered by `intermediate`/`terminal-single`/`terminal-multi` and/or by param |
+| `outcome-types [--has-param N[=V]] [--has-next-question]` | List outcomeTypes; useful for finding ones that route forward vs. terminal                  |
+| `questions [--mapping N] [--has-mapping]`                 | List questions; filter by `mcmsAppFormMapping`                                              |
+| `mappings`                                                | Distinct `mcmsAppFormMapping` values + the question route(s) that carry each                |
+
+Every subcommand accepts `--json` for machine-readable output. Exit codes: `0` success, `1` not-found, `2` invalid args.
+
+Examples:
+
+```bash
+# A terminal-single outcome whose ADV_TYPE is EXE — handy when writing a test
+npm run iat -- outcomes --classify terminal-single --has-param ADV_TYPE=EXE
+
+# Every mcmsAppFormMapping in the JSON, with the question carrying it
+npm run iat -- mappings
+
+# A specific question and where each answer leads
+npm run iat -- question /activity-type
+```
+
+Source: [`marine-licensing-frontend/scripts/iat-query.js`](../../../../scripts/iat-query.js). Tests colocated in `scripts/iat-query.test.js`.
+
 ## Security: defence in depth
 
 The IAT's threat model is unusual: the routes are public-by-design (no

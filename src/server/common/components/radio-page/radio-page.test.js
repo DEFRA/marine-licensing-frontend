@@ -104,4 +104,19 @@ describe('radioPage Component', () => {
       'test hint text'
     )
   })
+
+  test('Should render contentHtml as hint content above the error message', () => {
+    $radioPage = renderComponent('radio-page', {
+      ...commonTestData,
+      isPageHeading: true,
+      heading: 'Test heading',
+      cancelLink: '#',
+      contentHtml: '<ul><li>item one</li><li>item two</li></ul>'
+    })
+
+    const hintDiv = $radioPage('.govuk-hint')
+    expect(hintDiv.find('ul')).toHaveLength(1)
+    expect(hintDiv.find('li')).toHaveLength(2)
+    expect(hintDiv.find('li').first().text().trim()).toBe('item one')
+  })
 })

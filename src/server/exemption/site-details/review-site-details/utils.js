@@ -36,11 +36,14 @@ export const getSiteDetailsBackLink = (
     return routes.TASK_LIST
   }
 
+  const siteParam = url.searchParams.get('site')
+  const queryParams = siteParam ? `?site=${siteParam}` : ''
+
   if (coordinatesEntry === 'multiple') {
-    return routes.ENTER_MULTIPLE_COORDINATES
+    return `${routes.ENTER_MULTIPLE_COORDINATES}${queryParams}`
   }
 
-  return routes.WIDTH_OF_SITE
+  return `${routes.WIDTH_OF_SITE}${queryParams}`
 }
 
 export const getFileUploadBackLink = (

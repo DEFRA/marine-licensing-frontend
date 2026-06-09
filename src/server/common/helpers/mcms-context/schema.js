@@ -3,15 +3,14 @@ import { config } from '#src/config/config.js'
 import {
   requiredQueryParams,
   activityTypes,
-  articleCodes,
-  allowedOutcomeDocumentHosts
+  articleCodes
 } from '#src/server/common/constants/mcms-context.js'
 
 const { ACTIVITY_TYPE, ARTICLE, pdfDownloadUrl } = requiredQueryParams
 
 const NEW_DOC_PATH =
   /^\/journey\/self-service\/outcome-document\/[A-Za-z0-9_-]+$/
-const LEGACY_DOC_PATH =
+const MCMS_DOC_PATH =
   /^\/[^/]+\/journey\/self-service\/outcome-document\/[A-Za-z0-9_-]+$/
 
 function appHost() {
@@ -22,12 +21,12 @@ function appHost() {
   }
 }
 
-function isLegacyHost(host) {
+function isMcmsHost(host) {
   return /^[^.]+\.marinemanagement\.org\.uk$/.test(host)
 }
 
-function isNewAllowedHost(host) {
-  return allowedOutcomeDocumentHosts.includes(host) || host === appHost()
+function isOwnHost(host) {
+  return host === appHost()
 }
 
 function validatePdfDownloadUrl(value, helpers) {
@@ -37,16 +36,16 @@ function validatePdfDownloadUrl(value, helpers) {
   } catch {
     return helpers.error('any.invalid')
   }
-  if (isLegacyHost(url.host)) {
+  if (isMcmsHost(url.host)) {
     if (url.protocol !== 'https:') {
       return helpers.error('any.invalid')
     }
-    if (!LEGACY_DOC_PATH.test(url.pathname)) {
+    if (!MCMS_DOC_PATH.test(url.pathname)) {
       return helpers.error('any.invalid')
     }
     return value
   }
-  if (isNewAllowedHost(url.host)) {
+  if (isOwnHost(url.host)) {
     if (url.protocol !== 'https:' && url.protocol !== 'http:') {
       return helpers.error('any.invalid')
     }

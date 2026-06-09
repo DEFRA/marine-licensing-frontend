@@ -98,7 +98,7 @@ describe('view details controller', () => {
 
         const mockProcessedSiteDetails = {
           isFileUpload: true,
-          method: 'Upload a file with the coordinates of the site',
+          method: 'File upload',
           fileType: 'KML',
           filename: 'test.kml'
         }
@@ -487,7 +487,7 @@ describe('view details controller', () => {
 
         const mockProcessedSiteDetails = {
           isFileUpload: true,
-          method: 'Upload a file with the coordinates of the site',
+          method: 'File upload',
           fileType: 'Shapefile',
           filename: 'Unknown file'
         }
@@ -498,7 +498,7 @@ describe('view details controller', () => {
 
         const mockSiteLocationData = {
           multipleSiteDetails: 'No',
-          method: 'Upload a file with the coordinates of the site',
+          method: 'File upload',
           isFileUpload: true,
           fileType: 'Shapefile',
           filename: 'test-boundary.zip'
@@ -535,7 +535,7 @@ describe('view details controller', () => {
           expect.objectContaining({
             siteDetails: expect.objectContaining({
               isFileUpload: true,
-              method: 'Upload a file with the coordinates of the site',
+              method: 'File upload',
               fileType: 'Shapefile',
               filename: 'Unknown file'
             }),
@@ -564,7 +564,7 @@ describe('view details controller', () => {
 
         const mockProcessedSiteDetails = {
           isFileUpload: true,
-          method: 'Upload a file with the coordinates of the site',
+          method: 'File upload',
           fileType: 'KML',
           filename: 'Unknown file'
         }
@@ -575,7 +575,7 @@ describe('view details controller', () => {
 
         const mockSiteLocationData = {
           multipleSiteDetails: 'No',
-          method: 'Upload a file with the coordinates of the site',
+          method: 'File upload',
           isFileUpload: true,
           fileType: 'KML',
           filename: 'test-area.kml'
@@ -612,7 +612,7 @@ describe('view details controller', () => {
           expect.objectContaining({
             siteDetails: expect.objectContaining({
               isFileUpload: true,
-              method: 'Upload a file with the coordinates of the site',
+              method: 'File upload',
               fileType: 'KML',
               filename: 'Unknown file'
             }),

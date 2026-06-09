@@ -100,6 +100,30 @@ describe('ML Review Site Details - File Upload Integration Tests', () => {
       )
     })
 
+    test('should redirect to check-your-answers when returnTo flash is set', async () => {
+      const cyaResponse = await makeGetRequest({
+        server: getServer(),
+        url: marineLicenceRoutes.MARINE_LICENCE_CHECK_YOUR_ANSWERS
+      })
+
+      const sessionCookie = cyaResponse.headers['set-cookie']
+      const cookieHeader = Array.isArray(sessionCookie)
+        ? sessionCookie.join('; ')
+        : sessionCookie
+
+      const response = await makePostRequest({
+        url: marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS,
+        server: getServer(),
+        formData: {},
+        headers: { cookie: cookieHeader }
+      })
+
+      expect(response.statusCode).toBe(statusCodes.redirect)
+      expect(response.headers.location).toBe(
+        marineLicenceRoutes.MARINE_LICENCE_CHECK_YOUR_ANSWERS
+      )
+    })
+
     test('should redirect back to review page with anchor when addActivity is submitted', async () => {
       mockMarineLicence(testScenarios[0].marineLicence)
 
@@ -140,10 +164,10 @@ describe('ML Review Site Details - File Upload Integration Tests', () => {
 
     const methodRow = getRowByKey(card, 'Method of providing site location')
     expect(methodRow).toBeTruthy()
-    expect(methodRow.textContent).toContain('File uploaded')
+    expect(methodRow.textContent).toContain('File upload')
 
     expect(getRowByKey(card, 'File type')).toBeFalsy()
-    expect(getRowByKey(card, 'File uploaded')).toBeFalsy()
+    expect(getRowByKey(card, 'File upload')).toBeFalsy()
   }
 
   const validateFileUpload = (document, expected, siteIndex) => {

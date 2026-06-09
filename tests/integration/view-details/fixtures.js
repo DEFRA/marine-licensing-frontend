@@ -93,7 +93,7 @@ const baseExpectedContent = {
   summaryCards: [
     'Project summary',
     'Providing the site location',
-    'Site details',
+    'Site 1',
     'Sharing your project information publicly'
   ],
   siteLocation: {
@@ -165,17 +165,14 @@ export const testScenarios = [
     expectedPageContent: {
       ...baseExpectedContent,
       siteLocation: {
-        'Method of providing site location':
-          'Upload a file with the coordinates of the site',
-        'File type': 'KML',
-        'File uploaded': 'test_site.kml'
+        'Method of providing site location': 'File upload'
       },
-      siteDetails: {
-        'Method of providing site location':
-          'Upload a file with the coordinates of the site',
-        'File type': 'KML',
-        'File uploaded': 'test_site.kml'
-      }
+      siteDetails: [
+        {
+          'Activity dates': '',
+          'Activity description': 'Test activity description'
+        }
+      ]
     }
   },
   {
@@ -184,17 +181,14 @@ export const testScenarios = [
     expectedPageContent: {
       ...baseExpectedContent,
       siteLocation: {
-        'Method of providing site location':
-          'Upload a file with the coordinates of the site',
-        'File type': 'Shapefile',
-        'File uploaded': 'site_boundary.zip'
+        'Method of providing site location': 'File upload'
       },
-      siteDetails: {
-        'Method of providing site location':
-          'Upload a file with the coordinates of the site',
-        'File type': 'Shapefile',
-        'File uploaded': 'site_boundary.zip'
-      }
+      siteDetails: [
+        {
+          'Activity dates': '',
+          'Activity description': 'Test activity description'
+        }
+      ]
     }
   },
   {
@@ -280,7 +274,7 @@ export const testScenarios = [
       ...baseExpectedContent,
       summaryCards: [
         'Providing the site location',
-        'Site details',
+        'Site 1',
         'Sharing your project information publicly'
       ],
       summaryCardsMissing: ['Project summary'],

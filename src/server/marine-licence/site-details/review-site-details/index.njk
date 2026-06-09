@@ -59,10 +59,6 @@
 
       {% for site in summaryData %}
 
-        <script nonce='{{ cspNonce }}'>
-          var geoJSON{{loop.index}} = {{ site.siteDetailsData | safe }};
-        </script>
-
         {% set summaryRows = [] %}
 
         {% set summaryRowsHeading %}

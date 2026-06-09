@@ -1,7 +1,10 @@
 {% extends 'layouts/page.njk' %}
 {% from "govuk/components/back-link/macro.njk" import govukBackLink %}
 {% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
 {% from "marine-licence/project-details-card/macro.njk" import appMarineLicenceProjectDetailsCard %}
+{% from "marine-licence/site-details-card/macro.njk" import appMarineLicenceSiteDetailsCard %}
+{% from "marine-licence/activity-details-card/macro.njk" import appMarineLicenceActivityDetailsCard %}
 {% from "marine-licence/other-permissions-card/macro.njk" import appMarineLicenceOtherPermissionsCard %}
 {% from "public-register-card/macro.njk" import appPublicRegisterCard %}
 
@@ -31,6 +34,45 @@
         projectBackground: projectBackground,
         preferredDates: preferredDates
       }) }}
+
+      {% if summaryData and summaryData.length %}
+        {{ govukSummaryList({
+          card: {
+            title: { text: "Providing the site location" },
+            actions: {
+              items: [{
+                href: reviewSiteDetailsRoute + "?from=check-your-answers",
+                text: "Change",
+                classes: "govuk-link--no-visited-state"
+              }]
+            },
+            attributes: { id: "site-location-card" }
+          },
+          rows: [{
+            key: { text: "Method of providing site location" },
+            value: { text: "File upload" if coordinatesType === "file" else "Enter the coordinates of the site manually" }
+          }]
+        }) }}
+
+        {% for site in summaryData %}
+          {{ appMarineLicenceSiteDetailsCard({
+            site: site,
+            loopIndex0: loop.index0,
+            coordinatesType: coordinatesType,
+            changeLink: reviewSiteDetailsRoute + "?from=check-your-answers#site-details-" + site.siteNumber,
+            cspNonce: cspNonce
+          }) }}
+
+          {% for activityDetails in site.activityDetails %}
+            {{ appMarineLicenceActivityDetailsCard({
+              activityDetails: activityDetails,
+              siteNumber: site.siteNumber,
+              index: loop.index,
+              changeLink: reviewSiteDetailsRoute + "?from=check-your-answers#activity-details-site-" + site.siteNumber + "-activity-" + loop.index
+            }) }}
+          {% endfor %}
+        {% endfor %}
+      {% endif %}
 
        {{ appMarineLicenceOtherPermissionsCard({
         specialLegalPowers: specialLegalPowers,

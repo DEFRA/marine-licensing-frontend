@@ -130,11 +130,12 @@ export const routes = {
   PRIVACY: '/help/privacy',
   DECLARATION: '/declaration',
   IAT_START: '/journey/self-service/start',
-  IAT_QUESTION: '/journey/self-service/{questionPath*}',
-  IAT_OUTCOME: '/journey/self-service/outcome/{outcomePath*}',
+  IAT_INVALID: '/journey/self-service/invalid',
+  IAT_QUESTION: '/journey/self-service/c/{slug}/{questionPath*}',
+  IAT_OUTCOME: '/journey/self-service/c/{slug}/outcome/{outcomePath*}',
   IAT_OUTCOME_VIEW_ANSWERS:
-    '/journey/self-service/view-answers/{outcomeTypeId}/{outcomePath*}',
-  IAT_ANSWER: '/journey/self-service/answer'
+    '/journey/self-service/c/{slug}/view-answers/{outcomeTypeId}/{outcomePath*}',
+  OUTCOME_DOCUMENT: '/journey/self-service/outcome-document/{slug}'
 }
 
 export const entraIdRoutes = [

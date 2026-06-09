@@ -69,6 +69,16 @@ describe('Marine Licence Activity Details Card', () => {
     expect(cardActionsText).toContain('Delete activity')
   })
 
+  test('Should not show row-level actions when isReadOnly is true', () => {
+    const $c = renderComponent('marine-licence/activity-details-card', {
+      ...baseParams,
+      deleteLink: undefined,
+      isReadOnly: true
+    })
+    expect($c('.govuk-summary-list__actions')).toHaveLength(0)
+    expect($c('.govuk-summary-card__actions')).toHaveLength(0)
+  })
+
   test('Should display correct row labels', () => {
     const keys = $component('.govuk-summary-list__key')
       .toArray()

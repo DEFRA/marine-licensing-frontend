@@ -2,8 +2,17 @@ import {
   questionController,
   questionPostController
 } from '#src/server/journey/self-service/question/controller.js'
+import { loadIatContext } from '#src/server/journey/self-service/services/load-iat-context.js'
+import { slugSchema } from '#src/server/journey/self-service/schemas/slug.js'
 import { routes } from '#src/server/common/constants/routes.js'
 import Joi from 'joi'
+
+const QUESTION_PATH_MAX = 200
+
+const paramsSchema = Joi.object({
+  slug: slugSchema,
+  questionPath: Joi.string().max(QUESTION_PATH_MAX).required()
+})
 
 export const journeySelfServiceQuestion = {
   plugin: {
@@ -13,7 +22,11 @@ export const journeySelfServiceQuestion = {
         {
           method: 'GET',
           path: routes.IAT_QUESTION,
-          options: { auth: false },
+          options: {
+            auth: false,
+            pre: [loadIatContext],
+            validate: { params: paramsSchema }
+          },
           ...questionController
         },
         {
@@ -21,7 +34,9 @@ export const journeySelfServiceQuestion = {
           path: routes.IAT_QUESTION,
           options: {
             auth: false,
+            pre: [loadIatContext],
             validate: {
+              params: paramsSchema,
               payload: Joi.object({
                 answer: Joi.string().max(100),
                 answers: Joi.array()

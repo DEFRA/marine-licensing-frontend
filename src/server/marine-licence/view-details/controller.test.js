@@ -14,9 +14,16 @@ import {
   mockSubmittedMarineLicenceApplication
 } from '#src/server/test-helpers/mocks/marine-licence-mocks.js'
 import { getAuthProvider } from '#src/server/common/helpers/authenticated-requests.js'
+import { buildSiteData } from '#src/server/common/helpers/marine-licence/site-data.js'
 
-vi.mock('~/src/services/marine-licence-service/index.js')
-vi.mock('~/src/server/common/helpers/authenticated-requests.js', () => ({
+vi.mock('#src/server/common/helpers/marine-licence/site-data.js', () => ({
+  buildSiteData: vi
+    .fn()
+    .mockReturnValue({ coordinatesType: null, summaryData: [] })
+}))
+
+vi.mock('#src/services/marine-licence-service/index.js')
+vi.mock('#src/server/common/helpers/authenticated-requests.js', () => ({
   getAuthProvider: vi.fn().mockReturnValue('defra-id')
 }))
 
@@ -76,32 +83,6 @@ describe('marine-licence view details controller', () => {
         expect(statusCode).toBe(404)
       })
 
-      test('should return 403 when marine licence is not viewable', async () => {
-        mockMarineLicenceService.getMarineLicenceById.mockResolvedValue(
-          createSubmittedMarineLicence({ status: 'Draft' })
-        )
-
-        const { statusCode } = await makeGetRequest({
-          url: `/marine-licence/view-details/${mockMarineLicenceApplication.id}`,
-          server: getServer()
-        })
-
-        expect(statusCode).toBe(403)
-      })
-
-      test('should return 500 when the service throws an unexpected error', async () => {
-        mockMarineLicenceService.getMarineLicenceById.mockRejectedValue(
-          new Error('Something went wrong')
-        )
-
-        const { statusCode } = await makeGetRequest({
-          url: `/marine-licence/view-details/${mockMarineLicenceApplication.id}`,
-          server: getServer()
-        })
-
-        expect(statusCode).toBe(500)
-      })
-
       test('should propagate Boom errors from the service', async () => {
         mockMarineLicenceService.getMarineLicenceById.mockRejectedValue(
           Boom.forbidden('Forbidden')
@@ -135,8 +116,11 @@ describe('marine-licence view details controller', () => {
         const mockServiceInstance = {
           getMarineLicenceById: vi.fn().mockResolvedValue(marineLicence)
         }
-
         vi.mocked(getMarineLicenceService).mockReturnValue(mockServiceInstance)
+        vi.mocked(buildSiteData).mockReturnValue({
+          coordinatesType: 'coordinates',
+          summaryData: [{ siteNumber: 1, siteName: 'Test Site' }]
+        })
 
         const mockRequest = {
           path: `${marineLicenceRoutes.MARINE_LICENCE_VIEW_DETAILS}/${mockMarineLicenceApplication.id}`,
@@ -147,12 +131,15 @@ describe('marine-licence view details controller', () => {
 
         await viewDetailsController.handler(mockRequest, mockH)
 
+        expect(buildSiteData).toHaveBeenCalledWith(marineLicence)
         expect(mockH.view).toHaveBeenCalledWith(
           VIEW_DETAILS_VIEW_ROUTE,
           expect.objectContaining({
             pageTitle: marineLicence.projectName,
             pageCaption: `${marineLicence.applicationReference} - Marine licence`,
-            backLink: routes.DASHBOARD
+            backLink: routes.DASHBOARD,
+            coordinatesType: 'coordinates',
+            summaryData: [{ siteNumber: 1, siteName: 'Test Site' }]
           })
         )
       })

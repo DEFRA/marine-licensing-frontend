@@ -1,0 +1,20 @@
+{% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
+
+{{ govukSummaryList({
+  card: {
+    title: { text: "Providing the site location" },
+    actions: {
+      items: [{
+        href: params.changeLink,
+        text: "Change",
+        visuallyHiddenText: "Providing the site location",
+        classes: "govuk-link--no-visited-state"
+      }]
+    } if params.changeLink,
+    attributes: { id: "site-location-card" }
+  },
+  rows: [{
+    key: { text: "Method of providing site location" },
+    value: { text: "File upload" if params.coordinatesType === "file" else "Enter the coordinates of the site manually" }
+  }]
+}) }}

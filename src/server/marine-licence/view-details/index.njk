@@ -2,7 +2,9 @@
 {% from "govuk/components/back-link/macro.njk" import govukBackLink %}
 {% from "marine-licence/other-permissions-card/macro.njk" import appMarineLicenceOtherPermissionsCard %}
 {% from "marine-licence/project-details-card/macro.njk" import appMarineLicenceProjectDetailsCard %}
+{% from "marine-licence/site-location-card/macro.njk" import appMarineLicenceSiteLocationCard %}
 {% from "marine-licence/site-details-card/macro.njk" import appMarineLicenceSiteDetailsCard %}
+{% from "marine-licence/activity-details-card/macro.njk" import appMarineLicenceActivityDetailsCard %}
 {% from "public-register-card/macro.njk" import appPublicRegisterCard %}
 
 {% block beforeContent %}
@@ -32,6 +34,30 @@
         isReadOnly: isReadOnly,
         preferredDates: preferredDates
       }) }}
+
+      {% if summaryData and summaryData.length %}
+        {{ appMarineLicenceSiteLocationCard({
+          coordinatesType: coordinatesType
+        }) }}
+
+        {% for site in summaryData %}
+          {{ appMarineLicenceSiteDetailsCard({
+            site: site,
+            loopIndex0: loop.index0,
+            coordinatesType: coordinatesType,
+            cspNonce: cspNonce
+          }) }}
+
+          {% for activityDetails in site.activityDetails %}
+            {{ appMarineLicenceActivityDetailsCard({
+              activityDetails: activityDetails,
+              siteNumber: site.siteNumber,
+              index: loop.index,
+              isReadOnly: true
+            }) }}
+          {% endfor %}
+        {% endfor %}
+      {% endif %}
 
       {% if isInternalUserView %}
         {{ appMarineLicenceSiteDetailsCard({

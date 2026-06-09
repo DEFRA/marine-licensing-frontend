@@ -94,10 +94,8 @@ describe('buildSiteLocationData', () => {
       sameActivityDates: 'No',
       sameActivityDescription: 'No',
       multipleSitesEnabled: false,
-      method: 'Upload a file with the coordinates of the site',
-      isFileUpload: true,
-      fileType: 'KML',
-      filename: 'test-site.kml'
+      method: 'File upload',
+      isFileUpload: true
     })
   })
 
@@ -129,10 +127,8 @@ describe('buildSiteLocationData', () => {
       sameActivityDates: 'Yes',
       sameActivityDescription: 'No',
       multipleSitesEnabled: true,
-      method: 'Upload a file with the coordinates of the site',
+      method: 'File upload',
       isFileUpload: true,
-      fileType: 'Shapefile',
-      filename: 'site-boundary.zip',
       activityDates: '1 February 2025 to 28 February 2025'
     })
   })

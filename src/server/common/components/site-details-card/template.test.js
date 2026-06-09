@@ -77,7 +77,7 @@ describe('Site Details Card Component', () => {
       test('should display correct card title', () => {
         const title = document.querySelector('.govuk-summary-card__title')
         expect(title).toBeTruthy()
-        expect(title.textContent.trim()).toBe('Site details')
+        expect(title.textContent.trim()).toBe('Site 1')
       })
 
       test('should show Change action when not read-only', () => {
@@ -86,7 +86,7 @@ describe('Site Details Card Component', () => {
         )
         expect(changeLink).toBeTruthy()
         expect(changeLink.textContent.replace(/\s+/g, ' ').trim()).toBe(
-          'Change ( Site details )'
+          'Change ( Site 1 )'
         )
         expect(changeLink.getAttribute('href')).toBe('#')
       })
@@ -200,7 +200,7 @@ describe('Site Details Card Component', () => {
 
       test('should display correct card title', () => {
         const title = document.querySelector('.govuk-summary-card__title')
-        expect(title.textContent.trim()).toBe('Site details')
+        expect(title.textContent.trim()).toBe('Site 1')
       })
 
       test('should show Change action when not read-only', () => {
@@ -209,7 +209,7 @@ describe('Site Details Card Component', () => {
         )
         expect(changeLink).toBeTruthy()
         expect(changeLink.textContent.replace(/\s+/g, ' ').trim()).toBe(
-          'Change ( Site details )'
+          'Change ( Site 1 )'
         )
       })
 
@@ -336,7 +336,7 @@ describe('Site Details Card Component', () => {
 
       test('should display correct card title', () => {
         const title = document.querySelector('.govuk-summary-card__title')
-        expect(title.textContent.trim()).toBe('Site details')
+        expect(title.textContent.trim()).toBe('Site 1')
       })
 
       test('should show Change action when not read-only', () => {
@@ -345,7 +345,7 @@ describe('Site Details Card Component', () => {
         )
         expect(changeLink).toBeTruthy()
         expect(changeLink.textContent.replace(/\s+/g, ' ').trim()).toBe(
-          'Change ( Site details )'
+          'Change ( Site 1 )'
         )
       })
 

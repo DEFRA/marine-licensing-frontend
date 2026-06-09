@@ -2,11 +2,7 @@
 {% from "site-details-map/macro.njk" import appSiteDetailsMap %}
 
 {% set cardTitle %}
-  {% if params.multipleSiteDetails and params.multipleSiteDetails.multipleSitesEnabled %}
-    Site {{ params.siteNumber }} details
-  {% else %}
-    Site details
-  {% endif %}
+  Site {{ params.siteNumber }}
 {% endset %}
 
 {% set siteDetailsRows = [] %}

@@ -48,7 +48,7 @@ describe('View Details (non-applicant ie internal user, or public)', () => {
     summaryCards: [
       'Project summary',
       'Providing the site location',
-      'Site details',
+      'Site 1',
       'Sharing project information publicly'
     ],
     pageCaption: savedExemption.applicationReference,

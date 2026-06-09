@@ -57,6 +57,18 @@ describe('Marine Licence Activity Details Card', () => {
     expect(html).toContain('Test hours')
   })
 
+  test('Should not show row-level actions when changeLink is provided', () => {
+    const $c = renderComponent('marine-licence/activity-details-card', {
+      ...baseParams,
+      changeLink:
+        '/marine-licence/review-site-details?from=check-your-answers#activity-details-site-1-activity-1'
+    })
+    expect($c('.govuk-summary-list__actions')).toHaveLength(0)
+    const cardActionsText = $c('.govuk-summary-card__actions a').text().trim()
+    expect(cardActionsText).toContain('Change')
+    expect(cardActionsText).toContain('Delete activity')
+  })
+
   test('Should display correct row labels', () => {
     const keys = $component('.govuk-summary-list__key')
       .toArray()

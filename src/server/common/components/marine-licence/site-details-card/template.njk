@@ -1,5 +1,73 @@
 {% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
+{% from "site-details-map/macro.njk" import appSiteDetailsMap %}
 
+{% set summaryRows = [] %}
+
+{% set _ = summaryRows.push({
+  key: { text: "Site name" },
+  value: { text: params.site.siteName }
+}) %}
+
+{% if params.coordinatesType === "coordinates" %}
+  {% set _ = summaryRows.push({
+    key: { text: "Single or multiple sets of coordinates" },
+    value: { text: params.site.method }
+  }) %}
+
+  {% set _ = summaryRows.push({
+    key: { text: "Coordinate system" },
+    value: { text: params.site.coordinateSystem | replace('\n', '<br>') | safe }
+  }) %}
+
+  {% if params.site.polygonCoordinates %}
+    {% for coordinate in params.site.polygonCoordinates %}
+      {% set _ = summaryRows.push({
+        classes: "" if loop.last else "govuk-summary-list__row--no-border",
+        key: { text: coordinate.label },
+        value: { text: coordinate.value }
+      }) %}
+    {% endfor %}
+  {% else %}
+    {% set _ = summaryRows.push({
+      key: { text: "Coordinates at centre of site" },
+      value: { text: params.site.coordinates }
+    }) %}
+
+    {% set _ = summaryRows.push({
+      key: { text: "Width of circular site" },
+      value: { text: params.site.width }
+    }) %}
+  {% endif %}
+{% endif %}
+
+{% set _ = summaryRows.push({
+  key: { text: "Map view" },
+  value: {
+    html: appSiteDetailsMap(params.site.siteDetailsData, params.loopIndex0),
+    classes: "govuk-summary-list__value--full-width"
+  }
+}) %}
+
+{% set siteCardHeading %}
+  Site {{ params.site.siteNumber }}
+{% endset %}
+
+{{ govukSummaryList({
+  card: {
+    attributes: { id: "site-details-" + params.site.siteNumber },
+    title: { text: siteCardHeading },
+    actions: {
+      items: [{
+        href: params.changeLink,
+        text: "Change",
+        visuallyHiddenText: "site " + params.site.siteNumber + " details",
+        classes: "govuk-link--no-visited-state"
+      }]
+    }
+  },
+  classes: "govuk-summary-list--full-width",
+  rows: summaryRows
+}) }}
 
 {% if params.isInternalUserView %}
   {% set csvAnchor %}
@@ -7,26 +75,27 @@
   {% endset %}
 {% endif %}
 
-{% set rows = [] %}
+{% if params.isInternalUserView %}
+  {% set rows = [] %}
 
-{% set rows = (rows.push({
-  key: {
-    text: "Location coordinates"
-  },
-  value: {
-    html: csvAnchor
-  }
-} if params.isInternalUserView), rows) %}
-
-
-{{ govukSummaryList({
-  card: {
-    title: {
-      text: "Providing the site location"
+  {% set rows = (rows.push({
+    key: {
+      text: "Location coordinates"
     },
-    attributes: {
-      id: "site-details-card"
+    value: {
+      html: csvAnchor
     }
-  },
-  rows: rows
-}) }}
+  }), rows) %}
+
+  {{ govukSummaryList({
+    card: {
+      title: {
+        text: "Providing the site location"
+      },
+      attributes: {
+        id: "site-details-card"
+      }
+    },
+    rows: rows
+  }) }}
+{% endif %}

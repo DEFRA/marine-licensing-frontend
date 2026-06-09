@@ -18,6 +18,7 @@ import { PROJECT_TYPE } from '#src/server/common/constants/projects.js'
 import { getUserSession } from '#src/server/common/plugins/auth/utils.js'
 import { USER_TYPES } from '#src/server/common/constants/user-types.js'
 import Boom from '@hapi/boom'
+import { RETURN_TO_CACHE_KEY } from '#src/server/common/constants/cache.js'
 
 export const TASK_LIST_VIEW_ROUTE = 'marine-licence/task-list/index'
 
@@ -28,8 +29,50 @@ const taskListViewSettings = {
   heading: headingText
 }
 
+function transformTaskLists(taskList, isCitizen) {
+  return {
+    otherPermissions: transformOtherPermissionsTaskList(taskList, isCitizen),
+    sharing: transformSharingTaskList(taskList),
+    projectDetails: transformProjectDetailsTaskList(taskList),
+    siteDetails: transformSiteDetailsTaskList(taskList),
+    waterFrameworkDirective: transformWaterFrameworkDirectiveTaskList(taskList)
+  }
+}
+
+async function updateLicenceSession(request, h, licenceData, hasCancel) {
+  const {
+    id: marineLicenceId,
+    projectName,
+    projectBackground,
+    specialLegalPowers,
+    preferredDates,
+    publicRegister,
+    publicConsultation,
+    otherAuthorities,
+    siteDetails,
+    waterFrameworkDirective
+  } = licenceData
+
+  await setMarineLicenceCache(request, h, {
+    id: marineLicenceId,
+    projectName,
+    projectBackground,
+    specialLegalPowers,
+    preferredDates,
+    publicRegister,
+    publicConsultation,
+    otherAuthorities,
+    siteDetails: hasCancel ? [] : siteDetails,
+    waterFrameworkDirective
+  })
+  await setProjectType(request, h, PROJECT_TYPE.MARINE_LICENCE)
+  await clearSingleSiteMode(request, h)
+}
+
 export const taskListController = {
   async handler(request, h) {
+    request.yar.flash(RETURN_TO_CACHE_KEY)
+
     const userSession = await getUserSession(
       request,
       request.state?.userSession
@@ -41,80 +84,37 @@ export const taskListController = {
       throw Boom.notFound('Marine licence not found')
     }
     const { id } = marineLicence
-
-    const { query } = request
-
-    const hasCancel = query?.cancel === 'site-details'
+    const hasCancel = request.query?.cancel === 'site-details'
 
     const { payload } = await authenticatedGetRequest(
       request,
       `/marine-licence/${id}`
     )
-
-    const {
-      id: marineLicenceId,
-      taskList,
-      projectName,
-      projectBackground,
-      specialLegalPowers,
-      preferredDates,
-      publicRegister,
-      publicConsultation,
-      otherAuthorities,
-      siteDetails,
-      waterFrameworkDirective
-    } = payload.value
-
+    const { taskList, projectName } = payload.value
     const { userRelationshipType } = userSession
 
-    const otherPermissionsTaskListTransformed =
-      transformOtherPermissionsTaskList(
-        taskList,
-        userRelationshipType === USER_TYPES.CITIZEN
-      )
-
-    const sharingTaskListTransformed = transformSharingTaskList(taskList)
-    const projectDetailsTaskListTransformed =
-      transformProjectDetailsTaskList(taskList)
-    const siteDetailsTaskListTransformed =
-      transformSiteDetailsTaskList(taskList)
-
-    const waterFrameworkDirectiveTaskListTransformed =
-      transformWaterFrameworkDirectiveTaskList(taskList)
-
-    await setMarineLicenceCache(request, h, {
-      id: marineLicenceId,
-      projectName,
-      projectBackground,
-      specialLegalPowers,
-      preferredDates,
-      publicRegister,
-      publicConsultation,
-      otherAuthorities,
-      siteDetails: hasCancel ? [] : siteDetails,
-      waterFrameworkDirective
-    })
-
-    await setProjectType(request, h, PROJECT_TYPE.MARINE_LICENCE)
-    await clearSingleSiteMode(request, h)
+    const transformed = transformTaskLists(
+      taskList,
+      userRelationshipType === USER_TYPES.CITIZEN
+    )
+    await updateLicenceSession(request, h, payload.value, hasCancel)
 
     const hasCompletedAllTasks = [
-      ...otherPermissionsTaskListTransformed,
-      ...sharingTaskListTransformed,
-      ...projectDetailsTaskListTransformed,
-      ...siteDetailsTaskListTransformed,
-      ...waterFrameworkDirectiveTaskListTransformed
+      ...transformed.otherPermissions,
+      ...transformed.sharing,
+      ...transformed.projectDetails,
+      ...transformed.siteDetails,
+      ...transformed.waterFrameworkDirective
     ].every((task) => task.status.text === 'Completed')
 
     return h.view(TASK_LIST_VIEW_ROUTE, {
       ...taskListViewSettings,
-      projectName: payload.value.projectName,
-      otherPermissionsTaskList: otherPermissionsTaskListTransformed,
-      sharingTaskList: sharingTaskListTransformed,
-      projectDetailsTaskList: projectDetailsTaskListTransformed,
-      siteDetailsTaskList: siteDetailsTaskListTransformed,
-      waterFrameworkDirectiveTaskList:
-        waterFrameworkDirectiveTaskListTransformed,
+      projectName,
+      otherPermissionsTaskList: transformed.otherPermissions,
+      sharingTaskList: transformed.sharing,
+      projectDetailsTaskList: transformed.projectDetails,
+      siteDetailsTaskList: transformed.siteDetails,
+      waterFrameworkDirectiveTaskList: transformed.waterFrameworkDirective,
       hasCompletedAllTasks
     })
   }

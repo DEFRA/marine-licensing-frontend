@@ -151,12 +151,10 @@ describe('siteDetails utils', () => {
             })
           ]),
           multipleSiteDetailsData: expect.objectContaining({
-            method: 'Upload a file with the coordinates of the site',
+            method: 'File upload',
             multipleSiteDetails: 'No',
             sameActivityDates: 'No',
-            sameActivityDescription: 'No',
-            fileType: 'KML',
-            filename: 'test-site.kml'
+            sameActivityDescription: 'No'
           })
         })
       )

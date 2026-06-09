@@ -9,7 +9,7 @@ describe('Site Location Card Component', () => {
         $component = renderComponent('site-location-card', {
           siteLocationData: {
             isFileUpload: true,
-            method: 'Upload a file with the coordinates of the site',
+            method: 'File upload',
             fileType: 'KML',
             filename: 'test-site.kml',
             multipleSiteDetails: 'No',
@@ -30,23 +30,13 @@ describe('Site Location Card Component', () => {
       })
 
       test('Should display method of providing site location', () => {
-        const htmlContent = $component.html()
-        expect(htmlContent).toContain('Method of providing site location')
-        expect(htmlContent).toContain(
-          'Upload a file with the coordinates of the site'
+        const methodRow = $component('.govuk-summary-list__row')
+        expect(methodRow.find('.govuk-summary-list__key').text().trim()).toBe(
+          'Method of providing site location'
         )
-      })
-
-      test('Should display file type', () => {
-        const htmlContent = $component.html()
-        expect(htmlContent).toContain('File type')
-        expect(htmlContent).toContain('KML')
-      })
-
-      test('Should display file uploaded', () => {
-        const htmlContent = $component.html()
-        expect(htmlContent).toContain('File uploaded')
-        expect(htmlContent).toContain('test-site.kml')
+        expect(methodRow.find('.govuk-summary-list__value').text().trim()).toBe(
+          'File upload'
+        )
       })
 
       test('Should show Change link when not read-only', () => {
@@ -61,7 +51,7 @@ describe('Site Location Card Component', () => {
         $component = renderComponent('site-location-card', {
           siteLocationData: {
             isFileUpload: true,
-            method: 'Upload a file with the coordinates of the site',
+            method: 'File upload',
             fileType: 'Shapefile',
             filename: 'site-boundary.shp',
             multipleSiteDetails: 'Yes',
@@ -75,13 +65,14 @@ describe('Site Location Card Component', () => {
         expect($component('#site-location-card')).toHaveLength(1)
       })
 
-      test('Should display all file upload fields', () => {
-        const htmlContent = $component.html()
-        expect(htmlContent).toContain('Method of providing site location')
-        expect(htmlContent).toContain('File type')
-        expect(htmlContent).toContain('Shapefile')
-        expect(htmlContent).toContain('File uploaded')
-        expect(htmlContent).toContain('site-boundary.shp')
+      test('Should display method of providing site location', () => {
+        const methodRow = $component('.govuk-summary-list__row')
+        expect(methodRow.find('.govuk-summary-list__key').text().trim()).toBe(
+          'Method of providing site location'
+        )
+        expect(methodRow.find('.govuk-summary-list__value').text().trim()).toBe(
+          'File upload'
+        )
       })
 
       test('Should not show Change link when read-only', () => {

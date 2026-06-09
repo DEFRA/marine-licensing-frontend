@@ -10,17 +10,17 @@ describe('journey self-service outcome route', () => {
     expect(server.route).toHaveBeenCalledWith([
       expect.objectContaining({
         method: 'GET',
-        path: '/journey/self-service/outcome/{outcomePath*}',
+        path: '/journey/self-service/c/{slug}/outcome/{outcomePath*}',
         options: expect.objectContaining({ auth: false })
       }),
       expect.objectContaining({
         method: 'POST',
-        path: '/journey/self-service/outcome/{outcomePath*}',
+        path: '/journey/self-service/c/{slug}/outcome/{outcomePath*}',
         options: expect.objectContaining({ auth: false })
       }),
       expect.objectContaining({
         method: 'GET',
-        path: '/journey/self-service/view-answers/{outcomeTypeId}/{outcomePath*}',
+        path: '/journey/self-service/c/{slug}/view-answers/{outcomeTypeId}/{outcomePath*}',
         options: expect.objectContaining({ auth: false })
       })
     ])

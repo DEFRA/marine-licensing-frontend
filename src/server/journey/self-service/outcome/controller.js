@@ -3,26 +3,27 @@ import {
   getOutcome,
   getOutcomeType,
   getOutcomeTypesForOutcome,
-  isIntermediateOutcome,
-  ROUTE_PREFIX
+  isIntermediateOutcome
 } from '#src/server/journey/self-service/services/journey-data.js'
-import {
-  getBackLink,
-  pushOutcomeSelection
-} from '#src/server/journey/self-service/services/session-answers.js'
+import { getBackLink } from '#src/server/journey/self-service/services/journey-answer-log.js'
 import { reportRuntimeIssue } from '#src/server/journey/self-service/services/data-quality.js'
 import {
   buildIntermediateView,
+  buildSnapshotPayload,
   buildTerminalMultiView,
   buildTerminalSingleView,
   classifyOutcome,
   outcomeRouteFromRequest
 } from '#src/server/journey/self-service/outcome/utils.js'
-import { iatAnswersService } from '#src/services/iat-answers-service/iat-answers.service.js'
-import { buildIatAnswersPayload } from '#src/server/journey/self-service/services/iat-answers-payload.js'
+import { iatContextService } from '#src/services/iat-service/iat-context.service.js'
+import { iatOutcomeDocumentService } from '#src/services/iat-service/iat-outcome-document.service.js'
 import { routes } from '#src/server/common/constants/routes.js'
 
 const VIEW_PATH = 'journey/self-service/outcome/index'
+
+function slugFromRequest(request) {
+  return request.params.slug
+}
 
 function loadOutcome(request) {
   const outcomeRoute = outcomeRouteFromRequest(request)
@@ -101,9 +102,36 @@ function logMissingHeadingIfNeeded(request, outcomeRoute, outcome) {
   )
 }
 
+function buildOutcomeAnswerPayload(outcomeRoute, outcome, outcomeType) {
+  const questionText =
+    outcomeType.text || outcome.heading || outcome.text || outcomeRoute
+  return {
+    questionRoute: outcomeRoute,
+    questionText,
+    answers: [
+      { id: outcomeType.id, text: outcomeType.heading ?? outcomeType.id }
+    ],
+    mcmsAppFormMapping: null
+  }
+}
+
+function renderTerminalSingle(request, h, baseModel, types) {
+  const [ot] = types
+  logEmptyTextIfNeeded(request, ot)
+  return h.view(VIEW_PATH, buildTerminalSingleView(baseModel, ot))
+}
+
+function renderTerminalMulti(request, h, baseModel, types) {
+  for (const ot of types) {
+    logEmptyTextIfNeeded(request, ot)
+  }
+  return h.view(VIEW_PATH, buildTerminalMultiView(baseModel, types))
+}
+
 export const outcomeController = {
   async handler(request, h) {
     const { outcomeRoute, outcome, types } = loadOutcomeForGet(request)
+    const slug = slugFromRequest(request)
     const classification = classifyOutcome(outcome)
     logMissingHeadingIfNeeded(request, outcomeRoute, outcome)
     const heading = outcome.heading ?? 'Result'
@@ -114,7 +142,8 @@ export const outcomeController = {
       pageTitle: heading,
       outcome,
       outcomeRoute,
-      backLink: getBackLink(request, outcomeRoute, 'outcome')
+      slug,
+      backLink: getBackLink(request, slug, outcomeRoute)
     }
 
     if (classification === 'intermediate') {
@@ -122,97 +151,103 @@ export const outcomeController = {
     }
 
     if (classification === 'terminal-single') {
-      const [ot] = types
-      logEmptyTextIfNeeded(request, ot)
-      return h.view(VIEW_PATH, buildTerminalSingleView(baseModel, ot))
+      return renderTerminalSingle(request, h, baseModel, types)
     }
 
-    for (const ot of types) {
-      logEmptyTextIfNeeded(request, ot)
-    }
-    return h.view(VIEW_PATH, buildTerminalMultiView(baseModel, types))
+    return renderTerminalMulti(request, h, baseModel, types)
   }
 }
 
-async function createAnswerDocOrThrow(request, outcomeRoute, outcomeTypeId) {
-  const payload = buildIatAnswersPayload(request, outcomeRoute, outcomeTypeId)
-  if (!payload) {
-    throw Boom.notFound('IAT answers payload could not be built')
-  }
-  let slug
-  try {
-    slug = await iatAnswersService.create(request, payload)
-  } catch (error) {
-    request.logger.warn(
-      {
-        event: {
-          action: 'iat-answers:save-failed',
-          reference: outcomeRoute,
-          reason: error.message
-        }
-      },
-      `IAT answers save failed for ${outcomeRoute}`
+function validateIntermediateChoice(
+  outcomeTypeId,
+  outcomeType,
+  outcome,
+  outcomeRoute,
+  request
+) {
+  const validChoice =
+    outcomeType &&
+    outcome.outcomeTypes.includes(outcomeTypeId) &&
+    outcomeType.nextQuestionRoute
+
+  if (!validChoice) {
+    reportRuntimeIssue(
+      request,
+      'invalid-outcome-selection',
+      outcomeRoute,
+      `If outcomeType '${outcomeTypeId}' should be selectable on ${outcomeRoute}, add it to outcomeTypes in self-service.json or fix the form payload`,
+      `POST ${outcomeRoute} rejected outcomeType '${outcomeTypeId}'`
     )
-    throw Boom.badImplementation('IAT answers save failed')
+    throw Boom.badRequest('Invalid outcome selection')
   }
-  if (!slug) {
-    throw Boom.badImplementation('IAT answers create returned no slug')
+}
+
+export const outcomePostController = {
+  async handler(request, h) {
+    const { outcomeRoute, outcome } = loadIntermediateOutcome(request)
+    const slug = slugFromRequest(request)
+
+    const outcomeTypeId = request.payload?.outcomeType
+    const outcomeType = outcomeTypeId ? getOutcomeType(outcomeTypeId) : null
+
+    validateIntermediateChoice(
+      outcomeTypeId,
+      outcomeType,
+      outcome,
+      outcomeRoute,
+      request
+    )
+
+    await iatContextService.patch(
+      request,
+      slug,
+      buildOutcomeAnswerPayload(outcomeRoute, outcome, outcomeType)
+    )
+
+    const target = outcomeType.nextQuestionRoute.replace(/^\//, '')
+    return h.redirect(`/journey/self-service/c/${slug}/${target}`)
   }
-  return slug
+}
+
+function validateOutcomeTypeId(
+  outcomeTypeId,
+  outcomeType,
+  outcome,
+  outcomeRoute,
+  request
+) {
+  if (!outcomeType || !outcome.outcomeTypes.includes(outcomeTypeId)) {
+    reportRuntimeIssue(
+      request,
+      'invalid-outcome-selection',
+      outcomeRoute,
+      `If outcomeType '${outcomeTypeId}' should be selectable on ${outcomeRoute}, add it to outcomeTypes in self-service.json or fix the trigger link`,
+      `GET view-answers ${outcomeRoute} rejected outcomeType '${outcomeTypeId}'`
+    )
+    throw Boom.badRequest('Invalid outcome selection')
+  }
 }
 
 export const outcomeViewAnswersController = {
   async handler(request, h) {
     const { outcomeRoute, outcome } = loadOutcome(request)
-
+    const slug = slugFromRequest(request)
     const outcomeTypeId = request.params.outcomeTypeId
     const outcomeType = outcomeTypeId ? getOutcomeType(outcomeTypeId) : null
-    if (!outcomeType || !outcome.outcomeTypes.includes(outcomeTypeId)) {
-      reportRuntimeIssue(
-        request,
-        'invalid-outcome-selection',
-        outcomeRoute,
-        `If outcomeType '${outcomeTypeId}' should be selectable on ${outcomeRoute}, add it to outcomeTypes in self-service.json or fix the trigger link`,
-        `GET view-answers ${outcomeRoute} rejected outcomeType '${outcomeTypeId}'`
-      )
-      throw Boom.badRequest('Invalid outcome selection')
-    }
 
-    const slug = await createAnswerDocOrThrow(
-      request,
+    validateOutcomeTypeId(
+      outcomeTypeId,
+      outcomeType,
+      outcome,
       outcomeRoute,
-      outcomeTypeId
+      request
     )
-    return h.redirect(`${routes.IAT_ANSWER}/${slug}`)
-  }
-}
 
-export const outcomePostController = {
-  handler(request, h) {
-    const { outcomeRoute, outcome } = loadIntermediateOutcome(request)
-
-    const outcomeTypeId = request.payload?.outcomeType
-    const outcomeType = outcomeTypeId ? getOutcomeType(outcomeTypeId) : null
-
-    const validChoice =
-      outcomeType &&
-      outcome.outcomeTypes.includes(outcomeTypeId) &&
-      outcomeType.nextQuestionRoute
-
-    if (!validChoice) {
-      reportRuntimeIssue(
-        request,
-        'invalid-outcome-selection',
-        outcomeRoute,
-        `If outcomeType '${outcomeTypeId}' should be selectable on ${outcomeRoute}, add it to outcomeTypes in self-service.json or fix the form payload`,
-        `POST ${outcomeRoute} rejected outcomeType '${outcomeTypeId}'`
-      )
-      throw Boom.badRequest('Invalid outcome selection')
+    const payload = buildSnapshotPayload(outcome, outcomeRoute, outcomeTypeId)
+    const minted = await iatOutcomeDocumentService.mint(request, slug, payload)
+    if (!minted?.slug) {
+      throw Boom.badImplementation('outcome-document mint returned no slug')
     }
-
-    pushOutcomeSelection(request, outcomeRoute, outcomeTypeId)
-
-    const target = outcomeType.nextQuestionRoute.replace(/^\//, '')
-    return h.redirect(`${ROUTE_PREFIX}/${target}`)
+    return h.redirect(routes.OUTCOME_DOCUMENT.replace('{slug}', minted.slug))
   }
 }

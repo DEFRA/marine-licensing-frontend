@@ -3,12 +3,17 @@ import { vi } from 'vitest'
 vi.mock('#src/server/journey/self-service/services/journey-data.js')
 
 import {
+  buildIntermediateView,
+  buildSnapshotPayload,
   buildTerminalMultiView,
   buildTerminalSingleView,
   classifyOutcome,
   ctaLabelFor
 } from '#src/server/journey/self-service/outcome/utils.js'
-import { getOutcomeTypesForOutcome } from '#src/server/journey/self-service/services/journey-data.js'
+import {
+  getDocumentPreambleText,
+  getOutcomeTypesForOutcome
+} from '#src/server/journey/self-service/services/journey-data.js'
 
 describe('#classifyOutcome', () => {
   test('returns "intermediate" when at least one outcomeType has nextQuestionRoute', () => {
@@ -96,13 +101,17 @@ describe('#buildTerminalSingleView — hasContinue', () => {
 })
 
 describe('#buildTerminalSingleView — viewAnswersUrl', () => {
-  test('builds /view-answers/<typeId>/<outcomeRoute-without-leading-slash>', () => {
+  test('builds /c/<slug>/view-answers/<typeId>/<outcomeRoute-without-leading-slash>', () => {
     const view = buildTerminalSingleView(
-      { heading: 'h', outcomeRoute: '/markers/ha-not-agreed' },
+      {
+        heading: 'h',
+        outcomeRoute: '/markers/ha-not-agreed',
+        slug: 'abcdefghijklmnopqrstuv'
+      },
       { id: 'WO_FOO' }
     )
     expect(view.viewAnswersUrl).toBe(
-      '/journey/self-service/view-answers/WO_FOO/markers/ha-not-agreed'
+      '/journey/self-service/c/abcdefghijklmnopqrstuv/view-answers/WO_FOO/markers/ha-not-agreed'
     )
   })
 })
@@ -115,5 +124,50 @@ describe('#buildTerminalMultiView — hasContinue per option', () => {
       { id: 'C', text: 'c', link: 'https://example.gov.uk/x.docx' }
     ])
     expect(view.options.map((o) => o.hasContinue)).toEqual([true, false, true])
+  })
+})
+
+describe('#buildSnapshotPayload — preamble', () => {
+  test('reads preamble from JSON via getDocumentPreambleText and freezes it into the payload', () => {
+    vi.mocked(getDocumentPreambleText).mockReturnValue('PREAMBLE-FROZEN')
+    vi.mocked(getOutcomeTypesForOutcome).mockReturnValue([
+      { id: 'X', module: 'M' }
+    ])
+    const payload = buildSnapshotPayload(
+      { heading: 'h', text: 't' },
+      '/some-outcome',
+      'X'
+    )
+    expect(payload.preamble).toBe('PREAMBLE-FROZEN')
+  })
+
+  test('falls back to empty string when JSON has no preamble', () => {
+    vi.mocked(getDocumentPreambleText).mockReturnValue(undefined)
+    vi.mocked(getOutcomeTypesForOutcome).mockReturnValue([
+      { id: 'X', module: 'M' }
+    ])
+    const payload = buildSnapshotPayload({}, '/some-outcome', 'X')
+    expect(payload.preamble).toBe('')
+  })
+
+  test("throws when the focused outcomeTypeId is not one of the outcome's outcomeTypes", () => {
+    vi.mocked(getOutcomeTypesForOutcome).mockReturnValue([
+      { id: 'A', module: 'M' },
+      { id: 'B', module: 'M' }
+    ])
+    expect(() =>
+      buildSnapshotPayload({}, '/some-outcome', 'NOT_IN_LIST')
+    ).toThrow(/Unknown outcomeTypeId: NOT_IN_LIST/)
+  })
+})
+
+describe('#buildIntermediateView — section ternary fallback', () => {
+  test('returns section: null when the outcome has no section field', () => {
+    const view = buildIntermediateView(
+      { heading: 'h', outcomeRoute: '/x', slug: 'abcdefghijklmnopqrstuv' },
+      { outcomeTypes: ['X'] }, // no `section`
+      [{ id: 'X', heading: 'opt' }]
+    )
+    expect(view.section).toBeNull()
   })
 })

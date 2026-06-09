@@ -121,6 +121,61 @@ export const mockExemptionMcmsContext = (
   }
 }
 
+const DEFAULT_TEST_SLUG = 'abcdefghijklmnopqrstuv'
+
+/**
+ * Configure the iat-context-service mocks for IAT integration tests.
+ * Pass in the mocked iatContextService (each test file does its own
+ * vi.mock for hoisting) and an optional config object.
+ *
+ * Returns: { slug, state, journeyUrl(path) }
+ */
+export const mockIatContext = (
+  iatContextService,
+  { slug = DEFAULT_TEST_SLUG, questionLog = [] } = {}
+) => {
+  const state = { slug, questionLog: [...questionLog] }
+  vi.mocked(iatContextService.create).mockResolvedValue(slug)
+  vi.mocked(iatContextService.get).mockImplementation(() =>
+    Promise.resolve({ slug: state.slug, questionLog: [...state.questionLog] })
+  )
+  vi.mocked(iatContextService.patch).mockImplementation(
+    (_req, _slug, answer) => {
+      const idx = state.questionLog.findIndex(
+        (e) => e.questionRoute === answer.questionRoute
+      )
+      const entry = { ...answer, answeredAt: new Date() }
+      if (idx === -1) {
+        state.questionLog = [...state.questionLog, entry]
+      } else {
+        state.questionLog = [...state.questionLog.slice(0, idx), entry]
+      }
+      return Promise.resolve({ questionLogLength: state.questionLog.length })
+    }
+  )
+  return {
+    slug,
+    state,
+    journeyUrl: (path) =>
+      `/journey/self-service/c/${slug}${path.startsWith('/') ? path : `/${path}`}`
+  }
+}
+
+/**
+ * Configure the iat-outcome-document-service mocks for IAT integration tests.
+ * Pass in the mocked iatOutcomeDocumentService and a snapshot doc.
+ */
+export const mockOutcomeDocument = (iatOutcomeDocumentService, doc) => {
+  vi.mocked(iatOutcomeDocumentService.mint).mockResolvedValue({
+    slug: doc.slug,
+    viewUrl: `/outcome-documents/${doc.slug}`,
+    snapshot: doc
+  })
+  vi.mocked(iatOutcomeDocumentService.get).mockImplementation((_req, s) =>
+    Promise.resolve(s === doc.slug ? doc : null)
+  )
+}
+
 export const mockMarineLicence = (m) => {
   vi.mocked(getMarineLicenceCache).mockImplementation(() => {
     if (m?.constructor === Error) {

@@ -77,7 +77,8 @@ describe('buildHandoffQueryString', () => {
     const qs = buildHandoffQueryString({
       questionLog,
       focusedOption,
-      answersUrl: 'https://fe.example/journey/self-service/outcome-document/ABC_123',
+      answersUrl:
+        'https://fe.example/journey/self-service/outcome-document/ABC_123',
       allowList: exemption
     })
     expect(qs).toBe(

@@ -128,3 +128,11 @@ describe('#checkYourAnswersContinueController', () => {
     expect(mockH.redirect).toHaveBeenCalledWith(routes.DECLARATION)
   })
 })
+
+describe('#checkYourAnswersContinueController', () => {
+  test('handler should redirect to declaration', async () => {
+    const mockH = { redirect: vi.fn() }
+    await checkYourAnswersContinueController.handler({}, mockH)
+    expect(mockH.redirect).toHaveBeenCalledWith(routes.DECLARATION)
+  })
+})

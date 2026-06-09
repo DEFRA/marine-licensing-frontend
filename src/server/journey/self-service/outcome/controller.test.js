@@ -218,7 +218,7 @@ describe('outcomeContinueController', () => {
   it('mints, builds the query string, and 302s to overrideCtaButtonUrl', async () => {
     iatOutcomeDocumentService.mint.mockResolvedValue({
       slug: 'B'.repeat(22),
-      answersUrl: `https://fe.example/outcome-documents/${'B'.repeat(22)}`
+      answersUrl: `https://fe.example/journey/self-service/outcome-document/${'B'.repeat(22)}`
     })
     const request = continueRequest(EXEMPTION_ROUTE, EXEMPTION_TYPE_ID, [
       {
@@ -238,7 +238,7 @@ describe('outcomeContinueController', () => {
     expect(location).toContain('ADV_TYPE=EXE')
     expect(location).toContain('ARTICLE=13')
     expect(location).toContain(
-      `pdfDownloadUrl=https%3A%2F%2Ffe.example%2Foutcome-documents%2F${'B'.repeat(22)}`
+      `pdfDownloadUrl=https%3A%2F%2Ffe.example%2Fjourney%2Fself-service%2Foutcome-document%2F${'B'.repeat(22)}`
     )
   })
 

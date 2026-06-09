@@ -108,7 +108,7 @@ describe('mcms-context schema', () => {
         expect(error.details[0].path).toEqual(['pdfDownloadUrl'])
       })
 
-      it('rejects a legacy-shaped path on a new self-hosted host (new hosts only serve /outcome-documents/{slug})', () => {
+      it('rejects a path with a leading context segment on a self-hosted host (self-hosted serves /journey/self-service/outcome-document/{slug} at root)', () => {
         const pdfDownloadUrl =
           'http://localhost:3000/x/journey/self-service/outcome-document/abc123'
         const { error } = paramsSchema.validate({
@@ -121,12 +121,12 @@ describe('mcms-context schema', () => {
       const NEW_SLUG_22 = 'B'.repeat(22)
 
       it.each([
-        `https://get-permission-for-marine-work.defra.gov.uk/outcome-documents/${NEW_SLUG_22}`,
-        `https://marine-licensing-frontend.dev.cdp-int.defra.cloud/outcome-documents/${NEW_SLUG_22}`,
-        `https://marine-licensing-frontend.test.cdp-int.defra.cloud/outcome-documents/${NEW_SLUG_22}`,
-        `https://marine-licensing-frontend.perf-test.cdp-int.defra.cloud/outcome-documents/${NEW_SLUG_22}`,
-        `http://marine-licensing-frontend.local:3000/outcome-documents/${NEW_SLUG_22}`,
-        `http://localhost:3000/outcome-documents/${NEW_SLUG_22}`
+        `https://get-permission-for-marine-work.defra.gov.uk/journey/self-service/outcome-document/${NEW_SLUG_22}`,
+        `https://marine-licensing-frontend.dev.cdp-int.defra.cloud/journey/self-service/outcome-document/${NEW_SLUG_22}`,
+        `https://marine-licensing-frontend.test.cdp-int.defra.cloud/journey/self-service/outcome-document/${NEW_SLUG_22}`,
+        `https://marine-licensing-frontend.perf-test.cdp-int.defra.cloud/journey/self-service/outcome-document/${NEW_SLUG_22}`,
+        `http://marine-licensing-frontend.local:3000/journey/self-service/outcome-document/${NEW_SLUG_22}`,
+        `http://localhost:3000/journey/self-service/outcome-document/${NEW_SLUG_22}`
       ])(
         'accepts new self-hosted outcome-document URL %s',
         (pdfDownloadUrl) => {
@@ -140,7 +140,7 @@ describe('mcms-context schema', () => {
 
       it('accepts a base64url slug containing an underscore (regression for the old [a-zA-Z0-9-] charset)', () => {
         const pdfDownloadUrl =
-          'https://get-permission-for-marine-work.defra.gov.uk/outcome-documents/ab_cd-EF1234567890123456'
+          'https://get-permission-for-marine-work.defra.gov.uk/journey/self-service/outcome-document/ab_cd-EF1234567890123456'
         const { error } = paramsSchema.validate({
           ...validBaseParams,
           pdfDownloadUrl
@@ -148,8 +148,17 @@ describe('mcms-context schema', () => {
         expect(error).toBeUndefined()
       })
 
+      it('rejects the removed /outcome-documents/{slug} path on a self-hosted host', () => {
+        const pdfDownloadUrl = `https://get-permission-for-marine-work.defra.gov.uk/outcome-documents/${NEW_SLUG_22}`
+        const { error } = paramsSchema.validate({
+          ...validBaseParams,
+          pdfDownloadUrl
+        })
+        expect(error).toBeDefined()
+      })
+
       it('rejects an unknown host', () => {
-        const pdfDownloadUrl = `https://evil.example.com/outcome-documents/${NEW_SLUG_22}`
+        const pdfDownloadUrl = `https://evil.example.com/journey/self-service/outcome-document/${NEW_SLUG_22}`
         const { error } = paramsSchema.validate({
           ...validBaseParams,
           pdfDownloadUrl

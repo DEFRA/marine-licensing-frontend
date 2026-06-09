@@ -77,7 +77,7 @@ describe('buildHandoffQueryString', () => {
     const qs = buildHandoffQueryString({
       questionLog,
       focusedOption,
-      answersUrl: 'https://fe.example/outcome-documents/ABC_123',
+      answersUrl: 'https://fe.example/journey/self-service/outcome-document/ABC_123',
       allowList: exemption
     })
     expect(qs).toBe(
@@ -85,7 +85,7 @@ describe('buildHandoffQueryString', () => {
         '&EXE_ACTIVITY_SUBTYPE_REMOVAL=maintenance' +
         '&ADV_TYPE=EXE' +
         '&ARTICLE=34' +
-        '&pdfDownloadUrl=https%3A%2F%2Ffe.example%2Foutcome-documents%2FABC_123'
+        '&pdfDownloadUrl=https%3A%2F%2Ffe.example%2Fjourney%2Fself-service%2Foutcome-document%2FABC_123'
     )
   })
 

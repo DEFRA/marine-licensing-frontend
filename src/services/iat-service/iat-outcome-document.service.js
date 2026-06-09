@@ -4,19 +4,21 @@ import {
 } from '#src/server/common/helpers/authenticated-requests.js'
 import { statusCodes } from '#src/server/common/constants/status-codes.js'
 
-const PATH = '/iat-answers'
-
-export const iatAnswersService = {
-  async create(request, body) {
-    const { payload } = await authenticatedPostRequest(request, PATH, body)
-    return payload?.value?.slug ?? null
+export const iatOutcomeDocumentService = {
+  async mint(request, contextSlug, payload) {
+    const { payload: response } = await authenticatedPostRequest(
+      request,
+      `/iat-contexts/${contextSlug}/outcome-documents`,
+      payload
+    )
+    return response?.value ?? null
   },
 
   async get(request, slug) {
     try {
       const { payload } = await authenticatedGetRequest(
         request,
-        `${PATH}/${slug}`
+        `/outcome-documents/${slug}`
       )
       return payload?.value ?? null
     } catch (error) {

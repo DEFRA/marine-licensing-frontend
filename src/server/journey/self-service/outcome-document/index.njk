@@ -41,7 +41,7 @@
             {{ entry.answers[0].text }}
           {% endif %}
         {% endset %}
-        {% set rows = (rows.push({ key: { text: entry.questionText }, value: { html: valueHtml } }), rows) %}
+        {% set rows = (rows.push({ key: { html: entry.questionText | sanitiseRichText }, value: { html: valueHtml } }), rows) %}
       {% endfor %}
 
       {{ govukSummaryList({ rows: rows }) }}

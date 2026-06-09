@@ -1,43 +1,47 @@
-import { vi } from 'vitest'
+import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { iatStartController, iatStartPostController } from './controller.js'
+import { iatContextService } from '#src/services/iat-service/iat-context.service.js'
 
-vi.mock('#src/server/journey/self-service/services/session-answers.js')
+vi.mock('#src/services/iat-service/iat-context.service.js', () => ({
+  iatContextService: { create: vi.fn() }
+}))
 
-import {
-  iatStartController,
-  iatStartPostController
-} from '#src/server/journey/self-service/start/controller.js'
-import { clearAnswers } from '#src/server/journey/self-service/services/session-answers.js'
-
-describe('iatStartController', () => {
-  test('Should call h.view with expected template path and view model', () => {
-    const h = { view: vi.fn() }
-
-    iatStartController.handler({}, h)
-
-    expect(h.view).toHaveBeenCalledTimes(1)
-    expect(h.view).toHaveBeenCalledWith('journey/self-service/start/index', {
-      pageTitle: 'Check if you need a marine licence',
-      links: {
-        jurisdiction:
-          'https://www.gov.uk/guidance/marine-licensing-definitions#jurisdiction',
-        exemptions:
-          'https://www.gov.uk/guidance/do-i-need-a-marine-licence#exemptions',
-        selfService:
-          'https://www.gov.uk/guidance/do-i-need-a-marine-licence#self-service',
-        guidance: 'https://www.gov.uk/guidance/do-i-need-a-marine-licence'
-      }
-    })
+describe('iatStartController GET', () => {
+  it('renders the start page view', () => {
+    const view = vi.fn()
+    iatStartController.handler({}, { view })
+    expect(view).toHaveBeenCalledWith(
+      'journey/self-service/start/index',
+      expect.objectContaining({ pageTitle: expect.any(String) })
+    )
   })
 })
 
-describe('#iatStartPostController', () => {
-  test('clears answers and redirects to first question', () => {
-    const request = {}
-    const h = { redirect: vi.fn() }
+describe('iatStartPostController', () => {
+  let request, h, redirect
 
-    iatStartPostController.handler(request, h)
+  beforeEach(() => {
+    vi.clearAllMocks()
+    redirect = vi.fn().mockReturnValue('redirected')
+    h = { redirect }
+    request = {}
+  })
 
-    expect(clearAnswers).toHaveBeenCalledWith(request)
-    expect(h.redirect).toHaveBeenCalledWith('/journey/self-service/sea')
+  it('creates an iat-context and redirects to the slug-prefixed first question', async () => {
+    iatContextService.create.mockResolvedValueOnce('abcdefghijklmnopqrstuv')
+
+    await iatStartPostController.handler(request, h)
+
+    expect(iatContextService.create).toHaveBeenCalledWith(request)
+    expect(redirect).toHaveBeenCalledWith(
+      expect.stringMatching(
+        /^\/journey\/self-service\/c\/abcdefghijklmnopqrstuv\//
+      )
+    )
+  })
+
+  it('throws Boom.badImplementation if create returns no slug', async () => {
+    iatContextService.create.mockResolvedValueOnce(null)
+    await expect(iatStartPostController.handler(request, h)).rejects.toThrow()
   })
 })

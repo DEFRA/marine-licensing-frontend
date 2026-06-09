@@ -2,6 +2,7 @@ import {
   apiRoutes,
   marineLicenceRoutes
 } from '#src/server/common/constants/routes.js'
+import { RETURN_TO_CACHE_KEY } from '#src/server/common/constants/cache.js'
 import { renderFileUploadReview, renderManualEntryReview } from './utils.js'
 import { getSiteDetailsBySite } from '#src/server/common/helpers/exemptions/session-cache/site-details-utils.js'
 import {
@@ -116,6 +117,12 @@ export const reviewSiteDetailsSubmitController = {
       return h.redirect(
         `${marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS}#activity-details-site-${siteNumber}-activity-${newActivityIndex}`
       )
+    }
+
+    const returnTo = request.yar.flash(RETURN_TO_CACHE_KEY)
+    const redirectPath = Array.isArray(returnTo) ? returnTo[0] : returnTo
+    if (redirectPath) {
+      return h.redirect(redirectPath)
     }
 
     return h.redirect(marineLicenceRoutes.MARINE_LICENCE_TASK_LIST)

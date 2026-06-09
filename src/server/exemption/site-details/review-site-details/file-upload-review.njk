@@ -37,22 +37,6 @@
                     value: {
                       text: multipleSiteDetailsData.method
                     }
-                },
-                {
-                    key: {
-                      text: "File type"
-                    },
-                    value: {
-                      text: multipleSiteDetailsData.fileType | default('')
-                    }
-                },
-                {
-                    key: {
-                      text: "File uploaded"
-                    },
-                    value: {
-                      text: multipleSiteDetailsData.filename | sanitiseFilename
-                    }
                 }
             ] %}
 
@@ -142,11 +126,6 @@
 
 
         {% for site in summaryData %}
-
-            {#  This javascript variable is only for testing purposes. #}
-            <script nonce='{{ cspNonce }}'>
-              var geoJSON{{loop.index}} = {{ site.geoJSON | dump | safe }};
-            </script>
 
           {% set summaryRowsHeading %}
             {% if isMultiSiteJourney %}

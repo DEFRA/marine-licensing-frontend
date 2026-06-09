@@ -156,7 +156,7 @@ describe('check your answers controller', () => {
       const mockProcessedSiteDetails = [
         {
           isFileUpload: true,
-          method: 'Upload a file with the coordinates of the site',
+          method: 'File upload',
           fileType: 'KML',
           filename: 'test.kml'
         }
@@ -197,7 +197,7 @@ describe('check your answers controller', () => {
       const mockProcessedSiteDetails = [
         {
           isFileUpload: true,
-          method: 'Upload a file with the coordinates of the site',
+          method: 'File upload',
           fileType: 'Shapefile',
           filename: 'Unknown file'
         }

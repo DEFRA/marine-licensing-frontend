@@ -95,6 +95,9 @@ describe('session-strategy', () => {
           true
         )
         expect(result).toBe(routes.SIGNIN)
+
+        expect(mockRequest.yar.clear).toHaveBeenCalledWith('exemption')
+
         expect(cacheMcmsContextFromQueryParams).toHaveBeenCalledWith(
           mockRequest
         )

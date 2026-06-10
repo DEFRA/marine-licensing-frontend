@@ -27,6 +27,10 @@ export const createSessionStrategy = (server) => {
         if (request.query.ACTIVITY_TYPE) {
           // in case the user is not logged in and comes from the IAT tool / MCMS
           cacheMcmsContextFromQueryParams(request)
+
+          // Clear any existing exemption cache for logged out users
+          request.yar.clear(EXEMPTION_CACHE_KEY)
+
           request.yar.flash(redirectPathCacheKey, request.path, true)
         } else {
           request.yar.flash(redirectPathCacheKey, routes.DASHBOARD, true)

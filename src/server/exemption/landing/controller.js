@@ -3,11 +3,15 @@ import { routes } from '#src/server/common/constants/routes.js'
 import { cacheMcmsContextFromQueryParams } from '#src/server/common/helpers/mcms-context/cache-mcms-context.js'
 import { USER_TYPES } from '#src/server/common/constants/user-types.js'
 import { postloginUserSession } from '#src/server/common/helpers/defraid-login/session-cache.js'
+import { clearExemptionCache } from '#src/server/common/helpers/exemptions/session-cache/utils.js'
 
 export const exemptionLandingController = {
   async handler(request, h) {
     if (request.query.ACTIVITY_TYPE) {
       cacheMcmsContextFromQueryParams(request)
+
+      // Clear any existing exemption cache for logged in users
+      await clearExemptionCache(request, h)
     }
 
     const userSession = await getUserSession(

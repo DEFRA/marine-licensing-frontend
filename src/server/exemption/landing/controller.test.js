@@ -9,10 +9,12 @@ import {
 } from '~/tests/integration/shared/session-fixtures.js'
 import { getUserSession } from '~/src/server/common/plugins/auth/utils.js'
 import { cacheMcmsContextFromQueryParams } from '~/src/server/common/helpers/mcms-context/cache-mcms-context.js'
+import { clearExemptionCache } from '~/src/server/common/helpers/exemptions/session-cache/utils.js'
 
 vi.mock('~/src/server/common/plugins/auth/utils.js')
 vi.mock('~/src/server/common/helpers/mcms-context/cache-mcms-context.js')
 vi.mock('~/src/server/common/helpers/defraid-login/session-cache.js')
+vi.mock('~/src/server/common/helpers/exemptions/session-cache/utils.js')
 
 describe('#exemptionLanding', () => {
   const getServer = setupTestServer()
@@ -68,6 +70,8 @@ describe('#exemptionLanding', () => {
       })
 
       expect(cacheMcmsContextFromQueryParams).toHaveBeenCalledTimes(1)
+
+      expect(clearExemptionCache).toHaveBeenCalledTimes(1)
     })
 
     test('Should not call cacheMcmsContextFromQueryParams when ACTIVITY_TYPE is absent', async () => {

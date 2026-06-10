@@ -731,6 +731,30 @@ describe('view details controller', () => {
       )
     })
 
+    test('renders the "View answers" new-tab link for our own answers URL', async () => {
+      mockExemptionService.getExemptionById.mockResolvedValue(
+        createSubmittedExemption({
+          mcmsContext: {
+            activity: { label: 'Deposit of a substance or object' },
+            articleCode: '17',
+            pdfDownloadUrl:
+              'https://get-permission-for-marine-work.defra.gov.uk/journey/self-service/outcome-document/BBBBBBBBBBBBBBBBBBBBBB',
+            iatQueryString: '?x=1'
+          }
+        })
+      )
+
+      const response = await makeGetRequest({
+        url: '/exemption/view-details/507f1f77bcf86cd799439011',
+        server: getServer()
+      })
+
+      expect(response.statusCode).toBe(200)
+      expect(response.payload).toContain('View answers (opens in a new tab)')
+      expect(response.payload).toContain('target="_blank"')
+      expect(response.payload).not.toContain('Download a copy')
+    })
+
     describe('acceptance criteria verification', () => {
       test('AC1 - View details route pattern validation', () => {
         const route = `/exemption/view-details/${validExemptionId}`

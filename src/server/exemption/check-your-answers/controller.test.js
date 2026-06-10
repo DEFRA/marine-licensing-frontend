@@ -126,6 +126,31 @@ describe('check your answers controller', () => {
     expect(response.payload).not.toContain('View answers (opens in a new tab)')
   })
 
+  test('renders the "View answers" new-tab link for our own answers URL', async () => {
+    const ourHostExemption = {
+      ...mockExemptionData,
+      mcmsContext: {
+        ...mockExemptionData.mcmsContext,
+        pdfDownloadUrl:
+          'https://get-permission-for-marine-work.defra.gov.uk/journey/self-service/outcome-document/BBBBBBBBBBBBBBBBBBBBBB'
+      }
+    }
+    mockExemption(ourHostExemption)
+    vi.spyOn(exemptionServiceModule, 'getExemptionService').mockReturnValue({
+      getExemptionById: vi.fn().mockResolvedValue(ourHostExemption)
+    })
+
+    const response = await makeGetRequest({
+      url: '/exemption/check-your-answers',
+      server: getServer()
+    })
+
+    expect(response.statusCode).toBe(200)
+    expect(response.payload).toContain('View answers (opens in a new tab)')
+    expect(response.payload).toContain('target="_blank"')
+    expect(response.payload).not.toContain('Download a copy')
+  })
+
   describe('Controller error handling edge cases', () => {
     test('Should handle GET request with missing exemption cache', async () => {
       mockExemption(null)

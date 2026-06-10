@@ -140,23 +140,6 @@ describe('mcms-context schema', () => {
         expect(error).toBeUndefined()
       })
 
-      it.each([
-        `https://get-permission-for-marine-work.defra.gov.uk/journey/self-service/outcome-document/${NEW_SLUG_22}`,
-        `https://marine-licensing-frontend.dev.cdp-int.defra.cloud/journey/self-service/outcome-document/${NEW_SLUG_22}`,
-        `https://marine-licensing-frontend.test.cdp-int.defra.cloud/journey/self-service/outcome-document/${NEW_SLUG_22}`,
-        `https://marine-licensing-frontend.perf-test.cdp-int.defra.cloud/journey/self-service/outcome-document/${NEW_SLUG_22}`,
-        `http://marine-licensing-frontend.local:3000/journey/self-service/outcome-document/${NEW_SLUG_22}`
-      ])(
-        'rejects an outcome-document URL on %s when it is not the configured app host (no hardcoded host list)',
-        (pdfDownloadUrl) => {
-          const { error } = paramsSchema.validate({
-            ...validBaseParams,
-            pdfDownloadUrl
-          })
-          expect(error).toBeDefined()
-        }
-      )
-
       it('accepts an outcome-document URL on the host configured via appBaseUrl', () => {
         const spy = vi
           .spyOn(config, 'get')

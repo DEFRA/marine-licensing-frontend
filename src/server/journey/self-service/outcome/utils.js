@@ -1,4 +1,5 @@
 import {
+  getDocumentPreambleText,
   getOutcomeTypesForOutcome,
   getSection
 } from '#src/server/journey/self-service/services/journey-data.js'
@@ -34,9 +35,9 @@ export function hasContinueFor(outcomeType) {
   )
 }
 
-function viewAnswersUrlFor(outcomeRoute, outcomeTypeId) {
+function viewAnswersUrlFor(slug, outcomeRoute, outcomeTypeId) {
   const tail = outcomeRoute.replace(/^\//, '')
-  return `/journey/self-service/view-answers/${outcomeTypeId}/${tail}`
+  return `/journey/self-service/c/${slug}/view-answers/${outcomeTypeId}/${tail}`
 }
 
 export function buildIntermediateView(baseModel, outcome, types) {
@@ -50,7 +51,11 @@ export function buildIntermediateView(baseModel, outcome, types) {
       text: ot.text,
       isTerminal: !ot.nextQuestionRoute,
       ctaLabel: ctaLabelFor(ot),
-      viewAnswersUrl: viewAnswersUrlFor(baseModel.outcomeRoute, ot.id)
+      viewAnswersUrl: viewAnswersUrlFor(
+        baseModel.slug,
+        baseModel.outcomeRoute,
+        ot.id
+      )
     }))
   }
 }
@@ -61,7 +66,40 @@ export function buildTerminalSingleView(baseModel, terminalType) {
     body: terminalType.text,
     ctaLabel: ctaLabelFor(terminalType),
     hasContinue: hasContinueFor(terminalType),
-    viewAnswersUrl: viewAnswersUrlFor(baseModel.outcomeRoute, terminalType.id)
+    viewAnswersUrl: viewAnswersUrlFor(
+      baseModel.slug,
+      baseModel.outcomeRoute,
+      terminalType.id
+    )
+  }
+}
+
+function buildFocusedOption(focused) {
+  return {
+    id: focused.id,
+    heading: focused.heading ?? '',
+    text: focused.text ?? '',
+    module: focused.module ?? null,
+    link: focused.link ?? null,
+    overrideCtaButtonUrl: focused.overrideCtaButtonUrl ?? null,
+    params: focused.params ?? null
+  }
+}
+
+export function buildSnapshotPayload(outcome, outcomeRoute, outcomeTypeId) {
+  const all = getOutcomeTypesForOutcome(outcome)
+  const focused = all.find((ot) => ot.id === outcomeTypeId)
+  if (!focused) {
+    throw new Error(`Unknown outcomeTypeId: ${outcomeTypeId}`)
+  }
+
+  return {
+    preamble: getDocumentPreambleText() ?? '',
+    outcomeRoute,
+    outcomeKind: classifyOutcome(outcome),
+    outcomeHeading: outcome.heading ?? '',
+    outcomeText: outcome.text ?? '',
+    focusedOption: buildFocusedOption(focused)
   }
 }
 
@@ -74,7 +112,11 @@ export function buildTerminalMultiView(baseModel, types) {
       text: ot.text,
       ctaLabel: ctaLabelFor(ot),
       hasContinue: hasContinueFor(ot),
-      viewAnswersUrl: viewAnswersUrlFor(baseModel.outcomeRoute, ot.id)
+      viewAnswersUrl: viewAnswersUrlFor(
+        baseModel.slug,
+        baseModel.outcomeRoute,
+        ot.id
+      )
     }))
   }
 }

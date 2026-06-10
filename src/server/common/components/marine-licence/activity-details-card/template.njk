@@ -10,7 +10,7 @@
 {% set _ = rows.push({
     key: { text: "Type of activity"},
     value: { html: appIncompleteField({text:params.activityDetails.activitySubType})},
-    actions: setSiteDetailsAction(params.activityDetails.activitySubType, 'type-of-activity', params.siteNumber, "", { skipAction: true, activityNumber: params.index }) if not params.changeLink
+    actions: setSiteDetailsAction(params.activityDetails.activitySubType, 'type-of-activity', params.siteNumber, "", { skipAction: true, activityNumber: params.index }) if not params.changeLink and not params.isReadOnly
 }) %}
 
 {% if params.activityDetails.activityHeading %}
@@ -26,38 +26,38 @@
   {% set _ = rows.push({
       key: { text: params.activityDetails.activityHeading},
       value: { html: activityList },
-      actions: setSiteDetailsAction(true,  params.activityDetails.activityLink, params.siteNumber, "", { activityNumber: params.index }) if not params.changeLink
+      actions: setSiteDetailsAction(true,  params.activityDetails.activityLink, params.siteNumber, "", { activityNumber: params.index }) if not params.changeLink and not params.isReadOnly
   }) %}
 {% endif %}
 
 {% set _ = rows.push({
     key: { text: "Activity description"},
     value: { html: appIncompleteField({text:params.activityDetails.activityDescription})},
-    actions: setSiteDetailsAction(params.activityDetails.activityDescription, 'activity-description', params.siteNumber, "", { skipAction: true, activityNumber: params.index }) if not params.changeLink
+    actions: setSiteDetailsAction(params.activityDetails.activityDescription, 'activity-description', params.siteNumber, "", { skipAction: true, activityNumber: params.index }) if not params.changeLink and not params.isReadOnly
 }) %}
 
 {% set _ = rows.push({
     key: { text: "Maximum duration of activity"},
     value: { html: appIncompleteField({text:params.activityDetails.activityDuration})},
-    actions: setSiteDetailsAction(params.activityDetails.activityDuration, 'activity-duration', params.siteNumber, "", { skipAction: true, activityNumber: params.index }) if not params.changeLink
+    actions: setSiteDetailsAction(params.activityDetails.activityDuration, 'activity-duration', params.siteNumber, "", { skipAction: true, activityNumber: params.index }) if not params.changeLink and not params.isReadOnly
 }) %}
 
 {% set _ = rows.push({
     key: { text: "Completion date"},
     value: { html: appIncompleteField({text:params.activityDetails.completionDate})},
-    actions: setSiteDetailsAction(params.activityDetails.completionDate, 'completion-date', params.siteNumber, "", { skipAction: true, activityNumber: params.index }) if not params.changeLink
+    actions: setSiteDetailsAction(params.activityDetails.completionDate, 'completion-date', params.siteNumber, "", { skipAction: true, activityNumber: params.index }) if not params.changeLink and not params.isReadOnly
 }) %}
 
 {% set _ = rows.push({
     key: { text: "Activity limited to specific months"},
     value: { html: appIncompleteField({text:params.activityDetails.activityMonths})},
-    actions: setSiteDetailsAction(params.activityDetails.activityMonths, 'months-of-activity', params.siteNumber, "", { skipAction: true, activityNumber: params.index }) if not params.changeLink
+    actions: setSiteDetailsAction(params.activityDetails.activityMonths, 'months-of-activity', params.siteNumber, "", { skipAction: true, activityNumber: params.index }) if not params.changeLink and not params.isReadOnly
 }) %}
 
 {% set _ = rows.push({
     key: { text: "Proposed working hours"},
     value: { html: appIncompleteField({text:params.activityDetails.workingHours})},
-    actions: setSiteDetailsAction(params.activityDetails.workingHours, 'working-hours', params.siteNumber, "", { skipAction: true, activityNumber: params.index }) if not params.changeLink
+    actions: setSiteDetailsAction(params.activityDetails.workingHours, 'working-hours', params.siteNumber, "", { skipAction: true, activityNumber: params.index }) if not params.changeLink and not params.isReadOnly
 }) %}
 
 

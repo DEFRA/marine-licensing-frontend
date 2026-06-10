@@ -1,13 +1,9 @@
-import {
-  getSection,
-  ROUTE_PREFIX
-} from '#src/server/journey/self-service/services/journey-data.js'
+import { getSection } from '#src/server/journey/self-service/services/journey-data.js'
 import { calculateNextRoute } from '#src/server/journey/self-service/services/journey-router.js'
 import {
-  getBackLink,
-  getAnswerForRoute,
-  pushAnswer
-} from '#src/server/journey/self-service/services/session-answers.js'
+  getSelectedAnswerIdsForRoute,
+  getBackLink
+} from '#src/server/journey/self-service/services/journey-answer-log.js'
 import { statusCodes } from '#src/server/common/constants/status-codes.js'
 import { reportRuntimeError } from '#src/server/journey/self-service/services/data-quality.js'
 import {
@@ -15,28 +11,69 @@ import {
   toArray,
   VIEW_PATH
 } from '#src/server/journey/self-service/question/utils.js'
+import { iatContextService } from '#src/services/iat-service/iat-context.service.js'
+
+function slugFromRequest(request) {
+  return request.params.slug
+}
+
+function redirectTargetFor(slug, next) {
+  const target = next.route.replace(/^\//, '')
+  const prefix = next.type === 'outcome' ? 'outcome/' : ''
+  return `/journey/self-service/c/${slug}/${prefix}${target}`
+}
+
+function buildErrorView(question, slug, request, questionRoute, isMulti) {
+  const errorText = isMulti ? 'Select at least one option' : 'Select an option'
+  const errorField = isMulti ? 'answers' : 'answer'
+  const section = question.section ? getSection(question.section) : null
+  return {
+    pageTitle: question.text,
+    question,
+    section,
+    backLink: getBackLink(request, slug, questionRoute),
+    errors: { [errorField]: { text: errorText } },
+    errorSummary: [{ text: errorText, href: `#${errorField}` }],
+    selectedAnswers: []
+  }
+}
+
+function buildAnswerPayload(question, questionRoute, submittedIds) {
+  const selected = submittedIds
+    .map((id) => question.answers?.find((a) => a.id === id))
+    .filter(Boolean)
+    .map((a) => ({ id: a.id, text: a.text }))
+
+  return {
+    questionRoute,
+    questionText: question.text,
+    answers: selected,
+    mcmsAppFormMapping: question.mcmsAppFormMapping ?? null
+  }
+}
 
 export const questionController = {
   handler(request, h) {
     const { questionRoute, question } = loadQuestion(request)
-
+    const slug = slugFromRequest(request)
     const section = question.section ? getSection(question.section) : null
 
     return h.view(VIEW_PATH, {
       pageTitle: question.text,
       question,
       section,
-      backLink: getBackLink(request, questionRoute, 'question'),
+      backLink: getBackLink(request, slug, questionRoute),
       selectedAnswers: question.multiSelect
         ? []
-        : getAnswerForRoute(request, questionRoute)
+        : getSelectedAnswerIdsForRoute(request, questionRoute)
     })
   }
 }
 
 export const questionPostController = {
-  handler(request, h) {
+  async handler(request, h) {
     const { questionRoute, question } = loadQuestion(request)
+    const slug = slugFromRequest(request)
 
     const isMulti = !!question.multiSelect
     const submittedIds = isMulti
@@ -44,25 +81,16 @@ export const questionPostController = {
       : toArray(request.payload?.answer)
 
     if (submittedIds.length === 0) {
-      const errorText = isMulti
-        ? 'Select at least one option'
-        : 'Select an option'
-      const errorField = isMulti ? 'answers' : 'answer'
-      const section = question.section ? getSection(question.section) : null
       return h
-        .view(VIEW_PATH, {
-          pageTitle: question.text,
-          question,
-          section,
-          backLink: getBackLink(request, questionRoute, 'question'),
-          errors: { [errorField]: { text: errorText } },
-          errorSummary: [{ text: errorText, href: `#${errorField}` }],
-          selectedAnswers: []
-        })
+        .view(
+          VIEW_PATH,
+          buildErrorView(question, slug, request, questionRoute, isMulti)
+        )
         .code(statusCodes.badRequest)
     }
 
-    pushAnswer(request, questionRoute, submittedIds)
+    const answer = buildAnswerPayload(question, questionRoute, submittedIds)
+    await iatContextService.patch(request, slug, answer)
 
     let next
     try {
@@ -78,9 +106,7 @@ export const questionPostController = {
       )
       throw err
     }
-    const target = next.route.replace(/^\//, '')
-    const prefix = next.type === 'outcome' ? 'outcome/' : ''
 
-    return h.redirect(`${ROUTE_PREFIX}/${prefix}${target}`)
+    return h.redirect(redirectTargetFor(slug, next))
   }
 }

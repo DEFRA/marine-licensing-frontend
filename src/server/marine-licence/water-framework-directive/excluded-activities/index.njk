@@ -1,0 +1,53 @@
+{% extends 'layouts/page.njk' %}
+{% from "govuk/components/back-link/macro.njk" import govukBackLink %}
+{% from "radio-page/macro.njk" import appRadioPage %}
+
+{% block beforeContent %}
+{{ super() }}
+<nav>
+  {{ govukBackLink({
+    text: "Back",
+    href: backLink
+  }) }}
+</nav>
+{% endblock %}
+
+{% block content %}
+
+  {% set excludedActivitiesHtml %}
+    <ul class="govuk-list govuk-list--bullet govuk-list--spaced">
+      <li>maintaining pumps at pumping stations - if you do it regularly, avoid low dissolved oxygen levels during maintenance and minimise silt movement when restarting the pumps</li>
+      <li>removing blockages or obstacles like litter or debris within 10m of an existing structure to maintain flow</li>
+      <li>replacing or removing existing pipes, cables or services crossing over a water body - but not including any new structure or supports, or new bed or bank reinforcement</li>
+      <li>'over water' replacement or repairs to, for example bridge, pier and jetty surfaces - if you minimise bank or bed disturbance</li>
+    </ul>
+  {% endset %}
+
+  {{ appRadioPage({
+    name: "excludedActivities",
+    errorSummary: errorSummary,
+    errors: errors,
+    heading: "Is your project limited to one of the following excluded activities?",
+    isPageHeading: true,
+    value: payload.excludedActivities,
+    errorMessage: errors['excludedActivities'],
+    projectName: projectName,
+    contentHtml: excludedActivitiesHtml,
+    items: [
+      {
+        value: "yes",
+        text: "Yes",
+        hint: {
+          text: "You do not need to complete a Water Framework Directive assessment"
+        }
+      },
+      {
+        value: "no",
+        text: "No"
+      }
+    ],
+    csrfToken: csrfToken,
+    cancelLink: cancelLink
+  }) }}
+
+{% endblock %}

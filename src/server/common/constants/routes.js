@@ -90,6 +90,10 @@ export const marineLicenceRoutes = {
     '/marine-licence/water-framework-directive-before-you-start',
   MARINE_LICENCE_WATER_FRAMEWORK_DIRECTIVE_NAUTICAL_MILE:
     '/marine-licence/water-framework-directive-nautical-mile',
+  MARINE_LICENCE_WATER_FRAMEWORK_DIRECTIVE_EXCLUDED_ACTIVITIES:
+    '/marine-licence/water-framework-directive-excluded-activities',
+  MARINE_LICENCE_WATER_FRAMEWORK_DIRECTIVE_PREVIOUS_ASSESSMENT:
+    '/marine-licence/water-framework-directive-previous-assessment',
   MARINE_LICENCE_PREFERRED_DATES: '/marine-licence/start-and-end-dates'
 }
 

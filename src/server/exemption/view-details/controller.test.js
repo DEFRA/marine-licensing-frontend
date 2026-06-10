@@ -708,6 +708,29 @@ describe('view details controller', () => {
       })
     })
 
+    test('renders the MCMS PDF link for an MCMS-hosted answers URL', async () => {
+      mockExemptionService.getExemptionById.mockResolvedValue(
+        createSubmittedExemption({
+          mcmsContext: {
+            activity: { label: 'Deposit of a substance or object' },
+            articleCode: '17',
+            pdfDownloadUrl:
+              'https://marinelicensingtest.marinemanagement.org.uk/mmofox5uat/journey/self-service/outcome-document/123',
+            iatQueryString: '?x=1'
+          }
+        })
+      )
+      const response = await makeGetRequest({
+        url: '/exemption/view-details/507f1f77bcf86cd799439011',
+        server: getServer()
+      })
+      expect(response.statusCode).toBe(200)
+      expect(response.payload).toContain('Download a copy of')
+      expect(response.payload).not.toContain(
+        'View answers (opens in a new tab)'
+      )
+    })
+
     describe('acceptance criteria verification', () => {
       test('AC1 - View details route pattern validation', () => {
         const route = `/exemption/view-details/${validExemptionId}`

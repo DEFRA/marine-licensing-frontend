@@ -116,6 +116,16 @@ describe('check your answers controller', () => {
     expect(statusCode).toBe(200)
   })
 
+  test('renders the MCMS PDF link for an MCMS-hosted answers URL', async () => {
+    const response = await makeGetRequest({
+      url: '/exemption/check-your-answers',
+      server: getServer()
+    })
+    expect(response.statusCode).toBe(200)
+    expect(response.payload).toContain('Download a copy of')
+    expect(response.payload).not.toContain('View answers (opens in a new tab)')
+  })
+
   describe('Controller error handling edge cases', () => {
     test('Should handle GET request with missing exemption cache', async () => {
       mockExemption(null)

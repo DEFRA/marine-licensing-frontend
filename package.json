@@ -108,13 +108,13 @@
     "source-map-loader": "^5.0.0",
     "stylelint": "^16.26.0",
     "stylelint-config-gds": "^2.0.0",
-    "terser-webpack-plugin": "^5.6.0",
+    "terser-webpack-plugin": "^5.6.1",
     "vitest": "^4.1.7",
     "vitest-axe": "^0.1.0",
     "vitest-fetch-mock": "^0.4.5",
-    "webpack": "^5.107.1",
+    "webpack": "^5.107.2",
     "webpack-assets-manifest": "6.5.2",
-    "webpack-cli": "7.0.2"
+    "webpack-cli": "7.0.3"
   },
   "overrides": {
     "minimatch": "10.2.4",

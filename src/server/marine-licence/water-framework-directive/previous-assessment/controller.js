@@ -76,6 +76,12 @@ export const previousAssessmentSubmitController = {
       previousAssessment
     )
 
+    if (previousAssessment === 'yes') {
+      return h.redirect(
+        marineLicenceRoutes.MARINE_LICENCE_WATER_FRAMEWORK_DIRECTIVE_ASSESSMENT_CHANGED
+      )
+    }
+
     return h.redirect(
       marineLicenceRoutes.MARINE_LICENCE_WATER_FRAMEWORK_DIRECTIVE_PREVIOUS_ASSESSMENT
     )

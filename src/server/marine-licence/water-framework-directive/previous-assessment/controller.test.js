@@ -68,7 +68,7 @@ describe('#previousAssessment', () => {
         'yes'
       )
       expect(h.redirect).toHaveBeenCalledWith(
-        marineLicenceRoutes.MARINE_LICENCE_WATER_FRAMEWORK_DIRECTIVE_PREVIOUS_ASSESSMENT
+        marineLicenceRoutes.MARINE_LICENCE_WATER_FRAMEWORK_DIRECTIVE_ASSESSMENT_CHANGED
       )
     })
 

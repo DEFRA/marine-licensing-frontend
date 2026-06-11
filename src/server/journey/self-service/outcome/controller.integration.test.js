@@ -394,13 +394,17 @@ describe('GET terminal-single', () => {
     )
   })
 
-  test('renders one Continue button (page-level, href="#")', async () => {
+  test('renders one Continue button linking to the exemption handoff continue route', async () => {
     const { document } = await getPage(journey.journeyUrl(SINGLE_PATH))
     const continueButtons = Array.from(
       document.querySelectorAll('a.govuk-button:not(.govuk-button--secondary)')
     ).filter((a) => a.textContent.trim() === 'Continue')
     expect(continueButtons).toHaveLength(1)
-    expect(continueButtons[0].getAttribute('href')).toBe('#')
+    expect(continueButtons[0].getAttribute('href')).toBe(
+      journey.journeyUrl(
+        '/continue/WO_EXE_AVAILABLE_ARTICLE_25A/exemption/licence-not-required-exemption-available-article-25A'
+      )
+    )
   })
 
   test('renders a single "View answers" link with the per-option trigger URL', async () => {
@@ -770,5 +774,39 @@ describe('GET /view-answers/:outcomeTypeId/:outcomePath', () => {
     })
     expect(response.statusCode).toBe(statusCodes.notFound)
     expect(iatOutcomeDocumentService.mint).not.toHaveBeenCalled()
+  })
+})
+
+describe('#outcomeContinueController (integration)', () => {
+  config.set('selfService.enabled', true)
+  const getServer = setupTestServer()
+
+  let journey
+
+  beforeEach(() => {
+    journey = mockIatContext(iatContextService)
+    iatOutcomeDocumentService.mint.mockResolvedValue({
+      slug: NEW_SLUG,
+      answersUrl: `https://fe.example/outcome-documents/${NEW_SLUG}`
+    })
+  })
+
+  it('302s an exemption Continue to overrideCtaButtonUrl with the query string', async () => {
+    const route =
+      'exemption/licence-not-required-exemption-available-article-13'
+    const url = `/journey/self-service/c/${journey.slug}/continue/WO_EXE_AVAILABLE_ARTICLE_13/${route}`
+
+    const response = await makeGetRequest({ url, server: getServer() })
+
+    expect(response.statusCode).toBe(statusCodes.redirect)
+    expect(response.headers.location).toContain(
+      '/guidance/who-is-the-exemption-for/?'
+    )
+    expect(response.headers.location).not.toContain(
+      'get-permission-for-marine-work.defra.gov.uk'
+    )
+    expect(response.headers.location).toContain('ADV_TYPE=EXE')
+    expect(response.headers.location).toContain('ARTICLE=13')
+    expect(response.headers.location).toContain('pdfDownloadUrl=')
   })
 })

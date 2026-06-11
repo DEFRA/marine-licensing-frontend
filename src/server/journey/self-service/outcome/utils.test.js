@@ -171,3 +171,44 @@ describe('#buildIntermediateView — section ternary fallback', () => {
     expect(view.section).toBeNull()
   })
 })
+
+describe('continueUrl wiring', () => {
+  const baseModel = { slug: 'S'.repeat(22), outcomeRoute: '/exemption/foo' }
+
+  it('sets continueUrl for an exemption outcomeType (has overrideCtaButtonUrl)', () => {
+    const view = buildTerminalSingleView(baseModel, {
+      id: 'WO_EXE_AVAILABLE_ARTICLE_13',
+      text: 'x',
+      overrideCtaButtonUrl: 'https://example.test/guidance',
+      overrideCtaButtonText: 'Continue'
+    })
+    expect(view.continueUrl).toBe(
+      `/journey/self-service/c/${'S'.repeat(22)}/continue/WO_EXE_AVAILABLE_ARTICLE_13/exemption/foo`
+    )
+  })
+
+  it('leaves continueUrl null for a non-exemption outcomeType', () => {
+    const view = buildTerminalSingleView(baseModel, {
+      id: 'WO_FAST_TRACK_MLA',
+      text: 'x',
+      module: 'MMO_APP2_CONTROL'
+    })
+    expect(view.continueUrl).toBeNull()
+  })
+
+  it('sets per-option continueUrl on terminal-multi exemption options', () => {
+    const view = buildTerminalMultiView(baseModel, [
+      {
+        id: 'WO_EXE_AVAILABLE_ARTICLE_13',
+        heading: 'h',
+        text: 't',
+        overrideCtaButtonUrl: 'https://example.test/guidance'
+      },
+      { id: 'WO_MOD_PERMISSION', heading: 'h2', text: 't2', module: null }
+    ])
+    expect(view.options[0].continueUrl).toBe(
+      `/journey/self-service/c/${'S'.repeat(22)}/continue/WO_EXE_AVAILABLE_ARTICLE_13/exemption/foo`
+    )
+    expect(view.options[1].continueUrl).toBeNull()
+  })
+})

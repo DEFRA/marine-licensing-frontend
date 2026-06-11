@@ -1,5 +1,6 @@
 import { paramsSchema } from './schema.js'
 import { mcmsAnswersDownloadUrl } from '~/src/server/test-helpers/mocks/mcms.js'
+import { config } from '#src/config/config.js'
 
 describe('mcms-context schema', () => {
   describe('paramsSchema validation and transformation', () => {
@@ -106,6 +107,79 @@ describe('mcms-context schema', () => {
         const { error } = paramsSchema.validate(params)
         expect(error).toBeDefined()
         expect(error.details[0].path).toEqual(['pdfDownloadUrl'])
+      })
+
+      it('rejects a path with a leading context segment on a self-hosted host (self-hosted serves /journey/self-service/outcome-document/{slug} at root)', () => {
+        const pdfDownloadUrl =
+          'http://localhost:3000/x/journey/self-service/outcome-document/abc123'
+        const { error } = paramsSchema.validate({
+          ...validBaseParams,
+          pdfDownloadUrl
+        })
+        expect(error).toBeDefined()
+      })
+
+      const NEW_SLUG_22 = 'B'.repeat(22)
+
+      it('accepts an outcome-document URL on the configured app host (default localhost)', () => {
+        const pdfDownloadUrl = `http://localhost:3000/journey/self-service/outcome-document/${NEW_SLUG_22}`
+        const { error } = paramsSchema.validate({
+          ...validBaseParams,
+          pdfDownloadUrl
+        })
+        expect(error).toBeUndefined()
+      })
+
+      it('accepts a base64url slug containing an underscore (regression for the old [a-zA-Z0-9-] charset)', () => {
+        const pdfDownloadUrl =
+          'http://localhost:3000/journey/self-service/outcome-document/ab_cd-EF1234567890123456'
+        const { error } = paramsSchema.validate({
+          ...validBaseParams,
+          pdfDownloadUrl
+        })
+        expect(error).toBeUndefined()
+      })
+
+      it('accepts an outcome-document URL on the host configured via appBaseUrl', () => {
+        const spy = vi
+          .spyOn(config, 'get')
+          .mockReturnValue(
+            'https://get-permission-for-marine-work.defra.gov.uk'
+          )
+        const pdfDownloadUrl = `https://get-permission-for-marine-work.defra.gov.uk/journey/self-service/outcome-document/${NEW_SLUG_22}`
+        const { error } = paramsSchema.validate({
+          ...validBaseParams,
+          pdfDownloadUrl
+        })
+        expect(error).toBeUndefined()
+        spy.mockRestore()
+      })
+
+      it('rejects the removed /outcome-documents/{slug} path on the app host', () => {
+        const pdfDownloadUrl = `http://localhost:3000/outcome-documents/${NEW_SLUG_22}`
+        const { error } = paramsSchema.validate({
+          ...validBaseParams,
+          pdfDownloadUrl
+        })
+        expect(error).toBeDefined()
+      })
+
+      it('rejects an unknown host', () => {
+        const pdfDownloadUrl = `https://evil.example.com/journey/self-service/outcome-document/${NEW_SLUG_22}`
+        const { error } = paramsSchema.validate({
+          ...validBaseParams,
+          pdfDownloadUrl
+        })
+        expect(error).toBeDefined()
+      })
+
+      it('rejects the app host with a non-outcome-document path', () => {
+        const pdfDownloadUrl = 'http://localhost:3000/not-a-document/123'
+        const { error } = paramsSchema.validate({
+          ...validBaseParams,
+          pdfDownloadUrl
+        })
+        expect(error).toBeDefined()
       })
     })
 

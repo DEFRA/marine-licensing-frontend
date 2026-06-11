@@ -2,7 +2,8 @@ import Joi from 'joi'
 import {
   outcomeController,
   outcomePostController,
-  outcomeViewAnswersController
+  outcomeViewAnswersController,
+  outcomeContinueController
 } from '#src/server/journey/self-service/outcome/controller.js'
 import { loadIatContext } from '#src/server/journey/self-service/services/load-iat-context.js'
 import { slugSchema } from '#src/server/journey/self-service/schemas/slug.js'
@@ -61,6 +62,16 @@ export const journeySelfServiceOutcome = {
             validate: { params: viewAnswersParamsSchema }
           },
           ...outcomeViewAnswersController
+        },
+        {
+          method: 'GET',
+          path: routes.IAT_OUTCOME_CONTINUE,
+          options: {
+            auth: false,
+            pre: [loadIatContext],
+            validate: { params: viewAnswersParamsSchema }
+          },
+          ...outcomeContinueController
         }
       ])
     }

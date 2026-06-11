@@ -11,7 +11,7 @@
     {% if option.hasContinue %}
       {{ govukButton({
         text: option.ctaLabel,
-        href: "#",
+        href: option.continueUrl or "#",
         classes: "govuk-!-margin-bottom-2"
       }) }}
     {% endif %}

@@ -12,6 +12,9 @@ import { getByRole } from '@testing-library/dom'
 import { statusCodes } from '~/src/server/common/constants/status-codes.js'
 
 vi.mock('~/src/services/cdp-upload-service/index.js')
+vi.mock(
+  '~/src/server/common/helpers/marine-licence/water-framework-directive/save-water-framework-directive.js'
+)
 
 describe('Upload and wait page (Water Framework Directive)', () => {
   const getServer = setupTestServer()

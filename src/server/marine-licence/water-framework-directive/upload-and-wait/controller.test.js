@@ -5,11 +5,15 @@ import * as mlCacheUtils from '#src/server/common/helpers/marine-licence/session
 import * as wfdCacheUtils from '#src/server/common/helpers/marine-licence/session-cache/water-framework-directive.js'
 import * as cdpUploadService from '#src/services/cdp-upload-service/index.js'
 import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
+import { saveWaterFrameworkDirectiveToBackend } from '#src/server/common/helpers/marine-licence/water-framework-directive/save-water-framework-directive.js'
 
 vi.mock('~/src/server/common/helpers/marine-licence/session-cache/utils.js')
 vi.mock('~/src/services/cdp-upload-service/index.js')
 vi.mock(
   '~/src/server/common/helpers/marine-licence/session-cache/water-framework-directive.js'
+)
+vi.mock(
+  '~/src/server/common/helpers/marine-licence/water-framework-directive/save-water-framework-directive.js'
 )
 
 vi.mock('~/src/server/common/helpers/logging/logger-options.js', () => ({
@@ -204,6 +208,10 @@ describe('#uploadAndWait', () => {
           h,
           'uploadConfig',
           null
+        )
+
+        expect(saveWaterFrameworkDirectiveToBackend).toHaveBeenCalledWith(
+          expect.any(Object)
         )
 
         expect(h.redirect).toHaveBeenCalledWith(

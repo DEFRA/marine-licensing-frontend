@@ -8,6 +8,7 @@ import {
   UPLOAD_AND_WAIT_VIEW_ROUTE,
   uploadAndWaitPageSettings
 } from '#src/server/common/helpers/file-upload/constants.js'
+import { saveWaterFrameworkDirectiveToBackend } from '#src/server/common/helpers/marine-licence/water-framework-directive/save-water-framework-directive.js'
 
 const fileUploadRoute =
   marineLicenceRoutes.MARINE_LICENCE_WATER_FRAMEWORK_DIRECTIVE_FILE_UPLOAD
@@ -39,6 +40,9 @@ const handleReadyStatus = async (status, request, h) => {
     s3Key: status.s3Location?.s3Key
   })
   await updateWaterFrameworkDirective(request, h, 'uploadConfig', null)
+
+  await saveWaterFrameworkDirectiveToBackend(request)
+
   return h.redirect(marineLicenceRoutes.MARINE_LICENCE_TASK_LIST)
 }
 

@@ -11,7 +11,7 @@ const ASSESSMENT_CHANGED_HEADING =
   'Has anything changed since your previous Water Framework Directive assessment?'
 
 export const errorMessages = {
-  WATER_FRAMEWORK_DIRECTIVE_ASSESSMENT_CHANGED_REQUIRED:
+  ASSESSMENT_CHANGED_REQUIRED:
     'Select whether anything has changed since your previous Water Framework Directive assessment'
 }
 
@@ -43,12 +43,9 @@ export const assessmentChangedSubmitController = {
     validate: {
       payload: joi.object({
         assessmentChanged: joi.string().valid('yes', 'no').required().messages({
-          'any.only':
-            errorMessages.WATER_FRAMEWORK_DIRECTIVE_ASSESSMENT_CHANGED_REQUIRED,
-          'string.empty':
-            errorMessages.WATER_FRAMEWORK_DIRECTIVE_ASSESSMENT_CHANGED_REQUIRED,
-          'any.required':
-            errorMessages.WATER_FRAMEWORK_DIRECTIVE_ASSESSMENT_CHANGED_REQUIRED
+          'any.only': errorMessages.ASSESSMENT_CHANGED_REQUIRED,
+          'string.empty': errorMessages.ASSESSMENT_CHANGED_REQUIRED,
+          'any.required': errorMessages.ASSESSMENT_CHANGED_REQUIRED
         })
       }),
       failAction: (request, h, err) => {

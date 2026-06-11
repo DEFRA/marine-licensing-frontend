@@ -86,6 +86,14 @@ describe('iatContextService', () => {
       )
     })
 
+    it('returns null when value missing in response', async () => {
+      authenticatedGetRequest.mockResolvedValue({
+        payload: { message: 'success' }
+      })
+      const doc = await iatContextService.get(request, slug)
+      expect(doc).toBeNull()
+    })
+
     it('returns null on Boom 404', async () => {
       authenticatedGetRequest.mockRejectedValue(
         Object.assign(new Error('Response Error: 404 Not Found'), {

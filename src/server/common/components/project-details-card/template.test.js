@@ -220,7 +220,7 @@ describe('Project Details Card Component', () => {
         })
       })
     })
-    describe('IAT answers link (ML-1299)', () => {
+    describe('IAT answers link', () => {
       const OUR_URL =
         'https://get-permission-for-marine-work.defra.gov.uk/journey/self-service/outcome-document/BBBBBBBBBBBBBBBBBBBBBB'
 

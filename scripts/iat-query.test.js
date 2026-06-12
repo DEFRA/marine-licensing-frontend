@@ -350,6 +350,15 @@ describe('iat-query', () => {
     })
   })
 
+  describe('usage', () => {
+    it('no subcommand prints self-teaching usage pointing at path and the README', () => {
+      const { stdout, code } = runCommand([])
+      expect(code).toBe(2)
+      expect(stdout).toContain('path')
+      expect(stdout).toContain('README.data.md')
+    })
+  })
+
   describe('error handling', () => {
     it('exits 2 for unknown subcommand', () => {
       const { stdout, code } = runCommand(['nonexistent'])

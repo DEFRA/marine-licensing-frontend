@@ -54,6 +54,28 @@ import {
 const EXCERPT_LEN = 60
 const MAX_TEXT_FOR_STRIP = 10000
 
+const USAGE = `iat-query — inspect the self-service IAT journey (self-service.json)
+
+Most common question — "how do I reach a page?":
+  npm run iat -- path /mod-permission           one shortest journey from /sea
+  npm run iat -- path /sea /mod-permission        between two routes
+  npm run iat -- reach /mod-permission            reachable? (exit 0/1)
+  npm run iat -- predecessors /activity/completion  pages that lead directly here
+
+Inspect a node:
+  question <route> | outcome <route> | outcome-type <id>
+
+List / filter:
+  outcomes | outcome-types | questions | mappings
+
+The journey is a graph of three node types (questions, outcomes,
+outcomeTypes). Routing happens four ways: single-select answers,
+multi-select pages (multiSelect.questionRoute / outcomeRoute), and
+outcome forks (outcomeType.nextQuestionRoute). All documented in:
+  src/server/journey/self-service/data/README.data.md
+
+Add --json to any subcommand for machine-readable output.`
+
 function excerpt(text) {
   if (!text) {
     return '-'
@@ -564,7 +586,7 @@ const DISPATCH = {
 export function runCommand(argv) {
   const [subcommand, ...rest] = argv
   if (!subcommand) {
-    return { stdout: 'Usage: iat-query <subcommand> [args] [--json]', code: 2 }
+    return { stdout: USAGE, code: 2 }
   }
   const handler = DISPATCH[subcommand]
   if (!handler) {
@@ -579,5 +601,5 @@ if (isMain) {
   const { stdout, code } = runCommand(process.argv.slice(2))
   // eslint-disable-next-line no-console
   console.log(stdout)
-  process.exit(code)
+  process.exitCode = code
 }

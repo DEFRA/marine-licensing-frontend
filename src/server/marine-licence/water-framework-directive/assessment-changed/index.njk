@@ -1,0 +1,47 @@
+{% extends 'layouts/page.njk' %}
+{% from "govuk/components/back-link/macro.njk" import govukBackLink %}
+{% from "radio-page/macro.njk" import appRadioPage %}
+
+{% block beforeContent %}
+{{ super() }}
+<nav>
+  {{ govukBackLink({
+    text: "Back",
+    href: backLink
+  }) }}
+</nav>
+{% endblock %}
+
+{% block content %}
+
+  {{ appRadioPage({
+    name: "assessmentChanged",
+    errorSummary: errorSummary,
+    errors: errors,
+    heading: "Has anything changed since your previous Water Framework Directive assessment?",
+    isPageHeading: true,
+    value: payload.assessmentChanged,
+    errorMessage: errors['assessmentChanged'],
+    projectName: projectName,
+    contentHtml: "<p class='govuk-body'>This includes changes to the method, size, scale, volume, depth, location or timings of the activity, or a pollution incident in the area.</p>",
+    items: [
+      {
+        value: "yes",
+        text: "Yes",
+        hint: {
+          text: "You will need to upload a new Water Framework Directive assessment"
+        }
+      },
+      {
+        value: "no",
+        text: "No",
+        hint: {
+          text: "You will need to upload the previous Water Framework Directive"
+        }
+      }
+    ],
+    csrfToken: csrfToken,
+    cancelLink: cancelLink
+  }) }}
+
+{% endblock %}

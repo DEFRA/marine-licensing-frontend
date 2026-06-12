@@ -1,27 +1,27 @@
 import { vi } from 'vitest'
 import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
 import {
-  previousAssessmentSubmitController,
-  PREVIOUS_ASSESSMENT_VIEW_ROUTE,
-  previousAssessmentController
-} from '#src/server/marine-licence/water-framework-directive/previous-assessment/controller.js'
+  assessmentChangedSubmitController,
+  ASSESSMENT_CHANGED_VIEW_ROUTE,
+  assessmentChangedController
+} from '#src/server/marine-licence/water-framework-directive/assessment-changed/controller.js'
 import * as cacheUtils from '#src/server/common/helpers/marine-licence/session-cache/utils.js'
 import * as wfdCache from '#src/server/common/helpers/marine-licence/session-cache/water-framework-directive.js'
 import { createMockH } from '#src/server/test-helpers/mocks/helpers.js'
 
 vi.mock('~/src/server/common/helpers/marine-licence/session-cache/utils.js')
 
-describe('#previousAssessment', () => {
+describe('#assessmentChanged', () => {
   const h = createMockH()
   const mockLicence = {
     projectName: 'Test Project',
     id: 'test-id',
-    waterFrameworkDirective: { previousAssessment: 'yes' }
+    waterFrameworkDirective: { assessmentChanged: 'yes' }
   }
 
   beforeEach(() => {
     vi.spyOn(wfdCache, 'updateWaterFrameworkDirective').mockResolvedValue({
-      previousAssessment: 'yes'
+      assessmentChanged: 'yes'
     })
     vi.spyOn(cacheUtils, 'getMarineLicenceCache').mockReturnValue(mockLicence)
   })
@@ -30,7 +30,7 @@ describe('#previousAssessment', () => {
     vi.restoreAllMocks()
   })
 
-  describe('#previousAssessmentController', () => {
+  describe('#assessmentChangedController', () => {
     test('Should correctly load page even without previous WFD data stored', async () => {
       const mockWithoutWfd = { ...mockLicence }
       delete mockWithoutWfd.waterFrameworkDirective
@@ -38,33 +38,33 @@ describe('#previousAssessment', () => {
         mockWithoutWfd
       )
 
-      await previousAssessmentController.handler({ query: {} }, h)
+      await assessmentChangedController.handler({ query: {} }, h)
 
-      expect(h.view).toHaveBeenCalledWith(PREVIOUS_ASSESSMENT_VIEW_ROUTE, {
+      expect(h.view).toHaveBeenCalledWith(ASSESSMENT_CHANGED_VIEW_ROUTE, {
         backLink:
-          marineLicenceRoutes.MARINE_LICENCE_WATER_FRAMEWORK_DIRECTIVE_EXCLUDED_ACTIVITIES,
+          marineLicenceRoutes.MARINE_LICENCE_WATER_FRAMEWORK_DIRECTIVE_PREVIOUS_ASSESSMENT,
         cancelLink: marineLicenceRoutes.MARINE_LICENCE_TASK_LIST,
         pageTitle:
-          'Do you have a previous Water Framework Directive assessment completed between 2015 and 2022 for this type of activity?',
+          'Has anything changed since your previous Water Framework Directive assessment?',
         heading:
-          'Do you have a previous Water Framework Directive assessment completed between 2015 and 2022 for this type of activity?',
+          'Has anything changed since your previous Water Framework Directive assessment?',
         projectName: mockLicence.projectName,
-        payload: { previousAssessment: undefined }
+        payload: { assessmentChanged: undefined }
       })
     })
   })
 
-  describe('#previousAssessmentSubmitController', () => {
-    test('Should update cache and redirect to previous assessment page on yes', async () => {
-      await previousAssessmentSubmitController.handler(
-        { payload: { previousAssessment: 'yes' }, query: {} },
+  describe('#assessmentChangedSubmitController', () => {
+    test('Should update cache and redirect to assessment changed page on yes', async () => {
+      await assessmentChangedSubmitController.handler(
+        { payload: { assessmentChanged: 'yes' }, query: {} },
         h
       )
 
       expect(wfdCache.updateWaterFrameworkDirective).toHaveBeenCalledWith(
         expect.any(Object),
         h,
-        'previousAssessment',
+        'assessmentChanged',
         'yes'
       )
       expect(h.redirect).toHaveBeenCalledWith(
@@ -72,39 +72,39 @@ describe('#previousAssessment', () => {
       )
     })
 
-    test('Should update cache and redirect to previous assessment page on no', async () => {
-      await previousAssessmentSubmitController.handler(
-        { payload: { previousAssessment: 'no' }, query: {} },
+    test('Should update cache and redirect to assessment changed page on no', async () => {
+      await assessmentChangedSubmitController.handler(
+        { payload: { assessmentChanged: 'no' }, query: {} },
         h
       )
 
       expect(wfdCache.updateWaterFrameworkDirective).toHaveBeenCalledWith(
         expect.any(Object),
         h,
-        'previousAssessment',
+        'assessmentChanged',
         'no'
       )
       expect(h.redirect).toHaveBeenCalledWith(
-        marineLicenceRoutes.MARINE_LICENCE_WATER_FRAMEWORK_DIRECTIVE_PREVIOUS_ASSESSMENT
+        marineLicenceRoutes.MARINE_LICENCE_WATER_FRAMEWORK_DIRECTIVE_ASSESSMENT_CHANGED
       )
     })
 
     test.each([
       {
         name: 'null error details',
-        payload: { previousAssessment: '' },
+        payload: { assessmentChanged: '' },
         err: { details: null },
         expectedExtra: {}
       },
       {
         name: 'missing error details',
-        payload: { previousAssessment: '' },
+        payload: { assessmentChanged: '' },
         err: {},
         expectedExtra: {}
       },
       {
-        name: 'invalid previous assessment value',
-        payload: { previousAssessment: 'invalid' },
+        name: 'invalid assessment changed value',
+        payload: { assessmentChanged: 'invalid' },
         err: {},
         expectedExtra: {}
       }
@@ -112,19 +112,19 @@ describe('#previousAssessment', () => {
       'Should correctly handle failAction with $name',
       ({ payload, err, expectedExtra }) => {
         const request = { payload }
-        previousAssessmentSubmitController.options.validate.failAction(
+        assessmentChangedSubmitController.options.validate.failAction(
           request,
           h,
           err
         )
-        expect(h.view).toHaveBeenCalledWith(PREVIOUS_ASSESSMENT_VIEW_ROUTE, {
+        expect(h.view).toHaveBeenCalledWith(ASSESSMENT_CHANGED_VIEW_ROUTE, {
           backLink:
-            marineLicenceRoutes.MARINE_LICENCE_WATER_FRAMEWORK_DIRECTIVE_EXCLUDED_ACTIVITIES,
+            marineLicenceRoutes.MARINE_LICENCE_WATER_FRAMEWORK_DIRECTIVE_PREVIOUS_ASSESSMENT,
           cancelLink: marineLicenceRoutes.MARINE_LICENCE_TASK_LIST,
           pageTitle:
-            'Do you have a previous Water Framework Directive assessment completed between 2015 and 2022 for this type of activity?',
+            'Has anything changed since your previous Water Framework Directive assessment?',
           heading:
-            'Do you have a previous Water Framework Directive assessment completed between 2015 and 2022 for this type of activity?',
+            'Has anything changed since your previous Water Framework Directive assessment?',
           projectName: mockLicence.projectName,
           payload,
           ...expectedExtra

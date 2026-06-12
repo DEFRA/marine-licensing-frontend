@@ -1,0 +1,81 @@
+import {
+  getQuestion,
+  getOutcome,
+  getOutcomeTypesForOutcome
+} from '../src/server/journey/self-service/services/journey-data.js'
+import { calculateNextRoute } from '../src/server/journey/self-service/services/journey-router.js'
+
+const HEADING_LEN = 50
+
+function truncate(text) {
+  if (!text) {
+    return ''
+  }
+  return text.length > HEADING_LEN ? text.slice(0, HEADING_LEN) + '…' : text
+}
+
+function safeNext(question, ids) {
+  try {
+    return calculateNextRoute(question, ids)
+  } catch {
+    return null
+  }
+}
+
+function multiSelectEdges(question) {
+  const { outcomeAnswerId } = question.multiSelect
+  const edges = []
+  const other = question.answers.find((a) => a.id !== outcomeAnswerId)
+  if (other) {
+    const next = safeNext(question, [other.id])
+    if (next) {
+      edges.push({
+        label: `tick any activity except "${outcomeAnswerId}"`,
+        to: next.route,
+        kind: next.type
+      })
+    }
+  }
+  const special = safeNext(question, [outcomeAnswerId])
+  if (special) {
+    edges.push({ label: `tick "${outcomeAnswerId}"`, to: special.route, kind: special.type })
+  }
+  return edges
+}
+
+function singleSelectEdges(question) {
+  const edges = []
+  for (const answer of question.answers) {
+    const next = safeNext(question, [answer.id])
+    if (next) {
+      edges.push({ label: `answer "${answer.text}"`, to: next.route, kind: next.type })
+    }
+  }
+  return edges
+}
+
+function outcomeForkEdges(outcome) {
+  const edges = []
+  for (const ot of getOutcomeTypesForOutcome(outcome)) {
+    if (ot.nextQuestionRoute) {
+      edges.push({
+        label: `continue: "${truncate(ot.heading)}"`,
+        to: ot.nextQuestionRoute,
+        kind: 'question'
+      })
+    }
+  }
+  return edges
+}
+
+export function edgesFrom(route) {
+  const question = getQuestion(route)
+  if (question) {
+    return question.multiSelect ? multiSelectEdges(question) : singleSelectEdges(question)
+  }
+  const outcome = getOutcome(route)
+  if (outcome) {
+    return outcomeForkEdges(outcome)
+  }
+  return []
+}

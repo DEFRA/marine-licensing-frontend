@@ -248,6 +248,12 @@ describe('Page accessibility checks (Axe)', () => {
         'Do you have a previous Water Framework Directive assessment completed between 2015 and 2022 for this type of activity?'
     },
     {
+      url: marineLicenceRoutes.MARINE_LICENCE_WATER_FRAMEWORK_DIRECTIVE_ASSESSMENT_CHANGED,
+      isMarineLicence: true,
+      title:
+        'Has anything changed since your previous Water Framework Directive assessment?'
+    },
+    {
       url: `${marineLicenceRoutes.MARINE_LICENCE_TYPE_OF_ACTIVITY}?site=1&activity=1`,
       isMarineLicence: true,
       title: 'Type of activity'

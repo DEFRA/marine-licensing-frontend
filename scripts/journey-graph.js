@@ -1,7 +1,8 @@
 import {
   getQuestion,
   getOutcome,
-  getOutcomeTypesForOutcome
+  getOutcomeTypesForOutcome,
+  getFirstQuestionRoute
 } from '../src/server/journey/self-service/services/journey-data.js'
 import { calculateNextRoute } from '../src/server/journey/self-service/services/journey-router.js'
 
@@ -78,4 +79,49 @@ export function edgesFrom(route) {
     return outcomeForkEdges(outcome)
   }
   return []
+}
+
+function reconstruct(prev, to) {
+  const steps = []
+  let cursor = to
+  while (prev.get(cursor)) {
+    const { from, edge } = prev.get(cursor)
+    const question = getQuestion(from)
+    steps.unshift({
+      from,
+      fromText: question ? question.text : null,
+      label: edge.label,
+      to: edge.to,
+      kind: edge.kind
+    })
+    cursor = from
+  }
+  return steps
+}
+
+export function shortestPath(to, options = {}) {
+  const from = options.from ?? getFirstQuestionRoute()
+  if (from === to) {
+    return []
+  }
+  const prev = new Map([[from, null]])
+  const queue = [from]
+  while (queue.length > 0) {
+    const node = queue.shift()
+    for (const edge of edgesFrom(node)) {
+      if (prev.has(edge.to)) {
+        continue
+      }
+      prev.set(edge.to, { from: node, edge })
+      if (edge.to === to) {
+        return reconstruct(prev, to)
+      }
+      queue.push(edge.to)
+    }
+  }
+  return null
+}
+
+export function reach(to, options = {}) {
+  return shortestPath(to, options) !== null
 }

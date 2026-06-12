@@ -333,6 +333,23 @@ describe('iat-query', () => {
     })
   })
 
+  describe('multi-select question view', () => {
+    it('shows the multi-select routing targets instead of terminal', () => {
+      const { stdout, code } = runCommand(['question', '/dredging/activities'])
+      expect(code).toBe(0)
+      expect(stdout).toContain('/activity/completion')
+      expect(stdout).toContain('/standard-marine-licence-application/other-clearance-dredging')
+    })
+
+    it('--json answer targets reflect multi-select routing', () => {
+      const { stdout } = runCommand(['question', '/dredging/activities', '--json'])
+      const parsed = JSON.parse(stdout)
+      const targets = parsed.answers.map((a) => a.target)
+      expect(targets).not.toContain('terminal')
+      expect(targets.some((t) => t.includes('/activity/completion'))).toBe(true)
+    })
+  })
+
   describe('error handling', () => {
     it('exits 2 for unknown subcommand', () => {
       const { stdout, code } = runCommand(['nonexistent'])

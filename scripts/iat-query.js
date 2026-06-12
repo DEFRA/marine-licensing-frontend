@@ -44,6 +44,7 @@ import {
   hasOutcome
 } from '../src/server/journey/self-service/services/journey-data.js'
 import { classifyOutcome } from '../src/server/journey/self-service/outcome/utils.js'
+import { calculateNextRoute } from '../src/server/journey/self-service/services/journey-router.js'
 import {
   shortestPath,
   reach,
@@ -73,14 +74,13 @@ function dash(value) {
   return String(value)
 }
 
-function targetForAnswer(answer) {
-  if (answer.nextQuestionRoute) {
-    return `question ${answer.nextQuestionRoute}`
+function targetForAnswer(answer, question) {
+  try {
+    const next = calculateNextRoute(question, [answer.id])
+    return `${next.type} ${next.route}`
+  } catch {
+    return 'terminal'
   }
-  if (answer.outcomeRoute) {
-    return `outcome ${answer.outcomeRoute}`
-  }
-  return 'terminal'
 }
 
 function paramsFlat(outcomeType) {
@@ -106,7 +106,7 @@ function runQuestion(route, json) {
       answers: q.answers.map((a) => ({
         id: a.id,
         text: a.text,
-        target: targetForAnswer(a)
+        target: targetForAnswer(a, q)
       }))
     }
     return { stdout: JSON.stringify(doc, null, 2), code: 0 }
@@ -122,7 +122,7 @@ function runQuestion(route, json) {
     '  id\ttext\ttarget'
   ]
   for (const a of q.answers) {
-    lines.push(`  ${a.id}\t${excerpt(a.text)}\t${targetForAnswer(a)}`)
+    lines.push(`  ${a.id}\t${excerpt(a.text)}\t${targetForAnswer(a, q)}`)
   }
   return { stdout: lines.join('\n'), code: 0 }
 }

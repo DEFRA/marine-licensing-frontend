@@ -6,6 +6,7 @@ import * as wfdCacheUtils from '#src/server/common/helpers/marine-licence/sessio
 import * as cdpUploadService from '#src/services/cdp-upload-service/index.js'
 import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
 import { saveWaterFrameworkDirectiveToBackend } from '#src/server/common/helpers/marine-licence/water-framework-directive/save-water-framework-directive.js'
+import { config } from '#src/config/config.js'
 
 vi.mock('~/src/server/common/helpers/marine-licence/session-cache/utils.js')
 vi.mock('~/src/services/cdp-upload-service/index.js')
@@ -196,10 +197,18 @@ describe('#uploadAndWait', () => {
           h,
           'uploadedFile',
           {
-            filename: 'test.odt',
-            contentType: 'application/vnd.oasis.opendocument.text',
-            fileId: 'test-id',
-            s3Key: 'test-key'
+            filename: 'test.odt'
+          }
+        )
+
+        expect(updateWaterFrameworkDirectiveSpy).toHaveBeenCalledWith(
+          mockRequest,
+          h,
+          's3Location',
+          {
+            s3Bucket: config.get('cdpUploader').s3Bucket,
+            s3Key: 'test-key',
+            checksumSha256: 'test-checksum'
           }
         )
 
@@ -234,10 +243,7 @@ describe('#uploadAndWait', () => {
           h,
           'uploadedFile',
           {
-            filename: 'test.odt',
-            contentType: 'application/vnd.oasis.opendocument.text',
-            fileId: undefined,
-            s3Key: undefined
+            filename: 'test.odt'
           }
         )
 

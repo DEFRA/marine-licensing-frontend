@@ -91,13 +91,27 @@ export const transformSiteDetailsTaskList = (taskList) => [
   }
 ]
 
-export const transformWaterFrameworkDirectiveTaskList = (taskList) => [
+const getWaterFrameworkDirectiveHref = (waterFrameworkDirective) => {
+  if (!waterFrameworkDirective?.nauticalMiles === 'no') {
+    return marineLicenceRoutes.MARINE_LICENCE_WATER_FRAMEWORK_DIRECTIVE_NAUTICAL_MILE
+  }
+
+  return marineLicenceRoutes.MARINE_LICENCE_WATER_FRAMEWORK_DIRECTIVE_BEFORE_YOU_START
+}
+
+export const transformWaterFrameworkDirectiveTaskList = (
+  taskList,
+  waterFrameworkDirective
+) => [
   {
     title: {
       text: 'Water Framework Directive assessment',
       classes: taskClasses
     },
-    href: marineLicenceRoutes.MARINE_LICENCE_WATER_FRAMEWORK_DIRECTIVE_BEFORE_YOU_START,
+    href:
+      taskList.waterFrameworkDirective === 'INCOMPLETE'
+        ? marineLicenceRoutes.MARINE_LICENCE_WATER_FRAMEWORK_DIRECTIVE_BEFORE_YOU_START
+        : getWaterFrameworkDirectiveHref(waterFrameworkDirective),
     status: setStatus(taskList.waterFrameworkDirective)
   }
 ]

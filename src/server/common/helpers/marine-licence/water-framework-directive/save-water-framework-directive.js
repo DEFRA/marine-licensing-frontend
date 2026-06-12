@@ -15,14 +15,21 @@ export const saveWaterFrameworkDirectiveToBackend = async (
   let dataToSave = { nauticalMile }
 
   if (!nauticalMileOnly) {
-    const { assessmentChanged, excludedActivities, previousAssessment } =
-      waterFrameworkDirective
+    const {
+      assessmentChanged,
+      excludedActivities,
+      previousAssessment,
+      uploadedFile,
+      s3Location
+    } = waterFrameworkDirective
 
     dataToSave = {
       ...dataToSave,
       assessmentChanged,
       excludedActivities,
-      previousAssessment
+      previousAssessment,
+      uploadedFile,
+      s3Location
     }
   }
 

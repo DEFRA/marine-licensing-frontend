@@ -9,6 +9,7 @@ import {
   uploadAndWaitPageSettings
 } from '#src/server/common/helpers/file-upload/constants.js'
 import { saveWaterFrameworkDirectiveToBackend } from '#src/server/common/helpers/marine-licence/water-framework-directive/save-water-framework-directive.js'
+import { config } from '#src/config/config.js'
 
 const fileUploadRoute =
   marineLicenceRoutes.MARINE_LICENCE_WATER_FRAMEWORK_DIRECTIVE_FILE_UPLOAD
@@ -32,13 +33,23 @@ const handleProcessingStatus = (status, marineLicence, h) => {
   })
 }
 
-const handleReadyStatus = async (status, request, h) => {
+const handleReadyStatus = async (status, context) => {
+  const { request, h } = context
+
   await updateWaterFrameworkDirective(request, h, 'uploadedFile', {
-    filename: status.filename,
-    contentType: status.contentType,
-    fileId: status.s3Location?.fileId,
-    s3Key: status.s3Location?.s3Key
+    filename: status.filename
   })
+
+  if (status.s3Location) {
+    const cdpUploadConfig = config.get('cdpUploader')
+
+    await updateWaterFrameworkDirective(request, h, 's3Location', {
+      s3Bucket: cdpUploadConfig.s3Bucket,
+      s3Key: status.s3Location.s3Key,
+      checksumSha256: status.s3Location.checksumSha256
+    })
+  }
+
   await updateWaterFrameworkDirective(request, h, 'uploadConfig', null)
 
   await saveWaterFrameworkDirectiveToBackend(request)
@@ -76,7 +87,7 @@ const processUploadStatus = async (status, context) => {
   }
 
   if (status.status === 'ready') {
-    return handleReadyStatus(status, request, h)
+    return handleReadyStatus(status, context)
   }
 
   if (status.status === 'rejected' || status.status === 'error') {

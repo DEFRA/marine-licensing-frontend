@@ -114,8 +114,8 @@ describe('#fileUpload', () => {
         await setupStandardFileUploadTest(mockRequest, mockH)
 
         expectViewCalledWith(mockH, {
-          pageTitle: 'Upload a file',
-          heading: 'Upload a file',
+          pageTitle: 'Upload your Water Framework Directive assessment',
+          heading: 'Upload your Water Framework Directive assessment',
           projectName: mockMarineLicenceApplication.projectName,
           uploadUrl: 'https://upload.example.com',
           maxFileSize: 50000000,

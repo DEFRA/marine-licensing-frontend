@@ -284,6 +284,55 @@ describe('iat-query', () => {
     })
   })
 
+  describe('path', () => {
+    it('prints a shortest journey from /sea to a deep page', () => {
+      const { stdout, code } = runCommand(['path', '/mod-permission'])
+      expect(code).toBe(0)
+      expect(stdout).toContain('/sea')
+      expect(stdout).toContain('/mod-permission')
+    })
+
+    it('accepts an explicit from and to', () => {
+      const { stdout, code } = runCommand(['path', '/sea', '/fast-track-mla'])
+      expect(code).toBe(0)
+      expect(stdout).toContain('/fast-track-mla')
+    })
+
+    it('exits 1 when the target is unreachable', () => {
+      const { code } = runCommand(['path', '/no-such-route'])
+      expect(code).toBe(1)
+    })
+
+    it('--json emits found and an ordered steps array', () => {
+      const { stdout, code } = runCommand(['path', '/mod-permission', '--json'])
+      expect(code).toBe(0)
+      const parsed = JSON.parse(stdout)
+      expect(parsed.found).toBe(true)
+      expect(Array.isArray(parsed.steps)).toBe(true)
+      expect(parsed.steps.at(-1).to).toBe('/mod-permission')
+    })
+  })
+
+  describe('reach', () => {
+    it('exits 0 for a reachable route', () => {
+      expect(runCommand(['reach', '/mod-permission']).code).toBe(0)
+    })
+    it('exits 1 for an unreachable route', () => {
+      expect(runCommand(['reach', '/no-such-route']).code).toBe(1)
+    })
+  })
+
+  describe('predecessors', () => {
+    it('lists direct callers of a page', () => {
+      const { stdout, code } = runCommand(['predecessors', '/military-defence-area'])
+      expect(code).toBe(0)
+      expect(stdout).toContain('/single-location')
+    })
+    it('exits 1 for an unknown route', () => {
+      expect(runCommand(['predecessors', '/no-such-route']).code).toBe(1)
+    })
+  })
+
   describe('error handling', () => {
     it('exits 2 for unknown subcommand', () => {
       const { stdout, code } = runCommand(['nonexistent'])

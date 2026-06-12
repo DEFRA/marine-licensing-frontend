@@ -13,6 +13,14 @@ import {
 export const WATER_FRAMEWORK_DIRECTIVE_FILE_UPLOAD_VIEW_ROUTE =
   'marine-licence/water-framework-directive/file-upload/index'
 
+const PAGE_HEADING = 'Upload your Water Framework Directive assessment'
+
+const waterFrameworkDirectiveUploadAndWaitPageSettings = {
+  ...fileUploadPageSettings,
+  pageTitle: PAGE_HEADING,
+  heading: PAGE_HEADING
+}
+
 export const waterFrameworkFileUploadController = {
   async handler(request, h) {
     const marineLicence = getMarineLicenceCache(request)
@@ -54,7 +62,7 @@ export const waterFrameworkFileUploadController = {
       })
 
       return h.view(WATER_FRAMEWORK_DIRECTIVE_FILE_UPLOAD_VIEW_ROUTE, {
-        ...fileUploadPageSettings,
+        ...waterFrameworkDirectiveUploadAndWaitPageSettings,
         projectName: marineLicence.projectName,
         uploadUrl: uploadConfig.uploadUrl,
         maxFileSize: uploadConfig.maxFileSize,

@@ -1,4 +1,5 @@
 import {
+  getJourneyData,
   getQuestion,
   getOutcome,
   getOutcomeTypesForOutcome,
@@ -124,4 +125,21 @@ export function shortestPath(to, options = {}) {
 
 export function reach(to, options = {}) {
   return shortestPath(to, options) !== null
+}
+
+export function predecessors(route) {
+  const data = getJourneyData()
+  const nodes = [
+    ...data.questions.map((q) => q.route),
+    ...data.outcomes.map((o) => o.route)
+  ]
+  const callers = []
+  for (const node of nodes) {
+    for (const edge of edgesFrom(node)) {
+      if (edge.to === route) {
+        callers.push({ route: node, via: edge.label })
+      }
+    }
+  }
+  return callers
 }

@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest'
 import { edgesFrom } from './journey-graph.js'
 import { shortestPath, reach } from './journey-graph.js'
+import { predecessors } from './journey-graph.js'
 
 describe('journey-graph edgesFrom', () => {
   it('follows multi-select routing instead of treating answers as terminal', () => {
@@ -55,5 +56,16 @@ describe('journey-graph reach', () => {
   })
   it('is false for an unknown route', () => {
     expect(reach('/no-such-route')).toBe(false)
+  })
+})
+
+describe('journey-graph predecessors', () => {
+  it('lists pages that route directly into /military-defence-area', () => {
+    const callers = predecessors('/military-defence-area').map((c) => c.route)
+    expect(callers).toContain('/single-location')
+  })
+
+  it('returns an empty array for the entry point /sea', () => {
+    expect(predecessors('/sea')).toEqual([])
   })
 })

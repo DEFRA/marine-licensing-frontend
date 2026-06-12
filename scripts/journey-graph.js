@@ -84,9 +84,9 @@ export function edgesFrom(route) {
 
 function reconstruct(prev, to) {
   const steps = []
-  let cursor = to
-  while (prev.get(cursor)) {
-    const { from, edge } = prev.get(cursor)
+  let entry = prev.get(to)
+  while (entry) {
+    const { from, edge } = entry
     const question = getQuestion(from)
     steps.unshift({
       from,
@@ -95,7 +95,7 @@ function reconstruct(prev, to) {
       to: edge.to,
       kind: edge.kind
     })
-    cursor = from
+    entry = prev.get(from)
   }
   return steps
 }

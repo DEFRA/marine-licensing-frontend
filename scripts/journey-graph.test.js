@@ -1,7 +1,10 @@
 import { describe, it, expect } from 'vitest'
-import { edgesFrom } from './journey-graph.js'
-import { shortestPath, reach } from './journey-graph.js'
-import { predecessors } from './journey-graph.js'
+import {
+  edgesFrom,
+  shortestPath,
+  reach,
+  predecessors
+} from './journey-graph.js'
 
 describe('journey-graph edgesFrom', () => {
   it('follows multi-select routing instead of treating answers as terminal', () => {

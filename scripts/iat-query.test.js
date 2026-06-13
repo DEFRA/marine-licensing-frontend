@@ -334,7 +334,10 @@ describe('iat-query', () => {
 
   describe('predecessors', () => {
     it('lists direct callers of a page', () => {
-      const { stdout, code } = runCommand(['predecessors', '/military-defence-area'])
+      const { stdout, code } = runCommand([
+        'predecessors',
+        '/military-defence-area'
+      ])
       expect(code).toBe(0)
       expect(stdout).toContain('/single-location')
     })
@@ -348,11 +351,17 @@ describe('iat-query', () => {
       const { stdout, code } = runCommand(['question', '/dredging/activities'])
       expect(code).toBe(0)
       expect(stdout).toContain('/activity/completion')
-      expect(stdout).toContain('/standard-marine-licence-application/other-clearance-dredging')
+      expect(stdout).toContain(
+        '/standard-marine-licence-application/other-clearance-dredging'
+      )
     })
 
     it('--json answer targets reflect multi-select routing', () => {
-      const { stdout } = runCommand(['question', '/dredging/activities', '--json'])
+      const { stdout } = runCommand([
+        'question',
+        '/dredging/activities',
+        '--json'
+      ])
       const parsed = JSON.parse(stdout)
       const targets = parsed.answers.map((a) => a.target)
       expect(targets).not.toContain('terminal')

@@ -40,7 +40,11 @@ function multiSelectEdges(question) {
   }
   const special = safeNext(question, [outcomeAnswerId])
   if (special) {
-    edges.push({ label: `tick "${outcomeAnswerId}"`, to: special.route, kind: special.type })
+    edges.push({
+      label: `tick "${outcomeAnswerId}"`,
+      to: special.route,
+      kind: special.type
+    })
   }
   return edges
 }
@@ -50,7 +54,11 @@ function singleSelectEdges(question) {
   for (const answer of question.answers) {
     const next = safeNext(question, [answer.id])
     if (next) {
-      edges.push({ label: `answer "${answer.text}"`, to: next.route, kind: next.type })
+      edges.push({
+        label: `answer "${answer.text}"`,
+        to: next.route,
+        kind: next.type
+      })
     }
   }
   return edges
@@ -73,7 +81,9 @@ function outcomeForkEdges(outcome) {
 export function edgesFrom(route) {
   const question = getQuestion(route)
   if (question) {
-    return question.multiSelect ? multiSelectEdges(question) : singleSelectEdges(question)
+    return question.multiSelect
+      ? multiSelectEdges(question)
+      : singleSelectEdges(question)
   }
   const outcome = getOutcome(route)
   if (outcome) {

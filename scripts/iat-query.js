@@ -50,11 +50,7 @@ import {
 } from '../src/server/journey/self-service/services/journey-data.js'
 import { classifyOutcome } from '../src/server/journey/self-service/outcome/utils.js'
 import { calculateNextRoute } from '../src/server/journey/self-service/services/journey-router.js'
-import {
-  shortestPath,
-  reach,
-  predecessors
-} from './journey-graph.js'
+import { shortestPath, reach, predecessors } from './journey-graph.js'
 
 const EXCERPT_LEN = 60
 const MAX_TEXT_FOR_STRIP = 10000
@@ -422,7 +418,10 @@ function runPredecessors(route, json) {
   if (callers.length === 0) {
     return { stdout: '(no predecessors — entry point or orphaned)', code: 0 }
   }
-  return { stdout: callers.map((c) => `${c.route}\t${c.via}`).join('\n'), code: 0 }
+  return {
+    stdout: callers.map((c) => `${c.route}\t${c.via}`).join('\n'),
+    code: 0
+  }
 }
 
 function parseSingleArg(rest, usage) {

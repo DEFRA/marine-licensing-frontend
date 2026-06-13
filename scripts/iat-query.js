@@ -43,17 +43,22 @@ import {
   getQuestion,
   getOutcome,
   getOutcomeType,
-  getOutcomeTypesForOutcome,
-  getFirstQuestionRoute,
-  hasQuestion,
-  hasOutcome
+  getOutcomeTypesForOutcome
 } from '../src/server/journey/self-service/services/journey-data.js'
 import { classifyOutcome } from '../src/server/journey/self-service/outcome/utils.js'
-import { calculateNextRoute } from '../src/server/journey/self-service/services/journey-router.js'
-import { shortestPath, reach, predecessors } from './journey-graph.js'
-
-const EXCERPT_LEN = 60
-const MAX_TEXT_FOR_STRIP = 10000
+import {
+  excerpt,
+  dash,
+  paramsFlat,
+  targetForAnswer,
+  parseSingleArg,
+  parseHasParam
+} from './iat-utils.js'
+import {
+  dispatchPath,
+  dispatchReach,
+  dispatchPredecessors
+} from './iat-graph-commands.js'
 
 const USAGE = `iat-query — inspect the self-service IAT journey (self-service.json)
 
@@ -76,43 +81,6 @@ outcome forks (outcomeType.nextQuestionRoute). All documented in:
   src/server/journey/self-service/data/README.data.md
 
 Add --json to any subcommand for machine-readable output.`
-
-function excerpt(text) {
-  if (!text) {
-    return '-'
-  }
-  const bounded =
-    text.length > MAX_TEXT_FOR_STRIP ? text.slice(0, MAX_TEXT_FOR_STRIP) : text
-  const stripped = bounded.replaceAll(/<[^>]+>/g, '').trim()
-  if (stripped.length <= EXCERPT_LEN) {
-    return stripped
-  }
-  return stripped.slice(0, EXCERPT_LEN) + '…'
-}
-
-function dash(value) {
-  if (value === null || value === undefined || value === '') {
-    return '-'
-  }
-  return String(value)
-}
-
-function targetForAnswer(answer, question) {
-  try {
-    const next = calculateNextRoute(question, [answer.id])
-    return `${next.type} ${next.route}`
-  } catch {
-    return 'terminal'
-  }
-}
-
-function paramsFlat(outcomeType) {
-  const params = outcomeType.params
-  if (!params || params.length === 0) {
-    return '-'
-  }
-  return params.map((p) => `${p.name}=${p.value}`).join(' ')
-}
 
 function runQuestion(route, json) {
   const q = getQuestion(route)
@@ -278,17 +246,6 @@ function runOutcomes(flags, json) {
   return { stdout: lines.join('\n'), code: 0 }
 }
 
-function parseHasParam(hasParam) {
-  if (!hasParam) {
-    return { name: null, value: null }
-  }
-  const eqIdx = hasParam.indexOf('=')
-  if (eqIdx === -1) {
-    return { name: hasParam, value: null }
-  }
-  return { name: hasParam.slice(0, eqIdx), value: hasParam.slice(eqIdx + 1) }
-}
-
 function runOutcomeTypes(flags, json) {
   const { hasParam, hasNextQuestion, hasLink } = flags
   const { name: paramName, value: paramValue } = parseHasParam(hasParam)
@@ -361,80 +318,6 @@ function runMappings(json) {
     (key) => `${key}\t${mappingMap.get(key).join(',')}`
   )
   return { stdout: lines.join('\n'), code: 0 }
-}
-
-function formatPathHuman(from, to, steps) {
-  const lines = [`Path ${from} -> ${to} (${steps.length} steps)`, '']
-  for (const step of steps) {
-    const head = step.fromText
-      ? `Q ${step.from}\t${step.fromText}`
-      : `[outcome ${step.from}]`
-    lines.push(head)
-    lines.push(`  -> ${step.label}\t==> ${step.kind} ${step.to}`)
-  }
-  return lines.join('\n')
-}
-
-function runPath(from, to, json) {
-  const steps = shortestPath(to, { from })
-  if (steps === null) {
-    if (json) {
-      return {
-        stdout: JSON.stringify({ from, to, found: false, steps: [] }, null, 2),
-        code: 1
-      }
-    }
-    return { stdout: `No path from ${from} to ${to}`, code: 1 }
-  }
-  if (json) {
-    return {
-      stdout: JSON.stringify({ from, to, found: true, steps }, null, 2),
-      code: 0
-    }
-  }
-  return { stdout: formatPathHuman(from, to, steps), code: 0 }
-}
-
-function runReach(route, json) {
-  const reachable = reach(route)
-  const code = reachable ? 0 : 1
-  if (json) {
-    return { stdout: JSON.stringify({ route, reachable }, null, 2), code }
-  }
-  return {
-    stdout: reachable ? `reachable: ${route}` : `not reachable: ${route}`,
-    code
-  }
-}
-
-function runPredecessors(route, json) {
-  if (!hasQuestion(route) && !hasOutcome(route)) {
-    return { stdout: `Route not found: ${route}`, code: 1 }
-  }
-  const callers = predecessors(route)
-  if (json) {
-    return { stdout: JSON.stringify(callers, null, 2), code: 0 }
-  }
-  if (callers.length === 0) {
-    return { stdout: '(no predecessors — entry point or orphaned)', code: 0 }
-  }
-  return {
-    stdout: callers.map((c) => `${c.route}\t${c.via}`).join('\n'),
-    code: 0
-  }
-}
-
-function parseSingleArg(rest, usage) {
-  const { values, positionals } = parseArgs({
-    args: rest,
-    options: { json: { type: 'boolean', default: false } },
-    allowPositionals: true
-  })
-  const arg = positionals[0]
-  if (!arg) {
-    return { error: { stdout: usage, code: 2 } }
-  }
-  return { arg, json: values.json }
 }
 
 function dispatchQuestion(rest) {
@@ -535,43 +418,6 @@ function dispatchMappings(rest) {
     allowPositionals: false
   })
   return runMappings(values.json)
-}
-
-function dispatchPath(rest) {
-  const { values, positionals } = parseArgs({
-    args: rest,
-    options: { json: { type: 'boolean', default: false } },
-    allowPositionals: true
-  })
-  if (positionals.length === 0) {
-    return {
-      stdout: 'Usage: iat-query path <to> | path <from> <to> [--json]',
-      code: 2
-    }
-  }
-  const hasFrom = positionals.length > 1
-  const from = hasFrom ? positionals[0] : getFirstQuestionRoute()
-  const to = hasFrom ? positionals[1] : positionals[0]
-  return runPath(from, to, values.json)
-}
-
-function dispatchReach(rest) {
-  const parsed = parseSingleArg(rest, 'Usage: iat-query reach <route> [--json]')
-  if (parsed.error) {
-    return parsed.error
-  }
-  return runReach(parsed.arg, parsed.json)
-}
-
-function dispatchPredecessors(rest) {
-  const parsed = parseSingleArg(
-    rest,
-    'Usage: iat-query predecessors <route> [--json]'
-  )
-  if (parsed.error) {
-    return parsed.error
-  }
-  return runPredecessors(parsed.arg, parsed.json)
 }
 
 const DISPATCH = {

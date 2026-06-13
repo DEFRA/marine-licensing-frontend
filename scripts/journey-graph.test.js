@@ -7,10 +7,23 @@ import {
 } from './journey-graph.js'
 
 describe('journey-graph edgesFrom', () => {
-  it('follows multi-select routing instead of treating answers as terminal', () => {
-    const targets = edgesFrom('/dredging/activities').map((e) => e.to)
-    expect(targets).toContain('/activity/completion')
-    expect(targets).toContain(
+  it('models a multi-select page as exactly two labelled tick branches', () => {
+    // multiSelectEdges produces precisely two edges with "tick …" labels — one
+    // edge per checkbox would be the single-select fallback. Pinning the count
+    // and labels here is the real regression guard: delete multiSelectEdges and
+    // edgesFrom falls through to singleSelectEdges (which still resolves the
+    // same .to targets via the router), so only this assertion catches it.
+    const edges = edgesFrom('/dredging/activities')
+    expect(edges).toHaveLength(2)
+
+    const tickAny = edges.find((e) =>
+      e.label.startsWith('tick any activity except')
+    )
+    const tickOther = edges.find(
+      (e) => e.label === 'tick "OTHER_CLEARANCE_DREDGING"'
+    )
+    expect(tickAny?.to).toBe('/activity/completion')
+    expect(tickOther?.to).toBe(
       '/standard-marine-licence-application/other-clearance-dredging'
     )
   })

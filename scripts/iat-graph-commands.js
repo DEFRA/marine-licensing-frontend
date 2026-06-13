@@ -7,16 +7,23 @@ import {
 import { shortestPath, reach, predecessors } from './journey-graph.js'
 import { parseSingleArg } from './iat-utils.js'
 
-function formatPathHuman(from, to, steps) {
-  const lines = [`Path ${from} -> ${to} (${steps.length} steps)`, '']
-  for (const step of steps) {
-    const head = step.fromText
-      ? `Q ${step.from}\t${step.fromText}`
-      : `[outcome ${step.from}]`
-    lines.push(head)
-    lines.push(`  -> ${step.label}\t==> ${step.kind} ${step.to}`)
+function choiceFromLabel(label) {
+  if (label.startsWith('answer ')) {
+    return label.slice('answer '.length).replace(/^"|"$/g, '')
   }
-  return lines.join('\n')
+  if (label.startsWith('continue:')) {
+    return 'Continue'
+  }
+  return label.replaceAll('"', '')
+}
+
+function formatPathHuman(steps) {
+  return steps
+    .map((step, index) => {
+      const destination = index === steps.length - 1 ? ` → ${step.to}` : ''
+      return `- ${step.from} → ${choiceFromLabel(step.label)}${destination}`
+    })
+    .join('\n')
 }
 
 function runPath(from, to, json) {
@@ -36,7 +43,7 @@ function runPath(from, to, json) {
       code: 0
     }
   }
-  return { stdout: formatPathHuman(from, to, steps), code: 0 }
+  return { stdout: formatPathHuman(steps), code: 0 }
 }
 
 function runReach(route, json) {

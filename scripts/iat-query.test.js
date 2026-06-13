@@ -288,8 +288,18 @@ describe('iat-query', () => {
     it('prints a shortest journey from /sea to a deep page', () => {
       const { stdout, code } = runCommand(['path', '/mod-permission'])
       expect(code).toBe(0)
-      expect(stdout).toContain('/sea')
-      expect(stdout).toContain('/mod-permission')
+      const lines = stdout.split('\n')
+      // one bullet per step: "- <route> → <choice>"; last line appends the target
+      expect(lines[0]).toMatch(/^- \/sea → /)
+      expect(lines.at(-1)).toMatch(/→ \/mod-permission$/)
+      // intermediate-outcome forks render as "Continue"
+      expect(stdout).toContain(
+        '- /exemption/dredging-exe-not-available-continue → Continue'
+      )
+      // multi-select renders the tick choice without quotes
+      expect(stdout).toContain(
+        '- /dredging/activities → tick any activity except OTHER_CLEARANCE_DREDGING'
+      )
     })
 
     it('accepts an explicit from below /sea and uses it as the start', () => {
@@ -299,9 +309,10 @@ describe('iat-query', () => {
         '/fast-track-mla'
       ])
       expect(code).toBe(0)
-      expect(stdout).toContain('/fast-track-mla')
+      const lines = stdout.split('\n')
       // started at the explicit from, not the default /sea
-      expect(stdout).toContain('Path /jurisdiction -> /fast-track-mla')
+      expect(lines[0]).toMatch(/^- \/jurisdiction → /)
+      expect(lines.at(-1)).toMatch(/→ \/fast-track-mla$/)
     })
 
     it('exits 1 when the target is unreachable', () => {

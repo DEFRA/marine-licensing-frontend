@@ -13,8 +13,13 @@
  *   outcome-types [--has-param N[=V]] [--has-next-question] [--has-link]
  *   questions [--mapping N] [--has-mapping]           list questions by mcmsAppFormMapping
  *   mappings                                          distinct mappings + carrier question routes
+ *   path [<from>] <to>                                shortest journey through the graph (from defaults to /sea)
+ *   reach <route>                                     reachable from /sea? (exit 0 reachable, 1 not)
+ *   predecessors <route>                              pages that route directly into this node
  *
  * Examples:
+ *   npm run iat -- path /mod-permission
+ *       print one shortest click-by-click journey from /sea to a page
  *   npm run iat -- question /activity-type
  *       inspect one question, its answers, and where each answer branches to
  *   npm run iat -- outcome /scaffolding-impede-navigation

@@ -292,10 +292,16 @@ describe('iat-query', () => {
       expect(stdout).toContain('/mod-permission')
     })
 
-    it('accepts an explicit from and to', () => {
-      const { stdout, code } = runCommand(['path', '/sea', '/fast-track-mla'])
+    it('accepts an explicit from below /sea and uses it as the start', () => {
+      const { stdout, code } = runCommand([
+        'path',
+        '/jurisdiction',
+        '/fast-track-mla'
+      ])
       expect(code).toBe(0)
       expect(stdout).toContain('/fast-track-mla')
+      // started at the explicit from, not the default /sea
+      expect(stdout).toContain('Path /jurisdiction -> /fast-track-mla')
     })
 
     it('exits 1 when the target is unreachable', () => {
@@ -314,11 +320,15 @@ describe('iat-query', () => {
   })
 
   describe('reach', () => {
-    it('exits 0 for a reachable route', () => {
-      expect(runCommand(['reach', '/mod-permission']).code).toBe(0)
+    it('exits 0 and reports reachable for a reachable route', () => {
+      const { stdout, code } = runCommand(['reach', '/mod-permission'])
+      expect(code).toBe(0)
+      expect(stdout).toContain('reachable: /mod-permission')
     })
-    it('exits 1 for an unreachable route', () => {
-      expect(runCommand(['reach', '/no-such-route']).code).toBe(1)
+    it('exits 1 and reports not reachable for an unreachable route', () => {
+      const { stdout, code } = runCommand(['reach', '/no-such-route'])
+      expect(code).toBe(1)
+      expect(stdout).toContain('not reachable: /no-such-route')
     })
   })
 

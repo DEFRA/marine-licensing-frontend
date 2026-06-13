@@ -309,6 +309,12 @@ describe('iat-query', () => {
       expect(code).toBe(1)
     })
 
+    it('exits 2 with usage when no target is given', () => {
+      const { stdout, code } = runCommand(['path'])
+      expect(code).toBe(2)
+      expect(stdout).toContain('Usage: iat-query path')
+    })
+
     it('--json emits found and an ordered steps array', () => {
       const { stdout, code } = runCommand(['path', '/mod-permission', '--json'])
       expect(code).toBe(0)
@@ -330,6 +336,17 @@ describe('iat-query', () => {
       expect(code).toBe(1)
       expect(stdout).toContain('not reachable: /no-such-route')
     })
+
+    it('--json emits route and reachable boolean', () => {
+      const { stdout, code } = runCommand([
+        'reach',
+        '/mod-permission',
+        '--json'
+      ])
+      expect(code).toBe(0)
+      const parsed = JSON.parse(stdout)
+      expect(parsed).toEqual({ route: '/mod-permission', reachable: true })
+    })
   })
 
   describe('predecessors', () => {
@@ -343,6 +360,25 @@ describe('iat-query', () => {
     })
     it('exits 1 for an unknown route', () => {
       expect(runCommand(['predecessors', '/no-such-route']).code).toBe(1)
+    })
+
+    it('reports no predecessors for the entry point /sea', () => {
+      const { stdout, code } = runCommand(['predecessors', '/sea'])
+      expect(code).toBe(0)
+      expect(stdout).toContain('no predecessors')
+    })
+
+    it('--json emits an array of { route, via } callers', () => {
+      const { stdout, code } = runCommand([
+        'predecessors',
+        '/military-defence-area',
+        '--json'
+      ])
+      expect(code).toBe(0)
+      const parsed = JSON.parse(stdout)
+      expect(Array.isArray(parsed)).toBe(true)
+      expect(parsed.some((c) => c.route === '/single-location')).toBe(true)
+      expect(parsed[0]).toHaveProperty('via')
     })
   })
 

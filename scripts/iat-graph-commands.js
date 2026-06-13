@@ -1,8 +1,3 @@
-/**
- * IAT query CLI — graph-traversal subcommands (path, reach, predecessors),
- * built on the journey-graph traversal layer.
- */
-
 import { parseArgs } from 'node:util'
 import {
   getFirstQuestionRoute,

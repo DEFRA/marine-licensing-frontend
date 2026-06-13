@@ -1,7 +1,3 @@
-/**
- * Shared formatting and argument-parsing helpers for the IAT query CLI.
- */
-
 import { parseArgs } from 'node:util'
 import { calculateNextRoute } from '../src/server/journey/self-service/services/journey-router.js'
 

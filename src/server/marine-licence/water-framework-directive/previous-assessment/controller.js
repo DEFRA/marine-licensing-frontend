@@ -82,8 +82,10 @@ export const previousAssessmentSubmitController = {
       )
     }
 
+    await updateWaterFrameworkDirective(request, h, 'assessmentChanged', null)
+
     return h.redirect(
-      marineLicenceRoutes.MARINE_LICENCE_WATER_FRAMEWORK_DIRECTIVE_PREVIOUS_ASSESSMENT
+      marineLicenceRoutes.MARINE_LICENCE_WATER_FRAMEWORK_DIRECTIVE_FILE_UPLOAD
     )
   }
 }

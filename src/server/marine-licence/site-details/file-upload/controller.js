@@ -66,7 +66,7 @@ export const fileUploadController = {
       const redirectUrl = marineLicenceRoutes.MARINE_LICENCE_UPLOAD_AND_WAIT
       const uploadConfig = await cdpService.initiate({
         redirectUrl,
-        s3Path: getS3PathForMarineLicence(),
+        s3Path: getS3PathForMarineLicence(fileUploadType),
         s3Bucket
       })
 

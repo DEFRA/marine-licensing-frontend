@@ -92,7 +92,10 @@ export const transformSiteDetailsTaskList = (taskList) => [
 ]
 
 const getWaterFrameworkDirectiveHref = (waterFrameworkDirective) => {
-  if (!waterFrameworkDirective?.nauticalMiles === 'no') {
+  if (
+    waterFrameworkDirective?.nauticalMiles &&
+    waterFrameworkDirective.nauticalMiles !== 'yes'
+  ) {
     return marineLicenceRoutes.MARINE_LICENCE_WATER_FRAMEWORK_DIRECTIVE_NAUTICAL_MILE
   }
 

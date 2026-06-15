@@ -67,4 +67,9 @@ describe('#invalidController IAT timeout page (integration)', () => {
     expect(button).toBeTruthy()
     expect(button.getAttribute('href')).toBe(routes.IAT_START)
   })
+
+  test('does not render the GOV.UK phase banner', async () => {
+    const { document } = await getPage()
+    expect(document.querySelectorAll('.govuk-phase-banner').length).toBe(0)
+  })
 })

@@ -94,6 +94,16 @@ describe('#outcomeController (integration)', () => {
       expect(response.statusCode).toBe(statusCodes.ok)
     })
 
+    test('renders content in a two-thirds column, not full width', async () => {
+      const { document } = await getPage(
+        journey.journeyUrl('/outcome' + OUTCOME_JOURNEY_SELECT)
+      )
+      expect(
+        document.querySelector('main .govuk-grid-column-two-thirds')
+      ).not.toBeNull()
+      expect(document.querySelector('main .govuk-grid-column-full')).toBeNull()
+    })
+
     test('renders the H1 from outcome.heading', async () => {
       const { document } = await getPage(
         journey.journeyUrl('/outcome' + OUTCOME_JOURNEY_SELECT)
@@ -369,6 +379,14 @@ describe('GET terminal-single', () => {
     expect(response.statusCode).toBe(statusCodes.ok)
   })
 
+  test('renders content in a two-thirds column, not full width', async () => {
+    const { document } = await getPage(journey.journeyUrl(SINGLE_PATH))
+    expect(
+      document.querySelector('main .govuk-grid-column-two-thirds')
+    ).not.toBeNull()
+    expect(document.querySelector('main .govuk-grid-column-full')).toBeNull()
+  })
+
   test('renders the H1 from outcome.heading', async () => {
     const { document } = await getPage(journey.journeyUrl(SINGLE_PATH))
     expect(document.querySelector('h1').textContent).toContain(
@@ -378,7 +396,9 @@ describe('GET terminal-single', () => {
 
   test('renders the body with sanitised anchor links', async () => {
     const { document } = await getPage(journey.journeyUrl(SINGLE_PATH))
-    const body = document.querySelector('.govuk-grid-column-full .govuk-body')
+    const body = document.querySelector(
+      'main .govuk-grid-column-two-thirds .govuk-body'
+    )
     expect(body).not.toBeNull()
     const anchors = body.querySelectorAll('a')
     expect(anchors.length).toBeGreaterThanOrEqual(1)
@@ -510,6 +530,14 @@ describe('GET terminal-multi', () => {
     expect(response.statusCode).toBe(statusCodes.ok)
   })
 
+  test('renders content in a two-thirds column, not full width', async () => {
+    const { document } = await getPage(journey.journeyUrl(MULTI_PATH))
+    expect(
+      document.querySelector('main .govuk-grid-column-two-thirds')
+    ).not.toBeNull()
+    expect(document.querySelector('main .govuk-grid-column-full')).toBeNull()
+  })
+
   test('renders the H1 from outcome.heading', async () => {
     const { document } = await getPage(journey.journeyUrl(MULTI_PATH))
     expect(document.querySelector('h1').textContent).toContain(
@@ -635,7 +663,9 @@ describe('GET licence-not-required (terminal-single, info-only)', () => {
 
   test('renders the body from the outcomeType text', async () => {
     const { document } = await getPage(journey.journeyUrl(ROUTE_PATH))
-    const body = document.querySelector('.govuk-grid-column-full .govuk-body')
+    const body = document.querySelector(
+      'main .govuk-grid-column-two-thirds .govuk-body'
+    )
     expect(body).not.toBeNull()
     expect(body.textContent).toContain('relevant devolved administration')
   })

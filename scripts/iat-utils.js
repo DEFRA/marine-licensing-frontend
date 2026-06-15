@@ -4,6 +4,23 @@ import { calculateNextRoute } from '../src/server/journey/self-service/services/
 const EXCERPT_LEN = 60
 const MAX_TEXT_FOR_STRIP = 10000
 
+export const JSON_FLAG = { type: 'boolean', default: false }
+
+export function jsonResult(value, code = 0) {
+  return { stdout: JSON.stringify(value, null, 2), code }
+}
+
+export function notFound(label, id) {
+  return { stdout: `${label} not found: ${id}`, code: 1 }
+}
+
+const KEY_VALUE_GAP = 2
+
+export function alignKeyValues(rows) {
+  const width = Math.max(...rows.map(([key]) => key.length)) + KEY_VALUE_GAP
+  return rows.map(([key, value]) => `${key.padEnd(width)}${value}`)
+}
+
 export function excerpt(text) {
   if (!text) {
     return '-'
@@ -41,10 +58,10 @@ export function paramsFlat(outcomeType) {
   return params.map((p) => `${p.name}=${p.value}`).join(' ')
 }
 
-export function parseSingleArg(rest, usage) {
+function parseSingleArg(rest, usage) {
   const { values, positionals } = parseArgs({
     args: rest,
-    options: { json: { type: 'boolean', default: false } },
+    options: { json: JSON_FLAG },
     allowPositionals: true
   })
   const arg = positionals[0]
@@ -52,6 +69,14 @@ export function parseSingleArg(rest, usage) {
     return { error: { stdout: usage, code: 2 } }
   }
   return { arg, json: values.json }
+}
+
+export function runSingleArg(rest, usage, run) {
+  const parsed = parseSingleArg(rest, usage)
+  if (parsed.error) {
+    return parsed.error
+  }
+  return run(parsed.arg, parsed.json)
 }
 
 export function parseHasParam(hasParam) {

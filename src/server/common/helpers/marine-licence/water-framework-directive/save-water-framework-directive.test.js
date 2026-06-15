@@ -55,7 +55,9 @@ describe('saveWaterFrameworkDirectiveToBackend', () => {
           nauticalMile: wfdWithoutPreviousAssessment.nauticalMile,
           assessmentChanged: wfdWithoutPreviousAssessment.assessmentChanged,
           excludedActivities: wfdWithoutPreviousAssessment.excludedActivities,
-          previousAssessment: undefined
+          previousAssessment: undefined,
+          s3Location: wfdWithoutPreviousAssessment.s3Location,
+          uploadedFile: wfdWithoutPreviousAssessment.uploadedFile
         },
         id: mockMarineLicenceApplication.id
       }

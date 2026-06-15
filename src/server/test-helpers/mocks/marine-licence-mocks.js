@@ -53,7 +53,15 @@ export const waterFrameworkDirective = {
   nauticalMile: 'yes',
   assessmentChanged: 'no',
   excludedActivities: 'no',
-  previousAssessment: 'no'
+  previousAssessment: 'no',
+  uploadedFile: {
+    filename: 'test-upload-id'
+  },
+  s3Location: {
+    checksumSha256: 'test-checksum',
+    s3Bucket: 'test-bucket',
+    s3Key: 'test-key'
+  }
 }
 
 export const mockMarineLicenceApplication = {

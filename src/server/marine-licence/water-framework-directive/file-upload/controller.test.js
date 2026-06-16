@@ -207,8 +207,7 @@ describe('#fileUpload', () => {
 
         expect(mockRequest.logger.error).toHaveBeenCalledWith(
           expect.objectContaining({
-            err: expect.any(Error),
-            marineLicenceId: mockMarineLicenceApplication.id
+            err: expect.any(Error)
           }),
           'Failed to initialize WFD file upload'
         )

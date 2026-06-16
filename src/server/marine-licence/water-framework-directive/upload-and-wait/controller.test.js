@@ -344,7 +344,7 @@ describe('#uploadAndWait', () => {
         )
 
         expect(mockRequest.logger.error).toHaveBeenCalledWith(
-          { err: expect.any(Error), uploadId: 'test-upload-id' },
+          { err: expect.any(Error) },
           'WFD FileUpload: Failed to check upload status'
         )
 

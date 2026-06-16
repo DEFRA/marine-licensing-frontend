@@ -29,13 +29,16 @@ const taskListViewSettings = {
   heading: headingText
 }
 
-function transformTaskLists(taskList, isCitizen) {
+function transformTaskLists(taskList, isCitizen, marineLicence) {
   return {
     otherPermissions: transformOtherPermissionsTaskList(taskList, isCitizen),
     sharing: transformSharingTaskList(taskList),
     projectDetails: transformProjectDetailsTaskList(taskList),
     siteDetails: transformSiteDetailsTaskList(taskList),
-    waterFrameworkDirective: transformWaterFrameworkDirectiveTaskList(taskList)
+    waterFrameworkDirective: transformWaterFrameworkDirectiveTaskList(
+      taskList,
+      marineLicence.waterFrameworkDirective
+    )
   }
 }
 
@@ -95,7 +98,8 @@ export const taskListController = {
 
     const transformed = transformTaskLists(
       taskList,
-      userRelationshipType === USER_TYPES.CITIZEN
+      userRelationshipType === USER_TYPES.CITIZEN,
+      marineLicence
     )
     await updateLicenceSession(request, h, payload.value, hasCancel)
 

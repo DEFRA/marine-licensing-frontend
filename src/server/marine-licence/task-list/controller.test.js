@@ -192,7 +192,10 @@ describe('#taskListController', () => {
     )
     expect(
       vi.mocked(transformWaterFrameworkDirectiveTaskList)
-    ).toHaveBeenCalledWith(mockPayload.value.taskList)
+    ).toHaveBeenCalledWith(
+      mockPayload.value.taskList,
+      mockMarineLicence.waterFrameworkDirective
+    )
 
     expect(vi.mocked(setMarineLicenceCache)).toHaveBeenCalledWith(
       mockRequest,

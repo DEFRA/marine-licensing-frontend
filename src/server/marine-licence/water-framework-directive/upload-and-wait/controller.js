@@ -129,7 +129,7 @@ export const waterFrameworkDirectiveUploadAndWaitController = {
       })
     } catch (error) {
       request.logger.error(
-        { err: error, uploadId: uploadConfig.uploadId },
+        { err: error },
         'WFD FileUpload: Failed to check upload status'
       )
 

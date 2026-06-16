@@ -76,8 +76,7 @@ export const waterFrameworkFileUploadController = {
     } catch (error) {
       request.logger.error(
         {
-          err: error,
-          marineLicenceId: marineLicence.id
+          err: error
         },
         'Failed to initialize WFD file upload'
       )

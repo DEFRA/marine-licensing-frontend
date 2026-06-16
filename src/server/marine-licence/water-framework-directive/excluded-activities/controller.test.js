@@ -55,7 +55,7 @@ describe('#excludedActivities', () => {
   })
 
   describe('#excludedActivitiesSubmitController', () => {
-    test('Should update cache and redirect to excluded activities page on yes', async () => {
+    test('Should update cache and redirect to review details page on yes', async () => {
       await excludedActivitiesSubmitController.handler(
         { payload: { excludedActivities: 'yes' }, query: {} },
         h
@@ -68,7 +68,7 @@ describe('#excludedActivities', () => {
         'yes'
       )
       expect(h.redirect).toHaveBeenCalledWith(
-        marineLicenceRoutes.MARINE_LICENCE_WATER_FRAMEWORK_DIRECTIVE_EXCLUDED_ACTIVITIES
+        marineLicenceRoutes.MARINE_LICENCE_WATER_FRAMEWORK_DIRECTIVE_REVIEW_YOUR_ANSWERS
       )
     })
 

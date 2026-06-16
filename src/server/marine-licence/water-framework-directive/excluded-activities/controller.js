@@ -2,6 +2,7 @@ import { getMarineLicenceCache } from '#src/server/common/helpers/marine-licence
 import { updateWaterFrameworkDirective } from '#src/server/common/helpers/marine-licence/session-cache/water-framework-directive.js'
 import { createFailAction } from '#src/server/common/helpers/createFailAction.js'
 import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
+import { saveWaterFrameworkDirectiveToBackend } from '#src/server/common/helpers/marine-licence/water-framework-directive/save-water-framework-directive.js'
 import joi from 'joi'
 
 export const EXCLUDED_ACTIVITIES_VIEW_ROUTE =
@@ -81,6 +82,8 @@ export const excludedActivitiesSubmitController = {
         marineLicenceRoutes.MARINE_LICENCE_WATER_FRAMEWORK_DIRECTIVE_PREVIOUS_ASSESSMENT
       )
     }
+
+    await saveWaterFrameworkDirectiveToBackend(request)
 
     return h.redirect(
       marineLicenceRoutes.MARINE_LICENCE_WATER_FRAMEWORK_DIRECTIVE_REVIEW_YOUR_ANSWERS

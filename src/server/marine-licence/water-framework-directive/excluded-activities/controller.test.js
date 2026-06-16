@@ -8,8 +8,12 @@ import {
 import * as cacheUtils from '#src/server/common/helpers/marine-licence/session-cache/utils.js'
 import * as wfdCache from '#src/server/common/helpers/marine-licence/session-cache/water-framework-directive.js'
 import { createMockH } from '#src/server/test-helpers/mocks/helpers.js'
+import { saveWaterFrameworkDirectiveToBackend } from '#src/server/common/helpers/marine-licence/water-framework-directive/save-water-framework-directive.js'
 
 vi.mock('~/src/server/common/helpers/marine-licence/session-cache/utils.js')
+vi.mock(
+  '~/src/server/common/helpers/marine-licence/water-framework-directive/save-water-framework-directive.js'
+)
 
 describe('#excludedActivities', () => {
   const h = createMockH()
@@ -66,6 +70,10 @@ describe('#excludedActivities', () => {
         h,
         'excludedActivities',
         'yes'
+      )
+
+      expect(saveWaterFrameworkDirectiveToBackend).toHaveBeenCalledWith(
+        expect.any(Object)
       )
       expect(h.redirect).toHaveBeenCalledWith(
         marineLicenceRoutes.MARINE_LICENCE_WATER_FRAMEWORK_DIRECTIVE_REVIEW_YOUR_ANSWERS

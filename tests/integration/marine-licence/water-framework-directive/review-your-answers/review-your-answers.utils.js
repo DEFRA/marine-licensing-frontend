@@ -1,6 +1,7 @@
 import {
   ASSESSMENT_CHANGED_HEADING,
   EXCLUDED_ACTIVITIES_HEADING,
+  FILE_UPLOAD_HEADING,
   NAUTICAL_MILE_HEADING,
   PREVIOUS_ASSESSMENT_HEADING
 } from '#src/server/common/helpers/marine-licence/water-framework-directive/water-framework-review-data.js'
@@ -54,6 +55,12 @@ export const validateWaterFrameworkDirectiveSummaryForAllFields = (
   expect(assessmentChangedRow.textContent).toContain(
     expectedPageContent.assessmentChanged
   )
+
+  const fileUploadRow = getRowByKey(
+    waterFrameworkDirectiveSummary,
+    FILE_UPLOAD_HEADING
+  )
+  expect(fileUploadRow.textContent).toContain(expectedPageContent.fileUpload)
 }
 
 export const validateWaterFrameworkDirectiveSummaryForMinimumFields = (
@@ -123,9 +130,15 @@ export const validateWaterFrameworkDirectiveSummaryForPreviousAssessmentFields =
       expectedPageContent.previousAssessment
     )
 
+    const fileUploadRow = getRowByKey(
+      waterFrameworkDirectiveSummary,
+      FILE_UPLOAD_HEADING
+    )
+    expect(fileUploadRow.textContent).toContain(expectedPageContent.fileUpload)
+
     const rows = waterFrameworkDirectiveSummary.querySelectorAll(
       '.govuk-summary-list__row'
     )
 
-    expect(rows.length).toBe(3)
+    expect(rows.length).toBe(4)
   }

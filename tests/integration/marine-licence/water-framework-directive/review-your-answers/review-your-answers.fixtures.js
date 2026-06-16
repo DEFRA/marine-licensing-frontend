@@ -2,7 +2,8 @@ export const expectedPageContentAllFields = {
   nauticalMile: 'Yes',
   excludedActivities: 'No',
   assessmentChanged: 'No',
-  previousAssessment: 'Yes'
+  previousAssessment: 'Yes',
+  fileUpload: 'test-upload-id'
 }
 
 export const expectedPageContentMinimumFields = {
@@ -13,5 +14,6 @@ export const expectedPageContentMinimumFields = {
 export const expectedPageContentPreviousAssessmentFields = {
   nauticalMile: 'Yes',
   excludedActivities: 'No',
-  previousAssessment: 'No'
+  previousAssessment: 'No',
+  fileUpload: 'test-upload-id'
 }

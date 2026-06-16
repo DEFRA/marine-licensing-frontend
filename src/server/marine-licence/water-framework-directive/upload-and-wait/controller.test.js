@@ -224,7 +224,7 @@ describe('#uploadAndWait', () => {
         )
 
         expect(h.redirect).toHaveBeenCalledWith(
-          marineLicenceRoutes.MARINE_LICENCE_TASK_LIST
+          marineLicenceRoutes.MARINE_LICENCE_WATER_FRAMEWORK_DIRECTIVE_REVIEW_YOUR_ANSWERS
         )
       })
 
@@ -248,7 +248,7 @@ describe('#uploadAndWait', () => {
         )
 
         expect(h.redirect).toHaveBeenCalledWith(
-          marineLicenceRoutes.MARINE_LICENCE_TASK_LIST
+          marineLicenceRoutes.MARINE_LICENCE_WATER_FRAMEWORK_DIRECTIVE_REVIEW_YOUR_ANSWERS
         )
       })
     })

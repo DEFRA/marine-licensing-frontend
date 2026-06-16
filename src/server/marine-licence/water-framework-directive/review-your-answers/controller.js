@@ -18,7 +18,7 @@ export const waterFrameworkReviewYourAnswersController = {
     return h.view(REVIEW_YOUR_ANSWERS_VIEW_ROUTE, {
       ...reviewYourAnswersPageData,
       projectName: marineLicence.projectName,
-      backLink: getBackLink(waterFrameworkDirective.excludedActivities)
+      backLink: getBackLink(request, waterFrameworkDirective)
     })
   }
 }

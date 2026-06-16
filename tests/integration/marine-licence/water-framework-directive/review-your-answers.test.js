@@ -1,10 +1,12 @@
 import { getByRole, getByText } from '@testing-library/dom'
+import { JSDOM } from 'jsdom'
 import { marineLicenceRoutes } from '~/src/server/common/constants/routes.js'
 import {
   mockMarineLicence,
   setupTestServer
 } from '~/tests/integration/shared/test-setup-helpers.js'
 import { loadPage, submitForm } from '~/tests/integration/shared/app-server.js'
+import { makeGetRequest } from '~/src/server/test-helpers/server-requests.js'
 
 describe('Water Framework Directive Review Your Answers', () => {
   const getServer = setupTestServer()
@@ -52,6 +54,25 @@ describe('Water Framework Directive Review Your Answers', () => {
     expect(getByRole(document, 'link', { name: 'Back' })).toHaveAttribute(
       'href',
       marineLicenceRoutes.MARINE_LICENCE_WATER_FRAMEWORK_DIRECTIVE_EXCLUDED_ACTIVITIES
+    )
+  })
+
+  test('back link points to task list when arriving from task list', async () => {
+    mockMarineLicence(marineLicence)
+
+    const response = await makeGetRequest({
+      url: marineLicenceRoutes.MARINE_LICENCE_WATER_FRAMEWORK_DIRECTIVE_REVIEW_YOUR_ANSWERS,
+      server: getServer(),
+      headers: {
+        referer: `http://example.com${marineLicenceRoutes.MARINE_LICENCE_TASK_LIST}`
+      }
+    })
+
+    const { document } = new JSDOM(response.result).window
+
+    expect(getByRole(document, 'link', { name: 'Back' })).toHaveAttribute(
+      'href',
+      marineLicenceRoutes.MARINE_LICENCE_TASK_LIST
     )
   })
 

@@ -92,14 +92,15 @@ export const transformSiteDetailsTaskList = (taskList) => [
 ]
 
 const getWaterFrameworkDirectiveHref = (waterFrameworkDirective) => {
-  if (
-    waterFrameworkDirective?.nauticalMile &&
-    waterFrameworkDirective.nauticalMile !== 'yes'
-  ) {
-    return marineLicenceRoutes.MARINE_LICENCE_WATER_FRAMEWORK_DIRECTIVE_NAUTICAL_MILE
+  if (!waterFrameworkDirective?.nauticalMile) {
+    return marineLicenceRoutes.MARINE_LICENCE_WATER_FRAMEWORK_DIRECTIVE_BEFORE_YOU_START
   }
 
-  return marineLicenceRoutes.MARINE_LICENCE_WATER_FRAMEWORK_DIRECTIVE_BEFORE_YOU_START
+  if (waterFrameworkDirective.nauticalMile === 'yes') {
+    return marineLicenceRoutes.MARINE_LICENCE_WATER_FRAMEWORK_DIRECTIVE_REVIEW_YOUR_ANSWERS
+  }
+
+  return marineLicenceRoutes.MARINE_LICENCE_WATER_FRAMEWORK_DIRECTIVE_NAUTICAL_MILE
 }
 
 export const transformWaterFrameworkDirectiveTaskList = (

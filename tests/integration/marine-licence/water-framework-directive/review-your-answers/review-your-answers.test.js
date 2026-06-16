@@ -7,15 +7,12 @@ import {
 } from '~/tests/integration/shared/test-setup-helpers.js'
 import { loadPage, submitForm } from '~/tests/integration/shared/app-server.js'
 import { makeGetRequest } from '~/src/server/test-helpers/server-requests.js'
+import { validateWaterFrameworkDirectiveSummary } from '~/tests/integration/marine-licence/water-framework-directive/review-your-answers/review-your-answers.utils.js'
+import { mockMarineLicenceApplication as marineLicence } from '~/src/server/test-helpers/mocks/marine-licence-mocks.js'
+import { expectedPageContent } from '~/tests/integration/marine-licence/water-framework-directive/review-your-answers/review-your-answers.fixtures.js'
 
 describe('Water Framework Directive Review Your Answers', () => {
   const getServer = setupTestServer()
-
-  const marineLicence = {
-    id: 'marine-licence-123',
-    projectName: 'Test Marine Project',
-    waterFrameworkDirective: { excludedActivities: 'no' }
-  }
 
   test('page elements', async () => {
     mockMarineLicence(marineLicence)
@@ -26,7 +23,7 @@ describe('Water Framework Directive Review Your Answers', () => {
       server: getServer()
     })
 
-    expect(getByText(document, 'Test Marine Project')).toBeInTheDocument()
+    expect(getByText(document, marineLicence.projectName)).toBeInTheDocument()
     expect(getByRole(document, 'heading', { level: 1 })).toHaveTextContent(
       'Check your answers for Water Framework Directive'
     )
@@ -34,6 +31,9 @@ describe('Water Framework Directive Review Your Answers', () => {
       'href',
       marineLicenceRoutes.MARINE_LICENCE_WATER_FRAMEWORK_DIRECTIVE_FILE_UPLOAD
     )
+
+    validateWaterFrameworkDirectiveSummary(document, expectedPageContent)
+
     expect(
       getByRole(document, 'button', { name: 'Continue' })
     ).toBeInTheDocument()

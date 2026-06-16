@@ -7,9 +7,17 @@ import {
 } from '~/tests/integration/shared/test-setup-helpers.js'
 import { loadPage, submitForm } from '~/tests/integration/shared/app-server.js'
 import { makeGetRequest } from '~/src/server/test-helpers/server-requests.js'
-import { validateWaterFrameworkDirectiveSummary } from '~/tests/integration/marine-licence/water-framework-directive/review-your-answers/review-your-answers.utils.js'
+import {
+  validateWaterFrameworkDirectiveSummaryForAllFields,
+  validateWaterFrameworkDirectiveSummaryForMinimumFields,
+  validateWaterFrameworkDirectiveSummaryForPreviousAssessmentFields
+} from '~/tests/integration/marine-licence/water-framework-directive/review-your-answers/review-your-answers.utils.js'
 import { mockMarineLicenceApplication as marineLicence } from '~/src/server/test-helpers/mocks/marine-licence-mocks.js'
-import { expectedPageContent } from '~/tests/integration/marine-licence/water-framework-directive/review-your-answers/review-your-answers.fixtures.js'
+import {
+  expectedPageContentAllFields,
+  expectedPageContentMinimumFields,
+  expectedPageContentPreviousAssessmentFields
+} from '~/tests/integration/marine-licence/water-framework-directive/review-your-answers/review-your-answers.fixtures.js'
 
 describe('Water Framework Directive Review Your Answers', () => {
   const getServer = setupTestServer()
@@ -32,11 +40,69 @@ describe('Water Framework Directive Review Your Answers', () => {
       marineLicenceRoutes.MARINE_LICENCE_WATER_FRAMEWORK_DIRECTIVE_FILE_UPLOAD
     )
 
-    validateWaterFrameworkDirectiveSummary(document, expectedPageContent)
+    validateWaterFrameworkDirectiveSummaryForAllFields(
+      document,
+      expectedPageContentAllFields
+    )
 
     expect(
       getByRole(document, 'button', { name: 'Continue' })
     ).toBeInTheDocument()
+  })
+
+  test('page elements with minimum data', async () => {
+    mockMarineLicence({
+      ...marineLicence,
+      waterFrameworkDirective: {
+        nauticalMile: 'yes',
+        excludedActivities: 'yes'
+      }
+    })
+
+    const document = await loadPage({
+      requestUrl:
+        marineLicenceRoutes.MARINE_LICENCE_WATER_FRAMEWORK_DIRECTIVE_REVIEW_YOUR_ANSWERS,
+      server: getServer()
+    })
+
+    expect(getByRole(document, 'link', { name: 'Back' })).toHaveAttribute(
+      'href',
+      marineLicenceRoutes.MARINE_LICENCE_WATER_FRAMEWORK_DIRECTIVE_EXCLUDED_ACTIVITIES
+    )
+
+    validateWaterFrameworkDirectiveSummaryForMinimumFields(
+      document,
+      expectedPageContentMinimumFields
+    )
+  })
+
+  test('page elements with previousAssessment as no', async () => {
+    mockMarineLicence({
+      ...marineLicence,
+      waterFrameworkDirective: {
+        nauticalMile: 'yes',
+        excludedActivities: 'no',
+        previousAssessment: 'no',
+        s3Location: marineLicence.waterFrameworkDirective.s3Location,
+        uploadedFile: marineLicence.waterFrameworkDirective.uploadedFile
+      }
+    })
+
+    const document = await loadPage({
+      requestUrl:
+        marineLicenceRoutes.MARINE_LICENCE_WATER_FRAMEWORK_DIRECTIVE_REVIEW_YOUR_ANSWERS,
+      server: getServer()
+    })
+
+    expect(getByRole(document, 'link', { name: 'Back' })).toHaveAttribute(
+      'href',
+      marineLicenceRoutes.MARINE_LICENCE_WATER_FRAMEWORK_DIRECTIVE_FILE_UPLOAD
+    )
+
+    validateWaterFrameworkDirectiveSummaryForPreviousAssessmentFields(
+      document,
+      expectedPageContentPreviousAssessmentFields
+    )
   })
 
   test('back link points to excluded-activities when excludedActivities is yes', async () => {
@@ -73,6 +139,25 @@ describe('Water Framework Directive Review Your Answers', () => {
     expect(getByRole(document, 'link', { name: 'Back' })).toHaveAttribute(
       'href',
       marineLicenceRoutes.MARINE_LICENCE_TASK_LIST
+    )
+  })
+
+  test('redirects to nautical mile page when nauticalMile is no', async () => {
+    mockMarineLicence({
+      ...marineLicence,
+      waterFrameworkDirective: {
+        ...marineLicence.waterFrameworkDirective,
+        nauticalMile: 'no'
+      }
+    })
+
+    const response = await makeGetRequest({
+      url: marineLicenceRoutes.MARINE_LICENCE_WATER_FRAMEWORK_DIRECTIVE_REVIEW_YOUR_ANSWERS,
+      server: getServer()
+    })
+
+    expect(response.headers.location).toBe(
+      marineLicenceRoutes.MARINE_LICENCE_WATER_FRAMEWORK_DIRECTIVE_NAUTICAL_MILE
     )
   })
 

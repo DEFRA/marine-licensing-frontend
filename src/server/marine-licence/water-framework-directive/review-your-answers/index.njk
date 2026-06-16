@@ -14,7 +14,15 @@
 {% endblock %}
 
 
- {% set activityRows = [wfdDisplayData.nauticalMile, wfdDisplayData.excludedActivities] %}
+{% set activityRows = [wfdDisplayData.nauticalMile, wfdDisplayData.excludedActivities] %}
+
+{% if waterFrameworkDirective.previousAssessment %}
+    {% set activityRows = (activityRows.push(wfdDisplayData.previousAssessment), activityRows) %}
+{% endif %}
+
+{% if waterFrameworkDirective.assessmentChanged %}
+    {% set activityRows = (activityRows.push(wfdDisplayData.assessmentChanged), activityRows) %}
+{% endif %}
 
 {% block content %}
   <div class="govuk-grid-row">

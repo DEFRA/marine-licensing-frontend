@@ -16,12 +16,19 @@ export const waterFrameworkReviewYourAnswersController = {
     const marineLicence = getMarineLicenceCache(request)
     const { waterFrameworkDirective = {} } = marineLicence
 
+    if (waterFrameworkDirective.nauticalMile === 'no') {
+      return h.redirect(
+        marineLicenceRoutes.MARINE_LICENCE_WATER_FRAMEWORK_DIRECTIVE_NAUTICAL_MILE
+      )
+    }
+
     const wfdDisplayData = waterFrameworkReviewData(waterFrameworkDirective)
 
     return h.view(REVIEW_YOUR_ANSWERS_VIEW_ROUTE, {
       ...reviewYourAnswersPageData,
       projectName: marineLicence.projectName,
       backLink: getBackLink(request, waterFrameworkDirective),
+      waterFrameworkDirective,
       wfdDisplayData
     })
   }

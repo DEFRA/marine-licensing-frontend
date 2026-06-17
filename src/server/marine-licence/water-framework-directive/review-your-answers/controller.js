@@ -1,7 +1,7 @@
 import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
 import { getMarineLicenceCache } from '#src/server/common/helpers/marine-licence/session-cache/utils.js'
 import { waterFrameworkReviewData } from '#src/server/common/helpers/marine-licence/water-framework-directive/water-framework-review-data.js'
-import { getBackLink } from './utils.js'
+import { getBackLink } from '#src/server/marine-licence/water-framework-directive/review-your-answers/utils.js'
 
 export const REVIEW_YOUR_ANSWERS_VIEW_ROUTE =
   'marine-licence/water-framework-directive/review-your-answers/index'

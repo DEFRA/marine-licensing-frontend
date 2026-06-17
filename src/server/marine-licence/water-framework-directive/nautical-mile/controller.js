@@ -1,12 +1,9 @@
 import { getMarineLicenceCache } from '#src/server/common/helpers/marine-licence/session-cache/utils.js'
 import { updateWaterFrameworkDirective } from '#src/server/common/helpers/marine-licence/session-cache/water-framework-directive.js'
 import { createFailAction } from '#src/server/common/helpers/createFailAction.js'
-import {
-  apiRoutes,
-  marineLicenceRoutes
-} from '#src/server/common/constants/routes.js'
+import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
 import joi from 'joi'
-import { authenticatedPatchRequest } from '#src/server/common/helpers/authenticated-requests.js'
+import { saveWaterFrameworkDirectiveToBackend } from '#src/server/common/helpers/marine-licence/water-framework-directive/save-water-framework-directive.js'
 
 export const NAUTICAL_MILE_VIEW_ROUTE =
   'marine-licence/water-framework-directive/nautical-mile/index'
@@ -65,21 +62,7 @@ export const nauticalMileSubmitController = {
   async handler(request, h) {
     const { payload } = request
 
-    const marineLicence = getMarineLicenceCache(request)
-
     const { nauticalMile } = payload
-
-    if (nauticalMile === 'no') {
-      await authenticatedPatchRequest(
-        request,
-        apiRoutes.UPDATE_WATER_FRAMEWORK_DIRECTIVE,
-        {
-          waterFrameworkDirective: { nauticalMile },
-          id: marineLicence.id
-        }
-      )
-      return h.redirect(marineLicenceRoutes.MARINE_LICENCE_TASK_LIST)
-    }
 
     await updateWaterFrameworkDirective(
       request,
@@ -87,6 +70,11 @@ export const nauticalMileSubmitController = {
       'nauticalMile',
       nauticalMile
     )
+
+    if (nauticalMile === 'no') {
+      await saveWaterFrameworkDirectiveToBackend(request, true)
+      return h.redirect(marineLicenceRoutes.MARINE_LICENCE_TASK_LIST)
+    }
 
     return h.redirect(
       marineLicenceRoutes.MARINE_LICENCE_WATER_FRAMEWORK_DIRECTIVE_EXCLUDED_ACTIVITIES

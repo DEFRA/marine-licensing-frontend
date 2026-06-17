@@ -4,6 +4,7 @@ import { processSiteDetails } from '#src/server/common/helpers/exemptions/exempt
 import { getExemptionService } from '#src/services/exemption-service/index.js'
 import { buildSiteLocationData } from '#src/server/common/helpers/site-location-data.js'
 import { RETURN_TO_CACHE_KEY } from '#src/server/common/constants/cache.js'
+import { withAnswersLinkType } from '#src/server/common/helpers/mcms-context/is-downloadable-pdf.js'
 
 const checkYourAnswersViewContent = {
   pageTitle: 'Check your answers before sending your information',
@@ -33,7 +34,7 @@ export const checkYourAnswersController = {
     return h.view(CHECK_YOUR_ANSWERS_VIEW_ROUTE, {
       ...checkYourAnswersViewContent,
       ...cachedExemption,
-      mcmsContext: savedExemption.mcmsContext,
+      mcmsContext: withAnswersLinkType(savedExemption.mcmsContext),
       siteDetails,
       siteLocationData: {
         ...siteLocationData,

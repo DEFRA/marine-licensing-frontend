@@ -56,6 +56,18 @@ describe('iatOutcomeDocumentService', () => {
         payload
       )
     })
+
+    it('returns null when value missing in response', async () => {
+      authenticatedPostRequest.mockResolvedValue({
+        payload: { message: 'success' }
+      })
+      const result = await iatOutcomeDocumentService.mint(
+        request,
+        contextSlug,
+        {}
+      )
+      expect(result).toBeNull()
+    })
   })
 
   describe('get', () => {
@@ -69,6 +81,14 @@ describe('iatOutcomeDocumentService', () => {
         request,
         `/outcome-documents/${snapSlug}`
       )
+    })
+
+    it('returns null when value missing in response', async () => {
+      authenticatedGetRequest.mockResolvedValue({
+        payload: { message: 'success' }
+      })
+      const doc = await iatOutcomeDocumentService.get(request, snapSlug)
+      expect(doc).toBeNull()
     })
 
     it('returns null on Boom 404', async () => {

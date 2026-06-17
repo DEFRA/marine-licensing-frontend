@@ -5,6 +5,7 @@ import {
   activityTypes,
   articleCodes
 } from '#src/server/common/constants/mcms-context.js'
+import { isMcmsHost } from './is-mcms-host.js'
 
 const { ACTIVITY_TYPE, ARTICLE, pdfDownloadUrl } = requiredQueryParams
 
@@ -19,10 +20,6 @@ function appHost() {
   } catch {
     return null
   }
-}
-
-function isMcmsHost(host) {
-  return /^[^.]+\.marinemanagement\.org\.uk$/.test(host)
 }
 
 function isOwnHost(host) {

@@ -19,7 +19,8 @@ describe('Project Details Card Component', () => {
           },
           articleCode: '17',
           pdfDownloadUrl:
-            'https://marinelicensingtest.marinemanagement.org.uk/mmofox5uat/journey…'
+            'https://marinelicensingtest.marinemanagement.org.uk/mmofox5uat/journey…',
+          isDownloadablePdf: true
         },
         isReadOnly: false,
         isApplicantView: true
@@ -125,7 +126,8 @@ describe('Project Details Card Component', () => {
             },
             articleCode: '17',
             pdfDownloadUrl:
-              'https://marinelicensingtest.marinemanagement.org.uk/mmofox5uat/journey…'
+              'https://marinelicensingtest.marinemanagement.org.uk/mmofox5uat/journey…',
+            isDownloadablePdf: true
           },
           isReadOnly: true,
           isApplicantView: true
@@ -159,7 +161,8 @@ describe('Project Details Card Component', () => {
             },
             articleCode: '17',
             pdfDownloadUrl:
-              'https://marinelicensingtest.marinemanagement.org.uk/mmofox5uat/journey…'
+              'https://marinelicensingtest.marinemanagement.org.uk/mmofox5uat/journey…',
+            isDownloadablePdf: true
           },
           isReadOnly: true,
           isApplicantView: true,
@@ -193,7 +196,8 @@ describe('Project Details Card Component', () => {
             },
             articleCode: '17',
             pdfDownloadUrl:
-              'https://marinelicensingtest.marinemanagement.org.uk/mmofox5uat/journey…'
+              'https://marinelicensingtest.marinemanagement.org.uk/mmofox5uat/journey…',
+            isDownloadablePdf: true
           },
           isReadOnly: true,
           isApplicantView: false
@@ -216,6 +220,68 @@ describe('Project Details Card Component', () => {
         })
       })
     })
+    describe('IAT answers link', () => {
+      const OUR_URL =
+        'https://get-permission-for-marine-work.defra.gov.uk/journey/self-service/outcome-document/BBBBBBBBBBBBBBBBBBBBBB'
+
+      test('renders a downloadable PDF link for an MCMS document', () => {
+        const $ = renderComponent('project-details-card', {
+          projectName: 'Test Marine Project',
+          mcmsContext: {
+            activity: { label: 'Deposit of a substance or object' },
+            articleCode: '17',
+            pdfDownloadUrl:
+              'https://marinelicensingtest.marinemanagement.org.uk/mmofox5uat/journey/self-service/outcome-document/123',
+            isDownloadablePdf: true
+          },
+          isReadOnly: true,
+          isApplicantView: true
+        })
+        const html = $.html()
+        expect(html).toContain('Download a copy of your answers (PDF)')
+        expect(html).not.toContain('View answers (opens in a new tab)')
+        const $link = $('a:contains("Download a copy")')
+        expect($link.attr('target')).toBeUndefined()
+      })
+
+      test('renders a new-tab "View answers" link for our own answers page', () => {
+        const $ = renderComponent('project-details-card', {
+          projectName: 'Test Marine Project',
+          mcmsContext: {
+            activity: { label: 'Deposit of a substance or object' },
+            articleCode: '17',
+            pdfDownloadUrl: OUR_URL,
+            isDownloadablePdf: false
+          },
+          isReadOnly: true,
+          isApplicantView: true
+        })
+        const html = $.html()
+        expect(html).toContain('View answers (opens in a new tab)')
+        expect(html).not.toContain('Download a copy')
+        const $link = $('a:contains("View answers")')
+        expect($link.attr('target')).toBe('_blank')
+        expect($link.attr('rel')).toBe('noopener noreferrer')
+        expect($link.attr('href')).toBe(OUR_URL)
+      })
+
+      test('renders no answers link when pdfDownloadUrl is absent', () => {
+        const $ = renderComponent('project-details-card', {
+          projectName: 'Test Marine Project',
+          mcmsContext: {
+            activity: { label: 'Deposit of a substance or object' },
+            articleCode: '17',
+            isDownloadablePdf: false
+          },
+          isReadOnly: true,
+          isApplicantView: true
+        })
+        const html = $.html()
+        expect(html).not.toContain('View answers (opens in a new tab)')
+        expect(html).not.toContain('Download a copy')
+      })
+    })
+
     describe('Activity purpose field', () => {
       test('Should render "The purpose of the activity" when purpose is provided', () => {
         $component = renderComponent('project-details-card', {
@@ -227,7 +293,8 @@ describe('Project Details Card Component', () => {
             },
             articleCode: '17',
             pdfDownloadUrl:
-              'https://marinelicensingtest.marinemanagement.org.uk/mmofox5uat/journey…'
+              'https://marinelicensingtest.marinemanagement.org.uk/mmofox5uat/journey…',
+            isDownloadablePdf: true
           },
           isReadOnly: false,
           isApplicantView: true
@@ -247,7 +314,8 @@ describe('Project Details Card Component', () => {
             },
             articleCode: '17',
             pdfDownloadUrl:
-              'https://marinelicensingtest.marinemanagement.org.uk/mmofox5uat/journey…'
+              'https://marinelicensingtest.marinemanagement.org.uk/mmofox5uat/journey…',
+            isDownloadablePdf: true
           },
           isReadOnly: false,
           isApplicantView: true

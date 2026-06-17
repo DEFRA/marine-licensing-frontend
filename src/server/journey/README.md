@@ -9,8 +9,11 @@ decision-tree experience.
 
 The IAT is a decision tree that asks the user a series of questions
 about their activity and tells them what kind of licence or permission
-they need (if any). It is a lift-and-shift from the legacy Java
-application in `mmo/iat/iat-source-code/`.
+they need (if any). It is a port of the legacy Java application (Fivium
+MCMS), whose source and API spec live in `mmo/Fivium source code/iat/`.
+The persistence model was reworked during the port — see
+[`self-service/README.md`](./self-service/README.md) for the current
+context/snapshot design.
 
 The IAT is **temporarily hosted inside `marine-licensing-frontend`**.
 Once the port is complete and tested, it may move to its own
@@ -21,21 +24,30 @@ patterns, and avoid reaching into unrelated feature directories.
 
 ### Pages
 
-| URL                                            | Directory                | Ticket           |
-| ---------------------------------------------- | ------------------------ | ---------------- |
-| `/journey/self-service/start`                  | `self-service/start/`    | ML-1162          |
-| `/journey/self-service/outcome/{outcomePath*}` | `self-service/outcome/`  | ML-1164          |
-| `/journey/self-service/{questionPath*}`        | `self-service/question/` | ML-1186, ML-1269 |
+The walkthrough is slug-prefixed (`c/{slug}/…`) once started. The
+authoritative routes table — with methods and purpose — lives in
+[`self-service/README.md`](./self-service/README.md#routes). Summary:
 
-More terminal outcome pages will land under `self-service/outcome/` as
-follow-up tickets complete.
+| URL                                                     | Directory                        |
+| ------------------------------------------------------- | -------------------------------- |
+| `/journey/self-service/start`                           | `self-service/start/`            |
+| `/journey/self-service/invalid`                         | `self-service/invalid/`          |
+| `/journey/self-service/c/{slug}/{questionPath*}`        | `self-service/question/`         |
+| `/journey/self-service/c/{slug}/outcome/{outcomePath*}` | `self-service/outcome/`          |
+| `/journey/self-service/outcome-document/{slug}`         | `self-service/outcome-document/` |
+
+A read-only developer CLI (`npm run iat`) inspects the journey config — see
+[`self-service/README.iat-query.md`](./self-service/README.iat-query.md).
 
 ### Related tickets
 
 - **ML-1157** — spike / parent for the IAT port
 - **ML-1162** — IAT start page (this directory's first page)
 - **ML-1186** — wires the "Start now" button behaviour on the start page
-- Further tickets will add the question journey and outcome pages
+- The question journey, outcome pages, the View-answers snapshot model
+  (ML-1164/1165/1269/1304/1306) and the `npm run iat` tooling have since
+  landed. See the per-page tickets in
+  [`self-service/README.md`](./self-service/README.md#file-map).
 
 ## Conventions for files in this tree
 

@@ -6,9 +6,12 @@ import { getBackLink } from './utils.js'
 export const REVIEW_YOUR_ANSWERS_VIEW_ROUTE =
   'marine-licence/water-framework-directive/review-your-answers/index'
 
+const REVIEW_YOUR_ANSWERS_PAGE_TITLE =
+  'Check your answers for Water Framework Directive'
+
 const reviewYourAnswersPageData = {
-  pageTitle: 'Check your answers for Water Framework Directive',
-  heading: 'Check your answers for Water Framework Directive'
+  pageTitle: REVIEW_YOUR_ANSWERS_PAGE_TITLE,
+  heading: REVIEW_YOUR_ANSWERS_PAGE_TITLE
 }
 
 export const waterFrameworkReviewYourAnswersController = {

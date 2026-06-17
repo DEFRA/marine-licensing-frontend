@@ -161,7 +161,7 @@ describe('Water Framework Directive Excluded Activities', () => {
     )
   })
 
-  test('should go to assessment-change when yes is chosen as answer', async () => {
+  test('should go to assessment-change when no is chosen as answer', async () => {
     mockMarineLicence(marineLicence)
 
     const { response } = await submitExcludedActivitiesForm({

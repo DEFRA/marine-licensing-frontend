@@ -18,6 +18,11 @@ import { getSiteDetailsBySite } from '#src/server/common/helpers/exemptions/sess
 
 const s3PathForMarineLicence = 'marine-licence'
 
+const getS3PathForMarineLicence = (fileType) =>
+  fileType === 'kml'
+    ? `${s3PathForMarineLicence}/kml-uploads`
+    : `${s3PathForMarineLicence}/shapefile-uploads`
+
 export const fileUploadController = {
   async handler(request, h) {
     const marineLicence = getMarineLicenceCache(request)
@@ -61,7 +66,7 @@ export const fileUploadController = {
       const redirectUrl = marineLicenceRoutes.MARINE_LICENCE_UPLOAD_AND_WAIT
       const uploadConfig = await cdpService.initiate({
         redirectUrl,
-        s3Path: s3PathForMarineLicence,
+        s3Path: getS3PathForMarineLicence(fileUploadType),
         s3Bucket
       })
 

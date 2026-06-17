@@ -84,8 +84,14 @@ describe('#previousAssessment', () => {
         'previousAssessment',
         'no'
       )
+      expect(wfdCache.updateWaterFrameworkDirective).toHaveBeenCalledWith(
+        expect.any(Object),
+        h,
+        'assessmentChanged',
+        null
+      )
       expect(h.redirect).toHaveBeenCalledWith(
-        marineLicenceRoutes.MARINE_LICENCE_WATER_FRAMEWORK_DIRECTIVE_PREVIOUS_ASSESSMENT
+        marineLicenceRoutes.MARINE_LICENCE_WATER_FRAMEWORK_DIRECTIVE_FILE_UPLOAD
       )
     })
 

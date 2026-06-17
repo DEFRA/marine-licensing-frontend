@@ -96,7 +96,11 @@ export const marineLicenceRoutes = {
     '/marine-licence/water-framework-directive-previous-assessment',
   MARINE_LICENCE_WATER_FRAMEWORK_DIRECTIVE_ASSESSMENT_CHANGED:
     '/marine-licence/water-framework-directive-assessment-changed',
-  MARINE_LICENCE_PREFERRED_DATES: '/marine-licence/start-and-end-dates'
+  MARINE_LICENCE_PREFERRED_DATES: '/marine-licence/start-and-end-dates',
+  MARINE_LICENCE_WATER_FRAMEWORK_DIRECTIVE_FILE_UPLOAD:
+    '/marine-licence/water-framework-directive-file-upload',
+  MARINE_LICENCE_WATER_FRAMEWORK_DIRECTIVE_UPLOAD_AND_WAIT:
+    '/marine-licence/water-framework-directive-upload-and-wait'
 }
 
 export const defraIdGuidanceRoutes = {

@@ -9,9 +9,8 @@ decision-tree experience.
 
 The IAT is a decision tree that asks the user a series of questions
 about their activity and tells them what kind of licence or permission
-they need (if any). It is a port of the legacy Java application (Fivium
-MCMS), whose source and API spec live in `mmo/Fivium source code/iat/`.
-The persistence model was reworked during the port — see
+they need (if any). It is a port of the legacy Fivium MCMS Java
+application. The persistence model was reworked during the port — see
 [`self-service/README.md`](./self-service/README.md) for the current
 context/snapshot design.
 

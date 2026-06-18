@@ -70,6 +70,32 @@ describe('config validation', () => {
       expect(config.get('redis.host')).toBe('127.0.0.1')
     })
 
+    test('exposes mcms.url and mcms.path defaults in local environment', async () => {
+      process.env.ENVIRONMENT = 'local'
+      process.env.NODE_ENV = 'test'
+
+      const { config } = await import('./config.js')
+
+      expect(config.get('mcms.url')).toBe(
+        'https://marinelicensingtest.marinemanagement.org.uk/'
+      )
+      expect(config.get('mcms.path')).toBe('')
+    })
+
+    test('honours MCMS_URL and MCMS_PATH overrides', async () => {
+      process.env.ENVIRONMENT = 'local'
+      process.env.NODE_ENV = 'test'
+      process.env.MCMS_URL = 'https://marinelicensing.marinemanagement.org.uk/'
+      process.env.MCMS_PATH = 'apply/new'
+
+      const { config } = await import('./config.js')
+
+      expect(config.get('mcms.url')).toBe(
+        'https://marinelicensing.marinemanagement.org.uk/'
+      )
+      expect(config.get('mcms.path')).toBe('apply/new')
+    })
+
     test('should allow default values in dev environment', async () => {
       process.env.ENVIRONMENT = 'dev'
       process.env.NODE_ENV = 'production'
@@ -121,6 +147,7 @@ describe('config validation', () => {
       process.env.CDP_UPLOAD_BUCKET = 'perf-bucket'
       process.env.APP_BASE_URL =
         'https://marine-licensing-frontend.perf-test.cdp-int.defra.cloud'
+      process.env.MCMS_URL = 'https://marinelicensing.marinemanagement.org.uk/'
 
       const { config } = await import('./config.js')
 
@@ -159,6 +186,7 @@ describe('config validation', () => {
       process.env.CDP_UPLOADER_BASE_URL = 'https://uploader.example.com'
       process.env.CDP_UPLOAD_BUCKET = 'prod-bucket'
       process.env.APP_BASE_URL = 'https://app.example.com'
+      process.env.MCMS_URL = 'https://marinelicensing.marinemanagement.org.uk/'
 
       const { config } = await import('./config.js')
 
@@ -191,6 +219,7 @@ describe('config validation', () => {
         expect(errorMessage).toContain('ENTRA_ID_CLIENT_SECRET')
         expect(errorMessage).toContain('CDP_UPLOADER_BASE_URL')
         expect(errorMessage).toContain('APP_BASE_URL')
+        expect(errorMessage).toContain('MCMS_URL')
       }
     })
   })
@@ -220,6 +249,7 @@ describe('config validation', () => {
       process.env.CDP_UPLOADER_BASE_URL = 'https://uploader.example.com'
       process.env.CDP_UPLOAD_BUCKET = 'prod-bucket'
       process.env.APP_BASE_URL = 'https://app.example.com'
+      process.env.MCMS_URL = 'https://marinelicensing.marinemanagement.org.uk/'
 
       await import('./config.js')
 
@@ -258,6 +288,7 @@ describe('config validation', () => {
       process.env.CDP_UPLOADER_BASE_URL = 'https://uploader.example.com'
       process.env.CDP_UPLOAD_BUCKET = 'prod-bucket'
       process.env.APP_BASE_URL = 'https://app.example.com'
+      process.env.MCMS_URL = 'https://marinelicensing.marinemanagement.org.uk/'
 
       await import('./config.js')
 

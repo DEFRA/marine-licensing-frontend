@@ -3,11 +3,15 @@ import { waterFrameworkDirectiveNauticalMileRoutes } from '#src/server/marine-li
 import { waterFrameworkDirectiveExcludedActivitiesRoutes } from '#src/server/marine-licence/water-framework-directive/excluded-activities/index.js'
 import { waterFrameworkDirectivePreviousAssessmentRoutes } from '#src/server/marine-licence/water-framework-directive/previous-assessment/index.js'
 import { waterFrameworkDirectiveAssessmentChangedRoutes } from '#src/server/marine-licence/water-framework-directive/assessment-changed/index.js'
+import { waterFrameworkFileUploadRoutes } from '#src/server/marine-licence/water-framework-directive/file-upload/index.js'
+import { waterFrameworkDirectiveUploadAndWaitRoutes } from '#src/server/marine-licence/water-framework-directive/upload-and-wait/index.js'
 
 export const waterDirectiveRoutes = [
   ...waterFrameworkDirectiveBeforeYouStartRoutes,
   ...waterFrameworkDirectiveNauticalMileRoutes,
   ...waterFrameworkDirectiveExcludedActivitiesRoutes,
   ...waterFrameworkDirectivePreviousAssessmentRoutes,
-  ...waterFrameworkDirectiveAssessmentChangedRoutes
+  ...waterFrameworkDirectiveAssessmentChangedRoutes,
+  ...waterFrameworkFileUploadRoutes,
+  ...waterFrameworkDirectiveUploadAndWaitRoutes
 ]

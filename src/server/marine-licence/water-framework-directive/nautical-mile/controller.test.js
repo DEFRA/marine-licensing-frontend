@@ -1,8 +1,5 @@
 import { vi } from 'vitest'
-import {
-  apiRoutes,
-  marineLicenceRoutes
-} from '#src/server/common/constants/routes.js'
+import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
 import {
   nauticalMileSubmitController,
   NAUTICAL_MILE_VIEW_ROUTE,
@@ -11,10 +8,12 @@ import {
 import * as cacheUtils from '#src/server/common/helpers/marine-licence/session-cache/utils.js'
 import * as wfdCache from '#src/server/common/helpers/marine-licence/session-cache/water-framework-directive.js'
 import { createMockH } from '#src/server/test-helpers/mocks/helpers.js'
-import { authenticatedPatchRequest } from '#src/server/common/helpers/authenticated-requests.js'
+import { saveWaterFrameworkDirectiveToBackend } from '#src/server/common/helpers/marine-licence/water-framework-directive/save-water-framework-directive.js'
 
 vi.mock('~/src/server/common/helpers/marine-licence/session-cache/utils.js')
-vi.mock('~/src/server/common/helpers/authenticated-requests.js')
+vi.mock(
+  '~/src/server/common/helpers/marine-licence/water-framework-directive/save-water-framework-directive.js'
+)
 
 describe('#nauticalMile', () => {
   const h = createMockH()
@@ -83,10 +82,9 @@ describe('#nauticalMile', () => {
         h
       )
 
-      expect(authenticatedPatchRequest).toHaveBeenCalledWith(
+      expect(saveWaterFrameworkDirectiveToBackend).toHaveBeenCalledWith(
         expect.any(Object),
-        apiRoutes.UPDATE_WATER_FRAMEWORK_DIRECTIVE,
-        { waterFrameworkDirective: { nauticalMile: 'no' }, id: mockLicence.id }
+        true
       )
       expect(h.redirect).toHaveBeenCalledWith(
         marineLicenceRoutes.MARINE_LICENCE_TASK_LIST

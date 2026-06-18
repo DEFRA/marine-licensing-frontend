@@ -68,7 +68,7 @@ describe('#assessmentChanged', () => {
         'yes'
       )
       expect(h.redirect).toHaveBeenCalledWith(
-        marineLicenceRoutes.MARINE_LICENCE_WATER_FRAMEWORK_DIRECTIVE_ASSESSMENT_CHANGED
+        marineLicenceRoutes.MARINE_LICENCE_WATER_FRAMEWORK_DIRECTIVE_FILE_UPLOAD
       )
     })
 
@@ -85,7 +85,7 @@ describe('#assessmentChanged', () => {
         'no'
       )
       expect(h.redirect).toHaveBeenCalledWith(
-        marineLicenceRoutes.MARINE_LICENCE_WATER_FRAMEWORK_DIRECTIVE_ASSESSMENT_CHANGED
+        marineLicenceRoutes.MARINE_LICENCE_WATER_FRAMEWORK_DIRECTIVE_FILE_UPLOAD
       )
     })
 

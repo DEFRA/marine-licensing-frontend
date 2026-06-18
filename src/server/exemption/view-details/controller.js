@@ -10,6 +10,7 @@ import {
   isProjectViewable
 } from '#src/server/common/helpers/view-details/utils.js'
 import { EXEMPTIONS_KEY } from '#src/server/common/constants/exemptions.js'
+import { withAnswersLinkType } from '#src/server/common/helpers/mcms-context/is-downloadable-pdf.js'
 
 export const VIEW_DETAILS_VIEW_ROUTE = 'exemption/view-details/index'
 export const viewDetailsController = {
@@ -60,6 +61,7 @@ export const viewDetailsController = {
         isReadOnly: true,
         isApplicantView,
         ...exemption,
+        mcmsContext: withAnswersLinkType(exemption.mcmsContext),
         statusTagClass,
         siteDetails,
         multipleSiteDetails,

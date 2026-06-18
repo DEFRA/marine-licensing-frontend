@@ -73,7 +73,7 @@ export const assessmentChangedSubmitController = {
     )
 
     return h.redirect(
-      marineLicenceRoutes.MARINE_LICENCE_WATER_FRAMEWORK_DIRECTIVE_ASSESSMENT_CHANGED
+      marineLicenceRoutes.MARINE_LICENCE_WATER_FRAMEWORK_DIRECTIVE_FILE_UPLOAD
     )
   }
 }

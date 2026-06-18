@@ -5,6 +5,7 @@
 {% from "marine-licence/site-location-card/macro.njk" import appMarineLicenceSiteLocationCard %}
 {% from "marine-licence/site-details-card/macro.njk" import appMarineLicenceSiteDetailsCard %}
 {% from "marine-licence/activity-details-card/macro.njk" import appMarineLicenceActivityDetailsCard %}
+{% from "marine-licence/water-framework-directive-card/macro.njk" import appMarineLicenceWaterFrameworkDirectiveCard %}
 {% from "public-register-card/macro.njk" import appPublicRegisterCard %}
 
 {% block beforeContent %}
@@ -65,6 +66,11 @@
           marineLicenceId: marineLicenceId
         }) }}
       {% endif %}
+
+      {{ appMarineLicenceWaterFrameworkDirectiveCard({
+        waterFrameworkDirectiveData: waterFrameworkDirectiveData,
+        isReadOnly: isReadOnly
+      }) }}
 
       {{ appMarineLicenceOtherPermissionsCard({
         specialLegalPowers: specialLegalPowers,

@@ -5,11 +5,11 @@
 {% set rows = (rows.push({
   key: params.waterFrameworkDirectiveData.nauticalMile.key,
   value: params.waterFrameworkDirectiveData.nauticalMile.value
-},{
-  key: params.waterFrameworkDirectiveData.excludedActivities.key,
-  value: params.waterFrameworkDirectiveData.excludedActivities.value
 }), rows) %}
 
+{% if params.waterFrameworkDirectiveData.excludedActivities %}
+    {% set rows = (rows.push(params.waterFrameworkDirectiveData.excludedActivities), rows) %}
+{% endif %}
 
 {% if params.waterFrameworkDirectiveData.previousAssessment %}
     {% set rows = (rows.push(params.waterFrameworkDirectiveData.previousAssessment), rows) %}

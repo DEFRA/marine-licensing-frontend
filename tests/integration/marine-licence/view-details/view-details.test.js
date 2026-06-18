@@ -6,8 +6,12 @@ import {
 } from '~/tests/integration/shared/test-setup-helpers.js'
 import { loadPage } from '~/tests/integration/shared/app-server.js'
 import { mockSubmittedMarineLicenceApplication } from '~/src/server/test-helpers/mocks/marine-licence-mocks.js'
-import { expectedProjectDetailsCard } from './fixtures.js'
+import {
+  expectedProjectDetailsCard,
+  expectedWaterFrameworkDirectiveCard
+} from './fixtures.js'
 import { getCardRow } from './utils.js'
+import { validateWaterFrameworkDirective } from '#tests/integration/shared/summary-card-validators.js'
 
 describe('Marine Licence View Details', () => {
   const getServer = setupTestServer()
@@ -79,6 +83,28 @@ describe('Marine Licence View Details', () => {
 
     test('does not render the internal-user-only site-details-card', () => {
       expect(document.querySelector('#site-details-card')).toBeNull()
+    })
+  })
+
+  describe('water framework directive card', () => {
+    let document
+
+    beforeEach(async () => {
+      document = await loadViewDetailsPage(getServer())
+    })
+
+    test('renders the water framework directive card', () => {
+      validateWaterFrameworkDirective(
+        document,
+        expectedWaterFrameworkDirectiveCard
+      )
+    })
+
+    test('does not render a Change link', () => {
+      const card = document.querySelector('#water-framework-directive-card')
+      const changeLink = card.querySelector('.govuk-summary-card__actions a')
+
+      expect(changeLink).toBeNull()
     })
   })
 })

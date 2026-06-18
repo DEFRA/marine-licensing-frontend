@@ -107,7 +107,7 @@ export const config = convict({
       env: 'MCMS_URL'
     },
     path: {
-      doc: 'Path appended to the MCMS base URL for the IAT handoff (TBC)',
+      doc: 'Path appended to the MCMS base URL for the IAT handoff — relative, no leading slash (TBC)',
       format: String,
       default: '',
       env: 'MCMS_PATH'

@@ -5,7 +5,8 @@ import {
   projectOutcomeParams,
   buildHandoffQueryString,
   buildHandoffRedirectUrl,
-  buildMcmsHandoffQueryString
+  buildMcmsHandoffQueryString,
+  buildMcmsRedirectUrl
 } from './application-handoff.js'
 
 const exemption = HANDOFF_ALLOWLISTS.exemption
@@ -197,5 +198,31 @@ describe('buildMcmsHandoffQueryString', () => {
       viewAnswersUrl: undefined
     })
     expect(qs).toBe('journeyId=CTX&FAST_TRACK=true')
+  })
+})
+
+describe('buildMcmsRedirectUrl', () => {
+  it('keeps the absolute origin and appends the query string', () => {
+    expect(
+      buildMcmsRedirectUrl(
+        'https://marinelicensingtest.marinemanagement.org.uk/',
+        '',
+        'journeyId=X&FAST_TRACK=true'
+      )
+    ).toBe(
+      'https://marinelicensingtest.marinemanagement.org.uk/?journeyId=X&FAST_TRACK=true'
+    )
+  })
+
+  it('joins a non-empty path onto the base URL', () => {
+    expect(
+      buildMcmsRedirectUrl('https://mcms.test/', 'apply/new', 'a=1')
+    ).toBe('https://mcms.test/apply/new?a=1')
+  })
+
+  it('returns just the base URL when there is no query string', () => {
+    expect(buildMcmsRedirectUrl('https://mcms.test/', '', '')).toBe(
+      'https://mcms.test/'
+    )
   })
 })

@@ -64,6 +64,15 @@ export function buildHandoffQueryString({
   return params.toString()
 }
 
+export function buildMcmsRedirectUrl(baseUrl, path, queryString) {
+  const url = new URL(path || '', baseUrl)
+  if (!queryString) {
+    return url.toString()
+  }
+  const separator = url.search ? '&' : '?'
+  return `${url.toString()}${separator}${queryString}`
+}
+
 export function buildMcmsHandoffQueryString({
   questionLog,
   focusedOption,

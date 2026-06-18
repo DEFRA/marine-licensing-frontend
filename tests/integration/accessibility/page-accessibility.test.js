@@ -254,6 +254,11 @@ describe('Page accessibility checks (Axe)', () => {
         'Has anything changed since your previous Water Framework Directive assessment?'
     },
     {
+      url: marineLicenceRoutes.MARINE_LICENCE_WATER_FRAMEWORK_DIRECTIVE_REVIEW_YOUR_ANSWERS,
+      isMarineLicence: true,
+      title: 'Check your answers for Water Framework Directive'
+    },
+    {
       url: `${marineLicenceRoutes.MARINE_LICENCE_TYPE_OF_ACTIVITY}?site=1&activity=1`,
       isMarineLicence: true,
       title: 'Type of activity'

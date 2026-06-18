@@ -19,6 +19,49 @@ vi.mock('#src/services/marine-licence-service/index.js')
 vi.mock('#src/server/common/helpers/marine-licence/site-data.js')
 vi.mock('#src/server/common/helpers/marine-licence/summary-data.js')
 
+const expectedWaterFrameworkDirectiveData = {
+  assessmentChanged: {
+    key: {
+      text: 'Changes since the previous Water Framework Directive assessment'
+    },
+    value: {
+      text: 'No'
+    }
+  },
+  excludedActivities: {
+    key: {
+      text: 'Project limited to one of the excluded activities'
+    },
+    value: {
+      text: 'No'
+    }
+  },
+  nauticalMile: {
+    key: {
+      text: 'Project located within one nautical mile (1.85km) of the coast'
+    },
+    value: {
+      text: 'Yes'
+    }
+  },
+  previousAssessment: {
+    key: {
+      text: 'Previous 2015 to 2022 Water Framework Directive assessment'
+    },
+    value: {
+      text: 'Yes'
+    }
+  },
+  uploadedFile: {
+    key: {
+      text: 'Water Framework Directive assessment upload'
+    },
+    value: {
+      text: 'test-upload-id'
+    }
+  }
+}
+
 describe('#checkYourAnswersController', () => {
   let mockRequest
   let mockH
@@ -88,7 +131,10 @@ describe('#checkYourAnswersController', () => {
       summaryData: mockSummaryData,
       reviewSiteDetailsRoute:
         marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS,
-      publicRegisterRoute: marineLicenceRoutes.MARINE_LICENCE_PUBLIC_REGISTER
+      publicRegisterRoute: marineLicenceRoutes.MARINE_LICENCE_PUBLIC_REGISTER,
+      waterFrameworkDirectiveData: expectedWaterFrameworkDirectiveData,
+      changeLink:
+        marineLicenceRoutes.MARINE_LICENCE_WATER_FRAMEWORK_DIRECTIVE_REVIEW_YOUR_ANSWERS
     })
   })
 
@@ -114,6 +160,7 @@ describe('#checkYourAnswersController', () => {
       preferredDates: null,
       coordinatesType: null,
       summaryData: [],
+      waterFrameworkDirectiveData: [],
       reviewSiteDetailsRoute:
         marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS,
       publicRegisterRoute: marineLicenceRoutes.MARINE_LICENCE_PUBLIC_REGISTER

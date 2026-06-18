@@ -16,6 +16,16 @@ describe('Water Framework Directive Excluded Activities', () => {
     waterFrameworkDirective: { excludedActivities: undefined }
   }
 
+  const submitExcludedActivitiesForm = async (formData) => {
+    const { document, response } = await submitForm({
+      requestUrl:
+        marineLicenceRoutes.MARINE_LICENCE_WATER_FRAMEWORK_DIRECTIVE_EXCLUDED_ACTIVITIES,
+      server: getServer(),
+      formData
+    })
+    return { document, response }
+  }
+
   test('page elements', async () => {
     mockMarineLicence(marineLicence)
 
@@ -127,17 +137,7 @@ describe('Water Framework Directive Excluded Activities', () => {
   test('should show a validation error when submitted without a decision', async () => {
     mockMarineLicence(marineLicence)
 
-    const submitExcludedActivitiesForm = async (formData) => {
-      const { document } = await submitForm({
-        requestUrl:
-          marineLicenceRoutes.MARINE_LICENCE_WATER_FRAMEWORK_DIRECTIVE_EXCLUDED_ACTIVITIES,
-        server: getServer(),
-        formData
-      })
-      return document
-    }
-
-    const document = await submitExcludedActivitiesForm({})
+    const { document } = await submitExcludedActivitiesForm({})
 
     expectFieldsetError({
       document,
@@ -147,5 +147,29 @@ describe('Water Framework Directive Excluded Activities', () => {
         'Select whether your project is limited to one of the excluded activities',
       findByHeading: true
     })
+  })
+
+  test('should go to review page when yes is chosen as answer', async () => {
+    mockMarineLicence(marineLicence)
+
+    const { response } = await submitExcludedActivitiesForm({
+      excludedActivities: 'yes'
+    })
+
+    expect(response.headers.location).toBe(
+      marineLicenceRoutes.MARINE_LICENCE_WATER_FRAMEWORK_DIRECTIVE_REVIEW_YOUR_ANSWERS
+    )
+  })
+
+  test('should go to assessment-change when no is chosen as answer', async () => {
+    mockMarineLicence(marineLicence)
+
+    const { response } = await submitExcludedActivitiesForm({
+      excludedActivities: 'no'
+    })
+
+    expect(response.headers.location).toBe(
+      marineLicenceRoutes.MARINE_LICENCE_WATER_FRAMEWORK_DIRECTIVE_PREVIOUS_ASSESSMENT
+    )
   })
 })

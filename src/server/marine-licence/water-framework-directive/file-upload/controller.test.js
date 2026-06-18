@@ -121,7 +121,7 @@ describe('#fileUpload', () => {
           maxFileSize: 50000000,
           acceptAttribute: WFD_ACCEPT_ATTRIBUTE,
           backLink:
-            marineLicenceRoutes.MARINE_LICENCE_WATER_FRAMEWORK_DIRECTIVE_PREVIOUS_ASSESSMENT,
+            marineLicenceRoutes.MARINE_LICENCE_WATER_FRAMEWORK_DIRECTIVE_ASSESSMENT_CHANGED,
           cancelLink: marineLicenceRoutes.MARINE_LICENCE_TASK_LIST
         })
       })

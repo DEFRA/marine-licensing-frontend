@@ -5,6 +5,7 @@ import { waterFrameworkDirectivePreviousAssessmentRoutes } from '#src/server/mar
 import { waterFrameworkDirectiveAssessmentChangedRoutes } from '#src/server/marine-licence/water-framework-directive/assessment-changed/index.js'
 import { waterFrameworkFileUploadRoutes } from '#src/server/marine-licence/water-framework-directive/file-upload/index.js'
 import { waterFrameworkDirectiveUploadAndWaitRoutes } from '#src/server/marine-licence/water-framework-directive/upload-and-wait/index.js'
+import { waterFrameworkDirectiveReviewYourAnswersRoutes } from '#src/server/marine-licence/water-framework-directive/review-your-answers/index.js'
 
 export const waterDirectiveRoutes = [
   ...waterFrameworkDirectiveBeforeYouStartRoutes,
@@ -13,5 +14,6 @@ export const waterDirectiveRoutes = [
   ...waterFrameworkDirectivePreviousAssessmentRoutes,
   ...waterFrameworkDirectiveAssessmentChangedRoutes,
   ...waterFrameworkFileUploadRoutes,
-  ...waterFrameworkDirectiveUploadAndWaitRoutes
+  ...waterFrameworkDirectiveUploadAndWaitRoutes,
+  ...waterFrameworkDirectiveReviewYourAnswersRoutes
 ]

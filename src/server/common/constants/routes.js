@@ -100,7 +100,9 @@ export const marineLicenceRoutes = {
   MARINE_LICENCE_WATER_FRAMEWORK_DIRECTIVE_FILE_UPLOAD:
     '/marine-licence/water-framework-directive-file-upload',
   MARINE_LICENCE_WATER_FRAMEWORK_DIRECTIVE_UPLOAD_AND_WAIT:
-    '/marine-licence/water-framework-directive-upload-and-wait'
+    '/marine-licence/water-framework-directive-upload-and-wait',
+  MARINE_LICENCE_WATER_FRAMEWORK_DIRECTIVE_REVIEW_YOUR_ANSWERS:
+    '/marine-licence/water-framework-directive-review-your-answers'
 }
 
 export const defraIdGuidanceRoutes = {

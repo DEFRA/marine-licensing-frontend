@@ -54,7 +54,9 @@ const handleReadyStatus = async (status, context) => {
 
   await saveWaterFrameworkDirectiveToBackend(request)
 
-  return h.redirect(marineLicenceRoutes.MARINE_LICENCE_TASK_LIST)
+  return h.redirect(
+    marineLicenceRoutes.MARINE_LICENCE_WATER_FRAMEWORK_DIRECTIVE_REVIEW_YOUR_ANSWERS
+  )
 }
 
 const handleRejectedStatus = async (status, request, h) => {

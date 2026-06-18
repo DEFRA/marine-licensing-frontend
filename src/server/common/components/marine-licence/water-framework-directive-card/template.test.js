@@ -56,10 +56,27 @@ describe('Marine Licence Water Framework Directive Component', () => {
     expect($component.html()).toContain(FILE_UPLOAD_HEADING)
   })
 
+  test('Should not render when nautical mile data is absent', () => {
+    const $comp = renderComponent(
+      'marine-licence/water-framework-directive-card',
+      {
+        waterFrameworkDirectiveData: {}
+      }
+    )
+
+    expect($comp('#water-framework-directive-card')).toHaveLength(0)
+  })
+
   test('Should show change link when not read only', () => {
     const $comp = renderComponent(
       'marine-licence/water-framework-directive-card',
       {
+        waterFrameworkDirectiveData: {
+          nauticalMile: {
+            key: { text: NAUTICAL_MILE_HEADING },
+            value: { text: 'Yes' }
+          }
+        },
         changeLink:
           '/marine-licence/water-framework-directive-review-your-answers',
         isReadOnly: false
@@ -74,6 +91,12 @@ describe('Marine Licence Water Framework Directive Component', () => {
     const $comp = renderComponent(
       'marine-licence/water-framework-directive-card',
       {
+        waterFrameworkDirectiveData: {
+          nauticalMile: {
+            key: { text: NAUTICAL_MILE_HEADING },
+            value: { text: 'Yes' }
+          }
+        },
         changeLink:
           '/marine-licence/water-framework-directive-review-your-answers',
         isReadOnly: true

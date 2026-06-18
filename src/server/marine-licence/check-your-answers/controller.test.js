@@ -171,7 +171,7 @@ describe('#checkYourAnswersController', () => {
       preferredDates: null,
       coordinatesType: null,
       summaryData: [],
-      waterFrameworkDirectiveData: [],
+      waterFrameworkDirectiveData: {},
       reviewSiteDetailsRoute:
         marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS,
       publicRegisterRoute: marineLicenceRoutes.MARINE_LICENCE_PUBLIC_REGISTER

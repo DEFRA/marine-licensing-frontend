@@ -1,5 +1,6 @@
 {% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
 
+{% if params.waterFrameworkDirectiveData.nauticalMile %}
 {% set rows = [] %}
 
 {% set rows = (rows.push({
@@ -23,7 +24,6 @@
     {% set rows = (rows.push(params.waterFrameworkDirectiveData.uploadedFile), rows) %}
 {% endif %}
 
-
 {{ govukSummaryList({
   card: {
     title: {
@@ -42,6 +42,7 @@
         }
       ]
     } if not params.isReadOnly
-  },      
+  },
   rows: rows
 }) }}
+{% endif %}

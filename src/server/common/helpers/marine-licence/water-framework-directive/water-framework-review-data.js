@@ -50,7 +50,7 @@ const getDisplayValue = (key, value) => {
 
 export const waterFrameworkReviewData = (waterFrameworkDirective) => {
   if (!waterFrameworkDirective) {
-    return []
+    return {}
   }
 
   return Object.entries(waterFrameworkDirective)

@@ -105,9 +105,9 @@ describe('waterFrameworkReviewData', () => {
     })
   })
 
-  test('returns empty array for null value', () => {
+  test('returns empty object for null value', () => {
     const result = waterFrameworkReviewData()
 
-    expect(result).toEqual([])
+    expect(result).toEqual({})
   })
 })

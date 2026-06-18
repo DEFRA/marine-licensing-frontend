@@ -43,19 +43,26 @@ describe('#classifyOutcome', () => {
 describe('#ctaLabelFor', () => {
   test('returns overrideCtaButtonText when present', () => {
     expect(
-      ctaLabelFor({
-        overrideCtaButtonText: 'Apply now',
-        link: 'x',
-        module: 'y'
-      })
+      ctaLabelFor({ overrideCtaButtonText: 'Apply now', link: 'x', module: 'y' })
     ).toBe('Apply now')
   })
 
   test('returns "Download" when only link: is set', () => {
-    expect(ctaLabelFor({ link: 'https://x.docx' })).toBe('Download')
+    expect(ctaLabelFor({ link: 'https://example.com/template.docx' })).toBe(
+      'Download'
+    )
   })
 
-  test('returns "Continue" when neither override nor link is set', () => {
+  test('returns the heading for a module (MCMS) outcomeType', () => {
+    expect(
+      ctaLabelFor({
+        module: 'MMO_APP2_CONTROL',
+        heading: 'Apply for a standard marine licence'
+      })
+    ).toBe('Apply for a standard marine licence')
+  })
+
+  test('falls back to "Continue" for a module outcomeType with no heading', () => {
     expect(ctaLabelFor({ module: 'MMO_APP2_CONTROL' })).toBe('Continue')
   })
 
@@ -172,43 +179,64 @@ describe('#buildIntermediateView — section ternary fallback', () => {
   })
 })
 
-describe('continueUrl wiring', () => {
+describe('continueUrl + ctaHref wiring', () => {
   const baseModel = { slug: 'S'.repeat(22), outcomeRoute: '/exemption/foo' }
+  const continueUrl = (id) =>
+    `/journey/self-service/c/${'S'.repeat(22)}/continue/${id}/exemption/foo`
 
-  it('sets continueUrl for an exemption outcomeType (has overrideCtaButtonUrl)', () => {
+  it('sets continueUrl + ctaHref for an exemption outcomeType', () => {
     const view = buildTerminalSingleView(baseModel, {
       id: 'WO_EXE_AVAILABLE_ARTICLE_13',
       text: 'x',
       overrideCtaButtonUrl: 'https://example.test/guidance',
       overrideCtaButtonText: 'Continue'
     })
-    expect(view.continueUrl).toBe(
-      `/journey/self-service/c/${'S'.repeat(22)}/continue/WO_EXE_AVAILABLE_ARTICLE_13/exemption/foo`
-    )
+    expect(view.continueUrl).toBe(continueUrl('WO_EXE_AVAILABLE_ARTICLE_13'))
+    expect(view.ctaHref).toBe(continueUrl('WO_EXE_AVAILABLE_ARTICLE_13'))
   })
 
-  it('leaves continueUrl null for a non-exemption outcomeType', () => {
+  it('sets continueUrl + ctaHref for a module (MCMS) outcomeType', () => {
     const view = buildTerminalSingleView(baseModel, {
       id: 'WO_FAST_TRACK_MLA',
       text: 'x',
       module: 'MMO_APP2_CONTROL'
     })
-    expect(view.continueUrl).toBeNull()
+    expect(view.continueUrl).toBe(continueUrl('WO_FAST_TRACK_MLA'))
+    expect(view.ctaHref).toBe(continueUrl('WO_FAST_TRACK_MLA'))
   })
 
-  it('sets per-option continueUrl on terminal-multi exemption options', () => {
+  it('uses the link as ctaHref (no continueUrl) for a link outcomeType', () => {
+    const view = buildTerminalSingleView(baseModel, {
+      id: 'WO_DOWNLOAD',
+      link: 'https://example.com/template.docx'
+    })
+    expect(view.continueUrl).toBeNull()
+    expect(view.ctaHref).toBe('https://example.com/template.docx')
+  })
+
+  it('leaves continueUrl + ctaHref null for an info-only outcomeType', () => {
+    const view = buildTerminalSingleView(baseModel, { id: 'WO_NOT_LICENSABLE' })
+    expect(view.continueUrl).toBeNull()
+    expect(view.ctaHref).toBeNull()
+  })
+
+  it('sets per-option ctaHref on terminal-multi (link vs module)', () => {
     const view = buildTerminalMultiView(baseModel, [
-      {
-        id: 'WO_EXE_AVAILABLE_ARTICLE_13',
-        heading: 'h',
-        text: 't',
-        overrideCtaButtonUrl: 'https://example.test/guidance'
-      },
-      { id: 'WO_MOD_PERMISSION', heading: 'h2', text: 't2', module: null }
+      { id: 'WO_DOWNLOAD', heading: 'h', text: 't', link: 'https://example.com/a.docx' },
+      { id: 'WO_STANDARD_TRACK_MLA', heading: 'h2', text: 't2', module: 'MMO_APP2_CONTROL' }
     ])
-    expect(view.options[0].continueUrl).toBe(
-      `/journey/self-service/c/${'S'.repeat(22)}/continue/WO_EXE_AVAILABLE_ARTICLE_13/exemption/foo`
+    expect(view.options[0].ctaHref).toBe('https://example.com/a.docx')
+    expect(view.options[1].ctaHref).toBe(continueUrl('WO_STANDARD_TRACK_MLA'))
+  })
+
+  it('sets ctaHref on an intermediate terminal (module) option', () => {
+    const view = buildIntermediateView(
+      { slug: 'S'.repeat(22), outcomeRoute: '/construction/journey-select' },
+      { outcomeTypes: ['WO_STANDARD_MLA'] },
+      [{ id: 'WO_STANDARD_MLA', heading: 'Apply for a standard marine licence', module: 'MMO_APP2_CONTROL' }]
     )
-    expect(view.options[1].continueUrl).toBeNull()
+    expect(view.options[0].ctaHref).toBe(
+      `/journey/self-service/c/${'S'.repeat(22)}/continue/WO_STANDARD_MLA/construction/journey-select`
+    )
   })
 })

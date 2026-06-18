@@ -133,7 +133,7 @@ describe('#checkYourAnswersController', () => {
         marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS,
       publicRegisterRoute: marineLicenceRoutes.MARINE_LICENCE_PUBLIC_REGISTER,
       waterFrameworkDirectiveData: expectedWaterFrameworkDirectiveData,
-      changeLink:
+      waterFrameworkDirectiveChangeLink:
         marineLicenceRoutes.MARINE_LICENCE_WATER_FRAMEWORK_DIRECTIVE_REVIEW_YOUR_ANSWERS
     })
   })

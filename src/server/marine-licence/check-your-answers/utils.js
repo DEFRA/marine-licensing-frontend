@@ -1,6 +1,8 @@
 import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
 
-export const getChangeLink = (waterFrameworkDirective) => {
+export const getWaterFrameworkDirectiveChangeLink = (
+  waterFrameworkDirective
+) => {
   if (!waterFrameworkDirective) {
     return undefined
   }
@@ -9,5 +11,5 @@ export const getChangeLink = (waterFrameworkDirective) => {
     return marineLicenceRoutes.MARINE_LICENCE_WATER_FRAMEWORK_DIRECTIVE_NAUTICAL_MILE
   }
 
-  return marineLicenceRoutes.MARINE_LICENCE_WATER_FRAMEWORK_DIRECTIVE_REVIEW_YOUR_ANSWERS
+  return `${marineLicenceRoutes.MARINE_LICENCE_WATER_FRAMEWORK_DIRECTIVE_REVIEW_YOUR_ANSWERS}`
 }

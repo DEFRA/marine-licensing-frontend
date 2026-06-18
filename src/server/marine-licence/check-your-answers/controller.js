@@ -8,7 +8,7 @@ import { buildSummaryData } from '#src/server/common/helpers/marine-licence/summ
 import { RETURN_TO_CACHE_KEY } from '#src/server/common/constants/cache.js'
 import { getMarineLicenceService } from '#src/services/marine-licence-service/index.js'
 import { waterFrameworkReviewData } from '#src/server/common/helpers/marine-licence/water-framework-directive/water-framework-review-data.js'
-import { getChangeLink } from '#src/server/marine-licence/check-your-answers/utils.js'
+import { getWaterFrameworkDirectiveChangeLink } from '#src/server/marine-licence/check-your-answers/utils.js'
 
 const checkYourAnswersViewContent = {
   pageTitle: 'Check your answers before sending your information',
@@ -51,7 +51,9 @@ export const checkYourAnswersController = {
       ...formattedMarineLicence,
       publicRegisterRoute: marineLicenceRoutes.MARINE_LICENCE_PUBLIC_REGISTER,
       waterFrameworkDirectiveData,
-      changeLink: getChangeLink(cachedMarineLicence.waterFrameworkDirective)
+      waterFrameworkDirectiveChangeLink: getWaterFrameworkDirectiveChangeLink(
+        cachedMarineLicence.waterFrameworkDirective
+      )
     })
   }
 }

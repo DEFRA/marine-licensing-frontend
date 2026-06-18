@@ -82,14 +82,30 @@ describe('#reviewYourAnswers', () => {
   })
 
   describe('reviewYourAnswersSubmitController', () => {
-    test('redirects to task list on submit', async () => {
+    test('redirects to task list on submit when no return flash is set', async () => {
       const h = createMockHandler('redirect')
       const request = createMockRequest({ payload: {} })
+      request.yar.flash.mockReturnValue(null)
 
       await reviewYourAnswersSubmitController.handler(request, h)
 
       expect(h.redirect).toHaveBeenCalledWith(
         marineLicenceRoutes.MARINE_LICENCE_TASK_LIST
+      )
+    })
+
+    test('redirects to check-your-answers on submit when return flash is set', async () => {
+      const h = createMockHandler('redirect')
+      const request = createMockRequest({ payload: {} })
+      request.yar.flash.mockReturnValue([
+        marineLicenceRoutes.MARINE_LICENCE_CHECK_YOUR_ANSWERS
+      ])
+
+      await reviewYourAnswersSubmitController.handler(request, h)
+
+      expect(h.redirect).toHaveBeenCalledWith(
+        marineLicenceRoutes.MARINE_LICENCE_CHECK_YOUR_ANSWERS +
+          '#water-framework-directive-card'
       )
     })
   })

@@ -1,6 +1,10 @@
 import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
 
 export const getBackLink = (request, waterFrameworkDirective = {}) => {
+  if (request.query?.from === 'check-your-answers') {
+    return `${marineLicenceRoutes.MARINE_LICENCE_CHECK_YOUR_ANSWERS}#water-framework-directive-card`
+  }
+
   const previousPage = request.headers?.referer
 
   if (previousPage && URL.canParse(previousPage)) {

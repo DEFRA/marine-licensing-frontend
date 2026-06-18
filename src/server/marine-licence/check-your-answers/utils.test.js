@@ -3,7 +3,7 @@ import { waterFrameworkDirective } from '~/src/server/test-helpers/mocks/marine-
 import { getWaterFrameworkDirectiveChangeLink } from '#src/server/marine-licence/check-your-answers/utils.js'
 
 describe('getWaterFrameworkDirectiveChangeLink', () => {
-  it('should return review answers route with from param when nauticalMile is yes', () => {
+  it('should return review answers route when nauticalMile is yes', () => {
     const result = getWaterFrameworkDirectiveChangeLink(waterFrameworkDirective)
 
     expect(result).toBe(
@@ -18,11 +18,11 @@ describe('getWaterFrameworkDirectiveChangeLink', () => {
     })
 
     expect(result).toBe(
-      marineLicenceRoutes.MARINE_LICENCE_WATER_FRAMEWORK_DIRECTIVE_NAUTICAL_MILE
+      `${marineLicenceRoutes.MARINE_LICENCE_WATER_FRAMEWORK_DIRECTIVE_NAUTICAL_MILE}`
     )
   })
 
-  it('should return review answers route with from param when nauticalMile is undefined', () => {
+  it('should return review answers route when nauticalMile is undefined', () => {
     const result = getWaterFrameworkDirectiveChangeLink({
       ...waterFrameworkDirective,
       nauticalMile: undefined

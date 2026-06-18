@@ -82,10 +82,10 @@ describe('#reviewYourAnswers', () => {
   })
 
   describe('reviewYourAnswersSubmitController', () => {
-    test('redirects to task list on submit when no return flash is set', async () => {
+    test('redirects to task list on submit when no returnTo session value is set', async () => {
       const h = createMockHandler('redirect')
       const request = createMockRequest({ payload: {} })
-      request.yar.flash.mockReturnValue(null)
+      request.yar.get.mockReturnValue(null)
 
       await reviewYourAnswersSubmitController.handler(request, h)
 
@@ -94,12 +94,12 @@ describe('#reviewYourAnswers', () => {
       )
     })
 
-    test('redirects to check-your-answers on submit when return flash is set', async () => {
+    test('redirects to check-your-answers with anchor on submit when returnTo session value is set', async () => {
       const h = createMockHandler('redirect')
       const request = createMockRequest({ payload: {} })
-      request.yar.flash.mockReturnValue([
+      request.yar.get.mockReturnValue(
         marineLicenceRoutes.MARINE_LICENCE_CHECK_YOUR_ANSWERS
-      ])
+      )
 
       await reviewYourAnswersSubmitController.handler(request, h)
 

@@ -4,9 +4,17 @@ import { createFailAction } from '#src/server/common/helpers/createFailAction.js
 import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
 import joi from 'joi'
 import { saveWaterFrameworkDirectiveToBackend } from '#src/server/common/helpers/marine-licence/water-framework-directive/save-water-framework-directive.js'
+import { RETURN_TO_CACHE_KEY } from '#src/server/common/constants/cache.js'
+import {
+  getBackLink,
+  getCancelLink
+} from '#src/server/marine-licence/water-framework-directive/nautical-mile/utils.js'
 
 export const NAUTICAL_MILE_VIEW_ROUTE =
   'marine-licence/water-framework-directive/nautical-mile/index'
+
+const NAUTICAL_MILE_HEADING =
+  'Is your project located within one nautical mile (1.85km) of the coast?'
 
 export const errorMessages = {
   NAUTICAL_MILE_REQUIRED:
@@ -14,13 +22,8 @@ export const errorMessages = {
 }
 
 const nauticalMileSettings = {
-  pageTitle:
-    'Is your project located within one nautical mile (1.85km) of the coast?',
-  heading:
-    'Is your project located within one nautical mile (1.85km) of the coast?',
-  backLink:
-    marineLicenceRoutes.MARINE_LICENCE_WATER_FRAMEWORK_DIRECTIVE_BEFORE_YOU_START,
-  cancelLink: marineLicenceRoutes.MARINE_LICENCE_TASK_LIST
+  pageTitle: NAUTICAL_MILE_HEADING,
+  heading: NAUTICAL_MILE_HEADING
 }
 
 export const nauticalMileController = {
@@ -28,8 +31,12 @@ export const nauticalMileController = {
     const marineLicence = getMarineLicenceCache(request)
     const { waterFrameworkDirective } = marineLicence
 
+    const returnTo = request.yar.get(RETURN_TO_CACHE_KEY)
+
     return h.view(NAUTICAL_MILE_VIEW_ROUTE, {
       ...nauticalMileSettings,
+      backLink: getBackLink(returnTo),
+      cancelLink: getCancelLink(returnTo),
       projectName: marineLicence.projectName,
       payload: { nauticalMile: waterFrameworkDirective?.nauticalMile }
     })
@@ -48,13 +55,17 @@ export const nauticalMileSubmitController = {
       }),
       failAction: (request, h, err) => {
         const { projectName } = getMarineLicenceCache(request)
+
+        const returnTo = request.yar.get(RETURN_TO_CACHE_KEY)
+
         return createFailAction({
           viewRoute: NAUTICAL_MILE_VIEW_ROUTE,
           settings: nauticalMileSettings,
-          backLink: nauticalMileSettings.backLink,
+          backLink: getBackLink(returnTo),
           errorMessages,
           projectName,
-          payload: request.payload
+          payload: request.payload,
+          params: { cancelLink: getCancelLink(returnTo) }
         })(request, h, err)
       }
     }
@@ -73,6 +84,10 @@ export const nauticalMileSubmitController = {
 
     if (nauticalMile === 'no') {
       await saveWaterFrameworkDirectiveToBackend(request, true)
+      const returnTo = request.yar.get(RETURN_TO_CACHE_KEY)
+      if (returnTo) {
+        return h.redirect(`${returnTo}#water-framework-directive-card`)
+      }
       return h.redirect(marineLicenceRoutes.MARINE_LICENCE_TASK_LIST)
     }
 

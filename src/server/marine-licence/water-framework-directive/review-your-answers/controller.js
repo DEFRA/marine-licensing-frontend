@@ -40,8 +40,7 @@ export const waterFrameworkReviewYourAnswersController = {
 
 export const reviewYourAnswersSubmitController = {
   async handler(request, h) {
-    const returnTo = request.yar.flash(RETURN_TO_CACHE_KEY)
-    const redirectPath = Array.isArray(returnTo) ? returnTo[0] : returnTo
+    const redirectPath = request.yar.get(RETURN_TO_CACHE_KEY)
     if (redirectPath) {
       return h.redirect(`${redirectPath}#water-framework-directive-card`)
     }

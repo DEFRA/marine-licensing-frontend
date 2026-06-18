@@ -1,5 +1,9 @@
 import { vi } from 'vitest'
-import { getMarineLicenceCache } from '#src/server/common/helpers/marine-licence/session-cache/utils.js'
+import {
+  getMarineLicenceCache,
+  setMarineLicenceCache
+} from '#src/server/common/helpers/marine-licence/session-cache/utils.js'
+import { setReturnToCache } from '#src/server/common/helpers/marine-licence/session-cache/return-to-cache.js'
 import { getMarineLicenceService } from '#src/services/marine-licence-service/index.js'
 import { buildSiteData } from '#src/server/common/helpers/marine-licence/site-data.js'
 import { buildSummaryData } from '#src/server/common/helpers/marine-licence/summary-data.js'
@@ -15,6 +19,9 @@ import {
 import { mockMarineLicenceApplication } from '~/src/server/test-helpers/mocks/marine-licence-mocks.js'
 
 vi.mock('#src/server/common/helpers/marine-licence/session-cache/utils.js')
+vi.mock(
+  '#src/server/common/helpers/marine-licence/session-cache/return-to-cache.js'
+)
 vi.mock('#src/services/marine-licence-service/index.js')
 vi.mock('#src/server/common/helpers/marine-licence/site-data.js')
 vi.mock('#src/server/common/helpers/marine-licence/summary-data.js')
@@ -68,6 +75,8 @@ describe('#checkYourAnswersController', () => {
   let mockGetMarineLicenceById
 
   const getMarineLicenceCacheMock = vi.mocked(getMarineLicenceCache)
+  const setMarineLicenceCacheMock = vi.mocked(setMarineLicenceCache)
+  const setReturnToCacheMock = vi.mocked(setReturnToCache)
   const buildSiteDataMock = vi.mocked(buildSiteData)
   const buildSummaryDataMock = vi.mocked(buildSummaryData)
 
@@ -79,9 +88,7 @@ describe('#checkYourAnswersController', () => {
     mockH = {
       view: vi.fn()
     }
-    mockRequest = {
-      yar: { flash: vi.fn() }
-    }
+    mockRequest = {}
   })
 
   test('handler should render with correct context including site data', async () => {
@@ -109,13 +116,16 @@ describe('#checkYourAnswersController', () => {
       preferredDates: 'July 2026 to August 2027'
     })
 
+    setReturnToCacheMock.mockResolvedValue(undefined)
+    setMarineLicenceCacheMock.mockResolvedValue(undefined)
+
     await checkYourAnswersController.handler(mockRequest, mockH)
 
     expect(getMarineLicenceCacheMock).toHaveBeenCalledWith(mockRequest)
-    expect(mockRequest.yar.flash).toHaveBeenCalledWith(
-      'returnTo',
-      marineLicenceRoutes.MARINE_LICENCE_CHECK_YOUR_ANSWERS,
-      true
+    expect(setReturnToCacheMock).toHaveBeenCalledWith(
+      mockRequest,
+      mockH,
+      marineLicenceRoutes.MARINE_LICENCE_CHECK_YOUR_ANSWERS
     )
     expect(mockGetMarineLicenceById).toHaveBeenCalledWith(
       mockMarineLicenceApplication.id
@@ -148,6 +158,7 @@ describe('#checkYourAnswersController', () => {
       ...mockCachedData,
       preferredDates: null
     })
+    setReturnToCacheMock.mockResolvedValue(undefined)
 
     await checkYourAnswersController.handler(mockRequest, mockH)
 

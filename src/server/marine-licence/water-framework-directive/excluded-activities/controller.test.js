@@ -8,8 +8,12 @@ import {
 import * as cacheUtils from '#src/server/common/helpers/marine-licence/session-cache/utils.js'
 import * as wfdCache from '#src/server/common/helpers/marine-licence/session-cache/water-framework-directive.js'
 import { createMockH } from '#src/server/test-helpers/mocks/helpers.js'
+import { saveWaterFrameworkDirectiveToBackend } from '#src/server/common/helpers/marine-licence/water-framework-directive/save-water-framework-directive.js'
 
 vi.mock('~/src/server/common/helpers/marine-licence/session-cache/utils.js')
+vi.mock(
+  '~/src/server/common/helpers/marine-licence/water-framework-directive/save-water-framework-directive.js'
+)
 
 describe('#excludedActivities', () => {
   const h = createMockH()
@@ -55,7 +59,7 @@ describe('#excludedActivities', () => {
   })
 
   describe('#excludedActivitiesSubmitController', () => {
-    test('Should update cache and redirect to excluded activities page on yes', async () => {
+    test('Should update cache and redirect to review details page on yes', async () => {
       await excludedActivitiesSubmitController.handler(
         { payload: { excludedActivities: 'yes' }, query: {} },
         h
@@ -67,8 +71,12 @@ describe('#excludedActivities', () => {
         'excludedActivities',
         'yes'
       )
+
+      expect(saveWaterFrameworkDirectiveToBackend).toHaveBeenCalledWith(
+        expect.any(Object)
+      )
       expect(h.redirect).toHaveBeenCalledWith(
-        marineLicenceRoutes.MARINE_LICENCE_WATER_FRAMEWORK_DIRECTIVE_EXCLUDED_ACTIVITIES
+        marineLicenceRoutes.MARINE_LICENCE_WATER_FRAMEWORK_DIRECTIVE_REVIEW_YOUR_ANSWERS
       )
     })
 

@@ -5,7 +5,7 @@ walkthrough that helps members of the public determine whether their
 planned marine activity needs a marine licence. It is anonymous (no Defra
 ID) and driven entirely by a JSON configuration file.
 
-This README is the top-level entry point for IAT engineers. For the two
+This README is the top-level entry point for IAT engineers. For the
 deeper-dive areas, see:
 
 - [`data/README.data.md`](./data/README.data.md) — the `self-service.json`
@@ -15,6 +15,9 @@ deeper-dive areas, see:
   the load-time and runtime config-defect logger
   (`runLoadTimeScan` / `reportRuntimeIssue`), its ECS log shape, and the
   bounded `seenRuntimeIssues` set.
+- [`README.iat-query.md`](./README.iat-query.md) — the `npm run iat`
+  developer CLI for inspecting `self-service.json`: node inspect/list
+  commands and the `path` / `reach` / `predecessors` graph traversal.
 
 ## File map
 
@@ -25,7 +28,8 @@ src/server/journey/self-service/
 ├── question/          # GET/POST /journey/self-service/c/{slug}/{questionPath*}              (ML-1186, ML-1304/1306)
 ├── outcome/           # GET/POST /journey/self-service/c/{slug}/outcome/{outcomePath*}       (ML-1164, ML-1304/1306)
 │                      # GET      /journey/self-service/c/{slug}/view-answers/{...}           (ML-1165, ML-1304/1306)
-├── outcome-document/  # GET      /outcome-documents/{snapshotSlug}                            (ML-1306)
+│                      # GET      /journey/self-service/c/{slug}/continue/{...}                (ML-1166)
+├── outcome-document/  # GET      /journey/self-service/outcome-document/{snapshotSlug}        (ML-1306)
 ├── data/              # self-service.json + load-time parser/sanitiser
 └── services/          # journey-data, journey-router, journey-answer-log,
                        # load-iat-context, data-quality, sanitise
@@ -40,7 +44,7 @@ convention:
   URL while the user is navigating.
 - A **snapshot slug** identifies an immutable "View answers" snapshot
   (`iat-outcome-documents` collection, no TTL — permanent). It appears
-  only in the public `/outcome-documents/{slug}` URL.
+  only in the public `/journey/self-service/outcome-document/{slug}` URL.
 
 Both are 22-char base64url UUIDv7s generated server-side. They never
 overlap and never coexist on the same URL.
@@ -58,21 +62,30 @@ true. Frontend routes are `auth: false`; backend `/iat-contexts` and
 
 ## Routes
 
-| Method | Path                                                                         | Purpose                                                                                                                | Source              |
-| ------ | ---------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------- | ------------------- |
-| GET    | `/journey/self-service/start`                                                | Pre-walkthrough landing page                                                                                           | `start/`            |
-| POST   | `/journey/self-service/start`                                                | Mint a context slug; redirect to first question under slug-prefixed URL                                                | `start/`            |
-| GET    | `/journey/self-service/invalid`                                              | "This check has expired or could not be found" page                                                                    | `invalid/`          |
-| GET    | `/journey/self-service/c/{slug}/{questionPath*}`                             | Render a question; pre-select answers from the context's questionLog                                                   | `question/`         |
-| POST   | `/journey/self-service/c/{slug}/{questionPath*}`                             | PATCH the context's questionLog with the new answer entry, redirect to next node                                       | `question/`         |
-| GET    | `/journey/self-service/c/{slug}/outcome/{outcomePath*}`                      | Render outcome (intermediate fork, terminal-single, or terminal-multi). No mint — view only.                           | `outcome/`          |
-| POST   | `/journey/self-service/c/{slug}/outcome/{outcomePath*}`                      | Intermediate selection — PATCH chosen outcomeType into questionLog, redirect to its `nextQuestionRoute`                | `outcome/`          |
-| GET    | `/journey/self-service/c/{slug}/view-answers/{outcomeTypeId}/{outcomePath*}` | **Mint** a new outcome-document snapshot from the current context + focused outcomeType; 302 to `/outcome-documents/…` | `outcome/`          |
-| GET    | `/outcome-documents/{slug}`                                                  | Render an immutable snapshot. Public, permanent, slug-only — no context required.                                      | `outcome-document/` |
+| Method | Path                                                                         | Purpose                                                                                                                                                                                                               | Source              |
+| ------ | ---------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------- |
+| GET    | `/journey/self-service/start`                                                | Pre-walkthrough landing page                                                                                                                                                                                          | `start/`            |
+| POST   | `/journey/self-service/start`                                                | Mint a context slug; redirect to first question under slug-prefixed URL                                                                                                                                               | `start/`            |
+| GET    | `/journey/self-service/invalid`                                              | "This check has expired or could not be found" page                                                                                                                                                                   | `invalid/`          |
+| GET    | `/journey/self-service/c/{slug}/{questionPath*}`                             | Render a question; pre-select answers from the context's questionLog                                                                                                                                                  | `question/`         |
+| POST   | `/journey/self-service/c/{slug}/{questionPath*}`                             | PATCH the context's questionLog with the new answer entry, redirect to next node                                                                                                                                      | `question/`         |
+| GET    | `/journey/self-service/c/{slug}/outcome/{outcomePath*}`                      | Render outcome (intermediate fork, terminal-single, or terminal-multi). No mint — view only.                                                                                                                          | `outcome/`          |
+| POST   | `/journey/self-service/c/{slug}/outcome/{outcomePath*}`                      | Intermediate selection — PATCH chosen outcomeType into questionLog, redirect to its `nextQuestionRoute`                                                                                                               | `outcome/`          |
+| GET    | `/journey/self-service/c/{slug}/view-answers/{outcomeTypeId}/{outcomePath*}` | **Mint** a new outcome-document snapshot from the current context + focused outcomeType; 302 to `/journey/self-service/outcome-document/…`                                                                            | `outcome/`          |
+| GET    | `/journey/self-service/c/{slug}/continue/{outcomeTypeId}/{outcomePath*}`     | **Mint** a snapshot, then hand off to the exemption journey: 302 to the focused outcomeType's `overrideCtaButtonUrl` with the answers passed as a query string. 404 if the outcomeType has no `overrideCtaButtonUrl`. | `outcome/`          |
+| GET    | `/journey/self-service/outcome-document/{slug}`                              | Render an immutable snapshot. Public, permanent, slug-only — no context required.                                                                                                                                     | `outcome-document/` |
 
 The catch-all paths on question and outcome resolve through
 `services/journey-data.js` and `services/journey-router.js`; see
 [`data/README.data.md`](./data/README.data.md) for the routing rules.
+
+`view-answers` and `continue` both **mint** an immutable snapshot from the
+current context — they differ only in where they send the user next.
+`view-answers` redirects to the public snapshot page; `continue` (ML-1166)
+hands off into the Defra exemption application journey, redirecting to the
+focused outcomeType's `overrideCtaButtonUrl` with the answers (and a link
+back to the snapshot) as a query string. Only outcomeTypes that carry an
+`overrideCtaButtonUrl` are valid `continue` targets.
 
 ## Request lifecycle
 
@@ -136,12 +149,12 @@ sequenceDiagram
         API->>API: generateSlug() (snapshot slug)
         API->>MS: insertOne({slug: snapSlug, contextSlug: ctxSlug,<br/>questionLog: copy, preamble, focusedOption, capturedAt})
         API-->>F: 201 { slug: snapSlug, viewUrl }
-        F-->>B: 302 /outcome-documents/{snapSlug}
+        F-->>B: 302 /journey/self-service/outcome-document/{snapSlug}
     end
 
     rect rgb(240,255,240)
         note over B,MS: Public snapshot page (forever)
-        B->>F: GET /outcome-documents/{snapSlug}
+        B->>F: GET /journey/self-service/outcome-document/{snapSlug}
         F->>API: GET /outcome-documents/{snapSlug}
         API->>MS: findOne({slug: snapSlug})
         MS-->>API: snap
@@ -156,7 +169,7 @@ sequenceDiagram
         B->>F: GET .../view-answers/...
         F->>API: POST /iat-contexts/{ctxSlug}/outcome-documents  (mint #2)
         API->>MS: insertOne({slug: snapSlug2, …})
-        F-->>B: 302 /outcome-documents/{snapSlug2}
+        F-->>B: 302 /journey/self-service/outcome-document/{snapSlug2}
         note over MS: snapSlug1 still resolves to its original content forever
     end
 ```
@@ -256,38 +269,21 @@ the JSON-replacement test in
 
 ## Querying `self-service.json`
 
-The JSON is large (~5000 lines) and relational. Use the in-repo CLI rather than ad-hoc grep/jq — it reuses the same parsed/sanitised view the running app sees, so what you see matches what runs.
+The JSON is large (~5000 lines) and relational. Use the in-repo CLI
+(`npm run iat`) rather than ad-hoc grep/jq — it reuses the same
+parsed/sanitised view the running app sees and the real router, so what you
+see matches what runs. It can inspect a single node, filter the lists, and
+**traverse the journey graph** (`path` / `reach` / `predecessors`).
 
 ```bash
-npm run iat -- <subcommand> [args] [--json]
-```
-
-| Subcommand                                                | Purpose                                                                                     |
-| --------------------------------------------------------- | ------------------------------------------------------------------------------------------- |
-| `question <route>`                                        | Show one question with its answers and where each leads                                     |
-| `outcome <route>`                                         | Show one outcome with its outcomeTypes inline                                               |
-| `outcome-type <id>`                                       | Show one outcomeType (params, link, module, nextQuestionRoute)                              |
-| `outcomes [--classify X] [--has-param N[=V]]`             | List outcomes filtered by `intermediate`/`terminal-single`/`terminal-multi` and/or by param |
-| `outcome-types [--has-param N[=V]] [--has-next-question]` | List outcomeTypes; useful for finding ones that route forward vs. terminal                  |
-| `questions [--mapping N] [--has-mapping]`                 | List questions; filter by `mcmsAppFormMapping`                                              |
-| `mappings`                                                | Distinct `mcmsAppFormMapping` values + the question route(s) that carry each                |
-
-Every subcommand accepts `--json` for machine-readable output. Exit codes: `0` success, `1` not-found, `2` invalid args.
-
-Examples:
-
-```bash
-# A terminal-single outcome whose ADV_TYPE is EXE — handy when writing a test
-npm run iat -- outcomes --classify terminal-single --has-param ADV_TYPE=EXE
-
-# Every mcmsAppFormMapping in the JSON, with the question carrying it
-npm run iat -- mappings
-
-# A specific question and where each answer leads
+# How does a user actually reach a page?
+npm run iat -- path /mod-permission
+# Inspect one question and where each answer branches to
 npm run iat -- question /activity-type
 ```
 
-Source: [`marine-licensing-frontend/scripts/iat-query.js`](../../../../scripts/iat-query.js). Tests colocated in `scripts/iat-query.test.js`.
+Full subcommand reference, the graph model, exit codes, `--json` contract,
+and the source-file map live in **[`README.iat-query.md`](./README.iat-query.md)**.
 
 ## Security: defence in depth
 

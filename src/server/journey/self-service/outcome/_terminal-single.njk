@@ -7,10 +7,10 @@
 {% endif %}
 
 <div class="app-iat-actions">
-  {% if hasContinue %}
+  {% if ctaHref %}
     {{ govukButton({
       text: ctaLabel,
-      href: continueUrl or "#",
+      href: ctaHref,
       classes: "govuk-!-margin-right-3"
     }) }}
   {% endif %}

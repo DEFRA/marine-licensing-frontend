@@ -79,7 +79,7 @@ export const excludedActivitiesSubmitController = {
 
     if (payload.excludedActivities === 'no') {
       return h.redirect(
-        marineLicenceRoutes.MARINE_LICENCE_WATER_FRAMEWORK_DIRECTIVE_PREVIOUS_ASSESSMENT
+        marineLicenceRoutes.MARINE_LICENCE_WATER_FRAMEWORK_DIRECTIVE_FILE_UPLOAD
       )
     }
 

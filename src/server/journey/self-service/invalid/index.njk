@@ -1,15 +1,20 @@
 {% extends 'layouts/page.njk' %}
 
+{% from "govuk/components/button/macro.njk" import govukButton %}
+
+{% block beforeContent %}{% endblock %}
+
 {% block content %}
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
-      <h1 class="govuk-heading-xl">This check has expired or could not be found</h1>
+      <h1 class="govuk-heading-xl">Your session has timed out</h1>
       <p class="govuk-body">
-        Start a new check to find out if you need a marine licence.
+        Any answers will be saved for 24 hours. To resume, you need to go back to the start.
       </p>
-      <p class="govuk-body">
-        <a class="govuk-link" href="{{ startUrl }}">Start again</a>
-      </p>
+      {{ govukButton({
+        text: "Return to start",
+        href: startUrl
+      }) }}
     </div>
   </div>
 {% endblock %}

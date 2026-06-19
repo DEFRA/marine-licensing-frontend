@@ -49,6 +49,10 @@ const getDisplayValue = (key, value) => {
 }
 
 export const waterFrameworkReviewData = (waterFrameworkDirective) => {
+  if (!waterFrameworkDirective) {
+    return {}
+  }
+
   return Object.entries(waterFrameworkDirective)
     .filter(([key]) => !EXCLUDED_DISPLAY_KEYS.has(key))
     .reduce((acc, [key, value]) => {

@@ -5,6 +5,7 @@ import {
   setMarineLicenceCache
 } from '#src/server/common/helpers/marine-licence/session-cache/utils.js'
 import { setProjectType } from '#src/server/common/helpers/session-cache/utils.js'
+import { clearReturnToCache } from '#src/server/common/helpers/marine-licence/session-cache/return-to-cache.js'
 import { authenticatedGetRequest } from '#src/server/common/helpers/authenticated-requests.js'
 import {
   transformProjectDetailsTaskList,
@@ -24,6 +25,9 @@ import * as authUtils from '#src/server/common/plugins/auth/utils.js'
 import Boom from '@hapi/boom'
 
 vi.mock('#src/server/common/helpers/marine-licence/session-cache/utils.js')
+vi.mock(
+  '#src/server/common/helpers/marine-licence/session-cache/return-to-cache.js'
+)
 vi.mock('#src/server/common/helpers/session-cache/utils.js')
 vi.mock('#src/server/common/helpers/authenticated-requests.js')
 vi.mock('#src/server/marine-licence/task-list/utils.js')
@@ -34,6 +38,7 @@ describe('#taskListController', () => {
   let mockH
 
   const getMarineLicenceCacheMock = vi.mocked(getMarineLicenceCache)
+  const clearReturnToCacheMock = vi.mocked(clearReturnToCache)
   const setMarineLicenceCacheMock = vi.mocked(setMarineLicenceCache)
   const clearMarineLicenceCacheMock = vi.mocked(clearMarineLicenceCache)
   const authenticatedGetRequestMock = vi.mocked(authenticatedGetRequest)
@@ -59,9 +64,7 @@ describe('#taskListController', () => {
       view: vi.fn(),
       redirect: vi.fn()
     }
-    mockRequest = {
-      yar: { flash: vi.fn() }
-    }
+    mockRequest = {}
   })
 
   test('taskListController handler should render with correct context', async () => {
@@ -180,6 +183,7 @@ describe('#taskListController', () => {
     await taskListController.handler(mockRequest, mockH)
 
     expect(getMarineLicenceCacheMock).toHaveBeenCalledWith(mockRequest)
+    expect(clearReturnToCacheMock).toHaveBeenCalledWith(mockRequest)
     expect(authenticatedGetRequestMock).toHaveBeenCalledWith(
       mockRequest,
       '/marine-licence/123'

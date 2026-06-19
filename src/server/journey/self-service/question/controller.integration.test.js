@@ -13,6 +13,7 @@ const { iatContextService } =
 
 import { JSDOM } from 'jsdom'
 import { statusCodes } from '#src/server/common/constants/status-codes.js'
+import { routes } from '#src/server/common/constants/routes.js'
 import {
   setupTestServer,
   mockIatContext
@@ -290,6 +291,21 @@ describe('#questionController (integration)', () => {
         'input[type="radio"][checked]'
       )
       expect(checkedRadio).toBeNull()
+    })
+  })
+
+  describe('POST after timeout', () => {
+    test('a timed-out session cannot save a further answer and is redirected to the timeout page', async () => {
+      // The 24h TTL has deleted the backend context, so get() now returns null.
+      vi.mocked(iatContextService.get).mockResolvedValue(null)
+
+      const { response } = await postPage(journey.journeyUrl('/sea'), {
+        answer: 'inSea'
+      })
+
+      expect(response.statusCode).toBe(statusCodes.redirect)
+      expect(response.headers.location).toBe(routes.IAT_INVALID)
+      expect(iatContextService.patch).not.toHaveBeenCalled()
     })
   })
 

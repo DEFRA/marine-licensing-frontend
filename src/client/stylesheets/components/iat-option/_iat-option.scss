@@ -2,7 +2,11 @@
 
 .app-iat-option {
   border: $govuk-border-width solid $govuk-border-colour;
-  padding: govuk-spacing(4) govuk-spacing(4) govuk-spacing(7);
+  padding: govuk-spacing(4);
+
+  > :last-child {
+    margin-bottom: 0;
+  }
 }
 
 .app-iat-option__actions {

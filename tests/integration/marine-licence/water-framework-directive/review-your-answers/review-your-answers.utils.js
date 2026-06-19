@@ -1,9 +1,7 @@
 import {
-  ASSESSMENT_CHANGED_HEADING,
   EXCLUDED_ACTIVITIES_HEADING,
   FILE_UPLOAD_HEADING,
-  NAUTICAL_MILE_HEADING,
-  PREVIOUS_ASSESSMENT_HEADING
+  NAUTICAL_MILE_HEADING
 } from '#src/server/common/helpers/marine-licence/water-framework-directive/water-framework-review-data.js'
 
 export const getRowByKey = (summary, keyText) => {

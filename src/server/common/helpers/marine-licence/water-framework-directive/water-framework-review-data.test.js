@@ -2,8 +2,6 @@ import {
   waterFrameworkReviewData,
   NAUTICAL_MILE_HEADING,
   EXCLUDED_ACTIVITIES_HEADING,
-  PREVIOUS_ASSESSMENT_HEADING,
-  ASSESSMENT_CHANGED_HEADING,
   FILE_UPLOAD_HEADING
 } from '~/src/server/common/helpers/marine-licence/water-framework-directive/water-framework-review-data.js'
 import { waterFrameworkDirective } from '~/src/server/test-helpers/mocks/marine-licence-mocks.js'

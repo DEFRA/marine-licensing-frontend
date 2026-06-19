@@ -13,8 +13,13 @@
  *   outcome-types [--has-param N[=V]] [--has-next-question] [--has-link]
  *   questions [--mapping N] [--has-mapping]           list questions by mcmsAppFormMapping
  *   mappings                                          distinct mappings + carrier question routes
+ *   path [<from>] <to>                                shortest journey through the graph (from defaults to /sea)
+ *   reach <route>                                     reachable from /sea? (exit 0 reachable, 1 not)
+ *   predecessors <route>                              pages that route directly into this node
  *
  * Examples:
+ *   npm run iat -- path /mod-permission
+ *       print one shortest click-by-click journey from /sea to a page
  *   npm run iat -- question /activity-type
  *       inspect one question, its answers, and where each answer branches to
  *   npm run iat -- outcome /scaffolding-impede-navigation
@@ -41,52 +46,50 @@ import {
   getOutcomeTypesForOutcome
 } from '../src/server/journey/self-service/services/journey-data.js'
 import { classifyOutcome } from '../src/server/journey/self-service/outcome/utils.js'
+import {
+  excerpt,
+  dash,
+  paramsFlat,
+  targetForAnswer,
+  parseHasParam,
+  runSingleArg,
+  jsonResult,
+  notFound,
+  alignKeyValues,
+  JSON_FLAG
+} from './iat-utils.js'
+import {
+  dispatchPath,
+  dispatchReach,
+  dispatchPredecessors
+} from './iat-graph-commands.js'
 
-const EXCERPT_LEN = 60
-const MAX_TEXT_FOR_STRIP = 10000
+const USAGE = `iat-query — inspect the self-service IAT journey (self-service.json)
 
-function excerpt(text) {
-  if (!text) {
-    return '-'
-  }
-  const bounded =
-    text.length > MAX_TEXT_FOR_STRIP ? text.slice(0, MAX_TEXT_FOR_STRIP) : text
-  const stripped = bounded.replaceAll(/<[^>]+>/g, '').trim()
-  if (stripped.length <= EXCERPT_LEN) {
-    return stripped
-  }
-  return stripped.slice(0, EXCERPT_LEN) + '…'
-}
+Most common question — "how do I reach a page?":
+  npm run iat -- path /mod-permission           one shortest journey from /sea
+  npm run iat -- path /sea /mod-permission        between two routes
+  npm run iat -- reach /mod-permission            reachable? (exit 0/1)
+  npm run iat -- predecessors /activity/completion  pages that lead directly here
 
-function dash(value) {
-  if (value === null || value === undefined || value === '') {
-    return '-'
-  }
-  return String(value)
-}
+Inspect a node:
+  question <route> | outcome <route> | outcome-type <id>
 
-function targetForAnswer(answer) {
-  if (answer.nextQuestionRoute) {
-    return `question ${answer.nextQuestionRoute}`
-  }
-  if (answer.outcomeRoute) {
-    return `outcome ${answer.outcomeRoute}`
-  }
-  return 'terminal'
-}
+List / filter:
+  outcomes | outcome-types | questions | mappings
 
-function paramsFlat(outcomeType) {
-  const params = outcomeType.params
-  if (!params || params.length === 0) {
-    return '-'
-  }
-  return params.map((p) => `${p.name}=${p.value}`).join(' ')
-}
+The journey is a graph of three node types (questions, outcomes,
+outcomeTypes). Routing happens four ways: single-select answers,
+multi-select pages (multiSelect.questionRoute / outcomeRoute), and
+outcome forks (outcomeType.nextQuestionRoute). All documented in:
+  src/server/journey/self-service/data/README.data.md
+
+Add --json to any subcommand for machine-readable output.`
 
 function runQuestion(route, json) {
   const q = getQuestion(route)
   if (!q) {
-    return { stdout: `Question not found: ${route}`, code: 1 }
+    return notFound('Question', route)
   }
   if (json) {
     const doc = {
@@ -98,23 +101,25 @@ function runQuestion(route, json) {
       answers: q.answers.map((a) => ({
         id: a.id,
         text: a.text,
-        target: targetForAnswer(a)
+        target: targetForAnswer(a, q)
       }))
     }
-    return { stdout: JSON.stringify(doc, null, 2), code: 0 }
+    return jsonResult(doc)
   }
   const lines = [
-    `route          ${q.route}`,
-    `text           ${q.text}`,
-    `mapping        ${dash(q.mcmsAppFormMapping)}`,
-    `multiSelect    ${q.multiSelect ? 'yes' : 'no'}`,
-    `section        ${dash(q.section)}`,
+    ...alignKeyValues([
+      ['route', q.route],
+      ['text', q.text],
+      ['mapping', dash(q.mcmsAppFormMapping)],
+      ['multiSelect', q.multiSelect ? 'yes' : 'no'],
+      ['section', dash(q.section)]
+    ]),
     '',
     '  ANSWERS',
     '  id\ttext\ttarget'
   ]
   for (const a of q.answers) {
-    lines.push(`  ${a.id}\t${excerpt(a.text)}\t${targetForAnswer(a)}`)
+    lines.push(`  ${a.id}\t${excerpt(a.text)}\t${targetForAnswer(a, q)}`)
   }
   return { stdout: lines.join('\n'), code: 0 }
 }
@@ -122,7 +127,7 @@ function runQuestion(route, json) {
 function runOutcome(route, json) {
   const o = getOutcome(route)
   if (!o) {
-    return { stdout: `Outcome not found: ${route}`, code: 1 }
+    return notFound('Outcome', route)
   }
   const classification = classifyOutcome(o)
   const types = getOutcomeTypesForOutcome(o)
@@ -139,13 +144,15 @@ function runOutcome(route, json) {
         nextQuestionRoute: ot.nextQuestionRoute ?? null
       }))
     }
-    return { stdout: JSON.stringify(doc, null, 2), code: 0 }
+    return jsonResult(doc)
   }
   const lines = [
-    `route            ${o.route}`,
-    `heading          ${o.heading}`,
-    `text             ${excerpt(o.text)}`,
-    `classification   ${classification}`,
+    ...alignKeyValues([
+      ['route', o.route],
+      ['heading', o.heading],
+      ['text', excerpt(o.text)],
+      ['classification', classification]
+    ]),
     '',
     '  OUTCOME TYPES',
     '  id\ttext\tparams\tnextQuestionRoute'
@@ -161,7 +168,7 @@ function runOutcome(route, json) {
 function runOutcomeType(id, json) {
   const ot = getOutcomeType(id)
   if (!ot) {
-    return { stdout: `OutcomeType not found: ${id}`, code: 1 }
+    return notFound('OutcomeType', id)
   }
   if (json) {
     const doc = {
@@ -175,31 +182,20 @@ function runOutcomeType(id, json) {
       entryTheme: ot.entryTheme ?? null,
       overrideCtaButtonText: ot.overrideCtaButtonText ?? null
     }
-    return { stdout: JSON.stringify(doc, null, 2), code: 0 }
+    return jsonResult(doc)
   }
-  const lines = [
-    `id                    ${ot.id}`,
-    `heading               ${ot.heading}`,
-    `text                  ${excerpt(ot.text)}`,
-    `params                ${paramsFlat(ot)}`,
-    `nextQuestionRoute     ${dash(ot.nextQuestionRoute)}`,
-    `link                  ${dash(ot.link)}`,
-    `module                ${dash(ot.module)}`,
-    `entryTheme            ${dash(ot.entryTheme)}`,
-    `overrideCtaButtonText ${dash(ot.overrideCtaButtonText)}`
-  ]
+  const lines = alignKeyValues([
+    ['id', ot.id],
+    ['heading', ot.heading],
+    ['text', excerpt(ot.text)],
+    ['params', paramsFlat(ot)],
+    ['nextQuestionRoute', dash(ot.nextQuestionRoute)],
+    ['link', dash(ot.link)],
+    ['module', dash(ot.module)],
+    ['entryTheme', dash(ot.entryTheme)],
+    ['overrideCtaButtonText', dash(ot.overrideCtaButtonText)]
+  ])
   return { stdout: lines.join('\n'), code: 0 }
-}
-
-function outcomeMatchesHasParam(outcome, paramName, paramValue) {
-  const types = getOutcomeTypesForOutcome(outcome)
-  return types.some((ot) =>
-    outcomeTypeMatchesHasParam(ot, paramName, paramValue)
-  )
-}
-
-function outcomeHasLink(outcome) {
-  return getOutcomeTypesForOutcome(outcome).some((ot) => Boolean(ot.link))
 }
 
 function outcomeTypeMatchesHasParam(ot, paramName, paramValue) {
@@ -212,6 +208,17 @@ function outcomeTypeMatchesHasParam(ot, paramName, paramValue) {
     }
     return paramValue === null || p.value === paramValue
   })
+}
+
+function outcomeMatchesHasParam(outcome, paramName, paramValue) {
+  const types = getOutcomeTypesForOutcome(outcome)
+  return types.some((ot) =>
+    outcomeTypeMatchesHasParam(ot, paramName, paramValue)
+  )
+}
+
+function outcomeHasLink(outcome) {
+  return getOutcomeTypesForOutcome(outcome).some((ot) => Boolean(ot.link))
 }
 
 function runOutcomes(flags, json) {
@@ -237,7 +244,7 @@ function runOutcomes(flags, json) {
       classification: classifyOutcome(o),
       outcomeTypeIds: o.outcomeTypes ?? []
     }))
-    return { stdout: JSON.stringify(docs, null, 2), code: 0 }
+    return jsonResult(docs)
   }
   const lines = filtered.map((o) => {
     const classification = classifyOutcome(o)
@@ -245,17 +252,6 @@ function runOutcomes(flags, json) {
     return `${o.route}\t${classification}\t${ids}`
   })
   return { stdout: lines.join('\n'), code: 0 }
-}
-
-function parseHasParam(hasParam) {
-  if (!hasParam) {
-    return { name: null, value: null }
-  }
-  const eqIdx = hasParam.indexOf('=')
-  if (eqIdx === -1) {
-    return { name: hasParam, value: null }
-  }
-  return { name: hasParam.slice(0, eqIdx), value: hasParam.slice(eqIdx + 1) }
 }
 
 function runOutcomeTypes(flags, json) {
@@ -275,7 +271,7 @@ function runOutcomeTypes(flags, json) {
     return true
   })
   if (json) {
-    return { stdout: JSON.stringify(filtered, null, 2), code: 0 }
+    return jsonResult(filtered)
   }
   const lines = filtered.map((ot) => {
     return `${ot.id}\t${paramsFlat(ot)}\t${dash(ot.nextQuestionRoute)}`
@@ -296,7 +292,7 @@ function runQuestions(flags, json) {
     return true
   })
   if (json) {
-    return { stdout: JSON.stringify(filtered, null, 2), code: 0 }
+    return jsonResult(filtered)
   }
   const lines = filtered.map((q) => {
     return `${q.route}\t${dash(q.mcmsAppFormMapping)}\t${q.multiSelect ? 'yes' : 'no'}\t${excerpt(q.text)}`
@@ -324,7 +320,7 @@ function runMappings(json) {
     for (const key of sortedKeys) {
       doc[key] = mappingMap.get(key)
     }
-    return { stdout: JSON.stringify(doc, null, 2), code: 0 }
+    return jsonResult(doc)
   }
   const lines = sortedKeys.map(
     (key) => `${key}\t${mappingMap.get(key).join(',')}`
@@ -332,57 +328,35 @@ function runMappings(json) {
   return { stdout: lines.join('\n'), code: 0 }
 }
 
-function parseSingleArg(rest, usage) {
-  const { values, positionals } = parseArgs({
-    args: rest,
-    options: { json: { type: 'boolean', default: false } },
-    allowPositionals: true
-  })
-  const arg = positionals[0]
-  if (!arg) {
-    return { error: { stdout: usage, code: 2 } }
-  }
-  return { arg, json: values.json }
-}
-
 function dispatchQuestion(rest) {
-  const parsed = parseSingleArg(
+  return runSingleArg(
     rest,
-    'Usage: iat-query question <route> [--json]'
+    'Usage: iat-query question <route> [--json]',
+    runQuestion
   )
-  if (parsed.error) {
-    return parsed.error
-  }
-  return runQuestion(parsed.arg, parsed.json)
 }
 
 function dispatchOutcome(rest) {
-  const parsed = parseSingleArg(
+  return runSingleArg(
     rest,
-    'Usage: iat-query outcome <route> [--json]'
+    'Usage: iat-query outcome <route> [--json]',
+    runOutcome
   )
-  if (parsed.error) {
-    return parsed.error
-  }
-  return runOutcome(parsed.arg, parsed.json)
 }
 
 function dispatchOutcomeType(rest) {
-  const parsed = parseSingleArg(
+  return runSingleArg(
     rest,
-    'Usage: iat-query outcome-type <id> [--json]'
+    'Usage: iat-query outcome-type <id> [--json]',
+    runOutcomeType
   )
-  if (parsed.error) {
-    return parsed.error
-  }
-  return runOutcomeType(parsed.arg, parsed.json)
 }
 
 function dispatchOutcomes(rest) {
   const { values } = parseArgs({
     args: rest,
     options: {
-      json: { type: 'boolean', default: false },
+      json: JSON_FLAG,
       classify: { type: 'string' },
       'has-param': { type: 'string' },
       'has-link': { type: 'boolean', default: false }
@@ -403,7 +377,7 @@ function dispatchOutcomeTypes(rest) {
   const { values } = parseArgs({
     args: rest,
     options: {
-      json: { type: 'boolean', default: false },
+      json: JSON_FLAG,
       'has-param': { type: 'string' },
       'has-next-question': { type: 'boolean', default: false },
       'has-link': { type: 'boolean', default: false }
@@ -424,7 +398,7 @@ function dispatchQuestions(rest) {
   const { values } = parseArgs({
     args: rest,
     options: {
-      json: { type: 'boolean', default: false },
+      json: JSON_FLAG,
       mapping: { type: 'string' },
       'has-mapping': { type: 'boolean', default: false }
     },
@@ -439,7 +413,7 @@ function dispatchQuestions(rest) {
 function dispatchMappings(rest) {
   const { values } = parseArgs({
     args: rest,
-    options: { json: { type: 'boolean', default: false } },
+    options: { json: JSON_FLAG },
     allowPositionals: false
   })
   return runMappings(values.json)
@@ -452,13 +426,16 @@ const DISPATCH = {
   outcomes: dispatchOutcomes,
   'outcome-types': dispatchOutcomeTypes,
   questions: dispatchQuestions,
-  mappings: dispatchMappings
+  mappings: dispatchMappings,
+  path: dispatchPath,
+  reach: dispatchReach,
+  predecessors: dispatchPredecessors
 }
 
 export function runCommand(argv) {
   const [subcommand, ...rest] = argv
   if (!subcommand) {
-    return { stdout: 'Usage: iat-query <subcommand> [args] [--json]', code: 2 }
+    return { stdout: USAGE, code: 2 }
   }
   const handler = DISPATCH[subcommand]
   if (!handler) {
@@ -473,5 +450,5 @@ if (isMain) {
   const { stdout, code } = runCommand(process.argv.slice(2))
   // eslint-disable-next-line no-console
   console.log(stdout)
-  process.exit(code)
+  process.exitCode = code
 }

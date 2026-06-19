@@ -284,6 +284,147 @@ describe('iat-query', () => {
     })
   })
 
+  describe('path', () => {
+    it('prints a shortest journey from /sea to a deep page', () => {
+      const { stdout, code } = runCommand(['path', '/mod-permission'])
+      expect(code).toBe(0)
+      const lines = stdout.split('\n')
+      // one bullet per step: "- <route> → <choice>"; last line appends the target
+      expect(lines[0]).toMatch(/^- \/sea → /)
+      expect(lines.at(-1)).toMatch(/→ \/mod-permission$/)
+      // intermediate-outcome forks render as "Continue"
+      expect(stdout).toContain(
+        '- /exemption/dredging-exe-not-available-continue → Continue'
+      )
+      // multi-select renders the tick choice without quotes
+      expect(stdout).toContain(
+        '- /dredging/activities → tick any activity except OTHER_CLEARANCE_DREDGING'
+      )
+    })
+
+    it('accepts an explicit from below /sea and uses it as the start', () => {
+      const { stdout, code } = runCommand([
+        'path',
+        '/jurisdiction',
+        '/fast-track-mla'
+      ])
+      expect(code).toBe(0)
+      const lines = stdout.split('\n')
+      // started at the explicit from, not the default /sea
+      expect(lines[0]).toMatch(/^- \/jurisdiction → /)
+      expect(lines.at(-1)).toMatch(/→ \/fast-track-mla$/)
+    })
+
+    it('exits 1 when the target is unreachable', () => {
+      const { code } = runCommand(['path', '/no-such-route'])
+      expect(code).toBe(1)
+    })
+
+    it('exits 2 with usage when no target is given', () => {
+      const { stdout, code } = runCommand(['path'])
+      expect(code).toBe(2)
+      expect(stdout).toContain('Usage: iat-query path')
+    })
+
+    it('--json emits found and an ordered steps array', () => {
+      const { stdout, code } = runCommand(['path', '/mod-permission', '--json'])
+      expect(code).toBe(0)
+      const parsed = JSON.parse(stdout)
+      expect(parsed.found).toBe(true)
+      expect(Array.isArray(parsed.steps)).toBe(true)
+      expect(parsed.steps.at(-1).to).toBe('/mod-permission')
+    })
+  })
+
+  describe('reach', () => {
+    it('exits 0 and reports reachable for a reachable route', () => {
+      const { stdout, code } = runCommand(['reach', '/mod-permission'])
+      expect(code).toBe(0)
+      expect(stdout).toContain('reachable: /mod-permission')
+    })
+    it('exits 1 and reports not reachable for an unreachable route', () => {
+      const { stdout, code } = runCommand(['reach', '/no-such-route'])
+      expect(code).toBe(1)
+      expect(stdout).toContain('not reachable: /no-such-route')
+    })
+
+    it('--json emits route and reachable boolean', () => {
+      const { stdout, code } = runCommand([
+        'reach',
+        '/mod-permission',
+        '--json'
+      ])
+      expect(code).toBe(0)
+      const parsed = JSON.parse(stdout)
+      expect(parsed).toEqual({ route: '/mod-permission', reachable: true })
+    })
+  })
+
+  describe('predecessors', () => {
+    it('lists direct callers of a page', () => {
+      const { stdout, code } = runCommand([
+        'predecessors',
+        '/military-defence-area'
+      ])
+      expect(code).toBe(0)
+      expect(stdout).toContain('/single-location')
+    })
+    it('exits 1 for an unknown route', () => {
+      expect(runCommand(['predecessors', '/no-such-route']).code).toBe(1)
+    })
+
+    it('reports no predecessors for the entry point /sea', () => {
+      const { stdout, code } = runCommand(['predecessors', '/sea'])
+      expect(code).toBe(0)
+      expect(stdout).toContain('no predecessors')
+    })
+
+    it('--json emits an array of { route, via } callers', () => {
+      const { stdout, code } = runCommand([
+        'predecessors',
+        '/military-defence-area',
+        '--json'
+      ])
+      expect(code).toBe(0)
+      const parsed = JSON.parse(stdout)
+      expect(Array.isArray(parsed)).toBe(true)
+      expect(parsed.some((c) => c.route === '/single-location')).toBe(true)
+      expect(parsed[0]).toHaveProperty('via')
+    })
+  })
+
+  describe('multi-select question view', () => {
+    it('shows the multi-select routing targets instead of terminal', () => {
+      const { stdout, code } = runCommand(['question', '/dredging/activities'])
+      expect(code).toBe(0)
+      expect(stdout).toContain('/activity/completion')
+      expect(stdout).toContain(
+        '/standard-marine-licence-application/other-clearance-dredging'
+      )
+    })
+
+    it('--json answer targets reflect multi-select routing', () => {
+      const { stdout } = runCommand([
+        'question',
+        '/dredging/activities',
+        '--json'
+      ])
+      const parsed = JSON.parse(stdout)
+      const targets = parsed.answers.map((a) => a.target)
+      expect(targets).not.toContain('terminal')
+      expect(targets.some((t) => t.includes('/activity/completion'))).toBe(true)
+    })
+  })
+
+  describe('usage', () => {
+    it('no subcommand prints self-teaching usage pointing at path and the README', () => {
+      const { stdout, code } = runCommand([])
+      expect(code).toBe(2)
+      expect(stdout).toContain('path')
+      expect(stdout).toContain('README.data.md')
+    })
+  })
+
   describe('error handling', () => {
     it('exits 2 for unknown subcommand', () => {
       const { stdout, code } = runCommand(['nonexistent'])

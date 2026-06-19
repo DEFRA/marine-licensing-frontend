@@ -29,28 +29,6 @@ describe('waterFrameworkReviewData', () => {
     })
   })
 
-  test('maps previousAssessment "yes" to correct heading and display value', () => {
-    const result = waterFrameworkReviewData({
-      previousAssessment: waterFrameworkDirective.previousAssessment
-    })
-
-    expect(result.previousAssessment).toEqual({
-      key: { text: PREVIOUS_ASSESSMENT_HEADING },
-      value: { text: 'Yes' }
-    })
-  })
-
-  test('maps assessmentChanged "no" to correct heading and display value', () => {
-    const result = waterFrameworkReviewData({
-      assessmentChanged: waterFrameworkDirective.assessmentChanged
-    })
-
-    expect(result.assessmentChanged).toEqual({
-      key: { text: ASSESSMENT_CHANGED_HEADING },
-      value: { text: 'No' }
-    })
-  })
-
   test('maps uploadedFile to correct heading and filename as display value', () => {
     const result = waterFrameworkReviewData({
       uploadedFile: waterFrameworkDirective.uploadedFile
@@ -79,14 +57,6 @@ describe('waterFrameworkReviewData', () => {
     })
     expect(result.excludedActivities).toEqual({
       key: { text: EXCLUDED_ACTIVITIES_HEADING },
-      value: { text: 'No' }
-    })
-    expect(result.previousAssessment).toEqual({
-      key: { text: PREVIOUS_ASSESSMENT_HEADING },
-      value: { text: 'Yes' }
-    })
-    expect(result.assessmentChanged).toEqual({
-      key: { text: ASSESSMENT_CHANGED_HEADING },
       value: { text: 'No' }
     })
     expect(result.uploadedFile).toEqual({

@@ -40,22 +40,6 @@ export const validateWaterFrameworkDirectiveSummaryForAllFields = (
     expectedPageContent.excludedActivities
   )
 
-  const previousAssessmentRow = getRowByKey(
-    waterFrameworkDirectiveSummary,
-    PREVIOUS_ASSESSMENT_HEADING
-  )
-  expect(previousAssessmentRow.textContent).toContain(
-    expectedPageContent.previousAssessment
-  )
-
-  const assessmentChangedRow = getRowByKey(
-    waterFrameworkDirectiveSummary,
-    ASSESSMENT_CHANGED_HEADING
-  )
-  expect(assessmentChangedRow.textContent).toContain(
-    expectedPageContent.assessmentChanged
-  )
-
   const fileUploadRow = getRowByKey(
     waterFrameworkDirectiveSummary,
     FILE_UPLOAD_HEADING
@@ -96,49 +80,3 @@ export const validateWaterFrameworkDirectiveSummaryForMinimumFields = (
 
   expect(rows.length).toBe(2)
 }
-
-export const validateWaterFrameworkDirectiveSummaryForPreviousAssessmentFields =
-  (document, expectedPageContent) => {
-    const waterFrameworkDirectiveSummary = document.querySelector(
-      '#water-framework-directive-review'
-    )
-    expect(waterFrameworkDirectiveSummary).toBeTruthy()
-
-    const nauticalMileRow = getRowByKey(
-      waterFrameworkDirectiveSummary,
-      NAUTICAL_MILE_HEADING
-    )
-
-    expect(nauticalMileRow.textContent).toContain(
-      expectedPageContent.nauticalMile
-    )
-
-    const excludedActivitiesRow = getRowByKey(
-      waterFrameworkDirectiveSummary,
-      EXCLUDED_ACTIVITIES_HEADING
-    )
-
-    expect(excludedActivitiesRow.textContent).toContain(
-      expectedPageContent.excludedActivities
-    )
-
-    const previousAssessmentRow = getRowByKey(
-      waterFrameworkDirectiveSummary,
-      PREVIOUS_ASSESSMENT_HEADING
-    )
-    expect(previousAssessmentRow.textContent).toContain(
-      expectedPageContent.previousAssessment
-    )
-
-    const fileUploadRow = getRowByKey(
-      waterFrameworkDirectiveSummary,
-      FILE_UPLOAD_HEADING
-    )
-    expect(fileUploadRow.textContent).toContain(expectedPageContent.fileUpload)
-
-    const rows = waterFrameworkDirectiveSummary.querySelectorAll(
-      '.govuk-summary-list__row'
-    )
-
-    expect(rows.length).toBe(4)
-  }

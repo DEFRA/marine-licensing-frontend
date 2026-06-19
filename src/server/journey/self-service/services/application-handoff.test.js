@@ -199,6 +199,22 @@ describe('buildMcmsHandoffQueryString', () => {
     })
     expect(qs).toBe('journeyId=CTX&FAST_TRACK=true')
   })
+
+  it('skips params with a null value or a missing name', () => {
+    const qs = buildMcmsHandoffQueryString({
+      questionLog: [],
+      focusedOption: {
+        params: [
+          { name: 'FAST_TRACK', value: 'true' },
+          { name: 'ADV_TYPE', value: null },
+          { name: '', value: 'orphan' }
+        ]
+      },
+      journeyId: 'CTX',
+      viewAnswersUrl: null
+    })
+    expect(qs).toBe('journeyId=CTX&FAST_TRACK=true')
+  })
 })
 
 describe('buildMcmsRedirectUrl', () => {
@@ -224,5 +240,11 @@ describe('buildMcmsRedirectUrl', () => {
     expect(buildMcmsRedirectUrl('https://mcms.test/', '', '')).toBe(
       'https://mcms.test/'
     )
+  })
+
+  it('uses & when the base URL already carries a query string', () => {
+    expect(
+      buildMcmsRedirectUrl('https://mcms.test/?theme=new', '', 'journeyId=X')
+    ).toBe('https://mcms.test/?theme=new&journeyId=X')
   })
 })

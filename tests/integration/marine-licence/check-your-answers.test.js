@@ -12,8 +12,26 @@ import {
   mockPolygonMarineLicence
 } from '~/src/server/test-helpers/mocks/marine-licence-mocks.js'
 import * as marineLicenceService from '~/src/services/marine-licence-service/index.js'
+import { validateWaterFrameworkDirective } from '~/tests/integration/shared/summary-card-validators.js'
+import {
+  NAUTICAL_MILE_HEADING,
+  EXCLUDED_ACTIVITIES_HEADING,
+  PREVIOUS_ASSESSMENT_HEADING,
+  ASSESSMENT_CHANGED_HEADING,
+  FILE_UPLOAD_HEADING
+} from '~/src/server/common/helpers/marine-licence/water-framework-directive/water-framework-review-data.js'
 
 vi.mock('~/src/services/marine-licence-service/index.js')
+
+const expectedWfdContent = {
+  waterFrameworkDirective: {
+    [NAUTICAL_MILE_HEADING]: 'Yes',
+    [EXCLUDED_ACTIVITIES_HEADING]: 'No',
+    [PREVIOUS_ASSESSMENT_HEADING]: 'Yes',
+    [ASSESSMENT_CHANGED_HEADING]: 'No',
+    [FILE_UPLOAD_HEADING]: 'test-upload-id'
+  }
+}
 
 describe('Marine Licence Check Your Answers - site and activity cards', () => {
   const getServer = setupTestServer()
@@ -76,6 +94,18 @@ describe('Marine Licence Check Your Answers - site and activity cards', () => {
       )
     })
 
+    test('renders the water framework directive card with a Change link', () => {
+      const wfdCard = document.querySelector('#water-framework-directive-card')
+      expect(wfdCard).toBeTruthy()
+
+      const changeLink = wfdCard.querySelector('.govuk-summary-card__actions a')
+      expect(changeLink).toBeTruthy()
+      expect(changeLink.textContent).toContain('Change')
+      expect(changeLink.getAttribute('href')).toBe(
+        `${marineLicenceRoutes.MARINE_LICENCE_WATER_FRAMEWORK_DIRECTIVE_REVIEW_YOUR_ANSWERS}?from=check-your-answers`
+      )
+    })
+
     test('renders activity card with card-level Change link and no row-level actions', () => {
       const activityCards = document.querySelectorAll(
         '[id^="activity-details-site-1-activity-"]'
@@ -91,6 +121,7 @@ describe('Marine Licence Check Your Answers - site and activity cards', () => {
       expect(
         activityCard.querySelectorAll('.govuk-summary-list__actions')
       ).toHaveLength(0)
+      validateWaterFrameworkDirective(document, expectedWfdContent)
     })
   })
 
@@ -113,6 +144,7 @@ describe('Marine Licence Check Your Answers - site and activity cards', () => {
       expect(
         getByRole(document, 'heading', { level: 2, name: 'Site 1' })
       ).toBeInTheDocument()
+      validateWaterFrameworkDirective(document, expectedWfdContent)
     })
   })
 
@@ -134,6 +166,7 @@ describe('Marine Licence Check Your Answers - site and activity cards', () => {
         'Single or multiple sets of coordinates'
       )
       expect(siteCard.textContent).toContain('100 metres')
+      validateWaterFrameworkDirective(document, expectedWfdContent)
     })
   })
 
@@ -155,6 +188,7 @@ describe('Marine Licence Check Your Answers - site and activity cards', () => {
         'Single or multiple sets of coordinates'
       )
       expect(siteCard.textContent).toContain('55.123456, 55.123456')
+      validateWaterFrameworkDirective(document, expectedWfdContent)
     })
   })
 
@@ -179,6 +213,7 @@ describe('Marine Licence Check Your Answers - site and activity cards', () => {
       expect(
         getByRole(document, 'heading', { level: 2, name: 'Project details' })
       ).toBeInTheDocument()
+      validateWaterFrameworkDirective(document, expectedWfdContent)
     })
   })
 })

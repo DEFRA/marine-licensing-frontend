@@ -6,6 +6,17 @@ import { waterFrameworkDirective } from '#src/server/test-helpers/mocks/marine-l
 describe('getBackLink', () => {
   const mockRequest = createMockRequest()
 
+  test('returns check-your-answers link when returnTo session value is set', () => {
+    const mockRequestFromCYA = createMockRequest()
+    mockRequestFromCYA.yar.get.mockReturnValue(
+      marineLicenceRoutes.MARINE_LICENCE_CHECK_YOUR_ANSWERS
+    )
+
+    expect(getBackLink(mockRequestFromCYA, waterFrameworkDirective)).toBe(
+      `${marineLicenceRoutes.MARINE_LICENCE_CHECK_YOUR_ANSWERS}#water-framework-directive-card`
+    )
+  })
+
   test('returns excluded-activities link when excludedActivities is yes', () => {
     expect(
       getBackLink(mockRequest, {

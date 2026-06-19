@@ -2,6 +2,7 @@ import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
 import { getMarineLicenceCache } from '#src/server/common/helpers/marine-licence/session-cache/utils.js'
 import { waterFrameworkReviewData } from '#src/server/common/helpers/marine-licence/water-framework-directive/water-framework-review-data.js'
 import { getBackLink } from '#src/server/marine-licence/water-framework-directive/review-your-answers/utils.js'
+import { RETURN_TO_CACHE_KEY } from '#src/server/common/constants/cache.js'
 
 export const REVIEW_YOUR_ANSWERS_VIEW_ROUTE =
   'marine-licence/water-framework-directive/review-your-answers/index'
@@ -38,7 +39,11 @@ export const waterFrameworkReviewYourAnswersController = {
 }
 
 export const reviewYourAnswersSubmitController = {
-  async handler(_request, h) {
+  async handler(request, h) {
+    const redirectPath = request.yar.get(RETURN_TO_CACHE_KEY)
+    if (redirectPath) {
+      return h.redirect(`${redirectPath}#water-framework-directive-card`)
+    }
     return h.redirect(marineLicenceRoutes.MARINE_LICENCE_TASK_LIST)
   }
 }

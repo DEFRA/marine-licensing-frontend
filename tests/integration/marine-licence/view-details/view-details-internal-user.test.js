@@ -6,10 +6,14 @@ import {
 } from '~/tests/integration/shared/test-setup-helpers.js'
 import { loadPage } from '~/tests/integration/shared/app-server.js'
 import { mockSubmittedMarineLicenceApplication } from '~/src/server/test-helpers/mocks/marine-licence-mocks.js'
-import { expectedSiteDetailsCard } from './fixtures.js'
+import {
+  expectedSiteDetailsCard,
+  expectedWaterFrameworkDirectiveCard
+} from './fixtures.js'
 import { getCardRow } from './utils.js'
 import { getAuthProvider } from '~/src/server/common/helpers/authenticated-requests.js'
 import { AUTH_STRATEGIES } from '~/src/server/common/constants/auth.js'
+import { validateWaterFrameworkDirective } from '#tests/integration/shared/summary-card-validators.js'
 
 vi.mock('~/src/server/common/helpers/authenticated-requests.js')
 
@@ -54,5 +58,27 @@ describe('Marine Licence View Details', () => {
         ).toBe(value)
       }
     )
+  })
+
+  describe('water framework directive card', () => {
+    let document
+
+    beforeEach(async () => {
+      document = await loadViewDetailsPage(getServer())
+    })
+
+    test('renders the water framework directive card', () => {
+      validateWaterFrameworkDirective(
+        document,
+        expectedWaterFrameworkDirectiveCard
+      )
+    })
+
+    test('does not render a Change link', () => {
+      const card = document.querySelector('#water-framework-directive-card')
+      const changeLink = card.querySelector('.govuk-summary-card__actions a')
+
+      expect(changeLink).toBeNull()
+    })
   })
 })

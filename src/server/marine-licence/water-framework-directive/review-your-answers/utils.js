@@ -1,6 +1,11 @@
 import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
+import { RETURN_TO_CACHE_KEY } from '#src/server/common/constants/cache.js'
 
 export const getBackLink = (request, waterFrameworkDirective = {}) => {
+  if (request.yar.get(RETURN_TO_CACHE_KEY)) {
+    return `${marineLicenceRoutes.MARINE_LICENCE_CHECK_YOUR_ANSWERS}#water-framework-directive-card`
+  }
+
   const previousPage = request.headers?.referer
 
   if (previousPage && URL.canParse(previousPage)) {

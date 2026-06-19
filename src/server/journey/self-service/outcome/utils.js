@@ -44,9 +44,7 @@ function continueUrlFor(slug, outcomeRoute, outcomeType) {
 
 function ctaHrefFor(slug, outcomeRoute, outcomeType) {
   return (
-    continueUrlFor(slug, outcomeRoute, outcomeType) ??
-    outcomeType.link ??
-    null
+    continueUrlFor(slug, outcomeRoute, outcomeType) ?? outcomeType.link ?? null
   )
 }
 

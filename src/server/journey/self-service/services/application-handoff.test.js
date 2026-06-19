@@ -215,9 +215,9 @@ describe('buildMcmsRedirectUrl', () => {
   })
 
   it('joins a non-empty path onto the base URL', () => {
-    expect(
-      buildMcmsRedirectUrl('https://mcms.test/', 'apply/new', 'a=1')
-    ).toBe('https://mcms.test/apply/new?a=1')
+    expect(buildMcmsRedirectUrl('https://mcms.test/', 'apply/new', 'a=1')).toBe(
+      'https://mcms.test/apply/new?a=1'
+    )
   })
 
   it('returns just the base URL when there is no query string', () => {

@@ -530,10 +530,7 @@ describe('GET terminal-multi', () => {
     const labels = cards.map((c) =>
       c.querySelector('a.govuk-button')?.textContent.trim()
     )
-    expect(labels).toEqual([
-      'Download',
-      'Apply for a standard marine licence'
-    ])
+    expect(labels).toEqual(['Download', 'Apply for a standard marine licence'])
   })
 
   test('each per-card CTA links to its destination (link → document, module → continue route)', async () => {

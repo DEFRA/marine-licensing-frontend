@@ -43,7 +43,11 @@ describe('#classifyOutcome', () => {
 describe('#ctaLabelFor', () => {
   test('returns overrideCtaButtonText when present', () => {
     expect(
-      ctaLabelFor({ overrideCtaButtonText: 'Apply now', link: 'x', module: 'y' })
+      ctaLabelFor({
+        overrideCtaButtonText: 'Apply now',
+        link: 'x',
+        module: 'y'
+      })
     ).toBe('Apply now')
   })
 
@@ -181,8 +185,18 @@ describe('ctaHref wiring', () => {
 
   it('sets per-option ctaHref on terminal-multi (link vs module)', () => {
     const view = buildTerminalMultiView(baseModel, [
-      { id: 'WO_DOWNLOAD', heading: 'h', text: 't', link: 'https://example.com/a.docx' },
-      { id: 'WO_STANDARD_TRACK_MLA', heading: 'h2', text: 't2', module: 'MMO_APP2_CONTROL' }
+      {
+        id: 'WO_DOWNLOAD',
+        heading: 'h',
+        text: 't',
+        link: 'https://example.com/a.docx'
+      },
+      {
+        id: 'WO_STANDARD_TRACK_MLA',
+        heading: 'h2',
+        text: 't2',
+        module: 'MMO_APP2_CONTROL'
+      }
     ])
     expect(view.options[0].ctaHref).toBe('https://example.com/a.docx')
     expect(view.options[1].ctaHref).toBe(continueRoute('WO_STANDARD_TRACK_MLA'))
@@ -192,7 +206,13 @@ describe('ctaHref wiring', () => {
     const view = buildIntermediateView(
       { slug: 'S'.repeat(22), outcomeRoute: '/construction/journey-select' },
       { outcomeTypes: ['WO_STANDARD_MLA'] },
-      [{ id: 'WO_STANDARD_MLA', heading: 'Apply for a standard marine licence', module: 'MMO_APP2_CONTROL' }]
+      [
+        {
+          id: 'WO_STANDARD_MLA',
+          heading: 'Apply for a standard marine licence',
+          module: 'MMO_APP2_CONTROL'
+        }
+      ]
     )
     expect(view.options[0].ctaHref).toBe(
       `/journey/self-service/c/${'S'.repeat(22)}/continue/WO_STANDARD_MLA/construction/journey-select`

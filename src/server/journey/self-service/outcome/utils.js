@@ -29,15 +29,6 @@ export function ctaLabelFor(outcomeType) {
   return 'Continue'
 }
 
-export function hasContinueFor(outcomeType) {
-  return Boolean(
-    outcomeType.module ||
-    outcomeType.nextQuestionRoute ||
-    outcomeType.link ||
-    outcomeType.overrideCtaButtonText
-  )
-}
-
 function viewAnswersUrlFor(slug, outcomeRoute, outcomeTypeId) {
   const tail = outcomeRoute.replace(/^\//, '')
   return `/journey/self-service/c/${slug}/view-answers/${outcomeTypeId}/${tail}`
@@ -85,12 +76,6 @@ export function buildTerminalSingleView(baseModel, terminalType) {
     ...baseModel,
     body: terminalType.text,
     ctaLabel: ctaLabelFor(terminalType),
-    hasContinue: hasContinueFor(terminalType),
-    continueUrl: continueUrlFor(
-      baseModel.slug,
-      baseModel.outcomeRoute,
-      terminalType
-    ),
     ctaHref: ctaHrefFor(baseModel.slug, baseModel.outcomeRoute, terminalType),
     viewAnswersUrl: viewAnswersUrlFor(
       baseModel.slug,
@@ -137,8 +122,6 @@ export function buildTerminalMultiView(baseModel, types) {
       heading: ot.heading,
       text: ot.text,
       ctaLabel: ctaLabelFor(ot),
-      hasContinue: hasContinueFor(ot),
-      continueUrl: continueUrlFor(baseModel.slug, baseModel.outcomeRoute, ot),
       ctaHref: ctaHrefFor(baseModel.slug, baseModel.outcomeRoute, ot),
       viewAnswersUrl: viewAnswersUrlFor(
         baseModel.slug,

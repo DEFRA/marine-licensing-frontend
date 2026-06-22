@@ -3,6 +3,7 @@ import {
   MARINE_LICENCE_CACHE_KEY
 } from '#src/server/common/helpers/marine-licence/session-cache/utils.js'
 import { WFD_RETURN_TO_KEY } from '#src/server/common/constants/cache.js'
+import { clearReturnToCache } from '#src/server/common/helpers/marine-licence/session-cache/return-to-cache.js'
 
 export const updateWaterFrameworkDirective = async (request, h, key, value) => {
   const existingCache = getMarineLicenceCache(request)
@@ -40,6 +41,10 @@ export const setWaterFrameworkDirectiveReturnToCache = async (
 }
 
 export const clearWaterFrameworkDirectiveReturnToCache = (request) => {
+  // Clear global return cache used by Check Your Answers
+  clearReturnToCache(request)
+
+  // Clear return cache used by WFD specific Review Your Answers
   request.yar.clear(WFD_RETURN_TO_KEY)
 }
 

@@ -79,7 +79,9 @@ describe('config validation', () => {
       expect(config.get('mcms.url')).toBe(
         'https://marinelicensingtest.marinemanagement.org.uk/'
       )
-      expect(config.get('mcms.path')).toBe('')
+      expect(config.get('mcms.path')).toBe(
+        'mmofox5uat/fox/mmo/MMO_IAT_INTEGRATION'
+      )
     })
 
     test('honours MCMS_URL and MCMS_PATH overrides', async () => {
@@ -148,7 +150,7 @@ describe('config validation', () => {
       process.env.APP_BASE_URL =
         'https://marine-licensing-frontend.perf-test.cdp-int.defra.cloud'
       process.env.MCMS_URL = 'https://marinelicensing.marinemanagement.org.uk/'
-
+      process.env.MCMS_PATH = 'apply/new'
       const { config } = await import('./config.js')
 
       expect(config.get('defraId.clientSecret')).toBe('test_value')
@@ -187,6 +189,7 @@ describe('config validation', () => {
       process.env.CDP_UPLOAD_BUCKET = 'prod-bucket'
       process.env.APP_BASE_URL = 'https://app.example.com'
       process.env.MCMS_URL = 'https://marinelicensing.marinemanagement.org.uk/'
+      process.env.MCMS_PATH = 'apply/new'
 
       const { config } = await import('./config.js')
 
@@ -250,6 +253,7 @@ describe('config validation', () => {
       process.env.CDP_UPLOAD_BUCKET = 'prod-bucket'
       process.env.APP_BASE_URL = 'https://app.example.com'
       process.env.MCMS_URL = 'https://marinelicensing.marinemanagement.org.uk/'
+      process.env.MCMS_PATH = 'apply/new'
 
       await import('./config.js')
 
@@ -289,6 +293,7 @@ describe('config validation', () => {
       process.env.CDP_UPLOAD_BUCKET = 'prod-bucket'
       process.env.APP_BASE_URL = 'https://app.example.com'
       process.env.MCMS_URL = 'https://marinelicensing.marinemanagement.org.uk/'
+      process.env.MCMS_PATH = 'apply/new'
 
       await import('./config.js')
 

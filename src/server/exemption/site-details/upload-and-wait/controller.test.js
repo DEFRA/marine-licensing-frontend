@@ -767,6 +767,54 @@ describe('#uploadAndWait', () => {
 
         expect(h.redirect).toHaveBeenCalledWith(routes.FILE_UPLOAD)
       })
+
+      test('should handle NO_SITE_BOUNDARIES error from geo-parser', async () => {
+        getExemptionCacheSpy.mockReturnValue(
+          createMockExemption({
+            siteDetails: [
+              {
+                uploadConfig: createMockUploadConfig({ fileType: 'shapefile' })
+              }
+            ]
+          })
+        )
+        const statusResponse = createMockStatusResponse('ready', {
+          filename: 'empty-site.zip'
+        })
+        mockCdpService.getStatus.mockResolvedValue(statusResponse)
+
+        mockValidateUploadedFile.mockResolvedValue({
+          isValid: true,
+          extension: 'zip',
+          errorMessage: null
+        })
+
+        const geoParserError = new Error('GeoJSON contains no features')
+        geoParserError.data = {
+          payload: {
+            message: 'NO_SITE_BOUNDARIES'
+          }
+        }
+        authenticatedPostRequestSpy.mockRejectedValue(geoParserError)
+
+        const h = createMockResponseHandler()
+
+        await uploadAndWaitController.handler(mockRequest, h)
+
+        expect(updateExemptionSiteDetailsSpy).toHaveBeenCalledWith(
+          mockRequest,
+          expect.any(Object),
+          0,
+          'uploadError',
+          {
+            message: 'The uploaded file must contain site boundaries',
+            fieldName: 'file',
+            fileType: 'shapefile'
+          }
+        )
+
+        expect(h.redirect).toHaveBeenCalledWith(routes.FILE_UPLOAD)
+      })
     })
 
     describe('when service errors occur', () => {

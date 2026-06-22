@@ -37,13 +37,9 @@ describe('saveWaterFrameworkDirectiveToBackend', () => {
   })
 
   test('should save full water framework directive', async () => {
-    const { previousAssessment, ...wfdWithoutPreviousAssessment } =
-      waterFrameworkDirective
-
-    vi.mocked(getMarineLicenceCache).mockReturnValue({
-      ...mockMarineLicenceApplication,
-      waterFrameworkDirective: wfdWithoutPreviousAssessment
-    })
+    vi.mocked(getMarineLicenceCache).mockReturnValue(
+      mockMarineLicenceApplication
+    )
 
     await saveWaterFrameworkDirectiveToBackend(mockRequest, false)
 
@@ -52,12 +48,10 @@ describe('saveWaterFrameworkDirectiveToBackend', () => {
       apiRoutes.UPDATE_WATER_FRAMEWORK_DIRECTIVE,
       {
         waterFrameworkDirective: {
-          nauticalMile: wfdWithoutPreviousAssessment.nauticalMile,
-          assessmentChanged: wfdWithoutPreviousAssessment.assessmentChanged,
-          excludedActivities: wfdWithoutPreviousAssessment.excludedActivities,
-          previousAssessment: undefined,
-          s3Location: wfdWithoutPreviousAssessment.s3Location,
-          uploadedFile: wfdWithoutPreviousAssessment.uploadedFile
+          nauticalMile: waterFrameworkDirective.nauticalMile,
+          excludedActivities: waterFrameworkDirective.excludedActivities,
+          s3Location: waterFrameworkDirective.s3Location,
+          uploadedFile: waterFrameworkDirective.uploadedFile
         },
         id: mockMarineLicenceApplication.id
       }

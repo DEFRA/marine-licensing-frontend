@@ -74,6 +74,12 @@ describe('error-messages', () => {
       )
     })
 
+    test('should have message for NO_SITE_BOUNDARIES', () => {
+      expect(GEO_PARSER_ERROR_MESSAGES.NO_SITE_BOUNDARIES).toBe(
+        'The uploaded file must contain site boundaries'
+      )
+    })
+
     test('should have message for GEOMETRY_NESTING_TOO_DEEP', () => {
       expect(GEO_PARSER_ERROR_MESSAGES.GEOMETRY_NESTING_TOO_DEEP).toBe(
         'We couldn’t process this map file because its geometry is too complex. Please simplify the shape and upload again.'

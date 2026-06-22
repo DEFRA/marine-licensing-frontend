@@ -23,14 +23,6 @@ describe('Marine Licence Water Framework Directive Component', () => {
             key: { text: EXCLUDED_ACTIVITIES_HEADING },
             value: { text: 'No' }
           },
-          assessmentChanged: {
-            key: { text: ASSESSMENT_CHANGED_HEADING },
-            value: { text: 'Yes' }
-          },
-          previousAssessment: {
-            key: { text: PREVIOUS_ASSESSMENT_HEADING },
-            value: { text: 'Yes' }
-          },
           uploadedFile: {
             key: { text: FILE_UPLOAD_HEADING },
             value: { text: 'test-upload-id' }

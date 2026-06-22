@@ -95,6 +95,20 @@ describe('#nauticalMile', () => {
       )
     })
 
+    test('Should redirect to review-your-answers when answer is yes and action=change', async () => {
+      await nauticalMileSubmitController.handler(
+        createMockRequest({
+          payload: { nauticalMile: 'yes' },
+          query: { action: 'change' }
+        }),
+        h
+      )
+
+      expect(h.redirect).toHaveBeenCalledWith(
+        marineLicenceRoutes.MARINE_LICENCE_WATER_FRAMEWORK_DIRECTIVE_REVIEW_YOUR_ANSWERS
+      )
+    })
+
     test('Should correctly redirect to task list when answer is no and no returnTo is set', async () => {
       await nauticalMileSubmitController.handler(
         createMockRequest({ payload: { nauticalMile: 'no' } }),

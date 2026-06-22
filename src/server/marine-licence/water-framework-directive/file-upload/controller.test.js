@@ -13,6 +13,7 @@ import {
   WFD_ACCEPT_ATTRIBUTE,
   s3PathForWaterFrameworkDirective
 } from '#src/server/common/constants/water-framework-directive.js'
+import { createMockRequest } from '#src/server/test-helpers/mocks/helpers.js'
 
 vi.mock('~/src/server/common/helpers/marine-licence/session-cache/utils.js')
 vi.mock('~/src/services/cdp-upload-service/index.js')
@@ -42,19 +43,6 @@ describe('#fileUpload', () => {
   let getMarineLicenceCacheSpy
   let updateWaterFrameworkDirectiveSpy
   let mockCdpService
-
-  const createMockRequest = () => ({
-    logger: {
-      debug: vi.fn(),
-      warn: vi.fn(),
-      error: vi.fn()
-    },
-    yar: {
-      get: vi.fn(),
-      set: vi.fn(),
-      commit: vi.fn()
-    }
-  })
 
   const createMockH = () => ({
     view: vi.fn(),
@@ -94,6 +82,16 @@ describe('#fileUpload', () => {
       .spyOn(wfdCacheUtils, 'updateWaterFrameworkDirective')
       .mockResolvedValue()
 
+    vi.spyOn(
+      wfdCacheUtils,
+      'getWaterFrameworkDirectiveReturnRoute'
+    ).mockReturnValue(undefined)
+
+    vi.spyOn(
+      wfdCacheUtils,
+      'setWaterFrameworkDirectiveReturnToCache'
+    ).mockResolvedValue()
+
     mockCdpService = { initiate: vi.fn() }
     vi.spyOn(cdpUploadService, 'getCdpUploadService').mockReturnValue(
       mockCdpService
@@ -123,6 +121,41 @@ describe('#fileUpload', () => {
           backLink:
             marineLicenceRoutes.MARINE_LICENCE_WATER_FRAMEWORK_DIRECTIVE_EXCLUDED_ACTIVITIES,
           cancelLink: marineLicenceRoutes.MARINE_LICENCE_TASK_LIST
+        })
+      })
+
+      test('should use review-your-answers back link and no cancel when action=change', async () => {
+        const RYA_ROUTE =
+          marineLicenceRoutes.MARINE_LICENCE_WATER_FRAMEWORK_DIRECTIVE_REVIEW_YOUR_ANSWERS
+
+        vi.spyOn(
+          wfdCacheUtils,
+          'getWaterFrameworkDirectiveReturnRoute'
+        ).mockReturnValue(RYA_ROUTE)
+
+        mockRequest = createMockRequest({ query: { action: 'change' } })
+        await setupStandardFileUploadTest(mockRequest, mockH)
+
+        expectViewCalledWith(mockH, {
+          backLink: RYA_ROUTE,
+          cancelLink: undefined
+        })
+      })
+
+      test('should use excluded-activities back link when wfdReturnTo is set but no action param', async () => {
+        vi.spyOn(
+          wfdCacheUtils,
+          'getWaterFrameworkDirectiveReturnRoute'
+        ).mockReturnValue(
+          marineLicenceRoutes.MARINE_LICENCE_WATER_FRAMEWORK_DIRECTIVE_REVIEW_YOUR_ANSWERS
+        )
+
+        await setupStandardFileUploadTest(mockRequest, mockH)
+
+        expectViewCalledWith(mockH, {
+          backLink:
+            marineLicenceRoutes.MARINE_LICENCE_WATER_FRAMEWORK_DIRECTIVE_EXCLUDED_ACTIVITIES,
+          cancelLink: undefined
         })
       })
 

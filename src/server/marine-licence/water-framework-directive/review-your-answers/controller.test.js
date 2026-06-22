@@ -7,8 +7,11 @@ import {
 } from '#src/server/marine-licence/water-framework-directive/review-your-answers/controller.js'
 import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
 import { createMockRequest } from '#src/server/test-helpers/mocks/helpers.js'
+import { getMarineLicenceService } from '#src/services/marine-licence-service/index.js'
+import { mockMarineLicenceApplication } from '~/src/server/test-helpers/mocks/marine-licence-mocks.js'
 
 vi.mock('~/src/server/common/helpers/marine-licence/session-cache/utils.js')
+vi.mock('#src/services/marine-licence-service/index.js')
 
 function createMockHandler(type = 'view') {
   if (type === 'redirect') {
@@ -19,10 +22,21 @@ function createMockHandler(type = 'view') {
 
 describe('#reviewYourAnswers', () => {
   const mockRequest = createMockRequest()
+  let mockGetMarineLicenceById
+
+  beforeEach(() => {
+    mockGetMarineLicenceById = vi.fn()
+    vi.mocked(getMarineLicenceService).mockReturnValue({
+      getMarineLicenceById: mockGetMarineLicenceById
+    })
+
+    mockGetMarineLicenceById.mockResolvedValue(mockMarineLicenceApplication)
+  })
 
   describe('waterFrameworkReviewYourAnswersController', () => {
     test('renders view with file-upload back link when excludedActivities is not yes', async () => {
       vi.mocked(cacheUtils.getMarineLicenceCache).mockReturnValue({
+        id: 'test-id',
         projectName: 'Test Project',
         waterFrameworkDirective: { excludedActivities: 'no' }
       })
@@ -45,8 +59,17 @@ describe('#reviewYourAnswers', () => {
 
     test('renders view with excluded-activities back link when excludedActivities is yes', async () => {
       vi.mocked(cacheUtils.getMarineLicenceCache).mockReturnValue({
+        id: 'test-id',
         projectName: 'Test Project',
         waterFrameworkDirective: { excludedActivities: 'yes' }
+      })
+
+      mockGetMarineLicenceById.mockResolvedValue({
+        ...mockMarineLicenceApplication,
+        waterFrameworkDirective: {
+          nauticalMile: 'yes',
+          excludedActivities: 'yes'
+        }
       })
 
       const h = createMockHandler()
@@ -64,7 +87,13 @@ describe('#reviewYourAnswers', () => {
 
     test('renders view with file-upload back link when waterFrameworkDirective is absent', async () => {
       vi.mocked(cacheUtils.getMarineLicenceCache).mockReturnValue({
+        id: 'test-id',
         projectName: 'Test Project'
+      })
+
+      mockGetMarineLicenceById.mockResolvedValue({
+        ...mockMarineLicenceApplication,
+        waterFrameworkDirective: undefined
       })
 
       const h = createMockHandler()

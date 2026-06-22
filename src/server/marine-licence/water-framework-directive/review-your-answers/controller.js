@@ -1,8 +1,13 @@
 import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
-import { getMarineLicenceCache } from '#src/server/common/helpers/marine-licence/session-cache/utils.js'
+import {
+  getMarineLicenceCache,
+  setMarineLicenceCache
+} from '#src/server/common/helpers/marine-licence/session-cache/utils.js'
 import { waterFrameworkReviewData } from '#src/server/common/helpers/marine-licence/water-framework-directive/water-framework-review-data.js'
 import { getBackLink } from '#src/server/marine-licence/water-framework-directive/review-your-answers/utils.js'
 import { RETURN_TO_CACHE_KEY } from '#src/server/common/constants/cache.js'
+import { clearWaterFrameworkDirectiveReturnToCache } from '#src/server/common/helpers/marine-licence/session-cache/water-framework-directive.js'
+import { getMarineLicenceService } from '#src/services/marine-licence-service/index.js'
 
 export const REVIEW_YOUR_ANSWERS_VIEW_ROUTE =
   'marine-licence/water-framework-directive/review-your-answers/index'
@@ -17,8 +22,21 @@ const reviewYourAnswersPageData = {
 
 export const waterFrameworkReviewYourAnswersController = {
   async handler(request, h) {
-    const marineLicence = getMarineLicenceCache(request)
+    clearWaterFrameworkDirectiveReturnToCache(request)
+
+    const cachedMarineLicence = getMarineLicenceCache(request)
+
+    const marineLicenceService = getMarineLicenceService(request)
+    const marineLicence = await marineLicenceService.getMarineLicenceById(
+      cachedMarineLicence.id
+    )
+
     const { waterFrameworkDirective = {} } = marineLicence
+
+    await setMarineLicenceCache(request, h, {
+      ...cachedMarineLicence,
+      waterFrameworkDirective
+    })
 
     if (waterFrameworkDirective.nauticalMile === 'no') {
       return h.redirect(

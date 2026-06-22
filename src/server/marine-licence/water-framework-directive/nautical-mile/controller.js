@@ -32,11 +32,12 @@ export const nauticalMileController = {
     const { waterFrameworkDirective } = marineLicence
 
     const returnTo = request.yar.get(RETURN_TO_CACHE_KEY)
+    const action = request.query.action
 
     return h.view(NAUTICAL_MILE_VIEW_ROUTE, {
       ...nauticalMileSettings,
-      backLink: getBackLink(returnTo),
-      cancelLink: getCancelLink(returnTo),
+      backLink: getBackLink(returnTo, action),
+      cancelLink: getCancelLink(returnTo, action),
       projectName: marineLicence.projectName,
       payload: { nauticalMile: waterFrameworkDirective?.nauticalMile }
     })
@@ -57,15 +58,16 @@ export const nauticalMileSubmitController = {
         const { projectName } = getMarineLicenceCache(request)
 
         const returnTo = request.yar.get(RETURN_TO_CACHE_KEY)
+        const action = request.query.action
 
         return createFailAction({
           viewRoute: NAUTICAL_MILE_VIEW_ROUTE,
           settings: nauticalMileSettings,
-          backLink: getBackLink(returnTo),
+          backLink: getBackLink(returnTo, action),
           errorMessages,
           projectName,
           payload: request.payload,
-          params: { cancelLink: getCancelLink(returnTo) }
+          params: { cancelLink: getCancelLink(returnTo, action) }
         })(request, h, err)
       }
     }
@@ -89,6 +91,12 @@ export const nauticalMileSubmitController = {
         return h.redirect(`${returnTo}#water-framework-directive-card`)
       }
       return h.redirect(marineLicenceRoutes.MARINE_LICENCE_TASK_LIST)
+    }
+
+    if (request.query.action) {
+      return h.redirect(
+        marineLicenceRoutes.MARINE_LICENCE_WATER_FRAMEWORK_DIRECTIVE_REVIEW_YOUR_ANSWERS
+      )
     }
 
     return h.redirect(

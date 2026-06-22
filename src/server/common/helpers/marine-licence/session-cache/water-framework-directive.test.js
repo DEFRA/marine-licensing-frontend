@@ -1,6 +1,15 @@
-import { updateWaterFrameworkDirective } from './water-framework-directive'
+import {
+  clearWaterFrameworkDirectiveReturnToCache,
+  getWaterFrameworkDirectiveReturnRoute,
+  setWaterFrameworkDirectiveReturnToCache,
+  updateWaterFrameworkDirective
+} from './water-framework-directive'
 import { MARINE_LICENCE_CACHE_KEY } from './utils'
-import { createMockH } from '#src/server/test-helpers/mocks/helpers.js'
+import {
+  createMockH,
+  createMockRequest
+} from '#src/server/test-helpers/mocks/helpers.js'
+import { WFD_RETURN_TO_KEY } from '#src/server/common/constants/cache.js'
 
 describe('updateWaterFrameworkDirective', () => {
   let mockRequest
@@ -85,5 +94,36 @@ describe('updateWaterFrameworkDirective', () => {
     expect(mockRequest.yar.commit).toHaveBeenCalledWith(mockH)
 
     expect(result).toEqual({ nauticalMile: null })
+  })
+})
+
+describe('setWaterFrameworkDirectiveReturnToCache', () => {
+  test('sets the WFD_RETURN_TO_KEY cache key', () => {
+    const mockRequest = createMockRequest()
+    const mockH = createMockH()
+
+    setWaterFrameworkDirectiveReturnToCache(mockRequest, mockH, '/test')
+
+    expect(mockRequest.yar.clear).toHaveBeenCalledWith(WFD_RETURN_TO_KEY)
+    expect(mockRequest.yar.set).toHaveBeenCalledWith(WFD_RETURN_TO_KEY, '/test')
+    expect(mockRequest.yar.commit).toHaveBeenCalledWith(mockH)
+  })
+})
+
+describe('clearWaterFrameworkDirectiveReturnToCache', () => {
+  test('clears the WFD_RETURN_TO_KEY cache key', () => {
+    const mockRequest = createMockRequest()
+    clearWaterFrameworkDirectiveReturnToCache(mockRequest)
+    expect(mockRequest.yar.clear).toHaveBeenCalledWith(WFD_RETURN_TO_KEY)
+  })
+})
+
+describe('getWaterFrameworkDirectiveReturnRoute', () => {
+  test('gets the WFD_RETURN_TO_KEY cache key value', () => {
+    const mockRequest = createMockRequest()
+
+    getWaterFrameworkDirectiveReturnRoute(mockRequest)
+
+    expect(mockRequest.yar.get).toHaveBeenCalledWith(WFD_RETURN_TO_KEY)
   })
 })

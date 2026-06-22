@@ -107,9 +107,9 @@ export const config = convict({
       env: 'MCMS_URL'
     },
     path: {
-      doc: 'Path appended to the MCMS base URL for the IAT handoff — relative, no leading slash (TBC)',
-      format: String,
-      default: '',
+      doc: 'Path appended to the MCMS base URL for the IAT handoff — relative, no leading slash',
+      format: requiredFromEnvInCdp,
+      default: 'mmofox5uat/fox/mmo/MMO_IAT_INTEGRATION',
       env: 'MCMS_PATH'
     }
   },

@@ -7,7 +7,10 @@ import {
 } from '#src/server/marine-licence/water-framework-directive/nautical-mile/controller.js'
 import * as cacheUtils from '#src/server/common/helpers/marine-licence/session-cache/utils.js'
 import * as wfdCache from '#src/server/common/helpers/marine-licence/session-cache/water-framework-directive.js'
-import { createMockH } from '#src/server/test-helpers/mocks/helpers.js'
+import {
+  createMockH,
+  createMockRequest
+} from '#src/server/test-helpers/mocks/helpers.js'
 import { saveWaterFrameworkDirectiveToBackend } from '#src/server/common/helpers/marine-licence/water-framework-directive/save-water-framework-directive.js'
 
 vi.mock('~/src/server/common/helpers/marine-licence/session-cache/utils.js')
@@ -42,7 +45,7 @@ describe('#nauticalMile', () => {
         mockWithouWfd
       )
 
-      await nauticalMileController.handler({ query: {} }, h)
+      await nauticalMileController.handler(createMockRequest(), h)
 
       expect(h.view).toHaveBeenCalledWith(NAUTICAL_MILE_VIEW_ROUTE, {
         backLink:
@@ -56,12 +59,28 @@ describe('#nauticalMile', () => {
         payload: { nauticalMile: undefined }
       })
     })
+
+    test('Should use check-your-answers back link with anchor when returnTo is set', async () => {
+      const request = createMockRequest()
+      request.yar.get.mockReturnValue(
+        marineLicenceRoutes.MARINE_LICENCE_CHECK_YOUR_ANSWERS
+      )
+
+      await nauticalMileController.handler(request, h)
+
+      expect(h.view).toHaveBeenCalledWith(
+        NAUTICAL_MILE_VIEW_ROUTE,
+        expect.objectContaining({
+          backLink: `${marineLicenceRoutes.MARINE_LICENCE_CHECK_YOUR_ANSWERS}#water-framework-directive-card`
+        })
+      )
+    })
   })
 
   describe('#nauticalMileSubmitController', () => {
-    test('Should correctly redirect to nautical mile page on success', async () => {
+    test('Should correctly redirect to excluded activities on success', async () => {
       await nauticalMileSubmitController.handler(
-        { payload: { nauticalMile: 'yes' }, query: {} },
+        createMockRequest({ payload: { nauticalMile: 'yes' } }),
         h
       )
 
@@ -76,9 +95,9 @@ describe('#nauticalMile', () => {
       )
     })
 
-    test('Should correctly redirect when answer is no', async () => {
+    test('Should correctly redirect to task list when answer is no and no returnTo is set', async () => {
       await nauticalMileSubmitController.handler(
-        { payload: { nauticalMile: 'no' }, query: {} },
+        createMockRequest({ payload: { nauticalMile: 'no' } }),
         h
       )
 
@@ -88,6 +107,23 @@ describe('#nauticalMile', () => {
       )
       expect(h.redirect).toHaveBeenCalledWith(
         marineLicenceRoutes.MARINE_LICENCE_TASK_LIST
+      )
+    })
+
+    test('Should redirect to check-your-answers with anchor when answer is no and returnTo is set', async () => {
+      const request = createMockRequest({ payload: { nauticalMile: 'no' } })
+      request.yar.get.mockReturnValue(
+        marineLicenceRoutes.MARINE_LICENCE_CHECK_YOUR_ANSWERS
+      )
+
+      await nauticalMileSubmitController.handler(request, h)
+
+      expect(saveWaterFrameworkDirectiveToBackend).toHaveBeenCalledWith(
+        expect.any(Object),
+        true
+      )
+      expect(h.redirect).toHaveBeenCalledWith(
+        `${marineLicenceRoutes.MARINE_LICENCE_CHECK_YOUR_ANSWERS}#water-framework-directive-card`
       )
     })
 
@@ -113,7 +149,7 @@ describe('#nauticalMile', () => {
     ])(
       'Should correctly handle failAction with $name',
       ({ payload, err, expectedExtra }) => {
-        const request = { payload }
+        const request = createMockRequest({ payload })
         nauticalMileSubmitController.options.validate.failAction(
           request,
           h,
@@ -134,5 +170,19 @@ describe('#nauticalMile', () => {
         expect(h.view().takeover).toHaveBeenCalled()
       }
     )
+
+    test('Should use check-your-answers back link with anchor in failAction when returnTo is set', () => {
+      const request = createMockRequest({ payload: { nauticalMile: '' } })
+      request.yar.get.mockReturnValue(
+        marineLicenceRoutes.MARINE_LICENCE_CHECK_YOUR_ANSWERS
+      )
+      nauticalMileSubmitController.options.validate.failAction(request, h, {})
+      expect(h.view).toHaveBeenCalledWith(
+        NAUTICAL_MILE_VIEW_ROUTE,
+        expect.objectContaining({
+          backLink: `${marineLicenceRoutes.MARINE_LICENCE_CHECK_YOUR_ANSWERS}#water-framework-directive-card`
+        })
+      )
+    })
   })
 })

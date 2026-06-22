@@ -171,10 +171,20 @@ export const validatePublicRegister = (document, expected) => {
 }
 
 /**
- * Validates site details summary card with support for extended content
+ * Validates water framework directive summary card with support for extended content
  * @param {Document} document - JSDOM document
  * @param {object} expectedPageContent - Expected page content
  */
+export const validateWaterFrameworkDirective = (document, expected) => {
+  if (expected.waterFrameworkDirective) {
+    validateSummaryCardContent(
+      document,
+      '#water-framework-directive-card',
+      expected.waterFrameworkDirective
+    )
+  }
+}
+
 export const validateSiteDetails = (document, expectedPageContent) => {
   const siteDetailsData = expectedPageContent.siteDetails
   const multipleSiteDetails =

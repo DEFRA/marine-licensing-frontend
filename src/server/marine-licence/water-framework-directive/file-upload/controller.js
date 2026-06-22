@@ -9,7 +9,6 @@ import {
   s3PathForWaterFrameworkDirective,
   WFD_ACCEPT_ATTRIBUTE
 } from '#src/server/common/constants/water-framework-directive.js'
-import { getBackLink } from '#src/server/marine-licence/water-framework-directive/file-upload/utils.js'
 
 export const WATER_FRAMEWORK_DIRECTIVE_FILE_UPLOAD_VIEW_ROUTE =
   'marine-licence/water-framework-directive/file-upload/index'
@@ -68,7 +67,8 @@ export const waterFrameworkFileUploadController = {
         uploadUrl: uploadConfig.uploadUrl,
         maxFileSize: uploadConfig.maxFileSize,
         acceptAttribute: WFD_ACCEPT_ATTRIBUTE,
-        backLink: getBackLink(waterFrameworkDirective.previousAssessment),
+        backLink:
+          marineLicenceRoutes.MARINE_LICENCE_WATER_FRAMEWORK_DIRECTIVE_EXCLUDED_ACTIVITIES,
         cancelLink: marineLicenceRoutes.MARINE_LICENCE_TASK_LIST,
         errorSummary,
         errors

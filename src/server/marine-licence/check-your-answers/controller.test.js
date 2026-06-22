@@ -27,14 +27,6 @@ vi.mock('#src/server/common/helpers/marine-licence/site-data.js')
 vi.mock('#src/server/common/helpers/marine-licence/summary-data.js')
 
 const expectedWaterFrameworkDirectiveData = {
-  assessmentChanged: {
-    key: {
-      text: 'Changes since the previous Water Framework Directive assessment'
-    },
-    value: {
-      text: 'No'
-    }
-  },
   excludedActivities: {
     key: {
       text: 'Project limited to one of the excluded activities'
@@ -46,14 +38,6 @@ const expectedWaterFrameworkDirectiveData = {
   nauticalMile: {
     key: {
       text: 'Project located within one nautical mile (1.85km) of the coast'
-    },
-    value: {
-      text: 'Yes'
-    }
-  },
-  previousAssessment: {
-    key: {
-      text: 'Previous 2015 to 2022 Water Framework Directive assessment'
     },
     value: {
       text: 'Yes'

@@ -2,8 +2,6 @@ import {
   waterFrameworkReviewData,
   NAUTICAL_MILE_HEADING,
   EXCLUDED_ACTIVITIES_HEADING,
-  PREVIOUS_ASSESSMENT_HEADING,
-  ASSESSMENT_CHANGED_HEADING,
   FILE_UPLOAD_HEADING
 } from '~/src/server/common/helpers/marine-licence/water-framework-directive/water-framework-review-data.js'
 import { waterFrameworkDirective } from '~/src/server/test-helpers/mocks/marine-licence-mocks.js'
@@ -25,28 +23,6 @@ describe('waterFrameworkReviewData', () => {
 
     expect(result.excludedActivities).toEqual({
       key: { text: EXCLUDED_ACTIVITIES_HEADING },
-      value: { text: 'No' }
-    })
-  })
-
-  test('maps previousAssessment "yes" to correct heading and display value', () => {
-    const result = waterFrameworkReviewData({
-      previousAssessment: waterFrameworkDirective.previousAssessment
-    })
-
-    expect(result.previousAssessment).toEqual({
-      key: { text: PREVIOUS_ASSESSMENT_HEADING },
-      value: { text: 'Yes' }
-    })
-  })
-
-  test('maps assessmentChanged "no" to correct heading and display value', () => {
-    const result = waterFrameworkReviewData({
-      assessmentChanged: waterFrameworkDirective.assessmentChanged
-    })
-
-    expect(result.assessmentChanged).toEqual({
-      key: { text: ASSESSMENT_CHANGED_HEADING },
       value: { text: 'No' }
     })
   })
@@ -79,14 +55,6 @@ describe('waterFrameworkReviewData', () => {
     })
     expect(result.excludedActivities).toEqual({
       key: { text: EXCLUDED_ACTIVITIES_HEADING },
-      value: { text: 'No' }
-    })
-    expect(result.previousAssessment).toEqual({
-      key: { text: PREVIOUS_ASSESSMENT_HEADING },
-      value: { text: 'Yes' }
-    })
-    expect(result.assessmentChanged).toEqual({
-      key: { text: ASSESSMENT_CHANGED_HEADING },
       value: { text: 'No' }
     })
     expect(result.uploadedFile).toEqual({

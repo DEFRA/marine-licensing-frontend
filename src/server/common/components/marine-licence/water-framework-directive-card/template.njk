@@ -12,14 +12,6 @@
     {% set rows = (rows.push(params.waterFrameworkDirectiveData.excludedActivities), rows) %}
 {% endif %}
 
-{% if params.waterFrameworkDirectiveData.previousAssessment %}
-    {% set rows = (rows.push(params.waterFrameworkDirectiveData.previousAssessment), rows) %}
-{% endif %}
-
-{% if params.waterFrameworkDirectiveData.assessmentChanged %}
-    {% set rows = (rows.push(params.waterFrameworkDirectiveData.assessmentChanged), rows) %}
-{% endif %}
-
 {% if params.waterFrameworkDirectiveData.uploadedFile %}
     {% set rows = (rows.push(params.waterFrameworkDirectiveData.uploadedFile), rows) %}
 {% endif %}

@@ -169,7 +169,7 @@ describe('Water Framework Directive Excluded Activities', () => {
     })
 
     expect(response.headers.location).toBe(
-      marineLicenceRoutes.MARINE_LICENCE_WATER_FRAMEWORK_DIRECTIVE_PREVIOUS_ASSESSMENT
+      marineLicenceRoutes.MARINE_LICENCE_WATER_FRAMEWORK_DIRECTIVE_FILE_UPLOAD
     )
   })
 })

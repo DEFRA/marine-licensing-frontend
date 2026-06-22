@@ -9,14 +9,12 @@ import { loadPage, submitForm } from '~/tests/integration/shared/app-server.js'
 import { makeGetRequest } from '~/src/server/test-helpers/server-requests.js'
 import {
   validateWaterFrameworkDirectiveSummaryForAllFields,
-  validateWaterFrameworkDirectiveSummaryForMinimumFields,
-  validateWaterFrameworkDirectiveSummaryForPreviousAssessmentFields
+  validateWaterFrameworkDirectiveSummaryForMinimumFields
 } from '~/tests/integration/marine-licence/water-framework-directive/review-your-answers/review-your-answers.utils.js'
 import { mockMarineLicenceApplication as marineLicence } from '~/src/server/test-helpers/mocks/marine-licence-mocks.js'
 import {
   expectedPageContentAllFields,
-  expectedPageContentMinimumFields,
-  expectedPageContentPreviousAssessmentFields
+  expectedPageContentMinimumFields
 } from '~/tests/integration/marine-licence/water-framework-directive/review-your-answers/review-your-answers.fixtures.js'
 
 describe('Water Framework Directive Review Your Answers', () => {
@@ -73,35 +71,6 @@ describe('Water Framework Directive Review Your Answers', () => {
     validateWaterFrameworkDirectiveSummaryForMinimumFields(
       document,
       expectedPageContentMinimumFields
-    )
-  })
-
-  test('page elements with previousAssessment as no', async () => {
-    mockMarineLicence({
-      ...marineLicence,
-      waterFrameworkDirective: {
-        nauticalMile: 'yes',
-        excludedActivities: 'no',
-        previousAssessment: 'no',
-        s3Location: marineLicence.waterFrameworkDirective.s3Location,
-        uploadedFile: marineLicence.waterFrameworkDirective.uploadedFile
-      }
-    })
-
-    const document = await loadPage({
-      requestUrl:
-        marineLicenceRoutes.MARINE_LICENCE_WATER_FRAMEWORK_DIRECTIVE_REVIEW_YOUR_ANSWERS,
-      server: getServer()
-    })
-
-    expect(getByRole(document, 'link', { name: 'Back' })).toHaveAttribute(
-      'href',
-      marineLicenceRoutes.MARINE_LICENCE_WATER_FRAMEWORK_DIRECTIVE_FILE_UPLOAD
-    )
-
-    validateWaterFrameworkDirectiveSummaryForPreviousAssessmentFields(
-      document,
-      expectedPageContentPreviousAssessmentFields
     )
   })
 

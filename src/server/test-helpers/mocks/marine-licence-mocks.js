@@ -51,9 +51,7 @@ export const mockOutputEmptyActivityDetails = {
 
 export const waterFrameworkDirective = {
   nauticalMile: 'yes',
-  assessmentChanged: 'no',
   excludedActivities: 'no',
-  previousAssessment: 'yes',
   uploadedFile: {
     filename: 'test-upload-id'
   },

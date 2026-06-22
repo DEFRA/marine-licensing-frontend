@@ -16,14 +16,6 @@
 
 {% set activityRows = [wfdDisplayData.nauticalMile, wfdDisplayData.excludedActivities] %}
 
-{% if waterFrameworkDirective.previousAssessment %}
-    {% set activityRows = (activityRows.push(wfdDisplayData.previousAssessment), activityRows) %}
-{% endif %}
-
-{% if waterFrameworkDirective.assessmentChanged %}
-    {% set activityRows = (activityRows.push(wfdDisplayData.assessmentChanged), activityRows) %}
-{% endif %}
-
 {% if waterFrameworkDirective.uploadedFile %}
     {% set activityRows = (activityRows.push(wfdDisplayData.uploadedFile), activityRows) %}
 {% endif %}

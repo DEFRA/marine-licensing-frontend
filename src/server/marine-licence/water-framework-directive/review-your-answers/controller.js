@@ -33,7 +33,8 @@ export const waterFrameworkReviewYourAnswersController = {
       projectName: marineLicence.projectName,
       backLink: getBackLink(request, waterFrameworkDirective),
       waterFrameworkDirective,
-      wfdDisplayData
+      wfdDisplayData,
+      routes: marineLicenceRoutes
     })
   }
 }

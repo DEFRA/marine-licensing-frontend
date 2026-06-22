@@ -3,6 +3,7 @@ import {
   FILE_UPLOAD_HEADING,
   NAUTICAL_MILE_HEADING
 } from '#src/server/common/helpers/marine-licence/water-framework-directive/water-framework-review-data.js'
+import { validateActionLink } from '#tests/integration/review-site-details/review-site-details-utils.js'
 
 export const getRowByKey = (summary, keyText) => {
   const rows = summary.querySelectorAll('.govuk-summary-list__row')
@@ -30,6 +31,8 @@ export const validateWaterFrameworkDirectiveSummaryForAllFields = (
     expectedPageContent.nauticalMile
   )
 
+  validateActionLink(nauticalMileRow, expectedPageContent.nauticalMile)
+
   const excludedActivitiesRow = getRowByKey(
     waterFrameworkDirectiveSummary,
     EXCLUDED_ACTIVITIES_HEADING
@@ -38,11 +41,18 @@ export const validateWaterFrameworkDirectiveSummaryForAllFields = (
     expectedPageContent.excludedActivities
   )
 
+  validateActionLink(
+    excludedActivitiesRow,
+    expectedPageContent.excludedActivities
+  )
+
   const fileUploadRow = getRowByKey(
     waterFrameworkDirectiveSummary,
     FILE_UPLOAD_HEADING
   )
   expect(fileUploadRow.textContent).toContain(expectedPageContent.fileUpload)
+
+  validateActionLink(fileUploadRow, expectedPageContent.fileUpload)
 }
 
 export const validateWaterFrameworkDirectiveSummaryForMinimumFields = (
@@ -63,12 +73,19 @@ export const validateWaterFrameworkDirectiveSummaryForMinimumFields = (
     expectedPageContent.nauticalMile
   )
 
+  validateActionLink(nauticalMileRow, expectedPageContent.nauticalMile)
+
   const excludedActivitiesRow = getRowByKey(
     waterFrameworkDirectiveSummary,
     EXCLUDED_ACTIVITIES_HEADING
   )
 
   expect(excludedActivitiesRow.textContent).toContain(
+    expectedPageContent.excludedActivities
+  )
+
+  validateActionLink(
+    excludedActivitiesRow,
     expectedPageContent.excludedActivities
   )
 

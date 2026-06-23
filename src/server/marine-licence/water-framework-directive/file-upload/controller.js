@@ -4,14 +4,14 @@ import { config } from '#src/config/config.js'
 import { createFileUploadErrorDisplay } from '#src/server/common/helpers/file-upload/file-upload.js'
 import { fileUploadPageSettings } from '#src/server/common/helpers/file-upload/constants.js'
 import { getMarineLicenceCache } from '#src/server/common/helpers/marine-licence/session-cache/utils.js'
-import { updateWaterFrameworkDirective } from '#src/server/common/helpers/marine-licence/session-cache/water-framework-directive.js'
 import {
   s3PathForWaterFrameworkDirective,
   WFD_ACCEPT_ATTRIBUTE
 } from '#src/server/common/constants/water-framework-directive.js'
 import {
   setWaterFrameworkDirectiveReturnToCache,
-  getWaterFrameworkDirectiveReturnRoute
+  getWaterFrameworkDirectiveReturnRoute,
+  updateWaterFrameworkDirective
 } from '#src/server/common/helpers/marine-licence/session-cache/water-framework-directive.js'
 
 export const WATER_FRAMEWORK_DIRECTIVE_FILE_UPLOAD_VIEW_ROUTE =

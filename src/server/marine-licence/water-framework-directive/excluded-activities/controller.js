@@ -1,5 +1,4 @@
 import { getMarineLicenceCache } from '#src/server/common/helpers/marine-licence/session-cache/utils.js'
-import { updateWaterFrameworkDirective } from '#src/server/common/helpers/marine-licence/session-cache/water-framework-directive.js'
 import { createFailAction } from '#src/server/common/helpers/createFailAction.js'
 import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
 import { saveWaterFrameworkDirectiveToBackend } from '#src/server/common/helpers/marine-licence/water-framework-directive/save-water-framework-directive.js'
@@ -7,7 +6,8 @@ import joi from 'joi'
 import {
   setWaterFrameworkDirectiveReturnToCache,
   getWaterFrameworkDirectiveReturnRoute,
-  clearWaterFrameworkDirectiveReturnToCache
+  clearWaterFrameworkDirectiveReturnToCache,
+  updateWaterFrameworkDirective
 } from '#src/server/common/helpers/marine-licence/session-cache/water-framework-directive.js'
 import {
   getBackLink,
@@ -91,6 +91,10 @@ export const excludedActivitiesSubmitController = {
     const { payload } = request
     const { excludedActivities } = payload
 
+    const marineLicence = getMarineLicenceCache(request)
+    const previousExcludedActivities =
+      marineLicence.waterFrameworkDirective?.excludedActivities
+
     await updateWaterFrameworkDirective(
       request,
       h,
@@ -100,7 +104,11 @@ export const excludedActivitiesSubmitController = {
 
     const wfdReturnTo = getWaterFrameworkDirectiveReturnRoute(request)
 
-    const redirectPath = getSubmitRedirect(excludedActivities, wfdReturnTo)
+    const redirectPath = getSubmitRedirect(
+      excludedActivities,
+      wfdReturnTo,
+      previousExcludedActivities
+    )
 
     if (excludedActivities === 'yes') {
       await saveWaterFrameworkDirectiveToBackend(request)

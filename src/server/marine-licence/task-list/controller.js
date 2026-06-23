@@ -18,6 +18,7 @@ import { PROJECT_TYPE } from '#src/server/common/constants/projects.js'
 import { getUserSession } from '#src/server/common/plugins/auth/utils.js'
 import { USER_TYPES } from '#src/server/common/constants/user-types.js'
 import Boom from '@hapi/boom'
+import { clearReturnToCache } from '#src/server/common/helpers/marine-licence/session-cache/return-to-cache.js'
 import { clearWaterFrameworkDirectiveReturnToCache } from '#src/server/common/helpers/marine-licence/session-cache/water-framework-directive.js'
 
 export const TASK_LIST_VIEW_ROUTE = 'marine-licence/task-list/index'
@@ -74,6 +75,7 @@ async function updateLicenceSession(request, h, licenceData, hasCancel) {
 
 export const taskListController = {
   async handler(request, h) {
+    clearReturnToCache(request)
     clearWaterFrameworkDirectiveReturnToCache(request)
 
     const userSession = await getUserSession(

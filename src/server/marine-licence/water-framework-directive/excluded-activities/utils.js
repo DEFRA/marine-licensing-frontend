@@ -10,13 +10,19 @@ export const getBackLink = (returnTo) => {
 export const getCancelLink = (returnTo) =>
   returnTo ? undefined : marineLicenceRoutes.MARINE_LICENCE_TASK_LIST
 
-export const getSubmitRedirect = (excludedActivities, returnTo) => {
-  if (excludedActivities === 'no') {
-    return marineLicenceRoutes.MARINE_LICENCE_WATER_FRAMEWORK_DIRECTIVE_FILE_UPLOAD
+export const getSubmitRedirect = (
+  excludedActivities,
+  returnTo,
+  previousExcludedActivities
+) => {
+  const hasAnswerChanged = previousExcludedActivities !== excludedActivities
+
+  if (returnTo && !hasAnswerChanged) {
+    return returnTo
   }
 
-  if (returnTo) {
-    return returnTo
+  if (excludedActivities === 'no') {
+    return marineLicenceRoutes.MARINE_LICENCE_WATER_FRAMEWORK_DIRECTIVE_FILE_UPLOAD
   }
 
   return marineLicenceRoutes.MARINE_LICENCE_WATER_FRAMEWORK_DIRECTIVE_REVIEW_YOUR_ANSWERS

@@ -39,6 +39,16 @@ describe('getSubmitRedirect', () => {
     )
   })
 
+  test('returns file-upload when changing from yes to no in change flow', () => {
+    expect(getSubmitRedirect('no', RYA_ROUTE, 'yes')).toBe(
+      marineLicenceRoutes.MARINE_LICENCE_WATER_FRAMEWORK_DIRECTIVE_FILE_UPLOAD
+    )
+  })
+
+  test('returns returnTo when keeping no in change flow', () => {
+    expect(getSubmitRedirect('no', RYA_ROUTE, 'no')).toBe(RYA_ROUTE)
+  })
+
   test('returns returnTo when excludedActivities is yes and returnTo is set', () => {
     expect(getSubmitRedirect('yes', RYA_ROUTE)).toBe(RYA_ROUTE)
   })

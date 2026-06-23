@@ -7,6 +7,8 @@ import * as cdpUploadService from '#src/services/cdp-upload-service/index.js'
 import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
 import { saveWaterFrameworkDirectiveToBackend } from '#src/server/common/helpers/marine-licence/water-framework-directive/save-water-framework-directive.js'
 import { config } from '#src/config/config.js'
+import { WFD_FILE_TYPE_ERROR_MESSAGE } from '#src/server/common/helpers/file-upload/error-messages.js'
+import { WFD_ALLOWED_MIME_TYPES } from '#src/server/common/constants/water-framework-directive.js'
 
 vi.mock('~/src/server/common/helpers/marine-licence/session-cache/utils.js')
 vi.mock('~/src/services/cdp-upload-service/index.js')
@@ -226,6 +228,91 @@ describe('#uploadAndWait', () => {
         expect(h.redirect).toHaveBeenCalledWith(
           marineLicenceRoutes.MARINE_LICENCE_WATER_FRAMEWORK_DIRECTIVE_REVIEW_YOUR_ANSWERS
         )
+      })
+
+      test.each(WFD_ALLOWED_MIME_TYPES)(
+        'should proceed when detectedContentType is %s',
+        async (mimeType) => {
+          mockCdpService.getStatus.mockResolvedValue({
+            ...createMockStatusResponse('ready'),
+            s3Location: {
+              s3Bucket: 'test-bucket',
+              s3Key: 'test-key',
+              fileId: 'test-id',
+              s3Url: 'test-url',
+              checksumSha256: 'test-checksum',
+              detectedContentType: mimeType
+            }
+          })
+
+          await waterFrameworkDirectiveUploadAndWaitController.handler(
+            mockRequest,
+            h
+          )
+
+          expect(h.redirect).toHaveBeenCalledWith(
+            marineLicenceRoutes.MARINE_LICENCE_WATER_FRAMEWORK_DIRECTIVE_REVIEW_YOUR_ANSWERS
+          )
+        }
+      )
+
+      test('should store file type error and redirect when detectedContentType is not allowed', async () => {
+        mockCdpService.getStatus.mockResolvedValue({
+          ...createMockStatusResponse('ready'),
+          s3Location: {
+            s3Bucket: 'test-bucket',
+            s3Key: 'test-key',
+            fileId: 'test-id',
+            s3Url: 'test-url',
+            checksumSha256: 'test-checksum',
+            detectedContentType: 'image/png'
+          }
+        })
+
+        await waterFrameworkDirectiveUploadAndWaitController.handler(
+          mockRequest,
+          h
+        )
+
+        expect(updateWaterFrameworkDirectiveSpy).toHaveBeenCalledWith(
+          mockRequest,
+          h,
+          'uploadError',
+          {
+            message: WFD_FILE_TYPE_ERROR_MESSAGE,
+            fieldName: 'file'
+          }
+        )
+
+        expect(h.redirect).toHaveBeenCalledWith(wfdFileUploadRoute)
+      })
+
+      test('should store file type error and redirect to upload when backend returns 415', async () => {
+        mockCdpService.getStatus.mockResolvedValue(
+          createMockStatusResponse('ready')
+        )
+
+        const boom415Error = { output: { statusCode: 415 } }
+        vi.mocked(saveWaterFrameworkDirectiveToBackend).mockRejectedValueOnce(
+          boom415Error
+        )
+
+        await waterFrameworkDirectiveUploadAndWaitController.handler(
+          mockRequest,
+          h
+        )
+
+        expect(updateWaterFrameworkDirectiveSpy).toHaveBeenCalledWith(
+          mockRequest,
+          h,
+          'uploadError',
+          {
+            message: WFD_FILE_TYPE_ERROR_MESSAGE,
+            fieldName: 'file'
+          }
+        )
+
+        expect(h.redirect).toHaveBeenCalledWith(wfdFileUploadRoute)
       })
 
       test('should handle missing s3Location gracefully and still redirect', async () => {

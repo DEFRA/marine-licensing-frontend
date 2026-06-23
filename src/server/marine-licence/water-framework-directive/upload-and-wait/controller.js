@@ -3,13 +3,18 @@ import { getMarineLicenceCache } from '#src/server/common/helpers/marine-licence
 import { updateWaterFrameworkDirective } from '#src/server/common/helpers/marine-licence/session-cache/water-framework-directive.js'
 import { getCdpUploadService } from '#src/services/cdp-upload-service/index.js'
 import { getCdpErrorMessageFromCode } from '#src/server/common/helpers/file-upload/file-upload.js'
-import { DEFAULT_ERROR_MESSAGE } from '#src/server/common/helpers/file-upload/error-messages.js'
+import {
+  DEFAULT_ERROR_MESSAGE,
+  WFD_FILE_TYPE_ERROR_MESSAGE
+} from '#src/server/common/helpers/file-upload/error-messages.js'
+import { statusCodes } from '#src/server/common/constants/status-codes.js'
 import {
   UPLOAD_AND_WAIT_VIEW_ROUTE,
   uploadAndWaitPageSettings
 } from '#src/server/common/helpers/file-upload/constants.js'
 import { saveWaterFrameworkDirectiveToBackend } from '#src/server/common/helpers/marine-licence/water-framework-directive/save-water-framework-directive.js'
 import { config } from '#src/config/config.js'
+import { WFD_ALLOWED_MIME_TYPES } from '#src/server/common/constants/water-framework-directive.js'
 
 const fileUploadRoute =
   marineLicenceRoutes.MARINE_LICENCE_WATER_FRAMEWORK_DIRECTIVE_FILE_UPLOAD
@@ -33,8 +38,21 @@ const handleProcessingStatus = (status, marineLicence, h) => {
   })
 }
 
+const isAllowedFileType = (s3Location) => {
+  const detected = s3Location?.detectedContentType
+  return !detected || WFD_ALLOWED_MIME_TYPES.includes(detected)
+}
+
 const handleReadyStatus = async (status, context) => {
   const { request, h } = context
+
+  if (!isAllowedFileType(status.s3Location)) {
+    await storeUploadError(request, h, {
+      message: WFD_FILE_TYPE_ERROR_MESSAGE,
+      fieldName: 'file'
+    })
+    return h.redirect(fileUploadRoute)
+  }
 
   await updateWaterFrameworkDirective(request, h, 'uploadedFile', {
     filename: status.filename
@@ -52,7 +70,18 @@ const handleReadyStatus = async (status, context) => {
 
   await updateWaterFrameworkDirective(request, h, 'uploadConfig', null)
 
-  await saveWaterFrameworkDirectiveToBackend(request)
+  try {
+    await saveWaterFrameworkDirectiveToBackend(request)
+  } catch (error) {
+    if (error.output?.statusCode === statusCodes.unsupportedMediaType) {
+      await storeUploadError(request, h, {
+        message: WFD_FILE_TYPE_ERROR_MESSAGE,
+        fieldName: 'file'
+      })
+      return h.redirect(fileUploadRoute)
+    }
+    throw error
+  }
 
   return h.redirect(
     marineLicenceRoutes.MARINE_LICENCE_WATER_FRAMEWORK_DIRECTIVE_REVIEW_YOUR_ANSWERS

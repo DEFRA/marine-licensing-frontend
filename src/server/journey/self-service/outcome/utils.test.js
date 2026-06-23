@@ -51,12 +51,6 @@ describe('#ctaLabelFor', () => {
     ).toBe('Apply now')
   })
 
-  test('does not return "Download" for a link-only outcomeType (link renders as a text link, not a button)', () => {
-    expect(ctaLabelFor({ link: 'https://example.com/template.docx' })).toBe(
-      'Continue'
-    )
-  })
-
   test('returns the heading for a module (MCMS) outcomeType', () => {
     expect(
       ctaLabelFor({

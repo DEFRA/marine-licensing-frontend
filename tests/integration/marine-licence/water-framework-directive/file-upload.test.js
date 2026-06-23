@@ -7,7 +7,7 @@ import {
 import { loadPage } from '~/tests/integration/shared/app-server.js'
 import * as cdpUploadService from '~/src/services/cdp-upload-service/index.js'
 import { mockMarineLicenceApplication } from '#src/server/test-helpers/mocks/marine-licence-mocks.js'
-import { getByLabelText, getByRole } from '@testing-library/dom'
+import { getByLabelText, getByRole, getByText } from '@testing-library/dom'
 
 vi.mock('~/src/services/cdp-upload-service/index.js')
 
@@ -42,6 +42,10 @@ describe('File upload page (Water Framework Directive)', () => {
     expect(h1).toHaveTextContent(
       'Upload your Water Framework Directive assessment'
     )
+
+    expect(
+      getByText(document, 'You can only upload a file that is a .docx or .odt.')
+    ).toBeInTheDocument()
 
     const uploadInput = getByLabelText(
       document,

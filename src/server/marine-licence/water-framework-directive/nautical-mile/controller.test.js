@@ -116,8 +116,7 @@ describe('#nauticalMile', () => {
       )
 
       expect(saveWaterFrameworkDirectiveToBackend).toHaveBeenCalledWith(
-        expect.any(Object),
-        true
+        expect.any(Object)
       )
       expect(h.redirect).toHaveBeenCalledWith(
         marineLicenceRoutes.MARINE_LICENCE_TASK_LIST
@@ -133,8 +132,7 @@ describe('#nauticalMile', () => {
       await nauticalMileSubmitController.handler(request, h)
 
       expect(saveWaterFrameworkDirectiveToBackend).toHaveBeenCalledWith(
-        expect.any(Object),
-        true
+        expect.any(Object)
       )
       expect(h.redirect).toHaveBeenCalledWith(
         `${marineLicenceRoutes.MARINE_LICENCE_CHECK_YOUR_ANSWERS}#water-framework-directive-card`

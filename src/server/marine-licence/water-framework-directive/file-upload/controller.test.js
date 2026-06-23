@@ -142,7 +142,7 @@ describe('#fileUpload', () => {
         })
       })
 
-      test('should use excluded-activities back link when wfdReturnTo is set but no action param', async () => {
+      test('should use excluded-activities back link and task-list cancel when wfdReturnTo is set but no action param', async () => {
         vi.spyOn(
           wfdCacheUtils,
           'getWaterFrameworkDirectiveReturnRoute'
@@ -155,7 +155,7 @@ describe('#fileUpload', () => {
         expectViewCalledWith(mockH, {
           backLink:
             marineLicenceRoutes.MARINE_LICENCE_WATER_FRAMEWORK_DIRECTIVE_EXCLUDED_ACTIVITIES,
-          cancelLink: undefined
+          cancelLink: marineLicenceRoutes.MARINE_LICENCE_TASK_LIST
         })
       })
 

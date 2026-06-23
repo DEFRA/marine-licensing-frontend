@@ -85,7 +85,7 @@ export const nauticalMileSubmitController = {
     )
 
     if (nauticalMile === 'no') {
-      await saveWaterFrameworkDirectiveToBackend(request, true)
+      await saveWaterFrameworkDirectiveToBackend(request)
       const returnTo = request.yar.get(RETURN_TO_CACHE_KEY)
       if (returnTo) {
         return h.redirect(`${returnTo}#water-framework-directive-card`)

@@ -98,13 +98,12 @@ describe('updateWaterFrameworkDirective', () => {
 })
 
 describe('setWaterFrameworkDirectiveReturnToCache', () => {
-  test('sets the WFD_RETURN_TO_KEY cache key', () => {
+  test('sets the WFD_RETURN_TO_KEY cache key', async () => {
     const mockRequest = createMockRequest()
     const mockH = createMockH()
 
-    setWaterFrameworkDirectiveReturnToCache(mockRequest, mockH, '/test')
+    await setWaterFrameworkDirectiveReturnToCache(mockRequest, mockH, '/test')
 
-    expect(mockRequest.yar.clear).toHaveBeenCalledWith(WFD_RETURN_TO_KEY)
     expect(mockRequest.yar.set).toHaveBeenCalledWith(WFD_RETURN_TO_KEY, '/test')
     expect(mockRequest.yar.commit).toHaveBeenCalledWith(mockH)
   })

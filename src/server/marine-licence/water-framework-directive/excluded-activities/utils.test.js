@@ -25,7 +25,7 @@ describe('getCancelLink', () => {
     expect(getCancelLink(RYA_ROUTE)).toBeUndefined()
   })
 
-  test('returns task list is other all other scenarios', () => {
+  test('returns task list in other all other scenarios', () => {
     expect(getCancelLink(undefined)).toBe(
       marineLicenceRoutes.MARINE_LICENCE_TASK_LIST
     )
@@ -49,8 +49,12 @@ describe('getSubmitRedirect', () => {
     expect(getSubmitRedirect('no', RYA_ROUTE, 'no')).toBe(RYA_ROUTE)
   })
 
-  test('returns returnTo when excludedActivities is yes and returnTo is set', () => {
-    expect(getSubmitRedirect('yes', RYA_ROUTE)).toBe(RYA_ROUTE)
+  test('returns returnTo when keeping yes in change flow', () => {
+    expect(getSubmitRedirect('yes', RYA_ROUTE, 'yes')).toBe(RYA_ROUTE)
+  })
+
+  test('returns review-your-answers when changing from no to yes in change flow', () => {
+    expect(getSubmitRedirect('yes', RYA_ROUTE, 'no')).toBe(RYA_ROUTE)
   })
 
   test('returns review-your-answers when excludedActivities is yes', () => {

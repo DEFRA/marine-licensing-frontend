@@ -84,7 +84,7 @@ export const waterFrameworkFileUploadController = {
         backLink: request.query.action
           ? wfdReturnTo
           : marineLicenceRoutes.MARINE_LICENCE_WATER_FRAMEWORK_DIRECTIVE_EXCLUDED_ACTIVITIES,
-        cancelLink: wfdReturnTo
+        cancelLink: request.query.action
           ? undefined
           : marineLicenceRoutes.MARINE_LICENCE_TASK_LIST,
         errorSummary,

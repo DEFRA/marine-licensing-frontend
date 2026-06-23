@@ -34,7 +34,6 @@ export const setWaterFrameworkDirectiveReturnToCache = async (
   h,
   returnPath
 ) => {
-  request.yar.clear(WFD_RETURN_TO_KEY)
   request.yar.set(WFD_RETURN_TO_KEY, returnPath)
   await request.yar.commit(h)
 }

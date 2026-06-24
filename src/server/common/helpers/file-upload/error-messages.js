@@ -40,6 +40,9 @@ export const FILE_TYPE_ERROR_MESSAGES = {
   shapefile: 'The selected file must be a Shapefile'
 }
 
+export const WFD_FILE_TYPE_ERROR_MESSAGE =
+  'The selected file must be a .docx or .odt file'
+
 export const DEFAULT_ERROR_MESSAGE =
   'The selected file could not be uploaded – try again'
 

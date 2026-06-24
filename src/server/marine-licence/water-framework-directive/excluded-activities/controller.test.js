@@ -7,7 +7,10 @@ import {
 } from '#src/server/marine-licence/water-framework-directive/excluded-activities/controller.js'
 import * as cacheUtils from '#src/server/common/helpers/marine-licence/session-cache/utils.js'
 import * as wfdCache from '#src/server/common/helpers/marine-licence/session-cache/water-framework-directive.js'
-import { createMockH } from '#src/server/test-helpers/mocks/helpers.js'
+import {
+  createMockH,
+  createMockRequest
+} from '#src/server/test-helpers/mocks/helpers.js'
 import { saveWaterFrameworkDirectiveToBackend } from '#src/server/common/helpers/marine-licence/water-framework-directive/save-water-framework-directive.js'
 
 vi.mock('~/src/server/common/helpers/marine-licence/session-cache/utils.js')
@@ -27,6 +30,9 @@ describe('#excludedActivities', () => {
     vi.spyOn(wfdCache, 'updateWaterFrameworkDirective').mockResolvedValue({
       excludedActivities: 'yes'
     })
+    vi.spyOn(wfdCache, 'getWaterFrameworkDirectiveReturnRoute').mockReturnValue(
+      undefined
+    )
     vi.spyOn(cacheUtils, 'getMarineLicenceCache').mockReturnValue(mockLicence)
   })
 
@@ -42,7 +48,7 @@ describe('#excludedActivities', () => {
         mockWithoutWfd
       )
 
-      await excludedActivitiesController.handler({ query: {} }, h)
+      await excludedActivitiesController.handler(createMockRequest(), h)
 
       expect(h.view).toHaveBeenCalledWith(EXCLUDED_ACTIVITIES_VIEW_ROUTE, {
         backLink:
@@ -61,7 +67,7 @@ describe('#excludedActivities', () => {
   describe('#excludedActivitiesSubmitController', () => {
     test('Should update cache and redirect to review details page on yes', async () => {
       await excludedActivitiesSubmitController.handler(
-        { payload: { excludedActivities: 'yes' }, query: {} },
+        createMockRequest({ payload: { excludedActivities: 'yes' } }),
         h
       )
 
@@ -80,9 +86,9 @@ describe('#excludedActivities', () => {
       )
     })
 
-    test('Should update cache and redirect to excluded activities page on no', async () => {
+    test('Should update cache and redirect to file upload page on no', async () => {
       await excludedActivitiesSubmitController.handler(
-        { payload: { excludedActivities: 'no' }, query: {} },
+        createMockRequest({ payload: { excludedActivities: 'no' } }),
         h
       )
 
@@ -97,48 +103,62 @@ describe('#excludedActivities', () => {
       )
     })
 
+    test('Should redirect to review-your-answers when action=change and answer is yes', async () => {
+      vi.spyOn(
+        wfdCache,
+        'getWaterFrameworkDirectiveReturnRoute'
+      ).mockReturnValue(
+        marineLicenceRoutes.MARINE_LICENCE_WATER_FRAMEWORK_DIRECTIVE_REVIEW_YOUR_ANSWERS
+      )
+
+      await excludedActivitiesSubmitController.handler(
+        createMockRequest({
+          payload: { excludedActivities: 'yes' },
+          query: { action: 'change' }
+        }),
+        h
+      )
+
+      expect(h.redirect).toHaveBeenCalledWith(
+        marineLicenceRoutes.MARINE_LICENCE_WATER_FRAMEWORK_DIRECTIVE_REVIEW_YOUR_ANSWERS
+      )
+    })
+
     test.each([
       {
         name: 'null error details',
         payload: { excludedActivities: '' },
-        err: { details: null },
-        expectedExtra: {}
+        err: { details: null }
       },
       {
         name: 'missing error details',
         payload: { excludedActivities: '' },
-        err: {},
-        expectedExtra: {}
+        err: {}
       },
       {
         name: 'invalid excluded activities value',
         payload: { excludedActivities: 'invalid' },
-        err: {},
-        expectedExtra: {}
+        err: {}
       }
-    ])(
-      'Should correctly handle failAction with $name',
-      ({ payload, err, expectedExtra }) => {
-        const request = { payload }
-        excludedActivitiesSubmitController.options.validate.failAction(
-          request,
-          h,
-          err
-        )
-        expect(h.view).toHaveBeenCalledWith(EXCLUDED_ACTIVITIES_VIEW_ROUTE, {
-          backLink:
-            marineLicenceRoutes.MARINE_LICENCE_WATER_FRAMEWORK_DIRECTIVE_NAUTICAL_MILE,
-          cancelLink: marineLicenceRoutes.MARINE_LICENCE_TASK_LIST,
-          pageTitle:
-            'Is your project limited to one of the following excluded activities?',
-          heading:
-            'Is your project limited to one of the following excluded activities?',
-          projectName: mockLicence.projectName,
-          payload,
-          ...expectedExtra
-        })
-        expect(h.view().takeover).toHaveBeenCalled()
-      }
-    )
+    ])('Should correctly handle failAction with $name', ({ payload, err }) => {
+      const request = createMockRequest({ payload })
+      excludedActivitiesSubmitController.options.validate.failAction(
+        request,
+        h,
+        err
+      )
+      expect(h.view).toHaveBeenCalledWith(EXCLUDED_ACTIVITIES_VIEW_ROUTE, {
+        backLink:
+          marineLicenceRoutes.MARINE_LICENCE_WATER_FRAMEWORK_DIRECTIVE_NAUTICAL_MILE,
+        cancelLink: marineLicenceRoutes.MARINE_LICENCE_TASK_LIST,
+        pageTitle:
+          'Is your project limited to one of the following excluded activities?',
+        heading:
+          'Is your project limited to one of the following excluded activities?',
+        projectName: mockLicence.projectName,
+        payload
+      })
+      expect(h.view().takeover).toHaveBeenCalled()
+    })
   })
 })

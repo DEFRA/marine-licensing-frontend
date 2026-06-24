@@ -20,9 +20,11 @@
     <span class="govuk-caption-l">{{ projectName }}</span>
   {% endif %}
 
-  <h1 class="govuk-heading-l">
+  <h1 class="govuk-heading-l govuk-!-margin-bottom-2">
     {{heading}}
   </h1>
+
+  <p class="govuk-hint">You can only upload a file that is a .docx or .odt.</p>
 {% endset %}
 
 {% block content %}

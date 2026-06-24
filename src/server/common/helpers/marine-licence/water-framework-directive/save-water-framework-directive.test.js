@@ -21,15 +21,29 @@ describe('saveWaterFrameworkDirectiveToBackend', () => {
     )
   })
 
-  test('should save only nauticalMile when nauticalMileOnly is true', async () => {
-    await saveWaterFrameworkDirectiveToBackend(mockRequest, true)
+  test('should save only nauticalMile when nauticalMile is "no" ', async () => {
+    const mockMarineLicenceApplicationWithoutNauticalMile = {
+      ...mockMarineLicenceApplication,
+      waterFrameworkDirective: {
+        ...mockMarineLicenceApplication.waterFrameworkDirective
+      }
+    }
+
+    mockMarineLicenceApplicationWithoutNauticalMile.waterFrameworkDirective.nauticalMile =
+      'no'
+
+    getMarineLicenceCache.mockReturnValueOnce(
+      mockMarineLicenceApplicationWithoutNauticalMile
+    )
+
+    await saveWaterFrameworkDirectiveToBackend(mockRequest)
 
     expect(authenticatedPatchRequest).toHaveBeenCalledWith(
       mockRequest,
       apiRoutes.UPDATE_WATER_FRAMEWORK_DIRECTIVE,
       {
         waterFrameworkDirective: {
-          nauticalMile: waterFrameworkDirective.nauticalMile
+          nauticalMile: 'no'
         },
         id: mockMarineLicenceApplication.id
       }
@@ -37,11 +51,7 @@ describe('saveWaterFrameworkDirectiveToBackend', () => {
   })
 
   test('should save full water framework directive', async () => {
-    vi.mocked(getMarineLicenceCache).mockReturnValue(
-      mockMarineLicenceApplication
-    )
-
-    await saveWaterFrameworkDirectiveToBackend(mockRequest, false)
+    await saveWaterFrameworkDirectiveToBackend(mockRequest)
 
     expect(authenticatedPatchRequest).toHaveBeenCalledWith(
       mockRequest,
@@ -52,6 +62,36 @@ describe('saveWaterFrameworkDirectiveToBackend', () => {
           excludedActivities: waterFrameworkDirective.excludedActivities,
           s3Location: waterFrameworkDirective.s3Location,
           uploadedFile: waterFrameworkDirective.uploadedFile
+        },
+        id: mockMarineLicenceApplication.id
+      }
+    )
+  })
+
+  test('should save water framework directive when excluded activities is yes', async () => {
+    const mockMarineLicenceApplicationWithExcludedActivities = {
+      ...mockMarineLicenceApplication,
+      waterFrameworkDirective: {
+        ...mockMarineLicenceApplication.waterFrameworkDirective
+      }
+    }
+
+    mockMarineLicenceApplicationWithExcludedActivities.waterFrameworkDirective.excludedActivities =
+      'yes'
+
+    getMarineLicenceCache.mockReturnValueOnce(
+      mockMarineLicenceApplicationWithExcludedActivities
+    )
+
+    await saveWaterFrameworkDirectiveToBackend(mockRequest)
+
+    expect(authenticatedPatchRequest).toHaveBeenCalledWith(
+      mockRequest,
+      apiRoutes.UPDATE_WATER_FRAMEWORK_DIRECTIVE,
+      {
+        waterFrameworkDirective: {
+          nauticalMile: waterFrameworkDirective.nauticalMile,
+          excludedActivities: 'yes'
         },
         id: mockMarineLicenceApplication.id
       }

@@ -4,11 +4,15 @@ import { config } from '#src/config/config.js'
 import { createFileUploadErrorDisplay } from '#src/server/common/helpers/file-upload/file-upload.js'
 import { fileUploadPageSettings } from '#src/server/common/helpers/file-upload/constants.js'
 import { getMarineLicenceCache } from '#src/server/common/helpers/marine-licence/session-cache/utils.js'
-import { updateWaterFrameworkDirective } from '#src/server/common/helpers/marine-licence/session-cache/water-framework-directive.js'
 import {
   s3PathForWaterFrameworkDirective,
   WFD_ACCEPT_ATTRIBUTE
 } from '#src/server/common/constants/water-framework-directive.js'
+import {
+  setWaterFrameworkDirectiveReturnToCache,
+  getWaterFrameworkDirectiveReturnRoute,
+  updateWaterFrameworkDirective
+} from '#src/server/common/helpers/marine-licence/session-cache/water-framework-directive.js'
 
 export const WATER_FRAMEWORK_DIRECTIVE_FILE_UPLOAD_VIEW_ROUTE =
   'marine-licence/water-framework-directive/file-upload/index'
@@ -26,6 +30,16 @@ export const waterFrameworkFileUploadController = {
     const marineLicence = getMarineLicenceCache(request)
     const { waterFrameworkDirective = {} } = marineLicence
     const { uploadedFile, uploadError } = waterFrameworkDirective
+
+    if (request.query.action) {
+      await setWaterFrameworkDirectiveReturnToCache(
+        request,
+        h,
+        marineLicenceRoutes.MARINE_LICENCE_WATER_FRAMEWORK_DIRECTIVE_REVIEW_YOUR_ANSWERS
+      )
+    }
+
+    const wfdReturnTo = getWaterFrameworkDirectiveReturnRoute(request)
 
     let errorSummary, errors
     if (uploadError) {
@@ -67,9 +81,12 @@ export const waterFrameworkFileUploadController = {
         uploadUrl: uploadConfig.uploadUrl,
         maxFileSize: uploadConfig.maxFileSize,
         acceptAttribute: WFD_ACCEPT_ATTRIBUTE,
-        backLink:
-          marineLicenceRoutes.MARINE_LICENCE_WATER_FRAMEWORK_DIRECTIVE_EXCLUDED_ACTIVITIES,
-        cancelLink: marineLicenceRoutes.MARINE_LICENCE_TASK_LIST,
+        backLink: request.query.action
+          ? wfdReturnTo
+          : marineLicenceRoutes.MARINE_LICENCE_WATER_FRAMEWORK_DIRECTIVE_EXCLUDED_ACTIVITIES,
+        cancelLink: request.query.action
+          ? undefined
+          : marineLicenceRoutes.MARINE_LICENCE_TASK_LIST,
         errorSummary,
         errors
       })

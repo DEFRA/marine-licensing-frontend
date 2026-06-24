@@ -11,8 +11,13 @@ import {
 import {
   setWaterFrameworkDirectiveReturnToCache,
   getWaterFrameworkDirectiveReturnRoute,
-  updateWaterFrameworkDirective
+  updateWaterFrameworkDirective,
+  setWaterFrameworkDirectivePageEntryPoint
 } from '#src/server/common/helpers/marine-licence/session-cache/water-framework-directive.js'
+import {
+  getBackLink,
+  getCancelLink
+} from '#src/server/marine-licence/water-framework-directive/file-upload/utils.js'
 
 export const WATER_FRAMEWORK_DIRECTIVE_FILE_UPLOAD_VIEW_ROUTE =
   'marine-licence/water-framework-directive/file-upload/index'
@@ -39,7 +44,18 @@ export const waterFrameworkFileUploadController = {
       )
     }
 
-    const wfdReturnTo = getWaterFrameworkDirectiveReturnRoute(request)
+    const waterFrameworkDirectiveReturnTo =
+      getWaterFrameworkDirectiveReturnRoute(request)
+
+    const fileUploadEntryPoint = request.query.action
+      ? 'review-your-answers'
+      : 'excluded-activities'
+    await setWaterFrameworkDirectivePageEntryPoint(
+      request,
+      h,
+      'fileUploadEntryPoint',
+      fileUploadEntryPoint
+    )
 
     let errorSummary, errors
     if (uploadError) {
@@ -81,12 +97,8 @@ export const waterFrameworkFileUploadController = {
         uploadUrl: uploadConfig.uploadUrl,
         maxFileSize: uploadConfig.maxFileSize,
         acceptAttribute: WFD_ACCEPT_ATTRIBUTE,
-        backLink: request.query.action
-          ? wfdReturnTo
-          : marineLicenceRoutes.MARINE_LICENCE_WATER_FRAMEWORK_DIRECTIVE_EXCLUDED_ACTIVITIES,
-        cancelLink: request.query.action
-          ? undefined
-          : marineLicenceRoutes.MARINE_LICENCE_TASK_LIST,
+        backLink: getBackLink(fileUploadEntryPoint),
+        cancelLink: getCancelLink(waterFrameworkDirectiveReturnTo),
         errorSummary,
         errors
       })

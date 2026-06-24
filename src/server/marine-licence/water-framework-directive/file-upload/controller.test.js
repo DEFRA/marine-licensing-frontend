@@ -92,6 +92,11 @@ describe('#fileUpload', () => {
       'setWaterFrameworkDirectiveReturnToCache'
     ).mockResolvedValue()
 
+    vi.spyOn(
+      wfdCacheUtils,
+      'setWaterFrameworkDirectivePageEntryPoint'
+    ).mockResolvedValue()
+
     mockCdpService = { initiate: vi.fn() }
     vi.spyOn(cdpUploadService, 'getCdpUploadService').mockReturnValue(
       mockCdpService
@@ -124,25 +129,7 @@ describe('#fileUpload', () => {
         })
       })
 
-      test('should use review-your-answers back link and no cancel when action=change', async () => {
-        const RYA_ROUTE =
-          marineLicenceRoutes.MARINE_LICENCE_WATER_FRAMEWORK_DIRECTIVE_REVIEW_YOUR_ANSWERS
-
-        vi.spyOn(
-          wfdCacheUtils,
-          'getWaterFrameworkDirectiveReturnRoute'
-        ).mockReturnValue(RYA_ROUTE)
-
-        mockRequest = createMockRequest({ query: { action: 'change' } })
-        await setupStandardFileUploadTest(mockRequest, mockH)
-
-        expectViewCalledWith(mockH, {
-          backLink: RYA_ROUTE,
-          cancelLink: undefined
-        })
-      })
-
-      test('should use excluded-activities back link and task-list cancel when wfdReturnTo is set but no action param', async () => {
+      test('should set backLink to "review-your-answers" and no cancel when using a change link', async () => {
         vi.spyOn(
           wfdCacheUtils,
           'getWaterFrameworkDirectiveReturnRoute'
@@ -150,6 +137,17 @@ describe('#fileUpload', () => {
           marineLicenceRoutes.MARINE_LICENCE_WATER_FRAMEWORK_DIRECTIVE_REVIEW_YOUR_ANSWERS
         )
 
+        mockRequest = createMockRequest({ query: { action: 'change' } })
+        await setupStandardFileUploadTest(mockRequest, mockH)
+
+        expectViewCalledWith(mockH, {
+          backLink:
+            marineLicenceRoutes.MARINE_LICENCE_WATER_FRAMEWORK_DIRECTIVE_REVIEW_YOUR_ANSWERS,
+          cancelLink: undefined
+        })
+      })
+
+      test('should set backLink to "excluded-activities" when not coming from a change link', async () => {
         await setupStandardFileUploadTest(mockRequest, mockH)
 
         expectViewCalledWith(mockH, {

@@ -88,7 +88,7 @@
     "@vitest/coverage-v8": "^4.1.4",
     "@vitest/runner": "^4.1.4",
     "@vitest/ui": "^4.1.4",
-    "allure-commandline": "^2.42.0",
+    "allure-commandline": "^2.42.1",
     "allure-vitest": "^3.6.0",
     "autoprefixer": "^10.5.0",
     "babel-loader": "^10.1.1",

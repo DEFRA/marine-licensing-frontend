@@ -149,8 +149,7 @@ describe('config validation', () => {
       process.env.CDP_UPLOAD_BUCKET = 'perf-bucket'
       process.env.APP_BASE_URL =
         'https://marine-licensing-frontend.perf-test.cdp-int.defra.cloud'
-      process.env.MCMS_URL = 'https://marinelicensing.marinemanagement.org.uk/'
-      process.env.MCMS_PATH = 'apply/new'
+
       const { config } = await import('./config.js')
 
       expect(config.get('defraId.clientSecret')).toBe('test_value')
@@ -188,9 +187,6 @@ describe('config validation', () => {
       process.env.CDP_UPLOADER_BASE_URL = 'https://uploader.example.com'
       process.env.CDP_UPLOAD_BUCKET = 'prod-bucket'
       process.env.APP_BASE_URL = 'https://app.example.com'
-      process.env.MCMS_URL = 'https://marinelicensing.marinemanagement.org.uk/'
-      process.env.MCMS_PATH = 'apply/new'
-
       const { config } = await import('./config.js')
 
       expect(config.get('appBaseUrl')).toBe('https://app.example.com')
@@ -222,7 +218,6 @@ describe('config validation', () => {
         expect(errorMessage).toContain('ENTRA_ID_CLIENT_SECRET')
         expect(errorMessage).toContain('CDP_UPLOADER_BASE_URL')
         expect(errorMessage).toContain('APP_BASE_URL')
-        expect(errorMessage).toContain('MCMS_URL')
       }
     })
   })
@@ -252,9 +247,6 @@ describe('config validation', () => {
       process.env.CDP_UPLOADER_BASE_URL = 'https://uploader.example.com'
       process.env.CDP_UPLOAD_BUCKET = 'prod-bucket'
       process.env.APP_BASE_URL = 'https://app.example.com'
-      process.env.MCMS_URL = 'https://marinelicensing.marinemanagement.org.uk/'
-      process.env.MCMS_PATH = 'apply/new'
-
       await import('./config.js')
 
       expect(warnSpy).toHaveBeenCalledWith(
@@ -292,9 +284,6 @@ describe('config validation', () => {
       process.env.CDP_UPLOADER_BASE_URL = 'https://uploader.example.com'
       process.env.CDP_UPLOAD_BUCKET = 'prod-bucket'
       process.env.APP_BASE_URL = 'https://app.example.com'
-      process.env.MCMS_URL = 'https://marinelicensing.marinemanagement.org.uk/'
-      process.env.MCMS_PATH = 'apply/new'
-
       await import('./config.js')
 
       expect(warnSpy).not.toHaveBeenCalled()

@@ -23,6 +23,7 @@ import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
 import { PROJECT_TYPE } from '#src/server/common/constants/projects.js'
 import * as authUtils from '#src/server/common/plugins/auth/utils.js'
 import Boom from '@hapi/boom'
+import { createMockRequest } from '#src/server/test-helpers/mocks/helpers.js'
 
 vi.mock('#src/server/common/helpers/marine-licence/session-cache/utils.js')
 vi.mock(
@@ -64,7 +65,7 @@ describe('#taskListController', () => {
       view: vi.fn(),
       redirect: vi.fn()
     }
-    mockRequest = {}
+    mockRequest = createMockRequest()
   })
 
   test('taskListController handler should render with correct context', async () => {

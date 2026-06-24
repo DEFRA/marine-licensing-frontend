@@ -116,6 +116,41 @@ describe('Water Framework Directive Nautical mile', () => {
     ).toBeChecked()
   })
 
+  test('should show review-your-answers back link when accessed via change link', async () => {
+    mockMarineLicence({
+      ...marineLicence,
+      waterFrameworkDirective: { nauticalMile: 'yes' }
+    })
+
+    const document = await loadPage({
+      requestUrl: `${marineLicenceRoutes.MARINE_LICENCE_WATER_FRAMEWORK_DIRECTIVE_NAUTICAL_MILE}?action=change`,
+      server: getServer()
+    })
+
+    expect(getByRole(document, 'link', { name: 'Back' })).toHaveAttribute(
+      'href',
+      marineLicenceRoutes.MARINE_LICENCE_WATER_FRAMEWORK_DIRECTIVE_REVIEW_YOUR_ANSWERS
+    )
+  })
+
+  test('should show task-list back link when accessed with existing answer', async () => {
+    mockMarineLicence({
+      ...marineLicence,
+      waterFrameworkDirective: { nauticalMile: 'yes' }
+    })
+
+    const document = await loadPage({
+      requestUrl:
+        marineLicenceRoutes.MARINE_LICENCE_WATER_FRAMEWORK_DIRECTIVE_NAUTICAL_MILE,
+      server: getServer()
+    })
+
+    expect(getByRole(document, 'link', { name: 'Back' })).toHaveAttribute(
+      'href',
+      marineLicenceRoutes.MARINE_LICENCE_TASK_LIST
+    )
+  })
+
   test('should show a validation error when submitted without a decision', async () => {
     mockMarineLicence(marineLicence)
 

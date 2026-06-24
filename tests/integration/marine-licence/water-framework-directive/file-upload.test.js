@@ -7,7 +7,12 @@ import {
 import { loadPage } from '~/tests/integration/shared/app-server.js'
 import * as cdpUploadService from '~/src/services/cdp-upload-service/index.js'
 import { mockMarineLicenceApplication } from '#src/server/test-helpers/mocks/marine-licence-mocks.js'
-import { getByLabelText, getByRole, getByText } from '@testing-library/dom'
+import {
+  getByLabelText,
+  getByRole,
+  getByText,
+  queryByRole
+} from '@testing-library/dom'
 
 vi.mock('~/src/services/cdp-upload-service/index.js')
 
@@ -60,5 +65,25 @@ describe('File upload page (Water Framework Directive)', () => {
       'href',
       marineLicenceRoutes.MARINE_LICENCE_TASK_LIST
     )
+
+    expect(getByRole(document, 'link', { name: 'Back' })).toHaveAttribute(
+      'href',
+      marineLicenceRoutes.MARINE_LICENCE_WATER_FRAMEWORK_DIRECTIVE_EXCLUDED_ACTIVITIES
+    )
+  })
+
+  test('should show review-your-answers back link and no cancel when accessed via change link', async () => {
+    const document = await loadPage({
+      requestUrl: `${marineLicenceRoutes.MARINE_LICENCE_WATER_FRAMEWORK_DIRECTIVE_FILE_UPLOAD}?action=change`,
+      server: getServer()
+    })
+
+    expect(getByRole(document, 'link', { name: 'Back' })).toHaveAttribute(
+      'href',
+      marineLicenceRoutes.MARINE_LICENCE_WATER_FRAMEWORK_DIRECTIVE_REVIEW_YOUR_ANSWERS
+    )
+    expect(
+      queryByRole(document, 'link', { name: 'Cancel' })
+    ).not.toBeInTheDocument()
   })
 })

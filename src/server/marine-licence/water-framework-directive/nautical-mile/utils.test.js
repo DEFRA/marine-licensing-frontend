@@ -6,7 +6,7 @@ import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
 
 describe('getBackLink', () => {
   test('returns review-your-answers when action is set', () => {
-    expect(getBackLink(null, 'change')).toBe(
+    expect(getBackLink(null, 'change', 'task-list')).toBe(
       marineLicenceRoutes.MARINE_LICENCE_WATER_FRAMEWORK_DIRECTIVE_REVIEW_YOUR_ANSWERS
     )
   })
@@ -15,7 +15,8 @@ describe('getBackLink', () => {
     expect(
       getBackLink(
         marineLicenceRoutes.MARINE_LICENCE_CHECK_YOUR_ANSWERS,
-        'change'
+        'change',
+        'task-list'
       )
     ).toBe(
       marineLicenceRoutes.MARINE_LICENCE_WATER_FRAMEWORK_DIRECTIVE_REVIEW_YOUR_ANSWERS
@@ -24,20 +25,30 @@ describe('getBackLink', () => {
 
   test('returns check-your-answers link with anchor when returnTo is set', () => {
     expect(
-      getBackLink(marineLicenceRoutes.MARINE_LICENCE_CHECK_YOUR_ANSWERS)
+      getBackLink(
+        marineLicenceRoutes.MARINE_LICENCE_CHECK_YOUR_ANSWERS,
+        undefined,
+        'task-list'
+      )
     ).toBe(
       `${marineLicenceRoutes.MARINE_LICENCE_CHECK_YOUR_ANSWERS}#water-framework-directive-card`
     )
   })
 
-  test('returns before-you-start link when returnTo is null', () => {
-    expect(getBackLink(null)).toBe(
+  test('returns task-list when waterFrameworkDirectiveEntryPoint is task-list', () => {
+    expect(getBackLink(null, undefined, 'task-list')).toBe(
+      marineLicenceRoutes.MARINE_LICENCE_TASK_LIST
+    )
+  })
+
+  test('returns before-you-start when waterFrameworkDirectiveEntryPoint is before-you-start', () => {
+    expect(getBackLink(null, undefined, 'before-you-start')).toBe(
       marineLicenceRoutes.MARINE_LICENCE_WATER_FRAMEWORK_DIRECTIVE_BEFORE_YOU_START
     )
   })
 
-  test('returns before-you-start link when returnTo is undefined', () => {
-    expect(getBackLink(undefined)).toBe(
+  test('returns before-you-start when waterFrameworkDirectiveEntryPoint is undefined', () => {
+    expect(getBackLink(null, undefined, undefined)).toBe(
       marineLicenceRoutes.MARINE_LICENCE_WATER_FRAMEWORK_DIRECTIVE_BEFORE_YOU_START
     )
   })

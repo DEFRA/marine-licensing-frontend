@@ -44,12 +44,13 @@ export const excludedActivitiesController = {
       )
     }
 
-    const wfdReturnTo = getWaterFrameworkDirectiveReturnRoute(request)
+    const waterFrameworkDirectiveReturnTo =
+      getWaterFrameworkDirectiveReturnRoute(request)
 
     return h.view(EXCLUDED_ACTIVITIES_VIEW_ROUTE, {
       ...excludedActivitiesSettings,
-      backLink: getBackLink(wfdReturnTo),
-      cancelLink: getCancelLink(wfdReturnTo),
+      backLink: getBackLink(waterFrameworkDirectiveReturnTo),
+      cancelLink: getCancelLink(waterFrameworkDirectiveReturnTo),
       projectName: marineLicence.projectName,
       payload: {
         excludedActivities: waterFrameworkDirective?.excludedActivities
@@ -74,15 +75,16 @@ export const excludedActivitiesSubmitController = {
       }),
       failAction: (request, h, err) => {
         const { projectName } = getMarineLicenceCache(request)
-        const wfdReturnTo = getWaterFrameworkDirectiveReturnRoute(request)
+        const waterFrameworkDirectiveReturnTo =
+          getWaterFrameworkDirectiveReturnRoute(request)
         return createFailAction({
           viewRoute: EXCLUDED_ACTIVITIES_VIEW_ROUTE,
           settings: excludedActivitiesSettings,
-          backLink: getBackLink(wfdReturnTo),
+          backLink: getBackLink(waterFrameworkDirectiveReturnTo),
           errorMessages,
           projectName,
           payload: request.payload,
-          params: { cancelLink: getCancelLink(wfdReturnTo) }
+          params: { cancelLink: getCancelLink(waterFrameworkDirectiveReturnTo) }
         })(request, h, err)
       }
     }
@@ -102,11 +104,12 @@ export const excludedActivitiesSubmitController = {
       excludedActivities
     )
 
-    const wfdReturnTo = getWaterFrameworkDirectiveReturnRoute(request)
+    const waterFrameworkDirectiveReturnTo =
+      getWaterFrameworkDirectiveReturnRoute(request)
 
     const redirectPath = getSubmitRedirect(
       excludedActivities,
-      wfdReturnTo,
+      waterFrameworkDirectiveReturnTo,
       previousExcludedActivities
     )
 

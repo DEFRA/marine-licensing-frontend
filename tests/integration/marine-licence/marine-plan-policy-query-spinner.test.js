@@ -8,6 +8,9 @@ import {
 import { loadPage } from '~/tests/integration/shared/app-server.js'
 import { makeGetRequest } from '~/src/server/test-helpers/server-requests.js'
 import { mockMarineLicenceApplication } from '~/src/server/test-helpers/mocks/marine-licence-mocks.js'
+import * as marineLicenceService from '~/src/services/marine-licence-service/index.js'
+
+vi.mock('~/src/services/marine-licence-service/index.js')
 
 describe('Marine Plan Policy Query Spinner', () => {
   const getServer = setupTestServer()
@@ -16,6 +19,12 @@ describe('Marine Plan Policy Query Spinner', () => {
     mockMarineLicence({
       ...mockMarineLicenceApplication,
       marinePlanPolicyJob: 'pending'
+    })
+    vi.mocked(marineLicenceService.getMarineLicenceService).mockReturnValue({
+      getMarineLicenceById: vi.fn().mockResolvedValue({
+        ...mockMarineLicenceApplication,
+        marinePlanPolicyJob: 'pending'
+      })
     })
   })
 
@@ -44,10 +53,14 @@ describe('Marine Plan Policy Query Spinner', () => {
   })
 
   test('should redirect to task list when marinePlanPolicyJob is ready', async () => {
-    mockMarineLicence({
-      ...mockMarineLicenceApplication,
-      marinePlanPolicyJob: 'ready'
-    })
+    vi.mocked(marineLicenceService.getMarineLicenceService).mockReturnValueOnce(
+      {
+        getMarineLicenceById: vi.fn().mockResolvedValue({
+          ...mockMarineLicenceApplication,
+          marinePlanPolicyJob: 'ready'
+        })
+      }
+    )
 
     const response = await makeGetRequest({
       server: getServer(),

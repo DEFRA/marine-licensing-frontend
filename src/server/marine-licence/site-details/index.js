@@ -21,8 +21,10 @@ import { deleteActivityRoutes } from '#src/server/marine-licence/site-details/de
 import { deleteSiteRoutes } from '#src/server/marine-licence/site-details/delete-site/index.js'
 import { deleteAllSitesRoutes } from '#src/server/marine-licence/site-details/delete-all-sites/index.js'
 import { changeSiteLocationRoutes } from '#src/server/marine-licence/site-details/change-site-location/index.js'
+import { marinePlanPolicyQuerySpinnerRoutes } from '#src/server/marine-licence/site-details/marine-plan-policy-query-spinner/index.js'
 
 export const siteDetailsRoutes = [
+  ...marinePlanPolicyQuerySpinnerRoutes,
   ...centreCoordinatesRoutes,
   ...widthOfSiteRoutes,
   ...enterMultipleCoordinatesRoutes,

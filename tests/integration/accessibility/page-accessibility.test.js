@@ -87,6 +87,12 @@ describe('Page accessibility checks (Axe)', () => {
     //   title: 'Upload and wait',
     //   exemption: mockExemptionWithUploadConfig
     // },
+    // TODO: Uncomment when meta refresh a11y issue is resolved (same issue as above)
+    // {
+    //   url: marineLicenceRoutes.MARINE_LICENCE_CALCULATE_MARINE_PLAN_POLICIES,
+    //   title: 'Calculating marine plan policies',
+    //   isMarineLicence: true
+    // },
     {
       url: routes.COORDINATES_ENTRY_CHOICE,
       title: 'How do you want to enter the site coordinates?'

@@ -13,7 +13,10 @@ import {
   updateMarineLicenceSiteDetails
 } from '#src/server/common/helpers/marine-licence/session-cache/utils.js'
 import { getMarineLicenceService } from '#src/services/marine-licence-service/index.js'
-import { authenticatedPatchRequest } from '#src/server/common/helpers/authenticated-requests.js'
+import {
+  authenticatedPatchRequest,
+  authenticatedPostRequest
+} from '#src/server/common/helpers/authenticated-requests.js'
 
 export const FILE_UPLOAD_REVIEW_VIEW_ROUTE =
   'marine-licence/site-details/review-site-details/file-upload-review'
@@ -123,6 +126,22 @@ export const reviewSiteDetailsSubmitController = {
     const redirectPath = Array.isArray(returnTo) ? returnTo[0] : returnTo
     if (redirectPath) {
       return h.redirect(redirectPath)
+    }
+
+    const marineLicenceService = getMarineLicenceService(request)
+    const { taskList } = await marineLicenceService.getMarineLicenceById(
+      marineLicence.id
+    )
+
+    if (taskList.siteDetails === 'COMPLETED') {
+      await authenticatedPostRequest(
+        request,
+        apiRoutes.CALCULATE_MARINE_PLAN_POLICIES,
+        JSON.stringify({ id: marineLicence.id })
+      )
+      return h.redirect(
+        marineLicenceRoutes.MARINE_LICENCE_CALCULATE_MARINE_PLAN_POLICIES
+      )
     }
 
     return h.redirect(marineLicenceRoutes.MARINE_LICENCE_TASK_LIST)

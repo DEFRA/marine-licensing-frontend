@@ -242,15 +242,93 @@ describe('outcomeContinueController', () => {
     )
   })
 
-  it('404s for a non-exemption outcomeType (no overrideCtaButtonUrl) without minting', async () => {
-    const request = continueRequest(
-      '/exemption/licence-required-no-exemption',
-      'WO_EXE_LICENCE_REQUIRED'
-    )
+  it('hands off to the exemption journey with no answer params when the question log is empty', async () => {
+    iatOutcomeDocumentService.mint.mockResolvedValue({
+      slug: 'B'.repeat(22),
+      answersUrl: `https://fe.example/journey/self-service/outcome-document/${'B'.repeat(22)}`
+    })
+    const request = {
+      params: {
+        slug: SLUG,
+        outcomeTypeId: EXEMPTION_TYPE_ID,
+        outcomePath: EXEMPTION_ROUTE.replace(/^\//, '')
+      },
+      app: { iatDoc: { slug: SLUG } },
+      logger: { warn: vi.fn() }
+    }
+
+    await outcomeContinueController.handler(request, h)
+
+    const location = redirect.mock.calls[0][0]
+    expect(location).toContain('/guidance/who-is-the-exemption-for/?')
+    expect(location).toContain('ADV_TYPE=EXE')
+    expect(location).not.toContain('ACTIVITY_TYPE')
+  })
+
+  it('404s for an outcomeType that is neither an exemption nor MCMS handoff, without minting', async () => {
+    const request = continueRequest('/not-licensable', 'WO_NOT_LICENSABLE')
     await expect(
       outcomeContinueController.handler(request, h)
     ).rejects.toMatchObject({ output: { statusCode: 404 } })
     expect(iatOutcomeDocumentService.mint).not.toHaveBeenCalled()
+  })
+
+  it('mints, builds the MCMS query string, and 302s to the absolute MCMS URL', async () => {
+    iatOutcomeDocumentService.mint.mockResolvedValue({
+      slug: 'B'.repeat(22),
+      answersUrl: `https://fe.example/journey/self-service/outcome-document/${'B'.repeat(22)}`
+    })
+    const request = continueRequest('/fast-track-mla', 'WO_FAST_TRACK_MLA', [
+      {
+        questionRoute: '/activity-type',
+        answers: [{ id: 'CON', text: 'Construction' }],
+        mcmsAppFormMapping: 'ACTIVITY_TYPE'
+      }
+    ])
+
+    await outcomeContinueController.handler(request, h)
+
+    expect(iatOutcomeDocumentService.mint).toHaveBeenCalledTimes(1)
+    const location = redirect.mock.calls[0][0]
+    expect(location).toMatch(
+      /^https:\/\/marinelicensingtest\.marinemanagement\.org\.uk\//
+    )
+    expect(location).toContain(`journeyId=${SLUG}`)
+    expect(location).toContain('viewAnswersUrl=https%3A%2F%2Ffe.example')
+    expect(location).toContain('ACTIVITY_TYPE=CON')
+    expect(location).toContain('FAST_TRACK=true')
+  })
+
+  it('throws Boom.badImplementation when the mint returns no slug', async () => {
+    iatOutcomeDocumentService.mint.mockResolvedValue({ slug: undefined })
+    const request = continueRequest('/fast-track-mla', 'WO_FAST_TRACK_MLA')
+    await expect(
+      outcomeContinueController.handler(request, h)
+    ).rejects.toMatchObject({ output: { statusCode: 500 } })
+    expect(redirect).not.toHaveBeenCalled()
+  })
+
+  it('hands off with no answer params when the journey has no question log', async () => {
+    iatOutcomeDocumentService.mint.mockResolvedValue({
+      slug: 'B'.repeat(22),
+      answersUrl: `https://fe.example/journey/self-service/outcome-document/${'B'.repeat(22)}`
+    })
+    const request = {
+      params: {
+        slug: SLUG,
+        outcomeTypeId: 'WO_FAST_TRACK_MLA',
+        outcomePath: 'fast-track-mla'
+      },
+      app: { iatDoc: { slug: SLUG } },
+      logger: { warn: vi.fn() }
+    }
+
+    await outcomeContinueController.handler(request, h)
+
+    const location = redirect.mock.calls[0][0]
+    expect(location).toContain(`journeyId=${SLUG}`)
+    expect(location).toContain('FAST_TRACK=true')
+    expect(location).not.toContain('ACTIVITY_TYPE')
   })
 
   it('400s for an outcomeTypeId that does not belong to the outcome', async () => {

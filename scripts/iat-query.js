@@ -76,7 +76,10 @@ Inspect a node:
   question <route> | outcome <route> | outcome-type <id>
 
 List / filter:
-  outcomes | outcome-types | questions | mappings
+  outcomes [--classify X] [--has-param N[=V]] [--has-link]
+  outcome-types [--has-param N[=V]] [--has-next-question] [--has-link]
+  questions [--mapping N] [--has-mapping]
+  mappings
 
 The journey is a graph of three node types (questions, outcomes,
 outcomeTypes). Routing happens four ways: single-select answers,

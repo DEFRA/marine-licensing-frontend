@@ -18,8 +18,11 @@ import {
 import {
   buildHandoffQueryString,
   buildHandoffRedirectUrl,
+  buildMcmsHandoffQueryString,
+  buildMcmsRedirectUrl,
   HANDOFF_ALLOWLISTS
 } from '#src/server/journey/self-service/services/application-handoff.js'
+import { config } from '#src/config/config.js'
 import { iatContextService } from '#src/services/iat-service/iat-context.service.js'
 import { iatOutcomeDocumentService } from '#src/services/iat-service/iat-outcome-document.service.js'
 import { routes } from '#src/server/common/constants/routes.js'
@@ -257,23 +260,56 @@ export const outcomeViewAnswersController = {
   }
 }
 
-function assertExemptionHandoff(
-  request,
-  outcomeRoute,
-  outcomeTypeId,
-  focusedOption
-) {
-  if (focusedOption.overrideCtaButtonUrl) {
-    return
+async function mintOrThrow(request, slug, payload) {
+  const minted = await iatOutcomeDocumentService.mint(request, slug, payload)
+  if (!minted?.slug) {
+    throw Boom.badImplementation('outcome-document mint returned no slug')
   }
+  return minted
+}
+
+async function handleExemptionHandoff(request, h, slug, payload) {
+  const minted = await mintOrThrow(request, slug, payload)
+  const queryString = buildHandoffQueryString({
+    questionLog: request.app.iatDoc?.questionLog ?? [],
+    focusedOption: payload.focusedOption,
+    answersUrl: minted.answersUrl,
+    allowList: HANDOFF_ALLOWLISTS.exemption
+  })
+  return h.redirect(
+    buildHandoffRedirectUrl(
+      payload.focusedOption.overrideCtaButtonUrl,
+      queryString
+    )
+  )
+}
+
+async function handleMcmsHandoff(request, h, slug, payload) {
+  const minted = await mintOrThrow(request, slug, payload)
+  const queryString = buildMcmsHandoffQueryString({
+    questionLog: request.app.iatDoc?.questionLog ?? [],
+    focusedOption: payload.focusedOption,
+    journeyId: slug,
+    viewAnswersUrl: minted.answersUrl
+  })
+  return h.redirect(
+    buildMcmsRedirectUrl(
+      config.get('mcms.url'),
+      config.get('mcms.path'),
+      queryString
+    )
+  )
+}
+
+function rejectNonHandoff(request, outcomeRoute, outcomeTypeId) {
   reportRuntimeIssue(
     request,
-    'continue-on-non-exemption-outcome',
+    'continue-on-non-handoff-outcome',
     outcomeTypeId,
-    `If outcomeType '${outcomeTypeId}' should hand off to the exemption journey, set overrideCtaButtonUrl on it in self-service.json`,
-    `GET continue ${outcomeRoute} rejected outcomeType '${outcomeTypeId}' (no overrideCtaButtonUrl)`
+    `If outcomeType '${outcomeTypeId}' should hand off, set overrideCtaButtonUrl (exemption) or module (MCMS) on it in self-service.json`,
+    `GET continue ${outcomeRoute} rejected outcomeType '${outcomeTypeId}' (no overrideCtaButtonUrl and no module)`
   )
-  throw Boom.notFound('Outcome is not an exemption handoff')
+  throw Boom.notFound('Outcome is not a handoff')
 }
 
 export const outcomeContinueController = {
@@ -292,30 +328,14 @@ export const outcomeContinueController = {
     )
 
     const payload = buildSnapshotPayload(outcome, outcomeRoute, outcomeTypeId)
-    assertExemptionHandoff(
-      request,
-      outcomeRoute,
-      outcomeTypeId,
-      payload.focusedOption
-    )
+    const focusedOption = payload.focusedOption
 
-    const minted = await iatOutcomeDocumentService.mint(request, slug, payload)
-    if (!minted?.slug) {
-      throw Boom.badImplementation('outcome-document mint returned no slug')
+    if (focusedOption.overrideCtaButtonUrl) {
+      return handleExemptionHandoff(request, h, slug, payload)
     }
-
-    const queryString = buildHandoffQueryString({
-      questionLog: request.app.iatDoc?.questionLog ?? [],
-      focusedOption: payload.focusedOption,
-      answersUrl: minted.answersUrl,
-      allowList: HANDOFF_ALLOWLISTS.exemption
-    })
-
-    return h.redirect(
-      buildHandoffRedirectUrl(
-        payload.focusedOption.overrideCtaButtonUrl,
-        queryString
-      )
-    )
+    if (focusedOption.module) {
+      return handleMcmsHandoff(request, h, slug, payload)
+    }
+    return rejectNonHandoff(request, outcomeRoute, outcomeTypeId)
   }
 }

@@ -11,7 +11,7 @@ import { createMockRequest } from '#src/server/test-helpers/mocks/helpers.js'
 vi.mock('~/src/server/common/helpers/marine-licence/session-cache/utils.js')
 vi.mock('~/src/services/marine-licence-service/index.js')
 
-describe('#calculateMarinePlanPoliciesAndWait', () => {
+describe('#calculateMarinePlanPoliciesAndWaitController', () => {
   const mockRequest = createMockRequest()
 
   beforeEach(() => {
@@ -25,68 +25,66 @@ describe('#calculateMarinePlanPoliciesAndWait', () => {
     })
   })
 
-  describe('calculateMarinePlanPoliciesAndWaitController', () => {
-    test('should redirect to task list when no marine licence id in cache', async () => {
-      vi.mocked(cacheUtils.getMarineLicenceCache).mockReturnValueOnce({})
+  test('should redirect to task list when no marine licence id in cache', async () => {
+    vi.mocked(cacheUtils.getMarineLicenceCache).mockReturnValueOnce({})
 
-      const h = { redirect: vi.fn() }
+    const h = { redirect: vi.fn() }
 
-      await calculateMarinePlanPoliciesAndWaitController.handler(mockRequest, h)
+    await calculateMarinePlanPoliciesAndWaitController.handler(mockRequest, h)
 
-      expect(h.redirect).toHaveBeenCalledWith(
-        marineLicenceRoutes.MARINE_LICENCE_TASK_LIST
-      )
-    })
+    expect(h.redirect).toHaveBeenCalledWith(
+      marineLicenceRoutes.MARINE_LICENCE_TASK_LIST
+    )
+  })
 
-    test('should redirect to task list when marinePlanPolicyJob is ready', async () => {
-      vi.mocked(
-        marineLicenceService.getMarineLicenceService
-      ).mockReturnValueOnce({
+  test('should redirect to task list when marinePlanPolicyJob is ready', async () => {
+    vi.mocked(marineLicenceService.getMarineLicenceService).mockReturnValueOnce(
+      {
         getMarineLicenceById: vi
           .fn()
           .mockResolvedValue({ marinePlanPolicyJob: 'ready' })
-      })
+      }
+    )
 
-      const h = { redirect: vi.fn() }
+    const h = { redirect: vi.fn() }
 
-      await calculateMarinePlanPoliciesAndWaitController.handler(mockRequest, h)
+    await calculateMarinePlanPoliciesAndWaitController.handler(mockRequest, h)
 
-      expect(h.redirect).toHaveBeenCalledWith(
-        marineLicenceRoutes.MARINE_LICENCE_TASK_LIST
-      )
-    })
+    expect(h.redirect).toHaveBeenCalledWith(
+      marineLicenceRoutes.MARINE_LICENCE_TASK_LIST
+    )
+  })
 
-    test('should redirect to task list when marinePlanPolicyJob is failed', async () => {
-      vi.mocked(
-        marineLicenceService.getMarineLicenceService
-      ).mockReturnValueOnce({
+  test('should redirect to task list when marinePlanPolicyJob is failed', async () => {
+    vi.mocked(marineLicenceService.getMarineLicenceService).mockReturnValueOnce(
+      {
         getMarineLicenceById: vi
           .fn()
           .mockResolvedValue({ marinePlanPolicyJob: 'failed' })
-      })
+      }
+    )
 
-      const h = { redirect: vi.fn() }
+    const h = { redirect: vi.fn() }
 
-      await calculateMarinePlanPoliciesAndWaitController.handler(mockRequest, h)
+    await calculateMarinePlanPoliciesAndWaitController.handler(mockRequest, h)
 
-      expect(h.redirect).toHaveBeenCalledWith(
-        marineLicenceRoutes.MARINE_LICENCE_TASK_LIST
-      )
-    })
+    expect(h.redirect).toHaveBeenCalledWith(
+      marineLicenceRoutes.MARINE_LICENCE_TASK_LIST
+    )
+  })
 
-    test('should render spinner view when job is not ready', async () => {
-      const h = { view: vi.fn() }
+  test('should render spinner view when job is not ready', async () => {
+    const h = { view: vi.fn() }
 
-      await calculateMarinePlanPoliciesAndWaitController.handler(mockRequest, h)
+    await calculateMarinePlanPoliciesAndWaitController.handler(mockRequest, h)
 
-      expect(h.view).toHaveBeenCalledWith(
-        CALCULATE_MARINE_PLAN_POLICIES_AND_WAIT_VIEW_ROUTE,
-        {
-          pageTitle: 'Calculating marine plan policies',
-          heading: 'Calculating marine plan policies',
-          pageRefreshTimeInSeconds: 2
-        }
-      )
-    })
+    expect(h.view).toHaveBeenCalledWith(
+      CALCULATE_MARINE_PLAN_POLICIES_AND_WAIT_VIEW_ROUTE,
+      {
+        pageTitle: 'Calculating marine plan policies',
+        heading: 'Calculating marine plan policies',
+        pageRefreshTimeInMs: 2000
+      }
+    )
   })
 })

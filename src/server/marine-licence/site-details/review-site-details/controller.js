@@ -133,7 +133,7 @@ export const reviewSiteDetailsSubmitController = {
       marineLicence.id
     )
 
-    if (taskList.siteDetails === 'COMPLETED') {
+    if (taskList?.siteDetails === 'COMPLETED') {
       await authenticatedPostRequest(
         request,
         apiRoutes.CALCULATE_MARINE_PLAN_POLICIES,

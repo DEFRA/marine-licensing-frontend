@@ -24,7 +24,7 @@ export const calculateMarinePlanPoliciesAndWaitController = {
     return h.view(CALCULATE_MARINE_PLAN_POLICIES_AND_WAIT_VIEW_ROUTE, {
       pageTitle: 'Calculating marine plan policies',
       heading: 'Calculating marine plan policies',
-      pageRefreshTimeInSeconds: 2
+      pageRefreshTimeInMs: 2000
     })
   }
 }

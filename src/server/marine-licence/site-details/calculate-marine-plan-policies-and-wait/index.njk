@@ -26,6 +26,6 @@
   <script nonce="{{ cspNonce }}">
     setTimeout(() => {
       window.location.reload()
-    }, {{ pageRefreshTimeInSeconds * 1000 }})
+    }, {{ pageRefreshTimeInMs }})
   </script>
 {% endblock %}

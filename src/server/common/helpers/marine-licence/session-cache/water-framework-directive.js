@@ -44,3 +44,15 @@ export const clearWaterFrameworkDirectiveReturnToCache = (request) => {
 
 export const getWaterFrameworkDirectiveReturnRoute = (request) =>
   request.yar.get(WFD_RETURN_TO_KEY)
+
+export const setWaterFrameworkDirectivePageEntryPoint = async (
+  request,
+  h,
+  pageKey,
+  entryPoint
+) => updateWaterFrameworkDirective(request, h, pageKey, entryPoint)
+
+export const getWaterFrameworkDirectivePageEntryPoint = (request, pageKey) => {
+  const { waterFrameworkDirective } = getMarineLicenceCache(request)
+  return waterFrameworkDirective?.[pageKey]
+}

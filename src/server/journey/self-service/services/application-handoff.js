@@ -63,3 +63,38 @@ export function buildHandoffQueryString({
   }
   return params.toString()
 }
+
+export function buildMcmsRedirectUrl(baseUrl, path, queryString) {
+  const url = new URL(path || '', baseUrl)
+  if (!queryString) {
+    return url.toString()
+  }
+  const separator = url.search ? '&' : '?'
+  return `${url.toString()}${separator}${queryString}`
+}
+
+export function buildMcmsHandoffQueryString({
+  questionLog,
+  focusedOption,
+  journeyId,
+  viewAnswersUrl
+}) {
+  const params = new URLSearchParams()
+  params.append('journeyId', journeyId)
+  if (viewAnswersUrl) {
+    params.append('viewAnswersUrl', viewAnswersUrl)
+  }
+  for (const entry of questionLog ?? []) {
+    const mapping = entry?.mcmsAppFormMapping
+    const answerId = entry?.answers?.[0]?.id
+    if (mapping && answerId) {
+      params.append(mapping, answerId)
+    }
+  }
+  for (const param of focusedOption?.params ?? []) {
+    if (param?.name && param.value != null) {
+      params.append(param.name, param.value)
+    }
+  }
+  return params.toString()
+}

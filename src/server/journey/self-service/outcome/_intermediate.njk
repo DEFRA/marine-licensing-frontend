@@ -21,11 +21,13 @@
 
     <div class="app-iat-option__actions">
       {% if option.isTerminal %}
-        {{ govukButton({
-          text: option.ctaLabel,
-          href: "#",
-          classes: "govuk-!-margin-right-3"
-        }) }}
+        {% if option.ctaHref %}
+          {{ govukButton({
+            text: option.ctaLabel,
+            href: option.ctaHref,
+            classes: "govuk-!-margin-right-3"
+          }) }}
+        {% endif %}
       {% else %}
         <form method="POST">
           <input type="hidden" name="csrfToken" value="{{ csrfToken }}"/>

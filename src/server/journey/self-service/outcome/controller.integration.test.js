@@ -160,17 +160,19 @@ describe('#outcomeController (integration)', () => {
       ])
     })
 
-    test('terminal option Continue is a non-submit link with href="#"', async () => {
+    test('terminal MCMS option links to the continue route and is labelled with its heading', async () => {
       const { document } = await getPage(
         journey.journeyUrl('/outcome' + OUTCOME_JOURNEY_SELECT)
       )
       const thirdCard = document.querySelectorAll('.app-iat-option')[2]
       expect(thirdCard.querySelector('form[method="POST"]')).toBeNull()
-      const continueButton = Array.from(
-        thirdCard.querySelectorAll('a.govuk-button')
-      ).find((a) => a.textContent.trim() === 'Continue')
-      expect(continueButton).not.toBeNull()
-      expect(continueButton.getAttribute('href')).toBe('#')
+      const cta = thirdCard.querySelector('a.govuk-button')
+      expect(cta.textContent.trim()).toBe('Apply for a standard marine licence')
+      expect(cta.getAttribute('href')).toBe(
+        journey.journeyUrl(
+          '/continue/WO_STANDARD_MLA/construction/journey-select'
+        )
+      )
     })
 
     test('renders a per-option "View answers" link inside each option card', async () => {
@@ -550,25 +552,28 @@ describe('GET terminal-multi', () => {
     expect(document.querySelectorAll('.app-iat-option')).toHaveLength(2)
   })
 
-  test('renders "Download" for link: outcomes and "Continue" for module: outcomes', async () => {
+  test('labels link outcomes "Download" and MCMS outcomes with their heading', async () => {
     const { document } = await getPage(journey.journeyUrl(MULTI_PATH))
     const cards = Array.from(document.querySelectorAll('.app-iat-option'))
     const labels = cards.map((c) =>
       c.querySelector('a.govuk-button')?.textContent.trim()
     )
-    expect(labels).toEqual(['Download', 'Continue'])
+    expect(labels).toEqual(['Download', 'Apply for a standard marine licence'])
   })
 
-  test('every per-card CTA has href="#"', async () => {
+  test('each per-card CTA links to its destination (link → document, module → continue route)', async () => {
     const { document } = await getPage(journey.journeyUrl(MULTI_PATH))
-    const cards = document.querySelectorAll('.app-iat-option')
-    for (const card of cards) {
-      const cta = card.querySelector(
-        'a.govuk-button:not(.govuk-button--secondary)'
+    const ctas = Array.from(
+      document.querySelectorAll(
+        '.app-iat-option a.govuk-button:not(.govuk-button--secondary)'
       )
-      expect(cta).not.toBeNull()
-      expect(cta.getAttribute('href')).toBe('#')
-    }
+    )
+    expect(ctas.map((a) => a.getAttribute('href'))).toEqual([
+      'https://marinelicensing.marinemanagement.org.uk/docs/HA_MCA_TH_Self_Service_Agreed_Method_Template.docx',
+      journey.journeyUrl(
+        '/continue/WO_STANDARD_TRACK_MLA/scaffolding-impede-navigation'
+      )
+    ])
   })
 
   test('renders a per-option "View answers" link inside each option card', async () => {
@@ -838,5 +843,19 @@ describe('#outcomeContinueController (integration)', () => {
     expect(response.headers.location).toContain('ADV_TYPE=EXE')
     expect(response.headers.location).toContain('ARTICLE=13')
     expect(response.headers.location).toContain('pdfDownloadUrl=')
+  })
+
+  it('302s an MCMS Continue to the configured MCMS URL with journeyId, viewAnswersUrl and params', async () => {
+    const url = `/journey/self-service/c/${journey.slug}/continue/WO_FAST_TRACK_MLA/fast-track-mla`
+
+    const response = await makeGetRequest({ url, server: getServer() })
+
+    expect(response.statusCode).toBe(statusCodes.redirect)
+    expect(response.headers.location).toMatch(
+      /^https:\/\/marinelicensingtest\.marinemanagement\.org\.uk\//
+    )
+    expect(response.headers.location).toContain(`journeyId=${journey.slug}`)
+    expect(response.headers.location).toContain('viewAnswersUrl=')
+    expect(response.headers.location).toContain('FAST_TRACK=true')
   })
 })

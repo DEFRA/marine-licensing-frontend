@@ -70,6 +70,34 @@ describe('config validation', () => {
       expect(config.get('redis.host')).toBe('127.0.0.1')
     })
 
+    test('exposes mcms.url and mcms.path defaults in local environment', async () => {
+      process.env.ENVIRONMENT = 'local'
+      process.env.NODE_ENV = 'test'
+
+      const { config } = await import('./config.js')
+
+      expect(config.get('mcms.url')).toBe(
+        'https://marinelicensingtest.marinemanagement.org.uk/'
+      )
+      expect(config.get('mcms.path')).toBe(
+        'mmofox5uat/fox/mmo/MMO_IAT_INTEGRATION'
+      )
+    })
+
+    test('honours MCMS_URL and MCMS_PATH overrides', async () => {
+      process.env.ENVIRONMENT = 'local'
+      process.env.NODE_ENV = 'test'
+      process.env.MCMS_URL = 'https://marinelicensing.marinemanagement.org.uk/'
+      process.env.MCMS_PATH = 'apply/new'
+
+      const { config } = await import('./config.js')
+
+      expect(config.get('mcms.url')).toBe(
+        'https://marinelicensing.marinemanagement.org.uk/'
+      )
+      expect(config.get('mcms.path')).toBe('apply/new')
+    })
+
     test('should allow default values in dev environment', async () => {
       process.env.ENVIRONMENT = 'dev'
       process.env.NODE_ENV = 'production'
@@ -159,7 +187,6 @@ describe('config validation', () => {
       process.env.CDP_UPLOADER_BASE_URL = 'https://uploader.example.com'
       process.env.CDP_UPLOAD_BUCKET = 'prod-bucket'
       process.env.APP_BASE_URL = 'https://app.example.com'
-
       const { config } = await import('./config.js')
 
       expect(config.get('appBaseUrl')).toBe('https://app.example.com')
@@ -220,7 +247,6 @@ describe('config validation', () => {
       process.env.CDP_UPLOADER_BASE_URL = 'https://uploader.example.com'
       process.env.CDP_UPLOAD_BUCKET = 'prod-bucket'
       process.env.APP_BASE_URL = 'https://app.example.com'
-
       await import('./config.js')
 
       expect(warnSpy).toHaveBeenCalledWith(
@@ -258,7 +284,6 @@ describe('config validation', () => {
       process.env.CDP_UPLOADER_BASE_URL = 'https://uploader.example.com'
       process.env.CDP_UPLOAD_BUCKET = 'prod-bucket'
       process.env.APP_BASE_URL = 'https://app.example.com'
-
       await import('./config.js')
 
       expect(warnSpy).not.toHaveBeenCalled()

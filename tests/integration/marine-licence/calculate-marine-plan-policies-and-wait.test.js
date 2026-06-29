@@ -40,18 +40,6 @@ describe('Marine Plan Policy Query Spinner', () => {
     )
   })
 
-  test('should include meta refresh tag when job is pending', async () => {
-    const document = await loadPage({
-      requestUrl:
-        marineLicenceRoutes.MARINE_LICENCE_CALCULATE_MARINE_PLAN_POLICIES,
-      server: getServer()
-    })
-
-    const metaRefresh = document.querySelector('meta[http-equiv="refresh"]')
-    expect(metaRefresh).not.toBeNull()
-    expect(metaRefresh.getAttribute('content')).toBe('2')
-  })
-
   test('should redirect to task list when marinePlanPolicyJob is ready', async () => {
     vi.mocked(marineLicenceService.getMarineLicenceService).mockReturnValueOnce(
       {

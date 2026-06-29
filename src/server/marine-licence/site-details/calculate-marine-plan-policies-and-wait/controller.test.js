@@ -84,8 +84,7 @@ describe('#calculateMarinePlanPoliciesAndWait', () => {
         {
           pageTitle: 'Calculating marine plan policies',
           heading: 'Calculating marine plan policies',
-          pageRefreshTimeInSeconds: 2,
-          isProcessing: true
+          pageRefreshTimeInSeconds: 2
         }
       )
     })

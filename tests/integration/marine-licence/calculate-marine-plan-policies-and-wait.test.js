@@ -60,4 +60,25 @@ describe('Marine Plan Policy Query Spinner', () => {
       marineLicenceRoutes.MARINE_LICENCE_TASK_LIST
     )
   })
+
+  test('should redirect to task list when marinePlanPolicyJob is failed', async () => {
+    vi.mocked(marineLicenceService.getMarineLicenceService).mockReturnValueOnce(
+      {
+        getMarineLicenceById: vi.fn().mockResolvedValue({
+          ...mockMarineLicenceApplication,
+          marinePlanPolicyJob: 'failed'
+        })
+      }
+    )
+
+    const response = await makeGetRequest({
+      server: getServer(),
+      url: marineLicenceRoutes.MARINE_LICENCE_CALCULATE_MARINE_PLAN_POLICIES
+    })
+
+    expect(response.statusCode).toBe(statusCodes.redirect)
+    expect(response.headers.location).toBe(
+      marineLicenceRoutes.MARINE_LICENCE_TASK_LIST
+    )
+  })
 })

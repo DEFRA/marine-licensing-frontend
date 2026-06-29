@@ -29,6 +29,10 @@ const hideNavigationRoutesMarineLicence = new Set([
   marineLicenceRoutes.MARINE_LICENCE_PROJECT_NAME
 ])
 
+const hideNavigationRoutesMarineLicenceAlways = new Set([
+  marineLicenceRoutes.MARINE_LICENCE_CALCULATE_MARINE_PLAN_POLICIES
+])
+
 const isRouteNavigationHidden = (request) => {
   const { path: pagePath } = request
 
@@ -39,6 +43,9 @@ const isRouteNavigationHidden = (request) => {
     }
 
     if (pagePath.includes('/marine-licence')) {
+      if (hideNavigationRoutesMarineLicenceAlways.has(pagePath)) {
+        return true
+      }
       const marineLicence = getMarineLicenceCache(request)
       return (
         hideNavigationRoutesMarineLicence.has(pagePath) && !marineLicence?.id

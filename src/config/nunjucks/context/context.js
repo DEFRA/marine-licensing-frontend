@@ -34,9 +34,7 @@ const hideNavigationRoutesMarineLicenceAlways = new Set([
   marineLicenceRoutes.MARINE_LICENCE_UPLOAD_AND_WAIT
 ])
 
-const hideNavigationRoutesExemptionAlways = new Set([
-  routes.UPLOAD_AND_WAIT
-])
+const hideNavigationRoutesExemptionAlways = new Set([routes.UPLOAD_AND_WAIT])
 
 const isRouteNavigationHidden = (request) => {
   const { path: pagePath } = request

@@ -185,6 +185,11 @@ describe('Page accessibility checks (Axe)', () => {
       isMarineLicence: true
     },
     {
+      url: marineLicenceRoutes.MARINE_LICENCE_FEE_ESTIMATE,
+      title: 'Fee estimate',
+      isMarineLicence: true
+    },
+    {
       url: marineLicenceRoutes.MARINE_LICENCE_SPECIAL_LEGAL_POWERS,
       title:
         'Does your organisation have special legal powers to do any of this project?',

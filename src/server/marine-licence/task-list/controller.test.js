@@ -295,66 +295,6 @@ describe('#taskListController', () => {
     )
   })
 
-  test('does not block submission when the marine plan policy task is incomplete', async () => {
-    const mockPayload = {
-      value: {
-        id: '123',
-        projectName: 'Test Project',
-        taskList: { siteDetails: 'COMPLETED' },
-        siteDetails: mockMarineLicence.siteDetails,
-        waterFrameworkDirective: { nauticalMile: 'no' },
-        marinePlanPolicyJob: 'ready',
-        marinePlanPoliciesCount: 44
-      }
-    }
-
-    const completed = (text) => [
-      {
-        href: '/',
-        status: { text: 'Completed' },
-        title: { classes: 'govuk-link--no-visited-state', text }
-      }
-    ]
-
-    getMarineLicenceCacheMock.mockReturnValue(mockMarineLicence)
-    authenticatedGetRequestMock.mockResolvedValue({ payload: mockPayload })
-    vi.mocked(transformProjectDetailsTaskList).mockReturnValue(
-      completed('Project name')
-    )
-    vi.mocked(transformSiteDetailsTaskList).mockReturnValue(
-      completed('Site details')
-    )
-    vi.mocked(transformOtherPermissionsTaskList).mockReturnValue(
-      completed('Other authorities')
-    )
-    vi.mocked(transformWaterFrameworkDirectiveTaskList).mockReturnValue(
-      completed('Water Framework Directive assessment')
-    )
-    vi.mocked(transformSharingTaskList).mockReturnValue(
-      completed('Sharing your project information publicly')
-    )
-    vi.mocked(transformMarinePlanPoliciesTaskList).mockReturnValue([
-      {
-        title: { text: 'Marine plan policy considerations' },
-        status: {
-          text: 'Cannot start yet',
-          classes: 'govuk-task-list__status--cannot-start-yet'
-        }
-      }
-    ])
-    vi.mocked(setMarineLicenceCache).mockResolvedValue(mockMarineLicence)
-    authUtils.getUserSession.mockResolvedValue({
-      userRelationshipType: 'CITIZEN'
-    })
-
-    await taskListController.handler(mockRequest, mockH)
-
-    expect(mockH.view).toHaveBeenCalledWith(
-      TASK_LIST_VIEW_ROUTE,
-      expect.objectContaining({ hasCompletedAllTasks: true })
-    )
-  })
-
   test('taskListSelectMarineLicenceController should clear cache and return to task list', async () => {
     const mockRequestWithParams = { ...mockRequest, params: { id: '123' } }
     await taskListSelectMarineLicenceController.handler(

@@ -120,8 +120,6 @@ export const taskListController = {
     )
     await updateLicenceSession(request, h, payload.value, hasCancel)
 
-    // ML-1311: marine plan policies is intentionally excluded — it has no
-    // "Completed" state yet and must not block submission.
     const hasCompletedAllTasks = [
       ...transformed.otherPermissions,
       ...transformed.sharing,

@@ -98,7 +98,9 @@ export const marineLicenceRoutes = {
   MARINE_LICENCE_WATER_FRAMEWORK_DIRECTIVE_UPLOAD_AND_WAIT:
     '/marine-licence/water-framework-directive-upload-and-wait',
   MARINE_LICENCE_WATER_FRAMEWORK_DIRECTIVE_REVIEW_YOUR_ANSWERS:
-    '/marine-licence/water-framework-directive-review-your-answers'
+    '/marine-licence/water-framework-directive-review-your-answers',
+  MARINE_LICENCE_CALCULATE_MARINE_PLAN_POLICIES:
+    '/marine-licence/calculate-marine-plan-policies'
 }
 
 export const defraIdGuidanceRoutes = {
@@ -176,5 +178,7 @@ export const apiRoutes = {
   GENERATE_COORDINATES_CSV:
     '/marine-licence/{marineLicenceId}/generate-coordinates-csv',
   UPDATE_PREFERRED_DATES: '/marine-licence/preferred-dates',
-  UPDATE_WATER_FRAMEWORK_DIRECTIVE: '/marine-licence/water-framework-directive'
+  UPDATE_WATER_FRAMEWORK_DIRECTIVE: '/marine-licence/water-framework-directive',
+  CALCULATE_MARINE_PLAN_POLICIES:
+    '/marine-licence/calculate-marine-plan-policies'
 }

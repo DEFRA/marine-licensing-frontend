@@ -90,7 +90,7 @@ describe('Page accessibility checks (Axe)', () => {
     // TODO: Uncomment when meta refresh a11y issue is resolved (same issue as above)
     // {
     //   url: marineLicenceRoutes.MARINE_LICENCE_CALCULATE_MARINE_PLAN_POLICIES,
-    //   title: 'Calculating marine plan policies',
+    //   title: 'Loading your Marine plan policies',
     //   isMarineLicence: true
     // },
     {

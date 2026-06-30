@@ -36,7 +36,7 @@ describe('Marine Plan Policy Query Spinner', () => {
     })
 
     expect(getByRole(document, 'heading', { level: 1 })).toHaveTextContent(
-      'Calculating marine plan policies'
+      'Loading your Marine plan policies'
     )
   })
 

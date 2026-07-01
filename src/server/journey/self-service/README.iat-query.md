@@ -166,8 +166,10 @@ npm run iat -- question /activity-type
 - `reach --json` → `{ route, reachable }`.
 - `predecessors --json` → `[{ route, via }]`.
 
-The inspect/list commands emit the same fields as their human output as
-JSON objects/arrays. `--json` does not change exit codes.
+The inspect/list commands emit at least the fields shown in their human
+output as JSON objects/arrays — `outcome-types --json` and `questions --json`
+emit the full underlying object (a superset of their tabular columns).
+`--json` does not change exit codes.
 
 ## Source files
 

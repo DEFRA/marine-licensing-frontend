@@ -31,16 +31,18 @@ A decision-tree engine that helps applicants determine whether they need a marin
 
 The entry point is defined by `firstQuestionRoute: "/sea"`.
 
-This first question asks: _"Where will the proposed activities take place?"_ with two answers:
+This first question asks: _"Where will the activity take place?"_ with five answers:
 
-- **"In or over the sea"** → continues to `/jurisdiction`
-- **"On land above mean high water springs"** → exits immediately (not licensable)
+- **"In or over the sea"**, **"On or under the seabed"**, **"In a river,
+  estuary, or channel up to the normal tidal limit…"**, and **"Waters in a
+  closed area, such as a dock…"** → all continue to `/jurisdiction`
+- **"Somewhere else"** → exits to `/exemption/licence-not-required/sea`
 
 ```mermaid
 flowchart TD
-    START(("Start")) --> SEA["/sea<br/>Where will activities take place?"]
-    SEA -->|In or over the sea| JURISDICTION["/jurisdiction<br/>In which waters?"]
-    SEA -->|On land above MHWS| EXIT_SEA[/"Not licensable"/]
+    START(("Start")) --> SEA["/sea<br/>Where will the activity take place?"]
+    SEA -->|"In/over sea, on/under seabed,<br/>river/estuary, or closed area"| JURISDICTION["/jurisdiction<br/>Which waters?"]
+    SEA -->|Somewhere else| EXIT_SEA[/"Licence not required"/]
 ```
 
 ---
@@ -71,19 +73,24 @@ A question page presents radio buttons (or occasionally checkboxes). Each answer
 ```json
 {
   "route": "/jurisdiction",
-  "text": "In which waters will the activity take place?",
+  "text": "Which waters will the activity take place in?",
   "hint": "See an illustration of these 'waters'...",
   "section": "doINeedAMarineLicence",
   "answers": [
     {
       "id": "englishWaters",
-      "text": "In English waters",
+      "text": "English waters or Northern Ireland offshore waters",
       "nextQuestionRoute": "/activity-type"
     },
     {
       "id": "otherUkWaters",
-      "text": "In other UK waters",
+      "text": "Other UK waters – Wales, Scotland or Northern Ireland (excluding Northern Ireland offshore waters)",
       "outcomeRoute": "/licence-not-required-devolved"
+    },
+    {
+      "id": "elsewhere",
+      "text": "Somewhere else in the world",
+      "nextQuestionRoute": "/elsewhere-in-the-world/activity-type"
     }
   ]
 }
@@ -127,8 +134,15 @@ An outcome page displays a result and presents one or more actions (defined by `
 }
 ```
 
-- When an outcome has **one** outcomeType → it's a terminal result page
-- When an outcome has **multiple** outcomeTypes → it's a fork (user chooses next step)
+- When **no** outcomeType has a `nextQuestionRoute` → it's a terminal page
+  (one action = terminal-single; several actions = terminal-multi).
+- When **at least one** outcomeType has a `nextQuestionRoute` → it's a fork
+  (the user's choice re-enters the question tree).
+
+Fork-ness is determined by `nextQuestionRoute`, **not** by the number of
+outcomeTypes — many multi-outcomeType outcomes are terminal-multi (several
+terminal actions on one page), not forks. The runtime classifier is
+`classifyOutcome` in `outcome/utils.js`.
 
 ### 3. OutcomeTypes (99 definitions)
 
@@ -147,15 +161,26 @@ These define what the user can _do_ at an outcome page. They are the leaf action
 
 **Types of outcomeType:**
 
-| Category                | What it does                                 | Key fields                                       | Count |
-| ----------------------- | -------------------------------------------- | ------------------------------------------------ | ----- |
-| **Application launch**  | Opens the licence application                | `module: "MMO_APP2_CONTROL"`                     | ~10   |
-| **Advice/notification** | Opens an enquiry or exemption form           | `module: "MMO_ADVICE_CONTROL"` + `params`        | ~33   |
-| **External redirect**   | Redirects to Defra marine licensing frontend | `overrideCtaButtonUrl` + `overrideCtaButtonText` | 12    |
-| **Download**            | Provides a .docx template                    | `link: "https://...docx"`                        | ~8    |
-| **External link**       | Opens an external tool (e.g. ArcGIS map)     | `link: "https://..."`                            | ~2    |
-| **Info only**           | Displays text, no action                     | (no module/link)                                 | ~22   |
-| **Routing**             | Sends user back into the question tree       | `nextQuestionRoute`                              | 12    |
+| Category                | What it does                                                      | Key fields                                  | Count |
+| ----------------------- | ----------------------------------------------------------------- | ------------------------------------------- | ----- |
+| **Application launch**  | Opens the licence application                                     | `module: "MMO_APP2_CONTROL"`                | 13    |
+| **Advice/notification** | Opens an enquiry or exemption notification                        | `module: "MMO_ADVICE_CONTROL"` (+ `params`) | 17    |
+| **Download**            | Provides a .docx template (rendered as a text link, see note)     | `link: "https://….docx"`                    | 6     |
+| **External link**       | Opens an external tool, e.g. ArcGIS map (rendered as a text link) | `link: "https://…"`                         | 2     |
+| **Info only**           | Displays text, no action                                          | (no `module`/`link`/`nextQuestionRoute`)    | 49    |
+| **Routing**             | Sends user back into the question tree                            | `nextQuestionRoute`                         | 12    |
+
+These six categories partition all 99 outcomeTypes (13 + 17 + 6 + 2 + 49 + 12 = 99).
+
+- **CTA-override subset:** 12 of the 17 `MMO_ADVICE_CONTROL` types also carry
+  `overrideCtaButtonUrl` + `overrideCtaButtonText` — these render a "Continue"
+  button redirecting to Defra marine-licensing guidance (the
+  exemption-available articles). They are a subset of Advice/notification, not
+  a separate category.
+- **`link` rendering (ML-1350):** a `link` field renders as a GOV.UK blue
+  **text link** (anchor text = the outcomeType's `heading`, opens in a new
+  tab), _not_ a "Download" button. The `link` value in the data is unchanged —
+  only its rendering.
 
 ---
 
@@ -358,9 +383,9 @@ Named `WO_EXE_NOT_LICENSABLE_*` — the activity doesn't require a marine licenc
 
 Named `WO_STANDARD_TRACK_MLA*` or `WO_FAST_TRACK_MLA*` — launches the licence application module (`MMO_APP2_CONTROL`).
 
-### Download Template (~8 outcomes)
+### Download Template (6 outcomes)
 
-Named `WO_DOWNLOAD_*_AGREED_METHOD_TEMPLATE` — provides a .docx template that must be agreed with a harbour authority, Trinity House, Natural England, or Historic England.
+Named `WO_DOWNLOAD_*_AGREED_METHOD_TEMPLATE` — provides a .docx template that must be agreed with a harbour authority, Trinity House, Natural England, or Historic England. The template `link` renders as a text hyperlink (anchor text = the outcomeType `heading`), not a download button — see the outcomeType-category note above.
 
 ### Enquiry / EIA (~4 outcomes)
 
@@ -396,7 +421,7 @@ These may be legacy pages from earlier versions, or they may be reached by appli
 **13 unreachable outcomes** — defined but never referenced by any `outcomeRoute`:
 
 - The 4 `/journey-select` pages (construction, deposit, removal, dredging)
-- The 8 `/standard-marine-licence-application/*` pages
+- The 7 `/standard-marine-licence-application/*` pages
 - `/not-licensable`
 - `/exemption/licence-not-required`
 
@@ -562,7 +587,7 @@ Some outcomeTypes carry `params` — key-value pairs passed to the destination m
 
 ```json
 {
-  "id": "WO_EXE_AVAILABLE_ARTICLE_25",
+  "id": "WO_EXE_AVAILABLE_ARTICLE_25_NOTIFICATION",
   "module": "MMO_ADVICE_CONTROL",
   "params": [
     { "name": "ADV_TYPE", "value": "EXE" },

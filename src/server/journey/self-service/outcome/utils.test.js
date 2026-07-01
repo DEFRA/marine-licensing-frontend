@@ -51,12 +51,6 @@ describe('#ctaLabelFor', () => {
     ).toBe('Apply now')
   })
 
-  test('returns "Download" when only link: is set', () => {
-    expect(ctaLabelFor({ link: 'https://example.com/template.docx' })).toBe(
-      'Download'
-    )
-  })
-
   test('returns the heading for a module (MCMS) outcomeType', () => {
     expect(
       ctaLabelFor({
@@ -160,12 +154,15 @@ describe('ctaHref wiring', () => {
     expect(view.ctaHref).toBe(continueRoute('WO_FAST_TRACK_MLA'))
   })
 
-  it('uses the link as ctaHref for a link outcomeType', () => {
+  it('does not use the link as ctaHref; exposes link and linkText for a link outcomeType', () => {
     const view = buildTerminalSingleView(baseModel, {
       id: 'WO_DOWNLOAD',
+      heading: 'Download the template',
       link: 'https://example.com/template.docx'
     })
-    expect(view.ctaHref).toBe('https://example.com/template.docx')
+    expect(view.ctaHref).toBeNull()
+    expect(view.link).toBe('https://example.com/template.docx')
+    expect(view.linkText).toBe('Download the template')
   })
 
   it('leaves ctaHref null for an info-only outcomeType', () => {
@@ -183,7 +180,7 @@ describe('ctaHref wiring', () => {
     expect(view).not.toHaveProperty('continueUrl')
   })
 
-  it('sets per-option ctaHref on terminal-multi (link vs module)', () => {
+  it('exposes link (not ctaHref) for a link option and ctaHref for a module option on terminal-multi', () => {
     const view = buildTerminalMultiView(baseModel, [
       {
         id: 'WO_DOWNLOAD',
@@ -198,7 +195,9 @@ describe('ctaHref wiring', () => {
         module: 'MMO_APP2_CONTROL'
       }
     ])
-    expect(view.options[0].ctaHref).toBe('https://example.com/a.docx')
+    expect(view.options[0].link).toBe('https://example.com/a.docx')
+    expect(view.options[0].ctaHref).toBeNull()
+    expect(view.options[1].link).toBeNull()
     expect(view.options[1].ctaHref).toBe(continueRoute('WO_STANDARD_TRACK_MLA'))
   })
 
@@ -217,5 +216,14 @@ describe('ctaHref wiring', () => {
     expect(view.options[0].ctaHref).toBe(
       `/journey/self-service/c/${'S'.repeat(22)}/continue/WO_STANDARD_MLA/construction/journey-select`
     )
+  })
+
+  it('exposes link on an intermediate terminal (link) option', () => {
+    const view = buildIntermediateView(
+      { slug: 'S'.repeat(22), outcomeRoute: '/x' },
+      { outcomeTypes: ['WO_DOWNLOAD'] },
+      [{ id: 'WO_DOWNLOAD', heading: 'h', link: 'https://example.com/a.docx' }]
+    )
+    expect(view.options[0].link).toBe('https://example.com/a.docx')
   })
 })

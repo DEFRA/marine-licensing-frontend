@@ -34,7 +34,12 @@ const taskListViewSettings = {
 function transformTaskLists(
   taskList,
   isCitizen,
-  { waterFrameworkDirective, marinePlanPolicyJob, marinePlanPoliciesCount }
+  {
+    waterFrameworkDirective,
+    marinePlanPolicyJob,
+    marinePlanPoliciesCount,
+    marinePlanPolicyResponseCount
+  }
 ) {
   return {
     otherPermissions: transformOtherPermissionsTaskList(taskList, isCitizen),
@@ -47,7 +52,8 @@ function transformTaskLists(
     ),
     marinePlanPolicies: transformMarinePlanPoliciesTaskList(taskList, {
       marinePlanPolicyJob,
-      marinePlanPoliciesCount
+      marinePlanPoliciesCount,
+      marinePlanPolicyResponseCount
     })
   }
 }
@@ -109,14 +115,20 @@ export const taskListController = {
       projectName,
       waterFrameworkDirective,
       marinePlanPolicyJob,
-      marinePlanPoliciesCount
+      marinePlanPoliciesCount,
+      marinePlanPolicyResponseCount
     } = payload.value
     const { userRelationshipType } = userSession
 
     const transformed = transformTaskLists(
       taskList,
       userRelationshipType === USER_TYPES.CITIZEN,
-      { waterFrameworkDirective, marinePlanPolicyJob, marinePlanPoliciesCount }
+      {
+        waterFrameworkDirective,
+        marinePlanPolicyJob,
+        marinePlanPoliciesCount,
+        marinePlanPolicyResponseCount
+      }
     )
     await updateLicenceSession(request, h, payload.value, hasCancel)
 

@@ -93,7 +93,8 @@ describe('#taskListController', () => {
         },
         waterFrameworkDirective: { nauticalMile: 'no' },
         marinePlanPolicyJob: 'ready',
-        marinePlanPoliciesCount: 44
+        marinePlanPoliciesCount: 44,
+        marinePlanPolicyResponseCount: 12
       }
     }
 
@@ -225,7 +226,8 @@ describe('#taskListController', () => {
       mockPayload.value.taskList,
       {
         marinePlanPolicyJob: 'ready',
-        marinePlanPoliciesCount: 44
+        marinePlanPoliciesCount: 44,
+        marinePlanPolicyResponseCount: 12
       }
     )
 

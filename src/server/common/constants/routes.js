@@ -180,5 +180,7 @@ export const apiRoutes = {
   UPDATE_PREFERRED_DATES: '/marine-licence/preferred-dates',
   UPDATE_WATER_FRAMEWORK_DIRECTIVE: '/marine-licence/water-framework-directive',
   CALCULATE_MARINE_PLAN_POLICIES:
-    '/marine-licence/calculate-marine-plan-policies'
+    '/marine-licence/calculate-marine-plan-policies',
+  SAVE_MARINE_PLAN_POLICY_RESPONSE:
+    '/marine-licence/marine-plan-policy-response'
 }

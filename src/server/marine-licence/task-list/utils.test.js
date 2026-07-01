@@ -487,6 +487,76 @@ describe('taskList utils', () => {
       )
     })
 
+    test('Should return "Not yet started" with "N to complete" when no responses saved', () => {
+      expect(
+        transformMarinePlanPoliciesTaskList(
+          { siteDetails: 'COMPLETED' },
+          {
+            marinePlanPolicyJob: 'ready',
+            marinePlanPoliciesCount: 37,
+            marinePlanPolicyResponseCount: 0
+          }
+        )
+      ).toEqual([
+        {
+          title: {
+            text: 'Marine plan policy considerations (37 to complete)',
+            classes: 'govuk-link--no-visited-state'
+          },
+          href: marineLicenceRoutes.MARINE_LICENCE_TASK_LIST,
+          status: {
+            tag: { text: 'Not yet started', classes: 'govuk-tag--blue' }
+          }
+        }
+      ])
+    })
+
+    test('Should return "In progress" with "N of M completed" when some responses saved', () => {
+      expect(
+        transformMarinePlanPoliciesTaskList(
+          { siteDetails: 'COMPLETED' },
+          {
+            marinePlanPolicyJob: 'ready',
+            marinePlanPoliciesCount: 37,
+            marinePlanPolicyResponseCount: 8
+          }
+        )
+      ).toEqual([
+        {
+          title: {
+            text: 'Marine plan policy considerations (8 of 37 completed)',
+            classes: 'govuk-link--no-visited-state'
+          },
+          href: marineLicenceRoutes.MARINE_LICENCE_TASK_LIST,
+          status: {
+            tag: { text: 'In progress', classes: 'govuk-tag--teal' }
+          }
+        }
+      ])
+    })
+
+    test('Should return "Completed" with "N of N completed" when all responses saved', () => {
+      expect(
+        transformMarinePlanPoliciesTaskList(
+          { siteDetails: 'COMPLETED' },
+          {
+            marinePlanPolicyJob: 'ready',
+            marinePlanPoliciesCount: 37,
+            marinePlanPolicyResponseCount: 37
+          }
+        )
+      ).toEqual([
+        {
+          title: {
+            text: 'Marine plan policy considerations (37 of 37 completed)',
+            classes: 'govuk-link--no-visited-state'
+          },
+          href: marineLicenceRoutes.MARINE_LICENCE_TASK_LIST,
+          status: { text: 'Completed' }
+        }
+      ])
+    })
+
     test('omits the count suffix when count is not a number', () => {
       expect(
         transformMarinePlanPoliciesTaskList(

@@ -164,7 +164,7 @@ describe('#taskListController', () => {
 
     const mockMarinePlanPoliciesTaskList = [
       {
-        href: marineLicenceRoutes.MARINE_LICENCE_TASK_LIST,
+        href: marineLicenceRoutes.MARINE_LICENCE_MARINE_PLAN_POLICIES,
         status: {
           tag: { text: 'Not yet started', classes: 'govuk-tag--blue' }
         },

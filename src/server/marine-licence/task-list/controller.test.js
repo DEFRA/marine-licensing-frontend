@@ -12,7 +12,8 @@ import {
   transformSiteDetailsTaskList,
   transformOtherPermissionsTaskList,
   transformSharingTaskList,
-  transformWaterFrameworkDirectiveTaskList
+  transformWaterFrameworkDirectiveTaskList,
+  transformFeeEstimateTaskList
 } from '#src/server/marine-licence/task-list/utils.js'
 import {
   taskListController,
@@ -24,6 +25,7 @@ import { PROJECT_TYPE } from '#src/server/common/constants/projects.js'
 import * as authUtils from '#src/server/common/plugins/auth/utils.js'
 import Boom from '@hapi/boom'
 import { createMockRequest } from '#src/server/test-helpers/mocks/helpers.js'
+import { mockMarineLicenceApplication } from '#src/server/test-helpers/mocks/marine-licence-mocks.js'
 
 vi.mock('#src/server/common/helpers/marine-licence/session-cache/utils.js')
 vi.mock(
@@ -44,22 +46,6 @@ describe('#taskListController', () => {
   const clearMarineLicenceCacheMock = vi.mocked(clearMarineLicenceCache)
   const authenticatedGetRequestMock = vi.mocked(authenticatedGetRequest)
 
-  const mockMarineLicence = {
-    id: '123',
-    projectName: 'Test Project',
-    projectBackground: 'Test project background',
-    siteDetails: [{ siteName: 'some-site' }],
-    otherAuthorities: {
-      agree: 'yes',
-      details: 'some details'
-    },
-    specialLegalPowers: {
-      agree: 'yes',
-      details: 'some special legal powers'
-    },
-    waterFrameworkDirective: { nauticalMile: 'no' }
-  }
-
   beforeEach(() => {
     mockH = {
       view: vi.fn(),
@@ -75,12 +61,13 @@ describe('#taskListController', () => {
         projectName: 'Test Project',
         projectBackground: 'Test project background',
         taskList: {
+          feeEstimate: 'COMPLETED',
           projectName: 'COMPLETED',
           projectBackground: 'COMPLETED',
           specialLegalPowers: 'COMPLETED',
           otherAuthorities: 'COMPLETED'
         },
-        siteDetails: mockMarineLicence.siteDetails,
+        siteDetails: mockMarineLicenceApplication.siteDetails,
         otherAuthorities: {
           agree: 'yes',
           details: 'some details'
@@ -134,7 +121,7 @@ describe('#taskListController', () => {
         status: { text: 'Completed' },
         title: {
           classes: 'govuk-link--no-visited-state',
-          text: 'Special Legal Powers'
+          text: 'Water framework directive'
         }
       }
     ]
@@ -158,7 +145,15 @@ describe('#taskListController', () => {
       }
     ]
 
-    getMarineLicenceCacheMock.mockReturnValue(mockMarineLicence)
+    const mockFeeEstimateTaskList = [
+      {
+        href: '/',
+        status: { text: 'Completed' },
+        title: { classes: 'govuk-link--no-visited-state', text: 'Fee estimate' }
+      }
+    ]
+
+    getMarineLicenceCacheMock.mockReturnValue(mockMarineLicenceApplication)
     authenticatedGetRequestMock.mockResolvedValue({
       payload: mockPayload
     })
@@ -174,8 +169,16 @@ describe('#taskListController', () => {
     vi.mocked(transformWaterFrameworkDirectiveTaskList).mockReturnValue(
       mockwaterFrameworkDirectiveTaskList
     )
+    vi.mocked(transformFeeEstimateTaskList).mockReturnValue(
+      mockFeeEstimateTaskList
+    )
     vi.mocked(transformSharingTaskList).mockReturnValue(mockSharingTaskList)
-    vi.mocked(setMarineLicenceCache).mockResolvedValue(mockMarineLicence)
+    vi.mocked(transformFeeEstimateTaskList).mockReturnValue(
+      mockFeeEstimateTaskList
+    )
+    vi.mocked(setMarineLicenceCache).mockResolvedValue(
+      mockMarineLicenceApplication
+    )
 
     authUtils.getUserSession.mockResolvedValue({
       userRelationshipType: 'CITIZEN'
@@ -187,9 +190,12 @@ describe('#taskListController', () => {
     expect(clearReturnToCacheMock).toHaveBeenCalledWith(mockRequest)
     expect(authenticatedGetRequestMock).toHaveBeenCalledWith(
       mockRequest,
-      '/marine-licence/123'
+      `/marine-licence/${mockMarineLicenceApplication.id}`
     )
     expect(vi.mocked(transformProjectDetailsTaskList)).toHaveBeenCalledWith(
+      mockPayload.value.taskList
+    )
+    expect(vi.mocked(transformFeeEstimateTaskList)).toHaveBeenCalledWith(
       mockPayload.value.taskList
     )
     expect(vi.mocked(transformSiteDetailsTaskList)).toHaveBeenCalledWith(
@@ -199,13 +205,21 @@ describe('#taskListController', () => {
       vi.mocked(transformWaterFrameworkDirectiveTaskList)
     ).toHaveBeenCalledWith(
       mockPayload.value.taskList,
-      mockMarineLicence.waterFrameworkDirective
+      mockPayload.value.waterFrameworkDirective
     )
 
     expect(vi.mocked(setMarineLicenceCache)).toHaveBeenCalledWith(
       mockRequest,
       mockH,
-      mockMarineLicence
+      expect.objectContaining({
+        id: mockPayload.value.id,
+        projectName: mockPayload.value.projectName,
+        projectBackground: mockPayload.value.projectBackground,
+        specialLegalPowers: mockPayload.value.specialLegalPowers,
+        otherAuthorities: mockPayload.value.otherAuthorities,
+        siteDetails: mockPayload.value.siteDetails,
+        waterFrameworkDirective: mockPayload.value.waterFrameworkDirective
+      })
     )
     expect(vi.mocked(setProjectType)).toHaveBeenCalledWith(
       mockRequest,
@@ -218,6 +232,7 @@ describe('#taskListController', () => {
       heading: 'Marine licence start page',
       projectName: 'Test Project',
       otherPermissionsTaskList: mockOtherPermissionsTaskList,
+      feeEstimateTaskList: mockFeeEstimateTaskList,
       projectDetailsTaskList: mockProjectDetailsTaskList,
       siteDetailsTaskList: mockSiteDetailsTaskList,
       sharingTaskList: mockSharingTaskList,
@@ -248,7 +263,10 @@ describe('#taskListController', () => {
   })
 
   test('taskListController handler should correctly handle request to clear cache', async () => {
-    getMarineLicenceCacheMock.mockReturnValue(mockMarineLicence)
+    getMarineLicenceCacheMock.mockReturnValue(mockMarineLicenceApplication)
+    authenticatedGetRequestMock.mockResolvedValue({
+      payload: { value: mockMarineLicenceApplication }
+    })
 
     const mockRequestWithParams = {
       ...mockRequest,
@@ -260,10 +278,7 @@ describe('#taskListController', () => {
     expect(setMarineLicenceCacheMock).toHaveBeenCalledWith(
       expect.any(Object),
       expect.any(Object),
-      {
-        ...mockMarineLicence,
-        siteDetails: []
-      }
+      expect.objectContaining({ siteDetails: [] })
     )
   })
 

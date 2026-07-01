@@ -36,6 +36,12 @@
         }) }}
         {% endif %}
 
+        <h2 class="govuk-heading-m">Fee estimate and invoicing details</h2>
+         {{ govukTaskList({
+          idPrefix: "fee-estimate-task-list",
+          items: feeEstimateTaskList
+        }) }}
+
          <h2 class="govuk-heading-m">Sharing your project information publicly</h2>
       {{ govukTaskList({
           idPrefix: "sharing-task-list",

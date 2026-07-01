@@ -9,6 +9,7 @@ import { validateErrors } from '~/tests/integration/shared/expect-utils.js'
 import { makePostRequest } from '~/src/server/test-helpers/server-requests.js'
 import { statusCodes } from '~/src/server/common/constants/status-codes.js'
 import { FEES_TERMS_AND_CONDITIONS_URL } from '~/src/server/marine-licence/fee-estimate/controller.js'
+import { mockMarineLicenceApplication } from '~/src/server/test-helpers/mocks/marine-licence-mocks.js'
 
 describe('Fee estimate', () => {
   const getServer = setupTestServer()
@@ -58,10 +59,10 @@ describe('Fee estimate', () => {
     })
 
     expect(
-      getByText(document, 'Your application fee band: 2A')
+      getByText(document, /Your application fee band: 2A/)
     ).toBeInTheDocument()
     expect(
-      getByText(document, 'Your application fee will not exceed £1,400')
+      getByText(document, /Your application fee will not exceed £1,400/)
     ).toBeInTheDocument()
     expect(
       getByText(document, (content) =>
@@ -158,7 +159,7 @@ describe('Fee estimate', () => {
     expect(getByRole(document, 'radio', { name: 'No' })).not.toBeChecked()
   })
 
-  test('form fields are pre-populated from cache', async () => {
+  test('form fields are pre-populated from cache when accept is yes', async () => {
     mockMarineLicence({
       ...marineLicence,
       feeEstimate: {
@@ -167,6 +168,47 @@ describe('Fee estimate', () => {
         feeBand: '2A'
       }
     })
+
+    const document = await loadPage({
+      requestUrl: marineLicenceRoutes.MARINE_LICENCE_FEE_ESTIMATE,
+      server: getServer()
+    })
+
+    expect(
+      getByRole(document, 'checkbox', {
+        name: 'I agree to the terms and conditions'
+      })
+    ).toBeChecked()
+    expect(getByRole(document, 'radio', { name: 'Yes' })).toBeChecked()
+    expect(getByRole(document, 'radio', { name: 'No' })).not.toBeChecked()
+  })
+
+  test('form fields are pre-populated from cache when accept is no', async () => {
+    mockMarineLicence({
+      ...marineLicence,
+      feeEstimate: {
+        termsAndConditions: 'true',
+        accept: 'no',
+        feeBand: '2A'
+      }
+    })
+
+    const document = await loadPage({
+      requestUrl: marineLicenceRoutes.MARINE_LICENCE_FEE_ESTIMATE,
+      server: getServer()
+    })
+
+    expect(
+      getByRole(document, 'checkbox', {
+        name: 'I agree to the terms and conditions'
+      })
+    ).toBeChecked()
+    expect(getByRole(document, 'radio', { name: 'Yes' })).not.toBeChecked()
+    expect(getByRole(document, 'radio', { name: 'No' })).toBeChecked()
+  })
+
+  test('form fields are pre-populated using mockMarineLicenceApplication', async () => {
+    mockMarineLicence(mockMarineLicenceApplication)
 
     const document = await loadPage({
       requestUrl: marineLicenceRoutes.MARINE_LICENCE_FEE_ESTIMATE,

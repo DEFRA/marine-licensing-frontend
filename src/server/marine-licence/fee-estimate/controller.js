@@ -6,7 +6,10 @@ import {
   errorDescriptionByFieldName,
   mapErrorsForDisplay
 } from '#src/server/common/helpers/errors.js'
-import { apiRoutes, marineLicenceRoutes } from '#src/server/common/constants/routes.js'
+import {
+  apiRoutes,
+  marineLicenceRoutes
+} from '#src/server/common/constants/routes.js'
 import { authenticatedPatchRequest } from '#src/server/common/helpers/authenticated-requests.js'
 import joi from 'joi'
 
@@ -14,6 +17,9 @@ export const FEE_ESTIMATE_VIEW_ROUTE = 'marine-licence/fee-estimate/index'
 
 export const FEES_TERMS_AND_CONDITIONS_URL =
   'https://assets.publishing.service.gov.uk/media/63567839e90e0777b38c5d02/FEES_Terms_and_Conditions.pdf'
+
+export const FEES_URL =
+  'https://www.gov.uk/government/publications/marine-licensing-fees'
 
 export const errorMessages = {
   FEE_ESTIMATE_TERMS_AND_CONDITIONS_REQUIRED:
@@ -30,13 +36,16 @@ export const feeEstimateController = {
   async handler(request, h) {
     const marineLicence = getMarineLicenceCache(request)
 
+    const { feeEstimate = {} } = marineLicence
+
     return h.view(FEE_ESTIMATE_VIEW_ROUTE, {
       ...feeEstimateSettings,
       projectName: marineLicence.projectName,
       feesTermsAndConditionsUrl: FEES_TERMS_AND_CONDITIONS_URL,
+      feesUrl: FEES_URL,
       payload: {
-        termsAndConditions: marineLicence.feeEstimate?.termsAndConditions,
-        accept: marineLicence.feeEstimate?.accept,
+        termsAndConditions: feeEstimate.termsAndConditions,
+        accept: feeEstimate.accept,
         feeBand: '2A'
       },
       backLink: marineLicenceRoutes.MARINE_LICENCE_TASK_LIST
@@ -49,8 +58,7 @@ export const feeEstimateSubmitController = {
     validate: {
       payload: joi.object({
         termsAndConditions: joi.valid('true').required().messages({
-          'any.only':
-            errorMessages.FEE_ESTIMATE_TERMS_AND_CONDITIONS_REQUIRED,
+          'any.only': errorMessages.FEE_ESTIMATE_TERMS_AND_CONDITIONS_REQUIRED,
           'any.required':
             errorMessages.FEE_ESTIMATE_TERMS_AND_CONDITIONS_REQUIRED
         }),
@@ -72,6 +80,7 @@ export const feeEstimateSubmitController = {
               payload,
               projectName,
               feesTermsAndConditionsUrl: FEES_TERMS_AND_CONDITIONS_URL,
+              feesUrl: FEES_URL,
               backLink: marineLicenceRoutes.MARINE_LICENCE_TASK_LIST
             })
             .takeover()
@@ -86,6 +95,7 @@ export const feeEstimateSubmitController = {
             payload,
             projectName,
             feesTermsAndConditionsUrl: FEES_TERMS_AND_CONDITIONS_URL,
+            feesUrl: FEES_URL,
             backLink: marineLicenceRoutes.MARINE_LICENCE_TASK_LIST,
             errors,
             errorSummary
@@ -132,6 +142,7 @@ export const feeEstimateSubmitController = {
         payload,
         projectName: marineLicence.projectName,
         feesTermsAndConditionsUrl: FEES_TERMS_AND_CONDITIONS_URL,
+        feesUrl: FEES_URL,
         backLink: marineLicenceRoutes.MARINE_LICENCE_TASK_LIST,
         errors,
         errorSummary

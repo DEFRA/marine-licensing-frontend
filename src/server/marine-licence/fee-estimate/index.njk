@@ -41,7 +41,7 @@
 
       <p class="govuk-body">Post-consent monitoring is the process of ensuring conditions are complied with after a marine licence is granted, which could involve an inspection.</p>
 
-      <p class="govuk-body"><a href="https://www.gov.uk/government/publications/marine-licensing-fees" rel="noreferrer noopener" target="_blank">Find out more about MMO charges (opens in new tab)</a>.</p>
+      <p class="govuk-body"><a href="{{ feesUrl }}" rel="noreferrer noopener" target="_blank">Find out more about MMO charges (opens in new tab)</a>.</p>
 
       <form method="POST">
         <input type="hidden" name="csrfToken" value="{{ csrfToken }}" />
@@ -58,7 +58,7 @@
             {
               value: "true",
               text: "I agree to the terms and conditions",
-              checked: payload.termsAndConditions === 'true'
+              checked: payload.termsAndConditions
             }
           ]
         }) }}

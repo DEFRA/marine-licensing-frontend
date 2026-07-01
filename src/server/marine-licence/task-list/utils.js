@@ -21,6 +21,15 @@ const setStatus = (task) => {
     }
   }
 
+  if (task === 'NOT_ACCEPTED') {
+    return {
+      tag: {
+        text: 'Not accepted',
+        classes: 'govuk-tag--red'
+      }
+    }
+  }
+
   return {
     text: 'Completed'
   }
@@ -117,5 +126,13 @@ export const transformWaterFrameworkDirectiveTaskList = (
         ? marineLicenceRoutes.MARINE_LICENCE_WATER_FRAMEWORK_DIRECTIVE_BEFORE_YOU_START
         : getWaterFrameworkDirectiveHref(waterFrameworkDirective),
     status: setStatus(taskList.waterFrameworkDirective)
+  }
+]
+
+export const transformFeeEstimateTaskList = (taskList) => [
+  {
+    title: { text: 'Fee estimate', classes: taskClasses },
+    href: marineLicenceRoutes.MARINE_LICENCE_FEE_ESTIMATE,
+    status: setStatus(taskList.feeEstimate)
   }
 ]

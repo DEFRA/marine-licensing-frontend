@@ -171,7 +171,7 @@ describe('#taskListController', () => {
       }
     ]
 
-    getMarineLicenceCacheMock.mockReturnValue(mockMarineLicence)
+    getMarineLicenceCacheMock.mockReturnValue(mockMarineLicenceApplication)
     authenticatedGetRequestMock.mockResolvedValue({
       payload: mockPayload
     })
@@ -200,7 +200,9 @@ describe('#taskListController', () => {
     vi.mocked(transformMarinePlanPoliciesTaskList).mockReturnValue(
       mockMarinePlanPoliciesTaskList
     )
-    vi.mocked(setMarineLicenceCache).mockResolvedValue(mockMarineLicence)
+    vi.mocked(setMarineLicenceCache).mockResolvedValue(
+      mockMarineLicenceApplication
+    )
 
     authUtils.getUserSession.mockResolvedValue({
       userRelationshipType: 'CITIZEN'

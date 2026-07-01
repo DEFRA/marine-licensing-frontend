@@ -100,7 +100,8 @@ export const marineLicenceRoutes = {
   MARINE_LICENCE_WATER_FRAMEWORK_DIRECTIVE_REVIEW_YOUR_ANSWERS:
     '/marine-licence/water-framework-directive-review-your-answers',
   MARINE_LICENCE_CALCULATE_MARINE_PLAN_POLICIES:
-    '/marine-licence/calculate-marine-plan-policies'
+    '/marine-licence/calculate-marine-plan-policies',
+  MARINE_LICENCE_MARINE_PLAN_POLICIES: '/marine-licence/marine-plan-policies'
 }
 
 export const defraIdGuidanceRoutes = {

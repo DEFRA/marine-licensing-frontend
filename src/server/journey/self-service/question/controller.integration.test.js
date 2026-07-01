@@ -395,7 +395,7 @@ describe('#questionController (integration)', () => {
       expect(backLink.getAttribute('href')).toBe(getUrl())
     })
 
-    test('returning to the multi-select page renders no checked checkboxes (AC5)', async () => {
+    test('returning to the multi-select page pre-selects the previously ticked checkboxes', async () => {
       const { response: postResponse } = await postPage(getUrl(), {
         answers: ['SCAFFOLDING_ACCESS_TOWERS', 'REPAINTING_STRUCTURES']
       })
@@ -403,10 +403,12 @@ describe('#questionController (integration)', () => {
       const headers = getSessionCookie(postResponse)
 
       const { document } = await getPage(getUrl(), headers)
-      const checkedBoxes = document.querySelectorAll(
-        'input[type="checkbox"][checked]'
-      )
-      expect(checkedBoxes.length).toBe(0)
+      const checkedValues = Array.from(
+        document.querySelectorAll('input[type="checkbox"][checked]')
+      ).map((el) => el.getAttribute('value'))
+      expect(checkedValues).toHaveLength(2)
+      expect(checkedValues).toContain('SCAFFOLDING_ACCESS_TOWERS')
+      expect(checkedValues).toContain('REPAINTING_STRUCTURES')
     })
   })
 })

@@ -20,9 +20,6 @@ export function ctaLabelFor(outcomeType) {
   if (outcomeType.overrideCtaButtonText) {
     return outcomeType.overrideCtaButtonText
   }
-  if (outcomeType.link) {
-    return 'Download'
-  }
   if (outcomeType.module) {
     return outcomeType.heading || 'Continue'
   }
@@ -43,9 +40,7 @@ function continueUrlFor(slug, outcomeRoute, outcomeType) {
 }
 
 function ctaHrefFor(slug, outcomeRoute, outcomeType) {
-  return (
-    continueUrlFor(slug, outcomeRoute, outcomeType) ?? outcomeType.link ?? null
-  )
+  return continueUrlFor(slug, outcomeRoute, outcomeType)
 }
 
 export function buildIntermediateView(baseModel, outcome, types) {
@@ -58,6 +53,7 @@ export function buildIntermediateView(baseModel, outcome, types) {
       heading: ot.heading,
       text: ot.text,
       isTerminal: !ot.nextQuestionRoute,
+      link: ot.link ?? null,
       ctaLabel: ctaLabelFor(ot),
       ctaHref: ctaHrefFor(baseModel.slug, baseModel.outcomeRoute, ot),
       viewAnswersUrl: viewAnswersUrlFor(
@@ -73,6 +69,8 @@ export function buildTerminalSingleView(baseModel, terminalType) {
   return {
     ...baseModel,
     body: terminalType.text,
+    link: terminalType.link ?? null,
+    linkText: terminalType.heading ?? '',
     ctaLabel: ctaLabelFor(terminalType),
     ctaHref: ctaHrefFor(baseModel.slug, baseModel.outcomeRoute, terminalType),
     viewAnswersUrl: viewAnswersUrlFor(
@@ -119,6 +117,7 @@ export function buildTerminalMultiView(baseModel, types) {
       id: ot.id,
       heading: ot.heading,
       text: ot.text,
+      link: ot.link ?? null,
       ctaLabel: ctaLabelFor(ot),
       ctaHref: ctaHrefFor(baseModel.slug, baseModel.outcomeRoute, ot),
       viewAnswersUrl: viewAnswersUrlFor(

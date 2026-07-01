@@ -89,13 +89,9 @@ describe('#iatStartController (integration)', () => {
     }
   })
 
-  test('Renders a CSP-compliant browser-history back link', async () => {
+  test('Does not render a back link (start is the journey entry point)', async () => {
     const { document } = await getPage()
-    const backLink = document.querySelector('.govuk-back-link')
-    expect(backLink).not.toBeNull()
-    expect(backLink.getAttribute('href')).not.toMatch(/^javascript:/)
-    expect(backLink.getAttribute('data-module')).toBe('app-back-link-history')
-    expect(backLink.getAttribute('style')).toBeNull()
+    expect(document.querySelector('.govuk-back-link')).toBeNull()
   })
 
   test('Renders a "Start now" button inside a POST form', async () => {

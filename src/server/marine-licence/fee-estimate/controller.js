@@ -11,7 +11,8 @@ import {
   marineLicenceRoutes
 } from '#src/server/common/constants/routes.js'
 import { authenticatedPatchRequest } from '#src/server/common/helpers/authenticated-requests.js'
-import joi from 'joi'
+import { feeEstimateSchema } from '#src/server/common/validation/fee-estimate/schema.js'
+import { feeEstimateErrorMessages } from '#src/server/common/validation/fee-estimate/constants.js'
 
 export const FEE_ESTIMATE_VIEW_ROUTE = 'marine-licence/fee-estimate/index'
 
@@ -21,11 +22,7 @@ export const FEES_TERMS_AND_CONDITIONS_URL =
 export const FEES_URL =
   'https://www.gov.uk/government/publications/marine-licensing-fees'
 
-export const errorMessages = {
-  FEE_ESTIMATE_TERMS_AND_CONDITIONS_REQUIRED:
-    'You need to agree to the terms and conditions',
-  FEE_ESTIMATE_ACCEPT_REQUIRED: 'Select if you accept the fee estimate'
-}
+export const errorMessages = feeEstimateErrorMessages
 
 const feeEstimateSettings = {
   pageTitle: 'Fee estimate',
@@ -56,19 +53,7 @@ export const feeEstimateController = {
 export const feeEstimateSubmitController = {
   options: {
     validate: {
-      payload: joi.object({
-        termsAndConditions: joi.valid('true').required().messages({
-          'any.only': errorMessages.FEE_ESTIMATE_TERMS_AND_CONDITIONS_REQUIRED,
-          'any.required':
-            errorMessages.FEE_ESTIMATE_TERMS_AND_CONDITIONS_REQUIRED
-        }),
-        accept: joi.string().valid('yes', 'no').required().messages({
-          'string.empty': errorMessages.FEE_ESTIMATE_ACCEPT_REQUIRED,
-          'any.required': errorMessages.FEE_ESTIMATE_ACCEPT_REQUIRED,
-          'any.only': errorMessages.FEE_ESTIMATE_ACCEPT_REQUIRED
-        }),
-        feeBand: joi.string().valid('2A').required()
-      }),
+      payload: feeEstimateSchema,
       failAction: (request, h, err) => {
         const { payload } = request
         const { projectName } = getMarineLicenceCache(request)
@@ -124,6 +109,12 @@ export const feeEstimateSubmitController = {
           feeBand: payload.feeBand
         }
       })
+
+      if (payload.accept === 'no') {
+        return h.redirect(
+          marineLicenceRoutes.MARINE_LICENCE_FEE_ESTIMATE_ARE_YOU_SURE
+        )
+      }
 
       return h.redirect(marineLicenceRoutes.MARINE_LICENCE_TASK_LIST)
     } catch (e) {

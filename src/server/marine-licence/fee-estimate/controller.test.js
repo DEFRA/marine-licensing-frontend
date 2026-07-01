@@ -7,7 +7,8 @@ import {
   feeEstimateController,
   feeEstimateSubmitController,
   FEE_ESTIMATE_VIEW_ROUTE,
-  FEES_TERMS_AND_CONDITIONS_URL
+  FEES_TERMS_AND_CONDITIONS_URL,
+  FEES_URL
 } from '#src/server/marine-licence/fee-estimate/controller.js'
 import * as cacheUtils from '#src/server/common/helpers/marine-licence/session-cache/utils.js'
 import * as authRequests from '#src/server/common/helpers/authenticated-requests.js'
@@ -42,6 +43,7 @@ describe('#feeEstimate', () => {
         pageTitle: 'Fee estimate',
         heading: 'Fee estimate',
         projectName: mockLicence.projectName,
+        feesUrl: FEES_URL,
         feesTermsAndConditionsUrl: FEES_TERMS_AND_CONDITIONS_URL,
         payload: {
           termsAndConditions: undefined,
@@ -67,6 +69,7 @@ describe('#feeEstimate', () => {
         pageTitle: 'Fee estimate',
         heading: 'Fee estimate',
         projectName: mockLicence.projectName,
+        feesUrl: FEES_URL,
         feesTermsAndConditionsUrl: FEES_TERMS_AND_CONDITIONS_URL,
         payload: {
           termsAndConditions: 'true',
@@ -115,6 +118,34 @@ describe('#feeEstimate', () => {
       )
       expect(h.redirect).toHaveBeenCalledWith(
         marineLicenceRoutes.MARINE_LICENCE_TASK_LIST
+      )
+    })
+
+    test('should save to cache and redirect to are you sure page when accept is no', async () => {
+      const h = { redirect: vi.fn(), view: vi.fn() }
+      const request = {
+        payload: {
+          ...validPayload,
+          accept: 'no'
+        }
+      }
+
+      await feeEstimateSubmitController.handler(request, h)
+
+      expect(cacheUtils.setMarineLicenceCache).toHaveBeenCalledWith(
+        request,
+        h,
+        {
+          ...mockLicence,
+          feeEstimate: {
+            termsAndConditions: 'true',
+            accept: 'no',
+            feeBand: '2A'
+          }
+        }
+      )
+      expect(h.redirect).toHaveBeenCalledWith(
+        marineLicenceRoutes.MARINE_LICENCE_FEE_ESTIMATE_ARE_YOU_SURE
       )
     })
 
@@ -175,6 +206,7 @@ describe('#feeEstimate', () => {
           pageTitle: 'Fee estimate',
           heading: 'Fee estimate',
           projectName: mockLicence.projectName,
+          feesUrl: FEES_URL,
           feesTermsAndConditionsUrl: FEES_TERMS_AND_CONDITIONS_URL,
           backLink: marineLicenceRoutes.MARINE_LICENCE_TASK_LIST,
           payload,

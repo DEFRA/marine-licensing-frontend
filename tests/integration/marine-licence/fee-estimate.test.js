@@ -302,4 +302,23 @@ describe('Fee estimate', () => {
       marineLicenceRoutes.MARINE_LICENCE_TASK_LIST
     )
   })
+
+  test('should redirect to are you sure page when accept is no', async () => {
+    mockMarineLicence(marineLicence)
+
+    const response = await makePostRequest({
+      url: marineLicenceRoutes.MARINE_LICENCE_FEE_ESTIMATE,
+      server: getServer(),
+      formData: {
+        termsAndConditions: 'true',
+        accept: 'no',
+        feeBand: '2A'
+      }
+    })
+
+    expect(response.statusCode).toBe(statusCodes.redirect)
+    expect(response.headers.location).toBe(
+      marineLicenceRoutes.MARINE_LICENCE_FEE_ESTIMATE_ARE_YOU_SURE
+    )
+  })
 })

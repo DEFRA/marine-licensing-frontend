@@ -191,7 +191,19 @@ describe('#reviewSiteDetails', () => {
       )
     })
 
-    test('should redirect to task list when no addActivity in payload', async () => {
+    test('should redirect to task list when siteDetails is not COMPLETED', async () => {
+      getMarineLicenceCacheSpy.mockReturnValueOnce({
+        id: 'test-id',
+        siteDetails: []
+      })
+      vi.spyOn(marineLicenceService, 'getMarineLicenceService').mockReturnValue(
+        {
+          getMarineLicenceById: vi
+            .fn()
+            .mockResolvedValue({ taskList: { siteDetails: 'IN_PROGRESS' } })
+        }
+      )
+
       const h = createMockHandler('redirect')
       const request = createMockRequest({ payload: {} })
 
@@ -199,6 +211,39 @@ describe('#reviewSiteDetails', () => {
 
       expect(h.redirect).toHaveBeenCalledWith(
         marineLicenceRoutes.MARINE_LICENCE_TASK_LIST
+      )
+    })
+
+    test('should call calculate-marine-plan-policies API and redirect to spinner when siteDetails is COMPLETED', async () => {
+      getMarineLicenceCacheSpy.mockReturnValueOnce({
+        id: 'test-id',
+        siteDetails: []
+      })
+      vi.spyOn(marineLicenceService, 'getMarineLicenceService').mockReturnValue(
+        {
+          getMarineLicenceById: vi
+            .fn()
+            .mockResolvedValue({ taskList: { siteDetails: 'COMPLETED' } })
+        }
+      )
+      vi.mocked(
+        authenticatedRequests.authenticatedPostRequest
+      ).mockResolvedValue({})
+
+      const h = createMockHandler('redirect')
+      const request = createMockRequest({ payload: {} })
+
+      await reviewSiteDetailsSubmitController.handler(request, h)
+
+      expect(
+        vi.mocked(authenticatedRequests.authenticatedPostRequest)
+      ).toHaveBeenCalledWith(
+        request,
+        apiRoutes.CALCULATE_MARINE_PLAN_POLICIES,
+        JSON.stringify({ id: 'test-id' })
+      )
+      expect(h.redirect).toHaveBeenCalledWith(
+        marineLicenceRoutes.MARINE_LICENCE_CALCULATE_MARINE_PLAN_POLICIES
       )
     })
 

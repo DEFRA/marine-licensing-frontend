@@ -140,7 +140,9 @@ pair are tracked as **separate** dedup keys and will both fire once.
 
 ## Log shape
 
-Every line produced by this module goes through `buildEvent`, which yields:
+Every line produced by this module is logged with an `event` object whose
+contents come from `buildEvent` (the `event:` wrapper is added by the callers
+`reportLoadTimeIssue` / `emitRuntime`, not by `buildEvent` itself):
 
 ```js
 {

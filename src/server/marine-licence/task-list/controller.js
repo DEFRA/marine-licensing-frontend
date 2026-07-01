@@ -11,7 +11,8 @@ import {
   transformSiteDetailsTaskList,
   transformOtherPermissionsTaskList,
   transformSharingTaskList,
-  transformWaterFrameworkDirectiveTaskList
+  transformWaterFrameworkDirectiveTaskList,
+  transformMarinePlanPoliciesTaskList
 } from '#src/server/marine-licence/task-list/utils.js'
 import { authenticatedGetRequest } from '#src/server/common/helpers/authenticated-requests.js'
 import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
@@ -31,7 +32,11 @@ const taskListViewSettings = {
   heading: headingText
 }
 
-function transformTaskLists(taskList, isCitizen, { waterFrameworkDirective }) {
+function transformTaskLists(
+  taskList,
+  isCitizen,
+  { waterFrameworkDirective, marinePlanPolicyJob, marinePlanPoliciesCount }
+) {
   return {
     feeEstimate: transformFeeEstimateTaskList(taskList),
     otherPermissions: transformOtherPermissionsTaskList(taskList, isCitizen),
@@ -41,7 +46,11 @@ function transformTaskLists(taskList, isCitizen, { waterFrameworkDirective }) {
     waterFrameworkDirective: transformWaterFrameworkDirectiveTaskList(
       taskList,
       waterFrameworkDirective
-    )
+    ),
+    marinePlanPolicies: transformMarinePlanPoliciesTaskList(taskList, {
+      marinePlanPolicyJob,
+      marinePlanPoliciesCount
+    })
   }
 }
 
@@ -99,13 +108,19 @@ export const taskListController = {
       request,
       `/marine-licence/${id}`
     )
-    const { taskList, projectName, waterFrameworkDirective } = payload.value
+    const {
+      taskList,
+      projectName,
+      waterFrameworkDirective,
+      marinePlanPolicyJob,
+      marinePlanPoliciesCount
+    } = payload.value
     const { userRelationshipType } = userSession
 
     const transformed = transformTaskLists(
       taskList,
       userRelationshipType === USER_TYPES.CITIZEN,
-      { waterFrameworkDirective }
+      { waterFrameworkDirective, marinePlanPolicyJob, marinePlanPoliciesCount }
     )
 
     await updateLicenceSession(request, h, payload.value, hasCancel)
@@ -128,6 +143,7 @@ export const taskListController = {
       siteDetailsTaskList: transformed.siteDetails,
       waterFrameworkDirectiveTaskList: transformed.waterFrameworkDirective,
       feeEstimateTaskList: transformed.feeEstimate,
+      marinePlanPoliciesTaskList: transformed.marinePlanPolicies,
       hasCompletedAllTasks
     })
   }

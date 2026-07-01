@@ -3,7 +3,8 @@ import {
   transformSiteDetailsTaskList,
   transformOtherPermissionsTaskList,
   transformSharingTaskList,
-  transformWaterFrameworkDirectiveTaskList
+  transformWaterFrameworkDirectiveTaskList,
+  transformMarinePlanPoliciesTaskList
 } from '#src/server/marine-licence/task-list/utils.js'
 import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
 
@@ -447,6 +448,86 @@ describe('taskList utils', () => {
             title: {
               classes: 'govuk-link--no-visited-state',
               text: 'Sharing your project information publicly'
+            }
+          }
+        ])
+      }
+    )
+  })
+
+  describe('transformMarinePlanPoliciesTaskList', () => {
+    test('returns linked "Not yet started" row when sites completed and job ready', () => {
+      expect(
+        transformMarinePlanPoliciesTaskList(
+          { siteDetails: 'COMPLETED' },
+          { marinePlanPolicyJob: 'ready', marinePlanPoliciesCount: 44 }
+        )
+      ).toEqual([
+        {
+          title: {
+            text: 'Marine plan policy considerations (44 to complete)',
+            classes: 'govuk-link--no-visited-state'
+          },
+          href: marineLicenceRoutes.MARINE_LICENCE_TASK_LIST,
+          status: {
+            tag: { text: 'Not yet started', classes: 'govuk-tag--blue' }
+          }
+        }
+      ])
+    })
+
+    test('uses marinePlanPoliciesCount for the count suffix', () => {
+      const [task] = transformMarinePlanPoliciesTaskList(
+        { siteDetails: 'COMPLETED' },
+        { marinePlanPolicyJob: 'ready', marinePlanPoliciesCount: 7 }
+      )
+
+      expect(task.title.text).toBe(
+        'Marine plan policy considerations (7 to complete)'
+      )
+    })
+
+    test('omits the count suffix when count is not a number', () => {
+      expect(
+        transformMarinePlanPoliciesTaskList(
+          { siteDetails: 'COMPLETED' },
+          { marinePlanPolicyJob: 'ready', marinePlanPoliciesCount: undefined }
+        )
+      ).toEqual([
+        {
+          title: {
+            text: 'Marine plan policy considerations',
+            classes: 'govuk-link--no-visited-state'
+          },
+          href: marineLicenceRoutes.MARINE_LICENCE_TASK_LIST,
+          status: {
+            tag: { text: 'Not yet started', classes: 'govuk-tag--blue' }
+          }
+        }
+      ])
+    })
+
+    test.each([
+      ['INCOMPLETE', 'ready'],
+      ['IN_PROGRESS', 'ready'],
+      ['COMPLETED', undefined],
+      ['COMPLETED', 'pending'],
+      ['COMPLETED', 'failed'],
+      [undefined, undefined]
+    ])(
+      'returns "Cannot start yet" (no link) when siteDetails=%s and job=%s',
+      (siteDetails, marinePlanPolicyJob) => {
+        expect(
+          transformMarinePlanPoliciesTaskList(
+            { siteDetails },
+            { marinePlanPolicyJob, marinePlanPoliciesCount: 44 }
+          )
+        ).toEqual([
+          {
+            title: { text: 'Marine plan policy considerations' },
+            status: {
+              text: 'Cannot start yet',
+              classes: 'govuk-task-list__status--cannot-start-yet'
             }
           }
         ])

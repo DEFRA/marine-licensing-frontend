@@ -2,6 +2,7 @@ import { JSDOM } from 'jsdom'
 import { marineLicenceRoutes } from '~/src/server/common/constants/routes.js'
 import { statusCodes } from '~/src/server/common/constants/status-codes.js'
 import { testScenarios } from './marine-licence-fixtures/file-upload-fixtures.js'
+import { mockMarineLicenceTaskList } from '~/src/server/test-helpers/mocks/marine-licence-mocks.js'
 import {
   getRowByKey,
   validateActionLink,
@@ -87,6 +88,14 @@ describe('ML Review Site Details - File Upload Integration Tests', () => {
   describe('Form Submission', () => {
     test('should redirect to task list on form submission', async () => {
       mockMarineLicence(testScenarios[0].marineLicence)
+      vi.mocked(
+        marineLicenceService.getMarineLicenceService
+      ).mockReturnValueOnce({
+        getMarineLicenceById: vi.fn().mockResolvedValue({
+          ...testScenarios[0].marineLicence,
+          taskList: { ...mockMarineLicenceTaskList, siteDetails: 'IN_PROGRESS' }
+        })
+      })
 
       const response = await makePostRequest({
         url: marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS,

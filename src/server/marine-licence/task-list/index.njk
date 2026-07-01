@@ -22,6 +22,17 @@
           items: siteDetailsTaskList
         }) }}
 
+      <h2 class="govuk-heading-m">Marine plan policies</h2>
+      <p class="govuk-body">
+        Read the
+        <a class="govuk-link" href="#" target="_blank" rel="noopener noreferrer">Marine plan policies guidance (opens in new tab)</a>
+        before you start.
+      </p>
+      {{ govukTaskList({
+          idPrefix: "marine-plan-policies-task-list",
+          items: marinePlanPoliciesTaskList
+        }) }}
+
         <h2 class="govuk-heading-m">Water Framework Directive</h2>
         {{ govukTaskList({
             idPrefix: "water-framework-task-list",

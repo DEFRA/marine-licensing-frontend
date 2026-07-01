@@ -101,7 +101,9 @@ export const marineLicenceRoutes = {
     '/marine-licence/water-framework-directive-review-your-answers',
   MARINE_LICENCE_FEE_ESTIMATE: '/marine-licence/fee-estimate',
   MARINE_LICENCE_FEE_ESTIMATE_ARE_YOU_SURE:
-    '/marine-licence/fee-estimate-are-you-sure'
+    '/marine-licence/fee-estimate-are-you-sure',
+  MARINE_LICENCE_CALCULATE_MARINE_PLAN_POLICIES:
+    '/marine-licence/calculate-marine-plan-policies'
 }
 
 export const defraIdGuidanceRoutes = {
@@ -180,5 +182,7 @@ export const apiRoutes = {
     '/marine-licence/{marineLicenceId}/generate-coordinates-csv',
   UPDATE_FEE_ESTIMATE: '/marine-licence/fee-estimate',
   UPDATE_PREFERRED_DATES: '/marine-licence/preferred-dates',
-  UPDATE_WATER_FRAMEWORK_DIRECTIVE: '/marine-licence/water-framework-directive'
+  UPDATE_WATER_FRAMEWORK_DIRECTIVE: '/marine-licence/water-framework-directive',
+  CALCULATE_MARINE_PLAN_POLICIES:
+    '/marine-licence/calculate-marine-plan-policies'
 }

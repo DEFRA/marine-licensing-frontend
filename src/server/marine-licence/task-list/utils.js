@@ -112,6 +112,42 @@ const getWaterFrameworkDirectiveHref = (waterFrameworkDirective) => {
   return marineLicenceRoutes.MARINE_LICENCE_WATER_FRAMEWORK_DIRECTIVE_NAUTICAL_MILE
 }
 
+export const transformMarinePlanPoliciesTaskList = (
+  taskList,
+  { marinePlanPolicyJob, marinePlanPoliciesCount }
+) => {
+  const isAvailable =
+    taskList.siteDetails === 'COMPLETED' && marinePlanPolicyJob === 'ready'
+
+  if (!isAvailable) {
+    return [
+      {
+        title: { text: 'Marine plan policy considerations' },
+        status: {
+          text: 'Cannot start yet',
+          classes: 'govuk-task-list__status--cannot-start-yet'
+        }
+      }
+    ]
+  }
+
+  const countSuffix =
+    typeof marinePlanPoliciesCount === 'number'
+      ? ` (${marinePlanPoliciesCount} to complete)`
+      : ''
+
+  return [
+    {
+      title: {
+        text: `Marine plan policy considerations${countSuffix}`,
+        classes: taskClasses
+      },
+      href: marineLicenceRoutes.MARINE_LICENCE_TASK_LIST,
+      status: { tag: { text: 'Not yet started', classes: 'govuk-tag--blue' } }
+    }
+  ]
+}
+
 export const transformWaterFrameworkDirectiveTaskList = (
   taskList,
   waterFrameworkDirective

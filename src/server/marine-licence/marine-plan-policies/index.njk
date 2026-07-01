@@ -16,7 +16,9 @@
 {% block content %}
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
-      <span class="govuk-caption-l">{{ projectName }}</span>
+      {% if projectName %}
+        <span class="govuk-caption-l">{{ projectName }}</span>
+      {% endif %}
       <h1 class="govuk-heading-l">{{ heading }}</h1>
 
       <p class="govuk-body">The policies listed are based on the information you entered in Site and activity details. You must consider every policy listed before you can send your information. If you cannot finish now, you can return to this page later.</p>

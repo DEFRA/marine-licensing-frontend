@@ -16,6 +16,9 @@ const toPolicyRow = (policy) => ({
 const sortByPolicyCode = (policies) =>
   [...policies].sort((a, b) => a.policyCode.localeCompare(b.policyCode))
 
+const buildPoliciesCountText = (count) =>
+  count === 1 ? '1 policy to complete' : `${count} policies to complete`
+
 export const marinePlanPoliciesController = {
   async handler(request, h) {
     const marineLicence = getMarineLicenceCache(request)
@@ -34,7 +37,7 @@ export const marinePlanPoliciesController = {
       pageTitle: HEADING,
       heading: HEADING,
       projectName,
-      marinePlanPoliciesCount,
+      policiesCountText: buildPoliciesCountText(marinePlanPoliciesCount),
       backLink: marineLicenceRoutes.MARINE_LICENCE_TASK_LIST,
       taskListLink: marineLicenceRoutes.MARINE_LICENCE_TASK_LIST,
       policies

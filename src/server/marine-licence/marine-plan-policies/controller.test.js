@@ -50,7 +50,7 @@ describe('#marinePlanPoliciesController', () => {
       pageTitle: 'Marine plan policies',
       heading: 'Marine plan policies',
       projectName: 'Test Project',
-      marinePlanPoliciesCount: 3,
+      policiesCountText: '3 policies to complete',
       backLink: marineLicenceRoutes.MARINE_LICENCE_TASK_LIST,
       taskListLink: marineLicenceRoutes.MARINE_LICENCE_TASK_LIST,
       policies: [
@@ -91,7 +91,30 @@ describe('#marinePlanPoliciesController', () => {
 
     expect(h.view).toHaveBeenCalledWith(
       MARINE_PLAN_POLICIES_VIEW_ROUTE,
-      expect.objectContaining({ policies: [], marinePlanPoliciesCount: 0 })
+      expect.objectContaining({
+        policies: [],
+        policiesCountText: '0 policies to complete'
+      })
+    )
+  })
+
+  test('uses singular wording when there is exactly one policy', async () => {
+    vi.mocked(marineLicenceService.getMarineLicenceService).mockReturnValueOnce(
+      {
+        getMarineLicenceById: vi.fn().mockResolvedValue({
+          projectName: 'Test Project',
+          marinePlanPoliciesCount: 1,
+          marinePlanPolicies: [{ policyCode: 'SW-AGG-2' }]
+        })
+      }
+    )
+    const h = { view: vi.fn() }
+
+    await marinePlanPoliciesController.handler(mockRequest, h)
+
+    expect(h.view).toHaveBeenCalledWith(
+      MARINE_PLAN_POLICIES_VIEW_ROUTE,
+      expect.objectContaining({ policiesCountText: '1 policy to complete' })
     )
   })
 })

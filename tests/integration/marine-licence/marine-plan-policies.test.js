@@ -29,6 +29,18 @@ describe('Marine plan policies (policy list) page', () => {
     expect(document.body).toHaveTextContent('3 policies to complete')
   })
 
+  test('uses singular wording when there is exactly one policy', async () => {
+    mockMarineLicence({
+      ...mockMarineLicenceWithMarinePlanPolicies,
+      marinePlanPoliciesCount: 1,
+      marinePlanPolicies: [{ policyCode: 'SW-AGG-2' }]
+    })
+
+    const document = await loadPolicyListPage()
+
+    expect(document.body).toHaveTextContent('1 policy to complete')
+  })
+
   test('lists policy codes sorted alphabetically', async () => {
     const document = await loadPolicyListPage()
 

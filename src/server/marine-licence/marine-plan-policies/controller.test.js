@@ -81,8 +81,7 @@ describe('#marinePlanPoliciesController', () => {
       {
         getMarineLicenceById: vi.fn().mockResolvedValue({
           projectName: 'Test Project',
-          marinePlanPoliciesCount: 0,
-          marinePlanPolicies: []
+          marinePlanPoliciesCount: 0
         })
       }
     )

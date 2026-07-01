@@ -6,6 +6,8 @@ import { getMarineLicenceService } from '#src/services/marine-licence-service/in
 export const MARINE_PLAN_POLICIES_VIEW_ROUTE =
   'marine-licence/marine-plan-policies/index'
 
+const HEADING = 'Marine plan policies'
+
 const toPolicyRow = (policy) => ({
   title: { text: policy.policyCode },
   status: { tag: { text: 'Not yet started', classes: 'govuk-tag--blue' } }
@@ -29,8 +31,8 @@ export const marinePlanPoliciesController = {
     const policies = sortByPolicyCode(marinePlanPolicies ?? []).map(toPolicyRow)
 
     return h.view(MARINE_PLAN_POLICIES_VIEW_ROUTE, {
-      pageTitle: 'Marine plan policies',
-      heading: 'Marine plan policies',
+      pageTitle: HEADING,
+      heading: HEADING,
       projectName,
       marinePlanPoliciesCount,
       backLink: marineLicenceRoutes.MARINE_LICENCE_TASK_LIST,

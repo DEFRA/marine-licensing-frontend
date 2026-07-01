@@ -552,28 +552,49 @@ describe('GET terminal-multi', () => {
     expect(document.querySelectorAll('.app-iat-option')).toHaveLength(2)
   })
 
-  test('labels link outcomes "Download" and MCMS outcomes with their heading', async () => {
+  test('renders the link option as a text link (no Download button) and the module option as a button', async () => {
     const { document } = await getPage(journey.journeyUrl(MULTI_PATH))
     const cards = Array.from(document.querySelectorAll('.app-iat-option'))
-    const labels = cards.map((c) =>
-      c.querySelector('a.govuk-button')?.textContent.trim()
+    // card 0 = WO_DOWNLOAD_HA_AGREED_METHOD_TEMPLATE (link), card 1 = WO_STANDARD_TRACK_MLA (module)
+    expect(cards[0].querySelector('a.govuk-button')).toBeNull()
+    expect(cards[1].querySelector('a.govuk-button').textContent.trim()).toBe(
+      'Apply for a standard marine licence'
     )
-    expect(labels).toEqual(['Download', 'Apply for a standard marine licence'])
+    const allButtonLabels = Array.from(
+      document.querySelectorAll('a.govuk-button')
+    ).map((b) => b.textContent.trim())
+    expect(allButtonLabels).not.toContain('Download')
   })
 
-  test('each per-card CTA links to its destination (link → document, module → continue route)', async () => {
+  test('renders the link option as a govuk-link to the .docx (new tab, heading as anchor) and the module option as a continue button', async () => {
     const { document } = await getPage(journey.journeyUrl(MULTI_PATH))
-    const ctas = Array.from(
-      document.querySelectorAll(
-        '.app-iat-option a.govuk-button:not(.govuk-button--secondary)'
+    const cards = Array.from(document.querySelectorAll('.app-iat-option'))
+
+    const downloadLink = Array.from(
+      cards[0].querySelectorAll('a.govuk-link')
+    ).find((a) =>
+      a.textContent.includes(
+        'Download HA self-service marine licensing agreed method template'
       )
     )
-    expect(ctas.map((a) => a.getAttribute('href'))).toEqual([
-      'https://marinelicensing.marinemanagement.org.uk/docs/HA_MCA_TH_Self_Service_Agreed_Method_Template.docx',
+    expect(downloadLink).not.toBeNull()
+    expect(downloadLink.getAttribute('href')).toBe(
+      'https://marinelicensing.marinemanagement.org.uk/docs/HA_MCA_TH_Self_Service_Agreed_Method_Template.docx'
+    )
+    expect(downloadLink.getAttribute('target')).toBe('_blank')
+    expect(downloadLink.getAttribute('rel')).toBe('noopener noreferrer')
+    expect(downloadLink.textContent.replace(/\s+/g, ' ').trim()).toBe(
+      'Download HA self-service marine licensing agreed method template (opens in a new tab)'
+    )
+
+    const moduleCta = cards[1].querySelector(
+      'a.govuk-button:not(.govuk-button--secondary)'
+    )
+    expect(moduleCta.getAttribute('href')).toBe(
       journey.journeyUrl(
         '/continue/WO_STANDARD_TRACK_MLA/scaffolding-impede-navigation'
       )
-    ])
+    )
   })
 
   test('renders a per-option "View answers" link inside each option card', async () => {

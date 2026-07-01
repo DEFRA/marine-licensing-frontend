@@ -1,5 +1,6 @@
 {% from "govuk/components/button/macro.njk" import govukButton %}
 {% from "govuk/components/inset-text/macro.njk" import govukInsetText %}
+{% from "journey/self-service/outcome/_external-link.njk" import externalLink %}
 
 {% if section %}
   <span class="govuk-caption-l">{{ section.text }}</span>
@@ -21,7 +22,9 @@
 
     <div class="app-iat-option__actions">
       {% if option.isTerminal %}
-        {% if option.ctaHref %}
+        {% if option.link %}
+          {{ externalLink(option.link, option.heading) }}
+        {% elif option.ctaHref %}
           {{ govukButton({
             text: option.ctaLabel,
             href: option.ctaHref,

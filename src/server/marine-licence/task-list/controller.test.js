@@ -12,7 +12,8 @@ import {
   transformSiteDetailsTaskList,
   transformOtherPermissionsTaskList,
   transformSharingTaskList,
-  transformWaterFrameworkDirectiveTaskList
+  transformWaterFrameworkDirectiveTaskList,
+  transformMarinePlanPoliciesTaskList
 } from '#src/server/marine-licence/task-list/utils.js'
 import {
   taskListController,
@@ -78,7 +79,8 @@ describe('#taskListController', () => {
           projectName: 'COMPLETED',
           projectBackground: 'COMPLETED',
           specialLegalPowers: 'COMPLETED',
-          otherAuthorities: 'COMPLETED'
+          otherAuthorities: 'COMPLETED',
+          siteDetails: 'COMPLETED'
         },
         siteDetails: mockMarineLicence.siteDetails,
         otherAuthorities: {
@@ -89,7 +91,9 @@ describe('#taskListController', () => {
           agree: 'yes',
           details: 'some special legal powers'
         },
-        waterFrameworkDirective: { nauticalMile: 'no' }
+        waterFrameworkDirective: { nauticalMile: 'no' },
+        marinePlanPolicyJob: 'ready',
+        marinePlanPoliciesCount: 44
       }
     }
 
@@ -158,6 +162,19 @@ describe('#taskListController', () => {
       }
     ]
 
+    const mockMarinePlanPoliciesTaskList = [
+      {
+        href: marineLicenceRoutes.MARINE_LICENCE_TASK_LIST,
+        status: {
+          tag: { text: 'Not yet started', classes: 'govuk-tag--blue' }
+        },
+        title: {
+          classes: 'govuk-link--no-visited-state',
+          text: 'Marine plan policy considerations (44 to complete)'
+        }
+      }
+    ]
+
     getMarineLicenceCacheMock.mockReturnValue(mockMarineLicence)
     authenticatedGetRequestMock.mockResolvedValue({
       payload: mockPayload
@@ -175,6 +192,9 @@ describe('#taskListController', () => {
       mockwaterFrameworkDirectiveTaskList
     )
     vi.mocked(transformSharingTaskList).mockReturnValue(mockSharingTaskList)
+    vi.mocked(transformMarinePlanPoliciesTaskList).mockReturnValue(
+      mockMarinePlanPoliciesTaskList
+    )
     vi.mocked(setMarineLicenceCache).mockResolvedValue(mockMarineLicence)
 
     authUtils.getUserSession.mockResolvedValue({
@@ -201,6 +221,13 @@ describe('#taskListController', () => {
       mockPayload.value.taskList,
       mockMarineLicence.waterFrameworkDirective
     )
+    expect(vi.mocked(transformMarinePlanPoliciesTaskList)).toHaveBeenCalledWith(
+      mockPayload.value.taskList,
+      {
+        marinePlanPolicyJob: 'ready',
+        marinePlanPoliciesCount: 44
+      }
+    )
 
     expect(vi.mocked(setMarineLicenceCache)).toHaveBeenCalledWith(
       mockRequest,
@@ -221,7 +248,8 @@ describe('#taskListController', () => {
       projectDetailsTaskList: mockProjectDetailsTaskList,
       siteDetailsTaskList: mockSiteDetailsTaskList,
       sharingTaskList: mockSharingTaskList,
-      waterFrameworkDirectiveTaskList: mockwaterFrameworkDirectiveTaskList
+      waterFrameworkDirectiveTaskList: mockwaterFrameworkDirectiveTaskList,
+      marinePlanPoliciesTaskList: mockMarinePlanPoliciesTaskList
     })
   })
 

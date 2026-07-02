@@ -1,0 +1,68 @@
+{% extends 'layouts/page.njk' %}
+{% from "govuk/components/textarea/macro.njk" import govukTextarea %}
+{% from "govuk/components/back-link/macro.njk" import govukBackLink %}
+{% from "radio-page/macro.njk" import appRadioPage %}
+
+{% block beforeContent %}
+{{ super() }}
+<nav>
+  {{ govukBackLink({
+    text: "Back",
+    href: backLink
+  }) }}
+</nav>
+{% endblock %}
+
+{% block content %}
+
+  {% set harbourAuthorityHint %}
+    <p class="govuk-body">A harbour authority is an organisation with legal powers to manage a harbour, and includes municipal, private and trust ports.</p>
+    <p class="govuk-body">Use the <a href="{{ mapUrl }}" class="govuk-link" target="_blank" rel="noopener noreferrer">marine licensing interactive map (opens in new tab)</a> to find out if your project is located in a harbour authority area.</p>
+  {% endset %}
+
+  {% set harbourAuthorityDetails %}
+    {{ govukTextarea({
+      id: "details",
+      name: "details",
+      label: {
+        text: "Provide details of the harbour authority"
+      },
+      hint: {
+        text: "Enter a maximum of 1,000 characters"
+      },
+      maxlength: 1000,
+      errorMessage: errors['details'],
+      value: payload.details
+    }) }}
+  {% endset -%}
+
+  {{ appRadioPage({
+      name: "harbourArea",
+      errorSummary: errorSummary,
+      errors: errors,
+      heading: "Is your project located in a harbour authority area?",
+      isPageHeading: true,
+      value: payload.harbourArea,
+      errorMessage: errors['harbourArea'],
+      projectName: projectName,
+      hint: { html: harbourAuthorityHint },
+      items: [
+          {
+          value: "yes",
+          text: "Yes",
+          conditional: {
+            html: harbourAuthorityDetails
+          }
+          },
+          {
+          value: "no",
+          text: "No"
+          }
+      ],
+      csrfToken: csrfToken,
+      buttonText: "Save and continue",
+      cancelLink: backLink
+      })
+  }}
+
+{% endblock %}

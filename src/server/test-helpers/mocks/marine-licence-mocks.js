@@ -5,6 +5,7 @@ export const mockMarineLicenceTaskList = {
   projectName: 'COMPLETED',
   specialLegalPowers: 'COMPLETED',
   otherAuthorities: 'COMPLETED',
+  harbourAuthority: 'COMPLETED',
   siteDetails: 'COMPLETED',
   preferredDates: 'COMPLETED',
   projectBackground: 'COMPLETED',
@@ -67,6 +68,7 @@ export const mockMarineLicenceApplication = {
   projectName: 'Test Project',
   projectBackground: 'Test project background',
   specialLegalPowers: { agree: 'yes', details: 'Test reason' },
+  harbourAuthority: { details: 'Harbour details', harbourArea: 'yes' },
   publicConsultation: {
     consulted: 'yes',
     details: 'Consulted with local fishing group'

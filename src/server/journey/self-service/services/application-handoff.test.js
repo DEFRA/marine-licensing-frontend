@@ -177,7 +177,7 @@ describe('buildMcmsHandoffQueryString', () => {
     )
   })
 
-  it('joins all selected answers of a multi-select question as a comma-separated value (ML-1431)', () => {
+  it('joins all selected answers of a multi-select question as a comma-separated value', () => {
     const qs = buildMcmsHandoffQueryString({
       questionLog: [
         {
@@ -205,7 +205,7 @@ describe('buildMcmsHandoffQueryString', () => {
     )
   })
 
-  it('joins three or more selected answers (not hard-coded to two)', () => {
+  it('joins three or more selected answers', () => {
     const qs = buildMcmsHandoffQueryString({
       questionLog: [
         {

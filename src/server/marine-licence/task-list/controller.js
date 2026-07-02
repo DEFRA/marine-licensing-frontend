@@ -137,6 +137,8 @@ export const taskListController = {
       siteDetailsTaskList: transformed.siteDetails,
       waterFrameworkDirectiveTaskList: transformed.waterFrameworkDirective,
       marinePlanPoliciesTaskList: transformed.marinePlanPolicies,
+      marinePlanPoliciesGuidanceLink:
+        marineLicenceRoutes.MARINE_LICENCE_MARINE_PLAN_POLICIES_GUIDANCE,
       hasCompletedAllTasks
     })
   }

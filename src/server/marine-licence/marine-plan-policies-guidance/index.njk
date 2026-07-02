@@ -1,0 +1,137 @@
+{% extends 'layouts/page.njk' %}
+{% from "govuk/components/back-link/macro.njk" import govukBackLink %}
+
+{% block beforeContent %}
+{{ super() }}
+<nav>
+  {{ govukBackLink({
+    text: "Back",
+    href: backLink
+  }) }}
+</nav>
+{% endblock %}
+
+{% block content %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+      <h1 class="govuk-heading-l">{{ heading }}</h1>
+
+      <p class="govuk-body">Once you complete the Site and activity details section, you can access the marine plan policies. We have grouped the policies into categories to help you navigate them. The categories are:</p>
+
+      <ul class="govuk-list govuk-list--bullet">
+        <li>cross-cutting</li>
+        <li>economic</li>
+        <li>environmental</li>
+        <li>social</li>
+      </ul>
+
+      <p class="govuk-body">Some policies apply to specific areas, so they are shown if they are relevant to your proposals based on what you told us in Site and activity details. Cross-cutting polices are relevant to all proposals across the whole marine area. Changing the information you've entered in Site and activity details may change your marine plan policies.</p>
+
+      <p class="govuk-body">View the marine plan documents:</p>
+
+      <ul class="govuk-list govuk-list--bullet">
+        <li><a href="https://www.gov.uk/government/publications/the-north-east-marine-plans-documents" class="govuk-link">North East Marine Plan</a></li>
+        <li><a href="https://www.gov.uk/government/publications/east-inshore-and-east-offshore-marine-plans" class="govuk-link">East Marine Plan</a></li>
+        <li><a href="https://www.gov.uk/government/publications/the-south-east-marine-plan-documents" class="govuk-link">South East Marine Plan</a></li>
+        <li><a href="https://www.gov.uk/government/publications/the-south-marine-plans-documents" class="govuk-link">South Marine Plan</a></li>
+        <li><a href="https://www.gov.uk/government/publications/the-south-west-marine-plans-documents" class="govuk-link">South West Marine Plan</a></li>
+        <li><a href="https://www.gov.uk/government/publications/the-north-west-marine-plans-documents" class="govuk-link">North West Marine Plan</a></li>
+      </ul>
+
+      <p class="govuk-body">You can find all the marine plan policies that apply to your proposals, other activities, evidence, and supporting information on <a href="https://www.gov.uk/guidance/explore-marine-plans" class="govuk-link">Explore Marine Plans</a>.</p>
+
+      <p class="govuk-body">You can access this guidance from every policy page in the Marine plan policy section.</p>
+
+      <h2 class="govuk-heading-m">How to complete the Marine plan policies section</h2>
+
+      <p class="govuk-body">Marine plans inform and guide how we assess and make decisions about marine licence applications. Your application must show how you have considered the relevant marine plan policies.</p>
+
+      <p class="govuk-body">You should consider the relevant marine plans as a whole, including contribution towards the marine plan's vision and objectives. Marine plan policies should be applied proportionately, considering the scale, complexity, and impact of a proposal.</p>
+
+      <p class="govuk-body">Several policies provide support for specific sectors. Other policies help identify potential challenges and offer direction.</p>
+
+      <p class="govuk-body">For each policy, you will need to explain how you've considered it for your proposals; how you've addressed any impacts or interactions with other activities, or how your proposals are supported by the policy.</p>
+
+      <p class="govuk-body">You can find more information about marine planning and how to use marine plans in <a href="https://www.gov.uk/guidance/using-marine-plans" class="govuk-link">Using marine plans</a>.</p>
+
+      <h3 class="govuk-heading-s">Policy walkthrough</h3>
+
+      <p class="govuk-body">You'll see different types of policies depending on your proposals. Understanding the type helps you know what to consider.</p>
+
+      <ol class="govuk-list govuk-list--number govuk-list--spaced">
+        <li>Policies that are relevant to all proposals and apply across the whole of the inshore and offshore plan areas. These are likely to apply to you and set out considerations or points to be aware of.</li>
+        <li>Definitive policies that show a clear preference for certain activities in certain locations. These support certain activities and prevent or restrict others unless they are compatible. These appear based on your site and activity details.</li>
+        <li>Policies that support existing use of the marine area. These do not prevent other activities, but require you to show how you will reduce impacts or enable co-existence. These appear based on your site and activity details.</li>
+        <li>Policies that safeguard areas for future development by certain sectors. These may support your sector or require you to show how you will avoid preventing future activity. These appear based on your site and activity details.</li>
+        <li>Policies that directly support certain sectors, support diversification, skills enhancement or employment across all activities.</li>
+        <li>Policies that support preferred methods and approaches including best practice, and support identification of the best way to successfully achieve a proposal.</li>
+      </ol>
+
+      <h3 class="govuk-heading-s">Mitigation hierarchy</h3>
+
+      <p class="govuk-body">Some marine plan policies follow a mitigation hierarchy. Some policies with a mitigation hierarchy require that <strong>significant</strong> adverse impacts are considered, whereas others require all adverse impacts to be considered.</p>
+
+      <p class="govuk-body">The mitigation hierarchy means you should address impacts in this order of preference:</p>
+
+      <p class="govuk-body"><strong>Avoid:</strong> - Impacts <strong>do not happen at all</strong>. This is the most effective approach to reducing impacts.</p>
+
+      <p class="govuk-body">Avoiding may include changing the location, method, timing, of a project, potentially including buffers or exclusion zones. It is often easiest to achieve when designing a proposal so that the impact does not occur.</p>
+
+      <p class="govuk-body">For example, re-routing a cable to avoid sensitive habitats, or choosing another site outside of a high-density shipping lane.</p>
+
+      <p class="govuk-body"><strong>Minimise:</strong> Reduce the scale, duration or intensity of impacts, often at the design or planning stage. This <strong>reduces the impacts</strong> that cannot be avoided.</p>
+
+      <p class="govuk-body">Minimising impacts could include considering the location, methodology, timing, re-use of infrastructure, or layout of the project.</p>
+
+      <p class="govuk-body">For example, changing the location of the proposals to not overlap with sensitive features, scheduling work outside of sensitive seasons like breeding seasons, or changing layout or spacing to allow for safe navigation or co-existence with other sectors.</p>
+
+      <p class="govuk-body"><strong>Mitigate:</strong> Specific action is taken to <strong>manage or control remaining impacts</strong> that cannot be fully avoided or minimised, often through methodology or management practices.</p>
+
+      <p class="govuk-body">This is the last stage of making adverse impacts acceptable.</p>
+
+      <p class="govuk-body">For example, using silt curtains during construction to contain sediment, or use of vibro-piling instead of impact piling.</p>
+
+      <p class="govuk-body"><strong>Compensate:</strong> Where adverse impacts cannot be avoided, minimised or mitigated, some policies allow you to compensate by <strong>delivering benefit elsewhere.</strong></p>
+
+      <p class="govuk-body">For example, restoring degraded habitat in a similar location, financial contributions for improvements at other locations or towards restoration projects, or creating new habitat to replace what will be lost.</p>
+
+      <p class="govuk-body">Compensation will be considered on a case-by-case basis; compensation will only be acceptable when in line with the provisions present in primary legislation and regulations.</p>
+
+      <p class="govuk-body">Only some policies include compensation as an option. The policy text will make it clear if this applies.</p>
+
+      <p class="govuk-body"><strong>State the case for proceeding:</strong> If you cannot avoid, minimise, or mitigate all or significant adverse impacts, some policies allow you to explain why your proposals should still proceed despite the remaining impacts.</p>
+
+      <p class="govuk-body">The case for proceeding may also include how the proposals support the marine plan vision, objectives or other policy aims.</p>
+
+      <p class="govuk-body">For example, explaining the public benefits of critical flood defence infrastructure, or the strategic importance of maintaining a working port.</p>
+
+      <p class="govuk-body">Only some policies include this option. The policy text will make it clear if this applies.</p>
+
+      <p class="govuk-body">Proposals will likely apply a mixture of measures to avoid, minimise and mitigate significant adverse impacts. Proposals must demonstrate how they have satisfied a) before moving to b), and so on.</p>
+
+      <p class="govuk-body">The inclusion of this information does not indicate that approval of the project will follow by default. Approval will also depend on other material considerations which may include, for example, other plans.</p>
+
+      <h3 class="govuk-heading-s">Supportive policies</h3>
+
+      <p class="govuk-body">Some policies actively support certain types of activity. If your proposals are supported by a policy, explain how.</p>
+
+      <p class="govuk-body">For example, installing new public access points that enhance recreational use of the marine area may be supported by tourism and recreation policies. Creating new habitat that enhances biodiversity is supported by biodiversity policies. Developing skills related to marine activities is supported by employment or social benefits policies.</p>
+
+      <h3 class="govuk-heading-s">Find detailed policy information</h3>
+
+      <p class="govuk-body">Each policy page includes a link to find out more about that specific policy. This will open the policy details in Explore Marine Plans, including:</p>
+
+      <ul class="govuk-list govuk-list--bullet">
+        <li>the full policy text and aim</li>
+        <li>which marine plan area it applies to</li>
+        <li>information on using the policy</li>
+      </ul>
+
+      <p class="govuk-body">Use this information to understand what the policy is trying to achieve and how it applies to your location.</p>
+
+      <h3 class="govuk-heading-s">Engagement</h3>
+
+      <p class="govuk-body">Early engagement with all stakeholders that may be impacted by the development is encouraged. Engagement may also support understanding of potential impacts of proposals and how adverse impacts can be reduced.</p>
+    </div>
+  </div>
+{% endblock %}

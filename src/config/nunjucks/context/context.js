@@ -30,14 +30,21 @@ const hideNavigationRoutesMarineLicence = new Set([
 ])
 
 const hideNavigationRoutesMarineLicenceAlways = new Set([
-  marineLicenceRoutes.MARINE_LICENCE_CALCULATE_MARINE_PLAN_POLICIES
+  marineLicenceRoutes.MARINE_LICENCE_CALCULATE_MARINE_PLAN_POLICIES,
+  marineLicenceRoutes.MARINE_LICENCE_UPLOAD_AND_WAIT,
+  marineLicenceRoutes.MARINE_LICENCE_WATER_FRAMEWORK_DIRECTIVE_UPLOAD_AND_WAIT
 ])
+
+const hideNavigationRoutesExemptionAlways = new Set([routes.UPLOAD_AND_WAIT])
 
 const isRouteNavigationHidden = (request) => {
   const { path: pagePath } = request
 
   try {
     if (pagePath.includes('/exemption')) {
+      if (hideNavigationRoutesExemptionAlways.has(pagePath)) {
+        return true
+      }
       const exemption = getExemptionCache(request)
       return hideNavigationRoutesExemptions.has(pagePath) && !exemption?.id
     }

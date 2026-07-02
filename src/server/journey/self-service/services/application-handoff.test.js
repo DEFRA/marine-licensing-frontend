@@ -177,6 +177,66 @@ describe('buildMcmsHandoffQueryString', () => {
     )
   })
 
+  it('joins all selected answers of a multi-select question as a comma-separated value (ML-1431)', () => {
+    const qs = buildMcmsHandoffQueryString({
+      questionLog: [
+        {
+          questionRoute: '/construction/maintenance-existing-works',
+          answers: [
+            {
+              id: 'SCAFFOLDING_ACCESS_TOWERS',
+              text: 'Scaffolding or access towers'
+            },
+            {
+              id: 'REPAINTING_STRUCTURES',
+              text: 'Re-painting of existing structures or assets'
+            }
+          ],
+          mcmsAppFormMapping: 'MAINTENANCE_EXISTING_WORKS_ACTIVITIES'
+        }
+      ],
+      focusedOption: { params: null },
+      journeyId: 'CTX',
+      viewAnswersUrl: null
+    })
+    expect(qs).toBe(
+      'journeyId=CTX' +
+        '&MAINTENANCE_EXISTING_WORKS_ACTIVITIES=SCAFFOLDING_ACCESS_TOWERS%2CREPAINTING_STRUCTURES'
+    )
+  })
+
+  it('joins three or more selected answers (not hard-coded to two)', () => {
+    const qs = buildMcmsHandoffQueryString({
+      questionLog: [
+        {
+          questionRoute: '/removal/activities',
+          answers: [{ id: 'A' }, { id: 'B' }, { id: 'C' }],
+          mcmsAppFormMapping: 'MINOR_REMOVALS_ACTIVITIES'
+        }
+      ],
+      focusedOption: { params: null },
+      journeyId: 'CTX',
+      viewAnswersUrl: null
+    })
+    expect(qs).toBe('journeyId=CTX&MINOR_REMOVALS_ACTIVITIES=A%2CB%2CC')
+  })
+
+  it('emits a single-select answer with no comma', () => {
+    const qs = buildMcmsHandoffQueryString({
+      questionLog: [
+        {
+          questionRoute: '/activity-type',
+          answers: [{ id: 'DEPOSIT', text: 'Deposit' }],
+          mcmsAppFormMapping: 'ACTIVITY_TYPE'
+        }
+      ],
+      focusedOption: { params: null },
+      journeyId: 'CTX',
+      viewAnswersUrl: null
+    })
+    expect(qs).toBe('journeyId=CTX&ACTIVITY_TYPE=DEPOSIT')
+  })
+
   it('always emits journeyId and skips entries with no mapping or no answer', () => {
     const qs = buildMcmsHandoffQueryString({
       questionLog: [

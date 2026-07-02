@@ -13,7 +13,7 @@ describe('#harbourAuthority', () => {
   const mockLicence = {
     projectName: 'Test Project',
     id: 'test-id',
-    harbourAuthority: { harbourArea: 'yes', details: 'Some details' }
+    harbourAuthority: { area: 'yes', details: 'Some details' }
   }
 
   beforeEach(() => {
@@ -44,7 +44,7 @@ describe('#harbourAuthority', () => {
       await expect(
         harbourAuthoritySubmitController.handler(
           {
-            payload: { harbourArea: 'yes', details: 'Some details' },
+            payload: { area: 'yes', details: 'Some details' },
             query: {}
           },
           h
@@ -63,7 +63,9 @@ describe('#harbourAuthority', () => {
       {
         name: 'check-your-answers backlink',
         query: { from: 'check-your-answers' },
-        expectedBackLink: marineLicenceRoutes.MARINE_LICENCE_CHECK_YOUR_ANSWERS
+        expectedBackLink:
+          marineLicenceRoutes.MARINE_LICENCE_CHECK_YOUR_ANSWERS +
+          '#other-permissions-card'
       }
     ])(
       'Should handle API validation errors in catch block with $name',
@@ -77,7 +79,7 @@ describe('#harbourAuthority', () => {
               validation: {
                 details: [
                   {
-                    path: ['harbourArea'],
+                    path: ['area'],
                     message: 'HARBOUR_AUTHORITY_REQUIRED',
                     type: 'any.required'
                   }
@@ -94,7 +96,7 @@ describe('#harbourAuthority', () => {
 
         await harbourAuthoritySubmitController.handler(
           {
-            payload: { harbourArea: 'yes', details: 'Some details' },
+            payload: { area: 'yes', details: 'Some details' },
             query
           },
           h
@@ -104,7 +106,7 @@ describe('#harbourAuthority', () => {
           HARBOUR_AUTHORITY_VIEW_ROUTE,
           expect.objectContaining({
             backLink: expectedBackLink,
-            payload: { harbourArea: 'yes', details: 'Some details' }
+            payload: { area: 'yes', details: 'Some details' }
           })
         )
       }

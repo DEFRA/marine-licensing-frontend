@@ -21,7 +21,7 @@ export const HARBOUR_AUTHORITY_VIEW_ROUTE =
 const getBackLink = (request) => {
   const fromCheckYourAnswers = request.query?.from === 'check-your-answers'
   return fromCheckYourAnswers
-    ? marineLicenceRoutes.MARINE_LICENCE_CHECK_YOUR_ANSWERS
+    ? `${marineLicenceRoutes.MARINE_LICENCE_CHECK_YOUR_ANSWERS}#other-permissions-card`
     : marineLicenceRoutes.MARINE_LICENCE_TASK_LIST
 }
 
@@ -62,14 +62,14 @@ export const harbourAuthoritySubmitController = {
     const marineLicence = getMarineLicenceCache(request)
 
     try {
-      const isInHarbourArea = payload.harbourArea === 'yes'
+      const isInArea = payload.area === 'yes'
 
       await authenticatedPatchRequest(
         request,
         '/marine-licence/harbour-authority',
         {
-          harbourArea: payload.harbourArea,
-          ...(isInHarbourArea && { details: payload.details }),
+          area: payload.area,
+          ...(isInArea && { details: payload.details }),
           id: marineLicence.id
         }
       )
@@ -77,8 +77,8 @@ export const harbourAuthoritySubmitController = {
       await setMarineLicenceCache(request, h, {
         ...marineLicence,
         harbourAuthority: {
-          harbourArea: payload.harbourArea,
-          ...(isInHarbourArea && { details: payload.details })
+          area: payload.area,
+          ...(isInArea && { details: payload.details })
         }
       })
 

@@ -1,14 +1,14 @@
 import { harbourAuthoritySchema } from '#src/server/common/validation/harbour-authority/schema.js'
 
 describe('#harbourAuthoritySchema', () => {
-  test('should validate when harbourArea is no', () => {
-    const { error } = harbourAuthoritySchema.validate({ harbourArea: 'no' })
+  test('should validate when area is no', () => {
+    const { error } = harbourAuthoritySchema.validate({ area: 'no' })
     expect(error).toBeUndefined()
   })
 
-  test('should validate when harbourArea is yes with details', () => {
+  test('should validate when area is yes with details', () => {
     const { error } = harbourAuthoritySchema.validate({
-      harbourArea: 'yes',
+      area: 'yes',
       details: 'The Port of Tyne harbour authority area.'
     })
     expect(error).toBeUndefined()
@@ -19,16 +19,16 @@ describe('#harbourAuthoritySchema', () => {
     expect(error.message).toBe('HARBOUR_AUTHORITY_REQUIRED')
   })
 
-  test('should fail on invalid harbourArea value', () => {
+  test('should fail on invalid area value', () => {
     const { error } = harbourAuthoritySchema.validate({
-      harbourArea: 'maybe'
+      area: 'maybe'
     })
     expect(error.message).toBe('HARBOUR_AUTHORITY_REQUIRED')
   })
 
-  test('should fail when harbourArea is yes but details is empty', () => {
+  test('should fail when area is yes but details is empty', () => {
     const { error } = harbourAuthoritySchema.validate({
-      harbourArea: 'yes',
+      area: 'yes',
       details: ''
     })
     expect(error.message).toBe('HARBOUR_AUTHORITY_AREA_REQUIRED')
@@ -36,7 +36,7 @@ describe('#harbourAuthoritySchema', () => {
 
   test('should fail when details exceeds 1000 characters', () => {
     const { error } = harbourAuthoritySchema.validate({
-      harbourArea: 'yes',
+      area: 'yes',
       details: 'a'.repeat(1001)
     })
     expect(error.message).toBe('HARBOUR_AUTHORITY_AREA_MAX_LENGTH')

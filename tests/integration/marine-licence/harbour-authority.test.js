@@ -17,7 +17,7 @@ describe('Harbour authority', () => {
   const marineLicence = {
     id: 'marine-licence-123',
     projectName: 'Test Marine Project',
-    harbourAuthority: { harbourArea: undefined, details: '' }
+    harbourAuthority: { area: undefined, details: '' }
   }
 
   test('page elements', async () => {
@@ -60,7 +60,8 @@ describe('Harbour authority', () => {
 
     expect(getByRole(document, 'link', { name: 'Back' })).toHaveAttribute(
       'href',
-      marineLicenceRoutes.MARINE_LICENCE_CHECK_YOUR_ANSWERS
+      marineLicenceRoutes.MARINE_LICENCE_CHECK_YOUR_ANSWERS +
+        '#other-permissions-card'
     )
   })
 
@@ -94,7 +95,7 @@ describe('Harbour authority', () => {
     mockMarineLicence({
       ...marineLicence,
       harbourAuthority: {
-        harbourArea: 'yes',
+        area: 'yes',
         details: 'The Port of Tyne harbour authority area'
       }
     })
@@ -131,7 +132,7 @@ describe('Harbour authority', () => {
       return document
     }
 
-    const document = await submitHarbourAuthorityForm({ harbourArea: '' })
+    const document = await submitHarbourAuthorityForm({ area: '' })
 
     expectFieldsetError({
       document,
@@ -155,7 +156,7 @@ describe('Harbour authority', () => {
     }
 
     const document = await submitHarbourAuthorityForm({
-      harbourArea: 'yes',
+      area: 'yes',
       details: ''
     })
 

@@ -37,13 +37,13 @@
   {% endset -%}
 
   {{ appRadioPage({
-      name: "harbourArea",
+      name: "area",
       errorSummary: errorSummary,
       errors: errors,
       heading: "Is your project located in a harbour authority area?",
       isPageHeading: true,
-      value: payload.harbourArea,
-      errorMessage: errors['harbourArea'],
+      value: payload.area,
+      errorMessage: errors['area'],
       projectName: projectName,
       hint: { html: harbourAuthorityHint },
       items: [

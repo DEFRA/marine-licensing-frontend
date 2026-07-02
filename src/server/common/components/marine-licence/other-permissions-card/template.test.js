@@ -49,6 +49,35 @@ describe('Marine Licence Other Permissions Card Component', () => {
     expect($comp.html()).not.toContain('Should not be shown')
   })
 
+  describe('harbour authority', () => {
+    test('Should display details when area is yes', () => {
+      const params = {
+        harbourAuthority: {
+          area: 'yes',
+          details: 'Portsmouth Harbour Authority'
+        }
+      }
+      const $comp = renderComponent(
+        'marine-licence/other-permissions-card',
+        params
+      )
+      expect($comp.html()).toContain('Portsmouth Harbour Authority')
+    })
+
+    test('Should display correct text when area is no', () => {
+      const params = {
+        harbourAuthority: {
+          area: 'no'
+        }
+      }
+      const $comp = renderComponent(
+        'marine-licence/other-permissions-card',
+        params
+      )
+      expect($comp.html()).toContain('No')
+    })
+  })
+
   describe('other authorities', () => {
     test('Should display details when agree is yes', () => {
       const params = {

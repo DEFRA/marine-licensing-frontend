@@ -184,6 +184,7 @@ describe('taskList utils', () => {
       expect(
         transformOtherPermissionsTaskList({
           specialLegalPowers: 'COMPLETED',
+          harbourAuthority: 'COMPLETED',
           otherAuthorities: 'COMPLETED',
           publicConsultation: 'COMPLETED'
         })
@@ -194,6 +195,14 @@ describe('taskList utils', () => {
           title: {
             classes: 'govuk-link--no-visited-state',
             text: 'Special legal powers'
+          }
+        },
+        {
+          href: marineLicenceRoutes.MARINE_LICENCE_HARBOUR_AUTHORITY,
+          status: { text: 'Completed' },
+          title: {
+            classes: 'govuk-link--no-visited-state',
+            text: 'Harbour authority'
           }
         },
         {
@@ -231,6 +240,16 @@ describe('taskList utils', () => {
           title: {
             classes: 'govuk-link--no-visited-state',
             text: 'Special legal powers'
+          }
+        },
+        {
+          href: marineLicenceRoutes.MARINE_LICENCE_HARBOUR_AUTHORITY,
+          status: {
+            tag: { text: 'Not yet started', classes: 'govuk-tag--blue' }
+          },
+          title: {
+            classes: 'govuk-link--no-visited-state',
+            text: 'Harbour authority'
           }
         },
         {
@@ -277,6 +296,16 @@ describe('taskList utils', () => {
             }
           },
           {
+            href: marineLicenceRoutes.MARINE_LICENCE_HARBOUR_AUTHORITY,
+            status: {
+              tag: { text: 'Not yet started', classes: 'govuk-tag--blue' }
+            },
+            title: {
+              classes: 'govuk-link--no-visited-state',
+              text: 'Harbour authority'
+            }
+          },
+          {
             href: marineLicenceRoutes.MARINE_LICENCE_OTHER_AUTHORITIES,
             status: {
               tag: { text: 'Not yet started', classes: 'govuk-tag--blue' }
@@ -309,6 +338,16 @@ describe('taskList utils', () => {
           )
         ).toEqual([
           {
+            href: marineLicenceRoutes.MARINE_LICENCE_HARBOUR_AUTHORITY,
+            status: {
+              tag: { text: 'Not yet started', classes: 'govuk-tag--blue' }
+            },
+            title: {
+              classes: 'govuk-link--no-visited-state',
+              text: 'Harbour authority'
+            }
+          },
+          {
             href: marineLicenceRoutes.MARINE_LICENCE_OTHER_AUTHORITIES,
             status: { text: 'Completed' },
             title: {
@@ -337,6 +376,16 @@ describe('taskList utils', () => {
             true
           )
         ).toEqual([
+          {
+            href: marineLicenceRoutes.MARINE_LICENCE_HARBOUR_AUTHORITY,
+            status: {
+              tag: { text: 'Not yet started', classes: 'govuk-tag--blue' }
+            },
+            title: {
+              classes: 'govuk-link--no-visited-state',
+              text: 'Harbour authority'
+            }
+          },
           {
             href: marineLicenceRoutes.MARINE_LICENCE_OTHER_AUTHORITIES,
             status: {
@@ -369,6 +418,16 @@ describe('taskList utils', () => {
               true
             )
           ).toEqual([
+            {
+              href: marineLicenceRoutes.MARINE_LICENCE_HARBOUR_AUTHORITY,
+              status: {
+                tag: { text: 'Not yet started', classes: 'govuk-tag--blue' }
+              },
+              title: {
+                classes: 'govuk-link--no-visited-state',
+                text: 'Harbour authority'
+              }
+            },
             {
               href: marineLicenceRoutes.MARINE_LICENCE_OTHER_AUTHORITIES,
               status: {

@@ -54,9 +54,20 @@ export const transformOtherPermissionsTaskList = (taskList, isCitizen) => {
     status: setStatus(taskList.publicConsultation)
   }
 
+  const harbourAuthority = {
+    title: { text: 'Harbour authority', classes: taskClasses },
+    href: marineLicenceRoutes.MARINE_LICENCE_HARBOUR_AUTHORITY,
+    status: setStatus(taskList.harbourAuthority)
+  }
+
   return isCitizen
-    ? [otherAuthorities, publicConsultation]
-    : [specialLegalPowers, otherAuthorities, publicConsultation]
+    ? [harbourAuthority, otherAuthorities, publicConsultation]
+    : [
+        specialLegalPowers,
+        harbourAuthority,
+        otherAuthorities,
+        publicConsultation
+      ]
 }
 
 export const transformProjectDetailsTaskList = (taskList) => [

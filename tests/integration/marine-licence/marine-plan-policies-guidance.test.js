@@ -1,4 +1,4 @@
-import { getByRole } from '@testing-library/dom'
+import { getByRole, queryByRole, queryByText } from '@testing-library/dom'
 import { marineLicenceRoutes } from '~/src/server/common/constants/routes.js'
 import {
   mockMarineLicence,
@@ -38,7 +38,7 @@ describe('Marine plan policy guidance page (marine licence)', () => {
     ).toBeInTheDocument()
   })
 
-  test('should have correct navigation links', async () => {
+  test('should not show a back link, project name, user name or navigation links', async () => {
     mockMarineLicence(marineLicence)
 
     const document = await loadPage({
@@ -47,10 +47,22 @@ describe('Marine plan policy guidance page (marine licence)', () => {
       server: getServer()
     })
 
-    expect(getByRole(document, 'link', { name: 'Back' })).toHaveAttribute(
-      'href',
-      marineLicenceRoutes.MARINE_LICENCE_TASK_LIST
-    )
+    expect(queryByRole(document, 'link', { name: 'Back' })).toBeNull()
+    expect(queryByText(document, marineLicence.projectName)).toBeNull()
+    expect(document.querySelector('.app-border-bottom')).toBeNull()
+    expect(queryByRole(document, 'link', { name: 'Home' })).toBeNull()
+    expect(queryByRole(document, 'link', { name: 'Sign out' })).toBeNull()
+  })
+
+  test('should still show the page content links', async () => {
+    mockMarineLicence(marineLicence)
+
+    const document = await loadPage({
+      requestUrl:
+        marineLicenceRoutes.MARINE_LICENCE_MARINE_PLAN_POLICIES_GUIDANCE,
+      server: getServer()
+    })
+
     expect(
       getByRole(document, 'link', { name: 'Explore Marine Plans' })
     ).toHaveAttribute(

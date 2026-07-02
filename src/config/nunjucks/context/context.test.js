@@ -185,6 +185,16 @@ describe('#context', () => {
     expect(contextResult.navigation).toEqual([])
   })
 
+  it('When on the water framework directive file upload page, should not use navigation links', () => {
+    vi.mocked(getMarineLicenceCache).mockReturnValue({ id: 'some-id' })
+    const mockRequest = {
+      path: '/marine-licence/water-framework-directive-upload-and-wait',
+      logger: { error: vi.fn() }
+    }
+    const contextResult = context(mockRequest)
+    expect(contextResult.navigation).toEqual([])
+  })
+
   it('When session cache throws, should show navigation', () => {
     vi.mocked(getMarineLicenceCache).mockImplementation(() => {
       throw new TypeError('Cannot read properties of null')

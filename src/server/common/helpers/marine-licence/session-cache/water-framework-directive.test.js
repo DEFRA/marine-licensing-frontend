@@ -1,6 +1,17 @@
-import { updateWaterFrameworkDirective } from './water-framework-directive'
+import {
+  clearWaterFrameworkDirectiveReturnToCache,
+  getWaterFrameworkDirectiveReturnRoute,
+  setWaterFrameworkDirectiveReturnToCache,
+  updateWaterFrameworkDirective,
+  setWaterFrameworkDirectivePageEntryPoint,
+  getWaterFrameworkDirectivePageEntryPoint
+} from './water-framework-directive'
 import { MARINE_LICENCE_CACHE_KEY } from './utils'
-import { createMockH } from '#src/server/test-helpers/mocks/helpers.js'
+import {
+  createMockH,
+  createMockRequest
+} from '#src/server/test-helpers/mocks/helpers.js'
+import { WFD_RETURN_TO_KEY } from '#src/server/common/constants/cache.js'
 
 describe('updateWaterFrameworkDirective', () => {
   let mockRequest
@@ -85,5 +96,119 @@ describe('updateWaterFrameworkDirective', () => {
     expect(mockRequest.yar.commit).toHaveBeenCalledWith(mockH)
 
     expect(result).toEqual({ nauticalMile: null })
+  })
+})
+
+describe('setWaterFrameworkDirectiveReturnToCache', () => {
+  test('sets the WFD_RETURN_TO_KEY cache key', async () => {
+    const mockRequest = createMockRequest()
+    const mockH = createMockH()
+
+    await setWaterFrameworkDirectiveReturnToCache(mockRequest, mockH, '/test')
+
+    expect(mockRequest.yar.set).toHaveBeenCalledWith(WFD_RETURN_TO_KEY, '/test')
+    expect(mockRequest.yar.commit).toHaveBeenCalledWith(mockH)
+  })
+})
+
+describe('clearWaterFrameworkDirectiveReturnToCache', () => {
+  test('clears the WFD_RETURN_TO_KEY cache key', () => {
+    const mockRequest = createMockRequest()
+    clearWaterFrameworkDirectiveReturnToCache(mockRequest)
+    expect(mockRequest.yar.clear).toHaveBeenCalledWith(WFD_RETURN_TO_KEY)
+  })
+})
+
+describe('getWaterFrameworkDirectiveReturnRoute', () => {
+  test('gets the WFD_RETURN_TO_KEY cache key value', () => {
+    const mockRequest = createMockRequest()
+
+    getWaterFrameworkDirectiveReturnRoute(mockRequest)
+
+    expect(mockRequest.yar.get).toHaveBeenCalledWith(WFD_RETURN_TO_KEY)
+  })
+})
+
+describe('setWaterFrameworkDirectivePageEntryPoint', () => {
+  const mockRequest = createMockRequest()
+  const mockH = createMockH()
+
+  test('stores the entry point value in the WFD cache under the given key', async () => {
+    await setWaterFrameworkDirectivePageEntryPoint(
+      mockRequest,
+      mockH,
+      'waterFrameworkDirectiveEntryPoint',
+      'before-you-start'
+    )
+
+    expect(mockRequest.yar.set).toHaveBeenCalledWith(
+      MARINE_LICENCE_CACHE_KEY,
+      expect.objectContaining({
+        waterFrameworkDirective: expect.objectContaining({
+          waterFrameworkDirectiveEntryPoint: 'before-you-start'
+        })
+      })
+    )
+    expect(mockRequest.yar.commit).toHaveBeenCalledWith(mockH)
+  })
+
+  test('stores a file upload entry point under a different key', async () => {
+    await setWaterFrameworkDirectivePageEntryPoint(
+      mockRequest,
+      mockH,
+      'fileUploadEntryPoint',
+      'excluded-activities'
+    )
+
+    expect(mockRequest.yar.set).toHaveBeenCalledWith(
+      MARINE_LICENCE_CACHE_KEY,
+      expect.objectContaining({
+        waterFrameworkDirective: expect.objectContaining({
+          fileUploadEntryPoint: 'excluded-activities'
+        })
+      })
+    )
+  })
+})
+
+describe('getWaterFrameworkDirectivePageEntryPoint', () => {
+  test('returns the entry point value for the given key', () => {
+    const mockRequest = createMockRequest()
+    mockRequest.yar.get.mockReturnValue({
+      waterFrameworkDirective: {
+        waterFrameworkDirectiveEntryPoint: 'task-list'
+      }
+    })
+
+    const result = getWaterFrameworkDirectivePageEntryPoint(
+      mockRequest,
+      'waterFrameworkDirectiveEntryPoint'
+    )
+
+    expect(result).toBe('task-list')
+  })
+
+  test('returns undefined when the key is not set', () => {
+    const mockRequest = createMockRequest()
+    mockRequest.yar.get.mockReturnValue({ waterFrameworkDirective: {} })
+
+    const result = getWaterFrameworkDirectivePageEntryPoint(
+      mockRequest,
+      'waterFrameworkDirectiveEntryPoint'
+    )
+
+    expect(result).toBeUndefined()
+  })
+
+  test('returns undefined when waterFrameworkDirective is not set', () => {
+    const mockRequest = createMockRequest()
+    mockRequest.yar.get.mockReturnValue({})
+
+    const result = getWaterFrameworkDirectivePageEntryPoint(
+      mockRequest,
+      'waterFrameworkDirectiveEntryPoint'
+    )
+
+    expect(result).toBeUndefined()
   })
 })

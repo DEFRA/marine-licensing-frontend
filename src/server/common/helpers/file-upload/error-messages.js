@@ -16,6 +16,7 @@ export const GEO_PARSER_ERROR_MESSAGES = {
   UNSUPPORTED_FILE_TYPE: 'The selected file type is not supported',
   FEATURES_CONTAIN_POINT_OR_LINE:
     'The selected file must only contain sites drawn as polygons (shapes), not points or lines',
+  NO_SITE_BOUNDARIES: 'The uploaded file must contain site boundaries',
   GEOMETRY_NESTING_TOO_DEEP:
     'We couldn’t process this map file because its geometry is too complex. Please simplify the shape and upload again.',
   SINGLE_SITE_ONLY: 'Upload a file that contains a single site'
@@ -38,6 +39,9 @@ export const FILE_TYPE_ERROR_MESSAGES = {
   kml: 'The selected file must be a KML file',
   shapefile: 'The selected file must be a Shapefile'
 }
+
+export const WFD_FILE_TYPE_ERROR_MESSAGE =
+  'The selected file must be a .docx or .odt file'
 
 export const DEFAULT_ERROR_MESSAGE =
   'The selected file could not be uploaded – try again'

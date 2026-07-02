@@ -4,7 +4,9 @@ import {
   projectMappedAnswers,
   projectOutcomeParams,
   buildHandoffQueryString,
-  buildHandoffRedirectUrl
+  buildHandoffRedirectUrl,
+  buildMcmsHandoffQueryString,
+  buildMcmsRedirectUrl
 } from './application-handoff.js'
 
 const exemption = HANDOFF_ALLOWLISTS.exemption
@@ -127,5 +129,122 @@ describe('buildHandoffRedirectUrl', () => {
         'ADV_TYPE=EXE'
       )
     ).toBe('/guidance/x?foo=bar&ADV_TYPE=EXE')
+  })
+})
+
+describe('buildMcmsHandoffQueryString', () => {
+  it('reproduces the ML-1167 worked example with no allow-list', () => {
+    const questionLog = [
+      {
+        questionRoute: '/activity-type',
+        answers: [{ id: 'DEPOSIT', text: 'Deposit' }],
+        mcmsAppFormMapping: 'ACTIVITY_TYPE'
+      },
+      {
+        questionRoute: '/deposit/method',
+        answers: [{ id: 'vehicleOrVessel', text: 'From a vehicle or vessel' }],
+        mcmsAppFormMapping: null
+      },
+      {
+        questionRoute: '/exemption/deposit/activity-type',
+        answers: [{ id: 'fishing', text: 'Fishing' }],
+        mcmsAppFormMapping: 'EXE_ACTIVITY_SUBTYPE_DEPOSIT'
+      }
+    ]
+    const focusedOption = {
+      id: 'WO_MARINE_LICENCE',
+      module: 'MMO_ADVICE_CONTROL',
+      params: [
+        { name: 'ADV_TYPE', value: 'MLA' },
+        { name: 'FAST_TRACK', value: 'true' }
+      ]
+    }
+
+    const qs = buildMcmsHandoffQueryString({
+      questionLog,
+      focusedOption,
+      journeyId: 'CTX123',
+      viewAnswersUrl: 'https://fe.example/iat/answers/CTX123'
+    })
+
+    expect(qs).toBe(
+      'journeyId=CTX123' +
+        '&viewAnswersUrl=https%3A%2F%2Ffe.example%2Fiat%2Fanswers%2FCTX123' +
+        '&ACTIVITY_TYPE=DEPOSIT' +
+        '&EXE_ACTIVITY_SUBTYPE_DEPOSIT=fishing' +
+        '&ADV_TYPE=MLA' +
+        '&FAST_TRACK=true'
+    )
+  })
+
+  it('always emits journeyId and skips entries with no mapping or no answer', () => {
+    const qs = buildMcmsHandoffQueryString({
+      questionLog: [
+        { mcmsAppFormMapping: null, answers: [{ id: 'x' }] },
+        { mcmsAppFormMapping: 'ACTIVITY_TYPE', answers: [] }
+      ],
+      focusedOption: { params: null },
+      journeyId: 'CTX',
+      viewAnswersUrl: null
+    })
+    expect(qs).toBe('journeyId=CTX')
+  })
+
+  it('omits viewAnswersUrl when it is missing', () => {
+    const qs = buildMcmsHandoffQueryString({
+      questionLog: [],
+      focusedOption: { params: [{ name: 'FAST_TRACK', value: 'true' }] },
+      journeyId: 'CTX',
+      viewAnswersUrl: undefined
+    })
+    expect(qs).toBe('journeyId=CTX&FAST_TRACK=true')
+  })
+
+  it('skips params with a null value or a missing name', () => {
+    const qs = buildMcmsHandoffQueryString({
+      questionLog: [],
+      focusedOption: {
+        params: [
+          { name: 'FAST_TRACK', value: 'true' },
+          { name: 'ADV_TYPE', value: null },
+          { name: '', value: 'orphan' }
+        ]
+      },
+      journeyId: 'CTX',
+      viewAnswersUrl: null
+    })
+    expect(qs).toBe('journeyId=CTX&FAST_TRACK=true')
+  })
+})
+
+describe('buildMcmsRedirectUrl', () => {
+  it('keeps the absolute origin and appends the query string', () => {
+    expect(
+      buildMcmsRedirectUrl(
+        'https://marinelicensingtest.marinemanagement.org.uk/',
+        '',
+        'journeyId=X&FAST_TRACK=true'
+      )
+    ).toBe(
+      'https://marinelicensingtest.marinemanagement.org.uk/?journeyId=X&FAST_TRACK=true'
+    )
+  })
+
+  it('joins a non-empty path onto the base URL', () => {
+    expect(buildMcmsRedirectUrl('https://mcms.test/', 'apply/new', 'a=1')).toBe(
+      'https://mcms.test/apply/new?a=1'
+    )
+  })
+
+  it('returns just the base URL when there is no query string', () => {
+    expect(buildMcmsRedirectUrl('https://mcms.test/', '', '')).toBe(
+      'https://mcms.test/'
+    )
+  })
+
+  it('uses & when the base URL already carries a query string', () => {
+    expect(
+      buildMcmsRedirectUrl('https://mcms.test/?theme=new', '', 'journeyId=X')
+    ).toBe('https://mcms.test/?theme=new&journeyId=X')
   })
 })

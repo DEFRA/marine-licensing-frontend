@@ -1,0 +1,5 @@
+{% macro externalLink(link, text) %}
+  <p class="govuk-body">
+    <a class="govuk-link" href="{{ link }}" target="_blank" rel="noopener noreferrer">{{ text }} (opens in a new tab)</a>
+  </p>
+{% endmacro %}

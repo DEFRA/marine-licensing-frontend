@@ -4,12 +4,20 @@ import { config } from '#src/config/config.js'
 import { createFileUploadErrorDisplay } from '#src/server/common/helpers/file-upload/file-upload.js'
 import { fileUploadPageSettings } from '#src/server/common/helpers/file-upload/constants.js'
 import { getMarineLicenceCache } from '#src/server/common/helpers/marine-licence/session-cache/utils.js'
-import { updateWaterFrameworkDirective } from '#src/server/common/helpers/marine-licence/session-cache/water-framework-directive.js'
 import {
   s3PathForWaterFrameworkDirective,
   WFD_ACCEPT_ATTRIBUTE
 } from '#src/server/common/constants/water-framework-directive.js'
-import { getBackLink } from '#src/server/marine-licence/water-framework-directive/file-upload/utils.js'
+import {
+  setWaterFrameworkDirectiveReturnToCache,
+  getWaterFrameworkDirectiveReturnRoute,
+  updateWaterFrameworkDirective,
+  setWaterFrameworkDirectivePageEntryPoint
+} from '#src/server/common/helpers/marine-licence/session-cache/water-framework-directive.js'
+import {
+  getBackLink,
+  getCancelLink
+} from '#src/server/marine-licence/water-framework-directive/file-upload/utils.js'
 
 export const WATER_FRAMEWORK_DIRECTIVE_FILE_UPLOAD_VIEW_ROUTE =
   'marine-licence/water-framework-directive/file-upload/index'
@@ -27,6 +35,27 @@ export const waterFrameworkFileUploadController = {
     const marineLicence = getMarineLicenceCache(request)
     const { waterFrameworkDirective = {} } = marineLicence
     const { uploadedFile, uploadError } = waterFrameworkDirective
+
+    if (request.query.action) {
+      await setWaterFrameworkDirectiveReturnToCache(
+        request,
+        h,
+        marineLicenceRoutes.MARINE_LICENCE_WATER_FRAMEWORK_DIRECTIVE_REVIEW_YOUR_ANSWERS
+      )
+    }
+
+    const waterFrameworkDirectiveReturnTo =
+      getWaterFrameworkDirectiveReturnRoute(request)
+
+    const fileUploadEntryPoint = request.query.action
+      ? 'review-your-answers'
+      : 'excluded-activities'
+    await setWaterFrameworkDirectivePageEntryPoint(
+      request,
+      h,
+      'fileUploadEntryPoint',
+      fileUploadEntryPoint
+    )
 
     let errorSummary, errors
     if (uploadError) {
@@ -68,8 +97,8 @@ export const waterFrameworkFileUploadController = {
         uploadUrl: uploadConfig.uploadUrl,
         maxFileSize: uploadConfig.maxFileSize,
         acceptAttribute: WFD_ACCEPT_ATTRIBUTE,
-        backLink: getBackLink(waterFrameworkDirective.previousAssessment),
-        cancelLink: marineLicenceRoutes.MARINE_LICENCE_TASK_LIST,
+        backLink: getBackLink(fileUploadEntryPoint),
+        cancelLink: getCancelLink(waterFrameworkDirectiveReturnTo),
         errorSummary,
         errors
       })

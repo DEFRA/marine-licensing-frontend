@@ -20,19 +20,10 @@ export function ctaLabelFor(outcomeType) {
   if (outcomeType.overrideCtaButtonText) {
     return outcomeType.overrideCtaButtonText
   }
-  if (outcomeType.link) {
-    return 'Download'
+  if (outcomeType.module) {
+    return outcomeType.heading || 'Continue'
   }
   return 'Continue'
-}
-
-export function hasContinueFor(outcomeType) {
-  return Boolean(
-    outcomeType.module ||
-    outcomeType.nextQuestionRoute ||
-    outcomeType.link ||
-    outcomeType.overrideCtaButtonText
-  )
 }
 
 function viewAnswersUrlFor(slug, outcomeRoute, outcomeTypeId) {
@@ -41,11 +32,15 @@ function viewAnswersUrlFor(slug, outcomeRoute, outcomeTypeId) {
 }
 
 function continueUrlFor(slug, outcomeRoute, outcomeType) {
-  if (!outcomeType.overrideCtaButtonUrl) {
+  if (!outcomeType.overrideCtaButtonUrl && !outcomeType.module) {
     return null
   }
   const tail = outcomeRoute.replace(/^\//, '')
   return `/journey/self-service/c/${slug}/continue/${outcomeType.id}/${tail}`
+}
+
+function ctaHrefFor(slug, outcomeRoute, outcomeType) {
+  return continueUrlFor(slug, outcomeRoute, outcomeType)
 }
 
 export function buildIntermediateView(baseModel, outcome, types) {
@@ -58,7 +53,9 @@ export function buildIntermediateView(baseModel, outcome, types) {
       heading: ot.heading,
       text: ot.text,
       isTerminal: !ot.nextQuestionRoute,
+      link: ot.link ?? null,
       ctaLabel: ctaLabelFor(ot),
+      ctaHref: ctaHrefFor(baseModel.slug, baseModel.outcomeRoute, ot),
       viewAnswersUrl: viewAnswersUrlFor(
         baseModel.slug,
         baseModel.outcomeRoute,
@@ -72,13 +69,10 @@ export function buildTerminalSingleView(baseModel, terminalType) {
   return {
     ...baseModel,
     body: terminalType.text,
+    link: terminalType.link ?? null,
+    linkText: terminalType.heading ?? '',
     ctaLabel: ctaLabelFor(terminalType),
-    hasContinue: hasContinueFor(terminalType),
-    continueUrl: continueUrlFor(
-      baseModel.slug,
-      baseModel.outcomeRoute,
-      terminalType
-    ),
+    ctaHref: ctaHrefFor(baseModel.slug, baseModel.outcomeRoute, terminalType),
     viewAnswersUrl: viewAnswersUrlFor(
       baseModel.slug,
       baseModel.outcomeRoute,
@@ -123,9 +117,9 @@ export function buildTerminalMultiView(baseModel, types) {
       id: ot.id,
       heading: ot.heading,
       text: ot.text,
+      link: ot.link ?? null,
       ctaLabel: ctaLabelFor(ot),
-      hasContinue: hasContinueFor(ot),
-      continueUrl: continueUrlFor(baseModel.slug, baseModel.outcomeRoute, ot),
+      ctaHref: ctaHrefFor(baseModel.slug, baseModel.outcomeRoute, ot),
       viewAnswersUrl: viewAnswersUrlFor(
         baseModel.slug,
         baseModel.outcomeRoute,

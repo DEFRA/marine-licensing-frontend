@@ -29,16 +29,29 @@ const hideNavigationRoutesMarineLicence = new Set([
   marineLicenceRoutes.MARINE_LICENCE_PROJECT_NAME
 ])
 
+const hideNavigationRoutesMarineLicenceAlways = new Set([
+  marineLicenceRoutes.MARINE_LICENCE_CALCULATE_MARINE_PLAN_POLICIES,
+  marineLicenceRoutes.MARINE_LICENCE_UPLOAD_AND_WAIT
+])
+
+const hideNavigationRoutesExemptionAlways = new Set([routes.UPLOAD_AND_WAIT])
+
 const isRouteNavigationHidden = (request) => {
   const { path: pagePath } = request
 
   try {
     if (pagePath.includes('/exemption')) {
+      if (hideNavigationRoutesExemptionAlways.has(pagePath)) {
+        return true
+      }
       const exemption = getExemptionCache(request)
       return hideNavigationRoutesExemptions.has(pagePath) && !exemption?.id
     }
 
     if (pagePath.includes('/marine-licence')) {
+      if (hideNavigationRoutesMarineLicenceAlways.has(pagePath)) {
+        return true
+      }
       const marineLicence = getMarineLicenceCache(request)
       return (
         hideNavigationRoutesMarineLicence.has(pagePath) && !marineLicence?.id

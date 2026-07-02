@@ -10,7 +10,8 @@ import {
   transformSiteDetailsTaskList,
   transformOtherPermissionsTaskList,
   transformSharingTaskList,
-  transformWaterFrameworkDirectiveTaskList
+  transformWaterFrameworkDirectiveTaskList,
+  transformMarinePlanPoliciesTaskList
 } from '#src/server/marine-licence/task-list/utils.js'
 import { authenticatedGetRequest } from '#src/server/common/helpers/authenticated-requests.js'
 import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
@@ -19,6 +20,7 @@ import { getUserSession } from '#src/server/common/plugins/auth/utils.js'
 import { USER_TYPES } from '#src/server/common/constants/user-types.js'
 import Boom from '@hapi/boom'
 import { clearReturnToCache } from '#src/server/common/helpers/marine-licence/session-cache/return-to-cache.js'
+import { clearWaterFrameworkDirectiveReturnToCache } from '#src/server/common/helpers/marine-licence/session-cache/water-framework-directive.js'
 
 export const TASK_LIST_VIEW_ROUTE = 'marine-licence/task-list/index'
 
@@ -29,7 +31,11 @@ const taskListViewSettings = {
   heading: headingText
 }
 
-function transformTaskLists(taskList, isCitizen, { waterFrameworkDirective }) {
+function transformTaskLists(
+  taskList,
+  isCitizen,
+  { waterFrameworkDirective, marinePlanPolicyJob, marinePlanPoliciesCount }
+) {
   return {
     otherPermissions: transformOtherPermissionsTaskList(taskList, isCitizen),
     sharing: transformSharingTaskList(taskList),
@@ -38,7 +44,11 @@ function transformTaskLists(taskList, isCitizen, { waterFrameworkDirective }) {
     waterFrameworkDirective: transformWaterFrameworkDirectiveTaskList(
       taskList,
       waterFrameworkDirective
-    )
+    ),
+    marinePlanPolicies: transformMarinePlanPoliciesTaskList(taskList, {
+      marinePlanPolicyJob,
+      marinePlanPoliciesCount
+    })
   }
 }
 
@@ -75,6 +85,7 @@ async function updateLicenceSession(request, h, licenceData, hasCancel) {
 export const taskListController = {
   async handler(request, h) {
     clearReturnToCache(request)
+    clearWaterFrameworkDirectiveReturnToCache(request)
 
     const userSession = await getUserSession(
       request,
@@ -93,13 +104,19 @@ export const taskListController = {
       request,
       `/marine-licence/${id}`
     )
-    const { taskList, projectName, waterFrameworkDirective } = payload.value
+    const {
+      taskList,
+      projectName,
+      waterFrameworkDirective,
+      marinePlanPolicyJob,
+      marinePlanPoliciesCount
+    } = payload.value
     const { userRelationshipType } = userSession
 
     const transformed = transformTaskLists(
       taskList,
       userRelationshipType === USER_TYPES.CITIZEN,
-      { waterFrameworkDirective }
+      { waterFrameworkDirective, marinePlanPolicyJob, marinePlanPoliciesCount }
     )
     await updateLicenceSession(request, h, payload.value, hasCancel)
 
@@ -119,6 +136,7 @@ export const taskListController = {
       projectDetailsTaskList: transformed.projectDetails,
       siteDetailsTaskList: transformed.siteDetails,
       waterFrameworkDirectiveTaskList: transformed.waterFrameworkDirective,
+      marinePlanPoliciesTaskList: transformed.marinePlanPolicies,
       hasCompletedAllTasks
     })
   }

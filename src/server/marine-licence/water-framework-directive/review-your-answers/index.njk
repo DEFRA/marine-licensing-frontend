@@ -14,18 +14,55 @@
 {% endblock %}
 
 
-{% set activityRows = [wfdDisplayData.nauticalMile, wfdDisplayData.excludedActivities] %}
+{% set activityRows = [] %}
 
-{% if waterFrameworkDirective.previousAssessment %}
-    {% set activityRows = (activityRows.push(wfdDisplayData.previousAssessment), activityRows) %}
-{% endif %}
+{% set activityRows = (activityRows.push({
+  key: wfdDisplayData.nauticalMile.key,
+  value: wfdDisplayData.nauticalMile.value,
+  actions: {
+    items: [
+      {
+        href: routes.MARINE_LICENCE_WATER_FRAMEWORK_DIRECTIVE_NAUTICAL_MILE + '?action=change',
+        text: "Change",
+        visuallyHiddenText: "nautical mile",
+        classes: "govuk-link--no-visited-state"
+      }
+    ]
+  }
+}), activityRows) %}
 
-{% if waterFrameworkDirective.assessmentChanged %}
-    {% set activityRows = (activityRows.push(wfdDisplayData.assessmentChanged), activityRows) %}
-{% endif %}
+{% set activityRows = (activityRows.push({
+  key: wfdDisplayData.excludedActivities.key,
+  value: wfdDisplayData.excludedActivities.value,
+  actions: {
+    items: [
+      {
+        href: routes.MARINE_LICENCE_WATER_FRAMEWORK_DIRECTIVE_EXCLUDED_ACTIVITIES + '?action=change',
+        text: "Change",
+        visuallyHiddenText: "excluded activities",
+        classes: "govuk-link--no-visited-state"
+      }
+    ]
+  }
+}), activityRows) %}
 
 {% if waterFrameworkDirective.uploadedFile %}
-    {% set activityRows = (activityRows.push(wfdDisplayData.uploadedFile), activityRows) %}
+
+  {% set activityRows = (activityRows.push({
+    key: wfdDisplayData.uploadedFile.key,
+    value: wfdDisplayData.uploadedFile.value,
+    actions: {
+      items: [
+        {
+          href: routes.MARINE_LICENCE_WATER_FRAMEWORK_DIRECTIVE_FILE_UPLOAD + '?action=change',
+          text: "Change",
+          visuallyHiddenText: "upload a file",
+          classes: "govuk-link--no-visited-state"
+        }
+      ]
+    }
+  }), activityRows) %}
+
 {% endif %}
 
 {% block content %}

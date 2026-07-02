@@ -1,5 +1,6 @@
 {% from "govuk/components/button/macro.njk" import govukButton %}
 {% from "govuk/components/inset-text/macro.njk" import govukInsetText %}
+{% from "journey/self-service/outcome/_external-link.njk" import externalLink %}
 
 {% if section %}
   <span class="govuk-caption-l">{{ section.text }}</span>
@@ -21,11 +22,15 @@
 
     <div class="app-iat-option__actions">
       {% if option.isTerminal %}
-        {{ govukButton({
-          text: option.ctaLabel,
-          href: "#",
-          classes: "govuk-!-margin-right-3"
-        }) }}
+        {% if option.link %}
+          {{ externalLink(option.link, option.heading) }}
+        {% elif option.ctaHref %}
+          {{ govukButton({
+            text: option.ctaLabel,
+            href: option.ctaHref,
+            classes: "govuk-!-margin-right-3"
+          }) }}
+        {% endif %}
       {% else %}
         <form method="POST">
           <input type="hidden" name="csrfToken" value="{{ csrfToken }}"/>

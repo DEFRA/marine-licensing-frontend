@@ -1,4 +1,5 @@
 {% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "journey/self-service/outcome/_external-link.njk" import externalLink %}
 
 <h1 class="govuk-heading-xl">{{ heading }}</h1>
 
@@ -8,10 +9,12 @@
     {% if option.text %}
       <div class="govuk-body">{{ option.text | safe }}</div>
     {% endif %}
-    {% if option.hasContinue %}
+    {% if option.link %}
+      {{ externalLink(option.link, option.heading) }}
+    {% elif option.ctaHref %}
       {{ govukButton({
         text: option.ctaLabel,
-        href: option.continueUrl or "#",
+        href: option.ctaHref,
         classes: "govuk-!-margin-bottom-2"
       }) }}
     {% endif %}

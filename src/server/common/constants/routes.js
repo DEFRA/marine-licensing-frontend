@@ -92,17 +92,15 @@ export const marineLicenceRoutes = {
     '/marine-licence/water-framework-directive-nautical-mile',
   MARINE_LICENCE_WATER_FRAMEWORK_DIRECTIVE_EXCLUDED_ACTIVITIES:
     '/marine-licence/water-framework-directive-excluded-activities',
-  MARINE_LICENCE_WATER_FRAMEWORK_DIRECTIVE_PREVIOUS_ASSESSMENT:
-    '/marine-licence/water-framework-directive-previous-assessment',
-  MARINE_LICENCE_WATER_FRAMEWORK_DIRECTIVE_ASSESSMENT_CHANGED:
-    '/marine-licence/water-framework-directive-assessment-changed',
   MARINE_LICENCE_PREFERRED_DATES: '/marine-licence/start-and-end-dates',
   MARINE_LICENCE_WATER_FRAMEWORK_DIRECTIVE_FILE_UPLOAD:
     '/marine-licence/water-framework-directive-file-upload',
   MARINE_LICENCE_WATER_FRAMEWORK_DIRECTIVE_UPLOAD_AND_WAIT:
     '/marine-licence/water-framework-directive-upload-and-wait',
   MARINE_LICENCE_WATER_FRAMEWORK_DIRECTIVE_REVIEW_YOUR_ANSWERS:
-    '/marine-licence/water-framework-directive-review-your-answers'
+    '/marine-licence/water-framework-directive-review-your-answers',
+  MARINE_LICENCE_CALCULATE_MARINE_PLAN_POLICIES:
+    '/marine-licence/calculate-marine-plan-policies'
 }
 
 export const defraIdGuidanceRoutes = {
@@ -180,5 +178,7 @@ export const apiRoutes = {
   GENERATE_COORDINATES_CSV:
     '/marine-licence/{marineLicenceId}/generate-coordinates-csv',
   UPDATE_PREFERRED_DATES: '/marine-licence/preferred-dates',
-  UPDATE_WATER_FRAMEWORK_DIRECTIVE: '/marine-licence/water-framework-directive'
+  UPDATE_WATER_FRAMEWORK_DIRECTIVE: '/marine-licence/water-framework-directive',
+  CALCULATE_MARINE_PLAN_POLICIES:
+    '/marine-licence/calculate-marine-plan-policies'
 }

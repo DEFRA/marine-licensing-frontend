@@ -99,6 +99,20 @@ export const config = convict({
     default: localhost,
     env: 'APP_BASE_URL'
   },
+  mcms: {
+    url: {
+      doc: 'Base URL of the MCMS service the IAT hands users off to at the end of a journey',
+      format: String,
+      default: 'https://marinelicensingtest.marinemanagement.org.uk/',
+      env: 'MCMS_URL'
+    },
+    path: {
+      doc: 'Path appended to the MCMS base URL for the IAT handoff — relative, no leading slash',
+      format: String,
+      default: 'mmofox5uat/fox/mmo/MMO_IAT_INTEGRATION',
+      env: 'MCMS_PATH'
+    }
+  },
   root: {
     doc: 'Project root',
     format: String,

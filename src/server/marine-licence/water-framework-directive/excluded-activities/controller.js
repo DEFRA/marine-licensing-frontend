@@ -1,9 +1,19 @@
 import { getMarineLicenceCache } from '#src/server/common/helpers/marine-licence/session-cache/utils.js'
-import { updateWaterFrameworkDirective } from '#src/server/common/helpers/marine-licence/session-cache/water-framework-directive.js'
 import { createFailAction } from '#src/server/common/helpers/createFailAction.js'
 import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
 import { saveWaterFrameworkDirectiveToBackend } from '#src/server/common/helpers/marine-licence/water-framework-directive/save-water-framework-directive.js'
 import joi from 'joi'
+import {
+  setWaterFrameworkDirectiveReturnToCache,
+  getWaterFrameworkDirectiveReturnRoute,
+  clearWaterFrameworkDirectiveReturnToCache,
+  updateWaterFrameworkDirective
+} from '#src/server/common/helpers/marine-licence/session-cache/water-framework-directive.js'
+import {
+  getBackLink,
+  getCancelLink,
+  getSubmitRedirect
+} from '#src/server/marine-licence/water-framework-directive/excluded-activities/utils.js'
 
 export const EXCLUDED_ACTIVITIES_VIEW_ROUTE =
   'marine-licence/water-framework-directive/excluded-activities/index'
@@ -18,10 +28,7 @@ export const errorMessages = {
 
 const excludedActivitiesSettings = {
   pageTitle: EXCLUDED_ACTIVITIES_HEADING,
-  heading: EXCLUDED_ACTIVITIES_HEADING,
-  backLink:
-    marineLicenceRoutes.MARINE_LICENCE_WATER_FRAMEWORK_DIRECTIVE_NAUTICAL_MILE,
-  cancelLink: marineLicenceRoutes.MARINE_LICENCE_TASK_LIST
+  heading: EXCLUDED_ACTIVITIES_HEADING
 }
 
 export const excludedActivitiesController = {
@@ -29,8 +36,21 @@ export const excludedActivitiesController = {
     const marineLicence = getMarineLicenceCache(request)
     const { waterFrameworkDirective } = marineLicence
 
+    if (request.query.action) {
+      await setWaterFrameworkDirectiveReturnToCache(
+        request,
+        h,
+        marineLicenceRoutes.MARINE_LICENCE_WATER_FRAMEWORK_DIRECTIVE_REVIEW_YOUR_ANSWERS
+      )
+    }
+
+    const waterFrameworkDirectiveReturnTo =
+      getWaterFrameworkDirectiveReturnRoute(request)
+
     return h.view(EXCLUDED_ACTIVITIES_VIEW_ROUTE, {
       ...excludedActivitiesSettings,
+      backLink: getBackLink(waterFrameworkDirectiveReturnTo),
+      cancelLink: getCancelLink(waterFrameworkDirectiveReturnTo),
       projectName: marineLicence.projectName,
       payload: {
         excludedActivities: waterFrameworkDirective?.excludedActivities
@@ -55,13 +75,16 @@ export const excludedActivitiesSubmitController = {
       }),
       failAction: (request, h, err) => {
         const { projectName } = getMarineLicenceCache(request)
+        const waterFrameworkDirectiveReturnTo =
+          getWaterFrameworkDirectiveReturnRoute(request)
         return createFailAction({
           viewRoute: EXCLUDED_ACTIVITIES_VIEW_ROUTE,
           settings: excludedActivitiesSettings,
-          backLink: excludedActivitiesSettings.backLink,
+          backLink: getBackLink(waterFrameworkDirectiveReturnTo),
           errorMessages,
           projectName,
-          payload: request.payload
+          payload: request.payload,
+          params: { cancelLink: getCancelLink(waterFrameworkDirectiveReturnTo) }
         })(request, h, err)
       }
     }
@@ -70,6 +93,10 @@ export const excludedActivitiesSubmitController = {
     const { payload } = request
     const { excludedActivities } = payload
 
+    const marineLicence = getMarineLicenceCache(request)
+    const previousExcludedActivities =
+      marineLicence.waterFrameworkDirective?.excludedActivities
+
     await updateWaterFrameworkDirective(
       request,
       h,
@@ -77,16 +104,20 @@ export const excludedActivitiesSubmitController = {
       excludedActivities
     )
 
-    if (payload.excludedActivities === 'no') {
-      return h.redirect(
-        marineLicenceRoutes.MARINE_LICENCE_WATER_FRAMEWORK_DIRECTIVE_PREVIOUS_ASSESSMENT
-      )
+    const waterFrameworkDirectiveReturnTo =
+      getWaterFrameworkDirectiveReturnRoute(request)
+
+    const redirectPath = getSubmitRedirect(
+      excludedActivities,
+      waterFrameworkDirectiveReturnTo,
+      previousExcludedActivities
+    )
+
+    if (excludedActivities === 'yes') {
+      await saveWaterFrameworkDirectiveToBackend(request)
+      clearWaterFrameworkDirectiveReturnToCache(request)
     }
 
-    await saveWaterFrameworkDirectiveToBackend(request)
-
-    return h.redirect(
-      marineLicenceRoutes.MARINE_LICENCE_WATER_FRAMEWORK_DIRECTIVE_REVIEW_YOUR_ANSWERS
-    )
+    return h.redirect(redirectPath)
   }
 }

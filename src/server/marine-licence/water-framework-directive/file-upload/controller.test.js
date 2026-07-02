@@ -13,6 +13,7 @@ import {
   WFD_ACCEPT_ATTRIBUTE,
   s3PathForWaterFrameworkDirective
 } from '#src/server/common/constants/water-framework-directive.js'
+import { createMockRequest } from '#src/server/test-helpers/mocks/helpers.js'
 
 vi.mock('~/src/server/common/helpers/marine-licence/session-cache/utils.js')
 vi.mock('~/src/services/cdp-upload-service/index.js')
@@ -42,19 +43,6 @@ describe('#fileUpload', () => {
   let getMarineLicenceCacheSpy
   let updateWaterFrameworkDirectiveSpy
   let mockCdpService
-
-  const createMockRequest = () => ({
-    logger: {
-      debug: vi.fn(),
-      warn: vi.fn(),
-      error: vi.fn()
-    },
-    yar: {
-      get: vi.fn(),
-      set: vi.fn(),
-      commit: vi.fn()
-    }
-  })
 
   const createMockH = () => ({
     view: vi.fn(),
@@ -94,6 +82,21 @@ describe('#fileUpload', () => {
       .spyOn(wfdCacheUtils, 'updateWaterFrameworkDirective')
       .mockResolvedValue()
 
+    vi.spyOn(
+      wfdCacheUtils,
+      'getWaterFrameworkDirectiveReturnRoute'
+    ).mockReturnValue(undefined)
+
+    vi.spyOn(
+      wfdCacheUtils,
+      'setWaterFrameworkDirectiveReturnToCache'
+    ).mockResolvedValue()
+
+    vi.spyOn(
+      wfdCacheUtils,
+      'setWaterFrameworkDirectivePageEntryPoint'
+    ).mockResolvedValue()
+
     mockCdpService = { initiate: vi.fn() }
     vi.spyOn(cdpUploadService, 'getCdpUploadService').mockReturnValue(
       mockCdpService
@@ -121,7 +124,35 @@ describe('#fileUpload', () => {
           maxFileSize: 50000000,
           acceptAttribute: WFD_ACCEPT_ATTRIBUTE,
           backLink:
-            marineLicenceRoutes.MARINE_LICENCE_WATER_FRAMEWORK_DIRECTIVE_ASSESSMENT_CHANGED,
+            marineLicenceRoutes.MARINE_LICENCE_WATER_FRAMEWORK_DIRECTIVE_EXCLUDED_ACTIVITIES,
+          cancelLink: marineLicenceRoutes.MARINE_LICENCE_TASK_LIST
+        })
+      })
+
+      test('should set backLink to "review-your-answers" and no cancel when using a change link', async () => {
+        vi.spyOn(
+          wfdCacheUtils,
+          'getWaterFrameworkDirectiveReturnRoute'
+        ).mockReturnValue(
+          marineLicenceRoutes.MARINE_LICENCE_WATER_FRAMEWORK_DIRECTIVE_REVIEW_YOUR_ANSWERS
+        )
+
+        mockRequest = createMockRequest({ query: { action: 'change' } })
+        await setupStandardFileUploadTest(mockRequest, mockH)
+
+        expectViewCalledWith(mockH, {
+          backLink:
+            marineLicenceRoutes.MARINE_LICENCE_WATER_FRAMEWORK_DIRECTIVE_REVIEW_YOUR_ANSWERS,
+          cancelLink: undefined
+        })
+      })
+
+      test('should set backLink to "excluded-activities" when not coming from a change link', async () => {
+        await setupStandardFileUploadTest(mockRequest, mockH)
+
+        expectViewCalledWith(mockH, {
+          backLink:
+            marineLicenceRoutes.MARINE_LICENCE_WATER_FRAMEWORK_DIRECTIVE_EXCLUDED_ACTIVITIES,
           cancelLink: marineLicenceRoutes.MARINE_LICENCE_TASK_LIST
         })
       })

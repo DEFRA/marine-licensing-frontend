@@ -1,3 +1,4 @@
 export const RETURN_TO_CACHE_KEY = 'returnTo'
 export const PROJECT_TYPE_CACHE_KEY = 'projectType'
 export const SINGLE_SITE_MODE_KEY = 'singleSiteMode'
+export const WFD_RETURN_TO_KEY = 'wfdReturnTo'

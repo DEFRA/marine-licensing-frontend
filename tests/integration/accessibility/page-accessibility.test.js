@@ -87,6 +87,12 @@ describe('Page accessibility checks (Axe)', () => {
     //   title: 'Upload and wait',
     //   exemption: mockExemptionWithUploadConfig
     // },
+    // TODO: Uncomment when meta refresh a11y issue is resolved (same issue as above)
+    // {
+    //   url: marineLicenceRoutes.MARINE_LICENCE_CALCULATE_MARINE_PLAN_POLICIES,
+    //   title: 'Loading your Marine plan policies',
+    //   isMarineLicence: true
+    // },
     {
       url: routes.COORDINATES_ENTRY_CHOICE,
       title: 'How do you want to enter the site coordinates?'
@@ -240,18 +246,6 @@ describe('Page accessibility checks (Axe)', () => {
       isMarineLicence: true,
       title:
         'Is your project limited to one of the following excluded activities?'
-    },
-    {
-      url: marineLicenceRoutes.MARINE_LICENCE_WATER_FRAMEWORK_DIRECTIVE_PREVIOUS_ASSESSMENT,
-      isMarineLicence: true,
-      title:
-        'Do you have a previous Water Framework Directive assessment completed between 2015 and 2022 for this type of activity?'
-    },
-    {
-      url: marineLicenceRoutes.MARINE_LICENCE_WATER_FRAMEWORK_DIRECTIVE_ASSESSMENT_CHANGED,
-      isMarineLicence: true,
-      title:
-        'Has anything changed since your previous Water Framework Directive assessment?'
     },
     {
       url: marineLicenceRoutes.MARINE_LICENCE_WATER_FRAMEWORK_DIRECTIVE_REVIEW_YOUR_ANSWERS,

@@ -1,4 +1,4 @@
-import { getByRole, getByText } from '@testing-library/dom'
+import { getByRole, getByText, queryByRole } from '@testing-library/dom'
 import { marineLicenceRoutes } from '~/src/server/common/constants/routes.js'
 import {
   mockMarineLicence,
@@ -149,6 +149,23 @@ describe('Water Framework Directive Excluded Activities', () => {
     })
   })
 
+  test('should show review-your-answers back link and no cancel when accessed via change link', async () => {
+    mockMarineLicence(marineLicence)
+
+    const document = await loadPage({
+      requestUrl: `${marineLicenceRoutes.MARINE_LICENCE_WATER_FRAMEWORK_DIRECTIVE_EXCLUDED_ACTIVITIES}?action=change`,
+      server: getServer()
+    })
+
+    expect(getByRole(document, 'link', { name: 'Back' })).toHaveAttribute(
+      'href',
+      marineLicenceRoutes.MARINE_LICENCE_WATER_FRAMEWORK_DIRECTIVE_REVIEW_YOUR_ANSWERS
+    )
+    expect(
+      queryByRole(document, 'link', { name: 'Cancel' })
+    ).not.toBeInTheDocument()
+  })
+
   test('should go to review page when yes is chosen as answer', async () => {
     mockMarineLicence(marineLicence)
 
@@ -169,7 +186,7 @@ describe('Water Framework Directive Excluded Activities', () => {
     })
 
     expect(response.headers.location).toBe(
-      marineLicenceRoutes.MARINE_LICENCE_WATER_FRAMEWORK_DIRECTIVE_PREVIOUS_ASSESSMENT
+      marineLicenceRoutes.MARINE_LICENCE_WATER_FRAMEWORK_DIRECTIVE_FILE_UPLOAD
     )
   })
 })

@@ -1,5 +1,9 @@
 import { getMarineLicenceCache } from '#src/server/common/helpers/marine-licence/session-cache/utils.js'
-import { updateWaterFrameworkDirective } from '#src/server/common/helpers/marine-licence/session-cache/water-framework-directive.js'
+import {
+  updateWaterFrameworkDirective,
+  setWaterFrameworkDirectivePageEntryPoint,
+  getWaterFrameworkDirectivePageEntryPoint
+} from '#src/server/common/helpers/marine-licence/session-cache/water-framework-directive.js'
 import { createFailAction } from '#src/server/common/helpers/createFailAction.js'
 import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
 import joi from 'joi'
@@ -32,11 +36,38 @@ export const nauticalMileController = {
     const { waterFrameworkDirective } = marineLicence
 
     const returnTo = request.yar.get(RETURN_TO_CACHE_KEY)
+    const { action } = request.query
+
+    const isReturningFromWithinFlow = request.info?.referrer?.includes(
+      marineLicenceRoutes.MARINE_LICENCE_WATER_FRAMEWORK_DIRECTIVE_EXCLUDED_ACTIVITIES
+    )
+    let waterFrameworkDirectiveEntryPoint =
+      getWaterFrameworkDirectivePageEntryPoint(
+        request,
+        'waterFrameworkDirectiveEntryPoint'
+      )
+
+    if (!isReturningFromWithinFlow) {
+      const hasExistingAnswer = Boolean(waterFrameworkDirective?.nauticalMile)
+      waterFrameworkDirectiveEntryPoint = hasExistingAnswer
+        ? 'task-list'
+        : 'before-you-start'
+      await setWaterFrameworkDirectivePageEntryPoint(
+        request,
+        h,
+        'waterFrameworkDirectiveEntryPoint',
+        waterFrameworkDirectiveEntryPoint
+      )
+    }
 
     return h.view(NAUTICAL_MILE_VIEW_ROUTE, {
       ...nauticalMileSettings,
-      backLink: getBackLink(returnTo),
-      cancelLink: getCancelLink(returnTo),
+      backLink: getBackLink(
+        returnTo,
+        action,
+        waterFrameworkDirectiveEntryPoint
+      ),
+      cancelLink: getCancelLink(returnTo, action),
       projectName: marineLicence.projectName,
       payload: { nauticalMile: waterFrameworkDirective?.nauticalMile }
     })
@@ -57,15 +88,25 @@ export const nauticalMileSubmitController = {
         const { projectName } = getMarineLicenceCache(request)
 
         const returnTo = request.yar.get(RETURN_TO_CACHE_KEY)
+        const { action } = request.query
+        const waterFrameworkDirectiveEntryPoint =
+          getWaterFrameworkDirectivePageEntryPoint(
+            request,
+            'waterFrameworkDirectiveEntryPoint'
+          )
 
         return createFailAction({
           viewRoute: NAUTICAL_MILE_VIEW_ROUTE,
           settings: nauticalMileSettings,
-          backLink: getBackLink(returnTo),
+          backLink: getBackLink(
+            returnTo,
+            action,
+            waterFrameworkDirectiveEntryPoint
+          ),
           errorMessages,
           projectName,
           payload: request.payload,
-          params: { cancelLink: getCancelLink(returnTo) }
+          params: { cancelLink: getCancelLink(returnTo, action) }
         })(request, h, err)
       }
     }
@@ -83,12 +124,18 @@ export const nauticalMileSubmitController = {
     )
 
     if (nauticalMile === 'no') {
-      await saveWaterFrameworkDirectiveToBackend(request, true)
+      await saveWaterFrameworkDirectiveToBackend(request)
       const returnTo = request.yar.get(RETURN_TO_CACHE_KEY)
       if (returnTo) {
         return h.redirect(`${returnTo}#water-framework-directive-card`)
       }
       return h.redirect(marineLicenceRoutes.MARINE_LICENCE_TASK_LIST)
+    }
+
+    if (request.query.action) {
+      return h.redirect(
+        marineLicenceRoutes.MARINE_LICENCE_WATER_FRAMEWORK_DIRECTIVE_REVIEW_YOUR_ANSWERS
+      )
     }
 
     return h.redirect(

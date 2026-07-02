@@ -156,6 +156,35 @@ describe('#context', () => {
     )
   })
 
+  it('When on the calculate marine plan policies page, should not use navigation links', () => {
+    vi.mocked(getMarineLicenceCache).mockReturnValue({ id: 'some-id' })
+    const mockRequest = {
+      path: '/marine-licence/calculate-marine-plan-policies',
+      logger: { error: vi.fn() }
+    }
+    const contextResult = context(mockRequest)
+    expect(contextResult.navigation).toEqual([])
+  })
+
+  it('When on the exemption file upload page, should not use navigation links', () => {
+    const mockRequest = {
+      path: '/exemption/upload-and-wait',
+      logger: { error: vi.fn() }
+    }
+    const contextResult = context(mockRequest)
+    expect(contextResult.navigation).toEqual([])
+  })
+
+  it('When on the marine licence file upload page, should not use navigation links', () => {
+    vi.mocked(getMarineLicenceCache).mockReturnValue({ id: 'some-id' })
+    const mockRequest = {
+      path: '/marine-licence/upload-and-wait',
+      logger: { error: vi.fn() }
+    }
+    const contextResult = context(mockRequest)
+    expect(contextResult.navigation).toEqual([])
+  })
+
   it('When session cache throws, should show navigation', () => {
     vi.mocked(getMarineLicenceCache).mockImplementation(() => {
       throw new TypeError('Cannot read properties of null')

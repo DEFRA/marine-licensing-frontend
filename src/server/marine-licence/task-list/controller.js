@@ -6,6 +6,7 @@ import {
 } from '#src/server/common/helpers/marine-licence/session-cache/utils.js'
 import { setProjectType } from '#src/server/common/helpers/session-cache/utils.js'
 import {
+  transformFeeEstimateTaskList,
   transformProjectDetailsTaskList,
   transformSiteDetailsTaskList,
   transformOtherPermissionsTaskList,
@@ -37,6 +38,7 @@ function transformTaskLists(
   { waterFrameworkDirective, marinePlanPolicyJob, marinePlanPoliciesCount }
 ) {
   return {
+    feeEstimate: transformFeeEstimateTaskList(taskList),
     otherPermissions: transformOtherPermissionsTaskList(taskList, isCitizen),
     sharing: transformSharingTaskList(taskList),
     projectDetails: transformProjectDetailsTaskList(taskList),
@@ -55,6 +57,7 @@ function transformTaskLists(
 async function updateLicenceSession(request, h, licenceData, hasCancel) {
   const {
     id: marineLicenceId,
+    feeEstimate,
     projectName,
     projectBackground,
     specialLegalPowers,
@@ -69,6 +72,7 @@ async function updateLicenceSession(request, h, licenceData, hasCancel) {
 
   await setMarineLicenceCache(request, h, {
     id: marineLicenceId,
+    feeEstimate,
     projectName,
     projectBackground,
     specialLegalPowers,
@@ -120,6 +124,7 @@ export const taskListController = {
       userRelationshipType === USER_TYPES.CITIZEN,
       { waterFrameworkDirective, marinePlanPolicyJob, marinePlanPoliciesCount }
     )
+
     await updateLicenceSession(request, h, payload.value, hasCancel)
 
     const hasCompletedAllTasks = [
@@ -127,7 +132,8 @@ export const taskListController = {
       ...transformed.sharing,
       ...transformed.projectDetails,
       ...transformed.siteDetails,
-      ...transformed.waterFrameworkDirective
+      ...transformed.waterFrameworkDirective,
+      ...transformed.feeEstimate
     ].every((task) => task.status.text === 'Completed')
 
     return h.view(TASK_LIST_VIEW_ROUTE, {
@@ -138,6 +144,7 @@ export const taskListController = {
       projectDetailsTaskList: transformed.projectDetails,
       siteDetailsTaskList: transformed.siteDetails,
       waterFrameworkDirectiveTaskList: transformed.waterFrameworkDirective,
+      feeEstimateTaskList: transformed.feeEstimate,
       marinePlanPoliciesTaskList: transformed.marinePlanPolicies,
       hasCompletedAllTasks
     })

@@ -65,11 +65,6 @@ describe('Task List', () => {
   })
 
   test('should render review button when all tasks are completed', async () => {
-    mockMarineLicence({
-      ...mockMarineLicenceApplication,
-      taskList: [{ status: { text: 'Completed' } }]
-    })
-
     expect(getByRole(document, 'heading', { level: 1 })).toHaveTextContent(
       'Marine licence start page'
     )

@@ -134,9 +134,9 @@ export const mockMarineLicenceWithMarinePlanPolicies = {
   marinePlanPolicyJob: 'ready',
   marinePlanPoliciesCount: 3,
   marinePlanPolicies: [
-    { policyCode: 'SW-MPA-1' },
-    { policyCode: 'SW-AGG-2' },
-    { policyCode: 'SW-BIO-1' }
+    { policyCode: 'SW-MPA-1', policy: 'Marine protected area policy wording.' },
+    { policyCode: 'SW-AGG-2', policy: 'Aggregates policy wording.' },
+    { policyCode: 'SW-BIO-1', policy: 'Biodiversity policy wording.' }
   ]
 }
 

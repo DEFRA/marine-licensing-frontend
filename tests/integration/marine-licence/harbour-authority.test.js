@@ -11,13 +11,13 @@ import {
   expectInputValue
 } from '~/tests/integration/shared/expect-utils.js'
 import { getInputInFieldset } from '~/tests/integration/shared/dom-helpers.js'
+import { statusCodes } from '~/src/server/common/constants/status-codes.js'
 
 describe('Harbour authority', () => {
   const getServer = setupTestServer()
   const marineLicence = {
     id: 'marine-licence-123',
     projectName: 'Test Marine Project',
-    harbourAuthority: { area: undefined, details: '' }
   }
 
   test('page elements', async () => {
@@ -61,7 +61,7 @@ describe('Harbour authority', () => {
     expect(getByRole(document, 'link', { name: 'Back' })).toHaveAttribute(
       'href',
       marineLicenceRoutes.MARINE_LICENCE_CHECK_YOUR_ANSWERS +
-        '#other-permissions-card'
+      '#other-permissions-card'
     )
   })
 
@@ -81,6 +81,7 @@ describe('Harbour authority', () => {
         findByHeading: true
       })
     ).not.toBeChecked()
+
     expect(
       getInputInFieldset({
         document,
@@ -113,6 +114,7 @@ describe('Harbour authority', () => {
         findByHeading: true
       })
     ).toBeChecked()
+
     expectInputValue({
       document,
       inputLabel: 'Provide details of the harbour authority',
@@ -123,16 +125,13 @@ describe('Harbour authority', () => {
   test('should show a validation error when submitted without a decision', async () => {
     mockMarineLicence(marineLicence)
 
-    const submitHarbourAuthorityForm = async (formData) => {
-      const { document } = await submitForm({
-        requestUrl: marineLicenceRoutes.MARINE_LICENCE_HARBOUR_AUTHORITY,
-        server: getServer(),
-        formData
-      })
-      return document
-    }
-
-    const document = await submitHarbourAuthorityForm({ area: '' })
+    const { document } = await submitForm({
+      requestUrl: marineLicenceRoutes.MARINE_LICENCE_HARBOUR_AUTHORITY,
+      server: getServer(),
+      formData: {
+        area: ''
+      }
+    })
 
     expectFieldsetError({
       document,
@@ -146,18 +145,14 @@ describe('Harbour authority', () => {
   test('should show a validation error when "yes" is selected but harbour area is missing', async () => {
     mockMarineLicence(marineLicence)
 
-    const submitHarbourAuthorityForm = async (formData) => {
-      const { document } = await submitForm({
-        requestUrl: marineLicenceRoutes.MARINE_LICENCE_HARBOUR_AUTHORITY,
-        server: getServer(),
-        formData
-      })
-      return document
-    }
 
-    const document = await submitHarbourAuthorityForm({
-      area: 'yes',
-      details: ''
+    const { document } = await submitForm({
+      requestUrl: marineLicenceRoutes.MARINE_LICENCE_HARBOUR_AUTHORITY,
+      server: getServer(),
+      formData: {
+        area: 'yes',
+        details: ''
+      }
     })
 
     expectFieldsetError({
@@ -166,5 +161,23 @@ describe('Harbour authority', () => {
       errorMessage: 'Enter details of the harbour authority',
       findByHeading: true
     })
+  })
+
+  test('should redirect to task list on valid submission', async () => {
+    mockMarineLicence(marineLicence)
+
+    const { response } = await submitForm({
+      requestUrl: marineLicenceRoutes.MARINE_LICENCE_HARBOUR_AUTHORITY,
+      server: getServer(),
+      formData: {
+        area: 'yes',
+        details: 'Details'
+      }
+    })
+
+    expect(response.statusCode).toBe(statusCodes.redirect)
+    expect(response.headers.location).toBe(
+      marineLicenceRoutes.MARINE_LICENCE_TASK_LIST
+    )
   })
 })

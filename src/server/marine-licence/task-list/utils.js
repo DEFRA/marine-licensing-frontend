@@ -187,7 +187,7 @@ export const transformMarinePlanPoliciesTaskList = (
         classes: taskClasses
       },
       href: marineLicenceRoutes.MARINE_LICENCE_MARINE_PLAN_POLICIES,
-      status: { tag: { text: 'Not yet started', classes: 'govuk-tag--blue' } }
+      status
     }
   ]
 }

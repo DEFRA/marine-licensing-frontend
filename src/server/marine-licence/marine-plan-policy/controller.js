@@ -47,6 +47,7 @@ const loadPolicyContext = async (request) => {
   }
 
   return {
+    id: marineLicence.id,
     policyCode,
     projectName,
     policy,
@@ -118,14 +119,13 @@ export const marinePlanPolicySubmitController = {
     }
   },
   async handler(request, h) {
-    const marineLicence = getMarineLicenceCache(request)
-    const { policyCode } = request.params
+    const { id, policyCode } = await loadPolicyContext(request)
 
     await authenticatedPatchRequest(
       request,
       apiRoutes.MARINE_LICENCE_MARINE_PLAN_POLICY_RESPONSE,
       {
-        id: marineLicence.id,
+        id,
         policyCode,
         response: request.payload.policyConsideration
       }

@@ -183,4 +183,50 @@ describe('#marinePlanPolicySubmitController (POST)', () => {
     )
     expect(h.view().takeover).toHaveBeenCalled()
   })
+
+  test('throws 404 and does not save when the policy code is unknown', async () => {
+    const h = {
+      redirect: vi.fn().mockReturnValue({ takeover: vi.fn() }),
+      view: vi.fn()
+    }
+
+    await expect(
+      marinePlanPolicySubmitController.handler(
+        {
+          params: { policyCode: 'UNKNOWN-1' },
+          payload: { policyConsideration: 'My considered answer' }
+        },
+        h
+      )
+    ).rejects.toMatchObject({ output: { statusCode: 404 } })
+    expect(authRequests.authenticatedPatchRequest).not.toHaveBeenCalled()
+    expect(h.redirect).not.toHaveBeenCalled()
+  })
+
+  test.each([
+    { name: 'null error details', err: { details: null } },
+    { name: 'missing error details', err: {} }
+  ])('failAction with $name re-renders without error data', async ({ err }) => {
+    const h = { view: vi.fn().mockReturnValue({ takeover: vi.fn() }) }
+
+    await marinePlanPolicySubmitController.options.validate.failAction(
+      {
+        params: { policyCode: 'SW-BIO-1' },
+        payload: { policyConsideration: 'partial answer' }
+      },
+      h,
+      err
+    )
+
+    const model = h.view.mock.calls[0][1]
+    expect(model).toEqual(
+      expect.objectContaining({
+        heading: 'SW-BIO-1',
+        payload: { policyConsideration: 'partial answer' }
+      })
+    )
+    expect(model.errors).toBeUndefined()
+    expect(model.errorSummary).toBeUndefined()
+    expect(h.view().takeover).toHaveBeenCalled()
+  })
 })

@@ -32,11 +32,13 @@ export const getPageViewCommonData = async (request) => {
 
   const citizenName = shouldShowCitizenName ? displayName : null
 
+  const sessionOrgOrUserName = shouldShowOrgOrUserName
+    ? organisationName || displayName
+    : citizenName
+
   const orgOrUserName = hideOrgOrUserNameRoutes.includes(request.path)
     ? null
-    : shouldShowOrgOrUserName
-      ? organisationName || displayName
-      : citizenName
+    : sessionOrgOrUserName
 
   return { orgOrUserName, showChangeOrganisationLink }
 }

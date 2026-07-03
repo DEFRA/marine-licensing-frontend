@@ -17,7 +17,7 @@ describe('Harbour authority', () => {
   const getServer = setupTestServer()
   const marineLicence = {
     id: 'marine-licence-123',
-    projectName: 'Test Marine Project',
+    projectName: 'Test Marine Project'
   }
 
   test('page elements', async () => {
@@ -61,7 +61,7 @@ describe('Harbour authority', () => {
     expect(getByRole(document, 'link', { name: 'Back' })).toHaveAttribute(
       'href',
       marineLicenceRoutes.MARINE_LICENCE_CHECK_YOUR_ANSWERS +
-      '#other-permissions-card'
+        '#other-permissions-card'
     )
   })
 
@@ -144,7 +144,6 @@ describe('Harbour authority', () => {
 
   test('should show a validation error when "yes" is selected but harbour area is missing', async () => {
     mockMarineLicence(marineLicence)
-
 
     const { document } = await submitForm({
       requestUrl: marineLicenceRoutes.MARINE_LICENCE_HARBOUR_AUTHORITY,

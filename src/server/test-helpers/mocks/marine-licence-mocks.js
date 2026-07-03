@@ -10,7 +10,8 @@ export const mockMarineLicenceTaskList = {
   projectBackground: 'COMPLETED',
   publicRegister: 'COMPLETED',
   publicConsultation: 'COMPLETED',
-  waterFrameworkDirective: 'COMPLETED'
+  waterFrameworkDirective: 'COMPLETED',
+  feeEstimate: 'COMPLETED'
 }
 
 export const mockEmptyActivityDetails = {
@@ -66,6 +67,11 @@ export const mockMarineLicenceApplication = {
   id: faker.database.mongodbObjectId(),
   projectName: 'Test Project',
   projectBackground: 'Test project background',
+  feeEstimate: {
+    termsAndConditions: 'true',
+    accept: 'yes',
+    feeBand: '2A'
+  },
   specialLegalPowers: { agree: 'yes', details: 'Test reason' },
   publicConsultation: {
     consulted: 'yes',

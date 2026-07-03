@@ -76,6 +76,20 @@ describe('Marine Licence Other Permissions Card Component', () => {
       )
       expect($comp.html()).toContain('No')
     })
+
+    test('Should not show row when harbourAuthority is not provided', () => {
+      const params = {
+        specialLegalPowers: {
+          agree: 'yes',
+          details: 'We have statutory powers under the Marine Act.'
+        }
+      }
+      const $comp = renderComponent(
+        'marine-licence/other-permissions-card',
+        params
+      )
+      expect($comp.html()).not.toContain('Located in a harbour authority area')
+    })
   })
 
   describe('other authorities', () => {

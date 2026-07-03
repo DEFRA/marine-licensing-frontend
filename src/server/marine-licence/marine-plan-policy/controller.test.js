@@ -86,3 +86,101 @@ describe('#marinePlanPolicyController (GET)', () => {
     expect(h.view).not.toHaveBeenCalled()
   })
 })
+
+import * as authRequests from '#src/server/common/helpers/authenticated-requests.js'
+import {
+  marinePlanPolicySubmitController,
+  errorMessages
+} from '#src/server/marine-licence/marine-plan-policy/controller.js'
+
+const validate = (payload) =>
+  marinePlanPolicySubmitController.options.validate.payload.validate(payload)
+
+describe('#marinePlanPolicySubmitController (POST)', () => {
+  beforeEach(() => {
+    vi.mocked(cacheUtils.getMarineLicenceCache).mockReturnValue({ id: 'lic-1' })
+    vi.mocked(marineLicenceService.getMarineLicenceService).mockReturnValue({
+      getMarineLicenceById: vi.fn().mockResolvedValue(licenceData)
+    })
+    vi.spyOn(authRequests, 'authenticatedPatchRequest').mockResolvedValue({})
+  })
+
+  test('rejects an empty response with the required message', () => {
+    const { error } = validate({ policyConsideration: '' })
+    expect(error.details[0].message).toBe(
+      errorMessages.POLICY_CONSIDERATION_REQUIRED
+    )
+  })
+
+  test('rejects a response longer than 2000 characters', () => {
+    const { error } = validate({ policyConsideration: 'a'.repeat(2001) })
+    expect(error.details[0].message).toBe(
+      errorMessages.POLICY_CONSIDERATION_MAX_LENGTH
+    )
+  })
+
+  test('accepts a response of exactly 2000 characters', () => {
+    const { error } = validate({ policyConsideration: 'a'.repeat(2000) })
+    expect(error).toBeUndefined()
+  })
+
+  test('saves the response and redirects to the policy list on success', async () => {
+    const h = {
+      redirect: vi.fn().mockReturnValue({ takeover: vi.fn() }),
+      view: vi.fn()
+    }
+
+    await marinePlanPolicySubmitController.handler(
+      {
+        params: { policyCode: 'SW-BIO-1' },
+        payload: { policyConsideration: 'My considered answer' }
+      },
+      h
+    )
+
+    expect(authRequests.authenticatedPatchRequest).toHaveBeenCalledWith(
+      expect.any(Object),
+      '/marine-licence/marine-plan-policy-response',
+      { id: 'lic-1', policyCode: 'SW-BIO-1', response: 'My considered answer' }
+    )
+    expect(h.redirect).toHaveBeenCalledWith(
+      marineLicenceRoutes.MARINE_LICENCE_MARINE_PLAN_POLICIES
+    )
+  })
+
+  test('failAction re-renders the page with the error and submitted value', async () => {
+    const h = { view: vi.fn().mockReturnValue({ takeover: vi.fn() }) }
+    const err = {
+      details: [
+        {
+          path: ['policyConsideration'],
+          message: errorMessages.POLICY_CONSIDERATION_REQUIRED,
+          type: 'any.required'
+        }
+      ]
+    }
+
+    await marinePlanPolicySubmitController.options.validate.failAction(
+      {
+        params: { policyCode: 'SW-BIO-1' },
+        payload: { policyConsideration: '' }
+      },
+      h,
+      err
+    )
+
+    expect(h.view).toHaveBeenCalledWith(
+      MARINE_PLAN_POLICY_VIEW_ROUTE,
+      expect.objectContaining({
+        heading: 'SW-BIO-1',
+        payload: { policyConsideration: '' },
+        errors: expect.objectContaining({
+          policyConsideration: expect.objectContaining({
+            text: errorMessages.POLICY_CONSIDERATION_REQUIRED
+          })
+        })
+      })
+    )
+    expect(h.view().takeover).toHaveBeenCalled()
+  })
+})

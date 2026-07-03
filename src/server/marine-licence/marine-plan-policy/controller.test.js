@@ -85,6 +85,23 @@ describe('#marinePlanPolicyController (GET)', () => {
     ).rejects.toMatchObject({ output: { statusCode: 404 } })
     expect(h.view).not.toHaveBeenCalled()
   })
+
+  test('throws 404 when the licence has no marine plan policies', async () => {
+    vi.mocked(marineLicenceService.getMarineLicenceService).mockReturnValueOnce({
+      getMarineLicenceById: vi.fn().mockResolvedValue({
+        projectName: 'Test Project'
+      })
+    })
+    const h = { view: vi.fn() }
+
+    await expect(
+      marinePlanPolicyController.handler(
+        { params: { policyCode: 'SW-BIO-1' } },
+        h
+      )
+    ).rejects.toMatchObject({ output: { statusCode: 404 } })
+    expect(h.view).not.toHaveBeenCalled()
+  })
 })
 
 import * as authRequests from '#src/server/common/helpers/authenticated-requests.js'

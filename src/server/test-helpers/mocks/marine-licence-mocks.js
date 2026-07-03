@@ -129,6 +129,17 @@ export const mockSubmittedMarineLicenceApplication = {
   applicationReference: 'MLA/2026/10264'
 }
 
+export const mockMarineLicenceWithMarinePlanPolicies = {
+  ...mockMarineLicenceApplication,
+  marinePlanPolicyJob: 'ready',
+  marinePlanPoliciesCount: 3,
+  marinePlanPolicies: [
+    { policyCode: 'SW-MPA-1' },
+    { policyCode: 'SW-AGG-2' },
+    { policyCode: 'SW-BIO-1' }
+  ]
+}
+
 export const mockFileUploadMarineLicence = {
   ...mockMarineLicenceApplication,
   siteDetails: [

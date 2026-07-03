@@ -105,7 +105,8 @@ export const marineLicenceRoutes = {
   MARINE_LICENCE_CALCULATE_MARINE_PLAN_POLICIES:
     '/marine-licence/calculate-marine-plan-policies',
   MARINE_LICENCE_MARINE_PLAN_POLICIES_GUIDANCE:
-    '/marine-licence/marine-plan-policies-guidance'
+    '/marine-licence/marine-plan-policies-guidance',
+  MARINE_LICENCE_MARINE_PLAN_POLICIES: '/marine-licence/marine-plan-policies'
 }
 
 export const defraIdGuidanceRoutes = {

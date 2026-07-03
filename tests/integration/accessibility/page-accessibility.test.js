@@ -18,6 +18,7 @@ import {
 import {
   mockManualCoordinatesMarineLicence,
   mockMarineLicenceApplication,
+  mockMarineLicenceWithMarinePlanPolicies,
   mockSubmittedMarineLicenceApplication
 } from '~/src/server/test-helpers/mocks/marine-licence-mocks.js'
 import {
@@ -239,6 +240,12 @@ describe('Page accessibility checks (Axe)', () => {
       title: 'Marine licence start page',
       isMarineLicence: true,
       session: { ...agentSession, shouldShowOrgOrUserName: false }
+    },
+    {
+      url: marineLicenceRoutes.MARINE_LICENCE_MARINE_PLAN_POLICIES,
+      title: 'Marine plan policies',
+      isMarineLicence: true,
+      marineLicence: mockMarineLicenceWithMarinePlanPolicies
     },
     {
       url: marineLicenceRoutes.MARINE_LICENCE_SITE_DETAILS,

@@ -54,6 +54,21 @@ describe('Marine plan policy guidance page (marine licence)', () => {
     expect(queryByRole(document, 'link', { name: 'Sign out' })).toBeNull()
   })
 
+  test('should still show the beta phase banner', async () => {
+    mockMarineLicence(marineLicence)
+
+    const document = await loadPage({
+      requestUrl:
+        marineLicenceRoutes.MARINE_LICENCE_MARINE_PLAN_POLICIES_GUIDANCE,
+      server: getServer()
+    })
+
+    expect(document.querySelector('.govuk-phase-banner')).toBeInTheDocument()
+    expect(
+      getByRole(document, 'link', { name: /give your feedback/i })
+    ).toBeInTheDocument()
+  })
+
   test('should still show the page content links', async () => {
     mockMarineLicence(marineLicence)
 

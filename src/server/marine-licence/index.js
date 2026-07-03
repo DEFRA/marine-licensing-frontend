@@ -15,6 +15,8 @@ import { viewMarineLicencePublicUserRoutes } from '#src/server/marine-licence/vi
 import { viewMarineLicenceInternalUserRoutes } from '#src/server/marine-licence/view-marine-licence-internal-user/index.js'
 import { preferredDatesRoutes } from '#src/server/marine-licence/preferred-dates/index.js'
 import { waterDirectiveRoutes } from '#src/server/marine-licence/water-framework-directive/index.js'
+import { feeEstimateRoutes } from '#src/server/marine-licence/fee-estimate/index.js'
+import { feeEstimateAreYouSureRoutes } from '#src/server/marine-licence/fee-estimate-are-you-sure/index.js'
 
 export const marineLicence = {
   plugin: {
@@ -37,7 +39,9 @@ export const marineLicence = {
         ...locationCsvDownloadRoutes,
         ...viewMarineLicencePublicUserRoutes,
         ...viewMarineLicenceInternalUserRoutes,
-        ...waterDirectiveRoutes
+        ...waterDirectiveRoutes,
+        ...feeEstimateRoutes,
+        ...feeEstimateAreYouSureRoutes
       ])
     }
   }

@@ -503,7 +503,7 @@ describe('taskList utils', () => {
             text: 'Marine plan policy considerations (37 to complete)',
             classes: 'govuk-link--no-visited-state'
           },
-          href: marineLicenceRoutes.MARINE_LICENCE_TASK_LIST,
+          href: marineLicenceRoutes.MARINE_LICENCE_MARINE_PLAN_POLICIES,
           status: {
             tag: { text: 'Not yet started', classes: 'govuk-tag--blue' }
           }
@@ -527,7 +527,7 @@ describe('taskList utils', () => {
             text: 'Marine plan policy considerations (8 of 37 completed)',
             classes: 'govuk-link--no-visited-state'
           },
-          href: marineLicenceRoutes.MARINE_LICENCE_TASK_LIST,
+          href: marineLicenceRoutes.MARINE_LICENCE_MARINE_PLAN_POLICIES,
           status: {
             tag: { text: 'In progress', classes: 'govuk-tag--teal' }
           }
@@ -551,7 +551,7 @@ describe('taskList utils', () => {
             text: 'Marine plan policy considerations (37 of 37 completed)',
             classes: 'govuk-link--no-visited-state'
           },
-          href: marineLicenceRoutes.MARINE_LICENCE_TASK_LIST,
+          href: marineLicenceRoutes.MARINE_LICENCE_MARINE_PLAN_POLICIES,
           status: { text: 'Completed' }
         }
       ])

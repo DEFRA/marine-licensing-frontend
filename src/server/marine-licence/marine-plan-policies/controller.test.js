@@ -7,6 +7,7 @@ import {
 } from '#src/server/marine-licence/marine-plan-policies/controller.js'
 import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
 import { createMockRequest } from '#src/server/test-helpers/mocks/helpers.js'
+import { getMarinePlanPolicyLink } from '#src/server/common/helpers/marine-licence/marine-plan-policy-link.js'
 
 vi.mock('~/src/server/common/helpers/marine-licence/session-cache/utils.js')
 vi.mock('~/src/services/marine-licence-service/index.js')
@@ -55,24 +56,62 @@ describe('#marinePlanPoliciesController', () => {
       taskListLink: marineLicenceRoutes.MARINE_LICENCE_TASK_LIST,
       policies: [
         {
-          title: { text: 'SW-AGG-2' },
+          title: {
+            text: 'SW-AGG-2',
+            href: getMarinePlanPolicyLink('SW-AGG-2')
+          },
           status: {
             tag: { text: 'Not yet started', classes: 'govuk-tag--blue' }
           }
         },
         {
-          title: { text: 'SW-BIO-1' },
+          title: {
+            text: 'SW-BIO-1',
+            href: getMarinePlanPolicyLink('SW-BIO-1')
+          },
           status: {
             tag: { text: 'Not yet started', classes: 'govuk-tag--blue' }
           }
         },
         {
-          title: { text: 'SW-MPA-1' },
+          title: {
+            text: 'SW-MPA-1',
+            href: getMarinePlanPolicyLink('SW-MPA-1')
+          },
           status: {
             tag: { text: 'Not yet started', classes: 'govuk-tag--blue' }
           }
         }
       ]
+    })
+  })
+
+  test('marks answered policies Completed and shows the completed count', async () => {
+    vi.mocked(marineLicenceService.getMarineLicenceService).mockReturnValueOnce(
+      {
+        getMarineLicenceById: vi.fn().mockResolvedValue({
+          projectName: 'Test Project',
+          marinePlanPoliciesCount: 3,
+          marinePlanPolicies: [
+            { policyCode: 'SW-MPA-1' },
+            { policyCode: 'SW-AGG-2' },
+            { policyCode: 'SW-BIO-1' }
+          ],
+          marinePlanPolicyResponses: { 'SW-BIO-1': 'A considered answer' }
+        })
+      }
+    )
+    const h = { view: vi.fn() }
+
+    await marinePlanPoliciesController.handler(mockRequest, h)
+
+    const model = h.view.mock.calls[0][1]
+    expect(model.policiesCountText).toBe('1 of 3 policies completed')
+    const bioRow = model.policies.find((row) => row.title.text === 'SW-BIO-1')
+    expect(bioRow.status).toEqual({ text: 'Completed' })
+    const aggRow = model.policies.find((row) => row.title.text === 'SW-AGG-2')
+    expect(aggRow.status).toEqual({
+      tag: { text: 'Not yet started', classes: 'govuk-tag--blue' }
     })
   })
 

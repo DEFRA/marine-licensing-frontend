@@ -40,6 +40,8 @@ export const marinePlanPoliciesController = {
       policiesCountText: buildPoliciesCountText(marinePlanPoliciesCount),
       backLink: marineLicenceRoutes.MARINE_LICENCE_TASK_LIST,
       taskListLink: marineLicenceRoutes.MARINE_LICENCE_TASK_LIST,
+      marinePlanPoliciesGuidanceLink:
+        marineLicenceRoutes.MARINE_LICENCE_MARINE_PLAN_POLICIES_GUIDANCE,
       policies
     })
   }

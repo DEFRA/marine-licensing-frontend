@@ -53,6 +53,8 @@ describe('#marinePlanPoliciesController', () => {
       policiesCountText: '3 policies to complete',
       backLink: marineLicenceRoutes.MARINE_LICENCE_TASK_LIST,
       taskListLink: marineLicenceRoutes.MARINE_LICENCE_TASK_LIST,
+      marinePlanPoliciesGuidanceLink:
+        marineLicenceRoutes.MARINE_LICENCE_MARINE_PLAN_POLICIES_GUIDANCE,
       policies: [
         {
           title: { text: 'SW-AGG-2' },

@@ -30,7 +30,6 @@ const loadPolicyContext = async (request) => {
   }
 
   return {
-    id: marineLicence.id,
     policyCode,
     projectName,
     policy,
@@ -43,7 +42,7 @@ const buildRenderModel = ({ policyCode, projectName, policy, payload }) => ({
   heading: policyCode,
   projectName,
   policyText: policy.policy,
-  findOutMoreUrl: `${FIND_OUT_MORE_BASE}${policyCode}`,
+  findOutMoreUrl: `${FIND_OUT_MORE_BASE}${encodeURIComponent(policyCode)}`,
   backLink: marineLicenceRoutes.MARINE_LICENCE_MARINE_PLAN_POLICIES,
   payload
 })

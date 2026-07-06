@@ -237,6 +237,35 @@ describe('buildMcmsHandoffQueryString', () => {
     expect(qs).toBe('journeyId=CTX&ACTIVITY_TYPE=DEPOSIT')
   })
 
+  it('drops answers with no id and joins only the truthy ids', () => {
+    const qs = buildMcmsHandoffQueryString({
+      questionLog: [
+        {
+          questionRoute: '/removal/activities',
+          answers: [{ id: null }, { id: 'B' }, null, { id: 'C' }],
+          mcmsAppFormMapping: 'MINOR_REMOVALS_ACTIVITIES'
+        }
+      ],
+      focusedOption: { params: null },
+      journeyId: 'CTX',
+      viewAnswersUrl: null
+    })
+    expect(qs).toBe('journeyId=CTX&MINOR_REMOVALS_ACTIVITIES=B%2CC')
+  })
+
+  it('skips a null entry and a mapped entry that has no answers array', () => {
+    const qs = buildMcmsHandoffQueryString({
+      questionLog: [
+        null,
+        { questionRoute: '/x', mcmsAppFormMapping: 'ACTIVITY_TYPE' }
+      ],
+      focusedOption: { params: null },
+      journeyId: 'CTX',
+      viewAnswersUrl: null
+    })
+    expect(qs).toBe('journeyId=CTX')
+  })
+
   it('always emits journeyId and skips entries with no mapping or no answer', () => {
     const qs = buildMcmsHandoffQueryString({
       questionLog: [

@@ -55,9 +55,10 @@ describe('Marine plan policies (policy list) page', () => {
   test('renders each policy code as a link to its consideration page', async () => {
     const document = await loadPolicyListPage()
 
-    expect(
-      getByRole(document, 'link', { name: 'SW-AGG-2' })
-    ).toHaveAttribute('href', getMarinePlanPolicyLink('SW-AGG-2'))
+    expect(getByRole(document, 'link', { name: 'SW-AGG-2' })).toHaveAttribute(
+      'href',
+      getMarinePlanPolicyLink('SW-AGG-2')
+    )
     expect(document.querySelectorAll('.govuk-task-list__link')).toHaveLength(3)
   })
 

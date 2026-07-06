@@ -87,11 +87,13 @@ describe('#marinePlanPolicyController (GET)', () => {
   })
 
   test('throws 404 when the licence has no marine plan policies', async () => {
-    vi.mocked(marineLicenceService.getMarineLicenceService).mockReturnValueOnce({
-      getMarineLicenceById: vi.fn().mockResolvedValue({
-        projectName: 'Test Project'
-      })
-    })
+    vi.mocked(marineLicenceService.getMarineLicenceService).mockReturnValueOnce(
+      {
+        getMarineLicenceById: vi.fn().mockResolvedValue({
+          projectName: 'Test Project'
+        })
+      }
+    )
     const h = { view: vi.fn() }
 
     await expect(

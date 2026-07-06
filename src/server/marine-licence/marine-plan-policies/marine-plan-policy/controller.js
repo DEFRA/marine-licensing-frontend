@@ -13,7 +13,7 @@ import {
 import { authenticatedPatchRequest } from '#src/server/common/helpers/authenticated-requests.js'
 
 export const MARINE_PLAN_POLICY_VIEW_ROUTE =
-  'marine-licence/marine-plan-policy/index'
+  'marine-licence/marine-plan-policies/marine-plan-policy/index'
 
 const FIND_OUT_MORE_BASE =
   'https://environment.data.gov.uk/marine-plans-explorer/policy/'

@@ -4,7 +4,7 @@ import * as marineLicenceService from '#src/services/marine-licence-service/inde
 import {
   MARINE_PLAN_POLICY_VIEW_ROUTE,
   marinePlanPolicyController
-} from '#src/server/marine-licence/marine-plan-policy/controller.js'
+} from '#src/server/marine-licence/marine-plan-policies/marine-plan-policy/controller.js'
 import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
 
 vi.mock('#src/server/common/helpers/marine-licence/session-cache/utils.js')
@@ -108,7 +108,7 @@ import * as authRequests from '#src/server/common/helpers/authenticated-requests
 import {
   marinePlanPolicySubmitController,
   errorMessages
-} from '#src/server/marine-licence/marine-plan-policy/controller.js'
+} from '#src/server/marine-licence/marine-plan-policies/marine-plan-policy/controller.js'
 
 const validate = (payload) =>
   marinePlanPolicySubmitController.options.validate.payload.validate(payload)

@@ -56,28 +56,22 @@ describe('#marinePlanPoliciesController', () => {
       taskListLink: marineLicenceRoutes.MARINE_LICENCE_TASK_LIST,
       policies: [
         {
-          title: {
-            text: 'SW-AGG-2',
-            href: getMarinePlanPolicyLink('SW-AGG-2')
-          },
+          title: { text: 'SW-AGG-2' },
+          href: getMarinePlanPolicyLink('SW-AGG-2'),
           status: {
             tag: { text: 'Not yet started', classes: 'govuk-tag--blue' }
           }
         },
         {
-          title: {
-            text: 'SW-BIO-1',
-            href: getMarinePlanPolicyLink('SW-BIO-1')
-          },
+          title: { text: 'SW-BIO-1' },
+          href: getMarinePlanPolicyLink('SW-BIO-1'),
           status: {
             tag: { text: 'Not yet started', classes: 'govuk-tag--blue' }
           }
         },
         {
-          title: {
-            text: 'SW-MPA-1',
-            href: getMarinePlanPolicyLink('SW-MPA-1')
-          },
+          title: { text: 'SW-MPA-1' },
+          href: getMarinePlanPolicyLink('SW-MPA-1'),
           status: {
             tag: { text: 'Not yet started', classes: 'govuk-tag--blue' }
           }

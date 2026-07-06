@@ -39,7 +39,7 @@
         <a class="govuk-link" href="#" target="_blank" rel="noopener noreferrer">Get help with completing the Marine plan policy section (opens in a new tab)</a>.
       </p>
 
-      <form method="POST">
+      <form method="POST" novalidate>
         <input type="hidden" name="csrfToken" value="{{ csrfToken }}" />
 
         {{ govukTextarea({
@@ -57,9 +57,12 @@
           value: payload.policyConsideration
         }) }}
 
-        {{ govukButton({
-          text: "Save and continue"
-        }) }}
+        <div class="govuk-button-group">
+          {{ govukButton({
+            text: "Save and continue",
+            preventDoubleClick: true
+          }) }}
+        </div>
       </form>
 
     </div>

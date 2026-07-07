@@ -73,6 +73,13 @@ export function buildMcmsRedirectUrl(baseUrl, path, queryString) {
   return `${url.toString()}${separator}${queryString}`
 }
 
+function joinAnswerIds(entry) {
+  return (entry?.answers ?? [])
+    .map((a) => a?.id)
+    .filter(Boolean)
+    .join(',')
+}
+
 export function buildMcmsHandoffQueryString({
   questionLog,
   focusedOption,
@@ -86,9 +93,9 @@ export function buildMcmsHandoffQueryString({
   }
   for (const entry of questionLog ?? []) {
     const mapping = entry?.mcmsAppFormMapping
-    const answerId = entry?.answers?.[0]?.id
-    if (mapping && answerId) {
-      params.append(mapping, answerId)
+    const answerIds = joinAnswerIds(entry)
+    if (mapping && answerIds) {
+      params.append(mapping, answerIds)
     }
   }
   for (const param of focusedOption?.params ?? []) {

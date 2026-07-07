@@ -8,6 +8,7 @@ import { loadPage } from '~/tests/integration/shared/app-server.js'
 import { mockSubmittedMarineLicenceApplication } from '~/src/server/test-helpers/mocks/marine-licence-mocks.js'
 import {
   expectedProjectDetailsCard,
+  expectedOtherPermissionsCard,
   expectedWaterFrameworkDirectiveCard
 } from './fixtures.js'
 import { getCardRow } from './utils.js'
@@ -84,6 +85,31 @@ describe('Marine Licence View Details', () => {
     test('does not render the internal-user-only site-details-card', () => {
       expect(document.querySelector('#site-details-card')).toBeNull()
     })
+  })
+
+  describe('other permissions card', () => {
+    let document
+
+    beforeEach(async () => {
+      document = await loadViewDetailsPage(getServer())
+    })
+
+    test('renders the other permissions card', () => {
+      expect(document.querySelector('#other-permissions-card')).not.toBeNull()
+    })
+
+    test.each(expectedOtherPermissionsCard.rows)(
+      'renders "$key" row with correct value',
+      ({ key, value }) => {
+        const card = document.querySelector('#other-permissions-card')
+        const row = getCardRow(card, key)
+
+        expect(row).toBeTruthy()
+        expect(
+          row.querySelector('.govuk-summary-list__value').textContent.trim()
+        ).toBe(value)
+      }
+    )
   })
 
   describe('water framework directive card', () => {

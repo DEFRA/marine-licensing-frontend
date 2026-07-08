@@ -90,7 +90,7 @@
     "@vitest/ui": "^4.1.4",
     "allure-commandline": "^2.43.0",
     "allure-vitest": "^3.6.0",
-    "autoprefixer": "^10.5.1",
+    "autoprefixer": "^10.5.2",
     "babel-loader": "^10.1.1",
     "cheerio": "^1.2.0",
     "copy-webpack-plugin": "^14.0.0",
@@ -112,9 +112,9 @@
     "vitest": "^4.1.8",
     "vitest-axe": "^0.1.0",
     "vitest-fetch-mock": "^0.4.5",
-    "webpack": "^5.107.2",
+    "webpack": "^5.108.1",
     "webpack-assets-manifest": "6.5.2",
-    "webpack-cli": "7.0.3"
+    "webpack-cli": "7.1.0"
   },
   "overrides": {
     "@babel/core": "^7.29.7",

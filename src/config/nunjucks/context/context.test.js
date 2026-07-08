@@ -132,6 +132,11 @@ describe('#context', () => {
       page: 'the water framework directive file upload page',
       path: '/marine-licence/water-framework-directive-upload-and-wait',
       marineLicenceCache: { id: 'some-id' }
+    },
+    {
+      page: 'the marine plan policy guidance page',
+      path: '/marine-licence/marine-plan-policies-guidance',
+      marineLicenceCache: { id: 'some-id' }
     }
   ])(
     'When on $page, should not use navigation links',
@@ -179,49 +184,9 @@ describe('#context', () => {
     )
   })
 
-  it('When on the calculate marine plan policies page, should not use navigation links', () => {
-    vi.mocked(getMarineLicenceCache).mockReturnValue({ id: 'some-id' })
-    const mockRequest = {
-      path: '/marine-licence/calculate-marine-plan-policies',
-      logger: { error: vi.fn() }
-    }
-    const contextResult = context(mockRequest)
-    expect(contextResult.navigation).toEqual([])
-  })
-
   it('When on the exemption file upload page, should not use navigation links', () => {
     const mockRequest = {
       path: '/exemption/upload-and-wait',
-      logger: { error: vi.fn() }
-    }
-    const contextResult = context(mockRequest)
-    expect(contextResult.navigation).toEqual([])
-  })
-
-  it('When on the marine licence file upload page, should not use navigation links', () => {
-    vi.mocked(getMarineLicenceCache).mockReturnValue({ id: 'some-id' })
-    const mockRequest = {
-      path: '/marine-licence/upload-and-wait',
-      logger: { error: vi.fn() }
-    }
-    const contextResult = context(mockRequest)
-    expect(contextResult.navigation).toEqual([])
-  })
-
-  it('When on the water framework directive file upload page, should not use navigation links', () => {
-    vi.mocked(getMarineLicenceCache).mockReturnValue({ id: 'some-id' })
-    const mockRequest = {
-      path: '/marine-licence/water-framework-directive-upload-and-wait',
-      logger: { error: vi.fn() }
-    }
-    const contextResult = context(mockRequest)
-    expect(contextResult.navigation).toEqual([])
-  })
-
-  it('When on the marine plan policy guidance page, should not use navigation links', () => {
-    vi.mocked(getMarineLicenceCache).mockReturnValue({ id: 'some-id' })
-    const mockRequest = {
-      path: '/marine-licence/marine-plan-policies-guidance',
       logger: { error: vi.fn() }
     }
     const contextResult = context(mockRequest)

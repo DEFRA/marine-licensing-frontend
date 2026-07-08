@@ -12,7 +12,7 @@ export const harbourAuthoritySettings = {
 
 export const harbourAuthorityErrorMessages = {
   HARBOUR_AUTHORITY_REQUIRED:
-    'Select whether your project is located in a harbour authority area',
+    'Select whether your project is located within a harbour authority area',
   HARBOUR_AUTHORITY_AREA_REQUIRED: 'Enter details of the harbour authority',
   HARBOUR_AUTHORITY_AREA_MAX_LENGTH:
     'Details of the harbour authority must be 1000 characters or fewer'

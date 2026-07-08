@@ -61,7 +61,7 @@ describe('Harbour authority', () => {
     expect(getByRole(document, 'link', { name: 'Back' })).toHaveAttribute(
       'href',
       marineLicenceRoutes.MARINE_LICENCE_CHECK_YOUR_ANSWERS +
-        '#other-permissions-card'
+      '#other-permissions-card'
     )
   })
 
@@ -137,7 +137,7 @@ describe('Harbour authority', () => {
       document,
       fieldsetLabel: 'Is your project located in a harbour authority area?',
       errorMessage:
-        'Select whether your project is located in a harbour authority area',
+        'Select whether your project is located within a harbour authority area',
       findByHeading: true
     })
   })

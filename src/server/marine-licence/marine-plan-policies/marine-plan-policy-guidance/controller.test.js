@@ -13,7 +13,7 @@ describe('#marinePlanPolicyGuidanceController', () => {
     })
 
     expect(result).toEqual(
-      expect.stringContaining('Marine plan policy guidance')
+      expect.stringContaining('Marine plan policies guidance')
     )
     expect(statusCode).toBe(statusCodes.ok)
   })

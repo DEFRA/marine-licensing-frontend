@@ -263,8 +263,8 @@ describe('#taskListController', () => {
       sharingTaskList: mockSharingTaskList,
       waterFrameworkDirectiveTaskList: mockwaterFrameworkDirectiveTaskList,
       marinePlanPoliciesTaskList: mockMarinePlanPoliciesTaskList,
-      marinePlanPoliciesGuidanceLink:
-        marineLicenceRoutes.MARINE_LICENCE_MARINE_PLAN_POLICIES_GUIDANCE
+      marinePlanPolicyGuidanceLink:
+        marineLicenceRoutes.MARINE_LICENCE_MARINE_PLAN_POLICY_GUIDANCE
     })
   })
 

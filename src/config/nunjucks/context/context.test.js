@@ -135,7 +135,7 @@ describe('#context', () => {
     },
     {
       page: 'the marine plan policy guidance page',
-      path: '/marine-licence/marine-plan-policies-guidance',
+      path: '/marine-licence/marine-plan-policy-guidance',
       marineLicenceCache: { id: 'some-id' }
     }
   ])(

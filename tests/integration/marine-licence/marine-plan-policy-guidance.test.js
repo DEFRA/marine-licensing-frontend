@@ -18,7 +18,7 @@ describe('Marine plan policy guidance page (marine licence)', () => {
 
     const document = await loadPage({
       requestUrl:
-        marineLicenceRoutes.MARINE_LICENCE_MARINE_PLAN_POLICIES_GUIDANCE,
+        marineLicenceRoutes.MARINE_LICENCE_MARINE_PLAN_POLICY_GUIDANCE,
       server: getServer()
     })
 
@@ -43,7 +43,7 @@ describe('Marine plan policy guidance page (marine licence)', () => {
 
     const document = await loadPage({
       requestUrl:
-        marineLicenceRoutes.MARINE_LICENCE_MARINE_PLAN_POLICIES_GUIDANCE,
+        marineLicenceRoutes.MARINE_LICENCE_MARINE_PLAN_POLICY_GUIDANCE,
       server: getServer()
     })
 
@@ -59,7 +59,7 @@ describe('Marine plan policy guidance page (marine licence)', () => {
 
     const document = await loadPage({
       requestUrl:
-        marineLicenceRoutes.MARINE_LICENCE_MARINE_PLAN_POLICIES_GUIDANCE,
+        marineLicenceRoutes.MARINE_LICENCE_MARINE_PLAN_POLICY_GUIDANCE,
       server: getServer()
     })
 
@@ -74,7 +74,7 @@ describe('Marine plan policy guidance page (marine licence)', () => {
 
     const document = await loadPage({
       requestUrl:
-        marineLicenceRoutes.MARINE_LICENCE_MARINE_PLAN_POLICIES_GUIDANCE,
+        marineLicenceRoutes.MARINE_LICENCE_MARINE_PLAN_POLICY_GUIDANCE,
       server: getServer()
     })
 

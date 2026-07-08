@@ -33,7 +33,7 @@ const hideNavigationRoutesMarineLicenceAlways = new Set([
   marineLicenceRoutes.MARINE_LICENCE_CALCULATE_MARINE_PLAN_POLICIES,
   marineLicenceRoutes.MARINE_LICENCE_UPLOAD_AND_WAIT,
   marineLicenceRoutes.MARINE_LICENCE_WATER_FRAMEWORK_DIRECTIVE_UPLOAD_AND_WAIT,
-  marineLicenceRoutes.MARINE_LICENCE_MARINE_PLAN_POLICIES_GUIDANCE
+  marineLicenceRoutes.MARINE_LICENCE_MARINE_PLAN_POLICY_GUIDANCE
 ])
 
 const hideNavigationRoutesExemptionAlways = new Set([routes.UPLOAD_AND_WAIT])

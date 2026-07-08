@@ -146,8 +146,8 @@ export const taskListController = {
       waterFrameworkDirectiveTaskList: transformed.waterFrameworkDirective,
       feeEstimateTaskList: transformed.feeEstimate,
       marinePlanPoliciesTaskList: transformed.marinePlanPolicies,
-      marinePlanPoliciesGuidanceLink:
-        marineLicenceRoutes.MARINE_LICENCE_MARINE_PLAN_POLICIES_GUIDANCE,
+      marinePlanPolicyGuidanceLink:
+        marineLicenceRoutes.MARINE_LICENCE_MARINE_PLAN_POLICY_GUIDANCE,
       hasCompletedAllTasks
     })
   }

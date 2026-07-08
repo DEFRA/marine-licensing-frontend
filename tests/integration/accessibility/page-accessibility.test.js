@@ -226,7 +226,7 @@ describe('Page accessibility checks (Axe)', () => {
       isMarineLicence: true
     },
     {
-      url: marineLicenceRoutes.MARINE_LICENCE_MARINE_PLAN_POLICIES_GUIDANCE,
+      url: marineLicenceRoutes.MARINE_LICENCE_MARINE_PLAN_POLICY_GUIDANCE,
       title: 'Marine plan policy guidance',
       isMarineLicence: true
     },

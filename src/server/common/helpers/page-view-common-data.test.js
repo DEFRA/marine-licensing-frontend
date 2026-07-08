@@ -349,7 +349,7 @@ describe('getPageViewCommonData', () => {
 
     const mockRequest = {
       state: { userSession: 'mock-session' },
-      path: marineLicenceRoutes.MARINE_LICENCE_MARINE_PLAN_POLICIES_GUIDANCE
+      path: marineLicenceRoutes.MARINE_LICENCE_MARINE_PLAN_POLICY_GUIDANCE
     }
 
     const result = await getPageViewCommonData(mockRequest)

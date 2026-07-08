@@ -10,7 +10,7 @@ export const changeOrganisationLinkRoutes = [
 ]
 
 export const hideOrgOrUserNameRoutes = [
-  marineLicenceRoutes.MARINE_LICENCE_MARINE_PLAN_POLICIES_GUIDANCE
+  marineLicenceRoutes.MARINE_LICENCE_MARINE_PLAN_POLICY_GUIDANCE
 ]
 
 export const getPageViewCommonData = async (request) => {

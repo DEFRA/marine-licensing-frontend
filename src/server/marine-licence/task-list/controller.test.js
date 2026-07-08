@@ -187,15 +187,9 @@ describe('#taskListController', () => {
     vi.mocked(transformWaterFrameworkDirectiveTaskList).mockReturnValue(
       mockwaterFrameworkDirectiveTaskList
     )
-    vi.mocked(transformFeeEstimateTaskList).mockReturnValue(
-      mockFeeEstimateTaskList
-    )
     vi.mocked(transformSharingTaskList).mockReturnValue(mockSharingTaskList)
     vi.mocked(transformFeeEstimateTaskList).mockReturnValue(
       mockFeeEstimateTaskList
-    )
-    vi.mocked(setMarineLicenceCache).mockResolvedValue(
-      mockMarineLicenceApplication
     )
     vi.mocked(transformMarinePlanPoliciesTaskList).mockReturnValue(
       mockMarinePlanPoliciesTaskList

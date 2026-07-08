@@ -37,6 +37,7 @@ import { config } from '~/src/config/config.js'
 import { getUserSession } from '~/src/server/common/plugins/auth/utils.js'
 import { postloginUserSession } from '~/src/server/common/helpers/defraid-login/session-cache.js'
 import { selectActivityVariants } from '~/src/server/common/constants/activity-variants.js'
+import { getMarinePlanPolicyLink } from '~/src/server/common/helpers/marine-licence/marine-plan-policy-link.js'
 
 vi.mock('~/src/server/common/helpers/authenticated-requests.js')
 vi.mock('~/src/server/common/helpers/defraid-login/session-cache.js')
@@ -215,6 +216,11 @@ describe('Page accessibility checks (Axe)', () => {
       isMarineLicence: true
     },
     {
+      url: marineLicenceRoutes.MARINE_LICENCE_HARBOUR_AUTHORITY,
+      title: 'Is your project located in a harbour authority area?',
+      isMarineLicence: true
+    },
+    {
       url: marineLicenceRoutes.MARINE_LICENCE_PUBLIC_REGISTER,
       title: 'Sharing your project information publicly',
       isMarineLicence: true
@@ -244,6 +250,12 @@ describe('Page accessibility checks (Axe)', () => {
     {
       url: marineLicenceRoutes.MARINE_LICENCE_MARINE_PLAN_POLICIES,
       title: 'Marine plan policies',
+      isMarineLicence: true,
+      marineLicence: mockMarineLicenceWithMarinePlanPolicies
+    },
+    {
+      url: getMarinePlanPolicyLink('SW-BIO-1'),
+      title: 'SW-BIO-1',
       isMarineLicence: true,
       marineLicence: mockMarineLicenceWithMarinePlanPolicies
     },

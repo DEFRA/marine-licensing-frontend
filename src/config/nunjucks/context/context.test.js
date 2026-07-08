@@ -102,23 +102,46 @@ describe('#context', () => {
     )
   })
 
-  it('When on the project name page, should not use navigation links', () => {
-    const mockRequest = {
+  it.each([
+    {
+      page: 'the project name page',
       path: '/exemption/project-name',
-      logger: { error: vi.fn() }
-    }
-    const contextResult = context(mockRequest)
-    expect(contextResult.navigation).toEqual([])
-  })
-
-  it('When on the IAT start page, should not use navigation links', () => {
-    const mockRequest = {
+      marineLicenceCache: {}
+    },
+    {
+      page: 'the IAT start page',
       path: '/journey/self-service/start',
-      logger: { error: vi.fn() }
+      marineLicenceCache: {}
+    },
+    {
+      page: 'the exemption file upload page',
+      path: '/exemption/upload-and-wait',
+      marineLicenceCache: {}
+    },
+    {
+      page: 'the calculate marine plan policies page',
+      path: '/marine-licence/calculate-marine-plan-policies',
+      marineLicenceCache: { id: 'some-id' }
+    },
+    {
+      page: 'the marine licence file upload page',
+      path: '/marine-licence/upload-and-wait',
+      marineLicenceCache: { id: 'some-id' }
+    },
+    {
+      page: 'the water framework directive file upload page',
+      path: '/marine-licence/water-framework-directive-upload-and-wait',
+      marineLicenceCache: { id: 'some-id' }
     }
-    const contextResult = context(mockRequest)
-    expect(contextResult.navigation).toEqual([])
-  })
+  ])(
+    'When on $page, should not use navigation links',
+    ({ path, marineLicenceCache }) => {
+      vi.mocked(getMarineLicenceCache).mockReturnValue(marineLicenceCache)
+      const mockRequest = { path, logger: { error: vi.fn() } }
+      const contextResult = context(mockRequest)
+      expect(contextResult.navigation).toEqual([])
+    }
+  )
 
   test('Should read file on first call', () => {
     readFileSync.mockReturnValue(`{

@@ -50,6 +50,7 @@ export const marineLicenceRoutes = {
   MARINE_LICENCE_DELETE: '/marine-licence/delete',
   MARINE_LICENCE_SPECIAL_LEGAL_POWERS: '/marine-licence/special-legal-powers',
   MARINE_LICENCE_OTHER_AUTHORITIES: '/marine-licence/other-authorities',
+  MARINE_LICENCE_HARBOUR_AUTHORITY: '/marine-licence/harbour-authority',
   MARINE_LICENCE_PROJECT_BACKGROUND: '/marine-licence/project-background',
   MARINE_LICENCE_SITE_DETAILS: '/marine-licence/site-details',
   MARINE_LICENCE_COORDINATES_TYPE_CHOICE:
@@ -106,7 +107,9 @@ export const marineLicenceRoutes = {
     '/marine-licence/calculate-marine-plan-policies',
   MARINE_LICENCE_MARINE_PLAN_POLICIES_GUIDANCE:
     '/marine-licence/marine-plan-policies-guidance',
-  MARINE_LICENCE_MARINE_PLAN_POLICIES: '/marine-licence/marine-plan-policies'
+  MARINE_LICENCE_MARINE_PLAN_POLICIES: '/marine-licence/marine-plan-policies',
+  MARINE_LICENCE_MARINE_PLAN_POLICY:
+    '/marine-licence/marine-plan-policy/{policyCode}'
 }
 
 export const defraIdGuidanceRoutes = {
@@ -187,5 +190,7 @@ export const apiRoutes = {
   UPDATE_PREFERRED_DATES: '/marine-licence/preferred-dates',
   UPDATE_WATER_FRAMEWORK_DIRECTIVE: '/marine-licence/water-framework-directive',
   CALCULATE_MARINE_PLAN_POLICIES:
-    '/marine-licence/calculate-marine-plan-policies'
+    '/marine-licence/calculate-marine-plan-policies',
+  MARINE_LICENCE_MARINE_PLAN_POLICY_RESPONSE:
+    '/marine-licence/marine-plan-policy-response'
 }

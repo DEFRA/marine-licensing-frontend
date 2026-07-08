@@ -70,6 +70,6 @@ describe('#invalidController IAT timeout page (integration)', () => {
 
   test('does not render the GOV.UK phase banner', async () => {
     const { document } = await getPage()
-    expect(document.querySelectorAll('.govuk-phase-banner').length).toBe(0)
+    expect(document.querySelectorAll('.govuk-phase-banner')).toHaveLength(0)
   })
 })

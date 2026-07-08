@@ -1,0 +1,43 @@
+{% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
+
+{% if params.policies and params.policies.length %}
+{% set rows = [] %}
+{% for policy in params.policies %}
+  {% set considerationValue %}
+    <p class="govuk-body govuk-!-font-weight-bold govuk-!-margin-bottom-1">Policy information</p>
+    <p class="govuk-body">{{ policy.wording }}</p>
+    <p class="govuk-body govuk-!-font-weight-bold govuk-!-margin-bottom-1">Your consideration</p>
+    <p class="govuk-body govuk-!-margin-bottom-0">{{ policy.response }}</p>
+  {% endset %}
+  {% set rows = (rows.push({
+    key: {
+      text: policy.policyCode
+    },
+    value: {
+      html: considerationValue
+    },
+    actions: {
+      items: [
+        {
+          href: policy.changeHref,
+          text: "Change",
+          visuallyHiddenText: policy.policyCode,
+          classes: "govuk-link--no-visited-state"
+        }
+      ]
+    } if not params.isReadOnly
+  }), rows) %}
+{% endfor %}
+
+{{ govukSummaryList({
+  card: {
+    title: {
+      text: "Marine plan policies"
+    },
+    attributes: {
+      id: "marine-plan-policies-card"
+    }
+  },
+  rows: rows
+}) }}
+{% endif %}

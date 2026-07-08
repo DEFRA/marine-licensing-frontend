@@ -61,7 +61,7 @@ describe('Harbour authority', () => {
     expect(getByRole(document, 'link', { name: 'Back' })).toHaveAttribute(
       'href',
       marineLicenceRoutes.MARINE_LICENCE_CHECK_YOUR_ANSWERS +
-      '#other-permissions-card'
+        '#other-permissions-card'
     )
   })
 

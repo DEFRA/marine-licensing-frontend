@@ -89,9 +89,22 @@ describe('#iatStartController (integration)', () => {
     }
   })
 
-  test('Does not render a back link (start is the journey entry point)', async () => {
+  test.each([
+    {
+      element: 'a back link (start is the journey entry point)',
+      selector: '.govuk-back-link'
+    },
+    {
+      element: 'the phase banner',
+      selector: '.govuk-phase-banner'
+    },
+    {
+      element: 'navigation links in the header',
+      selector: '.govuk-service-navigation__list'
+    }
+  ])('Does not render $element', async ({ selector }) => {
     const { document } = await getPage()
-    expect(document.querySelector('.govuk-back-link')).toBeNull()
+    expect(document.querySelector(selector)).toBeNull()
   })
 
   test('Renders a "Start now" button inside a POST form', async () => {
@@ -102,16 +115,6 @@ describe('#iatStartController (integration)', () => {
     const form = startButton.closest('form')
     expect(form).not.toBeNull()
     expect(form.getAttribute('method')).toBe('POST')
-  })
-
-  test('Does not render the phase banner', async () => {
-    const { document } = await getPage()
-    expect(document.querySelector('.govuk-phase-banner')).toBeNull()
-  })
-
-  test('Renders no navigation links in the header', async () => {
-    const { document } = await getPage()
-    expect(document.querySelector('.govuk-service-navigation__list')).toBeNull()
   })
 
   test('POST redirects to first question', async () => {

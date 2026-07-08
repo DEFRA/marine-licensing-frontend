@@ -33,6 +33,16 @@ export const expectedSiteDetailsCard = {
   ]
 }
 
+export const expectedOtherPermissionsCard = {
+  cardTitle: 'Other permissions',
+  rows: [
+    {
+      key: 'Located in a harbour authority area',
+      value: mockSubmittedMarineLicenceApplication.harbourAuthority.details
+    }
+  ]
+}
+
 export const expectedWaterFrameworkDirectiveCard = {
   waterFrameworkDirective: {
     [NAUTICAL_MILE_HEADING]: 'Yes',

@@ -71,6 +71,7 @@ async function updateLicenceSession(request, h, licenceData, hasCancel) {
     publicRegister,
     publicConsultation,
     otherAuthorities,
+    harbourAuthority,
     siteDetails,
     waterFrameworkDirective
   } = licenceData
@@ -85,6 +86,7 @@ async function updateLicenceSession(request, h, licenceData, hasCancel) {
     publicRegister,
     publicConsultation,
     otherAuthorities,
+    harbourAuthority,
     siteDetails: hasCancel ? [] : siteDetails,
     waterFrameworkDirective
   })

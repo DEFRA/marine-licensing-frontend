@@ -65,6 +65,7 @@ export const viewDetailsController = {
         pageTitle: formattedMarineLicence.projectName,
         specialLegalPowers: formattedMarineLicence.specialLegalPowers,
         publicRegister: formattedMarineLicence.publicRegister,
+        harbourAuthority: formattedMarineLicence.harbourAuthority,
         otherAuthorities: formattedMarineLicence.otherAuthorities,
         preferredDates: formattedMarineLicence.preferredDates,
         projectName: formattedMarineLicence.projectName,

@@ -25,6 +25,23 @@
   }) %}
 {% endif %}
 
+{% if params.harbourAuthority %}
+  {% set _ = rows.push({
+    key: { text: "Located in a harbour authority area" },
+    value: { text: params.harbourAuthority.details if params.harbourAuthority.area === 'yes' else "No" },
+    actions: {
+        items: [
+          {
+            href: "/marine-licence/harbour-authority?from=check-your-answers",
+            text: "Change",
+            visuallyHiddenText: "harbour authority area",
+            classes: "govuk-link--no-visited-state"
+          }
+        ]
+      } if not params.isReadOnly
+  }) %}
+{% endif %}
+
 {% if params.otherAuthorities %}
   {% if params.otherAuthorities.agree === 'yes' %}
     {% set value = { text: params.otherAuthorities.details } %}

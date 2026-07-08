@@ -139,7 +139,8 @@ describe('marine-licence view details controller', () => {
             pageCaption: `${marineLicence.applicationReference} - Marine licence`,
             backLink: routes.DASHBOARD,
             coordinatesType: 'coordinates',
-            summaryData: [{ siteNumber: 1, siteName: 'Test Site' }]
+            summaryData: [{ siteNumber: 1, siteName: 'Test Site' }],
+            harbourAuthority: marineLicence.harbourAuthority
           })
         )
       })

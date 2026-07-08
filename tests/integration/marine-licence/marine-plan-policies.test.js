@@ -1,4 +1,4 @@
-import { getByRole, queryByRole } from '@testing-library/dom'
+import { getByRole } from '@testing-library/dom'
 import { marineLicenceRoutes } from '~/src/server/common/constants/routes.js'
 import {
   mockMarineLicence,
@@ -6,6 +6,7 @@ import {
 } from '~/tests/integration/shared/test-setup-helpers.js'
 import { loadPage } from '~/tests/integration/shared/app-server.js'
 import { mockMarineLicenceWithMarinePlanPolicies } from '~/src/server/test-helpers/mocks/marine-licence-mocks.js'
+import { getMarinePlanPolicyLink } from '~/src/server/common/helpers/marine-licence/marine-plan-policy-link.js'
 
 describe('Marine plan policies (policy list) page', () => {
   const getServer = setupTestServer()
@@ -51,11 +52,14 @@ describe('Marine plan policies (policy list) page', () => {
     expect(codes).toEqual(['SW-AGG-2', 'SW-BIO-1', 'SW-MPA-1'])
   })
 
-  test('renders policy codes as plain text, not links', async () => {
+  test('renders each policy code as a link to its consideration page', async () => {
     const document = await loadPolicyListPage()
 
-    expect(queryByRole(document, 'link', { name: 'SW-AGG-2' })).toBeNull()
-    expect(document.querySelector('.govuk-task-list__link')).toBeNull()
+    expect(getByRole(document, 'link', { name: 'SW-AGG-2' })).toHaveAttribute(
+      'href',
+      getMarinePlanPolicyLink('SW-AGG-2')
+    )
+    expect(document.querySelectorAll('.govuk-task-list__link')).toHaveLength(3)
   })
 
   test('Continue button and back link both return to the task list', async () => {

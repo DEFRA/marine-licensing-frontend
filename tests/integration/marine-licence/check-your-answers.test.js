@@ -102,6 +102,27 @@ describe('Marine Licence Check Your Answers - site and activity cards', () => {
       )
     })
 
+    describe('other permissions card', () => {
+      test('renders harbour authority details with a Change link', () => {
+        const card = document.querySelector('#other-permissions-card')
+        expect(card).toBeTruthy()
+        expect(card.textContent).toContain(
+          'Located in a harbour authority area'
+        )
+        expect(card.textContent).toContain(
+          mockFileUploadMarineLicence.harbourAuthority.details
+        )
+
+        const changeLink = card.querySelector(
+          'a[href*="/marine-licence/harbour-authority"]'
+        )
+        expect(changeLink).toBeTruthy()
+        expect(changeLink.getAttribute('href')).toBe(
+          '/marine-licence/harbour-authority?from=check-your-answers'
+        )
+      })
+    })
+
     test('renders activity card with card-level Change link and no row-level actions', () => {
       const activityCards = document.querySelectorAll(
         '[id^="activity-details-site-1-activity-"]'

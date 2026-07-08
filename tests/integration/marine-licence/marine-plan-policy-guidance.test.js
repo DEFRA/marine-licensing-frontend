@@ -23,7 +23,7 @@ describe('Marine plan policy guidance page (marine licence)', () => {
     })
 
     expect(
-      getByRole(document, 'heading', { name: 'Marine plan policy guidance' })
+      getByRole(document, 'heading', { name: 'Marine plan policies guidance' })
     ).toBeInTheDocument()
     expect(
       getByRole(document, 'heading', {
@@ -31,12 +31,10 @@ describe('Marine plan policy guidance page (marine licence)', () => {
       })
     ).toBeInTheDocument()
     expect(
-      getByRole(document, 'heading', { name: 'Supporting the policy' })
+      getByRole(document, 'heading', { name: 'Policy walkthrough' })
     ).toBeInTheDocument()
     expect(
-      getByRole(document, 'heading', {
-        name: 'Stating the case for proceeding'
-      })
+      getByRole(document, 'heading', { name: 'Mitigation hierarchy' })
     ).toBeInTheDocument()
   })
 
@@ -81,12 +79,13 @@ describe('Marine plan policy guidance page (marine licence)', () => {
     })
 
     expect(
-      getByRole(document, 'link', {
-        name: 'Explore marine plans (opens in new tab)'
-      })
+      getByRole(document, 'link', { name: 'Explore Marine Plans' })
     ).toHaveAttribute(
       'href',
       'https://www.gov.uk/guidance/explore-marine-plans'
     )
+    expect(
+      getByRole(document, 'link', { name: 'Using marine plans' })
+    ).toHaveAttribute('href', 'https://www.gov.uk/guidance/using-marine-plans')
   })
 })

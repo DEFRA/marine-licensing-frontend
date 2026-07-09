@@ -27,7 +27,9 @@ vi.mock('#src/services/marine-licence-service/index.js')
 vi.mock('#src/server/common/helpers/authenticated-requests.js', () => ({
   getAuthProvider: vi.fn().mockReturnValue('defra-id')
 }))
-vi.mock('#src/server/common/helpers/marine-licence/marine-plan-policies-data.js')
+vi.mock(
+  '#src/server/common/helpers/marine-licence/marine-plan-policies-data.js'
+)
 
 const createSubmittedMarineLicence = (overrides = {}) => ({
   ...mockSubmittedMarineLicenceApplication,

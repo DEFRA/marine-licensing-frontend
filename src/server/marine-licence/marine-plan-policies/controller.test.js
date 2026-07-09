@@ -8,6 +8,7 @@ import {
 import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
 import { createMockRequest } from '#src/server/test-helpers/mocks/helpers.js'
 import { getMarinePlanPolicyLink } from '#src/server/common/helpers/marine-licence/marine-plan-policy-link.js'
+import { RETURN_TO_CACHE_KEY } from '#src/server/common/constants/cache.js'
 
 vi.mock('~/src/server/common/helpers/marine-licence/session-cache/utils.js')
 vi.mock('~/src/services/marine-licence-service/index.js')
@@ -149,5 +150,14 @@ describe('#marinePlanPoliciesController', () => {
       MARINE_PLAN_POLICIES_VIEW_ROUTE,
       expect.objectContaining({ policiesCountText: '1 policy to complete' })
     )
+  })
+
+  test('clears any stale returnTo so list-flow considerations return to the list', async () => {
+    const request = createMockRequest()
+    const h = { view: vi.fn() }
+
+    await marinePlanPoliciesController.handler(request, h)
+
+    expect(request.yar.clear).toHaveBeenCalledWith(RETURN_TO_CACHE_KEY)
   })
 })

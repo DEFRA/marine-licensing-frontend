@@ -14,11 +14,33 @@ import {
 import { getCardRow } from './utils.js'
 import { validateWaterFrameworkDirective } from '#tests/integration/shared/summary-card-validators.js'
 
+const marinePlanPolicyFixture = {
+  marinePlanPolicies: [
+    { policyCode: 'S-CC-2', policy: 'Second policy wording.' },
+    { policyCode: 'S-CC-1', policy: 'First policy wording.' }
+  ],
+  marinePlanPolicyResponses: {
+    'S-CC-1': 'My first consideration.',
+    'S-CC-2': 'My second consideration.'
+  }
+}
+
 describe('Marine Licence View Details', () => {
   const getServer = setupTestServer()
 
   const loadViewDetailsPage = async (server) => {
     mockMarineLicence(mockSubmittedMarineLicenceApplication)
+    return loadPage({
+      requestUrl: `${marineLicenceRoutes.MARINE_LICENCE_VIEW_DETAILS}/${mockSubmittedMarineLicenceApplication.id}`,
+      server
+    })
+  }
+
+  const loadViewDetailsWithPolicies = async (server) => {
+    mockMarineLicence({
+      ...mockSubmittedMarineLicenceApplication,
+      ...marinePlanPolicyFixture
+    })
     return loadPage({
       requestUrl: `${marineLicenceRoutes.MARINE_LICENCE_VIEW_DETAILS}/${mockSubmittedMarineLicenceApplication.id}`,
       server
@@ -131,6 +153,37 @@ describe('Marine Licence View Details', () => {
       const changeLink = card.querySelector('.govuk-summary-card__actions a')
 
       expect(changeLink).toBeNull()
+    })
+  })
+
+  describe('marine plan policies card', () => {
+    let document
+
+    beforeEach(async () => {
+      document = await loadViewDetailsWithPolicies(getServer())
+    })
+
+    test('renders the marine plan policies card with the correct title', () => {
+      const card = document.querySelector('#marine-plan-policies-card')
+      expect(card).not.toBeNull()
+      expect(
+        card.querySelector('.govuk-summary-card__title').textContent.trim()
+      ).toBe('Marine plan policies')
+    })
+
+    test('renders the policy code, wording and consideration', () => {
+      const card = document.querySelector('#marine-plan-policies-card')
+      expect(card.textContent).toContain('S-CC-1')
+      expect(card.textContent).toContain('First policy wording.')
+      expect(card.textContent).toContain('My first consideration.')
+    })
+
+    test('does not render a Change link for any row', () => {
+      const card = document.querySelector('#marine-plan-policies-card')
+      expect(
+        card.querySelectorAll('.govuk-summary-list__actions a')
+      ).toHaveLength(0)
+      expect(card.querySelector('.govuk-summary-card__actions a')).toBeNull()
     })
   })
 })

@@ -566,6 +566,46 @@ describe('taskList utils', () => {
       ])
     })
 
+    test('renders Completed status when marinePlanPolicies task is COMPLETED', () => {
+      const [task] = transformMarinePlanPoliciesTaskList(
+        {
+          siteDetails: 'COMPLETED',
+          marinePlanPolicies: 'COMPLETED'
+        },
+        { marinePlanPolicyJob: 'ready', marinePlanPoliciesCount: 3 }
+      )
+
+      expect(task.status).toEqual({ text: 'Completed' })
+    })
+
+    test('renders In progress status when marinePlanPolicies task is IN_PROGRESS', () => {
+      const [task] = transformMarinePlanPoliciesTaskList(
+        {
+          siteDetails: 'COMPLETED',
+          marinePlanPolicies: 'IN_PROGRESS'
+        },
+        { marinePlanPolicyJob: 'ready', marinePlanPoliciesCount: 3 }
+      )
+
+      expect(task.status).toEqual({
+        tag: { text: 'In progress', classes: 'govuk-tag--teal' }
+      })
+    })
+
+    test('renders Not yet started status when marinePlanPolicies task is INCOMPLETE', () => {
+      const [task] = transformMarinePlanPoliciesTaskList(
+        {
+          siteDetails: 'COMPLETED',
+          marinePlanPolicies: 'INCOMPLETE'
+        },
+        { marinePlanPolicyJob: 'ready', marinePlanPoliciesCount: 3 }
+      )
+
+      expect(task.status).toEqual({
+        tag: { text: 'Not yet started', classes: 'govuk-tag--blue' }
+      })
+    })
+
     test.each([
       ['INCOMPLETE', 'ready'],
       ['IN_PROGRESS', 'ready'],

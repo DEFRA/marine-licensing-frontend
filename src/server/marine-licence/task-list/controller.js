@@ -133,7 +133,8 @@ export const taskListController = {
       ...transformed.projectDetails,
       ...transformed.siteDetails,
       ...transformed.waterFrameworkDirective,
-      ...transformed.feeEstimate
+      ...transformed.feeEstimate,
+      ...transformed.marinePlanPolicies
     ].every((task) => task.status.text === 'Completed')
 
     return h.view(TASK_LIST_VIEW_ROUTE, {

@@ -55,7 +55,7 @@ describe('#taskListController', () => {
     mockRequest = createMockRequest()
   })
 
-  test('taskListController handler should render with correct context', async () => {
+  function setupAllTasksCompleted() {
     const mockPayload = {
       value: {
         id: '123',
@@ -157,13 +157,10 @@ describe('#taskListController', () => {
       }
     ]
 
-    getMarineLicenceCacheMock.mockReturnValue(mockMarineLicenceApplication)
     const mockMarinePlanPoliciesTaskList = [
       {
         href: marineLicenceRoutes.MARINE_LICENCE_MARINE_PLAN_POLICIES,
-        status: {
-          tag: { text: 'Not yet started', classes: 'govuk-tag--blue' }
-        },
+        status: { text: 'Completed' },
         title: {
           classes: 'govuk-link--no-visited-state',
           text: 'Marine plan policy considerations (44 to complete)'
@@ -201,6 +198,30 @@ describe('#taskListController', () => {
     authUtils.getUserSession.mockResolvedValue({
       userRelationshipType: 'CITIZEN'
     })
+
+    return {
+      mockPayload,
+      mockProjectDetailsTaskList,
+      mockOtherPermissionsTaskList,
+      mockwaterFrameworkDirectiveTaskList,
+      mockSharingTaskList,
+      mockSiteDetailsTaskList,
+      mockFeeEstimateTaskList,
+      mockMarinePlanPoliciesTaskList
+    }
+  }
+
+  test('taskListController handler should render with correct context', async () => {
+    const {
+      mockPayload,
+      mockProjectDetailsTaskList,
+      mockOtherPermissionsTaskList,
+      mockwaterFrameworkDirectiveTaskList,
+      mockSharingTaskList,
+      mockSiteDetailsTaskList,
+      mockFeeEstimateTaskList,
+      mockMarinePlanPoliciesTaskList
+    } = setupAllTasksCompleted()
 
     await taskListController.handler(mockRequest, mockH)
 
@@ -264,6 +285,29 @@ describe('#taskListController', () => {
       waterFrameworkDirectiveTaskList: mockwaterFrameworkDirectiveTaskList,
       marinePlanPoliciesTaskList: mockMarinePlanPoliciesTaskList
     })
+  })
+
+  test('taskListController handler should not treat all tasks as complete when marine plan policies is not completed', async () => {
+    setupAllTasksCompleted()
+    vi.mocked(transformMarinePlanPoliciesTaskList).mockReturnValue([
+      {
+        href: marineLicenceRoutes.MARINE_LICENCE_MARINE_PLAN_POLICIES,
+        status: {
+          tag: { text: 'Not yet started', classes: 'govuk-tag--blue' }
+        },
+        title: {
+          classes: 'govuk-link--no-visited-state',
+          text: 'Marine plan policy considerations (44 to complete)'
+        }
+      }
+    ])
+
+    await taskListController.handler(mockRequest, mockH)
+
+    expect(mockH.view).toHaveBeenCalledWith(
+      TASK_LIST_VIEW_ROUTE,
+      expect.objectContaining({ hasCompletedAllTasks: false })
+    )
   })
 
   test('taskListController handler should throw not found when id is missing', async () => {

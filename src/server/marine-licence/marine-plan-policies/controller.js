@@ -43,6 +43,8 @@ export const marinePlanPoliciesController = {
       throw Boom.notFound('Marine licence not found')
     }
 
+    // Clear any CYA returnTo so considerations opened via the normal list flow
+    // return to this list page, not to Check your answers.
     clearReturnToCache(request)
 
     const marineLicenceService = getMarineLicenceService(request)

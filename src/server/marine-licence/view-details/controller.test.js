@@ -175,7 +175,7 @@ describe('marine-licence view details controller', () => {
 
         await viewDetailsController.handler(mockRequest, mockH)
 
-        expect(buildMarinePlanPoliciesData).toHaveBeenCalled()
+        expect(buildMarinePlanPoliciesData).toHaveBeenCalledWith(marineLicence)
         expect(mockH.view).toHaveBeenCalledWith(
           VIEW_DETAILS_VIEW_ROUTE,
           expect.objectContaining({ marinePlanPolicies: mockPolicies })
@@ -296,6 +296,40 @@ describe('marine-licence view details controller', () => {
           })
         )
       })
+
+      test('passes marine plan policies data to the view for the public route', async () => {
+        const mockPolicies = [
+          {
+            policyCode: 'S-CC-1',
+            wording: 'Wording',
+            response: 'Consideration',
+            changeHref: '/marine-licence/marine-plan-policy/S-CC-1'
+          }
+        ]
+        vi.mocked(buildMarinePlanPoliciesData).mockReturnValue(mockPolicies)
+
+        const marineLicence = createSubmittedMarineLicence()
+        const mockServiceInstance = {
+          getPublicMarineLicenceById: vi.fn().mockResolvedValue(marineLicence)
+        }
+
+        vi.mocked(getMarineLicenceService).mockReturnValue(mockServiceInstance)
+
+        const mockRequest = {
+          path: `${marineLicenceRoutes.MARINE_LICENCE_VIEW_DETAILS_PUBLIC}/${mockMarineLicenceApplication.id}`,
+          params: { marineLicenceId: mockMarineLicenceApplication.id },
+          logger: { error: vi.fn() }
+        }
+        const mockH = { view: vi.fn() }
+
+        await viewDetailsController.handler(mockRequest, mockH)
+
+        expect(buildMarinePlanPoliciesData).toHaveBeenCalledWith(marineLicence)
+        expect(mockH.view).toHaveBeenCalledWith(
+          VIEW_DETAILS_VIEW_ROUTE,
+          expect.objectContaining({ marinePlanPolicies: mockPolicies })
+        )
+      })
     })
 
     describe('error scenarios', () => {
@@ -339,6 +373,41 @@ describe('marine-licence view details controller', () => {
           pageCaption: `${mockSubmittedMarineLicenceApplication.applicationReference}`,
           backLink: null
         })
+      )
+    })
+
+    test('passes marine plan policies data to the view for the internal-user route', async () => {
+      vi.mocked(getAuthProvider).mockReturnValue('entra-id')
+
+      const mockPolicies = [
+        {
+          policyCode: 'S-CC-1',
+          wording: 'Wording',
+          response: 'Consideration',
+          changeHref: '/marine-licence/marine-plan-policy/S-CC-1'
+        }
+      ]
+      vi.mocked(buildMarinePlanPoliciesData).mockReturnValue(mockPolicies)
+
+      const marineLicence = createSubmittedMarineLicence()
+      const mockServiceInstance = {
+        getMarineLicenceById: vi.fn().mockResolvedValue(marineLicence)
+      }
+      vi.mocked(getMarineLicenceService).mockReturnValue(mockServiceInstance)
+
+      const mockH = { view: vi.fn() }
+      const mockRequest = {
+        path: `${marineLicenceRoutes.MARINE_LICENCE_VIEW_DETAILS_INTERNAL_USER}/${mockMarineLicenceApplication.id}`,
+        params: { marineLicenceId: mockMarineLicenceApplication.id },
+        logger: { error: vi.fn() }
+      }
+
+      await viewDetailsController.handler(mockRequest, mockH)
+
+      expect(buildMarinePlanPoliciesData).toHaveBeenCalledWith(marineLicence)
+      expect(mockH.view).toHaveBeenCalledWith(
+        VIEW_DETAILS_VIEW_ROUTE,
+        expect.objectContaining({ marinePlanPolicies: mockPolicies })
       )
     })
   })

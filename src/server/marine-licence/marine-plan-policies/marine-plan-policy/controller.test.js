@@ -251,6 +251,41 @@ describe('#marinePlanPolicySubmitController (POST)', () => {
     expect(h.view().takeover).toHaveBeenCalled()
   })
 
+  test('failAction preserves the check your answers return link', async () => {
+    const h = { view: vi.fn().mockReturnValue({ takeover: vi.fn() }) }
+    const err = {
+      details: [
+        {
+          path: ['policyConsideration'],
+          message: errorMessages.POLICY_CONSIDERATION_REQUIRED,
+          type: 'any.required'
+        }
+      ]
+    }
+
+    await marinePlanPolicySubmitController.options.validate.failAction(
+      {
+        params: { policyCode: 'SW-BIO-1' },
+        payload: { policyConsideration: '' },
+        yar: {
+          get: vi
+            .fn()
+            .mockReturnValue(
+              marineLicenceRoutes.MARINE_LICENCE_CHECK_YOUR_ANSWERS
+            )
+        }
+      },
+      h,
+      err
+    )
+
+    expect(h.view).toHaveBeenCalledWith(
+      MARINE_PLAN_POLICY_VIEW_ROUTE,
+      expect.objectContaining({ backLink: CYA_RETURN_LINK })
+    )
+    expect(h.view().takeover).toHaveBeenCalled()
+  })
+
   test('throws 404 and does not save when the policy code is unknown', async () => {
     const h = {
       redirect: vi.fn().mockReturnValue({ takeover: vi.fn() }),

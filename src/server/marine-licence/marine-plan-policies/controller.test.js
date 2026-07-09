@@ -43,6 +43,18 @@ describe('#marinePlanPoliciesController', () => {
     expect(h.view).not.toHaveBeenCalled()
   })
 
+  test('does not clear the returnTo cache when there is no marine licence id in the cache', async () => {
+    const request = createMockRequest()
+    vi.mocked(cacheUtils.getMarineLicenceCache).mockReturnValueOnce({})
+    const h = { view: vi.fn() }
+
+    await expect(
+      marinePlanPoliciesController.handler(request, h)
+    ).rejects.toMatchObject({ output: { statusCode: 404 } })
+    expect(request.yar.clear).not.toHaveBeenCalled()
+    expect(request.yar.flash).not.toHaveBeenCalled()
+  })
+
   test('renders policies sorted by code as plain rows with a "Not yet started" tag', async () => {
     const h = { view: vi.fn() }
 

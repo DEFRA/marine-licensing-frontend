@@ -62,6 +62,8 @@ const buildRenderModel = ({ policyCode, projectName, policy, payload }) => ({
   policyText: policy.policy,
   findOutMoreUrl: `${FIND_OUT_MORE_BASE}${encodeURIComponent(policyCode)}`,
   backLink: marineLicenceRoutes.MARINE_LICENCE_MARINE_PLAN_POLICIES,
+  marinePlanPolicyGuidanceLink:
+    marineLicenceRoutes.MARINE_LICENCE_MARINE_PLAN_POLICY_GUIDANCE,
   payload
 })
 

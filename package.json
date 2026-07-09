@@ -80,7 +80,7 @@
     "undici": "^8.5.0"
   },
   "devDependencies": {
-    "@axe-core/playwright": "^4.11.3",
+    "@axe-core/playwright": "^4.12.1",
     "@babel/preset-env": "^8.0.2",
     "@faker-js/faker": "^10.5.0",
     "@testing-library/dom": "^10.4.1",

@@ -11,6 +11,7 @@ import {
   mapErrorsForDisplay
 } from '#src/server/common/helpers/errors.js'
 import { authenticatedPatchRequest } from '#src/server/common/helpers/authenticated-requests.js'
+import { RETURN_TO_CACHE_KEY } from '#src/server/common/constants/cache.js'
 
 export const MARINE_PLAN_POLICY_VIEW_ROUTE =
   'marine-licence/marine-plan-policies/marine-plan-policy/index'
@@ -24,6 +25,15 @@ export const errorMessages = {
   POLICY_CONSIDERATION_REQUIRED: 'Enter how you have considered this policy',
   POLICY_CONSIDERATION_MAX_LENGTH:
     'Policy consideration must be 2000 characters or less'
+}
+
+const CHECK_YOUR_ANSWERS_RETURN_LINK = `${marineLicenceRoutes.MARINE_LICENCE_CHECK_YOUR_ANSWERS}#marine-plan-policies-card`
+
+const getPolicyReturnLink = (returnTo) => {
+  if (returnTo) {
+    return CHECK_YOUR_ANSWERS_RETURN_LINK
+  }
+  return marineLicenceRoutes.MARINE_LICENCE_MARINE_PLAN_POLICIES
 }
 
 const loadPolicyContext = async (request) => {
@@ -51,17 +61,24 @@ const loadPolicyContext = async (request) => {
     policyCode,
     projectName,
     policy,
-    existingResponse: marinePlanPolicyResponses?.[policyCode] ?? ''
+    existingResponse: marinePlanPolicyResponses?.[policyCode] ?? '',
+    returnTo: request.yar?.get(RETURN_TO_CACHE_KEY)
   }
 }
 
-const buildRenderModel = ({ policyCode, projectName, policy, payload }) => ({
+const buildRenderModel = ({
+  policyCode,
+  projectName,
+  policy,
+  payload,
+  returnTo
+}) => ({
   pageTitle: policyCode,
   heading: policyCode,
   projectName,
   policyText: policy.policy,
   findOutMoreUrl: `${FIND_OUT_MORE_BASE}${encodeURIComponent(policyCode)}`,
-  backLink: marineLicenceRoutes.MARINE_LICENCE_MARINE_PLAN_POLICIES,
+  backLink: getPolicyReturnLink(returnTo),
   payload
 })
 
@@ -119,7 +136,7 @@ export const marinePlanPolicySubmitController = {
     }
   },
   async handler(request, h) {
-    const { id, policyCode } = await loadPolicyContext(request)
+    const { id, policyCode, returnTo } = await loadPolicyContext(request)
 
     await authenticatedPatchRequest(
       request,
@@ -131,6 +148,6 @@ export const marinePlanPolicySubmitController = {
       }
     )
 
-    return h.redirect(marineLicenceRoutes.MARINE_LICENCE_MARINE_PLAN_POLICIES)
+    return h.redirect(getPolicyReturnLink(returnTo))
   }
 }

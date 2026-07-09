@@ -7,6 +7,8 @@ import {
 } from '#src/server/marine-licence/marine-plan-policies/marine-plan-policy/controller.js'
 import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
 
+const CYA_RETURN_LINK = `${marineLicenceRoutes.MARINE_LICENCE_CHECK_YOUR_ANSWERS}#marine-plan-policies-card`
+
 vi.mock('#src/server/common/helpers/marine-licence/session-cache/utils.js')
 vi.mock('#src/services/marine-licence-service/index.js')
 
@@ -104,6 +106,28 @@ describe('#marinePlanPolicyController (GET)', () => {
     ).rejects.toMatchObject({ output: { statusCode: 404 } })
     expect(h.view).not.toHaveBeenCalled()
   })
+
+  test('back link targets check your answers when returnTo is set', async () => {
+    const h = { view: vi.fn() }
+    await marinePlanPolicyController.handler(
+      {
+        params: { policyCode: 'SW-MPA-1' },
+        yar: {
+          get: vi
+            .fn()
+            .mockReturnValue(
+              marineLicenceRoutes.MARINE_LICENCE_CHECK_YOUR_ANSWERS
+            )
+        }
+      },
+      h
+    )
+
+    expect(h.view).toHaveBeenCalledWith(
+      MARINE_PLAN_POLICY_VIEW_ROUTE,
+      expect.objectContaining({ backLink: CYA_RETURN_LINK })
+    )
+  })
 })
 
 import * as authRequests from '#src/server/common/helpers/authenticated-requests.js'
@@ -165,6 +189,30 @@ describe('#marinePlanPolicySubmitController (POST)', () => {
     expect(h.redirect).toHaveBeenCalledWith(
       marineLicenceRoutes.MARINE_LICENCE_MARINE_PLAN_POLICIES
     )
+  })
+
+  test('redirects to check your answers when returnTo is set', async () => {
+    const h = {
+      redirect: vi.fn().mockReturnValue({ takeover: vi.fn() }),
+      view: vi.fn()
+    }
+
+    await marinePlanPolicySubmitController.handler(
+      {
+        params: { policyCode: 'SW-BIO-1' },
+        payload: { policyConsideration: 'My considered answer' },
+        yar: {
+          get: vi
+            .fn()
+            .mockReturnValue(
+              marineLicenceRoutes.MARINE_LICENCE_CHECK_YOUR_ANSWERS
+            )
+        }
+      },
+      h
+    )
+
+    expect(h.redirect).toHaveBeenCalledWith(CYA_RETURN_LINK)
   })
 
   test('failAction re-renders the page with the error and submitted value', async () => {

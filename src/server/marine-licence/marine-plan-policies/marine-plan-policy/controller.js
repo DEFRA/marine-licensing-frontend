@@ -79,6 +79,8 @@ const buildRenderModel = ({
   policyText: policy.policy,
   findOutMoreUrl: `${FIND_OUT_MORE_BASE}${encodeURIComponent(policyCode)}`,
   backLink: getPolicyReturnLink(returnTo),
+  marinePlanPolicyGuidanceLink:
+    marineLicenceRoutes.MARINE_LICENCE_MARINE_PLAN_POLICY_GUIDANCE,
   payload
 })
 

@@ -68,10 +68,8 @@ describe('Task List', () => {
     mockMarineLicence({
       ...mockMarineLicenceApplication,
       marinePlanPolicyJob: 'ready',
-      taskList: {
-        ...mockMarineLicenceApplication.taskList,
-        marinePlanPolicies: 'COMPLETED'
-      }
+      marinePlanPoliciesCount: 3,
+      marinePlanPolicyResponseCount: 3
     })
     const completedDocument = await loadPage({
       requestUrl: marineLicenceRoutes.MARINE_LICENCE_TASK_LIST,
@@ -93,10 +91,8 @@ describe('Task List', () => {
     mockMarineLicence({
       ...mockMarineLicenceApplication,
       marinePlanPolicyJob: 'ready',
-      taskList: {
-        ...mockMarineLicenceApplication.taskList,
-        marinePlanPolicies: 'IN_PROGRESS'
-      }
+      marinePlanPoliciesCount: 3,
+      marinePlanPolicyResponseCount: 1
     })
     const incompleteDocument = await loadPage({
       requestUrl: marineLicenceRoutes.MARINE_LICENCE_TASK_LIST,

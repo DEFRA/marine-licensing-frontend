@@ -72,6 +72,8 @@ export const marinePlanPoliciesController = {
       ),
       backLink: marineLicenceRoutes.MARINE_LICENCE_TASK_LIST,
       taskListLink: marineLicenceRoutes.MARINE_LICENCE_TASK_LIST,
+      marinePlanPolicyGuidanceLink:
+        marineLicenceRoutes.MARINE_LICENCE_MARINE_PLAN_POLICY_GUIDANCE,
       policies
     })
   }

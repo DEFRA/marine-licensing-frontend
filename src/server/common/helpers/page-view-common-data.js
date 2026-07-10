@@ -1,9 +1,16 @@
 import { getUserSession } from '#src/server/common/plugins/auth/utils.js'
-import { routes } from '#src/server/common/constants/routes.js'
+import {
+  marineLicenceRoutes,
+  routes
+} from '#src/server/common/constants/routes.js'
 
 export const changeOrganisationLinkRoutes = [
   routes.DASHBOARD,
   routes.SERVICE_HOME
+]
+
+export const hideOrgOrUserNameRoutes = [
+  marineLicenceRoutes.MARINE_LICENCE_MARINE_PLAN_POLICY_GUIDANCE
 ]
 
 export const getPageViewCommonData = async (request) => {
@@ -25,9 +32,13 @@ export const getPageViewCommonData = async (request) => {
 
   const citizenName = shouldShowCitizenName ? displayName : null
 
-  const orgOrUserName = shouldShowOrgOrUserName
+  const sessionOrgOrUserName = shouldShowOrgOrUserName
     ? organisationName || displayName
     : citizenName
+
+  const orgOrUserName = hideOrgOrUserNameRoutes.includes(request.path)
+    ? null
+    : sessionOrgOrUserName
 
   return { orgOrUserName, showChangeOrganisationLink }
 }

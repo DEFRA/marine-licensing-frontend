@@ -1,6 +1,9 @@
 import { getPageViewCommonData } from './page-view-common-data.js'
 import { getUserSession } from '#src/server/common/plugins/auth/utils.js'
-import { routes } from '#src/server/common/constants/routes.js'
+import {
+  marineLicenceRoutes,
+  routes
+} from '#src/server/common/constants/routes.js'
 
 vi.mock('~/src/server/common/plugins/auth/utils.js', () => ({
   getUserSession: vi.fn()
@@ -327,6 +330,26 @@ describe('getPageViewCommonData', () => {
     const mockRequest = {
       state: { userSession: 'mock-session' },
       path: routes.DASHBOARD
+    }
+
+    const result = await getPageViewCommonData(mockRequest)
+
+    expect(result.orgOrUserName).toEqual(null)
+  })
+
+  test('should return orgOrUserName as null on the marine plan policies guidance page, even when the user session would otherwise show a name', async () => {
+    const mockUserSession = {
+      organisationName: 'Test Organisation Ltd',
+      displayName: 'John Doe',
+      hasMultipleOrgPickerEntries: true,
+      shouldShowOrgOrUserName: true,
+      shouldShowCitizenName: false
+    }
+    mockGetUserSession.mockResolvedValue(mockUserSession)
+
+    const mockRequest = {
+      state: { userSession: 'mock-session' },
+      path: marineLicenceRoutes.MARINE_LICENCE_MARINE_PLAN_POLICY_GUIDANCE
     }
 
     const result = await getPageViewCommonData(mockRequest)

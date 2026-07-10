@@ -105,6 +105,8 @@ export const marineLicenceRoutes = {
     '/marine-licence/fee-estimate-are-you-sure',
   MARINE_LICENCE_CALCULATE_MARINE_PLAN_POLICIES:
     '/marine-licence/calculate-marine-plan-policies',
+  MARINE_LICENCE_MARINE_PLAN_POLICY_GUIDANCE:
+    '/marine-licence/marine-plan-policy-guidance',
   MARINE_LICENCE_MARINE_PLAN_POLICIES: '/marine-licence/marine-plan-policies',
   MARINE_LICENCE_MARINE_PLAN_POLICY:
     '/marine-licence/marine-plan-policy/{policyCode}'

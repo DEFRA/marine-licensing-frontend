@@ -123,9 +123,53 @@ const getWaterFrameworkDirectiveHref = (waterFrameworkDirective) => {
   return marineLicenceRoutes.MARINE_LICENCE_WATER_FRAMEWORK_DIRECTIVE_NAUTICAL_MILE
 }
 
+const NOT_STARTED_STATUS = {
+  tag: {
+    text: 'Not yet started',
+    classes: 'govuk-tag--blue'
+  }
+}
+
+const getMarinePlanPoliciesStatus = (total, completed) => {
+  if (typeof total !== 'number') {
+    return {
+      status: NOT_STARTED_STATUS,
+      suffix: ''
+    }
+  }
+
+  if (!completed) {
+    return {
+      status: NOT_STARTED_STATUS,
+      suffix: ` (${total} to complete)`
+    }
+  }
+
+  if (completed >= total) {
+    return {
+      status: { text: 'Completed' },
+      suffix: ` (${total} of ${total} completed)`
+    }
+  }
+
+  return {
+    status: {
+      tag: {
+        text: 'In progress',
+        classes: 'govuk-tag--teal'
+      }
+    },
+    suffix: ` (${completed} of ${total} completed)`
+  }
+}
+
 export const transformMarinePlanPoliciesTaskList = (
   taskList,
-  { marinePlanPolicyJob, marinePlanPoliciesCount }
+  {
+    marinePlanPolicyJob,
+    marinePlanPoliciesCount,
+    marinePlanPolicyResponseCount
+  }
 ) => {
   const isAvailable =
     taskList.siteDetails === 'COMPLETED' && marinePlanPolicyJob === 'ready'
@@ -142,19 +186,19 @@ export const transformMarinePlanPoliciesTaskList = (
     ]
   }
 
-  const countSuffix =
-    typeof marinePlanPoliciesCount === 'number'
-      ? ` (${marinePlanPoliciesCount} to complete)`
-      : ''
+  const { status, suffix } = getMarinePlanPoliciesStatus(
+    marinePlanPoliciesCount,
+    marinePlanPolicyResponseCount
+  )
 
   return [
     {
       title: {
-        text: `Marine plan policy considerations${countSuffix}`,
+        text: `Marine plan policy considerations${suffix}`,
         classes: taskClasses
       },
       href: marineLicenceRoutes.MARINE_LICENCE_MARINE_PLAN_POLICIES,
-      status: setStatus(taskList.marinePlanPolicies)
+      status
     }
   ]
 }

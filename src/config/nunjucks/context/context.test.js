@@ -132,6 +132,11 @@ describe('#context', () => {
       page: 'the water framework directive file upload page',
       path: '/marine-licence/water-framework-directive-upload-and-wait',
       marineLicenceCache: { id: 'some-id' }
+    },
+    {
+      page: 'the marine plan policy guidance page',
+      path: '/marine-licence/marine-plan-policy-guidance',
+      marineLicenceCache: { id: 'some-id' }
     }
   ])(
     'When on $page, should not use navigation links',

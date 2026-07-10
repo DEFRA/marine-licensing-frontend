@@ -44,6 +44,8 @@ describe('#marinePlanPolicyController (GET)', () => {
       findOutMoreUrl:
         'https://environment.data.gov.uk/marine-plans-explorer/policy/SW-MPA-1',
       backLink: marineLicenceRoutes.MARINE_LICENCE_MARINE_PLAN_POLICIES,
+      marinePlanPolicyGuidanceLink:
+        marineLicenceRoutes.MARINE_LICENCE_MARINE_PLAN_POLICY_GUIDANCE,
       payload: { policyConsideration: '' }
     })
   })

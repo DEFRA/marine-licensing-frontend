@@ -47,6 +47,11 @@ describe('Water Framework Directive Nautical mile', () => {
       })
     ).toBeInTheDocument()
 
+    const lists = document.querySelectorAll('ul.govuk-list--bullet')
+    const list = lists[0]
+    const listLinks = list.querySelectorAll('li')
+    expect(listLinks).toHaveLength(4)
+
     expect(
       getByRole(document, 'button', { name: 'Continue' })
     ).toBeInTheDocument()

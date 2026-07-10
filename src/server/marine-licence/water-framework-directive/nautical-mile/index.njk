@@ -22,7 +22,7 @@
 
   {% set nauticalMileContentHtml %}
     {{ govukDetails({
-      summaryText: "Help with understanding one nautical mile from the coast",
+      summaryText: "Help with understanding the Water Framework Directive assessment area",
       html: nauticalMileHelpHtml
     }) }}
   {% endset %}
@@ -31,7 +31,7 @@
     name: "nauticalMile",
     errorSummary: errorSummary,
     errors: errors,
-    heading: "Is your project located within one nautical mile (1.85km) of the coast?",
+    heading: heading,
     isPageHeading: true,
     value: payload.nauticalMile,
     errorMessage: errors['nauticalMile'],

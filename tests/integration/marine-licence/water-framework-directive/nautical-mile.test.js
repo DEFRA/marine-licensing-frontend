@@ -31,13 +31,13 @@ describe('Water Framework Directive Nautical mile', () => {
       marineLicenceRoutes.MARINE_LICENCE_WATER_FRAMEWORK_DIRECTIVE_BEFORE_YOU_START
     )
     expect(getByRole(document, 'heading', { level: 1 })).toHaveTextContent(
-      'Is your project located within one nautical mile (1.85km) of the coast?'
+      'Is your project within one nautical mile (1.85km) of the low-water line, or in a tidal river or estuary?'
     )
 
     expect(
       getByText(
         document,
-        'This example shows a project site located within one nautical mile of the coast.'
+        'This includes the shore between low and high tide, the sea up to one nautical mile (1.85km) out from the low-water line, and tidal areas such as docks, marinas and tidal rivers.'
       )
     ).toBeInTheDocument()
 
@@ -59,7 +59,7 @@ describe('Water Framework Directive Nautical mile', () => {
     expect(
       getByText(
         document,
-        'Help with understanding one nautical mile from the coast'
+        'Help with understanding the Water Framework Directive assessment area'
       )
     ).toBeInTheDocument()
   })
@@ -77,7 +77,7 @@ describe('Water Framework Directive Nautical mile', () => {
       getInputInFieldset({
         document,
         fieldsetLabel:
-          'Is your project located within one nautical mile (1.85km) of the coast?',
+          'Is your project within one nautical mile (1.85km) of the low-water line, or in a tidal river or estuary?',
         inputLabel: 'Yes',
         findByHeading: true
       })
@@ -86,7 +86,7 @@ describe('Water Framework Directive Nautical mile', () => {
       getInputInFieldset({
         document,
         fieldsetLabel:
-          'Is your project located within one nautical mile (1.85km) of the coast?',
+          'Is your project within one nautical mile (1.85km) of the low-water line, or in a tidal river or estuary?',
         inputLabel: 'No',
         findByHeading: true
       })
@@ -109,7 +109,7 @@ describe('Water Framework Directive Nautical mile', () => {
       getInputInFieldset({
         document,
         fieldsetLabel:
-          'Is your project located within one nautical mile (1.85km) of the coast?',
+          'Is your project within one nautical mile (1.85km) of the low-water line, or in a tidal river or estuary?',
         inputLabel: 'Yes',
         findByHeading: true
       })
@@ -169,7 +169,7 @@ describe('Water Framework Directive Nautical mile', () => {
     expectFieldsetError({
       document,
       fieldsetLabel:
-        'Is your project located within one nautical mile (1.85km) of the coast?',
+        'Is your project within one nautical mile (1.85km) of the low-water line, or in a tidal river or estuary?',
       errorMessage:
         'Select whether your project is located within one nautical mile (1.85km) of the coast',
       findByHeading: true

@@ -273,7 +273,7 @@ describe('Page accessibility checks (Axe)', () => {
       url: marineLicenceRoutes.MARINE_LICENCE_WATER_FRAMEWORK_DIRECTIVE_NAUTICAL_MILE,
       isMarineLicence: true,
       title:
-        'Is your project located within one nautical mile (1.85km) of the coast?'
+        'Is your project within one nautical mile (1.85km) of the low-water line, or in a tidal river or estuary?'
     },
     {
       url: marineLicenceRoutes.MARINE_LICENCE_WATER_FRAMEWORK_DIRECTIVE_EXCLUDED_ACTIVITIES,
@@ -520,20 +520,20 @@ describe('Page accessibility checks (Axe)', () => {
                   ? mockProjectList
                   : endpoint === '/exemptions/summary'
                     ? {
-                        coordinatesInputMethod: {
-                          shapefile: 0,
-                          kml: 0,
-                          manualCoordinates: 0
-                        },
-                        coordinateSystemVolume: {
-                          wgs84: { count: 0, percentage: 0 },
-                          bng: { count: 0, percentage: 0 },
-                          total: 0
-                        },
-                        byArticle: {},
-                        byMarinePlanArea: {},
-                        byCoastalOperationsArea: {}
-                      }
+                      coordinatesInputMethod: {
+                        shapefile: 0,
+                        kml: 0,
+                        manualCoordinates: 0
+                      },
+                      coordinateSystemVolume: {
+                        wgs84: { count: 0, percentage: 0 },
+                        bng: { count: 0, percentage: 0 },
+                        total: 0
+                      },
+                      byArticle: {},
+                      byMarinePlanArea: {},
+                      byCoastalOperationsArea: {}
+                    }
                     : exemption
             }
           })

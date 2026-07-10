@@ -48,6 +48,9 @@ describe('Marine Licence Marine Plan Policies Component', () => {
 
     expect($('.govuk-summary-list__actions a')).toHaveLength(2)
     expect($.html()).toContain('/marine-licence/marine-plan-policy/S-CC-1')
+    expect($('.govuk-summary-list__actions a').first().text()).toContain(
+      'marine plan policy S-CC-1'
+    )
   })
 
   test('hides Change links when read only', () => {

@@ -520,20 +520,20 @@ describe('Page accessibility checks (Axe)', () => {
                   ? mockProjectList
                   : endpoint === '/exemptions/summary'
                     ? {
-                      coordinatesInputMethod: {
-                        shapefile: 0,
-                        kml: 0,
-                        manualCoordinates: 0
-                      },
-                      coordinateSystemVolume: {
-                        wgs84: { count: 0, percentage: 0 },
-                        bng: { count: 0, percentage: 0 },
-                        total: 0
-                      },
-                      byArticle: {},
-                      byMarinePlanArea: {},
-                      byCoastalOperationsArea: {}
-                    }
+                        coordinatesInputMethod: {
+                          shapefile: 0,
+                          kml: 0,
+                          manualCoordinates: 0
+                        },
+                        coordinateSystemVolume: {
+                          wgs84: { count: 0, percentage: 0 },
+                          bng: { count: 0, percentage: 0 },
+                          total: 0
+                        },
+                        byArticle: {},
+                        byMarinePlanArea: {},
+                        byCoastalOperationsArea: {}
+                      }
                     : exemption
             }
           })

@@ -13,7 +13,7 @@ import {
 export const IS_INVOICE_ADDRESS_UK_OR_INTERNATIONAL_VIEW_ROUTE =
   'marine-licence/invoicing/is-invoice-address-uk-or-international/index'
 
-const getBackLink = () => marineLicenceRoutes.MARINE_LICENCE_TASK_LIST
+const backLink = marineLicenceRoutes.MARINE_LICENCE_TASK_LIST
 
 export const isInvoiceAddressUkOrInternationalController = {
   async handler(request, h) {
@@ -23,7 +23,7 @@ export const isInvoiceAddressUkOrInternationalController = {
       ...isInvoiceAddressUkOrInternationalSettings,
       projectName: marineLicence.projectName,
       payload: marineLicence.invoiceAddress ?? {},
-      backLink: getBackLink()
+      backLink
     })
   }
 }
@@ -34,7 +34,6 @@ export const isInvoiceAddressUkOrInternationalSubmitController = {
       payload: isInvoiceAddressUkOrInternationalSchema,
       failAction: (request, h, err) => {
         const { projectName } = getMarineLicenceCache(request)
-        const backLink = getBackLink()
         return createFailAction({
           viewRoute: IS_INVOICE_ADDRESS_UK_OR_INTERNATIONAL_VIEW_ROUTE,
           settings: isInvoiceAddressUkOrInternationalSettings,

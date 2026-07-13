@@ -84,7 +84,7 @@ describe('Is invoice address UK or international', () => {
   test('form state when decision is set', async () => {
     mockMarineLicence({
       ...marineLicence,
-      invoiceAddress: {
+      invoicing: {
         invoiceAddressType: 'international'
       }
     })

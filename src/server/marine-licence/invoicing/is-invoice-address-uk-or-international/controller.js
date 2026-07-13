@@ -18,11 +18,13 @@ const backLink = marineLicenceRoutes.MARINE_LICENCE_TASK_LIST
 export const isInvoiceAddressUkOrInternationalController = {
   async handler(request, h) {
     const marineLicence = getMarineLicenceCache(request)
+    const { invoicing } = marineLicence
+
 
     return h.view(IS_INVOICE_ADDRESS_UK_OR_INTERNATIONAL_VIEW_ROUTE, {
       ...isInvoiceAddressUkOrInternationalSettings,
       projectName: marineLicence.projectName,
-      payload: marineLicence.invoiceAddress ?? {},
+      payload: invoicing ?? {},
       backLink
     })
   }

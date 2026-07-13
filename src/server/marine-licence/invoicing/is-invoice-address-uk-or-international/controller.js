@@ -20,7 +20,6 @@ export const isInvoiceAddressUkOrInternationalController = {
     const marineLicence = getMarineLicenceCache(request)
     const { invoicing } = marineLicence
 
-
     return h.view(IS_INVOICE_ADDRESS_UK_OR_INTERNATIONAL_VIEW_ROUTE, {
       ...isInvoiceAddressUkOrInternationalSettings,
       projectName: marineLicence.projectName,

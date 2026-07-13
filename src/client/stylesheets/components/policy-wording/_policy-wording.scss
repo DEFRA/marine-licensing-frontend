@@ -5,7 +5,7 @@
   ul,
   ol {
     @include govuk-font($size: 19);
-    @include govuk-text-colour;
+    color: govuk-functional-colour(text);
     margin-top: 0;
     @include govuk-responsive-margin(4, 'bottom');
   }

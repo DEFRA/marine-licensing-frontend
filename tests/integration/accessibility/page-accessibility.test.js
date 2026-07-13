@@ -221,6 +221,11 @@ describe('Page accessibility checks (Axe)', () => {
       isMarineLicence: true
     },
     {
+      url: marineLicenceRoutes.MARINE_LICENCE_IS_INVOICE_ADDRESS_UK_OR_INTERNATIONAL,
+      title: "Is the invoice contact's address in the UK or international?",
+      isMarineLicence: true
+    },
+    {
       url: marineLicenceRoutes.MARINE_LICENCE_PUBLIC_REGISTER,
       title: 'Sharing your project information publicly',
       isMarineLicence: true

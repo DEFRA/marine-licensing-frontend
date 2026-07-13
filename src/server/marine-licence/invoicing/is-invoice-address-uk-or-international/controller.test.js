@@ -43,7 +43,7 @@ describe('#isInvoiceAddressUkOrInternational', () => {
         h,
         {
           ...mockLicence,
-          invoiceAddress: {
+          invoicing: {
             invoiceAddressType: 'uk'
           }
         }

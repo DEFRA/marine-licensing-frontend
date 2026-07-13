@@ -52,9 +52,9 @@ describe('#nauticalMile', () => {
           marineLicenceRoutes.MARINE_LICENCE_WATER_FRAMEWORK_DIRECTIVE_BEFORE_YOU_START,
         cancelLink: marineLicenceRoutes.MARINE_LICENCE_TASK_LIST,
         pageTitle:
-          'Is your project located within one nautical mile (1.85km) of the coast?',
+          'Is your project within one nautical mile (1.85km) of the low-water line, or in a tidal river or estuary?',
         heading:
-          'Is your project located within one nautical mile (1.85km) of the coast?',
+          'Is your project within one nautical mile (1.85km) of the low-water line, or in a tidal river or estuary?',
         projectName: mockLicence.projectName,
         payload: { nauticalMile: undefined }
       })
@@ -172,9 +172,9 @@ describe('#nauticalMile', () => {
             marineLicenceRoutes.MARINE_LICENCE_WATER_FRAMEWORK_DIRECTIVE_BEFORE_YOU_START,
           cancelLink: marineLicenceRoutes.MARINE_LICENCE_TASK_LIST,
           pageTitle:
-            'Is your project located within one nautical mile (1.85km) of the coast?',
+            'Is your project within one nautical mile (1.85km) of the low-water line, or in a tidal river or estuary?',
           heading:
-            'Is your project located within one nautical mile (1.85km) of the coast?',
+            'Is your project within one nautical mile (1.85km) of the low-water line, or in a tidal river or estuary?',
           projectName: mockLicence.projectName,
           payload,
           ...expectedExtra

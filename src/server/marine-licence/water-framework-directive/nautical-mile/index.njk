@@ -16,22 +16,37 @@
 {% block content %}
 
   {% set nauticalMileHelpHtml %}
-    <p class="govuk-body">This example shows a project site located within one nautical mile of the coast.</p>
-    <img src="/public/assets/images/nautical-mile-illustration.png" alt="Diagram showing a site location in the water less than 1 nautical mile from the coast" width="100%" class="govuk-!-margin-bottom-6" />
+    <p>The Water Framework Directive assessment area is anywhere in the marine environment from the Normal Tidal Limit (the furthest point upstream that the tide reaches) to within one nautical mile (1.85km) of the low water line (the edge of the sea at low tide).</p>
+    
+    <p>This includes:</p>
+
+    <ul class="govuk-list govuk-list--bullet">
+      <li>tidal rivers and estuaries</li>
+      <li>enclosed tidal waters, such as docks and marinas, where seawater can flow in and out, for example, through a lock</li>
+      <li>the shore between low tide and Mean High Water Springs (MHWS) - the average level the sea reaches at its highest tides</li>
+      <li>coastal areas within one nautical mile (1.85km) of the low-water line</li>
+    </ul>
+
+    <p class="govuk-body">This illustration shows the area where a Water Framework Directive (WFD) assessment is usually required.</p>
+    <img src="/public/assets/images/nautical-mile-illustration.jpg" alt="Diagram showing a site location in the water less than 1 nautical mile from the coast" width="100%" class="govuk-!-margin-bottom-0" />
   {% endset %}
 
   {% set nauticalMileContentHtml %}
+
+    <p class="govuk-body">This includes the shore between low and high tide, the sea up to one nautical mile (1.85km) out from the low-water line, and tidal areas such as docks, marinas and tidal rivers.</p>    
+
     {{ govukDetails({
-      summaryText: "Help with understanding one nautical mile from the coast",
+      summaryText: "Help with understanding the Water Framework Directive assessment area",
       html: nauticalMileHelpHtml
     }) }}
+
   {% endset %}
 
   {{ appRadioPage({
     name: "nauticalMile",
     errorSummary: errorSummary,
     errors: errors,
-    heading: "Is your project located within one nautical mile (1.85km) of the coast?",
+    heading: heading,
     isPageHeading: true,
     value: payload.nauticalMile,
     errorMessage: errors['nauticalMile'],

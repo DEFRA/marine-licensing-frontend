@@ -1,5 +1,5 @@
 export const NAUTICAL_MILE_HEADING =
-  'Project located within one nautical mile (1.85km) of the coast'
+  'Project located within one nautical mile (1.85km) of low-water, in a tidal river or estuary'
 
 export const EXCLUDED_ACTIVITIES_HEADING =
   'Project limited to one of the excluded activities'

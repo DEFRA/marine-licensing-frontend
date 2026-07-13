@@ -24,19 +24,18 @@
 
       <p class="govuk-body">The Water Framework Directive (WFD) protects the quality of estuarine and coastal waters. Its aim is to make sure all water bodies reach or maintain 'good' status.</p>
 
-      <p class="govuk-body">We'll ask you some questions to find out whether you need to include a WFD assessment with your application. We'll ask you:</p>
+      <p class="govuk-body">We'll ask you some questions to find out whether you need to provide a WFD assessment with your application. We'll ask you if:</p>
 
       <ul class="govuk-list govuk-list--bullet">
-        <li>if your project is within one nautical mile (1.85km) of the coast</li>
-        <li>if your activity is one of the types that does not require an assessment</li>
-        <li>if you have a WFD assessment, for the same activity and location, from a previous project and if anything has changed since it was done</li>
+        <li>your project is within one nautical mile (1.85km) of the low water line, or in a tidal river or estuary - including the shore between low and high tide</li>
+        <li>your activity is one of the types that does not require an assessment</li>
       </ul>
 
       <p class="govuk-body"><a href="https://www.gov.uk/guidance/water-framework-directive-assessment-estuarine-and-coastal-waters" class="govuk-link" rel="noreferrer noopener" target="_blank">Read the guidance Water Framework Directive (opens in new tab)</a>.</p>
 
       <h3 class="govuk-heading-s">Excluded activities</h3>
 
-      <p class="govuk-body">Even if your project is within one nautical mile (1.85km) of the coast, some specific activities are excluded from having to provide a WFD assessment.</p>
+      <p class="govuk-body">Even if your project is within one nautical mile (1.85km) of the low water line, or in a tidal river or estuary - including the shore between low and high tide, some specific activities are excluded from having to provide a WFD assessment.</p>
 
       {% set excludedActivitiesHtml %}
         <p class="govuk-body">You do not need to provide a WFD assessment if your project is limited to one of the following activities:</p>
@@ -44,7 +43,7 @@
           <li>maintaining pumps at pumping stations - providing you do this regularly, avoid low dissolved oxygen levels during maintenance and minimise silt movement when restarting</li>
           <li>removing blockages or obstacles, such as litter or debris, within 10 metres of an existing structure to maintain flow</li>
           <li>replacing or removing existing pipes, cables or services crossing over a water body - not including any new structure or supports, or new bed or bank reinforcement</li>
-          <li>'over water' repair or replacement work, for example to bridge, pier or jetty surfaces - providing you minimise bank or bed disturbance</li>
+          <li>‘over water’ repair or replacement work, for example to bridge, pier or jetty surfaces - providing you minimise bank or bed disturbance</li>
         </ul>
       {% endset %}
 
@@ -53,23 +52,27 @@
         html: excludedActivitiesHtml
       }) }}
 
-      <h3 class="govuk-heading-s">Previous WFD assessment</h3>
+      <h3 class="govuk-heading-s">Previous WFD assessments</h3>
 
-      <p class="govuk-body">You may not need to complete a new WFD assessment if you carried out the same activity at the same location, between 2015 and 2022 and already have an assessment.</p>
+      <p class="govuk-body">You can provide a previous WFD assessment for the same activity in the same location, but it must be up to date.</p>
 
-      <p class="govuk-body">You will still need a new assessment if:</p>
+      <p class="govuk-body">You will need to carry out a new or updated assessment if:</p>
+
       <ul class="govuk-list govuk-list--bullet">
-        <li>you have changed how you carry out the activity - including the method, size, scale, volume, depth, location or timings</li>
-        <li>there has been a pollution incident in the area since you last carried out the activity</li>
+        <li>the activity has changed in a way that could affect its impact on the water body</li>
+        <li>the status or objectives of the water body have changed since the assessment was completed</li>
+        <li>there is a new or increased risk that the water body will not meet its objectives</li>
+        <li>the previous assessment does not contain enough detail to support your current application</li>
+        <li>the assessment relates to an outdated river basin management plan cycle</li>
       </ul>
 
-      <h3 class="govuk-heading-s">Uploading your assessment</h3>
+      <h3 class="govuk-heading-s">Providing a WFD assessment</h3>
 
       <p class="govuk-body">You will need to upload a WFD assessment as part of your application if:</p>
+
       <ul class="govuk-list govuk-list--bullet">
-        <li>your project is within one nautical mile (1.85km) of the coast</li>
+        <li>your project is within one nautical mile (1.85km) of the low water line, or in a tidal river or estuary - including the shore between low and high tide</li>
         <li>your project is not limited to an excluded activity</li>
-        <li>you have a previous assessment from an activity carried out between 2015 to 2022 (you will still need to upload a new assessment if you do not have access to the previous one, you have changed how you carry out the activity, or there has been a pollution incident)</li>
       </ul>
 
       <div class="govuk-button-group">

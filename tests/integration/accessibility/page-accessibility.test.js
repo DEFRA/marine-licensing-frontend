@@ -278,7 +278,7 @@ describe('Page accessibility checks (Axe)', () => {
       url: marineLicenceRoutes.MARINE_LICENCE_WATER_FRAMEWORK_DIRECTIVE_NAUTICAL_MILE,
       isMarineLicence: true,
       title:
-        'Is your project located within one nautical mile (1.85km) of the coast?'
+        'Is your project within one nautical mile (1.85km) of the low-water line, or in a tidal river or estuary?'
     },
     {
       url: marineLicenceRoutes.MARINE_LICENCE_WATER_FRAMEWORK_DIRECTIVE_EXCLUDED_ACTIVITIES,

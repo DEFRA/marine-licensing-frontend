@@ -18,7 +18,7 @@ export const NAUTICAL_MILE_VIEW_ROUTE =
   'marine-licence/water-framework-directive/nautical-mile/index'
 
 const NAUTICAL_MILE_HEADING =
-  'Is your project located within one nautical mile (1.85km) of the coast?'
+  'Is your project within one nautical mile (1.85km) of the low-water line, or in a tidal river or estuary?'
 
 export const errorMessages = {
   NAUTICAL_MILE_REQUIRED:

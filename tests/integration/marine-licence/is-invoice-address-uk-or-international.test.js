@@ -8,9 +8,7 @@ import { loadPage, submitForm } from '~/tests/integration/shared/app-server.js'
 import { expectFieldsetError } from '~/tests/integration/shared/expect-utils.js'
 import { getInputInFieldset } from '~/tests/integration/shared/dom-helpers.js'
 import { statusCodes } from '~/src/server/common/constants/status-codes.js'
-import {
-  isInvoiceAddressUkOrInternationalSettings
-} from '~/src/server/common/validation/invoicing/constants.js'
+import { isInvoiceAddressUkOrInternationalSettings } from '~/src/server/common/validation/invoicing/constants.js'
 
 describe('Is invoice address UK or international', () => {
   const getServer = setupTestServer()

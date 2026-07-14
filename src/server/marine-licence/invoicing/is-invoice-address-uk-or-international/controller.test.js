@@ -1,23 +1,25 @@
 import { vi } from 'vitest'
-import { IS_INVOICE_ADDRESS_UK_OR_INTERNATIONAL_VIEW_ROUTE, isInvoiceAddressUkOrInternationalController, isInvoiceAddressUkOrInternationalSubmitController } from '#src/server/marine-licence/invoicing/is-invoice-address-uk-or-international/controller.js'
+import {
+  IS_INVOICE_ADDRESS_UK_OR_INTERNATIONAL_VIEW_ROUTE,
+  isInvoiceAddressUkOrInternationalController,
+  isInvoiceAddressUkOrInternationalSubmitController
+} from '#src/server/marine-licence/invoicing/is-invoice-address-uk-or-international/controller.js'
 import * as cacheUtils from '#src/server/common/helpers/marine-licence/session-cache/utils.js'
 import * as authRequests from '#src/server/common/helpers/authenticated-requests.js'
 import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
 import { mockMarineLicenceApplication } from '#src/server/test-helpers/mocks/marine-licence-mocks.js'
 import { createMockH } from '#src/server/test-helpers/mocks/helpers.js'
-import {
-  isInvoiceAddressUkOrInternationalSettings
-} from '#src/server/common/validation/invoicing/constants.js'
+import { isInvoiceAddressUkOrInternationalSettings } from '#src/server/common/validation/invoicing/constants.js'
 
 vi.mock('#/src/server/common/helpers/marine-licence/session-cache/utils.js')
 
 describe('#isInvoiceAddressUkOrInternational', () => {
-
-
   const h = createMockH()
 
   beforeEach(() => {
-    vi.spyOn(cacheUtils, 'getMarineLicenceCache').mockReturnValue(mockMarineLicenceApplication)
+    vi.spyOn(cacheUtils, 'getMarineLicenceCache').mockReturnValue(
+      mockMarineLicenceApplication
+    )
     vi.spyOn(authRequests, 'authenticatedPatchRequest')
     vi.spyOn(cacheUtils, 'setMarineLicenceCache').mockResolvedValue()
   })
@@ -26,13 +28,12 @@ describe('#isInvoiceAddressUkOrInternational', () => {
     vi.restoreAllMocks()
   })
 
-
-
   describe('#isInvoiceAddressUkOrInternationalController', () => {
     test('Should render page with no invoicing details in cache', async () => {
-
-      vi.spyOn(cacheUtils, 'getMarineLicenceCache').mockReturnValue({ ...mockMarineLicenceApplication, invoicing: undefined })
-
+      vi.spyOn(cacheUtils, 'getMarineLicenceCache').mockReturnValue({
+        ...mockMarineLicenceApplication,
+        invoicing: undefined
+      })
 
       await isInvoiceAddressUkOrInternationalController.handler(
         {
@@ -41,13 +42,16 @@ describe('#isInvoiceAddressUkOrInternational', () => {
         h
       )
 
-      expect(h.view).toHaveBeenCalledWith(IS_INVOICE_ADDRESS_UK_OR_INTERNATIONAL_VIEW_ROUTE, {
-        backLink: "/marine-licence/task-list",
-        heading: isInvoiceAddressUkOrInternationalSettings.heading,
-        pageTitle: isInvoiceAddressUkOrInternationalSettings.pageTitle,
-        payload: {},
-        projectName: mockMarineLicenceApplication.projectName
-      })
+      expect(h.view).toHaveBeenCalledWith(
+        IS_INVOICE_ADDRESS_UK_OR_INTERNATIONAL_VIEW_ROUTE,
+        {
+          backLink: '/marine-licence/task-list',
+          heading: isInvoiceAddressUkOrInternationalSettings.heading,
+          pageTitle: isInvoiceAddressUkOrInternationalSettings.pageTitle,
+          payload: {},
+          projectName: mockMarineLicenceApplication.projectName
+        }
+      )
     })
   })
 

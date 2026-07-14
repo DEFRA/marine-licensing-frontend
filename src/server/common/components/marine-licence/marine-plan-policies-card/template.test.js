@@ -78,6 +78,23 @@ describe('Marine Licence Marine Plan Policies Component', () => {
     expect($.html()).toContain('&lt;script&gt;')
   })
 
+  test('renders policy wording HTML as formatted markup', () => {
+    const $ = renderComponent('marine-licence/marine-plan-policies-card', {
+      policies: [
+        {
+          policyCode: 'S-CC-1',
+          wording: '<p>Intro</p><ul><li>item one</li><li>item two</li></ul>',
+          response: 'My consideration',
+          changeHref: '/marine-licence/marine-plan-policy/S-CC-1'
+        }
+      ]
+    })
+
+    expect($('.app-policy-wording p').first().text()).toBe('Intro')
+    expect($('.app-policy-wording ul li')).toHaveLength(2)
+    expect($.html()).not.toContain('&lt;p&gt;')
+  })
+
   test('does not render the card when there are no policies', () => {
     const $ = renderComponent('marine-licence/marine-plan-policies-card', {
       policies: []

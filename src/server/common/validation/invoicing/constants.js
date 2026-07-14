@@ -20,6 +20,13 @@ export const ukInvoiceAddressSettings = {
 
 export const ukInvoiceAddressErrorMessages = {
   ADDRESS_LINE_1_REQUIRED: 'Enter the first line of the address',
+  ADDRESS_LINE_1_MAX_LENGTH:
+    'The first line of the address must be 100 characters or fewer',
+  ADDRESS_LINE_2_MAX_LENGTH:
+    'The second line of the address must be 100 characters or fewer',
   ADDRESS_TOWN_REQUIRED: 'Enter the town or city',
-  ADDRESS_POSTCODE_REQUIRED: 'Enter the postcode'
+  ADDRESS_TOWN_MAX_LENGTH: 'The town or city must be 30 characters or fewer',
+  ADDRESS_COUNTY_MAX_LENGTH: 'The county must be 50 characters or fewer',
+  ADDRESS_POSTCODE_REQUIRED: 'Enter the postcode',
+  ADDRESS_POSTCODE_INVALID: 'Enter a valid postcode'
 }

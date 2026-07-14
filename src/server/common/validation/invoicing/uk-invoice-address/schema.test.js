@@ -42,7 +42,7 @@ describe('#ukInvoiceAddressSchema', () => {
     expect(error.message).toBe('ADDRESS_LINE_1_REQUIRED')
   })
 
-  test('should fail when addressTown is missing', () => {
+  test('should fail when town is missing', () => {
     const { error } = ukInvoiceAddressSchema.validate({
       ...validAddress,
       addressTown: ''
@@ -50,7 +50,7 @@ describe('#ukInvoiceAddressSchema', () => {
     expect(error.message).toBe('ADDRESS_TOWN_REQUIRED')
   })
 
-  test('should fail when addressPostcode is missing', () => {
+  test('should fail when postcode is missing', () => {
     const { error } = ukInvoiceAddressSchema.validate({
       ...validAddress,
       addressPostcode: ''
@@ -76,5 +76,77 @@ describe('#ukInvoiceAddressSchema', () => {
     })
     expect(error).toBeUndefined()
     expect(value).toEqual(validAddress)
+  })
+
+  test('should fail when addressLine1 exceeds 100 characters', () => {
+    const { error } = ukInvoiceAddressSchema.validate({
+      ...validAddress,
+      addressLine1: 'a'.repeat(101)
+    })
+    expect(error.message).toBe('ADDRESS_LINE_1_MAX_LENGTH')
+  })
+
+  test('should fail when addressLine2 exceeds 100 characters', () => {
+    const { error } = ukInvoiceAddressSchema.validate({
+      ...validAddress,
+      addressLine2: 'a'.repeat(101)
+    })
+    expect(error.message).toBe('ADDRESS_LINE_2_MAX_LENGTH')
+  })
+
+  test('should fail when addressTown exceeds 30 characters', () => {
+    const { error } = ukInvoiceAddressSchema.validate({
+      ...validAddress,
+      addressTown: 'a'.repeat(31)
+    })
+    expect(error.message).toBe('ADDRESS_TOWN_MAX_LENGTH')
+  })
+
+  test('should fail when addressCounty exceeds 50 characters', () => {
+    const { error } = ukInvoiceAddressSchema.validate({
+      ...validAddress,
+      addressCounty: 'a'.repeat(51)
+    })
+    expect(error.message).toBe('ADDRESS_COUNTY_MAX_LENGTH')
+  })
+
+  test.each([
+    'AA1 1AA',
+    'AA11AA',
+    'aa1 1aa',
+    'M1 1AE',
+    'M60 1NW',
+    'CR2 6XH',
+    'DN55 1PT',
+    'W1A 1HQ',
+    'EC1A 1BB'
+  ])('should validate postcode format %s', (addressPostcode) => {
+    const { error } = ukInvoiceAddressSchema.validate({
+      ...validAddress,
+      addressPostcode
+    })
+    expect(error).toBeUndefined()
+  })
+
+  test.each(['NOT A POSTCODE', 'A1', '12345', 'AA1 1A'])(
+    'should fail when postcode is invalid: %s',
+    (addressPostcode) => {
+      const { error } = ukInvoiceAddressSchema.validate({
+        ...validAddress,
+        addressPostcode
+      })
+      expect(error.message).toBe('ADDRESS_POSTCODE_INVALID')
+    }
+  )
+
+  test('should validate at exact max lengths', () => {
+    const { error } = ukInvoiceAddressSchema.validate({
+      addressLine1: 'a'.repeat(100),
+      addressLine2: 'a'.repeat(100),
+      addressTown: 'a'.repeat(30),
+      addressCounty: 'a'.repeat(50),
+      addressPostcode: 'AA1 1AA'
+    })
+    expect(error).toBeUndefined()
   })
 })

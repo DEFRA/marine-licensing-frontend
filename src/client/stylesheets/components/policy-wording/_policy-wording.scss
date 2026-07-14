@@ -23,9 +23,18 @@
     list-style-type: decimal;
   }
 
+  li {
+    margin-bottom: 0;
+
+    @include govuk-media-query($from: tablet) {
+      margin-bottom: govuk-spacing(1);
+    }
+  }
+
   a {
     @include govuk-link-common;
     @include govuk-link-style-default;
+    @include govuk-link-print-friendly;
   }
 
   > :last-child {

@@ -225,5 +225,10 @@ export const transformFeeEstimateTaskList = (taskList) => [
     title: { text: 'Fee estimate', classes: taskClasses },
     href: marineLicenceRoutes.MARINE_LICENCE_FEE_ESTIMATE,
     status: setStatus(taskList.feeEstimate)
+  },
+  {
+    title: { text: 'Invoicing details', classes: taskClasses },
+    href: marineLicenceRoutes.MARINE_LICENCE_IS_INVOICE_ADDRESS_UK_OR_INTERNATIONAL,
+    status: setStatus(taskList.invoicing)
   }
 ]

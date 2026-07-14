@@ -1,4 +1,4 @@
-import { getByRole, getByText } from '@testing-library/dom'
+import { getAllByText, getByRole, getByText } from '@testing-library/dom'
 import { marineLicenceRoutes } from '~/src/server/common/constants/routes.js'
 import {
   mockMarineLicence,
@@ -33,10 +33,10 @@ describe('Water Framework Directive before you start page (marine licence)', () 
       getByRole(document, 'heading', { name: 'Excluded activities' })
     ).toBeInTheDocument()
     expect(
-      getByRole(document, 'heading', { name: 'Previous WFD assessment' })
+      getByRole(document, 'heading', { name: 'Previous WFD assessments' })
     ).toBeInTheDocument()
     expect(
-      getByRole(document, 'heading', { name: 'Uploading your assessment' })
+      getByRole(document, 'heading', { name: 'Providing a WFD assessment' })
     ).toBeInTheDocument()
     expect(
       getByText(
@@ -45,18 +45,18 @@ describe('Water Framework Directive before you start page (marine licence)', () 
       )
     ).toBeInTheDocument()
     expect(
-      getByText(
+      getAllByText(
         document,
-        'if your project is within one nautical mile (1.85km) of the coast'
+        'your project is within one nautical mile (1.85km) of the low water line, or in a tidal river or estuary - including the shore between low and high tide'
       )
-    ).toBeInTheDocument()
+    ).toHaveLength(2)
     expect(
       getByText(document, 'Help with excluded activities')
     ).toBeInTheDocument()
     expect(
       getByText(
         document,
-        'You may not need to complete a new WFD assessment if you carried out the same activity at the same location, between 2015 and 2022 and already have an assessment.'
+        'You can provide a previous WFD assessment for the same activity in the same location, but it must be up to date.'
       )
     ).toBeInTheDocument()
     expect(

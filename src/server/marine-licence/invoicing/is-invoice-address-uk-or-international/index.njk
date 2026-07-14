@@ -1,0 +1,48 @@
+{% extends 'layouts/page.njk' %}
+{% from "govuk/components/back-link/macro.njk" import govukBackLink %}
+{% from "radio-page/macro.njk" import appRadioPage %}
+
+{% block beforeContent %}
+{{ super() }}
+<nav>
+  {{ govukBackLink({
+    text: "Back",
+    href: backLink
+  }) }}
+</nav>
+{% endblock %}
+
+{% block content %}
+
+  {% set invoiceAddressTypeHint %}
+    <p class="govuk-body">We will send an invoice to the contact you provide here once we have assessed your application. This usually takes around 13 weeks.</p>
+    <p class="govuk-body">You will have 28 days to pay from the date of the invoice. No payment is taken during this application.</p>
+  {% endset %}
+
+  {{ appRadioPage({
+      name: "invoiceAddressType",
+      errorSummary: errorSummary,
+      errors: errors,
+      heading: heading,
+      isPageHeading: true,
+      value: payload.invoiceAddressType,
+      errorMessage: errors['invoiceAddressType'],
+      projectName: projectName,
+      hint: { html: invoiceAddressTypeHint },
+      items: [
+          {
+          value: "uk",
+          text: "UK"
+          },
+          {
+          value: "international",
+          text: "International"
+          }
+      ],
+      csrfToken: csrfToken,
+      buttonText: "Continue",
+      cancelLink: backLink
+      })
+  }}
+
+{% endblock %}

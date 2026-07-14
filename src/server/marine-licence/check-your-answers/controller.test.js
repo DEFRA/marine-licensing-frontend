@@ -41,7 +41,7 @@ const expectedWaterFrameworkDirectiveData = {
   },
   nauticalMile: {
     key: {
-      text: 'Project located within one nautical mile (1.85km) of the coast'
+      text: 'Project located within one nautical mile (1.85km) of low-water, in a tidal river or estuary'
     },
     value: {
       text: 'Yes'

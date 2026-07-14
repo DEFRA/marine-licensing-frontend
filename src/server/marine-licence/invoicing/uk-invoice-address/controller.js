@@ -23,6 +23,10 @@ export const ukInvoiceAddressController = {
     const marineLicence = getMarineLicenceCache(request)
     const { invoicing } = marineLicence
 
+    if (invoicing.invoiceAddressType !== "uk") {
+      return h.redirect(marineLicenceRoutes.MARINE_LICENCE_IS_INVOICE_ADDRESS_UK_OR_INTERNATIONAL)
+    }
+
     return h.view(UK_INVOICE_ADDRESS_VIEW_ROUTE, {
       ...ukInvoiceAddressSettings,
       projectName: marineLicence.projectName,

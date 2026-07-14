@@ -12,6 +12,7 @@ import {
 import { statusCodes } from '~/src/server/common/constants/status-codes.js'
 import { ukInvoiceAddressSettings } from '~/src/server/common/validation/invoicing/constants.js'
 import { mockMarineLicenceApplication } from '~/src/server/test-helpers/mocks/marine-licence-mocks.js'
+import { makeGetRequest } from '~/src/server/test-helpers/server-requests.js'
 
 describe('UK invoice address', () => {
   const getServer = setupTestServer()
@@ -47,7 +48,10 @@ describe('UK invoice address', () => {
   })
 
   test('form state when no address set', async () => {
-    mockMarineLicence({ ...mockMarineLicenceApplication, invoicing: {} })
+    mockMarineLicence({
+      ...mockMarineLicenceApplication,
+      invoicing: { invoiceAddressType: 'uk' }
+    })
 
     const document = await loadPage({
       requestUrl: marineLicenceRoutes.MARINE_LICENCE_UK_INVOICE_ADDRESS,
@@ -79,6 +83,23 @@ describe('UK invoice address', () => {
       inputLabel: 'Postcode',
       value: ''
     })
+  })
+
+  test('should redirect when invoice address type is not UK', async () => {
+    mockMarineLicence({
+      ...mockMarineLicenceApplication,
+      invoicing: { invoiceAddressType: 'international' }
+    })
+
+    const response = await makeGetRequest({
+      url: marineLicenceRoutes.MARINE_LICENCE_UK_INVOICE_ADDRESS,
+      server: getServer()
+    })
+
+    expect(response.statusCode).toBe(statusCodes.redirect)
+    expect(response.headers.location).toBe(
+      marineLicenceRoutes.MARINE_LICENCE_IS_INVOICE_ADDRESS_UK_OR_INTERNATIONAL
+    )
   })
 
   test('form state when address is set', async () => {

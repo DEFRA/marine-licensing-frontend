@@ -9,16 +9,14 @@ import { expectFieldsetError } from '~/tests/integration/shared/expect-utils.js'
 import { getInputInFieldset } from '~/tests/integration/shared/dom-helpers.js'
 import { statusCodes } from '~/src/server/common/constants/status-codes.js'
 import { isInvoiceAddressUkOrInternationalSettings } from '~/src/server/common/validation/invoicing/constants.js'
+import { mockMarineLicenceApplication } from '~/src/server/test-helpers/mocks/marine-licence-mocks.js'
 
 describe('Is invoice address UK or international', () => {
   const getServer = setupTestServer()
-  const marineLicence = {
-    id: 'marine-licence-123',
-    projectName: 'Test Marine Project'
-  }
+
 
   test('page elements', async () => {
-    mockMarineLicence(marineLicence)
+    mockMarineLicence(mockMarineLicenceApplication)
 
     const document = await loadPage({
       requestUrl:
@@ -26,7 +24,7 @@ describe('Is invoice address UK or international', () => {
       server: getServer()
     })
 
-    expect(getByText(document, 'Test Marine Project')).toBeInTheDocument()
+    expect(getByText(document, mockMarineLicenceApplication.projectName)).toBeInTheDocument()
     expect(getByRole(document, 'link', { name: 'Back' })).toHaveAttribute(
       'href',
       marineLicenceRoutes.MARINE_LICENCE_TASK_LIST
@@ -53,8 +51,8 @@ describe('Is invoice address UK or international', () => {
     ).toBeInTheDocument()
   })
 
-  test('form state when no decision set', async () => {
-    mockMarineLicence(marineLicence)
+  test('form state when no value set', async () => {
+    mockMarineLicence({ ...mockMarineLicenceApplication, invoicing: {} })
 
     const document = await loadPage({
       requestUrl:
@@ -81,9 +79,9 @@ describe('Is invoice address UK or international', () => {
     ).not.toBeChecked()
   })
 
-  test('form state when decision is set', async () => {
+  test('form state when value is set', async () => {
     mockMarineLicence({
-      ...marineLicence,
+      ...mockMarineLicenceApplication,
       invoicing: {
         invoiceAddressType: 'international'
       }
@@ -106,7 +104,7 @@ describe('Is invoice address UK or international', () => {
   })
 
   test('should show a validation error when submitted without a decision', async () => {
-    mockMarineLicence(marineLicence)
+    mockMarineLicence(mockMarineLicenceApplication)
 
     const { document } = await submitForm({
       requestUrl:
@@ -127,7 +125,7 @@ describe('Is invoice address UK or international', () => {
   })
 
   test('should stay on the same page on valid submission', async () => {
-    mockMarineLicence(marineLicence)
+    mockMarineLicence(mockMarineLicenceApplication)
 
     const { response } = await submitForm({
       requestUrl:

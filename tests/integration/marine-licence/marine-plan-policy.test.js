@@ -31,9 +31,9 @@ describe('Marine plan policy (consideration) page', () => {
   test('renders the policy wording as formatted markup', async () => {
     const document = await loadPolicyPage()
 
-    expect(
-      document.querySelectorAll('.app-policy-wording ol li')
-    ).toHaveLength(2)
+    expect(document.querySelectorAll('.app-policy-wording ol li')).toHaveLength(
+      2
+    )
   })
 
   test('does not render the wording as escaped, visible markup', async () => {

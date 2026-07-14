@@ -14,7 +14,6 @@ import { mockMarineLicenceApplication } from '~/src/server/test-helpers/mocks/ma
 describe('Is invoice address UK or international', () => {
   const getServer = setupTestServer()
 
-
   test('page elements', async () => {
     mockMarineLicence(mockMarineLicenceApplication)
 
@@ -24,7 +23,9 @@ describe('Is invoice address UK or international', () => {
       server: getServer()
     })
 
-    expect(getByText(document, mockMarineLicenceApplication.projectName)).toBeInTheDocument()
+    expect(
+      getByText(document, mockMarineLicenceApplication.projectName)
+    ).toBeInTheDocument()
     expect(getByRole(document, 'link', { name: 'Back' })).toHaveAttribute(
       'href',
       marineLicenceRoutes.MARINE_LICENCE_TASK_LIST

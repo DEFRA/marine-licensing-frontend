@@ -61,6 +61,8 @@ export const isInvoiceAddressUkOrInternationalSubmitController = {
       return h.redirect(marineLicenceRoutes.MARINE_LICENCE_UK_INVOICE_ADDRESS)
     }
 
-    return h.redirect(marineLicenceRoutes.MARINE_LICENCE_IS_INVOICE_ADDRESS_UK_OR_INTERNATIONAL)
+    return h.redirect(
+      marineLicenceRoutes.MARINE_LICENCE_IS_INVOICE_ADDRESS_UK_OR_INTERNATIONAL
+    )
   }
 }

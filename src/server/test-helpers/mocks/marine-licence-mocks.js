@@ -76,7 +76,14 @@ export const mockMarineLicenceApplication = {
   specialLegalPowers: { agree: 'yes', details: 'Test reason' },
   harbourAuthority: { details: 'Harbour details', area: 'yes' },
   invoicing: {
-    invoiceAddressType: 'uk'
+    invoiceAddressType: 'uk',
+    invoiceAddress: {
+      addressLine1: '123 Example Street',
+      addressLine2: 'Flat 2',
+      addressTown: 'Example town',
+      addressCounty: 'Example country',
+      addressPostcode: 'AA1 1AA'
+    }
   },
   publicConsultation: {
     consulted: 'yes',

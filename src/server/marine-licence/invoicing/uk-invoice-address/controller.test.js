@@ -1,19 +1,17 @@
 import { vi } from 'vitest'
-import { isInvoiceAddressUkOrInternationalSubmitController } from '#src/server/marine-licence/invoicing/is-invoice-address-uk-or-international/controller.js'
+import { ukInvoiceAddressSubmitController } from '#src/server/marine-licence/invoicing/uk-invoice-address/controller.js'
 import * as cacheUtils from '#src/server/common/helpers/marine-licence/session-cache/utils.js'
 import * as authRequests from '#src/server/common/helpers/authenticated-requests.js'
 import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
+import { mockMarineLicenceApplication } from '#src/server/test-helpers/mocks/marine-licence-mocks.js'
 
 vi.mock('#/src/server/common/helpers/marine-licence/session-cache/utils.js')
 
-describe('#isInvoiceAddressUkOrInternational', () => {
-  const mockLicence = {
-    projectName: 'Test Project',
-    id: 'test-id'
-  }
-
+describe('#ukInvoiceAddress', () => {
   beforeEach(() => {
-    vi.spyOn(cacheUtils, 'getMarineLicenceCache').mockReturnValue(mockLicence)
+    vi.spyOn(cacheUtils, 'getMarineLicenceCache').mockReturnValue(
+      mockMarineLicenceApplication
+    )
     vi.spyOn(authRequests, 'authenticatedPatchRequest')
     vi.spyOn(cacheUtils, 'setMarineLicenceCache').mockResolvedValue()
   })
@@ -22,16 +20,24 @@ describe('#isInvoiceAddressUkOrInternational', () => {
     vi.restoreAllMocks()
   })
 
-  describe('#isInvoiceAddressUkOrInternationalSubmitController', () => {
+  describe('#ukInvoiceAddressSubmitController', () => {
     test('Should save to cache and redirect to the same page without calling the backend', async () => {
       const h = {
         redirect: vi.fn().mockReturnValue({ takeover: vi.fn() }),
         view: vi.fn()
       }
 
-      await isInvoiceAddressUkOrInternationalSubmitController.handler(
+      const payload = {
+        addressLine1: '123 Example Street',
+        addressLine2: 'Flat 2',
+        addressTown: 'Exampletown',
+        addressCounty: 'Exampleshire',
+        addressPostcode: 'AA1 1AA'
+      }
+
+      await ukInvoiceAddressSubmitController.handler(
         {
-          payload: { invoiceAddressType: 'uk' },
+          payload,
           query: {}
         },
         h
@@ -42,9 +48,12 @@ describe('#isInvoiceAddressUkOrInternational', () => {
         expect.anything(),
         h,
         {
-          ...mockLicence,
+          ...mockMarineLicenceApplication,
           invoicing: {
-            invoiceAddressType: 'uk'
+            invoiceAddressType: 'uk',
+            invoiceAddress: {
+              ...payload
+            }
           }
         }
       )

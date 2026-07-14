@@ -4,7 +4,7 @@ import {
 } from '#src/server/common/helpers/marine-licence/session-cache/utils.js'
 import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
 import { createFailAction } from '#src/server/common/helpers/createFailAction.js'
-import { isInvoiceAddressUkOrInternationalSchema } from '#src/server/common/validation/invoicing/schema.js'
+import { isInvoiceAddressUkOrInternationalSchema } from '#src/server/common/validation/invoicing/is-invoice-address-uk-or-international/schema.js'
 import {
   isInvoiceAddressUkOrInternationalErrorMessages,
   isInvoiceAddressUkOrInternationalSettings
@@ -57,8 +57,6 @@ export const isInvoiceAddressUkOrInternationalSubmitController = {
       }
     })
 
-    return h.redirect(
-      marineLicenceRoutes.MARINE_LICENCE_IS_INVOICE_ADDRESS_UK_OR_INTERNATIONAL
-    )
+    return h.redirect(marineLicenceRoutes.MARINE_LICENCE_UK_INVOICE_ADDRESS)
   }
 }

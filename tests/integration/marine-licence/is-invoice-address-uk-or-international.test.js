@@ -140,7 +140,7 @@ describe('Is invoice address UK or international', () => {
 
     expect(response.statusCode).toBe(statusCodes.redirect)
     expect(response.headers.location).toBe(
-      marineLicenceRoutes.MARINE_LICENCE_IS_INVOICE_ADDRESS_UK_OR_INTERNATIONAL
+      marineLicenceRoutes.MARINE_LICENCE_UK_INVOICE_ADDRESS
     )
   })
 })

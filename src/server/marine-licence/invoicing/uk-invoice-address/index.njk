@@ -1,0 +1,120 @@
+{% extends 'layouts/page.njk' %}
+{% from "govuk/components/back-link/macro.njk" import govukBackLink %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+{% from "govuk/components/fieldset/macro.njk" import govukFieldset %}
+{% from "govuk/components/input/macro.njk" import govukInput %}
+{% from "cancel-button/macro.njk" import appCancelButton %}
+
+{% block beforeContent %}
+{{ super() }}
+<nav>
+  {{ govukBackLink({
+    text: "Back",
+    href: backLink
+  }) }}
+</nav>
+{% endblock %}
+
+{% set headingWithCaption %}
+  {% if projectName %}
+    <span class="govuk-caption-l">{{ projectName }}</span>
+  {% endif %}
+  {{ heading }}
+{% endset %}
+
+{% block content %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+
+      {% if errorSummary %}
+        {{ govukErrorSummary({
+          titleText: "There is a problem",
+          errorList: errorSummary
+        }) }}
+      {% endif %}
+
+      <form method="POST">
+        <input type="hidden" name="csrfToken" value="{{ csrfToken }}" />
+
+        {% call govukFieldset({
+          legend: {
+            html: headingWithCaption,
+            classes: "govuk-fieldset__legend--l",
+            isPageHeading: true
+          }
+        }) %}
+
+          {{ govukInput({
+            label: {
+              text: "Address line 1"
+            },
+            id: "addressLine1",
+            name: "addressLine1",
+            autocomplete: "address-line1",
+            errorMessage: errors['addressLine1'],
+            value: payload.addressLine1
+          }) }}
+
+          {{ govukInput({
+            label: {
+              text: "Address line 2 (optional)"
+            },
+            id: "addressLine2",
+            name: "addressLine2",
+            autocomplete: "address-line2",
+            errorMessage: errors['addressLine2'],
+            value: payload.addressLine2
+          }) }}
+
+          {{ govukInput({
+            label: {
+              text: "Town or city"
+            },
+            classes: "govuk-!-width-two-thirds",
+            id: "addressTown",
+            name: "addressTown",
+            autocomplete: "address-level2",
+            errorMessage: errors['addressTown'],
+            value: payload.addressTown
+          }) }}
+
+          {{ govukInput({
+            label: {
+              text: "County (optional)"
+            },
+            classes: "govuk-!-width-two-thirds",
+            id: "addressCounty",
+            name: "addressCounty",
+            errorMessage: errors['addressCounty'],
+            value: payload.addressCounty
+          }) }}
+
+          {{ govukInput({
+            label: {
+              text: "Postcode"
+            },
+            classes: "govuk-input--width-10",
+            id: "addressPostcode",
+            name: "addressPostcode",
+            autocomplete: "postal-code",
+            errorMessage: errors['addressPostcode'],
+            value: payload.addressPostcode
+          }) }}
+
+        {% endcall %}
+
+        <div class="govuk-button-group">
+          {{ govukButton({
+            text: "Continue",
+            classes: "govuk-button--primary"
+          }) }}
+          {{ appCancelButton({
+            cancelLink: cancelLink
+          }) }}
+        </div>
+      </form>
+
+    </div>
+  </div>
+{% endblock %}

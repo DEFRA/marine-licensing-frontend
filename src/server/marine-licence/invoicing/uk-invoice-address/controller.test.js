@@ -1,19 +1,14 @@
 import { vi } from 'vitest'
-import {
-  IS_INVOICE_ADDRESS_UK_OR_INTERNATIONAL_VIEW_ROUTE,
-  isInvoiceAddressUkOrInternationalController,
-  isInvoiceAddressUkOrInternationalSubmitController
-} from '#src/server/marine-licence/invoicing/is-invoice-address-uk-or-international/controller.js'
+import { ukInvoiceAddressSubmitController } from '#src/server/marine-licence/invoicing/uk-invoice-address/controller.js'
 import * as cacheUtils from '#src/server/common/helpers/marine-licence/session-cache/utils.js'
 import * as authRequests from '#src/server/common/helpers/authenticated-requests.js'
 import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
 import { mockMarineLicenceApplication } from '#src/server/test-helpers/mocks/marine-licence-mocks.js'
 import { createMockH } from '#src/server/test-helpers/mocks/helpers.js'
-import { isInvoiceAddressUkOrInternationalSettings } from '#src/server/common/validation/invoicing/constants.js'
 
 vi.mock('#/src/server/common/helpers/marine-licence/session-cache/utils.js')
 
-describe('#isInvoiceAddressUkOrInternational', () => {
+describe('#ukInvoiceAddress', () => {
   const h = createMockH()
 
   beforeEach(() => {
@@ -28,38 +23,19 @@ describe('#isInvoiceAddressUkOrInternational', () => {
     vi.restoreAllMocks()
   })
 
-  describe('#isInvoiceAddressUkOrInternationalController', () => {
-    test('Should render page with no invoicing details in cache', async () => {
-      vi.spyOn(cacheUtils, 'getMarineLicenceCache').mockReturnValue({
-        ...mockMarineLicenceApplication,
-        invoicing: undefined
-      })
-
-      await isInvoiceAddressUkOrInternationalController.handler(
-        {
-          query: {}
-        },
-        h
-      )
-
-      expect(h.view).toHaveBeenCalledWith(
-        IS_INVOICE_ADDRESS_UK_OR_INTERNATIONAL_VIEW_ROUTE,
-        {
-          backLink: '/marine-licence/task-list',
-          heading: isInvoiceAddressUkOrInternationalSettings.heading,
-          pageTitle: isInvoiceAddressUkOrInternationalSettings.pageTitle,
-          payload: {},
-          projectName: mockMarineLicenceApplication.projectName
-        }
-      )
-    })
-  })
-
-  describe('#isInvoiceAddressUkOrInternationalSubmitController', () => {
+  describe('#ukInvoiceAddressSubmitController', () => {
     test('Should save to cache and redirect to the same page without calling the backend', async () => {
-      await isInvoiceAddressUkOrInternationalSubmitController.handler(
+      const payload = {
+        addressLine1: '123 Example Street',
+        addressLine2: 'Flat 2',
+        addressTown: 'Exampletown',
+        addressCounty: 'Exampleshire',
+        addressPostcode: 'AA1 1AA'
+      }
+
+      await ukInvoiceAddressSubmitController.handler(
         {
-          payload: { invoiceAddressType: 'uk' },
+          payload,
           query: {}
         },
         h
@@ -72,7 +48,10 @@ describe('#isInvoiceAddressUkOrInternational', () => {
         {
           ...mockMarineLicenceApplication,
           invoicing: {
-            invoiceAddressType: 'uk'
+            invoiceAddressType: 'uk',
+            invoiceAddress: {
+              ...payload
+            }
           }
         }
       )

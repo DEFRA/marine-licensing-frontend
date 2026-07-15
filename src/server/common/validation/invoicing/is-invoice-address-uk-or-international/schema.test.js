@@ -1,4 +1,4 @@
-import { isInvoiceAddressUkOrInternationalSchema } from '#src/server/common/validation/invoicing/schema.js'
+import { isInvoiceAddressUkOrInternationalSchema } from '#src/server/common/validation/invoicing/is-invoice-address-uk-or-international/schema.js'
 
 describe('#isInvoiceAddressUkOrInternationalSchema', () => {
   test('should validate when invoiceAddressType is uk', () => {

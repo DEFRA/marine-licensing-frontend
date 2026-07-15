@@ -2,7 +2,7 @@ import { internationalInvoiceAddressSchema } from '#src/server/common/validation
 
 describe('#internationalInvoiceAddressSchema', () => {
   const validAddress = {
-    country: 'united kingdom',
+    country: 'United Kingdom',
     address: '123 Example Street\nExampletown\nExampleshire\nAA1 1AA'
   }
 
@@ -15,6 +15,14 @@ describe('#internationalInvoiceAddressSchema', () => {
     const { error } = internationalInvoiceAddressSchema.validate({
       ...validAddress,
       country: ''
+    })
+    expect(error.message).toBe('INVOICING_COUNTRY_REQUIRED')
+  })
+
+  test('should fail when country is not in the list of countries', () => {
+    const { error } = internationalInvoiceAddressSchema.validate({
+      ...validAddress,
+      country: 'Nonsenseland'
     })
     expect(error.message).toBe('INVOICING_COUNTRY_REQUIRED')
   })
@@ -39,12 +47,12 @@ describe('#internationalInvoiceAddressSchema', () => {
 
   test('should trim whitespace from address', () => {
     const { error, value } = internationalInvoiceAddressSchema.validate({
-      country: 'united kingdom',
+      country: 'United Kingdom',
       address: '  123 Example Street  '
     })
     expect(error).toBeUndefined()
     expect(value).toEqual({
-      country: 'united kingdom',
+      country: 'United Kingdom',
       address: '123 Example Street'
     })
   })
@@ -59,7 +67,7 @@ describe('#internationalInvoiceAddressSchema', () => {
 
   test('should validate at exact max length', () => {
     const { error } = internationalInvoiceAddressSchema.validate({
-      country: 'united kingdom',
+      country: 'United Kingdom',
       address: 'a'.repeat(300)
     })
     expect(error).toBeUndefined()

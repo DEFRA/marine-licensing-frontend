@@ -1,0 +1,16 @@
+{% from "govuk/components/select/macro.njk" import govukSelect %}
+
+{% set autocompleteItems = [{ value: '', text: '' }].concat(params.items) %}
+
+<script src="/public/javascripts/accessible-autocomplete.min.js"></script>
+<div data-module="app-accessible-autocomplete">
+  {{ govukSelect({
+    id: params.id,
+    name: params.name,
+    label: params.label,
+    hint: params.hint,
+    errorMessage: params.errorMessage,
+    value: params.value,
+    items: autocompleteItems
+  }) }}
+</div>

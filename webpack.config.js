@@ -93,6 +93,7 @@ export default {
               sassOptions: {
                 loadPaths: [
                   '.',
+                  'node_modules/accessible-autocomplete/dist',
                   'node_modules/@ministryofjustice/frontend',
                   'node_modules/govuk-frontend/dist',
                   path.join(dirname, 'src/client/stylesheets'),
@@ -173,6 +174,18 @@ export default {
         {
           from: require.resolve('ol/ol.css'),
           to: 'stylesheets/ol.css'
+        },
+        {
+          from: require.resolve(
+            'accessible-autocomplete/dist/accessible-autocomplete.min.css'
+          ),
+          to: 'stylesheets/accessible-autocomplete.min.css'
+        },
+        {
+          from: require.resolve(
+            'accessible-autocomplete/dist/accessible-autocomplete.min.js'
+          ),
+          to: 'javascripts/accessible-autocomplete.min.js'
         },
         {
           from: path.join(dirname, 'src/client/images'),

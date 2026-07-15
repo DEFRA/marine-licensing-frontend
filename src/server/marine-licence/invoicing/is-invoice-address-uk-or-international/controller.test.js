@@ -72,6 +72,7 @@ describe('#isInvoiceAddressUkOrInternational', () => {
         {
           ...mockMarineLicenceApplication,
           invoicing: {
+            ...mockMarineLicenceApplication.invoicing,
             invoiceAddressType: 'uk'
           }
         }
@@ -98,6 +99,7 @@ describe('#isInvoiceAddressUkOrInternational', () => {
         {
           ...mockMarineLicenceApplication,
           invoicing: {
+            ...mockMarineLicenceApplication.invoicing,
             invoiceAddressType: 'international'
           }
         }

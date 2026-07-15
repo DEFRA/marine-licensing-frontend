@@ -54,9 +54,8 @@ export const internationalInvoiceAddressSubmitController = {
           errorMessages: internationalInvoiceAddressErrorMessages,
           projectName,
           backLink,
-          countries,
           payload: request.payload,
-          params: { cancelLink }
+          params: { cancelLink, countries }
         })(request, h, err)
       }
     }

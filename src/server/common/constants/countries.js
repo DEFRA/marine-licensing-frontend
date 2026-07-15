@@ -203,6 +203,5 @@ export const countryList = [
 
 export const countries = countryList.map((c) => ({
   value: c,
-  text: c,
-  selected: c === 'United Kingdom'
+  text: c
 }))

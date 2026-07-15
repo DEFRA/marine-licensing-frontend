@@ -54,6 +54,7 @@ export const isInvoiceAddressUkOrInternationalSubmitController = {
     await setMarineLicenceCache(request, h, {
       ...marineLicence,
       invoicing: {
+        ...marineLicence.invoicing,
         invoiceAddressType: payload.invoiceAddressType
       }
     })

@@ -51,6 +51,9 @@ describe('International invoice address', () => {
     getByLabelText(document, 'Country')
     getByLabelText(document, 'Address')
     expect(
+      document.querySelector('[data-module="app-accessible-autocomplete"]')
+    ).toBeInTheDocument()
+    expect(
       getByText(
         document,
         'Start typing the name of a country to filter the list'
@@ -76,7 +79,7 @@ describe('International invoice address', () => {
     expectInputValue({
       document,
       inputLabel: 'Country',
-      value: 'United Kingdom'
+      value: ''
     })
     expectInputValue({
       document,

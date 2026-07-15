@@ -56,7 +56,7 @@ describe('#isInvoiceAddressUkOrInternational', () => {
   })
 
   describe('#isInvoiceAddressUkOrInternationalSubmitController', () => {
-    test('Should save to cache and redirect to the same page without calling the backend', async () => {
+    test('Should save to cache and redirect to UK invoice address without calling the backend', async () => {
       await isInvoiceAddressUkOrInternationalSubmitController.handler(
         {
           payload: { invoiceAddressType: 'uk' },
@@ -78,6 +78,32 @@ describe('#isInvoiceAddressUkOrInternational', () => {
       )
       expect(h.redirect).toHaveBeenCalledWith(
         marineLicenceRoutes.MARINE_LICENCE_UK_INVOICE_ADDRESS
+      )
+      expect(h.view).not.toHaveBeenCalled()
+    })
+
+    test('Should save to cache and redirect to international invoice address without calling the backend', async () => {
+      await isInvoiceAddressUkOrInternationalSubmitController.handler(
+        {
+          payload: { invoiceAddressType: 'international' },
+          query: {}
+        },
+        h
+      )
+
+      expect(authRequests.authenticatedPatchRequest).not.toHaveBeenCalled()
+      expect(cacheUtils.setMarineLicenceCache).toHaveBeenCalledWith(
+        expect.anything(),
+        h,
+        {
+          ...mockMarineLicenceApplication,
+          invoicing: {
+            invoiceAddressType: 'international'
+          }
+        }
+      )
+      expect(h.redirect).toHaveBeenCalledWith(
+        marineLicenceRoutes.MARINE_LICENCE_INTERNATIONAL_INVOICE_ADDRESS
       )
       expect(h.view).not.toHaveBeenCalled()
     })

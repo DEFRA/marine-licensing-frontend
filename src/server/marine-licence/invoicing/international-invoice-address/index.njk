@@ -1,0 +1,102 @@
+{% extends 'layouts/page.njk' %}
+{% from "govuk/components/back-link/macro.njk" import govukBackLink %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+{% from "govuk/components/fieldset/macro.njk" import govukFieldset %}
+{% from "govuk/components/select/macro.njk" import govukSelect %}
+{% from "govuk/components/textarea/macro.njk" import govukTextarea %}
+{% from "cancel-button/macro.njk" import appCancelButton %}
+
+{% block beforeContent %}
+{{ super() }}
+<nav>
+  {{ govukBackLink({
+    text: "Back",
+    href: backLink
+  }) }}
+</nav>
+{% endblock %}
+
+{% set headingWithCaption %}
+  {% if projectName %}
+    <span class="govuk-caption-l">{{ projectName }}</span>
+  {% endif %}
+  {{ heading }}
+{% endset %}
+
+{% block content %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+
+      {% if errorSummary %}
+        {{ govukErrorSummary({
+          titleText: "There is a problem",
+          errorList: errorSummary
+        }) }}
+      {% endif %}
+
+      <form method="POST">
+        <input type="hidden" name="csrfToken" value="{{ csrfToken }}" />
+
+        {% call govukFieldset({
+          legend: {
+            html: headingWithCaption,
+            classes: "govuk-fieldset__legend--l govuk-!-margin-bottom-6",
+            isPageHeading: true
+          }
+        }) %}
+
+          {{ govukSelect({
+            label: {
+              text: "Country",
+              classes: 'govuk-label--s'
+            },
+            id: "country",
+            name: "country",
+            hint: {
+              text: "Start typing the name of a country to filter the list"
+            },
+            errorMessage: errors['country'],
+            value: payload.country,
+            items: [
+              {
+                value: "",
+                text: "Select a country"
+              },
+              {
+                value: "united kingdom",
+                text: "United Kingdom"
+              }
+            ]
+          }) }}
+
+          {{ govukTextarea({
+            label: {
+              text: "Address",
+              classes: 'govuk-label--s'
+            },
+            id: "address",
+            name: "address",
+            hint: {
+              text: "Enter the full address including any region or state"
+            },
+            errorMessage: errors['address'],
+            value: payload.address
+          }) }}
+
+        {% endcall %}
+
+        <div class="govuk-button-group">
+          {{ govukButton({
+            text: "Continue",
+            classes: "govuk-button--primary"
+          }) }}
+          {{ appCancelButton({
+            cancelLink: cancelLink
+          }) }}
+        </div>
+      </form>
+
+    </div>
+  </div>
+{% endblock %}

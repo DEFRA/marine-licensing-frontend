@@ -30,3 +30,16 @@ export const ukInvoiceAddressErrorMessages = {
   ADDRESS_POSTCODE_REQUIRED: 'Enter the postcode',
   ADDRESS_POSTCODE_INVALID: 'Enter a valid postcode'
 }
+
+const INTERNATIONAL_INVOICE_ADDRESS_TITLE = 'International invoice address'
+
+export const internationalInvoiceAddressSettings = {
+  pageTitle: INTERNATIONAL_INVOICE_ADDRESS_TITLE,
+  heading: INTERNATIONAL_INVOICE_ADDRESS_TITLE
+}
+
+export const internationalInvoiceAddressErrorMessages = {
+  INVOICING_COUNTRY_REQUIRED: 'Select the country',
+  INVOICING_ADDRESS_REQUIRED: 'Enter the address',
+  INVOICING_ADDRESS_MAX_LENGTH: 'Address must be 300 characters or fewer'
+}

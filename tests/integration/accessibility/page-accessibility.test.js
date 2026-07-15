@@ -231,6 +231,17 @@ describe('Page accessibility checks (Axe)', () => {
       isMarineLicence: true
     },
     {
+      url: marineLicenceRoutes.MARINE_LICENCE_INTERNATIONAL_INVOICE_ADDRESS,
+      title: 'International invoice address',
+      isMarineLicence: true,
+      marineLicence: {
+        ...mockMarineLicenceApplication,
+        invoicing: {
+          invoiceAddressType: 'international'
+        }
+      }
+    },
+    {
       url: marineLicenceRoutes.MARINE_LICENCE_PUBLIC_REGISTER,
       title: 'Sharing your project information publicly',
       isMarineLicence: true

@@ -128,16 +128,6 @@ describe('#ukInvoiceAddressSchema', () => {
     expect(error).toBeUndefined()
   })
 
-  test.each(['NOT A POSTCODE', 'A1', '12345', 'AA1 1A'])(
-    'should fail when postcode is invalid: %s',
-    (addressPostcode) => {
-      const { error } = ukInvoiceAddressSchema.validate({
-        ...validAddress,
-        addressPostcode
-      })
-      expect(error.message).toBe('ADDRESS_POSTCODE_INVALID')
-    }
-  )
   test.each([
     'NOT A POSTCODE',
     'A1',

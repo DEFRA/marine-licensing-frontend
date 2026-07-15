@@ -7,7 +7,8 @@ import { createFailAction } from '#src/server/common/helpers/createFailAction.js
 import { internationalInvoiceAddressSchema } from '#src/server/common/validation/invoicing/international-invoice-address/schema.js'
 import {
   internationalInvoiceAddressErrorMessages,
-  internationalInvoiceAddressSettings
+  internationalInvoiceAddressSettings,
+  INVOICE_TYPE_OPTIONS
 } from '#src/server/common/validation/invoicing/constants.js'
 import { countries } from '#src/server/common/constants/countries.js'
 
@@ -24,7 +25,7 @@ export const internationalInvoiceAddressController = {
     const marineLicence = getMarineLicenceCache(request)
     const { invoicing } = marineLicence
 
-    if (invoicing.invoiceAddressType !== 'international') {
+    if (invoicing.invoiceAddressType !== INVOICE_TYPE_OPTIONS.INTERNATIONAL) {
       return h.redirect(
         marineLicenceRoutes.MARINE_LICENCE_IS_INVOICE_ADDRESS_UK_OR_INTERNATIONAL
       )

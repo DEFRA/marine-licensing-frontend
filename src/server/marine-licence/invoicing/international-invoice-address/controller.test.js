@@ -4,10 +4,13 @@ import * as cacheUtils from '#src/server/common/helpers/marine-licence/session-c
 import * as authRequests from '#src/server/common/helpers/authenticated-requests.js'
 import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
 import { mockMarineLicenceApplication } from '#src/server/test-helpers/mocks/marine-licence-mocks.js'
+import { createMockH } from '#src/server/test-helpers/mocks/helpers.js'
 
 vi.mock('#/src/server/common/helpers/marine-licence/session-cache/utils.js')
 
 describe('#internationalInvoiceAddress', () => {
+  const h = createMockH()
+
   beforeEach(() => {
     vi.spyOn(cacheUtils, 'getMarineLicenceCache').mockReturnValue({
       ...mockMarineLicenceApplication,
@@ -25,11 +28,6 @@ describe('#internationalInvoiceAddress', () => {
 
   describe('#internationalInvoiceAddressSubmitController', () => {
     test('Should save to cache and redirect to the same page without calling the backend', async () => {
-      const h = {
-        redirect: vi.fn().mockReturnValue({ takeover: vi.fn() }),
-        view: vi.fn()
-      }
-
       const payload = {
         country: 'united kingdom',
         address: '123 Example Street\nExampletown\nExampleshire'

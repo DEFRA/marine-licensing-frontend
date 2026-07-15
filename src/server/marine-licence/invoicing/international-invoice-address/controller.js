@@ -9,6 +9,7 @@ import {
   internationalInvoiceAddressErrorMessages,
   internationalInvoiceAddressSettings
 } from '#src/server/common/validation/invoicing/constants.js'
+import { countries } from '#src/server/common/constants/countries.js'
 
 export const INTERNATIONAL_INVOICE_ADDRESS_VIEW_ROUTE =
   'marine-licence/invoicing/international-invoice-address/index'
@@ -33,6 +34,7 @@ export const internationalInvoiceAddressController = {
       ...internationalInvoiceAddressSettings,
       projectName: marineLicence.projectName,
       payload: invoicing.invoiceAddress ?? {},
+      countries,
       backLink,
       cancelLink
     })
@@ -51,6 +53,7 @@ export const internationalInvoiceAddressSubmitController = {
           errorMessages: internationalInvoiceAddressErrorMessages,
           projectName,
           backLink,
+          countries,
           payload: request.payload,
           params: { cancelLink }
         })(request, h, err)

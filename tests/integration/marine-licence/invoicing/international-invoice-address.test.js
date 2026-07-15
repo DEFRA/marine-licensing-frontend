@@ -76,7 +76,7 @@ describe('International invoice address', () => {
     expectInputValue({
       document,
       inputLabel: 'Country',
-      value: ''
+      value: 'United Kingdom'
     })
     expectInputValue({
       document,
@@ -108,7 +108,7 @@ describe('International invoice address', () => {
       invoicing: {
         invoiceAddressType: 'international',
         invoiceAddress: {
-          country: 'united kingdom',
+          country: 'United Kingdom',
           address: '123 Example Street\nExampletown'
         }
       }
@@ -123,7 +123,7 @@ describe('International invoice address', () => {
     expectInputValue({
       document,
       inputLabel: 'Country',
-      value: 'united kingdom'
+      value: 'United Kingdom'
     })
     expectInputValue({
       document,
@@ -165,7 +165,7 @@ describe('International invoice address', () => {
         marineLicenceRoutes.MARINE_LICENCE_INTERNATIONAL_INVOICE_ADDRESS,
       server: getServer(),
       formData: {
-        country: 'united kingdom',
+        country: 'United Kingdom',
         address: '123 Example Street\nExampletown'
       }
     })

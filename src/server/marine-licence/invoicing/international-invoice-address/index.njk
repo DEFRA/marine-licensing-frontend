@@ -58,16 +58,7 @@
             },
             errorMessage: errors['country'],
             value: payload.country,
-            items: [
-              {
-                value: "",
-                text: "Select a country"
-              },
-              {
-                value: "united kingdom",
-                text: "United Kingdom"
-              }
-            ]
+            items: countries
           }) }}
 
           {{ govukTextarea({

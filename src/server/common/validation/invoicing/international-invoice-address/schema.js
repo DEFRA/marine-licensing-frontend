@@ -7,14 +7,9 @@ export const internationalInvoiceAddressSchema = joi.object({
     'string.empty': 'INVOICING_COUNTRY_REQUIRED',
     'any.required': 'INVOICING_COUNTRY_REQUIRED'
   }),
-  address: joi
-    .string()
-    .trim()
-    .max(ADDRESS_MAX_LENGTH)
-    .required()
-    .messages({
-      'string.empty': 'INVOICING_ADDRESS_REQUIRED',
-      'any.required': 'INVOICING_ADDRESS_REQUIRED',
-      'string.max': 'INVOICING_ADDRESS_MAX_LENGTH'
-    })
+  address: joi.string().trim().max(ADDRESS_MAX_LENGTH).required().messages({
+    'string.empty': 'INVOICING_ADDRESS_REQUIRED',
+    'any.required': 'INVOICING_ADDRESS_REQUIRED',
+    'string.max': 'INVOICING_ADDRESS_MAX_LENGTH'
+  })
 })

@@ -8,6 +8,7 @@
 {% from "marine-licence/activity-details-card/macro.njk" import appMarineLicenceActivityDetailsCard %}
 {% from "marine-licence/other-permissions-card/macro.njk" import appMarineLicenceOtherPermissionsCard %}
 {% from "marine-licence/water-framework-directive-card/macro.njk" import appMarineLicenceWaterFrameworkDirectiveCard %}
+{% from "marine-licence/marine-plan-policies-card/macro.njk" import appMarineLicenceMarinePlanPoliciesCard %}
 {% from "public-register-card/macro.njk" import appPublicRegisterCard %}
 
 {% block head %}
@@ -63,6 +64,9 @@
         {% endfor %}
       {% endif %}
 
+      {{ appMarineLicenceMarinePlanPoliciesCard({
+        policies: marinePlanPolicies
+      }) }}
 
       {{ appMarineLicenceWaterFrameworkDirectiveCard({
         waterFrameworkDirectiveData: waterFrameworkDirectiveData,

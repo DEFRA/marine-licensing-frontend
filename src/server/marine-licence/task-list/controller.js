@@ -154,7 +154,8 @@ export const taskListController = {
       ...transformed.projectDetails,
       ...transformed.siteDetails,
       ...transformed.waterFrameworkDirective,
-      ...transformed.feeEstimate
+      ...transformed.feeEstimate,
+      ...transformed.marinePlanPolicies
     ]
       .filter((task) => task.title.text !== 'Invoicing details')
       .every((task) => task.status.text === 'Completed')

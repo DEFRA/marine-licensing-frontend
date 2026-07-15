@@ -7,6 +7,7 @@ import { setReturnToCache } from '#src/server/common/helpers/marine-licence/sess
 import { getMarineLicenceService } from '#src/services/marine-licence-service/index.js'
 import { buildSiteData } from '#src/server/common/helpers/marine-licence/site-data.js'
 import { buildSummaryData } from '#src/server/common/helpers/marine-licence/summary-data.js'
+import { buildMarinePlanPoliciesData } from '#src/server/common/helpers/marine-licence/marine-plan-policies-data.js'
 import {
   checkYourAnswersController,
   checkYourAnswersContinueController,
@@ -25,6 +26,9 @@ vi.mock(
 vi.mock('#src/services/marine-licence-service/index.js')
 vi.mock('#src/server/common/helpers/marine-licence/site-data.js')
 vi.mock('#src/server/common/helpers/marine-licence/summary-data.js')
+vi.mock(
+  '#src/server/common/helpers/marine-licence/marine-plan-policies-data.js'
+)
 
 const expectedWaterFrameworkDirectiveData = {
   excludedActivities: {
@@ -57,6 +61,7 @@ describe('#checkYourAnswersController', () => {
   let mockRequest
   let mockH
   let mockGetMarineLicenceById
+  let mockPolicies
 
   const getMarineLicenceCacheMock = vi.mocked(getMarineLicenceCache)
   const setMarineLicenceCacheMock = vi.mocked(setMarineLicenceCache)
@@ -73,6 +78,15 @@ describe('#checkYourAnswersController', () => {
       view: vi.fn()
     }
     mockRequest = {}
+    mockPolicies = [
+      {
+        policyCode: 'S-CC-1',
+        wording: 'Wording',
+        response: 'Consideration',
+        changeHref: '/marine-licence/marine-plan-policy/S-CC-1'
+      }
+    ]
+    vi.mocked(buildMarinePlanPoliciesData).mockReturnValue(mockPolicies)
   })
 
   test('handler should render with correct context including site data', async () => {
@@ -116,6 +130,9 @@ describe('#checkYourAnswersController', () => {
     )
     expect(buildSiteDataMock).toHaveBeenCalledWith(mockCompleteLicence)
     expect(buildSummaryDataMock).toHaveBeenCalledWith(mockCachedData)
+    expect(buildMarinePlanPoliciesData).toHaveBeenCalledWith(
+      mockCompleteLicence
+    )
     expect(mockH.view).toHaveBeenCalledWith(CHECK_YOUR_ANSWERS_VIEW_ROUTE, {
       pageTitle: 'Check your answers before sending your information',
       backLink: marineLicenceRoutes.MARINE_LICENCE_TASK_LIST,
@@ -128,7 +145,8 @@ describe('#checkYourAnswersController', () => {
       publicRegisterRoute: marineLicenceRoutes.MARINE_LICENCE_PUBLIC_REGISTER,
       waterFrameworkDirectiveData: expectedWaterFrameworkDirectiveData,
       waterFrameworkDirectiveChangeLink:
-        marineLicenceRoutes.MARINE_LICENCE_WATER_FRAMEWORK_DIRECTIVE_REVIEW_YOUR_ANSWERS
+        marineLicenceRoutes.MARINE_LICENCE_WATER_FRAMEWORK_DIRECTIVE_REVIEW_YOUR_ANSWERS,
+      marinePlanPolicies: mockPolicies
     })
   })
 
@@ -158,7 +176,8 @@ describe('#checkYourAnswersController', () => {
       waterFrameworkDirectiveData: {},
       reviewSiteDetailsRoute:
         marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS,
-      publicRegisterRoute: marineLicenceRoutes.MARINE_LICENCE_PUBLIC_REGISTER
+      publicRegisterRoute: marineLicenceRoutes.MARINE_LICENCE_PUBLIC_REGISTER,
+      marinePlanPolicies: []
     })
   })
 })

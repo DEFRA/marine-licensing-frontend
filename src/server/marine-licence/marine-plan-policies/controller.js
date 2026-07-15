@@ -3,6 +3,8 @@ import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
 import { getMarineLicenceCache } from '#src/server/common/helpers/marine-licence/session-cache/utils.js'
 import { getMarineLicenceService } from '#src/services/marine-licence-service/index.js'
 import { getMarinePlanPolicyLink } from '#src/server/common/helpers/marine-licence/marine-plan-policy-link.js'
+import { clearReturnToCache } from '#src/server/common/helpers/marine-licence/session-cache/return-to-cache.js'
+import { sortByPolicyCode } from '#src/server/common/helpers/marine-licence/sort-by-policy-code.js'
 
 export const MARINE_PLAN_POLICIES_VIEW_ROUTE =
   'marine-licence/marine-plan-policies/index'
@@ -25,9 +27,6 @@ const toPolicyRow = (responses) => (policy) => ({
 const countCompleted = (policies, responses) =>
   policies.filter((policy) => isCompleted(responses, policy.policyCode)).length
 
-const sortByPolicyCode = (policies) =>
-  [...policies].sort((a, b) => a.policyCode.localeCompare(b.policyCode))
-
 const buildPoliciesCountText = (total, completed) => {
   if (completed > 0) {
     return `${completed} of ${total} policies completed`
@@ -43,6 +42,10 @@ export const marinePlanPoliciesController = {
     if (!marineLicence?.id) {
       throw Boom.notFound('Marine licence not found')
     }
+
+    // Clear any CYA returnTo so considerations opened via the normal list flow
+    // return to this list page, not to Check your answers.
+    clearReturnToCache(request)
 
     const marineLicenceService = getMarineLicenceService(request)
     const {

@@ -64,6 +64,16 @@ export const waterFrameworkDirective = {
   }
 }
 
+export const mockMarinePlanPolicies = [
+  { policyCode: 'S-CC-2', policy: 'Second policy wording.' },
+  { policyCode: 'S-CC-1', policy: 'First policy wording.' }
+]
+
+export const mockMarinePlanPolicyResponses = {
+  'S-CC-1': 'My first consideration.',
+  'S-CC-2': 'My second consideration.'
+}
+
 export const mockMarineLicenceApplication = {
   id: faker.database.mongodbObjectId(),
   projectName: 'Test Project',
@@ -126,7 +136,9 @@ export const mockMarineLicenceApplication = {
       }
     }
   ],
-  waterFrameworkDirective
+  waterFrameworkDirective,
+  marinePlanPolicies: mockMarinePlanPolicies,
+  marinePlanPolicyResponses: mockMarinePlanPolicyResponses
 }
 
 export const mockSubmittedMarineLicenceApplication = {

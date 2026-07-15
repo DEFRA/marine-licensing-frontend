@@ -12,6 +12,7 @@ import { setReturnToCache } from '#src/server/common/helpers/marine-licence/sess
 import { getMarineLicenceService } from '#src/services/marine-licence-service/index.js'
 import { waterFrameworkReviewData } from '#src/server/common/helpers/marine-licence/water-framework-directive/water-framework-review-data.js'
 import { getWaterFrameworkDirectiveChangeLink } from '#src/server/marine-licence/check-your-answers/utils.js'
+import { buildMarinePlanPoliciesData } from '#src/server/common/helpers/marine-licence/marine-plan-policies-data.js'
 
 const checkYourAnswersViewContent = {
   pageTitle: 'Check your answers before sending your information',
@@ -32,12 +33,14 @@ export const checkYourAnswersController = {
 
     let siteData = { coordinatesType: null, summaryData: [] }
     let waterFrameworkDirective = cachedMarineLicence.waterFrameworkDirective
+    let marinePlanPolicies = []
 
     if (cachedMarineLicence.id) {
       const marineLicenceService = getMarineLicenceService(request)
       const completeMarineLicence =
         await marineLicenceService.getMarineLicenceById(cachedMarineLicence.id)
       siteData = buildSiteData(completeMarineLicence)
+      marinePlanPolicies = buildMarinePlanPoliciesData(completeMarineLicence)
 
       // A user may have cancelled out of the WFD flow part way and returned to this page
       // So it is necessary to reset the cache of this property to the server value
@@ -66,7 +69,8 @@ export const checkYourAnswersController = {
       waterFrameworkDirectiveData,
       waterFrameworkDirectiveChangeLink: getWaterFrameworkDirectiveChangeLink(
         waterFrameworkDirective
-      )
+      ),
+      marinePlanPolicies
     })
   }
 }

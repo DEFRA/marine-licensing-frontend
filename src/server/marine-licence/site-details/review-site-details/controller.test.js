@@ -164,6 +164,56 @@ describe('#reviewSiteDetails', () => {
         })
       )
     })
+
+    test('should show the marine plan policies question when siteDetails is COMPLETED', async () => {
+      getMarineLicenceCacheSpy.mockReturnValueOnce({ id: 'test-id' })
+
+      vi.spyOn(marineLicenceService, 'getMarineLicenceService').mockReturnValue(
+        {
+          getMarineLicenceById: vi.fn().mockResolvedValue({
+            ...mockFileUploadMarineLicence,
+            taskList: { siteDetails: 'COMPLETED' }
+          })
+        }
+      )
+
+      const h = createMockHandler()
+
+      await reviewSiteDetailsController.handler(mockRequest, h)
+
+      expect(h.view).toHaveBeenCalledWith(
+        FILE_UPLOAD_REVIEW_VIEW_ROUTE,
+        expect.objectContaining({
+          showMarinePlanPoliciesQuestion: true,
+          errors: undefined,
+          errorSummary: undefined
+        })
+      )
+    })
+
+    test('should not show the marine plan policies question when siteDetails is not COMPLETED', async () => {
+      getMarineLicenceCacheSpy.mockReturnValueOnce({ id: 'test-id' })
+
+      vi.spyOn(marineLicenceService, 'getMarineLicenceService').mockReturnValue(
+        {
+          getMarineLicenceById: vi.fn().mockResolvedValue({
+            ...mockFileUploadMarineLicence,
+            taskList: { siteDetails: 'IN_PROGRESS' }
+          })
+        }
+      )
+
+      const h = createMockHandler()
+
+      await reviewSiteDetailsController.handler(mockRequest, h)
+
+      expect(h.view).toHaveBeenCalledWith(
+        FILE_UPLOAD_REVIEW_VIEW_ROUTE,
+        expect.objectContaining({
+          showMarinePlanPoliciesQuestion: false
+        })
+      )
+    })
   })
 
   describe('reviewSiteDetailsSubmitController', () => {
@@ -214,27 +264,39 @@ describe('#reviewSiteDetails', () => {
       )
     })
 
-    test('should call calculate-marine-plan-policies API and redirect to spinner when siteDetails is COMPLETED', async () => {
+    test('should call calculate-marine-plan-policies API and redirect to spinner when siteDetails is COMPLETED and answer is yes', async () => {
       getMarineLicenceCacheSpy.mockReturnValueOnce({
         id: 'test-id',
         siteDetails: []
       })
       vi.spyOn(marineLicenceService, 'getMarineLicenceService').mockReturnValue(
         {
-          getMarineLicenceById: vi
-            .fn()
-            .mockResolvedValue({ taskList: { siteDetails: 'COMPLETED' } })
+          getMarineLicenceById: vi.fn().mockResolvedValue({
+            taskList: { siteDetails: 'COMPLETED' },
+            siteDetails: []
+          })
         }
       )
       vi.mocked(
         authenticatedRequests.authenticatedPostRequest
       ).mockResolvedValue({})
+      vi.mocked(
+        authenticatedRequests.authenticatedPatchRequest
+      ).mockResolvedValue({})
 
       const h = createMockHandler('redirect')
-      const request = createMockRequest({ payload: {} })
+      const request = createMockRequest({
+        payload: { finishedEnteringSiteDetails: 'yes' }
+      })
 
       await reviewSiteDetailsSubmitController.handler(request, h)
 
+      expect(
+        vi.mocked(authenticatedRequests.authenticatedPatchRequest)
+      ).toHaveBeenCalledWith(request, apiRoutes.CONFIRM_SITE_DETAILS, {
+        id: 'test-id',
+        confirmed: true
+      })
       expect(
         vi.mocked(authenticatedRequests.authenticatedPostRequest)
       ).toHaveBeenCalledWith(
@@ -244,6 +306,88 @@ describe('#reviewSiteDetails', () => {
       )
       expect(h.redirect).toHaveBeenCalledWith(
         marineLicenceRoutes.MARINE_LICENCE_CALCULATE_MARINE_PLAN_POLICIES
+      )
+    })
+
+    test('should not call calculate-marine-plan-policies API and redirect to task list when siteDetails is COMPLETED and answer is no', async () => {
+      getMarineLicenceCacheSpy.mockReturnValueOnce({
+        id: 'test-id',
+        siteDetails: []
+      })
+      vi.spyOn(marineLicenceService, 'getMarineLicenceService').mockReturnValue(
+        {
+          getMarineLicenceById: vi.fn().mockResolvedValue({
+            taskList: { siteDetails: 'COMPLETED' },
+            siteDetails: []
+          })
+        }
+      )
+      vi.mocked(
+        authenticatedRequests.authenticatedPatchRequest
+      ).mockResolvedValue({})
+
+      const h = createMockHandler('redirect')
+      const request = createMockRequest({
+        payload: { finishedEnteringSiteDetails: 'no' }
+      })
+
+      await reviewSiteDetailsSubmitController.handler(request, h)
+
+      expect(
+        vi.mocked(authenticatedRequests.authenticatedPatchRequest)
+      ).toHaveBeenCalledWith(request, apiRoutes.CONFIRM_SITE_DETAILS, {
+        id: 'test-id',
+        confirmed: false
+      })
+      expect(
+        vi.mocked(authenticatedRequests.authenticatedPostRequest)
+      ).not.toHaveBeenCalled()
+      expect(h.redirect).toHaveBeenCalledWith(
+        marineLicenceRoutes.MARINE_LICENCE_TASK_LIST
+      )
+    })
+
+    test('should show a validation error when siteDetails is COMPLETED and no answer is given', async () => {
+      getMarineLicenceCacheSpy.mockReturnValueOnce({
+        id: 'test-id',
+        siteDetails: []
+      })
+      vi.spyOn(marineLicenceService, 'getMarineLicenceService').mockReturnValue(
+        {
+          getMarineLicenceById: vi.fn().mockResolvedValue({
+            ...mockFileUploadMarineLicence,
+            taskList: { siteDetails: 'COMPLETED' }
+          })
+        }
+      )
+
+      const h = createMockHandler()
+      const request = createMockRequest({ payload: {} })
+
+      await reviewSiteDetailsSubmitController.handler(request, h)
+
+      expect(
+        vi.mocked(authenticatedRequests.authenticatedPatchRequest)
+      ).not.toHaveBeenCalled()
+      expect(
+        vi.mocked(authenticatedRequests.authenticatedPostRequest)
+      ).not.toHaveBeenCalled()
+      expect(h.view).toHaveBeenCalledWith(
+        FILE_UPLOAD_REVIEW_VIEW_ROUTE,
+        expect.objectContaining({
+          showMarinePlanPoliciesQuestion: true,
+          errorSummary: [
+            expect.objectContaining({
+              text: 'Select whether you have finished entering your site details',
+              href: '#finishedEnteringSiteDetails'
+            })
+          ],
+          errors: expect.objectContaining({
+            finishedEnteringSiteDetails: expect.objectContaining({
+              text: 'Select whether you have finished entering your site details'
+            })
+          })
+        })
       )
     })
 

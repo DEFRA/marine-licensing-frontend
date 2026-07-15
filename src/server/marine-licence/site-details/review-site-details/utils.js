@@ -78,7 +78,10 @@ export const renderFileUploadReview = (h, options) => {
     previousPage,
     siteDetails,
     reviewSiteDetailsPageData,
-    returnToCheckYourAnswers = false
+    returnToCheckYourAnswers = false,
+    showMarinePlanPoliciesQuestion = false,
+    errors,
+    errorSummary
   } = options
 
   const summaryData = siteDetails.map((site, index) => {
@@ -112,7 +115,10 @@ export const renderFileUploadReview = (h, options) => {
     backLink: getFileUploadBackLink(previousPage, returnToCheckYourAnswers),
     projectName: marineLicence.projectName,
     hasIncompleteFields: hasIncompleteFields(siteDetails),
-    summaryData
+    summaryData,
+    showMarinePlanPoliciesQuestion,
+    errors,
+    errorSummary
   })
 }
 
@@ -122,7 +128,10 @@ export const renderManualEntryReview = (h, options) => {
     previousPage,
     siteDetails,
     reviewSiteDetailsPageData,
-    returnToCheckYourAnswers = false
+    returnToCheckYourAnswers = false,
+    showMarinePlanPoliciesQuestion = false,
+    errors,
+    errorSummary
   } = options
 
   const summaryData = buildManualCoordinateSummaryData(
@@ -137,7 +146,10 @@ export const renderManualEntryReview = (h, options) => {
     ...reviewSiteDetailsPageData,
     backLink: getManualEntryBackLink(previousPage, returnToCheckYourAnswers),
     projectName: marineLicence.projectName,
-    summaryData
+    summaryData,
+    showMarinePlanPoliciesQuestion,
+    errors,
+    errorSummary
   })
 }
 

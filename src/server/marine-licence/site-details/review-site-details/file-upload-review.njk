@@ -2,10 +2,12 @@
 {% from "govuk/components/back-link/macro.njk" import govukBackLink %}
 {% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
 {% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
 {% from "site-details-map/macro.njk" import appSiteDetailsMap %}
 {% from "incomplete-field/macro.njk" import appIncompleteField %}
 {% from "incomplete-fields-warning/macro.njk" import appIncompleteFieldsWarning %}
 {% from "marine-licence/activity-details-card/macro.njk" import appMarineLicenceActivityDetailsCard %}
+{% from "finished-site-details-question/macro.njk" import appFinishedSiteDetailsQuestion %}
 {% block head %}
   {{ super() }}
 {% endblock %}
@@ -24,6 +26,13 @@
       <div class="govuk-grid-column-full">
         <span class="govuk-caption-l">{{ projectName }}</span>
         <h1 class="govuk-heading-l">Review site details</h1>
+
+            {% if errorSummary %}
+              {{ govukErrorSummary({
+                titleText: "There is a problem",
+                errorList: errorSummary
+              }) }}
+            {% endif %}
 
             {% if hasIncompleteFields %}
               {{ appIncompleteFieldsWarning() }}
@@ -135,6 +144,11 @@
 
         <form method="POST">
           <input type="hidden" name="csrfToken" value="{{ csrfToken }}">
+
+            {% if showMarinePlanPoliciesQuestion %}
+              {{ appFinishedSiteDetailsQuestion({ errors: errors }) }}
+            {% endif %}
+
             <div class="govuk-button-group">
               {{ govukButton({
                 text: "Continue",

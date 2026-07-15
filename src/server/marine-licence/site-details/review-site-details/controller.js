@@ -17,6 +17,12 @@ import {
   authenticatedPatchRequest,
   authenticatedPostRequest
 } from '#src/server/common/helpers/authenticated-requests.js'
+import { finishedSiteDetailsSchema } from '#src/server/common/validation/finished-site-details/schema.js'
+import { finishedSiteDetailsErrorMessages } from '#src/server/common/validation/finished-site-details/constants.js'
+import {
+  mapErrorsForDisplay,
+  errorDescriptionByFieldName
+} from '#src/server/common/helpers/errors.js'
 
 export const FILE_UPLOAD_REVIEW_VIEW_ROUTE =
   'marine-licence/site-details/review-site-details/file-upload-review'
@@ -25,6 +31,27 @@ const reviewSiteDetailsPageData = {
   pageTitle: 'Review site details',
   heading: 'Review site details'
 }
+
+function renderReviewSiteDetails(h, options) {
+  const { marineLicence, siteDetails } = options
+
+  const firstSite = getSiteDetailsBySite({
+    ...marineLicence,
+    siteDetails
+  })
+  const { coordinatesType } = firstSite
+
+  if (coordinatesType === 'file') {
+    return renderFileUploadReview(h, options)
+  }
+
+  if (coordinatesType === 'coordinates') {
+    return renderManualEntryReview(h, options)
+  }
+
+  return h.redirect(marineLicenceRoutes.MARINE_LICENCE_TASK_LIST)
+}
+
 export const reviewSiteDetailsController = {
   async handler(request, h) {
     const previousPage = request.headers?.referer
@@ -42,7 +69,7 @@ export const reviewSiteDetailsController = {
     const completeMarineLicence =
       await marineLicenceService.getMarineLicenceById(marineLicence.id)
 
-    const { projectName, siteDetails } = completeMarineLicence
+    const { projectName, siteDetails, taskList } = completeMarineLicence
 
     await setMarineLicenceCache(request, h, {
       id: marineLicence.id,
@@ -50,35 +77,18 @@ export const reviewSiteDetailsController = {
       siteDetails
     })
 
-    const firstSite = getSiteDetailsBySite({
-      ...completeMarineLicence,
-      siteDetails
-    })
-    const { coordinatesType } = firstSite
-
     const returnToCheckYourAnswers = fromCheckYourAnswers
       ? marineLicenceRoutes.MARINE_LICENCE_CHECK_YOUR_ANSWERS
       : false
 
-    if (coordinatesType === 'file') {
-      return renderFileUploadReview(h, {
-        marineLicence: completeMarineLicence,
-        siteDetails,
-        previousPage,
-        reviewSiteDetailsPageData,
-        returnToCheckYourAnswers
-      })
-    } else if (coordinatesType === 'coordinates') {
-      return renderManualEntryReview(h, {
-        marineLicence: completeMarineLicence,
-        siteDetails,
-        previousPage,
-        reviewSiteDetailsPageData,
-        returnToCheckYourAnswers
-      })
-    } else {
-      return h.redirect(marineLicenceRoutes.MARINE_LICENCE_TASK_LIST)
-    }
+    return renderReviewSiteDetails(h, {
+      marineLicence: completeMarineLicence,
+      siteDetails,
+      previousPage,
+      reviewSiteDetailsPageData,
+      returnToCheckYourAnswers,
+      showMarinePlanPoliciesQuestion: taskList?.siteDetails === 'COMPLETED'
+    })
   }
 }
 
@@ -129,11 +139,43 @@ export const reviewSiteDetailsSubmitController = {
     }
 
     const marineLicenceService = getMarineLicenceService(request)
-    const { taskList } = await marineLicenceService.getMarineLicenceById(
-      marineLicence.id
-    )
+    const completeMarineLicence =
+      await marineLicenceService.getMarineLicenceById(marineLicence.id)
+    const { taskList, siteDetails } = completeMarineLicence
 
-    if (taskList?.siteDetails === 'COMPLETED') {
+    if (taskList?.siteDetails !== 'COMPLETED') {
+      return h.redirect(marineLicenceRoutes.MARINE_LICENCE_TASK_LIST)
+    }
+
+    const { error, value } = finishedSiteDetailsSchema.validate(payload)
+
+    if (error) {
+      const errorSummary = mapErrorsForDisplay(
+        error.details,
+        finishedSiteDetailsErrorMessages
+      )
+      const errors = errorDescriptionByFieldName(errorSummary)
+
+      return renderReviewSiteDetails(h, {
+        marineLicence: completeMarineLicence,
+        siteDetails,
+        previousPage: request.headers?.referer,
+        reviewSiteDetailsPageData,
+        showMarinePlanPoliciesQuestion: true,
+        errors,
+        errorSummary
+      })
+    }
+
+    const hasFinishedEnteringSiteDetails =
+      value.finishedEnteringSiteDetails === 'yes'
+
+    await authenticatedPatchRequest(request, apiRoutes.CONFIRM_SITE_DETAILS, {
+      id: marineLicence.id,
+      confirmed: hasFinishedEnteringSiteDetails
+    })
+
+    if (hasFinishedEnteringSiteDetails) {
       await authenticatedPostRequest(
         request,
         apiRoutes.CALCULATE_MARINE_PLAN_POLICIES,

@@ -122,12 +122,21 @@ export const taskListController = {
       waterFrameworkDirective,
       marinePlanPolicyJob,
       marinePlanPoliciesCount,
-      marinePlanPolicyResponseCount
+      marinePlanPolicyResponseCount,
+      siteDetailsConfirmed
     } = payload.value
     const { userRelationshipType } = userSession
 
+    const effectiveTaskList = {
+      ...taskList,
+      siteDetails:
+        taskList.siteDetails === 'COMPLETED' && !siteDetailsConfirmed
+          ? 'IN_PROGRESS'
+          : taskList.siteDetails
+    }
+
     const transformed = transformTaskLists(
-      taskList,
+      effectiveTaskList,
       userRelationshipType === USER_TYPES.CITIZEN,
       {
         waterFrameworkDirective,

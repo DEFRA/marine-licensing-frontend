@@ -29,17 +29,6 @@ const expectedWfdContent = {
   }
 }
 
-const marinePlanPolicyFixture = {
-  marinePlanPolicies: [
-    { policyCode: 'S-CC-2', policy: 'Second policy wording.' },
-    { policyCode: 'S-CC-1', policy: 'First policy wording.' }
-  ],
-  marinePlanPolicyResponses: {
-    'S-CC-1': 'My first consideration.',
-    'S-CC-2': 'My second consideration.'
-  }
-}
-
 describe('Marine Licence Check Your Answers - site and activity cards', () => {
   const getServer = setupTestServer()
 
@@ -249,10 +238,7 @@ describe('Marine Licence Check Your Answers - site and activity cards', () => {
     let document
 
     beforeEach(async () => {
-      document = await loadCyaPage({
-        ...mockFileUploadMarineLicence,
-        ...marinePlanPolicyFixture
-      })
+      document = await loadCyaPage(mockFileUploadMarineLicence)
     })
 
     test('renders the marine plan policies card with the correct title', () => {

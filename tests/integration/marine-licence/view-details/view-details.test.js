@@ -14,33 +14,11 @@ import {
 import { getCardRow } from './utils.js'
 import { validateWaterFrameworkDirective } from '#tests/integration/shared/summary-card-validators.js'
 
-const marinePlanPolicyFixture = {
-  marinePlanPolicies: [
-    { policyCode: 'S-CC-2', policy: 'Second policy wording.' },
-    { policyCode: 'S-CC-1', policy: 'First policy wording.' }
-  ],
-  marinePlanPolicyResponses: {
-    'S-CC-1': 'My first consideration.',
-    'S-CC-2': 'My second consideration.'
-  }
-}
-
 describe('Marine Licence View Details', () => {
   const getServer = setupTestServer()
 
   const loadViewDetailsPage = async (server) => {
     mockMarineLicence(mockSubmittedMarineLicenceApplication)
-    return loadPage({
-      requestUrl: `${marineLicenceRoutes.MARINE_LICENCE_VIEW_DETAILS}/${mockSubmittedMarineLicenceApplication.id}`,
-      server
-    })
-  }
-
-  const loadViewDetailsWithPolicies = async (server) => {
-    mockMarineLicence({
-      ...mockSubmittedMarineLicenceApplication,
-      ...marinePlanPolicyFixture
-    })
     return loadPage({
       requestUrl: `${marineLicenceRoutes.MARINE_LICENCE_VIEW_DETAILS}/${mockSubmittedMarineLicenceApplication.id}`,
       server
@@ -160,7 +138,7 @@ describe('Marine Licence View Details', () => {
     let document
 
     beforeEach(async () => {
-      document = await loadViewDetailsWithPolicies(getServer())
+      document = await loadViewDetailsPage(getServer())
     })
 
     test('renders the marine plan policies card with the correct title', () => {

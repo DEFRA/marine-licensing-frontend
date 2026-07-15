@@ -17,7 +17,10 @@ const isCompleted = (responses, policyCode) => {
 }
 
 const toPolicyRow = (responses) => (policy) => ({
-  title: { text: policy.policyCode },
+  title: {
+    text: policy.policyCode,
+    classes: 'govuk-link--no-visited-state'
+  },
   href: getMarinePlanPolicyLink(policy.policyCode),
   status: isCompleted(responses, policy.policyCode)
     ? { text: 'Completed' }

@@ -71,21 +71,30 @@ describe('#marinePlanPoliciesController', () => {
         marineLicenceRoutes.MARINE_LICENCE_MARINE_PLAN_POLICY_GUIDANCE,
       policies: [
         {
-          title: { text: 'SW-AGG-2' },
+          title: {
+            text: 'SW-AGG-2',
+            classes: 'govuk-link--no-visited-state'
+          },
           href: getMarinePlanPolicyLink('SW-AGG-2'),
           status: {
             tag: { text: 'Not yet started', classes: 'govuk-tag--blue' }
           }
         },
         {
-          title: { text: 'SW-BIO-1' },
+          title: {
+            text: 'SW-BIO-1',
+            classes: 'govuk-link--no-visited-state'
+          },
           href: getMarinePlanPolicyLink('SW-BIO-1'),
           status: {
             tag: { text: 'Not yet started', classes: 'govuk-tag--blue' }
           }
         },
         {
-          title: { text: 'SW-MPA-1' },
+          title: {
+            text: 'SW-MPA-1',
+            classes: 'govuk-link--no-visited-state'
+          },
           href: getMarinePlanPolicyLink('SW-MPA-1'),
           status: {
             tag: { text: 'Not yet started', classes: 'govuk-tag--blue' }

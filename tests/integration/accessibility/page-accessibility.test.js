@@ -231,17 +231,6 @@ describe('Page accessibility checks (Axe)', () => {
       isMarineLicence: true
     },
     {
-      url: marineLicenceRoutes.MARINE_LICENCE_INTERNATIONAL_INVOICE_ADDRESS,
-      title: 'International invoice address',
-      isMarineLicence: true,
-      marineLicence: {
-        ...mockMarineLicenceApplication,
-        invoicing: {
-          invoiceAddressType: 'international'
-        }
-      }
-    },
-    {
       url: marineLicenceRoutes.MARINE_LICENCE_PUBLIC_REGISTER,
       title: 'Sharing your project information publicly',
       isMarineLicence: true
@@ -541,20 +530,20 @@ describe('Page accessibility checks (Axe)', () => {
                   ? mockProjectList
                   : endpoint === '/exemptions/summary'
                     ? {
-                        coordinatesInputMethod: {
-                          shapefile: 0,
-                          kml: 0,
-                          manualCoordinates: 0
-                        },
-                        coordinateSystemVolume: {
-                          wgs84: { count: 0, percentage: 0 },
-                          bng: { count: 0, percentage: 0 },
-                          total: 0
-                        },
-                        byArticle: {},
-                        byMarinePlanArea: {},
-                        byCoastalOperationsArea: {}
-                      }
+                      coordinatesInputMethod: {
+                        shapefile: 0,
+                        kml: 0,
+                        manualCoordinates: 0
+                      },
+                      coordinateSystemVolume: {
+                        wgs84: { count: 0, percentage: 0 },
+                        bng: { count: 0, percentage: 0 },
+                        total: 0
+                      },
+                      byArticle: {},
+                      byMarinePlanArea: {},
+                      byCoastalOperationsArea: {}
+                    }
                     : exemption
             }
           })

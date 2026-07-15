@@ -125,7 +125,7 @@ describe('Is invoice address UK or international', () => {
     })
   })
 
-  test('should redirect to UK invoice address on UK submission', async () => {
+  test('should stay on the same page on valid submission', async () => {
     mockMarineLicence(mockMarineLicenceApplication)
 
     const { response } = await submitForm({

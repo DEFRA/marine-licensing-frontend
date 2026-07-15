@@ -56,7 +56,7 @@ describe('#isInvoiceAddressUkOrInternational', () => {
   })
 
   describe('#isInvoiceAddressUkOrInternationalSubmitController', () => {
-    test('Should save to cache and redirect to UK invoice address without calling the backend', async () => {
+    test('Should save to cache and redirect to the same page without calling the backend', async () => {
       await isInvoiceAddressUkOrInternationalSubmitController.handler(
         {
           payload: { invoiceAddressType: 'uk' },

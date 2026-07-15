@@ -133,4 +133,35 @@ describe('Marine Licence View Details', () => {
       expect(changeLink).toBeNull()
     })
   })
+
+  describe('marine plan policies card', () => {
+    let document
+
+    beforeEach(async () => {
+      document = await loadViewDetailsPage(getServer())
+    })
+
+    test('renders the marine plan policies card with the correct title', () => {
+      const card = document.querySelector('#marine-plan-policies-card')
+      expect(card).not.toBeNull()
+      expect(
+        card.querySelector('.govuk-summary-card__title').textContent.trim()
+      ).toBe('Marine plan policies')
+    })
+
+    test('renders the policy code, wording and consideration', () => {
+      const card = document.querySelector('#marine-plan-policies-card')
+      expect(card.textContent).toContain('S-CC-1')
+      expect(card.textContent).toContain('First policy wording.')
+      expect(card.textContent).toContain('My first consideration.')
+    })
+
+    test('does not render a Change link for any row', () => {
+      const card = document.querySelector('#marine-plan-policies-card')
+      expect(
+        card.querySelectorAll('.govuk-summary-list__actions a')
+      ).toHaveLength(0)
+      expect(card.querySelector('.govuk-summary-card__actions a')).toBeNull()
+    })
+  })
 })

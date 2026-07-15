@@ -6,6 +6,7 @@ import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
 import { createFailAction } from '#src/server/common/helpers/createFailAction.js'
 import { isInvoiceAddressUkOrInternationalSchema } from '#src/server/common/validation/invoicing/is-invoice-address-uk-or-international/schema.js'
 import {
+  INVOICE_TYPE_OPTIONS,
   isInvoiceAddressUkOrInternationalErrorMessages,
   isInvoiceAddressUkOrInternationalSettings
 } from '#src/server/common/validation/invoicing/constants.js'
@@ -57,7 +58,7 @@ export const isInvoiceAddressUkOrInternationalSubmitController = {
       }
     })
 
-    if (payload.invoiceAddressType === 'uk') {
+    if (payload.invoiceAddressType === INVOICE_TYPE_OPTIONS.UK) {
       return h.redirect(marineLicenceRoutes.MARINE_LICENCE_UK_INVOICE_ADDRESS)
     }
 

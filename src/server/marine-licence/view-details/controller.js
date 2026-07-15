@@ -13,6 +13,7 @@ import { MARINE_LICENCE_KEY } from '#src/server/common/constants/marine-licence.
 import { buildSummaryData } from '#src/server/common/helpers/marine-licence/summary-data.js'
 import { buildSiteData } from '#src/server/common/helpers/marine-licence/site-data.js'
 import { waterFrameworkReviewData } from '#src/server/common/helpers/marine-licence/water-framework-directive/water-framework-review-data.js'
+import { buildMarinePlanPoliciesData } from '#src/server/common/helpers/marine-licence/marine-plan-policies-data.js'
 
 export const VIEW_DETAILS_VIEW_ROUTE = 'marine-licence/view-details/index'
 
@@ -61,6 +62,8 @@ export const viewDetailsController = {
         formattedMarineLicence.waterFrameworkDirective
       )
 
+      const marinePlanPolicies = buildMarinePlanPoliciesData(marineLicence)
+
       return h.view(VIEW_DETAILS_VIEW_ROUTE, {
         pageTitle: formattedMarineLicence.projectName,
         specialLegalPowers: formattedMarineLicence.specialLegalPowers,
@@ -78,7 +81,8 @@ export const viewDetailsController = {
         backLink: isApplicantView ? routes.DASHBOARD : null,
         isInternalUserView,
         marineLicenceId,
-        waterFrameworkDirectiveData
+        waterFrameworkDirectiveData,
+        marinePlanPolicies
       })
     } catch (error) {
       if (error.isBoom) {

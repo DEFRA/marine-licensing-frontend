@@ -138,6 +138,21 @@ describe('#ukInvoiceAddressSchema', () => {
       expect(error.message).toBe('ADDRESS_POSTCODE_INVALID')
     }
   )
+  test.each([
+    'NOT A POSTCODE',
+    'A1',
+    '12345',
+    'AA1 1A',
+    'BF1 1AA',
+    'BF18 1AA',
+    'bf1 1aa'
+  ])('should fail when postcode is invalid: %s', (addressPostcode) => {
+    const { error } = ukInvoiceAddressSchema.validate({
+      ...validAddress,
+      addressPostcode
+    })
+    expect(error.message).toBe('ADDRESS_POSTCODE_INVALID')
+  })
 
   test('should validate at exact max lengths', () => {
     const { error } = ukInvoiceAddressSchema.validate({

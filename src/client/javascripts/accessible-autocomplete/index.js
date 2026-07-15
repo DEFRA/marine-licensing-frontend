@@ -30,9 +30,7 @@ export class AccessibleAutocomplete extends Component {
     this.$input = document.getElementById(
       this.$select.id.replace(/-select$/, '')
     )
-
   }
 
   static moduleName = 'app-accessible-autocomplete'
-
 }

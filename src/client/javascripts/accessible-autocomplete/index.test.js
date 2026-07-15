@@ -39,7 +39,9 @@ describe('AccessibleAutocomplete', () => {
   })
 
   test('exposes the module name for createAll', () => {
-    expect(AccessibleAutocomplete.moduleName).toBe('app-accessible-autocomplete')
+    expect(AccessibleAutocomplete.moduleName).toBe(
+      'app-accessible-autocomplete'
+    )
   })
 
   test('enhances the select element', () => {

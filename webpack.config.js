@@ -176,15 +176,11 @@ export default {
           to: 'stylesheets/ol.css'
         },
         {
-          from: require.resolve(
-            'accessible-autocomplete/dist/accessible-autocomplete.min.css'
-          ),
+          from: require.resolve('accessible-autocomplete/dist/accessible-autocomplete.min.css'),
           to: 'stylesheets/accessible-autocomplete.min.css'
         },
         {
-          from: require.resolve(
-            'accessible-autocomplete/dist/accessible-autocomplete.min.js'
-          ),
+          from: require.resolve('accessible-autocomplete/dist/accessible-autocomplete.min.js'),
           to: 'javascripts/accessible-autocomplete.min.js'
         },
         {

@@ -92,50 +92,121 @@ export const reviewSiteDetailsController = {
   }
 }
 
+async function handleAddSite(request, h, marineLicence) {
+  const newSiteNumber = marineLicence.siteDetails.length + 1
+  await updateMarineLicenceSiteDetails(
+    request,
+    h,
+    newSiteNumber - 1,
+    'coordinatesType',
+    'coordinates'
+  )
+  return h.redirect(
+    `${marineLicenceRoutes.MARINE_LICENCE_SITE_NAME}?site=${newSiteNumber}`
+  )
+}
+
+async function handleAddActivity(request, h, marineLicence, siteNumber) {
+  const siteIndex = Number.parseInt(siteNumber, 10) - 1
+
+  const currentActivityCount =
+    marineLicence.siteDetails[siteIndex].activityDetails.length
+
+  const newActivityIndex = currentActivityCount + 1
+
+  await authenticatedPatchRequest(request, apiRoutes.ADD_ACTIVITY_TO_SITE, {
+    siteIndex,
+    id: marineLicence.id
+  })
+
+  return h.redirect(
+    `${marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS}#activity-details-site-${siteNumber}-activity-${newActivityIndex}`
+  )
+}
+
+function handleReturnToRedirect(request, h) {
+  const returnTo = request.yar.flash(RETURN_TO_CACHE_KEY)
+  const redirectPath = Array.isArray(returnTo) ? returnTo[0] : returnTo
+
+  if (!redirectPath) {
+    return { redirected: false }
+  }
+
+  return { redirected: true, response: h.redirect(redirectPath) }
+}
+
+function handleFinishedSiteDetailsValidation(
+  request,
+  h,
+  completeMarineLicence,
+  siteDetails
+) {
+  const { error, value } = finishedSiteDetailsSchema.validate(request.payload)
+
+  if (!error) {
+    return { valid: true, value }
+  }
+
+  const errorSummary = mapErrorsForDisplay(
+    error.details,
+    finishedSiteDetailsErrorMessages
+  )
+  const errors = errorDescriptionByFieldName(errorSummary)
+
+  return {
+    valid: false,
+    response: renderReviewSiteDetails(h, {
+      marineLicence: completeMarineLicence,
+      siteDetails,
+      previousPage: request.headers?.referer,
+      reviewSiteDetailsPageData,
+      showMarinePlanPoliciesQuestion: true,
+      errors,
+      errorSummary
+    })
+  }
+}
+
+async function confirmSiteDetails(request, h, marineLicence, value) {
+  const hasFinishedEnteringSiteDetails =
+    value.finishedEnteringSiteDetails === 'yes'
+
+  await authenticatedPatchRequest(request, apiRoutes.CONFIRM_SITE_DETAILS, {
+    id: marineLicence.id,
+    confirmed: hasFinishedEnteringSiteDetails
+  })
+
+  if (hasFinishedEnteringSiteDetails) {
+    await authenticatedPostRequest(
+      request,
+      apiRoutes.CALCULATE_MARINE_PLAN_POLICIES,
+      JSON.stringify({ id: marineLicence.id })
+    )
+    return h.redirect(
+      marineLicenceRoutes.MARINE_LICENCE_CALCULATE_MARINE_PLAN_POLICIES
+    )
+  }
+
+  return h.redirect(marineLicenceRoutes.MARINE_LICENCE_TASK_LIST)
+}
+
 export const reviewSiteDetailsSubmitController = {
   async handler(request, h) {
     const { payload } = request
-
     const { add, addActivity, siteNumber } = payload
-
     const marineLicence = getMarineLicenceCache(request)
 
     if (add) {
-      const newSiteNumber = marineLicence.siteDetails.length + 1
-      await updateMarineLicenceSiteDetails(
-        request,
-        h,
-        newSiteNumber - 1,
-        'coordinatesType',
-        'coordinates'
-      )
-      return h.redirect(
-        `${marineLicenceRoutes.MARINE_LICENCE_SITE_NAME}?site=${newSiteNumber}`
-      )
+      return handleAddSite(request, h, marineLicence)
     }
 
     if (addActivity) {
-      const siteIndex = Number.parseInt(siteNumber, 10) - 1
-
-      const currentActivityCount =
-        marineLicence.siteDetails[siteIndex].activityDetails.length
-
-      const newActivityIndex = currentActivityCount + 1
-
-      await authenticatedPatchRequest(request, apiRoutes.ADD_ACTIVITY_TO_SITE, {
-        siteIndex,
-        id: marineLicence.id
-      })
-
-      return h.redirect(
-        `${marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS}#activity-details-site-${siteNumber}-activity-${newActivityIndex}`
-      )
+      return handleAddActivity(request, h, marineLicence, siteNumber)
     }
 
-    const returnTo = request.yar.flash(RETURN_TO_CACHE_KEY)
-    const redirectPath = Array.isArray(returnTo) ? returnTo[0] : returnTo
-    if (redirectPath) {
-      return h.redirect(redirectPath)
+    const returnTo = handleReturnToRedirect(request, h)
+    if (returnTo.redirected) {
+      return returnTo.response
     }
 
     const marineLicenceService = getMarineLicenceService(request)
@@ -147,45 +218,16 @@ export const reviewSiteDetailsSubmitController = {
       return h.redirect(marineLicenceRoutes.MARINE_LICENCE_TASK_LIST)
     }
 
-    const { error, value } = finishedSiteDetailsSchema.validate(payload)
-
-    if (error) {
-      const errorSummary = mapErrorsForDisplay(
-        error.details,
-        finishedSiteDetailsErrorMessages
-      )
-      const errors = errorDescriptionByFieldName(errorSummary)
-
-      return renderReviewSiteDetails(h, {
-        marineLicence: completeMarineLicence,
-        siteDetails,
-        previousPage: request.headers?.referer,
-        reviewSiteDetailsPageData,
-        showMarinePlanPoliciesQuestion: true,
-        errors,
-        errorSummary
-      })
+    const validation = handleFinishedSiteDetailsValidation(
+      request,
+      h,
+      completeMarineLicence,
+      siteDetails
+    )
+    if (!validation.valid) {
+      return validation.response
     }
 
-    const hasFinishedEnteringSiteDetails =
-      value.finishedEnteringSiteDetails === 'yes'
-
-    await authenticatedPatchRequest(request, apiRoutes.CONFIRM_SITE_DETAILS, {
-      id: marineLicence.id,
-      confirmed: hasFinishedEnteringSiteDetails
-    })
-
-    if (hasFinishedEnteringSiteDetails) {
-      await authenticatedPostRequest(
-        request,
-        apiRoutes.CALCULATE_MARINE_PLAN_POLICIES,
-        JSON.stringify({ id: marineLicence.id })
-      )
-      return h.redirect(
-        marineLicenceRoutes.MARINE_LICENCE_CALCULATE_MARINE_PLAN_POLICIES
-      )
-    }
-
-    return h.redirect(marineLicenceRoutes.MARINE_LICENCE_TASK_LIST)
+    return confirmSiteDetails(request, h, marineLicence, validation.value)
   }
 }

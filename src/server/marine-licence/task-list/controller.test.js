@@ -368,6 +368,8 @@ describe('#taskListController', () => {
     expect(vi.mocked(transformSiteDetailsTaskList)).toHaveBeenCalledWith({
       siteDetails: 'COMPLETED'
     })
+  })
+
   test('taskListController handler should not treat all tasks as complete when marine plan policies is not completed', async () => {
     setupAllTasksCompleted()
     vi.mocked(transformMarinePlanPoliciesTaskList).mockReturnValue([

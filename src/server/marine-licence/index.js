@@ -8,6 +8,7 @@ import { publicRegisterRoutes } from '#src/server/marine-licence/public-register
 import { publicConsultationRoutes } from '#src/server/marine-licence/public-consultation/index.js'
 import { otherAuthoritiesRoutes } from '#src/server/marine-licence/other-authorities/index.js'
 import { harbourAuthorityRoutes } from '#src/server/marine-licence/harbour-authority/index.js'
+import { invoicingRoutes } from '#src/server/marine-licence/invoicing/index.js'
 import { projectBackgroundRoutes } from '#src/server/marine-licence/project-background/index.js'
 import { siteDetailsRoutes } from '#src/server/marine-licence/site-details/index.js'
 import { viewDetailsRoutes } from '#src/server/marine-licence/view-details/index.js'
@@ -36,6 +37,7 @@ export const marineLicence = {
         ...publicConsultationRoutes,
         ...otherAuthoritiesRoutes,
         ...harbourAuthorityRoutes,
+        ...invoicingRoutes,
         ...preferredDatesRoutes,
         ...projectBackgroundRoutes,
         ...siteDetailsRoutes,

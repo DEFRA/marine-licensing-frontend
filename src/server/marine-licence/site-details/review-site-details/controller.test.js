@@ -378,13 +378,13 @@ describe('#reviewSiteDetails', () => {
           showMarinePlanPoliciesQuestion: true,
           errorSummary: [
             expect.objectContaining({
-              text: 'Select whether you have finished entering your site details',
+              text: 'Select if you have finished entering your site details',
               href: '#finishedEnteringSiteDetails'
             })
           ],
           errors: expect.objectContaining({
             finishedEnteringSiteDetails: expect.objectContaining({
-              text: 'Select whether you have finished entering your site details'
+              text: 'Select if you have finished entering your site details'
             })
           })
         })

@@ -233,4 +233,49 @@ describe('Marine Licence Check Your Answers - site and activity cards', () => {
       validateWaterFrameworkDirective(document, expectedWfdContent)
     })
   })
+
+  describe('marine plan policies card', () => {
+    let document
+
+    beforeEach(async () => {
+      document = await loadCyaPage(mockFileUploadMarineLicence)
+    })
+
+    test('renders the marine plan policies card with the correct title', () => {
+      const card = document.querySelector('#marine-plan-policies-card')
+      expect(card).toBeTruthy()
+      expect(
+        card.querySelector('.govuk-summary-card__title').textContent.trim()
+      ).toBe('Marine plan policies')
+    })
+
+    test('renders rows sorted alphabetically by policy code with wording and consideration', () => {
+      const card = document.querySelector('#marine-plan-policies-card')
+      const rows = card.querySelectorAll('.govuk-summary-list__row')
+      expect(rows).toHaveLength(2)
+      expect(
+        rows[0].querySelector('.govuk-summary-list__key').textContent.trim()
+      ).toBe('S-CC-1')
+      expect(card.textContent).toContain('First policy wording.')
+      expect(card.textContent).toContain('Policy information')
+      expect(card.textContent).toContain('Your consideration')
+      expect(card.textContent).toContain('My first consideration.')
+    })
+
+    test('renders a Change link for each policy row', () => {
+      const card = document.querySelector('#marine-plan-policies-card')
+      const changeLinks = card.querySelectorAll(
+        '.govuk-summary-list__actions a'
+      )
+      expect(changeLinks).toHaveLength(2)
+
+      const firstPolicyChangeLink = [...changeLinks].find(
+        (link) =>
+          link.getAttribute('href') ===
+          '/marine-licence/marine-plan-policy/S-CC-1'
+      )
+      expect(firstPolicyChangeLink).toBeTruthy()
+      expect(firstPolicyChangeLink.textContent).toContain('Change')
+    })
+  })
 })

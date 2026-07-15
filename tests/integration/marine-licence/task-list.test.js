@@ -1,4 +1,4 @@
-import { getByRole, getByText } from '@testing-library/dom'
+import { getByRole, getByText, queryByRole } from '@testing-library/dom'
 import { marineLicenceRoutes } from '~/src/server/common/constants/routes.js'
 import {
   mockMarineLicence,
@@ -65,15 +65,45 @@ describe('Task List', () => {
   })
 
   test('should render review button when all tasks are completed', async () => {
-    expect(getByRole(document, 'heading', { level: 1 })).toHaveTextContent(
-      'Marine licence start page'
-    )
+    mockMarineLicence({
+      ...mockMarineLicenceApplication,
+      marinePlanPolicyJob: 'ready',
+      marinePlanPoliciesCount: 3,
+      marinePlanPolicyResponseCount: 3
+    })
+    const completedDocument = await loadPage({
+      requestUrl: marineLicenceRoutes.MARINE_LICENCE_TASK_LIST,
+      server: getServer()
+    })
 
     expect(
-      getByRole(document, 'button', {
+      getByRole(completedDocument, 'heading', { level: 1 })
+    ).toHaveTextContent('Marine licence start page')
+
+    expect(
+      getByRole(completedDocument, 'button', {
         name: 'Review and send your information'
       })
     ).toBeInTheDocument()
+  })
+
+  test('should not render review button when marine plan policies are incomplete', async () => {
+    mockMarineLicence({
+      ...mockMarineLicenceApplication,
+      marinePlanPolicyJob: 'ready',
+      marinePlanPoliciesCount: 3,
+      marinePlanPolicyResponseCount: 1
+    })
+    const incompleteDocument = await loadPage({
+      requestUrl: marineLicenceRoutes.MARINE_LICENCE_TASK_LIST,
+      server: getServer()
+    })
+
+    expect(
+      queryByRole(incompleteDocument, 'button', {
+        name: 'Review and send your information'
+      })
+    ).not.toBeInTheDocument()
   })
 
   test('should display phase banner with feedback link that goes to current URL', () => {

@@ -6,6 +6,7 @@ import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
 import { createFailAction } from '#src/server/common/helpers/createFailAction.js'
 import { ukInvoiceAddressSchema } from '#src/server/common/validation/invoicing/uk-invoice-address/schema.js'
 import {
+  INVOICE_TYPE_OPTIONS,
   ukInvoiceAddressErrorMessages,
   ukInvoiceAddressSettings
 } from '#src/server/common/validation/invoicing/constants.js'
@@ -23,7 +24,7 @@ export const ukInvoiceAddressController = {
     const marineLicence = getMarineLicenceCache(request)
     const { invoicing } = marineLicence
 
-    if (invoicing.invoiceAddressType !== 'uk') {
+    if (invoicing.invoiceAddressType !== INVOICE_TYPE_OPTIONS.UK) {
       return h.redirect(
         marineLicenceRoutes.MARINE_LICENCE_IS_INVOICE_ADDRESS_UK_OR_INTERNATIONAL
       )

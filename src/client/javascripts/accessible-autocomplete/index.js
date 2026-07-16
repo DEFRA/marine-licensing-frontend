@@ -30,6 +30,16 @@ export class AccessibleAutocomplete extends Component {
     this.$input = document.getElementById(
       this.$select.id.replace(/-select$/, '')
     )
+
+    this.$arrow = this.$root.querySelector('.autocomplete__dropdown-arrow-down')
+
+    if (
+      this.$arrow instanceof SVGSVGElement &&
+      !this.$arrow.getAttribute('viewBox')
+    ) {
+      this.$arrow.setAttribute('viewBox', '0 0 22 17')
+      this.$arrow.setAttribute('preserveAspectRatio', 'none')
+    }
   }
 
   static moduleName = 'app-accessible-autocomplete'

@@ -54,6 +54,7 @@ export const isInvoiceAddressUkOrInternationalSubmitController = {
     await setMarineLicenceCache(request, h, {
       ...marineLicence,
       invoicing: {
+        ...marineLicence.invoicing,
         invoiceAddressType: payload.invoiceAddressType
       }
     })
@@ -63,7 +64,7 @@ export const isInvoiceAddressUkOrInternationalSubmitController = {
     }
 
     return h.redirect(
-      marineLicenceRoutes.MARINE_LICENCE_IS_INVOICE_ADDRESS_UK_OR_INTERNATIONAL
+      marineLicenceRoutes.MARINE_LICENCE_INTERNATIONAL_INVOICE_ADDRESS
     )
   }
 }

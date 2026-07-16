@@ -142,4 +142,22 @@ describe('Is invoice address UK or international', () => {
       marineLicenceRoutes.MARINE_LICENCE_UK_INVOICE_ADDRESS
     )
   })
+
+  test('should redirect to international invoice address on international submission', async () => {
+    mockMarineLicence(mockMarineLicenceApplication)
+
+    const { response } = await submitForm({
+      requestUrl:
+        marineLicenceRoutes.MARINE_LICENCE_IS_INVOICE_ADDRESS_UK_OR_INTERNATIONAL,
+      server: getServer(),
+      formData: {
+        invoiceAddressType: 'international'
+      }
+    })
+
+    expect(response.statusCode).toBe(statusCodes.redirect)
+    expect(response.headers.location).toBe(
+      marineLicenceRoutes.MARINE_LICENCE_INTERNATIONAL_INVOICE_ADDRESS
+    )
+  })
 })

@@ -1,0 +1,41 @@
+@use 'govuk-frontend' as *;
+@use 'accessible-autocomplete.min';
+
+[data-module='app-accessible-autocomplete'] {
+  .govuk-select {
+    width: 100%;
+  }
+
+  // When JS is available, hide native chevron to avoid visible swapping when component loads
+  @media (scripting: enabled) {
+    .govuk-select {
+      appearance: none;
+    }
+  }
+}
+
+.autocomplete__wrapper * {
+  @include govuk-typography-common($font-family: $govuk-font-family);
+}
+
+.autocomplete__wrapper {
+  position: relative;
+
+  .autocomplete__input {
+    padding-right: govuk-spacing(7);
+  }
+
+  .autocomplete__menu {
+    .autocomplete__option {
+      padding: govuk-spacing(2) govuk-spacing(3);
+    }
+  }
+
+  .autocomplete__dropdown-arrow-down {
+    z-index: 1;
+    right: govuk-spacing(3);
+    top: govuk-spacing(3);
+    width: govuk-spacing(3);
+    height: govuk-spacing(2);
+  }
+}

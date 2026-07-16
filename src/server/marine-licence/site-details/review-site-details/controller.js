@@ -3,6 +3,7 @@ import {
   marineLicenceRoutes
 } from '#src/server/common/constants/routes.js'
 import { RETURN_TO_CACHE_KEY } from '#src/server/common/constants/cache.js'
+import { clearReturnToCache } from '#src/server/common/helpers/marine-licence/session-cache/return-to-cache.js'
 import { renderFileUploadReview, renderManualEntryReview } from './utils.js'
 import { getSiteDetailsBySite } from '#src/server/common/helpers/exemptions/session-cache/site-details-utils.js'
 import {
@@ -139,7 +140,8 @@ function handleFinishedSiteDetailsValidation(
   request,
   h,
   completeMarineLicence,
-  siteDetails
+  siteDetails,
+  returnToCheckYourAnswers
 ) {
   const { error, value } = finishedSiteDetailsSchema.validate(request.payload)
 
@@ -160,6 +162,7 @@ function handleFinishedSiteDetailsValidation(
       siteDetails,
       previousPage: request.headers?.referer,
       reviewSiteDetailsPageData,
+      returnToCheckYourAnswers,
       showMarinePlanPoliciesQuestion: true,
       errors,
       errorSummary
@@ -167,7 +170,13 @@ function handleFinishedSiteDetailsValidation(
   }
 }
 
-async function confirmSiteDetails(request, h, marineLicence, value) {
+async function confirmSiteDetails(
+  request,
+  h,
+  marineLicence,
+  value,
+  { siteDetailsAlreadyConfirmed, returnToCheckYourAnswers }
+) {
   const hasFinishedEnteringSiteDetails =
     value.finishedEnteringSiteDetails === 'yes'
 
@@ -176,18 +185,22 @@ async function confirmSiteDetails(request, h, marineLicence, value) {
     confirmed: hasFinishedEnteringSiteDetails
   })
 
-  if (hasFinishedEnteringSiteDetails) {
-    await authenticatedPostRequest(
-      request,
-      apiRoutes.CALCULATE_MARINE_PLAN_POLICIES,
-      JSON.stringify({ id: marineLicence.id })
-    )
-    return h.redirect(
-      marineLicenceRoutes.MARINE_LICENCE_CALCULATE_MARINE_PLAN_POLICIES
-    )
+  if (!hasFinishedEnteringSiteDetails) {
+    return h.redirect(marineLicenceRoutes.MARINE_LICENCE_TASK_LIST)
   }
 
-  return h.redirect(marineLicenceRoutes.MARINE_LICENCE_TASK_LIST)
+  if (siteDetailsAlreadyConfirmed && returnToCheckYourAnswers) {
+    return h.redirect(returnToCheckYourAnswers)
+  }
+
+  await authenticatedPostRequest(
+    request,
+    apiRoutes.CALCULATE_MARINE_PLAN_POLICIES,
+    JSON.stringify({ id: marineLicence.id })
+  )
+  return h.redirect(
+    marineLicenceRoutes.MARINE_LICENCE_CALCULATE_MARINE_PLAN_POLICIES
+  )
 }
 
 export const reviewSiteDetailsSubmitController = {
@@ -195,6 +208,10 @@ export const reviewSiteDetailsSubmitController = {
     const { payload } = request
     const { add, addActivity, siteNumber } = payload
     const marineLicence = getMarineLicenceCache(request)
+    const fromCheckYourAnswers = request.query?.from === 'check-your-answers'
+    const returnToCheckYourAnswers = fromCheckYourAnswers
+      ? marineLicenceRoutes.MARINE_LICENCE_CHECK_YOUR_ANSWERS
+      : false
 
     if (add) {
       return handleAddSite(request, h, marineLicence)
@@ -204,30 +221,35 @@ export const reviewSiteDetailsSubmitController = {
       return handleAddActivity(request, h, marineLicence, siteNumber)
     }
 
-    const returnTo = handleReturnToRedirect(request, h)
-    if (returnTo.redirected) {
-      return returnTo.response
-    }
-
     const marineLicenceService = getMarineLicenceService(request)
     const completeMarineLicence =
       await marineLicenceService.getMarineLicenceById(marineLicence.id)
     const { taskList, siteDetails } = completeMarineLicence
 
     if (taskList?.siteDetails !== 'COMPLETED') {
+      const returnTo = handleReturnToRedirect(request, h)
+      if (returnTo.redirected) {
+        return returnTo.response
+      }
       return h.redirect(marineLicenceRoutes.MARINE_LICENCE_TASK_LIST)
     }
+
+    clearReturnToCache(request)
 
     const validation = handleFinishedSiteDetailsValidation(
       request,
       h,
       completeMarineLicence,
-      siteDetails
+      siteDetails,
+      returnToCheckYourAnswers
     )
     if (!validation.valid) {
       return validation.response
     }
 
-    return confirmSiteDetails(request, h, marineLicence, validation.value)
+    return confirmSiteDetails(request, h, marineLicence, validation.value, {
+      siteDetailsAlreadyConfirmed: completeMarineLicence.siteDetailsConfirmed,
+      returnToCheckYourAnswers
+    })
   }
 }

@@ -1,7 +1,4 @@
-import {
-  routes,
-  marineLicenceRoutes
-} from '#src/server/common/constants/routes.js'
+import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
 import { FILE_UPLOAD_REVIEW_VIEW_ROUTE } from './controller.js'
 import { getFileUploadSummaryData } from '#src/server/common/helpers/review-site-details/file-upload.js'
 import { createSiteDetailsDataJson } from '#src/server/common/helpers/site-details.js'
@@ -28,8 +25,8 @@ export const getFileUploadBackLink = (
   const url = new URL(previousPage)
   const previousPath = url.pathname
 
-  if (previousPath === routes.TASK_LIST) {
-    return routes.TASK_LIST
+  if (previousPath === marineLicenceRoutes.MARINE_LICENCE_TASK_LIST) {
+    return marineLicenceRoutes.MARINE_LICENCE_TASK_LIST
   }
 
   return previousPath
@@ -65,8 +62,8 @@ export const getManualEntryBackLink = (
     return `${marineLicenceRoutes.MARINE_LICENCE_WIDTH_OF_SITE}${queryParams}`
   }
 
-  if (previousPath === routes.TASK_LIST) {
-    return routes.TASK_LIST
+  if (previousPath === marineLicenceRoutes.MARINE_LICENCE_TASK_LIST) {
+    return marineLicenceRoutes.MARINE_LICENCE_TASK_LIST
   }
 
   return marineLicenceRoutes.MARINE_LICENCE_WIDTH_OF_SITE
@@ -139,7 +136,13 @@ export const renderManualEntryReview = (h, options) => {
     marineLicence.multipleSiteDetails ?? {}
   ).map((site, index) => ({
     ...site,
-    deleteSiteLink: `${marineLicenceRoutes.MARINE_LICENCE_DELETE_SITE}?site=${index + 1}`
+    deleteSiteLink: `${marineLicenceRoutes.MARINE_LICENCE_DELETE_SITE}?site=${index + 1}`,
+    activityDetails: site.activityDetails.map((activity, actIndex) => ({
+      ...activity,
+      ...(actIndex > 0 && {
+        deleteLink: `${marineLicenceRoutes.MARINE_LICENCE_DELETE_ACTIVITY}?site=${index + 1}&activity=${actIndex + 1}`
+      })
+    }))
   }))
 
   return h.view(MANUAL_ENTRY_REVIEW_VIEW_ROUTE, {

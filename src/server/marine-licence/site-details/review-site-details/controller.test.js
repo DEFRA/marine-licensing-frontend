@@ -18,6 +18,7 @@ import {
   mockManualCoordinatesMarineLicence
 } from '#src/server/test-helpers/mocks/marine-licence-mocks.js'
 import { createMockRequest } from '#src/server/test-helpers/mocks/helpers.js'
+import { RETURN_TO_CACHE_KEY } from '#src/server/common/constants/cache.js'
 
 vi.mock('~/src/server/common/helpers/marine-licence/session-cache/utils.js')
 vi.mock('~/src/services/marine-licence-service/index.js')
@@ -309,6 +310,127 @@ describe('#reviewSiteDetails', () => {
       )
     })
 
+    test('should skip recalculation and redirect straight to check-your-answers when answer is yes, siteDetails is already confirmed and the user came from check-your-answers', async () => {
+      getMarineLicenceCacheSpy.mockReturnValueOnce({
+        id: 'test-id',
+        siteDetails: []
+      })
+      vi.spyOn(marineLicenceService, 'getMarineLicenceService').mockReturnValue(
+        {
+          getMarineLicenceById: vi.fn().mockResolvedValue({
+            taskList: { siteDetails: 'COMPLETED' },
+            siteDetails: [],
+            siteDetailsConfirmed: true
+          })
+        }
+      )
+      vi.mocked(
+        authenticatedRequests.authenticatedPatchRequest
+      ).mockResolvedValue({})
+
+      const h = createMockHandler('redirect')
+      const request = createMockRequest({
+        payload: { finishedEnteringSiteDetails: 'yes' },
+        query: { from: 'check-your-answers' }
+      })
+
+      await reviewSiteDetailsSubmitController.handler(request, h)
+
+      expect(
+        vi.mocked(authenticatedRequests.authenticatedPatchRequest)
+      ).toHaveBeenCalledWith(request, apiRoutes.CONFIRM_SITE_DETAILS, {
+        id: 'test-id',
+        confirmed: true
+      })
+      expect(
+        vi.mocked(authenticatedRequests.authenticatedPostRequest)
+      ).not.toHaveBeenCalled()
+      expect(h.redirect).toHaveBeenCalledWith(
+        marineLicenceRoutes.MARINE_LICENCE_CHECK_YOUR_ANSWERS
+      )
+    })
+
+    test('should still recalculate when answer is yes, siteDetails is not already confirmed and the user came from check-your-answers', async () => {
+      getMarineLicenceCacheSpy.mockReturnValueOnce({
+        id: 'test-id',
+        siteDetails: []
+      })
+      vi.spyOn(marineLicenceService, 'getMarineLicenceService').mockReturnValue(
+        {
+          getMarineLicenceById: vi.fn().mockResolvedValue({
+            taskList: { siteDetails: 'COMPLETED' },
+            siteDetails: [],
+            siteDetailsConfirmed: false
+          })
+        }
+      )
+      vi.mocked(
+        authenticatedRequests.authenticatedPostRequest
+      ).mockResolvedValue({})
+      vi.mocked(
+        authenticatedRequests.authenticatedPatchRequest
+      ).mockResolvedValue({})
+
+      const h = createMockHandler('redirect')
+      const request = createMockRequest({
+        payload: { finishedEnteringSiteDetails: 'yes' },
+        query: { from: 'check-your-answers' }
+      })
+
+      await reviewSiteDetailsSubmitController.handler(request, h)
+
+      expect(
+        vi.mocked(authenticatedRequests.authenticatedPostRequest)
+      ).toHaveBeenCalledWith(
+        request,
+        apiRoutes.CALCULATE_MARINE_PLAN_POLICIES,
+        JSON.stringify({ id: 'test-id' })
+      )
+      expect(h.redirect).toHaveBeenCalledWith(
+        marineLicenceRoutes.MARINE_LICENCE_CALCULATE_MARINE_PLAN_POLICIES
+      )
+    })
+
+    test('should still recalculate when answer is yes, siteDetails is already confirmed but the user did not come from check-your-answers', async () => {
+      getMarineLicenceCacheSpy.mockReturnValueOnce({
+        id: 'test-id',
+        siteDetails: []
+      })
+      vi.spyOn(marineLicenceService, 'getMarineLicenceService').mockReturnValue(
+        {
+          getMarineLicenceById: vi.fn().mockResolvedValue({
+            taskList: { siteDetails: 'COMPLETED' },
+            siteDetails: [],
+            siteDetailsConfirmed: true
+          })
+        }
+      )
+      vi.mocked(
+        authenticatedRequests.authenticatedPostRequest
+      ).mockResolvedValue({})
+      vi.mocked(
+        authenticatedRequests.authenticatedPatchRequest
+      ).mockResolvedValue({})
+
+      const h = createMockHandler('redirect')
+      const request = createMockRequest({
+        payload: { finishedEnteringSiteDetails: 'yes' }
+      })
+
+      await reviewSiteDetailsSubmitController.handler(request, h)
+
+      expect(
+        vi.mocked(authenticatedRequests.authenticatedPostRequest)
+      ).toHaveBeenCalledWith(
+        request,
+        apiRoutes.CALCULATE_MARINE_PLAN_POLICIES,
+        JSON.stringify({ id: 'test-id' })
+      )
+      expect(h.redirect).toHaveBeenCalledWith(
+        marineLicenceRoutes.MARINE_LICENCE_CALCULATE_MARINE_PLAN_POLICIES
+      )
+    })
+
     test('should not call calculate-marine-plan-policies API and redirect to task list when siteDetails is COMPLETED and answer is no', async () => {
       getMarineLicenceCacheSpy.mockReturnValueOnce({
         id: 'test-id',
@@ -391,7 +513,49 @@ describe('#reviewSiteDetails', () => {
       )
     })
 
-    test('should redirect to check-your-answers when flash returnTo is set', async () => {
+    test('should keep the check-your-answers back link when validation fails and the user came from check-your-answers', async () => {
+      getMarineLicenceCacheSpy.mockReturnValueOnce({
+        id: 'test-id',
+        siteDetails: []
+      })
+      vi.spyOn(marineLicenceService, 'getMarineLicenceService').mockReturnValue(
+        {
+          getMarineLicenceById: vi.fn().mockResolvedValue({
+            ...mockFileUploadMarineLicence,
+            taskList: { siteDetails: 'COMPLETED' }
+          })
+        }
+      )
+
+      const h = createMockHandler()
+      const request = createMockRequest({
+        payload: {},
+        query: { from: 'check-your-answers' }
+      })
+
+      await reviewSiteDetailsSubmitController.handler(request, h)
+
+      expect(h.view).toHaveBeenCalledWith(
+        FILE_UPLOAD_REVIEW_VIEW_ROUTE,
+        expect.objectContaining({
+          backLink: marineLicenceRoutes.MARINE_LICENCE_CHECK_YOUR_ANSWERS
+        })
+      )
+    })
+
+    test('should redirect to check-your-answers when flash returnTo is set and siteDetails is not COMPLETED', async () => {
+      getMarineLicenceCacheSpy.mockReturnValueOnce({
+        id: 'test-id',
+        siteDetails: []
+      })
+      vi.spyOn(marineLicenceService, 'getMarineLicenceService').mockReturnValue(
+        {
+          getMarineLicenceById: vi
+            .fn()
+            .mockResolvedValue({ taskList: { siteDetails: 'IN_PROGRESS' } })
+        }
+      )
+
       const h = createMockHandler('redirect')
       const request = createMockRequest({ payload: {} })
       request.yar.flash.mockReturnValue([
@@ -403,6 +567,66 @@ describe('#reviewSiteDetails', () => {
       expect(h.redirect).toHaveBeenCalledWith(
         marineLicenceRoutes.MARINE_LICENCE_CHECK_YOUR_ANSWERS
       )
+    })
+
+    test('should show a validation error rather than redirecting when flash returnTo is set but siteDetails is COMPLETED and no answer is given', async () => {
+      getMarineLicenceCacheSpy.mockReturnValueOnce({
+        id: 'test-id',
+        siteDetails: []
+      })
+      vi.spyOn(marineLicenceService, 'getMarineLicenceService').mockReturnValue(
+        {
+          getMarineLicenceById: vi.fn().mockResolvedValue({
+            ...mockFileUploadMarineLicence,
+            taskList: { siteDetails: 'COMPLETED' }
+          })
+        }
+      )
+
+      const h = createMockHandler()
+      const request = createMockRequest({ payload: {} })
+      request.yar.flash.mockReturnValue([
+        marineLicenceRoutes.MARINE_LICENCE_CHECK_YOUR_ANSWERS
+      ])
+
+      await reviewSiteDetailsSubmitController.handler(request, h)
+
+      expect(h.redirect).toBeUndefined()
+      expect(h.view).toHaveBeenCalledWith(
+        FILE_UPLOAD_REVIEW_VIEW_ROUTE,
+        expect.objectContaining({
+          errorSummary: [
+            expect.objectContaining({
+              text: 'Select if you have finished entering your site details'
+            })
+          ]
+        })
+      )
+    })
+
+    test('should clear the returnTo cache when siteDetails is COMPLETED so a stale flash does not linger', async () => {
+      getMarineLicenceCacheSpy.mockReturnValueOnce({
+        id: 'test-id',
+        siteDetails: []
+      })
+      vi.spyOn(marineLicenceService, 'getMarineLicenceService').mockReturnValue(
+        {
+          getMarineLicenceById: vi.fn().mockResolvedValue({
+            ...mockFileUploadMarineLicence,
+            taskList: { siteDetails: 'COMPLETED' }
+          })
+        }
+      )
+
+      const h = createMockHandler('redirect')
+      const request = createMockRequest({
+        payload: { finishedEnteringSiteDetails: 'no' }
+      })
+
+      await reviewSiteDetailsSubmitController.handler(request, h)
+
+      expect(request.yar.flash).toHaveBeenCalledWith(RETURN_TO_CACHE_KEY)
+      expect(request.yar.clear).toHaveBeenCalledWith(RETURN_TO_CACHE_KEY)
     })
 
     test('should call the API and redirect to review page with the next activity anchor', async () => {

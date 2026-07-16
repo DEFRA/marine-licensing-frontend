@@ -1,7 +1,9 @@
 import { isInvoiceAddressUkOrInternationalRoutes } from '#src/server/marine-licence/invoicing/is-invoice-address-uk-or-international/index.js'
 import { ukInvoiceAddressRoutes } from '#src/server/marine-licence/invoicing/uk-invoice-address/index.js'
+import { internationalInvoiceAddressRoutes } from '#src/server/marine-licence/invoicing/international-invoice-address/index.js'
 
 export const invoicingRoutes = [
   ...isInvoiceAddressUkOrInternationalRoutes,
-  ...ukInvoiceAddressRoutes
+  ...ukInvoiceAddressRoutes,
+  ...internationalInvoiceAddressRoutes
 ]

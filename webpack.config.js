@@ -93,6 +93,7 @@ export default {
               sassOptions: {
                 loadPaths: [
                   '.',
+                  'node_modules/accessible-autocomplete/dist',
                   'node_modules/@ministryofjustice/frontend',
                   'node_modules/govuk-frontend/dist',
                   path.join(dirname, 'src/client/stylesheets'),

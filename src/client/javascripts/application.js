@@ -12,6 +12,7 @@ import {
 } from 'govuk-frontend'
 import { SortableTable } from '@ministryofjustice/frontend'
 
+import { AccessibleAutocomplete } from './accessible-autocomplete/index.js'
 import { AddAnotherPoint } from './add-another-point/index.js'
 import { BackLinkHistory } from './back-link-history/index.js'
 import { IatAnswerPrint } from './iat-answer-print/index.js'
@@ -26,6 +27,7 @@ createAll(Radios)
 createAll(SkipLink)
 createAll(FileUpload)
 createAll(SortableTable)
+createAll(AccessibleAutocomplete)
 
 function syncClarityConsent() {
   if (

@@ -1,6 +1,5 @@
 @use 'govuk-frontend' as *;
-
-@import 'accessible-autocomplete.min';
+@use 'accessible-autocomplete.min';
 
 [data-module='app-accessible-autocomplete'] {
   .govuk-select {

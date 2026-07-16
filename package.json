@@ -90,7 +90,7 @@
     "@vitest/runner": "^4.1.4",
     "@vitest/ui": "^4.1.4",
     "allure-commandline": "^2.43.0",
-    "allure-vitest": "^3.6.0",
+    "allure-vitest": "^3.10.2",
     "autoprefixer": "^10.5.2",
     "babel-loader": "^10.1.1",
     "cheerio": "^1.2.0",

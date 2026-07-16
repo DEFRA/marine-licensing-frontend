@@ -1,4 +1,7 @@
 import { Component } from 'govuk-frontend'
+import accessibleAutocomplete from 'accessible-autocomplete'
+
+import { dropdownArrowDown } from './dropdown-arrow-down.js'
 
 export class AccessibleAutocomplete extends Component {
   /**
@@ -13,33 +16,14 @@ export class AccessibleAutocomplete extends Component {
       return
     }
 
-    const accessibleAutocomplete = globalThis.accessibleAutocomplete
-
-    if (typeof accessibleAutocomplete?.enhanceSelectElement !== 'function') {
-      return
-    }
-
     accessibleAutocomplete.enhanceSelectElement({
       selectElement: this.$select,
       defaultValue: '',
       showAllValues: true,
       confirmOnBlur: false,
-      inputClasses: 'govuk-input'
+      inputClasses: 'govuk-input',
+      dropdownArrow: dropdownArrowDown
     })
-
-    this.$input = document.getElementById(
-      this.$select.id.replace(/-select$/, '')
-    )
-
-    this.$arrow = this.$root.querySelector('.autocomplete__dropdown-arrow-down')
-
-    if (
-      this.$arrow instanceof SVGSVGElement &&
-      !this.$arrow.getAttribute('viewBox')
-    ) {
-      this.$arrow.setAttribute('viewBox', '0 0 22 17')
-      this.$arrow.setAttribute('preserveAspectRatio', 'none')
-    }
   }
 
   static moduleName = 'app-accessible-autocomplete'

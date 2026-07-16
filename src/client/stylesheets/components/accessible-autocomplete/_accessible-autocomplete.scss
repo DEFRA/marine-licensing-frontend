@@ -1,6 +1,6 @@
 @use 'govuk-frontend' as *;
 
-@import 'accessible-autocomplete.min.css';
+@import 'accessible-autocomplete.min';
 
 [data-module='app-accessible-autocomplete'] {
   .govuk-select {
@@ -23,20 +23,20 @@
   position: relative;
 
   .autocomplete__input {
-    padding-right: 40px;
+    padding-right: govuk-spacing(7);
   }
 
   .autocomplete__menu {
     .autocomplete__option {
-      padding: 10px 15px;
+      padding: govuk-spacing(2) govuk-spacing(3);
     }
   }
 
   .autocomplete__dropdown-arrow-down {
     z-index: 1;
-    right: 15px;
-    top: 16px;
-    width: 16px;
-    height: 8px;
+    right: govuk-spacing(3);
+    top: govuk-spacing(3);
+    width: govuk-spacing(3);
+    height: govuk-spacing(2);
   }
 }

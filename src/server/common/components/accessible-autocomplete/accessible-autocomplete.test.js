@@ -19,10 +19,5 @@ describe('AccessibleAutocomplete component', () => {
     expect($wrapper.find('select#country')).toHaveLength(1)
     expect($wrapper.find('select#country').attr('name')).toBe('country')
     expect($wrapper.find('option')).toHaveLength(3)
-    expect(
-      $component(
-        'script[src="/public/javascripts/accessible-autocomplete.min.js"]'
-      )
-    ).toHaveLength(1)
   })
 })

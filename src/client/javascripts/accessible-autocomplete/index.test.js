@@ -1,6 +1,8 @@
 // @vitest-environment jsdom
 import { describe, expect, test, vi, beforeEach } from 'vitest'
 
+const enhanceSelectElement = vi.fn()
+
 vi.mock('govuk-frontend', () => ({
   Component: class {
     constructor($root) {
@@ -9,23 +11,15 @@ vi.mock('govuk-frontend', () => ({
   }
 }))
 
+vi.mock('accessible-autocomplete', () => ({
+  default: { enhanceSelectElement }
+}))
+
 const { AccessibleAutocomplete } = await import('./index.js')
 
 describe('AccessibleAutocomplete', () => {
-  let enhanceSelectElement
-
   beforeEach(() => {
-    enhanceSelectElement = vi.fn(({ selectElement }) => {
-      selectElement.id = `${selectElement.id}-select`
-      selectElement.style.display = 'none'
-
-      const input = document.createElement('input')
-      input.id = 'country'
-      input.type = 'text'
-      selectElement.parentNode.insertBefore(input, selectElement)
-    })
-
-    globalThis.accessibleAutocomplete = { enhanceSelectElement }
+    enhanceSelectElement.mockClear()
 
     document.body.innerHTML = `
       <div data-module="app-accessible-autocomplete">
@@ -51,29 +45,20 @@ describe('AccessibleAutocomplete', () => {
 
     new AccessibleAutocomplete($root) // eslint-disable-line no-new
 
-    expect(enhanceSelectElement).toHaveBeenCalledWith({
-      selectElement: expect.any(HTMLSelectElement),
-      defaultValue: '',
-      showAllValues: true,
-      confirmOnBlur: false,
-      inputClasses: 'govuk-input'
-    })
+    expect(enhanceSelectElement).toHaveBeenCalledWith(
+      expect.objectContaining({
+        selectElement: expect.any(HTMLSelectElement),
+        defaultValue: '',
+        showAllValues: true,
+        confirmOnBlur: false,
+        inputClasses: 'govuk-input'
+      })
+    )
   })
 
   test('does nothing when there is no select', () => {
     document.body.innerHTML =
       '<div data-module="app-accessible-autocomplete"></div>'
-    const $root = document.querySelector(
-      '[data-module="app-accessible-autocomplete"]'
-    )
-
-    new AccessibleAutocomplete($root) // eslint-disable-line no-new
-
-    expect(enhanceSelectElement).not.toHaveBeenCalled()
-  })
-
-  test('does nothing when the library is not on window', () => {
-    delete globalThis.accessibleAutocomplete
     const $root = document.querySelector(
       '[data-module="app-accessible-autocomplete"]'
     )

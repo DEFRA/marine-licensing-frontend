@@ -93,6 +93,12 @@ export const mockMarineLicenceApplication = {
       addressTown: 'Example town',
       addressCounty: 'Example country',
       addressPostcode: 'AA1 1AA'
+    },
+    invoiceContactDetails: {
+      fullName: 'Jon Doe',
+      organisationName: 'Example Organisation',
+      phoneNumber: '0191 111 1111',
+      emailAddress: 'john.doe@example.com'
     }
   },
   publicConsultation: {

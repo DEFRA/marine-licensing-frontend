@@ -1,5 +1,5 @@
 import { vi } from 'vitest'
-import { internationalInvoiceAddressSubmitController } from '#src/server/marine-licence/invoicing/international-invoice-address/controller.js'
+import { invoiceContactDetailsSubmitController } from '#src/server/marine-licence/invoicing/invoice-contact-details/controller.js'
 import * as cacheUtils from '#src/server/common/helpers/marine-licence/session-cache/utils.js'
 import * as authRequests from '#src/server/common/helpers/authenticated-requests.js'
 import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
@@ -8,14 +8,14 @@ import { createMockH } from '#src/server/test-helpers/mocks/helpers.js'
 
 vi.mock('#/src/server/common/helpers/marine-licence/session-cache/utils.js')
 
-describe('#internationalInvoiceAddress', () => {
+describe('#invoiceContactDetails', () => {
   const h = createMockH()
 
   beforeEach(() => {
     vi.spyOn(cacheUtils, 'getMarineLicenceCache').mockReturnValue({
       ...mockMarineLicenceApplication,
       invoicing: {
-        invoiceAddressType: 'international'
+        invoiceAddressType: 'uk'
       }
     })
     vi.spyOn(authRequests, 'authenticatedPatchRequest')
@@ -26,14 +26,16 @@ describe('#internationalInvoiceAddress', () => {
     vi.restoreAllMocks()
   })
 
-  describe('#internationalInvoiceAddressSubmitController', () => {
-    test('Should save to cache and redirect to invoice contact details without calling the backend', async () => {
+  describe('#invoiceContactDetailsSubmitController', () => {
+    test('Should save to cache and redirect to the same page without calling the backend', async () => {
       const payload = {
-        country: 'united kingdom',
-        address: '123 Example Street\nExampletown\nExampleshire'
+        fullName: 'Jane Smith',
+        organisationName: 'Example Organisation',
+        phoneNumber: '0191 376 2791',
+        emailAddress: 'jane.smith@example.com'
       }
 
-      await internationalInvoiceAddressSubmitController.handler(
+      await invoiceContactDetailsSubmitController.handler(
         {
           payload,
           query: {}
@@ -48,8 +50,8 @@ describe('#internationalInvoiceAddress', () => {
         {
           ...mockMarineLicenceApplication,
           invoicing: {
-            invoiceAddressType: 'international',
-            invoiceAddress: {
+            invoiceAddressType: 'uk',
+            invoiceContactDetails: {
               ...payload
             }
           }

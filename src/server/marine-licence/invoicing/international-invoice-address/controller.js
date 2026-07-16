@@ -78,7 +78,7 @@ export const internationalInvoiceAddressSubmitController = {
     })
 
     return h.redirect(
-      marineLicenceRoutes.MARINE_LICENCE_INTERNATIONAL_INVOICE_ADDRESS
+      marineLicenceRoutes.MARINE_LICENCE_INVOICE_CONTACT_DETAILS
     )
   }
 }

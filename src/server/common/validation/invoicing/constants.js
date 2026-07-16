@@ -48,3 +48,18 @@ export const internationalInvoiceAddressErrorMessages = {
   INVOICING_ADDRESS_REQUIRED: 'Enter the address',
   INVOICING_ADDRESS_MAX_LENGTH: 'Address must be 300 characters or fewer'
 }
+
+const INVOICE_CONTACT_DETAILS_TITLE = 'Invoice contact details'
+
+export const invoiceContactDetailsSettings = {
+  pageTitle: INVOICE_CONTACT_DETAILS_TITLE,
+  heading: INVOICE_CONTACT_DETAILS_TITLE
+}
+
+export const invoiceContactDetailsErrorMessages = {
+  INVOICING_CONTACT_FULL_NAME_REQUIRED: 'Enter the full name',
+  INVOICING_CONTACT_ORGANISATION_NAME_REQUIRED: 'Enter the organisation name',
+  INVOICING_CONTACT_PHONE_NUMBER_REQUIRED: 'Enter the phone number',
+  INVOICING_CONTACT_EMAIL_ADDRESS_REQUIRED: 'Enter the email address',
+  INVOICING_CONTACT_EMAIL_ADDRESS_INVALID: "Enter an email address in the correct format, like name@example.com"
+}

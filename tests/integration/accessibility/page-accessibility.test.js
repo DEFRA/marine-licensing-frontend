@@ -231,6 +231,11 @@ describe('Page accessibility checks (Axe)', () => {
       isMarineLicence: true
     },
     {
+      url: marineLicenceRoutes.MARINE_LICENCE_INVOICE_CONTACT_DETAILS,
+      title: 'Invoice contact details',
+      isMarineLicence: true
+    },
+    {
       url: marineLicenceRoutes.MARINE_LICENCE_PUBLIC_REGISTER,
       title: 'Sharing your project information publicly',
       isMarineLicence: true

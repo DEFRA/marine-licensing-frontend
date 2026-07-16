@@ -160,7 +160,7 @@ describe('International invoice address', () => {
     })
   })
 
-  test('should stay on the same page on valid submission', async () => {
+  test('should redirect to invoice contact details on valid submission', async () => {
     mockMarineLicence(mockInternationalMarineLicence)
 
     const { response } = await submitForm({
@@ -175,7 +175,7 @@ describe('International invoice address', () => {
 
     expect(response.statusCode).toBe(statusCodes.redirect)
     expect(response.headers.location).toBe(
-      marineLicenceRoutes.MARINE_LICENCE_INTERNATIONAL_INVOICE_ADDRESS
+      marineLicenceRoutes.MARINE_LICENCE_INVOICE_CONTACT_DETAILS
     )
   })
 })

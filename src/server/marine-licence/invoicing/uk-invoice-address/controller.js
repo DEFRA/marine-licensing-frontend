@@ -78,6 +78,8 @@ export const ukInvoiceAddressSubmitController = {
       }
     })
 
-    return h.redirect(marineLicenceRoutes.MARINE_LICENCE_UK_INVOICE_ADDRESS)
+    return h.redirect(
+      marineLicenceRoutes.MARINE_LICENCE_INVOICE_CONTACT_DETAILS
+    )
   }
 }

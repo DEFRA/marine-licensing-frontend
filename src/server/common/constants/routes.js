@@ -56,6 +56,8 @@ export const marineLicenceRoutes = {
   MARINE_LICENCE_UK_INVOICE_ADDRESS: '/marine-licence/uk-invoice-address',
   MARINE_LICENCE_INTERNATIONAL_INVOICE_ADDRESS:
     '/marine-licence/international-invoice-address',
+  MARINE_LICENCE_INVOICE_CONTACT_DETAILS:
+    '/marine-licence/invoice-contact-details',
   MARINE_LICENCE_PROJECT_BACKGROUND: '/marine-licence/project-background',
   MARINE_LICENCE_SITE_DETAILS: '/marine-licence/site-details',
   MARINE_LICENCE_COORDINATES_TYPE_CHOICE:

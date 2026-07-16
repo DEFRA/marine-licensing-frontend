@@ -24,7 +24,7 @@ describe('#ukInvoiceAddress', () => {
   })
 
   describe('#ukInvoiceAddressSubmitController', () => {
-    test('Should save to cache and redirect to the same page without calling the backend', async () => {
+    test('Should save to cache and redirect to invoice contact details without calling the backend', async () => {
       const payload = {
         addressLine1: '123 Example Street',
         addressLine2: 'Flat 2',
@@ -48,7 +48,7 @@ describe('#ukInvoiceAddress', () => {
         {
           ...mockMarineLicenceApplication,
           invoicing: {
-            invoiceAddressType: 'uk',
+            ...mockMarineLicenceApplication.invoicing,
             invoiceAddress: {
               ...payload
             }
@@ -56,7 +56,7 @@ describe('#ukInvoiceAddress', () => {
         }
       )
       expect(h.redirect).toHaveBeenCalledWith(
-        marineLicenceRoutes.MARINE_LICENCE_UK_INVOICE_ADDRESS
+        marineLicenceRoutes.MARINE_LICENCE_INVOICE_CONTACT_DETAILS
       )
       expect(h.view).not.toHaveBeenCalled()
     })

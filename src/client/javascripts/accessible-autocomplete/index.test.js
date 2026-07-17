@@ -19,7 +19,7 @@ const { AccessibleAutocomplete } = await import('./index.js')
 
 describe('AccessibleAutocomplete', () => {
   beforeEach(() => {
-    enhanceSelectElement.mockClear()
+    enhanceSelectElement.mockReset()
 
     document.body.innerHTML = `
       <div data-module="app-accessible-autocomplete">
@@ -54,6 +54,79 @@ describe('AccessibleAutocomplete', () => {
         inputClasses: 'govuk-input'
       })
     )
+  })
+
+  test('removes the name from the select and creates a hidden field to submit the typed value', () => {
+    const $root = document.querySelector(
+      '[data-module="app-accessible-autocomplete"]'
+    )
+    const $select = $root.querySelector('select')
+    $select.value = 'United Kingdom'
+
+    enhanceSelectElement.mockImplementation(({ selectElement }) => {
+      const $input = document.createElement('input')
+      $input.id = selectElement.id
+      $input.className = 'govuk-input'
+      selectElement.parentNode.insertBefore($input, selectElement)
+      selectElement.id = `${selectElement.id}-select`
+    })
+
+    new AccessibleAutocomplete($root) // eslint-disable-line no-new
+
+    expect($select.getAttribute('name')).toBeNull()
+
+    const $hiddenInput = $root.querySelector('input[type="hidden"]')
+    expect($hiddenInput.name).toBe('country')
+    expect($hiddenInput.value).toBe('United Kingdom')
+  })
+
+  test('mirrors whatever is typed into the hidden field as the user types', () => {
+    const $root = document.querySelector(
+      '[data-module="app-accessible-autocomplete"]'
+    )
+
+    enhanceSelectElement.mockImplementation(({ selectElement }) => {
+      const $input = document.createElement('input')
+      $input.id = selectElement.id
+      $input.className = 'govuk-input'
+      selectElement.parentNode.insertBefore($input, selectElement)
+      selectElement.id = `${selectElement.id}-select`
+    })
+
+    new AccessibleAutocomplete($root) // eslint-disable-line no-new
+
+    const $input = document.getElementById('country')
+    $input.value = 'Not a real country'
+    $input.dispatchEvent(new Event('input'))
+
+    const $hiddenInput = $root.querySelector('input[type="hidden"]')
+    expect($hiddenInput.value).toBe('Not a real country')
+  })
+
+  test('updates the hidden field via onConfirm when a suggestion is clicked or entered', () => {
+    const $root = document.querySelector(
+      '[data-module="app-accessible-autocomplete"]'
+    )
+
+    enhanceSelectElement.mockImplementation(({ selectElement }) => {
+      const $input = document.createElement('input')
+      $input.id = selectElement.id
+      $input.className = 'govuk-input'
+      selectElement.parentNode.insertBefore($input, selectElement)
+      selectElement.id = `${selectElement.id}-select`
+    })
+
+    new AccessibleAutocomplete($root) // eslint-disable-line no-new
+
+    const $input = document.getElementById('country')
+    $input.value = 'Fra'
+    $input.dispatchEvent(new Event('input'))
+
+    const { onConfirm } = enhanceSelectElement.mock.calls[0][0]
+    onConfirm('France')
+
+    const $hiddenInput = $root.querySelector('input[type="hidden"]')
+    expect($hiddenInput.value).toBe('France')
   })
 
   test('does nothing when there is no select', () => {

@@ -54,10 +54,7 @@ describe('Invoice contact details', () => {
     getByLabelText(document, 'Phone number')
     getByLabelText(document, 'Email address')
     expect(
-      getByText(
-        document,
-        'For international numbers include the country code'
-      )
+      getByText(document, 'For international numbers include the country code')
     ).toBeInTheDocument()
   })
 

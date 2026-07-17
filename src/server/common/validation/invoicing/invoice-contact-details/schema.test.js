@@ -53,7 +53,6 @@ describe('#invoiceContactDetailsSchema', () => {
     expect(error.message).toBe('INVOICING_CONTACT_PHONE_NUMBER_REQUIRED')
   })
 
-
   test('should fail when phone number is invalid', () => {
     const { error } = invoiceContactDetailsSchema.validate({
       ...validContactDetails,

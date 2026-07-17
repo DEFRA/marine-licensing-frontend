@@ -58,12 +58,16 @@ export const invoiceContactDetailsSettings = {
 
 export const invoiceContactDetailsErrorMessages = {
   INVOICING_CONTACT_FULL_NAME_REQUIRED: 'Enter the full name',
-  INVOICING_CONTACT_FULL_NAME_MAX_LENGTH: 'Full name must be 100 characters or fewer',
+  INVOICING_CONTACT_FULL_NAME_MAX_LENGTH:
+    'Full name must be 100 characters or fewer',
   INVOICING_CONTACT_ORGANISATION_NAME_REQUIRED: 'Enter the organisation name',
-  INVOICING_CONTACT_ORGANISATION_NAME_MAX_LENGTH: 'Organisation name must be 100 characters or fewer',
+  INVOICING_CONTACT_ORGANISATION_NAME_MAX_LENGTH:
+    'Organisation name must be 100 characters or fewer',
   INVOICING_CONTACT_PHONE_NUMBER_REQUIRED: 'Enter the phone number',
   INVOICING_CONTACT_PHONE_NUMBER_INVALID: 'Enter a valid phone number',
   INVOICING_CONTACT_EMAIL_ADDRESS_REQUIRED: 'Enter the email address',
-  INVOICING_CONTACT_EMAIL_ADDRESS_MAX_LENGTH: 'Email address must be 254 characters or fewer',
-  INVOICING_CONTACT_EMAIL_ADDRESS_INVALID: "Enter an email address in the correct format, like name@example.com"
+  INVOICING_CONTACT_EMAIL_ADDRESS_MAX_LENGTH:
+    'Email address must be 254 characters or fewer',
+  INVOICING_CONTACT_EMAIL_ADDRESS_INVALID:
+    'Enter an email address in the correct format, like name@example.com'
 }

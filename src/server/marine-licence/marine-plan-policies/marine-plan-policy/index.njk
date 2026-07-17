@@ -3,6 +3,7 @@
 {% from "govuk/components/back-link/macro.njk" import govukBackLink %}
 {% from "govuk/components/button/macro.njk" import govukButton %}
 {% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+{% from "marine-licence/policy-wording/macro.njk" import appMarineLicencePolicyWording %}
 
 {% block beforeContent %}
 {{ super() }}
@@ -29,7 +30,7 @@
       <h1 class="govuk-heading-l">{{ heading }}</h1>
 
       <h2 class="govuk-heading-m">Policy information</h2>
-      <p class="govuk-body">{{ policyText }}</p>
+      {{ appMarineLicencePolicyWording({ html: policyText }) }}
 
       <p class="govuk-body">
         <a class="govuk-link" href="{{ findOutMoreUrl }}" target="_blank" rel="noopener noreferrer">Find out more detailed information about this policy (opens in a new tab)</a>.

@@ -37,7 +37,7 @@ describe('#invoiceContactDetailsSchema', () => {
     expect(error.message).toBe('INVOICING_CONTACT_ORGANISATION_NAME_REQUIRED')
   })
 
-  test('should fail when organisation name is missing', () => {
+  test('should fail when organisation name is too long', () => {
     const { error } = invoiceContactDetailsSchema.validate({
       ...validContactDetails,
       organisationName: 'a'.repeat(101)

@@ -47,17 +47,19 @@
           value: payload.fullName
         }) }}
 
-        {{ govukInput({
-          label: {
-            text: "Organisation name",
-            classes: 'govuk-label--s'
-          },
-          id: "organisationName",
-          name: "organisationName",
-          autocomplete: "organization",
-          errorMessage: errors['organisationName'],
-          value: payload.organisationName
-        }) }}
+        {% if not isIndividual %}
+          {{ govukInput({
+            label: {
+              text: "Organisation name",
+              classes: 'govuk-label--s'
+            },
+            id: "organisationName",
+            name: "organisationName",
+            autocomplete: "organization",
+            errorMessage: errors['organisationName'],
+            value: payload.organisationName
+          }) }}
+        {% endif %}
 
         {{ govukInput({
           label: {
@@ -93,7 +95,7 @@
 
         <div class="govuk-button-group">
           {{ govukButton({
-            text: "Continue",
+            text: "Save and continue" if isIndividual else "Continue",
             classes: "govuk-button--primary"
           }) }}
           {{ appCancelButton({

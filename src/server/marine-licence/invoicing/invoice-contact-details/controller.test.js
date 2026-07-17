@@ -1,7 +1,11 @@
 import { vi } from 'vitest'
-import { invoiceContactDetailsSubmitController } from '#src/server/marine-licence/invoicing/invoice-contact-details/controller.js'
+import {
+  invoiceContactDetailsController,
+  invoiceContactDetailsSubmitController
+} from '#src/server/marine-licence/invoicing/invoice-contact-details/controller.js'
 import * as cacheUtils from '#src/server/common/helpers/marine-licence/session-cache/utils.js'
 import * as authRequests from '#src/server/common/helpers/authenticated-requests.js'
+import * as authUtils from '#src/server/common/plugins/auth/utils.js'
 import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
 import { mockMarineLicenceApplication } from '#src/server/test-helpers/mocks/marine-licence-mocks.js'
 import { createMockH } from '#src/server/test-helpers/mocks/helpers.js'
@@ -20,10 +24,37 @@ describe('#invoiceContactDetails', () => {
     })
     vi.spyOn(authRequests, 'authenticatedPatchRequest')
     vi.spyOn(cacheUtils, 'setMarineLicenceCache').mockResolvedValue()
+    vi.spyOn(authUtils, 'getUserSession').mockResolvedValue({
+      userRelationshipType: 'Agent'
+    })
   })
 
   afterEach(() => {
     vi.restoreAllMocks()
+  })
+
+  describe('#invoiceContactDetailsController', () => {
+    test('Should pass isIndividual as false for a non-citizen user', async () => {
+      await invoiceContactDetailsController.handler({ query: {} }, h)
+
+      expect(h.view).toHaveBeenCalledWith(
+        expect.any(String),
+        expect.objectContaining({ isIndividual: false })
+      )
+    })
+
+    test('Should pass isIndividual as true for a citizen user', async () => {
+      authUtils.getUserSession.mockResolvedValue({
+        userRelationshipType: 'Citizen'
+      })
+
+      await invoiceContactDetailsController.handler({ query: {} }, h)
+
+      expect(h.view).toHaveBeenCalledWith(
+        expect.any(String),
+        expect.objectContaining({ isIndividual: true })
+      )
+    })
   })
 
   describe('#invoiceContactDetailsSubmitController', () => {

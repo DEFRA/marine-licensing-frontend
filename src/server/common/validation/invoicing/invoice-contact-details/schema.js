@@ -12,16 +12,27 @@ export const invoiceContactDetailsSchema = joi.object({
     'string.max': 'INVOICING_CONTACT_FULL_NAME_MAX_LENGTH',
     'any.required': 'INVOICING_CONTACT_FULL_NAME_REQUIRED'
   }),
-  organisationName: joi
-    .string()
-    .trim()
-    .required()
-    .max(ORGANISATION_MAX_LENGTH)
-    .messages({
-      'string.empty': 'INVOICING_CONTACT_ORGANISATION_NAME_REQUIRED',
-      'string.max': 'INVOICING_CONTACT_ORGANISATION_NAME_MAX_LENGTH',
-      'any.required': 'INVOICING_CONTACT_ORGANISATION_NAME_REQUIRED'
-    }),
+  organisationName: joi.when('$isIndividual', {
+    is: true,
+    then: joi
+      .string()
+      .trim()
+      .allow('')
+      .max(ORGANISATION_MAX_LENGTH)
+      .messages({
+        'string.max': 'INVOICING_CONTACT_ORGANISATION_NAME_MAX_LENGTH'
+      }),
+    otherwise: joi
+      .string()
+      .trim()
+      .required()
+      .max(ORGANISATION_MAX_LENGTH)
+      .messages({
+        'string.empty': 'INVOICING_CONTACT_ORGANISATION_NAME_REQUIRED',
+        'string.max': 'INVOICING_CONTACT_ORGANISATION_NAME_MAX_LENGTH',
+        'any.required': 'INVOICING_CONTACT_ORGANISATION_NAME_REQUIRED'
+      })
+  }),
   phoneNumber: joi
     .string()
     .trim()

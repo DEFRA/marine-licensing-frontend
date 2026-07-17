@@ -107,4 +107,33 @@ describe('#invoiceContactDetailsSchema', () => {
     expect(error).toBeUndefined()
     expect(value).toEqual(validContactDetails)
   })
+
+  describe('when the user is an individual', () => {
+    const citizenContext = {
+      context: { isIndividual: true }
+    }
+
+    test('should validate when organisation name is missing', () => {
+      const { error } = invoiceContactDetailsSchema.validate(
+        {
+          ...validContactDetails,
+          organisationName: undefined
+        },
+        citizenContext
+      )
+      expect(error).toBeUndefined()
+    })
+
+    test('should validate when organisation name is an empty string', () => {
+      const { error } = invoiceContactDetailsSchema.validate(
+        {
+          ...validContactDetails,
+          organisationName: ''
+        },
+        citizenContext
+      )
+      expect(error).toBeUndefined()
+    })
+
+  })
 })

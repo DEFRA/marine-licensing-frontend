@@ -5,6 +5,7 @@ import {
   setupTestServer
 } from '~/tests/integration/shared/test-setup-helpers.js'
 import { loadPage, submitForm } from '~/tests/integration/shared/app-server.js'
+import { makePostRequest } from '~/src/server/test-helpers/server-requests.js'
 import {
   expectInputError,
   expectInputValue
@@ -12,6 +13,13 @@ import {
 import { statusCodes } from '~/src/server/common/constants/status-codes.js'
 import { invoiceContactDetailsSettings } from '~/src/server/common/validation/invoicing/constants.js'
 import { mockMarineLicenceApplication } from '~/src/server/test-helpers/mocks/marine-licence-mocks.js'
+import {
+  citizenUserSession,
+  agentSession
+} from '~/tests/integration/shared/session-fixtures.js'
+import { getUserSession } from '~/src/server/common/plugins/auth/utils.js'
+
+vi.mock('~/src/server/common/plugins/auth/utils.js')
 
 const mockUkInvoiceMarineLicence = {
   ...mockMarineLicenceApplication,
@@ -29,6 +37,10 @@ const mockInternationalInvoiceMarineLicence = {
 
 describe('Invoice contact details', () => {
   const getServer = setupTestServer()
+
+  beforeEach(() => {
+    vi.mocked(getUserSession).mockResolvedValue(agentSession)
+  })
 
   test('page elements', async () => {
     mockMarineLicence(mockUkInvoiceMarineLicence)
@@ -56,6 +68,34 @@ describe('Invoice contact details', () => {
     expect(
       getByText(document, 'For international numbers include the country code')
     ).toBeInTheDocument()
+  })
+
+  test('shows "Continue" button and organisation name field for an agent', async () => {
+    vi.mocked(getUserSession).mockResolvedValue(agentSession)
+    mockMarineLicence(mockUkInvoiceMarineLicence)
+
+    const document = await loadPage({
+      requestUrl: marineLicenceRoutes.MARINE_LICENCE_INVOICE_CONTACT_DETAILS,
+      server: getServer()
+    })
+
+    expect(
+      getByRole(document, 'button', { name: 'Continue' })
+    ).toBeInTheDocument()
+    expect(getByLabelText(document, 'Organisation name')).toBeInTheDocument()
+  })
+
+  test('shows "Save and continue" button and hides organisation name field for a citizen', async () => {
+    vi.mocked(getUserSession).mockResolvedValue(citizenUserSession)
+    mockMarineLicence(mockUkInvoiceMarineLicence)
+
+    const document = await loadPage({
+      requestUrl: marineLicenceRoutes.MARINE_LICENCE_INVOICE_CONTACT_DETAILS,
+      server: getServer()
+    })
+
+    getByRole(document, 'button', { name: 'Save and continue' })
+    expect(document.querySelector('#organisationName')).not.toBeInTheDocument()
   })
 
   test('back link goes to UK invoice address when address type is uk', async () => {
@@ -191,6 +231,27 @@ describe('Invoice contact details', () => {
       inputLabel: 'Email address',
       errorMessage: 'Enter the email address'
     })
+  })
+
+  test('should not require organisation name for a citizen submitting without one', async () => {
+    mockMarineLicence(mockUkInvoiceMarineLicence)
+
+    const response = await makePostRequest({
+      url: marineLicenceRoutes.MARINE_LICENCE_INVOICE_CONTACT_DETAILS,
+      server: getServer(),
+      auth: { credentials: { userRelationshipType: 'Citizen' } },
+      formData: {
+        fullName: 'Jane Smith',
+        organisationName: '',
+        phoneNumber: '0191 376 2791',
+        emailAddress: 'jane.smith@example.com'
+      }
+    })
+
+    expect(response.statusCode).toBe(statusCodes.redirect)
+    expect(response.headers.location).toBe(
+      marineLicenceRoutes.MARINE_LICENCE_INVOICE_CONTACT_DETAILS
+    )
   })
 
   test('should stay on the same page on valid submission', async () => {

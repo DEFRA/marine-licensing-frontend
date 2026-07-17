@@ -10,23 +10,38 @@ import {
   invoiceContactDetailsSettings
 } from '#src/server/common/validation/invoicing/constants.js'
 import { getBackLink } from '#src/server/marine-licence/invoicing/invoice-contact-details/utils.js'
+import { isIndividualUser } from '#src/server/common/helpers/user-session-utils.js'
+import { USER_TYPES } from '#src/server/common/constants/user-types.js'
 
 export const INVOICE_CONTACT_DETAILS_VIEW_ROUTE =
   'marine-licence/invoicing/invoice-contact-details/index'
 
 const cancelLink = marineLicenceRoutes.MARINE_LICENCE_TASK_LIST
 
+const validateInvoiceContactDetailsPayload = (value, options) =>
+  invoiceContactDetailsSchema.validateAsync(value, {
+    ...options,
+    context: {
+      ...options.context,
+      isIndividual:
+        options.context?.auth?.credentials?.userRelationshipType ===
+        USER_TYPES.CITIZEN
+    }
+  })
+
 export const invoiceContactDetailsController = {
   async handler(request, h) {
     const marineLicence = getMarineLicenceCache(request)
     const { invoicing } = marineLicence
+    const isIndividual = await isIndividualUser(request)
 
     return h.view(INVOICE_CONTACT_DETAILS_VIEW_ROUTE, {
       ...invoiceContactDetailsSettings,
       projectName: marineLicence.projectName,
       payload: invoicing.invoiceContactDetails ?? {},
       backLink: getBackLink(invoicing.invoiceAddressType),
-      cancelLink
+      cancelLink,
+      isIndividual
     })
   }
 }
@@ -34,9 +49,11 @@ export const invoiceContactDetailsController = {
 export const invoiceContactDetailsSubmitController = {
   options: {
     validate: {
-      payload: invoiceContactDetailsSchema,
-      failAction: (request, h, err) => {
+      payload: validateInvoiceContactDetailsPayload,
+      failAction: async (request, h, err) => {
         const { projectName, invoicing } = getMarineLicenceCache(request)
+        const isIndividual = await isIndividualUser(request)
+
         return createFailAction({
           viewRoute: INVOICE_CONTACT_DETAILS_VIEW_ROUTE,
           settings: invoiceContactDetailsSettings,
@@ -44,7 +61,7 @@ export const invoiceContactDetailsSubmitController = {
           projectName,
           backLink: getBackLink(invoicing?.invoiceAddressType),
           payload: request.payload,
-          params: { cancelLink }
+          params: { cancelLink, isIndividual }
         })(request, h, err)
       }
     }

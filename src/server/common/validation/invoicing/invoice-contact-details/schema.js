@@ -14,14 +14,9 @@ export const invoiceContactDetailsSchema = joi.object({
   }),
   organisationName: joi.when('$isIndividual', {
     is: true,
-    then: joi
-      .string()
-      .trim()
-      .allow('')
-      .max(ORGANISATION_MAX_LENGTH)
-      .messages({
-        'string.max': 'INVOICING_CONTACT_ORGANISATION_NAME_MAX_LENGTH'
-      }),
+    then: joi.string().trim().allow('').max(ORGANISATION_MAX_LENGTH).messages({
+      'string.max': 'INVOICING_CONTACT_ORGANISATION_NAME_MAX_LENGTH'
+    }),
     otherwise: joi
       .string()
       .trim()

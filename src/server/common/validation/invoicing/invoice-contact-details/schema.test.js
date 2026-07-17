@@ -134,6 +134,5 @@ describe('#invoiceContactDetailsSchema', () => {
       )
       expect(error).toBeUndefined()
     })
-
   })
 })

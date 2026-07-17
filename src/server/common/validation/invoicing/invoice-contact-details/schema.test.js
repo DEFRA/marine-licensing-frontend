@@ -21,12 +21,28 @@ describe('#invoiceContactDetailsSchema', () => {
     expect(error.message).toBe('INVOICING_CONTACT_FULL_NAME_REQUIRED')
   })
 
+  test('should fail when full name is too long', () => {
+    const { error } = invoiceContactDetailsSchema.validate({
+      ...validContactDetails,
+      fullName: 'a'.repeat(101)
+    })
+    expect(error.message).toBe('INVOICING_CONTACT_FULL_NAME_MAX_LENGTH')
+  })
+
   test('should fail when organisation name is missing', () => {
     const { error } = invoiceContactDetailsSchema.validate({
       ...validContactDetails,
       organisationName: ''
     })
     expect(error.message).toBe('INVOICING_CONTACT_ORGANISATION_NAME_REQUIRED')
+  })
+
+  test('should fail when organisation name is missing', () => {
+    const { error } = invoiceContactDetailsSchema.validate({
+      ...validContactDetails,
+      organisationName: 'a'.repeat(101)
+    })
+    expect(error.message).toBe('INVOICING_CONTACT_ORGANISATION_NAME_MAX_LENGTH')
   })
 
   test('should fail when phone number is missing', () => {
@@ -37,12 +53,29 @@ describe('#invoiceContactDetailsSchema', () => {
     expect(error.message).toBe('INVOICING_CONTACT_PHONE_NUMBER_REQUIRED')
   })
 
+
+  test('should fail when phone number is invalid', () => {
+    const { error } = invoiceContactDetailsSchema.validate({
+      ...validContactDetails,
+      phoneNumber: 'test'
+    })
+    expect(error.message).toBe('INVOICING_CONTACT_PHONE_NUMBER_INVALID')
+  })
+
   test('should fail when email address is missing', () => {
     const { error } = invoiceContactDetailsSchema.validate({
       ...validContactDetails,
       emailAddress: ''
     })
     expect(error.message).toBe('INVOICING_CONTACT_EMAIL_ADDRESS_REQUIRED')
+  })
+
+  test('should fail when email address is too long', () => {
+    const { error } = invoiceContactDetailsSchema.validate({
+      ...validContactDetails,
+      emailAddress: 'a'.repeat(265)
+    })
+    expect(error.message).toBe('INVOICING_CONTACT_EMAIL_ADDRESS_MAX_LENGTH')
   })
 
   test('should fail when email address is invalid', () => {

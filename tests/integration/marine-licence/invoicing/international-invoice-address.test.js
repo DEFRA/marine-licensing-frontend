@@ -112,7 +112,7 @@ describe('International invoice address', () => {
         invoiceAddressType: 'international',
         invoiceAddress: {
           country: 'United Kingdom',
-          address: '123 Example Street\nExampletown'
+          address: '123 Example Street Exampletown'
         }
       }
     })
@@ -131,7 +131,7 @@ describe('International invoice address', () => {
     expectInputValue({
       document,
       inputLabel: 'Address',
-      value: '123 Example Street\nExampletown'
+      value: '123 Example Street Exampletown'
     })
   })
 
@@ -169,7 +169,7 @@ describe('International invoice address', () => {
       server: getServer(),
       formData: {
         country: 'United Kingdom',
-        address: '123 Example Street\nExampletown'
+        address: '123 Example Street Exampletown'
       }
     })
 

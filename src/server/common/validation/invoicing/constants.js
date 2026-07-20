@@ -71,3 +71,19 @@ export const invoiceContactDetailsErrorMessages = {
   INVOICING_CONTACT_EMAIL_ADDRESS_INVALID:
     'Enter an email address in the correct format, like name@example.com'
 }
+
+const PURCHASE_ORDER_DETAILS_TITLE =
+  'Do you require a purchase order number on the invoice?'
+
+export const purchaseOrderDetailsSettings = {
+  pageTitle: PURCHASE_ORDER_DETAILS_TITLE,
+  heading: PURCHASE_ORDER_DETAILS_TITLE
+}
+
+export const purchaseOrderDetailsErrorMessages = {
+  INVOICING_PURCHASE_ORDER_REQUIRED:
+    'Select whether you require a purchase order number on the invoice',
+  INVOICING_PURCHASE_ORDER_NUMBER_REQUIRED: 'Enter the purchase order number',
+  INVOICING_PURCHASE_ORDER_NUMBER_MAX_LENGTH:
+    'Purchase order number must be 30 characters or fewer'
+}

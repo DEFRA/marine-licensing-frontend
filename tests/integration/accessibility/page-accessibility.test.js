@@ -53,6 +53,9 @@ describe('Page accessibility checks (Axe)', () => {
   const getServer = setupTestServer()
 
   beforeEach(() => {
+    vi.mocked(getUserSession).mockReset()
+    vi.mocked(postloginUserSession.get).mockReset()
+
     vi.spyOn(cdpUploadService, 'getCdpUploadService').mockReturnValue({
       getStatus: vi.fn().mockResolvedValue({
         status: 'pending'
@@ -207,7 +210,7 @@ describe('Page accessibility checks (Axe)', () => {
       title:
         'Does your organisation have special legal powers to do any of this project?',
       isMarineLicence: true,
-      session: { ...agentSession, shouldShowOrgOrUserName: false }
+      session: agentSession
     },
     {
       url: marineLicenceRoutes.MARINE_LICENCE_OTHER_AUTHORITIES,
@@ -233,7 +236,14 @@ describe('Page accessibility checks (Axe)', () => {
     {
       url: marineLicenceRoutes.MARINE_LICENCE_INVOICE_CONTACT_DETAILS,
       title: 'Invoice contact details',
-      isMarineLicence: true
+      isMarineLicence: true,
+      session: agentSession
+    },
+    {
+      url: marineLicenceRoutes.MARINE_LICENCE_INVOICE_PURCHASE_ORDER_DETAILS,
+      title: 'Do you require a purchase order number on the invoice?',
+      isMarineLicence: true,
+      session: agentSession
     },
     {
       url: marineLicenceRoutes.MARINE_LICENCE_PUBLIC_REGISTER,
@@ -260,7 +270,7 @@ describe('Page accessibility checks (Axe)', () => {
       url: marineLicenceRoutes.MARINE_LICENCE_TASK_LIST,
       title: 'Marine licence start page',
       isMarineLicence: true,
-      session: { ...agentSession, shouldShowOrgOrUserName: false }
+      session: agentSession
     },
     {
       url: marineLicenceRoutes.MARINE_LICENCE_MARINE_PLAN_POLICIES,
@@ -455,7 +465,7 @@ describe('Page accessibility checks (Axe)', () => {
     {
       url: routes.postLogin.CONFIRM_AGENT,
       title: 'Are you notifying us as an agent or intermediary for Client Org?',
-      session: { ...agentSession, shouldShowOrgOrUserName: false }
+      session: agentSession
     },
     {
       url: routes.postLogin.GUIDANCE_INDIVIDUAL,

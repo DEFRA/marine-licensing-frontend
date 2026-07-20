@@ -99,6 +99,10 @@ export const mockMarineLicenceApplication = {
       organisationName: 'Example Organisation',
       phoneNumber: '0191 111 1111',
       emailAddress: 'john.doe@example.com'
+    },
+    purchaseOrderDetails: {
+      requiresPurchaseOrder: 'yes',
+      purchaseOrderNumber: 'PO-12345'
     }
   },
   publicConsultation: {

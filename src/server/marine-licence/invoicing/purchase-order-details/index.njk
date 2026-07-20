@@ -1,0 +1,57 @@
+{% extends 'layouts/page.njk' %}
+{% from "govuk/components/input/macro.njk" import govukInput %}
+{% from "govuk/components/back-link/macro.njk" import govukBackLink %}
+{% from "radio-page/macro.njk" import appRadioPage %}
+
+{% block beforeContent %}
+{{ super() }}
+<nav>
+  {{ govukBackLink({
+    text: "Back",
+    href: backLink
+  }) }}
+</nav>
+{% endblock %}
+
+{% block content %}
+
+  {% set purchaseOrderNumberHtml %}
+    {{ govukInput({
+      id: "purchaseOrderNumber",
+      name: "purchaseOrderNumber",
+      label: {
+        text: "Enter the purchase order number"
+      },
+      errorMessage: errors['purchaseOrderNumber'],
+      value: payload.purchaseOrderNumber
+    }) }}
+  {% endset -%}
+
+  {{ appRadioPage({
+    name: "requiresPurchaseOrder",
+    errorSummary: errorSummary,
+    errors: errors,
+    heading: heading,
+    isPageHeading: true,
+    value: payload.requiresPurchaseOrder,
+    errorMessage: errors['requiresPurchaseOrder'],
+    projectName: projectName,
+    buttonText: 'Save and continue',
+    items: [
+      {
+        value: "yes",
+        text: "Yes",
+        conditional: {
+          html: purchaseOrderNumberHtml
+        }
+      },
+      {
+        value: "no",
+        text: "No"
+      }
+    ],
+    csrfToken: csrfToken,
+    cancelLink: cancelLink
+  }) }}
+
+{% endblock %}

@@ -250,11 +250,11 @@ describe('Invoice contact details', () => {
 
     expect(response.statusCode).toBe(statusCodes.redirect)
     expect(response.headers.location).toBe(
-      marineLicenceRoutes.MARINE_LICENCE_INVOICE_CONTACT_DETAILS
+      marineLicenceRoutes.MARINE_LICENCE_INVOICE_PURCHASE_ORDER_DETAILS
     )
   })
 
-  test('should stay on the same page on valid submission', async () => {
+  test('should redirect to purchase order details on valid submission', async () => {
     mockMarineLicence(mockUkInvoiceMarineLicence)
 
     const { response } = await submitForm({
@@ -270,7 +270,7 @@ describe('Invoice contact details', () => {
 
     expect(response.statusCode).toBe(statusCodes.redirect)
     expect(response.headers.location).toBe(
-      marineLicenceRoutes.MARINE_LICENCE_INVOICE_CONTACT_DETAILS
+      marineLicenceRoutes.MARINE_LICENCE_INVOICE_PURCHASE_ORDER_DETAILS
     )
   })
 })

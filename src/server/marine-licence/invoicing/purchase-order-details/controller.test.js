@@ -1,18 +1,19 @@
 import { vi } from 'vitest'
 import {
-  invoiceContactDetailsController,
-  invoiceContactDetailsSubmitController
-} from '#src/server/marine-licence/invoicing/invoice-contact-details/controller.js'
+  purchaseOrderDetailsController,
+  purchaseOrderDetailsSubmitController,
+  PURCHASE_ORDER_DETAILS_VIEW_ROUTE
+} from '#src/server/marine-licence/invoicing/purchase-order-details/controller.js'
 import * as cacheUtils from '#src/server/common/helpers/marine-licence/session-cache/utils.js'
-import * as authRequests from '#src/server/common/helpers/authenticated-requests.js'
 import * as authUtils from '#src/server/common/plugins/auth/utils.js'
 import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
 import { mockMarineLicenceApplication } from '#src/server/test-helpers/mocks/marine-licence-mocks.js'
 import { createMockH } from '#src/server/test-helpers/mocks/helpers.js'
 
 vi.mock('#/src/server/common/helpers/marine-licence/session-cache/utils.js')
+vi.mock('#/src/server/common/plugins/auth/utils.js')
 
-describe('#invoiceContactDetails', () => {
+describe('#purchaseOrderDetails', () => {
   const h = createMockH()
 
   beforeEach(() => {
@@ -22,7 +23,6 @@ describe('#invoiceContactDetails', () => {
         invoiceAddressType: 'uk'
       }
     })
-    vi.spyOn(authRequests, 'authenticatedPatchRequest')
     vi.spyOn(cacheUtils, 'setMarineLicenceCache').mockResolvedValue()
     vi.spyOn(authUtils, 'getUserSession').mockResolvedValue({
       userRelationshipType: 'Agent'
@@ -33,48 +33,46 @@ describe('#invoiceContactDetails', () => {
     vi.restoreAllMocks()
   })
 
-  describe('#invoiceContactDetailsController', () => {
-    test('Should pass isIndividual as false for a non-citizen user', async () => {
-      await invoiceContactDetailsController.handler({ query: {} }, h)
+  describe('#purchaseOrderDetailsController', () => {
+    test('Should render the page for a non-citizen user', async () => {
+      await purchaseOrderDetailsController.handler({ query: {} }, h)
 
       expect(h.view).toHaveBeenCalledWith(
-        expect.any(String),
-        expect.objectContaining({ isIndividual: false })
+        PURCHASE_ORDER_DETAILS_VIEW_ROUTE,
+        expect.objectContaining({
+          backLink: marineLicenceRoutes.MARINE_LICENCE_INVOICE_CONTACT_DETAILS,
+          cancelLink: marineLicenceRoutes.MARINE_LICENCE_TASK_LIST,
+          payload: {}
+        })
       )
     })
 
-    test('Should pass isIndividual as true for a citizen user', async () => {
+    test('Should redirect citizens to task list without rendering the page', async () => {
       authUtils.getUserSession.mockResolvedValue({
         userRelationshipType: 'Citizen'
       })
 
-      await invoiceContactDetailsController.handler({ query: {} }, h)
+      await purchaseOrderDetailsController.handler({ query: {} }, h)
 
-      expect(h.view).toHaveBeenCalledWith(
-        expect.any(String),
-        expect.objectContaining({ isIndividual: true })
+      expect(h.redirect).toHaveBeenCalledWith(
+        marineLicenceRoutes.MARINE_LICENCE_TASK_LIST
       )
+      expect(h.view).not.toHaveBeenCalled()
     })
   })
 
-  describe('#invoiceContactDetailsSubmitController', () => {
-    test('Should save to cache and redirect to the same page without calling the backend', async () => {
+  describe('#purchaseOrderDetailsSubmitController', () => {
+    test('Should save requiresPurchaseOrder and purchaseOrderNumber to cache and redirect to the same page', async () => {
       const payload = {
-        fullName: 'Jane Smith',
-        organisationName: 'Example Organisation',
-        phoneNumber: '0191 376 2791',
-        emailAddress: 'jane.smith@example.com'
+        requiresPurchaseOrder: 'yes',
+        purchaseOrderNumber: 'PO-12345'
       }
 
-      await invoiceContactDetailsSubmitController.handler(
-        {
-          payload,
-          query: {}
-        },
+      await purchaseOrderDetailsSubmitController.handler(
+        { payload, query: {} },
         h
       )
 
-      expect(authRequests.authenticatedPatchRequest).not.toHaveBeenCalled()
       expect(cacheUtils.setMarineLicenceCache).toHaveBeenCalledWith(
         expect.anything(),
         h,
@@ -82,8 +80,9 @@ describe('#invoiceContactDetails', () => {
           ...mockMarineLicenceApplication,
           invoicing: {
             invoiceAddressType: 'uk',
-            invoiceContactDetails: {
-              ...payload
+            purchaseOrderDetails: {
+              requiresPurchaseOrder: 'yes',
+              purchaseOrderNumber: 'PO-12345'
             }
           }
         }
@@ -91,7 +90,6 @@ describe('#invoiceContactDetails', () => {
       expect(h.redirect).toHaveBeenCalledWith(
         marineLicenceRoutes.MARINE_LICENCE_INVOICE_PURCHASE_ORDER_DETAILS
       )
-      expect(h.view).not.toHaveBeenCalled()
     })
   })
 })

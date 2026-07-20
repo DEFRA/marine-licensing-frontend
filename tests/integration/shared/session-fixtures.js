@@ -35,7 +35,7 @@ export const agentSession = {
   ...baseSession,
   userRelationshipType: 'Agent',
   organisationName: 'Client Org',
-  shouldShowOrgOrUserName: true
+  shouldShowOrgOrUserName: false
 }
 
 export const agentSessionWithMultipleOrgs = {

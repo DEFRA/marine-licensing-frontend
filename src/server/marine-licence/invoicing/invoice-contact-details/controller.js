@@ -86,7 +86,7 @@ export const invoiceContactDetailsSubmitController = {
     })
 
     return h.redirect(
-      marineLicenceRoutes.MARINE_LICENCE_INVOICE_CONTACT_DETAILS
+      marineLicenceRoutes.MARINE_LICENCE_INVOICE_PURCHASE_ORDER_DETAILS
     )
   }
 }

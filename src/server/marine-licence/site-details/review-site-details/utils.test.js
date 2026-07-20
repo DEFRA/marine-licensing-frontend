@@ -30,9 +30,11 @@ vi.mock('~/src/server/common/helpers/site-details.js', () => ({
 describe('siteDetails utils', () => {
   describe('getFileUploadBackLink util', () => {
     test('getFileUploadBackLink correctly returns task list when coming from the task list', () => {
-      expect(getFileUploadBackLink(`http://hostname${routes.TASK_LIST}`)).toBe(
-        routes.TASK_LIST
-      )
+      expect(
+        getFileUploadBackLink(
+          `http://hostname${marineLicenceRoutes.MARINE_LICENCE_TASK_LIST}`
+        )
+      ).toBe(marineLicenceRoutes.MARINE_LICENCE_TASK_LIST)
     })
 
     test('getFileUploadBackLink correctly returns file upload route', () => {
@@ -151,9 +153,11 @@ describe('siteDetails utils', () => {
     })
 
     test('returns task list when coming from task list', () => {
-      expect(getManualEntryBackLink(`http://hostname${routes.TASK_LIST}`)).toBe(
-        routes.TASK_LIST
-      )
+      expect(
+        getManualEntryBackLink(
+          `http://hostname${marineLicenceRoutes.MARINE_LICENCE_TASK_LIST}`
+        )
+      ).toBe(marineLicenceRoutes.MARINE_LICENCE_TASK_LIST)
     })
 
     test('returns width-of-site as fallback for undefined', () => {
@@ -231,6 +235,48 @@ describe('siteDetails utils', () => {
               siteNumber: 1,
               coordinates: '51.5074, -0.1278',
               activityDetails: []
+            })
+          ])
+        })
+      )
+    })
+
+    test('adds a deleteLink for the second and subsequent activities on a site, but not the first', () => {
+      createSiteDetailsDataJson.mockReturnValue('{}')
+
+      const marineLicence = { projectName: 'Test Project' }
+      const siteDetails = [
+        {
+          coordinatesType: 'coordinates',
+          coordinatesEntry: 'single',
+          coordinateSystem: 'wgs84',
+          coordinates: { latitude: '51.5074', longitude: '-0.1278' },
+          circleWidth: '100',
+          siteName: 'Manual Site',
+          activityDetails: [
+            { activitySubType: 'construction-type-1' },
+            { activitySubType: 'construction-type-1' }
+          ]
+        }
+      ]
+
+      renderManualEntryReview(mockH, {
+        marineLicence,
+        siteDetails,
+        reviewSiteDetailsPageData: { pageTitle: 'Review site details' }
+      })
+
+      expect(mockH.view).toHaveBeenCalledWith(
+        MANUAL_ENTRY_REVIEW_VIEW_ROUTE,
+        expect.objectContaining({
+          summaryData: expect.arrayContaining([
+            expect.objectContaining({
+              activityDetails: [
+                expect.not.objectContaining({ deleteLink: expect.anything() }),
+                expect.objectContaining({
+                  deleteLink: `${marineLicenceRoutes.MARINE_LICENCE_DELETE_ACTIVITY}?site=1&activity=2`
+                })
+              ]
             })
           ])
         })

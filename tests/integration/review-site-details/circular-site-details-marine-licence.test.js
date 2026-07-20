@@ -187,7 +187,7 @@ describe('ML Review Site Details - Circular Coordinates Integration Tests', () =
 
       expect(response.statusCode).toBe(statusCodes.redirect)
       expect(response.headers.location).toBe(
-        `${marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS}#activity-details-site-1-activity-2`
+        `${marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS}#activity-details-site-1-activity-3`
       )
     })
 

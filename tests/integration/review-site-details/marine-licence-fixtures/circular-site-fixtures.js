@@ -148,7 +148,7 @@ export const testScenarios = [
           coordinates: { latitude: '55.123456', longitude: '55.123456' },
           circleWidth: '100',
           siteName: 'Test Site 1',
-          activityDetails: [mockActivityDetails]
+          activityDetails: [mockActivityDetails, mockActivityDetails]
         }
       ]
     },
@@ -165,7 +165,10 @@ export const testScenarios = [
             'WGS84 (World Geodetic System 1984)Latitude and longitude',
           centreCoordinates: '55.123456, 55.123456',
           circleWidth: '100 metres',
-          activityDetails: [mockOutputActivityDetails]
+          activityDetails: [
+            mockOutputActivityDetails,
+            mockOutputActivityDetails
+          ]
         }
       ]
     }

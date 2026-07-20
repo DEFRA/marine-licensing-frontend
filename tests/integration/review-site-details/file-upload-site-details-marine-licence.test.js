@@ -93,7 +93,11 @@ describe('ML Review Site Details - File Upload Integration Tests', () => {
       ).mockReturnValueOnce({
         getMarineLicenceById: vi.fn().mockResolvedValue({
           ...testScenarios[0].marineLicence,
-          taskList: { ...mockMarineLicenceTaskList, siteDetails: 'IN_PROGRESS' }
+          taskList: {
+            ...mockMarineLicenceTaskList,
+            siteDetails: 'IN_PROGRESS'
+          },
+          siteDetailsDataComplete: false
         })
       })
 
@@ -113,7 +117,11 @@ describe('ML Review Site Details - File Upload Integration Tests', () => {
       vi.mocked(marineLicenceService.getMarineLicenceService).mockReturnValue({
         getMarineLicenceById: vi.fn().mockResolvedValue({
           ...testScenarios[0].marineLicence,
-          taskList: { ...mockMarineLicenceTaskList, siteDetails: 'IN_PROGRESS' }
+          taskList: {
+            ...mockMarineLicenceTaskList,
+            siteDetails: 'IN_PROGRESS'
+          },
+          siteDetailsDataComplete: false
         })
       })
 

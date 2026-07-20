@@ -101,6 +101,7 @@ export const mockMarineLicenceApplication = {
   },
   taskList: mockMarineLicenceTaskList,
   siteDetailsConfirmed: true,
+  siteDetailsDataComplete: true,
   preferredDates: {
     start: { month: '07', year: '2026' },
     end: { month: '08', year: '2027' }

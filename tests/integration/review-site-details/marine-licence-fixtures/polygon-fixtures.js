@@ -175,7 +175,7 @@ export const testScenarios = [
             { latitude: '78.123456', longitude: '78.123456' }
           ],
           siteName: 'Test Site 1',
-          activityDetails: [mockActivityDetails]
+          activityDetails: [mockActivityDetails, mockActivityDetails]
         }
       ]
     },
@@ -195,7 +195,10 @@ export const testScenarios = [
             { label: 'Point 2', value: '33.987654, 33.987654' },
             { label: 'Point 3', value: '78.123456, 78.123456' }
           ],
-          activityDetails: [mockOutputActivityDetails]
+          activityDetails: [
+            mockOutputActivityDetails,
+            mockOutputActivityDetails
+          ]
         }
       ]
     }

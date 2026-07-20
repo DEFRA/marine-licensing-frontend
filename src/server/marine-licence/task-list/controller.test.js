@@ -291,6 +291,48 @@ describe('#taskListController', () => {
     })
   })
 
+  test('taskListController handler should pass through the backend-computed siteDetails status unmodified', async () => {
+    const mockPayload = {
+      value: {
+        id: '123',
+        projectName: 'Test Project',
+        taskList: {
+          siteDetails: 'IN_PROGRESS'
+        },
+        marinePlanPolicyJob: null,
+        marinePlanPoliciesCount: 0,
+        marinePlanPolicyResponseCount: 0
+      }
+    }
+
+    getMarineLicenceCacheMock.mockReturnValue(mockMarineLicenceApplication)
+    authenticatedGetRequestMock.mockResolvedValue({ payload: mockPayload })
+    vi.mocked(transformSiteDetailsTaskList).mockReturnValue([])
+    vi.mocked(transformProjectDetailsTaskList).mockReturnValue([])
+    vi.mocked(transformOtherPermissionsTaskList).mockReturnValue([])
+    vi.mocked(transformWaterFrameworkDirectiveTaskList).mockReturnValue([])
+    vi.mocked(transformSharingTaskList).mockReturnValue([])
+    vi.mocked(transformFeeEstimateTaskList).mockReturnValue([])
+    vi.mocked(transformMarinePlanPoliciesTaskList).mockReturnValue([])
+    authUtils.getUserSession.mockResolvedValue({
+      userRelationshipType: 'CITIZEN'
+    })
+
+    await taskListController.handler(mockRequest, mockH)
+
+    expect(vi.mocked(transformSiteDetailsTaskList)).toHaveBeenCalledWith({
+      siteDetails: 'IN_PROGRESS'
+    })
+    expect(vi.mocked(transformMarinePlanPoliciesTaskList)).toHaveBeenCalledWith(
+      { siteDetails: 'IN_PROGRESS' },
+      {
+        marinePlanPolicyJob: null,
+        marinePlanPoliciesCount: 0,
+        marinePlanPolicyResponseCount: 0
+      }
+    )
+  })
+
   test('taskListController handler should not treat all tasks as complete when marine plan policies is not completed', async () => {
     setupAllTasksCompleted()
     vi.mocked(transformMarinePlanPoliciesTaskList).mockReturnValue([

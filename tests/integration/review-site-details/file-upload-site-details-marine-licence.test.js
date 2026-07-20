@@ -93,7 +93,11 @@ describe('ML Review Site Details - File Upload Integration Tests', () => {
       ).mockReturnValueOnce({
         getMarineLicenceById: vi.fn().mockResolvedValue({
           ...testScenarios[0].marineLicence,
-          taskList: { ...mockMarineLicenceTaskList, siteDetails: 'IN_PROGRESS' }
+          taskList: {
+            ...mockMarineLicenceTaskList,
+            siteDetails: 'IN_PROGRESS'
+          },
+          siteDetailsDataComplete: false
         })
       })
 
@@ -109,7 +113,18 @@ describe('ML Review Site Details - File Upload Integration Tests', () => {
       )
     })
 
-    test('should redirect to check-your-answers when returnTo flash is set', async () => {
+    test('should redirect to check-your-answers when returnTo flash is set and siteDetails is not COMPLETED', async () => {
+      vi.mocked(marineLicenceService.getMarineLicenceService).mockReturnValue({
+        getMarineLicenceById: vi.fn().mockResolvedValue({
+          ...testScenarios[0].marineLicence,
+          taskList: {
+            ...mockMarineLicenceTaskList,
+            siteDetails: 'IN_PROGRESS'
+          },
+          siteDetailsDataComplete: false
+        })
+      })
+
       const cyaResponse = await makeGetRequest({
         server: getServer(),
         url: marineLicenceRoutes.MARINE_LICENCE_CHECK_YOUR_ANSWERS
@@ -131,6 +146,31 @@ describe('ML Review Site Details - File Upload Integration Tests', () => {
       expect(response.headers.location).toBe(
         marineLicenceRoutes.MARINE_LICENCE_CHECK_YOUR_ANSWERS
       )
+    })
+
+    test('should show a validation error rather than redirecting when returnTo flash is set but siteDetails is COMPLETED', async () => {
+      const cyaResponse = await makeGetRequest({
+        server: getServer(),
+        url: marineLicenceRoutes.MARINE_LICENCE_CHECK_YOUR_ANSWERS
+      })
+
+      const sessionCookie = cyaResponse.headers['set-cookie']
+      const cookieHeader = Array.isArray(sessionCookie)
+        ? sessionCookie.join('; ')
+        : sessionCookie
+
+      const response = await makePostRequest({
+        url: marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS,
+        server: getServer(),
+        formData: {},
+        headers: { cookie: cookieHeader }
+      })
+
+      expect(response.statusCode).toBe(statusCodes.ok)
+      const document = new JSDOM(response.result).window.document
+      expect(
+        document.querySelector('#finishedEnteringSiteDetails-error')
+      ).toBeTruthy()
     })
 
     test('should redirect back to review page with anchor when addActivity is submitted', async () => {

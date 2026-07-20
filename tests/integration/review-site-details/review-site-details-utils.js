@@ -116,6 +116,25 @@ export const validateActivityDetailsCards = (document, expected, siteIndex) => {
   activityDetailsCards.forEach((card, i) => {
     const activityDetails = expected.siteDetails[siteIndex].activityDetails[i]
 
+    const actionList = card.querySelector('.govuk-summary-card__actions')
+
+    if (i === 0) {
+      expect(actionList).toBeNull()
+    } else {
+      expect(actionList).toBeTruthy()
+
+      const deleteLink = within(actionList).getByRole('link', {
+        name: /Delete activity/
+      })
+
+      expect(deleteLink).toHaveAttribute(
+        'href',
+        expect.stringContaining(
+          `delete-activity?site=${siteIndex + 1}&activity=${i + 1}`
+        )
+      )
+    }
+
     const activityTypeRow = getRowByKey(card, 'Type of activity')
     expect(activityTypeRow).toBeTruthy()
     expect(activityTypeRow.textContent).toContain(

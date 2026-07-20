@@ -201,5 +201,6 @@ export const apiRoutes = {
   CALCULATE_MARINE_PLAN_POLICIES:
     '/marine-licence/calculate-marine-plan-policies',
   MARINE_LICENCE_MARINE_PLAN_POLICY_RESPONSE:
-    '/marine-licence/marine-plan-policy-response'
+    '/marine-licence/marine-plan-policy-response',
+  CONFIRM_SITE_DETAILS: '/marine-licence/confirm-site-details'
 }

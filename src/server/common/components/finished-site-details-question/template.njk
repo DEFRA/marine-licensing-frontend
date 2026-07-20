@@ -1,0 +1,21 @@
+{% from "govuk/components/radios/macro.njk" import govukRadios %}
+
+<h2 class="govuk-heading-m">Marine plan policies</h2>
+<p class="govuk-body">If you've completed Site and activity details, you can now start the Marine plan policy considerations. The information you enter in Site and activity details is used to determine which Marine plan policies you need to consider.</p>
+<p class="govuk-body">You can change your Site and activity details later. If you do, the policies you need to consider may change.</p>
+
+{{ govukRadios({
+  idPrefix: "finishedEnteringSiteDetails",
+  name: "finishedEnteringSiteDetails",
+  fieldset: {
+    legend: {
+      text: "Have you finished entering your site details?",
+      classes: "govuk-fieldset__legend--m"
+    }
+  },
+  errorMessage: params.errors.finishedEnteringSiteDetails,
+  items: [
+    { value: "yes", text: "Yes" },
+    { value: "no", text: "No" }
+  ]
+}) }}

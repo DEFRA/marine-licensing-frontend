@@ -2,8 +2,10 @@
 {% from "govuk/components/back-link/macro.njk" import govukBackLink %}
 {% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
 {% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
 {% from "site-details-map/macro.njk" import appSiteDetailsMap %}
 {% from "marine-licence/activity-details-card/macro.njk" import appMarineLicenceActivityDetailsCard %}
+{% from "finished-site-details-question/macro.njk" import appFinishedSiteDetailsQuestion %}
 {% block head %}
   {{ super() }}
 {% endblock %}
@@ -22,6 +24,13 @@
     <div class="govuk-grid-column-full">
       <span class="govuk-caption-l">{{ projectName }}</span>
       <h1 class="govuk-heading-l">Review site details</h1>
+
+      {% if errorSummary %}
+        {{ govukErrorSummary({
+          titleText: "There is a problem",
+          errorList: errorSummary
+        }) }}
+      {% endif %}
 
       <div class="govuk-inset-text">
         The site details you've provided are saved.<br>You must complete all sections marked <span class='govuk-tag govuk-tag--red govuk-!-margin-bottom-2 govuk-!-margin-top-2'>Incomplete</span> before you can send your information.<br>If you cannot finish now, you can return to this page later.
@@ -158,7 +167,8 @@
           {{ appMarineLicenceActivityDetailsCard({
             activityDetails: activityDetails,
             siteNumber: site.siteNumber,
-            index: loop.index
+            index: loop.index,
+            deleteLink: activityDetails.deleteLink
           }) }}
         {% endfor %}
 
@@ -196,6 +206,11 @@
             }
           }) }}
         </div>
+
+        {% if showMarinePlanPoliciesQuestion %}
+          {{ appFinishedSiteDetailsQuestion({ errors: errors }) }}
+        {% endif %}
+
         <div class="govuk-button-group">
           {{ govukButton({
             text: "Continue",

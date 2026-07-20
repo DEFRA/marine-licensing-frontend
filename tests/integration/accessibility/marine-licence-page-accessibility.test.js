@@ -183,8 +183,7 @@ const marineLicencePages = [
   },
   {
     url: marineLicenceRoutes.MARINE_LICENCE_ENTER_MULTIPLE_COORDINATES,
-    title:
-      'Enter multiple sets of coordinates to mark the boundary of the site'
+    title: 'Enter multiple sets of coordinates to mark the boundary of the site'
   },
   {
     url: marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS,

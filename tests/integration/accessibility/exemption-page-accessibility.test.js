@@ -64,8 +64,7 @@ const exemptionPages = [
   },
   {
     url: routes.ENTER_MULTIPLE_COORDINATES,
-    title:
-      'Enter multiple sets of coordinates to mark the boundary of the site'
+    title: 'Enter multiple sets of coordinates to mark the boundary of the site'
   },
   { url: routes.ACTIVITY_DATES, title: 'Activity dates' },
   { url: routes.ACTIVITY_DESCRIPTION, title: 'Activity description' },
@@ -220,20 +219,20 @@ describe('Exemption page accessibility checks (Axe)', () => {
                 ? mockProjectList
                 : endpoint === '/exemptions/summary'
                   ? {
-                    coordinatesInputMethod: {
-                      shapefile: 0,
-                      kml: 0,
-                      manualCoordinates: 0
-                    },
-                    coordinateSystemVolume: {
-                      wgs84: { count: 0, percentage: 0 },
-                      bng: { count: 0, percentage: 0 },
-                      total: 0
-                    },
-                    byArticle: {},
-                    byMarinePlanArea: {},
-                    byCoastalOperationsArea: {}
-                  }
+                      coordinatesInputMethod: {
+                        shapefile: 0,
+                        kml: 0,
+                        manualCoordinates: 0
+                      },
+                      coordinateSystemVolume: {
+                        wgs84: { count: 0, percentage: 0 },
+                        bng: { count: 0, percentage: 0 },
+                        total: 0
+                      },
+                      byArticle: {},
+                      byMarinePlanArea: {},
+                      byCoastalOperationsArea: {}
+                    }
                   : exemption
           }
         })

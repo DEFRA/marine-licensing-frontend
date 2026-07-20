@@ -81,8 +81,7 @@ describe('#taskListController', () => {
         waterFrameworkDirective: { nauticalMile: 'no' },
         marinePlanPolicyJob: 'ready',
         marinePlanPoliciesCount: 44,
-        marinePlanPolicyResponseCount: 12,
-        siteDetailsConfirmed: true
+        marinePlanPolicyResponseCount: 12
       }
     }
 
@@ -292,15 +291,14 @@ describe('#taskListController', () => {
     })
   })
 
-  test('taskListController handler should override siteDetails status to IN_PROGRESS when not confirmed', async () => {
+  test('taskListController handler should pass through the backend-computed siteDetails status unmodified', async () => {
     const mockPayload = {
       value: {
         id: '123',
         projectName: 'Test Project',
         taskList: {
-          siteDetails: 'COMPLETED'
+          siteDetails: 'IN_PROGRESS'
         },
-        siteDetailsConfirmed: false,
         marinePlanPolicyJob: null,
         marinePlanPoliciesCount: 0,
         marinePlanPolicyResponseCount: 0
@@ -333,41 +331,6 @@ describe('#taskListController', () => {
         marinePlanPolicyResponseCount: 0
       }
     )
-  })
-
-  test('taskListController handler should keep siteDetails status as COMPLETED when confirmed', async () => {
-    const mockPayload = {
-      value: {
-        id: '123',
-        projectName: 'Test Project',
-        taskList: {
-          siteDetails: 'COMPLETED'
-        },
-        siteDetailsConfirmed: true,
-        marinePlanPolicyJob: null,
-        marinePlanPoliciesCount: 0,
-        marinePlanPolicyResponseCount: 0
-      }
-    }
-
-    getMarineLicenceCacheMock.mockReturnValue(mockMarineLicenceApplication)
-    authenticatedGetRequestMock.mockResolvedValue({ payload: mockPayload })
-    vi.mocked(transformSiteDetailsTaskList).mockReturnValue([])
-    vi.mocked(transformProjectDetailsTaskList).mockReturnValue([])
-    vi.mocked(transformOtherPermissionsTaskList).mockReturnValue([])
-    vi.mocked(transformWaterFrameworkDirectiveTaskList).mockReturnValue([])
-    vi.mocked(transformSharingTaskList).mockReturnValue([])
-    vi.mocked(transformFeeEstimateTaskList).mockReturnValue([])
-    vi.mocked(transformMarinePlanPoliciesTaskList).mockReturnValue([])
-    authUtils.getUserSession.mockResolvedValue({
-      userRelationshipType: 'CITIZEN'
-    })
-
-    await taskListController.handler(mockRequest, mockH)
-
-    expect(vi.mocked(transformSiteDetailsTaskList)).toHaveBeenCalledWith({
-      siteDetails: 'COMPLETED'
-    })
   })
 
   test('taskListController handler should not treat all tasks as complete when marine plan policies is not completed', async () => {

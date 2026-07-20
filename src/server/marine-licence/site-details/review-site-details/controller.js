@@ -70,7 +70,8 @@ export const reviewSiteDetailsController = {
     const completeMarineLicence =
       await marineLicenceService.getMarineLicenceById(marineLicence.id)
 
-    const { projectName, siteDetails, taskList } = completeMarineLicence
+    const { projectName, siteDetails, siteDetailsDataComplete } =
+      completeMarineLicence
 
     await setMarineLicenceCache(request, h, {
       id: marineLicence.id,
@@ -88,7 +89,7 @@ export const reviewSiteDetailsController = {
       previousPage,
       reviewSiteDetailsPageData,
       returnToCheckYourAnswers,
-      showMarinePlanPoliciesQuestion: taskList?.siteDetails === 'COMPLETED'
+      showMarinePlanPoliciesQuestion: siteDetailsDataComplete
     })
   }
 }
@@ -224,9 +225,9 @@ export const reviewSiteDetailsSubmitController = {
     const marineLicenceService = getMarineLicenceService(request)
     const completeMarineLicence =
       await marineLicenceService.getMarineLicenceById(marineLicence.id)
-    const { taskList, siteDetails } = completeMarineLicence
+    const { siteDetails, siteDetailsDataComplete } = completeMarineLicence
 
-    if (taskList?.siteDetails !== 'COMPLETED') {
+    if (!siteDetailsDataComplete) {
       const returnTo = handleReturnToRedirect(request, h)
       if (returnTo.redirected) {
         return returnTo.response

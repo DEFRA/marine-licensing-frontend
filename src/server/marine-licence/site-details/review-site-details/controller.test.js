@@ -173,7 +173,7 @@ describe('#reviewSiteDetails', () => {
         {
           getMarineLicenceById: vi.fn().mockResolvedValue({
             ...mockFileUploadMarineLicence,
-            taskList: { siteDetails: 'COMPLETED' }
+            siteDetailsDataComplete: true
           })
         }
       )
@@ -199,7 +199,7 @@ describe('#reviewSiteDetails', () => {
         {
           getMarineLicenceById: vi.fn().mockResolvedValue({
             ...mockFileUploadMarineLicence,
-            taskList: { siteDetails: 'IN_PROGRESS' }
+            siteDetailsDataComplete: false
           })
         }
       )
@@ -251,7 +251,7 @@ describe('#reviewSiteDetails', () => {
         {
           getMarineLicenceById: vi
             .fn()
-            .mockResolvedValue({ taskList: { siteDetails: 'IN_PROGRESS' } })
+            .mockResolvedValue({ siteDetailsDataComplete: false })
         }
       )
 
@@ -273,7 +273,7 @@ describe('#reviewSiteDetails', () => {
       vi.spyOn(marineLicenceService, 'getMarineLicenceService').mockReturnValue(
         {
           getMarineLicenceById: vi.fn().mockResolvedValue({
-            taskList: { siteDetails: 'COMPLETED' },
+            siteDetailsDataComplete: true,
             siteDetails: []
           })
         }
@@ -318,7 +318,7 @@ describe('#reviewSiteDetails', () => {
       vi.spyOn(marineLicenceService, 'getMarineLicenceService').mockReturnValue(
         {
           getMarineLicenceById: vi.fn().mockResolvedValue({
-            taskList: { siteDetails: 'COMPLETED' },
+            siteDetailsDataComplete: true,
             siteDetails: [],
             siteDetailsConfirmed: true
           })
@@ -358,7 +358,7 @@ describe('#reviewSiteDetails', () => {
       vi.spyOn(marineLicenceService, 'getMarineLicenceService').mockReturnValue(
         {
           getMarineLicenceById: vi.fn().mockResolvedValue({
-            taskList: { siteDetails: 'COMPLETED' },
+            siteDetailsDataComplete: true,
             siteDetails: [],
             siteDetailsConfirmed: false
           })
@@ -399,7 +399,7 @@ describe('#reviewSiteDetails', () => {
       vi.spyOn(marineLicenceService, 'getMarineLicenceService').mockReturnValue(
         {
           getMarineLicenceById: vi.fn().mockResolvedValue({
-            taskList: { siteDetails: 'COMPLETED' },
+            siteDetailsDataComplete: true,
             siteDetails: [],
             siteDetailsConfirmed: true
           })
@@ -439,7 +439,7 @@ describe('#reviewSiteDetails', () => {
       vi.spyOn(marineLicenceService, 'getMarineLicenceService').mockReturnValue(
         {
           getMarineLicenceById: vi.fn().mockResolvedValue({
-            taskList: { siteDetails: 'COMPLETED' },
+            siteDetailsDataComplete: true,
             siteDetails: []
           })
         }
@@ -478,7 +478,7 @@ describe('#reviewSiteDetails', () => {
         {
           getMarineLicenceById: vi.fn().mockResolvedValue({
             ...mockFileUploadMarineLicence,
-            taskList: { siteDetails: 'COMPLETED' }
+            siteDetailsDataComplete: true
           })
         }
       )
@@ -522,7 +522,7 @@ describe('#reviewSiteDetails', () => {
         {
           getMarineLicenceById: vi.fn().mockResolvedValue({
             ...mockFileUploadMarineLicence,
-            taskList: { siteDetails: 'COMPLETED' }
+            siteDetailsDataComplete: true
           })
         }
       )
@@ -552,7 +552,7 @@ describe('#reviewSiteDetails', () => {
         {
           getMarineLicenceById: vi
             .fn()
-            .mockResolvedValue({ taskList: { siteDetails: 'IN_PROGRESS' } })
+            .mockResolvedValue({ siteDetailsDataComplete: false })
         }
       )
 
@@ -578,7 +578,7 @@ describe('#reviewSiteDetails', () => {
         {
           getMarineLicenceById: vi.fn().mockResolvedValue({
             ...mockFileUploadMarineLicence,
-            taskList: { siteDetails: 'COMPLETED' }
+            siteDetailsDataComplete: true
           })
         }
       )
@@ -613,7 +613,7 @@ describe('#reviewSiteDetails', () => {
         {
           getMarineLicenceById: vi.fn().mockResolvedValue({
             ...mockFileUploadMarineLicence,
-            taskList: { siteDetails: 'COMPLETED' }
+            siteDetailsDataComplete: true
           })
         }
       )

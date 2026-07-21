@@ -80,6 +80,8 @@ export const validateInvoicingSummaryForIndividual = (
 
   validateContactDetails(invoicingSummary, expectedPageContent)
 
+  expect(getRowByKey(invoicingSummary, CONTACT_ORG_NAME)).toBeUndefined()
+
   const rows = invoicingSummary.querySelectorAll('.govuk-summary-list__row')
-  expect(rows.length).toBe(6)
+  expect(rows.length).toBe(5)
 }

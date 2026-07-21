@@ -31,7 +31,7 @@
   classes: "govuk-summary-list__row--no-border"
 }), invoicingRows) %}
 
-{% if invoicingDisplayData.organisationName %}
+{% if not isIndividual %}
 
   {% set invoicingRows = (invoicingRows.push({
     key: invoicingDisplayData.organisationName.key,

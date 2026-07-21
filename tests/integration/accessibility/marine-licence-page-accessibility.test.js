@@ -108,6 +108,14 @@ const marineLicencePages = [
     marineLicence: mockMarineLicenceWithMarinePlanPolicies
   },
   {
+    url: marineLicenceRoutes.MARINE_LICENCE_MARINE_PLAN_POLICIES_HOLDING,
+    title: 'Marine plan policies',
+    marineLicence: {
+      ...mockMarineLicenceApplication,
+      marinePlanPolicyJob: 'pending'
+    }
+  },
+  {
     url: marineLicenceRoutes.MARINE_LICENCE_SITE_DETAILS,
     title: 'Site details'
   },

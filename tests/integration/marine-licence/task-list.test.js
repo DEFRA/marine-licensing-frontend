@@ -106,6 +106,46 @@ describe('Task List', () => {
     ).not.toBeInTheDocument()
   })
 
+  test('should link "Marine plan policy considerations" to the holding page when marinePlanPolicyJob is pending', async () => {
+    mockMarineLicence({
+      ...mockMarineLicenceApplication,
+      marinePlanPolicyJob: 'pending'
+    })
+    const pendingDocument = await loadPage({
+      requestUrl: marineLicenceRoutes.MARINE_LICENCE_TASK_LIST,
+      server: getServer()
+    })
+
+    expect(
+      getByRole(pendingDocument, 'link', {
+        name: 'Marine plan policy considerations'
+      })
+    ).toHaveAttribute(
+      'href',
+      marineLicenceRoutes.MARINE_LICENCE_MARINE_PLAN_POLICIES_HOLDING
+    )
+  })
+
+  test('should render "Marine plan policy considerations" as unlinked "Cannot start yet" when marinePlanPolicyJob is failed', async () => {
+    mockMarineLicence({
+      ...mockMarineLicenceApplication,
+      marinePlanPolicyJob: 'failed'
+    })
+    const failedDocument = await loadPage({
+      requestUrl: marineLicenceRoutes.MARINE_LICENCE_TASK_LIST,
+      server: getServer()
+    })
+
+    expect(
+      queryByRole(failedDocument, 'link', {
+        name: 'Marine plan policy considerations'
+      })
+    ).not.toBeInTheDocument()
+    expect(
+      getByText(failedDocument, 'Marine plan policy considerations')
+    ).toBeInTheDocument()
+  })
+
   test('should display phase banner with feedback link that goes to current URL', () => {
     const phaseBanner = document.querySelector('.govuk-phase-banner')
     expect(phaseBanner).toBeInTheDocument()

@@ -3,9 +3,7 @@ import {
   invoicingReviewData
 } from '#src/server/common/helpers/marine-licence/invoicing/invoicing-review-data.js'
 import { INVOICE_TYPE_OPTIONS } from '#src/server/common/validation/invoicing/constants.js'
-import {
-  mockMarineLicenceApplication
-} from '#src/server/test-helpers/mocks/marine-licence-mocks.js'
+import { mockMarineLicenceApplication } from '#src/server/test-helpers/mocks/marine-licence-mocks.js'
 
 describe('formatInvoiceAddress', () => {
   test('formats a UK address with all fields', () => {
@@ -66,11 +64,11 @@ describe('invoicingReviewData', () => {
     const result = invoicingReviewData(invoicing)
 
     expect(result.invoiceAddressType.value).toEqual({
-      text: "UK"
+      text: 'UK'
     })
 
     expect(result.invoiceAddress.value).toEqual({
-      html: "123 Example Street<br>Flat 2<br>Example town<br>Example country<br>AA1 1AA"
+      html: '123 Example Street<br>Flat 2<br>Example town<br>Example country<br>AA1 1AA'
     })
 
     expect(result.fullName.value).toEqual({

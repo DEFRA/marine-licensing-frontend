@@ -4,27 +4,26 @@ import { getMarineLicenceCache } from '#src/server/common/helpers/marine-licence
 import { isIndividualUser } from '#src/server/common/helpers/user-session-utils.js'
 
 export const saveInvoicingToBackend = async (request) => {
-    const marineLicence = getMarineLicenceCache(request)
+  const marineLicence = getMarineLicenceCache(request)
 
-    const { invoicing } = marineLicence
+  const { invoicing } = marineLicence
 
-    const { purchaseOrderDetails } = invoicing
+  const { purchaseOrderDetails } = invoicing
 
-    const individualUser = await isIndividualUser(request)
+  const individualUser = await isIndividualUser(request)
 
-    const { invoiceContactDetails, invoiceAddressType, invoiceAddress } =
-        invoicing
+  const { invoiceContactDetails, invoiceAddressType, invoiceAddress } =
+    invoicing
 
-    const dataToSave = {
-        invoiceContactDetails, invoiceAddressType, invoiceAddress, ...(individualUser ? {} : { purchaseOrderDetails })
-    }
+  const dataToSave = {
+    invoiceContactDetails,
+    invoiceAddressType,
+    invoiceAddress,
+    ...(individualUser ? {} : { purchaseOrderDetails })
+  }
 
-    await authenticatedPatchRequest(
-        request,
-        apiRoutes.UPDATE_INVOICING,
-        {
-            ...dataToSave,
-            id: marineLicence.id
-        }
-    )
+  await authenticatedPatchRequest(request, apiRoutes.UPDATE_INVOICING, {
+    ...dataToSave,
+    id: marineLicence.id
+  })
 }

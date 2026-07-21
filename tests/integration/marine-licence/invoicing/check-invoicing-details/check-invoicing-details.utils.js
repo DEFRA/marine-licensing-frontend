@@ -22,19 +22,14 @@ const validateContactDetails = (invoicingSummary, expectedPageContent) => {
   expect(fullNameRow.textContent).toContain(expectedPageContent.fullName)
 
   if (expectedPageContent.organisationName) {
-    const organisationNameRow = getRowByKey(
-      invoicingSummary,
-      CONTACT_ORG_NAME
-    )
+    const organisationNameRow = getRowByKey(invoicingSummary, CONTACT_ORG_NAME)
     expect(organisationNameRow.textContent).toContain(
       expectedPageContent.organisationName
     )
   }
 
   const phoneNumberRow = getRowByKey(invoicingSummary, CONTACT_PHONE_NUMBER)
-  expect(phoneNumberRow.textContent).toContain(
-    expectedPageContent.phoneNumber
-  )
+  expect(phoneNumberRow.textContent).toContain(expectedPageContent.phoneNumber)
 
   const emailAddressRow = getRowByKey(invoicingSummary, CONTACT_EMAIL)
   expect(emailAddressRow.textContent).toContain(

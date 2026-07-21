@@ -74,8 +74,7 @@ describe('#checkInvoicingDetails', () => {
       expect(h.view).toHaveBeenCalledWith(
         CHECK_INVOICING_DETAILS_VIEW_ROUTE,
         expect.objectContaining({
-          backLink:
-            marineLicenceRoutes.MARINE_LICENCE_INVOICE_CONTACT_DETAILS,
+          backLink: marineLicenceRoutes.MARINE_LICENCE_INVOICE_CONTACT_DETAILS,
           isIndividual: true
         })
       )
@@ -94,7 +93,7 @@ describe('#checkInvoicingDetails', () => {
 
       expect(h.redirect).toHaveBeenCalledWith(
         marineLicenceRoutes.MARINE_LICENCE_CHECK_YOUR_ANSWERS +
-        '#invoicing-card'
+          '#invoicing-card'
       )
     })
   })

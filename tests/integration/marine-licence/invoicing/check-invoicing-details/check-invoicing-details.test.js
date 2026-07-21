@@ -14,7 +14,8 @@ import {
 import { mockMarineLicenceApplication as marineLicence } from '~/src/server/test-helpers/mocks/marine-licence-mocks.js'
 import {
   expectedPageContentIndividual,
-  expectedPageContentOrganisation
+  expectedPageContentOrganisation,
+  expectedPageContentOrganisationPoNotRequired
 } from '~/tests/integration/marine-licence/invoicing/check-invoicing-details/check-invoicing-details.fixtures.js'
 import {
   agentSession,
@@ -75,6 +76,29 @@ describe('Check invoicing details', () => {
     validateInvoicingSummaryForIndividual(
       document,
       expectedPageContentIndividual
+    )
+  })
+
+  test('displays not required when purchase order number is not required', async () => {
+    vi.mocked(getUserSession).mockResolvedValue(agentSession)
+    mockMarineLicence({
+      ...marineLicence,
+      invoicing: {
+        ...marineLicence.invoicing,
+        purchaseOrderDetails: {
+          requiresPurchaseOrder: 'no'
+        }
+      }
+    })
+
+    const document = await loadPage({
+      requestUrl: marineLicenceRoutes.MARINE_LICENCE_CHECK_INVOICING_DETAILS,
+      server: getServer()
+    })
+
+    validateInvoicingSummaryForOrganisation(
+      document,
+      expectedPageContentOrganisationPoNotRequired
     )
   })
 

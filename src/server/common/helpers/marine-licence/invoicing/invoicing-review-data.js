@@ -74,9 +74,9 @@ const getDisplayValue = (key, value, invoicing) => {
     case 'emailAddress':
       return value
     case 'purchaseOrderDetails':
-      return value === INVOICE_TYPE_OPTIONS.UK
-        ? INVOICE_TYPE_LABELS.UK
-        : INVOICE_TYPE_LABELS.INTERNATIONAL
+      return value.requiresPurchaseOrder === 'no'
+        ? 'Not required'
+        : value.purchaseOrderNumber
     default:
       return undefined
   }

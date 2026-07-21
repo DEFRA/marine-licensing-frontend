@@ -5,7 +5,12 @@ export const expectedPageContentOrganisation = {
   organisationName: 'Example Organisation',
   phoneNumber: '0191 111 1111',
   emailAddress: 'john.doe@example.com',
-  purchaseOrderDetails: 'International'
+  purchaseOrderDetails: 'PO-12345'
+}
+
+export const expectedPageContentOrganisationPoNotRequired = {
+  ...expectedPageContentOrganisation,
+  purchaseOrderDetails: 'Not required'
 }
 
 export const expectedPageContentIndividual = {

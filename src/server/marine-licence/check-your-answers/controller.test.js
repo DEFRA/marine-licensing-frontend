@@ -151,7 +151,6 @@ describe('#checkYourAnswersController', () => {
       invoicingData: expectedInvoicingData,
       invoicingChangeLink:
         marineLicenceRoutes.MARINE_LICENCE_CHECK_INVOICING_DETAILS,
-      isIndividual: false,
       marinePlanPolicies: mockPolicies
     })
   })
@@ -179,9 +178,8 @@ describe('#checkYourAnswersController', () => {
       preferredDates: null,
       coordinatesType: null,
       summaryData: [],
-      invoicingChangeLink: "/marine-licence/check-invoicing-details",
+      invoicingChangeLink: '/marine-licence/check-invoicing-details',
       invoicingData: undefined,
-      isIndividual: false,
       waterFrameworkDirectiveData: {},
       reviewSiteDetailsRoute:
         marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS,

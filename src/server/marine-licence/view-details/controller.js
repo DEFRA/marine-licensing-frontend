@@ -82,6 +82,9 @@ export const viewDetailsController = {
         isInternalUserView,
         marineLicenceId,
         waterFrameworkDirectiveData,
+        invoicingData: formattedMarineLicence.invoicing,
+        invoicingChangeLink:
+          marineLicenceRoutes.MARINE_LICENCE_CHECK_INVOICING_DETAILS,
         marinePlanPolicies
       })
     } catch (error) {

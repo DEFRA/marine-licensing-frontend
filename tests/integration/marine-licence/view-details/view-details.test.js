@@ -9,16 +9,23 @@ import { mockSubmittedMarineLicenceApplication } from '~/src/server/test-helpers
 import {
   expectedProjectDetailsCard,
   expectedOtherPermissionsCard,
-  expectedWaterFrameworkDirectiveCard
+  expectedWaterFrameworkDirectiveCard,
+  expectedInvocingCardIndividualUser,
+  expectedInvocingCardOrgUser
 } from './fixtures.js'
 import { getCardRow } from './utils.js'
-import { validateWaterFrameworkDirective } from '#tests/integration/shared/summary-card-validators.js'
+import {
+  validateInvoicingCard,
+  validateWaterFrameworkDirective
+} from '#tests/integration/shared/summary-card-validators.js'
 
 describe('Marine Licence View Details', () => {
   const getServer = setupTestServer()
 
-  const loadViewDetailsPage = async (server) => {
-    mockMarineLicence(mockSubmittedMarineLicenceApplication)
+  const loadViewDetailsPage = async (server, marineLicenceMock) => {
+    mockMarineLicence(
+      marineLicenceMock ?? mockSubmittedMarineLicenceApplication
+    )
     return loadPage({
       requestUrl: `${marineLicenceRoutes.MARINE_LICENCE_VIEW_DETAILS}/${mockSubmittedMarineLicenceApplication.id}`,
       server
@@ -128,6 +135,41 @@ describe('Marine Licence View Details', () => {
 
     test('does not render a Change link', () => {
       const card = document.querySelector('#water-framework-directive-card')
+      const changeLink = card.querySelector('.govuk-summary-card__actions a')
+
+      expect(changeLink).toBeNull()
+    })
+  })
+
+  describe('invoicing card', () => {
+    let document
+
+    beforeEach(async () => {
+      document = await loadViewDetailsPage(getServer())
+    })
+
+    test('renders the invoicing card for org user', () => {
+      validateInvoicingCard(document, expectedInvocingCardOrgUser)
+    })
+
+    test('renders the invoicing card for individual user', async () => {
+      const mockMarineLicenceIndividualInvoice = {
+        ...mockSubmittedMarineLicenceApplication
+      }
+      delete mockMarineLicenceIndividualInvoice.invoicing.purchaseOrderDetails
+      delete mockMarineLicenceIndividualInvoice.invoicing.invoiceContactDetails
+        .organisationName
+
+      document = await loadViewDetailsPage(
+        getServer(),
+        mockMarineLicenceIndividualInvoice
+      )
+
+      validateInvoicingCard(document, expectedInvocingCardIndividualUser, true)
+    })
+
+    test('does not render a Change link', () => {
+      const card = document.querySelector('#invoicing-card')
       const changeLink = card.querySelector('.govuk-summary-card__actions a')
 
       expect(changeLink).toBeNull()

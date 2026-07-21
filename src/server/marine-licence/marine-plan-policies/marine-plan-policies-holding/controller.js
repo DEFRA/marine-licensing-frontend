@@ -2,10 +2,12 @@ import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
 import { getMarineLicenceCache } from '#src/server/common/helpers/marine-licence/session-cache/utils.js'
 import { getMarineLicenceService } from '#src/services/marine-licence-service/index.js'
 
-export const CALCULATE_MARINE_PLAN_POLICIES_AND_WAIT_VIEW_ROUTE =
-  'marine-licence/site-details/calculate-marine-plan-policies-and-wait/index'
+export const MARINE_PLAN_POLICIES_HOLDING_VIEW_ROUTE =
+  'marine-licence/marine-plan-policies/marine-plan-policies-holding/index'
 
-export const calculateMarinePlanPoliciesAndWaitController = {
+const HEADING = 'Marine plan policies'
+
+export const marinePlanPoliciesHoldingController = {
   async handler(request, h) {
     const marineLicence = getMarineLicenceCache(request)
 
@@ -14,17 +16,18 @@ export const calculateMarinePlanPoliciesAndWaitController = {
     }
 
     const marineLicenceService = getMarineLicenceService(request)
-    const { marinePlanPolicyJob } =
+    const { marinePlanPolicyJob, projectName } =
       await marineLicenceService.getMarineLicenceById(marineLicence.id)
 
-    if (marinePlanPolicyJob === 'ready' || marinePlanPolicyJob === 'failed') {
-      return h.redirect(marineLicenceRoutes.MARINE_LICENCE_TASK_LIST)
+    if (marinePlanPolicyJob === 'ready') {
+      return h.redirect(marineLicenceRoutes.MARINE_LICENCE_MARINE_PLAN_POLICIES)
     }
 
-    return h.view(CALCULATE_MARINE_PLAN_POLICIES_AND_WAIT_VIEW_ROUTE, {
-      pageTitle: 'Loading your Marine plan policies',
-      heading: 'Loading your Marine plan policies',
-      pageRefreshTimeInMs: 2000
+    return h.view(MARINE_PLAN_POLICIES_HOLDING_VIEW_ROUTE, {
+      pageTitle: HEADING,
+      heading: HEADING,
+      projectName,
+      backLink: marineLicenceRoutes.MARINE_LICENCE_TASK_LIST
     })
   }
 }

@@ -13,6 +13,7 @@ import {
   setMarineLicenceCache,
   updateMarineLicenceSiteDetails
 } from '#src/server/common/helpers/marine-licence/session-cache/utils.js'
+import { storeMarinePlanPolicyQueryStartTime } from '#src/server/common/helpers/marine-licence/marine-plan-policy-wait.js'
 import { getMarineLicenceService } from '#src/services/marine-licence-service/index.js'
 import {
   authenticatedPatchRequest,
@@ -199,6 +200,7 @@ async function confirmSiteDetails(
     apiRoutes.CALCULATE_MARINE_PLAN_POLICIES,
     JSON.stringify({ id: marineLicence.id })
   )
+  storeMarinePlanPolicyQueryStartTime(request)
   return h.redirect(
     marineLicenceRoutes.MARINE_LICENCE_CALCULATE_MARINE_PLAN_POLICIES
   )

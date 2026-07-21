@@ -639,8 +639,7 @@ describe('taskList utils', () => {
     test.each([
       ['INCOMPLETE', 'ready'],
       ['IN_PROGRESS', 'ready'],
-      ['COMPLETED', undefined],
-      ['COMPLETED', 'pending'],
+      ['INCOMPLETE', 'pending'],
       ['COMPLETED', 'failed'],
       [undefined, undefined]
     ])(
@@ -657,6 +656,29 @@ describe('taskList utils', () => {
             status: {
               text: 'Cannot start yet',
               classes: 'govuk-task-list__status--cannot-start-yet'
+            }
+          }
+        ])
+      }
+    )
+
+    test.each([['pending'], ['computing'], [undefined], [null]])(
+      'returns "Not yet started" linked to the MPP holding page when siteDetails=COMPLETED and job=%s',
+      (marinePlanPolicyJob) => {
+        expect(
+          transformMarinePlanPoliciesTaskList(
+            { siteDetails: 'COMPLETED' },
+            { marinePlanPolicyJob, marinePlanPoliciesCount: 44 }
+          )
+        ).toEqual([
+          {
+            title: {
+              text: 'Marine plan policy considerations',
+              classes: 'govuk-link--no-visited-state'
+            },
+            href: marineLicenceRoutes.MARINE_LICENCE_MARINE_PLAN_POLICIES_HOLDING,
+            status: {
+              tag: { text: 'Not yet started', classes: 'govuk-tag--blue' }
             }
           }
         ])

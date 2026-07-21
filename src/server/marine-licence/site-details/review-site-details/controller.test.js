@@ -305,6 +305,10 @@ describe('#reviewSiteDetails', () => {
         apiRoutes.CALCULATE_MARINE_PLAN_POLICIES,
         JSON.stringify({ id: 'test-id' })
       )
+      expect(request.yar.set).toHaveBeenCalledWith(
+        'marinePlanPolicyQueryStartedAt',
+        expect.any(Number)
+      )
       expect(h.redirect).toHaveBeenCalledWith(
         marineLicenceRoutes.MARINE_LICENCE_CALCULATE_MARINE_PLAN_POLICIES
       )
@@ -386,6 +390,10 @@ describe('#reviewSiteDetails', () => {
         apiRoutes.CALCULATE_MARINE_PLAN_POLICIES,
         JSON.stringify({ id: 'test-id' })
       )
+      expect(request.yar.set).toHaveBeenCalledWith(
+        'marinePlanPolicyQueryStartedAt',
+        expect.any(Number)
+      )
       expect(h.redirect).toHaveBeenCalledWith(
         marineLicenceRoutes.MARINE_LICENCE_CALCULATE_MARINE_PLAN_POLICIES
       )
@@ -425,6 +433,10 @@ describe('#reviewSiteDetails', () => {
         request,
         apiRoutes.CALCULATE_MARINE_PLAN_POLICIES,
         JSON.stringify({ id: 'test-id' })
+      )
+      expect(request.yar.set).toHaveBeenCalledWith(
+        'marinePlanPolicyQueryStartedAt',
+        expect.any(Number)
       )
       expect(h.redirect).toHaveBeenCalledWith(
         marineLicenceRoutes.MARINE_LICENCE_CALCULATE_MARINE_PLAN_POLICIES

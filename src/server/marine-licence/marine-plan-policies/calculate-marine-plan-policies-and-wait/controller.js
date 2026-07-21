@@ -20,12 +20,14 @@ export const calculateMarinePlanPoliciesAndWaitController = {
     const { marinePlanPolicyJob } =
       await marineLicenceService.getMarineLicenceById(marineLicence.id)
 
-    if (marinePlanPolicyJob === 'ready' || marinePlanPolicyJob === 'failed') {
-      return h.redirect(marineLicenceRoutes.MARINE_LICENCE_TASK_LIST)
-    }
-
     const startedAt = getMarinePlanPolicyQueryStartTime(request)
-    if (startedAt && Date.now() - startedAt >= WAIT_TIMEOUT_MS) {
+
+    const isJobComplete =
+      marinePlanPolicyJob === 'ready' || marinePlanPolicyJob === 'failed'
+
+    const hasTimedOut = startedAt && Date.now() - startedAt >= WAIT_TIMEOUT_MS
+
+    if (isJobComplete || hasTimedOut) {
       return h.redirect(marineLicenceRoutes.MARINE_LICENCE_TASK_LIST)
     }
 

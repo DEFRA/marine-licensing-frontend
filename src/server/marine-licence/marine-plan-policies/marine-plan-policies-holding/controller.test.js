@@ -75,8 +75,8 @@ describe('#marinePlanPoliciesHoldingController', () => {
       expect(h.view).toHaveBeenCalledWith(
         MARINE_PLAN_POLICIES_HOLDING_VIEW_ROUTE,
         {
-          pageTitle: 'Marine plan policy considerations',
-          heading: 'Marine plan policy considerations',
+          pageTitle: 'Marine plan policies',
+          heading: 'Marine plan policies',
           projectName: 'Test Project',
           backLink: marineLicenceRoutes.MARINE_LICENCE_TASK_LIST
         }

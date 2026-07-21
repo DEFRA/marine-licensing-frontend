@@ -6,7 +6,7 @@ import { getMarinePlanPolicyQueryStartTime } from '#src/server/common/helpers/ma
 export const CALCULATE_MARINE_PLAN_POLICIES_AND_WAIT_VIEW_ROUTE =
   'marine-licence/marine-plan-policies/calculate-marine-plan-policies-and-wait/index'
 
-const WAIT_TIMEOUT_MS = 1_000
+const WAIT_TIMEOUT_MS = 50_000
 
 export const calculateMarinePlanPoliciesAndWaitController = {
   async handler(request, h) {

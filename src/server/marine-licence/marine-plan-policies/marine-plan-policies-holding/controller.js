@@ -23,11 +23,17 @@ export const marinePlanPoliciesHoldingController = {
       return h.redirect(marineLicenceRoutes.MARINE_LICENCE_MARINE_PLAN_POLICIES)
     }
 
+    if (marinePlanPolicyJob === 'failed') {
+      return h.redirect(marineLicenceRoutes.MARINE_LICENCE_TASK_LIST)
+    }
+
     return h.view(MARINE_PLAN_POLICIES_HOLDING_VIEW_ROUTE, {
       pageTitle: HEADING,
       heading: HEADING,
       projectName,
-      backLink: marineLicenceRoutes.MARINE_LICENCE_TASK_LIST
+      backLink: marineLicenceRoutes.MARINE_LICENCE_TASK_LIST,
+      refreshLink:
+        marineLicenceRoutes.MARINE_LICENCE_MARINE_PLAN_POLICIES_HOLDING
     })
   }
 }

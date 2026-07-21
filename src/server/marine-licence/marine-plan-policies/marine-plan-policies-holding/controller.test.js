@@ -56,7 +56,25 @@ describe('#marinePlanPoliciesHoldingController', () => {
     )
   })
 
-  test.each(['pending', 'computing', 'failed'])(
+  test('should redirect to the task list when marinePlanPolicyJob is failed', async () => {
+    vi.mocked(marineLicenceService.getMarineLicenceService).mockReturnValueOnce(
+      {
+        getMarineLicenceById: vi
+          .fn()
+          .mockResolvedValue({ marinePlanPolicyJob: 'failed' })
+      }
+    )
+
+    const h = { redirect: vi.fn() }
+
+    await marinePlanPoliciesHoldingController.handler(mockRequest, h)
+
+    expect(h.redirect).toHaveBeenCalledWith(
+      marineLicenceRoutes.MARINE_LICENCE_TASK_LIST
+    )
+  })
+
+  test.each(['pending', 'computing'])(
     'should render the holding view when marinePlanPolicyJob is %s',
     async (marinePlanPolicyJob) => {
       vi.mocked(
@@ -78,7 +96,9 @@ describe('#marinePlanPoliciesHoldingController', () => {
           pageTitle: 'Marine plan policies',
           heading: 'Marine plan policies',
           projectName: 'Test Project',
-          backLink: marineLicenceRoutes.MARINE_LICENCE_TASK_LIST
+          backLink: marineLicenceRoutes.MARINE_LICENCE_TASK_LIST,
+          refreshLink:
+            marineLicenceRoutes.MARINE_LICENCE_MARINE_PLAN_POLICIES_HOLDING
         }
       )
     }

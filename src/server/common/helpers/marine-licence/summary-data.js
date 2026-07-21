@@ -1,4 +1,5 @@
 import dayjs from 'dayjs'
+import { invoicingReviewData } from './invoicing/invoicing-review-data.js'
 
 const formatDate = (date) => {
   const { month, year } = date ?? {}
@@ -20,6 +21,6 @@ export const formatPreferredDates = (preferredDates) => {
 
 export const buildSummaryData = (marineLicence) => {
   const preferredDates = formatPreferredDates(marineLicence.preferredDates)
-
-  return { ...marineLicence, preferredDates }
+  const invoicing = invoicingReviewData(marineLicence.invoicing)
+  return { ...marineLicence, preferredDates, invoicing }
 }

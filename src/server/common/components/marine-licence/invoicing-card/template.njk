@@ -1,0 +1,71 @@
+{% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
+
+{% if params.invoicingData.invoiceAddressType %}
+
+{% set rows = [] %}
+
+{% set rows = (rows.push({
+  key: params.invoicingData.invoiceAddressType.key,
+  value: params.invoicingData.invoiceAddressType.value
+}), rows) %}
+
+{% set rows = (rows.push({
+  key: params.invoicingData.invoiceAddress.key,
+  value: params.invoicingData.invoiceAddress.value
+}), rows) %}
+
+{% set rows = (rows.push({
+  key: params.invoicingData.fullName.key,
+  value: params.invoicingData.fullName.value,
+  classes: "govuk-summary-list__row--no-border"
+}), rows) %}
+
+{% if not params.isIndividual %}
+  {% set rows = (rows.push({
+    key: params.invoicingData.organisationName.key,
+    value: params.invoicingData.organisationName.value,
+    classes: "govuk-summary-list__row--no-border"
+  }), rows) %}
+{% endif %}
+
+{% set rows = (rows.push({
+  key: params.invoicingData.phoneNumber.key,
+  value: params.invoicingData.phoneNumber.value,
+  classes: "govuk-summary-list__row--no-border"
+}), rows) %}
+
+{% set rows = (rows.push({
+  key: params.invoicingData.emailAddress.key,
+  value: params.invoicingData.emailAddress.value
+}), rows) %}
+
+{% if not params.isIndividual and params.invoicingData.purchaseOrderDetails %}
+  {% set rows = (rows.push({
+    key: params.invoicingData.purchaseOrderDetails.key,
+    value: params.invoicingData.purchaseOrderDetails.value
+  }), rows) %}
+{% endif %}
+
+{{ govukSummaryList({
+  card: {
+    title: {
+      text: "Invoicing details"
+    },
+    attributes: {
+      id: "invoicing-card"
+    },
+    actions: {
+      items: [
+        {
+          href: params.changeLink ~ "?from=check-your-answers",
+          text: "Change",
+          visuallyHiddenText: " invoicing details",
+          classes: "govuk-link--no-visited-state"
+        }
+      ]
+    } if not params.isReadOnly
+  },
+  rows: rows
+}) }}
+
+{% endif %}

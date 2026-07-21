@@ -32,13 +32,11 @@
 }), invoicingRows) %}
 
 {% if not isIndividual %}
-
   {% set invoicingRows = (invoicingRows.push({
     key: invoicingDisplayData.organisationName.key,
     value: invoicingDisplayData.organisationName.value,
     classes: "govuk-summary-list__row--no-border"
   }), invoicingRows) %}
-
 {% endif %}
 
 {% set invoicingRows = (invoicingRows.push({
@@ -52,7 +50,7 @@
   value: invoicingDisplayData.emailAddress.value
 }), invoicingRows) %}
 
-{% if not isIndividual and invoicing.purchaseOrderDetails and invoicingDisplayData.purchaseOrderDetails %}
+{% if not isIndividual and invoicingDisplayData.purchaseOrderDetails %}
   {% set invoicingRows = (invoicingRows.push({
     key: invoicingDisplayData.purchaseOrderDetails.key,
     value: invoicingDisplayData.purchaseOrderDetails.value

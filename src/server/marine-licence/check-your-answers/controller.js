@@ -13,6 +13,7 @@ import { getMarineLicenceService } from '#src/services/marine-licence-service/in
 import { waterFrameworkReviewData } from '#src/server/common/helpers/marine-licence/water-framework-directive/water-framework-review-data.js'
 import { getWaterFrameworkDirectiveChangeLink } from '#src/server/marine-licence/check-your-answers/utils.js'
 import { buildMarinePlanPoliciesData } from '#src/server/common/helpers/marine-licence/marine-plan-policies-data.js'
+import { isIndividualUser } from '#src/server/common/helpers/user-session-utils.js'
 
 const checkYourAnswersViewContent = {
   pageTitle: 'Check your answers before sending your information',
@@ -45,6 +46,7 @@ export const checkYourAnswersController = {
       // A user may have cancelled out of the WFD flow part way and returned to this page
       // So it is necessary to reset the cache of this property to the server value
       waterFrameworkDirective = completeMarineLicence.waterFrameworkDirective
+
       await setMarineLicenceCache(request, h, {
         ...cachedMarineLicence,
         waterFrameworkDirective
@@ -56,6 +58,8 @@ export const checkYourAnswersController = {
     const waterFrameworkDirectiveData = waterFrameworkReviewData(
       waterFrameworkDirective
     )
+
+    const isIndividual = await isIndividualUser(request)
 
     return h.view(CHECK_YOUR_ANSWERS_VIEW_ROUTE, {
       ...checkYourAnswersViewContent,
@@ -70,6 +74,9 @@ export const checkYourAnswersController = {
       waterFrameworkDirectiveChangeLink: getWaterFrameworkDirectiveChangeLink(
         waterFrameworkDirective
       ),
+      invoicingData: formattedMarineLicence.invoicing,
+      invoicingChangeLink: marineLicenceRoutes.MARINE_LICENCE_CHECK_INVOICING_DETAILS,
+      isIndividual,
       marinePlanPolicies
     })
   }

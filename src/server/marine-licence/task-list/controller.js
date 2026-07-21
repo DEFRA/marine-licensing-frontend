@@ -67,6 +67,7 @@ async function updateLicenceSession(request, h, licenceData, hasCancel) {
     projectName,
     projectBackground,
     specialLegalPowers,
+    invoicing,
     preferredDates,
     publicRegister,
     publicConsultation,
@@ -82,6 +83,7 @@ async function updateLicenceSession(request, h, licenceData, hasCancel) {
     projectName,
     projectBackground,
     specialLegalPowers,
+    invoicing,
     preferredDates,
     publicRegister,
     publicConsultation,
@@ -148,7 +150,6 @@ export const taskListController = {
       ...transformed.feeEstimate,
       ...transformed.marinePlanPolicies
     ]
-      .filter((task) => task.title.text !== 'Invoicing details')
       .every((task) => task.status.text === 'Completed')
 
     return h.view(TASK_LIST_VIEW_ROUTE, {

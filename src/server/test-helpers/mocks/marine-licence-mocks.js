@@ -12,7 +12,8 @@ export const mockMarineLicenceTaskList = {
   publicRegister: 'COMPLETED',
   publicConsultation: 'COMPLETED',
   waterFrameworkDirective: 'COMPLETED',
-  feeEstimate: 'COMPLETED'
+  feeEstimate: 'COMPLETED',
+  invoicing: 'COMPLETED'
 }
 
 export const mockEmptyActivityDetails = {

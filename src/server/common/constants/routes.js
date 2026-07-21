@@ -197,6 +197,7 @@ export const apiRoutes = {
     '/marine-licence/{marineLicenceId}/generate-coordinates-csv',
   UPDATE_FEE_ESTIMATE: '/marine-licence/fee-estimate',
   UPDATE_PREFERRED_DATES: '/marine-licence/preferred-dates',
+  UPDATE_INVOICING: '/marine-licence/invoicing',
   UPDATE_WATER_FRAMEWORK_DIRECTIVE: '/marine-licence/water-framework-directive',
   CALCULATE_MARINE_PLAN_POLICIES:
     '/marine-licence/calculate-marine-plan-policies',

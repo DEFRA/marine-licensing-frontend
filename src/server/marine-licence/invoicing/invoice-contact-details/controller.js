@@ -92,7 +92,7 @@ export const invoiceContactDetailsSubmitController = {
       await saveInvoicingToBackend(request)
 
       return h.redirect(
-        marineLicenceRoutes.MARINE_LICENCE_TASK_LIST
+        marineLicenceRoutes.MARINE_LICENCE_CHECK_INVOICING_DETAILS
       )
     }
 

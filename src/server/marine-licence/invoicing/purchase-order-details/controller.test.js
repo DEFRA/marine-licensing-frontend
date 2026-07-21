@@ -64,7 +64,7 @@ describe('#purchaseOrderDetails', () => {
   })
 
   describe('#purchaseOrderDetailsSubmitController', () => {
-    test('Should save purchase order details to cache and redirect to the same page', async () => {
+    test('Should save purchase order details to cache and redirect to check invoicing details', async () => {
       const payload = {
         requiresPurchaseOrder: 'yes',
         purchaseOrderNumber: 'PO-12345'
@@ -95,7 +95,7 @@ describe('#purchaseOrderDetails', () => {
       expect(saveInvoicingToBackend).toHaveBeenCalledWith(mockRequest)
 
       expect(h.redirect).toHaveBeenCalledWith(
-        marineLicenceRoutes.MARINE_LICENCE_INVOICE_PURCHASE_ORDER_DETAILS
+        marineLicenceRoutes.MARINE_LICENCE_CHECK_INVOICING_DETAILS
       )
     })
   })

@@ -76,6 +76,11 @@ const marineLicencePages = [
     session: agentSession
   },
   {
+    url: marineLicenceRoutes.MARINE_LICENCE_CHECK_INVOICING_DETAILS,
+    title: 'Check your invoicing details',
+    session: agentSession
+  },
+  {
     url: marineLicenceRoutes.MARINE_LICENCE_PUBLIC_REGISTER,
     title: 'Sharing your project information publicly'
   },

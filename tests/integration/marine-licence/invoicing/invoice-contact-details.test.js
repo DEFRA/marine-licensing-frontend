@@ -234,6 +234,7 @@ describe('Invoice contact details', () => {
   })
 
   test('should not require organisation name for a citizen submitting without one', async () => {
+    vi.mocked(getUserSession).mockResolvedValue(citizenUserSession)
     mockMarineLicence(mockUkInvoiceMarineLicence)
 
     const response = await makePostRequest({
@@ -250,7 +251,7 @@ describe('Invoice contact details', () => {
 
     expect(response.statusCode).toBe(statusCodes.redirect)
     expect(response.headers.location).toBe(
-      marineLicenceRoutes.MARINE_LICENCE_INVOICE_PURCHASE_ORDER_DETAILS
+      marineLicenceRoutes.MARINE_LICENCE_CHECK_INVOICING_DETAILS
     )
   })
 

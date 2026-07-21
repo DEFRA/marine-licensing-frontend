@@ -1,0 +1,86 @@
+{% extends 'layouts/page.njk' %}
+{% from "govuk/components/back-link/macro.njk" import govukBackLink %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
+
+{% block beforeContent %}
+{{ super() }}
+<nav>
+  {{ govukBackLink({
+    text: "Back",
+    href: backLink
+  }) }}
+</nav>
+{% endblock %}
+
+{% set invoicingRows = [] %}
+
+{% set invoicingRows = (invoicingRows.push({
+  key: invoicingDisplayData.invoiceAddressType.key,
+  value: invoicingDisplayData.invoiceAddressType.value
+}), invoicingRows) %}
+
+{% set invoicingRows = (invoicingRows.push({
+  key: invoicingDisplayData.invoiceAddress.key,
+  value: invoicingDisplayData.invoiceAddress.value
+}), invoicingRows) %}
+
+{% set invoicingRows = (invoicingRows.push({
+  key: invoicingDisplayData.fullName.key,
+  value: invoicingDisplayData.fullName.value,
+  classes: "govuk-summary-list__row--no-border"
+}), invoicingRows) %}
+
+{% if invoicingDisplayData.organisationName %}
+
+  {% set invoicingRows = (invoicingRows.push({
+    key: invoicingDisplayData.organisationName.key,
+    value: invoicingDisplayData.organisationName.value,
+    classes: "govuk-summary-list__row--no-border"
+  }), invoicingRows) %}
+
+{% endif %}
+
+{% set invoicingRows = (invoicingRows.push({
+  key: invoicingDisplayData.phoneNumber.key,
+  value: invoicingDisplayData.phoneNumber.value,
+  classes: "govuk-summary-list__row--no-border"
+}), invoicingRows) %}
+
+{% set invoicingRows = (invoicingRows.push({
+  key: invoicingDisplayData.emailAddress.key,
+  value: invoicingDisplayData.emailAddress.value
+}), invoicingRows) %}
+
+{% if not isIndividual and invoicing.purchaseOrderDetails and invoicingDisplayData.purchaseOrderDetails %}
+  {% set invoicingRows = (invoicingRows.push({
+    key: invoicingDisplayData.purchaseOrderDetails.key,
+    value: invoicingDisplayData.purchaseOrderDetails.value
+  }), invoicingRows) %}
+{% endif %}
+
+{% block content %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+      <span class="govuk-caption-l">{{ projectName }}</span>
+      <h1 class="govuk-heading-l">{{ heading }}</h1>
+
+      {{ govukSummaryList({
+        rows: invoicingRows,
+        attributes: { id: 'invoicing-review' }
+      }) }}
+
+      <form method="POST">
+        <input type="hidden" name="csrfToken" value="{{ csrfToken }}">
+        <div class="govuk-button-group">
+          {{ govukButton({
+            text: "Continue",
+            attributes: {
+              id: "continue"
+            }
+          }) }}
+        </div>
+      </form>
+    </div>
+  </div>
+{% endblock %}

@@ -81,7 +81,7 @@ export const purchaseOrderDetailsSubmitController = {
     await saveInvoicingToBackend(request)
 
     return h.redirect(
-      marineLicenceRoutes.MARINE_LICENCE_INVOICE_PURCHASE_ORDER_DETAILS
+      marineLicenceRoutes.MARINE_LICENCE_CHECK_INVOICING_DETAILS
     )
   }
 }

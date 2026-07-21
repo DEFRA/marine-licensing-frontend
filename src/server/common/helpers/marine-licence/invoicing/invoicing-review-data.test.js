@@ -47,7 +47,7 @@ describe('formatInvoiceAddress', () => {
         },
         INVOICE_TYPE_OPTIONS.INTERNATIONAL
       )
-    ).toBe('France<br>123 International Street')
+    ).toBe('123 International Street<br>France')
   })
 
   test('returns undefined when address is missing', () => {

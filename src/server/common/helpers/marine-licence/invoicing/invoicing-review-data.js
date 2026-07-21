@@ -30,7 +30,7 @@ export const formatInvoiceAddress = (invoiceAddress, invoiceAddressType) => {
   }
 
   if (invoiceAddressType === INVOICE_TYPE_OPTIONS.INTERNATIONAL) {
-    return formatAddressLines([invoiceAddress.country, invoiceAddress.address])
+    return formatAddressLines([invoiceAddress.address, invoiceAddress.country])
   }
 
   return undefined

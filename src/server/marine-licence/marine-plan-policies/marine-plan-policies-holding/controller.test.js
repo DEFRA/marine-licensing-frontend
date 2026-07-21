@@ -75,6 +75,7 @@ describe('#marinePlanPoliciesHoldingController', () => {
   })
 
   test.each(['pending', 'computing'])(
+
     'should render the holding view when marinePlanPolicyJob is %s',
     async (marinePlanPolicyJob) => {
       vi.mocked(

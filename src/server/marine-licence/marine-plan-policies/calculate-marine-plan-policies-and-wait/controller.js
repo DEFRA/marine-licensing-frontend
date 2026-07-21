@@ -31,6 +31,11 @@ export const calculateMarinePlanPoliciesAndWaitController = {
       return h.redirect(marineLicenceRoutes.MARINE_LICENCE_TASK_LIST)
     }
 
+    const startedAt = getMarinePlanPolicyQueryStartTime(request)
+    if (startedAt && Date.now() - startedAt >= WAIT_TIMEOUT_MS) {
+      return h.redirect(marineLicenceRoutes.MARINE_LICENCE_TASK_LIST)
+    }
+
     return h.view(CALCULATE_MARINE_PLAN_POLICIES_AND_WAIT_VIEW_ROUTE, {
       pageTitle: 'Loading your Marine plan policies',
       heading: 'Loading your Marine plan policies',

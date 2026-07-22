@@ -95,7 +95,7 @@
 
         <div class="govuk-button-group">
           {{ govukButton({
-            text: "Save and continue" if isIndividual else "Continue",
+            text: buttonText,
             classes: "govuk-button--primary"
           }) }}
           {{ appCancelButton({

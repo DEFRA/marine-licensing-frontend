@@ -1,4 +1,9 @@
-import { getByRole, getByText, getByLabelText } from '@testing-library/dom'
+import {
+  getByRole,
+  getByText,
+  getByLabelText,
+  queryByRole
+} from '@testing-library/dom'
 import { marineLicenceRoutes } from '~/src/server/common/constants/routes.js'
 import {
   mockMarineLicence,
@@ -123,6 +128,22 @@ describe('Invoice contact details', () => {
     expect(getByRole(document, 'link', { name: 'Back' })).toHaveAttribute(
       'href',
       marineLicenceRoutes.MARINE_LICENCE_INTERNATIONAL_INVOICE_ADDRESS
+    )
+  })
+
+  test('when using the change link, page content is correct', async () => {
+    mockMarineLicence(mockUkInvoiceMarineLicence)
+
+    const document = await loadPage({
+      requestUrl: `${marineLicenceRoutes.MARINE_LICENCE_INVOICE_CONTACT_DETAILS}?action=change`,
+      server: getServer()
+    })
+
+    expect(queryByRole(document, 'link', { name: 'Cancel' })).toBeNull()
+    getByRole(document, 'button', { name: 'Save and continue' })
+    expect(getByRole(document, 'link', { name: 'Back' })).toHaveAttribute(
+      'href',
+      marineLicenceRoutes.MARINE_LICENCE_CHECK_INVOICING_DETAILS
     )
   })
 

@@ -9,15 +9,17 @@ import {
   invoiceContactDetailsErrorMessages,
   invoiceContactDetailsSettings
 } from '#src/server/common/validation/invoicing/constants.js'
-import { getBackLink } from '#src/server/marine-licence/invoicing/invoice-contact-details/utils.js'
+import {
+  getBackLink,
+  getButtonText,
+  getCancelLink
+} from '#src/server/marine-licence/invoicing/invoice-contact-details/utils.js'
 import { isIndividualUser } from '#src/server/common/helpers/user-session-utils.js'
 import { USER_TYPES } from '#src/server/common/constants/user-types.js'
 import { saveInvoicingToBackend } from '#src/server/common/helpers/marine-licence/invoicing/save-invoicing.js'
 
 export const INVOICE_CONTACT_DETAILS_VIEW_ROUTE =
   'marine-licence/invoicing/invoice-contact-details/index'
-
-const cancelLink = marineLicenceRoutes.MARINE_LICENCE_TASK_LIST
 
 const validateInvoiceContactDetailsPayload = (value, options) =>
   invoiceContactDetailsSchema.validateAsync(value, {
@@ -36,13 +38,16 @@ export const invoiceContactDetailsController = {
     const { invoicing } = marineLicence
     const isIndividual = await isIndividualUser(request)
 
+    const action = request.query.action
+
     return h.view(INVOICE_CONTACT_DETAILS_VIEW_ROUTE, {
       ...invoiceContactDetailsSettings,
       projectName: marineLicence.projectName,
       payload: invoicing.invoiceContactDetails ?? {},
-      backLink: getBackLink(invoicing.invoiceAddressType),
-      cancelLink,
-      isIndividual
+      backLink: getBackLink(invoicing.invoiceAddressType, action),
+      cancelLink: getCancelLink(action),
+      isIndividual,
+      buttonText: getButtonText(isIndividual, action)
     })
   }
 }
@@ -55,14 +60,21 @@ export const invoiceContactDetailsSubmitController = {
         const { projectName, invoicing } = getMarineLicenceCache(request)
         const isIndividual = await isIndividualUser(request)
 
+        const action = request.query.action
+        const cancelLink = getCancelLink(action)
+
         return createFailAction({
           viewRoute: INVOICE_CONTACT_DETAILS_VIEW_ROUTE,
           settings: invoiceContactDetailsSettings,
           errorMessages: invoiceContactDetailsErrorMessages,
           projectName,
-          backLink: getBackLink(invoicing?.invoiceAddressType),
+          backLink: getBackLink(invoicing?.invoiceAddressType, action),
           payload: request.payload,
-          params: { cancelLink, isIndividual }
+          params: {
+            cancelLink,
+            isIndividual,
+            buttonText: getButtonText(isIndividual, action)
+          }
         })(request, h, err)
       }
     }

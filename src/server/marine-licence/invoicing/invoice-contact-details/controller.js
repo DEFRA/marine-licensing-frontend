@@ -99,8 +99,9 @@ export const invoiceContactDetailsSubmitController = {
     })
 
     const isIndividual = await isIndividualUser(request)
+    const action = request.query.action
 
-    if (isIndividual) {
+    if (isIndividual || action) {
       await saveInvoicingToBackend(request)
 
       return h.redirect(

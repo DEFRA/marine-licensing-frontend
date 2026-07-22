@@ -295,4 +295,24 @@ describe('Invoice contact details', () => {
       marineLicenceRoutes.MARINE_LICENCE_INVOICE_PURCHASE_ORDER_DETAILS
     )
   })
+
+  test('should save to the backend and redirect to check invoicing details when using the change link', async () => {
+    mockMarineLicence(mockUkInvoiceMarineLicence)
+
+    const { response } = await submitForm({
+      requestUrl: `${marineLicenceRoutes.MARINE_LICENCE_INVOICE_CONTACT_DETAILS}?action=change`,
+      server: getServer(),
+      formData: {
+        fullName: 'Jane Smith',
+        organisationName: 'Example Organisation',
+        phoneNumber: '0191 376 2791',
+        emailAddress: 'jane.smith@example.com'
+      }
+    })
+
+    expect(response.statusCode).toBe(statusCodes.redirect)
+    expect(response.headers.location).toBe(
+      marineLicenceRoutes.MARINE_LICENCE_CHECK_INVOICING_DETAILS
+    )
+  })
 })

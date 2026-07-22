@@ -8,9 +8,16 @@ import {
 import { loadPage, submitForm } from '~/tests/integration/shared/app-server.js'
 import { makeGetRequest } from '~/src/server/test-helpers/server-requests.js'
 import {
+  getRowByKey,
   validateInvoicingSummaryForIndividual,
   validateInvoicingSummaryForOrganisation
 } from '~/tests/integration/marine-licence/invoicing/check-invoicing-details/check-invoicing-details.utils.js'
+import {
+  ADDRESS_HEADING,
+  ADDRESS_TYPE_HEADING,
+  CONTACT_FULL_NAME,
+  PO_HEADING
+} from '#src/server/common/helpers/marine-licence/invoicing/invoicing-review-data.js'
 import { mockMarineLicenceApplication as marineLicence } from '~/src/server/test-helpers/mocks/marine-licence-mocks.js'
 import {
   expectedPageContentIndividual,
@@ -76,6 +83,70 @@ describe('Check invoicing details', () => {
     validateInvoicingSummaryForIndividual(
       document,
       expectedPageContentIndividual
+    )
+  })
+
+  test('change links point to the correct pages for all users', async () => {
+    vi.mocked(getUserSession).mockResolvedValue(agentSession)
+    mockMarineLicence(marineLicence)
+
+    const document = await loadPage({
+      requestUrl: marineLicenceRoutes.MARINE_LICENCE_CHECK_INVOICING_DETAILS,
+      server: getServer()
+    })
+
+    const invoicingSummary = document.querySelector('#invoicing-review')
+
+    const addressTypeRow = getRowByKey(invoicingSummary, ADDRESS_TYPE_HEADING)
+    expect(getByRole(addressTypeRow, 'link')).toHaveAttribute(
+      'href',
+      `${marineLicenceRoutes.MARINE_LICENCE_IS_INVOICE_ADDRESS_UK_OR_INTERNATIONAL}?action=change`
+    )
+
+    const addressRow = getRowByKey(invoicingSummary, ADDRESS_HEADING)
+    expect(getByRole(addressRow, 'link')).toHaveAttribute(
+      'href',
+      `${marineLicenceRoutes.MARINE_LICENCE_UK_INVOICE_ADDRESS}?action=change`
+    )
+
+    const fullNameRow = getRowByKey(invoicingSummary, CONTACT_FULL_NAME)
+    expect(getByRole(fullNameRow, 'link')).toHaveAttribute(
+      'href',
+      `${marineLicenceRoutes.MARINE_LICENCE_INVOICE_CONTACT_DETAILS}?action=change`
+    )
+
+    const purchaseOrderRow = getRowByKey(invoicingSummary, PO_HEADING)
+    expect(getByRole(purchaseOrderRow, 'link')).toHaveAttribute(
+      'href',
+      `${marineLicenceRoutes.MARINE_LICENCE_INVOICE_PURCHASE_ORDER_DETAILS}?action=change`
+    )
+  })
+
+  test('address change link points to international address page when address type is international', async () => {
+    vi.mocked(getUserSession).mockResolvedValue(agentSession)
+    mockMarineLicence({
+      ...marineLicence,
+      invoicing: {
+        ...marineLicence.invoicing,
+        invoiceAddressType: 'international',
+        invoiceAddress: {
+          address: '123 Example Street',
+          country: 'Germany'
+        }
+      }
+    })
+
+    const document = await loadPage({
+      requestUrl: marineLicenceRoutes.MARINE_LICENCE_CHECK_INVOICING_DETAILS,
+      server: getServer()
+    })
+
+    const invoicingSummary = document.querySelector('#invoicing-review')
+    const addressRow = getRowByKey(invoicingSummary, ADDRESS_HEADING)
+
+    expect(getByRole(addressRow, 'link')).toHaveAttribute(
+      'href',
+      `${marineLicenceRoutes.MARINE_LICENCE_INTERNATIONAL_INVOICE_ADDRESS}?action=change`
     )
   })
 

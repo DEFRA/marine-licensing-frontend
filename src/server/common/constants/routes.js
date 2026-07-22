@@ -40,17 +40,7 @@ export const exemptionRoutes = {
   EXEMPTION: '/exemption'
 }
 
-export const marineLicenceRoutes = {
-  MARINE_LICENCE_ACTIVITY_DESCRIPTION: '/marine-licence/activity-description',
-  MARINE_LICENCE_COMPLETION_DATE: '/marine-licence/completion-date',
-  MARINE_LICENCE_CHECK_YOUR_ANSWERS: '/marine-licence/check-your-answers',
-  MARINE_LICENCE_CONFIRMATION: '/marine-licence/confirmation',
-  MARINE_LICENCE_PROJECT_NAME: '/marine-licence/project-name',
-  MARINE_LICENCE_TASK_LIST: '/marine-licence/task-list',
-  MARINE_LICENCE_DELETE: '/marine-licence/delete',
-  MARINE_LICENCE_SPECIAL_LEGAL_POWERS: '/marine-licence/special-legal-powers',
-  MARINE_LICENCE_OTHER_AUTHORITIES: '/marine-licence/other-authorities',
-  MARINE_LICENCE_HARBOUR_AUTHORITY: '/marine-licence/harbour-authority',
+export const marineLicenceInvoicingRoutes = {
   MARINE_LICENCE_IS_INVOICE_ADDRESS_UK_OR_INTERNATIONAL:
     '/marine-licence/is-invoice-address-uk-or-international',
   MARINE_LICENCE_UK_INVOICE_ADDRESS: '/marine-licence/uk-invoice-address',
@@ -61,7 +51,21 @@ export const marineLicenceRoutes = {
   MARINE_LICENCE_INVOICE_PURCHASE_ORDER_DETAILS:
     '/marine-licence/purchase-order-details',
   MARINE_LICENCE_CHECK_INVOICING_DETAILS:
-    '/marine-licence/check-invoicing-details',
+    '/marine-licence/check-invoicing-details'
+}
+
+export const marineLicenceRoutes = {
+  ...marineLicenceInvoicingRoutes,
+  MARINE_LICENCE_ACTIVITY_DESCRIPTION: '/marine-licence/activity-description',
+  MARINE_LICENCE_COMPLETION_DATE: '/marine-licence/completion-date',
+  MARINE_LICENCE_CHECK_YOUR_ANSWERS: '/marine-licence/check-your-answers',
+  MARINE_LICENCE_CONFIRMATION: '/marine-licence/confirmation',
+  MARINE_LICENCE_PROJECT_NAME: '/marine-licence/project-name',
+  MARINE_LICENCE_TASK_LIST: '/marine-licence/task-list',
+  MARINE_LICENCE_DELETE: '/marine-licence/delete',
+  MARINE_LICENCE_SPECIAL_LEGAL_POWERS: '/marine-licence/special-legal-powers',
+  MARINE_LICENCE_OTHER_AUTHORITIES: '/marine-licence/other-authorities',
+  MARINE_LICENCE_HARBOUR_AUTHORITY: '/marine-licence/harbour-authority',
   MARINE_LICENCE_PROJECT_BACKGROUND: '/marine-licence/project-background',
   MARINE_LICENCE_SITE_DETAILS: '/marine-licence/site-details',
   MARINE_LICENCE_COORDINATES_TYPE_CHOICE:

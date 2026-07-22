@@ -32,11 +32,13 @@
 }), invoicingRows) %}
 
 {% if not isIndividual %}
+
   {% set invoicingRows = (invoicingRows.push({
     key: invoicingDisplayData.organisationName.key,
     value: invoicingDisplayData.organisationName.value,
     classes: "govuk-summary-list__row--no-border"
   }), invoicingRows) %}
+
 {% endif %}
 
 {% set invoicingRows = (invoicingRows.push({

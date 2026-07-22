@@ -9,6 +9,7 @@
 {% from "marine-licence/other-permissions-card/macro.njk" import appMarineLicenceOtherPermissionsCard %}
 {% from "marine-licence/water-framework-directive-card/macro.njk" import appMarineLicenceWaterFrameworkDirectiveCard %}
 {% from "marine-licence/marine-plan-policies-card/macro.njk" import appMarineLicenceMarinePlanPoliciesCard %}
+{% from "marine-licence/invoicing-card/macro.njk" import appMarineLicenceInvoicingCard %}
 {% from "public-register-card/macro.njk" import appPublicRegisterCard %}
 
 {% block head %}
@@ -79,6 +80,12 @@
         harbourAuthority: harbourAuthority,
         otherAuthorities: otherAuthorities,
         publicConsultation: publicConsultation,
+        isReadOnly: isReadOnly
+      }) }}
+
+      {{ appMarineLicenceInvoicingCard({
+        invoicingData: invoicingData,
+        changeLink: invoicingChangeLink,
         isReadOnly: isReadOnly
       }) }}
 

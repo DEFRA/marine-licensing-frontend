@@ -82,7 +82,7 @@
   value: invoicingDisplayData.emailAddress.value
 }), invoicingRows) %}
 
-{% if not isIndividual and invoicing.purchaseOrderDetails and invoicingDisplayData.purchaseOrderDetails %}
+{% if not isIndividual and invoicingDisplayData.purchaseOrderDetails %}
   {% set invoicingRows = (invoicingRows.push({
     key: invoicingDisplayData.purchaseOrderDetails.key,
     value: invoicingDisplayData.purchaseOrderDetails.value,

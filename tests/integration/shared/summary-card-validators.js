@@ -185,6 +185,28 @@ export const validateWaterFrameworkDirective = (document, expected) => {
   }
 }
 
+/**
+ * Validates invoicing card for individual and org users
+ * @param {Document} document - JSDOM document
+ * @param {object} expectedPageContent - Expected page content
+ * @param {object} individual - Is this individual user view
+ */
+export const validateInvoicingCard = (document, expected, individual) => {
+  if (expected.invoicingData) {
+    validateSummaryCardContent(
+      document,
+      '#invoicing-card',
+      expected.invoicingData
+    )
+
+    if (individual) {
+      const card = document.querySelector('#invoicing-card')
+      expect(card.textContent).not.toContain('Organisation name')
+      expect(card.textContent).not.toContain('Purchase order number')
+    }
+  }
+}
+
 export const validateSiteDetails = (document, expectedPageContent) => {
   const siteDetailsData = expectedPageContent.siteDetails
   const multipleSiteDetails =

@@ -102,25 +102,35 @@ describe('Marine Licence Check Your Answers - site and activity cards', () => {
       )
     })
 
-    describe('other permissions card', () => {
-      test('renders harbour authority details with a Change link', () => {
-        const card = document.querySelector('#other-permissions-card')
-        expect(card).toBeTruthy()
-        expect(card.textContent).toContain(
-          'Located in a harbour authority area'
-        )
-        expect(card.textContent).toContain(
-          mockFileUploadMarineLicence.harbourAuthority.details
-        )
+    test('renders the invoicing card with a Change link', () => {
+      const invoicingCard = document.querySelector('#invoicing-card')
+      expect(invoicingCard).toBeTruthy()
 
-        const changeLink = card.querySelector(
-          'a[href*="/marine-licence/harbour-authority"]'
-        )
-        expect(changeLink).toBeTruthy()
-        expect(changeLink.getAttribute('href')).toBe(
-          '/marine-licence/harbour-authority?from=check-your-answers'
-        )
-      })
+      const changeLink = invoicingCard.querySelector(
+        '.govuk-summary-card__actions a'
+      )
+      expect(changeLink).toBeTruthy()
+      expect(changeLink.textContent).toContain('Change')
+      expect(changeLink.getAttribute('href')).toBe(
+        `${marineLicenceRoutes.MARINE_LICENCE_CHECK_INVOICING_DETAILS}?from=check-your-answers`
+      )
+    })
+
+    test('renders harbour authority details with a Change link', () => {
+      const card = document.querySelector('#other-permissions-card')
+      expect(card).toBeTruthy()
+      expect(card.textContent).toContain('Located in a harbour authority area')
+      expect(card.textContent).toContain(
+        mockFileUploadMarineLicence.harbourAuthority.details
+      )
+
+      const changeLink = card.querySelector(
+        'a[href*="/marine-licence/harbour-authority"]'
+      )
+      expect(changeLink).toBeTruthy()
+      expect(changeLink.getAttribute('href')).toBe(
+        '/marine-licence/harbour-authority?from=check-your-answers'
+      )
     })
 
     test('renders activity card with card-level Change link and no row-level actions', () => {

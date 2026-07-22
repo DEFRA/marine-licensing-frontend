@@ -45,6 +45,7 @@ export const checkYourAnswersController = {
       // A user may have cancelled out of the WFD flow part way and returned to this page
       // So it is necessary to reset the cache of this property to the server value
       waterFrameworkDirective = completeMarineLicence.waterFrameworkDirective
+
       await setMarineLicenceCache(request, h, {
         ...cachedMarineLicence,
         waterFrameworkDirective
@@ -70,6 +71,9 @@ export const checkYourAnswersController = {
       waterFrameworkDirectiveChangeLink: getWaterFrameworkDirectiveChangeLink(
         waterFrameworkDirective
       ),
+      invoicingData: formattedMarineLicence.invoicing,
+      invoicingChangeLink:
+        marineLicenceRoutes.MARINE_LICENCE_CHECK_INVOICING_DETAILS,
       marinePlanPolicies
     })
   }

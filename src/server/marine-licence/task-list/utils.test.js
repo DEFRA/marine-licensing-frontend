@@ -4,7 +4,8 @@ import {
   transformOtherPermissionsTaskList,
   transformSharingTaskList,
   transformWaterFrameworkDirectiveTaskList,
-  transformMarinePlanPoliciesTaskList
+  transformMarinePlanPoliciesTaskList,
+  transformFeeEstimateTaskList
 } from '#src/server/marine-licence/task-list/utils.js'
 import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
 
@@ -722,5 +723,111 @@ describe('taskList utils', () => {
         ])
       }
     )
+  })
+
+  describe('transformFeeEstimateTaskList', () => {
+    test('correctly returns Completed status and check-invoicing-details href', () => {
+      expect(
+        transformFeeEstimateTaskList({
+          feeEstimate: 'COMPLETED',
+          invoicing: 'COMPLETED'
+        })
+      ).toEqual([
+        {
+          href: marineLicenceRoutes.MARINE_LICENCE_FEE_ESTIMATE,
+          status: { text: 'Completed' },
+          title: {
+            classes: 'govuk-link--no-visited-state',
+            text: 'Fee estimate'
+          }
+        },
+        {
+          href: marineLicenceRoutes.MARINE_LICENCE_CHECK_INVOICING_DETAILS,
+          status: { text: 'Completed' },
+          title: {
+            classes: 'govuk-link--no-visited-state',
+            text: 'Invoicing details'
+          }
+        }
+      ])
+    })
+
+    test('correctly returns In progress', () => {
+      expect(
+        transformFeeEstimateTaskList({
+          feeEstimate: 'IN_PROGRESS',
+          invoicing: 'IN_PROGRESS'
+        })
+      ).toEqual([
+        {
+          href: marineLicenceRoutes.MARINE_LICENCE_FEE_ESTIMATE,
+          status: {
+            tag: { text: 'In progress', classes: 'govuk-tag--teal' }
+          },
+          title: {
+            classes: 'govuk-link--no-visited-state',
+            text: 'Fee estimate'
+          }
+        },
+        {
+          href: marineLicenceRoutes.MARINE_LICENCE_IS_INVOICE_ADDRESS_UK_OR_INTERNATIONAL,
+          status: {
+            tag: { text: 'In progress', classes: 'govuk-tag--teal' }
+          },
+          title: {
+            classes: 'govuk-link--no-visited-state',
+            text: 'Invoicing details'
+          }
+        }
+      ])
+    })
+
+    test.each([null, 'INCOMPLETE', undefined])(
+      'correctly returns Not yet started for %s',
+      (value) => {
+        expect(
+          transformFeeEstimateTaskList({
+            feeEstimate: value,
+            invoicing: value
+          })
+        ).toEqual([
+          {
+            href: marineLicenceRoutes.MARINE_LICENCE_FEE_ESTIMATE,
+            status: {
+              tag: { text: 'Not yet started', classes: 'govuk-tag--blue' }
+            },
+            title: {
+              classes: 'govuk-link--no-visited-state',
+              text: 'Fee estimate'
+            }
+          },
+          {
+            href: marineLicenceRoutes.MARINE_LICENCE_IS_INVOICE_ADDRESS_UK_OR_INTERNATIONAL,
+            status: {
+              tag: { text: 'Not yet started', classes: 'govuk-tag--blue' }
+            },
+            title: {
+              classes: 'govuk-link--no-visited-state',
+              text: 'Invoicing details'
+            }
+          }
+        ])
+      }
+    )
+
+    test('correctly returns Not accepted', () => {
+      const [, invoicingTask] = transformFeeEstimateTaskList({
+        invoicing: 'NOT_ACCEPTED'
+      })
+
+      expect(invoicingTask).toEqual({
+        href: marineLicenceRoutes.MARINE_LICENCE_IS_INVOICE_ADDRESS_UK_OR_INTERNATIONAL,
+        status: { tag: { text: 'Not accepted', classes: 'govuk-tag--red' } },
+        title: {
+          classes: 'govuk-link--no-visited-state',
+          text: 'Invoicing details'
+        }
+      })
+    })
   })
 })

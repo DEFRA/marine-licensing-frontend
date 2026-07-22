@@ -60,6 +60,8 @@ export const marineLicenceRoutes = {
     '/marine-licence/invoice-contact-details',
   MARINE_LICENCE_INVOICE_PURCHASE_ORDER_DETAILS:
     '/marine-licence/purchase-order-details',
+  MARINE_LICENCE_CHECK_INVOICING_DETAILS:
+    '/marine-licence/check-invoicing-details',
   MARINE_LICENCE_PROJECT_BACKGROUND: '/marine-licence/project-background',
   MARINE_LICENCE_SITE_DETAILS: '/marine-licence/site-details',
   MARINE_LICENCE_COORDINATES_TYPE_CHOICE:
@@ -199,6 +201,7 @@ export const apiRoutes = {
     '/marine-licence/{marineLicenceId}/generate-coordinates-csv',
   UPDATE_FEE_ESTIMATE: '/marine-licence/fee-estimate',
   UPDATE_PREFERRED_DATES: '/marine-licence/preferred-dates',
+  UPDATE_INVOICING: '/marine-licence/invoicing',
   UPDATE_WATER_FRAMEWORK_DIRECTIVE: '/marine-licence/water-framework-directive',
   CALCULATE_MARINE_PLAN_POLICIES:
     '/marine-licence/calculate-marine-plan-policies',

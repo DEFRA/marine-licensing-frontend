@@ -9,9 +9,11 @@ import * as authUtils from '#src/server/common/plugins/auth/utils.js'
 import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
 import { mockMarineLicenceApplication } from '#src/server/test-helpers/mocks/marine-licence-mocks.js'
 import { createMockH } from '#src/server/test-helpers/mocks/helpers.js'
+import { saveInvoicingToBackend } from '#src/server/common/helpers/marine-licence/invoicing/save-invoicing.js'
 
-vi.mock('#/src/server/common/helpers/marine-licence/session-cache/utils.js')
-vi.mock('#/src/server/common/plugins/auth/utils.js')
+vi.mock('#src/server/common/helpers/marine-licence/session-cache/utils.js')
+vi.mock('#src/server/common/plugins/auth/utils.js')
+vi.mock('#src/server/common/helpers/marine-licence/invoicing/save-invoicing.js')
 
 describe('#purchaseOrderDetails', () => {
   const h = createMockH()
@@ -62,11 +64,13 @@ describe('#purchaseOrderDetails', () => {
   })
 
   describe('#purchaseOrderDetailsSubmitController', () => {
-    test('Should save requiresPurchaseOrder and purchaseOrderNumber to cache and redirect to the same page', async () => {
+    test('Should save purchase order details to cache and redirect to check invoicing details', async () => {
       const payload = {
         requiresPurchaseOrder: 'yes',
         purchaseOrderNumber: 'PO-12345'
       }
+
+      const mockRequest = { payload, query: {} }
 
       await purchaseOrderDetailsSubmitController.handler(
         { payload, query: {} },
@@ -87,8 +91,11 @@ describe('#purchaseOrderDetails', () => {
           }
         }
       )
+
+      expect(saveInvoicingToBackend).toHaveBeenCalledWith(mockRequest)
+
       expect(h.redirect).toHaveBeenCalledWith(
-        marineLicenceRoutes.MARINE_LICENCE_INVOICE_PURCHASE_ORDER_DETAILS
+        marineLicenceRoutes.MARINE_LICENCE_CHECK_INVOICING_DETAILS
       )
     })
   })

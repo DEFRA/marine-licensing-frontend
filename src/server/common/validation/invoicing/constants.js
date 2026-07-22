@@ -3,6 +3,11 @@ export const INVOICE_TYPE_OPTIONS = {
   INTERNATIONAL: 'international'
 }
 
+export const INVOICE_TYPE_LABELS = {
+  UK: 'UK',
+  INTERNATIONAL: 'International'
+}
+
 const IS_INVOICE_ADDRESS_UK_OR_INTERNATIONAL_TITLE =
   "Is the invoice contact's address in the UK or international?"
 

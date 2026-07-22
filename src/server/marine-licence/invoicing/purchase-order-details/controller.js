@@ -10,6 +10,7 @@ import {
   purchaseOrderDetailsSettings
 } from '#src/server/common/validation/invoicing/constants.js'
 import { isIndividualUser } from '#src/server/common/helpers/user-session-utils.js'
+import { saveInvoicingToBackend } from '#src/server/common/helpers/marine-licence/invoicing/save-invoicing.js'
 
 export const PURCHASE_ORDER_DETAILS_VIEW_ROUTE =
   'marine-licence/invoicing/purchase-order-details/index'
@@ -77,8 +78,10 @@ export const purchaseOrderDetailsSubmitController = {
       }
     })
 
+    await saveInvoicingToBackend(request)
+
     return h.redirect(
-      marineLicenceRoutes.MARINE_LICENCE_INVOICE_PURCHASE_ORDER_DETAILS
+      marineLicenceRoutes.MARINE_LICENCE_CHECK_INVOICING_DETAILS
     )
   }
 }

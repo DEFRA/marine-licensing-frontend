@@ -12,6 +12,7 @@ import {
 import { getBackLink } from '#src/server/marine-licence/invoicing/invoice-contact-details/utils.js'
 import { isIndividualUser } from '#src/server/common/helpers/user-session-utils.js'
 import { USER_TYPES } from '#src/server/common/constants/user-types.js'
+import { saveInvoicingToBackend } from '#src/server/common/helpers/marine-licence/invoicing/save-invoicing.js'
 
 export const INVOICE_CONTACT_DETAILS_VIEW_ROUTE =
   'marine-licence/invoicing/invoice-contact-details/index'
@@ -84,6 +85,16 @@ export const invoiceContactDetailsSubmitController = {
         }
       }
     })
+
+    const isIndividual = await isIndividualUser(request)
+
+    if (isIndividual) {
+      await saveInvoicingToBackend(request)
+
+      return h.redirect(
+        marineLicenceRoutes.MARINE_LICENCE_CHECK_INVOICING_DETAILS
+      )
+    }
 
     return h.redirect(
       marineLicenceRoutes.MARINE_LICENCE_INVOICE_PURCHASE_ORDER_DETAILS

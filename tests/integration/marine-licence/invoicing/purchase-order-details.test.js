@@ -176,7 +176,7 @@ describe('Purchase order details', () => {
     })
   })
 
-  test('should stay on the same page on valid submission', async () => {
+  test('should redirect to check invoicing details on valid submission', async () => {
     mockMarineLicence(mockMarineLicenceWithInvoicing)
 
     const { response } = await submitForm({
@@ -188,7 +188,7 @@ describe('Purchase order details', () => {
 
     expect(response.statusCode).toBe(statusCodes.redirect)
     expect(response.headers.location).toBe(
-      marineLicenceRoutes.MARINE_LICENCE_INVOICE_PURCHASE_ORDER_DETAILS
+      marineLicenceRoutes.MARINE_LICENCE_CHECK_INVOICING_DETAILS
     )
   })
 })

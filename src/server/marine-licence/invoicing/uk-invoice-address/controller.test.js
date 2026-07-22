@@ -29,7 +29,10 @@ describe('#ukInvoiceAddress', () => {
 
   describe('#ukInvoiceAddressController', () => {
     test('Should not show a cancel link, show the correct button text and back link when using the change link', async () => {
-      await ukInvoiceAddressController.handler({ query: { action: 'change' } }, h)
+      await ukInvoiceAddressController.handler(
+        { query: { action: 'change' } },
+        h
+      )
 
       expect(h.view).toHaveBeenCalledWith(
         UK_INVOICE_ADDRESS_VIEW_ROUTE,

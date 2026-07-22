@@ -30,6 +30,8 @@ vi.mock(
   '#src/server/common/helpers/marine-licence/marine-plan-policies-data.js'
 )
 
+const expectedInvoicingData = mockMarineLicenceApplication.invoicing
+
 const expectedWaterFrameworkDirectiveData = {
   excludedActivities: {
     key: {
@@ -146,6 +148,9 @@ describe('#checkYourAnswersController', () => {
       waterFrameworkDirectiveData: expectedWaterFrameworkDirectiveData,
       waterFrameworkDirectiveChangeLink:
         marineLicenceRoutes.MARINE_LICENCE_WATER_FRAMEWORK_DIRECTIVE_REVIEW_YOUR_ANSWERS,
+      invoicingData: expectedInvoicingData,
+      invoicingChangeLink:
+        marineLicenceRoutes.MARINE_LICENCE_CHECK_INVOICING_DETAILS,
       marinePlanPolicies: mockPolicies
     })
   })
@@ -173,6 +178,8 @@ describe('#checkYourAnswersController', () => {
       preferredDates: null,
       coordinatesType: null,
       summaryData: [],
+      invoicingChangeLink: '/marine-licence/check-invoicing-details',
+      invoicingData: undefined,
       waterFrameworkDirectiveData: {},
       reviewSiteDetailsRoute:
         marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS,

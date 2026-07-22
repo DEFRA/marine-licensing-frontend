@@ -1,5 +1,6 @@
 import { describe, expect, test } from 'vitest'
 import { formatPreferredDates, buildSummaryData } from './summary-data.js'
+import { invoicingReviewData } from './invoicing/invoicing-review-data.js'
 import { mockMarineLicenceApplication } from '~/src/server/test-helpers/mocks/marine-licence-mocks.js'
 
 describe('formatPreferredDates', () => {
@@ -40,7 +41,8 @@ describe('buildSummaryData', () => {
 
     expect(result).toMatchObject({
       ...mockMarineLicenceApplication,
-      preferredDates: 'July 2026 to August 2027'
+      preferredDates: 'July 2026 to August 2027',
+      invoicing: invoicingReviewData(mockMarineLicenceApplication.invoicing)
     })
   })
 })

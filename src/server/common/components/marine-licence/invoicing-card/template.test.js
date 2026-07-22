@@ -96,7 +96,7 @@ describe('Marine Licence Invoicing Card Component', () => {
     delete individualInvoicingData.organisationName
 
     const $comp = renderComponent('marine-licence/invoicing-card', {
-      individualInvoicingData
+      invoicingData: individualInvoicingData
     })
 
     expect($comp.html()).not.toContain(CONTACT_ORG_NAME)

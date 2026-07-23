@@ -5,14 +5,14 @@ import { saveInvoicingToBackend } from '#src/server/common/helpers/marine-licenc
 export const isInAddressTypeChangeFlow = (invoicing) =>
   Boolean(invoicing?.originalInvoiceAddressType)
 
-export const isInAddressChangeFlow = (action) => Boolean(action)
+export const isInAddressChangeFlow = (action) => !!action
 
 export const isInChangeFlow = (action, invoicing) => {
   return isInAddressTypeChangeFlow(invoicing) || isInAddressChangeFlow(action)
 }
 
 export const getInvoiceAddressBackLink = (action, invoicing) => {
-  if (isInAddressChangeFlow(action)) {
+  if (isInAddressChangeFlow(action, invoicing)) {
     return marineLicenceRoutes.MARINE_LICENCE_CHECK_INVOICING_DETAILS
   }
   return marineLicenceRoutes.MARINE_LICENCE_IS_INVOICE_ADDRESS_UK_OR_INTERNATIONAL

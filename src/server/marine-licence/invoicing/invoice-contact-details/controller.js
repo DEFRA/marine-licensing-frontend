@@ -11,9 +11,9 @@ import {
 } from '#src/server/common/validation/invoicing/constants.js'
 import {
   getBackLink,
-  getButtonText,
-  getCancelLink
+  getButtonText
 } from '#src/server/marine-licence/invoicing/invoice-contact-details/utils.js'
+import { getInvoiceCancelLink } from '#src/server/marine-licence/invoicing/utils.js'
 import { isIndividualUser } from '#src/server/common/helpers/user-session-utils.js'
 import { USER_TYPES } from '#src/server/common/constants/user-types.js'
 import { saveInvoicingToBackend } from '#src/server/common/helpers/marine-licence/invoicing/save-invoicing.js'
@@ -45,7 +45,7 @@ export const invoiceContactDetailsController = {
       projectName: marineLicence.projectName,
       payload: invoicing.invoiceContactDetails ?? {},
       backLink: getBackLink(invoicing.invoiceAddressType, action),
-      cancelLink: getCancelLink(action),
+      cancelLink: getInvoiceCancelLink(action),
       isIndividual,
       buttonText: getButtonText(isIndividual, action)
     })
@@ -61,7 +61,7 @@ export const invoiceContactDetailsSubmitController = {
         const isIndividual = await isIndividualUser(request)
 
         const action = request.query.action
-        const cancelLink = getCancelLink(action)
+        const cancelLink = getInvoiceCancelLink(action)
 
         return createFailAction({
           viewRoute: INVOICE_CONTACT_DETAILS_VIEW_ROUTE,

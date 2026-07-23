@@ -13,9 +13,6 @@ export const getBackLink = (invoiceAddressType, action) => {
   return marineLicenceRoutes.MARINE_LICENCE_INTERNATIONAL_INVOICE_ADDRESS
 }
 
-export const getCancelLink = (action) =>
-  action ? undefined : marineLicenceRoutes.MARINE_LICENCE_TASK_LIST
-
 export const getButtonText = (isIndividual, action) => {
   if (action || isIndividual) {
     return 'Save and continue'

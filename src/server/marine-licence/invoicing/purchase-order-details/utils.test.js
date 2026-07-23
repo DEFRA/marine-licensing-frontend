@@ -1,8 +1,5 @@
 import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
-import {
-  getBackLink,
-  getCancelLink
-} from '#src/server/marine-licence/invoicing/purchase-order-details/utils.js'
+import { getBackLink } from '#src/server/marine-licence/invoicing/purchase-order-details/utils.js'
 
 describe('getBackLink', () => {
   test('returns to review page when action link is set', () => {
@@ -15,15 +12,5 @@ describe('getBackLink', () => {
     expect(getBackLink(undefined)).toBe(
       marineLicenceRoutes.MARINE_LICENCE_INVOICE_CONTACT_DETAILS
     )
-  })
-})
-
-describe('getCancelLink', () => {
-  test('hides when using action link', () => {
-    expect(getCancelLink('change')).toBeUndefined()
-  })
-
-  test('returns task list in other all other scenarios', () => {
-    expect(getCancelLink()).toBe(marineLicenceRoutes.MARINE_LICENCE_TASK_LIST)
   })
 })

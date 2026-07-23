@@ -5,7 +5,7 @@ import {
   isInAddressChangeFlow,
   isInChangeFlow,
   getInvoiceAddressBackLink,
-  getInvoiceAddressCancelLink,
+  getInvoiceCancelLink,
   getInvoiceAddressButtonText,
   redirectAfterInvoiceAddressSubmit
 } from '#src/server/marine-licence/invoicing/utils.js'
@@ -67,13 +67,13 @@ describe('getInvoiceAddressBackLink', () => {
   })
 })
 
-describe('getInvoiceAddressCancelLink', () => {
+describe('getInvoiceCancelLink', () => {
   test('hides when using action link', () => {
-    expect(getInvoiceAddressCancelLink('change')).toBeUndefined()
+    expect(getInvoiceCancelLink('change')).toBeUndefined()
   })
 
   test('returns task list in all other scenarios', () => {
-    expect(getInvoiceAddressCancelLink()).toBe(
+    expect(getInvoiceCancelLink()).toBe(
       marineLicenceRoutes.MARINE_LICENCE_TASK_LIST
     )
   })

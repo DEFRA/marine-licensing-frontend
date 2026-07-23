@@ -10,7 +10,7 @@ import {
   isInvoiceAddressUkOrInternationalSettings
 } from '#src/server/common/validation/invoicing/constants.js'
 import {
-  getInvoiceAddressCancelLink,
+  getInvoiceCancelLink,
   getInvoiceAddressButtonText,
   isInChangeFlow
 } from '#src/server/marine-licence/invoicing/utils.js'
@@ -34,7 +34,7 @@ export const isInvoiceAddressUkOrInternationalController = {
       projectName: marineLicence.projectName,
       payload: invoicing ?? {},
       backLink: getBackLink(action, invoicing),
-      cancelLink: getInvoiceAddressCancelLink(action, invoicing),
+      cancelLink: getInvoiceCancelLink(action, invoicing),
       buttonText: getInvoiceAddressButtonText(action, invoicing)
     })
   }
@@ -58,7 +58,7 @@ export const isInvoiceAddressUkOrInternationalSubmitController = {
           backLink: getBackLink(action),
           payload: request.payload,
           params: {
-            cancelLink: getInvoiceAddressCancelLink(action, invoicing),
+            cancelLink: getInvoiceCancelLink(action, invoicing),
             buttonText: getInvoiceAddressButtonText(action, invoicing)
           }
         })(request, h, err)

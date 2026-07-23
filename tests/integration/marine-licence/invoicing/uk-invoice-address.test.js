@@ -233,13 +233,13 @@ describe('UK invoice address', () => {
     })
 
     const document = await loadPage({
-      requestUrl: `${marineLicenceRoutes.MARINE_LICENCE_UK_INVOICE_ADDRESS}?action=change`,
+      requestUrl: marineLicenceRoutes.MARINE_LICENCE_UK_INVOICE_ADDRESS,
       server: getServer()
     })
 
     expect(getByRole(document, 'link', { name: 'Back' })).toHaveAttribute(
       'href',
-      `${marineLicenceRoutes.MARINE_LICENCE_IS_INVOICE_ADDRESS_UK_OR_INTERNATIONAL}?action=change`
+      marineLicenceRoutes.MARINE_LICENCE_IS_INVOICE_ADDRESS_UK_OR_INTERNATIONAL
     )
   })
 

@@ -2,8 +2,7 @@ import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
 import { INVOICE_TYPE_OPTIONS } from '#src/server/common/validation/invoicing/constants.js'
 import {
   getBackLink,
-  getButtonText,
-  getCancelLink
+  getButtonText
 } from '#src/server/marine-licence/invoicing/invoice-contact-details/utils.js'
 
 describe('invoiceContactDetails utils', () => {
@@ -23,16 +22,6 @@ describe('invoiceContactDetails utils', () => {
     expect(getBackLink(INVOICE_TYPE_OPTIONS.INTERNATIONAL)).toEqual(
       marineLicenceRoutes.MARINE_LICENCE_INTERNATIONAL_INVOICE_ADDRESS
     )
-  })
-})
-
-describe('getCancelLink', () => {
-  test('hides when using action link', () => {
-    expect(getCancelLink('change')).toBeUndefined()
-  })
-
-  test('returns task list in other all other scenarios', () => {
-    expect(getCancelLink()).toBe(marineLicenceRoutes.MARINE_LICENCE_TASK_LIST)
   })
 })
 

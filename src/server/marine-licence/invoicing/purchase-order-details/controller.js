@@ -11,10 +11,8 @@ import {
 } from '#src/server/common/validation/invoicing/constants.js'
 import { isIndividualUser } from '#src/server/common/helpers/user-session-utils.js'
 import { saveInvoicingToBackend } from '#src/server/common/helpers/marine-licence/invoicing/save-invoicing.js'
-import {
-  getBackLink,
-  getCancelLink
-} from '#src/server/marine-licence/invoicing/purchase-order-details/utils.js'
+import { getBackLink } from '#src/server/marine-licence/invoicing/purchase-order-details/utils.js'
+import { getInvoiceCancelLink } from '#src/server/marine-licence/invoicing/utils.js'
 
 export const PURCHASE_ORDER_DETAILS_VIEW_ROUTE =
   'marine-licence/invoicing/purchase-order-details/index'
@@ -37,7 +35,7 @@ export const purchaseOrderDetailsController = {
       projectName: marineLicence.projectName,
       payload: invoicing.purchaseOrderDetails ?? {},
       backLink: getBackLink(action),
-      cancelLink: getCancelLink(action)
+      cancelLink: getInvoiceCancelLink(action)
     })
   }
 }
@@ -50,7 +48,7 @@ export const purchaseOrderDetailsSubmitController = {
         const { projectName } = getMarineLicenceCache(request)
 
         const action = request.query.action
-        const cancelLink = getCancelLink(action)
+        const cancelLink = getInvoiceCancelLink(action)
 
         return createFailAction({
           viewRoute: PURCHASE_ORDER_DETAILS_VIEW_ROUTE,

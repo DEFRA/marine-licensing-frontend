@@ -12,7 +12,7 @@ import {
 import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
 import {
   getInvoiceAddressBackLink,
-  getInvoiceAddressCancelLink,
+  getInvoiceCancelLink,
   getInvoiceAddressButtonText,
   redirectAfterInvoiceAddressSubmit
 } from '#src/server/marine-licence/invoicing/utils.js'
@@ -38,7 +38,7 @@ export const ukInvoiceAddressController = {
       projectName: marineLicence.projectName,
       payload: invoicing.invoiceAddress ?? {},
       backLink: getInvoiceAddressBackLink(action, invoicing),
-      cancelLink: getInvoiceAddressCancelLink(action),
+      cancelLink: getInvoiceCancelLink(action),
       buttonText: getInvoiceAddressButtonText(action)
     })
   }
@@ -60,7 +60,7 @@ export const ukInvoiceAddressSubmitController = {
           backLink: getInvoiceAddressBackLink(action, invoicing),
           payload: request.payload,
           params: {
-            cancelLink: getInvoiceAddressCancelLink(action),
+            cancelLink: getInvoiceCancelLink(action),
             buttonText: getInvoiceAddressButtonText(action)
           }
         })(request, h, err)

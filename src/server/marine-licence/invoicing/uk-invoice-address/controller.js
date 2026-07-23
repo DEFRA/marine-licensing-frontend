@@ -38,8 +38,8 @@ export const ukInvoiceAddressController = {
       projectName: marineLicence.projectName,
       payload: invoicing.invoiceAddress ?? {},
       backLink: getInvoiceAddressBackLink(action, invoicing),
-      cancelLink: getInvoiceCancelLink(action),
-      buttonText: getInvoiceAddressButtonText(action)
+      cancelLink: getInvoiceCancelLink(action, invoicing),
+      buttonText: getInvoiceAddressButtonText(action, invoicing)
     })
   }
 }
@@ -60,8 +60,8 @@ export const ukInvoiceAddressSubmitController = {
           backLink: getInvoiceAddressBackLink(action, invoicing),
           payload: request.payload,
           params: {
-            cancelLink: getInvoiceCancelLink(action),
-            buttonText: getInvoiceAddressButtonText(action)
+            cancelLink: getInvoiceCancelLink(action, invoicing),
+            buttonText: getInvoiceAddressButtonText(action, invoicing)
           }
         })(request, h, err)
       }
@@ -87,6 +87,11 @@ export const ukInvoiceAddressSubmitController = {
       }
     })
 
-    return redirectAfterInvoiceAddressSubmit(request, h, request.query.action)
+    return redirectAfterInvoiceAddressSubmit(
+      request,
+      h,
+      request.query.action,
+      invoicing
+    )
   }
 }

@@ -113,6 +113,60 @@ describe('#isInvoiceAddressUkOrInternational', () => {
       expect(h.view).not.toHaveBeenCalled()
     })
 
+    test('Should capture the current address type when in change flow', async () => {
+      await isInvoiceAddressUkOrInternationalSubmitController.handler(
+        {
+          payload: { invoiceAddressType: 'international' },
+          query: { action: 'change' }
+        },
+        h
+      )
+
+      expect(cacheUtils.setMarineLicenceCache).toHaveBeenCalledWith(
+        expect.anything(),
+        h,
+        {
+          ...mockMarineLicenceApplication,
+          invoicing: {
+            ...mockMarineLicenceApplication.invoicing,
+            invoiceAddressType: 'international',
+            originalInvoiceAddressType:
+              mockMarineLicenceApplication.invoicing.invoiceAddressType
+          }
+        }
+      )
+      expect(authRequests.authenticatedPatchRequest).not.toHaveBeenCalled()
+      expect(h.redirect).toHaveBeenCalledWith(
+        marineLicenceRoutes.MARINE_LICENCE_INTERNATIONAL_INVOICE_ADDRESS
+      )
+    })
+
+    test('Should capture the current address type as the original when first submitting in the change flow and the value is unchanged', async () => {
+      await isInvoiceAddressUkOrInternationalSubmitController.handler(
+        {
+          payload: { invoiceAddressType: 'uk' },
+          query: { action: 'change' }
+        },
+        h
+      )
+
+      expect(cacheUtils.setMarineLicenceCache).toHaveBeenCalledWith(
+        expect.anything(),
+        h,
+        {
+          ...mockMarineLicenceApplication,
+          invoicing: {
+            ...mockMarineLicenceApplication.invoicing,
+            invoiceAddressType: 'uk',
+            originalInvoiceAddressType: 'uk'
+          }
+        }
+      )
+      expect(h.redirect).toHaveBeenCalledWith(
+        marineLicenceRoutes.MARINE_LICENCE_CHECK_INVOICING_DETAILS
+      )
+    })
+
     test('Should redirect to check invoicing details when the change link value is unchanged', async () => {
       authRequests.authenticatedPatchRequest.mockResolvedValue()
       vi.spyOn(cacheUtils, 'getMarineLicenceCache').mockReturnValue({

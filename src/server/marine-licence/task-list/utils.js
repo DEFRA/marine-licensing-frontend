@@ -171,17 +171,32 @@ export const transformMarinePlanPoliciesTaskList = (
     marinePlanPolicyResponseCount
   }
 ) => {
-  const isAvailable =
-    taskList.siteDetails === 'COMPLETED' && marinePlanPolicyJob === 'ready'
+  const cannotStartYet = [
+    {
+      title: { text: 'Marine plan policy considerations' },
+      status: {
+        text: 'Cannot start yet',
+        classes: 'govuk-task-list__status--cannot-start-yet'
+      }
+    }
+  ]
 
-  if (!isAvailable) {
+  if (
+    taskList.siteDetails !== 'COMPLETED' ||
+    marinePlanPolicyJob === 'failed'
+  ) {
+    return cannotStartYet
+  }
+
+  if (marinePlanPolicyJob !== 'ready') {
     return [
       {
-        title: { text: 'Marine plan policy considerations' },
-        status: {
-          text: 'Cannot start yet',
-          classes: 'govuk-task-list__status--cannot-start-yet'
-        }
+        title: {
+          text: 'Marine plan policy considerations',
+          classes: taskClasses
+        },
+        href: marineLicenceRoutes.MARINE_LICENCE_MARINE_PLAN_POLICIES_HOLDING,
+        status: NOT_STARTED_STATUS
       }
     ]
   }

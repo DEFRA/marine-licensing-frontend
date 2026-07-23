@@ -123,6 +123,8 @@ export const marineLicenceRoutes = {
   MARINE_LICENCE_MARINE_PLAN_POLICY_GUIDANCE:
     '/marine-licence/marine-plan-policy-guidance',
   MARINE_LICENCE_MARINE_PLAN_POLICIES: '/marine-licence/marine-plan-policies',
+  MARINE_LICENCE_MARINE_PLAN_POLICIES_HOLDING:
+    '/marine-licence/marine-plan-policies-holding',
   MARINE_LICENCE_MARINE_PLAN_POLICY:
     '/marine-licence/marine-plan-policy/{policyCode}'
 }

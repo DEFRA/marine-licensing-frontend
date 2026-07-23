@@ -46,12 +46,15 @@ describe('#isInvoiceAddressUkOrInternational', () => {
         IS_INVOICE_ADDRESS_UK_OR_INTERNATIONAL_VIEW_ROUTE,
         {
           backLink: '/marine-licence/task-list',
+          cancelLink: '/marine-licence/task-list',
+          buttonText: 'Continue',
           heading: isInvoiceAddressUkOrInternationalSettings.heading,
           pageTitle: isInvoiceAddressUkOrInternationalSettings.pageTitle,
           payload: {},
           projectName: mockMarineLicenceApplication.projectName
         }
       )
+      expect(cacheUtils.setMarineLicenceCache).not.toHaveBeenCalled()
     })
   })
 
@@ -108,6 +111,52 @@ describe('#isInvoiceAddressUkOrInternational', () => {
         marineLicenceRoutes.MARINE_LICENCE_INTERNATIONAL_INVOICE_ADDRESS
       )
       expect(h.view).not.toHaveBeenCalled()
+    })
+
+    test('Should redirect to check invoicing details when the change link value is unchanged', async () => {
+      authRequests.authenticatedPatchRequest.mockResolvedValue()
+      vi.spyOn(cacheUtils, 'getMarineLicenceCache').mockReturnValue({
+        ...mockMarineLicenceApplication,
+        invoicing: {
+          ...mockMarineLicenceApplication.invoicing,
+          originalInvoiceAddressType: 'uk'
+        }
+      })
+
+      await isInvoiceAddressUkOrInternationalSubmitController.handler(
+        {
+          payload: { invoiceAddressType: 'uk' },
+          query: { action: 'change' }
+        },
+        h
+      )
+
+      expect(h.redirect).toHaveBeenCalledWith(
+        marineLicenceRoutes.MARINE_LICENCE_CHECK_INVOICING_DETAILS
+      )
+    })
+
+    test('Should not call the backend and should redirect to the address page with the change link when the value has changed', async () => {
+      vi.spyOn(cacheUtils, 'getMarineLicenceCache').mockReturnValue({
+        ...mockMarineLicenceApplication,
+        invoicing: {
+          ...mockMarineLicenceApplication.invoicing,
+          originalInvoiceAddressType: 'uk'
+        }
+      })
+
+      await isInvoiceAddressUkOrInternationalSubmitController.handler(
+        {
+          payload: { invoiceAddressType: 'international' },
+          query: { action: 'change' }
+        },
+        h
+      )
+
+      expect(authRequests.authenticatedPatchRequest).not.toHaveBeenCalled()
+      expect(h.redirect).toHaveBeenCalledWith(
+        `${marineLicenceRoutes.MARINE_LICENCE_INTERNATIONAL_INVOICE_ADDRESS}`
+      )
     })
   })
 })

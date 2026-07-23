@@ -200,6 +200,26 @@ describe('International invoice address', () => {
     )
   })
 
+  test('page content when using change link flow from address type page', async () => {
+    mockMarineLicence({
+      ...mockInternationalMarineLicence,
+      invoicing: {
+        ...mockInternationalMarineLicence.invoicing,
+        originalInvoiceAddressType: 'uk'
+      }
+    })
+
+    const document = await loadPage({
+      requestUrl: `${marineLicenceRoutes.MARINE_LICENCE_INTERNATIONAL_INVOICE_ADDRESS}?action=change`,
+      server: getServer()
+    })
+
+    expect(getByRole(document, 'link', { name: 'Back' })).toHaveAttribute(
+      'href',
+      `${marineLicenceRoutes.MARINE_LICENCE_IS_INVOICE_ADDRESS_UK_OR_INTERNATIONAL}?action=change`
+    )
+  })
+
   test('should redirect to check invoicing details on valid submission when using the change link', async () => {
     mockMarineLicence(mockInternationalMarineLicence)
 

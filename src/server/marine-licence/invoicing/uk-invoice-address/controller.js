@@ -37,7 +37,7 @@ export const ukInvoiceAddressController = {
       ...ukInvoiceAddressSettings,
       projectName: marineLicence.projectName,
       payload: invoicing.invoiceAddress ?? {},
-      backLink: getInvoiceAddressBackLink(action),
+      backLink: getInvoiceAddressBackLink(action, invoicing),
       cancelLink: getInvoiceAddressCancelLink(action),
       buttonText: getInvoiceAddressButtonText(action)
     })
@@ -49,7 +49,7 @@ export const ukInvoiceAddressSubmitController = {
     validate: {
       payload: ukInvoiceAddressSchema,
       failAction: (request, h, err) => {
-        const { projectName } = getMarineLicenceCache(request)
+        const { projectName, invoicing } = getMarineLicenceCache(request)
         const action = request.query.action
 
         return createFailAction({
@@ -57,7 +57,7 @@ export const ukInvoiceAddressSubmitController = {
           settings: ukInvoiceAddressSettings,
           errorMessages: ukInvoiceAddressErrorMessages,
           projectName,
-          backLink: getInvoiceAddressBackLink(action),
+          backLink: getInvoiceAddressBackLink(action, invoicing),
           payload: request.payload,
           params: {
             cancelLink: getInvoiceAddressCancelLink(action),

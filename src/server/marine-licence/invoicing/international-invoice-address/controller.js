@@ -39,9 +39,9 @@ export const internationalInvoiceAddressController = {
       projectName: marineLicence.projectName,
       payload: invoicing.invoiceAddress ?? {},
       countries,
-      backLink: getInvoiceAddressBackLink(action),
-      cancelLink: getInvoiceAddressCancelLink(action),
-      buttonText: getInvoiceAddressButtonText(action)
+      backLink: getInvoiceAddressBackLink(action, invoicing),
+      cancelLink: getInvoiceAddressCancelLink(action, invoicing),
+      buttonText: getInvoiceAddressButtonText(action, invoicing)
     })
   }
 }
@@ -51,7 +51,7 @@ export const internationalInvoiceAddressSubmitController = {
     validate: {
       payload: internationalInvoiceAddressSchema,
       failAction: (request, h, err) => {
-        const { projectName } = getMarineLicenceCache(request)
+        const { projectName, invoicing } = getMarineLicenceCache(request)
         const action = request.query.action
 
         return createFailAction({
@@ -59,7 +59,7 @@ export const internationalInvoiceAddressSubmitController = {
           settings: internationalInvoiceAddressSettings,
           errorMessages: internationalInvoiceAddressErrorMessages,
           projectName,
-          backLink: getInvoiceAddressBackLink(action),
+          backLink: getInvoiceAddressBackLink(action, invoicing),
           payload: request.payload,
           params: {
             cancelLink: getInvoiceAddressCancelLink(action),
@@ -87,6 +87,11 @@ export const internationalInvoiceAddressSubmitController = {
       }
     })
 
-    return redirectAfterInvoiceAddressSubmit(request, h, request.query.action)
+    return redirectAfterInvoiceAddressSubmit(
+      request,
+      h,
+      request.query.action,
+      invoicing
+    )
   }
 }

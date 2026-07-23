@@ -34,6 +34,7 @@ export const checkInvoicingDetailsController = {
 
     const { invoicing = {} } = marineLicence
 
+    // Automatically discards `originalInvoiceAddressType` if it is being used in Change Flow
     await setMarineLicenceCache(request, h, {
       ...cachedMarineLicence,
       invoicing

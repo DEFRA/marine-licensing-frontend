@@ -6,26 +6,36 @@ import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
 import { createFailAction } from '#src/server/common/helpers/createFailAction.js'
 import { isInvoiceAddressUkOrInternationalSchema } from '#src/server/common/validation/invoicing/is-invoice-address-uk-or-international/schema.js'
 import {
-  INVOICE_TYPE_OPTIONS,
   isInvoiceAddressUkOrInternationalErrorMessages,
   isInvoiceAddressUkOrInternationalSettings
 } from '#src/server/common/validation/invoicing/constants.js'
+import {
+  getInvoiceAddressCancelLink,
+  getInvoiceAddressButtonText,
+  isInChangeFlow
+} from '#src/server/marine-licence/invoicing/utils.js'
+import {
+  getBackLink,
+  getAddressRouteForType,
+  isAddressTypeUnchangedSinceEnteringChangeFlow
+} from '#src/server/marine-licence/invoicing/is-invoice-address-uk-or-international/utils.js'
 
 export const IS_INVOICE_ADDRESS_UK_OR_INTERNATIONAL_VIEW_ROUTE =
   'marine-licence/invoicing/is-invoice-address-uk-or-international/index'
-
-const backLink = marineLicenceRoutes.MARINE_LICENCE_TASK_LIST
 
 export const isInvoiceAddressUkOrInternationalController = {
   async handler(request, h) {
     const marineLicence = getMarineLicenceCache(request)
     const { invoicing } = marineLicence
+    const action = request.query.action
 
     return h.view(IS_INVOICE_ADDRESS_UK_OR_INTERNATIONAL_VIEW_ROUTE, {
       ...isInvoiceAddressUkOrInternationalSettings,
       projectName: marineLicence.projectName,
       payload: invoicing ?? {},
-      backLink
+      backLink: getBackLink(action, invoicing),
+      cancelLink: getInvoiceAddressCancelLink(action, invoicing),
+      buttonText: getInvoiceAddressButtonText(action, invoicing)
     })
   }
 }
@@ -35,14 +45,22 @@ export const isInvoiceAddressUkOrInternationalSubmitController = {
     validate: {
       payload: isInvoiceAddressUkOrInternationalSchema,
       failAction: (request, h, err) => {
-        const { projectName } = getMarineLicenceCache(request)
+        const marineLicence = getMarineLicenceCache(request)
+        const { invoicing, projectName } = marineLicence
+
+        const action = request.query.action
+
         return createFailAction({
           viewRoute: IS_INVOICE_ADDRESS_UK_OR_INTERNATIONAL_VIEW_ROUTE,
           settings: isInvoiceAddressUkOrInternationalSettings,
           errorMessages: isInvoiceAddressUkOrInternationalErrorMessages,
           projectName,
-          backLink,
-          payload: request.payload
+          backLink: getBackLink(action),
+          payload: request.payload,
+          params: {
+            cancelLink: getInvoiceAddressCancelLink(action, invoicing),
+            buttonText: getInvoiceAddressButtonText(action, invoicing)
+          }
         })(request, h, err)
       }
     }
@@ -50,21 +68,43 @@ export const isInvoiceAddressUkOrInternationalSubmitController = {
   async handler(request, h) {
     const { payload } = request
     const marineLicence = getMarineLicenceCache(request)
+    const { invoicing } = marineLicence
+    const action = request.query.action
+
+    const changeFlowActive = isInChangeFlow(action, invoicing)
+    const saveOriginalValue =
+      changeFlowActive && !invoicing?.originalInvoiceAddressType
+
+    const updatedCacheInvoicing = {
+      ...invoicing,
+      invoiceAddressType: payload.invoiceAddressType,
+      ...(saveOriginalValue && {
+        originalInvoiceAddressType: invoicing?.invoiceAddressType
+      })
+    }
 
     await setMarineLicenceCache(request, h, {
       ...marineLicence,
-      invoicing: {
-        ...marineLicence.invoicing,
-        invoiceAddressType: payload.invoiceAddressType
-      }
+      invoicing: updatedCacheInvoicing
     })
 
-    if (payload.invoiceAddressType === INVOICE_TYPE_OPTIONS.UK) {
-      return h.redirect(marineLicenceRoutes.MARINE_LICENCE_UK_INVOICE_ADDRESS)
+    const addressRoute = getAddressRouteForType(payload.invoiceAddressType)
+
+    if (!changeFlowActive) {
+      return h.redirect(addressRoute)
     }
 
-    return h.redirect(
-      marineLicenceRoutes.MARINE_LICENCE_INTERNATIONAL_INVOICE_ADDRESS
-    )
+    if (
+      isAddressTypeUnchangedSinceEnteringChangeFlow(
+        updatedCacheInvoicing,
+        payload.invoiceAddressType
+      )
+    ) {
+      return h.redirect(
+        marineLicenceRoutes.MARINE_LICENCE_CHECK_INVOICING_DETAILS
+      )
+    }
+
+    return h.redirect(addressRoute)
   }
 }

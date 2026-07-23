@@ -1,4 +1,4 @@
-import { getByRole, getByText } from '@testing-library/dom'
+import { getByRole, getByText, queryByRole } from '@testing-library/dom'
 import { marineLicenceRoutes } from '~/src/server/common/constants/routes.js'
 import {
   mockMarineLicence,
@@ -158,6 +158,45 @@ describe('Is invoice address UK or international', () => {
     expect(response.statusCode).toBe(statusCodes.redirect)
     expect(response.headers.location).toBe(
       marineLicenceRoutes.MARINE_LICENCE_INTERNATIONAL_INVOICE_ADDRESS
+    )
+  })
+
+  test('page content when using change link', async () => {
+    mockMarineLicence(mockMarineLicenceApplication)
+
+    const document = await loadPage({
+      requestUrl: `${marineLicenceRoutes.MARINE_LICENCE_IS_INVOICE_ADDRESS_UK_OR_INTERNATIONAL}?action=change`,
+      server: getServer()
+    })
+
+    expect(queryByRole(document, 'link', { name: 'Cancel' })).toBeNull()
+    getByRole(document, 'button', { name: 'Save and continue' })
+    expect(getByRole(document, 'link', { name: 'Back' })).toHaveAttribute(
+      'href',
+      marineLicenceRoutes.MARINE_LICENCE_CHECK_INVOICING_DETAILS
+    )
+  })
+
+  test('should save to the backend and redirect to check invoicing details when the change link value is unchanged', async () => {
+    mockMarineLicence({
+      ...mockMarineLicenceApplication,
+      invoicing: {
+        ...mockMarineLicenceApplication.invoicing,
+        originalInvoiceAddressType: 'uk'
+      }
+    })
+
+    const { response } = await submitForm({
+      requestUrl: `${marineLicenceRoutes.MARINE_LICENCE_IS_INVOICE_ADDRESS_UK_OR_INTERNATIONAL}?action=change`,
+      server: getServer(),
+      formData: {
+        invoiceAddressType: 'uk'
+      }
+    })
+
+    expect(response.statusCode).toBe(statusCodes.redirect)
+    expect(response.headers.location).toBe(
+      marineLicenceRoutes.MARINE_LICENCE_CHECK_INVOICING_DETAILS
     )
   })
 })

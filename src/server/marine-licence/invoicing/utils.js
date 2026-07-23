@@ -11,7 +11,7 @@ export const isInChangeFlow = (action, invoicing) => {
   return isInAddressTypeChangeFlow(invoicing) || isInAddressChangeFlow(action)
 }
 
-export const getInvoiceAddressBackLink = (action, invoicing) => {
+export const getInvoiceAddressBackLink = (action) => {
   if (isInAddressChangeFlow(action)) {
     return marineLicenceRoutes.MARINE_LICENCE_CHECK_INVOICING_DETAILS
   }

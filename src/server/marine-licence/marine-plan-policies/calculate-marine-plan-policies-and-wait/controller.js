@@ -11,11 +11,11 @@ export const CALCULATE_MARINE_PLAN_POLICIES_AND_WAIT_VIEW_ROUTE =
 
 const WAIT_TIMEOUT_MS = 50_000
 
-const waitPageView = () => ({
+const WAIT_PAGE_VIEW = {
   pageTitle: 'Loading your Marine plan policies',
   heading: 'Loading your Marine plan policies',
   pageRefreshTimeInMs: 2000
-})
+}
 
 async function handleFailedJob(request, h, marineLicenceId, taskList) {
   if (taskList?.siteDetails !== 'COMPLETED') {
@@ -25,7 +25,7 @@ async function handleFailedJob(request, h, marineLicenceId, taskList) {
   await triggerMarinePlanPolicyQuery(request, marineLicenceId)
   return h.view(
     CALCULATE_MARINE_PLAN_POLICIES_AND_WAIT_VIEW_ROUTE,
-    waitPageView()
+    WAIT_PAGE_VIEW
   )
 }
 
@@ -54,7 +54,7 @@ export const calculateMarinePlanPoliciesAndWaitController = {
 
     return h.view(
       CALCULATE_MARINE_PLAN_POLICIES_AND_WAIT_VIEW_ROUTE,
-      waitPageView()
+      WAIT_PAGE_VIEW
     )
   }
 }

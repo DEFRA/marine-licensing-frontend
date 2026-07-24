@@ -131,6 +131,17 @@ const NOT_STARTED_STATUS = {
   }
 }
 
+const buildNotStartedTask = (href) => [
+  {
+    title: {
+      text: marinePlanPoliciesConsiderationText,
+      classes: taskClasses
+    },
+    href,
+    status: NOT_STARTED_STATUS
+  }
+]
+
 const getMarinePlanPoliciesStatus = (total, completed) => {
   if (typeof total !== 'number') {
     return {
@@ -187,29 +198,15 @@ export const transformMarinePlanPoliciesTaskList = (
   }
 
   if (marinePlanPolicyJob === 'failed') {
-    return [
-      {
-        title: {
-          text: marinePlanPoliciesConsiderationText,
-          classes: taskClasses
-        },
-        href: marineLicenceRoutes.MARINE_LICENCE_CALCULATE_MARINE_PLAN_POLICIES,
-        status: NOT_STARTED_STATUS
-      }
-    ]
+    return buildNotStartedTask(
+      marineLicenceRoutes.MARINE_LICENCE_CALCULATE_MARINE_PLAN_POLICIES
+    )
   }
 
   if (marinePlanPolicyJob !== 'ready') {
-    return [
-      {
-        title: {
-          text: marinePlanPoliciesConsiderationText,
-          classes: taskClasses
-        },
-        href: marineLicenceRoutes.MARINE_LICENCE_MARINE_PLAN_POLICIES_HOLDING,
-        status: NOT_STARTED_STATUS
-      }
-    ]
+    return buildNotStartedTask(
+      marineLicenceRoutes.MARINE_LICENCE_MARINE_PLAN_POLICIES_HOLDING
+    )
   }
 
   const { status, suffix } = getMarinePlanPoliciesStatus(

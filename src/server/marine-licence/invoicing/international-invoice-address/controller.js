@@ -51,7 +51,7 @@ export const internationalInvoiceAddressSubmitController = {
     validate: {
       payload: internationalInvoiceAddressSchema,
       failAction: (request, h, err) => {
-        const { projectName } = getMarineLicenceCache(request)
+        const { invoicing, projectName } = getMarineLicenceCache(request)
         const action = request.query.action
 
         return createFailAction({
@@ -62,7 +62,7 @@ export const internationalInvoiceAddressSubmitController = {
           backLink: getInvoiceAddressBackLink(action),
           payload: request.payload,
           params: {
-            cancelLink: getInvoiceCancelLink(action),
+            cancelLink: getInvoiceCancelLink(action, invoicing),
             buttonText: getInvoiceAddressButtonText(action),
             countries
           }

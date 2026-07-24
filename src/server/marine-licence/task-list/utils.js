@@ -220,7 +220,7 @@ export const transformMarinePlanPoliciesTaskList = (
   return [
     {
       title: {
-        text: `${marinePlanPoliciesConsiderationText}}${suffix}`,
+        text: `${marinePlanPoliciesConsiderationText}${suffix}`,
         classes: taskClasses
       },
       href: marineLicenceRoutes.MARINE_LICENCE_MARINE_PLAN_POLICIES,

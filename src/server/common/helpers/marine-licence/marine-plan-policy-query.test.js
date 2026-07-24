@@ -1,8 +1,13 @@
 import { vi } from 'vitest'
 import {
   storeMarinePlanPolicyQueryStartTime,
-  getMarinePlanPolicyQueryStartTime
-} from './marine-plan-policy-wait.js'
+  getMarinePlanPolicyQueryStartTime,
+  triggerMarinePlanPolicyQuery
+} from './marine-plan-policy-query.js'
+import { authenticatedPostRequest } from '#src/server/common/helpers/authenticated-requests.js'
+import { apiRoutes } from '#src/server/common/constants/routes.js'
+
+vi.mock('~/src/server/common/helpers/authenticated-requests.js')
 
 const createMockRequest = () => ({
   yar: {
@@ -11,7 +16,7 @@ const createMockRequest = () => ({
   }
 })
 
-describe('marine-plan-policy-wait', () => {
+describe('marine-plan-policy-query', () => {
   let mockRequest
 
   beforeEach(() => {
@@ -46,6 +51,26 @@ describe('marine-plan-policy-wait', () => {
       mockRequest.yar.get.mockReturnValue(undefined)
 
       expect(getMarinePlanPolicyQueryStartTime(mockRequest)).toBeUndefined()
+    })
+  })
+
+  describe('triggerMarinePlanPolicyQuery', () => {
+    it('posts the calculate request and stores the start time', async () => {
+      const now = 1700000000000
+      vi.spyOn(Date, 'now').mockReturnValue(now)
+      vi.mocked(authenticatedPostRequest).mockResolvedValue({})
+
+      await triggerMarinePlanPolicyQuery(mockRequest, 'test-id')
+
+      expect(authenticatedPostRequest).toHaveBeenCalledWith(
+        mockRequest,
+        apiRoutes.CALCULATE_MARINE_PLAN_POLICIES,
+        JSON.stringify({ id: 'test-id' })
+      )
+      expect(mockRequest.yar.set).toHaveBeenCalledWith(
+        'marinePlanPolicyQueryStartedAt',
+        now
+      )
     })
   })
 })

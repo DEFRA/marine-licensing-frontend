@@ -181,11 +181,21 @@ export const transformMarinePlanPoliciesTaskList = (
     }
   ]
 
-  if (
-    taskList.siteDetails !== 'COMPLETED' ||
-    marinePlanPolicyJob === 'failed'
-  ) {
+  if (taskList.siteDetails !== 'COMPLETED') {
     return cannotStartYet
+  }
+
+  if (marinePlanPolicyJob === 'failed') {
+    return [
+      {
+        title: {
+          text: 'Marine plan policy considerations',
+          classes: taskClasses
+        },
+        href: marineLicenceRoutes.MARINE_LICENCE_CALCULATE_MARINE_PLAN_POLICIES,
+        status: NOT_STARTED_STATUS
+      }
+    ]
   }
 
   if (marinePlanPolicyJob !== 'ready') {

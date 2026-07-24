@@ -2,7 +2,6 @@ import {
   getMarineLicenceCache,
   setMarineLicenceCache
 } from '#src/server/common/helpers/marine-licence/session-cache/utils.js'
-import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
 import { createFailAction } from '#src/server/common/helpers/createFailAction.js'
 import { internationalInvoiceAddressSchema } from '#src/server/common/validation/invoicing/international-invoice-address/schema.js'
 import {
@@ -11,14 +10,16 @@ import {
   INVOICE_TYPE_OPTIONS
 } from '#src/server/common/validation/invoicing/constants.js'
 import { countries } from '#src/server/common/constants/countries.js'
+import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
+import {
+  getInvoiceAddressBackLink,
+  getInvoiceCancelLink,
+  getInvoiceAddressButtonText,
+  redirectAfterInvoiceAddressSubmit
+} from '#src/server/marine-licence/invoicing/utils.js'
 
 export const INTERNATIONAL_INVOICE_ADDRESS_VIEW_ROUTE =
   'marine-licence/invoicing/international-invoice-address/index'
-
-const backLink =
-  marineLicenceRoutes.MARINE_LICENCE_IS_INVOICE_ADDRESS_UK_OR_INTERNATIONAL
-
-const cancelLink = marineLicenceRoutes.MARINE_LICENCE_TASK_LIST
 
 export const internationalInvoiceAddressController = {
   async handler(request, h) {
@@ -31,13 +32,16 @@ export const internationalInvoiceAddressController = {
       )
     }
 
+    const action = request.query.action
+
     return h.view(INTERNATIONAL_INVOICE_ADDRESS_VIEW_ROUTE, {
       ...internationalInvoiceAddressSettings,
       projectName: marineLicence.projectName,
       payload: invoicing.invoiceAddress ?? {},
       countries,
-      backLink,
-      cancelLink
+      backLink: getInvoiceAddressBackLink(action),
+      cancelLink: getInvoiceCancelLink(action, invoicing),
+      buttonText: getInvoiceAddressButtonText(action, invoicing)
     })
   }
 }
@@ -47,15 +51,21 @@ export const internationalInvoiceAddressSubmitController = {
     validate: {
       payload: internationalInvoiceAddressSchema,
       failAction: (request, h, err) => {
-        const { projectName } = getMarineLicenceCache(request)
+        const { invoicing, projectName } = getMarineLicenceCache(request)
+        const action = request.query.action
+
         return createFailAction({
           viewRoute: INTERNATIONAL_INVOICE_ADDRESS_VIEW_ROUTE,
           settings: internationalInvoiceAddressSettings,
           errorMessages: internationalInvoiceAddressErrorMessages,
           projectName,
-          backLink,
+          backLink: getInvoiceAddressBackLink(action),
           payload: request.payload,
-          params: { cancelLink, countries }
+          params: {
+            cancelLink: getInvoiceCancelLink(action, invoicing),
+            buttonText: getInvoiceAddressButtonText(action),
+            countries
+          }
         })(request, h, err)
       }
     }
@@ -77,8 +87,11 @@ export const internationalInvoiceAddressSubmitController = {
       }
     })
 
-    return h.redirect(
-      marineLicenceRoutes.MARINE_LICENCE_INVOICE_CONTACT_DETAILS
+    return redirectAfterInvoiceAddressSubmit(
+      request,
+      h,
+      request.query.action,
+      invoicing
     )
   }
 }

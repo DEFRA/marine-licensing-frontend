@@ -11,12 +11,11 @@ import {
 } from '#src/server/common/validation/invoicing/constants.js'
 import { isIndividualUser } from '#src/server/common/helpers/user-session-utils.js'
 import { saveInvoicingToBackend } from '#src/server/common/helpers/marine-licence/invoicing/save-invoicing.js'
+import { getBackLink } from '#src/server/marine-licence/invoicing/purchase-order-details/utils.js'
+import { getInvoiceCancelLink } from '#src/server/marine-licence/invoicing/utils.js'
 
 export const PURCHASE_ORDER_DETAILS_VIEW_ROUTE =
   'marine-licence/invoicing/purchase-order-details/index'
-
-const backLink = marineLicenceRoutes.MARINE_LICENCE_INVOICE_CONTACT_DETAILS
-const cancelLink = marineLicenceRoutes.MARINE_LICENCE_TASK_LIST
 
 export const purchaseOrderDetailsController = {
   async handler(request, h) {
@@ -29,12 +28,14 @@ export const purchaseOrderDetailsController = {
       return h.redirect(marineLicenceRoutes.MARINE_LICENCE_TASK_LIST)
     }
 
+    const action = request.query.action
+
     return h.view(PURCHASE_ORDER_DETAILS_VIEW_ROUTE, {
       ...purchaseOrderDetailsSettings,
       projectName: marineLicence.projectName,
       payload: invoicing.purchaseOrderDetails ?? {},
-      backLink,
-      cancelLink
+      backLink: getBackLink(action),
+      cancelLink: getInvoiceCancelLink(action)
     })
   }
 }
@@ -46,12 +47,15 @@ export const purchaseOrderDetailsSubmitController = {
       failAction: (request, h, err) => {
         const { projectName } = getMarineLicenceCache(request)
 
+        const action = request.query.action
+        const cancelLink = getInvoiceCancelLink(action)
+
         return createFailAction({
           viewRoute: PURCHASE_ORDER_DETAILS_VIEW_ROUTE,
           settings: purchaseOrderDetailsSettings,
           errorMessages: purchaseOrderDetailsErrorMessages,
           projectName,
-          backLink,
+          backLink: getBackLink(action),
           payload: request.payload,
           params: { cancelLink }
         })(request, h, err)

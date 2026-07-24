@@ -93,5 +93,29 @@ describe('#invoiceContactDetails', () => {
       )
       expect(h.view).not.toHaveBeenCalled()
     })
+
+    test('Should save to the backend and redirect to check invoicing details when using the change link', async () => {
+      const payload = {
+        fullName: 'Jane Smith',
+        organisationName: 'Example Organisation',
+        phoneNumber: '0191 376 2791',
+        emailAddress: 'jane.smith@example.com'
+      }
+
+      authRequests.authenticatedPatchRequest.mockResolvedValue()
+
+      await invoiceContactDetailsSubmitController.handler(
+        {
+          payload,
+          query: { action: 'change' }
+        },
+        h
+      )
+
+      expect(authRequests.authenticatedPatchRequest).toHaveBeenCalled()
+      expect(h.redirect).toHaveBeenCalledWith(
+        marineLicenceRoutes.MARINE_LICENCE_CHECK_INVOICING_DETAILS
+      )
+    })
   })
 })

@@ -1,4 +1,4 @@
-import { getByRole, getByText } from '@testing-library/dom'
+import { getByRole, getByText, queryByRole } from '@testing-library/dom'
 import { marineLicenceRoutes } from '~/src/server/common/constants/routes.js'
 import {
   mockMarineLicence,
@@ -60,6 +60,21 @@ describe('Purchase order details', () => {
       marineLicenceRoutes.MARINE_LICENCE_TASK_LIST
     )
     getByRole(document, 'button', { name: 'Save and continue' })
+  })
+
+  test('when using the change link, page content is correct', async () => {
+    mockMarineLicence(mockMarineLicenceWithInvoicing)
+
+    const document = await loadPage({
+      requestUrl: `${marineLicenceRoutes.MARINE_LICENCE_INVOICE_PURCHASE_ORDER_DETAILS}?action=change`,
+      server: getServer()
+    })
+
+    expect(queryByRole(document, 'link', { name: 'Cancel' })).toBeNull()
+    expect(getByRole(document, 'link', { name: 'Back' })).toHaveAttribute(
+      'href',
+      marineLicenceRoutes.MARINE_LICENCE_CHECK_INVOICING_DETAILS
+    )
   })
 
   test('redirects citizens to the task list without showing the page', async () => {

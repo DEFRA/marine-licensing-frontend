@@ -17,18 +17,48 @@
 
 {% set invoicingRows = (invoicingRows.push({
   key: invoicingDisplayData.invoiceAddressType.key,
-  value: invoicingDisplayData.invoiceAddressType.value
+  value: invoicingDisplayData.invoiceAddressType.value,
+  actions: {
+    items: [
+      {
+        href: routes.MARINE_LICENCE_IS_INVOICE_ADDRESS_UK_OR_INTERNATIONAL + '?action=change',
+        text: "Change",
+        visuallyHiddenText: "address type",
+        classes: "govuk-link--no-visited-state"
+      }
+    ]
+  }
 }), invoicingRows) %}
 
 {% set invoicingRows = (invoicingRows.push({
   key: invoicingDisplayData.invoiceAddress.key,
-  value: invoicingDisplayData.invoiceAddress.value
+  value: invoicingDisplayData.invoiceAddress.value,
+  actions: {
+    items: [
+      {
+        href: addressRoute + '?action=change',
+        text: "Change",
+        visuallyHiddenText: "address",
+        classes: "govuk-link--no-visited-state"
+      }
+    ]
+  }
 }), invoicingRows) %}
 
 {% set invoicingRows = (invoicingRows.push({
   key: invoicingDisplayData.fullName.key,
   value: invoicingDisplayData.fullName.value,
-  classes: "govuk-summary-list__row--no-border"
+  classes: "govuk-summary-list__row--no-border",
+  actions: {
+    items: [
+      {
+        href: routes.MARINE_LICENCE_INVOICE_CONTACT_DETAILS + '?action=change',
+        text: "Change",
+        visuallyHiddenText: "contact details",
+        classes: "govuk-link--no-visited-state"
+      }
+    ]
+  }
 }), invoicingRows) %}
 
 {% if not isIndividual %}
@@ -55,7 +85,17 @@
 {% if not isIndividual and invoicingDisplayData.purchaseOrderDetails %}
   {% set invoicingRows = (invoicingRows.push({
     key: invoicingDisplayData.purchaseOrderDetails.key,
-    value: invoicingDisplayData.purchaseOrderDetails.value
+    value: invoicingDisplayData.purchaseOrderDetails.value,
+    actions: {
+      items: [
+        {
+          href: routes.MARINE_LICENCE_INVOICE_PURCHASE_ORDER_DETAILS + '?action=change',
+          text: "Change",
+          visuallyHiddenText: "purchase order details",
+          classes: "govuk-link--no-visited-state"
+        }
+      ]
+    }
   }), invoicingRows) %}
 {% endif %}
 

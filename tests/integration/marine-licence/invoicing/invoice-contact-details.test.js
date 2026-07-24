@@ -1,4 +1,9 @@
-import { getByRole, getByText, getByLabelText } from '@testing-library/dom'
+import {
+  getByRole,
+  getByText,
+  getByLabelText,
+  queryByRole
+} from '@testing-library/dom'
 import { marineLicenceRoutes } from '~/src/server/common/constants/routes.js'
 import {
   mockMarineLicence,
@@ -123,6 +128,22 @@ describe('Invoice contact details', () => {
     expect(getByRole(document, 'link', { name: 'Back' })).toHaveAttribute(
       'href',
       marineLicenceRoutes.MARINE_LICENCE_INTERNATIONAL_INVOICE_ADDRESS
+    )
+  })
+
+  test('when using the change link, page content is correct', async () => {
+    mockMarineLicence(mockUkInvoiceMarineLicence)
+
+    const document = await loadPage({
+      requestUrl: `${marineLicenceRoutes.MARINE_LICENCE_INVOICE_CONTACT_DETAILS}?action=change`,
+      server: getServer()
+    })
+
+    expect(queryByRole(document, 'link', { name: 'Cancel' })).toBeNull()
+    getByRole(document, 'button', { name: 'Save and continue' })
+    expect(getByRole(document, 'link', { name: 'Back' })).toHaveAttribute(
+      'href',
+      marineLicenceRoutes.MARINE_LICENCE_CHECK_INVOICING_DETAILS
     )
   })
 
@@ -272,6 +293,26 @@ describe('Invoice contact details', () => {
     expect(response.statusCode).toBe(statusCodes.redirect)
     expect(response.headers.location).toBe(
       marineLicenceRoutes.MARINE_LICENCE_INVOICE_PURCHASE_ORDER_DETAILS
+    )
+  })
+
+  test('should save to the backend and redirect to check invoicing details when using the change link', async () => {
+    mockMarineLicence(mockUkInvoiceMarineLicence)
+
+    const { response } = await submitForm({
+      requestUrl: `${marineLicenceRoutes.MARINE_LICENCE_INVOICE_CONTACT_DETAILS}?action=change`,
+      server: getServer(),
+      formData: {
+        fullName: 'Jane Smith',
+        organisationName: 'Example Organisation',
+        phoneNumber: '0191 376 2791',
+        emailAddress: 'jane.smith@example.com'
+      }
+    })
+
+    expect(response.statusCode).toBe(statusCodes.redirect)
+    expect(response.headers.location).toBe(
+      marineLicenceRoutes.MARINE_LICENCE_CHECK_INVOICING_DETAILS
     )
   })
 })

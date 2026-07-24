@@ -1,4 +1,9 @@
-import { getByRole, getByText, getByLabelText } from '@testing-library/dom'
+import {
+  getByRole,
+  getByText,
+  getByLabelText,
+  queryByRole
+} from '@testing-library/dom'
 import { marineLicenceRoutes } from '~/src/server/common/constants/routes.js'
 import {
   mockMarineLicence,
@@ -199,6 +204,63 @@ describe('UK invoice address', () => {
     expect(response.statusCode).toBe(statusCodes.redirect)
     expect(response.headers.location).toBe(
       marineLicenceRoutes.MARINE_LICENCE_INVOICE_CONTACT_DETAILS
+    )
+  })
+
+  test('page content when using change link', async () => {
+    mockMarineLicence(mockMarineLicenceApplication)
+
+    const document = await loadPage({
+      requestUrl: `${marineLicenceRoutes.MARINE_LICENCE_UK_INVOICE_ADDRESS}?action=change`,
+      server: getServer()
+    })
+
+    expect(queryByRole(document, 'link', { name: 'Cancel' })).toBeNull()
+    getByRole(document, 'button', { name: 'Save and continue' })
+    expect(getByRole(document, 'link', { name: 'Back' })).toHaveAttribute(
+      'href',
+      marineLicenceRoutes.MARINE_LICENCE_CHECK_INVOICING_DETAILS
+    )
+  })
+
+  test('page content when using change link flow from address type page', async () => {
+    mockMarineLicence({
+      ...mockMarineLicenceApplication,
+      invoicing: {
+        ...mockMarineLicenceApplication.invoicing,
+        originalInvoiceAddressType: 'international'
+      }
+    })
+
+    const document = await loadPage({
+      requestUrl: marineLicenceRoutes.MARINE_LICENCE_UK_INVOICE_ADDRESS,
+      server: getServer()
+    })
+
+    expect(getByRole(document, 'link', { name: 'Back' })).toHaveAttribute(
+      'href',
+      marineLicenceRoutes.MARINE_LICENCE_IS_INVOICE_ADDRESS_UK_OR_INTERNATIONAL
+    )
+  })
+
+  test('should redirect to check invoicing details on valid submission when using the change link', async () => {
+    mockMarineLicence(mockMarineLicenceApplication)
+
+    const { response } = await submitForm({
+      requestUrl: `${marineLicenceRoutes.MARINE_LICENCE_UK_INVOICE_ADDRESS}?action=change`,
+      server: getServer(),
+      formData: {
+        addressLine1: '123 Example Street',
+        addressLine2: '',
+        addressTown: 'Exampletown',
+        addressCounty: '',
+        addressPostcode: 'AA1 1AA'
+      }
+    })
+
+    expect(response.statusCode).toBe(statusCodes.redirect)
+    expect(response.headers.location).toBe(
+      marineLicenceRoutes.MARINE_LICENCE_CHECK_INVOICING_DETAILS
     )
   })
 })

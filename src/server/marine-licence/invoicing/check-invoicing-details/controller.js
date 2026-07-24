@@ -1,4 +1,7 @@
-import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
+import {
+  marineLicenceInvoicingRoutes,
+  marineLicenceRoutes
+} from '#src/server/common/constants/routes.js'
 import {
   getMarineLicenceCache,
   setMarineLicenceCache
@@ -8,6 +11,7 @@ import { getBackLink } from '#src/server/marine-licence/invoicing/check-invoicin
 import { RETURN_TO_CACHE_KEY } from '#src/server/common/constants/cache.js'
 import { isIndividualUser } from '#src/server/common/helpers/user-session-utils.js'
 import { getMarineLicenceService } from '#src/services/marine-licence-service/index.js'
+import { INVOICE_TYPE_OPTIONS } from '#src/server/common/validation/invoicing/constants.js'
 
 export const CHECK_INVOICING_DETAILS_VIEW_ROUTE =
   'marine-licence/invoicing/check-invoicing-details/index'
@@ -30,6 +34,7 @@ export const checkInvoicingDetailsController = {
 
     const { invoicing = {} } = marineLicence
 
+    // Automatically discards `originalInvoiceAddressType` if it is being used in Change Flow
     await setMarineLicenceCache(request, h, {
       ...cachedMarineLicence,
       invoicing
@@ -37,6 +42,10 @@ export const checkInvoicingDetailsController = {
 
     const isIndividual = await isIndividualUser(request)
     const invoicingDisplayData = invoicingReviewData(invoicing)
+    const addressRoute =
+      invoicing.invoiceAddressType === INVOICE_TYPE_OPTIONS.UK
+        ? marineLicenceInvoicingRoutes.MARINE_LICENCE_UK_INVOICE_ADDRESS
+        : marineLicenceInvoicingRoutes.MARINE_LICENCE_INTERNATIONAL_INVOICE_ADDRESS
 
     return h.view(CHECK_INVOICING_DETAILS_VIEW_ROUTE, {
       ...checkInvoicingDetailsPageData,
@@ -44,7 +53,9 @@ export const checkInvoicingDetailsController = {
       backLink: getBackLink(request, isIndividual),
       invoicing,
       invoicingDisplayData,
-      isIndividual
+      isIndividual,
+      routes: marineLicenceInvoicingRoutes,
+      addressRoute
     })
   }
 }

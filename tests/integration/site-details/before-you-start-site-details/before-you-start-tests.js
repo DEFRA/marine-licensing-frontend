@@ -102,7 +102,19 @@ export function sharedBeforeYouStartSiteDetailsTests({
         )
       ).toBeInTheDocument()
 
-      expect(getByText(document, 'activity description')).toBeInTheDocument()
+      expect(
+        getByText(
+          document,
+          'a drawing or plan for new construction, alteration or improvement works - not including maintenance'
+        )
+      ).toBeInTheDocument()
+
+      expect(
+        getByText(
+          document,
+          'activity description and methodology - a step-by-step explanation of how you will carry out the activity'
+        )
+      ).toBeInTheDocument()
 
       expect(
         getByText(document, 'maximum duration of the activity')
@@ -133,7 +145,8 @@ export function sharedBeforeYouStartSiteDetailsTests({
     const { document } = new JSDOM(result).window
 
     const lists = document.querySelectorAll('ul.govuk-list--bullet')
-    expect(lists).toHaveLength(2)
+    const expectedListCount = projectType === 'marineLicence' ? 4 : 2
+    expect(lists).toHaveLength(expectedListCount)
 
     const firstList = lists[0]
     expect(firstList).toContainElement(getByText(document, 'site name'))

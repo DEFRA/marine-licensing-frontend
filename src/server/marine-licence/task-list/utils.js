@@ -1,6 +1,7 @@
 import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
 
 const taskClasses = 'govuk-link--no-visited-state'
+const marinePlanPoliciesConsiderationText = 'Marine plan policy considerations'
 
 const setStatus = (task) => {
   if (!task || task === 'INCOMPLETE') {
@@ -130,6 +131,17 @@ const NOT_STARTED_STATUS = {
   }
 }
 
+const buildNotStartedTask = (href) => [
+  {
+    title: {
+      text: marinePlanPoliciesConsiderationText,
+      classes: taskClasses
+    },
+    href,
+    status: NOT_STARTED_STATUS
+  }
+]
+
 const getMarinePlanPoliciesStatus = (total, completed) => {
   if (typeof total !== 'number') {
     return {
@@ -173,7 +185,7 @@ export const transformMarinePlanPoliciesTaskList = (
 ) => {
   const cannotStartYet = [
     {
-      title: { text: 'Marine plan policy considerations' },
+      title: { text: marinePlanPoliciesConsiderationText },
       status: {
         text: 'Cannot start yet',
         classes: 'govuk-task-list__status--cannot-start-yet'
@@ -181,24 +193,20 @@ export const transformMarinePlanPoliciesTaskList = (
     }
   ]
 
-  if (
-    taskList.siteDetails !== 'COMPLETED' ||
-    marinePlanPolicyJob === 'failed'
-  ) {
+  if (taskList.siteDetails !== 'COMPLETED') {
     return cannotStartYet
   }
 
+  if (marinePlanPolicyJob === 'failed') {
+    return buildNotStartedTask(
+      marineLicenceRoutes.MARINE_LICENCE_CALCULATE_MARINE_PLAN_POLICIES
+    )
+  }
+
   if (marinePlanPolicyJob !== 'ready') {
-    return [
-      {
-        title: {
-          text: 'Marine plan policy considerations',
-          classes: taskClasses
-        },
-        href: marineLicenceRoutes.MARINE_LICENCE_MARINE_PLAN_POLICIES_HOLDING,
-        status: NOT_STARTED_STATUS
-      }
-    ]
+    return buildNotStartedTask(
+      marineLicenceRoutes.MARINE_LICENCE_MARINE_PLAN_POLICIES_HOLDING
+    )
   }
 
   const { status, suffix } = getMarinePlanPoliciesStatus(
@@ -209,7 +217,7 @@ export const transformMarinePlanPoliciesTaskList = (
   return [
     {
       title: {
-        text: `Marine plan policy considerations${suffix}`,
+        text: `${marinePlanPoliciesConsiderationText}${suffix}`,
         classes: taskClasses
       },
       href: marineLicenceRoutes.MARINE_LICENCE_MARINE_PLAN_POLICIES,

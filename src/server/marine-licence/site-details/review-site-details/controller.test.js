@@ -2,6 +2,7 @@ import { beforeAll, vi } from 'vitest'
 import * as cacheUtils from '#src/server/common/helpers/marine-licence/session-cache/utils.js'
 import * as marineLicenceService from '#src/services/marine-licence-service/index.js'
 import * as authenticatedRequests from '#src/server/common/helpers/authenticated-requests.js'
+import * as marinePlanPolicyQuery from '#src/server/common/helpers/marine-licence/marine-plan-policy-query.js'
 import {
   FILE_UPLOAD_REVIEW_VIEW_ROUTE,
   reviewSiteDetailsController,
@@ -23,6 +24,9 @@ import { RETURN_TO_CACHE_KEY } from '#src/server/common/constants/cache.js'
 vi.mock('~/src/server/common/helpers/marine-licence/session-cache/utils.js')
 vi.mock('~/src/services/marine-licence-service/index.js')
 vi.mock('~/src/server/common/helpers/authenticated-requests.js')
+vi.mock(
+  '~/src/server/common/helpers/marine-licence/marine-plan-policy-query.js'
+)
 
 function createMockHandler(type = 'view') {
   if (type === 'redirect') {
@@ -279,8 +283,8 @@ describe('#reviewSiteDetails', () => {
         }
       )
       vi.mocked(
-        authenticatedRequests.authenticatedPostRequest
-      ).mockResolvedValue({})
+        marinePlanPolicyQuery.triggerMarinePlanPolicyQuery
+      ).mockResolvedValue(undefined)
       vi.mocked(
         authenticatedRequests.authenticatedPatchRequest
       ).mockResolvedValue({})
@@ -299,16 +303,8 @@ describe('#reviewSiteDetails', () => {
         confirmed: true
       })
       expect(
-        vi.mocked(authenticatedRequests.authenticatedPostRequest)
-      ).toHaveBeenCalledWith(
-        request,
-        apiRoutes.CALCULATE_MARINE_PLAN_POLICIES,
-        JSON.stringify({ id: 'test-id' })
-      )
-      expect(request.yar.set).toHaveBeenCalledWith(
-        'marinePlanPolicyQueryStartedAt',
-        expect.any(Number)
-      )
+        vi.mocked(marinePlanPolicyQuery.triggerMarinePlanPolicyQuery)
+      ).toHaveBeenCalledWith(request, 'test-id')
       expect(h.redirect).toHaveBeenCalledWith(
         marineLicenceRoutes.MARINE_LICENCE_CALCULATE_MARINE_PLAN_POLICIES
       )
@@ -347,7 +343,7 @@ describe('#reviewSiteDetails', () => {
         confirmed: true
       })
       expect(
-        vi.mocked(authenticatedRequests.authenticatedPostRequest)
+        vi.mocked(marinePlanPolicyQuery.triggerMarinePlanPolicyQuery)
       ).not.toHaveBeenCalled()
       expect(h.redirect).toHaveBeenCalledWith(
         marineLicenceRoutes.MARINE_LICENCE_CHECK_YOUR_ANSWERS
@@ -369,8 +365,8 @@ describe('#reviewSiteDetails', () => {
         }
       )
       vi.mocked(
-        authenticatedRequests.authenticatedPostRequest
-      ).mockResolvedValue({})
+        marinePlanPolicyQuery.triggerMarinePlanPolicyQuery
+      ).mockResolvedValue(undefined)
       vi.mocked(
         authenticatedRequests.authenticatedPatchRequest
       ).mockResolvedValue({})
@@ -384,16 +380,8 @@ describe('#reviewSiteDetails', () => {
       await reviewSiteDetailsSubmitController.handler(request, h)
 
       expect(
-        vi.mocked(authenticatedRequests.authenticatedPostRequest)
-      ).toHaveBeenCalledWith(
-        request,
-        apiRoutes.CALCULATE_MARINE_PLAN_POLICIES,
-        JSON.stringify({ id: 'test-id' })
-      )
-      expect(request.yar.set).toHaveBeenCalledWith(
-        'marinePlanPolicyQueryStartedAt',
-        expect.any(Number)
-      )
+        vi.mocked(marinePlanPolicyQuery.triggerMarinePlanPolicyQuery)
+      ).toHaveBeenCalledWith(request, 'test-id')
       expect(h.redirect).toHaveBeenCalledWith(
         marineLicenceRoutes.MARINE_LICENCE_CALCULATE_MARINE_PLAN_POLICIES
       )
@@ -414,8 +402,8 @@ describe('#reviewSiteDetails', () => {
         }
       )
       vi.mocked(
-        authenticatedRequests.authenticatedPostRequest
-      ).mockResolvedValue({})
+        marinePlanPolicyQuery.triggerMarinePlanPolicyQuery
+      ).mockResolvedValue(undefined)
       vi.mocked(
         authenticatedRequests.authenticatedPatchRequest
       ).mockResolvedValue({})
@@ -428,16 +416,8 @@ describe('#reviewSiteDetails', () => {
       await reviewSiteDetailsSubmitController.handler(request, h)
 
       expect(
-        vi.mocked(authenticatedRequests.authenticatedPostRequest)
-      ).toHaveBeenCalledWith(
-        request,
-        apiRoutes.CALCULATE_MARINE_PLAN_POLICIES,
-        JSON.stringify({ id: 'test-id' })
-      )
-      expect(request.yar.set).toHaveBeenCalledWith(
-        'marinePlanPolicyQueryStartedAt',
-        expect.any(Number)
-      )
+        vi.mocked(marinePlanPolicyQuery.triggerMarinePlanPolicyQuery)
+      ).toHaveBeenCalledWith(request, 'test-id')
       expect(h.redirect).toHaveBeenCalledWith(
         marineLicenceRoutes.MARINE_LICENCE_CALCULATE_MARINE_PLAN_POLICIES
       )
@@ -474,7 +454,7 @@ describe('#reviewSiteDetails', () => {
         confirmed: false
       })
       expect(
-        vi.mocked(authenticatedRequests.authenticatedPostRequest)
+        vi.mocked(marinePlanPolicyQuery.triggerMarinePlanPolicyQuery)
       ).not.toHaveBeenCalled()
       expect(h.redirect).toHaveBeenCalledWith(
         marineLicenceRoutes.MARINE_LICENCE_TASK_LIST
@@ -504,7 +484,7 @@ describe('#reviewSiteDetails', () => {
         vi.mocked(authenticatedRequests.authenticatedPatchRequest)
       ).not.toHaveBeenCalled()
       expect(
-        vi.mocked(authenticatedRequests.authenticatedPostRequest)
+        vi.mocked(marinePlanPolicyQuery.triggerMarinePlanPolicyQuery)
       ).not.toHaveBeenCalled()
       expect(h.view).toHaveBeenCalledWith(
         FILE_UPLOAD_REVIEW_VIEW_ROUTE,

@@ -4,6 +4,7 @@
 {% from "govuk/components/textarea/macro.njk" import govukTextarea %}
 {% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
 {% from "site-activity-heading/macro.njk" import appSiteActivityHeading %}
+{% from "govuk/components/details/macro.njk" import govukDetails %}
 
 {% block beforeContent %}
 {{ super() }}
@@ -24,10 +25,35 @@
   }) }}
 {% endset %}
 
+{% set helperHtml%}
+ <h2 class="govuk-heading-s govuk-!-margin-bottom-1">Example one</h2><p class="govuk-body">Up to 15 existing timber fenders, together with associated fixings and fixtures (including bolts and brackets), will be removed from the quay face.</p><p class="govuk-body">The fenders will be removed using a crane and man basket, operated from the quayside during low tide.</p><p class="govuk-body govuk-!-margin-bottom-4">All removed materials, including timber fenders and associated debris (for example bolts and fittings), will be lifted directly onto the quayside.</p><h2 class="govuk-heading-s govuk-!-margin-bottom-1">Example two</h2><p class="govuk-body">A new timber pontoon, measuring a maximum of 12 metres long, 3 metres wide and 0.8 metres deep, will be installed against the existing quay wall. It will be secured with 4 steel piles, each up to 8 metres long and 0.4 metres in diameter.</p><p class="govuk-body">The piles will be driven into the seabed using a vibro-piling hammer operated from a jack-up barge. All materials will be transported to the site by barge.</p><p class="govuk-body">The pontoon sections will be assembled on land and floated into position at high tide. The maximum footprint of the completed works, including piles and fixings, will be 40 square metres.</p>
+  
+{% endset %}
+
 {% set hintText %}
-  <p class="govuk-body">This is a summary of what you're going to do and in what order. Include the equipment you'll use, how you'll transport materials and the maximum dimensions of the marine works and materials.</p>
-  <p class="govuk-body">For example, if you're constructing a sheet piled wall you need to tell us the maximum dimension of the wall, maximum dimension of the piles and the maximum number of piles.</p>
-  <p class="govuk-hint">Enter a maximum of 1,000 characters</p>
+  <p class="govuk-body">This is a summary of what you're going to do and in what order, including your methodology.</p>
+
+  <p class="govuk-body">Your description should explain step by step how you will carry out the activity. Include:</p>
+
+  <ul class="govuk-list govuk-list--bullet">
+      <li>the equipment you will use, including all plant and general tools</li>
+      <li>the maximum amounts of materials you will use, for example, the total number of piles or gabion baskets</li>
+      <li>how materials will be transported to the site, for example by road, boat or barge</li>
+      <li>the route through the marine area if materials are transported by sea</li>
+      <li>whether the activity will be carried out from land, the marine area, or both - and any temporary structures you will use</li>
+      <li>the maximum dimensions of any works or structures, for example length, depth, volume and height</li>
+  </ul>
+
+  <p class="govuk-body">If the method could change, provide a worst-case scenario covering the maximum dimensions and duration.</p>
+
+  {{ govukDetails({
+      html: helperHtml,
+      summaryText: "Activity description examples"
+  }) }}
+
+  <div id="low-complexity-activity-description-hint" class="govuk-hint">
+      Enter a maximum of 1,000 characters
+  </div>
 {% endset %}
 
 {% block content %}
@@ -45,7 +71,7 @@
           id: "activityDescription",
           name: "activityDescription",
           value: payload.activityDescription,
-          rows: 8,
+          rows: 5,
           label: {
             html: headingWithCaption,
             classes: "govuk-label--l"

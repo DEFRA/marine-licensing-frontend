@@ -13,6 +13,10 @@ describe('getTagStyle', () => {
     expect(getTagStyle('Active')).toBe('govuk-tag--green')
   })
 
+  it('should return magenta for Withdrawn', () => {
+    expect(getTagStyle('Transferred')).toBe('govuk-tag--magenta')
+  })
+
   it('should return green for unknown status', () => {
     expect(getTagStyle('SomeOtherStatus')).toBe('govuk-tag--green')
   })

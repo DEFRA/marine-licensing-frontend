@@ -126,10 +126,34 @@ describe('Task List', () => {
     )
   })
 
-  test('should render "Marine plan policy considerations" as unlinked "Cannot start yet" when marinePlanPolicyJob is failed', async () => {
+  test('should link "Marine plan policy considerations" to the spinner page (re-trigger) when marinePlanPolicyJob is failed and site details are completed', async () => {
     mockMarineLicence({
       ...mockMarineLicenceApplication,
       marinePlanPolicyJob: 'failed'
+    })
+    const failedDocument = await loadPage({
+      requestUrl: marineLicenceRoutes.MARINE_LICENCE_TASK_LIST,
+      server: getServer()
+    })
+
+    expect(
+      getByRole(failedDocument, 'link', {
+        name: 'Marine plan policy considerations'
+      })
+    ).toHaveAttribute(
+      'href',
+      marineLicenceRoutes.MARINE_LICENCE_CALCULATE_MARINE_PLAN_POLICIES
+    )
+  })
+
+  test('should render "Marine plan policy considerations" as unlinked "Cannot start yet" when marinePlanPolicyJob is failed but site details are not completed', async () => {
+    mockMarineLicence({
+      ...mockMarineLicenceApplication,
+      marinePlanPolicyJob: 'failed',
+      taskList: {
+        ...mockMarineLicenceApplication.taskList,
+        siteDetails: 'IN_PROGRESS'
+      }
     })
     const failedDocument = await loadPage({
       requestUrl: marineLicenceRoutes.MARINE_LICENCE_TASK_LIST,

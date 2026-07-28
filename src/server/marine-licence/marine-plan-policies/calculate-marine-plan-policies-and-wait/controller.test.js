@@ -1,7 +1,7 @@
 import { vi } from 'vitest'
 import * as cacheUtils from '#src/server/common/helpers/marine-licence/session-cache/utils.js'
 import * as marineLicenceService from '#src/services/marine-licence-service/index.js'
-import * as marinePlanPolicyWait from '#src/server/common/helpers/marine-licence/marine-plan-policy-wait.js'
+import * as marinePlanPolicyQuery from '#src/server/common/helpers/marine-licence/marine-plan-policy-query.js'
 import {
   CALCULATE_MARINE_PLAN_POLICIES_AND_WAIT_VIEW_ROUTE,
   calculateMarinePlanPoliciesAndWaitController
@@ -11,7 +11,9 @@ import { createMockRequest } from '#src/server/test-helpers/mocks/helpers.js'
 
 vi.mock('~/src/server/common/helpers/marine-licence/session-cache/utils.js')
 vi.mock('~/src/services/marine-licence-service/index.js')
-vi.mock('~/src/server/common/helpers/marine-licence/marine-plan-policy-wait.js')
+vi.mock(
+  '~/src/server/common/helpers/marine-licence/marine-plan-policy-query.js'
+)
 
 describe('#calculateMarinePlanPoliciesAndWaitController', () => {
   const mockRequest = createMockRequest()
@@ -26,8 +28,11 @@ describe('#calculateMarinePlanPoliciesAndWaitController', () => {
         .mockResolvedValue({ marinePlanPolicyJob: 'pending' })
     })
     vi.mocked(
-      marinePlanPolicyWait.getMarinePlanPolicyQueryStartTime
+      marinePlanPolicyQuery.getMarinePlanPolicyQueryStartTime
     ).mockReturnValue(undefined)
+    vi.mocked(
+      marinePlanPolicyQuery.triggerMarinePlanPolicyQuery
+    ).mockResolvedValue(undefined)
   })
 
   test('should redirect to task list when no marine licence id in cache', async () => {
@@ -58,9 +63,62 @@ describe('#calculateMarinePlanPoliciesAndWaitController', () => {
     expect(h.redirect).toHaveBeenCalledWith(
       marineLicenceRoutes.MARINE_LICENCE_TASK_LIST
     )
+    expect(
+      marinePlanPolicyQuery.triggerMarinePlanPolicyQuery
+    ).not.toHaveBeenCalled()
   })
 
-  test('should redirect to task list when marinePlanPolicyJob is failed', async () => {
+  test('should re-trigger the query and render the spinner when marinePlanPolicyJob is failed and site details are completed', async () => {
+    vi.mocked(marineLicenceService.getMarineLicenceService).mockReturnValueOnce(
+      {
+        getMarineLicenceById: vi.fn().mockResolvedValue({
+          marinePlanPolicyJob: 'failed',
+          taskList: { siteDetails: 'COMPLETED' }
+        })
+      }
+    )
+
+    const h = { redirect: vi.fn(), view: vi.fn() }
+
+    await calculateMarinePlanPoliciesAndWaitController.handler(mockRequest, h)
+
+    expect(
+      marinePlanPolicyQuery.triggerMarinePlanPolicyQuery
+    ).toHaveBeenCalledWith(mockRequest, 'test-id')
+    expect(h.view).toHaveBeenCalledWith(
+      CALCULATE_MARINE_PLAN_POLICIES_AND_WAIT_VIEW_ROUTE,
+      {
+        pageTitle: 'Loading your Marine plan policies',
+        heading: 'Loading your Marine plan policies',
+        pageRefreshTimeInMs: 2000
+      }
+    )
+    expect(h.redirect).not.toHaveBeenCalled()
+  })
+
+  test('should redirect to task list when marinePlanPolicyJob is failed and site details are not completed', async () => {
+    vi.mocked(marineLicenceService.getMarineLicenceService).mockReturnValueOnce(
+      {
+        getMarineLicenceById: vi.fn().mockResolvedValue({
+          marinePlanPolicyJob: 'failed',
+          taskList: { siteDetails: 'IN_PROGRESS' }
+        })
+      }
+    )
+
+    const h = { redirect: vi.fn(), view: vi.fn() }
+
+    await calculateMarinePlanPoliciesAndWaitController.handler(mockRequest, h)
+
+    expect(h.redirect).toHaveBeenCalledWith(
+      marineLicenceRoutes.MARINE_LICENCE_TASK_LIST
+    )
+    expect(
+      marinePlanPolicyQuery.triggerMarinePlanPolicyQuery
+    ).not.toHaveBeenCalled()
+  })
+
+  test('should redirect to task list when marinePlanPolicyJob is failed and taskList is missing', async () => {
     vi.mocked(marineLicenceService.getMarineLicenceService).mockReturnValueOnce(
       {
         getMarineLicenceById: vi
@@ -69,13 +127,16 @@ describe('#calculateMarinePlanPoliciesAndWaitController', () => {
       }
     )
 
-    const h = { redirect: vi.fn() }
+    const h = { redirect: vi.fn(), view: vi.fn() }
 
     await calculateMarinePlanPoliciesAndWaitController.handler(mockRequest, h)
 
     expect(h.redirect).toHaveBeenCalledWith(
       marineLicenceRoutes.MARINE_LICENCE_TASK_LIST
     )
+    expect(
+      marinePlanPolicyQuery.triggerMarinePlanPolicyQuery
+    ).not.toHaveBeenCalled()
   })
 
   test('should render spinner view when job is not ready', async () => {
@@ -91,6 +152,9 @@ describe('#calculateMarinePlanPoliciesAndWaitController', () => {
         pageRefreshTimeInMs: 2000
       }
     )
+    expect(
+      marinePlanPolicyQuery.triggerMarinePlanPolicyQuery
+    ).not.toHaveBeenCalled()
   })
 
   test('should render spinner view when job is computing', async () => {
@@ -114,13 +178,16 @@ describe('#calculateMarinePlanPoliciesAndWaitController', () => {
         pageRefreshTimeInMs: 2000
       }
     )
+    expect(
+      marinePlanPolicyQuery.triggerMarinePlanPolicyQuery
+    ).not.toHaveBeenCalled()
   })
 
   test('should render spinner view when under the 50 second wait limit', async () => {
     const now = 1_700_000_000_000
     vi.spyOn(Date, 'now').mockReturnValue(now)
     vi.mocked(
-      marinePlanPolicyWait.getMarinePlanPolicyQueryStartTime
+      marinePlanPolicyQuery.getMarinePlanPolicyQueryStartTime
     ).mockReturnValue(now - 49_000)
 
     const h = { view: vi.fn() }
@@ -137,7 +204,7 @@ describe('#calculateMarinePlanPoliciesAndWaitController', () => {
     const now = 1_700_000_000_000
     vi.spyOn(Date, 'now').mockReturnValue(now)
     vi.mocked(
-      marinePlanPolicyWait.getMarinePlanPolicyQueryStartTime
+      marinePlanPolicyQuery.getMarinePlanPolicyQueryStartTime
     ).mockReturnValue(now - 50_000)
 
     const h = { redirect: vi.fn() }
@@ -160,7 +227,7 @@ describe('#calculateMarinePlanPoliciesAndWaitController', () => {
     const now = 1_700_000_000_000
     vi.spyOn(Date, 'now').mockReturnValue(now)
     vi.mocked(
-      marinePlanPolicyWait.getMarinePlanPolicyQueryStartTime
+      marinePlanPolicyQuery.getMarinePlanPolicyQueryStartTime
     ).mockReturnValue(now - 60_000)
 
     const h = { redirect: vi.fn() }

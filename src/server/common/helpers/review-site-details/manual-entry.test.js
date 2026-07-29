@@ -388,7 +388,7 @@ describe('manual-entry helpers', () => {
 
       expect(result[0].activityDetails).toHaveLength(1)
       expect(result[0].activityDetails[0]).toMatchObject({
-        activitySubType: 'Construction of new works',
+        activitySubType: 'Construction of new marine works',
         activityDuration: '1 year, 4 months',
         completionDate: 'Test completion',
         activityMonths: 'Test months'

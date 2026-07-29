@@ -1,0 +1,78 @@
+import {
+  getMarineLicenceCache,
+  updateMarineLicenceSiteActivityDetails
+} from '#src/server/common/helpers/marine-licence/session-cache/utils.js'
+import { getSiteDataFromParam } from '#src/server/common/helpers/site-details/site-name.js'
+import { validateSiteAndActivityParams } from '#src/server/common/helpers/marine-licence/session-cache/site-utils.js'
+import { getActivityVariantFromSubType } from '#src/server/common/helpers/activity-details/activity-variants.js'
+import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
+
+export const CONFIRM_CHANGE_ACTIVITY_TYPE_VIEW_ROUTE =
+  'marine-licence/site-details/confirm-change-activity-type/index'
+
+const CONFIRM_CHANGE_ACTIVITY_TYPE_PAGE_TITLE =
+  'Changing your type of activity will delete any uploaded construction drawings'
+
+export const confirmChangeActivityTypeController = {
+  options: {
+    pre: [validateSiteAndActivityParams]
+  },
+  handler(request, h) {
+    const { activityType, activitySubType } = request.query
+
+    if (!activityType || !activitySubType) {
+      return h.redirect(marineLicenceRoutes.MARINE_LICENCE_TASK_LIST)
+    }
+
+    const marineLicence = getMarineLicenceCache(request)
+    const { siteNumber, activityDetailsNumber } = getSiteDataFromParam(
+      request.query
+    )
+
+    return h.view(CONFIRM_CHANGE_ACTIVITY_TYPE_VIEW_ROUTE, {
+      pageTitle: CONFIRM_CHANGE_ACTIVITY_TYPE_PAGE_TITLE,
+      heading: CONFIRM_CHANGE_ACTIVITY_TYPE_PAGE_TITLE,
+      projectName: marineLicence.projectName,
+      siteNumber,
+      activityDetailsNumber,
+      activityType,
+      activitySubType,
+      backLink: `${marineLicenceRoutes.MARINE_LICENCE_TYPE_OF_ACTIVITY}?site=${siteNumber}&activity=${activityDetailsNumber}`,
+      cancelLink: `${marineLicenceRoutes.MARINE_LICENCE_TYPE_OF_ACTIVITY}?site=${siteNumber}&activity=${activityDetailsNumber}`
+    })
+  }
+}
+
+export const confirmChangeActivityTypeSubmitController = {
+  options: {
+    pre: [validateSiteAndActivityParams]
+  },
+  async handler(request, h) {
+    const { site, activity, activityType, activitySubType } = request.payload
+
+    const {
+      siteIndex,
+      siteNumber,
+      activityDetailsIndex,
+      activityDetailsNumber
+    } = getSiteDataFromParam({ site, activity })
+
+    await updateMarineLicenceSiteActivityDetails(
+      request,
+      h,
+      siteIndex,
+      activityDetailsIndex,
+      {
+        activityType,
+        activitySubType,
+        activities: null
+      }
+    )
+
+    const activityVariant = getActivityVariantFromSubType(activitySubType)
+
+    return h.redirect(
+      `/marine-licence/activity-details/${activityVariant}?site=${siteNumber}&activity=${activityDetailsNumber}`
+    )
+  }
+}

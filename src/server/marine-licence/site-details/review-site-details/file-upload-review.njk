@@ -140,6 +140,50 @@
 
           </form>
 
+        {% set siteHasConstructionDrawing = false %}
+        {% set firstDrawingActivityNumber = 1 %}
+
+        {% for activityDetails in site.activityDetails %}
+          {% if activityDetails.requiresConstructionDrawing %}
+            {% if not siteHasConstructionDrawing %}
+              {% set siteHasConstructionDrawing = true %}
+              {% set firstDrawingActivityNumber = loop.index %}
+            {% endif %}
+
+            {% set drawingRows = [{
+              key: { text: "File upload" },
+              value: { html: appIncompleteField({ text: "" }) },
+              actions: setSiteDetailsAction(false, 'upload-drawing', site.siteNumber, "", { activityNumber: loop.index })
+            }] %}
+
+            {{ govukSummaryList({
+              card: {
+                attributes: {
+                  id: "construction-drawing-site-" + site.siteNumber + "-activity-" + loop.index
+                },
+                title: {
+                  text: "Site " + site.siteNumber + " - Construction drawing " + loop.index
+                }
+              },
+              classes: "govuk-summary-list--full-width",
+              rows: drawingRows
+            }) }}
+          {% endif %}
+        {% endfor %}
+
+        {% if siteHasConstructionDrawing %}
+          <div class="govuk-!-margin-bottom-6">
+            {{ govukButton({
+              text: "Add another construction drawing for site " + site.siteNumber,
+              classes: "govuk-button--secondary",
+              href: "upload-drawing?site=" + site.siteNumber + "&activity=" + firstDrawingActivityNumber,
+              attributes: {
+                id: 'add-another-construction-drawing-site-' + site.siteNumber
+              }
+            }) }}
+          </div>
+        {% endif %}
+
         {% endfor %}
 
         <form method="POST">

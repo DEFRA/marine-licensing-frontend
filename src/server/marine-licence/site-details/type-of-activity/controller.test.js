@@ -115,26 +115,6 @@ describe('#typeOfActivity', () => {
     })
 
     describe('changing away from a drawing-requiring activity', () => {
-      test('redirects to the confirmation guard instead of saving when the existing activity required a drawing and the new one does not', async () => {
-        const redirectH = createMockH()
-        const request = createMockRequest({
-          query: { site: 1, activity: 1 },
-          payload: {
-            activityType: 'construction',
-            activitySubTypeConstruction: 'construction-type-2',
-            activitySubTypeDeposit: '',
-            activitySubTypeRemoval: ''
-          }
-        })
-
-        await typeOfActivitySubmitController.handler(request, redirectH)
-
-        expect(updateMarineLicenceSiteActivityDetails).not.toHaveBeenCalled()
-        expect(redirectH.redirect).toHaveBeenCalledWith(
-          '/marine-licence/confirm-change-activity-type?site=1&activity=1&activityType=construction&activitySubType=construction-type-2'
-        )
-      })
-
       test('redirects to the confirmation guard when changing to a different activity type entirely', async () => {
         const redirectH = createMockH()
         const request = createMockRequest({

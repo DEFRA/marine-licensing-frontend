@@ -54,6 +54,13 @@ describe('Type of activity (marine licence)', () => {
     ).toBeInTheDocument()
 
     expect(
+      getByText(
+        document,
+        "Upkeep or repair of a structure or asset that's already there, without changing its size or shape"
+      )
+    ).toBeInTheDocument()
+
+    expect(
       getByRole(document, 'button', { name: 'Continue' })
     ).toBeInTheDocument()
   })

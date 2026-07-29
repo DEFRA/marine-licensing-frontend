@@ -6,7 +6,10 @@ import {
 import { loadPage } from '~/tests/integration/shared/app-server.js'
 import { mockMarineLicenceApplication } from '#src/server/test-helpers/mocks/marine-licence-mocks.js'
 import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
-import { makePostRequest } from '#src/server/test-helpers/server-requests.js'
+import {
+  makeGetRequest,
+  makePostRequest
+} from '#src/server/test-helpers/server-requests.js'
 
 describe('Confirm change activity type', () => {
   mockMarineLicence(mockMarineLicenceApplication)
@@ -36,6 +39,18 @@ describe('Confirm change activity type', () => {
     expect(cancelLink).toHaveAttribute(
       'href',
       '/marine-licence/type-of-activity?site=1&activity=1'
+    )
+  })
+
+  test('redirects to the task list when activityType/activitySubType are missing or invalid', async () => {
+    const response = await makeGetRequest({
+      url: `${marineLicenceRoutes.MARINE_LICENCE_CONFIRM_CHANGE_ACTIVITY_TYPE}?site=1&activity=1`,
+      server: getServer()
+    })
+
+    expect(response.statusCode).toBe(302)
+    expect(response.headers.location).toBe(
+      marineLicenceRoutes.MARINE_LICENCE_TASK_LIST
     )
   })
 

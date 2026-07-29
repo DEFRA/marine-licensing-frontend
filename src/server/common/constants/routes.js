@@ -97,7 +97,8 @@ export const marineLicenceRoutes = {
   MARINE_LICENCE_WORKING_HOURS: '/marine-licence/working-hours',
   MARINE_LICENCE_WIDTH_OF_SITE: '/marine-licence/width-of-site',
   MARINE_LICENCE_DELETE_ACTIVITY: '/marine-licence/delete-activity',
-  MARINE_LICENCE_UPLOAD_DRAWING: '/marine-licence/upload-drawing',
+  MARINE_LICENCE_UPLOAD_CONSTRUCTION_DRAWING:
+    '/marine-licence/upload-construction-drawing',
   MARINE_LICENCE_CONFIRM_CHANGE_ACTIVITY_TYPE:
     '/marine-licence/confirm-change-activity-type',
   MARINE_LICENCE_DELETE_SITE: '/marine-licence/delete-site',

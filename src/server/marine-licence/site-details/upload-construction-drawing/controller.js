@@ -3,12 +3,12 @@ import { getSiteDataFromParam } from '#src/server/common/helpers/site-details/si
 import { validateSiteAndActivityParams } from '#src/server/common/helpers/marine-licence/session-cache/site-utils.js'
 import { getActivityDetailsBackLink } from '#src/server/marine-licence/site-details/utils/back-link.js'
 
-export const UPLOAD_DRAWING_VIEW_ROUTE =
-  'marine-licence/site-details/upload-drawing/index'
+export const UPLOAD_CONSTRUCTION_DRAWING_VIEW_ROUTE =
+  'marine-licence/site-details/upload-construction-drawing/index'
 
-const UPLOAD_DRAWING_PAGE_TITLE = 'Upload a construction drawing'
+const UPLOAD_CONSTRUCTION_DRAWING_PAGE_TITLE = 'Upload a construction drawing'
 
-export const uploadDrawingController = {
+export const uploadConstructionDrawingController = {
   options: {
     pre: [validateSiteAndActivityParams]
   },
@@ -18,9 +18,9 @@ export const uploadDrawingController = {
       request.query
     )
 
-    return h.view(UPLOAD_DRAWING_VIEW_ROUTE, {
-      pageTitle: UPLOAD_DRAWING_PAGE_TITLE,
-      heading: UPLOAD_DRAWING_PAGE_TITLE,
+    return h.view(UPLOAD_CONSTRUCTION_DRAWING_VIEW_ROUTE, {
+      pageTitle: UPLOAD_CONSTRUCTION_DRAWING_PAGE_TITLE,
+      heading: UPLOAD_CONSTRUCTION_DRAWING_PAGE_TITLE,
       projectName: marineLicence.projectName,
       siteNumber,
       activityDetailsNumber,

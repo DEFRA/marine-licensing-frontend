@@ -26,6 +26,12 @@ describe('Confirm change activity type', () => {
 
     within(document).getByRole('button', { name: 'Yes, change activity' })
 
+    const insetText = document.querySelector('.govuk-inset-text')
+    expect(insetText).toHaveTextContent('construction of new marine works')
+    expect(insetText).toHaveTextContent(
+      'alteration or improvement, including extending, of existing marine works'
+    )
+
     const cancelLink = within(document).getByRole('link', { name: 'Cancel' })
     expect(cancelLink).toHaveAttribute(
       'href',

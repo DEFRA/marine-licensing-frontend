@@ -40,7 +40,7 @@ describe('Review site details - construction drawing card', () => {
       expect(addDrawingButton.tagName).toBe('A')
       expect(addDrawingButton).toHaveAttribute(
         'href',
-        'upload-drawing?site=1&activity=1'
+        'upload-construction-drawing?site=1&activity=1'
       )
     })
 

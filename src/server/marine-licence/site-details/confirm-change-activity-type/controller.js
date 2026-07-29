@@ -6,12 +6,26 @@ import { getSiteDataFromParam } from '#src/server/common/helpers/site-details/si
 import { validateSiteAndActivityParams } from '#src/server/common/helpers/marine-licence/session-cache/site-utils.js'
 import { getActivityVariantFromSubType } from '#src/server/common/helpers/activity-details/activity-variants.js'
 import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
+import { formatActivitySubTypeLabel } from '#src/server/common/helpers/review-site-details/activity-details.js'
+import {
+  activityTypeValues,
+  activitySubTypeCodesByType,
+  DRAWING_REQUIRING_SUBTYPES
+} from '#src/server/marine-licence/site-details/type-of-activity/constants.js'
 
 export const CONFIRM_CHANGE_ACTIVITY_TYPE_VIEW_ROUTE =
   'marine-licence/site-details/confirm-change-activity-type/index'
 
 const CONFIRM_CHANGE_ACTIVITY_TYPE_PAGE_TITLE =
   'Changing your type of activity will delete any uploaded construction drawings'
+
+const isValidActivitySelection = (activityType, activitySubType) =>
+  activityTypeValues.includes(activityType) &&
+  Boolean(activitySubTypeCodesByType[activityType]?.includes(activitySubType))
+
+const drawingRequiringActivityLabels = DRAWING_REQUIRING_SUBTYPES.map(
+  formatActivitySubTypeLabel
+)
 
 export const confirmChangeActivityTypeController = {
   options: {
@@ -20,7 +34,11 @@ export const confirmChangeActivityTypeController = {
   handler(request, h) {
     const { activityType, activitySubType } = request.query
 
-    if (!activityType || !activitySubType) {
+    if (
+      !activityType ||
+      !activitySubType ||
+      !isValidActivitySelection(activityType, activitySubType)
+    ) {
       return h.redirect(marineLicenceRoutes.MARINE_LICENCE_TASK_LIST)
     }
 
@@ -28,6 +46,7 @@ export const confirmChangeActivityTypeController = {
     const { siteNumber, activityDetailsNumber } = getSiteDataFromParam(
       request.query
     )
+    const typeOfActivityLink = `${marineLicenceRoutes.MARINE_LICENCE_TYPE_OF_ACTIVITY}?site=${siteNumber}&activity=${activityDetailsNumber}`
 
     return h.view(CONFIRM_CHANGE_ACTIVITY_TYPE_VIEW_ROUTE, {
       pageTitle: CONFIRM_CHANGE_ACTIVITY_TYPE_PAGE_TITLE,
@@ -37,8 +56,9 @@ export const confirmChangeActivityTypeController = {
       activityDetailsNumber,
       activityType,
       activitySubType,
-      backLink: `${marineLicenceRoutes.MARINE_LICENCE_TYPE_OF_ACTIVITY}?site=${siteNumber}&activity=${activityDetailsNumber}`,
-      cancelLink: `${marineLicenceRoutes.MARINE_LICENCE_TYPE_OF_ACTIVITY}?site=${siteNumber}&activity=${activityDetailsNumber}`
+      drawingRequiringActivityLabels,
+      backLink: typeOfActivityLink,
+      cancelLink: typeOfActivityLink
     })
   }
 }
@@ -49,6 +69,10 @@ export const confirmChangeActivityTypeSubmitController = {
   },
   async handler(request, h) {
     const { site, activity, activityType, activitySubType } = request.payload
+
+    if (!isValidActivitySelection(activityType, activitySubType)) {
+      return h.redirect(marineLicenceRoutes.MARINE_LICENCE_TASK_LIST)
+    }
 
     const {
       siteIndex,

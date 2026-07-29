@@ -21,8 +21,14 @@
       <span class="govuk-caption-l">{{ projectName }}</span>
       <h1 class="govuk-heading-l">{{ heading }}</h1>
 
+      {% set drawingActivityList %}
+        <ul class="govuk-list govuk-list--bullet">
+          {% for label in drawingRequiringActivityLabels %}<li>{{ label | lower }}</li>{% endfor %}
+        </ul>
+      {% endset %}
+
       {{ govukInsetText({
-        html: 'You only need construction drawings for:<ul class="govuk-list govuk-list--bullet"><li>construction of new marine works</li><li>alteration or improvement, including extending, of existing marine works</li></ul>'
+        html: 'You only need construction drawings for:' + drawingActivityList
       }) }}
 
       <form method="POST">

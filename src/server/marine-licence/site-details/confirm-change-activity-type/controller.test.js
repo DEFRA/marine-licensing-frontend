@@ -36,6 +36,44 @@ describe('confirmChangeActivityTypeController', () => {
       expect(h.view).not.toHaveBeenCalled()
     })
 
+    it('redirects to the task list when activityType is not a recognised value', () => {
+      const request = createMockRequest({
+        query: {
+          site: '1',
+          activity: '1',
+          activityType: 'not-a-real-type',
+          activitySubType: 'construction-type-2'
+        }
+      })
+      const h = createMockH()
+
+      confirmChangeActivityTypeController.handler(request, h)
+
+      expect(h.redirect).toHaveBeenCalledWith(
+        marineLicenceRoutes.MARINE_LICENCE_TASK_LIST
+      )
+      expect(h.view).not.toHaveBeenCalled()
+    })
+
+    it('redirects to the task list when activitySubType does not belong to activityType', () => {
+      const request = createMockRequest({
+        query: {
+          site: '1',
+          activity: '1',
+          activityType: 'deposit',
+          activitySubType: 'construction-type-2'
+        }
+      })
+      const h = createMockH()
+
+      confirmChangeActivityTypeController.handler(request, h)
+
+      expect(h.redirect).toHaveBeenCalledWith(
+        marineLicenceRoutes.MARINE_LICENCE_TASK_LIST
+      )
+      expect(h.view).not.toHaveBeenCalled()
+    })
+
     it('renders the confirmation view with the pending activity type/subtype', () => {
       const request = createMockRequest({
         query: {
@@ -61,6 +99,10 @@ describe('confirmChangeActivityTypeController', () => {
           activityDetailsNumber: 1,
           activityType: 'construction',
           activitySubType: 'construction-type-2',
+          drawingRequiringActivityLabels: [
+            'Construction of new marine works',
+            'Alteration or improvement, including extending, of existing marine works'
+          ],
           backLink: '/marine-licence/type-of-activity?site=1&activity=1',
           cancelLink: '/marine-licence/type-of-activity?site=1&activity=1'
         }
@@ -91,6 +133,48 @@ describe('confirmChangeActivityTypeController', () => {
       })
       expect(h.redirect).toHaveBeenCalledWith(
         '/marine-licence/activity-details/what-are-you-maintaining?site=1&activity=1'
+      )
+    })
+
+    it('redirects to the task list without saving when activityType is not a recognised value', async () => {
+      const request = createMockRequest({
+        payload: {
+          site: '1',
+          activity: '1',
+          activityType: 'not-a-real-type',
+          activitySubType: 'construction-type-2'
+        }
+      })
+      const h = createMockH()
+
+      await confirmChangeActivityTypeSubmitController.handler(request, h)
+
+      expect(
+        cacheUtils.updateMarineLicenceSiteActivityDetails
+      ).not.toHaveBeenCalled()
+      expect(h.redirect).toHaveBeenCalledWith(
+        marineLicenceRoutes.MARINE_LICENCE_TASK_LIST
+      )
+    })
+
+    it('redirects to the task list without saving when activitySubType does not belong to activityType', async () => {
+      const request = createMockRequest({
+        payload: {
+          site: '1',
+          activity: '1',
+          activityType: 'deposit',
+          activitySubType: 'construction-type-1'
+        }
+      })
+      const h = createMockH()
+
+      await confirmChangeActivityTypeSubmitController.handler(request, h)
+
+      expect(
+        cacheUtils.updateMarineLicenceSiteActivityDetails
+      ).not.toHaveBeenCalled()
+      expect(h.redirect).toHaveBeenCalledWith(
+        marineLicenceRoutes.MARINE_LICENCE_TASK_LIST
       )
     })
   })

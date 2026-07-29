@@ -176,7 +176,7 @@ const marineLicencePages = [
     title: 'Are you sure you want to delete this activity?'
   },
   {
-    url: `${marineLicenceRoutes.MARINE_LICENCE_UPLOAD_DRAWING}?site=1&activity=1`,
+    url: `${marineLicenceRoutes.MARINE_LICENCE_UPLOAD_CONSTRUCTION_DRAWING}?site=1&activity=1`,
     title: 'Upload a construction drawing'
   },
   {

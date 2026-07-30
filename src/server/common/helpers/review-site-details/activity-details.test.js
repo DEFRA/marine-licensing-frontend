@@ -12,13 +12,13 @@ import {
 describe('formatActivitySubTypeLabel', () => {
   test('returns label for construction-type-1', () => {
     expect(formatActivitySubTypeLabel('construction-type-1')).toBe(
-      'Construction of new works'
+      'Construction of new marine works'
     )
   })
 
   test('returns label for construction-type-2', () => {
     expect(formatActivitySubTypeLabel('construction-type-2')).toBe(
-      'Maintenance of existing works'
+      'Maintenance of existing marine works'
     )
   })
 
@@ -173,13 +173,14 @@ describe('parseActivityDetails', () => {
         activityHeading: "What you're constructing",
         activityLink:
           '/marine-licence/activity-details/what-are-you-constructing',
-        activitySubType: 'Construction of new works',
+        activitySubType: 'Construction of new marine works',
         activityType: 'construction',
         activities: ['Aquaculture trestles or fixed walkways'],
         activityMonths: 'test reason',
         someField: 'value',
         completionDate: 'Test completion',
-        workingHours: 'Test hours'
+        workingHours: 'Test hours',
+        requiresConstructionDrawing: true
       }
     ])
   })
@@ -203,6 +204,25 @@ describe('parseActivityDetails', () => {
   test('returns empty array when activityDetails is missing', () => {
     expect(parseActivityDetails({})).toEqual([])
   })
+
+  test.each([
+    ['construction-type-1', true],
+    ['construction-type-2', false],
+    ['construction-type-3', true],
+    ['deposit-type-1', false],
+    ['removal-type-1', false]
+  ])(
+    'sets requiresConstructionDrawing to %s for %s',
+    (activitySubType, expected) => {
+      const siteDetails = {
+        activityDetails: [{ activitySubType }]
+      }
+
+      expect(
+        parseActivityDetails(siteDetails)[0].requiresConstructionDrawing
+      ).toBe(expected)
+    }
+  )
 })
 
 describe('formatActivityDuration', () => {

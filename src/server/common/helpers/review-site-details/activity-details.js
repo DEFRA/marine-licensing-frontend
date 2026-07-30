@@ -1,13 +1,14 @@
 import { ACTIVITY_LABELS } from '#src/server/common/constants/activities.js'
 import { getActivityVariantFromSubType } from '#src/server/common/helpers/activity-details/activity-variants.js'
+import { SUBTYPES_REQUIRING_CONSTRUCTION_DRAWING } from '#src/server/marine-licence/site-details/type-of-activity/constants.js'
 
 const ACTIVITY_SUB_TYPE_MAP = {
   'construction-type-1': {
-    label: 'Construction of new works',
+    label: 'Construction of new marine works',
     heading: "What you're constructing"
   },
   'construction-type-2': {
-    label: 'Maintenance of existing works',
+    label: 'Maintenance of existing marine works',
     heading: "What you're maintaining"
   },
   'construction-type-3': {
@@ -117,6 +118,10 @@ export const parseActivityDetails = (siteDetails) => {
     activitySubType: formatActivitySubTypeLabel(activity.activitySubType),
     activityHeading: formatActivitySubTypeHeading(activity.activitySubType),
     activityLink: `/marine-licence/activity-details/${getActivityVariantFromSubType(activity.activitySubType)}`,
+    requiresConstructionDrawing:
+      SUBTYPES_REQUIRING_CONSTRUCTION_DRAWING.includes(
+        activity.activitySubType
+      ),
     activities: mapActivitySelections(
       activity.activities,
       activity.activityType

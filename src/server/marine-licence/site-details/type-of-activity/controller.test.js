@@ -56,15 +56,15 @@ describe('#typeOfActivity', () => {
       })
     })
 
-    test('handler should persist activityType and activitySubType and redirect', async () => {
+    test('handler should persist activityType and activitySubType and redirect when drawing status is unaffected', async () => {
       const redirectH = createMockH()
       const request = createMockRequest({
         query: { site: 1, activity: 1 },
         payload: {
-          activityType: 'removal',
-          activitySubTypeConstruction: '',
+          activityType: 'construction',
+          activitySubTypeConstruction: 'construction-type-3',
           activitySubTypeDeposit: '',
-          activitySubTypeRemoval: 'removal-type-2'
+          activitySubTypeRemoval: ''
         }
       })
 
@@ -77,17 +77,81 @@ describe('#typeOfActivity', () => {
         0,
         {
           activities: null,
-          activityType: 'removal',
-          activitySubType: 'removal-type-2'
+          activityType: 'construction',
+          activitySubType: 'construction-type-3'
         }
       )
       expect(redirectH.redirect).toHaveBeenCalledWith(
-        '/marine-licence/activity-details/what-are-you-removing-on-an-ongoing-basis?site=1&activity=1'
+        '/marine-licence/activity-details/what-are-you-altering-or-improving?site=1&activity=1'
       )
     })
 
     describe('activityTypeChanged', () => {
-      test('clears activities when activityType changes', async () => {
+      test('does not clear activities when activityType and activitySubType are unchanged', async () => {
+        const redirectH = createMockH()
+        const request = createMockRequest({
+          query: { site: 1, activity: 1 },
+          payload: {
+            activityType: 'construction',
+            activitySubTypeConstruction: 'construction-type-1',
+            activitySubTypeDeposit: '',
+            activitySubTypeRemoval: ''
+          }
+        })
+
+        await typeOfActivitySubmitController.handler(request, redirectH)
+
+        expect(updateMarineLicenceSiteActivityDetails).toHaveBeenCalledWith(
+          request,
+          redirectH,
+          0,
+          0,
+          {
+            activityType: 'construction',
+            activitySubType: 'construction-type-1'
+          }
+        )
+      })
+    })
+
+    describe('changing away from a drawing-requiring activity', () => {
+      test('redirects to the confirmation guard when changing to a different activity type entirely', async () => {
+        const redirectH = createMockH()
+        const request = createMockRequest({
+          query: { site: 1, activity: 1 },
+          payload: {
+            activityType: 'deposit',
+            activitySubTypeConstruction: '',
+            activitySubTypeDeposit: 'deposit-type-1',
+            activitySubTypeRemoval: ''
+          }
+        })
+
+        await typeOfActivitySubmitController.handler(request, redirectH)
+
+        expect(updateMarineLicenceSiteActivityDetails).not.toHaveBeenCalled()
+        expect(redirectH.redirect).toHaveBeenCalledWith(
+          '/marine-licence/confirm-change-activity-type?site=1&activity=1&activityType=deposit&activitySubType=deposit-type-1'
+        )
+      })
+
+      test('does not guard when the existing activity did not require a drawing', async () => {
+        vi.mocked(getMarineLicenceCache).mockReturnValueOnce({
+          ...mockMarineLicenceApplication,
+          siteDetails: [
+            {
+              ...mockMarineLicenceApplication.siteDetails[0],
+              activityDetails: [
+                {
+                  ...mockMarineLicenceApplication.siteDetails[0]
+                    .activityDetails[0],
+                  activityType: 'construction',
+                  activitySubType: 'construction-type-2'
+                }
+              ]
+            }
+          ]
+        })
         const redirectH = createMockH()
         const request = createMockRequest({
           query: { site: 1, activity: 1 },
@@ -112,58 +176,8 @@ describe('#typeOfActivity', () => {
             activitySubType: 'deposit-type-1'
           }
         )
-      })
-
-      test('clears activities when activitySubType changes', async () => {
-        const redirectH = createMockH()
-        const request = createMockRequest({
-          query: { site: 1, activity: 1 },
-          payload: {
-            activityType: 'construction',
-            activitySubTypeConstruction: 'construction-type-2',
-            activitySubTypeDeposit: '',
-            activitySubTypeRemoval: ''
-          }
-        })
-
-        await typeOfActivitySubmitController.handler(request, redirectH)
-
-        expect(updateMarineLicenceSiteActivityDetails).toHaveBeenCalledWith(
-          request,
-          redirectH,
-          0,
-          0,
-          {
-            activities: null,
-            activityType: 'construction',
-            activitySubType: 'construction-type-2'
-          }
-        )
-      })
-
-      test('does not clear activities when activityType and activitySubType are unchanged', async () => {
-        const redirectH = createMockH()
-        const request = createMockRequest({
-          query: { site: 1, activity: 1 },
-          payload: {
-            activityType: 'construction',
-            activitySubTypeConstruction: 'construction-type-1',
-            activitySubTypeDeposit: '',
-            activitySubTypeRemoval: ''
-          }
-        })
-
-        await typeOfActivitySubmitController.handler(request, redirectH)
-
-        expect(updateMarineLicenceSiteActivityDetails).toHaveBeenCalledWith(
-          request,
-          redirectH,
-          0,
-          0,
-          {
-            activityType: 'construction',
-            activitySubType: 'construction-type-1'
-          }
+        expect(redirectH.redirect).toHaveBeenCalledWith(
+          '/marine-licence/activity-details/what-deposit-activity-are-you-continuing?site=1&activity=1'
         )
       })
     })

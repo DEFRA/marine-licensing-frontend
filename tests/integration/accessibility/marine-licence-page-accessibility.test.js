@@ -177,6 +177,15 @@ const marineLicencePages = [
     title: 'Are you sure you want to delete this activity?'
   },
   {
+    url: `${marineLicenceRoutes.MARINE_LICENCE_UPLOAD_CONSTRUCTION_DRAWING}?site=1&activity=1`,
+    title: 'Upload a construction drawing'
+  },
+  {
+    url: `${marineLicenceRoutes.MARINE_LICENCE_CONFIRM_CHANGE_ACTIVITY_TYPE}?site=1&activity=1&activityType=deposit&activitySubType=deposit-type-1`,
+    title:
+      'Changing your type of activity will delete any uploaded construction drawings'
+  },
+  {
     url: `${marineLicenceRoutes.MARINE_LICENCE_CHANGE_SITE_LOCATION}?site=1`,
     title: 'Change site location'
   },

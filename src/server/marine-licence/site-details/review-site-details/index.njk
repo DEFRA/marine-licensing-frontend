@@ -5,6 +5,7 @@
 {% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
 {% from "site-details-map/macro.njk" import appSiteDetailsMap %}
 {% from "marine-licence/activity-details-card/macro.njk" import appMarineLicenceActivityDetailsCard %}
+{% from "marine-licence/construction-drawing-card/macro.njk" import appMarineLicenceConstructionDrawingCard %}
 {% from "finished-site-details-question/macro.njk" import appFinishedSiteDetailsQuestion %}
 {% block head %}
   {{ super() }}
@@ -190,6 +191,11 @@
           </div>
 
           </form>
+
+        {{ appMarineLicenceConstructionDrawingCard({
+          siteNumber: site.siteNumber,
+          activityDetails: site.activityDetails
+        }) }}
 
       {% endfor %}
 

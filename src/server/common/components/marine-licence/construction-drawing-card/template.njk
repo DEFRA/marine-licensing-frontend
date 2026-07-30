@@ -1,0 +1,47 @@
+{% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "incomplete-field/macro.njk" import appIncompleteField %}
+
+{% set siteHasConstructionDrawing = false %}
+{% set firstDrawingActivityNumber = 1 %}
+
+{% for activityDetails in params.activityDetails %}
+  {% if activityDetails.requiresConstructionDrawing %}
+    {% if not siteHasConstructionDrawing %}
+      {% set siteHasConstructionDrawing = true %}
+      {% set firstDrawingActivityNumber = loop.index %}
+    {% endif %}
+
+    {% set drawingRows = [{
+      key: { text: "File upload" },
+      value: { html: appIncompleteField({ text: "" }) },
+      actions: setSiteDetailsAction(false, 'upload-construction-drawing', params.siteNumber, "", { activityNumber: loop.index })
+    }] %}
+
+    {{ govukSummaryList({
+      card: {
+        attributes: {
+          id: "construction-drawing-site-" + params.siteNumber + "-activity-" + loop.index
+        },
+        title: {
+          text: "Site " + params.siteNumber + " - Construction drawing " + loop.index
+        }
+      },
+      classes: "govuk-summary-list--full-width",
+      rows: drawingRows
+    }) }}
+  {% endif %}
+{% endfor %}
+
+{% if siteHasConstructionDrawing %}
+  <div class="govuk-!-margin-bottom-6">
+    {{ govukButton({
+      text: "Add another construction drawing for site " + params.siteNumber,
+      classes: "govuk-button--secondary",
+      href: "upload-construction-drawing?site=" + params.siteNumber + "&activity=" + firstDrawingActivityNumber,
+      attributes: {
+        id: 'add-another-construction-drawing-site-' + params.siteNumber
+      }
+    }) }}
+  </div>
+{% endif %}

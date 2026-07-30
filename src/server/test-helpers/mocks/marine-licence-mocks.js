@@ -41,7 +41,7 @@ export const mockActivityDetails = {
 
 export const mockOutputActivityDetails = {
   ...mockActivityDetails,
-  activityType: 'Construction of new works',
+  activityType: 'Construction of new marine works',
   activityDuration: '1 year, 4 months',
   completionDate: mockActivityDetails.completionDate.reason,
   activityMonths: mockActivityDetails.activityMonths.details

@@ -2,6 +2,7 @@ import {
   marineLicenceRoutes,
   routes
 } from '#src/server/common/constants/routes.js'
+import { MCMS_LOGIN_URL } from '#src/server/common/constants/mcms.js'
 import { config } from '#src/config/config.js'
 import { clearMarineLicenceCache } from '#src/server/common/helpers/marine-licence/session-cache/utils.js'
 
@@ -26,7 +27,7 @@ const cards = [
   },
   {
     title: 'Sign in to the Marine Case Management System',
-    link: 'https://marinelicensing.marinemanagement.org.uk/mmofox5/fox/live/MMO_LOGIN/login',
+    link: MCMS_LOGIN_URL,
     description: 'View or manage projects not available in this account.'
   }
 ]

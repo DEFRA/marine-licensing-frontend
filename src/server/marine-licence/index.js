@@ -21,6 +21,7 @@ import { marinePlanPolicyGuidanceRoutes } from '#src/server/marine-licence/marin
 import { marinePlanPoliciesRoutes } from '#src/server/marine-licence/marine-plan-policies/index.js'
 import { feeEstimateRoutes } from '#src/server/marine-licence/fee-estimate/index.js'
 import { feeEstimateAreYouSureRoutes } from '#src/server/marine-licence/fee-estimate-are-you-sure/index.js'
+import { applicationTransferredRoutes } from '#src/server/marine-licence/application-transferred/index.js'
 
 export const marineLicence = {
   plugin: {
@@ -49,7 +50,8 @@ export const marineLicence = {
         ...marinePlanPolicyGuidanceRoutes,
         ...marinePlanPoliciesRoutes,
         ...feeEstimateRoutes,
-        ...feeEstimateAreYouSureRoutes
+        ...feeEstimateAreYouSureRoutes,
+        ...applicationTransferredRoutes
       ])
     }
   }

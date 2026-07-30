@@ -1,0 +1,32 @@
+{% extends 'layouts/page.njk' %}
+
+{% block content %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+
+      <span class="govuk-caption-l">{{ projectName }}</span>
+      <h1 class="govuk-heading-l">{{ heading }}</h1>
+
+      <p class="govuk-body">Your application ({{ applicationReference }}) has been transferred from Get permission for marine work to our Marine Case Management System (MCMS).</p>
+
+      <p class="govuk-body">Get permission for marine work currently processes certain types of marine licence application. MCMS processes all types, so we have transferred your application there.</p>
+
+      <p class="govuk-body">Your application will continue to be managed as normal and you do not need to do anything.</p>
+
+      <h2 class="govuk-heading-m">What happens next</h2>
+
+      <p class="govuk-body">Your fee estimate may change but we will confirm that when we contact you.</p>
+
+      <p class="govuk-body">If you have an MCMS account you can <a class="govuk-link" href="{{ mcmsLoginUrl }}">track the progress of your application</a>.</p>
+
+      <p class="govuk-body">If you have not heard from us or do not have access to MCMS, contact us:</p>
+
+      <p class="govuk-body">Email: <a class="govuk-link" href="mailto:{{ contactEmail }}">{{ contactEmail }}</a></p>
+
+      <p class="govuk-body">Phone: {{ contactPhone }}</p>
+
+      <p class="govuk-body"><a class="govuk-link" href="{{ viewDetailsUrl }}">View your submitted application in this service</a></p>
+
+    </div>
+  </div>
+{% endblock %}

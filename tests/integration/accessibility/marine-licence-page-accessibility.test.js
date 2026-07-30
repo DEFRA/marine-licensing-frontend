@@ -242,6 +242,11 @@ const marineLicencePages = [
   {
     url: `${marineLicenceRoutes.MARINE_LICENCE_CONFIRMATION}?applicationReference=123`,
     title: 'Application sent'
+  },
+  {
+    url: `${marineLicenceRoutes.MARINE_LICENCE_APPLICATION_TRANSFERRED}/${mockSubmittedMarineLicenceApplication.id}`,
+    title: 'Your application has been transferred',
+    marineLicence: mockSubmittedMarineLicenceApplication
   }
   // TODO: Uncomment when meta refresh a11y issue is resolved (same issue as upload-and-wait)
   // {

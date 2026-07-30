@@ -21,7 +21,8 @@ const applicationTransferredSettings = {
   heading: pageTitle,
   mcmsLoginUrl: MCMS_LOGIN_URL,
   contactEmail: CONTACT_EMAIL,
-  contactPhone: CONTACT_PHONE
+  contactPhone: CONTACT_PHONE,
+  backLink: routes.DASHBOARD
 }
 
 export const applicationTransferredController = {

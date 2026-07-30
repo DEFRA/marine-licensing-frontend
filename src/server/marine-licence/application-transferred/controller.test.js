@@ -1,6 +1,9 @@
 import { vi } from 'vitest'
 import Boom from '@hapi/boom'
-import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
+import {
+  marineLicenceRoutes,
+  routes
+} from '#src/server/common/constants/routes.js'
 import {
   applicationTransferredController,
   APPLICATION_TRANSFERRED_VIEW_ROUTE,
@@ -51,7 +54,8 @@ describe('#applicationTransferred', () => {
         viewDetailsUrl: `${marineLicenceRoutes.MARINE_LICENCE_VIEW_DETAILS}/${mockLicence.id}`,
         mcmsLoginUrl: MCMS_LOGIN_URL,
         contactEmail: CONTACT_EMAIL,
-        contactPhone: CONTACT_PHONE
+        contactPhone: CONTACT_PHONE,
+        backLink: routes.DASHBOARD
       })
     })
 

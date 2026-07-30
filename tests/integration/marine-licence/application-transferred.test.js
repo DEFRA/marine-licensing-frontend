@@ -33,6 +33,10 @@ describe('Application transferred', () => {
     })
 
     expect(getByText(document, marineLicence.projectName)).toBeInTheDocument()
+    expect(getByRole(document, 'link', { name: 'Back' })).toHaveAttribute(
+      'href',
+      routes.DASHBOARD
+    )
     expect(getByRole(document, 'heading', { level: 1 })).toHaveTextContent(
       'Your application has been transferred'
     )

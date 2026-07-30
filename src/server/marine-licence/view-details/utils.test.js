@@ -13,11 +13,19 @@ describe('#buildApplicationDetailsCardData', () => {
     const result = buildApplicationDetailsCardData(marineLicence)
 
     expect(result.applicationReference).toBe('ML-2026-001')
-    expect(result.status).toBe(PROJECT_STATUS.TRANSFERRED)
+    expect(result.isTransferred).toBe(true)
     expect(result.submittedAt).toBe('15 Jan 2026')
     expect(result.transferredDate).toBe('20 Feb 2026')
     expect(result.statusTag).toContain('govuk-tag--magenta')
     expect(result.statusTag).toContain(PROJECT_STATUS.TRANSFERRED)
+  })
+
+  test('sets isTransferred to false when status is not transferred', () => {
+    const result = buildApplicationDetailsCardData({
+      status: PROJECT_STATUS.SUBMITTED
+    })
+
+    expect(result.isTransferred).toBe(false)
   })
 
   test('escapes html in the status', () => {

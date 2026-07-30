@@ -12,13 +12,13 @@ describe('Marine Licence Application Details Card Component', () => {
     })
   })
 
-  test('Should render Application Details card component', () => {
+  test('Should render Application details card component', () => {
     expect($component('#application-details-card')).toHaveLength(1)
   })
 
   test('Should have correct card title', () => {
     expect($component('.govuk-summary-card__title').text().trim()).toBe(
-      'Application Details'
+      'Application details'
     )
 
     const htmlContent = $component.html()

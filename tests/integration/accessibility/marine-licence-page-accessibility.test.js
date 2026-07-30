@@ -15,6 +15,7 @@ import { agentSession } from '../shared/session-fixtures.js'
 import { selectActivityVariants } from '~/src/server/common/constants/activity-variants.js'
 import { getMarinePlanPolicyLink } from '~/src/server/common/helpers/marine-licence/marine-plan-policy-link.js'
 import { runPageAccessibilityTests } from './page-accessibility-tests.js'
+import { mockTransferredMarineLicenceApplication } from '#src/server/test-helpers/mocks/marine-licence-mocks.js'
 
 vi.mock('~/src/server/common/helpers/authenticated-requests.js')
 vi.mock('~/src/server/common/helpers/defraid-login/session-cache.js')
@@ -246,7 +247,7 @@ const marineLicencePages = [
   {
     url: `${marineLicenceRoutes.MARINE_LICENCE_APPLICATION_TRANSFERRED}/${mockSubmittedMarineLicenceApplication.id}`,
     title: 'Your application has been transferred',
-    marineLicence: mockSubmittedMarineLicenceApplication
+    marineLicence: mockTransferredMarineLicenceApplication
   }
   // TODO: Uncomment when meta refresh a11y issue is resolved (same issue as upload-and-wait)
   // {

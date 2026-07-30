@@ -10,11 +10,15 @@ import {
 import { MCMS_LOGIN_URL } from '#src/server/common/constants/mcms.js'
 import { getMarineLicenceService } from '#src/services/marine-licence-service/index.js'
 import { mockSubmittedMarineLicenceApplication } from '#src/server/test-helpers/mocks/marine-licence-mocks.js'
+import { PROJECT_STATUS } from '#src/server/common/constants/projects.js'
 
 vi.mock('#src/services/marine-licence-service/index.js')
 
 describe('#applicationTransferred', () => {
-  const mockLicence = mockSubmittedMarineLicenceApplication
+  const mockLicence = {
+    ...mockSubmittedMarineLicenceApplication,
+    status: PROJECT_STATUS.TRANSFERRED
+  }
 
   let mockMarineLicenceService
 

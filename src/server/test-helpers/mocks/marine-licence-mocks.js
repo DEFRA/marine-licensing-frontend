@@ -1,5 +1,6 @@
 import { MARINE_LICENCE_KEY } from '#src/server/common/constants/marine-licence.js'
 import { faker } from '@faker-js/faker'
+import { PROJECT_STATUS } from '#src/server/common/constants/projects.js'
 
 export const mockMarineLicenceTaskList = {
   projectName: 'COMPLETED',
@@ -163,6 +164,12 @@ export const mockMarineLicenceApplication = {
 export const mockSubmittedMarineLicenceApplication = {
   ...mockMarineLicenceApplication,
   status: 'Submitted',
+  applicationReference: 'MLA/2026/10264'
+}
+
+export const mockTransferredMarineLicenceApplication = {
+  ...mockMarineLicenceApplication,
+  status: PROJECT_STATUS.TRANSFERRED,
   applicationReference: 'MLA/2026/10264'
 }
 

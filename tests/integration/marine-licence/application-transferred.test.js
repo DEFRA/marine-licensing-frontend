@@ -1,23 +1,31 @@
 import { getByRole, getByText } from '@testing-library/dom'
-import { marineLicenceRoutes } from '~/src/server/common/constants/routes.js'
+import {
+  marineLicenceRoutes,
+  routes
+} from '~/src/server/common/constants/routes.js'
 import {
   mockMarineLicence,
   setupTestServer
 } from '~/tests/integration/shared/test-setup-helpers.js'
 import { loadPage } from '~/tests/integration/shared/app-server.js'
-import { mockSubmittedMarineLicenceApplication } from '~/src/server/test-helpers/mocks/marine-licence-mocks.js'
 import {
   CONTACT_EMAIL,
   CONTACT_PHONE
 } from '~/src/server/marine-licence/application-transferred/controller.js'
 import { MCMS_LOGIN_URL } from '~/src/server/common/constants/mcms.js'
+import {
+  mockSubmittedMarineLicenceApplication,
+  mockTransferredMarineLicenceApplication
+} from '#src/server/test-helpers/mocks/marine-licence-mocks.js'
+import { statusCodes } from '~/src/server/common/constants/status-codes.js'
+import { makeGetRequest } from '~/src/server/test-helpers/server-requests.js'
 
 describe('Application transferred', () => {
   const getServer = setupTestServer()
-  const marineLicence = mockSubmittedMarineLicenceApplication
+  const marineLicence = mockTransferredMarineLicenceApplication
 
   test('page elements', async () => {
-    mockMarineLicence(marineLicence)
+    mockMarineLicence(mockTransferredMarineLicenceApplication)
 
     const document = await loadPage({
       requestUrl: `${marineLicenceRoutes.MARINE_LICENCE_APPLICATION_TRANSFERRED}/${marineLicence.id}`,
@@ -58,5 +66,17 @@ describe('Application transferred', () => {
       'href',
       `${marineLicenceRoutes.MARINE_LICENCE_VIEW_DETAILS}/${marineLicence.id}`
     )
+  })
+
+  test('should if marine licence is not transferred', async () => {
+    mockMarineLicence(mockSubmittedMarineLicenceApplication)
+
+    const response = await makeGetRequest({
+      url: `${marineLicenceRoutes.MARINE_LICENCE_APPLICATION_TRANSFERRED}/${marineLicence.id}`,
+      server: getServer()
+    })
+
+    expect(response.statusCode).toBe(statusCodes.redirect)
+    expect(response.headers.location).toBe(routes.DASHBOARD)
   })
 })

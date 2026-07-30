@@ -1,7 +1,11 @@
 import Boom from '@hapi/boom'
-import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
+import {
+  marineLicenceRoutes,
+  routes
+} from '#src/server/common/constants/routes.js'
 import { MCMS_LOGIN_URL } from '#src/server/common/constants/mcms.js'
 import { getMarineLicenceService } from '#src/services/marine-licence-service/index.js'
+import { PROJECT_STATUS } from '#src/server/common/constants/projects.js'
 
 export const APPLICATION_TRANSFERRED_VIEW_ROUTE =
   'marine-licence/application-transferred/index'
@@ -27,6 +31,10 @@ export const applicationTransferredController = {
     try {
       const service = getMarineLicenceService(request)
       const marineLicence = await service.getMarineLicenceById(marineLicenceId)
+
+      if (marineLicence.status !== PROJECT_STATUS.TRANSFERRED) {
+        return h.redirect(routes.DASHBOARD)
+      }
 
       return h.view(APPLICATION_TRANSFERRED_VIEW_ROUTE, {
         ...applicationTransferredSettings,

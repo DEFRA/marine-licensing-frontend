@@ -54,6 +54,13 @@ describe('Type of activity (marine licence)', () => {
     ).toBeInTheDocument()
 
     expect(
+      getByText(
+        document,
+        "Upkeep or repair of a structure or asset that's already there, without changing its size or shape"
+      )
+    ).toBeInTheDocument()
+
+    expect(
       getByRole(document, 'button', { name: 'Continue' })
     ).toBeInTheDocument()
   })
@@ -88,7 +95,7 @@ describe('Type of activity (marine licence)', () => {
 
     expect(
       getByRole(document, 'radio', {
-        name: 'Maintenance of existing works'
+        name: 'Maintenance of existing marine works'
       })
     ).toBeChecked()
   })
@@ -163,7 +170,25 @@ describe('Type of activity (marine licence)', () => {
     ).toBeChecked()
   })
 
-  test('redirects after valid submission', async () => {
+  test('redirects after valid submission when the change does not affect drawing requirements', async () => {
+    mockMarineLicence(mockMarineLicenceApplication)
+
+    const response = await makePostRequest({
+      url: `${marineLicenceRoutes.MARINE_LICENCE_TYPE_OF_ACTIVITY}?site=1&activity=1`,
+      server: getServer(),
+      formData: {
+        activityType: 'construction',
+        activitySubTypeConstruction: 'construction-type-3'
+      }
+    })
+
+    expect(response.statusCode).toBe(statusCodes.redirect)
+    expect(response.headers.location).toBe(
+      '/marine-licence/activity-details/what-are-you-altering-or-improving?site=1&activity=1'
+    )
+  })
+
+  test('redirects to the change-activity guard when moving away from a drawing-requiring activity', async () => {
     mockMarineLicence(mockMarineLicenceApplication)
 
     const response = await makePostRequest({
@@ -177,7 +202,7 @@ describe('Type of activity (marine licence)', () => {
 
     expect(response.statusCode).toBe(statusCodes.redirect)
     expect(response.headers.location).toBe(
-      '/marine-licence/activity-details/what-new-deposit-activity-are-you-doing?site=1&activity=1'
+      '/marine-licence/confirm-change-activity-type?site=1&activity=1&activityType=deposit&activitySubType=deposit-type-2'
     )
   })
 })

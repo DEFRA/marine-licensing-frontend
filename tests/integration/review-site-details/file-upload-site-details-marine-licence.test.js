@@ -222,7 +222,7 @@ describe('ML Review Site Details - File Upload Integration Tests', () => {
   const validateFileUpload = (document, expected, siteIndex) => {
     const cards = document.querySelectorAll('.govuk-summary-card')
     const siteDetailsCards = Array.from(cards).filter((card) =>
-      card.textContent.match(/Site \d+(?! - Activity)/)
+      card.id.match(/^site-details-\d+$/)
     )
 
     siteDetailsCards.forEach((card, i) => {

@@ -1,6 +1,7 @@
 {% extends 'layouts/page.njk' %}
 {% from "govuk/components/back-link/macro.njk" import govukBackLink %}
 {% from "marine-licence/other-permissions-card/macro.njk" import appMarineLicenceOtherPermissionsCard %}
+{% from "marine-licence/application-details-card/macro.njk" import appMarineLicenceApplicationDetailsCard %}
 {% from "marine-licence/project-details-card/macro.njk" import appMarineLicenceProjectDetailsCard %}
 {% from "marine-licence/site-location-card/macro.njk" import appMarineLicenceSiteLocationCard %}
 {% from "marine-licence/site-details-card/macro.njk" import appMarineLicenceSiteDetailsCard %}
@@ -30,6 +31,17 @@
         <span class="govuk-caption-l">{{ pageCaption }}</span>
       {% endif %}
       <h1 class="govuk-heading-l" id="view-details-heading">{{ pageTitle }}</h1>
+
+      {% if status === 'Transferred' %}
+        {{ appMarineLicenceApplicationDetailsCard({
+          statusTag: statusTag,
+          applicationReference: applicationReference,
+          transferredDate: transferredDate,
+          submittedAt: submittedAt,
+          isReadOnly: isReadOnly,
+          preferredDates: preferredDates
+        }) }}
+      {% endif %}
 
       {{ appMarineLicenceProjectDetailsCard({
         projectName: projectName,

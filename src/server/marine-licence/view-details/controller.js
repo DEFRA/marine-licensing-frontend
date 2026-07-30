@@ -14,8 +14,18 @@ import { buildSummaryData } from '#src/server/common/helpers/marine-licence/summ
 import { buildSiteData } from '#src/server/common/helpers/marine-licence/site-data.js'
 import { waterFrameworkReviewData } from '#src/server/common/helpers/marine-licence/water-framework-directive/water-framework-review-data.js'
 import { buildMarinePlanPoliciesData } from '#src/server/common/helpers/marine-licence/marine-plan-policies-data.js'
+import { PROJECT_STATUS } from '#src/server/common/constants/projects.js'
+import { buildApplicationDetailsCardData } from '#src/server/marine-licence/view-details/utils.js'
 
 export const VIEW_DETAILS_VIEW_ROUTE = 'marine-licence/view-details/index'
+
+const getApplicantBackLink = (status, marineLicenceId) => {
+  if (status === PROJECT_STATUS.TRANSFERRED) {
+    return `${marineLicenceRoutes.MARINE_LICENCE_APPLICATION_TRANSFERRED}/${marineLicenceId}`
+  }
+
+  return routes.DASHBOARD
+}
 
 export const viewDetailsController = {
   async handler(request, h) {
@@ -64,6 +74,9 @@ export const viewDetailsController = {
 
       const marinePlanPolicies = buildMarinePlanPoliciesData(marineLicence)
 
+      const applicationDetailsCardData =
+        buildApplicationDetailsCardData(marineLicence)
+
       return h.view(VIEW_DETAILS_VIEW_ROUTE, {
         pageTitle: formattedMarineLicence.projectName,
         specialLegalPowers: formattedMarineLicence.specialLegalPowers,
@@ -78,14 +91,17 @@ export const viewDetailsController = {
         summaryData,
         isReadOnly: true,
         pageCaption,
-        backLink: isApplicantView ? routes.DASHBOARD : null,
+        backLink: isApplicantView
+          ? getApplicantBackLink(marineLicence.status, marineLicenceId)
+          : null,
         isInternalUserView,
         marineLicenceId,
         waterFrameworkDirectiveData,
         invoicingData: formattedMarineLicence.invoicing,
         invoicingChangeLink:
           marineLicenceRoutes.MARINE_LICENCE_CHECK_INVOICING_DETAILS,
-        marinePlanPolicies
+        marinePlanPolicies,
+        ...applicationDetailsCardData
       })
     } catch (error) {
       if (error.isBoom) {

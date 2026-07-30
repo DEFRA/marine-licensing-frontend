@@ -168,9 +168,11 @@ export const mockSubmittedMarineLicenceApplication = {
 }
 
 export const mockTransferredMarineLicenceApplication = {
-  ...mockMarineLicenceApplication,
+  ...mockSubmittedMarineLicenceApplication,
   status: PROJECT_STATUS.TRANSFERRED,
-  applicationReference: 'MLA/2026/10264'
+  applicationReference: 'MLA/2026/10264',
+  submittedAt: '2026-05-26T10:00:00Z',
+  transferredDate: '2026-06-26T10:00:00Z'
 }
 
 export const mockMarineLicenceWithMarinePlanPolicies = {

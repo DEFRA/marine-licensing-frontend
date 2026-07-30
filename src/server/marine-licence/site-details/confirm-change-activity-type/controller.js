@@ -10,7 +10,7 @@ import { formatActivitySubTypeLabel } from '#src/server/common/helpers/review-si
 import {
   activityTypeValues,
   activitySubTypeCodesByType,
-  DRAWING_REQUIRING_SUBTYPES
+  SUBTYPES_REQUIRING_CONSTRUCTION_DRAWING
 } from '#src/server/marine-licence/site-details/type-of-activity/constants.js'
 
 export const CONFIRM_CHANGE_ACTIVITY_TYPE_VIEW_ROUTE =
@@ -23,9 +23,8 @@ const isValidActivitySelection = (activityType, activitySubType) =>
   activityTypeValues.includes(activityType) &&
   Boolean(activitySubTypeCodesByType[activityType]?.includes(activitySubType))
 
-const drawingRequiringActivityLabels = DRAWING_REQUIRING_SUBTYPES.map(
-  formatActivitySubTypeLabel
-)
+const drawingRequiringActivityLabels =
+  SUBTYPES_REQUIRING_CONSTRUCTION_DRAWING.map(formatActivitySubTypeLabel)
 
 export const confirmChangeActivityTypeController = {
   options: {

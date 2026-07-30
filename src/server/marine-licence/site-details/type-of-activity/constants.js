@@ -15,7 +15,7 @@ export const activitySubTypeCodesByType = {
 
 export const activityTypeValues = Object.keys(activitySubTypeCodesByType)
 
-export const DRAWING_REQUIRING_SUBTYPES = [
+export const SUBTYPES_REQUIRING_CONSTRUCTION_DRAWING = [
   'construction-type-1',
   'construction-type-3'
 ]

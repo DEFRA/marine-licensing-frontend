@@ -8,9 +8,13 @@ import {
   GEO_PARSER_ERROR_MESSAGES,
   CDP_ERROR_MESSAGES,
   FILE_TYPE_ERROR_MESSAGES,
+  FILE_SIZE_ERROR_MESSAGES,
   DEFAULT_ERROR_MESSAGE,
   DEFAULT_GEO_PARSER_ERROR_MESSAGE
 } from '#src/server/common/helpers/file-upload/error-messages.js'
+
+export const CONSTRUCTION_DRAWING_ACCEPT_ATTRIBUTE =
+  '.pdf,.bmp,.gif,.jpg,.jpeg,.png,.tif'
 
 export const getFileTypeContent = (fileUploadType) => {
   if (fileUploadType === 'kml') {
@@ -22,6 +26,11 @@ export const getFileTypeContent = (fileUploadType) => {
     return {
       heading: 'Upload a shapefile',
       acceptAttribute: '.zip'
+    }
+  } else if (fileUploadType === 'construction-drawing') {
+    return {
+      heading: UPLOAD_A_FILE,
+      acceptAttribute: CONSTRUCTION_DRAWING_ACCEPT_ATTRIBUTE
     }
   } else {
     return {
@@ -37,6 +46,8 @@ export const getAllowedExtensions = (fileType) => {
       return ['kml']
     case 'shapefile':
       return ['zip']
+    case 'construction-drawing':
+      return ['pdf', 'bmp', 'gif', 'jpg', 'jpeg', 'png', 'tif']
     default:
       return []
   }
@@ -81,6 +92,10 @@ export const getGeoParserErrorMessage = (errorCode) => {
 export const getCdpErrorMessageFromCode = (errorCode, fileType) => {
   if (errorCode === 'INVALID_FILE_TYPE') {
     return FILE_TYPE_ERROR_MESSAGES[fileType] || CDP_ERROR_MESSAGES[errorCode]
+  }
+
+  if (errorCode === 'FILE_TOO_LARGE') {
+    return FILE_SIZE_ERROR_MESSAGES[fileType] || CDP_ERROR_MESSAGES[errorCode]
   }
 
   return CDP_ERROR_MESSAGES[errorCode] || DEFAULT_ERROR_MESSAGE

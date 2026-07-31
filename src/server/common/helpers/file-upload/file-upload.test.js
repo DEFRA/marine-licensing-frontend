@@ -1,11 +1,14 @@
 import {
   getAllowedExtensions,
   getCdpErrorMessageFromCode,
-  getGeoParserErrorMessage
+  getFileTypeContent,
+  getGeoParserErrorMessage,
+  CONSTRUCTION_DRAWING_ACCEPT_ATTRIBUTE
 } from '#src/server/common/helpers/file-upload/file-upload.js'
 import {
   CDP_ERROR_MESSAGES,
   FILE_TYPE_ERROR_MESSAGES,
+  FILE_SIZE_ERROR_MESSAGES,
   DEFAULT_ERROR_MESSAGE,
   DEFAULT_GEO_PARSER_ERROR_MESSAGE,
   GEO_PARSER_ERROR_MESSAGES
@@ -15,6 +18,10 @@ describe('#getAllowedExtensions', () => {
   test.each([
     ['kml', ['kml']],
     ['shapefile', ['zip']],
+    [
+      'construction-drawing',
+      ['pdf', 'bmp', 'gif', 'jpg', 'jpeg', 'png', 'tif']
+    ],
     ['unknown', []],
     [undefined, []]
   ])(
@@ -25,15 +32,34 @@ describe('#getAllowedExtensions', () => {
   )
 })
 
+describe('#getFileTypeContent', () => {
+  test('returns the construction drawing accept attribute', () => {
+    expect(getFileTypeContent('construction-drawing')).toEqual({
+      heading: 'Upload a file',
+      acceptAttribute: CONSTRUCTION_DRAWING_ACCEPT_ATTRIBUTE
+    })
+  })
+})
+
 describe('#getCdpErrorMessageFromCode', () => {
   test.each([
     ['VIRUS_DETECTED', 'kml', CDP_ERROR_MESSAGES.VIRUS_DETECTED],
     ['FILE_EMPTY', 'kml', CDP_ERROR_MESSAGES.FILE_EMPTY],
     ['FILE_TOO_LARGE', 'kml', CDP_ERROR_MESSAGES.FILE_TOO_LARGE],
+    [
+      'FILE_TOO_LARGE',
+      'construction-drawing',
+      FILE_SIZE_ERROR_MESSAGES['construction-drawing']
+    ],
     ['NO_FILE_SELECTED', 'kml', CDP_ERROR_MESSAGES.NO_FILE_SELECTED],
     ['UPLOAD_ERROR', 'kml', CDP_ERROR_MESSAGES.UPLOAD_ERROR],
     ['INVALID_FILE_TYPE', 'kml', FILE_TYPE_ERROR_MESSAGES.kml],
     ['INVALID_FILE_TYPE', 'shapefile', FILE_TYPE_ERROR_MESSAGES.shapefile],
+    [
+      'INVALID_FILE_TYPE',
+      'construction-drawing',
+      FILE_TYPE_ERROR_MESSAGES['construction-drawing']
+    ],
     ['INVALID_FILE_TYPE', 'foo', CDP_ERROR_MESSAGES.INVALID_FILE_TYPE],
     [null, 'kml', DEFAULT_ERROR_MESSAGE],
     ['UNKNOWN_CODE', 'kml', DEFAULT_ERROR_MESSAGE]

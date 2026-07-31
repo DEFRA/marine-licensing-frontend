@@ -5,6 +5,9 @@ import { getSiteParam } from '#src/server/common/helpers/site-details/site-numbe
 export const getActivityDetailsBackLink = (siteNumber, activityDetailsNumber) =>
   `${marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS}#activity-details-site-${siteNumber}-activity-${activityDetailsNumber}`
 
+export const getConstructionDrawingBackLink = (siteNumber, drawingNumber) =>
+  `${marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS}#construction-drawing-site-${siteNumber}-${drawingNumber}`
+
 export const getCoordinateSystemBackLink = (
   action,
   siteNumber,

@@ -4,6 +4,10 @@ export const getSiteDataFromParam = (query = {}) => ({
   ...(query.activity && {
     activityDetailsIndex: Number.parseInt(query.activity, 10) - 1,
     activityDetailsNumber: Number.parseInt(query.activity, 10)
+  }),
+  ...(query.drawing && {
+    drawingIndex: Number.parseInt(query.drawing, 10) - 1,
+    drawingNumber: Number.parseInt(query.drawing, 10)
   })
 })
 

@@ -22,6 +22,8 @@ import { deleteSiteRoutes } from '#src/server/marine-licence/site-details/delete
 import { deleteAllSitesRoutes } from '#src/server/marine-licence/site-details/delete-all-sites/index.js'
 import { changeSiteLocationRoutes } from '#src/server/marine-licence/site-details/change-site-location/index.js'
 import { uploadConstructionDrawingRoutes } from '#src/server/marine-licence/site-details/upload-construction-drawing/index.js'
+import { uploadConstructionDrawingWaitRoutes } from '#src/server/marine-licence/site-details/upload-construction-drawing-wait/index.js'
+import { deleteConstructionDrawingRoutes } from '#src/server/marine-licence/site-details/delete-construction-drawing/index.js'
 import { confirmChangeActivityTypeRoutes } from '#src/server/marine-licence/site-details/confirm-change-activity-type/index.js'
 
 export const siteDetailsRoutes = [
@@ -49,5 +51,7 @@ export const siteDetailsRoutes = [
   ...deleteAllSitesRoutes,
   ...changeSiteLocationRoutes,
   ...uploadConstructionDrawingRoutes,
+  ...uploadConstructionDrawingWaitRoutes,
+  ...deleteConstructionDrawingRoutes,
   ...confirmChangeActivityTypeRoutes
 ]

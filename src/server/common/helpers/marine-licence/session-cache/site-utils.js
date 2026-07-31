@@ -27,6 +27,36 @@ export const validateSiteAndActivityParams = {
   }
 }
 
+export const validateSiteAndDrawingParams = {
+  method: (request, h) => {
+    const { site, drawing } = request.query
+
+    if (!site || !drawing) {
+      return h.redirect(marineLicenceRoutes.MARINE_LICENCE_TASK_LIST).takeover()
+    }
+
+    const siteIndex = Number.parseInt(site, 10) - 1
+    const drawingIndex = Number.parseInt(drawing, 10) - 1
+
+    const marineLicence = getMarineLicenceCache(request)
+    const siteDetails = marineLicence.siteDetails?.[siteIndex]
+
+    if (!siteDetails) {
+      return h.redirect(marineLicenceRoutes.MARINE_LICENCE_TASK_LIST).takeover()
+    }
+
+    const constructionDrawings = siteDetails.constructionDrawings ?? []
+    const isValidDrawingIndex =
+      drawingIndex === 0 || drawingIndex < constructionDrawings.length
+
+    if (!isValidDrawingIndex) {
+      return h.redirect(marineLicenceRoutes.MARINE_LICENCE_TASK_LIST).takeover()
+    }
+
+    return h.continue
+  }
+}
+
 export const validateSiteRequiredParam = {
   method: (request, h) => {
     const { site } = request.query

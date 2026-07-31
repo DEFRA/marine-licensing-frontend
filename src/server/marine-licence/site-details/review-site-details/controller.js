@@ -124,6 +124,43 @@ async function handleAddActivity(request, h, marineLicence, siteNumber) {
   )
 }
 
+async function handleAddConstructionDrawing(
+  request,
+  h,
+  marineLicence,
+  siteNumber
+) {
+  const siteIndex = Number.parseInt(siteNumber, 10) - 1
+
+  // The first drawing card renders even before any backend entry exists, so
+  // "visible" count is always at least 1 - adding another must land one
+  // past whatever's currently shown, which may mean creating two entries
+  // the very first time (to materialise the already-visible first card too).
+  const { constructionDrawings } = marineLicence.siteDetails[siteIndex]
+  const currentDrawings = Array.isArray(constructionDrawings)
+    ? constructionDrawings
+    : []
+  const visibleCount = Math.max(currentDrawings.length, 1)
+  const drawingsToAdd = visibleCount + 1 - currentDrawings.length
+
+  for (let count = 0; count < drawingsToAdd; count += 1) {
+    await authenticatedPatchRequest(
+      request,
+      apiRoutes.ADD_CONSTRUCTION_DRAWING,
+      {
+        siteIndex,
+        id: marineLicence.id
+      }
+    )
+  }
+
+  const newDrawingNumber = visibleCount + 1
+
+  return h.redirect(
+    `${marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS}#construction-drawing-site-${siteNumber}-${newDrawingNumber}`
+  )
+}
+
 function handleReturnToRedirect(request, h) {
   const returnTo = request.yar.flash(RETURN_TO_CACHE_KEY)
   const redirectPath = Array.isArray(returnTo) ? returnTo[0] : returnTo
@@ -201,7 +238,7 @@ async function confirmSiteDetails(
 export const reviewSiteDetailsSubmitController = {
   async handler(request, h) {
     const { payload } = request
-    const { add, addActivity, siteNumber } = payload
+    const { add, addActivity, addConstructionDrawing, siteNumber } = payload
     const marineLicence = getMarineLicenceCache(request)
     const fromCheckYourAnswers = request.query?.from === 'check-your-answers'
     const returnToCheckYourAnswers = fromCheckYourAnswers
@@ -214,6 +251,10 @@ export const reviewSiteDetailsSubmitController = {
 
     if (addActivity) {
       return handleAddActivity(request, h, marineLicence, siteNumber)
+    }
+
+    if (addConstructionDrawing) {
+      return handleAddConstructionDrawing(request, h, marineLicence, siteNumber)
     }
 
     const marineLicenceService = getMarineLicenceService(request)

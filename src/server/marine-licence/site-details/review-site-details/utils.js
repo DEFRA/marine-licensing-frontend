@@ -4,6 +4,7 @@ import { getFileUploadSummaryData } from '#src/server/common/helpers/review-site
 import { createSiteDetailsDataJson } from '#src/server/common/helpers/site-details.js'
 import { parseActivityDetails } from '#src/server/common/helpers/review-site-details/activity-details.js'
 import { buildManualCoordinateSummaryData } from '#src/server/common/helpers/review-site-details/manual-entry.js'
+import { SUBTYPES_REQUIRING_CONSTRUCTION_DRAWING } from '#src/server/marine-licence/site-details/type-of-activity/constants.js'
 
 export const MANUAL_ENTRY_REVIEW_VIEW_ROUTE =
   'marine-licence/site-details/review-site-details/index'
@@ -103,7 +104,8 @@ export const renderFileUploadReview = (h, options) => {
       siteName: site.siteName,
       siteNumber: index + 1,
       siteDetailsData,
-      activityDetails
+      activityDetails,
+      constructionDrawings: site.constructionDrawings
     }
   })
 
@@ -137,6 +139,7 @@ export const renderManualEntryReview = (h, options) => {
   ).map((site, index) => ({
     ...site,
     deleteSiteLink: `${marineLicenceRoutes.MARINE_LICENCE_DELETE_SITE}?site=${index + 1}`,
+    constructionDrawings: siteDetails[index]?.constructionDrawings,
     activityDetails: site.activityDetails.map((activity, actIndex) => ({
       ...activity,
       ...(actIndex > 0 && {
@@ -156,9 +159,18 @@ export const renderManualEntryReview = (h, options) => {
   })
 }
 
+const siteRequiresConstructionDrawing = (site) =>
+  (site.activityDetails ?? []).some((activity) =>
+    SUBTYPES_REQUIRING_CONSTRUCTION_DRAWING.includes(activity.activitySubType)
+  )
+
+const isMissingConstructionDrawing = (site) =>
+  siteRequiresConstructionDrawing(site) &&
+  !site.constructionDrawings?.[0]?.s3Location
+
 const hasMissingRequiredFields = (site) => {
   const isSiteNameMissing = !site.siteName || site.siteName.trim() === ''
-  return isSiteNameMissing
+  return isSiteNameMissing || isMissingConstructionDrawing(site)
 }
 
 export const hasIncompleteFields = (siteDetails) => {

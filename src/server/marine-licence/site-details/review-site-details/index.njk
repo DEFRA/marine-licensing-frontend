@@ -194,7 +194,9 @@
 
         {{ appMarineLicenceConstructionDrawingCard({
           siteNumber: site.siteNumber,
-          activityDetails: site.activityDetails
+          activityDetails: site.activityDetails,
+          constructionDrawings: site.constructionDrawings,
+          csrfToken: csrfToken
         }) }}
 
       {% endfor %}

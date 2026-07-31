@@ -37,7 +37,13 @@ export const CDP_ERROR_MESSAGES = {
 
 export const FILE_TYPE_ERROR_MESSAGES = {
   kml: 'The selected file must be a KML file',
-  shapefile: 'The selected file must be a Shapefile'
+  shapefile: 'The selected file must be a Shapefile',
+  'construction-drawing':
+    'The selected file must be a PDF or image (.bmp, .gif, .jpg, .jpeg, .png, .tif) file'
+}
+
+export const FILE_SIZE_ERROR_MESSAGES = {
+  'construction-drawing': 'The selected file must be smaller than 10 MB'
 }
 
 export const WFD_FILE_TYPE_ERROR_MESSAGE =

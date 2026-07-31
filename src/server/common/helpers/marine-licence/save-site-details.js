@@ -29,7 +29,8 @@ export const prepareFileUploadDataForSave = (siteDetails, request) => {
         checksumSha256: site.s3Location.checksumSha256
       },
       siteName: site.siteName,
-      activityDetails: site.activityDetails
+      activityDetails: site.activityDetails,
+      constructionDrawings: site.constructionDrawings
     }
 
     request.logger.info(
@@ -57,7 +58,8 @@ export const prepareManualCoordinateDataForSave = (siteDetails) => {
       coordinateSystem: site.coordinateSystem,
       coordinates: site.coordinates,
       siteName: site.siteName,
-      activityDetails: site.activityDetails
+      activityDetails: site.activityDetails,
+      constructionDrawings: site.constructionDrawings
     }
 
     if (site.coordinatesEntry === 'single') {

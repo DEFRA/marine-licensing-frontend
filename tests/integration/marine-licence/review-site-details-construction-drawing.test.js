@@ -17,7 +17,7 @@ describe('Review site details - construction drawing card', () => {
   const getServer = setupTestServer()
 
   describe('file upload coordinates journey', () => {
-    test('renders drawing cards and the "Add another" button after the activity cards, in the correct order', async () => {
+    test('renders one drawing card and the "Add another" button after the activity cards, in the correct order', async () => {
       mockMarineLicence(mockMarineLicenceApplication)
 
       const document = await loadPage({
@@ -29,19 +29,16 @@ describe('Review site details - construction drawing card', () => {
         'activity-details-site-1-activity-1',
         'activity-details-site-1-activity-2',
         'add-another-activity-site-1',
-        'construction-drawing-site-1-activity-1',
-        'construction-drawing-site-1-activity-2',
+        'construction-drawing-site-1-1',
         'add-another-construction-drawing-site-1'
       ])
 
       const addDrawingButton = document.querySelector(
         '#add-another-construction-drawing-site-1'
       )
-      expect(addDrawingButton.tagName).toBe('A')
-      expect(addDrawingButton).toHaveAttribute(
-        'href',
-        'upload-construction-drawing?site=1&activity=1'
-      )
+      expect(addDrawingButton.tagName).toBe('BUTTON')
+      expect(addDrawingButton).toHaveAttribute('type', 'submit')
+      expect(addDrawingButton).toHaveAttribute('name', 'addConstructionDrawing')
     })
 
     test('does not render drawing cards or button when no activity requires a drawing', async () => {
@@ -71,6 +68,62 @@ describe('Review site details - construction drawing card', () => {
       expect(
         document.querySelector('#add-another-construction-drawing-site-1')
       ).toBeNull()
+    })
+  })
+
+  describe('multiple drawings for a site', () => {
+    test('numbers each drawing card sequentially and only shows a delete link from the second drawing onwards', async () => {
+      mockMarineLicence({
+        ...mockMarineLicenceApplication,
+        siteDetails: [
+          {
+            ...mockMarineLicenceApplication.siteDetails[0],
+            constructionDrawings: [
+              {
+                filename: 'drawing-one.pdf',
+                s3Location: {
+                  s3Bucket: 'test-bucket',
+                  s3Key: 'test-key-1',
+                  checksumSha256: 'test-checksum-1'
+                }
+              },
+              {
+                filename: 'drawing-two.pdf',
+                s3Location: {
+                  s3Bucket: 'test-bucket',
+                  s3Key: 'test-key-2',
+                  checksumSha256: 'test-checksum-2'
+                }
+              }
+            ]
+          }
+        ]
+      })
+
+      const document = await loadPage({
+        requestUrl: marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS,
+        server: getServer()
+      })
+
+      expect(
+        document.querySelector('#construction-drawing-site-1-1')
+      ).not.toBeNull()
+      expect(
+        document.querySelector('#construction-drawing-site-1-2')
+      ).not.toBeNull()
+
+      const firstCardDeleteLink = document
+        .querySelector('#construction-drawing-site-1-1')
+        .querySelector('a[href*="delete-construction-drawing"]')
+      const secondCardDeleteLink = document
+        .querySelector('#construction-drawing-site-1-2')
+        .querySelector('a[href*="delete-construction-drawing"]')
+
+      expect(firstCardDeleteLink).toBeNull()
+      expect(secondCardDeleteLink).toHaveAttribute(
+        'href',
+        'delete-construction-drawing?site=1&drawing=2'
+      )
     })
   })
 
@@ -104,7 +157,7 @@ describe('Review site details - construction drawing card', () => {
       expect(getCardOrder(document)).toEqual([
         'activity-details-site-1-activity-1',
         'add-another-activity-site-1',
-        'construction-drawing-site-1-activity-1',
+        'construction-drawing-site-1-1',
         'add-another-construction-drawing-site-1'
       ])
     })

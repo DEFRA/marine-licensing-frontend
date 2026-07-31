@@ -18,11 +18,13 @@ import { authenticatedPatchRequest } from '#src/server/common/helpers/authentica
 import { config } from '#src/config/config.js'
 import { getConstructionDrawingBackLink } from '#src/server/marine-licence/site-details/utils/back-link.js'
 
+const CONSTRUCTION_DRAWING_FILETYPE = 'construction-drawing'
+
 async function storeUploadError(request, h, errorDetails, siteIndex) {
   await updateMarineLicenceSiteDetails(request, h, siteIndex, 'uploadError', {
     message: errorDetails.message,
     fieldName: errorDetails.fieldName,
-    fileType: 'construction-drawing'
+    fileType: CONSTRUCTION_DRAWING_FILETYPE
   })
   await updateMarineLicenceSiteDetails(
     request,
@@ -35,7 +37,10 @@ async function storeUploadError(request, h, errorDetails, siteIndex) {
 
 async function handleRejectedStatus(status, uploadConfig, request, h) {
   const errorMessage = status.errorCode
-    ? getCdpErrorMessageFromCode(status.errorCode, 'construction-drawing')
+    ? getCdpErrorMessageFromCode(
+        status.errorCode,
+        CONSTRUCTION_DRAWING_FILETYPE
+      )
     : DEFAULT_ERROR_MESSAGE
 
   request.logger.error(
@@ -43,7 +48,7 @@ async function handleRejectedStatus(status, uploadConfig, request, h) {
       error: {
         code: status.errorCode,
         message: status.message,
-        type: 'construction-drawing'
+        type: CONSTRUCTION_DRAWING_FILETYPE
       }
     },
     'ConstructionDrawingUpload: CDP rejection error'

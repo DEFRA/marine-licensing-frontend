@@ -11,7 +11,7 @@ import { authenticatedPatchRequest } from '#src/server/common/helpers/authentica
 export const DELETE_CONSTRUCTION_DRAWING_VIEW_ROUTE =
   'marine-licence/site-details/delete-construction-drawing/index'
 
-const DELETE_CONSTRUCTION_DRAWING_PAGE_TITLE = (siteNumber, drawingNumber) =>
+const deleteConstructionDrawingPageTitle = (siteNumber, drawingNumber) =>
   `Are you sure you want to delete Site ${siteNumber} construction drawing ${drawingNumber}?`
 
 export const deleteConstructionDrawingController = {
@@ -27,7 +27,7 @@ export const deleteConstructionDrawingController = {
       return h.redirect(marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS)
     }
 
-    const heading = DELETE_CONSTRUCTION_DRAWING_PAGE_TITLE(
+    const heading = deleteConstructionDrawingPageTitle(
       siteNumber,
       drawingNumber
     )

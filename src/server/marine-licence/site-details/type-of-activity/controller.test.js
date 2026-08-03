@@ -116,6 +116,17 @@ describe('#typeOfActivity', () => {
 
     describe('changing away from a drawing-requiring activity', () => {
       test('redirects to the confirmation guard when changing to a different activity type entirely', async () => {
+        vi.mocked(getMarineLicenceCache).mockReturnValueOnce({
+          ...mockMarineLicenceApplication,
+          siteDetails: [
+            {
+              ...mockMarineLicenceApplication.siteDetails[0],
+              activityDetails: [
+                mockMarineLicenceApplication.siteDetails[0].activityDetails[0]
+              ]
+            }
+          ]
+        })
         const redirectH = createMockH()
         const request = createMockRequest({
           query: { site: 1, activity: 1 },
@@ -132,6 +143,56 @@ describe('#typeOfActivity', () => {
         expect(updateMarineLicenceSiteActivityDetails).not.toHaveBeenCalled()
         expect(redirectH.redirect).toHaveBeenCalledWith(
           '/marine-licence/confirm-change-activity-type?site=1&activity=1&activityType=deposit&activitySubType=deposit-type-1'
+        )
+      })
+
+      test('does not guard when another activity on the site still requires a drawing', async () => {
+        vi.mocked(getMarineLicenceCache).mockReturnValueOnce({
+          ...mockMarineLicenceApplication,
+          siteDetails: [
+            {
+              ...mockMarineLicenceApplication.siteDetails[0],
+              activityDetails: [
+                {
+                  ...mockMarineLicenceApplication.siteDetails[0]
+                    .activityDetails[0],
+                  activitySubType: 'construction-type-1'
+                },
+                {
+                  ...mockMarineLicenceApplication.siteDetails[0]
+                    .activityDetails[0],
+                  activitySubType: 'construction-type-1'
+                }
+              ]
+            }
+          ]
+        })
+        const redirectH = createMockH()
+        const request = createMockRequest({
+          query: { site: 1, activity: 1 },
+          payload: {
+            activityType: 'deposit',
+            activitySubTypeConstruction: '',
+            activitySubTypeDeposit: 'deposit-type-1',
+            activitySubTypeRemoval: ''
+          }
+        })
+
+        await typeOfActivitySubmitController.handler(request, redirectH)
+
+        expect(updateMarineLicenceSiteActivityDetails).toHaveBeenCalledWith(
+          request,
+          redirectH,
+          0,
+          0,
+          {
+            activities: null,
+            activityType: 'deposit',
+            activitySubType: 'deposit-type-1'
+          }
+        )
+        expect(redirectH.redirect).toHaveBeenCalledWith(
+          '/marine-licence/activity-details/what-deposit-activity-are-you-continuing?site=1&activity=1'
         )
       })
 

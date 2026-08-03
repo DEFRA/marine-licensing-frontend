@@ -129,6 +129,17 @@ describe('#validateSiteAndDrawingParams', () => {
     )
   })
 
+  test('redirects when drawing is 0', () => {
+    const request = createMockRequest({ query: { site: '1', drawing: '0' } })
+    const h = createMockH()
+
+    validateSiteAndDrawingParams.method(request, h)
+
+    expect(h.redirect).toHaveBeenCalledWith(
+      marineLicenceRoutes.MARINE_LICENCE_TASK_LIST
+    )
+  })
+
   test('continues for drawing 1 even when no drawings exist yet', () => {
     const request = createMockRequest({ query: { site: '1', drawing: '1' } })
     const h = createMockH()

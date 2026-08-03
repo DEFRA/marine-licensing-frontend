@@ -179,6 +179,27 @@ const marineLicencePages = [
     url: `${marineLicenceRoutes.MARINE_LICENCE_UPLOAD_CONSTRUCTION_DRAWING}?site=1&drawing=1`,
     title: 'Site 1: Upload construction drawing 1'
   },
+  // TODO: Uncomment when meta refresh a11y issue is resolved (same issue as upload-and-wait)
+  // {
+  //   url: marineLicenceRoutes.MARINE_LICENCE_UPLOAD_CONSTRUCTION_DRAWING_WAIT,
+  //   title: 'Upload construction drawing'
+  // },
+  {
+    url: `${marineLicenceRoutes.MARINE_LICENCE_DELETE_CONSTRUCTION_DRAWING}?site=1&drawing=2`,
+    title: 'Are you sure you want to delete Site 1 construction drawing 2?',
+    marineLicence: {
+      ...mockMarineLicenceApplication,
+      siteDetails: [
+        {
+          ...mockMarineLicenceApplication.siteDetails[0],
+          constructionDrawings: [
+            { filename: 'drawing-1.pdf' },
+            { filename: 'drawing-2.pdf' }
+          ]
+        }
+      ]
+    }
+  },
   {
     url: `${marineLicenceRoutes.MARINE_LICENCE_CONFIRM_CHANGE_ACTIVITY_TYPE}?site=1&activity=1&activityType=deposit&activitySubType=deposit-type-1`,
     title:

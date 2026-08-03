@@ -212,6 +212,7 @@ export const apiRoutes = {
   ADD_CONSTRUCTION_DRAWING: '/marine-licence/add-construction-drawing',
   UPDATE_CONSTRUCTION_DRAWING: '/marine-licence/update-construction-drawing',
   DELETE_CONSTRUCTION_DRAWING: '/marine-licence/delete-construction-drawing',
+  DELETE_CONSTRUCTION_DRAWINGS: '/marine-licence/delete-construction-drawings',
   GENERATE_COORDINATES_CSV:
     '/marine-licence/{marineLicenceId}/generate-coordinates-csv',
   UPDATE_FEE_ESTIMATE: '/marine-licence/fee-estimate',

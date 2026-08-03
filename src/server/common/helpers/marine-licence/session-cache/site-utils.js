@@ -47,7 +47,8 @@ export const validateSiteAndDrawingParams = {
 
     const constructionDrawings = siteDetails.constructionDrawings ?? []
     const isValidDrawingIndex =
-      drawingIndex === 0 || drawingIndex < constructionDrawings.length
+      drawingIndex >= 0 &&
+      (drawingIndex === 0 || drawingIndex < constructionDrawings.length)
 
     if (!isValidDrawingIndex) {
       return h.redirect(marineLicenceRoutes.MARINE_LICENCE_TASK_LIST).takeover()

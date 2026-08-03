@@ -1,17 +1,24 @@
 import { getByRole } from '@testing-library/dom'
-import { marineLicenceRoutes } from '~/src/server/common/constants/routes.js'
+import {
+  marineLicenceRoutes,
+  routes
+} from '~/src/server/common/constants/routes.js'
 import {
   mockMarineLicence,
   setupTestServer
 } from '~/tests/integration/shared/test-setup-helpers.js'
 import { loadPage } from '~/tests/integration/shared/app-server.js'
-import { mockSubmittedMarineLicenceApplication } from '~/src/server/test-helpers/mocks/marine-licence-mocks.js'
+import {
+  mockSubmittedMarineLicenceApplication,
+  mockTransferredMarineLicenceApplication
+} from '~/src/server/test-helpers/mocks/marine-licence-mocks.js'
 import {
   expectedProjectDetailsCard,
   expectedOtherPermissionsCard,
   expectedWaterFrameworkDirectiveCard,
   expectedInvocingCardIndividualUser,
-  expectedInvocingCardOrgUser
+  expectedInvocingCardOrgUser,
+  expectedApplicationDetailsCard
 } from './fixtures.js'
 import { getCardRow } from './utils.js'
 import {
@@ -23,11 +30,11 @@ describe('Marine Licence View Details', () => {
   const getServer = setupTestServer()
 
   const loadViewDetailsPage = async (server, marineLicenceMock) => {
-    mockMarineLicence(
+    const marineLicence =
       marineLicenceMock ?? mockSubmittedMarineLicenceApplication
-    )
+    mockMarineLicence(marineLicence)
     return loadPage({
-      requestUrl: `${marineLicenceRoutes.MARINE_LICENCE_VIEW_DETAILS}/${mockSubmittedMarineLicenceApplication.id}`,
+      requestUrl: `${marineLicenceRoutes.MARINE_LICENCE_VIEW_DETAILS}/${marineLicence.id}`,
       server
     })
   }
@@ -37,6 +44,63 @@ describe('Marine Licence View Details', () => {
 
     expect(getByRole(document, 'heading', { level: 1 })).toHaveTextContent(
       mockSubmittedMarineLicenceApplication.projectName
+    )
+  })
+
+  test('back link goes to dashboard for submitted applications', async () => {
+    const document = await loadViewDetailsPage(getServer())
+
+    expect(getByRole(document, 'link', { name: 'Back' })).toHaveAttribute(
+      'href',
+      routes.DASHBOARD
+    )
+  })
+
+  test('back link goes to application transferred page for transferred applications', async () => {
+    const document = await loadViewDetailsPage(
+      getServer(),
+      mockTransferredMarineLicenceApplication
+    )
+
+    expect(getByRole(document, 'link', { name: 'Back' })).toHaveAttribute(
+      'href',
+      `${marineLicenceRoutes.MARINE_LICENCE_APPLICATION_TRANSFERRED}/${mockTransferredMarineLicenceApplication.id}`
+    )
+  })
+
+  describe('application details card', () => {
+    let document
+
+    beforeEach(async () => {
+      document = await loadViewDetailsPage(
+        getServer(),
+        mockTransferredMarineLicenceApplication
+      )
+    })
+
+    test('does not render for submitted applications', async () => {
+      document = await loadViewDetailsPage(getServer())
+
+      expect(document.querySelector('#application-details-card')).toBeNull()
+    })
+
+    test('renders for transferred applications', async () => {
+      expect(
+        document.querySelector('#application-details-card')
+      ).toBeInTheDocument()
+    })
+
+    test.each(expectedApplicationDetailsCard.rows)(
+      'renders "$key" row with correct value',
+      ({ key, value }) => {
+        const card = document.querySelector('#application-details-card')
+        const row = getCardRow(card, key)
+
+        expect(row).toBeTruthy()
+        expect(
+          row.querySelector('.govuk-summary-list__value').textContent.trim()
+        ).toBe(value)
+      }
     )
   })
 

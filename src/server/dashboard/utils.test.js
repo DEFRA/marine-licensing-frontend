@@ -344,7 +344,7 @@ describe('getActionButtons', () => {
     )
   })
 
-  it('returns empty string for marine licence project when not draft or not own project', () => {
+  it('returns View details link for marine licence project when not draft or not own project', () => {
     const marineLicenceActive = {
       id: 'ml123',
       projectName: 'Marine Licence Project',
@@ -355,6 +355,20 @@ describe('getActionButtons', () => {
     const result = getActionButtons(marineLicenceActive)
     expect(result).toBe(
       '<a href="/marine-licence/view-details/ml123" class="govuk-link govuk-link--no-visited-state" aria-label="View details of Marine Licence Project">View details</a>'
+    )
+  })
+
+  it('returns transferred page link for transferred marine licence', () => {
+    const transferred = {
+      id: 'ml123',
+      projectName: 'Marine Licence Project',
+      projectType: 'MARINE_LICENCE',
+      status: 'Transferred',
+      isOwnProject: true
+    }
+    const result = getActionButtons(transferred)
+    expect(result).toBe(
+      `<a href="${marineLicenceRoutes.MARINE_LICENCE_APPLICATION_TRANSFERRED}/ml123" class="govuk-link govuk-link--no-visited-state" aria-label="View details of Marine Licence Project">View details</a>`
     )
   })
 })

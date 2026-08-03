@@ -1,5 +1,6 @@
 import { getByRole, queryByRole } from '@testing-library/dom'
 import { routes } from '~/src/server/common/constants/routes.js'
+import { MCMS_LOGIN_URL } from '~/src/server/common/constants/mcms.js'
 import { setupTestServer } from '~/tests/integration/shared/test-setup-helpers.js'
 import { loadPage } from '~/tests/integration/shared/app-server.js'
 import { config } from '~/src/config/config.js'
@@ -60,10 +61,7 @@ describe('Service Home', () => {
       const signInLink = getByRole(doc, 'link', {
         name: /Sign in to the Marine Case Management System/i
       })
-      expect(signInLink).toHaveAttribute(
-        'href',
-        'https://marinelicensing.marinemanagement.org.uk/mmofox5/fox/live/MMO_LOGIN/login'
-      )
+      expect(signInLink).toHaveAttribute('href', MCMS_LOGIN_URL)
       expect(signInLink).toHaveClass('card')
       expect(signInLink.parentElement).toHaveClass(
         'govuk-grid-column-one-third-from-desktop'

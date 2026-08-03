@@ -18,6 +18,8 @@ vi.mock('#src/server/common/helpers/dates/date-utils.js', async () => ({
 
 const START_DATE_HINT = '8 2026'
 const END_DATE_HINT = '8 2027'
+// Fixed "now" so preferred date fixtures stay in the future independently of wall clock
+const MOCK_NOW = new Date('2026-05-01T12:00:00.000Z')
 
 describe('#preferredDates', () => {
   const mockLicence = {
@@ -30,6 +32,8 @@ describe('#preferredDates', () => {
   }
 
   beforeEach(() => {
+    vi.useFakeTimers()
+    vi.setSystemTime(MOCK_NOW)
     vi.spyOn(authRequests, 'authenticatedPatchRequest').mockResolvedValue({
       payload: { id: mockLicence.id }
     })
@@ -37,6 +41,7 @@ describe('#preferredDates', () => {
   })
 
   afterEach(() => {
+    vi.useRealTimers()
     vi.restoreAllMocks()
   })
 

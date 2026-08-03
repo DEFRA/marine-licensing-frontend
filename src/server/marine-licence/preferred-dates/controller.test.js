@@ -96,10 +96,10 @@ describe('#preferredDates', () => {
         preferredDatesSubmitController.handler(
           {
             payload: {
-              'start-date-month': '7',
-              'start-date-year': '2026',
-              'end-date-month': '8',
-              'end-date-year': '2027'
+              'start-date-month': '1',
+              'start-date-year': '2030',
+              'end-date-month': '6',
+              'end-date-year': '2031'
             }
           },
           h
@@ -115,10 +115,10 @@ describe('#preferredDates', () => {
       await preferredDatesSubmitController.handler(
         {
           payload: {
-            'start-date-month': '7',
-            'start-date-year': '2026',
-            'end-date-month': '8',
-            'end-date-year': '2027'
+            'start-date-month': '1',
+            'start-date-year': '2030',
+            'end-date-month': '6',
+            'end-date-year': '2031'
           }
         },
         h
@@ -129,8 +129,8 @@ describe('#preferredDates', () => {
         '/marine-licence/preferred-dates',
         {
           id: mockLicence.id,
-          start: { month: '07', year: '2026' },
-          end: { month: '08', year: '2027' }
+          start: { month: '01', year: '2030' },
+          end: { month: '06', year: '2031' }
         }
       )
       expect(h.redirect).toHaveBeenCalledWith(

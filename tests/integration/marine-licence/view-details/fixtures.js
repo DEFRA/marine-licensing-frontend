@@ -1,4 +1,7 @@
-import { mockSubmittedMarineLicenceApplication } from '~/src/server/test-helpers/mocks/marine-licence-mocks.js'
+import {
+  mockSubmittedMarineLicenceApplication,
+  mockTransferredMarineLicenceApplication
+} from '~/src/server/test-helpers/mocks/marine-licence-mocks.js'
 import {
   NAUTICAL_MILE_HEADING,
   EXCLUDED_ACTIVITIES_HEADING,
@@ -13,6 +16,32 @@ import {
   CONTACT_PHONE_NUMBER,
   PO_HEADING
 } from '#src/server/common/helpers/marine-licence/invoicing/invoicing-review-data.js'
+
+export const expectedApplicationDetailsCard = {
+  cardTitle: 'Application details',
+  rows: [
+    {
+      key: 'Application type',
+      value: 'Marine licence application'
+    },
+    {
+      key: 'Status',
+      value: 'Transferred'
+    },
+    {
+      key: 'Reference number',
+      value: mockTransferredMarineLicenceApplication.applicationReference
+    },
+    {
+      key: 'Date submitted',
+      value: '26 May 2026'
+    },
+    {
+      key: 'Date of transfer',
+      value: '26 Jun 2026'
+    }
+  ]
+}
 
 export const expectedProjectDetailsCard = {
   cardTitle: 'Project details',

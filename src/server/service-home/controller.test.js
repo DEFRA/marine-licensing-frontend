@@ -1,6 +1,7 @@
 import { vi } from 'vitest'
 import { statusCodes } from '#src/server/common/constants/status-codes.js'
 import { routes } from '#src/server/common/constants/routes.js'
+import { MCMS_LOGIN_URL } from '#src/server/common/constants/mcms.js'
 import { setupTestServer } from '#tests/integration/shared/test-setup-helpers.js'
 import { makeGetRequest } from '#src/server/test-helpers/server-requests.js'
 import { serviceHomeController, SERVICE_HOME_VIEW_ROUTE } from './controller.js'
@@ -55,7 +56,7 @@ describe('#serviceHome', () => {
           {
             description:
               'View or manage projects not available in this account.',
-            link: 'https://marinelicensing.marinemanagement.org.uk/mmofox5/fox/live/MMO_LOGIN/login',
+            link: MCMS_LOGIN_URL,
             title: 'Sign in to the Marine Case Management System'
           }
         ]

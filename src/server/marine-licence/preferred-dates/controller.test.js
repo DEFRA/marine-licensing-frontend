@@ -18,6 +18,8 @@ vi.mock('#src/server/common/helpers/dates/date-utils.js', async () => ({
 
 const START_DATE_HINT = '8 2026'
 const END_DATE_HINT = '8 2027'
+// Fixed "now" so preferred date fixtures stay in the future independently of wall clock
+const MOCK_NOW = new Date('2026-05-01T12:00:00.000Z')
 
 describe('#preferredDates', () => {
   const mockLicence = {
@@ -30,6 +32,8 @@ describe('#preferredDates', () => {
   }
 
   beforeEach(() => {
+    vi.useFakeTimers()
+    vi.setSystemTime(MOCK_NOW)
     vi.spyOn(authRequests, 'authenticatedPatchRequest').mockResolvedValue({
       payload: { id: mockLicence.id }
     })
@@ -37,6 +41,7 @@ describe('#preferredDates', () => {
   })
 
   afterEach(() => {
+    vi.useRealTimers()
     vi.restoreAllMocks()
   })
 
@@ -96,10 +101,10 @@ describe('#preferredDates', () => {
         preferredDatesSubmitController.handler(
           {
             payload: {
-              'start-date-month': '1',
-              'start-date-year': '2030',
-              'end-date-month': '6',
-              'end-date-year': '2031'
+              'start-date-month': '7',
+              'start-date-year': '2026',
+              'end-date-month': '8',
+              'end-date-year': '2027'
             }
           },
           h
@@ -115,10 +120,10 @@ describe('#preferredDates', () => {
       await preferredDatesSubmitController.handler(
         {
           payload: {
-            'start-date-month': '1',
-            'start-date-year': '2030',
-            'end-date-month': '6',
-            'end-date-year': '2031'
+            'start-date-month': '7',
+            'start-date-year': '2026',
+            'end-date-month': '8',
+            'end-date-year': '2027'
           }
         },
         h
@@ -129,8 +134,8 @@ describe('#preferredDates', () => {
         '/marine-licence/preferred-dates',
         {
           id: mockLicence.id,
-          start: { month: '01', year: '2030' },
-          end: { month: '06', year: '2031' }
+          start: { month: '07', year: '2026' },
+          end: { month: '08', year: '2027' }
         }
       )
       expect(h.redirect).toHaveBeenCalledWith(

@@ -107,30 +107,21 @@ describe('#validateSiteAndDrawingParams', () => {
     )
   })
 
-  test('redirects when site does not exist in cache', () => {
-    const request = createMockRequest({ query: { site: '99', drawing: '1' } })
-    const h = createMockH()
-
-    validateSiteAndDrawingParams.method(request, h)
-
-    expect(h.redirect).toHaveBeenCalledWith(
-      marineLicenceRoutes.MARINE_LICENCE_TASK_LIST
-    )
-  })
-
-  test('redirects when the drawing index does not exist for the site', () => {
-    const request = createMockRequest({ query: { site: '1', drawing: '2' } })
-    const h = createMockH()
-
-    validateSiteAndDrawingParams.method(request, h)
-
-    expect(h.redirect).toHaveBeenCalledWith(
-      marineLicenceRoutes.MARINE_LICENCE_TASK_LIST
-    )
-  })
-
-  test('redirects when drawing is 0', () => {
-    const request = createMockRequest({ query: { site: '1', drawing: '0' } })
+  test.each([
+    {
+      name: 'redirects when site does not exist in cache',
+      query: { site: '99', drawing: '1' }
+    },
+    {
+      name: 'redirects when the drawing index does not exist for the site',
+      query: { site: '1', drawing: '2' }
+    },
+    {
+      name: 'redirects when drawing number is zero',
+      query: { site: '1', drawing: '0' }
+    }
+  ])('$name', ({ query }) => {
+    const request = createMockRequest({ query })
     const h = createMockH()
 
     validateSiteAndDrawingParams.method(request, h)

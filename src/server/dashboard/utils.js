@@ -26,15 +26,23 @@ const getDraftActions = (id, escapedProjectName, projectType) => {
   return `<a href="${taskListRoute}/${id}" class="govuk-link govuk-!-margin-right-4 govuk-link--no-visited-state" aria-label="Continue to task list">Continue</a><a href="${deleteRoute}/${id}" class="govuk-link govuk-link--no-visited-state" aria-label="Delete ${escapedProjectName}">Delete</a>`
 }
 
-const getActiveActions = (id, escapedProjectName, projectType, canWithdraw) => {
+const getViewDetailsRoute = (projectType, status) => {
+  if (
+    projectType === MARINE_LICENCE_KEY &&
+    status === PROJECT_STATUS.TRANSFERRED
+  ) {
+    return marineLicenceRoutes.MARINE_LICENCE_APPLICATION_TRANSFERRED
+  }
+
+  return projectType === MARINE_LICENCE_KEY
+    ? marineLicenceRoutes.MARINE_LICENCE_VIEW_DETAILS
+    : routes.VIEW_DETAILS
+}
+
+const getActiveActions = (id, escapedProjectName, viewRoute, canWithdraw) => {
   const marginClass = canWithdraw
     ? 'govuk-link govuk-!-margin-right-4 '
     : 'govuk-link '
-
-  const viewRoute =
-    projectType === MARINE_LICENCE_KEY
-      ? marineLicenceRoutes.MARINE_LICENCE_VIEW_DETAILS
-      : routes.VIEW_DETAILS
 
   let buttons = `<a href="${viewRoute}/${id}" class="${marginClass}govuk-link--no-visited-state" aria-label="View details of ${escapedProjectName}">View details</a>`
 
@@ -58,11 +66,12 @@ export const getActionButtons = (project) => {
   const { status, id, projectName, projectType } = project
 
   const escapedProjectName = escapeHtml(projectName)
+  const viewRoute = getViewDetailsRoute(projectType, status)
 
   if (projectType === MARINE_LICENCE_KEY) {
     return status === PROJECT_STATUS.DRAFT && isOwnProject
       ? getDraftActions(id, escapedProjectName, projectType)
-      : getActiveActions(id, escapedProjectName, projectType)
+      : getActiveActions(id, escapedProjectName, viewRoute)
   }
 
   const canWithdraw = status === PROJECT_STATUS.ACTIVE && !!isOwnProject
@@ -70,12 +79,12 @@ export const getActionButtons = (project) => {
   if (isOwnProject) {
     return status === PROJECT_STATUS.DRAFT
       ? getDraftActions(id, escapedProjectName, projectType)
-      : getActiveActions(id, escapedProjectName, projectType, canWithdraw)
+      : getActiveActions(id, escapedProjectName, viewRoute, canWithdraw)
   }
 
   return project.status === PROJECT_STATUS.DRAFT
     ? ''
-    : `<a href="${routes.VIEW_DETAILS}/${project.id}" class="govuk-link govuk-link--no-visited-state" aria-label="View details of ${escapedProjectName}">View details</a>`
+    : `<a href="${viewRoute}/${project.id}" class="govuk-link govuk-link--no-visited-state" aria-label="View details of ${escapedProjectName}">View details</a>`
 }
 
 export const formatProjectsForDisplay = (projects, isEmployee = false) =>

@@ -152,6 +152,7 @@ export const renderManualEntryReview = (h, options) => {
     ...reviewSiteDetailsPageData,
     backLink: getManualEntryBackLink(previousPage, returnToCheckYourAnswers),
     projectName: marineLicence.projectName,
+    hasIncompleteFields: hasIncompleteFields(siteDetails),
     summaryData,
     showMarinePlanPoliciesQuestion,
     errors,

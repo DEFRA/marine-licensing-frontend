@@ -56,6 +56,10 @@ export const deleteConstructionDrawingSubmitController = {
     const parsedSiteIndex = Number.parseInt(siteIndex, 10)
     const parsedDrawingIndex = Number.parseInt(drawingIndex, 10)
 
+    if (parsedDrawingIndex === 0) {
+      return h.redirect(marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS)
+    }
+
     await deleteConstructionDrawingsRequest(request, {
       route: apiRoutes.DELETE_CONSTRUCTION_DRAWING,
       payload: {

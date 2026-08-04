@@ -1,9 +1,7 @@
 import {
   getAllowedExtensions,
   getCdpErrorMessageFromCode,
-  getFileTypeContent,
-  getGeoParserErrorMessage,
-  CONSTRUCTION_DRAWING_ACCEPT_ATTRIBUTE
+  getGeoParserErrorMessage
 } from '#src/server/common/helpers/file-upload/file-upload.js'
 import {
   CDP_ERROR_MESSAGES,
@@ -30,15 +28,6 @@ describe('#getAllowedExtensions', () => {
       expect(getAllowedExtensions(fileType)).toEqual(expected)
     }
   )
-})
-
-describe('#getFileTypeContent', () => {
-  test('returns the construction drawing accept attribute', () => {
-    expect(getFileTypeContent('construction-drawing')).toEqual({
-      heading: 'Upload a file',
-      acceptAttribute: CONSTRUCTION_DRAWING_ACCEPT_ATTRIBUTE
-    })
-  })
 })
 
 describe('#getCdpErrorMessageFromCode', () => {

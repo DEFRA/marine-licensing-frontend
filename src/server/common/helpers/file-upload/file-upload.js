@@ -27,11 +27,6 @@ export const getFileTypeContent = (fileUploadType) => {
       heading: 'Upload a shapefile',
       acceptAttribute: '.zip'
     }
-  } else if (fileUploadType === 'construction-drawing') {
-    return {
-      heading: UPLOAD_A_FILE,
-      acceptAttribute: CONSTRUCTION_DRAWING_ACCEPT_ATTRIBUTE
-    }
   } else {
     return {
       heading: UPLOAD_A_FILE,

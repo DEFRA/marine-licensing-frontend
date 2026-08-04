@@ -3,6 +3,7 @@
 {% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
 {% from "govuk/components/button/macro.njk" import govukButton %}
 {% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+{% from "incomplete-fields-warning/macro.njk" import appIncompleteFieldsWarning %}
 {% from "site-details-map/macro.njk" import appSiteDetailsMap %}
 {% from "marine-licence/activity-details-card/macro.njk" import appMarineLicenceActivityDetailsCard %}
 {% from "marine-licence/construction-drawing-card/macro.njk" import appMarineLicenceConstructionDrawingCard %}
@@ -33,9 +34,9 @@
         }) }}
       {% endif %}
 
-      <div class="govuk-inset-text">
-        The site details you've provided are saved.<br>You must complete all sections marked <span class='govuk-tag govuk-tag--red govuk-!-margin-bottom-2 govuk-!-margin-top-2'>Incomplete</span> before you can send your information.<br>If you cannot finish now, you can return to this page later.
-      </div>
+      {% if hasIncompleteFields %}
+        {{ appIncompleteFieldsWarning() }}
+      {% endif %}
 
       {% set multipleSiteRows = [
         {

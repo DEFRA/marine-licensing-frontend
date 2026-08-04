@@ -17,6 +17,10 @@ describe('getTagStyle', () => {
     expect(getTagStyle('Transferred')).toBe('govuk-tag--magenta')
   })
 
+  it('should return magenta for Rejected', () => {
+    expect(getTagStyle('Rejected')).toBe('govuk-tag--orange')
+  })
+
   it('should return green for unknown status', () => {
     expect(getTagStyle('SomeOtherStatus')).toBe('govuk-tag--green')
   })

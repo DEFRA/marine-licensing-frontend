@@ -439,9 +439,19 @@ describe('Cookies Controller', () => {
         })
         mockRequest.payload = { analytics: 'yes' }
 
-        expect(() => {
+        // Capture the error outside expect(): allure-vitest wraps matchers and
+        // calls Date.now() for step timing, which would rethrow this mock error.
+        let thrown
+        try {
           cookiesSubmitController.handler(mockRequest, mockH)
-        }).toThrow('Error saving cookie preferences')
+        } catch (error) {
+          thrown = error
+        }
+
+        Date.now.mockReturnValue(1234567890000)
+
+        expect(thrown).toBeDefined()
+        expect(thrown.message).toBe('Error saving cookie preferences')
       })
     })
 

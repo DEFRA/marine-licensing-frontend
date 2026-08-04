@@ -66,7 +66,7 @@
     "dayjs": "^1.11.21",
     "dotenv": "^17.4.2",
     "global-agent": "^3.0.0",
-    "govuk-frontend": "^6.0.0",
+    "govuk-frontend": "6.1.0",
     "hapi-pino": "^13.0.0",
     "hapi-pulse": "^4.0.0",
     "ioredis": "^5.11.1",
@@ -80,7 +80,7 @@
     "proj4": "^2.20.9",
     "rfc2047": "^4.0.1",
     "sanitize-html": "2.17.6",
-    "undici": "^8.7.0"
+    "undici": "^8.9.0"
   },
   "devDependencies": {
     "@axe-core/playwright": "^4.12.1",
@@ -118,35 +118,5 @@
     "webpack": "^5.108.4",
     "webpack-assets-manifest": "6.5.2",
     "webpack-cli": "7.2.1"
-  },
-  "overrides": {
-    "@babel/core": "^7.29.7",
-    "brace-expansion": "5.0.8",
-    "js-yaml": "^4.3.0",
-    "minimatch": "10.2.4",
-    "flatted": "^3.4.2",
-    "picomatch": "^4.0.4",
-    "postcss": "8.5.20",
-    "vite": "^8.0.5",
-    "@babel/plugin-transform-modules-systemjs": "^7.29.4",
-    "shell-quote": "^1.10.0",
-    "cheerio": {
-      "undici": "^7.28.0"
-    },
-    "jsdom": {
-      "undici": "^7.28.0"
-    },
-    "hapi-pulse": {
-      "joi": "^17.13.4"
-    },
-    "@hapi/bell": {
-      "joi": "^17.13.4"
-    },
-    "@hapi/catbox-redis": {
-      "joi": "^17.13.4"
-    },
-    "@hapi/jwt": {
-      "joi": "^17.13.4"
-    }
   }
 }

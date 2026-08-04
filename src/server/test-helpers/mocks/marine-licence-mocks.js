@@ -180,7 +180,7 @@ export const mockRejectedMarineLicenceApplication = {
   status: PROJECT_STATUS.REJECTED,
   applicationReference: 'MLA/2026/10264',
   submittedAt: '2026-05-26T10:00:00Z',
-  rejectedDate: '2026-06-26T10:00:00Z',
+  rejectedDate: '2026-07-26T10:00:00Z',
   rejectedReasons: 'Site location,Water Framework Directive',
   rejectedInformation:
     'The site location entered indicated that it was within 1 nautical mile of the coast but no Water Framework Directive assessment was uploaded. Check the site location and if it meets the requirements for a WFD assessment.'

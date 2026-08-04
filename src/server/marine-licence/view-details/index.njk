@@ -32,10 +32,13 @@
       {% endif %}
       <h1 class="govuk-heading-l" id="view-details-heading">{{ pageTitle }}</h1>
 
-      {% if isTransferred %}
+      {% if showApplicationDetailsCard %}
         {{ appMarineLicenceApplicationDetailsCard({
           statusTag: statusTag,
+          isTransferred: isTransferred,
+          isRejected: isRejected,
           applicationReference: applicationReference,
+          rejectedDate: rejectedDate,
           transferredDate: transferredDate,
           submittedAt: submittedAt
         }) }}

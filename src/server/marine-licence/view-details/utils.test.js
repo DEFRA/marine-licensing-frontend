@@ -1,5 +1,8 @@
 import { buildApplicationDetailsCardData } from '#src/server/marine-licence/view-details/utils.js'
-import { PROJECT_STATUS } from '#src/server/common/constants/projects.js'
+import {
+  PROJECT_STATUS,
+  UNABLE_TO_PROGRESS
+} from '#src/server/common/constants/projects.js'
 import { expect } from 'vitest'
 
 describe('#buildApplicationDetailsCardData', () => {
@@ -39,7 +42,7 @@ describe('#buildApplicationDetailsCardData', () => {
     expect(result.rejectedDate).toBe('20 Mar 2026')
     expect(result.rejectedReasons).toEqual(['Reason 1', 'Reason 2'])
     expect(result.statusTag).toContain('govuk-tag--orange')
-    expect(result.statusTag).toContain(PROJECT_STATUS.REJECTED)
+    expect(result.statusTag).toContain(UNABLE_TO_PROGRESS)
   })
 
   test('leaves rejectedReasons unset when not present', () => {

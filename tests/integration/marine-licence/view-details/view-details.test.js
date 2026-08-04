@@ -19,7 +19,8 @@ import {
   expectedWaterFrameworkDirectiveCard,
   expectedInvocingCardIndividualUser,
   expectedInvocingCardOrgUser,
-  expectedApplicationDetailsCard
+  expectedTransferredApplicationDetailsCard,
+  expectedRejectedApplicationDetailsCard
 } from './fixtures.js'
 import { getCardRow } from './utils.js'
 import {
@@ -81,7 +82,7 @@ describe('Marine Licence View Details', () => {
     )
   })
 
-  describe('application details card', () => {
+  describe('application details card (transferred)', () => {
     let document
 
     beforeEach(async () => {
@@ -103,7 +104,43 @@ describe('Marine Licence View Details', () => {
       ).toBeInTheDocument()
     })
 
-    test.each(expectedApplicationDetailsCard.rows)(
+    test.each(expectedTransferredApplicationDetailsCard.rows)(
+      'renders "$key" row with correct value',
+      ({ key, value }) => {
+        const card = document.querySelector('#application-details-card')
+        const row = getCardRow(card, key)
+
+        expect(row).toBeTruthy()
+        expect(
+          row.querySelector('.govuk-summary-list__value').textContent.trim()
+        ).toBe(value)
+      }
+    )
+  })
+
+  describe('application details card (rejected)', () => {
+    let document
+
+    beforeEach(async () => {
+      document = await loadViewDetailsPage(
+        getServer(),
+        mockRejectedMarineLicenceApplication
+      )
+    })
+
+    test('does not render for submitted applications', async () => {
+      document = await loadViewDetailsPage(getServer())
+
+      expect(document.querySelector('#application-details-card')).toBeNull()
+    })
+
+    test('renders for rejected applications', async () => {
+      expect(
+        document.querySelector('#application-details-card')
+      ).toBeInTheDocument()
+    })
+
+    test.each(expectedRejectedApplicationDetailsCard.rows)(
       'renders "$key" row with correct value',
       ({ key, value }) => {
         const card = document.querySelector('#application-details-card')

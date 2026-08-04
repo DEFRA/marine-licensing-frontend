@@ -25,20 +25,42 @@ export const expectedApplicationDetailsCard = {
       value: 'Marine licence application'
     },
     {
-      key: 'Status',
-      value: 'Transferred'
-    },
-    {
       key: 'Reference number',
       value: mockTransferredMarineLicenceApplication.applicationReference
     },
     {
       key: 'Date submitted',
       value: '26 May 2026'
+    }
+  ]
+}
+
+export const expectedTransferredApplicationDetailsCard = {
+  ...expectedApplicationDetailsCard,
+  rows: [
+    ...expectedApplicationDetailsCard.rows,
+    {
+      key: 'Status',
+      value: 'Transferred'
     },
     {
       key: 'Date of transfer',
       value: '26 Jun 2026'
+    }
+  ]
+}
+
+export const expectedRejectedApplicationDetailsCard = {
+  ...expectedApplicationDetailsCard,
+  rows: [
+    ...expectedApplicationDetailsCard.rows,
+    {
+      key: 'Status',
+      value: 'Unable to progress'
+    },
+    {
+      key: 'Date rejected',
+      value: '26 Jul 2026'
     }
   ]
 }

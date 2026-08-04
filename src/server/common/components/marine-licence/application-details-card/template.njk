@@ -32,12 +32,20 @@
   }
 },{
   key: {
+    text: "Date rejected"
+  },
+  value: {
+    text: params.rejectedDate
+  }
+} if params.isRejected, 
+{
+  key: {
     text: "Date of transfer"
   },
   value: {
     text: params.transferredDate
   }
-}), rows) %}
+} if params.isTransferred), rows) %}
 
 
 {{ govukSummaryList({

@@ -148,7 +148,10 @@ describe('Marine Licence View Details', () => {
 
         expect(row).toBeTruthy()
         expect(
-          row.querySelector('.govuk-summary-list__value').textContent.trim()
+          row
+            .querySelector('.govuk-summary-list__value')
+            .textContent.replace(/\s+/g, ' ')
+            .trim()
         ).toBe(value)
       }
     )

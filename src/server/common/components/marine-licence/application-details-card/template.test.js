@@ -55,6 +55,7 @@ describe('Marine Licence Application Details Card Component', () => {
         applicationReference: 'TEST-REF',
         submittedAt: '01 01 2026',
         rejectedDate: '02 02 2026',
+        rejectedReasons: '<p>Test reason</p>',
         isRejected: true
       }
     )
@@ -75,7 +76,10 @@ describe('Marine Licence Application Details Card Component', () => {
     expect(htmlContent).toContain('Date submitted')
     expect(htmlContent).toContain('01 01 2026')
 
-    expect(htmlContent).toContain('Date rejected')
+    expect(htmlContent).toContain('Date marked as unable to progress')
     expect(htmlContent).toContain('02 02 2026')
+
+    expect(htmlContent).toContain('Reasons marked as unable to progress')
+    expect(htmlContent).toContain('<p>Test reason</p>')
   })
 })

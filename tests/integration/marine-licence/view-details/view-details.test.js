@@ -10,7 +10,8 @@ import {
 import { loadPage } from '~/tests/integration/shared/app-server.js'
 import {
   mockSubmittedMarineLicenceApplication,
-  mockTransferredMarineLicenceApplication
+  mockTransferredMarineLicenceApplication,
+  mockRejectedMarineLicenceApplication
 } from '~/src/server/test-helpers/mocks/marine-licence-mocks.js'
 import {
   expectedProjectDetailsCard,
@@ -65,6 +66,18 @@ describe('Marine Licence View Details', () => {
     expect(getByRole(document, 'link', { name: 'Back' })).toHaveAttribute(
       'href',
       `${marineLicenceRoutes.MARINE_LICENCE_APPLICATION_TRANSFERRED}/${mockTransferredMarineLicenceApplication.id}`
+    )
+  })
+
+  test('back link goes to application rejected page for rejected applications', async () => {
+    const document = await loadViewDetailsPage(
+      getServer(),
+      mockRejectedMarineLicenceApplication
+    )
+
+    expect(getByRole(document, 'link', { name: 'Back' })).toHaveAttribute(
+      'href',
+      `${marineLicenceRoutes.MARINE_LICENCE_APPLICATION_REJECTED}/${mockRejectedMarineLicenceApplication.id}`
     )
   })
 

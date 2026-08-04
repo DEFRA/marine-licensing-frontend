@@ -376,6 +376,20 @@ describe('getActionButtons', () => {
       `<a href="${marineLicenceRoutes.MARINE_LICENCE_APPLICATION_TRANSFERRED}/ml123" class="govuk-link govuk-link--no-visited-state" aria-label="View details of Marine Licence Project">View details</a>`
     )
   })
+
+  it('returns rejected page link for rejected marine licence', () => {
+    const rejected = {
+      id: 'ml123',
+      projectName: 'Marine Licence Project',
+      projectType: 'MARINE_LICENCE',
+      status: 'Rejected',
+      isOwnProject: true
+    }
+    const result = getActionButtons(rejected)
+    expect(result).toBe(
+      `<a href="${marineLicenceRoutes.MARINE_LICENCE_APPLICATION_REJECTED}/ml123" class="govuk-link govuk-link--no-visited-state" aria-label="View details of Marine Licence Project">View details</a>`
+    )
+  })
 })
 
 describe('#getStatusLabelText', () => {

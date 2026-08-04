@@ -19,7 +19,9 @@ export const buildApplicationDetailsCardData = (marineLicence) => {
     submittedAt: formatDate(submittedAt, 'd MMM yyyy'),
     transferredDate: formatDate(transferredDate, 'd MMM yyyy'),
     rejectedDate: formatDate(rejectedDate, 'd MMM yyyy'),
-    rejectedReasons: rejectedReasons ? rejectedReasons.split(',') : rejectedReasons,
+    rejectedReasons: rejectedReasons
+      ? rejectedReasons.split(',')
+      : rejectedReasons,
     rejectedInformation,
     isTransferred: status === PROJECT_STATUS.TRANSFERRED,
     isRejected: status === PROJECT_STATUS.REJECTED,

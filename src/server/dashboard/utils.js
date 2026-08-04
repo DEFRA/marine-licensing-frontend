@@ -37,6 +37,13 @@ const getViewDetailsRoute = (projectType, status) => {
     return marineLicenceRoutes.MARINE_LICENCE_APPLICATION_TRANSFERRED
   }
 
+  if (
+    projectType === MARINE_LICENCE_KEY &&
+    status === PROJECT_STATUS.REJECTED
+  ) {
+    return marineLicenceRoutes.MARINE_LICENCE_APPLICATION_REJECTED
+  }
+
   return projectType === MARINE_LICENCE_KEY
     ? marineLicenceRoutes.MARINE_LICENCE_VIEW_DETAILS
     : routes.VIEW_DETAILS

@@ -9,6 +9,8 @@ import { createFailAction } from '#src/server/common/helpers/createFailAction.js
 import { getActivityVariantFromSubType } from '#src/server/common/helpers/activity-details/activity-variants.js'
 import { validateSiteAndActivityParams } from '#src/server/common/helpers/marine-licence/session-cache/site-utils.js'
 import { getActivityDetailsBackLink } from '#src/server/marine-licence/site-details/utils/back-link.js'
+import { SUBTYPES_REQUIRING_CONSTRUCTION_DRAWING } from '#src/server/marine-licence/site-details/type-of-activity/constants.js'
+import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
 
 export const typeOfActivityErrorMessages = {
   ACTIVITY_TYPE_REQUIRED: 'Select the type of activity',
@@ -122,6 +124,18 @@ export const typeOfActivitySubmitController = {
     const activityTypeChanged =
       existingActivityDetails.activityType !== payload.activityType ||
       existingActivityDetails.activitySubType !== activitySubType
+
+    const wasDrawingRequired = SUBTYPES_REQUIRING_CONSTRUCTION_DRAWING.includes(
+      existingActivityDetails.activitySubType
+    )
+    const willBeDrawingRequired =
+      SUBTYPES_REQUIRING_CONSTRUCTION_DRAWING.includes(activitySubType)
+
+    if (activityTypeChanged && wasDrawingRequired && !willBeDrawingRequired) {
+      return h.redirect(
+        `${marineLicenceRoutes.MARINE_LICENCE_CONFIRM_CHANGE_ACTIVITY_TYPE}?site=${siteNumber}&activity=${activityDetailsNumber}&activityType=${payload.activityType}&activitySubType=${activitySubType}`
+      )
+    }
 
     await updateMarineLicenceSiteActivityDetails(
       request,

@@ -641,7 +641,7 @@ describe('taskList utils', () => {
       ['INCOMPLETE', 'ready'],
       ['IN_PROGRESS', 'ready'],
       ['INCOMPLETE', 'pending'],
-      ['COMPLETED', 'failed'],
+      ['IN_PROGRESS', 'failed'],
       [undefined, undefined]
     ])(
       'returns "Cannot start yet" (no link) when siteDetails=%s and job=%s',
@@ -685,6 +685,26 @@ describe('taskList utils', () => {
         ])
       }
     )
+
+    test('returns "Not yet started" linked to the MPP spinner page (re-trigger) when siteDetails=COMPLETED and job=failed', () => {
+      expect(
+        transformMarinePlanPoliciesTaskList(
+          { siteDetails: 'COMPLETED' },
+          { marinePlanPolicyJob: 'failed', marinePlanPoliciesCount: 44 }
+        )
+      ).toEqual([
+        {
+          title: {
+            text: 'Marine plan policy considerations',
+            classes: 'govuk-link--no-visited-state'
+          },
+          href: marineLicenceRoutes.MARINE_LICENCE_CALCULATE_MARINE_PLAN_POLICIES,
+          status: {
+            tag: { text: 'Not yet started', classes: 'govuk-tag--blue' }
+          }
+        }
+      ])
+    })
   })
 
   describe('transformWaterFrameworkDirectiveTaskList', () => {

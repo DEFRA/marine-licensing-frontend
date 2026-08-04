@@ -13,12 +13,9 @@ import {
   setMarineLicenceCache,
   updateMarineLicenceSiteDetails
 } from '#src/server/common/helpers/marine-licence/session-cache/utils.js'
-import { storeMarinePlanPolicyQueryStartTime } from '#src/server/common/helpers/marine-licence/marine-plan-policy-wait.js'
+import { triggerMarinePlanPolicyQuery } from '#src/server/common/helpers/marine-licence/marine-plan-policy-query.js'
 import { getMarineLicenceService } from '#src/services/marine-licence-service/index.js'
-import {
-  authenticatedPatchRequest,
-  authenticatedPostRequest
-} from '#src/server/common/helpers/authenticated-requests.js'
+import { authenticatedPatchRequest } from '#src/server/common/helpers/authenticated-requests.js'
 import { finishedSiteDetailsSchema } from '#src/server/common/validation/finished-site-details/schema.js'
 import { finishedSiteDetailsErrorMessages } from '#src/server/common/validation/finished-site-details/constants.js'
 import {
@@ -195,12 +192,7 @@ async function confirmSiteDetails(
     return h.redirect(returnToCheckYourAnswers)
   }
 
-  await authenticatedPostRequest(
-    request,
-    apiRoutes.CALCULATE_MARINE_PLAN_POLICIES,
-    JSON.stringify({ id: marineLicence.id })
-  )
-  storeMarinePlanPolicyQueryStartTime(request)
+  await triggerMarinePlanPolicyQuery(request, marineLicence.id)
   return h.redirect(
     marineLicenceRoutes.MARINE_LICENCE_CALCULATE_MARINE_PLAN_POLICIES
   )

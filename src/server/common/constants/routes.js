@@ -60,6 +60,8 @@ export const marineLicenceRoutes = {
   MARINE_LICENCE_COMPLETION_DATE: '/marine-licence/completion-date',
   MARINE_LICENCE_CHECK_YOUR_ANSWERS: '/marine-licence/check-your-answers',
   MARINE_LICENCE_CONFIRMATION: '/marine-licence/confirmation',
+  MARINE_LICENCE_APPLICATION_TRANSFERRED:
+    '/marine-licence/application-transferred',
   MARINE_LICENCE_PROJECT_NAME: '/marine-licence/project-name',
   MARINE_LICENCE_TASK_LIST: '/marine-licence/task-list',
   MARINE_LICENCE_DELETE: '/marine-licence/delete',
@@ -97,6 +99,10 @@ export const marineLicenceRoutes = {
   MARINE_LICENCE_WORKING_HOURS: '/marine-licence/working-hours',
   MARINE_LICENCE_WIDTH_OF_SITE: '/marine-licence/width-of-site',
   MARINE_LICENCE_DELETE_ACTIVITY: '/marine-licence/delete-activity',
+  MARINE_LICENCE_UPLOAD_CONSTRUCTION_DRAWING:
+    '/marine-licence/upload-construction-drawing',
+  MARINE_LICENCE_CONFIRM_CHANGE_ACTIVITY_TYPE:
+    '/marine-licence/confirm-change-activity-type',
   MARINE_LICENCE_DELETE_SITE: '/marine-licence/delete-site',
   MARINE_LICENCE_CHANGE_SITE_LOCATION: '/marine-licence/change-site-location',
   MARINE_LICENCE_ENTER_MULTIPLE_COORDINATES:

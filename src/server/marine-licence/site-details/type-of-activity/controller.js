@@ -13,7 +13,11 @@ import { getActivityVariantFromSubType } from '#src/server/common/helpers/activi
 import { validateSiteAndActivityParams } from '#src/server/common/helpers/marine-licence/session-cache/site-utils.js'
 import { getActivityDetailsBackLink } from '#src/server/marine-licence/site-details/utils/back-link.js'
 import { SUBTYPES_REQUIRING_CONSTRUCTION_DRAWING } from '#src/server/marine-licence/site-details/type-of-activity/constants.js'
-import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
+import {
+  apiRoutes,
+  marineLicenceRoutes
+} from '#src/server/common/constants/routes.js'
+import { authenticatedPatchRequest } from '#src/server/common/helpers/authenticated-requests.js'
 
 export const typeOfActivityErrorMessages = {
   ACTIVITY_TYPE_REQUIRED: 'Select the type of activity',
@@ -24,6 +28,16 @@ export const typeOfActivityErrorMessages = {
 
 export const MARINE_LICENCE_TYPE_OF_ACTIVITY_VIEW_ROUTE =
   'marine-licence/site-details/type-of-activity/index'
+
+const siteHasConstructionDrawings = (marineLicence, siteIndex) =>
+  marineLicence.siteDetails[siteIndex]?.constructionDrawings?.length > 0
+
+async function seedFirstConstructionDrawing(request, marineLicence, siteIndex) {
+  await authenticatedPatchRequest(request, apiRoutes.ADD_CONSTRUCTION_DRAWING, {
+    siteIndex,
+    id: marineLicence.id
+  })
+}
 
 const subTypePayload = (activityType, activitySubType) => ({
   activitySubTypeConstruction:
@@ -163,6 +177,13 @@ export const typeOfActivitySubmitController = {
         ...(activityTypeChanged && { activities: null })
       }
     )
+
+    if (
+      willBeDrawingRequired &&
+      !siteHasConstructionDrawings(marineLicence, siteIndex)
+    ) {
+      await seedFirstConstructionDrawing(request, marineLicence, siteIndex)
+    }
 
     const getPageToNavigateTo = getActivityVariantFromSubType(activitySubType)
 

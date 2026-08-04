@@ -132,10 +132,14 @@ async function handleAddConstructionDrawing(
 ) {
   const siteIndex = Number.parseInt(siteNumber, 10) - 1
 
-  // The first drawing card renders even before any backend entry exists, so
-  // "visible" count is always at least 1 - adding another must land one
-  // past whatever's currently shown, which may mean creating two entries
-  // the very first time (to materialise the already-visible first card too).
+  // The first drawing is normally seeded when the drawing-requiring activity
+  // type is set (see typeOfActivitySubmitController), so this loop usually
+  // adds exactly one. It's a defensive fallback for sites saved before that
+  // seeding existed: the drawing card always renders a first, placeholder
+  // card even with zero backend entries, so on legacy data with none yet,
+  // "visible" count is still at least 1 and we must land one past it -
+  // creating two entries in that one case (to materialise the already-visible
+  // first card too).
   const { constructionDrawings } = marineLicence.siteDetails[siteIndex]
   const currentDrawings = Array.isArray(constructionDrawings)
     ? constructionDrawings

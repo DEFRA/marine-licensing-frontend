@@ -1,5 +1,9 @@
+import { vi } from 'vitest'
 import { getByRole, getByText } from '@testing-library/dom'
-import { marineLicenceRoutes } from '~/src/server/common/constants/routes.js'
+import {
+  apiRoutes,
+  marineLicenceRoutes
+} from '~/src/server/common/constants/routes.js'
 import {
   mockMarineLicence,
   setupTestServer
@@ -8,6 +12,9 @@ import { loadPage } from '~/tests/integration/shared/app-server.js'
 import { makePostRequest } from '~/src/server/test-helpers/server-requests.js'
 import { statusCodes } from '~/src/server/common/constants/status-codes.js'
 import { mockMarineLicenceApplication } from '#src/server/test-helpers/mocks/marine-licence-mocks.js'
+import * as authenticatedRequests from '#src/server/common/helpers/authenticated-requests.js'
+
+vi.mock('#src/server/common/helpers/authenticated-requests.js')
 
 describe('Type of activity (marine licence)', () => {
   const getServer = setupTestServer()
@@ -231,6 +238,45 @@ describe('Type of activity (marine licence)', () => {
     expect(response.statusCode).toBe(statusCodes.redirect)
     expect(response.headers.location).toBe(
       '/marine-licence/activity-details/what-new-deposit-activity-are-you-doing?site=1&activity=1'
+    )
+  })
+
+  test('seeds the first construction drawing when the new subtype newly requires one', async () => {
+    mockMarineLicence({
+      ...mockMarineLicenceApplication,
+      siteDetails: [
+        {
+          ...mockMarineLicenceApplication.siteDetails[0],
+          activityDetails: [
+            {
+              ...mockMarineLicenceApplication.siteDetails[0].activityDetails[0],
+              activityType: 'deposit',
+              activitySubType: 'deposit-type-1'
+            }
+          ]
+        }
+      ]
+    })
+
+    const response = await makePostRequest({
+      url: `${marineLicenceRoutes.MARINE_LICENCE_TYPE_OF_ACTIVITY}?site=1&activity=1`,
+      server: getServer(),
+      formData: {
+        activityType: 'construction',
+        activitySubTypeConstruction: 'construction-type-1'
+      }
+    })
+
+    expect(response.statusCode).toBe(statusCodes.redirect)
+    expect(
+      vi.mocked(authenticatedRequests.authenticatedPatchRequest)
+    ).toHaveBeenCalledWith(
+      expect.anything(),
+      apiRoutes.ADD_CONSTRUCTION_DRAWING,
+      {
+        siteIndex: 0,
+        id: mockMarineLicenceApplication.id
+      }
     )
   })
 })

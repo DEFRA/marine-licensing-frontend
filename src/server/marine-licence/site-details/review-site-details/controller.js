@@ -132,8 +132,8 @@ async function handleAddConstructionDrawing(
 ) {
   const siteIndex = Number.parseInt(siteNumber, 10) - 1
 
-  // The first drawing is normally seeded when the drawing-requiring activity
-  // type is set (see typeOfActivitySubmitController), so this loop usually
+  // The first drawing is normally seeded when the drawing-requiring
+  // checkbox page is submitted (see selectActivitySubmitController), so this loop usually
   // adds exactly one. It's a defensive fallback for sites saved before that
   // seeding existed: the drawing card always renders a first, placeholder
   // card even with zero backend entries, so on legacy data with none yet,

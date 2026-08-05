@@ -10,8 +10,6 @@ import {
   updateMarineLicenceSiteActivityDetails
 } from '#src/server/common/helpers/marine-licence/session-cache/utils.js'
 import { createFailAction } from '#src/server/common/helpers/createFailAction.js'
-import { authenticatedPatchRequest } from '#src/server/common/helpers/authenticated-requests.js'
-import { apiRoutes } from '#src/server/common/constants/routes.js'
 import { mockMarineLicenceApplication } from '#src/server/test-helpers/mocks/marine-licence-mocks.js'
 import {
   createMockRequest,
@@ -20,7 +18,6 @@ import {
 
 vi.mock('~/src/server/common/helpers/marine-licence/session-cache/utils.js')
 vi.mock('~/src/server/common/helpers/createFailAction.js')
-vi.mock('~/src/server/common/helpers/authenticated-requests.js')
 
 describe('#typeOfActivity', () => {
   beforeEach(() => {
@@ -243,112 +240,6 @@ describe('#typeOfActivity', () => {
         expect(redirectH.redirect).toHaveBeenCalledWith(
           '/marine-licence/activity-details/what-deposit-activity-are-you-continuing?site=1&activity=1'
         )
-      })
-    })
-
-    describe('gaining a drawing-requiring activity', () => {
-      const createGainingDrawingRequest = () =>
-        createMockRequest({
-          query: { site: 1, activity: 1 },
-          payload: {
-            activityType: 'construction',
-            activitySubTypeConstruction: 'construction-type-1',
-            activitySubTypeDeposit: '',
-            activitySubTypeRemoval: ''
-          }
-        })
-
-      test('seeds the first construction drawing when the new subtype requires one and the site has none yet', async () => {
-        vi.mocked(getMarineLicenceCache).mockReturnValueOnce({
-          ...mockMarineLicenceApplication,
-          siteDetails: [
-            {
-              ...mockMarineLicenceApplication.siteDetails[0],
-              activityDetails: [
-                {
-                  ...mockMarineLicenceApplication.siteDetails[0]
-                    .activityDetails[0],
-                  activityType: 'construction',
-                  activitySubType: 'construction-type-2'
-                }
-              ]
-            }
-          ]
-        })
-        const h = createMockH()
-        const request = createGainingDrawingRequest()
-
-        await typeOfActivitySubmitController.handler(request, h)
-
-        expect(authenticatedPatchRequest).toHaveBeenCalledWith(
-          request,
-          apiRoutes.ADD_CONSTRUCTION_DRAWING,
-          {
-            siteIndex: 0,
-            id: mockMarineLicenceApplication.id
-          }
-        )
-      })
-
-      test('does not seed a construction drawing when the site already has one', async () => {
-        vi.mocked(getMarineLicenceCache).mockReturnValueOnce({
-          ...mockMarineLicenceApplication,
-          siteDetails: [
-            {
-              ...mockMarineLicenceApplication.siteDetails[0],
-              activityDetails: [
-                {
-                  ...mockMarineLicenceApplication.siteDetails[0]
-                    .activityDetails[0],
-                  activityType: 'construction',
-                  activitySubType: 'construction-type-2'
-                }
-              ],
-              constructionDrawings: [{ filename: 'existing.pdf' }]
-            }
-          ]
-        })
-        const h = createMockH()
-
-        await typeOfActivitySubmitController.handler(
-          createGainingDrawingRequest(),
-          h
-        )
-
-        expect(authenticatedPatchRequest).not.toHaveBeenCalled()
-      })
-
-      test('does not seed a construction drawing when the new subtype does not require one', async () => {
-        vi.mocked(getMarineLicenceCache).mockReturnValueOnce({
-          ...mockMarineLicenceApplication,
-          siteDetails: [
-            {
-              ...mockMarineLicenceApplication.siteDetails[0],
-              activityDetails: [
-                {
-                  ...mockMarineLicenceApplication.siteDetails[0]
-                    .activityDetails[0],
-                  activityType: 'construction',
-                  activitySubType: 'construction-type-1'
-                }
-              ]
-            }
-          ]
-        })
-        const h = createMockH()
-        const request = createMockRequest({
-          query: { site: 1, activity: 1 },
-          payload: {
-            activityType: 'construction',
-            activitySubTypeConstruction: 'construction-type-2',
-            activitySubTypeDeposit: '',
-            activitySubTypeRemoval: ''
-          }
-        })
-
-        await typeOfActivitySubmitController.handler(request, h)
-
-        expect(authenticatedPatchRequest).not.toHaveBeenCalled()
       })
     })
   })

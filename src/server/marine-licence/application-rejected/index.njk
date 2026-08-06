@@ -37,16 +37,13 @@
         <li>your new application will have a new reference number</li>
       </ul>
 
-      <form method="POST">
-        <input type="hidden" name="csrfToken" value="{{ csrfToken }}" />
-        {{ govukButton({
-          text: "Apply again",
-          preventDoubleClick: true,
-          attributes: {
-            "data-module": "govuk-button"
-          }
-        }) }}
-      </form>
+      {{ govukButton({
+        text: "Apply again",
+        href: updateAndResubmitUrl,
+        attributes: {
+          "data-module": "govuk-button"
+        }
+      }) }}
 
       <p class="govuk-body"><a class="govuk-link" href="{{ viewDetailsUrl }}">View your original application</a></p>
 

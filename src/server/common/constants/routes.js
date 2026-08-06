@@ -63,6 +63,7 @@ export const marineLicenceRoutes = {
   MARINE_LICENCE_APPLICATION_TRANSFERRED:
     '/marine-licence/application-transferred',
   MARINE_LICENCE_APPLICATION_REJECTED: '/marine-licence/application-rejected',
+  MARINE_LICENCE_UPDATE_AND_RESUBMIT: '/marine-licence/update-and-resubmit',
   MARINE_LICENCE_PROJECT_NAME: '/marine-licence/project-name',
   MARINE_LICENCE_TASK_LIST: '/marine-licence/task-list',
   MARINE_LICENCE_DELETE: '/marine-licence/delete',

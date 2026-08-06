@@ -23,6 +23,7 @@ import { feeEstimateRoutes } from '#src/server/marine-licence/fee-estimate/index
 import { feeEstimateAreYouSureRoutes } from '#src/server/marine-licence/fee-estimate-are-you-sure/index.js'
 import { applicationTransferredRoutes } from '#src/server/marine-licence/application-transferred/index.js'
 import { applicationRejectedRoutes } from '#src/server/marine-licence/application-rejected/index.js'
+import { updateAndResubmitRoutes } from '#src/server/marine-licence/update-and-resubmit/index.js'
 
 export const marineLicence = {
   plugin: {
@@ -53,7 +54,8 @@ export const marineLicence = {
         ...feeEstimateRoutes,
         ...feeEstimateAreYouSureRoutes,
         ...applicationTransferredRoutes,
-        ...applicationRejectedRoutes
+        ...applicationRejectedRoutes,
+        ...updateAndResubmitRoutes
       ])
     }
   }

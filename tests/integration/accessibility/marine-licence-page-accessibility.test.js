@@ -263,6 +263,11 @@ const marineLicencePages = [
     url: `${marineLicenceRoutes.MARINE_LICENCE_APPLICATION_REJECTED}/${mockRejectedMarineLicenceApplication.id}`,
     title: 'We are unable to progress your application',
     marineLicence: mockRejectedMarineLicenceApplication
+  },
+  {
+    url: `${marineLicenceRoutes.MARINE_LICENCE_UPDATE_AND_RESUBMIT}/${mockRejectedMarineLicenceApplication.id}`,
+    title: 'Apply again for this project',
+    marineLicence: mockRejectedMarineLicenceApplication
   }
   // TODO: Uncomment when meta refresh a11y issue is resolved (same issue as upload-and-wait)
   // {

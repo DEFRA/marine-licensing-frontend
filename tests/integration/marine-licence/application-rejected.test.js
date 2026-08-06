@@ -13,10 +13,7 @@ import {
   mockSubmittedMarineLicenceApplication
 } from '#src/server/test-helpers/mocks/marine-licence-mocks.js'
 import { statusCodes } from '~/src/server/common/constants/status-codes.js'
-import {
-  makeGetRequest,
-  makePostRequest
-} from '~/src/server/test-helpers/server-requests.js'
+import { makeGetRequest } from '~/src/server/test-helpers/server-requests.js'
 
 describe('Application rejected', () => {
   const getServer = setupTestServer()
@@ -75,7 +72,11 @@ describe('Application rejected', () => {
     ).toBeInTheDocument()
     expect(
       getByRole(document, 'button', { name: 'Apply again' })
-    ).toBeInTheDocument()
+    ).toHaveAttribute(
+      'href',
+      `${marineLicenceRoutes.MARINE_LICENCE_UPDATE_AND_RESUBMIT}/${marineLicence.id}`
+    )
+
     expect(
       getByRole(document, 'link', {
         name: 'View your original application'
@@ -96,15 +97,6 @@ describe('Application rejected', () => {
 
     expect(response.statusCode).toBe(statusCodes.redirect)
     expect(response.headers.location).toBe(routes.DASHBOARD)
-  })
-
-  test('should submit apply again without error', async () => {
-    const response = await makePostRequest({
-      url: `${marineLicenceRoutes.MARINE_LICENCE_APPLICATION_REJECTED}/${marineLicence.id}`,
-      server: getServer()
-    })
-
-    expect(response.statusCode).toBe(statusCodes.noContent)
   })
 
   test('should return bad request for an invalid marine licence id', async () => {

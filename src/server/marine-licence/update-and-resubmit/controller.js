@@ -7,17 +7,17 @@ import { getMarineLicenceService } from '#src/services/marine-licence-service/in
 import { PROJECT_STATUS } from '#src/server/common/constants/projects.js'
 import { validateMarineLicenceIdParams } from '#src/server/common/helpers/marine-licence/validate-marine-licence-id-params.js'
 
-export const APPLICATION_REJECTED_VIEW_ROUTE =
-  'marine-licence/application-rejected/index'
+export const UPDATE_AND_RESUBMIT_VIEW_ROUTE =
+  'marine-licence/update-and-resubmit/index'
 
-const pageTitle = 'We are unable to progress your application'
+const pageTitle = 'Apply again for this project'
 
-const applicationRejectedSettings = {
+const updateAndResubmitSettings = {
   pageTitle,
   heading: pageTitle
 }
 
-export const applicationRejectedController = {
+export const updateAndResubmitController = {
   options: validateMarineLicenceIdParams,
   async handler(request, h) {
     const { marineLicenceId } = request.params
@@ -30,27 +30,29 @@ export const applicationRejectedController = {
         return h.redirect(routes.DASHBOARD)
       }
 
-      const { rejectedReasons, rejectedInformation } = marineLicence
+      const applicationRejectedLink = `${marineLicenceRoutes.MARINE_LICENCE_APPLICATION_REJECTED}/${marineLicenceId}`
 
-      return h.view(APPLICATION_REJECTED_VIEW_ROUTE, {
-        ...applicationRejectedSettings,
-        marineLicenceId,
+      return h.view(UPDATE_AND_RESUBMIT_VIEW_ROUTE, {
+        ...updateAndResubmitSettings,
         projectName: marineLicence.projectName,
         applicationReference: marineLicence.applicationReference,
-        rejectedReasons: rejectedReasons
-          ? rejectedReasons.split(',')
-          : rejectedReasons,
-        rejectedInformation,
-        viewDetailsUrl: `${marineLicenceRoutes.MARINE_LICENCE_VIEW_DETAILS}/${marineLicenceId}`,
-        updateAndResubmitUrl: `${marineLicenceRoutes.MARINE_LICENCE_UPDATE_AND_RESUBMIT}/${marineLicenceId}`
+        backLink: applicationRejectedLink,
+        cancelLink: applicationRejectedLink
       })
     } catch (error) {
       if (error.isBoom) {
         throw error
       }
 
-      request.logger.error(error, 'Error displaying application rejected page')
-      throw Boom.internal('Error displaying application rejected page')
+      request.logger.error(error, 'Error displaying update and resubmit page')
+      throw Boom.internal('Error displaying update and resubmit page')
     }
+  }
+}
+
+export const updateAndResubmitSubmitController = {
+  options: validateMarineLicenceIdParams,
+  async handler(_request, h) {
+    return h.response()
   }
 }

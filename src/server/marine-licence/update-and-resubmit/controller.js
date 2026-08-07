@@ -1,11 +1,14 @@
 import Boom from '@hapi/boom'
 import {
+  apiRoutes,
   marineLicenceRoutes,
   routes
 } from '#src/server/common/constants/routes.js'
 import { getMarineLicenceService } from '#src/services/marine-licence-service/index.js'
 import { PROJECT_STATUS } from '#src/server/common/constants/projects.js'
 import { validateMarineLicenceIdParams } from '#src/server/common/helpers/marine-licence/validate-marine-licence-id-params.js'
+import { authenticatedPostRequest } from '#src/server/common/helpers/authenticated-requests.js'
+import { clearMarineLicenceCache } from '#src/server/common/helpers/marine-licence/session-cache/utils.js'
 
 export const UPDATE_AND_RESUBMIT_VIEW_ROUTE =
   'marine-licence/update-and-resubmit/index'
@@ -52,7 +55,26 @@ export const updateAndResubmitController = {
 
 export const updateAndResubmitSubmitController = {
   options: validateMarineLicenceIdParams,
-  async handler(_request, h) {
-    return h.response()
+  async handler(request, h) {
+    const { marineLicenceId } = request.params
+
+    try {
+      const { payload } = await authenticatedPostRequest(
+        request,
+        apiRoutes.COPY_MARINE_LICENCE,
+        { id: marineLicenceId }
+      )
+
+      await clearMarineLicenceCache(request, h)
+
+      const { id: newMarineLicenceId } = payload.value
+
+      return h.redirect(
+        `${marineLicenceRoutes.MARINE_LICENCE_TASK_LIST}/${newMarineLicenceId}`
+      )
+    } catch (error) {
+      request.logger.error(error, 'Error copying marine licence')
+      return h.redirect(routes.DASHBOARD)
+    }
   }
 }

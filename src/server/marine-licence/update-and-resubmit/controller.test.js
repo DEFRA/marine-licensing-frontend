@@ -1,16 +1,24 @@
 import { vi } from 'vitest'
 import Boom from '@hapi/boom'
-import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
+import {
+  apiRoutes,
+  marineLicenceRoutes,
+  routes
+} from '#src/server/common/constants/routes.js'
 import {
   updateAndResubmitController,
   updateAndResubmitSubmitController,
   UPDATE_AND_RESUBMIT_VIEW_ROUTE
 } from '#src/server/marine-licence/update-and-resubmit/controller.js'
 import { getMarineLicenceService } from '#src/services/marine-licence-service/index.js'
+import { authenticatedPostRequest } from '#src/server/common/helpers/authenticated-requests.js'
+import { clearMarineLicenceCache } from '#src/server/common/helpers/marine-licence/session-cache/utils.js'
 import { mockRejectedMarineLicenceApplication } from '#src/server/test-helpers/mocks/marine-licence-mocks.js'
 import { PROJECT_STATUS } from '#src/server/common/constants/projects.js'
 
 vi.mock('#src/services/marine-licence-service/index.js')
+vi.mock('#src/server/common/helpers/authenticated-requests.js')
+vi.mock('#src/server/common/helpers/marine-licence/session-cache/utils.js')
 
 describe('#updateAndResubmit', () => {
   const mockLicence = {
@@ -94,16 +102,48 @@ describe('#updateAndResubmit', () => {
   })
 
   describe('#updateAndResubmitSubmitController', () => {
-    test('should do nothing', async () => {
+    test('should copy the marine licence, clear the cache and redirect to the new task list', async () => {
       const request = {
-        params: { marineLicenceId: mockLicence.id }
+        params: { marineLicenceId: mockLicence.id },
+        logger: { error: vi.fn() }
       }
-      const h = { response: vi.fn() }
+      const h = { redirect: vi.fn() }
+
+      vi.mocked(authenticatedPostRequest).mockResolvedValue({
+        payload: { value: { id: 'new-marine-licence-id' } }
+      })
 
       await updateAndResubmitSubmitController.handler(request, h)
 
-      expect(h.response).toHaveBeenCalled()
-      expect(getMarineLicenceService).not.toHaveBeenCalled()
+      expect(authenticatedPostRequest).toHaveBeenCalledWith(
+        request,
+        apiRoutes.COPY_MARINE_LICENCE,
+        { id: mockLicence.id }
+      )
+      expect(clearMarineLicenceCache).toHaveBeenCalledWith(request, h)
+      expect(h.redirect).toHaveBeenCalledWith(
+        `${marineLicenceRoutes.MARINE_LICENCE_TASK_LIST}/new-marine-licence-id`
+      )
+    })
+
+    test('should redirect to the dashboard if the copy request fails', async () => {
+      const request = {
+        params: { marineLicenceId: mockLicence.id },
+        logger: { error: vi.fn() }
+      }
+      const h = { redirect: vi.fn() }
+      const error = new Error('Copy failed')
+
+      vi.mocked(authenticatedPostRequest).mockRejectedValue(error)
+
+      await updateAndResubmitSubmitController.handler(request, h)
+
+      expect(request.logger.error).toHaveBeenCalledWith(
+        error,
+        'Error copying marine licence'
+      )
+      expect(clearMarineLicenceCache).not.toHaveBeenCalled()
+      expect(h.redirect).toHaveBeenCalledWith(routes.DASHBOARD)
     })
   })
 })

@@ -1,5 +1,7 @@
+import { vi } from 'vitest'
 import { getByRole, getByText } from '@testing-library/dom'
 import {
+  apiRoutes,
   marineLicenceRoutes,
   routes
 } from '~/src/server/common/constants/routes.js'
@@ -17,6 +19,7 @@ import {
   makeGetRequest,
   makePostRequest
 } from '~/src/server/test-helpers/server-requests.js'
+import { authenticatedPostRequest } from '~/src/server/common/helpers/authenticated-requests.js'
 
 describe('Update and resubmit', () => {
   const getServer = setupTestServer()
@@ -78,13 +81,41 @@ describe('Update and resubmit', () => {
     expect(response.headers.location).toBe(routes.DASHBOARD)
   })
 
-  test('should submit without error', async () => {
+  test('should copy the marine licence and redirect to the new task list', async () => {
+    mockMarineLicence(mockRejectedMarineLicenceApplication)
+    vi.mocked(authenticatedPostRequest).mockResolvedValue({
+      payload: { value: { id: 'new-marine-licence-id' } }
+    })
+
     const response = await makePostRequest({
       url: `${marineLicenceRoutes.MARINE_LICENCE_UPDATE_AND_RESUBMIT}/${marineLicence.id}`,
       server: getServer()
     })
 
-    expect(response.statusCode).toBe(statusCodes.noContent)
+    expect(authenticatedPostRequest).toHaveBeenCalledWith(
+      expect.anything(),
+      apiRoutes.COPY_MARINE_LICENCE,
+      { id: marineLicence.id }
+    )
+    expect(response.statusCode).toBe(statusCodes.redirect)
+    expect(response.headers.location).toBe(
+      `${marineLicenceRoutes.MARINE_LICENCE_TASK_LIST}/new-marine-licence-id`
+    )
+  })
+
+  test('should redirect to the dashboard if copying the marine licence fails', async () => {
+    mockMarineLicence(mockRejectedMarineLicenceApplication)
+    vi.mocked(authenticatedPostRequest).mockRejectedValue(
+      new Error('Copy failed')
+    )
+
+    const response = await makePostRequest({
+      url: `${marineLicenceRoutes.MARINE_LICENCE_UPDATE_AND_RESUBMIT}/${marineLicence.id}`,
+      server: getServer()
+    })
+
+    expect(response.statusCode).toBe(statusCodes.redirect)
+    expect(response.headers.location).toBe(routes.DASHBOARD)
   })
 
   test('should return bad request for an invalid marine licence id', async () => {

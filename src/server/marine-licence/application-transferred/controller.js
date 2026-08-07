@@ -6,6 +6,7 @@ import {
 import { MCMS_LOGIN_URL } from '#src/server/common/constants/mcms.js'
 import { getMarineLicenceService } from '#src/services/marine-licence-service/index.js'
 import { PROJECT_STATUS } from '#src/server/common/constants/projects.js'
+import { validateMarineLicenceIdParams } from '#src/server/common/helpers/marine-licence/validate-marine-licence-id-params.js'
 
 export const APPLICATION_TRANSFERRED_VIEW_ROUTE =
   'marine-licence/application-transferred/index'
@@ -26,6 +27,7 @@ const applicationTransferredSettings = {
 }
 
 export const applicationTransferredController = {
+  options: validateMarineLicenceIdParams,
   async handler(request, h) {
     const { marineLicenceId } = request.params
 

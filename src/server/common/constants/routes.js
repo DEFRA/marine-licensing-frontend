@@ -62,6 +62,8 @@ export const marineLicenceRoutes = {
   MARINE_LICENCE_CONFIRMATION: '/marine-licence/confirmation',
   MARINE_LICENCE_APPLICATION_TRANSFERRED:
     '/marine-licence/application-transferred',
+  MARINE_LICENCE_APPLICATION_REJECTED: '/marine-licence/application-rejected',
+  MARINE_LICENCE_UPDATE_AND_RESUBMIT: '/marine-licence/update-and-resubmit',
   MARINE_LICENCE_PROJECT_NAME: '/marine-licence/project-name',
   MARINE_LICENCE_TASK_LIST: '/marine-licence/task-list',
   MARINE_LICENCE_DELETE: '/marine-licence/delete',
@@ -225,5 +227,6 @@ export const apiRoutes = {
     '/marine-licence/calculate-marine-plan-policies',
   MARINE_LICENCE_MARINE_PLAN_POLICY_RESPONSE:
     '/marine-licence/marine-plan-policy-response',
-  CONFIRM_SITE_DETAILS: '/marine-licence/confirm-site-details'
+  CONFIRM_SITE_DETAILS: '/marine-licence/confirm-site-details',
+  COPY_MARINE_LICENCE: '/marine-licence/copy-marine-licence'
 }

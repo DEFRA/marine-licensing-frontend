@@ -24,6 +24,10 @@ const getApplicantBackLink = (status, marineLicenceId) => {
     return `${marineLicenceRoutes.MARINE_LICENCE_APPLICATION_TRANSFERRED}/${marineLicenceId}`
   }
 
+  if (status === PROJECT_STATUS.REJECTED) {
+    return `${marineLicenceRoutes.MARINE_LICENCE_APPLICATION_REJECTED}/${marineLicenceId}`
+  }
+
   return routes.DASHBOARD
 }
 

@@ -8,6 +8,8 @@ export const getTagStyle = (status) => {
       return 'govuk-tag--grey'
     case PROJECT_STATUS.TRANSFERRED:
       return 'govuk-tag--magenta'
+    case PROJECT_STATUS.REJECTED:
+      return 'govuk-tag--orange'
     default:
       return 'govuk-tag--green'
   }

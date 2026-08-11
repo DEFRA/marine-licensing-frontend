@@ -23,6 +23,22 @@
   {% endif %}
 {% endblock %}
 
+{% set rejectedReasonsOutput %}
+
+  {% if rejectedReasons %}
+    <ul class="govuk-list govuk-list--bullet">
+    {% for reason in rejectedReasons %}
+      <li>{{reason}}</li>
+    {% endfor %}
+  </ul>
+  {% endif %}
+
+  {% if rejectedInformation %}
+    <p class="govuk-body">{{ rejectedInformation }}</p>
+  {% endif %}
+
+{% endset %}
+
 {% block content %}
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-full">
@@ -32,10 +48,14 @@
       {% endif %}
       <h1 class="govuk-heading-l" id="view-details-heading">{{ pageTitle }}</h1>
 
-      {% if isTransferred %}
+      {% if showApplicationDetailsCard %}
         {{ appMarineLicenceApplicationDetailsCard({
           statusTag: statusTag,
+          isTransferred: isTransferred,
+          isRejected: isRejected,
           applicationReference: applicationReference,
+          rejectedDate: rejectedDate,
+          rejectedReasons: rejectedReasonsOutput,
           transferredDate: transferredDate,
           submittedAt: submittedAt
         }) }}

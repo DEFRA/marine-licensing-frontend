@@ -25,20 +25,47 @@ export const expectedApplicationDetailsCard = {
       value: 'Marine licence application'
     },
     {
-      key: 'Status',
-      value: 'Transferred'
-    },
-    {
       key: 'Reference number',
       value: mockTransferredMarineLicenceApplication.applicationReference
     },
     {
       key: 'Date submitted',
       value: '26 May 2026'
+    }
+  ]
+}
+
+export const expectedTransferredApplicationDetailsCard = {
+  ...expectedApplicationDetailsCard,
+  rows: [
+    ...expectedApplicationDetailsCard.rows,
+    {
+      key: 'Status',
+      value: 'Transferred'
     },
     {
       key: 'Date of transfer',
       value: '26 Jun 2026'
+    }
+  ]
+}
+
+export const expectedRejectedApplicationDetailsCard = {
+  ...expectedApplicationDetailsCard,
+  rows: [
+    ...expectedApplicationDetailsCard.rows,
+    {
+      key: 'Status',
+      value: 'Unable to progress'
+    },
+    {
+      key: 'Date marked as unable to progress',
+      value: '26 Jul 2026'
+    },
+    {
+      key: 'Reasons marked as unable to progress',
+      value:
+        'Site location Water Framework Directive The site location entered indicated that it was within 1 nautical mile of the coast but no Water Framework Directive assessment was uploaded. Check the site location and if it meets the requirements for a WFD assessment.'
     }
   ]
 }

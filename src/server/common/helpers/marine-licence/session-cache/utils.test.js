@@ -299,7 +299,10 @@ describe('#utils', () => {
                 { activityType: 'construction' },
                 {
                   activityType: 'removal',
-                  activitySubType: 'removal-type-2'
+                  activityTypeLabel: 'Removal of any substance or object',
+                  activitySubType: 'removal-type-2',
+                  activitySubTypeLabel:
+                    'Removal as part of an ongoing or routine activity'
                 }
               ]
             }
@@ -311,7 +314,10 @@ describe('#utils', () => {
           { activityType: 'construction' },
           {
             activityType: 'removal',
-            activitySubType: 'removal-type-2'
+            activityTypeLabel: 'Removal of any substance or object',
+            activitySubType: 'removal-type-2',
+            activitySubTypeLabel:
+              'Removal as part of an ongoing or routine activity'
           }
         ]
       })
@@ -339,7 +345,11 @@ describe('#utils', () => {
           siteDetails: [
             {
               activityDetails: [
-                { activityType: 'removal', activityDescription: 'Building' },
+                {
+                  activityType: 'removal',
+                  activityTypeLabel: 'Removal of any substance or object',
+                  activityDescription: 'Building'
+                },
                 { activityType: 'deposit', activityDescription: 'Dumping' }
               ]
             }
@@ -366,11 +376,27 @@ describe('#utils', () => {
       expect(mockRequest.yar.set).toHaveBeenCalledWith(
         MARINE_LICENCE_CACHE_KEY,
         {
-          siteDetails: [{ activityDetails: [{ activityType: 'construction' }] }]
+          siteDetails: [
+            {
+              activityDetails: [
+                {
+                  activityType: 'construction',
+                  activityTypeLabel:
+                    'Construction, alteration or improvement of any works'
+                }
+              ]
+            }
+          ]
         }
       )
       expect(result).toEqual({
-        activityDetails: [{ activityType: 'construction' }]
+        activityDetails: [
+          {
+            activityType: 'construction',
+            activityTypeLabel:
+              'Construction, alteration or improvement of any works'
+          }
+        ]
       })
     })
 
@@ -389,7 +415,14 @@ describe('#utils', () => {
         }
       )
 
-      expect(result).toEqual({ activityDetails: [{ activityType: 'deposit' }] })
+      expect(result).toEqual({
+        activityDetails: [
+          {
+            activityType: 'deposit',
+            activityTypeLabel: 'Deposit of any substance or object'
+          }
+        ]
+      })
     })
   })
 

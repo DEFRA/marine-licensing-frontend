@@ -17,6 +17,7 @@ import {
   mockManualCoordinatesMarineLicence
 } from '#src/server/test-helpers/mocks/marine-licence-mocks.js'
 import { apiRoutes } from '#src/server/common/constants/routes.js'
+import { snapshotActivityDetails } from '#src/server/common/helpers/activity-details/snapshot-activity-labels.js'
 
 vi.mock('../authenticated-requests.js')
 vi.mock('./session-cache/utils.js')
@@ -41,8 +42,9 @@ describe('save-site-details', () => {
       expect(result[0]).toEqual({
         coordinatesType: 'file',
         fileUploadType: 'kml',
-        activityDetails:
-          mockMarineLicenceApplication.siteDetails[0].activityDetails,
+        activityDetails: snapshotActivityDetails(
+          mockMarineLicenceApplication.siteDetails[0].activityDetails
+        ),
         geoJSON: mockMarineLicenceApplication.siteDetails[0].geoJSON,
         featureCount: mockMarineLicenceApplication.siteDetails[0].featureCount,
         siteName: 'test site name',
@@ -369,11 +371,17 @@ describe('save-site-details', () => {
 
       await saveSiteDetailsToBackend(mockRequest, mockH, { siteIndex: 0 })
 
+      const siteDetails = mockMarineLicenceApplication.siteDetails[0]
       expect(authenticatedPatchRequest).toHaveBeenCalledWith(
         mockRequest,
         apiRoutes.UPDATE_MARINE_LICENCE_SITE,
         {
-          siteDetails: mockMarineLicenceApplication.siteDetails[0],
+          siteDetails: {
+            ...siteDetails,
+            activityDetails: snapshotActivityDetails(
+              siteDetails.activityDetails
+            )
+          },
           siteIndex: 0,
           id: mockMarineLicenceApplication.id
         }

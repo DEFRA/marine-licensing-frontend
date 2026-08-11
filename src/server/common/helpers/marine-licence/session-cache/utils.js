@@ -1,6 +1,7 @@
 import { clone } from '@hapi/hoek'
 import { getSiteDetailsBySite } from '#src/server/common/helpers/exemptions/session-cache/site-details-utils.js'
 import { getSiteDetailsBySite as getSiteByIndex } from '#src/server/common/helpers/marine-licence/session-cache/site-details-utils.js'
+import { snapshotActivityLabels } from '#src/server/common/helpers/activity-details/snapshot-activity-labels.js'
 import { SINGLE_SITE_MODE_KEY } from '#src/server/common/constants/cache.js'
 
 export const MARINE_LICENCE_CACHE_KEY = 'marineLicence'
@@ -68,10 +69,10 @@ export const updateMarineLicenceSiteActivityDetails = async (
     existingCache.siteDetails[siteIndex]?.activityDetails || []
 
   const updatedActivityDetails = [...existingActivityDetails]
-  updatedActivityDetails[activityDetailsIndex] = {
+  updatedActivityDetails[activityDetailsIndex] = snapshotActivityLabels({
     ...updatedActivityDetails[activityDetailsIndex],
     ...values
-  }
+  })
 
   return updateMarineLicenceSiteDetails(
     request,

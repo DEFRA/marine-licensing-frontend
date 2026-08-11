@@ -31,6 +31,11 @@ describe('Param validation', () => {
     { url: marineLicenceRoutes.MARINE_LICENCE_DELETE_SITE }
   ]
 
+  const pagesWithSiteAndDrawingParams = [
+    { url: marineLicenceRoutes.MARINE_LICENCE_UPLOAD_CONSTRUCTION_DRAWING },
+    { url: marineLicenceRoutes.MARINE_LICENCE_DELETE_CONSTRUCTION_DRAWING }
+  ]
+
   const expectsTaskListRedirect = async (requestUrl) => {
     const response = await makeGetRequest({
       server: getServer(),
@@ -69,6 +74,24 @@ describe('Param validation', () => {
     })
   }
 
+  const drawingScenarios = (url) => {
+    test('redirects when drawing param is missing', async () => {
+      await expectsTaskListRedirect(`${url}?site=1`)
+    })
+    test('redirects when drawing param does not exist for the site', async () => {
+      await expectsTaskListRedirect(`${url}?site=1&drawing=999`)
+    })
+  }
+
+  const siteWithDrawingScenarios = (url) => {
+    test('redirects when site param is missing', async () => {
+      await expectsTaskListRedirect(`${url}?drawing=1`)
+    })
+    test('redirects when site param is not valid', async () => {
+      await expectsTaskListRedirect(`${url}?site=999&drawing=1`)
+    })
+  }
+
   describe.each(pagesWithSiteAndActivityParams)(
     'site and activity params - $url',
     ({ url }) => {
@@ -79,5 +102,13 @@ describe('Param validation', () => {
 
   describe.each(pagesWithSiteParamOnly)('site param only - $url', ({ url }) =>
     siteOnlyScenarios(url)
+  )
+
+  describe.each(pagesWithSiteAndDrawingParams)(
+    'site and drawing params - $url',
+    ({ url }) => {
+      siteWithDrawingScenarios(url)
+      drawingScenarios(url)
+    }
   )
 })

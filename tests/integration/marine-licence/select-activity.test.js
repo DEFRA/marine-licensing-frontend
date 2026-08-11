@@ -12,6 +12,7 @@ import {
   expectFieldsetError,
   expectInputValue
 } from '~/tests/integration/shared/expect-utils.js'
+import { updateMarineLicenceSiteDetails } from '#src/server/common/helpers/marine-licence/session-cache/utils.js'
 
 describe('Type of activity (marine licence)', () => {
   const getServer = setupTestServer()
@@ -128,6 +129,53 @@ describe('Type of activity (marine licence)', () => {
     expect(response.statusCode).toBe(statusCodes.redirect)
     expect(response.headers.location).toBe(
       `${marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS}#activity-details-site-1-activity-1`
+    )
+  })
+
+  test('seeds the first construction drawing on submission when the activity subtype requires one', async () => {
+    mockMarineLicence(mockMarineLicenceApplication)
+
+    const response = await makePostRequest({
+      url: `/marine-licence/activity-details/${variantUsedForTesting}?site=1&activity=1`,
+      server: getServer(),
+      formData: {
+        activities: ['CON1'],
+        otherActivity: 'Test activity'
+      }
+    })
+
+    expect(response.statusCode).toBe(statusCodes.redirect)
+    expect(updateMarineLicenceSiteDetails).toHaveBeenCalledWith(
+      expect.anything(),
+      expect.anything(),
+      0,
+      'constructionDrawings',
+      [{}]
+    )
+  })
+
+  test('does not seed a construction drawing when the activity subtype does not require one', async () => {
+    const maintenanceApplication = structuredClone(mockMarineLicenceApplication)
+    maintenanceApplication.siteDetails[0].activityDetails[0].activitySubType =
+      'construction-type-2'
+    mockMarineLicence(maintenanceApplication)
+
+    const response = await makePostRequest({
+      url: '/marine-licence/activity-details/what-are-you-maintaining?site=1&activity=1',
+      server: getServer(),
+      formData: {
+        activities: ['CON1'],
+        otherActivity: 'Test activity'
+      }
+    })
+
+    expect(response.statusCode).toBe(statusCodes.redirect)
+    expect(updateMarineLicenceSiteDetails).not.toHaveBeenCalledWith(
+      expect.anything(),
+      expect.anything(),
+      0,
+      'constructionDrawings',
+      expect.anything()
     )
   })
 

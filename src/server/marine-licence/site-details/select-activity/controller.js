@@ -12,6 +12,8 @@ import { selectActivitySchema } from '#src/server/marine-licence/site-details/se
 import { createFailAction } from '#src/server/common/helpers/createFailAction.js'
 import { selectActivityErrorMessages } from '#src/server/common/validation/select-activity/constants.js'
 import { validateSiteAndActivityParams } from '#src/server/common/helpers/marine-licence/session-cache/site-utils.js'
+import { seedFirstConstructionDrawingIfNeeded } from '#src/server/common/helpers/marine-licence/session-cache/construction-drawing-utils.js'
+import { SUBTYPES_REQUIRING_CONSTRUCTION_DRAWING } from '#src/server/marine-licence/site-details/type-of-activity/constants.js'
 
 export const SELECT_ACTIVITY_VIEW_ROUTE =
   'marine-licence/site-details/select-activity/index'
@@ -120,6 +122,13 @@ export const selectActivitySubmitController = {
       activityDetailsNumber
     } = getSiteDataFromParam(request.query)
 
+    const marineLicence = getMarineLicenceCache(request)
+    const activityDetails = getActivityDetailsByIndex(
+      marineLicence,
+      siteIndex,
+      activityDetailsIndex
+    )
+
     const userHasSelectedOther = [payload.activities].flat().includes('other')
 
     await updateMarineLicenceSiteActivityDetails(
@@ -134,6 +143,19 @@ export const selectActivitySubmitController = {
         }
       }
     )
+
+    if (
+      SUBTYPES_REQUIRING_CONSTRUCTION_DRAWING.includes(
+        activityDetails.activitySubType
+      )
+    ) {
+      await seedFirstConstructionDrawingIfNeeded(
+        request,
+        h,
+        marineLicence,
+        siteIndex
+      )
+    }
 
     await saveSiteDetailsToBackend(request, h, { siteIndex })
 

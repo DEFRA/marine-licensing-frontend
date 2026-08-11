@@ -647,5 +647,99 @@ describe('#reviewSiteDetails', () => {
         `${marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS}#activity-details-site-1-activity-2`
       )
     })
+
+    test('adds two drawing slots the first time, so the already-visible first card is materialised too', async () => {
+      getMarineLicenceCacheSpy.mockReturnValue({
+        id: 'test-id',
+        siteDetails: [{ activityDetails: [] }]
+      })
+      vi.mocked(
+        authenticatedRequests.authenticatedPatchRequest
+      ).mockResolvedValue({})
+
+      const h = createMockHandler('redirect')
+      const request = createMockRequest({
+        payload: {
+          addConstructionDrawing: 'addConstructionDrawing',
+          siteNumber: '1'
+        }
+      })
+
+      await reviewSiteDetailsSubmitController.handler(request, h)
+
+      expect(
+        vi.mocked(authenticatedRequests.authenticatedPatchRequest)
+      ).toHaveBeenCalledTimes(2)
+      expect(
+        vi.mocked(authenticatedRequests.authenticatedPatchRequest)
+      ).toHaveBeenCalledWith(request, apiRoutes.ADD_CONSTRUCTION_DRAWING, {
+        siteIndex: 0,
+        id: 'test-id'
+      })
+      expect(h.redirect).toHaveBeenCalledWith(
+        `${marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS}#construction-drawing-site-1-2`
+      )
+    })
+
+    test('adds a single drawing slot when one already exists', async () => {
+      getMarineLicenceCacheSpy.mockReturnValue({
+        id: 'test-id',
+        siteDetails: [
+          {
+            activityDetails: [],
+            constructionDrawings: [{ filename: 'existing.pdf' }]
+          }
+        ]
+      })
+      vi.mocked(
+        authenticatedRequests.authenticatedPatchRequest
+      ).mockResolvedValue({})
+
+      const h = createMockHandler('redirect')
+      const request = createMockRequest({
+        payload: {
+          addConstructionDrawing: 'addConstructionDrawing',
+          siteNumber: '1'
+        }
+      })
+
+      await reviewSiteDetailsSubmitController.handler(request, h)
+
+      expect(
+        vi.mocked(authenticatedRequests.authenticatedPatchRequest)
+      ).toHaveBeenCalledTimes(1)
+      expect(h.redirect).toHaveBeenCalledWith(
+        `${marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS}#construction-drawing-site-1-2`
+      )
+    })
+
+    test('treats a non-array constructionDrawings value as empty rather than producing NaN', async () => {
+      getMarineLicenceCacheSpy.mockReturnValue({
+        id: 'test-id',
+        siteDetails: [
+          {
+            activityDetails: [],
+            constructionDrawings: {}
+          }
+        ]
+      })
+      vi.mocked(
+        authenticatedRequests.authenticatedPatchRequest
+      ).mockResolvedValue({})
+
+      const h = createMockHandler('redirect')
+      const request = createMockRequest({
+        payload: {
+          addConstructionDrawing: 'addConstructionDrawing',
+          siteNumber: '1'
+        }
+      })
+
+      await reviewSiteDetailsSubmitController.handler(request, h)
+
+      expect(h.redirect).toHaveBeenCalledWith(
+        `${marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS}#construction-drawing-site-1-2`
+      )
+    })
   })
 })

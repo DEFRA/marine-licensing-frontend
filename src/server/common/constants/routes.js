@@ -103,6 +103,10 @@ export const marineLicenceRoutes = {
   MARINE_LICENCE_DELETE_ACTIVITY: '/marine-licence/delete-activity',
   MARINE_LICENCE_UPLOAD_CONSTRUCTION_DRAWING:
     '/marine-licence/upload-construction-drawing',
+  MARINE_LICENCE_UPLOAD_CONSTRUCTION_DRAWING_WAIT:
+    '/marine-licence/upload-construction-drawing-wait',
+  MARINE_LICENCE_DELETE_CONSTRUCTION_DRAWING:
+    '/marine-licence/delete-construction-drawing',
   MARINE_LICENCE_CONFIRM_CHANGE_ACTIVITY_TYPE:
     '/marine-licence/confirm-change-activity-type',
   MARINE_LICENCE_DELETE_SITE: '/marine-licence/delete-site',
@@ -209,6 +213,10 @@ export const apiRoutes = {
   UPDATE_MARINE_LICENCE_SITE_DETAILS: '/marine-licence/site-details',
   MARINE_LICENCE_PROJECT_BACKGROUND: '/marine-licence/project-background',
   DELETE_ACTIVITY_FROM_SITE: '/marine-licence/delete-activity-details',
+  ADD_CONSTRUCTION_DRAWING: '/marine-licence/add-construction-drawing',
+  UPDATE_CONSTRUCTION_DRAWING: '/marine-licence/update-construction-drawing',
+  DELETE_CONSTRUCTION_DRAWING: '/marine-licence/delete-construction-drawing',
+  DELETE_CONSTRUCTION_DRAWINGS: '/marine-licence/delete-construction-drawings',
   GENERATE_COORDINATES_CSV:
     '/marine-licence/{marineLicenceId}/generate-coordinates-csv',
   UPDATE_FEE_ESTIMATE: '/marine-licence/fee-estimate',

@@ -53,7 +53,8 @@ describe('save-site-details', () => {
           s3Bucket: 'test-bucket',
           s3Key: 'test-key',
           checksumSha256: 'test-checksum'
-        }
+        },
+        constructionDrawings: undefined
       })
 
       expect(mockRequest.logger.info).toHaveBeenCalledWith(
@@ -137,7 +138,8 @@ describe('save-site-details', () => {
           s3Bucket: 'test-bucket',
           s3Key: 'test-key',
           checksumSha256: 'test-checksum'
-        }
+        },
+        constructionDrawings: undefined
       })
 
       expect(result[1]).toEqual({
@@ -153,7 +155,8 @@ describe('save-site-details', () => {
           s3Bucket: 'test-bucket',
           s3Key: 'test-key-2',
           checksumSha256: 'test-checksum-2'
-        }
+        },
+        constructionDrawings: undefined
       })
     })
 
@@ -204,7 +207,8 @@ describe('save-site-details', () => {
         coordinates: { latitude: '51.489676', longitude: '-0.231530' },
         circleWidth: '100',
         siteName: 'Test site',
-        activityDetails: { description: 'Test activity' }
+        activityDetails: { description: 'Test activity' },
+        constructionDrawings: undefined
       })
       expect(result[0]).not.toHaveProperty('someUiOnlyField')
     })
@@ -236,8 +240,47 @@ describe('save-site-details', () => {
         coordinateSystem: 'wgs84',
         coordinates: siteDetails[0].coordinates,
         siteName: 'Test polygon site',
-        activityDetails: null
+        activityDetails: null,
+        constructionDrawings: undefined
       })
+    })
+
+    test('preserves constructionDrawings for file-upload and manual-coordinate sites', () => {
+      const constructionDrawings = [
+        {
+          filename: 'drawing.pdf',
+          s3Location: {
+            s3Bucket: 'test-bucket',
+            s3Key: 'test-key',
+            checksumSha256: 'test-checksum'
+          }
+        }
+      ]
+
+      const fileUploadSite = {
+        ...mockMarineLicenceApplication.siteDetails[0],
+        constructionDrawings
+      }
+      const fileUploadResult = prepareFileUploadDataForSave(
+        [fileUploadSite],
+        mockRequest
+      )
+      expect(fileUploadResult[0].constructionDrawings).toBe(
+        constructionDrawings
+      )
+
+      const manualSite = {
+        coordinatesType: 'coordinates',
+        coordinatesEntry: 'single',
+        coordinateSystem: 'wgs84',
+        coordinates: { latitude: '51.489676', longitude: '-0.231530' },
+        circleWidth: '100',
+        siteName: 'Test site',
+        activityDetails: { description: 'Test activity' },
+        constructionDrawings
+      }
+      const manualResult = prepareManualCoordinateDataForSave([manualSite])
+      expect(manualResult[0].constructionDrawings).toBe(constructionDrawings)
     })
   })
 

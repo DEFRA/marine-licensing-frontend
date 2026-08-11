@@ -16,10 +16,13 @@ import { getAuthProvider } from '#src/server/common/helpers/authenticated-reques
 import { getUserSession } from '#src/server/common/plugins/auth/utils.js'
 
 vi.mock('~/src/services/exemption-service/index.js')
-vi.mock('~/src/server/common/plugins/auth/utils.js', async (importOriginal) => ({
-  ...(await importOriginal()),
-  getUserSession: vi.fn().mockResolvedValue(null)
-}))
+vi.mock(
+  '~/src/server/common/plugins/auth/utils.js',
+  async (importOriginal) => ({
+    ...(await importOriginal()),
+    getUserSession: vi.fn().mockResolvedValue(null)
+  })
+)
 vi.mock('~/src/server/common/helpers/authenticated-requests.js', () => ({
   getAuthProvider: vi.fn().mockReturnValue('defra-id')
 }))

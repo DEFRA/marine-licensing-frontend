@@ -13,16 +13,19 @@ export const buildApplicationDetailsCardData = (marineLicence) => {
     rejectedDate,
     rejectedReasons,
     rejectedInformation,
-    transferredDate
+    transferredDate,
+    withdrawnAt
   } = marineLicence
 
   const isTransferred = status === PROJECT_STATUS.TRANSFERRED
   const isRejected = status === PROJECT_STATUS.REJECTED
+  const isWithdrawn = status === PROJECT_STATUS.WITHDRAWN
 
   return {
     applicationReference,
     submittedAt: formatDate(submittedAt, APPLICATION_DATE_FORMAT),
     transferredDate: formatDate(transferredDate, APPLICATION_DATE_FORMAT),
+    withdrawnAt: formatDate(withdrawnAt, APPLICATION_DATE_FORMAT),
     rejectedDate: formatDate(rejectedDate, APPLICATION_DATE_FORMAT),
     rejectedReasons: rejectedReasons
       ? rejectedReasons.split(',')
@@ -30,7 +33,8 @@ export const buildApplicationDetailsCardData = (marineLicence) => {
     rejectedInformation,
     isTransferred,
     isRejected,
-    showApplicationDetailsCard: isTransferred || isRejected,
+    isWithdrawn,
+    showApplicationDetailsCard: isTransferred || isRejected || isWithdrawn,
     status,
     statusTag: `<strong class="govuk-tag ${getTagStyle(status)}">${getStatusLabelText(status)}</strong>`
   }

@@ -363,6 +363,64 @@ describe('getActionButtons', () => {
     )
   })
 
+  it('returns View details and Withdraw links for a submitted marine licence owned by the user', () => {
+    const submittedMarineLicence = {
+      id: 'ml123',
+      projectName: 'Groyne construction, Bournemouth seafront, Dorset',
+      projectType: 'MARINE_LICENCE',
+      status: 'Submitted',
+      isOwnProject: true
+    }
+    const result = getActionButtons(submittedMarineLicence)
+    expect(result).toBe(
+      `<a href="${marineLicenceRoutes.MARINE_LICENCE_VIEW_DETAILS}/ml123" class="govuk-link govuk-!-margin-right-4 govuk-link--no-visited-state" aria-label="View details of Groyne construction, Bournemouth seafront, Dorset">View details</a><a href="${marineLicenceRoutes.MARINE_LICENCE_WITHDRAW}/ml123" class="govuk-link govuk-link--no-visited-state" aria-label="Withdraw Groyne construction, Bournemouth seafront, Dorset">Withdraw</a>`
+    )
+  })
+
+  it('does not return a Withdraw link for a submitted marine licence owned by another user', () => {
+    const submittedMarineLicence = {
+      id: 'ml123',
+      projectName: 'Marine Licence Project',
+      projectType: 'MARINE_LICENCE',
+      status: 'Submitted',
+      isOwnProject: false
+    }
+    const result = getActionButtons(submittedMarineLicence)
+    expect(result).toBe(
+      `<a href="${marineLicenceRoutes.MARINE_LICENCE_VIEW_DETAILS}/ml123" class="govuk-link govuk-link--no-visited-state" aria-label="View details of Marine Licence Project">View details</a>`
+    )
+  })
+
+  it.each(['Transferred', 'Withdrawn', 'Active'])(
+    'does not return a Withdraw link for a marine licence with status %s',
+    (status) => {
+      const result = getActionButtons({
+        id: 'ml123',
+        projectName: 'Marine Licence Project',
+        projectType: 'MARINE_LICENCE',
+        status,
+        isOwnProject: true
+      })
+
+      expect(result).not.toContain('Withdraw</a>')
+      expect(result).not.toContain(marineLicenceRoutes.MARINE_LICENCE_WITHDRAW)
+    }
+  )
+
+  it('returns only a View details link for a withdrawn marine licence', () => {
+    const withdrawn = {
+      id: 'ml123',
+      projectName: 'Marine Licence Project',
+      projectType: 'MARINE_LICENCE',
+      status: 'Withdrawn',
+      isOwnProject: true
+    }
+    const result = getActionButtons(withdrawn)
+    expect(result).toBe(
+      `<a href="${marineLicenceRoutes.MARINE_LICENCE_VIEW_DETAILS}/ml123" class="govuk-link govuk-link--no-visited-state" aria-label="View details of Marine Licence Project">View details</a>`
+    )
+  })
+
   it('returns transferred page link for transferred marine licence', () => {
     const transferred = {
       id: 'ml123',

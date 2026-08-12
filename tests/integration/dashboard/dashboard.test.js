@@ -126,6 +126,65 @@ describe('Dashboard', () => {
       'href',
       `/marine-licence/view-details/${mockMarineLicenceApplication.id}`
     )
+    expect(
+      getByRole(actionsCell, 'link', { name: 'Withdraw Test Project' })
+    ).toHaveAttribute(
+      'href',
+      `/marine-licence/withdraw/${mockMarineLicenceApplication.id}`
+    )
+  })
+
+  it('should not offer Withdraw for a submitted marine licence owned by another user', async () => {
+    mockMarineLicence([{ ...marineLicences[0], isOwnProject: false }])
+    const doc = await loadDashboardPage()
+
+    const cells = getProjectsTableRow({
+      document: doc,
+      name: mockMarineLicenceApplication.projectName
+    })
+    const actionsCell = cells.pop()
+
+    expect(
+      getByRole(actionsCell, 'link', { name: 'View details of Test Project' })
+    ).toBeInTheDocument()
+    expect(
+      queryByRole(actionsCell, 'link', { name: 'Withdraw Test Project' })
+    ).not.toBeInTheDocument()
+  })
+
+  it('should render a withdrawn marine licence with View details only', async () => {
+    mockMarineLicence([
+      {
+        ...marineLicences[0],
+        status: 'Withdrawn',
+        applicationReference: 'MLA/2025/10018'
+      }
+    ])
+    const doc = await loadDashboardPage()
+
+    const cells = getProjectsTableRow({
+      document: doc,
+      name: mockMarineLicenceApplication.projectName
+    })
+    const actionsCell = cells.pop()
+    const cellContents = cells.map((cell) => cell.textContent.trim())
+    expect(cellContents).toEqual([
+      'Test Project',
+      'Marine licence application',
+      'MLA/2025/10018',
+      'Withdrawn',
+      '23 Oct 2025'
+    ])
+
+    expect(
+      getByRole(actionsCell, 'link', { name: 'View details of Test Project' })
+    ).toHaveAttribute(
+      'href',
+      `/marine-licence/view-details/${mockMarineLicenceApplication.id}`
+    )
+    expect(
+      queryByRole(actionsCell, 'link', { name: 'Withdraw Test Project' })
+    ).not.toBeInTheDocument()
   })
 
   it('should render a message if there are no projects', async () => {

@@ -1,0 +1,58 @@
+{% extends 'layouts/page.njk' %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/inset-text/macro.njk" import govukInsetText %}
+{% from "govuk/components/back-link/macro.njk" import govukBackLink %}
+{% from "cancel-button/macro.njk" import appCancelButton %}
+
+{% block beforeContent %}
+  {{ super() }}
+  <nav>
+    {{ govukBackLink({
+      text: "Back",
+      href: backLink
+    }) }}
+  </nav>
+{% endblock %}
+
+{% block content %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+
+      <h1 class="govuk-heading-l">{{ heading }}</h1>
+
+      {{ govukInsetText({
+        text: marineLicenceType + ": " + projectName
+      }) }}
+
+      <p class="govuk-body">
+        If you withdraw this marine licence application, we will not progress it any further. You must not carry out the proposed works unless a valid marine licence is in place.
+      </p>
+
+      <p class="govuk-body govuk-!-margin-bottom-6">
+        We will charge you for the time spent processing your application up to the date of withdrawal, in accordance with our <a href="{{ termsAndConditionsLink }}" class="govuk-link" target="_blank" rel="noreferrer noopener">terms and conditions (opens in new tab)</a>.
+      </p>
+
+      <form method="POST">
+        <input type="hidden" name="csrfToken" value="{{csrfToken}}">
+        <input type="hidden" name="marineLicenceId" value="{{ marineLicenceId }}">
+
+        <div class="govuk-button-group">
+          {{ govukButton({
+            text: "Yes, withdraw application",
+            classes: "govuk-button--warning",
+            type: "submit",
+            preventDoubleClick: true,
+            attributes: {
+              "data-module": "govuk-button"
+            }
+          }) }}
+
+          {{ appCancelButton({
+            cancelLink: cancelLink
+          }) }}
+        </div>
+      </form>
+
+    </div>
+  </div>
+{% endblock %}

@@ -45,6 +45,29 @@ describe('Marine Licence Application Details Card Component', () => {
 
     expect(htmlContent).toContain('Date of transfer')
     expect(htmlContent).toContain('02 01 2026')
+
+    expect(htmlContent).not.toContain('Date withdrawn')
+  })
+
+  test('Should render the date withdrawn row and omit the transfer row for a withdrawn application', () => {
+    const $withdrawn = renderComponent(
+      'marine-licence/application-details-card',
+      {
+        statusTag:
+          '<strong class="govuk-tag govuk-tag--grey">Withdrawn</strong>',
+        applicationReference: 'MLA/2025/10018',
+        submittedAt: '15 Dec 2025',
+        withdrawnAt: '19 Jan 2026'
+      }
+    )
+
+    const htmlContent = $withdrawn.html()
+
+    expect(htmlContent).toContain('Date withdrawn')
+    expect(htmlContent).toContain('19 Jan 2026')
+    expect(htmlContent).toContain('Withdrawn')
+
+    expect(htmlContent).not.toContain('Date of transfer')
   })
 
   test('Should have correct card content for rejected application', () => {

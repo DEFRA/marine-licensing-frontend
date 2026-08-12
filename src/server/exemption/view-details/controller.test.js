@@ -13,16 +13,8 @@ import {
 
 import { makeGetRequest } from '#src/server/test-helpers/server-requests.js'
 import { getAuthProvider } from '#src/server/common/helpers/authenticated-requests.js'
-import { getUserSession } from '#src/server/common/plugins/auth/utils.js'
 
 vi.mock('~/src/services/exemption-service/index.js')
-vi.mock(
-  '~/src/server/common/plugins/auth/utils.js',
-  async (importOriginal) => ({
-    ...(await importOriginal()),
-    getUserSession: vi.fn().mockResolvedValue(null)
-  })
-)
 vi.mock('~/src/server/common/helpers/authenticated-requests.js', () => ({
   getAuthProvider: vi.fn().mockReturnValue('defra-id')
 }))
@@ -425,9 +417,9 @@ describe('view details controller', () => {
         expect(mockH.view.mock.calls[0][1].backLink).toBeNull()
       })
 
-      test('should pass whoExemptionIsFor as undefined if organisation is not set in the exemption', async () => {
+      test('should pass whoExemptionIsFor as undefined if the API does not return it', async () => {
         const submittedExemption = createSubmittedExemption({
-          organisation: undefined
+          whoExemptionIsFor: undefined
         })
         const mockExemptionServiceInstance = {
           getExemptionById: vi.fn().mockResolvedValue(submittedExemption)
@@ -460,7 +452,6 @@ describe('view details controller', () => {
             path: '/exemption/view-details/:exemptionId',
             params: { exemptionId: validExemptionId },
             logger: { error: vi.fn() },
-            state: { userSession: { sessionId: 'session-id' } },
             auth: { credentials: { strategy: 'defra-id' } }
           }
           const mockH = { view: vi.fn() }
@@ -469,32 +460,18 @@ describe('view details controller', () => {
           return mockH.view.mock.calls[0][1]
         }
 
-        test('should use the organisation name when the exemption has one', async () => {
+        test('should pass through the value returned by the API', async () => {
           const viewData = await handleApplicantRequest(
-            createSubmittedExemption({ organisation: { name: 'Dredging Co' } })
+            createSubmittedExemption({ whoExemptionIsFor: 'Dave Barnett' })
           )
 
-          expect(viewData.whoExemptionIsFor).toBe('Dredging Co')
-          expect(getUserSession).not.toHaveBeenCalled()
-        })
-
-        test('should fall back to the signed in user name when there is no organisation', async () => {
-          vi.mocked(getUserSession).mockResolvedValue({
-            displayName: 'Dave Barnett'
-          })
-
-          const viewData = await handleApplicantRequest(
-            createSubmittedExemption({ organisation: undefined })
-          )
-
+          expect(viewData.isApplicantView).toBe(true)
           expect(viewData.whoExemptionIsFor).toBe('Dave Barnett')
         })
 
-        test('should pass whoExemptionIsFor as undefined when there is no organisation or user session', async () => {
-          vi.mocked(getUserSession).mockResolvedValue(null)
-
+        test('should pass whoExemptionIsFor as undefined when the API does not return it', async () => {
           const viewData = await handleApplicantRequest(
-            createSubmittedExemption({ organisation: undefined })
+            createSubmittedExemption({ whoExemptionIsFor: undefined })
           )
 
           expect(viewData.whoExemptionIsFor).toBeUndefined()

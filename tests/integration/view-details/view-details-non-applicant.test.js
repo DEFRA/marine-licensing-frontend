@@ -42,7 +42,7 @@ describe('View Details (non-applicant ie internal user, or public)', () => {
   }
 
   const { exemption, expectedPageContent } = testScenarios[0]
-  const savedExemption = { ...exemption, whoExemptionIsFor: 'Dredging Co' }
+  const savedExemption = { ...exemption }
   const expectedContent = {
     ...expectedPageContent,
     summaryCards: [

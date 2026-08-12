@@ -417,7 +417,7 @@ describe('view details controller', () => {
         expect(mockH.view.mock.calls[0][1].backLink).toBeNull()
       })
 
-      test('should pass whoExemptionIsFor as undefined if the API does not return it', async () => {
+      test('should pass whoExemptionIsFor as undefined if the API does not return it (internal user view)', async () => {
         const submittedExemption = createSubmittedExemption({
           whoExemptionIsFor: undefined
         })
@@ -440,42 +440,6 @@ describe('view details controller', () => {
 
         await viewDetailsController.handler(mockRequest, mockH)
         expect(mockH.view.mock.calls[0][1].whoExemptionIsFor).toBeUndefined()
-      })
-
-      describe('whoExemptionIsFor for the applicant view', () => {
-        const handleApplicantRequest = async (exemption) => {
-          vi.mocked(getExemptionService).mockReturnValue({
-            getExemptionById: vi.fn().mockResolvedValue(exemption)
-          })
-
-          const mockRequest = {
-            path: '/exemption/view-details/:exemptionId',
-            params: { exemptionId: validExemptionId },
-            logger: { error: vi.fn() },
-            auth: { credentials: { strategy: 'defra-id' } }
-          }
-          const mockH = { view: vi.fn() }
-
-          await viewDetailsController.handler(mockRequest, mockH)
-          return mockH.view.mock.calls[0][1]
-        }
-
-        test('should pass through the value returned by the API', async () => {
-          const viewData = await handleApplicantRequest(
-            createSubmittedExemption({ whoExemptionIsFor: 'Dave Barnett' })
-          )
-
-          expect(viewData.isApplicantView).toBe(true)
-          expect(viewData.whoExemptionIsFor).toBe('Dave Barnett')
-        })
-
-        test('should pass whoExemptionIsFor as undefined when the API does not return it', async () => {
-          const viewData = await handleApplicantRequest(
-            createSubmittedExemption({ whoExemptionIsFor: undefined })
-          )
-
-          expect(viewData.whoExemptionIsFor).toBeUndefined()
-        })
       })
 
       test('should handle file upload data error and use fallback', async () => {

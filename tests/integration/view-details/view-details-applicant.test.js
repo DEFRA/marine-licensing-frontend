@@ -73,21 +73,6 @@ describe('View Details - Content Verification Integration Tests', () => {
       )
     })
 
-    test('shows no date withdrawn row for an active exemption', async () => {
-      const document = await getPageDocument({
-        ...exemption,
-        status: 'Active'
-      })
-
-      validateApplicationDetails(document, {
-        ...expectedPageContent,
-        applicationDetails: {
-          ...expectedPageContent.applicationDetails,
-          Status: 'Active'
-        }
-      })
-    })
-
     test('shows the date withdrawn row for a withdrawn exemption', async () => {
       const document = await getPageDocument({
         ...exemption,

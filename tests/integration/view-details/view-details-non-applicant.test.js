@@ -42,10 +42,11 @@ describe('View Details (non-applicant ie internal user, or public)', () => {
   }
 
   const { exemption, expectedPageContent } = testScenarios[0]
-  const savedExemption = { ...exemption }
+  const savedExemption = exemption
   const expectedContent = {
     ...expectedPageContent,
     summaryCards: [
+      'Application details',
       'Project summary',
       'Providing the site location',
       'Site 1',
@@ -64,9 +65,8 @@ describe('View Details (non-applicant ie internal user, or public)', () => {
       ]
     },
     applicationDetails: {
-      'Application type': 'Exempt activity notification',
+      ...expectedPageContent.applicationDetails,
       'Reference number': savedExemption.applicationReference,
-      'Who the exemption is for': 'Dredging Co',
       'Date submitted': format(savedExemption.submittedAt, 'd MMMM yyyy')
     },
     publicRegister: {
@@ -92,17 +92,26 @@ describe('View Details (non-applicant ie internal user, or public)', () => {
   })
 
   test('public user', async () => {
+    const publicExemption = { ...savedExemption, status: 'Active' }
+    const publicExpectedContent = {
+      ...expectedContent,
+      applicationDetails: {
+        ...expectedContent.applicationDetails,
+        Status: 'Active'
+      }
+    }
+
     const document = await getPageDocument(
-      savedExemption,
-      `${routes.VIEW_DETAILS_PUBLIC}/${savedExemption.id}`
+      publicExemption,
+      `${routes.VIEW_DETAILS_PUBLIC}/${publicExemption.id}`
     )
 
-    validatePageStructure(document, expectedContent)
-    validateAllSummaryCardsExist(document, expectedContent)
-    validateProjectDetails(document, expectedContent)
-    validateApplicationDetails(document, expectedContent)
-    validateSiteDetails(document, expectedContent)
-    validatePublicRegister(document, expectedContent)
+    validatePageStructure(document, publicExpectedContent)
+    validateAllSummaryCardsExist(document, publicExpectedContent)
+    validateProjectDetails(document, publicExpectedContent)
+    validateApplicationDetails(document, publicExpectedContent)
+    validateSiteDetails(document, publicExpectedContent)
+    validatePublicRegister(document, publicExpectedContent)
     validateReadOnlyBehavior(document)
   })
 })

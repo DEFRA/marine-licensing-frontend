@@ -7,7 +7,6 @@ const baseSubmittedExemption = {
   applicationReference: 'EXE/2025/00003',
   submittedAt: '2025-01-01T10:00:00.000Z',
   projectName: 'Test Marine Activity Project',
-  organisation: { name: 'Dredging Co' },
   whoExemptionIsFor: 'Dredging Co',
   publicRegister: {
     consent: 'no',

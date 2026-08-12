@@ -7,8 +7,7 @@ describe('Application Details Card Component', () => {
     const card = renderComponentJSDOM('application-details-card', {
       applicationReference: 'EXE/2025/10121',
       dateSubmitted: '2025-09-18T08:56:34.000Z',
-      whoExemptionIsFor: 'Test Organisation',
-      isReadOnly: true
+      whoExemptionIsFor: 'Test Organisation'
     })
     expect(within(card).getByRole('heading', { level: 2 })).toHaveTextContent(
       'Application details'
@@ -30,8 +29,7 @@ describe('Application Details Card Component', () => {
       whoExemptionIsFor: 'Test Organisation',
       status: 'Withdrawn',
       statusTagClass: 'govuk-tag--grey',
-      withdrawnAt: '2025-10-02T08:56:34.000Z',
-      isReadOnly: true
+      withdrawnAt: '2025-10-02T08:56:34.000Z'
     })
 
     validateApplicationDetails(card, {
@@ -49,8 +47,7 @@ describe('Application Details Card Component', () => {
       dateSubmitted: '2025-09-18T08:56:34.000Z',
       whoExemptionIsFor: 'Test Organisation',
       status: 'Active',
-      statusTagClass: 'govuk-tag--green',
-      isReadOnly: true
+      statusTagClass: 'govuk-tag--green'
     })
 
     validateApplicationDetails(card, {
@@ -62,8 +59,7 @@ describe('Application Details Card Component', () => {
   test('should not display who the exemption is for if it is not provided', () => {
     const card = renderComponentJSDOM('application-details-card', {
       applicationReference: 'EXE/2025/10121',
-      dateSubmitted: '2025-09-18T08:56:34.000Z',
-      isReadOnly: true
+      dateSubmitted: '2025-09-18T08:56:34.000Z'
     })
     expect(
       within(card).queryByText('Who the exemption is for')

@@ -61,6 +61,32 @@ describe('#buildApplicationDetailsCardData', () => {
     expect(result.isTransferred).toBe(false)
   })
 
+  test('returns the withdrawal fields when the application is withdrawn', () => {
+    const result = buildApplicationDetailsCardData({
+      applicationReference: 'MLA/2025/10018',
+      status: PROJECT_STATUS.WITHDRAWN,
+      submittedAt: '2025-12-15',
+      withdrawnAt: '2026-01-19'
+    })
+
+    expect(result.isWithdrawn).toBe(true)
+    expect(result.isTransferred).toBe(false)
+    expect(result.submittedAt).toBe('15 Dec 2025')
+    expect(result.withdrawnAt).toBe('19 Jan 2026')
+    expect(result.transferredDate).toBe('')
+    expect(result.statusTag).toContain('govuk-tag--grey')
+    expect(result.statusTag).toContain(PROJECT_STATUS.WITHDRAWN)
+  })
+
+  test('sets isWithdrawn to false when status is not withdrawn', () => {
+    const result = buildApplicationDetailsCardData({
+      status: PROJECT_STATUS.SUBMITTED
+    })
+
+    expect(result.isWithdrawn).toBe(false)
+    expect(result.withdrawnAt).toBe('')
+  })
+
   test('escapes html in the status', () => {
     const marineLicence = { status: '<script>alert(1)</script>' }
 

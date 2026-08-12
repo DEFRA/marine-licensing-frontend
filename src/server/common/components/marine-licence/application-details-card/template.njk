@@ -1,61 +1,5 @@
 {% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
 
-{% set rows = [] %}
-
-{% set rows = (rows.push({
-  key: {
-    text: "Application type"
-  },
-  value: {
-    text: 'Marine licence application'
-  }
-},{
-  key: {
-    text: "Status"
-  },
-  value: {
-    html: params.statusTag
-  }
-},{
-  key: {
-    text: "Reference number"
-  },
-  value: {
-    text: params.applicationReference
-  }
-}, {
-  key: {
-    text: "Date submitted"
-  },
-  value: {
-    text: params.submittedAt
-  }
-},{
-  key: {
-    text: "Date marked as unable to progress"
-  },
-  value: {
-    text: params.rejectedDate
-  }
-} if params.isRejected, 
-{
-  key: {
-    text: "Date of transfer"
-  },
-  value: {
-    text: params.transferredDate
-  }
-} if params.isTransferred,
-{
-  key: {
-    text: "Reasons marked as unable to progress"
-  },
-  value: {
-    html: params.rejectedReasons
-  }
-} if params.isRejected), rows) %}
-
-
 {{ govukSummaryList({
   card: {
     title: {
@@ -65,5 +9,70 @@
       id: "application-details-card"
     }
   },
-  rows: rows
+  rows: [
+    {
+      key: {
+        text: "Application type"
+      },
+      value: {
+        text: 'Marine licence application'
+      }
+    },
+    {
+      key: {
+        text: "Status"
+      },
+      value: {
+        html: params.statusTag
+      }
+    },
+    {
+      key: {
+        text: "Reference number"
+      },
+      value: {
+        text: params.applicationReference
+      }
+    },
+    {
+      key: {
+        text: "Date submitted"
+      },
+      value: {
+        text: params.submittedAt
+      }
+    },
+    {
+      key: {
+        text: "Date of transfer"
+      },
+      value: {
+        text: params.transferredDate
+      }
+    } if params.transferredDate else none,
+    {
+      key: {
+        text: "Date withdrawn"
+      },
+      value: {
+        text: params.withdrawnAt
+      }
+    } if params.withdrawnAt else none,
+    {
+      key: {
+        text: "Date marked as unable to progress"
+      },
+      value: {
+        text: params.rejectedDate
+      }
+    } if params.isRejected else none,
+    {
+      key: {
+        text: "Reasons marked as unable to progress"
+      },
+      value: {
+        html: params.rejectedReasons
+      }
+    } if params.isRejected else none
+  ]
 }) }}

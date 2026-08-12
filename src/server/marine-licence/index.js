@@ -3,6 +3,7 @@ import { confirmationRoutes } from '#src/server/marine-licence/confirmation/inde
 import { projectNameRoutes } from '#src/server/marine-licence/project-name/index.js'
 import { taskListRoutes } from '#src/server/marine-licence/task-list/index.js'
 import { deleteMarineLicenceRoutes } from '#src/server/marine-licence/delete/index.js'
+import { withdrawMarineLicenceRoutes } from '#src/server/marine-licence/withdraw/index.js'
 import { specialLegalPowersRoutes } from '#src/server/marine-licence/special-legal-powers/index.js'
 import { publicRegisterRoutes } from '#src/server/marine-licence/public-register/index.js'
 import { publicConsultationRoutes } from '#src/server/marine-licence/public-consultation/index.js'
@@ -35,6 +36,7 @@ export const marineLicence = {
         ...projectNameRoutes,
         ...taskListRoutes,
         ...deleteMarineLicenceRoutes,
+        ...withdrawMarineLicenceRoutes,
         ...specialLegalPowersRoutes,
         ...publicRegisterRoutes,
         ...publicConsultationRoutes,

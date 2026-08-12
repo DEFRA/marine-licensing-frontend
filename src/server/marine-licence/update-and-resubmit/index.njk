@@ -1,0 +1,49 @@
+{% extends 'layouts/page.njk' %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/back-link/macro.njk" import govukBackLink %}
+{% from "cancel-button/macro.njk" import appCancelButton %}
+
+{% block beforeContent %}
+  {{ super() }}
+  <nav>
+    {{ govukBackLink({
+      text: "Back",
+      href: backLink
+    }) }}
+  </nav>
+{% endblock %}
+
+{% block content %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+
+      <span class="govuk-caption-l">{{ projectName }}</span>
+      <h1 class="govuk-heading-l">{{ heading }}</h1>
+
+      <p class="govuk-body">To support you with this, we will copy all of the information from your original application (<strong>{{ applicationReference }}</strong>) into a new draft application.</p>
+
+      <p class="govuk-body">Fix the issues we've identified before you submit. You can also change anything else.</p>
+
+      <p class="govuk-body">Your original application will stay 'Unable to progress'. You can still view it in your projects.</p>
+
+      <form method="POST">
+        <input type="hidden" name="csrfToken" value="{{ csrfToken }}" />
+
+        <div class="govuk-button-group">
+          {{ govukButton({
+            text: "Create new draft and fix issues",
+            preventDoubleClick: true,
+            attributes: {
+              "data-module": "govuk-button"
+            }
+          }) }}
+
+          {{ appCancelButton({
+            cancelLink: cancelLink
+          }) }}
+        </div>
+      </form>
+
+    </div>
+  </div>
+{% endblock %}

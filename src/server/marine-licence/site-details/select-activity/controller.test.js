@@ -14,10 +14,14 @@ import {
   createMockH
 } from '#src/server/test-helpers/mocks/helpers.js'
 import { getActivityOptions } from '#src/server/marine-licence/site-details/select-activity/utils.js'
+import { seedFirstConstructionDrawingIfNeeded } from '#src/server/common/helpers/marine-licence/session-cache/construction-drawing-utils.js'
 
 vi.mock('~/src/server/common/helpers/marine-licence/session-cache/utils.js')
 vi.mock('~/src/server/common/helpers/marine-licence/save-site-details.js')
 vi.mock('~/src/server/common/helpers/createFailAction.js')
+vi.mock(
+  '~/src/server/common/helpers/marine-licence/session-cache/construction-drawing-utils.js'
+)
 
 describe('#selectActivity', () => {
   beforeEach(() => {
@@ -206,6 +210,52 @@ describe('#selectActivity', () => {
         '/marine-licence/review-site-details#activity-details-site-1-activity-1'
       )
       expect(redirectH.redirect).toHaveBeenCalled()
+    })
+
+    describe('construction drawing seeding', () => {
+      test('seeds a construction drawing when the activity subtype requires one', async () => {
+        const redirectH = createMockH()
+        const request = createMockRequest({
+          query: { site: 1, activity: 1 },
+          payload: {
+            activities: ['CON1'],
+            otherActivity: ''
+          }
+        })
+
+        await selectActivitySubmitController.handler(request, redirectH)
+
+        expect(seedFirstConstructionDrawingIfNeeded).toHaveBeenCalledWith(
+          request,
+          redirectH,
+          mockMarineLicenceApplication,
+          0
+        )
+      })
+
+      test('does not seed a construction drawing when the activity subtype does not require one', async () => {
+        const mockMarineLicenceApplicationNoDrawing = structuredClone(
+          mockMarineLicenceApplication
+        )
+        mockMarineLicenceApplicationNoDrawing.siteDetails[0].activityDetails[0].activitySubType =
+          'construction-type-2'
+        vi.mocked(getMarineLicenceCache).mockReturnValueOnce(
+          mockMarineLicenceApplicationNoDrawing
+        )
+
+        const redirectH = createMockH()
+        const request = createMockRequest({
+          query: { site: 1, activity: 1 },
+          payload: {
+            activities: ['CON1'],
+            otherActivity: ''
+          }
+        })
+
+        await selectActivitySubmitController.handler(request, redirectH)
+
+        expect(seedFirstConstructionDrawingIfNeeded).not.toHaveBeenCalled()
+      })
     })
   })
 })

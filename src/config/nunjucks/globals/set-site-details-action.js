@@ -1,10 +1,19 @@
-const buildQueryString = (siteNumber, activityNumber, skipAction, action) => {
+const buildQueryString = (
+  siteNumber,
+  activityNumber,
+  drawingNumber,
+  skipAction,
+  action
+) => {
   const queryParams = []
   if (siteNumber) {
     queryParams.push(`site=${siteNumber}`)
   }
   if (activityNumber) {
     queryParams.push(`activity=${activityNumber}`)
+  }
+  if (drawingNumber) {
+    queryParams.push(`drawing=${drawingNumber}`)
   }
   if (!skipAction) {
     queryParams.push(`action=${action}`)
@@ -21,11 +30,12 @@ export function setSiteDetailsAction(
 ) {
   const hasValue = value && value !== ''
   const action = hasValue ? 'change' : 'add'
-  const { skipAction, activityNumber, hideLinkText } = options
+  const { skipAction, activityNumber, drawingNumber, hideLinkText } = options
 
   const queryString = buildQueryString(
     siteNumber,
     activityNumber,
+    drawingNumber,
     skipAction,
     action
   )

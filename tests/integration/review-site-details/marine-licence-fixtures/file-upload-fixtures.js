@@ -9,7 +9,24 @@ import {
 export const testScenarios = [
   {
     name: 'File Upload - KML - Complete site details',
-    marineLicence: mockMarineLicenceApplication,
+    marineLicence: {
+      ...mockMarineLicenceApplication,
+      siteDetails: [
+        {
+          ...mockMarineLicenceApplication.siteDetails[0],
+          constructionDrawings: [
+            {
+              filename: 'tech-drawing.pdf',
+              s3Location: {
+                s3Bucket: 'test-bucket',
+                s3Key: 'test-key',
+                checksumSha256: 'test-checksum'
+              }
+            }
+          ]
+        }
+      ]
+    },
     expectedPageContent: {
       projectName: 'Test Project',
       backLink: marineLicenceRoutes.MARINE_LICENCE_FILE_UPLOAD,

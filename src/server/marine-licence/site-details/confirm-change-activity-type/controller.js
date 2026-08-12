@@ -1,11 +1,17 @@
 import {
   getMarineLicenceCache,
-  updateMarineLicenceSiteActivityDetails
+  updateMarineLicenceSiteActivityDetails,
+  updateMarineLicenceSiteDetails
 } from '#src/server/common/helpers/marine-licence/session-cache/utils.js'
+import { siteHasOtherActivityRequiringDrawing } from '#src/server/common/helpers/marine-licence/session-cache/site-details-utils.js'
 import { getSiteDataFromParam } from '#src/server/common/helpers/site-details/site-name.js'
 import { validateSiteAndActivityParams } from '#src/server/common/helpers/marine-licence/session-cache/site-utils.js'
 import { getActivityVariantFromSubType } from '#src/server/common/helpers/activity-details/activity-variants.js'
-import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
+import {
+  apiRoutes,
+  marineLicenceRoutes
+} from '#src/server/common/constants/routes.js'
+import { deleteConstructionDrawingsRequest } from '#src/server/common/helpers/marine-licence/construction-drawings-request.js'
 import { formatActivitySubTypeLabel } from '#src/server/common/helpers/review-site-details/activity-details.js'
 import {
   activityTypeValues,
@@ -80,6 +86,16 @@ export const confirmChangeActivityTypeSubmitController = {
       activityDetailsNumber
     } = getSiteDataFromParam({ site, activity })
 
+    const marineLicence = getMarineLicenceCache(request)
+    const hasExistingDrawings =
+      marineLicence.siteDetails[siteIndex]?.constructionDrawings?.length > 0
+    const otherActivityStillRequiresDrawing =
+      siteHasOtherActivityRequiringDrawing(
+        marineLicence,
+        siteIndex,
+        activityDetailsIndex
+      )
+
     await updateMarineLicenceSiteActivityDetails(
       request,
       h,
@@ -91,6 +107,23 @@ export const confirmChangeActivityTypeSubmitController = {
         activities: null
       }
     )
+
+    if (hasExistingDrawings && !otherActivityStillRequiresDrawing) {
+      await updateMarineLicenceSiteDetails(
+        request,
+        h,
+        siteIndex,
+        'constructionDrawings',
+        null
+      )
+      await deleteConstructionDrawingsRequest(request, {
+        route: apiRoutes.DELETE_CONSTRUCTION_DRAWINGS,
+        payload: { id: marineLicence.id, siteIndex },
+        logAction: 'marine-licence:delete-construction-drawings-failed',
+        reason: `siteIndex=${siteIndex}`,
+        errorMessage: 'Error deleting construction drawings'
+      })
+    }
 
     const activityVariant = getActivityVariantFromSubType(activitySubType)
 

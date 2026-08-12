@@ -4,7 +4,10 @@ import {
   marineLicenceRoutes
 } from '#src/server/common/constants/routes.js'
 import { EXEMPTION_TYPE } from '#src/server/common/constants/exemptions.js'
-import { PROJECT_STATUS } from '#src/server/common/constants/projects.js'
+import {
+  PROJECT_STATUS,
+  UNABLE_TO_PROGRESS
+} from '#src/server/common/constants/projects.js'
 import { getTagStyle } from '#src/server/common/helpers/ui/get-tag-style.js'
 import escapeHtml from 'lodash/escape.js'
 import {
@@ -32,6 +35,13 @@ const getViewDetailsRoute = (projectType, status) => {
     status === PROJECT_STATUS.TRANSFERRED
   ) {
     return marineLicenceRoutes.MARINE_LICENCE_APPLICATION_TRANSFERRED
+  }
+
+  if (
+    projectType === MARINE_LICENCE_KEY &&
+    status === PROJECT_STATUS.REJECTED
+  ) {
+    return marineLicenceRoutes.MARINE_LICENCE_APPLICATION_REJECTED
   }
 
   return projectType === MARINE_LICENCE_KEY
@@ -87,6 +97,14 @@ export const getActionButtons = (project) => {
     : `<a href="${viewRoute}/${project.id}" class="govuk-link govuk-link--no-visited-state" aria-label="View details of ${escapedProjectName}">View details</a>`
 }
 
+export const getStatusLabelText = (status) => {
+  if (status === PROJECT_STATUS.REJECTED) {
+    return UNABLE_TO_PROGRESS
+  }
+
+  return escapeHtml(status)
+}
+
 export const formatProjectsForDisplay = (projects, isEmployee = false) =>
   projects.map((project) => {
     const { status, projectType } = project
@@ -103,7 +121,7 @@ export const formatProjectsForDisplay = (projects, isEmployee = false) =>
       },
       { text: project.applicationReference || '-' },
       {
-        html: `<strong class="govuk-tag ${getTagStyle(status)}">${escapeHtml(project.status)}</strong>`,
+        html: `<strong class="govuk-tag ${getTagStyle(status)}">${getStatusLabelText(project.status)}</strong>`,
         attributes: {
           'data-sort-value': project.status
         }

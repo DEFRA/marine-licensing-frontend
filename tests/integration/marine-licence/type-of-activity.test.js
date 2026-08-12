@@ -188,8 +188,18 @@ describe('Type of activity (marine licence)', () => {
     )
   })
 
-  test('redirects to the change-activity guard when moving away from a drawing-requiring activity', async () => {
-    mockMarineLicence(mockMarineLicenceApplication)
+  test('redirects to the change-activity guard when moving away from a drawing-requiring activity and no other activity on the site needs one', async () => {
+    mockMarineLicence({
+      ...mockMarineLicenceApplication,
+      siteDetails: [
+        {
+          ...mockMarineLicenceApplication.siteDetails[0],
+          activityDetails: [
+            mockMarineLicenceApplication.siteDetails[0].activityDetails[0]
+          ]
+        }
+      ]
+    })
 
     const response = await makePostRequest({
       url: `${marineLicenceRoutes.MARINE_LICENCE_TYPE_OF_ACTIVITY}?site=1&activity=1`,
@@ -203,6 +213,24 @@ describe('Type of activity (marine licence)', () => {
     expect(response.statusCode).toBe(statusCodes.redirect)
     expect(response.headers.location).toBe(
       '/marine-licence/confirm-change-activity-type?site=1&activity=1&activityType=deposit&activitySubType=deposit-type-2'
+    )
+  })
+
+  test('does not redirect to the change-activity guard when another activity on the site still requires a drawing', async () => {
+    mockMarineLicence(mockMarineLicenceApplication)
+
+    const response = await makePostRequest({
+      url: `${marineLicenceRoutes.MARINE_LICENCE_TYPE_OF_ACTIVITY}?site=1&activity=1`,
+      server: getServer(),
+      formData: {
+        activityType: 'deposit',
+        activitySubTypeDeposit: 'deposit-type-2'
+      }
+    })
+
+    expect(response.statusCode).toBe(statusCodes.redirect)
+    expect(response.headers.location).toBe(
+      '/marine-licence/activity-details/what-new-deposit-activity-are-you-doing?site=1&activity=1'
     )
   })
 })

@@ -2,12 +2,17 @@ import { vi } from 'vitest'
 import {
   sortProjectsByStatus,
   formatProjectsForDisplay,
-  getActionButtons
+  getActionButtons,
+  getStatusLabelText
 } from './utils.js'
 import {
   routes,
   marineLicenceRoutes
 } from '#src/server/common/constants/routes.js'
+import {
+  PROJECT_STATUS,
+  UNABLE_TO_PROGRESS
+} from '#src/server/common/constants/projects.js'
 
 vi.mock('~/src/config/nunjucks/filters/format-date.js', () => ({
   formatDate: vi.fn((date) => {
@@ -369,6 +374,40 @@ describe('getActionButtons', () => {
     const result = getActionButtons(transferred)
     expect(result).toBe(
       `<a href="${marineLicenceRoutes.MARINE_LICENCE_APPLICATION_TRANSFERRED}/ml123" class="govuk-link govuk-link--no-visited-state" aria-label="View details of Marine Licence Project">View details</a>`
+    )
+  })
+
+  it('returns rejected page link for rejected marine licence', () => {
+    const rejected = {
+      id: 'ml123',
+      projectName: 'Marine Licence Project',
+      projectType: 'MARINE_LICENCE',
+      status: 'Rejected',
+      isOwnProject: true
+    }
+    const result = getActionButtons(rejected)
+    expect(result).toBe(
+      `<a href="${marineLicenceRoutes.MARINE_LICENCE_APPLICATION_REJECTED}/ml123" class="govuk-link govuk-link--no-visited-state" aria-label="View details of Marine Licence Project">View details</a>`
+    )
+  })
+})
+
+describe('#getStatusLabelText', () => {
+  it('returns UNABLE_TO_PROGRESS for Rejected status', () => {
+    expect(getStatusLabelText(PROJECT_STATUS.REJECTED)).toBe(UNABLE_TO_PROGRESS)
+  })
+
+  it('returns the status unchanged for non-Rejected statuses', () => {
+    expect(getStatusLabelText(PROJECT_STATUS.DRAFT)).toBe('Draft')
+    expect(getStatusLabelText(PROJECT_STATUS.ACTIVE)).toBe('Active')
+    expect(getStatusLabelText(PROJECT_STATUS.SUBMITTED)).toBe('Submitted')
+    expect(getStatusLabelText(PROJECT_STATUS.TRANSFERRED)).toBe('Transferred')
+    expect(getStatusLabelText(PROJECT_STATUS.WITHDRAWN)).toBe('Withdrawn')
+  })
+
+  it('escapes HTML in the status value', () => {
+    expect(getStatusLabelText('<script>alert(1)</script>')).toBe(
+      '&lt;script&gt;alert(1)&lt;/script&gt;'
     )
   })
 })

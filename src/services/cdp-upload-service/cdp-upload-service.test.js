@@ -160,6 +160,36 @@ describe('#CdpUploadService', () => {
         expect(result.allowedTypes).toEqual(overrideMimeTypes)
       })
 
+      test('Should override the default maxFileSize when provided', async () => {
+        // Given
+        const mockResponse = {
+          uploadId: mockUploadId,
+          uploadUrl: mockUploadUrl
+        }
+
+        Wreck.post.mockResolvedValue({
+          res: { statusCode: 200 },
+          payload: mockResponse
+        })
+
+        const tenMb = 10 * 1024 * 1024
+
+        // When
+        await service.initiate({
+          redirectUrl: mockRedirectUrl,
+          s3Bucket: config.get('cdpUploader').s3Bucket,
+          maxFileSize: tenMb
+        })
+
+        // Then
+        expect(Wreck.post).toHaveBeenCalledWith(
+          expect.any(String),
+          expect.objectContaining({
+            payload: expect.stringContaining(`"maxFileSize":${tenMb}`)
+          })
+        )
+      })
+
       test('Should include s3Path when provided', async () => {
         // Given
         const s3Path = 'uploads/kml-files'

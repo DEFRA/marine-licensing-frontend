@@ -12,6 +12,16 @@ describe('#site name utils', () => {
       })
     })
 
+    test('returns correct values when site and drawing params are provided', () => {
+      const result = getSiteDataFromParam({ site: '1', drawing: '2' })
+      expect(result).toEqual({
+        siteIndex: 0,
+        siteNumber: 1,
+        drawingIndex: 1,
+        drawingNumber: 2
+      })
+    })
+
     test('returns defaults when called with all undefined value', () => {
       const result = getSiteDataFromParam(undefined)
       expect(result).toEqual({

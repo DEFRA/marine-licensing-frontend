@@ -1,0 +1,52 @@
+{% extends 'layouts/page.njk' %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+
+{% block content %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+
+      <span class="govuk-caption-l">{{ projectName }}</span>
+      <h1 class="govuk-heading-l">{{ heading }}</h1>
+
+      <p class="govuk-body">We have reviewed your application ({{ applicationReference }}) and we are unable to progress it as submitted.</p>
+
+      <h2 class="govuk-heading-m">Why we are unable to progress your application</h2>
+
+      <p class="govuk-body">We've identified issues with the following sections of your application:</p>
+
+      <ul class="govuk-list govuk-list--bullet">
+        {% for reason in rejectedReasons %}
+          <li>{{ reason }}</li>
+        {% endfor %}
+      </ul>
+
+      <p class="govuk-body">{{ rejectedInformation }}</p>
+
+      <h2 class="govuk-heading-m">Charges for reviewing your application</h2>
+
+      <p class="govuk-body">We will charge you for the time we have spent reviewing your application to date. We will send you an invoice separately.</p>
+
+      <h2 class="govuk-heading-m">What you can do</h2>
+
+      <p class="govuk-body">You can apply again for the same project. To support you with this, we will copy your existing application into a new draft application, so you can fix the issues we've identified before you submit.</p>
+
+      <p class="govuk-body">This will be a new application, meaning:</p>
+
+      <ul class="govuk-list govuk-list--bullet govuk-!-margin-bottom-6">
+        <li>you will get a new fee estimate</li>
+        <li>your new application will have a new reference number</li>
+      </ul>
+
+      {{ govukButton({
+        text: "Apply again",
+        href: updateAndResubmitUrl,
+        attributes: {
+          "data-module": "govuk-button"
+        }
+      }) }}
+
+      <p class="govuk-body"><a class="govuk-link" href="{{ viewDetailsUrl }}">View your original application</a></p>
+
+    </div>
+  </div>
+{% endblock %}

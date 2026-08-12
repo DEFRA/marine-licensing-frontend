@@ -2,46 +2,66 @@
 {% from "govuk/components/button/macro.njk" import govukButton %}
 {% from "incomplete-field/macro.njk" import appIncompleteField %}
 
-{% set siteHasConstructionDrawing = false %}
-{% set firstDrawingActivityNumber = 1 %}
+{% set siteRequiresConstructionDrawing = false %}
 
 {% for activityDetails in params.activityDetails %}
   {% if activityDetails.requiresConstructionDrawing %}
-    {% if not siteHasConstructionDrawing %}
-      {% set siteHasConstructionDrawing = true %}
-      {% set firstDrawingActivityNumber = loop.index %}
-    {% endif %}
+    {% set siteRequiresConstructionDrawing = true %}
+  {% endif %}
+{% endfor %}
+
+{% if siteRequiresConstructionDrawing %}
+  {% set constructionDrawings = params.constructionDrawings or [] %}
+  {% set drawingCount = constructionDrawings.length if constructionDrawings.length > 1 else 1 %}
+
+  {% for drawingIndex in range(0, drawingCount) %}
+    {% set drawing = constructionDrawings[drawingIndex] or {} %}
+    {% set drawingNumber = drawingIndex + 1 %}
 
     {% set drawingRows = [{
       key: { text: "File upload" },
-      value: { html: appIncompleteField({ text: "" }) },
-      actions: setSiteDetailsAction(false, 'upload-construction-drawing', params.siteNumber, "", { activityNumber: loop.index })
+      value: { html: appIncompleteField({ text: drawing.filename }) },
+      actions: setSiteDetailsAction(drawing.filename, 'upload-construction-drawing', params.siteNumber, "", { drawingNumber: drawingNumber })
     }] %}
+
+    {% set deleteActionItems = [{
+      href: "delete-construction-drawing?site=" + params.siteNumber + "&drawing=" + drawingNumber,
+      text: "Delete file upload",
+      classes: "govuk-link--no-visited-state"
+    }] if drawingIndex > 0 else [] %}
 
     {{ govukSummaryList({
       card: {
         attributes: {
-          id: "construction-drawing-site-" + params.siteNumber + "-activity-" + loop.index
+          id: "construction-drawing-site-" + params.siteNumber + "-" + drawingNumber
         },
         title: {
-          text: "Site " + params.siteNumber + " - Construction drawing " + loop.index
+          text: "Site " + params.siteNumber + " - Construction drawing " + drawingNumber
+        },
+        actions: {
+          items: deleteActionItems
         }
       },
       classes: "govuk-summary-list--full-width",
       rows: drawingRows
     }) }}
-  {% endif %}
-{% endfor %}
+  {% endfor %}
 
-{% if siteHasConstructionDrawing %}
-  <div class="govuk-!-margin-bottom-6">
-    {{ govukButton({
-      text: "Add another construction drawing for site " + params.siteNumber,
-      classes: "govuk-button--secondary",
-      href: "upload-construction-drawing?site=" + params.siteNumber + "&activity=" + firstDrawingActivityNumber,
-      attributes: {
-        id: 'add-another-construction-drawing-site-' + params.siteNumber
-      }
-    }) }}
-  </div>
+  <form method="POST">
+    <input type="hidden" name="csrfToken" value="{{ params.csrfToken }}">
+    <input type="hidden" name="siteNumber" value="{{ params.siteNumber }}">
+
+    <div class="govuk-!-margin-bottom-6">
+      {{ govukButton({
+        text: "Add another construction drawing for site " + params.siteNumber,
+        classes: "govuk-button--secondary",
+        attributes: {
+          id: 'add-another-construction-drawing-site-' + params.siteNumber,
+          name: "addConstructionDrawing",
+          value: "addConstructionDrawing",
+          type: "submit"
+        }
+      }) }}
+    </div>
+  </form>
 {% endif %}

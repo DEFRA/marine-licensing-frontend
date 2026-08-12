@@ -83,4 +83,13 @@ describe('Application transferred', () => {
     expect(response.statusCode).toBe(statusCodes.redirect)
     expect(response.headers.location).toBe(routes.DASHBOARD)
   })
+
+  test('should return bad request for an invalid marine licence id', async () => {
+    const response = await makeGetRequest({
+      url: `${marineLicenceRoutes.MARINE_LICENCE_APPLICATION_TRANSFERRED}/not-a-valid-id`,
+      server: getServer()
+    })
+
+    expect(response.statusCode).toBe(statusCodes.badRequest)
+  })
 })

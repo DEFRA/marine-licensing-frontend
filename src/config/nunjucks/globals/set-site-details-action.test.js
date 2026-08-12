@@ -183,6 +183,23 @@ describe('setSiteDetailsAction', () => {
     })
   })
 
+  test('should include drawing query param when provided', () => {
+    const result = setSiteDetailsAction('Value', '/page', 1, '', {
+      skipAction: true,
+      drawingNumber: 2
+    })
+
+    expect(result).toEqual({
+      items: [
+        {
+          classes: 'govuk-link--no-visited-state',
+          href: '/page?site=1&drawing=2',
+          text: 'Change'
+        }
+      ]
+    })
+  })
+
   test('should include activity with action when no site is provided', () => {
     const result = setSiteDetailsAction('Value', '/page', null, '', {
       activityNumber: 3

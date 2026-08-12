@@ -100,13 +100,19 @@ export class CdpUploadService {
     )
   }
 
-  async initiate({ redirectUrl, s3Bucket, allowedMimeTypes, s3Path = '' }) {
+  async initiate({
+    redirectUrl,
+    s3Bucket,
+    allowedMimeTypes,
+    maxFileSize,
+    s3Path = ''
+  }) {
     this._validateInitiateParams({ redirectUrl, s3Bucket })
 
     const mimeTypes = allowedMimeTypes ?? this.allowedMimeTypes
     const requestPayload = {
       redirect: redirectUrl,
-      maxFileSize: this.config.maxFileSize,
+      maxFileSize: maxFileSize ?? this.config.maxFileSize,
       s3Path,
       s3Bucket
     }

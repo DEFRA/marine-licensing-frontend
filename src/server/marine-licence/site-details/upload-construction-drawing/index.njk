@@ -1,24 +1,75 @@
 {% extends 'layouts/page.njk' %}
 {% from "govuk/components/back-link/macro.njk" import govukBackLink %}
+{% from "govuk/components/file-upload/macro.njk" import govukFileUpload %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+{% from "cancel-button/macro.njk" import appCancelButton %}
 
 {% block beforeContent %}
-{{ super() }}
-<nav>
-  {{ govukBackLink({
-    text: "Back",
-    href: backLink
-  }) }}
-</nav>
+  {{ super() }}
+  <nav>
+    {{ govukBackLink({
+      text: "Back",
+      href: backLink
+    }) }}
+  </nav>
 {% endblock %}
+
+{% set formLabel %}
+  {% if projectName %}
+    <span class="govuk-caption-l">{{ projectName }}</span>
+  {% endif %}
+
+  <h1 class="govuk-heading-l">{{ heading }}</h1>
+
+  <p class="govuk-body">Upload a drawing showing what you plan to build or change at this site. Only upload drawings that show the work you're telling us about in this application.</p>
+
+  <p class="govuk-body">If your drawing is part of a larger document, upload only the pages that show this work. Do not upload full project plans or documents that cover other work.</p>
+
+  <p class="govuk-body">The file must be a PDF or image (.bmp, .gif, .jpg, .jpeg, .png, .tif) and no larger than 10MB.</p>
+{% endset %}
 
 {% block content %}
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
-      <span class="govuk-caption-l">{{ projectName }}</span>
-      <span class="govuk-caption-l">Site {{ siteNumber }} - Activity {{ activityDetailsNumber }}</span>
-      <h1 class="govuk-heading-l">{{ heading }}</h1>
 
-      <p class="govuk-body">This part of the service is not yet available. You'll be able to upload your construction drawing here soon.</p>
+      {% if errorSummary %}
+        {{ govukErrorSummary({
+          titleText: "There is a problem",
+          errorList: errorSummary
+        }) }}
+      {% endif %}
+
+      <form action="{{ uploadUrl }}" method="post" enctype="multipart/form-data" novalidate>
+
+        {{ govukFileUpload({
+            id: "file-id",
+            name: "file",
+            label: {
+              html: formLabel,
+              for: "file-id"
+            },
+            multiple: false,
+            javascript: true,
+            errorMessage: { text: errors['file'].text } if errors and errors['file'] else false,
+            attributes: {
+              "accept": acceptAttribute
+            }
+        }) }}
+
+        <div class="govuk-button-group">
+          {{ govukButton({
+            text: "Save and continue",
+            type: "submit",
+            classes: "govuk-button--primary"
+          }) }}
+
+          {{ appCancelButton({
+            cancelLink: cancelLink
+          }) }}
+        </div>
+
+      </form>
     </div>
   </div>
 {% endblock %}

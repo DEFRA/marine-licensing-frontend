@@ -5,7 +5,9 @@ import {
   mockManualCoordinatesMarineLicence,
   mockMarineLicenceApplication,
   mockMarineLicenceWithMarinePlanPolicies,
-  mockSubmittedMarineLicenceApplication
+  mockSubmittedMarineLicenceApplication,
+  mockTransferredMarineLicenceApplication,
+  mockRejectedMarineLicenceApplication
 } from '~/src/server/test-helpers/mocks/marine-licence-mocks.js'
 import {
   mockMarineLicence,
@@ -15,7 +17,6 @@ import { agentSession } from '../shared/session-fixtures.js'
 import { selectActivityVariants } from '~/src/server/common/constants/activity-variants.js'
 import { getMarinePlanPolicyLink } from '~/src/server/common/helpers/marine-licence/marine-plan-policy-link.js'
 import { runPageAccessibilityTests } from './page-accessibility-tests.js'
-import { mockTransferredMarineLicenceApplication } from '#src/server/test-helpers/mocks/marine-licence-mocks.js'
 
 vi.mock('~/src/server/common/helpers/authenticated-requests.js')
 vi.mock('~/src/server/common/helpers/defraid-login/session-cache.js')
@@ -177,8 +178,29 @@ const marineLicencePages = [
     title: 'Are you sure you want to delete this activity?'
   },
   {
-    url: `${marineLicenceRoutes.MARINE_LICENCE_UPLOAD_CONSTRUCTION_DRAWING}?site=1&activity=1`,
-    title: 'Upload a construction drawing'
+    url: `${marineLicenceRoutes.MARINE_LICENCE_UPLOAD_CONSTRUCTION_DRAWING}?site=1&drawing=1`,
+    title: 'Site 1: Upload construction drawing 1'
+  },
+  // TODO: Uncomment when meta refresh a11y issue is resolved (same issue as upload-and-wait)
+  // {
+  //   url: marineLicenceRoutes.MARINE_LICENCE_UPLOAD_CONSTRUCTION_DRAWING_WAIT,
+  //   title: 'Upload construction drawing'
+  // },
+  {
+    url: `${marineLicenceRoutes.MARINE_LICENCE_DELETE_CONSTRUCTION_DRAWING}?site=1&drawing=2`,
+    title: 'Are you sure you want to delete Site 1 construction drawing 2?',
+    marineLicence: {
+      ...mockMarineLicenceApplication,
+      siteDetails: [
+        {
+          ...mockMarineLicenceApplication.siteDetails[0],
+          constructionDrawings: [
+            { filename: 'drawing-1.pdf' },
+            { filename: 'drawing-2.pdf' }
+          ]
+        }
+      ]
+    }
   },
   {
     url: `${marineLicenceRoutes.MARINE_LICENCE_CONFIRM_CHANGE_ACTIVITY_TYPE}?site=1&activity=1&activityType=deposit&activitySubType=deposit-type-1`,
@@ -257,6 +279,16 @@ const marineLicencePages = [
     url: `${marineLicenceRoutes.MARINE_LICENCE_APPLICATION_TRANSFERRED}/${mockSubmittedMarineLicenceApplication.id}`,
     title: 'Your application has been transferred',
     marineLicence: mockTransferredMarineLicenceApplication
+  },
+  {
+    url: `${marineLicenceRoutes.MARINE_LICENCE_APPLICATION_REJECTED}/${mockRejectedMarineLicenceApplication.id}`,
+    title: 'We are unable to progress your application',
+    marineLicence: mockRejectedMarineLicenceApplication
+  },
+  {
+    url: `${marineLicenceRoutes.MARINE_LICENCE_UPDATE_AND_RESUBMIT}/${mockRejectedMarineLicenceApplication.id}`,
+    title: 'Apply again for this project',
+    marineLicence: mockRejectedMarineLicenceApplication
   }
   // TODO: Uncomment when meta refresh a11y issue is resolved (same issue as upload-and-wait)
   // {

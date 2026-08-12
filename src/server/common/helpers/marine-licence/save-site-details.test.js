@@ -17,6 +17,7 @@ import {
   mockManualCoordinatesMarineLicence
 } from '#src/server/test-helpers/mocks/marine-licence-mocks.js'
 import { apiRoutes } from '#src/server/common/constants/routes.js'
+import { snapshotActivityDetails } from '#src/server/common/helpers/activity-details/snapshot-activity-labels.js'
 
 vi.mock('../authenticated-requests.js')
 vi.mock('./session-cache/utils.js')
@@ -41,8 +42,9 @@ describe('save-site-details', () => {
       expect(result[0]).toEqual({
         coordinatesType: 'file',
         fileUploadType: 'kml',
-        activityDetails:
-          mockMarineLicenceApplication.siteDetails[0].activityDetails,
+        activityDetails: snapshotActivityDetails(
+          mockMarineLicenceApplication.siteDetails[0].activityDetails
+        ),
         geoJSON: mockMarineLicenceApplication.siteDetails[0].geoJSON,
         featureCount: mockMarineLicenceApplication.siteDetails[0].featureCount,
         siteName: 'test site name',
@@ -51,7 +53,8 @@ describe('save-site-details', () => {
           s3Bucket: 'test-bucket',
           s3Key: 'test-key',
           checksumSha256: 'test-checksum'
-        }
+        },
+        constructionDrawings: undefined
       })
 
       expect(mockRequest.logger.info).toHaveBeenCalledWith(
@@ -135,7 +138,8 @@ describe('save-site-details', () => {
           s3Bucket: 'test-bucket',
           s3Key: 'test-key',
           checksumSha256: 'test-checksum'
-        }
+        },
+        constructionDrawings: undefined
       })
 
       expect(result[1]).toEqual({
@@ -151,7 +155,8 @@ describe('save-site-details', () => {
           s3Bucket: 'test-bucket',
           s3Key: 'test-key-2',
           checksumSha256: 'test-checksum-2'
-        }
+        },
+        constructionDrawings: undefined
       })
     })
 
@@ -202,7 +207,8 @@ describe('save-site-details', () => {
         coordinates: { latitude: '51.489676', longitude: '-0.231530' },
         circleWidth: '100',
         siteName: 'Test site',
-        activityDetails: { description: 'Test activity' }
+        activityDetails: { description: 'Test activity' },
+        constructionDrawings: undefined
       })
       expect(result[0]).not.toHaveProperty('someUiOnlyField')
     })
@@ -234,8 +240,47 @@ describe('save-site-details', () => {
         coordinateSystem: 'wgs84',
         coordinates: siteDetails[0].coordinates,
         siteName: 'Test polygon site',
-        activityDetails: null
+        activityDetails: null,
+        constructionDrawings: undefined
       })
+    })
+
+    test('preserves constructionDrawings for file-upload and manual-coordinate sites', () => {
+      const constructionDrawings = [
+        {
+          filename: 'drawing.pdf',
+          s3Location: {
+            s3Bucket: 'test-bucket',
+            s3Key: 'test-key',
+            checksumSha256: 'test-checksum'
+          }
+        }
+      ]
+
+      const fileUploadSite = {
+        ...mockMarineLicenceApplication.siteDetails[0],
+        constructionDrawings
+      }
+      const fileUploadResult = prepareFileUploadDataForSave(
+        [fileUploadSite],
+        mockRequest
+      )
+      expect(fileUploadResult[0].constructionDrawings).toBe(
+        constructionDrawings
+      )
+
+      const manualSite = {
+        coordinatesType: 'coordinates',
+        coordinatesEntry: 'single',
+        coordinateSystem: 'wgs84',
+        coordinates: { latitude: '51.489676', longitude: '-0.231530' },
+        circleWidth: '100',
+        siteName: 'Test site',
+        activityDetails: { description: 'Test activity' },
+        constructionDrawings
+      }
+      const manualResult = prepareManualCoordinateDataForSave([manualSite])
+      expect(manualResult[0].constructionDrawings).toBe(constructionDrawings)
     })
   })
 
@@ -326,11 +371,17 @@ describe('save-site-details', () => {
 
       await saveSiteDetailsToBackend(mockRequest, mockH, { siteIndex: 0 })
 
+      const siteDetails = mockMarineLicenceApplication.siteDetails[0]
       expect(authenticatedPatchRequest).toHaveBeenCalledWith(
         mockRequest,
         apiRoutes.UPDATE_MARINE_LICENCE_SITE,
         {
-          siteDetails: mockMarineLicenceApplication.siteDetails[0],
+          siteDetails: {
+            ...siteDetails,
+            activityDetails: snapshotActivityDetails(
+              siteDetails.activityDetails
+            )
+          },
           siteIndex: 0,
           id: mockMarineLicenceApplication.id
         }

@@ -4,6 +4,7 @@ import {
   setMarineLicenceCache
 } from '#src/server/common/helpers/marine-licence/session-cache/utils.js'
 import { transformCoordinatesForApi } from '#src/server/common/helpers/site-details/coordinate-transform.js'
+import { snapshotActivityDetails } from '#src/server/common/helpers/activity-details/snapshot-activity-labels.js'
 import { routes, apiRoutes } from '#src/server/common/constants/routes.js'
 import Boom from '@hapi/boom'
 
@@ -29,7 +30,8 @@ export const prepareFileUploadDataForSave = (siteDetails, request) => {
         checksumSha256: site.s3Location.checksumSha256
       },
       siteName: site.siteName,
-      activityDetails: site.activityDetails
+      activityDetails: snapshotActivityDetails(site.activityDetails),
+      constructionDrawings: site.constructionDrawings
     }
 
     request.logger.info(
@@ -57,7 +59,8 @@ export const prepareManualCoordinateDataForSave = (siteDetails) => {
       coordinateSystem: site.coordinateSystem,
       coordinates: site.coordinates,
       siteName: site.siteName,
-      activityDetails: site.activityDetails
+      activityDetails: snapshotActivityDetails(site.activityDetails),
+      constructionDrawings: site.constructionDrawings
     }
 
     if (site.coordinatesEntry === 'single') {

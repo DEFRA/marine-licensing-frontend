@@ -2,7 +2,10 @@ import {
   getMarineLicenceCache,
   updateMarineLicenceSiteActivityDetails
 } from '#src/server/common/helpers/marine-licence/session-cache/utils.js'
-import { getActivityDetailsByIndex } from '#src/server/common/helpers/marine-licence/session-cache/site-details-utils.js'
+import {
+  getActivityDetailsByIndex,
+  siteHasOtherActivityRequiringDrawing
+} from '#src/server/common/helpers/marine-licence/session-cache/site-details-utils.js'
 import { typeOfActivitySchema } from '#src/server/marine-licence/site-details/type-of-activity/schema.js'
 import { getSiteDataFromParam } from '#src/server/common/helpers/site-details/site-name.js'
 import { createFailAction } from '#src/server/common/helpers/createFailAction.js'
@@ -131,7 +134,19 @@ export const typeOfActivitySubmitController = {
     const willBeDrawingRequired =
       SUBTYPES_REQUIRING_CONSTRUCTION_DRAWING.includes(activitySubType)
 
-    if (activityTypeChanged && wasDrawingRequired && !willBeDrawingRequired) {
+    const otherActivityStillRequiresDrawing =
+      siteHasOtherActivityRequiringDrawing(
+        marineLicence,
+        siteIndex,
+        activityDetailsIndex
+      )
+
+    if (
+      activityTypeChanged &&
+      wasDrawingRequired &&
+      !willBeDrawingRequired &&
+      !otherActivityStillRequiresDrawing
+    ) {
       return h.redirect(
         `${marineLicenceRoutes.MARINE_LICENCE_CONFIRM_CHANGE_ACTIVITY_TYPE}?site=${siteNumber}&activity=${activityDetailsNumber}&activityType=${payload.activityType}&activitySubType=${activitySubType}`
       )

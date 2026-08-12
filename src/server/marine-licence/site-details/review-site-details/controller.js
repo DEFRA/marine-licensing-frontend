@@ -124,6 +124,47 @@ async function handleAddActivity(request, h, marineLicence, siteNumber) {
   )
 }
 
+async function handleAddConstructionDrawing(
+  request,
+  h,
+  marineLicence,
+  siteNumber
+) {
+  const siteIndex = Number.parseInt(siteNumber, 10) - 1
+
+  // The first drawing is normally seeded when the drawing-requiring
+  // checkbox page is submitted (see selectActivitySubmitController), so this loop usually
+  // adds exactly one. It's a defensive fallback for sites saved before that
+  // seeding existed: the drawing card always renders a first, placeholder
+  // card even with zero backend entries, so on legacy data with none yet,
+  // "visible" count is still at least 1 and we must land one past it -
+  // creating two entries in that one case (to materialise the already-visible
+  // first card too).
+  const { constructionDrawings } = marineLicence.siteDetails[siteIndex]
+  const currentDrawings = Array.isArray(constructionDrawings)
+    ? constructionDrawings
+    : []
+  const visibleCount = Math.max(currentDrawings.length, 1)
+  const drawingsToAdd = visibleCount + 1 - currentDrawings.length
+
+  for (let count = 0; count < drawingsToAdd; count += 1) {
+    await authenticatedPatchRequest(
+      request,
+      apiRoutes.ADD_CONSTRUCTION_DRAWING,
+      {
+        siteIndex,
+        id: marineLicence.id
+      }
+    )
+  }
+
+  const newDrawingNumber = visibleCount + 1
+
+  return h.redirect(
+    `${marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS}#construction-drawing-site-${siteNumber}-${newDrawingNumber}`
+  )
+}
+
 function handleReturnToRedirect(request, h) {
   const returnTo = request.yar.flash(RETURN_TO_CACHE_KEY)
   const redirectPath = Array.isArray(returnTo) ? returnTo[0] : returnTo
@@ -201,7 +242,7 @@ async function confirmSiteDetails(
 export const reviewSiteDetailsSubmitController = {
   async handler(request, h) {
     const { payload } = request
-    const { add, addActivity, siteNumber } = payload
+    const { add, addActivity, addConstructionDrawing, siteNumber } = payload
     const marineLicence = getMarineLicenceCache(request)
     const fromCheckYourAnswers = request.query?.from === 'check-your-answers'
     const returnToCheckYourAnswers = fromCheckYourAnswers
@@ -214,6 +255,10 @@ export const reviewSiteDetailsSubmitController = {
 
     if (addActivity) {
       return handleAddActivity(request, h, marineLicence, siteNumber)
+    }
+
+    if (addConstructionDrawing) {
+      return handleAddConstructionDrawing(request, h, marineLicence, siteNumber)
     }
 
     const marineLicenceService = getMarineLicenceService(request)

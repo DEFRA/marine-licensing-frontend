@@ -75,8 +75,7 @@ describe('#context', () => {
         serviceUrl: '/',
         surveyUrls: {
           midJourney: expect.stringContaining('https://'),
-          exemptionConfirmation: expect.stringContaining('https://'),
-          marineLicenceConfirmation: expect.stringContaining('https://')
+          confirmation: expect.stringContaining('https://')
         }
       })
     })
@@ -224,20 +223,34 @@ describe('#context', () => {
       }
     )
 
-    it('Should provide both confirmation survey URLs regardless of journey', () => {
+    it.each([
+      {
+        page: 'a marine licence journey page',
+        path: '/marine-licence/confirmation',
+        expected: 'https://forms.cloud.microsoft/e/vUT96ZvAez'
+      },
+      {
+        page: 'an exemption journey page',
+        path: '/exemption/confirmation',
+        expected:
+          'https://forms.office.com/pages/responsepage.aspx?id=UCQKdycCYkyQx044U38RAjXEiYXnHG1DvkWr_VjRfzZURFMxRkhCSzQyVlRKQzdZNDEyVDhSMFdSNy4u&route=shorturl'
+      }
+    ])(
+      'When on $page, should use the matching confirmation survey URL',
+      ({ path, expected }) => {
+        const request = { path, logger: { error: vi.fn() } }
+        expect(context(request).surveyUrls.confirmation).toBe(expected)
+      }
+    )
+
+    it('Should use a different survey for the confirmation page and the banner', () => {
       const request = {
-        path: '/exemption/project-name',
+        path: '/marine-licence/confirmation',
         logger: { error: vi.fn() }
       }
       const { surveyUrls } = context(request)
 
-      expect(surveyUrls.marineLicenceConfirmation).toBe(
-        'https://forms.cloud.microsoft/e/vUT96ZvAez'
-      )
-      expect(surveyUrls.exemptionConfirmation).not.toBe(
-        surveyUrls.marineLicenceConfirmation
-      )
-      expect(surveyUrls.exemptionConfirmation).not.toBe(surveyUrls.midJourney)
+      expect(surveyUrls.confirmation).not.toBe(surveyUrls.midJourney)
     })
   })
 

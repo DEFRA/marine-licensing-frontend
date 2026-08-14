@@ -46,16 +46,13 @@ const isMarineLicencePath = (pagePath = '') => {
 }
 
 const getSurveyUrls = (request) => {
-  const midJourneyUrl = isMarineLicencePath(request?.path)
-    ? config.get('survey.marineLicence.midJourneyUrl')
-    : config.get('survey.exemption.midJourneyUrl')
+  const journey = isMarineLicencePath(request?.path)
+    ? 'marineLicence'
+    : 'exemption'
 
   return {
-    midJourney: midJourneyUrl,
-    exemptionConfirmation: config.get('survey.exemption.confirmationUrl'),
-    marineLicenceConfirmation: config.get(
-      'survey.marineLicence.confirmationUrl'
-    )
+    midJourney: config.get(`survey.${journey}.midJourneyUrl`),
+    confirmation: config.get(`survey.${journey}.confirmationUrl`)
   }
 }
 

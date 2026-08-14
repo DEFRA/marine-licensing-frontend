@@ -137,6 +137,19 @@ export function sharedBeforeYouStartSiteDetailsTests({
     expect(
       getByText(document, 'enter the coordinates manually')
     ).toBeInTheDocument()
+
+    expect(
+      getByText(
+        document,
+        "We'll use a site name for each area in your file if one is included."
+      )
+    ).toBeInTheDocument()
+    expect(
+      getByText(
+        document,
+        'For shapefiles, put the name in a column such as ‘Name’ or ‘Site_name’ for each area. For KML files, use the name of each place.'
+      )
+    ).toBeInTheDocument()
   })
 
   test('should have properly structured lists for accessibility', async () => {

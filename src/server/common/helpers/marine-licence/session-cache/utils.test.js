@@ -709,6 +709,76 @@ describe('#utils', () => {
 
       expect(result).toEqual([expected])
     })
+
+    test('should populate siteName from KML feature properties', () => {
+      const existingCache = {
+        projectName: 'Test Project',
+        siteDetails: [{ coordinatesType: 'file', fileUploadType: 'kml' }]
+      }
+      mockRequest.yar.get.mockReturnValue(existingCache)
+
+      const mockCoordinateData = {
+        extractedCoordinates: [],
+        geoJSON: {
+          type: 'FeatureCollection',
+          features: [
+            {
+              type: 'Feature',
+              geometry: { type: 'Polygon', coordinates: [] },
+              properties: { name: 'North Harbour' }
+            }
+          ]
+        }
+      }
+
+      const result = updateMarineLicenceSiteDetailsBatch(
+        mockRequest,
+        mockStatus,
+        mockCoordinateData,
+        mockS3Location,
+        { isMultipleSitesFile: false }
+      )
+
+      expect(result[0].siteName).toBe('North Harbour')
+    })
+
+    test('should populate site names from shapefile columns for multiple sites', () => {
+      const existingCache = {
+        projectName: 'Test Project',
+        siteDetails: [{ coordinatesType: 'file', fileUploadType: 'shapefile' }]
+      }
+      mockRequest.yar.get.mockReturnValue(existingCache)
+
+      const mockCoordinateData = {
+        extractedCoordinates: [[], []],
+        geoJSON: {
+          type: 'FeatureCollection',
+          features: [
+            {
+              type: 'Feature',
+              geometry: { type: 'Polygon', coordinates: [] },
+              properties: { Site_name: 'East Pier' }
+            },
+            {
+              type: 'Feature',
+              geometry: { type: 'Polygon', coordinates: [] },
+              properties: {}
+            }
+          ]
+        }
+      }
+
+      const result = updateMarineLicenceSiteDetailsBatch(
+        mockRequest,
+        mockStatus,
+        mockCoordinateData,
+        mockS3Location,
+        { isMultipleSitesFile: true }
+      )
+
+      expect(result[0].siteName).toBe('East Pier')
+      expect(result[1].siteName).toBeUndefined()
+    })
   })
 
   describe('clearSavedMarineLicenceSiteDetails', () => {
@@ -1009,6 +1079,46 @@ describe('#utils', () => {
         featureCount: 1,
         uploadConfig: null
       })
+    })
+
+    test('should populate siteName from the uploaded file when present', () => {
+      const existingCache = {
+        projectName: 'Test Project',
+        siteDetails: [
+          {
+            siteName: 'Site A',
+            coordinatesType: 'file',
+            fileUploadType: 'kml'
+          }
+        ]
+      }
+
+      const mockRequest = {
+        yar: { get: vi.fn().mockReturnValue(existingCache), set: vi.fn() }
+      }
+
+      updateSingleSiteLocation(
+        mockRequest,
+        mockStatus,
+        {
+          ...mockCoordinateData,
+          geoJSON: {
+            type: 'FeatureCollection',
+            features: [
+              {
+                type: 'Feature',
+                geometry: { type: 'Point', coordinates: [-1.23, 50.99] },
+                properties: { name: 'Updated from file' }
+              }
+            ]
+          }
+        },
+        mockS3Location,
+        0
+      )
+
+      const [, setCall] = mockRequest.yar.set.mock.calls[0]
+      expect(setCall.siteDetails[0].siteName).toBe('Updated from file')
     })
 
     test('should write updated siteDetails to the cache', () => {

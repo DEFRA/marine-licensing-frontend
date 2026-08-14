@@ -3,6 +3,7 @@ import { getSiteDetailsBySite } from '#src/server/common/helpers/exemptions/sess
 import { getSiteDetailsBySite as getSiteByIndex } from '#src/server/common/helpers/marine-licence/session-cache/site-details-utils.js'
 import { snapshotActivityLabels } from '#src/server/common/helpers/activity-details/snapshot-activity-labels.js'
 import { SINGLE_SITE_MODE_KEY } from '#src/server/common/constants/cache.js'
+import { withExtractedSiteName } from '#src/server/common/helpers/file-upload/extract-site-name.js'
 
 export const MARINE_LICENCE_CACHE_KEY = 'marineLicence'
 export const SAVED_SITE_DETAILS_CACHE_KEY = 'savedMarineLicenceSiteDetails'
@@ -146,11 +147,15 @@ export const updateMarineLicenceSiteDetailsBatch = (
   })
 
   if (!isMultipleSitesFile) {
-    const updatedSite = {
-      ...uploadSiteData,
-      extractedCoordinates: coordinateData.extractedCoordinates,
-      geoJSON: coordinateData.geoJSON
-    }
+    const updatedSite = withExtractedSiteName(
+      {
+        ...uploadSiteData,
+        extractedCoordinates: coordinateData.extractedCoordinates,
+        geoJSON: coordinateData.geoJSON
+      },
+      coordinateData.geoJSON.features[0],
+      uploadSiteData.fileUploadType
+    )
 
     request.yar.set(MARINE_LICENCE_CACHE_KEY, {
       ...existingCache,
@@ -164,16 +169,21 @@ export const updateMarineLicenceSiteDetailsBatch = (
 
   for (const [index] of coordinateData.geoJSON.features.entries()) {
     const existingSiteDetails = getSiteDetailsBySite(existingCache, index)
+    const feature = coordinateData.geoJSON.features[index]
 
-    const updatedSite = {
-      ...existingSiteDetails,
-      ...uploadSiteData,
-      extractedCoordinates: coordinateData.extractedCoordinates[index],
-      geoJSON: {
-        type: coordinateData.geoJSON.type,
-        features: [coordinateData.geoJSON.features[index]]
-      }
-    }
+    const updatedSite = withExtractedSiteName(
+      {
+        ...existingSiteDetails,
+        ...uploadSiteData,
+        extractedCoordinates: coordinateData.extractedCoordinates[index],
+        geoJSON: {
+          type: coordinateData.geoJSON.type,
+          features: [feature]
+        }
+      },
+      feature,
+      uploadSiteData.fileUploadType
+    )
 
     updatedSiteDetails.push(updatedSite)
   }
@@ -201,12 +211,17 @@ export const updateSingleSiteLocation = (
     siteDetails: targetSite
   })
 
-  const updatedSite = {
-    ...targetSite,
-    ...uploadSiteData,
-    extractedCoordinates: coordinateData.extractedCoordinates,
-    geoJSON: coordinateData.geoJSON
-  }
+  const updatedSite = withExtractedSiteName(
+    {
+      ...targetSite,
+      ...uploadSiteData,
+      extractedCoordinates: coordinateData.extractedCoordinates,
+      geoJSON: coordinateData.geoJSON
+    },
+    coordinateData.geoJSON.features[0],
+    uploadSiteData.fileUploadType,
+    { preserveExisting: true }
+  )
 
   const updatedSiteDetails = [...existingCache.siteDetails]
   updatedSiteDetails[targetSiteIndex] = updatedSite

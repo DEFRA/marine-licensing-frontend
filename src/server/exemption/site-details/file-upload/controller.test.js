@@ -6,6 +6,10 @@ import { fileUploadController } from '#src/server/exemption/site-details/file-up
 import { mockExemption } from '#src/server/test-helpers/mocks/exemption.js'
 import * as cdpUploadService from '#src/services/cdp-upload-service/index.js'
 import { FILE_UPLOAD_VIEW_ROUTE } from '#src/server/common/helpers/file-upload/constants.js'
+import {
+  KML_SITE_NAME_GUIDANCE,
+  SHAPEFILE_SITE_NAME_GUIDANCE
+} from '#src/server/common/helpers/file-upload/file-upload.js'
 
 vi.mock('~/src/server/common/helpers/exemptions/session-cache/utils.js')
 vi.mock('~/src/services/cdp-upload-service/index.js')
@@ -123,16 +127,23 @@ describe('#fileUpload', () => {
         {
           fileType: 'kml',
           expectedHeading: 'Upload a KML file',
-          expectedAccept: '.kml'
+          expectedAccept: '.kml',
+          expectedSiteNameGuidance: KML_SITE_NAME_GUIDANCE
         },
         {
           fileType: 'shapefile',
           expectedHeading: 'Upload a shapefile',
-          expectedAccept: '.zip'
+          expectedAccept: '.zip',
+          expectedSiteNameGuidance: SHAPEFILE_SITE_NAME_GUIDANCE
         }
       ])(
         'Should display $fileType upload page with correct title and content',
-        async ({ fileType, expectedHeading, expectedAccept }) => {
+        async ({
+          fileType,
+          expectedHeading,
+          expectedAccept,
+          expectedSiteNameGuidance
+        }) => {
           // Given - File type selected
           // When
           await setupStandardFileUploadTest(fileType, mockRequest, mockH)
@@ -144,6 +155,7 @@ describe('#fileUpload', () => {
             projectName: 'Test Project',
             acceptAttribute: expectedAccept,
             fileUploadType: fileType,
+            siteNameGuidance: expectedSiteNameGuidance,
             backLink: routes.CHOOSE_FILE_UPLOAD_TYPE,
             cancelLink: `${routes.TASK_LIST}?cancel=site-details`
           })

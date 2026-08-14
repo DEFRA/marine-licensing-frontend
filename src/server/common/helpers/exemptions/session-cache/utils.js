@@ -1,5 +1,6 @@
 import { clone } from '@hapi/hoek'
 import { getSiteDetailsBySite } from '#src/server/common/helpers/exemptions/session-cache/site-details-utils.js'
+import { withExtractedSiteName } from '#src/server/common/helpers/file-upload/extract-site-name.js'
 
 export const EXEMPTION_CACHE_KEY = 'exemption'
 export const SAVED_SITE_DETAILS_CACHE_KEY = 'savedSiteDetails'
@@ -117,11 +118,15 @@ export const updateExemptionSiteDetailsBatch = (
   }
 
   if (!isMultipleSitesFile) {
-    const updatedSite = {
-      ...uploadSiteData,
-      extractedCoordinates: coordinateData.extractedCoordinates,
-      geoJSON: coordinateData.geoJSON
-    }
+    const updatedSite = withExtractedSiteName(
+      {
+        ...uploadSiteData,
+        extractedCoordinates: coordinateData.extractedCoordinates,
+        geoJSON: coordinateData.geoJSON
+      },
+      coordinateData.geoJSON.features[0],
+      fileUploadType
+    )
 
     request.yar.set(EXEMPTION_CACHE_KEY, {
       ...existingCache,
@@ -135,16 +140,21 @@ export const updateExemptionSiteDetailsBatch = (
 
   for (const [index] of coordinateData.geoJSON.features.entries()) {
     const existingSiteDetails = getSiteDetailsBySite(existingCache, index)
+    const feature = coordinateData.geoJSON.features[index]
 
-    const updatedSite = {
-      ...existingSiteDetails,
-      ...uploadSiteData,
-      extractedCoordinates: coordinateData.extractedCoordinates[index],
-      geoJSON: {
-        type: coordinateData.geoJSON.type,
-        features: [coordinateData.geoJSON.features[index]]
-      }
-    }
+    const updatedSite = withExtractedSiteName(
+      {
+        ...existingSiteDetails,
+        ...uploadSiteData,
+        extractedCoordinates: coordinateData.extractedCoordinates[index],
+        geoJSON: {
+          type: coordinateData.geoJSON.type,
+          features: [feature]
+        }
+      },
+      feature,
+      fileUploadType
+    )
 
     updatedSiteDetails.push(updatedSite)
   }

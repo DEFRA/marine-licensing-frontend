@@ -185,7 +185,7 @@ describe('Task List', () => {
     expect(feedbackLink).toHaveAttribute('rel', 'noopener noreferrer')
     expect(feedbackLink).toHaveAttribute(
       'href',
-      'https://forms.office.com/pages/responsepage.aspx?id=UCQKdycCYkyQx044U38RAjXEiYXnHG1DvkWr_VjRfzZUNERIRURNOFNVT0tXSlo1NUdONUYxQjNKUy4u&route=shorturl'
+      'https://forms.cloud.microsoft/e/MHPbixhs4i'
     )
   })
 })

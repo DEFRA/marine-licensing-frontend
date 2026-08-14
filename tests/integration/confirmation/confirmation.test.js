@@ -50,6 +50,25 @@ describe('Confirmation page', () => {
     )
     expect(feedbackLink).toHaveAttribute('rel', 'noopener noreferrer')
     expect(feedbackLink).toHaveClass('govuk-link')
+    expect(feedbackLink.parentElement).toHaveTextContent(
+      'What did you think of this service? (takes 30 seconds)'
+    )
+  })
+
+  it('should keep the exemption mid journey survey URL in the banner', async () => {
+    const document = await loadPage({
+      requestUrl: `${routes.CONFIRMATION}?applicationReference=TEST-REF-123`,
+      server: getServer()
+    })
+
+    const phaseBanner = document.querySelector('.govuk-phase-banner')
+    const bannerLink = within(phaseBanner).getByRole('link', {
+      name: /give your feedback/i
+    })
+    expect(bannerLink).toHaveAttribute(
+      'href',
+      'https://forms.office.com/pages/responsepage.aspx?id=UCQKdycCYkyQx044U38RAjXEiYXnHG1DvkWr_VjRfzZUNERIRURNOFNVT0tXSlo1NUdONUYxQjNKUy4u&route=shorturl'
+    )
   })
 
   it('should return bad request when application reference is missing', async () => {

@@ -11,9 +11,7 @@
       <p class="govuk-body">We have sent you a confirmation email with your reference number.</p>
       <h2 class="govuk-heading-m">What happens next</h2>
       <p class="govuk-body">You can complete your activity within the dates you provided.</p>
-      <p class="govuk-body">
-        <a href="https://forms.office.com/pages/responsepage.aspx?id=UCQKdycCYkyQx044U38RAjXEiYXnHG1DvkWr_VjRfzZURFMxRkhCSzQyVlRKQzdZNDEyVDhSMFdSNy4u&route=shorturl" class="govuk-link" rel="noopener noreferrer">What did you think of this service? (takes 30 seconds)</a>
-      </p>
+      {{ appSurveyLink({ href: surveyUrls.exemptionConfirmation }) }}
     </div>
   </div>
 {% endblock %}

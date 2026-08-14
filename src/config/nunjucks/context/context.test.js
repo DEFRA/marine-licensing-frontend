@@ -72,7 +72,12 @@ describe('#context', () => {
           }
         ],
         serviceName: 'Get permission for marine work',
-        serviceUrl: '/'
+        serviceUrl: '/',
+        surveyUrls: {
+          midJourney: expect.stringContaining('https://'),
+          exemptionConfirmation: expect.stringContaining('https://'),
+          marineLicenceConfirmation: expect.stringContaining('https://')
+        }
       })
     })
 
@@ -182,6 +187,58 @@ describe('#context', () => {
         serviceUrl: '/'
       })
     )
+  })
+
+  describe('survey URLs', () => {
+    const exemptionMidJourneyUrl =
+      'https://forms.office.com/pages/responsepage.aspx?id=UCQKdycCYkyQx044U38RAjXEiYXnHG1DvkWr_VjRfzZUNERIRURNOFNVT0tXSlo1NUdONUYxQjNKUy4u&route=shorturl'
+    const marineLicenceMidJourneyUrl =
+      'https://forms.cloud.microsoft/e/MHPbixhs4i'
+
+    it.each([
+      {
+        page: 'a marine licence journey page',
+        path: '/marine-licence/project-name',
+        expected: marineLicenceMidJourneyUrl
+      },
+      {
+        page: 'the internal user view details page',
+        path: '/view-marine-licence-details',
+        expected: marineLicenceMidJourneyUrl
+      },
+      {
+        page: 'an exemption journey page',
+        path: '/exemption/project-name',
+        expected: exemptionMidJourneyUrl
+      },
+      {
+        page: 'a page belonging to neither journey',
+        path: '/help/privacy',
+        expected: exemptionMidJourneyUrl
+      }
+    ])(
+      'When on $page, should use the matching mid journey survey URL',
+      ({ path, expected }) => {
+        const request = { path, logger: { error: vi.fn() } }
+        expect(context(request).surveyUrls.midJourney).toBe(expected)
+      }
+    )
+
+    it('Should provide both confirmation survey URLs regardless of journey', () => {
+      const request = {
+        path: '/exemption/project-name',
+        logger: { error: vi.fn() }
+      }
+      const { surveyUrls } = context(request)
+
+      expect(surveyUrls.marineLicenceConfirmation).toBe(
+        'https://forms.cloud.microsoft/e/vUT96ZvAez'
+      )
+      expect(surveyUrls.exemptionConfirmation).not.toBe(
+        surveyUrls.marineLicenceConfirmation
+      )
+      expect(surveyUrls.exemptionConfirmation).not.toBe(surveyUrls.midJourney)
+    })
   })
 
   it('When session cache throws, should show navigation', () => {

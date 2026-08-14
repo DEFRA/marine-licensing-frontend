@@ -305,3 +305,33 @@ describe('config validation', () => {
     })
   })
 })
+
+describe('survey config', () => {
+  const surveyKeys = [
+    'survey.exemption.midJourneyUrl',
+    'survey.exemption.confirmationUrl',
+    'survey.marineLicence.midJourneyUrl',
+    'survey.marineLicence.confirmationUrl'
+  ]
+
+  test.each(surveyKeys)('should provide a default URL for %s', async (key) => {
+    const { config } = await import('./config.js')
+    expect(config.get(key)).toMatch(/^https:\/\//)
+  })
+
+  test('should use a distinct URL for every survey', async () => {
+    const { config } = await import('./config.js')
+    const urls = surveyKeys.map((key) => config.get(key))
+    expect(new Set(urls).size).toBe(surveyKeys.length)
+  })
+
+  test('should use the marine licence specific survey URLs', async () => {
+    const { config } = await import('./config.js')
+    expect(config.get('survey.marineLicence.midJourneyUrl')).toBe(
+      'https://forms.cloud.microsoft/e/MHPbixhs4i'
+    )
+    expect(config.get('survey.marineLicence.confirmationUrl')).toBe(
+      'https://forms.cloud.microsoft/e/vUT96ZvAez'
+    )
+  })
+})

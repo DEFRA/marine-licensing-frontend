@@ -28,17 +28,14 @@
     {% endif %}
 
     <h1 class="govuk-heading-l" id="view-details-heading">{{ pageTitle }}</h1>
-      {% if not isApplicantView %}
     {{ appApplicationDetailsCard({
       applicationReference: applicationReference,
       dateSubmitted: submittedAt,
       whoExemptionIsFor: whoExemptionIsFor,
-      isReadOnly: isReadOnly,
       status: status,
       statusTagClass: statusTagClass,
       withdrawnAt: withdrawnAt
     }) }}
-      {% endif %}
     {% if mcmsContext and mcmsContext.activity %}
     {{ appProjectDetailsCard({
       mcmsContext: mcmsContext,

@@ -4,6 +4,7 @@
 import { within } from '@testing-library/dom'
 
 const GOV_UK_SUMMARY_LIST_KEY = '.govuk-summary-list__key'
+const APPLICATION_DETAILS_CARD = '#application-details-card'
 /**
  * Validates the basic page structure (heading and back link)
  * @param {Document} document - JSDOM document
@@ -114,9 +115,22 @@ export const validateSummaryCardContent = (
 export const validateApplicationDetails = (document, expected) => {
   validateSummaryCardContent(
     document,
-    '#application-details-card',
+    APPLICATION_DETAILS_CARD,
     expected.applicationDetails
   )
+
+  const card = document.querySelector(APPLICATION_DETAILS_CARD)
+  if (!card) {
+    return
+  }
+
+  const rowKeys = Array.from(
+    card.querySelectorAll(GOV_UK_SUMMARY_LIST_KEY)
+  ).map((keyElement) => keyElement.textContent.trim())
+
+  for (const key of expected.applicationDetailsMissingRows ?? []) {
+    expect(rowKeys).not.toContain(key)
+  }
 }
 
 /**

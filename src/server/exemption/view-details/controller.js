@@ -13,6 +13,7 @@ import { EXEMPTIONS_KEY } from '#src/server/common/constants/exemptions.js'
 import { withAnswersLinkType } from '#src/server/common/helpers/mcms-context/is-downloadable-pdf.js'
 
 export const VIEW_DETAILS_VIEW_ROUTE = 'exemption/view-details/index'
+
 export const viewDetailsController = {
   async handler(request, h) {
     const { exemptionId } = request.params
@@ -50,13 +51,11 @@ export const viewDetailsController = {
         exemption.siteDetails
       )
 
-      // Format the page caption with application reference
-      const pageCaption = `${exemption.applicationReference}${isApplicantView ? ' - Exempt activity notification' : ''}`
       const statusTagClass = getTagStyle(exemption.status)
 
       return h.view(VIEW_DETAILS_VIEW_ROUTE, {
         pageTitle: exemption.projectName,
-        pageCaption,
+        pageCaption: exemption.applicationReference,
         backLink: isApplicantView ? routes.DASHBOARD : null,
         isReadOnly: true,
         isApplicantView,

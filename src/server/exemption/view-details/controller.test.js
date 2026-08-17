@@ -273,7 +273,7 @@ describe('view details controller', () => {
           expect.objectContaining({
             isApplicantView: true,
             pageTitle: submittedExemption.projectName,
-            pageCaption: 'EXE/2025/00003 - Exempt activity notification',
+            pageCaption: 'EXE/2025/00003',
             backLink: '/projects',
             isReadOnly: true,
             projectName: submittedExemption.projectName,
@@ -417,9 +417,9 @@ describe('view details controller', () => {
         expect(mockH.view.mock.calls[0][1].backLink).toBeNull()
       })
 
-      test('should pass whoExemptionIsFor as undefined if organisation is not set in the exemption', async () => {
+      test('should pass whoExemptionIsFor as undefined if the API does not return it (internal user view)', async () => {
         const submittedExemption = createSubmittedExemption({
-          organisation: undefined
+          whoExemptionIsFor: undefined
         })
         const mockExemptionServiceInstance = {
           getExemptionById: vi.fn().mockResolvedValue(submittedExemption)
@@ -435,30 +435,6 @@ describe('view details controller', () => {
           params: { exemptionId: validExemptionId },
           logger: { error: vi.fn() },
           auth: { credentials: { strategy: 'entra-id' } }
-        }
-        const mockH = { view: vi.fn() }
-
-        await viewDetailsController.handler(mockRequest, mockH)
-        expect(mockH.view.mock.calls[0][1].whoExemptionIsFor).toBeUndefined()
-      })
-
-      test('should pass whoExemptionIsFor as undefined if the applicant is viewing the page', async () => {
-        const submittedExemption = createSubmittedExemption({
-          organisation: { name: 'Test' }
-        })
-        const mockExemptionServiceInstance = {
-          getExemptionById: vi.fn().mockResolvedValue(submittedExemption)
-        }
-
-        vi.mocked(getExemptionService).mockReturnValue(
-          mockExemptionServiceInstance
-        )
-
-        const mockRequest = {
-          path: '/exemption/view-details/:exemptionId',
-          params: { exemptionId: validExemptionId },
-          logger: { error: vi.fn() },
-          auth: { credentials: { strategy: 'defra-id' } }
         }
         const mockH = { view: vi.fn() }
 

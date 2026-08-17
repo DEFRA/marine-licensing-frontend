@@ -89,6 +89,15 @@ const exemptionPages = [
     title: mockExemptionSubmitted.projectName,
     exemption: mockExemptionSubmitted
   },
+  {
+    url: `${routes.VIEW_DETAILS}/${mockExemptionSubmitted.id}`,
+    title: mockExemptionSubmitted.projectName,
+    exemption: {
+      ...mockExemptionSubmitted,
+      status: 'Withdrawn',
+      withdrawnAt: '2025-07-19T09:00:00.000Z'
+    }
+  },
   { url: routes.SITE_NAME, title: 'Site name' },
   {
     url: routes.MULTIPLE_SITES_CHOICE,

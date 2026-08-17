@@ -113,6 +113,38 @@ export const config = convict({
       env: 'MCMS_PATH'
     }
   },
+  survey: {
+    exemption: {
+      midJourneyUrl: {
+        doc: 'Mid-journey feedback survey linked from the service banner on exemption screens',
+        format: String,
+        default:
+          'https://forms.office.com/pages/responsepage.aspx?id=UCQKdycCYkyQx044U38RAjXEiYXnHG1DvkWr_VjRfzZUNERIRURNOFNVT0tXSlo1NUdONUYxQjNKUy4u&route=shorturl',
+        env: 'SURVEY_EXEMPTION_MID_JOURNEY_URL'
+      },
+      confirmationUrl: {
+        doc: 'End-of-journey feedback survey linked from the exemption confirmation page',
+        format: String,
+        default:
+          'https://forms.office.com/pages/responsepage.aspx?id=UCQKdycCYkyQx044U38RAjXEiYXnHG1DvkWr_VjRfzZURFMxRkhCSzQyVlRKQzdZNDEyVDhSMFdSNy4u&route=shorturl',
+        env: 'SURVEY_EXEMPTION_CONFIRMATION_URL'
+      }
+    },
+    marineLicence: {
+      midJourneyUrl: {
+        doc: 'Mid-journey feedback survey linked from the service banner on marine licence screens',
+        format: String,
+        default: 'https://forms.cloud.microsoft/e/MHPbixhs4i',
+        env: 'SURVEY_MARINE_LICENCE_MID_JOURNEY_URL'
+      },
+      confirmationUrl: {
+        doc: 'End-of-journey feedback survey linked from the marine licence confirmation page',
+        format: String,
+        default: 'https://forms.cloud.microsoft/e/vUT96ZvAez',
+        env: 'SURVEY_MARINE_LICENCE_CONFIRMATION_URL'
+      }
+    }
+  },
   root: {
     doc: 'Project root',
     format: String,

@@ -3,6 +3,7 @@ import { testScenarios } from './fixtures.js'
 import {
   validatePageStructure,
   validateAllSummaryCardsExist,
+  validateApplicationDetails,
   validateProjectDetails,
   validateSiteLocation,
   validateActivityDetails,
@@ -48,6 +49,7 @@ describe('View Details - Content Verification Integration Tests', () => {
       validatePageStructure(document, expectedPageContent)
       validateAllSummaryCardsExist(document, expectedPageContent)
       validateAnySummaryCardsMissing(document, expectedPageContent)
+      validateApplicationDetails(document, expectedPageContent)
       validateProjectDetails(document, expectedPageContent)
       validateSiteLocation(document, expectedPageContent)
       validateActivityDetails(document, expectedPageContent)
@@ -56,4 +58,37 @@ describe('View Details - Content Verification Integration Tests', () => {
       validateReadOnlyBehavior(document)
     }
   )
+
+  describe('application details card', () => {
+    const { exemption, expectedPageContent } = testScenarios[0]
+
+    test('shows the caption without the exempt activity notification suffix', async () => {
+      const document = await getPageDocument(exemption)
+
+      expect(document.querySelector('.govuk-caption-l')).toHaveTextContent(
+        'EXE/2025/00003'
+      )
+      expect(document.querySelector('.govuk-caption-l')).not.toHaveTextContent(
+        'Exempt activity notification'
+      )
+    })
+
+    test('shows the date withdrawn row for a withdrawn exemption', async () => {
+      const document = await getPageDocument({
+        ...exemption,
+        status: 'Withdrawn',
+        withdrawnAt: '2025-07-19T09:00:00.000Z'
+      })
+
+      validateApplicationDetails(document, {
+        ...expectedPageContent,
+        applicationDetails: {
+          ...expectedPageContent.applicationDetails,
+          Status: 'Withdrawn',
+          'Date withdrawn': '19 July 2025'
+        },
+        applicationDetailsMissingRows: []
+      })
+    })
+  })
 })

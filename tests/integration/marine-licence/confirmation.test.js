@@ -58,6 +58,51 @@ describe('Marine licence confirmation page', () => {
     expect(contactEmail).toHaveClass('govuk-link')
   })
 
+  it('should display the survey link with the hint text and the marine licence survey URL', async () => {
+    const document = await loadPage({
+      requestUrl: `${marineLicenceRoutes.MARINE_LICENCE_CONFIRMATION}?applicationReference=ML-REF-123`,
+      server: getServer()
+    })
+
+    const surveyLink = within(document).getByRole('link', {
+      name: 'What did you think of this service?'
+    })
+    expect(surveyLink).toBeInTheDocument()
+    expect(surveyLink).toHaveAttribute(
+      'href',
+      'https://forms.cloud.microsoft/e/vUT96ZvAez'
+    )
+    expect(surveyLink).toHaveAttribute('rel', 'noopener noreferrer')
+    expect(surveyLink).toHaveClass('govuk-link')
+
+    expect(surveyLink.parentElement).toHaveTextContent(
+      'What did you think of this service? (takes 30 seconds)'
+    )
+  })
+
+  it('should display the banner feedback link using a different, mid journey survey URL', async () => {
+    const document = await loadPage({
+      requestUrl: `${marineLicenceRoutes.MARINE_LICENCE_CONFIRMATION}?applicationReference=ML-REF-123`,
+      server: getServer()
+    })
+
+    const phaseBanner = document.querySelector('.govuk-phase-banner')
+    const bannerLink = within(phaseBanner).getByRole('link', {
+      name: /give your feedback/i
+    })
+    expect(bannerLink).toHaveAttribute(
+      'href',
+      'https://forms.cloud.microsoft/e/MHPbixhs4i'
+    )
+
+    const surveyLink = within(document).getByRole('link', {
+      name: 'What did you think of this service?'
+    })
+    expect(bannerLink.getAttribute('href')).not.toBe(
+      surveyLink.getAttribute('href')
+    )
+  })
+
   it('should return bad request when application reference is missing', async () => {
     const response = await makeGetRequest({
       server: getServer(),

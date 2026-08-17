@@ -38,6 +38,24 @@ const hideNavigationRoutesMarineLicenceAlways = new Set([
 
 const hideNavigationRoutesExemptionAlways = new Set([routes.UPLOAD_AND_WAIT])
 
+const isMarineLicencePath = (pagePath = '') => {
+  return (
+    pagePath.startsWith('/marine-licence') ||
+    pagePath === marineLicenceRoutes.MARINE_LICENCE_VIEW_DETAILS_INTERNAL_USER
+  )
+}
+
+const getSurveyUrls = (request) => {
+  const journey = isMarineLicencePath(request?.path)
+    ? 'marineLicence'
+    : 'exemption'
+
+  return {
+    midJourney: config.get(`survey.${journey}.midJourneyUrl`),
+    confirmation: config.get(`survey.${journey}.confirmationUrl`)
+  }
+}
+
 const isRouteNavigationHidden = (request) => {
   const { path: pagePath } = request
 
@@ -93,6 +111,7 @@ export function context(request) {
     navigation,
     isAuthenticated,
     analyticsEnabled,
+    surveyUrls: getSurveyUrls(request),
     clarityProjectId: config.get('clarityProjectId'),
     enableBrowserLogging: config.get('enableBrowserLogging'),
     getAssetPath(asset) {

@@ -7,6 +7,7 @@ const baseSubmittedExemption = {
   applicationReference: 'EXE/2025/00003',
   submittedAt: '2025-01-01T10:00:00.000Z',
   projectName: 'Test Marine Activity Project',
+  whoExemptionIsFor: 'Dredging Co',
   publicRegister: {
     consent: 'no',
     reason: 'Legal reasons'
@@ -87,10 +88,11 @@ export const mockPolygonCoordinatesOSGB36 = [
 
 const baseExpectedContent = {
   pageTitle: 'Test Marine Activity Project',
-  pageCaption: 'EXE/2025/00003 - Exempt activity notification',
+  pageCaption: 'EXE/2025/00003',
   backLinkText: 'Back',
   backLinkHref: '/projects',
   summaryCards: [
+    'Application details',
     'Project summary',
     'Providing the site location',
     'Site 1',
@@ -111,6 +113,14 @@ const baseExpectedContent = {
       'Download a copy of your answers (PDF)'
     ]
   },
+  applicationDetails: {
+    'Application type': 'Exempt activity notification',
+    Status: 'Submitted',
+    'Reference number': 'EXE/2025/00003',
+    'Who the exemption is for': 'Dredging Co',
+    'Date submitted': '1 January 2025'
+  },
+  applicationDetailsMissingRows: ['Date withdrawn'],
   publicRegister: {
     'Consent to publish your project information': 'No',
     'Why you do not consent': 'Legal reasons'

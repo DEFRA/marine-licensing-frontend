@@ -1,18 +1,15 @@
 import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
-import { getCommonRedirectLink } from '#src/server/common/helpers/marine-licence/redirect-link.js'
+import { RETURN_TO_CACHE_KEY } from '#src/server/common/constants/cache.js'
 
 export const getCancelLink = (request) => {
-  const fromCheckYourAnswers = request.query?.from === 'check-your-answers'
-
-  return fromCheckYourAnswers
-    ? undefined
-    : marineLicenceRoutes.MARINE_LICENCE_TASK_LIST
+  const returnTo = request.yar.get(RETURN_TO_CACHE_KEY)
+  return returnTo ? undefined : marineLicenceRoutes.MARINE_LICENCE_TASK_LIST
 }
 
 export const getContinueLink = (request) => {
-  const redirectLink = getCommonRedirectLink(request)
+  const returnTo = request.yar.get(RETURN_TO_CACHE_KEY)
 
-  return redirectLink === marineLicenceRoutes.MARINE_LICENCE_TASK_LIST
-    ? redirectLink
-    : `${redirectLink}#fee-estimate-card`
+  return returnTo
+    ? `${returnTo}#fee-estimate-card`
+    : marineLicenceRoutes.MARINE_LICENCE_TASK_LIST
 }

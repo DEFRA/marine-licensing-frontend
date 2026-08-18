@@ -13,6 +13,10 @@ import { getMarineLicenceService } from '#src/services/marine-licence-service/in
 import { waterFrameworkReviewData } from '#src/server/common/helpers/marine-licence/water-framework-directive/water-framework-review-data.js'
 import { getWaterFrameworkDirectiveChangeLink } from '#src/server/marine-licence/check-your-answers/utils.js'
 import { buildMarinePlanPoliciesData } from '#src/server/common/helpers/marine-licence/marine-plan-policies-data.js'
+import {
+  FEE_ESTIMATE_AMOUNT,
+  FEE_ESTIMATE_MONITORING_AMOUNT
+} from '#src/server/common/validation/fee-estimate/constants.js'
 
 const checkYourAnswersViewContent = {
   pageTitle: 'Check your answers before sending your information',
@@ -75,7 +79,9 @@ export const checkYourAnswersController = {
       invoicingChangeLink:
         marineLicenceRoutes.MARINE_LICENCE_CHECK_INVOICING_DETAILS,
       feeEstimateChangeLink: marineLicenceRoutes.MARINE_LICENCE_FEE_ESTIMATE,
-      marinePlanPolicies
+      marinePlanPolicies,
+      amount: FEE_ESTIMATE_AMOUNT,
+      monitoringAmount: FEE_ESTIMATE_MONITORING_AMOUNT
     })
   }
 }

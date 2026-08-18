@@ -17,6 +17,15 @@
 </nav>
 {% endblock %}
 
+
+{% set introHtml %}
+ Your application fee band: 2A<br>Your application fee will not exceed {{ amount }}
+{% endset %}
+
+{% set hintText %}
+ This includes the application fee of up to {{ amount }} and potential post-consent monitoring of up to {{ monitoringAmount }}
+{% endset %}
+
 {% block content %}
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
@@ -32,7 +41,7 @@
       <h1 class="govuk-heading-l">{{ heading }}</h1>
 
       {{ govukInsetText({
-        html: "Your application fee band: 2A<br>Your application fee will not exceed £1,400"
+        html: introHtml
       }) }}
 
       <p class="govuk-body">Your final invoice will be based on actual hours worked. VAT does not apply.</p>
@@ -73,7 +82,7 @@
             }
           },
           hint: {
-            text: "This includes the application fee of up to £1,400 and potential post-consent monitoring of up to £750"
+            text: hintText
           },
           value: payload.accept,
           items: [

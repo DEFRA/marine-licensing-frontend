@@ -2,9 +2,13 @@
 
 {% set rows = [] %}
 
+{% set rowText %}
+{{ params.amount }} (Does not include potential post-consent monitoring of up to {{ params.monitoringAmount }})
+{% endset %}
+
 {% set _ = rows.push({
      key: { text:  "Maximum application fee estimate accepted" },
-     value: { text: "£1,400 (Does not include potential post-consent monitoring of up to £750)" },
+     value: { text: rowText },
      classes: "govuk-summary-list__row--no-border",
        actions: {
       items: [

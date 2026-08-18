@@ -12,7 +12,11 @@ import {
 } from '#src/server/common/constants/routes.js'
 import { authenticatedPatchRequest } from '#src/server/common/helpers/authenticated-requests.js'
 import { feeEstimateSchema } from '#src/server/common/validation/fee-estimate/schema.js'
-import { feeEstimateErrorMessages } from '#src/server/common/validation/fee-estimate/constants.js'
+import {
+  FEE_ESTIMATE_AMOUNT,
+  FEE_ESTIMATE_MONITORING_AMOUNT,
+  feeEstimateErrorMessages
+} from '#src/server/common/validation/fee-estimate/constants.js'
 import {
   getCancelLink,
   getContinueLink
@@ -30,7 +34,9 @@ export const errorMessages = feeEstimateErrorMessages
 
 const feeEstimateSettings = {
   pageTitle: 'Fee estimate',
-  heading: 'Fee estimate'
+  heading: 'Fee estimate',
+  amount: FEE_ESTIMATE_AMOUNT,
+  monitoringAmount: FEE_ESTIMATE_MONITORING_AMOUNT
 }
 
 export const feeEstimateController = {

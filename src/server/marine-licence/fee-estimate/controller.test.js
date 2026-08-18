@@ -13,6 +13,10 @@ import {
 import * as cacheUtils from '#src/server/common/helpers/marine-licence/session-cache/utils.js'
 import * as authRequests from '#src/server/common/helpers/authenticated-requests.js'
 import { createMockRequest } from '#src/server/test-helpers/mocks/helpers.js'
+import {
+  FEE_ESTIMATE_AMOUNT,
+  FEE_ESTIMATE_MONITORING_AMOUNT
+} from '#src/server/common/validation/fee-estimate/constants.js'
 
 vi.mock('#src/server/common/helpers/marine-licence/session-cache/utils.js')
 
@@ -54,7 +58,9 @@ describe('#feeEstimate', () => {
           feeBand: '2A'
         },
         backLink: marineLicenceRoutes.MARINE_LICENCE_TASK_LIST,
-        cancelLink: marineLicenceRoutes.MARINE_LICENCE_TASK_LIST
+        cancelLink: marineLicenceRoutes.MARINE_LICENCE_TASK_LIST,
+        amount: FEE_ESTIMATE_AMOUNT,
+        monitoringAmount: FEE_ESTIMATE_MONITORING_AMOUNT
       })
     })
 
@@ -81,7 +87,9 @@ describe('#feeEstimate', () => {
           feeBand: '2A'
         },
         backLink: marineLicenceRoutes.MARINE_LICENCE_TASK_LIST,
-        cancelLink: marineLicenceRoutes.MARINE_LICENCE_TASK_LIST
+        cancelLink: marineLicenceRoutes.MARINE_LICENCE_TASK_LIST,
+        amount: FEE_ESTIMATE_AMOUNT,
+        monitoringAmount: FEE_ESTIMATE_MONITORING_AMOUNT
       })
     })
 
@@ -244,6 +252,8 @@ describe('#feeEstimate', () => {
           feesTermsAndConditionsUrl: FEES_TERMS_AND_CONDITIONS_URL,
           backLink: marineLicenceRoutes.MARINE_LICENCE_TASK_LIST,
           cancelLink: marineLicenceRoutes.MARINE_LICENCE_TASK_LIST,
+          amount: FEE_ESTIMATE_AMOUNT,
+          monitoringAmount: FEE_ESTIMATE_MONITORING_AMOUNT,
           payload,
           ...expectedExtra
         })

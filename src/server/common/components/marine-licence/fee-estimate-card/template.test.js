@@ -1,4 +1,8 @@
 import { renderComponent } from '#src/server/test-helpers/component-helpers.js'
+import {
+  FEE_ESTIMATE_AMOUNT,
+  FEE_ESTIMATE_MONITORING_AMOUNT
+} from '#src/server/common/validation/fee-estimate/constants.js'
 
 describe('Marine Licence Fee Estimate Card Component', () => {
   let $component
@@ -15,7 +19,9 @@ describe('Marine Licence Fee Estimate Card Component', () => {
 
   test('Should display correct text', () => {
     const $comp = renderComponent('marine-licence/fee-estimate-card', {
-      changeLink
+      changeLink,
+      amount: FEE_ESTIMATE_AMOUNT,
+      monitoringAmount: FEE_ESTIMATE_MONITORING_AMOUNT
     })
 
     expect($comp.html()).toContain('Maximum application fee estimate accepted')

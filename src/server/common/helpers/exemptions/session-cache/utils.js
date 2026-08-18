@@ -124,8 +124,7 @@ export const updateExemptionSiteDetailsBatch = (
         extractedCoordinates: coordinateData.extractedCoordinates,
         geoJSON: coordinateData.geoJSON
       },
-      coordinateData.geoJSON.features[0],
-      fileUploadType
+      coordinateData.geoJSON.features[0]
     )
 
     request.yar.set(EXEMPTION_CACHE_KEY, {
@@ -152,8 +151,7 @@ export const updateExemptionSiteDetailsBatch = (
           features: [feature]
         }
       },
-      feature,
-      fileUploadType
+      feature
     )
 
     updatedSiteDetails.push(updatedSite)

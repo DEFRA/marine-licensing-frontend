@@ -742,7 +742,7 @@ describe('#utils', () => {
       expect(result[0].siteName).toBe('North Harbour')
     })
 
-    test('should populate site names from shapefile columns for multiple sites', () => {
+    test('should populate site names from GeoJSON properties.name for multiple sites', () => {
       const existingCache = {
         projectName: 'Test Project',
         siteDetails: [{ coordinatesType: 'file', fileUploadType: 'shapefile' }]
@@ -757,7 +757,7 @@ describe('#utils', () => {
             {
               type: 'Feature',
               geometry: { type: 'Polygon', coordinates: [] },
-              properties: { Site_name: 'East Pier' }
+              properties: { name: 'East Pier' }
             },
             {
               type: 'Feature',

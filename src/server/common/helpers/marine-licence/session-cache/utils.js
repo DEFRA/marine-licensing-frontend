@@ -153,8 +153,7 @@ export const updateMarineLicenceSiteDetailsBatch = (
         extractedCoordinates: coordinateData.extractedCoordinates,
         geoJSON: coordinateData.geoJSON
       },
-      coordinateData.geoJSON.features[0],
-      uploadSiteData.fileUploadType
+      coordinateData.geoJSON.features[0]
     )
 
     request.yar.set(MARINE_LICENCE_CACHE_KEY, {
@@ -181,8 +180,7 @@ export const updateMarineLicenceSiteDetailsBatch = (
           features: [feature]
         }
       },
-      feature,
-      uploadSiteData.fileUploadType
+      feature
     )
 
     updatedSiteDetails.push(updatedSite)
@@ -219,7 +217,6 @@ export const updateSingleSiteLocation = (
       geoJSON: coordinateData.geoJSON
     },
     coordinateData.geoJSON.features[0],
-    uploadSiteData.fileUploadType,
     { preserveExisting: true }
   )
 

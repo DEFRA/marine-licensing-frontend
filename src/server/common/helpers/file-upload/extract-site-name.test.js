@@ -79,6 +79,60 @@ describe('#extractSiteNameFromFeature', () => {
     expect(extractSiteNameFromFeature(null, 'shapefile')).toBeNull()
   })
 
+  test('returns null when properties is not an object', () => {
+    expect(
+      extractSiteNameFromFeature(
+        { type: 'Feature', properties: 'invalid' },
+        'kml'
+      )
+    ).toBeNull()
+  })
+
+  test('converts finite numeric names to strings', () => {
+    expect(
+      extractSiteNameFromFeature(polygonFeature({ name: 42 }), 'kml')
+    ).toBe('42')
+  })
+
+  test('returns null for non-string, non-numeric values', () => {
+    expect(
+      extractSiteNameFromFeature(polygonFeature({ name: true }), 'kml')
+    ).toBeNull()
+    expect(
+      extractSiteNameFromFeature(polygonFeature({ name: null }), 'kml')
+    ).toBeNull()
+  })
+
+  test('returns null for non-finite numbers', () => {
+    expect(
+      extractSiteNameFromFeature(polygonFeature({ name: Infinity }), 'kml')
+    ).toBeNull()
+    expect(
+      extractSiteNameFromFeature(polygonFeature({ name: NaN }), 'kml')
+    ).toBeNull()
+  })
+
+  test('uses shapefile column names for unknown file types', () => {
+    expect(
+      extractSiteNameFromFeature(
+        polygonFeature({ Site_name: 'Fallback site' }),
+        'geojson'
+      )
+    ).toBe('Fallback site')
+  })
+
+  test('skips a blank recognised column and uses the next one', () => {
+    expect(
+      extractSiteNameFromFeature(
+        polygonFeature({
+          Site_name: '  ',
+          Name: 'West Dock'
+        }),
+        'shapefile'
+      )
+    ).toBe('West Dock')
+  })
+
   test('truncates names longer than 250 characters', () => {
     expect(
       extractSiteNameFromFeature(

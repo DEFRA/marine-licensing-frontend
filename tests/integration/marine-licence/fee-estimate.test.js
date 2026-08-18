@@ -1,4 +1,4 @@
-import { getByRole, getByText } from '@testing-library/dom'
+import { getByRole, getByText, queryByRole } from '@testing-library/dom'
 import { marineLicenceRoutes } from '~/src/server/common/constants/routes.js'
 import {
   mockMarineLicence,
@@ -48,6 +48,26 @@ describe('Fee estimate', () => {
       'href',
       marineLicenceRoutes.MARINE_LICENCE_TASK_LIST
     )
+  })
+
+  test('page elements when using a change link', async () => {
+    mockMarineLicence(marineLicence)
+
+    const document = await loadPage({
+      requestUrl: `${marineLicenceRoutes.MARINE_LICENCE_FEE_ESTIMATE}?from=check-your-answers`,
+      server: getServer()
+    })
+
+    expect(getByText(document, 'Test Marine Project')).toBeInTheDocument()
+
+    expect(getByRole(document, 'link', { name: 'Back' })).toHaveAttribute(
+      'href',
+      `${marineLicenceRoutes.MARINE_LICENCE_CHECK_YOUR_ANSWERS}#fee-estimate-card`
+    )
+
+    expect(
+      queryByRole(document, 'link', { name: 'Cancel' })
+    ).not.toBeInTheDocument()
   })
 
   test('inset text and body content', async () => {

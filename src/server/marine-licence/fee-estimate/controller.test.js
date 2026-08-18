@@ -50,7 +50,8 @@ describe('#feeEstimate', () => {
           accept: undefined,
           feeBand: '2A'
         },
-        backLink: marineLicenceRoutes.MARINE_LICENCE_TASK_LIST
+        backLink: marineLicenceRoutes.MARINE_LICENCE_TASK_LIST,
+        cancelLink: marineLicenceRoutes.MARINE_LICENCE_TASK_LIST
       })
     })
 
@@ -76,7 +77,8 @@ describe('#feeEstimate', () => {
           accept: 'yes',
           feeBand: '2A'
         },
-        backLink: marineLicenceRoutes.MARINE_LICENCE_TASK_LIST
+        backLink: marineLicenceRoutes.MARINE_LICENCE_TASK_LIST,
+        cancelLink: marineLicenceRoutes.MARINE_LICENCE_TASK_LIST
       })
     })
   })
@@ -209,6 +211,7 @@ describe('#feeEstimate', () => {
           feesUrl: FEES_URL,
           feesTermsAndConditionsUrl: FEES_TERMS_AND_CONDITIONS_URL,
           backLink: marineLicenceRoutes.MARINE_LICENCE_TASK_LIST,
+          cancelLink: marineLicenceRoutes.MARINE_LICENCE_TASK_LIST,
           payload,
           ...expectedExtra
         })

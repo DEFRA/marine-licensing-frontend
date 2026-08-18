@@ -13,6 +13,10 @@ import {
 import { authenticatedPatchRequest } from '#src/server/common/helpers/authenticated-requests.js'
 import { feeEstimateSchema } from '#src/server/common/validation/fee-estimate/schema.js'
 import { feeEstimateErrorMessages } from '#src/server/common/validation/fee-estimate/constants.js'
+import {
+  getCancelLink,
+  getContinueLink
+} from '#src/server/marine-licence/fee-estimate/utils.js'
 
 export const FEE_ESTIMATE_VIEW_ROUTE = 'marine-licence/fee-estimate/index'
 
@@ -34,6 +38,7 @@ export const feeEstimateController = {
     const marineLicence = getMarineLicenceCache(request)
 
     const { feeEstimate = {} } = marineLicence
+    const cancelLink = getCancelLink(request)
 
     return h.view(FEE_ESTIMATE_VIEW_ROUTE, {
       ...feeEstimateSettings,
@@ -45,7 +50,8 @@ export const feeEstimateController = {
         accept: feeEstimate.accept,
         feeBand: '2A'
       },
-      backLink: marineLicenceRoutes.MARINE_LICENCE_TASK_LIST
+      backLink: getContinueLink(request),
+      cancelLink
     })
   }
 }
@@ -57,6 +63,7 @@ export const feeEstimateSubmitController = {
       failAction: (request, h, err) => {
         const { payload } = request
         const { projectName } = getMarineLicenceCache(request)
+        const cancelLink = getCancelLink(request)
 
         if (!err.details) {
           return h
@@ -66,7 +73,8 @@ export const feeEstimateSubmitController = {
               projectName,
               feesTermsAndConditionsUrl: FEES_TERMS_AND_CONDITIONS_URL,
               feesUrl: FEES_URL,
-              backLink: marineLicenceRoutes.MARINE_LICENCE_TASK_LIST
+              backLink: getContinueLink(request),
+              cancelLink
             })
             .takeover()
         }
@@ -81,7 +89,8 @@ export const feeEstimateSubmitController = {
             projectName,
             feesTermsAndConditionsUrl: FEES_TERMS_AND_CONDITIONS_URL,
             feesUrl: FEES_URL,
-            backLink: marineLicenceRoutes.MARINE_LICENCE_TASK_LIST,
+            backLink: getContinueLink(request),
+            cancelLink,
             errors,
             errorSummary
           })
@@ -116,7 +125,9 @@ export const feeEstimateSubmitController = {
         )
       }
 
-      return h.redirect(marineLicenceRoutes.MARINE_LICENCE_TASK_LIST)
+      const continueLink = getContinueLink(request)
+
+      return h.redirect(continueLink)
     } catch (e) {
       const validation = e.data?.payload?.validation
       const details = validation?.details
@@ -128,13 +139,16 @@ export const feeEstimateSubmitController = {
       const errorSummary = mapErrorsForDisplay(details, errorMessages)
       const errors = errorDescriptionByFieldName(errorSummary)
 
+      const cancelLink = getCancelLink(request)
+
       return h.view(FEE_ESTIMATE_VIEW_ROUTE, {
         ...feeEstimateSettings,
         payload,
         projectName: marineLicence.projectName,
         feesTermsAndConditionsUrl: FEES_TERMS_AND_CONDITIONS_URL,
         feesUrl: FEES_URL,
-        backLink: marineLicenceRoutes.MARINE_LICENCE_TASK_LIST,
+        backLink: getContinueLink(request),
+        cancelLink,
         errors,
         errorSummary
       })

@@ -5,15 +5,39 @@ import {
 } from '#src/server/common/validation/fee-estimate/constants.js'
 
 describe('Marine Licence Fee Estimate Card Component', () => {
-  let $component
-
   const changeLink = 'marine-licence/fee-estimate'
 
-  beforeEach(() => {
-    $component = renderComponent('marine-licence/fee-estimate-card')
+  test('Should not render fee estimate card when amount and monitoringAmount are missing', () => {
+    const $component = renderComponent('marine-licence/fee-estimate-card')
+
+    expect($component('#fee-estimate-card')).toHaveLength(0)
   })
 
-  test('Should render fee estimate crd component', () => {
+  test('Should not render fee estimate card when amount is missing', () => {
+    const $component = renderComponent('marine-licence/fee-estimate-card', {
+      changeLink,
+      monitoringAmount: FEE_ESTIMATE_MONITORING_AMOUNT
+    })
+
+    expect($component('#fee-estimate-card')).toHaveLength(0)
+  })
+
+  test('Should not render fee estimate card when monitoringAmount is missing', () => {
+    const $component = renderComponent('marine-licence/fee-estimate-card', {
+      changeLink,
+      amount: FEE_ESTIMATE_AMOUNT
+    })
+
+    expect($component('#fee-estimate-card')).toHaveLength(0)
+  })
+
+  test('Should render fee estimate card component', () => {
+    const $component = renderComponent('marine-licence/fee-estimate-card', {
+      changeLink,
+      amount: FEE_ESTIMATE_AMOUNT,
+      monitoringAmount: FEE_ESTIMATE_MONITORING_AMOUNT
+    })
+
     expect($component('#fee-estimate-card')).toHaveLength(1)
   })
 

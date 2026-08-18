@@ -16,6 +16,10 @@ import { waterFrameworkReviewData } from '#src/server/common/helpers/marine-lice
 import { buildMarinePlanPoliciesData } from '#src/server/common/helpers/marine-licence/marine-plan-policies-data.js'
 import { PROJECT_STATUS } from '#src/server/common/constants/projects.js'
 import { buildApplicationDetailsCardData } from '#src/server/marine-licence/view-details/utils.js'
+import {
+  FEE_ESTIMATE_AMOUNT,
+  FEE_ESTIMATE_MONITORING_AMOUNT
+} from '#src/server/common/validation/fee-estimate/constants.js'
 
 export const VIEW_DETAILS_VIEW_ROUTE = 'marine-licence/view-details/index'
 
@@ -99,12 +103,15 @@ export const viewDetailsController = {
           ? getApplicantBackLink(marineLicence.status, marineLicenceId)
           : null,
         isInternalUserView,
+        isApplicantView,
         marineLicenceId,
         waterFrameworkDirectiveData,
         invoicingData: formattedMarineLicence.invoicing,
         invoicingChangeLink:
           marineLicenceRoutes.MARINE_LICENCE_CHECK_INVOICING_DETAILS,
         marinePlanPolicies,
+        amount: FEE_ESTIMATE_AMOUNT,
+        monitoringAmount: FEE_ESTIMATE_MONITORING_AMOUNT,
         ...applicationDetailsCardData
       })
     } catch (error) {

@@ -20,7 +20,8 @@ import {
   expectedInvocingCardIndividualUser,
   expectedInvocingCardOrgUser,
   expectedTransferredApplicationDetailsCard,
-  expectedRejectedApplicationDetailsCard
+  expectedRejectedApplicationDetailsCard,
+  expectedFeeEstimateCard
 } from './fixtures.js'
 import { getCardRow } from './utils.js'
 import {
@@ -226,6 +227,31 @@ describe('Marine Licence View Details', () => {
       'renders "$key" row with correct value',
       ({ key, value }) => {
         const card = document.querySelector('#other-permissions-card')
+        const row = getCardRow(card, key)
+
+        expect(row).toBeTruthy()
+        expect(
+          row.querySelector('.govuk-summary-list__value').textContent.trim()
+        ).toBe(value)
+      }
+    )
+  })
+
+  describe('fee estimate card', () => {
+    let document
+
+    beforeEach(async () => {
+      document = await loadViewDetailsPage(getServer())
+    })
+
+    test('renders the fee estimate card', () => {
+      expect(document.querySelector('#fee-estimate-card')).not.toBeNull()
+    })
+
+    test.each(expectedFeeEstimateCard.rows)(
+      'renders "$key" row with correct value',
+      ({ key, value }) => {
+        const card = document.querySelector('#fee-estimate-card')
         const row = getCardRow(card, key)
 
         expect(row).toBeTruthy()

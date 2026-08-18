@@ -88,22 +88,23 @@ export const expectedProjectDetailsCard = {
   ]
 }
 
-export const expectedSiteDetailsCard = {
-  cardTitle: 'Providing the site location',
-  rows: [
-    {
-      key: 'Location coordinates',
-      value: 'Download coordinates as a csv file'
-    }
-  ]
-}
-
 export const expectedOtherPermissionsCard = {
   cardTitle: 'Other permissions',
   rows: [
     {
       key: 'Located in a harbour authority area',
       value: mockSubmittedMarineLicenceApplication.harbourAuthority.details
+    }
+  ]
+}
+
+export const expectedFeeEstimateCard = {
+  cardTitle: 'Fee estimate',
+  rows: [
+    {
+      key: 'Maximum application fee estimate accepted',
+      value:
+        '£1,400 (Does not include potential post-consent monitoring of up to £750)'
     }
   ]
 }

@@ -1,5 +1,7 @@
 {% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
 
+{% if params.amount and params.monitoringAmount %}
+
 {% set rows = [] %}
 
 {% set rowText %}
@@ -37,5 +39,7 @@
     },
     rows: rows
   }) }}
-  
+
+{% endif %}
+
 {% endif %}

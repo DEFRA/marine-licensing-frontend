@@ -7,8 +7,6 @@ import {
 import { loadPage } from '~/tests/integration/shared/app-server.js'
 import { mockSubmittedMarineLicenceApplication } from '~/src/server/test-helpers/mocks/marine-licence-mocks.js'
 import { expectedWaterFrameworkDirectiveCard } from './fixtures.js'
-import { getAuthProvider } from '~/src/server/common/helpers/authenticated-requests.js'
-import { AUTH_STRATEGIES } from '~/src/server/common/constants/auth.js'
 import { validateWaterFrameworkDirective } from '#tests/integration/shared/summary-card-validators.js'
 
 vi.mock('~/src/server/common/helpers/authenticated-requests.js')
@@ -18,11 +16,9 @@ describe('Marine Licence View Details', () => {
   let document
 
   const loadViewDetailsPage = async (server) => {
-    vi.mocked(getAuthProvider).mockReturnValue(AUTH_STRATEGIES.ENTRA_ID)
-
     mockMarineLicence(mockSubmittedMarineLicenceApplication)
     return loadPage({
-      requestUrl: `${marineLicenceRoutes.MARINE_LICENCE_VIEW_DETAILS_INTERNAL_USER}/${mockSubmittedMarineLicenceApplication.id}`,
+      requestUrl: `${marineLicenceRoutes.MARINE_LICENCE_VIEW_DETAILS_PUBLIC}/${mockSubmittedMarineLicenceApplication.id}`,
       server
     })
   }
@@ -31,7 +27,7 @@ describe('Marine Licence View Details', () => {
     document = await loadViewDetailsPage(getServer())
   })
 
-  test('renders the page in Dynamics view', async () => {
+  test('renders the page in public view', async () => {
     expect(getByRole(document, 'heading', { level: 1 })).toHaveTextContent(
       mockSubmittedMarineLicenceApplication.projectName
     )

@@ -74,6 +74,7 @@ export const checkYourAnswersController = {
       invoicingData: formattedMarineLicence.invoicing,
       invoicingChangeLink:
         marineLicenceRoutes.MARINE_LICENCE_CHECK_INVOICING_DETAILS,
+      feeEstimateChangeLink: marineLicenceRoutes.MARINE_LICENCE_FEE_ESTIMATE,
       marinePlanPolicies
     })
   }

@@ -244,6 +244,32 @@ describe('Marine Licence Check Your Answers - site and activity cards', () => {
     })
   })
 
+  describe('fee estimate card', () => {
+    let document
+
+    beforeEach(async () => {
+      document = await loadCyaPage(mockFileUploadMarineLicence)
+    })
+
+    test('renders the marine plan policies card with the correct content', () => {
+      const card = document.querySelector('#fee-estimate-card')
+      expect(card).toBeTruthy()
+      expect(
+        card.querySelector('.govuk-summary-card__title').textContent.trim()
+      ).toBe('Fee estimate')
+
+      const rows = card.querySelectorAll('.govuk-summary-list__row')
+      expect(rows).toHaveLength(1)
+
+      expect(
+        rows[0].querySelector('.govuk-summary-list__key').textContent.trim()
+      ).toBe('Maximum application fee estimate accepted')
+      expect(card.textContent).toContain(
+        '£1,400 (Does not include potential post-consent monitoring of up to £750)'
+      )
+    })
+  })
+
   describe('marine plan policies card', () => {
     let document
 

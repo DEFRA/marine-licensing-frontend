@@ -1,0 +1,37 @@
+{% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
+
+{% set rows = [] %}
+
+{% set _ = rows.push({
+     key: { text:  "Maximum application fee estimate accepted" },
+     value: { text: "£1,400 (Does not include potential post-consent monitoring of up to £750)" },
+     classes: "govuk-summary-list__row--no-border",
+       actions: {
+      items: [
+        {
+          href: params.changeLink + "?from=check-your-answers",
+          text: "Change",
+          visuallyHiddenText: "fee estimate",
+          classes: "govuk-link--no-visited-state"
+        }
+      ]
+    } if not params.isReadOnly
+   })
+%}
+
+{% if rows | length %}
+
+{{ govukSummaryList({
+    card: {
+      title: {
+        text: "Fee estimate"
+    },
+      
+      attributes: {
+        id: "fee-estimate-card"
+      }
+    },
+    rows: rows
+  }) }}
+  
+{% endif %}

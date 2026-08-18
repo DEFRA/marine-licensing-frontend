@@ -148,6 +148,7 @@ describe('#checkYourAnswersController', () => {
       waterFrameworkDirectiveData: expectedWaterFrameworkDirectiveData,
       waterFrameworkDirectiveChangeLink:
         marineLicenceRoutes.MARINE_LICENCE_WATER_FRAMEWORK_DIRECTIVE_REVIEW_YOUR_ANSWERS,
+      feeEstimateChangeLink: '/marine-licence/fee-estimate',
       invoicingData: expectedInvoicingData,
       invoicingChangeLink:
         marineLicenceRoutes.MARINE_LICENCE_CHECK_INVOICING_DETAILS,
@@ -178,6 +179,7 @@ describe('#checkYourAnswersController', () => {
       preferredDates: null,
       coordinatesType: null,
       summaryData: [],
+      feeEstimateChangeLink: '/marine-licence/fee-estimate',
       invoicingChangeLink: '/marine-licence/check-invoicing-details',
       invoicingData: undefined,
       waterFrameworkDirectiveData: {},

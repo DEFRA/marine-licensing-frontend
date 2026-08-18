@@ -121,13 +121,12 @@ export const updateMarineLicenceSiteDetailsMultiple = async (
   await request.yar.commit(h)
 }
 
-export const updateMarineLicenceSiteDetailsBatch = createSiteDetailsBatchUpdater(
-  {
+export const updateMarineLicenceSiteDetailsBatch =
+  createSiteDetailsBatchUpdater({
     cacheKey: MARINE_LICENCE_CACHE_KEY,
     getCache: getMarineLicenceCache,
     getSiteDetails: getSiteDetailsBySite
-  }
-)
+  })
 
 export const updateSingleSiteLocation = (
   request,

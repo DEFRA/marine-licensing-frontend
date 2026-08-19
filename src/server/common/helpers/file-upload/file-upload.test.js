@@ -1,7 +1,10 @@
 import {
   getAllowedExtensions,
   getCdpErrorMessageFromCode,
-  getGeoParserErrorMessage
+  getFileTypeContent,
+  getGeoParserErrorMessage,
+  KML_SITE_NAME_GUIDANCE,
+  SHAPEFILE_SITE_NAME_GUIDANCE
 } from '#src/server/common/helpers/file-upload/file-upload.js'
 import {
   CDP_ERROR_MESSAGES,
@@ -11,6 +14,32 @@ import {
   DEFAULT_GEO_PARSER_ERROR_MESSAGE,
   GEO_PARSER_ERROR_MESSAGES
 } from '#src/server/common/helpers/file-upload/error-messages.js'
+import { UPLOAD_A_FILE } from '#src/server/common/helpers/file-upload/constants.js'
+
+describe('#getFileTypeContent', () => {
+  test('should return KML heading, accept attribute and site name guidance', () => {
+    expect(getFileTypeContent('kml')).toEqual({
+      heading: 'Upload a KML file',
+      acceptAttribute: '.kml',
+      siteNameGuidance: KML_SITE_NAME_GUIDANCE
+    })
+  })
+
+  test('should return shapefile heading, accept attribute and site name guidance', () => {
+    expect(getFileTypeContent('shapefile')).toEqual({
+      heading: 'Upload a shapefile',
+      acceptAttribute: '.zip',
+      siteNameGuidance: SHAPEFILE_SITE_NAME_GUIDANCE
+    })
+  })
+
+  test('should return default content when file type is unknown', () => {
+    expect(getFileTypeContent('unknown')).toEqual({
+      heading: UPLOAD_A_FILE,
+      acceptAttribute: ''
+    })
+  })
+})
 
 describe('#getAllowedExtensions', () => {
   test.each([

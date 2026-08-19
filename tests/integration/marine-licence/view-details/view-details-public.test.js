@@ -50,7 +50,7 @@ describe('Marine Licence View Details', () => {
     })
   })
 
-  describe('fee estimate card', () => {
+  describe('hidden cards', () => {
     let document
 
     beforeEach(async () => {
@@ -59,6 +59,10 @@ describe('Marine Licence View Details', () => {
 
     test('does not render the fee estimate card', () => {
       expect(document.querySelector('#fee-estimate-card')).toBeNull()
+    })
+
+    test('does not render the invoicing card', () => {
+      expect(document.querySelector('#invoicing-card')).toBeNull()
     })
   })
 

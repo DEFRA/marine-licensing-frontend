@@ -121,11 +121,13 @@
         }) }}
       {% endif %}
 
-      {{ appMarineLicenceInvoicingCard({
-        invoicingData: invoicingData,
-        changeLink: invoicingChangeLink,
-        isReadOnly: isReadOnly
-      }) }}
+      {% if isApplicantView %}
+        {{ appMarineLicenceInvoicingCard({
+          invoicingData: invoicingData,
+          changeLink: invoicingChangeLink,
+          isReadOnly: isReadOnly
+        }) }}
+      {% endif %}
 
       {{ appPublicRegisterCard({
         publicRegister: publicRegister,

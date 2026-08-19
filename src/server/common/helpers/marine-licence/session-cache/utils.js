@@ -3,6 +3,11 @@ import { getSiteDetailsBySite } from '#src/server/common/helpers/exemptions/sess
 import { getSiteDetailsBySite as getSiteByIndex } from '#src/server/common/helpers/marine-licence/session-cache/site-details-utils.js'
 import { snapshotActivityLabels } from '#src/server/common/helpers/activity-details/snapshot-activity-labels.js'
 import { SINGLE_SITE_MODE_KEY } from '#src/server/common/constants/cache.js'
+import {
+  buildUploadSiteData,
+  createSiteDetailsBatchUpdater
+} from '#src/server/common/helpers/file-upload/build-uploaded-site-details.js'
+import { withExtractedSiteName } from '#src/server/common/helpers/file-upload/extract-site-name.js'
 
 export const MARINE_LICENCE_CACHE_KEY = 'marineLicence'
 export const SAVED_SITE_DETAILS_CACHE_KEY = 'savedMarineLicenceSiteDetails'
@@ -23,6 +28,10 @@ export const getSavedSiteDetails = (request) =>
 export const setSavedSiteDetails = async (request, h, values) => {
   request.yar.set(SAVED_SITE_DETAILS_CACHE_KEY, values)
   await request.yar.commit(h)
+}
+
+export const getMarineLicenceCache = (request) => {
+  return clone(request.yar.get(MARINE_LICENCE_CACHE_KEY) || {})
 }
 
 export const updateMarineLicenceSiteDetails = async (
@@ -111,80 +120,13 @@ export const updateMarineLicenceSiteDetailsMultiple = async (
 
   await request.yar.commit(h)
 }
-const buildUploadSiteData = ({ status, s3Location, siteDetails }) => ({
-  coordinatesType: siteDetails.coordinatesType,
-  fileUploadType: siteDetails.fileUploadType,
-  uploadedFile: {
-    ...status
-  },
-  s3Location: {
-    s3Bucket: s3Location.s3Bucket,
-    s3Key: s3Location.s3Key,
-    fileId: status.s3Location.fileId,
-    s3Url: status.s3Location.s3Url,
-    checksumSha256: status.s3Location.checksumSha256
-  },
-  featureCount: 1,
-  uploadConfig: null
-})
 
-export const updateMarineLicenceSiteDetailsBatch = (
-  request,
-  status,
-  coordinateData,
-  s3Location,
-  options
-) => {
-  const { isMultipleSitesFile } = options
-  const existingCache = getMarineLicenceCache(request)
-
-  const firstSiteDetails = getSiteDetailsBySite(existingCache)
-  const uploadSiteData = buildUploadSiteData({
-    status,
-    s3Location,
-    siteDetails: firstSiteDetails
+export const updateMarineLicenceSiteDetailsBatch =
+  createSiteDetailsBatchUpdater({
+    cacheKey: MARINE_LICENCE_CACHE_KEY,
+    getCache: getMarineLicenceCache,
+    getSiteDetails: getSiteDetailsBySite
   })
-
-  if (!isMultipleSitesFile) {
-    const updatedSite = {
-      ...uploadSiteData,
-      extractedCoordinates: coordinateData.extractedCoordinates,
-      geoJSON: coordinateData.geoJSON
-    }
-
-    request.yar.set(MARINE_LICENCE_CACHE_KEY, {
-      ...existingCache,
-      siteDetails: [updatedSite]
-    })
-
-    return [updatedSite]
-  }
-
-  const updatedSiteDetails = []
-
-  for (const [index] of coordinateData.geoJSON.features.entries()) {
-    const existingSiteDetails = getSiteDetailsBySite(existingCache, index)
-
-    const updatedSite = {
-      ...existingSiteDetails,
-      ...uploadSiteData,
-      extractedCoordinates: coordinateData.extractedCoordinates[index],
-      geoJSON: {
-        type: coordinateData.geoJSON.type,
-        features: [coordinateData.geoJSON.features[index]]
-      }
-    }
-
-    updatedSiteDetails.push(updatedSite)
-  }
-
-  request.yar.set(MARINE_LICENCE_CACHE_KEY, {
-    ...existingCache,
-    siteDetails: updatedSiteDetails
-  })
-
-  return updatedSiteDetails
-}
 
 export const updateSingleSiteLocation = (
   request,
@@ -201,12 +143,16 @@ export const updateSingleSiteLocation = (
     siteDetails: targetSite
   })
 
-  const updatedSite = {
-    ...targetSite,
-    ...uploadSiteData,
-    extractedCoordinates: coordinateData.extractedCoordinates,
-    geoJSON: coordinateData.geoJSON
-  }
+  const updatedSite = withExtractedSiteName(
+    {
+      ...targetSite,
+      ...uploadSiteData,
+      extractedCoordinates: coordinateData.extractedCoordinates,
+      geoJSON: coordinateData.geoJSON
+    },
+    coordinateData.geoJSON.features[0],
+    { preserveExisting: true }
+  )
 
   const updatedSiteDetails = [...existingCache.siteDetails]
   updatedSiteDetails[targetSiteIndex] = updatedSite
@@ -215,10 +161,6 @@ export const updateSingleSiteLocation = (
     ...existingCache,
     siteDetails: updatedSiteDetails
   })
-}
-
-export const getMarineLicenceCache = (request) => {
-  return clone(request.yar.get(MARINE_LICENCE_CACHE_KEY) || {})
 }
 
 export const setSingleSiteMode = async (request, h, siteIndex) => {

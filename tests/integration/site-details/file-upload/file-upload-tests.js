@@ -19,6 +19,19 @@ export function sharedFileUploadTests({ loadPageWithFileType, projectType }) {
     expect(zipFileText).toBeInTheDocument()
 
     expect(
+      getByText(
+        document,
+        /We'll use a site name for each area in your file if one is included/i
+      )
+    ).toBeInTheDocument()
+    expect(
+      getByText(
+        document,
+        /In a shapefile, put the name in a column such as Name or Site_name for each area/i
+      )
+    ).toBeInTheDocument()
+
+    expect(
       getByText(document, /You can include more than one site/i)
     ).toBeInTheDocument()
 
@@ -43,6 +56,21 @@ export function sharedFileUploadTests({ loadPageWithFileType, projectType }) {
     expect(
       document.body.textContent.includes('You can include more than one site')
     ).toBe(true)
+
+    expect(
+      getByText(
+        document,
+        /We'll use a site name for each area in your file if one is included/i
+      )
+    ).toBeInTheDocument()
+    expect(
+      getByText(document, /In a KML file, use the name of each place/i)
+    ).toBeInTheDocument()
+    expect(
+      document.body.textContent.includes(
+        'In a shapefile, put the name in a column such as Name or Site_name'
+      )
+    ).toBe(false)
 
     expect(getByRole(document, 'link', { name: 'Cancel' })).toHaveAttribute(
       'href',
@@ -78,6 +106,19 @@ export function singleSiteModeTests({ loadPageWithFileType }) {
         'The file you upload must be for a single site.'
       )
     ).toBe(true)
+
+    expect(
+      getByText(
+        document,
+        /We'll use a site name for each area in your file if one is included/i
+      )
+    ).toBeInTheDocument()
+    expect(
+      getByText(
+        document,
+        /In a shapefile, put the name in a column such as Name or Site_name for each area/i
+      )
+    ).toBeInTheDocument()
   })
 
   test('should show KML heading and polygon guidance text only', async () => {
@@ -99,6 +140,16 @@ export function singleSiteModeTests({ loadPageWithFileType }) {
         'The file you upload must be for a single site.'
       )
     ).toBe(true)
+
+    expect(
+      getByText(
+        document,
+        /We'll use a site name for each area in your file if one is included/i
+      )
+    ).toBeInTheDocument()
+    expect(
+      getByText(document, /In a KML file, use the name of each place/i)
+    ).toBeInTheDocument()
 
     expect(getByRole(document, 'link', { name: 'Cancel' })).toHaveAttribute(
       'href',

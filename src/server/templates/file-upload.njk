@@ -37,6 +37,12 @@
     <p class="govuk-body">The file you upload must be for a single site. Your file must only contain a site drawn as a polygon (shape), not a point or a line.</p>
   {% endif %}
 
+  {% if siteNameGuidance %}
+    {% for paragraph in siteNameGuidance %}
+      <p class="govuk-body">{{ paragraph }}</p>
+    {% endfor %}
+  {% endif %}
+
 {% endset %}
 
 {% block content %}

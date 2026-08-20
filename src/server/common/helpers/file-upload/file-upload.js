@@ -16,16 +16,28 @@ import {
 export const CONSTRUCTION_DRAWING_ACCEPT_ATTRIBUTE =
   '.pdf,.bmp,.gif,.jpg,.jpeg,.png,.tif'
 
+export const KML_SITE_NAME_GUIDANCE = [
+  "We'll use a site name for each area in your file if one is included.",
+  'In a KML file, use the name of each place.'
+]
+
+export const SHAPEFILE_SITE_NAME_GUIDANCE = [
+  "We'll use a site name for each area in your file if one is included.",
+  'In a shapefile, put the name in a column such as Name or Site_name for each area.'
+]
+
 export const getFileTypeContent = (fileUploadType) => {
   if (fileUploadType === 'kml') {
     return {
       heading: 'Upload a KML file',
-      acceptAttribute: '.kml'
+      acceptAttribute: '.kml',
+      siteNameGuidance: KML_SITE_NAME_GUIDANCE
     }
   } else if (fileUploadType === 'shapefile') {
     return {
       heading: 'Upload a shapefile',
-      acceptAttribute: '.zip'
+      acceptAttribute: '.zip',
+      siteNameGuidance: SHAPEFILE_SITE_NAME_GUIDANCE
     }
   } else {
     return {

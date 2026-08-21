@@ -116,24 +116,6 @@ const lookupWithTokenRetry = async (request, url) => {
   }
 }
 
-const logLookupOutcome = (
-  request,
-  { propertyNameOrNumber, results, filtered, totalResults, truncated }
-) => {
-  const outcomeSummary =
-    `resultCount=${results.length} filteredCount=${filtered.length} ` +
-    `totalResults=${totalResults} truncated=${truncated} ` +
-    `propertyFilterApplied=${Boolean(propertyNameOrNumber?.trim())}`
-
-  request.logger.info(
-    {
-      event: { action: 'address-lookup-completed' },
-      tenant: { message: outcomeSummary }
-    },
-    'Postcode lookup completed'
-  )
-}
-
 export const lookupAddresses = async (
   request,
   { postcode, propertyNameOrNumber }
@@ -154,15 +136,6 @@ export const lookupAddresses = async (
     // Flag it rather than reporting a confident "no addresses found".
     const filtered = filterByPropertyNameOrNumber(results, propertyNameOrNumber)
     const truncated = totalResults > results.length
-
-    logLookupOutcome(request, {
-      postcode,
-      propertyNameOrNumber,
-      results,
-      filtered,
-      totalResults,
-      truncated
-    })
 
     return {
       results: filtered,

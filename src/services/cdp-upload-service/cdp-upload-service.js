@@ -60,7 +60,17 @@ const CDP_CONSTANTS = {
       code: 'FILE_TOO_LARGE'
     },
     {
-      keywords: ['must be a', 'KML file', 'Shapefile'],
+      // 'file type'/'not supported' are here because a CDP mimeTypes rejection is not
+      // guaranteed to phrase itself as "must be a ...". Anything type-related has to reach
+      // INVALID_FILE_TYPE, or getCdpErrorMessageFromCode falls back to the generic
+      // "could not be uploaded" instead of the per-file-type copy.
+      keywords: [
+        'must be a',
+        'KML file',
+        'Shapefile',
+        'file type',
+        'not supported'
+      ],
       code: 'INVALID_FILE_TYPE'
     },
     { keywords: ['could not be uploaded'], code: 'UPLOAD_ERROR' }

@@ -10,6 +10,7 @@ import {
   createMockH
 } from '#src/server/test-helpers/mocks/helpers.js'
 import { mockMarineLicenceApplication } from '#src/server/test-helpers/mocks/marine-licence-mocks.js'
+import { CONSTRUCTION_DRAWING_ALLOWED_MIME_TYPES } from '#src/server/common/helpers/file-upload/file-upload.js'
 
 vi.mock('~/src/server/common/helpers/marine-licence/session-cache/utils.js')
 vi.mock('~/src/services/cdp-upload-service/index.js')
@@ -76,6 +77,29 @@ describe('uploadConstructionDrawingController', () => {
         s3Path: 'marine-licence/construction-drawings'
       })
     )
+  })
+
+  // Without this, CDP accepts any type and a dropped file is only rejected after it has
+  // been uploaded to S3 - the accept attribute does not apply to drag and drop.
+  it('restricts the CDP upload to the allowed drawing mime types', async () => {
+    const initiate = vi.fn().mockResolvedValue(mockUploadConfig)
+    vi.mocked(cdpUploadService.getCdpUploadService).mockReturnValue({
+      initiate
+    })
+
+    const request = createMockRequest({
+      query: { site: '1', drawing: '2' }
+    })
+    const h = createMockH()
+
+    await uploadConstructionDrawingController.handler(request, h)
+
+    expect(initiate).toHaveBeenCalledWith(
+      expect.objectContaining({
+        allowedMimeTypes: CONSTRUCTION_DRAWING_ALLOWED_MIME_TYPES
+      })
+    )
+    expect(CONSTRUCTION_DRAWING_ALLOWED_MIME_TYPES).toContain('application/pdf')
   })
 
   it('stores the upload config against the site, keyed by drawing index', async () => {

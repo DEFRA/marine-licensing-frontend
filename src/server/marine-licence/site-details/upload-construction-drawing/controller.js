@@ -10,6 +10,7 @@ import { validateSiteAndDrawingParams } from '#src/server/common/helpers/marine-
 import { getConstructionDrawingBackLink } from '#src/server/marine-licence/site-details/utils/back-link.js'
 import {
   CONSTRUCTION_DRAWING_ACCEPT_ATTRIBUTE,
+  CONSTRUCTION_DRAWING_ALLOWED_MIME_TYPES,
   createFileUploadErrorDisplay
 } from '#src/server/common/helpers/file-upload/file-upload.js'
 
@@ -52,7 +53,8 @@ export const uploadConstructionDrawingController = {
       redirectUrl: `${marineLicenceRoutes.MARINE_LICENCE_UPLOAD_CONSTRUCTION_DRAWING_WAIT}?site=${siteNumber}`,
       s3Path: CONSTRUCTION_DRAWING_S3_PATH,
       s3Bucket,
-      maxFileSize: TEN_MB
+      maxFileSize: TEN_MB,
+      allowedMimeTypes: CONSTRUCTION_DRAWING_ALLOWED_MIME_TYPES
     })
 
     await updateMarineLicenceSiteDetails(

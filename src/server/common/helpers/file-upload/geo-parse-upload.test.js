@@ -167,4 +167,55 @@ describe('#validateUploadedFile', () => {
 
     expect(result).toEqual(invalidResult)
   })
+
+  // A file dropped onto the upload page bypasses the input's accept attribute, so a
+  // disallowed type reaches this check. The message has to be the designed copy, not the
+  // extension list the validation service builds by joining them with " or ".
+  test('should use the designed copy for a rejected construction drawing', async () => {
+    vi.mocked(fileUploadModule.getAllowedExtensions).mockReturnValue([
+      'pdf',
+      'bmp',
+      'gif',
+      'jpg',
+      'jpeg',
+      'png',
+      'tif'
+    ])
+    mockValidateFileExtension.mockReturnValue({
+      isValid: false,
+      extension: 'txt',
+      errorMessage:
+        'The selected file must be a PDF or BMP or GIF or JPG or JPEG or PNG or TIF file'
+    })
+
+    const result = await validateUploadedFile(
+      { filename: 'notes.txt' },
+      { fileType: 'construction-drawing' },
+      mockRequest
+    )
+
+    expect(result).toEqual({
+      isValid: false,
+      extension: 'txt',
+      errorMessage:
+        'The selected file must be a PDF or image (.bmp, .gif, .jpg, .jpeg, .png, .tif) file'
+    })
+  })
+
+  test('should keep the validation service message for a file type with no designed copy', async () => {
+    vi.mocked(fileUploadModule.getAllowedExtensions).mockReturnValue(['csv'])
+    mockValidateFileExtension.mockReturnValue({
+      isValid: false,
+      extension: 'txt',
+      errorMessage: 'The selected file must be a CSV file'
+    })
+
+    const result = await validateUploadedFile(
+      { filename: 'notes.txt' },
+      { fileType: 'something-else' },
+      mockRequest
+    )
+
+    expect(result.errorMessage).toBe('The selected file must be a CSV file')
+  })
 })

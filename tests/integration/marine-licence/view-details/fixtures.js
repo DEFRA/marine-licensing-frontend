@@ -70,6 +70,60 @@ export const expectedRejectedApplicationDetailsCard = {
   ]
 }
 
+export const expectedApplicantActivityCards = [
+  {
+    rows: [
+      {
+        key: 'Type of activity',
+        value: 'Construction of new marine works'
+      },
+      {
+        key: "What you're constructing",
+        value: 'Aquaculture trestles or fixed walkways'
+      }
+    ]
+  },
+  {
+    rows: [
+      {
+        key: 'Type of activity',
+        value: 'Continuation of existing deposit activity'
+      },
+      {
+        key: "What deposit activity you're continuing",
+        value: 'Alternative use of dredged material – beach management'
+      }
+    ]
+  }
+]
+
+export const expectedExternalActivityCards = [
+  {
+    rows: [
+      {
+        key: 'Type of activity',
+        value: 'Construction of new marine works'
+      },
+      {
+        key: 'What is being constructed',
+        value: 'Aquaculture trestles or fixed walkways'
+      }
+    ]
+  },
+  {
+    rows: [
+      {
+        key: 'Type of activity',
+        value: 'Continuation of existing deposit activity'
+      },
+      {
+        key: 'What deposit activity is being continued',
+        value: 'Alternative use of dredged material – beach management'
+      }
+    ]
+  }
+]
+
 export const expectedProjectDetailsCard = {
   cardTitle: 'Project details',
   rows: [

@@ -6,7 +6,10 @@ import {
 } from '~/tests/integration/shared/test-setup-helpers.js'
 import { loadPage } from '~/tests/integration/shared/app-server.js'
 import { mockSubmittedMarineLicenceApplication } from '~/src/server/test-helpers/mocks/marine-licence-mocks.js'
-import { expectedWaterFrameworkDirectiveCard } from './fixtures.js'
+import {
+  expectedExternalActivityCards,
+  expectedWaterFrameworkDirectiveCard
+} from './fixtures.js'
 import { getAuthProvider } from '~/src/server/common/helpers/authenticated-requests.js'
 import { AUTH_STRATEGIES } from '~/src/server/common/constants/auth.js'
 import { validateWaterFrameworkDirective } from '#tests/integration/shared/summary-card-validators.js'
@@ -121,6 +124,59 @@ describe('Marine Licence View Details', () => {
         card.querySelectorAll('.govuk-summary-list__actions a')
       ).toHaveLength(0)
       expect(card.querySelector('.govuk-summary-card__actions a')).toBeNull()
+    })
+  })
+
+  describe('site activity details', () => {
+    let document
+
+    beforeEach(async () => {
+      document = await loadViewDetailsPage(getServer())
+    })
+
+    test('renders a activity card for each site and activity', () => {
+      const siteDetails = mockSubmittedMarineLicenceApplication.siteDetails
+
+      let siteCount = 1
+      for (const site of siteDetails) {
+        const activityCount = site.activityDetails.length
+        for (let a = 1; a <= activityCount; a++) {
+          expect(
+            document.querySelector(
+              `#activity-details-site-${siteCount}-activity-${a}`
+            )
+          ).not.toBeNull()
+
+          const card = document.querySelector(
+            `#activity-details-site-${siteCount}-activity-${a}`
+          )
+
+          const rows = card.querySelectorAll('.govuk-summary-list__row')
+
+          const activityIndex = a - 1
+
+          expect(
+            rows[0].querySelector('.govuk-summary-list__key').textContent.trim()
+          ).toBe(expectedExternalActivityCards[activityIndex].rows[0].key)
+
+          expect(
+            rows[0]
+              .querySelector('.govuk-summary-list__value')
+              .textContent.trim()
+          ).toBe(expectedExternalActivityCards[activityIndex].rows[0].value)
+
+          expect(
+            rows[1].querySelector('.govuk-summary-list__key').textContent.trim()
+          ).toBe(expectedExternalActivityCards[activityIndex].rows[1].key)
+
+          expect(
+            rows[1]
+              .querySelector('.govuk-summary-list__value')
+              .textContent.trim()
+          ).toBe(expectedExternalActivityCards[activityIndex].rows[1].value)
+        }
+        siteCount++
+      }
     })
   })
 })

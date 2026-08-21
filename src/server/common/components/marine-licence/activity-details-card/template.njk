@@ -13,7 +13,9 @@
     actions: setSiteDetailsAction(params.activityDetails.activitySubType, 'type-of-activity', params.siteNumber, "", { skipAction: true, activityNumber: params.index }) if not params.changeLink and not params.isReadOnly
 }) %}
 
-{% if params.activityDetails.activityHeading %}
+{% set activityHeadingText = params.activityDetails.activityHeadingExternalUser if params.isApplicant === false else params.activityDetails.activityHeading %}
+
+{% if activityHeadingText %}
 
   {% set activityList %}
     <ul class="govuk-list govuk-list--bullet">
@@ -24,7 +26,7 @@
   {% endset %}
 
   {% set _ = rows.push({
-      key: { text: params.activityDetails.activityHeading},
+      key: { text: activityHeadingText },
       value: { html: activityList },
       actions: setSiteDetailsAction(true,  params.activityDetails.activityLink, params.siteNumber, "", { activityNumber: params.index }) if not params.changeLink and not params.isReadOnly
   }) %}

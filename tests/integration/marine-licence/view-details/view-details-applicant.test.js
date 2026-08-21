@@ -21,7 +21,8 @@ import {
   expectedInvocingCardOrgUser,
   expectedTransferredApplicationDetailsCard,
   expectedRejectedApplicationDetailsCard,
-  expectedFeeEstimateCard
+  expectedFeeEstimateCard,
+  expectedApplicantActivityCards
 } from './fixtures.js'
 import { getCardRow } from './utils.js'
 import {
@@ -209,6 +210,59 @@ describe('Marine Licence View Details', () => {
 
     test('does not render the internal-user-only site-details-card', () => {
       expect(document.querySelector('#site-details-card')).toBeNull()
+    })
+  })
+
+  describe('site activity details', () => {
+    let document
+
+    beforeEach(async () => {
+      document = await loadViewDetailsPage(getServer())
+    })
+
+    test('renders a activity card for each site and activity', () => {
+      const siteDetails = mockSubmittedMarineLicenceApplication.siteDetails
+
+      let siteCount = 1
+      for (const site of siteDetails) {
+        const activityCount = site.activityDetails.length
+        for (let a = 1; a <= activityCount; a++) {
+          expect(
+            document.querySelector(
+              `#activity-details-site-${siteCount}-activity-${a}`
+            )
+          ).not.toBeNull()
+
+          const card = document.querySelector(
+            `#activity-details-site-${siteCount}-activity-${a}`
+          )
+
+          const rows = card.querySelectorAll('.govuk-summary-list__row')
+
+          const activityIndex = a - 1
+
+          expect(
+            rows[0].querySelector('.govuk-summary-list__key').textContent.trim()
+          ).toBe(expectedApplicantActivityCards[activityIndex].rows[0].key)
+
+          expect(
+            rows[0]
+              .querySelector('.govuk-summary-list__value')
+              .textContent.trim()
+          ).toBe(expectedApplicantActivityCards[activityIndex].rows[0].value)
+
+          expect(
+            rows[1].querySelector('.govuk-summary-list__key').textContent.trim()
+          ).toBe(expectedApplicantActivityCards[activityIndex].rows[1].key)
+
+          expect(
+            rows[1]
+              .querySelector('.govuk-summary-list__value')
+              .textContent.trim()
+          ).toBe(expectedApplicantActivityCards[activityIndex].rows[1].value)
+        }
+        siteCount++
+      }
     })
   })
 

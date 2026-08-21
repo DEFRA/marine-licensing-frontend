@@ -27,11 +27,6 @@ const CONSTRUCTION_DRAWING_FILETYPE = 'construction-drawing'
 const getFileUploadRoute = ({ siteIndex, drawingIndex }) =>
   `${marineLicenceRoutes.MARINE_LICENCE_UPLOAD_CONSTRUCTION_DRAWING}?site=${siteIndex + 1}&drawing=${drawingIndex + 1}`
 
-// Mirrors the water framework directive upload. detectedContentType is CDP's reading of
-// the file's actual bytes, so unlike the filename extension check it also catches a file
-// renamed to an allowed extension. Nothing downstream would notice otherwise - a drawing
-// is stored for someone to look at later, never parsed. Absent detection is allowed
-// through rather than failing an upload CDP could not classify.
 const isAllowedFileType = (s3Location) => {
   const detected = s3Location?.detectedContentType
   return !detected || CONSTRUCTION_DRAWING_ALLOWED_MIME_TYPES.includes(detected)

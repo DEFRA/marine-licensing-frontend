@@ -118,7 +118,7 @@ const lookupWithTokenRetry = async (request, url) => {
 
 const logLookupOutcome = (
   request,
-  { postcode, propertyNameOrNumber, results, filtered, totalResults, truncated }
+  { propertyNameOrNumber, results, filtered, totalResults, truncated }
 ) => {
   const outcomeSummary =
     `resultCount=${results.length} filteredCount=${filtered.length} ` +

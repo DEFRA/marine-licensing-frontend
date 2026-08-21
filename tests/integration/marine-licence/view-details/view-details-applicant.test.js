@@ -22,7 +22,8 @@ import {
   expectedTransferredApplicationDetailsCard,
   expectedRejectedApplicationDetailsCard,
   expectedFeeEstimateCard,
-  expectedApplicantActivityCards
+  expectedApplicantActivityCards,
+  expectedPublicRegisterCard
 } from './fixtures.js'
 import { getCardRow } from './utils.js'
 import {
@@ -403,5 +404,30 @@ describe('Marine Licence View Details', () => {
       ).toHaveLength(0)
       expect(card.querySelector('.govuk-summary-card__actions a')).toBeNull()
     })
+  })
+
+  describe('public register card', () => {
+    let document
+
+    beforeEach(async () => {
+      document = await loadViewDetailsPage(getServer())
+    })
+
+    test('renders the public register card', () => {
+      expect(document.querySelector('#public-register-card')).not.toBeNull()
+    })
+
+    test.each(expectedPublicRegisterCard.rows)(
+      'renders "$key" row with correct value',
+      ({ key, value }) => {
+        const card = document.querySelector('#public-register-card')
+        const row = getCardRow(card, key)
+
+        expect(row).toBeTruthy()
+        expect(
+          row.querySelector('.govuk-summary-list__value').textContent.trim()
+        ).toBe(value)
+      }
+    )
   })
 })

@@ -159,6 +159,16 @@ export const expectedFeeEstimateCard = {
   ]
 }
 
+export const expectedPublicRegisterCard = {
+  cardTitle: 'Public register card',
+  rows: [
+    {
+      key: 'Consent to publish project information',
+      value: 'No'
+    }
+  ]
+}
+
 export const expectedWaterFrameworkDirectiveCard = {
   waterFrameworkDirective: {
     [NAUTICAL_MILE_HEADING]: 'Yes',

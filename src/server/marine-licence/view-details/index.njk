@@ -130,10 +130,12 @@
         }) }}
       {% endif %}
 
-      {{ appPublicRegisterCard({
-        publicRegister: publicRegister,
-        isReadOnly: isReadOnly
-      }) }}
+      {% if isApplicantView %}
+        {{ appPublicRegisterCard({
+          publicRegister: publicRegister,
+          isReadOnly: isReadOnly
+        }) }}
+      {% endif %}
       
     </div>
   </div>

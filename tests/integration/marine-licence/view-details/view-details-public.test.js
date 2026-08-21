@@ -67,6 +67,10 @@ describe('Marine Licence View Details', () => {
     test('does not render the invoicing card', () => {
       expect(document.querySelector('#invoicing-card')).toBeNull()
     })
+
+    test('does not render the public register card', () => {
+      expect(document.querySelector('#public-register-card')).toBeNull()
+    })
   })
 
   describe('water framework directive card', () => {

@@ -197,6 +197,89 @@ describe('uploadConstructionDrawingWaitController', () => {
     )
   })
 
+  // The extension check only sees the filename, so a file renamed to .pdf passes it.
+  // Nothing downstream opens a drawing, unlike the geo-parser for KML/shapefile or the
+  // backend 415 for WFD, so this is the only thing standing between a mislabelled file
+  // and the application record.
+  it('stores an error and redirects back when the detected content type is not allowed', async () => {
+    mockCdpService.getStatus.mockResolvedValue({
+      status: 'ready',
+      filename: 'drawing.pdf',
+      s3Location: {
+        s3Key: 'test-key',
+        checksumSha256: 'test-checksum',
+        detectedContentType: 'application/zip'
+      }
+    })
+    vi.mocked(geoParseUpload.validateUploadedFile).mockResolvedValue({
+      isValid: true
+    })
+    const request = createMockRequest({ query: { site: '1' } })
+    const h = createMockH()
+
+    await uploadConstructionDrawingWaitController.handler(request, h)
+
+    expect(mlCacheUtils.updateMarineLicenceSiteDetails).toHaveBeenCalledWith(
+      request,
+      h,
+      0,
+      'uploadError',
+      expect.objectContaining({
+        message:
+          'The selected file must be a PDF or image (.bmp, .gif, .jpg, .jpeg, .png, .tif) file'
+      })
+    )
+    expect(h.redirect).toHaveBeenCalledWith(
+      `${marineLicenceRoutes.MARINE_LICENCE_UPLOAD_CONSTRUCTION_DRAWING}?site=1&drawing=2`
+    )
+    expect(
+      authenticatedRequests.authenticatedPatchRequest
+    ).not.toHaveBeenCalled()
+  })
+
+  it.each([['application/pdf'], ['image/jpeg'], ['image/tiff'], ['image/bmp']])(
+    'persists the drawing when the detected content type is %s',
+    async (detectedContentType) => {
+      mockCdpService.getStatus.mockResolvedValue({
+        status: 'ready',
+        filename: 'drawing.pdf',
+        s3Location: {
+          s3Key: 'test-key',
+          checksumSha256: 'test-checksum',
+          detectedContentType
+        }
+      })
+      vi.mocked(geoParseUpload.validateUploadedFile).mockResolvedValue({
+        isValid: true
+      })
+      const request = createMockRequest({ query: { site: '1' } })
+      const h = createMockH()
+
+      await uploadConstructionDrawingWaitController.handler(request, h)
+
+      expect(authenticatedRequests.authenticatedPatchRequest).toHaveBeenCalled()
+    }
+  )
+
+  // CDP not classifying a file is not the same as classifying it as disallowed - failing
+  // here would block legitimate uploads, and the extension check still applies.
+  it('persists the drawing when CDP reports no detected content type', async () => {
+    mockCdpService.getStatus.mockResolvedValue({
+      status: 'ready',
+      filename: 'drawing.pdf',
+      s3Location: { s3Key: 'test-key', checksumSha256: 'test-checksum' }
+    })
+    vi.mocked(geoParseUpload.validateUploadedFile).mockResolvedValue({
+      isValid: true
+    })
+    const request = createMockRequest({ query: { site: '1' } })
+    const h = createMockH()
+
+    await uploadConstructionDrawingWaitController.handler(request, h)
+
+    expect(authenticatedRequests.authenticatedPatchRequest).toHaveBeenCalled()
+  })
+
   it('maps a CDP virus rejection to the correct message and redirects back to the upload screen', async () => {
     mockCdpService.getStatus.mockResolvedValue({
       status: 'rejected',

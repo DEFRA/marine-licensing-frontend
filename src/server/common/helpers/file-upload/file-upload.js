@@ -13,25 +13,6 @@ import {
   DEFAULT_GEO_PARSER_ERROR_MESSAGE
 } from '#src/server/common/helpers/file-upload/error-messages.js'
 
-export const CONSTRUCTION_DRAWING_ACCEPT_ATTRIBUTE =
-  '.pdf,.bmp,.gif,.jpg,.jpeg,.png,.tif'
-
-// Sent to CDP so a disallowed file is rejected before it reaches S3. The accept attribute
-// above only filters the file picker dialog - a dropped file ignores it entirely - so this
-// is what actually enforces the type. Keep the two lists in step.
-// Aliases are included because the browser sets the part's Content-Type from the OS mime
-// database, which still reports the x- forms for BMP and TIFF on some platforms.
-export const CONSTRUCTION_DRAWING_ALLOWED_MIME_TYPES = [
-  'application/pdf',
-  'image/bmp',
-  'image/x-ms-bmp',
-  'image/gif',
-  'image/jpeg',
-  'image/png',
-  'image/tiff',
-  'image/x-tiff'
-]
-
 export const KML_SITE_NAME_GUIDANCE = [
   "We'll use a site name for each area in your file if one is included.",
   'In a KML file, use the name of each place.'

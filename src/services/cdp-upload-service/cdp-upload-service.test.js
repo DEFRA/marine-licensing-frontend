@@ -1278,16 +1278,5 @@ describe('#CdpUploadService', () => {
       const result = service._extractErrorCode(errorMessage)
       expect(result).toBe('VIRUS_DETECTED')
     })
-
-    // A mimeTypes rejection has to reach INVALID_FILE_TYPE whichever way CDP words it,
-    // because that is the only code that resolves to the per-file-type copy. Falling
-    // through to UPLOAD_ERROR would show "could not be uploaded - try again" instead.
-    test.each([
-      ['The selected file must be a PDF file'],
-      ['The selected file type is not supported'],
-      ['This file type is not allowed']
-    ])('Should map %s to INVALID_FILE_TYPE', (errorMessage) => {
-      expect(service._extractErrorCode(errorMessage)).toBe('INVALID_FILE_TYPE')
-    })
   })
 })

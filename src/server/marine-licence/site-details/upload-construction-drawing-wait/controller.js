@@ -9,7 +9,11 @@ import {
 import { getCdpUploadService } from '#src/services/cdp-upload-service/index.js'
 import { getCdpErrorMessageFromCode } from '#src/server/common/helpers/file-upload/file-upload.js'
 import { handleReadyStatus } from '#src/server/common/helpers/file-upload/upload-status-handler.js'
-import { DEFAULT_ERROR_MESSAGE } from '#src/server/common/helpers/file-upload/error-messages.js'
+import {
+  DEFAULT_ERROR_MESSAGE,
+  FILE_TYPE_ERROR_MESSAGES
+} from '#src/server/common/helpers/file-upload/error-messages.js'
+import { CONSTRUCTION_DRAWING_ALLOWED_MIME_TYPES } from '#src/server/common/constants/construction-drawing.js'
 import {
   UPLOAD_AND_WAIT_VIEW_ROUTE,
   uploadAndWaitPageSettings
@@ -19,6 +23,19 @@ import { config } from '#src/config/config.js'
 import { getConstructionDrawingBackLink } from '#src/server/marine-licence/site-details/utils/back-link.js'
 
 const CONSTRUCTION_DRAWING_FILETYPE = 'construction-drawing'
+
+const getFileUploadRoute = ({ siteIndex, drawingIndex }) =>
+  `${marineLicenceRoutes.MARINE_LICENCE_UPLOAD_CONSTRUCTION_DRAWING}?site=${siteIndex + 1}&drawing=${drawingIndex + 1}`
+
+// Mirrors the water framework directive upload. detectedContentType is CDP's reading of
+// the file's actual bytes, so unlike the filename extension check it also catches a file
+// renamed to an allowed extension. Nothing downstream would notice otherwise - a drawing
+// is stored for someone to look at later, never parsed. Absent detection is allowed
+// through rather than failing an upload CDP could not classify.
+const isAllowedFileType = (s3Location) => {
+  const detected = s3Location?.detectedContentType
+  return !detected || CONSTRUCTION_DRAWING_ALLOWED_MIME_TYPES.includes(detected)
+}
 
 async function storeUploadError(request, h, errorDetails, siteIndex) {
   await updateMarineLicenceSiteDetails(request, h, siteIndex, 'uploadError', {
@@ -116,6 +133,51 @@ async function processValidatedFile(
   )
 }
 
+async function handleReadyUpload(
+  status,
+  uploadConfig,
+  request,
+  h,
+  marineLicence
+) {
+  const redirect = await handleReadyStatus(status, uploadConfig, request, h, {
+    storeUploadError: (req, hh, errorDetails) =>
+      storeUploadError(req, hh, errorDetails, uploadConfig.siteIndex),
+    fileUploadRoute: getFileUploadRoute(uploadConfig)
+  })
+
+  if (redirect) {
+    return redirect
+  }
+
+  if (!isAllowedFileType(status.s3Location)) {
+    request.logger.error(
+      {
+        error: {
+          code: 'INVALID_FILE_TYPE',
+          message: status.s3Location?.detectedContentType,
+          type: CONSTRUCTION_DRAWING_FILETYPE
+        }
+      },
+      'ConstructionDrawingUpload: detected content type not allowed'
+    )
+
+    await storeUploadError(
+      request,
+      h,
+      {
+        message: FILE_TYPE_ERROR_MESSAGES[CONSTRUCTION_DRAWING_FILETYPE],
+        fieldName: 'file'
+      },
+      uploadConfig.siteIndex
+    )
+
+    return h.redirect(getFileUploadRoute(uploadConfig))
+  }
+
+  return processValidatedFile(status, uploadConfig, request, h, marineLicence)
+}
+
 async function processUploadStatus(status, context) {
   const { uploadConfig, request, h, marineLicence } = context
 
@@ -124,15 +186,7 @@ async function processUploadStatus(status, context) {
   }
 
   if (status.status === 'ready') {
-    const redirect = await handleReadyStatus(status, uploadConfig, request, h, {
-      storeUploadError: (req, hh, errorDetails) =>
-        storeUploadError(req, hh, errorDetails, uploadConfig.siteIndex),
-      fileUploadRoute: `${marineLicenceRoutes.MARINE_LICENCE_UPLOAD_CONSTRUCTION_DRAWING}?site=${uploadConfig.siteIndex + 1}&drawing=${uploadConfig.drawingIndex + 1}`
-    })
-    if (redirect) {
-      return redirect
-    }
-    return processValidatedFile(status, uploadConfig, request, h, marineLicence)
+    return handleReadyUpload(status, uploadConfig, request, h, marineLicence)
   }
 
   if (status.status === 'rejected' || status.status === 'error') {

@@ -3,6 +3,7 @@ import { marineLicenceRoutes } from '~/src/server/common/constants/routes.js'
 import {
   mockEmptyActivityDetails,
   mockOutputActivityDetails,
+  mockOutputActivityDetailsDeposit,
   mockOutputEmptyActivityDetails
 } from '#src/server/test-helpers/mocks/marine-licence-mocks.js'
 
@@ -36,7 +37,7 @@ export const testScenarios = [
           ...mockMarineLicenceApplication.siteDetails[0],
           activityDetails: [
             mockOutputActivityDetails,
-            mockOutputActivityDetails
+            mockOutputActivityDetailsDeposit
           ]
         }
       ]

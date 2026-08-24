@@ -12,7 +12,7 @@ describe('Marine Licence Application Details Card Component', () => {
         isTransferred: true
       }
     )
-    expect($componentTransferred('#application-details-card')).toHaveLength(1)
+    expect($componentTransferred('#application-overview-card')).toHaveLength(1)
   })
 
   test('Should have correct card content for transferred application', () => {
@@ -28,7 +28,7 @@ describe('Marine Licence Application Details Card Component', () => {
     )
     expect(
       $componentTransferred('.govuk-summary-card__title').text().trim()
-    ).toBe('Application details')
+    ).toBe('Application overview')
 
     const htmlContent = $componentTransferred.html()
     expect(htmlContent).toContain('Application type')
@@ -83,7 +83,7 @@ describe('Marine Licence Application Details Card Component', () => {
       }
     )
     expect($componentRejected('.govuk-summary-card__title').text().trim()).toBe(
-      'Application details'
+      'Application overview'
     )
 
     const htmlContent = $componentRejected.html()

@@ -3,6 +3,7 @@ import {
   formatActivityMonths,
   formatActivitySubTypeHeading,
   formatActivitySubTypeLabel,
+  formatActivitySubTypeExternalUserHeading,
   formatCompletionDate,
   getOtherActivityLabel,
   mapActivitySelections,
@@ -99,6 +100,30 @@ describe('formatActivitySubTypeHeading', () => {
   })
 })
 
+describe('formatActivitySubTypeexternalUserHeading', () => {
+  test('returns non-applicant heading for construction', () => {
+    expect(
+      formatActivitySubTypeExternalUserHeading('construction-type-1')
+    ).toBe('What is being constructed')
+  })
+
+  test('returns non-applicant heading for deposit', () => {
+    expect(formatActivitySubTypeExternalUserHeading('deposit-type-1')).toBe(
+      'What deposit activity is being continued'
+    )
+  })
+
+  test('returns non-applicant heading for removal', () => {
+    expect(formatActivitySubTypeExternalUserHeading('removal-type-1')).toBe(
+      'What is being removed for the first time'
+    )
+  })
+
+  test('returns null for an unknown activity type', () => {
+    expect(formatActivitySubTypeExternalUserHeading('unknown-type')).toBe(null)
+  })
+})
+
 describe('getOtherActivityLabel', () => {
   test('returns construction label with text', () => {
     expect(getOtherActivityLabel('construction', 'my structure')).toBe(
@@ -171,6 +196,7 @@ describe('parseActivityDetails', () => {
         activityDescription: 'Test description',
         activityDuration: '1 year, 10 months',
         activityHeading: "What you're constructing",
+        activityHeadingExternalUser: 'What is being constructed',
         activityLink:
           '/marine-licence/activity-details/what-are-you-constructing',
         activitySubType: 'Construction of new marine works',

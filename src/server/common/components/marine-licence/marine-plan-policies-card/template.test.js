@@ -27,7 +27,22 @@ describe('Marine Licence Marine Plan Policies Component', () => {
     )
   })
 
-  test('renders one row per policy with code, wording and consideration', () => {
+  test('renders one row per policy with code, wording and consideration for applicant', () => {
+    const $ = renderComponent('marine-licence/marine-plan-policies-card', {
+      policies,
+      isApplicant: true
+    })
+
+    expect($('.govuk-summary-list__row')).toHaveLength(2)
+    const html = $.html()
+    expect(html).toContain('S-CC-1')
+    expect(html).toContain('First policy wording.')
+    expect(html).toContain('My first consideration.')
+    expect(html).toContain('Policy information')
+    expect(html).toContain('Your consideration')
+  })
+
+  test('renders one row per policy with code, wording and consideration for public view', () => {
     const $ = renderComponent('marine-licence/marine-plan-policies-card', {
       policies
     })
@@ -38,7 +53,7 @@ describe('Marine Licence Marine Plan Policies Component', () => {
     expect(html).toContain('First policy wording.')
     expect(html).toContain('My first consideration.')
     expect(html).toContain('Policy information')
-    expect(html).toContain('Your consideration')
+    expect(html).toContain(`Applicant's consideration`)
   })
 
   test('shows a Change link per policy when not read only', () => {

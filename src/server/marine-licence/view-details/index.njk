@@ -64,7 +64,6 @@
       {% endif %}
 
       {{ appMarineLicenceProjectDetailsCard({
-        projectName: projectName,
         projectBackground: projectBackground,
         isReadOnly: isReadOnly,
         preferredDates: preferredDates
@@ -88,7 +87,8 @@
               activityDetails: activityDetails,
               siteNumber: site.siteNumber,
               index: loop.index,
-              isReadOnly: true
+              isReadOnly: true,
+              isApplicant: isApplicantView
             }) }}
           {% endfor %}
         {% endfor %}
@@ -96,6 +96,7 @@
 
       {{ appMarineLicenceMarinePlanPoliciesCard({
         policies: marinePlanPolicies,
+        isApplicant: isApplicantView,
         isReadOnly: true
       }) }}
 
@@ -129,10 +130,12 @@
         }) }}
       {% endif %}
 
-      {{ appPublicRegisterCard({
-        publicRegister: publicRegister,
-        isReadOnly: isReadOnly
-      }) }}
+      {% if isApplicantView %}
+        {{ appPublicRegisterCard({
+          publicRegister: publicRegister,
+          isReadOnly: isReadOnly
+        }) }}
+      {% endif %}
       
     </div>
   </div>

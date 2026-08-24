@@ -70,13 +70,63 @@ export const expectedRejectedApplicationDetailsCard = {
   ]
 }
 
+export const expectedApplicantActivityCards = [
+  {
+    rows: [
+      {
+        key: 'Type of activity',
+        value: 'Construction of new marine works'
+      },
+      {
+        key: "What you're constructing",
+        value: 'Aquaculture trestles or fixed walkways'
+      }
+    ]
+  },
+  {
+    rows: [
+      {
+        key: 'Type of activity',
+        value: 'Continuation of existing deposit activity'
+      },
+      {
+        key: "What deposit activity you're continuing",
+        value: 'Alternative use of dredged material – beach management'
+      }
+    ]
+  }
+]
+
+export const expectedExternalActivityCards = [
+  {
+    rows: [
+      {
+        key: 'Type of activity',
+        value: 'Construction of new marine works'
+      },
+      {
+        key: 'What is being constructed',
+        value: 'Aquaculture trestles or fixed walkways'
+      }
+    ]
+  },
+  {
+    rows: [
+      {
+        key: 'Type of activity',
+        value: 'Continuation of existing deposit activity'
+      },
+      {
+        key: 'What deposit activity is being continued',
+        value: 'Alternative use of dredged material – beach management'
+      }
+    ]
+  }
+]
+
 export const expectedProjectDetailsCard = {
   cardTitle: 'Project details',
   rows: [
-    {
-      key: 'Project name',
-      value: mockSubmittedMarineLicenceApplication.projectName
-    },
     {
       key: 'Project background',
       value: mockSubmittedMarineLicenceApplication.projectBackground
@@ -105,6 +155,16 @@ export const expectedFeeEstimateCard = {
       key: 'Maximum application fee estimate accepted',
       value:
         '£1,400 (Does not include potential post-consent monitoring of up to £750)'
+    }
+  ]
+}
+
+export const expectedPublicRegisterCard = {
+  cardTitle: 'Public register card',
+  rows: [
+    {
+      key: 'Consent to publish project information',
+      value: 'No'
     }
   ]
 }

@@ -39,12 +39,31 @@ export const mockActivityDetails = {
   workingHours: 'Test hours'
 }
 
+export const mockActivityDetailsDeposit = {
+  activityType: 'deposit',
+  activitySubType: 'deposit-type-1',
+  activities: { selections: ['DEP1'] },
+  activityDescription: 'Test description',
+  completionDate: { date: 'yes', reason: 'Test completion' },
+  activityDuration: { years: 1, months: 4 },
+  activityMonths: { months: 'yes', details: 'Test months' },
+  workingHours: 'Test hours'
+}
+
 export const mockOutputActivityDetails = {
   ...mockActivityDetails,
   activityType: 'Construction of new marine works',
   activityDuration: '1 year, 4 months',
   completionDate: mockActivityDetails.completionDate.reason,
   activityMonths: mockActivityDetails.activityMonths.details
+}
+
+export const mockOutputActivityDetailsDeposit = {
+  ...mockActivityDetailsDeposit,
+  activityType: 'Continuation of existing deposit activity',
+  activityDuration: '1 year, 4 months',
+  completionDate: mockActivityDetailsDeposit.completionDate.reason,
+  activityMonths: mockActivityDetailsDeposit.activityMonths.details
 }
 
 export const mockOutputEmptyActivityDetails = {
@@ -121,7 +140,7 @@ export const mockMarineLicenceApplication = {
   projectType: MARINE_LICENCE_KEY,
   siteDetails: [
     {
-      activityDetails: [mockActivityDetails, mockActivityDetails],
+      activityDetails: [mockActivityDetails, mockActivityDetailsDeposit],
       coordinatesType: 'file',
       fileUploadType: 'kml',
       siteName: 'test site name',
